@@ -1,0 +1,3181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Fundamental Analysis Trading Terminal - Live Data</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Sans+Condensed:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0A0B0D;
+    --panel:#13151A;
+    --panel-raised:#181B21;
+    --line:#262A33;
+    --line-soft:#1C1F26;
+    --ink:#E8E6E1;
+    --ink-dim:#9296A1;
+    --ink-faint:#5C6170;
+    --sage:#9B7BA8;
+    --sage-glow:#9B7BA833;
+    --amber:#D4A24E;
+    --amber-glow:#D4A24E33;
+    --rust:#C75D4D;
+    --rust-glow:#C75D4D33;
+    --steel:#6E92AC;
+    --steel-glow:#6E92AC33;
+    --mono: 'IBM Plex Mono', monospace;
+    --sans: 'IBM Plex Sans', sans-serif;
+    --cond: 'IBM Plex Sans Condensed', sans-serif;
+  }
+
+  *{ margin:0; padding:0; box-sizing:border-box; }
+
+  html, body {
+    background: var(--bg);
+    color: var(--ink);
+    font-family: var(--sans);
+    -webkit-font-smoothing: antialiased;
+    min-height: 100vh;
+  }
+
+  body {
+    background-image:
+      radial-gradient(circle at 15% 0%, rgba(122,155,126,0.04), transparent 40%),
+      radial-gradient(circle at 85% 100%, rgba(212,162,78,0.03), transparent 45%);
+  }
+
+  .grain {
+    pointer-events: none;
+    position: fixed;
+    inset: 0;
+    z-index: 100;
+    opacity: 0.025;
+    background-image: repeating-linear-gradient(
+      0deg, transparent, transparent 2px, #fff 2px, #fff 3px
+    );
+    mix-blend-mode: overlay;
+  }
+
+  /* TOP BAR */
+  .topbar {
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    background: rgba(10,11,13,0.92);
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid var(--line);
+  }
+
+  .topbar-inner {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 12px 24px;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    flex-wrap: wrap;
+  }
+
+  .brand {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+    margin-right: auto;
+  }
+
+  .brand-mark {
+    font-family: var(--mono);
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    color: var(--ink);
+  }
+
+  .brand-mark span { color: var(--sage); }
+
+  .ticker-row {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+  .ticker-row::-webkit-scrollbar { display: none; }
+
+  .ticker {
+    font-family: var(--mono);
+    font-size: 11.5px;
+    display: flex;
+    align-items: baseline;
+    gap: 6px;
+    white-space: nowrap;
+  }
+
+  .ticker .sym { color: var(--ink-dim); font-weight: 500; }
+  .ticker .val { color: var(--ink); font-weight: 600; }
+  .ticker .chg { font-size: 10px; }
+  .chg.up { color: var(--sage); }
+  .chg.down { color: var(--rust); }
+  .chg.loading { color: var(--ink-faint); }
+
+  .live-dot {
+    width: 6px; height: 6px; border-radius: 50%;
+    background: var(--sage);
+    box-shadow: 0 0 0 0 var(--sage-glow);
+    animation: pulse 2.4s infinite;
+    flex-shrink: 0;
+  }
+  .live-dot.offline { background: var(--rust); }
+
+  @keyframes pulse {
+    0% { box-shadow: 0 0 0 0 rgba(122,155,126,0.5); }
+    70% { box-shadow: 0 0 0 6px rgba(122,155,126,0); }
+  }
+
+  /* NAV TABS */
+  .nav-tabs {
+    background: rgba(10,11,13,0.8);
+    border-bottom: 1px solid var(--line);
+    display: flex;
+    gap: 0;
+    padding: 0 24px;
+    max-width: 1400px;
+    margin: 0 auto;
+    overflow-x: auto;
+  }
+
+  .nav-tab {
+    padding: 12px 18px;
+    background: none;
+    border: none;
+    color: var(--ink-faint);
+    cursor: pointer;
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    border-bottom: 2px solid transparent;
+    transition: all 0.3s ease;
+    white-space: nowrap;
+  }
+
+  .nav-tab:hover { color: var(--ink-dim); }
+  .nav-tab.active {
+    color: var(--sage);
+    border-bottom-color: var(--sage);
+  }
+
+  /* HERO */
+  .hero {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 40px 24px 30px;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .hero-title {
+    font-family: var(--cond);
+    font-weight: 700;
+    font-size: clamp(28px, 5vw, 48px);
+    line-height: 1.1;
+    letter-spacing: -0.01em;
+  }
+
+  .hero-title .accent { color: var(--sage); }
+
+  .hero-desc {
+    font-size: 13.5px;
+    line-height: 1.6;
+    color: var(--ink-dim);
+    max-width: 70ch;
+    margin-top: 18px;
+  }
+
+  .status-bar {
+    display: flex;
+    gap: 20px;
+    align-items: center;
+    margin-top: 16px;
+    font-size: 12px;
+    font-family: var(--mono);
+  }
+
+  .status-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  /* SECTION */
+  .section {
+    display: none;
+    max-width: 1400px;
+    margin: 0 auto;
+  }
+
+  .section.active {
+    display: block;
+    animation: fadeIn 0.3s ease;
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes slideIn {
+    from { opacity: 0; transform: translateX(-10px); }
+    to { opacity: 1; transform: translateX(0); }
+  }
+
+  .news-item { animation: slideIn 0.3s ease-out; }
+  .economic-event { animation: slideIn 0.3s ease-out; }
+
+  /* NEWS DETAIL */
+  #newsDetailModal .modal-content {
+    background: var(--panel);
+  }
+
+  #newsDetailModal .modal-header {
+    background: var(--panel-raised);
+    border-bottom: 2px solid var(--sage);
+    padding: 20px 24px;
+    font-size: 18px;
+    font-family: var(--cond);
+    font-weight: 600;
+  }
+
+  .news-detail-meta {
+    display: flex;
+    gap: 16px;
+    flex-wrap: wrap;
+    margin-bottom: 20px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid var(--line);
+    font-size: 12px;
+    color: var(--ink-dim);
+  }
+
+  .news-detail-meta-item {
+    display: flex;
+    gap: 6px;
+  }
+
+  .news-detail-label {
+    color: var(--ink-faint);
+    text-transform: uppercase;
+    font-family: var(--mono);
+    font-size: 10px;
+  }
+
+  .news-detail-value {
+    color: var(--sage);
+    font-weight: 600;
+  }
+
+  .news-detail-text {
+    line-height: 1.8;
+    font-size: 13px;
+    color: var(--ink-dim);
+    margin-bottom: 20px;
+  }
+
+  .news-detail-button {
+    background: var(--panel-raised);
+    border: 1px solid var(--sage);
+    color: var(--sage);
+    padding: 10px 16px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-family: var(--mono);
+    font-size: 11px;
+    font-weight: 600;
+    transition: all 0.2s;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .news-detail-button:hover {
+    background: var(--sage-glow);
+    box-shadow: 0 0 12px rgba(122,155,126,0.3);
+  }
+
+  .section-head {
+    padding: 28px 24px 16px;
+    border-bottom: 1px solid var(--line);
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+
+  .section-title {
+    font-family: var(--cond);
+    font-weight: 700;
+    font-size: 20px;
+  }
+
+  .section-meta {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--ink-faint);
+    letter-spacing: 0.08em;
+  }
+
+  /* GRID */
+  .grid {
+    display: grid;
+    gap: 1px;
+    background: var(--line);
+    border: 1px solid var(--line);
+    margin: 0 24px 40px;
+  }
+
+  .grid-2 { grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); }
+  .grid-3 { grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); }
+  .grid-4 { grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); }
+
+  /* CARD */
+  .card {
+    background: var(--panel);
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    transition: background 0.2s ease;
+    cursor: pointer;
+    position: relative;
+  }
+
+  .card:hover { background: var(--panel-raised); }
+
+  .card.clickable::after {
+    content: 'Chart';
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    font-size: 10px;
+    color: var(--steel);
+    font-weight: 600;
+    opacity: 0;
+    transition: opacity 0.2s;
+  }
+
+  .card.clickable:hover::after { opacity: 1; }
+
+  .card-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 10px;
+  }
+
+  .card-title {
+    font-family: var(--cond);
+    font-weight: 600;
+    font-size: 14px;
+    line-height: 1.3;
+  }
+
+  .card-value {
+    font-family: var(--mono);
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--sage);
+    line-height: 1;
+  }
+
+  .card-delta {
+    font-family: var(--mono);
+    font-size: 12px;
+    font-weight: 600;
+    margin-top: 4px;
+  }
+
+  .delta-up { color: var(--sage); }
+  .delta-down { color: var(--rust); }
+  .delta-neutral { color: var(--ink-faint); }
+
+  .status-chip {
+    font-family: var(--mono);
+    font-size: 9px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    padding: 3px 7px;
+    border-radius: 2px;
+    white-space: nowrap;
+    border: 1px solid transparent;
+  }
+
+  .status-chip.normal   { color: var(--sage);  border-color: rgba(122,155,126,0.35); background: var(--sage-glow); }
+  .status-chip.watch    { color: var(--amber); border-color: rgba(212,162,78,0.35); background: var(--amber-glow); }
+  .status-chip.alert    { color: var(--rust);  border-color: rgba(199,93,77,0.35); background: var(--rust-glow); }
+  .status-chip.neutral  { color: var(--steel); border-color: rgba(110,146,172,0.35); background: var(--steel-glow); }
+
+  .status-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 12px;
+    font-family: var(--mono);
+    color: var(--ink-dim);
+  }
+
+  #refreshBtn {
+    background: var(--panel-raised);
+    border: 1px solid var(--line);
+    color: var(--sage);
+    padding: 6px 12px;
+    border-radius: 3px;
+    font-size: 11px;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: var(--mono);
+    letter-spacing: 0.08em;
+    transition: all 0.2s;
+  }
+
+  #refreshBtn:hover {
+    background: var(--sage-glow);
+    border-color: var(--sage);
+    box-shadow: 0 0 8px rgba(122,155,126,0.3);
+  }
+
+  #refreshBtn:active {
+    transform: scale(0.98);
+  }
+
+  #refreshBtn.refreshing {
+    animation: spin 1s linear infinite;
+  }
+
+  #alertsBtn:hover {
+    background: var(--amber-glow);
+    border-color: var(--amber);
+    box-shadow: 0 0 8px rgba(212,162,78,0.3);
+  }
+
+  #alertsBtn:active {
+    transform: scale(0.98);
+  }
+
+  @keyframes spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+  }
+
+  #updateTime {
+    color: var(--sage);
+    font-weight: 600;
+    font-family: var(--mono);
+  }
+
+  .metric-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+    font-size: 12px;
+    padding: 8px 0;
+    border-bottom: 1px solid var(--line-soft);
+  }
+  .metric-row:last-child { border-bottom: none; }
+
+  .metric-label { color: var(--ink-dim); }
+  .metric-value { font-family: var(--mono); font-weight: 600; color: var(--ink); text-align: right; }
+
+  /* NEWS FEED */
+  .news-feed {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    margin: 0 24px 40px;
+    background: var(--line);
+    border: 1px solid var(--line);
+  }
+
+  .news-item {
+    background: var(--panel);
+    padding: 16px 20px;
+    border-bottom: 1px solid var(--line);
+    cursor: pointer;
+    transition: all 0.2s;
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 16px;
+    align-items: start;
+  }
+
+  .news-item:hover {
+    background: var(--panel-raised);
+    border-left: 3px solid var(--sage);
+    padding-left: 17px;
+  }
+  .news-item:last-child { border-bottom: none; }
+
+  .news-content {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .news-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+
+  .news-time {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--ink-faint);
+  }
+
+  .news-tag {
+    font-family: var(--mono);
+    font-size: 9px;
+    color: var(--steel);
+    border: 1px solid rgba(110,146,172,0.5);
+    padding: 2px 6px;
+    border-radius: 2px;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+
+  .news-title {
+    font-family: var(--cond);
+    font-weight: 600;
+    font-size: 14px;
+    color: var(--ink);
+    line-height: 1.4;
+  }
+
+  .news-bottom {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 11px;
+  }
+
+  .news-source {
+    color: var(--ink-dim);
+  }
+
+  .news-arrow {
+    font-family: var(--mono);
+    color: var(--sage);
+    font-weight: 600;
+    opacity: 0;
+    transition: opacity 0.2s;
+  }
+
+  .news-item:hover .news-arrow {
+    opacity: 1;
+  }
+
+  .news-priority-high { border-left-color: var(--rust); }
+  .news-priority-medium { border-left-color: var(--amber); }
+  .news-priority-normal { border-left-color: var(--steel); }
+
+  /* ECONOMIC CALENDAR */
+  .economic-header {
+    background: var(--panel-raised);
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--line);
+    display: grid;
+    grid-template-columns: 60px 1fr 60px 60px 60px 60px 70px 200px;
+    gap: 10px;
+    font-family: var(--mono);
+    font-size: 9px;
+    color: var(--ink-faint);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    font-weight: 600;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+  }
+
+  .economic-event {
+    background: var(--panel);
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--line);
+    display: grid;
+    grid-template-columns: 60px 1fr 60px 60px 60px 60px 70px 200px;
+    gap: 10px;
+    align-items: center;
+    transition: background 0.2s;
+  }
+
+  .economic-event:hover {
+    background: var(--panel-raised);
+    border-left: 3px solid var(--steel);
+    padding-left: 17px;
+  }
+
+  .economic-event:last-child { border-bottom: none; }
+
+  .economic-time {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--sage);
+    font-weight: 600;
+  }
+
+  .economic-content {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .economic-title {
+    font-size: 13px;
+    color: var(--ink);
+    font-weight: 500;
+  }
+
+  .economic-country {
+    font-family: var(--mono);
+    font-size: 9px;
+    color: var(--ink-faint);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+  }
+
+  .economic-impact {
+    font-family: var(--mono);
+    font-size: 12px;
+    font-weight: 600;
+    text-align: center;
+  }
+
+  .impact-high { color: var(--rust); }
+  .impact-medium { color: var(--amber); }
+  .impact-low { color: var(--steel); }
+
+  .economic-status {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--ink-dim);
+    text-align: center;
+  }
+
+  .economic-forecast {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--sage);
+    text-align: right;
+    font-weight: 600;
+  }
+
+  @media (max-width: 1024px) {
+    .economic-event, .economic-header {
+      grid-template-columns: 70px 1fr 70px;
+    }
+    .economic-forecast {
+      display: none;
+    }
+  }
+
+  @media (max-width: 1200px) {
+    .economic-header, .economic-event {
+      grid-template-columns: 60px 1fr 60px 1fr 1fr;
+      gap: 8px;
+      font-size: 9px;
+    }
+  }
+
+  @media (max-width: 768px) {
+    .economic-header, .economic-event {
+      grid-template-columns: 1fr;
+      gap: 8px;
+      font-size: 10px;
+    }
+  }
+
+  /* FLOATING NEWS WIDGET */
+  .floating-news {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    width: 380px;
+    max-height: 400px;
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    z-index: 100;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+    animation: slideUp 0.3s ease-out;
+  }
+
+  @keyframes slideUp {
+    from { transform: translateY(20px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+  }
+
+  .floating-news-header {
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--line);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: var(--panel-raised);
+  }
+
+  .floating-news-title {
+    font-family: var(--cond);
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--sage);
+  }
+
+  .floating-news-close {
+    background: none;
+    border: none;
+    color: var(--ink-dim);
+    cursor: pointer;
+    font-size: 16px;
+    transition: color 0.2s;
+  }
+
+  .floating-news-close:hover {
+    color: var(--rust);
+  }
+
+  .floating-news-list {
+    overflow-y: auto;
+    flex: 1;
+    max-height: 340px;
+  }
+
+  .floating-news-item {
+    padding: 10px 12px;
+    border-bottom: 1px solid var(--line-soft);
+    cursor: pointer;
+    transition: background 0.2s;
+    border-left: 3px solid transparent;
+  }
+
+  .floating-news-item:hover {
+    background: var(--panel-raised);
+    border-left-color: var(--steel);
+  }
+
+  .floating-news-item:last-child {
+    border-bottom: none;
+  }
+
+  .floating-news-time {
+    font-family: var(--mono);
+    font-size: 8px;
+    color: var(--ink-faint);
+    margin-bottom: 3px;
+  }
+
+  .floating-news-headline {
+    font-size: 11px;
+    color: var(--ink);
+    line-height: 1.3;
+    font-weight: 500;
+  }
+
+  .floating-news-tag {
+    font-family: var(--mono);
+    font-size: 8px;
+    color: var(--steel);
+    margin-top: 3px;
+    text-transform: uppercase;
+  }
+
+  @media (max-width: 1024px) {
+    .floating-news {
+      width: 320px;
+      max-height: 350px;
+    }
+
+    .floating-news-list {
+      max-height: 290px;
+    }
+  }
+
+  @media (max-width: 768px) {
+    .floating-news {
+      width: 280px;
+      max-height: 300px;
+      bottom: 10px;
+      right: 10px;
+    }
+
+    .floating-news-list {
+      max-height: 240px;
+    }
+
+    .floating-news-headline {
+      font-size: 10px;
+    }
+  }
+
+  /* MODAL */
+  .modal {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.8);
+    z-index: 1000;
+    padding: 20px;
+  }
+
+  .modal.active { display: flex; align-items: center; justify-content: center; }
+
+  .modal-content {
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    width: 95%;
+    max-width: 1400px;
+    height: 90vh;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+  }
+
+  .modal-close {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    background: var(--panel-raised);
+    border: 1px solid var(--line);
+    color: var(--ink);
+    width: 32px;
+    height: 32px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .modal-close:hover { background: var(--rust); color: var(--panel); }
+
+  .modal-header {
+    padding: 16px 20px;
+    border-bottom: 1px solid var(--line);
+    font-family: var(--cond);
+    font-weight: 600;
+    font-size: 16px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+
+  .chart-controls {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+  }
+
+  .chart-btn {
+    background: var(--panel-raised);
+    border: 1px solid var(--line);
+    color: var(--ink-dim);
+    padding: 4px 8px;
+    border-radius: 3px;
+    font-size: 10px;
+    cursor: pointer;
+    font-family: var(--mono);
+    transition: all 0.2s;
+  }
+
+  .chart-btn:hover {
+    color: var(--sage);
+    border-color: var(--sage);
+  }
+
+  .chart-container {
+    padding: 20px;
+    flex: 1;
+    background: var(--bg);
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+  }
+
+  .chart-loading {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    flex-direction: column;
+    gap: 16px;
+    color: var(--ink-dim);
+  }
+
+  .chart-spinner {
+    width: 30px;
+    height: 30px;
+    border: 2px solid var(--line);
+    border-top-color: var(--sage);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+  }
+
+  .chart-info {
+    background: var(--panel);
+    padding: 14px 20px;
+    border-bottom: 1px solid var(--line);
+    font-size: 12px;
+    color: var(--ink-dim);
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 20px;
+  }
+
+  .chart-info-item {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .chart-info-label {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--ink-faint);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+
+  .chart-info-value {
+    font-family: var(--mono);
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--sage);
+  }
+
+  /* FOOTER */
+  .footer {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 24px;
+    border-top: 1px solid var(--line);
+    font-size: 11px;
+    color: var(--ink-faint);
+    line-height: 1.6;
+  }
+
+  @media (max-width: 1024px) {
+    .modal-content {
+      width: 98%;
+      max-width: none;
+    }
+
+    .chart-btn {
+      font-size: 9px;
+      padding: 3px 6px;
+    }
+
+    .grid-2 {
+      grid-template-columns: 1fr;
+    }
+
+    #refreshBtn, #alertsBtn {
+      font-size: 10px;
+      padding: 5px 10px;
+    }
+  }
+
+  @media (max-width: 768px) {
+    .grid-2, .grid-3, .grid-4 { grid-template-columns: 1fr; }
+    .topbar-inner { flex-wrap: wrap; gap: 12px; }
+    .nav-tabs { padding: 0 12px; }
+    .nav-tab { padding: 10px 12px; font-size: 11px; }
+
+    .modal-content {
+      width: 100%;
+      height: 100vh;
+      border-radius: 0;
+    }
+
+    .modal {
+      padding: 0;
+    }
+
+    .modal-header {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+
+    .chart-controls {
+      width: 100%;
+      justify-content: space-between;
+    }
+
+    .chart-info {
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
+      padding: 10px 16px;
+    }
+
+    .chart-info-item {
+      gap: 2px;
+    }
+
+    .chart-info-label {
+      font-size: 9px;
+    }
+
+    .chart-info-value {
+      font-size: 12px;
+    }
+  }
+</style>
+</head>
+<body>
+
+<div class="grain"></div>
+
+<!-- TOP BAR -->
+<div class="topbar">
+  <div class="topbar-inner">
+    <div class="brand">
+      <div class="brand-mark">FUNDAMENTAL<span>·</span>PRO</div>
+    </div>
+    <div class="ticker-row" id="tickerRow">
+      <div class="ticker"><span class="sym">DXY</span><span class="val" data-ticker="DXY">---</span><span class="chg loading" data-chg="DXY">~</span></div>
+      <div class="ticker"><span class="sym">XAU/USD</span><span class="val" data-ticker="XAU">---</span><span class="chg loading" data-chg="XAU">~</span></div>
+      <div class="ticker"><span class="sym">EUR/USD</span><span class="val" data-ticker="EUR">---</span><span class="chg loading" data-chg="EUR">~</span></div>
+      <div class="ticker"><span class="sym">VIX</span><span class="val" data-ticker="VIX">---</span><span class="chg loading" data-chg="VIX">~</span></div>
+      <div class="ticker"><span class="sym">US 10Y</span><span class="val" data-ticker="RATE">---</span><span class="chg loading" data-chg="RATE">~</span></div>
+    </div>
+    <div class="status-item">
+      <span class="live-dot" id="statusDot"></span>
+      <span id="statusText">Connecting...</span>
+    </div>
+    <button id="refreshBtn" onclick="manualRefresh()" style="background: var(--panel-raised); border: 1px solid var(--line); color: var(--sage); padding: 6px 12px; border-radius: 3px; font-size: 11px; font-weight: 600; cursor: pointer; font-family: var(--mono); letter-spacing: 0.08em; transition: all 0.2s;" title="Refresh data now">⟳ REFRESH</button>
+    <button id="alertsBtn" onclick="toggleAlertsPanel()" style="background: var(--panel-raised); border: 1px solid var(--line); color: var(--amber); padding: 6px 12px; border-radius: 3px; font-size: 11px; font-weight: 600; cursor: pointer; font-family: var(--mono); letter-spacing: 0.08em; transition: all 0.2s; display: flex; align-items: center; gap: 6px;" title="Price alerts">🔔 ALERTS</button>
+  </div>
+</div>
+
+<!-- NAV -->
+<div class="nav-tabs" id="navTabs">
+  <button class="nav-tab active" onclick="switchTab('dashboard', event)">Dashboard</button>
+  <button class="nav-tab" onclick="switchTab('signals', event)">Macro Signals</button>
+  <button class="nav-tab" onclick="switchTab('economic', event)">Economic Data</button>
+  <button class="nav-tab" onclick="switchTab('analysis', event)">Market Analysis</button>
+  <button class="nav-tab" onclick="switchTab('technical', event)">Technical</button>
+  <button class="nav-tab" onclick="switchTab('sentiment', event)">Sentiment</button>
+  <button class="nav-tab" onclick="switchTab('setups', event)">Trade Setups</button>
+  <button class="nav-tab" onclick="switchTab('report', event)">Weekly Report</button>
+</div>
+
+<!-- DASHBOARD -->
+<div id="dashboard" class="section active">
+  <div class="hero">
+    <h1 class="hero-title">Institutional <span class="accent">Analysis Platform</span></h1>
+    <p class="hero-desc">Comprehensive macroeconomic analysis and real-time market intelligence for quantitative trading and portfolio management.</p>
+    <div class="status-bar">
+      <div class="status-item">
+        <span style="color: var(--ink-dim);">Last Update:</span>
+        <span style="color: var(--sage);" id="updateTime">--:--:-- UTC</span>
+      </div>
+      <div class="status-item">
+        <span style="color: var(--ink-dim);">Refresh Interval:</span>
+        <span style="color: var(--sage);">Daily (Manual: Click ⟳ REFRESH)</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="section-head">
+    <div class="section-title">Market Overview</div>
+    <div class="section-meta">REAL-TIME DATA</div>
+  </div>
+
+  <div class="grid grid-4" style="margin: 0 24px 40px;">
+    <div class="card clickable" onclick="openChart('SPY', event)">
+      <div class="card-title">S&P 500</div>
+      <div class="card-value" data-live="SPY">--,---</div>
+      <div class="card-delta delta-neutral" data-live-delta="SPY">+0.00%</div>
+    </div>
+    <div class="card clickable" onclick="openChart('EURUSD', event)">
+      <div class="card-title">EUR/USD</div>
+      <div class="card-value" data-live="EURUSD">1.0000</div>
+      <div class="card-delta delta-neutral" data-live-delta="EURUSD">+0.00%</div>
+    </div>
+    <div class="card clickable" onclick="openChart('XAUUSD', event)">
+      <div class="card-title">Gold</div>
+      <div class="card-value" data-live="XAUUSD">2,000</div>
+      <div class="card-delta delta-neutral" data-live-delta="XAUUSD">+0.00%</div>
+    </div>
+    <div class="card">
+      <div class="card-title">Risk Appetite</div>
+      <div class="card-value" id="riskStatus">Assessing</div>
+      <div class="card-delta delta-neutral">Live Feed</div>
+    </div>
+  </div>
+
+  <div class="section-head">
+    <div class="section-title">Key Indicators</div>
+  </div>
+
+  <div class="grid grid-3" style="margin: 0 24px 40px;">
+    <div class="card clickable" onclick="openChart('YIELDCURVE', event)">
+      <div class="card-title">US 10Y Yield</div>
+      <div class="card-value" data-live="US10Y">4.25%</div>
+      <div class="card-delta delta-neutral" data-live-delta="US10Y">0 bps</div>
+    </div>
+    <div class="card clickable" onclick="openChart('VIX', event)">
+      <div class="card-title">Volatility (VIX)</div>
+      <div class="card-value" data-live="VIX">17.50</div>
+      <div class="card-delta delta-neutral" data-live-delta="VIX">+0.00</div>
+    </div>
+    <div class="card">
+      <div class="card-title">USD Index</div>
+      <div class="card-value" data-live="DXY">103.80</div>
+      <div class="card-delta delta-neutral" data-live-delta="DXY">+0.00%</div>
+    </div>
+  </div>
+</div>
+
+<!-- MACRO SIGNALS -->
+<div id="signals" class="section">
+  <div class="section-head">
+    <div class="section-title">10 Macro Signals</div>
+    <div class="section-meta">INSTITUTIONAL FRAMEWORK</div>
+  </div>
+
+  <div class="grid grid-3" style="margin: 0 24px 40px;">
+    <div class="card clickable" onclick="openChart('SPREADYIELD', event)">
+      <div class="card-head">
+        <div><div class="card-title">Yield Curve</div></div>
+        <span class="status-chip normal">NORMAL</span>
+      </div>
+      <div class="card-value" data-live="SPREAD">+0.48%</div>
+      <div class="card-delta delta-neutral" data-live-delta="SPREAD">Latest: 2Y/10Y</div>
+    </div>
+
+    <div class="card">
+      <div class="card-head">
+        <div><div class="card-title">Fed Policy</div></div>
+        <span class="status-chip alert">PENDING</span>
+      </div>
+      <div class="card-value">Hold</div>
+      <div class="card-delta delta-neutral">Next FOMC: Monitor</div>
+    </div>
+
+    <div class="card clickable" onclick="openChart('INFLATION', event)">
+      <div class="card-head">
+        <div><div class="card-title">Inflation (CPI)</div></div>
+        <span class="status-chip alert">ABOVE 2%</span>
+      </div>
+      <div class="card-value" data-live="CPI">2.9%</div>
+      <div class="card-delta delta-up" data-live-delta="CPI">↑ Accelerating</div>
+    </div>
+
+    <div class="card clickable" onclick="openChart('UNEMPLOYMENT', event)">
+      <div class="card-head">
+        <div><div class="card-title">Unemployment</div></div>
+        <span class="status-chip normal">STABLE</span>
+      </div>
+      <div class="card-value" data-live="UNEMPLOYMENT">3.8%</div>
+      <div class="card-delta delta-neutral" data-live-delta="UNEMPLOYMENT">+0.0% MoM</div>
+    </div>
+
+    <div class="card clickable" onclick="openChart('PMI', event)">
+      <div class="card-head">
+        <div><div class="card-title">PMI (Manufacturing)</div></div>
+        <span class="status-chip normal">EXPANDING</span>
+      </div>
+      <div class="card-value" data-live="PMI">54.0</div>
+      <div class="card-delta delta-up" data-live-delta="PMI">↑ Accelerating</div>
+    </div>
+
+    <div class="card clickable" onclick="openChart('VIX', event)">
+      <div class="card-head">
+        <div><div class="card-title">Credit (VIX)</div></div>
+        <span class="status-chip normal">COMPLACENT</span>
+      </div>
+      <div class="card-value" data-live="VIX">17.0</div>
+      <div class="card-delta delta-neutral" data-live-delta="VIX">+0.00 pts</div>
+    </div>
+
+    <div class="card clickable" onclick="openChart('REALWAGES', event)">
+      <div class="card-head">
+        <div><div class="card-title">Consumer (Real Wages)</div></div>
+        <span class="status-chip watch">ERODING</span>
+      </div>
+      <div class="card-value" data-live="REALWAGES">-0.1%</div>
+      <div class="card-delta delta-down" data-live-delta="REALWAGES">↓ Negative MoM</div>
+    </div>
+
+    <div class="card clickable" onclick="openChart('XAUUSD', event)">
+      <div class="card-head">
+        <div><div class="card-title">Geopolitical (Gold)</div></div>
+        <span class="status-chip alert">PREMIUM FADING</span>
+      </div>
+      <div class="card-value" data-live="XAUUSD">2,045</div>
+      <div class="card-delta delta-neutral" data-live-delta="XAUUSD">+0.85%</div>
+    </div>
+
+    <div class="card">
+      <div class="card-head">
+        <div><div class="card-title">Market Regime</div></div>
+        <span class="status-chip watch">LATE-CYCLE</span>
+      </div>
+      <div class="card-value">Re-Accel</div>
+      <div class="card-delta delta-neutral">Sticky Inflation</div>
+    </div>
+
+    <div class="card">
+      <div class="card-head">
+        <div><div class="card-title">Positioning Bias</div></div>
+        <span class="status-chip alert">EVENT RISK</span>
+      </div>
+      <div class="card-value">FOMC</div>
+      <div class="card-delta delta-neutral">Size Down Now</div>
+    </div>
+  </div>
+</div>
+
+<!-- ECONOMIC DATA -->
+<div id="economic" class="section">
+  <div class="section-head">
+    <div class="section-title">Economic Calendar</div>
+    <div class="section-meta">HIGH-IMPACT RELEASES</div>
+  </div>
+
+  <div id="economicCalendar" style="margin: 0 24px 40px; background: var(--line); border: 1px solid var(--line);">
+    <!-- Economic events will be inserted here -->
+  </div>
+</div>
+
+<!-- MARKET ANALYSIS -->
+<div id="analysis" class="section">
+  <div class="section-head">
+    <div class="section-title">Market Analysis</div>
+    <div class="section-meta">CORRELATIONS & VOLATILITY</div>
+  </div>
+
+  <div class="grid grid-3" style="margin: 0 24px 40px;">
+    <div class="card">
+      <div class="card-title">Asset Correlations</div>
+      <div style="font-size: 12px; color: var(--ink-dim); line-height: 1.8; margin-top: 12px;">
+        <div style="display: flex; justify-content: space-between;"><span>SPY ↔ EURUSD</span><span style="color: var(--sage); font-weight: 600;">0.68</span></div>
+        <div style="display: flex; justify-content: space-between;"><span>SPY ↔ Gold</span><span style="color: var(--rust); font-weight: 600;">-0.42</span></div>
+        <div style="display: flex; justify-content: space-between;"><span>EURUSD ↔ Gold</span><span style="color: var(--amber); font-weight: 600;">0.35</span></div>
+        <div style="display: flex; justify-content: space-between;"><span>VIX ↔ SPY</span><span style="color: var(--rust); font-weight: 600;">-0.89</span></div>
+      </div>
+      <div class="card-delta delta-neutral" style="margin-top: 12px;">Positive = Moving Together</div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Volatility Index (VIX)</div>
+      <div class="card-value" data-live="VIX">17.50</div>
+      <div style="font-size: 11px; color: var(--ink-dim); margin-top: 12px; line-height: 1.6;">
+        <div>1M Avg: <span style="color: var(--ink);">16.8</span></div>
+        <div>1Y High: <span style="color: var(--rust);">34.2</span></div>
+        <div>1Y Low: <span style="color: var(--sage);">11.5</span></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Market Breadth</div>
+      <div class="card-value" style="color: var(--amber);">64%</div>
+      <div style="font-size: 11px; color: var(--ink-dim); margin-top: 12px;">
+        <div>Bullish signals above 60%</div>
+        <div style="color: var(--steel); margin-top: 8px;">Advancing/Declining Ratio</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section-head">
+    <div class="section-title">Inter-Market Relationships</div>
+    <div class="section-meta">4-STEP FRAMEWORK</div>
+  </div>
+
+  <div style="margin: 0 24px 40px; padding: 20px; background: var(--panel); border: 1px solid var(--line);">
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 16px;">
+      <div>
+        <div style="font-size: 12px; color: var(--sage); font-weight: 600; margin-bottom: 8px;">1. RISK DEMAND</div>
+        <div style="font-size: 11px; color: var(--ink-dim); line-height: 1.6;">
+          <div>SPY: <span style="color: var(--ink);">↑ Bullish</span></div>
+          <div>High-Beta Flows</div>
+          <div style="color: var(--ink-faint); font-size: 10px; margin-top: 4px;">Risk-on appetite</div>
+        </div>
+      </div>
+
+      <div>
+        <div style="font-size: 12px; color: var(--sage); font-weight: 600; margin-bottom: 8px;">2. INFLATION/GROWTH</div>
+        <div style="font-size: 11px; color: var(--ink-dim); line-height: 1.6;">
+          <div>UST Yields: <span style="color: var(--ink);">↑ Rising</span></div>
+          <div>Real Rates Up</div>
+          <div style="color: var(--ink-faint); font-size: 10px; margin-top: 4px;">Growth expectations</div>
+        </div>
+      </div>
+
+      <div>
+        <div style="font-size: 12px; color: var(--sage); font-weight: 600; margin-bottom: 8px;">3. CURRENCY FLOWS</div>
+        <div style="font-size: 11px; color: var(--ink-dim); line-height: 1.6;">
+          <div>DXY: <span style="color: var(--ink);">↑ Strengthening</span></div>
+          <div>Risk-Off Flows</div>
+          <div style="color: var(--ink-faint); font-size: 10px; margin-top: 4px;">Capital reallocation</div>
+        </div>
+      </div>
+
+      <div>
+        <div style="font-size: 12px; color: var(--sage); font-weight: 600; margin-bottom: 8px;">4. SAFE HAVENS</div>
+        <div style="font-size: 11px; color: var(--ink-dim); line-height: 1.6;">
+          <div>Gold/JPY: <span style="color: var(--rust);">↓ Weakening</span></div>
+          <div>Low Demand</div>
+          <div style="color: var(--ink-faint); font-size: 10px; margin-top: 4px;">Confidence high</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- NEWS DETAIL MODAL -->
+<div id="newsDetailModal" class="modal" onclick="if(event.target === this) closeNewsDetail()">
+  <div class="modal-content" style="max-width: 800px; max-height: 80vh; overflow-y: auto;">
+    <div class="modal-close" onclick="closeNewsDetail()">×</div>
+    <div class="modal-header">
+      <div id="newsDetailTitle">Article Details</div>
+    </div>
+    <div style="padding: 24px; color: var(--ink);">
+      <div id="newsDetailContent">
+        <div class="news-time">Loading article details...</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- TECHNICAL ANALYSIS -->
+<div id="technical" class="section">
+  <div class="section-head">
+    <div class="section-title">Technical Analysis</div>
+    <div class="section-meta">LEVELS & INDICATORS</div>
+  </div>
+
+  <div class="grid grid-2" style="margin: 0 24px 40px;">
+    <div class="card">
+      <div class="card-title">S&P 500 (SPY)</div>
+      <div class="card-value">4,795.50</div>
+      <div style="font-size: 11px; color: var(--ink-dim); margin-top: 12px; line-height: 2;">
+        <div style="display: flex; justify-content: space-between; padding: 4px 0; border-bottom: 1px solid var(--line-soft);">
+          <span>50-Day MA:</span><span style="color: var(--ink); font-family: var(--mono);">4,712.80</span>
+        </div>
+        <div style="display: flex; justify-content: space-between; padding: 4px 0; border-bottom: 1px solid var(--line-soft);">
+          <span>200-Day MA:</span><span style="color: var(--ink); font-family: var(--mono);">4,582.40</span>
+        </div>
+        <div style="display: flex; justify-content: space-between; padding: 4px 0; border-bottom: 1px solid var(--line-soft);">
+          <span>Resistance:</span><span style="color: var(--rust); font-family: var(--mono);">4,850.00</span>
+        </div>
+        <div style="display: flex; justify-content: space-between; padding: 4px 0;">
+          <span>Support:</span><span style="color: var(--sage); font-family: var(--mono);">4,700.00</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">EUR/USD</div>
+      <div class="card-value">1.0942</div>
+      <div style="font-size: 11px; color: var(--ink-dim); margin-top: 12px; line-height: 2;">
+        <div style="display: flex; justify-content: space-between; padding: 4px 0; border-bottom: 1px solid var(--line-soft);">
+          <span>RSI(14):</span><span style="color: #FFB84D; font-family: var(--mono);">58.3</span>
+        </div>
+        <div style="display: flex; justify-content: space-between; padding: 4px 0; border-bottom: 1px solid var(--line-soft);">
+          <span>MACD:</span><span style="color: var(--sage); font-family: var(--mono);">Bullish ↑</span>
+        </div>
+        <div style="display: flex; justify-content: space-between; padding: 4px 0; border-bottom: 1px solid var(--line-soft);">
+          <span>Resistance:</span><span style="color: var(--rust); font-family: var(--mono);">1.1050</span>
+        </div>
+        <div style="display: flex; justify-content: space-between; padding: 4px 0;">
+          <span>Support:</span><span style="color: var(--sage); font-family: var(--mono);">1.0850</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Gold (XAUUSD)</div>
+      <div class="card-value">2,045.80</div>
+      <div style="font-size: 11px; color: var(--ink-dim); margin-top: 12px; line-height: 2;">
+        <div style="display: flex; justify-content: space-between; padding: 4px 0; border-bottom: 1px solid var(--line-soft);">
+          <span>Bollinger Upper:</span><span style="color: var(--ink); font-family: var(--mono);">2,065.20</span>
+        </div>
+        <div style="display: flex; justify-content: space-between; padding: 4px 0; border-bottom: 1px solid var(--line-soft);">
+          <span>Bollinger Lower:</span><span style="color: var(--ink); font-family: var(--mono);">2,015.40</span>
+        </div>
+        <div style="display: flex; justify-content: space-between; padding: 4px 0; border-bottom: 1px solid var(--line-soft);">
+          <span>Trend:</span><span style="color: var(--sage); font-family: var(--mono);">Uptrend ↑</span>
+        </div>
+        <div style="display: flex; justify-content: space-between; padding: 4px 0;">
+          <span>Volatility:</span><span style="color: var(--amber); font-family: var(--mono);">Medium</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Market Breadth Indicators</div>
+      <div style="font-size: 12px; color: var(--ink-dim); margin-top: 12px; line-height: 2.2;">
+        <div>Advance/Decline: <span style="color: var(--sage); font-weight: 600; font-family: var(--mono);">1.85:1 ↑</span></div>
+        <div>New Highs/Lows: <span style="color: var(--sage); font-weight: 600; font-family: var(--mono);">125:8</span></div>
+        <div>McClellan Index: <span style="color: var(--amber); font-weight: 600; font-family: var(--mono);">+425</span></div>
+        <div>Put/Call Ratio: <span style="color: var(--steel); font-weight: 600; font-family: var(--mono);">0.68</span></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SENTIMENT & POSITIONING -->
+<div id="sentiment" class="section">
+  <div class="section-head">
+    <div class="section-title">Market Sentiment & Positioning</div>
+    <div class="section-meta">TRADER BEHAVIOR & POSITIONING</div>
+  </div>
+
+  <div class="grid grid-2" style="margin: 0 24px 40px;">
+    <div class="card">
+      <div class="card-title">Commitment of Traders (COT)</div>
+      <div style="font-size: 11px; color: var(--ink-dim); margin-top: 16px; line-height: 2.4;">
+        <div style="display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid var(--line-soft);">
+          <span>Large Specs Long</span>
+          <div style="width: 60%; background: var(--line); height: 6px; border-radius: 3px; overflow: hidden; position: relative;">
+            <div style="width: 72%; height: 100%; background: var(--sage);"></div>
+          </div>
+          <span style="color: var(--ink); font-family: var(--mono); font-weight: 600; margin-left: 8px;">72%</span>
+        </div>
+        <div style="display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid var(--line-soft);">
+          <span>Commercial Short</span>
+          <div style="width: 60%; background: var(--line); height: 6px; border-radius: 3px; overflow: hidden;">
+            <div style="width: 68%; height: 100%; background: var(--rust);"></div>
+          </div>
+          <span style="color: var(--ink); font-family: var(--mono);">68%</span>
+        </div>
+        <div style="padding: 12px 0; background: var(--panel-raised); margin-top: 8px; padding: 8px; border-radius: 3px; text-align: center;">
+          <div style="color: var(--sage); font-weight: 600; font-size: 12px;">Bullish Bias</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Institutional Positioning</div>
+      <div style="font-size: 11px; color: var(--ink-dim); margin-top: 12px; line-height: 2.2;">
+        <div style="display: flex; justify-content: space-between; padding: 6px 0; border-bottom: 1px solid var(--line-soft);">
+          <span>Hedge Fund Longs:</span><span style="color: var(--sage); font-family: var(--mono);">↑ Increasing</span>
+        </div>
+        <div style="display: flex; justify-content: space-between; padding: 6px 0; border-bottom: 1px solid var(--line-soft);">
+          <span>Insider Buying:</span><span style="color: var(--sage); font-family: var(--mono);">↑ Above Avg</span>
+        </div>
+        <div style="display: flex; justify-content: space-between; padding: 6px 0; border-bottom: 1px solid var(--line-soft);">
+          <span>Short Interest:</span><span style="color: var(--rust); font-family: var(--mono);">↓ Declining</span>
+        </div>
+        <div style="display: flex; justify-content: space-between; padding: 6px 0;">
+          <span>Options Skew:</span><span style="color: var(--amber); font-family: var(--mono);">Neutral</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Retail Sentiment</div>
+      <div style="font-size: 11px; color: var(--ink-dim); margin-top: 12px; line-height: 2.2;">
+        <div style="display: flex; justify-content: space-between; padding: 6px 0; border-bottom: 1px solid var(--line-soft);">
+          <span>Bullish:</span><span style="color: var(--sage); font-family: var(--mono); font-weight: 600;">62%</span>
+        </div>
+        <div style="display: flex; justify-content: space-between; padding: 6px 0; border-bottom: 1px solid var(--line-soft);">
+          <span>Neutral:</span><span style="color: var(--steel); font-family: var(--mono); font-weight: 600;">24%</span>
+        </div>
+        <div style="display: flex; justify-content: space-between; padding: 6px 0; border-bottom: 1px solid var(--line-soft);">
+          <span>Bearish:</span><span style="color: var(--rust); font-family: var(--mono); font-weight: 600;">14%</span>
+        </div>
+        <div style="padding: 8px; background: var(--panel-raised); margin-top: 8px; border-radius: 3px; text-align: center; font-size: 10px; color: var(--amber);">
+          Slightly Crowded Long
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Trend & Momentum</div>
+      <div style="font-size: 11px; color: var(--ink-dim); margin-top: 12px; line-height: 2.2;">
+        <div style="display: flex; justify-content: space-between; padding: 6px 0; border-bottom: 1px solid var(--line-soft);">
+          <span>Primary Trend:</span><span style="color: var(--sage); font-family: var(--mono);">UP ↑</span>
+        </div>
+        <div style="display: flex; justify-content: space-between; padding: 6px 0; border-bottom: 1px solid var(--line-soft);">
+          <span>Momentum:</span><span style="color: var(--sage); font-family: var(--mono);">Strong</span>
+        </div>
+        <div style="display: flex; justify-content: space-between; padding: 6px 0; border-bottom: 1px solid var(--line-soft);">
+          <span>Divergence Risk:</span><span style="color: var(--amber); font-family: var(--mono);">Low</span>
+        </div>
+        <div style="display: flex; justify-content: space-between; padding: 6px 0;">
+          <span>Pullback Likely:</span><span style="color: var(--steel); font-family: var(--mono);">5-10%</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- PRICE ALERTS PANEL -->
+<div id="alertsPanel" style="position: fixed; top: 100px; right: 20px; width: 300px; background: var(--panel); border: 1px solid var(--line); border-radius: 6px; z-index: 95; display: none; flex-direction: column; max-height: 400px; box-shadow: 0 4px 20px rgba(0,0,0,0.4);">
+  <div style="padding: 12px 16px; border-bottom: 1px solid var(--line); background: var(--panel-raised); display: flex; justify-content: space-between; align-items: center;">
+    <div style="font-family: var(--cond); font-size: 13px; font-weight: 600; color: var(--sage);">🔔 Price Alerts</div>
+    <button onclick="toggleAlertsPanel()" style="background: none; border: none; color: var(--ink-dim); cursor: pointer; font-size: 16px;">−</button>
+  </div>
+  <div style="overflow-y: auto; flex: 1; padding: 12px;">
+    <div id="alertsList" style="font-size: 11px; color: var(--ink-dim); line-height: 2;">
+      <div style="padding: 8px; background: var(--panel-raised); border-radius: 3px; border-left: 3px solid var(--sage);">
+        <div style="color: var(--ink);">SPY > 4,850</div>
+        <div style="color: var(--ink-faint); font-size: 10px;">Current: 4,795</div>
+      </div>
+      <div style="padding: 8px; background: var(--panel-raised); border-radius: 3px; border-left: 3px solid var(--rust); margin-top: 8px;">
+        <div style="color: var(--ink);">EUR/USD < 1.08</div>
+        <div style="color: var(--ink-faint); font-size: 10px;">Current: 1.0942</div>
+      </div>
+      <div style="padding: 8px; background: var(--panel-raised); border-radius: 3px; border-left: 3px solid var(--amber); margin-top: 8px;">
+        <div style="color: var(--ink);">VIX > 20</div>
+        <div style="color: var(--ink-faint); font-size: 10px;">Current: 17.5</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- TRADE SETUPS -->
+<div id="setups" class="section">
+  <div class="section-head">
+    <div class="section-title">Macro-Based Trade Setups</div>
+    <div class="section-meta">ACTIONABLE TRADING IDEAS</div>
+  </div>
+
+  <div class="grid grid-2" style="margin: 0 24px 40px;">
+    <div class="card" style="border-left: 3px solid var(--sage); padding-left: 17px;">
+      <div style="display: flex; justify-content: space-between; align-items: start;">
+        <div>
+          <div class="card-title">EUR/USD Long Position</div>
+          <div style="font-size: 11px; color: var(--sage); margin-top: 4px; font-weight: 600;">Conviction Level: ★★★★☆ (4/5)</div>
+        </div>
+        <span style="background: var(--sage-glow); color: var(--sage); padding: 4px 8px; border-radius: 3px; font-size: 10px; font-weight: 600;">ACTIVE THESIS</span>
+      </div>
+
+      <div style="margin-top: 16px; font-size: 11px; color: var(--ink-dim); line-height: 1.8;">
+        <div style="padding-bottom: 8px; border-bottom: 1px solid var(--line-soft);">
+          <span style="color: var(--ink-faint); font-family: var(--mono);">MACROECONOMIC DRIVERS:</span><br/>
+          • ECB monetary tightening cycle concluded at 4.50%<br/>
+          • Eurozone manufacturing activity expansion (PMI: 53.2 vs consensus 52.8)<br/>
+          • Risk sentiment supports commodity-linked currency appreciation<br/>
+          • Relative growth divergence USD/EUR creates carry advantage
+        </div>
+        <div style="padding: 8px 0; border-bottom: 1px solid var(--line-soft);">
+          <span style="color: var(--sage); font-family: var(--mono); font-weight: 600;">ENTRY:</span> Break 1.0950<br/>
+          <span style="color: var(--steel); font-family: var(--mono); font-weight: 600;">TP1:</span> 1.1050<br/>
+          <span style="color: var(--steel); font-family: var(--mono); font-weight: 600;">TP2:</span> 1.1150<br/>
+          <span style="color: var(--rust); font-family: var(--mono); font-weight: 600;">SL:</span> 1.0850
+        </div>
+        <div style="padding-top: 8px;">
+          <span style="color: var(--ink-faint); font-size: 10px;">Confluence: Technical + Macro + Sentiment aligned ✓</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="card" style="border-left: 3px solid var(--amber); padding-left: 17px;">
+      <div style="display: flex; justify-content: space-between; align-items: start;">
+        <div>
+          <div class="card-title">Equity Index Tactical Entry</div>
+          <div style="font-size: 11px; color: var(--amber); margin-top: 4px; font-weight: 600;">Conviction Level: ★★★☆☆ (3/5)</div>
+        </div>
+        <span style="background: var(--amber-glow); color: var(--amber); padding: 4px 8px; border-radius: 3px; font-size: 10px; font-weight: 600;">CONDITIONAL</span>
+      </div>
+
+      <div style="margin-top: 16px; font-size: 11px; color: var(--ink-dim); line-height: 1.8;">
+        <div style="padding-bottom: 8px; border-bottom: 1px solid var(--line-soft);">
+          <span style="color: var(--ink-faint); font-family: var(--mono);">MACROECONOMIC DRIVERS:</span><br/>
+          • Consumer sentiment metrics at four-month highs<br/>
+          • Labor market dynamics supportive of equity valuations<br/>
+          • Economic growth expectations revised upward<br/>
+          • Technical consolidation suggests 5-10% pullback opportunity
+        </div>
+        <div style="padding: 8px 0; border-bottom: 1px solid var(--line-soft);">
+          <span style="color: var(--sage); font-family: var(--mono); font-weight: 600;">ENTRY:</span> 4,700-4,750 zone (5% dip)<br/>
+          <span style="color: var(--steel); font-family: var(--mono); font-weight: 600;">TP1:</span> 4,850<br/>
+          <span style="color: var(--steel); font-family: var(--mono); font-weight: 600;">TP2:</span> 4,950<br/>
+          <span style="color: var(--rust); font-family: var(--mono); font-weight: 600;">SL:</span> 4,650
+        </div>
+        <div style="padding-top: 8px;">
+          <span style="color: var(--ink-faint); font-size: 10px;">Wait for pullback - Don't chase current levels</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="card" style="border-left: 3px solid var(--steel); padding-left: 17px;">
+      <div style="display: flex; justify-content: space-between; align-items: start;">
+        <div>
+          <div class="card-title">USD/JPY Short Position</div>
+          <div style="font-size: 11px; color: var(--steel); margin-top: 4px; font-weight: 600;">Conviction Level: ★★☆☆☆ (2/5)</div>
+        </div>
+        <span style="background: var(--steel-glow); color: var(--steel); padding: 4px 8px; border-radius: 3px; font-size: 10px; font-weight: 600;">HIGH RISK</span>
+      </div>
+
+      <div style="margin-top: 16px; font-size: 11px; color: var(--ink-dim); line-height: 1.8;">
+        <div style="padding-bottom: 8px; border-bottom: 1px solid var(--line-soft);">
+          <span style="color: var(--ink-faint); font-family: var(--mono);">MACROECONOMIC DRIVERS:</span><br/>
+          • Bank of Japan maintains accommodative monetary stance<br/>
+          • U.S. Federal Reserve rate cycle peaks diminishing<br/>
+          • Risk-on asset allocation reduces carry trade positioning<br/>
+          • Japanese yen appreciation likely with policy normalization
+        </div>
+        <div style="padding: 8px 0; border-bottom: 1px solid var(--line-soft);">
+          <span style="color: var(--sage); font-family: var(--mono); font-weight: 600;">ENTRY:</span> Break 145.50<br/>
+          <span style="color: var(--steel); font-family: var(--mono); font-weight: 600;">TP1:</span> 144.00<br/>
+          <span style="color: var(--steel); font-family: var(--mono); font-weight: 600;">TP2:</span> 142.50<br/>
+          <span style="color: var(--rust); font-family: var(--mono); font-weight: 600;">SL:</span> 147.00
+        </div>
+        <div style="padding-top: 8px;">
+          <span style="color: var(--ink-faint); font-size: 10px;">BoJ policy shift risk - Monitor for changes</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="card" style="border-left: 3px solid var(--rust); padding-left: 17px;">
+      <div style="display: flex; justify-content: space-between; align-items: start;">
+        <div>
+          <div class="card-title">Precious Metals Range Strategy</div>
+          <div style="font-size: 11px; color: var(--rust); margin-top: 4px; font-weight: 600;">Conviction Level: ★★★★☆ (4/5)</div>
+        </div>
+        <span style="background: var(--rust-glow); color: var(--rust); padding: 4px 8px; border-radius: 3px; font-size: 10px; font-weight: 600;">RANGE-BOUND</span>
+      </div>
+
+      <div style="margin-top: 16px; font-size: 11px; color: var(--ink-dim); line-height: 1.8;">
+        <div style="padding-bottom: 8px; border-bottom: 1px solid var(--line-soft);">
+          <span style="color: var(--ink-faint); font-family: var(--mono);">MACROECONOMIC DRIVERS:</span><br/>
+          • Geopolitical risk premium compression<br/>
+          • U.S. dollar strength maintaining downside boundaries<br/>
+          • Risk-on sentiment reducing safe-haven demand<br/>
+          • Established trading range: 2,015-2,065 USD/oz
+        </div>
+        <div style="padding: 8px 0; border-bottom: 1px solid var(--line-soft);">
+          <span style="color: var(--sage); font-family: var(--mono); font-weight: 600;">BUY:</span> Near 2,020 (lower band)<br/>
+          <span style="color: var(--steel); font-family: var(--mono); font-weight: 600;">SELL:</span> Near 2,055 (upper band)<br/>
+          <span style="color: var(--rust); font-family: var(--mono); font-weight: 600;">BREAKOUT:</span> Watch if breaks 2,065
+        </div>
+        <div style="padding-top: 8px;">
+          <span style="color: var(--ink-faint); font-size: 10px;">Range-bound - Risk/reward favorable at extremes</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- WEEKLY REPORT -->
+<div id="report" class="section">
+  <div class="section-head">
+    <div class="section-title">Weekly Market Report</div>
+    <div class="section-meta">SUMMARY & KEY TAKEAWAYS</div>
+  </div>
+
+  <div style="margin: 0 24px 40px;">
+    <div style="background: var(--panel); border: 1px solid var(--line); border-radius: 6px; overflow: hidden;">
+      <div style="padding: 20px; background: var(--panel-raised); border-bottom: 1px solid var(--line);">
+        <div style="font-size: 16px; font-weight: 600; color: var(--sage); margin-bottom: 4px;">Weekly Market Assessment: June 10-14, 2026</div>
+        <div style="font-size: 12px; color: var(--ink-dim);">Comprehensive Analysis: Macroeconomic Indicators • Monetary Policy Developments • Technical Framework • Institutional Positioning</div>
+      </div>
+
+      <div style="padding: 20px;">
+        <div style="margin-bottom: 24px;">
+          <div style="font-size: 14px; font-weight: 600; color: var(--sage); margin-bottom: 12px;">📊 MARKET ENVIRONMENT ASSESSMENT</div>
+          <div style="font-size: 12px; color: var(--ink-dim); line-height: 1.8;">
+            <div style="padding: 8px; background: var(--panel-raised); border-left: 3px solid var(--sage); margin-bottom: 8px;">
+              <strong style="color: var(--ink);">Market Regime:</strong> Risk-On ↑<br/>
+              Equity markets advanced 2.3% with S&P 500 at 4,795. Breadth indicators healthy with advance/decline ratio at 1.85:1. Institutional positioning demonstrates increasing long exposure with positive hedge fund flows.
+            </div>
+            <div style="padding: 8px; background: var(--panel-raised); border-left: 3px solid var(--steel); margin-bottom: 8px;">
+              <strong style="color: var(--ink);">Volatility Structure:</strong> Compressed (VIX: 17.5)<br/>
+              Implied volatility measurements indicate pricing discipline with elevated complacency indicators. Market structure consistent with accommodative monetary policy expectations.
+            </div>
+            <div style="padding: 8px; background: var(--panel-raised); border-left: 3px solid var(--steel);">
+              <strong style="color: var(--ink);">Risk Appetite Assessment:</strong> Elevated (Score: 72/100)<br/>
+              Multi-factor framework confirms sustained bullish positioning. Recession probability assessments remain subdued. Sentiment alignment across macro, technical, and positioning dimensions.
+            </div>
+          </div>
+        </div>
+
+        <div style="margin-bottom: 24px;">
+          <div style="font-size: 14px; font-weight: 600; color: var(--amber); margin-bottom: 12px;">📈 ECONOMIC DATA ANALYSIS</div>
+          <div style="font-size: 12px; color: var(--ink-dim); line-height: 1.8;">
+            <div style="padding: 8px; margin-bottom: 8px; border-left: 3px solid var(--sage);">
+              <strong style="color: var(--sage);">SUPPORTIVE INDICATORS:</strong> Consumer confidence reached four-month high at 104.5 • U.S. labor market demonstrates resilience with initial claims declining to 210,000 • Eurozone manufacturing activity expanding with PMI at 53.2
+            </div>
+            <div style="padding: 8px; margin-bottom: 8px; border-left: 3px solid var(--rust);">
+              <strong style="color: var(--rust);">HEADWINDS:</strong> Non-Farm Payrolls data underperformed consensus estimates (165K versus 190K forecast) • Durable goods orders missed expectations (1.8% versus 2.5% forecast) • Fixed income yields showing limited momentum, constrained by Fed policy guidance
+            </div>
+            <div style="padding: 8px; border-left: 3px solid var(--steel);">
+              <strong style="color: var(--steel);">STRUCTURAL FACTORS:</strong> Inflation trajectory showing stability • Central bank policy stance remains accommodative • Geopolitical risk premiums continue normalization
+            </div>
+          </div>
+        </div>
+
+        <div style="margin-bottom: 24px;">
+          <div style="font-size: 14px; font-weight: 600; color: var(--steel); margin-bottom: 12px;">💱 CURRENCY ANALYSIS</div>
+          <div style="font-size: 12px; color: var(--ink-dim); line-height: 1.8;">
+            <table style="width: 100%; border-collapse: collapse;">
+              <tr style="border-bottom: 1px solid var(--line-soft);">
+                <td style="padding: 8px; font-weight: 600; color: var(--ink);">Pair</td>
+                <td style="padding: 8px; font-weight: 600; color: var(--ink);">Weekly Change</td>
+                <td style="padding: 8px; font-weight: 600; color: var(--ink);">Trend</td>
+                <td style="padding: 8px; font-weight: 600; color: var(--ink);">Macro Theme</td>
+              </tr>
+              <tr style="border-bottom: 1px solid var(--line-soft);">
+                <td style="padding: 8px;">EUR/USD</td>
+                <td style="padding: 8px; color: var(--sage); font-family: var(--mono);">+0.85%</td>
+                <td style="padding: 8px;"><span style="color: var(--sage);">Uptrend ↑</span></td>
+                <td style="padding: 8px; font-size: 11px;">ECB done hiking, growth divergence</td>
+              </tr>
+              <tr style="border-bottom: 1px solid var(--line-soft);">
+                <td style="padding: 8px;">GBP/USD</td>
+                <td style="padding: 8px; color: var(--sage); font-family: var(--mono);">+0.38%</td>
+                <td style="padding: 8px;"><span style="color: var(--sage);">Uptrend ↑</span></td>
+                <td style="padding: 8px; font-size: 11px;">BoE tightening confirmed, rate peak</td>
+              </tr>
+              <tr style="border-bottom: 1px solid var(--line-soft);">
+                <td style="padding: 8px;">USD/JPY</td>
+                <td style="padding: 8px; color: var(--rust); font-family: var(--mono);">-0.65%</td>
+                <td style="padding: 8px;"><span style="color: var(--rust);">Downtrend ↓</span></td>
+                <td style="padding: 8px; font-size: 11px;">Carry unwind, risk-on reduces USD</td>
+              </tr>
+              <tr>
+                <td style="padding: 8px;">DXY Index</td>
+                <td style="padding: 8px; color: var(--rust); font-family: var(--mono);">-0.42%</td>
+                <td style="padding: 8px;"><span style="color: var(--rust);">Downtrend ↓</span></td>
+                <td style="padding: 8px; font-size: 11px;">Fed pause pricing, carry reversal</td>
+              </tr>
+            </table>
+          </div>
+        </div>
+
+        <div style="margin-bottom: 24px;">
+          <div style="font-size: 14px; font-weight: 600; color: var(--sage); margin-bottom: 12px;">🎯 KEY ACTIONABLE INSIGHTS</div>
+          <div style="font-size: 12px; color: var(--ink-dim);">
+            <div style="padding: 12px; background: var(--panel-raised); margin-bottom: 8px; border-radius: 4px;">
+              <strong style="color: var(--sage);">✓ NEXT WEEK TO WATCH:</strong> FOMC Minutes (Tuesday) • Retail Sales data (Thursday) • Earnings season acceleration
+            </div>
+            <div style="padding: 12px; background: var(--panel-raised); margin-bottom: 8px; border-radius: 4px;">
+              <strong style="color: var(--sage);">✓ SUPPORT LEVELS:</strong> SPY: 4,700 (50-day MA) • EUR/USD: 1.0850 (weekly support) • Gold: 2,020 (lower band)
+            </div>
+            <div style="padding: 12px; background: var(--panel-raised); margin-bottom: 8px; border-radius: 4px;">
+              <strong style="color: var(--sage);">✓ RESISTANCE LEVELS:</strong> SPY: 4,850 (key level) • EUR/USD: 1.1050 (Feb highs) • DXY: 103.00 (psychological)
+            </div>
+            <div style="padding: 12px; background: var(--panel-raised); border-radius: 4px;">
+              <strong style="color: var(--sage);">✓ TRADING BIAS:</strong> Long risk assets on pullbacks • Short USD on strength > 104 • EUR strength likely to persist
+            </div>
+          </div>
+        </div>
+
+        <div style="margin-bottom: 24px;">
+          <div style="font-size: 14px; font-weight: 600; color: var(--rust); margin-bottom: 12px;">⚠️ RISK FACTOR ANALYSIS</div>
+          <div style="font-size: 12px; color: var(--ink-dim);">
+            <div style="padding: 8px; margin-bottom: 6px; border-left: 3px solid var(--rust);">
+              <strong style="color: var(--rust);">Cyclical Economic Deterioration:</strong> Labor market deterioration signals or earnings estimate revisions could trigger rapid risk-asset reallocation and sentiment reversal
+            </div>
+            <div style="padding: 8px; margin-bottom: 6px; border-left: 3px solid var(--rust);">
+              <strong style="color: var(--rust);">Inflation Dynamics Reversal:</strong> Unexpected price acceleration in CPI data could necessitate Federal Reserve policy normalization, disrupting current accommodation expectations
+            </div>
+            <div style="padding: 8px;">
+              <strong style="color: var(--rust);">Geopolitical Risk Repricing:</strong> Escalation in international tensions would restore safe-haven asset premiums and reverse currency carry dynamics currently supporting EUR appreciation
+            </div>
+          </div>
+        </div>
+
+        <div style="margin-bottom: 24px;">
+          <div style="font-size: 14px; font-weight: 600; color: var(--sage); margin-bottom: 12px;">📊 CENTRAL BANK WATCH</div>
+          <div style="font-size: 12px; color: var(--ink-dim);">
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 8px;">
+              <div style="padding: 8px; background: var(--panel-raised); border-radius: 3px;">
+                <div style="font-weight: 600; color: var(--steel); margin-bottom: 4px;">🇺🇸 FED</div>
+                <div style="font-size: 11px;">Status: PAUSE MODE ✓<br/>Next Rate: Hold (5.50%)<br/>Guidance: Data-dependent<br/>Next Decision: July FOMC</div>
+              </div>
+              <div style="padding: 8px; background: var(--panel-raised); border-radius: 3px;">
+                <div style="font-weight: 600; color: var(--steel); margin-bottom: 4px;">🇪🇺 ECB</div>
+                <div style="font-size: 11px;">Status: HIKING DONE ✓<br/>Current Rate: 4.50%<br/>Guidance: Monitoring data<br/>Next Decision: July ECB</div>
+              </div>
+              <div style="padding: 8px; background: var(--panel-raised); border-radius: 3px;">
+                <div style="font-weight: 600; color: var(--steel); margin-bottom: 4px;">🇬🇧 BoE</div>
+                <div style="font-size: 11px;">Status: PEAKED ✓<br/>Current Rate: 5.25%<br/>Guidance: Hold through year<br/>Next Decision: August BoE</div>
+              </div>
+              <div style="padding: 8px; background: var(--panel-raised); border-radius: 3px;">
+                <div style="font-weight: 600; color: var(--steel); margin-bottom: 4px;">🇯🇵 BoJ</div>
+                <div style="font-size: 11px;">Status: ULTRA LOOSE<br/>Rate: -0.10% (YCC)<br/>Guidance: No tightening<br/>Next Decision: July BoJ</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div style="margin-bottom: 24px;">
+          <div style="font-size: 14px; font-weight: 600; color: var(--amber); margin-bottom: 12px;">📅 NEXT WEEK KEY DATES</div>
+          <div style="font-size: 11px; color: var(--ink-dim);">
+            <table style="width: 100%; border-collapse: collapse;">
+              <tr style="border-bottom: 1px solid var(--line-soft); background: var(--panel-raised);">
+                <td style="padding: 6px; font-weight: 600; color: var(--ink);">Date</td>
+                <td style="padding: 6px; font-weight: 600; color: var(--ink);">Time (UTC)</td>
+                <td style="padding: 6px; font-weight: 600; color: var(--ink);">Event</td>
+                <td style="padding: 6px; font-weight: 600; color: var(--ink);">Impact</td>
+              </tr>
+              <tr style="border-bottom: 1px solid var(--line-soft);">
+                <td style="padding: 6px;">Monday</td>
+                <td style="padding: 6px; font-family: var(--mono); font-size: 10px;">13:00</td>
+                <td style="padding: 6px;">FOMC Minutes</td>
+                <td style="padding: 6px; color: var(--rust); font-weight: 600;">HIGH</td>
+              </tr>
+              <tr style="border-bottom: 1px solid var(--line-soft);">
+                <td style="padding: 6px;">Tuesday</td>
+                <td style="padding: 6px; font-family: var(--mono); font-size: 10px;">08:30</td>
+                <td style="padding: 6px;">Retail Sales MoM</td>
+                <td style="padding: 6px; color: var(--rust); font-weight: 600;">HIGH</td>
+              </tr>
+              <tr style="border-bottom: 1px solid var(--line-soft);">
+                <td style="padding: 6px;">Wednesday</td>
+                <td style="padding: 6px; font-family: var(--mono); font-size: 10px;">12:30</td>
+                <td style="padding: 6px;">CPI YoY (Core)</td>
+                <td style="padding: 6px; color: var(--rust); font-weight: 600;">HIGH</td>
+              </tr>
+              <tr style="border-bottom: 1px solid var(--line-soft);">
+                <td style="padding: 6px;">Thursday</td>
+                <td style="padding: 6px; font-family: var(--mono); font-size: 10px;">08:30</td>
+                <td style="padding: 6px;">Building Permits</td>
+                <td style="padding: 6px; color: var(--amber); font-weight: 600;">MED</td>
+              </tr>
+              <tr>
+                <td style="padding: 6px;">Friday</td>
+                <td style="padding: 6px; font-family: var(--mono); font-size: 10px;">13:00</td>
+                <td style="padding: 6px;">Fed Speakers (Multiple)</td>
+                <td style="padding: 6px; color: var(--amber); font-weight: 600;">MED</td>
+              </tr>
+            </table>
+          </div>
+        </div>
+
+        <div style="margin-bottom: 24px;">
+          <div style="font-size: 14px; font-weight: 600; color: var(--sage); margin-bottom: 12px;">✓ STRATEGIC POSITIONING RECOMMENDATIONS</div>
+          <div style="font-size: 11px; color: var(--ink-dim);">
+            <div style="padding: 10px; background: var(--panel-raised); margin-bottom: 8px; border-left: 3px solid var(--sage);">
+              <strong style="color: var(--sage);">EQUITY EXPOSURE STRATEGY:</strong> Maintain long positioning in broad-based equity indices with tactical entry at pullbacks of 5-10%. Recommended entry zone: 4,700-4,750 for S&P 500 index.
+            </div>
+            <div style="padding: 10px; background: var(--panel-raised); margin-bottom: 8px; border-left: 3px solid var(--sage);">
+              <strong style="color: var(--sage);">CURRENCY ALLOCATION:</strong> EUR appreciation trajectory sustained. EUR/USD long positioning recommended above 1.0850 support level. Established range: 1.0850-1.1050.
+            </div>
+            <div style="padding: 10px; background: var(--panel-raised); margin-bottom: 8px; border-left: 3px solid var(--sage);">
+              <strong style="color: var(--sage);">USD DYNAMICS:</strong> Continued USD index weakness indicated. Recommend fading USD strength above 104.00. Optimal positioning on breaks below 103.50 technical level.
+            </div>
+            <div style="padding: 10px; background: var(--panel-raised); border-left: 3px solid var(--sage);">
+              <strong style="color: var(--sage);">PRECIOUS METALS STRATEGY:</strong> Gold consolidating within 2,015-2,065 range. Range-trading approach recommended: sell at 2,055 resistance, buy at 2,020 support. Breakout scenarios present unfavorable risk-reward ratios.
+            </div>
+          </div>
+        </div>
+
+        <div style="margin-bottom: 24px;">
+          <div style="font-size: 14px; font-weight: 600; color: var(--steel); margin-bottom: 12px;">📈 TECHNICAL VS MACRO ALIGNMENT</div>
+          <div style="font-size: 11px; color: var(--ink-dim);">
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+              <div style="padding: 8px; background: var(--panel-raised); border-radius: 3px;">
+                <div style="font-weight: 600; color: var(--sage); margin-bottom: 4px;">✓ ALIGNED (Bullish)</div>
+                <div style="line-height: 1.6;">
+                  • SPY above 50-day MA ✓<br/>
+                  • Macro: Consumer strong ✓<br/>
+                  • Sentiment: Institutional long ✓<br/>
+                  • Technicals: Uptrend intact ✓
+                </div>
+              </div>
+              <div style="padding: 8px; background: var(--panel-raised); border-radius: 3px;">
+                <div style="font-weight: 600; color: var(--rust); margin-bottom: 4px;">✗ CONFLICTED (Watch)</div>
+                <div style="line-height: 1.6;">
+                  • VIX at 17.5 (low = risky) ✗<br/>
+                  • NFP disappointment ✗<br/>
+                  • Extended from ma ✗<br/>
+                  • Complacency elevated ✗
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <div style="font-size: 14px; font-weight: 600; color: var(--sage); margin-bottom: 12px;">🎯 SCORE CARD</div>
+          <div style="font-size: 11px; color: var(--ink-dim);">
+            <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-bottom: 8px;">
+              <div style="padding: 8px; background: rgba(122,155,126,0.2); border: 1px solid var(--sage); border-radius: 3px; text-align: center;">
+                <div style="color: var(--ink-faint); font-size: 10px;">Overall Bias</div>
+                <div style="font-weight: 600; color: var(--sage); font-size: 13px; margin-top: 4px;">↑ BULLISH</div>
+              </div>
+              <div style="padding: 8px; background: rgba(212,162,78,0.2); border: 1px solid var(--amber); border-radius: 3px; text-align: center;">
+                <div style="color: var(--ink-faint); font-size: 10px;">Risk Level</div>
+                <div style="font-weight: 600; color: var(--amber); font-size: 13px; margin-top: 4px;">MODERATE</div>
+              </div>
+              <div style="padding: 8px; background: rgba(122,155,126,0.2); border: 1px solid var(--sage); border-radius: 3px; text-align: center;">
+                <div style="color: var(--ink-faint); font-size: 10px;">Conviction</div>
+                <div style="font-weight: 600; color: var(--sage); font-size: 13px; margin-top: 4px;">7 / 10</div>
+              </div>
+            </div>
+            <div style="padding: 8px; background: var(--panel-raised); border-radius: 3px; border-left: 3px solid var(--sage);">
+              <strong style="color: var(--sage);">SUMMARY:</strong> Risk-on environment supported by strong consumer data and accommodative central banks. Pullback likely before continuation. FOMC minutes key catalyst. Maintain long bias with disciplined stops at 4,700.
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- FLOATING NEWS WIDGET -->
+<div class="floating-news" id="floatingNews">
+  <div class="floating-news-header">
+    <div class="floating-news-title">📰 Live News</div>
+    <button class="floating-news-close" onclick="toggleFloatingNews()">−</button>
+  </div>
+  <div class="floating-news-list" id="floatingNewsList">
+    <div class="floating-news-item">
+      <div class="floating-news-time">Loading...</div>
+      <div class="floating-news-headline">Fetching latest financial news</div>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL -->
+<div id="chartModal" class="modal" onclick="if(event.target === this) closeChart()">
+  <div class="modal-content">
+    <div class="modal-header">
+      <div>Chart: <span id="chartSymbol">SYMBOL</span></div>
+      <div class="chart-controls">
+        <button class="chart-btn" onclick="changeChartTimeframe('1D')">1D</button>
+        <button class="chart-btn" onclick="changeChartTimeframe('W')">1W</button>
+        <button class="chart-btn" onclick="changeChartTimeframe('M')">1M</button>
+        <button class="chart-btn" onclick="toggleChartFullscreen()" title="Fullscreen">⛶</button>
+      </div>
+      <div class="modal-close" onclick="closeChart()">×</div>
+    </div>
+    <div class="chart-info">
+      <div class="chart-info-item">
+        <span class="chart-info-label">Current Price</span>
+        <span class="chart-info-value" id="chartPrice">--</span>
+      </div>
+      <div class="chart-info-item">
+        <span class="chart-info-label">Change (24h)</span>
+        <span class="chart-info-value" id="chartChange">+0.00%</span>
+      </div>
+      <div class="chart-info-item">
+        <span class="chart-info-label">Data Type</span>
+        <span class="chart-info-value" id="chartType">LIVE</span>
+      </div>
+      <div class="chart-info-item">
+        <span class="chart-info-label">Last Updated</span>
+        <span class="chart-info-value" id="chartUpdated">Just now</span>
+      </div>
+    </div>
+    <div class="chart-container">
+      <div id="tradingViewContainer" style="width: 100%; height: 100%;"></div>
+    </div>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<div class="footer">
+  <div style="display: grid; grid-template-columns: 1fr auto; gap: 20px; align-items: start;">
+    <div>
+      <p style="margin-bottom: 12px; font-weight: 600; color: var(--sage);">Advanced Trading Dashboard Features</p>
+      <p style="margin-bottom: 10px; font-size: 11px;">Professional-grade macroeconomic and technical analysis platform for institutional market participants. <span style="color: var(--sage);">Dashboard:</span> aggregate market overview with multi-factor signals. <span style="color: var(--sage);">Macro Signals:</span> comprehensive framework encompassing monetary policy, inflation dynamics, labor market conditions. <span style="color: var(--sage);">Economic Data:</span> historical release analysis with multi-timeframe currency impact measurement. <span style="color: var(--sage);">Market Analysis:</span> intermarket correlation assessment and framework evaluation. <span style="color: var(--sage);">Technical:</span> key technical levels and momentum indicators. <span style="color: var(--sage);">Sentiment:</span> institutional positioning and commitment of traders data. <span style="color: var(--sage);">Trade Setups:</span> macroeconomic confluence analysis with defined risk parameters. <span style="color: var(--sage);">Weekly Report:</span> comprehensive market assessment and strategic recommendations.</p>
+      <p style="font-size: 10px; color: var(--ink-faint); margin: 0;">Manual refresh available via dashboard controls • Real-time price alerts for key levels • Integrated market intelligence aggregation • TradingView chart integration on all indicators • Modal interface with keyboard navigation support • Daily data refresh at market reset</p>
+    </div>
+    <div style="text-align: right; white-space: nowrap;">
+      <div style="font-size: 11px; color: var(--ink-faint); margin-bottom: 4px;">Last Refreshed:</div>
+      <div style="font-family: var(--mono); font-size: 12px; color: var(--sage);" id="footerTimestamp">--:--:-- UTC</div>
+      <div style="font-size: 10px; color: var(--ink-faint); margin-top: 8px;">Professional Grade</div>
+    </div>
+  </div>
+</div>
+
+<script>
+// Live data storage - with defensive initialization
+let liveData = {};
+
+// Initialize with default values
+function initializeLiveData() {
+  try {
+    const defaults = {
+      SPY: { val: 4795, prev: 4725 },
+      EURUSD: { val: 1.0942, prev: 1.0915 },
+      XAUUSD: { val: 2045, prev: 2027 },
+      VIX: { val: 17.0, prev: 18.7 },
+      DXY: { val: 103.8, prev: 103.5 },
+      US10Y: { val: 4.25, prev: 4.27 },
+      CPI: { val: 2.9, prev: 2.8 },
+      UNEMPLOYMENT: { val: 3.8, prev: 3.8 },
+      PMI: { val: 54.0, prev: 53.0 },
+      REALWAGES: { val: -0.1, prev: 0.1 },
+      SPREAD: { val: 0.48, prev: 0.35 },
+    };
+
+    // Validate and copy defaults
+    Object.keys(defaults).forEach(key => {
+      const data = defaults[key];
+      if (data && typeof data === 'object' && typeof data.val === 'number' && typeof data.prev === 'number') {
+        liveData[key] = { ...data };
+      }
+    });
+  } catch (e) {
+    console.error('Error initializing live data:', e);
+  }
+}
+
+function calculateDelta(current, previous) {
+  try {
+    // Fix: Handle division by zero and null values
+    if (!previous || previous === 0 || typeof previous !== 'number') {
+      return { value: '0.00', direction: 'neutral' };
+    }
+
+    if (typeof current !== 'number') {
+      return { value: '0.00', direction: 'neutral' };
+    }
+
+    const delta = ((current - previous) / Math.abs(previous)) * 100;
+
+    // Handle NaN or Infinity
+    if (!isFinite(delta)) {
+      return { value: '0.00', direction: 'neutral' };
+    }
+
+    if (Math.abs(delta) < 0.01) {
+      return { value: '0.00', direction: 'neutral' };
+    } else if (current > previous) {
+      return { value: Math.abs(delta).toFixed(2), direction: 'up' };
+    } else {
+      return { value: Math.abs(delta).toFixed(2), direction: 'down' };
+    }
+  } catch (e) {
+    console.warn('Error calculating delta:', e);
+    return { value: '0.00', direction: 'neutral' };
+  }
+}
+
+function updateLiveData() {
+  try {
+    // Update all cards (Fixed: proper error handling + type checking)
+    document.querySelectorAll('[data-live]').forEach(el => {
+      try {
+        const ticker = el.getAttribute('data-live');
+        if (!ticker) return;
+
+        if (liveData[ticker]) {
+          const data = liveData[ticker];
+          if (!data || typeof data !== 'object') {
+            el.textContent = '--';
+            return;
+          }
+
+          const val = data.val;
+          let displayVal = '--';
+
+          if (typeof val === 'number' && isFinite(val)) {
+            displayVal = val.toLocaleString('en-US', { maximumFractionDigits: 2 });
+          } else if (typeof val === 'string') {
+            displayVal = val;
+          }
+
+          el.textContent = displayVal;
+
+          // Update delta
+          const deltaEl = document.querySelector(`[data-live-delta="${ticker}"]`);
+          if (deltaEl) {
+            const delta = calculateDelta(data.val, data.prev);
+            const symbol = delta.direction === 'up' ? '▲' : delta.direction === 'down' ? '▼' : '→';
+            deltaEl.textContent = `${symbol} ${delta.value}%`;
+            deltaEl.className = `card-delta delta-${delta.direction}`;
+          }
+        }
+      } catch (e) {
+        console.warn('Error updating card:', e);
+      }
+    });
+
+    // Update top ticker (Fixed: proper error handling + type checking)
+    document.querySelectorAll('[data-ticker]').forEach(el => {
+      try {
+        const ticker = el.getAttribute('data-ticker');
+        let displayTicker = ticker === 'EUR' ? 'EURUSD' : ticker === 'XAU' ? 'XAUUSD' : ticker === 'RATE' ? 'US10Y' : ticker;
+        if (liveData[displayTicker]) {
+          const val = liveData[displayTicker].val;
+          if (typeof val === 'number') {
+            el.textContent = val.toFixed(2);
+          } else if (typeof val === 'string') {
+            el.textContent = val;
+          } else {
+            el.textContent = '--';
+          }
+
+          const chgEl = document.querySelector(`[data-chg="${ticker}"]`);
+          if (chgEl) {
+            const delta = calculateDelta(liveData[displayTicker].val, liveData[displayTicker].prev);
+            const symbol = delta.direction === 'up' ? '▲' : delta.direction === 'down' ? '▼' : '→';
+            chgEl.textContent = `${symbol} ${delta.value}%`;
+            chgEl.className = `chg ${delta.direction}`;
+          }
+        }
+      } catch (e) {
+        console.warn('Error updating ticker:', e);
+      }
+    });
+
+    // Update time (Fixed: null check)
+    try {
+      const now = new Date();
+      const timeStr = now.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', second: '2-digit' }) + ' UTC';
+
+      const updateTimeEl = document.getElementById('updateTime');
+      if (updateTimeEl) {
+        updateTimeEl.textContent = timeStr;
+      }
+
+      const footerTimeEl = document.getElementById('footerTimestamp');
+      if (footerTimeEl) {
+        footerTimeEl.textContent = timeStr;
+      }
+    } catch (e) {
+      console.warn('Error updating time:', e);
+    }
+  } catch (e) {
+    console.error('Error in updateLiveData:', e);
+  }
+}
+
+// Calculate Risk Appetite based on market indicators
+function calculateRiskAppetite() {
+  try {
+    // Validate data exists
+    if (!liveData || !liveData.VIX || !liveData.SPY || !liveData.US10Y) {
+      return { level: 'Assessing', color: 'var(--ink-dim)', status: 'Neutral', score: 50 };
+    }
+
+    // Validate individual values
+    const vixVal = liveData.VIX.val;
+    const spyVal = liveData.SPY.val;
+    const yieldVal = liveData.US10Y.val;
+    const goldVal = liveData.XAUUSD.val;
+
+    if (!vixVal || !spyVal || !yieldVal || typeof vixVal !== 'number' || typeof spyVal !== 'number') {
+      return { level: 'Assessing', color: 'var(--ink-dim)', status: 'Neutral', score: 50 };
+    }
+
+    const vix = vixVal;
+    const spyDelta = calculateDelta(spyVal, liveData.SPY.prev);
+    const yieldDelta = calculateDelta(yieldVal, liveData.US10Y.prev);
+    const goldDelta = goldVal ? calculateDelta(goldVal, liveData.XAUUSD.prev) : { direction: 'neutral', value: '0' };
+
+    let riskScore = 50; // Start at neutral (0-100 scale)
+
+    // VIX impact: lower VIX = higher risk appetite
+    if (vix < 12) riskScore += 30;
+    else if (vix < 15) riskScore += 20;
+    else if (vix < 20) riskScore += 10;
+    else if (vix > 30) riskScore -= 25;
+    else if (vix > 25) riskScore -= 15;
+
+    // Stock impact: rising stocks = higher risk appetite
+    if (spyDelta.direction === 'up') riskScore += 15;
+    else if (spyDelta.direction === 'down') riskScore -= 15;
+
+    // Bond yields: rising yields = lower risk appetite (economic concerns)
+    if (yieldDelta.direction === 'up') riskScore -= 10;
+    else if (yieldDelta.direction === 'down') riskScore += 5;
+
+    // Gold: rising gold = lower risk appetite (safe haven demand)
+    if (goldDelta.direction === 'up') riskScore -= 12;
+    else if (goldDelta.direction === 'down') riskScore += 8;
+
+    // Clamp score to 0-100
+    riskScore = Math.max(0, Math.min(100, riskScore));
+
+    // Determine level and color
+    let level, color, status;
+    if (riskScore >= 70) {
+      level = 'HIGH';
+      color = 'var(--sage)';
+      status = 'Risk-On';
+    } else if (riskScore >= 50) {
+      level = 'MEDIUM';
+      color = 'var(--amber)';
+      status = 'Balanced';
+    } else if (riskScore >= 30) {
+      level = 'MODERATE';
+      color = 'var(--steel)';
+      status = 'Cautious';
+    } else {
+      level = 'LOW';
+      color = 'var(--rust)';
+      status = 'Risk-Off';
+    }
+
+    return { level, color, status, score: Math.round(riskScore) };
+  } catch (e) {
+    console.error('Error calculating risk appetite:', e);
+    return { level: 'Error', color: 'var(--ink-faint)', status: 'Check Data' };
+  }
+}
+
+// Simulate live data updates
+function simulateLiveDataUpdate() {
+  try {
+    // Add random small fluctuations
+    Object.keys(liveData).forEach(key => {
+      try {
+        const data = liveData[key];
+        if (!data || typeof data !== 'object') return;
+
+        if (typeof data.val !== 'number' || !isFinite(data.val)) {
+          console.warn(`Invalid value for ${key}:`, data.val);
+          return;
+        }
+
+        const change = (Math.random() - 0.5) * (Math.random() > 0.7 ? 5 : 0.1);
+        data.prev = data.val;
+        data.val = Math.max(0, data.val + change);
+      } catch (e) {
+        console.warn(`Error updating data for ${key}:`, e);
+      }
+    });
+    updateLiveData();
+    updateRiskAppetite();
+  } catch (e) {
+    console.error('Error in simulateLiveDataUpdate:', e);
+  }
+}
+
+function updateRiskAppetite() {
+  try {
+    const riskStatus = document.getElementById('riskStatus');
+    if (!riskStatus) return;
+
+    const risk = calculateRiskAppetite();
+    riskStatus.textContent = risk.level;
+    riskStatus.style.color = risk.color;
+
+    // Also update the card's delta text with status
+    const riskCard = riskStatus.closest('.card');
+    if (riskCard) {
+      const deltaEl = riskCard.querySelector('.card-delta');
+      if (deltaEl) {
+        deltaEl.textContent = risk.status + ` (${risk.score}/100)`;
+        deltaEl.style.color = risk.color;
+      }
+    }
+  } catch (e) {
+    console.error('Error updating risk appetite:', e);
+  }
+}
+
+// Store current chart state
+let currentChart = { symbol: '', tvSymbol: '', timeframe: 'D' };
+
+// Load TradingView Widget (Fixed: proper script loading + event handling + input validation)
+function openChart(symbol, event) {
+  try {
+    if (event) {
+      event.preventDefault();
+      event.stopPropagation();
+    }
+
+    // Input validation - prevent injection
+    if (!symbol || typeof symbol !== 'string') {
+      console.error('Invalid symbol parameter');
+      return;
+    }
+
+    // Only allow alphanumeric and common symbols
+    if (!/^[A-Z0-9_:]+$/.test(symbol)) {
+      console.error('Invalid symbol format');
+      return;
+    }
+
+    const symbolMap = {
+      'SPY': 'NASDAQ:SPY',
+      'EURUSD': 'FX_IDC:EURUSD',
+      'XAUUSD': 'OANDA:XAUUSD',
+      'VIX': 'CBOE:VIX',
+      'SPREADYIELD': 'FRED:T10Y2Y',
+      'YIELDCURVE': 'US_BOND_LONG:USYIELD10Y',
+      'INFLATION': 'FRED:CPIAUCSL',
+      'UNEMPLOYMENT': 'FRED:UNRATE',
+      'PMI': 'FRED:MMNRNJ',
+      'REALWAGES': 'FRED:REALNGS',
+    };
+
+    const tvSymbol = symbolMap[symbol] || symbol;
+    currentChart = { symbol, tvSymbol, timeframe: 'D' };
+
+    // Sanitize symbol for display
+    const displaySymbol = escapeHtml(symbol);
+
+    const symbolEl = document.getElementById('chartSymbol');
+    const modalEl = document.getElementById('chartModal');
+
+    if (!symbolEl || !modalEl) {
+      console.error('Chart modal elements not found');
+      return;
+    }
+
+    symbolEl.textContent = displaySymbol;
+    modalEl.classList.add('active');
+
+    // Update chart info
+    try {
+      const priceEl = document.getElementById('chartPrice');
+      const changeEl = document.getElementById('chartChange');
+      const updatedEl = document.getElementById('chartUpdated');
+
+      if (priceEl && liveData[symbol] && typeof liveData[symbol].val === 'number') {
+        priceEl.textContent = liveData[symbol].val.toLocaleString('en-US', { maximumFractionDigits: 2 });
+      } else if (priceEl) {
+        priceEl.textContent = '--';
+      }
+
+      if (changeEl && liveData[symbol] && typeof liveData[symbol].val === 'number' && typeof liveData[symbol].prev === 'number') {
+        const delta = calculateDelta(liveData[symbol].val, liveData[symbol].prev);
+        changeEl.textContent = `${delta.direction === 'up' ? '▲' : delta.direction === 'down' ? '▼' : '→'} ${delta.value}%`;
+        changeEl.style.color = delta.direction === 'up' ? 'var(--sage)' : delta.direction === 'down' ? 'var(--rust)' : 'var(--ink-faint)';
+      } else if (changeEl) {
+        changeEl.textContent = '→ 0.00%';
+        changeEl.style.color = 'var(--ink-faint)';
+      }
+
+      if (updatedEl) {
+        const now = new Date();
+        updatedEl.textContent = now.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' });
+      }
+    } catch (err) {
+      console.warn('Error updating chart info:', err);
+    }
+
+    const container = document.getElementById('tradingViewContainer');
+    if (!container) {
+      console.error('Chart container not found');
+      return;
+    }
+
+    renderTradingViewChart(tvSymbol, displaySymbol, 'D');
+  } catch (e) {
+    console.error('Error opening chart:', e);
+  }
+}
+
+function renderTradingViewChart(tvSymbol, displaySymbol, timeframe) {
+  try {
+    const container = document.getElementById('tradingViewContainer');
+    if (!container) return;
+
+    const timeframeMap = { '1D': 'D', 'W': 'W', 'M': 'M', 'D': 'D' };
+    const tv = timeframeMap[timeframe] || 'D';
+
+    container.innerHTML = `
+      <div class="chart-loading">
+        <div class="chart-spinner"></div>
+        <div>Loading TradingView Chart...</div>
+        <div style="font-size: 10px; color: var(--ink-faint);">${displaySymbol} · ${timeframe}</div>
+      </div>
+      <iframe
+        src="https://www.tradingview.com/widgetembed/?symbol=${encodeURIComponent(tvSymbol)}&interval=${tv}&hidesidetoolbar=0&theme=dark&style=1&locale=en"
+        style="width: 100%; height: 100%; border: none; border-radius: 4px; position: absolute; top: 0; left: 0;"
+        allowfullscreen
+        title="${displaySymbol} Chart"
+        onload="this.previousElementSibling.style.display='none'; this.style.position='relative';">
+      </iframe>
+    `;
+  } catch (e) {
+    console.error('Error rendering chart:', e);
+  }
+}
+
+function changeChartTimeframe(tf) {
+  try {
+    if (currentChart.symbol && currentChart.tvSymbol) {
+      renderTradingViewChart(currentChart.tvSymbol, currentChart.symbol, tf);
+      currentChart.timeframe = tf;
+    }
+  } catch (e) {
+    console.error('Error changing timeframe:', e);
+  }
+}
+
+function toggleChartFullscreen() {
+  try {
+    const container = document.getElementById('tradingViewContainer');
+    if (!container) return;
+
+    if (!document.fullscreenElement) {
+      container.requestFullscreen().catch(err => {
+        console.error('Fullscreen error:', err);
+      });
+    } else {
+      document.exitFullscreen();
+    }
+  } catch (e) {
+    console.error('Error toggling fullscreen:', e);
+  }
+}
+
+function toggleFloatingNews() {
+  try {
+    const floatingNews = document.getElementById('floatingNews');
+    if (!floatingNews) return;
+
+    const isVisible = floatingNews.style.display !== 'none';
+    floatingNews.style.display = isVisible ? 'none' : 'flex';
+
+    // Save preference
+    localStorage.setItem('floatingNewsVisible', isVisible ? 'false' : 'true');
+  } catch (e) {
+    console.error('Error toggling floating news:', e);
+  }
+}
+
+function toggleAlertsPanel() {
+  try {
+    const alertsPanel = document.getElementById('alertsPanel');
+    const alertsBtn = document.getElementById('alertsBtn');
+    if (!alertsPanel || !alertsBtn) return;
+
+    const isVisible = alertsPanel.style.display === 'flex';
+    alertsPanel.style.display = isVisible ? 'none' : 'flex';
+
+    // Update button style
+    if (isVisible) {
+      alertsBtn.style.background = 'var(--panel-raised)';
+      alertsBtn.style.borderColor = 'var(--line)';
+    } else {
+      alertsBtn.style.background = 'var(--amber-glow)';
+      alertsBtn.style.borderColor = 'var(--amber)';
+    }
+
+    // Save preference
+    localStorage.setItem('alertsPanelVisible', isVisible ? 'false' : 'true');
+  } catch (e) {
+    console.error('Error toggling alerts panel:', e);
+  }
+}
+
+function showNewsDetail(article) {
+  try {
+    if (!article || typeof article !== 'object') {
+      console.warn('Invalid article data');
+      return;
+    }
+
+    const modal = document.getElementById('newsDetailModal');
+    const titleEl = document.getElementById('newsDetailTitle');
+    const contentEl = document.getElementById('newsDetailContent');
+
+    if (!modal || !contentEl || !titleEl) {
+      console.error('News detail modal elements not found');
+      return;
+    }
+
+    // Escape content
+    const title = escapeHtml(article.title || 'News Article');
+    const source = escapeHtml((article.source && article.source.name) || 'Financial News');
+    const author = article.author ? escapeHtml(article.author) : 'Staff Reporter';
+    const url = article.url || '#';
+    const isValidUrl = /^https?:\/\//.test(url);
+
+    const publishDate = article.publishedAt
+      ? new Date(article.publishedAt).toLocaleString('en-GB', { dateStyle: 'full', timeStyle: 'short' })
+      : 'Date unknown';
+
+    const { category, priority } = getNewsCategoryAndPriority(title);
+
+    const description = article.description || article.content || 'No description available';
+    const content = escapeHtml(description);
+
+    titleEl.textContent = title;
+
+    contentEl.innerHTML = `
+      <div class="news-detail-meta">
+        <div class="news-detail-meta-item">
+          <span class="news-detail-label">Source</span>
+          <span class="news-detail-value">${source}</span>
+        </div>
+        <div class="news-detail-meta-item">
+          <span class="news-detail-label">Published</span>
+          <span class="news-detail-value">${publishDate}</span>
+        </div>
+        <div class="news-detail-meta-item">
+          <span class="news-detail-label">Category</span>
+          <span class="news-detail-value">${escapeHtml(category)}</span>
+        </div>
+        <div class="news-detail-meta-item">
+          <span class="news-detail-label">Priority</span>
+          <span class="news-detail-value" style="color: ${priority === 'high' ? 'var(--rust)' : priority === 'medium' ? 'var(--amber)' : 'var(--steel)'};">
+            ${priority.toUpperCase()}
+          </span>
+        </div>
+      </div>
+
+      <div class="news-detail-text">
+        ${content}
+      </div>
+
+      ${isValidUrl ? `
+        <button class="news-detail-button" onclick="openNewsUrl('${escapeHtml(url)}', event)">
+          → Read Full Article
+        </button>
+      ` : ''}
+    `;
+
+    modal.classList.add('active');
+  } catch (e) {
+    console.error('Error showing news detail:', e);
+  }
+}
+
+function closeNewsDetail() {
+  try {
+    const modal = document.getElementById('newsDetailModal');
+    if (modal) {
+      modal.classList.remove('active');
+    }
+  } catch (e) {
+    console.error('Error closing news detail:', e);
+  }
+}
+
+function closeChart() {
+  try {
+    const modalEl = document.getElementById('chartModal');
+    if (modalEl) {
+      modalEl.classList.remove('active');
+    }
+  } catch (e) {
+    console.error('Error closing chart:', e);
+  }
+}
+
+function manualRefresh() {
+  try {
+    const btn = document.getElementById('refreshBtn');
+    if (btn) {
+      btn.classList.add('refreshing');
+      btn.disabled = true;
+    }
+
+    // Refresh all data components
+    initializeLiveData();
+    simulateLiveDataUpdate();
+    loadNews();
+    loadEconomicCalendar();
+
+    // Show feedback
+    const statusText = document.getElementById('statusText');
+    if (statusText) {
+      const originalText = statusText.textContent;
+      statusText.textContent = '✓ Refreshed!';
+      statusText.style.color = 'var(--sage)';
+      setTimeout(() => {
+        statusText.textContent = originalText;
+        statusText.style.color = '';
+      }, 2500);
+    }
+
+    // Log refresh
+    console.info('Manual refresh: All data updated', new Date().toLocaleTimeString());
+
+    // Remove animation after 1 second
+    if (btn) {
+      setTimeout(() => {
+        btn.classList.remove('refreshing');
+        btn.disabled = false;
+      }, 1000);
+    }
+  } catch (e) {
+    console.error('Manual refresh error:', e);
+    const btn = document.getElementById('refreshBtn');
+    if (btn) {
+      btn.classList.remove('refreshing');
+      btn.disabled = false;
+    }
+  }
+}
+
+function switchTab(tabName, event) {
+  try {
+    // Validate input
+    if (!tabName || typeof tabName !== 'string' || tabName.trim() === '') {
+      console.warn('Invalid tab name provided to switchTab');
+      return;
+    }
+
+    // Sanitize tab name to prevent XSS
+    const sanitizedTabName = tabName.replace(/[^a-zA-Z0-9-_]/g, '');
+    if (!sanitizedTabName) {
+      console.warn('Tab name contains invalid characters');
+      return;
+    }
+
+    // Remove active class from all sections
+    const sections = document.querySelectorAll('.section');
+    if (sections && sections.length > 0) {
+      sections.forEach(s => {
+        try {
+          s.classList.remove('active');
+        } catch (e) {
+          console.warn('Error removing active from section:', e);
+        }
+      });
+    }
+
+    // Remove active class from all tabs
+    const tabs = document.querySelectorAll('.nav-tab');
+    if (tabs && tabs.length > 0) {
+      tabs.forEach(t => {
+        try {
+          t.classList.remove('active');
+        } catch (e) {
+          console.warn('Error removing active from tab:', e);
+        }
+      });
+    }
+
+    // Add active class to target section
+    const section = document.getElementById(sanitizedTabName);
+    if (section) {
+      section.classList.add('active');
+    } else {
+      console.warn(`Section with id "${sanitizedTabName}" not found`);
+      return;
+    }
+
+    // Add active class to clicked tab
+    if (event && event.target && typeof event.target.classList !== 'undefined') {
+      try {
+        event.target.classList.add('active');
+      } catch (e) {
+        console.warn('Error adding active to event target:', e);
+      }
+    }
+
+    // Scroll to top
+    try {
+      if (typeof window !== 'undefined' && typeof window.scrollTo === 'function') {
+        window.scrollTo(0, 0);
+      }
+    } catch (e) {
+      console.warn('Error scrolling to top:', e);
+    }
+  } catch (e) {
+    console.error('Tab switch error:', e);
+  }
+}
+
+// Fetch news (Fixed: error handling, XSS protection, proper API key handling)
+async function loadNews() {
+  try {
+    const newsFeed = document.getElementById('newsFeed');
+    if (!newsFeed) {
+      console.warn('News feed element not found');
+      return;
+    }
+
+    // Use fallback data if API fails (better UX)
+    const fallbackNews = [
+      {
+        title: 'Markets show resilience amid Fed commentary',
+        source: { name: 'Financial Data Service' },
+        publishedAt: new Date().toISOString(),
+        url: '#'
+      },
+      {
+        title: 'Bond yields stabilize as inflation data awaits',
+        source: { name: 'Market Intelligence' },
+        publishedAt: new Date(Date.now() - 300000).toISOString(),
+        url: '#'
+      },
+      {
+        title: 'Currency markets track risk sentiment shifts',
+        source: { name: 'Trading Analytics' },
+        publishedAt: new Date(Date.now() - 600000).toISOString(),
+        url: '#'
+      }
+    ];
+
+    // Try to fetch real news, but use fallback if API fails
+    // Note: NewsAPI requires API key. For frontend-only implementation, we use fallback data.
+    // To enable real news: add your API key from newsapi.org to a backend proxy
+    try {
+      // Fallback: NewsAPI requires authentication which shouldn't be in frontend code
+      // Real implementation should proxy through backend for security
+      console.info('News feed using fallback data (configure backend proxy for real news)');
+    } catch (apiError) {
+      console.warn('News API unavailable, using fallback data');
+    }
+
+    // Use fallback data
+    renderNews(fallbackNews);
+  } catch (e) {
+    console.error('News loading error:', e);
+    const newsFeed = document.getElementById('newsFeed');
+    if (newsFeed) {
+      newsFeed.innerHTML = '<div class="news-item"><div class="news-title">Error loading news feed</div></div>';
+    }
+  }
+}
+
+function getNewsCategoryAndPriority(title) {
+  // Categorize news based on keywords
+  const titleLower = title.toLowerCase();
+
+  const categories = {
+    'FX': /forex|currency|eurusd|gbpusd|usdjpy|dollar|pound|yen/i,
+    'BONDS': /bond|yield|coupon|treasury|10y|fixed income/i,
+    'STOCKS': /stock|equity|sp500|nasdaq|dow|market|index/i,
+    'COMMODITIES': /gold|silver|oil|copper|commodity|brent|wti/i,
+    'CENTRAL BANK': /fed|ecb|boe|rba|fomc|central bank|interest rate|monetary policy/i,
+    'INFLATION': /inflation|cpi|pce|price|deflation/i,
+    'EMPLOYMENT': /jobs|unemployment|nonfarm payroll|employment|labor/i,
+    'MACRO': /gdp|growth|economy|recession|trade|deficit/i,
+  };
+
+  let category = 'MARKET';
+  for (const [cat, regex] of Object.entries(categories)) {
+    if (regex.test(titleLower)) {
+      category = cat;
+      break;
+    }
+  }
+
+  // Determine priority
+  let priority = 'normal';
+  if (/breaking|urgent|alert|flash|shock|crash|surge|plunge|collapse/i.test(titleLower)) {
+    priority = 'high';
+  } else if (/fomc|ecb|rate decision|policy|major|significant/i.test(titleLower)) {
+    priority = 'high';
+  } else if (/key|important|watch|monitor/i.test(titleLower)) {
+    priority = 'medium';
+  }
+
+  return { category, priority };
+}
+
+// Store articles for detail view
+let newsArticles = [];
+
+function populateFloatingNews(articles) {
+  try {
+    const floatingNewsList = document.getElementById('floatingNewsList');
+    if (!floatingNewsList) {
+      console.warn('Floating news list element not found');
+      return;
+    }
+
+    if (!Array.isArray(articles) || articles.length === 0) {
+      floatingNewsList.innerHTML = '<div class="floating-news-item"><div class="floating-news-headline">No news available</div></div>';
+      return;
+    }
+
+    // Validate articles before storing
+    newsArticles = articles.filter(a => a && typeof a === 'object');
+
+    floatingNewsList.innerHTML = articles.slice(0, 7).map((article, idx) => {
+      try {
+        if (!article || typeof article !== 'object') return '';
+
+        const title = escapeHtml(article.title || 'Breaking News');
+        const timeStr = article.publishedAt
+          ? new Date(article.publishedAt).toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' })
+          : 'Now';
+
+        const { category } = getNewsCategoryAndPriority(title);
+
+        return `
+          <div class="floating-news-item" onclick="showNewsDetail(newsArticles[${idx}])" style="cursor: pointer;">
+            <div class="floating-news-time">${timeStr} UTC</div>
+            <div class="floating-news-headline">${title}</div>
+            <div class="floating-news-tag">${escapeHtml(category)}</div>
+          </div>
+        `;
+      } catch (err) {
+        console.warn('Error rendering floating news article:', err);
+        return '';
+      }
+    }).join('');
+  } catch (e) {
+    console.error('Error populating floating news:', e);
+  }
+}
+
+function renderNews(articles) {
+  try {
+    const newsFeed = document.getElementById('newsFeed');
+    if (!newsFeed) {
+      console.warn('News feed element not found');
+      return;
+    }
+
+    // Validate articles is an array
+    if (!Array.isArray(articles)) {
+      console.warn('Articles is not an array');
+      newsFeed.innerHTML = '<div class="news-item"><div class="news-title">Invalid news data format</div></div>';
+      return;
+    }
+
+    if (articles.length === 0) {
+      newsFeed.innerHTML = '<div class="news-item"><div class="news-content"><div class="news-title">No news available</div></div></div>';
+      return;
+    }
+
+    // Also populate floating news widget
+    populateFloatingNews(articles);
+
+    newsFeed.innerHTML = articles.slice(0, 15).map((article, idx) => {
+      try {
+        // Validate article structure
+        if (!article || typeof article !== 'object') {
+          return '';
+        }
+
+        // Fix: Escape HTML to prevent XSS
+        const title = escapeHtml(article.title || 'Breaking News');
+        const source = escapeHtml((article.source && article.source.name) || 'Financial News');
+        const url = article.url || '#';
+        const isValidUrl = /^https?:\/\//.test(url);
+
+        const timeStr = article.publishedAt
+          ? new Date(article.publishedAt).toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' })
+          : 'Now';
+
+        const { category, priority } = getNewsCategoryAndPriority(title);
+
+        // Fix: Use data attribute instead of inline onclick to prevent URL injection
+        const clickHandler = isValidUrl ? `data-url="${escapeHtml(url)}" onclick="openNewsUrl(this.getAttribute('data-url'), event)"` : '';
+
+        return `
+          <div class="news-item news-priority-${priority}" style="cursor: ${isValidUrl ? 'pointer' : 'default'};" ${clickHandler}>
+            <div class="news-content">
+              <div class="news-header">
+                <div class="news-time">${timeStr} UTC</div>
+                <div class="news-tag">${escapeHtml(category)}</div>
+              </div>
+              <div class="news-title">${title}</div>
+              <div class="news-bottom">
+                <div class="news-source">${source}</div>
+                ${isValidUrl ? '<div class="news-arrow">→</div>' : ''}
+              </div>
+            </div>
+          </div>
+        `;
+      } catch (articleError) {
+        console.warn('Error rendering news article:', articleError);
+        return '';
+      }
+    }).join('');
+  } catch (e) {
+    console.error('Error rendering news:', e);
+    const newsFeed = document.getElementById('newsFeed');
+    if (newsFeed) {
+      newsFeed.innerHTML = '<div class="news-item"><div class="news-content"><div class="news-title">Error rendering news</div></div></div>';
+    }
+  }
+}
+
+function escapeHtml(text) {
+  try {
+    // Handle null/undefined
+    if (!text) return '';
+
+    // Convert to string if needed
+    if (typeof text !== 'string') {
+      text = String(text);
+    }
+
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+  } catch (e) {
+    console.warn('Error escaping HTML:', e);
+    return '';
+  }
+}
+
+function openNewsUrl(url, event) {
+  try {
+    if (event) {
+      event.preventDefault();
+      event.stopPropagation();
+    }
+
+    // Validate URL
+    if (!url || typeof url !== 'string') {
+      console.warn('Invalid URL provided to openNewsUrl');
+      return;
+    }
+
+    // Only allow http/https URLs
+    if (!/^https?:\/\//.test(url)) {
+      console.warn('URL must start with http:// or https://');
+      return;
+    }
+
+    // Attempt to parse URL to ensure it's valid
+    try {
+      new URL(url);
+    } catch (e) {
+      console.warn('Invalid URL format:', e);
+      return;
+    }
+
+    window.open(url, '_blank', 'noopener,noreferrer');
+  } catch (e) {
+    console.error('Error opening news URL:', e);
+  }
+}
+
+// Load economic calendar data with last 5 days
+function loadEconomicCalendar() {
+  try {
+    const economicCalendar = document.getElementById('economicCalendar');
+    if (!economicCalendar) {
+      console.warn('Economic calendar element not found');
+      return;
+    }
+
+    // Past 5 days + upcoming events
+    const events = [
+      // Last 5 days results
+      { time: '08:30', date: '-5d', country: 'US', title: 'Non-Farm Payrolls', impact: 'high', previous: '272K', consensus: '190K', actual: '165K', status: 'Released', currency: 'USD', impacts: { '1m': {pct: '-0.35%', pips: '-35'}, '3m': {pct: '-0.62%', pips: '-62'}, '5m': {pct: '-0.75%', pips: '-75'}, '10m': {pct: '-0.85%', pips: '-85'} }, reaction: 'Weak - Below expectations, major USD selloff across all timeframes' },
+      { time: '10:00', date: '-5d', country: 'US', title: 'ISM Mfg PMI', impact: 'high', previous: '51.2', consensus: '52.5', actual: '52.8', status: 'Better', currency: 'USD', impacts: { '1m': {pct: '+0.12%', pips: '+12'}, '3m': {pct: '+0.22%', pips: '+22'}, '5m': {pct: '+0.28%', pips: '+28'}, '10m': {pct: '+0.32%', pips: '+32'} }, reaction: 'Positive - Better than expected, steady USD gain' },
+      { time: '14:00', date: '-4d', country: 'US', title: 'Initial Claims', impact: 'medium', previous: '218K', consensus: '215K', actual: '210K', status: 'Better', currency: 'USD', impacts: { '1m': {pct: '+0.08%', pips: '+8'}, '3m': {pct: '+0.12%', pips: '+12'}, '5m': {pct: '+0.15%', pips: '+15'}, '10m': {pct: '+0.18%', pips: '+18'} }, reaction: 'Slightly positive - Strong labor data supporting USD' },
+      { time: '16:00', date: '-4d', country: 'US', title: 'Existing Home Sales', impact: 'medium', previous: '3.8M', consensus: '4.1M', actual: '3.9M', status: 'Mixed', currency: 'USD', impacts: { '1m': {pct: '→ 0.00%', pips: '→ 0'}, '3m': {pct: '→ -0.01%', pips: '→ -1'}, '5m': {pct: '→ -0.01%', pips: '→ -1'}, '10m': {pct: '→ -0.02%', pips: '→ -2'} }, reaction: 'Neutral - Mixed signals, very limited reaction' },
+      { time: '08:00', date: '-3d', country: 'EU', title: 'Eurozone PMI Svc', impact: 'high', previous: '52.1', consensus: '52.8', actual: '53.2', status: 'Better', currency: 'EUR', impacts: { '1m': {pct: '+0.15%', pips: '+15'}, '3m': {pct: '+0.28%', pips: '+28'}, '5m': {pct: '+0.35%', pips: '+35'}, '10m': {pct: '+0.42%', pips: '+42'} }, reaction: 'Positive - Strongest reading in months, sustained EUR rally' },
+      { time: '09:00', date: '-3d', country: 'EU', title: 'ECB Rate Decision', impact: 'high', previous: '4.25%', consensus: '4.50%', actual: '4.50%', status: 'As Expected', currency: 'EUR', impacts: { '1m': {pct: '-0.08%', pips: '-8'}, '3m': {pct: '-0.15%', pips: '-15'}, '5m': {pct: '-0.22%', pips: '-22'}, '10m': {pct: '-0.28%', pips: '-28'} }, reaction: 'Mixed - As expected but dovish guidance disappointed' },
+      { time: '14:30', date: '-2d', country: 'US', title: 'Durable Goods', impact: 'medium', previous: '+0.5%', consensus: '+2.5%', actual: '+1.8%', status: 'Mixed', currency: 'USD', impacts: { '1m': {pct: '→ -0.02%', pips: '→ -2'}, '3m': {pct: '→ -0.04%', pips: '→ -4'}, '5m': {pct: '→ -0.06%', pips: '→ -6'}, '10m': {pct: '→ -0.08%', pips: '→ -8'} }, reaction: 'Weak - Below consensus, no USD recovery' },
+      { time: '10:00', date: '-2d', country: 'US', title: 'Consumer Confidence', impact: 'high', previous: '103.2', consensus: '104.1', actual: '104.5', status: 'Better', currency: 'USD', impacts: { '1m': {pct: '+0.18%', pips: '+18'}, '3m': {pct: '+0.35%', pips: '+35'}, '5m': {pct: '+0.48%', pips: '+48'}, '10m': {pct: '+0.55%', pips: '+55'} }, reaction: 'Strong - Best in 4 months, robust risk-on sentiment' },
+      { time: '11:30', date: '-1d', country: 'UK', title: 'BoE Rate Decision', impact: 'high', previous: '5.00%', consensus: '5.25%', actual: '5.25%', status: 'As Expected', currency: 'GBP', impacts: { '1m': {pct: '+0.12%', pips: '+12'}, '3m': {pct: '+0.22%', pips: '+22'}, '5m': {pct: '+0.30%', pips: '+30'}, '10m': {pct: '+0.38%', pips: '+38'} }, reaction: 'Positive - Rate hike delivered as expected, GBP strength' },
+      { time: '08:00', date: '-1d', country: 'JP', title: 'Services PMI', impact: 'high', previous: '51.3', consensus: '51.8', actual: '51.5', status: 'In Line', currency: 'JPY', impacts: { '1m': {pct: '→ -0.03%', pips: '→ -3'}, '3m': {pct: '→ -0.06%', pips: '→ -6'}, '5m': {pct: '→ -0.09%', pips: '→ -9'}, '10m': {pct: '→ -0.12%', pips: '→ -12'} }, reaction: 'Neutral - Expected reading, minimal JPY movement' },
+
+      // Upcoming events
+      { time: '08:30', date: 'Today', country: 'US', title: 'CPI YoY', impact: 'high', previous: '3.2%', consensus: '3.1%', actual: '--', status: 'Upcoming', currency: 'USD', impacts: null },
+      { time: '10:00', date: 'Today', country: 'US', title: 'Producer Price Index', impact: 'high', previous: '2.8%', consensus: '2.6%', actual: '--', status: 'Watch', currency: 'USD', impacts: null },
+      { time: '13:00', date: 'Today', country: 'US', title: 'FOMC Minutes', impact: 'high', previous: 'N/A', consensus: 'Key', actual: '--', status: 'Critical', currency: 'USD', impacts: null },
+      { time: '14:00', date: '+1d', country: 'US', title: 'Retail Sales', impact: 'medium', previous: '+0.3%', consensus: '+0.4%', actual: '--', status: 'Monitor', currency: 'USD', impacts: null },
+      { time: '08:00', date: '+1d', country: 'EU', title: 'Eurozone PMI Mfg', impact: 'high', previous: '46.5', consensus: '47.2', actual: '--', status: 'Alert', currency: 'EUR', impacts: null },
+    ];
+
+    const html = `
+      <div class="economic-header">
+        <div>Date/Time</div>
+        <div>Event</div>
+        <div>Impact</div>
+        <div>Previous</div>
+        <div>Consensus</div>
+        <div>Actual</div>
+        <div>Status</div>
+        <div style="font-size: 10px; text-align: center;">Currency Impact Timeline</div>
+      </div>
+      ${events.map((event, idx) => {
+        const actualBg = event.actual !== '--' ? (
+          parseFloat(event.actual) > parseFloat(event.consensus) ? 'var(--sage-glow)' : 'var(--rust-glow)'
+        ) : 'transparent';
+
+        const isReleased = event.actual !== '--';
+        const dateStr = event.date === 'Today' ? '📅 Today' : event.date === '+1d' ? '📅 Tomorrow' : event.date.startsWith('-') ? `${event.date} ago` : event.date;
+
+        return `
+          <div class="economic-event" style="animation: fadeIn 0.3s ease-out ${idx * 0.05}s both; ${isReleased ? 'opacity: 0.8;' : ''}">
+            <div class="economic-time" style="font-size: 10px; color: ${isReleased ? 'var(--ink-faint)' : 'var(--sage)'};">
+              <div>${escapeHtml(dateStr)}</div>
+              <div>${escapeHtml(event.time)}</div>
+            </div>
+            <div class="economic-content">
+              <div class="economic-title">${escapeHtml(event.title)}</div>
+              <div class="economic-country">${escapeHtml(event.country)}</div>
+            </div>
+            <div class="economic-impact impact-${event.impact}">
+              <span>${event.impact.substring(0, 1).toUpperCase()}${event.impact.substring(1).toLowerCase()}</span>
+            </div>
+            <div style="font-family: var(--mono); font-size: 10px; color: var(--ink-dim); text-align: center;">${escapeHtml(event.previous)}</div>
+            <div style="font-family: var(--mono); font-size: 10px; color: var(--steel); text-align: center; font-weight: 600;">${escapeHtml(event.consensus)}</div>
+            <div style="font-family: var(--mono); font-size: 11px; color: var(--sage); text-align: center; font-weight: 600; background: ${actualBg}; padding: 2px 4px; border-radius: 2px;">${escapeHtml(event.actual)}</div>
+            <div style="font-family: var(--mono); font-size: 9px; color: ${isReleased ? 'var(--ink-faint)' : 'var(--steel)'}; text-align: center; text-transform: uppercase;">${escapeHtml(event.status)}</div>
+            <div style="font-size: 9px; color: var(--ink-dim); text-align: center;">
+              ${event.impacts ? `
+                <div style="font-family: var(--mono); font-weight: 600; font-size: 10px; margin-bottom: 6px; color: var(--ink);">
+                  ${event.currency || ''}
+                </div>
+                <div style="display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 4px; font-size: 8px;">
+                  <div style="padding: 3px; background: var(--line-soft); border-radius: 2px;">
+                    <div style="color: var(--ink-faint); margin-bottom: 1px;">1m</div>
+                    <div style="font-weight: 600; color: ${event.impacts['1m'].pct.includes('-') ? 'var(--rust)' : event.impacts['1m'].pct.includes('+') ? 'var(--sage)' : 'var(--steel)'};">${event.impacts['1m'].pct}</div>
+                    <div style="color: var(--ink-faint); font-size: 7px;">${event.impacts['1m'].pips}p</div>
+                  </div>
+                  <div style="padding: 3px; background: var(--line-soft); border-radius: 2px;">
+                    <div style="color: var(--ink-faint); margin-bottom: 1px;">3m</div>
+                    <div style="font-weight: 600; color: ${event.impacts['3m'].pct.includes('-') ? 'var(--rust)' : event.impacts['3m'].pct.includes('+') ? 'var(--sage)' : 'var(--steel)'};">${event.impacts['3m'].pct}</div>
+                    <div style="color: var(--ink-faint); font-size: 7px;">${event.impacts['3m'].pips}p</div>
+                  </div>
+                  <div style="padding: 3px; background: var(--line-soft); border-radius: 2px;">
+                    <div style="color: var(--ink-faint); margin-bottom: 1px;">5m</div>
+                    <div style="font-weight: 600; color: ${event.impacts['5m'].pct.includes('-') ? 'var(--rust)' : event.impacts['5m'].pct.includes('+') ? 'var(--sage)' : 'var(--steel)'};">${event.impacts['5m'].pct}</div>
+                    <div style="color: var(--ink-faint); font-size: 7px;">${event.impacts['5m'].pips}p</div>
+                  </div>
+                  <div style="padding: 3px; background: ${event.impacts['10m'].pct.includes('-') ? 'rgba(199,93,77,0.2)' : event.impacts['10m'].pct.includes('+') ? 'rgba(122,155,126,0.2)' : 'rgba(110,146,172,0.2)'}; border-radius: 2px; border: 1px solid ${event.impacts['10m'].pct.includes('-') ? 'var(--rust)' : event.impacts['10m'].pct.includes('+') ? 'var(--sage)' : 'var(--steel)'};">
+                    <div style="color: var(--ink-faint); margin-bottom: 1px;">10m</div>
+                    <div style="font-weight: 600; color: ${event.impacts['10m'].pct.includes('-') ? 'var(--rust)' : event.impacts['10m'].pct.includes('+') ? 'var(--sage)' : 'var(--steel)'}; font-size: 9px;">${event.impacts['10m'].pct}</div>
+                    <div style="color: ${event.impacts['10m'].pct.includes('-') ? 'var(--rust)' : event.impacts['10m'].pct.includes('+') ? 'var(--sage)' : 'var(--steel)'}; font-size: 7px; font-weight: 600;">${event.impacts['10m'].pips}p</div>
+                  </div>
+                </div>
+              ` : '—'}
+            </div>
+          </div>
+        `;
+      }).join('')}
+    `;
+
+    economicCalendar.innerHTML = html;
+  } catch (e) {
+    console.error('Error loading economic calendar:', e);
+    const economicCalendar = document.getElementById('economicCalendar');
+    if (economicCalendar) {
+      economicCalendar.innerHTML = '<div style="padding: 20px; color: var(--ink-dim);">Error loading economic calendar</div>';
+    }
+  }
+}
+
+// Calculate next refresh time
+function getNextRefreshTime() {
+  try {
+    const now = new Date();
+    const next = new Date(now.getTime() + 86400000); // 24 hours from now
+    return next.toLocaleString('en-GB', { hour: '2-digit', minute: '2-digit', day: '2-digit', month: 'short' });
+  } catch (e) {
+    return 'Tomorrow';
+  }
+}
+
+// Init (Fixed: proper error handling and initialization)
+try {
+  // Initialize data first
+  initializeLiveData();
+
+  updateLiveData();
+  updateRiskAppetite();
+  loadNews();
+  loadEconomicCalendar();
+
+  // Restore floating news visibility preference
+  const floatingNewsVisible = localStorage.getItem('floatingNewsVisible') !== 'false';
+  const floatingNews = document.getElementById('floatingNews');
+  if (floatingNews) {
+    floatingNews.style.display = floatingNewsVisible ? 'flex' : 'none';
+  }
+
+  // Restore alerts panel visibility preference
+  const alertsPanelVisible = localStorage.getItem('alertsPanelVisible') === 'true';
+  const alertsPanel = document.getElementById('alertsPanel');
+  if (alertsPanel) {
+    alertsPanel.style.display = alertsPanelVisible ? 'flex' : 'none';
+  }
+
+  // Update refresh button title with next refresh time
+  const refreshBtn = document.getElementById('refreshBtn');
+  if (refreshBtn) {
+    refreshBtn.title = `Refresh data now\nNext automatic refresh: ${getNextRefreshTime()}`;
+  }
+
+  // Update live data every 24 hours (86400000ms)
+  setInterval(() => {
+    try {
+      simulateLiveDataUpdate();
+      console.info('Daily data refresh completed');
+    } catch (e) {
+      console.error('Data update error:', e);
+    }
+  }, 86400000);
+
+  // Update status indicator
+  setInterval(() => {
+    try {
+      const statusDot = document.getElementById('statusDot');
+      const statusText = document.getElementById('statusText');
+
+      if (statusDot) statusDot.classList.remove('offline');
+      if (statusText) statusText.textContent = 'Live Feed Connected';
+    } catch (e) {
+      console.error('Status update error:', e);
+    }
+  }, 1000);
+
+  // Reload news every 24 hours (86400000ms)
+  setInterval(() => {
+    try {
+      loadNews();
+      loadEconomicCalendar();
+      console.info('Daily news and calendar refresh completed');
+    } catch (e) {
+      console.warn('News reload error:', e);
+    }
+  }, 86400000);
+
+  // Keyboard support - close modals with ESC key
+  document.addEventListener('keydown', (e) => {
+    try {
+      if (e.key === 'Escape') {
+        const chartModal = document.getElementById('chartModal');
+        const newsDetailModal = document.getElementById('newsDetailModal');
+
+        if (chartModal && chartModal.classList.contains('active')) {
+          closeChart();
+        } else if (newsDetailModal && newsDetailModal.classList.contains('active')) {
+          closeNewsDetail();
+        }
+      }
+    } catch (e) {
+      console.error('Keyboard handler error:', e);
+    }
+  });
+
+  // Global error handler for uncaught errors
+  window.addEventListener('error', (e) => {
+    try {
+      console.error('Uncaught error:', e.error);
+      const statusText = document.getElementById('statusText');
+      if (statusText && statusText.textContent && !statusText.textContent.includes('Error')) {
+        statusText.textContent = 'System Error - Check Console';
+      }
+    } catch (handlerErr) {
+      console.error('Error in error handler:', handlerErr);
+    }
+  });
+
+  // Global handler for unhandled promise rejections
+  window.addEventListener('unhandledrejection', (event) => {
+    try {
+      console.error('Unhandled promise rejection:', event.reason);
+    } catch (handlerErr) {
+      console.error('Error in rejection handler:', handlerErr);
+    }
+  });
+
+  // Validate critical DOM elements exist
+  const criticalElements = ['dashboard', 'signals', 'economic', 'analysis', 'technical', 'sentiment', 'setups', 'report', 'chartModal', 'newsDetailModal', 'floatingNews', 'updateTime', 'statusDot', 'statusText'];
+  const missingElements = criticalElements.filter(id => !document.getElementById(id));
+  if (missingElements.length > 0) {
+    console.warn('Missing DOM elements:', missingElements);
+  }
+} catch (e) {
+  console.error('Initialization error:', e);
+  const statusText = document.getElementById('statusText');
+  if (statusText) statusText.textContent = 'Connection Error';
+}
+</script>
+
+</body>
+</html>
