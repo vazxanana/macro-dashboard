@@ -144,6 +144,29 @@
     max-width: 1400px;
     margin: 0 auto;
     overflow-x: auto;
+    overflow-y: hidden;
+    scrollbar-width: thin;
+    scrollbar-color: var(--line-soft) transparent;
+  }
+
+  .nav-tabs::-webkit-scrollbar {
+    height: 6px;
+  }
+
+  .nav-tabs::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  .nav-tabs::-webkit-scrollbar-thumb {
+    background: var(--line-soft);
+    border-radius: 3px;
+    border: 2px solid transparent;
+    background-clip: content-box;
+  }
+
+  .nav-tabs::-webkit-scrollbar-thumb:hover {
+    background: var(--ink-faint);
+    background-clip: content-box;
   }
 
   .nav-tab {
@@ -161,10 +184,15 @@
     white-space: nowrap;
   }
 
-  .nav-tab:hover { color: var(--ink-dim); }
+  .nav-tab:hover {
+    color: var(--ink-dim);
+    border-bottom-color: var(--line-soft);
+  }
+
   .nav-tab.active {
     color: var(--sage);
     border-bottom-color: var(--sage);
+    text-shadow: 0 0 8px var(--sage-glow);
   }
 
   /* HERO */
