@@ -1330,6 +1330,19 @@
   <div id="economicCalendar" style="margin: 0 24px 40px; background: var(--line); border: 1px solid var(--line);">
     <!-- Economic events will be inserted here -->
   </div>
+
+  <div class="section-head" style="margin-top: 40px;">
+    <div class="section-title">Financial News Feed</div>
+    <div class="section-meta">REAL-TIME MARKET NEWS</div>
+  </div>
+
+  <div id="newsFeed" style="margin: 0 24px 40px;" class="news-feed">
+    <div class="news-item">
+      <div class="news-content">
+        <div class="news-title">Loading financial news...</div>
+      </div>
+    </div>
+  </div>
 </div>
 
 <!-- MARKET ANALYSIS -->
@@ -3935,17 +3948,25 @@ try {
   loadEconomicCalendar();
 
   // Restore floating news visibility preference
-  const floatingNewsVisible = localStorage.getItem('floatingNewsVisible') !== 'false';
-  const floatingNews = document.getElementById('floatingNews');
-  if (floatingNews) {
-    floatingNews.style.display = floatingNewsVisible ? 'flex' : 'none';
+  try {
+    const floatingNewsVisible = localStorage.getItem('floatingNewsVisible') !== 'false';
+    const floatingNews = document.getElementById('floatingNews');
+    if (floatingNews) {
+      floatingNews.style.display = floatingNewsVisible ? 'flex' : 'none';
+    }
+  } catch (e) {
+    console.warn('Error restoring floating news visibility:', e);
   }
 
   // Restore alerts panel visibility preference
-  const alertsPanelVisible = localStorage.getItem('alertsPanelVisible') === 'true';
-  const alertsPanel = document.getElementById('alertsPanel');
-  if (alertsPanel) {
-    alertsPanel.style.display = alertsPanelVisible ? 'flex' : 'none';
+  try {
+    const alertsPanelVisible = localStorage.getItem('alertsPanelVisible') === 'true';
+    const alertsPanel = document.getElementById('alertsPanel');
+    if (alertsPanel) {
+      alertsPanel.style.display = alertsPanelVisible ? 'flex' : 'none';
+    }
+  } catch (e) {
+    console.warn('Error restoring alerts panel visibility:', e);
   }
 
   // Update refresh button title with next refresh time
