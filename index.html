@@ -3177,8 +3177,14 @@ try {
   if (missingElements.length > 0) {
     console.warn('Missing DOM elements:', missingElements);
   }
+} catch (e) {
+  console.error('Initialization error:', e);
+  const statusText = document.getElementById('statusText');
+  if (statusText) statusText.textContent = 'Connection Error';
+}
 
-  // Intelligence Platform Integration
+// Intelligence Platform Validation (runs after initialization)
+setTimeout(() => {
   const intelligenceSections = [
     'intelligence-regime', 'intelligence-bias', 'intelligence-liquidity',
     'intelligence-policy', 'intelligence-summary', 'intelligence-history'
@@ -3187,21 +3193,21 @@ try {
   intelligenceSections.forEach(id => {
     const el = document.getElementById(id);
     if (!el) {
-      console.warn(`Intelligence section missing: ${id}`);
+      console.warn(`Intelligence section may be loading: ${id}`);
     }
   });
-
-} catch (e) {
-  console.error('Initialization error:', e);
-  const statusText = document.getElementById('statusText');
-  if (statusText) statusText.textContent = 'Connection Error';
-}
+}, 500);
   // Initialize Intelligence Sections
   function initializeIntelligenceSections() {
-    const container = document.querySelector('body');
+    try {
+      const container = document.querySelector('body');
+      if (!container) {
+        console.error('Body container not found');
+        return;
+      }
 
-    // Create intelligence sections HTML
-    const intelligenceHTML = `
+      // Create intelligence sections HTML
+      const intelligenceHTML = `
       <!-- INTELLIGENCE: REGIME -->
       <div id="intelligence-regime" class="section" style="display: none;">
         <div class="section-head">
@@ -3677,13 +3683,16 @@ try {
       </div>
     `;
 
-    // Insert intelligence sections before closing body tag
-    if (document.body) {
-      const tempDiv = document.createElement('div');
-      tempDiv.innerHTML = intelligenceHTML;
-      while (tempDiv.firstChild) {
-        document.body.insertBefore(tempDiv.firstChild, document.body.lastChild);
+      // Insert intelligence sections before closing body tag
+      if (document.body) {
+        const tempDiv = document.createElement('div');
+        tempDiv.innerHTML = intelligenceHTML;
+        while (tempDiv.firstChild) {
+          document.body.insertBefore(tempDiv.firstChild, document.body.lastChild);
+        }
       }
+    } catch (err) {
+      console.error('Error initializing intelligence sections:', err);
     }
   }
 
@@ -3693,4 +3702,8 @@ try {
   } else {
     initializeIntelligenceSections();
   }
+</script>
+
+</body>
+</html>
 
