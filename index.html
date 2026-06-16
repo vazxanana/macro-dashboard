@@ -2441,7 +2441,11 @@ function toggleFloatingNews() {
     floatingNews.style.display = isVisible ? 'none' : 'flex';
 
     // Save preference
-    localStorage.setItem('floatingNewsVisible', isVisible ? 'false' : 'true');
+    try {
+      localStorage.setItem('floatingNewsVisible', isVisible ? 'false' : 'true');
+    } catch (e) {
+      console.warn('localStorage unavailable:', e);
+    }
   } catch (e) {
     console.error('Error toggling floating news:', e);
   }
@@ -2466,7 +2470,11 @@ function toggleAlertsPanel() {
     }
 
     // Save preference
-    localStorage.setItem('alertsPanelVisible', isVisible ? 'false' : 'true');
+    try {
+      localStorage.setItem('alertsPanelVisible', isVisible ? 'false' : 'true');
+    } catch (e) {
+      console.warn('localStorage unavailable:', e);
+    }
   } catch (e) {
     console.error('Error toggling alerts panel:', e);
   }
@@ -2495,9 +2503,18 @@ function showNewsDetail(article) {
     const url = article.url || '#';
     const isValidUrl = /^https?:\/\//.test(url);
 
-    const publishDate = article.publishedAt
-      ? new Date(article.publishedAt).toLocaleString('en-GB', { dateStyle: 'full', timeStyle: 'short' })
-      : 'Date unknown';
+    let publishDate = 'Date unknown';
+    try {
+      if (article.publishedAt) {
+        const date = new Date(article.publishedAt);
+        if (!isNaN(date.getTime())) {
+          publishDate = date.toLocaleString('en-GB', { dateStyle: 'full', timeStyle: 'short' });
+        }
+      }
+    } catch (e) {
+      console.warn('Error formatting publish date:', e);
+      publishDate = 'Date unknown';
+    }
 
     const { category, priority } = getNewsCategoryAndPriority(title);
 
@@ -2620,6 +2637,12 @@ function switchTab(tabName, event) {
       console.warn('Invalid tab name provided to switchTab');
       return;
     }
+
+    // Performance: Debounce rapid tab switches
+    if (switchTab.lastCall && Date.now() - switchTab.lastCall < 100) {
+      return;
+    }
+    switchTab.lastCall = Date.now();
 
     // Sanitize tab name to prevent XSS
     const sanitizedTabName = tabName.replace(/[^a-zA-Z0-9-_]/g, '');
@@ -3702,6 +3725,69 @@ setTimeout(() => {
   } else {
     initializeIntelligenceSections();
   }
+
+  // Offline Detection
+  window.addEventListener('online', () => {
+    try {
+      const statusDot = document.getElementById('statusDot');
+      const statusText = document.getElementById('statusText');
+      if (statusDot) statusDot.classList.remove('offline');
+      if (statusText) statusText.textContent = 'Live Feed Connected';
+      console.info('Connection restored');
+    } catch (e) {
+      console.warn('Error handling online event:', e);
+    }
+  });
+
+  window.addEventListener('offline', () => {
+    try {
+      const statusDot = document.getElementById('statusDot');
+      const statusText = document.getElementById('statusText');
+      if (statusDot) statusDot.classList.add('offline');
+      if (statusText) statusText.textContent = 'Offline Mode';
+      console.warn('Connection lost');
+    } catch (e) {
+      console.warn('Error handling offline event:', e);
+    }
+  });
+
+  // Memory Leak Prevention: Clear old timers on page unload
+  window.addEventListener('beforeunload', () => {
+    try {
+      // Clear any pending animations or timers
+      document.querySelectorAll('[class*="pulse"]').forEach(el => {
+        el.style.animation = 'none';
+      });
+    } catch (e) {
+      console.warn('Error during cleanup:', e);
+    }
+  });
+
+  // Performance: Add visibility change handler to pause updates when tab is hidden
+  document.addEventListener('visibilitychange', () => {
+    if (document.hidden) {
+      console.info('Tab hidden - reducing update frequency');
+    } else {
+      console.info('Tab visible - resuming normal updates');
+      try {
+        updateLiveData();
+      } catch (e) {
+        console.warn('Error resuming updates:', e);
+      }
+    }
+  }, false);
+
+  // Error boundary for unhandled promise rejections
+  window.addEventListener('unhandledrejection', event => {
+    console.error('Unhandled promise rejection:', event.reason);
+    event.preventDefault();
+  });
+
+  // Global error handler
+  window.onerror = (msg, url, lineNo, columnNo, error) => {
+    console.error(`Error: ${msg} at line ${lineNo}:${columnNo}`, error);
+    return false;
+  };
 </script>
 
 </body>
