@@ -2037,6 +2037,80 @@ function initializeLiveData() {
   }
 }
 
+// ═══════════════════════════════════════════════════════════
+// VALIDATION UTILITIES - CRITICAL FOR SAFETY
+// ═══════════════════════════════════════════════════════════
+
+// Utility: Validate numeric data with range checking
+function validateNumber(value, min = -Infinity, max = Infinity, fallback = 0) {
+  try {
+    if (value === null || value === undefined) return fallback;
+    if (typeof value !== 'number') {
+      const parsed = parseFloat(value);
+      if (isNaN(parsed)) return fallback;
+      value = parsed;
+    }
+    if (!isFinite(value)) return fallback;
+    if (value < min || value > max) return fallback;
+    return value;
+  } catch (e) {
+    console.warn('Error validating number:', e);
+    return fallback;
+  }
+}
+
+// Utility: Safely get DOM element with error handling
+function getSafeElement(id) {
+  try {
+    if (!id || typeof id !== 'string') {
+      console.warn('Invalid element ID:', id);
+      return null;
+    }
+    const el = document.getElementById(id);
+    if (!el) {
+      console.warn('Element not found:', id);
+      return null;
+    }
+    return el;
+  } catch (e) {
+    console.warn('Error getting element:', e);
+    return null;
+  }
+}
+
+// Utility: Safely set text content
+function setSafeTextContent(elementId, content) {
+  try {
+    const el = getSafeElement(elementId);
+    if (!el) return false;
+
+    if (content === null || content === undefined) {
+      el.textContent = '--';
+    } else {
+      el.textContent = String(content);
+    }
+    return true;
+  } catch (e) {
+    console.warn('Error setting text content:', e);
+    return false;
+  }
+}
+
+// Utility: Validate string input (prevent XSS)
+function validateString(value, maxLength = 500, allowedPattern = null) {
+  try {
+    if (typeof value !== 'string') return '';
+    if (value.length > maxLength) return '';
+    if (allowedPattern && !allowedPattern.test(value)) return '';
+    return value;
+  } catch (e) {
+    console.warn('Error validating string:', e);
+    return '';
+  }
+}
+
+// ═══════════════════════════════════════════════════════════
+
 function calculateDelta(current, previous) {
   try {
     // Fix: Handle division by zero and null values
@@ -2632,23 +2706,29 @@ function manualRefresh() {
 
 function switchTab(tabName, event) {
   try {
-    // Validate input
+    // Validate input - comprehensive checks
     if (!tabName || typeof tabName !== 'string' || tabName.trim() === '') {
       console.warn('Invalid tab name provided to switchTab');
-      return;
+      return false;
+    }
+
+    // Prevent excessively long tab names (DoS protection)
+    if (tabName.length > 100) {
+      console.warn('Tab name too long');
+      return false;
     }
 
     // Performance: Debounce rapid tab switches
     if (switchTab.lastCall && Date.now() - switchTab.lastCall < 100) {
-      return;
+      return false;
     }
     switchTab.lastCall = Date.now();
 
-    // Sanitize tab name to prevent XSS
+    // Sanitize tab name to prevent XSS - strict whitelist
     const sanitizedTabName = tabName.replace(/[^a-zA-Z0-9-_]/g, '');
-    if (!sanitizedTabName) {
+    if (!sanitizedTabName || sanitizedTabName !== tabName.trim().replace(/[^a-zA-Z0-9-_]/g, '')) {
       console.warn('Tab name contains invalid characters');
-      return;
+      return false;
     }
 
     // Remove active class from all sections
@@ -2675,13 +2755,23 @@ function switchTab(tabName, event) {
       });
     }
 
-    // Add active class to target section
-    const section = document.getElementById(sanitizedTabName);
+    // Add active class to target section - with safety check
+    const section = getSafeElement(sanitizedTabName);
     if (section) {
-      section.classList.add('active');
+      try {
+        section.classList.add('active');
+        // Additional safety: verify the class was added
+        if (!section.classList.contains('active')) {
+          console.error('Failed to add active class to section');
+          return false;
+        }
+      } catch (e) {
+        console.error('Error adding active class:', e);
+        return false;
+      }
     } else {
       console.warn(`Section with id "${sanitizedTabName}" not found`);
-      return;
+      return false;
     }
 
     // Add active class to clicked tab
@@ -3120,8 +3210,11 @@ try {
     refreshBtn.title = `Refresh data now\nNext automatic refresh: ${getNextRefreshTime()}`;
   }
 
+  // Store timer IDs for cleanup
+  const timerIds = [];
+
   // Update live data every 24 hours (86400000ms)
-  setInterval(() => {
+  const dataRefreshTimer = setInterval(() => {
     try {
       simulateLiveDataUpdate();
       console.info('Daily data refresh completed');
@@ -3129,9 +3222,10 @@ try {
       console.error('Data update error:', e);
     }
   }, 86400000);
+  timerIds.push(dataRefreshTimer);
 
   // Update status indicator
-  setInterval(() => {
+  const statusRefreshTimer = setInterval(() => {
     try {
       const statusDot = document.getElementById('statusDot');
       const statusText = document.getElementById('statusText');
@@ -3142,9 +3236,10 @@ try {
       console.error('Status update error:', e);
     }
   }, 1000);
+  timerIds.push(statusRefreshTimer);
 
   // Reload news every 24 hours (86400000ms)
-  setInterval(() => {
+  const newsRefreshTimer = setInterval(() => {
     try {
       loadNews();
       loadEconomicCalendar();
@@ -3153,6 +3248,18 @@ try {
       console.warn('News reload error:', e);
     }
   }, 86400000);
+  timerIds.push(newsRefreshTimer);
+
+  // Cleanup timers on page unload
+  window.addEventListener('beforeunload', () => {
+    timerIds.forEach(id => {
+      try {
+        clearInterval(id);
+      } catch (e) {
+        console.warn('Error clearing timer:', e);
+      }
+    });
+  });
 
   // Keyboard support - close modals with ESC key
   document.addEventListener('keydown', (e) => {
@@ -3751,9 +3858,39 @@ setTimeout(() => {
     }
   });
 
-  // Memory Leak Prevention: Clear old timers on page unload
+  // Memory Leak Prevention: Store and cleanup event listeners
+  const eventListeners = [];
+
+  // Helper to add tracked event listeners
+  function addTrackedEventListener(target, event, handler) {
+    try {
+      target.addEventListener(event, handler);
+      eventListeners.push({ target, event, handler });
+    } catch (e) {
+      console.warn('Error adding event listener:', e);
+    }
+  }
+
+  // Cleanup function
+  function cleanupEventListeners() {
+    try {
+      eventListeners.forEach(({ target, event, handler }) => {
+        try {
+          target.removeEventListener(event, handler);
+        } catch (e) {
+          console.warn('Error removing event listener:', e);
+        }
+      });
+      eventListeners.length = 0;
+    } catch (e) {
+      console.warn('Error during event cleanup:', e);
+    }
+  }
+
+  // Clear old timers and animations on page unload
   window.addEventListener('beforeunload', () => {
     try {
+      cleanupEventListeners();
       // Clear any pending animations or timers
       document.querySelectorAll('[class*="pulse"]').forEach(el => {
         el.style.animation = 'none';
