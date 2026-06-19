@@ -1150,6 +1150,7 @@
   <button class="nav-tab" onclick="switchTab('intelligence-policy', event)">Policy</button>
   <button class="nav-tab" onclick="switchTab('intelligence-summary', event)">AI Summary</button>
   <button class="nav-tab" onclick="switchTab('intelligence-history', event)">Historical</button>
+  <button class="nav-tab" onclick="switchTab('gold-playbook', event)">Gold Playbook</button>
 </div>
 
 <!-- DASHBOARD -->
@@ -2470,6 +2471,294 @@
   </div>
 </div>
 
+<!-- GOLD TRADING PLAYBOOK -->
+<div id="gold-playbook" class="section">
+  <div class="section-head">
+    <div class="section-title">Gold Trading Playbook</div>
+    <div class="section-meta">INSTITUTIONAL FRAMEWORK</div>
+  </div>
+
+  <!-- Five Primary Drivers -->
+  <div class="section-head" style="margin: 24px 24px 0;">
+    <div class="section-title" style="font-size: 14px;">The Five Primary Drivers</div>
+  </div>
+  <div class="grid grid-2" style="margin: 0 24px 24px;">
+    <div class="card">
+      <div class="card-head">
+        <div class="card-title">Real Yields (60-70%)</div>
+      </div>
+      <div style="font-size: 12px; color: var(--ink-dim); line-height: 1.8;">
+        <div style="padding: 8px; background: var(--sage-glow); border-radius: 4px; margin: 8px 0; color: var(--ink);">
+          <strong style="color: var(--sage);">Metric: 10-Year TIPS Yield</strong><br/>
+          Current: <span style="color: var(--sage); font-weight: 600;">+0.42%</span>
+        </div>
+        <div style="margin-top: 8px;">
+          <strong>Bullish Signal:</strong> Negative &amp; falling TIPS<br/>
+          <strong>Bearish Signal:</strong> Positive &amp; rising TIPS
+        </div>
+        <div style="margin-top: 8px; padding-top: 8px; border-top: 1px solid var(--line-soft); font-size: 11px; color: var(--ink-faint);">
+          Gold becomes superior when holding bonds results in real purchasing power loss
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-head">
+        <div class="card-title">US Dollar Strength (DXY)</div>
+      </div>
+      <div style="font-size: 12px; color: var(--ink-dim); line-height: 1.8;">
+        <div style="padding: 8px; background: var(--steel-glow); border-radius: 4px; margin: 8px 0; color: var(--ink);">
+          <strong style="color: var(--steel);">Correlation: -0.6 to -0.8</strong><br/>
+          Current DXY: <span style="color: var(--steel); font-weight: 600;">103.8</span>
+        </div>
+        <div style="margin-top: 8px;">
+          <strong>Strong USD:</strong> Bearish for gold<br/>
+          <strong>Weak USD:</strong> Bullish for gold
+        </div>
+        <div style="margin-top: 8px; padding-top: 8px; border-top: 1px solid var(--line-soft); font-size: 11px; color: var(--ink-faint);">
+          Higher DXY reduces global demand for precious metals
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-head">
+        <div class="card-title">CB Buying (De-Dollarization)</div>
+      </div>
+      <div style="font-size: 12px; color: var(--ink-dim); line-height: 1.8;">
+        <div style="padding: 8px; background: var(--amber-glow); border-radius: 4px; margin: 8px 0; color: var(--ink);">
+          <strong style="color: var(--amber);">Paradigm: Price-Insensitive Buying</strong><br/>
+          Trend: <span style="color: var(--sage); font-weight: 600;">Accelerating ↑</span>
+        </div>
+        <div style="margin-top: 8px;">
+          <strong>Effect:</strong> Creates structural price floor<br/>
+          <strong>Override:</strong> Can overcome real yield headwinds
+        </div>
+        <div style="margin-top: 8px; padding-top: 8px; border-top: 1px solid var(--line-soft); font-size: 11px; color: var(--ink-faint);">
+          Post-2022 phenomenon: central banks buying regardless of price
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-head">
+        <div class="card-title">Inflation Expectations</div>
+      </div>
+      <div style="font-size: 12px; color: var(--ink-dim); line-height: 1.8;">
+        <div style="padding: 8px; background: var(--lime-glow); border-radius: 4px; margin: 8px 0; color: var(--ink);">
+          <strong style="color: var(--lime);">Metric: 10Y Breakeven Inflation</strong><br/>
+          Current: <span style="color: var(--lime); font-weight: 600;">2.35%</span>
+        </div>
+        <div style="margin-top: 8px;">
+          <strong>Watch:</strong> If expectations rise faster than yields<br/>
+          <strong>Result:</strong> Real yields fall = Bullish gold
+        </div>
+        <div style="margin-top: 8px; padding-top: 8px; border-top: 1px solid var(--line-soft); font-size: 11px; color: var(--ink-faint);">
+          Secondary driver, but critical in disinflation regimes
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-head">
+        <div class="card-title">Risk-Off / Geopolitical</div>
+      </div>
+      <div style="font-size: 12px; color: var(--ink-dim); line-height: 1.8;">
+        <div style="padding: 8px; background: var(--rust-glow); border-radius: 4px; margin: 8px 0; color: var(--ink);">
+          <strong style="color: var(--rust);">VIX Trigger: Above 25</strong><br/>
+          Current VIX: <span style="color: var(--rust); font-weight: 600;">17.0</span>
+        </div>
+        <div style="margin-top: 8px;">
+          <strong>Signal:</strong> Safe-haven rallies in fear regimes<br/>
+          <strong>Duration:</strong> Temporary unless policy changes
+        </div>
+        <div style="margin-top: 8px; padding-top: 8px; border-top: 1px solid var(--line-soft); font-size: 11px; color: var(--ink-faint);">
+          Banking crisis &amp; wars trigger fastest rallies
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-head">
+        <div class="card-title">Current Regime Assessment</div>
+      </div>
+      <div style="font-size: 12px; color: var(--ink-dim); line-height: 1.8;">
+        <div style="padding: 8px; background: var(--panel-raised); border-radius: 4px; margin: 8px 0;">
+          <strong style="color: var(--ink);">TIPS Yield:</strong> +0.42% (Slightly Bearish)<br/>
+          <strong style="color: var(--ink);">DXY Trend:</strong> Neutral/Weak (Bullish)<br/>
+          <strong style="color: var(--ink);">CB Buying:</strong> Accelerating (Bullish)<br/>
+          <strong style="color: var(--ink);">Overall Bias:</strong> <span style="color: var(--sage);">NEUTRAL-BULLISH</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Four-Step Execution Workflow -->
+  <div class="section-head" style="margin: 24px 24px 0;">
+    <div class="section-title" style="font-size: 14px;">4-Step Execution Workflow</div>
+  </div>
+  <div style="margin: 0 24px 24px; padding: 20px; background: var(--panel); border: 1px solid var(--line); border-radius: 6px;">
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px;">
+      <div style="padding: 12px; background: var(--panel-raised); border-left: 3px solid var(--sage); border-radius: 4px;">
+        <div style="font-weight: 600; color: var(--sage); margin-bottom: 8px; font-size: 13px;">Step 1: Macro Bias</div>
+        <div style="font-size: 12px; color: var(--ink-dim); line-height: 1.6;">
+          Establish weekly directional bias from the 5 drivers above (e.g., "Bullish because TIPS falling + CB buying accelerating")
+        </div>
+      </div>
+
+      <div style="padding: 12px; background: var(--panel-raised); border-left: 3px solid var(--steel); border-radius: 4px;">
+        <div style="font-weight: 600; color: var(--steel); margin-bottom: 8px; font-size: 13px;">Step 2: 1-Hour Structure</div>
+        <div style="font-size: 12px; color: var(--ink-dim); line-height: 1.6;">
+          Identify key support (longs) or resistance (shorts) on 1-hour chart to anchor the trade execution
+        </div>
+      </div>
+
+      <div style="padding: 12px; background: var(--panel-raised); border-left: 3px solid var(--amber); border-radius: 4px;">
+        <div style="font-weight: 600; color: var(--amber); margin-bottom: 8px; font-size: 13px;">Step 3: Pattern Confirmation</div>
+        <div style="font-size: 12px; color: var(--ink-dim); line-height: 1.6;">
+          Wait for <strong>double bottom</strong> (longs) or <strong>double top</strong> (shorts) to confirm institutional order rejection
+        </div>
+      </div>
+
+      <div style="padding: 12px; background: var(--panel-raised); border-left: 3px solid var(--lime); border-radius: 4px;">
+        <div style="font-weight: 600; color: var(--lime); margin-bottom: 8px; font-size: 13px;">Step 4: 1-Minute Entry</div>
+        <div style="font-size: 12px; color: var(--ink-dim); line-height: 1.6;">
+          Execute on 1-minute following neckline break + pullback for high-precision, low-risk entry with tight stops
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Geopolitical Playbooks -->
+  <div class="section-head" style="margin: 24px 24px 0;">
+    <div class="section-title" style="font-size: 14px;">Geopolitical Response Playbooks</div>
+  </div>
+  <div class="grid grid-2" style="margin: 0 24px 24px;">
+    <div class="card">
+      <div class="card-head">
+        <div class="card-title">🏦 Banking Crisis</div>
+      </div>
+      <div style="font-size: 12px; color: var(--ink-dim); line-height: 1.8;">
+        <div style="padding: 8px; background: var(--rust-glow); border-radius: 4px; margin: 8px 0; color: var(--ink);">
+          <strong style="color: var(--rust);">Classification:</strong> Fastest Risk-Off Event
+        </div>
+        <div><strong>Playbook:</strong></div>
+        <ul style="margin: 6px 0 0 16px; font-size: 12px;">
+          <li>Buy gold immediately</li>
+          <li>Buy JPY (safe haven)</li>
+          <li>Buy US Treasuries (flight to quality)</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-head">
+        <div class="card-title">💵 QE Announcement</div>
+      </div>
+      <div style="font-size: 12px; color: var(--ink-dim); line-height: 1.8;">
+        <div style="padding: 8px; background: var(--lime-glow); border-radius: 4px; margin: 8px 0; color: var(--ink);">
+          <strong style="color: var(--lime);">Classification:</strong> Most Powerful Gold Buy Signal
+        </div>
+        <div><strong>Triple Effect:</strong></div>
+        <ul style="margin: 6px 0 0 16px; font-size: 12px;">
+          <li>Suppresses real yields ↓</li>
+          <li>Weakens currency ↓</li>
+          <li>Raises inflation expectations ↑</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-head">
+        <div class="card-title">⏱️ Information Lag Rule</div>
+      </div>
+      <div style="font-size: 12px; color: var(--ink-dim); line-height: 1.8;">
+        <div style="padding: 8px; background: var(--amber-glow); border-radius: 4px; margin: 8px 0; color: var(--ink);">
+          <strong style="color: var(--amber);">Critical Rule:</strong> Never Trade First 60-90s
+        </div>
+        <div style="margin-top: 8px;">
+          <strong>Wait for:</strong> Algorithmic noise to settle<br/>
+          <strong>Enter on:</strong> 2-5 minute pullback once direction confirmed
+        </div>
+        <div style="margin-top: 8px; padding-top: 8px; border-top: 1px solid var(--line-soft); font-size: 11px;">
+          Applies to CPI, NFP, FOMC, and major economic releases
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-head">
+        <div class="card-title">⚠️ Geopolitical War</div>
+      </div>
+      <div style="font-size: 12px; color: var(--ink-dim); line-height: 1.8;">
+        <div style="padding: 8px; background: var(--rust-glow); border-radius: 4px; margin: 8px 0; color: var(--ink);">
+          <strong style="color: var(--rust);">Classification:</strong> Sharp Safe-Haven Rally
+        </strong>
+        </div>
+        <div style="margin-top: 8px;">
+          <strong>Primary Driver:</strong> USD strength (haven currency)<br/>
+          <strong>Secondary:</strong> Gold as geopolitical insurance
+        </div>
+        <div style="margin-top: 8px; padding-top: 8px; border-top: 1px solid var(--line-soft); font-size: 11px;">
+          Duration depends on whether conflict affects energy/supply chains
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Daily Dashboard Metrics -->
+  <div class="section-head" style="margin: 24px 24px 0;">
+    <div class="section-title" style="font-size: 14px;">Daily Dashboard Metrics</div>
+  </div>
+  <div style="margin: 0 24px 40px; padding: 20px; background: var(--panel); border: 1px solid var(--line); border-radius: 6px;">
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px;">
+      <div style="padding: 12px; background: var(--panel-raised); border-radius: 4px;">
+        <div style="font-size: 11px; color: var(--ink-faint); margin-bottom: 6px;">10-Year TIPS Yield</div>
+        <div style="font-size: 16px; font-weight: 600; color: var(--sage); margin-bottom: 8px;">+0.42%</div>
+        <div style="font-size: 11px; color: var(--ink-dim);">Symbol: DFII10 (FRED)</div>
+        <div style="margin-top: 8px; padding-top: 8px; border-top: 1px solid var(--line-soft); font-size: 10px; color: var(--amber);">
+          ⚠️ Primary direction input
+        </div>
+      </div>
+
+      <div style="padding: 12px; background: var(--panel-raised); border-radius: 4px;">
+        <div style="font-size: 11px; color: var(--ink-faint); margin-bottom: 6px;">DXY Trend</div>
+        <div style="font-size: 16px; font-weight: 600; color: var(--steel); margin-bottom: 8px;">103.8</div>
+        <div style="font-size: 11px; color: var(--ink-dim);">Inverse Gold Correlation</div>
+        <div style="margin-top: 8px; padding-top: 8px; border-top: 1px solid var(--line-soft); font-size: 10px; color: var(--amber);">
+          Primary filter for non-USD
+        </div>
+      </div>
+
+      <div style="padding: 12px; background: var(--panel-raised); border-radius: 4px;">
+        <div style="font-size: 11px; color: var(--ink-faint); margin-bottom: 6px;">VIX Level</div>
+        <div style="font-size: 16px; font-weight: 600; color: var(--rust); margin-bottom: 8px;">17.0</div>
+        <div style="font-size: 11px; color: var(--ink-dim);">Watch for spikes above 25</div>
+        <div style="margin-top: 8px; padding-top: 8px; border-top: 1px solid var(--line-soft); font-size: 10px; color: var(--amber);">
+          Fear regime signal
+        </div>
+      </div>
+
+      <div style="padding: 12px; background: var(--panel-raised); border-radius: 4px;">
+        <div style="font-size: 11px; color: var(--ink-faint); margin-bottom: 6px;">COT Report</div>
+        <div style="font-size: 16px; font-weight: 600; color: var(--lime); margin-bottom: 8px;">Friday</div>
+        <div style="font-size: 11px; color: var(--ink-dim);">Check Managed Money positioning</div>
+        <div style="margin-top: 8px; padding-top: 8px; border-top: 1px solid var(--line-soft); font-size: 10px; color: var(--amber);">
+          Extreme shorts = squeeze setup
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Core Principle -->
+  <div style="margin: 0 24px 40px; padding: 16px; background: var(--sage-glow); border-left: 4px solid var(--sage); border-radius: 4px;">
+    <div style="font-weight: 600; color: var(--sage); margin-bottom: 8px; font-size: 13px;">Core Principle</div>
+    <div style="font-size: 12px; color: var(--ink); line-height: 1.7;">
+      <strong>Gold is a real interest rate asset, not a nominal inflation hedge.</strong> Institutions ignore the retail misconception and use a systematic framework driven by real yields, central bank flows, and geopolitical risk classification. Negative and falling TIPS yields create the most bullish signal—when holding safe bonds results in a loss of real purchasing power, gold becomes superior.
+    </div>
+  </div>
+</div>
+
 <!-- FLOATING NEWS WIDGET -->
 <div class="floating-news" id="floatingNews">
   <div class="floating-news-header">
@@ -2561,6 +2850,7 @@ const translations = {
     policy: 'Policy',
     aiSummary: 'AI Summary',
     historical: 'Historical',
+    goldPlaybook: 'Gold Playbook',
 
     // Buttons & Controls
     refresh: 'REFRESH',
@@ -2599,6 +2889,7 @@ const translations = {
     policy: 'Política',
     aiSummary: 'Resumo IA',
     historical: 'Histórico',
+    goldPlaybook: 'Playbook de Ouro',
 
     // Buttons & Controls
     refresh: 'ATUALIZAR',
@@ -4087,6 +4378,7 @@ try {
   const criticalElements = [
     'dashboard', 'signals', 'economic', 'analysis', 'technical', 'sentiment', 'setups', 'report',
     'intelligence-regime', 'intelligence-bias', 'intelligence-liquidity', 'intelligence-policy', 'intelligence-summary', 'intelligence-history',
+    'gold-playbook',
     'chartModal', 'newsDetailModal', 'floatingNews', 'updateTime', 'statusDot', 'statusText'
   ];
   const missingElements = criticalElements.filter(id => !document.getElementById(id));
