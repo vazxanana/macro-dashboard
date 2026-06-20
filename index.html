@@ -1265,48 +1265,51 @@
   </div>
 </div>
 
-<!-- NAV -->
+<!-- NAV - SIMPLE FLAT TABS -->
 <div class="nav-tabs" id="navTabs">
-  <button class="nav-tab active" data-tab="dashboard">Dashboard</button>
-
-  <div class="nav-dropdown-container">
-    <button class="nav-tab nav-dropdown-trigger">Core Macro ▼</button>
-    <div class="nav-dropdown-menu" style="display: none;">
-      <button class="nav-tab nav-dropdown-item" data-tab="signals">Macro Signals</button>
-      <button class="nav-tab nav-dropdown-item" data-tab="economic">Economic Data</button>
-    </div>
-  </div>
-
-  <div class="nav-dropdown-container">
-    <button class="nav-tab nav-dropdown-trigger">Trading ▼</button>
-    <div class="nav-dropdown-menu" style="display: none;">
-      <button class="nav-tab nav-dropdown-item" data-tab="analysis">Market Analysis</button>
-      <button class="nav-tab nav-dropdown-item" data-tab="technical">Technical</button>
-      <button class="nav-tab nav-dropdown-item" data-tab="setups">Trade Setups</button>
-      <button class="nav-tab nav-dropdown-item" data-tab="gold-playbook">Gold Playbook</button>
-    </div>
-  </div>
-
-  <div class="nav-dropdown-container">
-    <button class="nav-tab nav-dropdown-trigger">Intelligence ▼</button>
-    <div class="nav-dropdown-menu" style="display: none;">
-      <button class="nav-tab nav-dropdown-item" data-tab="intelligence-regime">Regime</button>
-      <button class="nav-tab nav-dropdown-item" data-tab="intelligence-bias">Daily Bias</button>
-      <button class="nav-tab nav-dropdown-item" data-tab="intelligence-liquidity">Liquidity</button>
-      <button class="nav-tab nav-dropdown-item" data-tab="intelligence-policy">Policy</button>
-      <button class="nav-tab nav-dropdown-item" data-tab="intelligence-summary">AI Summary</button>
-      <button class="nav-tab nav-dropdown-item" data-tab="intelligence-history">Historical</button>
-    </div>
-  </div>
-
-  <div class="nav-dropdown-container">
-    <button class="nav-tab nav-dropdown-trigger">Reports ▼</button>
-    <div class="nav-dropdown-menu" style="display: none;">
-      <button class="nav-tab nav-dropdown-item" data-tab="sentiment">Sentiment</button>
-      <button class="nav-tab nav-dropdown-item" data-tab="report">Weekly Report</button>
-    </div>
-  </div>
+  <button class="nav-tab active" onclick="showTab('dashboard')">📊 Dashboard</button>
+  <button class="nav-tab" onclick="showTab('signals')">📈 Macro Signals</button>
+  <button class="nav-tab" onclick="showTab('economic')">💹 Economic</button>
+  <button class="nav-tab" onclick="showTab('analysis')">📉 Analysis</button>
+  <button class="nav-tab" onclick="showTab('technical')">🔧 Technical</button>
+  <button class="nav-tab" onclick="showTab('sentiment')">💬 Sentiment</button>
+  <button class="nav-tab" onclick="showTab('setups')">🎯 Setups</button>
+  <button class="nav-tab" onclick="showTab('report')">📋 Report</button>
+  <button class="nav-tab" onclick="showTab('intelligence-regime')">🧠 Regime</button>
+  <button class="nav-tab" onclick="showTab('intelligence-bias')">⚖️ Bias</button>
+  <button class="nav-tab" onclick="showTab('intelligence-liquidity')">💧 Liquidity</button>
+  <button class="nav-tab" onclick="showTab('intelligence-policy')">🏛️ Policy</button>
+  <button class="nav-tab" onclick="showTab('intelligence-summary')">🤖 AI Summary</button>
+  <button class="nav-tab" onclick="showTab('intelligence-history')">📚 Historical</button>
+  <button class="nav-tab" onclick="showTab('gold-playbook')">🏆 Gold Playbook</button>
 </div>
+
+<script>
+function showTab(tabName) {
+  // Hide all sections
+  var sections = document.querySelectorAll('.section');
+  for (var i = 0; i < sections.length; i++) {
+    sections[i].classList.remove('active');
+  }
+
+  // Remove active from all buttons
+  var buttons = document.querySelectorAll('.nav-tab');
+  for (var i = 0; i < buttons.length; i++) {
+    buttons[i].classList.remove('active');
+  }
+
+  // Show selected section
+  var section = document.getElementById(tabName);
+  if (section) {
+    section.classList.add('active');
+  }
+
+  // Mark button as active
+  event.target.classList.add('active');
+
+  window.scrollTo(0, 0);
+}
+</script>
 
 <!-- DASHBOARD -->
 <div id="dashboard" class="section active">
