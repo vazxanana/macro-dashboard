@@ -245,6 +245,47 @@
     color: var(--sage);
   }
 
+  .nav-dropdown-container {
+    position: relative;
+    display: inline-block;
+  }
+
+  .nav-dropdown-menu {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    background: var(--panel-raised);
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    min-width: 160px;
+    z-index: 1000;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+    margin-top: 4px;
+    display: none;
+  }
+
+  .nav-dropdown-item {
+    display: block;
+    width: 100%;
+    text-align: left;
+    padding: 10px 16px;
+    border: none;
+    background: none;
+    color: var(--ink);
+    cursor: pointer;
+    transition: all 0.2s;
+    font-family: var(--sans);
+    font-size: 13px;
+  }
+
+  .nav-dropdown-item:first-child {
+    border-radius: 4px 4px 0 0;
+  }
+
+  .nav-dropdown-item:last-child {
+    border-radius: 0 0 4px 4px;
+  }
+
   /* LANGUAGE SELECTOR */
   .lang-selector {
     display: flex;
@@ -1270,116 +1311,6 @@
     </div>
   </div>
 </div>
-
-<script>
-// Tab click handler - works for all tabs
-function handleTabClick(tabName) {
-  // Hide all sections
-  document.querySelectorAll('.section').forEach(section => {
-    section.classList.remove('active');
-  });
-
-  // Remove active from all buttons
-  document.querySelectorAll('.nav-tab').forEach(b => {
-    b.classList.remove('active');
-  });
-
-  // Show selected section
-  const section = document.getElementById(tabName);
-  if (section) {
-    section.classList.add('active');
-    window.scrollTo(0, 0);
-  }
-
-  // Close all dropdowns
-  document.querySelectorAll('.nav-dropdown-menu').forEach(menu => {
-    menu.style.display = 'none';
-  });
-}
-
-// Attach click handlers to all tab buttons
-document.querySelectorAll('[data-tab]').forEach(btn => {
-  btn.addEventListener('click', function(e) {
-    e.stopPropagation();
-    const tabName = this.getAttribute('data-tab');
-    handleTabClick(tabName);
-    this.classList.add('active');
-  });
-});
-
-// Dropdown toggle functionality
-document.querySelectorAll('.nav-dropdown-trigger').forEach(trigger => {
-  trigger.addEventListener('click', function(e) {
-    e.stopPropagation();
-    const menu = this.nextElementSibling;
-
-    // Close all other menus
-    document.querySelectorAll('.nav-dropdown-menu').forEach(m => {
-      if (m !== menu) m.style.display = 'none';
-    });
-
-    // Toggle this menu
-    menu.style.display = menu.style.display === 'none' ? 'block' : 'none';
-  });
-});
-
-// Close dropdowns when clicking outside
-document.addEventListener('click', function() {
-  document.querySelectorAll('.nav-dropdown-menu').forEach(menu => {
-    menu.style.display = 'none';
-  });
-});
-</script>
-
-<style>
-.nav-dropdown-container {
-  position: relative;
-  display: inline-block;
-}
-
-.nav-dropdown-menu {
-  position: absolute;
-  top: 100%;
-  left: 0;
-  background: var(--panel-raised);
-  border: 1px solid var(--line);
-  border-radius: 4px;
-  min-width: 160px;
-  z-index: 1000;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-  margin-top: 4px;
-  display: none !important;
-}
-
-.nav-dropdown-menu.open {
-  display: block !important;
-}
-
-.nav-dropdown-item {
-  display: block;
-  width: 100%;
-  text-align: left;
-  padding: 10px 16px;
-  border: none;
-  background: none;
-  color: var(--ink);
-  cursor: pointer;
-  transition: all 0.2s;
-}
-
-.nav-dropdown-item:hover {
-  background: var(--sage-glow);
-  color: var(--sage);
-}
-
-.nav-dropdown-item:first-of-type {
-  border-radius: 4px 4px 0 0;
-}
-
-.nav-dropdown-item:last-of-type {
-  border-radius: 0 0 4px 4px;
-}
-</style>
 
 <!-- DASHBOARD -->
 <div id="dashboard" class="section active">
@@ -5493,6 +5424,96 @@ try {
     console.error(`Error: ${msg} at line ${lineNo}:${columnNo}`, error);
     return false;
   };
+
+  // ═══════════════════════════════════════════════════════════
+  // TAB NAVIGATION INITIALIZATION
+  // ═══════════════════════════════════════════════════════════
+
+  function initTabs() {
+    console.log('Initializing tabs...');
+
+    // Tab click handler
+    function switchToTab(tabName) {
+      console.log('Switching to tab:', tabName);
+
+      // Hide all sections
+      document.querySelectorAll('.section').forEach(s => {
+        s.classList.remove('active');
+      });
+
+      // Remove active from all buttons
+      document.querySelectorAll('[data-tab], .nav-dropdown-trigger').forEach(b => {
+        b.classList.remove('active');
+      });
+
+      // Show target section
+      const section = document.getElementById(tabName);
+      if (section) {
+        section.classList.add('active');
+        console.log('Section shown:', tabName);
+      }
+
+      // Close all dropdowns
+      document.querySelectorAll('.nav-dropdown-menu').forEach(m => {
+        m.style.display = 'none';
+      });
+
+      window.scrollTo(0, 0);
+    }
+
+    // Attach click handlers to tab items
+    document.querySelectorAll('[data-tab]').forEach(btn => {
+      btn.addEventListener('click', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        const tabName = this.getAttribute('data-tab');
+        switchToTab(tabName);
+        this.classList.add('active');
+      });
+    });
+
+    // Dropdown toggle
+    document.querySelectorAll('.nav-dropdown-trigger').forEach(trigger => {
+      trigger.addEventListener('click', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+
+        const menu = this.parentElement.querySelector('.nav-dropdown-menu');
+        if (!menu) {
+          console.error('Menu not found');
+          return;
+        }
+
+        // Close other menus
+        document.querySelectorAll('.nav-dropdown-menu').forEach(m => {
+          if (m !== menu) m.style.display = 'none';
+        });
+
+        // Toggle this menu
+        const isOpen = menu.style.display === 'block';
+        menu.style.display = isOpen ? 'none' : 'block';
+        console.log('Menu toggled:', isOpen ? 'closed' : 'opened');
+      });
+    });
+
+    // Close dropdowns on outside click
+    document.addEventListener('click', function(e) {
+      if (!e.target.closest('.nav-dropdown-trigger') && !e.target.closest('.nav-dropdown-menu')) {
+        document.querySelectorAll('.nav-dropdown-menu').forEach(m => {
+          m.style.display = 'none';
+        });
+      }
+    });
+
+    console.log('Tabs initialized successfully');
+  }
+
+  // Initialize when DOM is ready
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initTabs);
+  } else {
+    initTabs();
+  }
 </script>
 
 </body>
