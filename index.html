@@ -4653,123 +4653,61 @@ function manualRefresh() {
 
 function switchTab(tabName, event) {
   try {
+    console.log('switchTab called with:', tabName);
+
     // Prevent default and stop propagation
     if (event) {
       event.preventDefault();
       event.stopPropagation();
     }
 
-    // Validate input - comprehensive checks
-    if (!tabName || typeof tabName !== 'string' || tabName.trim() === '') {
-      console.warn('Invalid tab name provided to switchTab');
+    // Validate input
+    if (!tabName || typeof tabName !== 'string') {
+      console.warn('Invalid tab name');
       return false;
     }
 
-    // Prevent excessively long tab names (DoS protection)
-    if (tabName.length > 100) {
-      console.warn('Tab name too long');
-      return false;
-    }
+    tabName = tabName.trim();
 
-    // Performance: Debounce rapid tab switches
-    if (switchTab.lastCall && Date.now() - switchTab.lastCall < 100) {
-      return false;
-    }
-    switchTab.lastCall = Date.now();
-
-    // Sanitize tab name to prevent XSS - strict whitelist
-    const sanitizedTabName = tabName.replace(/[^a-zA-Z0-9-_]/g, '');
-    if (!sanitizedTabName || sanitizedTabName !== tabName.trim().replace(/[^a-zA-Z0-9-_]/g, '')) {
-      console.warn('Tab name contains invalid characters');
-      return false;
-    }
-
-    // Remove active class from all sections
+    // Hide all sections
     const sections = document.querySelectorAll('.section');
-    if (sections && sections.length > 0) {
-      sections.forEach(s => {
-        try {
-          s.classList.remove('active');
-        } catch (e) {
-          console.warn('Error removing active from section:', e);
-        }
-      });
-    }
+    sections.forEach(s => {
+      s.classList.remove('active');
+      s.style.display = 'none';
+    });
 
-    // Close all dropdown menus
+    // Remove active from all tabs
+    const tabs = document.querySelectorAll('.nav-tab, .nav-dropdown-item');
+    tabs.forEach(t => {
+      t.classList.remove('active');
+    });
+
+    // Close all dropdowns
     const dropdowns = document.querySelectorAll('.nav-dropdown-menu');
-    if (dropdowns && dropdowns.length > 0) {
-      dropdowns.forEach(d => {
-        try {
-          d.style.display = 'none';
-        } catch (e) {
-          console.warn('Error closing dropdown:', e);
-        }
-      });
-    }
+    dropdowns.forEach(d => {
+      d.style.display = 'none';
+    });
 
-    // Remove active class from all tabs
-    const tabs = document.querySelectorAll('.nav-tab');
-    if (tabs && tabs.length > 0) {
-      tabs.forEach(t => {
-        try {
-          t.classList.remove('active');
-        } catch (e) {
-          console.warn('Error removing active from tab:', e);
-        }
-      });
-    }
-
-    // Find and mark the active tab button (look in both main tabs and dropdown items)
-    const tabButtons = document.querySelectorAll('[onclick*="switchTab"]');
-    if (tabButtons && tabButtons.length > 0) {
-      tabButtons.forEach(btn => {
-        try {
-          if (btn.getAttribute('onclick').includes(`'${sanitizedTabName}'`)) {
-            btn.classList.add('active');
-          }
-        } catch (e) {
-          console.warn('Error updating button active state:', e);
-        }
-      });
-    }
-
-    // Add active class to target section - with safety check
-    const section = getSafeElement(sanitizedTabName);
+    // Show target section
+    const section = document.getElementById(tabName);
     if (section) {
-      try {
-        section.classList.add('active');
-        // Additional safety: verify the class was added
-        if (!section.classList.contains('active')) {
-          console.error('Failed to add active class to section');
-          return false;
-        }
-      } catch (e) {
-        console.error('Error adding active class:', e);
-        return false;
-      }
+      section.classList.add('active');
+      section.style.display = 'block';
+      console.log('Showing section:', tabName);
     } else {
-      console.warn(`Section with id "${sanitizedTabName}" not found`);
+      console.error('Section not found:', tabName);
       return false;
     }
 
-    // Add active class to clicked tab
-    if (event && event.target && typeof event.target.classList !== 'undefined') {
-      try {
-        event.target.classList.add('active');
-      } catch (e) {
-        console.warn('Error adding active to event target:', e);
-      }
+    // Mark active tab
+    if (event && event.target) {
+      event.target.classList.add('active');
     }
 
     // Scroll to top
-    try {
-      if (typeof window !== 'undefined' && typeof window.scrollTo === 'function') {
-        window.scrollTo(0, 0);
-      }
-    } catch (e) {
-      console.warn('Error scrolling to top:', e);
-    }
+    window.scrollTo(0, 0);
+    console.log('Tab switched to:', tabName);
+    return true;
   } catch (e) {
     console.error('Tab switch error:', e);
   }
