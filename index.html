@@ -5050,9 +5050,10 @@ function loadEconomicCalendar() {
   try {
     const economicCalendar = document.getElementById('economicCalendar');
     if (!economicCalendar) {
-      console.warn('Economic calendar element not found');
+      console.error('ERROR: Economic calendar element with ID "economicCalendar" not found in DOM');
       return;
     }
+    console.log('✓ Calendar element found, loading events...');
 
     // Past 5 days + upcoming events
     const events = [
