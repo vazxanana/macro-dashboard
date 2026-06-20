@@ -4652,65 +4652,38 @@ function manualRefresh() {
 }
 
 function switchTab(tabName, event) {
-  try {
-    console.log('switchTab called with:', tabName);
+  if (event) event.preventDefault();
 
-    // Prevent default and stop propagation
-    if (event) {
-      event.preventDefault();
-      event.stopPropagation();
-    }
+  // Hide all sections - use both methods to be sure
+  document.querySelectorAll('.section').forEach(el => {
+    el.style.display = 'none';
+    el.classList.remove('active');
+  });
 
-    // Validate input
-    if (!tabName || typeof tabName !== 'string') {
-      console.warn('Invalid tab name');
-      return false;
-    }
-
-    tabName = tabName.trim();
-
-    // Hide all sections
-    const sections = document.querySelectorAll('.section');
-    sections.forEach(s => {
-      s.classList.remove('active');
-      s.style.display = 'none';
-    });
-
-    // Remove active from all tabs
-    const tabs = document.querySelectorAll('.nav-tab, .nav-dropdown-item');
-    tabs.forEach(t => {
-      t.classList.remove('active');
-    });
-
-    // Close all dropdowns
-    const dropdowns = document.querySelectorAll('.nav-dropdown-menu');
-    dropdowns.forEach(d => {
-      d.style.display = 'none';
-    });
-
-    // Show target section
-    const section = document.getElementById(tabName);
-    if (section) {
-      section.classList.add('active');
-      section.style.display = 'block';
-      console.log('Showing section:', tabName);
-    } else {
-      console.error('Section not found:', tabName);
-      return false;
-    }
-
-    // Mark active tab
-    if (event && event.target) {
-      event.target.classList.add('active');
-    }
-
-    // Scroll to top
-    window.scrollTo(0, 0);
-    console.log('Tab switched to:', tabName);
-    return true;
-  } catch (e) {
-    console.error('Tab switch error:', e);
+  // Show target section
+  const target = document.getElementById(tabName);
+  if (!target) {
+    console.error('Section not found:', tabName);
+    return;
   }
+
+  target.style.display = 'block';
+  target.classList.add('active');
+
+  // Update tab styling
+  document.querySelectorAll('[onclick*="switchTab"]').forEach(btn => {
+    btn.classList.remove('active');
+    if (btn.getAttribute('onclick').includes(`'${tabName}'`)) {
+      btn.classList.add('active');
+    }
+  });
+
+  // Close dropdowns
+  document.querySelectorAll('.nav-dropdown-menu').forEach(menu => {
+    menu.style.display = 'none';
+  });
+
+  window.scrollTo(0, 0);
 }
 
 // Fetch news (Fixed: error handling, XSS protection, proper API key handling)
