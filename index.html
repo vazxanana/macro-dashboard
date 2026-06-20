@@ -4654,9 +4654,8 @@ function manualRefresh() {
 function switchTab(tabName, event) {
   if (event) event.preventDefault();
 
-  // Hide all sections - use both methods to be sure
+  // Hide all sections using ONLY classes (not inline styles)
   document.querySelectorAll('.section').forEach(el => {
-    el.style.display = 'none';
     el.classList.remove('active');
   });
 
@@ -4667,7 +4666,6 @@ function switchTab(tabName, event) {
     return;
   }
 
-  target.style.display = 'block';
   target.classList.add('active');
 
   // Update tab styling
