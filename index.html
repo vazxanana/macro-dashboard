@@ -134,53 +134,76 @@
     70% { box-shadow: 0 0 0 6px rgba(122,155,126,0); }
   }
 
-  /* NAV TABS */
-  .nav-tabs {
-    background: rgba(10,11,13,0.8);
+  /* NAV — two-level grouped navigation */
+  .nav-wrapper {
+    background: rgba(10,11,13,0.95);
     border-bottom: 1px solid var(--line);
-    display: flex;
-    gap: 0;
-    padding: 0 24px;
+  }
+
+  .nav-primary {
     max-width: 1400px;
     margin: 0 auto;
+    padding: 0 24px;
+    display: flex;
+    align-items: center;
+    border-bottom: 1px solid var(--line-soft);
+  }
+
+  .nav-primary-tab {
+    padding: 11px 22px;
+    background: none;
+    border: none;
+    color: var(--ink-faint);
+    cursor: pointer;
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1.2px;
+    border-bottom: 2px solid transparent;
+    transition: color 0.2s, border-color 0.2s;
+    white-space: nowrap;
+    margin-bottom: -1px;
+  }
+
+  .nav-primary-tab:hover { color: var(--ink-dim); }
+
+  .nav-primary-tab.active {
+    color: var(--sage);
+    border-bottom-color: var(--sage);
+  }
+
+  .nav-secondary {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 0 24px;
+    display: none;
     overflow-x: auto;
     overflow-y: hidden;
     scrollbar-width: thin;
     scrollbar-color: var(--line-soft) transparent;
   }
 
-  .nav-tabs::-webkit-scrollbar {
-    height: 6px;
-  }
+  .nav-secondary.visible { display: flex; }
 
-  .nav-tabs::-webkit-scrollbar-track {
-    background: transparent;
-  }
-
-  .nav-tabs::-webkit-scrollbar-thumb {
+  .nav-secondary::-webkit-scrollbar { height: 3px; }
+  .nav-secondary::-webkit-scrollbar-track { background: transparent; }
+  .nav-secondary::-webkit-scrollbar-thumb {
     background: var(--line-soft);
-    border-radius: 3px;
-    border: 2px solid transparent;
-    background-clip: content-box;
-  }
-
-  .nav-tabs::-webkit-scrollbar-thumb:hover {
-    background: var(--ink-faint);
-    background-clip: content-box;
+    border-radius: 2px;
   }
 
   .nav-tab {
-    padding: 12px 18px;
+    padding: 9px 15px;
     background: none;
     border: none;
     color: var(--ink-faint);
     cursor: pointer;
-    font-size: 12px;
+    font-size: 11px;
     font-weight: 600;
     text-transform: uppercase;
-    letter-spacing: 0.8px;
+    letter-spacing: 0.7px;
     border-bottom: 2px solid transparent;
-    transition: all 0.3s ease;
+    transition: color 0.2s, border-color 0.2s;
     white-space: nowrap;
   }
 
@@ -192,7 +215,28 @@
   .nav-tab.active {
     color: var(--sage);
     border-bottom-color: var(--sage);
-    text-shadow: 0 0 8px var(--sage-glow);
+  }
+
+  /* PDF download button */
+  .pdf-btn {
+    background: var(--panel-raised);
+    border: 1px solid var(--sage);
+    color: var(--sage);
+    padding: 6px 14px;
+    border-radius: 3px;
+    font-family: var(--mono);
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+
+  .pdf-btn:hover {
+    background: var(--sage-glow);
+    box-shadow: 0 0 8px rgba(155,123,168,0.2);
   }
 
   /* LANGUAGE SELECTOR */
@@ -1057,11 +1101,32 @@
     }
   }
 
+  /* PRINT / PDF */
+  @media print {
+    .grain, .topbar, .nav-wrapper, .floating-news, .modal,
+    #alertsBtn, #refreshBtn, .lang-selector, .live-dot,
+    .pdf-btn { display: none !important; }
+    body { background: white !important; }
+    :root {
+      --bg:#fff; --panel:#f5f5f5; --panel-raised:#ebebeb;
+      --line:#ddd; --line-soft:#e5e5e5;
+      --ink:#111; --ink-dim:#444; --ink-faint:#888;
+      --sage:#1a6b32; --sage-glow:rgba(26,107,50,0.1);
+      --amber:#9a6b00; --amber-glow:rgba(154,107,0,0.1);
+      --rust:#b83030; --rust-glow:rgba(184,48,48,0.1);
+      --steel:#285498; --steel-glow:rgba(40,84,152,0.1);
+    }
+    .section { display: none !important; }
+    .section.active { display: block !important; }
+    @page { margin: 15mm; }
+  }
+
   @media (max-width: 768px) {
     .grid-2, .grid-3, .grid-4 { grid-template-columns: 1fr; }
     .topbar-inner { flex-wrap: wrap; gap: 12px; }
-    .nav-tabs { padding: 0 12px; }
-    .nav-tab { padding: 10px 12px; font-size: 11px; }
+    .nav-primary, .nav-secondary { padding: 0 12px; }
+    .nav-primary-tab { padding: 9px 14px; }
+    .nav-tab { padding: 8px 10px; font-size: 10px; }
 
     .modal-content {
       width: 100%;
@@ -1134,23 +1199,36 @@
 </div>
 
 <!-- NAV -->
-<div class="nav-tabs" id="navTabs">
-  <button class="nav-tab active" onclick="switchTab('dashboard', event)">Dashboard</button>
-  <button class="nav-tab" onclick="switchTab('signals', event)">Macro Signals</button>
-  <button class="nav-tab" onclick="switchTab('economic', event)">Economic Data</button>
-  <button class="nav-tab" onclick="switchTab('analysis', event)">Market Analysis</button>
-  <button class="nav-tab" onclick="switchTab('technical', event)">Technical</button>
-  <button class="nav-tab" onclick="switchTab('sentiment', event)">Sentiment</button>
-  <button class="nav-tab" onclick="switchTab('setups', event)">Trade Setups</button>
-  <button class="nav-tab" onclick="switchTab('report', event)">Weekly Report</button>
-  <div style="width: 100%; height: 1px; background: var(--line); margin: 0 16px;"></div>
-  <button class="nav-tab" onclick="switchTab('intelligence-regime', event)">Regime</button>
-  <button class="nav-tab" onclick="switchTab('intelligence-bias', event)">Daily Bias</button>
-  <button class="nav-tab" onclick="switchTab('intelligence-liquidity', event)">Liquidity</button>
-  <button class="nav-tab" onclick="switchTab('intelligence-policy', event)">Policy</button>
-  <button class="nav-tab" onclick="switchTab('intelligence-summary', event)">AI Summary</button>
-  <button class="nav-tab" onclick="switchTab('intelligence-history', event)">Historical</button>
-  <button class="nav-tab" onclick="switchTab('gold-playbook', event)">Gold Playbook</button>
+<div class="nav-wrapper" id="navWrapper">
+  <div class="nav-primary">
+    <button class="nav-primary-tab active" onclick="switchGroup('overview', this)">Dashboard</button>
+    <button class="nav-primary-tab" onclick="switchGroup('markets', this)">Markets</button>
+    <button class="nav-primary-tab" onclick="switchGroup('intelligence', this)">Intelligence</button>
+    <button class="nav-primary-tab" onclick="switchGroup('reports', this)">Reports</button>
+  </div>
+
+  <div class="nav-secondary" id="nav-group-markets">
+    <button class="nav-tab" onclick="switchTab('signals', event)">Macro Signals</button>
+    <button class="nav-tab" onclick="switchTab('economic', event)">Economic Data</button>
+    <button class="nav-tab" onclick="switchTab('analysis', event)">Market Analysis</button>
+    <button class="nav-tab" onclick="switchTab('technical', event)">Technical</button>
+    <button class="nav-tab" onclick="switchTab('sentiment', event)">Sentiment</button>
+    <button class="nav-tab" onclick="switchTab('setups', event)">Trade Setups</button>
+  </div>
+
+  <div class="nav-secondary" id="nav-group-intelligence">
+    <button class="nav-tab" onclick="switchTab('intelligence-regime', event)">Regime</button>
+    <button class="nav-tab" onclick="switchTab('intelligence-bias', event)">Daily Bias</button>
+    <button class="nav-tab" onclick="switchTab('intelligence-liquidity', event)">Liquidity</button>
+    <button class="nav-tab" onclick="switchTab('intelligence-policy', event)">Policy</button>
+    <button class="nav-tab" onclick="switchTab('intelligence-summary', event)">AI Summary</button>
+    <button class="nav-tab" onclick="switchTab('intelligence-history', event)">Historical</button>
+  </div>
+
+  <div class="nav-secondary" id="nav-group-reports">
+    <button class="nav-tab" onclick="switchTab('gold-playbook', event)">Gold Playbook</button>
+    <button class="nav-tab" onclick="switchTab('report', event)">Weekly Report</button>
+  </div>
 </div>
 
 <!-- DASHBOARD -->
@@ -1761,9 +1839,12 @@
 
 <!-- WEEKLY REPORT -->
 <div id="report" class="section">
-  <div class="section-head">
-    <div class="section-title">Weekly Market Report</div>
-    <div class="section-meta">SUMMARY & KEY TAKEAWAYS</div>
+  <div class="section-head" style="align-items: center;">
+    <div>
+      <div class="section-title">Weekly Market Report</div>
+      <div class="section-meta">SUMMARY &amp; KEY TAKEAWAYS</div>
+    </div>
+    <button class="pdf-btn" onclick="generatePDF('report', 'Weekly Market Report')">&#x1F4C4; Download PDF</button>
   </div>
 
   <div style="margin: 0 24px 40px;">
@@ -2479,9 +2560,7 @@
         <div class="section-title">Gold Trading Playbook</div>
         <div class="section-meta">INSTITUTIONAL FRAMEWORK</div>
       </div>
-      <button onclick="downloadGoldPlaybookReport()" style="background: var(--sage); color: var(--bg); border: none; padding: 10px 16px; border-radius: 4px; font-size: 12px; font-weight: 600; cursor: pointer; letter-spacing: 0.8px; text-transform: uppercase; transition: all 0.3s;" onmouseover="this.style.background='var(--ink)'" onmouseout="this.style.background='var(--sage)'">
-        📥 DOWNLOAD REPORT
-      </button>
+      <button class="pdf-btn" onclick="generatePDF('gold-playbook', 'Gold Trading Playbook')">&#x1F4C4; Download PDF</button>
     </div>
   </div>
 
@@ -3860,112 +3939,7 @@ function toggleChartFullscreen() {
 }
 
 function downloadGoldPlaybookReport() {
-  try {
-    const xauusdEl = document.querySelector('[data-live="XAUUSD"]');
-    const dxyEl = document.querySelector('[data-live="DXY"]');
-    const vixEl = document.querySelector('[data-live="VIX"]');
-
-    const xauusd = xauusdEl ? xauusdEl.textContent : '4,172.9';
-    const dxy = dxyEl ? dxyEl.textContent : '103.8';
-    const vix = vixEl ? vixEl.textContent : '17.0';
-
-    const now = new Date();
-    const reportDate = now.toLocaleString('en-GB', {
-      year: 'numeric', month: 'short', day: 'numeric',
-      hour: '2-digit', minute: '2-digit', second: '2-digit'
-    });
-
-    const reportContent = `GOLD TRADING PLAYBOOK - INSTITUTIONAL FRAMEWORK
-═════════════════════════════════════════════════════════════
-Generated: ${reportDate}
-Current XAU/USD: ${xauusd} | DXY: ${dxy} | VIX: ${vix}
-
-TRADING DIRECTION ENGINE
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-RECOMMENDATION: ↑ LONG
-Confidence: 72%
-Time Horizon: 2-4 weeks
-
-ENTRY → STOP → TARGETS:
-Entry:           4,160 (next pullback to support)
-Stop Loss:       4,140 (32.9 pips risk)
-Profit Target 1: 4,190 (+30 pips)
-Profit Target 2: 4,220 (+60 pips)
-Profit Target 3: 4,250 (+90 pips)
-Risk/Reward:     1:2.7
-
-FUNDAMENTAL ANALYSIS
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-✓ MACRO REGIME: CBs pivoting dovish while inflation moderates
-✓ REAL YIELDS: Falling to +0.42% (bullish signal)
-✓ DE-DOLLARIZATION: Institutional price-insensitive CB buying
-✓ TECHNICAL: Double-bottom at 4,150 (institutional accumulation)
-✓ CATALYSTS: ECB easing (July 17), Fed hold (June 18)
-
-FUNDAMENTAL SCORE: 31/40 (78% STRONG BULLISH)
-• Real Yields Falling: 9/10
-• CB Buying Flow: 9/10
-• USD Weakness: 7/10
-• Risk Sentiment: 6/10
-
-EXECUTION WORKFLOW
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-Step 1: MACRO BIAS - Establish directional bias
-Step 2: 1-HOUR STRUCTURE - Identify support/resistance
-Step 3: PATTERN CONFIRMATION - Double bottom/top
-Step 4: 1-MINUTE ENTRY - Neckline break + pullback
-
-SCENARIOS
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-Scenario 1: TIPS Fall → Target 4,240-4,290 (+70-120 pips)
-Scenario 2: DXY Strength → Pullback to 4,120-4,140
-Scenario 3: VIX Spike 25+ → Target 4,200-4,210 (+40-80 pips/24h)
-Scenario 4: QE Announcement → Target 4,300+ (+120-200 pips/4-6w)
-
-DECISION TREE
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-IF at 4,160 + conditions met: ✓ LONG ENTRY READY
-  Entry: 4,160-4,165 | Stop: 4,140 | Targets: 4,190|4,220|4,250
-
-IF falling to 4,140 + no pattern: ⏸ WAIT (don't chase)
-  Monitor double bottom at 4,150-4,160
-
-IF breaks below 4,140: ✕ REVERSE TO SHORT
-  Target: 4,100-4,090 (-50 pips)
-
-INVESTMENT THESIS - HIGH CONVICTION (72%)
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-Macro regime shifted dovish. Real yields (true driver) falling. CBs
-committed to de-dollarization. Technical setup shows institutional
-accumulation at 4,150. Risk-reward 1:2.7 with 4,140 stop. Expect
-2-3 week move to 4,250+.
-
-DAILY METRICS TO WATCH
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-• 10-Year TIPS Yield (DFII10 on FRED) - Primary direction input
-• DXY Trend - Primary filter for non-USD
-• VIX Level - Watch above 25 for fear regime
-• COT Report (Friday) - Managed Money positioning
-
-═════════════════════════════════════════════════════════════
-Report Generated by Institutional Trading Dashboard
-https://vazxanana.github.io/macro-dashboard/
-═════════════════════════════════════════════════════════════`;
-
-    const element = document.createElement('a');
-    const file = new Blob([reportContent], {type: 'text/plain'});
-    element.href = URL.createObjectURL(file);
-    element.download = `Gold_Playbook_${now.toISOString().slice(0,10)}.txt`;
-    document.body.appendChild(element);
-    element.click();
-    document.body.removeChild(element);
-    URL.revokeObjectURL(element.href);
-
-    console.info('Gold Playbook report downloaded');
-  } catch (e) {
-    console.error('Error downloading report:', e);
-    alert('Error downloading report');
-  }
+  generatePDF('gold-playbook', 'Gold Trading Playbook');
 }
 
 function toggleFloatingNews() {
@@ -4255,6 +4229,126 @@ function switchTab(tabName, event) {
     }
   } catch (e) {
     console.error('Tab switch error:', e);
+  }
+}
+
+function switchGroup(groupName, el) {
+  try {
+    const groupMap = {
+      overview:     { section: 'dashboard',           secondary: null },
+      markets:      { section: 'signals',              secondary: 'nav-group-markets' },
+      intelligence: { section: 'intelligence-regime',  secondary: 'nav-group-intelligence' },
+      reports:      { section: 'gold-playbook',        secondary: 'nav-group-reports' }
+    };
+
+    const group = groupMap[groupName];
+    if (!group) return;
+
+    // Update primary tab active state
+    document.querySelectorAll('.nav-primary-tab').forEach(t => t.classList.remove('active'));
+    if (el) el.classList.add('active');
+
+    // Hide all secondary navs, show selected one
+    document.querySelectorAll('.nav-secondary').forEach(nav => nav.classList.remove('visible'));
+    if (group.secondary) {
+      const secNav = document.getElementById(group.secondary);
+      if (secNav) secNav.classList.add('visible');
+
+      // Activate first sub-tab
+      document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+      const firstTab = secNav.querySelector('.nav-tab');
+      if (firstTab) firstTab.classList.add('active');
+    } else {
+      document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+    }
+
+    // Show target section
+    document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+    const section = document.getElementById(group.section);
+    if (section) section.classList.add('active');
+
+    window.scrollTo(0, 0);
+  } catch (e) {
+    console.error('Group switch error:', e);
+  }
+}
+
+function generatePDF(sectionId, reportTitle) {
+  try {
+    const section = document.getElementById(sectionId);
+    if (!section) { console.warn('Section not found:', sectionId); return; }
+
+    const now = new Date();
+    const dateStr = now.toLocaleDateString('en-GB', { year: 'numeric', month: 'long', day: 'numeric' });
+
+    const printWin = window.open('', '_blank');
+    if (!printWin) {
+      alert('Please allow pop-ups to generate the PDF, then try again.');
+      return;
+    }
+
+    const css = [
+      ':root{--bg:#fff;--panel:#f6f6f6;--panel-raised:#ececec;--line:#ddd;--line-soft:#e8e8e8;',
+      '--ink:#111;--ink-dim:#444;--ink-faint:#888;',
+      '--sage:#1c6e38;--sage-glow:rgba(28,110,56,0.1);',
+      '--amber:#9a6b00;--amber-glow:rgba(154,107,0,0.1);',
+      '--rust:#b83030;--rust-glow:rgba(184,48,48,0.1);',
+      '--steel:#285498;--steel-glow:rgba(40,84,152,0.1);',
+      "--mono:'IBM Plex Mono',monospace;--sans:'IBM Plex Sans',sans-serif;--cond:'IBM Plex Sans Condensed',sans-serif;}",
+      '*{margin:0;padding:0;box-sizing:border-box;}',
+      'html,body{background:#fff;color:var(--ink);font-family:var(--sans);font-size:12px;line-height:1.55;}',
+      '.print-header{display:flex;justify-content:space-between;align-items:flex-end;padding-bottom:12px;margin-bottom:20px;border-bottom:2px solid var(--sage);}',
+      '.print-logo{font-family:var(--mono);font-size:13px;font-weight:700;letter-spacing:0.1em;}',
+      '.print-logo span{color:var(--sage);}',
+      '.print-date{font-family:var(--mono);font-size:10px;color:var(--ink-faint);}',
+      '.section-head{padding:14px 0 10px;border-bottom:1px solid var(--line);margin-bottom:14px;display:flex;justify-content:space-between;align-items:center;}',
+      '.section-title{font-family:var(--cond);font-weight:700;font-size:18px;}',
+      '.section-meta{font-family:var(--mono);font-size:10px;color:var(--ink-faint);letter-spacing:0.08em;}',
+      '.grid{display:grid;gap:8px;margin-bottom:14px;}',
+      '.grid-2{grid-template-columns:repeat(2,1fr);}.grid-3{grid-template-columns:repeat(3,1fr);}.grid-4{grid-template-columns:repeat(4,1fr);}',
+      '.card{background:var(--panel);border:1px solid var(--line);padding:12px;break-inside:avoid;}',
+      '.card-head{display:flex;justify-content:space-between;align-items:flex-start;gap:8px;margin-bottom:6px;}',
+      '.card-title{font-family:var(--cond);font-weight:600;font-size:13px;}',
+      '.card-value{font-family:var(--mono);font-size:18px;font-weight:700;color:var(--sage);}',
+      '.card-delta{font-family:var(--mono);font-size:11px;margin-top:4px;}',
+      '.delta-up{color:var(--sage);}.delta-down{color:var(--rust);}.delta-neutral{color:var(--ink-faint);}',
+      '.status-chip{font-family:var(--mono);font-size:9px;letter-spacing:0.06em;text-transform:uppercase;padding:2px 5px;border-radius:2px;border:1px solid;}',
+      '.status-chip.normal{color:var(--sage);border-color:var(--sage);background:var(--sage-glow);}',
+      '.status-chip.watch{color:var(--amber);border-color:var(--amber);background:var(--amber-glow);}',
+      '.status-chip.alert{color:var(--rust);border-color:var(--rust);background:var(--rust-glow);}',
+      '.status-chip.neutral{color:var(--steel);border-color:var(--steel);background:var(--steel-glow);}',
+      '.metric-row{display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--line-soft);font-size:11px;}',
+      '.metric-label{color:var(--ink-dim);}.metric-value{font-family:var(--mono);font-weight:600;}',
+      'table{width:100%;border-collapse:collapse;font-size:11px;margin-bottom:12px;}',
+      'th,td{padding:5px 8px;border-bottom:1px solid var(--line);text-align:left;}',
+      'th{font-weight:700;background:var(--panel);}',
+      '.print-footer{margin-top:24px;padding-top:10px;border-top:1px solid var(--line);font-family:var(--mono);font-size:9px;color:var(--ink-faint);display:flex;justify-content:space-between;}',
+      'button,.pdf-btn,.card.clickable::after{display:none!important;}',
+      '@page{margin:15mm;}'
+    ].join('');
+
+    printWin.document.write(
+      '<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8">' +
+      '<title>' + reportTitle + ' — ' + dateStr + '<\/title>' +
+      '<link rel="preconnect" href="https://fonts.googleapis.com">' +
+      '<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans:wght@400;600;700&family=IBM+Plex+Sans+Condensed:wght@600;700&display=swap" rel="stylesheet">' +
+      '<style>' + css + '<\/style><\/head><body>' +
+      '<div class="print-header">' +
+      '<div class="print-logo">FUNDAMENTAL<span>·<\/span>PRO<\/div>' +
+      '<div class="print-date">Generated: ' + dateStr + '<\/div>' +
+      '<\/div>' +
+      section.innerHTML +
+      '<div class="print-footer">' +
+      '<span>FUNDAMENTAL·PRO — Institutional Analysis Platform<\/span>' +
+      '<span>' + dateStr + '<\/span>' +
+      '<\/div>' +
+      '<script>window.addEventListener("load",function(){setTimeout(function(){window.print();},800);});<\/script>' +
+      '<\/body><\/html>'
+    );
+    printWin.document.close();
+  } catch (e) {
+    console.error('PDF generation error:', e);
+    alert('Error generating PDF. Please try again.');
   }
 }
 
