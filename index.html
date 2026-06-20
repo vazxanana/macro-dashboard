@@ -195,6 +195,56 @@
     text-shadow: 0 0 8px var(--sage-glow);
   }
 
+  .nav-dropdown {
+    position: relative;
+    display: inline-block;
+  }
+
+  .nav-dropdown-menu {
+    display: none;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    background: var(--panel-raised);
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    min-width: 160px;
+    z-index: 1000;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+    margin-top: 4px;
+  }
+
+  .nav-dropdown:hover .nav-dropdown-menu {
+    display: block;
+  }
+
+  .nav-dropdown-item {
+    display: block;
+    width: 100%;
+    padding: 10px 16px;
+    background: none;
+    border: none;
+    color: var(--ink);
+    font-family: var(--sans);
+    font-size: 13px;
+    text-align: left;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .nav-dropdown-item:first-child {
+    border-radius: 4px 4px 0 0;
+  }
+
+  .nav-dropdown-item:last-child {
+    border-radius: 0 0 4px 4px;
+  }
+
+  .nav-dropdown-item:hover {
+    background: var(--sage-glow);
+    color: var(--sage);
+  }
+
   /* LANGUAGE SELECTOR */
   .lang-selector {
     display: flex;
@@ -1129,6 +1179,51 @@
     <div class="lang-selector">
       <button class="lang-btn active" onclick="setLanguage('en')" data-lang="en">EN</button>
       <button class="lang-btn" onclick="setLanguage('pt')" data-lang="pt">PT</button>
+      <button class="lang-btn" onclick="openAPISettings()" style="margin-left: 16px; background: var(--sage-glow); color: var(--sage);">⚙️ API Settings</button>
+    </div>
+  </div>
+</div>
+
+<!-- API SETTINGS MODAL -->
+<div id="apiSettingsModal" style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.7); z-index: 2000; align-items: center; justify-content: center;">
+  <div style="background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 32px; max-width: 500px; width: 90%; max-height: 80vh; overflow-y: auto; box-shadow: 0 20px 60px rgba(0,0,0,0.4);">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+      <h2 style="font-size: 20px; font-weight: 700; color: var(--ink);">Live API Configuration</h2>
+      <button onclick="closeAPISettings()" style="background: none; border: none; font-size: 24px; color: var(--ink-dim); cursor: pointer;">✕</button>
+    </div>
+
+    <div style="background: var(--panel-raised); border-left: 3px solid var(--sage); padding: 16px; border-radius: 4px; margin-bottom: 24px;">
+      <div style="font-size: 12px; color: var(--ink); line-height: 1.8;">
+        <strong>Get your free API keys:</strong><br/>
+        1. <a href="https://www.alphavantage.co/" target="_blank" style="color: var(--sage); text-decoration: underline;">Alpha Vantage</a> - For XAU/USD, DXY prices<br/>
+        2. <a href="https://fred.stlouisfed.org/docs/api/" target="_blank" style="color: var(--sage); text-decoration: underline;">FRED</a> - For TIPS yield data
+      </div>
+    </div>
+
+    <!-- Alpha Vantage Key -->
+    <div style="margin-bottom: 20px;">
+      <label style="display: block; font-size: 12px; font-weight: 600; color: var(--ink-faint); margin-bottom: 8px; text-transform: uppercase;">Alpha Vantage API Key</label>
+      <input type="password" id="alphaVantageKeyInput" placeholder="Enter your Alpha Vantage key..." style="width: 100%; padding: 12px; background: var(--panel-raised); border: 1px solid var(--line); border-radius: 4px; color: var(--ink); font-family: var(--mono); font-size: 12px;">
+      <div style="font-size: 11px; color: var(--ink-dim); margin-top: 6px;">✓ Used for: XAU/USD (gold), DXY (dollar index)</div>
+    </div>
+
+    <!-- FRED Key -->
+    <div style="margin-bottom: 24px;">
+      <label style="display: block; font-size: 12px; font-weight: 600; color: var(--ink-faint); margin-bottom: 8px; text-transform: uppercase;">FRED API Key</label>
+      <input type="password" id="fredKeyInput" placeholder="Enter your FRED API key..." style="width: 100%; padding: 12px; background: var(--panel-raised); border: 1px solid var(--line); border-radius: 4px; color: var(--ink); font-family: var(--mono); font-size: 12px;">
+      <div style="font-size: 11px; color: var(--ink-dim); margin-top: 6px;">✓ Used for: 10-Year TIPS yield</div>
+    </div>
+
+    <!-- Status -->
+    <div id="apiStatusMessage" style="background: var(--panel-raised); border-left: 3px solid var(--lime); padding: 12px; border-radius: 4px; margin-bottom: 20px; display: none;">
+      <div style="font-size: 12px; color: var(--lime);">✓ Configuration saved successfully!</div>
+    </div>
+
+    <!-- Buttons -->
+    <div style="display: flex; gap: 12px;">
+      <button onclick="saveAPISettings()" style="flex: 1; padding: 12px; background: var(--sage); color: var(--bg); border: none; border-radius: 4px; font-weight: 600; cursor: pointer; font-size: 13px;">💾 SAVE SETTINGS</button>
+      <button onclick="testAPIKeys()" style="flex: 1; padding: 12px; background: var(--steel); color: var(--bg); border: none; border-radius: 4px; font-weight: 600; cursor: pointer; font-size: 13px;">🧪 TEST KEYS</button>
+      <button onclick="closeAPISettings()" style="flex: 1; padding: 12px; background: var(--line); color: var(--ink); border: none; border-radius: 4px; font-weight: 600; cursor: pointer; font-size: 13px;">CLOSE</button>
     </div>
   </div>
 </div>
@@ -1136,21 +1231,44 @@
 <!-- NAV -->
 <div class="nav-tabs" id="navTabs">
   <button class="nav-tab active" onclick="switchTab('dashboard', event)">Dashboard</button>
-  <button class="nav-tab" onclick="switchTab('signals', event)">Macro Signals</button>
-  <button class="nav-tab" onclick="switchTab('economic', event)">Economic Data</button>
-  <button class="nav-tab" onclick="switchTab('analysis', event)">Market Analysis</button>
-  <button class="nav-tab" onclick="switchTab('technical', event)">Technical</button>
-  <button class="nav-tab" onclick="switchTab('sentiment', event)">Sentiment</button>
-  <button class="nav-tab" onclick="switchTab('setups', event)">Trade Setups</button>
-  <button class="nav-tab" onclick="switchTab('report', event)">Weekly Report</button>
-  <div style="width: 100%; height: 1px; background: var(--line); margin: 0 16px;"></div>
-  <button class="nav-tab" onclick="switchTab('intelligence-regime', event)">Regime</button>
-  <button class="nav-tab" onclick="switchTab('intelligence-bias', event)">Daily Bias</button>
-  <button class="nav-tab" onclick="switchTab('intelligence-liquidity', event)">Liquidity</button>
-  <button class="nav-tab" onclick="switchTab('intelligence-policy', event)">Policy</button>
-  <button class="nav-tab" onclick="switchTab('intelligence-summary', event)">AI Summary</button>
-  <button class="nav-tab" onclick="switchTab('intelligence-history', event)">Historical</button>
-  <button class="nav-tab" onclick="switchTab('gold-playbook', event)">Gold Playbook</button>
+
+  <div class="nav-dropdown">
+    <button class="nav-tab nav-dropdown-btn">Core Macro ▼</button>
+    <div class="nav-dropdown-menu">
+      <button class="nav-dropdown-item" onclick="switchTab('signals', event)">Macro Signals</button>
+      <button class="nav-dropdown-item" onclick="switchTab('economic', event)">Economic Data</button>
+    </div>
+  </div>
+
+  <div class="nav-dropdown">
+    <button class="nav-tab nav-dropdown-btn">Trading ▼</button>
+    <div class="nav-dropdown-menu">
+      <button class="nav-dropdown-item" onclick="switchTab('analysis', event)">Market Analysis</button>
+      <button class="nav-dropdown-item" onclick="switchTab('technical', event)">Technical</button>
+      <button class="nav-dropdown-item" onclick="switchTab('setups', event)">Trade Setups</button>
+      <button class="nav-dropdown-item" onclick="switchTab('gold-playbook', event)">Gold Playbook</button>
+    </div>
+  </div>
+
+  <div class="nav-dropdown">
+    <button class="nav-tab nav-dropdown-btn">Intelligence ▼</button>
+    <div class="nav-dropdown-menu">
+      <button class="nav-dropdown-item" onclick="switchTab('intelligence-regime', event)">Regime</button>
+      <button class="nav-dropdown-item" onclick="switchTab('intelligence-bias', event)">Daily Bias</button>
+      <button class="nav-dropdown-item" onclick="switchTab('intelligence-liquidity', event)">Liquidity</button>
+      <button class="nav-dropdown-item" onclick="switchTab('intelligence-policy', event)">Policy</button>
+      <button class="nav-dropdown-item" onclick="switchTab('intelligence-summary', event)">AI Summary</button>
+      <button class="nav-dropdown-item" onclick="switchTab('intelligence-history', event)">Historical</button>
+    </div>
+  </div>
+
+  <div class="nav-dropdown">
+    <button class="nav-tab nav-dropdown-btn">Reports ▼</button>
+    <div class="nav-dropdown-menu">
+      <button class="nav-dropdown-item" onclick="switchTab('sentiment', event)">Sentiment</button>
+      <button class="nav-dropdown-item" onclick="switchTab('report', event)">Weekly Report</button>
+    </div>
+  </div>
 </div>
 
 <!-- DASHBOARD -->
@@ -1188,7 +1306,7 @@
     </div>
     <div class="card clickable" onclick="openChart('XAUUSD', event)">
       <div class="card-title">Gold</div>
-      <div class="card-value" data-live="XAUUSD">2,000</div>
+      <div class="card-value" data-live="XAUUSD">4,172.9</div>
       <div class="card-delta delta-neutral" data-live-delta="XAUUSD">+0.00%</div>
     </div>
     <div class="card">
@@ -1297,7 +1415,7 @@
         <div><div class="card-title">Geopolitical (Gold)</div></div>
         <span class="status-chip alert">PREMIUM FADING</span>
       </div>
-      <div class="card-value" data-live="XAUUSD">2,380</div>
+      <div class="card-value" data-live="XAUUSD">4,172.9</div>
       <div class="card-delta delta-neutral" data-live-delta="XAUUSD">+0.85%</div>
     </div>
 
@@ -1494,7 +1612,7 @@
 
     <div class="card">
       <div class="card-title">Gold (XAUUSD)</div>
-      <div class="card-value">2,380.50</div>
+      <div class="card-value">4,172.90</div>
       <div style="font-size: 11px; color: var(--ink-dim); margin-top: 12px; line-height: 2;">
         <div style="display: flex; justify-content: space-between; padding: 4px 0; border-bottom: 1px solid var(--line-soft);">
           <span>Bollinger Upper:</span><span style="color: var(--ink); font-family: var(--mono);">2,400.20</span>
@@ -2543,36 +2661,61 @@
         </div>
       </div>
 
-      <!-- Real-Time Condition Checker -->
-      <div style="margin-top: 20px; padding-top: 20px; border-top: 1px solid var(--line); display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px;">
-        <div style="background: var(--panel-raised); padding: 12px; border-radius: 4px; border-left: 3px solid var(--sage);">
-          <div style="font-size: 10px; color: var(--ink-faint); margin-bottom: 4px;">TIPS Yield</div>
-          <div style="font-size: 14px; font-weight: 600; color: var(--sage);">+0.42%</div>
-          <div style="font-size: 10px; color: var(--ink-dim); margin-top: 4px;">Below +0.5% = Bullish</div>
+      <!-- Real-Time Market Data & Trend Context -->
+      <div style="margin-top: 20px; padding-top: 20px; border-top: 1px solid var(--line);">
+        <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 16px;">
+          <div style="background: var(--panel-raised); padding: 12px; border-radius: 4px; border-left: 3px solid var(--sage);">
+            <div style="font-size: 10px; color: var(--ink-faint); margin-bottom: 4px;">TIPS Yield (10Y)</div>
+            <div style="font-size: 14px; font-weight: 600; color: var(--sage);" id="tipsYield">+0.42%</div>
+            <div style="font-size: 10px; color: var(--ink-dim); margin-top: 4px;">✓ Bullish (Below +0.5%)</div>
+          </div>
+
+          <div style="background: var(--panel-raised); padding: 12px; border-radius: 4px; border-left: 3px solid var(--steel);">
+            <div style="font-size: 10px; color: var(--ink-faint); margin-bottom: 4px;">DXY Trend</div>
+            <div style="font-size: 14px; font-weight: 600; color: var(--steel);" data-live="DXY">103.8</div>
+            <div style="font-size: 10px; color: var(--ink-dim); margin-top: 4px;">↓ Weakening Bias</div>
+          </div>
+
+          <div style="background: var(--panel-raised); padding: 12px; border-radius: 4px; border-left: 3px solid var(--amber);">
+            <div style="font-size: 10px; color: var(--ink-faint); margin-bottom: 4px;">Chart Trend (Daily)</div>
+            <div style="font-size: 14px; font-weight: 600; color: var(--amber);">CONSOLIDATION</div>
+            <div style="font-size: 10px; color: var(--ink-dim); margin-top: 4px;">Range: 4,140 ↔ 4,200</div>
+          </div>
         </div>
 
-        <div style="background: var(--panel-raised); padding: 12px; border-radius: 4px; border-left: 3px solid var(--steel);">
-          <div style="font-size: 10px; color: var(--ink-faint); margin-bottom: 4px;">DXY Trend</div>
-          <div style="font-size: 14px; font-weight: 600; color: var(--steel);" data-live="DXY">103.8</div>
-          <div style="font-size: 10px; color: var(--ink-dim); margin-top: 4px;">↓ Weakening = Bullish</div>
-        </div>
-
-        <div style="background: var(--panel-raised); padding: 12px; border-radius: 4px; border-left: 3px solid var(--amber);">
-          <div style="font-size: 10px; color: var(--ink-faint); margin-bottom: 4px;">CB Flows</div>
-          <div style="font-size: 14px; font-weight: 600; color: var(--amber);">Accelerating</div>
-          <div style="font-size: 10px; color: var(--ink-dim); margin-top: 4px;">Price floor support</div>
-        </div>
-
-        <div style="background: var(--panel-raised); padding: 12px; border-radius: 4px; border-left: 3px solid var(--lime);">
-          <div style="font-size: 10px; color: var(--ink-faint); margin-bottom: 4px;">VIX Level</div>
-          <div style="font-size: 14px; font-weight: 600; color: var(--lime);" data-live="VIX">17.0</div>
-          <div style="font-size: 10px; color: var(--ink-dim); margin-top: 4px;">Below 25 = Normal</div>
-        </div>
-
-        <div style="background: var(--panel-raised); padding: 12px; border-radius: 4px; border-left: 3px solid var(--lime);">
-          <div style="font-size: 10px; color: var(--ink-faint); margin-bottom: 4px;">Action Signal</div>
-          <div style="font-size: 14px; font-weight: 600; color: var(--lime);">🟢 READY</div>
-          <div style="font-size: 10px; color: var(--ink-dim); margin-top: 4px;">Entry setup confirmed</div>
+        <!-- Key S/R Levels -->
+        <div style="background: var(--panel-raised); padding: 12px; border-radius: 4px; margin-top: 12px;">
+          <div style="font-weight: 600; color: var(--ink); margin-bottom: 8px; font-size: 12px;">🎯 KEY SUPPORT & RESISTANCE LEVELS</div>
+          <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px;">
+            <div>
+              <div style="font-size: 10px; color: var(--ink-faint); margin-bottom: 6px; text-transform: uppercase;">SUPPORT LEVELS (Buy zones)</div>
+              <div style="font-size: 11px; color: var(--ink); line-height: 2;">
+                <div style="padding: 6px; background: var(--lime-glow); border-radius: 3px; margin-bottom: 6px;">
+                  <strong style="color: var(--lime);">S1: 4,150</strong> <span style="color: var(--ink-dim); font-size: 10px;">Double-bottom pivot</span>
+                </div>
+                <div style="padding: 6px; background: var(--lime-glow); border-radius: 3px; margin-bottom: 6px;">
+                  <strong style="color: var(--lime);">S2: 4,120</strong> <span style="color: var(--ink-dim); font-size: 10px;">4-week consolidation floor</span>
+                </div>
+                <div style="padding: 6px; background: var(--rust-glow); border-radius: 3px;">
+                  <strong style="color: var(--rust);">S3: 4,090</strong> <span style="color: var(--ink-dim); font-size: 10px;">Hard stop if break below</span>
+                </div>
+              </div>
+            </div>
+            <div>
+              <div style="font-size: 10px; color: var(--ink-faint); margin-bottom: 6px; text-transform: uppercase;">RESISTANCE LEVELS (Sell zones)</div>
+              <div style="font-size: 11px; color: var(--ink); line-height: 2;">
+                <div style="padding: 6px; background: var(--sage-glow); border-radius: 3px; margin-bottom: 6px;">
+                  <strong style="color: var(--sage);">R1: 4,190</strong> <span style="color: var(--ink-dim); font-size: 10px;">Daily resistance cluster</span>
+                </div>
+                <div style="padding: 6px; background: var(--sage-glow); border-radius: 3px; margin-bottom: 6px;">
+                  <strong style="color: var(--sage);">R2: 4,220</strong> <span style="color: var(--ink-dim); font-size: 10px;">2-week high, psychological</span>
+                </div>
+                <div style="padding: 6px; background: var(--lime-glow); border-radius: 3px;">
+                  <strong style="color: var(--lime);">R3: 4,250</strong> <span style="color: var(--ink-dim); font-size: 10px;">Monthly target, breakout zone</span>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -2898,7 +3041,6 @@
       <div style="font-size: 12px; color: var(--ink-dim); line-height: 1.8;">
         <div style="padding: 8px; background: var(--rust-glow); border-radius: 4px; margin: 8px 0; color: var(--ink);">
           <strong style="color: var(--rust);">Classification:</strong> Sharp Safe-Haven Rally
-        </strong>
         </div>
         <div style="margin-top: 8px;">
           <strong>Primary Driver:</strong> USD strength (haven currency)<br/>
@@ -2909,6 +3051,81 @@
         </div>
       </div>
     </div>
+  </div>
+
+  <!-- MISSED MOVE: Alternative Entry Scenarios -->
+  <div class="section-head" style="margin: 24px 24px 0;">
+    <div class="section-title" style="font-size: 14px;">⚡ MISSED MOVE: What If Market Goes Straight Up?</div>
+    <div class="section-meta">Entry at 4,160 didn't trigger. Market rallied to 4,190+ with no pullback. Here's your action plan.</div>
+  </div>
+  <div style="margin: 0 24px 24px; display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 16px;">
+
+    <div style="background: var(--panel); border: 1px solid var(--line); border-radius: 6px; overflow: hidden;">
+      <div style="background: var(--lime-glow); padding: 12px; border-bottom: 1px solid var(--line);">
+        <div style="font-weight: 600; color: var(--lime); font-size: 13px;">Plan A: Buy at R1 (4,190)</div>
+      </div>
+      <div style="padding: 16px; font-size: 12px; color: var(--ink-dim); line-height: 1.8;">
+        <div style="margin-bottom: 12px;">
+          <strong style="color: var(--lime);">Scenario:</strong> Market gaps through 4,160-4,170, rallies to 4,190
+        </div>
+        <div style="margin-bottom: 12px;">
+          <strong style="color: var(--lime);">Entry Setup:</strong>
+          <ul style="margin: 6px 0 0 16px;">
+            <li>Buy pullback to 4,185-4,190 (not above)</li>
+            <li>Stop: 4,170 (20 pips risk)</li>
+            <li>Target: 4,220 (+30 pips)</li>
+          </ul>
+        </div>
+        <div style="background: var(--panel-raised); padding: 8px; border-radius: 4px; margin-top: 12px;">
+          <strong style="color: var(--sage);">Key Rule:</strong> Only enter if price pulls back 5-10 pips at R1. Never chase breakouts.
+        </div>
+      </div>
+    </div>
+
+    <div style="background: var(--panel); border: 1px solid var(--line); border-radius: 6px; overflow: hidden;">
+      <div style="background: var(--sage-glow); padding: 12px; border-bottom: 1px solid var(--line);">
+        <div style="font-weight: 600; color: var(--sage); font-size: 13px;">Plan B: Buy at R2 (4,220)</div>
+      </div>
+      <div style="padding: 16px; font-size: 12px; color: var(--ink-dim); line-height: 1.8;">
+        <div style="margin-bottom: 12px;">
+          <strong style="color: var(--sage);">Scenario:</strong> Strong momentum continues through 4,190, hits 4,220
+        </div>
+        <div style="margin-bottom: 12px;">
+          <strong style="color: var(--sage);">Entry Setup:</strong>
+          <ul style="margin: 6px 0 0 16px;">
+            <li>Buy breakout above 4,220 with volume</li>
+            <li>Stop: 4,205 (15 pips risk)</li>
+            <li>Target: 4,250 (+30 pips)</li>
+          </ul>
+        </div>
+        <div style="background: var(--panel-raised); padding: 8px; border-radius: 4px; margin-top: 12px;">
+          <strong style="color: var(--lime);">Risk Level:</strong> MODERATE. Momentum trade, tighter stop needed.
+        </div>
+      </div>
+    </div>
+
+    <div style="background: var(--panel); border: 1px solid var(--line); border-radius: 6px; overflow: hidden;">
+      <div style="background: var(--amber-glow); padding: 12px; border-bottom: 1px solid var(--line);">
+        <div style="font-weight: 600; color: var(--amber); font-size: 13px;">Plan C: Wait for Pullback (Smart Play)</div>
+      </div>
+      <div style="padding: 16px; font-size: 12px; color: var(--ink-dim); line-height: 1.8;">
+        <div style="margin-bottom: 12px;">
+          <strong style="color: var(--amber);">Best Approach:</strong> If market runs without pulling back to key levels
+        </div>
+        <div style="margin-bottom: 12px;">
+          <strong style="color: var(--amber);">Action:</strong>
+          <ul style="margin: 6px 0 0 16px;">
+            <li>✓ Do NOT chase breakouts above 4,220</li>
+            <li>✓ Wait for 4-8 hour pullback to create entry</li>
+            <li>✓ Re-enter at 4,200-4,210 (better R/R)</li>
+          </ul>
+        </div>
+        <div style="background: var(--panel-raised); padding: 8px; border-radius: 4px; margin-top: 12px;">
+          <strong style="color: var(--rust);">Key Rule:</strong> "Don't buy parabolic. Patience = better entries."
+        </div>
+      </div>
+    </div>
+
   </div>
 
   <!-- Trading Scenarios & Action Plan -->
@@ -3190,6 +3407,7 @@
   </div>
 </div>
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 <script>
 // ═══════════════════════════════════════════════════════════
 // LANGUAGE & TRANSLATION SYSTEM
@@ -3361,16 +3579,234 @@ setTimeout(() => {
 // Live data storage - with defensive initialization
 let liveData = {};
 
+// ═══════════════════════════════════════════════════════════
+// LIVE API INTEGRATION - Free APIs
+// ═══════════════════════════════════════════════════════════
+
+const API_CONFIG = {
+  ALPHA_VANTAGE_KEY: localStorage.getItem('ALPHA_VANTAGE_KEY') || 'demo',
+  FRED_KEY: localStorage.getItem('FRED_KEY') || 'demo',
+  CACHE_DURATION: 60000, // 60 seconds cache
+  lastFetch: {}
+};
+
+// Open API Settings Modal
+function openAPISettings() {
+  const modal = document.getElementById('apiSettingsModal');
+  const alphaInput = document.getElementById('alphaVantageKeyInput');
+  const fredInput = document.getElementById('fredKeyInput');
+
+  if (modal && alphaInput && fredInput) {
+    alphaInput.value = API_CONFIG.ALPHA_VANTAGE_KEY === 'demo' ? '' : API_CONFIG.ALPHA_VANTAGE_KEY;
+    fredInput.value = API_CONFIG.FRED_KEY === 'demo' ? '' : API_CONFIG.FRED_KEY;
+    modal.style.display = 'flex';
+  }
+}
+
+// Close API Settings Modal
+function closeAPISettings() {
+  const modal = document.getElementById('apiSettingsModal');
+  const statusMsg = document.getElementById('apiStatusMessage');
+  if (modal) modal.style.display = 'none';
+  if (statusMsg) statusMsg.style.display = 'none';
+}
+
+// Save API Settings
+function saveAPISettings() {
+  try {
+    const alphaInput = document.getElementById('alphaVantageKeyInput');
+    const fredInput = document.getElementById('fredKeyInput');
+    const statusMsg = document.getElementById('apiStatusMessage');
+
+    if (!alphaInput || !fredInput) return;
+
+    const alphaKey = alphaInput.value.trim() || 'demo';
+    const fredKey = fredInput.value.trim() || 'demo';
+
+    // Save to localStorage
+    localStorage.setItem('ALPHA_VANTAGE_KEY', alphaKey);
+    localStorage.setItem('FRED_KEY', fredKey);
+
+    // Update API_CONFIG
+    API_CONFIG.ALPHA_VANTAGE_KEY = alphaKey;
+    API_CONFIG.FRED_KEY = fredKey;
+    API_CONFIG.lastFetch = {}; // Clear cache
+
+    console.info('API keys saved:', { alphaKey: alphaKey.slice(0, 4) + '***', fredKey: fredKey.slice(0, 4) + '***' });
+
+    // Show success message
+    if (statusMsg) {
+      statusMsg.style.display = 'block';
+      statusMsg.innerHTML = '✓ Configuration saved successfully! Fetching live data...';
+      statusMsg.style.borderLeftColor = 'var(--lime)';
+      setTimeout(() => {
+        statusMsg.style.display = 'none';
+        closeAPISettings();
+      }, 2000);
+    }
+
+    // Fetch new data immediately
+    updateLiveDataFromAPIs();
+  } catch (e) {
+    console.error('Error saving API settings:', e);
+    alert('Error saving API settings');
+  }
+}
+
+// Test API Keys
+async function testAPIKeys() {
+  try {
+    const statusMsg = document.getElementById('apiStatusMessage');
+    if (!statusMsg) return;
+
+    statusMsg.innerHTML = '🔄 Testing API keys...';
+    statusMsg.style.borderLeftColor = 'var(--steel)';
+    statusMsg.style.display = 'block';
+
+    const alphaInput = document.getElementById('alphaVantageKeyInput');
+    const fredInput = document.getElementById('fredKeyInput');
+
+    if (!alphaInput || !fredInput) return;
+
+    const alphaKey = alphaInput.value.trim() || API_CONFIG.ALPHA_VANTAGE_KEY;
+    const fredKey = fredInput.value.trim() || API_CONFIG.FRED_KEY;
+
+    let alphaWorks = false;
+    let fredWorks = false;
+
+    // Test Alpha Vantage
+    try {
+      const alphaUrl = `https://www.alphavantage.co/query?function=CURRENCY_EXCHANGE_RATE&from_currency=XAU&to_currency=USD&apikey=${alphaKey}`;
+      const alphaResponse = await fetch(alphaUrl);
+      const alphaData = await alphaResponse.json();
+      alphaWorks = !!alphaData['Realtime Currency Exchange Rate'];
+    } catch (e) {
+      console.warn('Alpha Vantage test failed:', e.message);
+    }
+
+    // Test FRED
+    try {
+      const fredUrl = `https://api.stlouisfed.org/fred/series/observations?series_id=DFII10&api_key=${fredKey}&limit=1`;
+      const fredResponse = await fetch(fredUrl);
+      const fredData = await fredResponse.json();
+      fredWorks = !!fredData.observations && fredData.observations.length > 0;
+    } catch (e) {
+      console.warn('FRED test failed:', e.message);
+    }
+
+    // Show results
+    let message = '';
+    if (alphaWorks && fredWorks) {
+      message = '✓ Both API keys are working correctly!';
+      statusMsg.style.borderLeftColor = 'var(--lime)';
+    } else if (alphaWorks || fredWorks) {
+      message = (alphaWorks ? '✓ Alpha Vantage: OK | ' : '✗ Alpha Vantage: Failed | ') +
+                (fredWorks ? '✓ FRED: OK' : '✗ FRED: Failed');
+      statusMsg.style.borderLeftColor = 'var(--amber)';
+    } else {
+      message = '✗ Both API keys failed. Check your keys and try again.';
+      statusMsg.style.borderLeftColor = 'var(--rust)';
+    }
+
+    statusMsg.innerHTML = message;
+  } catch (e) {
+    console.error('Error testing API keys:', e);
+    alert('Error testing API keys');
+  }
+}
+
+// Fetch live prices from Alpha Vantage
+async function fetchAlphaVantagePrice(symbol) {
+  try {
+    const cacheKey = `alpha_${symbol}`;
+    const now = Date.now();
+    if (API_CONFIG.lastFetch[cacheKey] && now - API_CONFIG.lastFetch[cacheKey] < API_CONFIG.CACHE_DURATION) {
+      return null; // Use cached data
+    }
+
+    const url = `https://www.alphavantage.co/query?function=CURRENCY_EXCHANGE_RATE&from_currency=${symbol.split('/')[0]}&to_currency=${symbol.split('/')[1]}&apikey=${API_CONFIG.ALPHA_VANTAGE_KEY}`;
+    const response = await fetch(url);
+    const data = await response.json();
+
+    if (data['Realtime Currency Exchange Rate']) {
+      const rate = parseFloat(data['Realtime Currency Exchange Rate']['5. Exchange Rate']);
+      API_CONFIG.lastFetch[cacheKey] = now;
+      return rate;
+    }
+  } catch (e) {
+    console.warn(`Error fetching ${symbol} from Alpha Vantage:`, e.message);
+  }
+  return null;
+}
+
+// Fetch TIPS yield from FRED
+async function fetchFREDData(seriesId) {
+  try {
+    const cacheKey = `fred_${seriesId}`;
+    const now = Date.now();
+    if (API_CONFIG.lastFetch[cacheKey] && now - API_CONFIG.lastFetch[cacheKey] < API_CONFIG.CACHE_DURATION) {
+      return null; // Use cached data
+    }
+
+    const url = `https://api.stlouisfed.org/fred/series/observations?series_id=${seriesId}&api_key=${API_CONFIG.FRED_KEY}&limit=1`;
+    const response = await fetch(url);
+    const data = await response.json();
+
+    if (data.observations && data.observations.length > 0) {
+      const lastValue = parseFloat(data.observations[data.observations.length - 1].value);
+      API_CONFIG.lastFetch[cacheKey] = now;
+      return lastValue / 100; // Convert to percentage
+    }
+  } catch (e) {
+    console.warn(`Error fetching ${seriesId} from FRED:`, e.message);
+  }
+  return null;
+}
+
+// Update live data with real prices
+async function updateLiveDataFromAPIs() {
+  try {
+    // Fetch XAU/USD
+    const xauusd = await fetchAlphaVantagePrice('XAU/USD');
+    if (xauusd) {
+      const prev = liveData.XAUUSD?.val || 4172.9;
+      liveData.XAUUSD = { val: xauusd, prev: prev };
+      console.info('Updated XAUUSD:', xauusd);
+    }
+
+    // Fetch DXY (proxy with EURUSD inverse)
+    const eurusd = await fetchAlphaVantagePrice('EUR/USD');
+    if (eurusd) {
+      const dxyProxy = 105.5 / eurusd; // Inverse relationship approximation
+      const prev = liveData.DXY?.val || 103.8;
+      liveData.DXY = { val: Math.round(dxyProxy * 10) / 10, prev: prev };
+      console.info('Updated DXY (proxy):', dxyProxy);
+    }
+
+    // Fetch TIPS yield (10-Year TIPS)
+    const tips = await fetchFREDData('DFII10');
+    if (tips !== null) {
+      const prev = liveData.TIPS?.val || 0.42;
+      liveData.TIPS = { val: tips, prev: prev };
+      console.info('Updated TIPS yield:', tips);
+    }
+
+  } catch (e) {
+    console.error('Error updating live data from APIs:', e);
+  }
+}
+
 // Initialize with default values
 function initializeLiveData() {
   try {
     const defaults = {
       SPY: { val: 5380, prev: 5340 },
       EURUSD: { val: 1.0942, prev: 1.0915 },
-      XAUUSD: { val: 2380, prev: 2360 },
+      XAUUSD: { val: 4172.9, prev: 4150 },
       VIX: { val: 17.0, prev: 18.7 },
       DXY: { val: 103.8, prev: 103.5 },
       US10Y: { val: 4.25, prev: 4.27 },
+      TIPS: { val: 0.42, prev: 0.45 },
       CPI: { val: 2.9, prev: 2.8 },
       UNEMPLOYMENT: { val: 3.8, prev: 3.8 },
       PMI: { val: 54.0, prev: 53.0 },
@@ -3385,6 +3821,11 @@ function initializeLiveData() {
         liveData[key] = { ...data };
       }
     });
+
+    // Try to fetch real data from APIs
+    updateLiveDataFromAPIs();
+    // Refresh every 60 seconds
+    setInterval(updateLiveDataFromAPIs, 60000);
   } catch (e) {
     console.error('Error initializing live data:', e);
   }
@@ -3861,9 +4302,10 @@ function toggleChartFullscreen() {
 
 function downloadGoldPlaybookReport() {
   try {
-    const xauusdEl = document.querySelector('[data-live="XAUUSD"]');
-    const dxyEl = document.querySelector('[data-live="DXY"]');
-    const vixEl = document.querySelector('[data-live="VIX"]');
+    const goldSection = document.getElementById('gold-playbook');
+    const xauusdEl = goldSection ? goldSection.querySelector('[data-live="XAUUSD"]') : null;
+    const dxyEl = goldSection ? goldSection.querySelector('[data-live="DXY"]') : document.querySelector('[data-live="DXY"]');
+    const vixEl = goldSection ? goldSection.querySelector('[data-live="VIX"]') : document.querySelector('[data-live="VIX"]');
 
     const xauusd = xauusdEl ? xauusdEl.textContent : '4,172.9';
     const dxy = dxyEl ? dxyEl.textContent : '103.8';
@@ -3875,13 +4317,15 @@ function downloadGoldPlaybookReport() {
       hour: '2-digit', minute: '2-digit', second: '2-digit'
     });
 
-    const reportContent = `GOLD TRADING PLAYBOOK - INSTITUTIONAL FRAMEWORK
+    const reportText = `GOLD TRADING PLAYBOOK
 ═════════════════════════════════════════════════════════════
 Generated: ${reportDate}
 Current XAU/USD: ${xauusd} | DXY: ${dxy} | VIX: ${vix}
 
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 TRADING DIRECTION ENGINE
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
 RECOMMENDATION: ↑ LONG
 Confidence: 72%
 Time Horizon: 2-4 weeks
@@ -3894,66 +4338,107 @@ Profit Target 2: 4,220 (+60 pips)
 Profit Target 3: 4,250 (+90 pips)
 Risk/Reward:     1:2.7
 
-FUNDAMENTAL ANALYSIS
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-✓ MACRO REGIME: CBs pivoting dovish while inflation moderates
-✓ REAL YIELDS: Falling to +0.42% (bullish signal)
-✓ DE-DOLLARIZATION: Institutional price-insensitive CB buying
-✓ TECHNICAL: Double-bottom at 4,150 (institutional accumulation)
-✓ CATALYSTS: ECB easing (July 17), Fed hold (June 18)
+WHY LONG: THE BULL CASE
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-FUNDAMENTAL SCORE: 31/40 (78% STRONG BULLISH)
-• Real Yields Falling: 9/10
-• CB Buying Flow: 9/10
-• USD Weakness: 7/10
-• Risk Sentiment: 6/10
+✓ Macro Regime: CBs pivoting dovish while inflation moderates
+✓ Real Yields: Falling to +0.42% (below +0.5% bullish threshold)
+✓ De-Dollarization: Institutional price-insensitive CB buying
+✓ Technical Setup: Double-bottom at 4,150 signals accumulation
+✓ Catalysts: ECB easing (July 17), Fed hold (June 18)
 
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+FUNDAMENTAL SCORE BREAKDOWN
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Real Yields Falling:  9/10
+CB Buying Flow:       9/10
+USD Weakness:         7/10
+Risk Sentiment:       6/10
+─────────────────────────
+COMPOSITE SCORE:      31/40 (78% STRONG BULLISH)
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 EXECUTION WORKFLOW
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-Step 1: MACRO BIAS - Establish directional bias
-Step 2: 1-HOUR STRUCTURE - Identify support/resistance
-Step 3: PATTERN CONFIRMATION - Double bottom/top
+
+Step 1: MACRO BIAS - Establish directional bias from 5 drivers
+Step 2: 1-HOUR STRUCTURE - Identify key support/resistance
+Step 3: PATTERN CONFIRMATION - Double-bottom pattern
 Step 4: 1-MINUTE ENTRY - Neckline break + pullback
 
-SCENARIOS
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-Scenario 1: TIPS Fall → Target 4,240-4,290 (+70-120 pips)
-Scenario 2: DXY Strength → Pullback to 4,120-4,140
-Scenario 3: VIX Spike 25+ → Target 4,200-4,210 (+40-80 pips/24h)
-Scenario 4: QE Announcement → Target 4,300+ (+120-200 pips/4-6w)
-
-DECISION TREE
+SCENARIOS & ACTION PLAN
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-IF at 4,160 + conditions met: ✓ LONG ENTRY READY
-  Entry: 4,160-4,165 | Stop: 4,140 | Targets: 4,190|4,220|4,250
 
-IF falling to 4,140 + no pattern: ⏸ WAIT (don't chase)
-  Monitor double bottom at 4,150-4,160
+Scenario 1: TIPS YIELDS FALL (Most Bullish)
+  Trigger: TIPS below +0.30%
+  Effect: Shift to STRONG BULLISH
+  Action: AGGRESSIVE - Buy at 4,160 with 50% position
+  Target: 4,240-4,290 (+70-120 pips)
 
-IF breaks below 4,140: ✕ REVERSE TO SHORT
+Scenario 2: DXY STRENGTHENS (Conflicting Signal)
+  Trigger: DXY breaks above 104.5
+  Effect: Pullback expected
+  Action: DO NOT CHASE - Wait for reversal
+  Target: 4,120-4,140 (better entry)
+
+Scenario 3: VIX SPIKES ABOVE 25 (Risk-Off)
+  Trigger: VIX to 26+
+  Effect: Safe-haven rally triggered
+  Action: IMMEDIATE BUY at market
+  Target: 4,200-4,210 (+40-80 pips in 24h)
+
+Scenario 4: QE ANNOUNCEMENT (Game-Changing)
+  Trigger: CB announces QE
+  Effect: Most bullish signal ever
+  Action: WAIT 60-90s, enter on pullback
+  Target: 4,300+ (+120-200 pips / 4-6 weeks)
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+QUICK DECISION TREE
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+✓ IF at 4,160 + Conditions Met
+  Entry: 4,160-4,165 | Stop: 4,140
+  Targets: 4,190 → 4,220 → 4,250
+
+⏸ IF Falling to 4,140 + No Pattern
+  Monitor double-bottom at 4,150-4,160
+  Enter on neckline break + retest
+
+✕ IF Breaks Below 4,140
+  REVERSE TO SHORT
   Target: 4,100-4,090 (-50 pips)
 
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 INVESTMENT THESIS - HIGH CONVICTION (72%)
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-Macro regime shifted dovish. Real yields (true driver) falling. CBs
-committed to de-dollarization. Technical setup shows institutional
-accumulation at 4,150. Risk-reward 1:2.7 with 4,140 stop. Expect
-2-3 week move to 4,250+.
 
+Macro regime shifted dovish. Real yields (true driver) falling.
+CBs committed to de-dollarization. Technical setup shows
+institutional accumulation at 4,150.
+
+Risk-reward 1:2.7 with 4,140 stop. Expect 2-3 week move to
+4,250+ driven by TIPS falling or CB acceleration.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 DAILY METRICS TO WATCH
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
 • 10-Year TIPS Yield (DFII10 on FRED) - Primary direction input
-• DXY Trend - Primary filter for non-USD
+• DXY Trend - Primary filter for non-USD assets
 • VIX Level - Watch above 25 for fear regime
 • COT Report (Friday) - Managed Money positioning
 
 ═════════════════════════════════════════════════════════════
-Report Generated by Institutional Trading Dashboard
+Generated by Institutional Trading Dashboard
 https://vazxanana.github.io/macro-dashboard/
 ═════════════════════════════════════════════════════════════`;
 
     const element = document.createElement('a');
-    const file = new Blob([reportContent], {type: 'text/plain'});
+    const file = new Blob([reportText], {type: 'text/plain'});
     element.href = URL.createObjectURL(file);
     element.download = `Gold_Playbook_${now.toISOString().slice(0,10)}.txt`;
     document.body.appendChild(element);
@@ -4168,6 +4653,12 @@ function manualRefresh() {
 
 function switchTab(tabName, event) {
   try {
+    // Prevent default and stop propagation
+    if (event) {
+      event.preventDefault();
+      event.stopPropagation();
+    }
+
     // Validate input - comprehensive checks
     if (!tabName || typeof tabName !== 'string' || tabName.trim() === '') {
       console.warn('Invalid tab name provided to switchTab');
@@ -4205,6 +4696,18 @@ function switchTab(tabName, event) {
       });
     }
 
+    // Close all dropdown menus
+    const dropdowns = document.querySelectorAll('.nav-dropdown-menu');
+    if (dropdowns && dropdowns.length > 0) {
+      dropdowns.forEach(d => {
+        try {
+          d.style.display = 'none';
+        } catch (e) {
+          console.warn('Error closing dropdown:', e);
+        }
+      });
+    }
+
     // Remove active class from all tabs
     const tabs = document.querySelectorAll('.nav-tab');
     if (tabs && tabs.length > 0) {
@@ -4213,6 +4716,20 @@ function switchTab(tabName, event) {
           t.classList.remove('active');
         } catch (e) {
           console.warn('Error removing active from tab:', e);
+        }
+      });
+    }
+
+    // Find and mark the active tab button (look in both main tabs and dropdown items)
+    const tabButtons = document.querySelectorAll('[onclick*="switchTab"]');
+    if (tabButtons && tabButtons.length > 0) {
+      tabButtons.forEach(btn => {
+        try {
+          if (btn.getAttribute('onclick').includes(`'${sanitizedTabName}'`)) {
+            btn.classList.add('active');
+          }
+        } catch (e) {
+          console.warn('Error updating button active state:', e);
         }
       });
     }
