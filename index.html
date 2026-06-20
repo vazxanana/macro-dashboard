@@ -5045,114 +5045,57 @@ function openNewsUrl(url, event) {
   }
 }
 
-// Load economic calendar data with last 5 days
+// Load economic calendar data
 function loadEconomicCalendar() {
   try {
     const economicCalendar = document.getElementById('economicCalendar');
     if (!economicCalendar) {
-      console.error('ERROR: Economic calendar element with ID "economicCalendar" not found in DOM');
+      console.error('Calendar element not found');
       return;
     }
-    console.log('✓ Calendar element found, loading events...');
 
-    // Past 5 days + upcoming events
+    // Simple events
+    let html = '<div class="economic-header">';
+    html += '<div>Date</div><div>Event</div><div>Impact</div><div>Prev</div><div>Consens</div><div>Actual</div><div>Status</div>';
+    html += '</div>';
+
+    // Add simple events
     const events = [
-      // Last 5 days results
-      { time: '08:30', date: '-5d', country: 'US', title: 'Non-Farm Payrolls', impact: 'high', previous: '272K', consensus: '190K', actual: '165K', status: 'Released', currency: 'USD', impacts: { '1m': {pct: '-0.35%', pips: '-35'}, '3m': {pct: '-0.62%', pips: '-62'}, '5m': {pct: '-0.75%', pips: '-75'}, '10m': {pct: '-0.85%', pips: '-85'} }, reaction: 'Weak - Below expectations, major USD selloff across all timeframes' },
-      { time: '10:00', date: '-5d', country: 'US', title: 'ISM Mfg PMI', impact: 'high', previous: '51.2', consensus: '52.5', actual: '52.8', status: 'Better', currency: 'USD', impacts: { '1m': {pct: '+0.12%', pips: '+12'}, '3m': {pct: '+0.22%', pips: '+22'}, '5m': {pct: '+0.28%', pips: '+28'}, '10m': {pct: '+0.32%', pips: '+32'} }, reaction: 'Positive - Better than expected, steady USD gain' },
-      { time: '14:00', date: '-4d', country: 'US', title: 'Initial Claims', impact: 'medium', previous: '218K', consensus: '215K', actual: '210K', status: 'Better', currency: 'USD', impacts: { '1m': {pct: '+0.08%', pips: '+8'}, '3m': {pct: '+0.12%', pips: '+12'}, '5m': {pct: '+0.15%', pips: '+15'}, '10m': {pct: '+0.18%', pips: '+18'} }, reaction: 'Slightly positive - Strong labor data supporting USD' },
-      { time: '16:00', date: '-4d', country: 'US', title: 'Existing Home Sales', impact: 'medium', previous: '3.8M', consensus: '4.1M', actual: '3.9M', status: 'Mixed', currency: 'USD', impacts: { '1m': {pct: '→ 0.00%', pips: '→ 0'}, '3m': {pct: '→ -0.01%', pips: '→ -1'}, '5m': {pct: '→ -0.01%', pips: '→ -1'}, '10m': {pct: '→ -0.02%', pips: '→ -2'} }, reaction: 'Neutral - Mixed signals, very limited reaction' },
-      { time: '08:00', date: '-3d', country: 'EU', title: 'Eurozone PMI Svc', impact: 'high', previous: '52.1', consensus: '52.8', actual: '53.2', status: 'Better', currency: 'EUR', impacts: { '1m': {pct: '+0.15%', pips: '+15'}, '3m': {pct: '+0.28%', pips: '+28'}, '5m': {pct: '+0.35%', pips: '+35'}, '10m': {pct: '+0.42%', pips: '+42'} }, reaction: 'Positive - Strongest reading in months, sustained EUR rally' },
-      { time: '09:00', date: '-3d', country: 'EU', title: 'ECB Rate Decision', impact: 'high', previous: '4.25%', consensus: '4.50%', actual: '4.50%', status: 'As Expected', currency: 'EUR', impacts: { '1m': {pct: '-0.08%', pips: '-8'}, '3m': {pct: '-0.15%', pips: '-15'}, '5m': {pct: '-0.22%', pips: '-22'}, '10m': {pct: '-0.28%', pips: '-28'} }, reaction: 'Mixed - As expected but dovish guidance disappointed' },
-      { time: '14:30', date: '-2d', country: 'US', title: 'Durable Goods', impact: 'medium', previous: '+0.5%', consensus: '+2.5%', actual: '+1.8%', status: 'Mixed', currency: 'USD', impacts: { '1m': {pct: '→ -0.02%', pips: '→ -2'}, '3m': {pct: '→ -0.04%', pips: '→ -4'}, '5m': {pct: '→ -0.06%', pips: '→ -6'}, '10m': {pct: '→ -0.08%', pips: '→ -8'} }, reaction: 'Weak - Below consensus, no USD recovery' },
-      { time: '10:00', date: '-2d', country: 'US', title: 'Consumer Confidence', impact: 'high', previous: '103.2', consensus: '104.1', actual: '104.5', status: 'Better', currency: 'USD', impacts: { '1m': {pct: '+0.18%', pips: '+18'}, '3m': {pct: '+0.35%', pips: '+35'}, '5m': {pct: '+0.48%', pips: '+48'}, '10m': {pct: '+0.55%', pips: '+55'} }, reaction: 'Strong - Best in 4 months, robust risk-on sentiment' },
-      { time: '11:30', date: '-1d', country: 'UK', title: 'BoE Rate Decision', impact: 'high', previous: '5.00%', consensus: '5.25%', actual: '5.25%', status: 'As Expected', currency: 'GBP', impacts: { '1m': {pct: '+0.12%', pips: '+12'}, '3m': {pct: '+0.22%', pips: '+22'}, '5m': {pct: '+0.30%', pips: '+30'}, '10m': {pct: '+0.38%', pips: '+38'} }, reaction: 'Positive - Rate hike delivered as expected, GBP strength' },
-      { time: '08:00', date: '-1d', country: 'JP', title: 'Services PMI', impact: 'high', previous: '51.3', consensus: '51.8', actual: '51.5', status: 'In Line', currency: 'JPY', impacts: { '1m': {pct: '→ -0.03%', pips: '→ -3'}, '3m': {pct: '→ -0.06%', pips: '→ -6'}, '5m': {pct: '→ -0.09%', pips: '→ -9'}, '10m': {pct: '→ -0.12%', pips: '→ -12'} }, reaction: 'Neutral - Expected reading, minimal JPY movement' },
-
-      // Upcoming events
-      { time: '08:30', date: 'Today', country: 'US', title: 'CPI YoY', impact: 'high', previous: '3.2%', consensus: '3.1%', actual: '--', status: 'Upcoming', currency: 'USD', impacts: null },
-      { time: '10:00', date: 'Today', country: 'US', title: 'Producer Price Index', impact: 'high', previous: '2.8%', consensus: '2.6%', actual: '--', status: 'Watch', currency: 'USD', impacts: null },
-      { time: '13:00', date: 'Today', country: 'US', title: 'FOMC Minutes', impact: 'high', previous: 'N/A', consensus: 'Key', actual: '--', status: 'Critical', currency: 'USD', impacts: null },
-      { time: '14:00', date: '+1d', country: 'US', title: 'Retail Sales', impact: 'medium', previous: '+0.3%', consensus: '+0.4%', actual: '--', status: 'Monitor', currency: 'USD', impacts: null },
-      { time: '08:00', date: '+1d', country: 'EU', title: 'Eurozone PMI Mfg', impact: 'high', previous: '46.5', consensus: '47.2', actual: '--', status: 'Alert', currency: 'EUR', impacts: null },
+      {date: '-5d', time: '08:30', country: 'US', title: 'Non-Farm Payrolls', impact: 'high', prev: '272K', cons: '190K', actual: '165K', status: 'Released'},
+      {date: '-4d', time: '14:00', country: 'US', title: 'Initial Claims', impact: 'medium', prev: '218K', cons: '215K', actual: '210K', status: 'Released'},
+      {date: '-3d', time: '08:00', country: 'EU', title: 'Eurozone PMI', impact: 'high', prev: '52.1', cons: '52.8', actual: '53.2', status: 'Released'},
+      {date: '-2d', time: '10:00', country: 'US', title: 'Consumer Conf', impact: 'high', prev: '103.2', cons: '104.1', actual: '104.5', status: 'Released'},
+      {date: '-1d', time: '11:30', country: 'UK', title: 'BoE Rate', impact: 'high', prev: '5.00%', cons: '5.25%', actual: '5.25%', status: 'Released'},
+      {date: 'Today', time: '08:30', country: 'US', title: 'CPI YoY', impact: 'high', prev: '3.2%', cons: '3.1%', actual: '--', status: 'Upcoming'},
+      {date: 'Today', time: '13:00', country: 'US', title: 'FOMC Minutes', impact: 'high', prev: 'N/A', cons: 'Key', actual: '--', status: 'Critical'},
+      {date: '+1d', time: '14:00', country: 'US', title: 'Retail Sales', impact: 'medium', prev: '+0.3%', cons: '+0.4%', actual: '--', status: 'Monitor'},
     ];
 
-    const html = `
-      <div class="economic-header">
-        <div>Date/Time</div>
-        <div>Event</div>
-        <div>Impact</div>
-        <div>Previous</div>
-        <div>Consensus</div>
-        <div>Actual</div>
-        <div>Status</div>
-        <div style="font-size: 10px; text-align: center;">Currency Impact Timeline</div>
-      </div>
-      ${events.map((event, idx) => {
-        const actualBg = event.actual !== '--' ? (
-          parseFloat(event.actual) > parseFloat(event.consensus) ? 'var(--sage-glow)' : 'var(--rust-glow)'
-        ) : 'transparent';
+    events.forEach(event => {
+      const isReleased = event.actual !== '--';
+      const actualBg = isReleased ? (parseFloat(event.actual) > parseFloat(event.cons) ? 'var(--sage-glow)' : 'var(--rust-glow)') : 'transparent';
 
-        const isReleased = event.actual !== '--';
-        const dateStr = event.date === 'Today' ? '📅 Today' : event.date === '+1d' ? '📅 Tomorrow' : event.date.startsWith('-') ? `${event.date} ago` : event.date;
-
-        return `
-          <div class="economic-event" style="animation: fadeIn 0.3s ease-out ${idx * 0.05}s both; ${isReleased ? 'opacity: 0.8;' : ''}">
-            <div class="economic-time" style="font-size: 10px; color: ${isReleased ? 'var(--ink-faint)' : 'var(--sage)'};">
-              <div>${escapeHtml(dateStr)}</div>
-              <div>${escapeHtml(event.time)}</div>
-            </div>
-            <div class="economic-content">
-              <div class="economic-title">${escapeHtml(event.title)}</div>
-              <div class="economic-country">${escapeHtml(event.country)}</div>
-            </div>
-            <div class="economic-impact impact-${event.impact}">
-              <span>${event.impact.substring(0, 1).toUpperCase()}${event.impact.substring(1).toLowerCase()}</span>
-            </div>
-            <div style="font-family: var(--mono); font-size: 10px; color: var(--ink-dim); text-align: center;">${escapeHtml(event.previous)}</div>
-            <div style="font-family: var(--mono); font-size: 10px; color: var(--steel); text-align: center; font-weight: 600;">${escapeHtml(event.consensus)}</div>
-            <div style="font-family: var(--mono); font-size: 11px; color: var(--sage); text-align: center; font-weight: 600; background: ${actualBg}; padding: 2px 4px; border-radius: 2px;">${escapeHtml(event.actual)}</div>
-            <div style="font-family: var(--mono); font-size: 9px; color: ${isReleased ? 'var(--ink-faint)' : 'var(--steel)'}; text-align: center; text-transform: uppercase;">${escapeHtml(event.status)}</div>
-            <div style="font-size: 9px; color: var(--ink-dim); text-align: center;">
-              ${event.impacts ? `
-                <div style="font-family: var(--mono); font-weight: 600; font-size: 10px; margin-bottom: 6px; color: var(--ink);">
-                  ${event.currency || ''}
-                </div>
-                <div style="display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 4px; font-size: 8px;">
-                  <div style="padding: 3px; background: var(--line-soft); border-radius: 2px;">
-                    <div style="color: var(--ink-faint); margin-bottom: 1px;">1m</div>
-                    <div style="font-weight: 600; color: ${event.impacts['1m'].pct.includes('-') ? 'var(--rust)' : event.impacts['1m'].pct.includes('+') ? 'var(--sage)' : 'var(--steel)'};">${event.impacts['1m'].pct}</div>
-                    <div style="color: var(--ink-faint); font-size: 7px;">${event.impacts['1m'].pips}p</div>
-                  </div>
-                  <div style="padding: 3px; background: var(--line-soft); border-radius: 2px;">
-                    <div style="color: var(--ink-faint); margin-bottom: 1px;">3m</div>
-                    <div style="font-weight: 600; color: ${event.impacts['3m'].pct.includes('-') ? 'var(--rust)' : event.impacts['3m'].pct.includes('+') ? 'var(--sage)' : 'var(--steel)'};">${event.impacts['3m'].pct}</div>
-                    <div style="color: var(--ink-faint); font-size: 7px;">${event.impacts['3m'].pips}p</div>
-                  </div>
-                  <div style="padding: 3px; background: var(--line-soft); border-radius: 2px;">
-                    <div style="color: var(--ink-faint); margin-bottom: 1px;">5m</div>
-                    <div style="font-weight: 600; color: ${event.impacts['5m'].pct.includes('-') ? 'var(--rust)' : event.impacts['5m'].pct.includes('+') ? 'var(--sage)' : 'var(--steel)'};">${event.impacts['5m'].pct}</div>
-                    <div style="color: var(--ink-faint); font-size: 7px;">${event.impacts['5m'].pips}p</div>
-                  </div>
-                  <div style="padding: 3px; background: ${event.impacts['10m'].pct.includes('-') ? 'rgba(199,93,77,0.2)' : event.impacts['10m'].pct.includes('+') ? 'rgba(122,155,126,0.2)' : 'rgba(110,146,172,0.2)'}; border-radius: 2px; border: 1px solid ${event.impacts['10m'].pct.includes('-') ? 'var(--rust)' : event.impacts['10m'].pct.includes('+') ? 'var(--sage)' : 'var(--steel)'};">
-                    <div style="color: var(--ink-faint); margin-bottom: 1px;">10m</div>
-                    <div style="font-weight: 600; color: ${event.impacts['10m'].pct.includes('-') ? 'var(--rust)' : event.impacts['10m'].pct.includes('+') ? 'var(--sage)' : 'var(--steel)'}; font-size: 9px;">${event.impacts['10m'].pct}</div>
-                    <div style="color: ${event.impacts['10m'].pct.includes('-') ? 'var(--rust)' : event.impacts['10m'].pct.includes('+') ? 'var(--sage)' : 'var(--steel)'}; font-size: 7px; font-weight: 600;">${event.impacts['10m'].pips}p</div>
-                  </div>
-                </div>
-              ` : '—'}
-            </div>
-          </div>
-        `;
-      }).join('')}
-    `;
+      html += '<div class="economic-event" style="' + (isReleased ? 'opacity: 0.8;' : '') + '">';
+      html += '<div class="economic-time" style="font-size: 10px;">' + event.date + ' ' + event.time + '</div>';
+      html += '<div class="economic-content">';
+      html += '<div class="economic-title">' + event.title + '</div>';
+      html += '<div class="economic-country">' + event.country + '</div>';
+      html += '</div>';
+      html += '<div class="economic-impact impact-' + event.impact + '">' + event.impact.charAt(0).toUpperCase() + '</div>';
+      html += '<div style="text-align: center; font-size: 10px;">' + event.prev + '</div>';
+      html += '<div style="text-align: center; font-size: 10px; font-weight: 600; color: var(--steel);">' + event.cons + '</div>';
+      html += '<div style="text-align: center; font-size: 11px; font-weight: 600; color: var(--sage); background: ' + actualBg + '; padding: 2px 4px; border-radius: 2px;">' + event.actual + '</div>';
+      html += '<div style="text-align: center; font-size: 9px; color: var(--ink-faint);">' + event.status + '</div>';
+      html += '</div>';
+    });
 
     economicCalendar.innerHTML = html;
+    console.log('✓ Calendar loaded');
   } catch (e) {
-    console.error('Error loading economic calendar:', e);
-    const economicCalendar = document.getElementById('economicCalendar');
-    if (economicCalendar) {
-      economicCalendar.innerHTML = '<div style="padding: 20px; color: var(--ink-dim);">Error loading economic calendar</div>';
+    console.error('Calendar error:', e);
+    const cal = document.getElementById('economicCalendar');
+    if (cal) {
+      cal.innerHTML = '<div style="padding: 20px; color: var(--rust);">Error: ' + e.message + '</div>';
     }
   }
 }
