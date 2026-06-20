@@ -1231,47 +1231,155 @@
 <!-- NAV -->
 <div class="nav-tabs" id="navTabs">
   <button class="nav-tab active" data-tab="dashboard">Dashboard</button>
-  <button class="nav-tab" data-tab="signals">Macro Signals</button>
-  <button class="nav-tab" data-tab="economic">Economic Data</button>
-  <button class="nav-tab" data-tab="analysis">Market Analysis</button>
-  <button class="nav-tab" data-tab="technical">Technical</button>
-  <button class="nav-tab" data-tab="sentiment">Sentiment</button>
-  <button class="nav-tab" data-tab="setups">Trade Setups</button>
-  <button class="nav-tab" data-tab="report">Weekly Report</button>
-  <button class="nav-tab" data-tab="intelligence-regime">Regime</button>
-  <button class="nav-tab" data-tab="intelligence-bias">Daily Bias</button>
-  <button class="nav-tab" data-tab="intelligence-liquidity">Liquidity</button>
-  <button class="nav-tab" data-tab="intelligence-policy">Policy</button>
-  <button class="nav-tab" data-tab="intelligence-summary">AI Summary</button>
-  <button class="nav-tab" data-tab="intelligence-history">Historical</button>
-  <button class="nav-tab" data-tab="gold-playbook">Gold Playbook</button>
+
+  <div class="nav-dropdown-container">
+    <button class="nav-tab nav-dropdown-trigger">Core Macro ▼</button>
+    <div class="nav-dropdown-menu" style="display: none;">
+      <button class="nav-tab nav-dropdown-item" data-tab="signals">Macro Signals</button>
+      <button class="nav-tab nav-dropdown-item" data-tab="economic">Economic Data</button>
+    </div>
+  </div>
+
+  <div class="nav-dropdown-container">
+    <button class="nav-tab nav-dropdown-trigger">Trading ▼</button>
+    <div class="nav-dropdown-menu" style="display: none;">
+      <button class="nav-tab nav-dropdown-item" data-tab="analysis">Market Analysis</button>
+      <button class="nav-tab nav-dropdown-item" data-tab="technical">Technical</button>
+      <button class="nav-tab nav-dropdown-item" data-tab="setups">Trade Setups</button>
+      <button class="nav-tab nav-dropdown-item" data-tab="gold-playbook">Gold Playbook</button>
+    </div>
+  </div>
+
+  <div class="nav-dropdown-container">
+    <button class="nav-tab nav-dropdown-trigger">Intelligence ▼</button>
+    <div class="nav-dropdown-menu" style="display: none;">
+      <button class="nav-tab nav-dropdown-item" data-tab="intelligence-regime">Regime</button>
+      <button class="nav-tab nav-dropdown-item" data-tab="intelligence-bias">Daily Bias</button>
+      <button class="nav-tab nav-dropdown-item" data-tab="intelligence-liquidity">Liquidity</button>
+      <button class="nav-tab nav-dropdown-item" data-tab="intelligence-policy">Policy</button>
+      <button class="nav-tab nav-dropdown-item" data-tab="intelligence-summary">AI Summary</button>
+      <button class="nav-tab nav-dropdown-item" data-tab="intelligence-history">Historical</button>
+    </div>
+  </div>
+
+  <div class="nav-dropdown-container">
+    <button class="nav-tab nav-dropdown-trigger">Reports ▼</button>
+    <div class="nav-dropdown-menu" style="display: none;">
+      <button class="nav-tab nav-dropdown-item" data-tab="sentiment">Sentiment</button>
+      <button class="nav-tab nav-dropdown-item" data-tab="report">Weekly Report</button>
+    </div>
+  </div>
 </div>
 
 <script>
-document.querySelectorAll('.nav-tab').forEach(btn => {
-  btn.addEventListener('click', function() {
+// Tab click handler - works for all tabs
+function handleTabClick(tabName) {
+  // Hide all sections
+  document.querySelectorAll('.section').forEach(section => {
+    section.classList.remove('active');
+  });
+
+  // Remove active from all buttons
+  document.querySelectorAll('.nav-tab').forEach(b => {
+    b.classList.remove('active');
+  });
+
+  // Show selected section
+  const section = document.getElementById(tabName);
+  if (section) {
+    section.classList.add('active');
+    window.scrollTo(0, 0);
+  }
+
+  // Close all dropdowns
+  document.querySelectorAll('.nav-dropdown-menu').forEach(menu => {
+    menu.style.display = 'none';
+  });
+}
+
+// Attach click handlers to all tab buttons
+document.querySelectorAll('[data-tab]').forEach(btn => {
+  btn.addEventListener('click', function(e) {
+    e.stopPropagation();
     const tabName = this.getAttribute('data-tab');
+    handleTabClick(tabName);
+    this.classList.add('active');
+  });
+});
 
-    // Hide all sections
-    document.querySelectorAll('.section').forEach(section => {
-      section.classList.remove('active');
+// Dropdown toggle functionality
+document.querySelectorAll('.nav-dropdown-trigger').forEach(trigger => {
+  trigger.addEventListener('click', function(e) {
+    e.stopPropagation();
+    const menu = this.nextElementSibling;
+
+    // Close all other menus
+    document.querySelectorAll('.nav-dropdown-menu').forEach(m => {
+      if (m !== menu) m.style.display = 'none';
     });
 
-    // Remove active from all buttons
-    document.querySelectorAll('.nav-tab').forEach(b => {
-      b.classList.remove('active');
-    });
+    // Toggle this menu
+    menu.style.display = menu.style.display === 'none' ? 'block' : 'none';
+  });
+});
 
-    // Show selected section
-    const section = document.getElementById(tabName);
-    if (section) {
-      section.classList.add('active');
-      this.classList.add('active');
-      window.scrollTo(0, 0);
-    }
+// Close dropdowns when clicking outside
+document.addEventListener('click', function() {
+  document.querySelectorAll('.nav-dropdown-menu').forEach(menu => {
+    menu.style.display = 'none';
   });
 });
 </script>
+
+<style>
+.nav-dropdown-container {
+  position: relative;
+  display: inline-block;
+}
+
+.nav-dropdown-menu {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  background: var(--panel-raised);
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  min-width: 160px;
+  z-index: 1000;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+  margin-top: 4px;
+  display: none !important;
+}
+
+.nav-dropdown-menu.open {
+  display: block !important;
+}
+
+.nav-dropdown-item {
+  display: block;
+  width: 100%;
+  text-align: left;
+  padding: 10px 16px;
+  border: none;
+  background: none;
+  color: var(--ink);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.nav-dropdown-item:hover {
+  background: var(--sage-glow);
+  color: var(--sage);
+}
+
+.nav-dropdown-item:first-of-type {
+  border-radius: 4px 4px 0 0;
+}
+
+.nav-dropdown-item:last-of-type {
+  border-radius: 0 0 4px 4px;
+}
+</style>
 
 <!-- DASHBOARD -->
 <div id="dashboard" class="section active">
