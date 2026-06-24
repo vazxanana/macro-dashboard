@@ -525,6 +525,238 @@
       color: var(--accent-red);
     }
 
+    /* TAB NAV */
+    .tab-nav {
+      background: rgba(255, 255, 255, 0.45);
+      backdrop-filter: blur(20px) saturate(200%);
+      -webkit-backdrop-filter: blur(20px) saturate(200%);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.5);
+      padding: 0 40px;
+      display: flex;
+      gap: 0;
+      position: sticky;
+      top: 97px;
+      z-index: 90;
+      box-shadow: 0 2px 12px rgba(26, 29, 41, 0.04);
+    }
+
+    .tab-btn {
+      padding: 14px 24px;
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1.2px;
+      color: var(--text-tertiary);
+      background: none;
+      border: none;
+      border-bottom: 2px solid transparent;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      font-family: 'Inter', sans-serif;
+      white-space: nowrap;
+    }
+
+    .tab-btn:hover {
+      color: var(--text-primary);
+    }
+
+    .tab-btn.active {
+      color: var(--accent-blue);
+      border-bottom-color: var(--accent-blue);
+    }
+
+    .tab-panel {
+      display: none;
+    }
+
+    .tab-panel.active {
+      display: block;
+    }
+
+    /* CALCULATOR */
+    .calc-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 40px;
+    }
+
+    .calc-input-group {
+      margin-bottom: 20px;
+    }
+
+    .calc-label {
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: var(--text-tertiary);
+      margin-bottom: 8px;
+      display: block;
+    }
+
+    .calc-input {
+      width: 100%;
+      padding: 12px 16px;
+      background: rgba(255, 255, 255, 0.5);
+      border: 1.5px solid rgba(255, 255, 255, 0.6);
+      border-radius: 10px;
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--text-primary);
+      font-family: 'JetBrains Mono', monospace;
+      outline: none;
+      transition: all 0.2s ease;
+      backdrop-filter: blur(10px);
+    }
+
+    .calc-input:focus {
+      border-color: rgba(0, 82, 204, 0.4);
+      background: rgba(255, 255, 255, 0.7);
+      box-shadow: 0 0 0 3px rgba(0, 82, 204, 0.1);
+    }
+
+    .calc-result {
+      padding: 24px;
+      background: rgba(0, 82, 204, 0.06);
+      border: 1.5px solid rgba(0, 82, 204, 0.15);
+      border-radius: 14px;
+      margin-bottom: 16px;
+    }
+
+    .calc-result-label {
+      font-size: 9px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1.2px;
+      color: var(--text-tertiary);
+      margin-bottom: 8px;
+    }
+
+    .calc-result-value {
+      font-size: 32px;
+      font-weight: 700;
+      font-family: 'JetBrains Mono', monospace;
+      color: var(--text-primary);
+      letter-spacing: -1px;
+    }
+
+    .calc-result-value.good { color: var(--accent-green); }
+    .calc-result-value.warn { color: #D97706; }
+    .calc-result-value.bad  { color: var(--accent-red); }
+
+    .calc-result-detail {
+      font-size: 11px;
+      color: var(--text-tertiary);
+      margin-top: 6px;
+    }
+
+    /* CALENDAR */
+    .cal-event {
+      display: flex;
+      align-items: flex-start;
+      gap: 20px;
+      padding: 20px 24px;
+      background: rgba(255, 255, 255, 0.4);
+      border-radius: 12px;
+      border: 1px solid rgba(255, 255, 255, 0.5);
+      margin-bottom: 12px;
+      transition: all 0.2s ease;
+    }
+
+    .cal-event:hover {
+      background: rgba(255, 255, 255, 0.6);
+      transform: translateX(4px);
+    }
+
+    .cal-date {
+      min-width: 60px;
+      text-align: center;
+    }
+
+    .cal-day {
+      font-size: 22px;
+      font-weight: 700;
+      font-family: 'JetBrains Mono', monospace;
+      color: var(--text-primary);
+      line-height: 1;
+    }
+
+    .cal-month {
+      font-size: 9px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: var(--text-tertiary);
+      margin-top: 2px;
+    }
+
+    .cal-body {
+      flex: 1;
+    }
+
+    .cal-title {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--text-primary);
+      margin-bottom: 4px;
+    }
+
+    .cal-desc {
+      font-size: 11px;
+      color: var(--text-secondary);
+      line-height: 1.6;
+    }
+
+    .cal-impact {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-top: 8px;
+    }
+
+    .impact-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+    }
+
+    .impact-high .impact-dot { background: var(--accent-red); }
+    .impact-med .impact-dot  { background: #D97706; }
+    .impact-low .impact-dot  { background: var(--accent-green); }
+
+    .impact-label {
+      font-size: 9px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .impact-high .impact-label { color: var(--accent-red); }
+    .impact-med .impact-label  { color: #D97706; }
+    .impact-low .impact-label  { color: var(--accent-green); }
+
+    .cal-gold-bias {
+      font-size: 10px;
+      font-weight: 600;
+      padding: 3px 8px;
+      border-radius: 6px;
+    }
+
+    .bias-bull {
+      background: rgba(0, 166, 81, 0.12);
+      color: var(--accent-green);
+    }
+
+    .bias-bear {
+      background: rgba(194, 59, 51, 0.12);
+      color: var(--accent-red);
+    }
+
+    .bias-neutral {
+      background: rgba(122, 129, 150, 0.12);
+      color: var(--text-tertiary);
+    }
+
     /* RESPONSIVE */
     @media (max-width: 1400px) {
       .chart-wrapper {
@@ -552,6 +784,18 @@
     }
 
     @media (max-width: 768px) {
+      .tab-nav {
+        padding: 0 16px;
+        top: auto;
+        overflow-x: auto;
+        position: relative;
+      }
+
+      .calc-grid {
+        grid-template-columns: 1fr;
+        gap: 24px;
+      }
+
       .container {
         padding: 20px 16px;
       }
@@ -722,8 +966,19 @@
   </div>
 </div>
 
+<!-- TAB NAV -->
+<div class="tab-nav">
+  <button class="tab-btn active" onclick="switchTab('analysis', this)">Analysis</button>
+  <button class="tab-btn" onclick="switchTab('strategy', this)">Strategy</button>
+  <button class="tab-btn" onclick="switchTab('calculator', this)">Position Calculator</button>
+  <button class="tab-btn" onclick="switchTab('calendar', this)">Economic Calendar</button>
+</div>
+
 <!-- MAIN -->
 <div class="container">
+
+  <!-- ANALYSIS TAB -->
+  <div id="tab-analysis" class="tab-panel active">
 
   <!-- MACRO DRIVERS FIRST -->
   <div class="section">
@@ -993,6 +1248,256 @@
     </div>
   </div>
 
+  </div><!-- end tab-analysis -->
+
+  <!-- STRATEGY TAB -->
+  <div id="tab-strategy" class="tab-panel">
+    <div class="section">
+      <div class="section-header">
+        <div class="section-title">4-Step Execution Workflow</div>
+      </div>
+      <div class="card glass">
+        <div class="grid-2">
+          <div class="direction-block">
+            <div class="block-title">Step 1: Macro Bias Confirmation</div>
+            <div class="block-content">
+              Establish weekly directional bias from 5 key drivers.<br/>
+              Target: 72%+ confidence reading before any trade.
+            </div>
+          </div>
+          <div class="direction-block">
+            <div class="block-title">Step 2: 1-Hour Structure Analysis</div>
+            <div class="block-content">
+              Identify key support/resistance on 1H timeframe.<br/>
+              Confluence with macro bias required for entry.
+            </div>
+          </div>
+          <div class="direction-block">
+            <div class="block-title">Step 3: Pattern Confirmation</div>
+            <div class="block-content">
+              Wait for double-bottom/top pattern formation.<br/>
+              Volume breakout of neckline confirms setup.
+            </div>
+          </div>
+          <div class="direction-block">
+            <div class="block-title">Step 4: 1-Minute Entry Execution</div>
+            <div class="block-content">
+              Execute on neckline break + pullback retest.<br/>
+              Tight risk management: max 1% account risk.
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-header">
+        <div class="section-title">Contingency: Missed Move Scenarios</div>
+      </div>
+      <div class="card glass">
+        <div class="scenario bullish">
+          <div class="scenario-title">Scenario 1: Re-Entry at R1 (4,190)</div>
+          <div class="scenario-text">
+            <strong>Setup:</strong> Market gaps through 4,160 entry level<br/>
+            <strong>Action:</strong> Pullback to 4,185–4,190 creates alt entry<br/>
+            <strong>Stop:</strong> 4,170 (20 pips risk) &nbsp;|&nbsp; <strong>Target:</strong> 4,220 (+30 pips)<br/>
+            <strong>Key Rule:</strong> Only enter on pullback — never chase breakouts
+          </div>
+        </div>
+        <div class="scenario">
+          <div class="scenario-title">Scenario 2: Momentum Play at R2 (4,220)</div>
+          <div class="scenario-text">
+            <strong>Setup:</strong> Strong momentum continuation through 4,190<br/>
+            <strong>Action:</strong> Breakout above 4,220 with volume confirmation<br/>
+            <strong>Stop:</strong> 4,205 (15 pips risk) &nbsp;|&nbsp; <strong>Target:</strong> 4,250 (+30 pips)<br/>
+            <strong>Risk Level:</strong> MODERATE — momentum trade, tighter stops required
+          </div>
+        </div>
+        <div class="scenario bearish">
+          <div class="scenario-title">Scenario 3: Patient Entry — Wait for Pullback (OPTIMAL)</div>
+          <div class="scenario-text">
+            <strong>Strategy:</strong> Do NOT chase breakouts above 4,220<br/>
+            <strong>Action:</strong> Wait for 4–8 hour pullback to form<br/>
+            <strong>Re-Entry Level:</strong> Buy zone 4,200–4,210<br/>
+            <strong>Key Principle:</strong> Patience = superior entries and exits
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="card glass-ultra" style="padding: 32px; background: rgba(0, 82, 204, 0.08);">
+        <h3 style="font-size: 16px; margin-bottom: 16px;">Risk Management Rules</h3>
+        <div class="grid-3">
+          <div class="metric-box">
+            <div class="metric-label">Max Risk Per Trade</div>
+            <div class="metric-value">1%</div>
+            <div class="metric-detail">Never exceed 1% of account on single trade</div>
+          </div>
+          <div class="metric-box">
+            <div class="metric-label">Minimum R:R Ratio</div>
+            <div class="metric-value">1:2</div>
+            <div class="metric-detail">Reject setups below 2× reward-to-risk</div>
+          </div>
+          <div class="metric-box">
+            <div class="metric-label">Max Concurrent Trades</div>
+            <div class="metric-value">3</div>
+            <div class="metric-detail">Diversify risk; avoid over-exposure</div>
+          </div>
+          <div class="metric-box">
+            <div class="metric-label">Daily Loss Limit</div>
+            <div class="metric-value">3%</div>
+            <div class="metric-detail">Stop trading for the day if hit</div>
+          </div>
+          <div class="metric-box">
+            <div class="metric-label">Trailing Stop</div>
+            <div class="metric-value">Breakeven</div>
+            <div class="metric-detail">Move stop to entry once T1 hit</div>
+          </div>
+          <div class="metric-box">
+            <div class="metric-label">Position Scaling</div>
+            <div class="metric-value">50% / 50%</div>
+            <div class="metric-detail">Half off at T1, run remainder to T2/T3</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div><!-- end tab-strategy -->
+
+  <!-- CALCULATOR TAB -->
+  <div id="tab-calculator" class="tab-panel">
+    <div class="section">
+      <div class="section-header">
+        <div class="section-title">Position Size Calculator</div>
+        <span class="badge">XAU/USD</span>
+      </div>
+      <div class="calc-grid">
+        <div class="card glass">
+          <h3>Inputs</h3>
+
+          <div class="calc-input-group">
+            <label class="calc-label" for="accountSize">Account Size (USD)</label>
+            <input class="calc-input" type="number" id="accountSize" value="10000" min="0" step="100" oninput="calcPosition()">
+          </div>
+
+          <div class="calc-input-group">
+            <label class="calc-label" for="riskPct">Risk Per Trade (%)</label>
+            <input class="calc-input" type="number" id="riskPct" value="1" min="0.1" max="10" step="0.1" oninput="calcPosition()">
+          </div>
+
+          <div class="calc-input-group">
+            <label class="calc-label" for="entryPrice">Entry Price (USD)</label>
+            <input class="calc-input" type="number" id="entryPrice" value="4160" min="0" step="1" oninput="this.dataset.touched='1';calcPosition()">
+          </div>
+
+          <div class="calc-input-group">
+            <label class="calc-label" for="stopPrice">Stop Loss Price (USD)</label>
+            <input class="calc-input" type="number" id="stopPrice" value="4140" min="0" step="1" oninput="calcPosition()">
+          </div>
+
+          <div class="calc-input-group">
+            <label class="calc-label" for="target1">Target 1 Price (USD)</label>
+            <input class="calc-input" type="number" id="target1" value="4190" min="0" step="1" oninput="calcPosition()">
+          </div>
+
+          <div class="calc-input-group">
+            <label class="calc-label" for="target2">Target 2 Price (USD)</label>
+            <input class="calc-input" type="number" id="target2" value="4220" min="0" step="1" oninput="calcPosition()">
+          </div>
+        </div>
+
+        <div class="card glass">
+          <h3>Results</h3>
+
+          <div class="calc-result">
+            <div class="calc-result-label">Dollar Risk</div>
+            <div class="calc-result-value" id="res-dollar-risk">$100.00</div>
+            <div class="calc-result-detail" id="res-dollar-risk-detail">1% of $10,000</div>
+          </div>
+
+          <div class="calc-result">
+            <div class="calc-result-label">Stop Distance</div>
+            <div class="calc-result-value" id="res-stop-dist">20.00 pts</div>
+            <div class="calc-result-detail" id="res-stop-pct">—% from entry</div>
+          </div>
+
+          <div class="calc-result">
+            <div class="calc-result-label">Position Size (oz)</div>
+            <div class="calc-result-value" id="res-oz">5.00 oz</div>
+            <div class="calc-result-detail" id="res-notional">Notional: $20,800</div>
+          </div>
+
+          <div class="calc-result" id="res-rr-block">
+            <div class="calc-result-label">Risk : Reward (to T1 / T2)</div>
+            <div class="calc-result-value" id="res-rr">1:1.5 / 1:3.0</div>
+            <div class="calc-result-detail" id="res-rr-detail">Profit at T1: $150 | T2: $300</div>
+          </div>
+
+          <div class="calc-result">
+            <div class="calc-result-label">Leverage Required (at 1× = full notional)</div>
+            <div class="calc-result-value" id="res-leverage">2.1×</div>
+            <div class="calc-result-detail" id="res-leverage-detail">Notional vs account size</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div><!-- end tab-calculator -->
+
+  <!-- CALENDAR TAB -->
+  <div id="tab-calendar" class="tab-panel">
+    <div class="section">
+      <div class="section-header">
+        <div class="section-title">Economic Calendar — Gold-Relevant Events</div>
+        <span class="badge">Next 30 Days</span>
+      </div>
+      <div class="card glass">
+        <div id="cal-events">
+          <!-- populated by JS -->
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-header">
+        <div class="section-title">How Events Move Gold</div>
+      </div>
+      <div class="card glass">
+        <div class="grid-3">
+          <div class="metric-box">
+            <div class="metric-label">CPI Hotter Than Expected</div>
+            <div class="metric-value text-red">Bearish</div>
+            <div class="metric-detail">Raises rate hike odds → higher real yields → gold down</div>
+          </div>
+          <div class="metric-box">
+            <div class="metric-label">CPI Cooler Than Expected</div>
+            <div class="metric-value text-green">Bullish</div>
+            <div class="metric-detail">Rate cut odds rise → lower real yields → gold up</div>
+          </div>
+          <div class="metric-box">
+            <div class="metric-label">FOMC Hawkish Surprise</div>
+            <div class="metric-value text-red">Bearish</div>
+            <div class="metric-detail">Dollar strength & yield spike compress gold</div>
+          </div>
+          <div class="metric-box">
+            <div class="metric-label">FOMC Dovish Surprise</div>
+            <div class="metric-value text-green">Bullish</div>
+            <div class="metric-detail">Lower rate path expectations → gold rally</div>
+          </div>
+          <div class="metric-box">
+            <div class="metric-label">NFP Strong Beat</div>
+            <div class="metric-value text-red">Bearish</div>
+            <div class="metric-detail">Delays rate cuts, DXY strength, gold falls</div>
+          </div>
+          <div class="metric-box">
+            <div class="metric-label">NFP Weak Miss</div>
+            <div class="metric-value text-green">Bullish</div>
+            <div class="metric-detail">Accelerates cut timeline, DXY falls, gold rises</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div><!-- end tab-calendar -->
+
 </div>
 
 <!-- FOOTER -->
@@ -1001,6 +1506,101 @@
 </div>
 
 <script>
+  // ─── TAB NAVIGATION ────────────────────────────────────────────────────────
+  function switchTab(name, btn) {
+    document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    const panel = document.getElementById('tab-' + name);
+    if (panel) panel.classList.add('active');
+    if (btn) btn.classList.add('active');
+    if (name === 'calculator') calcPosition();
+    if (name === 'calendar') renderCalendar();
+  }
+
+  // ─── POSITION CALCULATOR ───────────────────────────────────────────────────
+  function calcPosition() {
+    const account  = parseFloat(document.getElementById('accountSize')?.value) || 0;
+    const riskPct  = parseFloat(document.getElementById('riskPct')?.value)     || 0;
+    const entry    = parseFloat(document.getElementById('entryPrice')?.value)  || 0;
+    const stop     = parseFloat(document.getElementById('stopPrice')?.value)   || 0;
+    const t1       = parseFloat(document.getElementById('target1')?.value)     || 0;
+    const t2       = parseFloat(document.getElementById('target2')?.value)     || 0;
+
+    const dollarRisk = account * riskPct / 100;
+    const stopDist   = Math.abs(entry - stop);
+    const stopPct    = entry > 0 ? (stopDist / entry * 100) : 0;
+    const oz         = stopDist > 0 ? dollarRisk / stopDist : 0;
+    const notional   = oz * entry;
+    const leverage   = account > 0 ? notional / account : 0;
+
+    const rrT1 = stopDist > 0 ? Math.abs(t1 - entry) / stopDist : 0;
+    const rrT2 = stopDist > 0 ? Math.abs(t2 - entry) / stopDist : 0;
+    const profitT1 = oz * Math.abs(t1 - entry);
+    const profitT2 = oz * Math.abs(t2 - entry);
+
+    set('res-dollar-risk', '$' + dollarRisk.toFixed(2));
+    set('res-dollar-risk-detail', riskPct + '% of $' + account.toLocaleString());
+    set('res-stop-dist', stopDist.toFixed(2) + ' pts');
+    set('res-stop-pct', stopPct.toFixed(3) + '% from entry');
+    set('res-oz', oz.toFixed(3) + ' oz');
+    set('res-notional', 'Notional: $' + notional.toLocaleString(undefined, {maximumFractionDigits: 0}));
+    set('res-rr', '1:' + rrT1.toFixed(2) + ' / 1:' + rrT2.toFixed(2));
+    set('res-rr-detail', 'Profit at T1: $' + profitT1.toFixed(0) + ' | T2: $' + profitT2.toFixed(0));
+    set('res-leverage', leverage.toFixed(2) + '×');
+    set('res-leverage-detail', 'Notional $' + notional.toFixed(0) + ' vs account $' + account.toLocaleString());
+
+    const rrEl = document.getElementById('res-rr');
+    if (rrEl) {
+      rrEl.className = 'calc-result-value ' + (rrT1 >= 2 ? 'good' : rrT1 >= 1.5 ? '' : 'warn');
+    }
+  }
+
+  function set(id, val) {
+    const el = document.getElementById(id);
+    if (el) el.textContent = val;
+  }
+
+  // ─── ECONOMIC CALENDAR ─────────────────────────────────────────────────────
+  const CAL_EVENTS = [
+    { day: 25, month: 'JUN', title: 'US Consumer Confidence', desc: 'Conference Board index. Weak reading signals slowdown, boosts gold safe-haven demand.', impact: 'med', bias: 'neutral', biasTxt: 'Neutral' },
+    { day: 27, month: 'JUN', title: 'US PCE Price Index (May)', desc: 'Fed\'s preferred inflation gauge. Cooler print = rate cut acceleration = gold bullish.', impact: 'high', bias: 'bull', biasTxt: 'Bullish if cool' },
+    { day: 3,  month: 'JUL', title: 'US Non-Farm Payrolls (Jun)', desc: 'Employment report. Weak jobs = earlier Fed cuts = DXY weakness = gold up.', impact: 'high', bias: 'bull', biasTxt: 'Bullish if weak' },
+    { day: 3,  month: 'JUL', title: 'US Unemployment Rate (Jun)', desc: 'Rising unemployment strengthens rate cut case, typically gold bullish.', impact: 'high', bias: 'bull', biasTxt: 'Bullish if rising' },
+    { day: 10, month: 'JUL', title: 'US CPI Inflation (Jun)', desc: 'Core CPI year-on-year. Key FOMC input. Miss below 3% = strong gold rally catalyst.', impact: 'high', bias: 'bull', biasTxt: 'Bullish if cool' },
+    { day: 11, month: 'JUL', title: 'US PPI (Jun)', desc: 'Producer prices feed into future CPI. Cooling PPI signals disinflationary trend.', impact: 'med', bias: 'neutral', biasTxt: 'Neutral' },
+    { day: 16, month: 'JUL', title: 'US Retail Sales (Jun)', desc: 'Weak retail = slowdown fear = gold safe-haven demand rises.', impact: 'med', bias: 'bull', biasTxt: 'Bullish if weak' },
+    { day: 17, month: 'JUL', title: 'Fed Beige Book', desc: 'Qualitative economic conditions report. Dovish language supports gold.', impact: 'med', bias: 'neutral', biasTxt: 'Neutral' },
+    { day: 22, month: 'JUL', title: 'Flash PMI (Jul)', desc: 'Services & manufacturing sentiment. Contraction reinforces easing expectations.', impact: 'med', bias: 'bull', biasTxt: 'Bullish if weak' },
+    { day: 24, month: 'JUL', title: 'US GDP (Q2 Advance)', desc: 'First GDP estimate. Miss below 2% growth accelerates rate cut timeline.', impact: 'high', bias: 'bull', biasTxt: 'Bullish if miss' },
+    { day: 30, month: 'JUL', title: 'FOMC Rate Decision', desc: 'Critical event. Any dovish pivot signal or dot plot revision can trigger 1–2% gold rally.', impact: 'high', bias: 'bull', biasTxt: 'Key catalyst' },
+    { day: 1,  month: 'AUG', title: 'US Non-Farm Payrolls (Jul)', desc: 'Second-consecutive weak reading would cement rate cut conviction.', impact: 'high', bias: 'bull', biasTxt: 'Bullish if weak' },
+  ];
+
+  function renderCalendar() {
+    const container = document.getElementById('cal-events');
+    if (!container || container.dataset.rendered) return;
+    container.dataset.rendered = '1';
+
+    container.innerHTML = CAL_EVENTS.map(ev => `
+      <div class="cal-event">
+        <div class="cal-date">
+          <div class="cal-day">${ev.day}</div>
+          <div class="cal-month">${ev.month}</div>
+        </div>
+        <div class="cal-body">
+          <div class="cal-title">${ev.title}</div>
+          <div class="cal-desc">${ev.desc}</div>
+          <div class="cal-impact impact-${ev.impact}">
+            <span class="impact-dot"></span>
+            <span class="impact-label">${ev.impact === 'high' ? 'High Impact' : ev.impact === 'med' ? 'Medium Impact' : 'Low Impact'}</span>
+            <span class="cal-gold-bias bias-${ev.bias}" style="margin-left:8px;">${ev.biasTxt}</span>
+          </div>
+        </div>
+      </div>
+    `).join('');
+  }
+
+  // ─── PRICE DATA ────────────────────────────────────────────────────────────
   let lastGoldPrice = 4172.90;
   let prevGoldPrice = 4172.90;
 
@@ -1009,11 +1609,11 @@
     av: localStorage.getItem('av_api_key') || 'CONT1PDJKZXQRQ97'
   };
 
-  // Better price data sources
   const priceSources = {
     gold: [
       'https://api.metals.live/v1/spot/gold',
-      'https://api.genial.ai/xauusd'
+      'https://data-asg.goldbroker.com/prices/latest?code=XAU',
+      'https://www.metals.live/api/spot/gold'
     ]
   };
 
@@ -1158,6 +1758,11 @@
                 changeEl.innerHTML = '<span style="color: var(--text-tertiary);">—</span>';
               }
             }
+            const entryEl = document.getElementById('entryPrice');
+            if (entryEl && entryEl.dataset.touched !== '1') {
+              entryEl.value = Math.round(lastGoldPrice);
+              calcPosition();
+            }
             console.log('Gold price updated:', lastGoldPrice);
           }
         }
@@ -1240,9 +1845,8 @@
   }
 
   function initializeApp() {
-    console.log('Initializing Gold Trading Platform...');
+    calcPosition();
 
-    // Initial price update
     updatePrices();
 
     // Initialize chart
