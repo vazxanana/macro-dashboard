@@ -4265,6 +4265,7 @@
 
     // ── Direction logic ─────────────────────────────────────────────────────
     // Direction derived from live macro score (TIPS + DXY + seasonal + structural)
+    const tips = parseFloat(document.getElementById('tipsYield')?.textContent) || 2.0;
     const { score: macroScore } = computeMacroScore();
     const macroConf  = Math.round((macroScore / 40) * 100);
     const isLong  = macroConf >= 60;
@@ -4623,9 +4624,9 @@
       // Gold Price Update - Multiple sources
       try {
         const goldRes = await fetchWithFallback([
+          'https://api.gold-api.com/price/XAU',
           'https://api.metals.live/v1/spot/gold',
-          'https://data-asg.goldbroker.com/prices/latest?code=XAU',
-          'https://www.metals.live/api/spot/gold'
+          'https://data-asg.goldbroker.com/prices/latest?code=XAU'
         ]);
 
         if (goldRes) {
@@ -4633,9 +4634,9 @@
           let price = null;
 
           // Handle different API response formats
-          if (gold.price) price = gold.price;
+          if (gold.price) price = gold.price;            // gold-api.com / metals.live object
           else if (gold.data?.rate) price = gold.data.rate;
-          else if (gold[0]?.mid) price = gold[0].mid;
+          else if (gold[0]?.mid) price = gold[0].mid;    // metals.live array
 
           if (price) {
             prevGoldPrice = lastGoldPrice;
@@ -4707,21 +4708,26 @@
       }
 
       // TIPS Yield Update — DFII10 = 10-Year Treasury Inflation-Indexed (real yield)
+      // FRED has no CORS headers, so route through a CORS proxy for browser use;
+      // fall back to the direct call (works locally / if FRED ever adds CORS).
       try {
         if (apiKeys.fred) {
-          const tipsRes = await Promise.race([
-            fetch(`https://api.stlouisfed.org/fred/series/data?series_id=DFII10&api_key=${apiKeys.fred}&limit=1&sort_order=desc&file_type=json`),
-            new Promise((_, reject) => setTimeout(() => reject(new Error('timeout')), 4000))
+          const fredUrl = `https://api.stlouisfed.org/fred/series/observations?series_id=DFII10&api_key=${apiKeys.fred}&limit=1&sort_order=desc&file_type=json`;
+          const tipsRes = await fetchWithFallback([
+            `https://corsproxy.io/?url=${encodeURIComponent(fredUrl)}`,
+            `https://api.allorigins.win/raw?url=${encodeURIComponent(fredUrl)}`,
+            fredUrl
           ]);
-          if (tipsRes.ok) {
+          if (tipsRes) {
             const tips = await tipsRes.json();
             const obs = tips.observations?.filter(o => o.value !== '.');
             if (obs?.length > 0) {
               const value = parseFloat(obs[0].value).toFixed(2);
+              const sign  = parseFloat(value) >= 0 ? '+' : '';
               const tipsEl = document.getElementById('tipsYield');
-              if (tipsEl) tipsEl.textContent = '+' + value + '%';
+              if (tipsEl) tipsEl.textContent = sign + value + '%';
               const detailEl = document.getElementById('tipsMetricDetail');
-              if (detailEl) detailEl.textContent = `Currently +${value}% | Below +0.5% = Bullish`;
+              if (detailEl) detailEl.textContent = `Currently ${sign}${value}% | Below +0.5% = Bullish`;
               console.log('TIPS 10Y real yield updated:', value);
             }
           }
@@ -4733,16 +4739,14 @@
       // Gold/Silver ratio
       updateGoldSilverRatio();
 
-      // Refresh active views
+      // Refresh active views (always recompute analysis cards from live price)
+      updateAnalysisTab();
       if (activeSection === 'dashboard') renderDashboard();
-      if (activeSection === 'markets')   updateAnalysisTab();
       if (activeSection === 'traderoom') {
         const act = document.querySelector('.snav-btn.active');
         if (act?.dataset?.tab === 'scalp')    renderScalpDesk();
         if (act?.dataset?.tab === 'daytrade') renderDayTradeDesk();
       }
-      // Always refresh analysis cards even when not on markets tab
-      updateAnalysisTab();
 
       // Update timestamps
       const now = new Date();
@@ -5599,8 +5603,8 @@
   async function updateGoldSilverRatio() {
     try {
       const res = await fetchWithFallback([
-        'https://api.metals.live/v1/spot/silver',
-        'https://www.metals.live/api/spot/silver'
+        'https://api.gold-api.com/price/XAG',
+        'https://api.metals.live/v1/spot/silver'
       ]);
       if (res && lastGoldPrice) {
         const silver = await res.json();
