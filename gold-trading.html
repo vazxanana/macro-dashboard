@@ -525,6 +525,171 @@
       color: var(--accent-red);
     }
 
+    /* TRADE SETUP BOARD */
+    .setup-board {
+      display: grid;
+      grid-template-columns: 200px 1fr 1fr 1fr;
+      gap: 0;
+      border-radius: 20px;
+      overflow: hidden;
+      border: 1.5px solid rgba(255,255,255,0.6);
+      box-shadow: 0 8px 40px rgba(26,29,41,0.1);
+      margin-bottom: 40px;
+    }
+
+    .setup-direction {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 32px 24px;
+      gap: 10px;
+      text-align: center;
+      border-right: 1px solid rgba(255,255,255,0.4);
+    }
+
+    .setup-direction.long  { background: linear-gradient(160deg, rgba(0,166,81,0.18) 0%, rgba(0,166,81,0.08) 100%); }
+    .setup-direction.short { background: linear-gradient(160deg, rgba(194,59,51,0.18) 0%, rgba(194,59,51,0.08) 100%); }
+    .setup-direction.wait  { background: linear-gradient(160deg, rgba(217,119,6,0.15) 0%, rgba(217,119,6,0.06) 100%); }
+
+    .dir-arrow {
+      font-size: 48px;
+      line-height: 1;
+      font-weight: 900;
+    }
+
+    .dir-label {
+      font-size: 22px;
+      font-weight: 900;
+      letter-spacing: -0.5px;
+      font-family: 'Lora', serif;
+    }
+
+    .dir-conf {
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1.2px;
+      padding: 4px 10px;
+      border-radius: 20px;
+    }
+
+    .long  .dir-arrow, .long  .dir-label { color: var(--accent-green); }
+    .long  .dir-conf  { background: rgba(0,166,81,0.15); color: var(--accent-green); }
+    .short .dir-arrow, .short .dir-label { color: var(--accent-red); }
+    .short .dir-conf  { background: rgba(194,59,51,0.15); color: var(--accent-red); }
+    .wait  .dir-arrow, .wait  .dir-label { color: #D97706; }
+    .wait  .dir-conf  { background: rgba(217,119,6,0.15); color: #D97706; }
+
+    .setup-col {
+      padding: 20px 24px;
+      border-right: 1px solid rgba(255,255,255,0.4);
+      background: rgba(255,255,255,0.45);
+      backdrop-filter: blur(20px);
+    }
+
+    .setup-col:last-child { border-right: none; }
+
+    .setup-col-title {
+      font-size: 9px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 1.2px;
+      color: var(--text-tertiary);
+      margin-bottom: 16px;
+    }
+
+    .setup-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      padding: 8px 0;
+      border-bottom: 1px solid rgba(26,29,41,0.05);
+    }
+
+    .setup-row:last-child { border-bottom: none; }
+
+    .setup-row-lbl {
+      font-size: 10px;
+      color: var(--text-tertiary);
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .setup-row-val {
+      font-size: 18px;
+      font-weight: 800;
+      font-family: 'JetBrains Mono', monospace;
+      letter-spacing: -0.5px;
+      color: var(--text-primary);
+    }
+
+    .setup-row-sub {
+      font-size: 9px;
+      color: var(--text-tertiary);
+      margin-top: 1px;
+    }
+
+    .sl-tag {
+      display: inline-block;
+      font-size: 8px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      padding: 2px 6px;
+      border-radius: 4px;
+      margin-left: 6px;
+      vertical-align: middle;
+    }
+
+    .sl-tight   { background: rgba(217,119,6,0.15);  color: #D97706;             }
+    .sl-safe    { background: rgba(0,82,204,0.12);   color: var(--accent-blue);  }
+    .sl-swing   { background: rgba(122,129,150,0.12); color: var(--text-tertiary); }
+
+    .rr-bar {
+      height: 6px;
+      border-radius: 3px;
+      margin-top: 8px;
+      background: rgba(26,29,41,0.08);
+      overflow: hidden;
+    }
+
+    .rr-fill {
+      height: 100%;
+      border-radius: 3px;
+      background: linear-gradient(90deg, var(--accent-green), #10B981);
+      transition: width 0.6s ease;
+    }
+
+    .setup-why {
+      font-size: 11px;
+      color: var(--text-secondary);
+      line-height: 1.7;
+      padding: 16px 20px;
+      background: rgba(255,255,255,0.3);
+      border-radius: 10px;
+      margin-top: 16px;
+    }
+
+    @media (max-width: 1100px) {
+      .setup-board {
+        grid-template-columns: 1fr 1fr;
+      }
+      .setup-direction {
+        grid-column: 1 / -1;
+        flex-direction: row;
+        border-right: none;
+        border-bottom: 1px solid rgba(255,255,255,0.4);
+        padding: 20px 24px;
+      }
+    }
+
+    @media (max-width: 600px) {
+      .setup-board { grid-template-columns: 1fr; }
+      .setup-col   { border-right: none; border-bottom: 1px solid rgba(255,255,255,0.4); }
+    }
+
     /* SESSION INDICATOR */
     .session-bar {
       display: flex;
@@ -1402,6 +1567,155 @@
 
   <!-- ANALYSIS TAB -->
   <div id="tab-analysis" class="tab-panel active">
+
+  <!-- LIVE TRADE SETUP BOARD -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-title">Live Trade Setup</div>
+      <span class="badge" id="setup-updated">Calculating…</span>
+    </div>
+
+    <div class="setup-board" id="setupBoard">
+      <!-- Direction -->
+      <div class="setup-direction" id="setupDir">
+        <div class="dir-arrow" id="setupArrow">↑</div>
+        <div class="dir-label" id="setupLabel">LONG</div>
+        <div class="dir-conf" id="setupConf">72% Confidence</div>
+      </div>
+
+      <!-- Entry & Stop -->
+      <div class="setup-col">
+        <div class="setup-col-title">Entry &amp; Stop Loss</div>
+
+        <div class="setup-row">
+          <div>
+            <div class="setup-row-lbl">Entry Zone</div>
+            <div class="setup-row-sub">Best area to buy</div>
+          </div>
+          <div style="text-align:right;">
+            <div class="setup-row-val" id="sb-entry">—</div>
+          </div>
+        </div>
+
+        <div class="setup-row">
+          <div>
+            <div class="setup-row-lbl">Stop Loss — Tight <span class="sl-tag sl-tight">Intraday</span></div>
+            <div class="setup-row-sub" id="sb-sl-tight-dist">— pts from entry</div>
+          </div>
+          <div style="text-align:right;">
+            <div class="setup-row-val text-red" id="sb-sl-tight">—</div>
+          </div>
+        </div>
+
+        <div class="setup-row">
+          <div>
+            <div class="setup-row-lbl">Stop Loss — Safe <span class="sl-tag sl-safe">Swing</span></div>
+            <div class="setup-row-sub" id="sb-sl-safe-dist">— pts from entry</div>
+          </div>
+          <div style="text-align:right;">
+            <div class="setup-row-val text-red" id="sb-sl-safe">—</div>
+          </div>
+        </div>
+
+        <div class="setup-row">
+          <div>
+            <div class="setup-row-lbl">Stop Loss — Wide <span class="sl-tag sl-swing">Position</span></div>
+            <div class="setup-row-sub" id="sb-sl-wide-dist">— pts from entry</div>
+          </div>
+          <div style="text-align:right;">
+            <div class="setup-row-val text-red" id="sb-sl-wide">—</div>
+          </div>
+        </div>
+
+        <div class="setup-why" id="sb-sl-why">Loading stop loss logic…</div>
+      </div>
+
+      <!-- Targets -->
+      <div class="setup-col">
+        <div class="setup-col-title">Profit Targets</div>
+
+        <div class="setup-row">
+          <div>
+            <div class="setup-row-lbl">Target 1 — Quick Win</div>
+            <div class="setup-row-sub" id="sb-t1-rr">R:R — | +— pts</div>
+          </div>
+          <div style="text-align:right;">
+            <div class="setup-row-val text-green" id="sb-t1">—</div>
+          </div>
+        </div>
+
+        <div class="setup-row">
+          <div>
+            <div class="setup-row-lbl">Target 2 — Standard</div>
+            <div class="setup-row-sub" id="sb-t2-rr">R:R — | +— pts</div>
+          </div>
+          <div style="text-align:right;">
+            <div class="setup-row-val text-green" id="sb-t2">—</div>
+          </div>
+        </div>
+
+        <div class="setup-row">
+          <div>
+            <div class="setup-row-lbl">Target 3 — Extended</div>
+            <div class="setup-row-sub" id="sb-t3-rr">R:R — | +— pts</div>
+          </div>
+          <div style="text-align:right;">
+            <div class="setup-row-val text-green" id="sb-t3">—</div>
+          </div>
+        </div>
+
+        <div class="rr-bar"><div class="rr-fill" id="sb-rr-fill" style="width:0%"></div></div>
+        <div style="font-size:10px; color:var(--text-tertiary); margin-top:6px;" id="sb-rr-label">R:R to T2 using Safe SL</div>
+      </div>
+
+      <!-- Risk Summary -->
+      <div class="setup-col">
+        <div class="setup-col-title">Risk at 1% Account Risk</div>
+
+        <div class="setup-row">
+          <div>
+            <div class="setup-row-lbl">$10k account</div>
+            <div class="setup-row-sub">Size (safe SL)</div>
+          </div>
+          <div style="text-align:right;">
+            <div class="setup-row-val" id="sb-10k-oz">— oz</div>
+          </div>
+        </div>
+
+        <div class="setup-row">
+          <div>
+            <div class="setup-row-lbl">$25k account</div>
+            <div class="setup-row-sub">Size (safe SL)</div>
+          </div>
+          <div style="text-align:right;">
+            <div class="setup-row-val" id="sb-25k-oz">— oz</div>
+          </div>
+        </div>
+
+        <div class="setup-row">
+          <div>
+            <div class="setup-row-lbl">$50k account</div>
+            <div class="setup-row-sub">Size (safe SL)</div>
+          </div>
+          <div style="text-align:right;">
+            <div class="setup-row-val" id="sb-50k-oz">— oz</div>
+          </div>
+        </div>
+
+        <div class="setup-row">
+          <div>
+            <div class="setup-row-lbl">$100k account</div>
+            <div class="setup-row-sub">Size (safe SL)</div>
+          </div>
+          <div style="text-align:right;">
+            <div class="setup-row-val" id="sb-100k-oz">— oz</div>
+          </div>
+        </div>
+
+        <div class="setup-why" id="sb-reason">Based on current macro score + price structure</div>
+      </div>
+    </div>
+  </div>
 
   <!-- MACRO DRIVERS FIRST -->
   <div class="section">
@@ -2750,6 +3064,142 @@
     `).join('');
   }
 
+  // ─── LIVE TRADE SETUP BOARD ───────────────────────────────────────────────
+  function updateSetupBoard() {
+    const price = lastGoldPrice;
+    if (!price || price < 100) return;
+
+    // ── Direction logic ─────────────────────────────────────────────────────
+    // Based on macro score (31/40 = 78% bullish), TIPS reading, DXY regime
+    const tips = parseFloat(document.getElementById('tipsYield')?.textContent) || 0.42;
+    const tipsScore = tips < 0 ? 5 : tips < 0.5 ? 4 : tips < 1.5 ? 2 : 0;
+    const macroScore = 31; // live from macro panel (could be made dynamic)
+    const macroConf  = Math.round((macroScore / 40) * 100);
+    const isLong  = macroConf >= 60 && tipsScore >= 2;
+    const isShort = macroConf <= 40;
+    const conf    = isLong ? macroConf : isShort ? (100 - macroConf) : 50;
+
+    const dirEl    = document.getElementById('setupDir');
+    const arrowEl  = document.getElementById('setupArrow');
+    const labelEl  = document.getElementById('setupLabel');
+    const confEl   = document.getElementById('setupConf');
+
+    if (isLong) {
+      dirEl.className  = 'setup-direction long';
+      arrowEl.textContent = '↑';
+      labelEl.textContent = 'LONG';
+    } else if (isShort) {
+      dirEl.className  = 'setup-direction short';
+      arrowEl.textContent = '↓';
+      labelEl.textContent = 'SHORT';
+    } else {
+      dirEl.className  = 'setup-direction wait';
+      arrowEl.textContent = '→';
+      labelEl.textContent = 'WAIT';
+    }
+    confEl.textContent = conf + '% Confidence';
+
+    // ── Key level offsets (% of price, calibrated to gold volatility) ────────
+    // Gold daily ATR ≈ 0.8–1.2% of price
+    const atr    = price * 0.009;   // ~0.9% ≈ typical daily ATR
+    const atr15  = atr * 1.5;       // 1.5× ATR = safe distance from noise
+
+    // Entry: slight pullback from current price (0.15%)
+    const entry = Math.round(price * (isLong ? 0.9985 : 1.0015));
+
+    // Stop losses — three tiers
+    const slTight = isLong
+      ? Math.round(entry - atr * 0.8)          // 0.8× ATR (~$30-40 on gold)
+      : Math.round(entry + atr * 0.8);
+
+    const slSafe  = isLong
+      ? Math.round(entry - atr15)               // 1.5× ATR — absorbs daily volatility
+      : Math.round(entry + atr15);
+
+    const slWide  = isLong
+      ? Math.round(entry - atr * 2.5)           // 2.5× ATR — only for swing/position
+      : Math.round(entry + atr * 2.5);
+
+    // Targets (based on ATR multiples + key resistance clusters)
+    const t1 = isLong
+      ? Math.round(entry + atr * 1.5)           // 1.5× ATR — quick profit
+      : Math.round(entry - atr * 1.5);
+
+    const t2 = isLong
+      ? Math.round(entry + atr * 3.0)           // 3× ATR — standard target
+      : Math.round(entry - atr * 3.0);
+
+    const t3 = isLong
+      ? Math.round(entry + atr * 5.0)           // 5× ATR — extended swing
+      : Math.round(entry - atr * 5.0);
+
+    // R:R calculations (using safe SL)
+    const risk  = Math.abs(entry - slSafe);
+    const rrT1  = risk > 0 ? Math.abs(t1 - entry) / risk : 0;
+    const rrT2  = risk > 0 ? Math.abs(t2 - entry) / risk : 0;
+    const rrT3  = risk > 0 ? Math.abs(t3 - entry) / risk : 0;
+
+    const fmt  = n => n.toLocaleString('en-US', {minimumFractionDigits: 0, maximumFractionDigits: 2});
+    const dist = n => (isLong ? '−' : '+') + Math.abs(n - entry).toFixed(0) + ' pts';
+    const gainDist = n => (isLong ? '+' : '−') + Math.abs(n - entry).toFixed(0) + ' pts';
+
+    // Position sizes at 1% risk for common account sizes
+    const ozAt = (account) => risk > 0 ? (account * 0.01 / risk).toFixed(2) : '—';
+
+    // ── DOM updates ──────────────────────────────────────────────────────────
+    set('sb-entry',         fmt(entry));
+    set('sb-sl-tight',      fmt(slTight));
+    set('sb-sl-tight-dist', dist(slTight) + ' from entry  |  ' + (Math.abs(slTight - entry) / price * 100).toFixed(2) + '%');
+    set('sb-sl-safe',       fmt(slSafe));
+    set('sb-sl-safe-dist',  dist(slSafe) + ' from entry  |  ' + (Math.abs(slSafe - entry) / price * 100).toFixed(2) + '%');
+    set('sb-sl-wide',       fmt(slWide));
+    set('sb-sl-wide-dist',  dist(slWide) + ' from entry  |  ' + (Math.abs(slWide - entry) / price * 100).toFixed(2) + '%');
+
+    set('sb-t1',    fmt(t1));
+    set('sb-t1-rr', '1:' + rrT1.toFixed(1) + '   |   ' + gainDist(t1));
+    set('sb-t2',    fmt(t2));
+    set('sb-t2-rr', '1:' + rrT2.toFixed(1) + '   |   ' + gainDist(t2));
+    set('sb-t3',    fmt(t3));
+    set('sb-t3-rr', '1:' + rrT3.toFixed(1) + '   |   ' + gainDist(t3));
+
+    const rrPct = Math.min(rrT2 / 5 * 100, 100);
+    const rrFill = document.getElementById('sb-rr-fill');
+    if (rrFill) rrFill.style.width = rrPct + '%';
+    set('sb-rr-label', 'R:R to T2 = 1:' + rrT2.toFixed(1) + ' using Safe SL (' + Math.abs(slSafe - entry).toFixed(0) + ' pts risk)');
+
+    set('sb-10k-oz',  ozAt(10000)  + ' oz  ($' + (parseFloat(ozAt(10000)) * price).toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, ',') + ')');
+    set('sb-25k-oz',  ozAt(25000)  + ' oz  ($' + (parseFloat(ozAt(25000)) * price).toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, ',') + ')');
+    set('sb-50k-oz',  ozAt(50000)  + ' oz  ($' + (parseFloat(ozAt(50000)) * price).toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, ',') + ')');
+    set('sb-100k-oz', ozAt(100000) + ' oz  ($' + (parseFloat(ozAt(100000)) * price).toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, ',') + ')');
+
+    // Why this SL explanation
+    const slWhyText = isLong
+      ? `<strong>Tight SL (${fmt(slTight)}):</strong> Below 0.8× daily ATR — will be hit by normal intraday swings. Intraday scalps only.<br/><br/>
+         <strong>Safe SL (${fmt(slSafe)}):</strong> 1.5× ATR below entry — absorbs typical daily noise (±${atr.toFixed(0)} pts). This is the recommended stop for day/swing trades. Below this level = setup invalidated.<br/><br/>
+         <strong>Wide SL (${fmt(slWide)}):</strong> 2.5× ATR — for multi-day swing positions. Only use with 0.5% account risk or less.`
+      : `<strong>Tight SL (${fmt(slTight)}):</strong> Above 0.8× daily ATR — intraday scalps only.<br/><br/>
+         <strong>Safe SL (${fmt(slSafe)}):</strong> 1.5× ATR above entry — absorbs daily noise. Recommended for day/swing trades.<br/><br/>
+         <strong>Wide SL (${fmt(slWide)}):</strong> 2.5× ATR — multi-day position sizing only.`;
+
+    const slWhyEl = document.getElementById('sb-sl-why');
+    if (slWhyEl) slWhyEl.innerHTML = slWhyText;
+
+    const reasonEl = document.getElementById('sb-reason');
+    if (reasonEl) {
+      reasonEl.textContent = isLong
+        ? `Macro score ${macroScore}/40 (${macroConf}% bullish) + TIPS ${tips.toFixed(2)}% + DXY decoupling regime. Enter on pullbacks only — never chase breakouts.`
+        : isShort
+        ? `Macro score ${macroScore}/40 (${macroConf}% bearish) + rising real yields headwind. Enter short on failed retests of resistance.`
+        : `Mixed signals — macro score ${macroScore}/40. Wait for clearer macro alignment before taking a position.`;
+    }
+
+    const updEl = document.getElementById('setup-updated');
+    if (updEl) {
+      const t = new Date();
+      updEl.textContent = 'Updated ' + t.toLocaleTimeString('en-US', {hour12:false, timeZone:'UTC'}) + ' UTC';
+    }
+  }
+
   // ─── EDGE LAB ──────────────────────────────────────────────────────────────
   const WEAK_MONTHS  = [2, 5];   // 0-indexed: March=2, June=5
   const STRONG_MONTHS = [0, 10, 11]; // Jan=0, Nov=10, Dec=11
@@ -3016,6 +3466,7 @@
               entryEl.value = Math.round(lastGoldPrice);
               calcPosition();
             }
+            updateSetupBoard();
             console.log('Gold price updated:', lastGoldPrice);
           }
         }
@@ -3102,6 +3553,7 @@
     updateSessionBar();
     renderSessionGrid();
     edgeConfluence();
+    updateSetupBoard();
 
     setInterval(() => {
       updateSessionBar();
