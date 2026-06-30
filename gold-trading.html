@@ -525,6 +525,190 @@
       color: var(--accent-red);
     }
 
+    /* SESSION INDICATOR */
+    .session-bar {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+    }
+
+    .session-pill {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      padding: 6px 14px;
+      border-radius: 20px;
+      border: 1px solid rgba(255,255,255,0.5);
+      background: rgba(255,255,255,0.35);
+      backdrop-filter: blur(10px);
+      transition: all 0.3s ease;
+    }
+
+    .session-pill.active-session {
+      border-color: rgba(0,166,81,0.4);
+      background: rgba(0,166,81,0.1);
+      box-shadow: 0 0 12px rgba(0,166,81,0.15);
+    }
+
+    .session-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--text-tertiary);
+      flex-shrink: 0;
+    }
+
+    .session-pill.active-session .session-dot {
+      background: var(--accent-green);
+      box-shadow: 0 0 6px rgba(0,166,81,0.6);
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.4; }
+    }
+
+    .session-name {
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      color: var(--text-secondary);
+    }
+
+    .session-pill.active-session .session-name {
+      color: var(--accent-green);
+    }
+
+    .session-countdown {
+      font-size: 10px;
+      font-family: 'JetBrains Mono', monospace;
+      color: var(--text-tertiary);
+      font-weight: 600;
+    }
+
+    /* SESSION CHECKLIST */
+    .checklist-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 14px;
+      padding: 14px 0;
+      border-bottom: 1px solid rgba(26,29,41,0.06);
+    }
+
+    .checklist-item:last-child { border-bottom: none; }
+
+    .check-box {
+      width: 20px;
+      height: 20px;
+      border-radius: 6px;
+      border: 2px solid rgba(26,29,41,0.15);
+      background: rgba(255,255,255,0.5);
+      flex-shrink: 0;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      transition: all 0.2s ease;
+      margin-top: 1px;
+      user-select: none;
+    }
+
+    .check-box.checked {
+      background: var(--accent-green);
+      border-color: var(--accent-green);
+      color: white;
+    }
+
+    .check-text {
+      flex: 1;
+    }
+
+    .check-title {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin-bottom: 2px;
+    }
+
+    .check-desc {
+      font-size: 11px;
+      color: var(--text-tertiary);
+      line-height: 1.5;
+    }
+
+    .check-box.checked + .check-text .check-title {
+      text-decoration: line-through;
+      color: var(--text-tertiary);
+    }
+
+    .session-time-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+    }
+
+    .stime-card {
+      padding: 20px;
+      border-radius: 14px;
+      border: 1.5px solid rgba(255,255,255,0.5);
+      background: rgba(255,255,255,0.4);
+      text-align: center;
+      transition: all 0.3s ease;
+    }
+
+    .stime-card.live {
+      border-color: rgba(0,166,81,0.4);
+      background: rgba(0,166,81,0.08);
+      box-shadow: 0 4px 20px rgba(0,166,81,0.12);
+    }
+
+    .stime-name {
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1.2px;
+      color: var(--text-tertiary);
+      margin-bottom: 8px;
+    }
+
+    .stime-card.live .stime-name { color: var(--accent-green); }
+
+    .stime-hours {
+      font-size: 13px;
+      font-weight: 700;
+      font-family: 'JetBrains Mono', monospace;
+      color: var(--text-primary);
+      margin-bottom: 4px;
+    }
+
+    .stime-tz {
+      font-size: 9px;
+      color: var(--text-tertiary);
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+    }
+
+    .stime-quality {
+      margin-top: 10px;
+      font-size: 10px;
+      font-weight: 600;
+      padding: 3px 8px;
+      border-radius: 6px;
+      display: inline-block;
+    }
+
+    .qual-high  { background: rgba(0,166,81,0.15);   color: var(--accent-green); }
+    .qual-med   { background: rgba(0,82,204,0.12);   color: var(--accent-blue);  }
+    .qual-low   { background: rgba(122,129,150,0.12); color: var(--text-tertiary); }
+
+    @media (max-width: 900px) {
+      .session-time-grid { grid-template-columns: 1fr 1fr; }
+      .session-bar { display: none; }
+    }
+
     /* TAB NAV */
     .tab-nav {
       background: rgba(255, 255, 255, 0.45);
@@ -963,6 +1147,9 @@
         <div class="timestamp" id="timestamp">—:—:— UTC</div>
       </div>
     </div>
+    <div class="session-bar" id="sessionBar">
+      <!-- populated by JS -->
+    </div>
   </div>
 </div>
 
@@ -972,6 +1159,7 @@
   <button class="tab-btn" onclick="switchTab('strategy', this)">Strategy</button>
   <button class="tab-btn" onclick="switchTab('calculator', this)">Position Calculator</button>
   <button class="tab-btn" onclick="switchTab('calendar', this)">Economic Calendar</button>
+  <button class="tab-btn" onclick="switchTab('sessions', this)">Trade Sessions</button>
 </div>
 
 <!-- MAIN -->
@@ -1498,6 +1686,203 @@
     </div>
   </div><!-- end tab-calendar -->
 
+  <!-- SESSIONS TAB -->
+  <div id="tab-sessions" class="tab-panel">
+
+    <!-- Live session clocks -->
+    <div class="section">
+      <div class="section-header">
+        <div class="section-title">Active Trading Sessions</div>
+        <span class="badge" id="session-live-badge">Detecting...</span>
+      </div>
+      <div class="session-time-grid" id="sessionGrid">
+        <!-- populated by JS -->
+      </div>
+    </div>
+
+    <!-- Morning routine -->
+    <div class="section">
+      <div class="section-header">
+        <div class="section-title">Morning Session — London Open</div>
+        <span class="badge">08:00 – 12:00 London</span>
+      </div>
+      <div class="grid-2">
+        <div class="card glass">
+          <h3>Pre-Trade Checklist (Before 08:00 London)</h3>
+          <div id="morning-checklist">
+            <div class="checklist-item">
+              <div class="check-box" onclick="toggleCheck(this)"></div>
+              <div class="check-text">
+                <div class="check-title">Check overnight gold move & reason</div>
+                <div class="check-desc">Review Asian session range — was there a news-driven move or just noise?</div>
+              </div>
+            </div>
+            <div class="checklist-item">
+              <div class="check-box" onclick="toggleCheck(this)"></div>
+              <div class="check-text">
+                <div class="check-title">Review macro drivers (Analysis tab)</div>
+                <div class="check-desc">Confirm the 5 key drivers haven't changed overnight — any CB statements or data?</div>
+              </div>
+            </div>
+            <div class="checklist-item">
+              <div class="check-box" onclick="toggleCheck(this)"></div>
+              <div class="check-text">
+                <div class="check-title">Mark today's key levels on chart</div>
+                <div class="check-desc">Draw S1/R1 from the Key Levels section. Note overnight high and low.</div>
+              </div>
+            </div>
+            <div class="checklist-item">
+              <div class="check-box" onclick="toggleCheck(this)"></div>
+              <div class="check-text">
+                <div class="check-title">Check DXY and TIPS direction</div>
+                <div class="check-desc">If DXY rising + TIPS rising → bearish gold bias. Adjust position sizing accordingly.</div>
+              </div>
+            </div>
+            <div class="checklist-item">
+              <div class="check-box" onclick="toggleCheck(this)"></div>
+              <div class="check-text">
+                <div class="check-title">Set position size via Calculator</div>
+                <div class="check-desc">Enter today's entry/stop into the Position Calculator before placing any order.</div>
+              </div>
+            </div>
+            <div class="checklist-item">
+              <div class="check-box" onclick="toggleCheck(this)"></div>
+              <div class="check-text">
+                <div class="check-title">Check today's economic calendar</div>
+                <div class="check-desc">Are any high-impact events scheduled today? Avoid new entries 30 min before.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card glass">
+          <h3>London Open Playbook</h3>
+          <div class="scenario bullish">
+            <div class="scenario-title">Bullish London Setup</div>
+            <div class="scenario-text">
+              <strong>Condition:</strong> Asian session held above S1 with DXY flat/falling<br/>
+              <strong>Watch for:</strong> Break above Asian high + retest as support<br/>
+              <strong>Entry:</strong> On pullback after Asian high break<br/>
+              <strong>Target:</strong> R1 or previous session high<br/>
+              <strong>Stop:</strong> Below Asian session low
+            </div>
+          </div>
+          <div class="scenario bearish">
+            <div class="scenario-title">Bearish London Setup</div>
+            <div class="scenario-text">
+              <strong>Condition:</strong> Gold rejected at R1, DXY strengthening<br/>
+              <strong>Watch for:</strong> Break below Asian session low<br/>
+              <strong>Entry:</strong> Pullback retest of broken Asian low<br/>
+              <strong>Target:</strong> S1 / S2<br/>
+              <strong>Stop:</strong> Above Asian session low
+            </div>
+          </div>
+          <div class="direction-block" style="margin-top:16px;">
+            <div class="block-title">Best London Entry Window</div>
+            <div class="block-content">
+              <strong>08:00 – 09:30 London</strong> — London open momentum<br/>
+              Wait for the first 15–30 min candle to close to confirm direction.<br/>
+              Avoid trading the first 5 minutes (spread spike).
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Afternoon routine -->
+    <div class="section">
+      <div class="section-header">
+        <div class="section-title">Afternoon Session — NY Overlap</div>
+        <span class="badge">13:00 – 17:00 London / 08:00 – 12:00 New York</span>
+      </div>
+      <div class="grid-2">
+        <div class="card glass">
+          <h3>Pre-Afternoon Checklist (Before 13:00 London)</h3>
+          <div id="afternoon-checklist">
+            <div class="checklist-item">
+              <div class="check-box" onclick="toggleCheck(this)"></div>
+              <div class="check-text">
+                <div class="check-title">Review London session outcome</div>
+                <div class="check-desc">Was the morning trend clean or choppy? Strong London trends often continue into NY.</div>
+              </div>
+            </div>
+            <div class="checklist-item">
+              <div class="check-box" onclick="toggleCheck(this)"></div>
+              <div class="check-text">
+                <div class="check-title">Check any open morning positions</div>
+                <div class="check-desc">Move stop to breakeven if T1 was hit in the London session. Trail if T2 approaching.</div>
+              </div>
+            </div>
+            <div class="checklist-item">
+              <div class="check-box" onclick="toggleCheck(this)"></div>
+              <div class="check-text">
+                <div class="check-title">US data releases at 13:30 London?</div>
+                <div class="check-desc">CPI, NFP, Retail Sales at 08:30 NY = 13:30 London. Wait for spike to settle before entering.</div>
+              </div>
+            </div>
+            <div class="checklist-item">
+              <div class="check-box" onclick="toggleCheck(this)"></div>
+              <div class="check-text">
+                <div class="check-title">Recalculate position size for PM setup</div>
+                <div class="check-desc">Update the Calculator with current price — spreads may differ from morning.</div>
+              </div>
+            </div>
+            <div class="checklist-item">
+              <div class="check-box" onclick="toggleCheck(this)"></div>
+              <div class="check-text">
+                <div class="check-title">Check daily loss limit</div>
+                <div class="check-desc">If morning trade hit stop, check you're within your 3% daily loss limit before trading again.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card glass">
+          <h3>NY Overlap Playbook (Highest Volume)</h3>
+          <div class="scenario bullish">
+            <div class="scenario-title">NY Continuation Setup</div>
+            <div class="scenario-text">
+              <strong>Condition:</strong> London was bullish, NY open confirms with higher low<br/>
+              <strong>Watch for:</strong> 13:00–13:30 London pullback, then bid at support<br/>
+              <strong>Entry:</strong> Pullback to London session midpoint or S/R flip<br/>
+              <strong>Target:</strong> Daily R1 / R2<br/>
+              <strong>Strongest signal:</strong> London bullish + US data miss = powerful continuation
+            </div>
+          </div>
+          <div class="scenario">
+            <div class="scenario-title">NY Reversal Setup</div>
+            <div class="scenario-text">
+              <strong>Condition:</strong> London overextended, price at major resistance<br/>
+              <strong>Watch for:</strong> NY open fakeout above London high then reversal<br/>
+              <strong>Entry:</strong> Close below London high (stop-hunt reversal pattern)<br/>
+              <strong>Caution:</strong> Higher risk setup — reduce size by 50%
+            </div>
+          </div>
+          <div class="direction-block" style="margin-top:16px;">
+            <div class="block-title">Avoid Trading After 17:00 London</div>
+            <div class="block-content">
+              Post-overlap liquidity drops sharply. Spreads widen, moves become erratic.<br/>
+              <strong>Best practice:</strong> Close or trail all positions by 16:30 London unless holding a strong swing trade.
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Session times reference -->
+    <div class="section">
+      <div class="section-header">
+        <div class="section-title">Session Times — Your Local Clock</div>
+      </div>
+      <div class="card glass">
+        <div id="local-times-grid" class="grid-3">
+          <!-- populated by JS -->
+        </div>
+      </div>
+    </div>
+
+  </div><!-- end tab-sessions -->
+
 </div>
 
 <!-- FOOTER -->
@@ -1515,6 +1900,120 @@
     if (btn) btn.classList.add('active');
     if (name === 'calculator') calcPosition();
     if (name === 'calendar') renderCalendar();
+    if (name === 'sessions') { renderSessionGrid(); renderLocalTimes(); }
+  }
+
+  // ─── CHECKLIST ─────────────────────────────────────────────────────────────
+  function toggleCheck(el) {
+    el.classList.toggle('checked');
+    el.textContent = el.classList.contains('checked') ? '✓' : '';
+  }
+
+  // ─── TRADING SESSIONS ──────────────────────────────────────────────────────
+  const SESSIONS = [
+    { key: 'asian',   name: 'Asian',          openUTC: 23, closeUTC: 8,  quality: 'low',  qualTxt: 'Low Volume',       next: false },
+    { key: 'london',  name: 'London Open',    openUTC: 7,  closeUTC: 12, quality: 'high', qualTxt: 'High Volume',      next: false },
+    { key: 'overlap', name: 'London/NY',      openUTC: 12, closeUTC: 16, quality: 'high', qualTxt: 'Highest Volume',   next: false },
+    { key: 'ny',      name: 'New York PM',    openUTC: 16, closeUTC: 21, quality: 'med',  qualTxt: 'Medium Volume',    next: false },
+  ];
+
+  const SESSION_DISPLAY = [
+    { name: 'Asian Session',      openUTC: 23, closeUTC: 8,  londonOpen: '23:00', londonClose: '08:00', nyOpen: '18:00', nyClose: '03:00',  quality: 'low',  qualTxt: 'Low Volume'     },
+    { name: 'London Open',        openUTC: 7,  closeUTC: 12, londonOpen: '08:00', londonClose: '12:00', nyOpen: '03:00', nyClose: '07:00',  quality: 'high', qualTxt: 'High Volume'    },
+    { name: 'London/NY Overlap',  openUTC: 12, closeUTC: 16, londonOpen: '13:00', londonClose: '17:00', nyOpen: '08:00', nyClose: '12:00',  quality: 'high', qualTxt: 'Highest Volume' },
+    { name: 'New York PM',        openUTC: 16, closeUTC: 21, londonOpen: '17:00', londonClose: '22:00', nyOpen: '12:00', nyClose: '17:00',  quality: 'med',  qualTxt: 'Medium Volume'  },
+  ];
+
+  function utcHour() {
+    return new Date().getUTCHours() + new Date().getUTCMinutes() / 60;
+  }
+
+  function isSessionActive(s) {
+    const h = utcHour();
+    if (s.openUTC < s.closeUTC) return h >= s.openUTC && h < s.closeUTC;
+    return h >= s.openUTC || h < s.closeUTC; // crosses midnight
+  }
+
+  function minsUntilClose(s) {
+    const nowMins = new Date().getUTCHours() * 60 + new Date().getUTCMinutes();
+    const closeMins = s.closeUTC * 60;
+    let diff = closeMins - nowMins;
+    if (diff < 0) diff += 1440;
+    return diff;
+  }
+
+  function minsUntilOpen(s) {
+    const nowMins = new Date().getUTCHours() * 60 + new Date().getUTCMinutes();
+    const openMins = s.openUTC * 60;
+    let diff = openMins - nowMins;
+    if (diff < 0) diff += 1440;
+    return diff;
+  }
+
+  function fmtMins(m) {
+    const h = Math.floor(m / 60);
+    const min = m % 60;
+    return h > 0 ? `${h}h ${min}m` : `${min}m`;
+  }
+
+  function updateSessionBar() {
+    const bar = document.getElementById('sessionBar');
+    if (!bar) return;
+
+    bar.innerHTML = SESSION_DISPLAY.map(s => {
+      const active = isSessionActive(s);
+      const mins = active ? minsUntilClose(s) : minsUntilOpen(s);
+      const label = active ? `closes ${fmtMins(mins)}` : `opens ${fmtMins(mins)}`;
+      return `
+        <div class="session-pill ${active ? 'active-session' : ''}">
+          <span class="session-dot"></span>
+          <span class="session-name">${s.name}</span>
+          <span class="session-countdown">${label}</span>
+        </div>`;
+    }).join('');
+  }
+
+  function renderSessionGrid() {
+    const grid = document.getElementById('sessionGrid');
+    const badge = document.getElementById('session-live-badge');
+    if (!grid) return;
+
+    const active = SESSION_DISPLAY.filter(s => isSessionActive(s));
+    if (badge) badge.textContent = active.length ? active.map(s => s.name).join(' + ') + ' LIVE' : 'No Session Active';
+
+    grid.innerHTML = SESSION_DISPLAY.map(s => {
+      const isLive = isSessionActive(s);
+      return `
+        <div class="stime-card ${isLive ? 'live' : ''}">
+          <div class="stime-name">${s.name}</div>
+          <div class="stime-hours">${s.londonOpen}–${s.londonClose}</div>
+          <div class="stime-tz">London</div>
+          <div class="stime-hours" style="font-size:11px; margin-top:6px;">${s.nyOpen}–${s.nyClose}</div>
+          <div class="stime-tz">New York</div>
+          <div class="stime-quality qual-${s.quality}">${isLive ? '● LIVE — ' : ''}${s.qualTxt}</div>
+        </div>`;
+    }).join('');
+  }
+
+  function renderLocalTimes() {
+    const grid = document.getElementById('local-times-grid');
+    if (!grid || grid.dataset.rendered) return;
+    grid.dataset.rendered = '1';
+
+    const tzName = Intl.DateTimeFormat().resolvedOptions().timeZone;
+    const fmt = (utcH) => {
+      const d = new Date();
+      d.setUTCHours(utcH, 0, 0, 0);
+      return d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true });
+    };
+
+    grid.innerHTML = SESSION_DISPLAY.map(s => `
+      <div class="metric-box">
+        <div class="metric-label">${s.name}</div>
+        <div class="metric-value" style="font-size:18px;">${fmt(s.openUTC)} – ${fmt(s.closeUTC)}</div>
+        <div class="metric-detail">Your time (${tzName})</div>
+        <div class="metric-detail" style="margin-top:6px;">${s.qualTxt}</div>
+      </div>`).join('');
   }
 
   // ─── POSITION CALCULATOR ───────────────────────────────────────────────────
@@ -1846,6 +2345,13 @@
 
   function initializeApp() {
     calcPosition();
+    updateSessionBar();
+    renderSessionGrid();
+
+    setInterval(() => {
+      updateSessionBar();
+      renderSessionGrid();
+    }, 60000);
 
     updatePrices();
 
