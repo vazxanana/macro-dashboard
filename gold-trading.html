@@ -1993,6 +1993,15 @@
       box-shadow: 0 0 6px rgba(0,166,81,0.7);
       animation: pulse 2s ease infinite;
     }
+    .pnav-live.is-stale .pnav-live-dot {
+      background: #D97706;
+      box-shadow: 0 0 6px rgba(217,119,6,0.7);
+    }
+    .pnav-live.is-offline .pnav-live-dot {
+      background: #DC2626;
+      box-shadow: 0 0 6px rgba(220,38,38,0.7);
+      animation: none;
+    }
     .pnav-live-label {
       font-size: 9px;
       font-weight: 800;
@@ -2000,6 +2009,8 @@
       text-transform: uppercase;
       color: rgba(255,255,255,0.3);
     }
+    .pnav-live.is-stale .pnav-live-label { color: rgba(217,119,6,0.9); }
+    .pnav-live.is-offline .pnav-live-label { color: rgba(220,38,38,0.9); }
 
     .sub-nav {
       background: #111827;
@@ -2346,16 +2357,16 @@
     <div class="price-ticker">
       <div class="ticker-item">
         <div class="ticker-label">XAU/USD</div>
-        <div class="ticker-value" id="goldPrice">4,172.90</div>
+        <div class="ticker-value" id="goldPrice">…</div>
         <div class="ticker-change" id="goldChange" style="color: var(--text-tertiary);">—</div>
       </div>
       <div class="ticker-item">
         <div class="ticker-label">DXY Index</div>
-        <div class="ticker-value" id="dxyPrice">103.80</div>
+        <div class="ticker-value" id="dxyPrice">…</div>
       </div>
       <div class="ticker-item">
         <div class="ticker-label">TIPS Yield (10Y)</div>
-        <div class="ticker-value" id="tipsYield">+0.42%</div>
+        <div class="ticker-value" id="tipsYield">…</div>
       </div>
       <div class="ticker-item">
         <div class="ticker-label">Gold/Silver</div>
@@ -2419,9 +2430,9 @@
     <span class="pnav-icon">⊞</span> Utilities
   </button>
   <div class="pnav-right">
-    <div class="pnav-live">
-      <div class="pnav-live-dot"></div>
-      <span class="pnav-live-label">Live</span>
+    <div class="pnav-live" id="liveStatus" title="Live data connection status">
+      <div class="pnav-live-dot" id="liveDot"></div>
+      <span class="pnav-live-label" id="liveLabel">Connecting…</span>
     </div>
   </div>
 </nav>
@@ -2674,8 +2685,8 @@
       <div class="grid-3">
         <div class="metric-box">
           <div class="metric-label">Real Yields (TIPS 10Y)</div>
-          <div class="metric-value text-green">9/10</div>
-          <div class="metric-detail">Currently +0.42% | Below +0.5% = Bullish</div>
+          <div class="metric-value text-green" id="tips-driver-score">—/10</div>
+          <div class="metric-detail" id="tipsMetricDetail">Loading…</div>
         </div>
         <div class="metric-box">
           <div class="metric-label">Central Bank Flows</div>
@@ -2684,46 +2695,46 @@
         </div>
         <div class="metric-box">
           <div class="metric-label">USD Index Correlation</div>
-          <div class="metric-value text-green">7/10</div>
-          <div class="metric-detail">DXY 103.8 | Below 104+ = Bullish</div>
+          <div class="metric-value text-green" id="dxy-driver-score">—/10</div>
+          <div class="metric-detail" id="dxy-driver-detail">Loading…</div>
         </div>
         <div class="metric-box">
-          <div class="metric-label">Risk Sentiment (VIX)</div>
-          <div class="metric-value">6/10</div>
-          <div class="metric-detail">VIX 17 | Normal volatility</div>
+          <div class="metric-label">Seasonal Edge</div>
+          <div class="metric-value" id="seasonal-driver-score">—/10</div>
+          <div class="metric-detail" id="seasonal-driver-detail">Loading…</div>
         </div>
         <div class="metric-box">
           <div class="metric-label">Geopolitical Risk</div>
-          <div class="metric-value text-green">7/10</div>
+          <div class="metric-value text-green">8/10</div>
           <div class="metric-detail">Safe-haven demand elevated</div>
         </div>
         <div class="metric-box">
           <div class="metric-label">Composite Score</div>
-          <div class="metric-value text-green">31/40</div>
-          <div class="metric-detail">78% BULLISH REGIME</div>
+          <div class="metric-value text-green" id="composite-driver-score">—/40</div>
+          <div class="metric-detail" id="composite-driver-detail">Loading…</div>
         </div>
       </div>
     </div>
 
     <div class="card glass">
       <div class="grid-2">
-        <div class="direction-block bullish">
-          <div class="block-title text-green">Trading Direction: Long Bias</div>
-          <div class="block-content">
-            <strong>Confidence: 72%</strong><br/>
+        <div class="direction-block bullish" id="dir-block-main">
+          <div class="block-title text-green" id="dir-block-title">Trading Direction: Loading…</div>
+          <div class="block-content" id="dir-block-content">
+            <strong id="dir-block-conf">Confidence: —</strong><br/>
             Time Horizon: 2-4 weeks<br/><br/>
             <strong>Fundamental Drivers:</strong><br/>
-            • Real yields falling<br/>
+            • Real yields &amp; TIPS regime<br/>
             • CB de-dollarization flow<br/>
-            • Double-bottom pattern<br/>
-            • DXY weakness ongoing
+            • Seasonal + session confluence<br/>
+            • DXY correlation regime
           </div>
         </div>
         <div class="direction-block bearish">
           <div class="block-title text-red">Critical Risk Factors</div>
           <div class="block-content">
-            • TIPS surprise (yield spike)<br/>
-            • USD rally trap (104.5+)<br/>
+            • TIPS surprise (real yield spike)<br/>
+            • USD rally trap (DXY &gt; 106)<br/>
             • Fed hawkish pivot signal<br/>
             • Retail positioning crowding
           </div>
@@ -2744,33 +2755,33 @@
           <h3>Primary Entry Point</h3>
           <div class="price-level">
             <div class="level-label">Entry Zone</div>
-            <div class="level-price">4,160</div>
-            <div class="level-description">Pullback to double-bottom support | High probability reversal</div>
+            <div class="level-price" id="analysis-entry">—</div>
+            <div class="level-description" id="analysis-entry-desc">Pullback from current price | ATR-based zone</div>
           </div>
           <div class="price-level">
             <div class="level-label">Stop Loss</div>
-            <div class="level-price">4,140</div>
-            <div class="level-description">Risk: 32.9 pips | Invalidates bullish setup</div>
+            <div class="level-price" id="analysis-sl">—</div>
+            <div class="level-description" id="analysis-sl-desc">Risk: — pts | Invalidates bullish setup</div>
           </div>
         </div>
 
         <div class="card glass">
-          <h3>Profit Targets (Risk/Reward 1:2.7)</h3>
+          <h3>Profit Targets <span id="analysis-rr" style="font-size:13px;font-weight:500;">(R:R loading…)</span></h3>
           <div class="grid-3">
             <div class="metric-box">
               <div class="metric-label">Target 1</div>
-              <div class="metric-value">4,190</div>
-              <div class="metric-detail">Quick scalp zone | +30 pips</div>
+              <div class="metric-value" id="analysis-t1">—</div>
+              <div class="metric-detail" id="analysis-t1-desc">Quick scalp zone</div>
             </div>
             <div class="metric-box">
               <div class="metric-label">Target 2</div>
-              <div class="metric-value">4,220</div>
-              <div class="metric-detail">Resistance cluster | +60 pips</div>
+              <div class="metric-value" id="analysis-t2">—</div>
+              <div class="metric-detail" id="analysis-t2-desc">Resistance cluster</div>
             </div>
             <div class="metric-box">
               <div class="metric-label">Target 3</div>
-              <div class="metric-value">4,250</div>
-              <div class="metric-detail">Monthly objective | +90 pips</div>
+              <div class="metric-value" id="analysis-t3">—</div>
+              <div class="metric-detail" id="analysis-t3-desc">Monthly objective</div>
             </div>
           </div>
         </div>
@@ -2796,37 +2807,37 @@
       <div class="card glass">
         <h3 class="text-green">Support Zones (Buying Opportunities)</h3>
         <div class="price-level bullish">
-          <div class="level-label">S1 - Primary Support</div>
-          <div class="level-price">4,150</div>
-          <div class="level-description">Double-bottom pivot | High conviction</div>
+          <div class="level-label">S1 - Primary Support (0.5× ATR)</div>
+          <div class="level-price" id="sr-s1">—</div>
+          <div class="level-description" id="sr-s1-desc">First pullback support</div>
         </div>
         <div class="price-level bullish">
-          <div class="level-label">S2 - Secondary Support</div>
-          <div class="level-price">4,120</div>
-          <div class="level-description">4-week consolidation floor</div>
+          <div class="level-label">S2 - Secondary Support (1.5× ATR)</div>
+          <div class="level-price" id="sr-s2">—</div>
+          <div class="level-description" id="sr-s2-desc">Consolidation floor</div>
         </div>
         <div class="price-level bearish">
-          <div class="level-label">S3 - Hard Floor</div>
-          <div class="level-price">4,090</div>
-          <div class="level-description">Invalidates bullish thesis</div>
+          <div class="level-label">S3 - Hard Floor (2.5× ATR)</div>
+          <div class="level-price" id="sr-s3">—</div>
+          <div class="level-description">Breach invalidates bullish thesis</div>
         </div>
       </div>
 
       <div class="card glass">
         <h3 class="text-red">Resistance Zones (Profit Taking)</h3>
         <div class="price-level">
-          <div class="level-label">R1 - Technical Resistance</div>
-          <div class="level-price">4,190</div>
-          <div class="level-description">Daily chart resistance cluster</div>
+          <div class="level-label">R1 - Technical Resistance (0.5× ATR)</div>
+          <div class="level-price" id="sr-r1">—</div>
+          <div class="level-description" id="sr-r1-desc">First resistance cluster</div>
         </div>
         <div class="price-level">
-          <div class="level-label">R2 - Intermediate Resistance</div>
-          <div class="level-price">4,220</div>
-          <div class="level-description">2-week high | Psychological level</div>
+          <div class="level-label">R2 - Intermediate Resistance (1.5× ATR)</div>
+          <div class="level-price" id="sr-r2">—</div>
+          <div class="level-description" id="sr-r2-desc">Weekly high target</div>
         </div>
         <div class="price-level">
-          <div class="level-label">R3 - Monthly Target</div>
-          <div class="level-price">4,250</div>
+          <div class="level-label">R3 - Monthly Target (2.5× ATR)</div>
+          <div class="level-price" id="sr-r3">—</div>
           <div class="level-description">Breakout objective | Extended upside</div>
         </div>
       </div>
@@ -2841,33 +2852,20 @@
 
     <div class="card glass">
       <div class="scenario bullish">
-        <div class="scenario-title">Scenario 1: Re-Entry at R1 (4,190)</div>
-        <div class="scenario-text">
-          <strong>Setup:</strong> Market gaps through 4,160 entry level<br/>
-          <strong>Action:</strong> Pullback to 4,185-4,190 creates alt entry<br/>
-          <strong>Stop:</strong> 4,170 (20 pips risk)<br/>
-          <strong>Target:</strong> 4,220 (+30 pips)<br/>
-          <strong>Key Rule:</strong> Only enter on pullback — never chase breakouts
-        </div>
+        <div class="scenario-title" id="scen1-title">Scenario 1: Re-Entry at R1 (—)</div>
+        <div class="scenario-text" id="scen1-body">Loading live prices…</div>
       </div>
 
       <div class="scenario">
-        <div class="scenario-title">Scenario 2: Momentum Play at R2 (4,220)</div>
-        <div class="scenario-text">
-          <strong>Setup:</strong> Strong momentum continuation through 4,190<br/>
-          <strong>Action:</strong> Breakout above 4,220 with volume confirmation<br/>
-          <strong>Stop:</strong> 4,205 (15 pips risk)<br/>
-          <strong>Target:</strong> 4,250 (+30 pips)<br/>
-          <strong>Risk Level:</strong> MODERATE — momentum trade, tighter stops required
-        </div>
+        <div class="scenario-title" id="scen2-title">Scenario 2: Momentum Play at R2 (—)</div>
+        <div class="scenario-text" id="scen2-body">Loading live prices…</div>
       </div>
 
       <div class="scenario bearish">
         <div class="scenario-title">Scenario 3: Patient Entry — Wait for Pullback (OPTIMAL)</div>
-        <div class="scenario-text">
-          <strong>Strategy:</strong> Do NOT chase breakouts above 4,220<br/>
+        <div class="scenario-text" id="scen3-body"><strong>Strategy:</strong> Do NOT chase breakouts above R2<br/>
           <strong>Action:</strong> Wait for 4-8 hour pullback to form<br/>
-          <strong>Re-Entry Level:</strong> Buy zone 4,200-4,210<br/>
+          <strong>Re-Entry Level:</strong> <span id="scen3-reentry">—</span><br/>
           <strong>Advantage:</strong> Better risk/reward, reduced drawdown<br/>
           <strong>Key Principle:</strong> Patience = superior entries and exits
         </div>
@@ -2978,30 +2976,33 @@
         <div class="section-title">Contingency: Missed Move Scenarios</div>
       </div>
       <div class="card glass">
+        <div style="font-size:12px;color:var(--text-tertiary);margin-bottom:16px;">
+          Structural playbook — for live price-specific levels, see the <strong>Markets → Live Analysis</strong> tab.
+        </div>
         <div class="scenario bullish">
-          <div class="scenario-title">Scenario 1: Re-Entry at R1 (4,190)</div>
+          <div class="scenario-title">Scenario 1: Re-Entry at First Resistance (R1)</div>
           <div class="scenario-text">
-            <strong>Setup:</strong> Market gaps through 4,160 entry level<br/>
-            <strong>Action:</strong> Pullback to 4,185–4,190 creates alt entry<br/>
-            <strong>Stop:</strong> 4,170 (20 pips risk) &nbsp;|&nbsp; <strong>Target:</strong> 4,220 (+30 pips)<br/>
+            <strong>Setup:</strong> Market gaps through your planned entry zone<br/>
+            <strong>Action:</strong> Wait for a pullback to the R1 cluster (~0.5× ATR above price) for an alternate entry<br/>
+            <strong>Stop:</strong> Just below R1 (~0.25× ATR) &nbsp;|&nbsp; <strong>Target:</strong> R2 (~1.5× ATR)<br/>
             <strong>Key Rule:</strong> Only enter on pullback — never chase breakouts
           </div>
         </div>
         <div class="scenario">
-          <div class="scenario-title">Scenario 2: Momentum Play at R2 (4,220)</div>
+          <div class="scenario-title">Scenario 2: Momentum Play at Second Resistance (R2)</div>
           <div class="scenario-text">
-            <strong>Setup:</strong> Strong momentum continuation through 4,190<br/>
-            <strong>Action:</strong> Breakout above 4,220 with volume confirmation<br/>
-            <strong>Stop:</strong> 4,205 (15 pips risk) &nbsp;|&nbsp; <strong>Target:</strong> 4,250 (+30 pips)<br/>
+            <strong>Setup:</strong> Strong momentum continuation through R1<br/>
+            <strong>Action:</strong> Breakout above R2 (~1.5× ATR) with candle-close confirmation<br/>
+            <strong>Stop:</strong> Just below R2 (~0.2× ATR) &nbsp;|&nbsp; <strong>Target:</strong> R3 (~2.5× ATR)<br/>
             <strong>Risk Level:</strong> MODERATE — momentum trade, tighter stops required
           </div>
         </div>
         <div class="scenario bearish">
           <div class="scenario-title">Scenario 3: Patient Entry — Wait for Pullback (OPTIMAL)</div>
           <div class="scenario-text">
-            <strong>Strategy:</strong> Do NOT chase breakouts above 4,220<br/>
-            <strong>Action:</strong> Wait for 4–8 hour pullback to form<br/>
-            <strong>Re-Entry Level:</strong> Buy zone 4,200–4,210<br/>
+            <strong>Strategy:</strong> Do NOT chase extended breakouts<br/>
+            <strong>Action:</strong> Wait for a 4–8 hour pullback to form<br/>
+            <strong>Re-Entry Level:</strong> Buy zone near the prior breakout level<br/>
             <strong>Key Principle:</strong> Patience = superior entries and exits
           </div>
         </div>
@@ -3211,22 +3212,22 @@
 
           <div class="calc-input-group">
             <label class="calc-label" for="entryPrice">Entry Price (USD)</label>
-            <input class="calc-input" type="number" id="entryPrice" value="4160" min="0" step="1" oninput="this.dataset.touched='1';calcPosition()">
+            <input class="calc-input" type="number" id="entryPrice" value="3900" min="0" step="1" oninput="this.dataset.touched='1';calcPosition()">
           </div>
 
           <div class="calc-input-group">
             <label class="calc-label" for="stopPrice">Stop Loss Price (USD)</label>
-            <input class="calc-input" type="number" id="stopPrice" value="4140" min="0" step="1" oninput="calcPosition()">
+            <input class="calc-input" type="number" id="stopPrice" value="3847" min="0" step="1" oninput="this.dataset.touched='1';calcPosition()">
           </div>
 
           <div class="calc-input-group">
             <label class="calc-label" for="target1">Target 1 Price (USD)</label>
-            <input class="calc-input" type="number" id="target1" value="4190" min="0" step="1" oninput="calcPosition()">
+            <input class="calc-input" type="number" id="target1" value="3953" min="0" step="1" oninput="this.dataset.touched='1';calcPosition()">
           </div>
 
           <div class="calc-input-group">
             <label class="calc-label" for="target2">Target 2 Price (USD)</label>
-            <input class="calc-input" type="number" id="target2" value="4220" min="0" step="1" oninput="calcPosition()">
+            <input class="calc-input" type="number" id="target2" value="4005" min="0" step="1" oninput="this.dataset.touched='1';calcPosition()">
           </div>
         </div>
 
@@ -4046,6 +4047,8 @@
     if (name === 'dashboard') { renderDashboard(); }
     if (name === 'scalp')     { renderScalpDesk(); }
     if (name === 'daytrade')  { renderDayTradeDesk(); }
+    if (name === 'analysis')  { updateAnalysisTab(); }
+    if (name === 'calendar')  { renderCalendar(); }
   }
 
   // ─── CHECKLIST ─────────────────────────────────────────────────────────────
@@ -4220,19 +4223,44 @@
     { day: 1,  month: 'AUG', title: 'US Non-Farm Payrolls (Jul)', desc: 'Second-consecutive weak reading would cement rate cut conviction.', impact: 'high', bias: 'bull', biasTxt: 'Bullish if weak' },
   ];
 
+  const MONTH_MAP = { JAN:0, FEB:1, MAR:2, APR:3, MAY:4, JUN:5, JUL:6, AUG:7, SEP:8, OCT:9, NOV:10, DEC:11 };
+
   function renderCalendar() {
     const container = document.getElementById('cal-events');
-    if (!container || container.dataset.rendered) return;
-    container.dataset.rendered = '1';
+    if (!container) return;
+    delete container.dataset.rendered; // always re-render so past/today updates
 
-    container.innerHTML = CAL_EVENTS.map(ev => `
-      <div class="cal-event">
+    const now   = new Date();
+    const today = new Date(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate());
+
+    const upcoming = CAL_EVENTS.filter(ev => {
+      const d = new Date(now.getUTCFullYear(), MONTH_MAP[ev.month], ev.day);
+      if (MONTH_MAP[ev.month] < now.getUTCMonth()) {
+        // Event was earlier this year — skip (already passed)
+        return false;
+      }
+      return d >= today;
+    });
+
+    if (!upcoming.length) {
+      container.innerHTML = '<div style="padding:24px;text-align:center;color:var(--text-tertiary);">No upcoming events in calendar window.</div>';
+      return;
+    }
+
+    container.innerHTML = upcoming.map(ev => {
+      const evDate = new Date(now.getUTCFullYear(), MONTH_MAP[ev.month], ev.day);
+      const isToday = evDate.getTime() === today.getTime();
+      const daysOut = Math.round((evDate - today) / 86400000);
+      const badge   = isToday ? '<span style="background:var(--accent-blue);color:#fff;font-size:10px;font-weight:700;padding:2px 6px;border-radius:4px;margin-left:8px;">TODAY</span>'
+                    : daysOut <= 3 ? `<span style="background:rgba(217,119,6,0.15);color:#D97706;font-size:10px;font-weight:600;padding:2px 6px;border-radius:4px;margin-left:8px;">in ${daysOut}d</span>` : '';
+      return `
+      <div class="cal-event" style="${isToday ? 'border-left:3px solid var(--accent-blue);' : ''}">
         <div class="cal-date">
           <div class="cal-day">${ev.day}</div>
           <div class="cal-month">${ev.month}</div>
         </div>
         <div class="cal-body">
-          <div class="cal-title">${ev.title}</div>
+          <div class="cal-title">${ev.title}${badge}</div>
           <div class="cal-desc">${ev.desc}</div>
           <div class="cal-impact impact-${ev.impact}">
             <span class="impact-dot"></span>
@@ -4240,8 +4268,8 @@
             <span class="cal-gold-bias bias-${ev.bias}" style="margin-left:8px;">${ev.biasTxt}</span>
           </div>
         </div>
-      </div>
-    `).join('');
+      </div>`;
+    }).join('');
   }
 
   // ─── LIVE TRADE SETUP BOARD ───────────────────────────────────────────────
@@ -4250,12 +4278,11 @@
     if (!price || price < 100) return;
 
     // ── Direction logic ─────────────────────────────────────────────────────
-    // Based on macro score (31/40 = 78% bullish), TIPS reading, DXY regime
-    const tips = parseFloat(document.getElementById('tipsYield')?.textContent) || 0.42;
-    const tipsScore = tips < 0 ? 5 : tips < 0.5 ? 4 : tips < 1.5 ? 2 : 0;
-    const macroScore = 31; // live from macro panel (could be made dynamic)
+    // Direction derived from live macro score (TIPS + DXY + seasonal + structural)
+    const tips = parseFloat(document.getElementById('tipsYield')?.textContent) || 2.0;
+    const { score: macroScore } = computeMacroScore();
     const macroConf  = Math.round((macroScore / 40) * 100);
-    const isLong  = macroConf >= 60 && tipsScore >= 2;
+    const isLong  = macroConf >= 60;
     const isShort = macroConf <= 40;
     const conf    = isLong ? macroConf : isShort ? (100 - macroConf) : 50;
 
@@ -4484,20 +4511,15 @@
   }
 
   // ─── PRICE DATA ────────────────────────────────────────────────────────────
-  let lastGoldPrice = 4172.90;
-  let prevGoldPrice = 4172.90;
+  // Seed with last-known approximate spot; replaced immediately by live feed.
+  let lastGoldPrice = 3900.00;
+  let prevGoldPrice = 3900.00;
+  let goldIsLive    = false;       // true once a live fetch has ever succeeded
+  let lastLiveTs    = 0;           // ms timestamp of last successful gold fetch
 
   const apiKeys = {
     fred: localStorage.getItem('fred_api_key') || '4d4ee6e804ae4c3cbe36e3678391f0ae',
     av: localStorage.getItem('av_api_key') || 'CONT1PDJKZXQRQ97'
-  };
-
-  const priceSources = {
-    gold: [
-      'https://api.metals.live/v1/spot/gold',
-      'https://data-asg.goldbroker.com/prices/latest?code=XAU',
-      'https://www.metals.live/api/spot/gold'
-    ]
   };
 
   let chartAttempts = 0;
@@ -4606,80 +4628,138 @@
     return null;
   }
 
+  // Live status indicator (top-right of primary nav)
+  function setLiveStatus(state) {
+    const wrap  = document.getElementById('liveStatus');
+    const label = document.getElementById('liveLabel');
+    if (!wrap || !label) return;
+    wrap.classList.remove('is-stale', 'is-offline');
+    if (state === 'live')        { label.textContent = 'Live'; }
+    else if (state === 'stale')  { wrap.classList.add('is-stale');   label.textContent = 'Delayed'; }
+    else                         { wrap.classList.add('is-offline'); label.textContent = 'Offline'; }
+  }
+
+  // Gold spot via several independent CORS-enabled, key-free sources.
+  // PAXG (PAX Gold) tracks 1 troy oz of gold ~1:1 and trades on major exchanges
+  // whose REST APIs all send Access-Control-Allow-Origin:* — reliable in-browser.
+  const GOLD_SOURCES = [
+    { url: 'https://api.gold-api.com/price/XAU',                              parse: j => j.price },
+    { url: 'https://api.binance.com/api/v3/ticker/price?symbol=PAXGUSDT',     parse: j => j.price },
+    { url: 'https://api.coinbase.com/v2/prices/PAXG-USD/spot',               parse: j => j.data?.amount },
+    { url: 'https://api.kraken.com/0/public/Ticker?pair=PAXGUSD',            parse: j => j.result?.[Object.keys(j.result||{})[0]]?.c?.[0] },
+    { url: 'https://api.metals.live/v1/spot/gold',                            parse: j => j.price ?? j[0]?.mid }
+  ];
+  const SILVER_SOURCES = [
+    { url: 'https://api.gold-api.com/price/XAG',                              parse: j => j.price },
+    { url: 'https://api.binance.com/api/v3/ticker/price?symbol=XAGUSDT',      parse: j => j.price },
+    { url: 'https://api.metals.live/v1/spot/silver',                          parse: j => j.price ?? j[0]?.mid }
+  ];
+
+  async function fetchSpot(sources) {
+    for (const src of sources) {
+      try {
+        const res = await Promise.race([
+          fetch(src.url),
+          new Promise((_, reject) => setTimeout(() => reject(new Error('timeout')), 4000))
+        ]);
+        if (!res.ok) continue;
+        const json = await res.json();
+        const raw  = src.parse(json);
+        const val  = parseFloat(raw);
+        if (!isNaN(val) && val > 0) return { val, source: src.url };
+      } catch (e) {
+        console.warn(`Spot source failed (${src.url}):`, e.message);
+      }
+    }
+    return null;
+  }
+
   async function updatePrices() {
     try {
-      // Gold Price Update - Multiple sources
+      // Gold Price Update — multiple independent CORS-enabled sources
       try {
-        const goldRes = await fetchWithFallback([
-          'https://api.metals.live/v1/spot/gold',
-          'https://data-asg.goldbroker.com/prices/latest?code=XAU',
-          'https://www.metals.live/api/spot/gold'
-        ]);
+        const spot = await fetchSpot(GOLD_SOURCES);
 
-        if (goldRes) {
-          const gold = await goldRes.json();
-          let price = null;
+        if (spot) {
+          prevGoldPrice = lastGoldPrice;
+          lastGoldPrice = spot.val;
+          goldIsLive    = true;
+          lastLiveTs    = Date.now();
+          setLiveStatus('live');
 
-          // Handle different API response formats
-          if (gold.price) price = gold.price;
-          else if (gold.data?.rate) price = gold.data.rate;
-          else if (gold[0]?.mid) price = gold[0].mid;
+          const priceEl = document.getElementById('goldPrice');
+          if (priceEl) priceEl.textContent = lastGoldPrice.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2});
 
-          if (price) {
-            prevGoldPrice = lastGoldPrice;
-            lastGoldPrice = parseFloat(price);
-            const priceEl = document.getElementById('goldPrice');
-            if (priceEl) priceEl.textContent = lastGoldPrice.toFixed(2);
-
-            const change = (lastGoldPrice - prevGoldPrice).toFixed(2);
-            const changeEl = document.getElementById('goldChange');
-            if (changeEl) {
-              if (parseFloat(change) !== 0) {
-                const isUp = parseFloat(change) > 0;
-                changeEl.innerHTML = `<span class="${isUp ? 'change-up' : 'change-down'}">${isUp ? '↑' : '↓'} ${Math.abs(change)}</span>`;
-              } else {
-                changeEl.innerHTML = '<span style="color: var(--text-tertiary);">—</span>';
-              }
+          const change = (lastGoldPrice - prevGoldPrice).toFixed(2);
+          const changeEl = document.getElementById('goldChange');
+          if (changeEl) {
+            if (parseFloat(change) !== 0) {
+              const isUp = parseFloat(change) > 0;
+              changeEl.innerHTML = `<span class="${isUp ? 'change-up' : 'change-down'}">${isUp ? '↑' : '↓'} ${Math.abs(change)}</span>`;
+            } else {
+              changeEl.innerHTML = '<span style="color: var(--text-tertiary);">—</span>';
             }
-            const entryEl = document.getElementById('entryPrice');
-            if (entryEl && entryEl.dataset.touched !== '1') {
-              entryEl.value = Math.round(lastGoldPrice);
-              calcPosition();
-            }
-            updateSetupBoard();
-            console.log('Gold price updated:', lastGoldPrice);
           }
+          // Auto-seed the position calculator from the live price (until the
+          // user edits a field). Stop/targets are placed at ATR-based offsets
+          // around the live entry so the calc is always sensible (long bias).
+          const entryEl = document.getElementById('entryPrice');
+          if (entryEl && entryEl.dataset.touched !== '1') {
+            const p   = Math.round(lastGoldPrice);
+            const atr = lastGoldPrice * 0.009;
+            entryEl.value = p;
+            const stopEl = document.getElementById('stopPrice');
+            const t1El   = document.getElementById('target1');
+            const t2El   = document.getElementById('target2');
+            if (stopEl && stopEl.dataset.touched !== '1') stopEl.value = Math.round(p - atr * 1.5);
+            if (t1El   && t1El.dataset.touched   !== '1') t1El.value   = Math.round(p + atr * 1.5);
+            if (t2El   && t2El.dataset.touched   !== '1') t2El.value   = Math.round(p + atr * 3.0);
+            calcPosition();
+          }
+          updateSetupBoard();
+          console.log('Gold price updated:', lastGoldPrice, 'via', spot.source);
+        } else {
+          // No source responded — mark stale/offline so the user knows
+          setLiveStatus(goldIsLive ? 'stale' : 'offline');
+          console.warn('All gold price sources failed');
         }
       } catch (e) {
+        setLiveStatus(goldIsLive ? 'stale' : 'offline');
         console.warn('Gold price update failed:', e.message);
       }
 
-      // DXY Update - Using ECB or alternative
+      // DXY Update - Frankfurter (free/no-key) primary, Alpha Vantage fallback
       try {
         let dxyValue = null;
 
-        // Try Alpha Vantage first
-        if (apiKeys.av) {
+        // Primary: Frankfurter ECB data — EUR/USD, no key, CORS-enabled
+        const frankRes = await fetchWithFallback(['https://api.frankfurter.app/latest?from=EUR&to=USD']);
+        if (frankRes) {
+          const frankData = await frankRes.json();
+          const eurusd = parseFloat(frankData.rates?.USD);
+          if (!isNaN(eurusd) && eurusd > 0) {
+            // DXY ≈ 112.3 / EURUSD (calibrated — EUR is 57.6% of DXY basket)
+            dxyValue = (112.3 / eurusd).toFixed(2);
+          }
+        }
+
+        // Fallback: Alpha Vantage USD→EUR rate
+        if (!dxyValue && apiKeys.av) {
           const dxyRes = await Promise.race([
             fetch(`https://www.alphavantage.co/query?function=CURRENCY_EXCHANGE_RATE&from_currency=USD&to_currency=EUR&apikey=${apiKeys.av}`),
             new Promise((_, reject) => setTimeout(() => reject(new Error('timeout')), 4000))
           ]);
           if (dxyRes.ok) {
             const dxy = await dxyRes.json();
-            if (dxy['Realtime Currency Exchange Rate']?.['5. Exchange Rate']) {
-              const eurRate = parseFloat(dxy['Realtime Currency Exchange Rate']['5. Exchange Rate']);
-              if (!isNaN(eurRate)) {
-                // More accurate DXY calculation
-                dxyValue = (100.24 * eurRate).toFixed(2);
-              }
+            const usdEurRate = parseFloat(dxy['Realtime Currency Exchange Rate']?.['5. Exchange Rate']);
+            if (!isNaN(usdEurRate) && usdEurRate > 0) {
+              // usdEurRate = USD/EUR, so 1/usdEurRate = EUR/USD; DXY ≈ 112.3 * usdEurRate
+              dxyValue = (112.3 * usdEurRate).toFixed(2);
             }
           }
         }
 
-        // Fallback: Fixed reference value with indicator
-        if (!dxyValue) {
-          dxyValue = '103.80'; // Reference value
-        }
+        if (!dxyValue) dxyValue = '103.80';
 
         const dxyEl = document.getElementById('dxyPrice');
         if (dxyEl) dxyEl.textContent = dxyValue;
@@ -4688,20 +4768,28 @@
         console.warn('DXY update failed:', e.message);
       }
 
-      // TIPS Yield Update
+      // TIPS Yield Update — DFII10 = 10-Year Treasury Inflation-Indexed (real yield)
+      // FRED has no CORS headers, so route through a CORS proxy for browser use;
+      // fall back to the direct call (works locally / if FRED ever adds CORS).
       try {
         if (apiKeys.fred) {
-          const tipsRes = await Promise.race([
-            fetch(`https://api.stlouisfed.org/fred/series/data?series_id=DFEDTARU&api_key=${apiKeys.fred}&limit=1&sort_order=desc`),
-            new Promise((_, reject) => setTimeout(() => reject(new Error('timeout')), 4000))
+          const fredUrl = `https://api.stlouisfed.org/fred/series/observations?series_id=DFII10&api_key=${apiKeys.fred}&limit=1&sort_order=desc&file_type=json`;
+          const tipsRes = await fetchWithFallback([
+            `https://corsproxy.io/?url=${encodeURIComponent(fredUrl)}`,
+            `https://api.allorigins.win/raw?url=${encodeURIComponent(fredUrl)}`,
+            fredUrl
           ]);
-          if (tipsRes.ok) {
+          if (tipsRes) {
             const tips = await tipsRes.json();
-            if (tips.observations?.length > 0) {
-              const value = parseFloat(tips.observations[0].value).toFixed(2);
+            const obs = tips.observations?.filter(o => o.value !== '.');
+            if (obs?.length > 0) {
+              const value = parseFloat(obs[0].value).toFixed(2);
+              const sign  = parseFloat(value) >= 0 ? '+' : '';
               const tipsEl = document.getElementById('tipsYield');
-              if (tipsEl) tipsEl.textContent = '+' + value + '%';
-              console.log('TIPS yield updated:', value);
+              if (tipsEl) tipsEl.textContent = sign + value + '%';
+              const detailEl = document.getElementById('tipsMetricDetail');
+              if (detailEl) detailEl.textContent = `Currently ${sign}${value}% | Below +0.5% = Bullish`;
+              console.log('TIPS 10Y real yield updated:', value);
             }
           }
         }
@@ -4712,7 +4800,8 @@
       // Gold/Silver ratio
       updateGoldSilverRatio();
 
-      // Refresh active trade desk if open
+      // Refresh active views (always recompute analysis cards from live price)
+      updateAnalysisTab();
       if (activeSection === 'dashboard') renderDashboard();
       if (activeSection === 'traderoom') {
         const act = document.querySelector('.snav-btn.active');
@@ -4745,6 +4834,8 @@
     renderSessionGrid();
     edgeConfluence();
     updateSetupBoard();
+    updateAnalysisTab();
+    renderCalendar();
 
     setInterval(() => {
       updateSessionBar();
@@ -5052,16 +5143,138 @@
 
   // ─── DASHBOARD RENDERER ─────────────────────────────────────────────────────
 
+  function computeMacroScore() {
+    const tips  = parseFloat(document.getElementById('tipsYield')?.textContent) || 2.0;
+    const dxy   = parseFloat(document.getElementById('dxyPrice')?.textContent)  || 104;
+    const month = new Date().getMonth();
+    // Factor 1: TIPS real yield (lower = bullish for gold)
+    const tipsS = tips <= 0 ? 10 : tips <= 0.5 ? 9 : tips <= 1.0 ? 8 : tips <= 1.5 ? 7 : tips <= 2.0 ? 5 : tips <= 2.5 ? 3 : 1;
+    // Factor 2: DXY (lower = bullish for gold)
+    const dxyS  = dxy <= 96 ? 10 : dxy <= 100 ? 8 : dxy <= 104 ? 6 : dxy <= 108 ? 4 : 2;
+    // Factor 3: Seasonal pattern (Nov/Dec/Jan/Feb strong; Mar/Jun weak)
+    const seasS = [10,11,0,1].includes(month) ? 9 : [2,5].includes(month) ? 5 : 7;
+    // Factor 4: Central bank / structural (de-dollarization — ongoing structural bullish)
+    const cbS   = 9;
+    // Factor 5: Geopolitical / safe haven demand (elevated)
+    const shS   = 8;
+    return { score: Math.min(40, tipsS + dxyS + seasS + cbS + shS), tipsS, dxyS, seasS };
+  }
+
   function getMacroData() {
-    const tips      = parseFloat(document.getElementById('tipsYield')?.textContent) || 0.42;
-    const tipsScore = tips < 0 ? 5 : tips < 0.5 ? 4 : tips < 1.5 ? 2 : 0;
-    const macroScore = 31;
+    const tips       = parseFloat(document.getElementById('tipsYield')?.textContent) || 2.0;
+    const tipsScore  = tips < 0 ? 5 : tips < 0.5 ? 4 : tips < 1.5 ? 2 : 0;
+    const { score: macroScore, tipsS, dxyS, seasS } = computeMacroScore();
     const macroConf  = Math.round((macroScore / 40) * 100);
-    const isLong  = macroConf >= 60 && tipsScore >= 2;
+    const isLong  = macroConf >= 60;
     const isShort = macroConf <= 40;
     const conf    = isLong ? macroConf : isShort ? (100 - macroConf) : 50;
     const dir     = isLong ? 'long' : isShort ? 'short' : 'wait';
-    return { tips, tipsScore, macroScore, macroConf, isLong, isShort, conf, dir };
+    return { tips, tipsScore, macroScore, macroConf, isLong, isShort, conf, dir, tipsS, dxyS, seasS };
+  }
+
+  function updateAnalysisTab() {
+    if (!lastGoldPrice || lastGoldPrice < 100) return;
+    const p    = lastGoldPrice;
+    const atr  = p * 0.009;
+    const fmt  = v => Math.round(v).toLocaleString();
+    const set  = (id, v) => { const e = document.getElementById(id); if (e) e.textContent = v; };
+    const setH = (id, v) => { const e = document.getElementById(id); if (e) e.innerHTML   = v; };
+    const md   = getMacroData();
+    const { score, tipsS, dxyS, seasS } = computeMacroScore();
+    const dxy  = parseFloat(document.getElementById('dxyPrice')?.textContent) || 104;
+    const tips = md.tips;
+    const month = new Date().getMonth();
+
+    // ── Macro driver cards ──────────────────────────────────────────────────
+    const tipsColor = tipsS >= 8 ? 'var(--accent-green)' : tipsS >= 5 ? '#D97706' : 'var(--accent-red)';
+    const dxyColor  = dxyS  >= 8 ? 'var(--accent-green)' : dxyS  >= 5 ? '#D97706' : 'var(--accent-red)';
+    const seasColor = seasS >= 8 ? 'var(--accent-green)' : seasS >= 5 ? '#D97706' : 'var(--accent-red)';
+    const compColor = score >= 30 ? 'var(--accent-green)' : score >= 22 ? '#D97706' : 'var(--accent-red)';
+    const regimeLabel = md.isLong ? 'BULLISH REGIME' : md.isShort ? 'BEARISH REGIME' : 'MIXED SIGNALS';
+
+    const tipsEl = document.getElementById('tips-driver-score');
+    if (tipsEl) { tipsEl.textContent = tipsS + '/10'; tipsEl.style.color = tipsColor; }
+    set('tipsMetricDetail', `Currently +${tips.toFixed(2)}% | ${tips < 0.5 ? 'Bullish — below +0.5%' : tips < 1.5 ? 'Neutral zone' : 'Bearish — above +1.5%'}`);
+
+    const dxyEl = document.getElementById('dxy-driver-score');
+    if (dxyEl) { dxyEl.textContent = dxyS + '/10'; dxyEl.style.color = dxyColor; }
+    set('dxy-driver-detail', `DXY ${dxy.toFixed(1)} | ${dxy < 100 ? 'Bullish (DXY weak)' : dxy < 104 ? 'Neutral' : 'Headwind (DXY strong)'}`);
+
+    const seasEl = document.getElementById('seasonal-driver-score');
+    if (seasEl) { seasEl.textContent = seasS + '/10'; seasEl.style.color = seasColor; }
+    const MONTH_NAMES = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+    const seasDesc = [10,11,0,1].includes(month) ? `${MONTH_NAMES[month]} — Strong seasonal window` : [2,5].includes(month) ? `${MONTH_NAMES[month]} — Weak seasonal window` : `${MONTH_NAMES[month]} — Neutral month`;
+    set('seasonal-driver-detail', seasDesc);
+
+    const compEl = document.getElementById('composite-driver-score');
+    if (compEl) { compEl.textContent = score + '/40'; compEl.style.color = compColor; }
+    set('composite-driver-detail', `${md.macroConf}% ${regimeLabel}`);
+
+    // ── Direction block ─────────────────────────────────────────────────────
+    const dirBlock = document.getElementById('dir-block-main');
+    if (dirBlock) dirBlock.className = `direction-block ${md.isLong ? 'bullish' : md.isShort ? 'bearish' : ''}`;
+    const dirTitle = document.getElementById('dir-block-title');
+    if (dirTitle) {
+      dirTitle.textContent = md.isLong ? 'Trading Direction: Long Bias' : md.isShort ? 'Trading Direction: Short Bias' : 'Trading Direction: Neutral — Wait';
+      dirTitle.className   = md.isLong ? 'block-title text-green' : md.isShort ? 'block-title text-red' : 'block-title';
+    }
+    set('dir-block-conf', `Confidence: ${md.conf}%`);
+
+    // ── Entry / Stop / Targets ───────────────────────────────────────────────
+    const entry  = md.isLong  ? p - atr * 0.3 : md.isShort ? p + atr * 0.3 : p;
+    const sl     = md.isLong  ? p - atr * 1.2  : md.isShort ? p + atr * 1.2  : p - atr * 1.2;
+    const t1     = md.isLong  ? p + atr * 1.0  : p - atr * 1.0;
+    const t2     = md.isLong  ? p + atr * 2.0  : p - atr * 2.0;
+    const t3     = md.isLong  ? p + atr * 3.0  : p - atr * 3.0;
+    const risk   = Math.abs(entry - sl);
+    const rr1    = (Math.abs(t1 - entry) / risk).toFixed(1);
+    const rr2    = (Math.abs(t2 - entry) / risk).toFixed(1);
+    set('analysis-entry',      fmt(entry));
+    set('analysis-entry-desc', `${md.isLong ? 'Pullback' : 'Rally'} to entry zone | ATR-based (0.3× ATR from current)`);
+    set('analysis-sl',         fmt(sl));
+    set('analysis-sl-desc',    `Risk: ${Math.round(risk)} pts | Invalidates ${md.isLong ? 'bullish' : 'bearish'} setup`);
+    set('analysis-rr',         `(Best R:R ~1:${rr2})`);
+    set('analysis-t1',         fmt(t1));
+    set('analysis-t1-desc',    `Quick ${md.isLong ? 'scalp' : 'short'} zone | +${Math.round(atr).toLocaleString()} pts`);
+    set('analysis-t2',         fmt(t2));
+    set('analysis-t2-desc',    `${md.isLong ? 'Resistance' : 'Support'} cluster | +${Math.round(atr * 2).toLocaleString()} pts`);
+    set('analysis-t3',         fmt(t3));
+    set('analysis-t3-desc',    `Monthly objective | +${Math.round(atr * 3).toLocaleString()} pts`);
+
+    // ── S&R levels ──────────────────────────────────────────────────────────
+    const s1 = Math.round(p - atr * 0.5);
+    const s2 = Math.round(p - atr * 1.5);
+    const s3 = Math.round(p - atr * 2.5);
+    const r1 = Math.round(p + atr * 0.5);
+    const r2 = Math.round(p + atr * 1.5);
+    const r3 = Math.round(p + atr * 2.5);
+    set('sr-s1', s1.toLocaleString()); set('sr-s1-desc', `${Math.round(atr*0.5)} pts below current | First bounce zone`);
+    set('sr-s2', s2.toLocaleString()); set('sr-s2-desc', `${Math.round(atr*1.5)} pts below current | Consolidation floor`);
+    set('sr-s3', s3.toLocaleString());
+    set('sr-r1', r1.toLocaleString()); set('sr-r1-desc', `${Math.round(atr*0.5)} pts above current | First resistance`);
+    set('sr-r2', r2.toLocaleString()); set('sr-r2-desc', `${Math.round(atr*1.5)} pts above | Weekly high target`);
+    set('sr-r3', r3.toLocaleString());
+
+    // ── Scenarios ───────────────────────────────────────────────────────────
+    set('scen1-title', `Scenario 1: Re-Entry at R1 (${r1.toLocaleString()})`);
+    setH('scen1-body',
+      `<strong>Setup:</strong> Market breaks through entry zone<br/>` +
+      `<strong>Action:</strong> Wait for pullback to ${(r1 - Math.round(atr * 0.1)).toLocaleString()}–${r1.toLocaleString()}<br/>` +
+      `<strong>Stop:</strong> ${(r1 - Math.round(atr * 0.25)).toLocaleString()} (${Math.round(atr * 0.25)} pts risk)<br/>` +
+      `<strong>Target:</strong> ${r2.toLocaleString()} (+${Math.round(atr).toLocaleString()} pts)<br/>` +
+      `<strong>Key Rule:</strong> Only enter on pullback — never chase breakouts`
+    );
+    set('scen2-title', `Scenario 2: Momentum Play at R2 (${r2.toLocaleString()})`);
+    setH('scen2-body',
+      `<strong>Setup:</strong> Strong momentum continuation through R1<br/>` +
+      `<strong>Action:</strong> Breakout above ${r2.toLocaleString()} with candle close confirmation<br/>` +
+      `<strong>Stop:</strong> ${(r2 - Math.round(atr * 0.2)).toLocaleString()} (${Math.round(atr * 0.2)} pts risk)<br/>` +
+      `<strong>Target:</strong> ${r3.toLocaleString()} (+${Math.round(atr).toLocaleString()} pts)<br/>` +
+      `<strong>Risk Level:</strong> MODERATE — tighter stops required`
+    );
+    const reentryLow  = r2 - Math.round(atr * 0.15);
+    const reentryHigh = r2 + Math.round(atr * 0.05);
+    set('scen3-reentry', `Buy zone ${reentryLow.toLocaleString()}–${reentryHigh.toLocaleString()}`);
   }
 
   function getSessionInfo() {
@@ -5450,20 +5663,11 @@
   // ─── GOLD/SILVER RATIO ──────────────────────────────────────────────────────
   async function updateGoldSilverRatio() {
     try {
-      const res = await fetchWithFallback([
-        'https://api.metals.live/v1/spot/silver',
-        'https://www.metals.live/api/spot/silver'
-      ]);
-      if (res && lastGoldPrice) {
-        const silver = await res.json();
-        let silverPrice = null;
-        if (silver.price) silverPrice = silver.price;
-        else if (silver[0]?.mid) silverPrice = silver[0].mid;
-        if (silverPrice && parseFloat(silverPrice) > 0) {
-          const ratio = (lastGoldPrice / parseFloat(silverPrice)).toFixed(1);
-          const el = document.getElementById('gsRatio');
-          if (el) el.textContent = ratio;
-        }
+      const spot = await fetchSpot(SILVER_SOURCES);
+      if (spot && lastGoldPrice) {
+        const ratio = (lastGoldPrice / spot.val).toFixed(1);
+        const el = document.getElementById('gsRatio');
+        if (el) el.textContent = ratio;
       }
     } catch (e) {
       console.warn('Gold/silver ratio update failed:', e.message);
