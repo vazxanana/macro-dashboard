@@ -2675,7 +2675,7 @@
         <div class="metric-box">
           <div class="metric-label">Real Yields (TIPS 10Y)</div>
           <div class="metric-value text-green">9/10</div>
-          <div class="metric-detail">Currently +0.42% | Below +0.5% = Bullish</div>
+          <div class="metric-detail" id="tipsMetricDetail">Currently +0.42% | Below +0.5% = Bullish</div>
         </div>
         <div class="metric-box">
           <div class="metric-label">Central Bank Flows</div>
@@ -4654,32 +4654,38 @@
         console.warn('Gold price update failed:', e.message);
       }
 
-      // DXY Update - Using ECB or alternative
+      // DXY Update - Frankfurter (free/no-key) primary, Alpha Vantage fallback
       try {
         let dxyValue = null;
 
-        // Try Alpha Vantage first
-        if (apiKeys.av) {
+        // Primary: Frankfurter ECB data — EUR/USD, no key, CORS-enabled
+        const frankRes = await fetchWithFallback(['https://api.frankfurter.app/latest?from=EUR&to=USD']);
+        if (frankRes) {
+          const frankData = await frankRes.json();
+          const eurusd = parseFloat(frankData.rates?.USD);
+          if (!isNaN(eurusd) && eurusd > 0) {
+            // DXY ≈ 112.3 / EURUSD (calibrated — EUR is 57.6% of DXY basket)
+            dxyValue = (112.3 / eurusd).toFixed(2);
+          }
+        }
+
+        // Fallback: Alpha Vantage USD→EUR rate
+        if (!dxyValue && apiKeys.av) {
           const dxyRes = await Promise.race([
             fetch(`https://www.alphavantage.co/query?function=CURRENCY_EXCHANGE_RATE&from_currency=USD&to_currency=EUR&apikey=${apiKeys.av}`),
             new Promise((_, reject) => setTimeout(() => reject(new Error('timeout')), 4000))
           ]);
           if (dxyRes.ok) {
             const dxy = await dxyRes.json();
-            if (dxy['Realtime Currency Exchange Rate']?.['5. Exchange Rate']) {
-              const eurRate = parseFloat(dxy['Realtime Currency Exchange Rate']['5. Exchange Rate']);
-              if (!isNaN(eurRate)) {
-                // More accurate DXY calculation
-                dxyValue = (100.24 * eurRate).toFixed(2);
-              }
+            const usdEurRate = parseFloat(dxy['Realtime Currency Exchange Rate']?.['5. Exchange Rate']);
+            if (!isNaN(usdEurRate) && usdEurRate > 0) {
+              // usdEurRate = USD/EUR, so 1/usdEurRate = EUR/USD; DXY ≈ 112.3 * usdEurRate
+              dxyValue = (112.3 * usdEurRate).toFixed(2);
             }
           }
         }
 
-        // Fallback: Fixed reference value with indicator
-        if (!dxyValue) {
-          dxyValue = '103.80'; // Reference value
-        }
+        if (!dxyValue) dxyValue = '103.80';
 
         const dxyEl = document.getElementById('dxyPrice');
         if (dxyEl) dxyEl.textContent = dxyValue;
@@ -4688,20 +4694,23 @@
         console.warn('DXY update failed:', e.message);
       }
 
-      // TIPS Yield Update
+      // TIPS Yield Update — DFII10 = 10-Year Treasury Inflation-Indexed (real yield)
       try {
         if (apiKeys.fred) {
           const tipsRes = await Promise.race([
-            fetch(`https://api.stlouisfed.org/fred/series/data?series_id=DFEDTARU&api_key=${apiKeys.fred}&limit=1&sort_order=desc`),
+            fetch(`https://api.stlouisfed.org/fred/series/data?series_id=DFII10&api_key=${apiKeys.fred}&limit=1&sort_order=desc&file_type=json`),
             new Promise((_, reject) => setTimeout(() => reject(new Error('timeout')), 4000))
           ]);
           if (tipsRes.ok) {
             const tips = await tipsRes.json();
-            if (tips.observations?.length > 0) {
-              const value = parseFloat(tips.observations[0].value).toFixed(2);
+            const obs = tips.observations?.filter(o => o.value !== '.');
+            if (obs?.length > 0) {
+              const value = parseFloat(obs[0].value).toFixed(2);
               const tipsEl = document.getElementById('tipsYield');
               if (tipsEl) tipsEl.textContent = '+' + value + '%';
-              console.log('TIPS yield updated:', value);
+              const detailEl = document.getElementById('tipsMetricDetail');
+              if (detailEl) detailEl.textContent = `Currently +${value}% | Below +0.5% = Bullish`;
+              console.log('TIPS 10Y real yield updated:', value);
             }
           }
         }
