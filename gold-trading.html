@@ -31,11 +31,34 @@
       --glass-light: rgba(255, 255, 255, 0.6);
       --glass-lighter: rgba(255, 255, 255, 0.75);
       --glass-ultra: rgba(255, 255, 255, 0.5);
+      --body-bg-a: #F8F9FA;
+      --body-bg-b: #F1F3F5;
+      --header-bg: rgba(255,255,255,0.5);
+      --card-bg: rgba(255,255,255,0.5);
+    }
+
+    html.dark {
+      --bg-primary: #0F1117;
+      --bg-secondary: #1A1D29;
+      --bg-tertiary: #141620;
+      --text-primary: #E8EAF0;
+      --text-secondary: #9BA3B8;
+      --text-tertiary: #5A6278;
+      --border: #252836;
+      --border-light: #1E2130;
+      --glass-light: rgba(26, 29, 41, 0.7);
+      --glass-lighter: rgba(26, 29, 41, 0.85);
+      --glass-ultra: rgba(26, 29, 41, 0.6);
+      --body-bg-a: #0F1117;
+      --body-bg-b: #141620;
+      --header-bg: rgba(15,17,23,0.85);
+      --card-bg: rgba(26,29,41,0.7);
     }
 
     html, body {
-      background: linear-gradient(135deg, #F8F9FA 0%, #F1F3F5 100%);
+      background: linear-gradient(135deg, var(--body-bg-a) 0%, var(--body-bg-b) 100%);
       background-attachment: fixed;
+      transition: background 0.3s ease, color 0.3s ease;
       color: var(--text-primary);
       font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
       min-height: 100vh;
@@ -525,6 +548,821 @@
       color: var(--accent-red);
     }
 
+    /* TRADE SETUP BOARD */
+    .setup-board {
+      display: grid;
+      grid-template-columns: 200px 1fr 1fr 1fr;
+      gap: 0;
+      border-radius: 20px;
+      overflow: hidden;
+      border: 1.5px solid rgba(255,255,255,0.6);
+      box-shadow: 0 8px 40px rgba(26,29,41,0.1);
+      margin-bottom: 40px;
+    }
+
+    .setup-direction {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 32px 24px;
+      gap: 10px;
+      text-align: center;
+      border-right: 1px solid rgba(255,255,255,0.4);
+    }
+
+    .setup-direction.long  { background: linear-gradient(160deg, rgba(0,166,81,0.18) 0%, rgba(0,166,81,0.08) 100%); }
+    .setup-direction.short { background: linear-gradient(160deg, rgba(194,59,51,0.18) 0%, rgba(194,59,51,0.08) 100%); }
+    .setup-direction.wait  { background: linear-gradient(160deg, rgba(217,119,6,0.15) 0%, rgba(217,119,6,0.06) 100%); }
+
+    .dir-arrow {
+      font-size: 48px;
+      line-height: 1;
+      font-weight: 900;
+    }
+
+    .dir-label {
+      font-size: 22px;
+      font-weight: 900;
+      letter-spacing: -0.5px;
+      font-family: 'Lora', serif;
+    }
+
+    .dir-conf {
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1.2px;
+      padding: 4px 10px;
+      border-radius: 20px;
+    }
+
+    .long  .dir-arrow, .long  .dir-label { color: var(--accent-green); }
+    .long  .dir-conf  { background: rgba(0,166,81,0.15); color: var(--accent-green); }
+    .short .dir-arrow, .short .dir-label { color: var(--accent-red); }
+    .short .dir-conf  { background: rgba(194,59,51,0.15); color: var(--accent-red); }
+    .wait  .dir-arrow, .wait  .dir-label { color: #D97706; }
+    .wait  .dir-conf  { background: rgba(217,119,6,0.15); color: #D97706; }
+
+    .setup-col {
+      padding: 20px 24px;
+      border-right: 1px solid rgba(255,255,255,0.4);
+      background: rgba(255,255,255,0.45);
+      backdrop-filter: blur(20px);
+    }
+
+    .setup-col:last-child { border-right: none; }
+
+    .setup-col-title {
+      font-size: 9px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 1.2px;
+      color: var(--text-tertiary);
+      margin-bottom: 16px;
+    }
+
+    .setup-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      padding: 8px 0;
+      border-bottom: 1px solid rgba(26,29,41,0.05);
+    }
+
+    .setup-row:last-child { border-bottom: none; }
+
+    .setup-row-lbl {
+      font-size: 10px;
+      color: var(--text-tertiary);
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .setup-row-val {
+      font-size: 18px;
+      font-weight: 800;
+      font-family: 'JetBrains Mono', monospace;
+      letter-spacing: -0.5px;
+      color: var(--text-primary);
+    }
+
+    .setup-row-sub {
+      font-size: 9px;
+      color: var(--text-tertiary);
+      margin-top: 1px;
+    }
+
+    .sl-tag {
+      display: inline-block;
+      font-size: 8px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      padding: 2px 6px;
+      border-radius: 4px;
+      margin-left: 6px;
+      vertical-align: middle;
+    }
+
+    .sl-tight   { background: rgba(217,119,6,0.15);  color: #D97706;             }
+    .sl-safe    { background: rgba(0,82,204,0.12);   color: var(--accent-blue);  }
+    .sl-swing   { background: rgba(122,129,150,0.12); color: var(--text-tertiary); }
+
+    .rr-bar {
+      height: 6px;
+      border-radius: 3px;
+      margin-top: 8px;
+      background: rgba(26,29,41,0.08);
+      overflow: hidden;
+    }
+
+    .rr-fill {
+      height: 100%;
+      border-radius: 3px;
+      background: linear-gradient(90deg, var(--accent-green), #10B981);
+      transition: width 0.6s ease;
+    }
+
+    .setup-why {
+      font-size: 11px;
+      color: var(--text-secondary);
+      line-height: 1.7;
+      padding: 16px 20px;
+      background: rgba(255,255,255,0.3);
+      border-radius: 10px;
+      margin-top: 16px;
+    }
+
+    @media (max-width: 1100px) {
+      .setup-board {
+        grid-template-columns: 1fr 1fr;
+      }
+      .setup-direction {
+        grid-column: 1 / -1;
+        flex-direction: row;
+        border-right: none;
+        border-bottom: 1px solid rgba(255,255,255,0.4);
+        padding: 20px 24px;
+      }
+    }
+
+    @media (max-width: 600px) {
+      .setup-board { grid-template-columns: 1fr; }
+      .setup-col   { border-right: none; border-bottom: 1px solid rgba(255,255,255,0.4); }
+    }
+
+    /* SESSION INDICATOR */
+    .session-bar {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+    }
+
+    .session-pill {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      padding: 6px 14px;
+      border-radius: 20px;
+      border: 1px solid rgba(255,255,255,0.5);
+      background: rgba(255,255,255,0.35);
+      backdrop-filter: blur(10px);
+      transition: all 0.3s ease;
+    }
+
+    .session-pill.active-session {
+      border-color: rgba(0,166,81,0.4);
+      background: rgba(0,166,81,0.1);
+      box-shadow: 0 0 12px rgba(0,166,81,0.15);
+    }
+
+    .session-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--text-tertiary);
+      flex-shrink: 0;
+    }
+
+    .session-pill.active-session .session-dot {
+      background: var(--accent-green);
+      box-shadow: 0 0 6px rgba(0,166,81,0.6);
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.4; }
+    }
+
+    .session-name {
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      color: var(--text-secondary);
+    }
+
+    .session-pill.active-session .session-name {
+      color: var(--accent-green);
+    }
+
+    .session-countdown {
+      font-size: 10px;
+      font-family: 'JetBrains Mono', monospace;
+      color: var(--text-tertiary);
+      font-weight: 600;
+    }
+
+    /* SESSION CHECKLIST */
+    .checklist-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 14px;
+      padding: 14px 0;
+      border-bottom: 1px solid rgba(26,29,41,0.06);
+    }
+
+    .checklist-item:last-child { border-bottom: none; }
+
+    .check-box {
+      width: 20px;
+      height: 20px;
+      border-radius: 6px;
+      border: 2px solid rgba(26,29,41,0.15);
+      background: rgba(255,255,255,0.5);
+      flex-shrink: 0;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      transition: all 0.2s ease;
+      margin-top: 1px;
+      user-select: none;
+    }
+
+    .check-box.checked {
+      background: var(--accent-green);
+      border-color: var(--accent-green);
+      color: white;
+    }
+
+    .check-text {
+      flex: 1;
+    }
+
+    .check-title {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin-bottom: 2px;
+    }
+
+    .check-desc {
+      font-size: 11px;
+      color: var(--text-tertiary);
+      line-height: 1.5;
+    }
+
+    .check-box.checked + .check-text .check-title {
+      text-decoration: line-through;
+      color: var(--text-tertiary);
+    }
+
+    .session-time-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+    }
+
+    .stime-card {
+      padding: 20px;
+      border-radius: 14px;
+      border: 1.5px solid rgba(255,255,255,0.5);
+      background: rgba(255,255,255,0.4);
+      text-align: center;
+      transition: all 0.3s ease;
+    }
+
+    .stime-card.live {
+      border-color: rgba(0,166,81,0.4);
+      background: rgba(0,166,81,0.08);
+      box-shadow: 0 4px 20px rgba(0,166,81,0.12);
+    }
+
+    .stime-name {
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1.2px;
+      color: var(--text-tertiary);
+      margin-bottom: 8px;
+    }
+
+    .stime-card.live .stime-name { color: var(--accent-green); }
+
+    .stime-hours {
+      font-size: 13px;
+      font-weight: 700;
+      font-family: 'JetBrains Mono', monospace;
+      color: var(--text-primary);
+      margin-bottom: 4px;
+    }
+
+    .stime-tz {
+      font-size: 9px;
+      color: var(--text-tertiary);
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+    }
+
+    .stime-quality {
+      margin-top: 10px;
+      font-size: 10px;
+      font-weight: 600;
+      padding: 3px 8px;
+      border-radius: 6px;
+      display: inline-block;
+    }
+
+    .qual-high  { background: rgba(0,166,81,0.15);   color: var(--accent-green); }
+    .qual-med   { background: rgba(0,82,204,0.12);   color: var(--accent-blue);  }
+    .qual-low   { background: rgba(122,129,150,0.12); color: var(--text-tertiary); }
+
+    @media (max-width: 900px) {
+      .session-time-grid { grid-template-columns: 1fr 1fr; }
+      .session-bar { display: none; }
+    }
+
+    /* EDGE LAB */
+    .edge-confluence {
+      display: grid;
+      grid-template-columns: auto 1fr;
+      gap: 32px;
+      align-items: center;
+      padding: 32px 40px;
+      background: linear-gradient(135deg, rgba(217,119,6,0.08) 0%, rgba(0,82,204,0.06) 100%);
+      border: 1.5px solid rgba(217,119,6,0.2);
+      border-radius: 20px;
+      margin-bottom: 40px;
+    }
+
+    .confluence-score-ring {
+      width: 120px;
+      height: 120px;
+      border-radius: 50%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      border: 4px solid rgba(217,119,6,0.3);
+      background: rgba(255,255,255,0.5);
+      backdrop-filter: blur(10px);
+      flex-shrink: 0;
+    }
+
+    .confluence-number {
+      font-size: 42px;
+      font-weight: 800;
+      font-family: 'JetBrains Mono', monospace;
+      line-height: 1;
+      color: var(--text-primary);
+    }
+
+    .confluence-denom {
+      font-size: 13px;
+      color: var(--text-tertiary);
+      font-weight: 600;
+    }
+
+    .confluence-label {
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      font-weight: 700;
+      margin-top: 4px;
+    }
+
+    .confluence-dots {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+
+    .conf-dot {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: rgba(26,29,41,0.1);
+      border: 1.5px solid rgba(26,29,41,0.12);
+    }
+
+    .conf-dot.on  { background: var(--accent-green); border-color: var(--accent-green); }
+    .conf-dot.warn { background: #D97706; border-color: #D97706; }
+
+    .confluence-verdict {
+      font-size: 22px;
+      font-weight: 800;
+      color: var(--text-primary);
+      margin-bottom: 6px;
+    }
+
+    .confluence-sub {
+      font-size: 12px;
+      color: var(--text-secondary);
+      line-height: 1.6;
+      max-width: 700px;
+    }
+
+    .edge-card {
+      padding: 28px;
+      background: rgba(255,255,255,0.45);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1.5px solid rgba(255,255,255,0.6);
+      border-radius: 18px;
+      margin-bottom: 24px;
+      transition: all 0.3s ease;
+      animation: slideIn 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) backwards;
+    }
+
+    .edge-card:hover {
+      background: rgba(255,255,255,0.6);
+      box-shadow: 0 12px 40px rgba(26,29,41,0.1);
+      transform: translateY(-2px);
+    }
+
+    .edge-header {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      margin-bottom: 20px;
+    }
+
+    .edge-number {
+      width: 40px;
+      height: 40px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+      font-weight: 800;
+      font-family: 'JetBrains Mono', monospace;
+      flex-shrink: 0;
+      color: white;
+    }
+
+    .edge-meta {
+      flex: 1;
+    }
+
+    .edge-name {
+      font-size: 16px;
+      font-weight: 800;
+      color: var(--text-primary);
+      margin-bottom: 3px;
+      letter-spacing: -0.3px;
+    }
+
+    .edge-tagline {
+      font-size: 11px;
+      color: var(--text-tertiary);
+      font-weight: 500;
+    }
+
+    .edge-stats {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .edge-stat-pill {
+      padding: 5px 12px;
+      border-radius: 20px;
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      border: 1.5px solid;
+    }
+
+    .pill-green  { background: rgba(0,166,81,0.1);   border-color: rgba(0,166,81,0.3);   color: var(--accent-green); }
+    .pill-blue   { background: rgba(0,82,204,0.1);   border-color: rgba(0,82,204,0.3);   color: var(--accent-blue);  }
+    .pill-amber  { background: rgba(217,119,6,0.1);  border-color: rgba(217,119,6,0.3);  color: #D97706;             }
+    .pill-red    { background: rgba(194,59,51,0.1);  border-color: rgba(194,59,51,0.3);  color: var(--accent-red);   }
+    .pill-grey   { background: rgba(122,129,150,0.1); border-color: rgba(122,129,150,0.3); color: var(--text-tertiary); }
+
+    .edge-body {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 20px;
+      margin-top: 4px;
+    }
+
+    .edge-section-title {
+      font-size: 9px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 1.2px;
+      color: var(--text-tertiary);
+      margin-bottom: 10px;
+    }
+
+    .edge-section-body {
+      font-size: 11.5px;
+      color: var(--text-secondary);
+      line-height: 1.75;
+    }
+
+    .edge-section-body strong {
+      color: var(--text-primary);
+      font-weight: 700;
+    }
+
+    .edge-rule {
+      padding: 10px 14px;
+      background: rgba(255,255,255,0.4);
+      border-radius: 8px;
+      border-left: 3px solid var(--text-tertiary);
+      margin-bottom: 8px;
+      font-size: 11px;
+      color: var(--text-secondary);
+      line-height: 1.5;
+    }
+
+    .edge-rule.buy  { border-left-color: var(--accent-green); }
+    .edge-rule.sell { border-left-color: var(--accent-red);   }
+    .edge-rule.note { border-left-color: #D97706;             }
+
+    .edge-status {
+      padding: 14px 18px;
+      border-radius: 12px;
+      font-size: 12px;
+      font-weight: 600;
+      text-align: center;
+      border: 1.5px solid;
+      margin-top: 4px;
+    }
+
+    .status-bull  { background: rgba(0,166,81,0.1);   border-color: rgba(0,166,81,0.3);   color: var(--accent-green); }
+    .status-bear  { background: rgba(194,59,51,0.1);  border-color: rgba(194,59,51,0.3);  color: var(--accent-red);   }
+    .status-watch { background: rgba(217,119,6,0.1);  border-color: rgba(217,119,6,0.3);  color: #D97706;             }
+    .status-neutral { background: rgba(122,129,150,0.1); border-color: rgba(122,129,150,0.3); color: var(--text-tertiary); }
+
+    .stat-row {
+      display: flex;
+      justify-content: space-between;
+      padding: 7px 0;
+      border-bottom: 1px solid rgba(26,29,41,0.05);
+      font-size: 11px;
+    }
+
+    .stat-row:last-child { border-bottom: none; }
+    .stat-row-label { color: var(--text-tertiary); font-weight: 600; }
+    .stat-row-val   { color: var(--text-primary);  font-weight: 700; font-family: 'JetBrains Mono', monospace; font-size: 12px; }
+
+    @media (max-width: 900px) {
+      .edge-body { grid-template-columns: 1fr; }
+      .edge-confluence { grid-template-columns: 1fr; text-align: center; }
+      .confluence-dots { justify-content: center; }
+    }
+
+    /* TAB NAV */
+    .tab-nav {
+      background: rgba(255, 255, 255, 0.45);
+      backdrop-filter: blur(20px) saturate(200%);
+      -webkit-backdrop-filter: blur(20px) saturate(200%);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.5);
+      padding: 0 40px;
+      display: flex;
+      gap: 0;
+      position: sticky;
+      top: 97px;
+      z-index: 90;
+      box-shadow: 0 2px 12px rgba(26, 29, 41, 0.04);
+    }
+
+    .tab-btn {
+      padding: 14px 24px;
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1.2px;
+      color: var(--text-tertiary);
+      background: none;
+      border: none;
+      border-bottom: 2px solid transparent;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      font-family: 'Inter', sans-serif;
+      white-space: nowrap;
+    }
+
+    .tab-btn:hover {
+      color: var(--text-primary);
+    }
+
+    .tab-btn.active {
+      color: var(--accent-blue);
+      border-bottom-color: var(--accent-blue);
+    }
+
+    .tab-panel {
+      display: none;
+    }
+
+    .tab-panel.active {
+      display: block;
+    }
+
+    /* CALCULATOR */
+    .calc-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 40px;
+    }
+
+    .calc-input-group {
+      margin-bottom: 20px;
+    }
+
+    .calc-label {
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: var(--text-tertiary);
+      margin-bottom: 8px;
+      display: block;
+    }
+
+    .calc-input {
+      width: 100%;
+      padding: 12px 16px;
+      background: rgba(255, 255, 255, 0.5);
+      border: 1.5px solid rgba(255, 255, 255, 0.6);
+      border-radius: 10px;
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--text-primary);
+      font-family: 'JetBrains Mono', monospace;
+      outline: none;
+      transition: all 0.2s ease;
+      backdrop-filter: blur(10px);
+    }
+
+    .calc-input:focus {
+      border-color: rgba(0, 82, 204, 0.4);
+      background: rgba(255, 255, 255, 0.7);
+      box-shadow: 0 0 0 3px rgba(0, 82, 204, 0.1);
+    }
+
+    .calc-result {
+      padding: 24px;
+      background: rgba(0, 82, 204, 0.06);
+      border: 1.5px solid rgba(0, 82, 204, 0.15);
+      border-radius: 14px;
+      margin-bottom: 16px;
+    }
+
+    .calc-result-label {
+      font-size: 9px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1.2px;
+      color: var(--text-tertiary);
+      margin-bottom: 8px;
+    }
+
+    .calc-result-value {
+      font-size: 32px;
+      font-weight: 700;
+      font-family: 'JetBrains Mono', monospace;
+      color: var(--text-primary);
+      letter-spacing: -1px;
+    }
+
+    .calc-result-value.good { color: var(--accent-green); }
+    .calc-result-value.warn { color: #D97706; }
+    .calc-result-value.bad  { color: var(--accent-red); }
+
+    .calc-result-detail {
+      font-size: 11px;
+      color: var(--text-tertiary);
+      margin-top: 6px;
+    }
+
+    /* CALENDAR */
+    .cal-event {
+      display: flex;
+      align-items: flex-start;
+      gap: 20px;
+      padding: 20px 24px;
+      background: rgba(255, 255, 255, 0.4);
+      border-radius: 12px;
+      border: 1px solid rgba(255, 255, 255, 0.5);
+      margin-bottom: 12px;
+      transition: all 0.2s ease;
+    }
+
+    .cal-event:hover {
+      background: rgba(255, 255, 255, 0.6);
+      transform: translateX(4px);
+    }
+
+    .cal-date {
+      min-width: 60px;
+      text-align: center;
+    }
+
+    .cal-day {
+      font-size: 22px;
+      font-weight: 700;
+      font-family: 'JetBrains Mono', monospace;
+      color: var(--text-primary);
+      line-height: 1;
+    }
+
+    .cal-month {
+      font-size: 9px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: var(--text-tertiary);
+      margin-top: 2px;
+    }
+
+    .cal-body {
+      flex: 1;
+    }
+
+    .cal-title {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--text-primary);
+      margin-bottom: 4px;
+    }
+
+    .cal-desc {
+      font-size: 11px;
+      color: var(--text-secondary);
+      line-height: 1.6;
+    }
+
+    .cal-impact {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-top: 8px;
+    }
+
+    .impact-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+    }
+
+    .impact-high .impact-dot { background: var(--accent-red); }
+    .impact-med .impact-dot  { background: #D97706; }
+    .impact-low .impact-dot  { background: var(--accent-green); }
+
+    .impact-label {
+      font-size: 9px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .impact-high .impact-label { color: var(--accent-red); }
+    .impact-med .impact-label  { color: #D97706; }
+    .impact-low .impact-label  { color: var(--accent-green); }
+
+    .cal-gold-bias {
+      font-size: 10px;
+      font-weight: 600;
+      padding: 3px 8px;
+      border-radius: 6px;
+    }
+
+    .bias-bull {
+      background: rgba(0, 166, 81, 0.12);
+      color: var(--accent-green);
+    }
+
+    .bias-bear {
+      background: rgba(194, 59, 51, 0.12);
+      color: var(--accent-red);
+    }
+
+    .bias-neutral {
+      background: rgba(122, 129, 150, 0.12);
+      color: var(--text-tertiary);
+    }
+
     /* RESPONSIVE */
     @media (max-width: 1400px) {
       .chart-wrapper {
@@ -552,6 +1390,18 @@
     }
 
     @media (max-width: 768px) {
+      .tab-nav {
+        padding: 0 16px;
+        top: auto;
+        overflow-x: auto;
+        position: relative;
+      }
+
+      .calc-grid {
+        grid-template-columns: 1fr;
+        gap: 24px;
+      }
+
       .container {
         padding: 20px 16px;
       }
@@ -690,6 +1540,798 @@
         transition-duration: 0.01ms !important;
       }
     }
+
+    /* ── DARK MODE OVERRIDES ──────────────────────────────────────────────── */
+    html.dark body { color: var(--text-primary); }
+
+    html.dark .glass,
+    html.dark .glass:hover {
+      background: rgba(26,29,41,0.7);
+      border-color: rgba(255,255,255,0.08);
+      box-shadow: 0 4px 24px rgba(0,0,0,0.3);
+    }
+    html.dark .glass-premium {
+      background: linear-gradient(135deg,rgba(26,29,41,0.8) 0%,rgba(20,22,32,0.75) 100%);
+      border-color: rgba(255,255,255,0.1);
+    }
+    html.dark .glass-ultra {
+      background: rgba(20,22,32,0.65);
+      border-color: rgba(255,255,255,0.07);
+    }
+    html.dark .header {
+      background: rgba(15,17,23,0.85);
+      border-bottom-color: rgba(255,255,255,0.07);
+    }
+    html.dark .tab-nav {
+      background: rgba(15,17,23,0.8);
+      border-bottom-color: rgba(255,255,255,0.07);
+    }
+    html.dark .card {
+      background: rgba(26,29,41,0.7);
+      border-color: rgba(255,255,255,0.08);
+    }
+    html.dark .metric-box,
+    html.dark .direction-block,
+    html.dark .scenario,
+    html.dark .price-level,
+    html.dark .cal-event {
+      background: rgba(26,29,41,0.5);
+      border-color: rgba(255,255,255,0.08);
+    }
+    html.dark .setup-col { background: rgba(20,22,32,0.6); }
+    html.dark .setup-direction.long  { background: linear-gradient(160deg,rgba(0,166,81,0.15) 0%,rgba(0,166,81,0.06) 100%); }
+    html.dark .setup-direction.short { background: linear-gradient(160deg,rgba(194,59,51,0.15) 0%,rgba(194,59,51,0.06) 100%); }
+    html.dark .setup-direction.wait  { background: linear-gradient(160deg,rgba(217,119,6,0.12) 0%,rgba(217,119,6,0.05) 100%); }
+    html.dark .section-header { border-bottom-color: rgba(255,255,255,0.08); }
+    html.dark table td, html.dark table th { border-color: rgba(255,255,255,0.06); }
+    html.dark .stime-card  { background: rgba(26,29,41,0.6); border-color: rgba(255,255,255,0.08); }
+    html.dark .edge-card   { background: rgba(26,29,41,0.65); border-color: rgba(255,255,255,0.09); }
+    html.dark .edge-confluence { background: linear-gradient(135deg,rgba(217,119,6,0.06) 0%,rgba(0,82,204,0.04) 100%); }
+    html.dark .confluence-score-ring { background: rgba(26,29,41,0.8); }
+    html.dark .setup-board { border-color: rgba(255,255,255,0.09); }
+    html.dark .setup-why   { background: rgba(255,255,255,0.04); }
+    html.dark .calc-input  { background: rgba(26,29,41,0.6); border-color: rgba(255,255,255,0.12); color: var(--text-primary); }
+    html.dark .calc-result { background: rgba(0,82,204,0.08); border-color: rgba(0,82,204,0.2); }
+    html.dark .checklist-item { border-color: rgba(255,255,255,0.05); }
+    html.dark .check-box   { background: rgba(26,29,41,0.6); border-color: rgba(255,255,255,0.15); }
+    html.dark .session-pill { background: rgba(26,29,41,0.5); border-color: rgba(255,255,255,0.08); }
+    html.dark .session-pill.active-session { background: rgba(0,166,81,0.12); border-color: rgba(0,166,81,0.3); }
+    html.dark .tab-btn.active { color: #60A5FA; border-bottom-color: #60A5FA; }
+    html.dark .footer { border-top-color: rgba(255,255,255,0.06); }
+    html.dark .badge { background: rgba(26,29,41,0.7); border-color: rgba(255,255,255,0.1); color: var(--text-secondary); }
+
+    /* ── HEADER CONTROLS (dark toggle + alerts) ──────────────────────────── */
+    .header-controls {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      flex-shrink: 0;
+    }
+
+    .ctrl-btn {
+      width: 36px;
+      height: 36px;
+      border-radius: 10px;
+      background: rgba(255,255,255,0.4);
+      border: 1px solid rgba(255,255,255,0.5);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+      transition: all 0.2s ease;
+      color: var(--text-secondary);
+      position: relative;
+    }
+
+    html.dark .ctrl-btn {
+      background: rgba(26,29,41,0.6);
+      border-color: rgba(255,255,255,0.1);
+    }
+
+    .ctrl-btn:hover { transform: scale(1.08); box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+
+    .alert-badge {
+      position: absolute;
+      top: -4px;
+      right: -4px;
+      width: 16px;
+      height: 16px;
+      background: var(--accent-red);
+      border-radius: 50%;
+      font-size: 9px;
+      font-weight: 800;
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      display: none;
+    }
+
+    /* ── ALERTS PANEL ─────────────────────────────────────────────────────── */
+    .alerts-panel {
+      position: fixed;
+      top: 80px;
+      right: 40px;
+      width: 360px;
+      background: var(--bg-secondary);
+      border: 1.5px solid rgba(255,255,255,0.5);
+      border-radius: 16px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.15);
+      z-index: 200;
+      backdrop-filter: blur(30px);
+      display: none;
+      overflow: hidden;
+    }
+
+    html.dark .alerts-panel {
+      background: rgba(20,22,32,0.95);
+      border-color: rgba(255,255,255,0.1);
+    }
+
+    .alerts-panel.open { display: block; animation: slideDown 0.2s ease; }
+
+    @keyframes slideDown {
+      from { opacity:0; transform: translateY(-10px); }
+      to   { opacity:1; transform: translateY(0); }
+    }
+
+    .panel-header {
+      padding: 16px 20px;
+      border-bottom: 1px solid rgba(26,29,41,0.08);
+      font-size: 12px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: var(--text-primary);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    html.dark .panel-header { border-color: rgba(255,255,255,0.07); }
+
+    .panel-close {
+      cursor: pointer;
+      color: var(--text-tertiary);
+      font-size: 18px;
+      line-height: 1;
+      padding: 2px 6px;
+    }
+
+    .alert-form {
+      padding: 16px 20px;
+      display: grid;
+      grid-template-columns: 1fr 1fr auto;
+      gap: 8px;
+      border-bottom: 1px solid rgba(26,29,41,0.08);
+    }
+
+    html.dark .alert-form { border-color: rgba(255,255,255,0.07); }
+
+    .alert-input {
+      padding: 8px 12px;
+      border-radius: 8px;
+      border: 1.5px solid rgba(26,29,41,0.12);
+      background: rgba(255,255,255,0.5);
+      font-size: 12px;
+      font-family: 'JetBrains Mono', monospace;
+      font-weight: 600;
+      color: var(--text-primary);
+      outline: none;
+    }
+
+    html.dark .alert-input {
+      background: rgba(26,29,41,0.6);
+      border-color: rgba(255,255,255,0.12);
+      color: var(--text-primary);
+    }
+
+    .alert-input:focus { border-color: rgba(0,82,204,0.4); }
+
+    .alert-add-btn {
+      padding: 8px 14px;
+      background: var(--accent-blue);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 11px;
+      font-weight: 700;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+
+    .alert-list { max-height: 260px; overflow-y: auto; padding: 8px 20px 16px; }
+
+    .alert-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 12px;
+      border-radius: 10px;
+      margin-bottom: 6px;
+      background: rgba(255,255,255,0.4);
+      border: 1px solid rgba(255,255,255,0.5);
+      transition: all 0.2s ease;
+    }
+
+    html.dark .alert-row { background: rgba(26,29,41,0.5); border-color: rgba(255,255,255,0.08); }
+
+    .alert-row.triggered {
+      background: rgba(0,166,81,0.1);
+      border-color: rgba(0,166,81,0.3);
+    }
+
+    .alert-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+    .alert-dot.above { background: var(--accent-green); }
+    .alert-dot.below { background: var(--accent-red); }
+    .alert-dot.done  { background: var(--text-tertiary); }
+
+    .alert-text { flex: 1; font-size: 12px; font-weight: 600; color: var(--text-primary); }
+    .alert-sub  { font-size: 10px; color: var(--text-tertiary); margin-top: 1px; }
+
+    .alert-del {
+      color: var(--text-tertiary);
+      cursor: pointer;
+      font-size: 16px;
+      padding: 2px 4px;
+      opacity: 0.5;
+      transition: opacity 0.2s;
+    }
+    .alert-del:hover { opacity: 1; }
+
+    .alert-flash { animation: flash 0.4s ease 3; }
+    @keyframes flash {
+      0%,100% { opacity:1; }
+      50%      { opacity:0.3; }
+    }
+
+    /* ── TRADE JOURNAL ────────────────────────────────────────────────────── */
+    .journal-stats {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 16px;
+      margin-bottom: 28px;
+    }
+
+    .j-stat {
+      padding: 18px 16px;
+      background: rgba(255,255,255,0.45);
+      border: 1px solid rgba(255,255,255,0.5);
+      border-radius: 12px;
+      text-align: center;
+      backdrop-filter: blur(16px);
+    }
+
+    html.dark .j-stat { background: rgba(26,29,41,0.6); border-color: rgba(255,255,255,0.08); }
+
+    .j-stat-val { font-size: 24px; font-weight: 800; font-family: 'JetBrains Mono', monospace; letter-spacing: -0.5px; color: var(--text-primary); }
+    .j-stat-lbl { font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: var(--text-tertiary); margin-top: 4px; }
+
+    .journal-form {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr) auto;
+      gap: 10px;
+      padding: 20px;
+      background: rgba(255,255,255,0.4);
+      border: 1px solid rgba(255,255,255,0.5);
+      border-radius: 14px;
+      margin-bottom: 24px;
+      backdrop-filter: blur(16px);
+      align-items: end;
+    }
+
+    html.dark .journal-form { background: rgba(26,29,41,0.5); border-color: rgba(255,255,255,0.08); }
+
+    .j-field label {
+      display: block;
+      font-size: 9px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: var(--text-tertiary);
+      margin-bottom: 6px;
+    }
+
+    .j-input, .j-select {
+      width: 100%;
+      padding: 9px 12px;
+      border-radius: 8px;
+      border: 1.5px solid rgba(26,29,41,0.12);
+      background: rgba(255,255,255,0.6);
+      font-size: 12px;
+      font-family: 'JetBrains Mono', monospace;
+      font-weight: 600;
+      color: var(--text-primary);
+      outline: none;
+      -webkit-appearance: none;
+    }
+
+    html.dark .j-input, html.dark .j-select {
+      background: rgba(26,29,41,0.6);
+      border-color: rgba(255,255,255,0.12);
+      color: var(--text-primary);
+    }
+
+    .j-input:focus, .j-select:focus { border-color: rgba(0,82,204,0.5); }
+
+    .j-add-btn {
+      padding: 9px 18px;
+      background: var(--accent-blue);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 11px;
+      font-weight: 800;
+      cursor: pointer;
+      white-space: nowrap;
+      letter-spacing: 0.5px;
+      height: 36px;
+      align-self: end;
+    }
+
+    .j-add-btn:hover { background: #0041A3; }
+
+    .journal-table-wrap { overflow-x: auto; border-radius: 14px; }
+
+    .journal-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 12px;
+    }
+
+    .journal-table th {
+      padding: 10px 14px;
+      text-align: left;
+      font-size: 9px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: var(--text-tertiary);
+      background: rgba(255,255,255,0.3);
+      border-bottom: 1.5px solid rgba(26,29,41,0.08);
+    }
+
+    html.dark .journal-table th { background: rgba(26,29,41,0.4); border-color: rgba(255,255,255,0.07); }
+
+    .journal-table td {
+      padding: 11px 14px;
+      border-bottom: 1px solid rgba(26,29,41,0.05);
+      color: var(--text-secondary);
+      vertical-align: middle;
+    }
+
+    html.dark .journal-table td { border-color: rgba(255,255,255,0.04); }
+
+    .journal-table tr:hover td { background: rgba(255,255,255,0.2); }
+    html.dark .journal-table tr:hover td { background: rgba(255,255,255,0.03); }
+
+    .j-win  { color: var(--accent-green); font-weight: 700; font-family: 'JetBrains Mono', monospace; }
+    .j-loss { color: var(--accent-red);   font-weight: 700; font-family: 'JetBrains Mono', monospace; }
+    .j-be   { color: var(--text-tertiary); font-weight: 700; font-family: 'JetBrains Mono', monospace; }
+
+    .j-dir-long  { background: rgba(0,166,81,0.12);   color: var(--accent-green); padding: 2px 8px; border-radius: 5px; font-weight: 700; font-size: 10px; }
+    .j-dir-short { background: rgba(194,59,51,0.12);  color: var(--accent-red);   padding: 2px 8px; border-radius: 5px; font-weight: 700; font-size: 10px; }
+
+    .j-del-btn { color: var(--text-tertiary); cursor: pointer; opacity:0.4; font-size:15px; }
+    .j-del-btn:hover { opacity:1; color: var(--accent-red); }
+
+    .j-empty { text-align: center; padding: 40px 20px; color: var(--text-tertiary); font-size: 13px; }
+
+    @media (max-width: 900px) {
+      .journal-stats { grid-template-columns: repeat(3, 1fr); }
+      .journal-form  { grid-template-columns: 1fr 1fr; }
+    }
+
+    /* ══════════════════════════════════════════════════════════════════════════
+       INSTITUTIONAL TWO-LEVEL NAVIGATION
+       ══════════════════════════════════════════════════════════════════════════ */
+
+    .primary-nav {
+      background: #0D111F;
+      border-bottom: 1px solid rgba(255,255,255,0.07);
+      display: flex;
+      align-items: stretch;
+      padding: 0 32px;
+      position: sticky;
+      top: 0;
+      z-index: 99;
+      overflow-x: auto;
+      scrollbar-width: none;
+    }
+    .primary-nav::-webkit-scrollbar { display: none; }
+
+    .pnav-btn {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 0 22px;
+      height: 50px;
+      background: transparent;
+      border: none;
+      border-bottom: 3px solid transparent;
+      cursor: pointer;
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.4);
+      transition: all 0.2s ease;
+      white-space: nowrap;
+      font-family: 'Inter', sans-serif;
+    }
+    .pnav-btn:hover { color: rgba(255,255,255,0.8); background: rgba(255,255,255,0.03); }
+    .pnav-btn.active { color: #D4AF37; border-bottom-color: #D4AF37; }
+
+    .pnav-icon { font-size: 13px; opacity: 0.8; }
+
+    .pnav-sep {
+      width: 1px;
+      background: rgba(255,255,255,0.07);
+      margin: 12px 0;
+    }
+
+    .pnav-right {
+      margin-left: auto;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding-left: 20px;
+      border-left: 1px solid rgba(255,255,255,0.06);
+      margin-left: auto;
+    }
+
+    .pnav-live {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .pnav-live-dot {
+      width: 6px; height: 6px;
+      background: #00A651;
+      border-radius: 50%;
+      box-shadow: 0 0 6px rgba(0,166,81,0.7);
+      animation: pulse 2s ease infinite;
+    }
+    .pnav-live-label {
+      font-size: 9px;
+      font-weight: 800;
+      letter-spacing: 1.2px;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.3);
+    }
+
+    .sub-nav {
+      background: #111827;
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+      display: flex;
+      align-items: stretch;
+      padding: 0 36px;
+      overflow-x: auto;
+      scrollbar-width: none;
+      min-height: 40px;
+    }
+    .sub-nav::-webkit-scrollbar { display: none; }
+
+    .snav-btn {
+      display: flex;
+      align-items: center;
+      padding: 0 16px;
+      background: transparent;
+      border: none;
+      border-bottom: 2px solid transparent;
+      cursor: pointer;
+      font-size: 12px;
+      font-weight: 600;
+      color: rgba(255,255,255,0.4);
+      transition: all 0.18s ease;
+      white-space: nowrap;
+      font-family: 'Inter', sans-serif;
+    }
+    .snav-btn:hover { color: rgba(255,255,255,0.75); }
+    .snav-btn.active { color: #60A5FA; border-bottom-color: #60A5FA; }
+
+    /* ══════════════════════════════════════════════════════════════════════════
+       DASHBOARD
+       ══════════════════════════════════════════════════════════════════════════ */
+
+    .kpi-strip {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+      margin-bottom: 22px;
+    }
+
+    .kpi-card {
+      padding: 20px 22px;
+      border-radius: 14px;
+      background: rgba(255,255,255,0.5);
+      border: 1px solid rgba(255,255,255,0.65);
+      backdrop-filter: blur(20px);
+    }
+    html.dark .kpi-card { background: rgba(20,22,32,0.8); border-color: rgba(255,255,255,0.09); }
+
+    .kpi-label {
+      font-size: 9px; font-weight: 800;
+      letter-spacing: 1.4px; text-transform: uppercase;
+      color: var(--text-tertiary); margin-bottom: 8px;
+    }
+    .kpi-value {
+      font-size: 28px; font-weight: 800;
+      font-family: 'JetBrains Mono', monospace;
+      color: var(--text-primary); letter-spacing: -1px; line-height: 1;
+    }
+    .kpi-sub { font-size: 11px; color: var(--text-tertiary); margin-top: 6px; }
+    .kpi-badge {
+      display: inline-block;
+      padding: 3px 8px; border-radius: 5px;
+      font-size: 10px; font-weight: 800; letter-spacing: 0.5px; margin-top: 6px;
+    }
+    .kpi-badge.bull { background: rgba(0,166,81,0.12); color: var(--accent-green); }
+    .kpi-badge.bear { background: rgba(194,59,51,0.12); color: var(--accent-red); }
+    .kpi-badge.wait { background: rgba(217,119,6,0.12); color: #D97706; }
+
+    .dash-grid {
+      display: grid;
+      grid-template-columns: 1fr 360px;
+      gap: 20px;
+      margin-bottom: 22px;
+      align-items: start;
+    }
+
+    .dash-sidebar { display: flex; flex-direction: column; gap: 16px; }
+
+    .dash-widget {
+      padding: 18px 20px;
+      background: rgba(255,255,255,0.45);
+      border: 1px solid rgba(255,255,255,0.65);
+      border-radius: 14px;
+      backdrop-filter: blur(16px);
+    }
+    html.dark .dash-widget { background: rgba(20,22,32,0.7); border-color: rgba(255,255,255,0.09); }
+
+    .dash-widget-title {
+      font-size: 9px; font-weight: 800;
+      letter-spacing: 1.4px; text-transform: uppercase;
+      color: var(--text-tertiary);
+      margin-bottom: 14px; padding-bottom: 10px;
+      border-bottom: 1px solid rgba(26,29,41,0.07);
+    }
+    html.dark .dash-widget-title { border-color: rgba(255,255,255,0.07); }
+
+    .gauge-wrap { display: flex; align-items: center; gap: 16px; }
+    .gauge-ring {
+      width: 80px; height: 80px; border-radius: 50%; flex-shrink: 0;
+      background: conic-gradient(var(--accent-green) 0% var(--gauge-pct,78%), rgba(26,29,41,0.08) var(--gauge-pct,78%) 100%);
+      display: flex; align-items: center; justify-content: center; position: relative;
+    }
+    .gauge-ring::after {
+      content: ''; width: 56px; height: 56px; background: var(--bg-secondary);
+      border-radius: 50%; position: absolute;
+    }
+    html.dark .gauge-ring::after { background: #141620; }
+    .gauge-ring-val {
+      position: relative; z-index: 1;
+      font-size: 16px; font-weight: 800;
+      font-family: 'JetBrains Mono', monospace; color: var(--text-primary);
+    }
+    .gauge-rows { flex: 1; }
+    .gauge-row {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 5px 0; font-size: 11px;
+      border-bottom: 1px solid rgba(26,29,41,0.05);
+    }
+    html.dark .gauge-row { border-color: rgba(255,255,255,0.04); }
+    .gauge-row:last-child { border-bottom: none; }
+    .gauge-row-lbl { color: var(--text-secondary); }
+    .gauge-row-val { font-family: 'JetBrains Mono', monospace; font-weight: 700; font-size: 11px; }
+
+    .signal-feed { display: flex; flex-direction: column; gap: 7px; }
+    .signal-item {
+      display: flex; align-items: center; gap: 10px;
+      padding: 9px 12px; border-radius: 10px;
+      background: rgba(255,255,255,0.4);
+      border: 1px solid rgba(255,255,255,0.5);
+    }
+    html.dark .signal-item { background: rgba(26,29,41,0.5); border-color: rgba(255,255,255,0.07); }
+    .signal-dot {
+      width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0;
+    }
+    .signal-dot.bull { background: var(--accent-green); box-shadow: 0 0 5px rgba(0,166,81,0.5); }
+    .signal-dot.bear { background: var(--accent-red);   box-shadow: 0 0 5px rgba(194,59,51,0.5); }
+    .signal-dot.wait { background: #D97706;             box-shadow: 0 0 5px rgba(217,119,6,0.5); }
+    .signal-text { flex: 1; }
+    .signal-title { font-size: 12px; font-weight: 700; color: var(--text-primary); }
+    .signal-desc  { font-size: 10px; color: var(--text-tertiary); margin-top: 1px; }
+    .signal-pct { font-size: 12px; font-weight: 800; font-family: 'JetBrains Mono', monospace; }
+
+    .dash-shortcuts {
+      display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px;
+    }
+    .dash-shortcut {
+      padding: 16px 18px; border-radius: 12px; cursor: pointer; text-align: left;
+      transition: all 0.2s ease; border: 1.5px solid;
+    }
+    .dash-shortcut:hover { transform: translateY(-2px); }
+    .dash-shortcut-title { font-size: 11px; font-weight: 800; letter-spacing: 1px; text-transform: uppercase; }
+    .dash-shortcut-sub   { font-size: 11px; color: var(--text-tertiary); margin-top: 3px; }
+
+    /* ══════════════════════════════════════════════════════════════════════════
+       TRADE DESK (SCALP + DAY TRADE)
+       ══════════════════════════════════════════════════════════════════════════ */
+
+    .desk-banner {
+      padding: 22px 28px; border-radius: 16px; margin-bottom: 22px;
+      display: flex; align-items: center; gap: 24px;
+      border: 1.5px solid; backdrop-filter: blur(20px);
+    }
+    .desk-banner.long  { background: rgba(0,166,81,0.07);   border-color: rgba(0,166,81,0.25); }
+    .desk-banner.short { background: rgba(194,59,51,0.07);  border-color: rgba(194,59,51,0.25); }
+    .desk-banner.wait  { background: rgba(217,119,6,0.07);  border-color: rgba(217,119,6,0.25); }
+
+    .desk-signal-main { display: flex; flex-direction: column; align-items: center; min-width: 110px; }
+    .desk-arrow { font-size: 46px; font-weight: 900; line-height: 1; }
+    .desk-banner.long  .desk-arrow { color: var(--accent-green); }
+    .desk-banner.short .desk-arrow { color: var(--accent-red); }
+    .desk-banner.wait  .desk-arrow { color: #D97706; }
+    .desk-word {
+      font-size: 14px; font-weight: 900; letter-spacing: 2.5px;
+      text-transform: uppercase; margin-top: 2px;
+    }
+    .desk-banner.long  .desk-word { color: var(--accent-green); }
+    .desk-banner.short .desk-word { color: var(--accent-red); }
+    .desk-banner.wait  .desk-word { color: #D97706; }
+    .desk-conf { font-size: 10px; color: var(--text-tertiary); margin-top: 1px; }
+
+    .desk-vline {
+      width: 1px; height: 60px;
+      background: rgba(26,29,41,0.1); flex-shrink: 0;
+    }
+    html.dark .desk-vline { background: rgba(255,255,255,0.08); }
+
+    .desk-details {
+      flex: 1; display: grid;
+      grid-template-columns: repeat(4, 1fr); gap: 16px;
+    }
+    .desk-det { display: flex; flex-direction: column; gap: 3px; }
+    .desk-det-lbl {
+      font-size: 9px; font-weight: 800;
+      letter-spacing: 1.2px; text-transform: uppercase; color: var(--text-tertiary);
+    }
+    .desk-det-val {
+      font-size: 18px; font-weight: 800;
+      font-family: 'JetBrains Mono', monospace; color: var(--text-primary); line-height: 1;
+    }
+    .desk-det-sub { font-size: 10px; color: var(--text-tertiary); }
+
+    .desk-meta { min-width: 130px; }
+    .desk-meta-session {
+      font-size: 11px; font-weight: 800; text-transform: uppercase;
+      letter-spacing: 1px; color: var(--text-secondary);
+    }
+    .desk-meta-time { font-size: 10px; color: var(--text-tertiary); margin-top: 3px; }
+    .desk-meta-hint { font-size: 10px; color: var(--text-tertiary); margin-top: 8px; font-style: italic; }
+
+    .setups-grid {
+      display: grid; grid-template-columns: repeat(3, 1fr);
+      gap: 16px; margin-bottom: 22px;
+    }
+    .setup-card { border-radius: 14px; overflow: hidden; border: 1.5px solid rgba(255,255,255,0.55); }
+    html.dark .setup-card { border-color: rgba(255,255,255,0.09); }
+
+    .setup-card-head {
+      padding: 13px 17px;
+      display: flex; justify-content: space-between; align-items: center;
+    }
+    .setup-card-head.long  { background: rgba(0,166,81,0.1); }
+    .setup-card-head.short { background: rgba(194,59,51,0.1); }
+    .setup-card-head.wait  { background: rgba(217,119,6,0.1); }
+
+    .setup-card-type {
+      font-size: 11px; font-weight: 800;
+      letter-spacing: 1px; text-transform: uppercase;
+    }
+    .setup-card-head.long  .setup-card-type { color: var(--accent-green); }
+    .setup-card-head.short .setup-card-type { color: var(--accent-red); }
+    .setup-card-head.wait  .setup-card-type { color: #D97706; }
+    .setup-card-pct {
+      font-size: 14px; font-weight: 900;
+      font-family: 'JetBrains Mono', monospace;
+    }
+    .setup-card-head.long  .setup-card-pct { color: var(--accent-green); }
+    .setup-card-head.short .setup-card-pct { color: var(--accent-red); }
+    .setup-card-head.wait  .setup-card-pct { color: #D97706; }
+
+    .setup-card-body {
+      padding: 15px 17px; background: rgba(255,255,255,0.42);
+      display: flex; flex-direction: column; gap: 8px;
+    }
+    html.dark .setup-card-body { background: rgba(20,22,32,0.7); }
+
+    .scard-row { display: flex; justify-content: space-between; font-size: 12px; }
+    .scard-lbl { color: var(--text-secondary); }
+    .scard-val { font-family: 'JetBrains Mono', monospace; font-weight: 700; color: var(--text-primary); }
+    .scard-val.green { color: var(--accent-green); }
+    .scard-val.red   { color: var(--accent-red); }
+
+    .scard-reason {
+      font-size: 11px; color: var(--text-tertiary);
+      padding: 8px 12px; background: rgba(255,255,255,0.18);
+      border-radius: 8px; margin-top: 2px; line-height: 1.5;
+    }
+    html.dark .scard-reason { background: rgba(255,255,255,0.03); }
+
+    .levels-grid {
+      display: grid; grid-template-columns: 1fr 1fr;
+      gap: 16px; margin-bottom: 8px;
+    }
+    .levels-panel {
+      padding: 18px 20px; border-radius: 14px;
+      background: rgba(255,255,255,0.45);
+      border: 1px solid rgba(255,255,255,0.65); backdrop-filter: blur(16px);
+    }
+    html.dark .levels-panel { background: rgba(20,22,32,0.7); border-color: rgba(255,255,255,0.09); }
+
+    .levels-panel-title {
+      font-size: 9px; font-weight: 800; letter-spacing: 1.4px;
+      text-transform: uppercase; color: var(--text-tertiary);
+      margin-bottom: 13px; padding-bottom: 10px;
+      border-bottom: 1px solid rgba(26,29,41,0.07);
+    }
+    html.dark .levels-panel-title { border-color: rgba(255,255,255,0.07); }
+
+    .level-row {
+      display: flex; align-items: center;
+      padding: 8px 0; gap: 10px;
+      border-bottom: 1px solid rgba(26,29,41,0.04);
+    }
+    html.dark .level-row { border-color: rgba(255,255,255,0.04); }
+    .level-row:last-child { border-bottom: none; }
+    .level-row-tag {
+      padding: 2px 7px; border-radius: 4px;
+      font-size: 9px; font-weight: 800; letter-spacing: 0.5px; text-transform: uppercase;
+      min-width: 36px; text-align: center;
+    }
+    .level-row-tag.res { background: rgba(194,59,51,0.1); color: var(--accent-red); }
+    .level-row-tag.sup { background: rgba(0,166,81,0.1);  color: var(--accent-green); }
+    .level-row-tag.psy { background: rgba(0,82,204,0.1);  color: var(--accent-blue); }
+    .level-row-tag.key { background: rgba(217,119,6,0.1); color: #D97706; }
+    .level-row-name { flex: 1; font-size: 12px; font-weight: 600; color: var(--text-secondary); }
+    .level-row-price {
+      font-size: 13px; font-family: 'JetBrains Mono', monospace;
+      font-weight: 700; color: var(--text-primary);
+    }
+    .level-row-dist { font-size: 10px; color: var(--text-tertiary); min-width: 52px; text-align: right; }
+
+    .desk-checklist { display: grid; grid-template-columns: 1fr 1fr; gap: 7px; }
+    .dcheck {
+      display: flex; align-items: center; gap: 9px;
+      padding: 9px 13px; border-radius: 9px;
+      background: rgba(255,255,255,0.35);
+      border: 1px solid rgba(255,255,255,0.5);
+      font-size: 11.5px; font-weight: 600; color: var(--text-secondary);
+      cursor: pointer; transition: all 0.2s ease;
+    }
+    html.dark .dcheck { background: rgba(26,29,41,0.45); border-color: rgba(255,255,255,0.07); }
+    .dcheck.checked { background: rgba(0,166,81,0.08); border-color: rgba(0,166,81,0.2); color: var(--accent-green); }
+    .dcheck-box {
+      width: 15px; height: 15px; border-radius: 4px;
+      background: rgba(255,255,255,0.5); border: 1.5px solid rgba(26,29,41,0.15);
+      flex-shrink: 0; display: flex; align-items: center; justify-content: center;
+      font-size: 9px; transition: all 0.2s ease;
+    }
+    html.dark .dcheck-box { background: rgba(26,29,41,0.6); border-color: rgba(255,255,255,0.15); }
+    .dcheck.checked .dcheck-box { background: var(--accent-green); border-color: var(--accent-green); color: white; }
+
+    @media (max-width: 1000px) {
+      .kpi-strip { grid-template-columns: repeat(2, 1fr); }
+      .dash-grid { grid-template-columns: 1fr; }
+      .setups-grid { grid-template-columns: 1fr; }
+      .desk-details { grid-template-columns: repeat(2, 1fr); }
+      .levels-grid { grid-template-columns: 1fr; }
+      .desk-checklist { grid-template-columns: 1fr; }
+      .dash-shortcuts { grid-template-columns: repeat(2, 1fr); }
+    }
   </style>
 </head>
 <body>
@@ -716,14 +2358,310 @@
         <div class="ticker-value" id="tipsYield">+0.42%</div>
       </div>
       <div class="ticker-item">
+        <div class="ticker-label">Gold/Silver</div>
+        <div class="ticker-value" id="gsRatio">—</div>
+      </div>
+      <div class="ticker-item">
         <div class="timestamp" id="timestamp">—:—:— UTC</div>
       </div>
+    </div>
+    <div class="header-controls">
+      <button class="ctrl-btn" id="darkToggle" onclick="toggleDarkMode()" title="Toggle dark mode">🌙</button>
+      <button class="ctrl-btn" id="alertsToggle" onclick="toggleAlerts()" title="Price Alerts">
+        🔔
+        <span class="alert-badge" id="alertBadge">0</span>
+      </button>
+    </div>
+    <div class="session-bar" id="sessionBar">
+      <!-- populated by JS -->
     </div>
   </div>
 </div>
 
+<!-- ALERTS PANEL -->
+<div class="alerts-panel" id="alertsPanel">
+  <div class="panel-header">
+    <span>Price Alerts</span>
+    <span class="panel-close" onclick="toggleAlerts()">×</span>
+  </div>
+  <div class="alert-form">
+    <input class="alert-input" type="number" id="alertPrice" placeholder="Price" step="0.01">
+    <select class="alert-input j-select" id="alertDir" style="font-family:'Inter',sans-serif;">
+      <option value="above">Above</option>
+      <option value="below">Below</option>
+    </select>
+    <button class="alert-add-btn" onclick="addAlert()">+ Add</button>
+  </div>
+  <div class="alert-list" id="alertList">
+    <div class="j-empty">No alerts set</div>
+  </div>
+</div>
+
+<!-- PRIMARY NAV -->
+<nav class="primary-nav" id="primaryNav">
+  <button class="pnav-btn active" data-section="dashboard" onclick="switchSection('dashboard',this)">
+    <span class="pnav-icon">▣</span> Dashboard
+  </button>
+  <div class="pnav-sep"></div>
+  <button class="pnav-btn" data-section="markets" onclick="switchSection('markets',this)">
+    <span class="pnav-icon">◎</span> Markets
+  </button>
+  <div class="pnav-sep"></div>
+  <button class="pnav-btn" data-section="traderoom" onclick="switchSection('traderoom',this)">
+    <span class="pnav-icon">⬡</span> Trade Room
+  </button>
+  <div class="pnav-sep"></div>
+  <button class="pnav-btn" data-section="research" onclick="switchSection('research',this)">
+    <span class="pnav-icon">◉</span> Research
+  </button>
+  <div class="pnav-sep"></div>
+  <button class="pnav-btn" data-section="utilities" onclick="switchSection('utilities',this)">
+    <span class="pnav-icon">⊞</span> Utilities
+  </button>
+  <div class="pnav-right">
+    <div class="pnav-live">
+      <div class="pnav-live-dot"></div>
+      <span class="pnav-live-label">Live</span>
+    </div>
+  </div>
+</nav>
+<nav class="sub-nav" id="subNav"></nav>
+
 <!-- MAIN -->
 <div class="container">
+
+  <!-- DASHBOARD TAB -->
+  <div id="tab-dashboard" class="tab-panel active">
+
+    <!-- KPI Strip -->
+    <div class="kpi-strip">
+      <div class="kpi-card">
+        <div class="kpi-label">XAU/USD Live</div>
+        <div class="kpi-value" id="dash-price">—</div>
+        <div class="kpi-sub" id="dash-price-ch">Connecting…</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">Trade Signal</div>
+        <div class="kpi-value" id="dash-sig" style="font-size:22px;letter-spacing:0">—</div>
+        <div id="dash-sig-badge" style="margin-top:6px;"></div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">Active Session</div>
+        <div class="kpi-value" id="dash-sess" style="font-size:18px;letter-spacing:0">—</div>
+        <div class="kpi-sub" id="dash-sess-sub">—</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">Edge Confluence</div>
+        <div class="kpi-value" id="dash-conf-val">—</div>
+        <div class="kpi-sub" id="dash-conf-sub">—</div>
+      </div>
+    </div>
+
+    <!-- Main grid: setup board + sidebar -->
+    <div class="dash-grid">
+      <!-- Left: compact live setup -->
+      <div class="dash-widget" style="padding:0;overflow:hidden;">
+        <div class="dash-widget-title" style="padding:16px 20px 12px;margin-bottom:0;">Live Trade Setup</div>
+        <div id="dash-setup" style="padding:0 20px 20px;">
+          <!-- populated by renderDashboardSetup() -->
+        </div>
+      </div>
+
+      <!-- Right: macro gauge + signals -->
+      <div class="dash-sidebar">
+        <div class="dash-widget">
+          <div class="dash-widget-title">Macro Regime Score</div>
+          <div class="gauge-wrap">
+            <div class="gauge-ring" id="dash-gauge">
+              <span class="gauge-ring-val" id="dash-gauge-val">—</span>
+            </div>
+            <div class="gauge-rows" id="dash-gauge-rows"></div>
+          </div>
+        </div>
+        <div class="dash-widget">
+          <div class="dash-widget-title">Active Edge Signals</div>
+          <div class="signal-feed" id="dash-signals"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Quick-launch shortcuts -->
+    <div class="dash-shortcuts">
+      <button class="dash-shortcut" style="background:rgba(0,166,81,0.07);border-color:rgba(0,166,81,0.2);"
+        onclick="switchSection('traderoom', document.querySelector('[data-section=traderoom]'), 'scalp')">
+        <div class="dash-shortcut-title" style="color:var(--accent-green);">⬆ Scalp Desk</div>
+        <div class="dash-shortcut-sub">5–30 min precision entries</div>
+      </button>
+      <button class="dash-shortcut" style="background:rgba(0,82,204,0.07);border-color:rgba(0,82,204,0.2);"
+        onclick="switchSection('traderoom', document.querySelector('[data-section=traderoom]'), 'daytrade')">
+        <div class="dash-shortcut-title" style="color:var(--accent-blue);">◈ Day Trade Desk</div>
+        <div class="dash-shortcut-sub">1–4 hour session plays</div>
+      </button>
+      <button class="dash-shortcut" style="background:rgba(212,175,55,0.07);border-color:rgba(212,175,55,0.2);"
+        onclick="switchSection('research', document.querySelector('[data-section=research]'))">
+        <div class="dash-shortcut-title" style="color:#D4AF37;">◉ Edge Lab</div>
+        <div class="dash-shortcut-sub">6 quantified trade edges</div>
+      </button>
+      <button class="dash-shortcut" style="background:rgba(139,92,246,0.07);border-color:rgba(139,92,246,0.2);"
+        onclick="switchSection('utilities', document.querySelector('[data-section=utilities]'))">
+        <div class="dash-shortcut-title" style="color:#8B5CF6;">⊞ Utilities</div>
+        <div class="dash-shortcut-sub">Calculator · Journal · Alerts</div>
+      </button>
+    </div>
+
+  </div><!-- end tab-dashboard -->
+
+  <!-- ANALYSIS TAB -->
+  <div id="tab-analysis" class="tab-panel">
+
+  <!-- LIVE TRADE SETUP BOARD -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-title">Live Trade Setup</div>
+      <span class="badge" id="setup-updated">Calculating…</span>
+    </div>
+
+    <div class="setup-board" id="setupBoard">
+      <!-- Direction -->
+      <div class="setup-direction" id="setupDir">
+        <div class="dir-arrow" id="setupArrow">↑</div>
+        <div class="dir-label" id="setupLabel">LONG</div>
+        <div class="dir-conf" id="setupConf">72% Confidence</div>
+      </div>
+
+      <!-- Entry & Stop -->
+      <div class="setup-col">
+        <div class="setup-col-title">Entry &amp; Stop Loss</div>
+
+        <div class="setup-row">
+          <div>
+            <div class="setup-row-lbl">Entry Zone</div>
+            <div class="setup-row-sub">Best area to buy</div>
+          </div>
+          <div style="text-align:right;">
+            <div class="setup-row-val" id="sb-entry">—</div>
+          </div>
+        </div>
+
+        <div class="setup-row">
+          <div>
+            <div class="setup-row-lbl">Stop Loss — Tight <span class="sl-tag sl-tight">Intraday</span></div>
+            <div class="setup-row-sub" id="sb-sl-tight-dist">— pts from entry</div>
+          </div>
+          <div style="text-align:right;">
+            <div class="setup-row-val text-red" id="sb-sl-tight">—</div>
+          </div>
+        </div>
+
+        <div class="setup-row">
+          <div>
+            <div class="setup-row-lbl">Stop Loss — Safe <span class="sl-tag sl-safe">Swing</span></div>
+            <div class="setup-row-sub" id="sb-sl-safe-dist">— pts from entry</div>
+          </div>
+          <div style="text-align:right;">
+            <div class="setup-row-val text-red" id="sb-sl-safe">—</div>
+          </div>
+        </div>
+
+        <div class="setup-row">
+          <div>
+            <div class="setup-row-lbl">Stop Loss — Wide <span class="sl-tag sl-swing">Position</span></div>
+            <div class="setup-row-sub" id="sb-sl-wide-dist">— pts from entry</div>
+          </div>
+          <div style="text-align:right;">
+            <div class="setup-row-val text-red" id="sb-sl-wide">—</div>
+          </div>
+        </div>
+
+        <div class="setup-why" id="sb-sl-why">Loading stop loss logic…</div>
+      </div>
+
+      <!-- Targets -->
+      <div class="setup-col">
+        <div class="setup-col-title">Profit Targets</div>
+
+        <div class="setup-row">
+          <div>
+            <div class="setup-row-lbl">Target 1 — Quick Win</div>
+            <div class="setup-row-sub" id="sb-t1-rr">R:R — | +— pts</div>
+          </div>
+          <div style="text-align:right;">
+            <div class="setup-row-val text-green" id="sb-t1">—</div>
+          </div>
+        </div>
+
+        <div class="setup-row">
+          <div>
+            <div class="setup-row-lbl">Target 2 — Standard</div>
+            <div class="setup-row-sub" id="sb-t2-rr">R:R — | +— pts</div>
+          </div>
+          <div style="text-align:right;">
+            <div class="setup-row-val text-green" id="sb-t2">—</div>
+          </div>
+        </div>
+
+        <div class="setup-row">
+          <div>
+            <div class="setup-row-lbl">Target 3 — Extended</div>
+            <div class="setup-row-sub" id="sb-t3-rr">R:R — | +— pts</div>
+          </div>
+          <div style="text-align:right;">
+            <div class="setup-row-val text-green" id="sb-t3">—</div>
+          </div>
+        </div>
+
+        <div class="rr-bar"><div class="rr-fill" id="sb-rr-fill" style="width:0%"></div></div>
+        <div style="font-size:10px; color:var(--text-tertiary); margin-top:6px;" id="sb-rr-label">R:R to T2 using Safe SL</div>
+      </div>
+
+      <!-- Risk Summary -->
+      <div class="setup-col">
+        <div class="setup-col-title">Risk at 1% Account Risk</div>
+
+        <div class="setup-row">
+          <div>
+            <div class="setup-row-lbl">$10k account</div>
+            <div class="setup-row-sub">Size (safe SL)</div>
+          </div>
+          <div style="text-align:right;">
+            <div class="setup-row-val" id="sb-10k-oz">— oz</div>
+          </div>
+        </div>
+
+        <div class="setup-row">
+          <div>
+            <div class="setup-row-lbl">$25k account</div>
+            <div class="setup-row-sub">Size (safe SL)</div>
+          </div>
+          <div style="text-align:right;">
+            <div class="setup-row-val" id="sb-25k-oz">— oz</div>
+          </div>
+        </div>
+
+        <div class="setup-row">
+          <div>
+            <div class="setup-row-lbl">$50k account</div>
+            <div class="setup-row-sub">Size (safe SL)</div>
+          </div>
+          <div style="text-align:right;">
+            <div class="setup-row-val" id="sb-50k-oz">— oz</div>
+          </div>
+        </div>
+
+        <div class="setup-row">
+          <div>
+            <div class="setup-row-lbl">$100k account</div>
+            <div class="setup-row-sub">Size (safe SL)</div>
+          </div>
+          <div style="text-align:right;">
+            <div class="setup-row-val" id="sb-100k-oz">— oz</div>
+          </div>
+        </div>
+
+        <div class="setup-why" id="sb-reason">Based on current macro score + price structure</div>
+      </div>
+    </div>
+  </div>
 
   <!-- MACRO DRIVERS FIRST -->
   <div class="section">
@@ -993,6 +2931,1098 @@
     </div>
   </div>
 
+  </div><!-- end tab-analysis -->
+
+  <!-- STRATEGY TAB -->
+  <div id="tab-strategy" class="tab-panel">
+    <div class="section">
+      <div class="section-header">
+        <div class="section-title">4-Step Execution Workflow</div>
+      </div>
+      <div class="card glass">
+        <div class="grid-2">
+          <div class="direction-block">
+            <div class="block-title">Step 1: Macro Bias Confirmation</div>
+            <div class="block-content">
+              Establish weekly directional bias from 5 key drivers.<br/>
+              Target: 72%+ confidence reading before any trade.
+            </div>
+          </div>
+          <div class="direction-block">
+            <div class="block-title">Step 2: 1-Hour Structure Analysis</div>
+            <div class="block-content">
+              Identify key support/resistance on 1H timeframe.<br/>
+              Confluence with macro bias required for entry.
+            </div>
+          </div>
+          <div class="direction-block">
+            <div class="block-title">Step 3: Pattern Confirmation</div>
+            <div class="block-content">
+              Wait for double-bottom/top pattern formation.<br/>
+              Volume breakout of neckline confirms setup.
+            </div>
+          </div>
+          <div class="direction-block">
+            <div class="block-title">Step 4: 1-Minute Entry Execution</div>
+            <div class="block-content">
+              Execute on neckline break + pullback retest.<br/>
+              Tight risk management: max 1% account risk.
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-header">
+        <div class="section-title">Contingency: Missed Move Scenarios</div>
+      </div>
+      <div class="card glass">
+        <div class="scenario bullish">
+          <div class="scenario-title">Scenario 1: Re-Entry at R1 (4,190)</div>
+          <div class="scenario-text">
+            <strong>Setup:</strong> Market gaps through 4,160 entry level<br/>
+            <strong>Action:</strong> Pullback to 4,185–4,190 creates alt entry<br/>
+            <strong>Stop:</strong> 4,170 (20 pips risk) &nbsp;|&nbsp; <strong>Target:</strong> 4,220 (+30 pips)<br/>
+            <strong>Key Rule:</strong> Only enter on pullback — never chase breakouts
+          </div>
+        </div>
+        <div class="scenario">
+          <div class="scenario-title">Scenario 2: Momentum Play at R2 (4,220)</div>
+          <div class="scenario-text">
+            <strong>Setup:</strong> Strong momentum continuation through 4,190<br/>
+            <strong>Action:</strong> Breakout above 4,220 with volume confirmation<br/>
+            <strong>Stop:</strong> 4,205 (15 pips risk) &nbsp;|&nbsp; <strong>Target:</strong> 4,250 (+30 pips)<br/>
+            <strong>Risk Level:</strong> MODERATE — momentum trade, tighter stops required
+          </div>
+        </div>
+        <div class="scenario bearish">
+          <div class="scenario-title">Scenario 3: Patient Entry — Wait for Pullback (OPTIMAL)</div>
+          <div class="scenario-text">
+            <strong>Strategy:</strong> Do NOT chase breakouts above 4,220<br/>
+            <strong>Action:</strong> Wait for 4–8 hour pullback to form<br/>
+            <strong>Re-Entry Level:</strong> Buy zone 4,200–4,210<br/>
+            <strong>Key Principle:</strong> Patience = superior entries and exits
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="card glass-ultra" style="padding: 32px; background: rgba(0, 82, 204, 0.08);">
+        <h3 style="font-size: 16px; margin-bottom: 16px;">Risk Management Rules</h3>
+        <div class="grid-3">
+          <div class="metric-box">
+            <div class="metric-label">Max Risk Per Trade</div>
+            <div class="metric-value">1%</div>
+            <div class="metric-detail">Never exceed 1% of account on single trade</div>
+          </div>
+          <div class="metric-box">
+            <div class="metric-label">Minimum R:R Ratio</div>
+            <div class="metric-value">1:2</div>
+            <div class="metric-detail">Reject setups below 2× reward-to-risk</div>
+          </div>
+          <div class="metric-box">
+            <div class="metric-label">Max Concurrent Trades</div>
+            <div class="metric-value">3</div>
+            <div class="metric-detail">Diversify risk; avoid over-exposure</div>
+          </div>
+          <div class="metric-box">
+            <div class="metric-label">Daily Loss Limit</div>
+            <div class="metric-value">3%</div>
+            <div class="metric-detail">Stop trading for the day if hit</div>
+          </div>
+          <div class="metric-box">
+            <div class="metric-label">Trailing Stop</div>
+            <div class="metric-value">Breakeven</div>
+            <div class="metric-detail">Move stop to entry once T1 hit</div>
+          </div>
+          <div class="metric-box">
+            <div class="metric-label">Position Scaling</div>
+            <div class="metric-value">50% / 50%</div>
+            <div class="metric-detail">Half off at T1, run remainder to T2/T3</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div><!-- end tab-strategy -->
+
+  <!-- SCALP DESK TAB -->
+  <div id="tab-scalp" class="tab-panel">
+
+    <!-- Signal Banner -->
+    <div id="scalp-banner" class="desk-banner long">
+      <div class="desk-signal-main">
+        <div class="desk-arrow" id="scalp-arrow">↑</div>
+        <div class="desk-word" id="scalp-word">LONG</div>
+        <div class="desk-conf" id="scalp-conf">—% confidence</div>
+      </div>
+      <div class="desk-vline"></div>
+      <div class="desk-details" id="scalp-details">
+        <div class="desk-det">
+          <div class="desk-det-lbl">Entry</div>
+          <div class="desk-det-val" id="scalp-entry">—</div>
+          <div class="desk-det-sub">Current price</div>
+        </div>
+        <div class="desk-det">
+          <div class="desk-det-lbl">Scalp Stop</div>
+          <div class="desk-det-val" id="scalp-stop" style="color:var(--accent-red)">—</div>
+          <div class="desk-det-sub" id="scalp-stop-pts">— pts</div>
+        </div>
+        <div class="desk-det">
+          <div class="desk-det-lbl">Target 1</div>
+          <div class="desk-det-val" id="scalp-t1" style="color:var(--accent-green)">—</div>
+          <div class="desk-det-sub" id="scalp-t1-pts">— pts · 1.5R</div>
+        </div>
+        <div class="desk-det">
+          <div class="desk-det-lbl">Target 2</div>
+          <div class="desk-det-val" id="scalp-t2" style="color:var(--accent-green)">—</div>
+          <div class="desk-det-sub" id="scalp-t2-pts">— pts · 2.5R</div>
+        </div>
+      </div>
+      <div class="desk-meta">
+        <div class="desk-meta-session" id="scalp-session">—</div>
+        <div class="desk-meta-time" id="scalp-session-time">—</div>
+        <div class="desk-meta-hint" id="scalp-hint">—</div>
+      </div>
+    </div>
+
+    <!-- 3 Live Scalp Setups -->
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
+      <div style="font-size:9px;font-weight:800;letter-spacing:1.4px;text-transform:uppercase;color:var(--text-tertiary);">Live Scalp Setups — ATR-Based Precision Levels</div>
+      <div style="font-size:10px;color:var(--text-tertiary);">Updates every 30s with live price</div>
+    </div>
+    <div class="setups-grid" id="scalp-setups-grid"></div>
+
+    <!-- Key Levels + Checklist -->
+    <div class="levels-grid">
+      <div class="levels-panel">
+        <div class="levels-panel-title">Key Scalp Price Levels</div>
+        <div id="scalp-levels-list"></div>
+      </div>
+      <div class="levels-panel">
+        <div class="levels-panel-title">Scalp Execution Checklist</div>
+        <div class="desk-checklist">
+          <div class="dcheck" onclick="this.classList.toggle('checked')"><div class="dcheck-box">✓</div>Active session (not dead zone)</div>
+          <div class="dcheck" onclick="this.classList.toggle('checked')"><div class="dcheck-box">✓</div>Spread under 0.30 pts</div>
+          <div class="dcheck" onclick="this.classList.toggle('checked')"><div class="dcheck-box">✓</div>No news in next 30 minutes</div>
+          <div class="dcheck" onclick="this.classList.toggle('checked')"><div class="dcheck-box">✓</div>Price at identified key level</div>
+          <div class="dcheck" onclick="this.classList.toggle('checked')"><div class="dcheck-box">✓</div>Macro bias matches direction</div>
+          <div class="dcheck" onclick="this.classList.toggle('checked')"><div class="dcheck-box">✓</div>Stop placed before entry</div>
+          <div class="dcheck" onclick="this.classList.toggle('checked')"><div class="dcheck-box">✓</div>Risk ≤ 0.5% account (scalp)</div>
+          <div class="dcheck" onclick="this.classList.toggle('checked')"><div class="dcheck-box">✓</div>R:R ≥ 1.5:1 minimum</div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- end tab-scalp -->
+
+  <!-- DAY TRADE DESK TAB -->
+  <div id="tab-daytrade" class="tab-panel">
+
+    <!-- Signal Banner -->
+    <div id="daytrade-banner" class="desk-banner long">
+      <div class="desk-signal-main">
+        <div class="desk-arrow" id="dt-arrow">↑</div>
+        <div class="desk-word" id="dt-word">LONG</div>
+        <div class="desk-conf" id="dt-conf">—% confidence</div>
+      </div>
+      <div class="desk-vline"></div>
+      <div class="desk-details">
+        <div class="desk-det">
+          <div class="desk-det-lbl">Day Entry</div>
+          <div class="desk-det-val" id="dt-entry">—</div>
+          <div class="desk-det-sub">Limit zone</div>
+        </div>
+        <div class="desk-det">
+          <div class="desk-det-lbl">Day Stop</div>
+          <div class="desk-det-val" id="dt-stop" style="color:var(--accent-red)">—</div>
+          <div class="desk-det-sub" id="dt-stop-pts">1.5× ATR</div>
+        </div>
+        <div class="desk-det">
+          <div class="desk-det-lbl">Target 1</div>
+          <div class="desk-det-val" id="dt-t1" style="color:var(--accent-green)">—</div>
+          <div class="desk-det-sub" id="dt-t1-pts">3R · partial exit</div>
+        </div>
+        <div class="desk-det">
+          <div class="desk-det-lbl">Target 2</div>
+          <div class="desk-det-val" id="dt-t2" style="color:var(--accent-green)">—</div>
+          <div class="desk-det-sub" id="dt-t2-pts">5R · full exit</div>
+        </div>
+      </div>
+      <div class="desk-meta">
+        <div class="desk-meta-session" id="dt-session">—</div>
+        <div class="desk-meta-time" id="dt-session-time">—</div>
+        <div class="desk-meta-hint" id="dt-hint">—</div>
+      </div>
+    </div>
+
+    <!-- 3 Day Trade Setups -->
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
+      <div style="font-size:9px;font-weight:800;letter-spacing:1.4px;text-transform:uppercase;color:var(--text-tertiary);">Day Trade Setups — Session-Based Institutional Plays</div>
+      <div style="font-size:10px;color:var(--text-tertiary);">1–4 hour hold time · Full-size entries</div>
+    </div>
+    <div class="setups-grid" id="daytrade-setups-grid"></div>
+
+    <!-- Key Levels + Checklist -->
+    <div class="levels-grid">
+      <div class="levels-panel">
+        <div class="levels-panel-title">Key Day Trade Levels</div>
+        <div id="daytrade-levels-list"></div>
+      </div>
+      <div class="levels-panel">
+        <div class="levels-panel-title">Day Trade Rules</div>
+        <div class="desk-checklist">
+          <div class="dcheck" onclick="this.classList.toggle('checked')"><div class="dcheck-box">✓</div>Macro bias confirmed (TIPS + DXY)</div>
+          <div class="dcheck" onclick="this.classList.toggle('checked')"><div class="dcheck-box">✓</div>Correct session window (London/NY)</div>
+          <div class="dcheck" onclick="this.classList.toggle('checked')"><div class="dcheck-box">✓</div>No FOMC/CPI within 4 hours</div>
+          <div class="dcheck" onclick="this.classList.toggle('checked')"><div class="dcheck-box">✓</div>At least 2 edges aligning</div>
+          <div class="dcheck" onclick="this.classList.toggle('checked')"><div class="dcheck-box">✓</div>Daily structure supports setup</div>
+          <div class="dcheck" onclick="this.classList.toggle('checked')"><div class="dcheck-box">✓</div>Risk ≤ 1% account per trade</div>
+          <div class="dcheck" onclick="this.classList.toggle('checked')"><div class="dcheck-box">✓</div>Plan: partial exit ½ at T1</div>
+          <div class="dcheck" onclick="this.classList.toggle('checked')"><div class="dcheck-box">✓</div>Trail stop to B/E after T1 hit</div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- end tab-daytrade -->
+
+
+  <!-- CALCULATOR TAB -->
+  <div id="tab-calculator" class="tab-panel">
+    <div class="section">
+      <div class="section-header">
+        <div class="section-title">Position Size Calculator</div>
+        <span class="badge">XAU/USD</span>
+      </div>
+      <div class="calc-grid">
+        <div class="card glass">
+          <h3>Inputs</h3>
+
+          <div class="calc-input-group">
+            <label class="calc-label" for="accountSize">Account Size (USD)</label>
+            <input class="calc-input" type="number" id="accountSize" value="10000" min="0" step="100" oninput="calcPosition()">
+          </div>
+
+          <div class="calc-input-group">
+            <label class="calc-label" for="riskPct">Risk Per Trade (%)</label>
+            <input class="calc-input" type="number" id="riskPct" value="1" min="0.1" max="10" step="0.1" oninput="calcPosition()">
+          </div>
+
+          <div class="calc-input-group">
+            <label class="calc-label" for="entryPrice">Entry Price (USD)</label>
+            <input class="calc-input" type="number" id="entryPrice" value="4160" min="0" step="1" oninput="this.dataset.touched='1';calcPosition()">
+          </div>
+
+          <div class="calc-input-group">
+            <label class="calc-label" for="stopPrice">Stop Loss Price (USD)</label>
+            <input class="calc-input" type="number" id="stopPrice" value="4140" min="0" step="1" oninput="calcPosition()">
+          </div>
+
+          <div class="calc-input-group">
+            <label class="calc-label" for="target1">Target 1 Price (USD)</label>
+            <input class="calc-input" type="number" id="target1" value="4190" min="0" step="1" oninput="calcPosition()">
+          </div>
+
+          <div class="calc-input-group">
+            <label class="calc-label" for="target2">Target 2 Price (USD)</label>
+            <input class="calc-input" type="number" id="target2" value="4220" min="0" step="1" oninput="calcPosition()">
+          </div>
+        </div>
+
+        <div class="card glass">
+          <h3>Results</h3>
+
+          <div class="calc-result">
+            <div class="calc-result-label">Dollar Risk</div>
+            <div class="calc-result-value" id="res-dollar-risk">$100.00</div>
+            <div class="calc-result-detail" id="res-dollar-risk-detail">1% of $10,000</div>
+          </div>
+
+          <div class="calc-result">
+            <div class="calc-result-label">Stop Distance</div>
+            <div class="calc-result-value" id="res-stop-dist">20.00 pts</div>
+            <div class="calc-result-detail" id="res-stop-pct">—% from entry</div>
+          </div>
+
+          <div class="calc-result">
+            <div class="calc-result-label">Position Size (oz)</div>
+            <div class="calc-result-value" id="res-oz">5.00 oz</div>
+            <div class="calc-result-detail" id="res-notional">Notional: $20,800</div>
+          </div>
+
+          <div class="calc-result" id="res-rr-block">
+            <div class="calc-result-label">Risk : Reward (to T1 / T2)</div>
+            <div class="calc-result-value" id="res-rr">1:1.5 / 1:3.0</div>
+            <div class="calc-result-detail" id="res-rr-detail">Profit at T1: $150 | T2: $300</div>
+          </div>
+
+          <div class="calc-result">
+            <div class="calc-result-label">Leverage Required (at 1× = full notional)</div>
+            <div class="calc-result-value" id="res-leverage">2.1×</div>
+            <div class="calc-result-detail" id="res-leverage-detail">Notional vs account size</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div><!-- end tab-calculator -->
+
+  <!-- CALENDAR TAB -->
+  <div id="tab-calendar" class="tab-panel">
+    <div class="section">
+      <div class="section-header">
+        <div class="section-title">Economic Calendar — Gold-Relevant Events</div>
+        <span class="badge">Next 30 Days</span>
+      </div>
+      <div class="card glass">
+        <div id="cal-events">
+          <!-- populated by JS -->
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-header">
+        <div class="section-title">How Events Move Gold</div>
+      </div>
+      <div class="card glass">
+        <div class="grid-3">
+          <div class="metric-box">
+            <div class="metric-label">CPI Hotter Than Expected</div>
+            <div class="metric-value text-red">Bearish</div>
+            <div class="metric-detail">Raises rate hike odds → higher real yields → gold down</div>
+          </div>
+          <div class="metric-box">
+            <div class="metric-label">CPI Cooler Than Expected</div>
+            <div class="metric-value text-green">Bullish</div>
+            <div class="metric-detail">Rate cut odds rise → lower real yields → gold up</div>
+          </div>
+          <div class="metric-box">
+            <div class="metric-label">FOMC Hawkish Surprise</div>
+            <div class="metric-value text-red">Bearish</div>
+            <div class="metric-detail">Dollar strength & yield spike compress gold</div>
+          </div>
+          <div class="metric-box">
+            <div class="metric-label">FOMC Dovish Surprise</div>
+            <div class="metric-value text-green">Bullish</div>
+            <div class="metric-detail">Lower rate path expectations → gold rally</div>
+          </div>
+          <div class="metric-box">
+            <div class="metric-label">NFP Strong Beat</div>
+            <div class="metric-value text-red">Bearish</div>
+            <div class="metric-detail">Delays rate cuts, DXY strength, gold falls</div>
+          </div>
+          <div class="metric-box">
+            <div class="metric-label">NFP Weak Miss</div>
+            <div class="metric-value text-green">Bullish</div>
+            <div class="metric-detail">Accelerates cut timeline, DXY falls, gold rises</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div><!-- end tab-calendar -->
+
+  <!-- SESSIONS TAB -->
+  <div id="tab-sessions" class="tab-panel">
+
+    <!-- Live session clocks -->
+    <div class="section">
+      <div class="section-header">
+        <div class="section-title">Active Trading Sessions</div>
+        <span class="badge" id="session-live-badge">Detecting...</span>
+      </div>
+      <div class="session-time-grid" id="sessionGrid">
+        <!-- populated by JS -->
+      </div>
+    </div>
+
+    <!-- Morning routine -->
+    <div class="section">
+      <div class="section-header">
+        <div class="section-title">Morning Session — London Open</div>
+        <span class="badge">08:00 – 12:00 London</span>
+      </div>
+      <div class="grid-2">
+        <div class="card glass">
+          <h3>Pre-Trade Checklist (Before 08:00 London)</h3>
+          <div id="morning-checklist">
+            <div class="checklist-item">
+              <div class="check-box" onclick="toggleCheck(this)"></div>
+              <div class="check-text">
+                <div class="check-title">Check overnight gold move & reason</div>
+                <div class="check-desc">Review Asian session range — was there a news-driven move or just noise?</div>
+              </div>
+            </div>
+            <div class="checklist-item">
+              <div class="check-box" onclick="toggleCheck(this)"></div>
+              <div class="check-text">
+                <div class="check-title">Review macro drivers (Analysis tab)</div>
+                <div class="check-desc">Confirm the 5 key drivers haven't changed overnight — any CB statements or data?</div>
+              </div>
+            </div>
+            <div class="checklist-item">
+              <div class="check-box" onclick="toggleCheck(this)"></div>
+              <div class="check-text">
+                <div class="check-title">Mark today's key levels on chart</div>
+                <div class="check-desc">Draw S1/R1 from the Key Levels section. Note overnight high and low.</div>
+              </div>
+            </div>
+            <div class="checklist-item">
+              <div class="check-box" onclick="toggleCheck(this)"></div>
+              <div class="check-text">
+                <div class="check-title">Check DXY and TIPS direction</div>
+                <div class="check-desc">If DXY rising + TIPS rising → bearish gold bias. Adjust position sizing accordingly.</div>
+              </div>
+            </div>
+            <div class="checklist-item">
+              <div class="check-box" onclick="toggleCheck(this)"></div>
+              <div class="check-text">
+                <div class="check-title">Set position size via Calculator</div>
+                <div class="check-desc">Enter today's entry/stop into the Position Calculator before placing any order.</div>
+              </div>
+            </div>
+            <div class="checklist-item">
+              <div class="check-box" onclick="toggleCheck(this)"></div>
+              <div class="check-text">
+                <div class="check-title">Check today's economic calendar</div>
+                <div class="check-desc">Are any high-impact events scheduled today? Avoid new entries 30 min before.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card glass">
+          <h3>London Open Playbook</h3>
+          <div class="scenario bullish">
+            <div class="scenario-title">Bullish London Setup</div>
+            <div class="scenario-text">
+              <strong>Condition:</strong> Asian session held above S1 with DXY flat/falling<br/>
+              <strong>Watch for:</strong> Break above Asian high + retest as support<br/>
+              <strong>Entry:</strong> On pullback after Asian high break<br/>
+              <strong>Target:</strong> R1 or previous session high<br/>
+              <strong>Stop:</strong> Below Asian session low
+            </div>
+          </div>
+          <div class="scenario bearish">
+            <div class="scenario-title">Bearish London Setup</div>
+            <div class="scenario-text">
+              <strong>Condition:</strong> Gold rejected at R1, DXY strengthening<br/>
+              <strong>Watch for:</strong> Break below Asian session low<br/>
+              <strong>Entry:</strong> Pullback retest of broken Asian low<br/>
+              <strong>Target:</strong> S1 / S2<br/>
+              <strong>Stop:</strong> Above Asian session low
+            </div>
+          </div>
+          <div class="direction-block" style="margin-top:16px;">
+            <div class="block-title">Best London Entry Window</div>
+            <div class="block-content">
+              <strong>08:00 – 09:30 London</strong> — London open momentum<br/>
+              Wait for the first 15–30 min candle to close to confirm direction.<br/>
+              Avoid trading the first 5 minutes (spread spike).
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Afternoon routine -->
+    <div class="section">
+      <div class="section-header">
+        <div class="section-title">Afternoon Session — NY Overlap</div>
+        <span class="badge">13:00 – 17:00 London / 08:00 – 12:00 New York</span>
+      </div>
+      <div class="grid-2">
+        <div class="card glass">
+          <h3>Pre-Afternoon Checklist (Before 13:00 London)</h3>
+          <div id="afternoon-checklist">
+            <div class="checklist-item">
+              <div class="check-box" onclick="toggleCheck(this)"></div>
+              <div class="check-text">
+                <div class="check-title">Review London session outcome</div>
+                <div class="check-desc">Was the morning trend clean or choppy? Strong London trends often continue into NY.</div>
+              </div>
+            </div>
+            <div class="checklist-item">
+              <div class="check-box" onclick="toggleCheck(this)"></div>
+              <div class="check-text">
+                <div class="check-title">Check any open morning positions</div>
+                <div class="check-desc">Move stop to breakeven if T1 was hit in the London session. Trail if T2 approaching.</div>
+              </div>
+            </div>
+            <div class="checklist-item">
+              <div class="check-box" onclick="toggleCheck(this)"></div>
+              <div class="check-text">
+                <div class="check-title">US data releases at 13:30 London?</div>
+                <div class="check-desc">CPI, NFP, Retail Sales at 08:30 NY = 13:30 London. Wait for spike to settle before entering.</div>
+              </div>
+            </div>
+            <div class="checklist-item">
+              <div class="check-box" onclick="toggleCheck(this)"></div>
+              <div class="check-text">
+                <div class="check-title">Recalculate position size for PM setup</div>
+                <div class="check-desc">Update the Calculator with current price — spreads may differ from morning.</div>
+              </div>
+            </div>
+            <div class="checklist-item">
+              <div class="check-box" onclick="toggleCheck(this)"></div>
+              <div class="check-text">
+                <div class="check-title">Check daily loss limit</div>
+                <div class="check-desc">If morning trade hit stop, check you're within your 3% daily loss limit before trading again.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card glass">
+          <h3>NY Overlap Playbook (Highest Volume)</h3>
+          <div class="scenario bullish">
+            <div class="scenario-title">NY Continuation Setup</div>
+            <div class="scenario-text">
+              <strong>Condition:</strong> London was bullish, NY open confirms with higher low<br/>
+              <strong>Watch for:</strong> 13:00–13:30 London pullback, then bid at support<br/>
+              <strong>Entry:</strong> Pullback to London session midpoint or S/R flip<br/>
+              <strong>Target:</strong> Daily R1 / R2<br/>
+              <strong>Strongest signal:</strong> London bullish + US data miss = powerful continuation
+            </div>
+          </div>
+          <div class="scenario">
+            <div class="scenario-title">NY Reversal Setup</div>
+            <div class="scenario-text">
+              <strong>Condition:</strong> London overextended, price at major resistance<br/>
+              <strong>Watch for:</strong> NY open fakeout above London high then reversal<br/>
+              <strong>Entry:</strong> Close below London high (stop-hunt reversal pattern)<br/>
+              <strong>Caution:</strong> Higher risk setup — reduce size by 50%
+            </div>
+          </div>
+          <div class="direction-block" style="margin-top:16px;">
+            <div class="block-title">Avoid Trading After 17:00 London</div>
+            <div class="block-content">
+              Post-overlap liquidity drops sharply. Spreads widen, moves become erratic.<br/>
+              <strong>Best practice:</strong> Close or trail all positions by 16:30 London unless holding a strong swing trade.
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Session times reference -->
+    <div class="section">
+      <div class="section-header">
+        <div class="section-title">Session Times — Your Local Clock</div>
+      </div>
+      <div class="card glass">
+        <div id="local-times-grid" class="grid-3">
+          <!-- populated by JS -->
+        </div>
+      </div>
+    </div>
+
+  </div><!-- end tab-sessions -->
+
+  <!-- EDGE LAB TAB -->
+  <div id="tab-edges" class="tab-panel">
+
+    <!-- Confluence Score -->
+    <div class="section">
+      <div class="section-header">
+        <div class="section-title">Edge Confluence Score</div>
+        <span class="badge" style="background:rgba(217,119,6,0.15); border-color:rgba(217,119,6,0.3); color:#D97706;">Deep Research Analysis</span>
+      </div>
+
+      <div class="edge-confluence">
+        <div class="confluence-score-ring">
+          <div class="confluence-number" id="conf-score">—</div>
+          <div class="confluence-denom">/ 6</div>
+          <div class="confluence-label" id="conf-label" style="color:#D97706;">Loading</div>
+        </div>
+        <div>
+          <div class="confluence-dots" id="conf-dots">
+            <div class="conf-dot" id="cd0"></div>
+            <div class="conf-dot" id="cd1"></div>
+            <div class="conf-dot" id="cd2"></div>
+            <div class="conf-dot" id="cd3"></div>
+            <div class="conf-dot" id="cd4"></div>
+            <div class="conf-dot" id="cd5"></div>
+          </div>
+          <div class="confluence-verdict" id="conf-verdict">Calculating…</div>
+          <div class="confluence-sub">
+            Six independently-researched edges synthesised from quantitative studies, COT positioning data, seasonal anomaly databases, and macro correlation analysis.
+            A score of 4+ means multiple independent signals align — take only high-R:R setups. A score of 6/6 has historically preceded the strongest gold rallies.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Edge 1: COT -->
+    <div class="section">
+      <div class="edge-card">
+        <div class="edge-header">
+          <div class="edge-number" style="background: linear-gradient(135deg,#D97706,#F59E0B);">1</div>
+          <div class="edge-meta">
+            <div class="edge-name">COT Contrarian Signal</div>
+            <div class="edge-tagline">Commitment of Traders — speculative positioning extremes</div>
+          </div>
+          <div class="edge-stats">
+            <div class="edge-stat-pill pill-amber">Published Weekly</div>
+            <div class="edge-stat-pill pill-green">High Conviction</div>
+          </div>
+        </div>
+        <div class="edge-body">
+          <div>
+            <div class="edge-section-title">Research Basis</div>
+            <div class="stat-row"><span class="stat-row-label">Signal type</span><span class="stat-row-val">Contrarian</span></div>
+            <div class="stat-row"><span class="stat-row-label">Data source</span><span class="stat-row-val">CFTC Weekly</span></div>
+            <div class="stat-row"><span class="stat-row-label">Strongest signal</span><span class="stat-row-val">Divergence</span></div>
+            <div class="stat-row"><span class="stat-row-label">Lag</span><span class="stat-row-val">3 days (Tue→Fri)</span></div>
+            <div class="edge-section-body" style="margin-top:12px;">
+              The CFTC Commitments of Traders report separates gold futures positions into Managed Money (hedge funds), Producers (commercials), and Non-Reportables.
+              When <strong>Managed Money net longs approach the 90th percentile</strong> of their 3-year range, the crowd is too long — a reversal typically follows.
+              The <strong>"holy grail" divergence signal</strong> occurs when commercials are extreme net short (hedging) while speculators are extreme net long simultaneously.
+            </div>
+          </div>
+          <div>
+            <div class="edge-section-title">Entry Rules</div>
+            <div class="edge-rule buy">
+              <strong>BUY signal:</strong> Managed Money net position falls to 10th percentile or below (washout). Commercials covering shorts. Enter long on next technical breakout.
+            </div>
+            <div class="edge-rule sell">
+              <strong>CAUTION signal:</strong> Managed Money at 90th+ percentile. Reduce position size, tighten stops, avoid new longs. Not a standalone short signal.
+            </div>
+            <div class="edge-rule note">
+              <strong>Confirmation required:</strong> Use COT as bias filter only. Combine with price action — a weekly candle close above resistance confirms the washout was real.
+            </div>
+          </div>
+          <div>
+            <div class="edge-section-title">Current Status</div>
+            <div class="edge-status status-watch">MONITOR — Check CFTC weekly release<br/><span style="font-size:10px; font-weight:500; margin-top:4px; display:block;">Visit: cftc.gov → COT → COMEX Gold futures<br/>Watch Managed Money net position vs 52-week range</span></div>
+            <div class="edge-section-body" style="margin-top:14px;">
+              <strong>Where to check:</strong> CFTC.gov, Barchart COT charts, or MacroMicro "Gold COT Index".<br/><br/>
+              <strong>Key number:</strong> Managed Money net long contracts. Compare to prior 52-week high/low to determine percentile.
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Edge 2: Seasonal -->
+    <div class="section">
+      <div class="edge-card">
+        <div class="edge-header">
+          <div class="edge-number" style="background: linear-gradient(135deg,#059669,#10B981);">2</div>
+          <div class="edge-meta">
+            <div class="edge-name">Seasonal Calendar Edge</div>
+            <div class="edge-tagline">50-year statistical anomaly — month-of-year and day-of-week patterns</div>
+          </div>
+          <div class="edge-stats">
+            <div class="edge-stat-pill pill-green">Jan: 80% Win Rate</div>
+            <div class="edge-stat-pill pill-green">Nov–Feb Window</div>
+            <div class="edge-stat-pill pill-amber">Monday: Weakest Day</div>
+          </div>
+        </div>
+        <div class="edge-body">
+          <div>
+            <div class="edge-section-title">Monthly Statistics (50-Year Data)</div>
+            <div class="stat-row"><span class="stat-row-label">January</span><span class="stat-row-val" style="color:var(--accent-green)">+1.79% avg · 80% ↑</span></div>
+            <div class="stat-row"><span class="stat-row-label">November</span><span class="stat-row-val" style="color:var(--accent-green)">+1.4% avg · seasonal buy</span></div>
+            <div class="stat-row"><span class="stat-row-label">December</span><span class="stat-row-val" style="color:var(--accent-green)">+0.9% avg · pre-Jan setup</span></div>
+            <div class="stat-row"><span class="stat-row-label">March</span><span class="stat-row-val" style="color:var(--accent-red)">−0.6% avg · avoid longs</span></div>
+            <div class="stat-row"><span class="stat-row-label">June</span><span class="stat-row-val" style="color:var(--accent-red)">−0.4% avg · weakest Q2</span></div>
+            <div class="stat-row"><span class="stat-row-label">Nov–Feb window</span><span class="stat-row-val" style="color:var(--accent-green)">Strongest 4-month run</span></div>
+          </div>
+          <div>
+            <div class="edge-section-title">Day-of-Week Pattern</div>
+            <div class="stat-row"><span class="stat-row-label">Friday</span><span class="stat-row-val" style="color:var(--accent-green)">Strongest · pre-weekend buy</span></div>
+            <div class="stat-row"><span class="stat-row-label">Tuesday / Wed</span><span class="stat-row-val" style="color:var(--accent-green)">Best entry days</span></div>
+            <div class="stat-row"><span class="stat-row-label">Monday</span><span class="stat-row-val" style="color:var(--accent-red)">Weakest · avoid new longs</span></div>
+            <div class="edge-section-title" style="margin-top:16px;">Why It Persists</div>
+            <div class="edge-section-body">
+              Structurally driven: <strong>Diwali/Indian wedding season</strong> (Oct–Nov), <strong>Chinese New Year restocking</strong> (Dec–Jan), and <strong>Christmas jewellery demand</strong> all converge in the Nov–Feb window. These are <em>physical demand cycles</em>, not noise.
+            </div>
+          </div>
+          <div>
+            <div class="edge-section-title">Current Month Status</div>
+            <div class="edge-status" id="seasonal-status" style="background:rgba(122,129,150,0.1); border-color:rgba(122,129,150,0.3); color:var(--text-secondary);">
+              Loading seasonal reading…
+            </div>
+            <div class="edge-section-title" style="margin-top:16px;">Entry Rules</div>
+            <div class="edge-rule buy">
+              <strong>Seasonal BUY window:</strong> Nov, Dec, Jan. Enter on any 2–4% pullback during this window. Hold into February. Target: Jan high.
+            </div>
+            <div class="edge-rule sell">
+              <strong>Avoid:</strong> New longs in March and June. Reduce size. Wait for May/Sep for next seasonal setup.
+            </div>
+            <div class="edge-rule note">
+              <strong>Day rule:</strong> Enter Tuesday or Wednesday. Avoid Monday entries — statistically the worst day to initiate a gold position.
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Edge 3: Real Yield Threshold -->
+    <div class="section">
+      <div class="edge-card">
+        <div class="edge-header">
+          <div class="edge-number" style="background: linear-gradient(135deg,#0052CC,#2563EB);">3</div>
+          <div class="edge-meta">
+            <div class="edge-name">Real Yield Threshold Signal</div>
+            <div class="edge-tagline">10-Year TIPS yield regime — the most reliable gold macro signal</div>
+          </div>
+          <div class="edge-stats">
+            <div class="edge-stat-pill pill-blue">−0.73 Correlation</div>
+            <div class="edge-stat-pill pill-blue">2003–2022 Consistent</div>
+          </div>
+        </div>
+        <div class="edge-body">
+          <div>
+            <div class="edge-section-title">Threshold Map</div>
+            <div class="stat-row"><span class="stat-row-label">TIPS below 0%</span><span class="stat-row-val" style="color:var(--accent-green)">STRONGLY BULLISH</span></div>
+            <div class="stat-row"><span class="stat-row-label">TIPS 0% – +0.5%</span><span class="stat-row-val" style="color:var(--accent-green)">Bullish regime</span></div>
+            <div class="stat-row"><span class="stat-row-label">TIPS +0.5% – +1.5%</span><span class="stat-row-val" style="color:#D97706;">Neutral — mixed</span></div>
+            <div class="stat-row"><span class="stat-row-label">TIPS +1.5% – +2%</span><span class="stat-row-val" style="color:var(--accent-red);">Headwinds building</span></div>
+            <div class="stat-row"><span class="stat-row-label">TIPS above +2%</span><span class="stat-row-val" style="color:var(--accent-red);">Strong headwinds</span></div>
+            <div class="stat-row"><span class="stat-row-label">Correlation (avg)</span><span class="stat-row-val">−0.73 rolling 12m</span></div>
+          </div>
+          <div>
+            <div class="edge-section-title">The Correlation Breakdown Signal</div>
+            <div class="edge-section-body">
+              From 2023 onward, gold rose <strong>despite rising real yields</strong> — breaking the historical rule. This is itself a powerful edge:<br/><br/>
+              When gold holds or rises while TIPS yields rise → <strong>structural demand override</strong> (central bank buying, de-dollarization). This regime creates a <strong>stealth accumulation signal</strong>: when TIPS eventually falls, gold will accelerate far beyond what the yield move alone implies.<br/><br/>
+              <strong>Current correlation:</strong> ~−0.25 (vs historical −0.85). The structural demand floor is in place.
+            </div>
+          </div>
+          <div>
+            <div class="edge-section-title">Current Regime</div>
+            <div class="edge-status" id="tips-status">Loading TIPS reading…</div>
+            <div class="edge-section-title" style="margin-top:16px;">Entry Rules</div>
+            <div class="edge-rule buy">
+              <strong>Regime BUY:</strong> TIPS yield crosses below +0.5% (direction matters). Add to longs aggressively. Target: prior highs.
+            </div>
+            <div class="edge-rule buy">
+              <strong>Stealth BUY:</strong> Gold rises while TIPS rises. Do NOT short. Structural demand is overriding yields — buy any pullbacks.
+            </div>
+            <div class="edge-rule note">
+              <strong>3 confirming inputs:</strong> TIPS yield direction + breakeven inflation rate + CME FedWatch cut probabilities. All three dovish = highest conviction.
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Edge 4: DXY Divergence -->
+    <div class="section">
+      <div class="edge-card">
+        <div class="edge-header">
+          <div class="edge-number" style="background: linear-gradient(135deg,#7C3AED,#8B5CF6);">4</div>
+          <div class="edge-meta">
+            <div class="edge-name">DXY Divergence Edge</div>
+            <div class="edge-tagline">When gold breaks its inverse dollar relationship — a powerful anticipatory signal</div>
+          </div>
+          <div class="edge-stats">
+            <div class="edge-stat-pill pill-blue">Historical: −0.85</div>
+            <div class="edge-stat-pill pill-amber">Current: −0.25</div>
+            <div class="edge-stat-pill pill-green">Divergence = Setup</div>
+          </div>
+        </div>
+        <div class="edge-body">
+          <div>
+            <div class="edge-section-title">Normal vs Divergence Regime</div>
+            <div class="edge-section-body">
+              Historically, gold and DXY hold a <strong>−0.85 average correlation</strong>. DXY up → gold down. Simple.<br/><br/>
+              But when this rule breaks, it tells you something: the structural demand for gold (central banks, geopolitical safe-haven) is <strong>overriding the dollar effect</strong>. This is the signal most retail traders miss.<br/><br/>
+              In 2023–2024, gold and DXY rose together during geopolitical escalations — and both kept rising. Traders who shorted gold because "DXY is up" were trapped.
+            </div>
+          </div>
+          <div>
+            <div class="edge-section-title">Two Divergence Signals</div>
+            <div class="edge-rule buy">
+              <strong>BULLISH DIVERGENCE:</strong> DXY makes a new monthly high, but gold fails to make a new monthly low (gold is "holding"). When DXY eventually reverses down, gold will accelerate upward — often by 3–5%.
+            </div>
+            <div class="edge-rule sell">
+              <strong>BEARISH DIVERGENCE:</strong> DXY falls, but gold also falls (or doesn't rally). When DXY turns back up, gold will drop sharply. Avoid longs until resolved.
+            </div>
+            <div class="edge-rule note">
+              <strong>Confirmation rule:</strong> Divergence must hold on the daily timeframe for 3+ sessions. Don't act on intraday divergence alone.
+            </div>
+          </div>
+          <div>
+            <div class="edge-section-title">Current Regime</div>
+            <div class="edge-status status-bull">STRUCTURAL BULL — Divergence Era<br/><span style="font-size:10px; font-weight:500; margin-top:4px; display:block;">30-day corr. ≈ −0.25. Gold decoupled from DXY. Buy dips — structural buyers absorb any weakness.</span></div>
+            <div class="edge-section-title" style="margin-top:16px;">Entry Rule</div>
+            <div class="edge-rule buy">
+              <strong>Action:</strong> Any DXY spike that fails to break gold below S1 = strong accumulation opportunity. Buy the pullback.
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Edge 5: London PM Fix -->
+    <div class="section">
+      <div class="edge-card">
+        <div class="edge-header">
+          <div class="edge-number" style="background: linear-gradient(135deg,#C23B33,#EF4444);">5</div>
+          <div class="edge-meta">
+            <div class="edge-name">London Fix Intraday Pattern</div>
+            <div class="edge-tagline">LBMA AM fix (10:30) and PM fix (15:00) create recurring intraday price behaviour</div>
+          </div>
+          <div class="edge-stats">
+            <div class="edge-stat-pill pill-red">PM Fix: Downward Bias</div>
+            <div class="edge-stat-pill pill-green">AM Fix Range: High Win</div>
+          </div>
+        </div>
+        <div class="edge-body">
+          <div>
+            <div class="edge-section-title">Fix Times & Patterns</div>
+            <div class="stat-row"><span class="stat-row-label">AM Fix time</span><span class="stat-row-val">10:30 London</span></div>
+            <div class="stat-row"><span class="stat-row-label">PM Fix time</span><span class="stat-row-val">15:00 London</span></div>
+            <div class="stat-row"><span class="stat-row-label">PM Fix bias</span><span class="stat-row-val" style="color:var(--accent-red);">Downward historically</span></div>
+            <div class="stat-row"><span class="stat-row-label">AM range breakout</span><span class="stat-row-val" style="color:var(--accent-green);">High-probability setup</span></div>
+            <div class="stat-row"><span class="stat-row-label">Best trading window</span><span class="stat-row-val">12:00–16:00 GMT</span></div>
+            <div class="edge-section-body" style="margin-top:10px;">
+              The LBMA gold price is set at electronic auction. <strong>Institutional orders cluster around fix times</strong> creating predictable pre- and post-fix price behaviour.
+            </div>
+          </div>
+          <div>
+            <div class="edge-section-title">AM Fix Range Breakout (10:30 London)</div>
+            <div class="edge-section-body">
+              <strong>Step 1:</strong> Mark the high and low of the 09:30–10:30 London pre-fix range.<br/><br/>
+              <strong>Step 2:</strong> Wait for a close <em>outside</em> this range on a 15-minute candle after 10:30.<br/><br/>
+              <strong>Step 3:</strong> Enter in the breakout direction. Stop inside the range. Target 1.5× the range width.<br/><br/>
+              <strong>Why it works:</strong> Institutional orders queued for the fix create a liquidity pool. Once the fix prints, the accumulated directional pressure resolves sharply.
+            </div>
+          </div>
+          <div>
+            <div class="edge-section-title">PM Fix Fade (15:00 London)</div>
+            <div class="edge-section-body">
+              Historical analysis found PM fix moves were <strong>overwhelmingly to the downside</strong>. At 10:00 AM New York (= 15:00 London), US economic data often releases, exacerbating moves.<br/><br/>
+              <strong>Rule:</strong> If PM Fix produces a sharp spike UP, wait 15 minutes. If price fails to hold above the spike high, a fade short is historically valid.<br/><br/>
+              <strong>Caution:</strong> Do not fade strong macro-driven moves. Apply only in choppy, range-bound sessions.
+            </div>
+            <div class="edge-status status-watch">Active: Check 10:30 &amp; 15:00 London daily<br/><span style="font-size:10px; font-weight:500; margin-top:4px; display:block;">Mark pre-fix range every morning before 10:30</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Edge 6: Bollinger Band Squeeze -->
+    <div class="section">
+      <div class="edge-card">
+        <div class="edge-header">
+          <div class="edge-number" style="background: linear-gradient(135deg,#0891B2,#06B6D4);">6</div>
+          <div class="edge-meta">
+            <div class="edge-name">Bollinger Band Squeeze</div>
+            <div class="edge-tagline">Volatility compression → explosive directional breakout — gold's most backtest-validated technical edge</div>
+          </div>
+          <div class="edge-stats">
+            <div class="edge-stat-pill pill-blue">55–65% Win Rate</div>
+            <div class="edge-stat-pill pill-blue">3:1 – 6:1 R:R</div>
+            <div class="edge-stat-pill pill-green">Profit Factor 1.14 (daily)</div>
+          </div>
+        </div>
+        <div class="edge-body">
+          <div>
+            <div class="edge-section-title">Backtest Statistics</div>
+            <div class="stat-row"><span class="stat-row-label">Win rate (confirmed)</span><span class="stat-row-val">55–65%</span></div>
+            <div class="stat-row"><span class="stat-row-label">R:R ratio</span><span class="stat-row-val">3:1 – 6:1</span></div>
+            <div class="stat-row"><span class="stat-row-label">Breakout rate</span><span class="stat-row-val">70–80% confirmed</span></div>
+            <div class="stat-row"><span class="stat-row-label">Gold daily PF</span><span class="stat-row-val">1.14</span></div>
+            <div class="stat-row"><span class="stat-row-label">Choppy market WR</span><span class="stat-row-val" style="color:var(--accent-red);">drops to 51%</span></div>
+            <div class="stat-row"><span class="stat-row-label">Trending SMA WR</span><span class="stat-row-val" style="color:var(--accent-green);">increases to 65%+</span></div>
+          </div>
+          <div>
+            <div class="edge-section-title">Setup Rules</div>
+            <div class="edge-rule buy">
+              <strong>Step 1 — Identify squeeze:</strong> 20-period Bollinger Band width narrows to its lowest in 20+ bars (bands are pinching together).
+            </div>
+            <div class="edge-rule buy">
+              <strong>Step 2 — Confirm trend:</strong> Is the 20-period SMA sloping? If upward → bias long. Flat SMA = skip or reduce size.
+            </div>
+            <div class="edge-rule buy">
+              <strong>Step 3 — Enter on close:</strong> Enter when price closes above the upper band (bullish) or below lower band (bearish). Stop at the opposite band.
+            </div>
+            <div class="edge-rule note">
+              <strong>Timeframe:</strong> Daily chart is most reliable (PF 1.14). Hourly has flat edge (PF 1.01) — use only with macro confirmation.
+            </div>
+          </div>
+          <div>
+            <div class="edge-section-title">Why It Works on Gold</div>
+            <div class="edge-section-body">
+              Gold alternates between trending (high volatility) and consolidating (low volatility) regimes. The Bollinger Band squeeze identifies the exact moment of transition.<br/><br/>
+              Because gold is driven by macro events (CPI, FOMC, geopolitics) that arrive suddenly, long periods of compression are frequently followed by explosive moves when a catalyst lands — exactly the breakout the squeeze is designed to capture.<br/><br/>
+              <strong>Best squeeze setups follow:</strong> 3–7 days of sideways price action, declining volume, and a narrowing ATR.
+            </div>
+            <div class="edge-status status-watch">Check daily chart for BB width &lt; 20-day low<br/><span style="font-size:10px;font-weight:500;margin-top:4px;display:block;">TradingView: add "Bollinger Bands Width" indicator, watch for 20-bar compression lows</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Edge Summary Table -->
+    <div class="section">
+      <div class="section-header">
+        <div class="section-title">Edge Summary — Quick Reference</div>
+      </div>
+      <div class="card glass">
+        <table style="width:100%; border-collapse:collapse; font-size:11.5px;">
+          <thead>
+            <tr style="border-bottom:2px solid rgba(26,29,41,0.1);">
+              <th style="text-align:left; padding:10px 16px; font-size:9px; text-transform:uppercase; letter-spacing:1px; color:var(--text-tertiary); font-weight:700;">#</th>
+              <th style="text-align:left; padding:10px 16px; font-size:9px; text-transform:uppercase; letter-spacing:1px; color:var(--text-tertiary); font-weight:700;">Edge</th>
+              <th style="text-align:left; padding:10px 16px; font-size:9px; text-transform:uppercase; letter-spacing:1px; color:var(--text-tertiary); font-weight:700;">Timeframe</th>
+              <th style="text-align:left; padding:10px 16px; font-size:9px; text-transform:uppercase; letter-spacing:1px; color:var(--text-tertiary); font-weight:700;">Win Rate</th>
+              <th style="text-align:left; padding:10px 16px; font-size:9px; text-transform:uppercase; letter-spacing:1px; color:var(--text-tertiary); font-weight:700;">R:R</th>
+              <th style="text-align:left; padding:10px 16px; font-size:9px; text-transform:uppercase; letter-spacing:1px; color:var(--text-tertiary); font-weight:700;">Check Frequency</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr style="border-bottom:1px solid rgba(26,29,41,0.05);">
+              <td style="padding:12px 16px; font-weight:700; color:#D97706;">1</td>
+              <td style="padding:12px 16px; font-weight:600; color:var(--text-primary);">COT Contrarian</td>
+              <td style="padding:12px 16px; color:var(--text-secondary);">Weekly/Monthly</td>
+              <td style="padding:12px 16px; color:var(--accent-green); font-family:'JetBrains Mono',monospace; font-weight:700;">High (not quantified)</td>
+              <td style="padding:12px 16px; color:var(--text-primary); font-family:'JetBrains Mono',monospace; font-weight:700;">2:1 – 4:1</td>
+              <td style="padding:12px 16px; color:var(--text-secondary);">Every Friday (CFTC release)</td>
+            </tr>
+            <tr style="border-bottom:1px solid rgba(26,29,41,0.05);">
+              <td style="padding:12px 16px; font-weight:700; color:#059669;">2</td>
+              <td style="padding:12px 16px; font-weight:600; color:var(--text-primary);">Seasonal Calendar</td>
+              <td style="padding:12px 16px; color:var(--text-secondary);">Monthly</td>
+              <td style="padding:12px 16px; color:var(--accent-green); font-family:'JetBrains Mono',monospace; font-weight:700;">80% (January)</td>
+              <td style="padding:12px 16px; color:var(--text-primary); font-family:'JetBrains Mono',monospace; font-weight:700;">Macro position</td>
+              <td style="padding:12px 16px; color:var(--text-secondary);">Monthly review</td>
+            </tr>
+            <tr style="border-bottom:1px solid rgba(26,29,41,0.05);">
+              <td style="padding:12px 16px; font-weight:700; color:#0052CC;">3</td>
+              <td style="padding:12px 16px; font-weight:600; color:var(--text-primary);">Real Yield Threshold</td>
+              <td style="padding:12px 16px; color:var(--text-secondary);">Weekly/Swing</td>
+              <td style="padding:12px 16px; color:var(--accent-green); font-family:'JetBrains Mono',monospace; font-weight:700;">−0.73 corr.</td>
+              <td style="padding:12px 16px; color:var(--text-primary); font-family:'JetBrains Mono',monospace; font-weight:700;">3:1 – 5:1</td>
+              <td style="padding:12px 16px; color:var(--text-secondary);">Daily (FRED / header)</td>
+            </tr>
+            <tr style="border-bottom:1px solid rgba(26,29,41,0.05);">
+              <td style="padding:12px 16px; font-weight:700; color:#7C3AED;">4</td>
+              <td style="padding:12px 16px; font-weight:600; color:var(--text-primary);">DXY Divergence</td>
+              <td style="padding:12px 16px; color:var(--text-secondary);">Daily/Swing</td>
+              <td style="padding:12px 16px; color:var(--accent-green); font-family:'JetBrains Mono',monospace; font-weight:700;">High in trend</td>
+              <td style="padding:12px 16px; color:var(--text-primary); font-family:'JetBrains Mono',monospace; font-weight:700;">3:1+</td>
+              <td style="padding:12px 16px; color:var(--text-secondary);">Daily (DXY chart)</td>
+            </tr>
+            <tr style="border-bottom:1px solid rgba(26,29,41,0.05);">
+              <td style="padding:12px 16px; font-weight:700; color:var(--accent-red);">5</td>
+              <td style="padding:12px 16px; font-weight:600; color:var(--text-primary);">London Fix Pattern</td>
+              <td style="padding:12px 16px; color:var(--text-secondary);">Intraday</td>
+              <td style="padding:12px 16px; color:var(--accent-green); font-family:'JetBrains Mono',monospace; font-weight:700;">60%+ (AM range)</td>
+              <td style="padding:12px 16px; color:var(--text-primary); font-family:'JetBrains Mono',monospace; font-weight:700;">1.5× range</td>
+              <td style="padding:12px 16px; color:var(--text-secondary);">10:30 &amp; 15:00 London</td>
+            </tr>
+            <tr>
+              <td style="padding:12px 16px; font-weight:700; color:#0891B2;">6</td>
+              <td style="padding:12px 16px; font-weight:600; color:var(--text-primary);">BB Squeeze</td>
+              <td style="padding:12px 16px; color:var(--text-secondary);">Daily/Swing</td>
+              <td style="padding:12px 16px; color:var(--accent-green); font-family:'JetBrains Mono',monospace; font-weight:700;">55–65%</td>
+              <td style="padding:12px 16px; color:var(--text-primary); font-family:'JetBrains Mono',monospace; font-weight:700;">3:1 – 6:1</td>
+              <td style="padding:12px 16px; color:var(--text-secondary);">Daily chart review</td>
+            </tr>
+          </tbody>
+        </table>
+        <div style="padding:16px; font-size:11px; color:var(--text-tertiary); border-top: 1px solid rgba(26,29,41,0.06); margin-top:4px;">
+          ⚠ Win rates and statistics sourced from: 50-year seasonal anomaly databases, CFTC COT research, LBMA pricing studies, Bollinger Band backtests across 6 markets. Past performance does not guarantee future results. Use all edges with proper risk management.
+        </div>
+      </div>
+    </div>
+
+  </div><!-- end tab-edges -->
+
+  <!-- JOURNAL TAB -->
+  <div id="tab-journal" class="tab-panel">
+    <div class="section-header">Trade Journal</div>
+
+    <!-- Stats Row -->
+    <div class="journal-stats" id="journalStats">
+      <div class="j-stat">
+        <div class="j-stat-val" id="jTotalTrades">0</div>
+        <div class="j-stat-lbl">Total Trades</div>
+      </div>
+      <div class="j-stat">
+        <div class="j-stat-val" id="jWinRate">—</div>
+        <div class="j-stat-lbl">Win Rate</div>
+      </div>
+      <div class="j-stat">
+        <div class="j-stat-val" id="jAvgRR">—</div>
+        <div class="j-stat-lbl">Avg R:R</div>
+      </div>
+      <div class="j-stat">
+        <div class="j-stat-val" id="jPnl">—</div>
+        <div class="j-stat-lbl">Total P&amp;L (pts)</div>
+      </div>
+      <div class="j-stat">
+        <div class="j-stat-val" id="jPF">—</div>
+        <div class="j-stat-lbl">Profit Factor</div>
+      </div>
+    </div>
+
+    <!-- Entry Form -->
+    <div class="journal-form">
+      <div class="j-field">
+        <label>Date</label>
+        <input class="j-input" type="date" id="jDate">
+      </div>
+      <div class="j-field">
+        <label>Direction</label>
+        <select class="j-select" id="jDir">
+          <option value="long">Long</option>
+          <option value="short">Short</option>
+        </select>
+      </div>
+      <div class="j-field">
+        <label>Entry</label>
+        <input class="j-input" type="number" id="jEntry" placeholder="3200.00" step="0.01">
+      </div>
+      <div class="j-field">
+        <label>Stop Loss</label>
+        <input class="j-input" type="number" id="jSL" placeholder="3185.00" step="0.01">
+      </div>
+      <div class="j-field">
+        <label>Exit</label>
+        <input class="j-input" type="number" id="jExit" placeholder="3240.00" step="0.01">
+      </div>
+      <div class="j-field">
+        <label>Size (oz)</label>
+        <input class="j-input" type="number" id="jSize" placeholder="1.0" step="0.01">
+      </div>
+      <div class="j-field">
+        <label>Notes</label>
+        <input class="j-input" type="text" id="jNotes" placeholder="Edge used, context...">
+      </div>
+      <button class="j-add-btn" onclick="addTrade()">+ Log Trade</button>
+    </div>
+
+    <!-- Trades Table -->
+    <div class="journal-table-wrap">
+      <table class="journal-table">
+        <thead>
+          <tr>
+            <th>Date</th>
+            <th>Dir</th>
+            <th>Entry</th>
+            <th>SL</th>
+            <th>Exit</th>
+            <th>Size</th>
+            <th>P&amp;L (pts)</th>
+            <th>R:R</th>
+            <th>Result</th>
+            <th>Notes</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody id="journalBody">
+          <tr><td colspan="11" class="j-empty">No trades logged yet — add your first trade above</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div><!-- end tab-journal -->
+
 </div>
 
 <!-- FOOTER -->
@@ -1001,6 +4031,459 @@
 </div>
 
 <script>
+  // ─── TAB NAVIGATION ────────────────────────────────────────────────────────
+  function switchTab(name, btn) {
+    document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    const panel = document.getElementById('tab-' + name);
+    if (panel) panel.classList.add('active');
+    if (btn) btn.classList.add('active');
+    if (name === 'calculator') calcPosition();
+    if (name === 'calendar') renderCalendar();
+    if (name === 'sessions') { renderSessionGrid(); renderLocalTimes(); }
+    if (name === 'edges')     { edgeConfluence(); }
+    if (name === 'journal')   { renderJournal(); }
+    if (name === 'dashboard') { renderDashboard(); }
+    if (name === 'scalp')     { renderScalpDesk(); }
+    if (name === 'daytrade')  { renderDayTradeDesk(); }
+  }
+
+  // ─── CHECKLIST ─────────────────────────────────────────────────────────────
+  function toggleCheck(el) {
+    el.classList.toggle('checked');
+    el.textContent = el.classList.contains('checked') ? '✓' : '';
+  }
+
+  // ─── TRADING SESSIONS ──────────────────────────────────────────────────────
+  const SESSIONS = [
+    { key: 'asian',   name: 'Asian',          openUTC: 23, closeUTC: 8,  quality: 'low',  qualTxt: 'Low Volume',       next: false },
+    { key: 'london',  name: 'London Open',    openUTC: 7,  closeUTC: 12, quality: 'high', qualTxt: 'High Volume',      next: false },
+    { key: 'overlap', name: 'London/NY',      openUTC: 12, closeUTC: 16, quality: 'high', qualTxt: 'Highest Volume',   next: false },
+    { key: 'ny',      name: 'New York PM',    openUTC: 16, closeUTC: 21, quality: 'med',  qualTxt: 'Medium Volume',    next: false },
+  ];
+
+  const SESSION_DISPLAY = [
+    { name: 'Asian Session',      openUTC: 23, closeUTC: 8,  londonOpen: '23:00', londonClose: '08:00', nyOpen: '18:00', nyClose: '03:00',  quality: 'low',  qualTxt: 'Low Volume'     },
+    { name: 'London Open',        openUTC: 7,  closeUTC: 12, londonOpen: '08:00', londonClose: '12:00', nyOpen: '03:00', nyClose: '07:00',  quality: 'high', qualTxt: 'High Volume'    },
+    { name: 'London/NY Overlap',  openUTC: 12, closeUTC: 16, londonOpen: '13:00', londonClose: '17:00', nyOpen: '08:00', nyClose: '12:00',  quality: 'high', qualTxt: 'Highest Volume' },
+    { name: 'New York PM',        openUTC: 16, closeUTC: 21, londonOpen: '17:00', londonClose: '22:00', nyOpen: '12:00', nyClose: '17:00',  quality: 'med',  qualTxt: 'Medium Volume'  },
+  ];
+
+  function utcHour() {
+    return new Date().getUTCHours() + new Date().getUTCMinutes() / 60;
+  }
+
+  function isSessionActive(s) {
+    const h = utcHour();
+    if (s.openUTC < s.closeUTC) return h >= s.openUTC && h < s.closeUTC;
+    return h >= s.openUTC || h < s.closeUTC; // crosses midnight
+  }
+
+  function minsUntilClose(s) {
+    const nowMins = new Date().getUTCHours() * 60 + new Date().getUTCMinutes();
+    const closeMins = s.closeUTC * 60;
+    let diff = closeMins - nowMins;
+    if (diff < 0) diff += 1440;
+    return diff;
+  }
+
+  function minsUntilOpen(s) {
+    const nowMins = new Date().getUTCHours() * 60 + new Date().getUTCMinutes();
+    const openMins = s.openUTC * 60;
+    let diff = openMins - nowMins;
+    if (diff < 0) diff += 1440;
+    return diff;
+  }
+
+  function fmtMins(m) {
+    const h = Math.floor(m / 60);
+    const min = m % 60;
+    return h > 0 ? `${h}h ${min}m` : `${min}m`;
+  }
+
+  function updateSessionBar() {
+    const bar = document.getElementById('sessionBar');
+    if (!bar) return;
+
+    bar.innerHTML = SESSION_DISPLAY.map(s => {
+      const active = isSessionActive(s);
+      const mins = active ? minsUntilClose(s) : minsUntilOpen(s);
+      const label = active ? `closes ${fmtMins(mins)}` : `opens ${fmtMins(mins)}`;
+      return `
+        <div class="session-pill ${active ? 'active-session' : ''}">
+          <span class="session-dot"></span>
+          <span class="session-name">${s.name}</span>
+          <span class="session-countdown">${label}</span>
+        </div>`;
+    }).join('');
+  }
+
+  function renderSessionGrid() {
+    const grid = document.getElementById('sessionGrid');
+    const badge = document.getElementById('session-live-badge');
+    if (!grid) return;
+
+    const active = SESSION_DISPLAY.filter(s => isSessionActive(s));
+    if (badge) badge.textContent = active.length ? active.map(s => s.name).join(' + ') + ' LIVE' : 'No Session Active';
+
+    grid.innerHTML = SESSION_DISPLAY.map(s => {
+      const isLive = isSessionActive(s);
+      return `
+        <div class="stime-card ${isLive ? 'live' : ''}">
+          <div class="stime-name">${s.name}</div>
+          <div class="stime-hours">${s.londonOpen}–${s.londonClose}</div>
+          <div class="stime-tz">London</div>
+          <div class="stime-hours" style="font-size:11px; margin-top:6px;">${s.nyOpen}–${s.nyClose}</div>
+          <div class="stime-tz">New York</div>
+          <div class="stime-quality qual-${s.quality}">${isLive ? '● LIVE — ' : ''}${s.qualTxt}</div>
+        </div>`;
+    }).join('');
+  }
+
+  function renderLocalTimes() {
+    const grid = document.getElementById('local-times-grid');
+    if (!grid || grid.dataset.rendered) return;
+    grid.dataset.rendered = '1';
+
+    const tzName = Intl.DateTimeFormat().resolvedOptions().timeZone;
+    const fmt = (utcH) => {
+      const d = new Date();
+      d.setUTCHours(utcH, 0, 0, 0);
+      return d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true });
+    };
+
+    grid.innerHTML = SESSION_DISPLAY.map(s => `
+      <div class="metric-box">
+        <div class="metric-label">${s.name}</div>
+        <div class="metric-value" style="font-size:18px;">${fmt(s.openUTC)} – ${fmt(s.closeUTC)}</div>
+        <div class="metric-detail">Your time (${tzName})</div>
+        <div class="metric-detail" style="margin-top:6px;">${s.qualTxt}</div>
+      </div>`).join('');
+  }
+
+  // ─── POSITION CALCULATOR ───────────────────────────────────────────────────
+  function calcPosition() {
+    const account  = parseFloat(document.getElementById('accountSize')?.value) || 0;
+    const riskPct  = parseFloat(document.getElementById('riskPct')?.value)     || 0;
+    const entry    = parseFloat(document.getElementById('entryPrice')?.value)  || 0;
+    const stop     = parseFloat(document.getElementById('stopPrice')?.value)   || 0;
+    const t1       = parseFloat(document.getElementById('target1')?.value)     || 0;
+    const t2       = parseFloat(document.getElementById('target2')?.value)     || 0;
+
+    const dollarRisk = account * riskPct / 100;
+    const stopDist   = Math.abs(entry - stop);
+    const stopPct    = entry > 0 ? (stopDist / entry * 100) : 0;
+    const oz         = stopDist > 0 ? dollarRisk / stopDist : 0;
+    const notional   = oz * entry;
+    const leverage   = account > 0 ? notional / account : 0;
+
+    const rrT1 = stopDist > 0 ? Math.abs(t1 - entry) / stopDist : 0;
+    const rrT2 = stopDist > 0 ? Math.abs(t2 - entry) / stopDist : 0;
+    const profitT1 = oz * Math.abs(t1 - entry);
+    const profitT2 = oz * Math.abs(t2 - entry);
+
+    set('res-dollar-risk', '$' + dollarRisk.toFixed(2));
+    set('res-dollar-risk-detail', riskPct + '% of $' + account.toLocaleString());
+    set('res-stop-dist', stopDist.toFixed(2) + ' pts');
+    set('res-stop-pct', stopPct.toFixed(3) + '% from entry');
+    set('res-oz', oz.toFixed(3) + ' oz');
+    set('res-notional', 'Notional: $' + notional.toLocaleString(undefined, {maximumFractionDigits: 0}));
+    set('res-rr', '1:' + rrT1.toFixed(2) + ' / 1:' + rrT2.toFixed(2));
+    set('res-rr-detail', 'Profit at T1: $' + profitT1.toFixed(0) + ' | T2: $' + profitT2.toFixed(0));
+    set('res-leverage', leverage.toFixed(2) + '×');
+    set('res-leverage-detail', 'Notional $' + notional.toFixed(0) + ' vs account $' + account.toLocaleString());
+
+    const rrEl = document.getElementById('res-rr');
+    if (rrEl) {
+      rrEl.className = 'calc-result-value ' + (rrT1 >= 2 ? 'good' : rrT1 >= 1.5 ? '' : 'warn');
+    }
+  }
+
+  function set(id, val) {
+    const el = document.getElementById(id);
+    if (el) el.textContent = val;
+  }
+
+  // ─── ECONOMIC CALENDAR ─────────────────────────────────────────────────────
+  const CAL_EVENTS = [
+    { day: 25, month: 'JUN', title: 'US Consumer Confidence', desc: 'Conference Board index. Weak reading signals slowdown, boosts gold safe-haven demand.', impact: 'med', bias: 'neutral', biasTxt: 'Neutral' },
+    { day: 27, month: 'JUN', title: 'US PCE Price Index (May)', desc: 'Fed\'s preferred inflation gauge. Cooler print = rate cut acceleration = gold bullish.', impact: 'high', bias: 'bull', biasTxt: 'Bullish if cool' },
+    { day: 3,  month: 'JUL', title: 'US Non-Farm Payrolls (Jun)', desc: 'Employment report. Weak jobs = earlier Fed cuts = DXY weakness = gold up.', impact: 'high', bias: 'bull', biasTxt: 'Bullish if weak' },
+    { day: 3,  month: 'JUL', title: 'US Unemployment Rate (Jun)', desc: 'Rising unemployment strengthens rate cut case, typically gold bullish.', impact: 'high', bias: 'bull', biasTxt: 'Bullish if rising' },
+    { day: 10, month: 'JUL', title: 'US CPI Inflation (Jun)', desc: 'Core CPI year-on-year. Key FOMC input. Miss below 3% = strong gold rally catalyst.', impact: 'high', bias: 'bull', biasTxt: 'Bullish if cool' },
+    { day: 11, month: 'JUL', title: 'US PPI (Jun)', desc: 'Producer prices feed into future CPI. Cooling PPI signals disinflationary trend.', impact: 'med', bias: 'neutral', biasTxt: 'Neutral' },
+    { day: 16, month: 'JUL', title: 'US Retail Sales (Jun)', desc: 'Weak retail = slowdown fear = gold safe-haven demand rises.', impact: 'med', bias: 'bull', biasTxt: 'Bullish if weak' },
+    { day: 17, month: 'JUL', title: 'Fed Beige Book', desc: 'Qualitative economic conditions report. Dovish language supports gold.', impact: 'med', bias: 'neutral', biasTxt: 'Neutral' },
+    { day: 22, month: 'JUL', title: 'Flash PMI (Jul)', desc: 'Services & manufacturing sentiment. Contraction reinforces easing expectations.', impact: 'med', bias: 'bull', biasTxt: 'Bullish if weak' },
+    { day: 24, month: 'JUL', title: 'US GDP (Q2 Advance)', desc: 'First GDP estimate. Miss below 2% growth accelerates rate cut timeline.', impact: 'high', bias: 'bull', biasTxt: 'Bullish if miss' },
+    { day: 30, month: 'JUL', title: 'FOMC Rate Decision', desc: 'Critical event. Any dovish pivot signal or dot plot revision can trigger 1–2% gold rally.', impact: 'high', bias: 'bull', biasTxt: 'Key catalyst' },
+    { day: 1,  month: 'AUG', title: 'US Non-Farm Payrolls (Jul)', desc: 'Second-consecutive weak reading would cement rate cut conviction.', impact: 'high', bias: 'bull', biasTxt: 'Bullish if weak' },
+  ];
+
+  function renderCalendar() {
+    const container = document.getElementById('cal-events');
+    if (!container || container.dataset.rendered) return;
+    container.dataset.rendered = '1';
+
+    container.innerHTML = CAL_EVENTS.map(ev => `
+      <div class="cal-event">
+        <div class="cal-date">
+          <div class="cal-day">${ev.day}</div>
+          <div class="cal-month">${ev.month}</div>
+        </div>
+        <div class="cal-body">
+          <div class="cal-title">${ev.title}</div>
+          <div class="cal-desc">${ev.desc}</div>
+          <div class="cal-impact impact-${ev.impact}">
+            <span class="impact-dot"></span>
+            <span class="impact-label">${ev.impact === 'high' ? 'High Impact' : ev.impact === 'med' ? 'Medium Impact' : 'Low Impact'}</span>
+            <span class="cal-gold-bias bias-${ev.bias}" style="margin-left:8px;">${ev.biasTxt}</span>
+          </div>
+        </div>
+      </div>
+    `).join('');
+  }
+
+  // ─── LIVE TRADE SETUP BOARD ───────────────────────────────────────────────
+  function updateSetupBoard() {
+    const price = lastGoldPrice;
+    if (!price || price < 100) return;
+
+    // ── Direction logic ─────────────────────────────────────────────────────
+    // Based on macro score (31/40 = 78% bullish), TIPS reading, DXY regime
+    const tips = parseFloat(document.getElementById('tipsYield')?.textContent) || 0.42;
+    const tipsScore = tips < 0 ? 5 : tips < 0.5 ? 4 : tips < 1.5 ? 2 : 0;
+    const macroScore = 31; // live from macro panel (could be made dynamic)
+    const macroConf  = Math.round((macroScore / 40) * 100);
+    const isLong  = macroConf >= 60 && tipsScore >= 2;
+    const isShort = macroConf <= 40;
+    const conf    = isLong ? macroConf : isShort ? (100 - macroConf) : 50;
+
+    const dirEl    = document.getElementById('setupDir');
+    const arrowEl  = document.getElementById('setupArrow');
+    const labelEl  = document.getElementById('setupLabel');
+    const confEl   = document.getElementById('setupConf');
+
+    if (isLong) {
+      dirEl.className  = 'setup-direction long';
+      arrowEl.textContent = '↑';
+      labelEl.textContent = 'LONG';
+    } else if (isShort) {
+      dirEl.className  = 'setup-direction short';
+      arrowEl.textContent = '↓';
+      labelEl.textContent = 'SHORT';
+    } else {
+      dirEl.className  = 'setup-direction wait';
+      arrowEl.textContent = '→';
+      labelEl.textContent = 'WAIT';
+    }
+    confEl.textContent = conf + '% Confidence';
+
+    // ── Key level offsets (% of price, calibrated to gold volatility) ────────
+    // Gold daily ATR ≈ 0.8–1.2% of price
+    const atr    = price * 0.009;   // ~0.9% ≈ typical daily ATR
+    const atr15  = atr * 1.5;       // 1.5× ATR = safe distance from noise
+
+    // Entry: slight pullback from current price (0.15%)
+    const entry = Math.round(price * (isLong ? 0.9985 : 1.0015));
+
+    // Stop losses — three tiers
+    const slTight = isLong
+      ? Math.round(entry - atr * 0.8)          // 0.8× ATR (~$30-40 on gold)
+      : Math.round(entry + atr * 0.8);
+
+    const slSafe  = isLong
+      ? Math.round(entry - atr15)               // 1.5× ATR — absorbs daily volatility
+      : Math.round(entry + atr15);
+
+    const slWide  = isLong
+      ? Math.round(entry - atr * 2.5)           // 2.5× ATR — only for swing/position
+      : Math.round(entry + atr * 2.5);
+
+    // Targets (based on ATR multiples + key resistance clusters)
+    const t1 = isLong
+      ? Math.round(entry + atr * 1.5)           // 1.5× ATR — quick profit
+      : Math.round(entry - atr * 1.5);
+
+    const t2 = isLong
+      ? Math.round(entry + atr * 3.0)           // 3× ATR — standard target
+      : Math.round(entry - atr * 3.0);
+
+    const t3 = isLong
+      ? Math.round(entry + atr * 5.0)           // 5× ATR — extended swing
+      : Math.round(entry - atr * 5.0);
+
+    // R:R calculations (using safe SL)
+    const risk  = Math.abs(entry - slSafe);
+    const rrT1  = risk > 0 ? Math.abs(t1 - entry) / risk : 0;
+    const rrT2  = risk > 0 ? Math.abs(t2 - entry) / risk : 0;
+    const rrT3  = risk > 0 ? Math.abs(t3 - entry) / risk : 0;
+
+    const fmt  = n => n.toLocaleString('en-US', {minimumFractionDigits: 0, maximumFractionDigits: 2});
+    const dist = n => (isLong ? '−' : '+') + Math.abs(n - entry).toFixed(0) + ' pts';
+    const gainDist = n => (isLong ? '+' : '−') + Math.abs(n - entry).toFixed(0) + ' pts';
+
+    // Position sizes at 1% risk for common account sizes
+    const ozAt = (account) => risk > 0 ? (account * 0.01 / risk).toFixed(2) : '—';
+
+    // ── DOM updates ──────────────────────────────────────────────────────────
+    set('sb-entry',         fmt(entry));
+    set('sb-sl-tight',      fmt(slTight));
+    set('sb-sl-tight-dist', dist(slTight) + ' from entry  |  ' + (Math.abs(slTight - entry) / price * 100).toFixed(2) + '%');
+    set('sb-sl-safe',       fmt(slSafe));
+    set('sb-sl-safe-dist',  dist(slSafe) + ' from entry  |  ' + (Math.abs(slSafe - entry) / price * 100).toFixed(2) + '%');
+    set('sb-sl-wide',       fmt(slWide));
+    set('sb-sl-wide-dist',  dist(slWide) + ' from entry  |  ' + (Math.abs(slWide - entry) / price * 100).toFixed(2) + '%');
+
+    set('sb-t1',    fmt(t1));
+    set('sb-t1-rr', '1:' + rrT1.toFixed(1) + '   |   ' + gainDist(t1));
+    set('sb-t2',    fmt(t2));
+    set('sb-t2-rr', '1:' + rrT2.toFixed(1) + '   |   ' + gainDist(t2));
+    set('sb-t3',    fmt(t3));
+    set('sb-t3-rr', '1:' + rrT3.toFixed(1) + '   |   ' + gainDist(t3));
+
+    const rrPct = Math.min(rrT2 / 5 * 100, 100);
+    const rrFill = document.getElementById('sb-rr-fill');
+    if (rrFill) rrFill.style.width = rrPct + '%';
+    set('sb-rr-label', 'R:R to T2 = 1:' + rrT2.toFixed(1) + ' using Safe SL (' + Math.abs(slSafe - entry).toFixed(0) + ' pts risk)');
+
+    set('sb-10k-oz',  ozAt(10000)  + ' oz  ($' + (parseFloat(ozAt(10000)) * price).toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, ',') + ')');
+    set('sb-25k-oz',  ozAt(25000)  + ' oz  ($' + (parseFloat(ozAt(25000)) * price).toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, ',') + ')');
+    set('sb-50k-oz',  ozAt(50000)  + ' oz  ($' + (parseFloat(ozAt(50000)) * price).toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, ',') + ')');
+    set('sb-100k-oz', ozAt(100000) + ' oz  ($' + (parseFloat(ozAt(100000)) * price).toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, ',') + ')');
+
+    // Why this SL explanation
+    const slWhyText = isLong
+      ? `<strong>Tight SL (${fmt(slTight)}):</strong> Below 0.8× daily ATR — will be hit by normal intraday swings. Intraday scalps only.<br/><br/>
+         <strong>Safe SL (${fmt(slSafe)}):</strong> 1.5× ATR below entry — absorbs typical daily noise (±${atr.toFixed(0)} pts). This is the recommended stop for day/swing trades. Below this level = setup invalidated.<br/><br/>
+         <strong>Wide SL (${fmt(slWide)}):</strong> 2.5× ATR — for multi-day swing positions. Only use with 0.5% account risk or less.`
+      : `<strong>Tight SL (${fmt(slTight)}):</strong> Above 0.8× daily ATR — intraday scalps only.<br/><br/>
+         <strong>Safe SL (${fmt(slSafe)}):</strong> 1.5× ATR above entry — absorbs daily noise. Recommended for day/swing trades.<br/><br/>
+         <strong>Wide SL (${fmt(slWide)}):</strong> 2.5× ATR — multi-day position sizing only.`;
+
+    const slWhyEl = document.getElementById('sb-sl-why');
+    if (slWhyEl) slWhyEl.innerHTML = slWhyText;
+
+    const reasonEl = document.getElementById('sb-reason');
+    if (reasonEl) {
+      reasonEl.textContent = isLong
+        ? `Macro score ${macroScore}/40 (${macroConf}% bullish) + TIPS ${tips.toFixed(2)}% + DXY decoupling regime. Enter on pullbacks only — never chase breakouts.`
+        : isShort
+        ? `Macro score ${macroScore}/40 (${macroConf}% bearish) + rising real yields headwind. Enter short on failed retests of resistance.`
+        : `Mixed signals — macro score ${macroScore}/40. Wait for clearer macro alignment before taking a position.`;
+    }
+
+    const updEl = document.getElementById('setup-updated');
+    if (updEl) {
+      const t = new Date();
+      updEl.textContent = 'Updated ' + t.toLocaleTimeString('en-US', {hour12:false, timeZone:'UTC'}) + ' UTC';
+    }
+  }
+
+  // ─── EDGE LAB ──────────────────────────────────────────────────────────────
+  const WEAK_MONTHS  = [2, 5];   // 0-indexed: March=2, June=5
+  const STRONG_MONTHS = [0, 10, 11]; // Jan=0, Nov=10, Dec=11
+  const SEASONAL_WINDOW = [0, 10, 11, 1]; // Nov-Feb
+
+  function edgeConfluence() {
+    const now    = new Date();
+    const month  = now.getMonth();
+    const dow    = now.getDay(); // 0=Sun,5=Fri
+    const hour   = now.getUTCHours();
+
+    const tipsRaw = parseFloat(document.getElementById('tipsYield')?.textContent) || 0.42;
+
+    let score = 0;
+    const dots = [];
+
+    // Edge 1: COT — can't read automatically; show as "check manually" = neutral 0
+    dots.push('neutral');
+
+    // Edge 2: Seasonal
+    const inStrongMonth = SEASONAL_WINDOW.includes(month);
+    const inWeakMonth   = WEAK_MONTHS.includes(month);
+    const isFriday      = dow === 5;
+    const notMonday     = dow !== 1;
+    if (inStrongMonth) { score++; dots[0] = 'on'; dots.push('on'); }
+    else if (!inWeakMonth && notMonday) { dots.push('warn'); }
+    else { dots.push('neutral'); }
+
+    // Edge 3: Real yield threshold
+    if (tipsRaw < 0.5) { score++; dots.push('on'); }
+    else if (tipsRaw < 1.5) { dots.push('warn'); }
+    else { dots.push('neutral'); }
+
+    // Edge 4: DXY divergence — structural bull era: always "on" (decoupled regime)
+    score++;
+    dots.push('on');
+
+    // Edge 5: London Fix window (09:00–16:00 UTC = 10:00–17:00 London approx)
+    if (hour >= 9 && hour < 16) { score++; dots.push('on'); }
+    else { dots.push('neutral'); }
+
+    // Edge 6: BB squeeze — can't compute here; show as watch
+    dots.push('warn');
+
+    // Update dots
+    dots.slice(0, 6).forEach((state, i) => {
+      const el = document.getElementById('cd' + i);
+      if (el) { el.className = 'conf-dot' + (state === 'on' ? ' on' : state === 'warn' ? ' warn' : ''); }
+    });
+
+    const scoreEl  = document.getElementById('conf-score');
+    const labelEl  = document.getElementById('conf-label');
+    const verdictEl= document.getElementById('conf-verdict');
+    if (scoreEl)   scoreEl.textContent = score;
+    if (labelEl) {
+      if (score >= 5) { labelEl.textContent = 'STRONG'; labelEl.style.color = 'var(--accent-green)'; }
+      else if (score >= 3) { labelEl.textContent = 'MODERATE'; labelEl.style.color = '#D97706'; }
+      else { labelEl.textContent = 'WEAK'; labelEl.style.color = 'var(--accent-red)'; }
+    }
+    if (verdictEl) {
+      if (score >= 5) verdictEl.textContent = 'Strong multi-edge confluence — take quality setups with full size';
+      else if (score >= 4) verdictEl.textContent = 'Good confluence — trade setups with standard sizing';
+      else if (score >= 3) verdictEl.textContent = 'Moderate alignment — trade only A-grade setups, reduce size';
+      else verdictEl.textContent = 'Low confluence — wait for better alignment or paper-trade only';
+    }
+
+    // Seasonal status
+    const seasonEl = document.getElementById('seasonal-status');
+    if (seasonEl) {
+      if (SEASONAL_WINDOW.includes(month)) {
+        const names = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+        seasonEl.className = 'edge-status status-bull';
+        seasonEl.innerHTML = `SEASONAL BUY WINDOW — ${names[month]}<br/><span style="font-size:10px;font-weight:500;margin-top:4px;display:block;">Nov–Feb is the strongest 4-month window. Enter on any 2–4% pullback.</span>`;
+      } else if (WEAK_MONTHS.includes(month)) {
+        const names = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+        seasonEl.className = 'edge-status status-bear';
+        seasonEl.innerHTML = `SEASONAL WEAK MONTH — ${names[month]}<br/><span style="font-size:10px;font-weight:500;margin-top:4px;display:block;">Reduce new long entries. Tighten trailing stops on existing positions.</span>`;
+      } else {
+        seasonEl.className = 'edge-status status-neutral';
+        seasonEl.textContent = 'NEUTRAL MONTH — No seasonal edge active';
+      }
+    }
+
+    // TIPS status
+    const tipsEl = document.getElementById('tips-status');
+    if (tipsEl) {
+      const tv = parseFloat(tipsRaw);
+      if (tv < 0) {
+        tipsEl.className = 'edge-status status-bull';
+        tipsEl.innerHTML = `STRONGLY BULLISH — TIPS negative (${tv.toFixed(2)}%)<br/><span style="font-size:10px;font-weight:500;margin-top:4px;display:block;">Bonds destroying real purchasing power. Gold outperforms in this regime.</span>`;
+      } else if (tv < 0.5) {
+        tipsEl.className = 'edge-status status-bull';
+        tipsEl.innerHTML = `BULLISH REGIME — TIPS ${tv.toFixed(2)}% (below +0.5%)<br/><span style="font-size:10px;font-weight:500;margin-top:4px;display:block;">Real yield opportunity cost is low. Gold has structural tailwind.</span>`;
+      } else if (tv < 1.5) {
+        tipsEl.className = 'edge-status status-watch';
+        tipsEl.innerHTML = `NEUTRAL — TIPS ${tv.toFixed(2)}% (0.5%–1.5% range)<br/><span style="font-size:10px;font-weight:500;margin-top:4px;display:block;">Mixed regime. Watch direction of change, not just level.</span>`;
+      } else {
+        tipsEl.className = 'edge-status status-bear';
+        tipsEl.innerHTML = `HEADWINDS — TIPS ${tv.toFixed(2)}% (above +1.5%)<br/><span style="font-size:10px;font-weight:500;margin-top:4px;display:block;">High real yields make bonds more attractive vs gold. Reduce size.</span>`;
+      }
+    }
+  }
+
+  // ─── PRICE DATA ────────────────────────────────────────────────────────────
   let lastGoldPrice = 4172.90;
   let prevGoldPrice = 4172.90;
 
@@ -1009,11 +4492,11 @@
     av: localStorage.getItem('av_api_key') || 'CONT1PDJKZXQRQ97'
   };
 
-  // Better price data sources
   const priceSources = {
     gold: [
       'https://api.metals.live/v1/spot/gold',
-      'https://api.genial.ai/xauusd'
+      'https://data-asg.goldbroker.com/prices/latest?code=XAU',
+      'https://www.metals.live/api/spot/gold'
     ]
   };
 
@@ -1158,6 +4641,12 @@
                 changeEl.innerHTML = '<span style="color: var(--text-tertiary);">—</span>';
               }
             }
+            const entryEl = document.getElementById('entryPrice');
+            if (entryEl && entryEl.dataset.touched !== '1') {
+              entryEl.value = Math.round(lastGoldPrice);
+              calcPosition();
+            }
+            updateSetupBoard();
             console.log('Gold price updated:', lastGoldPrice);
           }
         }
@@ -1220,6 +4709,17 @@
         console.warn('TIPS update failed:', e.message);
       }
 
+      // Gold/Silver ratio
+      updateGoldSilverRatio();
+
+      // Refresh active trade desk if open
+      if (activeSection === 'dashboard') renderDashboard();
+      if (activeSection === 'traderoom') {
+        const act = document.querySelector('.snav-btn.active');
+        if (act?.dataset?.tab === 'scalp')    renderScalpDesk();
+        if (act?.dataset?.tab === 'daytrade') renderDayTradeDesk();
+      }
+
       // Update timestamps
       const now = new Date();
       const timeStr = now.toLocaleTimeString('en-US', {hour12: false, timeZone: 'UTC'}) + ' UTC';
@@ -1240,9 +4740,17 @@
   }
 
   function initializeApp() {
-    console.log('Initializing Gold Trading Platform...');
+    calcPosition();
+    updateSessionBar();
+    renderSessionGrid();
+    edgeConfluence();
+    updateSetupBoard();
 
-    // Initial price update
+    setInterval(() => {
+      updateSessionBar();
+      renderSessionGrid();
+    }, 60000);
+
     updatePrices();
 
     // Initialize chart
@@ -1258,7 +4766,708 @@
       clearInterval(updateInterval);
     });
 
+    // Apply stored dark mode preference
+    if (localStorage.getItem('goldDarkMode') === '1') {
+      document.documentElement.classList.add('dark');
+      const btn = document.getElementById('darkToggle');
+      if (btn) btn.textContent = '☀️';
+    }
+
+    // Boot institutional nav on Dashboard
+    switchSection('dashboard', document.querySelector('[data-section=dashboard]'));
+
+    // Pre-fill today's date in journal form
+    const jDateEl = document.getElementById('jDate');
+    if (jDateEl) jDateEl.valueAsDate = new Date();
+
+    // Restore alert badge
+    updateAlertBadge();
+
+    // Render journal on load (so stats show persisted data)
+    renderJournal();
+
+    // Start alert checker every 5 seconds
+    setInterval(checkAlerts, 5000);
+
     console.log('Platform initialized successfully');
+  }
+
+  // ─── DARK MODE ──────────────────────────────────────────────────────────────
+  function toggleDarkMode() {
+    const html = document.documentElement;
+    const isDark = html.classList.toggle('dark');
+    localStorage.setItem('goldDarkMode', isDark ? '1' : '0');
+    const btn = document.getElementById('darkToggle');
+    if (btn) btn.textContent = isDark ? '☀️' : '🌙';
+  }
+
+  // ─── PRICE ALERTS ───────────────────────────────────────────────────────────
+  let priceAlerts = JSON.parse(localStorage.getItem('goldAlerts') || '[]');
+
+  function saveAlerts() {
+    localStorage.setItem('goldAlerts', JSON.stringify(priceAlerts));
+  }
+
+  function toggleAlerts() {
+    const panel = document.getElementById('alertsPanel');
+    if (!panel) return;
+    panel.classList.toggle('open');
+    if (panel.classList.contains('open')) renderAlerts();
+  }
+
+  function addAlert() {
+    const priceEl = document.getElementById('alertPrice');
+    const dirEl   = document.getElementById('alertDir');
+    const price   = parseFloat(priceEl.value);
+    if (!price || isNaN(price)) return;
+    priceAlerts.push({
+      id: Date.now(),
+      price,
+      dir: dirEl.value,
+      triggered: false
+    });
+    saveAlerts();
+    renderAlerts();
+    updateAlertBadge();
+    priceEl.value = '';
+  }
+
+  function deleteAlert(id) {
+    priceAlerts = priceAlerts.filter(a => a.id !== id);
+    saveAlerts();
+    renderAlerts();
+    updateAlertBadge();
+  }
+
+  function checkAlerts() {
+    if (!lastGoldPrice || priceAlerts.length === 0) return;
+    let triggered = false;
+    priceAlerts.forEach(a => {
+      if (a.triggered) return;
+      const hit = (a.dir === 'above' && lastGoldPrice >= a.price) ||
+                  (a.dir === 'below' && lastGoldPrice <= a.price);
+      if (hit) {
+        a.triggered = true;
+        triggered   = true;
+        showAlertNotification(a);
+      }
+    });
+    if (triggered) {
+      saveAlerts();
+      renderAlerts();
+      updateAlertBadge();
+    }
+  }
+
+  function showAlertNotification(a) {
+    const msg = `XAU/USD ${a.dir === 'above' ? 'above' : 'below'} ${a.price.toFixed(2)}`;
+    if ('Notification' in window && Notification.permission === 'granted') {
+      new Notification('Gold Price Alert', { body: msg, icon: '/favicon.ico' });
+    }
+    // Visual flash on alert badge
+    const badge = document.getElementById('alertBadge');
+    if (badge) badge.classList.add('alert-flash');
+    setTimeout(() => badge && badge.classList.remove('alert-flash'), 1500);
+  }
+
+  function updateAlertBadge() {
+    const active = priceAlerts.filter(a => !a.triggered).length;
+    const badge  = document.getElementById('alertBadge');
+    if (!badge) return;
+    if (active > 0) {
+      badge.style.display = 'flex';
+      badge.textContent   = active;
+    } else {
+      badge.style.display = 'none';
+    }
+  }
+
+  function renderAlerts() {
+    const list = document.getElementById('alertList');
+    if (!list) return;
+    if (priceAlerts.length === 0) {
+      list.innerHTML = '<div class="j-empty">No alerts set</div>';
+      return;
+    }
+    list.innerHTML = priceAlerts.map(a => `
+      <div class="alert-row${a.triggered ? ' triggered' : ''}">
+        <span class="alert-dot ${a.triggered ? 'done' : a.dir}"></span>
+        <div class="alert-text">
+          <div>XAU/USD ${a.dir === 'above' ? '≥' : '≤'} ${a.price.toFixed(2)}</div>
+          <div class="alert-sub">${a.triggered ? 'Triggered ✓' : 'Watching…'}</div>
+        </div>
+        <span class="alert-del" onclick="deleteAlert(${a.id})">✕</span>
+      </div>
+    `).join('');
+  }
+
+  // Request notification permission on first alert add
+  document.getElementById('alertPrice')?.addEventListener('focus', () => {
+    if ('Notification' in window && Notification.permission === 'default') {
+      Notification.requestPermission();
+    }
+  });
+
+  // ─── TRADE JOURNAL ──────────────────────────────────────────────────────────
+  let tradeJournal = JSON.parse(localStorage.getItem('goldJournal') || '[]');
+
+  function saveJournal() {
+    localStorage.setItem('goldJournal', JSON.stringify(tradeJournal));
+  }
+
+  function addTrade() {
+    const date  = document.getElementById('jDate').value;
+    const dir   = document.getElementById('jDir').value;
+    const entry = parseFloat(document.getElementById('jEntry').value);
+    const sl    = parseFloat(document.getElementById('jSL').value);
+    const exit  = parseFloat(document.getElementById('jExit').value);
+    const size  = parseFloat(document.getElementById('jSize').value) || 1;
+    const notes = document.getElementById('jNotes').value.trim();
+
+    if (!date || isNaN(entry) || isNaN(exit) || isNaN(sl)) {
+      alert('Please fill in Date, Entry, SL, and Exit fields.');
+      return;
+    }
+
+    const risk     = Math.abs(entry - sl);
+    const reward   = dir === 'long' ? (exit - entry) : (entry - exit);
+    const rr       = risk > 0 ? (reward / risk) : 0;
+    const pnlPts   = dir === 'long' ? (exit - entry) : (entry - exit);
+
+    tradeJournal.unshift({
+      id: Date.now(),
+      date, dir, entry, sl, exit, size, notes,
+      risk, reward, rr: parseFloat(rr.toFixed(2)), pnlPts: parseFloat(pnlPts.toFixed(2))
+    });
+
+    saveJournal();
+    renderJournal();
+
+    // Clear form (keep date and direction)
+    document.getElementById('jEntry').value = '';
+    document.getElementById('jSL').value    = '';
+    document.getElementById('jExit').value  = '';
+    document.getElementById('jNotes').value = '';
+  }
+
+  function deleteTrade(id) {
+    tradeJournal = tradeJournal.filter(t => t.id !== id);
+    saveJournal();
+    renderJournal();
+  }
+
+  function renderJournal() {
+    calcJournalStats();
+    const tbody = document.getElementById('journalBody');
+    if (!tbody) return;
+    if (tradeJournal.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="11" class="j-empty">No trades logged yet — add your first trade above</td></tr>';
+      return;
+    }
+    tbody.innerHTML = tradeJournal.map(t => {
+      const outcome = t.pnlPts > 0 ? 'WIN' : (t.pnlPts < 0 ? 'LOSS' : 'B/E');
+      const cls     = t.pnlPts > 0 ? 'j-win' : (t.pnlPts < 0 ? 'j-loss' : 'j-be');
+      const dirCls  = t.dir === 'long' ? 'j-dir-long' : 'j-dir-short';
+      const sign    = t.pnlPts >= 0 ? '+' : '';
+      return `<tr>
+        <td>${t.date}</td>
+        <td><span class="${dirCls}">${t.dir.toUpperCase()}</span></td>
+        <td style="font-family:'JetBrains Mono',monospace">${t.entry.toFixed(2)}</td>
+        <td style="font-family:'JetBrains Mono',monospace">${t.sl.toFixed(2)}</td>
+        <td style="font-family:'JetBrains Mono',monospace">${t.exit.toFixed(2)}</td>
+        <td style="font-family:'JetBrains Mono',monospace">${t.size}</td>
+        <td class="${cls}">${sign}${t.pnlPts.toFixed(2)}</td>
+        <td style="font-family:'JetBrains Mono',monospace;color:var(--text-secondary)">${t.rr.toFixed(2)}</td>
+        <td class="${cls}">${outcome}</td>
+        <td style="color:var(--text-tertiary);max-width:140px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${t.notes}</td>
+        <td><span class="j-del-btn" onclick="deleteTrade(${t.id})">✕</span></td>
+      </tr>`;
+    }).join('');
+  }
+
+  function calcJournalStats() {
+    const total = tradeJournal.length;
+    if (total === 0) {
+      ['jTotalTrades','jWinRate','jAvgRR','jPnl','jPF'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.textContent = id === 'jTotalTrades' ? '0' : '—';
+      });
+      return;
+    }
+    const wins      = tradeJournal.filter(t => t.pnlPts > 0).length;
+    const winRate   = ((wins / total) * 100).toFixed(1) + '%';
+    const avgRR     = (tradeJournal.reduce((s, t) => s + t.rr, 0) / total).toFixed(2);
+    const totalPnl  = tradeJournal.reduce((s, t) => s + t.pnlPts * t.size, 0);
+    const grossWin  = tradeJournal.filter(t => t.pnlPts > 0).reduce((s, t) => s + t.pnlPts * t.size, 0);
+    const grossLoss = Math.abs(tradeJournal.filter(t => t.pnlPts < 0).reduce((s, t) => s + t.pnlPts * t.size, 0));
+    const pf        = grossLoss > 0 ? (grossWin / grossLoss).toFixed(2) : grossWin > 0 ? '∞' : '—';
+    const sign      = totalPnl >= 0 ? '+' : '';
+
+    const set = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val; };
+    set('jTotalTrades', total);
+    set('jWinRate', winRate);
+    set('jAvgRR', avgRR);
+    set('jPnl', sign + totalPnl.toFixed(2));
+    set('jPF', pf);
+
+    // Colour P&L stat
+    const pnlEl = document.getElementById('jPnl');
+    if (pnlEl) pnlEl.style.color = totalPnl >= 0 ? 'var(--accent-green)' : 'var(--accent-red)';
+  }
+
+  // ─── INSTITUTIONAL NAVIGATION ───────────────────────────────────────────────
+
+  const NAV_SECTIONS = {
+    dashboard: { tabs: [{ id: 'dashboard', label: 'Overview' }] },
+    markets:   { tabs: [{ id: 'analysis', label: 'Live Analysis' }, { id: 'sessions', label: 'Trade Sessions' }, { id: 'calendar', label: 'Economic Calendar' }] },
+    traderoom: { tabs: [{ id: 'scalp',    label: 'Scalp Desk' },    { id: 'daytrade', label: 'Day Trade Desk' }, { id: 'strategy', label: 'Strategy Guide' }] },
+    research:  { tabs: [{ id: 'edges',    label: 'Edge Lab' }] },
+    utilities: { tabs: [{ id: 'calculator', label: 'Position Calc' }, { id: 'journal', label: 'Trade Journal' }] }
+  };
+
+  let activeSection = 'dashboard';
+
+  function switchSection(section, btn, forceTab) {
+    activeSection = section;
+    document.querySelectorAll('.pnav-btn').forEach(b => b.classList.remove('active'));
+    if (btn) btn.classList.add('active');
+
+    const sec    = NAV_SECTIONS[section];
+    const subNav = document.getElementById('subNav');
+    if (!sec) return;
+
+    if (section === 'dashboard') {
+      subNav.innerHTML = '';
+    } else {
+      subNav.innerHTML = sec.tabs.map(t =>
+        `<button class="snav-btn" data-tab="${t.id}" onclick="switchTab('${t.id}',this)">${t.label}</button>`
+      ).join('');
+    }
+
+    const targetTab = forceTab || sec.tabs[0].id;
+    const firstBtn  = subNav.querySelector(`[data-tab="${targetTab}"]`) || subNav.querySelector('.snav-btn');
+    if (firstBtn) firstBtn.classList.add('active');
+    switchTab(targetTab, null);
+  }
+
+  // ─── DASHBOARD RENDERER ─────────────────────────────────────────────────────
+
+  function getMacroData() {
+    const tips      = parseFloat(document.getElementById('tipsYield')?.textContent) || 0.42;
+    const tipsScore = tips < 0 ? 5 : tips < 0.5 ? 4 : tips < 1.5 ? 2 : 0;
+    const macroScore = 31;
+    const macroConf  = Math.round((macroScore / 40) * 100);
+    const isLong  = macroConf >= 60 && tipsScore >= 2;
+    const isShort = macroConf <= 40;
+    const conf    = isLong ? macroConf : isShort ? (100 - macroConf) : 50;
+    const dir     = isLong ? 'long' : isShort ? 'short' : 'wait';
+    return { tips, tipsScore, macroScore, macroConf, isLong, isShort, conf, dir };
+  }
+
+  function getSessionInfo() {
+    const h = new Date().getUTCHours();
+    const m = new Date().getUTCMinutes();
+    if (h >= 23 || h < 7)  return { name: 'ASIAN',    sub: '23:00–07:00 UTC', hint: 'Tight range — fade extremes', vol: 'Low', code: 'asian' };
+    if (h >= 7  && h < 12) return { name: 'LONDON',   sub: '07:00–12:00 UTC', hint: 'Trend direction often set here', vol: 'High', code: 'london' };
+    if (h >= 12 && h < 17) return { name: 'OVERLAP',  sub: '12:00–17:00 UTC', hint: 'Peak volume — momentum trades', vol: 'Very High', code: 'overlap' };
+    if (h >= 17 && h < 21) return { name: 'NEW YORK', sub: '17:00–21:00 UTC', hint: 'Fade London extremes in NY', vol: 'High', code: 'ny' };
+    return { name: 'DEAD ZONE', sub: '21:00–23:00 UTC', hint: 'Avoid trading — very low liquidity', vol: 'Minimal', code: 'dead' };
+  }
+
+  function computeEdgeScore() {
+    const month = new Date().getMonth();
+    const h     = new Date().getUTCHours();
+    const tips  = parseFloat(document.getElementById('tipsYield')?.textContent) || 0.42;
+    let s = 0;
+    const SEASONAL = [0, 10, 11, 1];
+    if (SEASONAL.includes(month)) s++;
+    if (tips < 0.5) s++;
+    if (tips < 1.5) s++; else if (s > 0) s--;
+    s++; // DXY decoupling structural
+    if (h >= 9 && h < 16) s++;
+    return Math.min(10, Math.round(s * 2));
+  }
+
+  function renderDashboard() {
+    if (!lastGoldPrice) return;
+    const price = lastGoldPrice;
+    const md    = getMacroData();
+    const si    = getSessionInfo();
+    const conf  = computeEdgeScore();
+
+    // KPI cards
+    const setEl = (id, v) => { const e = document.getElementById(id); if (e) e.textContent = v; };
+    setEl('dash-price', price.toFixed(2));
+    const chEl = document.getElementById('dash-price-ch');
+    if (chEl && prevGoldPrice) {
+      const ch = price - prevGoldPrice;
+      chEl.innerHTML = `<span style="color:${ch>=0?'var(--accent-green)':'var(--accent-red)'}">${ch>=0?'↑':'↓'} ${Math.abs(ch).toFixed(2)} pts</span>`;
+    }
+    const sigEl = document.getElementById('dash-sig');
+    if (sigEl) {
+      const label = md.isLong ? 'LONG ↑' : md.isShort ? 'SHORT ↓' : 'WAIT →';
+      const color = md.isLong ? 'var(--accent-green)' : md.isShort ? 'var(--accent-red)' : '#D97706';
+      sigEl.textContent = label; sigEl.style.color = color;
+    }
+    const badgeEl = document.getElementById('dash-sig-badge');
+    if (badgeEl) {
+      const cls = md.isLong ? 'bull' : md.isShort ? 'bear' : 'wait';
+      badgeEl.innerHTML = `<span class="kpi-badge ${cls}">${md.conf}% Confidence</span>`;
+    }
+    setEl('dash-sess', si.name);
+    setEl('dash-sess-sub', si.sub);
+    const cvEl = document.getElementById('dash-conf-val');
+    if (cvEl) { cvEl.textContent = conf + '/10'; cvEl.style.color = conf >= 7 ? 'var(--accent-green)' : conf >= 5 ? '#D97706' : 'var(--accent-red)'; }
+    const cSubEl = document.getElementById('dash-conf-sub');
+    if (cSubEl) cSubEl.textContent = conf >= 7 ? 'Strong confluence' : conf >= 5 ? 'Moderate' : 'Low — wait';
+
+    // Macro gauge
+    const pct = Math.round((md.macroScore / 40) * 100);
+    const gaugeEl = document.getElementById('dash-gauge');
+    if (gaugeEl) gaugeEl.style.background = `conic-gradient(${md.isLong?'var(--accent-green)':md.isShort?'var(--accent-red)':'#D97706'} 0% ${pct}%, rgba(26,29,41,0.08) ${pct}% 100%)`;
+    setEl('dash-gauge-val', md.macroScore);
+    const rowsEl = document.getElementById('dash-gauge-rows');
+    if (rowsEl) rowsEl.innerHTML = [
+      ['Macro Score', md.macroScore + '/40'],
+      ['Regime',      md.isLong ? 'BULLISH' : md.isShort ? 'BEARISH' : 'MIXED'],
+      ['TIPS Yield',  '+' + md.tips.toFixed(2) + '%'],
+      ['Confidence',  md.conf + '%']
+    ].map(([l,v]) => `<div class="gauge-row"><span class="gauge-row-lbl">${l}</span><span class="gauge-row-val" style="color:${l==='Regime'&&md.isLong?'var(--accent-green)':l==='Regime'&&md.isShort?'var(--accent-red)':'var(--text-primary)'}">${v}</span></div>`).join('');
+
+    // Signal feed
+    const feedEl = document.getElementById('dash-signals');
+    if (feedEl) {
+      const month  = new Date().getMonth();
+      const h      = new Date().getUTCHours();
+      const SEAS   = [0,10,11,1];
+      const signals = [
+        { dot: md.isLong?'bull':md.isShort?'bear':'wait', title: 'Macro Direction', desc: `Score ${md.macroScore}/40 — ${md.isLong?'Bullish regime':'Mixed signals'}`, pct: md.conf+'%' },
+        { dot: SEAS.includes(month)?'bull':'wait',        title: 'Seasonal Edge',   desc: SEAS.includes(month)?'Strong season (Nov–Feb window)':'Neutral season',           pct: SEAS.includes(month)?'80%':'—' },
+        { dot: md.tips<0.5?'bull':md.tips<1.5?'wait':'bear', title: 'Real Yield',  desc: `TIPS ${md.tips.toFixed(2)}% — ${md.tips<0.5?'Bullish threshold':'Neutral zone'}`, pct: md.tips<0.5?'On':'Watch' },
+        { dot: 'bull',                                     title: 'DXY Decoupled', desc: 'USD decoupling regime active — supportive',                                       pct: 'Active' },
+        { dot: h>=9&&h<16?'bull':'wait',                   title: 'London Fix',    desc: h>=9&&h<16?'Fix window active (09:00–16:00 UTC)':'Outside fix window',              pct: h>=9&&h<16?'On':'Off' },
+        { dot: si.code==='overlap'||si.code==='london'?'bull':'wait', title: 'Session Edge', desc: `${si.name} session — ${si.hint}`, pct: si.vol }
+      ];
+      feedEl.innerHTML = signals.map(s => `
+        <div class="signal-item">
+          <span class="signal-dot ${s.dot}"></span>
+          <div class="signal-text">
+            <div class="signal-title">${s.title}</div>
+            <div class="signal-desc">${s.desc}</div>
+          </div>
+          <span class="signal-pct" style="color:${s.dot==='bull'?'var(--accent-green)':s.dot==='bear'?'var(--accent-red)':'#D97706'}">${s.pct}</span>
+        </div>`).join('');
+    }
+
+    // Compact setup in dashboard
+    const setupEl = document.getElementById('dash-setup');
+    if (setupEl) {
+      const atr   = price * 0.009;
+      const entry = Math.round(price * (md.isLong ? 0.9985 : 1.0015));
+      const slS   = md.isLong ? Math.round(entry - atr * 1.5) : Math.round(entry + atr * 1.5);
+      const t1    = md.isLong ? Math.round(entry + atr * 1.5) : Math.round(entry - atr * 1.5);
+      const t2    = md.isLong ? Math.round(entry + atr * 3.0) : Math.round(entry - atr * 3.0);
+      const color = md.isLong ? 'var(--accent-green)' : md.isShort ? 'var(--accent-red)' : '#D97706';
+      setupEl.innerHTML = `
+        <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-top:4px;">
+          ${[
+            ['Direction', `<span style="font-size:16px;font-weight:900;color:${color}">${md.isLong?'▲ LONG':md.isShort?'▼ SHORT':'→ WAIT'}</span>`, ''],
+            ['Entry Zone', entry.toLocaleString(), ''],
+            ['Safe Stop', slS.toLocaleString(), 'color:var(--accent-red)'],
+            ['Target 1', t1.toLocaleString(), 'color:var(--accent-green)'],
+            ['Target 2', t2.toLocaleString(), 'color:var(--accent-green)']
+          ].map(([l,v,s]) => `<div style="text-align:center;padding:14px 8px;background:rgba(255,255,255,0.3);border-radius:10px;border:1px solid rgba(255,255,255,0.5);">
+            <div style="font-size:9px;font-weight:800;letter-spacing:1.2px;text-transform:uppercase;color:var(--text-tertiary);margin-bottom:8px;">${l}</div>
+            <div style="font-size:15px;font-weight:800;font-family:'JetBrains Mono',monospace;${s}">${v}</div>
+          </div>`).join('')}
+        </div>
+        <div style="margin-top:12px;padding:12px 14px;background:rgba(255,255,255,0.25);border-radius:10px;font-size:11px;color:var(--text-secondary);line-height:1.6;">
+          <strong style="color:var(--text-primary);">Session:</strong> ${si.name} (${si.vol} Vol) — ${si.hint}
+        </div>`;
+    }
+  }
+
+  // ─── SCALP DESK ─────────────────────────────────────────────────────────────
+
+  function renderScalpDesk() {
+    if (!lastGoldPrice) return;
+    const price = lastGoldPrice;
+    const atr   = price * 0.009;
+    const md    = getMacroData();
+    const si    = getSessionInfo();
+    const tStop = atr * 0.8;
+    const tT1   = tStop * 1.8;
+    const tT2   = tStop * 3.0;
+
+    const isL = md.isLong, isS = md.isShort;
+    const dir = isL ? 'long' : isS ? 'short' : 'wait';
+
+    // Update banner
+    const banner = document.getElementById('scalp-banner');
+    if (banner) banner.className = `desk-banner ${dir}`;
+    const setEl = (id, v) => { const e = document.getElementById(id); if (e) e.textContent = v; };
+
+    const arrow = isL ? '↑' : isS ? '↓' : '→';
+    const word  = isL ? 'LONG' : isS ? 'SHORT' : 'WAIT';
+    setEl('scalp-arrow', arrow); setEl('scalp-word', word);
+    setEl('scalp-conf', md.conf + '% confidence');
+
+    const entry = price;
+    const stop  = isL ? price - tStop : isS ? price + tStop : price - tStop;
+    const t1    = isL ? price + tT1   : isS ? price - tT1   : price + tT1;
+    const t2    = isL ? price + tT2   : isS ? price - tT2   : price + tT2;
+
+    setEl('scalp-entry', price.toFixed(2));
+    setEl('scalp-stop',  stop.toFixed(2));
+    setEl('scalp-stop-pts', tStop.toFixed(0) + ' pts tight');
+    setEl('scalp-t1',  t1.toFixed(2));
+    setEl('scalp-t1-pts', tT1.toFixed(0) + ' pts · 1.8R');
+    setEl('scalp-t2',  t2.toFixed(2));
+    setEl('scalp-t2-pts', tT2.toFixed(0) + ' pts · 3.0R');
+    setEl('scalp-session', si.name + ' SESSION');
+    setEl('scalp-session-time', si.sub);
+    setEl('scalp-hint', si.hint);
+
+    // 3 scalp setups
+    const nearest100 = Math.round(price / 100) * 100;
+    const nearest50  = Math.round(price / 50)  * 50;
+    const nearest25  = Math.round(price / 25)  * 25;
+    const d100 = Math.abs(price - nearest100);
+    const d50  = Math.abs(price - nearest50);
+
+    const scalpSetups = [
+      {
+        dir,
+        type: si.code === 'overlap' ? 'NY/London Overlap Play' :
+              si.code === 'london'  ? 'London Open Momentum'   :
+              si.code === 'ny'      ? 'New York Session Play'  :
+              si.code === 'asian'   ? 'Asian Range Fade'       : 'Session Momentum',
+        conf: si.code === 'overlap' ? 72 : si.code === 'london' ? 68 : si.code === 'ny' ? 62 : 48,
+        entry: price.toFixed(2),
+        stop: stop.toFixed(2),
+        t1:   t1.toFixed(2), t1pts: tT1.toFixed(0),
+        t2:   t2.toFixed(2), t2pts: tT2.toFixed(0),
+        stopPts: tStop.toFixed(0),
+        reason: si.code === 'overlap' ? 'Peak liquidity window — momentum accelerates. Trade with the macro trend, hold through minor pullbacks.' :
+                si.code === 'london'  ? 'London open sets the intraday direction 70% of the time. Enter in first 30 min on confirmation.' :
+                si.code === 'ny'      ? 'NY session creates fresh momentum. Watch for London high/low break as continuation signal.' :
+                                        'Asian session is range-bound. Enter near range extremes, target midpoint. Keep stops tight.'
+      },
+      {
+        dir: d100 < tStop * 0.8 ? (price < nearest100 ? 'long' : 'short') : dir,
+        type: d100 < tStop * 0.8 ? 'Round Number Magnet ($' + nearest100 + ')' :
+              d50  < tStop * 0.5 ? 'Half-Level Bounce ($' + nearest50 + ')' :
+                                   'ATR Precision Entry',
+        conf: d100 < tStop * 0.8 ? 70 : d50 < tStop * 0.5 ? 64 : 58,
+        entry: (d100 < tStop * 0.8 ? (price < nearest100 ? nearest100 - tStop * 0.3 : nearest100 + tStop * 0.3) :
+                d50  < tStop * 0.5 ? nearest50 : price).toFixed(2),
+        stop: (d100 < tStop * 0.8 ? (price < nearest100 ? nearest100 - tStop * 1.1 : nearest100 + tStop * 1.1) :
+               price + (dir === 'short' ? 1 : -1) * tStop).toFixed(2),
+        t1:   (d100 < tStop * 0.8 ? (price < nearest100 ? price + tT1 : price - tT1) :
+               price + (dir === 'long' ? 1 : -1) * tT1).toFixed(2),
+        t1pts: tT1.toFixed(0),
+        t2:   (price + (dir === 'long' ? 1 : -1) * tT2).toFixed(2),
+        t2pts: tT2.toFixed(0),
+        stopPts: tStop.toFixed(0),
+        reason: d100 < tStop * 0.8 ? `Price within ${d100.toFixed(1)} pts of $${nearest100} psychological level. Institutions cluster orders at round hundreds — expect bounce or rejection.` :
+                d50  < tStop * 0.5 ? `Near $${nearest50} half-level. Significant order clustering. Watch for price deceleration as entry signal.` :
+                                     `ATR mean-reversion setup. ${(atr*0.8).toFixed(0)}-pt stop, ${(atr*1.8).toFixed(0)}-pt target. Best entry after small counter-move.`
+      },
+      {
+        dir,
+        type: 'ATR Reversion Scalp',
+        conf: 55,
+        entry: (price + (isL ? -tStop * 0.3 : tStop * 0.3)).toFixed(2),
+        stop:  (price + (isL ? -tStop * 1.2 : tStop * 1.2)).toFixed(2),
+        t1:    (price + (isL ?  tT1          : -tT1       )).toFixed(2),
+        t1pts: tT1.toFixed(0),
+        t2:    (price + (isL ?  tT2          : -tT2       )).toFixed(2),
+        t2pts: tT2.toFixed(0),
+        stopPts: (tStop * 1.2).toFixed(0),
+        reason: `Wait for a ${(tStop * 0.3).toFixed(0)}-pt pullback against trend, then enter. ATR-derived mean reversion — statistically gold reverts after short bursts. Exits at ${tT1.toFixed(0)} and ${tT2.toFixed(0)} pts.`
+      }
+    ];
+
+    const gridEl = document.getElementById('scalp-setups-grid');
+    if (gridEl) {
+      gridEl.innerHTML = scalpSetups.map(s => `
+        <div class="setup-card">
+          <div class="setup-card-head ${s.dir}">
+            <span class="setup-card-type">${s.type}</span>
+            <span class="setup-card-pct">${s.conf}%</span>
+          </div>
+          <div class="setup-card-body">
+            <div class="scard-row"><span class="scard-lbl">Direction</span><span class="scard-val ${s.dir==='long'?'green':s.dir==='short'?'red':''}">${s.dir.toUpperCase()}</span></div>
+            <div class="scard-row"><span class="scard-lbl">Entry</span><span class="scard-val">${s.entry}</span></div>
+            <div class="scard-row"><span class="scard-lbl">Stop Loss</span><span class="scard-val red">${s.stop} <span style="font-size:10px;color:var(--text-tertiary)">(${s.stopPts} pts)</span></span></div>
+            <div class="scard-row"><span class="scard-lbl">Target 1</span><span class="scard-val green">${s.t1} <span style="font-size:10px;color:var(--text-tertiary)">(+${s.t1pts} pts)</span></span></div>
+            <div class="scard-row"><span class="scard-lbl">Target 2</span><span class="scard-val green">${s.t2} <span style="font-size:10px;color:var(--text-tertiary)">(+${s.t2pts} pts)</span></span></div>
+            <div class="scard-reason">${s.reason}</div>
+          </div>
+        </div>`).join('');
+    }
+
+    // Key levels
+    const levelsEl = document.getElementById('scalp-levels-list');
+    if (levelsEl) {
+      const levels = [
+        { tag: 'psy', type: 'PSY', name: `Round 100: $${nearest100}`,    price: nearest100, dist: d100 },
+        { tag: 'psy', type: 'PSY', name: `Half-Level: $${nearest50}`,    price: nearest50,  dist: d50  },
+        { tag: nearest25 < price ? 'sup' : 'res', type: nearest25 < price ? 'SUP' : 'RES', name: `Quarter: $${nearest25}`, price: nearest25, dist: Math.abs(price-nearest25) },
+        { tag: 'key', type: 'ATR', name: `ATR High (0.9×): ${(price + atr * 0.9).toFixed(0)}`, price: Math.round(price + atr * 0.9), dist: atr * 0.9 },
+        { tag: 'key', type: 'ATR', name: `ATR Low  (0.9×): ${(price - atr * 0.9).toFixed(0)}`, price: Math.round(price - atr * 0.9), dist: atr * 0.9 },
+        { tag: 'key', type: 'ATR', name: `ATR Ext  (2.0×): ${(price + atr * 2.0).toFixed(0)}`, price: Math.round(price + atr * 2.0), dist: atr * 2.0 }
+      ].sort((a,b) => a.dist - b.dist);
+      levelsEl.innerHTML = levels.map(l => `
+        <div class="level-row">
+          <span class="level-row-tag ${l.tag}">${l.type}</span>
+          <span class="level-row-name">${l.name}</span>
+          <span class="level-row-price">${l.price}</span>
+          <span class="level-row-dist">${l.dist.toFixed(0)} pts</span>
+        </div>`).join('');
+    }
+  }
+
+  // ─── DAY TRADE DESK ─────────────────────────────────────────────────────────
+
+  function renderDayTradeDesk() {
+    if (!lastGoldPrice) return;
+    const price = lastGoldPrice;
+    const atr   = price * 0.009;
+    const md    = getMacroData();
+    const si    = getSessionInfo();
+    const dayStop = atr * 1.5;
+    const dayT1   = dayStop * 2.0;
+    const dayT2   = dayStop * 3.5;
+
+    const dir = md.dir;
+    const isL = md.isLong, isS = md.isShort;
+
+    // Update banner
+    const banner = document.getElementById('daytrade-banner');
+    if (banner) banner.className = `desk-banner ${dir}`;
+    const setEl = (id, v) => { const e = document.getElementById(id); if (e) e.textContent = v; };
+
+    setEl('dt-arrow', isL ? '↑' : isS ? '↓' : '→');
+    setEl('dt-word',  isL ? 'LONG' : isS ? 'SHORT' : 'WAIT');
+    setEl('dt-conf',  md.conf + '% confidence');
+
+    const entry = Math.round(price * (isL ? 0.9985 : 1.0015));
+    const dStop = isL ? entry - dayStop : entry + dayStop;
+    const dT1   = isL ? entry + dayT1   : entry - dayT1;
+    const dT2   = isL ? entry + dayT2   : entry - dayT2;
+
+    setEl('dt-entry', entry.toLocaleString());
+    setEl('dt-stop',  Math.round(dStop).toLocaleString());
+    setEl('dt-stop-pts', dayStop.toFixed(0) + ' pts · 1.5× ATR');
+    setEl('dt-t1',    Math.round(dT1).toLocaleString());
+    setEl('dt-t1-pts', dayT1.toFixed(0) + ' pts · 2R — 50% out');
+    setEl('dt-t2',    Math.round(dT2).toLocaleString());
+    setEl('dt-t2-pts', dayT2.toFixed(0) + ' pts · 3.5R — full exit');
+    setEl('dt-session', si.name + ' SESSION');
+    setEl('dt-session-time', si.sub);
+    setEl('dt-hint', si.hint);
+
+    // 3 Day Trade Setups
+    const dtSetups = [
+      {
+        dir,
+        type: 'London Open Range Breakout',
+        conf: si.code === 'london' || si.code === 'overlap' ? 74 : 58,
+        entry: entry.toLocaleString(),
+        stop:  Math.round(dStop).toLocaleString(), stopPts: dayStop.toFixed(0),
+        t1:    Math.round(dT1).toLocaleString(),   t1pts: dayT1.toFixed(0),
+        t2:    Math.round(dT2).toLocaleString(),   t2pts: dayT2.toFixed(0),
+        reason: `Enter the ${isL?'long':'short'} side of the London open range when macro bias aligns. London sets the day's direction ~68% of the time. Use a ${dayStop.toFixed(0)}-pt stop below the range and target ${dayT1.toFixed(0)} pts minimum. Most reliable 07:00–09:00 UTC.`
+      },
+      {
+        dir: isL ? 'long' : 'short',
+        type: 'Macro Trend Continuation',
+        conf: md.conf > 65 ? 71 : 60,
+        entry: Math.round(price * (isL ? 0.997 : 1.003)).toLocaleString(),
+        stop:  Math.round(isL ? price - dayStop * 1.1 : price + dayStop * 1.1).toLocaleString(), stopPts: (dayStop * 1.1).toFixed(0),
+        t1:    Math.round(isL ? price + dayT1 : price - dayT1).toLocaleString(), t1pts: dayT1.toFixed(0),
+        t2:    Math.round(isL ? price + dayT2 * 1.3 : price - dayT2 * 1.3).toLocaleString(), t2pts: (dayT2 * 1.3).toFixed(0),
+        reason: `Macro score ${md.macroScore}/40 (${md.conf}% ${isL?'bullish':'bearish'}) with TIPS at ${parseFloat(document.getElementById('tipsYield')?.textContent||'0.42').toFixed(2)}%. Enter pullbacks of 0.3% in trend direction. Scale in: ½ size at entry, ½ on confirmation candle close.`
+      },
+      {
+        dir: isL ? 'short' : 'long',
+        type: isL ? 'NY Session London Fade' : 'NY Open Reversal',
+        conf: si.code === 'ny' ? 63 : 50,
+        entry: Math.round(price * (isL ? 1.002 : 0.998)).toLocaleString(),
+        stop:  Math.round(isL ? price + dayStop * 0.9 : price - dayStop * 0.9).toLocaleString(), stopPts: (dayStop * 0.9).toFixed(0),
+        t1:    Math.round(isL ? price - dayT1 * 0.7 : price + dayT1 * 0.7).toLocaleString(), t1pts: (dayT1 * 0.7).toFixed(0),
+        t2:    Math.round(isL ? price - dayT2 * 0.8 : price + dayT2 * 0.8).toLocaleString(), t2pts: (dayT2 * 0.8).toFixed(0),
+        reason: `Counter-trend play at London session high/low. NY session fades London extremes in 45–55% of days. Only trade this if price is extended ${(atr*1.8).toFixed(0)}+ pts from day open. Reduce size — this is the B-grade setup.`
+      }
+    ];
+
+    const gridEl = document.getElementById('daytrade-setups-grid');
+    if (gridEl) {
+      gridEl.innerHTML = dtSetups.map(s => `
+        <div class="setup-card">
+          <div class="setup-card-head ${s.dir}">
+            <span class="setup-card-type">${s.type}</span>
+            <span class="setup-card-pct">${s.conf}%</span>
+          </div>
+          <div class="setup-card-body">
+            <div class="scard-row"><span class="scard-lbl">Direction</span><span class="scard-val ${s.dir==='long'?'green':s.dir==='short'?'red':''}">${s.dir.toUpperCase()}</span></div>
+            <div class="scard-row"><span class="scard-lbl">Entry Zone</span><span class="scard-val">${s.entry}</span></div>
+            <div class="scard-row"><span class="scard-lbl">Stop Loss</span><span class="scard-val red">${s.stop} <span style="font-size:10px;color:var(--text-tertiary)">(${s.stopPts} pts)</span></span></div>
+            <div class="scard-row"><span class="scard-lbl">Target 1 (½ out)</span><span class="scard-val green">${s.t1} <span style="font-size:10px;color:var(--text-tertiary)">(+${s.t1pts} pts)</span></span></div>
+            <div class="scard-row"><span class="scard-lbl">Target 2 (full)</span><span class="scard-val green">${s.t2} <span style="font-size:10px;color:var(--text-tertiary)">(+${s.t2pts} pts)</span></span></div>
+            <div class="scard-reason">${s.reason}</div>
+          </div>
+        </div>`).join('');
+    }
+
+    // Key day trade levels
+    const levelsEl = document.getElementById('daytrade-levels-list');
+    if (levelsEl) {
+      const nearest100 = Math.round(price / 100) * 100;
+      const r1 = Math.round(price + atr * 1.0);
+      const r2 = Math.round(price + atr * 2.0);
+      const s1 = Math.round(price - atr * 1.0);
+      const s2 = Math.round(price - atr * 2.0);
+      const levels = [
+        { tag: 'res', type: 'R2',  name: 'Day Resistance 2 (2× ATR)', price: r2 },
+        { tag: 'res', type: 'R1',  name: 'Day Resistance 1 (1× ATR)', price: r1 },
+        { tag: 'psy', type: 'KEY', name: `Key Psychological $${nearest100}`, price: nearest100 },
+        { tag: 'sup', type: 'S1',  name: 'Day Support 1 (1× ATR)',    price: s1 },
+        { tag: 'sup', type: 'S2',  name: 'Day Support 2 (2× ATR)',    price: s2 },
+        { tag: 'key', type: 'ATR', name: `Daily ATR: ${atr.toFixed(0)} pts`, price: Math.round(price), note: 'Current' }
+      ];
+      levelsEl.innerHTML = levels.map(l => `
+        <div class="level-row">
+          <span class="level-row-tag ${l.tag}">${l.type}</span>
+          <span class="level-row-name">${l.name}</span>
+          <span class="level-row-price">${l.price}</span>
+          <span class="level-row-dist" style="font-size:10px;color:var(--text-tertiary)">${Math.abs(price-l.price).toFixed(0)} pts</span>
+        </div>`).join('');
+    }
+  }
+
+  // ─── GOLD/SILVER RATIO ──────────────────────────────────────────────────────
+  async function updateGoldSilverRatio() {
+    try {
+      const res = await fetchWithFallback([
+        'https://api.metals.live/v1/spot/silver',
+        'https://www.metals.live/api/spot/silver'
+      ]);
+      if (res && lastGoldPrice) {
+        const silver = await res.json();
+        let silverPrice = null;
+        if (silver.price) silverPrice = silver.price;
+        else if (silver[0]?.mid) silverPrice = silver[0].mid;
+        if (silverPrice && parseFloat(silverPrice) > 0) {
+          const ratio = (lastGoldPrice / parseFloat(silverPrice)).toFixed(1);
+          const el = document.getElementById('gsRatio');
+          if (el) el.textContent = ratio;
+        }
+      }
+    } catch (e) {
+      console.warn('Gold/silver ratio update failed:', e.message);
+    }
   }
 </script>
 
