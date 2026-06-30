@@ -1993,6 +1993,15 @@
       box-shadow: 0 0 6px rgba(0,166,81,0.7);
       animation: pulse 2s ease infinite;
     }
+    .pnav-live.is-stale .pnav-live-dot {
+      background: #D97706;
+      box-shadow: 0 0 6px rgba(217,119,6,0.7);
+    }
+    .pnav-live.is-offline .pnav-live-dot {
+      background: #DC2626;
+      box-shadow: 0 0 6px rgba(220,38,38,0.7);
+      animation: none;
+    }
     .pnav-live-label {
       font-size: 9px;
       font-weight: 800;
@@ -2000,6 +2009,8 @@
       text-transform: uppercase;
       color: rgba(255,255,255,0.3);
     }
+    .pnav-live.is-stale .pnav-live-label { color: rgba(217,119,6,0.9); }
+    .pnav-live.is-offline .pnav-live-label { color: rgba(220,38,38,0.9); }
 
     .sub-nav {
       background: #111827;
@@ -2346,16 +2357,16 @@
     <div class="price-ticker">
       <div class="ticker-item">
         <div class="ticker-label">XAU/USD</div>
-        <div class="ticker-value" id="goldPrice">4,172.90</div>
+        <div class="ticker-value" id="goldPrice">…</div>
         <div class="ticker-change" id="goldChange" style="color: var(--text-tertiary);">—</div>
       </div>
       <div class="ticker-item">
         <div class="ticker-label">DXY Index</div>
-        <div class="ticker-value" id="dxyPrice">103.80</div>
+        <div class="ticker-value" id="dxyPrice">…</div>
       </div>
       <div class="ticker-item">
         <div class="ticker-label">TIPS Yield (10Y)</div>
-        <div class="ticker-value" id="tipsYield">+0.42%</div>
+        <div class="ticker-value" id="tipsYield">…</div>
       </div>
       <div class="ticker-item">
         <div class="ticker-label">Gold/Silver</div>
@@ -2419,9 +2430,9 @@
     <span class="pnav-icon">⊞</span> Utilities
   </button>
   <div class="pnav-right">
-    <div class="pnav-live">
-      <div class="pnav-live-dot"></div>
-      <span class="pnav-live-label">Live</span>
+    <div class="pnav-live" id="liveStatus" title="Live data connection status">
+      <div class="pnav-live-dot" id="liveDot"></div>
+      <span class="pnav-live-label" id="liveLabel">Connecting…</span>
     </div>
   </div>
 </nav>
@@ -2965,30 +2976,33 @@
         <div class="section-title">Contingency: Missed Move Scenarios</div>
       </div>
       <div class="card glass">
+        <div style="font-size:12px;color:var(--text-tertiary);margin-bottom:16px;">
+          Structural playbook — for live price-specific levels, see the <strong>Markets → Live Analysis</strong> tab.
+        </div>
         <div class="scenario bullish">
-          <div class="scenario-title">Scenario 1: Re-Entry at R1 (4,190)</div>
+          <div class="scenario-title">Scenario 1: Re-Entry at First Resistance (R1)</div>
           <div class="scenario-text">
-            <strong>Setup:</strong> Market gaps through 4,160 entry level<br/>
-            <strong>Action:</strong> Pullback to 4,185–4,190 creates alt entry<br/>
-            <strong>Stop:</strong> 4,170 (20 pips risk) &nbsp;|&nbsp; <strong>Target:</strong> 4,220 (+30 pips)<br/>
+            <strong>Setup:</strong> Market gaps through your planned entry zone<br/>
+            <strong>Action:</strong> Wait for a pullback to the R1 cluster (~0.5× ATR above price) for an alternate entry<br/>
+            <strong>Stop:</strong> Just below R1 (~0.25× ATR) &nbsp;|&nbsp; <strong>Target:</strong> R2 (~1.5× ATR)<br/>
             <strong>Key Rule:</strong> Only enter on pullback — never chase breakouts
           </div>
         </div>
         <div class="scenario">
-          <div class="scenario-title">Scenario 2: Momentum Play at R2 (4,220)</div>
+          <div class="scenario-title">Scenario 2: Momentum Play at Second Resistance (R2)</div>
           <div class="scenario-text">
-            <strong>Setup:</strong> Strong momentum continuation through 4,190<br/>
-            <strong>Action:</strong> Breakout above 4,220 with volume confirmation<br/>
-            <strong>Stop:</strong> 4,205 (15 pips risk) &nbsp;|&nbsp; <strong>Target:</strong> 4,250 (+30 pips)<br/>
+            <strong>Setup:</strong> Strong momentum continuation through R1<br/>
+            <strong>Action:</strong> Breakout above R2 (~1.5× ATR) with candle-close confirmation<br/>
+            <strong>Stop:</strong> Just below R2 (~0.2× ATR) &nbsp;|&nbsp; <strong>Target:</strong> R3 (~2.5× ATR)<br/>
             <strong>Risk Level:</strong> MODERATE — momentum trade, tighter stops required
           </div>
         </div>
         <div class="scenario bearish">
           <div class="scenario-title">Scenario 3: Patient Entry — Wait for Pullback (OPTIMAL)</div>
           <div class="scenario-text">
-            <strong>Strategy:</strong> Do NOT chase breakouts above 4,220<br/>
-            <strong>Action:</strong> Wait for 4–8 hour pullback to form<br/>
-            <strong>Re-Entry Level:</strong> Buy zone 4,200–4,210<br/>
+            <strong>Strategy:</strong> Do NOT chase extended breakouts<br/>
+            <strong>Action:</strong> Wait for a 4–8 hour pullback to form<br/>
+            <strong>Re-Entry Level:</strong> Buy zone near the prior breakout level<br/>
             <strong>Key Principle:</strong> Patience = superior entries and exits
           </div>
         </div>
@@ -3198,22 +3212,22 @@
 
           <div class="calc-input-group">
             <label class="calc-label" for="entryPrice">Entry Price (USD)</label>
-            <input class="calc-input" type="number" id="entryPrice" value="4160" min="0" step="1" oninput="this.dataset.touched='1';calcPosition()">
+            <input class="calc-input" type="number" id="entryPrice" value="3900" min="0" step="1" oninput="this.dataset.touched='1';calcPosition()">
           </div>
 
           <div class="calc-input-group">
             <label class="calc-label" for="stopPrice">Stop Loss Price (USD)</label>
-            <input class="calc-input" type="number" id="stopPrice" value="4140" min="0" step="1" oninput="calcPosition()">
+            <input class="calc-input" type="number" id="stopPrice" value="3847" min="0" step="1" oninput="this.dataset.touched='1';calcPosition()">
           </div>
 
           <div class="calc-input-group">
             <label class="calc-label" for="target1">Target 1 Price (USD)</label>
-            <input class="calc-input" type="number" id="target1" value="4190" min="0" step="1" oninput="calcPosition()">
+            <input class="calc-input" type="number" id="target1" value="3953" min="0" step="1" oninput="this.dataset.touched='1';calcPosition()">
           </div>
 
           <div class="calc-input-group">
             <label class="calc-label" for="target2">Target 2 Price (USD)</label>
-            <input class="calc-input" type="number" id="target2" value="4220" min="0" step="1" oninput="calcPosition()">
+            <input class="calc-input" type="number" id="target2" value="4005" min="0" step="1" oninput="this.dataset.touched='1';calcPosition()">
           </div>
         </div>
 
@@ -4497,20 +4511,15 @@
   }
 
   // ─── PRICE DATA ────────────────────────────────────────────────────────────
-  let lastGoldPrice = 4172.90;
-  let prevGoldPrice = 4172.90;
+  // Seed with last-known approximate spot; replaced immediately by live feed.
+  let lastGoldPrice = 3900.00;
+  let prevGoldPrice = 3900.00;
+  let goldIsLive    = false;       // true once a live fetch has ever succeeded
+  let lastLiveTs    = 0;           // ms timestamp of last successful gold fetch
 
   const apiKeys = {
     fred: localStorage.getItem('fred_api_key') || '4d4ee6e804ae4c3cbe36e3678391f0ae',
     av: localStorage.getItem('av_api_key') || 'CONT1PDJKZXQRQ97'
-  };
-
-  const priceSources = {
-    gold: [
-      'https://api.metals.live/v1/spot/gold',
-      'https://data-asg.goldbroker.com/prices/latest?code=XAU',
-      'https://www.metals.live/api/spot/gold'
-    ]
   };
 
   let chartAttempts = 0;
@@ -4619,51 +4628,103 @@
     return null;
   }
 
+  // Live status indicator (top-right of primary nav)
+  function setLiveStatus(state) {
+    const wrap  = document.getElementById('liveStatus');
+    const label = document.getElementById('liveLabel');
+    if (!wrap || !label) return;
+    wrap.classList.remove('is-stale', 'is-offline');
+    if (state === 'live')        { label.textContent = 'Live'; }
+    else if (state === 'stale')  { wrap.classList.add('is-stale');   label.textContent = 'Delayed'; }
+    else                         { wrap.classList.add('is-offline'); label.textContent = 'Offline'; }
+  }
+
+  // Gold spot via several independent CORS-enabled, key-free sources.
+  // PAXG (PAX Gold) tracks 1 troy oz of gold ~1:1 and trades on major exchanges
+  // whose REST APIs all send Access-Control-Allow-Origin:* — reliable in-browser.
+  const GOLD_SOURCES = [
+    { url: 'https://api.gold-api.com/price/XAU',                              parse: j => j.price },
+    { url: 'https://api.binance.com/api/v3/ticker/price?symbol=PAXGUSDT',     parse: j => j.price },
+    { url: 'https://api.coinbase.com/v2/prices/PAXG-USD/spot',               parse: j => j.data?.amount },
+    { url: 'https://api.kraken.com/0/public/Ticker?pair=PAXGUSD',            parse: j => j.result?.[Object.keys(j.result||{})[0]]?.c?.[0] },
+    { url: 'https://api.metals.live/v1/spot/gold',                            parse: j => j.price ?? j[0]?.mid }
+  ];
+  const SILVER_SOURCES = [
+    { url: 'https://api.gold-api.com/price/XAG',                              parse: j => j.price },
+    { url: 'https://api.binance.com/api/v3/ticker/price?symbol=XAGUSDT',      parse: j => j.price },
+    { url: 'https://api.metals.live/v1/spot/silver',                          parse: j => j.price ?? j[0]?.mid }
+  ];
+
+  async function fetchSpot(sources) {
+    for (const src of sources) {
+      try {
+        const res = await Promise.race([
+          fetch(src.url),
+          new Promise((_, reject) => setTimeout(() => reject(new Error('timeout')), 4000))
+        ]);
+        if (!res.ok) continue;
+        const json = await res.json();
+        const raw  = src.parse(json);
+        const val  = parseFloat(raw);
+        if (!isNaN(val) && val > 0) return { val, source: src.url };
+      } catch (e) {
+        console.warn(`Spot source failed (${src.url}):`, e.message);
+      }
+    }
+    return null;
+  }
+
   async function updatePrices() {
     try {
-      // Gold Price Update - Multiple sources
+      // Gold Price Update — multiple independent CORS-enabled sources
       try {
-        const goldRes = await fetchWithFallback([
-          'https://api.gold-api.com/price/XAU',
-          'https://api.metals.live/v1/spot/gold',
-          'https://data-asg.goldbroker.com/prices/latest?code=XAU'
-        ]);
+        const spot = await fetchSpot(GOLD_SOURCES);
 
-        if (goldRes) {
-          const gold = await goldRes.json();
-          let price = null;
+        if (spot) {
+          prevGoldPrice = lastGoldPrice;
+          lastGoldPrice = spot.val;
+          goldIsLive    = true;
+          lastLiveTs    = Date.now();
+          setLiveStatus('live');
 
-          // Handle different API response formats
-          if (gold.price) price = gold.price;            // gold-api.com / metals.live object
-          else if (gold.data?.rate) price = gold.data.rate;
-          else if (gold[0]?.mid) price = gold[0].mid;    // metals.live array
+          const priceEl = document.getElementById('goldPrice');
+          if (priceEl) priceEl.textContent = lastGoldPrice.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2});
 
-          if (price) {
-            prevGoldPrice = lastGoldPrice;
-            lastGoldPrice = parseFloat(price);
-            const priceEl = document.getElementById('goldPrice');
-            if (priceEl) priceEl.textContent = lastGoldPrice.toFixed(2);
-
-            const change = (lastGoldPrice - prevGoldPrice).toFixed(2);
-            const changeEl = document.getElementById('goldChange');
-            if (changeEl) {
-              if (parseFloat(change) !== 0) {
-                const isUp = parseFloat(change) > 0;
-                changeEl.innerHTML = `<span class="${isUp ? 'change-up' : 'change-down'}">${isUp ? '↑' : '↓'} ${Math.abs(change)}</span>`;
-              } else {
-                changeEl.innerHTML = '<span style="color: var(--text-tertiary);">—</span>';
-              }
+          const change = (lastGoldPrice - prevGoldPrice).toFixed(2);
+          const changeEl = document.getElementById('goldChange');
+          if (changeEl) {
+            if (parseFloat(change) !== 0) {
+              const isUp = parseFloat(change) > 0;
+              changeEl.innerHTML = `<span class="${isUp ? 'change-up' : 'change-down'}">${isUp ? '↑' : '↓'} ${Math.abs(change)}</span>`;
+            } else {
+              changeEl.innerHTML = '<span style="color: var(--text-tertiary);">—</span>';
             }
-            const entryEl = document.getElementById('entryPrice');
-            if (entryEl && entryEl.dataset.touched !== '1') {
-              entryEl.value = Math.round(lastGoldPrice);
-              calcPosition();
-            }
-            updateSetupBoard();
-            console.log('Gold price updated:', lastGoldPrice);
           }
+          // Auto-seed the position calculator from the live price (until the
+          // user edits a field). Stop/targets are placed at ATR-based offsets
+          // around the live entry so the calc is always sensible (long bias).
+          const entryEl = document.getElementById('entryPrice');
+          if (entryEl && entryEl.dataset.touched !== '1') {
+            const p   = Math.round(lastGoldPrice);
+            const atr = lastGoldPrice * 0.009;
+            entryEl.value = p;
+            const stopEl = document.getElementById('stopPrice');
+            const t1El   = document.getElementById('target1');
+            const t2El   = document.getElementById('target2');
+            if (stopEl && stopEl.dataset.touched !== '1') stopEl.value = Math.round(p - atr * 1.5);
+            if (t1El   && t1El.dataset.touched   !== '1') t1El.value   = Math.round(p + atr * 1.5);
+            if (t2El   && t2El.dataset.touched   !== '1') t2El.value   = Math.round(p + atr * 3.0);
+            calcPosition();
+          }
+          updateSetupBoard();
+          console.log('Gold price updated:', lastGoldPrice, 'via', spot.source);
+        } else {
+          // No source responded — mark stale/offline so the user knows
+          setLiveStatus(goldIsLive ? 'stale' : 'offline');
+          console.warn('All gold price sources failed');
         }
       } catch (e) {
+        setLiveStatus(goldIsLive ? 'stale' : 'offline');
         console.warn('Gold price update failed:', e.message);
       }
 
@@ -5602,20 +5663,11 @@
   // ─── GOLD/SILVER RATIO ──────────────────────────────────────────────────────
   async function updateGoldSilverRatio() {
     try {
-      const res = await fetchWithFallback([
-        'https://api.gold-api.com/price/XAG',
-        'https://api.metals.live/v1/spot/silver'
-      ]);
-      if (res && lastGoldPrice) {
-        const silver = await res.json();
-        let silverPrice = null;
-        if (silver.price) silverPrice = silver.price;
-        else if (silver[0]?.mid) silverPrice = silver[0].mid;
-        if (silverPrice && parseFloat(silverPrice) > 0) {
-          const ratio = (lastGoldPrice / parseFloat(silverPrice)).toFixed(1);
-          const el = document.getElementById('gsRatio');
-          if (el) el.textContent = ratio;
-        }
+      const spot = await fetchSpot(SILVER_SOURCES);
+      if (spot && lastGoldPrice) {
+        const ratio = (lastGoldPrice / spot.val).toFixed(1);
+        const el = document.getElementById('gsRatio');
+        if (el) el.textContent = ratio;
       }
     } catch (e) {
       console.warn('Gold/silver ratio update failed:', e.message);
