@@ -4445,9 +4445,18 @@
     { day: 17, month: 'JUL', title: 'Fed Beige Book', desc: 'Qualitative economic conditions report. Dovish language supports gold.', impact: 'med', bias: 'neutral', biasTxt: 'Neutral' },
     { day: 22, month: 'JUL', title: 'Flash PMI (Jul)', desc: 'Services & manufacturing sentiment. Contraction reinforces easing expectations.', impact: 'med', bias: 'bull', biasTxt: 'Bullish if weak' },
     { day: 24, month: 'JUL', title: 'US GDP (Q2 Advance)', desc: 'First GDP estimate. Miss below 2% growth accelerates rate cut timeline.', impact: 'high', bias: 'bull', biasTxt: 'Bullish if miss' },
-    { day: 30, month: 'JUL', title: 'FOMC Rate Decision', desc: 'Critical event. Any dovish pivot signal or dot plot revision can trigger 1–2% gold rally.', impact: 'high', bias: 'bull', biasTxt: 'Key catalyst' },
-    { day: 1,  month: 'AUG', title: 'US Non-Farm Payrolls (Jul)', desc: 'Second-consecutive weak reading would cement rate cut conviction.', impact: 'high', bias: 'bull', biasTxt: 'Bullish if weak' },
+    { day: 29, month: 'JUL', title: 'FOMC Rate Decision', desc: 'Jul 28–29 meeting; decision Wednesday. Any dovish pivot signal can trigger a 1–2% gold rally.', impact: 'high', bias: 'bull', biasTxt: 'Key catalyst' },
+    { day: 31, month: 'JUL', title: 'US PCE Price Index (Jun)', desc: 'Fed\'s preferred inflation gauge, two days after FOMC. Cooler print extends any dovish move.', impact: 'high', bias: 'bull', biasTxt: 'Bullish if cool' },
+    { day: 7,  month: 'AUG', title: 'US Non-Farm Payrolls (Jul)', desc: 'First Friday. A second consecutive weak reading would cement rate-cut conviction.', impact: 'high', bias: 'bull', biasTxt: 'Bullish if weak' },
+    { day: 12, month: 'AUG', title: 'US CPI Inflation (Jul)', desc: 'Mid-month release. Key input into the September FOMC.', impact: 'high', bias: 'bull', biasTxt: 'Bullish if cool' },
+    { day: 27, month: 'AUG', title: 'Jackson Hole Symposium', desc: 'Fed chair keynote (Aug 27–29). Historically a venue for policy-shift signals — high gold volatility.', impact: 'high', bias: 'neutral', biasTxt: 'Volatility event' },
+    { day: 4,  month: 'SEP', title: 'US Non-Farm Payrolls (Aug)', desc: 'First Friday. Labor softness pulls Fed cut expectations forward.', impact: 'high', bias: 'bull', biasTxt: 'Bullish if weak' },
+    { day: 10, month: 'SEP', title: 'US CPI Inflation (Aug)', desc: 'Final CPI before the September FOMC — the key print of the month.', impact: 'high', bias: 'bull', biasTxt: 'Bullish if cool' },
+    { day: 16, month: 'SEP', title: 'FOMC Rate Decision + Dot Plot', desc: 'Sep 15–16 meeting with updated projections. Dot-plot shifts move gold 1–2%.', impact: 'high', bias: 'bull', biasTxt: 'Key catalyst' },
   ];
+  // NOTE: dates follow the standard release calendar (NFP = first Friday,
+  // CPI ≈ mid-month, FOMC per the Fed's published 2026 schedule). Verify exact
+  // dates each month — agencies occasionally shift them around holidays.
 
   const MONTH_MAP = { JAN:0, FEB:1, MAR:2, APR:3, MAY:4, JUN:5, JUL:6, AUG:7, SEP:8, OCT:9, NOV:10, DEC:11 };
 
@@ -5094,8 +5103,9 @@
     { url: 'https://api.metals.live/v1/spot/gold',                            parse: j => j.price ?? j[0]?.mid }
   ];
   const SILVER_SOURCES = [
+    // Note: no silver token trades on Binance/Kraken spot, so gold-api.com is
+    // the primary keyless CORS source for XAG.
     { url: 'https://api.gold-api.com/price/XAG',                              parse: j => j.price },
-    { url: 'https://api.binance.com/api/v3/ticker/price?symbol=XAGUSDT',      parse: j => j.price },
     { url: 'https://api.metals.live/v1/spot/silver',                          parse: j => j.price ?? j[0]?.mid }
   ];
 
@@ -5172,42 +5182,33 @@
         console.warn('Gold price update failed:', e.message);
       }
 
-      // DXY Update - Frankfurter (free/no-key) primary, Alpha Vantage fallback
+      // DXY Update — official ICE formula from the full 6-currency basket.
+      // DXY = 50.14348112 × EURUSD^-0.576 × USDJPY^0.136 × GBPUSD^-0.119
+      //       × USDCAD^0.091 × USDSEK^0.042 × USDCHF^0.036
+      // Frankfurter (ECB reference rates, no key, CORS) supplies every pair in
+      // one call. ECB rates are daily (~16:00 CET) — accurate level, not tick.
       try {
         let dxyValue = null;
 
-        // Primary: Frankfurter ECB data — EUR/USD, no key, CORS-enabled
-        const frankRes = await fetchWithFallback(['https://api.frankfurter.app/latest?from=EUR&to=USD']);
+        const frankRes = await fetchWithFallback(['https://api.frankfurter.app/latest?from=USD&to=EUR,JPY,GBP,CAD,SEK,CHF']);
         if (frankRes) {
-          const frankData = await frankRes.json();
-          const eurusd = parseFloat(frankData.rates?.USD);
-          if (!isNaN(eurusd) && eurusd > 0) {
-            // DXY ≈ 112.3 / EURUSD (calibrated — EUR is 57.6% of DXY basket)
-            dxyValue = (112.3 / eurusd).toFixed(2);
+          const R = (await frankRes.json()).rates || {};
+          const eurusd = 1 / R.EUR, usdjpy = R.JPY, gbpusd = 1 / R.GBP;
+          const usdcad = R.CAD, usdsek = R.SEK, usdchf = R.CHF;
+          if ([eurusd, usdjpy, gbpusd, usdcad, usdsek, usdchf].every(v => isFinite(v) && v > 0)) {
+            const dxy = 50.14348112
+              * Math.pow(eurusd, -0.576) * Math.pow(usdjpy, 0.136)
+              * Math.pow(gbpusd, -0.119) * Math.pow(usdcad, 0.091)
+              * Math.pow(usdsek, 0.042)  * Math.pow(usdchf, 0.036);
+            if (isFinite(dxy) && dxy > 50 && dxy < 200) dxyValue = dxy.toFixed(2);
           }
         }
 
-        // Fallback: Alpha Vantage USD→EUR rate
-        if (!dxyValue && apiKeys.av) {
-          const dxyRes = await Promise.race([
-            fetch(`https://www.alphavantage.co/query?function=CURRENCY_EXCHANGE_RATE&from_currency=USD&to_currency=EUR&apikey=${apiKeys.av}`),
-            new Promise((_, reject) => setTimeout(() => reject(new Error('timeout')), 4000))
-          ]);
-          if (dxyRes.ok) {
-            const dxy = await dxyRes.json();
-            const usdEurRate = parseFloat(dxy['Realtime Currency Exchange Rate']?.['5. Exchange Rate']);
-            if (!isNaN(usdEurRate) && usdEurRate > 0) {
-              // usdEurRate = USD/EUR, so 1/usdEurRate = EUR/USD; DXY ≈ 112.3 * usdEurRate
-              dxyValue = (112.3 * usdEurRate).toFixed(2);
-            }
-          }
-        }
-
-        if (!dxyValue) dxyValue = '103.80';
-
+        // No fake fallback number: show a dash when there's no live data.
+        // (Macro scoring falls back to a neutral DXY assumption internally.)
         const dxyEl = document.getElementById('dxyPrice');
-        if (dxyEl) dxyEl.textContent = dxyValue;
-        console.log('DXY updated:', dxyValue);
+        if (dxyEl) dxyEl.textContent = dxyValue || '—';
+        if (dxyValue) console.log('DXY (ICE formula) updated:', dxyValue);
       } catch (e) {
         console.warn('DXY update failed:', e.message);
       }
