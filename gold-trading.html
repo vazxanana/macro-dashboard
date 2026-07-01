@@ -8,7 +8,8 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Lora:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
   <script src="https://s3.tradingview.com/tv.js" async></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/lightweight-charts/4.1.0/lightweight-charts.production.min.js"></script>
+  <!-- Lightweight Charts: MUST be the "standalone" build to expose window.LightweightCharts -->
+  <script src="https://unpkg.com/lightweight-charts@4.1.3/dist/lightweight-charts.standalone.production.js"></script>
   <style>
     * {
       margin: 0;
@@ -4829,26 +4830,20 @@
     async function loadCandles() {
       if (!series) return;
       try {
-        const res = await fetchWithFallback(['https://api.binance.com/api/v3/klines?symbol=PAXGUSDT&interval=5m&limit=120']);
-        if (!res) throw new Error('no kline data');
-        const raw = await res.json();
-        if (!Array.isArray(raw) || !raw.length) throw new Error('bad kline data');
-        const lastClose = parseFloat(raw[raw.length - 1][4]);
+        let candles = await fetchGoldKlines();
+        if (!candles || !candles.length) throw new Error('no kline data');
+        // Normalise the proxy series to live gold spot so the lines align
+        const lastClose = candles[candles.length - 1].close;
         offset = (lastGoldPrice && lastClose) ? (lastGoldPrice - lastClose) : 0;
-        const candles = raw.map(k => ({
-          time: Math.floor(k[0] / 1000),
-          open:  +(parseFloat(k[1]) + offset).toFixed(2),
-          high:  +(parseFloat(k[2]) + offset).toFixed(2),
-          low:   +(parseFloat(k[3]) + offset).toFixed(2),
-          close: +(parseFloat(k[4]) + offset).toFixed(2)
-        }));
+        if (offset) candles = candles.map(c => ({ time: c.time, open:+(c.open+offset).toFixed(2), high:+(c.high+offset).toFixed(2), low:+(c.low+offset).toFixed(2), close:+(c.close+offset).toFixed(2) }));
         series.setData(candles);
+        if (chart && chart.timeScale) { try { chart.timeScale().fitContent(); } catch (e) {} }
         const msg = document.getElementById(cfg.msgId);
         if (msg) msg.style.display = 'none';
         updateLevels();
       } catch (e) {
         console.warn(`${cfg.chartId} candles failed:`, e.message);
-        fallback('Live candles unavailable (data source blocked) — setup levels shown below.');
+        fallback('Live candles unavailable in your region — setup levels shown below (chart data blocked).');
         updateLevels();
       }
     }
@@ -4856,9 +4851,9 @@
     async function init() {
       const el = document.getElementById(cfg.chartId);
       if (!el) return;
-      if (typeof LightweightCharts === 'undefined') {
-        if (attempts++ < 15) { setTimeout(init, 400); return; }
-        fallback('Interactive chart unavailable — setup levels shown below.');
+      const ok = await ensureChartLib();
+      if (!ok || typeof LightweightCharts === 'undefined') {
+        fallback('Interactive chart library unavailable — setup levels shown below.');
         updateLevels();
         return;
       }
@@ -4891,6 +4886,59 @@
 
   const scalpChartCtl = createLevelChart({ chartId: 'scalpChart', msgId: 'scalpChartMsg', boxId: 'scalpChartLevels', getLevels: scalpLevels });
   const dayChartCtl   = createLevelChart({ chartId: 'dayChart',   msgId: 'dayChartMsg',   boxId: 'dayChartLevels',   getLevels: dayTradeLevels });
+
+  // Ensure the Lightweight Charts global is available; if the <head> script
+  // didn't provide it, inject a fallback CDN and wait a little longer.
+  let _libPromise = null;
+  function ensureChartLib() {
+    if (typeof LightweightCharts !== 'undefined') return Promise.resolve(true);
+    if (_libPromise) return _libPromise;
+    _libPromise = new Promise((resolve) => {
+      let waited = 0, injected = false;
+      const poll = () => {
+        if (typeof LightweightCharts !== 'undefined') return resolve(true);
+        waited += 300;
+        if (waited >= 2400 && !injected) {
+          injected = true;
+          const s = document.createElement('script');
+          s.src = 'https://cdn.jsdelivr.net/npm/lightweight-charts@4.1.3/dist/lightweight-charts.standalone.production.js';
+          document.head.appendChild(s);
+        }
+        if (waited >= 9000) return resolve(typeof LightweightCharts !== 'undefined');
+        setTimeout(poll, 300);
+      };
+      poll();
+    });
+    return _libPromise;
+  }
+
+  // Gold OHLC via CORS-enabled exchange APIs (PAXG tracks 1oz spot).
+  // Returns [{time(sec), open, high, low, close}] ascending, or null.
+  async function fetchGoldKlines() {
+    // 1) Binance PAXGUSDT 5m
+    try {
+      const r = await fetchWithFallback(['https://api.binance.com/api/v3/klines?symbol=PAXGUSDT&interval=5m&limit=120']);
+      if (r) {
+        const raw = await r.json();
+        if (Array.isArray(raw) && raw.length) {
+          return raw.map(k => ({ time: Math.floor(k[0] / 1000), open: +k[1], high: +k[2], low: +k[3], close: +k[4] }));
+        }
+      }
+    } catch (e) { console.warn('Binance klines failed:', e.message); }
+    // 2) Kraken PAXGUSD 5m (fallback if Binance is geo-blocked)
+    try {
+      const r = await fetchWithFallback(['https://api.kraken.com/0/public/OHLC?pair=PAXGUSD&interval=5']);
+      if (r) {
+        const j = await r.json();
+        const key = j.result && Object.keys(j.result).find(k => k !== 'last');
+        const rows = key ? j.result[key] : null;
+        if (Array.isArray(rows) && rows.length) {
+          return rows.slice(-120).map(k => ({ time: k[0], open: +k[1], high: +k[2], low: +k[3], close: +k[4] }));
+        }
+      }
+    } catch (e) { console.warn('Kraken klines failed:', e.message); }
+    return null;
+  }
 
   async function fetchWithFallback(urls) {
     for (let url of urls) {
