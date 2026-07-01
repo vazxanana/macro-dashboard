@@ -71,6 +71,36 @@
       line-height: 1.5;
     }
 
+    /* ── Institutional terminal refinements ─────────────────────────────── */
+    /* Tabular numerals: every numeric readout keeps fixed-width digits so
+       values align in columns and don't jitter on live updates. */
+    .ticker-value, .kpi-value, .metric-value, .level-price, .desk-det-val,
+    .ry-metric-val, .gauge-ring-val, .setup-row-val, .calc-result-value,
+    .j-stat-val, .clv, .stat-row-val, .timestamp,
+    table, input[type="number"] {
+      font-variant-numeric: tabular-nums;
+      font-feature-settings: "tnum" 1;
+    }
+
+    ::selection { background: rgba(0,82,204,0.22); }
+    html.dark ::selection { background: rgba(212,175,55,0.28); }
+
+    ::-webkit-scrollbar { width: 10px; height: 10px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb {
+      background: rgba(122,129,150,0.35);
+      border-radius: 6px;
+      border: 2px solid transparent;
+      background-clip: content-box;
+    }
+    ::-webkit-scrollbar-thumb:hover { background-color: rgba(122,129,150,0.55); }
+
+    button:focus-visible, input:focus-visible, select:focus-visible {
+      outline: 2px solid var(--accent-blue);
+      outline-offset: 2px;
+    }
+    html.dark button:focus-visible, html.dark input:focus-visible { outline-color: #D4AF37; }
+
     /* GLASS EFFECT - Ultra Transparent */
     .glass {
       background: var(--glass-light);
@@ -2083,6 +2113,39 @@
     .kpi-badge.bear { background: rgba(194,59,51,0.12); color: var(--accent-red); }
     .kpi-badge.wait { background: rgba(217,119,6,0.12); color: #D97706; }
 
+    /* Dashboard setup tiles — dark-aware surfaces (no hardcoded white tints) */
+    .dash-setup-tile {
+      text-align: center; padding: 14px 8px; border-radius: 10px;
+      background: rgba(255,255,255,0.3);
+      border: 1px solid rgba(255,255,255,0.5);
+    }
+    html.dark .dash-setup-tile {
+      background: rgba(255,255,255,0.04);
+      border-color: rgba(255,255,255,0.09);
+    }
+    .dash-setup-session {
+      margin-top: 12px; padding: 12px 14px; border-radius: 10px;
+      background: rgba(255,255,255,0.25);
+      font-size: 11px; color: var(--text-secondary); line-height: 1.6;
+    }
+    html.dark .dash-setup-session { background: rgba(255,255,255,0.04); }
+
+    /* Event risk banner */
+    .risk-banner {
+      display: flex; align-items: center; flex-wrap: wrap; gap: 12px;
+      padding: 12px 18px; margin-bottom: 22px; border-radius: 10px;
+      font-size: 12px; border: 1px solid transparent;
+    }
+    .risk-banner.risk-clear { background: rgba(0,166,81,0.06);  border-color: rgba(0,166,81,0.2); }
+    .risk-banner.risk-elev  { background: rgba(217,119,6,0.08); border-color: rgba(217,119,6,0.3); }
+    .risk-banner.risk-high  { background: rgba(194,59,51,0.08); border-color: rgba(194,59,51,0.35); }
+    .risk-badge { font-weight: 800; letter-spacing: 0.8px; font-size: 11px; white-space: nowrap; }
+    .risk-clear .risk-badge { color: var(--accent-green); }
+    .risk-elev  .risk-badge { color: #D97706; }
+    .risk-high  .risk-badge { color: var(--accent-red); }
+    .risk-events { font-weight: 700; color: var(--text-primary); }
+    .risk-advice { color: var(--text-secondary); }
+
     /* Chart legend */
     .chart-legend { display:flex; gap:14px; flex-wrap:wrap; }
     .cl-item { display:inline-flex; align-items:center; gap:5px; font-size:11px; font-weight:700; color:var(--text-secondary); text-transform:uppercase; letter-spacing:0.5px; }
@@ -2522,6 +2585,12 @@
       </div>
     </div>
 
+    <!-- EVENT RISK GATE -->
+    <div class="risk-banner risk-clear" id="eventRiskBanner">
+      <span class="risk-badge">…</span>
+      <span class="risk-advice">Checking economic calendar…</span>
+    </div>
+
     <!-- Main grid: setup board + sidebar -->
     <div class="dash-grid">
       <!-- Left: compact live setup -->
@@ -2761,8 +2830,8 @@
         </div>
         <div class="metric-box">
           <div class="metric-label">Central Bank Flows</div>
-          <div class="metric-value text-green">9/10</div>
-          <div class="metric-detail">De-dollarization | Institutional buying</div>
+          <div class="metric-value text-green" id="cb-driver-score">—/10</div>
+          <div class="metric-detail" id="cb-driver-detail">Loading…</div>
         </div>
         <div class="metric-box">
           <div class="metric-label">USD Index Correlation</div>
@@ -2785,6 +2854,16 @@
           <div class="metric-detail" id="composite-driver-detail">Loading…</div>
         </div>
       </div>
+    </div>
+
+    <!-- INSTITUTIONAL FLOWS — World Gold Council reference data -->
+    <div class="card glass-premium" id="instFlowsCard">
+      <div style="display:flex;justify-content:space-between;align-items:baseline;flex-wrap:wrap;gap:8px;">
+        <h3 style="margin:0;">Institutional Flows <span style="font-size:11px;font-weight:500;color:var(--text-tertiary)">— central banks &amp; gold ETFs</span></h3>
+        <span id="instFlowsAsOf" style="font-size:10px;color:var(--text-tertiary);"></span>
+      </div>
+      <div class="grid-3" id="instFlowsGrid" style="margin-top:14px;"></div>
+      <div id="instFlowsNote" style="margin-top:12px;font-size:11px;color:var(--text-secondary);line-height:1.6;"></div>
     </div>
 
     <div class="card glass">
@@ -4372,6 +4451,44 @@
 
   const MONTH_MAP = { JAN:0, FEB:1, MAR:2, APR:3, MAY:4, JUN:5, JUL:6, AUG:7, SEP:8, OCT:9, NOV:10, DEC:11 };
 
+  // ─── EVENT RISK GATE ────────────────────────────────────────────────────────
+  // Institutional pre-trade control: flag high-impact releases landing today or
+  // tomorrow. Calendar entries carry dates (not times), so the gate works at
+  // day granularity — today = stand aside near the release, tomorrow = caution.
+  function getEventRisk() {
+    const now   = new Date();
+    const today = new Date(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate());
+    const hits  = { today: [], tomorrow: [] };
+    for (const ev of CAL_EVENTS) {
+      if (ev.impact !== 'high') continue;
+      const d = new Date(now.getUTCFullYear(), MONTH_MAP[ev.month], ev.day);
+      const days = Math.round((d - today) / 86400000);
+      if (days === 0) hits.today.push(ev.title);
+      else if (days === 1) hits.tomorrow.push(ev.title);
+    }
+    if (hits.today.length)    return { level: 'high', label: 'EVENT RISK — TODAY',    events: hits.today,    advice: 'High-impact release today. Stand aside 30 min before/after the print; halve size on any position held through it.' };
+    if (hits.tomorrow.length) return { level: 'elev', label: 'EVENT RISK — TOMORROW', events: hits.tomorrow, advice: 'High-impact release tomorrow. Avoid new swing entries late in the day; keep stops honest.' };
+    return { level: 'clear', label: 'NO EVENT RISK', events: [], advice: 'No high-impact releases within 24h — normal sizing rules apply.' };
+  }
+
+  function renderEventRiskBanner() {
+    const el = document.getElementById('eventRiskBanner');
+    if (!el) return;
+    const r = getEventRisk();
+    el.className = 'risk-banner risk-' + r.level;
+    el.innerHTML =
+      `<span class="risk-badge">${r.level === 'clear' ? '✓' : '⚠'} ${r.label}</span>` +
+      (r.events.length ? `<span class="risk-events">${r.events.join(' · ')}</span>` : '') +
+      `<span class="risk-advice">${r.advice}</span>`;
+  }
+
+  function eventRiskTag() {
+    const r = getEventRisk();
+    if (r.level === 'high') return '  ·  ⚠ HIGH-IMPACT EVENT TODAY — reduce size';
+    if (r.level === 'elev') return '  ·  ⚠ event risk tomorrow';
+    return '';
+  }
+
   function renderCalendar() {
     const container = document.getElementById('cal-events');
     if (!container) return;
@@ -5167,6 +5284,8 @@
     updateAnalysisTab();
     renderCalendar();
     renderSignalTracker();
+    renderEventRiskBanner();
+    renderInstitutionalFlows();
 
     setInterval(() => {
       updateSessionBar();
@@ -5680,6 +5799,58 @@
     set('ry-note', `${ry.regime}. ${ry.biasTxt}. Real yields are gold's #1 fundamental anchor (~-0.8 correlation) — direction leads price.`);
   }
 
+  // ─── INSTITUTIONAL FLOWS (World Gold Council reference data) ───────────────
+  // WGC's Goldhub (gold.org/goldhub/data) publishes these as periodic Excel
+  // releases with no public API, so the latest published figures are embedded
+  // here with an explicit as-of date. Update quarterly from Gold Demand Trends.
+  const WGC_FLOWS = {
+    asOf: 'Data through 2024 full year · update quarterly',
+    source: 'World Gold Council, Gold Demand Trends',
+    cb: {
+      figure: '+1,045t',
+      period: '2024 net purchases',
+      trend: '3rd consecutive year above 1,000t (2022: 1,082t · 2023: 1,037t)',
+      bias: 'bull',
+      score: 5    // contribution to macro score (0-5): sustained 1,000t+ = max
+    },
+    etf: {
+      figure: 'Inflows resumed',
+      period: '2024-25 flows',
+      trend: 'Western ETF flows turned positive in 2024 H2 after 3 years of outflows',
+      bias: 'bull'
+    },
+    note: 'Central-bank demand is the structural floor under gold — EM banks (China, Poland, Türkiye, India) are diversifying reserves away from USD. This is slow-moving allocation flow: it sets the regime, not the day\'s direction.'
+  };
+
+  function renderInstitutionalFlows() {
+    const grid = document.getElementById('instFlowsGrid');
+    const asOf = document.getElementById('instFlowsAsOf');
+    const note = document.getElementById('instFlowsNote');
+    if (!grid) return;
+    const biasChip = b => b === 'bull'
+      ? '<span style="color:var(--accent-green);font-weight:800;">▲ Supportive</span>'
+      : b === 'bear' ? '<span style="color:var(--accent-red);font-weight:800;">▼ Headwind</span>'
+      : '<span style="color:#D97706;font-weight:800;">→ Neutral</span>';
+    grid.innerHTML = `
+      <div class="metric-box">
+        <div class="metric-label">Central Bank Net Purchases</div>
+        <div class="metric-value text-green">${WGC_FLOWS.cb.figure}</div>
+        <div class="metric-detail">${WGC_FLOWS.cb.period} · ${biasChip(WGC_FLOWS.cb.bias)}</div>
+      </div>
+      <div class="metric-box">
+        <div class="metric-label">CB Buying Trend</div>
+        <div class="metric-value" style="font-size:13px;line-height:1.4;padding-top:6px;">${WGC_FLOWS.cb.trend}</div>
+        <div class="metric-detail">Sustained official-sector demand</div>
+      </div>
+      <div class="metric-box">
+        <div class="metric-label">Gold ETF Flows</div>
+        <div class="metric-value" style="font-size:15px;padding-top:4px;">${WGC_FLOWS.etf.figure}</div>
+        <div class="metric-detail">${WGC_FLOWS.etf.trend} · ${biasChip(WGC_FLOWS.etf.bias)}</div>
+      </div>`;
+    if (asOf) asOf.textContent = `${WGC_FLOWS.asOf} · Source: ${WGC_FLOWS.source}`;
+    if (note) note.textContent = WGC_FLOWS.note;
+  }
+
   // Short inline tag describing the current real-yield tailwind/headwind.
   function realYieldTag() {
     if (realYield.level === null) return '';
@@ -5703,10 +5874,11 @@
     const dxyS  = dxy <= 96 ? 10 : dxy <= 100 ? 8 : dxy <= 104 ? 6 : dxy <= 108 ? 4 : 2;
     // Factor 3: Seasonal pattern (Nov/Dec/Jan/Feb strong; Mar/Jun weak)
     const seasS = [10,11,0,1].includes(month) ? 9 : [2,5].includes(month) ? 5 : 7;
-    // Factors 4+5: Structural tailwind (CB de-dollarization + safe-haven demand).
-    // Kept as a moderate FIXED base so the CYCLICAL drivers above (real yields
-    // + DXY) actually determine direction rather than being floored permanently.
-    const cbS   = 5;
+    // Factor 4: Central-bank flows — anchored to the latest WGC published data
+    // (see WGC_FLOWS) rather than a hardcoded assumption. Moderate weight so
+    // the CYCLICAL drivers above still determine direction.
+    const cbS   = WGC_FLOWS.cb.score;
+    // Factor 5: Safe-haven / geopolitical demand.
     const shS   = 4;
     return { score: Math.min(40, tipsS + dxyS + seasS + cbS + shS), tipsS, dxyS, seasS };
   }
@@ -5765,6 +5937,11 @@
     const MONTH_NAMES = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
     const seasDesc = [10,11,0,1].includes(month) ? `${MONTH_NAMES[month]} — Strong seasonal window` : [2,5].includes(month) ? `${MONTH_NAMES[month]} — Weak seasonal window` : `${MONTH_NAMES[month]} — Neutral month`;
     set('seasonal-driver-detail', seasDesc);
+
+    // CB flows driver — anchored to WGC published data (scaled to /10 display)
+    const cbEl = document.getElementById('cb-driver-score');
+    if (cbEl) cbEl.textContent = (WGC_FLOWS.cb.score * 2) + '/10';
+    set('cb-driver-detail', `WGC ${WGC_FLOWS.cb.period}: ${WGC_FLOWS.cb.figure} | De-dollarization flow`);
 
     const compEl = document.getElementById('composite-driver-score');
     if (compEl) { compEl.textContent = score + '/40'; compEl.style.color = compColor; }
@@ -5864,6 +6041,7 @@
   function renderDashboard() {
     if (!lastGoldPrice) return;
     renderRealYieldBanner();
+    renderEventRiskBanner();
     scalpChartCtl.updateLevels();
     const price = lastGoldPrice;
     const md    = getMacroData();
@@ -5951,12 +6129,12 @@
             ['Safe Stop', slS.toLocaleString(), 'color:var(--accent-red)'],
             ['Target 1', t1.toLocaleString(), 'color:var(--accent-green)'],
             ['Target 2', t2.toLocaleString(), 'color:var(--accent-green)']
-          ].map(([l,v,s]) => `<div style="text-align:center;padding:14px 8px;background:rgba(255,255,255,0.3);border-radius:10px;border:1px solid rgba(255,255,255,0.5);">
+          ].map(([l,v,s]) => `<div class="dash-setup-tile">
             <div style="font-size:9px;font-weight:800;letter-spacing:1.2px;text-transform:uppercase;color:var(--text-tertiary);margin-bottom:8px;">${l}</div>
             <div style="font-size:15px;font-weight:800;font-family:'JetBrains Mono',monospace;${s}">${v}</div>
           </div>`).join('')}
         </div>
-        <div style="margin-top:12px;padding:12px 14px;background:rgba(255,255,255,0.25);border-radius:10px;font-size:11px;color:var(--text-secondary);line-height:1.6;">
+        <div class="dash-setup-session">
           <strong style="color:var(--text-primary);">Session:</strong> ${si.name} (${si.vol} Vol) — ${si.hint}
         </div>`;
     }
@@ -6001,7 +6179,7 @@
     setEl('scalp-t2-pts', tT2.toFixed(0) + ' pts · 3.0R');
     setEl('scalp-session', si.name + ' SESSION');
     setEl('scalp-session-time', si.sub);
-    setEl('scalp-hint', si.hint + realYieldTag());
+    setEl('scalp-hint', si.hint + realYieldTag() + eventRiskTag());
 
     // 3 scalp setups
     const nearest100 = Math.round(price / 100) * 100;
@@ -6141,7 +6319,7 @@
     setEl('dt-t2-pts', dayT2.toFixed(0) + ' pts · 3.5R — full exit');
     setEl('dt-session', si.name + ' SESSION');
     setEl('dt-session-time', si.sub);
-    setEl('dt-hint', si.hint + realYieldTag());
+    setEl('dt-hint', si.hint + realYieldTag() + eventRiskTag());
     dayChartCtl.updateLevels();
 
     // 3 Day Trade Setups
