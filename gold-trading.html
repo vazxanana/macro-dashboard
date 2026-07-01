@@ -2082,6 +2082,30 @@
     .kpi-badge.bear { background: rgba(194,59,51,0.12); color: var(--accent-red); }
     .kpi-badge.wait { background: rgba(217,119,6,0.12); color: #D97706; }
 
+    /* Real Yield Engine banner */
+    .ry-banner {
+      display: grid;
+      grid-template-columns: 2fr 1fr 1fr 1.2fr;
+      gap: 20px; align-items: center;
+      padding: 18px 24px; margin-bottom: 22px;
+      border-radius: 14px;
+      background: linear-gradient(135deg, rgba(212,175,55,0.14), rgba(212,175,55,0.04));
+      border: 1px solid rgba(212,175,55,0.35);
+    }
+    html.dark .ry-banner { background: linear-gradient(135deg, rgba(212,175,55,0.16), rgba(212,175,55,0.03)); border-color: rgba(212,175,55,0.3); }
+    .ry-eyebrow { font-size: 9px; font-weight: 800; letter-spacing: 1.4px; text-transform: uppercase; color: #B8860B; margin-bottom: 6px; }
+    .ry-title { font-size: 18px; font-weight: 800; color: var(--text-primary); }
+    .ry-sub { font-size: 11px; font-weight: 600; color: var(--text-tertiary); margin-left: 6px; }
+    .ry-note { font-size: 11px; color: var(--text-secondary); margin-top: 6px; line-height: 1.5; max-width: 340px; }
+    .ry-metric-label { font-size: 9px; font-weight: 800; letter-spacing: 1.2px; text-transform: uppercase; color: var(--text-tertiary); margin-bottom: 5px; }
+    .ry-metric-val { font-size: 22px; font-weight: 800; font-family: 'JetBrains Mono', monospace; color: var(--text-primary); line-height: 1; }
+    .ry-metric-sub { font-size: 10px; color: var(--text-tertiary); margin-top: 4px; }
+    .ry-signal { display: inline-block; padding: 6px 12px; border-radius: 7px; font-size: 13px; font-weight: 800; letter-spacing: 0.3px; }
+    .ry-signal.bull { background: rgba(0,166,81,0.15); color: var(--accent-green); }
+    .ry-signal.bear { background: rgba(194,59,51,0.15); color: var(--accent-red); }
+    .ry-signal.neutral { background: rgba(217,119,6,0.15); color: #D97706; }
+    @media (max-width: 900px) { .ry-banner { grid-template-columns: 1fr 1fr; } }
+
     .dash-grid {
       display: grid;
       grid-template-columns: 1fr 360px;
@@ -2465,6 +2489,28 @@
         <div class="kpi-label">Edge Confluence</div>
         <div class="kpi-value" id="dash-conf-val">—</div>
         <div class="kpi-sub" id="dash-conf-sub">—</div>
+      </div>
+    </div>
+
+    <!-- REAL YIELD ENGINE — master fundamental driver -->
+    <div class="ry-banner" id="ryBanner">
+      <div class="ry-left">
+        <div class="ry-eyebrow">★ Master Fundamental Driver</div>
+        <div class="ry-title">Real Yields <span class="ry-sub">10-Year TIPS (DFII10)</span></div>
+        <div class="ry-note" id="ry-note">Loading real-yield regime…</div>
+      </div>
+      <div class="ry-metric">
+        <div class="ry-metric-label">Level</div>
+        <div class="ry-metric-val" id="ry-level">—</div>
+      </div>
+      <div class="ry-metric">
+        <div class="ry-metric-label">1-Week Trend</div>
+        <div class="ry-metric-val" id="ry-dir">—</div>
+        <div class="ry-metric-sub" id="ry-chg">—</div>
+      </div>
+      <div class="ry-metric">
+        <div class="ry-metric-label">Gold Signal</div>
+        <div class="ry-signal" id="ry-signal">—</div>
       </div>
     </div>
 
@@ -4024,6 +4070,64 @@
     </div>
   </div><!-- end tab-journal -->
 
+  <!-- SIGNAL TRACKER — auto-logged track record of the dashboard's own signals -->
+  <div id="tab-tracker" class="tab-panel">
+    <div class="section-header">Signal Tracker <span style="font-size:11px;font-weight:500;color:var(--text-tertiary)">— auto-logged every time the dashboard's signal flips</span></div>
+
+    <div class="journal-stats" id="trackerStats">
+      <div class="j-stat">
+        <div class="j-stat-val" id="tkTotal">0</div>
+        <div class="j-stat-lbl">Signals Logged</div>
+      </div>
+      <div class="j-stat">
+        <div class="j-stat-val" id="tkWinRate">—</div>
+        <div class="j-stat-lbl">Hit Rate (T1)</div>
+      </div>
+      <div class="j-stat">
+        <div class="j-stat-val" id="tkAvgR">—</div>
+        <div class="j-stat-lbl">Avg R Result</div>
+      </div>
+      <div class="j-stat">
+        <div class="j-stat-val" id="tkOpen">—</div>
+        <div class="j-stat-lbl">Currently Open</div>
+      </div>
+    </div>
+
+    <div class="card glass" style="margin-bottom:16px;">
+      <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;">
+        <div style="font-size:12px;color:var(--text-secondary);line-height:1.6;max-width:640px;">
+          Each row is a setup the dashboard generated. A new signal is logged automatically whenever the
+          primary direction flips (LONG⇄SHORT). Outcomes resolve <strong>live</strong> against price:
+          <span style="color:var(--accent-green);font-weight:700;">WIN</span> if Target&nbsp;1 is hit first,
+          <span style="color:var(--accent-red);font-weight:700;">LOSS</span> if the stop is hit first,
+          <span style="color:#D97706;font-weight:700;">OPEN</span> while in progress.
+        </div>
+        <button class="j-add-btn" style="background:rgba(194,59,51,0.12);color:var(--accent-red);" onclick="clearSignalLog()">Clear Log</button>
+      </div>
+    </div>
+
+    <div class="journal-table-wrap">
+      <table class="journal-table">
+        <thead>
+          <tr>
+            <th>Logged (UTC)</th>
+            <th>Dir</th>
+            <th>Entry</th>
+            <th>Stop</th>
+            <th>Target 1</th>
+            <th>Macro</th>
+            <th>Session</th>
+            <th>Result</th>
+            <th>R</th>
+          </tr>
+        </thead>
+        <tbody id="trackerBody">
+          <tr><td colspan="9" class="j-empty">No signals logged yet — the tracker starts recording as soon as the dashboard produces a directional signal.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div><!-- end tab-tracker -->
+
 </div>
 
 <!-- FOOTER -->
@@ -4049,6 +4153,7 @@
     if (name === 'daytrade')  { renderDayTradeDesk(); }
     if (name === 'analysis')  { updateAnalysisTab(); }
     if (name === 'calendar')  { renderCalendar(); }
+    if (name === 'tracker')   { renderSignalTracker(); }
   }
 
   // ─── CHECKLIST ─────────────────────────────────────────────────────────────
@@ -4773,7 +4878,8 @@
       // fall back to the direct call (works locally / if FRED ever adds CORS).
       try {
         if (apiKeys.fred) {
-          const fredUrl = `https://api.stlouisfed.org/fred/series/observations?series_id=DFII10&api_key=${apiKeys.fred}&limit=1&sort_order=desc&file_type=json`;
+          // Pull ~15 recent daily readings so we can measure the 1-week trend.
+          const fredUrl = `https://api.stlouisfed.org/fred/series/observations?series_id=DFII10&api_key=${apiKeys.fred}&limit=15&sort_order=desc&file_type=json`;
           const tipsRes = await fetchWithFallback([
             `https://corsproxy.io/?url=${encodeURIComponent(fredUrl)}`,
             `https://api.allorigins.win/raw?url=${encodeURIComponent(fredUrl)}`,
@@ -4789,6 +4895,7 @@
               if (tipsEl) tipsEl.textContent = sign + value + '%';
               const detailEl = document.getElementById('tipsMetricDetail');
               if (detailEl) detailEl.textContent = `Currently ${sign}${value}% | Below +0.5% = Bullish`;
+              applyRealYield(obs);
               console.log('TIPS 10Y real yield updated:', value);
             }
           }
@@ -4799,6 +4906,9 @@
 
       // Gold/Silver ratio
       updateGoldSilverRatio();
+
+      // Auto-log / resolve the dashboard's own signals against live price
+      trackSignal();
 
       // Refresh active views (always recompute analysis cards from live price)
       updateAnalysisTab();
@@ -4821,14 +4931,12 @@
     }
   }
 
-  // Initialize when DOM is ready
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', initializeApp);
-  } else {
-    initializeApp();
-  }
+  // NOTE: app bootstrap is invoked at the very end of this script (after all
+  // top-level `let` globals like realYield / signalLog are initialized) to
+  // avoid a temporal-dead-zone error during initializeApp().
 
   function initializeApp() {
+    seedRealYield();
     calcPosition();
     updateSessionBar();
     renderSessionGrid();
@@ -4836,6 +4944,7 @@
     updateSetupBoard();
     updateAnalysisTab();
     renderCalendar();
+    renderSignalTracker();
 
     setInterval(() => {
       updateSessionBar();
@@ -5006,6 +5115,123 @@
     localStorage.setItem('goldJournal', JSON.stringify(tradeJournal));
   }
 
+  // ─── SIGNAL TRACKER — auto-logged record of the dashboard's own signals ──────
+  let signalLog = JSON.parse(localStorage.getItem('goldSignalLog') || '[]');
+  function saveSignalLog() { localStorage.setItem('goldSignalLog', JSON.stringify(signalLog)); }
+
+  // Called on every price tick. Logs a new setup when the primary signal flips,
+  // and resolves any open setups live against price (T1 = win, stop = loss).
+  function trackSignal() {
+    if (!lastGoldPrice || lastGoldPrice < 100) return;
+    const md = getMacroData();
+    const dir = md.dir; // 'long' | 'short' | 'wait'
+
+    // 1) Resolve open setups against live price
+    let changed = false;
+    for (const s of signalLog) {
+      if (s.status !== 'OPEN') continue;
+      const hitT1   = s.dir === 'long' ? lastGoldPrice >= s.t1   : lastGoldPrice <= s.t1;
+      const hitStop = s.dir === 'long' ? lastGoldPrice <= s.stop : lastGoldPrice >= s.stop;
+      if (hitT1)   { s.status = 'WIN';  s.resolvedTs = Date.now(); s.resolvedPrice = lastGoldPrice; s.resultR = +Math.abs((s.t1 - s.entry) / (s.entry - s.stop)); changed = true; }
+      else if (hitStop) { s.status = 'LOSS'; s.resolvedTs = Date.now(); s.resolvedPrice = lastGoldPrice; s.resultR = -1; changed = true; }
+    }
+
+    // 2) Log a new setup only when the primary direction flips to a new,
+    //    non-wait signal (one setup per directional regime — no re-logging).
+    const last = signalLog[0];
+    const needNew = dir !== 'wait' && (!last || last.dir !== dir);
+
+    if (needNew) {
+      // Close any still-open setup of the opposite direction at market (flip exit)
+      for (const s of signalLog) {
+        if (s.status === 'OPEN') {
+          s.status = 'FLIPPED';
+          s.resolvedTs = Date.now(); s.resolvedPrice = lastGoldPrice;
+          const risk = Math.abs(s.entry - s.stop) || 1;
+          s.resultR = ((s.dir === 'long' ? (lastGoldPrice - s.entry) : (s.entry - lastGoldPrice)) / risk);
+        }
+      }
+      const p    = lastGoldPrice;
+      const atr  = p * 0.009;
+      const isL  = dir === 'long';
+      const entry = p;
+      const stop  = isL ? p - atr * 1.5 : p + atr * 1.5;   // day-trade profile (1.5× ATR)
+      const t1    = isL ? p + atr * 3.0 : p - atr * 3.0;   // 2R
+      const t2    = isL ? p + atr * 5.25 : p - atr * 5.25; // 3.5R
+      const si = getSessionInfo();
+      signalLog.unshift({
+        id: Date.now(),
+        ts: Date.now(),
+        dir,
+        entry: +entry.toFixed(2), stop: +stop.toFixed(2), t1: +t1.toFixed(2), t2: +t2.toFixed(2),
+        macroScore: md.macroScore, conf: md.conf,
+        session: si.name, ryBias: realYield.bias || 'neutral',
+        status: 'OPEN', resolvedTs: null, resolvedPrice: null, resultR: null
+      });
+      if (signalLog.length > 200) signalLog = signalLog.slice(0, 200);
+      changed = true;
+    }
+
+    if (changed) { saveSignalLog(); if (activeSection === 'utilities') renderSignalTracker(); }
+  }
+
+  function clearSignalLog() {
+    if (!confirm('Clear the entire signal track record? This cannot be undone.')) return;
+    signalLog = [];
+    saveSignalLog();
+    renderSignalTracker();
+  }
+
+  function renderSignalTracker() {
+    const body = document.getElementById('trackerBody');
+    const set  = (id, v) => { const e = document.getElementById(id); if (e) e.textContent = v; };
+
+    const resolved = signalLog.filter(s => s.status === 'WIN' || s.status === 'LOSS');
+    const wins     = signalLog.filter(s => s.status === 'WIN').length;
+    const losses   = signalLog.filter(s => s.status === 'LOSS').length;
+    const openOnes = signalLog.filter(s => s.status === 'OPEN');
+    const rVals    = signalLog.filter(s => typeof s.resultR === 'number');
+    const avgR     = rVals.length ? (rVals.reduce((a, s) => a + s.resultR, 0) / rVals.length) : null;
+
+    set('tkTotal', signalLog.length);
+    set('tkWinRate', resolved.length ? Math.round(wins / resolved.length * 100) + '%' : '—');
+    set('tkAvgR', avgR === null ? '—' : (avgR >= 0 ? '+' : '') + avgR.toFixed(2) + 'R');
+    set('tkOpen', openOnes.length ? `${openOnes[0].dir.toUpperCase()} (${openOnes.length})` : 'None');
+
+    if (!body) return;
+    if (!signalLog.length) {
+      body.innerHTML = '<tr><td colspan="9" class="j-empty">No signals logged yet — the tracker starts recording as soon as the dashboard produces a directional signal.</td></tr>';
+      return;
+    }
+
+    body.innerHTML = signalLog.map(s => {
+      const d = new Date(s.ts);
+      const tstr = d.toLocaleString('en-GB', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit', hour12: false, timeZone: 'UTC' });
+      const dirCls = s.dir === 'long' ? 'j-dir-long' : 'j-dir-short';
+      const statusMap = {
+        WIN:     ['WIN',     'var(--accent-green)'],
+        LOSS:    ['LOSS',    'var(--accent-red)'],
+        OPEN:    ['OPEN',    '#D97706'],
+        FLIPPED: ['FLIPPED', 'var(--text-tertiary)']
+      };
+      const [stTxt, stCol] = statusMap[s.status] || ['—', 'var(--text-tertiary)'];
+      const rTxt = (typeof s.resultR === 'number') ? (s.resultR >= 0 ? '+' : '') + s.resultR.toFixed(2) + 'R' : '—';
+      const rCol = (typeof s.resultR === 'number') ? (s.resultR >= 0 ? 'var(--accent-green)' : 'var(--accent-red)') : 'var(--text-tertiary)';
+      const mono = "font-family:'JetBrains Mono',monospace";
+      return `<tr>
+        <td style="color:var(--text-secondary);white-space:nowrap">${tstr}</td>
+        <td><span class="${dirCls}">${s.dir.toUpperCase()}</span></td>
+        <td style="${mono}">${s.entry.toLocaleString()}</td>
+        <td style="${mono};color:var(--accent-red)">${s.stop.toLocaleString()}</td>
+        <td style="${mono};color:var(--accent-green)">${s.t1.toLocaleString()}</td>
+        <td style="${mono}">${s.macroScore}/40</td>
+        <td style="color:var(--text-tertiary)">${s.session}</td>
+        <td style="font-weight:800;color:${stCol}">${stTxt}</td>
+        <td style="${mono};font-weight:700;color:${rCol}">${rTxt}</td>
+      </tr>`;
+    }).join('');
+  }
+
   function addTrade() {
     const date  = document.getElementById('jDate').value;
     const dir   = document.getElementById('jDir').value;
@@ -5113,7 +5339,7 @@
     markets:   { tabs: [{ id: 'analysis', label: 'Live Analysis' }, { id: 'sessions', label: 'Trade Sessions' }, { id: 'calendar', label: 'Economic Calendar' }] },
     traderoom: { tabs: [{ id: 'scalp',    label: 'Scalp Desk' },    { id: 'daytrade', label: 'Day Trade Desk' }, { id: 'strategy', label: 'Strategy Guide' }] },
     research:  { tabs: [{ id: 'edges',    label: 'Edge Lab' }] },
-    utilities: { tabs: [{ id: 'calculator', label: 'Position Calc' }, { id: 'journal', label: 'Trade Journal' }] }
+    utilities: { tabs: [{ id: 'calculator', label: 'Position Calc' }, { id: 'tracker', label: 'Signal Tracker' }, { id: 'journal', label: 'Trade Journal' }] }
   };
 
   let activeSection = 'dashboard';
@@ -5143,20 +5369,121 @@
 
   // ─── DASHBOARD RENDERER ─────────────────────────────────────────────────────
 
+  // ─── REAL YIELD ENGINE (master fundamental driver) ──────────────────────────
+  // Gold pays no coupon, so its true cost is the real (inflation-adjusted) yield
+  // given up by not holding Treasuries. 10Y TIPS carry the strongest, most durable
+  // inverse correlation with gold (~-0.8). The tradable edge is the DIRECTION:
+  // gold rallies hardest when real yields are FALLING.
+  let realYield = {
+    level: null,      // latest 10Y real yield (%)
+    prevWeek: null,   // reading ~5 trading days earlier
+    chg: null,        // weekly change (percentage points)
+    dir: 'flat',      // 'falling' | 'rising' | 'flat'
+    regime: '—',      // descriptive band
+    bias: 'neutral',  // 'bull' | 'bear' | 'neutral'
+    score: 6          // 0-12 contribution to macro score
+  };
+
+  function applyRealYield(obs) {
+    // obs is newest-first, missing values already filtered
+    const level = parseFloat(obs[0].value);
+    if (isNaN(level)) return;
+    // ~1 trading week back (5 sessions); fall back to oldest available
+    const backIdx = Math.min(5, obs.length - 1);
+    const prevWeek = parseFloat(obs[backIdx]?.value);
+    const chg = (!isNaN(prevWeek)) ? level - prevWeek : 0;
+
+    // Direction (2bp deadband to ignore noise)
+    const dir = chg <= -0.02 ? 'falling' : chg >= 0.02 ? 'rising' : 'flat';
+
+    // Level regime bands
+    const regime =
+      level <= 0    ? 'Deeply Negative — maximum tailwind' :
+      level <= 0.5  ? 'Low — structural tailwind' :
+      level <= 1.0  ? 'Moderate — supportive' :
+      level <= 1.75 ? 'Neutral — mixed' :
+      level <= 2.25 ? 'Restrictive — headwind' :
+                      'High — strong headwind';
+
+    // Level score 0-7 (lower yield = higher/more bullish)
+    const lvlScore = level <= 0.5 ? 7 : level <= 1.0 ? 6 : level <= 1.5 ? 5 : level <= 2.0 ? 4 : level <= 2.5 ? 2 : 1;
+    // Direction adds/subtracts up to 3 — the leading part of the signal
+    const dirScore = dir === 'falling' ? 3 : dir === 'rising' ? -3 : 0;
+    const score = Math.max(0, Math.min(10, lvlScore + dirScore));
+
+    // Combined gold bias — direction leads, so a falling trend tilts bullish
+    // even at moderately elevated levels; a rising trend tilts bearish.
+    let bias, biasTxt;
+    if (dir === 'falling' && level <= 2.0)       { bias = 'bull';    biasTxt = 'BULLISH — real yields falling'; }
+    else if (dir === 'rising' && level >= 1.0)   { bias = 'bear';    biasTxt = 'BEARISH — real yields rising'; }
+    else if (level <= 0.75)                      { bias = 'bull';    biasTxt = 'BULLISH — low real yields'; }
+    else if (level >= 2.5)                       { bias = 'bear';    biasTxt = 'BEARISH — high real yields'; }
+    else                                         { bias = 'neutral'; biasTxt = 'NEUTRAL — watch direction'; }
+
+    realYield = { level, prevWeek: isNaN(prevWeek) ? null : prevWeek, chg, dir, regime, bias, biasTxt, score };
+    renderRealYieldBanner();
+  }
+
+  // Seed with a last-known ~10Y real yield so the engine is never empty before
+  // (or if) the live FRED feed lands. Live data overrides this immediately.
+  function seedRealYield() {
+    if (realYield.level !== null) return;
+    const seed = 1.95;
+    applyRealYield([{ value: String(seed) }, { value: String(seed) }]);
+    const t = document.getElementById('tipsYield');
+    if (t && (t.textContent === '…' || t.textContent.trim() === '')) t.textContent = '+' + seed.toFixed(2) + '%';
+  }
+
+  function renderRealYieldBanner() {
+    const ry = realYield;
+    const set = (id, v) => { const e = document.getElementById(id); if (e) e.textContent = v; };
+    if (ry.level === null) return;
+    const sign = ry.level >= 0 ? '+' : '';
+    set('ry-level', `${sign}${ry.level.toFixed(2)}%`);
+
+    const dirEl = document.getElementById('ry-dir');
+    if (dirEl) {
+      const arrow = ry.dir === 'falling' ? '↓ Falling' : ry.dir === 'rising' ? '↑ Rising' : '→ Flat';
+      dirEl.textContent = arrow;
+      dirEl.style.color = ry.dir === 'falling' ? 'var(--accent-green)' : ry.dir === 'rising' ? 'var(--accent-red)' : '#D97706';
+    }
+    if (ry.chg !== null) {
+      const bps = (ry.chg * 100);
+      set('ry-chg', `${bps >= 0 ? '+' : ''}${bps.toFixed(0)} bps / wk`);
+    }
+    const sigEl = document.getElementById('ry-signal');
+    if (sigEl) { sigEl.textContent = ry.bias === 'bull' ? 'BULLISH' : ry.bias === 'bear' ? 'BEARISH' : 'NEUTRAL'; sigEl.className = 'ry-signal ' + ry.bias; }
+    set('ry-note', `${ry.regime}. ${ry.biasTxt}. Real yields are gold's #1 fundamental anchor (~-0.8 correlation) — direction leads price.`);
+  }
+
+  // Short inline tag describing the current real-yield tailwind/headwind.
+  function realYieldTag() {
+    if (realYield.level === null) return '';
+    const word = realYield.bias === 'bull' ? 'tailwind' : realYield.bias === 'bear' ? 'headwind' : 'neutral';
+    return `  ·  Real-yield ${word} (${realYield.dir})`;
+  }
+
   function computeMacroScore() {
-    const tips  = parseFloat(document.getElementById('tipsYield')?.textContent) || 2.0;
     const dxy   = parseFloat(document.getElementById('dxyPrice')?.textContent)  || 104;
     const month = new Date().getMonth();
-    // Factor 1: TIPS real yield (lower = bullish for gold)
-    const tipsS = tips <= 0 ? 10 : tips <= 0.5 ? 9 : tips <= 1.0 ? 8 : tips <= 1.5 ? 7 : tips <= 2.0 ? 5 : tips <= 2.5 ? 3 : 1;
-    // Factor 2: DXY (lower = bullish for gold)
+    // Factor 1 (MASTER): Real yields — level + direction, 0-10 from the engine.
+    // Falls back to a level-only estimate before FRED data lands.
+    let tipsS;
+    if (realYield.level !== null) {
+      tipsS = realYield.score;
+    } else {
+      const tips = parseFloat(document.getElementById('tipsYield')?.textContent) || 2.0;
+      tipsS = tips <= 0.5 ? 7 : tips <= 1.0 ? 6 : tips <= 1.5 ? 5 : tips <= 2.0 ? 4 : tips <= 2.5 ? 2 : 1;
+    }
+    // Factor 2: DXY (lower = bullish for gold) — the other cyclical driver
     const dxyS  = dxy <= 96 ? 10 : dxy <= 100 ? 8 : dxy <= 104 ? 6 : dxy <= 108 ? 4 : 2;
     // Factor 3: Seasonal pattern (Nov/Dec/Jan/Feb strong; Mar/Jun weak)
     const seasS = [10,11,0,1].includes(month) ? 9 : [2,5].includes(month) ? 5 : 7;
-    // Factor 4: Central bank / structural (de-dollarization — ongoing structural bullish)
-    const cbS   = 9;
-    // Factor 5: Geopolitical / safe haven demand (elevated)
-    const shS   = 8;
+    // Factors 4+5: Structural tailwind (CB de-dollarization + safe-haven demand).
+    // Kept as a moderate FIXED base so the CYCLICAL drivers above (real yields
+    // + DXY) actually determine direction rather than being floored permanently.
+    const cbS   = 5;
+    const shS   = 4;
     return { score: Math.min(40, tipsS + dxyS + seasS + cbS + shS), tipsS, dxyS, seasS };
   }
 
@@ -5165,8 +5492,17 @@
     const tipsScore  = tips < 0 ? 5 : tips < 0.5 ? 4 : tips < 1.5 ? 2 : 0;
     const { score: macroScore, tipsS, dxyS, seasS } = computeMacroScore();
     const macroConf  = Math.round((macroScore / 40) * 100);
-    const isLong  = macroConf >= 60;
-    const isShort = macroConf <= 40;
+    let isLong  = macroConf >= 60;
+    let isShort = macroConf <= 40;
+    // Real yields are the MASTER driver — they get veto/override authority:
+    //  • rising real yields (bear bias) forbid new longs; if the dollar is also
+    //    firm (dxyS ≤ 4) that's a genuine bearish regime → short
+    //  • falling real yields (bull bias) confirm longs a touch more readily
+    const ry = realYield;
+    if (ry.level !== null) {
+      if (ry.bias === 'bear') { isLong = false; if (dxyS <= 4) isShort = true; }
+      else if (ry.bias === 'bull' && macroConf >= 54) { isLong = true; isShort = false; }
+    }
     const conf    = isLong ? macroConf : isShort ? (100 - macroConf) : 50;
     const dir     = isLong ? 'long' : isShort ? 'short' : 'wait';
     return { tips, tipsScore, macroScore, macroConf, isLong, isShort, conf, dir, tipsS, dxyS, seasS };
@@ -5303,6 +5639,7 @@
 
   function renderDashboard() {
     if (!lastGoldPrice) return;
+    renderRealYieldBanner();
     const price = lastGoldPrice;
     const md    = getMacroData();
     const si    = getSessionInfo();
@@ -5439,7 +5776,7 @@
     setEl('scalp-t2-pts', tT2.toFixed(0) + ' pts · 3.0R');
     setEl('scalp-session', si.name + ' SESSION');
     setEl('scalp-session-time', si.sub);
-    setEl('scalp-hint', si.hint);
+    setEl('scalp-hint', si.hint + realYieldTag());
 
     // 3 scalp setups
     const nearest100 = Math.round(price / 100) * 100;
@@ -5579,7 +5916,7 @@
     setEl('dt-t2-pts', dayT2.toFixed(0) + ' pts · 3.5R — full exit');
     setEl('dt-session', si.name + ' SESSION');
     setEl('dt-session-time', si.sub);
-    setEl('dt-hint', si.hint);
+    setEl('dt-hint', si.hint + realYieldTag());
 
     // 3 Day Trade Setups
     const dtSetups = [
@@ -5672,6 +6009,13 @@
     } catch (e) {
       console.warn('Gold/silver ratio update failed:', e.message);
     }
+  }
+
+  // ─── APP BOOTSTRAP (must be last — after all top-level globals initialize) ───
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initializeApp);
+  } else {
+    initializeApp();
   }
 </script>
 
