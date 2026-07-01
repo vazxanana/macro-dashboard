@@ -3228,6 +3228,23 @@
       </div>
     </div>
 
+    <!-- Live chart with day-trade setup levels marked -->
+    <div class="dash-widget" style="margin-bottom:20px;">
+      <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;margin-bottom:12px;">
+        <div class="dash-widget-title" style="margin:0;">Live Chart · Day Trade Levels <span style="font-size:11px;font-weight:500;color:var(--text-tertiary)">— XAU/USD (PAXG proxy, 5m)</span></div>
+        <div class="chart-legend">
+          <span class="cl-item"><span class="cl-dot" style="background:#2962FF"></span>Entry</span>
+          <span class="cl-item"><span class="cl-dot" style="background:#C23B33"></span>Stop</span>
+          <span class="cl-item"><span class="cl-dot" style="background:#00A651"></span>Target 1</span>
+          <span class="cl-item"><span class="cl-dot" style="background:#0F9D58;opacity:0.6"></span>Target 2</span>
+        </div>
+      </div>
+      <div id="dayChart" style="width:100%;height:340px;position:relative;">
+        <div id="dayChartMsg" style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;text-align:center;color:var(--text-tertiary);font-size:13px;padding:20px;">Loading live chart…</div>
+      </div>
+      <div id="dayChartLevels" style="display:flex;flex-wrap:wrap;gap:14px;margin-top:12px;font-size:12px;"></div>
+    </div>
+
     <!-- 3 Day Trade Setups -->
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
       <div style="font-size:9px;font-weight:800;letter-spacing:1.4px;text-transform:uppercase;color:var(--text-tertiary);">Day Trade Setups — Session-Based Institutional Plays</div>
@@ -4742,127 +4759,138 @@
     }, 1000);
   }
 
-  // ─── SCALP LEVELS CHART (Lightweight Charts + Binance PAXG klines) ──────────
-  // The TradingView embed can't be drawn on programmatically, so the dashboard
-  // uses TradingView's free Lightweight Charts to render real gold candles
-  // (PAXG tracks 1oz spot) with the scalp Entry/Stop/T1/T2 marked as price lines.
-  let scalpChart = null, scalpSeries = null, scalpPriceLines = [], scalpChartOffset = 0, scalpChartAttempts = 0;
+  // ─── LEVEL CHARTS (Lightweight Charts + Binance PAXG klines) ────────────────
+  // The TradingView embed can't be drawn on programmatically, so we use
+  // TradingView's free Lightweight Charts to render real gold candles (PAXG
+  // tracks 1oz spot, CORS-enabled) and mark the desk's Entry/Stop/T1/T2 as
+  // horizontal price lines. One reusable factory drives both the Scalp chart
+  // (dashboard) and the Day Trade chart (Trade Room → Day Trade Desk).
 
+  // Scalp Desk geometry: entry = price, tight stop 0.8× ATR, T1 1.8R, T2 3R
   function scalpLevels() {
-    // Mirror the Scalp Desk: entry = price, tight stop 0.8× ATR, T1 1.44× ATR, T2 2.4× ATR
+    if (!lastGoldPrice || lastGoldPrice < 100) return null;
+    const p = lastGoldPrice, atr = p * 0.009;
+    const md = getMacroData();
+    const dirSign = md.isShort ? -1 : 1;   // default long-side geometry when 'wait'
+    const tStop = atr * 0.8;
+    return { dir: md.dir, entry: p, stop: p - dirSign * tStop, t1: p + dirSign * tStop * 1.8, t2: p + dirSign * tStop * 3.0 };
+  }
+
+  // Day Trade Desk geometry (mirrors renderDayTradeDesk exactly):
+  // entry = price ∓0.15%, stop 1.5× ATR, T1 = 2R (3× ATR), T2 = 3.5R (5.25× ATR)
+  function dayTradeLevels() {
     if (!lastGoldPrice || lastGoldPrice < 100) return null;
     const p = lastGoldPrice, atr = p * 0.009;
     const md = getMacroData();
     const isL = md.isLong, isS = md.isShort;
-    const dirSign = isL ? 1 : isS ? -1 : 1;   // default long-side geometry when 'wait'
-    const tStop = atr * 0.8;
-    return {
-      dir: md.dir,
-      entry: p,
-      stop: p - dirSign * tStop,
-      t1:   p + dirSign * tStop * 1.8,
-      t2:   p + dirSign * tStop * 3.0
-    };
+    const dirSign = isS ? -1 : 1;
+    const entry = Math.round(p * (isS ? 1.0015 : 0.9985));
+    const dayStop = atr * 1.5;
+    return { dir: md.dir, entry, stop: entry - dirSign * dayStop, t1: entry + dirSign * dayStop * 2.0, t2: entry + dirSign * dayStop * 3.5 };
   }
 
-  async function initScalpChart() {
-    const el = document.getElementById('scalpChart');
-    if (!el) return;
-    if (typeof LightweightCharts === 'undefined') {
-      if (scalpChartAttempts++ < 15) { setTimeout(initScalpChart, 400); return; }
-      renderLevelsFallback('Interactive chart unavailable — setup levels shown below.');
-      updateScalpChartLevels();
-      return;
+  function createLevelChart(cfg) {
+    // cfg: { chartId, msgId, boxId, getLevels }
+    let chart = null, series = null, priceLines = [], offset = 0, attempts = 0;
+
+    function fallback(text) {
+      const msg = document.getElementById(cfg.msgId);
+      if (msg) { msg.style.display = 'flex'; msg.textContent = text; }
     }
-    try {
-      const dark = document.documentElement.classList.contains('dark');
-      scalpChart = LightweightCharts.createChart(el, {
-        width: el.clientWidth, height: 340,
-        layout: { background: { type: 'solid', color: 'transparent' }, textColor: dark ? '#9BA3B8' : '#5A6278' },
-        grid: { vertLines: { color: 'rgba(127,127,127,0.08)' }, horzLines: { color: 'rgba(127,127,127,0.08)' } },
-        rightPriceScale: { borderColor: 'rgba(127,127,127,0.2)' },
-        timeScale: { borderColor: 'rgba(127,127,127,0.2)', timeVisible: true, secondsVisible: false },
-        crosshair: { mode: 0 }
-      });
-      scalpSeries = scalpChart.addCandlestickSeries({
-        upColor: '#00A651', downColor: '#C23B33', borderVisible: false,
-        wickUpColor: '#00A651', wickDownColor: '#C23B33'
-      });
-      new ResizeObserver(() => { if (scalpChart && el.clientWidth) scalpChart.applyOptions({ width: el.clientWidth }); }).observe(el);
-      await loadScalpCandles();
-      // refresh candles periodically
-      setInterval(loadScalpCandles, 60000);
-    } catch (e) {
-      console.warn('Scalp chart init failed:', e.message);
-      renderLevelsFallback('Chart failed to load — setup levels shown below.');
-      updateScalpChartLevels();
+
+    function updateLevels() {
+      const lv = cfg.getLevels();
+      if (!lv) return;
+      if (series) {
+        priceLines.forEach(l => { try { series.removePriceLine(l); } catch (e) {} });
+        priceLines = [];
+        const mk = (price, color, title, dashed) => series.createPriceLine({
+          price: +price.toFixed(2), color, lineWidth: 2,
+          lineStyle: dashed ? 2 : 0, axisLabelVisible: true, title
+        });
+        priceLines.push(mk(lv.entry, '#2962FF', 'ENTRY'));
+        priceLines.push(mk(lv.stop,  '#C23B33', 'STOP'));
+        priceLines.push(mk(lv.t1,    '#00A651', 'T1'));
+        priceLines.push(mk(lv.t2,    '#0F9D58', 'T2', true));
+      }
+      const box = document.getElementById(cfg.boxId);
+      if (box) {
+        const dirTxt = lv.dir === 'long' ? 'LONG' : lv.dir === 'short' ? 'SHORT' : 'WAIT (long-side geometry)';
+        const chip = (lbl, val, col) => `<span class="clv"><span class="clv-lbl">${lbl}</span><span style="color:${col}">${Math.round(val).toLocaleString()}</span></span>`;
+        box.innerHTML =
+          `<span class="clv"><span class="clv-lbl">Bias</span><span>${dirTxt}</span></span>` +
+          chip('Entry', lv.entry, 'var(--accent-blue)') +
+          chip('Stop', lv.stop, 'var(--accent-red)') +
+          chip('T1', lv.t1, 'var(--accent-green)') +
+          chip('T2', lv.t2, 'var(--accent-green)');
+      }
     }
+
+    async function loadCandles() {
+      if (!series) return;
+      try {
+        const res = await fetchWithFallback(['https://api.binance.com/api/v3/klines?symbol=PAXGUSDT&interval=5m&limit=120']);
+        if (!res) throw new Error('no kline data');
+        const raw = await res.json();
+        if (!Array.isArray(raw) || !raw.length) throw new Error('bad kline data');
+        const lastClose = parseFloat(raw[raw.length - 1][4]);
+        offset = (lastGoldPrice && lastClose) ? (lastGoldPrice - lastClose) : 0;
+        const candles = raw.map(k => ({
+          time: Math.floor(k[0] / 1000),
+          open:  +(parseFloat(k[1]) + offset).toFixed(2),
+          high:  +(parseFloat(k[2]) + offset).toFixed(2),
+          low:   +(parseFloat(k[3]) + offset).toFixed(2),
+          close: +(parseFloat(k[4]) + offset).toFixed(2)
+        }));
+        series.setData(candles);
+        const msg = document.getElementById(cfg.msgId);
+        if (msg) msg.style.display = 'none';
+        updateLevels();
+      } catch (e) {
+        console.warn(`${cfg.chartId} candles failed:`, e.message);
+        fallback('Live candles unavailable (data source blocked) — setup levels shown below.');
+        updateLevels();
+      }
+    }
+
+    async function init() {
+      const el = document.getElementById(cfg.chartId);
+      if (!el) return;
+      if (typeof LightweightCharts === 'undefined') {
+        if (attempts++ < 15) { setTimeout(init, 400); return; }
+        fallback('Interactive chart unavailable — setup levels shown below.');
+        updateLevels();
+        return;
+      }
+      try {
+        const dark = document.documentElement.classList.contains('dark');
+        chart = LightweightCharts.createChart(el, {
+          width: el.clientWidth || 600, height: 340,
+          layout: { background: { type: 'solid', color: 'transparent' }, textColor: dark ? '#9BA3B8' : '#5A6278' },
+          grid: { vertLines: { color: 'rgba(127,127,127,0.08)' }, horzLines: { color: 'rgba(127,127,127,0.08)' } },
+          rightPriceScale: { borderColor: 'rgba(127,127,127,0.2)' },
+          timeScale: { borderColor: 'rgba(127,127,127,0.2)', timeVisible: true, secondsVisible: false },
+          crosshair: { mode: 0 }
+        });
+        series = chart.addCandlestickSeries({
+          upColor: '#00A651', downColor: '#C23B33', borderVisible: false,
+          wickUpColor: '#00A651', wickDownColor: '#C23B33'
+        });
+        new ResizeObserver(() => { if (chart && el.clientWidth) chart.applyOptions({ width: el.clientWidth }); }).observe(el);
+        await loadCandles();
+        setInterval(loadCandles, 60000);
+      } catch (e) {
+        console.warn(`${cfg.chartId} init failed:`, e.message);
+        fallback('Chart failed to load — setup levels shown below.');
+        updateLevels();
+      }
+    }
+
+    return { init, loadCandles, updateLevels };
   }
 
-  async function loadScalpCandles() {
-    if (!scalpSeries) return;
-    try {
-      const res = await fetchWithFallback([
-        'https://api.binance.com/api/v3/klines?symbol=PAXGUSDT&interval=5m&limit=120'
-      ]);
-      if (!res) throw new Error('no kline data');
-      const raw = await res.json();
-      if (!Array.isArray(raw) || !raw.length) throw new Error('bad kline data');
-      // Normalise PAXG candles to the live gold spot so the level lines align
-      const lastClose = parseFloat(raw[raw.length - 1][4]);
-      scalpChartOffset = (lastGoldPrice && lastClose) ? (lastGoldPrice - lastClose) : 0;
-      const candles = raw.map(k => ({
-        time: Math.floor(k[0] / 1000),
-        open:  +(parseFloat(k[1]) + scalpChartOffset).toFixed(2),
-        high:  +(parseFloat(k[2]) + scalpChartOffset).toFixed(2),
-        low:   +(parseFloat(k[3]) + scalpChartOffset).toFixed(2),
-        close: +(parseFloat(k[4]) + scalpChartOffset).toFixed(2)
-      }));
-      scalpSeries.setData(candles);
-      const msg = document.getElementById('scalpChartMsg');
-      if (msg) msg.style.display = 'none';
-      updateScalpChartLevels();
-    } catch (e) {
-      console.warn('Scalp candles failed:', e.message);
-      renderLevelsFallback('Live candles unavailable (data source blocked) — setup levels shown below.');
-      updateScalpChartLevels();
-    }
-  }
-
-  function updateScalpChartLevels() {
-    const lv = scalpLevels();
-    if (!lv) return;
-    // Draw / redraw the horizontal price lines on the candle series
-    if (scalpSeries) {
-      scalpPriceLines.forEach(l => { try { scalpSeries.removePriceLine(l); } catch (e) {} });
-      scalpPriceLines = [];
-      const mk = (price, color, title, dashed) => scalpSeries.createPriceLine({
-        price: +price.toFixed(2), color, lineWidth: 2,
-        lineStyle: dashed ? 2 : 0, axisLabelVisible: true, title
-      });
-      scalpPriceLines.push(mk(lv.entry, '#2962FF', 'ENTRY'));
-      scalpPriceLines.push(mk(lv.stop,  '#C23B33', 'STOP'));
-      scalpPriceLines.push(mk(lv.t1,    '#00A651', 'T1'));
-      scalpPriceLines.push(mk(lv.t2,    '#0F9D58', 'T2', true));
-    }
-    // Always render the text level chips (works even without the chart)
-    const box = document.getElementById('scalpChartLevels');
-    if (box) {
-      const dirTxt = lv.dir === 'long' ? 'LONG' : lv.dir === 'short' ? 'SHORT' : 'WAIT (long-side geometry)';
-      const chip = (lbl, val, col) => `<span class="clv"><span class="clv-lbl">${lbl}</span><span style="color:${col}">${Math.round(val).toLocaleString()}</span></span>`;
-      box.innerHTML =
-        `<span class="clv"><span class="clv-lbl">Bias</span><span>${dirTxt}</span></span>` +
-        chip('Entry', lv.entry, 'var(--accent-blue)') +
-        chip('Stop', lv.stop, 'var(--accent-red)') +
-        chip('T1', lv.t1, 'var(--accent-green)') +
-        chip('T2', lv.t2, 'var(--accent-green)');
-    }
-  }
-
-  function renderLevelsFallback(text) {
-    const msg = document.getElementById('scalpChartMsg');
-    if (msg) { msg.style.display = 'flex'; msg.textContent = text; }
-  }
+  const scalpChartCtl = createLevelChart({ chartId: 'scalpChart', msgId: 'scalpChartMsg', boxId: 'scalpChartLevels', getLevels: scalpLevels });
+  const dayChartCtl   = createLevelChart({ chartId: 'dayChart',   msgId: 'dayChartMsg',   boxId: 'dayChartLevels',   getLevels: dayTradeLevels });
 
   async function fetchWithFallback(urls) {
     for (let url of urls) {
@@ -5101,7 +5129,8 @@
 
     // Initialize charts
     initChart();
-    initScalpChart();
+    scalpChartCtl.init();
+    dayChartCtl.init();
 
     // Set up periodic updates
     const updateInterval = setInterval(() => {
@@ -5787,7 +5816,7 @@
   function renderDashboard() {
     if (!lastGoldPrice) return;
     renderRealYieldBanner();
-    updateScalpChartLevels();
+    scalpChartCtl.updateLevels();
     const price = lastGoldPrice;
     const md    = getMacroData();
     const si    = getSessionInfo();
@@ -6065,6 +6094,7 @@
     setEl('dt-session', si.name + ' SESSION');
     setEl('dt-session-time', si.sub);
     setEl('dt-hint', si.hint + realYieldTag());
+    dayChartCtl.updateLevels();
 
     // 3 Day Trade Setups
     const dtSetups = [
