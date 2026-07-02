@@ -2113,6 +2113,36 @@
     .kpi-badge.bear { background: rgba(194,59,51,0.12); color: var(--accent-red); }
     .kpi-badge.wait { background: rgba(217,119,6,0.12); color: #D97706; }
 
+    /* Red Folder desk */
+    .rf-card {
+      background: var(--card-bg); border: 1px solid var(--border);
+      border-left: 3px solid var(--accent-red);
+      border-radius: 12px; padding: 18px 20px; margin-bottom: 14px;
+    }
+    .rf-head { display: flex; align-items: flex-start; gap: 16px; flex-wrap: wrap; }
+    .rf-date { text-align: center; min-width: 44px; }
+    .rf-day  { font-size: 22px; font-weight: 800; font-family: 'JetBrains Mono', monospace; line-height: 1; }
+    .rf-mon  { font-size: 9px; font-weight: 800; letter-spacing: 1.2px; color: var(--text-tertiary); }
+    .rf-titlebox { flex: 1; min-width: 220px; }
+    .rf-title { font-size: 14px; font-weight: 800; }
+    .rf-when  { font-size: 10px; font-weight: 700; color: var(--text-tertiary); margin-left: 6px; }
+    .rf-when-hot { color: #fff; background: var(--accent-red); padding: 2px 7px; border-radius: 5px; }
+    .rf-type  { font-size: 11px; color: var(--text-secondary); margin-top: 4px; line-height: 1.5; }
+    .rf-skew  { font-size: 11px; font-weight: 800; padding: 6px 12px; border-radius: 7px; white-space: nowrap; }
+    .rf-skew-bull { background: rgba(0,166,81,0.12);  color: var(--accent-green); }
+    .rf-skew-bear { background: rgba(194,59,51,0.12); color: var(--accent-red); }
+    .rf-skew-wait { background: rgba(217,119,6,0.12); color: #D97706; }
+    .rf-scenarios { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 14px; }
+    @media (max-width: 800px) { .rf-scenarios { grid-template-columns: 1fr; } }
+    .rf-scn {
+      padding: 12px 14px; border-radius: 9px;
+      background: rgba(127,127,127,0.05); border: 1px solid var(--border-light);
+    }
+    .rf-scn-label    { font-size: 11px; font-weight: 800; letter-spacing: 0.4px; }
+    .rf-scn-trigger  { font-size: 10px; color: var(--text-tertiary); margin-top: 5px; }
+    .rf-scn-reaction { font-size: 11px; color: var(--text-secondary); margin-top: 6px; line-height: 1.5; }
+    .rf-note { margin-top: 12px; font-size: 11px; color: var(--text-secondary); line-height: 1.6; }
+
     /* Dashboard setup tiles — dark-aware surfaces (no hardcoded white tints) */
     .dash-setup-tile {
       text-align: center; padding: 14px 8px; border-radius: 10px;
@@ -3490,6 +3520,25 @@
     </div>
   </div><!-- end tab-calendar -->
 
+  <!-- RED FOLDER — high-impact event prediction desk -->
+  <div id="tab-redfolder" class="tab-panel">
+    <div class="section-header">
+      <div class="section-title">📕 Red Folder Desk <span style="font-size:11px;font-weight:500;color:var(--text-tertiary)">— gold scenario maps for upcoming high-impact events</span></div>
+    </div>
+
+    <div class="card glass" style="margin-bottom:16px;">
+      <div style="font-size:12px;color:var(--text-secondary);line-height:1.7;">
+        Each card maps how gold typically reacts to a <strong>red-folder</strong> (high-impact) release, with the
+        directional skew computed from the <strong>live macro regime</strong> (real yields + DXY + composite score).
+        These are probability maps and reaction plans — not forecasts of the print itself.
+        The golden rule on every card: <strong>flat into the release, trade the confirmed direction after the first
+        15-minute candle closes.</strong>
+      </div>
+    </div>
+
+    <div id="rf-cards"></div>
+  </div><!-- end tab-redfolder -->
+
   <!-- SESSIONS TAB -->
   <div id="tab-sessions" class="tab-panel">
 
@@ -4275,6 +4324,7 @@
     if (name === 'analysis')  { updateAnalysisTab(); }
     if (name === 'calendar')  { renderCalendar(); }
     if (name === 'tracker')   { renderSignalTracker(); }
+    if (name === 'redfolder') { renderRedFolder(); }
   }
 
   // ─── CHECKLIST ─────────────────────────────────────────────────────────────
@@ -4437,8 +4487,7 @@
   const CAL_EVENTS = [
     { day: 25, month: 'JUN', title: 'US Consumer Confidence', desc: 'Conference Board index. Weak reading signals slowdown, boosts gold safe-haven demand.', impact: 'med', bias: 'neutral', biasTxt: 'Neutral' },
     { day: 27, month: 'JUN', title: 'US PCE Price Index (May)', desc: 'Fed\'s preferred inflation gauge. Cooler print = rate cut acceleration = gold bullish.', impact: 'high', bias: 'bull', biasTxt: 'Bullish if cool' },
-    { day: 3,  month: 'JUL', title: 'US Non-Farm Payrolls (Jun)', desc: 'Employment report. Weak jobs = earlier Fed cuts = DXY weakness = gold up.', impact: 'high', bias: 'bull', biasTxt: 'Bullish if weak' },
-    { day: 3,  month: 'JUL', title: 'US Unemployment Rate (Jun)', desc: 'Rising unemployment strengthens rate cut case, typically gold bullish.', impact: 'high', bias: 'bull', biasTxt: 'Bullish if rising' },
+    { day: 2,  month: 'JUL', title: 'US Non-Farm Payrolls (Jun)', desc: 'Released early (Jul 4 holiday). Weak jobs = earlier Fed cuts = DXY weakness = gold up.', impact: 'high', bias: 'bull', biasTxt: 'Bullish if weak' },
     { day: 10, month: 'JUL', title: 'US CPI Inflation (Jun)', desc: 'Core CPI year-on-year. Key FOMC input. Miss below 3% = strong gold rally catalyst.', impact: 'high', bias: 'bull', biasTxt: 'Bullish if cool' },
     { day: 11, month: 'JUL', title: 'US PPI (Jun)', desc: 'Producer prices feed into future CPI. Cooling PPI signals disinflationary trend.', impact: 'med', bias: 'neutral', biasTxt: 'Neutral' },
     { day: 16, month: 'JUL', title: 'US Retail Sales (Jun)', desc: 'Weak retail = slowdown fear = gold safe-haven demand rises.', impact: 'med', bias: 'bull', biasTxt: 'Bullish if weak' },
@@ -4496,6 +4545,114 @@
     if (r.level === 'high') return '  ·  ⚠ HIGH-IMPACT EVENT TODAY — reduce size';
     if (r.level === 'elev') return '  ·  ⚠ event risk tomorrow';
     return '';
+  }
+
+  // ─── RED FOLDER DESK — per-event gold scenario maps ─────────────────────────
+  // Each playbook encodes how gold typically reacts to a release family.
+  // baseTilt shifts the computed skew (+ = bullish-gold asymmetry: soft prints
+  // rally hard while hot prints tend to get bought by the structural CB bid).
+  const EVENT_PLAYBOOKS = [
+    { match: /payrolls|unemployment/i, type: 'Labor (NFP)', baseTilt: 5,
+      scenarios: [
+        { label: 'Soft',    trigger: 'Jobs well under consensus / unemployment up', reaction: 'Sharp rally — cuts pulled forward, yields & DXY drop', tone: 'bull' },
+        { label: 'In-line', trigger: 'Within ~±20k of consensus',                   reaction: 'Whippy first 15 min, then reverts to prevailing trend', tone: 'wait' },
+        { label: 'Hot',     trigger: 'Big beat / unemployment falls',               reaction: 'Initial dip on hawkish repricing — dips historically get bought', tone: 'bear' }
+      ],
+      note: 'Highest-volume print of the month. First spike is spread noise — never trade the initial candle.' },
+    { match: /CPI|PPI|PCE/i, type: 'Inflation', baseTilt: 4,
+      scenarios: [
+        { label: 'Cool',    trigger: 'Core below consensus',  reaction: 'Rally — real yields fall, cut path accelerates', tone: 'bull' },
+        { label: 'In-line', trigger: 'On consensus',          reaction: 'Muted — attention rolls to the next FOMC',       tone: 'wait' },
+        { label: 'Hot',     trigger: 'Core above consensus',  reaction: 'Drop — real yields spike; wait for the floor before re-entry', tone: 'bear' }
+      ],
+      note: 'Gold trades this through REAL yields — watch the TIPS reaction, not the headline.' },
+    { match: /FOMC|rate decision/i, type: 'Fed Decision', baseTilt: 3,
+      scenarios: [
+        { label: 'Dovish',  trigger: 'Cut, or dots shift lower',        reaction: 'Rally 1–2%, often extending for days', tone: 'bull' },
+        { label: 'As-expected', trigger: 'Priced outcome + neutral presser', reaction: 'Volatile chop — direction resolves during the presser, not the statement', tone: 'wait' },
+        { label: 'Hawkish', trigger: 'Hold + pushback on cut timing',   reaction: 'Sell-off; structural bid usually absorbs it within 1–3 sessions', tone: 'bear' }
+      ],
+      note: 'Two-stage event: statement 14:00 ET, presser 14:30 ET. The presser reverses the statement move ~40% of the time.' },
+    { match: /GDP/i, type: 'Growth', baseTilt: 2,
+      scenarios: [
+        { label: 'Miss',    trigger: 'Growth under consensus', reaction: 'Rally — slowdown accelerates the cut timeline', tone: 'bull' },
+        { label: 'In-line', trigger: 'Near consensus',         reaction: 'Minor — GDP is backward-looking',               tone: 'wait' },
+        { label: 'Beat',    trigger: 'Strong growth',          reaction: 'Modest dip — less urgency to cut',              tone: 'bear' }
+      ],
+      note: 'Usually a secondary mover unless it surprises hugely.' },
+    { match: /jackson hole/i, type: 'Fed Symposium', baseTilt: 0,
+      scenarios: [
+        { label: 'Dovish signal',  trigger: 'Chair hints at easier policy', reaction: 'Strong rally — venue famous for pivot signals', tone: 'bull' },
+        { label: 'Balanced',       trigger: 'Academic, no policy signal',   reaction: 'Fade the initial vol, range re-establishes',    tone: 'wait' },
+        { label: 'Hawkish signal', trigger: 'Inflation-fight rhetoric',     reaction: 'Sharp drop (cf. 2022) — respect it, do not fade day one', tone: 'bear' }
+      ],
+      note: 'Pure volatility event — size down, widen stops, or stand aside entirely.' },
+    { match: /./, type: 'Macro Release', baseTilt: 1,
+      scenarios: [
+        { label: 'Weak data',   trigger: 'Below consensus', reaction: 'Gold bid — easing path supported',  tone: 'bull' },
+        { label: 'In-line',     trigger: 'On consensus',    reaction: 'Little sustained impact',           tone: 'wait' },
+        { label: 'Strong data', trigger: 'Above consensus', reaction: 'Gold offered — yields tick higher', tone: 'bear' }
+      ],
+      note: 'Standard reaction map — weak US data is gold-bullish via the rates channel.' }
+  ];
+
+  function renderRedFolder() {
+    const box = document.getElementById('rf-cards');
+    if (!box) return;
+    const md  = getMacroData();
+    const now   = new Date();
+    const today = new Date(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate());
+
+    const upcoming = CAL_EVENTS
+      .filter(ev => ev.impact === 'high')
+      .map(ev => ({ ev, date: new Date(now.getUTCFullYear(), MONTH_MAP[ev.month], ev.day) }))
+      .filter(x => x.date >= today && (x.date - today) / 86400000 <= 90)
+      .sort((a, b) => a.date - b.date);
+
+    if (!upcoming.length) {
+      box.innerHTML = '<div class="card glass" style="text-align:center;color:var(--text-tertiary);padding:32px;">No red-folder events in the next 90 days — extend the calendar.</div>';
+      return;
+    }
+
+    box.innerHTML = upcoming.map(({ ev, date }) => {
+      const pb = EVENT_PLAYBOOKS.find(p => p.match.test(ev.title));
+      // Regime-aware skew: macro direction + real-yield bias + event asymmetry
+      let skew = 50
+        + (md.isLong ? 8 : md.isShort ? -8 : 0)
+        + (realYield.bias === 'bull' ? 4 : realYield.bias === 'bear' ? -4 : 0)
+        + pb.baseTilt;
+      skew = Math.max(25, Math.min(80, Math.round(skew)));
+      const skewTone = skew >= 56 ? 'bull' : skew <= 44 ? 'bear' : 'wait';
+      const skewTxt  = skew >= 56 ? `${skew}% bullish skew` : skew <= 44 ? `${100 - skew}% bearish skew` : 'balanced — no edge';
+
+      const daysOut = Math.round((date - today) / 86400000);
+      const when = daysOut === 0 ? 'TODAY' : daysOut === 1 ? 'TOMORROW' : `in ${daysOut}d`;
+      const toneCol = t => t === 'bull' ? 'var(--accent-green)' : t === 'bear' ? 'var(--accent-red)' : '#D97706';
+
+      return `
+      <div class="rf-card">
+        <div class="rf-head">
+          <div class="rf-date">
+            <div class="rf-day">${ev.day}</div>
+            <div class="rf-mon">${ev.month}</div>
+          </div>
+          <div class="rf-titlebox">
+            <div class="rf-title">${ev.title} <span class="rf-when ${daysOut <= 1 ? 'rf-when-hot' : ''}">${when}</span></div>
+            <div class="rf-type">${pb.type} · ${ev.desc}</div>
+          </div>
+          <div class="rf-skew rf-skew-${skewTone}">${skewTxt}</div>
+        </div>
+        <div class="rf-scenarios">
+          ${pb.scenarios.map(s => `
+            <div class="rf-scn">
+              <div class="rf-scn-label" style="color:${toneCol(s.tone)}">${s.tone === 'bull' ? '▲' : s.tone === 'bear' ? '▼' : '→'} ${s.label}</div>
+              <div class="rf-scn-trigger">${s.trigger}</div>
+              <div class="rf-scn-reaction">${s.reaction}</div>
+            </div>`).join('')}
+        </div>
+        <div class="rf-note"><strong>Playbook:</strong> ${pb.note} Flat into the print; trade the confirmed direction after the first 15-min close.</div>
+      </div>`;
+    }).join('');
   }
 
   function renderCalendar() {
@@ -5680,7 +5837,7 @@
 
   const NAV_SECTIONS = {
     dashboard: { tabs: [{ id: 'dashboard', label: 'Overview' }] },
-    markets:   { tabs: [{ id: 'analysis', label: 'Live Analysis' }, { id: 'sessions', label: 'Trade Sessions' }, { id: 'calendar', label: 'Economic Calendar' }] },
+    markets:   { tabs: [{ id: 'analysis', label: 'Live Analysis' }, { id: 'redfolder', label: 'Red Folder' }, { id: 'sessions', label: 'Trade Sessions' }, { id: 'calendar', label: 'Economic Calendar' }] },
     traderoom: { tabs: [{ id: 'scalp',    label: 'Scalp Desk' },    { id: 'daytrade', label: 'Day Trade Desk' }, { id: 'strategy', label: 'Strategy Guide' }] },
     research:  { tabs: [{ id: 'edges',    label: 'Edge Lab' }] },
     utilities: { tabs: [{ id: 'calculator', label: 'Position Calc' }, { id: 'tracker', label: 'Signal Tracker' }, { id: 'journal', label: 'Trade Journal' }] }
