@@ -2132,6 +2132,33 @@
     .rf-skew-bull { background: rgba(0,166,81,0.12);  color: var(--accent-green); }
     .rf-skew-bear { background: rgba(194,59,51,0.12); color: var(--accent-red); }
     .rf-skew-wait { background: rgba(217,119,6,0.12); color: #D97706; }
+    .rf-breakdown { font-size: 9px; color: var(--text-tertiary); margin-top: 5px; font-family: 'JetBrains Mono', monospace; }
+    .rf-em { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 14px; }
+    @media (max-width: 800px) { .rf-em { grid-template-columns: 1fr; } }
+    .rf-em-block {
+      padding: 12px 14px; border-radius: 9px;
+      background: rgba(0,82,204,0.05); border: 1px solid rgba(0,82,204,0.15);
+    }
+    html.dark .rf-em-block { background: rgba(41,98,255,0.07); border-color: rgba(41,98,255,0.2); }
+    .rf-em-lbl { font-size: 9px; font-weight: 800; letter-spacing: 1px; text-transform: uppercase; color: var(--text-tertiary); }
+    .rf-em-val { font-size: 16px; font-weight: 800; font-family: 'JetBrains Mono', monospace; margin-top: 5px; }
+    .rf-em-sub { font-size: 10px; color: var(--text-secondary); font-weight: 500; margin-top: 3px; }
+    .rf-triggers {
+      margin-top: 12px; padding: 10px 14px; border-radius: 9px; font-size: 11px;
+      color: var(--text-secondary); line-height: 1.8;
+      background: rgba(127,127,127,0.05); border: 1px solid var(--border-light);
+    }
+    .rf-lv { font-family: 'JetBrains Mono', monospace; font-weight: 800; }
+    .rf-lv-g { color: var(--accent-green); }
+    .rf-lv-r { color: var(--accent-red); }
+    .rf-tc {
+      display: inline-block; padding: 6px 11px; border-radius: 7px;
+      font-size: 11px; font-weight: 700; color: var(--text-secondary);
+      background: rgba(127,127,127,0.07); border: 1px solid var(--border-light);
+    }
+    .rf-tc-bull { color: var(--accent-green); background: rgba(0,166,81,0.08); border-color: rgba(0,166,81,0.2); }
+    .rf-tc-bear { color: var(--accent-red);   background: rgba(194,59,51,0.08); border-color: rgba(194,59,51,0.2); }
+    .rf-tc-hot  { color: #D97706; background: rgba(217,119,6,0.1); border-color: rgba(217,119,6,0.3); }
     .rf-scenarios { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 14px; }
     @media (max-width: 800px) { .rf-scenarios { grid-template-columns: 1fr; } }
     .rf-scn {
@@ -3528,11 +3555,12 @@
 
     <div class="card glass" style="margin-bottom:16px;">
       <div style="font-size:12px;color:var(--text-secondary);line-height:1.7;">
-        Each card maps how gold typically reacts to a <strong>red-folder</strong> (high-impact) release, with the
-        directional skew computed from the <strong>live macro regime</strong> (real yields + DXY + composite score).
-        These are probability maps and reaction plans — not forecasts of the print itself.
-        The golden rule on every card: <strong>flat into the release, trade the confirmed direction after the first
-        15-minute candle closes.</strong>
+        Each card maps how gold typically reacts to a <strong>red-folder</strong> (high-impact) release:
+        a directional <strong>skew</strong> with its components shown (macro regime + real yields + event asymmetry
+        + live intraday technicals), an <strong>expected move</strong> (typical and tail, calibrated to 2022–2025
+        event-day behavior) mapped onto the live S/R ladder, and <strong>technical trigger levels</strong> shared
+        with the Analysis tab and charts. Probability maps and reaction plans — not forecasts of the print itself.
+        Golden rule: <strong>flat into the release, trade the confirmed direction after the first 15-minute close.</strong>
       </div>
     </div>
 
@@ -4551,8 +4579,13 @@
   // Each playbook encodes how gold typically reacts to a release family.
   // baseTilt shifts the computed skew (+ = bullish-gold asymmetry: soft prints
   // rally hard while hot prints tend to get bought by the structural CB bid).
+  // Each playbook carries an EXPECTED MOVE calibration (em): typical and tail
+  // event-day reactions as % of spot, plus the event day's usual range vs a
+  // normal day's ATR. Calibrated from gold's 2022–2025 event-day behavior —
+  // estimates for planning, not guarantees.
   const EVENT_PLAYBOOKS = [
     { match: /payrolls|unemployment/i, type: 'Labor (NFP)', baseTilt: 5,
+      em: { typ: 0.8, tail: 1.6, atrX: 1.4 },
       scenarios: [
         { label: 'Soft',    trigger: 'Jobs well under consensus / unemployment up', reaction: 'Sharp rally — cuts pulled forward, yields & DXY drop', tone: 'bull' },
         { label: 'In-line', trigger: 'Within ~±20k of consensus',                   reaction: 'Whippy first 15 min, then reverts to prevailing trend', tone: 'wait' },
@@ -4560,6 +4593,7 @@
       ],
       note: 'Highest-volume print of the month. First spike is spread noise — never trade the initial candle.' },
     { match: /CPI|PPI|PCE/i, type: 'Inflation', baseTilt: 4,
+      em: { typ: 0.9, tail: 1.8, atrX: 1.5 },
       scenarios: [
         { label: 'Cool',    trigger: 'Core below consensus',  reaction: 'Rally — real yields fall, cut path accelerates', tone: 'bull' },
         { label: 'In-line', trigger: 'On consensus',          reaction: 'Muted — attention rolls to the next FOMC',       tone: 'wait' },
@@ -4567,6 +4601,7 @@
       ],
       note: 'Gold trades this through REAL yields — watch the TIPS reaction, not the headline.' },
     { match: /FOMC|rate decision/i, type: 'Fed Decision', baseTilt: 3,
+      em: { typ: 1.0, tail: 2.0, atrX: 1.6 },
       scenarios: [
         { label: 'Dovish',  trigger: 'Cut, or dots shift lower',        reaction: 'Rally 1–2%, often extending for days', tone: 'bull' },
         { label: 'As-expected', trigger: 'Priced outcome + neutral presser', reaction: 'Volatile chop — direction resolves during the presser, not the statement', tone: 'wait' },
@@ -4574,6 +4609,7 @@
       ],
       note: 'Two-stage event: statement 14:00 ET, presser 14:30 ET. The presser reverses the statement move ~40% of the time.' },
     { match: /GDP/i, type: 'Growth', baseTilt: 2,
+      em: { typ: 0.4, tail: 0.9, atrX: 1.1 },
       scenarios: [
         { label: 'Miss',    trigger: 'Growth under consensus', reaction: 'Rally — slowdown accelerates the cut timeline', tone: 'bull' },
         { label: 'In-line', trigger: 'Near consensus',         reaction: 'Minor — GDP is backward-looking',               tone: 'wait' },
@@ -4581,6 +4617,7 @@
       ],
       note: 'Usually a secondary mover unless it surprises hugely.' },
     { match: /jackson hole/i, type: 'Fed Symposium', baseTilt: 0,
+      em: { typ: 0.8, tail: 1.8, atrX: 1.3 },
       scenarios: [
         { label: 'Dovish signal',  trigger: 'Chair hints at easier policy', reaction: 'Strong rally — venue famous for pivot signals', tone: 'bull' },
         { label: 'Balanced',       trigger: 'Academic, no policy signal',   reaction: 'Fade the initial vol, range re-establishes',    tone: 'wait' },
@@ -4588,6 +4625,7 @@
       ],
       note: 'Pure volatility event — size down, widen stops, or stand aside entirely.' },
     { match: /./, type: 'Macro Release', baseTilt: 1,
+      em: { typ: 0.3, tail: 0.7, atrX: 1.0 },
       scenarios: [
         { label: 'Weak data',   trigger: 'Below consensus', reaction: 'Gold bid — easing path supported',  tone: 'bull' },
         { label: 'In-line',     trigger: 'On consensus',    reaction: 'Little sustained impact',           tone: 'wait' },
@@ -4596,12 +4634,44 @@
       note: 'Standard reaction map — weak US data is gold-bullish via the rates channel.' }
   ];
 
-  function renderRedFolder() {
+  // ── Live intraday technicals from the 5-minute candles ─────────────────────
+  // Computed from the same kline feed the charts use. Feeds the skew (trend
+  // confirmation) and the volatility-compression read (coiled = bigger break).
+  let techState = { ok: false, ts: 0 };
+  async function computeTechnicals() {
+    if (techState.ok && Date.now() - techState.ts < 5 * 60 * 1000) return techState;
+    try {
+      const c = await fetchGoldKlines();
+      if (!c || c.length < 70) return techState;
+      const closes = c.map(x => x.close);
+      const last   = closes[closes.length - 1];
+      const sma20  = closes.slice(-20).reduce((a, b) => a + b, 0) / 20;
+      // RSI-14 on 5m closes
+      let g = 0, l = 0;
+      for (let i = closes.length - 14; i < closes.length; i++) {
+        const d = closes[i] - closes[i - 1];
+        if (d > 0) g += d; else l -= d;
+      }
+      const rsi = l === 0 ? 100 : 100 - 100 / (1 + g / l);
+      // Volatility compression: mean bar range last hour vs prior 4 hours
+      const rng    = c.map(x => x.high - x.low);
+      const recent = rng.slice(-12).reduce((a, b) => a + b, 0) / 12;
+      const base   = rng.slice(-60, -12).reduce((a, b) => a + b, 0) / 48;
+      const compression = base > 0 ? recent / base : 1;
+      techState = { ok: true, ts: Date.now(), last, sma20, trend: last >= sma20 ? 'up' : 'down', rsi, compression };
+    } catch (e) { console.warn('technicals failed:', e.message); }
+    return techState;
+  }
+
+  async function renderRedFolder() {
     const box = document.getElementById('rf-cards');
     if (!box) return;
-    const md  = getMacroData();
+    const md    = getMacroData();
+    const tech  = await computeTechnicals();
     const now   = new Date();
     const today = new Date(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate());
+    const price = lastGoldPrice || 3900;
+    const atr   = price * 0.009;
 
     const upcoming = CAL_EVENTS
       .filter(ev => ev.impact === 'high')
@@ -4614,16 +4684,49 @@
       return;
     }
 
-    box.innerHTML = upcoming.map(({ ev, date }) => {
+    // Shared technical ladder (ATR-based S/R from the live price — the same
+    // levels shown on the Analysis tab and marked on the charts)
+    const R1 = Math.round(price + atr * 0.5), R2 = Math.round(price + atr * 1.5), R3 = Math.round(price + atr * 2.5);
+    const S1 = Math.round(price - atr * 0.5), S2 = Math.round(price - atr * 1.5), S3 = Math.round(price - atr * 2.5);
+    const levelFor = pts => pts >= atr * 2.5 ? 'R3/S3' : pts >= atr * 1.5 ? 'R2/S2' : pts >= atr * 0.5 ? 'R1/S1' : 'inside R1/S1';
+
+    // Technicals summary chip row (shared across cards)
+    const techRow = tech.ok
+      ? `<span class="rf-tc ${tech.trend === 'up' ? 'rf-tc-bull' : 'rf-tc-bear'}">${tech.trend === 'up' ? '▲ Trend above 20-SMA' : '▼ Trend below 20-SMA'}</span>` +
+        `<span class="rf-tc ${tech.rsi >= 70 ? 'rf-tc-bear' : tech.rsi <= 30 ? 'rf-tc-bull' : ''}">RSI-14 (5m): ${tech.rsi.toFixed(0)}${tech.rsi >= 70 ? ' — stretched, mean-revert risk' : tech.rsi <= 30 ? ' — washed out, bounce risk' : ''}</span>` +
+        `<span class="rf-tc ${tech.compression <= 0.75 ? 'rf-tc-hot' : ''}">${tech.compression <= 0.75 ? '⚡ Vol compressed ' + Math.round((1 - tech.compression) * 100) + '% — coiled for expansion' : 'Volatility normal (' + tech.compression.toFixed(2) + '× baseline)'}</span>`
+      : `<span class="rf-tc">Intraday technicals unavailable — skew is macro-only</span>`;
+
+    box.innerHTML = `
+      <div class="card glass" style="margin-bottom:14px;">
+        <div style="font-size:10px;font-weight:800;letter-spacing:1.2px;text-transform:uppercase;color:var(--text-tertiary);margin-bottom:8px;">Live Technical State (feeds every skew below)</div>
+        <div style="display:flex;gap:10px;flex-wrap:wrap;">${techRow}</div>
+      </div>` +
+      upcoming.map(({ ev, date }) => {
       const pb = EVENT_PLAYBOOKS.find(p => p.match.test(ev.title));
-      // Regime-aware skew: macro direction + real-yield bias + event asymmetry
-      let skew = 50
-        + (md.isLong ? 8 : md.isShort ? -8 : 0)
-        + (realYield.bias === 'bull' ? 4 : realYield.bias === 'bear' ? -4 : 0)
-        + pb.baseTilt;
-      skew = Math.max(25, Math.min(80, Math.round(skew)));
+
+      // ── Skew model (transparent components) ────────────────────────────────
+      const cMacro = md.isLong ? 8 : md.isShort ? -8 : 0;
+      const cRY    = realYield.bias === 'bull' ? 4 : realYield.bias === 'bear' ? -4 : 0;
+      const cEvent = pb.baseTilt;
+      const cTech  = tech.ok ? (tech.trend === 'up' ? 4 : -4) : 0;
+      // Overbought/oversold damping: stretched RSI into an event argues for
+      // mean reversion against the trend component.
+      const cRsi   = tech.ok ? (tech.rsi >= 70 ? -3 : tech.rsi <= 30 ? 3 : 0) : 0;
+      let skew = 50 + cMacro + cRY + cEvent + cTech + cRsi;
+      skew = Math.max(20, Math.min(85, Math.round(skew)));
       const skewTone = skew >= 56 ? 'bull' : skew <= 44 ? 'bear' : 'wait';
       const skewTxt  = skew >= 56 ? `${skew}% bullish skew` : skew <= 44 ? `${100 - skew}% bearish skew` : 'balanced — no edge';
+      const fmtC = v => (v >= 0 ? '+' : '') + v;
+      const breakdown = `macro ${fmtC(cMacro)} · real yield ${fmtC(cRY)} · event ${fmtC(cEvent)}` + (tech.ok ? ` · trend ${fmtC(cTech)}${cRsi ? ' · RSI ' + fmtC(cRsi) : ''}` : '');
+
+      // ── Expected move → technical map ───────────────────────────────────────
+      const typPts  = Math.round(price * pb.em.typ  / 100);
+      const tailPts = Math.round(price * pb.em.tail / 100);
+      // Volatility compression amplifies the realized move historically
+      const compBoost = (tech.ok && tech.compression <= 0.75) ? ' ⚡ compression argues for the upper end' : '';
+      const upTyp = Math.round(price + typPts),  dnTyp = Math.round(price - typPts);
+      const upTail = Math.round(price + tailPts), dnTail = Math.round(price - tailPts);
 
       const daysOut = Math.round((date - today) / 86400000);
       const when = daysOut === 0 ? 'TODAY' : daysOut === 1 ? 'TOMORROW' : `in ${daysOut}d`;
@@ -4640,8 +4743,30 @@
             <div class="rf-title">${ev.title} <span class="rf-when ${daysOut <= 1 ? 'rf-when-hot' : ''}">${when}</span></div>
             <div class="rf-type">${pb.type} · ${ev.desc}</div>
           </div>
-          <div class="rf-skew rf-skew-${skewTone}">${skewTxt}</div>
+          <div style="text-align:right;">
+            <div class="rf-skew rf-skew-${skewTone}">${skewTxt}</div>
+            <div class="rf-breakdown">${breakdown}</div>
+          </div>
         </div>
+
+        <div class="rf-em">
+          <div class="rf-em-block">
+            <div class="rf-em-lbl">Expected Move (typical)</div>
+            <div class="rf-em-val">±${typPts.toLocaleString()} pts <span class="rf-em-sub">(±${pb.em.typ}%)</span></div>
+            <div class="rf-em-sub">→ ${dnTyp.toLocaleString()} / ${upTyp.toLocaleString()} · tags ${levelFor(typPts)}</div>
+          </div>
+          <div class="rf-em-block">
+            <div class="rf-em-lbl">Tail Move (big surprise)</div>
+            <div class="rf-em-val">±${tailPts.toLocaleString()} pts <span class="rf-em-sub">(±${pb.em.tail}%)</span></div>
+            <div class="rf-em-sub">→ ${dnTail.toLocaleString()} / ${upTail.toLocaleString()} · reaches ${levelFor(tailPts)}</div>
+          </div>
+          <div class="rf-em-block">
+            <div class="rf-em-lbl">Event-Day Range</div>
+            <div class="rf-em-val">≈${pb.em.atrX}× ATR</div>
+            <div class="rf-em-sub">vs normal daily ATR ~${Math.round(atr)} pts${compBoost}</div>
+          </div>
+        </div>
+
         <div class="rf-scenarios">
           ${pb.scenarios.map(s => `
             <div class="rf-scn">
@@ -4650,6 +4775,14 @@
               <div class="rf-scn-reaction">${s.reaction}</div>
             </div>`).join('')}
         </div>
+
+        <div class="rf-triggers">
+          <strong>Technical triggers (live levels):</strong>
+          momentum long on 15m close &gt; <span class="rf-lv rf-lv-g">${R1.toLocaleString()}</span> → target <span class="rf-lv rf-lv-g">${R2.toLocaleString()}</span>, runner <span class="rf-lv rf-lv-g">${R3.toLocaleString()}</span>
+          &nbsp;·&nbsp; breakdown short on 15m close &lt; <span class="rf-lv rf-lv-r">${S1.toLocaleString()}</span> → target <span class="rf-lv rf-lv-r">${S2.toLocaleString()}</span>, runner <span class="rf-lv rf-lv-r">${S3.toLocaleString()}</span>
+          &nbsp;·&nbsp; stop = beyond the print candle's extreme (~${Math.round(atr * 0.25)} pts)
+        </div>
+
         <div class="rf-note"><strong>Playbook:</strong> ${pb.note} Flat into the print; trade the confirmed direction after the first 15-min close.</div>
       </div>`;
     }).join('');
