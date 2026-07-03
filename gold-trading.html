@@ -3451,6 +3451,72 @@
 
   </div><!-- end tab-daytrade -->
 
+  <!-- ENGULFING DESK — pattern method, live scanner, marked chart -->
+  <div id="tab-engulf" class="tab-panel">
+    <div class="section-header">
+      <div class="section-title">Engulfing Desk <span style="font-size:11px;font-weight:500;color:var(--text-tertiary)">— the tight-stop scalp method: pattern + structure + confirmation</span></div>
+    </div>
+
+    <!-- THE METHOD -->
+    <div class="card glass-premium" style="margin-bottom:16px;">
+      <h3>The Engulfing Method — how it works and why the stop is tight</h3>
+      <div class="grid-3" style="margin-top:12px;">
+        <div class="metric-box">
+          <div class="metric-label">1 · The Pattern</div>
+          <div class="metric-detail" style="font-size:11px;line-height:1.7;">A <strong style="color:var(--accent-green)">bullish engulfing</strong> = a red candle followed by a green candle whose <strong>body completely covers</strong> the red body. Sellers pushed, buyers absorbed everything and reversed it — a real shift in control, not a wick. Bearish = the mirror image.</div>
+        </div>
+        <div class="metric-box">
+          <div class="metric-label">2 · Location Is Everything</div>
+          <div class="metric-detail" style="font-size:11px;line-height:1.7;">An engulfing in the middle of a range is noise. It becomes tradeable <strong>at structure</strong>: VWAP, previous-day high/low, Asian range edge, round numbers, or an S/R level. The scanner tags these with <strong>★</strong> — those are the only ones worth risk.</div>
+        </div>
+        <div class="metric-box">
+          <div class="metric-label">3 · Entry / Stop / Target</div>
+          <div class="metric-detail" style="font-size:11px;line-height:1.7;"><strong>Entry:</strong> break of the engulfing candle's extreme (or next candle open for aggressive).<br><strong>Stop:</strong> just beyond the engulfing candle's other extreme — typically <strong>8–15 pts</strong>, not 30+.<br><strong>Targets:</strong> 1.8R and 3R, or the next structure level.</div>
+        </div>
+      </div>
+      <div style="margin-top:14px;padding:12px 16px;border-radius:9px;background:rgba(212,175,55,0.08);border:1px solid rgba(212,175,55,0.25);font-size:11px;line-height:1.7;color:var(--text-secondary);">
+        <strong style="color:#B8860B;">Why this fixes the &ldquo;SL too big&rdquo; problem:</strong> an ATR stop asks &ldquo;how far does gold wander in a day?&rdquo; A pattern stop asks &ldquo;at what price is this specific trade proven wrong?&rdquo; If price trades back through the entire engulfing candle, the reversal failed — exit. That invalidation point is close by definition, so the same $ risk buys a 2–3× larger position, and the 1.8R target is only ~20 pts away instead of ~60.
+        <br><br><strong style="color:#B8860B;">Filters that keep the win rate up:</strong> trade only ★ at-structure signals · only in the macro/MTF direction (check the alignment verdict) · London or NY session · never 30 min around a red-folder print · skip if the engulfing body is 3×+ average (exhaustion, not reversal).
+      </div>
+    </div>
+
+    <!-- LIVE CHART WITH MARKERS -->
+    <div class="dash-widget" style="margin-bottom:16px;">
+      <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;margin-bottom:10px;">
+        <div class="dash-widget-title" style="margin:0;">M5 Live Chart — engulfings marked <span style="font-size:10px;font-weight:500;color:var(--text-tertiary)">▲/▼ arrows &middot; ★E = at structure &middot; VWAP/PDH/PDL/Asia lines</span></div>
+        <div class="chart-legend">
+          <span class="cl-item"><span class="cl-dot" style="background:#00A651"></span>Bullish engulf</span>
+          <span class="cl-item"><span class="cl-dot" style="background:#C23B33"></span>Bearish engulf</span>
+          <span class="cl-item"><span class="cl-dot" style="background:#8B5CF6"></span>VWAP</span>
+        </div>
+      </div>
+      <div id="engulfChart" style="width:100%;height:360px;position:relative;">
+        <div id="engulfChartMsg" style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;text-align:center;color:var(--text-tertiary);font-size:12px;padding:16px;">Loading&hellip;</div>
+      </div>
+    </div>
+
+    <!-- LIVE SCANNER -->
+    <div class="card glass">
+      <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;">
+        <h3 style="margin:0;">Live Scanner — recent engulfings (M5 &amp; M15)</h3>
+        <span style="font-size:10px;color:var(--text-tertiary);" id="engulfScanTs">&mdash;</span>
+      </div>
+      <div class="journal-table-wrap" style="margin-top:12px;">
+        <table class="journal-table">
+          <thead>
+            <tr><th>Time (UTC)</th><th>TF</th><th>Type</th><th>At Structure</th><th>Entry (break)</th><th>Stop</th><th>Risk</th><th>T1 (1.8R)</th><th>T2 (3R)</th></tr>
+          </thead>
+          <tbody id="engulfScanBody">
+            <tr><td colspan="9" class="j-empty">Scanning&hellip;</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div style="margin-top:10px;font-size:10px;color:var(--text-tertiary);line-height:1.6;">
+        ★ rows printed at a structure level — the tradeable ones. Raw rows are shown for learning: watch how often they fail vs ★ rows. Entries assume break of the pattern extreme; always confirm direction against the macro signal and MTF verdict first.
+      </div>
+    </div>
+  </div><!-- end tab-engulf -->
+
 
   <!-- CALCULATOR TAB -->
   <div id="tab-calculator" class="tab-panel">
@@ -4489,6 +4555,7 @@
     if (name === 'tracker')   { renderSignalTracker(); }
     if (name === 'redfolder') { renderRedFolder(); }
     if (name === 'mtf')       { initMtfCharts(); renderMtfSummary(); }
+    if (name === 'engulf')    { engulfChartCtl.init(); renderEngulfDesk(); }
   }
 
   // ─── CHECKLIST ─────────────────────────────────────────────────────────────
@@ -5323,8 +5390,10 @@
     const p = lastGoldPrice, atr = atrOf(p);
     const md = getMacroData();
     const dirSign = md.isShort ? -1 : 1;   // default long-side geometry when 'wait'
-    const tStop = atr * 0.8;
-    return { dir: md.dir, entry: p, stop: p - dirSign * tStop, t1: p + dirSign * tStop * 1.8, t2: p + dirSign * tStop * 3.0 };
+    // Structure-based stop (last swing + buffer), NOT a fat ATR fraction —
+    // targets stay R-multiples of the actual risk so R:R is honest.
+    const ss = swingStop(md.isShort ? 'short' : 'long', p, atr);
+    return { dir: md.dir, entry: p, stop: ss.stop, t1: p + dirSign * ss.risk * 1.8, t2: p + dirSign * ss.risk * 3.0, risk: ss.risk, basis: ss.basis };
   }
 
   // Day Trade Desk geometry (mirrors renderDayTradeDesk exactly):
@@ -5416,6 +5485,10 @@
         offset = (lastGoldPrice && lastClose) ? (lastGoldPrice - lastClose) : 0;
         if (offset) candles = candles.map(c => ({ time: c.time, open:+(c.open+offset).toFixed(2), high:+(c.high+offset).toFixed(2), low:+(c.low+offset).toFixed(2), close:+(c.close+offset).toFixed(2) }));
         series.setData(candles);
+        // Engulfing markers (arrows on the bars; ★ = printed at structure)
+        if (cfg.markers && typeof series.setMarkers === 'function') {
+          try { series.setMarkers(engulfMarkers(candles)); } catch (e) {}
+        }
         if (chart && chart.timeScale) { try { chart.timeScale().fitContent(); } catch (e) {} }
         const msg = document.getElementById(cfg.msgId);
         if (msg) msg.style.display = 'none';
@@ -5467,7 +5540,7 @@
   }
 
   const scalpChartCtl = createLevelChart({
-    chartId: 'scalpChart', msgId: 'scalpChartMsg', boxId: 'scalpChartLevels', getLevels: scalpLevels,
+    chartId: 'scalpChart', msgId: 'scalpChartMsg', boxId: 'scalpChartLevels', getLevels: scalpLevels, markers: true,
     extraLevels: () => !structState.ok ? [] : [
       structState.vwap   !== null ? { price: structState.vwap,   color: '#8B5CF6', title: 'VWAP',    dashed: true } : null,
       structState.asianH !== null ? { price: structState.asianH, color: '#7A8196', title: 'ASIA H',  dashed: true } : null,
@@ -5498,7 +5571,7 @@
   });
   const mtfM15Ctl = createLevelChart({
     chartId: 'mtfM15', msgId: 'mtfM15Msg', boxId: 'mtfM15Levels', interval: '15m', height: 340,
-    biasKey: 'M15', biasId: 'mtf-bias-m15', getLevels: scalpLevels,
+    biasKey: 'M15', biasId: 'mtf-bias-m15', getLevels: scalpLevels, markers: true,
     extraLevels: () => !structState.ok ? [] : [
       structState.vwap   !== null ? { price: structState.vwap,   color: '#8B5CF6', title: 'VWAP',   dashed: true } : null,
       structState.asianH !== null ? { price: structState.asianH, color: '#7A8196', title: 'ASIA H', dashed: true } : null,
@@ -5507,6 +5580,18 @@
   });
 
   function initMtfCharts() { mtfDailyCtl.init(); mtfH4Ctl.init(); mtfM15Ctl.init(); }
+
+  // Engulfing Desk chart: 5m execution view with pattern markers + structure
+  const engulfChartCtl = createLevelChart({
+    chartId: 'engulfChart', msgId: 'engulfChartMsg', interval: '5m', height: 360, markers: true,
+    extraLevels: () => !structState.ok ? [] : [
+      structState.vwap   !== null ? { price: structState.vwap,   color: '#8B5CF6', title: 'VWAP',   dashed: true } : null,
+      structState.pdh    !== null ? { price: structState.pdh,    color: '#7A8196', title: 'PDH',    dashed: true } : null,
+      structState.pdl    !== null ? { price: structState.pdl,    color: '#7A8196', title: 'PDL',    dashed: true } : null,
+      structState.asianH !== null ? { price: structState.asianH, color: '#7A8196', title: 'ASIA H', dashed: true } : null,
+      structState.asianL !== null ? { price: structState.asianL, color: '#7A8196', title: 'ASIA L', dashed: true } : null
+    ]
+  });
 
   // Top-down alignment verdict: the classic multi-timeframe filter — trade M15
   // entries only in the direction the Daily and H4 agree on.
@@ -5610,11 +5695,13 @@
   // ─── INTRADAY STRUCTURE — the levels institutions actually trade ────────────
   // Session VWAP, EMA20/50 (5m), previous-day H/L/C, Asian-session range.
   let structState = { ok: false, ts: 0 };
+  let candles5mCache = null;   // latest 5m candles, shared (swing stops, engulfing scan)
   async function refreshStructure() {
     if (structState.ok && Date.now() - structState.ts < 5 * 60 * 1000) return structState;
     try {
       const [c5, d1] = await Promise.all([fetchGoldKlines('5m'), fetchGoldKlines('1d')]);
       if (!c5 || c5.length < 60) return structState;
+      candles5mCache = c5;
       const closes = c5.map(x => x.close);
       const last   = closes[closes.length - 1];
 
@@ -5662,6 +5749,141 @@
       };
     } catch (e) { console.warn('structure refresh failed:', e.message); }
     return structState;
+  }
+
+  // ─── STRUCTURE-BASED SCALP STOP ─────────────────────────────────────────────
+  // A scalp stop belongs behind structure (last swing / pattern extreme), not
+  // at a statistical distance. Swing stop = extreme of the last 8×5m bars plus
+  // a small buffer, clamped to [0.2, 0.8]× ATR so it is tight but never inside
+  // spread noise. Falls back to 0.4× ATR when candles are unavailable.
+  function swingStop(dir, price, atr) {
+    const c = candles5mCache;
+    let stop, basis = 'fallback';
+    if (c && c.length >= 10) {
+      const w = c.slice(-8);
+      const off = (lastGoldPrice && c[c.length - 1].close) ? (lastGoldPrice - c[c.length - 1].close) : 0;
+      if (dir === 'short') {
+        const hi = Math.max(...w.map(x => x.high)) + off;
+        stop = hi + atr * 0.06; basis = 'swing high';
+      } else {
+        const lo = Math.min(...w.map(x => x.low)) + off;
+        stop = lo - atr * 0.06; basis = 'swing low';
+      }
+      // clamp risk into a sane scalp band
+      const risk = Math.abs(price - stop);
+      const minR = atr * 0.2, maxR = atr * 0.8;
+      if (risk < minR) stop = dir === 'short' ? price + minR : price - minR;
+      if (risk > maxR) { stop = dir === 'short' ? price + maxR : price - maxR; basis = 'clamped 0.8× ATR'; }
+    } else {
+      stop = dir === 'short' ? price + atr * 0.4 : price - atr * 0.4;
+    }
+    return { stop, risk: Math.abs(price - stop), basis };
+  }
+
+  // ─── ENGULFING DETECTION ────────────────────────────────────────────────────
+  // Bullish engulfing: a down candle followed by an up candle whose real body
+  // completely covers the previous body (and is meaningfully sized). Highest-
+  // probability when it prints AT structure (VWAP, PDH/PDL, Asian range, round
+  // numbers) — a raw engulfing mid-range is noise.
+  function detectEngulfings(candles) {
+    if (!candles || candles.length < 25) return [];
+    const out = [];
+    const bodies = candles.map(c => Math.abs(c.close - c.open));
+    const off = (lastGoldPrice && candles[candles.length - 1].close) ? (lastGoldPrice - candles[candles.length - 1].close) : 0;
+    const nearLevel = (p) => {
+      const tol = p * 0.0012; // ~0.12%
+      const s = structState;
+      const levels = [];
+      if (s.ok) {
+        if (s.vwap   !== null) levels.push(['VWAP', s.vwap]);
+        if (s.pdh    !== null) levels.push(['PDH',  s.pdh]);
+        if (s.pdl    !== null) levels.push(['PDL',  s.pdl]);
+        if (s.asianH !== null) levels.push(['Asia H', s.asianH]);
+        if (s.asianL !== null) levels.push(['Asia L', s.asianL]);
+      }
+      const r100 = Math.round(p / 100) * 100, r50 = Math.round(p / 50) * 50;
+      levels.push(['$' + r100, r100]); if (r50 !== r100) levels.push(['$' + r50, r50]);
+      for (const [name, lv] of levels) if (Math.abs(p - lv) <= tol) return name;
+      return null;
+    };
+    for (let i = 1; i < candles.length; i++) {
+      const p = candles[i - 1], c = candles[i];
+      const pBody = bodies[i - 1], cBody = bodies[i];
+      // average body of the trailing 20 bars — size filter kills noise prints
+      const start = Math.max(0, i - 20);
+      const avgBody = bodies.slice(start, i).reduce((a, b) => a + b, 0) / (i - start);
+      if (cBody < avgBody * 1.2 || cBody < pBody * 1.05) continue;
+      const bull = c.close > c.open && p.close < p.open && c.close >= Math.max(p.open, p.close) && c.open <= Math.min(p.open, p.close);
+      const bear = c.close < c.open && p.close > p.open && c.close <= Math.min(p.open, p.close) && c.open >= Math.max(p.open, p.close);
+      if (!bull && !bear) continue;
+      const mid = (c.high + c.low) / 2 + off;
+      out.push({
+        time: c.time, type: bull ? 'bull' : 'bear',
+        high: +(c.high + off).toFixed(2), low: +(c.low + off).toFixed(2),
+        close: +(c.close + off).toFixed(2),
+        size: +(cBody).toFixed(2),
+        atLevel: nearLevel(mid)
+      });
+    }
+    return out;
+  }
+
+  // Chart markers for detected engulfings (Lightweight Charts setMarkers)
+  function engulfMarkers(candles) {
+    return detectEngulfings(candles).slice(-30).map(e => ({
+      time: e.time,
+      position: e.type === 'bull' ? 'belowBar' : 'aboveBar',
+      color: e.type === 'bull' ? '#00A651' : '#C23B33',
+      shape: e.type === 'bull' ? 'arrowUp' : 'arrowDown',
+      text: (e.atLevel ? '★' : '') + 'E'
+    }));
+  }
+
+  // ─── ENGULFING SCANNER (Engulfing Desk table) ───────────────────────────────
+  async function renderEngulfDesk() {
+    const body = document.getElementById('engulfScanBody');
+    const ts   = document.getElementById('engulfScanTs');
+    if (!body) return;
+    try {
+      const [c5, c15] = await Promise.all([fetchGoldKlines('5m'), fetchGoldKlines('15m')]);
+      const rows = [];
+      const collect = (cands, tf) => {
+        if (!cands) return;
+        for (const e of detectEngulfings(cands).slice(-8)) rows.push({ ...e, tf });
+      };
+      collect(c5, 'M5'); collect(c15, 'M15');
+      rows.sort((a, b) => b.time - a.time);
+      if (ts) ts.textContent = 'scanned ' + new Date().toLocaleTimeString('en-US', { hour12: false, timeZone: 'UTC' }) + ' UTC';
+      if (!rows.length) {
+        body.innerHTML = '<tr><td colspan="9" class="j-empty">No engulfing patterns in the recent window' + (candles5mCache ? '' : ' — candle feed unavailable in this region') + '.</td></tr>';
+        return;
+      }
+      const mono = "font-family:'JetBrains Mono',monospace";
+      body.innerHTML = rows.slice(0, 14).map(e => {
+        const isB   = e.type === 'bull';
+        const entry = isB ? e.high : e.low;              // break of pattern extreme
+        const stop  = isB ? e.low  : e.high;             // beyond the other extreme
+        const risk  = Math.abs(entry - stop);
+        const t1    = isB ? entry + risk * 1.8 : entry - risk * 1.8;
+        const t2    = isB ? entry + risk * 3.0 : entry - risk * 3.0;
+        const tstr  = new Date(e.time * 1000).toLocaleString('en-GB', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit', hour12: false, timeZone: 'UTC' });
+        const col   = isB ? 'var(--accent-green)' : 'var(--accent-red)';
+        return `<tr style="${e.atLevel ? '' : 'opacity:0.55;'}">
+          <td style="white-space:nowrap;color:var(--text-secondary)">${tstr}</td>
+          <td style="${mono}">${e.tf}</td>
+          <td style="font-weight:800;color:${col}">${isB ? '▲ BULL' : '▼ BEAR'}</td>
+          <td>${e.atLevel ? '<span style="color:#B8860B;font-weight:800;">★ ' + e.atLevel + '</span>' : '<span style="color:var(--text-tertiary)">raw</span>'}</td>
+          <td style="${mono}">${entry.toFixed(1)}</td>
+          <td style="${mono};color:var(--accent-red)">${stop.toFixed(1)}</td>
+          <td style="${mono};font-weight:700">${risk.toFixed(0)} pts</td>
+          <td style="${mono};color:var(--accent-green)">${t1.toFixed(1)}</td>
+          <td style="${mono};color:var(--accent-green)">${t2.toFixed(1)}</td>
+        </tr>`;
+      }).join('');
+    } catch (e) {
+      console.warn('engulf scan failed:', e.message);
+      body.innerHTML = '<tr><td colspan="9" class="j-empty">Scanner unavailable — candle feed blocked.</td></tr>';
+    }
   }
 
   // ─── SIGNAL QUALITY GRADE — the win-rate filter ─────────────────────────────
@@ -6329,7 +6551,7 @@
   const NAV_SECTIONS = {
     dashboard: { tabs: [{ id: 'dashboard', label: 'Overview' }] },
     markets:   { tabs: [{ id: 'analysis', label: 'Live Analysis' }, { id: 'mtf', label: 'Multi-TF Charts' }, { id: 'redfolder', label: 'Red Folder' }, { id: 'sessions', label: 'Trade Sessions' }, { id: 'calendar', label: 'Economic Calendar' }] },
-    traderoom: { tabs: [{ id: 'scalp',    label: 'Scalp Desk' },    { id: 'daytrade', label: 'Day Trade Desk' }, { id: 'strategy', label: 'Strategy Guide' }] },
+    traderoom: { tabs: [{ id: 'scalp',    label: 'Scalp Desk' },    { id: 'daytrade', label: 'Day Trade Desk' }, { id: 'engulf', label: 'Engulfing Desk' }, { id: 'strategy', label: 'Strategy Guide' }] },
     research:  { tabs: [{ id: 'edges',    label: 'Edge Lab' }, { id: 'intel', label: 'Intel Sources' }] },
     utilities: { tabs: [{ id: 'calculator', label: 'Position Calc' }, { id: 'tracker', label: 'Signal Tracker' }, { id: 'journal', label: 'Trade Journal' }] }
   };
@@ -6846,12 +7068,16 @@
     const atr   = atrOf(price);
     const md    = getMacroData();
     const si    = getSessionInfo();
-    const tStop = atr * 0.8;
-    const tT1   = tStop * 1.8;
-    const tT2   = tStop * 3.0;
 
     const isL = md.isLong, isS = md.isShort;
     const dir = isL ? 'long' : isS ? 'short' : 'wait';
+
+    // Structure-based stop (last 5m swing + buffer, clamped 0.2–0.8× ATR).
+    // Much tighter than the old 0.8×ATR default; targets are true R-multiples.
+    const ss    = swingStop(isS ? 'short' : 'long', price, atr);
+    const tStop = ss.risk;
+    const tT1   = tStop * 1.8;
+    const tT2   = tStop * 3.0;
 
     // Update banner
     const banner = document.getElementById('scalp-banner');
@@ -6864,13 +7090,13 @@
     setEl('scalp-conf', md.conf + '% confidence');
 
     const entry = price;
-    const stop  = isL ? price - tStop : isS ? price + tStop : price - tStop;
+    const stop  = ss.stop;
     const t1    = isL ? price + tT1   : isS ? price - tT1   : price + tT1;
     const t2    = isL ? price + tT2   : isS ? price - tT2   : price + tT2;
 
     setEl('scalp-entry', price.toFixed(2));
     setEl('scalp-stop',  stop.toFixed(2));
-    setEl('scalp-stop-pts', tStop.toFixed(0) + ' pts tight');
+    setEl('scalp-stop-pts', tStop.toFixed(0) + ' pts · ' + ss.basis);
     setEl('scalp-t1',  t1.toFixed(2));
     setEl('scalp-t1-pts', tT1.toFixed(0) + ' pts · 1.8R');
     setEl('scalp-t2',  t2.toFixed(2));
