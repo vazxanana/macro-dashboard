@@ -2155,6 +2155,26 @@
     .mtf-v-bear  { color: var(--accent-red);   background: rgba(194,59,51,0.1); }
     .mtf-v-mixed { color: #D97706;             background: rgba(217,119,6,0.1); }
 
+    /* EMS Trinity */
+    .ems-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+    @media (max-width: 1100px) { .ems-grid { grid-template-columns: repeat(2, 1fr); } }
+    @media (max-width: 640px)  { .ems-grid { grid-template-columns: 1fr; } }
+    .ems-step {
+      background: var(--card-bg); border: 1px solid var(--border);
+      border-radius: 12px; padding: 16px 18px;
+    }
+    .ems-step-head { font-size: 10px; font-weight: 800; letter-spacing: 1px; text-transform: uppercase; color: var(--text-tertiary); display: flex; align-items: center; gap: 8px; }
+    .ems-num {
+      display: inline-flex; align-items: center; justify-content: center;
+      width: 20px; height: 20px; border-radius: 6px; font-size: 11px;
+      background: rgba(212,175,55,0.15); color: #B8860B; font-weight: 900;
+    }
+    .ems-step-val { font-size: 15px; font-weight: 800; font-family: 'JetBrains Mono', monospace; margin-top: 10px; }
+    .ems-step-sub { font-size: 11px; color: var(--text-secondary); margin-top: 8px; line-height: 1.7; }
+    .ems-chip { display: inline-block; padding: 3px 9px; border-radius: 6px; font-size: 10px; font-weight: 800; margin: 1px 0; }
+    .ems-ok   { background: rgba(0,166,81,0.12);  color: var(--accent-green); }
+    .ems-wait { background: rgba(217,119,6,0.12); color: #D97706; }
+
     /* Intel sources */
     .intel-item { padding: 12px 0; border-bottom: 1px solid var(--border-light); }
     .intel-item:last-child { border-bottom: none; }
@@ -3517,6 +3537,59 @@
     </div>
   </div><!-- end tab-engulf -->
 
+  <!-- EMS TRINITY — bias → HTF engulf zone → LTF sweep+BOS → execute -->
+  <div id="tab-ems" class="tab-panel">
+    <div class="section-header">
+      <div class="section-title">EMS Trinity <span style="font-size:11px;font-weight:500;color:var(--text-tertiary)">— live top-down pipeline: Daily bias &middot; H4 engulf zone &middot; M15 sweep→BOS &middot; RR ≥ 3</span></div>
+    </div>
+
+    <div class="card glass" style="margin-bottom:16px;">
+      <div style="font-size:12px;color:var(--text-secondary);line-height:1.75;">
+        This desk runs the <strong>EMS Trinity</strong> workflow live (methodology credit: <em>The Alchemist EMS Trinity</em>, Yanu Emmanuel — summarised here in our own words for personal use).
+        The core idea: <strong>direction comes from fresh higher-timeframe levels measured on candle bodies</strong>; the <strong>H4 engulfing zone in that direction is the point of interest</strong> (a continuation zone, not a reversal signal);
+        the <strong>entry trigger is a lower-timeframe liquidity sweep followed by a break of structure</strong> inside that zone; and the trade only exists if the <strong>reward to the next fresh level is at least 3× the risk</strong>.
+        Every step below is computed from live candles — when a step is amber, the method says wait.
+      </div>
+      <div style="margin-top:8px;text-align:right;font-size:10px;color:var(--text-tertiary);" id="ems-ts">&mdash;</div>
+    </div>
+
+    <!-- 4-step live pipeline -->
+    <div class="ems-grid" id="ems-steps"></div>
+
+    <!-- Trade plan -->
+    <div class="dash-widget" style="margin:16px 0;">
+      <div class="dash-widget-title" style="margin-bottom:12px;">Trade Plan (auto-built from the pipeline)</div>
+      <div id="ems-plan"></div>
+    </div>
+
+    <!-- H4 chart with MSNR lines + engulf zones -->
+    <div class="dash-widget" style="margin-bottom:16px;">
+      <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;margin-bottom:10px;">
+        <div class="dash-widget-title" style="margin:0;">H4 — Zones + Fresh Daily Levels <span style="font-size:10px;font-weight:500;color:var(--text-tertiary)">gold lines = fresh MSNR levels (bodies) &middot; boxes = engulf zones</span></div>
+        <div class="chart-legend">
+          <span class="cl-item"><span class="cl-dot" style="background:#D4AF37"></span>Fresh level</span>
+          <span class="cl-item"><span class="cl-dot" style="background:#00A651"></span>Bull zone</span>
+          <span class="cl-item"><span class="cl-dot" style="background:#C23B33"></span>Bear zone</span>
+        </div>
+      </div>
+      <div id="emsChart" style="width:100%;height:360px;position:relative;">
+        <div id="emsChartMsg" style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;text-align:center;color:var(--text-tertiary);font-size:12px;padding:16px;">Loading&hellip;</div>
+      </div>
+    </div>
+
+    <!-- Compounding calculator -->
+    <div class="card glass">
+      <h3>Precision Compounding Calculator <span style="font-size:11px;font-weight:500;color:var(--text-tertiary)">— the account-splitting model, with your own assumptions</span></h3>
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:14px 0;">
+        <div class="calc-input-group"><label class="calc-label" for="emsCap">Total Capital ($)</label><input class="calc-input" type="number" id="emsCap" value="1000" min="10" oninput="emsFlipCalc()"></div>
+        <div class="calc-input-group"><label class="calc-label" for="emsN">Accounts</label><input class="calc-input" type="number" id="emsN" value="10" min="1" max="50" oninput="emsFlipCalc()"></div>
+        <div class="calc-input-group"><label class="calc-label" for="emsWR">Win Rate (%)</label><input class="calc-input" type="number" id="emsWR" value="60" min="0" max="100" oninput="emsFlipCalc()"></div>
+        <div class="calc-input-group"><label class="calc-label" for="emsMult">Target Multiple (×)</label><input class="calc-input" type="number" id="emsMult" value="7" min="1" max="20" step="0.5" oninput="emsFlipCalc()"></div>
+      </div>
+      <div id="emsFlipOut"></div>
+    </div>
+  </div><!-- end tab-ems -->
+
 
   <!-- CALCULATOR TAB -->
   <div id="tab-calculator" class="tab-panel">
@@ -4556,6 +4629,7 @@
     if (name === 'redfolder') { renderRedFolder(); }
     if (name === 'mtf')       { initMtfCharts(); renderMtfSummary(); }
     if (name === 'engulf')    { engulfChartCtl.init(); renderEngulfDesk(); }
+    if (name === 'ems')       { renderEmsDesk().then(() => emsChartCtl.init()); emsFlipCalc(); }
   }
 
   // ─── CHECKLIST ─────────────────────────────────────────────────────────────
@@ -5589,6 +5663,17 @@
 
   function initMtfCharts() { mtfDailyCtl.init(); mtfH4Ctl.init(); mtfM15Ctl.init(); }
 
+  // EMS Trinity chart: H4 with engulf zones + fresh daily MSNR levels
+  const emsChartCtl = createLevelChart({
+    chartId: 'emsChart', msgId: 'emsChartMsg', interval: '4h', height: 360, markers: true, zones: true,
+    extraLevels: () => {
+      const out = [];
+      if (emsLevels.res) out.push({ price: emsLevels.res.price, color: '#D4AF37', title: 'FRESH R' });
+      if (emsLevels.sup) out.push({ price: emsLevels.sup.price, color: '#D4AF37', title: 'FRESH S' });
+      return out;
+    }
+  });
+
   // Engulfing Desk chart: 5m execution view with pattern markers + structure
   const engulfChartCtl = createLevelChart({
     chartId: 'engulfChart', msgId: 'engulfChartMsg', interval: '5m', height: 360, markers: true, zones: true,
@@ -5922,6 +6007,222 @@
         }];
       }
     };
+  }
+
+  // ─── EMS TRINITY ENGINE ─────────────────────────────────────────────────────
+  // Implements the EMS workflow (bias -> HTF engulf zone -> LTF sweep+BOS ->
+  // execute) as a live pipeline. Concepts follow "The Alchemist EMS Trinity"
+  // (Yanu Emmanuel); all code and wording here are original.
+
+  // MSNR-style levels: swing support/resistance measured on candle BODIES
+  // (open/close), and only FRESH levels (no later body has traded through).
+  function dailyBodyLevels(d1) {
+    if (!d1 || d1.length < 12) return { res: null, sup: null, all: [] };
+    const off = (lastGoldPrice && d1[d1.length - 1].close) ? (lastGoldPrice - d1[d1.length - 1].close) : 0;
+    const bt = c => Math.max(c.open, c.close), bb = c => Math.min(c.open, c.close);
+    const raw = [];
+    for (let i = 2; i < d1.length - 2; i++) {
+      if (bt(d1[i]) > bt(d1[i-1]) && bt(d1[i]) > bt(d1[i-2]) && bt(d1[i]) > bt(d1[i+1]) && bt(d1[i]) > bt(d1[i+2]))
+        raw.push({ type: 'res', price: bt(d1[i]), i });
+      if (bb(d1[i]) < bb(d1[i-1]) && bb(d1[i]) < bb(d1[i-2]) && bb(d1[i]) < bb(d1[i+1]) && bb(d1[i]) < bb(d1[i+2]))
+        raw.push({ type: 'sup', price: bb(d1[i]), i });
+    }
+    const fresh = raw.filter(L => {
+      for (let j = L.i + 2; j < d1.length; j++) {
+        const c = d1[j];
+        if (L.type === 'res' ? bt(c) >= L.price : bb(c) <= L.price) return false;
+      }
+      return true;
+    }).map(L => ({ type: L.type, price: +(L.price + off).toFixed(2) }));
+    const px = lastGoldPrice || 0;
+    return {
+      res: fresh.filter(l => l.type === 'res' && l.price > px).sort((a, b) => a.price - b.price)[0] || null,
+      sup: fresh.filter(l => l.type === 'sup' && l.price < px).sort((a, b) => b.price - a.price)[0] || null,
+      all: fresh
+    };
+  }
+
+  // Liquidity sweep -> break of structure on a lower timeframe.
+  // Long: a fractal swing low gets wicked below but the candle closes back
+  // above it (sweep), then a later close above the interim high (BOS).
+  function detectSweepBOS(candles, dir) {
+    const none = { swing: null, sweep: null, bos: null, confirmed: false };
+    if (!candles || candles.length < 30) return none;
+    const off = (lastGoldPrice && candles[candles.length - 1].close) ? (lastGoldPrice - candles[candles.length - 1].close) : 0;
+    const n = candles.length, isL = dir === 'long';
+
+    // Collect recent fractal swings (most recent first). The newest fractal is
+    // often the SWEEP bar itself, so we evaluate several candidates and keep
+    // the most advanced state (confirmed > swept > swing-only).
+    const fractals = [];
+    for (let i = n - 4; i >= 2 && fractals.length < 6; i--) {
+      const c = candles[i];
+      const isSwing = isL
+        ? (c.low  < candles[i-1].low  && c.low  < candles[i-2].low  && c.low  < candles[i+1].low  && c.low  < candles[i+2].low)
+        : (c.high > candles[i-1].high && c.high > candles[i-2].high && c.high > candles[i+1].high && c.high > candles[i+2].high);
+      if (isSwing) fractals.push(i);
+    }
+    if (!fractals.length) return none;
+
+    const evalSwing = (si) => {
+      const sw = candles[si];
+      const swing = { time: sw.time, price: +((isL ? sw.low : sw.high) + off).toFixed(2) };
+      let pi = -1;
+      for (let j = si + 1; j < n; j++) {
+        const c = candles[j];
+        if (isL ? (c.low < sw.low && c.close > sw.low) : (c.high > sw.high && c.close < sw.high)) { pi = j; break; }
+      }
+      if (pi < 0) return { swing, sweep: null, bos: null, confirmed: false };
+      let lvl = isL ? -Infinity : Infinity;
+      for (let k = si; k <= pi; k++) lvl = isL ? Math.max(lvl, candles[k].high) : Math.min(lvl, candles[k].low);
+      let bi = -1;
+      for (let m = pi + 1; m < n; m++) {
+        if (isL ? candles[m].close > lvl : candles[m].close < lvl) { bi = m; break; }
+      }
+      return {
+        swing,
+        sweep: { time: candles[pi].time, price: +((isL ? candles[pi].low : candles[pi].high) + off).toFixed(2) },
+        bos: bi >= 0 ? { time: candles[bi].time, level: +(lvl + off).toFixed(2) } : null,
+        confirmed: bi >= 0
+      };
+    };
+
+    let best = null;
+    for (const si of fractals) {
+      const r = evalSwing(si);
+      if (r.confirmed) return r;                       // most recent confirmed sequence wins
+      if (!best || (r.sweep && !best.sweep)) best = r; // otherwise keep most advanced
+    }
+    return best || none;
+  }
+
+  // Full pipeline state (Daily bias -> H4 zone -> M15 structure -> plan)
+  let emsLevels = { res: null, sup: null };   // read by the EMS chart overlay
+  async function computeEmsState() {
+    const [d1, h4, m15] = await Promise.all([fetchGoldKlines('1d'), fetchGoldKlines('4h'), fetchGoldKlines('15m')]);
+    const px = lastGoldPrice || 0;
+    const st = { ok: !!(d1 && h4 && m15), px };
+    if (!st.ok) return st;
+
+    // STEP 1 — bias: daily close vs 20-SMA + the fresh-level map
+    const closes = d1.map(c => c.close);
+    const sma20 = closes.slice(-20).reduce((a, b) => a + b, 0) / Math.min(20, closes.length);
+    st.bias = closes[closes.length - 1] >= sma20 ? 'long' : 'short';
+    st.levels = dailyBodyLevels(d1);
+    emsLevels = st.levels;
+    st.target = st.bias === 'long' ? st.levels.res : st.levels.sup;   // next fresh level = delivery target
+
+    // STEP 2 — HTF engulf zone in the bias direction, fresh first
+    const zones = engulfZones(h4).filter(z => z.bull === (st.bias === 'long'));
+    const freshZ = zones.filter(z => z.t2 === null);
+    const pool = freshZ.length ? freshZ : zones;
+    st.zone = pool.sort((a, b) => Math.abs(px - (a.hi + a.lo) / 2) - Math.abs(px - (b.hi + b.lo) / 2))[0] || null;
+    st.zoneFresh = st.zone ? st.zone.t2 === null : false;
+    st.inZone = st.zone ? (px >= st.zone.lo - 2 && px <= st.zone.hi + 2) : false;
+
+    // STEP 3 — M15 sweep + BOS toward bias
+    st.struct = detectSweepBOS(m15, st.bias);
+
+    // STEP 4 — plan (only meaningful when a zone exists)
+    if (st.zone) {
+      const isL = st.bias === 'long';
+      const entry = isL ? st.zone.hi : st.zone.lo;                     // zone edge
+      const buf   = Math.max(0.8, (st.zone.hi - st.zone.lo) * 0.25);
+      const sl    = isL ? st.zone.lo - buf : st.zone.hi + buf;         // beyond the engulfed candle
+      const risk  = Math.abs(entry - sl);
+      const tgt   = st.target ? st.target.price : (isL ? entry + risk * 3 : entry - risk * 3);
+      const rr    = risk > 0 ? Math.abs(tgt - entry) / risk : 0;
+      st.plan = { entry: +entry.toFixed(1), sl: +sl.toFixed(1), tp: +(+tgt).toFixed(1), risk: +risk.toFixed(1), rr: +rr.toFixed(1), valid: rr >= 3 };
+    }
+    return st;
+  }
+
+  function emsChip(state, txtOk, txtWait) {
+    return state
+      ? '<span class="ems-chip ems-ok">✓ ' + txtOk + '</span>'
+      : '<span class="ems-chip ems-wait">⏳ ' + txtWait + '</span>';
+  }
+
+  async function renderEmsDesk() {
+    const box = document.getElementById('ems-steps');
+    const planEl = document.getElementById('ems-plan');
+    if (!box) return;
+    const st = await computeEmsState();
+    if (!st.ok) {
+      box.innerHTML = '<div class="card glass" style="text-align:center;color:var(--text-tertiary);padding:24px;">Candle feed unavailable — the EMS pipeline needs Daily/H4/M15 data.</div>';
+      return;
+    }
+    const isL = st.bias === 'long';
+    const dirCol = isL ? 'var(--accent-green)' : 'var(--accent-red)';
+    const fmtL = l => l ? l.price.toLocaleString() : '—';
+
+    box.innerHTML = `
+      <div class="ems-step">
+        <div class="ems-step-head"><span class="ems-num">1</span> BIAS — Fresh Daily Levels (bodies)</div>
+        <div class="ems-step-val" style="color:${dirCol}">${isL ? '▲ LONG storyline' : '▼ SHORT storyline'}</div>
+        <div class="ems-step-sub">Fresh resistance ${fmtL(st.levels.res)} · fresh support ${fmtL(st.levels.sup)}<br>Delivery target: <strong>${fmtL(st.target)}</strong> ${st.target ? '(' + Math.abs(st.px - st.target.price).toFixed(0) + ' pts away)' : '— no fresh level mapped'}</div>
+      </div>
+      <div class="ems-step">
+        <div class="ems-step-head"><span class="ems-num">2</span> POI — H4 Engulf Zone (continuation)</div>
+        <div class="ems-step-val">${st.zone ? st.zone.lo.toLocaleString() + ' – ' + st.zone.hi.toLocaleString() : '—'}</div>
+        <div class="ems-step-sub">${st.zone
+          ? emsChip(st.zoneFresh, 'FRESH zone (unmitigated)', 'mitigated — lower quality') + ' ' + emsChip(st.inZone, 'price IN the zone now', 'price ' + Math.abs(st.px - (st.zone.hi + st.zone.lo) / 2).toFixed(0) + ' pts from zone')
+          : 'No H4 engulfing in the bias direction yet — no trade, by definition.'}</div>
+      </div>
+      <div class="ems-step">
+        <div class="ems-step-head"><span class="ems-num">3</span> CONFIRM — M15 Sweep → BOS</div>
+        <div class="ems-step-val">${emsChip(!!st.struct.sweep, 'Liquidity swept @ ' + (st.struct.sweep ? st.struct.sweep.price.toLocaleString() : ''), 'waiting for sweep of ' + (st.struct.swing ? st.struct.swing.price.toLocaleString() : 'last swing'))}</div>
+        <div class="ems-step-sub">${emsChip(st.struct.confirmed, 'Structure broken @ ' + (st.struct.bos ? st.struct.bos.level.toLocaleString() : ''), 'waiting for the break of structure')}</div>
+      </div>
+      <div class="ems-step">
+        <div class="ems-step-head"><span class="ems-num">4</span> EXECUTE — RR ≥ 3 gate</div>
+        <div class="ems-step-val">${st.plan ? (st.plan.valid ? '<span style="color:var(--accent-green)">RR 1:' + st.plan.rr + ' — VALID</span>' : '<span style="color:var(--accent-red)">RR 1:' + st.plan.rr + ' — below 3, SKIP</span>') : '—'}</div>
+        <div class="ems-step-sub">All three prior steps must be green before this matters.</div>
+      </div>`;
+
+    if (planEl) {
+      if (st.plan) {
+        const ready = st.zone && st.struct.confirmed && st.plan.valid && st.inZone;
+        planEl.innerHTML = `
+          <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:12px;">
+            ${[['Direction', isL ? '▲ LONG' : '▼ SHORT', dirCol],
+               ['Entry (zone edge)', st.plan.entry.toLocaleString(), 'var(--accent-blue)'],
+               ['Stop (beyond zone)', st.plan.sl.toLocaleString(), 'var(--accent-red)'],
+               ['Target (fresh level)', st.plan.tp.toLocaleString(), 'var(--accent-green)'],
+               ['R:R', '1:' + st.plan.rr, st.plan.valid ? 'var(--accent-green)' : 'var(--accent-red)']]
+              .map(([l, v, c]) => `<div class="dash-setup-tile"><div style="font-size:9px;font-weight:800;letter-spacing:1.2px;text-transform:uppercase;color:var(--text-tertiary);margin-bottom:8px;">${l}</div><div style="font-size:15px;font-weight:800;font-family:'JetBrains Mono',monospace;color:${c}">${v}</div></div>`).join('')}
+          </div>
+          <div class="dash-setup-session" style="margin-top:12px;">
+            <strong style="color:${ready ? 'var(--accent-green)' : '#D97706'}">${ready ? 'ALL FOUR STEPS ALIGNED — setup is live.' : 'STAND BY — pipeline incomplete.'}</strong>
+            Risk ${st.plan.risk} pts per unit. The tracker and journal apply as usual; size so a full stop costs ≤ your per-trade risk.
+          </div>`;
+      } else {
+        planEl.innerHTML = '<div class="dash-setup-session">No qualifying H4 zone in the bias direction — the method says do nothing.</div>';
+      }
+    }
+    const ts = document.getElementById('ems-ts');
+    if (ts) ts.textContent = 'evaluated ' + new Date().toLocaleTimeString('en-US', { hour12: false, timeZone: 'UTC' }) + ' UTC';
+  }
+
+  // Compounding ("flipping") calculator — the book's account-splitting model
+  // with adjustable assumptions so the math is transparent.
+  function emsFlipCalc() {
+    const g = id => parseFloat(document.getElementById(id)?.value) || 0;
+    const cap = g('emsCap'), n = Math.max(1, Math.round(g('emsN'))), wr = Math.min(100, Math.max(0, g('emsWR'))) / 100, mult = g('emsMult');
+    const per = cap / n;
+    const wins = Math.round(n * wr), losses = n - wins;
+    const equity = wins * per * mult;
+    const out = document.getElementById('emsFlipOut');
+    if (out) out.innerHTML = `
+      <div class="grid-3">
+        <div class="metric-box"><div class="metric-label">Per Account</div><div class="metric-value">$${per.toFixed(0)}</div><div class="metric-detail">${n} accounts from $${cap.toLocaleString()}</div></div>
+        <div class="metric-box"><div class="metric-label">Expected Outcome</div><div class="metric-value">${wins}W / ${losses}L</div><div class="metric-detail">at ${(wr*100).toFixed(0)}% win rate assumption</div></div>
+        <div class="metric-box"><div class="metric-label">Projected Equity</div><div class="metric-value" style="color:${equity >= cap ? 'var(--accent-green)' : 'var(--accent-red)'}">$${equity.toLocaleString(undefined,{maximumFractionDigits:0})}</div><div class="metric-detail">${equity >= cap ? '+' : ''}${(((equity - cap) / cap) * 100).toFixed(0)}% vs invested</div></div>
+      </div>
+      <div style="margin-top:10px;font-size:11px;color:var(--text-secondary);line-height:1.7;">
+        Rules of the model: losing accounts go to zero and that is planned; winners run to the target multiple; when an account hits target, <strong>withdraw the initial capital</strong> and recycle profits into a new cycle.
+        <strong style="color:#D97706;">Honesty check:</strong> the author assumes ~80% win rate on validated zones. Your real number is in the Signal Tracker — use that here before believing the projection.
+      </div>`;
   }
 
   // ─── ENGULFING SCANNER (Engulfing Desk table) ───────────────────────────────
@@ -6639,7 +6940,7 @@
   const NAV_SECTIONS = {
     dashboard: { tabs: [{ id: 'dashboard', label: 'Overview' }] },
     markets:   { tabs: [{ id: 'analysis', label: 'Live Analysis' }, { id: 'mtf', label: 'Multi-TF Charts' }, { id: 'redfolder', label: 'Red Folder' }, { id: 'sessions', label: 'Trade Sessions' }, { id: 'calendar', label: 'Economic Calendar' }] },
-    traderoom: { tabs: [{ id: 'scalp',    label: 'Scalp Desk' },    { id: 'daytrade', label: 'Day Trade Desk' }, { id: 'engulf', label: 'Engulfing Desk' }, { id: 'strategy', label: 'Strategy Guide' }] },
+    traderoom: { tabs: [{ id: 'scalp',    label: 'Scalp Desk' },    { id: 'daytrade', label: 'Day Trade Desk' }, { id: 'engulf', label: 'Engulfing Desk' }, { id: 'ems', label: 'EMS Trinity' }, { id: 'strategy', label: 'Strategy Guide' }] },
     research:  { tabs: [{ id: 'edges',    label: 'Edge Lab' }, { id: 'intel', label: 'Intel Sources' }] },
     utilities: { tabs: [{ id: 'calculator', label: 'Position Calc' }, { id: 'tracker', label: 'Signal Tracker' }, { id: 'journal', label: 'Trade Journal' }] }
   };
