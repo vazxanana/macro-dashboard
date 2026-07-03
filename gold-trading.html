@@ -3603,6 +3603,83 @@
     </div>
   </div><!-- end tab-ems -->
 
+  <!-- mSNR DESK — Malaysian SNR: body levels, wick-first validation, 2-TF confirmation -->
+  <div id="tab-msnr" class="tab-panel">
+    <div class="section-header">
+      <div class="section-title">mSNR Desk <span style="font-size:11px;font-weight:500;color:var(--text-tertiary)">— Malaysian SNR: body-junction levels &middot; wick-first validation &middot; Weekly→Daily→H1 storyline</span></div>
+    </div>
+
+    <div class="card glass" style="margin-bottom:16px;">
+      <div style="font-size:12px;color:var(--text-secondary);line-height:1.75;">
+        Live implementation of the <strong>Malaysian SNR</strong> price-action method (credit: <em>The Truth About Price Action</em>, Iyanu Adegboruwa / Price Action Traders; mSNR lineage incl. Ariff T — summarised in our own words for personal use).
+        The core rules the engine enforces: <strong>levels live on candle bodies, never wicks</strong> — the open/close junction of adjacent opposite candles (the &ldquo;A&rdquo; and &ldquo;V&rdquo; shapes on a line chart);
+        a junction with a body gap is a <strong>GAP SNR (hidden zone)</strong>, drawn as a box; a level is <strong>FRESH</strong> until touched;
+        the <strong>first touch must be a wick</strong> (body-first = invalid); a <strong>Liquidity Sweep at the touch</strong> strengthens it;
+        and per the <strong>2-timeframe rule</strong>, a Daily setup is confirmed by an H1 breakout — entered on the retest.
+        <strong style="color:#B8860B;">NO VALIDATION, NO TRADE.</strong>
+      </div>
+      <div style="margin-top:8px;text-align:right;font-size:10px;color:var(--text-tertiary);" id="msnr-ts">&mdash;</div>
+    </div>
+
+    <!-- 4-step live pipeline -->
+    <div class="ems-grid" id="msnr-steps"></div>
+
+    <!-- Trade plan -->
+    <div class="dash-widget" style="margin:16px 0;">
+      <div class="dash-widget-title" style="margin-bottom:12px;">Trade Plan (auto-built from the storyline)</div>
+      <div id="msnr-plan"></div>
+    </div>
+
+    <!-- 3 charts: each TF draws its own body-SNR levels -->
+    <div class="mtf-grid" style="margin-bottom:16px;">
+      <div class="dash-widget">
+        <div class="dash-widget-title" style="margin-bottom:10px;">DAILY — mSNR Levels <span style="font-size:10px;font-weight:500;color:var(--text-tertiary)">red/green = fresh &middot; gold = wick-validated &middot; gray = flipped &middot; boxes = gap SNR</span></div>
+        <div id="msnrDaily" style="width:100%;height:300px;position:relative;">
+          <div id="msnrDailyMsg" style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;text-align:center;color:var(--text-tertiary);font-size:12px;padding:16px;">Loading&hellip;</div>
+        </div>
+      </div>
+      <div class="dash-widget">
+        <div class="dash-widget-title" style="margin-bottom:10px;">H4 — mSNR Levels <span style="font-size:10px;font-weight:500;color:var(--text-tertiary)">gap boxes here are the &ldquo;Decision&rdquo; levels</span></div>
+        <div id="msnrH4" style="width:100%;height:300px;position:relative;">
+          <div id="msnrH4Msg" style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;text-align:center;color:var(--text-tertiary);font-size:12px;padding:16px;">Loading&hellip;</div>
+        </div>
+      </div>
+    </div>
+    <div class="dash-widget" style="margin-bottom:16px;">
+      <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;margin-bottom:10px;">
+        <div class="dash-widget-title" style="margin:0;">M15 — mSNR Levels <span style="font-size:10px;font-weight:500;color:var(--text-tertiary)">refinement view for the H1 breakout retest</span></div>
+        <div class="chart-legend">
+          <span class="cl-item"><span class="cl-dot" style="background:#C23B33"></span>Fresh R</span>
+          <span class="cl-item"><span class="cl-dot" style="background:#00A651"></span>Fresh S</span>
+          <span class="cl-item"><span class="cl-dot" style="background:#D4AF37"></span>Wick-validated</span>
+          <span class="cl-item"><span class="cl-dot" style="background:#7A8196"></span>Flipped</span>
+        </div>
+      </div>
+      <div id="msnrM15" style="width:100%;height:340px;position:relative;">
+        <div id="msnrM15Msg" style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;text-align:center;color:var(--text-tertiary);font-size:12px;padding:16px;">Loading&hellip;</div>
+      </div>
+    </div>
+
+    <!-- Rules card -->
+    <div class="card glass">
+      <h3>The Rulebook (enforced above; trendlines stay manual)</h3>
+      <div class="grid-3" style="margin-top:12px;">
+        <div class="metric-box">
+          <div class="metric-label">Validation Rules</div>
+          <div class="metric-detail" style="font-size:11px;line-height:1.7;">First touch of an SNR must be a <strong>wick</strong>, never a body. A <strong>Liquidity Sweep</strong> (prior high/low taken at the touch, or a &ldquo;MISS&rdquo;) upgrades the setup. If the HTF touch lacks the sweep, refine to H4/H1 to find it.</div>
+        </div>
+        <div class="metric-box">
+          <div class="metric-label">Storyline Rules</div>
+          <div class="metric-detail" style="font-size:11px;line-height:1.7;">Weekly sets the main direction; Daily maps retracements and roadblocks; the H4 <strong>gap = decision level</strong>; H1 validates. If Daily runs against Weekly, the weekly leg pauses until the daily storyline completes.</div>
+        </div>
+        <div class="metric-box">
+          <div class="metric-label">Trendline Marriage (manual)</div>
+          <div class="metric-detail" style="font-size:11px;line-height:1.7;">Trendlines are angled SNRs: connect ≥2 body junctions (never wicks, never gap SNRs), no closes beyond the line, and enter only on the wick rejection at touch #3 — never at #2. Drawing stays manual by design: a mis-drawn auto-line is worse than none.</div>
+        </div>
+      </div>
+    </div>
+  </div><!-- end tab-msnr -->
+
 
   <!-- CALCULATOR TAB -->
   <div id="tab-calculator" class="tab-panel">
@@ -4643,6 +4720,7 @@
     if (name === 'mtf')       { initMtfCharts(); renderMtfSummary(); }
     if (name === 'engulf')    { initEgCharts(); renderEngulfDesk(); }
     if (name === 'ems')       { renderEmsDesk().then(() => emsChartCtl.init()); emsFlipCalc(); }
+    if (name === 'msnr')      { renderMsnrDesk().then(() => initMsnrCharts()); }
   }
 
   // ─── CHECKLIST ─────────────────────────────────────────────────────────────
@@ -5572,9 +5650,11 @@
         offset = (lastGoldPrice && lastClose) ? (lastGoldPrice - lastClose) : 0;
         if (offset) candles = candles.map(c => ({ time: c.time, open:+(c.open+offset).toFixed(2), high:+(c.high+offset).toFixed(2), low:+(c.low+offset).toFixed(2), close:+(c.close+offset).toFixed(2) }));
         series.setData(candles);
-        // Engulfing zones (boxes over the engulfed candle, order-block style)
+        // Per-chart candle hook (e.g. computing this TF's own mSNR levels)
+        if (cfg.onCandles) { try { cfg.onCandles(candles); } catch (e) {} }
+        // Zone boxes: custom source when provided, engulfing zones by default
         if (zonesPrim) {
-          try { zonesPrim.setZones(engulfZones(candles)); } catch (e) {}
+          try { zonesPrim.setZones((cfg.zonesFn || engulfZones)(candles)); } catch (e) {}
         }
         if (chart && chart.timeScale) { try { chart.timeScale().fitContent(); } catch (e) {} }
         const msg = document.getElementById(cfg.msgId);
@@ -5689,6 +5769,146 @@
   const egM15Ctl   = createLevelChart({ chartId: 'egM15',   msgId: 'egM15Msg',   interval: '15m', height: 340, zones: true });
   function initEgCharts() { egDailyCtl.init(); egH4Ctl.init(); egM15Ctl.init(); }
 
+  // mSNR Desk charts: each TF computes and draws its OWN body-junction levels;
+  // gap SNRs (hidden zones) draw as boxes via the zones primitive.
+  const msnrReg = { d: null, h4: null, m15: null };
+  function makeMsnrChart(key, chartId, msgId, interval, height) {
+    return createLevelChart({
+      chartId, msgId, interval, height, zones: true,
+      onCandles: (candles) => { msnrReg[key] = msnrLevels(candles, lastGoldPrice); },
+      zonesFn: (candles) => msnrChartLevels(msnrReg[key] || msnrLevels(candles, lastGoldPrice), lastGoldPrice || 0).zones,
+      extraLevels: () => msnrReg[key] ? msnrChartLevels(msnrReg[key], lastGoldPrice || 0).lines : []
+    });
+  }
+  const msnrDailyCtl = makeMsnrChart('d',   'msnrDaily', 'msnrDailyMsg', '1d',  300);
+  const msnrH4Ctl    = makeMsnrChart('h4',  'msnrH4',    'msnrH4Msg',    '4h',  300);
+  const msnrM15Ctl   = makeMsnrChart('m15', 'msnrM15',   'msnrM15Msg',   '15m', 340);
+  function initMsnrCharts() { msnrDailyCtl.init(); msnrH4Ctl.init(); msnrM15Ctl.init(); }
+
+  // ── mSNR storyline pipeline (Weekly direction → Daily level+validation →
+  //    H1 breakout per the 2-TF confirmation rule → plan) ──────────────────────
+  async function computeMsnrState() {
+    const [w1, d1, h4, h1] = await Promise.all([
+      fetchGoldKlines('1w'), fetchGoldKlines('1d'), fetchGoldKlines('4h'), fetchGoldKlines('1h')
+    ]);
+    const px = lastGoldPrice || 0;
+    const st = { ok: !!(w1 && d1 && h1), px };
+    if (!st.ok) return st;
+
+    // 1) Weekly = main direction (close vs its 20-SMA)
+    const wc = w1.map(c => c.close);
+    const wSma = wc.slice(-20).reduce((a, b) => a + b, 0) / Math.min(20, wc.length);
+    st.weekly = wc[wc.length - 1] >= wSma ? 'long' : 'short';
+
+    // 2) Daily: nearest fresh/wick-validated level in the weekly direction
+    //    (long → we buy at fresh SUPPORT; short → sell at fresh RESISTANCE)
+    const dLv = msnrLevels(d1, px);
+    const wantKind = st.weekly === 'long' ? 'sup' : 'res';
+    const usable = dLv.filter(l => l.kind === wantKind && (l.state === 'fresh' || l.state === 'wick'));
+    st.dailyLevel = usable.sort((a, b) => Math.abs(px - a.price) - Math.abs(px - b.price))[0] || null;
+    st.dailyTouched = st.dailyLevel ? st.dailyLevel.state === 'wick' : false;
+    st.dailyLS = st.dailyLevel ? st.dailyLevel.ls : false;
+
+    // Daily roadblock: opposing fresh level between price and target
+    st.target = dLv.filter(l => l.kind !== wantKind && l.state === 'fresh' &&
+        (st.weekly === 'long' ? l.price > px : l.price < px))
+      .sort((a, b) => Math.abs(px - a.price) - Math.abs(px - b.price))[0] || null;
+
+    // H4 gap "Decision level" near the daily level?
+    st.h4Decision = false;
+    if (h4 && st.dailyLevel) {
+      const h4Lv = msnrLevels(h4, px);
+      st.h4Decision = h4Lv.some(l => l.type === 'gap' && Math.abs(l.price - st.dailyLevel.price) <= px * 0.003);
+    }
+
+    // 3) H1 confirmation: after the daily wick touch, an H1 level flipped in
+    //    the trade direction = the LTF breakout; its retest is the entry.
+    st.h1Break = null;
+    if (st.dailyTouched && st.dailyLevel.touchedAt) {
+      const h1Lv = msnrLevels(h1, px);
+      const flips = h1Lv.filter(l => l.state === 'flipped' && l.flippedAt >= st.dailyLevel.touchedAt &&
+        (st.weekly === 'long' ? l.kind === 'res' : l.kind === 'sup'));   // broken resistance for longs
+      st.h1Break = flips.sort((a, b) => b.flippedAt - a.flippedAt)[0] || null;
+    }
+
+    // 4) Plan: entry at the flipped H1 level (retest), stop beyond the daily
+    //    touch extreme, target the next fresh daily level.
+    if (st.dailyLevel) {
+      const isL = st.weekly === 'long';
+      const entry = st.h1Break ? st.h1Break.price : (isL ? st.dailyLevel.hi : st.dailyLevel.lo);
+      const stop  = isL ? st.dailyLevel.lo - atrOf(px) * 0.25 : st.dailyLevel.hi + atrOf(px) * 0.25;
+      const risk  = Math.abs(entry - stop);
+      const tp    = st.target ? st.target.price : (isL ? entry + risk * 3 : entry - risk * 3);
+      const rr    = risk > 0 ? Math.abs(tp - entry) / risk : 0;
+      st.plan = { entry: +entry.toFixed(1), stop: +stop.toFixed(1), tp: +(+tp).toFixed(1),
+                  risk: +risk.toFixed(1), rr: +rr.toFixed(1), valid: rr >= 2 };
+    }
+    return st;
+  }
+
+  async function renderMsnrDesk() {
+    const box = document.getElementById('msnr-steps');
+    const planEl = document.getElementById('msnr-plan');
+    if (!box) return;
+    const st = await computeMsnrState();
+    if (!st.ok) {
+      box.innerHTML = '<div class="card glass" style="text-align:center;color:var(--text-tertiary);padding:24px;">Candle feed unavailable — mSNR needs Weekly/Daily/H1 data.</div>';
+      return;
+    }
+    const isL = st.weekly === 'long';
+    const dirCol = isL ? 'var(--accent-green)' : 'var(--accent-red)';
+    const L = st.dailyLevel;
+
+    box.innerHTML = `
+      <div class="ems-step">
+        <div class="ems-step-head"><span class="ems-num">1</span> STORYLINE — Weekly Direction</div>
+        <div class="ems-step-val" style="color:${dirCol}">${isL ? '▲ WEEKLY BULLISH' : '▼ WEEKLY BEARISH'}</div>
+        <div class="ems-step-sub">Daily is the retracement/roadblock map for this direction. Next fresh daily target: <strong>${st.target ? st.target.price.toLocaleString() : '—'}</strong></div>
+      </div>
+      <div class="ems-step">
+        <div class="ems-step-head"><span class="ems-num">2</span> LEVEL — Fresh Daily ${isL ? 'Support' : 'Resistance'} (bodies)</div>
+        <div class="ems-step-val">${L ? L.price.toLocaleString() + (L.type === 'gap' ? ' (GAP)' : '') : '—'}</div>
+        <div class="ems-step-sub">${L
+          ? emsChip(L.state === 'fresh', 'FRESH — untouched', 'wick-validated') + (st.h4Decision ? ' <span class="ems-chip ems-ok">H4 gap decision near level</span>' : '')
+          : 'No fresh daily level in the weekly direction — wait for one to form.'}</div>
+      </div>
+      <div class="ems-step">
+        <div class="ems-step-head"><span class="ems-num">3</span> VALIDATION — Wick Touch + LS</div>
+        <div class="ems-step-val">${emsChip(st.dailyTouched, 'Wick rejection seen', 'waiting for FIRST touch (must be wick)')}</div>
+        <div class="ems-step-sub">${st.dailyTouched
+          ? emsChip(st.dailyLS, 'Liquidity Sweep at the touch', 'no LS at touch — refine to H4/H1 to find it')
+          : 'The rule: first touch by WICK, never body. Body-first = invalid level.'}</div>
+      </div>
+      <div class="ems-step">
+        <div class="ems-step-head"><span class="ems-num">4</span> CONFIRM — H1 Breakout (2-TF rule)</div>
+        <div class="ems-step-val">${emsChip(!!st.h1Break, 'H1 SNR flipped @ ' + (st.h1Break ? st.h1Break.price.toLocaleString() : ''), 'waiting for H1 breakout after the touch')}</div>
+        <div class="ems-step-sub">Daily setup = H1 confirmation. Enter on the pullback/retest of the flipped level — never chase the break.</div>
+      </div>`;
+
+    if (planEl) {
+      if (st.plan && L) {
+        const ready = st.dailyTouched && !!st.h1Break && st.plan.valid;
+        planEl.innerHTML = `
+          <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:12px;">
+            ${[['Direction', isL ? '▲ LONG' : '▼ SHORT', dirCol],
+               ['Entry (retest)', st.plan.entry.toLocaleString(), 'var(--accent-blue)'],
+               ['Stop (beyond wick)', st.plan.stop.toLocaleString(), 'var(--accent-red)'],
+               ['Target (next fresh)', st.plan.tp.toLocaleString(), 'var(--accent-green)'],
+               ['R:R', '1:' + st.plan.rr, st.plan.valid ? 'var(--accent-green)' : 'var(--accent-red)']]
+              .map(([l2, v, c]) => `<div class="dash-setup-tile"><div style="font-size:9px;font-weight:800;letter-spacing:1.2px;text-transform:uppercase;color:var(--text-tertiary);margin-bottom:8px;">${l2}</div><div style="font-size:15px;font-weight:800;font-family:'JetBrains Mono',monospace;color:${c}">${v}</div></div>`).join('')}
+          </div>
+          <div class="dash-setup-session" style="margin-top:12px;">
+            <strong style="color:${ready ? 'var(--accent-green)' : '#D97706'}">${ready ? 'PIPELINE COMPLETE — setup is live on the retest.' : 'STAND BY — NO VALIDATION, NO TRADE.'}</strong>
+            Risk ${st.plan.risk} pts per unit.
+          </div>`;
+      } else {
+        planEl.innerHTML = '<div class="dash-setup-session">No qualifying daily level in the weekly direction — the method says wait.</div>';
+      }
+    }
+    const ts = document.getElementById('msnr-ts');
+    if (ts) ts.textContent = 'evaluated ' + new Date().toLocaleTimeString('en-US', { hour12: false, timeZone: 'UTC' }) + ' UTC';
+  }
+
   // Top-down alignment verdict: the classic multi-timeframe filter — trade M15
   // entries only in the direction the Daily and H4 agree on.
   function renderMtfSummary() {
@@ -5731,8 +5951,8 @@
   // Gold OHLC via CORS-enabled exchange APIs (PAXG tracks 1oz spot).
   // Returns [{time(sec), open, high, low, close, vol}] ascending, or null.
   // Supported intervals: '5m' (24h), '15m' (2 days), '4h' (~1 month), '1d' (~4 months).
-  const KLINE_LIMITS  = { '5m': 288, '15m': 192, '4h': 180, '1d': 120 };
-  const KRAKEN_MINUTES = { '5m': 5, '15m': 15, '4h': 240, '1d': 1440 };
+  const KLINE_LIMITS  = { '5m': 288, '15m': 192, '1h': 192, '4h': 180, '1d': 120, '1w': 104 };
+  const KRAKEN_MINUTES = { '5m': 5, '15m': 15, '1h': 60, '4h': 240, '1d': 1440, '1w': 10080 };
   async function fetchGoldKlines(interval = '5m') {
     const lim = KLINE_LIMITS[interval] || 288;
     // 1) Binance PAXGUSDT
@@ -5998,6 +6218,93 @@
           })
         }];
       }
+    };
+  }
+
+  // ─── MALAYSIAN SNR (mSNR) ENGINE ────────────────────────────────────────────
+  // Implements body-based SNR per "The Truth About Price Action" (Iyanu
+  // Adegboruwa, Price Action Traders; Malaysian SNR lineage / Ariff T).
+  // Levels form at the open-close JUNCTION of adjacent opposite candles:
+  //  "A" (bull close -> bear open at a local body peak)  = resistance
+  //  "V" (bear close -> bull open at a local body trough) = support
+  // A junction whose close != next open by a material amount is a GAP SNR
+  // (hidden zone). States: fresh (untouched), wick (first touch was a wick
+  // rejection — tradeable), flipped (a body traded through — role reverses).
+  function msnrLevels(candles, refPrice) {
+    if (!candles || candles.length < 12) return [];
+    const off = (refPrice && candles[candles.length - 1].close) ? (refPrice - candles[candles.length - 1].close) : 0;
+    const isBull = c => c.close > c.open, isBear = c => c.close < c.open;
+    const out = [];
+    const gapTol = (refPrice || candles[candles.length - 1].close) * 0.0004; // ~0.04% = material body gap
+
+    for (let i = 1; i < candles.length - 1; i++) {
+      const a = candles[i], b = candles[i + 1];
+      let kind = null;
+      // local body-peak / body-trough on the close line (the A / V shapes)
+      if (isBull(a) && isBear(b) && a.close > candles[i - 1].close && a.close >= b.close) kind = 'res';
+      else if (isBear(a) && isBull(b) && a.close < candles[i - 1].close && a.close <= b.close) kind = 'sup';
+      if (!kind) continue;
+
+      const j1 = a.close, j2 = b.open;
+      const lo = Math.min(j1, j2), hi = Math.max(j1, j2);
+      const type = (hi - lo) > gapTol ? 'gap' : 'classical';
+      const L = { kind, type, lo, hi, price: (lo + hi) / 2, formedAt: b.time, iEnd: i + 1,
+                  state: 'fresh', wickFirst: null, ls: false, flippedAt: null, touchedAt: null };
+
+      // walk forward: first interaction decides validation; body-through flips
+      for (let k = i + 2; k < candles.length; k++) {
+        const c = candles[k];
+        const bTop = Math.max(c.open, c.close), bBot = Math.min(c.open, c.close);
+        const bodyThrough = kind === 'res' ? bTop >= lo : bBot <= hi;      // body reaches the zone
+        const bodyBeyond  = kind === 'res' ? c.close > hi : c.close < lo;  // close through -> flip
+        const wickTouch   = kind === 'res' ? (c.high >= lo && bTop < lo) : (c.low <= hi && bBot > hi);
+
+        if (L.state === 'fresh') {
+          if (wickTouch) {
+            L.state = 'wick'; L.wickFirst = true; L.touchedAt = c.time;
+            // Liquidity Sweep at the touch: the touch candle takes the prior candle's extreme
+            L.ls = kind === 'res' ? c.high > candles[k - 1].high : c.low < candles[k - 1].low;
+          } else if (bodyThrough) {
+            L.wickFirst = false; L.touchedAt = c.time;
+            if (bodyBeyond) { L.state = 'flipped'; L.flippedAt = c.time; }
+            else L.state = 'body';           // body reached it first — invalid per the wick-first rule
+          }
+        } else if (L.state === 'wick' || L.state === 'body') {
+          if (bodyBeyond) { L.state = 'flipped'; L.flippedAt = c.time; }
+        } else if (L.state === 'flipped') {
+          // re-broken back through -> discard as exhausted
+          const backBeyond = kind === 'res' ? c.close < lo : c.close > hi;
+          if (backBeyond) { L.state = 'dead'; break; }
+        }
+      }
+      if (L.state !== 'dead') {
+        L.lo = +(L.lo + off).toFixed(2); L.hi = +(L.hi + off).toFixed(2); L.price = +(L.price + off).toFixed(2);
+        out.push(L);
+      }
+    }
+    return out;
+  }
+
+  // Chart-friendly selection: nearest few levels around price, per state
+  function msnrChartLevels(levels, px) {
+    const fresh = levels.filter(l => l.state === 'fresh');
+    const wick  = levels.filter(l => l.state === 'wick');
+    const flip  = levels.filter(l => l.state === 'flipped');
+    const near = (arr, kind, n) => arr.filter(l => l.kind === kind)
+      .sort((a, b) => Math.abs(px - a.price) - Math.abs(px - b.price)).slice(0, n);
+    return {
+      lines: [
+        ...near(fresh, 'res', 3).map(l => ({ price: l.price, color: '#C23B33', title: 'FRESH R' })),
+        ...near(fresh, 'sup', 3).map(l => ({ price: l.price, color: '#00A651', title: 'FRESH S' })),
+        ...near(wick,  'res', 2).map(l => ({ price: l.price, color: '#D4AF37', title: 'R✓wick', dashed: true })),
+        ...near(wick,  'sup', 2).map(l => ({ price: l.price, color: '#D4AF37', title: 'S✓wick', dashed: true })),
+        ...near(flip,  'res', 1).map(l => ({ price: l.price, color: '#7A8196', title: 'FLIP', dashed: true })),
+        ...near(flip,  'sup', 1).map(l => ({ price: l.price, color: '#7A8196', title: 'FLIP', dashed: true }))
+      ],
+      // Gap SNRs draw as boxes (hidden zones), fresh/wick only
+      zones: levels.filter(l => l.type === 'gap' && (l.state === 'fresh' || l.state === 'wick'))
+        .sort((a, b) => Math.abs(px - a.price) - Math.abs(px - b.price)).slice(0, 4)
+        .map(l => ({ t1: l.formedAt, t2: null, hi: l.hi, lo: l.lo, bull: l.kind === 'sup', star: l.state === 'fresh' }))
     };
   }
 
@@ -6932,7 +7239,7 @@
   const NAV_SECTIONS = {
     dashboard: { tabs: [{ id: 'dashboard', label: 'Overview' }] },
     markets:   { tabs: [{ id: 'analysis', label: 'Live Analysis' }, { id: 'mtf', label: 'Multi-TF Charts' }, { id: 'redfolder', label: 'Red Folder' }, { id: 'sessions', label: 'Trade Sessions' }, { id: 'calendar', label: 'Economic Calendar' }] },
-    traderoom: { tabs: [{ id: 'scalp',    label: 'Scalp Desk' },    { id: 'daytrade', label: 'Day Trade Desk' }, { id: 'engulf', label: 'Engulfing Desk' }, { id: 'ems', label: 'EMS Trinity' }, { id: 'strategy', label: 'Strategy Guide' }] },
+    traderoom: { tabs: [{ id: 'scalp',    label: 'Scalp Desk' },    { id: 'daytrade', label: 'Day Trade Desk' }, { id: 'engulf', label: 'Engulfing Desk' }, { id: 'ems', label: 'EMS Trinity' }, { id: 'msnr', label: 'mSNR Desk' }, { id: 'strategy', label: 'Strategy Guide' }] },
     research:  { tabs: [{ id: 'edges',    label: 'Edge Lab' }, { id: 'intel', label: 'Intel Sources' }] },
     utilities: { tabs: [{ id: 'calculator', label: 'Position Calc' }, { id: 'tracker', label: 'Signal Tracker' }, { id: 'journal', label: 'Trade Journal' }] }
   };
