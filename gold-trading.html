@@ -2133,6 +2133,14 @@
     .rf-skew-bear { background: rgba(194,59,51,0.12); color: var(--accent-red); }
     .rf-skew-wait { background: rgba(217,119,6,0.12); color: #D97706; }
     .rf-breakdown { font-size: 9px; color: var(--text-tertiary); margin-top: 5px; font-family: 'JetBrains Mono', monospace; }
+
+    /* Intel sources */
+    .intel-item { padding: 12px 0; border-bottom: 1px solid var(--border-light); }
+    .intel-item:last-child { border-bottom: none; }
+    .intel-item a { font-size: 13px; font-weight: 700; color: var(--accent-blue); text-decoration: none; }
+    html.dark .intel-item a { color: #6E9FFF; }
+    .intel-item a:hover { text-decoration: underline; }
+    .intel-desc { display: block; font-size: 11px; color: var(--text-secondary); margin-top: 4px; line-height: 1.6; }
     .rf-em { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 14px; }
     @media (max-width: 800px) { .rf-em { grid-template-columns: 1fr; } }
     .rf-em-block {
@@ -2525,6 +2533,10 @@
         <div class="ticker-value" id="gsRatio">—</div>
       </div>
       <div class="ticker-item">
+        <div class="ticker-label">VIX</div>
+        <div class="ticker-value" id="vixVal">…</div>
+      </div>
+      <div class="ticker-item">
         <div class="timestamp" id="timestamp">—:—:— UTC</div>
       </div>
     </div>
@@ -2901,9 +2913,9 @@
           <div class="metric-detail" id="seasonal-driver-detail">Loading…</div>
         </div>
         <div class="metric-box">
-          <div class="metric-label">Geopolitical Risk</div>
-          <div class="metric-value text-green">8/10</div>
-          <div class="metric-detail">Safe-haven demand elevated</div>
+          <div class="metric-label">Risk Sentiment (VIX)</div>
+          <div class="metric-value" id="vix-driver-score">—/10</div>
+          <div class="metric-detail" id="vix-driver-detail">Loading…</div>
         </div>
         <div class="metric-box">
           <div class="metric-label">Composite Score</div>
@@ -3295,6 +3307,9 @@
       </div>
     </div>
 
+    <!-- Signal Quality (the win-rate filter) -->
+    <div id="scalp-quality"></div>
+
     <!-- 3 Live Scalp Setups -->
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
       <div style="font-size:9px;font-weight:800;letter-spacing:1.4px;text-transform:uppercase;color:var(--text-tertiary);">Live Scalp Setups — ATR-Based Precision Levels</div>
@@ -3364,6 +3379,9 @@
         <div class="desk-meta-hint" id="dt-hint">—</div>
       </div>
     </div>
+
+    <!-- Signal Quality (the win-rate filter) -->
+    <div id="dt-quality"></div>
 
     <!-- Live chart with day-trade setup levels marked -->
     <div class="dash-widget" style="margin-bottom:20px;">
@@ -4179,6 +4197,51 @@
 
   </div><!-- end tab-edges -->
 
+  <!-- INTEL SOURCES — the daily gold information stack -->
+  <div id="tab-intel" class="tab-panel">
+    <div class="section-header">
+      <div class="section-title">Daily Intel Sources <span style="font-size:11px;font-weight:500;color:var(--text-tertiary)">— where a gold desk actually looks every day</span></div>
+    </div>
+
+    <div class="card glass" style="margin-bottom:16px;">
+      <div style="font-size:12px;color:var(--text-secondary);line-height:1.7;">
+        The dashboard automates what it can (prices, real yields, DXY, VIX, structure levels). These are the
+        sources that <strong>can't be automated</strong> from a static page but move gold daily — check them in this
+        order as part of the morning routine. ★ = highest value per minute.
+      </div>
+    </div>
+
+    <div class="grid-2">
+      <div class="card glass">
+        <h3>★ Every Morning (5 min)</h3>
+        <div class="intel-item"><a href="https://www.forexfactory.com/calendar" target="_blank" rel="noopener">ForexFactory Calendar</a><span class="intel-desc">THE red-folder source — exact release times, consensus and prior for every print. Cross-check the Red Folder desk dates here (agencies shift dates around holidays).</span></div>
+        <div class="intel-item"><a href="https://www.cmegroup.com/markets/interest-rates/cme-fedwatch-tool.html" target="_blank" rel="noopener">CME FedWatch</a><span class="intel-desc">Live market-implied Fed cut/hike odds from Fed Funds futures — the fastest read on what's priced in before an event.</span></div>
+        <div class="intel-item"><a href="https://www.tradingview.com/symbols/XAUUSD/" target="_blank" rel="noopener">TradingView XAU/USD</a><span class="intel-desc">Overnight structure, volume profile, and the levels other traders are watching (ideas feed shows crowd positioning).</span></div>
+      </div>
+
+      <div class="card glass">
+        <h3>★ Weekly (Friday/Monday)</h3>
+        <div class="intel-item"><a href="https://www.cftc.gov/MarketReports/CommitmentsofTraders/index.htm" target="_blank" rel="noopener">CFTC COT Report</a><span class="intel-desc">Managed-money gold positioning (Fridays, 15:30 ET). Extremes are contrarian: crowded longs = pullback risk. Feeds Edge #1 in the Edge Lab.</span></div>
+        <div class="intel-item"><a href="https://www.gold.org/goldhub" target="_blank" rel="noopener">WGC Goldhub</a><span class="intel-desc">Central-bank purchases and ETF flow updates — the structural bid. Refresh the Institutional Flows panel figures from here quarterly.</span></div>
+        <div class="intel-item"><a href="https://fred.stlouisfed.org/series/DFII10" target="_blank" rel="noopener">FRED — 10Y Real Yield</a><span class="intel-desc">The master driver's official chart. Set a mental alert on the 2.0% and 1.5% levels — regime boundaries.</span></div>
+      </div>
+
+      <div class="card glass">
+        <h3>News &amp; Flows (as needed)</h3>
+        <div class="intel-item"><a href="https://www.kitco.com/news/" target="_blank" rel="noopener">Kitco News</a><span class="intel-desc">Gold-specific headlines and analyst positioning — fastest gold-dedicated newswire.</span></div>
+        <div class="intel-item"><a href="https://www.dailyfx.com/gold-price" target="_blank" rel="noopener">DailyFX Gold</a><span class="intel-desc">Retail sentiment data (IG client positioning) — useful contrarian read when >75% one-sided.</span></div>
+        <div class="intel-item"><a href="https://www.investing.com/commodities/gold-news" target="_blank" rel="noopener">Investing.com Gold News</a><span class="intel-desc">Broad wire aggregation; good for catching geopolitical headlines that spike the safe-haven bid.</span></div>
+      </div>
+
+      <div class="card glass">
+        <h3>Deep Context (monthly)</h3>
+        <div class="intel-item"><a href="https://www.gold.org/goldhub/research" target="_blank" rel="noopener">WGC Research Library</a><span class="intel-desc">Gold Demand Trends (quarterly) — the definitive supply/demand accounting.</span></div>
+        <div class="intel-item"><a href="https://www.federalreserve.gov/monetarypolicy/fomccalendars.htm" target="_blank" rel="noopener">Fed FOMC Calendar</a><span class="intel-desc">Official meeting dates + minutes release schedule — verify the Red Folder FOMC dates each quarter.</span></div>
+        <div class="intel-item"><a href="https://www.lbma.org.uk/prices-and-data" target="_blank" rel="noopener">LBMA Prices &amp; Data</a><span class="intel-desc">Official AM/PM fix data behind the London Fix edge (Edge #5).</span></div>
+      </div>
+    </div>
+  </div><!-- end tab-intel -->
+
   <!-- JOURNAL TAB -->
   <div id="tab-journal" class="tab-panel">
     <div class="section-header">Trade Journal</div>
@@ -4671,7 +4734,7 @@
     const now   = new Date();
     const today = new Date(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate());
     const price = lastGoldPrice || 3900;
-    const atr   = price * 0.009;
+    const atr   = atrOf(price);
 
     const upcoming = CAL_EVENTS
       .filter(ev => ev.impact === 'high')
@@ -4871,7 +4934,7 @@
 
     // ── Key level offsets (% of price, calibrated to gold volatility) ────────
     // Gold daily ATR ≈ 0.8–1.2% of price
-    const atr    = price * 0.009;   // ~0.9% ≈ typical daily ATR
+    const atr    = atrOf(price);   // ~0.9% ≈ typical daily ATR
     const atr15  = atr * 1.5;       // 1.5× ATR = safe distance from noise
 
     // Entry: slight pullback from current price (0.15%)
@@ -5108,27 +5171,25 @@
       // Clear any existing content
       container.innerHTML = '';
 
+      const dark = document.documentElement.classList.contains('dark');
       new TradingView.widget({
         autosize: true,
         symbol: "OANDA:XAUUSD",
         interval: "60",
         timezone: "exchange",
-        theme: "light",
+        theme: dark ? "dark" : "light",
         style: "1",
         locale: "en",
-        toolbar_bg: "rgba(248, 249, 250, 0.5)",
         enable_publishing: false,
         allow_symbol_change: false,
+        hide_side_toolbar: false,      // drawing tools available
+        withdateranges: true,          // quick range switcher
         container_id: "tradingview_chart",
-        studies: ["RSI@tv-basicstudies", "MACD@tv-basicstudies"],
-        overrides: {
-          "paneProperties.background": "rgba(248, 249, 250, 0.3)",
-          "paneProperties.backgroundType": "solid"
-        },
+        studies: ["RSI@tv-basicstudies", "MACD@tv-basicstudies", "MAExp@tv-basicstudies"],
         width: '100%',
         height: 500
       });
-      console.log('TradingView chart initialized');
+      console.log('TradingView chart initialized (' + (dark ? 'dark' : 'light') + ')');
     } catch (e) {
       console.error('TradingView error:', e);
       createFallbackChart();
@@ -5186,7 +5247,7 @@
   // Scalp Desk geometry: entry = price, tight stop 0.8× ATR, T1 1.8R, T2 3R
   function scalpLevels() {
     if (!lastGoldPrice || lastGoldPrice < 100) return null;
-    const p = lastGoldPrice, atr = p * 0.009;
+    const p = lastGoldPrice, atr = atrOf(p);
     const md = getMacroData();
     const dirSign = md.isShort ? -1 : 1;   // default long-side geometry when 'wait'
     const tStop = atr * 0.8;
@@ -5197,7 +5258,7 @@
   // entry = price ∓0.15%, stop 1.5× ATR, T1 = 2R (3× ATR), T2 = 3.5R (5.25× ATR)
   function dayTradeLevels() {
     if (!lastGoldPrice || lastGoldPrice < 100) return null;
-    const p = lastGoldPrice, atr = p * 0.009;
+    const p = lastGoldPrice, atr = atrOf(p);
     const md = getMacroData();
     const isL = md.isLong, isS = md.isShort;
     const dirSign = isS ? -1 : 1;
@@ -5229,6 +5290,12 @@
         priceLines.push(mk(lv.stop,  '#C23B33', 'STOP'));
         priceLines.push(mk(lv.t1,    '#00A651', 'T1'));
         priceLines.push(mk(lv.t2,    '#0F9D58', 'T2', true));
+        // Structure overlays (VWAP / prev-day / Asian range) when available
+        if (cfg.extraLevels) {
+          for (const x of cfg.extraLevels()) {
+            if (x && isFinite(x.price)) priceLines.push(mk(x.price, x.color, x.title, x.dashed));
+          }
+        }
       }
       const box = document.getElementById(cfg.boxId);
       if (box) {
@@ -5300,8 +5367,22 @@
     return { init, loadCandles, updateLevels };
   }
 
-  const scalpChartCtl = createLevelChart({ chartId: 'scalpChart', msgId: 'scalpChartMsg', boxId: 'scalpChartLevels', getLevels: scalpLevels });
-  const dayChartCtl   = createLevelChart({ chartId: 'dayChart',   msgId: 'dayChartMsg',   boxId: 'dayChartLevels',   getLevels: dayTradeLevels });
+  const scalpChartCtl = createLevelChart({
+    chartId: 'scalpChart', msgId: 'scalpChartMsg', boxId: 'scalpChartLevels', getLevels: scalpLevels,
+    extraLevels: () => !structState.ok ? [] : [
+      structState.vwap   !== null ? { price: structState.vwap,   color: '#8B5CF6', title: 'VWAP',    dashed: true } : null,
+      structState.asianH !== null ? { price: structState.asianH, color: '#7A8196', title: 'ASIA H',  dashed: true } : null,
+      structState.asianL !== null ? { price: structState.asianL, color: '#7A8196', title: 'ASIA L',  dashed: true } : null
+    ]
+  });
+  const dayChartCtl = createLevelChart({
+    chartId: 'dayChart', msgId: 'dayChartMsg', boxId: 'dayChartLevels', getLevels: dayTradeLevels,
+    extraLevels: () => !structState.ok ? [] : [
+      structState.vwap !== null ? { price: structState.vwap, color: '#8B5CF6', title: 'VWAP', dashed: true } : null,
+      structState.pdh  !== null ? { price: structState.pdh,  color: '#7A8196', title: 'PDH',  dashed: true } : null,
+      structState.pdl  !== null ? { price: structState.pdl,  color: '#7A8196', title: 'PDL',  dashed: true } : null
+    ]
+  });
 
   // Ensure the Lightweight Charts global is available; if the <head> script
   // didn't provide it, inject a fallback CDN and wait a little longer.
@@ -5329,31 +5410,155 @@
   }
 
   // Gold OHLC via CORS-enabled exchange APIs (PAXG tracks 1oz spot).
-  // Returns [{time(sec), open, high, low, close}] ascending, or null.
-  async function fetchGoldKlines() {
-    // 1) Binance PAXGUSDT 5m
+  // Returns [{time(sec), open, high, low, close, vol}] ascending, or null.
+  // interval: '5m' (default, 24h of bars) or '1d' (3 weeks of dailies).
+  async function fetchGoldKlines(interval = '5m') {
+    const lim = interval === '1d' ? 21 : 288;
+    // 1) Binance PAXGUSDT
     try {
-      const r = await fetchWithFallback(['https://api.binance.com/api/v3/klines?symbol=PAXGUSDT&interval=5m&limit=120']);
+      const r = await fetchWithFallback([`https://api.binance.com/api/v3/klines?symbol=PAXGUSDT&interval=${interval}&limit=${lim}`]);
       if (r) {
         const raw = await r.json();
         if (Array.isArray(raw) && raw.length) {
-          return raw.map(k => ({ time: Math.floor(k[0] / 1000), open: +k[1], high: +k[2], low: +k[3], close: +k[4] }));
+          return raw.map(k => ({ time: Math.floor(k[0] / 1000), open: +k[1], high: +k[2], low: +k[3], close: +k[4], vol: +k[5] }));
         }
       }
     } catch (e) { console.warn('Binance klines failed:', e.message); }
-    // 2) Kraken PAXGUSD 5m (fallback if Binance is geo-blocked)
+    // 2) Kraken PAXGUSD (fallback if Binance is geo-blocked)
     try {
-      const r = await fetchWithFallback(['https://api.kraken.com/0/public/OHLC?pair=PAXGUSD&interval=5']);
+      const kInt = interval === '1d' ? 1440 : 5;
+      const r = await fetchWithFallback([`https://api.kraken.com/0/public/OHLC?pair=PAXGUSD&interval=${kInt}`]);
       if (r) {
         const j = await r.json();
         const key = j.result && Object.keys(j.result).find(k => k !== 'last');
         const rows = key ? j.result[key] : null;
         if (Array.isArray(rows) && rows.length) {
-          return rows.slice(-120).map(k => ({ time: k[0], open: +k[1], high: +k[2], low: +k[3], close: +k[4] }));
+          return rows.slice(-lim).map(k => ({ time: k[0], open: +k[1], high: +k[2], low: +k[3], close: +k[4], vol: +k[6] }));
         }
       }
     } catch (e) { console.warn('Kraken klines failed:', e.message); }
     return null;
+  }
+
+  // ─── REAL ATR(14) — true average daily range from daily candles ─────────────
+  // Every stop, target and S/R level on the platform keys off ATR. The 0.9%
+  // estimate is only the cold-start fallback; the real Wilder ATR(14) from
+  // daily candles replaces it as soon as the feed responds.
+  let realATRState = { atr: null, ts: 0 };
+  async function refreshRealATR() {
+    if (realATRState.atr && Date.now() - realATRState.ts < 30 * 60 * 1000) return;
+    try {
+      const d = await fetchGoldKlines('1d');
+      if (!d || d.length < 15) return;
+      let prevClose = d[0].close, trs = [];
+      for (let i = 1; i < d.length; i++) {
+        const tr = Math.max(d[i].high - d[i].low, Math.abs(d[i].high - prevClose), Math.abs(d[i].low - prevClose));
+        trs.push(tr); prevClose = d[i].close;
+      }
+      const atr14 = trs.slice(-14).reduce((a, b) => a + b, 0) / Math.min(14, trs.length);
+      if (isFinite(atr14) && atr14 > 0) {
+        realATRState = { atr: atr14, ts: Date.now() };
+        console.log('Real ATR(14) updated:', atr14.toFixed(1), 'pts');
+      }
+    } catch (e) { console.warn('ATR refresh failed:', e.message); }
+  }
+  // ATR accessor used platform-wide: real ATR(14) when available, else ~0.9%.
+  function atrOf(price) {
+    return realATRState.atr || (price * 0.009);
+  }
+
+  // ─── INTRADAY STRUCTURE — the levels institutions actually trade ────────────
+  // Session VWAP, EMA20/50 (5m), previous-day H/L/C, Asian-session range.
+  let structState = { ok: false, ts: 0 };
+  async function refreshStructure() {
+    if (structState.ok && Date.now() - structState.ts < 5 * 60 * 1000) return structState;
+    try {
+      const [c5, d1] = await Promise.all([fetchGoldKlines('5m'), fetchGoldKlines('1d')]);
+      if (!c5 || c5.length < 60) return structState;
+      const closes = c5.map(x => x.close);
+      const last   = closes[closes.length - 1];
+
+      // Session VWAP since 00:00 UTC (typical price × volume)
+      const midnight = Math.floor(Date.now() / 86400000) * 86400;
+      const sess = c5.filter(x => x.time >= midnight);
+      let vwap = null;
+      if (sess.length >= 3) {
+        let pv = 0, vv = 0;
+        for (const b of sess) { const tp = (b.high + b.low + b.close) / 3; const v = b.vol || 1; pv += tp * v; vv += v; }
+        vwap = vv > 0 ? pv / vv : null;
+      }
+
+      // EMAs on 5m closes
+      const ema = (n) => { const k = 2 / (n + 1); let e = closes[0]; for (let i = 1; i < closes.length; i++) e = closes[i] * k + e * (1 - k); return e; };
+      const ema20 = ema(20), ema50 = ema(50);
+
+      // Previous completed day H/L/C from dailies
+      let pdh = null, pdl = null, pdc = null;
+      if (d1 && d1.length >= 2) {
+        const prev = d1[d1.length - 2];
+        pdh = prev.high; pdl = prev.low; pdc = prev.close;
+      }
+
+      // Asian session range (23:00 prior UTC day → 07:00 today)
+      const asianStart = midnight - 3600, asianEnd = midnight + 7 * 3600;
+      const asian = c5.filter(x => x.time >= asianStart && x.time < asianEnd);
+      let asianH = null, asianL = null;
+      if (asian.length >= 6) {
+        asianH = Math.max(...asian.map(x => x.high));
+        asianL = Math.min(...asian.map(x => x.low));
+      }
+
+      // Normalise PAXG values to spot (same offset logic as the charts)
+      const off = (lastGoldPrice && last) ? (lastGoldPrice - last) : 0;
+      const adj = v => v === null ? null : +(v + off).toFixed(2);
+
+      structState = {
+        ok: true, ts: Date.now(),
+        vwap: adj(vwap), ema20: adj(ema20), ema50: adj(ema50),
+        pdh: adj(pdh), pdl: adj(pdl), pdc: adj(pdc),
+        asianH: adj(asianH), asianL: adj(asianL),
+        aboveVwap: vwap !== null ? last >= vwap : null,
+        emaBull: ema20 >= ema50
+      };
+    } catch (e) { console.warn('structure refresh failed:', e.message); }
+    return structState;
+  }
+
+  // ─── SIGNAL QUALITY GRADE — the win-rate filter ─────────────────────────────
+  // Grades the desk signal by counting independent confirmations. The edge is
+  // selectivity: A-grade = full size, B = half size, C = paper-trade or skip.
+  function signalQuality(dir) {
+    const md = getMacroData();
+    const si = getSessionInfo();
+    const er = getEventRisk();
+    const s  = structState;
+    const t  = techState;
+    const isL = dir === 'long';
+    const checks = [];
+    checks.push({ n: 'Macro regime aligned',      ok: (isL && md.isLong) || (!isL && md.isShort), w: 2 });
+    checks.push({ n: 'Real-yield bias aligned',   ok: realYield.bias === (isL ? 'bull' : 'bear'), w: 1 });
+    if (s.ok && s.vwap !== null) checks.push({ n: 'Price on right side of VWAP', ok: isL ? s.aboveVwap : !s.aboveVwap, w: 2 });
+    if (s.ok) checks.push({ n: 'EMA20/50 trend aligned', ok: isL ? s.emaBull : !s.emaBull, w: 1 });
+    checks.push({ n: 'Quality session (London/NY)', ok: si.code === 'london' || si.code === 'overlap' || si.code === 'ny', w: 1 });
+    checks.push({ n: 'No red-folder event today',  ok: er.level !== 'high', w: 1 });
+    if (t.ok) checks.push({ n: 'RSI not stretched against entry', ok: isL ? t.rsi < 70 : t.rsi > 30, w: 1 });
+    const max   = checks.reduce((a, c) => a + c.w, 0);
+    const score = checks.reduce((a, c) => a + (c.ok ? c.w : 0), 0);
+    const pct   = score / max;
+    const grade = pct >= 0.78 ? 'A' : pct >= 0.55 ? 'B' : 'C';
+    return { grade, score, max, checks,
+      advice: grade === 'A' ? 'Full size — strong confluence' : grade === 'B' ? 'Half size — partial confluence' : 'Skip or paper-trade — weak confluence' };
+  }
+
+  function qualityBadgeHTML(dir) {
+    const q = signalQuality(dir);
+    const col = q.grade === 'A' ? 'var(--accent-green)' : q.grade === 'B' ? '#D97706' : 'var(--accent-red)';
+    const fails = q.checks.filter(c => !c.ok).map(c => c.n);
+    return `<div style="margin-top:10px;padding:10px 14px;border-radius:9px;background:rgba(127,127,127,0.06);border:1px solid var(--border-light);font-size:11px;">
+      <span style="font-weight:900;font-size:14px;color:${col};font-family:'JetBrains Mono',monospace;">GRADE ${q.grade}</span>
+      <span style="font-weight:700;color:var(--text-secondary);margin-left:8px;">${q.score}/${q.max} confluence — ${q.advice}</span>
+      ${fails.length ? `<div style="margin-top:5px;color:var(--text-tertiary);">Missing: ${fails.join(' · ')}</div>` : ''}
+    </div>`;
   }
 
   async function fetchWithFallback(urls) {
@@ -5450,7 +5655,7 @@
           const entryEl = document.getElementById('entryPrice');
           if (entryEl && entryEl.dataset.touched !== '1') {
             const p   = Math.round(lastGoldPrice);
-            const atr = lastGoldPrice * 0.009;
+            const atr = atrOf(lastGoldPrice);
             entryEl.value = p;
             const stopEl = document.getElementById('stopPrice');
             const t1El   = document.getElementById('target1');
@@ -5534,11 +5739,18 @@
         console.warn('TIPS update failed:', e.message);
       }
 
+      // VIX (risk sentiment) — daily FRED series, refreshed every 30 min
+      refreshVix();
+
       // Gold/Silver ratio
       updateGoldSilverRatio();
 
       // Auto-log / resolve the dashboard's own signals against live price
       trackSignal();
+
+      // Refresh real ATR(14) + intraday structure (both cached internally)
+      refreshRealATR();
+      refreshStructure();
 
       // Refresh active views (always recompute analysis cards from live price)
       updateAnalysisTab();
@@ -5566,6 +5778,16 @@
   // avoid a temporal-dead-zone error during initializeApp().
 
   function initializeApp() {
+    // Theme FIRST — dark terminal by default (institutional standard); an
+    // explicit user toggle ('0' = light) is respected. Must run before
+    // initChart() so the TradingView embed picks the right theme.
+    const themePref = localStorage.getItem('goldDarkMode');
+    if (themePref === '1' || themePref === null) {
+      document.documentElement.classList.add('dark');
+      const btn = document.getElementById('darkToggle');
+      if (btn) btn.textContent = '☀️';
+    }
+
     seedRealYield();
     calcPosition();
     updateSessionBar();
@@ -5600,13 +5822,6 @@
       clearInterval(updateInterval);
     });
 
-    // Apply stored dark mode preference
-    if (localStorage.getItem('goldDarkMode') === '1') {
-      document.documentElement.classList.add('dark');
-      const btn = document.getElementById('darkToggle');
-      if (btn) btn.textContent = '☀️';
-    }
-
     // Boot institutional nav on Dashboard
     switchSection('dashboard', document.querySelector('[data-section=dashboard]'));
 
@@ -5633,6 +5848,9 @@
     localStorage.setItem('goldDarkMode', isDark ? '1' : '0');
     const btn = document.getElementById('darkToggle');
     if (btn) btn.textContent = isDark ? '☀️' : '🌙';
+    // Rebuild the TradingView embed so its theme follows the terminal theme
+    chartAttempts = 0;
+    initChart();
   }
 
   // ─── PRICE ALERTS ───────────────────────────────────────────────────────────
@@ -5786,7 +6004,7 @@
         }
       }
       const p    = lastGoldPrice;
-      const atr  = p * 0.009;
+      const atr  = atrOf(p);
       const isL  = dir === 'long';
       const entry = p;
       const stop  = isL ? p - atr * 1.5 : p + atr * 1.5;   // day-trade profile (1.5× ATR)
@@ -5972,7 +6190,7 @@
     dashboard: { tabs: [{ id: 'dashboard', label: 'Overview' }] },
     markets:   { tabs: [{ id: 'analysis', label: 'Live Analysis' }, { id: 'redfolder', label: 'Red Folder' }, { id: 'sessions', label: 'Trade Sessions' }, { id: 'calendar', label: 'Economic Calendar' }] },
     traderoom: { tabs: [{ id: 'scalp',    label: 'Scalp Desk' },    { id: 'daytrade', label: 'Day Trade Desk' }, { id: 'strategy', label: 'Strategy Guide' }] },
-    research:  { tabs: [{ id: 'edges',    label: 'Edge Lab' }] },
+    research:  { tabs: [{ id: 'edges',    label: 'Edge Lab' }, { id: 'intel', label: 'Intel Sources' }] },
     utilities: { tabs: [{ id: 'calculator', label: 'Position Calc' }, { id: 'tracker', label: 'Signal Tracker' }, { id: 'journal', label: 'Trade Journal' }] }
   };
 
@@ -6066,6 +6284,46 @@
     applyRealYield([{ value: String(seed) }, { value: String(seed) }]);
     const t = document.getElementById('tipsYield');
     if (t && (t.textContent === '…' || t.textContent.trim() === '')) t.textContent = '+' + seed.toFixed(2) + '%';
+  }
+
+  // ─── VIX (risk sentiment) — FRED VIXCLS, daily close ────────────────────────
+  // Elevated VIX = fear = safe-haven demand for gold. Feeds the risk-sentiment
+  // macro driver with real data instead of a hardcoded assumption.
+  let vixState = { val: null, ts: 0 };
+  async function refreshVix() {
+    if (vixState.val !== null && Date.now() - vixState.ts < 30 * 60 * 1000) return;
+    try {
+      if (!apiKeys.fred) return;
+      const url = `https://api.stlouisfed.org/fred/series/observations?series_id=VIXCLS&api_key=${apiKeys.fred}&limit=5&sort_order=desc&file_type=json`;
+      const res = await fetchWithFallback([
+        `https://corsproxy.io/?url=${encodeURIComponent(url)}`,
+        `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`,
+        url
+      ]);
+      if (!res) return;
+      const j = await res.json();
+      const obs = j.observations?.filter(o => o.value !== '.');
+      if (obs?.length) {
+        const v = parseFloat(obs[0].value);
+        if (isFinite(v) && v > 0) {
+          vixState = { val: v, ts: Date.now() };
+          const el = document.getElementById('vixVal');
+          if (el) el.textContent = v.toFixed(1);
+          console.log('VIX updated:', v);
+        }
+      }
+    } catch (e) { console.warn('VIX refresh failed:', e.message); }
+  }
+  // Risk-sentiment score 0-6 for the macro engine (neutral 4 when unknown)
+  function vixScore() {
+    const v = vixState.val;
+    if (v === null) return 4;
+    return v >= 30 ? 6 : v >= 22 ? 5 : v >= 15 ? 4 : 3;
+  }
+  function vixLabel() {
+    const v = vixState.val;
+    if (v === null) return 'VIX unavailable — neutral assumption';
+    return `VIX ${v.toFixed(1)} — ${v >= 30 ? 'Fear: strong safe-haven bid' : v >= 22 ? 'Elevated: safe-haven supportive' : v >= 15 ? 'Normal volatility' : 'Complacent: little fear bid'}`;
   }
 
   function renderRealYieldBanner() {
@@ -6169,8 +6427,8 @@
     // (see WGC_FLOWS) rather than a hardcoded assumption. Moderate weight so
     // the CYCLICAL drivers above still determine direction.
     const cbS   = WGC_FLOWS.cb.score;
-    // Factor 5: Safe-haven / geopolitical demand.
-    const shS   = 4;
+    // Factor 5: Risk sentiment — live VIX (neutral 4 when feed unavailable).
+    const shS   = vixScore();
     return { score: Math.min(40, tipsS + dxyS + seasS + cbS + shS), tipsS, dxyS, seasS };
   }
 
@@ -6198,7 +6456,7 @@
   function updateAnalysisTab() {
     if (!lastGoldPrice || lastGoldPrice < 100) return;
     const p    = lastGoldPrice;
-    const atr  = p * 0.009;
+    const atr  = atrOf(p);
     const fmt  = v => Math.round(v).toLocaleString();
     const set  = (id, v) => { const e = document.getElementById(id); if (e) e.textContent = v; };
     const setH = (id, v) => { const e = document.getElementById(id); if (e) e.innerHTML   = v; };
@@ -6233,6 +6491,15 @@
     const cbEl = document.getElementById('cb-driver-score');
     if (cbEl) cbEl.textContent = (WGC_FLOWS.cb.score * 2) + '/10';
     set('cb-driver-detail', `WGC ${WGC_FLOWS.cb.period}: ${WGC_FLOWS.cb.figure} | De-dollarization flow`);
+
+    // Risk-sentiment driver — live VIX
+    const vixEl = document.getElementById('vix-driver-score');
+    if (vixEl) {
+      const vs = vixScore();
+      vixEl.textContent = Math.round(vs * 10 / 6) + '/10';
+      vixEl.style.color = vs >= 5 ? 'var(--accent-green)' : vs >= 4 ? '#D97706' : 'var(--accent-red)';
+    }
+    set('vix-driver-detail', vixLabel());
 
     const compEl = document.getElementById('composite-driver-score');
     if (compEl) { compEl.textContent = score + '/40'; compEl.style.color = compColor; }
@@ -6406,7 +6673,7 @@
     // Compact setup in dashboard
     const setupEl = document.getElementById('dash-setup');
     if (setupEl) {
-      const atr   = price * 0.009;
+      const atr   = atrOf(price);
       const entry = Math.round(price * (md.isLong ? 0.9985 : 1.0015));
       const slS   = md.isLong ? Math.round(entry - atr * 1.5) : Math.round(entry + atr * 1.5);
       const t1    = md.isLong ? Math.round(entry + atr * 1.5) : Math.round(entry - atr * 1.5);
@@ -6436,7 +6703,7 @@
   function renderScalpDesk() {
     if (!lastGoldPrice) return;
     const price = lastGoldPrice;
-    const atr   = price * 0.009;
+    const atr   = atrOf(price);
     const md    = getMacroData();
     const si    = getSessionInfo();
     const tStop = atr * 0.8;
@@ -6559,17 +6826,30 @@
         { tag: 'psy', type: 'PSY', name: `Half-Level: $${nearest50}`,    price: nearest50,  dist: d50  },
         { tag: nearest25 < price ? 'sup' : 'res', type: nearest25 < price ? 'SUP' : 'RES', name: `Quarter: $${nearest25}`, price: nearest25, dist: Math.abs(price-nearest25) },
         { tag: 'key', type: 'ATR', name: `ATR High (0.9×): ${(price + atr * 0.9).toFixed(0)}`, price: Math.round(price + atr * 0.9), dist: atr * 0.9 },
-        { tag: 'key', type: 'ATR', name: `ATR Low  (0.9×): ${(price - atr * 0.9).toFixed(0)}`, price: Math.round(price - atr * 0.9), dist: atr * 0.9 },
-        { tag: 'key', type: 'ATR', name: `ATR Ext  (2.0×): ${(price + atr * 2.0).toFixed(0)}`, price: Math.round(price + atr * 2.0), dist: atr * 2.0 }
-      ].sort((a,b) => a.dist - b.dist);
+        { tag: 'key', type: 'ATR', name: `ATR Low  (0.9×): ${(price - atr * 0.9).toFixed(0)}`, price: Math.round(price - atr * 0.9), dist: atr * 0.9 }
+      ];
+      // Real structure levels — what institutional flow actually keys off
+      const s = structState;
+      if (s.ok) {
+        if (s.vwap   !== null) levels.push({ tag: 'key', type: 'VWAP', name: 'Session VWAP (live)',   price: Math.round(s.vwap),   dist: Math.abs(price - s.vwap) });
+        if (s.pdh    !== null) levels.push({ tag: 'res', type: 'PDH',  name: 'Previous Day High',     price: Math.round(s.pdh),    dist: Math.abs(price - s.pdh) });
+        if (s.pdl    !== null) levels.push({ tag: 'sup', type: 'PDL',  name: 'Previous Day Low',      price: Math.round(s.pdl),    dist: Math.abs(price - s.pdl) });
+        if (s.asianH !== null) levels.push({ tag: 'res', type: 'ASIA', name: 'Asian Range High (London breakout)', price: Math.round(s.asianH), dist: Math.abs(price - s.asianH) });
+        if (s.asianL !== null) levels.push({ tag: 'sup', type: 'ASIA', name: 'Asian Range Low',       price: Math.round(s.asianL), dist: Math.abs(price - s.asianL) });
+      }
+      levels.sort((a,b) => a.dist - b.dist);
       levelsEl.innerHTML = levels.map(l => `
         <div class="level-row">
           <span class="level-row-tag ${l.tag}">${l.type}</span>
           <span class="level-row-name">${l.name}</span>
-          <span class="level-row-price">${l.price}</span>
+          <span class="level-row-price">${l.price.toLocaleString()}</span>
           <span class="level-row-dist">${l.dist.toFixed(0)} pts</span>
         </div>`).join('');
     }
+
+    // Signal quality grade — the selectivity filter
+    const qEl = document.getElementById('scalp-quality');
+    if (qEl) qEl.innerHTML = dir === 'wait' ? '' : qualityBadgeHTML(dir);
   }
 
   // ─── DAY TRADE DESK ─────────────────────────────────────────────────────────
@@ -6577,7 +6857,7 @@
   function renderDayTradeDesk() {
     if (!lastGoldPrice) return;
     const price = lastGoldPrice;
-    const atr   = price * 0.009;
+    const atr   = atrOf(price);
     const md    = getMacroData();
     const si    = getSessionInfo();
     const dayStop = atr * 1.5;
@@ -6680,16 +6960,28 @@
         { tag: 'psy', type: 'KEY', name: `Key Psychological $${nearest100}`, price: nearest100 },
         { tag: 'sup', type: 'S1',  name: 'Day Support 1 (1× ATR)',    price: s1 },
         { tag: 'sup', type: 'S2',  name: 'Day Support 2 (2× ATR)',    price: s2 },
-        { tag: 'key', type: 'ATR', name: `Daily ATR: ${atr.toFixed(0)} pts`, price: Math.round(price), note: 'Current' }
+        { tag: 'key', type: 'ATR', name: `Daily ATR(14): ${atr.toFixed(0)} pts${realATRState.atr ? ' (real)' : ' (est.)'}`, price: Math.round(price), note: 'Current' }
       ];
+      // Real structure levels
+      const st = structState;
+      if (st.ok) {
+        if (st.vwap !== null) levels.push({ tag: 'key', type: 'VWAP', name: 'Session VWAP (live)', price: Math.round(st.vwap) });
+        if (st.pdh  !== null) levels.push({ tag: 'res', type: 'PDH',  name: 'Previous Day High',   price: Math.round(st.pdh) });
+        if (st.pdl  !== null) levels.push({ tag: 'sup', type: 'PDL',  name: 'Previous Day Low',    price: Math.round(st.pdl) });
+        if (st.pdc  !== null) levels.push({ tag: 'psy', type: 'PDC',  name: 'Previous Day Close',  price: Math.round(st.pdc) });
+      }
       levelsEl.innerHTML = levels.map(l => `
         <div class="level-row">
           <span class="level-row-tag ${l.tag}">${l.type}</span>
           <span class="level-row-name">${l.name}</span>
-          <span class="level-row-price">${l.price}</span>
+          <span class="level-row-price">${l.price.toLocaleString()}</span>
           <span class="level-row-dist" style="font-size:10px;color:var(--text-tertiary)">${Math.abs(price-l.price).toFixed(0)} pts</span>
         </div>`).join('');
     }
+
+    // Signal quality grade — the selectivity filter
+    const qEl = document.getElementById('dt-quality');
+    if (qEl) qEl.innerHTML = dir === 'wait' ? '' : qualityBadgeHTML(dir);
   }
 
   // ─── GOLD/SILVER RATIO ──────────────────────────────────────────────────────
