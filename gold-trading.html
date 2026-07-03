@@ -3500,18 +3500,31 @@
       </div>
     </div>
 
-    <!-- LIVE CHART WITH MARKERS -->
-    <div class="dash-widget" style="margin-bottom:16px;">
-      <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;margin-bottom:10px;">
-        <div class="dash-widget-title" style="margin:0;">M5 Live Chart — engulfings marked <span style="font-size:10px;font-weight:500;color:var(--text-tertiary)">▲/▼ arrows &middot; ★E = at structure &middot; VWAP/PDH/PDL/Asia lines</span></div>
-        <div class="chart-legend">
-          <span class="cl-item"><span class="cl-dot" style="background:#00A651"></span>Bullish engulf</span>
-          <span class="cl-item"><span class="cl-dot" style="background:#C23B33"></span>Bearish engulf</span>
-          <span class="cl-item"><span class="cl-dot" style="background:#8B5CF6"></span>VWAP</span>
+    <!-- EG CHARTS — Daily / H4 / M15, boxes only -->
+    <div class="mtf-grid" style="margin-bottom:16px;">
+      <div class="dash-widget">
+        <div class="dash-widget-title" style="margin-bottom:10px;">DAILY — EG Zones <span style="font-size:10px;font-weight:500;color:var(--text-tertiary)">boxes only &middot; brighter = at structure</span></div>
+        <div id="egDaily" style="width:100%;height:300px;position:relative;">
+          <div id="egDailyMsg" style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;text-align:center;color:var(--text-tertiary);font-size:12px;padding:16px;">Loading&hellip;</div>
         </div>
       </div>
-      <div id="engulfChart" style="width:100%;height:360px;position:relative;">
-        <div id="engulfChartMsg" style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;text-align:center;color:var(--text-tertiary);font-size:12px;padding:16px;">Loading&hellip;</div>
+      <div class="dash-widget">
+        <div class="dash-widget-title" style="margin-bottom:10px;">H4 — EG Zones <span style="font-size:10px;font-weight:500;color:var(--text-tertiary)">boxes only</span></div>
+        <div id="egH4" style="width:100%;height:300px;position:relative;">
+          <div id="egH4Msg" style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;text-align:center;color:var(--text-tertiary);font-size:12px;padding:16px;">Loading&hellip;</div>
+        </div>
+      </div>
+    </div>
+    <div class="dash-widget" style="margin-bottom:16px;">
+      <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;margin-bottom:10px;">
+        <div class="dash-widget-title" style="margin:0;">M15 — EG Zones <span style="font-size:10px;font-weight:500;color:var(--text-tertiary)">boxes only &middot; fresh zones run to the right edge</span></div>
+        <div class="chart-legend">
+          <span class="cl-item"><span class="cl-dot" style="background:#00A651"></span>Bullish EG zone</span>
+          <span class="cl-item"><span class="cl-dot" style="background:#C23B33"></span>Bearish EG zone</span>
+        </div>
+      </div>
+      <div id="egM15" style="width:100%;height:340px;position:relative;">
+        <div id="egM15Msg" style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;text-align:center;color:var(--text-tertiary);font-size:12px;padding:16px;">Loading&hellip;</div>
       </div>
     </div>
 
@@ -4628,7 +4641,7 @@
     if (name === 'tracker')   { renderSignalTracker(); }
     if (name === 'redfolder') { renderRedFolder(); }
     if (name === 'mtf')       { initMtfCharts(); renderMtfSummary(); }
-    if (name === 'engulf')    { engulfChartCtl.init(); renderEngulfDesk(); }
+    if (name === 'engulf')    { initEgCharts(); renderEngulfDesk(); }
     if (name === 'ems')       { renderEmsDesk().then(() => emsChartCtl.init()); emsFlipCalc(); }
   }
 
@@ -5559,10 +5572,6 @@
         offset = (lastGoldPrice && lastClose) ? (lastGoldPrice - lastClose) : 0;
         if (offset) candles = candles.map(c => ({ time: c.time, open:+(c.open+offset).toFixed(2), high:+(c.high+offset).toFixed(2), low:+(c.low+offset).toFixed(2), close:+(c.close+offset).toFixed(2) }));
         series.setData(candles);
-        // Engulfing markers (arrows on the bars; ★ = printed at structure)
-        if (cfg.markers && typeof series.setMarkers === 'function') {
-          try { series.setMarkers(engulfMarkers(candles)); } catch (e) {}
-        }
         // Engulfing zones (boxes over the engulfed candle, order-block style)
         if (zonesPrim) {
           try { zonesPrim.setZones(engulfZones(candles)); } catch (e) {}
@@ -5622,7 +5631,7 @@
   }
 
   const scalpChartCtl = createLevelChart({
-    chartId: 'scalpChart', msgId: 'scalpChartMsg', boxId: 'scalpChartLevels', getLevels: scalpLevels, markers: true, zones: true,
+    chartId: 'scalpChart', msgId: 'scalpChartMsg', boxId: 'scalpChartLevels', getLevels: scalpLevels, zones: true,
     extraLevels: () => !structState.ok ? [] : [
       structState.vwap   !== null ? { price: structState.vwap,   color: '#8B5CF6', title: 'VWAP',    dashed: true } : null,
       structState.asianH !== null ? { price: structState.asianH, color: '#7A8196', title: 'ASIA H',  dashed: true } : null,
@@ -5640,11 +5649,11 @@
 
   // ── Multi-timeframe view: Daily (trend) / H4 (structure) / M15 (execution) ──
   const mtfDailyCtl = createLevelChart({
-    chartId: 'mtfDaily', msgId: 'mtfDailyMsg', interval: '1d', height: 300, markers: true, zones: true,
+    chartId: 'mtfDaily', msgId: 'mtfDailyMsg', interval: '1d', height: 300, zones: true,
     biasKey: 'D', biasId: 'mtf-bias-d'
   });
   const mtfH4Ctl = createLevelChart({
-    chartId: 'mtfH4', msgId: 'mtfH4Msg', interval: '4h', height: 300, markers: true, zones: true,
+    chartId: 'mtfH4', msgId: 'mtfH4Msg', interval: '4h', height: 300, zones: true,
     biasKey: 'H4', biasId: 'mtf-bias-h4',
     extraLevels: () => !structState.ok ? [] : [
       structState.pdh !== null ? { price: structState.pdh, color: '#7A8196', title: 'PDH', dashed: true } : null,
@@ -5653,7 +5662,7 @@
   });
   const mtfM15Ctl = createLevelChart({
     chartId: 'mtfM15', msgId: 'mtfM15Msg', boxId: 'mtfM15Levels', interval: '15m', height: 340,
-    biasKey: 'M15', biasId: 'mtf-bias-m15', getLevels: scalpLevels, markers: true, zones: true,
+    biasKey: 'M15', biasId: 'mtf-bias-m15', getLevels: scalpLevels, zones: true,
     extraLevels: () => !structState.ok ? [] : [
       structState.vwap   !== null ? { price: structState.vwap,   color: '#8B5CF6', title: 'VWAP',   dashed: true } : null,
       structState.asianH !== null ? { price: structState.asianH, color: '#7A8196', title: 'ASIA H', dashed: true } : null,
@@ -5665,7 +5674,7 @@
 
   // EMS Trinity chart: H4 with engulf zones + fresh daily MSNR levels
   const emsChartCtl = createLevelChart({
-    chartId: 'emsChart', msgId: 'emsChartMsg', interval: '4h', height: 360, markers: true, zones: true,
+    chartId: 'emsChart', msgId: 'emsChartMsg', interval: '4h', height: 360, zones: true,
     extraLevels: () => {
       const out = [];
       if (emsLevels.res) out.push({ price: emsLevels.res.price, color: '#D4AF37', title: 'FRESH R' });
@@ -5674,17 +5683,11 @@
     }
   });
 
-  // Engulfing Desk chart: 5m execution view with pattern markers + structure
-  const engulfChartCtl = createLevelChart({
-    chartId: 'engulfChart', msgId: 'engulfChartMsg', interval: '5m', height: 360, markers: true, zones: true,
-    extraLevels: () => !structState.ok ? [] : [
-      structState.vwap   !== null ? { price: structState.vwap,   color: '#8B5CF6', title: 'VWAP',   dashed: true } : null,
-      structState.pdh    !== null ? { price: structState.pdh,    color: '#7A8196', title: 'PDH',    dashed: true } : null,
-      structState.pdl    !== null ? { price: structState.pdl,    color: '#7A8196', title: 'PDL',    dashed: true } : null,
-      structState.asianH !== null ? { price: structState.asianH, color: '#7A8196', title: 'ASIA H', dashed: true } : null,
-      structState.asianL !== null ? { price: structState.asianL, color: '#7A8196', title: 'ASIA L', dashed: true } : null
-    ]
-  });
+  // Engulfing Desk charts: pure EG view — candles + zone boxes, nothing else
+  const egDailyCtl = createLevelChart({ chartId: 'egDaily', msgId: 'egDailyMsg', interval: '1d',  height: 300, zones: true });
+  const egH4Ctl    = createLevelChart({ chartId: 'egH4',    msgId: 'egH4Msg',    interval: '4h',  height: 300, zones: true });
+  const egM15Ctl   = createLevelChart({ chartId: 'egM15',   msgId: 'egM15Msg',   interval: '15m', height: 340, zones: true });
+  function initEgCharts() { egDailyCtl.init(); egH4Ctl.init(); egM15Ctl.init(); }
 
   // Top-down alignment verdict: the classic multi-timeframe filter — trade M15
   // entries only in the direction the Daily and H4 agree on.
@@ -5925,17 +5928,6 @@
       });
     }
     return out;
-  }
-
-  // Chart markers for detected engulfings (Lightweight Charts setMarkers)
-  function engulfMarkers(candles) {
-    return detectEngulfings(candles).slice(-30).map(e => ({
-      time: e.time,
-      position: e.type === 'bull' ? 'belowBar' : 'aboveBar',
-      color: e.type === 'bull' ? '#00A651' : '#C23B33',
-      shape: e.type === 'bull' ? 'arrowUp' : 'arrowDown',
-      text: (e.atLevel ? '★' : '') + 'E'
-    }));
   }
 
   // ─── ENGULFING ZONES (order-block style boxes) ──────────────────────────────
