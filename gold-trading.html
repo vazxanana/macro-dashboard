@@ -5413,8 +5413,8 @@
   const mtfBias = {};
 
   function createLevelChart(cfg) {
-    // cfg: { chartId, msgId, boxId?, getLevels?, extraLevels?, interval?, height?, biasId?, biasKey? }
-    let chart = null, series = null, priceLines = [], offset = 0, inited = false;
+    // cfg: { chartId, msgId, boxId?, getLevels?, extraLevels?, interval?, height?, biasId?, biasKey?, markers?, zones? }
+    let chart = null, series = null, priceLines = [], offset = 0, inited = false, zonesPrim = null;
     const interval = cfg.interval || '5m';
 
     function fallback(text) {
@@ -5489,6 +5489,10 @@
         if (cfg.markers && typeof series.setMarkers === 'function') {
           try { series.setMarkers(engulfMarkers(candles)); } catch (e) {}
         }
+        // Engulfing zones (boxes over the engulfed candle, order-block style)
+        if (zonesPrim) {
+          try { zonesPrim.setZones(engulfZones(candles)); } catch (e) {}
+        }
         if (chart && chart.timeScale) { try { chart.timeScale().fitContent(); } catch (e) {} }
         const msg = document.getElementById(cfg.msgId);
         if (msg) msg.style.display = 'none';
@@ -5526,6 +5530,10 @@
           upColor: '#00A651', downColor: '#C23B33', borderVisible: false,
           wickUpColor: '#00A651', wickDownColor: '#C23B33'
         });
+        if (cfg.zones && typeof series.attachPrimitive === 'function') {
+          zonesPrim = makeZonesPrimitive();
+          try { series.attachPrimitive(zonesPrim); } catch (e) { zonesPrim = null; }
+        }
         new ResizeObserver(() => { if (chart && el.clientWidth) chart.applyOptions({ width: el.clientWidth }); }).observe(el);
         await loadCandles();
         setInterval(loadCandles, interval === '1d' ? 10 * 60000 : 60000);
@@ -5540,7 +5548,7 @@
   }
 
   const scalpChartCtl = createLevelChart({
-    chartId: 'scalpChart', msgId: 'scalpChartMsg', boxId: 'scalpChartLevels', getLevels: scalpLevels, markers: true,
+    chartId: 'scalpChart', msgId: 'scalpChartMsg', boxId: 'scalpChartLevels', getLevels: scalpLevels, markers: true, zones: true,
     extraLevels: () => !structState.ok ? [] : [
       structState.vwap   !== null ? { price: structState.vwap,   color: '#8B5CF6', title: 'VWAP',    dashed: true } : null,
       structState.asianH !== null ? { price: structState.asianH, color: '#7A8196', title: 'ASIA H',  dashed: true } : null,
@@ -5558,11 +5566,11 @@
 
   // ── Multi-timeframe view: Daily (trend) / H4 (structure) / M15 (execution) ──
   const mtfDailyCtl = createLevelChart({
-    chartId: 'mtfDaily', msgId: 'mtfDailyMsg', interval: '1d', height: 300,
+    chartId: 'mtfDaily', msgId: 'mtfDailyMsg', interval: '1d', height: 300, markers: true, zones: true,
     biasKey: 'D', biasId: 'mtf-bias-d'
   });
   const mtfH4Ctl = createLevelChart({
-    chartId: 'mtfH4', msgId: 'mtfH4Msg', interval: '4h', height: 300,
+    chartId: 'mtfH4', msgId: 'mtfH4Msg', interval: '4h', height: 300, markers: true, zones: true,
     biasKey: 'H4', biasId: 'mtf-bias-h4',
     extraLevels: () => !structState.ok ? [] : [
       structState.pdh !== null ? { price: structState.pdh, color: '#7A8196', title: 'PDH', dashed: true } : null,
@@ -5571,7 +5579,7 @@
   });
   const mtfM15Ctl = createLevelChart({
     chartId: 'mtfM15', msgId: 'mtfM15Msg', boxId: 'mtfM15Levels', interval: '15m', height: 340,
-    biasKey: 'M15', biasId: 'mtf-bias-m15', getLevels: scalpLevels, markers: true,
+    biasKey: 'M15', biasId: 'mtf-bias-m15', getLevels: scalpLevels, markers: true, zones: true,
     extraLevels: () => !structState.ok ? [] : [
       structState.vwap   !== null ? { price: structState.vwap,   color: '#8B5CF6', title: 'VWAP',   dashed: true } : null,
       structState.asianH !== null ? { price: structState.asianH, color: '#7A8196', title: 'ASIA H', dashed: true } : null,
@@ -5583,7 +5591,7 @@
 
   // Engulfing Desk chart: 5m execution view with pattern markers + structure
   const engulfChartCtl = createLevelChart({
-    chartId: 'engulfChart', msgId: 'engulfChartMsg', interval: '5m', height: 360, markers: true,
+    chartId: 'engulfChart', msgId: 'engulfChartMsg', interval: '5m', height: 360, markers: true, zones: true,
     extraLevels: () => !structState.ok ? [] : [
       structState.vwap   !== null ? { price: structState.vwap,   color: '#8B5CF6', title: 'VWAP',   dashed: true } : null,
       structState.pdh    !== null ? { price: structState.pdh,    color: '#7A8196', title: 'PDH',    dashed: true } : null,
@@ -5843,6 +5851,77 @@
       shape: e.type === 'bull' ? 'arrowUp' : 'arrowDown',
       text: (e.atLevel ? '★' : '') + 'E'
     }));
+  }
+
+  // ─── ENGULFING ZONES (order-block style boxes) ──────────────────────────────
+  // The tradeable object is the ENGULFED candle — the zone of orders that got
+  // absorbed. Each zone is a box over that candle's body, extended right until
+  // price leaves and later re-touches it (mitigation), matching how order
+  // blocks are marked by hand on TradingView.
+  function engulfZones(candles) {
+    if (!candles || candles.length < 25) return [];
+    const zones = [];
+    const idx = new Map(candles.map((c, i) => [c.time, i]));
+    for (const e of detectEngulfings(candles).slice(-12)) {
+      const i = idx.get(e.time);
+      if (i == null || i < 1) continue;
+      const p = candles[i - 1];                     // the engulfed candle
+      const hi = Math.max(p.open, p.close), lo = Math.min(p.open, p.close);
+      const bull = e.type === 'bull';
+      // extend right: wait until price fully LEAVES the zone, then close the
+      // box at the first RE-touch; still-fresh zones run to the right edge.
+      let t2 = null, left = false;
+      for (let j = i + 1; j < candles.length; j++) {
+        const c = candles[j];
+        const outside = bull ? c.low > hi : c.high < lo;
+        const touch   = bull ? c.low <= hi : c.high >= lo;
+        if (!left) { if (outside) left = true; continue; }
+        if (touch) { t2 = c.time; break; }
+      }
+      zones.push({ t1: p.time, t2, hi, lo, bull, star: !!e.atLevel });
+    }
+    return zones;
+  }
+
+  // Rectangle-drawing plugin (Lightweight Charts v4.1 series primitive)
+  function makeZonesPrimitive() {
+    let _chart = null, _series = null, _requestUpdate = null, _zones = [];
+    return {
+      attached(params) { _chart = params.chart; _series = params.series; _requestUpdate = params.requestUpdate; },
+      detached() { _chart = null; _series = null; _requestUpdate = null; },
+      setZones(z) { _zones = z || []; if (_requestUpdate) _requestUpdate(); },
+      updateAllViews() {},
+      paneViews() {
+        return [{
+          zOrder: () => 'bottom',
+          renderer: () => ({
+            draw(target) {
+              if (!_chart || !_series) return;
+              target.useBitmapCoordinateSpace(scope => {
+                const ctx = scope.context, hr = scope.horizontalPixelRatio, vr = scope.verticalPixelRatio;
+                for (const z of _zones) {
+                  const x1m = _chart.timeScale().timeToCoordinate(z.t1);
+                  if (x1m === null) continue;               // zone start scrolled out
+                  let x2m = z.t2 !== null ? _chart.timeScale().timeToCoordinate(z.t2) : null;
+                  if (x2m === null) x2m = scope.mediaSize.width; // fresh zone → right edge
+                  const y1m = _series.priceToCoordinate(z.hi);
+                  const y2m = _series.priceToCoordinate(z.lo);
+                  if (y1m === null || y2m === null) continue;
+                  const a = z.star ? 0.16 : 0.09, sa = z.star ? 0.55 : 0.3;
+                  ctx.fillStyle   = z.bull ? `rgba(0,166,81,${a})`  : `rgba(194,59,51,${a})`;
+                  ctx.strokeStyle = z.bull ? `rgba(0,166,81,${sa})` : `rgba(194,59,51,${sa})`;
+                  ctx.lineWidth = Math.max(1, hr);
+                  const X = Math.min(x1m, x2m) * hr, W = Math.abs(x2m - x1m) * hr;
+                  const Y = Math.min(y1m, y2m) * vr, H = Math.max(Math.abs(y2m - y1m) * vr, 1);
+                  ctx.fillRect(X, Y, W, H);
+                  ctx.strokeRect(X, Y, W, H);
+                }
+              });
+            }
+          })
+        }];
+      }
+    };
   }
 
   // ─── ENGULFING SCANNER (Engulfing Desk table) ───────────────────────────────
