@@ -5809,12 +5809,18 @@
     for (let i = 1; i < candles.length; i++) {
       const p = candles[i - 1], c = candles[i];
       const pBody = bodies[i - 1], cBody = bodies[i];
-      // average body of the trailing 20 bars — size filter kills noise prints
+      // Size filter: current body must be at least average-sized and bigger
+      // than the candle it engulfs (kills doji noise without over-filtering).
       const start = Math.max(0, i - 20);
       const avgBody = bodies.slice(start, i).reduce((a, b) => a + b, 0) / (i - start);
-      if (cBody < avgBody * 1.2 || cBody < pBody * 1.05) continue;
-      const bull = c.close > c.open && p.close < p.open && c.close >= Math.max(p.open, p.close) && c.open <= Math.min(p.open, p.close);
-      const bear = c.close < c.open && p.close > p.open && c.close <= Math.min(p.open, p.close) && c.open >= Math.max(p.open, p.close);
+      if (cBody < avgBody || cBody < pBody) continue;
+      // Continuous markets open at (or ticks away from) the prior close, so a
+      // strict open<=prevBodyLow test rejects most genuine engulfings. Allow a
+      // small tolerance on the engulfed side: 15% of the prior body (min 5c).
+      const eps = Math.max(0.05, pBody * 0.15);
+      const pTop = Math.max(p.open, p.close), pBot = Math.min(p.open, p.close);
+      const bull = c.close > c.open && p.close < p.open && c.close >= pTop && c.open <= pBot + eps;
+      const bear = c.close < c.open && p.close > p.open && c.close <= pBot && c.open >= pTop - eps;
       if (!bull && !bear) continue;
       const mid = (c.high + c.low) / 2 + off;
       out.push({
@@ -5855,7 +5861,10 @@
       rows.sort((a, b) => b.time - a.time);
       if (ts) ts.textContent = 'scanned ' + new Date().toLocaleTimeString('en-US', { hour12: false, timeZone: 'UTC' }) + ' UTC';
       if (!rows.length) {
-        body.innerHTML = '<tr><td colspan="9" class="j-empty">No engulfing patterns in the recent window' + (candles5mCache ? '' : ' — candle feed unavailable in this region') + '.</td></tr>';
+        const n5 = c5 ? c5.length : 0, n15 = c15 ? c15.length : 0;
+        body.innerHTML = `<tr><td colspan="9" class="j-empty">${(n5 + n15) === 0
+          ? 'Candle feed unavailable in this region — scanner cannot run.'
+          : `Scanned ${n5} M5 + ${n15} M15 candles — no qualifying engulfings right now (quiet tape). The scanner re-runs each time you open this tab.`}</td></tr>`;
         return;
       }
       const mono = "font-family:'JetBrains Mono',monospace";
