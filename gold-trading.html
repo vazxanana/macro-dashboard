@@ -2156,7 +2156,7 @@
     .mtf-v-bear  { color: var(--accent-red);   background: rgba(194,59,51,0.1); }
     .mtf-v-mixed { color: #D97706;             background: rgba(217,119,6,0.1); }
 
-    /* EMS Trinity */
+    /* Pipeline step tiles (EG desks) */
     .ems-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
     @media (max-width: 1100px) { .ems-grid { grid-template-columns: repeat(2, 1fr); } }
     @media (max-width: 640px)  { .ems-grid { grid-template-columns: 1fr; } }
@@ -3201,31 +3201,31 @@
       <div class="card glass">
         <div class="grid-2">
           <div class="direction-block">
-            <div class="block-title">Step 1: Macro Bias Confirmation</div>
+            <div class="block-title">Step 1: Fundamental Bias</div>
             <div class="block-content">
-              Establish weekly directional bias from 5 key drivers.<br/>
-              Target: 72%+ confidence reading before any trade.
+              Real yields are the master driver; DXY, VIX and flows complete the score.<br/>
+              Trade ONLY in the bias direction — counter-trend EGs are skip/half-size.
             </div>
           </div>
           <div class="direction-block">
-            <div class="block-title">Step 2: 1-Hour Structure Analysis</div>
+            <div class="block-title">Step 2: Structure</div>
             <div class="block-content">
-              Identify key support/resistance on 1H timeframe.<br/>
-              Confluence with macro bias required for entry.
+              VWAP, PDH/PDL/PDC, Asian range, round numbers.<br/>
+              An engulfing away from structure is noise — only ★ at-structure counts.
             </div>
           </div>
           <div class="direction-block">
-            <div class="block-title">Step 3: Pattern Confirmation</div>
+            <div class="block-title">Step 3: The Engulfing</div>
             <div class="block-content">
-              Wait for double-bottom/top pattern formation.<br/>
-              Volume breakout of neckline confirms setup.
+              M5/M15 for scalps, H1/H4 for day trades: a body that fully covers the prior opposite body.<br/>
+              Skip if the body is 3×+ average — that is exhaustion, not reversal.
             </div>
           </div>
           <div class="direction-block">
-            <div class="block-title">Step 4: 1-Minute Entry Execution</div>
+            <div class="block-title">Step 4: Execution</div>
             <div class="block-content">
-              Execute on neckline break + pullback retest.<br/>
-              Tight risk management: max 1% account risk.
+              Enter on the break of the pattern extreme; stop beyond the other extreme — the "proven wrong" point.<br/>
+              Scalps: 1.8R / 3R. Day trades: 2R / 3.5R, half off at T1, stop to breakeven.
             </div>
           </div>
         </div>
@@ -3324,7 +3324,7 @@
         <div class="desk-det">
           <div class="desk-det-lbl">Entry</div>
           <div class="desk-det-val" id="scalp-entry">—</div>
-          <div class="desk-det-sub">Current price</div>
+          <div class="desk-det-sub">Break of pattern extreme</div>
         </div>
         <div class="desk-det">
           <div class="desk-det-lbl">Scalp Stop</div>
@@ -3352,10 +3352,13 @@
     <!-- Signal Quality (the win-rate filter) -->
     <div id="scalp-quality"></div>
 
-    <!-- 3 Live Scalp Setups -->
+    <!-- EG pipeline: fundamentals → structure → pattern → execute -->
+    <div class="ems-grid" id="scalp-eg-steps" style="margin:14px 0;"></div>
+
+    <!-- Live EG scalp signals -->
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
-      <div style="font-size:9px;font-weight:800;letter-spacing:1.4px;text-transform:uppercase;color:var(--text-tertiary);">Live Scalp Setups — ATR-Based Precision Levels</div>
-      <div style="font-size:10px;color:var(--text-tertiary);">Updates every 30s with live price</div>
+      <div style="font-size:9px;font-weight:800;letter-spacing:1.4px;text-transform:uppercase;color:var(--text-tertiary);">Live EG Scalp Signals — M5/M15 engulfings, pattern stops, macro-gated</div>
+      <div style="font-size:10px;color:var(--text-tertiary);">Re-scans on every visit + price tick</div>
     </div>
     <div class="setups-grid" id="scalp-setups-grid"></div>
 
@@ -3368,14 +3371,14 @@
       <div class="levels-panel">
         <div class="levels-panel-title">Scalp Execution Checklist</div>
         <div class="desk-checklist">
-          <div class="dcheck" onclick="this.classList.toggle('checked')"><div class="dcheck-box">✓</div>Active session (not dead zone)</div>
-          <div class="dcheck" onclick="this.classList.toggle('checked')"><div class="dcheck-box">✓</div>Spread under 0.30 pts</div>
-          <div class="dcheck" onclick="this.classList.toggle('checked')"><div class="dcheck-box">✓</div>No news in next 30 minutes</div>
-          <div class="dcheck" onclick="this.classList.toggle('checked')"><div class="dcheck-box">✓</div>Price at identified key level</div>
-          <div class="dcheck" onclick="this.classList.toggle('checked')"><div class="dcheck-box">✓</div>Macro bias matches direction</div>
-          <div class="dcheck" onclick="this.classList.toggle('checked')"><div class="dcheck-box">✓</div>Stop placed before entry</div>
+          <div class="dcheck" onclick="this.classList.toggle('checked')"><div class="dcheck-box">✓</div>Engulfing printed AT structure (★)</div>
+          <div class="dcheck" onclick="this.classList.toggle('checked')"><div class="dcheck-box">✓</div>Fundamental bias matches direction</div>
+          <div class="dcheck" onclick="this.classList.toggle('checked')"><div class="dcheck-box">✓</div>London / NY session (not dead zone)</div>
+          <div class="dcheck" onclick="this.classList.toggle('checked')"><div class="dcheck-box">✓</div>No red-folder news in next 30 min</div>
+          <div class="dcheck" onclick="this.classList.toggle('checked')"><div class="dcheck-box">✓</div>Entry = break of pattern extreme, not chase</div>
+          <div class="dcheck" onclick="this.classList.toggle('checked')"><div class="dcheck-box">✓</div>Stop beyond the other extreme, placed first</div>
           <div class="dcheck" onclick="this.classList.toggle('checked')"><div class="dcheck-box">✓</div>Risk ≤ 0.5% account (scalp)</div>
-          <div class="dcheck" onclick="this.classList.toggle('checked')"><div class="dcheck-box">✓</div>R:R ≥ 1.5:1 minimum</div>
+          <div class="dcheck" onclick="this.classList.toggle('checked')"><div class="dcheck-box">✓</div>Skip if engulfing body 3×+ average (exhaustion)</div>
         </div>
       </div>
     </div>
@@ -3397,22 +3400,22 @@
         <div class="desk-det">
           <div class="desk-det-lbl">Day Entry</div>
           <div class="desk-det-val" id="dt-entry">—</div>
-          <div class="desk-det-sub">Limit zone</div>
+          <div class="desk-det-sub">Break of pattern extreme</div>
         </div>
         <div class="desk-det">
           <div class="desk-det-lbl">Day Stop</div>
           <div class="desk-det-val" id="dt-stop" style="color:var(--accent-red)">—</div>
-          <div class="desk-det-sub" id="dt-stop-pts">1.5× ATR</div>
+          <div class="desk-det-sub" id="dt-stop-pts">— pts</div>
         </div>
         <div class="desk-det">
           <div class="desk-det-lbl">Target 1</div>
           <div class="desk-det-val" id="dt-t1" style="color:var(--accent-green)">—</div>
-          <div class="desk-det-sub" id="dt-t1-pts">3R · partial exit</div>
+          <div class="desk-det-sub" id="dt-t1-pts">— pts · 2R</div>
         </div>
         <div class="desk-det">
           <div class="desk-det-lbl">Target 2</div>
           <div class="desk-det-val" id="dt-t2" style="color:var(--accent-green)">—</div>
-          <div class="desk-det-sub" id="dt-t2-pts">5R · full exit</div>
+          <div class="desk-det-sub" id="dt-t2-pts">— pts · 3.5R</div>
         </div>
       </div>
       <div class="desk-meta">
@@ -3425,10 +3428,13 @@
     <!-- Signal Quality (the win-rate filter) -->
     <div id="dt-quality"></div>
 
+    <!-- EG pipeline: fundamentals → structure → pattern → execute -->
+    <div class="ems-grid" id="dt-eg-steps" style="margin:14px 0;"></div>
+
     <!-- Live chart with day-trade setup levels marked -->
     <div class="dash-widget" style="margin-bottom:20px;">
       <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;margin-bottom:12px;">
-        <div class="dash-widget-title" style="margin:0;">Live Chart · Day Trade Levels <span style="font-size:11px;font-weight:500;color:var(--text-tertiary)">— XAU/USD (PAXG proxy, 5m)</span></div>
+        <div class="dash-widget-title" style="margin:0;">Live Chart · EG Day Trade Levels <span style="font-size:11px;font-weight:500;color:var(--text-tertiary)">— XAU/USD (PAXG proxy, 1h)</span></div>
         <div class="chart-legend">
           <span class="cl-item"><span class="cl-dot" style="background:#2962FF"></span>Entry</span>
           <span class="cl-item"><span class="cl-dot" style="background:#C23B33"></span>Stop</span>
@@ -3444,8 +3450,8 @@
 
     <!-- 3 Day Trade Setups -->
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
-      <div style="font-size:9px;font-weight:800;letter-spacing:1.4px;text-transform:uppercase;color:var(--text-tertiary);">Day Trade Setups — Session-Based Institutional Plays</div>
-      <div style="font-size:10px;color:var(--text-tertiary);">1–4 hour hold time · Full-size entries</div>
+      <div style="font-size:9px;font-weight:800;letter-spacing:1.4px;text-transform:uppercase;color:var(--text-tertiary);">Live EG Day Trade Signals — H1/H4 engulfings at daily structure, macro-gated</div>
+      <div style="font-size:10px;color:var(--text-tertiary);">Hours-to-days hold · pattern stops</div>
     </div>
     <div class="setups-grid" id="daytrade-setups-grid"></div>
 
@@ -3458,11 +3464,11 @@
       <div class="levels-panel">
         <div class="levels-panel-title">Day Trade Rules</div>
         <div class="desk-checklist">
-          <div class="dcheck" onclick="this.classList.toggle('checked')"><div class="dcheck-box">✓</div>Macro bias confirmed (TIPS + DXY)</div>
-          <div class="dcheck" onclick="this.classList.toggle('checked')"><div class="dcheck-box">✓</div>Correct session window (London/NY)</div>
+          <div class="dcheck" onclick="this.classList.toggle('checked')"><div class="dcheck-box">✓</div>Fundamental bias confirmed (TIPS + DXY + VIX)</div>
+          <div class="dcheck" onclick="this.classList.toggle('checked')"><div class="dcheck-box">✓</div>H1/H4 engulfing AT daily structure (★)</div>
           <div class="dcheck" onclick="this.classList.toggle('checked')"><div class="dcheck-box">✓</div>No FOMC/CPI within 4 hours</div>
-          <div class="dcheck" onclick="this.classList.toggle('checked')"><div class="dcheck-box">✓</div>At least 2 edges aligning</div>
-          <div class="dcheck" onclick="this.classList.toggle('checked')"><div class="dcheck-box">✓</div>Daily structure supports setup</div>
+          <div class="dcheck" onclick="this.classList.toggle('checked')"><div class="dcheck-box">✓</div>Daily trend (SMA20) agrees with pattern</div>
+          <div class="dcheck" onclick="this.classList.toggle('checked')"><div class="dcheck-box">✓</div>Entry = break of pattern extreme, no chasing</div>
           <div class="dcheck" onclick="this.classList.toggle('checked')"><div class="dcheck-box">✓</div>Risk ≤ 1% account per trade</div>
           <div class="dcheck" onclick="this.classList.toggle('checked')"><div class="dcheck-box">✓</div>Plan: partial exit ½ at T1</div>
           <div class="dcheck" onclick="this.classList.toggle('checked')"><div class="dcheck-box">✓</div>Trail stop to B/E after T1 hit</div>
@@ -3551,135 +3557,6 @@
     </div>
   </div><!-- end tab-engulf -->
 
-  <!-- EMS TRINITY — bias → HTF engulf zone → LTF sweep+BOS → execute -->
-  <div id="tab-ems" class="tab-panel">
-    <div class="section-header">
-      <div class="section-title">EMS Trinity <span style="font-size:11px;font-weight:500;color:var(--text-tertiary)">— live top-down pipeline: Daily bias &middot; H4 engulf zone &middot; M15 sweep→BOS &middot; RR ≥ 3</span></div>
-    </div>
-
-    <div class="card glass" style="margin-bottom:16px;">
-      <div style="font-size:12px;color:var(--text-secondary);line-height:1.75;">
-        This desk runs the <strong>EMS Trinity</strong> workflow live (methodology credit: <em>The Alchemist EMS Trinity</em>, Yanu Emmanuel — summarised here in our own words for personal use).
-        The core idea: <strong>direction comes from fresh higher-timeframe levels measured on candle bodies</strong>; the <strong>H4 engulfing zone in that direction is the point of interest</strong> (a continuation zone, not a reversal signal);
-        the <strong>entry trigger is a lower-timeframe liquidity sweep followed by a break of structure</strong> inside that zone; and the trade only exists if the <strong>reward to the next fresh level is at least 3× the risk</strong>.
-        Every step below is computed from live candles — when a step is amber, the method says wait.
-      </div>
-      <div style="margin-top:8px;text-align:right;font-size:10px;color:var(--text-tertiary);" id="ems-ts">&mdash;</div>
-    </div>
-
-    <!-- 4-step live pipeline -->
-    <div class="ems-grid" id="ems-steps"></div>
-
-    <!-- Trade plan -->
-    <div class="dash-widget" style="margin:16px 0;">
-      <div class="dash-widget-title" style="margin-bottom:12px;">Trade Plan (auto-built from the pipeline)</div>
-      <div id="ems-plan"></div>
-    </div>
-
-    <!-- H4 chart with MSNR lines + engulf zones -->
-    <div class="dash-widget" style="margin-bottom:16px;">
-      <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;margin-bottom:10px;">
-        <div class="dash-widget-title" style="margin:0;">H4 — Zones + Fresh Daily Levels <span style="font-size:10px;font-weight:500;color:var(--text-tertiary)">gold lines = fresh MSNR levels (bodies) &middot; boxes = engulf zones</span></div>
-        <div class="chart-legend">
-          <span class="cl-item"><span class="cl-dot" style="background:#D4AF37"></span>Fresh level</span>
-          <span class="cl-item"><span class="cl-dot" style="background:#00A651"></span>Bull zone</span>
-          <span class="cl-item"><span class="cl-dot" style="background:#C23B33"></span>Bear zone</span>
-        </div>
-      </div>
-      <div id="emsChart" style="width:100%;height:360px;position:relative;">
-        <div id="emsChartMsg" style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;text-align:center;color:var(--text-tertiary);font-size:12px;padding:16px;">Loading&hellip;</div>
-      </div>
-    </div>
-
-    <!-- Compounding calculator -->
-    <div class="card glass">
-      <h3>Precision Compounding Calculator <span style="font-size:11px;font-weight:500;color:var(--text-tertiary)">— the account-splitting model, with your own assumptions</span></h3>
-      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:14px 0;">
-        <div class="calc-input-group"><label class="calc-label" for="emsCap">Total Capital ($)</label><input class="calc-input" type="number" id="emsCap" value="1000" min="10" oninput="emsFlipCalc()"></div>
-        <div class="calc-input-group"><label class="calc-label" for="emsN">Accounts</label><input class="calc-input" type="number" id="emsN" value="10" min="1" max="50" oninput="emsFlipCalc()"></div>
-        <div class="calc-input-group"><label class="calc-label" for="emsWR">Win Rate (%)</label><input class="calc-input" type="number" id="emsWR" value="60" min="0" max="100" oninput="emsFlipCalc()"></div>
-        <div class="calc-input-group"><label class="calc-label" for="emsMult">Target Multiple (×)</label><input class="calc-input" type="number" id="emsMult" value="7" min="1" max="20" step="0.5" oninput="emsFlipCalc()"></div>
-      </div>
-      <div id="emsFlipOut"></div>
-    </div>
-  </div><!-- end tab-ems -->
-
-  <!-- mSNR DESK — Malaysian SNR: body levels, wick-first validation, 2-TF confirmation -->
-  <div id="tab-msnr" class="tab-panel">
-    <div class="section-header">
-      <div class="section-title">mSNR Desk <span style="font-size:11px;font-weight:500;color:var(--text-tertiary)">— Malaysian SNR: body-junction levels &middot; wick-first validation &middot; Weekly→Daily→H1 storyline</span></div>
-    </div>
-
-    <div class="card glass" style="margin-bottom:16px;">
-      <div style="font-size:12px;color:var(--text-secondary);line-height:1.75;">
-        Live implementation of the <strong>Malaysian SNR</strong> price-action method (credit: <em>The Truth About Price Action</em>, Iyanu Adegboruwa / Price Action Traders; mSNR lineage incl. Ariff T — summarised in our own words for personal use).
-        The core rules the engine enforces: <strong>levels live on candle bodies, never wicks</strong> — the open/close junction of adjacent opposite candles (the &ldquo;A&rdquo; and &ldquo;V&rdquo; shapes on a line chart);
-        a junction with a body gap is a <strong>GAP SNR (hidden zone)</strong>, drawn as a box; a level is <strong>FRESH</strong> until touched;
-        the <strong>first touch must be a wick</strong> (body-first = invalid); a <strong>Liquidity Sweep at the touch</strong> strengthens it;
-        and per the <strong>2-timeframe rule</strong>, a Daily setup is confirmed by an H1 breakout — entered on the retest.
-        <strong style="color:#B8860B;">NO VALIDATION, NO TRADE.</strong>
-      </div>
-      <div style="margin-top:8px;text-align:right;font-size:10px;color:var(--text-tertiary);" id="msnr-ts">&mdash;</div>
-    </div>
-
-    <!-- 4-step live pipeline -->
-    <div class="ems-grid" id="msnr-steps"></div>
-
-    <!-- Trade plan -->
-    <div class="dash-widget" style="margin:16px 0;">
-      <div class="dash-widget-title" style="margin-bottom:12px;">Trade Plan (auto-built from the storyline)</div>
-      <div id="msnr-plan"></div>
-    </div>
-
-    <!-- 3 charts: each TF draws its own body-SNR levels -->
-    <div class="mtf-grid" style="margin-bottom:16px;">
-      <div class="dash-widget">
-        <div class="dash-widget-title" style="margin-bottom:10px;">DAILY — mSNR Levels <span style="font-size:10px;font-weight:500;color:var(--text-tertiary)">red/green = fresh &middot; gold = wick-validated &middot; gray = flipped &middot; boxes = gap SNR</span></div>
-        <div id="msnrDaily" style="width:100%;height:300px;position:relative;">
-          <div id="msnrDailyMsg" style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;text-align:center;color:var(--text-tertiary);font-size:12px;padding:16px;">Loading&hellip;</div>
-        </div>
-      </div>
-      <div class="dash-widget">
-        <div class="dash-widget-title" style="margin-bottom:10px;">H4 — mSNR Levels <span style="font-size:10px;font-weight:500;color:var(--text-tertiary)">gap boxes here are the &ldquo;Decision&rdquo; levels</span></div>
-        <div id="msnrH4" style="width:100%;height:300px;position:relative;">
-          <div id="msnrH4Msg" style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;text-align:center;color:var(--text-tertiary);font-size:12px;padding:16px;">Loading&hellip;</div>
-        </div>
-      </div>
-    </div>
-    <div class="dash-widget" style="margin-bottom:16px;">
-      <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;margin-bottom:10px;">
-        <div class="dash-widget-title" style="margin:0;">M15 — mSNR Levels <span style="font-size:10px;font-weight:500;color:var(--text-tertiary)">refinement view for the H1 breakout retest</span></div>
-        <div class="chart-legend">
-          <span class="cl-item"><span class="cl-dot" style="background:#C23B33"></span>Fresh R</span>
-          <span class="cl-item"><span class="cl-dot" style="background:#00A651"></span>Fresh S</span>
-          <span class="cl-item"><span class="cl-dot" style="background:#D4AF37"></span>Wick-validated</span>
-          <span class="cl-item"><span class="cl-dot" style="background:#7A8196"></span>Flipped</span>
-        </div>
-      </div>
-      <div id="msnrM15" style="width:100%;height:340px;position:relative;">
-        <div id="msnrM15Msg" style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;text-align:center;color:var(--text-tertiary);font-size:12px;padding:16px;">Loading&hellip;</div>
-      </div>
-    </div>
-
-    <!-- Rules card -->
-    <div class="card glass">
-      <h3>The Rulebook (enforced above; trendlines stay manual)</h3>
-      <div class="grid-3" style="margin-top:12px;">
-        <div class="metric-box">
-          <div class="metric-label">Validation Rules</div>
-          <div class="metric-detail" style="font-size:11px;line-height:1.7;">First touch of an SNR must be a <strong>wick</strong>, never a body. A <strong>Liquidity Sweep</strong> (prior high/low taken at the touch, or a &ldquo;MISS&rdquo;) upgrades the setup. If the HTF touch lacks the sweep, refine to H4/H1 to find it.</div>
-        </div>
-        <div class="metric-box">
-          <div class="metric-label">Storyline Rules</div>
-          <div class="metric-detail" style="font-size:11px;line-height:1.7;">Weekly sets the main direction; Daily maps retracements and roadblocks; the H4 <strong>gap = decision level</strong>; H1 validates. If Daily runs against Weekly, the weekly leg pauses until the daily storyline completes.</div>
-        </div>
-        <div class="metric-box">
-          <div class="metric-label">Trendline Marriage (manual)</div>
-          <div class="metric-detail" style="font-size:11px;line-height:1.7;">Trendlines are angled SNRs: connect ≥2 body junctions (never wicks, never gap SNRs), no closes beyond the line, and enter only on the wick rejection at touch #3 — never at #2. Drawing stays manual by design: a mis-drawn auto-line is worse than none.</div>
-        </div>
-      </div>
-    </div>
-  </div><!-- end tab-msnr -->
 
 
   <!-- CALCULATOR TAB -->
@@ -4544,18 +4421,18 @@
     </div>
   </div><!-- end tab-intel -->
 
-  <!-- BACKTEST LAB — replay the three method desks over real 2026 history -->
+  <!-- BACKTEST LAB — replay the two EG desks over real 2026 history -->
   <div id="tab-backtest" class="tab-panel">
     <div class="section-header">
-      <div class="section-title">Backtest Lab <span style="font-size:11px;font-weight:500;color:var(--text-tertiary)">— walk-forward replay of the three Trade Room strategies on real 2026 gold history</span></div>
+      <div class="section-title">Backtest Lab <span style="font-size:11px;font-weight:500;color:var(--text-tertiary)">— walk-forward replay of the EG Scalp and EG Day Trade playbooks on real 2026 gold history</span></div>
     </div>
 
     <div class="card glass" style="margin-bottom:16px;">
       <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;">
         <div style="font-size:12px;color:var(--text-secondary);line-height:1.7;max-width:760px;">
-          Fetches <strong>2026 year-to-date</strong> PAXG (tokenized gold) candles from Binance — M15, H1, H4, Daily, Weekly —
-          and replays the <strong>Engulfing Desk</strong>, <strong>EMS Trinity</strong> and <strong>mSNR</strong> pipelines bar by bar using
-          the platform's own detection code, with data available only up to each bar (<strong>no look-ahead</strong>).
+          Fetches <strong>2026 year-to-date</strong> PAXG (tokenized gold) candles from Binance — M15, H1, H4, Daily —
+          and replays the <strong>EG Scalp</strong> and <strong>EG Day Trade</strong> playbooks bar by bar using
+          the platform's own engulfing detector, with data available only up to each bar (<strong>no look-ahead</strong>).
           Fills are conservative (stop counted before target inside the same bar). A 0.35-pt round-trip cost is charged per trade.
         </div>
         <button class="j-add-btn" onclick="runBacktest()">▶ Run 2026 Backtest</button>
@@ -4569,7 +4446,7 @@
       <h3 style="font-size:13px;">Honest assumptions (read before believing numbers)</h3>
       <div style="font-size:11px;color:var(--text-secondary);line-height:1.8;margin-top:8px;">
         · PAXG tracks spot gold ~1:1 but has its own microstructure; treat results as directional, not exact.<br>
-        · The red-folder blackout filter can't be reconstructed historically, so event-day trades are included — live results with the gate should be slightly better.<br>
+        · The live fundamental gate (real yields / DXY / VIX) can't be reconstructed historically — the sim uses the daily trend as the bias proxy — and the red-folder blackout is likewise not applied, so live results with both gates should be slightly better.<br>
         · One position per strategy at a time; entries that never trigger within their window are discarded; both-sides bars count as losses (conservative).<br>
         · R-multiples are risk-normalised: +1R means the trade made exactly its risked amount after costs. Past performance ≠ future results.
       </div>
@@ -4752,8 +4629,6 @@
     if (name === 'redfolder') { renderRedFolder(); }
     if (name === 'mtf')       { initMtfCharts(); renderMtfSummary(); }
     if (name === 'engulf')    { initEgCharts(); renderEngulfDesk(); }
-    if (name === 'ems')       { renderEmsDesk().then(() => emsChartCtl.init()); emsFlipCalc(); }
-    if (name === 'msnr')      { renderMsnrDesk().then(() => initMsnrCharts()); }
   }
 
   // ─── CHECKLIST ─────────────────────────────────────────────────────────────
@@ -5581,25 +5456,28 @@
   // horizontal price lines. One reusable factory drives both the Scalp chart
   // (dashboard) and the Day Trade chart (Trade Room → Day Trade Desk).
 
-  // Scalp Desk geometry: entry = price, tight stop 0.8× ATR, T1 1.8R, T2 3R
+  // Scalp chart geometry: the live EG Scalp signal when one exists, otherwise
+  // the swing-stop fallback so the chart always has honest levels to mark.
   function scalpLevels() {
     if (!lastGoldPrice || lastGoldPrice < 100) return null;
+    const b = egScalpState && egScalpState.best;
+    if (b) return { dir: b.dir, entry: b.entry, stop: b.stop, t1: b.t1, t2: b.t2, risk: b.risk, basis: 'EG ' + b.tf };
     const p = lastGoldPrice, atr = atrOf(p);
     const md = getMacroData();
-    const dirSign = md.isShort ? -1 : 1;   // default long-side geometry when 'wait'
-    // Structure-based stop (last swing + buffer), NOT a fat ATR fraction —
-    // targets stay R-multiples of the actual risk so R:R is honest.
+    const dirSign = md.isShort ? -1 : 1;
     const ss = swingStop(md.isShort ? 'short' : 'long', p, atr);
     return { dir: md.dir, entry: p, stop: ss.stop, t1: p + dirSign * ss.risk * 1.8, t2: p + dirSign * ss.risk * 3.0, risk: ss.risk, basis: ss.basis };
   }
 
-  // Day Trade Desk geometry (mirrors renderDayTradeDesk exactly):
-  // entry = price ∓0.15%, stop 1.5× ATR, T1 = 2R (3× ATR), T2 = 3.5R (5.25× ATR)
+  // Day chart geometry: the live EG Day Trade signal when one exists, else the
+  // macro-direction ATR fallback (1.5× ATR stop, 2R / 3.5R).
   function dayTradeLevels() {
     if (!lastGoldPrice || lastGoldPrice < 100) return null;
+    const b = egDayState && egDayState.best;
+    if (b) return { dir: b.dir, entry: b.entry, stop: b.stop, t1: b.t1, t2: b.t2 };
     const p = lastGoldPrice, atr = atrOf(p);
     const md = getMacroData();
-    const isL = md.isLong, isS = md.isShort;
+    const isS = md.isShort;
     const dirSign = isS ? -1 : 1;
     const entry = Math.round(p * (isS ? 1.0015 : 0.9985));
     const dayStop = atr * 1.5;
@@ -5682,7 +5560,7 @@
         offset = (lastGoldPrice && lastClose) ? (lastGoldPrice - lastClose) : 0;
         if (offset) candles = candles.map(c => ({ time: c.time, open:+(c.open+offset).toFixed(2), high:+(c.high+offset).toFixed(2), low:+(c.low+offset).toFixed(2), close:+(c.close+offset).toFixed(2) }));
         series.setData(candles);
-        // Per-chart candle hook (e.g. computing this TF's own mSNR levels)
+        // Per-chart candle hook (per-TF derived state)
         if (cfg.onCandles) { try { cfg.onCandles(candles); } catch (e) {} }
         // Zone boxes: custom source when provided, engulfing zones by default
         if (zonesPrim) {
@@ -5753,7 +5631,7 @@
     ]
   });
   const dayChartCtl = createLevelChart({
-    chartId: 'dayChart', msgId: 'dayChartMsg', boxId: 'dayChartLevels', getLevels: dayTradeLevels,
+    chartId: 'dayChart', msgId: 'dayChartMsg', boxId: 'dayChartLevels', getLevels: dayTradeLevels, interval: '1h', zones: true,
     extraLevels: () => !structState.ok ? [] : [
       structState.vwap !== null ? { price: structState.vwap, color: '#8B5CF6', title: 'VWAP', dashed: true } : null,
       structState.pdh  !== null ? { price: structState.pdh,  color: '#7A8196', title: 'PDH',  dashed: true } : null,
@@ -5786,162 +5664,11 @@
 
   function initMtfCharts() { mtfDailyCtl.init(); mtfH4Ctl.init(); mtfM15Ctl.init(); }
 
-  // EMS Trinity chart: H4 with engulf zones + fresh daily MSNR levels
-  const emsChartCtl = createLevelChart({
-    chartId: 'emsChart', msgId: 'emsChartMsg', interval: '4h', height: 360, zones: true,
-    extraLevels: () => {
-      const out = [];
-      if (emsLevels.res) out.push({ price: emsLevels.res.price, color: '#D4AF37', title: 'FRESH R' });
-      if (emsLevels.sup) out.push({ price: emsLevels.sup.price, color: '#D4AF37', title: 'FRESH S' });
-      return out;
-    }
-  });
-
   // Engulfing Desk charts: pure EG view — candles + zone boxes, nothing else
   const egDailyCtl = createLevelChart({ chartId: 'egDaily', msgId: 'egDailyMsg', interval: '1d',  height: 300, zones: true });
   const egH4Ctl    = createLevelChart({ chartId: 'egH4',    msgId: 'egH4Msg',    interval: '4h',  height: 300, zones: true });
   const egM15Ctl   = createLevelChart({ chartId: 'egM15',   msgId: 'egM15Msg',   interval: '15m', height: 340, zones: true });
   function initEgCharts() { egDailyCtl.init(); egH4Ctl.init(); egM15Ctl.init(); }
-
-  // mSNR Desk charts: each TF computes and draws its OWN body-junction levels;
-  // gap SNRs (hidden zones) draw as boxes via the zones primitive.
-  const msnrReg = { d: null, h4: null, m15: null };
-  function makeMsnrChart(key, chartId, msgId, interval, height) {
-    return createLevelChart({
-      chartId, msgId, interval, height, zones: true,
-      onCandles: (candles) => { msnrReg[key] = msnrLevels(candles, lastGoldPrice); },
-      zonesFn: (candles) => msnrChartLevels(msnrReg[key] || msnrLevels(candles, lastGoldPrice), lastGoldPrice || 0).zones,
-      extraLevels: () => msnrReg[key] ? msnrChartLevels(msnrReg[key], lastGoldPrice || 0).lines : []
-    });
-  }
-  const msnrDailyCtl = makeMsnrChart('d',   'msnrDaily', 'msnrDailyMsg', '1d',  300);
-  const msnrH4Ctl    = makeMsnrChart('h4',  'msnrH4',    'msnrH4Msg',    '4h',  300);
-  const msnrM15Ctl   = makeMsnrChart('m15', 'msnrM15',   'msnrM15Msg',   '15m', 340);
-  function initMsnrCharts() { msnrDailyCtl.init(); msnrH4Ctl.init(); msnrM15Ctl.init(); }
-
-  // ── mSNR storyline pipeline (Weekly direction → Daily level+validation →
-  //    H1 breakout per the 2-TF confirmation rule → plan) ──────────────────────
-  async function computeMsnrState() {
-    const [w1, d1, h4, h1] = await Promise.all([
-      fetchGoldKlines('1w'), fetchGoldKlines('1d'), fetchGoldKlines('4h'), fetchGoldKlines('1h')
-    ]);
-    const px = lastGoldPrice || 0;
-    const st = { ok: !!(w1 && d1 && h1), px };
-    if (!st.ok) return st;
-
-    // 1) Weekly = main direction (close vs its 20-SMA)
-    const wc = w1.map(c => c.close);
-    const wSma = wc.slice(-20).reduce((a, b) => a + b, 0) / Math.min(20, wc.length);
-    st.weekly = wc[wc.length - 1] >= wSma ? 'long' : 'short';
-
-    // 2) Daily: nearest fresh/wick-validated level in the weekly direction
-    //    (long → we buy at fresh SUPPORT; short → sell at fresh RESISTANCE)
-    const dLv = msnrLevels(d1, px);
-    const wantKind = st.weekly === 'long' ? 'sup' : 'res';
-    const usable = dLv.filter(l => l.kind === wantKind && (l.state === 'fresh' || l.state === 'wick'));
-    st.dailyLevel = usable.sort((a, b) => Math.abs(px - a.price) - Math.abs(px - b.price))[0] || null;
-    st.dailyTouched = st.dailyLevel ? st.dailyLevel.state === 'wick' : false;
-    st.dailyLS = st.dailyLevel ? st.dailyLevel.ls : false;
-
-    // Daily roadblock: opposing fresh level between price and target
-    st.target = dLv.filter(l => l.kind !== wantKind && l.state === 'fresh' &&
-        (st.weekly === 'long' ? l.price > px : l.price < px))
-      .sort((a, b) => Math.abs(px - a.price) - Math.abs(px - b.price))[0] || null;
-
-    // H4 gap "Decision level" near the daily level?
-    st.h4Decision = false;
-    if (h4 && st.dailyLevel) {
-      const h4Lv = msnrLevels(h4, px);
-      st.h4Decision = h4Lv.some(l => l.type === 'gap' && Math.abs(l.price - st.dailyLevel.price) <= px * 0.003);
-    }
-
-    // 3) H1 confirmation: after the daily wick touch, an H1 level flipped in
-    //    the trade direction = the LTF breakout; its retest is the entry.
-    st.h1Break = null;
-    if (st.dailyTouched && st.dailyLevel.touchedAt) {
-      const h1Lv = msnrLevels(h1, px);
-      const flips = h1Lv.filter(l => l.state === 'flipped' && l.flippedAt >= st.dailyLevel.touchedAt &&
-        (st.weekly === 'long' ? l.kind === 'res' : l.kind === 'sup'));   // broken resistance for longs
-      st.h1Break = flips.sort((a, b) => b.flippedAt - a.flippedAt)[0] || null;
-    }
-
-    // 4) Plan: entry at the flipped H1 level (retest), stop beyond the daily
-    //    touch extreme, target the next fresh daily level.
-    if (st.dailyLevel) {
-      const isL = st.weekly === 'long';
-      const entry = st.h1Break ? st.h1Break.price : (isL ? st.dailyLevel.hi : st.dailyLevel.lo);
-      const stop  = isL ? st.dailyLevel.lo - atrOf(px) * 0.25 : st.dailyLevel.hi + atrOf(px) * 0.25;
-      const risk  = Math.abs(entry - stop);
-      const tp    = st.target ? st.target.price : (isL ? entry + risk * 3 : entry - risk * 3);
-      const rr    = risk > 0 ? Math.abs(tp - entry) / risk : 0;
-      st.plan = { entry: +entry.toFixed(1), stop: +stop.toFixed(1), tp: +(+tp).toFixed(1),
-                  risk: +risk.toFixed(1), rr: +rr.toFixed(1), valid: rr >= 2 };
-    }
-    return st;
-  }
-
-  async function renderMsnrDesk() {
-    const box = document.getElementById('msnr-steps');
-    const planEl = document.getElementById('msnr-plan');
-    if (!box) return;
-    const st = await computeMsnrState();
-    if (!st.ok) {
-      box.innerHTML = '<div class="card glass" style="text-align:center;color:var(--text-tertiary);padding:24px;">Candle feed unavailable — mSNR needs Weekly/Daily/H1 data.</div>';
-      return;
-    }
-    const isL = st.weekly === 'long';
-    const dirCol = isL ? 'var(--accent-green)' : 'var(--accent-red)';
-    const L = st.dailyLevel;
-
-    box.innerHTML = `
-      <div class="ems-step">
-        <div class="ems-step-head"><span class="ems-num">1</span> STORYLINE — Weekly Direction</div>
-        <div class="ems-step-val" style="color:${dirCol}">${isL ? '▲ WEEKLY BULLISH' : '▼ WEEKLY BEARISH'}</div>
-        <div class="ems-step-sub">Daily is the retracement/roadblock map for this direction. Next fresh daily target: <strong>${st.target ? st.target.price.toLocaleString() : '—'}</strong></div>
-      </div>
-      <div class="ems-step">
-        <div class="ems-step-head"><span class="ems-num">2</span> LEVEL — Fresh Daily ${isL ? 'Support' : 'Resistance'} (bodies)</div>
-        <div class="ems-step-val">${L ? L.price.toLocaleString() + (L.type === 'gap' ? ' (GAP)' : '') : '—'}</div>
-        <div class="ems-step-sub">${L
-          ? emsChip(L.state === 'fresh', 'FRESH — untouched', 'wick-validated') + (st.h4Decision ? ' <span class="ems-chip ems-ok">H4 gap decision near level</span>' : '')
-          : 'No fresh daily level in the weekly direction — wait for one to form.'}</div>
-      </div>
-      <div class="ems-step">
-        <div class="ems-step-head"><span class="ems-num">3</span> VALIDATION — Wick Touch + LS</div>
-        <div class="ems-step-val">${emsChip(st.dailyTouched, 'Wick rejection seen', 'waiting for FIRST touch (must be wick)')}</div>
-        <div class="ems-step-sub">${st.dailyTouched
-          ? emsChip(st.dailyLS, 'Liquidity Sweep at the touch', 'no LS at touch — refine to H4/H1 to find it')
-          : 'The rule: first touch by WICK, never body. Body-first = invalid level.'}</div>
-      </div>
-      <div class="ems-step">
-        <div class="ems-step-head"><span class="ems-num">4</span> CONFIRM — H1 Breakout (2-TF rule)</div>
-        <div class="ems-step-val">${emsChip(!!st.h1Break, 'H1 SNR flipped @ ' + (st.h1Break ? st.h1Break.price.toLocaleString() : ''), 'waiting for H1 breakout after the touch')}</div>
-        <div class="ems-step-sub">Daily setup = H1 confirmation. Enter on the pullback/retest of the flipped level — never chase the break.</div>
-      </div>`;
-
-    if (planEl) {
-      if (st.plan && L) {
-        const ready = st.dailyTouched && !!st.h1Break && st.plan.valid;
-        planEl.innerHTML = `
-          <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:12px;">
-            ${[['Direction', isL ? '▲ LONG' : '▼ SHORT', dirCol],
-               ['Entry (retest)', st.plan.entry.toLocaleString(), 'var(--accent-blue)'],
-               ['Stop (beyond wick)', st.plan.stop.toLocaleString(), 'var(--accent-red)'],
-               ['Target (next fresh)', st.plan.tp.toLocaleString(), 'var(--accent-green)'],
-               ['R:R', '1:' + st.plan.rr, st.plan.valid ? 'var(--accent-green)' : 'var(--accent-red)']]
-              .map(([l2, v, c]) => `<div class="dash-setup-tile"><div style="font-size:9px;font-weight:800;letter-spacing:1.2px;text-transform:uppercase;color:var(--text-tertiary);margin-bottom:8px;">${l2}</div><div style="font-size:15px;font-weight:800;font-family:'JetBrains Mono',monospace;color:${c}">${v}</div></div>`).join('')}
-          </div>
-          <div class="dash-setup-session" style="margin-top:12px;">
-            <strong style="color:${ready ? 'var(--accent-green)' : '#D97706'}">${ready ? 'PIPELINE COMPLETE — setup is live on the retest.' : 'STAND BY — NO VALIDATION, NO TRADE.'}</strong>
-            Risk ${st.plan.risk} pts per unit.
-          </div>`;
-      } else {
-        planEl.innerHTML = '<div class="dash-setup-session">No qualifying daily level in the weekly direction — the method says wait.</div>';
-      }
-    }
-    const ts = document.getElementById('msnr-ts');
-    if (ts) ts.textContent = 'evaluated ' + new Date().toLocaleTimeString('en-US', { hour12: false, timeZone: 'UTC' }) + ' UTC';
-  }
 
   // Top-down alignment verdict: the classic multi-timeframe filter — trade M15
   // entries only in the direction the Daily and H4 agree on.
@@ -6273,12 +6000,11 @@
   }
 
   // ─── BACKTEST LAB ───────────────────────────────────────────────────────────
-  // Walk-forward replay of the three Trade Room method desks over real 2026
-  // history (Binance PAXGUSDT, fetched paginated from the browser). Uses the
-  // platform's OWN detectors — detectEngulfings / engulfZones / msnrLevels /
-  // detectSweepBOS — evaluated only on data available at each bar (no
-  // look-ahead). Fills are conservative: if one bar touches both stop and
-  // target, it counts as a LOSS; a fixed cost is charged per round trip.
+  // Walk-forward replay of the two EG Trade Room desks over real 2026 history
+  // (Binance PAXGUSDT, fetched paginated from the browser). Uses the platform's
+  // OWN detector — detectEngulfings — evaluated only on data available at each
+  // bar (no look-ahead). Fills are conservative: if one bar touches both stop
+  // and target, it counts as a LOSS; a fixed cost is charged per round trip.
   const BT_COST_PTS = 0.35;   // spread+slippage per round trip, in gold points
 
   async function btFetchRange(interval, startMs, endMs, onProgress) {
@@ -6348,7 +6074,7 @@
     return filled ? { r: 0 - BT_COST_PTS / risk, exitI: Math.min(iStart + maxBars, m15.length) - 1, bars: maxBars } : null;
   }
 
-  // S1 — Engulfing Desk (M15 ★ at-structure continuation, 1.8R target)
+  // S1 — EG Scalp (M15 ★ at-structure continuation, 1.8R target)
   function btSimEngulf(D, m15, h4) {
     const trades = [];
     const events = detectEngulfings(m15);      // pattern times (pattern itself uses no future data)
@@ -6383,92 +6109,39 @@
     return trades;
   }
 
-  // S2 — EMS Trinity (Daily bias → fresh H4 engulf zone → M15 sweep+BOS in zone → 3R)
-  function btSimEms(D, h4, m15) {
+  // S2 — EG Day Trade (H1 engulfing at daily structure, daily-trend aligned —
+  // the walk-forward proxy for the live fundamental bias gate — 2R target)
+  function btSimEgDay(D, h1, m15) {
     const trades = [];
+    const events = detectEngulfings(h1);
+    const evByTime = new Map(events.map(e => [e.time, e]));
     let busyUntil = -1;
-    let zonesAsOf = [], lastH4i = -1, biasAsOf = 'wait', lastDi = -1;
-    const tradedZones = new Set();   // one attempt per zone — no revenge re-entries
-    for (let i = 60; i < m15.length - 2; i++) {
-      if (i <= busyUntil) continue;
-      const t = m15[i].time;
+    for (let i = 30; i < h1.length - 1; i++) {
+      const e = evByTime.get(h1[i].time);
+      if (!e) continue;
+      const t = h1[i].time;
+      const i15 = btAsOfIndex(m15, t) + 1;
+      if (i15 <= 0 || i15 <= busyUntil) continue;
+      const hr = new Date(t * 1000).getUTCHours();
+      if (hr < 6 || hr >= 20) continue;                    // London + NY day-trade window
+      // structure filter: within 0.15% of PDH/PDL/PDC or a round number (as-of)
       const di = btAsOfIndex(D, t - 86400);
-      if (di !== lastDi && di >= 20) {
-        lastDi = di;
-        biasAsOf = D[di].close >= btSma(D.slice(0, di + 1).map(b => b.close), 20) ? 'long' : 'short';
-      }
-      const h4i = btAsOfIndex(h4, t - 14400);
-      if (h4i !== lastH4i && h4i >= 30) {
-        lastH4i = h4i;
-        zonesAsOf = engulfZones(h4.slice(0, h4i + 1)).filter(z => z.t2 === null);
-      }
-      if (biasAsOf === 'wait' || !zonesAsOf.length) continue;
-      const px = m15[i].close;
-      const z = zonesAsOf.find(z2 => z2.bull === (biasAsOf === 'long') && px >= z2.lo - 1 && px <= z2.hi + 1 && !tradedZones.has(z2.t1));
-      if (!z) continue;
-      // confirm: sweep+BOS on the last 60 M15 bars toward bias
-      const sb = detectSweepBOS(m15.slice(Math.max(0, i - 60), i + 1), biasAsOf);
-      if (!sb.confirmed) continue;
-      const dir = biasAsOf;
-      const entry = m15[i].close;
-      const buf = Math.max(0.8, (z.hi - z.lo) * 0.25);
-      const stop = dir === 'long' ? z.lo - buf : z.hi + buf;
-      const risk = Math.abs(entry - stop);
-      const target = dir === 'long' ? entry + risk * 3 : entry - risk * 3;
-      const res = btPlayOut(m15, i + 1, dir, entry, stop, target, 192);
-      if (res) { trades.push({ t, dir, ...res }); busyUntil = res.exitI; tradedZones.add(z.t1); }
-    }
-    return trades;
-  }
-
-  // S3 — mSNR (Weekly dir → fresh Daily level wick-touch → H1 flip → retest, next-level target)
-  function btSimMsnr(W, D, h1, m15) {
-    const trades = [];
-    let busyUntil = -1, lastDi = -1, lvAsOf = [], weeklyDir = 'long';
-    let pending = null;   // { dir, level, touchT, touchExtreme }
-    for (let i = 60; i < m15.length - 2; i++) {
-      if (i <= busyUntil) { pending = null; continue; }
-      const t = m15[i].time;
-      const di = btAsOfIndex(D, t - 86400);
-      if (di !== lastDi && di >= 20) {
-        lastDi = di;
-        const wi = btAsOfIndex(W, t - 604800);
-        if (wi >= 10) weeklyDir = W[wi].close >= btSma(W.slice(0, wi + 1).map(b => b.close), 20) ? 'long' : 'short';
-        lvAsOf = msnrLevels(D.slice(0, di + 1), D[di].close);
-        // the freshest wick-validated level in the weekly direction becomes pending
-        const want = weeklyDir === 'long' ? 'sup' : 'res';
-        const cand = lvAsOf.filter(l => l.kind === want && l.state === 'wick' && l.wickFirst)
-          .sort((a, b) => (b.touchedAt || 0) - (a.touchedAt || 0))[0];
-        pending = cand ? { dir: weeklyDir, level: cand, touchT: cand.touchedAt } : null;
-      }
-      if (!pending) continue;
-      // H1 flip after the touch, in trade direction (recompute once per H1 bar)
-      const h1i = btAsOfIndex(h1, t - 3600);
-      if (h1i < 40) continue;
-      if (h1i !== btSimMsnr._h1i) {
-        btSimMsnr._h1i = h1i;
-        btSimMsnr._h1lv = msnrLevels(h1.slice(Math.max(0, h1i - 160), h1i + 1), h1[h1i].close);
-      }
-      const h1lv = btSimMsnr._h1lv;
-      const flip = h1lv.filter(l => l.state === 'flipped' && l.flippedAt >= pending.touchT &&
-        (pending.dir === 'long' ? l.kind === 'res' : l.kind === 'sup'))
-        .sort((a, b) => b.flippedAt - a.flippedAt)[0];
-      if (!flip) continue;
-      // retest entry at the flipped level
-      const dir = pending.dir;
-      const entry = flip.price;
-      const touched = dir === 'long' ? m15[i].low <= entry : m15[i].high >= entry;
-      if (!touched) continue;
-      const stop = dir === 'long' ? pending.level.lo - 2 : pending.level.hi + 2;
-      const risk = Math.abs(entry - stop);
-      const want2 = dir === 'long' ? 'res' : 'sup';
-      const tgt = lvAsOf.filter(l => l.kind === want2 && l.state === 'fresh' &&
-          (dir === 'long' ? l.price > entry : l.price < entry))
-        .sort((a, b) => Math.abs(entry - a.price) - Math.abs(entry - b.price))[0];
-      const target = tgt ? tgt.price : (dir === 'long' ? entry + risk * 3 : entry - risk * 3);
-      if (Math.abs(target - entry) / risk < 2) { pending = null; continue; }   // the desk's RR gate
-      const res = btPlayOut(m15, i, dir, entry, stop, target, 384);
-      if (res) { trades.push({ t, dir, ...res }); busyUntil = res.exitI; pending = null; }
+      if (di < 20) continue;
+      const pd = D[di];
+      const mid = (e.high + e.low) / 2, tol = mid * 0.0015;
+      const round100 = Math.round(mid / 100) * 100, round50 = Math.round(mid / 50) * 50;
+      if (![pd.high, pd.low, pd.close, round100, round50].some(L => Math.abs(mid - L) <= tol)) continue;
+      // bias filter: daily close vs its 20-SMA (as-of) must agree with the pattern
+      const dUp = pd.close >= btSma(D.slice(0, di + 1).map(b2 => b2.close), 20);
+      if ((e.type === 'bull') !== dUp) continue;
+      const dir = e.type === 'bull' ? 'long' : 'short';
+      const buf = Math.max(0.5, (e.high - e.low) * 0.15);
+      const entry = dir === 'long' ? e.high + 0.1 : e.low - 0.1;
+      const stop  = dir === 'long' ? e.low - buf : e.high + buf;
+      const risk  = Math.abs(entry - stop);
+      const target = dir === 'long' ? entry + risk * 2 : entry - risk * 2;
+      const res = btPlayOut(m15, i15, dir, entry, stop, target, 192);   // ≤2 trading days
+      if (res) { trades.push({ t, dir, ...res }); busyUntil = res.exitI; }
     }
     return trades;
   }
@@ -6483,8 +6156,7 @@
     try {
       const start = Date.UTC(2026, 0, 1), end = Date.now();
       say('Fetching 2026 history from Binance (PAXG = tokenized gold)…');
-      const [W, D, h4, h1, m15] = [
-        await btFetchRange('1w', start - 200 * 86400e3, end, say),   // extra warmup for the weekly SMA
+      const [D, h4, h1, m15] = [
         await btFetchRange('1d', start - 60 * 86400e3, end, say),
         await btFetchRange('4h', start - 30 * 86400e3, end, say),
         await btFetchRange('1h', start - 15 * 86400e3, end, say),
@@ -6494,12 +6166,11 @@
         say('History fetch failed — Binance unreachable from this network.');
         btRunning = false; return;
       }
-      say(`Loaded ${m15.length} M15 / ${h1.length} H1 / ${h4.length} H4 / ${D.length} D / ${W.length} W bars. Replaying…`);
+      say(`Loaded ${m15.length} M15 / ${h1.length} H1 / ${h4.length} H4 / ${D.length} D bars. Replaying…`);
       await new Promise(r => setTimeout(r, 30));
       const rows = [
-        btMetrics('Engulfing Desk (★ M15, 1.8R)', btSimEngulf(D, m15, h4)),
-        btMetrics('EMS Trinity (H4 zone + sweep→BOS, 3R)', btSimEms(D, h4, m15)),
-        btMetrics('mSNR (Daily wick-touch → H1 flip, next level)', btSimMsnr(W, D, h1, m15))
+        btMetrics('EG Scalp (★ M15 at structure, 1.8R)', btSimEngulf(D, m15, h4)),
+        btMetrics('EG Day Trade (H1 at daily structure, 2R)', btSimEgDay(D, h1, m15))
       ];
       // Rank by total R, but a strategy needs a minimum sample to win
       const qualified = rows.filter(r2 => r2.n >= 5);
@@ -6532,307 +6203,175 @@
     btRunning = false;
   }
 
-  // ─── MALAYSIAN SNR (mSNR) ENGINE ────────────────────────────────────────────
-  // Implements body-based SNR per "The Truth About Price Action" (Iyanu
-  // Adegboruwa, Price Action Traders; Malaysian SNR lineage / Ariff T).
-  // Levels form at the open-close JUNCTION of adjacent opposite candles:
-  //  "A" (bull close -> bear open at a local body peak)  = resistance
-  //  "V" (bear close -> bull open at a local body trough) = support
-  // A junction whose close != next open by a material amount is a GAP SNR
-  // (hidden zone). States: fresh (untouched), wick (first touch was a wick
-  // rejection — tradeable), flipped (a body traded through — role reverses).
-  function msnrLevels(candles, refPrice) {
-    if (!candles || candles.length < 12) return [];
-    const off = (refPrice && candles[candles.length - 1].close) ? (refPrice - candles[candles.length - 1].close) : 0;
-    const isBull = c => c.close > c.open, isBear = c => c.close < c.open;
-    const out = [];
-    const gapTol = (refPrice || candles[candles.length - 1].close) * 0.0004; // ~0.04% = material body gap
+  // ─── EG DESK ENGINE — engulfing setups gated by the fundamental engine ──────
+  // Both Trade Room desks run the same playbook on different timeframes:
+  //   EG Scalp:     M5 + M15 engulfings at intraday structure (VWAP, PDH/PDL,
+  //                 Asian range, round numbers) — pattern stop, 1.8R / 3R.
+  //   EG Day Trade: H1 + H4 engulfings at daily structure — pattern stop with
+  //                 buffer, 2R / 3.5R, and the daily SMA20 trend must agree.
+  // The fundamental engine (real yields master driver + DXY + VIX + flows) is
+  // the accuracy gate: a signal WITH the macro bias gets upgraded confidence;
+  // one against it is flagged counter-trend — skip or half-size.
 
-    for (let i = 1; i < candles.length - 1; i++) {
-      const a = candles[i], b = candles[i + 1];
-      let kind = null;
-      // local body-peak / body-trough on the close line (the A / V shapes)
-      if (isBull(a) && isBear(b) && a.close > candles[i - 1].close && a.close >= b.close) kind = 'res';
-      else if (isBear(a) && isBull(b) && a.close < candles[i - 1].close && a.close <= b.close) kind = 'sup';
-      if (!kind) continue;
+  let egScalpState = null, egDayState = null;   // read by the chart geometry
 
-      const j1 = a.close, j2 = b.open;
-      const lo = Math.min(j1, j2), hi = Math.max(j1, j2);
-      const type = (hi - lo) > gapTol ? 'gap' : 'classical';
-      const L = { kind, type, lo, hi, price: (lo + hi) / 2, formedAt: b.time, iEnd: i + 1,
-                  state: 'fresh', wickFirst: null, ls: false, flippedAt: null, touchedAt: null };
-
-      // walk forward: first interaction decides validation; body-through flips
-      for (let k = i + 2; k < candles.length; k++) {
-        const c = candles[k];
-        const bTop = Math.max(c.open, c.close), bBot = Math.min(c.open, c.close);
-        const bodyThrough = kind === 'res' ? bTop >= lo : bBot <= hi;      // body reaches the zone
-        const bodyBeyond  = kind === 'res' ? c.close > hi : c.close < lo;  // close through -> flip
-        const wickTouch   = kind === 'res' ? (c.high >= lo && bTop < lo) : (c.low <= hi && bBot > hi);
-
-        if (L.state === 'fresh') {
-          if (wickTouch) {
-            L.state = 'wick'; L.wickFirst = true; L.touchedAt = c.time;
-            // Liquidity Sweep at the touch: the touch candle takes the prior candle's extreme
-            L.ls = kind === 'res' ? c.high > candles[k - 1].high : c.low < candles[k - 1].low;
-          } else if (bodyThrough) {
-            L.wickFirst = false; L.touchedAt = c.time;
-            if (bodyBeyond) { L.state = 'flipped'; L.flippedAt = c.time; }
-            else L.state = 'body';           // body reached it first — invalid per the wick-first rule
-          }
-        } else if (L.state === 'wick' || L.state === 'body') {
-          if (bodyBeyond) { L.state = 'flipped'; L.flippedAt = c.time; }
-        } else if (L.state === 'flipped') {
-          // re-broken back through -> discard as exhausted
-          const backBeyond = kind === 'res' ? c.close < lo : c.close > hi;
-          if (backBeyond) { L.state = 'dead'; break; }
-        }
-      }
-      if (L.state !== 'dead') {
-        L.lo = +(L.lo + off).toFixed(2); L.hi = +(L.hi + off).toFixed(2); L.price = +(L.price + off).toFixed(2);
-        out.push(L);
-      }
-    }
-    return out;
-  }
-
-  // Chart-friendly selection: nearest few levels around price, per state
-  function msnrChartLevels(levels, px) {
-    const fresh = levels.filter(l => l.state === 'fresh');
-    const wick  = levels.filter(l => l.state === 'wick');
-    const flip  = levels.filter(l => l.state === 'flipped');
-    const near = (arr, kind, n) => arr.filter(l => l.kind === kind)
-      .sort((a, b) => Math.abs(px - a.price) - Math.abs(px - b.price)).slice(0, n);
-    return {
-      lines: [
-        ...near(fresh, 'res', 3).map(l => ({ price: l.price, color: '#C23B33', title: 'FRESH R' })),
-        ...near(fresh, 'sup', 3).map(l => ({ price: l.price, color: '#00A651', title: 'FRESH S' })),
-        ...near(wick,  'res', 2).map(l => ({ price: l.price, color: '#D4AF37', title: 'R✓wick', dashed: true })),
-        ...near(wick,  'sup', 2).map(l => ({ price: l.price, color: '#D4AF37', title: 'S✓wick', dashed: true })),
-        ...near(flip,  'res', 1).map(l => ({ price: l.price, color: '#7A8196', title: 'FLIP', dashed: true })),
-        ...near(flip,  'sup', 1).map(l => ({ price: l.price, color: '#7A8196', title: 'FLIP', dashed: true }))
-      ],
-      // Gap SNRs draw as boxes (hidden zones), fresh/wick only
-      zones: levels.filter(l => l.type === 'gap' && (l.state === 'fresh' || l.state === 'wick'))
-        .sort((a, b) => Math.abs(px - a.price) - Math.abs(px - b.price)).slice(0, 4)
-        .map(l => ({ t1: l.formedAt, t2: null, hi: l.hi, lo: l.lo, bull: l.kind === 'sup', star: l.state === 'fresh' }))
-    };
-  }
-
-  // ─── EMS TRINITY ENGINE ─────────────────────────────────────────────────────
-  // Implements the EMS workflow (bias -> HTF engulf zone -> LTF sweep+BOS ->
-  // execute) as a live pipeline. Concepts follow "The Alchemist EMS Trinity"
-  // (Yanu Emmanuel); all code and wording here are original.
-
-  // MSNR-style levels: swing support/resistance measured on candle BODIES
-  // (open/close), and only FRESH levels (no later body has traded through).
-  function dailyBodyLevels(d1) {
-    if (!d1 || d1.length < 12) return { res: null, sup: null, all: [] };
-    const off = (lastGoldPrice && d1[d1.length - 1].close) ? (lastGoldPrice - d1[d1.length - 1].close) : 0;
-    const bt = c => Math.max(c.open, c.close), bb = c => Math.min(c.open, c.close);
-    const raw = [];
-    for (let i = 2; i < d1.length - 2; i++) {
-      if (bt(d1[i]) > bt(d1[i-1]) && bt(d1[i]) > bt(d1[i-2]) && bt(d1[i]) > bt(d1[i+1]) && bt(d1[i]) > bt(d1[i+2]))
-        raw.push({ type: 'res', price: bt(d1[i]), i });
-      if (bb(d1[i]) < bb(d1[i-1]) && bb(d1[i]) < bb(d1[i-2]) && bb(d1[i]) < bb(d1[i+1]) && bb(d1[i]) < bb(d1[i+2]))
-        raw.push({ type: 'sup', price: bb(d1[i]), i });
-    }
-    const fresh = raw.filter(L => {
-      for (let j = L.i + 2; j < d1.length; j++) {
-        const c = d1[j];
-        if (L.type === 'res' ? bt(c) >= L.price : bb(c) <= L.price) return false;
-      }
-      return true;
-    }).map(L => ({ type: L.type, price: +(L.price + off).toFixed(2) }));
-    const px = lastGoldPrice || 0;
-    return {
-      res: fresh.filter(l => l.type === 'res' && l.price > px).sort((a, b) => a.price - b.price)[0] || null,
-      sup: fresh.filter(l => l.type === 'sup' && l.price < px).sort((a, b) => b.price - a.price)[0] || null,
-      all: fresh
-    };
-  }
-
-  // Liquidity sweep -> break of structure on a lower timeframe.
-  // Long: a fractal swing low gets wicked below but the candle closes back
-  // above it (sweep), then a later close above the interim high (BOS).
-  function detectSweepBOS(candles, dir) {
-    const none = { swing: null, sweep: null, bos: null, confirmed: false };
-    if (!candles || candles.length < 30) return none;
-    const off = (lastGoldPrice && candles[candles.length - 1].close) ? (lastGoldPrice - candles[candles.length - 1].close) : 0;
-    const n = candles.length, isL = dir === 'long';
-
-    // Collect recent fractal swings (most recent first). The newest fractal is
-    // often the SWEEP bar itself, so we evaluate several candidates and keep
-    // the most advanced state (confirmed > swept > swing-only).
-    const fractals = [];
-    for (let i = n - 4; i >= 2 && fractals.length < 6; i--) {
-      const c = candles[i];
-      const isSwing = isL
-        ? (c.low  < candles[i-1].low  && c.low  < candles[i-2].low  && c.low  < candles[i+1].low  && c.low  < candles[i+2].low)
-        : (c.high > candles[i-1].high && c.high > candles[i-2].high && c.high > candles[i+1].high && c.high > candles[i+2].high);
-      if (isSwing) fractals.push(i);
-    }
-    if (!fractals.length) return none;
-
-    const evalSwing = (si) => {
-      const sw = candles[si];
-      const swing = { time: sw.time, price: +((isL ? sw.low : sw.high) + off).toFixed(2) };
-      let pi = -1;
-      for (let j = si + 1; j < n; j++) {
-        const c = candles[j];
-        if (isL ? (c.low < sw.low && c.close > sw.low) : (c.high > sw.high && c.close < sw.high)) { pi = j; break; }
-      }
-      if (pi < 0) return { swing, sweep: null, bos: null, confirmed: false };
-      let lvl = isL ? -Infinity : Infinity;
-      for (let k = si; k <= pi; k++) lvl = isL ? Math.max(lvl, candles[k].high) : Math.min(lvl, candles[k].low);
-      let bi = -1;
-      for (let m = pi + 1; m < n; m++) {
-        if (isL ? candles[m].close > lvl : candles[m].close < lvl) { bi = m; break; }
-      }
-      return {
-        swing,
-        sweep: { time: candles[pi].time, price: +((isL ? candles[pi].low : candles[pi].high) + off).toFixed(2) },
-        bos: bi >= 0 ? { time: candles[bi].time, level: +(lvl + off).toFixed(2) } : null,
-        confirmed: bi >= 0
-      };
-    };
-
-    let best = null;
-    for (const si of fractals) {
-      const r = evalSwing(si);
-      if (r.confirmed) return r;                       // most recent confirmed sequence wins
-      if (!best || (r.sweep && !best.sweep)) best = r; // otherwise keep most advanced
-    }
-    return best || none;
-  }
-
-  // Full pipeline state (Daily bias -> H4 zone -> M15 structure -> plan)
-  let emsLevels = { res: null, sup: null };   // read by the EMS chart overlay
-  async function computeEmsState() {
-    const [d1, h4, m15] = await Promise.all([fetchGoldKlines('1d'), fetchGoldKlines('4h'), fetchGoldKlines('15m')]);
-    const px = lastGoldPrice || 0;
-    const st = { ok: !!(d1 && h4 && m15), px };
-    if (!st.ok) return st;
-
-    // STEP 1 — bias: daily close vs 20-SMA + the fresh-level map
-    const closes = d1.map(c => c.close);
-    const sma20 = closes.slice(-20).reduce((a, b) => a + b, 0) / Math.min(20, closes.length);
-    st.bias = closes[closes.length - 1] >= sma20 ? 'long' : 'short';
-    st.levels = dailyBodyLevels(d1);
-    emsLevels = st.levels;
-    st.target = st.bias === 'long' ? st.levels.res : st.levels.sup;   // next fresh level = delivery target
-
-    // STEP 2 — HTF engulf zone in the bias direction, fresh first
-    const zones = engulfZones(h4).filter(z => z.bull === (st.bias === 'long'));
-    const freshZ = zones.filter(z => z.t2 === null);
-    const pool = freshZ.length ? freshZ : zones;
-    st.zone = pool.sort((a, b) => Math.abs(px - (a.hi + a.lo) / 2) - Math.abs(px - (b.hi + b.lo) / 2))[0] || null;
-    st.zoneFresh = st.zone ? st.zone.t2 === null : false;
-    st.inZone = st.zone ? (px >= st.zone.lo - 2 && px <= st.zone.hi + 2) : false;
-
-    // STEP 3 — M15 sweep + BOS toward bias
-    st.struct = detectSweepBOS(m15, st.bias);
-
-    // STEP 4 — plan (only meaningful when a zone exists)
-    if (st.zone) {
-      const isL = st.bias === 'long';
-      const entry = isL ? st.zone.hi : st.zone.lo;                     // zone edge
-      const buf   = Math.max(0.8, (st.zone.hi - st.zone.lo) * 0.25);
-      const sl    = isL ? st.zone.lo - buf : st.zone.hi + buf;         // beyond the engulfed candle
-      const risk  = Math.abs(entry - sl);
-      const tgt   = st.target ? st.target.price : (isL ? entry + risk * 3 : entry - risk * 3);
-      const rr    = risk > 0 ? Math.abs(tgt - entry) / risk : 0;
-      st.plan = { entry: +entry.toFixed(1), sl: +sl.toFixed(1), tp: +(+tgt).toFixed(1), risk: +risk.toFixed(1), rr: +rr.toFixed(1), valid: rr >= 3 };
-    }
-    return st;
-  }
-
-  function emsChip(state, txtOk, txtWait) {
+  function egChip(state, txtOk, txtWait) {
     return state
       ? '<span class="ems-chip ems-ok">✓ ' + txtOk + '</span>'
       : '<span class="ems-chip ems-wait">⏳ ' + txtWait + '</span>';
   }
 
-  async function renderEmsDesk() {
-    const box = document.getElementById('ems-steps');
-    const planEl = document.getElementById('ems-plan');
-    if (!box) return;
-    const st = await computeEmsState();
-    if (!st.ok) {
-      box.innerHTML = '<div class="card glass" style="text-align:center;color:var(--text-tertiary);padding:24px;">Candle feed unavailable — the EMS pipeline needs Daily/H4/M15 data.</div>';
-      return;
-    }
-    const isL = st.bias === 'long';
-    const dirCol = isL ? 'var(--accent-green)' : 'var(--accent-red)';
-    const fmtL = l => l ? l.price.toLocaleString() : '—';
-
-    box.innerHTML = `
-      <div class="ems-step">
-        <div class="ems-step-head"><span class="ems-num">1</span> BIAS — Fresh Daily Levels (bodies)</div>
-        <div class="ems-step-val" style="color:${dirCol}">${isL ? '▲ LONG storyline' : '▼ SHORT storyline'}</div>
-        <div class="ems-step-sub">Fresh resistance ${fmtL(st.levels.res)} · fresh support ${fmtL(st.levels.sup)}<br>Delivery target: <strong>${fmtL(st.target)}</strong> ${st.target ? '(' + Math.abs(st.px - st.target.price).toFixed(0) + ' pts away)' : '— no fresh level mapped'}</div>
-      </div>
-      <div class="ems-step">
-        <div class="ems-step-head"><span class="ems-num">2</span> POI — H4 Engulf Zone (continuation)</div>
-        <div class="ems-step-val">${st.zone ? st.zone.lo.toLocaleString() + ' – ' + st.zone.hi.toLocaleString() : '—'}</div>
-        <div class="ems-step-sub">${st.zone
-          ? emsChip(st.zoneFresh, 'FRESH zone (unmitigated)', 'mitigated — lower quality') + ' ' + emsChip(st.inZone, 'price IN the zone now', 'price ' + Math.abs(st.px - (st.zone.hi + st.zone.lo) / 2).toFixed(0) + ' pts from zone')
-          : 'No H4 engulfing in the bias direction yet — no trade, by definition.'}</div>
-      </div>
-      <div class="ems-step">
-        <div class="ems-step-head"><span class="ems-num">3</span> CONFIRM — M15 Sweep → BOS</div>
-        <div class="ems-step-val">${emsChip(!!st.struct.sweep, 'Liquidity swept @ ' + (st.struct.sweep ? st.struct.sweep.price.toLocaleString() : ''), 'waiting for sweep of ' + (st.struct.swing ? st.struct.swing.price.toLocaleString() : 'last swing'))}</div>
-        <div class="ems-step-sub">${emsChip(st.struct.confirmed, 'Structure broken @ ' + (st.struct.bos ? st.struct.bos.level.toLocaleString() : ''), 'waiting for the break of structure')}</div>
-      </div>
-      <div class="ems-step">
-        <div class="ems-step-head"><span class="ems-num">4</span> EXECUTE — RR ≥ 3 gate</div>
-        <div class="ems-step-val">${st.plan ? (st.plan.valid ? '<span style="color:var(--accent-green)">RR 1:' + st.plan.rr + ' — VALID</span>' : '<span style="color:var(--accent-red)">RR 1:' + st.plan.rr + ' — below 3, SKIP</span>') : '—'}</div>
-        <div class="ems-step-sub">All three prior steps must be green before this matters.</div>
-      </div>`;
-
-    if (planEl) {
-      if (st.plan) {
-        const ready = st.zone && st.struct.confirmed && st.plan.valid && st.inZone;
-        planEl.innerHTML = `
-          <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:12px;">
-            ${[['Direction', isL ? '▲ LONG' : '▼ SHORT', dirCol],
-               ['Entry (zone edge)', st.plan.entry.toLocaleString(), 'var(--accent-blue)'],
-               ['Stop (beyond zone)', st.plan.sl.toLocaleString(), 'var(--accent-red)'],
-               ['Target (fresh level)', st.plan.tp.toLocaleString(), 'var(--accent-green)'],
-               ['R:R', '1:' + st.plan.rr, st.plan.valid ? 'var(--accent-green)' : 'var(--accent-red)']]
-              .map(([l, v, c]) => `<div class="dash-setup-tile"><div style="font-size:9px;font-weight:800;letter-spacing:1.2px;text-transform:uppercase;color:var(--text-tertiary);margin-bottom:8px;">${l}</div><div style="font-size:15px;font-weight:800;font-family:'JetBrains Mono',monospace;color:${c}">${v}</div></div>`).join('')}
-          </div>
-          <div class="dash-setup-session" style="margin-top:12px;">
-            <strong style="color:${ready ? 'var(--accent-green)' : '#D97706'}">${ready ? 'ALL FOUR STEPS ALIGNED — setup is live.' : 'STAND BY — pipeline incomplete.'}</strong>
-            Risk ${st.plan.risk} pts per unit. The tracker and journal apply as usual; size so a full stop costs ≤ your per-trade risk.
-          </div>`;
-      } else {
-        planEl.innerHTML = '<div class="dash-setup-session">No qualifying H4 zone in the bias direction — the method says do nothing.</div>';
-      }
-    }
-    const ts = document.getElementById('ems-ts');
-    if (ts) ts.textContent = 'evaluated ' + new Date().toLocaleTimeString('en-US', { hour12: false, timeZone: 'UTC' }) + ' UTC';
+  // Score one engulfing event under the current fundamental bias and build
+  // its trade plan (entry = break of the pattern extreme, stop beyond the
+  // other extreme — the "proven wrong" point, which is why the stop is tight).
+  function egEvaluate(e, md, cfg) {
+    const dir = e.type === 'bull' ? 'long' : 'short';
+    const aligned = md.dir === 'wait' ? null : (md.dir === dir);
+    const buf = cfg.buf(e);
+    const entry = dir === 'long' ? e.high + 0.1 : e.low - 0.1;
+    const stop  = dir === 'long' ? e.low - buf : e.high + buf;
+    const risk  = Math.abs(entry - stop);
+    const t1 = dir === 'long' ? entry + risk * cfg.r1 : entry - risk * cfg.r1;
+    const t2 = dir === 'long' ? entry + risk * cfg.r2 : entry - risk * cfg.r2;
+    let conf = e.atLevel ? 62 : 48;
+    if (aligned === true)  conf += Math.min(18, Math.round((md.conf - 50) * 0.6));
+    if (aligned === false) conf -= 15;
+    if (cfg.trendOk === false) conf -= 8;
+    conf = Math.max(25, Math.min(92, conf));
+    const score = (e.atLevel ? 2 : 0) + (aligned === true ? 2 : aligned === null ? 1 : 0) + (cfg.tfBonus || 0);
+    return { ...e, dir, aligned, conf, score,
+             entry: +entry.toFixed(2), stop: +stop.toFixed(2), risk: +risk.toFixed(2),
+             t1: +t1.toFixed(2), t2: +t2.toFixed(2), r1: cfg.r1, r2: cfg.r2 };
   }
 
-  // Compounding ("flipping") calculator — the book's account-splitting model
-  // with adjustable assumptions so the math is transparent.
-  function emsFlipCalc() {
-    const g = id => parseFloat(document.getElementById(id)?.value) || 0;
-    const cap = g('emsCap'), n = Math.max(1, Math.round(g('emsN'))), wr = Math.min(100, Math.max(0, g('emsWR'))) / 100, mult = g('emsMult');
-    const per = cap / n;
-    const wins = Math.round(n * wr), losses = n - wins;
-    const equity = wins * per * mult;
-    const out = document.getElementById('emsFlipOut');
-    if (out) out.innerHTML = `
-      <div class="grid-3">
-        <div class="metric-box"><div class="metric-label">Per Account</div><div class="metric-value">$${per.toFixed(0)}</div><div class="metric-detail">${n} accounts from $${cap.toLocaleString()}</div></div>
-        <div class="metric-box"><div class="metric-label">Expected Outcome</div><div class="metric-value">${wins}W / ${losses}L</div><div class="metric-detail">at ${(wr*100).toFixed(0)}% win rate assumption</div></div>
-        <div class="metric-box"><div class="metric-label">Projected Equity</div><div class="metric-value" style="color:${equity >= cap ? 'var(--accent-green)' : 'var(--accent-red)'}">$${equity.toLocaleString(undefined,{maximumFractionDigits:0})}</div><div class="metric-detail">${equity >= cap ? '+' : ''}${(((equity - cap) / cap) * 100).toFixed(0)}% vs invested</div></div>
+  async function computeEgScalp() {
+    const [c5, c15] = await Promise.all([fetchGoldKlines('5m'), fetchGoldKlines('15m')]);
+    const md = getMacroData();
+    const now = Date.now() / 1000;
+    const evs = [];
+    const collect = (cands, tf, maxAge, tfBonus) => {
+      for (const e of detectEngulfings(cands || []).slice(-8))
+        if (now - e.time <= maxAge)
+          evs.push(egEvaluate({ ...e, tf }, md, { r1: 1.8, r2: 3.0, tfBonus, buf: () => 0.1 }));
+    };
+    collect(c5,  'M5',  3 * 3600, 0);
+    collect(c15, 'M15', 8 * 3600, 0.5);
+    evs.sort((a, b) => b.score - a.score || b.time - a.time);
+    egScalpState = { ok: !!(c5 || c15), md, events: evs, best: evs[0] || null };
+    return egScalpState;
+  }
+
+  async function computeEgDay() {
+    const [h1, h4, d1] = await Promise.all([fetchGoldKlines('1h'), fetchGoldKlines('4h'), fetchGoldKlines('1d')]);
+    const md = getMacroData();
+    const now = Date.now() / 1000;
+    // Daily SMA20 trend — the technical half of the bias gate (and the only
+    // half the Backtest Lab can reconstruct historically)
+    let dTrend = null;
+    if (d1 && d1.length >= 21) {
+      const closes = d1.map(c => c.close);
+      dTrend = closes[closes.length - 1] >= btSma(closes, 20) ? 'long' : 'short';
+    }
+    const evs = [];
+    const collect = (cands, tf, maxAge, tfBonus) => {
+      for (const e of detectEngulfings(cands || []).slice(-8))
+        if (now - e.time <= maxAge) {
+          const dir = e.type === 'bull' ? 'long' : 'short';
+          const trendOk = dTrend === null ? null : dTrend === dir;
+          evs.push(egEvaluate({ ...e, tf }, md, {
+            r1: 2.0, r2: 3.5, trendOk,
+            tfBonus: tfBonus + (trendOk === true ? 1 : 0),
+            buf: x => Math.max(0.5, (x.high - x.low) * 0.15)
+          }));
+        }
+    };
+    collect(h1, 'H1', 48 * 3600, 0);
+    collect(h4, 'H4', 8 * 86400, 0.5);
+    evs.sort((a, b) => b.score - a.score || b.time - a.time);
+    egDayState = { ok: !!(h1 || h4), md, dTrend, events: evs, best: evs[0] || null };
+    return egDayState;
+  }
+
+  // The 4-step pipeline strip both desks render above their signal cards
+  function egPipelineHTML(st, desk) {
+    const md = st.md;
+    const ry = realYield;
+    const dxy = parseFloat(document.getElementById('dxyPrice')?.textContent) || null;
+    const bCol = md.isLong ? 'var(--accent-green)' : md.isShort ? 'var(--accent-red)' : '#D97706';
+    let nearName = null, nearDist = null;
+    const sst = structState;
+    if (sst.ok && lastGoldPrice) {
+      const px = lastGoldPrice;
+      const cand = [['VWAP', sst.vwap], ['PDH', sst.pdh], ['PDL', sst.pdl], ['Asia H', sst.asianH], ['Asia L', sst.asianL]]
+        .filter(x => x[1] !== null)
+        .map(x => [x[0], Math.abs(px - x[1])])
+        .sort((a, b) => a[1] - b[1])[0];
+      if (cand) { nearName = cand[0]; nearDist = cand[1]; }
+    }
+    const b = st.best;
+    const ageMin = b ? Math.round((Date.now() / 1000 - b.time) / 60) : null;
+    const age = ageMin === null ? '' : ageMin < 90 ? ageMin + ' min ago' : (ageMin / 60).toFixed(1) + ' h ago';
+    const trendBit = desk === 'day' && b
+      ? '<br>' + egChip(st.dTrend !== null && st.dTrend === b.dir, 'daily SMA20 trend agrees',
+          st.dTrend === null ? 'daily trend unavailable' : 'daily trend disagrees — stand down')
+      : '';
+    return `
+      <div class="ems-step">
+        <div class="ems-step-head"><span class="ems-num">1</span> FUNDAMENTAL BIAS</div>
+        <div class="ems-step-val" style="color:${bCol}">${md.isLong ? '▲ LONG' : md.isShort ? '▼ SHORT' : '— NEUTRAL'} · ${md.conf}%</div>
+        <div class="ems-step-sub">Real yields ${ry.level !== null ? ry.level.toFixed(2) + '% (' + (ry.bias || 'neutral') + ' — master driver)' : 'n/a'} · DXY ${dxy ? dxy.toFixed(1) : 'n/a'} · macro ${md.macroScore}/40</div>
       </div>
-      <div style="margin-top:10px;font-size:11px;color:var(--text-secondary);line-height:1.7;">
-        Rules of the model: losing accounts go to zero and that is planned; winners run to the target multiple; when an account hits target, <strong>withdraw the initial capital</strong> and recycle profits into a new cycle.
-        <strong style="color:#D97706;">Honesty check:</strong> the author assumes ~80% win rate on validated zones. Your real number is in the Signal Tracker — use that here before believing the projection.
+      <div class="ems-step">
+        <div class="ems-step-head"><span class="ems-num">2</span> STRUCTURE</div>
+        <div class="ems-step-val">${nearName ? nearName + ' · ' + nearDist.toFixed(0) + ' pts' : '—'}</div>
+        <div class="ems-step-sub">${nearName ? 'Nearest structure level. ' : 'Structure feed warming up. '}Engulfings only earn full grade AT structure (★).</div>
+      </div>
+      <div class="ems-step">
+        <div class="ems-step-head"><span class="ems-num">3</span> PATTERN — latest EG</div>
+        <div class="ems-step-val">${b ? b.tf + ' ' + (b.type === 'bull' ? '▲ BULL' : '▼ BEAR') + (b.atLevel ? ' ★' : '') : '—'}</div>
+        <div class="ems-step-sub">${b ? age + (b.atLevel ? ' at ' + b.atLevel : ' (mid-range — B-grade)') + trendBit : 'No engulfing in the scan window — the desk is flat by design.'}</div>
+      </div>
+      <div class="ems-step">
+        <div class="ems-step-head"><span class="ems-num">4</span> EXECUTE — bias gate</div>
+        <div class="ems-step-val">${b ? (b.aligned === true ? '<span style="color:var(--accent-green)">WITH BIAS — full size</span>' : b.aligned === false ? '<span style="color:var(--accent-red)">COUNTER-TREND — skip/half</span>' : '<span style="color:#D97706">MACRO NEUTRAL — half size</span>') : '—'}</div>
+        <div class="ems-step-sub">${b ? 'Entry ' + b.entry.toLocaleString() + ' · stop ' + b.stop.toLocaleString() + ' (' + b.risk.toFixed(1) + ' pts) · T1 ' + b.t1.toLocaleString() : 'Wait for the next qualifying engulfing.'}</div>
       </div>`;
+  }
+
+  // Signal cards (top 3 events) — shared by both desks
+  function egSetupCardsHTML(st) {
+    const md = st.md;
+    if (!st.events.length) return `
+      <div class="setup-card">
+        <div class="setup-card-head wait"><span class="setup-card-type">No engulfing in the scan window</span><span class="setup-card-pct">—</span></div>
+        <div class="setup-card-body"><div class="scard-reason">The desk trades ONLY printed engulfings — no pattern, no trade. That is the edge, not a malfunction. Check back after the next few candles close, or watch the Engulfing Desk scanner.</div></div>
+      </div>`;
+    const mono = "font-family:'JetBrains Mono',monospace";
+    return st.events.slice(0, 3).map(e => {
+      const isB = e.type === 'bull';
+      const tstr = new Date(e.time * 1000).toLocaleString('en-GB', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit', hour12: false, timeZone: 'UTC' });
+      const reason = e.aligned === true
+        ? `Prints ${e.atLevel ? 'at ' + e.atLevel : 'mid-range'} WITH the fundamental bias (macro ${md.conf}% ${md.dir}${realYield.bias ? ', real yields ' + realYield.bias : ''}). Enter on the break of the pattern extreme; the stop sits where the reversal is proven wrong.`
+        : e.aligned === false
+        ? 'AGAINST the fundamental bias — counter-trend. Playbook: skip, or half-size with an early exit at 1R. Fighting the real-yield regime is how win rates die.'
+        : 'Macro engine is neutral — pattern-only trade. Half size, and only worth it if printed at structure (★).';
+      return `
+        <div class="setup-card">
+          <div class="setup-card-head ${e.dir}">
+            <span class="setup-card-type">${e.tf} ${isB ? 'Bullish' : 'Bearish'} Engulfing${e.atLevel ? ' ★ ' + e.atLevel : ''}</span>
+            <span class="setup-card-pct">${e.conf}%</span>
+          </div>
+          <div class="setup-card-body">
+            <div class="scard-row"><span class="scard-lbl">Printed</span><span class="scard-val" style="${mono}">${tstr} UTC</span></div>
+            <div class="scard-row"><span class="scard-lbl">Direction</span><span class="scard-val ${e.dir === 'long' ? 'green' : 'red'}">${e.dir.toUpperCase()}${e.aligned === false ? ' ⚠ counter' : ''}</span></div>
+            <div class="scard-row"><span class="scard-lbl">Entry (break)</span><span class="scard-val">${e.entry.toFixed(2)}</span></div>
+            <div class="scard-row"><span class="scard-lbl">Stop Loss</span><span class="scard-val red">${e.stop.toFixed(2)} <span style="font-size:10px;color:var(--text-tertiary)">(${e.risk.toFixed(1)} pts)</span></span></div>
+            <div class="scard-row"><span class="scard-lbl">Target 1</span><span class="scard-val green">${e.t1.toFixed(2)} <span style="font-size:10px;color:var(--text-tertiary)">(${e.r1}R)</span></span></div>
+            <div class="scard-row"><span class="scard-lbl">Target 2</span><span class="scard-val green">${e.t2.toFixed(2)} <span style="font-size:10px;color:var(--text-tertiary)">(${e.r2}R)</span></span></div>
+            <div class="scard-reason">${reason}</div>
+          </div>
+        </div>`;
+    }).join('');
   }
 
   // ─── ENGULFING SCANNER (Engulfing Desk table) ───────────────────────────────
@@ -7557,7 +7096,7 @@
   const NAV_SECTIONS = {
     dashboard: { tabs: [{ id: 'dashboard', label: 'Overview' }] },
     markets:   { tabs: [{ id: 'analysis', label: 'Live Analysis' }, { id: 'mtf', label: 'Multi-TF Charts' }, { id: 'redfolder', label: 'Red Folder' }, { id: 'sessions', label: 'Trade Sessions' }, { id: 'calendar', label: 'Economic Calendar' }] },
-    traderoom: { tabs: [{ id: 'scalp',    label: 'Scalp Desk' },    { id: 'daytrade', label: 'Day Trade Desk' }, { id: 'engulf', label: 'Engulfing Desk' }, { id: 'ems', label: 'EMS Trinity' }, { id: 'msnr', label: 'mSNR Desk' }, { id: 'strategy', label: 'Strategy Guide' }] },
+    traderoom: { tabs: [{ id: 'scalp',    label: 'EG Scalp' },      { id: 'daytrade', label: 'EG Day Trade' },   { id: 'engulf', label: 'Engulfing Desk' }, { id: 'strategy', label: 'Strategy Guide' }] },
     research:  { tabs: [{ id: 'edges',    label: 'Edge Lab' }, { id: 'backtest', label: 'Backtest Lab' }, { id: 'intel', label: 'Intel Sources' }] },
     utilities: { tabs: [{ id: 'calculator', label: 'Position Calc' }, { id: 'tracker', label: 'Signal Tracker' }, { id: 'journal', label: 'Trade Journal' }] }
   };
@@ -8068,148 +7607,82 @@
 
   // ─── SCALP DESK ─────────────────────────────────────────────────────────────
 
-  function renderScalpDesk() {
+  async function renderScalpDesk() {
     if (!lastGoldPrice) return;
     const price = lastGoldPrice;
     const atr   = atrOf(price);
-    const md    = getMacroData();
     const si    = getSessionInfo();
+    const st    = await computeEgScalp();
+    const md    = st.md;
+    const b     = st.best;
 
-    const isL = md.isLong, isS = md.isShort;
-    const dir = isL ? 'long' : isS ? 'short' : 'wait';
-
-    // Structure-based stop (last 5m swing + buffer, clamped 0.2–0.8× ATR).
-    // Much tighter than the old 0.8×ATR default; targets are true R-multiples.
-    const ss    = swingStop(isS ? 'short' : 'long', price, atr);
-    const tStop = ss.risk;
-    const tT1   = tStop * 1.8;
-    const tT2   = tStop * 3.0;
-
-    // Update banner
+    const dir = b ? b.dir : 'wait';
     const banner = document.getElementById('scalp-banner');
-    if (banner) banner.className = `desk-banner ${dir}`;
+    if (banner) banner.className = `desk-banner ${b && b.aligned !== false ? dir : 'wait'}`;
     const setEl = (id, v) => { const e = document.getElementById(id); if (e) e.textContent = v; };
 
-    const arrow = isL ? '↑' : isS ? '↓' : '→';
-    const word  = isL ? 'LONG' : isS ? 'SHORT' : 'WAIT';
-    setEl('scalp-arrow', arrow); setEl('scalp-word', word);
-    setEl('scalp-conf', md.conf + '% confidence');
+    setEl('scalp-arrow', b ? (dir === 'long' ? '↑' : '↓') : '→');
+    setEl('scalp-word',  b ? dir.toUpperCase() + (b.aligned === false ? ' ⚠' : '') : 'WAIT');
+    setEl('scalp-conf', (b ? b.conf : md.conf) + '% confidence');
 
-    const entry = price;
-    const stop  = ss.stop;
-    const t1    = isL ? price + tT1   : isS ? price - tT1   : price + tT1;
-    const t2    = isL ? price + tT2   : isS ? price - tT2   : price + tT2;
-
-    setEl('scalp-entry', price.toFixed(2));
-    setEl('scalp-stop',  stop.toFixed(2));
-    setEl('scalp-stop-pts', tStop.toFixed(0) + ' pts · ' + ss.basis);
-    setEl('scalp-t1',  t1.toFixed(2));
-    setEl('scalp-t1-pts', tT1.toFixed(0) + ' pts · 1.8R');
-    setEl('scalp-t2',  t2.toFixed(2));
-    setEl('scalp-t2-pts', tT2.toFixed(0) + ' pts · 3.0R');
+    if (b) {
+      setEl('scalp-entry', b.entry.toFixed(2));
+      setEl('scalp-stop',  b.stop.toFixed(2));
+      setEl('scalp-stop-pts', b.risk.toFixed(1) + ' pts · ' + b.tf + ' pattern stop');
+      setEl('scalp-t1', b.t1.toFixed(2));
+      setEl('scalp-t1-pts', (b.risk * 1.8).toFixed(1) + ' pts · 1.8R');
+      setEl('scalp-t2', b.t2.toFixed(2));
+      setEl('scalp-t2-pts', (b.risk * 3.0).toFixed(1) + ' pts · 3.0R');
+    } else {
+      // no engulfing in the window — show honest fallback geometry, flagged WAIT
+      const ss  = swingStop(md.isShort ? 'short' : 'long', price, atr);
+      const sgn = md.isShort ? -1 : 1;
+      setEl('scalp-entry', price.toFixed(2));
+      setEl('scalp-stop',  ss.stop.toFixed(2));
+      setEl('scalp-stop-pts', ss.risk.toFixed(0) + ' pts · ' + ss.basis + ' (no EG yet)');
+      setEl('scalp-t1', (price + sgn * ss.risk * 1.8).toFixed(2));
+      setEl('scalp-t1-pts', (ss.risk * 1.8).toFixed(0) + ' pts · 1.8R');
+      setEl('scalp-t2', (price + sgn * ss.risk * 3.0).toFixed(2));
+      setEl('scalp-t2-pts', (ss.risk * 3.0).toFixed(0) + ' pts · 3.0R');
+    }
     setEl('scalp-session', si.name + ' SESSION');
     setEl('scalp-session-time', si.sub);
-    setEl('scalp-hint', si.hint + realYieldTag() + eventRiskTag());
+    setEl('scalp-hint', (b ? (b.aligned === true ? 'EG + fundamental bias aligned. '
+                             : b.aligned === false ? 'EG is COUNTER the fundamental bias — reduce or skip. '
+                             : 'Macro neutral — pattern-only. ')
+                           : 'No engulfing printed — the desk waits. ')
+                        + si.hint + realYieldTag() + eventRiskTag());
 
-    // 3 scalp setups
-    const nearest100 = Math.round(price / 100) * 100;
-    const nearest50  = Math.round(price / 50)  * 50;
-    const nearest25  = Math.round(price / 25)  * 25;
-    const d100 = Math.abs(price - nearest100);
-    const d50  = Math.abs(price - nearest50);
+    // 4-step pipeline strip
+    const stepsEl = document.getElementById('scalp-eg-steps');
+    if (stepsEl) stepsEl.innerHTML = egPipelineHTML(st, 'scalp');
 
-    const scalpSetups = [
-      {
-        dir,
-        type: si.code === 'overlap' ? 'NY/London Overlap Play' :
-              si.code === 'london'  ? 'London Open Momentum'   :
-              si.code === 'ny'      ? 'New York Session Play'  :
-              si.code === 'asian'   ? 'Asian Range Fade'       : 'Session Momentum',
-        conf: si.code === 'overlap' ? 72 : si.code === 'london' ? 68 : si.code === 'ny' ? 62 : 48,
-        entry: price.toFixed(2),
-        stop: stop.toFixed(2),
-        t1:   t1.toFixed(2), t1pts: tT1.toFixed(0),
-        t2:   t2.toFixed(2), t2pts: tT2.toFixed(0),
-        stopPts: tStop.toFixed(0),
-        reason: si.code === 'overlap' ? 'Peak liquidity window — momentum accelerates. Trade with the macro trend, hold through minor pullbacks.' :
-                si.code === 'london'  ? 'London open sets the intraday direction 70% of the time. Enter in first 30 min on confirmation.' :
-                si.code === 'ny'      ? 'NY session creates fresh momentum. Watch for London high/low break as continuation signal.' :
-                                        'Asian session is range-bound. Enter near range extremes, target midpoint. Keep stops tight.'
-      },
-      {
-        dir: d100 < tStop * 0.8 ? (price < nearest100 ? 'long' : 'short') : dir,
-        type: d100 < tStop * 0.8 ? 'Round Number Magnet ($' + nearest100 + ')' :
-              d50  < tStop * 0.5 ? 'Half-Level Bounce ($' + nearest50 + ')' :
-                                   'ATR Precision Entry',
-        conf: d100 < tStop * 0.8 ? 70 : d50 < tStop * 0.5 ? 64 : 58,
-        entry: (d100 < tStop * 0.8 ? (price < nearest100 ? nearest100 - tStop * 0.3 : nearest100 + tStop * 0.3) :
-                d50  < tStop * 0.5 ? nearest50 : price).toFixed(2),
-        stop: (d100 < tStop * 0.8 ? (price < nearest100 ? nearest100 - tStop * 1.1 : nearest100 + tStop * 1.1) :
-               price + (dir === 'short' ? 1 : -1) * tStop).toFixed(2),
-        t1:   (d100 < tStop * 0.8 ? (price < nearest100 ? price + tT1 : price - tT1) :
-               price + (dir === 'long' ? 1 : -1) * tT1).toFixed(2),
-        t1pts: tT1.toFixed(0),
-        t2:   (price + (dir === 'long' ? 1 : -1) * tT2).toFixed(2),
-        t2pts: tT2.toFixed(0),
-        stopPts: tStop.toFixed(0),
-        reason: d100 < tStop * 0.8 ? `Price within ${d100.toFixed(1)} pts of $${nearest100} psychological level. Institutions cluster orders at round hundreds — expect bounce or rejection.` :
-                d50  < tStop * 0.5 ? `Near $${nearest50} half-level. Significant order clustering. Watch for price deceleration as entry signal.` :
-                                     `ATR mean-reversion setup. ${(atr*0.8).toFixed(0)}-pt stop, ${(atr*1.8).toFixed(0)}-pt target. Best entry after small counter-move.`
-      },
-      {
-        dir,
-        type: 'ATR Reversion Scalp',
-        conf: 55,
-        entry: (price + (isL ? -tStop * 0.3 : tStop * 0.3)).toFixed(2),
-        stop:  (price + (isL ? -tStop * 1.2 : tStop * 1.2)).toFixed(2),
-        t1:    (price + (isL ?  tT1          : -tT1       )).toFixed(2),
-        t1pts: tT1.toFixed(0),
-        t2:    (price + (isL ?  tT2          : -tT2       )).toFixed(2),
-        t2pts: tT2.toFixed(0),
-        stopPts: (tStop * 1.2).toFixed(0),
-        reason: `Wait for a ${(tStop * 0.3).toFixed(0)}-pt pullback against trend, then enter. ATR-derived mean reversion — statistically gold reverts after short bursts. Exits at ${tT1.toFixed(0)} and ${tT2.toFixed(0)} pts.`
-      }
-    ];
-
+    // signal cards
     const gridEl = document.getElementById('scalp-setups-grid');
-    if (gridEl) {
-      gridEl.innerHTML = scalpSetups.map(s => `
-        <div class="setup-card">
-          <div class="setup-card-head ${s.dir}">
-            <span class="setup-card-type">${s.type}</span>
-            <span class="setup-card-pct">${s.conf}%</span>
-          </div>
-          <div class="setup-card-body">
-            <div class="scard-row"><span class="scard-lbl">Direction</span><span class="scard-val ${s.dir==='long'?'green':s.dir==='short'?'red':''}">${s.dir.toUpperCase()}</span></div>
-            <div class="scard-row"><span class="scard-lbl">Entry</span><span class="scard-val">${s.entry}</span></div>
-            <div class="scard-row"><span class="scard-lbl">Stop Loss</span><span class="scard-val red">${s.stop} <span style="font-size:10px;color:var(--text-tertiary)">(${s.stopPts} pts)</span></span></div>
-            <div class="scard-row"><span class="scard-lbl">Target 1</span><span class="scard-val green">${s.t1} <span style="font-size:10px;color:var(--text-tertiary)">(+${s.t1pts} pts)</span></span></div>
-            <div class="scard-row"><span class="scard-lbl">Target 2</span><span class="scard-val green">${s.t2} <span style="font-size:10px;color:var(--text-tertiary)">(+${s.t2pts} pts)</span></span></div>
-            <div class="scard-reason">${s.reason}</div>
-          </div>
-        </div>`).join('');
-    }
+    if (gridEl) gridEl.innerHTML = egSetupCardsHTML(st);
 
-    // Key levels
+    // Key levels — the structure the engulfings must print at
     const levelsEl = document.getElementById('scalp-levels-list');
     if (levelsEl) {
+      const nearest100 = Math.round(price / 100) * 100;
+      const nearest50  = Math.round(price / 50)  * 50;
+      const nearest25  = Math.round(price / 25)  * 25;
       const levels = [
-        { tag: 'psy', type: 'PSY', name: `Round 100: $${nearest100}`,    price: nearest100, dist: d100 },
-        { tag: 'psy', type: 'PSY', name: `Half-Level: $${nearest50}`,    price: nearest50,  dist: d50  },
-        { tag: nearest25 < price ? 'sup' : 'res', type: nearest25 < price ? 'SUP' : 'RES', name: `Quarter: $${nearest25}`, price: nearest25, dist: Math.abs(price-nearest25) },
+        { tag: 'psy', type: 'PSY', name: `Round 100: $${nearest100}`, price: nearest100, dist: Math.abs(price - nearest100) },
+        { tag: 'psy', type: 'PSY', name: `Half-Level: $${nearest50}`, price: nearest50,  dist: Math.abs(price - nearest50) },
+        { tag: nearest25 < price ? 'sup' : 'res', type: nearest25 < price ? 'SUP' : 'RES', name: `Quarter: $${nearest25}`, price: nearest25, dist: Math.abs(price - nearest25) },
         { tag: 'key', type: 'ATR', name: `ATR High (0.9×): ${(price + atr * 0.9).toFixed(0)}`, price: Math.round(price + atr * 0.9), dist: atr * 0.9 },
         { tag: 'key', type: 'ATR', name: `ATR Low  (0.9×): ${(price - atr * 0.9).toFixed(0)}`, price: Math.round(price - atr * 0.9), dist: atr * 0.9 }
       ];
-      // Real structure levels — what institutional flow actually keys off
-      const s = structState;
-      if (s.ok) {
-        if (s.vwap   !== null) levels.push({ tag: 'key', type: 'VWAP', name: 'Session VWAP (live)',   price: Math.round(s.vwap),   dist: Math.abs(price - s.vwap) });
-        if (s.pdh    !== null) levels.push({ tag: 'res', type: 'PDH',  name: 'Previous Day High',     price: Math.round(s.pdh),    dist: Math.abs(price - s.pdh) });
-        if (s.pdl    !== null) levels.push({ tag: 'sup', type: 'PDL',  name: 'Previous Day Low',      price: Math.round(s.pdl),    dist: Math.abs(price - s.pdl) });
-        if (s.asianH !== null) levels.push({ tag: 'res', type: 'ASIA', name: 'Asian Range High (London breakout)', price: Math.round(s.asianH), dist: Math.abs(price - s.asianH) });
-        if (s.asianL !== null) levels.push({ tag: 'sup', type: 'ASIA', name: 'Asian Range Low',       price: Math.round(s.asianL), dist: Math.abs(price - s.asianL) });
+      const sst = structState;
+      if (sst.ok) {
+        if (sst.vwap   !== null) levels.push({ tag: 'key', type: 'VWAP', name: 'Session VWAP (live)', price: Math.round(sst.vwap),   dist: Math.abs(price - sst.vwap) });
+        if (sst.pdh    !== null) levels.push({ tag: 'res', type: 'PDH',  name: 'Previous Day High',   price: Math.round(sst.pdh),    dist: Math.abs(price - sst.pdh) });
+        if (sst.pdl    !== null) levels.push({ tag: 'sup', type: 'PDL',  name: 'Previous Day Low',    price: Math.round(sst.pdl),    dist: Math.abs(price - sst.pdl) });
+        if (sst.asianH !== null) levels.push({ tag: 'res', type: 'ASIA', name: 'Asian Range High (London breakout)', price: Math.round(sst.asianH), dist: Math.abs(price - sst.asianH) });
+        if (sst.asianL !== null) levels.push({ tag: 'sup', type: 'ASIA', name: 'Asian Range Low',     price: Math.round(sst.asianL), dist: Math.abs(price - sst.asianL) });
       }
-      levels.sort((a,b) => a.dist - b.dist);
+      levels.sort((a, b) => a.dist - b.dist);
       levelsEl.innerHTML = levels.map(l => `
         <div class="level-row">
           <span class="level-row-tag ${l.tag}">${l.type}</span>
@@ -8222,103 +7695,68 @@
     // Signal quality grade — the selectivity filter
     const qEl = document.getElementById('scalp-quality');
     if (qEl) qEl.innerHTML = dir === 'wait' ? '' : qualityBadgeHTML(dir);
+
+    scalpChartCtl.updateLevels();
   }
 
   // ─── DAY TRADE DESK ─────────────────────────────────────────────────────────
 
-  function renderDayTradeDesk() {
+  async function renderDayTradeDesk() {
     if (!lastGoldPrice) return;
     const price = lastGoldPrice;
     const atr   = atrOf(price);
-    const md    = getMacroData();
     const si    = getSessionInfo();
-    const dayStop = atr * 1.5;
-    const dayT1   = dayStop * 2.0;
-    const dayT2   = dayStop * 3.5;
+    const st    = await computeEgDay();
+    const md    = st.md;
+    const b     = st.best;
 
-    const dir = md.dir;
-    const isL = md.isLong, isS = md.isShort;
-
-    // Update banner
+    const dir = b ? b.dir : 'wait';
     const banner = document.getElementById('daytrade-banner');
-    if (banner) banner.className = `desk-banner ${dir}`;
+    if (banner) banner.className = `desk-banner ${b && b.aligned !== false ? dir : 'wait'}`;
     const setEl = (id, v) => { const e = document.getElementById(id); if (e) e.textContent = v; };
 
-    setEl('dt-arrow', isL ? '↑' : isS ? '↓' : '→');
-    setEl('dt-word',  isL ? 'LONG' : isS ? 'SHORT' : 'WAIT');
-    setEl('dt-conf',  md.conf + '% confidence');
+    setEl('dt-arrow', b ? (dir === 'long' ? '↑' : '↓') : '→');
+    setEl('dt-word',  b ? dir.toUpperCase() + (b.aligned === false ? ' ⚠' : '') : 'WAIT');
+    setEl('dt-conf',  (b ? b.conf : md.conf) + '% confidence');
 
-    const entry = Math.round(price * (isL ? 0.9985 : 1.0015));
-    const dStop = isL ? entry - dayStop : entry + dayStop;
-    const dT1   = isL ? entry + dayT1   : entry - dayT1;
-    const dT2   = isL ? entry + dayT2   : entry - dayT2;
-
-    setEl('dt-entry', entry.toLocaleString());
-    setEl('dt-stop',  Math.round(dStop).toLocaleString());
-    setEl('dt-stop-pts', dayStop.toFixed(0) + ' pts · 1.5× ATR');
-    setEl('dt-t1',    Math.round(dT1).toLocaleString());
-    setEl('dt-t1-pts', dayT1.toFixed(0) + ' pts · 2R — 50% out');
-    setEl('dt-t2',    Math.round(dT2).toLocaleString());
-    setEl('dt-t2-pts', dayT2.toFixed(0) + ' pts · 3.5R — full exit');
+    if (b) {
+      setEl('dt-entry', b.entry.toFixed(2));
+      setEl('dt-stop',  b.stop.toFixed(2));
+      setEl('dt-stop-pts', b.risk.toFixed(1) + ' pts · ' + b.tf + ' pattern stop');
+      setEl('dt-t1',    b.t1.toFixed(2));
+      setEl('dt-t1-pts', (b.risk * 2.0).toFixed(1) + ' pts · 2R — 50% out');
+      setEl('dt-t2',    b.t2.toFixed(2));
+      setEl('dt-t2-pts', (b.risk * 3.5).toFixed(1) + ' pts · 3.5R — full exit');
+    } else {
+      const isS = md.isShort;
+      const sgn = isS ? -1 : 1;
+      const entry = Math.round(price * (isS ? 1.0015 : 0.9985));
+      const dayStop = atr * 1.5;
+      setEl('dt-entry', entry.toLocaleString());
+      setEl('dt-stop',  Math.round(entry - sgn * dayStop).toLocaleString());
+      setEl('dt-stop-pts', dayStop.toFixed(0) + ' pts · 1.5× ATR (no EG yet)');
+      setEl('dt-t1',    Math.round(entry + sgn * dayStop * 2.0).toLocaleString());
+      setEl('dt-t1-pts', (dayStop * 2.0).toFixed(0) + ' pts · 2R — 50% out');
+      setEl('dt-t2',    Math.round(entry + sgn * dayStop * 3.5).toLocaleString());
+      setEl('dt-t2-pts', (dayStop * 3.5).toFixed(0) + ' pts · 3.5R — full exit');
+    }
     setEl('dt-session', si.name + ' SESSION');
     setEl('dt-session-time', si.sub);
-    setEl('dt-hint', si.hint + realYieldTag() + eventRiskTag());
-    dayChartCtl.updateLevels();
+    setEl('dt-hint', (b ? (b.aligned === true ? 'H1/H4 EG + fundamental bias aligned. '
+                          : b.aligned === false ? 'EG is COUNTER the fundamental bias — reduce or skip. '
+                          : 'Macro neutral — pattern-only. ')
+                        : 'No H1/H4 engulfing at structure — the desk waits. ')
+                     + si.hint + realYieldTag() + eventRiskTag());
 
-    // 3 Day Trade Setups
-    const dtSetups = [
-      {
-        dir,
-        type: 'London Open Range Breakout',
-        conf: si.code === 'london' || si.code === 'overlap' ? 74 : 58,
-        entry: entry.toLocaleString(),
-        stop:  Math.round(dStop).toLocaleString(), stopPts: dayStop.toFixed(0),
-        t1:    Math.round(dT1).toLocaleString(),   t1pts: dayT1.toFixed(0),
-        t2:    Math.round(dT2).toLocaleString(),   t2pts: dayT2.toFixed(0),
-        reason: `Enter the ${isL?'long':'short'} side of the London open range when macro bias aligns. London sets the day's direction ~68% of the time. Use a ${dayStop.toFixed(0)}-pt stop below the range and target ${dayT1.toFixed(0)} pts minimum. Most reliable 07:00–09:00 UTC.`
-      },
-      {
-        dir: isL ? 'long' : 'short',
-        type: 'Macro Trend Continuation',
-        conf: md.conf > 65 ? 71 : 60,
-        entry: Math.round(price * (isL ? 0.997 : 1.003)).toLocaleString(),
-        stop:  Math.round(isL ? price - dayStop * 1.1 : price + dayStop * 1.1).toLocaleString(), stopPts: (dayStop * 1.1).toFixed(0),
-        t1:    Math.round(isL ? price + dayT1 : price - dayT1).toLocaleString(), t1pts: dayT1.toFixed(0),
-        t2:    Math.round(isL ? price + dayT2 * 1.3 : price - dayT2 * 1.3).toLocaleString(), t2pts: (dayT2 * 1.3).toFixed(0),
-        reason: `Macro score ${md.macroScore}/40 (${md.conf}% ${isL?'bullish':'bearish'}) with TIPS at ${parseFloat(document.getElementById('tipsYield')?.textContent||'0.42').toFixed(2)}%. Enter pullbacks of 0.3% in trend direction. Scale in: ½ size at entry, ½ on confirmation candle close.`
-      },
-      {
-        dir: isL ? 'short' : 'long',
-        type: isL ? 'NY Session London Fade' : 'NY Open Reversal',
-        conf: si.code === 'ny' ? 63 : 50,
-        entry: Math.round(price * (isL ? 1.002 : 0.998)).toLocaleString(),
-        stop:  Math.round(isL ? price + dayStop * 0.9 : price - dayStop * 0.9).toLocaleString(), stopPts: (dayStop * 0.9).toFixed(0),
-        t1:    Math.round(isL ? price - dayT1 * 0.7 : price + dayT1 * 0.7).toLocaleString(), t1pts: (dayT1 * 0.7).toFixed(0),
-        t2:    Math.round(isL ? price - dayT2 * 0.8 : price + dayT2 * 0.8).toLocaleString(), t2pts: (dayT2 * 0.8).toFixed(0),
-        reason: `Counter-trend play at London session high/low. NY session fades London extremes in 45–55% of days. Only trade this if price is extended ${(atr*1.8).toFixed(0)}+ pts from day open. Reduce size — this is the B-grade setup.`
-      }
-    ];
+    // 4-step pipeline strip
+    const stepsEl = document.getElementById('dt-eg-steps');
+    if (stepsEl) stepsEl.innerHTML = egPipelineHTML(st, 'day');
 
+    // signal cards
     const gridEl = document.getElementById('daytrade-setups-grid');
-    if (gridEl) {
-      gridEl.innerHTML = dtSetups.map(s => `
-        <div class="setup-card">
-          <div class="setup-card-head ${s.dir}">
-            <span class="setup-card-type">${s.type}</span>
-            <span class="setup-card-pct">${s.conf}%</span>
-          </div>
-          <div class="setup-card-body">
-            <div class="scard-row"><span class="scard-lbl">Direction</span><span class="scard-val ${s.dir==='long'?'green':s.dir==='short'?'red':''}">${s.dir.toUpperCase()}</span></div>
-            <div class="scard-row"><span class="scard-lbl">Entry Zone</span><span class="scard-val">${s.entry}</span></div>
-            <div class="scard-row"><span class="scard-lbl">Stop Loss</span><span class="scard-val red">${s.stop} <span style="font-size:10px;color:var(--text-tertiary)">(${s.stopPts} pts)</span></span></div>
-            <div class="scard-row"><span class="scard-lbl">Target 1 (½ out)</span><span class="scard-val green">${s.t1} <span style="font-size:10px;color:var(--text-tertiary)">(+${s.t1pts} pts)</span></span></div>
-            <div class="scard-row"><span class="scard-lbl">Target 2 (full)</span><span class="scard-val green">${s.t2} <span style="font-size:10px;color:var(--text-tertiary)">(+${s.t2pts} pts)</span></span></div>
-            <div class="scard-reason">${s.reason}</div>
-          </div>
-        </div>`).join('');
-    }
+    if (gridEl) gridEl.innerHTML = egSetupCardsHTML(st);
 
-    // Key day trade levels
+    // Key day trade levels — the daily structure the H1/H4 engulfings key off
     const levelsEl = document.getElementById('daytrade-levels-list');
     if (levelsEl) {
       const nearest100 = Math.round(price / 100) * 100;
@@ -8334,26 +7772,27 @@
         { tag: 'sup', type: 'S2',  name: 'Day Support 2 (2× ATR)',    price: s2 },
         { tag: 'key', type: 'ATR', name: `Daily ATR(14): ${atr.toFixed(0)} pts${realATRState.atr ? ' (real)' : ' (est.)'}`, price: Math.round(price), note: 'Current' }
       ];
-      // Real structure levels
-      const st = structState;
-      if (st.ok) {
-        if (st.vwap !== null) levels.push({ tag: 'key', type: 'VWAP', name: 'Session VWAP (live)', price: Math.round(st.vwap) });
-        if (st.pdh  !== null) levels.push({ tag: 'res', type: 'PDH',  name: 'Previous Day High',   price: Math.round(st.pdh) });
-        if (st.pdl  !== null) levels.push({ tag: 'sup', type: 'PDL',  name: 'Previous Day Low',    price: Math.round(st.pdl) });
-        if (st.pdc  !== null) levels.push({ tag: 'psy', type: 'PDC',  name: 'Previous Day Close',  price: Math.round(st.pdc) });
+      const sst = structState;
+      if (sst.ok) {
+        if (sst.vwap !== null) levels.push({ tag: 'key', type: 'VWAP', name: 'Session VWAP (live)', price: Math.round(sst.vwap) });
+        if (sst.pdh  !== null) levels.push({ tag: 'res', type: 'PDH',  name: 'Previous Day High',   price: Math.round(sst.pdh) });
+        if (sst.pdl  !== null) levels.push({ tag: 'sup', type: 'PDL',  name: 'Previous Day Low',    price: Math.round(sst.pdl) });
+        if (sst.pdc  !== null) levels.push({ tag: 'psy', type: 'PDC',  name: 'Previous Day Close',  price: Math.round(sst.pdc) });
       }
       levelsEl.innerHTML = levels.map(l => `
         <div class="level-row">
           <span class="level-row-tag ${l.tag}">${l.type}</span>
           <span class="level-row-name">${l.name}</span>
           <span class="level-row-price">${l.price.toLocaleString()}</span>
-          <span class="level-row-dist" style="font-size:10px;color:var(--text-tertiary)">${Math.abs(price-l.price).toFixed(0)} pts</span>
+          <span class="level-row-dist" style="font-size:10px;color:var(--text-tertiary)">${Math.abs(price - l.price).toFixed(0)} pts</span>
         </div>`).join('');
     }
 
     // Signal quality grade — the selectivity filter
     const qEl = document.getElementById('dt-quality');
     if (qEl) qEl.innerHTML = dir === 'wait' ? '' : qualityBadgeHTML(dir);
+
+    dayChartCtl.updateLevels();
   }
 
   // ─── GOLD/SILVER RATIO ──────────────────────────────────────────────────────
