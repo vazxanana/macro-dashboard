@@ -5449,8 +5449,7 @@
   let lastLiveTs    = 0;           // ms timestamp of last successful gold fetch
 
   const apiKeys = {
-    fred: localStorage.getItem('fred_api_key') || '4d4ee6e804ae4c3cbe36e3678391f0ae',
-    av: localStorage.getItem('av_api_key') || 'CONT1PDJKZXQRQ97'
+    fred: localStorage.getItem('fred_api_key') || '4d4ee6e804ae4c3cbe36e3678391f0ae'
   };
 
   let chartAttempts = 0;
@@ -5699,7 +5698,9 @@
         }
         new ResizeObserver(() => { if (chart && el.clientWidth) chart.applyOptions({ width: el.clientWidth }); }).observe(el);
         await loadCandles();
-        setInterval(loadCandles, interval === '1d' ? 10 * 60000 : 60000);
+        // Poll for fresh candles, but skip the redraw while this chart's tab
+        // is hidden (the shared kline cache makes visible refreshes cheap).
+        setInterval(() => { if (el.offsetParent !== null) loadCandles(); }, interval === '1d' ? 10 * 60000 : 60000);
       } catch (e) {
         console.warn(`${cfg.chartId} init failed:`, e.message);
         fallback('Chart failed to load — setup levels shown below.');
@@ -5953,7 +5954,24 @@
   // Supported intervals: '5m' (24h), '15m' (2 days), '4h' (~1 month), '1d' (~4 months).
   const KLINE_LIMITS  = { '5m': 288, '15m': 192, '1h': 192, '4h': 180, '1d': 120, '1w': 104 };
   const KRAKEN_MINUTES = { '5m': 5, '15m': 15, '1h': 60, '4h': 240, '1d': 1440, '1w': 10080 };
+  // Shared cache: ~10 chart instances plus the structure/ATR/scanner engines
+  // all want the same candles — one network call per interval per TTL window
+  // serves everyone (and concurrent callers share one in-flight request).
+  const KLINE_TTL = { '5m': 50e3, '15m': 50e3, '1h': 240e3, '4h': 300e3, '1d': 600e3, '1w': 3600e3 };
+  const _klineCache = {};
   async function fetchGoldKlines(interval = '5m') {
+    const now = Date.now();
+    const hit = _klineCache[interval];
+    if (hit && hit.data && now - hit.ts < (KLINE_TTL[interval] || 60e3)) return hit.data;
+    if (hit && hit.promise) return hit.promise;          // share the in-flight fetch
+    const promise = _fetchGoldKlinesRaw(interval).then(data => {
+      _klineCache[interval] = { data, ts: Date.now() };
+      return data;
+    }).catch(() => { delete _klineCache[interval]; return null; });
+    _klineCache[interval] = { ...(hit || {}), promise };
+    return promise;
+  }
+  async function _fetchGoldKlinesRaw(interval = '5m') {
     const lim = KLINE_LIMITS[interval] || 288;
     // 1) Binance PAXGUSDT
     try {
@@ -6809,6 +6827,13 @@
         const act = document.querySelector('.snav-btn.active');
         if (act?.dataset?.tab === 'scalp')    renderScalpDesk();
         if (act?.dataset?.tab === 'daytrade') renderDayTradeDesk();
+      }
+
+      // Settle boot placeholders: anything still "…" after a full update
+      // cycle means that feed is unavailable — show an honest dash instead.
+      for (const tid of ['goldPrice', 'dxyPrice', 'tipsYield', 'vixVal']) {
+        const el = document.getElementById(tid);
+        if (el && el.textContent.trim() === '…') el.textContent = '—';
       }
 
       // Update timestamps
