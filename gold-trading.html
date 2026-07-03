@@ -4543,6 +4543,38 @@
     </div>
   </div><!-- end tab-intel -->
 
+  <!-- BACKTEST LAB — replay the three method desks over real 2026 history -->
+  <div id="tab-backtest" class="tab-panel">
+    <div class="section-header">
+      <div class="section-title">Backtest Lab <span style="font-size:11px;font-weight:500;color:var(--text-tertiary)">— walk-forward replay of the three Trade Room strategies on real 2026 gold history</span></div>
+    </div>
+
+    <div class="card glass" style="margin-bottom:16px;">
+      <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;">
+        <div style="font-size:12px;color:var(--text-secondary);line-height:1.7;max-width:760px;">
+          Fetches <strong>2026 year-to-date</strong> PAXG (tokenized gold) candles from Binance — M15, H1, H4, Daily, Weekly —
+          and replays the <strong>Engulfing Desk</strong>, <strong>EMS Trinity</strong> and <strong>mSNR</strong> pipelines bar by bar using
+          the platform's own detection code, with data available only up to each bar (<strong>no look-ahead</strong>).
+          Fills are conservative (stop counted before target inside the same bar). A 0.35-pt round-trip cost is charged per trade.
+        </div>
+        <button class="j-add-btn" onclick="runBacktest()">▶ Run 2026 Backtest</button>
+      </div>
+      <div id="btProgress" style="margin-top:10px;font-size:11px;color:#D97706;font-family:'JetBrains Mono',monospace;">idle — press Run</div>
+    </div>
+
+    <div id="btResults"></div>
+
+    <div class="card glass" style="margin-top:16px;">
+      <h3 style="font-size:13px;">Honest assumptions (read before believing numbers)</h3>
+      <div style="font-size:11px;color:var(--text-secondary);line-height:1.8;margin-top:8px;">
+        · PAXG tracks spot gold ~1:1 but has its own microstructure; treat results as directional, not exact.<br>
+        · The red-folder blackout filter can't be reconstructed historically, so event-day trades are included — live results with the gate should be slightly better.<br>
+        · One position per strategy at a time; entries that never trigger within their window are discarded; both-sides bars count as losses (conservative).<br>
+        · R-multiples are risk-normalised: +1R means the trade made exactly its risked amount after costs. Past performance ≠ future results.
+      </div>
+    </div>
+  </div><!-- end tab-backtest -->
+
   <!-- JOURNAL TAB -->
   <div id="tab-journal" class="tab-panel">
     <div class="section-header">Trade Journal</div>
@@ -6239,6 +6271,266 @@
     };
   }
 
+  // ─── BACKTEST LAB ───────────────────────────────────────────────────────────
+  // Walk-forward replay of the three Trade Room method desks over real 2026
+  // history (Binance PAXGUSDT, fetched paginated from the browser). Uses the
+  // platform's OWN detectors — detectEngulfings / engulfZones / msnrLevels /
+  // detectSweepBOS — evaluated only on data available at each bar (no
+  // look-ahead). Fills are conservative: if one bar touches both stop and
+  // target, it counts as a LOSS; a fixed cost is charged per round trip.
+  const BT_COST_PTS = 0.35;   // spread+slippage per round trip, in gold points
+
+  async function btFetchRange(interval, startMs, endMs, onProgress) {
+    const out = [];
+    let t = startMs;
+    while (t < endMs) {
+      const url = `https://api.binance.com/api/v3/klines?symbol=PAXGUSDT&interval=${interval}&startTime=${t}&endTime=${endMs}&limit=1000`;
+      const res = await fetchWithFallback([url]);
+      if (!res) break;
+      const raw = await res.json();
+      if (!Array.isArray(raw) || !raw.length) break;
+      for (const k of raw) out.push({ time: Math.floor(k[0] / 1000), open: +k[1], high: +k[2], low: +k[3], close: +k[4], vol: +k[5] });
+      const lastOpen = raw[raw.length - 1][0];
+      if (raw.length < 1000) break;
+      t = lastOpen + 1;
+      if (onProgress) onProgress(`${interval}: ${out.length} bars…`);
+      await new Promise(r => setTimeout(r, 120));   // stay far under rate limits
+    }
+    return out;
+  }
+
+  function btMetrics(name, trades) {
+    const wins = trades.filter(t => t.r > 0);
+    const grossW = wins.reduce((a, t) => a + t.r, 0);
+    const grossL = trades.filter(t => t.r <= 0).reduce((a, t) => a + t.r, 0);
+    let eq = 0, peak = 0, maxDD = 0, streak = 0, maxStreak = 0;
+    for (const t of trades) {
+      eq += t.r; peak = Math.max(peak, eq); maxDD = Math.max(maxDD, peak - eq);
+      if (t.r <= 0) { streak++; maxStreak = Math.max(maxStreak, streak); } else streak = 0;
+    }
+    return {
+      name, n: trades.length,
+      winPct: trades.length ? Math.round(wins.length / trades.length * 100) : 0,
+      totalR: +eq.toFixed(1),
+      avgR: trades.length ? +(eq / trades.length).toFixed(2) : 0,
+      pf: grossL !== 0 ? +(grossW / Math.abs(grossL)).toFixed(2) : (grossW > 0 ? Infinity : 0),
+      maxDD: +maxDD.toFixed(1), maxLossStreak: maxStreak
+    };
+  }
+
+  // Shared helpers for the sims
+  function btAsOfIndex(bars, tSec) {      // last bar CLOSED at or before tSec
+    let lo = 0, hi = bars.length - 1, ans = -1;
+    while (lo <= hi) { const mid = (lo + hi) >> 1; if (bars[mid].time <= tSec) { ans = mid; lo = mid + 1; } else hi = mid - 1; }
+    return ans;
+  }
+  const btSma = (arr, n) => arr.slice(-n).reduce((a, b) => a + b, 0) / Math.min(n, arr.length);
+
+  // Simulate an armed order through subsequent M15 bars. Conservative:
+  // stop checked before target within the same bar.
+  function btPlayOut(m15, iStart, dir, entry, stop, target, maxBars) {
+    const risk = Math.abs(entry - stop);
+    if (!(risk > 0)) return null;
+    let filled = false, fillI = -1;
+    for (let j = iStart; j < Math.min(iStart + maxBars, m15.length); j++) {
+      const b = m15[j];
+      if (!filled) {
+        const hit = dir === 'long' ? b.high >= entry : b.low <= entry;
+        if (hit) { filled = true; fillI = j; }
+        else continue;
+      }
+      const stopHit = dir === 'long' ? b.low <= stop : b.high >= stop;
+      const tgtHit  = dir === 'long' ? b.high >= target : b.low <= target;
+      if (stopHit) return { r: -1 - BT_COST_PTS / risk, exitI: j, bars: j - fillI };
+      if (tgtHit)  return { r: Math.abs(target - entry) / risk - BT_COST_PTS / risk, exitI: j, bars: j - fillI };
+    }
+    return filled ? { r: 0 - BT_COST_PTS / risk, exitI: Math.min(iStart + maxBars, m15.length) - 1, bars: maxBars } : null;
+  }
+
+  // S1 — Engulfing Desk (M15 ★ at-structure continuation, 1.8R target)
+  function btSimEngulf(D, m15, h4) {
+    const trades = [];
+    const events = detectEngulfings(m15);      // pattern times (pattern itself uses no future data)
+    const evByTime = new Map(events.map(e => [e.time, e]));
+    let busyUntil = -1;
+    for (let i = 30; i < m15.length - 2; i++) {
+      if (i <= busyUntil) continue;
+      const e = evByTime.get(m15[i].time);
+      if (!e) continue;
+      const hr = new Date(m15[i].time * 1000).getUTCHours();
+      if (hr < 7 || hr >= 21) continue;                       // London/NY only
+      // structure filter: within 0.12% of PDH/PDL or a round number (as-of)
+      const di = btAsOfIndex(D, m15[i].time - 86400);
+      if (di < 1) continue;
+      const pd = D[di];
+      const mid = (e.high + e.low) / 2, tol = mid * 0.0012;
+      const round100 = Math.round(mid / 100) * 100, round50 = Math.round(mid / 50) * 50;
+      const atLvl = [pd.high, pd.low, round100, round50].some(L => Math.abs(mid - L) <= tol);
+      if (!atLvl) continue;
+      // trend filter: H4 close vs its 20-SMA (as-of)
+      const hi4 = btAsOfIndex(h4, m15[i].time - 14400);
+      if (hi4 < 20) continue;
+      const h4up = h4[hi4].close >= btSma(h4.slice(0, hi4 + 1).map(b => b.close), 20);
+      if ((e.type === 'bull') !== h4up) continue;
+      const dir = e.type === 'bull' ? 'long' : 'short';
+      const entry = dir === 'long' ? e.high + 0.1 : e.low - 0.1;
+      const stop  = dir === 'long' ? e.low - 0.1 : e.high + 0.1;
+      const target = dir === 'long' ? entry + (entry - stop) * 1.8 : entry - (stop - entry) * 1.8;
+      const res = btPlayOut(m15, i + 1, dir, entry, stop, target, 96);
+      if (res) { trades.push({ t: m15[i].time, dir, ...res }); busyUntil = res.exitI; }
+    }
+    return trades;
+  }
+
+  // S2 — EMS Trinity (Daily bias → fresh H4 engulf zone → M15 sweep+BOS in zone → 3R)
+  function btSimEms(D, h4, m15) {
+    const trades = [];
+    let busyUntil = -1;
+    let zonesAsOf = [], lastH4i = -1, biasAsOf = 'wait', lastDi = -1;
+    const tradedZones = new Set();   // one attempt per zone — no revenge re-entries
+    for (let i = 60; i < m15.length - 2; i++) {
+      if (i <= busyUntil) continue;
+      const t = m15[i].time;
+      const di = btAsOfIndex(D, t - 86400);
+      if (di !== lastDi && di >= 20) {
+        lastDi = di;
+        biasAsOf = D[di].close >= btSma(D.slice(0, di + 1).map(b => b.close), 20) ? 'long' : 'short';
+      }
+      const h4i = btAsOfIndex(h4, t - 14400);
+      if (h4i !== lastH4i && h4i >= 30) {
+        lastH4i = h4i;
+        zonesAsOf = engulfZones(h4.slice(0, h4i + 1)).filter(z => z.t2 === null);
+      }
+      if (biasAsOf === 'wait' || !zonesAsOf.length) continue;
+      const px = m15[i].close;
+      const z = zonesAsOf.find(z2 => z2.bull === (biasAsOf === 'long') && px >= z2.lo - 1 && px <= z2.hi + 1 && !tradedZones.has(z2.t1));
+      if (!z) continue;
+      // confirm: sweep+BOS on the last 60 M15 bars toward bias
+      const sb = detectSweepBOS(m15.slice(Math.max(0, i - 60), i + 1), biasAsOf);
+      if (!sb.confirmed) continue;
+      const dir = biasAsOf;
+      const entry = m15[i].close;
+      const buf = Math.max(0.8, (z.hi - z.lo) * 0.25);
+      const stop = dir === 'long' ? z.lo - buf : z.hi + buf;
+      const risk = Math.abs(entry - stop);
+      const target = dir === 'long' ? entry + risk * 3 : entry - risk * 3;
+      const res = btPlayOut(m15, i + 1, dir, entry, stop, target, 192);
+      if (res) { trades.push({ t, dir, ...res }); busyUntil = res.exitI; tradedZones.add(z.t1); }
+    }
+    return trades;
+  }
+
+  // S3 — mSNR (Weekly dir → fresh Daily level wick-touch → H1 flip → retest, next-level target)
+  function btSimMsnr(W, D, h1, m15) {
+    const trades = [];
+    let busyUntil = -1, lastDi = -1, lvAsOf = [], weeklyDir = 'long';
+    let pending = null;   // { dir, level, touchT, touchExtreme }
+    for (let i = 60; i < m15.length - 2; i++) {
+      if (i <= busyUntil) { pending = null; continue; }
+      const t = m15[i].time;
+      const di = btAsOfIndex(D, t - 86400);
+      if (di !== lastDi && di >= 20) {
+        lastDi = di;
+        const wi = btAsOfIndex(W, t - 604800);
+        if (wi >= 10) weeklyDir = W[wi].close >= btSma(W.slice(0, wi + 1).map(b => b.close), 20) ? 'long' : 'short';
+        lvAsOf = msnrLevels(D.slice(0, di + 1), D[di].close);
+        // the freshest wick-validated level in the weekly direction becomes pending
+        const want = weeklyDir === 'long' ? 'sup' : 'res';
+        const cand = lvAsOf.filter(l => l.kind === want && l.state === 'wick' && l.wickFirst)
+          .sort((a, b) => (b.touchedAt || 0) - (a.touchedAt || 0))[0];
+        pending = cand ? { dir: weeklyDir, level: cand, touchT: cand.touchedAt } : null;
+      }
+      if (!pending) continue;
+      // H1 flip after the touch, in trade direction (recompute once per H1 bar)
+      const h1i = btAsOfIndex(h1, t - 3600);
+      if (h1i < 40) continue;
+      if (h1i !== btSimMsnr._h1i) {
+        btSimMsnr._h1i = h1i;
+        btSimMsnr._h1lv = msnrLevels(h1.slice(Math.max(0, h1i - 160), h1i + 1), h1[h1i].close);
+      }
+      const h1lv = btSimMsnr._h1lv;
+      const flip = h1lv.filter(l => l.state === 'flipped' && l.flippedAt >= pending.touchT &&
+        (pending.dir === 'long' ? l.kind === 'res' : l.kind === 'sup'))
+        .sort((a, b) => b.flippedAt - a.flippedAt)[0];
+      if (!flip) continue;
+      // retest entry at the flipped level
+      const dir = pending.dir;
+      const entry = flip.price;
+      const touched = dir === 'long' ? m15[i].low <= entry : m15[i].high >= entry;
+      if (!touched) continue;
+      const stop = dir === 'long' ? pending.level.lo - 2 : pending.level.hi + 2;
+      const risk = Math.abs(entry - stop);
+      const want2 = dir === 'long' ? 'res' : 'sup';
+      const tgt = lvAsOf.filter(l => l.kind === want2 && l.state === 'fresh' &&
+          (dir === 'long' ? l.price > entry : l.price < entry))
+        .sort((a, b) => Math.abs(entry - a.price) - Math.abs(entry - b.price))[0];
+      const target = tgt ? tgt.price : (dir === 'long' ? entry + risk * 3 : entry - risk * 3);
+      if (Math.abs(target - entry) / risk < 2) { pending = null; continue; }   // the desk's RR gate
+      const res = btPlayOut(m15, i, dir, entry, stop, target, 384);
+      if (res) { trades.push({ t, dir, ...res }); busyUntil = res.exitI; pending = null; }
+    }
+    return trades;
+  }
+
+  let btRunning = false;
+  async function runBacktest() {
+    if (btRunning) return;
+    btRunning = true;
+    const out = document.getElementById('btResults');
+    const prog = document.getElementById('btProgress');
+    const say = m => { if (prog) prog.textContent = m; };
+    try {
+      const start = Date.UTC(2026, 0, 1), end = Date.now();
+      say('Fetching 2026 history from Binance (PAXG = tokenized gold)…');
+      const [W, D, h4, h1, m15] = [
+        await btFetchRange('1w', start - 200 * 86400e3, end, say),   // extra warmup for the weekly SMA
+        await btFetchRange('1d', start - 60 * 86400e3, end, say),
+        await btFetchRange('4h', start - 30 * 86400e3, end, say),
+        await btFetchRange('1h', start - 15 * 86400e3, end, say),
+        await btFetchRange('15m', start, end, say)
+      ];
+      if (!m15.length || !D.length) {
+        say('History fetch failed — Binance unreachable from this network.');
+        btRunning = false; return;
+      }
+      say(`Loaded ${m15.length} M15 / ${h1.length} H1 / ${h4.length} H4 / ${D.length} D / ${W.length} W bars. Replaying…`);
+      await new Promise(r => setTimeout(r, 30));
+      const rows = [
+        btMetrics('Engulfing Desk (★ M15, 1.8R)', btSimEngulf(D, m15, h4)),
+        btMetrics('EMS Trinity (H4 zone + sweep→BOS, 3R)', btSimEms(D, h4, m15)),
+        btMetrics('mSNR (Daily wick-touch → H1 flip, next level)', btSimMsnr(W, D, h1, m15))
+      ];
+      // Rank by total R, but a strategy needs a minimum sample to win
+      const qualified = rows.filter(r2 => r2.n >= 5);
+      const best = (qualified.length ? qualified : rows).slice().sort((a, b) => b.totalR - a.totalR)[0];
+      const smallSample = best.n < 5;
+      const mono = "font-family:'JetBrains Mono',monospace";
+      if (out) out.innerHTML = `
+        <div class="journal-table-wrap"><table class="journal-table">
+          <thead><tr><th>Strategy</th><th>Trades</th><th>Win %</th><th>Total R</th><th>Avg R</th><th>Profit Factor</th><th>Max DD (R)</th><th>Worst Streak</th></tr></thead>
+          <tbody>${rows.map(r2 => `
+            <tr style="${r2.name === best.name ? 'background:rgba(0,166,81,0.07);' : ''}">
+              <td style="font-weight:700">${r2.name}${r2.name === best.name ? ' <span style="color:var(--accent-green);font-weight:900">★ BEST</span>' : ''}</td>
+              <td style="${mono}">${r2.n}</td><td style="${mono}">${r2.winPct}%</td>
+              <td style="${mono};font-weight:800;color:${r2.totalR >= 0 ? 'var(--accent-green)' : 'var(--accent-red)'}">${r2.totalR >= 0 ? '+' : ''}${r2.totalR}R</td>
+              <td style="${mono}">${r2.avgR}R</td><td style="${mono}">${r2.pf}</td>
+              <td style="${mono};color:var(--accent-red)">−${r2.maxDD}R</td><td style="${mono}">${r2.maxLossStreak}</td>
+            </tr>`).join('')}
+          </tbody></table></div>
+        <div style="margin-top:12px;font-size:11px;color:var(--text-secondary);line-height:1.7;">
+          <strong>Verdict:</strong> ${smallSample
+            ? 'Inconclusive — no strategy produced a meaningful sample (≥5 trades) in this window. That usually means the feed window was short or conditions were unusually quiet.'
+            : `${best.name} produced the strongest risk-adjusted result over 2026 YTD (${best.totalR >= 0 ? '+' : ''}${best.totalR}R across ${best.n} trades, PF ${best.pf}).`}
+          Size any strategy so 1R = your per-trade risk; the R numbers translate directly.
+        </div>`;
+      say(`Done — ${rows.reduce((a, r2) => a + r2.n, 0)} total simulated trades, evaluated ${new Date().toISOString().slice(0, 16)}Z.`);
+    } catch (e) {
+      say('Backtest error: ' + e.message);
+      console.warn('backtest failed:', e);
+    }
+    btRunning = false;
+  }
+
   // ─── MALAYSIAN SNR (mSNR) ENGINE ────────────────────────────────────────────
   // Implements body-based SNR per "The Truth About Price Action" (Iyanu
   // Adegboruwa, Price Action Traders; Malaysian SNR lineage / Ariff T).
@@ -7265,7 +7557,7 @@
     dashboard: { tabs: [{ id: 'dashboard', label: 'Overview' }] },
     markets:   { tabs: [{ id: 'analysis', label: 'Live Analysis' }, { id: 'mtf', label: 'Multi-TF Charts' }, { id: 'redfolder', label: 'Red Folder' }, { id: 'sessions', label: 'Trade Sessions' }, { id: 'calendar', label: 'Economic Calendar' }] },
     traderoom: { tabs: [{ id: 'scalp',    label: 'Scalp Desk' },    { id: 'daytrade', label: 'Day Trade Desk' }, { id: 'engulf', label: 'Engulfing Desk' }, { id: 'ems', label: 'EMS Trinity' }, { id: 'msnr', label: 'mSNR Desk' }, { id: 'strategy', label: 'Strategy Guide' }] },
-    research:  { tabs: [{ id: 'edges',    label: 'Edge Lab' }, { id: 'intel', label: 'Intel Sources' }] },
+    research:  { tabs: [{ id: 'edges',    label: 'Edge Lab' }, { id: 'backtest', label: 'Backtest Lab' }, { id: 'intel', label: 'Intel Sources' }] },
     utilities: { tabs: [{ id: 'calculator', label: 'Position Calc' }, { id: 'tracker', label: 'Signal Tracker' }, { id: 'journal', label: 'Trade Journal' }] }
   };
 
