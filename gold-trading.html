@@ -2134,6 +2134,27 @@
     .rf-skew-wait { background: rgba(217,119,6,0.12); color: #D97706; }
     .rf-breakdown { font-size: 9px; color: var(--text-tertiary); margin-top: 5px; font-family: 'JetBrains Mono', monospace; }
 
+    /* Multi-TF view */
+    .mtf-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    @media (max-width: 1000px) { .mtf-grid { grid-template-columns: 1fr; } }
+    .mtf-chip {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 7px 12px; border-radius: 8px;
+      background: rgba(127,127,127,0.07); border: 1px solid var(--border-light);
+      font-size: 11px; font-weight: 800; letter-spacing: 0.8px; color: var(--text-tertiary);
+    }
+    .mtf-bias { font-family: 'JetBrains Mono', monospace; font-weight: 800; color: var(--text-secondary); }
+    .mtf-bias-up   { color: var(--accent-green); }
+    .mtf-bias-down { color: var(--accent-red); }
+    .mtf-verdict {
+      font-size: 12px; font-weight: 800; letter-spacing: 0.3px;
+      padding: 7px 14px; border-radius: 8px; color: var(--text-secondary);
+      background: rgba(127,127,127,0.07);
+    }
+    .mtf-v-bull  { color: var(--accent-green); background: rgba(0,166,81,0.1); }
+    .mtf-v-bear  { color: var(--accent-red);   background: rgba(194,59,51,0.1); }
+    .mtf-v-mixed { color: #D97706;             background: rgba(217,119,6,0.1); }
+
     /* Intel sources */
     .intel-item { padding: 12px 0; border-bottom: 1px solid var(--border-light); }
     .intel-item:last-child { border-bottom: none; }
@@ -3585,6 +3606,57 @@
     <div id="rf-cards"></div>
   </div><!-- end tab-redfolder -->
 
+  <!-- MULTI-TIMEFRAME CHARTS — top-down: Daily trend, H4 structure, M15 execution -->
+  <div id="tab-mtf" class="tab-panel">
+    <div class="section-header">
+      <div class="section-title">Multi-Timeframe Charts <span style="font-size:11px;font-weight:500;color:var(--text-tertiary)">— Daily trend &middot; H4 structure &middot; M15 execution (XAU/USD, PAXG proxy)</span></div>
+    </div>
+
+    <!-- Alignment verdict -->
+    <div class="card glass" style="margin-bottom:16px;">
+      <div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap;">
+        <span class="mtf-chip">DAILY <span class="mtf-bias" id="mtf-bias-d">&mdash;</span></span>
+        <span class="mtf-chip">H4 <span class="mtf-bias" id="mtf-bias-h4">&mdash;</span></span>
+        <span class="mtf-chip">M15 <span class="mtf-bias" id="mtf-bias-m15">&mdash;</span></span>
+        <span class="mtf-verdict" id="mtf-verdict">Waiting for all three timeframes&hellip;</span>
+      </div>
+      <div style="margin-top:10px;font-size:11px;color:var(--text-tertiary);line-height:1.6;">
+        Bias per timeframe = close vs its own 20-SMA. The classic top-down rule: <strong>take M15 entries only in the direction Daily and H4 agree on.</strong>
+      </div>
+    </div>
+
+    <div class="mtf-grid">
+      <div class="dash-widget">
+        <div class="dash-widget-title" style="margin-bottom:10px;">DAILY — Trend <span style="font-size:10px;font-weight:500;color:var(--text-tertiary)">last ~4 months</span></div>
+        <div id="mtfDaily" style="width:100%;height:300px;position:relative;">
+          <div id="mtfDailyMsg" style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;text-align:center;color:var(--text-tertiary);font-size:12px;padding:16px;">Loading&hellip;</div>
+        </div>
+      </div>
+      <div class="dash-widget">
+        <div class="dash-widget-title" style="margin-bottom:10px;">H4 — Structure <span style="font-size:10px;font-weight:500;color:var(--text-tertiary)">last ~30 days &middot; PDH/PDL marked</span></div>
+        <div id="mtfH4" style="width:100%;height:300px;position:relative;">
+          <div id="mtfH4Msg" style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;text-align:center;color:var(--text-tertiary);font-size:12px;padding:16px;">Loading&hellip;</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="dash-widget" style="margin-top:16px;">
+      <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;margin-bottom:10px;">
+        <div class="dash-widget-title" style="margin:0;">M15 — Execution <span style="font-size:10px;font-weight:500;color:var(--text-tertiary)">last 2 days &middot; scalp levels + VWAP + Asian range</span></div>
+        <div class="chart-legend">
+          <span class="cl-item"><span class="cl-dot" style="background:#2962FF"></span>Entry</span>
+          <span class="cl-item"><span class="cl-dot" style="background:#C23B33"></span>Stop</span>
+          <span class="cl-item"><span class="cl-dot" style="background:#00A651"></span>T1/T2</span>
+          <span class="cl-item"><span class="cl-dot" style="background:#8B5CF6"></span>VWAP</span>
+        </div>
+      </div>
+      <div id="mtfM15" style="width:100%;height:340px;position:relative;">
+        <div id="mtfM15Msg" style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;text-align:center;color:var(--text-tertiary);font-size:12px;padding:16px;">Loading&hellip;</div>
+      </div>
+      <div id="mtfM15Levels" style="display:flex;flex-wrap:wrap;gap:14px;margin-top:12px;font-size:12px;"></div>
+    </div>
+  </div><!-- end tab-mtf -->
+
   <!-- SESSIONS TAB -->
   <div id="tab-sessions" class="tab-panel">
 
@@ -4416,6 +4488,7 @@
     if (name === 'calendar')  { renderCalendar(); }
     if (name === 'tracker')   { renderSignalTracker(); }
     if (name === 'redfolder') { renderRedFolder(); }
+    if (name === 'mtf')       { initMtfCharts(); renderMtfSummary(); }
   }
 
   // ─── CHECKLIST ─────────────────────────────────────────────────────────────
@@ -5267,9 +5340,13 @@
     return { dir: md.dir, entry, stop: entry - dirSign * dayStop, t1: entry + dirSign * dayStop * 2.0, t2: entry + dirSign * dayStop * 3.5 };
   }
 
+  // Per-timeframe bias registry for the Multi-TF view
+  const mtfBias = {};
+
   function createLevelChart(cfg) {
-    // cfg: { chartId, msgId, boxId, getLevels }
-    let chart = null, series = null, priceLines = [], offset = 0, attempts = 0;
+    // cfg: { chartId, msgId, boxId?, getLevels?, extraLevels?, interval?, height?, biasId?, biasKey? }
+    let chart = null, series = null, priceLines = [], offset = 0, inited = false;
+    const interval = cfg.interval || '5m';
 
     function fallback(text) {
       const msg = document.getElementById(cfg.msgId);
@@ -5277,8 +5354,7 @@
     }
 
     function updateLevels() {
-      const lv = cfg.getLevels();
-      if (!lv) return;
+      const lv = cfg.getLevels ? cfg.getLevels() : null;
       if (series) {
         priceLines.forEach(l => { try { series.removePriceLine(l); } catch (e) {} });
         priceLines = [];
@@ -5286,10 +5362,12 @@
           price: +price.toFixed(2), color, lineWidth: 2,
           lineStyle: dashed ? 2 : 0, axisLabelVisible: true, title
         });
-        priceLines.push(mk(lv.entry, '#2962FF', 'ENTRY'));
-        priceLines.push(mk(lv.stop,  '#C23B33', 'STOP'));
-        priceLines.push(mk(lv.t1,    '#00A651', 'T1'));
-        priceLines.push(mk(lv.t2,    '#0F9D58', 'T2', true));
+        if (lv) {
+          priceLines.push(mk(lv.entry, '#2962FF', 'ENTRY'));
+          priceLines.push(mk(lv.stop,  '#C23B33', 'STOP'));
+          priceLines.push(mk(lv.t1,    '#00A651', 'T1'));
+          priceLines.push(mk(lv.t2,    '#0F9D58', 'T2', true));
+        }
         // Structure overlays (VWAP / prev-day / Asian range) when available
         if (cfg.extraLevels) {
           for (const x of cfg.extraLevels()) {
@@ -5297,8 +5375,8 @@
           }
         }
       }
-      const box = document.getElementById(cfg.boxId);
-      if (box) {
+      const box = cfg.boxId ? document.getElementById(cfg.boxId) : null;
+      if (box && lv) {
         const dirTxt = lv.dir === 'long' ? 'LONG' : lv.dir === 'short' ? 'SHORT' : 'WAIT (long-side geometry)';
         const chip = (lbl, val, col) => `<span class="clv"><span class="clv-lbl">${lbl}</span><span style="color:${col}">${Math.round(val).toLocaleString()}</span></span>`;
         box.innerHTML =
@@ -5310,10 +5388,28 @@
       }
     }
 
+    function updateBias(candles) {
+      // Timeframe bias: close vs 20-SMA of this TF; recorded for the MTF summary.
+      if (!cfg.biasKey || !candles || candles.length < 21) return;
+      const closes = candles.map(c => c.close);
+      const last   = closes[closes.length - 1];
+      const sma20  = closes.slice(-20).reduce((a, b) => a + b, 0) / 20;
+      const up     = last >= sma20;
+      mtfBias[cfg.biasKey] = up ? 'up' : 'down';
+      if (cfg.biasId) {
+        const el = document.getElementById(cfg.biasId);
+        if (el) {
+          el.textContent = up ? '▲ BULLISH' : '▼ BEARISH';
+          el.className = 'mtf-bias ' + (up ? 'mtf-bias-up' : 'mtf-bias-down');
+        }
+      }
+      if (typeof renderMtfSummary === 'function') renderMtfSummary();
+    }
+
     async function loadCandles() {
       if (!series) return;
       try {
-        let candles = await fetchGoldKlines();
+        let candles = await fetchGoldKlines(interval);
         if (!candles || !candles.length) throw new Error('no kline data');
         // Normalise the proxy series to live gold spot so the lines align
         const lastClose = candles[candles.length - 1].close;
@@ -5323,6 +5419,7 @@
         if (chart && chart.timeScale) { try { chart.timeScale().fitContent(); } catch (e) {} }
         const msg = document.getElementById(cfg.msgId);
         if (msg) msg.style.display = 'none';
+        updateBias(candles);
         updateLevels();
       } catch (e) {
         console.warn(`${cfg.chartId} candles failed:`, e.message);
@@ -5332,8 +5429,10 @@
     }
 
     async function init() {
+      if (inited) return;             // lazy/idempotent — safe to call on tab open
       const el = document.getElementById(cfg.chartId);
       if (!el) return;
+      inited = true;
       const ok = await ensureChartLib();
       if (!ok || typeof LightweightCharts === 'undefined') {
         fallback('Interactive chart library unavailable — setup levels shown below.');
@@ -5343,11 +5442,11 @@
       try {
         const dark = document.documentElement.classList.contains('dark');
         chart = LightweightCharts.createChart(el, {
-          width: el.clientWidth || 600, height: 340,
+          width: el.clientWidth || 600, height: cfg.height || 340,
           layout: { background: { type: 'solid', color: 'transparent' }, textColor: dark ? '#9BA3B8' : '#5A6278' },
           grid: { vertLines: { color: 'rgba(127,127,127,0.08)' }, horzLines: { color: 'rgba(127,127,127,0.08)' } },
           rightPriceScale: { borderColor: 'rgba(127,127,127,0.2)' },
-          timeScale: { borderColor: 'rgba(127,127,127,0.2)', timeVisible: true, secondsVisible: false },
+          timeScale: { borderColor: 'rgba(127,127,127,0.2)', timeVisible: interval !== '1d', secondsVisible: false },
           crosshair: { mode: 0 }
         });
         series = chart.addCandlestickSeries({
@@ -5356,7 +5455,7 @@
         });
         new ResizeObserver(() => { if (chart && el.clientWidth) chart.applyOptions({ width: el.clientWidth }); }).observe(el);
         await loadCandles();
-        setInterval(loadCandles, 60000);
+        setInterval(loadCandles, interval === '1d' ? 10 * 60000 : 60000);
       } catch (e) {
         console.warn(`${cfg.chartId} init failed:`, e.message);
         fallback('Chart failed to load — setup levels shown below.');
@@ -5383,6 +5482,45 @@
       structState.pdl  !== null ? { price: structState.pdl,  color: '#7A8196', title: 'PDL',  dashed: true } : null
     ]
   });
+
+  // ── Multi-timeframe view: Daily (trend) / H4 (structure) / M15 (execution) ──
+  const mtfDailyCtl = createLevelChart({
+    chartId: 'mtfDaily', msgId: 'mtfDailyMsg', interval: '1d', height: 300,
+    biasKey: 'D', biasId: 'mtf-bias-d'
+  });
+  const mtfH4Ctl = createLevelChart({
+    chartId: 'mtfH4', msgId: 'mtfH4Msg', interval: '4h', height: 300,
+    biasKey: 'H4', biasId: 'mtf-bias-h4',
+    extraLevels: () => !structState.ok ? [] : [
+      structState.pdh !== null ? { price: structState.pdh, color: '#7A8196', title: 'PDH', dashed: true } : null,
+      structState.pdl !== null ? { price: structState.pdl, color: '#7A8196', title: 'PDL', dashed: true } : null
+    ]
+  });
+  const mtfM15Ctl = createLevelChart({
+    chartId: 'mtfM15', msgId: 'mtfM15Msg', boxId: 'mtfM15Levels', interval: '15m', height: 340,
+    biasKey: 'M15', biasId: 'mtf-bias-m15', getLevels: scalpLevels,
+    extraLevels: () => !structState.ok ? [] : [
+      structState.vwap   !== null ? { price: structState.vwap,   color: '#8B5CF6', title: 'VWAP',   dashed: true } : null,
+      structState.asianH !== null ? { price: structState.asianH, color: '#7A8196', title: 'ASIA H', dashed: true } : null,
+      structState.asianL !== null ? { price: structState.asianL, color: '#7A8196', title: 'ASIA L', dashed: true } : null
+    ]
+  });
+
+  function initMtfCharts() { mtfDailyCtl.init(); mtfH4Ctl.init(); mtfM15Ctl.init(); }
+
+  // Top-down alignment verdict: the classic multi-timeframe filter — trade M15
+  // entries only in the direction the Daily and H4 agree on.
+  function renderMtfSummary() {
+    const el = document.getElementById('mtf-verdict');
+    if (!el) return;
+    const d = mtfBias.D, h = mtfBias.H4, m = mtfBias.M15;
+    if (!d || !h || !m) { el.textContent = 'Waiting for all three timeframes…'; el.className = 'mtf-verdict'; return; }
+    const ups = [d, h, m].filter(x => x === 'up').length;
+    if (ups === 3)      { el.textContent = '3/3 ALIGNED BULLISH — trade longs only, full conviction';  el.className = 'mtf-verdict mtf-v-bull'; }
+    else if (ups === 0) { el.textContent = '3/3 ALIGNED BEARISH — trade shorts only, full conviction'; el.className = 'mtf-verdict mtf-v-bear'; }
+    else if (d === h)   { el.textContent = `Daily + H4 agree (${d === 'up' ? 'bullish' : 'bearish'}) — M15 counter-trend: wait for it to rotate before entry`; el.className = 'mtf-verdict mtf-v-mixed'; }
+    else                { el.textContent = 'Timeframes disagree — chop regime: reduce size or stand aside'; el.className = 'mtf-verdict mtf-v-mixed'; }
+  }
 
   // Ensure the Lightweight Charts global is available; if the <head> script
   // didn't provide it, inject a fallback CDN and wait a little longer.
@@ -5411,9 +5549,11 @@
 
   // Gold OHLC via CORS-enabled exchange APIs (PAXG tracks 1oz spot).
   // Returns [{time(sec), open, high, low, close, vol}] ascending, or null.
-  // interval: '5m' (default, 24h of bars) or '1d' (3 weeks of dailies).
+  // Supported intervals: '5m' (24h), '15m' (2 days), '4h' (~1 month), '1d' (~4 months).
+  const KLINE_LIMITS  = { '5m': 288, '15m': 192, '4h': 180, '1d': 120 };
+  const KRAKEN_MINUTES = { '5m': 5, '15m': 15, '4h': 240, '1d': 1440 };
   async function fetchGoldKlines(interval = '5m') {
-    const lim = interval === '1d' ? 21 : 288;
+    const lim = KLINE_LIMITS[interval] || 288;
     // 1) Binance PAXGUSDT
     try {
       const r = await fetchWithFallback([`https://api.binance.com/api/v3/klines?symbol=PAXGUSDT&interval=${interval}&limit=${lim}`]);
@@ -5426,7 +5566,7 @@
     } catch (e) { console.warn('Binance klines failed:', e.message); }
     // 2) Kraken PAXGUSD (fallback if Binance is geo-blocked)
     try {
-      const kInt = interval === '1d' ? 1440 : 5;
+      const kInt = KRAKEN_MINUTES[interval] || 5;
       const r = await fetchWithFallback([`https://api.kraken.com/0/public/OHLC?pair=PAXGUSD&interval=${kInt}`]);
       if (r) {
         const j = await r.json();
@@ -6188,7 +6328,7 @@
 
   const NAV_SECTIONS = {
     dashboard: { tabs: [{ id: 'dashboard', label: 'Overview' }] },
-    markets:   { tabs: [{ id: 'analysis', label: 'Live Analysis' }, { id: 'redfolder', label: 'Red Folder' }, { id: 'sessions', label: 'Trade Sessions' }, { id: 'calendar', label: 'Economic Calendar' }] },
+    markets:   { tabs: [{ id: 'analysis', label: 'Live Analysis' }, { id: 'mtf', label: 'Multi-TF Charts' }, { id: 'redfolder', label: 'Red Folder' }, { id: 'sessions', label: 'Trade Sessions' }, { id: 'calendar', label: 'Economic Calendar' }] },
     traderoom: { tabs: [{ id: 'scalp',    label: 'Scalp Desk' },    { id: 'daytrade', label: 'Day Trade Desk' }, { id: 'strategy', label: 'Strategy Guide' }] },
     research:  { tabs: [{ id: 'edges',    label: 'Edge Lab' }, { id: 'intel', label: 'Intel Sources' }] },
     utilities: { tabs: [{ id: 'calculator', label: 'Position Calc' }, { id: 'tracker', label: 'Signal Tracker' }, { id: 'journal', label: 'Trade Journal' }] }
