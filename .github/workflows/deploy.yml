@@ -32,6 +32,18 @@ jobs:
         with:
           path: '.'
 
+      # The Pages service intermittently answers "Deployment failed, try again
+      # later" — retry once after a pause before failing the run for real.
       - name: Deploy to GitHub Pages
         id: deployment
+        uses: actions/deploy-pages@v4
+        continue-on-error: true
+
+      - name: Wait before retry
+        if: steps.deployment.outcome == 'failure'
+        run: sleep 45
+
+      - name: Retry deploy (Pages service flake)
+        id: deployment-retry
+        if: steps.deployment.outcome == 'failure'
         uses: actions/deploy-pages@v4
