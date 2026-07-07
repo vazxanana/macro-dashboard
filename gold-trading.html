@@ -7,7 +7,7 @@
   <title>Gold Trading Platform - Institutional</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Lora:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
   <script src="https://s3.tradingview.com/tv.js" async></script>
   <!-- Lightweight Charts: MUST be the "standalone" build to expose window.LightweightCharts -->
   <script src="https://unpkg.com/lightweight-charts@4.1.3/dist/lightweight-charts.standalone.production.js"></script>
@@ -2563,6 +2563,117 @@
     :focus-visible { outline: 2px solid rgba(224,184,77,0.6); outline-offset: 2px; }
     .journal-table tbody tr, .level-row { transition: background .12s ease; }
     .journal-table tbody tr:hover, .level-row:hover { background: rgba(224,184,77,0.05); }
+
+    /* ══════════════════════════════════════════════════════════════════════════
+       OBSIDIAN RAIL — design v3: fixed left rail, true-black flat surfaces,
+       Space Grotesk display type, single gold accent
+       ══════════════════════════════════════════════════════════════════════════ */
+    :root {
+      --rail-w: 212px;
+      --rail-bg: #FFFFFF; --rail-border: #E2E5EB; --rail-fg: #4A5568;
+      --gold: #B8860B;
+      --card-bg: #FFFFFF;
+      --glass-light: #FFFFFF; --glass-lighter: #FFFFFF; --glass-ultra: #FFFFFF;
+      --body-bg-a: #F4F5F7; --body-bg-b: #F4F5F7;
+    }
+    html.dark {
+      --rail-bg: #08090C; --rail-border: #15171E; --rail-fg: #8A93A8;
+      --gold: #E8B84B;
+      --card-bg: #0D0F14;
+      --glass-light: #0D0F14; --glass-lighter: #10131A; --glass-ultra: #0B0D12;
+      --body-bg-a: #060709; --body-bg-b: #060709;
+      --bg-secondary: #10131A;
+      --border: #1B1E26; --border-light: #14161D;
+      --header-bg: rgba(6,7,9,0.94);
+    }
+    html, body { background: var(--body-bg-a); }
+
+    /* display type */
+    .logo, .section-title, .dash-widget-title, .levels-panel-title, h1, h2, h3,
+    .desk-word, .kpi-label, .rail-brand {
+      font-family: 'Space Grotesk', 'Inter', sans-serif;
+    }
+
+    /* ── the rail ── */
+    .primary-nav {
+      position: fixed; left: 0; top: 0; bottom: 0; width: var(--rail-w);
+      flex-direction: column; align-items: stretch;
+      background: var(--rail-bg);
+      border-right: 1px solid var(--rail-border); border-bottom: none;
+      padding: 0; z-index: 130;
+      overflow-x: hidden; overflow-y: auto;
+    }
+    .rail-brand {
+      padding: 22px 20px 16px;
+      font-weight: 700; font-size: 17px; letter-spacing: 3px;
+      color: var(--text-primary);
+      border-bottom: 1px solid var(--rail-border);
+      margin-bottom: 8px;
+    }
+    .rail-brand span { display: block; font-size: 8px; letter-spacing: 3.2px; color: var(--gold); font-weight: 700; margin-top: 4px; }
+    .pnav-btn {
+      height: 46px; padding: 0 20px; justify-content: flex-start;
+      border-bottom: none; border-left: 3px solid transparent;
+      color: var(--rail-fg); letter-spacing: 1.2px;
+    }
+    .pnav-btn:hover { color: var(--text-primary); background: rgba(212,175,55,0.05); }
+    .pnav-btn.active { color: var(--gold); border-left-color: var(--gold); border-bottom: none; background: rgba(212,175,55,0.07); }
+    .pnav-sep { width: auto; height: 1px; margin: 6px 16px; background: var(--rail-border); }
+    .pnav-right { margin: auto 0 0 0; padding: 16px 20px; border-left: none; border-top: 1px solid var(--rail-border); }
+    .pnav-live-label { color: var(--rail-fg); }
+
+    /* ── shifted shell ── */
+    .header, .sub-nav, .container { margin-left: var(--rail-w); }
+    .header {
+      position: static;
+      padding: 14px 28px;
+      box-shadow: none;
+      backdrop-filter: none; -webkit-backdrop-filter: none;
+      background: var(--card-bg);
+      border-bottom: 1px solid var(--border-light);
+    }
+    .header-inner { gap: 28px; max-width: none; }
+    .price-ticker { flex-wrap: wrap; row-gap: 10px; }
+    .header-inner > div:first-child { display: none; }  /* brand lives in the rail */
+    .ticker-value { font-size: 20px; }
+    .sub-nav { padding: 0 28px; position: sticky; top: 0; z-index: 96; background: var(--rail-bg); border-bottom: 1px solid var(--rail-border); }
+    .snav-btn { color: var(--rail-fg); }
+    .snav-btn:hover { color: var(--text-primary); background: rgba(212,175,55,0.05); }
+    .snav-btn.active { color: var(--gold); border-bottom-color: var(--gold); }
+    .container { padding: 26px 28px 64px; max-width: none; }
+
+    /* ── flat surfaces: no glass, no bounce ── */
+    .card, .dash-widget, .kpi-card, .levels-panel, .ems-step, .setup-card, .metric-box, .j-stat {
+      backdrop-filter: none; -webkit-backdrop-filter: none;
+      border-radius: 10px;
+      box-shadow: none;
+      animation: none;
+      background: var(--card-bg);
+      border: 1px solid var(--border-light);
+    }
+    .card:hover, .dash-widget:hover { box-shadow: none; }
+    .section-header { border-bottom: 1px solid var(--border-light); padding-bottom: 12px; margin-bottom: 20px; }
+    .section-title::before {
+      content: ''; display: inline-block; width: 3px; height: 13px;
+      background: var(--gold); border-radius: 2px; margin-right: 10px; vertical-align: -1px;
+    }
+    html.dark #goldPrice { color: var(--gold); }
+
+    /* ── collapse to a top bar on narrow screens ── */
+    @media (max-width: 960px) {
+      .primary-nav {
+        position: sticky; top: 0; left: auto; bottom: auto; width: auto;
+        flex-direction: row; align-items: stretch;
+        overflow-x: auto; overflow-y: hidden;
+        border-right: none; border-bottom: 1px solid var(--rail-border);
+      }
+      .rail-brand { display: none; }
+      .pnav-btn { border-left: none; border-bottom: 3px solid transparent; }
+      .pnav-btn.active { border-left: none; border-bottom-color: var(--gold); background: transparent; }
+      .pnav-sep { width: 1px; height: auto; margin: 10px 0; }
+      .pnav-right { margin: 0 0 0 auto; padding: 0 12px; border-top: none; }
+      .header, .sub-nav, .container { margin-left: 0; }
+    }
   </style>
 </head>
 <body>
@@ -2634,6 +2745,7 @@
 
 <!-- PRIMARY NAV -->
 <nav class="primary-nav" id="primaryNav">
+  <div class="rail-brand">GOLD<span>TERMINAL · XAU/USD</span></div>
   <button class="pnav-btn active" data-section="dashboard" onclick="switchSection('dashboard',this)">
     <span class="pnav-icon">▣</span> Dashboard
   </button>
