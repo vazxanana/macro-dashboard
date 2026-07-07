@@ -2159,7 +2159,7 @@
     .mtf-v-bear  { color: var(--accent-red);   background: rgba(194,59,51,0.1); }
     .mtf-v-mixed { color: #D97706;             background: rgba(217,119,6,0.1); }
 
-    /* Pipeline step tiles (EG desks) */
+    /* Pipeline step tiles */
     .ems-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
     @media (max-width: 1100px) { .ems-grid { grid-template-columns: repeat(2, 1fr); } }
     @media (max-width: 640px)  { .ems-grid { grid-template-columns: 1fr; } }
@@ -2642,16 +2642,8 @@
     <span class="pnav-icon">◎</span> Markets
   </button>
   <div class="pnav-sep"></div>
-  <button class="pnav-btn" data-section="traderoom" onclick="switchSection('traderoom',this)">
-    <span class="pnav-icon">⬡</span> Trade Room
-  </button>
-  <div class="pnav-sep"></div>
   <button class="pnav-btn" data-section="research" onclick="switchSection('research',this)">
     <span class="pnav-icon">◉</span> Research
-  </button>
-  <div class="pnav-sep"></div>
-  <button class="pnav-btn" data-section="utilities" onclick="switchSection('utilities',this)">
-    <span class="pnav-icon">⊞</span> Utilities
   </button>
   <div class="pnav-right">
     <div class="pnav-live" id="liveStatus" title="Live data connection status">
@@ -2754,7 +2746,7 @@
     <!-- Live chart with scalp setup levels marked -->
     <div class="dash-widget" style="margin-bottom:20px;">
       <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;margin-bottom:12px;">
-        <div class="dash-widget-title" style="margin:0;">Live Chart · Scalp Setup Levels <span style="font-size:11px;font-weight:500;color:var(--text-tertiary)">— XAU/USD (PAXG proxy, 5m)</span></div>
+        <div class="dash-widget-title" style="margin:0;">Live Chart · Intraday Plan Levels <span style="font-size:11px;font-weight:500;color:var(--text-tertiary)">— XAU/USD (PAXG proxy, 5m)</span></div>
         <div class="chart-legend" id="chartLegend">
           <span class="cl-item"><span class="cl-dot" style="background:#2962FF"></span>Entry</span>
           <span class="cl-item"><span class="cl-dot" style="background:#C23B33"></span>Stop</span>
@@ -2771,24 +2763,24 @@
     <!-- Quick-launch shortcuts -->
     <div class="dash-shortcuts">
       <button class="dash-shortcut" style="background:rgba(0,166,81,0.07);border-color:rgba(0,166,81,0.2);"
-        onclick="switchSection('traderoom', document.querySelector('[data-section=traderoom]'), 'scalp')">
-        <div class="dash-shortcut-title" style="color:var(--accent-green);">⬆ Scalp Desk</div>
-        <div class="dash-shortcut-sub">5–30 min precision entries</div>
+        onclick="switchSection('markets', document.querySelector('[data-section=markets]'), 'bias')">
+        <div class="dash-shortcut-title" style="color:var(--accent-green);">◍ Daily Bias</div>
+        <div class="dash-shortcut-sub">Verdict · zones · playbook</div>
       </button>
       <button class="dash-shortcut" style="background:rgba(0,82,204,0.07);border-color:rgba(0,82,204,0.2);"
-        onclick="switchSection('traderoom', document.querySelector('[data-section=traderoom]'), 'daytrade')">
-        <div class="dash-shortcut-title" style="color:var(--accent-blue);">◈ Day Trade Desk</div>
-        <div class="dash-shortcut-sub">1–4 hour session plays</div>
+        onclick="switchSection('markets', document.querySelector('[data-section=markets]'), 'analysis')">
+        <div class="dash-shortcut-title" style="color:var(--accent-blue);">◈ Live Analysis</div>
+        <div class="dash-shortcut-sub">Drivers · setup · S&amp;R</div>
+      </button>
+      <button class="dash-shortcut" style="background:rgba(194,59,51,0.07);border-color:rgba(194,59,51,0.2);"
+        onclick="switchSection('markets', document.querySelector('[data-section=markets]'), 'redfolder')">
+        <div class="dash-shortcut-title" style="color:var(--accent-red);">⚑ Red Folder</div>
+        <div class="dash-shortcut-sub">High-impact event desk</div>
       </button>
       <button class="dash-shortcut" style="background:rgba(212,175,55,0.07);border-color:rgba(212,175,55,0.2);"
         onclick="switchSection('research', document.querySelector('[data-section=research]'))">
-        <div class="dash-shortcut-title" style="color:#D4AF37;">◉ Edge Lab</div>
-        <div class="dash-shortcut-sub">6 quantified trade edges</div>
-      </button>
-      <button class="dash-shortcut" style="background:rgba(139,92,246,0.07);border-color:rgba(139,92,246,0.2);"
-        onclick="switchSection('utilities', document.querySelector('[data-section=utilities]'))">
-        <div class="dash-shortcut-title" style="color:#8B5CF6;">⊞ Utilities</div>
-        <div class="dash-shortcut-sub">Calculator · Journal · Alerts</div>
+        <div class="dash-shortcut-title" style="color:#D4AF37;">◉ Research</div>
+        <div class="dash-shortcut-sub">Edges · backtest · intel</div>
       </button>
     </div>
 
@@ -2860,6 +2852,22 @@
       </div>
     </div>
 
+    <!-- H4 / M15: structure and execution views inside the zones -->
+    <div class="mtf-grid" style="margin-bottom:16px;">
+      <div class="dash-widget">
+        <div class="dash-widget-title" style="margin-bottom:10px;">H4 — Structure at the Zones <span style="font-size:10px;font-weight:500;color:var(--text-tertiary)">boxes = engulf zones &middot; gold lines = nearest reaction zone edges</span></div>
+        <div id="biasH4" style="width:100%;height:300px;position:relative;">
+          <div id="biasH4Msg" style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;text-align:center;color:var(--text-tertiary);font-size:12px;padding:16px;">Loading&hellip;</div>
+        </div>
+      </div>
+      <div class="dash-widget">
+        <div class="dash-widget-title" style="margin-bottom:10px;">M15 — Execution View <span style="font-size:10px;font-weight:500;color:var(--text-tertiary)">hunt the engulfing INSIDE a reaction zone, with the bias</span></div>
+        <div id="biasM15" style="width:100%;height:300px;position:relative;">
+          <div id="biasM15Msg" style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;text-align:center;color:var(--text-tertiary);font-size:12px;padding:16px;">Loading&hellip;</div>
+        </div>
+      </div>
+    </div>
+
     <!-- Reaction zones table -->
     <div class="card glass">
       <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;">
@@ -2877,7 +2885,7 @@
         </table>
       </div>
       <div style="margin-top:10px;font-size:10px;color:var(--text-tertiary);line-height:1.6;">
-        A reaction zone is a price area where gold previously reversed by at least ~1.1× the daily ATR within a few days of touching it. The more hits and the bigger the moves, the more institutional orders live there. Trade the EG desks INTO these zones in the bias direction — an engulfing printed inside one is the highest-probability setup on the platform.
+        Fundamental cadence: real yields / breakevens / 2Y are daily FRED closes; DXY momentum uses ECB reference rates; COT positioning is the CFTC weekly report (Fridays, data as of Tuesday). A reaction zone is a price area where gold previously reversed by at least ~1.1× the daily ATR within a few days of touching it. The more hits and the bigger the moves, the more institutional orders live there. Trade INTO these zones in the bias direction — an engulfing printed inside one (watch the M15 execution view above) is the highest-probability setup on the platform.
       </div>
     </div>
 
@@ -3233,413 +3241,17 @@
 
   </div><!-- end tab-analysis -->
 
-  <!-- STRATEGY TAB -->
-  <div id="tab-strategy" class="tab-panel">
-    <div class="section">
-      <div class="section-header">
-        <div class="section-title">4-Step Execution Workflow</div>
-      </div>
-      <div class="card glass">
-        <div class="grid-2">
-          <div class="direction-block">
-            <div class="block-title">Step 1: Fundamental Bias</div>
-            <div class="block-content">
-              Real yields are the master driver; DXY, VIX and flows complete the score.<br/>
-              Trade ONLY in the bias direction — counter-trend EGs are skip/half-size.
-            </div>
-          </div>
-          <div class="direction-block">
-            <div class="block-title">Step 2: Structure</div>
-            <div class="block-content">
-              VWAP, PDH/PDL/PDC, Asian range, round numbers.<br/>
-              An engulfing away from structure is noise — only ★ at-structure counts.
-            </div>
-          </div>
-          <div class="direction-block">
-            <div class="block-title">Step 3: The Engulfing</div>
-            <div class="block-content">
-              M5/M15 for scalps, H1/H4 for day trades: a body that fully covers the prior opposite body.<br/>
-              Skip if the body is 3×+ average — that is exhaustion, not reversal.
-            </div>
-          </div>
-          <div class="direction-block">
-            <div class="block-title">Step 4: Execution</div>
-            <div class="block-content">
-              Enter on the break of the pattern extreme; stop beyond the other extreme — the "proven wrong" point.<br/>
-              Scalps: 1.8R / 3R. Day trades: 2R / 3.5R, half off at T1, stop to breakeven.
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <div class="section">
-      <div class="card glass-ultra" style="padding: 32px; background: rgba(0, 82, 204, 0.08);">
-        <h3 style="font-size: 16px; margin-bottom: 16px;">Risk Management Rules</h3>
-        <div class="grid-3">
-          <div class="metric-box">
-            <div class="metric-label">Max Risk Per Trade</div>
-            <div class="metric-value">1%</div>
-            <div class="metric-detail">Never exceed 1% of account on single trade</div>
-          </div>
-          <div class="metric-box">
-            <div class="metric-label">Minimum R:R Ratio</div>
-            <div class="metric-value">1:2</div>
-            <div class="metric-detail">Reject setups below 2× reward-to-risk</div>
-          </div>
-          <div class="metric-box">
-            <div class="metric-label">Max Concurrent Trades</div>
-            <div class="metric-value">3</div>
-            <div class="metric-detail">Diversify risk; avoid over-exposure</div>
-          </div>
-          <div class="metric-box">
-            <div class="metric-label">Daily Loss Limit</div>
-            <div class="metric-value">3%</div>
-            <div class="metric-detail">Stop trading for the day if hit</div>
-          </div>
-          <div class="metric-box">
-            <div class="metric-label">Trailing Stop</div>
-            <div class="metric-value">Breakeven</div>
-            <div class="metric-detail">Move stop to entry once T1 hit</div>
-          </div>
-          <div class="metric-box">
-            <div class="metric-label">Position Scaling</div>
-            <div class="metric-value">50% / 50%</div>
-            <div class="metric-detail">Half off at T1, run remainder to T2/T3</div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div><!-- end tab-strategy -->
 
   <!-- SCALP DESK TAB -->
-  <div id="tab-scalp" class="tab-panel">
+  
 
-    <!-- Signal Banner -->
-    <div id="scalp-banner" class="desk-banner long">
-      <div class="desk-signal-main">
-        <div class="desk-arrow" id="scalp-arrow">↑</div>
-        <div class="desk-word" id="scalp-word">LONG</div>
-        <div class="desk-conf" id="scalp-conf">—% confidence</div>
-      </div>
-      <div class="desk-vline"></div>
-      <div class="desk-details" id="scalp-details">
-        <div class="desk-det">
-          <div class="desk-det-lbl">Entry</div>
-          <div class="desk-det-val" id="scalp-entry">—</div>
-          <div class="desk-det-sub">Break of pattern extreme</div>
-        </div>
-        <div class="desk-det">
-          <div class="desk-det-lbl">Scalp Stop</div>
-          <div class="desk-det-val" id="scalp-stop" style="color:var(--accent-red)">—</div>
-          <div class="desk-det-sub" id="scalp-stop-pts">— pts</div>
-        </div>
-        <div class="desk-det">
-          <div class="desk-det-lbl">Target 1</div>
-          <div class="desk-det-val" id="scalp-t1" style="color:var(--accent-green)">—</div>
-          <div class="desk-det-sub" id="scalp-t1-pts">— pts · 1.5R</div>
-        </div>
-        <div class="desk-det">
-          <div class="desk-det-lbl">Target 2</div>
-          <div class="desk-det-val" id="scalp-t2" style="color:var(--accent-green)">—</div>
-          <div class="desk-det-sub" id="scalp-t2-pts">— pts · 2.5R</div>
-        </div>
-      </div>
-      <div class="desk-meta">
-        <div class="desk-meta-session" id="scalp-session">—</div>
-        <div class="desk-meta-time" id="scalp-session-time">—</div>
-        <div class="desk-meta-hint" id="scalp-hint">—</div>
-      </div>
-    </div>
+  
 
-    <!-- Signal Quality (the win-rate filter) -->
-    <div id="scalp-quality"></div>
-
-    <!-- EG pipeline: fundamentals → structure → pattern → execute -->
-    <div class="ems-grid" id="scalp-eg-steps" style="margin:14px 0;"></div>
-
-    <!-- Live EG scalp signals -->
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
-      <div style="font-size:9px;font-weight:800;letter-spacing:1.4px;text-transform:uppercase;color:var(--text-tertiary);">Live EG Scalp Signals — M5/M15 engulfings, pattern stops, macro-gated</div>
-      <div style="font-size:10px;color:var(--text-tertiary);">Re-scans on every visit + price tick</div>
-    </div>
-    <div class="setups-grid" id="scalp-setups-grid"></div>
-
-    <!-- Key Levels + Checklist -->
-    <div class="levels-grid">
-      <div class="levels-panel">
-        <div class="levels-panel-title">Key Scalp Price Levels</div>
-        <div id="scalp-levels-list"></div>
-      </div>
-      <div class="levels-panel">
-        <div class="levels-panel-title">Scalp Execution Checklist</div>
-        <div class="desk-checklist">
-          <div class="dcheck" onclick="this.classList.toggle('checked')"><div class="dcheck-box">✓</div>Engulfing printed AT structure (★)</div>
-          <div class="dcheck" onclick="this.classList.toggle('checked')"><div class="dcheck-box">✓</div>Fundamental bias matches direction</div>
-          <div class="dcheck" onclick="this.classList.toggle('checked')"><div class="dcheck-box">✓</div>London / NY session (not dead zone)</div>
-          <div class="dcheck" onclick="this.classList.toggle('checked')"><div class="dcheck-box">✓</div>No red-folder news in next 30 min</div>
-          <div class="dcheck" onclick="this.classList.toggle('checked')"><div class="dcheck-box">✓</div>Entry = break of pattern extreme, not chase</div>
-          <div class="dcheck" onclick="this.classList.toggle('checked')"><div class="dcheck-box">✓</div>Stop beyond the other extreme, placed first</div>
-          <div class="dcheck" onclick="this.classList.toggle('checked')"><div class="dcheck-box">✓</div>Risk ≤ 0.5% account (scalp)</div>
-          <div class="dcheck" onclick="this.classList.toggle('checked')"><div class="dcheck-box">✓</div>Skip if engulfing body 3×+ average (exhaustion)</div>
-        </div>
-      </div>
-    </div>
-
-  </div><!-- end tab-scalp -->
-
-  <!-- DAY TRADE DESK TAB -->
-  <div id="tab-daytrade" class="tab-panel">
-
-    <!-- Signal Banner -->
-    <div id="daytrade-banner" class="desk-banner long">
-      <div class="desk-signal-main">
-        <div class="desk-arrow" id="dt-arrow">↑</div>
-        <div class="desk-word" id="dt-word">LONG</div>
-        <div class="desk-conf" id="dt-conf">—% confidence</div>
-      </div>
-      <div class="desk-vline"></div>
-      <div class="desk-details">
-        <div class="desk-det">
-          <div class="desk-det-lbl">Day Entry</div>
-          <div class="desk-det-val" id="dt-entry">—</div>
-          <div class="desk-det-sub">Break of pattern extreme</div>
-        </div>
-        <div class="desk-det">
-          <div class="desk-det-lbl">Day Stop</div>
-          <div class="desk-det-val" id="dt-stop" style="color:var(--accent-red)">—</div>
-          <div class="desk-det-sub" id="dt-stop-pts">— pts</div>
-        </div>
-        <div class="desk-det">
-          <div class="desk-det-lbl">Target 1</div>
-          <div class="desk-det-val" id="dt-t1" style="color:var(--accent-green)">—</div>
-          <div class="desk-det-sub" id="dt-t1-pts">— pts · 2R</div>
-        </div>
-        <div class="desk-det">
-          <div class="desk-det-lbl">Target 2</div>
-          <div class="desk-det-val" id="dt-t2" style="color:var(--accent-green)">—</div>
-          <div class="desk-det-sub" id="dt-t2-pts">— pts · 3.5R</div>
-        </div>
-      </div>
-      <div class="desk-meta">
-        <div class="desk-meta-session" id="dt-session">—</div>
-        <div class="desk-meta-time" id="dt-session-time">—</div>
-        <div class="desk-meta-hint" id="dt-hint">—</div>
-      </div>
-    </div>
-
-    <!-- Signal Quality (the win-rate filter) -->
-    <div id="dt-quality"></div>
-
-    <!-- EG pipeline: fundamentals → structure → pattern → execute -->
-    <div class="ems-grid" id="dt-eg-steps" style="margin:14px 0;"></div>
-
-    <!-- Live chart with day-trade setup levels marked -->
-    <div class="dash-widget" style="margin-bottom:20px;">
-      <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;margin-bottom:12px;">
-        <div class="dash-widget-title" style="margin:0;">Live Chart · EG Day Trade Levels <span style="font-size:11px;font-weight:500;color:var(--text-tertiary)">— XAU/USD (PAXG proxy, 1h)</span></div>
-        <div class="chart-legend">
-          <span class="cl-item"><span class="cl-dot" style="background:#2962FF"></span>Entry</span>
-          <span class="cl-item"><span class="cl-dot" style="background:#C23B33"></span>Stop</span>
-          <span class="cl-item"><span class="cl-dot" style="background:#00A651"></span>Target 1</span>
-          <span class="cl-item"><span class="cl-dot" style="background:#0F9D58;opacity:0.6"></span>Target 2</span>
-        </div>
-      </div>
-      <div id="dayChart" style="width:100%;height:340px;position:relative;">
-        <div id="dayChartMsg" style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;text-align:center;color:var(--text-tertiary);font-size:13px;padding:20px;">Loading live chart…</div>
-      </div>
-      <div id="dayChartLevels" style="display:flex;flex-wrap:wrap;gap:14px;margin-top:12px;font-size:12px;"></div>
-    </div>
-
-    <!-- 3 Day Trade Setups -->
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
-      <div style="font-size:9px;font-weight:800;letter-spacing:1.4px;text-transform:uppercase;color:var(--text-tertiary);">Live EG Day Trade Signals — H1/H4 engulfings at daily structure, macro-gated</div>
-      <div style="font-size:10px;color:var(--text-tertiary);">Hours-to-days hold · pattern stops</div>
-    </div>
-    <div class="setups-grid" id="daytrade-setups-grid"></div>
-
-    <!-- Key Levels + Checklist -->
-    <div class="levels-grid">
-      <div class="levels-panel">
-        <div class="levels-panel-title">Key Day Trade Levels</div>
-        <div id="daytrade-levels-list"></div>
-      </div>
-      <div class="levels-panel">
-        <div class="levels-panel-title">Day Trade Rules</div>
-        <div class="desk-checklist">
-          <div class="dcheck" onclick="this.classList.toggle('checked')"><div class="dcheck-box">✓</div>Fundamental bias confirmed (TIPS + DXY + VIX)</div>
-          <div class="dcheck" onclick="this.classList.toggle('checked')"><div class="dcheck-box">✓</div>H1/H4 engulfing AT daily structure (★)</div>
-          <div class="dcheck" onclick="this.classList.toggle('checked')"><div class="dcheck-box">✓</div>No FOMC/CPI within 4 hours</div>
-          <div class="dcheck" onclick="this.classList.toggle('checked')"><div class="dcheck-box">✓</div>Daily trend (SMA20) agrees with pattern</div>
-          <div class="dcheck" onclick="this.classList.toggle('checked')"><div class="dcheck-box">✓</div>Entry = break of pattern extreme, no chasing</div>
-          <div class="dcheck" onclick="this.classList.toggle('checked')"><div class="dcheck-box">✓</div>Risk ≤ 1% account per trade</div>
-          <div class="dcheck" onclick="this.classList.toggle('checked')"><div class="dcheck-box">✓</div>Plan: partial exit ½ at T1</div>
-          <div class="dcheck" onclick="this.classList.toggle('checked')"><div class="dcheck-box">✓</div>Trail stop to B/E after T1 hit</div>
-        </div>
-      </div>
-    </div>
-
-  </div><!-- end tab-daytrade -->
-
-  <!-- ENGULFING DESK — pattern method, live scanner, marked chart -->
-  <div id="tab-engulf" class="tab-panel">
-    <div class="section-header">
-      <div class="section-title">Engulfing Desk <span style="font-size:11px;font-weight:500;color:var(--text-tertiary)">— the tight-stop scalp method: pattern + structure + confirmation</span></div>
-    </div>
-
-    <!-- THE METHOD -->
-    <div class="card glass-premium" style="margin-bottom:16px;">
-      <h3>The Engulfing Method — how it works and why the stop is tight</h3>
-      <div class="grid-3" style="margin-top:12px;">
-        <div class="metric-box">
-          <div class="metric-label">1 · The Pattern</div>
-          <div class="metric-detail" style="font-size:11px;line-height:1.7;">A <strong style="color:var(--accent-green)">bullish engulfing</strong> = a red candle followed by a green candle whose <strong>body completely covers</strong> the red body. Sellers pushed, buyers absorbed everything and reversed it — a real shift in control, not a wick. Bearish = the mirror image.</div>
-        </div>
-        <div class="metric-box">
-          <div class="metric-label">2 · Location Is Everything</div>
-          <div class="metric-detail" style="font-size:11px;line-height:1.7;">An engulfing in the middle of a range is noise. It becomes tradeable <strong>at structure</strong>: VWAP, previous-day high/low, Asian range edge, round numbers, or an S/R level. The scanner tags these with <strong>★</strong> — those are the only ones worth risk.</div>
-        </div>
-        <div class="metric-box">
-          <div class="metric-label">3 · Entry / Stop / Target</div>
-          <div class="metric-detail" style="font-size:11px;line-height:1.7;"><strong>Entry:</strong> break of the engulfing candle's extreme (or next candle open for aggressive).<br><strong>Stop:</strong> just beyond the engulfing candle's other extreme — typically <strong>8–15 pts</strong>, not 30+.<br><strong>Targets:</strong> 1.8R and 3R, or the next structure level.</div>
-        </div>
-      </div>
-      <div style="margin-top:14px;padding:12px 16px;border-radius:9px;background:rgba(212,175,55,0.08);border:1px solid rgba(212,175,55,0.25);font-size:11px;line-height:1.7;color:var(--text-secondary);">
-        <strong style="color:#B8860B;">Why this fixes the &ldquo;SL too big&rdquo; problem:</strong> an ATR stop asks &ldquo;how far does gold wander in a day?&rdquo; A pattern stop asks &ldquo;at what price is this specific trade proven wrong?&rdquo; If price trades back through the entire engulfing candle, the reversal failed — exit. That invalidation point is close by definition, so the same $ risk buys a 2–3× larger position, and the 1.8R target is only ~20 pts away instead of ~60.
-        <br><br><strong style="color:#B8860B;">Filters that keep the win rate up:</strong> trade only ★ at-structure signals · only in the macro/MTF direction (check the alignment verdict) · London or NY session · never 30 min around a red-folder print · skip if the engulfing body is 3×+ average (exhaustion, not reversal).
-      </div>
-    </div>
-
-    <!-- EG CHARTS — Daily / H4 / M15, boxes only -->
-    <div class="mtf-grid" style="margin-bottom:16px;">
-      <div class="dash-widget">
-        <div class="dash-widget-title" style="margin-bottom:10px;">DAILY — EG Zones <span style="font-size:10px;font-weight:500;color:var(--text-tertiary)">boxes only &middot; brighter = at structure</span></div>
-        <div id="egDaily" style="width:100%;height:300px;position:relative;">
-          <div id="egDailyMsg" style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;text-align:center;color:var(--text-tertiary);font-size:12px;padding:16px;">Loading&hellip;</div>
-        </div>
-      </div>
-      <div class="dash-widget">
-        <div class="dash-widget-title" style="margin-bottom:10px;">H4 — EG Zones <span style="font-size:10px;font-weight:500;color:var(--text-tertiary)">boxes only</span></div>
-        <div id="egH4" style="width:100%;height:300px;position:relative;">
-          <div id="egH4Msg" style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;text-align:center;color:var(--text-tertiary);font-size:12px;padding:16px;">Loading&hellip;</div>
-        </div>
-      </div>
-    </div>
-    <div class="dash-widget" style="margin-bottom:16px;">
-      <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;margin-bottom:10px;">
-        <div class="dash-widget-title" style="margin:0;">M15 — EG Zones <span style="font-size:10px;font-weight:500;color:var(--text-tertiary)">boxes only &middot; fresh zones run to the right edge</span></div>
-        <div class="chart-legend">
-          <span class="cl-item"><span class="cl-dot" style="background:#00A651"></span>Bullish EG zone</span>
-          <span class="cl-item"><span class="cl-dot" style="background:#C23B33"></span>Bearish EG zone</span>
-        </div>
-      </div>
-      <div id="egM15" style="width:100%;height:340px;position:relative;">
-        <div id="egM15Msg" style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;text-align:center;color:var(--text-tertiary);font-size:12px;padding:16px;">Loading&hellip;</div>
-      </div>
-    </div>
-
-    <!-- LIVE SCANNER -->
-    <div class="card glass">
-      <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;">
-        <h3 style="margin:0;">Live Scanner — recent engulfings (M5 &amp; M15)</h3>
-        <span style="font-size:10px;color:var(--text-tertiary);" id="engulfScanTs">&mdash;</span>
-      </div>
-      <div class="journal-table-wrap" style="margin-top:12px;">
-        <table class="journal-table">
-          <thead>
-            <tr><th>Time (UTC)</th><th>TF</th><th>Type</th><th>At Structure</th><th>Entry (break)</th><th>Stop</th><th>Risk</th><th>T1 (1.8R)</th><th>T2 (3R)</th></tr>
-          </thead>
-          <tbody id="engulfScanBody">
-            <tr><td colspan="9" class="j-empty">Scanning&hellip;</td></tr>
-          </tbody>
-        </table>
-      </div>
-      <div style="margin-top:10px;font-size:10px;color:var(--text-tertiary);line-height:1.6;">
-        ★ rows printed at a structure level — the tradeable ones. Raw rows are shown for learning: watch how often they fail vs ★ rows. Entries assume break of the pattern extreme; always confirm direction against the macro signal and MTF verdict first.
-      </div>
-    </div>
-  </div><!-- end tab-engulf -->
+  
 
 
 
-  <!-- CALCULATOR TAB -->
-  <div id="tab-calculator" class="tab-panel">
-    <div class="section">
-      <div class="section-header">
-        <div class="section-title">Position Size Calculator</div>
-        <span class="badge">XAU/USD</span>
-      </div>
-      <div class="calc-grid">
-        <div class="card glass">
-          <h3>Inputs</h3>
-
-          <div class="calc-input-group">
-            <label class="calc-label" for="accountSize">Account Size (USD)</label>
-            <input class="calc-input" type="number" id="accountSize" value="10000" min="0" step="100" oninput="calcPosition()">
-          </div>
-
-          <div class="calc-input-group">
-            <label class="calc-label" for="riskPct">Risk Per Trade (%)</label>
-            <input class="calc-input" type="number" id="riskPct" value="1" min="0.1" max="10" step="0.1" oninput="calcPosition()">
-          </div>
-
-          <div class="calc-input-group">
-            <label class="calc-label" for="entryPrice">Entry Price (USD)</label>
-            <input class="calc-input" type="number" id="entryPrice" value="3900" min="0" step="1" oninput="this.dataset.touched='1';calcPosition()">
-          </div>
-
-          <div class="calc-input-group">
-            <label class="calc-label" for="stopPrice">Stop Loss Price (USD)</label>
-            <input class="calc-input" type="number" id="stopPrice" value="3847" min="0" step="1" oninput="this.dataset.touched='1';calcPosition()">
-          </div>
-
-          <div class="calc-input-group">
-            <label class="calc-label" for="target1">Target 1 Price (USD)</label>
-            <input class="calc-input" type="number" id="target1" value="3953" min="0" step="1" oninput="this.dataset.touched='1';calcPosition()">
-          </div>
-
-          <div class="calc-input-group">
-            <label class="calc-label" for="target2">Target 2 Price (USD)</label>
-            <input class="calc-input" type="number" id="target2" value="4005" min="0" step="1" oninput="this.dataset.touched='1';calcPosition()">
-          </div>
-        </div>
-
-        <div class="card glass">
-          <h3>Results</h3>
-
-          <div class="calc-result">
-            <div class="calc-result-label">Dollar Risk</div>
-            <div class="calc-result-value" id="res-dollar-risk">$100.00</div>
-            <div class="calc-result-detail" id="res-dollar-risk-detail">1% of $10,000</div>
-          </div>
-
-          <div class="calc-result">
-            <div class="calc-result-label">Stop Distance</div>
-            <div class="calc-result-value" id="res-stop-dist">20.00 pts</div>
-            <div class="calc-result-detail" id="res-stop-pct">—% from entry</div>
-          </div>
-
-          <div class="calc-result">
-            <div class="calc-result-label">Position Size (oz)</div>
-            <div class="calc-result-value" id="res-oz">5.00 oz</div>
-            <div class="calc-result-detail" id="res-notional">Notional: $20,800</div>
-          </div>
-
-          <div class="calc-result" id="res-rr-block">
-            <div class="calc-result-label">Risk : Reward (to T1 / T2)</div>
-            <div class="calc-result-value" id="res-rr">1:1.5 / 1:3.0</div>
-            <div class="calc-result-detail" id="res-rr-detail">Profit at T1: $150 | T2: $300</div>
-          </div>
-
-          <div class="calc-result">
-            <div class="calc-result-label">Leverage Required (at 1× = full notional)</div>
-            <div class="calc-result-value" id="res-leverage">2.1×</div>
-            <div class="calc-result-detail" id="res-leverage-detail">Notional vs account size</div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div><!-- end tab-calculator -->
+  
 
   <!-- CALENDAR TAB -->
   <div id="tab-calendar" class="tab-panel">
@@ -4456,152 +4068,10 @@
     </div>
   </div><!-- end tab-backtest -->
 
-  <!-- JOURNAL TAB -->
-  <div id="tab-journal" class="tab-panel">
-    <div class="section-header">Trade Journal</div>
-
-    <!-- Stats Row -->
-    <div class="journal-stats" id="journalStats">
-      <div class="j-stat">
-        <div class="j-stat-val" id="jTotalTrades">0</div>
-        <div class="j-stat-lbl">Total Trades</div>
-      </div>
-      <div class="j-stat">
-        <div class="j-stat-val" id="jWinRate">—</div>
-        <div class="j-stat-lbl">Win Rate</div>
-      </div>
-      <div class="j-stat">
-        <div class="j-stat-val" id="jAvgRR">—</div>
-        <div class="j-stat-lbl">Avg R:R</div>
-      </div>
-      <div class="j-stat">
-        <div class="j-stat-val" id="jPnl">—</div>
-        <div class="j-stat-lbl">Total P&amp;L (pts)</div>
-      </div>
-      <div class="j-stat">
-        <div class="j-stat-val" id="jPF">—</div>
-        <div class="j-stat-lbl">Profit Factor</div>
-      </div>
-    </div>
-
-    <!-- Entry Form -->
-    <div class="journal-form">
-      <div class="j-field">
-        <label>Date</label>
-        <input class="j-input" type="date" id="jDate">
-      </div>
-      <div class="j-field">
-        <label>Direction</label>
-        <select class="j-select" id="jDir">
-          <option value="long">Long</option>
-          <option value="short">Short</option>
-        </select>
-      </div>
-      <div class="j-field">
-        <label>Entry</label>
-        <input class="j-input" type="number" id="jEntry" placeholder="3200.00" step="0.01">
-      </div>
-      <div class="j-field">
-        <label>Stop Loss</label>
-        <input class="j-input" type="number" id="jSL" placeholder="3185.00" step="0.01">
-      </div>
-      <div class="j-field">
-        <label>Exit</label>
-        <input class="j-input" type="number" id="jExit" placeholder="3240.00" step="0.01">
-      </div>
-      <div class="j-field">
-        <label>Size (oz)</label>
-        <input class="j-input" type="number" id="jSize" placeholder="1.0" step="0.01">
-      </div>
-      <div class="j-field">
-        <label>Notes</label>
-        <input class="j-input" type="text" id="jNotes" placeholder="Edge used, context...">
-      </div>
-      <button class="j-add-btn" onclick="addTrade()">+ Log Trade</button>
-    </div>
-
-    <!-- Trades Table -->
-    <div class="journal-table-wrap">
-      <table class="journal-table">
-        <thead>
-          <tr>
-            <th>Date</th>
-            <th>Dir</th>
-            <th>Entry</th>
-            <th>SL</th>
-            <th>Exit</th>
-            <th>Size</th>
-            <th>P&amp;L (pts)</th>
-            <th>R:R</th>
-            <th>Result</th>
-            <th>Notes</th>
-            <th></th>
-          </tr>
-        </thead>
-        <tbody id="journalBody">
-          <tr><td colspan="11" class="j-empty">No trades logged yet — add your first trade above</td></tr>
-        </tbody>
-      </table>
-    </div>
-  </div><!-- end tab-journal -->
+  
 
   <!-- SIGNAL TRACKER — auto-logged track record of the dashboard's own signals -->
-  <div id="tab-tracker" class="tab-panel">
-    <div class="section-header">Signal Tracker <span style="font-size:11px;font-weight:500;color:var(--text-tertiary)">— auto-logged every time the dashboard's signal flips</span></div>
-
-    <div class="journal-stats" id="trackerStats">
-      <div class="j-stat">
-        <div class="j-stat-val" id="tkTotal">0</div>
-        <div class="j-stat-lbl">Signals Logged</div>
-      </div>
-      <div class="j-stat">
-        <div class="j-stat-val" id="tkWinRate">—</div>
-        <div class="j-stat-lbl">Hit Rate (T1)</div>
-      </div>
-      <div class="j-stat">
-        <div class="j-stat-val" id="tkAvgR">—</div>
-        <div class="j-stat-lbl">Avg R Result</div>
-      </div>
-      <div class="j-stat">
-        <div class="j-stat-val" id="tkOpen">—</div>
-        <div class="j-stat-lbl">Currently Open</div>
-      </div>
-    </div>
-
-    <div class="card glass" style="margin-bottom:16px;">
-      <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;">
-        <div style="font-size:12px;color:var(--text-secondary);line-height:1.6;max-width:640px;">
-          Each row is a setup the dashboard generated. A new signal is logged automatically whenever the
-          primary direction flips (LONG⇄SHORT). Outcomes resolve <strong>live</strong> against price:
-          <span style="color:var(--accent-green);font-weight:700;">WIN</span> if Target&nbsp;1 is hit first,
-          <span style="color:var(--accent-red);font-weight:700;">LOSS</span> if the stop is hit first,
-          <span style="color:#D97706;font-weight:700;">OPEN</span> while in progress.
-        </div>
-        <button class="j-add-btn" style="background:rgba(194,59,51,0.12);color:var(--accent-red);" onclick="clearSignalLog()">Clear Log</button>
-      </div>
-    </div>
-
-    <div class="journal-table-wrap">
-      <table class="journal-table">
-        <thead>
-          <tr>
-            <th>Logged (UTC)</th>
-            <th>Dir</th>
-            <th>Entry</th>
-            <th>Stop</th>
-            <th>Target 1</th>
-            <th>Macro</th>
-            <th>Session</th>
-            <th>Result</th>
-            <th>R</th>
-          </tr>
-        </thead>
-        <tbody id="trackerBody">
-          <tr><td colspan="9" class="j-empty">No signals logged yet — the tracker starts recording as soon as the dashboard produces a directional signal.</td></tr>
-        </tbody>
-      </table>
-    </div>
-  </div><!-- end tab-tracker -->
+  
 
 </div>
 
@@ -4618,21 +4088,15 @@
     const panel = document.getElementById('tab-' + name);
     if (panel) panel.classList.add('active');
     if (btn) btn.classList.add('active');
-    if (name === 'calculator') calcPosition();
     if (name === 'calendar') renderCalendar();
     if (name === 'sessions') { renderSessionGrid(); renderLocalTimes(); }
     if (name === 'edges')     { edgeConfluence(); }
-    if (name === 'journal')   { renderJournal(); }
     if (name === 'dashboard') { renderDashboard(); }
-    if (name === 'scalp')     { renderScalpDesk(); }
-    if (name === 'daytrade')  { renderDayTradeDesk(); }
     if (name === 'analysis')  { updateAnalysisTab(); }
     if (name === 'bias')      { renderDailyBias(); }
     if (name === 'calendar')  { renderCalendar(); }
-    if (name === 'tracker')   { renderSignalTracker(); }
     if (name === 'redfolder') { renderRedFolder(); }
     if (name === 'mtf')       { initMtfCharts(); renderMtfSummary(); }
-    if (name === 'engulf')    { initEgCharts(); renderEngulfDesk(); }
   }
 
   // ─── CHECKLIST ─────────────────────────────────────────────────────────────
@@ -4749,43 +4213,6 @@
   }
 
   // ─── POSITION CALCULATOR ───────────────────────────────────────────────────
-  function calcPosition() {
-    const account  = parseFloat(document.getElementById('accountSize')?.value) || 0;
-    const riskPct  = parseFloat(document.getElementById('riskPct')?.value)     || 0;
-    const entry    = parseFloat(document.getElementById('entryPrice')?.value)  || 0;
-    const stop     = parseFloat(document.getElementById('stopPrice')?.value)   || 0;
-    const t1       = parseFloat(document.getElementById('target1')?.value)     || 0;
-    const t2       = parseFloat(document.getElementById('target2')?.value)     || 0;
-    try { localStorage.setItem('acct_size', account); localStorage.setItem('risk_pct', riskPct); } catch (e) {}
-
-    const dollarRisk = account * riskPct / 100;
-    const stopDist   = Math.abs(entry - stop);
-    const stopPct    = entry > 0 ? (stopDist / entry * 100) : 0;
-    const oz         = stopDist > 0 ? dollarRisk / stopDist : 0;
-    const notional   = oz * entry;
-    const leverage   = account > 0 ? notional / account : 0;
-
-    const rrT1 = stopDist > 0 ? Math.abs(t1 - entry) / stopDist : 0;
-    const rrT2 = stopDist > 0 ? Math.abs(t2 - entry) / stopDist : 0;
-    const profitT1 = oz * Math.abs(t1 - entry);
-    const profitT2 = oz * Math.abs(t2 - entry);
-
-    set('res-dollar-risk', '$' + dollarRisk.toFixed(2));
-    set('res-dollar-risk-detail', riskPct + '% of $' + account.toLocaleString());
-    set('res-stop-dist', stopDist.toFixed(2) + ' pts');
-    set('res-stop-pct', stopPct.toFixed(3) + '% from entry');
-    set('res-oz', oz.toFixed(3) + ' oz');
-    set('res-notional', 'Notional: $' + notional.toLocaleString(undefined, {maximumFractionDigits: 0}));
-    set('res-rr', '1:' + rrT1.toFixed(2) + ' / 1:' + rrT2.toFixed(2));
-    set('res-rr-detail', 'Profit at T1: $' + profitT1.toFixed(0) + ' | T2: $' + profitT2.toFixed(0));
-    set('res-leverage', leverage.toFixed(2) + '×');
-    set('res-leverage-detail', 'Notional $' + notional.toFixed(0) + ' vs account $' + account.toLocaleString());
-
-    const rrEl = document.getElementById('res-rr');
-    if (rrEl) {
-      rrEl.className = 'calc-result-value ' + (rrT1 >= 2 ? 'good' : rrT1 >= 1.5 ? '' : 'warn');
-    }
-  }
 
   function set(id, val) {
     const el = document.getElementById(id);
@@ -5459,34 +4886,17 @@
   // TradingView's free Lightweight Charts to render real gold candles (PAXG
   // tracks 1oz spot, CORS-enabled) and mark the desk's Entry/Stop/T1/T2 as
   // horizontal price lines. One reusable factory drives both the Scalp chart
-  // (dashboard) and the Day Trade chart (Trade Room → Day Trade Desk).
+  // (dashboard) and the Daily Bias tab charts.
 
-  // Scalp chart geometry: the live EG Scalp signal when one exists, otherwise
-  // the swing-stop fallback so the chart always has honest levels to mark.
+  // Dashboard chart geometry: macro-direction plan with a structure-based
+  // swing stop (tight, honest R-multiples).
   function scalpLevels() {
     if (!lastGoldPrice || lastGoldPrice < 100) return null;
-    const b = egScalpState && egScalpState.best;
-    if (b) return { dir: b.dir, entry: b.entry, stop: b.stop, t1: b.t1, t2: b.t2, risk: b.risk, basis: 'EG ' + b.tf };
     const p = lastGoldPrice, atr = atrOf(p);
     const md = getMacroData();
     const dirSign = md.isShort ? -1 : 1;
     const ss = swingStop(md.isShort ? 'short' : 'long', p, atr);
     return { dir: md.dir, entry: p, stop: ss.stop, t1: p + dirSign * ss.risk * 1.8, t2: p + dirSign * ss.risk * 3.0, risk: ss.risk, basis: ss.basis };
-  }
-
-  // Day chart geometry: the live EG Day Trade signal when one exists, else the
-  // macro-direction ATR fallback (1.5× ATR stop, 2R / 3.5R).
-  function dayTradeLevels() {
-    if (!lastGoldPrice || lastGoldPrice < 100) return null;
-    const b = egDayState && egDayState.best;
-    if (b) return { dir: b.dir, entry: b.entry, stop: b.stop, t1: b.t1, t2: b.t2 };
-    const p = lastGoldPrice, atr = atrOf(p);
-    const md = getMacroData();
-    const isS = md.isShort;
-    const dirSign = isS ? -1 : 1;
-    const entry = Math.round(p * (isS ? 1.0015 : 0.9985));
-    const dayStop = atr * 1.5;
-    return { dir: md.dir, entry, stop: entry - dirSign * dayStop, t1: entry + dirSign * dayStop * 2.0, t2: entry + dirSign * dayStop * 3.5 };
   }
 
   // Per-timeframe bias registry for the Multi-TF view
@@ -5635,26 +5045,6 @@
       structState.asianL !== null ? { price: structState.asianL, color: '#7A8196', title: 'ASIA L',  dashed: true } : null
     ]
   });
-  const dayChartCtl = createLevelChart({
-    chartId: 'dayChart', msgId: 'dayChartMsg', boxId: 'dayChartLevels', getLevels: dayTradeLevels, interval: '1h', zones: true,
-    extraLevels: () => {
-      const out = !structState.ok ? [] : [
-        structState.vwap !== null ? { price: structState.vwap, color: '#8B5CF6', title: 'VWAP', dashed: true } : null,
-        structState.pdh  !== null ? { price: structState.pdh,  color: '#7A8196', title: 'PDH',  dashed: true } : null,
-        structState.pdl  !== null ? { price: structState.pdl,  color: '#7A8196', title: 'PDL',  dashed: true } : null
-      ];
-      // nearest historical reaction zones (Daily Bias engine)
-      const px = lastGoldPrice;
-      if (px && rzState.length) {
-        const below = rzState.filter(z => z.mid < px).sort((a, b) => b.mid - a.mid)[0];
-        const above = rzState.filter(z => z.mid > px).sort((a, b) => a.mid - b.mid)[0];
-        if (below) out.push({ price: below.mid, color: '#D4AF37', title: 'RZ ↓' });
-        if (above) out.push({ price: above.mid, color: '#D4AF37', title: 'RZ ↑' });
-      }
-      return out;
-    }
-  });
-
   // ── Multi-timeframe view: Daily (trend) / H4 (structure) / M15 (execution) ──
   const mtfDailyCtl = createLevelChart({
     chartId: 'mtfDaily', msgId: 'mtfDailyMsg', interval: '1d', height: 300, zones: true,
@@ -5679,12 +5069,6 @@
   });
 
   function initMtfCharts() { mtfDailyCtl.init(); mtfH4Ctl.init(); mtfM15Ctl.init(); }
-
-  // Engulfing Desk charts: pure EG view — candles + zone boxes, nothing else
-  const egDailyCtl = createLevelChart({ chartId: 'egDaily', msgId: 'egDailyMsg', interval: '1d',  height: 300, zones: true });
-  const egH4Ctl    = createLevelChart({ chartId: 'egH4',    msgId: 'egH4Msg',    interval: '4h',  height: 300, zones: true });
-  const egM15Ctl   = createLevelChart({ chartId: 'egM15',   msgId: 'egM15Msg',   interval: '15m', height: 340, zones: true });
-  function initEgCharts() { egDailyCtl.init(); egH4Ctl.init(); egM15Ctl.init(); }
 
   // Top-down alignment verdict: the classic multi-timeframe filter — trade M15
   // entries only in the direction the Daily and H4 agree on.
@@ -6016,7 +5400,7 @@
   }
 
   // ─── BACKTEST LAB ───────────────────────────────────────────────────────────
-  // Walk-forward replay of the two EG Trade Room desks over real 2026 history
+  // Walk-forward replay of the two EG playbooks over real 2026 history
   // (Binance PAXGUSDT, fetched paginated from the browser). Uses the platform's
   // OWN detector — detectEngulfings — evaluated only on data available at each
   // bar (no look-ahead). Fills are conservative: if one bar touches both stop
@@ -6219,6 +5603,88 @@
     btRunning = false;
   }
 
+  // ─── FUNDAMENTALS v2 — breakevens, Fed proxy, USD momentum, positioning ─────
+  // Free, keyless, browser-fetchable drivers that institutions actually watch:
+  //   Breakeven inflation  = 10Y nominal (DGS10) − 10Y TIPS  → inflation expectations
+  //   2Y yield (DGS2)      = the market's Fed-policy proxy   → falling = dovish = gold+
+  //   DXY 5-session change = USD momentum (ICE formula, ECB reference rates)
+  //   CFTC COT             = managed-money net gold futures positioning (weekly)
+  let fundX = { breakeven: null, dgs2: null, dxyMom: null, cot: null, _ts: 0 };
+
+  async function fetchFredSeries(seriesId, limit) {
+    const url = `https://api.stlouisfed.org/fred/series/observations?series_id=${seriesId}&api_key=${apiKeys.fred}&limit=${limit}&sort_order=desc&file_type=json`;
+    const res = await fetchWithFallback([
+      `https://corsproxy.io/?url=${encodeURIComponent(url)}`,
+      `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`,
+      url
+    ]);
+    if (!res) return null;
+    const obs = (await res.json()).observations?.filter(o => o.value !== '.');
+    return obs && obs.length ? obs : null;
+  }
+
+  async function refreshFundamentalsX() {
+    if (Date.now() - fundX._ts < 30 * 60000) return;   // 30-min cadence like VIX
+    fundX._ts = Date.now();
+
+    try {
+      const [nom, tw] = await Promise.all([fetchFredSeries('DGS10', 15), fetchFredSeries('DGS2', 15)]);
+      if (nom && realYield.level !== null) {
+        const nomNow = parseFloat(nom[0].value);
+        const nomWk  = parseFloat(nom[Math.min(5, nom.length - 1)].value);
+        const beNow  = nomNow - realYield.level;
+        const beWk   = (realYield.prevWeek !== null && isFinite(nomWk)) ? nomWk - realYield.prevWeek : null;
+        if (isFinite(beNow)) fundX.breakeven = { level: +beNow.toFixed(2), chg: beWk !== null && isFinite(beWk) ? +(beNow - beWk).toFixed(2) : null };
+      }
+      if (tw) {
+        const now = parseFloat(tw[0].value);
+        const wk  = parseFloat(tw[Math.min(5, tw.length - 1)].value);
+        if (isFinite(now) && isFinite(wk)) fundX.dgs2 = { level: +now.toFixed(2), chg: +(now - wk).toFixed(2) };
+      }
+    } catch (e) { console.warn('fundamentals-x FRED failed:', e.message); }
+
+    try {
+      const iso = d => d.toISOString().slice(0, 10);
+      const res = await fetchWithFallback([
+        `https://api.frankfurter.app/${iso(new Date(Date.now() - 9 * 86400e3))}..${iso(new Date())}?from=USD&to=EUR,JPY,GBP,CAD,SEK,CHF`
+      ]);
+      if (res) {
+        const days = (await res.json()).rates || {};
+        const keys = Object.keys(days).sort();
+        if (keys.length >= 2) {
+          const ice = R => 50.14348112 * Math.pow(1 / R.EUR, -0.576) * Math.pow(R.JPY, 0.136)
+            * Math.pow(1 / R.GBP, -0.119) * Math.pow(R.CAD, 0.091) * Math.pow(R.SEK, 0.042) * Math.pow(R.CHF, 0.036);
+          const a = ice(days[keys[0]]), b = ice(days[keys[keys.length - 1]]);
+          if (isFinite(a) && isFinite(b)) fundX.dxyMom = { chg: +(b - a).toFixed(2), days: keys.length };
+        }
+      }
+    } catch (e) { console.warn('DXY momentum failed:', e.message); }
+
+    try {
+      const q = 'https://publicreporting.cftc.gov/resource/72hh-3qpy.json'
+        + '?$select=report_date_as_yyyy_mm_dd,m_money_positions_long_all,m_money_positions_short_all'
+        + '&$where=' + encodeURIComponent("commodity_name='GOLD'")
+        + '&$order=' + encodeURIComponent('report_date_as_yyyy_mm_dd DESC') + '&$limit=60';
+      const res = await fetchWithFallback([
+        q,
+        `https://corsproxy.io/?url=${encodeURIComponent(q)}`,
+        `https://api.allorigins.win/raw?url=${encodeURIComponent(q)}`
+      ]);
+      if (res) {
+        const rows = await res.json();
+        if (Array.isArray(rows) && rows.length >= 5) {
+          const nets = rows.map(r => ({ d: (r.report_date_as_yyyy_mm_dd || '').slice(0, 10),
+            net: (+r.m_money_positions_long_all || 0) - (+r.m_money_positions_short_all || 0) }));
+          const now = nets[0], m4 = nets[Math.min(4, nets.length - 1)];
+          const sorted = nets.map(n => n.net).slice().sort((x, y) => x - y);
+          const idx = sorted.findIndex(v => v >= now.net);
+          const pct = Math.round((idx < 0 ? sorted.length - 1 : idx) / Math.max(1, sorted.length - 1) * 100);
+          fundX.cot = { net: now.net, chg4w: now.net - m4.net, pct, asOf: now.d };
+        }
+      }
+    } catch (e) { console.warn('COT fetch failed:', e.message); }
+  }
+
   // ─── DAILY BIAS + REACTION ZONES ENGINE ─────────────────────────────────────
   // reactionZones: scan ~1 year of daily candles for swings where price
   // reversed hard (≥1.1× daily ATR within 4 days of touching the level),
@@ -6274,6 +5740,7 @@
   let dailyBiasState = null;
 
   async function computeDailyBias() {
+    refreshFundamentalsX();   // throttled to 30-min; first result lands on the next render
     const [d1, w1] = await Promise.all([fetchGoldKlines('1d'), fetchGoldKlines('1w')]);
     const px  = lastGoldPrice || 0;
     const md  = getMacroData();
@@ -6304,6 +5771,20 @@
     add('Price vs session VWAP', sst.ok && sst.vwap !== null ? (px >= sst.vwap ? 'long' : 'short') : null, 1,
         sst.ok && sst.vwap !== null ? (px >= sst.vwap ? 'above' : 'below') : 'no data');
     add('Risk sentiment (VIX)', vs >= 5 ? 'long' : vs <= 3 ? 'short' : null, 1, vixLabel());
+    add('Real-yield 1-wk momentum', ry.chg === null || ry.chg === undefined ? null : ry.chg <= -0.02 ? 'long' : ry.chg >= 0.02 ? 'short' : null, 2,
+        ry.chg === null || ry.chg === undefined ? 'no data' : (ry.chg >= 0 ? '+' : '') + Math.round(ry.chg * 100) + ' bps/wk');
+    const be = fundX.breakeven;
+    add('Inflation expectations (10Y breakeven)', !be || be.chg === null ? null : be.chg >= 0.02 ? 'long' : be.chg <= -0.02 ? 'short' : null, 1,
+        be ? be.level.toFixed(2) + '%' + (be.chg !== null ? ' · ' + (be.chg >= 0 ? '+' : '') + Math.round(be.chg * 100) + ' bps/wk' : '') : 'no data');
+    const d2 = fundX.dgs2;
+    add('Fed expectations (2Y yield trend)', !d2 ? null : d2.chg <= -0.03 ? 'long' : d2.chg >= 0.03 ? 'short' : null, 1,
+        d2 ? d2.level.toFixed(2) + '% · ' + (d2.chg >= 0 ? '+' : '') + Math.round(d2.chg * 100) + ' bps/wk' : 'no data');
+    const dm = fundX.dxyMom;
+    add('USD 5-day momentum (ICE DXY)', !dm ? null : dm.chg <= -0.25 ? 'long' : dm.chg >= 0.25 ? 'short' : null, 1,
+        dm ? (dm.chg >= 0 ? '+' : '') + dm.chg.toFixed(2) + ' pts / 5 sessions' : 'no data');
+    const ct = fundX.cot;
+    add('Funds positioning (COT managed money)', !ct || ct.pct >= 90 ? null : ct.chg4w > 5000 ? 'long' : ct.chg4w < -5000 ? 'short' : null, 1,
+        ct ? Math.round(ct.net / 1000) + 'k net · ' + (ct.chg4w >= 0 ? '+' : '') + Math.round(ct.chg4w / 1000) + 'k/4wk · ' + ct.pct + 'th pct' + (ct.pct >= 90 ? ' ⚠ crowded' : '') + ' · wk of ' + ct.asOf : 'no data (weekly, CFTC)');
 
     st.wTot = checks.reduce((a, c) => a + c.w, 0);
     st.net  = checks.reduce((a, c) => a + (c.dir === 'long' ? c.w : c.dir === 'short' ? -c.w : 0), 0);
@@ -6326,6 +5807,19 @@
     chartId: 'biasChart', msgId: 'biasChartMsg', interval: '1d', height: 380, zones: true,
     zonesFn: () => rzState.slice(0, 7).map((z, i) => ({ t1: z.firstT, t2: null, hi: z.hi, lo: z.lo, bull: z.side !== 'res', star: i < 3 }))
   });
+  // Nearest reaction-zone edges as gold lines (shared by the H4/M15 views)
+  function rzNearLines() {
+    const px = lastGoldPrice;
+    if (!px || !rzState.length) return [];
+    const below = rzState.filter(z => z.mid < px).sort((a, b) => b.mid - a.mid)[0];
+    const above = rzState.filter(z => z.mid > px).sort((a, b) => a.mid - b.mid)[0];
+    const out = [];
+    if (below) out.push({ price: below.hi, color: '#D4AF37', title: 'RZ ↓' });
+    if (above) out.push({ price: above.lo, color: '#D4AF37', title: 'RZ ↑' });
+    return out;
+  }
+  const biasH4Ctl  = createLevelChart({ chartId: 'biasH4',  msgId: 'biasH4Msg',  interval: '4h',  height: 300, zones: true, extraLevels: rzNearLines });
+  const biasM15Ctl = createLevelChart({ chartId: 'biasM15', msgId: 'biasM15Msg', interval: '15m', height: 300, zones: true, extraLevels: rzNearLines });
 
   const rzDate = t => new Date(t * 1000).toLocaleDateString('en-GB', { day: '2-digit', month: 'short' });
 
@@ -6335,6 +5829,7 @@
     const setH  = (id, v) => { const e = document.getElementById(id); if (e) e.innerHTML = v; };
     if (!st.ok) { setEl('bias-hint', 'Candle feed unavailable — the bias engine needs daily data.'); return; }
     biasChartCtl.init(); biasChartCtl.loadCandles();
+    biasH4Ctl.init(); biasM15Ctl.init();
 
     const isL = st.dir === 'long', isS = st.dir === 'short';
     const banner = document.getElementById('bias-banner');
@@ -6372,7 +5867,7 @@
       pb = `Bias is <strong style="color:${isL ? 'var(--accent-green)' : 'var(--accent-red)'}">${isL ? 'LONG' : 'SHORT'} (${st.conf}%)</strong>.
         Let price ${isL ? 'pull back into the demand' : 'rally into the supply'} zone <strong>${ez.lo.toFixed(0)}–${ez.hi.toFixed(0)}</strong> —
         gold reacted there <strong>${ez.events.length}×</strong> before (${dates}), biggest snap <strong>${ez.maxMove.toFixed(0)} pts</strong>.
-        Hunt an M15/H1 ${isL ? 'bullish' : 'bearish'} engulfing INSIDE the zone on the EG desks — pattern stop ${isL ? 'below ' + ez.lo.toFixed(0) : 'above ' + ez.hi.toFixed(0)}.
+        Hunt an M15/H1 ${isL ? 'bullish' : 'bearish'} engulfing INSIDE the zone (M15 execution view below) — pattern stop ${isL ? 'below ' + ez.lo.toFixed(0) : 'above ' + ez.hi.toFixed(0)}.
         ${tz ? `Ride toward <strong>${tz.mid.toFixed(0)}</strong> (${Math.abs(st.px - tz.mid).toFixed(0)} pts).` : 'No opposing zone mapped — trail the runner.'}
         The bias dies on a daily CLOSE ${isL ? 'below' : 'above'} <strong>${(isL ? ez.lo : ez.hi).toFixed(0)}</strong>.`;
     } else if (isL || isS) {
@@ -6395,247 +5890,6 @@
           <td style="font-size:11px;color:var(--text-secondary)">${z.events.slice(-3).map(e => rzDate(e.time)).join(' · ')}</td>
           <td style="${mono}">${Math.abs(st.px - z.mid).toFixed(0)} pts ${z.mid > st.px ? '↑' : '↓'}</td>
         </tr>`).join('') : '<tr><td colspan="6" class="j-empty">No qualifying reaction zones in the available history.</td></tr>';
-    }
-  }
-
-  // ─── EG DESK ENGINE — engulfing setups gated by the fundamental engine ──────
-  // Both Trade Room desks run the same playbook on different timeframes:
-  //   EG Scalp:     M5 + M15 engulfings at intraday structure (VWAP, PDH/PDL,
-  //                 Asian range, round numbers) — pattern stop, 1.8R / 3R.
-  //   EG Day Trade: H1 + H4 engulfings at daily structure — pattern stop with
-  //                 buffer, 2R / 3.5R, and the daily SMA20 trend must agree.
-  // The fundamental engine (real yields master driver + DXY + VIX + flows) is
-  // the accuracy gate: a signal WITH the macro bias gets upgraded confidence;
-  // one against it is flagged counter-trend — skip or half-size.
-
-  let egScalpState = null, egDayState = null;   // read by the chart geometry
-
-  function egChip(state, txtOk, txtWait) {
-    return state
-      ? '<span class="ems-chip ems-ok">✓ ' + txtOk + '</span>'
-      : '<span class="ems-chip ems-wait">⏳ ' + txtWait + '</span>';
-  }
-
-  // Score one engulfing event under the current fundamental bias and build
-  // its trade plan (entry = break of the pattern extreme, stop beyond the
-  // other extreme — the "proven wrong" point, which is why the stop is tight).
-  function egEvaluate(e, md, cfg) {
-    const dir = e.type === 'bull' ? 'long' : 'short';
-    const aligned = md.dir === 'wait' ? null : (md.dir === dir);
-    const buf = cfg.buf(e);
-    const entry = dir === 'long' ? e.high + 0.1 : e.low - 0.1;
-    const stop  = dir === 'long' ? e.low - buf : e.high + buf;
-    const risk  = Math.abs(entry - stop);
-    const t1 = dir === 'long' ? entry + risk * cfg.r1 : entry - risk * cfg.r1;
-    const t2 = dir === 'long' ? entry + risk * cfg.r2 : entry - risk * cfg.r2;
-    // confluence: the pattern printed inside a historical reaction zone
-    const zone = rzState.length ? rzState.find(z => entry >= z.lo - 2 && entry <= z.hi + 2) || null : null;
-    let conf = e.atLevel ? 62 : 48;
-    if (aligned === true)  conf += Math.min(18, Math.round((md.conf - 50) * 0.6));
-    if (aligned === false) conf -= 15;
-    if (cfg.trendOk === false) conf -= 8;
-    if (zone) conf += 8;
-    conf = Math.max(25, Math.min(95, conf));
-    const score = (e.atLevel ? 2 : 0) + (aligned === true ? 2 : aligned === null ? 1 : 0) + (zone ? 2 : 0) + (cfg.tfBonus || 0);
-    return { ...e, dir, aligned, zone, conf, score,
-             entry: +entry.toFixed(2), stop: +stop.toFixed(2), risk: +risk.toFixed(2),
-             t1: +t1.toFixed(2), t2: +t2.toFixed(2), r1: cfg.r1, r2: cfg.r2 };
-  }
-
-  async function computeEgScalp() {
-    const [c5, c15] = await Promise.all([fetchGoldKlines('5m'), fetchGoldKlines('15m')]);
-    const md = getMacroData();
-    const now = Date.now() / 1000;
-    const evs = [];
-    const collect = (cands, tf, maxAge, tfBonus) => {
-      for (const e of detectEngulfings(cands || []).slice(-8))
-        if (now - e.time <= maxAge)
-          evs.push(egEvaluate({ ...e, tf }, md, { r1: 1.8, r2: 3.0, tfBonus, buf: () => 0.1 }));
-    };
-    collect(c5,  'M5',  3 * 3600, 0);
-    collect(c15, 'M15', 8 * 3600, 0.5);
-    evs.sort((a, b) => b.score - a.score || b.time - a.time);
-    egScalpState = { ok: !!(c5 || c15), md, events: evs, best: evs[0] || null };
-    return egScalpState;
-  }
-
-  async function computeEgDay() {
-    const [h1, h4, d1] = await Promise.all([fetchGoldKlines('1h'), fetchGoldKlines('4h'), fetchGoldKlines('1d')]);
-    const md = getMacroData();
-    const now = Date.now() / 1000;
-    // Daily SMA20 trend — the technical half of the bias gate (and the only
-    // half the Backtest Lab can reconstruct historically)
-    let dTrend = null;
-    if (d1 && d1.length >= 21) {
-      const closes = d1.map(c => c.close);
-      dTrend = closes[closes.length - 1] >= btSma(closes, 20) ? 'long' : 'short';
-    }
-    const evs = [];
-    const collect = (cands, tf, maxAge, tfBonus) => {
-      for (const e of detectEngulfings(cands || []).slice(-8))
-        if (now - e.time <= maxAge) {
-          const dir = e.type === 'bull' ? 'long' : 'short';
-          const trendOk = dTrend === null ? null : dTrend === dir;
-          evs.push(egEvaluate({ ...e, tf }, md, {
-            r1: 2.0, r2: 3.5, trendOk,
-            tfBonus: tfBonus + (trendOk === true ? 1 : 0),
-            buf: x => Math.max(0.5, (x.high - x.low) * 0.15)
-          }));
-        }
-    };
-    collect(h1, 'H1', 48 * 3600, 0);
-    collect(h4, 'H4', 8 * 86400, 0.5);
-    evs.sort((a, b) => b.score - a.score || b.time - a.time);
-    egDayState = { ok: !!(h1 || h4), md, dTrend, events: evs, best: evs[0] || null };
-    return egDayState;
-  }
-
-  // The 4-step pipeline strip both desks render above their signal cards
-  function egPipelineHTML(st, desk) {
-    const md = st.md;
-    const ry = realYield;
-    const dxy = parseFloat(document.getElementById('dxyPrice')?.textContent) || null;
-    const bCol = md.isLong ? 'var(--accent-green)' : md.isShort ? 'var(--accent-red)' : '#D97706';
-    let nearName = null, nearDist = null;
-    const sst = structState;
-    if (sst.ok && lastGoldPrice) {
-      const px = lastGoldPrice;
-      const cand = [['VWAP', sst.vwap], ['PDH', sst.pdh], ['PDL', sst.pdl], ['Asia H', sst.asianH], ['Asia L', sst.asianL]]
-        .filter(x => x[1] !== null)
-        .map(x => [x[0], Math.abs(px - x[1])])
-        .sort((a, b) => a[1] - b[1])[0];
-      if (cand) { nearName = cand[0]; nearDist = cand[1]; }
-    }
-    const b = st.best;
-    const ageMin = b ? Math.round((Date.now() / 1000 - b.time) / 60) : null;
-    const age = ageMin === null ? '' : ageMin < 90 ? ageMin + ' min ago' : (ageMin / 60).toFixed(1) + ' h ago';
-    const trendBit = desk === 'day' && b
-      ? '<br>' + egChip(st.dTrend !== null && st.dTrend === b.dir, 'daily SMA20 trend agrees',
-          st.dTrend === null ? 'daily trend unavailable' : 'daily trend disagrees — stand down')
-      : '';
-    return `
-      <div class="ems-step">
-        <div class="ems-step-head"><span class="ems-num">1</span> FUNDAMENTAL BIAS</div>
-        <div class="ems-step-val" style="color:${bCol}">${md.isLong ? '▲ LONG' : md.isShort ? '▼ SHORT' : '— NEUTRAL'} · ${md.conf}%</div>
-        <div class="ems-step-sub">Real yields ${ry.level !== null ? ry.level.toFixed(2) + '% (' + (ry.bias || 'neutral') + ' — master driver)' : 'n/a'} · DXY ${dxy ? dxy.toFixed(1) : 'n/a'} · macro ${md.macroScore}/40</div>
-      </div>
-      <div class="ems-step">
-        <div class="ems-step-head"><span class="ems-num">2</span> STRUCTURE</div>
-        <div class="ems-step-val">${nearName ? nearName + ' · ' + nearDist.toFixed(0) + ' pts' : '—'}</div>
-        <div class="ems-step-sub">${nearName ? 'Nearest structure level. ' : 'Structure feed warming up. '}Engulfings only earn full grade AT structure (★).</div>
-      </div>
-      <div class="ems-step">
-        <div class="ems-step-head"><span class="ems-num">3</span> PATTERN — latest EG</div>
-        <div class="ems-step-val">${b ? b.tf + ' ' + (b.type === 'bull' ? '▲ BULL' : '▼ BEAR') + (b.atLevel ? ' ★' : '') : '—'}</div>
-        <div class="ems-step-sub">${b ? age + (b.atLevel ? ' at ' + b.atLevel : ' (mid-range — B-grade)') + trendBit : 'No engulfing in the scan window — the desk is flat by design.'}</div>
-      </div>
-      <div class="ems-step">
-        <div class="ems-step-head"><span class="ems-num">4</span> EXECUTE — bias gate</div>
-        <div class="ems-step-val">${b ? (b.aligned === true ? '<span style="color:var(--accent-green)">WITH BIAS — full size</span>' : b.aligned === false ? '<span style="color:var(--accent-red)">COUNTER-TREND — skip/half</span>' : '<span style="color:#D97706">MACRO NEUTRAL — half size</span>') : '—'}</div>
-        <div class="ems-step-sub">${b ? 'Entry ' + b.entry.toLocaleString() + ' · stop ' + b.stop.toLocaleString() + ' (' + b.risk.toFixed(1) + ' pts) · T1 ' + b.t1.toLocaleString() + (b.zone ? ' · <span style=\"color:#D4AF37;font-weight:800\">⚡ inside reaction zone</span>' : '') : 'Wait for the next qualifying engulfing.'}</div>
-      </div>`;
-  }
-
-  // Sizing comes from the Position Calc settings (persisted): scalps risk
-  // half the day-trade percentage, matching the desk checklists.
-  function riskSettings() {
-    return { acct: parseFloat(localStorage.getItem('acct_size')) || 10000,
-             pct:  parseFloat(localStorage.getItem('risk_pct'))  || 1.0 };
-  }
-  function egSizeText(riskPts, desk) {
-    if (!(riskPts > 0)) return '—';
-    const rs  = riskSettings();
-    const pct = desk === 'scalp' ? rs.pct * 0.5 : rs.pct;
-    const usd = rs.acct * pct / 100;
-    const oz  = usd / riskPts;
-    return `${oz.toFixed(2)} oz <span style="font-size:10px;color:var(--text-tertiary)">($${usd.toFixed(0)} = ${pct.toFixed(2)}% of $${rs.acct.toLocaleString()})</span>`;
-  }
-
-  // Signal cards (top 3 events) — shared by both desks
-  function egSetupCardsHTML(st, desk) {
-    const md = st.md;
-    if (!st.events.length) return `
-      <div class="setup-card">
-        <div class="setup-card-head wait"><span class="setup-card-type">No engulfing in the scan window</span><span class="setup-card-pct">—</span></div>
-        <div class="setup-card-body"><div class="scard-reason">The desk trades ONLY printed engulfings — no pattern, no trade. That is the edge, not a malfunction. Check back after the next few candles close, or watch the Engulfing Desk scanner.</div></div>
-      </div>`;
-    const mono = "font-family:'JetBrains Mono',monospace";
-    return st.events.slice(0, 3).map(e => {
-      const isB = e.type === 'bull';
-      const tstr = new Date(e.time * 1000).toLocaleString('en-GB', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit', hour12: false, timeZone: 'UTC' });
-      const zoneBit = e.zone ? `⚡ Inside the ${e.zone.lo.toFixed(0)}–${e.zone.hi.toFixed(0)} reaction zone (reacted ${e.zone.events.length}× before) — the highest-probability location on the platform. ` : '';
-      const reason = zoneBit + (e.aligned === true
-        ? `Prints ${e.atLevel ? 'at ' + e.atLevel : 'mid-range'} WITH the fundamental bias (macro ${md.conf}% ${md.dir}${realYield.bias ? ', real yields ' + realYield.bias : ''}). Enter on the break of the pattern extreme; the stop sits where the reversal is proven wrong.`
-        : e.aligned === false
-        ? 'AGAINST the fundamental bias — counter-trend. Playbook: skip, or half-size with an early exit at 1R. Fighting the real-yield regime is how win rates die.'
-        : 'Macro engine is neutral — pattern-only trade. Half size, and only worth it if printed at structure (★).');
-      return `
-        <div class="setup-card">
-          <div class="setup-card-head ${e.dir}">
-            <span class="setup-card-type">${e.tf} ${isB ? 'Bullish' : 'Bearish'} Engulfing${e.atLevel ? ' ★ ' + e.atLevel : ''}${e.zone ? ' ⚡RZ' : ''}</span>
-            <span class="setup-card-pct">${e.conf}%</span>
-          </div>
-          <div class="setup-card-body">
-            <div class="scard-row"><span class="scard-lbl">Printed</span><span class="scard-val" style="${mono}">${tstr} UTC</span></div>
-            <div class="scard-row"><span class="scard-lbl">Direction</span><span class="scard-val ${e.dir === 'long' ? 'green' : 'red'}">${e.dir.toUpperCase()}${e.aligned === false ? ' ⚠ counter' : ''}</span></div>
-            <div class="scard-row"><span class="scard-lbl">Entry (break)</span><span class="scard-val">${e.entry.toFixed(2)}</span></div>
-            <div class="scard-row"><span class="scard-lbl">Stop Loss</span><span class="scard-val red">${e.stop.toFixed(2)} <span style="font-size:10px;color:var(--text-tertiary)">(${e.risk.toFixed(1)} pts)</span></span></div>
-            <div class="scard-row"><span class="scard-lbl">Target 1</span><span class="scard-val green">${e.t1.toFixed(2)} <span style="font-size:10px;color:var(--text-tertiary)">(${e.r1}R)</span></span></div>
-            <div class="scard-row"><span class="scard-lbl">Target 2</span><span class="scard-val green">${e.t2.toFixed(2)} <span style="font-size:10px;color:var(--text-tertiary)">(${e.r2}R)</span></span></div>
-            <div class="scard-row"><span class="scard-lbl">Size</span><span class="scard-val">${egSizeText(e.risk, desk)}</span></div>
-            <div class="scard-reason">${reason}</div>
-          </div>
-        </div>`;
-    }).join('');
-  }
-
-  // ─── ENGULFING SCANNER (Engulfing Desk table) ───────────────────────────────
-  async function renderEngulfDesk() {
-    const body = document.getElementById('engulfScanBody');
-    const ts   = document.getElementById('engulfScanTs');
-    if (!body) return;
-    try {
-      const [c5, c15] = await Promise.all([fetchGoldKlines('5m'), fetchGoldKlines('15m')]);
-      const rows = [];
-      const collect = (cands, tf) => {
-        if (!cands) return;
-        for (const e of detectEngulfings(cands).slice(-8)) rows.push({ ...e, tf });
-      };
-      collect(c5, 'M5'); collect(c15, 'M15');
-      rows.sort((a, b) => b.time - a.time);
-      if (ts) ts.textContent = 'scanned ' + new Date().toLocaleTimeString('en-US', { hour12: false, timeZone: 'UTC' }) + ' UTC';
-      if (!rows.length) {
-        const n5 = c5 ? c5.length : 0, n15 = c15 ? c15.length : 0;
-        body.innerHTML = `<tr><td colspan="9" class="j-empty">${(n5 + n15) === 0
-          ? 'Candle feed unavailable in this region — scanner cannot run.'
-          : `Scanned ${n5} M5 + ${n15} M15 candles — no qualifying engulfings right now (quiet tape). The scanner re-runs each time you open this tab.`}</td></tr>`;
-        return;
-      }
-      const mono = "font-family:'JetBrains Mono',monospace";
-      body.innerHTML = rows.slice(0, 14).map(e => {
-        const isB   = e.type === 'bull';
-        const entry = isB ? e.high : e.low;              // break of pattern extreme
-        const stop  = isB ? e.low  : e.high;             // beyond the other extreme
-        const risk  = Math.abs(entry - stop);
-        const t1    = isB ? entry + risk * 1.8 : entry - risk * 1.8;
-        const t2    = isB ? entry + risk * 3.0 : entry - risk * 3.0;
-        const tstr  = new Date(e.time * 1000).toLocaleString('en-GB', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit', hour12: false, timeZone: 'UTC' });
-        const col   = isB ? 'var(--accent-green)' : 'var(--accent-red)';
-        return `<tr style="${e.atLevel ? '' : 'opacity:0.55;'}">
-          <td style="white-space:nowrap;color:var(--text-secondary)">${tstr}</td>
-          <td style="${mono}">${e.tf}</td>
-          <td style="font-weight:800;color:${col}">${isB ? '▲ BULL' : '▼ BEAR'}</td>
-          <td>${e.atLevel ? '<span style="color:#B8860B;font-weight:800;">★ ' + e.atLevel + '</span>' : '<span style="color:var(--text-tertiary)">raw</span>'}</td>
-          <td style="${mono}">${entry.toFixed(1)}</td>
-          <td style="${mono};color:var(--accent-red)">${stop.toFixed(1)}</td>
-          <td style="${mono};font-weight:700">${risk.toFixed(0)} pts</td>
-          <td style="${mono};color:var(--accent-green)">${t1.toFixed(1)}</td>
-          <td style="${mono};color:var(--accent-green)">${t2.toFixed(1)}</td>
-        </tr>`;
-      }).join('');
-    } catch (e) {
-      console.warn('engulf scan failed:', e.message);
-      body.innerHTML = '<tr><td colspan="9" class="j-empty">Scanner unavailable — candle feed blocked.</td></tr>';
     }
   }
 
@@ -6764,22 +6018,6 @@
               changeEl.innerHTML = '<span style="color: var(--text-tertiary);">—</span>';
             }
           }
-          // Auto-seed the position calculator from the live price (until the
-          // user edits a field). Stop/targets are placed at ATR-based offsets
-          // around the live entry so the calc is always sensible (long bias).
-          const entryEl = document.getElementById('entryPrice');
-          if (entryEl && entryEl.dataset.touched !== '1') {
-            const p   = Math.round(lastGoldPrice);
-            const atr = atrOf(lastGoldPrice);
-            entryEl.value = p;
-            const stopEl = document.getElementById('stopPrice');
-            const t1El   = document.getElementById('target1');
-            const t2El   = document.getElementById('target2');
-            if (stopEl && stopEl.dataset.touched !== '1') stopEl.value = Math.round(p - atr * 1.5);
-            if (t1El   && t1El.dataset.touched   !== '1') t1El.value   = Math.round(p + atr * 1.5);
-            if (t2El   && t2El.dataset.touched   !== '1') t2El.value   = Math.round(p + atr * 3.0);
-            calcPosition();
-          }
           updateSetupBoard();
           console.log('Gold price updated:', lastGoldPrice, 'via', spot.source);
         } else {
@@ -6860,9 +6098,6 @@
       // Gold/Silver ratio
       updateGoldSilverRatio();
 
-      // Auto-log / resolve the dashboard's own signals against live price
-      trackSignal();
-
       // Refresh real ATR(14) + intraday structure (both cached internally)
       refreshRealATR();
       refreshStructure();
@@ -6877,12 +6112,6 @@
       // Refresh active views (always recompute analysis cards from live price)
       updateAnalysisTab();
       if (activeSection === 'dashboard') renderDashboard();
-      if (activeSection === 'traderoom') {
-        const act = document.querySelector('.snav-btn.active');
-        if (act?.dataset?.tab === 'scalp')    renderScalpDesk();
-        if (act?.dataset?.tab === 'daytrade') renderDayTradeDesk();
-      }
-
       // Settle boot placeholders: anything still "…" after a full update
       // cycle means that feed is unavailable — show an honest dash instead.
       for (const tid of ['goldPrice', 'dxyPrice', 'tipsYield', 'vixVal']) {
@@ -6903,16 +6132,10 @@
   }
 
   // NOTE: app bootstrap is invoked at the very end of this script (after all
-  // top-level `let` globals like realYield / signalLog are initialized) to
-  // avoid a temporal-dead-zone error during initializeApp().
+  // top-level `let` globals like realYield are initialized) to avoid a
+  // temporal-dead-zone error during initializeApp().
 
   function initializeApp() {
-    // Restore persisted risk settings into the Position Calc inputs
-    try {
-      const _as = localStorage.getItem('acct_size'), _rp = localStorage.getItem('risk_pct');
-      if (_as && document.getElementById('accountSize')) document.getElementById('accountSize').value = _as;
-      if (_rp && document.getElementById('riskPct')) document.getElementById('riskPct').value = _rp;
-    } catch (e) {}
     // Theme FIRST — dark terminal by default (institutional standard); an
     // explicit user toggle ('0' = light) is respected. Must run before
     // initChart() so the TradingView embed picks the right theme.
@@ -6924,14 +6147,12 @@
     }
 
     seedRealYield();
-    calcPosition();
     updateSessionBar();
     renderSessionGrid();
     edgeConfluence();
     updateSetupBoard();
     updateAnalysisTab();
     renderCalendar();
-    renderSignalTracker();
     renderEventRiskBanner();
     renderInstitutionalFlows();
 
@@ -6945,7 +6166,6 @@
     // Initialize charts
     initChart();
     scalpChartCtl.init();
-    dayChartCtl.init();
 
     // Set up periodic updates
     const updateInterval = setInterval(() => {
@@ -6960,15 +6180,8 @@
     // Boot institutional nav on Dashboard
     switchSection('dashboard', document.querySelector('[data-section=dashboard]'));
 
-    // Pre-fill today's date in journal form
-    const jDateEl = document.getElementById('jDate');
-    if (jDateEl) jDateEl.valueAsDate = new Date();
-
     // Restore alert badge
     updateAlertBadge();
-
-    // Render journal on load (so stats show persisted data)
-    renderJournal();
 
     // Start alert checker every 5 seconds
     setInterval(checkAlerts, 5000);
@@ -7095,238 +6308,13 @@
     }
   });
 
-  // ─── TRADE JOURNAL ──────────────────────────────────────────────────────────
-  let tradeJournal = JSON.parse(localStorage.getItem('goldJournal') || '[]');
-
-  function saveJournal() {
-    localStorage.setItem('goldJournal', JSON.stringify(tradeJournal));
-  }
-
-  // ─── SIGNAL TRACKER — auto-logged record of the dashboard's own signals ──────
-  let signalLog = JSON.parse(localStorage.getItem('goldSignalLog') || '[]');
-  function saveSignalLog() { localStorage.setItem('goldSignalLog', JSON.stringify(signalLog)); }
-
-  // Called on every price tick. Logs a new setup when the primary signal flips,
-  // and resolves any open setups live against price (T1 = win, stop = loss).
-  function trackSignal() {
-    if (!lastGoldPrice || lastGoldPrice < 100) return;
-    const md = getMacroData();
-    const dir = md.dir; // 'long' | 'short' | 'wait'
-
-    // 1) Resolve open setups against live price
-    let changed = false;
-    for (const s of signalLog) {
-      if (s.status !== 'OPEN') continue;
-      const hitT1   = s.dir === 'long' ? lastGoldPrice >= s.t1   : lastGoldPrice <= s.t1;
-      const hitStop = s.dir === 'long' ? lastGoldPrice <= s.stop : lastGoldPrice >= s.stop;
-      if (hitT1)   { s.status = 'WIN';  s.resolvedTs = Date.now(); s.resolvedPrice = lastGoldPrice; s.resultR = +Math.abs((s.t1 - s.entry) / (s.entry - s.stop)); changed = true; }
-      else if (hitStop) { s.status = 'LOSS'; s.resolvedTs = Date.now(); s.resolvedPrice = lastGoldPrice; s.resultR = -1; changed = true; }
-    }
-
-    // 2) Log a new setup only when the primary direction flips to a new,
-    //    non-wait signal (one setup per directional regime — no re-logging).
-    const last = signalLog[0];
-    const needNew = dir !== 'wait' && (!last || last.dir !== dir);
-
-    if (needNew) {
-      // Close any still-open setup of the opposite direction at market (flip exit)
-      for (const s of signalLog) {
-        if (s.status === 'OPEN') {
-          s.status = 'FLIPPED';
-          s.resolvedTs = Date.now(); s.resolvedPrice = lastGoldPrice;
-          const risk = Math.abs(s.entry - s.stop) || 1;
-          s.resultR = ((s.dir === 'long' ? (lastGoldPrice - s.entry) : (s.entry - lastGoldPrice)) / risk);
-        }
-      }
-      const p    = lastGoldPrice;
-      const atr  = atrOf(p);
-      const isL  = dir === 'long';
-      const entry = p;
-      const stop  = isL ? p - atr * 1.5 : p + atr * 1.5;   // day-trade profile (1.5× ATR)
-      const t1    = isL ? p + atr * 3.0 : p - atr * 3.0;   // 2R
-      const t2    = isL ? p + atr * 5.25 : p - atr * 5.25; // 3.5R
-      const si = getSessionInfo();
-      signalLog.unshift({
-        id: Date.now(),
-        ts: Date.now(),
-        dir,
-        entry: +entry.toFixed(2), stop: +stop.toFixed(2), t1: +t1.toFixed(2), t2: +t2.toFixed(2),
-        macroScore: md.macroScore, conf: md.conf,
-        session: si.name, ryBias: realYield.bias || 'neutral',
-        status: 'OPEN', resolvedTs: null, resolvedPrice: null, resultR: null
-      });
-      if (signalLog.length > 200) signalLog = signalLog.slice(0, 200);
-      changed = true;
-    }
-
-    if (changed) { saveSignalLog(); if (activeSection === 'utilities') renderSignalTracker(); }
-  }
-
-  function clearSignalLog() {
-    if (!confirm('Clear the entire signal track record? This cannot be undone.')) return;
-    signalLog = [];
-    saveSignalLog();
-    renderSignalTracker();
-  }
-
-  function renderSignalTracker() {
-    const body = document.getElementById('trackerBody');
-    const set  = (id, v) => { const e = document.getElementById(id); if (e) e.textContent = v; };
-
-    const resolved = signalLog.filter(s => s.status === 'WIN' || s.status === 'LOSS');
-    const wins     = signalLog.filter(s => s.status === 'WIN').length;
-    const losses   = signalLog.filter(s => s.status === 'LOSS').length;
-    const openOnes = signalLog.filter(s => s.status === 'OPEN');
-    const rVals    = signalLog.filter(s => typeof s.resultR === 'number');
-    const avgR     = rVals.length ? (rVals.reduce((a, s) => a + s.resultR, 0) / rVals.length) : null;
-
-    set('tkTotal', signalLog.length);
-    set('tkWinRate', resolved.length ? Math.round(wins / resolved.length * 100) + '%' : '—');
-    set('tkAvgR', avgR === null ? '—' : (avgR >= 0 ? '+' : '') + avgR.toFixed(2) + 'R');
-    set('tkOpen', openOnes.length ? `${openOnes[0].dir.toUpperCase()} (${openOnes.length})` : 'None');
-
-    if (!body) return;
-    if (!signalLog.length) {
-      body.innerHTML = '<tr><td colspan="9" class="j-empty">No signals logged yet — the tracker starts recording as soon as the dashboard produces a directional signal.</td></tr>';
-      return;
-    }
-
-    body.innerHTML = signalLog.map(s => {
-      const d = new Date(s.ts);
-      const tstr = d.toLocaleString('en-GB', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit', hour12: false, timeZone: 'UTC' });
-      const dirCls = s.dir === 'long' ? 'j-dir-long' : 'j-dir-short';
-      const statusMap = {
-        WIN:     ['WIN',     'var(--accent-green)'],
-        LOSS:    ['LOSS',    'var(--accent-red)'],
-        OPEN:    ['OPEN',    '#D97706'],
-        FLIPPED: ['FLIPPED', 'var(--text-tertiary)']
-      };
-      const [stTxt, stCol] = statusMap[s.status] || ['—', 'var(--text-tertiary)'];
-      const rTxt = (typeof s.resultR === 'number') ? (s.resultR >= 0 ? '+' : '') + s.resultR.toFixed(2) + 'R' : '—';
-      const rCol = (typeof s.resultR === 'number') ? (s.resultR >= 0 ? 'var(--accent-green)' : 'var(--accent-red)') : 'var(--text-tertiary)';
-      const mono = "font-family:'JetBrains Mono',monospace";
-      return `<tr>
-        <td style="color:var(--text-secondary);white-space:nowrap">${tstr}</td>
-        <td><span class="${dirCls}">${s.dir.toUpperCase()}</span></td>
-        <td style="${mono}">${s.entry.toLocaleString()}</td>
-        <td style="${mono};color:var(--accent-red)">${s.stop.toLocaleString()}</td>
-        <td style="${mono};color:var(--accent-green)">${s.t1.toLocaleString()}</td>
-        <td style="${mono}">${s.macroScore}/40</td>
-        <td style="color:var(--text-tertiary)">${s.session}</td>
-        <td style="font-weight:800;color:${stCol}">${stTxt}</td>
-        <td style="${mono};font-weight:700;color:${rCol}">${rTxt}</td>
-      </tr>`;
-    }).join('');
-  }
-
-  function addTrade() {
-    const date  = document.getElementById('jDate').value;
-    const dir   = document.getElementById('jDir').value;
-    const entry = parseFloat(document.getElementById('jEntry').value);
-    const sl    = parseFloat(document.getElementById('jSL').value);
-    const exit  = parseFloat(document.getElementById('jExit').value);
-    const size  = parseFloat(document.getElementById('jSize').value) || 1;
-    const notes = document.getElementById('jNotes').value.trim();
-
-    if (!date || isNaN(entry) || isNaN(exit) || isNaN(sl)) {
-      alert('Please fill in Date, Entry, SL, and Exit fields.');
-      return;
-    }
-
-    const risk     = Math.abs(entry - sl);
-    const reward   = dir === 'long' ? (exit - entry) : (entry - exit);
-    const rr       = risk > 0 ? (reward / risk) : 0;
-    const pnlPts   = dir === 'long' ? (exit - entry) : (entry - exit);
-
-    tradeJournal.unshift({
-      id: Date.now(),
-      date, dir, entry, sl, exit, size, notes,
-      risk, reward, rr: parseFloat(rr.toFixed(2)), pnlPts: parseFloat(pnlPts.toFixed(2))
-    });
-
-    saveJournal();
-    renderJournal();
-
-    // Clear form (keep date and direction)
-    document.getElementById('jEntry').value = '';
-    document.getElementById('jSL').value    = '';
-    document.getElementById('jExit').value  = '';
-    document.getElementById('jNotes').value = '';
-  }
-
-  function deleteTrade(id) {
-    tradeJournal = tradeJournal.filter(t => t.id !== id);
-    saveJournal();
-    renderJournal();
-  }
-
-  function renderJournal() {
-    calcJournalStats();
-    const tbody = document.getElementById('journalBody');
-    if (!tbody) return;
-    if (tradeJournal.length === 0) {
-      tbody.innerHTML = '<tr><td colspan="11" class="j-empty">No trades logged yet — add your first trade above</td></tr>';
-      return;
-    }
-    tbody.innerHTML = tradeJournal.map(t => {
-      const outcome = t.pnlPts > 0 ? 'WIN' : (t.pnlPts < 0 ? 'LOSS' : 'B/E');
-      const cls     = t.pnlPts > 0 ? 'j-win' : (t.pnlPts < 0 ? 'j-loss' : 'j-be');
-      const dirCls  = t.dir === 'long' ? 'j-dir-long' : 'j-dir-short';
-      const sign    = t.pnlPts >= 0 ? '+' : '';
-      return `<tr>
-        <td>${t.date}</td>
-        <td><span class="${dirCls}">${t.dir.toUpperCase()}</span></td>
-        <td style="font-family:'JetBrains Mono',monospace">${t.entry.toFixed(2)}</td>
-        <td style="font-family:'JetBrains Mono',monospace">${t.sl.toFixed(2)}</td>
-        <td style="font-family:'JetBrains Mono',monospace">${t.exit.toFixed(2)}</td>
-        <td style="font-family:'JetBrains Mono',monospace">${t.size}</td>
-        <td class="${cls}">${sign}${t.pnlPts.toFixed(2)}</td>
-        <td style="font-family:'JetBrains Mono',monospace;color:var(--text-secondary)">${t.rr.toFixed(2)}</td>
-        <td class="${cls}">${outcome}</td>
-        <td style="color:var(--text-tertiary);max-width:140px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${t.notes}</td>
-        <td><span class="j-del-btn" onclick="deleteTrade(${t.id})">✕</span></td>
-      </tr>`;
-    }).join('');
-  }
-
-  function calcJournalStats() {
-    const total = tradeJournal.length;
-    if (total === 0) {
-      ['jTotalTrades','jWinRate','jAvgRR','jPnl','jPF'].forEach(id => {
-        const el = document.getElementById(id);
-        if (el) el.textContent = id === 'jTotalTrades' ? '0' : '—';
-      });
-      return;
-    }
-    const wins      = tradeJournal.filter(t => t.pnlPts > 0).length;
-    const winRate   = ((wins / total) * 100).toFixed(1) + '%';
-    const avgRR     = (tradeJournal.reduce((s, t) => s + t.rr, 0) / total).toFixed(2);
-    const totalPnl  = tradeJournal.reduce((s, t) => s + t.pnlPts * t.size, 0);
-    const grossWin  = tradeJournal.filter(t => t.pnlPts > 0).reduce((s, t) => s + t.pnlPts * t.size, 0);
-    const grossLoss = Math.abs(tradeJournal.filter(t => t.pnlPts < 0).reduce((s, t) => s + t.pnlPts * t.size, 0));
-    const pf        = grossLoss > 0 ? (grossWin / grossLoss).toFixed(2) : grossWin > 0 ? '∞' : '—';
-    const sign      = totalPnl >= 0 ? '+' : '';
-
-    const set = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val; };
-    set('jTotalTrades', total);
-    set('jWinRate', winRate);
-    set('jAvgRR', avgRR);
-    set('jPnl', sign + totalPnl.toFixed(2));
-    set('jPF', pf);
-
-    // Colour P&L stat
-    const pnlEl = document.getElementById('jPnl');
-    if (pnlEl) pnlEl.style.color = totalPnl >= 0 ? 'var(--accent-green)' : 'var(--accent-red)';
-  }
 
   // ─── INSTITUTIONAL NAVIGATION ───────────────────────────────────────────────
 
   const NAV_SECTIONS = {
     dashboard: { tabs: [{ id: 'dashboard', label: 'Overview' }] },
     markets:   { tabs: [{ id: 'bias', label: 'Daily Bias' }, { id: 'analysis', label: 'Live Analysis' }, { id: 'mtf', label: 'Multi-TF Charts' }, { id: 'redfolder', label: 'Red Folder' }, { id: 'sessions', label: 'Trade Sessions' }, { id: 'calendar', label: 'Economic Calendar' }] },
-    traderoom: { tabs: [{ id: 'scalp',    label: 'EG Scalp' },      { id: 'daytrade', label: 'EG Day Trade' },   { id: 'engulf', label: 'Engulfing Desk' }, { id: 'strategy', label: 'Strategy Guide' }] },
-    research:  { tabs: [{ id: 'edges',    label: 'Edge Lab' }, { id: 'backtest', label: 'Backtest Lab' }, { id: 'intel', label: 'Intel Sources' }] },
-    utilities: { tabs: [{ id: 'calculator', label: 'Position Calc' }, { id: 'tracker', label: 'Signal Tracker' }, { id: 'journal', label: 'Trade Journal' }] }
+    research:  { tabs: [{ id: 'edges',    label: 'Edge Lab' }, { id: 'backtest', label: 'Backtest Lab' }, { id: 'intel', label: 'Intel Sources' }] }
   };
 
   let activeSection = 'dashboard';
@@ -7834,194 +6822,6 @@
   }
 
   // ─── SCALP DESK ─────────────────────────────────────────────────────────────
-
-  async function renderScalpDesk() {
-    if (!lastGoldPrice) return;
-    const price = lastGoldPrice;
-    const atr   = atrOf(price);
-    const si    = getSessionInfo();
-    const st    = await computeEgScalp();
-    const md    = st.md;
-    const b     = st.best;
-
-    const dir = b ? b.dir : 'wait';
-    const banner = document.getElementById('scalp-banner');
-    if (banner) banner.className = `desk-banner ${b && b.aligned !== false ? dir : 'wait'}`;
-    const setEl = (id, v) => { const e = document.getElementById(id); if (e) e.textContent = v; };
-
-    setEl('scalp-arrow', b ? (dir === 'long' ? '↑' : '↓') : '→');
-    setEl('scalp-word',  b ? dir.toUpperCase() + (b.aligned === false ? ' ⚠' : '') : 'WAIT');
-    setEl('scalp-conf', (b ? b.conf : md.conf) + '% confidence');
-
-    if (b) {
-      setEl('scalp-entry', b.entry.toFixed(2));
-      setEl('scalp-stop',  b.stop.toFixed(2));
-      setEl('scalp-stop-pts', b.risk.toFixed(1) + ' pts · ' + b.tf + ' pattern stop');
-      setEl('scalp-t1', b.t1.toFixed(2));
-      setEl('scalp-t1-pts', (b.risk * 1.8).toFixed(1) + ' pts · 1.8R');
-      setEl('scalp-t2', b.t2.toFixed(2));
-      setEl('scalp-t2-pts', (b.risk * 3.0).toFixed(1) + ' pts · 3.0R');
-    } else {
-      // no engulfing in the window — show honest fallback geometry, flagged WAIT
-      const ss  = swingStop(md.isShort ? 'short' : 'long', price, atr);
-      const sgn = md.isShort ? -1 : 1;
-      setEl('scalp-entry', price.toFixed(2));
-      setEl('scalp-stop',  ss.stop.toFixed(2));
-      setEl('scalp-stop-pts', ss.risk.toFixed(0) + ' pts · ' + ss.basis + ' (no EG yet)');
-      setEl('scalp-t1', (price + sgn * ss.risk * 1.8).toFixed(2));
-      setEl('scalp-t1-pts', (ss.risk * 1.8).toFixed(0) + ' pts · 1.8R');
-      setEl('scalp-t2', (price + sgn * ss.risk * 3.0).toFixed(2));
-      setEl('scalp-t2-pts', (ss.risk * 3.0).toFixed(0) + ' pts · 3.0R');
-    }
-    setEl('scalp-session', si.name + ' SESSION');
-    setEl('scalp-session-time', si.sub);
-    setEl('scalp-hint', (b ? (b.aligned === true ? 'EG + fundamental bias aligned. '
-                             : b.aligned === false ? 'EG is COUNTER the fundamental bias — reduce or skip. '
-                             : 'Macro neutral — pattern-only. ')
-                           : 'No engulfing printed — the desk waits. ')
-                        + si.hint + realYieldTag() + eventRiskTag());
-
-    // 4-step pipeline strip
-    const stepsEl = document.getElementById('scalp-eg-steps');
-    if (stepsEl) stepsEl.innerHTML = egPipelineHTML(st, 'scalp');
-
-    // signal cards
-    const gridEl = document.getElementById('scalp-setups-grid');
-    if (gridEl) gridEl.innerHTML = egSetupCardsHTML(st, 'scalp');
-
-    // Key levels — the structure the engulfings must print at
-    const levelsEl = document.getElementById('scalp-levels-list');
-    if (levelsEl) {
-      const nearest100 = Math.round(price / 100) * 100;
-      const nearest50  = Math.round(price / 50)  * 50;
-      const nearest25  = Math.round(price / 25)  * 25;
-      const levels = [
-        { tag: 'psy', type: 'PSY', name: `Round 100: $${nearest100}`, price: nearest100, dist: Math.abs(price - nearest100) },
-        { tag: 'psy', type: 'PSY', name: `Half-Level: $${nearest50}`, price: nearest50,  dist: Math.abs(price - nearest50) },
-        { tag: nearest25 < price ? 'sup' : 'res', type: nearest25 < price ? 'SUP' : 'RES', name: `Quarter: $${nearest25}`, price: nearest25, dist: Math.abs(price - nearest25) },
-        { tag: 'key', type: 'ATR', name: `ATR High (0.9×): ${(price + atr * 0.9).toFixed(0)}`, price: Math.round(price + atr * 0.9), dist: atr * 0.9 },
-        { tag: 'key', type: 'ATR', name: `ATR Low  (0.9×): ${(price - atr * 0.9).toFixed(0)}`, price: Math.round(price - atr * 0.9), dist: atr * 0.9 }
-      ];
-      const sst = structState;
-      if (sst.ok) {
-        if (sst.vwap   !== null) levels.push({ tag: 'key', type: 'VWAP', name: 'Session VWAP (live)', price: Math.round(sst.vwap),   dist: Math.abs(price - sst.vwap) });
-        if (sst.pdh    !== null) levels.push({ tag: 'res', type: 'PDH',  name: 'Previous Day High',   price: Math.round(sst.pdh),    dist: Math.abs(price - sst.pdh) });
-        if (sst.pdl    !== null) levels.push({ tag: 'sup', type: 'PDL',  name: 'Previous Day Low',    price: Math.round(sst.pdl),    dist: Math.abs(price - sst.pdl) });
-        if (sst.asianH !== null) levels.push({ tag: 'res', type: 'ASIA', name: 'Asian Range High (London breakout)', price: Math.round(sst.asianH), dist: Math.abs(price - sst.asianH) });
-        if (sst.asianL !== null) levels.push({ tag: 'sup', type: 'ASIA', name: 'Asian Range Low',     price: Math.round(sst.asianL), dist: Math.abs(price - sst.asianL) });
-      }
-      levels.sort((a, b) => a.dist - b.dist);
-      levelsEl.innerHTML = levels.map(l => `
-        <div class="level-row">
-          <span class="level-row-tag ${l.tag}">${l.type}</span>
-          <span class="level-row-name">${l.name}</span>
-          <span class="level-row-price">${l.price.toLocaleString()}</span>
-          <span class="level-row-dist">${l.dist.toFixed(0)} pts</span>
-        </div>`).join('');
-    }
-
-    // Signal quality grade — the selectivity filter
-    const qEl = document.getElementById('scalp-quality');
-    if (qEl) qEl.innerHTML = dir === 'wait' ? '' : qualityBadgeHTML(dir);
-
-    scalpChartCtl.updateLevels();
-  }
-
-  // ─── DAY TRADE DESK ─────────────────────────────────────────────────────────
-
-  async function renderDayTradeDesk() {
-    if (!lastGoldPrice) return;
-    const price = lastGoldPrice;
-    const atr   = atrOf(price);
-    const si    = getSessionInfo();
-    const st    = await computeEgDay();
-    const md    = st.md;
-    const b     = st.best;
-
-    const dir = b ? b.dir : 'wait';
-    const banner = document.getElementById('daytrade-banner');
-    if (banner) banner.className = `desk-banner ${b && b.aligned !== false ? dir : 'wait'}`;
-    const setEl = (id, v) => { const e = document.getElementById(id); if (e) e.textContent = v; };
-
-    setEl('dt-arrow', b ? (dir === 'long' ? '↑' : '↓') : '→');
-    setEl('dt-word',  b ? dir.toUpperCase() + (b.aligned === false ? ' ⚠' : '') : 'WAIT');
-    setEl('dt-conf',  (b ? b.conf : md.conf) + '% confidence');
-
-    if (b) {
-      setEl('dt-entry', b.entry.toFixed(2));
-      setEl('dt-stop',  b.stop.toFixed(2));
-      setEl('dt-stop-pts', b.risk.toFixed(1) + ' pts · ' + b.tf + ' pattern stop');
-      setEl('dt-t1',    b.t1.toFixed(2));
-      setEl('dt-t1-pts', (b.risk * 2.0).toFixed(1) + ' pts · 2R — 50% out');
-      setEl('dt-t2',    b.t2.toFixed(2));
-      setEl('dt-t2-pts', (b.risk * 3.5).toFixed(1) + ' pts · 3.5R — full exit');
-    } else {
-      const isS = md.isShort;
-      const sgn = isS ? -1 : 1;
-      const entry = Math.round(price * (isS ? 1.0015 : 0.9985));
-      const dayStop = atr * 1.5;
-      setEl('dt-entry', entry.toLocaleString());
-      setEl('dt-stop',  Math.round(entry - sgn * dayStop).toLocaleString());
-      setEl('dt-stop-pts', dayStop.toFixed(0) + ' pts · 1.5× ATR (no EG yet)');
-      setEl('dt-t1',    Math.round(entry + sgn * dayStop * 2.0).toLocaleString());
-      setEl('dt-t1-pts', (dayStop * 2.0).toFixed(0) + ' pts · 2R — 50% out');
-      setEl('dt-t2',    Math.round(entry + sgn * dayStop * 3.5).toLocaleString());
-      setEl('dt-t2-pts', (dayStop * 3.5).toFixed(0) + ' pts · 3.5R — full exit');
-    }
-    setEl('dt-session', si.name + ' SESSION');
-    setEl('dt-session-time', si.sub);
-    setEl('dt-hint', (b ? (b.aligned === true ? 'H1/H4 EG + fundamental bias aligned. '
-                          : b.aligned === false ? 'EG is COUNTER the fundamental bias — reduce or skip. '
-                          : 'Macro neutral — pattern-only. ')
-                        : 'No H1/H4 engulfing at structure — the desk waits. ')
-                     + si.hint + realYieldTag() + eventRiskTag());
-
-    // 4-step pipeline strip
-    const stepsEl = document.getElementById('dt-eg-steps');
-    if (stepsEl) stepsEl.innerHTML = egPipelineHTML(st, 'day');
-
-    // signal cards
-    const gridEl = document.getElementById('daytrade-setups-grid');
-    if (gridEl) gridEl.innerHTML = egSetupCardsHTML(st, 'day');
-
-    // Key day trade levels — the daily structure the H1/H4 engulfings key off
-    const levelsEl = document.getElementById('daytrade-levels-list');
-    if (levelsEl) {
-      const nearest100 = Math.round(price / 100) * 100;
-      const r1 = Math.round(price + atr * 1.0);
-      const r2 = Math.round(price + atr * 2.0);
-      const s1 = Math.round(price - atr * 1.0);
-      const s2 = Math.round(price - atr * 2.0);
-      const levels = [
-        { tag: 'res', type: 'R2',  name: 'Day Resistance 2 (2× ATR)', price: r2 },
-        { tag: 'res', type: 'R1',  name: 'Day Resistance 1 (1× ATR)', price: r1 },
-        { tag: 'psy', type: 'KEY', name: `Key Psychological $${nearest100}`, price: nearest100 },
-        { tag: 'sup', type: 'S1',  name: 'Day Support 1 (1× ATR)',    price: s1 },
-        { tag: 'sup', type: 'S2',  name: 'Day Support 2 (2× ATR)',    price: s2 },
-        { tag: 'key', type: 'ATR', name: `Daily ATR(14): ${atr.toFixed(0)} pts${realATRState.atr ? ' (real)' : ' (est.)'}`, price: Math.round(price), note: 'Current' }
-      ];
-      const sst = structState;
-      if (sst.ok) {
-        if (sst.vwap !== null) levels.push({ tag: 'key', type: 'VWAP', name: 'Session VWAP (live)', price: Math.round(sst.vwap) });
-        if (sst.pdh  !== null) levels.push({ tag: 'res', type: 'PDH',  name: 'Previous Day High',   price: Math.round(sst.pdh) });
-        if (sst.pdl  !== null) levels.push({ tag: 'sup', type: 'PDL',  name: 'Previous Day Low',    price: Math.round(sst.pdl) });
-        if (sst.pdc  !== null) levels.push({ tag: 'psy', type: 'PDC',  name: 'Previous Day Close',  price: Math.round(sst.pdc) });
-      }
-      levelsEl.innerHTML = levels.map(l => `
-        <div class="level-row">
-          <span class="level-row-tag ${l.tag}">${l.type}</span>
-          <span class="level-row-name">${l.name}</span>
-          <span class="level-row-price">${l.price.toLocaleString()}</span>
-          <span class="level-row-dist" style="font-size:10px;color:var(--text-tertiary)">${Math.abs(price - l.price).toFixed(0)} pts</span>
-        </div>`).join('');
-    }
-
-    // Signal quality grade — the selectivity filter
-    const qEl = document.getElementById('dt-quality');
-    if (qEl) qEl.innerHTML = dir === 'wait' ? '' : qualityBadgeHTML(dir);
-
-    dayChartCtl.updateLevels();
-  }
 
   // ─── GOLD/SILVER RATIO ──────────────────────────────────────────────────────
   async function updateGoldSilverRatio() {
