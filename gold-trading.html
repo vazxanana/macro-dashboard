@@ -40,21 +40,24 @@
     }
 
     html.dark {
-      --bg-primary: #0F1117;
-      --bg-secondary: #1A1D29;
-      --bg-tertiary: #141620;
-      --text-primary: #E8EAF0;
-      --text-secondary: #9BA3B8;
-      --text-tertiary: #5A6278;
-      --border: #252836;
-      --border-light: #1E2130;
-      --glass-light: rgba(26, 29, 41, 0.7);
-      --glass-lighter: rgba(26, 29, 41, 0.85);
-      --glass-ultra: rgba(26, 29, 41, 0.6);
-      --body-bg-a: #0F1117;
-      --body-bg-b: #141620;
-      --header-bg: rgba(15,17,23,0.85);
-      --card-bg: rgba(26,29,41,0.7);
+      --bg-primary: #0B0E14;
+      --bg-secondary: #131722;
+      --bg-tertiary: #0F131B;
+      --text-primary: #EAEDF5;
+      --text-secondary: #9AA3B8;
+      --text-tertiary: #5C6578;
+      --border: #1F2430;
+      --border-light: #171C26;
+      --accent-green: #17B26A;
+      --accent-red: #E5484D;
+      --accent-blue: #4B8BFF;
+      --glass-light: rgba(19, 23, 34, 0.72);
+      --glass-lighter: rgba(19, 23, 34, 0.88);
+      --glass-ultra: rgba(19, 23, 34, 0.62);
+      --body-bg-a: #0B0E14;
+      --body-bg-b: #0F131B;
+      --header-bg: rgba(11,14,20,0.88);
+      --card-bg: rgba(19,23,34,0.72);
     }
 
     html, body {
@@ -2545,6 +2548,21 @@
       .desk-checklist { grid-template-columns: 1fr; }
       .dash-shortcuts { grid-template-columns: repeat(2, 1fr); }
     }
+
+    /* ── Terminal polish — dark-first, Bloomberg black+amber lineage ── */
+    .card, .dash-widget, .kpi-card, .setup-card, .ems-step, .levels-panel {
+      transition: border-color .15s ease, transform .15s ease, box-shadow .15s ease;
+    }
+    .kpi-card:hover, .ems-step:hover { transform: translateY(-1px); border-color: rgba(212,175,55,0.35); }
+    .setup-card:hover { border-color: rgba(212,175,55,0.35); box-shadow: 0 4px 18px rgba(0,0,0,0.18); }
+    html.dark #goldPrice { color: #F0C75E; text-shadow: 0 0 18px rgba(224,184,77,0.22); }
+    html.dark ::-webkit-scrollbar { width: 10px; height: 10px; }
+    html.dark ::-webkit-scrollbar-track { background: #0B0E14; }
+    html.dark ::-webkit-scrollbar-thumb { background: #232838; border-radius: 5px; border: 2px solid #0B0E14; }
+    html.dark ::-webkit-scrollbar-thumb:hover { background: #2E3448; }
+    :focus-visible { outline: 2px solid rgba(224,184,77,0.6); outline-offset: 2px; }
+    .journal-table tbody tr, .level-row { transition: background .12s ease; }
+    .journal-table tbody tr:hover, .level-row:hover { background: rgba(224,184,77,0.05); }
   </style>
 </head>
 <body>
@@ -2673,6 +2691,9 @@
         <div class="kpi-sub" id="dash-conf-sub">—</div>
       </div>
     </div>
+
+    <!-- Daily Bias cockpit strip (filled by the bias engine) -->
+    <div id="dash-bias-strip" style="display:none;margin-bottom:20px;"></div>
 
     <!-- REAL YIELD ENGINE — master fundamental driver -->
     <div class="ry-banner" id="ryBanner">
@@ -4735,6 +4756,7 @@
     const stop     = parseFloat(document.getElementById('stopPrice')?.value)   || 0;
     const t1       = parseFloat(document.getElementById('target1')?.value)     || 0;
     const t2       = parseFloat(document.getElementById('target2')?.value)     || 0;
+    try { localStorage.setItem('acct_size', account); localStorage.setItem('risk_pct', riskPct); } catch (e) {}
 
     const dollarRisk = account * riskPct / 100;
     const stopDist   = Math.abs(entry - stop);
@@ -6406,13 +6428,16 @@
     const risk  = Math.abs(entry - stop);
     const t1 = dir === 'long' ? entry + risk * cfg.r1 : entry - risk * cfg.r1;
     const t2 = dir === 'long' ? entry + risk * cfg.r2 : entry - risk * cfg.r2;
+    // confluence: the pattern printed inside a historical reaction zone
+    const zone = rzState.length ? rzState.find(z => entry >= z.lo - 2 && entry <= z.hi + 2) || null : null;
     let conf = e.atLevel ? 62 : 48;
     if (aligned === true)  conf += Math.min(18, Math.round((md.conf - 50) * 0.6));
     if (aligned === false) conf -= 15;
     if (cfg.trendOk === false) conf -= 8;
-    conf = Math.max(25, Math.min(92, conf));
-    const score = (e.atLevel ? 2 : 0) + (aligned === true ? 2 : aligned === null ? 1 : 0) + (cfg.tfBonus || 0);
-    return { ...e, dir, aligned, conf, score,
+    if (zone) conf += 8;
+    conf = Math.max(25, Math.min(95, conf));
+    const score = (e.atLevel ? 2 : 0) + (aligned === true ? 2 : aligned === null ? 1 : 0) + (zone ? 2 : 0) + (cfg.tfBonus || 0);
+    return { ...e, dir, aligned, zone, conf, score,
              entry: +entry.toFixed(2), stop: +stop.toFixed(2), risk: +risk.toFixed(2),
              t1: +t1.toFixed(2), t2: +t2.toFixed(2), r1: cfg.r1, r2: cfg.r2 };
   }
@@ -6507,12 +6532,27 @@
       <div class="ems-step">
         <div class="ems-step-head"><span class="ems-num">4</span> EXECUTE — bias gate</div>
         <div class="ems-step-val">${b ? (b.aligned === true ? '<span style="color:var(--accent-green)">WITH BIAS — full size</span>' : b.aligned === false ? '<span style="color:var(--accent-red)">COUNTER-TREND — skip/half</span>' : '<span style="color:#D97706">MACRO NEUTRAL — half size</span>') : '—'}</div>
-        <div class="ems-step-sub">${b ? 'Entry ' + b.entry.toLocaleString() + ' · stop ' + b.stop.toLocaleString() + ' (' + b.risk.toFixed(1) + ' pts) · T1 ' + b.t1.toLocaleString() : 'Wait for the next qualifying engulfing.'}</div>
+        <div class="ems-step-sub">${b ? 'Entry ' + b.entry.toLocaleString() + ' · stop ' + b.stop.toLocaleString() + ' (' + b.risk.toFixed(1) + ' pts) · T1 ' + b.t1.toLocaleString() + (b.zone ? ' · <span style=\"color:#D4AF37;font-weight:800\">⚡ inside reaction zone</span>' : '') : 'Wait for the next qualifying engulfing.'}</div>
       </div>`;
   }
 
+  // Sizing comes from the Position Calc settings (persisted): scalps risk
+  // half the day-trade percentage, matching the desk checklists.
+  function riskSettings() {
+    return { acct: parseFloat(localStorage.getItem('acct_size')) || 10000,
+             pct:  parseFloat(localStorage.getItem('risk_pct'))  || 1.0 };
+  }
+  function egSizeText(riskPts, desk) {
+    if (!(riskPts > 0)) return '—';
+    const rs  = riskSettings();
+    const pct = desk === 'scalp' ? rs.pct * 0.5 : rs.pct;
+    const usd = rs.acct * pct / 100;
+    const oz  = usd / riskPts;
+    return `${oz.toFixed(2)} oz <span style="font-size:10px;color:var(--text-tertiary)">($${usd.toFixed(0)} = ${pct.toFixed(2)}% of $${rs.acct.toLocaleString()})</span>`;
+  }
+
   // Signal cards (top 3 events) — shared by both desks
-  function egSetupCardsHTML(st) {
+  function egSetupCardsHTML(st, desk) {
     const md = st.md;
     if (!st.events.length) return `
       <div class="setup-card">
@@ -6523,15 +6563,16 @@
     return st.events.slice(0, 3).map(e => {
       const isB = e.type === 'bull';
       const tstr = new Date(e.time * 1000).toLocaleString('en-GB', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit', hour12: false, timeZone: 'UTC' });
-      const reason = e.aligned === true
+      const zoneBit = e.zone ? `⚡ Inside the ${e.zone.lo.toFixed(0)}–${e.zone.hi.toFixed(0)} reaction zone (reacted ${e.zone.events.length}× before) — the highest-probability location on the platform. ` : '';
+      const reason = zoneBit + (e.aligned === true
         ? `Prints ${e.atLevel ? 'at ' + e.atLevel : 'mid-range'} WITH the fundamental bias (macro ${md.conf}% ${md.dir}${realYield.bias ? ', real yields ' + realYield.bias : ''}). Enter on the break of the pattern extreme; the stop sits where the reversal is proven wrong.`
         : e.aligned === false
         ? 'AGAINST the fundamental bias — counter-trend. Playbook: skip, or half-size with an early exit at 1R. Fighting the real-yield regime is how win rates die.'
-        : 'Macro engine is neutral — pattern-only trade. Half size, and only worth it if printed at structure (★).';
+        : 'Macro engine is neutral — pattern-only trade. Half size, and only worth it if printed at structure (★).');
       return `
         <div class="setup-card">
           <div class="setup-card-head ${e.dir}">
-            <span class="setup-card-type">${e.tf} ${isB ? 'Bullish' : 'Bearish'} Engulfing${e.atLevel ? ' ★ ' + e.atLevel : ''}</span>
+            <span class="setup-card-type">${e.tf} ${isB ? 'Bullish' : 'Bearish'} Engulfing${e.atLevel ? ' ★ ' + e.atLevel : ''}${e.zone ? ' ⚡RZ' : ''}</span>
             <span class="setup-card-pct">${e.conf}%</span>
           </div>
           <div class="setup-card-body">
@@ -6541,6 +6582,7 @@
             <div class="scard-row"><span class="scard-lbl">Stop Loss</span><span class="scard-val red">${e.stop.toFixed(2)} <span style="font-size:10px;color:var(--text-tertiary)">(${e.risk.toFixed(1)} pts)</span></span></div>
             <div class="scard-row"><span class="scard-lbl">Target 1</span><span class="scard-val green">${e.t1.toFixed(2)} <span style="font-size:10px;color:var(--text-tertiary)">(${e.r1}R)</span></span></div>
             <div class="scard-row"><span class="scard-lbl">Target 2</span><span class="scard-val green">${e.t2.toFixed(2)} <span style="font-size:10px;color:var(--text-tertiary)">(${e.r2}R)</span></span></div>
+            <div class="scard-row"><span class="scard-lbl">Size</span><span class="scard-val">${egSizeText(e.risk, desk)}</span></div>
             <div class="scard-reason">${reason}</div>
           </div>
         </div>`;
@@ -6829,6 +6871,7 @@
       computeDailyBias().then(() => {
         const act = document.querySelector('.snav-btn.active');
         if (act?.dataset?.tab === 'bias') renderDailyBias();
+        if (activeSection === 'dashboard') renderDashboard();
       }).catch(() => {});
 
       // Refresh active views (always recompute analysis cards from live price)
@@ -6864,6 +6907,12 @@
   // avoid a temporal-dead-zone error during initializeApp().
 
   function initializeApp() {
+    // Restore persisted risk settings into the Position Calc inputs
+    try {
+      const _as = localStorage.getItem('acct_size'), _rp = localStorage.getItem('risk_pct');
+      if (_as && document.getElementById('accountSize')) document.getElementById('accountSize').value = _as;
+      if (_rp && document.getElementById('riskPct')) document.getElementById('riskPct').value = _rp;
+    } catch (e) {}
     // Theme FIRST — dark terminal by default (institutional standard); an
     // explicit user toggle ('0' = light) is respected. Must run before
     // initChart() so the TradingView embed picks the right theme.
@@ -7663,6 +7712,26 @@
   }
 
   function renderDashboard() {
+    // Daily Bias cockpit strip — the one number that sets the day
+    (function () {
+      const el = document.getElementById('dash-bias-strip');
+      const st = dailyBiasState;
+      if (!el) return;
+      if (!st || !st.ok) { el.style.display = 'none'; return; }
+      const isL = st.dir === 'long', isS = st.dir === 'short';
+      const col = isL ? 'var(--accent-green)' : isS ? 'var(--accent-red)' : '#D97706';
+      const chip = (l, v, c) => `<div style="display:flex;flex-direction:column;gap:3px;"><span style="font-size:9px;font-weight:800;letter-spacing:1.2px;text-transform:uppercase;color:var(--text-tertiary);">${l}</span><span style="font-family:'JetBrains Mono',monospace;font-weight:800;font-size:15px;color:${c || 'var(--text-primary)'}">${v}</span></div>`;
+      const ez = st.entryZone, tz = st.targetZone;
+      el.style.display = 'block';
+      el.innerHTML = `<div class="card glass" style="display:flex;align-items:center;gap:26px;flex-wrap:wrap;padding:14px 20px;margin:0;border-left:3px solid ${col};">
+        ${chip('Daily Bias', (isL ? '▲ LONG' : isS ? '▼ SHORT' : '— NEUTRAL') + ' · ' + st.conf + '%', col)}
+        ${chip('Buy/Sell Zone', ez ? ez.lo.toFixed(0) + '–' + ez.hi.toFixed(0) : '—', 'var(--accent-blue)')}
+        ${chip('Target', tz ? tz.mid.toFixed(0) : '—', 'var(--accent-green)')}
+        ${chip('Invalidation', ez ? (isL ? ez.lo : ez.hi).toFixed(0) : '—', 'var(--accent-red)')}
+        ${chip('Daily ATR', st.atr.toFixed(0) + ' pts')}
+        <button class="j-add-btn" style="margin-left:auto;" onclick="switchSection('markets', document.querySelector('[data-section=markets]'), 'bias')">Full plan →</button>
+      </div>`;
+    })();
     if (!lastGoldPrice) return;
     renderRealYieldBanner();
     renderEventRiskBanner();
@@ -7818,7 +7887,7 @@
 
     // signal cards
     const gridEl = document.getElementById('scalp-setups-grid');
-    if (gridEl) gridEl.innerHTML = egSetupCardsHTML(st);
+    if (gridEl) gridEl.innerHTML = egSetupCardsHTML(st, 'scalp');
 
     // Key levels — the structure the engulfings must print at
     const levelsEl = document.getElementById('scalp-levels-list');
@@ -7913,7 +7982,7 @@
 
     // signal cards
     const gridEl = document.getElementById('daytrade-setups-grid');
-    if (gridEl) gridEl.innerHTML = egSetupCardsHTML(st);
+    if (gridEl) gridEl.innerHTML = egSetupCardsHTML(st, 'day');
 
     // Key day trade levels — the daily structure the H1/H4 engulfings key off
     const levelsEl = document.getElementById('daytrade-levels-list');
