@@ -2773,6 +2773,95 @@
 
   </div><!-- end tab-dashboard -->
 
+  <!-- DAILY BIAS — one verdict for the day + historical reaction zones -->
+  <div id="tab-bias" class="tab-panel">
+
+    <!-- Verdict banner -->
+    <div id="bias-banner" class="desk-banner wait">
+      <div class="desk-signal-main">
+        <div class="desk-arrow" id="bias-arrow">→</div>
+        <div class="desk-word" id="bias-word">—</div>
+        <div class="desk-conf" id="bias-conf">— confidence</div>
+      </div>
+      <div class="desk-vline"></div>
+      <div class="desk-details">
+        <div class="desk-det">
+          <div class="desk-det-lbl">Buy/Sell Zone</div>
+          <div class="desk-det-val" id="bias-zone" style="color:var(--accent-blue)">—</div>
+          <div class="desk-det-sub" id="bias-zone-sub">nearest reaction zone</div>
+        </div>
+        <div class="desk-det">
+          <div class="desk-det-lbl">Target</div>
+          <div class="desk-det-val" id="bias-target" style="color:var(--accent-green)">—</div>
+          <div class="desk-det-sub" id="bias-target-sub">next opposing zone</div>
+        </div>
+        <div class="desk-det">
+          <div class="desk-det-lbl">Invalidation</div>
+          <div class="desk-det-val" id="bias-invalid" style="color:var(--accent-red)">—</div>
+          <div class="desk-det-sub">daily close beyond kills the bias</div>
+        </div>
+        <div class="desk-det">
+          <div class="desk-det-lbl">Daily ATR</div>
+          <div class="desk-det-val" id="bias-atr">—</div>
+          <div class="desk-det-sub" id="bias-atr-sub">expected day range</div>
+        </div>
+      </div>
+      <div class="desk-meta">
+        <div class="desk-meta-session" id="bias-session">—</div>
+        <div class="desk-meta-time" id="bias-ts">—</div>
+        <div class="desk-meta-hint" id="bias-hint">—</div>
+      </div>
+    </div>
+
+    <!-- Confluence table + playbook -->
+    <div class="levels-grid" style="margin-bottom:16px;">
+      <div class="levels-panel">
+        <div class="levels-panel-title">Bias Confluence — every driver, weighted</div>
+        <div id="bias-checks"></div>
+      </div>
+      <div class="levels-panel">
+        <div class="levels-panel-title">Today's Playbook</div>
+        <div id="bias-playbook" style="font-size:12px;color:var(--text-secondary);line-height:1.85;">Loading…</div>
+      </div>
+    </div>
+
+    <!-- Reaction zones chart -->
+    <div class="dash-widget" style="margin-bottom:16px;">
+      <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;margin-bottom:10px;">
+        <div class="dash-widget-title" style="margin:0;">DAILY — Historical Reaction Zones <span style="font-size:10px;font-weight:500;color:var(--text-tertiary)">areas where gold snapped hard before — boxes run to today because they are still live</span></div>
+        <div class="chart-legend">
+          <span class="cl-item"><span class="cl-dot" style="background:#00A651"></span>Demand (reacted UP)</span>
+          <span class="cl-item"><span class="cl-dot" style="background:#C23B33"></span>Supply (reacted DOWN)</span>
+        </div>
+      </div>
+      <div id="biasChart" style="width:100%;height:380px;position:relative;">
+        <div id="biasChartMsg" style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;text-align:center;color:var(--text-tertiary);font-size:12px;padding:16px;">Loading&hellip;</div>
+      </div>
+    </div>
+
+    <!-- Reaction zones table -->
+    <div class="card glass">
+      <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;">
+        <h3 style="margin:0;">Reaction Zones — ranked by how hard price reacted there</h3>
+        <span style="font-size:10px;color:var(--text-tertiary);">~1 year of daily history · zones cluster within 0.4× ATR</span>
+      </div>
+      <div class="journal-table-wrap" style="margin-top:12px;">
+        <table class="journal-table">
+          <thead>
+            <tr><th>Zone</th><th>Side</th><th>Hits</th><th>Biggest Reaction</th><th>Reaction Dates</th><th>Distance</th></tr>
+          </thead>
+          <tbody id="rzTableBody">
+            <tr><td colspan="6" class="j-empty">Computing&hellip;</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div style="margin-top:10px;font-size:10px;color:var(--text-tertiary);line-height:1.6;">
+        A reaction zone is a price area where gold previously reversed by at least ~1.1× the daily ATR within a few days of touching it. The more hits and the bigger the moves, the more institutional orders live there. Trade the EG desks INTO these zones in the bias direction — an engulfing printed inside one is the highest-probability setup on the platform.
+      </div>
+    </div>
+
+  </div><!-- end tab-bias -->
+
   <!-- ANALYSIS TAB -->
   <div id="tab-analysis" class="tab-panel">
 
@@ -3105,75 +3194,6 @@
     </div>
   </div>
 
-  <!-- MISSED MOVE SCENARIOS -->
-  <div class="section">
-    <div class="section-header">
-      <div class="section-title">Contingency: Missed Move Scenarios</div>
-    </div>
-
-    <div class="card glass">
-      <div class="scenario bullish">
-        <div class="scenario-title" id="scen1-title">Scenario 1: Re-Entry at R1 (—)</div>
-        <div class="scenario-text" id="scen1-body">Loading live prices…</div>
-      </div>
-
-      <div class="scenario">
-        <div class="scenario-title" id="scen2-title">Scenario 2: Momentum Play at R2 (—)</div>
-        <div class="scenario-text" id="scen2-body">Loading live prices…</div>
-      </div>
-
-      <div class="scenario bearish">
-        <div class="scenario-title">Scenario 3: Patient Entry — Wait for Pullback (OPTIMAL)</div>
-        <div class="scenario-text" id="scen3-body"><strong>Strategy:</strong> Do NOT chase breakouts above R2<br/>
-          <strong>Action:</strong> Wait for 4-8 hour pullback to form<br/>
-          <strong>Re-Entry Level:</strong> <span id="scen3-reentry">—</span><br/>
-          <strong>Advantage:</strong> Better risk/reward, reduced drawdown<br/>
-          <strong>Key Principle:</strong> Patience = superior entries and exits
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- EXECUTION FRAMEWORK -->
-  <div class="section">
-    <div class="section-header">
-      <div class="section-title">4-Step Execution Workflow</div>
-    </div>
-
-    <div class="card glass">
-      <div class="grid-2">
-        <div class="direction-block">
-          <div class="block-title">Step 1: Macro Bias Confirmation</div>
-          <div class="block-content">
-            Establish weekly directional bias from 5 key drivers<br/>
-            Target: 72%+ confidence reading
-          </div>
-        </div>
-        <div class="direction-block">
-          <div class="block-title">Step 2: 1-Hour Structure Analysis</div>
-          <div class="block-content">
-            Identify key support/resistance on 1H timeframe<br/>
-            Confluence with macro bias required
-          </div>
-        </div>
-        <div class="direction-block">
-          <div class="block-title">Step 3: Pattern Confirmation</div>
-          <div class="block-content">
-            Wait for double-bottom pattern formation<br/>
-            Volume breakout of neckline
-          </div>
-        </div>
-        <div class="direction-block">
-          <div class="block-title">Step 4: 1-Minute Entry Execution</div>
-          <div class="block-content">
-            Execute on neckline break + pullback<br/>
-            Tight risk management in effect
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-
   <!-- CORE PHILOSOPHY -->
   <div class="section">
     <div class="card glass-ultra" style="padding: 32px; background: rgba(0, 82, 204, 0.08);">
@@ -3227,44 +3247,6 @@
               Enter on the break of the pattern extreme; stop beyond the other extreme — the "proven wrong" point.<br/>
               Scalps: 1.8R / 3R. Day trades: 2R / 3.5R, half off at T1, stop to breakeven.
             </div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <div class="section">
-      <div class="section-header">
-        <div class="section-title">Contingency: Missed Move Scenarios</div>
-      </div>
-      <div class="card glass">
-        <div style="font-size:12px;color:var(--text-tertiary);margin-bottom:16px;">
-          Structural playbook — for live price-specific levels, see the <strong>Markets → Live Analysis</strong> tab.
-        </div>
-        <div class="scenario bullish">
-          <div class="scenario-title">Scenario 1: Re-Entry at First Resistance (R1)</div>
-          <div class="scenario-text">
-            <strong>Setup:</strong> Market gaps through your planned entry zone<br/>
-            <strong>Action:</strong> Wait for a pullback to the R1 cluster (~0.5× ATR above price) for an alternate entry<br/>
-            <strong>Stop:</strong> Just below R1 (~0.25× ATR) &nbsp;|&nbsp; <strong>Target:</strong> R2 (~1.5× ATR)<br/>
-            <strong>Key Rule:</strong> Only enter on pullback — never chase breakouts
-          </div>
-        </div>
-        <div class="scenario">
-          <div class="scenario-title">Scenario 2: Momentum Play at Second Resistance (R2)</div>
-          <div class="scenario-text">
-            <strong>Setup:</strong> Strong momentum continuation through R1<br/>
-            <strong>Action:</strong> Breakout above R2 (~1.5× ATR) with candle-close confirmation<br/>
-            <strong>Stop:</strong> Just below R2 (~0.2× ATR) &nbsp;|&nbsp; <strong>Target:</strong> R3 (~2.5× ATR)<br/>
-            <strong>Risk Level:</strong> MODERATE — momentum trade, tighter stops required
-          </div>
-        </div>
-        <div class="scenario bearish">
-          <div class="scenario-title">Scenario 3: Patient Entry — Wait for Pullback (OPTIMAL)</div>
-          <div class="scenario-text">
-            <strong>Strategy:</strong> Do NOT chase extended breakouts<br/>
-            <strong>Action:</strong> Wait for a 4–8 hour pullback to form<br/>
-            <strong>Re-Entry Level:</strong> Buy zone near the prior breakout level<br/>
-            <strong>Key Principle:</strong> Patience = superior entries and exits
           </div>
         </div>
       </div>
@@ -4624,6 +4606,7 @@
     if (name === 'scalp')     { renderScalpDesk(); }
     if (name === 'daytrade')  { renderDayTradeDesk(); }
     if (name === 'analysis')  { updateAnalysisTab(); }
+    if (name === 'bias')      { renderDailyBias(); }
     if (name === 'calendar')  { renderCalendar(); }
     if (name === 'tracker')   { renderSignalTracker(); }
     if (name === 'redfolder') { renderRedFolder(); }
@@ -5632,11 +5615,22 @@
   });
   const dayChartCtl = createLevelChart({
     chartId: 'dayChart', msgId: 'dayChartMsg', boxId: 'dayChartLevels', getLevels: dayTradeLevels, interval: '1h', zones: true,
-    extraLevels: () => !structState.ok ? [] : [
-      structState.vwap !== null ? { price: structState.vwap, color: '#8B5CF6', title: 'VWAP', dashed: true } : null,
-      structState.pdh  !== null ? { price: structState.pdh,  color: '#7A8196', title: 'PDH',  dashed: true } : null,
-      structState.pdl  !== null ? { price: structState.pdl,  color: '#7A8196', title: 'PDL',  dashed: true } : null
-    ]
+    extraLevels: () => {
+      const out = !structState.ok ? [] : [
+        structState.vwap !== null ? { price: structState.vwap, color: '#8B5CF6', title: 'VWAP', dashed: true } : null,
+        structState.pdh  !== null ? { price: structState.pdh,  color: '#7A8196', title: 'PDH',  dashed: true } : null,
+        structState.pdl  !== null ? { price: structState.pdl,  color: '#7A8196', title: 'PDL',  dashed: true } : null
+      ];
+      // nearest historical reaction zones (Daily Bias engine)
+      const px = lastGoldPrice;
+      if (px && rzState.length) {
+        const below = rzState.filter(z => z.mid < px).sort((a, b) => b.mid - a.mid)[0];
+        const above = rzState.filter(z => z.mid > px).sort((a, b) => a.mid - b.mid)[0];
+        if (below) out.push({ price: below.mid, color: '#D4AF37', title: 'RZ ↓' });
+        if (above) out.push({ price: above.mid, color: '#D4AF37', title: 'RZ ↑' });
+      }
+      return out;
+    }
   });
 
   // ── Multi-timeframe view: Daily (trend) / H4 (structure) / M15 (execution) ──
@@ -5712,7 +5706,7 @@
   // Gold OHLC via CORS-enabled exchange APIs (PAXG tracks 1oz spot).
   // Returns [{time(sec), open, high, low, close, vol}] ascending, or null.
   // Supported intervals: '5m' (24h), '15m' (2 days), '4h' (~1 month), '1d' (~4 months).
-  const KLINE_LIMITS  = { '5m': 288, '15m': 192, '1h': 192, '4h': 180, '1d': 120, '1w': 104 };
+  const KLINE_LIMITS  = { '5m': 288, '15m': 192, '1h': 192, '4h': 180, '1d': 250, '1w': 104 };
   const KRAKEN_MINUTES = { '5m': 5, '15m': 15, '1h': 60, '4h': 240, '1d': 1440, '1w': 10080 };
   // Shared cache: ~10 chart instances plus the structure/ATR/scanner engines
   // all want the same candles — one network call per interval per TTL window
@@ -6203,6 +6197,185 @@
     btRunning = false;
   }
 
+  // ─── DAILY BIAS + REACTION ZONES ENGINE ─────────────────────────────────────
+  // reactionZones: scan ~1 year of daily candles for swings where price
+  // reversed hard (≥1.1× daily ATR within 4 days of touching the level),
+  // cluster nearby swing prices into zones, and rank by how hard and how
+  // often price reacted there. These are the "big reaction" areas.
+  function reactionZones(d1, atrPts) {
+    if (!d1 || d1.length < 30 || !(atrPts > 0)) return [];
+    const off = (lastGoldPrice && d1[d1.length - 1].close) ? (lastGoldPrice - d1[d1.length - 1].close) : 0;
+    const events = [];
+    for (let i = 2; i < d1.length - 2; i++) {
+      const c = d1[i];
+      const isHigh = c.high > d1[i - 1].high && c.high > d1[i - 2].high && c.high >= d1[i + 1].high && c.high >= d1[i + 2].high;
+      const isLow  = c.low  < d1[i - 1].low  && c.low  < d1[i - 2].low  && c.low  <= d1[i + 1].low  && c.low  <= d1[i + 2].low;
+      if (isHigh) {
+        let lo = Infinity;
+        for (let j = i + 1; j <= Math.min(i + 4, d1.length - 1); j++) lo = Math.min(lo, d1[j].low);
+        const move = c.high - lo;
+        if (move >= atrPts * 1.1) events.push({ price: c.high + off, time: c.time, side: 'res', move });
+      }
+      if (isLow) {
+        let hi = -Infinity;
+        for (let j = i + 1; j <= Math.min(i + 4, d1.length - 1); j++) hi = Math.max(hi, d1[j].high);
+        const move = hi - c.low;
+        if (move >= atrPts * 1.1) events.push({ price: c.low + off, time: c.time, side: 'sup', move });
+      }
+    }
+    events.sort((a, b) => a.price - b.price);
+    const zones = [];
+    for (const e of events) {
+      const z = zones[zones.length - 1];
+      if (z && e.price - z.hi <= atrPts * 0.4) { z.hi = Math.max(z.hi, e.price); z.events.push(e); }
+      else zones.push({ lo: e.price, hi: e.price, events: [e] });
+    }
+    const now = Date.now() / 1000;
+    for (const z of zones) {
+      z.events.sort((a, b) => a.time - b.time);
+      const pad = Math.max(0, atrPts * 0.12 - (z.hi - z.lo) / 2);   // give hair-thin zones a visible band
+      z.lo = +(z.lo - pad).toFixed(2); z.hi = +(z.hi + pad).toFixed(2);
+      z.mid = +((z.lo + z.hi) / 2).toFixed(2);
+      const ups = z.events.filter(e => e.side === 'sup').length;
+      z.side = ups * 2 > z.events.length ? 'sup' : ups * 2 === z.events.length ? 'both' : 'res';
+      z.maxMove = Math.max(...z.events.map(e => e.move));
+      z.firstT = Math.min(...z.events.map(e => e.time));
+      z.lastT  = Math.max(...z.events.map(e => e.time));
+      // score: total reaction size in ATRs + hit count, boosted if hit recently
+      const rec = 1 + Math.max(0, 1 - (now - z.lastT) / (180 * 86400)) * 0.5;
+      z.score = +(((z.events.reduce((a, e) => a + e.move, 0) / atrPts) + z.events.length) * rec).toFixed(1);
+    }
+    return zones.sort((a, b) => b.score - a.score);
+  }
+
+  let rzState = [];             // ranked zones — also drawn on the EG Day chart
+  let dailyBiasState = null;
+
+  async function computeDailyBias() {
+    const [d1, w1] = await Promise.all([fetchGoldKlines('1d'), fetchGoldKlines('1w')]);
+    const px  = lastGoldPrice || 0;
+    const md  = getMacroData();
+    const atr = atrOf(px);
+    const st  = { ok: !!(d1 && px), md, px, atr };
+    if (!st.ok) { dailyBiasState = st; return st; }
+
+    const smaOf = (cs, n) => cs.slice(-n).reduce((a, b) => a + b, 0) / Math.min(n, cs.length);
+    const dCloses = d1.map(c => c.close);
+    const dUp = dCloses[dCloses.length - 1] >= smaOf(dCloses, 20);
+    let wUp = null;
+    if (w1 && w1.length >= 10) { const wc = w1.map(c => c.close); wUp = wc[wc.length - 1] >= smaOf(wc, 20); }
+    const sst = structState;
+    const ry  = realYield;
+    const vs  = vixScore();
+
+    const checks = [];
+    const add = (n, dir, w, detail) => checks.push({ n, dir, w, detail });
+    add('Real yields (master driver)', ry.bias === 'bull' ? 'long' : ry.bias === 'bear' ? 'short' : null, 3,
+        ry.level !== null ? ry.level.toFixed(2) + '% · ' + (ry.bias || 'neutral') : 'no data');
+    add('Macro composite (TIPS·DXY·flows·seasonal)', md.isLong ? 'long' : md.isShort ? 'short' : null, 2,
+        md.macroScore + '/40 · ' + md.macroConf + '%');
+    add('Daily trend — close vs SMA20', dUp ? 'long' : 'short', 2, dUp ? 'above' : 'below');
+    add('Weekly trend — close vs SMA20', wUp === null ? null : wUp ? 'long' : 'short', 2,
+        wUp === null ? 'no data' : wUp ? 'above' : 'below');
+    add('Price vs previous day close', sst.ok && sst.pdc !== null ? (px >= sst.pdc ? 'long' : 'short') : null, 1,
+        sst.ok && sst.pdc !== null ? (px >= sst.pdc ? '+' : '') + (px - sst.pdc).toFixed(0) + ' pts' : 'no data');
+    add('Price vs session VWAP', sst.ok && sst.vwap !== null ? (px >= sst.vwap ? 'long' : 'short') : null, 1,
+        sst.ok && sst.vwap !== null ? (px >= sst.vwap ? 'above' : 'below') : 'no data');
+    add('Risk sentiment (VIX)', vs >= 5 ? 'long' : vs <= 3 ? 'short' : null, 1, vixLabel());
+
+    st.wTot = checks.reduce((a, c) => a + c.w, 0);
+    st.net  = checks.reduce((a, c) => a + (c.dir === 'long' ? c.w : c.dir === 'short' ? -c.w : 0), 0);
+    st.dir  = st.net >= 3 ? 'long' : st.net <= -3 ? 'short' : 'wait';
+    st.conf = Math.round(50 + Math.abs(st.net) / st.wTot * 50);
+    st.checks = checks;
+
+    rzState = reactionZones(d1, atr);
+    const below = rzState.filter(z => z.mid < px).sort((a, b) => b.mid - a.mid);
+    const above = rzState.filter(z => z.mid > px).sort((a, b) => a.mid - b.mid);
+    st.zBelow = below[0] || null;
+    st.zAbove = above[0] || null;
+    st.entryZone  = st.dir === 'long' ? st.zBelow : st.dir === 'short' ? st.zAbove : null;
+    st.targetZone = st.dir === 'long' ? st.zAbove : st.dir === 'short' ? st.zBelow : null;
+    dailyBiasState = st;
+    return st;
+  }
+
+  const biasChartCtl = createLevelChart({
+    chartId: 'biasChart', msgId: 'biasChartMsg', interval: '1d', height: 380, zones: true,
+    zonesFn: () => rzState.slice(0, 7).map((z, i) => ({ t1: z.firstT, t2: null, hi: z.hi, lo: z.lo, bull: z.side !== 'res', star: i < 3 }))
+  });
+
+  const rzDate = t => new Date(t * 1000).toLocaleDateString('en-GB', { day: '2-digit', month: 'short' });
+
+  async function renderDailyBias() {
+    const st = await computeDailyBias();
+    const setEl = (id, v) => { const e = document.getElementById(id); if (e) e.textContent = v; };
+    const setH  = (id, v) => { const e = document.getElementById(id); if (e) e.innerHTML = v; };
+    if (!st.ok) { setEl('bias-hint', 'Candle feed unavailable — the bias engine needs daily data.'); return; }
+    biasChartCtl.init(); biasChartCtl.loadCandles();
+
+    const isL = st.dir === 'long', isS = st.dir === 'short';
+    const banner = document.getElementById('bias-banner');
+    if (banner) banner.className = `desk-banner ${st.dir}`;
+    setEl('bias-arrow', isL ? '↑' : isS ? '↓' : '→');
+    setEl('bias-word',  isL ? 'LONG' : isS ? 'SHORT' : 'NEUTRAL');
+    setEl('bias-conf',  st.conf + '% confidence · net ' + (st.net > 0 ? '+' : '') + st.net + ' of ±' + st.wTot);
+
+    const ez = st.entryZone, tz = st.targetZone;
+    setEl('bias-zone',   ez ? ez.lo.toFixed(0) + '–' + ez.hi.toFixed(0) : '—');
+    setEl('bias-zone-sub', ez ? `reacted ${ez.events.length}× · max ${ez.maxMove.toFixed(0)} pts` : isL || isS ? 'no zone mapped' : 'no bias — no zone');
+    setEl('bias-target', tz ? tz.mid.toFixed(0) : '—');
+    setEl('bias-target-sub', tz ? Math.abs(st.px - tz.mid).toFixed(0) + ' pts away · ' + (tz.side === 'sup' ? 'demand' : tz.side === 'res' ? 'supply' : 'flip') + ' zone' : 'next opposing zone');
+    setEl('bias-invalid', ez ? (isL ? ez.lo.toFixed(0) : ez.hi.toFixed(0)) : '—');
+    setEl('bias-atr', st.atr.toFixed(0) + ' pts');
+    setEl('bias-atr-sub', realATRState.atr ? 'real ATR(14)' : 'estimated');
+    const si = getSessionInfo();
+    setEl('bias-session', si.name + ' SESSION');
+    setEl('bias-ts', 'evaluated ' + new Date().toLocaleTimeString('en-US', { hour12: false, timeZone: 'UTC' }) + ' UTC');
+    setEl('bias-hint', si.hint + realYieldTag() + eventRiskTag());
+
+    // Confluence rows
+    setH('bias-checks', st.checks.map(c => `
+      <div class="level-row">
+        <span class="level-row-tag ${c.dir === 'long' ? 'sup' : c.dir === 'short' ? 'res' : 'key'}">${c.dir === 'long' ? '▲' : c.dir === 'short' ? '▼' : '—'}</span>
+        <span class="level-row-name">${c.n}</span>
+        <span class="level-row-price" style="font-size:11px;">${c.detail}</span>
+        <span class="level-row-dist">w${c.w}</span>
+      </div>`).join(''));
+
+    // Playbook
+    let pb;
+    if ((isL || isS) && ez) {
+      const dates = ez.events.slice(-3).map(e => rzDate(e.time)).join(', ');
+      pb = `Bias is <strong style="color:${isL ? 'var(--accent-green)' : 'var(--accent-red)'}">${isL ? 'LONG' : 'SHORT'} (${st.conf}%)</strong>.
+        Let price ${isL ? 'pull back into the demand' : 'rally into the supply'} zone <strong>${ez.lo.toFixed(0)}–${ez.hi.toFixed(0)}</strong> —
+        gold reacted there <strong>${ez.events.length}×</strong> before (${dates}), biggest snap <strong>${ez.maxMove.toFixed(0)} pts</strong>.
+        Hunt an M15/H1 ${isL ? 'bullish' : 'bearish'} engulfing INSIDE the zone on the EG desks — pattern stop ${isL ? 'below ' + ez.lo.toFixed(0) : 'above ' + ez.hi.toFixed(0)}.
+        ${tz ? `Ride toward <strong>${tz.mid.toFixed(0)}</strong> (${Math.abs(st.px - tz.mid).toFixed(0)} pts).` : 'No opposing zone mapped — trail the runner.'}
+        The bias dies on a daily CLOSE ${isL ? 'below' : 'above'} <strong>${(isL ? ez.lo : ez.hi).toFixed(0)}</strong>.`;
+    } else if (isL || isS) {
+      pb = `Bias is ${isL ? 'LONG' : 'SHORT'} (${st.conf}%), but no reaction zone is mapped on the entry side — either trade structure levels from the EG desks or wait for price to build one.`;
+    } else {
+      pb = `Drivers disagree (net ${st.net > 0 ? '+' : ''}${st.net} of ±${st.wTot}) — <strong>no daily bias</strong>. Chop protocol: trade only A-grade EG signals printed inside a reaction zone, at half size, or stand aside. Capital preserved is edge kept.`;
+    }
+    setH('bias-playbook', pb);
+
+    // Zones table
+    const tb = document.getElementById('rzTableBody');
+    if (tb) {
+      const mono = "font-family:'JetBrains Mono',monospace";
+      tb.innerHTML = rzState.length ? rzState.slice(0, 8).map(z => `
+        <tr>
+          <td style="${mono};font-weight:700">${z.lo.toFixed(0)}–${z.hi.toFixed(0)}</td>
+          <td><span style="font-weight:800;color:${z.side === 'sup' ? 'var(--accent-green)' : z.side === 'res' ? 'var(--accent-red)' : '#D97706'}">${z.side === 'sup' ? 'DEMAND' : z.side === 'res' ? 'SUPPLY' : 'FLIP'}</span></td>
+          <td style="${mono}">${z.events.length}</td>
+          <td style="${mono}">${z.maxMove.toFixed(0)} pts <span style="color:var(--text-tertiary);font-size:10px">(${(z.maxMove / st.atr).toFixed(1)}× ATR)</span></td>
+          <td style="font-size:11px;color:var(--text-secondary)">${z.events.slice(-3).map(e => rzDate(e.time)).join(' · ')}</td>
+          <td style="${mono}">${Math.abs(st.px - z.mid).toFixed(0)} pts ${z.mid > st.px ? '↑' : '↓'}</td>
+        </tr>`).join('') : '<tr><td colspan="6" class="j-empty">No qualifying reaction zones in the available history.</td></tr>';
+    }
+  }
+
   // ─── EG DESK ENGINE — engulfing setups gated by the fundamental engine ──────
   // Both Trade Room desks run the same playbook on different timeframes:
   //   EG Scalp:     M5 + M15 engulfings at intraday structure (VWAP, PDH/PDL,
@@ -6652,6 +6825,12 @@
       refreshRealATR();
       refreshStructure();
 
+      // Daily bias + reaction zones (cached klines; feeds the day-chart overlay)
+      computeDailyBias().then(() => {
+        const act = document.querySelector('.snav-btn.active');
+        if (act?.dataset?.tab === 'bias') renderDailyBias();
+      }).catch(() => {});
+
       // Refresh active views (always recompute analysis cards from live price)
       updateAnalysisTab();
       if (activeSection === 'dashboard') renderDashboard();
@@ -7095,7 +7274,7 @@
 
   const NAV_SECTIONS = {
     dashboard: { tabs: [{ id: 'dashboard', label: 'Overview' }] },
-    markets:   { tabs: [{ id: 'analysis', label: 'Live Analysis' }, { id: 'mtf', label: 'Multi-TF Charts' }, { id: 'redfolder', label: 'Red Folder' }, { id: 'sessions', label: 'Trade Sessions' }, { id: 'calendar', label: 'Economic Calendar' }] },
+    markets:   { tabs: [{ id: 'bias', label: 'Daily Bias' }, { id: 'analysis', label: 'Live Analysis' }, { id: 'mtf', label: 'Multi-TF Charts' }, { id: 'redfolder', label: 'Red Folder' }, { id: 'sessions', label: 'Trade Sessions' }, { id: 'calendar', label: 'Economic Calendar' }] },
     traderoom: { tabs: [{ id: 'scalp',    label: 'EG Scalp' },      { id: 'daytrade', label: 'EG Day Trade' },   { id: 'engulf', label: 'Engulfing Desk' }, { id: 'strategy', label: 'Strategy Guide' }] },
     research:  { tabs: [{ id: 'edges',    label: 'Edge Lab' }, { id: 'backtest', label: 'Backtest Lab' }, { id: 'intel', label: 'Intel Sources' }] },
     utilities: { tabs: [{ id: 'calculator', label: 'Position Calc' }, { id: 'tracker', label: 'Signal Tracker' }, { id: 'journal', label: 'Trade Journal' }] }
@@ -7457,26 +7636,6 @@
     set('sr-r2', r2.toLocaleString()); set('sr-r2-desc', `${Math.round(atr*1.5)} pts above | Weekly high target`);
     set('sr-r3', r3.toLocaleString());
 
-    // ── Scenarios ───────────────────────────────────────────────────────────
-    set('scen1-title', `Scenario 1: Re-Entry at R1 (${r1.toLocaleString()})`);
-    setH('scen1-body',
-      `<strong>Setup:</strong> Market breaks through entry zone<br/>` +
-      `<strong>Action:</strong> Wait for pullback to ${(r1 - Math.round(atr * 0.1)).toLocaleString()}–${r1.toLocaleString()}<br/>` +
-      `<strong>Stop:</strong> ${(r1 - Math.round(atr * 0.25)).toLocaleString()} (${Math.round(atr * 0.25)} pts risk)<br/>` +
-      `<strong>Target:</strong> ${r2.toLocaleString()} (+${Math.round(atr).toLocaleString()} pts)<br/>` +
-      `<strong>Key Rule:</strong> Only enter on pullback — never chase breakouts`
-    );
-    set('scen2-title', `Scenario 2: Momentum Play at R2 (${r2.toLocaleString()})`);
-    setH('scen2-body',
-      `<strong>Setup:</strong> Strong momentum continuation through R1<br/>` +
-      `<strong>Action:</strong> Breakout above ${r2.toLocaleString()} with candle close confirmation<br/>` +
-      `<strong>Stop:</strong> ${(r2 - Math.round(atr * 0.2)).toLocaleString()} (${Math.round(atr * 0.2)} pts risk)<br/>` +
-      `<strong>Target:</strong> ${r3.toLocaleString()} (+${Math.round(atr).toLocaleString()} pts)<br/>` +
-      `<strong>Risk Level:</strong> MODERATE — tighter stops required`
-    );
-    const reentryLow  = r2 - Math.round(atr * 0.15);
-    const reentryHigh = r2 + Math.round(atr * 0.05);
-    set('scen3-reentry', `Buy zone ${reentryLow.toLocaleString()}–${reentryHigh.toLocaleString()}`);
   }
 
   function getSessionInfo() {
