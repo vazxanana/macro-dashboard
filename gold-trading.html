@@ -2565,33 +2565,59 @@
     .journal-table tbody tr:hover, .level-row:hover { background: rgba(224,184,77,0.05); }
 
     /* ══════════════════════════════════════════════════════════════════════════
-       OBSIDIAN RAIL — design v3: fixed left rail, true-black flat surfaces,
-       Space Grotesk display type, single gold accent
+       AMBER TERMINAL v4 — a different product: CRT amber-on-black, monospace
+       everywhere, square corners, phosphor glow, scanlines. Light mode = paper
+       terminal (cream + ink). Layout keeps the left rail shell.
        ══════════════════════════════════════════════════════════════════════════ */
     :root {
-      --rail-w: 212px;
-      --rail-bg: #FFFFFF; --rail-border: #E2E5EB; --rail-fg: #4A5568;
-      --gold: #B8860B;
-      --card-bg: #FFFFFF;
-      --glass-light: #FFFFFF; --glass-lighter: #FFFFFF; --glass-ultra: #FFFFFF;
-      --body-bg-a: #F4F5F7; --body-bg-b: #F4F5F7;
+      --rail-w: 216px;
+      /* paper terminal (light) */
+      --term-bg: #F1E9D5; --term-panel: #F7F1E1; --term-panel-2: #EFE6CE;
+      --term-ink: #3A2D0B; --term-ink-2: #6B5619; --term-ink-3: #93803F;
+      --term-line: #D7C89F; --term-amber: #8A6400; --term-glow: transparent;
+      --gold: #8A6400;
+      --rail-bg: var(--term-panel); --rail-border: var(--term-line); --rail-fg: var(--term-ink-2);
+      --bg-primary: var(--term-bg); --bg-secondary: var(--term-panel-2); --bg-tertiary: var(--term-panel);
+      --text-primary: var(--term-ink); --text-secondary: var(--term-ink-2); --text-tertiary: var(--term-ink-3);
+      --border: var(--term-line); --border-light: var(--term-line);
+      --accent-green: #1E7C3C; --accent-red: #B3301F; --accent-blue: #1F5FB3;
+      --card-bg: var(--term-panel);
+      --glass-light: var(--term-panel); --glass-lighter: var(--term-panel); --glass-ultra: var(--term-panel);
+      --body-bg-a: var(--term-bg); --body-bg-b: var(--term-bg);
+      --header-bg: var(--term-panel);
     }
     html.dark {
-      --rail-bg: #08090C; --rail-border: #15171E; --rail-fg: #8A93A8;
-      --gold: #E8B84B;
-      --card-bg: #0D0F14;
-      --glass-light: #0D0F14; --glass-lighter: #10131A; --glass-ultra: #0B0D12;
-      --body-bg-a: #060709; --body-bg-b: #060709;
-      --bg-secondary: #10131A;
-      --border: #1B1E26; --border-light: #14161D;
-      --header-bg: rgba(6,7,9,0.94);
+      /* CRT amber phosphor (dark, default) */
+      --term-bg: #000000; --term-panel: #070502; --term-panel-2: #0C0903;
+      --term-ink: #FFB000; --term-ink-2: #C8891A; --term-ink-3: #7A5C1E;
+      --term-line: #2A1F08; --term-amber: #FFB000; --term-glow: rgba(255,176,0,0.22);
+      --gold: #FFB000;
+      --rail-bg: #030201; --rail-border: var(--term-line); --rail-fg: var(--term-ink-2);
+      --bg-primary: var(--term-bg); --bg-secondary: var(--term-panel-2); --bg-tertiary: var(--term-panel);
+      --text-primary: var(--term-ink); --text-secondary: var(--term-ink-2); --text-tertiary: var(--term-ink-3);
+      --border: var(--term-line); --border-light: #1D1605;
+      --accent-green: #2EFF7B; --accent-red: #FF5C4D; --accent-blue: #5CB8FF;
+      --card-bg: var(--term-panel);
+      --glass-light: var(--term-panel); --glass-lighter: var(--term-panel-2); --glass-ultra: var(--term-panel);
+      --body-bg-a: #000000; --body-bg-b: #000000;
+      --header-bg: rgba(0,0,0,0.96);
     }
-    html, body { background: var(--body-bg-a); }
 
-    /* display type */
-    .logo, .section-title, .dash-widget-title, .levels-panel-title, h1, h2, h3,
-    .desk-word, .kpi-label, .rail-brand {
-      font-family: 'Space Grotesk', 'Inter', sans-serif;
+    /* everything is the machine: one face, hard corners */
+    body, body * { font-family: 'JetBrains Mono', monospace !important; }
+    *, *::before, *::after { border-radius: 0 !important; }
+    html, body { background: var(--term-bg); color: var(--text-primary); }
+
+    /* CRT scanlines + vignette (dark only) */
+    html.dark body::after {
+      content: ''; position: fixed; inset: 0; pointer-events: none; z-index: 9999;
+      background:
+        repeating-linear-gradient(0deg, rgba(0,0,0,0.16) 0 1px, transparent 1px 3px),
+        radial-gradient(ellipse at center, transparent 62%, rgba(0,0,0,0.32) 100%);
+    }
+    html.dark .ticker-value, html.dark .kpi-value, html.dark .desk-word,
+    html.dark .section-title, html.dark .rail-brand, html.dark .metric-value {
+      text-shadow: 0 0 7px var(--term-glow);
     }
 
     /* ── the rail ── */
@@ -2600,64 +2626,94 @@
       flex-direction: column; align-items: stretch;
       background: var(--rail-bg);
       border-right: 1px solid var(--rail-border); border-bottom: none;
-      padding: 0; z-index: 130;
-      overflow-x: hidden; overflow-y: auto;
+      padding: 0; z-index: 130; overflow-x: hidden; overflow-y: auto;
     }
     .rail-brand {
-      padding: 22px 20px 16px;
-      font-weight: 700; font-size: 17px; letter-spacing: 3px;
-      color: var(--text-primary);
+      padding: 20px 18px 14px;
+      font-weight: 700; font-size: 15px; letter-spacing: 3px;
+      color: var(--term-amber);
       border-bottom: 1px solid var(--rail-border);
       margin-bottom: 8px;
     }
-    .rail-brand span { display: block; font-size: 8px; letter-spacing: 3.2px; color: var(--gold); font-weight: 700; margin-top: 4px; }
+    .rail-brand span { display: block; font-size: 8px; letter-spacing: 2.6px; color: var(--term-ink-3); font-weight: 700; margin-top: 5px; }
+    .rail-brand::before { content: '█ '; }
     .pnav-btn {
-      height: 46px; padding: 0 20px; justify-content: flex-start;
+      height: 42px; padding: 0 18px; justify-content: flex-start;
       border-bottom: none; border-left: 3px solid transparent;
-      color: var(--rail-fg); letter-spacing: 1.2px;
+      color: var(--rail-fg); letter-spacing: 1.6px;
     }
-    .pnav-btn:hover { color: var(--text-primary); background: rgba(212,175,55,0.05); }
-    .pnav-btn.active { color: var(--gold); border-left-color: var(--gold); border-bottom: none; background: rgba(212,175,55,0.07); }
-    .pnav-sep { width: auto; height: 1px; margin: 6px 16px; background: var(--rail-border); }
-    .pnav-right { margin: auto 0 0 0; padding: 16px 20px; border-left: none; border-top: 1px solid var(--rail-border); }
+    .pnav-btn:hover { color: var(--term-ink); background: rgba(255,176,0,0.05); }
+    .pnav-btn.active {
+      color: var(--term-bg); border-left-color: var(--term-amber); border-bottom: none;
+      background: var(--term-amber);
+    }
+    .pnav-btn.active .pnav-icon { opacity: 1; }
+    .pnav-sep { width: auto; height: 1px; margin: 6px 14px; background: var(--rail-border); }
+    .pnav-right { margin: auto 0 0 0; padding: 14px 18px; border-left: none; border-top: 1px solid var(--rail-border); }
     .pnav-live-label { color: var(--rail-fg); }
 
-    /* ── shifted shell ── */
+    /* ── shell ── */
     .header, .sub-nav, .container { margin-left: var(--rail-w); }
     .header {
-      position: static;
-      padding: 14px 28px;
-      box-shadow: none;
-      backdrop-filter: none; -webkit-backdrop-filter: none;
-      background: var(--card-bg);
-      border-bottom: 1px solid var(--border-light);
+      position: static; padding: 12px 24px;
+      box-shadow: none; backdrop-filter: none; -webkit-backdrop-filter: none;
+      background: var(--term-panel);
+      border-bottom: 1px solid var(--term-line);
     }
-    .header-inner { gap: 28px; max-width: none; }
+    .header-inner { gap: 26px; max-width: none; }
+    .header-inner > div:first-child { display: none; }
     .price-ticker { flex-wrap: wrap; row-gap: 10px; }
-    .header-inner > div:first-child { display: none; }  /* brand lives in the rail */
-    .ticker-value { font-size: 20px; }
-    .sub-nav { padding: 0 28px; position: sticky; top: 0; z-index: 96; background: var(--rail-bg); border-bottom: 1px solid var(--rail-border); }
-    .snav-btn { color: var(--rail-fg); }
-    .snav-btn:hover { color: var(--text-primary); background: rgba(212,175,55,0.05); }
-    .snav-btn.active { color: var(--gold); border-bottom-color: var(--gold); }
-    .container { padding: 26px 28px 64px; max-width: none; }
+    .ticker-value { font-size: 19px; color: var(--term-ink); }
+    .ticker-label { color: var(--term-ink-3); }
+    html.dark #goldPrice { color: #FFC63D; }
+    .sub-nav {
+      padding: 0 24px; position: sticky; top: 0; z-index: 96;
+      background: var(--term-panel); border-bottom: 1px solid var(--term-line);
+    }
+    .snav-btn { color: var(--term-ink-3); letter-spacing: 0.6px; }
+    .snav-btn::before { content: '['; opacity: 0; margin-right: 2px; }
+    .snav-btn::after  { content: ']'; opacity: 0; margin-left: 2px; }
+    .snav-btn:hover { color: var(--term-ink); background: transparent; }
+    .snav-btn.active { color: var(--term-amber); border-bottom-color: var(--term-amber); }
+    .snav-btn.active::before, .snav-btn.active::after { opacity: 0.7; }
+    .container { padding: 22px 24px 64px; max-width: none; }
 
-    /* ── flat surfaces: no glass, no bounce ── */
+    /* ── panels: bordered readouts, no chrome ── */
     .card, .dash-widget, .kpi-card, .levels-panel, .ems-step, .setup-card, .metric-box, .j-stat {
       backdrop-filter: none; -webkit-backdrop-filter: none;
-      border-radius: 10px;
-      box-shadow: none;
-      animation: none;
-      background: var(--card-bg);
-      border: 1px solid var(--border-light);
+      box-shadow: none; animation: none;
+      background: var(--term-panel);
+      border: 1px solid var(--term-line);
     }
-    .card:hover, .dash-widget:hover { box-shadow: none; }
-    .section-header { border-bottom: 1px solid var(--border-light); padding-bottom: 12px; margin-bottom: 20px; }
-    .section-title::before {
-      content: ''; display: inline-block; width: 3px; height: 13px;
-      background: var(--gold); border-radius: 2px; margin-right: 10px; vertical-align: -1px;
+    .card:hover, .dash-widget:hover, .kpi-card:hover, .ems-step:hover { transform: none; border-color: var(--term-ink-3); box-shadow: none; }
+    .setup-card:hover { border-color: var(--term-ink-3); box-shadow: none; }
+    .section-header { border-bottom: 1px dashed var(--term-line); padding-bottom: 10px; margin-bottom: 18px; }
+    .section-title { color: var(--term-ink); letter-spacing: 1.5px; text-transform: uppercase; }
+    .section-title::before { content: '// '; color: var(--term-amber); background: none; width: auto; height: auto; margin-right: 4px; vertical-align: baseline; }
+    .dash-widget-title, .levels-panel-title { color: var(--term-ink-2); text-transform: uppercase; letter-spacing: 1.4px; }
+    .dash-widget-title::before, .levels-panel-title::before { content: '> '; color: var(--term-amber); }
+
+    /* buttons: square amber outline, invert on hover */
+    .j-add-btn, .dash-shortcut, button.j-add-btn {
+      background: transparent; color: var(--term-amber);
+      border: 1px solid var(--term-amber);
+      box-shadow: none; text-transform: uppercase; letter-spacing: 1px;
     }
-    html.dark #goldPrice { color: var(--gold); }
+    .j-add-btn:hover, .dash-shortcut:hover { background: var(--term-amber); color: var(--term-bg); transform: none; }
+    .dash-shortcut { background: var(--term-panel); border: 1px solid var(--term-line) !important; }
+    .dash-shortcut:hover { background: rgba(255,176,0,0.08); color: inherit; border-color: var(--term-amber) !important; }
+
+    /* tables: ledger style */
+    .journal-table thead th { border-bottom: 1px solid var(--term-amber); color: var(--term-ink-3); text-transform: uppercase; letter-spacing: 1px; }
+    .journal-table tbody tr { border-bottom: 1px dashed var(--term-line); }
+    .journal-table tbody tr:hover, .level-row:hover { background: rgba(255,176,0,0.06); }
+    html.dark ::-webkit-scrollbar { width: 10px; height: 10px; }
+    html.dark ::-webkit-scrollbar-track { background: #000; }
+    html.dark ::-webkit-scrollbar-thumb { background: #3A2B0C; border: 2px solid #000; }
+    :focus-visible { outline: 1px solid var(--term-amber); outline-offset: 2px; }
+
+    /* status dots stay lit */
+    .pnav-live-dot { box-shadow: 0 0 8px var(--accent-green); }
 
     /* ── collapse to a top bar on narrow screens ── */
     @media (max-width: 960px) {
@@ -2669,7 +2725,7 @@
       }
       .rail-brand { display: none; }
       .pnav-btn { border-left: none; border-bottom: 3px solid transparent; }
-      .pnav-btn.active { border-left: none; border-bottom-color: var(--gold); background: transparent; }
+      .pnav-btn.active { border-left: none; background: transparent; color: var(--term-amber); border-bottom-color: var(--term-amber); }
       .pnav-sep { width: 1px; height: auto; margin: 10px 0; }
       .pnav-right { margin: 0 0 0 auto; padding: 0 12px; border-top: none; }
       .header, .sub-nav, .container { margin-left: 0; }
@@ -5120,15 +5176,16 @@
         const dark = document.documentElement.classList.contains('dark');
         chart = LightweightCharts.createChart(el, {
           width: el.clientWidth || 600, height: cfg.height || 340,
-          layout: { background: { type: 'solid', color: 'transparent' }, textColor: dark ? '#9BA3B8' : '#5A6278' },
+          layout: { background: { type: 'solid', color: 'transparent' }, textColor: dark ? '#C8891A' : '#6B5619' },
           grid: { vertLines: { color: 'rgba(127,127,127,0.08)' }, horzLines: { color: 'rgba(127,127,127,0.08)' } },
           rightPriceScale: { borderColor: 'rgba(127,127,127,0.2)' },
           timeScale: { borderColor: 'rgba(127,127,127,0.2)', timeVisible: interval !== '1d', secondsVisible: false },
           crosshair: { mode: 0 }
         });
+        const cUp = dark ? '#2EFF7B' : '#1E7C3C', cDn = dark ? '#FF5C4D' : '#B3301F';
         series = chart.addCandlestickSeries({
-          upColor: '#00A651', downColor: '#C23B33', borderVisible: false,
-          wickUpColor: '#00A651', wickDownColor: '#C23B33'
+          upColor: cUp, downColor: cDn, borderVisible: false,
+          wickUpColor: cUp, wickDownColor: cDn
         });
         if (cfg.zones && typeof series.attachPrimitive === 'function') {
           zonesPrim = makeZonesPrimitive();
