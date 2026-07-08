@@ -2565,187 +2565,197 @@
     .journal-table tbody tr:hover, .level-row:hover { background: rgba(224,184,77,0.05); }
 
     /* ══════════════════════════════════════════════════════════════════════════
-       AURUM GLASS v5 — premium glassmorphism: deep gradient canvas with ambient
-       gold/violet glows, frosted translucent panels, pill navigation.
-       Layout keeps the left rail shell (collapses <960px).
+       MINT HORIZON v6 — BrightHub-style visual language, recreated in original
+       CSS: near-black canvas + starfield, teal hero gradient with a glowing
+       planet-horizon arc, mint accent system, top navbar with logo/links/CTA.
        ══════════════════════════════════════════════════════════════════════════ */
     :root {
-      --rail-w: 220px;
-      --gold: #B8860B; --gold-soft: rgba(184,134,11,0.35);
-      --glass: rgba(255,255,255,0.62); --glass-strong: rgba(255,255,255,0.78);
-      --glass-border: rgba(255,255,255,0.75); --glass-inner: rgba(255,255,255,0.9);
-      --rail-bg: rgba(255,255,255,0.55); --rail-border: rgba(120,130,160,0.18); --rail-fg: #4A5568;
-      --bg-primary: #EEF1F7; --bg-secondary: rgba(255,255,255,0.7); --bg-tertiary: rgba(255,255,255,0.5);
-      --text-primary: #1A1D29; --text-secondary: #4A5568; --text-tertiary: #7A8196;
-      --border: rgba(120,130,160,0.22); --border-light: rgba(120,130,160,0.14);
-      --accent-green: #059669; --accent-red: #DC2626; --accent-blue: #2563EB;
-      --card-bg: var(--glass);
-      --glass-light: var(--glass); --glass-lighter: var(--glass-strong); --glass-ultra: rgba(255,255,255,0.5);
-      --body-bg-a: #EEF1F7; --body-bg-b: #EEF1F7;
-      --header-bg: rgba(255,255,255,0.5);
-      --glow-a: rgba(240,199,94,0.35); --glow-b: rgba(120,140,255,0.22); --glow-c: rgba(240,199,94,0.12);
+      --nav-h: 62px;
+      --mint: #0FA48B; --mint-2: #0B8A75; --mint-soft: rgba(15,164,139,0.16);
+      --bg-primary: #F2F7F6; --panel: #FFFFFF; --panel-2: #F6FAF9;
+      --text-primary: #10201D; --text-secondary: #46605B; --text-tertiary: #7E938F;
+      --line: rgba(16,32,29,0.12); --line-soft: rgba(16,32,29,0.07);
+      --accent-green: #0E9F6E; --accent-red: #E02424; --accent-blue: #1C64F2;
+      --gold: var(--mint);
+      --card-bg: var(--panel);
+      --glass-light: var(--panel); --glass-lighter: var(--panel); --glass-ultra: var(--panel-2);
+      --bg-secondary: var(--panel-2); --bg-tertiary: var(--panel-2);
+      --border: var(--line); --border-light: var(--line-soft);
+      --body-bg-a: #F2F7F6; --body-bg-b: #F2F7F6;
+      --header-bg: #EAF4F1;
+      --hero-core: rgba(15,164,139,0.14); --arc-glow-a: rgba(15,164,139,0.5); --arc-glow-b: rgba(15,164,139,0.9);
+      --star-a: transparent; --star-b: transparent;
+      --nav-bg: rgba(255,255,255,0.85);
     }
     html.dark {
-      --gold: #F0C75E; --gold-soft: rgba(240,199,94,0.35);
-      --glass: rgba(255,255,255,0.055); --glass-strong: rgba(255,255,255,0.085);
-      --glass-border: rgba(255,255,255,0.12); --glass-inner: rgba(255,255,255,0.08);
-      --rail-bg: rgba(10,11,20,0.55); --rail-border: rgba(255,255,255,0.09); --rail-fg: #99A1B7;
-      --bg-primary: #0A0B14; --bg-secondary: rgba(255,255,255,0.06); --bg-tertiary: rgba(255,255,255,0.04);
-      --text-primary: #EEF0F8; --text-secondary: #A6ADC4; --text-tertiary: #646C84;
-      --border: rgba(255,255,255,0.12); --border-light: rgba(255,255,255,0.08);
-      --accent-green: #34D399; --accent-red: #F87171; --accent-blue: #60A5FA;
-      --card-bg: var(--glass);
-      --glass-light: var(--glass); --glass-lighter: var(--glass-strong); --glass-ultra: rgba(255,255,255,0.04);
-      --body-bg-a: #0A0B14; --body-bg-b: #0A0B14;
-      --header-bg: rgba(10,11,20,0.45);
-      --glow-a: rgba(240,199,94,0.16); --glow-b: rgba(99,102,241,0.14); --glow-c: rgba(240,199,94,0.06);
+      --mint: #7BE0CE; --mint-2: #3FC4AF; --mint-soft: rgba(123,224,206,0.16);
+      --bg-primary: #030607; --panel: #081011; --panel-2: #0B1516;
+      --text-primary: #E9F4F1; --text-secondary: #A8B8B5; --text-tertiary: #5F7370;
+      --line: rgba(255,255,255,0.09); --line-soft: rgba(255,255,255,0.055);
+      --accent-green: #4ADE80; --accent-red: #FB7185; --accent-blue: #60A5FA;
+      --gold: var(--mint);
+      --card-bg: var(--panel);
+      --glass-light: var(--panel); --glass-lighter: var(--panel-2); --glass-ultra: rgba(255,255,255,0.03);
+      --bg-secondary: var(--panel-2); --bg-tertiary: var(--panel);
+      --border: var(--line); --border-light: var(--line-soft);
+      --body-bg-a: #030607; --body-bg-b: #030607;
+      --header-bg: transparent;
+      --hero-core: rgba(16,64,61,0.85); --arc-glow-a: rgba(140,240,220,0.5); --arc-glow-b: rgba(200,255,242,0.85);
+      --star-a: rgba(255,255,255,0.5); --star-b: rgba(255,255,255,0.28);
+      --nav-bg: rgba(3,6,7,0.82);
     }
 
     html, body { background: var(--bg-primary); color: var(--text-primary); }
-    /* ambient aurora glows behind everything */
+    body, .section-title, h1, h2, h3, .logo, .rail-brand { font-family: 'Inter', -apple-system, sans-serif; }
+    /* starfield + faint teal ambient behind everything */
     body::before {
       content: ''; position: fixed; inset: 0; z-index: -1; pointer-events: none;
-      background:
-        radial-gradient(900px 600px at 12% -8%,  var(--glow-a), transparent 60%),
-        radial-gradient(1100px 700px at 105% 12%, var(--glow-b), transparent 62%),
-        radial-gradient(800px 800px at 50% 118%,  var(--glow-c), transparent 65%);
+      background-image:
+        radial-gradient(1.2px 1.2px at 28px 44px, var(--star-a), transparent 55%),
+        radial-gradient(1px 1px at 160px 120px, var(--star-b), transparent 55%),
+        radial-gradient(1.4px 1.4px at 240px 60px, var(--star-b), transparent 55%),
+        radial-gradient(60% 520px at 50% 0px, var(--hero-core), transparent 72%);
+      background-size: 320px 260px, 280px 320px, 380px 300px, 100% 100%;
+      background-repeat: repeat, repeat, repeat, no-repeat;
     }
 
-    /* ── the rail: a floating glass column ── */
+    /* ── top navbar: logo · links · CTA ── */
     .primary-nav {
-      position: fixed; left: 0; top: 0; bottom: 0; width: var(--rail-w);
-      flex-direction: column; align-items: stretch;
-      background: var(--rail-bg);
-      backdrop-filter: blur(26px) saturate(160%); -webkit-backdrop-filter: blur(26px) saturate(160%);
-      border-right: 1px solid var(--rail-border); border-bottom: none;
-      padding: 0 0 0; z-index: 130; overflow-x: hidden; overflow-y: auto;
+      position: fixed; top: 0; left: 0; right: 0; bottom: auto; width: auto; height: var(--nav-h);
+      flex-direction: row; align-items: center;
+      background: var(--nav-bg);
+      backdrop-filter: blur(18px) saturate(140%); -webkit-backdrop-filter: blur(18px) saturate(140%);
+      border-right: none; border-bottom: 1px solid var(--line-soft);
+      padding: 0 28px; z-index: 130; overflow: visible;
     }
     .rail-brand {
-      padding: 24px 22px 18px;
-      font-family: 'Inter', sans-serif;
-      font-weight: 800; font-size: 17px; letter-spacing: 2.5px;
-      color: var(--text-primary);
-      border-bottom: 1px solid var(--rail-border);
-      margin-bottom: 10px;
+      display: flex; align-items: baseline; gap: 7px;
+      padding: 0 26px 0 0; margin: 0; border: none;
+      font-size: 17px; font-weight: 800; letter-spacing: 0.2px; color: var(--text-primary);
     }
-    .rail-brand::before { content: none; }
-    .rail-brand span {
-      display: block; font-size: 8px; letter-spacing: 3px; font-weight: 700; margin-top: 5px;
-      background: linear-gradient(90deg, var(--gold), #D4AF37);
-      -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
+    .rail-brand::before {
+      content: ''; width: 15px; height: 15px; align-self: center;
+      border-radius: 50% 50% 50% 4px;
+      background: linear-gradient(135deg, var(--mint), var(--mint-2));
+      box-shadow: 0 0 14px var(--mint-soft);
     }
+    .rail-brand span { display: none; }
     .pnav-btn {
-      height: 44px; margin: 2px 12px; padding: 0 14px; justify-content: flex-start;
-      border: 1px solid transparent; border-radius: 12px;
-      color: var(--rail-fg); letter-spacing: 1.3px;
+      height: var(--nav-h); margin: 0; padding: 0 15px;
+      border: none; border-radius: 0; background: none;
+      color: var(--text-secondary); font-size: 12.5px; font-weight: 600;
+      letter-spacing: 0.3px; text-transform: none;
     }
-    .pnav-btn:hover { color: var(--text-primary); background: var(--glass); }
-    .pnav-btn.active {
-      color: var(--gold);
-      background: linear-gradient(135deg, var(--gold-soft), rgba(240,199,94,0.06));
-      border: 1px solid var(--gold-soft);
-      box-shadow: 0 4px 18px rgba(240,199,94,0.12), inset 0 1px 0 var(--glass-inner);
+    .pnav-btn:hover { color: var(--text-primary); background: none; }
+    .pnav-btn.active { color: var(--mint); background: none; border: none; box-shadow: none; }
+    .pnav-icon { display: none; }
+    .pnav-sep { display: none; }
+    .pnav-right {
+      margin: 0 0 0 auto; padding: 0; border: none;
     }
-    .pnav-sep { width: auto; height: 1px; margin: 8px 20px; background: var(--rail-border); }
-    .pnav-right { margin: auto 0 0 0; padding: 16px 22px; border-left: none; border-top: 1px solid var(--rail-border); }
-    .pnav-live-label { color: var(--rail-fg); }
+    .pnav-live {
+      background: linear-gradient(135deg, var(--mint), var(--mint-2));
+      padding: 8px 16px; border-radius: 9px;
+      box-shadow: 0 4px 18px var(--mint-soft);
+    }
+    .pnav-live-dot { background: #06231F; box-shadow: none; animation: none; width: 7px; height: 7px; border-radius: 50%; }
+    .pnav-live-label { color: #06231F; font-weight: 800; }
+    .pnav-live.is-stale   { background: linear-gradient(135deg, #F5C26B, #D99A06); }
+    .pnav-live.is-offline { background: linear-gradient(135deg, #F98080, #E02424); }
 
-    /* ── shell ── */
-    .header, .sub-nav, .container { margin-left: var(--rail-w); }
+    /* ── hero ticker strip with the glowing horizon arc ── */
+    .header, .sub-nav, .container { margin-left: 0; }
     .header {
-      position: static; padding: 16px 30px;
-      background: var(--header-bg);
-      backdrop-filter: blur(24px) saturate(160%); -webkit-backdrop-filter: blur(24px) saturate(160%);
-      border-bottom: 1px solid var(--border-light);
-      box-shadow: none;
+      position: relative; overflow: hidden;
+      margin-top: var(--nav-h);
+      padding: 26px 34px 42px;
+      background: radial-gradient(130% 340px at 50% -120px, var(--hero-core) 0%, transparent 78%);
+      border-bottom: none; box-shadow: none;
+      backdrop-filter: none; -webkit-backdrop-filter: none;
     }
-    .header-inner { gap: 30px; max-width: none; }
+    .header::after {
+      content: ''; position: absolute; left: 50%; top: calc(100% - 10px);
+      width: 165%; height: 420px; transform: translateX(-50%);
+      border-radius: 50%;
+      background: var(--bg-primary);
+      box-shadow: 0 -4px 16px var(--arc-glow-b), 0 -26px 80px var(--arc-glow-a);
+    }
+    .header-inner { gap: 30px; max-width: 1500px; margin: 0 auto; }
     .header-inner > div:first-child { display: none; }
     .price-ticker { flex-wrap: wrap; row-gap: 12px; }
     .ticker-value { font-size: 21px; }
-    #goldPrice {
-      background: linear-gradient(120deg, var(--gold) 20%, #D4AF37 55%, var(--gold) 90%);
-      -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
-    }
-    .sub-nav {
-      padding: 8px 26px; position: sticky; top: 0; z-index: 96;
-      background: var(--header-bg);
-      backdrop-filter: blur(24px) saturate(160%); -webkit-backdrop-filter: blur(24px) saturate(160%);
-      border-bottom: 1px solid var(--border-light);
-      gap: 4px; min-height: 0;
-    }
-    .snav-btn { color: var(--text-tertiary); border: 1px solid transparent; border-radius: 999px; padding: 7px 16px; margin: 2px 0; }
-    .snav-btn::before, .snav-btn::after { content: none; }
-    .snav-btn:hover { color: var(--text-primary); background: var(--glass); }
-    .snav-btn.active {
-      color: var(--gold); border-bottom: 1px solid var(--gold-soft);
-      background: linear-gradient(135deg, var(--gold-soft), rgba(240,199,94,0.05));
-      border: 1px solid var(--gold-soft);
-    }
-    .container { padding: 26px 30px 70px; max-width: none; }
+    .ticker-label { color: var(--text-tertiary); }
+    #goldPrice { color: var(--mint); text-shadow: 0 0 22px var(--mint-soft); }
 
-    /* ── frosted panels ── */
+    .sub-nav {
+      padding: 6px 26px; position: sticky; top: var(--nav-h); z-index: 96;
+      background: var(--nav-bg);
+      backdrop-filter: blur(18px) saturate(140%); -webkit-backdrop-filter: blur(18px) saturate(140%);
+      border-bottom: 1px solid var(--line-soft);
+      gap: 2px; min-height: 0;
+    }
+    .snav-btn { color: var(--text-tertiary); border: none; border-radius: 8px; padding: 8px 14px; margin: 2px 0; font-weight: 600; }
+    .snav-btn::before, .snav-btn::after { content: none; }
+    .snav-btn:hover { color: var(--text-primary); background: var(--mint-soft); }
+    .snav-btn.active { color: var(--mint); background: var(--mint-soft); border: none; }
+    .container { padding: 28px 30px 72px; max-width: 1500px; margin-left: auto; margin-right: auto; }
+
+    /* ── panels: quiet dark cards, thin borders, mint on hover ── */
     .card, .dash-widget, .kpi-card, .levels-panel, .ems-step, .setup-card, .metric-box, .j-stat {
-      background: var(--card-bg);
-      backdrop-filter: blur(22px) saturate(160%); -webkit-backdrop-filter: blur(22px) saturate(160%);
-      border: 1px solid var(--glass-border);
-      border-radius: 18px;
-      box-shadow: 0 8px 32px rgba(8, 10, 24, 0.18), inset 0 1px 0 var(--glass-inner);
+      background: linear-gradient(180deg, rgba(255,255,255,0.028), rgba(255,255,255,0.012)), var(--panel);
+      backdrop-filter: none; -webkit-backdrop-filter: none;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.22);
       animation: none;
+      transition: border-color .18s ease, transform .18s ease;
     }
-    html.dark .card, html.dark .dash-widget, html.dark .kpi-card, html.dark .levels-panel,
-    html.dark .ems-step, html.dark .setup-card, html.dark .metric-box, html.dark .j-stat {
-      box-shadow: 0 10px 38px rgba(0, 0, 0, 0.42), inset 0 1px 0 var(--glass-inner);
+    :root:not(.dark) .card, :root:not(.dark) .dash-widget, :root:not(.dark) .kpi-card,
+    :root:not(.dark) .levels-panel, :root:not(.dark) .ems-step, :root:not(.dark) .setup-card,
+    :root:not(.dark) .metric-box, :root:not(.dark) .j-stat {
+      background: var(--panel); box-shadow: 0 6px 22px rgba(16,32,29,0.06);
     }
-    .card, .dash-widget, .kpi-card, .ems-step, .setup-card { transition: transform .18s ease, border-color .18s ease, box-shadow .18s ease; }
     .kpi-card:hover, .setup-card:hover, .ems-step:hover, .dash-widget:hover, .card:hover {
-      transform: translateY(-2px);
-      border-color: var(--gold-soft);
+      transform: translateY(-2px); border-color: rgba(123,224,206,0.4);
     }
-    .section-header { border-bottom: 1px solid var(--border-light); padding-bottom: 12px; margin-bottom: 20px; }
-    .section-title { letter-spacing: 0.4px; }
+    .section-header { border-bottom: 1px solid var(--line-soft); padding-bottom: 12px; margin-bottom: 20px; }
+    .section-title { letter-spacing: 0.3px; color: var(--text-primary); }
     .section-title::before {
-      content: ''; display: inline-block; width: 10px; height: 10px; margin-right: 10px;
-      border-radius: 3px; vertical-align: 0;
-      background: linear-gradient(135deg, var(--gold), #D4AF37);
-      box-shadow: 0 0 12px var(--gold-soft);
+      content: ''; display: inline-block; width: 8px; height: 8px; margin-right: 10px;
+      border-radius: 50% 50% 50% 2px; vertical-align: 1px;
+      background: linear-gradient(135deg, var(--mint), var(--mint-2));
+      box-shadow: 0 0 10px var(--mint-soft);
     }
     .dash-widget-title::before, .levels-panel-title::before { content: none; }
 
-    /* pills + buttons */
+    /* buttons: solid mint primary / glass secondary */
     .j-add-btn, button.j-add-btn {
-      background: linear-gradient(135deg, var(--gold-soft), rgba(240,199,94,0.08));
-      color: var(--gold); border: 1px solid var(--gold-soft); border-radius: 999px;
-      box-shadow: inset 0 1px 0 var(--glass-inner);
-      text-transform: none; letter-spacing: 0.2px;
+      background: linear-gradient(135deg, var(--mint), var(--mint-2));
+      color: #06231F; border: none; border-radius: 10px;
+      font-weight: 800; letter-spacing: 0.2px; text-transform: none;
+      box-shadow: 0 6px 22px var(--mint-soft);
     }
-    .j-add-btn:hover { background: var(--gold); color: #14120A; transform: translateY(-1px); }
-    .dash-shortcut { border-radius: 16px; backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px); }
-    .dash-shortcut:hover { transform: translateY(-2px); border-color: var(--gold-soft) !important; }
+    .j-add-btn:hover { filter: brightness(1.08); transform: translateY(-1px); background: linear-gradient(135deg, var(--mint), var(--mint-2)); color: #06231F; }
+    .dash-shortcut {
+      border-radius: 12px; background: var(--glass-ultra) !important;
+      border: 1px solid var(--line) !important;
+      backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+    }
+    .dash-shortcut:hover { transform: translateY(-2px); border-color: rgba(123,224,206,0.45) !important; }
 
     /* tables */
-    .journal-table thead th { border-bottom: 1px solid var(--gold-soft); color: var(--text-tertiary); }
-    .journal-table tbody tr { border-bottom: 1px solid var(--border-light); }
-    .journal-table tbody tr:hover, .level-row:hover { background: var(--glass); }
+    .journal-table thead th { border-bottom: 1px solid rgba(123,224,206,0.35); color: var(--text-tertiary); }
+    .journal-table tbody tr { border-bottom: 1px solid var(--line-soft); }
+    .journal-table tbody tr:hover, .level-row:hover { background: var(--mint-soft); }
     html.dark ::-webkit-scrollbar { width: 10px; height: 10px; }
     html.dark ::-webkit-scrollbar-track { background: transparent; }
-    html.dark ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.14); border-radius: 6px; }
-    :focus-visible { outline: 2px solid var(--gold-soft); outline-offset: 2px; }
+    html.dark ::-webkit-scrollbar-thumb { background: rgba(123,224,206,0.18); border-radius: 6px; }
+    :focus-visible { outline: 2px solid var(--mint-soft); outline-offset: 2px; }
 
-    /* ── collapse to a top bar on narrow screens ── */
     @media (max-width: 960px) {
-      .primary-nav {
-        position: sticky; top: 0; left: auto; bottom: auto; width: auto;
-        flex-direction: row; align-items: center;
-        overflow-x: auto; overflow-y: hidden;
-        border-right: none; border-bottom: 1px solid var(--rail-border);
-        padding: 6px 10px;
-      }
-      .rail-brand { display: none; }
-      .pnav-btn { margin: 0 4px; height: 38px; }
-      .pnav-sep { width: 1px; height: 22px; margin: 0 4px; align-self: center; }
-      .pnav-right { margin: 0 0 0 auto; padding: 0 10px; border-top: none; }
-      .header, .sub-nav, .container { margin-left: 0; }
+      .primary-nav { overflow-x: auto; padding: 0 14px; }
+      .rail-brand { padding-right: 14px; }
+      .pnav-btn { padding: 0 10px; white-space: nowrap; }
     }
   </style>
 </head>
@@ -5193,13 +5203,13 @@
         const dark = document.documentElement.classList.contains('dark');
         chart = LightweightCharts.createChart(el, {
           width: el.clientWidth || 600, height: cfg.height || 340,
-          layout: { background: { type: 'solid', color: 'transparent' }, textColor: dark ? '#8E96AC' : '#5A6278' },
+          layout: { background: { type: 'solid', color: 'transparent' }, textColor: dark ? '#7E938F' : '#46605B' },
           grid: { vertLines: { color: 'rgba(127,127,127,0.08)' }, horzLines: { color: 'rgba(127,127,127,0.08)' } },
           rightPriceScale: { borderColor: 'rgba(127,127,127,0.2)' },
           timeScale: { borderColor: 'rgba(127,127,127,0.2)', timeVisible: interval !== '1d', secondsVisible: false },
           crosshair: { mode: 0 }
         });
-        const cUp = dark ? '#34D399' : '#059669', cDn = dark ? '#F87171' : '#DC2626';
+        const cUp = dark ? '#4ADE80' : '#0E9F6E', cDn = dark ? '#FB7185' : '#E02424';
         series = chart.addCandlestickSeries({
           upColor: cUp, downColor: cDn, borderVisible: false,
           wickUpColor: cUp, wickDownColor: cDn
