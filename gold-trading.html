@@ -8,6 +8,10 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#030607">
+  <link rel="apple-touch-icon" href="icon-192.png">
+  <link rel="icon" type="image/png" href="icon-192.png">
   <script src="https://s3.tradingview.com/tv.js" async></script>
   <!-- Lightweight Charts: MUST be the "standalone" build to expose window.LightweightCharts -->
   <script src="https://unpkg.com/lightweight-charts@4.1.3/dist/lightweight-charts.standalone.production.js"></script>
@@ -2787,6 +2791,11 @@
         <div class="ticker-value" id="gsRatio">—</div>
       </div>
       <div class="ticker-item">
+        <div class="ticker-label">Next Red Folder</div>
+        <div class="ticker-value" id="nextEventVal" style="font-size:15px;">—</div>
+        <div class="ticker-change" id="nextEventSub" style="color: var(--text-tertiary);">scanning calendar…</div>
+      </div>
+      <div class="ticker-item">
         <div class="ticker-label">VIX</div>
         <div class="ticker-value" id="vixVal">…</div>
       </div>
@@ -2813,6 +2822,7 @@
     <span>Price Alerts</span>
     <span class="panel-close" onclick="toggleAlerts()">×</span>
   </div>
+  <button class="j-add-btn" id="notifBtn" style="width:100%;margin-bottom:10px;" onclick="enableNotifs()">🔕 Enable auto alerts (zones · bias · events)</button>
   <div class="alert-form">
     <input class="alert-input" type="number" id="alertPrice" placeholder="Price" step="0.01">
     <select class="alert-input j-select" id="alertDir" style="font-family:'Inter',sans-serif;">
@@ -3081,6 +3091,22 @@
       </div>
       <div style="margin-top:10px;font-size:10px;color:var(--text-tertiary);line-height:1.6;">
         Fundamental cadence: real yields / breakevens / 2Y are daily FRED closes; DXY momentum uses ECB reference rates; COT positioning is the CFTC weekly report (Fridays, data as of Tuesday). A reaction zone is a price area where gold previously reversed by at least ~1.1× the daily ATR within a few days of touching it. The more hits and the bigger the moves, the more institutional orders live there. Trade INTO these zones in the bias direction — an engulfing printed inside one (watch the M15 execution view above) is the highest-probability setup on the platform.
+      </div>
+    </div>
+
+    <!-- Correlation + COT history -->
+    <div class="mtf-grid" style="margin-top:16px;">
+      <div class="dash-widget">
+        <div class="dash-widget-title" style="margin-bottom:10px;">GOLD CORRELATIONS <span style="font-size:10px;font-weight:500;color:var(--text-tertiary)">20-day rolling vs DXY (blue) and real yields (gold) — near −1 = master drivers in gear; near 0 = decoupled, trust the fundamental gate less</span></div>
+        <div id="corrChart" style="width:100%;height:260px;position:relative;">
+          <div id="corrChartMsg" style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;text-align:center;color:var(--text-tertiary);font-size:12px;padding:16px;">Loading&hellip;</div>
+        </div>
+      </div>
+      <div class="dash-widget">
+        <div class="dash-widget-title" style="margin-bottom:10px;">COT — MANAGED MONEY NET <span style="font-size:10px;font-weight:500;color:var(--text-tertiary)">last ~60 weekly reports (CFTC) — extremes mark crowding, turns mark rotations</span></div>
+        <div id="cotChart" style="width:100%;height:260px;position:relative;">
+          <div id="cotChartMsg" style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;text-align:center;color:var(--text-tertiary);font-size:12px;padding:16px;">Waiting for the weekly CFTC feed&hellip;</div>
+        </div>
       </div>
     </div>
 
@@ -4231,17 +4257,61 @@
     </div>
   </div><!-- end tab-intel -->
 
+  <!-- BIAS SCORECARD — the engine grades itself -->
+  <div id="tab-scorecard" class="tab-panel">
+    <div class="section-header">
+      <div class="section-title">Bias Scorecard <span style="font-size:11px;font-weight:500;color:var(--text-tertiary)">— every daily verdict logged automatically and graded against the actual daily candle</span></div>
+    </div>
+
+    <div class="grid-3" style="margin-bottom:16px;" id="scGrid"></div>
+
+    <div class="levels-grid" style="margin-bottom:16px;">
+      <div class="levels-panel">
+        <div class="levels-panel-title">Driver League — who earns their weight</div>
+        <div id="scDrivers" style="font-size:12px;">Collecting data&hellip;</div>
+        <div style="margin-top:10px;font-size:10px;color:var(--text-tertiary);line-height:1.6;">
+          For each graded day, a driver scores a hit when its vote matched the day's actual direction (candle close vs open). Drivers that stay below ~50% over a real sample are candidates for down-weighting.
+        </div>
+      </div>
+      <div class="levels-panel">
+        <div class="levels-panel-title">How grading works</div>
+        <div style="font-size:11px;color:var(--text-secondary);line-height:1.8;">
+          The first time the platform computes the Daily Bias each UTC day, the verdict is logged (call, confidence, entry zone, target, invalidation, every driver's vote).
+          Once that day's daily candle closes, the entry is graded: <strong>WIN</strong> if the day closed in the called direction, <strong>LOSS</strong> if against, <strong>FLAT</strong>/<strong>NO-CALL</strong> otherwise.
+          Target-hit and invalidation are checked off the day's high/low/close. Everything is stored in this browser (localStorage) — the ledger builds as you use the platform daily.
+        </div>
+      </div>
+    </div>
+
+    <div class="card glass">
+      <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;">
+        <h3 style="margin:0;">Verdict Ledger — last 30 graded days</h3>
+        <span style="font-size:10px;color:var(--text-tertiary);" id="scLedgerNote">&mdash;</span>
+      </div>
+      <div class="journal-table-wrap" style="margin-top:12px;">
+        <table class="journal-table">
+          <thead>
+            <tr><th>Date</th><th>Call</th><th>Conf</th><th>Result</th><th>Day Move</th><th>Target Hit</th><th>Invalidated</th></tr>
+          </thead>
+          <tbody id="scLedgerBody">
+            <tr><td colspan="7" class="j-empty">No graded days yet — the ledger starts filling after your first full day of use.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div><!-- end tab-scorecard -->
+
   <!-- BACKTEST LAB — replay the two EG desks over real 2026 history -->
   <div id="tab-backtest" class="tab-panel">
     <div class="section-header">
-      <div class="section-title">Backtest Lab <span style="font-size:11px;font-weight:500;color:var(--text-tertiary)">— walk-forward replay of the EG Scalp and EG Day Trade playbooks on real 2026 gold history</span></div>
+      <div class="section-title">Backtest Lab <span style="font-size:11px;font-weight:500;color:var(--text-tertiary)">— walk-forward replay of the three playbooks on real 2026 gold history</span></div>
     </div>
 
     <div class="card glass" style="margin-bottom:16px;">
       <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;">
         <div style="font-size:12px;color:var(--text-secondary);line-height:1.7;max-width:760px;">
           Fetches <strong>2026 year-to-date</strong> PAXG (tokenized gold) candles from Binance — M15, H1, H4, Daily —
-          and replays the <strong>EG Scalp</strong> and <strong>EG Day Trade</strong> playbooks bar by bar using
+          and replays the <strong>EG Scalp</strong>, <strong>EG Day Trade</strong> and <strong>Daily Bias</strong> playbooks bar by bar using
           the platform's own engulfing detector, with data available only up to each bar (<strong>no look-ahead</strong>).
           Fills are conservative (stop counted before target inside the same bar). A 0.35-pt round-trip cost is charged per trade.
         </div>
@@ -4289,6 +4359,7 @@
     if (name === 'dashboard') { renderDashboard(); }
     if (name === 'analysis')  { updateAnalysisTab(); }
     if (name === 'bias')      { renderDailyBias(); }
+    if (name === 'scorecard') { renderBiasScorecard(); }
     if (name === 'calendar')  { renderCalendar(); }
     if (name === 'redfolder') { renderRedFolder(); }
     if (name === 'mtf')       { initMtfCharts(); renderMtfSummary(); }
@@ -4458,6 +4529,25 @@
     if (hits.today.length)    return { level: 'high', label: 'EVENT RISK — TODAY',    events: hits.today,    advice: 'High-impact release today. Stand aside 30 min before/after the print; halve size on any position held through it.' };
     if (hits.tomorrow.length) return { level: 'elev', label: 'EVENT RISK — TOMORROW', events: hits.tomorrow, advice: 'High-impact release tomorrow. Avoid new swing entries late in the day; keep stops honest.' };
     return { level: 'clear', label: 'NO EVENT RISK', events: [], advice: 'No high-impact releases within 24h — normal sizing rules apply.' };
+  }
+
+  function updateNextEventChip() {
+    const vEl = document.getElementById('nextEventVal');
+    const sEl = document.getElementById('nextEventSub');
+    if (!vEl) return;
+    const now = new Date();
+    const today = new Date(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate());
+    let best = null;
+    for (const ev of CAL_EVENTS) {
+      if (ev.impact !== 'high') continue;
+      const d = new Date(now.getUTCFullYear(), MONTH_MAP[ev.month], ev.day);
+      const days = Math.round((d - today) / 86400000);
+      if (days >= 0 && (!best || days < best.days)) best = { ev, days };
+    }
+    if (!best) { vEl.textContent = '—'; if (sEl) sEl.textContent = 'no high-impact event mapped'; return; }
+    vEl.textContent = best.days === 0 ? 'TODAY' : best.days === 1 ? 'Tomorrow' : 'in ' + best.days + 'd';
+    vEl.style.color = best.days === 0 ? 'var(--accent-red)' : best.days === 1 ? '#D97706' : '';
+    if (sEl) sEl.textContent = best.ev.title;
   }
 
   function renderEventRiskBanner() {
@@ -5742,6 +5832,69 @@
     return trades;
   }
 
+  // Like btPlayOut, but the entry is a LIMIT (fills on a pullback INTO the
+  // price, not a breakout through it). Conservative fills as usual.
+  function btPlayOutLimit(m15, iStart, dir, entry, stop, target, maxBars) {
+    const risk = Math.abs(entry - stop);
+    if (!(risk > 0)) return null;
+    let filled = false, fillI = -1;
+    for (let j = iStart; j < Math.min(iStart + maxBars, m15.length); j++) {
+      const b = m15[j];
+      if (!filled) {
+        const hit = dir === 'long' ? b.low <= entry : b.high >= entry;
+        if (hit) { filled = true; fillI = j; }
+        else continue;
+      }
+      const stopHit = dir === 'long' ? b.low <= stop : b.high >= stop;
+      const tgtHit  = dir === 'long' ? b.high >= target : b.low <= target;
+      if (stopHit) return { r: -1 - BT_COST_PTS / risk, exitI: j, bars: j - fillI };
+      if (tgtHit)  return { r: Math.abs(target - entry) / risk - BT_COST_PTS / risk, exitI: j, bars: j - fillI };
+    }
+    return filled ? { r: 0 - BT_COST_PTS / risk, exitI: Math.min(iStart + maxBars, m15.length) - 1, bars: maxBars } : null;
+  }
+
+  function btAtrAt(D, i) {
+    let sum = 0, n = 0;
+    for (let k = Math.max(1, i - 13); k <= i; k++) {
+      sum += Math.max(D[k].high - D[k].low, Math.abs(D[k].high - D[k - 1].close), Math.abs(D[k].low - D[k - 1].close));
+      n++;
+    }
+    return n ? sum / n : 0;
+  }
+
+  // S3 — Daily Bias engine (trend proxy + reaction-zone limit entries).
+  // Each daily close: recompute zones as-of, buy the pullback into the nearest
+  // zone in the trend direction, stop beyond the zone, target the opposing zone.
+  function btSimBias(D, m15) {
+    const trades = [];
+    let busyUntil = -1;
+    for (let di = 40; di < D.length - 1; di++) {
+      const t = D[di].time;
+      const atr = btAtrAt(D, di);
+      if (!(atr > 0)) continue;
+      const closes = D.slice(0, di + 1).map(b => b.close);
+      const dir = closes[closes.length - 1] >= btSma(closes, 20) ? 'long' : 'short';
+      const px = D[di].close;
+      const zones = reactionZones(D.slice(0, di + 1), atr, px);   // refPx = as-of close (no look-ahead shift)
+      const below = zones.filter(z => z.mid < px).sort((a, b) => b.mid - a.mid)[0];
+      const above = zones.filter(z => z.mid > px).sort((a, b) => a.mid - b.mid)[0];
+      const ez = dir === 'long' ? below : above;
+      const tz = dir === 'long' ? above : below;
+      if (!ez) continue;
+      const entry = dir === 'long' ? ez.hi : ez.lo;                       // zone edge nearest price
+      const stop  = dir === 'long' ? ez.lo - atr * 0.35 : ez.hi + atr * 0.35;
+      const risk  = Math.abs(entry - stop);
+      if (!(risk > 0) || Math.abs(px - entry) > atr * 2.5) continue;      // zone too far to be today's business
+      const target = tz ? tz.mid : (dir === 'long' ? entry + risk * 2 : entry - risk * 2);
+      if (Math.abs(target - entry) / risk < 1) continue;                  // RR ≥ 1 gate
+      const i15 = btAsOfIndex(m15, t) + 1;
+      if (i15 <= 0 || i15 <= busyUntil) continue;
+      const res = btPlayOutLimit(m15, i15, dir, entry, stop, target, 480);   // ≤5 trading days
+      if (res) { trades.push({ t, dir, ...res }); busyUntil = res.exitI; }
+    }
+    return trades;
+  }
+
   let btRunning = false;
   async function runBacktest() {
     if (btRunning) return;
@@ -5766,7 +5919,8 @@
       await new Promise(r => setTimeout(r, 30));
       const rows = [
         btMetrics('EG Scalp (★ M15 at structure, 1.8R)', btSimEngulf(D, m15, h4)),
-        btMetrics('EG Day Trade (H1 at daily structure, 2R)', btSimEgDay(D, h1, m15))
+        btMetrics('EG Day Trade (H1 at daily structure, 2R)', btSimEgDay(D, h1, m15)),
+        btMetrics('Daily Bias (zone limit entries, trend proxy)', btSimBias(D, m15))
       ];
       // Rank by total R, but a strategy needs a minimum sample to win
       const qualified = rows.filter(r2 => r2.n >= 5);
@@ -5805,7 +5959,7 @@
   //   2Y yield (DGS2)      = the market's Fed-policy proxy   → falling = dovish = gold+
   //   DXY 5-session change = USD momentum (ICE formula, ECB reference rates)
   //   CFTC COT             = managed-money net gold futures positioning (weekly)
-  let fundX = { breakeven: null, dgs2: null, dxyMom: null, cot: null, _ts: 0 };
+  let fundX = { breakeven: null, dgs2: null, dxyMom: null, cot: null, curve: null, hy: null, cotSeries: null, _ts: 0 };
 
   async function fetchFredSeries(seriesId, limit) {
     const url = `https://api.stlouisfed.org/fred/series/observations?series_id=${seriesId}&api_key=${apiKeys.fred}&limit=${limit}&sort_order=desc&file_type=json`;
@@ -5824,7 +5978,18 @@
     fundX._ts = Date.now();
 
     try {
-      const [nom, tw] = await Promise.all([fetchFredSeries('DGS10', 15), fetchFredSeries('DGS2', 15)]);
+      const [nom, tw, cv, hy] = await Promise.all([
+        fetchFredSeries('DGS10', 15), fetchFredSeries('DGS2', 15),
+        fetchFredSeries('T10Y3M', 15), fetchFredSeries('BAMLH0A0HYM2', 15)
+      ]);
+      const lvlChg = obs => {
+        if (!obs) return null;
+        const now = parseFloat(obs[0].value);
+        const wk  = parseFloat(obs[Math.min(5, obs.length - 1)].value);
+        return isFinite(now) && isFinite(wk) ? { level: +now.toFixed(2), chg: +(now - wk).toFixed(2) } : null;
+      };
+      fundX.curve = lvlChg(cv);
+      fundX.hy = lvlChg(hy);
       if (nom && realYield.level !== null) {
         const nomNow = parseFloat(nom[0].value);
         const nomWk  = parseFloat(nom[Math.min(5, nom.length - 1)].value);
@@ -5858,7 +6023,7 @@
 
     try {
       const q = 'https://publicreporting.cftc.gov/resource/72hh-3qpy.json'
-        + '?$select=report_date_as_yyyy_mm_dd,m_money_positions_long_all,m_money_positions_short_all'
+        + '?$select=report_date_as_yyyy_mm_dd,m_money_positions_long_all,m_money_positions_short_all,open_interest_all'
         + '&$where=' + encodeURIComponent("commodity_name='GOLD'")
         + '&$order=' + encodeURIComponent('report_date_as_yyyy_mm_dd DESC') + '&$limit=60';
       const res = await fetchWithFallback([
@@ -5870,15 +6035,178 @@
         const rows = await res.json();
         if (Array.isArray(rows) && rows.length >= 5) {
           const nets = rows.map(r => ({ d: (r.report_date_as_yyyy_mm_dd || '').slice(0, 10),
-            net: (+r.m_money_positions_long_all || 0) - (+r.m_money_positions_short_all || 0) }));
+            net: (+r.m_money_positions_long_all || 0) - (+r.m_money_positions_short_all || 0),
+            oi: +r.open_interest_all || 0 }));
           const now = nets[0], m4 = nets[Math.min(4, nets.length - 1)];
           const sorted = nets.map(n => n.net).slice().sort((x, y) => x - y);
           const idx = sorted.findIndex(v => v >= now.net);
           const pct = Math.round((idx < 0 ? sorted.length - 1 : idx) / Math.max(1, sorted.length - 1) * 100);
-          fundX.cot = { net: now.net, chg4w: now.net - m4.net, pct, asOf: now.d };
+          fundX.cot = { net: now.net, chg4w: now.net - m4.net, pct, asOf: now.d, oi: now.oi, oiChg4w: now.oi - m4.oi };
+          fundX.cotSeries = nets.slice().reverse()
+            .filter(n => n.d)
+            .map(n => ({ time: Math.floor(Date.parse(n.d) / 1000), value: n.net }));
         }
       }
     } catch (e) { console.warn('COT fetch failed:', e.message); }
+  }
+
+  // ─── BIAS SCORECARD — the engine grades itself ──────────────────────────────
+  // Log the first Daily Bias verdict of each UTC day; grade past entries
+  // against the actual daily candles (close vs open). All localStorage.
+  function biasLedgerLoad() { try { return JSON.parse(localStorage.getItem('biasLedger') || '[]'); } catch (e) { return []; } }
+  function biasLedgerSave(l) { try { localStorage.setItem('biasLedger', JSON.stringify(l.slice(-150))); } catch (e) {} }
+
+  function logAndGradeBias(st, d1) {
+    if (!st || !st.ok || !d1 || !d1.length) return biasLedgerLoad();
+    const led = biasLedgerLoad();
+    const today = new Date().toISOString().slice(0, 10);
+    if (!led.some(e => e.d === today)) {
+      led.push({
+        d: today, dir: st.dir, conf: st.conf, net: st.net, px: +st.px.toFixed(2), atr: +st.atr.toFixed(1),
+        zLo: st.entryZone ? st.entryZone.lo : null, zHi: st.entryZone ? st.entryZone.hi : null,
+        tgt: st.targetZone ? st.targetZone.mid : null,
+        inv: st.entryZone ? +(st.dir === 'long' ? st.entryZone.lo : st.entryZone.hi).toFixed(1) : null,
+        drivers: st.checks.map(c => ({ n: c.n, dir: c.dir })),
+        graded: false
+      });
+    }
+    const byDay = {};
+    for (const c of d1) byDay[new Date(c.time * 1000).toISOString().slice(0, 10)] = c;
+    for (const e of led) {
+      if (e.graded || e.d === today) continue;
+      const c = byDay[e.d];
+      if (!c) { if (Date.now() - Date.parse(e.d) > 6 * 86400e3) { e.graded = true; e.res = 'N/A'; } continue; }
+      e.dayDir = c.close > c.open ? 'long' : c.close < c.open ? 'short' : 'flat';
+      e.dayMove = +(c.close - c.open).toFixed(1);
+      e.res = e.dir === 'wait' ? 'NO-CALL' : e.dayDir === 'flat' ? 'FLAT' : (e.dir === e.dayDir ? 'WIN' : 'LOSS');
+      e.tgtHit = (e.tgt !== null && e.dir !== 'wait') ? (e.dir === 'long' ? c.high >= e.tgt : c.low <= e.tgt) : null;
+      e.invHit = (e.inv !== null && e.dir !== 'wait') ? (e.dir === 'long' ? c.close < e.inv : c.close > e.inv) : null;
+      e.graded = true;
+    }
+    biasLedgerSave(led);
+    return led;
+  }
+
+  function renderBiasScorecard() {
+    const led = biasLedgerLoad();
+    const graded = led.filter(e => e.graded && e.res && e.res !== 'N/A');
+    const calls  = graded.filter(e => e.res === 'WIN' || e.res === 'LOSS');
+    const wins   = calls.filter(e => e.res === 'WIN');
+    const tgtT   = graded.filter(e => e.tgtHit === true).length;
+    const tgtAll = graded.filter(e => e.tgtHit !== null && e.tgtHit !== undefined).length;
+    const invT   = graded.filter(e => e.invHit === true).length;
+    const avgWin  = wins.length ? wins.reduce((a, e) => a + Math.abs(e.dayMove || 0), 0) / wins.length : 0;
+    const losses  = calls.filter(e => e.res === 'LOSS');
+    const avgLoss = losses.length ? losses.reduce((a, e) => a + Math.abs(e.dayMove || 0), 0) / losses.length : 0;
+
+    const grid = document.getElementById('scGrid');
+    if (grid) {
+      const tile = (l, v, sub, col) => `<div class="metric-box"><div class="metric-label">${l}</div><div class="metric-value" style="${col ? 'color:' + col : ''}">${v}</div><div class="metric-detail">${sub}</div></div>`;
+      grid.innerHTML =
+        tile('Days Logged', led.length, graded.length + ' graded · builds daily') +
+        tile('Directional Calls', calls.length, graded.filter(e => e.res === 'NO-CALL').length + ' no-call days (engine said wait)') +
+        tile('Hit Rate', calls.length ? Math.round(wins.length / calls.length * 100) + '%' : '—',
+             calls.length ? wins.length + 'W / ' + losses.length + 'L' : 'needs graded calls',
+             calls.length ? (wins.length / calls.length >= 0.5 ? 'var(--accent-green)' : 'var(--accent-red)') : null) +
+        tile('Target Hit', tgtAll ? Math.round(tgtT / tgtAll * 100) + '%' : '—', 'day high/low reached the target zone') +
+        tile('Invalidations', graded.length ? invT : '—', 'daily closes beyond the invalidation level') +
+        tile('Avg Day Move', calls.length ? ('W ' + avgWin.toFixed(0) + ' / L ' + avgLoss.toFixed(0) + ' pts') : '—', 'open→close magnitude on wins vs losses');
+    }
+
+    // driver league
+    const dEl = document.getElementById('scDrivers');
+    if (dEl) {
+      const tally = {};
+      for (const e of graded) {
+        if (!e.drivers || !e.dayDir || e.dayDir === 'flat') continue;
+        for (const dr of e.drivers) {
+          if (!dr.dir) continue;
+          tally[dr.n] = tally[dr.n] || { hit: 0, n: 0 };
+          tally[dr.n].n++;
+          if (dr.dir === e.dayDir) tally[dr.n].hit++;
+        }
+      }
+      const rows = Object.entries(tally).map(([n, t]) => ({ n, pct: Math.round(t.hit / t.n * 100), s: t.n }))
+        .sort((a, b) => b.pct - a.pct);
+      dEl.innerHTML = rows.length ? rows.map(r => `
+        <div class="level-row">
+          <span class="level-row-tag ${r.pct >= 55 ? 'sup' : r.pct <= 45 ? 'res' : 'key'}">${r.pct}%</span>
+          <span class="level-row-name">${r.n}</span>
+          <span class="level-row-dist">${r.s} samples</span>
+        </div>`).join('') : 'Collecting data — the league fills as days get graded.';
+    }
+
+    const body = document.getElementById('scLedgerBody');
+    if (body && graded.length) {
+      const mono = "font-family:'JetBrains Mono',monospace";
+      body.innerHTML = graded.slice(-30).reverse().map(e => `
+        <tr>
+          <td style="${mono}">${e.d}</td>
+          <td style="font-weight:800;color:${e.dir === 'long' ? 'var(--accent-green)' : e.dir === 'short' ? 'var(--accent-red)' : 'var(--text-tertiary)'}">${e.dir.toUpperCase()}</td>
+          <td style="${mono}">${e.conf}%</td>
+          <td style="font-weight:800;color:${e.res === 'WIN' ? 'var(--accent-green)' : e.res === 'LOSS' ? 'var(--accent-red)' : 'var(--text-tertiary)'}">${e.res}</td>
+          <td style="${mono}">${e.dayMove !== undefined ? (e.dayMove >= 0 ? '+' : '') + e.dayMove + ' pts' : '—'}</td>
+          <td>${e.tgtHit === true ? '✓' : e.tgtHit === false ? '✗' : '—'}</td>
+          <td>${e.invHit === true ? '<span style="color:var(--accent-red)">✗ yes</span>' : e.invHit === false ? 'no' : '—'}</td>
+        </tr>`).join('');
+    }
+    const note = document.getElementById('scLedgerNote');
+    if (note) note.textContent = 'stored in this browser · ' + led.length + ' entries';
+  }
+
+  // ─── AUTO ALERTS — browser notifications for the moments that matter ────────
+  function notifEnabled() {
+    return localStorage.getItem('notif_on') === '1' && typeof Notification !== 'undefined' && Notification.permission === 'granted';
+  }
+  async function enableNotifs() {
+    if (typeof Notification === 'undefined') { alert('This browser does not support notifications.'); return; }
+    const p = await Notification.requestPermission();
+    if (p === 'granted') {
+      localStorage.setItem('notif_on', '1');
+      sendNotif('GOLD Terminal', 'Alerts armed: reaction-zone entries, bias flips, red-folder events.');
+    }
+    renderNotifBtn();
+  }
+  function disableNotifs() { localStorage.setItem('notif_on', '0'); renderNotifBtn(); }
+  function renderNotifBtn() {
+    const b = document.getElementById('notifBtn');
+    if (!b) return;
+    const on = notifEnabled();
+    b.textContent = on ? '🔔 Auto alerts ON — click to disable' : '🔕 Enable auto alerts (zones · bias · events)';
+    b.onclick = on ? disableNotifs : enableNotifs;
+  }
+  function sendNotif(title, body) {
+    if (!notifEnabled()) return;
+    try { new Notification(title, { body, icon: 'icon-192.png', badge: 'icon-192.png' }); } catch (e) {}
+  }
+  const _alertMemo = {};
+  function checkAutoAlerts() {
+    const px = lastGoldPrice;
+    if (!px || !notifEnabled()) return;
+    // price entered a top reaction zone (once per zone per 12h)
+    for (const z of rzState.slice(0, 8)) {
+      if (px >= z.lo && px <= z.hi) {
+        const k = 'z' + z.mid.toFixed(0);
+        if (!_alertMemo[k] || Date.now() - _alertMemo[k] > 12 * 3600e3) {
+          _alertMemo[k] = Date.now();
+          sendNotif('Gold entered a reaction zone',
+            `${z.lo.toFixed(0)}–${z.hi.toFixed(0)} (${z.side === 'sup' ? 'demand' : z.side === 'res' ? 'supply' : 'flip'}, reacted ${z.events.length}×) — price ${px.toFixed(1)}. Hunt the engulfing.`);
+        }
+      }
+    }
+    // bias flip
+    const st = dailyBiasState;
+    if (st && st.ok) {
+      const last = localStorage.getItem('lastBiasDir');
+      if (last && last !== st.dir) sendNotif('Daily Bias flipped', `${last.toUpperCase()} → ${st.dir.toUpperCase()} (${st.conf}%). Recheck the playbook before the next entry.`);
+      localStorage.setItem('lastBiasDir', st.dir);
+    }
+    // red-folder day reminder (once per day)
+    const er = getEventRisk();
+    if (er.level === 'high') {
+      const k = 'rf' + new Date().toISOString().slice(0, 10);
+      if (!_alertMemo[k]) { _alertMemo[k] = 1; sendNotif('Red Folder day', er.events.join(' · ') + ' — blackout 30 min around the print; halve size.'); }
+    }
   }
 
   // ─── DAILY BIAS + REACTION ZONES ENGINE ─────────────────────────────────────
@@ -5886,25 +6214,35 @@
   // reversed hard (≥1.1× daily ATR within 4 days of touching the level),
   // cluster nearby swing prices into zones, and rank by how hard and how
   // often price reacted there. These are the "big reaction" areas.
-  function reactionZones(d1, atrPts) {
+  function reactionZones(d1, atrPts, refPx) {
     if (!d1 || d1.length < 30 || !(atrPts > 0)) return [];
-    const off = (lastGoldPrice && d1[d1.length - 1].close) ? (lastGoldPrice - d1[d1.length - 1].close) : 0;
+    // refPx anchors normalisation (live: spot; backtest: as-of close → off ≈ 0)
+    const anchor = refPx !== undefined ? refPx : lastGoldPrice;
+    const off = (anchor && d1[d1.length - 1].close) ? (anchor - d1[d1.length - 1].close) : 0;
+    // rolling average volume for relative-volume weighting
+    let volSum = 0; const volAvg = [];
+    for (let i = 0; i < d1.length; i++) {
+      volSum += d1[i].vol || 0;
+      if (i >= 20) volSum -= d1[i - 20].vol || 0;
+      volAvg[i] = volSum / Math.min(i + 1, 20);
+    }
     const events = [];
     for (let i = 2; i < d1.length - 2; i++) {
       const c = d1[i];
+      const relVol = volAvg[i] > 0 ? (c.vol || 0) / volAvg[i] : 1;
       const isHigh = c.high > d1[i - 1].high && c.high > d1[i - 2].high && c.high >= d1[i + 1].high && c.high >= d1[i + 2].high;
       const isLow  = c.low  < d1[i - 1].low  && c.low  < d1[i - 2].low  && c.low  <= d1[i + 1].low  && c.low  <= d1[i + 2].low;
       if (isHigh) {
         let lo = Infinity;
         for (let j = i + 1; j <= Math.min(i + 4, d1.length - 1); j++) lo = Math.min(lo, d1[j].low);
         const move = c.high - lo;
-        if (move >= atrPts * 1.1) events.push({ price: c.high + off, time: c.time, side: 'res', move });
+        if (move >= atrPts * 1.1) events.push({ price: c.high + off, time: c.time, side: 'res', move, relVol });
       }
       if (isLow) {
         let hi = -Infinity;
         for (let j = i + 1; j <= Math.min(i + 4, d1.length - 1); j++) hi = Math.max(hi, d1[j].high);
         const move = hi - c.low;
-        if (move >= atrPts * 1.1) events.push({ price: c.low + off, time: c.time, side: 'sup', move });
+        if (move >= atrPts * 1.1) events.push({ price: c.low + off, time: c.time, side: 'sup', move, relVol });
       }
     }
     events.sort((a, b) => a.price - b.price);
@@ -5926,13 +6264,17 @@
       z.firstT = Math.min(...z.events.map(e => e.time));
       z.lastT  = Math.max(...z.events.map(e => e.time));
       // score: total reaction size in ATRs + hit count, boosted if hit recently
+      // and if the reactions came on above-average volume (institutional interest)
       const rec = 1 + Math.max(0, 1 - (now - z.lastT) / (180 * 86400)) * 0.5;
-      z.score = +(((z.events.reduce((a, e) => a + e.move, 0) / atrPts) + z.events.length) * rec).toFixed(1);
+      z.relVol = +(z.events.reduce((a, e) => a + (e.relVol || 1), 0) / z.events.length).toFixed(2);
+      const volBoost = 1 + Math.max(0, Math.min(0.4, (z.relVol - 1) * 0.3));
+      z.score = +(((z.events.reduce((a, e) => a + e.move, 0) / atrPts) + z.events.length) * rec * volBoost).toFixed(1);
     }
     return zones.sort((a, b) => b.score - a.score);
   }
 
-  let rzState = [];             // ranked zones — also drawn on the EG Day chart
+  let rzState = [];             // ranked daily zones — drawn on charts + alerts
+  let rzWeeklyState = [];       // weekly zones — the swing-target map
   let dailyBiasState = null;
 
   async function computeDailyBias() {
@@ -5980,7 +6322,13 @@
         dm ? (dm.chg >= 0 ? '+' : '') + dm.chg.toFixed(2) + ' pts / 5 sessions' : 'no data');
     const ct = fundX.cot;
     add('Funds positioning (COT managed money)', !ct || ct.pct >= 90 ? null : ct.chg4w > 5000 ? 'long' : ct.chg4w < -5000 ? 'short' : null, 1,
-        ct ? Math.round(ct.net / 1000) + 'k net · ' + (ct.chg4w >= 0 ? '+' : '') + Math.round(ct.chg4w / 1000) + 'k/4wk · ' + ct.pct + 'th pct' + (ct.pct >= 90 ? ' ⚠ crowded' : '') + ' · wk of ' + ct.asOf : 'no data (weekly, CFTC)');
+        ct ? Math.round(ct.net / 1000) + 'k net · ' + (ct.chg4w >= 0 ? '+' : '') + Math.round(ct.chg4w / 1000) + 'k/4wk · ' + ct.pct + 'th pct' + (ct.pct >= 90 ? ' ⚠ crowded' : '') + (ct.oi ? ' · OI ' + (ct.oiChg4w >= 0 ? '↑' : '↓') : '') + ' · wk of ' + ct.asOf : 'no data (weekly, CFTC)');
+    const cv = fundX.curve;
+    add('Yield curve (10Y–3M)', !cv ? null : cv.level < 0 ? 'long' : null, 1,
+        cv ? cv.level.toFixed(2) + '%' + (cv.level < 0 ? ' — inverted (recession hedge bid)' : ' — normal') : 'no data');
+    const hy = fundX.hy;
+    add('Credit stress (HY spreads)', !hy ? null : hy.chg >= 0.08 ? 'long' : hy.chg <= -0.08 ? 'short' : null, 1,
+        hy ? hy.level.toFixed(2) + '% · ' + (hy.chg >= 0 ? '+' : '') + Math.round(hy.chg * 100) + ' bps/wk' + (hy.chg >= 0.08 ? ' — risk-off, haven bid' : '') : 'no data');
 
     st.wTot = checks.reduce((a, c) => a + c.w, 0);
     st.net  = checks.reduce((a, c) => a + (c.dir === 'long' ? c.w : c.dir === 'short' ? -c.w : 0), 0);
@@ -5989,6 +6337,16 @@
     st.checks = checks;
 
     rzState = reactionZones(d1, atr);
+    // weekly reaction zones — the swing-target map (bigger reactions, wider ATR)
+    rzWeeklyState = [];
+    if (w1 && w1.length >= 30) {
+      let trS = 0, trN = 0;
+      for (let k = Math.max(1, w1.length - 14); k < w1.length; k++) {
+        trS += Math.max(w1[k].high - w1[k].low, Math.abs(w1[k].high - w1[k - 1].close), Math.abs(w1[k].low - w1[k - 1].close)); trN++;
+      }
+      const atrW = trN ? trS / trN : atr * 2.2;
+      rzWeeklyState = reactionZones(w1, atrW);
+    }
     const below = rzState.filter(z => z.mid < px).sort((a, b) => b.mid - a.mid);
     const above = rzState.filter(z => z.mid > px).sort((a, b) => a.mid - b.mid);
     st.zBelow = below[0] || null;
@@ -5996,12 +6354,14 @@
     st.entryZone  = st.dir === 'long' ? st.zBelow : st.dir === 'short' ? st.zAbove : null;
     st.targetZone = st.dir === 'long' ? st.zAbove : st.dir === 'short' ? st.zBelow : null;
     dailyBiasState = st;
+    try { logAndGradeBias(st, d1); } catch (e) { console.warn('scorecard log failed:', e.message); }
     return st;
   }
 
   const biasChartCtl = createLevelChart({
     chartId: 'biasChart', msgId: 'biasChartMsg', interval: '1d', height: 380, zones: true,
-    zonesFn: () => rzState.slice(0, 7).map((z, i) => ({ t1: z.firstT, t2: null, hi: z.hi, lo: z.lo, bull: z.side !== 'res', star: i < 3 }))
+    zonesFn: () => rzState.slice(0, 7).map((z, i) => ({ t1: z.firstT, t2: null, hi: z.hi, lo: z.lo, bull: z.side !== 'res', star: i < 3 })),
+    extraLevels: () => rzWeeklyState.slice(0, 3).map(z => ({ price: z.mid, color: '#D4AF37', title: 'W-RZ', dashed: true }))
   });
   // Nearest reaction-zone edges as gold lines (shared by the H4/M15 views)
   function rzNearLines() {
@@ -6019,6 +6379,98 @@
 
   const rzDate = t => new Date(t * 1000).toLocaleDateString('en-GB', { day: '2-digit', month: 'short' });
 
+  // Minimal multi-line chart (correlations, COT history)
+  function makeLineChart(elId, seriesDefs, height, opts) {
+    let chart = null, lines = [];
+    async function render(dataArr) {
+      const el = document.getElementById(elId);
+      if (!el || !dataArr || !dataArr.length) return;
+      const ok = await ensureChartLib();
+      if (!ok || typeof LightweightCharts === 'undefined') return;
+      if (!chart) {
+        const dark = document.documentElement.classList.contains('dark');
+        chart = LightweightCharts.createChart(el, {
+          width: el.clientWidth || 500, height,
+          layout: { background: { type: 'solid', color: 'transparent' }, textColor: dark ? '#7E938F' : '#46605B' },
+          grid: { vertLines: { color: 'rgba(127,127,127,0.06)' }, horzLines: { color: 'rgba(127,127,127,0.06)' } },
+          rightPriceScale: { borderColor: 'rgba(127,127,127,0.2)' },
+          timeScale: { borderColor: 'rgba(127,127,127,0.2)', timeVisible: false }
+        });
+        lines = seriesDefs.map(d => chart.addLineSeries({ color: d.color, lineWidth: 2, title: d.name, priceLineVisible: false }));
+        if (opts && opts.zeroLine && lines[0]) {
+          lines[0].createPriceLine({ price: 0, color: 'rgba(127,127,127,0.4)', lineWidth: 1, lineStyle: 2, axisLabelVisible: false, title: '' });
+        }
+        new ResizeObserver(() => { if (chart && el.clientWidth) chart.applyOptions({ width: el.clientWidth }); }).observe(el);
+      }
+      dataArr.forEach((d, i) => { if (lines[i] && d && d.length) lines[i].setData(d); });
+      try { chart.timeScale().fitContent(); } catch (e) {}
+      const msg = document.getElementById(elId + 'Msg');
+      if (msg) msg.style.display = 'none';
+    }
+    return { render };
+  }
+
+  const corrChartCtl = makeLineChart('corrChart', [
+    { name: 'vs DXY', color: '#60A5FA' }, { name: 'vs real yields', color: '#D4AF37' }
+  ], 260, { zeroLine: true });
+  const cotChartCtl = makeLineChart('cotChart', [{ name: 'MM net', color: '#7BE0CE' }], 260);
+
+  function rollingCorr(a, b, win) {
+    const out = [];
+    for (let i = win; i < a.length; i++) {
+      const xa = a.slice(i - win, i), xb = b.slice(i - win, i);
+      const ma = xa.reduce((s, v) => s + v, 0) / win, mb = xb.reduce((s, v) => s + v, 0) / win;
+      let num = 0, da = 0, db = 0;
+      for (let k = 0; k < win; k++) { const va = xa[k] - ma, vb = xb[k] - mb; num += va * vb; da += va * va; db += vb * vb; }
+      out.push(da > 0 && db > 0 ? num / Math.sqrt(da * db) : 0);
+    }
+    return out;
+  }
+
+  let _corrTs = 0;
+  async function refreshCorrPanel() {
+    if (Date.now() - _corrTs < 30 * 60000) { return; }
+    _corrTs = Date.now();
+    try {
+      const d1 = await fetchGoldKlines('1d');
+      if (!d1 || d1.length < 60) return;
+      const goldByDay = {};
+      for (const c of d1) goldByDay[new Date(c.time * 1000).toISOString().slice(0, 10)] = c.close;
+
+      // DXY daily series from Frankfurter's range endpoint (ICE formula)
+      const iso = d => d.toISOString().slice(0, 10);
+      const res = await fetchWithFallback([
+        `https://api.frankfurter.app/${iso(new Date(Date.now() - 130 * 86400e3))}..${iso(new Date())}?from=USD&to=EUR,JPY,GBP,CAD,SEK,CHF`
+      ]);
+      const dxyByDay = {};
+      if (res) {
+        const days = (await res.json()).rates || {};
+        for (const [d, R] of Object.entries(days)) {
+          const v = 50.14348112 * Math.pow(1 / R.EUR, -0.576) * Math.pow(R.JPY, 0.136)
+            * Math.pow(1 / R.GBP, -0.119) * Math.pow(R.CAD, 0.091) * Math.pow(R.SEK, 0.042) * Math.pow(R.CHF, 0.036);
+          if (isFinite(v)) dxyByDay[d] = v;
+        }
+      }
+      const ryObs = await fetchFredSeries('DFII10', 130);
+      const ryByDay = {};
+      if (ryObs) for (const o of ryObs) ryByDay[o.date] = parseFloat(o.value);
+
+      // align on dates where gold + the other series both exist, oldest→newest
+      const mk = (other) => {
+        const dates = Object.keys(goldByDay).filter(d => other[d] !== undefined).sort();
+        return { dates, g: dates.map(d => goldByDay[d]), o: dates.map(d => other[d]) };
+      };
+      const out = [];
+      for (const [other, win] of [[dxyByDay, 20], [ryByDay, 20]]) {
+        const al = mk(other);
+        if (al.dates.length < win + 5) { out.push([]); continue; }
+        const corr = rollingCorr(al.g, al.o, win);
+        out.push(corr.map((v, i) => ({ time: Math.floor(Date.parse(al.dates[i + win]) / 1000), value: +v.toFixed(2) })));
+      }
+      corrChartCtl.render(out);
+    } catch (e) { console.warn('corr panel failed:', e.message); }
+  }
+
   async function renderDailyBias() {
     const st = await computeDailyBias();
     const setEl = (id, v) => { const e = document.getElementById(id); if (e) e.textContent = v; };
@@ -6026,6 +6478,8 @@
     if (!st.ok) { setEl('bias-hint', 'Candle feed unavailable — the bias engine needs daily data.'); return; }
     biasChartCtl.init(); biasChartCtl.loadCandles();
     biasH4Ctl.init(); biasM15Ctl.init();
+    refreshCorrPanel();
+    if (fundX.cotSeries && fundX.cotSeries.length) cotChartCtl.render([fundX.cotSeries]);
 
     const isL = st.dir === 'long', isS = st.dir === 'short';
     const banner = document.getElementById('bias-banner');
@@ -6077,15 +6531,18 @@
     const tb = document.getElementById('rzTableBody');
     if (tb) {
       const mono = "font-family:'JetBrains Mono',monospace";
-      tb.innerHTML = rzState.length ? rzState.slice(0, 8).map(z => `
+      const zoneRow = (z, tag) => `
         <tr>
-          <td style="${mono};font-weight:700">${z.lo.toFixed(0)}–${z.hi.toFixed(0)}</td>
+          <td style="${mono};font-weight:700">${tag ? '<span style=\"color:#D4AF37;font-weight:900\">W</span> ' : ''}${z.lo.toFixed(0)}–${z.hi.toFixed(0)}${z.relVol >= 1.5 ? ' <span style=\"font-size:9px;color:var(--accent-blue);font-weight:800\">VOL×' + z.relVol.toFixed(1) + '</span>' : ''}</td>
           <td><span style="font-weight:800;color:${z.side === 'sup' ? 'var(--accent-green)' : z.side === 'res' ? 'var(--accent-red)' : '#D97706'}">${z.side === 'sup' ? 'DEMAND' : z.side === 'res' ? 'SUPPLY' : 'FLIP'}</span></td>
           <td style="${mono}">${z.events.length}</td>
           <td style="${mono}">${z.maxMove.toFixed(0)} pts <span style="color:var(--text-tertiary);font-size:10px">(${(z.maxMove / st.atr).toFixed(1)}× ATR)</span></td>
           <td style="font-size:11px;color:var(--text-secondary)">${z.events.slice(-3).map(e => rzDate(e.time)).join(' · ')}</td>
           <td style="${mono}">${Math.abs(st.px - z.mid).toFixed(0)} pts ${z.mid > st.px ? '↑' : '↓'}</td>
-        </tr>`).join('') : '<tr><td colspan="6" class="j-empty">No qualifying reaction zones in the available history.</td></tr>';
+        </tr>`;
+      tb.innerHTML = rzState.length
+        ? rzState.slice(0, 8).map(z => zoneRow(z, false)).join('') + rzWeeklyState.slice(0, 3).map(z => zoneRow(z, true)).join('')
+        : '<tr><td colspan="6" class="j-empty">No qualifying reaction zones in the available history.</td></tr>';
     }
   }
 
@@ -6298,6 +6755,10 @@
       refreshRealATR();
       refreshStructure();
 
+      // Auto alerts: zone entries, bias flips, red-folder days
+      try { checkAutoAlerts(); } catch (e) {}
+      try { updateNextEventChip(); } catch (e) {}
+
       // Daily bias + reaction zones (cached klines; feeds the day-chart overlay)
       computeDailyBias().then(() => {
         const act = document.querySelector('.snav-btn.active');
@@ -6376,8 +6837,14 @@
     // Boot institutional nav on Dashboard
     switchSection('dashboard', document.querySelector('[data-section=dashboard]'));
 
-    // Restore alert badge
+    // Restore alert badge + notification toggle state
     updateAlertBadge();
+    renderNotifBtn();
+
+    // PWA: register the service worker (installable app + offline shell)
+    if ('serviceWorker' in navigator) {
+      try { navigator.serviceWorker.register('sw.js'); } catch (e) {}
+    }
 
     // Start alert checker every 5 seconds
     setInterval(checkAlerts, 5000);
@@ -6510,7 +6977,7 @@
   const NAV_SECTIONS = {
     dashboard: { tabs: [{ id: 'dashboard', label: 'Overview' }] },
     markets:   { tabs: [{ id: 'bias', label: 'Daily Bias' }, { id: 'analysis', label: 'Live Analysis' }, { id: 'mtf', label: 'Multi-TF Charts' }, { id: 'redfolder', label: 'Red Folder' }, { id: 'sessions', label: 'Trade Sessions' }, { id: 'calendar', label: 'Economic Calendar' }] },
-    research:  { tabs: [{ id: 'edges',    label: 'Edge Lab' }, { id: 'backtest', label: 'Backtest Lab' }, { id: 'intel', label: 'Intel Sources' }] }
+    research:  { tabs: [{ id: 'edges',    label: 'Edge Lab' }, { id: 'scorecard', label: 'Bias Scorecard' }, { id: 'backtest', label: 'Backtest Lab' }, { id: 'intel', label: 'Intel Sources' }] }
   };
 
   let activeSection = 'dashboard';
