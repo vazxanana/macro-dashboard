@@ -5425,10 +5425,17 @@
           timeScale: { borderColor: 'rgba(127,127,127,0.2)', timeVisible: interval !== '1d', secondsVisible: false },
           crosshair: { mode: 0 }
         });
-        const cUp = dark ? '#4ADE80' : '#0E9F6E', cDn = dark ? '#FB7185' : '#E02424';
-        series = chart.addCandlestickSeries({
-          upColor: cUp, downColor: cDn, borderVisible: false,
-          wickUpColor: cUp, wickDownColor: cDn
+        // TradingView-style monochrome candles (owner preference): light gray
+        // bullish bodies, dark charcoal bearish bodies, neutral wicks — with
+        // borders so dark bodies stay readable on the near-black canvas.
+        series = chart.addCandlestickSeries(dark ? {
+          upColor: '#D9DDE3', downColor: '#101318', borderVisible: true,
+          borderUpColor: '#D9DDE3', borderDownColor: '#8B93A1',
+          wickUpColor: '#9AA0A8', wickDownColor: '#9AA0A8'
+        } : {
+          upColor: '#E9E9E9', downColor: '#2E2E2E', borderVisible: true,
+          borderUpColor: '#5A5A5A', borderDownColor: '#111111',
+          wickUpColor: '#111111', wickDownColor: '#111111'
         });
         if (cfg.zones && typeof series.attachPrimitive === 'function') {
           zonesPrim = makeZonesPrimitive();
