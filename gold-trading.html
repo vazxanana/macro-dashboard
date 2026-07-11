@@ -3573,7 +3573,7 @@
   <!-- MULTI-TIMEFRAME CHARTS — top-down: Daily trend, H4 structure, M15 execution -->
   <div id="tab-mtf" class="tab-panel">
     <div class="section-header">
-      <div class="section-title">Multi-Timeframe Charts <span style="font-size:11px;font-weight:500;color:var(--text-tertiary)">— Daily trend &middot; H4 structure &middot; M15 execution (XAU/USD, PAXG proxy) &middot; MAJOR structure only: solid <span style="color:var(--accent-green)">green</span>/<span style="color:var(--accent-red)">red</span> line = trend extreme broken by a body close, <strong>ChoCh</strong> = protected origin swing broken (reversal warning) &middot; dashed gray <em>idm</em> = inducement swept &middot; dashed amber = sweep (wick through, level held) &middot; green/red boxes = demand/supply order blocks at break origins (bright = ChoCh origin), live until a body close through the far side</span></div>
+      <div class="section-title">Multi-Timeframe Charts <span style="font-size:11px;font-weight:500;color:var(--text-tertiary)">— Daily trend &middot; H4 structure &middot; M15 execution (XAU/USD, PAXG proxy) &middot; MAJOR structure only: solid <span style="color:var(--accent-green)">green</span>/<span style="color:var(--accent-red)">red</span> line = trend extreme broken by a body close, <strong>ChoCh</strong> = protected origin swing broken (reversal warning) &middot; dashed gray <em>idm</em> = inducement swept &middot; dashed amber = sweep (wick through, level held) &middot; green/red boxes = demand/supply order blocks at break origins — <strong>bright + &ldquo;unmitigated&rdquo;</strong> = price has never returned (highest probability), dim = already mitigated; killed by a body close through the far side</span></div>
     </div>
 
     <!-- Alignment verdict -->
@@ -5799,7 +5799,13 @@
                   const y1m = _series.priceToCoordinate(z.hi);
                   const y2m = _series.priceToCoordinate(z.lo);
                   if (y1m === null || y2m === null) continue;
-                  const a = z.star ? 0.16 : 0.09, sa = z.star ? 0.55 : 0.3;
+                  // engulf zones (no fresh flag) keep their classic styling;
+                  // S/D zones: bright + labelled while unmitigated, dim once
+                  // price has already traded back into them
+                  let a, sa;
+                  if (z.fresh === undefined) { a = z.star ? 0.16 : 0.09; sa = z.star ? 0.55 : 0.3; }
+                  else if (z.fresh) { a = z.star ? 0.2 : 0.15; sa = z.star ? 0.8 : 0.55; }
+                  else { a = 0.05; sa = 0.22; }
                   ctx.fillStyle   = z.bull ? `rgba(0,166,81,${a})`  : `rgba(194,59,51,${a})`;
                   ctx.strokeStyle = z.bull ? `rgba(0,166,81,${sa})` : `rgba(194,59,51,${sa})`;
                   ctx.lineWidth = Math.max(1, hr);
@@ -5807,6 +5813,12 @@
                   const Y = Math.min(y1m, y2m) * vr, H = Math.max(Math.abs(y2m - y1m) * vr, 1);
                   ctx.fillRect(X, Y, W, H);
                   ctx.strokeRect(X, Y, W, H);
+                  if (z.fresh) {
+                    ctx.font = `600 ${9 * hr}px 'JetBrains Mono', monospace`;
+                    ctx.fillStyle = z.bull ? `rgba(0,166,81,0.9)` : `rgba(194,59,51,0.9)`;
+                    ctx.textAlign = 'left';
+                    ctx.fillText('unmitigated', X + 5 * hr, Y + (z.bull ? H - 4 * vr : 11 * vr));
+                  }
                 }
               });
             }
@@ -5953,11 +5965,18 @@
       next: next ? { price: n(next.price) } : null,
       idm: idm ? { price: n(idm.price) } : null
     } : null;
-    // zones survive until some later candle CLOSES through the far side
+    // zones survive until some later candle CLOSES through the far side.
+    // A zone is FRESH (unmitigated) while price has never traded back into
+    // it after the impulse first left it — those are the ones that matter.
     const zonesLive = zonesRaw.filter(z => {
+      let left = false, touched = false;
       for (let k = z.idx + 1; k < candles.length; k++) {
-        if (z.bull ? candles[k].close < z.lo : candles[k].close > z.hi) return false;
+        const c = candles[k];
+        if (z.bull ? c.close < z.lo : c.close > z.hi) return false;   // invalidated
+        if (!left) { if (z.bull ? c.low > z.hi : c.high < z.lo) left = true; continue; }
+        if (z.bull ? c.low <= z.hi : c.high >= z.lo) touched = true;
       }
+      z.fresh = !touched;
       return true;
     });
     // pad doji order blocks to a readable box (anchored at the wick side)
@@ -5986,7 +6005,7 @@
     };
     const zones = dedupe(zonesLive.filter(z => z.bull)).slice(-3)
       .concat(dedupe(zonesLive.filter(z => !z.bull)).slice(-3))
-      .map(z => ({ t1: z.t1, t2: null, hi: n(z.hi), lo: n(z.lo), bull: z.bull, star: z.star }));
+      .map(z => ({ t1: z.t1, t2: null, hi: n(z.hi), lo: n(z.lo), bull: z.bull, star: z.star, fresh: z.fresh }));
     const shown = breaks.slice(-(maxEvents || 12))
       .concat(events.filter(e => e.sweep).slice(-3))
       .concat(events.filter(e => e.idm).slice(-1));
