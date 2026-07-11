@@ -3547,6 +3547,27 @@
     </div>
 
     <div id="rf-cards"></div>
+
+    <!-- PRINT REACTION METER — how hard did gold actually move on the print -->
+    <div class="card glass" style="margin-top:16px;">
+      <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;">
+        <h3 style="margin:0;">Print Reaction Meter <span style="font-size:11px;font-weight:500;color:var(--text-tertiary)">— XAU/USD move in the first 10s / 1m / 5m after each red-folder release</span></h3>
+        <button class="j-add-btn" onclick="refreshPrintMeter(true)">↻ Measure recent prints</button>
+      </div>
+      <div class="journal-table-wrap" style="margin-top:12px;">
+        <table class="journal-table">
+          <thead>
+            <tr><th>Event</th><th>Release (UTC)</th><th>Price at Print</th><th>+10 s</th><th>+1 min</th><th>+5 min</th></tr>
+          </thead>
+          <tbody id="prTableBody">
+            <tr><td colspan="6" class="j-empty">No prints measured yet — recent red-folder releases are measured automatically (~6 min after the print), or press Measure.</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div style="margin-top:10px;font-size:10px;color:var(--text-tertiary);line-height:1.6;">
+        Measured on second-by-second XAU/USD candles (PAXG proxy) around the scheduled release time; 1 pip = $0.10 on gold. The 10-second read is the algo/knee-jerk move, 1-minute is the human wave, 5-minute is the direction that tends to stick. Release times follow the standard calendar (12:30 UTC data prints, 18:00 UTC FOMC) — a shifted release shows as a flat 10s read.
+      </div>
+    </div>
   </div><!-- end tab-redfolder -->
 
   <!-- MULTI-TIMEFRAME CHARTS — top-down: Daily trend, H4 structure, M15 execution -->
@@ -4361,7 +4382,7 @@
     if (name === 'bias')      { renderDailyBias(); }
     if (name === 'scorecard') { renderBiasScorecard(); }
     if (name === 'calendar')  { renderCalendar(); }
-    if (name === 'redfolder') { renderRedFolder(); }
+    if (name === 'redfolder') { renderRedFolder(); renderPrintMeter(); refreshPrintMeter(); }
     if (name === 'mtf')       { initMtfCharts(); renderMtfSummary(); }
   }
 
@@ -4487,23 +4508,23 @@
 
   // ─── ECONOMIC CALENDAR ─────────────────────────────────────────────────────
   const CAL_EVENTS = [
-    { day: 25, month: 'JUN', title: 'US Consumer Confidence', desc: 'Conference Board index. Weak reading signals slowdown, boosts gold safe-haven demand.', impact: 'med', bias: 'neutral', biasTxt: 'Neutral' },
-    { day: 27, month: 'JUN', title: 'US PCE Price Index (May)', desc: 'Fed\'s preferred inflation gauge. Cooler print = rate cut acceleration = gold bullish.', impact: 'high', bias: 'bull', biasTxt: 'Bullish if cool' },
-    { day: 2,  month: 'JUL', title: 'US Non-Farm Payrolls (Jun)', desc: 'Released early (Jul 4 holiday). Weak jobs = earlier Fed cuts = DXY weakness = gold up.', impact: 'high', bias: 'bull', biasTxt: 'Bullish if weak' },
-    { day: 10, month: 'JUL', title: 'US CPI Inflation (Jun)', desc: 'Core CPI year-on-year. Key FOMC input. Miss below 3% = strong gold rally catalyst.', impact: 'high', bias: 'bull', biasTxt: 'Bullish if cool' },
-    { day: 11, month: 'JUL', title: 'US PPI (Jun)', desc: 'Producer prices feed into future CPI. Cooling PPI signals disinflationary trend.', impact: 'med', bias: 'neutral', biasTxt: 'Neutral' },
-    { day: 16, month: 'JUL', title: 'US Retail Sales (Jun)', desc: 'Weak retail = slowdown fear = gold safe-haven demand rises.', impact: 'med', bias: 'bull', biasTxt: 'Bullish if weak' },
-    { day: 17, month: 'JUL', title: 'Fed Beige Book', desc: 'Qualitative economic conditions report. Dovish language supports gold.', impact: 'med', bias: 'neutral', biasTxt: 'Neutral' },
-    { day: 22, month: 'JUL', title: 'Flash PMI (Jul)', desc: 'Services & manufacturing sentiment. Contraction reinforces easing expectations.', impact: 'med', bias: 'bull', biasTxt: 'Bullish if weak' },
-    { day: 24, month: 'JUL', title: 'US GDP (Q2 Advance)', desc: 'First GDP estimate. Miss below 2% growth accelerates rate cut timeline.', impact: 'high', bias: 'bull', biasTxt: 'Bullish if miss' },
-    { day: 29, month: 'JUL', title: 'FOMC Rate Decision', desc: 'Jul 28–29 meeting; decision Wednesday. Any dovish pivot signal can trigger a 1–2% gold rally.', impact: 'high', bias: 'bull', biasTxt: 'Key catalyst' },
-    { day: 31, month: 'JUL', title: 'US PCE Price Index (Jun)', desc: 'Fed\'s preferred inflation gauge, two days after FOMC. Cooler print extends any dovish move.', impact: 'high', bias: 'bull', biasTxt: 'Bullish if cool' },
-    { day: 7,  month: 'AUG', title: 'US Non-Farm Payrolls (Jul)', desc: 'First Friday. A second consecutive weak reading would cement rate-cut conviction.', impact: 'high', bias: 'bull', biasTxt: 'Bullish if weak' },
-    { day: 12, month: 'AUG', title: 'US CPI Inflation (Jul)', desc: 'Mid-month release. Key input into the September FOMC.', impact: 'high', bias: 'bull', biasTxt: 'Bullish if cool' },
-    { day: 27, month: 'AUG', title: 'Jackson Hole Symposium', desc: 'Fed chair keynote (Aug 27–29). Historically a venue for policy-shift signals — high gold volatility.', impact: 'high', bias: 'neutral', biasTxt: 'Volatility event' },
-    { day: 4,  month: 'SEP', title: 'US Non-Farm Payrolls (Aug)', desc: 'First Friday. Labor softness pulls Fed cut expectations forward.', impact: 'high', bias: 'bull', biasTxt: 'Bullish if weak' },
-    { day: 10, month: 'SEP', title: 'US CPI Inflation (Aug)', desc: 'Final CPI before the September FOMC — the key print of the month.', impact: 'high', bias: 'bull', biasTxt: 'Bullish if cool' },
-    { day: 16, month: 'SEP', title: 'FOMC Rate Decision + Dot Plot', desc: 'Sep 15–16 meeting with updated projections. Dot-plot shifts move gold 1–2%.', impact: 'high', bias: 'bull', biasTxt: 'Key catalyst' },
+    { day: 25, month: 'JUN', title: 'US Consumer Confidence', utc: '14:00', desc: 'Conference Board index. Weak reading signals slowdown, boosts gold safe-haven demand.', impact: 'med', bias: 'neutral', biasTxt: 'Neutral' },
+    { day: 27, month: 'JUN', title: 'US PCE Price Index (May)', utc: '12:30', desc: 'Fed\'s preferred inflation gauge. Cooler print = rate cut acceleration = gold bullish.', impact: 'high', bias: 'bull', biasTxt: 'Bullish if cool' },
+    { day: 2,  month: 'JUL', title: 'US Non-Farm Payrolls (Jun)', utc: '12:30', desc: 'Released early (Jul 4 holiday). Weak jobs = earlier Fed cuts = DXY weakness = gold up.', impact: 'high', bias: 'bull', biasTxt: 'Bullish if weak' },
+    { day: 10, month: 'JUL', title: 'US CPI Inflation (Jun)', utc: '12:30', desc: 'Core CPI year-on-year. Key FOMC input. Miss below 3% = strong gold rally catalyst.', impact: 'high', bias: 'bull', biasTxt: 'Bullish if cool' },
+    { day: 11, month: 'JUL', title: 'US PPI (Jun)', utc: '12:30', desc: 'Producer prices feed into future CPI. Cooling PPI signals disinflationary trend.', impact: 'med', bias: 'neutral', biasTxt: 'Neutral' },
+    { day: 16, month: 'JUL', title: 'US Retail Sales (Jun)', utc: '12:30', desc: 'Weak retail = slowdown fear = gold safe-haven demand rises.', impact: 'med', bias: 'bull', biasTxt: 'Bullish if weak' },
+    { day: 17, month: 'JUL', title: 'Fed Beige Book', utc: '18:00', desc: 'Qualitative economic conditions report. Dovish language supports gold.', impact: 'med', bias: 'neutral', biasTxt: 'Neutral' },
+    { day: 22, month: 'JUL', title: 'Flash PMI (Jul)', utc: '13:45', desc: 'Services & manufacturing sentiment. Contraction reinforces easing expectations.', impact: 'med', bias: 'bull', biasTxt: 'Bullish if weak' },
+    { day: 24, month: 'JUL', title: 'US GDP (Q2 Advance)', utc: '12:30', desc: 'First GDP estimate. Miss below 2% growth accelerates rate cut timeline.', impact: 'high', bias: 'bull', biasTxt: 'Bullish if miss' },
+    { day: 29, month: 'JUL', title: 'FOMC Rate Decision', utc: '18:00', desc: 'Jul 28–29 meeting; decision Wednesday. Any dovish pivot signal can trigger a 1–2% gold rally.', impact: 'high', bias: 'bull', biasTxt: 'Key catalyst' },
+    { day: 31, month: 'JUL', title: 'US PCE Price Index (Jun)', utc: '12:30', desc: 'Fed\'s preferred inflation gauge, two days after FOMC. Cooler print extends any dovish move.', impact: 'high', bias: 'bull', biasTxt: 'Bullish if cool' },
+    { day: 7,  month: 'AUG', title: 'US Non-Farm Payrolls (Jul)', utc: '12:30', desc: 'First Friday. A second consecutive weak reading would cement rate-cut conviction.', impact: 'high', bias: 'bull', biasTxt: 'Bullish if weak' },
+    { day: 12, month: 'AUG', title: 'US CPI Inflation (Jul)', utc: '12:30', desc: 'Mid-month release. Key input into the September FOMC.', impact: 'high', bias: 'bull', biasTxt: 'Bullish if cool' },
+    { day: 27, month: 'AUG', title: 'Jackson Hole Symposium', utc: '14:00', desc: 'Fed chair keynote (Aug 27–29). Historically a venue for policy-shift signals — high gold volatility.', impact: 'high', bias: 'neutral', biasTxt: 'Volatility event' },
+    { day: 4,  month: 'SEP', title: 'US Non-Farm Payrolls (Aug)', utc: '12:30', desc: 'First Friday. Labor softness pulls Fed cut expectations forward.', impact: 'high', bias: 'bull', biasTxt: 'Bullish if weak' },
+    { day: 10, month: 'SEP', title: 'US CPI Inflation (Aug)', utc: '12:30', desc: 'Final CPI before the September FOMC — the key print of the month.', impact: 'high', bias: 'bull', biasTxt: 'Bullish if cool' },
+    { day: 16, month: 'SEP', title: 'FOMC Rate Decision + Dot Plot', utc: '18:00', desc: 'Sep 15–16 meeting with updated projections. Dot-plot shifts move gold 1–2%.', impact: 'high', bias: 'bull', biasTxt: 'Key catalyst' },
   ];
   // NOTE: dates follow the standard release calendar (NFP = first Friday,
   // CPI ≈ mid-month, FOMC per the Fed's published 2026 schedule). Verify exact
@@ -4654,6 +4675,104 @@
       techState = { ok: true, ts: Date.now(), last, sma20, trend: last >= sma20 ? 'up' : 'down', rsi, compression };
     } catch (e) { console.warn('technicals failed:', e.message); }
     return techState;
+  }
+
+  // ─── PRINT REACTION METER — gold's move 10s / 1m / 5m after the print ───────
+  // Measured from Binance 1-second PAXGUSDT candles around the scheduled
+  // release time; falls back to 1-minute candles (10s marked n/a) if the
+  // 1s feed is unavailable. Results persist in localStorage.
+  function prLoad() { try { return JSON.parse(localStorage.getItem('printReactions') || '[]'); } catch (e) { return []; } }
+  function prSave(l) { try { localStorage.setItem('printReactions', JSON.stringify(l.slice(-40))); } catch (e) {} }
+  function eventUtcMs(ev) {
+    if (!ev.utc) return null;
+    const [h, m] = ev.utc.split(':').map(Number);
+    return Date.UTC(new Date().getUTCFullYear(), MONTH_MAP[ev.month], ev.day, h, m);
+  }
+
+  async function measurePrintReaction(t0) {
+    const at = (ms, arr) => { let best = null; for (const r of arr) { if (r.t <= ms) best = r; else break; } return best; };
+    try {
+      const url = `https://api.binance.com/api/v3/klines?symbol=PAXGUSDT&interval=1s&startTime=${t0 - 15000}&endTime=${t0 + 315000}&limit=1000`;
+      const res = await fetchWithFallback([url]);
+      if (res) {
+        const raw = await res.json();
+        if (Array.isArray(raw) && raw.length > 5) {
+          const rows = raw.map(k => ({ t: k[0], c: +k[4] }));
+          const base = at(t0, rows) || rows[0];
+          const d = p => (p && base) ? +(p.c - base.c).toFixed(2) : null;
+          return {
+            res: '1s', base: +base.c.toFixed(2),
+            d10: d(at(t0 + 10000, rows)), d60: d(at(t0 + 60000, rows)), d300: d(at(t0 + 300000, rows))
+          };
+        }
+      }
+    } catch (e) {}
+    try {
+      // fallback: minute candles — 1m/5m only
+      const url = `https://api.binance.com/api/v3/klines?symbol=PAXGUSDT&interval=1m&startTime=${t0 - 120000}&endTime=${t0 + 360000}&limit=20`;
+      const res = await fetchWithFallback([url]);
+      if (res) {
+        const raw = await res.json();
+        if (Array.isArray(raw) && raw.length) {
+          const rows = raw.map(k => ({ t: k[0], o: +k[1], c: +k[4] }));
+          const b = rows.find(r => r.t <= t0 && t0 < r.t + 60000);
+          if (b) {
+            const m1 = at(t0 + 60000, rows), m5 = at(t0 + 300000, rows);
+            return { res: '1m', base: +b.o.toFixed(2), d10: null,
+                     d60: m1 ? +(m1.c - b.o).toFixed(2) : null, d300: m5 ? +(m5.c - b.o).toFixed(2) : null };
+          }
+        }
+      }
+    } catch (e) {}
+    return null;
+  }
+
+  let _prBusy = false, _prTs = 0;
+  async function refreshPrintMeter(force) {
+    if (_prBusy) return;
+    if (!force && Date.now() - _prTs < 10 * 60000) return;
+    _prBusy = true; _prTs = Date.now();
+    try {
+      const led = prLoad();
+      const now = Date.now();
+      let changed = false;
+      for (const ev of CAL_EVENTS) {
+        if (ev.impact !== 'high' || !ev.utc) continue;
+        const t0 = eventUtcMs(ev);
+        if (t0 === null || now - t0 < 6.5 * 60000 || now - t0 > 35 * 86400e3) continue;
+        const key = ev.title + '@' + new Date(t0).toISOString().slice(0, 10);
+        const existing = led.find(e => e.key === key);
+        if (existing && !existing.failed) continue;
+        const m = await measurePrintReaction(t0);
+        const entry = { key, title: ev.title, when: new Date(t0).toISOString().slice(0, 16).replace('T', ' '), t0, ...(m || { failed: true }) };
+        if (existing) Object.assign(existing, entry); else led.push(entry);
+        changed = true;
+        await new Promise(r => setTimeout(r, 200));
+      }
+      if (changed) prSave(led);
+    } catch (e) { console.warn('print meter failed:', e.message); }
+    _prBusy = false;
+    renderPrintMeter();
+  }
+
+  function renderPrintMeter() {
+    const body = document.getElementById('prTableBody');
+    if (!body) return;
+    const led = prLoad().filter(e => !e.failed).sort((a, b) => b.t0 - a.t0);
+    if (!led.length) return;
+    const mono = "font-family:'JetBrains Mono',monospace";
+    const cell = d => d === null || d === undefined
+      ? '<span style="color:var(--text-tertiary)">n/a</span>'
+      : `<span style="${mono};font-weight:800;color:${d > 0 ? 'var(--accent-green)' : d < 0 ? 'var(--accent-red)' : 'var(--text-tertiary)'}">${d >= 0 ? '+' : ''}${d.toFixed(1)} pts <span style="font-size:10px;opacity:0.75">(${d >= 0 ? '+' : ''}${Math.round(d * 10)} pips)</span></span>`;
+    body.innerHTML = led.slice(0, 12).map(e => `
+      <tr>
+        <td style="font-weight:700">${e.title}${e.res === '1m' ? ' <span style="font-size:9px;color:var(--text-tertiary)">(1m data)</span>' : ''}</td>
+        <td style="${mono}">${e.when}</td>
+        <td style="${mono}">${e.base ? e.base.toFixed(2) : '—'}</td>
+        <td>${cell(e.d10)}</td>
+        <td>${cell(e.d60)}</td>
+        <td>${cell(e.d300)}</td>
+      </tr>`).join('');
   }
 
   async function renderRedFolder() {
@@ -6758,6 +6877,8 @@
       // Auto alerts: zone entries, bias flips, red-folder days
       try { checkAutoAlerts(); } catch (e) {}
       try { updateNextEventChip(); } catch (e) {}
+      // Print meter: auto-measure recent red-folder releases (throttled)
+      try { refreshPrintMeter(); } catch (e) {}
 
       // Daily bias + reaction zones (cached klines; feeds the day-chart overlay)
       computeDailyBias().then(() => {
