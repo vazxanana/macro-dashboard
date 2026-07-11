@@ -3043,6 +3043,14 @@
       </div>
     </div>
 
+    <!-- Trade plan: bias + structure + unmitigated order block, assembled -->
+    <div class="card glass" style="margin-bottom:16px;">
+      <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:10px;">
+        <h3 style="margin:0;">Trade Plan <span style="font-size:11px;font-weight:500;color:var(--text-tertiary)">— printed only when bias, daily structure and a live order block agree at ≥1.5R</span></h3>
+      </div>
+      <div id="tradePlanBody"><div style="font-size:12px;color:var(--text-tertiary);">Computing…</div></div>
+    </div>
+
     <!-- Reaction zones chart -->
     <div class="dash-widget" style="margin-bottom:16px;">
       <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;margin-bottom:10px;">
@@ -5851,9 +5859,11 @@
   //  • every structure break also stamps its SUPPLY/DEMAND zone: the order
   //    block at the leg origin (last opposite candle), kept until a body
   //    close through the far side invalidates it. ChoCh zones are starred.
-  function structureMap(candles, maxSwings, maxEvents) {
+  function structureMap(candles, maxSwings, maxEvents, refPx) {
     if (!candles || candles.length < 30) return { swings: [], events: [], zones: [], state: null };
-    const off = (lastGoldPrice && candles[candles.length - 1].close) ? (lastGoldPrice - candles[candles.length - 1].close) : 0;
+    // refPx anchors normalisation (live: spot; backtest: as-of close → off = 0)
+    const anchor = refPx !== undefined ? refPx : lastGoldPrice;
+    const off = (anchor && candles[candles.length - 1].close) ? (anchor - candles[candles.length - 1].close) : 0;
     const S = 3;                             // pivot strength: 3 bars each side
     const swings = [], events = [], zonesRaw = [];
     let trend = null;
@@ -6330,6 +6340,42 @@
     return trades;
   }
 
+  // S4 — Structure + S/D (the MTF engine traded mechanically): each daily
+  // close, if major structure has a bos-CONFIRMED trend, place a limit at the
+  // nearest live order block on the trend side (unmitigated preferred), stop
+  // beyond the block, target the opposing block / bos level. RR ≥ 1.5 gate.
+  function btSimStruct(D, m15) {
+    const trades = [];
+    let busyUntil = -1;
+    for (let di = 60; di < D.length - 1; di++) {
+      const t = D[di].time;
+      const atr = btAtrAt(D, di);
+      if (!(atr > 0)) continue;
+      const px = D[di].close;
+      const m = structureMap(D.slice(0, di + 1), 30, 12, px);   // refPx = as-of close (no look-ahead)
+      const ms = m.state;
+      if (!ms || !ms.confirmed) continue;
+      const L = ms.trend === 'bull';
+      const zs = m.zones.filter(z => z.bull === L && (L ? z.lo < px : z.hi > px));
+      zs.sort((a, b) => L ? (b.hi - a.hi) : (a.lo - b.lo));
+      const zone = zs.find(z => z.fresh) || zs[0];
+      if (!zone) continue;
+      const entry = L ? Math.min(zone.hi, px) : Math.max(zone.lo, px);
+      const stop  = L ? zone.lo - atr * 0.25 : zone.hi + atr * 0.25;
+      const risk  = Math.abs(entry - stop);
+      if (!(risk > 0) || Math.abs(px - entry) > atr * 2.5) continue;
+      const opp = m.zones.filter(z => z.bull !== L && (L ? z.lo > px : z.hi < px))
+        .sort((a, b) => L ? (a.lo - b.lo) : (b.hi - a.hi))[0];
+      const target = opp ? (L ? opp.lo : opp.hi) : ms.next ? ms.next.price : (L ? entry + risk * 2 : entry - risk * 2);
+      if (Math.abs(target - entry) / risk < 1.5) continue;
+      const i15 = btAsOfIndex(m15, t) + 1;
+      if (i15 <= 0 || i15 <= busyUntil) continue;
+      const res = btPlayOutLimit(m15, i15, L ? 'long' : 'short', entry, stop, target, 480);
+      if (res) { trades.push({ t, dir: L ? 'long' : 'short', ...res }); busyUntil = res.exitI; }
+    }
+    return trades;
+  }
+
   let btRunning = false;
   async function runBacktest() {
     if (btRunning) return;
@@ -6355,7 +6401,8 @@
       const rows = [
         btMetrics('EG Scalp (★ M15 at structure, 1.8R)', btSimEngulf(D, m15, h4)),
         btMetrics('EG Day Trade (H1 at daily structure, 2R)', btSimEgDay(D, h1, m15)),
-        btMetrics('Daily Bias (zone limit entries, trend proxy)', btSimBias(D, m15))
+        btMetrics('Daily Bias (zone limit entries, trend proxy)', btSimBias(D, m15)),
+        btMetrics('Structure + S/D (order-block limits, bos-confirmed)', btSimStruct(D, m15))
       ];
       // Rank by total R, but a strategy needs a minimum sample to win
       const qualified = rows.filter(r2 => r2.n >= 5);
@@ -6612,7 +6659,7 @@
     const b = document.getElementById('notifBtn');
     if (!b) return;
     const on = notifEnabled();
-    b.textContent = on ? '🔔 Auto alerts ON — click to disable' : '🔕 Enable auto alerts (zones · bias · events)';
+    b.textContent = on ? '🔔 Auto alerts ON — click to disable' : '🔕 Enable auto alerts (zones · bias · structure · events)';
     b.onclick = on ? disableNotifs : enableNotifs;
   }
   function sendNotif(title, body) {
@@ -6646,6 +6693,27 @@
     if (er.level === 'high') {
       const k = 'rf' + new Date().toISOString().slice(0, 10);
       if (!_alertMemo[k]) { _alertMemo[k] = 1; sendNotif('Red Folder day', er.events.join(' · ') + ' — blackout 30 min around the print; halve size.'); }
+    }
+    // structure events (daily): fresh ChoCh print + first touch of an
+    // unmitigated order block
+    if (st && st.ok) {
+      const lb = st.lastBreak;
+      if (lb && lb.type === 'ChoCh' && (Date.now() / 1000 - lb.t2) < 3 * 86400
+          && localStorage.getItem('lastChoChT') !== String(lb.t2)) {
+        localStorage.setItem('lastChoChT', String(lb.t2));
+        sendNotif('Daily ChoCh — structure flipped ' + (lb.up ? 'bullish' : 'bearish'),
+          `Body close through the protected swing at ${lb.price.toFixed(0)}. Reassess the bias before the next entry.`);
+      }
+      for (const z of (st.sdZones || [])) {
+        if (z.fresh && px >= z.lo && px <= z.hi) {
+          const k = 'sd' + z.lo.toFixed(0);
+          if (!_alertMemo[k] || Date.now() - _alertMemo[k] > 12 * 3600e3) {
+            _alertMemo[k] = Date.now();
+            sendNotif('Gold tapped an unmitigated ' + (z.bull ? 'demand' : 'supply') + ' block',
+              `${z.lo.toFixed(0)}–${z.hi.toFixed(0)} first touch — the highest-probability reaction. Hunt the trigger.`);
+          }
+        }
+      }
     }
   }
 
@@ -6738,6 +6806,80 @@
     return { phase: 'mid', dir: null, detail: 'transitional — no dominant USD force' };
   }
 
+  // ─── DRIVER AUTO-TUNING ─────────────────────────────────────────────────────
+  // The scorecard grades every driver every day. Once a driver has ≥30 graded
+  // directional days, its bias weight is shaded by its measured hit rate.
+  function driverTuningTable() {
+    let led = [];
+    try { led = biasLedgerLoad(); } catch (e) { return {}; }
+    const stat = {};
+    for (const e of led) {
+      if (!e.graded || (e.dayDir !== 'long' && e.dayDir !== 'short') || !e.drivers) continue;
+      for (const dr of e.drivers) {
+        if (!dr.dir) continue;
+        const s = stat[dr.n] || (stat[dr.n] = { n: 0, hit: 0 });
+        s.n++;
+        if (dr.dir === e.dayDir) s.hit++;
+      }
+    }
+    const out = {};
+    for (const k in stat) {
+      const s = stat[k];
+      if (s.n < 30) continue;
+      const r = s.hit / s.n;
+      out[k] = { mult: r >= 0.6 ? 1.25 : r <= 0.4 ? 0.75 : 1, rate: Math.round(r * 100), n: s.n };
+    }
+    return out;
+  }
+
+  // ─── TRADE PLAN — bias + structure + unmitigated S/D assembled into a ticket ─
+  function renderTradePlan(st) {
+    const el = document.getElementById('tradePlanBody');
+    if (!el) return;
+    const mono = "font-family:'JetBrains Mono',monospace";
+    const no = why => { el.innerHTML = `<div style="font-size:12px;color:var(--text-secondary);line-height:1.7;"><strong style="color:var(--text-tertiary)">NO TRADE PLAN</strong> — ${why}</div>`; };
+    if (!st || !st.ok) return no('waiting for market data.');
+    const er = getEventRisk();
+    if (er.level === 'high') return no(`red-folder day (${er.events.join(' · ')}) — stand down into the print, re-plan after the dust settles.`);
+    if (st.dir === 'wait') return no(`drivers net ${st.net > 0 ? '+' : ''}${st.net} of ±${st.wTot} — no directional bias today. Capital preserved is edge kept.`);
+    const ms = st.struct;
+    const L = st.dir === 'long';
+    if (!ms) return no('daily structure still forming — no protected swing to lean on.');
+    if ((ms.trend === 'bull') !== L)
+      return no(`bias says <strong>${st.dir.toUpperCase()}</strong> but daily structure is <strong>${ms.trend === 'bull' ? 'BULLISH' : 'BEARISH'}</strong>${ms.confirmed ? ' (bos-confirmed)' : ' (ChoCh only)'} — conflict. No A+ setup until they agree.`);
+    // entry: nearest live order block on the trade side (unmitigated preferred)
+    const zs = (st.sdZones || []).filter(z => z.bull === L && (L ? z.lo < st.px : z.hi > st.px));
+    zs.sort((a, b) => L ? (b.hi - a.hi) : (a.lo - b.lo));
+    const zone = zs.find(z => z.fresh) || zs[0] || null;
+    if (!zone) return no(`no live ${L ? 'demand' : 'supply'} order block ${L ? 'below' : 'above'} price — nothing to lean an entry on. Let a pullback build one.`);
+    const entry = L ? Math.min(zone.hi, st.px) : Math.max(zone.lo, st.px);
+    const stop  = L ? zone.lo - st.atr * 0.25 : zone.hi + st.atr * 0.25;
+    const risk  = Math.abs(entry - stop);
+    const opp = (st.sdZones || []).filter(z => z.bull !== L && (L ? z.lo > st.px : z.hi < st.px))
+      .sort((a, b) => L ? (a.lo - b.lo) : (b.hi - a.hi))[0];
+    const target = opp ? (L ? opp.lo : opp.hi) : ms.next ? ms.next.price : (L ? entry + risk * 2 : entry - risk * 2);
+    const rr = risk > 0 ? Math.abs(target - entry) / risk : 0;
+    if (!(risk > 0) || rr < 1.5) return no(`geometry too tight — best available plan is ${rr.toFixed(1)}R (needs ≥1.5R). Let price travel first.`);
+    const fresh = !!zone.fresh;
+    const cell = (l, v, sub, col) => `
+      <div class="metric-box"><div class="metric-label">${l}</div>
+      <div class="metric-value" style="${mono};font-size:17px;${col ? 'color:' + col : ''}">${v}</div>
+      <div class="metric-detail">${sub}</div></div>`;
+    el.innerHTML = `
+      <div class="metric-grid" style="margin-bottom:10px;">
+        ${cell('Direction', L ? '▲ LONG' : '▼ SHORT', st.conf + '% bias · structure ' + (ms.confirmed ? 'bos-confirmed' : 'ChoCh only'), L ? 'var(--accent-green)' : 'var(--accent-red)')}
+        ${cell('Entry', entry.toFixed(0), (fresh ? 'UNMITIGATED ' : '') + (L ? 'demand' : 'supply') + ' block ' + zone.lo.toFixed(0) + '–' + zone.hi.toFixed(0))}
+        ${cell('Stop', stop.toFixed(0), risk.toFixed(0) + ' pts risk · beyond the block', 'var(--accent-red)')}
+        ${cell('Target', target.toFixed(0), opp ? 'opposing ' + (L ? 'supply' : 'demand') + ' block' : ms.next ? 'structure bos level' : '2R fallback', 'var(--accent-green)')}
+        ${cell('R : R', rr.toFixed(1) + 'R', 'plan void on a daily close ' + (L ? 'below ' : 'above ') + (ms.protected ? ms.protected.price.toFixed(0) + ' (ChoCh)' : stop.toFixed(0)))}
+      </div>
+      <div style="font-size:11px;color:var(--text-secondary);line-height:1.7;">
+        Limit ${L ? 'buy the pullback into' : 'sell the rally into'} the ${fresh ? '<strong>unmitigated</strong> ' : ''}block, trigger on an M15 ${L ? 'bullish' : 'bearish'} engulfing inside it.
+        ${er.level === 'medium' ? '<strong style="color:#D97706">Event risk today — halve size.</strong>' : ''}
+        Size so ${risk.toFixed(0)} pts = 1R of your account risk.
+      </div>`;
+  }
+
   let rzState = [];             // ranked daily zones — drawn on charts + alerts
   let rzWeeklyState = [];       // weekly zones — the swing-target map
   let dailyBiasState = null;
@@ -6771,7 +6913,8 @@
         wUp === null ? 'no data' : wUp ? 'above' : 'below');
     // major market structure (same engine as the MTF charts): a confirmed
     // trend carries full weight, an unconfirmed ChoCh only half
-    const ms = structureMap(d1).state;
+    const smap = structureMap(d1);
+    const ms = smap.state;
     add('Market structure — Daily bos/ChoCh', !ms ? null : ms.trend === 'bull' ? 'long' : 'short',
         ms && ms.confirmed ? 2 : 1,
         !ms ? 'forming' : (ms.trend === 'bull' ? 'bullish' : 'bearish')
@@ -6806,11 +6949,25 @@
     add('Dollar Smile regime (USD cycle)', smile ? smile.dir : null, 1,
         smile ? smile.phase + ' · ' + smile.detail : 'no data');
 
-    st.wTot = checks.reduce((a, c) => a + c.w, 0);
-    st.net  = checks.reduce((a, c) => a + (c.dir === 'long' ? c.w : c.dir === 'short' ? -c.w : 0), 0);
+    // auto-tuning: once a driver has ≥30 graded days in the scorecard ledger,
+    // its weight is shaded by its real hit rate (≥60% → ×1.25, ≤40% → ×0.75)
+    const tune = driverTuningTable();
+    for (const c of checks) {
+      const t = tune[c.n];
+      if (t && t.mult !== 1) {
+        c.w = +(c.w * t.mult).toFixed(2);
+        c.detail += ` · auto-tuned ${t.mult > 1 ? '↑' : '↓'} (${t.rate}% over ${t.n}d)`;
+      }
+    }
+    st.wTot = +checks.reduce((a, c) => a + c.w, 0).toFixed(1);
+    st.net  = +checks.reduce((a, c) => a + (c.dir === 'long' ? c.w : c.dir === 'short' ? -c.w : 0), 0).toFixed(1);
     st.dir  = st.net >= 3 ? 'long' : st.net <= -3 ? 'short' : 'wait';
     st.conf = Math.round(50 + Math.abs(st.net) / st.wTot * 50);
     st.checks = checks;
+    st.struct = ms;                                   // daily structure state for the trade planner
+    st.sdZones = smap.zones;                          // live S/D order blocks (with fresh flags)
+    const majors = smap.events.filter(e => !e.sweep && !e.idm);
+    st.lastBreak = majors[majors.length - 1] || null; // for ChoCh alerts
 
     rzState = reactionZones(d1, atr);
     // weekly reaction zones — the swing-target map (bigger reactions, wider ATR)
@@ -7006,6 +7163,7 @@
       pb = `Drivers disagree (net ${st.net > 0 ? '+' : ''}${st.net} of ±${st.wTot}) — <strong>no daily bias</strong>. Chop protocol: trade only A-grade EG signals printed inside a reaction zone, at half size, or stand aside. Capital preserved is edge kept.`;
     }
     setH('bias-playbook', pb);
+    try { renderTradePlan(st); } catch (e) { console.warn('trade plan failed:', e.message); }
 
     // Zones table
     const tb = document.getElementById('rzTableBody');
