@@ -5425,17 +5425,10 @@
           timeScale: { borderColor: 'rgba(127,127,127,0.2)', timeVisible: interval !== '1d', secondsVisible: false },
           crosshair: { mode: 0 }
         });
-        // TradingView-style monochrome candles (owner preference): light gray
-        // bullish bodies, dark charcoal bearish bodies, neutral wicks — with
-        // borders so dark bodies stay readable on the near-black canvas.
-        series = chart.addCandlestickSeries(dark ? {
-          upColor: '#D9DDE3', downColor: '#101318', borderVisible: true,
-          borderUpColor: '#D9DDE3', borderDownColor: '#8B93A1',
-          wickUpColor: '#9AA0A8', wickDownColor: '#9AA0A8'
-        } : {
-          upColor: '#E9E9E9', downColor: '#2E2E2E', borderVisible: true,
-          borderUpColor: '#5A5A5A', borderDownColor: '#111111',
-          wickUpColor: '#111111', wickDownColor: '#111111'
+        const cUp = dark ? '#4ADE80' : '#0E9F6E', cDn = dark ? '#FB7185' : '#E02424';
+        series = chart.addCandlestickSeries({
+          upColor: cUp, downColor: cDn, borderVisible: false,
+          wickUpColor: cUp, wickDownColor: cDn
         });
         if (cfg.zones && typeof series.attachPrimitive === 'function') {
           zonesPrim = makeZonesPrimitive();
@@ -6394,7 +6387,7 @@
   //   2Y yield (DGS2)      = the market's Fed-policy proxy   → falling = dovish = gold+
   //   DXY 5-session change = USD momentum (ICE formula, ECB reference rates)
   //   CFTC COT             = managed-money net gold futures positioning (weekly)
-  let fundX = { breakeven: null, dgs2: null, dxyMom: null, cot: null, curve: null, hy: null, cotSeries: null, _ts: 0 };
+  let fundX = { breakeven: null, dgs2: null, dxyMom: null, cot: null, curve: null, hy: null, cotSeries: null, swap: null, _ts: 0 };
 
   async function fetchFredSeries(seriesId, limit) {
     const url = `https://api.stlouisfed.org/fred/series/observations?series_id=${seriesId}&api_key=${apiKeys.fred}&limit=${limit}&sort_order=desc&file_type=json`;
@@ -6413,9 +6406,10 @@
     fundX._ts = Date.now();
 
     try {
-      const [nom, tw, cv, hy] = await Promise.all([
+      const [nom, tw, cv, hy, sw] = await Promise.all([
         fetchFredSeries('DGS10', 15), fetchFredSeries('DGS2', 15),
-        fetchFredSeries('T10Y3M', 15), fetchFredSeries('BAMLH0A0HYM2', 15)
+        fetchFredSeries('T10Y3M', 15), fetchFredSeries('BAMLH0A0HYM2', 15),
+        fetchFredSeries('SWPT', 8)   // Fed central-bank liquidity swap lines (H.4.1, $M) — USD funding stress
       ]);
       const lvlChg = obs => {
         if (!obs) return null;
@@ -6425,6 +6419,10 @@
       };
       fundX.curve = lvlChg(cv);
       fundX.hy = lvlChg(hy);
+      if (sw) {
+        const v = parseFloat(sw[0].value);
+        if (isFinite(v)) fundX.swap = { bn: +(v / 1000).toFixed(1) };   // $bn drawn on Fed swap lines
+      }
       if (nom && realYield.level !== null) {
         const nomNow = parseFloat(nom[0].value);
         const nomWk  = parseFloat(nom[Math.min(5, nom.length - 1)].value);
@@ -6708,6 +6706,31 @@
     return zones.sort((a, b) => b.score - a.score);
   }
 
+  // ─── DOLLAR SMILE REGIME (institutional macro handbook, ch.1 & 7) ──────────
+  // USD is strong at BOTH ends of the global cycle: left side = crisis /
+  // dollar-funding stress (flight to quality + dollar debt servicing), right
+  // side = US outperformance (rate/growth differentials). It is weak only in
+  // the trough (synchronized global growth). Classified from feeds we already
+  // carry: VIX, HY spread momentum, DXY momentum, real-yield/2Y trends, plus
+  // Fed swap-line usage (FRED SWPT) — the coincident funding-stress gauge.
+  function dollarSmileRegime() {
+    const dm = fundX.dxyMom, hy = fundX.hy, d2 = fundX.dgs2, sw = fundX.swap;
+    const vix = vixState.val, ryChg = realYield.chg;
+    if (!dm && !hy && vix === null) return null;
+    const stress = (hy && hy.chg >= 0.15) || (sw && sw.bn >= 5) || (vix !== null && vix >= 28);
+    if (stress) return {
+      phase: 'left', dir: null,
+      detail: 'crisis/funding stress' + (sw && sw.bn >= 5 ? ` · swap lines $${sw.bn}bn` : '')
+        + ' — USD bid, gold whipsaws then catches the haven bid'
+    };
+    const calm = vix === null || vix < 22;
+    if (dm && dm.chg >= 0.25 && calm && ((ryChg !== null && ryChg >= 0.02) || (d2 && d2.chg >= 0.03)))
+      return { phase: 'right', dir: 'short', detail: 'US outperformance — USD + real rates bid (headwind)' };
+    if (dm && dm.chg <= -0.15 && calm && (!hy || hy.chg <= 0.05))
+      return { phase: 'trough', dir: 'long', detail: 'synchronized growth — USD offered (weak-dollar tailwind)' };
+    return { phase: 'mid', dir: null, detail: 'transitional — no dominant USD force' };
+  }
+
   let rzState = [];             // ranked daily zones — drawn on charts + alerts
   let rzWeeklyState = [];       // weekly zones — the swing-target map
   let dailyBiasState = null;
@@ -6772,6 +6795,9 @@
     const hy = fundX.hy;
     add('Credit stress (HY spreads)', !hy ? null : hy.chg >= 0.08 ? 'long' : hy.chg <= -0.08 ? 'short' : null, 1,
         hy ? hy.level.toFixed(2) + '% · ' + (hy.chg >= 0 ? '+' : '') + Math.round(hy.chg * 100) + ' bps/wk' + (hy.chg >= 0.08 ? ' — risk-off, haven bid' : '') : 'no data');
+    const smile = dollarSmileRegime();
+    add('Dollar Smile regime (USD cycle)', smile ? smile.dir : null, 1,
+        smile ? smile.phase + ' · ' + smile.detail : 'no data');
 
     st.wTot = checks.reduce((a, c) => a + c.w, 0);
     st.net  = checks.reduce((a, c) => a + (c.dir === 'long' ? c.w : c.dir === 'short' ? -c.w : 0), 0);
