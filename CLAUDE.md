@@ -8,11 +8,13 @@ Single-file gold trading platform: everything lives in `gold-trading.html`
 
 - **Market structure engine** (`structureMap` + `makeStructPrimitive` +
   `renderStructReadout`): major-structure mapping on the Multi-Timeframe
-  charts — alternating HH/HL/LH/LL swing tags, `bos` only at the ratcheting
-  trend extreme, `ChoCh` only at the protected origin swing, dashed gray
-  `idm` inducement marks, dashed amber liquidity `sweep` marks, and the
-  plain-language structure readout under each chart. The owner explicitly
-  asked to keep this.
+  charts — `bos` only at the ratcheting trend extreme, `ChoCh` only at the
+  protected origin swing, dashed gray `idm` inducement marks, dashed amber
+  liquidity `sweep` marks, and the plain-language structure readout under
+  each chart. The owner explicitly asked to keep this. Display preference
+  (also owner-requested): all MTF charts hide the HH/HL/LH/LL swing tags
+  and the "bos" label text (`structOpts: { hideTags, hideBosLabel }`);
+  break lines still draw and ChoCh stays labelled.
 - **Supply/demand order-block zones** (`sdZones` via `structureMap(...).zones`):
   green demand / red supply boxes at break-leg origins on the MTF charts
   (ChoCh origins drawn brighter), live until a body close through the far
