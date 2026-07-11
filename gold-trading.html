@@ -3573,7 +3573,7 @@
   <!-- MULTI-TIMEFRAME CHARTS — top-down: Daily trend, H4 structure, M15 execution -->
   <div id="tab-mtf" class="tab-panel">
     <div class="section-header">
-      <div class="section-title">Multi-Timeframe Charts <span style="font-size:11px;font-weight:500;color:var(--text-tertiary)">— Daily trend &middot; H4 structure &middot; M15 execution (XAU/USD, PAXG proxy) &middot; MAJOR structure only: <span style="color:var(--accent-green)">bos</span> = trend extreme broken by a body close, ChoCh = protected origin swing broken &middot; dashed gray <em>idm</em> = inducement swept (minor pullback liquidity, not a ChoCh) &middot; dashed amber = sweep (wick through, level held) &middot; green/red boxes = demand/supply order blocks at break origins (bright = ChoCh origin), live until a body close through the far side</span></div>
+      <div class="section-title">Multi-Timeframe Charts <span style="font-size:11px;font-weight:500;color:var(--text-tertiary)">— Daily trend &middot; H4 structure &middot; M15 execution (XAU/USD, PAXG proxy) &middot; MAJOR structure only: solid <span style="color:var(--accent-green)">green</span>/<span style="color:var(--accent-red)">red</span> line = trend extreme broken by a body close, <strong>ChoCh</strong> = protected origin swing broken (reversal warning) &middot; dashed gray <em>idm</em> = inducement swept &middot; dashed amber = sweep (wick through, level held) &middot; green/red boxes = demand/supply order blocks at break origins (bright = ChoCh origin), live until a body close through the far side</span></div>
     </div>
 
     <!-- Alignment verdict -->
@@ -3598,7 +3598,7 @@
         <div id="mtfDailyStruct" style="margin-top:8px;font-size:11px;line-height:1.5;color:var(--text-tertiary);"></div>
       </div>
       <div class="dash-widget">
-        <div class="dash-widget-title" style="margin-bottom:10px;">H4 — Structure <span style="font-size:10px;font-weight:500;color:var(--text-tertiary)">last ~30 days &middot; PDH/PDL marked</span></div>
+        <div class="dash-widget-title" style="margin-bottom:10px;">H4 — Structure <span style="font-size:10px;font-weight:500;color:var(--text-tertiary)">last ~30 days &middot; structure + supply/demand only</span></div>
         <div id="mtfH4" style="width:100%;height:300px;position:relative;">
           <div id="mtfH4Msg" style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;text-align:center;color:var(--text-tertiary);font-size:12px;padding:16px;">Loading&hellip;</div>
         </div>
@@ -5467,16 +5467,14 @@
   const mtfDailyCtl = createLevelChart({
     chartId: 'mtfDaily', msgId: 'mtfDailyMsg', interval: '1d', height: 300, zones: true, zonesFn: sdZones,
     biasKey: 'D', biasId: 'mtf-bias-d',
+    structOpts: { hideTags: true, hideBosLabel: true },
     structFn: async (c) => { const m = structureMap(c); renderStructReadout('mtfDailyStruct', m); return m; }
   });
   const mtfH4Ctl = createLevelChart({
     chartId: 'mtfH4', msgId: 'mtfH4Msg', interval: '4h', height: 300, zones: true, zonesFn: sdZones,
     biasKey: 'H4', biasId: 'mtf-bias-h4',
-    structFn: async (c) => { const m = structureMap(c); renderStructReadout('mtfH4Struct', m); return m; },
-    extraLevels: () => !structState.ok ? [] : [
-      structState.pdh !== null ? { price: structState.pdh, color: '#7A8196', title: 'PDH', dashed: true } : null,
-      structState.pdl !== null ? { price: structState.pdl, color: '#7A8196', title: 'PDL', dashed: true } : null
-    ]
+    structOpts: { hideTags: true, hideBosLabel: true },
+    structFn: async (c) => { const m = structureMap(c); renderStructReadout('mtfH4Struct', m); return m; }
   });
   // M15 execution chart stays clean: price + structure lines + supply/demand
   // only — no level lines, no swing tags, no "bos" text (ChoCh still labelled).
