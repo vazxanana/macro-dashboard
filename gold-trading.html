@@ -3055,12 +3055,13 @@
       <div id="biasChart" style="width:100%;height:380px;position:relative;">
         <div id="biasChartMsg" style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;text-align:center;color:var(--text-tertiary);font-size:12px;padding:16px;">Loading&hellip;</div>
       </div>
+      <div id="biasChartStruct" style="margin-top:8px;font-size:11px;line-height:1.5;color:var(--text-tertiary);"></div>
     </div>
 
     <!-- H4 / M15: structure and execution views inside the zones -->
     <div class="mtf-grid" style="margin-bottom:16px;">
       <div class="dash-widget">
-        <div class="dash-widget-title" style="margin-bottom:10px;">H4 — Structure at the Zones <span style="font-size:10px;font-weight:500;color:var(--text-tertiary)">boxes = engulf zones &middot; gold lines = nearest reaction zone edges</span></div>
+        <div class="dash-widget-title" style="margin-bottom:10px;">H4 — Structure at the Zones <span style="font-size:10px;font-weight:500;color:var(--text-tertiary)">boxes = supply/demand order blocks &middot; gold lines = nearest reaction zone edges</span></div>
         <div id="biasH4" style="width:100%;height:300px;position:relative;">
           <div id="biasH4Msg" style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;text-align:center;color:var(--text-tertiary);font-size:12px;padding:16px;">Loading&hellip;</div>
         </div>
@@ -6731,6 +6732,14 @@
     add('Daily trend — close vs SMA20', dUp ? 'long' : 'short', 2, dUp ? 'above' : 'below');
     add('Weekly trend — close vs SMA20', wUp === null ? null : wUp ? 'long' : 'short', 2,
         wUp === null ? 'no data' : wUp ? 'above' : 'below');
+    // major market structure (same engine as the MTF charts): a confirmed
+    // trend carries full weight, an unconfirmed ChoCh only half
+    const ms = structureMap(d1).state;
+    add('Market structure — Daily bos/ChoCh', !ms ? null : ms.trend === 'bull' ? 'long' : 'short',
+        ms && ms.confirmed ? 2 : 1,
+        !ms ? 'forming' : (ms.trend === 'bull' ? 'bullish' : 'bearish')
+          + (ms.confirmed ? ' · bos-confirmed' : ' · ChoCh only')
+          + (ms.protected ? ' · flips at ' + Math.round(ms.protected.price) : ''));
     add('Price vs previous day close', sst.ok && sst.pdc !== null ? (px >= sst.pdc ? 'long' : 'short') : null, 1,
         sst.ok && sst.pdc !== null ? (px >= sst.pdc ? '+' : '') + (px - sst.pdc).toFixed(0) + ' pts' : 'no data');
     add('Price vs session VWAP', sst.ok && sst.vwap !== null ? (px >= sst.vwap ? 'long' : 'short') : null, 1,
@@ -6788,7 +6797,9 @@
   const biasChartCtl = createLevelChart({
     chartId: 'biasChart', msgId: 'biasChartMsg', interval: '1d', height: 380, zones: true,
     zonesFn: () => rzState.slice(0, 7).map((z, i) => ({ t1: z.firstT, t2: null, hi: z.hi, lo: z.lo, bull: z.side !== 'res', star: i < 3 })),
-    extraLevels: () => rzWeeklyState.slice(0, 3).map(z => ({ price: z.mid, color: '#D4AF37', title: 'W-RZ', dashed: true }))
+    extraLevels: () => rzWeeklyState.slice(0, 3).map(z => ({ price: z.mid, color: '#D4AF37', title: 'W-RZ', dashed: true })),
+    structOpts: { hideTags: true, hideBosLabel: true },
+    structFn: async (c) => { const m = structureMap(c); renderStructReadout('biasChartStruct', m); return m; }
   });
   // Nearest reaction-zone edges as gold lines (shared by the H4/M15 views)
   function rzNearLines() {
@@ -6801,8 +6812,10 @@
     if (above) out.push({ price: above.lo, color: '#D4AF37', title: 'RZ ↑' });
     return out;
   }
-  const biasH4Ctl  = createLevelChart({ chartId: 'biasH4',  msgId: 'biasH4Msg',  interval: '4h',  height: 300, zones: true, extraLevels: rzNearLines });
-  const biasM15Ctl = createLevelChart({ chartId: 'biasM15', msgId: 'biasM15Msg', interval: '15m', height: 300, zones: true, extraLevels: rzNearLines });
+  // Bias H4/M15: same clean structure + S/D order blocks as the MTF tab,
+  // with the nearest daily reaction-zone edges kept as gold lines
+  const biasH4Ctl  = createLevelChart({ chartId: 'biasH4',  msgId: 'biasH4Msg',  interval: '4h',  height: 300, zones: true, zonesFn: sdZones, structOpts: { hideTags: true, hideBosLabel: true }, structFn: async (c) => structureMap(c), extraLevels: rzNearLines });
+  const biasM15Ctl = createLevelChart({ chartId: 'biasM15', msgId: 'biasM15Msg', interval: '15m', height: 300, zones: true, zonesFn: sdZones, structOpts: { hideTags: true, hideBosLabel: true }, structFn: async (c) => structureMap(c), extraLevels: rzNearLines });
 
   const rzDate = t => new Date(t * 1000).toLocaleDateString('en-GB', { day: '2-digit', month: 'short' });
 
