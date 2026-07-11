@@ -5960,7 +5960,32 @@
       }
       return true;
     });
-    const zones = zonesLive.filter(z => z.bull).slice(-3).concat(zonesLive.filter(z => !z.bull).slice(-3))
+    // pad doji order blocks to a readable box (anchored at the wick side)
+    let atr = 0;
+    const a0 = Math.max(1, candles.length - 14);
+    for (let k = a0; k < candles.length; k++) {
+      atr += Math.max(candles[k].high - candles[k].low,
+        Math.abs(candles[k].high - candles[k - 1].close),
+        Math.abs(candles[k].low - candles[k - 1].close));
+    }
+    atr /= (candles.length - a0) || 1;
+    const minH = 0.3 * atr;
+    for (const z of zonesLive) {
+      if (z.hi - z.lo < minH) { if (z.bull) z.hi = z.lo + minH; else z.lo = z.hi - minH; }
+    }
+    // same-side zones that overlap collapse into the freshest one
+    const dedupe = (arr) => {
+      const kept = [];
+      for (let i = arr.length - 1; i >= 0; i--) {
+        const z = arr[i];
+        const clash = kept.some(k =>
+          Math.min(k.hi, z.hi) - Math.max(k.lo, z.lo) > 0.5 * Math.min(k.hi - k.lo, z.hi - z.lo));
+        if (!clash) kept.unshift(z);
+      }
+      return kept;
+    };
+    const zones = dedupe(zonesLive.filter(z => z.bull)).slice(-3)
+      .concat(dedupe(zonesLive.filter(z => !z.bull)).slice(-3))
       .map(z => ({ t1: z.t1, t2: null, hi: n(z.hi), lo: n(z.lo), bull: z.bull, star: z.star }));
     const shown = breaks.slice(-(maxEvents || 12))
       .concat(events.filter(e => e.sweep).slice(-3))
@@ -6019,8 +6044,10 @@
                 const gray  = dark ? 'rgba(233,244,241,0.5)' : 'rgba(16,32,29,0.45)';
                 ctx.textAlign = 'center';
                 // break lines: swing → break candle, label centred on the line;
-                // liquidity sweeps dashed amber, inducement grabs dashed gray
+                // liquidity sweeps dashed amber, inducement grabs dashed gray.
+                // Labels dodge each other vertically instead of overprinting.
                 const amber = dark ? '#FBBF24' : '#B45309';
+                const placed = [];
                 for (const e of _map.events) {
                   const x1 = _chart.timeScale().timeToCoordinate(e.t1);
                   const x2 = _chart.timeScale().timeToCoordinate(e.t2);
@@ -6037,7 +6064,16 @@
                   ctx.setLineDash([]);
                   if (e.type === 'bos' && hideBos) continue;
                   ctx.font = `600 ${(minor ? 9 : 10) * hr}px 'JetBrains Mono', monospace`;
-                  ctx.fillText(e.type, ((x1 + x2) / 2) * hr, y * vr - 4 * vr);
+                  const cx = ((x1 + x2) / 2) * hr;
+                  const w  = ctx.measureText(e.type).width;
+                  let cy = y * vr - 4 * vr;
+                  for (let guard = 0; guard < 4; guard++) {
+                    const hit = placed.find(p => Math.abs(cy - p.y) < 10 * vr && Math.abs(cx - p.x) < (w + p.w) / 2 + 4 * hr);
+                    if (!hit) break;
+                    cy = hit.y - 11 * vr;
+                  }
+                  placed.push({ x: cx, y: cy, w });
+                  ctx.fillText(e.type, cx, cy);
                 }
                 // swing tags — above highs, below lows
                 ctx.font = `700 ${10 * hr}px 'JetBrains Mono', monospace`;
