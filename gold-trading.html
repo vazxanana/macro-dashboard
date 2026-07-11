@@ -3573,7 +3573,7 @@
   <!-- MULTI-TIMEFRAME CHARTS — top-down: Daily trend, H4 structure, M15 execution -->
   <div id="tab-mtf" class="tab-panel">
     <div class="section-header">
-      <div class="section-title">Multi-Timeframe Charts <span style="font-size:11px;font-weight:500;color:var(--text-tertiary)">— Daily trend &middot; H4 structure &middot; M15 execution (XAU/USD, PAXG proxy) &middot; rays = D / H4 swing levels, a ray ends with ✕ where a close broke it (BOS)</span></div>
+      <div class="section-title">Multi-Timeframe Charts <span style="font-size:11px;font-weight:500;color:var(--text-tertiary)">— Daily trend &middot; H4 structure &middot; M15 execution (XAU/USD, PAXG proxy) &middot; HH/HL/LH/LL swing tags &middot; short lines mark the break: <span style="color:var(--accent-green)">bos</span> = continuation, ChoCh = change of character</span></div>
     </div>
 
     <!-- Alignment verdict -->
@@ -5393,9 +5393,9 @@
         if (zonesPrim) {
           try { zonesPrim.setZones((cfg.zonesFn || engulfZones)(candles)); } catch (e) {}
         }
-        // Structure rays (BOS map) when a source is configured
+        // Structure notation (swing tags + BOS/ChoCh break lines)
         if (structPrim && cfg.structFn) {
-          try { structPrim.setSegs(await cfg.structFn(candles)); } catch (e) {}
+          try { structPrim.setMap(await cfg.structFn(candles)); } catch (e) {}
         }
         if (chart && chart.timeScale) { try { chart.timeScale().fitContent(); } catch (e) {} }
         const msg = document.getElementById(cfg.msgId);
@@ -5470,12 +5470,12 @@
   const mtfDailyCtl = createLevelChart({
     chartId: 'mtfDaily', msgId: 'mtfDailyMsg', interval: '1d', height: 300, zones: true,
     biasKey: 'D', biasId: 'mtf-bias-d',
-    structFn: async (c) => structureLevels(c, 'D', 4)
+    structFn: async (c) => structureMap(c)
   });
   const mtfH4Ctl = createLevelChart({
     chartId: 'mtfH4', msgId: 'mtfH4Msg', interval: '4h', height: 300, zones: true,
     biasKey: 'H4', biasId: 'mtf-bias-h4',
-    structFn: async (c) => structureLevels(c, 'H4', 4).concat(structureLevels(await fetchGoldKlines('1d') || [], 'D', 3)),
+    structFn: async (c) => structureMap(c),
     extraLevels: () => !structState.ok ? [] : [
       structState.pdh !== null ? { price: structState.pdh, color: '#7A8196', title: 'PDH', dashed: true } : null,
       structState.pdl !== null ? { price: structState.pdl, color: '#7A8196', title: 'PDL', dashed: true } : null
@@ -5484,7 +5484,7 @@
   const mtfM15Ctl = createLevelChart({
     chartId: 'mtfM15', msgId: 'mtfM15Msg', boxId: 'mtfM15Levels', interval: '15m', height: 340,
     biasKey: 'M15', biasId: 'mtf-bias-m15', getLevels: scalpLevels, zones: true,
-    structFn: async () => structureLevels(await fetchGoldKlines('4h') || [], 'H4', 4),
+    structFn: async (c) => structureMap(c),
     extraLevels: () => !structState.ok ? [] : [
       structState.vwap   !== null ? { price: structState.vwap,   color: '#8B5CF6', title: 'VWAP',   dashed: true } : null,
       structState.asianH !== null ? { price: structState.asianH, color: '#7A8196', title: 'ASIA H', dashed: true } : null,
@@ -5823,58 +5823,58 @@
     };
   }
 
-  // ─── STRUCTURE LEVELS (BOS) — swing levels that hold until a CLOSE breaks ───
-  // Fractal swing highs/lows (2-left/2-right). Each level extends right until
-  // a candle CLOSES beyond it — that candle is the Break of Structure. Drawn
-  // as labelled rays (D / H4): unbroken rays run to the right edge, broken
-  // ones stop at the BOS candle (marked ✕), exactly like hand-marked charts.
-  function structureLevels(candles, label, maxKeep) {
-    if (!candles || candles.length < 20) return [];
+  // ─── MARKET STRUCTURE MAP (BOS / ChoCh) ─────────────────────────────────────
+  // Classic structure notation: every confirmed fractal swing gets a tag
+  // (HH / HL green, LH / LL red). When a candle CLOSES through the most
+  // recent swing level, a SHORT line runs from that swing to the break
+  // candle, labelled "bos" (continuation) or "ChoCh" (first break against
+  // the prevailing structure — change of character). No long rays.
+  function structureMap(candles, maxSwings, maxEvents) {
+    if (!candles || candles.length < 20) return { swings: [], events: [] };
     const off = (lastGoldPrice && candles[candles.length - 1].close) ? (lastGoldPrice - candles[candles.length - 1].close) : 0;
-    // rough ATR of this timeframe (for the level-dedupe tolerance)
-    let trS = 0, trN = 0;
-    for (let k = Math.max(1, candles.length - 14); k < candles.length; k++) {
-      trS += Math.max(candles[k].high - candles[k].low,
-        Math.abs(candles[k].high - candles[k - 1].close), Math.abs(candles[k].low - candles[k - 1].close));
-      trN++;
-    }
-    const tfAtr = trN ? trS / trN : 1;
-    const segs = [];
-    for (let i = 2; i < candles.length - 2; i++) {
-      const c = candles[i];
-      const isH = c.high > candles[i - 1].high && c.high > candles[i - 2].high && c.high >= candles[i + 1].high && c.high >= candles[i + 2].high;
-      const isL = c.low  < candles[i - 1].low  && c.low  < candles[i - 2].low  && c.low  <= candles[i + 1].low  && c.low  <= candles[i + 2].low;
-      if (!isH && !isL) continue;
-      const raw = isH ? c.high : c.low;
-      let t2 = null, jBreak = null;
-      for (let j = i + 3; j < candles.length; j++) {
-        if (isH ? candles[j].close > raw : candles[j].close < raw) { t2 = candles[j].time; jBreak = j; break; }
+    const swings = [], events = [];
+    let curHigh = null, curLow = null, trend = null, prevHigh = null, prevLow = null;
+    for (let i = 4; i < candles.length; i++) {
+      // a fractal centred at j = i-2 confirms once two candles close after it
+      const j = i - 2;
+      const c = candles[j];
+      const isH = c.high > candles[j - 1].high && c.high > candles[j - 2].high && c.high >= candles[j + 1].high && c.high >= candles[j + 2].high;
+      const isL = c.low  < candles[j - 1].low  && c.low  < candles[j - 2].low  && c.low  <= candles[j + 1].low  && c.low  <= candles[j + 2].low;
+      if (isH) {
+        swings.push({ time: c.time, price: c.high, side: 'high', tag: prevHigh === null ? 'H' : (c.high > prevHigh ? 'HH' : 'LH') });
+        prevHigh = c.high;
+        curHigh = { time: c.time, price: c.high };
       }
-      // structure must HOLD to matter — swings broken within a few bars are
-      // noise stubs, not levels (this is what hand-marked charts skip)
-      const heldBars = (jBreak === null ? candles.length - 1 : jBreak) - i;
-      if (heldBars < 7) continue;
-      segs.push({ t1: c.time, t2, i, price: +(raw + off).toFixed(2), side: isH ? 'high' : 'low', label, broken: t2 !== null });
+      if (isL) {
+        swings.push({ time: c.time, price: c.low, side: 'low', tag: prevLow === null ? 'L' : (c.low > prevLow ? 'HL' : 'LL') });
+        prevLow = c.low;
+        curLow = { time: c.time, price: c.low };
+      }
+      // break = a CLOSE through the latest unbroken swing level
+      const cl = candles[i].close;
+      if (curHigh && cl > curHigh.price) {
+        events.push({ t1: curHigh.time, t2: candles[i].time, price: curHigh.price, up: true, type: trend === 'bull' ? 'bos' : 'ChoCh' });
+        trend = 'bull'; curHigh = null;
+      }
+      if (curLow && cl < curLow.price) {
+        events.push({ t1: curLow.time, t2: candles[i].time, price: curLow.price, up: false, type: trend === 'bear' ? 'bos' : 'ChoCh' });
+        trend = 'bear'; curLow = null;
+      }
     }
-    // dedupe near-equal levels (stacked labels): keep the most recent swing
-    segs.sort((a, b) => a.i - b.i);
-    const out = [];
-    for (const g of segs) {
-      const di = out.findIndex(o => o.broken === g.broken && o.side === g.side && Math.abs(o.price - g.price) < tfAtr * 0.35);
-      if (di >= 0) out[di] = g; else out.push(g);
-    }
-    const unbroken = out.filter(x => !x.broken).slice(-(maxKeep || 3));
-    const broken   = out.filter(x => x.broken).slice(-2);
-    return broken.concat(unbroken);
+    const n = v => +(v + off).toFixed(2);
+    return {
+      swings: swings.slice(-(maxSwings || 8)).map(x => ({ ...x, price: n(x.price) })),
+      events: events.slice(-(maxEvents || 4)).map(x => ({ ...x, price: n(x.price) }))
+    };
   }
 
-  // Ray-drawing plugin (labelled horizontal segments on the pane)
+  // Structure-notation plugin: swing tags + short labelled break lines
   function makeStructPrimitive() {
-    let _chart = null, _series = null, _req = null, _segs = [];
+    let _chart = null, _series = null, _req = null, _map = { swings: [], events: [] };
     return {
       attached(p) { _chart = p.chart; _series = p.series; _req = p.requestUpdate; },
       detached() { _chart = null; _series = null; _req = null; },
-      setSegs(x) { _segs = x || []; if (_req) _req(); },
+      setMap(m) { _map = m || { swings: [], events: [] }; if (_req) _req(); },
       updateAllViews() {},
       paneViews() {
         return [{
@@ -5885,31 +5885,35 @@
               target.useBitmapCoordinateSpace(scope => {
                 const ctx = scope.context, hr = scope.horizontalPixelRatio, vr = scope.verticalPixelRatio;
                 const dark = document.documentElement.classList.contains('dark');
-                const solid = dark ? 'rgba(233,244,241,0.85)' : 'rgba(16,32,29,0.8)';
-                const faded = dark ? 'rgba(233,244,241,0.32)' : 'rgba(16,32,29,0.3)';
+                const green = dark ? '#4ADE80' : '#0E9F6E';
+                const red   = dark ? '#FB7185' : '#E02424';
+                const gray  = dark ? 'rgba(233,244,241,0.5)' : 'rgba(16,32,29,0.45)';
+                ctx.textAlign = 'center';
+                // break lines: swing → break candle, label centred on the line
                 ctx.font = `600 ${10 * hr}px 'JetBrains Mono', monospace`;
-                for (const g of _segs) {
-                  const x1 = _chart.timeScale().timeToCoordinate(g.t1);
-                  if (x1 === null) continue;
-                  let x2 = g.t2 !== null ? _chart.timeScale().timeToCoordinate(g.t2) : null;
-                  if (x2 === null) x2 = scope.mediaSize.width - 26;
-                  const y = _series.priceToCoordinate(g.price);
-                  if (y === null || x2 <= x1) continue;
-                  ctx.strokeStyle = ctx.fillStyle = g.broken ? faded : solid;
+                for (const e of _map.events) {
+                  const x1 = _chart.timeScale().timeToCoordinate(e.t1);
+                  const x2 = _chart.timeScale().timeToCoordinate(e.t2);
+                  const y  = _series.priceToCoordinate(e.price);
+                  if (x1 === null || x2 === null || y === null || x2 <= x1) continue;
+                  ctx.strokeStyle = ctx.fillStyle = e.up ? green : red;
                   ctx.lineWidth = Math.max(1, hr);
                   ctx.beginPath();
                   ctx.moveTo(x1 * hr, Math.round(y * vr) + 0.5);
                   ctx.lineTo(x2 * hr, Math.round(y * vr) + 0.5);
                   ctx.stroke();
-                  if (g.broken) {
-                    // small ✕ AT the break point — the BOS marker
-                    ctx.fillText('✕', x2 * hr + 2 * hr, y * vr + 3.5 * vr);
-                    if (x2 - x1 > 60) ctx.fillText(g.label, x1 * hr + 3 * hr, y * vr - 4 * vr);
-                  } else {
-                    // label sits just above the live ray's right end
-                    ctx.fillText(g.label, x2 * hr + 4 * hr, y * vr + 3.5 * vr);
-                  }
+                  ctx.fillText(e.type, ((x1 + x2) / 2) * hr, y * vr - 4 * vr);
                 }
+                // swing tags — above highs, below lows
+                ctx.font = `700 ${10 * hr}px 'JetBrains Mono', monospace`;
+                for (const w of _map.swings) {
+                  const x = _chart.timeScale().timeToCoordinate(w.time);
+                  const y = _series.priceToCoordinate(w.price);
+                  if (x === null || y === null) continue;
+                  ctx.fillStyle = (w.tag === 'HH' || w.tag === 'HL') ? green : (w.tag === 'LH' || w.tag === 'LL') ? red : gray;
+                  ctx.fillText(w.tag, x * hr, w.side === 'high' ? y * vr - 7 * vr : y * vr + 14 * vr);
+                }
+                ctx.textAlign = 'start';
               });
             }
           })
