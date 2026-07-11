@@ -3573,7 +3573,7 @@
   <!-- MULTI-TIMEFRAME CHARTS — top-down: Daily trend, H4 structure, M15 execution -->
   <div id="tab-mtf" class="tab-panel">
     <div class="section-header">
-      <div class="section-title">Multi-Timeframe Charts <span style="font-size:11px;font-weight:500;color:var(--text-tertiary)">— Daily trend &middot; H4 structure &middot; M15 execution (XAU/USD, PAXG proxy) &middot; HH/HL/LH/LL swing tags &middot; short lines mark the break: <span style="color:var(--accent-green)">bos</span> = continuation, ChoCh = change of character</span></div>
+      <div class="section-title">Multi-Timeframe Charts <span style="font-size:11px;font-weight:500;color:var(--text-tertiary)">— Daily trend &middot; H4 structure &middot; M15 execution (XAU/USD, PAXG proxy) &middot; alternating HH/HL/LH/LL swings &middot; solid line = body-close break (<span style="color:var(--accent-green)">bos</span> = continuation, ChoCh = break of the protected swing) &middot; dashed amber = liquidity sweep (wick through, closed back — level still valid)</span></div>
     </div>
 
     <!-- Alignment verdict -->
@@ -3595,12 +3595,14 @@
         <div id="mtfDaily" style="width:100%;height:300px;position:relative;">
           <div id="mtfDailyMsg" style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;text-align:center;color:var(--text-tertiary);font-size:12px;padding:16px;">Loading&hellip;</div>
         </div>
+        <div id="mtfDailyStruct" style="margin-top:8px;font-size:11px;line-height:1.5;color:var(--text-tertiary);"></div>
       </div>
       <div class="dash-widget">
         <div class="dash-widget-title" style="margin-bottom:10px;">H4 — Structure <span style="font-size:10px;font-weight:500;color:var(--text-tertiary)">last ~30 days &middot; PDH/PDL marked</span></div>
         <div id="mtfH4" style="width:100%;height:300px;position:relative;">
           <div id="mtfH4Msg" style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;text-align:center;color:var(--text-tertiary);font-size:12px;padding:16px;">Loading&hellip;</div>
         </div>
+        <div id="mtfH4Struct" style="margin-top:8px;font-size:11px;line-height:1.5;color:var(--text-tertiary);"></div>
       </div>
     </div>
 
@@ -3617,6 +3619,7 @@
       <div id="mtfM15" style="width:100%;height:340px;position:relative;">
         <div id="mtfM15Msg" style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;text-align:center;color:var(--text-tertiary);font-size:12px;padding:16px;">Loading&hellip;</div>
       </div>
+      <div id="mtfM15Struct" style="margin-top:8px;font-size:11px;line-height:1.5;color:var(--text-tertiary);"></div>
       <div id="mtfM15Levels" style="display:flex;flex-wrap:wrap;gap:14px;margin-top:12px;font-size:12px;"></div>
     </div>
   </div><!-- end tab-mtf -->
@@ -5470,12 +5473,12 @@
   const mtfDailyCtl = createLevelChart({
     chartId: 'mtfDaily', msgId: 'mtfDailyMsg', interval: '1d', height: 300, zones: true,
     biasKey: 'D', biasId: 'mtf-bias-d',
-    structFn: async (c) => structureMap(c)
+    structFn: async (c) => { const m = structureMap(c); renderStructReadout('mtfDailyStruct', m); return m; }
   });
   const mtfH4Ctl = createLevelChart({
     chartId: 'mtfH4', msgId: 'mtfH4Msg', interval: '4h', height: 300, zones: true,
     biasKey: 'H4', biasId: 'mtf-bias-h4',
-    structFn: async (c) => structureMap(c),
+    structFn: async (c) => { const m = structureMap(c); renderStructReadout('mtfH4Struct', m); return m; },
     extraLevels: () => !structState.ok ? [] : [
       structState.pdh !== null ? { price: structState.pdh, color: '#7A8196', title: 'PDH', dashed: true } : null,
       structState.pdl !== null ? { price: structState.pdl, color: '#7A8196', title: 'PDL', dashed: true } : null
@@ -5484,7 +5487,7 @@
   const mtfM15Ctl = createLevelChart({
     chartId: 'mtfM15', msgId: 'mtfM15Msg', boxId: 'mtfM15Levels', interval: '15m', height: 340,
     biasKey: 'M15', biasId: 'mtf-bias-m15', getLevels: scalpLevels, zones: true,
-    structFn: async (c) => structureMap(c),
+    structFn: async (c) => { const m = structureMap(c); renderStructReadout('mtfM15Struct', m); return m; },
     extraLevels: () => !structState.ok ? [] : [
       structState.vwap   !== null ? { price: structState.vwap,   color: '#8B5CF6', title: 'VWAP',   dashed: true } : null,
       structState.asianH !== null ? { price: structState.asianH, color: '#7A8196', title: 'ASIA H', dashed: true } : null,
@@ -5823,49 +5826,117 @@
     };
   }
 
-  // ─── MARKET STRUCTURE MAP (BOS / ChoCh) ─────────────────────────────────────
-  // Classic structure notation: every confirmed fractal swing gets a tag
-  // (HH / HL green, LH / LL red). When a candle CLOSES through the most
-  // recent swing level, a SHORT line runs from that swing to the break
-  // candle, labelled "bos" (continuation) or "ChoCh" (first break against
-  // the prevailing structure — change of character). No long rays.
+  // ─── MARKET STRUCTURE MAP (BOS / ChoCh / liquidity sweeps) ─────────────────
+  // Proper SMC structure mapping:
+  //  • structural swings = 3-bar-strength fractals forced to ALTERNATE
+  //    high→low→high — consecutive same-side pivots merge into the extreme,
+  //    so internal (sub-structure) noise never prints a tag;
+  //  • tags compare each swing with the previous swing on the SAME side
+  //    (HH/HL green, LH/LL red);
+  //  • only a candle CLOSE through the most recent unbroken swing is a real
+  //    break: "bos" with the trend, "ChoCh" against it. Because swings
+  //    alternate, the level a ChoCh breaks is exactly the protected HL/LH
+  //    that produced the last push — the textbook definition;
+  //  • a ChoCh alone is a warning: the reversal counts as CONFIRMED only
+  //    after a follow-up bos in the new direction (surfaced in state);
+  //  • a wick through the level that closes back inside is a liquidity
+  //    sweep — the level stays valid and the grab is drawn dashed amber.
   function structureMap(candles, maxSwings, maxEvents) {
-    if (!candles || candles.length < 20) return { swings: [], events: [] };
+    if (!candles || candles.length < 30) return { swings: [], events: [], state: null };
     const off = (lastGoldPrice && candles[candles.length - 1].close) ? (lastGoldPrice - candles[candles.length - 1].close) : 0;
+    const S = 3;                             // pivot strength: 3 bars each side
     const swings = [], events = [];
-    let curHigh = null, curLow = null, trend = null, prevHigh = null, prevLow = null;
-    for (let i = 4; i < candles.length; i++) {
-      // a fractal centred at j = i-2 confirms once two candles close after it
-      const j = i - 2;
+    let trend = null, refHigh = null, refLow = null;   // most recent UNBROKEN structural swings
+
+    const pushSwing = (sw) => {
+      const last = swings[swings.length - 1];
+      if (last && last.side === sw.side) {
+        // alternation rule: two pivots in a row on the same side collapse
+        // into the more extreme one
+        const newWins = sw.side === 'high' ? sw.price >= last.price : sw.price <= last.price;
+        if (!newWins) return;
+        swings.pop();
+      }
+      let prevSame = null;
+      for (let k = swings.length - 1; k >= 0; k--) if (swings[k].side === sw.side) { prevSame = swings[k]; break; }
+      sw.tag = prevSame === null ? (sw.side === 'high' ? 'H' : 'L')
+        : sw.side === 'high' ? (sw.price > prevSame.price ? 'HH' : 'LH')
+        : (sw.price > prevSame.price ? 'HL' : 'LL');
+      swings.push(sw);
+      if (sw.side === 'high') refHigh = sw; else refLow = sw;
+    };
+
+    for (let i = S * 2; i < candles.length; i++) {
+      // a fractal centred at j = i-S confirms only after S more candles close
+      const j = i - S;
       const c = candles[j];
-      const isH = c.high > candles[j - 1].high && c.high > candles[j - 2].high && c.high >= candles[j + 1].high && c.high >= candles[j + 2].high;
-      const isL = c.low  < candles[j - 1].low  && c.low  < candles[j - 2].low  && c.low  <= candles[j + 1].low  && c.low  <= candles[j + 2].low;
-      if (isH) {
-        swings.push({ time: c.time, price: c.high, side: 'high', tag: prevHigh === null ? 'H' : (c.high > prevHigh ? 'HH' : 'LH') });
-        prevHigh = c.high;
-        curHigh = { time: c.time, price: c.high };
+      let isH = true, isL = true;
+      for (let k = 1; k <= S; k++) {
+        if (isH && !(c.high > candles[j - k].high && c.high >= candles[j + k].high)) isH = false;
+        if (isL && !(c.low  < candles[j - k].low  && c.low  <= candles[j + k].low))  isL = false;
+        if (!isH && !isL) break;
       }
-      if (isL) {
-        swings.push({ time: c.time, price: c.low, side: 'low', tag: prevLow === null ? 'L' : (c.low > prevLow ? 'HL' : 'LL') });
-        prevLow = c.low;
-        curLow = { time: c.time, price: c.low };
+      if (isH) pushSwing({ time: c.time, price: c.high, side: 'high' });
+      if (isL) pushSwing({ time: c.time, price: c.low,  side: 'low'  });
+
+      const bar = candles[i];
+      if (refHigh) {
+        if (bar.close > refHigh.price) {         // body close above = real break
+          events.push({ t1: refHigh.time, t2: bar.time, price: refHigh.price, up: true, type: trend === 'bull' ? 'bos' : 'ChoCh' });
+          trend = 'bull'; refHigh = null;
+        } else if (bar.high > refHigh.price && !refHigh.swept) {
+          // wick through, close back inside = buy-side liquidity grab
+          events.push({ t1: refHigh.time, t2: bar.time, price: refHigh.price, up: true, type: 'sweep', sweep: true });
+          refHigh.swept = true;
+        }
       }
-      // break = a CLOSE through the latest unbroken swing level
-      const cl = candles[i].close;
-      if (curHigh && cl > curHigh.price) {
-        events.push({ t1: curHigh.time, t2: candles[i].time, price: curHigh.price, up: true, type: trend === 'bull' ? 'bos' : 'ChoCh' });
-        trend = 'bull'; curHigh = null;
-      }
-      if (curLow && cl < curLow.price) {
-        events.push({ t1: curLow.time, t2: candles[i].time, price: curLow.price, up: false, type: trend === 'bear' ? 'bos' : 'ChoCh' });
-        trend = 'bear'; curLow = null;
+      if (refLow) {
+        if (bar.close < refLow.price) {
+          events.push({ t1: refLow.time, t2: bar.time, price: refLow.price, up: false, type: trend === 'bear' ? 'bos' : 'ChoCh' });
+          trend = 'bear'; refLow = null;
+        } else if (bar.low < refLow.price && !refLow.swept) {
+          events.push({ t1: refLow.time, t2: bar.time, price: refLow.price, up: false, type: 'sweep', sweep: true });
+          refLow.swept = true;                   // sell-side liquidity grab
+        }
       }
     }
+
     const n = v => +(v + off).toFixed(2);
+    const breaks = events.filter(e => !e.sweep);
+    const lastBreak = breaks[breaks.length - 1] || null;
+    const prot = trend === 'bull' ? refLow : trend === 'bear' ? refHigh : null;
+    const next = trend === 'bull' ? refHigh : trend === 'bear' ? refLow : null;
+    const state = trend ? {
+      trend,
+      confirmed: !!lastBreak && lastBreak.type === 'bos',
+      protected: prot ? { price: n(prot.price), tag: prot.tag } : null,
+      next: next ? { price: n(next.price), tag: next.tag } : null
+    } : null;
+    const shown = breaks.slice(-(maxEvents || 4)).concat(events.filter(e => e.sweep).slice(-2));
+    shown.sort((a, b) => a.t2 - b.t2);
     return {
       swings: swings.slice(-(maxSwings || 8)).map(x => ({ ...x, price: n(x.price) })),
-      events: events.slice(-(maxEvents || 4)).map(x => ({ ...x, price: n(x.price) }))
+      events: shown.map(x => ({ ...x, price: n(x.price) })),
+      state
     };
+  }
+
+  // Plain-language structure readout under each MTF chart: trend + whether it
+  // is bos-confirmed, the protected swing where it flips, and the next level.
+  function renderStructReadout(id, m) {
+    const el = document.getElementById(id);
+    if (!el) return;
+    const s = m && m.state;
+    const px = v => v.toLocaleString(undefined, { maximumFractionDigits: 0 });
+    if (!s) { el.textContent = 'Structure: forming — no confirmed break yet.'; return; }
+    const bull = s.trend === 'bull';
+    const col = bull ? 'var(--accent-green)' : 'var(--accent-red)';
+    const conf = s.confirmed ? 'confirmed by bos' : 'ChoCh only — needs a bos to confirm';
+    const flip = s.protected
+      ? `flips on a close ${bull ? 'below' : 'above'} <strong>${px(s.protected.price)}</strong> (${s.protected.tag})`
+      : `no protected ${bull ? 'low' : 'high'} formed yet`;
+    const nxt = s.next ? ` &middot; next level ${bull ? 'above' : 'below'}: ${px(s.next.price)} (${s.next.tag})` : '';
+    el.innerHTML = `Structure <strong style="color:${col}">${bull ? 'BULLISH' : 'BEARISH'}</strong> (${conf}) &middot; ${flip}${nxt}`;
   }
 
   // Structure-notation plugin: swing tags + short labelled break lines
@@ -5889,19 +5960,23 @@
                 const red   = dark ? '#FB7185' : '#E02424';
                 const gray  = dark ? 'rgba(233,244,241,0.5)' : 'rgba(16,32,29,0.45)';
                 ctx.textAlign = 'center';
-                // break lines: swing → break candle, label centred on the line
-                ctx.font = `600 ${10 * hr}px 'JetBrains Mono', monospace`;
+                // break lines: swing → break candle, label centred on the line;
+                // liquidity sweeps drawn dashed amber (level survived the wick)
+                const amber = dark ? '#FBBF24' : '#B45309';
                 for (const e of _map.events) {
                   const x1 = _chart.timeScale().timeToCoordinate(e.t1);
                   const x2 = _chart.timeScale().timeToCoordinate(e.t2);
                   const y  = _series.priceToCoordinate(e.price);
                   if (x1 === null || x2 === null || y === null || x2 <= x1) continue;
-                  ctx.strokeStyle = ctx.fillStyle = e.up ? green : red;
+                  ctx.strokeStyle = ctx.fillStyle = e.sweep ? amber : e.up ? green : red;
                   ctx.lineWidth = Math.max(1, hr);
+                  ctx.setLineDash(e.sweep ? [3 * hr, 3 * hr] : []);
                   ctx.beginPath();
                   ctx.moveTo(x1 * hr, Math.round(y * vr) + 0.5);
                   ctx.lineTo(x2 * hr, Math.round(y * vr) + 0.5);
                   ctx.stroke();
+                  ctx.setLineDash([]);
+                  ctx.font = `600 ${(e.sweep ? 9 : 10) * hr}px 'JetBrains Mono', monospace`;
                   ctx.fillText(e.type, ((x1 + x2) / 2) * hr, y * vr - 4 * vr);
                 }
                 // swing tags — above highs, below lows
