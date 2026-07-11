@@ -4508,6 +4508,14 @@
 
   // ─── ECONOMIC CALENDAR ─────────────────────────────────────────────────────
   const CAL_EVENTS = [
+    // Past red folders (kept for the Print Reaction Meter backfill — the
+    // calendar and Red Folder cards only show upcoming events)
+    { day: 1,  month: 'MAY', title: 'US Non-Farm Payrolls (Apr)', utc: '12:30', desc: 'First-Friday jobs report.', impact: 'high', bias: 'bull', biasTxt: 'Bullish if weak' },
+    { day: 12, month: 'MAY', title: 'US CPI Inflation (Apr)', utc: '12:30', desc: 'Mid-month CPI print.', impact: 'high', bias: 'bull', biasTxt: 'Bullish if cool' },
+    { day: 29, month: 'MAY', title: 'US PCE Price Index (Apr)', utc: '12:30', desc: 'Fed-preferred inflation gauge.', impact: 'high', bias: 'bull', biasTxt: 'Bullish if cool' },
+    { day: 5,  month: 'JUN', title: 'US Non-Farm Payrolls (May)', utc: '12:30', desc: 'First-Friday jobs report.', impact: 'high', bias: 'bull', biasTxt: 'Bullish if weak' },
+    { day: 10, month: 'JUN', title: 'US CPI Inflation (May)', utc: '12:30', desc: 'Mid-month CPI print.', impact: 'high', bias: 'bull', biasTxt: 'Bullish if cool' },
+    { day: 17, month: 'JUN', title: 'FOMC Rate Decision (Jun)', utc: '18:00', desc: 'Jun 16–17 meeting; decision Wednesday.', impact: 'high', bias: 'bull', biasTxt: 'Key catalyst' },
     { day: 25, month: 'JUN', title: 'US Consumer Confidence', utc: '14:00', desc: 'Conference Board index. Weak reading signals slowdown, boosts gold safe-haven demand.', impact: 'med', bias: 'neutral', biasTxt: 'Neutral' },
     { day: 27, month: 'JUN', title: 'US PCE Price Index (May)', utc: '12:30', desc: 'Fed\'s preferred inflation gauge. Cooler print = rate cut acceleration = gold bullish.', impact: 'high', bias: 'bull', biasTxt: 'Bullish if cool' },
     { day: 2,  month: 'JUL', title: 'US Non-Farm Payrolls (Jun)', utc: '12:30', desc: 'Released early (Jul 4 holiday). Weak jobs = earlier Fed cuts = DXY weakness = gold up.', impact: 'high', bias: 'bull', biasTxt: 'Bullish if weak' },
@@ -4739,7 +4747,7 @@
       for (const ev of CAL_EVENTS) {
         if (ev.impact !== 'high' || !ev.utc) continue;
         const t0 = eventUtcMs(ev);
-        if (t0 === null || now - t0 < 6.5 * 60000 || now - t0 > 35 * 86400e3) continue;
+        if (t0 === null || now - t0 < 6.5 * 60000 || now - t0 > 80 * 86400e3) continue;
         const key = ev.title + '@' + new Date(t0).toISOString().slice(0, 10);
         const existing = led.find(e => e.key === key);
         if (existing && !existing.failed) continue;
