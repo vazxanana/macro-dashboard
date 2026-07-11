@@ -3573,7 +3573,7 @@
   <!-- MULTI-TIMEFRAME CHARTS — top-down: Daily trend, H4 structure, M15 execution -->
   <div id="tab-mtf" class="tab-panel">
     <div class="section-header">
-      <div class="section-title">Multi-Timeframe Charts <span style="font-size:11px;font-weight:500;color:var(--text-tertiary)">— Daily trend &middot; H4 structure &middot; M15 execution (XAU/USD, PAXG proxy)</span></div>
+      <div class="section-title">Multi-Timeframe Charts <span style="font-size:11px;font-weight:500;color:var(--text-tertiary)">— Daily trend &middot; H4 structure &middot; M15 execution (XAU/USD, PAXG proxy) &middot; rays = D / H4 swing levels, a ray ends with ✕ where a close broke it (BOS)</span></div>
     </div>
 
     <!-- Alignment verdict -->
@@ -5316,7 +5316,7 @@
 
   function createLevelChart(cfg) {
     // cfg: { chartId, msgId, boxId?, getLevels?, extraLevels?, interval?, height?, biasId?, biasKey?, markers?, zones? }
-    let chart = null, series = null, priceLines = [], offset = 0, inited = false, zonesPrim = null;
+    let chart = null, series = null, priceLines = [], offset = 0, inited = false, zonesPrim = null, structPrim = null;
     const interval = cfg.interval || '5m';
 
     function fallback(text) {
@@ -5393,6 +5393,10 @@
         if (zonesPrim) {
           try { zonesPrim.setZones((cfg.zonesFn || engulfZones)(candles)); } catch (e) {}
         }
+        // Structure rays (BOS map) when a source is configured
+        if (structPrim && cfg.structFn) {
+          try { structPrim.setSegs(await cfg.structFn(candles)); } catch (e) {}
+        }
         if (chart && chart.timeScale) { try { chart.timeScale().fitContent(); } catch (e) {} }
         const msg = document.getElementById(cfg.msgId);
         if (msg) msg.style.display = 'none';
@@ -5435,6 +5439,10 @@
           zonesPrim = makeZonesPrimitive();
           try { series.attachPrimitive(zonesPrim); } catch (e) { zonesPrim = null; }
         }
+        if (cfg.structFn && typeof series.attachPrimitive === 'function') {
+          structPrim = makeStructPrimitive();
+          try { series.attachPrimitive(structPrim); } catch (e) { structPrim = null; }
+        }
         new ResizeObserver(() => { if (chart && el.clientWidth) chart.applyOptions({ width: el.clientWidth }); }).observe(el);
         await loadCandles();
         // Poll for fresh candles, but skip the redraw while this chart's tab
@@ -5461,11 +5469,13 @@
   // ── Multi-timeframe view: Daily (trend) / H4 (structure) / M15 (execution) ──
   const mtfDailyCtl = createLevelChart({
     chartId: 'mtfDaily', msgId: 'mtfDailyMsg', interval: '1d', height: 300, zones: true,
-    biasKey: 'D', biasId: 'mtf-bias-d'
+    biasKey: 'D', biasId: 'mtf-bias-d',
+    structFn: async (c) => structureLevels(c, 'D', 4)
   });
   const mtfH4Ctl = createLevelChart({
     chartId: 'mtfH4', msgId: 'mtfH4Msg', interval: '4h', height: 300, zones: true,
     biasKey: 'H4', biasId: 'mtf-bias-h4',
+    structFn: async (c) => structureLevels(c, 'H4', 4).concat(structureLevels(await fetchGoldKlines('1d') || [], 'D', 3)),
     extraLevels: () => !structState.ok ? [] : [
       structState.pdh !== null ? { price: structState.pdh, color: '#7A8196', title: 'PDH', dashed: true } : null,
       structState.pdl !== null ? { price: structState.pdl, color: '#7A8196', title: 'PDL', dashed: true } : null
@@ -5474,6 +5484,7 @@
   const mtfM15Ctl = createLevelChart({
     chartId: 'mtfM15', msgId: 'mtfM15Msg', boxId: 'mtfM15Levels', interval: '15m', height: 340,
     biasKey: 'M15', biasId: 'mtf-bias-m15', getLevels: scalpLevels, zones: true,
+    structFn: async () => structureLevels(await fetchGoldKlines('4h') || [], 'H4', 4),
     extraLevels: () => !structState.ok ? [] : [
       structState.vwap   !== null ? { price: structState.vwap,   color: '#8B5CF6', title: 'VWAP',   dashed: true } : null,
       structState.asianH !== null ? { price: structState.asianH, color: '#7A8196', title: 'ASIA H', dashed: true } : null,
@@ -5803,6 +5814,76 @@
                   const Y = Math.min(y1m, y2m) * vr, H = Math.max(Math.abs(y2m - y1m) * vr, 1);
                   ctx.fillRect(X, Y, W, H);
                   ctx.strokeRect(X, Y, W, H);
+                }
+              });
+            }
+          })
+        }];
+      }
+    };
+  }
+
+  // ─── STRUCTURE LEVELS (BOS) — swing levels that hold until a CLOSE breaks ───
+  // Fractal swing highs/lows (2-left/2-right). Each level extends right until
+  // a candle CLOSES beyond it — that candle is the Break of Structure. Drawn
+  // as labelled rays (D / H4): unbroken rays run to the right edge, broken
+  // ones stop at the BOS candle (marked ✕), exactly like hand-marked charts.
+  function structureLevels(candles, label, maxKeep) {
+    if (!candles || candles.length < 12) return [];
+    const off = (lastGoldPrice && candles[candles.length - 1].close) ? (lastGoldPrice - candles[candles.length - 1].close) : 0;
+    const segs = [];
+    for (let i = 2; i < candles.length - 2; i++) {
+      const c = candles[i];
+      const isH = c.high > candles[i - 1].high && c.high > candles[i - 2].high && c.high >= candles[i + 1].high && c.high >= candles[i + 2].high;
+      const isL = c.low  < candles[i - 1].low  && c.low  < candles[i - 2].low  && c.low  <= candles[i + 1].low  && c.low  <= candles[i + 2].low;
+      if (!isH && !isL) continue;
+      const raw = isH ? c.high : c.low;
+      let t2 = null;
+      for (let j = i + 3; j < candles.length; j++) {
+        if (isH ? candles[j].close > raw : candles[j].close < raw) { t2 = candles[j].time; break; }
+      }
+      segs.push({ t1: c.time, t2, price: +(raw + off).toFixed(2), side: isH ? 'high' : 'low', label, broken: t2 !== null });
+    }
+    // show the live map: all recent unbroken levels + the last few BOS events
+    const unbroken = segs.filter(x => !x.broken).slice(-(maxKeep || 4));
+    const broken   = segs.filter(x => x.broken).slice(-3);
+    return broken.concat(unbroken);
+  }
+
+  // Ray-drawing plugin (labelled horizontal segments on the pane)
+  function makeStructPrimitive() {
+    let _chart = null, _series = null, _req = null, _segs = [];
+    return {
+      attached(p) { _chart = p.chart; _series = p.series; _req = p.requestUpdate; },
+      detached() { _chart = null; _series = null; _req = null; },
+      setSegs(x) { _segs = x || []; if (_req) _req(); },
+      updateAllViews() {},
+      paneViews() {
+        return [{
+          zOrder: () => 'top',
+          renderer: () => ({
+            draw(target) {
+              if (!_chart || !_series) return;
+              target.useBitmapCoordinateSpace(scope => {
+                const ctx = scope.context, hr = scope.horizontalPixelRatio, vr = scope.verticalPixelRatio;
+                const dark = document.documentElement.classList.contains('dark');
+                const solid = dark ? 'rgba(233,244,241,0.85)' : 'rgba(16,32,29,0.8)';
+                const faded = dark ? 'rgba(233,244,241,0.32)' : 'rgba(16,32,29,0.3)';
+                ctx.font = `600 ${10 * hr}px 'JetBrains Mono', monospace`;
+                for (const g of _segs) {
+                  const x1 = _chart.timeScale().timeToCoordinate(g.t1);
+                  if (x1 === null) continue;
+                  let x2 = g.t2 !== null ? _chart.timeScale().timeToCoordinate(g.t2) : null;
+                  if (x2 === null) x2 = scope.mediaSize.width - 26;
+                  const y = _series.priceToCoordinate(g.price);
+                  if (y === null || x2 <= x1) continue;
+                  ctx.strokeStyle = ctx.fillStyle = g.broken ? faded : solid;
+                  ctx.lineWidth = Math.max(1, hr);
+                  ctx.beginPath();
+                  ctx.moveTo(x1 * hr, Math.round(y * vr) + 0.5);
+                  ctx.lineTo(x2 * hr, Math.round(y * vr) + 0.5);
+                  ctx.stroke();
+                  ctx.fillText(g.label + (g.broken ? '✕' : ''), x2 * hr + 4 * hr, y * vr + 3.5 * vr);
                 }
               });
             }
