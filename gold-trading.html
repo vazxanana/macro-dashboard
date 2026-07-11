@@ -5829,8 +5829,16 @@
   // as labelled rays (D / H4): unbroken rays run to the right edge, broken
   // ones stop at the BOS candle (marked ✕), exactly like hand-marked charts.
   function structureLevels(candles, label, maxKeep) {
-    if (!candles || candles.length < 12) return [];
+    if (!candles || candles.length < 20) return [];
     const off = (lastGoldPrice && candles[candles.length - 1].close) ? (lastGoldPrice - candles[candles.length - 1].close) : 0;
+    // rough ATR of this timeframe (for the level-dedupe tolerance)
+    let trS = 0, trN = 0;
+    for (let k = Math.max(1, candles.length - 14); k < candles.length; k++) {
+      trS += Math.max(candles[k].high - candles[k].low,
+        Math.abs(candles[k].high - candles[k - 1].close), Math.abs(candles[k].low - candles[k - 1].close));
+      trN++;
+    }
+    const tfAtr = trN ? trS / trN : 1;
     const segs = [];
     for (let i = 2; i < candles.length - 2; i++) {
       const c = candles[i];
@@ -5838,15 +5846,25 @@
       const isL = c.low  < candles[i - 1].low  && c.low  < candles[i - 2].low  && c.low  <= candles[i + 1].low  && c.low  <= candles[i + 2].low;
       if (!isH && !isL) continue;
       const raw = isH ? c.high : c.low;
-      let t2 = null;
+      let t2 = null, jBreak = null;
       for (let j = i + 3; j < candles.length; j++) {
-        if (isH ? candles[j].close > raw : candles[j].close < raw) { t2 = candles[j].time; break; }
+        if (isH ? candles[j].close > raw : candles[j].close < raw) { t2 = candles[j].time; jBreak = j; break; }
       }
-      segs.push({ t1: c.time, t2, price: +(raw + off).toFixed(2), side: isH ? 'high' : 'low', label, broken: t2 !== null });
+      // structure must HOLD to matter — swings broken within a few bars are
+      // noise stubs, not levels (this is what hand-marked charts skip)
+      const heldBars = (jBreak === null ? candles.length - 1 : jBreak) - i;
+      if (heldBars < 7) continue;
+      segs.push({ t1: c.time, t2, i, price: +(raw + off).toFixed(2), side: isH ? 'high' : 'low', label, broken: t2 !== null });
     }
-    // show the live map: all recent unbroken levels + the last few BOS events
-    const unbroken = segs.filter(x => !x.broken).slice(-(maxKeep || 4));
-    const broken   = segs.filter(x => x.broken).slice(-3);
+    // dedupe near-equal levels (stacked labels): keep the most recent swing
+    segs.sort((a, b) => a.i - b.i);
+    const out = [];
+    for (const g of segs) {
+      const di = out.findIndex(o => o.broken === g.broken && o.side === g.side && Math.abs(o.price - g.price) < tfAtr * 0.35);
+      if (di >= 0) out[di] = g; else out.push(g);
+    }
+    const unbroken = out.filter(x => !x.broken).slice(-(maxKeep || 3));
+    const broken   = out.filter(x => x.broken).slice(-2);
     return broken.concat(unbroken);
   }
 
@@ -5883,7 +5901,14 @@
                   ctx.moveTo(x1 * hr, Math.round(y * vr) + 0.5);
                   ctx.lineTo(x2 * hr, Math.round(y * vr) + 0.5);
                   ctx.stroke();
-                  ctx.fillText(g.label + (g.broken ? '✕' : ''), x2 * hr + 4 * hr, y * vr + 3.5 * vr);
+                  if (g.broken) {
+                    // small ✕ AT the break point — the BOS marker
+                    ctx.fillText('✕', x2 * hr + 2 * hr, y * vr + 3.5 * vr);
+                    if (x2 - x1 > 60) ctx.fillText(g.label, x1 * hr + 3 * hr, y * vr - 4 * vr);
+                  } else {
+                    // label sits just above the live ray's right end
+                    ctx.fillText(g.label, x2 * hr + 4 * hr, y * vr + 3.5 * vr);
+                  }
                 }
               });
             }
