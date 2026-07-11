@@ -1,6 +1,6 @@
 // GOLD Terminal service worker — network-first for same-origin GETs with a
 // cache fallback, so the app shell opens offline but never goes stale.
-const CACHE = 'gold-terminal-v1';
+const CACHE = 'gold-terminal-v2';
 const SHELL = ['./gold-trading.html', './manifest.json', './icon-192.png', './icon-512.png'];
 
 self.addEventListener('install', e => {
