@@ -3593,8 +3593,9 @@
         <span class="mtf-chip">M15 <span class="mtf-bias" id="mtf-bias-m15">&mdash;</span></span>
         <span class="mtf-verdict" id="mtf-verdict">Waiting for all three timeframes&hellip;</span>
       </div>
+      <div id="mtf-opp" style="display:none;margin-top:10px;font-size:12px;line-height:1.7;padding:10px 12px;border:1px solid rgba(127,127,127,0.25);border-radius:8px;"></div>
       <div style="margin-top:10px;font-size:11px;color:var(--text-tertiary);line-height:1.6;">
-        Bias per timeframe = its own MARKET STRUCTURE trend (bos/ChoCh engine; SMA20 only while structure is forming). The classic top-down rule: <strong>take M15 entries only in the direction Daily and H4 agree on.</strong>
+        Bias per timeframe = its own MARKET STRUCTURE trend (bos/ChoCh engine; SMA20 only while structure is forming). The classic top-down rule: <strong>take M15 entries only in the direction Daily and H4 agree on.</strong> When all three align, the opportunity banner appears here and a push alert fires (enable alerts in the 🔔 drawer).
       </div>
     </div>
 
@@ -5518,6 +5519,60 @@
     else                { el.textContent = 'Timeframes disagree — chop regime: reduce size or stand aside'; el.className = 'mtf-verdict mtf-v-mixed'; }
   }
 
+  // ─── MTF ALIGNMENT WATCHER — trading opportunity + push alert ──────────────
+  // Runs on the price loop (NOT tied to the charts being open): computes each
+  // timeframe's market-structure trend, and when Daily + H4 + M15 all agree it
+  // renders a trading-opportunity panel and fires ONE notification per
+  // alignment episode (re-armed when alignment breaks or flips).
+  let _mtfAlignTs = 0;
+  async function checkMtfAlignment() {
+    if (Date.now() - _mtfAlignTs < 10 * 60000) return;   // 10-min cadence
+    _mtfAlignTs = Date.now();
+    let dir = null, zones15 = [];
+    try {
+      const [d1, h4, m15] = await Promise.all([fetchGoldKlines('1d'), fetchGoldKlines('4h'), fetchGoldKlines('15m')]);
+      const t = tf => { const s = structureMap(tf).state; return s ? s.trend : null; };
+      const [td, th, tm] = [t(d1), t(h4), t(m15)];
+      if (td && td === th && th === tm) {
+        dir = td === 'bull' ? 'long' : 'short';
+        zones15 = structureMap(m15).zones || [];
+      }
+      // keep the chips/verdict live even while the MTF tab is closed
+      if (td) mtfBias.D = td === 'bull' ? 'up' : 'down';
+      if (th) mtfBias.H4 = th === 'bull' ? 'up' : 'down';
+      if (tm) mtfBias.M15 = tm === 'bull' ? 'up' : 'down';
+      renderMtfSummary();
+    } catch (e) { return; }
+
+    const opp = document.getElementById('mtf-opp');
+    const last = localStorage.getItem('lastMtfAlign') || '';
+    if (!dir) {
+      if (last) localStorage.setItem('lastMtfAlign', '');   // re-arm the alert
+      if (opp) opp.style.display = 'none';
+      return;
+    }
+    const L = dir === 'long';
+    const px = lastGoldPrice || 0;
+    const zone = zones15
+      .filter(z => z.bull === L && (L ? z.lo < px : z.hi > px))
+      .sort((a, b) => L ? (b.hi - a.hi) : (a.lo - b.lo))
+      .sort((a, b) => (b.fresh ? 1 : 0) - (a.fresh ? 1 : 0))[0];
+    const zoneTxt = zone
+      ? `${zone.fresh ? 'unmitigated ' : ''}${L ? 'demand' : 'supply'} block ${zone.lo.toFixed(0)}–${zone.hi.toFixed(0)} on M15`
+      : `wait for a pullback block to form on M15`;
+    if (opp) {
+      opp.style.display = 'block';
+      opp.innerHTML = `<strong style="color:${L ? 'var(--accent-green)' : 'var(--accent-red)'}">⚡ TRADING OPPORTUNITY — ${L ? 'LONG' : 'SHORT'}</strong>
+        <span style="color:var(--text-secondary)"> · Daily, H4 and M15 structure all ${L ? 'bullish' : 'bearish'}.
+        ${L ? 'Buy the pullback into' : 'Sell the rally into'} the ${zoneTxt}; full ticket on the Daily Bias → Trade Plan card.</span>`;
+    }
+    if (last !== dir) {
+      localStorage.setItem('lastMtfAlign', dir);
+      sendNotif(`⚡ MTF alignment — ${L ? 'LONG' : 'SHORT'} opportunity`,
+        `Daily, H4 and M15 structure all ${L ? 'bullish' : 'bearish'}. ${L ? 'Buy pullbacks into' : 'Sell rallies into'} the ${zoneTxt}. Check the Trade Plan.`);
+    }
+  }
+
   // Ensure the Lightweight Charts global is available; if the <head> script
   // didn't provide it, inject a fallback CDN and wait a little longer.
   let _libPromise = null;
@@ -6660,7 +6715,7 @@
     const b = document.getElementById('notifBtn');
     if (!b) return;
     const on = notifEnabled();
-    b.textContent = on ? '🔔 Auto alerts ON — click to disable' : '🔕 Enable auto alerts (zones · bias · structure · events)';
+    b.textContent = on ? '🔔 Auto alerts ON — click to disable' : '🔕 Enable auto alerts (zones · bias · structure · MTF alignment · events)';
     b.onclick = on ? disableNotifs : enableNotifs;
   }
   function sendNotif(title, body) {
@@ -7378,6 +7433,8 @@
 
       // Auto alerts: zone entries, bias flips, red-folder days
       try { checkAutoAlerts(); } catch (e) {}
+      // MTF structure alignment → trading opportunity + push alert
+      try { checkMtfAlignment(); } catch (e) {}
       try { updateNextEventChip(); } catch (e) {}
       // Print meter: auto-measure recent red-folder releases (throttled)
       try { refreshPrintMeter(); } catch (e) {}
