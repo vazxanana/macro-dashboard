@@ -3639,6 +3639,16 @@
       </div>
     </div>
 
+    <!-- Per-session macro + technical bias -->
+    <div class="section">
+      <div class="section-header">
+        <div class="section-title">Session Signals <span style="font-size:11px;font-weight:500;color:var(--text-tertiary)">— Asia / London / New York, each scored on its own macro catalysts + its own market structure</span></div>
+      </div>
+      <div class="grid-3" id="sessionSignalsGrid">
+        <!-- populated by JS -->
+      </div>
+    </div>
+
     <!-- Morning routine -->
     <div class="section">
       <div class="section-header">
@@ -4379,7 +4389,7 @@
     if (panel) panel.classList.add('active');
     if (btn) btn.classList.add('active');
     if (name === 'calendar') renderCalendar();
-    if (name === 'sessions') { renderSessionGrid(); renderLocalTimes(); }
+    if (name === 'sessions') { renderSessionGrid(); renderLocalTimes(); renderSessionSignals(); }
     if (name === 'edges')     { edgeConfluence(); }
     if (name === 'dashboard') { renderDashboard(); }
     if (name === 'analysis')  { updateAnalysisTab(); }
@@ -4478,6 +4488,87 @@
           <div class="stime-hours" style="font-size:11px; margin-top:6px;">${s.nyOpen}–${s.nyClose}</div>
           <div class="stime-tz">New York</div>
           <div class="stime-quality qual-${s.quality}">${isLive ? '● LIVE — ' : ''}${s.qualTxt}</div>
+        </div>`;
+    }).join('');
+  }
+
+  // ─── SESSION SIGNALS — macro + technical bias per trading session ─────────
+  // Asia / London / New York, each scored independently:
+  //  • technical = structureMap() run on that session's OWN H1 hours only —
+  //    the last ~8 days of H1 candles filtered down to the session's UTC
+  //    window, so swings/breaks reflect how price has actually structured
+  //    during those specific hours, not the full 24h tape;
+  //  • macro = the same global macro verdict from computeDailyBias() (real
+  //    yields, DXY, Dollar Smile, etc. don't have separate per-session
+  //    values — they're daily/weekly data), tagged with the catalysts that
+  //    typically dominate that session's price action;
+  //  • verdict = ALIGNED when the session's own structure agrees with the
+  //    macro direction, else CONFLICT — trade smaller or wait for one to flip.
+  const SESSION_WINDOWS = [
+    { key: 'asia', name: 'Asian Session', openUTC: 23, closeUTC: 7,
+      catalysts: 'PBOC reserves & China data · BoJ policy · thin liquidity (widen stops)' },
+    { key: 'london', name: 'London', openUTC: 7, closeUTC: 16,
+      catalysts: 'LBMA AM/PM fix · ECB/UK data · EUR flows feed the DXY formula' },
+    { key: 'ny', name: 'New York', openUTC: 12, closeUTC: 21,
+      catalysts: 'US CPI/NFP/FOMC · real yields · Fed-expectations repricing' }
+  ];
+
+  function hourInWindow(h, open, close) {
+    return open < close ? (h >= open && h < close) : (h >= open || h < close);
+  }
+
+  function sessionStructure(h1, win) {
+    if (!h1 || !h1.length) return null;
+    const filtered = h1.filter(c => hourInWindow(new Date(c.time * 1000).getUTCHours(), win.openUTC, win.closeUTC));
+    if (filtered.length < 30) return null;
+    return structureMap(filtered, 12, 8);
+  }
+
+  async function renderSessionSignals() {
+    const grid = document.getElementById('sessionSignalsGrid');
+    if (!grid) return;
+    const h1 = await fetchGoldKlines('1h');
+    const macro = dailyBiasState;
+
+    grid.innerHTML = SESSION_WINDOWS.map(win => {
+      const active = isSessionActive({ openUTC: win.openUTC, closeUTC: win.closeUTC });
+      const m = sessionStructure(h1, win);
+      const st = m && m.state;
+      const techBull = st ? st.trend === 'bull' : null;
+      const macroOk = macro && macro.ok && macro.dir !== 'wait';
+      const macroLong = macroOk && macro.dir === 'long';
+
+      let verdictTxt, verdictClass;
+      if (techBull === null || !macroOk) {
+        verdictTxt = techBull === null ? 'Building session history — check back soon' : 'No daily bias yet — technical only';
+        verdictClass = 'mtf-v-mixed';
+      } else if (techBull === macroLong) {
+        verdictTxt = `ALIGNED ${techBull ? 'LONG' : 'SHORT'} — macro and this session's structure agree`;
+        verdictClass = techBull ? 'mtf-v-bull' : 'mtf-v-bear';
+      } else {
+        verdictTxt = 'CONFLICT — macro and session structure disagree, trade smaller or wait';
+        verdictClass = 'mtf-v-mixed';
+      }
+
+      const techTxt = !st ? 'not enough session-hour history yet'
+        : `<strong style="color:${techBull ? 'var(--accent-green)' : 'var(--accent-red)'}">${techBull ? 'BULLISH' : 'BEARISH'}</strong> (${st.confirmed ? 'bos-confirmed' : 'ChoCh only'})`
+          + (st.protected ? ` · flips at ${Math.round(st.protected.price)}` : '');
+      const macroTxt = macro && macro.ok
+        ? `<strong style="color:${macroLong ? 'var(--accent-green)' : macroOk ? 'var(--accent-red)' : 'var(--text-tertiary)'}">${macro.dir.toUpperCase()}</strong> (${macro.conf}% · net ${macro.net > 0 ? '+' : ''}${macro.net})`
+        : 'waiting for daily bias data';
+
+      return `
+        <div class="card glass">
+          <div style="display:flex;justify-content:space-between;align-items:center;">
+            <div style="font-weight:800;">${win.name}</div>
+            <span class="badge ${active ? 'green' : ''}">${active ? '● LIVE' : 'closed'}</span>
+          </div>
+          <div style="margin-top:12px;font-size:12px;line-height:1.8;">
+            <div><span style="color:var(--text-tertiary)">Macro bias:</span> ${macroTxt}</div>
+            <div><span style="color:var(--text-tertiary)">Technical bias:</span> ${techTxt}</div>
+          </div>
+          <div style="margin-top:8px;font-size:11px;color:var(--text-tertiary);line-height:1.5;">${win.catalysts}</div>
+          <div class="mtf-verdict ${verdictClass}" style="margin-top:12px;">${verdictTxt}</div>
         </div>`;
     }).join('');
   }
@@ -7444,6 +7535,8 @@
         const act = document.querySelector('.snav-btn.active');
         if (act?.dataset?.tab === 'bias') renderDailyBias();
         if (activeSection === 'dashboard') renderDashboard();
+        const sessTab = document.getElementById('tab-sessions');
+        if (sessTab && sessTab.classList.contains('active')) renderSessionSignals();
       }).catch(() => {});
 
       // Refresh active views (always recompute analysis cards from live price)
@@ -7496,6 +7589,8 @@
     setInterval(() => {
       updateSessionBar();
       renderSessionGrid();
+      const sessTab = document.getElementById('tab-sessions');
+      if (sessTab && sessTab.classList.contains('active')) renderSessionSignals();
     }, 60000);
 
     updatePrices();
