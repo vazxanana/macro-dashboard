@@ -6651,7 +6651,7 @@
   //   2Y yield (DGS2)      = the market's Fed-policy proxy   → falling = dovish = gold+
   //   DXY 5-session change = USD momentum (ICE formula, ECB reference rates)
   //   CFTC COT             = managed-money net gold futures positioning (weekly)
-  let fundX = { breakeven: null, dgs2: null, dxyMom: null, cot: null, curve: null, hy: null, cotSeries: null, swap: null, _ts: 0 };
+  let fundX = { breakeven: null, dgs2: null, dxyMom: null, cot: null, curve: null, hy: null, cotSeries: null, swap: null, sofr: null, euGrowth: null, jpyMom: null, _ts: 0 };
 
   async function fetchFredSeries(seriesId, limit) {
     const url = `https://api.stlouisfed.org/fred/series/observations?series_id=${seriesId}&api_key=${apiKeys.fred}&limit=${limit}&sort_order=desc&file_type=json`;
@@ -6670,10 +6670,12 @@
     fundX._ts = Date.now();
 
     try {
-      const [nom, tw, cv, hy, sw] = await Promise.all([
+      const [nom, tw, cv, hy, sw, sofr, effr, eu] = await Promise.all([
         fetchFredSeries('DGS10', 15), fetchFredSeries('DGS2', 15),
         fetchFredSeries('T10Y3M', 15), fetchFredSeries('BAMLH0A0HYM2', 15),
-        fetchFredSeries('SWPT', 8)   // Fed central-bank liquidity swap lines (H.4.1, $M) — USD funding stress
+        fetchFredSeries('SWPT', 8),   // Fed central-bank liquidity swap lines (H.4.1, $M) — USD funding stress (coincident)
+        fetchFredSeries('SOFR', 10), fetchFredSeries('EFFR', 10),   // SOFR-EFFR spread — LEADING dollar-funding-stress gauge (macro handbook ch.7's own indicator hierarchy ranks this ahead of swap-line usage)
+        fetchFredSeries('BSCICP03DEM665S', 6)   // OECD composite business confidence, Germany — non-US growth pulse (ch.2/ch.4): confirms or denies the Dollar Smile's "synchronized growth" trough independently of USD price action
       ]);
       const lvlChg = obs => {
         if (!obs) return null;
@@ -6686,6 +6688,14 @@
       if (sw) {
         const v = parseFloat(sw[0].value);
         if (isFinite(v)) fundX.swap = { bn: +(v / 1000).toFixed(1) };   // $bn drawn on Fed swap lines
+      }
+      if (sofr && effr) {
+        const s = parseFloat(sofr[0].value), e = parseFloat(effr[0].value);
+        if (isFinite(s) && isFinite(e)) fundX.sofr = { bps: +((s - e) * 100).toFixed(0) };   // SOFR − EFFR, in bps
+      }
+      if (eu && eu.length >= 2) {
+        const now = parseFloat(eu[0].value), prior = parseFloat(eu[eu.length - 1].value);
+        if (isFinite(now) && isFinite(prior)) fundX.euGrowth = { level: +now.toFixed(1), chg: +(now - prior).toFixed(1) };
       }
       if (nom && realYield.level !== null) {
         const nomNow = parseFloat(nom[0].value);
@@ -6714,6 +6724,14 @@
             * Math.pow(1 / R.GBP, -0.119) * Math.pow(R.CAD, 0.091) * Math.pow(R.SEK, 0.042) * Math.pow(R.CHF, 0.036);
           const a = ice(days[keys[0]]), b = ice(days[keys[keys.length - 1]]);
           if (isFinite(a) && isFinite(b)) fundX.dxyMom = { chg: +(b - a).toFixed(2), days: keys.length };
+          // USDJPY % move over the same window — reuses the fetch already made
+          // for the DXY formula. Sharp JPY strength + elevated VIX is the
+          // carry-unwind signature (macro handbook ch.5): BoJ normalization
+          // unwinding yen-funded carry trades forces a violent, indiscriminate
+          // deleveraging across risk assets, gold included, before havens
+          // reassert — a volatility warning, not a clean directional call.
+          const jA = days[keys[0]].JPY, jB = days[keys[keys.length - 1]].JPY;
+          if (isFinite(jA) && jA > 0 && isFinite(jB)) fundX.jpyMom = { pct: +((jB - jA) / jA * 100).toFixed(2) };
         }
       }
     } catch (e) { console.warn('DXY momentum failed:', e.message); }
@@ -6996,16 +7014,19 @@
   // dollar-funding stress (flight to quality + dollar debt servicing), right
   // side = US outperformance (rate/growth differentials). It is weak only in
   // the trough (synchronized global growth). Classified from feeds we already
-  // carry: VIX, HY spread momentum, DXY momentum, real-yield/2Y trends, plus
-  // Fed swap-line usage (FRED SWPT) — the coincident funding-stress gauge.
+  // carry: VIX, HY spread momentum, DXY momentum, real-yield/2Y trends, Fed
+  // swap-line usage (FRED SWPT, coincident), plus the SOFR−EFFR spread — the
+  // handbook's own indicator hierarchy (ch.7) ranks short-term dollar funding
+  // rates rising above policy expectations as the EARLIEST signal, ahead of
+  // both swap-line usage and the credit-spread/VIX gate borrowed from ch.1.
   function dollarSmileRegime() {
-    const dm = fundX.dxyMom, hy = fundX.hy, d2 = fundX.dgs2, sw = fundX.swap;
+    const dm = fundX.dxyMom, hy = fundX.hy, d2 = fundX.dgs2, sw = fundX.swap, sf = fundX.sofr;
     const vix = vixState.val, ryChg = realYield.chg;
     if (!dm && !hy && vix === null) return null;
-    const stress = (hy && hy.chg >= 0.15) || (sw && sw.bn >= 5) || (vix !== null && vix >= 28);
+    const stress = (hy && hy.chg >= 0.15) || (sw && sw.bn >= 5) || (vix !== null && vix >= 28) || (sf && sf.bps >= 15);
     if (stress) return {
       phase: 'left', dir: null,
-      detail: 'crisis/funding stress' + (sw && sw.bn >= 5 ? ` · swap lines $${sw.bn}bn` : '')
+      detail: 'crisis/funding stress' + (sf && sf.bps >= 15 ? ` · SOFR−EFFR +${sf.bps}bp` : sw && sw.bn >= 5 ? ` · swap lines $${sw.bn}bn` : '')
         + ' — USD bid, gold whipsaws then catches the haven bid'
     };
     const calm = vix === null || vix < 22;
@@ -7360,6 +7381,25 @@
     const smile = dollarSmileRegime();
     add('Dollar Smile regime (USD cycle)', smile ? smile.dir : null, 1,
         smile ? smile.phase + ' · ' + smile.detail : 'no data');
+    // Eurozone growth pulse (OECD composite business confidence, Germany —
+    // macro handbook ch.2/ch.4): confirms or denies the Dollar Smile's
+    // "synchronized global growth" trough with an actual non-US growth read,
+    // independent of USD price action. Rising = growth resynchronizing away
+    // from the US = USD headwind = gold tailwind; falling = US relative
+    // outperformance reasserting = gold headwind.
+    const eu = fundX.euGrowth;
+    add('Eurozone growth pulse (OECD composite, DE)', !eu || Math.abs(eu.chg) < 0.3 ? null : eu.chg > 0 ? 'long' : 'short', 1,
+        eu ? eu.level.toFixed(1) + ' · ' + (eu.chg >= 0 ? '+' : '') + eu.chg.toFixed(1) + ' vs prior release' : 'no data (monthly, OECD)');
+    // Yen carry-unwind risk (ch.5): sharp JPY strength + elevated VIX is the
+    // signature of a BoJ-normalization-driven carry unwind — a violent,
+    // indiscriminate deleveraging across risk assets (gold included) before
+    // havens reassert. Two-sided by nature, so this is a volatility WARNING
+    // (dir always null, contributes no net score) rather than a directional
+    // call — same treatment as the Dollar Smile's own crisis phase.
+    const jm = fundX.jpyMom, vx = vixState.val;
+    const carryStress = jm && jm.pct <= -2 && vx !== null && vx >= 22;
+    add('Yen carry-unwind risk (BoJ/VIX)', null, 1,
+        !jm ? 'no data' : carryStress ? `USD/JPY ${jm.pct}% / 5d + VIX ${vx.toFixed(0)} — active unwind risk, expect violent two-way chop` : `USD/JPY ${jm.pct >= 0 ? '+' : ''}${jm.pct}% / 5d — calm`);
 
     // auto-tuning: once a driver has ≥30 graded days in the scorecard ledger,
     // its weight is shaded by its real hit rate (≥60% → ×1.25, ≤40% → ×0.75)
