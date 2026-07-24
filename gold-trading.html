@@ -3031,10 +3031,18 @@
       </div>
     </div>
 
+    <!-- Macro synthesis — the drivers stitched into one coherent story, not
+         just a weighted checklist -->
+    <div class="card glass" style="margin-bottom:16px;">
+      <div class="levels-panel-title" style="margin-bottom:10px;">Macro Synthesis <span style="font-size:11px;font-weight:500;color:var(--text-tertiary)">— how the 4 driver clusters fit (or fight) together</span></div>
+      <div id="bias-cluster-chips" style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px;"></div>
+      <div id="bias-narrative" style="font-size:12px;color:var(--text-secondary);line-height:1.85;">Loading…</div>
+    </div>
+
     <!-- Confluence table + playbook -->
     <div class="levels-grid" style="margin-bottom:16px;">
       <div class="levels-panel">
-        <div class="levels-panel-title">Bias Confluence — every driver, weighted</div>
+        <div class="levels-panel-title">Bias Confluence — every driver, grouped by cluster</div>
         <div id="bias-checks"></div>
       </div>
       <div class="levels-panel">
@@ -7335,11 +7343,19 @@
     const vs  = vixScore();
 
     const checks = [];
-    const add = (n, dir, w, detail) => checks.push({ n, dir, w, detail });
+    const add = (n, dir, w, detail, cluster) => checks.push({ n, dir, w, detail, cluster });
+    // Every driver belongs to one of 4 macro THEMES. The point of tagging
+    // them is the synthesis step below: 15 independent weighted votes don't
+    // "make sense together" on their own — grouping them lets us check
+    // whether the real-rates story and the dollar story actually AGREE
+    // (a coherent macro case) or are fighting each other (a weak, noisy
+    // case even when the raw net score clears the long/short threshold),
+    // and lets risk/positioning act as modifiers on that core case rather
+    // than just more votes in the same bucket.
     add('Real yields (master driver)', ry.bias === 'bull' ? 'long' : ry.bias === 'bear' ? 'short' : null, 3,
-        ry.level !== null ? ry.level.toFixed(2) + '% · ' + (ry.bias || 'neutral') : 'no data');
+        ry.level !== null ? ry.level.toFixed(2) + '% · ' + (ry.bias || 'neutral') : 'no data', 'rates');
     add('Macro composite (TIPS·DXY·flows·seasonal)', md.isLong ? 'long' : md.isShort ? 'short' : null, 2,
-        md.macroScore + '/40 · ' + md.macroConf + '%');
+        md.macroScore + '/40 · ' + md.macroConf + '%', 'dollar');
     // Technicals — market structure and supply/demand ONLY (owner request:
     // "remove the rest to avoid noise"). No SMA trend, no PDC, no VWAP rows.
     const smap = structureMap(d1);
@@ -7348,7 +7364,7 @@
         ms && ms.confirmed ? 3 : 2,
         !ms ? 'forming' : (ms.trend === 'bull' ? 'bullish' : 'bearish')
           + (ms.confirmed ? ' · bos-confirmed' : ' · ChoCh only')
-          + (ms.protected ? ' · flips at ' + Math.round(ms.protected.price) : ''));
+          + (ms.protected ? ' · flips at ' + Math.round(ms.protected.price) : ''), 'positioning');
     const nearZ = (smap.zones || [])
       .map(z => ({ z, d: px < z.lo ? z.lo - px : px > z.hi ? px - z.hi : 0 }))
       .filter(x => x.d <= atr * 0.5)
@@ -7356,31 +7372,31 @@
     add('Supply/Demand block (price location)', nearZ ? (nearZ.z.bull ? 'long' : 'short') : null, nearZ && nearZ.z.fresh ? 2 : 1,
         nearZ ? (nearZ.z.fresh ? 'UNMITIGATED ' : '') + (nearZ.z.bull ? 'demand' : 'supply') + ' ' + nearZ.z.lo.toFixed(0) + '–' + nearZ.z.hi.toFixed(0)
               + (nearZ.d === 0 ? ' · price inside' : ' · ' + nearZ.d.toFixed(0) + ' pts away')
-              : 'not at a block — no location edge');
-    add('Risk sentiment (VIX)', vs >= 5 ? 'long' : vs <= 3 ? 'short' : null, 1, vixLabel());
+              : 'not at a block — no location edge', 'positioning');
+    add('Risk sentiment (VIX)', vs >= 5 ? 'long' : vs <= 3 ? 'short' : null, 1, vixLabel(), 'risk');
     add('Real-yield 1-wk momentum', ry.chg === null || ry.chg === undefined ? null : ry.chg <= -0.02 ? 'long' : ry.chg >= 0.02 ? 'short' : null, 2,
-        ry.chg === null || ry.chg === undefined ? 'no data' : (ry.chg >= 0 ? '+' : '') + Math.round(ry.chg * 100) + ' bps/wk');
+        ry.chg === null || ry.chg === undefined ? 'no data' : (ry.chg >= 0 ? '+' : '') + Math.round(ry.chg * 100) + ' bps/wk', 'rates');
     const be = fundX.breakeven;
     add('Inflation expectations (10Y breakeven)', !be || be.chg === null ? null : be.chg >= 0.02 ? 'long' : be.chg <= -0.02 ? 'short' : null, 1,
-        be ? be.level.toFixed(2) + '%' + (be.chg !== null ? ' · ' + (be.chg >= 0 ? '+' : '') + Math.round(be.chg * 100) + ' bps/wk' : '') : 'no data');
+        be ? be.level.toFixed(2) + '%' + (be.chg !== null ? ' · ' + (be.chg >= 0 ? '+' : '') + Math.round(be.chg * 100) + ' bps/wk' : '') : 'no data', 'rates');
     const d2 = fundX.dgs2;
     add('Fed expectations (2Y yield trend)', !d2 ? null : d2.chg <= -0.03 ? 'long' : d2.chg >= 0.03 ? 'short' : null, 1,
-        d2 ? d2.level.toFixed(2) + '% · ' + (d2.chg >= 0 ? '+' : '') + Math.round(d2.chg * 100) + ' bps/wk' : 'no data');
+        d2 ? d2.level.toFixed(2) + '% · ' + (d2.chg >= 0 ? '+' : '') + Math.round(d2.chg * 100) + ' bps/wk' : 'no data', 'rates');
     const dm = fundX.dxyMom;
     add('USD 5-day momentum (ICE DXY)', !dm ? null : dm.chg <= -0.25 ? 'long' : dm.chg >= 0.25 ? 'short' : null, 1,
-        dm ? (dm.chg >= 0 ? '+' : '') + dm.chg.toFixed(2) + ' pts / 5 sessions' : 'no data');
+        dm ? (dm.chg >= 0 ? '+' : '') + dm.chg.toFixed(2) + ' pts / 5 sessions' : 'no data', 'dollar');
     const ct = fundX.cot;
     add('Funds positioning (COT managed money)', !ct || ct.pct >= 90 ? null : ct.chg4w > 5000 ? 'long' : ct.chg4w < -5000 ? 'short' : null, 1,
-        ct ? Math.round(ct.net / 1000) + 'k net · ' + (ct.chg4w >= 0 ? '+' : '') + Math.round(ct.chg4w / 1000) + 'k/4wk · ' + ct.pct + 'th pct' + (ct.pct >= 90 ? ' ⚠ crowded' : '') + (ct.oi ? ' · OI ' + (ct.oiChg4w >= 0 ? '↑' : '↓') : '') + ' · wk of ' + ct.asOf : 'no data (weekly, CFTC)');
+        ct ? Math.round(ct.net / 1000) + 'k net · ' + (ct.chg4w >= 0 ? '+' : '') + Math.round(ct.chg4w / 1000) + 'k/4wk · ' + ct.pct + 'th pct' + (ct.pct >= 90 ? ' ⚠ crowded' : '') + (ct.oi ? ' · OI ' + (ct.oiChg4w >= 0 ? '↑' : '↓') : '') + ' · wk of ' + ct.asOf : 'no data (weekly, CFTC)', 'positioning');
     const cv = fundX.curve;
     add('Yield curve (10Y–3M)', !cv ? null : cv.level < 0 ? 'long' : null, 1,
-        cv ? cv.level.toFixed(2) + '%' + (cv.level < 0 ? ' — inverted (recession hedge bid)' : ' — normal') : 'no data');
+        cv ? cv.level.toFixed(2) + '%' + (cv.level < 0 ? ' — inverted (recession hedge bid)' : ' — normal') : 'no data', 'rates');
     const hy = fundX.hy;
     add('Credit stress (HY spreads)', !hy ? null : hy.chg >= 0.08 ? 'long' : hy.chg <= -0.08 ? 'short' : null, 1,
-        hy ? hy.level.toFixed(2) + '% · ' + (hy.chg >= 0 ? '+' : '') + Math.round(hy.chg * 100) + ' bps/wk' + (hy.chg >= 0.08 ? ' — risk-off, haven bid' : '') : 'no data');
+        hy ? hy.level.toFixed(2) + '% · ' + (hy.chg >= 0 ? '+' : '') + Math.round(hy.chg * 100) + ' bps/wk' + (hy.chg >= 0.08 ? ' — risk-off, haven bid' : '') : 'no data', 'risk');
     const smile = dollarSmileRegime();
     add('Dollar Smile regime (USD cycle)', smile ? smile.dir : null, 1,
-        smile ? smile.phase + ' · ' + smile.detail : 'no data');
+        smile ? smile.phase + ' · ' + smile.detail : 'no data', 'dollar');
     // Eurozone growth pulse (OECD composite business confidence, Germany —
     // macro handbook ch.2/ch.4): confirms or denies the Dollar Smile's
     // "synchronized global growth" trough with an actual non-US growth read,
@@ -7389,7 +7405,7 @@
     // outperformance reasserting = gold headwind.
     const eu = fundX.euGrowth;
     add('Eurozone growth pulse (OECD composite, DE)', !eu || Math.abs(eu.chg) < 0.3 ? null : eu.chg > 0 ? 'long' : 'short', 1,
-        eu ? eu.level.toFixed(1) + ' · ' + (eu.chg >= 0 ? '+' : '') + eu.chg.toFixed(1) + ' vs prior release' : 'no data (monthly, OECD)');
+        eu ? eu.level.toFixed(1) + ' · ' + (eu.chg >= 0 ? '+' : '') + eu.chg.toFixed(1) + ' vs prior release' : 'no data (monthly, OECD)', 'dollar');
     // Yen carry-unwind risk (ch.5): sharp JPY strength + elevated VIX is the
     // signature of a BoJ-normalization-driven carry unwind — a violent,
     // indiscriminate deleveraging across risk assets (gold included) before
@@ -7399,7 +7415,7 @@
     const jm = fundX.jpyMom, vx = vixState.val;
     const carryStress = jm && jm.pct <= -2 && vx !== null && vx >= 22;
     add('Yen carry-unwind risk (BoJ/VIX)', null, 1,
-        !jm ? 'no data' : carryStress ? `USD/JPY ${jm.pct}% / 5d + VIX ${vx.toFixed(0)} — active unwind risk, expect violent two-way chop` : `USD/JPY ${jm.pct >= 0 ? '+' : ''}${jm.pct}% / 5d — calm`);
+        !jm ? 'no data' : carryStress ? `USD/JPY ${jm.pct}% / 5d + VIX ${vx.toFixed(0)} — active unwind risk, expect violent two-way chop` : `USD/JPY ${jm.pct >= 0 ? '+' : ''}${jm.pct}% / 5d — calm`, 'risk');
 
     // auto-tuning: once a driver has ≥30 graded days in the scorecard ledger,
     // its weight is shaded by its real hit rate (≥60% → ×1.25, ≤40% → ×0.75)
@@ -7416,6 +7432,73 @@
     st.dir  = st.net >= 3 ? 'long' : st.net <= -3 ? 'short' : 'wait';
     st.conf = Math.round(50 + Math.abs(st.net) / st.wTot * 50);
     st.checks = checks;
+
+    // ─── MACRO SYNTHESIS ────────────────────────────────────────────────────
+    // Group the 15 drivers into their 4 themes and read them AS A STORY:
+    // do real rates and the dollar actually agree (a coherent fundamental
+    // case), or are they fighting (net score clears the threshold on
+    // breadth, not conviction)? Is risk/liquidity confirming that case or
+    // is it a separate haven-panic overlay? Does positioning support or
+    // fight the fundamental lean? This is what makes 15 numbers into one
+    // bias instead of a checklist.
+    const CLUSTER_LABELS = { rates: 'Real Rates & Inflation', dollar: 'Dollar & Global Cycle', risk: 'Risk & Liquidity', positioning: 'Positioning & Technicals' };
+    const clusters = {};
+    for (const key in CLUSTER_LABELS) clusters[key] = { key, label: CLUSTER_LABELS[key], wTot: 0, net: 0, members: [] };
+    for (const c of checks) {
+      const cl = clusters[c.cluster] || clusters.positioning;
+      cl.wTot += c.w;
+      cl.net  += c.dir === 'long' ? c.w : c.dir === 'short' ? -c.w : 0;
+      cl.members.push(c);
+    }
+    for (const key in clusters) {
+      const cl = clusters[key];
+      const ratio = cl.wTot > 0 ? cl.net / cl.wTot : 0;
+      cl.dir = ratio >= 0.25 ? 'long' : ratio <= -0.25 ? 'short' : 'mixed';
+    }
+    st.clusters = clusters;
+
+    const rates = clusters.rates, dollarC = clusters.dollar, risk = clusters.risk, pos = clusters.positioning;
+    const say = d => d === 'long' ? 'gold-supportive' : d === 'short' ? 'a gold headwind' : 'directionless';
+    const lines = [];
+
+    if (rates.dir !== 'mixed') {
+      lines.push(`<strong>Real rates</strong> are ${rates.dir === 'long' ? 'falling' : 'rising'} — the master driver reads ${say(rates.dir)}, since ${rates.dir === 'long' ? 'a lower opportunity cost of holding a zero-yield asset' : 'a higher opportunity cost of holding a zero-yield asset'} is the single biggest lever on gold.`);
+    } else {
+      lines.push(`<strong>Real rates</strong> are mixed — yields, breakevens and the curve aren't pulling one way, so the master driver isn't offering a strong lean today.`);
+    }
+
+    if (dollarC.dir !== 'mixed') {
+      const agrees = rates.dir !== 'mixed' && dollarC.dir === rates.dir;
+      const conflicts = rates.dir !== 'mixed' && dollarC.dir !== rates.dir;
+      lines.push(`<strong>The dollar side ${agrees ? 'confirms it' : conflicts ? 'is fighting the rates story' : 'adds its own lean'}</strong>: DXY momentum, the Dollar Smile phase and the Eurozone growth pulse net out ${say(dollarC.dir)}${agrees ? ' — two independent macro complexes pointing the same way is a stronger case than either alone' : conflicts ? ' — when rates and the dollar disagree, the net score can still clear threshold on breadth without real conviction behind it' : ''}.`);
+    } else {
+      lines.push(`<strong>The dollar side is directionless</strong> — DXY momentum, the Dollar Smile phase and the Eurozone growth pulse aren't lined up with each other.`);
+    }
+
+    if (carryStress) {
+      lines.push(`<strong>Risk is not calm</strong>: the yen carry-unwind flag is active (USD/JPY ${jm.pct}%, VIX ${vx.toFixed(0)}) — expect violent two-way chop that can override the fundamental lean intraday even if the underlying thesis above is intact.`);
+    } else if (risk.dir === 'long') {
+      lines.push(`<strong>Risk sentiment reinforces it</strong>: VIX and credit spreads are both leaning toward haven demand, adding a fear bid on top of the fundamental case${rates.dir === 'long' || dollarC.dir === 'long' ? '' : ' even without one'}.`);
+    } else if (risk.dir === 'short') {
+      lines.push(`<strong>Risk sentiment argues against a haven bid</strong> — calm VIX and tight credit spreads mean any long case here has to be carried by rates and the dollar alone, not by fear.`);
+    }
+
+    if (ct && ct.pct >= 90) {
+      lines.push(`<strong>One real caution flag: positioning.</strong> Managed-money COT longs sit at the ${ct.pct}th percentile — a crowded book raises the odds of a sharp countertrend flush even inside an intact fundamental uptrend.`);
+    } else if (pos.dir !== 'mixed' && rates.dir !== 'mixed' && pos.dir !== rates.dir) {
+      lines.push(`<strong>Positioning and structure disagree with the fundamentals</strong> — the market hasn't caught up to the rates/dollar story yet, or the story is about to be tested.`);
+    } else if (pos.dir !== 'mixed' && pos.dir === rates.dir) {
+      lines.push(`<strong>Structure is participating</strong> — daily market structure and the nearest supply/demand block agree with the fundamental lean, not just macro data alone.`);
+    }
+
+    const coherent = rates.dir !== 'mixed' && dollarC.dir !== 'mixed' && rates.dir === dollarC.dir;
+    st.coherent = coherent;
+    if (st.dir !== 'wait') {
+      lines.push(coherent
+        ? `<em>Coherent case: rates and dollar agree, so the ${st.conf}% confidence reflects real conviction, not just breadth.</em>`
+        : `<em>Mixed case: the ${st.conf}% confidence is driven more by breadth of small signals than by rates and dollar agreeing — size accordingly.</em>`);
+    }
+    st.narrative = lines.join(' ');
     st.struct = ms;                                   // daily structure state for the trade planner
     st.sdZones = smap.zones;                          // live S/D order blocks (with fresh flags)
     const majors = smap.events.filter(e => !e.sweep && !e.idm);
@@ -7577,14 +7660,37 @@
     setEl('bias-ts', 'evaluated ' + new Date().toLocaleTimeString('en-US', { hour12: false, timeZone: 'UTC' }) + ' UTC');
     setEl('bias-hint', si.hint + realYieldTag() + eventRiskTag());
 
-    // Confluence rows
-    setH('bias-checks', st.checks.map(c => `
-      <div class="level-row">
-        <span class="level-row-tag ${c.dir === 'long' ? 'sup' : c.dir === 'short' ? 'res' : 'key'}">${c.dir === 'long' ? '▲' : c.dir === 'short' ? '▼' : '—'}</span>
-        <span class="level-row-name">${c.n}</span>
-        <span class="level-row-price" style="font-size:11px;">${c.detail}</span>
-        <span class="level-row-dist">w${c.w}</span>
-      </div>`).join(''));
+    // Macro synthesis: cluster chips + narrative
+    if (st.clusters) {
+      const chipCol = d => d === 'long' ? 'var(--accent-green)' : d === 'short' ? 'var(--accent-red)' : 'var(--text-tertiary)';
+      const chipArrow = d => d === 'long' ? '▲' : d === 'short' ? '▼' : '—';
+      setH('bias-cluster-chips', Object.values(st.clusters).map(cl => `
+        <span class="badge" style="border-color:${chipCol(cl.dir)};color:${chipCol(cl.dir)};">
+          ${chipArrow(cl.dir)} ${cl.label}
+        </span>`).join(''));
+      setH('bias-narrative', st.narrative || 'Building synthesis…');
+    }
+
+    // Confluence rows — grouped by cluster so related drivers read together
+    if (st.clusters) {
+      setH('bias-checks', Object.values(st.clusters).filter(cl => cl.members.length).map(cl => `
+        <div class="level-row-group-title" style="font-size:10px;font-weight:800;letter-spacing:0.8px;text-transform:uppercase;color:var(--text-tertiary);margin:10px 0 4px;">${cl.label}</div>
+        ${cl.members.map(c => `
+          <div class="level-row">
+            <span class="level-row-tag ${c.dir === 'long' ? 'sup' : c.dir === 'short' ? 'res' : 'key'}">${c.dir === 'long' ? '▲' : c.dir === 'short' ? '▼' : '—'}</span>
+            <span class="level-row-name">${c.n}</span>
+            <span class="level-row-price" style="font-size:11px;">${c.detail}</span>
+            <span class="level-row-dist">w${c.w}</span>
+          </div>`).join('')}`).join(''));
+    } else {
+      setH('bias-checks', st.checks.map(c => `
+        <div class="level-row">
+          <span class="level-row-tag ${c.dir === 'long' ? 'sup' : c.dir === 'short' ? 'res' : 'key'}">${c.dir === 'long' ? '▲' : c.dir === 'short' ? '▼' : '—'}</span>
+          <span class="level-row-name">${c.n}</span>
+          <span class="level-row-price" style="font-size:11px;">${c.detail}</span>
+          <span class="level-row-dist">w${c.w}</span>
+        </div>`).join(''));
+    }
 
     // Playbook
     let pb;
