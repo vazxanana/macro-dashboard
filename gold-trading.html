@@ -4247,6 +4247,16 @@
 
   </div><!-- end tab-edges -->
 
+  <!-- EDGE TRACKER — every strategy shown on this platform, auto-logged live -->
+  <div id="tab-edgetracker" class="tab-panel">
+    <div class="section-header">
+      <div class="section-title">Edge Tracker <span style="font-size:11px;font-weight:500;color:var(--text-tertiary)">— the 4 methods proven out in the Backtest Lab, each running live: entry conditions watched every cycle, trades logged and graded automatically against the real tape</span></div>
+    </div>
+    <div id="edgeTrackerGrid">
+      <div class="card glass" style="text-align:center;color:var(--text-tertiary);font-size:12px;">Loading…</div>
+    </div>
+  </div><!-- end tab-edgetracker -->
+
   <!-- INTEL SOURCES — the daily gold information stack -->
   <div id="tab-intel" class="tab-panel">
     <div class="section-header">
@@ -4391,6 +4401,7 @@
     if (name === 'calendar') renderCalendar();
     if (name === 'sessions') { renderSessionGrid(); renderLocalTimes(); renderSessionSignals(); }
     if (name === 'edges')     { edgeConfluence(); }
+    if (name === 'edgetracker') { renderEdgeTracker(); updateEdgeTracker().catch(() => {}); }
     if (name === 'dashboard') { renderDashboard(); }
     if (name === 'analysis')  { updateAnalysisTab(); }
     if (name === 'bias')      { renderDailyBias(); }
@@ -7032,25 +7043,23 @@
   }
 
   // ─── TRADE PLAN — bias + structure + unmitigated S/D assembled into a ticket ─
-  function renderTradePlan(st) {
-    const el = document.getElementById('tradePlanBody');
-    if (!el) return;
-    const mono = "font-family:'JetBrains Mono',monospace";
-    const no = why => { el.innerHTML = `<div style="font-size:12px;color:var(--text-secondary);line-height:1.7;"><strong style="color:var(--text-tertiary)">NO TRADE PLAN</strong> — ${why}</div>`; };
-    if (!st || !st.ok) return no('waiting for market data.');
+  // Pure ticket-builder shared by the Trade Plan card and the Edge Tracker's
+  // "Structure + S/D" live detector — one formula, two consumers.
+  function computeTradePlan(st) {
+    if (!st || !st.ok) return { ok: false, why: 'waiting for market data.' };
     const er = getEventRisk();
-    if (er.level === 'high') return no(`red-folder day (${er.events.join(' · ')}) — stand down into the print, re-plan after the dust settles.`);
-    if (st.dir === 'wait') return no(`drivers net ${st.net > 0 ? '+' : ''}${st.net} of ±${st.wTot} — no directional bias today. Capital preserved is edge kept.`);
+    if (er.level === 'high') return { ok: false, why: `red-folder day (${er.events.join(' · ')}) — stand down into the print, re-plan after the dust settles.` };
+    if (st.dir === 'wait') return { ok: false, why: `drivers net ${st.net > 0 ? '+' : ''}${st.net} of ±${st.wTot} — no directional bias today. Capital preserved is edge kept.` };
     const ms = st.struct;
     const L = st.dir === 'long';
-    if (!ms) return no('daily structure still forming — no protected swing to lean on.');
+    if (!ms) return { ok: false, why: 'daily structure still forming — no protected swing to lean on.' };
     if ((ms.trend === 'bull') !== L)
-      return no(`bias says <strong>${st.dir.toUpperCase()}</strong> but daily structure is <strong>${ms.trend === 'bull' ? 'BULLISH' : 'BEARISH'}</strong>${ms.confirmed ? ' (bos-confirmed)' : ' (ChoCh only)'} — conflict. No A+ setup until they agree.`);
+      return { ok: false, why: `bias says <strong>${st.dir.toUpperCase()}</strong> but daily structure is <strong>${ms.trend === 'bull' ? 'BULLISH' : 'BEARISH'}</strong>${ms.confirmed ? ' (bos-confirmed)' : ' (ChoCh only)'} — conflict. No A+ setup until they agree.` };
     // entry: nearest live order block on the trade side (unmitigated preferred)
     const zs = (st.sdZones || []).filter(z => z.bull === L && (L ? z.lo < st.px : z.hi > st.px));
     zs.sort((a, b) => L ? (b.hi - a.hi) : (a.lo - b.lo));
     const zone = zs.find(z => z.fresh) || zs[0] || null;
-    if (!zone) return no(`no live ${L ? 'demand' : 'supply'} order block ${L ? 'below' : 'above'} price — nothing to lean an entry on. Let a pullback build one.`);
+    if (!zone) return { ok: false, why: `no live ${L ? 'demand' : 'supply'} order block ${L ? 'below' : 'above'} price — nothing to lean an entry on. Let a pullback build one.` };
     const entry = L ? Math.min(zone.hi, st.px) : Math.max(zone.lo, st.px);
     const stop  = L ? zone.lo - st.atr * 0.25 : zone.hi + st.atr * 0.25;
     const risk  = Math.abs(entry - stop);
@@ -7058,7 +7067,17 @@
       .sort((a, b) => L ? (a.lo - b.lo) : (b.hi - a.hi))[0];
     const target = opp ? (L ? opp.lo : opp.hi) : ms.next ? ms.next.price : (L ? entry + risk * 2 : entry - risk * 2);
     const rr = risk > 0 ? Math.abs(target - entry) / risk : 0;
-    if (!(risk > 0) || rr < 1.5) return no(`geometry too tight — best available plan is ${rr.toFixed(1)}R (needs ≥1.5R). Let price travel first.`);
+    if (!(risk > 0) || rr < 1.5) return { ok: false, why: `geometry too tight — best available plan is ${rr.toFixed(1)}R (needs ≥1.5R). Let price travel first.` };
+    return { ok: true, dir: st.dir, L, entry, stop, target, risk, rr, zone, opp, ms, conf: st.conf, er };
+  }
+
+  function renderTradePlan(st) {
+    const el = document.getElementById('tradePlanBody');
+    if (!el) return;
+    const mono = "font-family:'JetBrains Mono',monospace";
+    const plan = computeTradePlan(st);
+    if (!plan.ok) { el.innerHTML = `<div style="font-size:12px;color:var(--text-secondary);line-height:1.7;"><strong style="color:var(--text-tertiary)">NO TRADE PLAN</strong> — ${plan.why}</div>`; return; }
+    const { L, entry, stop, target, risk, rr, zone, opp, ms, conf, er } = plan;
     const fresh = !!zone.fresh;
     const cell = (l, v, sub, col) => `
       <div class="metric-box"><div class="metric-label">${l}</div>
@@ -7066,7 +7085,7 @@
       <div class="metric-detail">${sub}</div></div>`;
     el.innerHTML = `
       <div class="metric-grid" style="margin-bottom:10px;">
-        ${cell('Direction', L ? '▲ LONG' : '▼ SHORT', st.conf + '% bias · structure ' + (ms.confirmed ? 'bos-confirmed' : 'ChoCh only'), L ? 'var(--accent-green)' : 'var(--accent-red)')}
+        ${cell('Direction', L ? '▲ LONG' : '▼ SHORT', conf + '% bias · structure ' + (ms.confirmed ? 'bos-confirmed' : 'ChoCh only'), L ? 'var(--accent-green)' : 'var(--accent-red)')}
         ${cell('Entry', entry.toFixed(0), (fresh ? 'UNMITIGATED ' : '') + (L ? 'demand' : 'supply') + ' block ' + zone.lo.toFixed(0) + '–' + zone.hi.toFixed(0))}
         ${cell('Stop', stop.toFixed(0), risk.toFixed(0) + ' pts risk · beyond the block', 'var(--accent-red)')}
         ${cell('Target', target.toFixed(0), opp ? 'opposing ' + (L ? 'supply' : 'demand') + ' block' : ms.next ? 'structure bos level' : '2R fallback', 'var(--accent-green)')}
@@ -7077,6 +7096,205 @@
         ${er.level === 'medium' ? '<strong style="color:#D97706">Event risk today — halve size.</strong>' : ''}
         Size so ${risk.toFixed(0)} pts = 1R of your account risk.
       </div>`;
+  }
+
+  // ─── EDGE TRACKER — every strategy shown on this platform, auto-logged ─────
+  // The 4 methods already proven out in the Backtest Lab also run LIVE: each
+  // one's own entry formula is re-evaluated on the current candle; the moment
+  // it fires, the trade is logged automatically. Every open trade is graded
+  // against the real M15 tape with the exact same rules the backtest uses —
+  // wait for the fill, stop checked before target, cost deducted, timed out
+  // after the same bar cap — so this is a live track record, not a backtest
+  // re-run. No manual bookkeeping.
+  const EDGE_DEFS = [
+    { key: 'egScalp',   name: 'EG Scalp',        desc: 'M15 engulfing at structure (VWAP / PDH-PDL / Asia range / round #), H4-trend aligned · 1.8R target', maxBars: 96,  breakout: true },
+    { key: 'egDay',     name: 'EG Day Trade',    desc: 'H1 engulfing at structure, daily-trend aligned · 2R target',                                          maxBars: 192, breakout: true },
+    { key: 'dailyBias', name: 'Daily Bias',      desc: 'Zone-limit entry in the daily bias direction · RR ≥ 1',                                              maxBars: 480, breakout: false },
+    { key: 'structSD',  name: 'Structure + S/D', desc: 'Order-block limit entry, bos-confirmed daily structure · RR ≥ 1.5 (same ticket as the Trade Plan)',  maxBars: 480, breakout: false }
+  ];
+
+  function edgeLedgerLoad() {
+    try { return JSON.parse(localStorage.getItem('edgeLedger') || '{}'); } catch (e) { return {}; }
+  }
+  function edgeLedgerSave(l) { try { localStorage.setItem('edgeLedger', JSON.stringify(l)); } catch (e) {} }
+
+  // Walks the M15 tape from the signal's own candle: waits for the entry to
+  // be touched (breakout = stop order through the pattern extreme, like EG
+  // Scalp/Day Trade; !breakout = limit order pulling back into a zone, like
+  // Daily Bias/Structure+S/D), then checks stop before target each bar
+  // (conservative — matches every backtest in this file), then times out
+  // after maxBars with the same round-trip cost charged on a dead trade.
+  function gradeSignal(m15, sig, maxBars, breakout) {
+    const iStart = m15.findIndex(c => c.time >= sig.ts);
+    if (iStart < 0) return { status: 'open' };
+    const risk = Math.abs(sig.entry - sig.stop);
+    if (!(risk > 0)) return { status: 'expired', r: 0 };
+    let filled = false;
+    const scanEnd = Math.min(iStart + maxBars, m15.length);
+    for (let j = iStart; j < scanEnd; j++) {
+      const b = m15[j];
+      if (!filled) {
+        const hit = breakout
+          ? (sig.dir === 'long' ? b.high >= sig.entry : b.low <= sig.entry)
+          : (sig.dir === 'long' ? b.low <= sig.entry : b.high >= sig.entry);
+        if (hit) filled = true; else continue;
+      }
+      const stopHit = sig.dir === 'long' ? b.low <= sig.stop : b.high >= sig.stop;
+      const tgtHit  = sig.dir === 'long' ? b.high >= sig.target : b.low <= sig.target;
+      if (stopHit) return { status: 'loss', r: +(-1 - BT_COST_PTS / risk).toFixed(2), exitTs: b.time };
+      if (tgtHit)  return { status: 'win', r: +(Math.abs(sig.target - sig.entry) / risk - BT_COST_PTS / risk).toFixed(2), exitTs: b.time };
+    }
+    if (m15.length - iStart >= maxBars) {
+      return filled
+        ? { status: 'expired', r: +(-BT_COST_PTS / risk).toFixed(2), exitTs: m15[scanEnd - 1].time }
+        : { status: 'unfilled', r: 0, exitTs: m15[scanEnd - 1].time };
+    }
+    return { status: 'open' };
+  }
+
+  // ---- live detectors: each edge's OWN backtest formula, evaluated on the
+  // latest completed candle only (not a historical walk-forward) ----
+  function liveEgScalp(m15, h4) {
+    if (!m15 || m15.length < 30 || !h4 || h4.length < 20) return null;
+    const events = detectEngulfings(m15);
+    const e = events[events.length - 1];
+    if (!e || e.time !== m15[m15.length - 1].time || !e.atLevel) return null;
+    const h4up = h4[h4.length - 1].close >= btSma(h4.map(b => b.close), 20);
+    if ((e.type === 'bull') !== h4up) return null;
+    const dir = e.type === 'bull' ? 'long' : 'short';
+    const entry = dir === 'long' ? e.high + 0.1 : e.low - 0.1;
+    const stop  = dir === 'long' ? e.low - 0.1 : e.high + 0.1;
+    const risk = Math.abs(entry - stop);
+    const target = dir === 'long' ? entry + risk * 1.8 : entry - risk * 1.8;
+    return { dir, entry: +entry.toFixed(2), stop: +stop.toFixed(2), target: +target.toFixed(2), ts: e.time };
+  }
+
+  function liveEgDay(h1, d1) {
+    if (!h1 || h1.length < 30 || !d1 || d1.length < 20) return null;
+    const events = detectEngulfings(h1);
+    const e = events[events.length - 1];
+    if (!e || e.time !== h1[h1.length - 1].time || !e.atLevel) return null;
+    const dUp = d1[d1.length - 1].close >= btSma(d1.map(b => b.close), 20);
+    if ((e.type === 'bull') !== dUp) return null;
+    const dir = e.type === 'bull' ? 'long' : 'short';
+    const buf = Math.max(0.5, (e.high - e.low) * 0.15);
+    const entry = dir === 'long' ? e.high + 0.1 : e.low - 0.1;
+    const stop  = dir === 'long' ? e.low - buf : e.high + buf;
+    const risk = Math.abs(entry - stop);
+    const target = dir === 'long' ? entry + risk * 2 : entry - risk * 2;
+    return { dir, entry: +entry.toFixed(2), stop: +stop.toFixed(2), target: +target.toFixed(2), ts: e.time };
+  }
+
+  function liveDailyBias(st) {
+    if (!st || !st.ok || st.dir === 'wait' || !st.entryZone) return null;
+    const dir = st.dir, ez = st.entryZone, tz = st.targetZone;
+    const entry = dir === 'long' ? ez.hi : ez.lo;
+    const stop  = dir === 'long' ? ez.lo - st.atr * 0.35 : ez.hi + st.atr * 0.35;
+    const risk = Math.abs(entry - stop);
+    if (!(risk > 0)) return null;
+    const target = tz ? tz.mid : (dir === 'long' ? entry + risk * 2 : entry - risk * 2);
+    if (Math.abs(target - entry) / risk < 1) return null;
+    const ts = Math.floor(Date.now() / 86400000) * 86400;   // one signal per UTC day
+    return { dir, entry: +entry.toFixed(2), stop: +stop.toFixed(2), target: +target.toFixed(2), ts };
+  }
+
+  function liveStructSD(st) {
+    const plan = computeTradePlan(st);
+    if (!plan.ok) return null;
+    const ts = Math.floor(Date.now() / 86400000) * 86400;   // one signal per UTC day
+    return { dir: plan.dir, entry: +plan.entry.toFixed(2), stop: +plan.stop.toFixed(2), target: +plan.target.toFixed(2), ts };
+  }
+
+  async function updateEdgeTracker() {
+    const ledger = edgeLedgerLoad();
+    const [m15, h1, h4, d1] = await Promise.all([
+      fetchGoldKlines('15m'), fetchGoldKlines('1h'), fetchGoldKlines('4h'), fetchGoldKlines('1d')
+    ]);
+    if (!m15 || !m15.length) return;
+
+    const detectors = {
+      egScalp:   () => liveEgScalp(m15, h4),
+      egDay:     () => liveEgDay(h1, d1),
+      dailyBias: () => liveDailyBias(dailyBiasState),
+      structSD:  () => liveStructSD(dailyBiasState)
+    };
+
+    for (const def of EDGE_DEFS) {
+      const rows = ledger[def.key] || (ledger[def.key] = []);
+      for (const tr of rows) {
+        if (tr.status !== 'open') continue;
+        const g = gradeSignal(m15, tr, def.maxBars, def.breakout);
+        if (g.status !== 'open') Object.assign(tr, g);
+      }
+      const hasOpen = rows.some(r => r.status === 'open');
+      if (!hasOpen) {
+        const sig = detectors[def.key]();
+        if (sig && !rows.some(r => r.ts === sig.ts)) rows.push({ ...sig, status: 'open', logged: Date.now() });
+      }
+      if (rows.length > 60) rows.splice(0, rows.length - 60);   // keep the ledger bounded
+    }
+    edgeLedgerSave(ledger);
+    const tab = document.getElementById('tab-edgetracker');
+    if (tab && tab.classList.contains('active')) renderEdgeTracker(ledger);
+  }
+
+  function renderEdgeTracker(ledger) {
+    const wrap = document.getElementById('edgeTrackerGrid');
+    if (!wrap) return;
+    ledger = ledger || edgeLedgerLoad();
+    const mono = "font-family:'JetBrains Mono',monospace";
+    const dfmt = ts => new Date(ts * 1000).toLocaleDateString('en-GB', { day: '2-digit', month: 'short' });
+    const statusChip = s => ({
+      open: '<span style="color:var(--accent-blue);font-weight:800;">OPEN</span>',
+      win: '<span style="color:var(--accent-green);font-weight:800;">WIN</span>',
+      loss: '<span style="color:var(--accent-red);font-weight:800;">LOSS</span>',
+      expired: '<span style="color:var(--text-tertiary);font-weight:800;">TIMEOUT</span>'
+    }[s] || s);
+
+    wrap.innerHTML = EDGE_DEFS.map(def => {
+      const rows = (ledger[def.key] || []).slice().reverse();
+      const closed = rows.filter(r => r.status === 'win' || r.status === 'loss' || r.status === 'expired');
+      const wins = closed.filter(r => r.status === 'win');
+      const totalR = +closed.reduce((a, r) => a + (r.r || 0), 0).toFixed(2);
+      const avgR = closed.length ? +(totalR / closed.length).toFixed(2) : 0;
+      const winPct = closed.length ? Math.round(wins.length / closed.length * 100) : null;
+      const openTrade = rows.find(r => r.status === 'open');
+      const tile = (l, v, col) => `<div class="metric-box"><div class="metric-label">${l}</div><div class="metric-value" style="${mono}${col ? ';color:' + col : ''}">${v}</div></div>`;
+      const tableRows = rows.filter(r => r.status !== 'unfilled').slice(0, 12).map(r => `
+        <tr>
+          <td style="${mono}">${dfmt(r.ts)}</td>
+          <td style="font-weight:800;color:${r.dir === 'long' ? 'var(--accent-green)' : 'var(--accent-red)'}">${r.dir === 'long' ? 'LONG' : 'SHORT'}</td>
+          <td style="${mono}">${r.entry.toFixed(0)}</td>
+          <td style="${mono}">${r.stop.toFixed(0)}</td>
+          <td style="${mono}">${r.target.toFixed(0)}</td>
+          <td>${statusChip(r.status)}</td>
+          <td style="${mono};font-weight:800;color:${(r.r || 0) >= 0 ? 'var(--accent-green)' : 'var(--accent-red)'}">${r.status === 'open' ? '—' : (r.r >= 0 ? '+' : '') + r.r + 'R'}</td>
+        </tr>`).join('');
+      return `
+        <div class="card glass" style="margin-bottom:16px;">
+          <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;">
+            <div>
+              <div class="edge-tracker-name" style="font-weight:800;font-size:15px;">${def.name}</div>
+              <div style="font-size:11px;color:var(--text-tertiary);margin-top:2px;">${def.desc}</div>
+            </div>
+            ${openTrade
+              ? `<span class="badge" style="background:rgba(37,99,235,0.15);border-color:rgba(37,99,235,0.3);color:var(--accent-blue);">● OPEN ${openTrade.dir === 'long' ? 'LONG' : 'SHORT'} @ ${openTrade.entry.toFixed(0)}</span>`
+              : `<span class="badge">no open trade</span>`}
+          </div>
+          <div class="metric-grid" style="margin-top:12px;">
+            ${tile('Trades Logged', closed.length)}
+            ${tile('Win Rate', winPct === null ? '—' : winPct + '%', winPct === null ? null : (winPct >= 50 ? 'var(--accent-green)' : 'var(--accent-red)'))}
+            ${tile('Total R', (totalR >= 0 ? '+' : '') + totalR + 'R', totalR >= 0 ? 'var(--accent-green)' : 'var(--accent-red)')}
+            ${tile('Avg R / Trade', (avgR >= 0 ? '+' : '') + avgR + 'R')}
+          </div>
+          <div class="journal-table-wrap" style="margin-top:12px;">
+            <table class="journal-table">
+              <thead><tr><th>Date</th><th>Dir</th><th>Entry</th><th>Stop</th><th>Target</th><th>Result</th><th>R</th></tr></thead>
+              <tbody>${tableRows || '<tr><td colspan="7" class="j-empty">No signals logged yet — this edge is watched live and will log the moment its own entry conditions are met.</td></tr>'}</tbody>
+            </table>
+          </div>
+        </div>`;
+    }).join('');
   }
 
   let rzState = [];             // ranked daily zones — drawn on charts + alerts
@@ -7589,7 +7807,8 @@
         if (activeSection === 'dashboard') renderDashboard();
         const sessTab = document.getElementById('tab-sessions');
         if (sessTab && sessTab.classList.contains('active')) renderSessionSignals();
-      }).catch(() => {});
+        updateEdgeTracker().catch(() => {});
+      }).catch(() => { updateEdgeTracker().catch(() => {}); });
 
       // Refresh active views (always recompute analysis cards from live price)
       updateAnalysisTab();
@@ -7804,7 +8023,7 @@
   const NAV_SECTIONS = {
     dashboard: { tabs: [{ id: 'dashboard', label: 'Overview' }] },
     markets:   { tabs: [{ id: 'bias', label: 'Daily Bias' }, { id: 'analysis', label: 'Live Analysis' }, { id: 'mtf', label: 'Multi-TF Charts' }, { id: 'redfolder', label: 'Red Folder' }, { id: 'sessions', label: 'Trade Sessions' }, { id: 'calendar', label: 'Economic Calendar' }] },
-    research:  { tabs: [{ id: 'edges',    label: 'Edge Lab' }, { id: 'scorecard', label: 'Bias Scorecard' }, { id: 'backtest', label: 'Backtest Lab' }, { id: 'intel', label: 'Intel Sources' }] }
+    research:  { tabs: [{ id: 'edges',    label: 'Edge Lab' }, { id: 'edgetracker', label: 'Edge Tracker' }, { id: 'scorecard', label: 'Bias Scorecard' }, { id: 'backtest', label: 'Backtest Lab' }, { id: 'intel', label: 'Intel Sources' }] }
   };
 
   let activeSection = 'dashboard';
