@@ -1,0 +1,15 @@
+# Time Series Momentum (Moskowitz, Ooi & Pedersen, 2012)
+- **URL:** https://w4.stern.nyu.edu/facdir/lpederse/papers/TimeSeriesMomentum.pdf (also SSRN: https://papers.ssrn.com/sol3/papers.cfm?abstract_id=2089463; NBER working paper version: https://www.nber.org/system/files/working_papers/w24575/revisions/w24575.rev0.pdf; published version: Journal of Financial Economics, ScienceDirect https://www.sciencedirect.com/science/article/pii/S0304405X11002613)
+- **Type:** academic
+- **Date:** 2012 (JFE publication); original working paper ~2011
+- **Credibility:** 5
+- **Recency:** 3 (foundational paper, still the central reference for trend-following academic literature)
+- **Bias:** None flagged — peer-reviewed, widely cited (Moskowitz is an academic; Ooi/Pedersen affiliated with AQR at time of writing, so there is a manager-interest tilt toward validating trend-following generally, but methodology is transparent and data since replicated independently)
+- **Sourcing:** SEARCH-DERIVED — not verified against primary text (paper itself was not opened, only search-engine summaries of its abstract/findings)
+
+## Reported content
+> (paraphrased from search summary) "Moskowitz, Ooi and Pedersen (2012) documented an asset pricing anomaly they term 'time series momentum'... They found strong positive predictability from a security's own past returns for a set of 58 diverse futures and forward contracts... over more than 25 years of data." Separately reported elsewhere: "The literature finds positive return autocorrelations at daily, weekly, and monthly horizons and negative autocorrelations at annual and multi-year frequencies," with persistence "for one to 12 months that partially reverses over longer horizons."
+> A separate, less certain search result (industry blog, not this paper directly) claimed: "strong momentum patterns at the monthly frequency of rebalancing, relatively strong momentum patterns at the weekly frequency and relatively weak momentum patterns at the daily frequency" — this specific daily/weekly/monthly comparison could NOT be confirmed as coming from Moskowitz/Ooi/Pedersen itself; it may be a secondary source's gloss. Treat with caution.
+
+## Relevance
+This is the single most load-bearing academic anchor for "does timeframe carry information beyond noise reduction." The core TSM finding is about *lookback/holding horizon* (12-month formation, 1-month holding) rather than daily-vs-weekly-close mechanics specifically, so it does NOT directly answer whether a Friday close is special — it answers a different but related question: past return sign over a horizon predicts future returns better at monthly/multi-month horizons than at very short (daily) horizons, and this decays at multi-year horizons (non-monotonic). This supports "aggregation to intermediate horizons adds real predictive signal, not just noise reduction" for trend continuation broadly, but doesn't isolate the weekly-close-as-such effect our research question is about. Needs primary-text verification before treating the daily/weekly/monthly comparison claim as fact.
