@@ -1,0 +1,14 @@
+# Signal-to-Noise Ratio (SNR) in Trading / time-frame aggregation literature
+- **URL:** https://arongroups.co/forex-articles/signal-to-noise-ratio/ (cross-referenced with academic-adjacent results: https://arxiv.org/pdf/2208.03568 "Learning Financial Networks with High-frequency Trade Data" and https://www.princeton.edu/~yacine/liquidity.pdf "High frequency market microstructure noise estimates")
+- **Type:** industry (primary claim source) / academic (cross-referenced microstructure literature)
+- **Date:** unknown (arongroups) / Princeton microstructure-noise paper is an established academic reference (Aït-Sahalia et al. line of research)
+- **Credibility:** 2 (arongroups claim alone) / 4 (for the microstructure-noise academic literature it echoes, though that literature is about intraday microstructure noise, not daily-vs-weekly bar aggregation specifically)
+- **Recency:** 3
+- **Bias:** arongroups.co is a forex-education/brokerage-adjacent content site; standard retail-education bias. The Princeton/microstructure-noise citation is legitimate academic market-microstructure literature but addresses a different question (bid-ask bounce and microstructure noise at very high frequency, e.g. tick/second data) than daily-vs-weekly close aggregation.
+- **Sourcing:** SEARCH-DERIVED — not verified against primary text.
+
+## Reported content
+> (paraphrased) "Filtering and aggregation can reduce market noise before measuring SNR... Aggregating trades is common in high-frequency financial data analysis, for several reasons: aggregation limits the effect of noise, reduces the amount of data that we need to process, and allows for the creation of economically meaningful variables." Also: "noise dominates short time frames, while signal reveals itself over longer periods."
+
+## Relevance
+This is the closest the search surfaced to directly addressing Question 2 (does aggregation add information or just smooth noise) — and the honest academic answer embedded in the microstructure literature is that aggregation's well-established benefit is *noise reduction* (specifically bid-ask bounce / microstructure noise at high intraday frequencies), not new information content. Critically, this microstructure-noise literature is about tick-level to intraday aggregation (e.g., 5-minute vs. tick data), not daily-vs-weekly bars — daily closes are not meaningfully corrupted by bid-ask-bounce microstructure noise the way tick data is, so this justification, strictly read, applies far more weakly (if at all) to the daily-to-weekly aggregation step than to the intraday-to-daily step. This is an important nuance: the academic case for "aggregation reduces noise" is strongest at very high frequencies and has not been shown by any source in this search to extend cleanly to justify daily-vs-weekly close significance specifically.

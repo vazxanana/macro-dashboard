@@ -4691,7 +4691,12 @@
     { day: 17, month: 'JUL', title: 'Fed Beige Book', utc: '18:00', desc: 'Qualitative economic conditions report. Dovish language supports gold.', impact: 'med', bias: 'neutral', biasTxt: 'Neutral' },
     { day: 22, month: 'JUL', title: 'Flash PMI (Jul)', utc: '13:45', desc: 'Services & manufacturing sentiment. Contraction reinforces easing expectations.', impact: 'med', bias: 'bull', biasTxt: 'Bullish if weak' },
     { day: 24, month: 'JUL', title: 'US GDP (Q2 Advance)', utc: '12:30', desc: 'First GDP estimate. Miss below 2% growth accelerates rate cut timeline.', impact: 'high', bias: 'bull', biasTxt: 'Bullish if miss' },
-    { day: 29, month: 'JUL', title: 'FOMC Rate Decision', utc: '18:00', desc: 'Jul 28–29 meeting; decision Wednesday. Any dovish pivot signal can trigger a 1–2% gold rally.', impact: 'high', bias: 'bull', biasTxt: 'Key catalyst' },
+    // Two-sided, not the usual dovish-tilt FOMC: hike odds moved from ~11% to
+    // ~35-38% in the week into the meeting (CME "no change" ~66%), after the
+    // June projections turned hawkish with inflation at 4.2%. `levels` are the
+    // published consensus reaction levels as of 28 Jul 2026 — event-specific,
+    // and stale after the print.
+    { day: 29, month: 'JUL', title: 'FOMC Rate Decision', utc: '18:00', desc: 'Jul 28–29 meeting; decision Wednesday 14:00 ET. Genuinely two-sided — a hike is live (~35–38% priced) after hawkish June projections. Dovish hold targets 4,300→4,500; hawkish/hike targets 4,000→3,895.', impact: 'high', bias: 'neutral', biasTxt: 'Two-sided — hike live', levels: [3895, 4000, 4300, 4500] },
     { day: 31, month: 'JUL', title: 'US PCE Price Index (Jun)', utc: '12:30', desc: 'Fed\'s preferred inflation gauge, two days after FOMC. Cooler print extends any dovish move.', impact: 'high', bias: 'bull', biasTxt: 'Bullish if cool' },
     { day: 7,  month: 'AUG', title: 'US Non-Farm Payrolls (Jul)', utc: '12:30', desc: 'First Friday. A second consecutive weak reading would cement rate-cut conviction.', impact: 'high', bias: 'bull', biasTxt: 'Bullish if weak' },
     { day: 12, month: 'AUG', title: 'US CPI Inflation (Jul)', utc: '12:30', desc: 'Mid-month release. Key input into the September FOMC.', impact: 'high', bias: 'bull', biasTxt: 'Bullish if cool' },
@@ -4788,14 +4793,20 @@
         { label: 'Hot',     trigger: 'Core above consensus',  reaction: 'Drop — real yields spike; wait for the floor before re-entry', tone: 'bear' }
       ],
       note: 'Gold trades this through REAL yields — watch the TIPS reaction, not the headline.' },
-    { match: /FOMC|rate decision/i, type: 'Fed Decision', baseTilt: 3,
+    // baseTilt 0 (was +3): the +3 assumed a cutting cycle where the surprise
+    // risk was one-directional. From mid-2026 the Fed's own projections turned
+    // hawkish with a live hike on the table, so the event is genuinely
+    // two-sided and should carry no built-in directional tilt. Re-check this
+    // whenever the policy cycle turns.
+    { match: /FOMC|rate decision/i, type: 'Fed Decision', baseTilt: 0,
       em: { typ: 1.0, tail: 2.0, atrX: 1.6 },
       scenarios: [
-        { label: 'Dovish',  trigger: 'Cut, or dots shift lower',        reaction: 'Rally 1–2%, often extending for days', tone: 'bull' },
+        { label: 'Dovish',  trigger: 'Cut, dots shift lower, or softer language than priced', reaction: 'Rally 1–2%, often extending for days', tone: 'bull' },
         { label: 'As-expected', trigger: 'Priced outcome + neutral presser', reaction: 'Volatile chop — direction resolves during the presser, not the statement', tone: 'wait' },
-        { label: 'Hawkish', trigger: 'Hold + pushback on cut timing',   reaction: 'Sell-off; structural bid usually absorbs it within 1–3 sessions', tone: 'bear' }
+        { label: 'Hawkish hold', trigger: 'Hold + pushback, or hawkish dots', reaction: 'Sell-off; structural bid usually absorbs it within 1–3 sessions', tone: 'bear' },
+        { label: 'Hike surprise', trigger: 'Outright hike against a priced hold', reaction: 'Sharp drop — the tail case; do not fade day one', tone: 'bear' }
       ],
-      note: 'Two-stage event: statement 14:00 ET, presser 14:30 ET. The presser reverses the statement move ~40% of the time.' },
+      note: 'Two-stage event: statement 14:00 ET, presser 14:30 ET. The presser reverses the statement move ~40% of the time. Watch the VOTE TALLY — dissents signal the next meeting more reliably than the decision itself.' },
     { match: /GDP/i, type: 'Growth', baseTilt: 2,
       em: { typ: 0.4, tail: 0.9, atrX: 1.1 },
       scenarios: [
@@ -5018,6 +5029,32 @@
       const when = daysOut === 0 ? 'TODAY' : daysOut === 1 ? 'TOMORROW' : `in ${daysOut}d`;
       const toneCol = t => t === 'bull' ? 'var(--accent-green)' : t === 'bear' ? 'var(--accent-red)' : '#D97706';
 
+      // Published consensus levels for this specific event, when the calendar
+      // entry carries them. These are externally-sourced reaction levels (the
+      // prices desks and the financial press are actually quoting into the
+      // print), which is a different thing from the ATR ladder computed above —
+      // the ladder is derived from our own volatility, these are where other
+      // people have said they will act. Sorted and marked relative to spot.
+      const evLevels = Array.isArray(ev.levels) && ev.levels.length
+        ? `<div class="rf-levels" style="margin-top:12px;padding:10px 12px;border:1px solid rgba(127,127,127,0.22);border-radius:8px;">
+             <div style="font-size:10px;font-weight:800;letter-spacing:1.1px;text-transform:uppercase;color:var(--text-tertiary);margin-bottom:7px;">Published consensus levels</div>
+             <div style="display:flex;flex-wrap:wrap;gap:8px;">
+               ${ev.levels.slice().sort((a, b) => a - b).map(L => {
+                 const above = L > price;
+                 const dist = Math.abs(L - price);
+                 const col = above ? 'var(--accent-green)' : 'var(--accent-red)';
+                 return `<span class="rf-tc" style="border-color:${col};color:${col};">
+                           ${above ? '↑' : '↓'} ${L.toLocaleString()}
+                           <span style="color:var(--text-tertiary);font-weight:500;"> ${Math.round(dist).toLocaleString()} pts${dist > 0 ? ` · ${(dist / atr).toFixed(1)}× ATR` : ''}</span>
+                         </span>`;
+               }).join('')}
+             </div>
+             <div style="margin-top:7px;font-size:10px;color:var(--text-tertiary);line-height:1.5;">
+               Externally sourced for this event — not computed from our feed, and stale once the print lands. Distances are from spot ${Math.round(price).toLocaleString()}.
+             </div>
+           </div>`
+        : '';
+
       return `
       <div class="rf-card">
         <div class="rf-head">
@@ -5052,6 +5089,7 @@
             <div class="rf-em-sub">vs normal daily ATR ~${Math.round(atr)} pts${compBoost}</div>
           </div>
         </div>
+        ${evLevels}
 
         <div class="rf-scenarios">
           ${pb.scenarios.map(s => `
@@ -5928,8 +5966,18 @@
   // ─── ENGULFING DETECTION ────────────────────────────────────────────────────
   // Bullish engulfing: a down candle followed by an up candle whose real body
   // completely covers the previous body (and is meaningfully sized). Highest-
-  // probability when it prints AT structure (VWAP, PDH/PDL, Asian range, round
-  // numbers) — a raw engulfing mid-range is noise.
+  // probability when it prints AT structure — a raw engulfing mid-range is noise.
+  //
+  // Level ordering here follows the evidence grades in
+  // research/trading-levels-and-closes (finding F2). Osler's NY Fed order-book
+  // work (9,655 real orders) is the only rigorous basis in this space and it
+  // supports ROUND NUMBERS strongly (stop/take-profit clustering); VWAP is
+  // supported structurally (institutional execution is routed to it). PDH/PDL
+  // grade C/D and the prior-day CLOSE grades D — no rigorous study, only
+  // uncited retail statistics. So round numbers and VWAP are checked FIRST and
+  // the weaker levels last, which matters because nearLevel() returns the first
+  // match: a pattern sitting at both a round number and PDL is now correctly
+  // attributed to the round number.
   function detectEngulfings(candles) {
     if (!candles || candles.length < 25) return [];
     const out = [];
@@ -5939,15 +5987,19 @@
       const tol = p * 0.0012; // ~0.12%
       const s = structState;
       const levels = [];
-      if (s.ok) {
-        if (s.vwap   !== null) levels.push(['VWAP', s.vwap]);
-        if (s.pdh    !== null) levels.push(['PDH',  s.pdh]);
-        if (s.pdl    !== null) levels.push(['PDL',  s.pdl]);
-        if (s.asianH !== null) levels.push(['Asia H', s.asianH]);
-        if (s.asianL !== null) levels.push(['Asia L', s.asianL]);
-      }
+      // Grade B+ — round numbers (Osler: stop/take-profit order clustering)
       const r100 = Math.round(p / 100) * 100, r50 = Math.round(p / 50) * 50;
       levels.push(['$' + r100, r100]); if (r50 !== r100) levels.push(['$' + r50, r50]);
+      // Grade B — VWAP (institutional execution benchmark)
+      if (s.ok && s.vwap !== null) levels.push(['VWAP', s.vwap]);
+      // Grade C/D — session and prior-day extremes; kept, but ranked below the
+      // evidenced levels rather than above them
+      if (s.ok) {
+        if (s.asianH !== null) levels.push(['Asia H', s.asianH]);
+        if (s.asianL !== null) levels.push(['Asia L', s.asianL]);
+        if (s.pdh    !== null) levels.push(['PDH',  s.pdh]);
+        if (s.pdl    !== null) levels.push(['PDL',  s.pdl]);
+      }
       for (const [name, lv] of levels) if (Math.abs(p - lv) <= tol) return name;
       return null;
     };
@@ -7048,6 +7100,17 @@
   // ─── DRIVER AUTO-TUNING ─────────────────────────────────────────────────────
   // The scorecard grades every driver every day. Once a driver has ≥30 graded
   // directional days, its bias weight is shaded by its measured hit rate.
+  // Gate raised from 30 → 200 after the research pass (research/daily-macro-signals,
+  // finding F3). At n=30 a 60% hit rate has p=0.18 under a coin-flip null, and
+  // because all 15 drivers are tested simultaneously every day, P(at least one
+  // spuriously boosted) = 0.95. In other words the tuner was firing on noise
+  // ~95% of the time it fired. n=80 is the single-driver p<0.05 threshold;
+  // n=200 is roughly what a multiple-testing correction across 15 drivers needs.
+  // It is also shrunk rather than stepped: the multiplier now scales with how
+  // far the observed rate sits from 50%, instead of snapping to 1.25/0.75 at an
+  // arbitrary cutoff. The equal-weight literature (F5) suggests deleting this
+  // entirely would also be defensible — this is the conservative middle.
+  const TUNER_MIN_N = 200;
   function driverTuningTable() {
     let led = [];
     try { led = biasLedgerLoad(); } catch (e) { return {}; }
@@ -7064,9 +7127,17 @@
     const out = {};
     for (const k in stat) {
       const s = stat[k];
-      if (s.n < 30) continue;
+      if (s.n < TUNER_MIN_N) continue;
       const r = s.hit / s.n;
-      out[k] = { mult: r >= 0.6 ? 1.25 : r <= 0.4 ? 0.75 : 1, rate: Math.round(r * 100), n: s.n };
+      // Shrinkage toward 50%: the weight of evidence grows with sample size, so
+      // the adjustment does too. At exactly n=TUNER_MIN_N the shrink factor is
+      // 0.5; it approaches 1 as n grows. Capped at ±25% either way so a single
+      // driver can never dominate the stack.
+      const shrink = Math.min(1, Math.sqrt(s.n / (s.n + TUNER_MIN_N)) * 1.415);
+      const raw = 1 + (r - 0.5) * 2 * 0.25 * shrink;
+      const mult = +Math.max(0.75, Math.min(1.25, raw)).toFixed(3);
+      if (Math.abs(mult - 1) < 0.02) continue;      // not worth reporting
+      out[k] = { mult, rate: Math.round(r * 100), n: s.n };
     }
     return out;
   }
@@ -7078,7 +7149,7 @@
     if (!st || !st.ok) return { ok: false, why: 'waiting for market data.' };
     const er = getEventRisk();
     if (er.level === 'high') return { ok: false, why: `red-folder day (${er.events.join(' · ')}) — stand down into the print, re-plan after the dust settles.` };
-    if (st.dir === 'wait') return { ok: false, why: `drivers net ${st.net > 0 ? '+' : ''}${st.net} of ±${st.wTot} — no directional bias today. Capital preserved is edge kept.` };
+    if (st.dir === 'wait') return { ok: false, why: `drivers net ${st.net > 0 ? '+' : ''}${st.net} of ±${st.wVote} voting weight — no directional bias today. Capital preserved is edge kept.` };
     const ms = st.struct;
     const L = st.dir === 'long';
     if (!ms) return { ok: false, why: 'daily structure still forming — no protected swing to lean on.' };
@@ -7343,7 +7414,19 @@
     const vs  = vixScore();
 
     const checks = [];
-    const add = (n, dir, w, detail, cluster) => checks.push({ n, dir, w, detail, cluster });
+    // `src` names the underlying DATA SERIES a driver reads. Two rows sharing a
+    // src are not two pieces of evidence — they're one fact counted twice, and
+    // the confidence number can't tell the difference unless we track it. See
+    // st.concentration below, which reports the largest single-series share of
+    // the vote so a 29%-of-the-stack dependency on DFII10 is visible instead
+    // of hiding inside "13 drivers agree".
+    const add = (n, dir, w, detail, cluster, src) => checks.push({ n, dir, w, detail, cluster, src });
+    // CONTEXT rows are structurally non-directional by design — a regime read
+    // or a volatility warning, not a call. They are displayed and they shape
+    // the narrative and the confidence modifier, but they carry w0 and are
+    // excluded from the vote, the confidence denominator and the cluster
+    // ratios, so they can never quietly drag a reading down or prop one up.
+    const addCtx = (n, detail, cluster, src) => checks.push({ n, dir: null, w: 0, detail, cluster, src, ctx: true });
     // Every driver belongs to one of 4 macro THEMES. The point of tagging
     // them is the synthesis step below: 15 independent weighted votes don't
     // "make sense together" on their own — grouping them lets us check
@@ -7353,9 +7436,30 @@
     // and lets risk/positioning act as modifiers on that core case rather
     // than just more votes in the same bucket.
     add('Real yields (master driver)', ry.bias === 'bull' ? 'long' : ry.bias === 'bear' ? 'short' : null, 3,
-        ry.level !== null ? ry.level.toFixed(2) + '% · ' + (ry.bias || 'neutral') : 'no data', 'rates');
-    add('Macro composite (TIPS·DXY·flows·seasonal)', md.isLong ? 'long' : md.isShort ? 'short' : null, 2,
-        md.macroScore + '/40 · ' + md.macroConf + '%', 'dollar');
+        ry.level !== null ? ry.level.toFixed(2) + '% · ' + (ry.bias || 'neutral') : 'no data', 'rates', 'DFII10');
+    // Structural demand & seasonality — what the old 'Macro composite' row is
+    // left with once the double-counted inputs are stripped out.
+    //
+    // The Analysis-tab composite (computeMacroScore) is real yields + DXY +
+    // seasonality + central-bank flows + VIX. FOUR of those five ALREADY vote
+    // on their own rows here: real yields (w3), real-yield momentum (w2), USD
+    // momentum (w1), VIX (w1). Feeding the composite in as an extra w2 vote
+    // meant one falling-real-yields print produced three long votes, and the
+    // "breadth" the confidence number reads was partly its own echo. Worse, it
+    // correlated the errors: whenever real yields were wrong, so was the
+    // composite, so the stack was less diversified than its 15 rows suggested.
+    //
+    // Kept here are only the two inputs nothing else votes on: WGC
+    // central-bank purchases (0–5) and the seasonal calendar (0–10). Weight is
+    // 1, not 2, because both are slow: the CB figure is quarterly-published and
+    // will read the same for months (a constant offset, not a daily signal),
+    // and the research pass graded seasonality poorly — sources contradict each
+    // other. It's a structural tilt, and it is now labelled as one.
+    const flowS = WGC_FLOWS.cb.score + macroSeasonalScore();     // 0–15
+    add('Structural demand & seasonality (CB flows · calendar)',
+        flowS >= 10 ? 'long' : flowS <= 6 ? 'short' : null, 1,
+        `${flowS}/15 · CB ${WGC_FLOWS.cb.figure} · ${monthSeasonLabel()} — slow-moving tilt, not a daily signal`,
+        'dollar', 'WGC');
     // Technicals — market structure and supply/demand ONLY (owner request:
     // "remove the rest to avoid noise"). No SMA trend, no PDC, no VWAP rows.
     const smap = structureMap(d1);
@@ -7364,7 +7468,7 @@
         ms && ms.confirmed ? 3 : 2,
         !ms ? 'forming' : (ms.trend === 'bull' ? 'bullish' : 'bearish')
           + (ms.confirmed ? ' · bos-confirmed' : ' · ChoCh only')
-          + (ms.protected ? ' · flips at ' + Math.round(ms.protected.price) : ''), 'positioning');
+          + (ms.protected ? ' · flips at ' + Math.round(ms.protected.price) : ''), 'positioning', 'XAU-1D');
     const nearZ = (smap.zones || [])
       .map(z => ({ z, d: px < z.lo ? z.lo - px : px > z.hi ? px - z.hi : 0 }))
       .filter(x => x.d <= atr * 0.5)
@@ -7372,31 +7476,55 @@
     add('Supply/Demand block (price location)', nearZ ? (nearZ.z.bull ? 'long' : 'short') : null, nearZ && nearZ.z.fresh ? 2 : 1,
         nearZ ? (nearZ.z.fresh ? 'UNMITIGATED ' : '') + (nearZ.z.bull ? 'demand' : 'supply') + ' ' + nearZ.z.lo.toFixed(0) + '–' + nearZ.z.hi.toFixed(0)
               + (nearZ.d === 0 ? ' · price inside' : ' · ' + nearZ.d.toFixed(0) + ' pts away')
-              : 'not at a block — no location edge', 'positioning');
-    add('Risk sentiment (VIX)', vs >= 5 ? 'long' : vs <= 3 ? 'short' : null, 1, vixLabel(), 'risk');
+              : 'not at a block — no location edge', 'positioning', 'XAU-1D');
+    add('Risk sentiment (VIX)', vs >= 5 ? 'long' : vs <= 3 ? 'short' : null, 1, vixLabel(), 'risk', 'VIX');
     add('Real-yield 1-wk momentum', ry.chg === null || ry.chg === undefined ? null : ry.chg <= -0.02 ? 'long' : ry.chg >= 0.02 ? 'short' : null, 2,
-        ry.chg === null || ry.chg === undefined ? 'no data' : (ry.chg >= 0 ? '+' : '') + Math.round(ry.chg * 100) + ' bps/wk', 'rates');
+        ry.chg === null || ry.chg === undefined ? 'no data' : (ry.chg >= 0 ? '+' : '') + Math.round(ry.chg * 100) + ' bps/wk' + ' · same series as the master driver (level vs change)', 'rates', 'DFII10');
     const be = fundX.breakeven;
     add('Inflation expectations (10Y breakeven)', !be || be.chg === null ? null : be.chg >= 0.02 ? 'long' : be.chg <= -0.02 ? 'short' : null, 1,
-        be ? be.level.toFixed(2) + '%' + (be.chg !== null ? ' · ' + (be.chg >= 0 ? '+' : '') + Math.round(be.chg * 100) + ' bps/wk' : '') : 'no data', 'rates');
+        be ? be.level.toFixed(2) + '%' + (be.chg !== null ? ' · ' + (be.chg >= 0 ? '+' : '') + Math.round(be.chg * 100) + ' bps/wk' : '') : 'no data', 'rates', 'T10YIE');
     const d2 = fundX.dgs2;
     add('Fed expectations (2Y yield trend)', !d2 ? null : d2.chg <= -0.03 ? 'long' : d2.chg >= 0.03 ? 'short' : null, 1,
-        d2 ? d2.level.toFixed(2) + '% · ' + (d2.chg >= 0 ? '+' : '') + Math.round(d2.chg * 100) + ' bps/wk' : 'no data', 'rates');
+        d2 ? d2.level.toFixed(2) + '% · ' + (d2.chg >= 0 ? '+' : '') + Math.round(d2.chg * 100) + ' bps/wk' : 'no data', 'rates', 'DGS2');
     const dm = fundX.dxyMom;
     add('USD 5-day momentum (ICE DXY)', !dm ? null : dm.chg <= -0.25 ? 'long' : dm.chg >= 0.25 ? 'short' : null, 1,
-        dm ? (dm.chg >= 0 ? '+' : '') + dm.chg.toFixed(2) + ' pts / 5 sessions' : 'no data', 'dollar');
+        dm ? (dm.chg >= 0 ? '+' : '') + dm.chg.toFixed(2) + ' pts / 5 sessions' : 'no data', 'dollar', 'DTWEXBGS');
+    // COT staleness decay (research/trading-levels-and-closes, finding F3).
+    // The report is collected Tuesday and published Friday, then sits unchanged
+    // until the next Friday — so by Thursday the engine's "positioning" input
+    // describes the market up to nine days ago, while being weighted like a
+    // same-day feed. Weight now decays with the age of the underlying survey.
     const ct = fundX.cot;
-    add('Funds positioning (COT managed money)', !ct || ct.pct >= 90 ? null : ct.chg4w > 5000 ? 'long' : ct.chg4w < -5000 ? 'short' : null, 1,
-        ct ? Math.round(ct.net / 1000) + 'k net · ' + (ct.chg4w >= 0 ? '+' : '') + Math.round(ct.chg4w / 1000) + 'k/4wk · ' + ct.pct + 'th pct' + (ct.pct >= 90 ? ' ⚠ crowded' : '') + (ct.oi ? ' · OI ' + (ct.oiChg4w >= 0 ? '↑' : '↓') : '') + ' · wk of ' + ct.asOf : 'no data (weekly, CFTC)', 'positioning');
+    const cotAgeDays = ct && ct.asOf ? Math.max(0, (Date.now() - Date.parse(ct.asOf)) / 86400e3) : null;
+    const cotW = cotAgeDays === null ? 1
+               : cotAgeDays <= 4 ? 1 : cotAgeDays <= 7 ? 0.6 : 0.3;
+    add('Funds positioning (COT managed money)', !ct || ct.pct >= 90 ? null : ct.chg4w > 5000 ? 'long' : ct.chg4w < -5000 ? 'short' : null, cotW,
+        ct ? Math.round(ct.net / 1000) + 'k net · ' + (ct.chg4w >= 0 ? '+' : '') + Math.round(ct.chg4w / 1000) + 'k/4wk · ' + ct.pct + 'th pct' + (ct.pct >= 90 ? ' ⚠ crowded' : '') + (ct.oi ? ' · OI ' + (ct.oiChg4w >= 0 ? '↑' : '↓') : '') + ' · wk of ' + ct.asOf + (cotAgeDays !== null && cotAgeDays > 4 ? ` · ${Math.round(cotAgeDays)}d stale → weight ${cotW}` : '') : 'no data (weekly, CFTC)', 'positioning', 'CFTC');
     const cv = fundX.curve;
     add('Yield curve (10Y–3M)', !cv ? null : cv.level < 0 ? 'long' : null, 1,
-        cv ? cv.level.toFixed(2) + '%' + (cv.level < 0 ? ' — inverted (recession hedge bid)' : ' — normal') : 'no data', 'rates');
+        cv ? cv.level.toFixed(2) + '%' + (cv.level < 0 ? ' — inverted (recession hedge bid)' : ' — normal') : 'no data', 'rates', 'T10Y3M');
     const hy = fundX.hy;
     add('Credit stress (HY spreads)', !hy ? null : hy.chg >= 0.08 ? 'long' : hy.chg <= -0.08 ? 'short' : null, 1,
-        hy ? hy.level.toFixed(2) + '% · ' + (hy.chg >= 0 ? '+' : '') + Math.round(hy.chg * 100) + ' bps/wk' + (hy.chg >= 0.08 ? ' — risk-off, haven bid' : '') : 'no data', 'risk');
+        hy ? hy.level.toFixed(2) + '% · ' + (hy.chg >= 0 ? '+' : '') + Math.round(hy.chg * 100) + ' bps/wk' + (hy.chg >= 0.08 ? ' — risk-off, haven bid' : '') : 'no data', 'risk', 'HY-OAS');
+    // Dollar Smile — demoted from a VOTE to a REGIME MODIFIER.
+    //
+    // dollarSmileRegime() is a deterministic function of dxyMom, HY spreads,
+    // DGS2, VIX, Fed swap lines and SOFR−EFFR. Five of those six already vote
+    // on their own rows above. It therefore contained no information the stack
+    // didn't already have — it was a *summary* of other votes being counted as
+    // a 15th independent one, which is the single clearest case of fake breadth
+    // in the engine (Grinold & Kahn's breadth term requires INDEPENDENT bets;
+    // re-voting a linear combination of existing ones inflates apparent
+    // conviction without adding any).
+    //
+    // What it is genuinely good at is saying which WORLD we're in, and that
+    // changes what a given net score is worth. So it now scales confidence
+    // (st.regimeMult below) and drives a narrative line, while contributing
+    // zero weight to the vote.
     const smile = dollarSmileRegime();
-    add('Dollar Smile regime (USD cycle)', smile ? smile.dir : null, 1,
-        smile ? smile.phase + ' · ' + smile.detail : 'no data', 'dollar');
+    addCtx('Dollar Smile regime (USD cycle)',
+        smile ? smile.phase + ' · ' + smile.detail + ' — regime context, scales confidence (no vote)' : 'no data',
+        'dollar', 'derived');
     // Eurozone growth pulse (OECD composite business confidence, Germany —
     // macro handbook ch.2/ch.4): confirms or denies the Dollar Smile's
     // "synchronized global growth" trough with an actual non-US growth read,
@@ -7405,7 +7533,7 @@
     // outperformance reasserting = gold headwind.
     const eu = fundX.euGrowth;
     add('Eurozone growth pulse (OECD composite, DE)', !eu || Math.abs(eu.chg) < 0.3 ? null : eu.chg > 0 ? 'long' : 'short', 1,
-        eu ? eu.level.toFixed(1) + ' · ' + (eu.chg >= 0 ? '+' : '') + eu.chg.toFixed(1) + ' vs prior release' : 'no data (monthly, OECD)', 'dollar');
+        eu ? eu.level.toFixed(1) + ' · ' + (eu.chg >= 0 ? '+' : '') + eu.chg.toFixed(1) + ' vs prior release' : 'no data (monthly, OECD)', 'dollar', 'OECD-DE');
     // Yen carry-unwind risk (ch.5): sharp JPY strength + elevated VIX is the
     // signature of a BoJ-normalization-driven carry unwind — a violent,
     // indiscriminate deleveraging across risk assets (gold included) before
@@ -7414,8 +7542,8 @@
     // call — same treatment as the Dollar Smile's own crisis phase.
     const jm = fundX.jpyMom, vx = vixState.val;
     const carryStress = jm && jm.pct <= -2 && vx !== null && vx >= 22;
-    add('Yen carry-unwind risk (BoJ/VIX)', null, 1,
-        !jm ? 'no data' : carryStress ? `USD/JPY ${jm.pct}% / 5d + VIX ${vx.toFixed(0)} — active unwind risk, expect violent two-way chop` : `USD/JPY ${jm.pct >= 0 ? '+' : ''}${jm.pct}% / 5d — calm`, 'risk');
+    addCtx('Yen carry-unwind risk (BoJ/VIX)',
+        !jm ? 'no data' : carryStress ? `USD/JPY ${jm.pct}% / 5d + VIX ${vx.toFixed(0)} — active unwind risk, expect violent two-way chop` : `USD/JPY ${jm.pct >= 0 ? '+' : ''}${jm.pct}% / 5d — calm`, 'risk', 'USDJPY');
 
     // auto-tuning: once a driver has ≥30 graded days in the scorecard ledger,
     // its weight is shaded by its real hit rate (≥60% → ×1.25, ≤40% → ×0.75)
@@ -7427,10 +7555,87 @@
         c.detail += ` · auto-tuned ${t.mult > 1 ? '↑' : '↓'} (${t.rate}% over ${t.n}d)`;
       }
     }
-    st.wTot = +checks.reduce((a, c) => a + c.w, 0).toFixed(1);
-    st.net  = +checks.reduce((a, c) => a + (c.dir === 'long' ? c.w : c.dir === 'short' ? -c.w : 0), 0).toFixed(1);
-    st.dir  = st.net >= 3 ? 'long' : st.net <= -3 ? 'short' : 'wait';
-    st.conf = Math.round(50 + Math.abs(st.net) / st.wTot * 50);
+    // Confidence denominator (research/daily-macro-signals, finding F2).
+    // Previously every driver's weight went into wTot regardless of whether it
+    // could vote, which had two bad effects:
+    //   1. 'Yen carry-unwind risk' is dir:null BY DESIGN (a volatility warning,
+    //      correctly not forced into a direction) — so it permanently dragged
+    //      every confidence reading down by sitting in the denominator forever.
+    //   2. A dead feed ('no data') did the same, making stated confidence
+    //      partly a function of feed uptime rather than of evidence.
+    // Now: wVote  = weight that was actually capable of voting today
+    //      wTot   = full stack weight, kept for display/context only
+    // 'no data' and 'neutral reading' remain distinguishable via c.detail.
+    // Context rows carry w0 and are excluded here, so coverage now measures
+    // exactly one thing — FEED HEALTH — instead of being permanently capped
+    // below 100% by rows that are non-directional on purpose.
+    const voters = checks.filter(c => !c.ctx);
+    st.wTot  = +voters.reduce((a, c) => a + c.w, 0).toFixed(1);
+    st.wVote = +voters.filter(c => c.dir !== null).reduce((a, c) => a + c.w, 0).toFixed(1);
+    st.net   = +voters.reduce((a, c) => a + (c.dir === 'long' ? c.w : c.dir === 'short' ? -c.w : 0), 0).toFixed(1);
+    // Direction threshold is now PROPORTIONAL, not an absolute ±3. An absolute
+    // cutoff meant a degraded-feed day (net 3 of 10 = 30%) produced the same
+    // verdict as a healthy day (net 3 of 22 = 14%) on far thinner evidence.
+    const share = st.wVote > 0 ? st.net / st.wVote : 0;
+    st.dir  = share >= 0.15 ? 'long' : share <= -0.15 ? 'short' : 'wait';
+    // Coverage means FEED HEALTH only. It used to be wVote/wTot, which conflated
+    // two different things: a dead feed and a live feed reading neutral. A row
+    // saying "not at a block — no location edge" is the engine working, not the
+    // engine blind, and it shouldn't look like an outage. Only rows that failed
+    // to get data count against coverage.
+    const deadW = voters.filter(c => /no data/.test(c.detail || '')).reduce((a, c) => a + c.w, 0);
+    st.coverage = st.wTot > 0 ? Math.round((st.wTot - deadW) / st.wTot * 100) : 0;
+    st.deadW = +deadW.toFixed(1);
+
+    // SOURCE CONCENTRATION — how much of today's vote rests on one data series.
+    // Real yields (level) and real-yield momentum are both DFII10; daily
+    // structure and the S/D block are both the same 1d candle series. Those are
+    // legitimate pairs — a level and its rate of change are different facts —
+    // but they are NOT independent, and a stack whose vote is 30% one series is
+    // far less diversified than a count of its rows implies. Reported, not
+    // silently corrected: the honest move is to make the dependency visible.
+    const bySrc = {};
+    for (const c of voters) {
+      if (c.dir === null || !c.src) continue;
+      bySrc[c.src] = (bySrc[c.src] || 0) + c.w;
+    }
+    const topSrc = Object.entries(bySrc).sort((a, b) => b[1] - a[1])[0];
+    st.concentration = topSrc && st.wVote > 0
+      ? { src: topSrc[0], w: +topSrc[1].toFixed(1), pct: Math.round(topSrc[1] / st.wVote * 100) }
+      : null;
+
+    // REGIME MODIFIER (replaces the Dollar Smile's old vote). The same net
+    // score is worth different amounts in different dollar worlds:
+    //   left   (funding stress) — everything correlates to 1 and directional
+    //                            reads are fragile → discount whichever way
+    //   right  (US outperformance) — a structural gold headwind: discount longs,
+    //                            reinforce shorts
+    //   trough (synchronized growth, USD offered) — the mirror image
+    //   mid    — no dominant USD force, no adjustment
+    // It scales the CONFIDENCE EXCESS over 50 rather than the net score, so it
+    // can never flip the direction — a modifier, not a vote.
+    st.regime = smile ? smile.phase : null;
+    st.regimeMult = 1;
+    st.regimeNote = '';
+    if (smile && st.dir !== 'wait') {
+      const L = st.dir === 'long';
+      if (smile.phase === 'left') {
+        st.regimeMult = 0.8;
+        st.regimeNote = 'funding-stress regime — correlations converge, discounting conviction 20%';
+      } else if (smile.phase === 'right') {
+        st.regimeMult = L ? 0.85 : 1.1;
+        st.regimeNote = L ? 'US-outperformance regime works against this long — conviction cut 15%'
+                          : 'US-outperformance regime reinforces this short — conviction +10%';
+      } else if (smile.phase === 'trough') {
+        st.regimeMult = L ? 1.1 : 0.85;
+        st.regimeNote = L ? 'weak-dollar trough reinforces this long — conviction +10%'
+                          : 'weak-dollar trough works against this short — conviction cut 15%';
+      }
+    }
+    st.confRaw = st.wVote > 0 ? Math.round(50 + Math.abs(share) * 50) : 50;
+    st.conf = st.wVote > 0
+      ? Math.max(50, Math.min(95, Math.round(50 + Math.abs(share) * 50 * st.regimeMult)))
+      : 50;
     st.checks = checks;
 
     // ─── MACRO SYNTHESIS ────────────────────────────────────────────────────
@@ -7446,9 +7651,10 @@
     for (const key in CLUSTER_LABELS) clusters[key] = { key, label: CLUSTER_LABELS[key], wTot: 0, net: 0, members: [] };
     for (const c of checks) {
       const cl = clusters[c.cluster] || clusters.positioning;
+      cl.members.push(c);
+      if (c.ctx) continue;             // context rows sit in the cluster for display only
       cl.wTot += c.w;
       cl.net  += c.dir === 'long' ? c.w : c.dir === 'short' ? -c.w : 0;
-      cl.members.push(c);
     }
     for (const key in clusters) {
       const cl = clusters[key];
@@ -7470,9 +7676,15 @@
     if (dollarC.dir !== 'mixed') {
       const agrees = rates.dir !== 'mixed' && dollarC.dir === rates.dir;
       const conflicts = rates.dir !== 'mixed' && dollarC.dir !== rates.dir;
-      lines.push(`<strong>The dollar side ${agrees ? 'confirms it' : conflicts ? 'is fighting the rates story' : 'adds its own lean'}</strong>: DXY momentum, the Dollar Smile phase and the Eurozone growth pulse net out ${say(dollarC.dir)}${agrees ? ' — two independent macro complexes pointing the same way is a stronger case than either alone' : conflicts ? ' — when rates and the dollar disagree, the net score can still clear threshold on breadth without real conviction behind it' : ''}.`);
+      lines.push(`<strong>The dollar side ${agrees ? 'confirms it' : conflicts ? 'is fighting the rates story' : 'adds its own lean'}</strong>: DXY momentum, the Eurozone growth pulse and structural CB demand net out ${say(dollarC.dir)}${agrees ? ' — two independent macro complexes pointing the same way is a stronger case than either alone' : conflicts ? ' — when rates and the dollar disagree, the net score can still clear threshold on breadth without real conviction behind it' : ''}.`);
     } else {
-      lines.push(`<strong>The dollar side is directionless</strong> — DXY momentum, the Dollar Smile phase and the Eurozone growth pulse aren't lined up with each other.`);
+      lines.push(`<strong>The dollar side is directionless</strong> — DXY momentum, the Eurozone growth pulse and structural CB demand aren't lined up with each other.`);
+    }
+
+    if (smile) {
+      lines.push(`<strong>Which dollar world we're in:</strong> the Dollar Smile reads <strong>${smile.phase}</strong> — ${smile.detail}. ${st.regimeNote
+        ? 'It doesn\'t get a vote (it\'s built from the same DXY, credit and VIX feeds already counted above), but it sets what a given score is worth: ' + st.regimeNote + '.'
+        : 'No adjustment applied today.'}`);
     }
 
     if (carryStress) {
@@ -7494,9 +7706,13 @@
     const coherent = rates.dir !== 'mixed' && dollarC.dir !== 'mixed' && rates.dir === dollarC.dir;
     st.coherent = coherent;
     if (st.dir !== 'wait') {
-      lines.push(coherent
-        ? `<em>Coherent case: rates and dollar agree, so the ${st.conf}% confidence reflects real conviction, not just breadth.</em>`
-        : `<em>Mixed case: the ${st.conf}% confidence is driven more by breadth of small signals than by rates and dollar agreeing — size accordingly.</em>`);
+      const conc = st.concentration && st.concentration.pct >= 25
+        ? ` Note the concentration: <strong>${st.concentration.pct}%</strong> of today's vote comes from one data series (${st.concentration.src}) — the row count overstates how many independent things agree.`
+        : '';
+      lines.push((coherent
+        ? `<em>Coherent case: rates and dollar agree, so the ${st.conf}% confidence reflects real conviction, not just breadth.`
+        : `<em>Mixed case: the ${st.conf}% confidence is driven more by breadth of small signals than by rates and dollar agreeing — size accordingly.`)
+        + conc + '</em>');
     }
     st.narrative = lines.join(' ');
     st.struct = ms;                                   // daily structure state for the trade planner
@@ -7645,7 +7861,10 @@
     if (banner) banner.className = `desk-banner ${st.dir}`;
     setEl('bias-arrow', isL ? '↑' : isS ? '↓' : '→');
     setEl('bias-word',  isL ? 'LONG' : isS ? 'SHORT' : 'NEUTRAL');
-    setEl('bias-conf',  st.conf + '% confidence · net ' + (st.net > 0 ? '+' : '') + st.net + ' of ±' + st.wTot);
+    setEl('bias-conf',  st.conf + '% confidence · net ' + (st.net > 0 ? '+' : '') + st.net + ' of ±' + st.wVote + ' voting weight'
+      + (st.coverage < 100 ? ' · ' + st.coverage + '% feed coverage' : '')
+      + (st.regimeMult && st.regimeMult !== 1 ? ' · ' + st.regime + ' regime ×' + st.regimeMult : '')
+      + (st.concentration && st.concentration.pct >= 25 ? ' · ' + st.concentration.pct + '% on ' + st.concentration.src : ''));
 
     const ez = st.entryZone, tz = st.targetZone;
     setEl('bias-zone',   ez ? ez.lo.toFixed(0) + '–' + ez.hi.toFixed(0) : '—');
@@ -7676,19 +7895,19 @@
       setH('bias-checks', Object.values(st.clusters).filter(cl => cl.members.length).map(cl => `
         <div class="level-row-group-title" style="font-size:10px;font-weight:800;letter-spacing:0.8px;text-transform:uppercase;color:var(--text-tertiary);margin:10px 0 4px;">${cl.label}</div>
         ${cl.members.map(c => `
-          <div class="level-row">
-            <span class="level-row-tag ${c.dir === 'long' ? 'sup' : c.dir === 'short' ? 'res' : 'key'}">${c.dir === 'long' ? '▲' : c.dir === 'short' ? '▼' : '—'}</span>
+          <div class="level-row"${c.ctx ? ' style="opacity:0.72;"' : ''}>
+            <span class="level-row-tag ${c.ctx ? 'key' : c.dir === 'long' ? 'sup' : c.dir === 'short' ? 'res' : 'key'}">${c.ctx ? 'ctx' : c.dir === 'long' ? '▲' : c.dir === 'short' ? '▼' : '—'}</span>
             <span class="level-row-name">${c.n}</span>
             <span class="level-row-price" style="font-size:11px;">${c.detail}</span>
-            <span class="level-row-dist">w${c.w}</span>
+            <span class="level-row-dist">${c.ctx ? 'no vote' : 'w' + c.w}</span>
           </div>`).join('')}`).join(''));
     } else {
       setH('bias-checks', st.checks.map(c => `
-        <div class="level-row">
-          <span class="level-row-tag ${c.dir === 'long' ? 'sup' : c.dir === 'short' ? 'res' : 'key'}">${c.dir === 'long' ? '▲' : c.dir === 'short' ? '▼' : '—'}</span>
+        <div class="level-row"${c.ctx ? ' style="opacity:0.72;"' : ''}>
+          <span class="level-row-tag ${c.ctx ? 'key' : c.dir === 'long' ? 'sup' : c.dir === 'short' ? 'res' : 'key'}">${c.ctx ? 'ctx' : c.dir === 'long' ? '▲' : c.dir === 'short' ? '▼' : '—'}</span>
           <span class="level-row-name">${c.n}</span>
           <span class="level-row-price" style="font-size:11px;">${c.detail}</span>
-          <span class="level-row-dist">w${c.w}</span>
+          <span class="level-row-dist">${c.ctx ? 'no vote' : 'w' + c.w}</span>
         </div>`).join(''));
     }
 
@@ -7705,7 +7924,7 @@
     } else if (isL || isS) {
       pb = `Bias is ${isL ? 'LONG' : 'SHORT'} (${st.conf}%), but no reaction zone is mapped on the entry side — either trade structure levels from the EG desks or wait for price to build one.`;
     } else {
-      pb = `Drivers disagree (net ${st.net > 0 ? '+' : ''}${st.net} of ±${st.wTot}) — <strong>no daily bias</strong>. Chop protocol: trade only A-grade EG signals printed inside a reaction zone, at half size, or stand aside. Capital preserved is edge kept.`;
+      pb = `Drivers disagree (net ${st.net > 0 ? '+' : ''}${st.net} of ±${st.wVote} voting weight) — <strong>no daily bias</strong>. Chop protocol: trade only A-grade EG signals printed inside a reaction zone, at half size, or stand aside. Capital preserved is edge kept.`;
     }
     setH('bias-playbook', pb);
     try { renderTradePlan(st); } catch (e) { console.warn('trade plan failed:', e.message); }
@@ -8385,9 +8604,21 @@
     return `  ·  Real-yield ${word} (${realYield.dir})`;
   }
 
+  // Seasonal calendar score (0–10), shared by the Analysis-tab composite and
+  // the Daily Bias 'Structural demand & seasonality' driver so there is one
+  // definition of gold's seasonal tilt rather than two that can drift apart.
+  function macroSeasonalScore() {
+    const m = new Date().getMonth();
+    return [10, 11, 0, 1].includes(m) ? 9 : [2, 5].includes(m) ? 5 : 7;
+  }
+  function monthSeasonLabel() {
+    const m = new Date().getMonth();
+    const name = new Date().toLocaleDateString('en-US', { month: 'short' });
+    return name + ' ' + ([10, 11, 0, 1].includes(m) ? 'seasonally strong' : [2, 5].includes(m) ? 'seasonally weak' : 'seasonally neutral');
+  }
+
   function computeMacroScore() {
     const dxy   = parseFloat(document.getElementById('dxyPrice')?.textContent)  || 104;
-    const month = new Date().getMonth();
     // Factor 1 (MASTER): Real yields — level + direction, 0-10 from the engine.
     // Falls back to a level-only estimate before FRED data lands.
     let tipsS;
@@ -8400,7 +8631,7 @@
     // Factor 2: DXY (lower = bullish for gold) — the other cyclical driver
     const dxyS  = dxy <= 96 ? 10 : dxy <= 100 ? 8 : dxy <= 104 ? 6 : dxy <= 108 ? 4 : 2;
     // Factor 3: Seasonal pattern (Nov/Dec/Jan/Feb strong; Mar/Jun weak)
-    const seasS = [10,11,0,1].includes(month) ? 9 : [2,5].includes(month) ? 5 : 7;
+    const seasS = macroSeasonalScore();
     // Factor 4: Central-bank flows — anchored to the latest WGC published data
     // (see WGC_FLOWS) rather than a hardcoded assumption. Moderate weight so
     // the CYCLICAL drivers above still determine direction.
