@@ -24,16 +24,37 @@ Single-file gold trading platform: everything lives in `gold-trading.html`
 
 ## Macro driver stack
 
-15 weighted drivers feed `computeDailyBias()` (real yields, macro composite,
-daily structure, S/D block location, VIX, real-yield momentum, breakeven,
-2Y, DXY momentum, COT, yield curve, HY spreads, Dollar Smile regime,
-Eurozone growth pulse, Yen carry-unwind risk). The last three are mined
-from an institutional macro handbook the owner supplied (Dollar Smile
-theory, global dollar liquidity, Germany/Eurozone, Japan) — see
-`dollarSmileRegime()`, and the `fundX.euGrowth` / `fundX.jpyMom` / `fundX.sofr`
-fetches in `refreshFundamentalsX()`. The Yen carry-unwind row is
-deliberately always `dir: null` (a volatility warning, not a directional
-call) — don't "fix" it to always vote a direction.
+15 rows feed `computeDailyBias()` — **13 voting drivers + 2 context rows**.
+Voting: real yields, structural demand & seasonality, daily structure, S/D
+block location, VIX, real-yield momentum, breakeven, 2Y, DXY momentum, COT,
+yield curve, HY spreads, Eurozone growth pulse. Several are mined from an
+institutional macro handbook the owner supplied (Dollar Smile theory, global
+dollar liquidity, Germany/Eurozone, Japan) — see `dollarSmileRegime()` and
+the `fundX.euGrowth` / `fundX.jpyMom` / `fundX.sofr` fetches in
+`refreshFundamentalsX()`.
+
+### Rules that must not be "fixed" away
+
+- **Context rows** (`addCtx`, `ctx: true`, `w: 0`) are non-directional **by
+  design** and are excluded from `wVote`, `wTot`, coverage and cluster
+  ratios. Two exist: **Yen carry-unwind risk** (a volatility warning — don't
+  make it vote a direction) and **Dollar Smile regime**.
+- **Dollar Smile is a regime MODIFIER, not a vote.** It is a deterministic
+  function of DXY momentum, HY spreads, DGS2, VIX, swap lines and SOFR−EFFR
+  — five of which already vote on their own rows — so voting it too was
+  double-counting dressed as independent breadth. It now scales
+  `st.regimeMult` (0.8 stress / ±0.85–1.1 aligned-or-not) which multiplies
+  the confidence **excess over 50**, so it can never flip `st.dir`.
+- **`src` on every voting row** names the underlying data series.
+  `st.concentration` reports the largest single-series share of the vote
+  (currently ~33% on DFII10) and is surfaced in the confidence line — the
+  dependency is disclosed, not silently corrected.
+- **`st.coverage` means feed health only** — weight lost to rows whose
+  detail says `no data`. A live feed reading neutral must not count as an
+  outage.
+- The Analysis-tab composite (`computeMacroScore`) still contains real
+  yields + DXY + VIX; the Daily Bias driver deliberately keeps only the
+  orthogonal slice (WGC central-bank flows + `macroSeasonalScore()`).
 
 ## Conventions
 

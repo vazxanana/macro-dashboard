@@ -7414,7 +7414,19 @@
     const vs  = vixScore();
 
     const checks = [];
-    const add = (n, dir, w, detail, cluster) => checks.push({ n, dir, w, detail, cluster });
+    // `src` names the underlying DATA SERIES a driver reads. Two rows sharing a
+    // src are not two pieces of evidence — they're one fact counted twice, and
+    // the confidence number can't tell the difference unless we track it. See
+    // st.concentration below, which reports the largest single-series share of
+    // the vote so a 29%-of-the-stack dependency on DFII10 is visible instead
+    // of hiding inside "13 drivers agree".
+    const add = (n, dir, w, detail, cluster, src) => checks.push({ n, dir, w, detail, cluster, src });
+    // CONTEXT rows are structurally non-directional by design — a regime read
+    // or a volatility warning, not a call. They are displayed and they shape
+    // the narrative and the confidence modifier, but they carry w0 and are
+    // excluded from the vote, the confidence denominator and the cluster
+    // ratios, so they can never quietly drag a reading down or prop one up.
+    const addCtx = (n, detail, cluster, src) => checks.push({ n, dir: null, w: 0, detail, cluster, src, ctx: true });
     // Every driver belongs to one of 4 macro THEMES. The point of tagging
     // them is the synthesis step below: 15 independent weighted votes don't
     // "make sense together" on their own — grouping them lets us check
@@ -7424,9 +7436,30 @@
     // and lets risk/positioning act as modifiers on that core case rather
     // than just more votes in the same bucket.
     add('Real yields (master driver)', ry.bias === 'bull' ? 'long' : ry.bias === 'bear' ? 'short' : null, 3,
-        ry.level !== null ? ry.level.toFixed(2) + '% · ' + (ry.bias || 'neutral') : 'no data', 'rates');
-    add('Macro composite (TIPS·DXY·flows·seasonal)', md.isLong ? 'long' : md.isShort ? 'short' : null, 2,
-        md.macroScore + '/40 · ' + md.macroConf + '%', 'dollar');
+        ry.level !== null ? ry.level.toFixed(2) + '% · ' + (ry.bias || 'neutral') : 'no data', 'rates', 'DFII10');
+    // Structural demand & seasonality — what the old 'Macro composite' row is
+    // left with once the double-counted inputs are stripped out.
+    //
+    // The Analysis-tab composite (computeMacroScore) is real yields + DXY +
+    // seasonality + central-bank flows + VIX. FOUR of those five ALREADY vote
+    // on their own rows here: real yields (w3), real-yield momentum (w2), USD
+    // momentum (w1), VIX (w1). Feeding the composite in as an extra w2 vote
+    // meant one falling-real-yields print produced three long votes, and the
+    // "breadth" the confidence number reads was partly its own echo. Worse, it
+    // correlated the errors: whenever real yields were wrong, so was the
+    // composite, so the stack was less diversified than its 15 rows suggested.
+    //
+    // Kept here are only the two inputs nothing else votes on: WGC
+    // central-bank purchases (0–5) and the seasonal calendar (0–10). Weight is
+    // 1, not 2, because both are slow: the CB figure is quarterly-published and
+    // will read the same for months (a constant offset, not a daily signal),
+    // and the research pass graded seasonality poorly — sources contradict each
+    // other. It's a structural tilt, and it is now labelled as one.
+    const flowS = WGC_FLOWS.cb.score + macroSeasonalScore();     // 0–15
+    add('Structural demand & seasonality (CB flows · calendar)',
+        flowS >= 10 ? 'long' : flowS <= 6 ? 'short' : null, 1,
+        `${flowS}/15 · CB ${WGC_FLOWS.cb.figure} · ${monthSeasonLabel()} — slow-moving tilt, not a daily signal`,
+        'dollar', 'WGC');
     // Technicals — market structure and supply/demand ONLY (owner request:
     // "remove the rest to avoid noise"). No SMA trend, no PDC, no VWAP rows.
     const smap = structureMap(d1);
@@ -7435,7 +7468,7 @@
         ms && ms.confirmed ? 3 : 2,
         !ms ? 'forming' : (ms.trend === 'bull' ? 'bullish' : 'bearish')
           + (ms.confirmed ? ' · bos-confirmed' : ' · ChoCh only')
-          + (ms.protected ? ' · flips at ' + Math.round(ms.protected.price) : ''), 'positioning');
+          + (ms.protected ? ' · flips at ' + Math.round(ms.protected.price) : ''), 'positioning', 'XAU-1D');
     const nearZ = (smap.zones || [])
       .map(z => ({ z, d: px < z.lo ? z.lo - px : px > z.hi ? px - z.hi : 0 }))
       .filter(x => x.d <= atr * 0.5)
@@ -7443,19 +7476,19 @@
     add('Supply/Demand block (price location)', nearZ ? (nearZ.z.bull ? 'long' : 'short') : null, nearZ && nearZ.z.fresh ? 2 : 1,
         nearZ ? (nearZ.z.fresh ? 'UNMITIGATED ' : '') + (nearZ.z.bull ? 'demand' : 'supply') + ' ' + nearZ.z.lo.toFixed(0) + '–' + nearZ.z.hi.toFixed(0)
               + (nearZ.d === 0 ? ' · price inside' : ' · ' + nearZ.d.toFixed(0) + ' pts away')
-              : 'not at a block — no location edge', 'positioning');
-    add('Risk sentiment (VIX)', vs >= 5 ? 'long' : vs <= 3 ? 'short' : null, 1, vixLabel(), 'risk');
+              : 'not at a block — no location edge', 'positioning', 'XAU-1D');
+    add('Risk sentiment (VIX)', vs >= 5 ? 'long' : vs <= 3 ? 'short' : null, 1, vixLabel(), 'risk', 'VIX');
     add('Real-yield 1-wk momentum', ry.chg === null || ry.chg === undefined ? null : ry.chg <= -0.02 ? 'long' : ry.chg >= 0.02 ? 'short' : null, 2,
-        ry.chg === null || ry.chg === undefined ? 'no data' : (ry.chg >= 0 ? '+' : '') + Math.round(ry.chg * 100) + ' bps/wk', 'rates');
+        ry.chg === null || ry.chg === undefined ? 'no data' : (ry.chg >= 0 ? '+' : '') + Math.round(ry.chg * 100) + ' bps/wk' + ' · same series as the master driver (level vs change)', 'rates', 'DFII10');
     const be = fundX.breakeven;
     add('Inflation expectations (10Y breakeven)', !be || be.chg === null ? null : be.chg >= 0.02 ? 'long' : be.chg <= -0.02 ? 'short' : null, 1,
-        be ? be.level.toFixed(2) + '%' + (be.chg !== null ? ' · ' + (be.chg >= 0 ? '+' : '') + Math.round(be.chg * 100) + ' bps/wk' : '') : 'no data', 'rates');
+        be ? be.level.toFixed(2) + '%' + (be.chg !== null ? ' · ' + (be.chg >= 0 ? '+' : '') + Math.round(be.chg * 100) + ' bps/wk' : '') : 'no data', 'rates', 'T10YIE');
     const d2 = fundX.dgs2;
     add('Fed expectations (2Y yield trend)', !d2 ? null : d2.chg <= -0.03 ? 'long' : d2.chg >= 0.03 ? 'short' : null, 1,
-        d2 ? d2.level.toFixed(2) + '% · ' + (d2.chg >= 0 ? '+' : '') + Math.round(d2.chg * 100) + ' bps/wk' : 'no data', 'rates');
+        d2 ? d2.level.toFixed(2) + '% · ' + (d2.chg >= 0 ? '+' : '') + Math.round(d2.chg * 100) + ' bps/wk' : 'no data', 'rates', 'DGS2');
     const dm = fundX.dxyMom;
     add('USD 5-day momentum (ICE DXY)', !dm ? null : dm.chg <= -0.25 ? 'long' : dm.chg >= 0.25 ? 'short' : null, 1,
-        dm ? (dm.chg >= 0 ? '+' : '') + dm.chg.toFixed(2) + ' pts / 5 sessions' : 'no data', 'dollar');
+        dm ? (dm.chg >= 0 ? '+' : '') + dm.chg.toFixed(2) + ' pts / 5 sessions' : 'no data', 'dollar', 'DTWEXBGS');
     // COT staleness decay (research/trading-levels-and-closes, finding F3).
     // The report is collected Tuesday and published Friday, then sits unchanged
     // until the next Friday — so by Thursday the engine's "positioning" input
@@ -7466,16 +7499,32 @@
     const cotW = cotAgeDays === null ? 1
                : cotAgeDays <= 4 ? 1 : cotAgeDays <= 7 ? 0.6 : 0.3;
     add('Funds positioning (COT managed money)', !ct || ct.pct >= 90 ? null : ct.chg4w > 5000 ? 'long' : ct.chg4w < -5000 ? 'short' : null, cotW,
-        ct ? Math.round(ct.net / 1000) + 'k net · ' + (ct.chg4w >= 0 ? '+' : '') + Math.round(ct.chg4w / 1000) + 'k/4wk · ' + ct.pct + 'th pct' + (ct.pct >= 90 ? ' ⚠ crowded' : '') + (ct.oi ? ' · OI ' + (ct.oiChg4w >= 0 ? '↑' : '↓') : '') + ' · wk of ' + ct.asOf + (cotAgeDays !== null && cotAgeDays > 4 ? ` · ${Math.round(cotAgeDays)}d stale → weight ${cotW}` : '') : 'no data (weekly, CFTC)', 'positioning');
+        ct ? Math.round(ct.net / 1000) + 'k net · ' + (ct.chg4w >= 0 ? '+' : '') + Math.round(ct.chg4w / 1000) + 'k/4wk · ' + ct.pct + 'th pct' + (ct.pct >= 90 ? ' ⚠ crowded' : '') + (ct.oi ? ' · OI ' + (ct.oiChg4w >= 0 ? '↑' : '↓') : '') + ' · wk of ' + ct.asOf + (cotAgeDays !== null && cotAgeDays > 4 ? ` · ${Math.round(cotAgeDays)}d stale → weight ${cotW}` : '') : 'no data (weekly, CFTC)', 'positioning', 'CFTC');
     const cv = fundX.curve;
     add('Yield curve (10Y–3M)', !cv ? null : cv.level < 0 ? 'long' : null, 1,
-        cv ? cv.level.toFixed(2) + '%' + (cv.level < 0 ? ' — inverted (recession hedge bid)' : ' — normal') : 'no data', 'rates');
+        cv ? cv.level.toFixed(2) + '%' + (cv.level < 0 ? ' — inverted (recession hedge bid)' : ' — normal') : 'no data', 'rates', 'T10Y3M');
     const hy = fundX.hy;
     add('Credit stress (HY spreads)', !hy ? null : hy.chg >= 0.08 ? 'long' : hy.chg <= -0.08 ? 'short' : null, 1,
-        hy ? hy.level.toFixed(2) + '% · ' + (hy.chg >= 0 ? '+' : '') + Math.round(hy.chg * 100) + ' bps/wk' + (hy.chg >= 0.08 ? ' — risk-off, haven bid' : '') : 'no data', 'risk');
+        hy ? hy.level.toFixed(2) + '% · ' + (hy.chg >= 0 ? '+' : '') + Math.round(hy.chg * 100) + ' bps/wk' + (hy.chg >= 0.08 ? ' — risk-off, haven bid' : '') : 'no data', 'risk', 'HY-OAS');
+    // Dollar Smile — demoted from a VOTE to a REGIME MODIFIER.
+    //
+    // dollarSmileRegime() is a deterministic function of dxyMom, HY spreads,
+    // DGS2, VIX, Fed swap lines and SOFR−EFFR. Five of those six already vote
+    // on their own rows above. It therefore contained no information the stack
+    // didn't already have — it was a *summary* of other votes being counted as
+    // a 15th independent one, which is the single clearest case of fake breadth
+    // in the engine (Grinold & Kahn's breadth term requires INDEPENDENT bets;
+    // re-voting a linear combination of existing ones inflates apparent
+    // conviction without adding any).
+    //
+    // What it is genuinely good at is saying which WORLD we're in, and that
+    // changes what a given net score is worth. So it now scales confidence
+    // (st.regimeMult below) and drives a narrative line, while contributing
+    // zero weight to the vote.
     const smile = dollarSmileRegime();
-    add('Dollar Smile regime (USD cycle)', smile ? smile.dir : null, 1,
-        smile ? smile.phase + ' · ' + smile.detail : 'no data', 'dollar');
+    addCtx('Dollar Smile regime (USD cycle)',
+        smile ? smile.phase + ' · ' + smile.detail + ' — regime context, scales confidence (no vote)' : 'no data',
+        'dollar', 'derived');
     // Eurozone growth pulse (OECD composite business confidence, Germany —
     // macro handbook ch.2/ch.4): confirms or denies the Dollar Smile's
     // "synchronized global growth" trough with an actual non-US growth read,
@@ -7484,7 +7533,7 @@
     // outperformance reasserting = gold headwind.
     const eu = fundX.euGrowth;
     add('Eurozone growth pulse (OECD composite, DE)', !eu || Math.abs(eu.chg) < 0.3 ? null : eu.chg > 0 ? 'long' : 'short', 1,
-        eu ? eu.level.toFixed(1) + ' · ' + (eu.chg >= 0 ? '+' : '') + eu.chg.toFixed(1) + ' vs prior release' : 'no data (monthly, OECD)', 'dollar');
+        eu ? eu.level.toFixed(1) + ' · ' + (eu.chg >= 0 ? '+' : '') + eu.chg.toFixed(1) + ' vs prior release' : 'no data (monthly, OECD)', 'dollar', 'OECD-DE');
     // Yen carry-unwind risk (ch.5): sharp JPY strength + elevated VIX is the
     // signature of a BoJ-normalization-driven carry unwind — a violent,
     // indiscriminate deleveraging across risk assets (gold included) before
@@ -7493,8 +7542,8 @@
     // call — same treatment as the Dollar Smile's own crisis phase.
     const jm = fundX.jpyMom, vx = vixState.val;
     const carryStress = jm && jm.pct <= -2 && vx !== null && vx >= 22;
-    add('Yen carry-unwind risk (BoJ/VIX)', null, 1,
-        !jm ? 'no data' : carryStress ? `USD/JPY ${jm.pct}% / 5d + VIX ${vx.toFixed(0)} — active unwind risk, expect violent two-way chop` : `USD/JPY ${jm.pct >= 0 ? '+' : ''}${jm.pct}% / 5d — calm`, 'risk');
+    addCtx('Yen carry-unwind risk (BoJ/VIX)',
+        !jm ? 'no data' : carryStress ? `USD/JPY ${jm.pct}% / 5d + VIX ${vx.toFixed(0)} — active unwind risk, expect violent two-way chop` : `USD/JPY ${jm.pct >= 0 ? '+' : ''}${jm.pct}% / 5d — calm`, 'risk', 'USDJPY');
 
     // auto-tuning: once a driver has ≥30 graded days in the scorecard ledger,
     // its weight is shaded by its real hit rate (≥60% → ×1.25, ≤40% → ×0.75)
@@ -7517,18 +7566,76 @@
     // Now: wVote  = weight that was actually capable of voting today
     //      wTot   = full stack weight, kept for display/context only
     // 'no data' and 'neutral reading' remain distinguishable via c.detail.
-    const isWarning = c => c.n.startsWith('Yen carry-unwind');   // structurally non-directional
-    st.wTot  = +checks.reduce((a, c) => a + c.w, 0).toFixed(1);
-    st.wVote = +checks.filter(c => !isWarning(c) && c.dir !== null)
-                      .reduce((a, c) => a + c.w, 0).toFixed(1);
-    st.net   = +checks.reduce((a, c) => a + (c.dir === 'long' ? c.w : c.dir === 'short' ? -c.w : 0), 0).toFixed(1);
+    // Context rows carry w0 and are excluded here, so coverage now measures
+    // exactly one thing — FEED HEALTH — instead of being permanently capped
+    // below 100% by rows that are non-directional on purpose.
+    const voters = checks.filter(c => !c.ctx);
+    st.wTot  = +voters.reduce((a, c) => a + c.w, 0).toFixed(1);
+    st.wVote = +voters.filter(c => c.dir !== null).reduce((a, c) => a + c.w, 0).toFixed(1);
+    st.net   = +voters.reduce((a, c) => a + (c.dir === 'long' ? c.w : c.dir === 'short' ? -c.w : 0), 0).toFixed(1);
     // Direction threshold is now PROPORTIONAL, not an absolute ±3. An absolute
     // cutoff meant a degraded-feed day (net 3 of 10 = 30%) produced the same
     // verdict as a healthy day (net 3 of 22 = 14%) on far thinner evidence.
     const share = st.wVote > 0 ? st.net / st.wVote : 0;
     st.dir  = share >= 0.15 ? 'long' : share <= -0.15 ? 'short' : 'wait';
-    st.conf = st.wVote > 0 ? Math.round(50 + Math.abs(share) * 50) : 50;
-    st.coverage = st.wTot > 0 ? Math.round(st.wVote / st.wTot * 100) : 0;
+    // Coverage means FEED HEALTH only. It used to be wVote/wTot, which conflated
+    // two different things: a dead feed and a live feed reading neutral. A row
+    // saying "not at a block — no location edge" is the engine working, not the
+    // engine blind, and it shouldn't look like an outage. Only rows that failed
+    // to get data count against coverage.
+    const deadW = voters.filter(c => /no data/.test(c.detail || '')).reduce((a, c) => a + c.w, 0);
+    st.coverage = st.wTot > 0 ? Math.round((st.wTot - deadW) / st.wTot * 100) : 0;
+    st.deadW = +deadW.toFixed(1);
+
+    // SOURCE CONCENTRATION — how much of today's vote rests on one data series.
+    // Real yields (level) and real-yield momentum are both DFII10; daily
+    // structure and the S/D block are both the same 1d candle series. Those are
+    // legitimate pairs — a level and its rate of change are different facts —
+    // but they are NOT independent, and a stack whose vote is 30% one series is
+    // far less diversified than a count of its rows implies. Reported, not
+    // silently corrected: the honest move is to make the dependency visible.
+    const bySrc = {};
+    for (const c of voters) {
+      if (c.dir === null || !c.src) continue;
+      bySrc[c.src] = (bySrc[c.src] || 0) + c.w;
+    }
+    const topSrc = Object.entries(bySrc).sort((a, b) => b[1] - a[1])[0];
+    st.concentration = topSrc && st.wVote > 0
+      ? { src: topSrc[0], w: +topSrc[1].toFixed(1), pct: Math.round(topSrc[1] / st.wVote * 100) }
+      : null;
+
+    // REGIME MODIFIER (replaces the Dollar Smile's old vote). The same net
+    // score is worth different amounts in different dollar worlds:
+    //   left   (funding stress) — everything correlates to 1 and directional
+    //                            reads are fragile → discount whichever way
+    //   right  (US outperformance) — a structural gold headwind: discount longs,
+    //                            reinforce shorts
+    //   trough (synchronized growth, USD offered) — the mirror image
+    //   mid    — no dominant USD force, no adjustment
+    // It scales the CONFIDENCE EXCESS over 50 rather than the net score, so it
+    // can never flip the direction — a modifier, not a vote.
+    st.regime = smile ? smile.phase : null;
+    st.regimeMult = 1;
+    st.regimeNote = '';
+    if (smile && st.dir !== 'wait') {
+      const L = st.dir === 'long';
+      if (smile.phase === 'left') {
+        st.regimeMult = 0.8;
+        st.regimeNote = 'funding-stress regime — correlations converge, discounting conviction 20%';
+      } else if (smile.phase === 'right') {
+        st.regimeMult = L ? 0.85 : 1.1;
+        st.regimeNote = L ? 'US-outperformance regime works against this long — conviction cut 15%'
+                          : 'US-outperformance regime reinforces this short — conviction +10%';
+      } else if (smile.phase === 'trough') {
+        st.regimeMult = L ? 1.1 : 0.85;
+        st.regimeNote = L ? 'weak-dollar trough reinforces this long — conviction +10%'
+                          : 'weak-dollar trough works against this short — conviction cut 15%';
+      }
+    }
+    st.confRaw = st.wVote > 0 ? Math.round(50 + Math.abs(share) * 50) : 50;
+    st.conf = st.wVote > 0
+      ? Math.max(50, Math.min(95, Math.round(50 + Math.abs(share) * 50 * st.regimeMult)))
+      : 50;
     st.checks = checks;
 
     // ─── MACRO SYNTHESIS ────────────────────────────────────────────────────
@@ -7544,9 +7651,10 @@
     for (const key in CLUSTER_LABELS) clusters[key] = { key, label: CLUSTER_LABELS[key], wTot: 0, net: 0, members: [] };
     for (const c of checks) {
       const cl = clusters[c.cluster] || clusters.positioning;
+      cl.members.push(c);
+      if (c.ctx) continue;             // context rows sit in the cluster for display only
       cl.wTot += c.w;
       cl.net  += c.dir === 'long' ? c.w : c.dir === 'short' ? -c.w : 0;
-      cl.members.push(c);
     }
     for (const key in clusters) {
       const cl = clusters[key];
@@ -7568,9 +7676,15 @@
     if (dollarC.dir !== 'mixed') {
       const agrees = rates.dir !== 'mixed' && dollarC.dir === rates.dir;
       const conflicts = rates.dir !== 'mixed' && dollarC.dir !== rates.dir;
-      lines.push(`<strong>The dollar side ${agrees ? 'confirms it' : conflicts ? 'is fighting the rates story' : 'adds its own lean'}</strong>: DXY momentum, the Dollar Smile phase and the Eurozone growth pulse net out ${say(dollarC.dir)}${agrees ? ' — two independent macro complexes pointing the same way is a stronger case than either alone' : conflicts ? ' — when rates and the dollar disagree, the net score can still clear threshold on breadth without real conviction behind it' : ''}.`);
+      lines.push(`<strong>The dollar side ${agrees ? 'confirms it' : conflicts ? 'is fighting the rates story' : 'adds its own lean'}</strong>: DXY momentum, the Eurozone growth pulse and structural CB demand net out ${say(dollarC.dir)}${agrees ? ' — two independent macro complexes pointing the same way is a stronger case than either alone' : conflicts ? ' — when rates and the dollar disagree, the net score can still clear threshold on breadth without real conviction behind it' : ''}.`);
     } else {
-      lines.push(`<strong>The dollar side is directionless</strong> — DXY momentum, the Dollar Smile phase and the Eurozone growth pulse aren't lined up with each other.`);
+      lines.push(`<strong>The dollar side is directionless</strong> — DXY momentum, the Eurozone growth pulse and structural CB demand aren't lined up with each other.`);
+    }
+
+    if (smile) {
+      lines.push(`<strong>Which dollar world we're in:</strong> the Dollar Smile reads <strong>${smile.phase}</strong> — ${smile.detail}. ${st.regimeNote
+        ? 'It doesn\'t get a vote (it\'s built from the same DXY, credit and VIX feeds already counted above), but it sets what a given score is worth: ' + st.regimeNote + '.'
+        : 'No adjustment applied today.'}`);
     }
 
     if (carryStress) {
@@ -7592,9 +7706,13 @@
     const coherent = rates.dir !== 'mixed' && dollarC.dir !== 'mixed' && rates.dir === dollarC.dir;
     st.coherent = coherent;
     if (st.dir !== 'wait') {
-      lines.push(coherent
-        ? `<em>Coherent case: rates and dollar agree, so the ${st.conf}% confidence reflects real conviction, not just breadth.</em>`
-        : `<em>Mixed case: the ${st.conf}% confidence is driven more by breadth of small signals than by rates and dollar agreeing — size accordingly.</em>`);
+      const conc = st.concentration && st.concentration.pct >= 25
+        ? ` Note the concentration: <strong>${st.concentration.pct}%</strong> of today's vote comes from one data series (${st.concentration.src}) — the row count overstates how many independent things agree.`
+        : '';
+      lines.push((coherent
+        ? `<em>Coherent case: rates and dollar agree, so the ${st.conf}% confidence reflects real conviction, not just breadth.`
+        : `<em>Mixed case: the ${st.conf}% confidence is driven more by breadth of small signals than by rates and dollar agreeing — size accordingly.`)
+        + conc + '</em>');
     }
     st.narrative = lines.join(' ');
     st.struct = ms;                                   // daily structure state for the trade planner
@@ -7743,7 +7861,10 @@
     if (banner) banner.className = `desk-banner ${st.dir}`;
     setEl('bias-arrow', isL ? '↑' : isS ? '↓' : '→');
     setEl('bias-word',  isL ? 'LONG' : isS ? 'SHORT' : 'NEUTRAL');
-    setEl('bias-conf',  st.conf + '% confidence · net ' + (st.net > 0 ? '+' : '') + st.net + ' of ±' + st.wVote + ' voting weight' + (st.coverage < 100 ? ' · ' + st.coverage + '% feed coverage' : ''));
+    setEl('bias-conf',  st.conf + '% confidence · net ' + (st.net > 0 ? '+' : '') + st.net + ' of ±' + st.wVote + ' voting weight'
+      + (st.coverage < 100 ? ' · ' + st.coverage + '% feed coverage' : '')
+      + (st.regimeMult && st.regimeMult !== 1 ? ' · ' + st.regime + ' regime ×' + st.regimeMult : '')
+      + (st.concentration && st.concentration.pct >= 25 ? ' · ' + st.concentration.pct + '% on ' + st.concentration.src : ''));
 
     const ez = st.entryZone, tz = st.targetZone;
     setEl('bias-zone',   ez ? ez.lo.toFixed(0) + '–' + ez.hi.toFixed(0) : '—');
@@ -7774,19 +7895,19 @@
       setH('bias-checks', Object.values(st.clusters).filter(cl => cl.members.length).map(cl => `
         <div class="level-row-group-title" style="font-size:10px;font-weight:800;letter-spacing:0.8px;text-transform:uppercase;color:var(--text-tertiary);margin:10px 0 4px;">${cl.label}</div>
         ${cl.members.map(c => `
-          <div class="level-row">
-            <span class="level-row-tag ${c.dir === 'long' ? 'sup' : c.dir === 'short' ? 'res' : 'key'}">${c.dir === 'long' ? '▲' : c.dir === 'short' ? '▼' : '—'}</span>
+          <div class="level-row"${c.ctx ? ' style="opacity:0.72;"' : ''}>
+            <span class="level-row-tag ${c.ctx ? 'key' : c.dir === 'long' ? 'sup' : c.dir === 'short' ? 'res' : 'key'}">${c.ctx ? 'ctx' : c.dir === 'long' ? '▲' : c.dir === 'short' ? '▼' : '—'}</span>
             <span class="level-row-name">${c.n}</span>
             <span class="level-row-price" style="font-size:11px;">${c.detail}</span>
-            <span class="level-row-dist">w${c.w}</span>
+            <span class="level-row-dist">${c.ctx ? 'no vote' : 'w' + c.w}</span>
           </div>`).join('')}`).join(''));
     } else {
       setH('bias-checks', st.checks.map(c => `
-        <div class="level-row">
-          <span class="level-row-tag ${c.dir === 'long' ? 'sup' : c.dir === 'short' ? 'res' : 'key'}">${c.dir === 'long' ? '▲' : c.dir === 'short' ? '▼' : '—'}</span>
+        <div class="level-row"${c.ctx ? ' style="opacity:0.72;"' : ''}>
+          <span class="level-row-tag ${c.ctx ? 'key' : c.dir === 'long' ? 'sup' : c.dir === 'short' ? 'res' : 'key'}">${c.ctx ? 'ctx' : c.dir === 'long' ? '▲' : c.dir === 'short' ? '▼' : '—'}</span>
           <span class="level-row-name">${c.n}</span>
           <span class="level-row-price" style="font-size:11px;">${c.detail}</span>
-          <span class="level-row-dist">w${c.w}</span>
+          <span class="level-row-dist">${c.ctx ? 'no vote' : 'w' + c.w}</span>
         </div>`).join(''));
     }
 
@@ -8483,9 +8604,21 @@
     return `  ·  Real-yield ${word} (${realYield.dir})`;
   }
 
+  // Seasonal calendar score (0–10), shared by the Analysis-tab composite and
+  // the Daily Bias 'Structural demand & seasonality' driver so there is one
+  // definition of gold's seasonal tilt rather than two that can drift apart.
+  function macroSeasonalScore() {
+    const m = new Date().getMonth();
+    return [10, 11, 0, 1].includes(m) ? 9 : [2, 5].includes(m) ? 5 : 7;
+  }
+  function monthSeasonLabel() {
+    const m = new Date().getMonth();
+    const name = new Date().toLocaleDateString('en-US', { month: 'short' });
+    return name + ' ' + ([10, 11, 0, 1].includes(m) ? 'seasonally strong' : [2, 5].includes(m) ? 'seasonally weak' : 'seasonally neutral');
+  }
+
   function computeMacroScore() {
     const dxy   = parseFloat(document.getElementById('dxyPrice')?.textContent)  || 104;
-    const month = new Date().getMonth();
     // Factor 1 (MASTER): Real yields — level + direction, 0-10 from the engine.
     // Falls back to a level-only estimate before FRED data lands.
     let tipsS;
@@ -8498,7 +8631,7 @@
     // Factor 2: DXY (lower = bullish for gold) — the other cyclical driver
     const dxyS  = dxy <= 96 ? 10 : dxy <= 100 ? 8 : dxy <= 104 ? 6 : dxy <= 108 ? 4 : 2;
     // Factor 3: Seasonal pattern (Nov/Dec/Jan/Feb strong; Mar/Jun weak)
-    const seasS = [10,11,0,1].includes(month) ? 9 : [2,5].includes(month) ? 5 : 7;
+    const seasS = macroSeasonalScore();
     // Factor 4: Central-bank flows — anchored to the latest WGC published data
     // (see WGC_FLOWS) rather than a hardcoded assumption. Moderate weight so
     // the CYCLICAL drivers above still determine direction.
