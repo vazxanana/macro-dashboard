@@ -2102,9 +2102,54 @@
 <!-- INTELLIGENCE: REGIME / MARKET STRUCTURE -->
 <div id="intelligence-regime" class="section">
   <div class="section-head">
-    <div class="section-title">Market Structure Framework</div>
-    <div class="section-meta">MOSHATRADES METHODOLOGY</div>
+    <div class="section-title">Market Structure</div>
+    <div class="section-meta">MOSHATRADES — BOS · VR · CF</div>
   </div>
+
+  <!-- Main Full-Panel Chart -->
+  <div style="margin: 0 24px 4px;">
+    <div style="background: #0d1117; border: 1px solid #1e2836; border-radius: 6px; overflow: hidden;">
+      <!-- Chart toolbar -->
+      <div style="padding: 10px 16px; border-bottom: 1px solid #1a2433; display: flex; gap: 20px; align-items: center; flex-wrap: wrap;">
+        <div style="font-size: 11px; font-weight: 700; color: #8b949e; font-family: monospace; letter-spacing: 1px;">H4 · MOSHATRADES</div>
+        <div style="display: flex; gap: 14px; flex-wrap: wrap;">
+          <span style="display:flex;align-items:center;gap:5px;"><span style="width:14px;height:3px;background:rgba(212,168,67,0.75);display:inline-block;border-radius:1px;"></span><span style="font-size:10px;color:#6b7a8d;">VR Zone</span></span>
+          <span style="display:flex;align-items:center;gap:5px;"><span style="width:14px;height:3px;background:rgba(109,183,132,0.75);display:inline-block;border-radius:1px;"></span><span style="font-size:10px;color:#6b7a8d;">CF Zone</span></span>
+          <span style="display:flex;align-items:center;gap:5px;"><span style="width:14px;height:1px;background:#4a7090;display:inline-block;border-top:1px dashed #4a7090;"></span><span style="font-size:10px;color:#6b7a8d;">BOS Level</span></span>
+        </div>
+        <div style="margin-left:auto;display:flex;gap:8px;align-items:center;">
+          <span id="ms-struct-badge" style="padding:3px 10px;background:rgba(109,183,132,0.15);border:1px solid rgba(109,183,132,0.35);border-radius:3px;font-size:10px;font-weight:700;color:#6db784;font-family:monospace;">BULLISH</span>
+          <span id="ms-phase-badge" style="padding:3px 10px;background:rgba(212,168,67,0.12);border:1px solid rgba(212,168,67,0.3);border-radius:3px;font-size:10px;color:#d4a843;font-family:monospace;">VR PULLBACK</span>
+        </div>
+      </div>
+      <div id="ms-main-chart" style="height:460px;width:100%;"></div>
+    </div>
+  </div>
+
+  <!-- Reading Panel -->
+  <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:12px 24px 20px;">
+    <div class="card" style="border-left:3px solid #6db784;">
+      <div style="font-size:9px;letter-spacing:1.2px;text-transform:uppercase;color:var(--ink-faint);margin-bottom:8px;">Structure</div>
+      <div style="font-size:15px;font-weight:700;color:#6db784;font-family:monospace;">BULLISH</div>
+      <div style="font-size:10px;color:var(--ink-dim);margin-top:5px;line-height:1.7;">BOS Buy confirmed<br>HH / HL sequence active</div>
+    </div>
+    <div class="card" style="border-left:3px solid #d4a843;">
+      <div style="font-size:9px;letter-spacing:1.2px;text-transform:uppercase;color:var(--ink-faint);margin-bottom:8px;">Zones</div>
+      <div style="font-size:11px;color:var(--ink);line-height:2;">
+        <div style="display:flex;justify-content:space-between;"><span style="color:#d4a843;font-weight:600;">H4 VR</span><span style="font-family:monospace;font-size:11px;">109 – 117</span></div>
+        <div style="display:flex;justify-content:space-between;"><span style="color:#6db784;font-weight:600;">H1 CF</span><span style="font-family:monospace;font-size:11px;">109 – 112</span></div>
+      </div>
+    </div>
+    <div class="card" style="border-left:3px solid #6db784;">
+      <div style="font-size:9px;letter-spacing:1.2px;text-transform:uppercase;color:var(--ink-faint);margin-bottom:8px;">Next Setup</div>
+      <div style="font-size:15px;font-weight:700;color:#6db784;font-family:monospace;">LONG ↑</div>
+      <div style="font-size:10px;color:var(--ink-dim);margin-top:5px;line-height:1.7;">Entry: CF zone 109–112<br>SL: below 108 · TP: 123+</div>
+    </div>
+  </div>
+
+  <!-- SOP Banner (compact reference) -->
+  <div style="margin:0 24px 16px;padding:3px 0;border-top:1px solid var(--line-soft);"></div>
+  <div style="margin:0 24px 8px;font-size:9px;font-weight:700;letter-spacing:1.4px;color:var(--ink-faint);text-transform:uppercase;">Reference Diagrams</div>
 
   <!-- SOP Banner -->
   <div style="margin: 0 24px 20px; padding: 14px 20px; background: var(--panel-raised); border: 1px solid var(--line); border-radius: 6px; border-left: 3px solid var(--sage);">
@@ -5193,6 +5238,121 @@ try {
     base.setDate(base.getDate() + n);
     return base.toISOString().slice(0,10);
   }
+
+  // H4 timestamp helper (4-hour candles)
+  function h4(n) { return Math.floor(new Date('2024-10-14T00:00:00Z').getTime()/1000) + n*14400; }
+
+  // ── MAIN PANEL CHART ─────────────────────────────────────
+  (function() {
+    const el = document.getElementById('ms-main-chart');
+    if (!el) return;
+    const ch = LW.createChart(el, {
+      width: el.offsetWidth || 800,
+      height: 460,
+      layout: { background: { color: '#0d1117' }, textColor: '#5a6a7a' },
+      grid: { vertLines: { color: '#0f1924' }, horzLines: { color: '#0f1924' } },
+      crosshair: { mode: 1 },
+      rightPriceScale: {
+        borderColor: '#1a2433',
+        scaleMargins: { top: 0.1, bottom: 0.1 },
+        textColor: '#5a6a7a',
+      },
+      timeScale: {
+        borderColor: '#1a2433',
+        timeVisible: true,
+        fixLeftEdge: true,
+        fixRightEdge: true,
+      },
+      handleScroll: true,
+      handleScale: true,
+    });
+    window.addEventListener('resize', () => {
+      const w = el.offsetWidth;
+      if (w > 0) ch.applyOptions({ width: w });
+    });
+
+    const cs = ch.addCandlestickSeries({
+      upColor: '#6db784', downColor: '#c17a6f',
+      borderUpColor: '#6db784', borderDownColor: '#c17a6f',
+      wickUpColor: '#6db784', wickDownColor: '#c17a6f',
+    });
+
+    // ─── OHLC data: H4 candles showing full Mosha sequence ───
+    // Phase 1 (bearish LH/LL), Phase 2 (BOS Buy), Phase 3 (VR pullback), Phase 4 (CF)
+    const raw = [
+      // ── Bearish structure: LH/LL ──
+      [0,  110,114,108,112],  // LH¹ = 114
+      [1,  112,113,107,108],
+      [2,  108,109,103,104],
+      [3,  104,106,100,101],  // LL¹ = 100
+      [4,  101,107, 99,106],
+      [5,  106,112,104,110],
+      [6,  110,112,107,108],  // LH² = 112  ← BOS level
+      [7,  108,110,103,104],
+      [8,  104,105, 98, 99],
+      [9,   99,100, 94, 95],  // LL² = 94
+      // ── Structure shift ──
+      [10,  95, 99, 93, 97],
+      [11,  97,104, 96,103],
+      [12, 103,110,102,109],
+      [13, 109,116,108,115],  // BOS Buy ↑ — breaks above LH² 112
+      // ── Rally to HH ──
+      [14, 115,119,113,118],
+      [15, 118,122,116,120],
+      [16, 120,124,119,123],  // HH = 124
+      // ── VR pullback zone: 109–117 (50–79% of 94→124) ──
+      [17, 123,124,118,119],  // pullback start
+      [18, 119,120,115,116],
+      [19, 116,117,112,113],  // enters VR zone
+      [20, 113,115,110,111],
+      // ── CF zone: 109–112 ──
+      [21, 111,113,109,110],  // CF zone entered
+      [22, 110,112,108,111],  // CF oscillation
+      [23, 111,114,109,113],  // bounce beginning
+      // ── Next Setup (last visible bars) ──
+      [24, 113,117,111,115],  // developing
+      [25, 115,119,113,118],  // LONG setup active
+    ];
+
+    const candles = raw.map(([n,o,h,l,c]) => ({ time: h4(n), open:o, high:h, low:l, close:c }));
+    cs.setData(candles);
+
+    // ─── BOS Level (dashed line at 112) ───
+    cs.createPriceLine({ price:112, color:'#4a7090', lineWidth:1, lineStyle:LW.LineStyle.Dashed, axisLabelVisible:true, title:'BOS' });
+    cs.createPriceLine({ price:124, color:'rgba(109,183,132,0.4)', lineWidth:1, lineStyle:LW.LineStyle.Dashed, axisLabelVisible:true, title:'HH' });
+    cs.createPriceLine({ price: 94, color:'rgba(193,122,111,0.4)', lineWidth:1, lineStyle:LW.LineStyle.Dashed, axisLabelVisible:true, title:'LL²' });
+
+    // ─── VR Zone fill (109–117, t17–t25) ───
+    const vrS = ch.addHistogramSeries({
+      color: 'rgba(212,168,67,0.14)',
+      priceLineVisible:false, lastValueVisible:false,
+    });
+    vrS.setData(raw.slice(17).map(([n])=>({ time:h4(n), value:117 })));
+    vrS.applyOptions({ base:109 });
+
+    // ─── CF Zone fill (109–112, t21–t25) ───
+    const cfS = ch.addHistogramSeries({
+      color: 'rgba(109,183,132,0.22)',
+      priceLineVisible:false, lastValueVisible:false,
+    });
+    cfS.setData(raw.slice(21).map(([n])=>({ time:h4(n), value:112 })));
+    cfS.applyOptions({ base:109 });
+
+    // ─── Markers ───
+    cs.setMarkers([
+      { time:h4(0),  position:'aboveBar', color:'#c17a6f', shape:'circle',    text:'LH¹',      size:1 },
+      { time:h4(3),  position:'belowBar', color:'#c17a6f', shape:'circle',    text:'LL¹',      size:1 },
+      { time:h4(6),  position:'aboveBar', color:'#c17a6f', shape:'circle',    text:'LH²',      size:1 },
+      { time:h4(9),  position:'belowBar', color:'#c17a6f', shape:'circle',    text:'LL²',      size:1 },
+      { time:h4(13), position:'aboveBar', color:'#6db784', shape:'arrowUp',   text:'BOS BUY ↑', size:2 },
+      { time:h4(16), position:'aboveBar', color:'#6db784', shape:'circle',    text:'HH',       size:1 },
+      { time:h4(19), position:'aboveBar', color:'#d4a843', shape:'circle',    text:'VR',       size:1 },
+      { time:h4(21), position:'belowBar', color:'#6db784', shape:'circle',    text:'CF zone',  size:1 },
+      { time:h4(25), position:'aboveBar', color:'#6db784', shape:'arrowUp',   text:'NEXT SETUP: LONG ↑', size:2 },
+    ]);
+
+    ch.timeScale().fitContent();
+  })();
 
   // ── 1. External Bullish ──────────────────────────────────
   (function() {
