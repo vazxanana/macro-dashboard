@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#0e1117">
-<title>Gold Structure</title>
+<title>Market Structure</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap">
@@ -142,6 +142,11 @@
   body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 30; background: var(--bg); }
   .brand { display: flex; align-items: center; gap: 10px; }
   .brand b { display: block; font-size: 15px; letter-spacing: .3px; }
+  .sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+  .inst { display: block; background: transparent; color: var(--ink); border: 1px solid transparent; border-radius: 6px; padding: 2px 22px 2px 4px; margin-left: -5px; font: 700 15px var(--sans); cursor: pointer; appearance: none; -webkit-appearance: none;
+    background-image: linear-gradient(45deg, transparent 50%, var(--ink-faint) 50%), linear-gradient(135deg, var(--ink-faint) 50%, transparent 50%); background-position: right 9px center, right 4px center; background-size: 5px 5px; background-repeat: no-repeat; }
+  .inst:hover, .inst:focus-visible { border-color: var(--line); outline: none; }
+  .inst option, .inst optgroup { background: var(--panel); color: var(--ink); }
   .brand span { display: block; font-size: 11px; color: var(--ink-faint); }
   .ms-coin { width: 26px; height: 26px; border-radius: 50%; background: radial-gradient(circle at 35% 35%, #ffd768, #b58600); display: inline-block; flex: none; }
   .px { display: flex; align-items: baseline; gap: 8px; }
@@ -189,7 +194,7 @@
 <div class="ms-live app" id="ms-live" data-chart="dark">
 
   <header class="top">
-    <div class="brand"><i class="ms-coin" aria-hidden="true"></i><div><b>XAU/USD</b><span>Gold · Mosha structure</span></div></div>
+    <div class="brand"><i class="ms-coin" aria-hidden="true"></i><div><label class="sr" for="ms-inst">Market</label><select id="ms-inst" class="inst"><option>XAU/USD · Gold</option></select><span id="ms-inst-name">Gold · Mosha structure</span></div></div>
     <div class="px"><b id="ms-hdr-price">—</b><span id="ms-hdr-chg" class="hdr-chg"></span></div>
     <span class="ms-status"><i class="ms-live-dot" id="ms-live-dot"></i><span id="ms-live-txt">Connecting…</span><span class="upd"> · <span id="ms-updated">—</span></span></span>
     <div class="top-actions">
@@ -221,7 +226,7 @@
   </header>
 
   <div class="ms-offline-box" role="alert">
-    <b>Live prices couldn't load.</b> The page couldn't reach the gold price feeds (Binance and Kraken). Check your connection; some networks and countries block these exchanges. You can still use <b>Settings → Load CSV</b> with a TradingView export.
+    <b>Live prices couldn't load.</b> The page couldn't reach the price feeds (Binance and Kraken). Check your connection; some networks and countries block these exchanges. You can still use <b>Settings → Load CSV</b> with a TradingView export.
     <div class="ms-note" id="ms-offline-why"></div>
   </div>
 
@@ -242,7 +247,7 @@
   <div class="card">
     <div class="ms-k">Possible trades <span class="ms-risk"><label for="ms-risk">Risk per trade $</label><input id="ms-risk" type="number" min="1" step="10" value="100" inputmode="decimal"></span></div>
     <div class="ms-trades" id="ms-trades"><div class="ms-note">Waiting for live candles…</div></div>
-    <div class="ms-note" style="margin-top:10px">Tap a trade to draw it on the charts. Prices are XAU/USD spot; MGC/GC futures trade a few dollars higher. Setups follow the Mosha rules and are not financial advice.</div>
+    <div class="ms-note" style="margin-top:10px">Tap a trade to draw it on the charts. Setups follow the Mosha rules and are not financial advice.</div>
   </div>
 
   <div class="sec-h">
@@ -270,7 +275,7 @@
     </ol>
   </details>
 
-  <p class="foot">Gold candles: Binance PAXG/USD (Kraken backup), aligned to XAU/USD spot via gold-api.com. Times are in your local zone.</p>
+  <p class="foot">Live candles from Binance and Kraken public feeds; gold is aligned to XAU/USD spot via gold-api.com. Times are in your local zone.</p>
   <div class="ms-toasts" id="ms-toasts" role="status" aria-live="polite"></div>
 </div>
 <script>
@@ -391,7 +396,8 @@ function msNextSetup(bars, A) {
   const inOrigin = price <= e.top && price >= e.bot;
   const brokenAway = sell ? price < e.bot : price > e.top;
   let phase, steps;
-  const fmt = (v) => v.toLocaleString('en-US', { maximumFractionDigits: 1 });
+  const dp = (typeof window !== 'undefined' && window.MS_DEC) || 1;
+  const fmt = (v) => v.toLocaleString('en-US', { minimumFractionDigits: dp, maximumFractionDigits: dp });
   const zone = `${fmt(e.bot)} – ${fmt(e.top)}`;
   if (!A.ext.fixed && brokenAway) {
     phase = sell ? 'Extension after BO Sell' : 'Extension after BO Buy';
@@ -434,7 +440,7 @@ function msNextSetup(bars, A) {
 
 
 
-// ═══ MOSHA LIVE MULTI-TIMEFRAME CHARTS — real gold candles (PAXG feed aligned to XAU/USD spot) ═══
+// ═══ MOSHA LIVE MULTI-TIMEFRAME CHARTS — live candles for gold, crypto and forex ═══
 (function () {
   const LW = window.LightweightCharts;
   const root = document.getElementById('ms-live');
@@ -447,6 +453,24 @@ function msNextSetup(bars, A) {
     { id: '1m',  label: 'M1',  role: 'Entry trigger',           sec: 60,    binance: '1m',  kraken: 1,   poll: 10e3 },
   ];
   const BARS = 500, PIVOT = 6;
+  const INSTRUMENTS = {
+    xau:    { group: 'Metals', label: 'XAU/USD', name: 'Gold',     binance: 'PAXGUSDT', kraken: 'PAXGUSD', dec: 1, spot: true, size: 'gold', color: '#c99400' },
+    btc:    { group: 'Crypto', label: 'BTC/USD', name: 'Bitcoin',  binance: 'BTCUSDT',  kraken: 'XBTUSD',  dec: 1, size: 'units', unit: 'BTC', color: '#f7931a' },
+    eth:    { group: 'Crypto', label: 'ETH/USD', name: 'Ethereum', binance: 'ETHUSDT',  kraken: 'ETHUSD',  dec: 2, size: 'units', unit: 'ETH', color: '#7b8cde' },
+    sol:    { group: 'Crypto', label: 'SOL/USD', name: 'Solana',   binance: 'SOLUSDT',  kraken: 'SOLUSD',  dec: 2, size: 'units', unit: 'SOL', color: '#14f195' },
+    xrp:    { group: 'Crypto', label: 'XRP/USD', name: 'XRP',      binance: 'XRPUSDT',  kraken: 'XRPUSD',  dec: 4, size: 'units', unit: 'XRP', color: '#8a96a8' },
+    eurusd: { group: 'Forex',  label: 'EUR/USD', name: 'Euro',     binance: 'EURUSDT',  kraken: 'EURUSD',  dec: 5, size: 'fx',    color: '#2962ff' },
+    gbpusd: { group: 'Forex',  label: 'GBP/USD', name: 'Pound',    binance: null,       kraken: 'GBPUSD',  dec: 5, size: 'fx',    color: '#2962ff' },
+    usdjpy: { group: 'Forex',  label: 'USD/JPY', name: 'Yen',      binance: null,       kraken: 'USDJPY',  dec: 3, size: 'fxjpy', color: '#2962ff' },
+    audusd: { group: 'Forex',  label: 'AUD/USD', name: 'Aussie',   binance: null,       kraken: 'AUDUSD',  dec: 5, size: 'fx',    color: '#2962ff' },
+  };
+  let instKey = null;
+  try { instKey = new URLSearchParams(location.search).get('s'); } catch (e) {}
+  if (!INSTRUMENTS[instKey]) { try { instKey = localStorage.getItem('msInst'); } catch (e) {} }
+  if (!INSTRUMENTS[instKey]) instKey = 'xau';
+  try { localStorage.setItem('msInst', instKey); } catch (e) {}
+  const INST = INSTRUMENTS[instKey];
+  window.MS_DEC = INST.dec;
   const TZ = -new Date().getTimezoneOffset() * 60;
   const THEMES = {
     light: { bg: '#ffffff', text: '#131722', grid: '#f0f3fa', border: '#e0e3eb' },
@@ -463,7 +487,7 @@ function msNextSetup(bars, A) {
     offset: 0, spot: null, source: '', live: false, csv: false };
   const $ = (id) => document.getElementById(id);
   const $o = (id) => document.getElementById(id) || { set textContent(v) {}, set className(v) {}, set innerHTML(v) {}, style: {} };
-  const fmt = (v) => (v == null || !isFinite(v)) ? '—' : v.toLocaleString('en-US', { minimumFractionDigits: 1, maximumFractionDigits: 1 });
+  const fmt = (v) => (v == null || !isFinite(v)) ? '—' : v.toLocaleString('en-US', { minimumFractionDigits: INST.dec, maximumFractionDigits: INST.dec });
   const ftime = (t) => new Date((t - TZ) * 1000).toLocaleString('en-GB', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' });
 
   // ─── Drawing overlay (series primitive) ───
@@ -546,14 +570,15 @@ function msNextSetup(bars, A) {
   }
   async function fetchBars(tf) {
     const errs = [];
-    try {
-      const raw = await getJSON(`https://api.binance.com/api/v3/klines?symbol=PAXGUSDT&interval=${tf.binance}&limit=${BARS}`);
+    if (INST.binance) try {
+      const raw = await getJSON(`https://api.binance.com/api/v3/klines?symbol=${INST.binance}&interval=${tf.binance}&limit=${BARS}`);
       if (Array.isArray(raw) && raw.length) return { src: 'Binance', bars: raw.map((k) => ({ time: k[0] / 1000, open: +k[1], high: +k[2], low: +k[3], close: +k[4] })) };
     } catch (e) { errs.push(e.message || 'Binance blocked'); }
     try {
-      const j = await getJSON(`https://api.kraken.com/0/public/OHLC?pair=PAXGUSD&interval=${tf.kraken}`);
+      const j = await getJSON(`https://api.kraken.com/0/public/OHLC?pair=${INST.kraken}&interval=${tf.kraken}`);
       const key = j.result && Object.keys(j.result).find((k) => k !== 'last');
       const rows = key ? j.result[key] : null;
+      if (j.error && j.error.length) throw new Error(`Kraken: ${j.error[0]}`);
       if (Array.isArray(rows) && rows.length) return { src: 'Kraken', bars: rows.slice(-BARS).map((k) => ({ time: +k[0], open: +k[1], high: +k[2], low: +k[3], close: +k[4] })) };
     } catch (e) { errs.push(e.message || 'Kraken blocked'); }
     throw new Error(errs.join(' · ') || 'No data source answered');
@@ -585,7 +610,7 @@ function msNextSetup(bars, A) {
       timeScale: { borderColor: THEMES.light.border, timeVisible: true, secondsVisible: false, rightOffset: 30, barSpacing: 6 },
       localization: { priceFormatter: (p) => fmt(p) },
     });
-    const series = chart.addCandlestickSeries({ upColor: UPC, downColor: DNC, borderUpColor: UPC, borderDownColor: DNC, wickUpColor: UPC, wickDownColor: DNC, priceLineStyle: LW.LineStyle.Dotted });
+    const series = chart.addCandlestickSeries({ upColor: UPC, downColor: DNC, borderUpColor: UPC, borderDownColor: DNC, wickUpColor: UPC, wickDownColor: DNC, priceLineStyle: LW.LineStyle.Dotted, priceFormat: { type: 'price', precision: INST.dec, minMove: Math.pow(10, -INST.dec) } });
     const overlay = new Overlay(); series.attachPrimitive(overlay);
     const P = { tf, el, chart, series, overlay, raw: null, bars: null, A: null, S: null, fitted: false, priceLines: [], pv: [] };
     series.applyOptions({ autoscaleInfoProvider: (orig) => {
@@ -693,7 +718,7 @@ function msNextSetup(bars, A) {
     P.legend = function (b, prev) {
       if (!b) return;
       const ch = prev ? b.close - prev.close : 0, col = b.close >= b.open ? UPC : DNC;
-      $(`ms-l-${tf.id}`).innerHTML = `<span class="ms-lg-sym">XAU/USD · ${tf.label}</span>` +
+      $(`ms-l-${tf.id}`).innerHTML = `<span class="ms-lg-sym">${INST.label} · ${tf.label}</span>` +
         `<span>O <b style="color:${col}">${fmt(b.open)}</b></span><span>H <b style="color:${col}">${fmt(b.high)}</b></span>` +
         `<span>L <b style="color:${col}">${fmt(b.low)}</b></span><span>C <b style="color:${col}">${fmt(b.close)}</b></span>` +
         `<span style="color:${ch >= 0 ? UPC : DNC}">${ch >= 0 ? '+' : ''}${fmt(ch)}</span>`;
@@ -759,7 +784,7 @@ function msNextSetup(bars, A) {
       $o('ms-hdr-price').textContent = fmt(price);
       $o('ms-hdr-chg').textContent = `${ch >= 0 ? '+' : ''}${fmt(ch)} (${(ch / ref * 100).toFixed(2)}%) 24h`;
       $o('ms-hdr-chg').className = 'hdr-chg ' + (ch >= 0 ? 'up' : 'down');
-      document.title = `${fmt(price)} · Gold Structure`;
+      document.title = `${fmt(price)} · ${INST.label} Structure`;
     }
     $('ms-td-inval').textContent = fmt(sell ? e.top : e.bot);
     $('ms-td-align').innerHTML = TFS.map((tf) => {
@@ -800,7 +825,7 @@ function msNextSetup(bars, A) {
     const touched = lp.bars.some((b) => b.time > breakT && (sell ? b.high >= e.bot : b.low <= e.top));
     const ll = lp.A.last;
     const cf = touched && vr && ll && ll.dir === dir && lp.bars[ll.breakIdx].time > breakT;
-    const buf = Math.max(0.08 * h, 0.3);
+    const buf = Math.max(0.08 * h, price * 0.00005);
     let entry, stop;
     if (cf) { entry = ll.level; stop = sell ? ll.top + buf / 2 : ll.bot - buf / 2; }
     else { entry = sell ? e.bot + 0.5 * h : e.top - 0.5 * h; stop = sell ? e.top + buf : e.bot - buf; }
@@ -817,8 +842,20 @@ function msNextSetup(bars, A) {
     else { state = 'WAIT VR'; cls = ''; next = `${H} just broke ${sell ? 'down' : 'up'}. Let the move finish and reverse on ${Lo} before planning the ${word}.`; }
     const upP = pr.up && panes[pr.up];
     const align = !upP || !upP.A ? null : upP.A.trend === dir;
-    const mgc = Math.floor(G.risk / (r * 10)), gc = Math.floor(G.risk / (r * 100));
-    return { k: pr.k, name: pr.name, pair: `${H} → ${Lo}`, sell, entry, stop, t1, t2, rr, r, state, cls, next, align, upL: pr.up ? LBL[pr.up] : '', mgc, gc, invalid: beyond };
+    return { k: pr.k, name: pr.name, pair: `${H} → ${Lo}`, sell, entry, stop, t1, t2, rr, r, state, cls, next, align, upL: pr.up ? LBL[pr.up] : '', size: sizeText(r, price), invalid: beyond };
+  }
+  function sizeText(r, price) {
+    const usd = (v) => '$' + Math.ceil(v).toLocaleString('en-US');
+    if (INST.size === 'gold') {
+      const mgc = Math.floor(G.risk / (r * 10)), gc = Math.floor(G.risk / (r * 100));
+      return mgc ? `${mgc} MGC${gc ? ` · ${gc} GC` : ''}` : `${usd(r * 10)}/MGC`;
+    }
+    if (INST.size === 'fx' || INST.size === 'fxjpy') {
+      const lots = (INST.size === 'fxjpy' ? G.risk * price : G.risk) / (r * 100000);
+      return lots >= 0.01 ? `${lots.toFixed(2)} lots` : 'Under 0.01 lot';
+    }
+    const u = G.risk / r;
+    return `${u >= 100 ? u.toFixed(0) : u >= 1 ? u.toFixed(2) : u.toFixed(4)} ${INST.unit}`;
   }
   function renderTrades(price) {
     const list = PAIRS.map((pr) => buildSetup(pr, price)).filter(Boolean);
@@ -828,9 +865,8 @@ function msNextSetup(bars, A) {
       const best = list.slice().sort((a, b) => order[a.state] - order[b.state])[0];
       G.sel = best.k;
     }
-    const usd = (v) => '$' + Math.ceil(v).toLocaleString('en-US');
     $('ms-trades').innerHTML = list.map((t) => {
-      const size = t.mgc ? `${t.mgc} MGC${t.gc ? ` · ${t.gc} GC` : ''}` : `${usd(t.r * 10)}/MGC`;
+      const size = t.size;
       const tag = t.align === null ? '' : `<span class="ms-tag ${t.align ? 'with' : 'counter'}">${t.align ? `WITH ${t.upL}` : `AGAINST ${t.upL}`}</span>`;
       return `<button type="button" class="ms-trade${t.k === G.sel ? ' sel' : ''}${t.invalid ? ' invalid' : ''}" data-k="${t.k}" aria-pressed="${t.k === G.sel}">` +
         `<div class="ms-tr-h"><span class="ms-chip ${t.sell ? 'ms-chip-sell' : 'ms-chip-buy'}">${t.sell ? 'SELL' : 'BUY'}</span><b>${t.name}</b><small>${t.pair}</small>${tag}<span class="ms-st ${t.cls}">${t.state}</span></div>` +
@@ -858,7 +894,7 @@ function msNextSetup(bars, A) {
     box.appendChild(t); setTimeout(() => t.remove(), 12000);
     while (box.children.length > 3) box.firstChild.remove();
     if (!G.alerts) return;
-    try { if ('Notification' in window && Notification.permission === 'granted') new Notification(`Gold · ${title}`, { body, tag: title }); } catch (e) {}
+    try { if ('Notification' in window && Notification.permission === 'granted') new Notification(`${INST.label} · ${title}`, { body, tag: title }); } catch (e) {}
     try {
       actx = actx || new (window.AudioContext || window.webkitAudioContext)();
       const o = actx.createOscillator(), g = actx.createGain();
@@ -885,7 +921,7 @@ function msNextSetup(bars, A) {
   function startStream() {
     if (G.csv) return;
     try {
-      ws = new WebSocket('wss://stream.binance.com:9443/stream?streams=' + TFS.map((t) => `paxgusdt@kline_${t.binance}`).join('/'));
+      ws = new WebSocket('wss://stream.binance.com:9443/stream?streams=' + TFS.map((t) => `${INST.binance.toLowerCase()}@kline_${t.binance}`).join('/'));
       const kill = setTimeout(() => { if (!G.live) { try { ws.close(); } catch (e) {} startPolling(); } }, 8000);
       ws.onmessage = (m) => {
         const d = JSON.parse(m.data).data, k = d && d.k; if (!k) return;
@@ -916,7 +952,12 @@ function msNextSetup(bars, A) {
     if (G.live) { dot.className = 'ms-live-dot on'; txt.textContent = `Live · ${G.source} stream`; }
     else if (polling) { dot.className = 'ms-live-dot poll'; txt.textContent = `Live · ${G.source} (refreshing)`; }
     else { dot.className = 'ms-live-dot'; txt.textContent = 'Connecting…'; }
-    $('ms-feed-note').textContent = `Gold candles from ${G.source} PAXG/USD (1 token = 1 oz of LBMA gold), shifted ${G.offset >= 0 ? '+' : ''}${fmt(G.offset)} onto XAU/USD spot from gold-api.com. Times in your local zone. COMEX futures (MGC/GC) trade a few dollars above spot.`;
+    const srcSym = G.source === 'Binance' ? INST.binance : INST.kraken;
+    $('ms-feed-note').textContent = INST.spot
+      ? `Gold candles from ${G.source} PAXG/USD (1 token = 1 oz of LBMA gold), shifted ${G.offset >= 0 ? '+' : ''}${fmt(G.offset)} onto XAU/USD spot from gold-api.com. Times in your local zone. COMEX futures (MGC/GC) trade a few dollars above spot.`
+      : INST.group === 'Forex'
+        ? `${INST.label} candles from ${G.source} (${srcSym}). Exchange forex can differ slightly from your broker's quotes. Times in your local zone.`
+        : `${INST.label} candles from ${G.source} (${srcSym}). Times in your local zone.`;
   }
 
   async function boot() {
@@ -933,14 +974,14 @@ function msNextSetup(bars, A) {
     }
     G.source = ok[0].value.src;
     res.forEach((r, k) => { if (r.status === 'fulfilled') { panes[TFS[k].id].raw = r.value.bars; } });
-    await refreshSpot();
+    if (INST.spot) await refreshSpot();
     const m1 = panes['1m'].raw;
     if (G.spot && m1) { const off = G.spot - m1[m1.length - 1].close; if (Math.abs(off) < 150) G.offset = off; }
     TFS.forEach((tf) => { const P = panes[tf.id]; if (P.raw) P.rebuild(false); });
     topDown(); setStatus();
     $('ms-updated').textContent = new Date().toLocaleTimeString();
-    setInterval(refreshSpot, 60e3);
-    if (G.source === 'Binance') startStream(); else startPolling();
+    if (INST.spot) setInterval(refreshSpot, 60e3);
+    if (G.source === 'Binance' && INST.binance) startStream(); else startPolling();
   }
 
   // ─── Controls ───
@@ -986,6 +1027,15 @@ function msNextSetup(bars, A) {
     }
   });
   $('ms-fit').addEventListener('click', () => Object.values(panes).forEach((p) => p.fit()));
+  const picker = document.getElementById('ms-inst');
+  if (picker) {
+    const groups = {};
+    Object.entries(INSTRUMENTS).forEach(([k, v]) => { (groups[v.group] = groups[v.group] || []).push(`<option value="${k}"${k === instKey ? ' selected' : ''}>${v.label} · ${v.name}</option>`); });
+    picker.innerHTML = Object.entries(groups).map(([g, o]) => `<optgroup label="${g}">${o.join('')}</optgroup>`).join('');
+    picker.addEventListener('change', () => { const u = new URL(location.href); u.searchParams.set('s', picker.value); location.href = u.toString(); });
+  }
+  $o('ms-inst-name').textContent = `${INST.name} · Mosha structure`;
+  root.querySelectorAll('.ms-coin').forEach((c) => { c.style.background = `radial-gradient(circle at 35% 35%, #ffffffaa, ${INST.color})`; });
   const grid4 = root.querySelector('.ms-grid4');
   function setView(v) {
     grid4.dataset.view = v;
