@@ -2178,7 +2178,6 @@
     .ms-note { font-size: 11px; color: var(--ink-faint); line-height: 1.6; }
     .ms-offline-box { display: none; }
     .ms-live.ms-offline .ms-offline-box { display: block; }
-    .ms-live.ms-offline .ms-grid4, .ms-live.ms-offline .ms-td, .ms-live.ms-offline .ms-td + .card { display: none; }
     .ms-open { display: inline-block; margin: 10px 0 6px; padding: 10px 18px; border-radius: 6px; background: #2962ff; color: #fff !important; font-weight: 700; font-size: 14px; text-decoration: none; }
     .ms-open:focus-visible { outline: 2px solid #fff; outline-offset: 2px; }
     .ms-offline-box { border: 1px solid rgba(240,165,0,.5); background: rgba(240,165,0,.1); border-radius: 6px; padding: 12px 14px; color: var(--ink); font-size: 12px; line-height: 1.6; }
@@ -2213,7 +2212,8 @@
     <div class="ms-offline-box" role="alert">
       <b>Live gold prices can't load here.</b> This viewer blocks network requests, so the charts can't reach the price feeds (Binance and Kraken).
       Open the live version in your browser to see real-time H4, H1, M15 and M1 candles:
-      <a class="ms-open" href="https://raw.githack.com/vazxanana/macro-dashboard/refs/heads/claude/website-display-xoyadz/index.html#market-structure" target="_blank" rel="noopener">Open live charts ↗</a>
+      <a class="ms-open" href="https://vazxanana.github.io/macro-dashboard/market-structure.html" target="_blank" rel="noopener">Open live charts ↗</a>
+      <span class="ms-note" style="display:block">If that page is not up yet, use the <a href="https://raw.githack.com/vazxanana/macro-dashboard/refs/heads/claude/website-display-xoyadz/index.html#market-structure" target="_blank" rel="noopener" style="color:inherit">backup link</a>.</span>
       <span class="ms-note" style="display:block">Or use <b>Load CSV</b> with a TradingView export (H4, H1, M15 or M1).</span>
       <div class="ms-note" id="ms-offline-why"></div>
     </div>
@@ -5812,7 +5812,7 @@ function msNextSetup(bars, A) {
 }
 
 
-if (/^#(market-structure|structure)$/.test(location.hash)) {
+if (/^#(market-structure|structure)$/.test(location.hash) || /market-structure\.html$/.test(location.pathname)) {
   window.addEventListener('load', () => {
     for (const t of document.querySelectorAll('.nav-primary .nav-tab')) if (t.textContent.trim() === 'Intelligence') t.click();
     const first = document.querySelector('#nav-group-intelligence .nav-tab'); if (first) first.click();
