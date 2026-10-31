@@ -5860,9 +5860,10 @@ if (/^#(market-structure|structure)$/.test(location.hash) || /market-structure\.
     vr:   { fill: 'rgba(255,152,0,0.18)', stroke: 'rgba(224,134,0,0.9)' },
     htf:  'rgba(41,98,255,0.85)', proj: '#2962ff',
   };
-  const G = { theme: 'light', show: { bo: true, origin: true, cf: true, vr: true, next: true, htf: true, plan: true }, risk: 100, alerts: false, plan: null, prev: null, sel: null, prevStates: {}, planKey: '',
+  const G = { theme: root.dataset.chart === 'dark' ? 'dark' : 'light', show: { bo: true, origin: true, cf: true, vr: true, next: true, htf: true, plan: true }, risk: 100, alerts: false, plan: null, prev: null, sel: null, prevStates: {}, planKey: '',
     offset: 0, spot: null, source: '', live: false, csv: false };
   const $ = (id) => document.getElementById(id);
+  const $o = (id) => document.getElementById(id) || { set textContent(v) {}, set className(v) {}, set innerHTML(v) {}, style: {} };
   const fmt = (v) => (v == null || !isFinite(v)) ? '—' : v.toLocaleString('en-US', { minimumFractionDigits: 1, maximumFractionDigits: 1 });
   const ftime = (t) => new Date((t - TZ) * 1000).toLocaleString('en-GB', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' });
 
@@ -6154,6 +6155,13 @@ if (/^#(market-structure|structure)$/.test(location.hash) || /market-structure\.
     $('ms-td-bias').textContent = `${word.toUpperCase()} SETUP`;
     $('ms-td-bias').className = 'ms-chip ' + (sell ? 'ms-chip-sell' : 'ms-chip-buy');
     $('ms-td-price').textContent = fmt(price);
+    if (document.getElementById('ms-hdr-price')) {
+      const hb = h1.bars, ref = hb.length > 24 ? hb[hb.length - 25].close : hb[0].close, ch = price - ref;
+      $o('ms-hdr-price').textContent = fmt(price);
+      $o('ms-hdr-chg').textContent = `${ch >= 0 ? '+' : ''}${fmt(ch)} (${(ch / ref * 100).toFixed(2)}%) 24h`;
+      $o('ms-hdr-chg').className = 'hdr-chg ' + (ch >= 0 ? 'up' : 'down');
+      document.title = `${fmt(price)} · Gold Structure`;
+    }
     $('ms-td-inval').textContent = fmt(sell ? e.top : e.bot);
     $('ms-td-align').innerHTML = TFS.map((tf) => {
       const p = panes[tf.id], tr = p.A ? p.A.trend : 0;
@@ -6223,7 +6231,7 @@ if (/^#(market-structure|structure)$/.test(location.hash) || /market-structure\.
     }
     const usd = (v) => '$' + Math.ceil(v).toLocaleString('en-US');
     $('ms-trades').innerHTML = list.map((t) => {
-      const size = t.mgc ? `${t.mgc} MGC${t.gc ? ` · ${t.gc} GC` : ''}` : `1 MGC = ${usd(t.r * 10)}`;
+      const size = t.mgc ? `${t.mgc} MGC${t.gc ? ` · ${t.gc} GC` : ''}` : `${usd(t.r * 10)}/MGC`;
       const tag = t.align === null ? '' : `<span class="ms-tag ${t.align ? 'with' : 'counter'}">${t.align ? `WITH ${t.upL}` : `AGAINST ${t.upL}`}</span>`;
       return `<button type="button" class="ms-trade${t.k === G.sel ? ' sel' : ''}${t.invalid ? ' invalid' : ''}" data-k="${t.k}" aria-pressed="${t.k === G.sel}">` +
         `<div class="ms-tr-h"><span class="ms-chip ${t.sell ? 'ms-chip-sell' : 'ms-chip-buy'}">${t.sell ? 'SELL' : 'BUY'}</span><b>${t.name}</b><small>${t.pair}</small>${tag}<span class="ms-st ${t.cls}">${t.state}</span></div>` +
@@ -6346,7 +6354,8 @@ if (/^#(market-structure|structure)$/.test(location.hash) || /market-structure\.
       p.chart.applyOptions({ layout: { background: { type: 'solid', color: t.bg }, textColor: t.text }, grid: { vertLines: { color: t.grid }, horzLines: { color: t.grid } }, rightPriceScale: { borderColor: t.border }, timeScale: { borderColor: t.border } });
       p.overlay.set(p.overlay.items);
     });
-    root.dataset.chart = G.theme; $('ms-theme').textContent = G.theme === 'light' ? 'Dark charts' : 'Light charts';
+    root.dataset.chart = G.theme; document.documentElement.dataset.theme = G.theme;
+    $('ms-theme').textContent = G.theme === 'light' ? 'Dark charts' : 'Light charts';
   }
   function applyAlertsBtn() {
     const b = $('ms-alerts'); b.textContent = G.alerts ? 'Alerts on' : 'Alerts off'; b.setAttribute('aria-pressed', String(G.alerts));
@@ -6356,12 +6365,12 @@ if (/^#(market-structure|structure)$/.test(location.hash) || /market-structure\.
     const pr = JSON.parse(localStorage.getItem('msPrefs') || '{}');
     if (pr.show) Object.assign(G.show, pr.show);
     if (pr.risk > 0) G.risk = +pr.risk;
-    if (pr.theme === 'dark') G.theme = 'dark';
+    if (pr.theme === 'dark' || pr.theme === 'light') G.theme = pr.theme;
     G.alerts = !!pr.alerts;
   } catch (e) {}
   root.querySelectorAll('[data-show]').forEach((cb) => { cb.checked = G.show[cb.dataset.show] !== false; });
   $('ms-risk').value = G.risk;
-  if (G.theme === 'dark') applyTheme();
+  applyTheme();
   applyAlertsBtn();
 
   root.querySelectorAll('[data-show]').forEach((cb) => cb.addEventListener('change', () => {
@@ -6378,6 +6387,18 @@ if (/^#(market-structure|structure)$/.test(location.hash) || /market-structure\.
     }
   });
   $('ms-fit').addEventListener('click', () => Object.values(panes).forEach((p) => p.fit()));
+  const grid4 = root.querySelector('.ms-grid4');
+  function setView(v) {
+    grid4.dataset.view = v;
+    root.querySelectorAll('[data-view]').forEach((b) => { const on = b.dataset.view === v; b.classList.toggle('on', on); b.setAttribute('aria-pressed', String(on)); });
+    try { localStorage.setItem('msView', v); } catch (e) {}
+    setTimeout(() => Object.values(panes).forEach((p) => p.fit()), 60);
+  }
+  if (root.querySelector('[data-view]')) {
+    root.querySelectorAll('[data-view]').forEach((b) => b.addEventListener('click', () => setView(b.dataset.view)));
+    let v0 = null; try { v0 = localStorage.getItem('msView'); } catch (e) {}
+    setView(v0 || (innerWidth < 1000 ? '1h' : 'all'));
+  }
   root.querySelectorAll('[data-expand]').forEach((b) => b.addEventListener('click', () => {
     const card = b.closest('.ms-pane'), on = !card.classList.contains('full');
     root.querySelectorAll('.ms-pane').forEach((c) => c.classList.remove('full'));
@@ -6410,6 +6431,7 @@ if (/^#(market-structure|structure)$/.test(location.hash) || /market-structure\.
 
   boot();
 })();
+
 </script>
 
 </body>
