@@ -2169,6 +2169,32 @@
     .ms-plan-grid b.ms-pos { color: #089981; }
     .ms-plan-grid input { width: 100%; max-width: 140px; background: transparent; color: var(--ink); border: 1px solid var(--line); border-radius: 4px; padding: 4px 8px; font: 700 15px var(--mono); }
     .ms-plan-grid input:focus-visible { outline: 2px solid #2962ff; outline-offset: 1px; }
+    .ms-risk { display: inline-flex; align-items: center; gap: 6px; text-transform: none; letter-spacing: 0; font-size: 11px; color: var(--ink-dim); }
+    .ms-risk input { width: 90px; background: transparent; color: var(--ink); border: 1px solid var(--line); border-radius: 4px; padding: 3px 6px; font: 700 13px var(--mono); }
+    .ms-risk input:focus-visible { outline: 2px solid #2962ff; outline-offset: 1px; }
+    .ms-trades { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
+    .ms-trade { all: unset; box-sizing: border-box; cursor: pointer; display: grid; gap: 8px; padding: 12px; border: 1px solid var(--line); border-radius: 6px; background: var(--panel-raised, transparent); min-width: 0; }
+    .ms-trade:hover { border-color: var(--ink-faint); }
+    .ms-trade:focus-visible { outline: 2px solid #2962ff; outline-offset: 2px; }
+    .ms-trade.sel { border-color: #2962ff; box-shadow: inset 0 0 0 1px #2962ff; }
+    .ms-trade.invalid { opacity: .55; }
+    .ms-tr-h { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+    .ms-tr-h b { font-size: 13px; color: var(--ink); }
+    .ms-tr-h small { color: var(--ink-faint); font: 600 10px var(--mono); }
+    .ms-st { margin-left: auto; padding: 2px 8px; border-radius: 10px; font: 700 10px var(--mono); letter-spacing: .4px; background: rgba(120,123,134,.15); color: var(--ink-dim); }
+    .ms-st.ready { background: #089981; color: #fff; }
+    .ms-st.near { background: rgba(240,165,0,.18); color: #f0a500; }
+    .ms-st.bad { background: rgba(242,54,69,.15); color: #f23645; }
+    .ms-tr-g { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px 10px; }
+    .ms-tr-g span { display: flex; flex-direction: column; font-size: 9px; letter-spacing: .6px; text-transform: uppercase; color: var(--ink-faint); min-width: 0; }
+    .ms-tr-g b { font: 700 13px var(--mono); color: var(--ink); font-variant-numeric: tabular-nums; letter-spacing: 0; text-transform: none; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .ms-tr-g b.neg { color: #f23645; }
+    .ms-tr-g b.pos { color: #089981; }
+    .ms-tr-n { font-size: 11px; line-height: 1.5; color: var(--ink-dim); }
+    .ms-tag { font: 700 9px var(--mono); padding: 1px 6px; border-radius: 3px; border: 1px solid var(--line); color: var(--ink-faint); }
+    .ms-tag.with { color: #089981; border-color: rgba(8,153,129,.4); }
+    .ms-tag.counter { color: #f0a500; border-color: rgba(240,165,0,.45); }
+    @media (max-width: 1000px) { .ms-trades { grid-template-columns: minmax(0, 1fr); } }
     .ms-cd { margin-left: auto; font: 600 11px var(--mono); color: var(--ms-mute); font-variant-numeric: tabular-nums; }
     .ms-cd + .ms-tbtn { margin-left: 0; }
     .ms-toasts { position: fixed; z-index: 9999; right: max(16px, env(safe-area-inset-right, 0px)); bottom: calc(16px + env(safe-area-inset-bottom, 0px)); display: grid; gap: 8px; max-width: min(360px, calc(100vw - 32px)); pointer-events: none; }
@@ -2233,18 +2259,9 @@
     </div>
 
     <div class="card">
-      <div class="ms-k">Trade plan <span class="ms-chip" id="ms-p-state">—</span></div>
-      <div class="ms-plan-grid">
-        <div><span>Entry</span><b id="ms-p-entry">—</b></div>
-        <div><span>Stop</span><b id="ms-p-stop" class="ms-neg">—</b></div>
-        <div><span>Target 1 (VR)</span><b id="ms-p-t1" class="ms-pos">—</b></div>
-        <div><span>Target 2</span><b id="ms-p-t2" class="ms-pos">—</b></div>
-        <div><span>Reward : risk (T1)</span><b id="ms-p-rr">—</b></div>
-        <div><label for="ms-risk">Risk per trade ($)</label><input id="ms-risk" type="number" min="1" step="10" value="100" inputmode="decimal"></div>
-        <div><span>MGC size ($10 / pt)</span><b id="ms-p-mgc">—</b></div>
-        <div><span>GC size ($100 / pt)</span><b id="ms-p-gc">—</b></div>
-      </div>
-      <div class="ms-note" id="ms-p-basis" style="margin-top:10px"></div>
+      <div class="ms-k">Possible trades <span class="ms-risk"><label for="ms-risk">Risk per trade $</label><input id="ms-risk" type="number" min="1" step="10" value="100" inputmode="decimal"></span></div>
+      <div class="ms-trades" id="ms-trades"><div class="ms-note">Waiting for live candles…</div></div>
+      <div class="ms-note" style="margin-top:10px">Tap a trade to draw it on the charts. Prices are XAU/USD spot; MGC/GC futures trade a few dollars higher. Setups follow the Mosha rules and are not financial advice.</div>
     </div>
     <div class="ms-toasts" id="ms-toasts" role="status" aria-live="polite"></div>
 
@@ -5843,7 +5860,7 @@ if (/^#(market-structure|structure)$/.test(location.hash) || /market-structure\.
     vr:   { fill: 'rgba(255,152,0,0.18)', stroke: 'rgba(224,134,0,0.9)' },
     htf:  'rgba(41,98,255,0.85)', proj: '#2962ff',
   };
-  const G = { theme: 'light', show: { bo: true, origin: true, cf: true, vr: true, next: true, htf: true, plan: true }, risk: 100, alerts: false, plan: null, prev: null,
+  const G = { theme: 'light', show: { bo: true, origin: true, cf: true, vr: true, next: true, htf: true, plan: true }, risk: 100, alerts: false, plan: null, prev: null, sel: null, prevStates: {}, planKey: '',
     offset: 0, spot: null, source: '', live: false, csv: false };
   const $ = (id) => document.getElementById(id);
   const fmt = (v) => (v == null || !isFinite(v)) ? '—' : v.toLocaleString('en-US', { minimumFractionDigits: 1, maximumFractionDigits: 1 });
@@ -6035,7 +6052,15 @@ if (/^#(market-structure|structure)$/.test(location.hash) || /market-structure\.
           items.labels.push({ l: n + 26, dx: -4, align: 'right', p: he.top, dy: 14, text: `${h.label} Origin`, color: Z.htf });
         });
       }
-      if (G.show.next && S && S.proj.length && (tf.id === '4h' || tf.id === '1h')) {
+      const pos = G.show.plan && G.plan;
+      if (pos) {
+        const pl = G.plan, l1 = n + 3, l2 = n + 20;
+        items.boxes.push({ l1, l2, lo: Math.min(pl.entry, pl.t1), hi: Math.max(pl.entry, pl.t1), fill: 'rgba(8,153,129,0.20)', stroke: 'rgba(8,153,129,0.7)' });
+        items.boxes.push({ l1, l2, lo: Math.min(pl.entry, pl.stop), hi: Math.max(pl.entry, pl.stop), fill: 'rgba(242,54,69,0.20)', stroke: 'rgba(242,54,69,0.7)' });
+        items.labels.push({ l: l1 + 8, p: pl.t1, text: `${pl.name} ${pl.sell ? 'SELL' : 'BUY'} · ${pl.rr.toFixed(1)}R`, pill: true, bg: pl.sell ? '#f23645' : '#089981', dy: pl.sell ? 16 : -16 });
+        items.labels.push({ l: l1 + 8, p: pl.entry, text: `Entry ${fmt(pl.entry)}`, pill: true, bg: '#2962ff', dy: 0 });
+      }
+      if (!pos && G.show.next && S && S.proj.length && (tf.id === '4h' || tf.id === '1h')) {
         items.path = S.proj;
         S.proj.forEach((p) => { if (p.t) items.labels.push({ l: p.l, p: p.p, text: p.t, pill: true, bg: Z.proj, dy: p.t.startsWith('②') ? (S.sell ? -18 : 18) : (S.sell ? 18 : -18) }); });
       }
@@ -6136,36 +6161,7 @@ if (/^#(market-structure|structure)$/.test(location.hash) || /market-structure\.
       return `<span class="ms-al ${cls}">${tf.label} ${tr < 0 ? '▼' : tr > 0 ? '▲' : '–'}</span>`;
     }).join('');
 
-    // Trade plan: Mosha stop beyond the Origin (or the H1 CF), first target at the H4 VR / extreme
-    const h = e.top - e.bot, buf = Math.max(0.08 * h, 0.5), sgn = sell ? -1 : 1;
-    let pe, ps, basis;
-    if (cfDone) {
-      pe = lastH1.level; ps = sell ? lastH1.top + buf / 2 : lastH1.bot - buf / 2;
-      basis = `Confirmed: enter at the H1 BO ${word} level ${fmt(pe)}; stop just beyond the H1 CF ${sell ? 'high' : 'low'}.`;
-    } else {
-      pe = sell ? e.bot + 0.5 * h : e.top - 0.5 * h; ps = sell ? e.top + buf : e.bot - buf;
-      basis = `Planned: limit in the middle of the H4 Origin, stop beyond the Origin. Only take it once the H1 CF prints (step 4).`;
-    }
-    const r = Math.abs(ps - pe);
-    let t1 = h4.A.ext.p;
-    if ((t1 - pe) * sgn < r) t1 = pe + sgn * 2 * r;
-    const t2 = t1 + sgn * h;
-    const rr = Math.abs(t1 - pe) / r;
-    G.plan = beyond ? null : { entry: pe, stop: ps, t1, t2 };
-    $('ms-p-entry').textContent = beyond ? '—' : fmt(pe);
-    $('ms-p-stop').textContent = beyond ? '—' : fmt(ps);
-    $('ms-p-t1').textContent = beyond ? '—' : fmt(t1);
-    $('ms-p-t2').textContent = beyond ? '—' : fmt(t2);
-    $('ms-p-rr').textContent = beyond ? '—' : `${rr.toFixed(1)} R`;
-    const mgc = Math.floor(G.risk / (r * 10)), gc = Math.floor(G.risk / (r * 100));
-    const usd = (v) => '$' + Math.ceil(v).toLocaleString('en-US');
-    $('ms-p-mgc').textContent = beyond ? '—' : (mgc ? `${mgc} contract${mgc === 1 ? '' : 's'}` : `1 needs ${usd(r * 10)}`);
-    $('ms-p-gc').textContent = beyond ? '—' : (gc ? `${gc} contract${gc === 1 ? '' : 's'}` : `1 needs ${usd(r * 100)}`);
-    $('ms-p-state').textContent = beyond ? 'NO TRADE' : cfDone ? `${word.toUpperCase()} · CONFIRMED` : `${word.toUpperCase()} · PLANNED`;
-    $('ms-p-state').className = 'ms-chip ' + (beyond ? '' : sell ? 'ms-chip-sell' : 'ms-chip-buy');
-    $('ms-p-basis').textContent = beyond ? 'Price is beyond the H4 Origin, so there is no valid plan until the next H4 BO.'
-      : `${basis} Stop distance ${fmt(r)} pts. Spot prices; adjust for the futures premium if you trade MGC/GC.`;
-    Object.values(panes).forEach((p) => p.A && p.planLinesDraw());
+    renderTrades(price);
 
     // Alerts when a step completes or H4 prints a new BO
     const key = `${e.dir}:${breakT}`, done = steps.map((x) => x.done);
@@ -6175,6 +6171,76 @@ if (/^#(market-structure|structure)$/.test(location.hash) || /market-structure\.
       if (!G.prev.beyond && beyond) notify('Setup invalidated', status);
     }
     G.prev = { key, done, beyond };
+  }
+
+  // ─── Possible trades: the Mosha setup on three timeframe pairs ───
+  const PAIRS = [
+    { k: 'swing',    name: 'Swing',    h: '4h',  l: '1h',  e: 'M15', up: null },
+    { k: 'intraday', name: 'Intraday', h: '1h',  l: '15m', e: 'M1',  up: '4h' },
+    { k: 'scalp',    name: 'Scalp',    h: '15m', l: '1m',  e: 'M1',  up: '1h' },
+  ];
+  const LBL = { '4h': 'H4', '1h': 'H1', '15m': 'M15', '1m': 'M1' };
+  function buildSetup(pr, price) {
+    const hp = panes[pr.h], lp = panes[pr.l];
+    if (!hp.A || !hp.A.last || !lp.A || !lp.bars) return null;
+    const e = hp.A.last, dir = e.dir, sell = dir < 0, sgn = sell ? -1 : 1, h = e.top - e.bot;
+    const H = LBL[pr.h], Lo = LBL[pr.l], word = sell ? 'sell' : 'buy';
+    const breakT = hp.bars[e.breakIdx].time;
+    const beyond = sell ? price > e.top : price < e.bot;
+    const inOrigin = price >= e.bot && price <= e.top;
+    const after = lp.A.events.filter((x) => lp.bars[x.breakIdx].time >= breakT);
+    const vr = !!e.vr || after.some((x) => x.dir === -dir);
+    const touched = lp.bars.some((b) => b.time > breakT && (sell ? b.high >= e.bot : b.low <= e.top));
+    const ll = lp.A.last;
+    const cf = touched && vr && ll && ll.dir === dir && lp.bars[ll.breakIdx].time > breakT;
+    const buf = Math.max(0.08 * h, 0.3);
+    let entry, stop;
+    if (cf) { entry = ll.level; stop = sell ? ll.top + buf / 2 : ll.bot - buf / 2; }
+    else { entry = sell ? e.bot + 0.5 * h : e.top - 0.5 * h; stop = sell ? e.top + buf : e.bot - buf; }
+    const r = Math.abs(stop - entry);
+    let t1 = hp.A.ext.p;
+    if ((t1 - entry) * sgn < r) t1 = entry + sgn * 2 * r;
+    const t2 = t1 + sgn * h, rr = Math.abs(t1 - entry) / r;
+    const dist = Math.abs(price - entry);
+    let state, cls, next;
+    if (beyond) { state = 'INVALID'; cls = 'bad'; next = `Price is beyond the ${H} Origin. Wait for the next ${H} BO.`; }
+    else if (cf) { state = 'READY'; cls = 'ready'; next = `${Lo} CF confirmed inside the ${H} Origin. Enter on an ${pr.e} Barrier pattern near ${fmt(entry)}.`; }
+    else if (inOrigin || touched) { state = 'IN ORIGIN'; cls = 'near'; next = `Price is in the ${H} Origin. Wait for ${Lo} to print a BO ${sell ? 'Sell' : 'Buy'} (the CF), then ${word}.`; }
+    else if (vr) { state = 'WAIT RETRACE'; cls = ''; next = `${H} VR is in. Wait for price to come back ${sell ? 'up' : 'down'} into ${fmt(e.bot)} – ${fmt(e.top)} (${fmt(dist)} pts away).`; }
+    else { state = 'WAIT VR'; cls = ''; next = `${H} just broke ${sell ? 'down' : 'up'}. Let the move finish and reverse on ${Lo} before planning the ${word}.`; }
+    const upP = pr.up && panes[pr.up];
+    const align = !upP || !upP.A ? null : upP.A.trend === dir;
+    const mgc = Math.floor(G.risk / (r * 10)), gc = Math.floor(G.risk / (r * 100));
+    return { k: pr.k, name: pr.name, pair: `${H} → ${Lo}`, sell, entry, stop, t1, t2, rr, r, state, cls, next, align, upL: pr.up ? LBL[pr.up] : '', mgc, gc, invalid: beyond };
+  }
+  function renderTrades(price) {
+    const list = PAIRS.map((pr) => buildSetup(pr, price)).filter(Boolean);
+    if (!list.length) return;
+    const order = { READY: 0, 'IN ORIGIN': 1, 'WAIT RETRACE': 2, 'WAIT VR': 3, INVALID: 4 };
+    if (!G.sel || !list.some((t) => t.k === G.sel && !t.invalid)) {
+      const best = list.slice().sort((a, b) => order[a.state] - order[b.state])[0];
+      G.sel = best.k;
+    }
+    const usd = (v) => '$' + Math.ceil(v).toLocaleString('en-US');
+    $('ms-trades').innerHTML = list.map((t) => {
+      const size = t.mgc ? `${t.mgc} MGC${t.gc ? ` · ${t.gc} GC` : ''}` : `1 MGC = ${usd(t.r * 10)}`;
+      const tag = t.align === null ? '' : `<span class="ms-tag ${t.align ? 'with' : 'counter'}">${t.align ? `WITH ${t.upL}` : `AGAINST ${t.upL}`}</span>`;
+      return `<button type="button" class="ms-trade${t.k === G.sel ? ' sel' : ''}${t.invalid ? ' invalid' : ''}" data-k="${t.k}" aria-pressed="${t.k === G.sel}">` +
+        `<div class="ms-tr-h"><span class="ms-chip ${t.sell ? 'ms-chip-sell' : 'ms-chip-buy'}">${t.sell ? 'SELL' : 'BUY'}</span><b>${t.name}</b><small>${t.pair}</small>${tag}<span class="ms-st ${t.cls}">${t.state}</span></div>` +
+        `<div class="ms-tr-g"><span>Entry<b>${fmt(t.entry)}</b></span><span>Stop<b class="neg">${fmt(t.stop)}</b></span><span>Target 1<b class="pos">${fmt(t.t1)}</b></span>` +
+        `<span>Target 2<b class="pos">${fmt(t.t2)}</b></span><span>Reward : risk<b>${t.rr.toFixed(1)} R</b></span><span>Size<b>${size}</b></span></div>` +
+        `<div class="ms-tr-n">${t.next}</div></button>`;
+    }).join('');
+    $('ms-trades').querySelectorAll('.ms-trade').forEach((b) => b.addEventListener('click', () => { G.sel = b.dataset.k; G.planKey = ''; renderTrades(price); }));
+    const sel = list.find((t) => t.k === G.sel);
+    G.plan = sel && !sel.invalid ? { entry: sel.entry, stop: sel.stop, t1: sel.t1, t2: sel.t2, rr: sel.rr, sell: sel.sell, name: sel.name } : null;
+    const key = G.plan ? [G.sel, G.plan.entry, G.plan.stop, G.plan.t1].map((v) => typeof v === 'number' ? v.toFixed(1) : v).join('|') : 'none';
+    if (key !== G.planKey) { G.planKey = key; Object.values(panes).forEach((p) => p.A && p.draw()); }
+    list.forEach((t) => {
+      const was = G.prevStates[t.k];
+      if (was && was !== t.state && t.state === 'READY') notify(`${t.name} ${t.sell ? 'sell' : 'buy'} ready`, `${t.pair}: entry ${fmt(t.entry)}, stop ${fmt(t.stop)}, target ${fmt(t.t1)} (${t.rr.toFixed(1)}R).`);
+      G.prevStates[t.k] = t.state;
+    });
   }
 
   let actx = null;
