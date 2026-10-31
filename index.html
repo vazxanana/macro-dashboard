@@ -2161,6 +2161,20 @@
     .ms-chart { height: 400px; width: 100%; }
     .ms-ro { display: flex; flex-wrap: wrap; gap: 4px 16px; padding: 7px 10px; border-top: 1px solid var(--ms-b); font-size: 11px; color: var(--ms-mute); min-height: 30px; }
     .ms-ro b { color: var(--ms-fg); font-weight: 600; font-variant-numeric: tabular-nums; }
+    .ms-plan-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px 16px; }
+    .ms-plan-grid > div { display: flex; flex-direction: column; gap: 4px; min-width: 0; border-bottom: 1px solid var(--line-soft); padding-bottom: 8px; }
+    .ms-plan-grid span, .ms-plan-grid label { font-size: 10px; letter-spacing: .6px; text-transform: uppercase; color: var(--ink-faint); }
+    .ms-plan-grid b { font: 700 16px var(--mono); color: var(--ink); font-variant-numeric: tabular-nums; }
+    .ms-plan-grid b.ms-neg { color: #f23645; }
+    .ms-plan-grid b.ms-pos { color: #089981; }
+    .ms-plan-grid input { width: 100%; max-width: 140px; background: transparent; color: var(--ink); border: 1px solid var(--line); border-radius: 4px; padding: 4px 8px; font: 700 15px var(--mono); }
+    .ms-plan-grid input:focus-visible { outline: 2px solid #2962ff; outline-offset: 1px; }
+    .ms-cd { margin-left: auto; font: 600 11px var(--mono); color: var(--ms-mute); font-variant-numeric: tabular-nums; }
+    .ms-cd + .ms-tbtn { margin-left: 0; }
+    .ms-toasts { position: fixed; z-index: 9999; right: max(16px, env(safe-area-inset-right, 0px)); bottom: calc(16px + env(safe-area-inset-bottom, 0px)); display: grid; gap: 8px; max-width: min(360px, calc(100vw - 32px)); pointer-events: none; }
+    .ms-toast { pointer-events: auto; background: #131722; color: #fff; border-left: 3px solid #2962ff; border-radius: 4px; padding: 10px 12px; font-size: 12px; line-height: 1.5; box-shadow: 0 6px 20px rgba(0,0,0,.35); }
+    .ms-toast b { display: block; font-size: 11px; letter-spacing: .6px; text-transform: uppercase; color: #8ab4ff; margin-bottom: 2px; }
+    @media (max-width: 1000px) { .ms-plan-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
     .ms-note { font-size: 11px; color: var(--ink-faint); line-height: 1.6; }
     .ms-offline-box { display: none; }
     .ms-live.ms-offline .ms-offline-box { display: block; }
@@ -2181,8 +2195,10 @@
         <label><input type="checkbox" id="ms-show-vr" data-show="vr" checked><i style="background:rgba(255,152,0,.4);border:1px solid #e08600"></i>VR</label>
         <label><input type="checkbox" id="ms-show-htf" data-show="htf" checked><i style="border:1.5px dashed #2962ff"></i>HTF Origin</label>
         <label><input type="checkbox" id="ms-show-next" data-show="next" checked><i style="background:#2962ff;height:2px"></i>Next setup</label>
+        <label><input type="checkbox" id="ms-show-plan" data-show="plan" checked><i style="background:#8e24aa;height:2px"></i>Trade plan</label>
       </div>
       <div class="ms-right">
+        <button type="button" class="ms-tbtn" id="ms-alerts" aria-pressed="false">Alerts off</button>
         <button type="button" class="ms-tbtn" id="ms-fit">Reset view</button>
         <button type="button" class="ms-tbtn" id="ms-theme">Dark charts</button>
         <label class="ms-tbtn" for="ms-csv">Load CSV</label>
@@ -2211,11 +2227,27 @@
       </div>
     </div>
 
+    <div class="card">
+      <div class="ms-k">Trade plan <span class="ms-chip" id="ms-p-state">—</span></div>
+      <div class="ms-plan-grid">
+        <div><span>Entry</span><b id="ms-p-entry">—</b></div>
+        <div><span>Stop</span><b id="ms-p-stop" class="ms-neg">—</b></div>
+        <div><span>Target 1 (VR)</span><b id="ms-p-t1" class="ms-pos">—</b></div>
+        <div><span>Target 2</span><b id="ms-p-t2" class="ms-pos">—</b></div>
+        <div><span>Reward : risk (T1)</span><b id="ms-p-rr">—</b></div>
+        <div><label for="ms-risk">Risk per trade ($)</label><input id="ms-risk" type="number" min="1" step="10" value="100" inputmode="decimal"></div>
+        <div><span>MGC size ($10 / pt)</span><b id="ms-p-mgc">—</b></div>
+        <div><span>GC size ($100 / pt)</span><b id="ms-p-gc">—</b></div>
+      </div>
+      <div class="ms-note" id="ms-p-basis" style="margin-top:10px"></div>
+    </div>
+    <div class="ms-toasts" id="ms-toasts" role="status" aria-live="polite"></div>
+
     <div class="ms-grid4">
-      <div class="ms-pane"><div class="ms-ph"><b>H4</b><span class="ms-role">Direction · BO</span><span class="ms-chip" id="ms-t-4h">—</span><button type="button" class="ms-tbtn" data-expand="4h" aria-pressed="false">Expand</button></div><div class="ms-legend" id="ms-l-4h"></div><div class="ms-chart" id="ms-c-4h"></div><div class="ms-ro" id="ms-r-4h"></div></div>
-      <div class="ms-pane"><div class="ms-ph"><b>H1</b><span class="ms-role">VR · CF</span><span class="ms-chip" id="ms-t-1h">—</span><button type="button" class="ms-tbtn" data-expand="1h" aria-pressed="false">Expand</button></div><div class="ms-legend" id="ms-l-1h"></div><div class="ms-chart" id="ms-c-1h"></div><div class="ms-ro" id="ms-r-1h"></div></div>
-      <div class="ms-pane"><div class="ms-ph"><b>M15</b><span class="ms-role">Narrative · Barrier</span><span class="ms-chip" id="ms-t-15m">—</span><button type="button" class="ms-tbtn" data-expand="15m" aria-pressed="false">Expand</button></div><div class="ms-legend" id="ms-l-15m"></div><div class="ms-chart" id="ms-c-15m"></div><div class="ms-ro" id="ms-r-15m"></div></div>
-      <div class="ms-pane"><div class="ms-ph"><b>M1</b><span class="ms-role">Entry trigger</span><span class="ms-chip" id="ms-t-1m">—</span><button type="button" class="ms-tbtn" data-expand="1m" aria-pressed="false">Expand</button></div><div class="ms-legend" id="ms-l-1m"></div><div class="ms-chart" id="ms-c-1m"></div><div class="ms-ro" id="ms-r-1m"></div></div>
+      <div class="ms-pane"><div class="ms-ph"><b>H4</b><span class="ms-role">Direction · BO</span><span class="ms-chip" id="ms-t-4h">—</span><span class="ms-cd" id="ms-cd-4h" title="Time until this candle closes"></span><button type="button" class="ms-tbtn" data-expand="4h" aria-pressed="false">Expand</button></div><div class="ms-legend" id="ms-l-4h"></div><div class="ms-chart" id="ms-c-4h"></div><div class="ms-ro" id="ms-r-4h"></div></div>
+      <div class="ms-pane"><div class="ms-ph"><b>H1</b><span class="ms-role">VR · CF</span><span class="ms-chip" id="ms-t-1h">—</span><span class="ms-cd" id="ms-cd-1h" title="Time until this candle closes"></span><button type="button" class="ms-tbtn" data-expand="1h" aria-pressed="false">Expand</button></div><div class="ms-legend" id="ms-l-1h"></div><div class="ms-chart" id="ms-c-1h"></div><div class="ms-ro" id="ms-r-1h"></div></div>
+      <div class="ms-pane"><div class="ms-ph"><b>M15</b><span class="ms-role">Narrative · Barrier</span><span class="ms-chip" id="ms-t-15m">—</span><span class="ms-cd" id="ms-cd-15m" title="Time until this candle closes"></span><button type="button" class="ms-tbtn" data-expand="15m" aria-pressed="false">Expand</button></div><div class="ms-legend" id="ms-l-15m"></div><div class="ms-chart" id="ms-c-15m"></div><div class="ms-ro" id="ms-r-15m"></div></div>
+      <div class="ms-pane"><div class="ms-ph"><b>M1</b><span class="ms-role">Entry trigger</span><span class="ms-chip" id="ms-t-1m">—</span><span class="ms-cd" id="ms-cd-1m" title="Time until this candle closes"></span><button type="button" class="ms-tbtn" data-expand="1m" aria-pressed="false">Expand</button></div><div class="ms-legend" id="ms-l-1m"></div><div class="ms-chart" id="ms-c-1m"></div><div class="ms-ro" id="ms-r-1m"></div></div>
     </div>
   </div>
 
@@ -5800,7 +5832,7 @@ function msNextSetup(bars, A) {
     vr:   { fill: 'rgba(255,152,0,0.18)', stroke: 'rgba(224,134,0,0.9)' },
     htf:  'rgba(41,98,255,0.85)', proj: '#2962ff',
   };
-  const G = { theme: 'light', show: { bo: true, origin: true, cf: true, vr: true, next: true, htf: true },
+  const G = { theme: 'light', show: { bo: true, origin: true, cf: true, vr: true, next: true, htf: true, plan: true }, risk: 100, alerts: false, plan: null, prev: null,
     offset: 0, spot: null, source: '', live: false, csv: false };
   const $ = (id) => document.getElementById(id);
   const fmt = (v) => (v == null || !isFinite(v)) ? '—' : v.toLocaleString('en-US', { minimumFractionDigits: 1, maximumFractionDigits: 1 });
@@ -5959,9 +5991,10 @@ function msNextSetup(bars, A) {
       const bars = P.bars, n = bars.length, A = P.A, S = P.S;
       const items = { boxes: [], lines: [], labels: [], path: [] };
       const recent = A.events.slice(-2), seen = new Set();
-      A.events.forEach((e) => {
+      const evs = A.events.slice(tf.sec <= 900 ? -8 : -14);
+      evs.forEach((e, k) => {
         const c = e.dir < 0 ? Z.sell : Z.buy, sell = e.dir < 0;
-        if (G.show.bo) items.lines.push({ l1: e.fromIdx, l2: e.breakIdx, p: e.level, color: c.line, text: e.structure ? 'BO Structure' : (sell ? 'BO Sell' : 'BO Buy'), below: sell });
+        if (G.show.bo) items.lines.push({ l1: e.fromIdx, l2: e.breakIdx, p: e.level, color: c.line, text: k >= evs.length - 5 ? (e.structure ? 'BO Structure' : (sell ? 'BO Sell' : 'BO Buy')) : '', below: sell });
         if (!recent.includes(e)) return;
         const end = e.endIdx !== null ? e.endIdx : n + 26;
         if (G.show.origin) {
@@ -5999,6 +6032,18 @@ function msNextSetup(bars, A) {
       overlay.set(items);
       P.priceLines.forEach((pl) => series.removePriceLine(pl)); P.priceLines = [];
       if (S) P.priceLines.push(series.createPriceLine({ price: S.invalid, color: '#787b86', lineWidth: 1, lineStyle: LW.LineStyle.Dashed, axisLabelVisible: true, title: 'Invalidation' }));
+      P.planLinesDraw();
+    };
+    P.planLines = [];
+    P.planLinesDraw = function () {
+      P.planLines.forEach((pl) => series.removePriceLine(pl)); P.planLines = [];
+      const pl = G.plan;
+      if (!G.show.plan || !pl || tf.id === '4h') return;
+      const add = (price, color, title, style) => P.planLines.push(series.createPriceLine({ price, color, lineWidth: 1, lineStyle: style, axisLabelVisible: true, title }));
+      add(pl.entry, '#2962ff', 'Entry', LW.LineStyle.Solid);
+      add(pl.stop, '#f23645', 'Stop', LW.LineStyle.Solid);
+      add(pl.t1, '#089981', 'T1', LW.LineStyle.Dashed);
+      if (tf.id !== '1m') add(pl.t2, '#089981', 'T2', LW.LineStyle.Dotted);
     };
     P.readout = function () {
       const A = P.A, e = A.last, box = $(`ms-r-${tf.id}`), chip = $(`ms-t-${tf.id}`);
@@ -6079,7 +6124,77 @@ function msNextSetup(bars, A) {
       const cls = tr === dir ? 'ok' : tr === -dir ? 'against' : '';
       return `<span class="ms-al ${cls}">${tf.label} ${tr < 0 ? '▼' : tr > 0 ? '▲' : '–'}</span>`;
     }).join('');
+
+    // Trade plan: Mosha stop beyond the Origin (or the H1 CF), first target at the H4 VR / extreme
+    const h = e.top - e.bot, buf = Math.max(0.08 * h, 0.5), sgn = sell ? -1 : 1;
+    let pe, ps, basis;
+    if (cfDone) {
+      pe = lastH1.level; ps = sell ? lastH1.top + buf / 2 : lastH1.bot - buf / 2;
+      basis = `Confirmed: enter at the H1 BO ${word} level ${fmt(pe)}; stop just beyond the H1 CF ${sell ? 'high' : 'low'}.`;
+    } else {
+      pe = sell ? e.bot + 0.5 * h : e.top - 0.5 * h; ps = sell ? e.top + buf : e.bot - buf;
+      basis = `Planned: limit in the middle of the H4 Origin, stop beyond the Origin. Only take it once the H1 CF prints (step 4).`;
+    }
+    const r = Math.abs(ps - pe);
+    let t1 = h4.A.ext.p;
+    if ((t1 - pe) * sgn < r) t1 = pe + sgn * 2 * r;
+    const t2 = t1 + sgn * h;
+    const rr = Math.abs(t1 - pe) / r;
+    G.plan = beyond ? null : { entry: pe, stop: ps, t1, t2 };
+    $('ms-p-entry').textContent = beyond ? '—' : fmt(pe);
+    $('ms-p-stop').textContent = beyond ? '—' : fmt(ps);
+    $('ms-p-t1').textContent = beyond ? '—' : fmt(t1);
+    $('ms-p-t2').textContent = beyond ? '—' : fmt(t2);
+    $('ms-p-rr').textContent = beyond ? '—' : `${rr.toFixed(1)} R`;
+    const mgc = Math.floor(G.risk / (r * 10)), gc = Math.floor(G.risk / (r * 100));
+    const usd = (v) => '$' + Math.ceil(v).toLocaleString('en-US');
+    $('ms-p-mgc').textContent = beyond ? '—' : (mgc ? `${mgc} contract${mgc === 1 ? '' : 's'}` : `1 needs ${usd(r * 10)}`);
+    $('ms-p-gc').textContent = beyond ? '—' : (gc ? `${gc} contract${gc === 1 ? '' : 's'}` : `1 needs ${usd(r * 100)}`);
+    $('ms-p-state').textContent = beyond ? 'NO TRADE' : cfDone ? `${word.toUpperCase()} · CONFIRMED` : `${word.toUpperCase()} · PLANNED`;
+    $('ms-p-state').className = 'ms-chip ' + (beyond ? '' : sell ? 'ms-chip-sell' : 'ms-chip-buy');
+    $('ms-p-basis').textContent = beyond ? 'Price is beyond the H4 Origin, so there is no valid plan until the next H4 BO.'
+      : `${basis} Stop distance ${fmt(r)} pts. Spot prices; adjust for the futures premium if you trade MGC/GC.`;
+    Object.values(panes).forEach((p) => p.A && p.planLinesDraw());
+
+    // Alerts when a step completes or H4 prints a new BO
+    const key = `${e.dir}:${breakT}`, done = steps.map((x) => x.done);
+    if (G.prev) {
+      if (G.prev.key !== key) notify(`New H4 BO ${word}`, `H4 broke ${fmt(e.level)}. Origin ${fmt(e.bot)} – ${fmt(e.top)}.`);
+      else done.forEach((d, k) => { if (d && !G.prev.done[k]) notify(k === 4 ? `${word} entry window` : `Step ${k + 1} done`, steps[k].t); });
+      if (!G.prev.beyond && beyond) notify('Setup invalidated', status);
+    }
+    G.prev = { key, done, beyond };
   }
+
+  let actx = null;
+  function notify(title, body) {
+    const box = $('ms-toasts'), t = document.createElement('div');
+    t.className = 'ms-toast'; t.innerHTML = `<b></b><span></span>`;
+    t.querySelector('b').textContent = title; t.querySelector('span').textContent = body;
+    box.appendChild(t); setTimeout(() => t.remove(), 12000);
+    while (box.children.length > 3) box.firstChild.remove();
+    if (!G.alerts) return;
+    try { if ('Notification' in window && Notification.permission === 'granted') new Notification(`Gold · ${title}`, { body, tag: title }); } catch (e) {}
+    try {
+      actx = actx || new (window.AudioContext || window.webkitAudioContext)();
+      const o = actx.createOscillator(), g = actx.createGain();
+      o.frequency.value = 880; g.gain.setValueAtTime(0.12, actx.currentTime); g.gain.exponentialRampToValueAtTime(0.001, actx.currentTime + 0.5);
+      o.connect(g); g.connect(actx.destination); o.start(); o.stop(actx.currentTime + 0.5);
+    } catch (e) {}
+  }
+
+  function tickCountdowns() {
+    const now = Date.now() / 1000;
+    TFS.forEach((tf) => {
+      const P = panes[tf.id], el = $(`ms-cd-${tf.id}`);
+      if (!P.raw || !P.raw.length || G.csv) { el.textContent = ''; return; }
+      const rem = Math.round(P.raw[P.raw.length - 1].time + tf.sec - now);
+      if (rem < 0 || rem > tf.sec) { el.textContent = ''; return; }
+      const hh = Math.floor(rem / 3600), mm = Math.floor(rem % 3600 / 60), ss = rem % 60;
+      el.textContent = (hh ? `${hh}:${String(mm).padStart(2, '0')}` : `${mm}`) + `:${String(ss).padStart(2, '0')}`;
+    });
+  }
+  setInterval(tickCountdowns, 1000);
 
   // ─── Live updates: Binance websocket, REST polling as fallback ───
   let ws = null;
@@ -6145,16 +6260,45 @@ function msNextSetup(bars, A) {
   }
 
   // ─── Controls ───
-  root.querySelectorAll('[data-show]').forEach((cb) => cb.addEventListener('change', () => {
-    G.show[cb.dataset.show] = cb.checked; Object.values(panes).forEach((p) => p.A && p.draw());
-  }));
-  $('ms-theme').addEventListener('click', () => {
-    G.theme = G.theme === 'light' ? 'dark' : 'light'; const t = THEMES[G.theme];
+  function savePrefs() {
+    try { localStorage.setItem('msPrefs', JSON.stringify({ theme: G.theme, show: G.show, risk: G.risk, alerts: G.alerts })); } catch (e) {}
+  }
+  function applyTheme() {
+    const t = THEMES[G.theme];
     Object.values(panes).forEach((p) => {
       p.chart.applyOptions({ layout: { background: { type: 'solid', color: t.bg }, textColor: t.text }, grid: { vertLines: { color: t.grid }, horzLines: { color: t.grid } }, rightPriceScale: { borderColor: t.border }, timeScale: { borderColor: t.border } });
       p.overlay.set(p.overlay.items);
     });
     root.dataset.chart = G.theme; $('ms-theme').textContent = G.theme === 'light' ? 'Dark charts' : 'Light charts';
+  }
+  function applyAlertsBtn() {
+    const b = $('ms-alerts'); b.textContent = G.alerts ? 'Alerts on' : 'Alerts off'; b.setAttribute('aria-pressed', String(G.alerts));
+    b.style.background = G.alerts ? '#2962ff' : ''; b.style.color = G.alerts ? '#fff' : ''; b.style.borderColor = G.alerts ? '#2962ff' : '';
+  }
+  try {
+    const pr = JSON.parse(localStorage.getItem('msPrefs') || '{}');
+    if (pr.show) Object.assign(G.show, pr.show);
+    if (pr.risk > 0) G.risk = +pr.risk;
+    if (pr.theme === 'dark') G.theme = 'dark';
+    G.alerts = !!pr.alerts;
+  } catch (e) {}
+  root.querySelectorAll('[data-show]').forEach((cb) => { cb.checked = G.show[cb.dataset.show] !== false; });
+  $('ms-risk').value = G.risk;
+  if (G.theme === 'dark') applyTheme();
+  applyAlertsBtn();
+
+  root.querySelectorAll('[data-show]').forEach((cb) => cb.addEventListener('change', () => {
+    G.show[cb.dataset.show] = cb.checked; savePrefs(); Object.values(panes).forEach((p) => p.A && p.draw());
+  }));
+  $('ms-theme').addEventListener('click', () => { G.theme = G.theme === 'light' ? 'dark' : 'light'; applyTheme(); savePrefs(); });
+  $('ms-risk').addEventListener('input', () => { const v = +$('ms-risk').value; if (v > 0) { G.risk = v; savePrefs(); topDown(); } });
+  $('ms-alerts').addEventListener('click', async () => {
+    G.alerts = !G.alerts; applyAlertsBtn(); savePrefs();
+    if (G.alerts) {
+      try { if ('Notification' in window && Notification.permission === 'default') await Notification.requestPermission(); } catch (e) {}
+      const denied = !('Notification' in window) || Notification.permission === 'denied';
+      notify('Alerts on', denied ? 'Desktop notifications are blocked in this browser, so alerts show here with a sound.' : 'You will get a notification and a sound when a step completes.');
+    }
   });
   $('ms-fit').addEventListener('click', () => Object.values(panes).forEach((p) => p.fit()));
   root.querySelectorAll('[data-expand]').forEach((b) => b.addEventListener('click', () => {
