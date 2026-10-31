@@ -5807,6 +5807,12 @@ function msNextSetup(bars, A) {
 }
 
 
+if (/^#(market-structure|structure)$/.test(location.hash)) {
+  window.addEventListener('load', () => {
+    for (const t of document.querySelectorAll('.nav-primary .nav-tab')) if (t.textContent.trim() === 'Intelligence') t.click();
+    const first = document.querySelector('#nav-group-intelligence .nav-tab'); if (first) first.click();
+  });
+}
 // ═══ MOSHA LIVE MULTI-TIMEFRAME CHARTS — real gold candles (PAXG feed aligned to XAU/USD spot) ═══
 (function () {
   const LW = window.LightweightCharts;
