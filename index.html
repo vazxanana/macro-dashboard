@@ -5872,7 +5872,7 @@ if (/^#(market-structure|structure)$/.test(location.hash) || /market-structure\.
   const TZ = -new Date().getTimezoneOffset() * 60;
   const THEMES = {
     light: { bg: '#ffffff', text: '#131722', grid: '#f0f3fa', border: '#e0e3eb' },
-    dark:  { bg: '#131722', text: '#d1d4dc', grid: '#1e222d', border: '#2a2e39' },
+    dark:  { bg: '#151a23', text: '#8f98aa', grid: '#1b2230', border: '#273042' },
   };
   const UPC = '#089981', DNC = '#f23645';
   const Z = {
@@ -5926,13 +5926,14 @@ if (/^#(market-structure|structure)$/.test(location.hash) || /market-structure\.
       }
       return;
     }
-    for (const ln of it.lines) {
+    const texts = [];
+    it.lines.forEach((ln, k) => {
       const x1 = X(ln.l1), x2 = X(ln.l2), y = Y(ln.p);
-      if ([x1, x2, y].some((v) => v === null)) continue;
+      if ([x1, x2, y].some((v) => v === null)) return;
       ctx.strokeStyle = ln.color; ctx.lineWidth = 2;
       ctx.beginPath(); ctx.moveTo(x1, Math.round(y) + 0.5); ctx.lineTo(x2, Math.round(y) + 0.5); ctx.stroke();
-      if (ln.text) { ctx.fillStyle = ln.color; ctx.textAlign = 'center'; ctx.fillText(ln.text, (x1 + x2) / 2, ln.below ? y + 14 : y - 6); }
-    }
+      if (ln.text) texts.push({ pr: 3 - k / 1000, text: ln.text, x: (x1 + x2) / 2, y: ln.below ? y + 14 : y - 6, align: 'center', color: ln.color });
+    });
     if (it.path.length > 1) {
       ctx.strokeStyle = Z.proj; ctx.lineWidth = 2; ctx.setLineDash([6, 5]); ctx.beginPath();
       it.path.forEach((p, k) => { const x = X(p.l), y = Y(p.p); if (x === null || y === null) return; k ? ctx.lineTo(x, y) : ctx.moveTo(x, y); });
@@ -5949,15 +5950,27 @@ if (/^#(market-structure|structure)$/.test(location.hash) || /market-structure\.
     for (const lb of it.labels) {
       const x = X(lb.l), y = Y(lb.p);
       if (x === null || y === null) continue;
-      if (lb.pill) {
-        const w = ctx.measureText(lb.text).width + 12, bx = x - w / 2, yy = y + (lb.dy || 0);
-        ctx.fillStyle = lb.bg; ctx.fillRect(bx, yy - 10, w, 18);
-        ctx.fillStyle = '#ffffff'; ctx.textAlign = 'left'; ctx.fillText(lb.text, bx + 6, yy + 3);
-      } else {
-        ctx.textAlign = lb.align || 'left'; ctx.fillStyle = lb.color || t.text;
-        ctx.fillText(lb.text, x + (lb.dx || 0), y + (lb.dy || 0));
-      }
+      texts.push(lb.pill ? { pr: 0, pill: true, text: lb.text, x, y: y + (lb.dy || 0), bg: lb.bg }
+        : { pr: 1, text: lb.text, x: x + (lb.dx || 0), y: y + (lb.dy || 0), align: lb.align || 'left', color: lb.color || t.text });
     }
+    // Draw the most important text first and skip anything that would sit on top of it
+    const taken = [], W = ctx.canvas.width / (window.devicePixelRatio || 1);
+    const hit = (r) => taken.some((q) => r.x1 < q.x2 && r.x2 > q.x1 && r.y1 < q.y2 && r.y2 > q.y1);
+    texts.sort((a, b) => a.pr - b.pr).forEach((tx) => {
+      const w = ctx.measureText(tx.text).width + (tx.pill ? 12 : 0);
+      const x1 = tx.pill || tx.align === 'center' ? tx.x - w / 2 : tx.align === 'right' ? tx.x - w : tx.x;
+      const r = { x1: x1 - 2, x2: x1 + w + 2, y1: tx.y - (tx.pill ? 11 : 11), y2: tx.y + (tx.pill ? 9 : 3) };
+      if (r.x2 < 0 || r.x1 > W) return;
+      if (!tx.pill && hit(r)) return;
+      taken.push(r);
+      if (tx.pill) {
+        ctx.fillStyle = tx.bg; ctx.beginPath();
+        if (ctx.roundRect) ctx.roundRect(x1, tx.y - 10, w, 18, 4); else ctx.rect(x1, tx.y - 10, w, 18);
+        ctx.fill(); ctx.fillStyle = '#ffffff'; ctx.textAlign = 'left'; ctx.fillText(tx.text, x1 + 6, tx.y + 3);
+      } else {
+        ctx.textAlign = tx.align; ctx.fillStyle = tx.color; ctx.fillText(tx.text, tx.x, tx.y);
+      }
+    });
   }
 
   // ─── Data feed ───
@@ -6100,7 +6113,6 @@ if (/^#(market-structure|structure)$/.test(location.hash) || /market-structure\.
         items.boxes.push({ l1, l2, lo: Math.min(pl.entry, pl.t1), hi: Math.max(pl.entry, pl.t1), fill: 'rgba(8,153,129,0.20)', stroke: 'rgba(8,153,129,0.7)' });
         items.boxes.push({ l1, l2, lo: Math.min(pl.entry, pl.stop), hi: Math.max(pl.entry, pl.stop), fill: 'rgba(242,54,69,0.20)', stroke: 'rgba(242,54,69,0.7)' });
         items.labels.push({ l: l1 + 8, p: pl.t1, text: `${pl.name} ${pl.sell ? 'SELL' : 'BUY'} · ${pl.rr.toFixed(1)}R`, pill: true, bg: pl.sell ? '#f23645' : '#089981', dy: pl.sell ? 16 : -16 });
-        items.labels.push({ l: l1 + 8, p: pl.entry, text: `Entry ${fmt(pl.entry)}`, pill: true, bg: '#2962ff', dy: 0 });
       }
       if (!pos && G.show.next && S && S.proj.length && (tf.id === '4h' || tf.id === '1h')) {
         items.path = S.proj;
@@ -6198,6 +6210,9 @@ if (/^#(market-structure|structure)$/.test(location.hash) || /market-structure\.
     $('ms-td-price').textContent = fmt(price);
     if (document.getElementById('ms-hdr-price')) {
       const hb = h1.bars, ref = hb.length > 24 ? hb[hb.length - 25].close : hb[0].close, ch = price - ref;
+      const hpEl = document.getElementById('ms-hdr-price'), prevP = +hpEl.dataset.p;
+      if (prevP && prevP !== price) { hpEl.classList.remove('tick-up', 'tick-down'); void hpEl.offsetWidth; hpEl.classList.add(price > prevP ? 'tick-up' : 'tick-down'); }
+      hpEl.dataset.p = price;
       $o('ms-hdr-price').textContent = fmt(price);
       $o('ms-hdr-chg').textContent = `${ch >= 0 ? '+' : ''}${fmt(ch)} (${(ch / ref * 100).toFixed(2)}%) 24h`;
       $o('ms-hdr-chg').className = 'hdr-chg ' + (ch >= 0 ? 'up' : 'down');
