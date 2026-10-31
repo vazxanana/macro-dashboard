@@ -1217,7 +1217,7 @@
   </div>
 
   <div class="nav-secondary" id="nav-group-intelligence">
-    <button class="nav-tab" onclick="switchTab('intelligence-regime', event)">Regime</button>
+    <button class="nav-tab" onclick="switchTab('intelligence-regime', event)">Market Structure</button>
     <button class="nav-tab" onclick="switchTab('intelligence-bias', event)">Daily Bias</button>
     <button class="nav-tab" onclick="switchTab('intelligence-liquidity', event)">Liquidity</button>
     <button class="nav-tab" onclick="switchTab('intelligence-policy', event)">Policy</button>
@@ -2098,95 +2098,162 @@
   </div>
 </div>
 
-<!-- INTELLIGENCE: REGIME -->
+<!-- INTELLIGENCE: REGIME / MARKET STRUCTURE -->
 <div id="intelligence-regime" class="section">
   <div class="section-head">
-    <div class="section-title">Macro Regime Analysis</div>
-    <div class="section-meta">DECISION ENGINE</div>
+    <div class="section-title">Market Structure Framework</div>
+    <div class="section-meta">MOSHATRADES METHODOLOGY</div>
   </div>
+
+  <!-- SOP Overview -->
+  <div style="margin: 0 24px 20px; padding: 16px 20px; background: var(--panel-raised); border: 1px solid var(--line); border-radius: 6px; border-left: 3px solid var(--sage);">
+    <div style="font-size: 10px; font-weight: 700; letter-spacing: 1.2px; color: var(--sage); margin-bottom: 12px; text-transform: uppercase;">Standard Operating Procedure</div>
+    <div style="display: flex; gap: 24px; flex-wrap: wrap;">
+      <div style="flex: 1; min-width: 200px;">
+        <div style="font-size: 11px; font-weight: 700; color: var(--ink); margin-bottom: 6px;">Step 1 — Mark Market Structure</div>
+        <div style="font-size: 11px; color: var(--ink-dim); line-height: 1.7;">Identify VR (Value Range), Origin, and CF zones. Minimum range requirement: <span style="color: var(--sage); font-weight: 600;">50%</span> of swing.</div>
+      </div>
+      <div style="flex: 1; min-width: 200px;">
+        <div style="font-size: 11px; font-weight: 700; color: var(--ink); margin-bottom: 6px;">Step 2 — Entry Model</div>
+        <div style="font-size: 11px; color: var(--ink-dim); line-height: 1.7;">Choose: <span style="color: var(--amber);">Breakout System</span> (BO → VR → CF) or <span style="color: var(--amber);">Barrier Entry</span> (Simple CF / Janda). Pick one and master it.</div>
+      </div>
+    </div>
+  </div>
+
   <div class="grid grid-2" style="margin: 0 24px 24px;">
+
+    <!-- External Structure -->
     <div class="card">
-      <div class="card-head">
-        <div class="card-title">Current Regime</div>
-      </div>
-      <div class="card-value" style="color: var(--sage);">GOLDILOCKS</div>
-      <div style="font-size: 13px; color: var(--ink-dim); margin-top: 8px;">
-        <div style="padding: 8px; background: var(--sage-glow); border-radius: 4px; margin: 8px 0;">Balanced Growth</div>
-        <div>VIX: 18.5 (Normal)</div>
-        <div>Yield Curve: +42 bps (Steepening)</div>
-        <div>Inflation vs Target: Above but moderating</div>
-        <div style="margin-top: 12px; color: var(--sage); font-weight: 600;">Confidence: 78%</div>
-      </div>
-    </div>
-    <div class="card">
-      <div class="card-head">
-        <div class="card-title">Regime Drivers</div>
-      </div>
-      <div style="font-size: 12px; line-height: 1.8;">
-        <div style="display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid var(--line-soft);">
-          <span>Earnings Growth</span>
-          <span style="color: var(--sage);">+8.2% ↑</span>
+      <div class="card-head"><div class="card-title">External Market Structure</div></div>
+      <div style="font-size: 11px; color: var(--ink-dim); line-height: 1.8; margin-top: 8px;">
+        <div style="margin-bottom: 10px; padding: 8px; background: var(--sage-glow); border-radius: 4px;">
+          <div style="font-weight: 700; color: var(--sage); margin-bottom: 4px;">BULLISH — Higher Highs &amp; Higher Lows</div>
+          <div>HH → HL → <span style="color: var(--sage); font-weight: 600;">BO Buy</span> (break above prev HH)</div>
+          <div style="color: var(--ink-faint); font-size: 10px; margin-top: 4px;">Price forms HH, pulls back to HL, breaks above external high</div>
         </div>
-        <div style="display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid var(--line-soft);">
-          <span>Valuations</span>
-          <span style="color: var(--ink-dim);">18.5x →</span>
-        </div>
-        <div style="display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid var(--line-soft);">
-          <span>Interest Rates</span>
-          <span style="color: var(--sage);">Declining ↓</span>
-        </div>
-        <div style="display: flex; justify-content: space-between; padding: 8px 0;">
-          <span>Liquidity</span>
-          <span style="color: var(--sage);">Abundant ↑</span>
+        <div style="padding: 8px; background: var(--rust-glow); border-radius: 4px;">
+          <div style="font-weight: 700; color: var(--rust); margin-bottom: 4px;">BEARISH — Lower Highs &amp; Lower Lows</div>
+          <div>LH → LL → <span style="color: var(--rust); font-weight: 600;">BO Sell</span> (break below prev LL)</div>
+          <div style="color: var(--ink-faint); font-size: 10px; margin-top: 4px;">Price forms LH, fails to hold, breaks below external low</div>
         </div>
       </div>
     </div>
+
+    <!-- Internal Structure -->
     <div class="card">
-      <div class="card-head">
-        <div class="card-title">Growth vs Inflation</div>
-      </div>
-      <div style="font-size: 12px; line-height: 1.8;">
-        <div style="display: flex; justify-content: space-between; padding: 8px 0;">
-          <span>GDP Growth</span>
-          <span>+2.4%</span>
+      <div class="card-head"><div class="card-title">Internal Market Structure</div></div>
+      <div style="font-size: 11px; color: var(--ink-dim); line-height: 1.8; margin-top: 8px;">
+        <div style="margin-bottom: 8px; font-size: 10px; font-weight: 700; letter-spacing: 0.8px; color: var(--ink-faint); text-transform: uppercase;">i-Breakout (Internal Breakout)</div>
+        <div style="padding: 8px; background: var(--panel-raised); border-radius: 4px; margin-bottom: 8px;">
+          <div style="font-weight: 600; color: var(--ink); margin-bottom: 4px;">i-BO Sell (inside bullish swing)</div>
+          <div>E.High formed → i-Breakout Sell below E.Low</div>
+          <div style="color: var(--ink-faint); font-size: 10px; margin-top: 3px;">Internal bearish break within the pullback of a larger bullish move</div>
         </div>
-        <div style="display: flex; justify-content: space-between; padding: 8px 0;">
-          <span>Inflation (YoY)</span>
-          <span>+3.1%</span>
-        </div>
-        <div style="display: flex; justify-content: space-between; padding: 8px 0;">
-          <span>Real Rate</span>
-          <span style="color: var(--rust);">-0.7%</span>
-        </div>
-        <div style="display: flex; justify-content: space-between; padding: 8px 0; border-top: 1px solid var(--line-soft); margin-top: 8px; padding-top: 8px; font-weight: 600;">
-          <span>Assessment</span>
-          <span style="color: var(--sage);">Supportive</span>
+        <div style="padding: 8px; background: var(--panel-raised); border-radius: 4px;">
+          <div style="font-weight: 600; color: var(--ink); margin-bottom: 4px;">i-BO Buy (inside bearish swing)</div>
+          <div>E.Low formed → i-Breakout Buy above E.High</div>
+          <div style="color: var(--ink-faint); font-size: 10px; margin-top: 3px;">Internal bullish break within the pullback of a larger bearish move</div>
         </div>
       </div>
     </div>
+
+    <!-- Breakout System -->
     <div class="card">
-      <div class="card-head">
-        <div class="card-title">Global Liquidity</div>
+      <div class="card-head"><div class="card-title">Entry Model 1 — Breakout System</div></div>
+      <div style="font-size: 11px; color: var(--ink-dim); line-height: 1.8; margin-top: 8px;">
+        <div style="display: flex; gap: 8px; margin-bottom: 12px; align-items: center;">
+          <div style="padding: 6px 12px; background: var(--panel-raised); border: 1px solid var(--line); border-radius: 4px; font-weight: 700; font-size: 12px; color: var(--sage); font-family: var(--mono);">1. BO</div>
+          <div style="color: var(--line);">→</div>
+          <div style="padding: 6px 12px; background: var(--panel-raised); border: 1px solid var(--line); border-radius: 4px; font-weight: 700; font-size: 12px; color: var(--amber); font-family: var(--mono);">2. VR</div>
+          <div style="color: var(--line);">→</div>
+          <div style="padding: 6px 12px; background: var(--panel-raised); border: 1px solid var(--line); border-radius: 4px; font-weight: 700; font-size: 12px; color: var(--rust); font-family: var(--mono);">3. CF</div>
+        </div>
+        <div style="padding: 8px; background: var(--sage-glow); border-radius: 4px; margin-bottom: 6px;">
+          <div style="font-weight: 600; color: var(--sage);">Buy Setup</div>
+          <div>H4 BO Buy → H1 VR pullback → Entry at H1 CF</div>
+        </div>
+        <div style="padding: 8px; background: var(--rust-glow); border-radius: 4px;">
+          <div style="font-weight: 600; color: var(--rust);">Sell Setup</div>
+          <div>H4 BO Sell → H1 VR pullback → Entry at H1 CF</div>
+        </div>
+        <div style="margin-top: 8px; font-size: 10px; color: var(--amber); font-style: italic;">Note: Entry can be before or after CF using Barrier Entry</div>
       </div>
-      <div style="font-size: 12px; line-height: 1.8;">
-        <div style="display: flex; justify-content: space-between; padding: 8px 0;">
-          <span>CB Balance Sheets</span>
-          <span style="color: var(--sage);">Expanding ↑</span>
+    </div>
+
+    <!-- 4 Cases -->
+    <div class="card">
+      <div class="card-head"><div class="card-title">BO System — 4 Setup Cases</div></div>
+      <div style="font-size: 11px; color: var(--ink-dim); line-height: 1.7; margin-top: 8px;">
+        <div style="display: flex; justify-content: space-between; align-items: flex-start; padding: 8px 0; border-bottom: 1px solid var(--line-soft);">
+          <div>
+            <div style="font-weight: 600; color: var(--sage);">Case 1: Normal Clean</div>
+            <div style="font-size: 10px;">Clean BO → VR → CF sequence. Best setup.</div>
+          </div>
+          <div style="font-size: 10px; color: var(--sage); font-weight: 700; white-space: nowrap; margin-left: 8px;">★ BEST</div>
         </div>
-        <div style="display: flex; justify-content: space-between; padding: 8px 0;">
-          <span>Money Supply (M2)</span>
-          <span>+4.2% YoY</span>
+        <div style="display: flex; justify-content: space-between; align-items: flex-start; padding: 8px 0; border-bottom: 1px solid var(--line-soft);">
+          <div>
+            <div style="font-weight: 600; color: var(--sage);">Case 2: CF inside VR</div>
+            <div style="font-size: 10px;">CF forms right inside the VR zone. Also strong.</div>
+          </div>
+          <div style="font-size: 10px; color: var(--sage); font-weight: 700; white-space: nowrap; margin-left: 8px;">★ BEST</div>
         </div>
-        <div style="display: flex; justify-content: space-between; padding: 8px 0;">
-          <span>Credit Spreads</span>
-          <span style="color: var(--sage);">Benign</span>
+        <div style="display: flex; justify-content: space-between; align-items: flex-start; padding: 8px 0; border-bottom: 1px solid var(--line-soft);">
+          <div>
+            <div style="font-weight: 600; color: var(--amber);">Case 3: CF breaks VR</div>
+            <div style="font-size: 10px;">Manipulation / HTF liquidity sweep. Risky. Repeat SOP.</div>
+          </div>
+          <div style="font-size: 10px; color: var(--amber); font-weight: 700; white-space: nowrap; margin-left: 8px;">RISKY</div>
         </div>
-        <div style="display: flex; justify-content: space-between; padding: 8px 0; border-top: 1px solid var(--line-soft); margin-top: 8px; padding-top: 8px; font-weight: 600;">
-          <span>Liquidity Score</span>
-          <span style="color: var(--sage);">8.2/10</span>
+        <div style="padding: 8px 0;">
+          <div style="font-weight: 600; color: var(--rust);">Case 4: Sideways</div>
+          <div style="font-size: 10px;">Price cannot break VR or CF → market is choppy. Use Barrier style entry only.</div>
         </div>
       </div>
     </div>
+
+    <!-- Barrier Entry -->
+    <div class="card">
+      <div class="card-head"><div class="card-title">Entry Model 2 — Barrier Entry</div></div>
+      <div style="font-size: 11px; color: var(--ink-dim); line-height: 1.8; margin-top: 8px;">
+        <div style="font-size: 10px; color: var(--amber); margin-bottom: 10px; font-style: italic;">Choose ONE strategy. Master it before moving to another.</div>
+        <div style="padding: 10px; background: var(--panel-raised); border-radius: 4px; margin-bottom: 8px; border-left: 2px solid var(--sage);">
+          <div style="font-weight: 700; color: var(--ink); margin-bottom: 4px;">1. Simple CF</div>
+          <div style="font-size: 10px; margin-bottom: 4px; color: var(--ink-dim);">Mark best barrier zone → Wait for CF pullback → Enter (CF must be QM pattern)</div>
+          <div style="font-size: 10px; color: var(--sage);">Pros: Early entry, smaller zone</div>
+          <div style="font-size: 10px; color: var(--rust);">Cons: Rejection only if against direction</div>
+        </div>
+        <div style="padding: 10px; background: var(--panel-raised); border-radius: 4px; border-left: 2px solid var(--amber);">
+          <div style="font-weight: 700; color: var(--ink); margin-bottom: 4px;">2. Janda</div>
+          <div style="font-size: 10px; color: var(--ink-dim);">Mark best barrier → Wait for BO Structure break → BO Buy/Sell → Pullback Entry</div>
+          <div style="font-size: 10px; margin-top: 4px; color: var(--ink-faint);">Entry rule: Wick on left candle must be broken by body of CMP (right candle)</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Timeframe Reference -->
+    <div class="card">
+      <div class="card-head"><div class="card-title">Barrier Formula — Timeframe Map</div></div>
+      <div style="font-size: 11px; color: var(--ink-dim); margin-top: 12px;">
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1px; background: var(--line); border: 1px solid var(--line); border-radius: 4px; overflow: hidden; margin-bottom: 12px; font-family: var(--mono);">
+          <div style="background: var(--panel-raised); padding: 8px 10px; font-size: 10px; font-weight: 700; color: var(--ink-faint); text-transform: uppercase; letter-spacing: 0.8px;">Barrier / Zone</div>
+          <div style="background: var(--panel-raised); padding: 8px 10px; font-size: 10px; font-weight: 700; color: var(--ink-faint); text-transform: uppercase; letter-spacing: 0.8px;">Confirmation TF</div>
+          <div style="background: var(--panel); padding: 8px 10px; font-weight: 600; color: var(--ink);">D1 (Daily)</div>
+          <div style="background: var(--panel); padding: 8px 10px; color: var(--sage); font-weight: 600;">H1</div>
+          <div style="background: var(--panel-raised); padding: 8px 10px; font-weight: 600; color: var(--ink);">H4</div>
+          <div style="background: var(--panel-raised); padding: 8px 10px; color: var(--sage); font-weight: 600;">M15 <span style="color: var(--ink-faint); font-size: 9px;">(Janda: M15, M1)</span></div>
+          <div style="background: var(--panel); padding: 8px 10px; font-weight: 600; color: var(--ink);">H1</div>
+          <div style="background: var(--panel); padding: 8px 10px; color: var(--sage); font-weight: 600;">M5 <span style="color: var(--ink-faint); font-size: 9px;">(Janda: M5, M1)</span></div>
+          <div style="background: var(--panel-raised); padding: 8px 10px; font-weight: 600; color: var(--ink);">M15</div>
+          <div style="background: var(--panel-raised); padding: 8px 10px; color: var(--sage); font-weight: 600;">M1</div>
+        </div>
+        <div style="font-size: 10px; line-height: 1.7; color: var(--ink-faint);">
+          <div><span style="color: var(--ink-dim); font-weight: 600;">Direction TFs:</span> D1, H4, H1 — read market direction only</div>
+          <div><span style="color: var(--ink-dim); font-weight: 600;">Execution TFs:</span> M15, M5, M1 — narrative &amp; entry confirmation</div>
+        </div>
+      </div>
+    </div>
+
   </div>
 </div>
 
