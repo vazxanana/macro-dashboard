@@ -2106,44 +2106,109 @@
     <div class="section-meta">MOSHATRADES — BOS · VR · CF</div>
   </div>
 
-  <!-- Main Full-Panel Chart -->
-  <div style="margin: 0 24px 4px;">
-    <div style="background: #0d1117; border: 1px solid #1e2836; border-radius: 6px; overflow: hidden;">
-      <!-- Chart toolbar -->
-      <div style="padding: 10px 16px; border-bottom: 1px solid #1a2433; display: flex; gap: 20px; align-items: center; flex-wrap: wrap;">
-        <div style="font-size: 11px; font-weight: 700; color: #8b949e; font-family: monospace; letter-spacing: 1px;">H4 · MOSHATRADES</div>
-        <div style="display: flex; gap: 14px; flex-wrap: wrap;">
-          <span style="display:flex;align-items:center;gap:5px;"><span style="width:14px;height:3px;background:rgba(212,168,67,0.75);display:inline-block;border-radius:1px;"></span><span style="font-size:10px;color:#6b7a8d;">VR Zone</span></span>
-          <span style="display:flex;align-items:center;gap:5px;"><span style="width:14px;height:3px;background:rgba(109,183,132,0.75);display:inline-block;border-radius:1px;"></span><span style="font-size:10px;color:#6b7a8d;">CF Zone</span></span>
-          <span style="display:flex;align-items:center;gap:5px;"><span style="width:14px;height:1px;background:#4a7090;display:inline-block;border-top:1px dashed #4a7090;"></span><span style="font-size:10px;color:#6b7a8d;">BOS Level</span></span>
-        </div>
-        <div style="margin-left:auto;display:flex;gap:8px;align-items:center;">
-          <span id="ms-struct-badge" style="padding:3px 10px;background:rgba(109,183,132,0.15);border:1px solid rgba(109,183,132,0.35);border-radius:3px;font-size:10px;font-weight:700;color:#6db784;font-family:monospace;">BULLISH</span>
-          <span id="ms-phase-badge" style="padding:3px 10px;background:rgba(212,168,67,0.12);border:1px solid rgba(212,168,67,0.3);border-radius:3px;font-size:10px;color:#d4a843;font-family:monospace;">VR PULLBACK</span>
-        </div>
-      </div>
-      <div id="ms-main-chart" style="height:460px;width:100%;"></div>
-    </div>
-  </div>
+  <style>
+    .ms-wrap { margin: 0 24px 20px; display: grid; grid-template-columns: minmax(0, 1fr); gap: 12px; }
+    .ms-tv { border: 1px solid #e0e3eb; border-radius: 6px; overflow: hidden; background: #fff; color: #131722; position: relative; }
+    .ms-tv[data-chart="dark"] { background: #131722; color: #d1d4dc; border-color: #2a2e39; }
+    .ms-tv-top { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 14px; padding: 8px 12px; border-bottom: 1px solid #e0e3eb; font: 12px -apple-system, BlinkMacSystemFont, "Trebuchet MS", Roboto, sans-serif; }
+    .ms-tv[data-chart="dark"] .ms-tv-top { border-color: #2a2e39; }
+    .ms-sym { display: flex; align-items: center; gap: 8px; }
+    .ms-sym b { font-size: 14px; }
+    .ms-sym span { color: #787b86; }
+    .ms-coin { width: 18px; height: 18px; border-radius: 50%; background: radial-gradient(circle at 35% 35%, #ffd768, #c99400); display: inline-block; }
+    .ms-seg { display: inline-flex; border: 1px solid #e0e3eb; border-radius: 4px; overflow: hidden; }
+    .ms-tv[data-chart="dark"] .ms-seg { border-color: #2a2e39; }
+    .ms-seg button, .ms-tbtn { background: transparent; color: inherit; border: 0; padding: 4px 10px; font: 600 12px inherit; font-family: inherit; cursor: pointer; }
+    .ms-seg button.on { background: #2962ff; color: #fff; }
+    .ms-tbtn { border: 1px solid #e0e3eb; border-radius: 4px; }
+    .ms-tv[data-chart="dark"] .ms-tbtn { border-color: #2a2e39; }
+    .ms-seg button:focus-visible, .ms-tbtn:focus-visible, .ms-tog input:focus-visible { outline: 2px solid #2962ff; outline-offset: 1px; }
+    .ms-tog { display: flex; flex-wrap: wrap; gap: 4px 12px; }
+    .ms-tog label { display: inline-flex; align-items: center; gap: 5px; cursor: pointer; color: #787b86; }
+    .ms-tog i { width: 12px; height: 9px; border-radius: 2px; display: inline-block; }
+    .ms-right { margin-left: auto; display: flex; gap: 6px; align-items: center; flex-wrap: wrap; }
+    .ms-legend { position: absolute; left: 12px; top: 54px; z-index: 3; display: flex; flex-wrap: wrap; gap: 4px 10px; font: 12px -apple-system, BlinkMacSystemFont, "Trebuchet MS", Roboto, sans-serif; pointer-events: none; color: #787b86; }
+    .ms-legend b { font-weight: 500; font-variant-numeric: tabular-nums; }
+    .ms-lg-sym { color: inherit; font-weight: 600; }
+    .ms-tv[data-chart="light"] .ms-lg-sym { color: #131722; }
+    .ms-tv[data-chart="dark"] .ms-lg-sym { color: #d1d4dc; }
+    #ms-main-chart { height: 600px; width: 100%; }
+    .ms-src { padding: 7px 12px; font-size: 11px; color: #787b86; border-top: 1px solid #e0e3eb; }
+    .ms-tv[data-chart="dark"] .ms-src { border-color: #2a2e39; }
+    .ms-err { color: #f23645; font-size: 11px; }
+    .ms-grid { display: grid; grid-template-columns: 1fr 1fr 1.6fr; gap: 12px; }
+    .ms-grid > .card { min-width: 0; }
+    .ms-k { font-size: 9px; letter-spacing: 1.2px; text-transform: uppercase; color: var(--ink-faint); margin-bottom: 8px; }
+    .ms-big { font-size: 20px; font-weight: 700; font-family: var(--mono); font-variant-numeric: tabular-nums; }
+    .ms-sub { font-size: 11px; color: var(--ink-dim); margin-top: 6px; line-height: 1.6; }
+    .ms-steps { margin: 8px 0 0; padding-left: 18px; font-size: 12px; line-height: 1.65; color: var(--ink); }
+    .ms-steps li + li { margin-top: 4px; }
+    .ms-kv { display: flex; gap: 18px; flex-wrap: wrap; margin-top: 10px; font-size: 11px; color: var(--ink-dim); }
+    .ms-kv b { font-family: var(--mono); color: var(--ink); font-size: 12px; }
+    .ms-chip { display: inline-block; padding: 2px 8px; border-radius: 3px; font: 700 10px var(--mono); letter-spacing: .5px; }
+    .ms-chip-sell { background: rgba(242,54,69,.15); color: #f23645; border: 1px solid rgba(242,54,69,.35); }
+    .ms-chip-buy { background: rgba(8,153,129,.15); color: #089981; border: 1px solid rgba(8,153,129,.35); }
+    .ms-table-wrap { overflow-x: auto; }
+    .ms-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+    .ms-table th { text-align: left; font-size: 9px; letter-spacing: 1px; text-transform: uppercase; color: var(--ink-faint); font-weight: 700; padding: 6px 8px; border-bottom: 1px solid var(--line); }
+    .ms-table td { padding: 7px 8px; border-bottom: 1px solid var(--line-soft); color: var(--ink); white-space: nowrap; }
+    .ms-table td.num { font-family: var(--mono); font-variant-numeric: tabular-nums; }
+    @media (max-width: 900px) { .ms-grid { grid-template-columns: 1fr; } #ms-main-chart { height: 460px; } .ms-legend { position: static; padding: 6px 12px 0; } }
+    @media (max-width: 520px) { .ms-wrap { margin: 0 12px 16px; } #ms-main-chart { height: 400px; } .ms-right { margin-left: 0; } }
+  </style>
 
-  <!-- Reading Panel -->
-  <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:12px 24px 20px;">
-    <div class="card" style="border-left:3px solid #6db784;">
-      <div style="font-size:9px;letter-spacing:1.2px;text-transform:uppercase;color:var(--ink-faint);margin-bottom:8px;">Structure</div>
-      <div style="font-size:15px;font-weight:700;color:#6db784;font-family:monospace;">BULLISH</div>
-      <div style="font-size:10px;color:var(--ink-dim);margin-top:5px;line-height:1.7;">BOS Buy confirmed<br>HH / HL sequence active</div>
+  <div class="ms-wrap">
+    <div class="ms-tv" id="ms-tv" data-chart="light">
+      <div class="ms-tv-top">
+        <div class="ms-sym"><i class="ms-coin"></i><b>MGC1!</b><span>Micro Gold Futures</span></div>
+        <div class="ms-seg" role="group" aria-label="Timeframe"><button type="button" data-tf="4h" class="on">4h</button><button type="button" data-tf="1D">1D</button></div>
+        <div class="ms-tog">
+          <label><input type="checkbox" id="ms-show-bo" data-show="bo" checked><i style="background:#f23645;height:2px"></i>BO lines</label>
+          <label><input type="checkbox" id="ms-show-origin" data-show="origin" checked><i style="background:rgba(242,54,69,.35);border:1px solid #b22833"></i>Origin</label>
+          <label><input type="checkbox" id="ms-show-cf" data-show="cf" checked><i style="background:rgba(242,54,69,.5)"></i>CF</label>
+          <label><input type="checkbox" id="ms-show-vr" data-show="vr" checked><i style="background:rgba(255,152,0,.4);border:1px solid #e08600"></i>VR</label>
+          <label><input type="checkbox" id="ms-show-next" data-show="next" checked><i style="background:#2962ff;height:2px"></i>Next setup</label>
+        </div>
+        <div class="ms-right">
+          <button type="button" class="ms-tbtn" id="ms-fit">Reset view</button>
+          <button type="button" class="ms-tbtn" id="ms-theme">Dark chart</button>
+          <label class="ms-tbtn" for="ms-csv" style="display:inline-flex;align-items:center">Load TradingView CSV</label>
+          <input type="file" id="ms-csv" accept=".csv,text/csv" hidden>
+          <span class="ms-err" id="ms-csv-err" role="alert"></span>
+        </div>
+      </div>
+      <div class="ms-legend" id="ms-legend"></div>
+      <div id="ms-main-chart"></div>
+      <div class="ms-src" id="ms-src"></div>
     </div>
-    <div class="card" style="border-left:3px solid #d4a843;">
-      <div style="font-size:9px;letter-spacing:1.2px;text-transform:uppercase;color:var(--ink-faint);margin-bottom:8px;">Zones</div>
-      <div style="font-size:11px;color:var(--ink);line-height:2;">
-        <div style="display:flex;justify-content:space-between;"><span style="color:#d4a843;font-weight:600;">H4 VR</span><span style="font-family:monospace;font-size:11px;">109 – 117</span></div>
-        <div style="display:flex;justify-content:space-between;"><span style="color:#6db784;font-weight:600;">H1 CF</span><span style="font-family:monospace;font-size:11px;">109 – 112</span></div>
+
+    <div class="ms-grid">
+      <div class="card">
+        <div class="ms-k" id="ms-trend-k">H4 structure</div>
+        <div class="ms-big" id="ms-trend">—</div>
+        <div class="ms-sub" id="ms-trend-sub"></div>
+      </div>
+      <div class="card">
+        <div class="ms-k">Active origin</div>
+        <div class="ms-big" id="ms-origin" style="font-size:17px">—</div>
+        <div class="ms-sub" id="ms-origin-sub"></div>
+      </div>
+      <div class="card">
+        <div class="ms-k" style="display:flex;justify-content:space-between;align-items:center;gap:8px">Next possible setup <span class="ms-chip" id="ms-bias"></span></div>
+        <div style="font-size:13px;font-weight:700;color:var(--ink)" id="ms-phase"></div>
+        <ol class="ms-steps" id="ms-steps"></ol>
+        <div class="ms-kv"><span>Price <b id="ms-price"></b></span><span><span id="ms-inval-k">Invalidation (4h close)</span> <b id="ms-inval"></b></span><span>First target <b id="ms-target"></b></span></div>
       </div>
     </div>
-    <div class="card" style="border-left:3px solid #6db784;">
-      <div style="font-size:9px;letter-spacing:1.2px;text-transform:uppercase;color:var(--ink-faint);margin-bottom:8px;">Next Setup</div>
-      <div style="font-size:15px;font-weight:700;color:#6db784;font-family:monospace;">LONG ↑</div>
-      <div style="font-size:10px;color:var(--ink-dim);margin-top:5px;line-height:1.7;">Entry: CF zone 109–112<br>SL: below 108 · TP: 123+</div>
+
+    <div class="card">
+      <div class="ms-k">Breakout log</div>
+      <div class="ms-table-wrap">
+        <table class="ms-table">
+          <thead><tr><th>Break</th><th>Type</th><th>Level</th><th>Origin zone</th><th>Status</th></tr></thead>
+          <tbody id="ms-bo-rows"></tbody>
+        </table>
+      </div>
     </div>
   </div>
 
@@ -2157,7 +2222,7 @@
     <div style="display: flex; gap: 40px; flex-wrap: wrap;">
       <div>
         <div style="font-size: 11px; font-weight: 700; color: var(--ink);">1 — Mark Market Structure</div>
-        <div style="font-size: 11px; color: var(--ink-dim); margin-top: 3px;">Identify VR (Value Range), Origin &amp; CF zones · Min 50% of swing</div>
+        <div style="font-size: 11px; color: var(--ink-dim); margin-top: 3px;">Mark BO lines at broken swings, the Origin above/below each BO, the VR at the reversal, and the CF back inside the Origin</div>
       </div>
       <div>
         <div style="font-size: 11px; font-weight: 700; color: var(--ink);">2 — Choose Entry Model</div>
@@ -2202,13 +2267,13 @@
 
     <div class="card">
       <div class="card-head"><div class="card-title" style="color: var(--sage);">Buy Setup</div></div>
-      <div style="font-size: 11px; color: var(--ink-dim); margin: 6px 0 10px; line-height: 1.6;">H4 BO Buy → price rises into <span style="color: var(--amber); font-weight: 600;">H1 VR</span> → pulls back to <span style="color: var(--sage); font-weight: 600;">H1 CF</span> → Entry ↑</div>
+      <div style="font-size: 11px; color: var(--ink-dim); margin: 6px 0 10px; line-height: 1.6;">H4 BO Buy → rally tops out in the <span style="color: var(--amber); font-weight: 600;">H1 VR</span> → pullback into the Origin forms the <span style="color: var(--sage); font-weight: 600;">H1 CF</span> → Entry ↑</div>
       <div id="ms-chart-bo-buy" style="height:220px;width:100%;"></div>
     </div>
 
     <div class="card">
       <div class="card-head"><div class="card-title" style="color: var(--rust);">Sell Setup</div></div>
-      <div style="font-size: 11px; color: var(--ink-dim); margin: 6px 0 10px; line-height: 1.6;">H4 BO Sell → price falls into <span style="color: var(--amber); font-weight: 600;">H1 VR</span> → pulls back to <span style="color: var(--rust); font-weight: 600;">H1 CF</span> → Entry ↓</div>
+      <div style="font-size: 11px; color: var(--ink-dim); margin: 6px 0 10px; line-height: 1.6;">H4 BO Sell → drop bottoms out in the <span style="color: var(--amber); font-weight: 600;">H1 VR</span> → pullback into the Origin forms the <span style="color: var(--rust); font-weight: 600;">H1 CF</span> → Entry ↓</div>
       <div id="ms-chart-bo-sell" style="height:220px;width:100%;"></div>
     </div>
 
@@ -5194,8 +5259,7 @@ try {
   function baseChart(el, h) {
     if (!el) return null;
     const ch = LW.createChart(el, {
-      width: el.offsetWidth || 400,
-      height: h || 200,
+      autoSize: true,
       layout: { background: { color: '#0d1117' }, textColor: '#6b7a8d' },
       grid: { vertLines: { color: '#131a23' }, horzLines: { color: '#131a23' } },
       crosshair: { mode: 0 },
@@ -5238,121 +5302,6 @@ try {
     base.setDate(base.getDate() + n);
     return base.toISOString().slice(0,10);
   }
-
-  // H4 timestamp helper (4-hour candles)
-  function h4(n) { return Math.floor(new Date('2024-10-14T00:00:00Z').getTime()/1000) + n*14400; }
-
-  // ── MAIN PANEL CHART ─────────────────────────────────────
-  (function() {
-    const el = document.getElementById('ms-main-chart');
-    if (!el) return;
-    const ch = LW.createChart(el, {
-      width: el.offsetWidth || 800,
-      height: 460,
-      layout: { background: { color: '#0d1117' }, textColor: '#5a6a7a' },
-      grid: { vertLines: { color: '#0f1924' }, horzLines: { color: '#0f1924' } },
-      crosshair: { mode: 1 },
-      rightPriceScale: {
-        borderColor: '#1a2433',
-        scaleMargins: { top: 0.1, bottom: 0.1 },
-        textColor: '#5a6a7a',
-      },
-      timeScale: {
-        borderColor: '#1a2433',
-        timeVisible: true,
-        fixLeftEdge: true,
-        fixRightEdge: true,
-      },
-      handleScroll: true,
-      handleScale: true,
-    });
-    window.addEventListener('resize', () => {
-      const w = el.offsetWidth;
-      if (w > 0) ch.applyOptions({ width: w });
-    });
-
-    const cs = ch.addCandlestickSeries({
-      upColor: '#6db784', downColor: '#c17a6f',
-      borderUpColor: '#6db784', borderDownColor: '#c17a6f',
-      wickUpColor: '#6db784', wickDownColor: '#c17a6f',
-    });
-
-    // ─── OHLC data: H4 candles showing full Mosha sequence ───
-    // Phase 1 (bearish LH/LL), Phase 2 (BOS Buy), Phase 3 (VR pullback), Phase 4 (CF)
-    const raw = [
-      // ── Bearish structure: LH/LL ──
-      [0,  110,114,108,112],  // LH¹ = 114
-      [1,  112,113,107,108],
-      [2,  108,109,103,104],
-      [3,  104,106,100,101],  // LL¹ = 100
-      [4,  101,107, 99,106],
-      [5,  106,112,104,110],
-      [6,  110,112,107,108],  // LH² = 112  ← BOS level
-      [7,  108,110,103,104],
-      [8,  104,105, 98, 99],
-      [9,   99,100, 94, 95],  // LL² = 94
-      // ── Structure shift ──
-      [10,  95, 99, 93, 97],
-      [11,  97,104, 96,103],
-      [12, 103,110,102,109],
-      [13, 109,116,108,115],  // BOS Buy ↑ — breaks above LH² 112
-      // ── Rally to HH ──
-      [14, 115,119,113,118],
-      [15, 118,122,116,120],
-      [16, 120,124,119,123],  // HH = 124
-      // ── VR pullback zone: 109–117 (50–79% of 94→124) ──
-      [17, 123,124,118,119],  // pullback start
-      [18, 119,120,115,116],
-      [19, 116,117,112,113],  // enters VR zone
-      [20, 113,115,110,111],
-      // ── CF zone: 109–112 ──
-      [21, 111,113,109,110],  // CF zone entered
-      [22, 110,112,108,111],  // CF oscillation
-      [23, 111,114,109,113],  // bounce beginning
-      // ── Next Setup (last visible bars) ──
-      [24, 113,117,111,115],  // developing
-      [25, 115,119,113,118],  // LONG setup active
-    ];
-
-    const candles = raw.map(([n,o,h,l,c]) => ({ time: h4(n), open:o, high:h, low:l, close:c }));
-    cs.setData(candles);
-
-    // ─── BOS Level (dashed line at 112) ───
-    cs.createPriceLine({ price:112, color:'#4a7090', lineWidth:1, lineStyle:LW.LineStyle.Dashed, axisLabelVisible:true, title:'BOS' });
-    cs.createPriceLine({ price:124, color:'rgba(109,183,132,0.4)', lineWidth:1, lineStyle:LW.LineStyle.Dashed, axisLabelVisible:true, title:'HH' });
-    cs.createPriceLine({ price: 94, color:'rgba(193,122,111,0.4)', lineWidth:1, lineStyle:LW.LineStyle.Dashed, axisLabelVisible:true, title:'LL²' });
-
-    // ─── VR Zone fill (109–117, t17–t25) ───
-    const vrS = ch.addHistogramSeries({
-      color: 'rgba(212,168,67,0.14)',
-      priceLineVisible:false, lastValueVisible:false,
-    });
-    vrS.setData(raw.slice(17).map(([n])=>({ time:h4(n), value:117 })));
-    vrS.applyOptions({ base:109 });
-
-    // ─── CF Zone fill (109–112, t21–t25) ───
-    const cfS = ch.addHistogramSeries({
-      color: 'rgba(109,183,132,0.22)',
-      priceLineVisible:false, lastValueVisible:false,
-    });
-    cfS.setData(raw.slice(21).map(([n])=>({ time:h4(n), value:112 })));
-    cfS.applyOptions({ base:109 });
-
-    // ─── Markers ───
-    cs.setMarkers([
-      { time:h4(0),  position:'aboveBar', color:'#c17a6f', shape:'circle',    text:'LH¹',      size:1 },
-      { time:h4(3),  position:'belowBar', color:'#c17a6f', shape:'circle',    text:'LL¹',      size:1 },
-      { time:h4(6),  position:'aboveBar', color:'#c17a6f', shape:'circle',    text:'LH²',      size:1 },
-      { time:h4(9),  position:'belowBar', color:'#c17a6f', shape:'circle',    text:'LL²',      size:1 },
-      { time:h4(13), position:'aboveBar', color:'#6db784', shape:'arrowUp',   text:'BOS BUY ↑', size:2 },
-      { time:h4(16), position:'aboveBar', color:'#6db784', shape:'circle',    text:'HH',       size:1 },
-      { time:h4(19), position:'aboveBar', color:'#d4a843', shape:'circle',    text:'VR',       size:1 },
-      { time:h4(21), position:'belowBar', color:'#6db784', shape:'circle',    text:'CF zone',  size:1 },
-      { time:h4(25), position:'aboveBar', color:'#6db784', shape:'arrowUp',   text:'NEXT SETUP: LONG ↑', size:2 },
-    ]);
-
-    ch.timeScale().fitContent();
-  })();
 
   // ── 1. External Bullish ──────────────────────────────────
   (function() {
@@ -5456,77 +5405,41 @@ try {
     ch.timeScale().fitContent();
   })();
 
-  // ── 5. BO→VR→CF Buy Setup ───────────────────────────────
-  (function() {
-    const el = document.getElementById('ms-chart-bo-buy');
+  // ── 5/6. SOP Buy & Sell Setup (PDF p.13): Origin under/over the BO line, VR at the extreme, CF back inside Origin
+  const SOP_BUY = [
+    [100,104,99,103],[103,103.5,98,99],[99,100,97,98.5],[98.5,105,98,104.5],[104.5,108,104,107.5],
+    [107.5,113,107,112],[112,116,111,114],[114,120,113,119],[119,119.5,114,115],[115,116,110,111],
+    [111,112,106,107],[107,108,102,103],[103,104,98.5,100],[100,104,99,103.5],[103.5,110,103,109],
+  ];
+  function sopSetup(id, sell) {
+    const el = document.getElementById(id);
     const ch = baseChart(el, 220);
     if (!ch) return;
     const cs = candleSeries(ch);
-    // H4 BO Buy at 114; VR = 107-112; CF = 107-109
-    cs.setData([
-      {time:d(0),open:100,high:103,low: 98,close:102},
-      {time:d(1),open:102,high:107,low:101,close:106},
-      {time:d(2),open:106,high:112,low:105,close:111},
-      {time:d(3),open:111,high:116,low:110,close:115}, // BO Buy breaks 114
-      {time:d(4),open:115,high:117,low:112,close:113}, // retracing into VR
-      {time:d(5),open:113,high:114,low:109,close:110}, // inside VR
-      {time:d(6),open:110,high:111,low:107,close:108}, // CF zone 107-109
-      {time:d(7),open:108,high:114,low:107,close:113}, // bounce from CF
-      {time:d(8),open:113,high:120,low:112,close:119}, // entry continuation
-    ]);
-    // VR zone 107-112 across d4-d7
-    const vrZ = zoneSeries(ch, 'rgba(212,168,67,0.18)');
-    vrZ.setData([d(4),d(5),d(6),d(7)].map(t=>({time:t, value:112})));
-    vrZ.applyOptions({ base: 107 });
-    // CF zone 107-109 across d6-d7
-    const cfZ = zoneSeries(ch, 'rgba(109,183,132,0.25)');
-    cfZ.setData([d(6),d(7)].map(t=>({time:t, value:109})));
-    cfZ.applyOptions({ base: 107 });
-    priceLabel(cs, 114, AMBE, 'H4 BO Buy');
+    const m = (v) => sell ? 200 - v : v;
+    cs.setData(SOP_BUY.map(([o,h,l,c], k) => sell
+      ? { time: d(k), open: m(o), high: m(l), low: m(h), close: m(c) }
+      : { time: d(k), open: o, high: h, low: l, close: c }));
+    const zone = (from, to, a, b, color) => {
+      const z = zoneSeries(ch, color);
+      z.applyOptions({ base: Math.min(m(a), m(b)) });
+      z.setData(Array.from({ length: to - from + 1 }, (_, k) => ({ time: d(from + k), value: Math.max(m(a), m(b)) })));
+    };
+    zone(0, 14, 97, 104, 'rgba(255,152,0,0.16)');
+    zone(6, 14, 115, 120, 'rgba(255,152,0,0.16)');
+    zone(11, 14, 98.5, 102, sell ? 'rgba(242,54,69,0.30)' : 'rgba(8,153,129,0.30)');
+    priceLabel(cs, m(104), AMBE, sell ? 'H4 BO Sell' : 'H4 BO Buy');
     cs.setMarkers([
-      {time:d(3), position:'aboveBar', color:AMBE, shape:'circle',  text:'H4 BO Buy', size:1},
-      {time:d(5), position:'aboveBar', color:AMBE, shape:'circle',  text:'H1 VR',     size:1},
-      {time:d(6), position:'belowBar', color:UP,   shape:'circle',  text:'H1 CF',     size:1},
-      {time:d(8), position:'aboveBar', color:UP,   shape:'arrowUp', text:'ENTRY ↑',   size:2},
+      { time: d(2),  position: sell ? 'aboveBar' : 'belowBar', color: AMBE, shape: 'circle', text: 'Origin', size: 1 },
+      { time: d(3),  position: sell ? 'belowBar' : 'aboveBar', color: AMBE, shape: 'circle', text: sell ? 'BO Sell' : 'BO Buy', size: 1 },
+      { time: d(7),  position: sell ? 'belowBar' : 'aboveBar', color: AMBE, shape: 'circle', text: 'H1 VR', size: 1 },
+      { time: d(12), position: sell ? 'aboveBar' : 'belowBar', color: sell ? DOWN : UP, shape: 'circle', text: 'H1 CF', size: 1 },
+      { time: d(14), position: sell ? 'belowBar' : 'aboveBar', color: sell ? DOWN : UP, shape: sell ? 'arrowDown' : 'arrowUp', text: sell ? 'ENTRY ↓' : 'ENTRY ↑', size: 2 },
     ]);
     ch.timeScale().fitContent();
-  })();
-
-  // ── 6. BO→VR→CF Sell Setup ──────────────────────────────
-  (function() {
-    const el = document.getElementById('ms-chart-bo-sell');
-    const ch = baseChart(el, 220);
-    if (!ch) return;
-    const cs = candleSeries(ch);
-    // H4 BO Sell at 106; VR = 108-113; CF = 111-113
-    cs.setData([
-      {time:d(0),open:120,high:122,low:116,close:118},
-      {time:d(1),open:118,high:120,low:114,close:115},
-      {time:d(2),open:115,high:116,low:110,close:111},
-      {time:d(3),open:111,high:112,low:104,close:105}, // BO Sell breaks 106
-      {time:d(4),open:105,high:110,low:104,close:109}, // retracing into VR
-      {time:d(5),open:109,high:113,low:108,close:112}, // inside VR
-      {time:d(6),open:112,high:114,low:111,close:113}, // CF zone 111-113
-      {time:d(7),open:113,high:114,low:108,close:109}, // rejected at CF
-      {time:d(8),open:109,high:110,low:102,close:103}, // entry continuation
-    ]);
-    // VR zone 108-113 across d4-d7
-    const vrZ = zoneSeries(ch, 'rgba(212,168,67,0.18)');
-    vrZ.setData([d(4),d(5),d(6),d(7)].map(t=>({time:t, value:113})));
-    vrZ.applyOptions({ base: 108 });
-    // CF zone 111-113 across d6-d7
-    const cfZ = zoneSeries(ch, 'rgba(193,122,111,0.28)');
-    cfZ.setData([d(6),d(7)].map(t=>({time:t, value:113})));
-    cfZ.applyOptions({ base: 111 });
-    priceLabel(cs, 106, AMBE, 'H4 BO Sell');
-    cs.setMarkers([
-      {time:d(3), position:'belowBar', color:AMBE, shape:'circle',    text:'H4 BO Sell', size:1},
-      {time:d(5), position:'belowBar', color:AMBE, shape:'circle',    text:'H1 VR',      size:1},
-      {time:d(6), position:'aboveBar', color:DOWN, shape:'circle',    text:'H1 CF',      size:1},
-      {time:d(8), position:'belowBar', color:DOWN, shape:'arrowDown', text:'ENTRY ↓',    size:2},
-    ]);
-    ch.timeScale().fitContent();
-  })();
+  }
+  sopSetup('ms-chart-bo-buy', false);
+  sopSetup('ms-chart-bo-sell', true);
 
   // ── 7. Case 1: Normal Clean ──────────────────────────────
   (function() {
@@ -5693,6 +5606,526 @@ try {
     ch.timeScale().fitContent();
   })();
 
+})();
+</script>
+<script>
+// ═══ MOSHA STRUCTURE ENGINE (pure functions, no DOM) ═══
+function msRng(seed) {
+  return function () {
+    seed |= 0; seed = seed + 0x6D2B79F5 | 0;
+    let t = Math.imul(seed ^ seed >>> 15, 1 | seed);
+    t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t;
+    return ((t ^ t >>> 14) >>> 0) / 4294967296;
+  };
+}
+
+// MGC1! 4h, Aug–Oct 2026, swing points read off the user's chart
+const MS_ANCHORS = [
+  ['08-10 00',4470],['08-11 12',4525],['08-13 08',4415],['08-14 16',4500],['08-18 12',4380],
+  ['08-21 08',4640],['08-24 12',4755],['08-25 16',4645],['08-26 20',4705],['08-28 12',4610],
+  ['08-31 08',4640],['09-02 08',4330],['09-04 12',4555],['09-08 08',4450],['09-10 16',4482],
+  ['09-17 04',4273],['09-18 16',4438],['09-22 08',4368],['09-23 16',4402],['09-25 12',4312],
+  ['09-29 08',4141],['10-01 04',4248],['10-02 12',4256],['10-05 08',4188],['10-06 12',4228],
+  ['10-07 16',4090],['10-09 08',4245],['10-12 12',4172],['10-13 16',4226],['10-14 20',4165],
+  ['10-15 12',4095],['10-16 16',4215],['10-19 04',4160],['10-19 20',4205],['10-20 16',4140],
+  ['10-21 12',4175],['10-23 08',3989],['10-26 04',4045],['10-26 20',4012],['10-28 12',4094],
+  ['10-29 08',4035],['10-29 20',4016.9],['10-30 16',3880],['10-30 20',3884.4],
+];
+
+function msGenerate() {
+  const rnd = msRng(20261031);
+  const ts = (s) => Date.UTC(2026, +s.slice(0,2)-1, +s.slice(3,5), +s.slice(6,8)) / 1000;
+  const t0 = ts(MS_ANCHORS[0][0]), t1 = ts(MS_ANCHORS[MS_ANCHORS.length-1][0]);
+  const times = [];
+  for (let t = t0; t <= t1; t += 14400) {
+    const wd = new Date(t*1000).getUTCDay();
+    if (wd !== 0 && wd !== 6) times.push(t);
+  }
+  const idxOf = (t) => times.findIndex(x => x >= t);
+  const A = MS_ANCHORS.map(([s,p]) => ({ i: idxOf(ts(s)), p }));
+  const close = new Array(times.length), segLo = [], segHi = [];
+  for (let k = 0; k < A.length-1; k++) {
+    const a = A[k], b = A[k+1], n = b.i - a.i;
+    const lo = Math.min(a.p,b.p), hi = Math.max(a.p,b.p);
+    const sig = 5 + Math.abs(b.p-a.p) * 0.09;
+    let w = 0; const walk = [0];
+    for (let j = 1; j <= n; j++) { w += (rnd()-0.5) * 2 * sig; walk.push(w); }
+    for (let j = 0; j <= n; j++) {
+      const lin = a.p + (b.p-a.p) * j / n;
+      const br = walk[j] - walk[n] * j / n;
+      const v = Math.min(hi, Math.max(lo, lin + br));
+      if (j < n || k === A.length-2) { close[a.i+j] = v; segLo[a.i+j] = lo; segHi[a.i+j] = hi; }
+    }
+  }
+  const bars = [];
+  for (let i = 0; i < times.length; i++) {
+    const o = i ? close[i-1] : close[0] - 6, c = close[i];
+    let lo = segLo[i], hi = segHi[i];
+    if (i) { lo = Math.min(lo, o); hi = Math.max(hi, o); }
+    const wk = 3 + rnd() * 11, wk2 = 3 + rnd() * 11;
+    bars.push({ time: times[i], open: o, close: c,
+      high: Math.min(hi, Math.max(o,c) + wk), low: Math.max(lo, Math.min(o,c) - wk2) });
+  }
+  A.forEach((a, k) => {
+    const prev = A[k-1], next = A[k+1], b = bars[a.i];
+    if ((!prev || a.p < prev.p) && (!next || a.p < next.p)) b.low = a.p;
+    if ((!prev || a.p > prev.p) && (!next || a.p > next.p)) b.high = a.p;
+  });
+  bars.forEach(b => { for (const k of ['open','high','low','close']) b[k] = Math.round(b[k]*10)/10; });
+  return bars;
+}
+
+function msDaily(bars) {
+  const out = [];
+  for (const b of bars) {
+    const d = Math.floor(b.time / 86400) * 86400, last = out[out.length-1];
+    if (last && last.time === d) { last.high = Math.max(last.high,b.high); last.low = Math.min(last.low,b.low); last.close = b.close; }
+    else out.push({ time: d, open: b.open, high: b.high, low: b.low, close: b.close });
+  }
+  return out;
+}
+
+function msAnalyze(bars, N) {
+  const H = bars.map(b=>b.high), L = bars.map(b=>b.low), C = bars.map(b=>b.close), n = bars.length;
+  const maxIn = (a,b) => { let m=-Infinity, k=a; for (let j=a;j<=b;j++) if (H[j]>m){m=H[j];k=j;} return [m,k]; };
+  const minIn = (a,b) => { let m=Infinity, k=a; for (let j=a;j<=b;j++) if (L[j]<m){m=L[j];k=j;} return [m,k]; };
+  const pivH = (j,w) => { for (let k=1;k<=w;k++){ if (j-k<0||j+k>=n||H[j-k]>H[j]||H[j+k]>=H[j]) return false; } return true; };
+  const pivL = (j,w) => { for (let k=1;k<=w;k++){ if (j-k<0||j+k>=n||L[j-k]<L[j]||L[j+k]<=L[j]) return false; } return true; };
+
+  const events = [];
+  let trend = 0, ext = null, prot = null, lastPH = null, lastPL = null;
+
+  function makeEvent(dir, level, fromIdx, i, structure) {
+    let start, top, topIdx, bot, botIdx;
+    if (dir < 0) {
+      const [pt, pti] = maxIn(fromIdx, i), h = pt - level;
+      start = fromIdx;
+      for (let j = i-1; j > pti; j--) if (L[j] <= level + 0.15*h && maxIn(j+1, i)[0] >= level + 0.5*h) { start = j; break; }
+      [top, topIdx] = maxIn(start, i); bot = level; botIdx = fromIdx;
+    } else {
+      const [pb, pbi] = minIn(fromIdx, i), h = level - pb;
+      start = fromIdx;
+      for (let j = i-1; j > pbi; j--) if (H[j] >= level - 0.15*h && minIn(j+1, i)[0] <= level - 0.5*h) { start = j; break; }
+      [bot, botIdx] = minIn(start, i); top = level; topIdx = fromIdx;
+    }
+    const e = { dir, level, fromIdx, breakIdx: i, structure, start, top, bot,
+      protIdx: dir < 0 ? topIdx : botIdx, prot: dir < 0 ? top : bot, vr: null, cf: [], endIdx: null };
+    events.push(e);
+    return e;
+  }
+
+  for (let i = 0; i < n; i++) {
+    const cj = i - N;
+    if (cj >= 0) { if (pivH(cj,N)) lastPH = { i: cj, p: H[cj] }; if (pivL(cj,N)) lastPL = { i: cj, p: L[cj] }; }
+
+    if (trend === 0) {
+      if (lastPH && C[i] > lastPH.p) {
+        const e = makeEvent(1, lastPH.p, lastPH.i, i, false); trend = 1;
+        prot = { p: e.bot, i: e.protIdx }; ext = { i, p: H[i], fixed: false };
+      } else if (lastPL && C[i] < lastPL.p) {
+        const e = makeEvent(-1, lastPL.p, lastPL.i, i, false); trend = -1;
+        prot = { p: e.top, i: e.protIdx }; ext = { i, p: L[i], fixed: false };
+      }
+      continue;
+    }
+
+    if (trend < 0) {
+      if (C[i] > prot.p) {
+        const prev = events[events.length-1];
+        const e = makeEvent(1, prot.p, prot.i, i, true); trend = 1;
+        if (prev.endIdx === null) prev.endIdx = i;
+        prot = { p: e.bot, i: e.protIdx }; ext = { i, p: H[i], fixed: false };
+        continue;
+      }
+      if (!ext.fixed) {
+        if (L[i] < ext.p) ext = { i, p: L[i], fixed: false };
+        else if (i - ext.i >= N) { ext.fixed = true; events[events.length-1].vr = { i: ext.i, p: ext.p }; }
+      }
+      if (ext.fixed && C[i] < ext.p) {
+        const e = makeEvent(-1, ext.p, ext.i, i, false);
+        prot = { p: e.top, i: e.protIdx }; ext = { i, p: L[i], fixed: false };
+      }
+    } else {
+      if (C[i] < prot.p) {
+        const prev = events[events.length-1];
+        const e = makeEvent(-1, prot.p, prot.i, i, true); trend = -1;
+        if (prev.endIdx === null) prev.endIdx = i;
+        prot = { p: e.top, i: e.protIdx }; ext = { i, p: L[i], fixed: false };
+        continue;
+      }
+      if (!ext.fixed) {
+        if (H[i] > ext.p) ext = { i, p: H[i], fixed: false };
+        else if (i - ext.i >= N) { ext.fixed = true; events[events.length-1].vr = { i: ext.i, p: ext.p }; }
+      }
+      if (ext.fixed && C[i] > ext.p) {
+        const e = makeEvent(1, ext.p, ext.i, i, false);
+        prot = { p: e.bot, i: e.protIdx }; ext = { i, p: H[i], fixed: false };
+      }
+    }
+  }
+
+  // Origin invalidation, VR box, CF boxes
+  const w = Math.max(2, Math.round(N/2));
+  events.forEach((e, k) => {
+    const h = e.top - e.bot;
+    for (let j = e.breakIdx+1; j < n && e.endIdx === null; j++) {
+      if ((e.dir < 0 && C[j] > e.top) || (e.dir > 0 && C[j] < e.bot)) e.endIdx = j;
+    }
+    if (e.vr) {
+      const d = Math.max(0.3*h, Math.abs(e.level - e.vr.p) * 0.25);
+      e.vrBox = e.dir < 0 ? { lo: e.vr.p, hi: e.vr.p + d } : { lo: e.vr.p - d, hi: e.vr.p };
+    }
+    const stop = Math.min(n-1-w, events[k+1] ? events[k+1].breakIdx : n-1);
+    for (let j = e.start+1; j <= stop; j++) {
+      const isPiv = e.dir < 0 ? pivH(j,w) : pivL(j,w);
+      if (!isPiv) continue;
+      const px = e.dir < 0 ? H[j] : L[j];
+      if (px < e.bot - 0.02*h || px > e.top + 0.02*h) continue;
+      const post = j > e.breakIdx;
+      if (post && e.vr && j < e.vr.i) continue;
+      e.cf.push({ i: j, p: px, post,
+        lo: e.dir < 0 ? Math.max(e.bot, px - 0.35*h) : px,
+        hi: e.dir < 0 ? px : Math.min(e.top, px + 0.35*h) });
+    }
+    e.cf = e.cf.slice(-4);
+  });
+
+  const last = events[events.length-1];
+  return { events, trend, ext, prot, last, n };
+}
+
+function msNextSetup(bars, A) {
+  const e = A.last, n = bars.length, price = bars[n-1].close;
+  if (!e) return null;
+  const sell = e.dir < 0, h = e.top - e.bot;
+  const inOrigin = price <= e.top && price >= e.bot;
+  const brokenAway = sell ? price < e.bot : price > e.top;
+  let phase, steps;
+  const fmt = (v) => v.toLocaleString('en-US', { maximumFractionDigits: 1 });
+  const zone = `${fmt(e.bot)} – ${fmt(e.top)}`;
+  if (!A.ext.fixed && brokenAway) {
+    phase = sell ? 'Extension after BO Sell' : 'Extension after BO Buy';
+    steps = [
+      `Wait for the H1 VR: price ${sell ? 'stops making lower lows and reverses' : 'stops making higher highs and reverses'} near ${fmt(A.ext.p)}.`,
+      `Let it retrace back into the Origin ${zone}. Do not chase the move.`,
+      `Inside the Origin, wait for an H1 CF (${sell ? 'lower high' : 'higher low'}), then ${sell ? 'sell' : 'buy'} with a Barrier entry on M15/M5.`,
+    ];
+  } else if (brokenAway) {
+    phase = 'VR formed, retracing to Origin';
+    steps = [
+      `VR is in at ${fmt(A.ext.p)}. Price is moving back toward the Origin.`,
+      `Mark the Origin ${zone} and wait for price to enter it.`,
+      `${sell ? 'Sell' : 'Buy'} from the H1 CF inside the Origin, or wait for the CF to confirm and enter after it.`,
+    ];
+  } else if (inOrigin) {
+    phase = 'Price inside Origin, CF watch';
+    steps = [
+      `Price is trading inside the Origin ${zone}.`,
+      `Drop to H1: look for a CF (${sell ? 'lower high with an internal BO Sell' : 'higher low with an internal BO Buy'}).`,
+      `Enter on M15/M5 Barrier (Simple CF or Janda). Stop beyond the Origin.`,
+    ];
+  } else {
+    phase = 'Origin under pressure';
+    steps = [`Price is beyond the Origin. A close past ${fmt(sell ? e.top : e.bot)} flips structure. Stand aside until the next BO.`];
+  }
+  const target = A.ext.p;
+  const proj = [];
+  if (brokenAway) {
+    const vrP = A.ext.fixed ? A.ext.p : (sell ? Math.min(A.ext.p, price) - 0.25*h : Math.max(A.ext.p, price) + 0.25*h);
+    const cfP = sell ? e.bot + 0.45*h : e.top - 0.45*h;
+    const endP = sell ? vrP - 0.5*h : vrP + 0.5*h;
+    proj.push({ l: n-1, p: price });
+    if (!A.ext.fixed) proj.push({ l: n+4, p: vrP, t: '① VR' });
+    proj.push({ l: n+(A.ext.fixed ? 7 : 13), p: cfP, t: `② H1 CF · ${sell ? 'SELL' : 'BUY'}` });
+    proj.push({ l: n+(A.ext.fixed ? 17 : 23), p: endP, t: '③ Target' });
+  }
+  return { sell, phase, steps, zone, invalid: sell ? e.top : e.bot, target, proj, e, price };
+}
+
+
+// ═══ MOSHA STRUCTURE CHART (TradingView Lightweight Charts + drawing overlay) ═══
+(function () {
+  const LW = window.LightweightCharts;
+  const el = document.getElementById('ms-main-chart');
+  if (!LW || !el) return;
+
+  const THEMES = {
+    light: { bg: '#ffffff', text: '#131722', grid: '#f0f3fa', border: '#e0e3eb', up: '#089981', down: '#f23645' },
+    dark:  { bg: '#131722', text: '#d1d4dc', grid: '#1e222d', border: '#2a2e39', up: '#089981', down: '#f23645' },
+  };
+  const Z = {
+    sell: { fill: 'rgba(242,54,69,0.20)', stroke: 'rgba(178,40,51,0.85)', cf: 'rgba(242,54,69,0.30)', line: '#f23645' },
+    buy:  { fill: 'rgba(8,153,129,0.16)', stroke: 'rgba(6,122,103,0.85)', cf: 'rgba(8,153,129,0.28)', line: '#089981' },
+    vr:   { fill: 'rgba(255,152,0,0.18)', stroke: 'rgba(224,134,0,0.9)' },
+    proj: '#2962ff',
+  };
+  const state = { tf: '4h', theme: 'light', show: { bo: true, origin: true, vr: true, cf: true, next: true },
+    base: null, source: 'reconstructed', symbol: 'MGC1!' };
+
+  // Drawing overlay as a series primitive
+  class Overlay {
+    constructor() { this.items = { boxes: [], lines: [], labels: [], path: [] }; this.views = [new View(this, 'bottom'), new View(this, 'top')]; }
+    attached(p) { this.chart = p.chart; this.series = p.series; this.req = p.requestUpdate; }
+    detached() {}
+    updateAllViews() {}
+    paneViews() { return this.views; }
+    set(items) { this.items = items; if (this.req) this.req(); }
+  }
+  class View {
+    constructor(o, z) { this.o = o; this.z = z; }
+    zOrder() { return this.z; }
+    renderer() {
+      const o = this.o, z = this.z;
+      return { draw(target) {
+        const run = (ctx) => { try { paint(o, z, ctx); } catch (err) { /* chart not ready */ } };
+        if (target.useMediaCoordinateSpace) target.useMediaCoordinateSpace((s) => run(s.context));
+        else target.useBitmapCoordinateSpace((s) => { s.context.save(); s.context.scale(s.horizontalPixelRatio, s.verticalPixelRatio); run(s.context); s.context.restore(); });
+      } };
+    }
+  }
+  function paint(o, z, ctx) {
+    if (!o.chart || !o.series) return;
+    const ts = o.chart.timeScale(), s = o.series;
+    const X = (l) => ts.logicalToCoordinate(l), Y = (p) => s.priceToCoordinate(p);
+    const it = o.items, t = THEMES[state.theme];
+    ctx.font = '600 11px -apple-system, BlinkMacSystemFont, "Trebuchet MS", Roboto, sans-serif';
+    if (z === 'bottom') {
+      for (const b of it.boxes) {
+        const x1 = X(b.l1), x2 = X(b.l2), y1 = Y(b.hi), y2 = Y(b.lo);
+        if ([x1, x2, y1, y2].some((v) => v === null)) continue;
+        ctx.fillStyle = b.fill; ctx.fillRect(x1, y1, x2 - x1, y2 - y1);
+        ctx.strokeStyle = b.stroke; ctx.lineWidth = 1; ctx.setLineDash(b.dash ? [4, 3] : []);
+        ctx.strokeRect(Math.round(x1) + 0.5, Math.round(y1) + 0.5, Math.round(x2 - x1), Math.round(y2 - y1));
+        ctx.setLineDash([]);
+      }
+      return;
+    }
+    for (const ln of it.lines) {
+      const x1 = X(ln.l1), x2 = X(ln.l2), y = Y(ln.p);
+      if ([x1, x2, y].some((v) => v === null)) continue;
+      ctx.strokeStyle = ln.color; ctx.lineWidth = ln.w || 2; ctx.setLineDash(ln.dash ? [6, 4] : []);
+      ctx.beginPath(); ctx.moveTo(x1, Math.round(y) + 0.5); ctx.lineTo(x2, Math.round(y) + 0.5); ctx.stroke(); ctx.setLineDash([]);
+      if (ln.text) {
+        ctx.fillStyle = ln.color; ctx.textAlign = 'center';
+        ctx.fillText(ln.text, (x1 + x2) / 2, ln.below ? y + 14 : y - 6);
+      }
+    }
+    if (it.path.length > 1) {
+      ctx.strokeStyle = Z.proj; ctx.lineWidth = 2; ctx.setLineDash([6, 5]); ctx.beginPath();
+      it.path.forEach((p, k) => { const x = X(p.l), y = Y(p.p); if (x === null || y === null) return; k ? ctx.lineTo(x, y) : ctx.moveTo(x, y); });
+      ctx.stroke(); ctx.setLineDash([]);
+      const a = it.path[it.path.length - 2], b = it.path[it.path.length - 1];
+      const ax = X(a.l), ay = Y(a.p), bx = X(b.l), by = Y(b.p);
+      if ([ax, ay, bx, by].every((v) => v !== null)) {
+        const ang = Math.atan2(by - ay, bx - ax);
+        ctx.fillStyle = Z.proj; ctx.beginPath(); ctx.moveTo(bx, by);
+        ctx.lineTo(bx - 11 * Math.cos(ang - 0.4), by - 11 * Math.sin(ang - 0.4));
+        ctx.lineTo(bx - 11 * Math.cos(ang + 0.4), by - 11 * Math.sin(ang + 0.4)); ctx.fill();
+      }
+    }
+    for (const lb of it.labels) {
+      const x = X(lb.l), y = Y(lb.p);
+      if (x === null || y === null) continue;
+      ctx.textAlign = lb.align || 'left';
+      if (lb.pill) {
+        const w = ctx.measureText(lb.text).width + 12, bx = lb.align === 'center' ? x - w / 2 : x;
+        ctx.fillStyle = lb.bg; ctx.fillRect(bx, y - 10 + (lb.dy || 0), w, 18);
+        ctx.fillStyle = '#ffffff'; ctx.textAlign = 'left'; ctx.fillText(lb.text, bx + 6, y + 3 + (lb.dy || 0));
+      } else {
+        ctx.fillStyle = lb.color || t.text; ctx.fillText(lb.text, x + (lb.dx || 0), y + (lb.dy || 0));
+      }
+    }
+  }
+
+  const chart = LW.createChart(el, {
+    autoSize: true,
+    layout: { background: { type: 'solid', color: THEMES.light.bg }, textColor: THEMES.light.text, fontSize: 11 },
+    grid: { vertLines: { color: THEMES.light.grid }, horzLines: { color: THEMES.light.grid } },
+    crosshair: { mode: LW.CrosshairMode.Normal },
+    rightPriceScale: { borderColor: THEMES.light.border, scaleMargins: { top: 0.08, bottom: 0.08 } },
+    timeScale: { borderColor: THEMES.light.border, timeVisible: true, secondsVisible: false, rightOffset: 32, barSpacing: 7 },
+    localization: { priceFormatter: (p) => p.toLocaleString('en-US', { minimumFractionDigits: 1, maximumFractionDigits: 1 }) },
+  });
+  const series = chart.addCandlestickSeries({
+    upColor: THEMES.light.up, downColor: THEMES.light.down, borderUpColor: THEMES.light.up, borderDownColor: THEMES.light.down,
+    wickUpColor: THEMES.light.up, wickDownColor: THEMES.light.down, priceLineStyle: LW.LineStyle.Dotted,
+  });
+  const overlay = new Overlay();
+  series.attachPrimitive(overlay);
+  let priceLines = [];
+
+  const fmt = (v) => v.toLocaleString('en-US', { minimumFractionDigits: 1, maximumFractionDigits: 1 });
+  const fdate = (t) => new Date(t * 1000).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', timeZone: 'UTC' });
+  const $ = (id) => document.getElementById(id);
+
+  function render(keepRange) {
+    const bars = state.tf === '1D' ? msDaily(state.base) : state.base;
+    const N = state.tf === '1D' ? 3 : 6;
+    const A = msAnalyze(bars, N), S = msNextSetup(bars, A), n = bars.length;
+    const range = keepRange ? chart.timeScale().getVisibleLogicalRange() : null;
+    series.setData(bars);
+
+    const items = { boxes: [], lines: [], labels: [], path: [] };
+    const ev = A.events;
+    const recent = ev.slice(-2);
+    const seenCF = new Set();
+    ev.forEach((e) => {
+      const c = e.dir < 0 ? Z.sell : Z.buy, sell = e.dir < 0;
+      if (state.show.bo) {
+        items.lines.push({ l1: e.fromIdx, l2: e.breakIdx, p: e.level, color: c.line, w: 2,
+          text: e.structure ? 'BO Structure' : (sell ? 'BO Sell' : 'BO Buy'), below: sell });
+      }
+      if (!recent.includes(e)) return;
+      const end = e.endIdx !== null ? e.endIdx : n + 28;
+      if (state.show.origin) {
+        items.boxes.push({ l1: e.start, l2: end, lo: e.bot, hi: e.top, fill: c.fill, stroke: c.stroke });
+        items.labels.push({ l: e.endIdx === null ? n + 1 : e.start + 1, dx: 4, p: sell ? e.bot : e.top, dy: sell ? -6 : 14, text: `Origin ${fmt(e.bot)}–${fmt(e.top)}`, color: c.line });
+      }
+      if (state.show.cf) {
+        e.cf.forEach((f) => {
+          if (seenCF.has(f.i)) return; seenCF.add(f.i);
+          items.boxes.push({ l1: f.i - 1, l2: f.i + 3, lo: f.lo, hi: f.hi, fill: c.cf, stroke: c.stroke });
+          items.labels.push({ l: f.i + 1, p: sell ? f.hi : f.lo, dy: sell ? -6 : 15, text: f.post ? 'CF ✓' : 'CF', align: 'center', color: c.line });
+        });
+      }
+      if (state.show.vr && e.vrBox) {
+        const vrEnd = Math.min(end, e.vr.i + 14);
+        items.boxes.push({ l1: e.vr.i - 2, l2: vrEnd, lo: e.vrBox.lo, hi: e.vrBox.hi, fill: Z.vr.fill, stroke: Z.vr.stroke });
+        items.labels.push({ l: e.vr.i, p: sell ? e.vrBox.lo : e.vrBox.hi, dy: sell ? 15 : -6, text: 'VR', align: 'center', color: Z.vr.stroke });
+      }
+    });
+    if (state.show.next && S && S.proj.length) {
+      items.path = S.proj;
+      S.proj.forEach((p) => { if (p.t) items.labels.push({ l: p.l, p: p.p, text: p.t, pill: true, bg: Z.proj, align: 'center', dy: p.t.startsWith('②') ? (S.sell ? -18 : 18) : (S.sell ? 18 : -18) }); });
+    }
+    overlay.set(items);
+    const pv = items.path.map((q) => q.p);
+    series.applyOptions({ autoscaleInfoProvider: (orig) => {
+      const r = orig();
+      if (r && r.priceRange && pv.length) {
+        r.priceRange.minValue = Math.min(r.priceRange.minValue, ...pv);
+        r.priceRange.maxValue = Math.max(r.priceRange.maxValue, ...pv);
+      }
+      return r;
+    } });
+
+    priceLines.forEach((pl) => series.removePriceLine(pl)); priceLines = [];
+    if (S) {
+      priceLines.push(series.createPriceLine({ price: S.invalid, color: '#787b86', lineWidth: 1, lineStyle: LW.LineStyle.Dashed, axisLabelVisible: true, title: 'Invalidation' }));
+    }
+
+    if (range) chart.timeScale().setVisibleLogicalRange(range);
+    else chart.timeScale().setVisibleLogicalRange({ from: Math.max(0, n - (state.tf === '1D' ? 70 : 190)), to: n + 32 });
+
+    updatePanel(bars, A, S);
+    legend(bars[n - 1], bars[n - 2]);
+  }
+
+  function legend(b, prev) {
+    if (!b) return;
+    const ch = prev ? b.close - (state.tf === '1D' ? prev.close : prev.close) : 0;
+    const col = b.close >= b.open ? THEMES.light.up : THEMES.light.down;
+    $('ms-legend').innerHTML =
+      `<span class="ms-lg-sym">${state.symbol} · ${state.tf} · COMEX</span>` +
+      `<span>O <b style="color:${col}">${fmt(b.open)}</b></span><span>H <b style="color:${col}">${fmt(b.high)}</b></span>` +
+      `<span>L <b style="color:${col}">${fmt(b.low)}</b></span><span>C <b style="color:${col}">${fmt(b.close)}</b></span>` +
+      `<span style="color:${ch >= 0 ? THEMES.light.up : THEMES.light.down}">${ch >= 0 ? '+' : ''}${fmt(ch)} (${(ch / (b.close - ch) * 100).toFixed(2)}%)</span>`;
+  }
+  chart.subscribeCrosshairMove((p) => {
+    const bars = state.tf === '1D' ? msDaily(state.base) : state.base;
+    if (!p || p.logical == null || p.logical < 0 || p.logical >= bars.length) { legend(bars[bars.length - 1], bars[bars.length - 2]); return; }
+    const i = Math.round(p.logical); legend(bars[i], bars[i - 1]);
+  });
+
+  function updatePanel(bars, A, S) {
+    const sells = A.events.filter((e) => e.dir < 0), last = A.last;
+    let streak = 0;
+    for (let k = A.events.length - 1; k >= 0 && A.events[k].dir === last.dir; k--) streak++;
+    const bear = A.trend < 0;
+    $('ms-trend-k').textContent = `${state.tf === '1D' ? 'Daily' : 'H4'} structure`;
+    $('ms-inval-k').textContent = `Invalidation (${state.tf} close)`;
+    $('ms-trend').textContent = bear ? 'Bearish' : 'Bullish';
+    $('ms-trend').style.color = bear ? '#f23645' : '#089981';
+    $('ms-trend-sub').textContent = `${streak} BO ${bear ? 'Sell' : 'Buy'}${streak > 1 ? 's' : ''} in a row on ${state.tf}. Last break ${fmt(last.level)} on ${fdate(bars[last.breakIdx].time)}.`;
+    $('ms-origin').textContent = S.zone;
+    $('ms-origin-sub').textContent = `From the ${fmt(last.level)} BO ${S.sell ? 'Sell' : 'Buy'} up to the ${S.sell ? 'high' : 'low'} that started the break.`;
+    $('ms-phase').textContent = S.phase;
+    $('ms-steps').innerHTML = S.steps.map((s) => `<li>${s}</li>`).join('');
+    $('ms-inval').textContent = fmt(S.invalid);
+    $('ms-target').textContent = fmt(S.target);
+    $('ms-price').textContent = fmt(S.price);
+    $('ms-bias').textContent = S.sell ? 'SELL setup' : 'BUY setup';
+    $('ms-bias').className = 'ms-chip ' + (S.sell ? 'ms-chip-sell' : 'ms-chip-buy');
+    $('ms-bo-rows').innerHTML = A.events.slice().reverse().map((e) => {
+      const sell = e.dir < 0;
+      return `<tr><td>${fdate(bars[e.breakIdx].time)}</td>` +
+        `<td><span class="ms-chip ${sell ? 'ms-chip-sell' : 'ms-chip-buy'}">${e.structure ? 'BO Structure' : sell ? 'BO Sell' : 'BO Buy'}</span></td>` +
+        `<td class="num">${fmt(e.level)}</td><td class="num">${fmt(e.bot)} – ${fmt(e.top)}</td>` +
+        `<td>${e.endIdx !== null ? 'Broken' : e.vr ? (e.cf.some((f) => f.post) ? 'CF given' : 'VR in') : 'Extending'}</td></tr>`;
+    }).join('');
+    $('ms-src').textContent = state.source === 'reconstructed'
+      ? 'Prices rebuilt from your MGC1! 4h chart (10 Aug – 30 Oct 2026). Swing levels match your markings; candles between them are approximate. Load a TradingView CSV export for exact prices.'
+      : `Loaded from your CSV: ${state.base.length} bars. Zones are recalculated from this data.`;
+  }
+
+  function applyTheme() {
+    const t = THEMES[state.theme];
+    chart.applyOptions({ layout: { background: { type: 'solid', color: t.bg }, textColor: t.text },
+      grid: { vertLines: { color: t.grid }, horzLines: { color: t.grid } },
+      rightPriceScale: { borderColor: t.border }, timeScale: { borderColor: t.border } });
+    $('ms-tv').dataset.chart = state.theme;
+    $('ms-theme').textContent = state.theme === 'light' ? 'Dark chart' : 'Light chart';
+    overlay.set(overlay.items);
+  }
+
+  function parseCSV(text) {
+    const rows = text.trim().split(/\r?\n/);
+    const head = rows.shift().split(',').map((h) => h.trim().toLowerCase().replace(/"/g, ''));
+    const ix = (k) => head.findIndex((h) => h === k || h.startsWith(k));
+    const it = ix('time'), io = ix('open'), ih = ix('high'), il = ix('low'), ic = ix('close');
+    if ([it, io, ih, il, ic].some((v) => v < 0)) throw new Error('The CSV needs time, open, high, low and close columns.');
+    const out = [];
+    for (const r of rows) {
+      const c = r.split(',');
+      let t = c[it].replace(/"/g, '').trim();
+      t = /^\d+$/.test(t) ? +t : Math.floor(Date.parse(t) / 1000);
+      const b = { time: t, open: +c[io], high: +c[ih], low: +c[il], close: +c[ic] };
+      if (Number.isFinite(t) && [b.open, b.high, b.low, b.close].every(Number.isFinite)) out.push(b);
+    }
+    out.sort((a, b) => a.time - b.time);
+    if (out.length < 60) throw new Error('Need at least 60 bars to mark structure.');
+    return out;
+  }
+
+  document.querySelectorAll('#ms-tv [data-tf]').forEach((b) => b.addEventListener('click', () => {
+    state.tf = b.dataset.tf;
+    document.querySelectorAll('#ms-tv [data-tf]').forEach((x) => x.classList.toggle('on', x === b));
+    render(false);
+  }));
+  document.querySelectorAll('#ms-tv [data-show]').forEach((cb) => cb.addEventListener('change', () => {
+    state.show[cb.dataset.show] = cb.checked; render(true);
+  }));
+  $('ms-theme').addEventListener('click', () => { state.theme = state.theme === 'light' ? 'dark' : 'light'; applyTheme(); });
+  $('ms-fit').addEventListener('click', () => render(false));
+  $('ms-csv').addEventListener('change', (ev) => {
+    const f = ev.target.files[0]; if (!f) return;
+    const rd = new FileReader();
+    rd.onload = () => {
+      try {
+        state.base = parseCSV(rd.result); state.source = 'csv';
+        state.symbol = (f.name.split(/[_,. ]/)[0] || 'CSV').replace(/^[A-Z]+:/, '').slice(0, 14);
+        $('ms-csv-err').textContent = ''; render(false);
+      } catch (err) { $('ms-csv-err').textContent = err.message; }
+    };
+    rd.readAsText(f);
+  });
+
+  state.base = msGenerate();
+  render(false);
+  let fitted = el.clientWidth > 0;
+  new ResizeObserver(() => {
+    if (!fitted && el.clientWidth > 0) { fitted = true; requestAnimationFrame(() => render(false)); }
+  }).observe(el);
 })();
 </script>
 
