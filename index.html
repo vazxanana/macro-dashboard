@@ -2107,108 +2107,115 @@
   </div>
 
   <style>
-    .ms-wrap { margin: 0 24px 20px; display: grid; grid-template-columns: minmax(0, 1fr); gap: 12px; }
-    .ms-tv { border: 1px solid #e0e3eb; border-radius: 6px; overflow: hidden; background: #fff; color: #131722; position: relative; }
-    .ms-tv[data-chart="dark"] { background: #131722; color: #d1d4dc; border-color: #2a2e39; }
-    .ms-tv-top { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 14px; padding: 8px 12px; border-bottom: 1px solid #e0e3eb; font: 12px -apple-system, BlinkMacSystemFont, "Trebuchet MS", Roboto, sans-serif; }
-    .ms-tv[data-chart="dark"] .ms-tv-top { border-color: #2a2e39; }
+    .ms-live { margin: 0 24px 20px; display: grid; grid-template-columns: minmax(0, 1fr); gap: 12px; --ms-b: #e0e3eb; --ms-bg: #ffffff; --ms-fg: #131722; --ms-mute: #787b86; }
+    .ms-live[data-chart="dark"] { --ms-b: #2a2e39; --ms-bg: #131722; --ms-fg: #d1d4dc; }
+    .ms-bar { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 14px; padding: 8px 12px; border: 1px solid var(--ms-b); border-radius: 6px; background: var(--ms-bg); color: var(--ms-fg); font: 12px -apple-system, BlinkMacSystemFont, "Trebuchet MS", Roboto, sans-serif; }
     .ms-sym { display: flex; align-items: center; gap: 8px; }
     .ms-sym b { font-size: 14px; }
-    .ms-sym span { color: #787b86; }
+    .ms-sym span { color: var(--ms-mute); }
     .ms-coin { width: 18px; height: 18px; border-radius: 50%; background: radial-gradient(circle at 35% 35%, #ffd768, #c99400); display: inline-block; }
-    .ms-seg { display: inline-flex; border: 1px solid #e0e3eb; border-radius: 4px; overflow: hidden; }
-    .ms-tv[data-chart="dark"] .ms-seg { border-color: #2a2e39; }
-    .ms-seg button, .ms-tbtn { background: transparent; color: inherit; border: 0; padding: 4px 10px; font: 600 12px inherit; font-family: inherit; cursor: pointer; }
-    .ms-seg button.on { background: #2962ff; color: #fff; }
-    .ms-tbtn { border: 1px solid #e0e3eb; border-radius: 4px; }
-    .ms-tv[data-chart="dark"] .ms-tbtn { border-color: #2a2e39; }
-    .ms-seg button:focus-visible, .ms-tbtn:focus-visible, .ms-tog input:focus-visible { outline: 2px solid #2962ff; outline-offset: 1px; }
+    .ms-live-dot { width: 8px; height: 8px; border-radius: 50%; background: #9598a1; display: inline-block; }
+    .ms-live-dot.on { background: #089981; box-shadow: 0 0 0 3px rgba(8,153,129,.2); animation: msPulse 2s infinite; }
+    .ms-live-dot.poll { background: #f0a500; }
+    @keyframes msPulse { 50% { box-shadow: 0 0 0 6px rgba(8,153,129,0); } }
+    @media (prefers-reduced-motion: reduce) { .ms-live-dot.on { animation: none; } }
+    .ms-status { display: inline-flex; align-items: center; gap: 6px; color: var(--ms-mute); }
     .ms-tog { display: flex; flex-wrap: wrap; gap: 4px 12px; }
-    .ms-tog label { display: inline-flex; align-items: center; gap: 5px; cursor: pointer; color: #787b86; }
+    .ms-tog label { display: inline-flex; align-items: center; gap: 5px; cursor: pointer; color: var(--ms-mute); }
     .ms-tog i { width: 12px; height: 9px; border-radius: 2px; display: inline-block; }
     .ms-right { margin-left: auto; display: flex; gap: 6px; align-items: center; flex-wrap: wrap; }
-    .ms-legend { position: absolute; left: 12px; top: 54px; z-index: 3; display: flex; flex-wrap: wrap; gap: 4px 10px; font: 12px -apple-system, BlinkMacSystemFont, "Trebuchet MS", Roboto, sans-serif; pointer-events: none; color: #787b86; }
+    .ms-tbtn { background: transparent; color: inherit; border: 1px solid var(--ms-b); border-radius: 4px; padding: 4px 10px; font: 600 12px -apple-system, BlinkMacSystemFont, "Trebuchet MS", Roboto, sans-serif; cursor: pointer; }
+    .ms-tbtn:focus-visible, .ms-tog input:focus-visible { outline: 2px solid #2962ff; outline-offset: 1px; }
+    .ms-err { color: var(--ms-mute); font-size: 11px; }
+    .ms-td { display: grid; grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr); gap: 16px; }
+    .ms-k { font-size: 9px; letter-spacing: 1.2px; text-transform: uppercase; color: var(--ink-faint); margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+    .ms-steps { list-style: none; margin: 0; padding: 0; display: grid; gap: 7px; font-size: 12px; line-height: 1.5; color: var(--ink-dim); }
+    .ms-steps li { display: grid; grid-template-columns: 20px minmax(0, 1fr); gap: 8px; align-items: start; }
+    .ms-steps li.done { color: var(--ink); }
+    .ms-steps li.now { color: var(--ink); font-weight: 600; }
+    .ms-dot { width: 20px; height: 20px; border-radius: 50%; display: grid; place-items: center; font: 700 10px var(--mono); border: 1px solid var(--line); color: var(--ink-faint); }
+    .ms-steps li.done .ms-dot { background: rgba(8,153,129,.18); border-color: rgba(8,153,129,.5); color: #089981; }
+    .ms-steps li.now .ms-dot { background: #2962ff; border-color: #2962ff; color: #fff; }
+    .ms-now { margin-top: 10px; padding: 8px 10px; border-radius: 4px; background: rgba(41,98,255,.12); color: var(--ink); font-size: 12px; line-height: 1.5; }
+    .ms-kv { display: grid; gap: 8px; font-size: 11px; color: var(--ink-dim); }
+    .ms-kv b { font-family: var(--mono); color: var(--ink); font-size: 14px; font-variant-numeric: tabular-nums; }
+    .ms-kv > div { display: flex; justify-content: space-between; gap: 10px; border-bottom: 1px solid var(--line-soft); padding-bottom: 6px; }
+    .ms-align { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 4px; }
+    .ms-al { padding: 3px 8px; border-radius: 3px; font: 700 11px var(--mono); border: 1px solid var(--line); color: var(--ink-faint); }
+    .ms-al.ok { color: #089981; border-color: rgba(8,153,129,.45); background: rgba(8,153,129,.1); }
+    .ms-al.against { color: #f23645; border-color: rgba(242,54,69,.45); background: rgba(242,54,69,.1); }
+    .ms-chip { display: inline-block; padding: 2px 8px; border-radius: 3px; font: 700 10px var(--mono); letter-spacing: .5px; border: 1px solid var(--ms-b); color: var(--ms-mute); }
+    .ms-chip-sell { background: rgba(242,54,69,.15); color: #f23645; border-color: rgba(242,54,69,.35); }
+    .ms-chip-buy { background: rgba(8,153,129,.15); color: #089981; border-color: rgba(8,153,129,.35); }
+    .ms-grid4 { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+    .ms-pane { border: 1px solid var(--ms-b); border-radius: 6px; overflow: hidden; background: var(--ms-bg); color: var(--ms-fg); position: relative; min-width: 0; }
+    .ms-pane.full { grid-column: 1 / -1; }
+    .ms-pane.full .ms-chart { height: 620px; }
+    .ms-ph { display: flex; align-items: center; gap: 10px; padding: 7px 10px; border-bottom: 1px solid var(--ms-b); font: 12px -apple-system, BlinkMacSystemFont, "Trebuchet MS", Roboto, sans-serif; }
+    .ms-ph b { font-size: 13px; }
+    .ms-ph .ms-role { color: var(--ms-mute); }
+    .ms-ph .ms-tbtn { margin-left: auto; padding: 2px 8px; font-size: 11px; }
+    .ms-legend { position: absolute; left: 10px; top: 44px; z-index: 3; display: flex; flex-wrap: wrap; gap: 3px 9px; font: 11px -apple-system, BlinkMacSystemFont, "Trebuchet MS", Roboto, sans-serif; pointer-events: none; color: var(--ms-mute); }
     .ms-legend b { font-weight: 500; font-variant-numeric: tabular-nums; }
-    .ms-lg-sym { color: inherit; font-weight: 600; }
-    .ms-tv[data-chart="light"] .ms-lg-sym { color: #131722; }
-    .ms-tv[data-chart="dark"] .ms-lg-sym { color: #d1d4dc; }
-    #ms-main-chart { height: 600px; width: 100%; }
-    .ms-src { padding: 7px 12px; font-size: 11px; color: #787b86; border-top: 1px solid #e0e3eb; }
-    .ms-tv[data-chart="dark"] .ms-src { border-color: #2a2e39; }
-    .ms-err { color: #f23645; font-size: 11px; }
-    .ms-grid { display: grid; grid-template-columns: 1fr 1fr 1.6fr; gap: 12px; }
-    .ms-grid > .card { min-width: 0; }
-    .ms-k { font-size: 9px; letter-spacing: 1.2px; text-transform: uppercase; color: var(--ink-faint); margin-bottom: 8px; }
-    .ms-big { font-size: 20px; font-weight: 700; font-family: var(--mono); font-variant-numeric: tabular-nums; }
-    .ms-sub { font-size: 11px; color: var(--ink-dim); margin-top: 6px; line-height: 1.6; }
-    .ms-steps { margin: 8px 0 0; padding-left: 18px; font-size: 12px; line-height: 1.65; color: var(--ink); }
-    .ms-steps li + li { margin-top: 4px; }
-    .ms-kv { display: flex; gap: 18px; flex-wrap: wrap; margin-top: 10px; font-size: 11px; color: var(--ink-dim); }
-    .ms-kv b { font-family: var(--mono); color: var(--ink); font-size: 12px; }
-    .ms-chip { display: inline-block; padding: 2px 8px; border-radius: 3px; font: 700 10px var(--mono); letter-spacing: .5px; }
-    .ms-chip-sell { background: rgba(242,54,69,.15); color: #f23645; border: 1px solid rgba(242,54,69,.35); }
-    .ms-chip-buy { background: rgba(8,153,129,.15); color: #089981; border: 1px solid rgba(8,153,129,.35); }
-    .ms-table-wrap { overflow-x: auto; }
-    .ms-table { width: 100%; border-collapse: collapse; font-size: 12px; }
-    .ms-table th { text-align: left; font-size: 9px; letter-spacing: 1px; text-transform: uppercase; color: var(--ink-faint); font-weight: 700; padding: 6px 8px; border-bottom: 1px solid var(--line); }
-    .ms-table td { padding: 7px 8px; border-bottom: 1px solid var(--line-soft); color: var(--ink); white-space: nowrap; }
-    .ms-table td.num { font-family: var(--mono); font-variant-numeric: tabular-nums; }
-    @media (max-width: 900px) { .ms-grid { grid-template-columns: 1fr; } #ms-main-chart { height: 460px; } .ms-legend { position: static; padding: 6px 12px 0; } }
-    @media (max-width: 520px) { .ms-wrap { margin: 0 12px 16px; } #ms-main-chart { height: 400px; } .ms-right { margin-left: 0; } }
+    .ms-lg-sym { color: var(--ms-fg); font-weight: 600; }
+    .ms-chart { height: 400px; width: 100%; }
+    .ms-ro { display: flex; flex-wrap: wrap; gap: 4px 16px; padding: 7px 10px; border-top: 1px solid var(--ms-b); font-size: 11px; color: var(--ms-mute); min-height: 30px; }
+    .ms-ro b { color: var(--ms-fg); font-weight: 600; font-variant-numeric: tabular-nums; }
+    .ms-note { font-size: 11px; color: var(--ink-faint); line-height: 1.6; }
+    .ms-offline-box { display: none; }
+    .ms-live.ms-offline .ms-offline-box { display: block; }
+    .ms-offline-box { border: 1px solid rgba(240,165,0,.5); background: rgba(240,165,0,.1); border-radius: 6px; padding: 12px 14px; color: var(--ink); font-size: 12px; line-height: 1.6; }
+    .ms-offline-box code { font-family: var(--mono); font-size: 11px; }
+    @media (max-width: 1000px) { .ms-grid4, .ms-td { grid-template-columns: minmax(0, 1fr); } .ms-chart { height: 360px; } .ms-pane.full .ms-chart { height: 480px; } }
+    @media (max-width: 520px) { .ms-live { margin: 0 12px 16px; } .ms-right { margin-left: 0; } .ms-legend { position: static; padding: 5px 10px 0; } }
   </style>
 
-  <div class="ms-wrap">
-    <div class="ms-tv" id="ms-tv" data-chart="light">
-      <div class="ms-tv-top">
-        <div class="ms-sym"><i class="ms-coin"></i><b>MGC1!</b><span>Micro Gold Futures</span></div>
-        <div class="ms-seg" role="group" aria-label="Timeframe"><button type="button" data-tf="4h" class="on">4h</button><button type="button" data-tf="1D">1D</button></div>
-        <div class="ms-tog">
-          <label><input type="checkbox" id="ms-show-bo" data-show="bo" checked><i style="background:#f23645;height:2px"></i>BO lines</label>
-          <label><input type="checkbox" id="ms-show-origin" data-show="origin" checked><i style="background:rgba(242,54,69,.35);border:1px solid #b22833"></i>Origin</label>
-          <label><input type="checkbox" id="ms-show-cf" data-show="cf" checked><i style="background:rgba(242,54,69,.5)"></i>CF</label>
-          <label><input type="checkbox" id="ms-show-vr" data-show="vr" checked><i style="background:rgba(255,152,0,.4);border:1px solid #e08600"></i>VR</label>
-          <label><input type="checkbox" id="ms-show-next" data-show="next" checked><i style="background:#2962ff;height:2px"></i>Next setup</label>
-        </div>
-        <div class="ms-right">
-          <button type="button" class="ms-tbtn" id="ms-fit">Reset view</button>
-          <button type="button" class="ms-tbtn" id="ms-theme">Dark chart</button>
-          <label class="ms-tbtn" for="ms-csv" style="display:inline-flex;align-items:center">Load TradingView CSV</label>
-          <input type="file" id="ms-csv" accept=".csv,text/csv" hidden>
-          <span class="ms-err" id="ms-csv-err" role="alert"></span>
-        </div>
+  <div class="ms-live" id="ms-live" data-chart="light">
+    <div class="ms-bar">
+      <div class="ms-sym"><i class="ms-coin"></i><b>XAU/USD</b><span>Gold spot · live</span></div>
+      <span class="ms-status"><i class="ms-live-dot" id="ms-live-dot"></i><span id="ms-live-txt">Connecting…</span> · <span id="ms-updated">—</span></span>
+      <div class="ms-tog">
+        <label><input type="checkbox" id="ms-show-bo" data-show="bo" checked><i style="background:#f23645;height:2px"></i>BO lines</label>
+        <label><input type="checkbox" id="ms-show-origin" data-show="origin" checked><i style="background:rgba(242,54,69,.35);border:1px solid #b22833"></i>Origin</label>
+        <label><input type="checkbox" id="ms-show-cf" data-show="cf" checked><i style="background:rgba(242,54,69,.5)"></i>CF</label>
+        <label><input type="checkbox" id="ms-show-vr" data-show="vr" checked><i style="background:rgba(255,152,0,.4);border:1px solid #e08600"></i>VR</label>
+        <label><input type="checkbox" id="ms-show-htf" data-show="htf" checked><i style="border:1.5px dashed #2962ff"></i>HTF Origin</label>
+        <label><input type="checkbox" id="ms-show-next" data-show="next" checked><i style="background:#2962ff;height:2px"></i>Next setup</label>
       </div>
-      <div class="ms-legend" id="ms-legend"></div>
-      <div id="ms-main-chart"></div>
-      <div class="ms-src" id="ms-src"></div>
-    </div>
-
-    <div class="ms-grid">
-      <div class="card">
-        <div class="ms-k" id="ms-trend-k">H4 structure</div>
-        <div class="ms-big" id="ms-trend">—</div>
-        <div class="ms-sub" id="ms-trend-sub"></div>
-      </div>
-      <div class="card">
-        <div class="ms-k">Active origin</div>
-        <div class="ms-big" id="ms-origin" style="font-size:17px">—</div>
-        <div class="ms-sub" id="ms-origin-sub"></div>
-      </div>
-      <div class="card">
-        <div class="ms-k" style="display:flex;justify-content:space-between;align-items:center;gap:8px">Next possible setup <span class="ms-chip" id="ms-bias"></span></div>
-        <div style="font-size:13px;font-weight:700;color:var(--ink)" id="ms-phase"></div>
-        <ol class="ms-steps" id="ms-steps"></ol>
-        <div class="ms-kv"><span>Price <b id="ms-price"></b></span><span><span id="ms-inval-k">Invalidation (4h close)</span> <b id="ms-inval"></b></span><span>First target <b id="ms-target"></b></span></div>
+      <div class="ms-right">
+        <button type="button" class="ms-tbtn" id="ms-fit">Reset view</button>
+        <button type="button" class="ms-tbtn" id="ms-theme">Dark charts</button>
+        <label class="ms-tbtn" for="ms-csv">Load CSV</label>
+        <input type="file" id="ms-csv" accept=".csv,text/csv" hidden>
+        <span class="ms-err" id="ms-csv-err" role="status"></span>
       </div>
     </div>
 
-    <div class="card">
-      <div class="ms-k">Breakout log</div>
-      <div class="ms-table-wrap">
-        <table class="ms-table">
-          <thead><tr><th>Break</th><th>Type</th><th>Level</th><th>Origin zone</th><th>Status</th></tr></thead>
-          <tbody id="ms-bo-rows"></tbody>
-        </table>
+    <div class="ms-offline-box" role="alert">
+      <b>Live gold prices can't load here.</b> This viewer blocks network requests, so the charts can't reach the price feeds (Binance and Kraken).
+      Open the dashboard from its web address to see live candles, or use <b>Load CSV</b> with a TradingView export (H4, H1, M15 or M1).
+      <div class="ms-note" id="ms-offline-why"></div>
+    </div>
+
+    <div class="card ms-td">
+      <div>
+        <div class="ms-k">Top-down: what to do now <span class="ms-chip" id="ms-td-bias">—</span></div>
+        <ol class="ms-steps" id="ms-td-steps"><li><span class="ms-dot">…</span><span>Waiting for live candles.</span></li></ol>
+        <div class="ms-now" id="ms-td-now">Loading H4, H1, M15 and M1…</div>
       </div>
+      <div class="ms-kv">
+        <div><span>Spot price</span><b id="ms-td-price">—</b></div>
+        <div><span>H4 invalidation (close beyond)</span><b id="ms-td-inval">—</b></div>
+        <div style="display:block;border:0"><span>Timeframe alignment with H4</span><div class="ms-align" id="ms-td-align"></div></div>
+        <div class="ms-note" id="ms-feed-note" style="display:block;border:0"></div>
+      </div>
+    </div>
+
+    <div class="ms-grid4">
+      <div class="ms-pane"><div class="ms-ph"><b>H4</b><span class="ms-role">Direction · BO</span><span class="ms-chip" id="ms-t-4h">—</span><button type="button" class="ms-tbtn" data-expand="4h" aria-pressed="false">Expand</button></div><div class="ms-legend" id="ms-l-4h"></div><div class="ms-chart" id="ms-c-4h"></div><div class="ms-ro" id="ms-r-4h"></div></div>
+      <div class="ms-pane"><div class="ms-ph"><b>H1</b><span class="ms-role">VR · CF</span><span class="ms-chip" id="ms-t-1h">—</span><button type="button" class="ms-tbtn" data-expand="1h" aria-pressed="false">Expand</button></div><div class="ms-legend" id="ms-l-1h"></div><div class="ms-chart" id="ms-c-1h"></div><div class="ms-ro" id="ms-r-1h"></div></div>
+      <div class="ms-pane"><div class="ms-ph"><b>M15</b><span class="ms-role">Narrative · Barrier</span><span class="ms-chip" id="ms-t-15m">—</span><button type="button" class="ms-tbtn" data-expand="15m" aria-pressed="false">Expand</button></div><div class="ms-legend" id="ms-l-15m"></div><div class="ms-chart" id="ms-c-15m"></div><div class="ms-ro" id="ms-r-15m"></div></div>
+      <div class="ms-pane"><div class="ms-ph"><b>M1</b><span class="ms-role">Entry trigger</span><span class="ms-chip" id="ms-t-1m">—</span><button type="button" class="ms-tbtn" data-expand="1m" aria-pressed="false">Expand</button></div><div class="ms-legend" id="ms-l-1m"></div><div class="ms-chart" id="ms-c-1m"></div><div class="ms-ro" id="ms-r-1m"></div></div>
     </div>
   </div>
 
@@ -5610,81 +5617,6 @@ try {
 </script>
 <script>
 // ═══ MOSHA STRUCTURE ENGINE (pure functions, no DOM) ═══
-function msRng(seed) {
-  return function () {
-    seed |= 0; seed = seed + 0x6D2B79F5 | 0;
-    let t = Math.imul(seed ^ seed >>> 15, 1 | seed);
-    t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t;
-    return ((t ^ t >>> 14) >>> 0) / 4294967296;
-  };
-}
-
-// MGC1! 4h, Aug–Oct 2026, swing points read off the user's chart
-const MS_ANCHORS = [
-  ['08-10 00',4470],['08-11 12',4525],['08-13 08',4415],['08-14 16',4500],['08-18 12',4380],
-  ['08-21 08',4640],['08-24 12',4755],['08-25 16',4645],['08-26 20',4705],['08-28 12',4610],
-  ['08-31 08',4640],['09-02 08',4330],['09-04 12',4555],['09-08 08',4450],['09-10 16',4482],
-  ['09-17 04',4273],['09-18 16',4438],['09-22 08',4368],['09-23 16',4402],['09-25 12',4312],
-  ['09-29 08',4141],['10-01 04',4248],['10-02 12',4256],['10-05 08',4188],['10-06 12',4228],
-  ['10-07 16',4090],['10-09 08',4245],['10-12 12',4172],['10-13 16',4226],['10-14 20',4165],
-  ['10-15 12',4095],['10-16 16',4215],['10-19 04',4160],['10-19 20',4205],['10-20 16',4140],
-  ['10-21 12',4175],['10-23 08',3989],['10-26 04',4045],['10-26 20',4012],['10-28 12',4094],
-  ['10-29 08',4035],['10-29 20',4016.9],['10-30 16',3880],['10-30 20',3884.4],
-];
-
-function msGenerate() {
-  const rnd = msRng(20261031);
-  const ts = (s) => Date.UTC(2026, +s.slice(0,2)-1, +s.slice(3,5), +s.slice(6,8)) / 1000;
-  const t0 = ts(MS_ANCHORS[0][0]), t1 = ts(MS_ANCHORS[MS_ANCHORS.length-1][0]);
-  const times = [];
-  for (let t = t0; t <= t1; t += 14400) {
-    const wd = new Date(t*1000).getUTCDay();
-    if (wd !== 0 && wd !== 6) times.push(t);
-  }
-  const idxOf = (t) => times.findIndex(x => x >= t);
-  const A = MS_ANCHORS.map(([s,p]) => ({ i: idxOf(ts(s)), p }));
-  const close = new Array(times.length), segLo = [], segHi = [];
-  for (let k = 0; k < A.length-1; k++) {
-    const a = A[k], b = A[k+1], n = b.i - a.i;
-    const lo = Math.min(a.p,b.p), hi = Math.max(a.p,b.p);
-    const sig = 5 + Math.abs(b.p-a.p) * 0.09;
-    let w = 0; const walk = [0];
-    for (let j = 1; j <= n; j++) { w += (rnd()-0.5) * 2 * sig; walk.push(w); }
-    for (let j = 0; j <= n; j++) {
-      const lin = a.p + (b.p-a.p) * j / n;
-      const br = walk[j] - walk[n] * j / n;
-      const v = Math.min(hi, Math.max(lo, lin + br));
-      if (j < n || k === A.length-2) { close[a.i+j] = v; segLo[a.i+j] = lo; segHi[a.i+j] = hi; }
-    }
-  }
-  const bars = [];
-  for (let i = 0; i < times.length; i++) {
-    const o = i ? close[i-1] : close[0] - 6, c = close[i];
-    let lo = segLo[i], hi = segHi[i];
-    if (i) { lo = Math.min(lo, o); hi = Math.max(hi, o); }
-    const wk = 3 + rnd() * 11, wk2 = 3 + rnd() * 11;
-    bars.push({ time: times[i], open: o, close: c,
-      high: Math.min(hi, Math.max(o,c) + wk), low: Math.max(lo, Math.min(o,c) - wk2) });
-  }
-  A.forEach((a, k) => {
-    const prev = A[k-1], next = A[k+1], b = bars[a.i];
-    if ((!prev || a.p < prev.p) && (!next || a.p < next.p)) b.low = a.p;
-    if ((!prev || a.p > prev.p) && (!next || a.p > next.p)) b.high = a.p;
-  });
-  bars.forEach(b => { for (const k of ['open','high','low','close']) b[k] = Math.round(b[k]*10)/10; });
-  return bars;
-}
-
-function msDaily(bars) {
-  const out = [];
-  for (const b of bars) {
-    const d = Math.floor(b.time / 86400) * 86400, last = out[out.length-1];
-    if (last && last.time === d) { last.high = Math.max(last.high,b.high); last.low = Math.min(last.low,b.low); last.close = b.close; }
-    else out.push({ time: d, open: b.open, high: b.high, low: b.low, close: b.close });
-  }
-  return out;
-}
-
 function msAnalyze(bars, N) {
   const H = bars.map(b=>b.high), L = bars.map(b=>b.low), C = bars.map(b=>b.close), n = bars.length;
   const maxIn = (a,b) => { let m=-Infinity, k=a; for (let j=a;j<=b;j++) if (H[j]>m){m=H[j];k=j;} return [m,k]; };
@@ -5843,26 +5775,38 @@ function msNextSetup(bars, A) {
 }
 
 
-// ═══ MOSHA STRUCTURE CHART (TradingView Lightweight Charts + drawing overlay) ═══
+// ═══ MOSHA LIVE MULTI-TIMEFRAME CHARTS — real gold candles (PAXG feed aligned to XAU/USD spot) ═══
 (function () {
   const LW = window.LightweightCharts;
-  const el = document.getElementById('ms-main-chart');
-  if (!LW || !el) return;
+  const root = document.getElementById('ms-live');
+  if (!LW || !root) return;
 
+  const TFS = [
+    { id: '4h',  label: 'H4',  role: 'Direction · BO',          sec: 14400, binance: '4h',  kraken: 240, poll: 120e3 },
+    { id: '1h',  label: 'H1',  role: 'VR · CF',                 sec: 3600,  binance: '1h',  kraken: 60,  poll: 60e3 },
+    { id: '15m', label: 'M15', role: 'Narrative · Barrier',     sec: 900,   binance: '15m', kraken: 15,  poll: 30e3 },
+    { id: '1m',  label: 'M1',  role: 'Entry trigger',           sec: 60,    binance: '1m',  kraken: 1,   poll: 10e3 },
+  ];
+  const BARS = 500, PIVOT = 6;
+  const TZ = -new Date().getTimezoneOffset() * 60;
   const THEMES = {
-    light: { bg: '#ffffff', text: '#131722', grid: '#f0f3fa', border: '#e0e3eb', up: '#089981', down: '#f23645' },
-    dark:  { bg: '#131722', text: '#d1d4dc', grid: '#1e222d', border: '#2a2e39', up: '#089981', down: '#f23645' },
+    light: { bg: '#ffffff', text: '#131722', grid: '#f0f3fa', border: '#e0e3eb' },
+    dark:  { bg: '#131722', text: '#d1d4dc', grid: '#1e222d', border: '#2a2e39' },
   };
+  const UPC = '#089981', DNC = '#f23645';
   const Z = {
     sell: { fill: 'rgba(242,54,69,0.20)', stroke: 'rgba(178,40,51,0.85)', cf: 'rgba(242,54,69,0.30)', line: '#f23645' },
     buy:  { fill: 'rgba(8,153,129,0.16)', stroke: 'rgba(6,122,103,0.85)', cf: 'rgba(8,153,129,0.28)', line: '#089981' },
     vr:   { fill: 'rgba(255,152,0,0.18)', stroke: 'rgba(224,134,0,0.9)' },
-    proj: '#2962ff',
+    htf:  'rgba(41,98,255,0.85)', proj: '#2962ff',
   };
-  const state = { tf: '4h', theme: 'light', show: { bo: true, origin: true, vr: true, cf: true, next: true },
-    base: null, source: 'reconstructed', symbol: 'MGC1!' };
+  const G = { theme: 'light', show: { bo: true, origin: true, cf: true, vr: true, next: true, htf: true },
+    offset: 0, spot: null, source: '', live: false, csv: false };
+  const $ = (id) => document.getElementById(id);
+  const fmt = (v) => (v == null || !isFinite(v)) ? '—' : v.toLocaleString('en-US', { minimumFractionDigits: 1, maximumFractionDigits: 1 });
+  const ftime = (t) => new Date((t - TZ) * 1000).toLocaleString('en-GB', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' });
 
-  // Drawing overlay as a series primitive
+  // ─── Drawing overlay (series primitive) ───
   class Overlay {
     constructor() { this.items = { boxes: [], lines: [], labels: [], path: [] }; this.views = [new View(this, 'bottom'), new View(this, 'top')]; }
     attached(p) { this.chart = p.chart; this.series = p.series; this.req = p.requestUpdate; }
@@ -5877,7 +5821,7 @@ function msNextSetup(bars, A) {
     renderer() {
       const o = this.o, z = this.z;
       return { draw(target) {
-        const run = (ctx) => { try { paint(o, z, ctx); } catch (err) { /* chart not ready */ } };
+        const run = (ctx) => { try { paint(o, z, ctx); } catch (err) { /* not laid out yet */ } };
         if (target.useMediaCoordinateSpace) target.useMediaCoordinateSpace((s) => run(s.context));
         else target.useBitmapCoordinateSpace((s) => { s.context.save(); s.context.scale(s.horizontalPixelRatio, s.verticalPixelRatio); run(s.context); s.context.restore(); });
       } };
@@ -5887,14 +5831,14 @@ function msNextSetup(bars, A) {
     if (!o.chart || !o.series) return;
     const ts = o.chart.timeScale(), s = o.series;
     const X = (l) => ts.logicalToCoordinate(l), Y = (p) => s.priceToCoordinate(p);
-    const it = o.items, t = THEMES[state.theme];
+    const it = o.items, t = THEMES[G.theme];
     ctx.font = '600 11px -apple-system, BlinkMacSystemFont, "Trebuchet MS", Roboto, sans-serif';
     if (z === 'bottom') {
       for (const b of it.boxes) {
         const x1 = X(b.l1), x2 = X(b.l2), y1 = Y(b.hi), y2 = Y(b.lo);
         if ([x1, x2, y1, y2].some((v) => v === null)) continue;
-        ctx.fillStyle = b.fill; ctx.fillRect(x1, y1, x2 - x1, y2 - y1);
-        ctx.strokeStyle = b.stroke; ctx.lineWidth = 1; ctx.setLineDash(b.dash ? [4, 3] : []);
+        if (b.fill) { ctx.fillStyle = b.fill; ctx.fillRect(x1, y1, x2 - x1, y2 - y1); }
+        ctx.strokeStyle = b.stroke; ctx.lineWidth = b.dash ? 1.5 : 1; ctx.setLineDash(b.dash ? [6, 4] : []);
         ctx.strokeRect(Math.round(x1) + 0.5, Math.round(y1) + 0.5, Math.round(x2 - x1), Math.round(y2 - y1));
         ctx.setLineDash([]);
       }
@@ -5903,12 +5847,9 @@ function msNextSetup(bars, A) {
     for (const ln of it.lines) {
       const x1 = X(ln.l1), x2 = X(ln.l2), y = Y(ln.p);
       if ([x1, x2, y].some((v) => v === null)) continue;
-      ctx.strokeStyle = ln.color; ctx.lineWidth = ln.w || 2; ctx.setLineDash(ln.dash ? [6, 4] : []);
-      ctx.beginPath(); ctx.moveTo(x1, Math.round(y) + 0.5); ctx.lineTo(x2, Math.round(y) + 0.5); ctx.stroke(); ctx.setLineDash([]);
-      if (ln.text) {
-        ctx.fillStyle = ln.color; ctx.textAlign = 'center';
-        ctx.fillText(ln.text, (x1 + x2) / 2, ln.below ? y + 14 : y - 6);
-      }
+      ctx.strokeStyle = ln.color; ctx.lineWidth = 2;
+      ctx.beginPath(); ctx.moveTo(x1, Math.round(y) + 0.5); ctx.lineTo(x2, Math.round(y) + 0.5); ctx.stroke();
+      if (ln.text) { ctx.fillStyle = ln.color; ctx.textAlign = 'center'; ctx.fillText(ln.text, (x1 + x2) / 2, ln.below ? y + 14 : y - 6); }
     }
     if (it.path.length > 1) {
       ctx.strokeStyle = Z.proj; ctx.lineWidth = 2; ctx.setLineDash([6, 5]); ctx.beginPath();
@@ -5926,206 +5867,327 @@ function msNextSetup(bars, A) {
     for (const lb of it.labels) {
       const x = X(lb.l), y = Y(lb.p);
       if (x === null || y === null) continue;
-      ctx.textAlign = lb.align || 'left';
       if (lb.pill) {
-        const w = ctx.measureText(lb.text).width + 12, bx = lb.align === 'center' ? x - w / 2 : x;
-        ctx.fillStyle = lb.bg; ctx.fillRect(bx, y - 10 + (lb.dy || 0), w, 18);
-        ctx.fillStyle = '#ffffff'; ctx.textAlign = 'left'; ctx.fillText(lb.text, bx + 6, y + 3 + (lb.dy || 0));
+        const w = ctx.measureText(lb.text).width + 12, bx = x - w / 2, yy = y + (lb.dy || 0);
+        ctx.fillStyle = lb.bg; ctx.fillRect(bx, yy - 10, w, 18);
+        ctx.fillStyle = '#ffffff'; ctx.textAlign = 'left'; ctx.fillText(lb.text, bx + 6, yy + 3);
       } else {
-        ctx.fillStyle = lb.color || t.text; ctx.fillText(lb.text, x + (lb.dx || 0), y + (lb.dy || 0));
+        ctx.textAlign = lb.align || 'left'; ctx.fillStyle = lb.color || t.text;
+        ctx.fillText(lb.text, x + (lb.dx || 0), y + (lb.dy || 0));
       }
     }
   }
 
-  const chart = LW.createChart(el, {
-    autoSize: true,
-    layout: { background: { type: 'solid', color: THEMES.light.bg }, textColor: THEMES.light.text, fontSize: 11 },
-    grid: { vertLines: { color: THEMES.light.grid }, horzLines: { color: THEMES.light.grid } },
-    crosshair: { mode: LW.CrosshairMode.Normal },
-    rightPriceScale: { borderColor: THEMES.light.border, scaleMargins: { top: 0.08, bottom: 0.08 } },
-    timeScale: { borderColor: THEMES.light.border, timeVisible: true, secondsVisible: false, rightOffset: 32, barSpacing: 7 },
-    localization: { priceFormatter: (p) => p.toLocaleString('en-US', { minimumFractionDigits: 1, maximumFractionDigits: 1 }) },
-  });
-  const series = chart.addCandlestickSeries({
-    upColor: THEMES.light.up, downColor: THEMES.light.down, borderUpColor: THEMES.light.up, borderDownColor: THEMES.light.down,
-    wickUpColor: THEMES.light.up, wickDownColor: THEMES.light.down, priceLineStyle: LW.LineStyle.Dotted,
-  });
-  const overlay = new Overlay();
-  series.attachPrimitive(overlay);
-  let priceLines = [];
-
-  const fmt = (v) => v.toLocaleString('en-US', { minimumFractionDigits: 1, maximumFractionDigits: 1 });
-  const fdate = (t) => new Date(t * 1000).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', timeZone: 'UTC' });
-  const $ = (id) => document.getElementById(id);
-
-  function render(keepRange) {
-    const bars = state.tf === '1D' ? msDaily(state.base) : state.base;
-    const N = state.tf === '1D' ? 3 : 6;
-    const A = msAnalyze(bars, N), S = msNextSetup(bars, A), n = bars.length;
-    const range = keepRange ? chart.timeScale().getVisibleLogicalRange() : null;
-    series.setData(bars);
-
-    const items = { boxes: [], lines: [], labels: [], path: [] };
-    const ev = A.events;
-    const recent = ev.slice(-2);
-    const seenCF = new Set();
-    ev.forEach((e) => {
-      const c = e.dir < 0 ? Z.sell : Z.buy, sell = e.dir < 0;
-      if (state.show.bo) {
-        items.lines.push({ l1: e.fromIdx, l2: e.breakIdx, p: e.level, color: c.line, w: 2,
-          text: e.structure ? 'BO Structure' : (sell ? 'BO Sell' : 'BO Buy'), below: sell });
-      }
-      if (!recent.includes(e)) return;
-      const end = e.endIdx !== null ? e.endIdx : n + 28;
-      if (state.show.origin) {
-        items.boxes.push({ l1: e.start, l2: end, lo: e.bot, hi: e.top, fill: c.fill, stroke: c.stroke });
-        items.labels.push({ l: e.endIdx === null ? n + 1 : e.start + 1, dx: 4, p: sell ? e.bot : e.top, dy: sell ? -6 : 14, text: `Origin ${fmt(e.bot)}–${fmt(e.top)}`, color: c.line });
-      }
-      if (state.show.cf) {
-        e.cf.forEach((f) => {
-          if (seenCF.has(f.i)) return; seenCF.add(f.i);
-          items.boxes.push({ l1: f.i - 1, l2: f.i + 3, lo: f.lo, hi: f.hi, fill: c.cf, stroke: c.stroke });
-          items.labels.push({ l: f.i + 1, p: sell ? f.hi : f.lo, dy: sell ? -6 : 15, text: f.post ? 'CF ✓' : 'CF', align: 'center', color: c.line });
-        });
-      }
-      if (state.show.vr && e.vrBox) {
-        const vrEnd = Math.min(end, e.vr.i + 14);
-        items.boxes.push({ l1: e.vr.i - 2, l2: vrEnd, lo: e.vrBox.lo, hi: e.vrBox.hi, fill: Z.vr.fill, stroke: Z.vr.stroke });
-        items.labels.push({ l: e.vr.i, p: sell ? e.vrBox.lo : e.vrBox.hi, dy: sell ? 15 : -6, text: 'VR', align: 'center', color: Z.vr.stroke });
-      }
-    });
-    if (state.show.next && S && S.proj.length) {
-      items.path = S.proj;
-      S.proj.forEach((p) => { if (p.t) items.labels.push({ l: p.l, p: p.p, text: p.t, pill: true, bg: Z.proj, align: 'center', dy: p.t.startsWith('②') ? (S.sell ? -18 : 18) : (S.sell ? 18 : -18) }); });
+  // ─── Data feed ───
+  async function getJSON(url) {
+    const r = await fetch(url, { cache: 'no-store' });
+    if (!r.ok) throw new Error(`${new URL(url).host} answered ${r.status}`);
+    return r.json();
+  }
+  async function fetchBars(tf) {
+    const errs = [];
+    try {
+      const raw = await getJSON(`https://api.binance.com/api/v3/klines?symbol=PAXGUSDT&interval=${tf.binance}&limit=${BARS}`);
+      if (Array.isArray(raw) && raw.length) return { src: 'Binance', bars: raw.map((k) => ({ time: k[0] / 1000, open: +k[1], high: +k[2], low: +k[3], close: +k[4] })) };
+    } catch (e) { errs.push(e.message || 'Binance blocked'); }
+    try {
+      const j = await getJSON(`https://api.kraken.com/0/public/OHLC?pair=PAXGUSD&interval=${tf.kraken}`);
+      const key = j.result && Object.keys(j.result).find((k) => k !== 'last');
+      const rows = key ? j.result[key] : null;
+      if (Array.isArray(rows) && rows.length) return { src: 'Kraken', bars: rows.slice(-BARS).map((k) => ({ time: +k[0], open: +k[1], high: +k[2], low: +k[3], close: +k[4] })) };
+    } catch (e) { errs.push(e.message || 'Kraken blocked'); }
+    throw new Error(errs.join(' · ') || 'No data source answered');
+  }
+  async function refreshSpot() {
+    try {
+      const j = await getJSON('https://api.gold-api.com/price/XAU');
+      if (j && isFinite(+j.price)) { G.spot = +j.price; recomputeOffset(); }
+    } catch (e) { /* keep last offset */ }
+  }
+  function recomputeOffset() {
+    const m1 = panes['1m'].raw, ref = m1 && m1.length ? m1[m1.length - 1].close : null;
+    if (G.spot && ref) {
+      const off = G.spot - ref;
+      if (Math.abs(off) < 150 && Math.abs(off - G.offset) > 0.05) { G.offset = off; Object.values(panes).forEach((p) => p.raw && p.rebuild(true)); }
     }
-    overlay.set(items);
-    const pv = items.path.map((q) => q.p);
+  }
+
+  // ─── One chart pane per timeframe ───
+  const panes = {};
+  function makePane(tf) {
+    const el = $(`ms-c-${tf.id}`);
+    const chart = LW.createChart(el, {
+      autoSize: true,
+      layout: { background: { type: 'solid', color: THEMES.light.bg }, textColor: THEMES.light.text, fontSize: 11 },
+      grid: { vertLines: { color: THEMES.light.grid }, horzLines: { color: THEMES.light.grid } },
+      crosshair: { mode: LW.CrosshairMode.Normal },
+      rightPriceScale: { borderColor: THEMES.light.border, scaleMargins: { top: 0.08, bottom: 0.08 } },
+      timeScale: { borderColor: THEMES.light.border, timeVisible: true, secondsVisible: false, rightOffset: 30, barSpacing: 6 },
+      localization: { priceFormatter: (p) => fmt(p) },
+    });
+    const series = chart.addCandlestickSeries({ upColor: UPC, downColor: DNC, borderUpColor: UPC, borderDownColor: DNC, wickUpColor: UPC, wickDownColor: DNC, priceLineStyle: LW.LineStyle.Dotted });
+    const overlay = new Overlay(); series.attachPrimitive(overlay);
+    const P = { tf, el, chart, series, overlay, raw: null, bars: null, A: null, S: null, fitted: false, priceLines: [], pv: [] };
     series.applyOptions({ autoscaleInfoProvider: (orig) => {
       const r = orig();
-      if (r && r.priceRange && pv.length) {
-        r.priceRange.minValue = Math.min(r.priceRange.minValue, ...pv);
-        r.priceRange.maxValue = Math.max(r.priceRange.maxValue, ...pv);
-      }
+      if (r && r.priceRange && P.pv.length) { r.priceRange.minValue = Math.min(r.priceRange.minValue, ...P.pv); r.priceRange.maxValue = Math.max(r.priceRange.maxValue, ...P.pv); }
       return r;
     } });
 
-    priceLines.forEach((pl) => series.removePriceLine(pl)); priceLines = [];
-    if (S) {
-      priceLines.push(series.createPriceLine({ price: S.invalid, color: '#787b86', lineWidth: 1, lineStyle: LW.LineStyle.Dashed, axisLabelVisible: true, title: 'Invalidation' }));
-    }
-
-    if (range) chart.timeScale().setVisibleLogicalRange(range);
-    else chart.timeScale().setVisibleLogicalRange({ from: Math.max(0, n - (state.tf === '1D' ? 70 : 190)), to: n + 32 });
-
-    updatePanel(bars, A, S);
-    legend(bars[n - 1], bars[n - 2]);
+    P.rebuild = function (keepView) {
+      const off = G.offset;
+      P.bars = P.raw.map((b) => ({ time: b.time + TZ, open: b.open + off, high: b.high + off, low: b.low + off, close: b.close + off }));
+      series.setData(P.bars);
+      P.analyze();
+      if (!keepView || !P.fitted) P.fit();
+    };
+    P.fit = function () {
+      if (!P.bars || el.clientWidth === 0) return;
+      chart.timeScale().setVisibleLogicalRange({ from: Math.max(0, P.bars.length - 150), to: P.bars.length + 30 });
+      P.fitted = true;
+    };
+    P.analyze = function () {
+      const bars = P.bars, n = bars.length;
+      if (n < 40) return;
+      P.A = msAnalyze(bars, PIVOT);
+      P.S = P.A.last ? msNextSetup(bars, P.A) : null;
+      P.draw();
+      P.readout();
+      topDown();
+    };
+    P.draw = function () {
+      const bars = P.bars, n = bars.length, A = P.A, S = P.S;
+      const items = { boxes: [], lines: [], labels: [], path: [] };
+      const recent = A.events.slice(-2), seen = new Set();
+      A.events.forEach((e) => {
+        const c = e.dir < 0 ? Z.sell : Z.buy, sell = e.dir < 0;
+        if (G.show.bo) items.lines.push({ l1: e.fromIdx, l2: e.breakIdx, p: e.level, color: c.line, text: e.structure ? 'BO Structure' : (sell ? 'BO Sell' : 'BO Buy'), below: sell });
+        if (!recent.includes(e)) return;
+        const end = e.endIdx !== null ? e.endIdx : n + 26;
+        if (G.show.origin) {
+          items.boxes.push({ l1: e.start, l2: end, lo: e.bot, hi: e.top, fill: c.fill, stroke: c.stroke });
+          items.labels.push({ l: e.endIdx === null ? n + 1 : e.start + 1, dx: 4, p: sell ? e.bot : e.top, dy: sell ? -6 : 14, text: `Origin ${fmt(e.bot)}–${fmt(e.top)}`, color: c.line });
+        }
+        if (G.show.cf) e.cf.forEach((f) => {
+          if (seen.has(f.i)) return; seen.add(f.i);
+          items.boxes.push({ l1: f.i - 1, l2: f.i + 3, lo: f.lo, hi: f.hi, fill: c.cf, stroke: c.stroke });
+          items.labels.push({ l: f.i + 1, p: sell ? f.hi : f.lo, dy: sell ? -6 : 15, text: f.post ? 'CF ✓' : 'CF', align: 'center', color: c.line });
+        });
+        if (G.show.vr && e.vrBox) {
+          items.boxes.push({ l1: e.vr.i - 2, l2: Math.min(end, e.vr.i + 14), lo: e.vrBox.lo, hi: e.vrBox.hi, fill: Z.vr.fill, stroke: Z.vr.stroke });
+          items.labels.push({ l: e.vr.i, p: sell ? e.vrBox.lo : e.vrBox.hi, dy: sell ? 15 : -6, text: 'VR', align: 'center', color: Z.vr.stroke });
+        }
+      });
+      // Higher-timeframe origins as dashed reference boxes (the barrier this TF trades from)
+      if (G.show.htf) {
+        const idx = TFS.findIndex((x) => x.id === tf.id);
+        TFS.slice(0, idx).slice(-2).forEach((h) => {
+          const hp = panes[h.id];
+          const he = hp && hp.A && hp.A.last;
+          if (!he || he.endIdx !== null) return;
+          const t0 = hp.bars[he.start].time;
+          let l1 = bars.findIndex((b) => b.time >= t0); if (l1 < 0) return;
+          items.boxes.push({ l1, l2: n + 26, lo: he.bot, hi: he.top, stroke: Z.htf, dash: true });
+          items.labels.push({ l: n + 26, dx: -4, align: 'right', p: he.top, dy: 14, text: `${h.label} Origin`, color: Z.htf });
+        });
+      }
+      if (G.show.next && S && S.proj.length && (tf.id === '4h' || tf.id === '1h')) {
+        items.path = S.proj;
+        S.proj.forEach((p) => { if (p.t) items.labels.push({ l: p.l, p: p.p, text: p.t, pill: true, bg: Z.proj, dy: p.t.startsWith('②') ? (S.sell ? -18 : 18) : (S.sell ? 18 : -18) }); });
+      }
+      P.pv = items.path.map((q) => q.p);
+      overlay.set(items);
+      P.priceLines.forEach((pl) => series.removePriceLine(pl)); P.priceLines = [];
+      if (S) P.priceLines.push(series.createPriceLine({ price: S.invalid, color: '#787b86', lineWidth: 1, lineStyle: LW.LineStyle.Dashed, axisLabelVisible: true, title: 'Invalidation' }));
+    };
+    P.readout = function () {
+      const A = P.A, e = A.last, box = $(`ms-r-${tf.id}`), chip = $(`ms-t-${tf.id}`);
+      if (!e) { chip.textContent = 'No BO yet'; chip.className = 'ms-chip'; box.textContent = 'Not enough swings to mark structure on this timeframe yet.'; return; }
+      const sell = A.trend < 0;
+      chip.textContent = sell ? 'BEARISH' : 'BULLISH';
+      chip.className = 'ms-chip ' + (sell ? 'ms-chip-sell' : 'ms-chip-buy');
+      const lastBO = `${e.structure ? 'BO Structure' : e.dir < 0 ? 'BO Sell' : 'BO Buy'} ${fmt(e.level)} · ${ftime(P.bars[e.breakIdx].time)}`;
+      box.innerHTML = `<span>Last <b>${lastBO}</b></span><span>Origin <b>${fmt(e.bot)} – ${fmt(e.top)}</b></span><span>${P.S ? P.S.phase : ''}</span>`;
+    };
+    P.legend = function (b, prev) {
+      if (!b) return;
+      const ch = prev ? b.close - prev.close : 0, col = b.close >= b.open ? UPC : DNC;
+      $(`ms-l-${tf.id}`).innerHTML = `<span class="ms-lg-sym">XAU/USD · ${tf.label}</span>` +
+        `<span>O <b style="color:${col}">${fmt(b.open)}</b></span><span>H <b style="color:${col}">${fmt(b.high)}</b></span>` +
+        `<span>L <b style="color:${col}">${fmt(b.low)}</b></span><span>C <b style="color:${col}">${fmt(b.close)}</b></span>` +
+        `<span style="color:${ch >= 0 ? UPC : DNC}">${ch >= 0 ? '+' : ''}${fmt(ch)}</span>`;
+    };
+    chart.subscribeCrosshairMove((p) => {
+      if (!P.bars) return;
+      const n = P.bars.length;
+      const i = (!p || p.logical == null || p.logical < 0 || p.logical >= n) ? n - 1 : Math.round(p.logical);
+      P.legend(P.bars[i], P.bars[i - 1]);
+    });
+    P.push = function (k) {   // live candle from the websocket / poll (raw PAXG prices)
+      if (!P.raw) return;
+      const last = P.raw[P.raw.length - 1];
+      if (k.time === last.time) Object.assign(last, k);
+      else if (k.time > last.time) { P.raw.push(k); if (P.raw.length > BARS + 50) P.raw.shift(); }
+      else return;
+      const off = G.offset, b = { time: k.time + TZ, open: k.open + off, high: k.high + off, low: k.low + off, close: k.close + off };
+      if (P.bars[P.bars.length - 1].time === b.time) P.bars[P.bars.length - 1] = b; else P.bars.push(b);
+      if (P.bars.length > P.raw.length) P.bars.shift();
+      series.update(b);
+      P.legend(b, P.bars[P.bars.length - 2]);
+      const now = Date.now();
+      if (k.closed || !P._t || now - P._t > 2000) { P._t = now; P.analyze(); }
+    };
+    new ResizeObserver(() => { if (!P.fitted && el.clientWidth > 0 && P.bars) requestAnimationFrame(P.fit); }).observe(el);
+    return P;
   }
+  TFS.forEach((tf) => { panes[tf.id] = makePane(tf); });
 
-  function legend(b, prev) {
-    if (!b) return;
-    const ch = prev ? b.close - (state.tf === '1D' ? prev.close : prev.close) : 0;
-    const col = b.close >= b.open ? THEMES.light.up : THEMES.light.down;
-    $('ms-legend').innerHTML =
-      `<span class="ms-lg-sym">${state.symbol} · ${state.tf} · COMEX</span>` +
-      `<span>O <b style="color:${col}">${fmt(b.open)}</b></span><span>H <b style="color:${col}">${fmt(b.high)}</b></span>` +
-      `<span>L <b style="color:${col}">${fmt(b.low)}</b></span><span>C <b style="color:${col}">${fmt(b.close)}</b></span>` +
-      `<span style="color:${ch >= 0 ? THEMES.light.up : THEMES.light.down}">${ch >= 0 ? '+' : ''}${fmt(ch)} (${(ch / (b.close - ch) * 100).toFixed(2)}%)</span>`;
-  }
-  chart.subscribeCrosshairMove((p) => {
-    const bars = state.tf === '1D' ? msDaily(state.base) : state.base;
-    if (!p || p.logical == null || p.logical < 0 || p.logical >= bars.length) { legend(bars[bars.length - 1], bars[bars.length - 2]); return; }
-    const i = Math.round(p.logical); legend(bars[i], bars[i - 1]);
-  });
-
-  function updatePanel(bars, A, S) {
-    const sells = A.events.filter((e) => e.dir < 0), last = A.last;
-    let streak = 0;
-    for (let k = A.events.length - 1; k >= 0 && A.events[k].dir === last.dir; k--) streak++;
-    const bear = A.trend < 0;
-    $('ms-trend-k').textContent = `${state.tf === '1D' ? 'Daily' : 'H4'} structure`;
-    $('ms-inval-k').textContent = `Invalidation (${state.tf} close)`;
-    $('ms-trend').textContent = bear ? 'Bearish' : 'Bullish';
-    $('ms-trend').style.color = bear ? '#f23645' : '#089981';
-    $('ms-trend-sub').textContent = `${streak} BO ${bear ? 'Sell' : 'Buy'}${streak > 1 ? 's' : ''} in a row on ${state.tf}. Last break ${fmt(last.level)} on ${fdate(bars[last.breakIdx].time)}.`;
-    $('ms-origin').textContent = S.zone;
-    $('ms-origin-sub').textContent = `From the ${fmt(last.level)} BO ${S.sell ? 'Sell' : 'Buy'} up to the ${S.sell ? 'high' : 'low'} that started the break.`;
-    $('ms-phase').textContent = S.phase;
-    $('ms-steps').innerHTML = S.steps.map((s) => `<li>${s}</li>`).join('');
-    $('ms-inval').textContent = fmt(S.invalid);
-    $('ms-target').textContent = fmt(S.target);
-    $('ms-price').textContent = fmt(S.price);
-    $('ms-bias').textContent = S.sell ? 'SELL setup' : 'BUY setup';
-    $('ms-bias').className = 'ms-chip ' + (S.sell ? 'ms-chip-sell' : 'ms-chip-buy');
-    $('ms-bo-rows').innerHTML = A.events.slice().reverse().map((e) => {
-      const sell = e.dir < 0;
-      return `<tr><td>${fdate(bars[e.breakIdx].time)}</td>` +
-        `<td><span class="ms-chip ${sell ? 'ms-chip-sell' : 'ms-chip-buy'}">${e.structure ? 'BO Structure' : sell ? 'BO Sell' : 'BO Buy'}</span></td>` +
-        `<td class="num">${fmt(e.level)}</td><td class="num">${fmt(e.bot)} – ${fmt(e.top)}</td>` +
-        `<td>${e.endIdx !== null ? 'Broken' : e.vr ? (e.cf.some((f) => f.post) ? 'CF given' : 'VR in') : 'Extending'}</td></tr>`;
+  // ─── Top-down checklist (Mosha SOP across timeframes) ───
+  function topDown() {
+    const h4 = panes['4h'], h1 = panes['1h'], m15 = panes['15m'], m1 = panes['1m'];
+    if (!h4.A || !h4.A.last || !h1.A || !m1.bars) return;
+    const e = h4.A.last, dir = e.dir, sell = dir < 0, price = m1.bars[m1.bars.length - 1].close;
+    const word = sell ? 'Sell' : 'Buy';
+    const inOrigin = price >= e.bot && price <= e.top;
+    const beyond = sell ? price > e.top : price < e.bot;
+    const breakT = h4.bars[e.breakIdx].time;
+    const h1Events = h1.A.events.filter((x) => x.breakIdx < h1.bars.length && h1.bars[x.breakIdx].time >= breakT);
+    const vrDone = !!e.vr || h1Events.some((x) => x.dir === -dir) || h1.A.trend === -dir;
+    const touched = (() => { const t0 = breakT; return h1.bars.some((b) => b.time > t0 && (sell ? b.high >= e.bot : b.low <= e.top)); })();
+    const lastH1 = h1.A.last;
+    const cfDone = touched && lastH1 && lastH1.dir === dir && h1.bars[lastH1.breakIdx].time > breakT && vrDone;
+    const recentWith = (p, bars) => p.A && p.A.last && p.A.last.dir === dir && (p.bars.length - 1 - p.A.last.breakIdx) <= bars;
+    const entry = (inOrigin || cfDone) && (recentWith(m15, 12) || recentWith(m1, 30));
+    const steps = [
+      { done: true,  t: `H4 BO ${word} at ${fmt(e.level)} (${ftime(breakT)}). Direction: ${word.toUpperCase()}.` },
+      { done: vrDone, t: vrDone ? `H1 VR formed: the ${sell ? 'drop' : 'rally'} has reversed on H1.` : `H1 VR: wait for the ${sell ? 'selling' : 'buying'} to stop and reverse on H1.` },
+      { done: touched, t: touched ? `Price came back into the H4 Origin ${fmt(e.bot)} – ${fmt(e.top)}.` : `Wait for price to retrace into the H4 Origin ${fmt(e.bot)} – ${fmt(e.top)}.` },
+      { done: cfDone, t: cfDone ? `H1 CF confirmed: H1 printed a BO ${word} from inside the Origin.` : `H1 CF: inside the Origin, wait for an H1 ${sell ? 'lower high and BO Sell' : 'higher low and BO Buy'}.` },
+      { done: entry, t: entry ? `Entry window: M15/M1 broke ${sell ? 'down' : 'up'} in line with H4. Barrier entry, stop beyond ${fmt(sell ? e.top : e.bot)}.` : `M15 / M1: enter only on a ${word} Barrier pattern (Simple CF or Janda) after the H1 CF.` },
+    ];
+    let now = steps.findIndex((s) => !s.done);
+    $('ms-td-steps').innerHTML = steps.map((s, k) => `<li class="${s.done ? 'done' : k === now ? 'now' : ''}"><span class="ms-dot" aria-hidden="true">${s.done ? '✓' : k + 1}</span><span>${s.t}</span></li>`).join('');
+    const status = beyond ? `Price is beyond the H4 Origin. A close past ${fmt(sell ? e.top : e.bot)} flips H4 structure, so stand aside.`
+      : entry ? `${word} setup is live.` : steps[now] ? `Next: ${steps[now].t}` : '';
+    $('ms-td-now').textContent = status;
+    $('ms-td-bias').textContent = `${word.toUpperCase()} SETUP`;
+    $('ms-td-bias').className = 'ms-chip ' + (sell ? 'ms-chip-sell' : 'ms-chip-buy');
+    $('ms-td-price').textContent = fmt(price);
+    $('ms-td-inval').textContent = fmt(sell ? e.top : e.bot);
+    $('ms-td-align').innerHTML = TFS.map((tf) => {
+      const p = panes[tf.id], tr = p.A ? p.A.trend : 0;
+      const cls = tr === dir ? 'ok' : tr === -dir ? 'against' : '';
+      return `<span class="ms-al ${cls}">${tf.label} ${tr < 0 ? '▼' : tr > 0 ? '▲' : '–'}</span>`;
     }).join('');
-    $('ms-src').textContent = state.source === 'reconstructed'
-      ? 'Prices rebuilt from your MGC1! 4h chart (10 Aug – 30 Oct 2026). Swing levels match your markings; candles between them are approximate. Load a TradingView CSV export for exact prices.'
-      : `Loaded from your CSV: ${state.base.length} bars. Zones are recalculated from this data.`;
   }
 
-  function applyTheme() {
-    const t = THEMES[state.theme];
-    chart.applyOptions({ layout: { background: { type: 'solid', color: t.bg }, textColor: t.text },
-      grid: { vertLines: { color: t.grid }, horzLines: { color: t.grid } },
-      rightPriceScale: { borderColor: t.border }, timeScale: { borderColor: t.border } });
-    $('ms-tv').dataset.chart = state.theme;
-    $('ms-theme').textContent = state.theme === 'light' ? 'Dark chart' : 'Light chart';
-    overlay.set(overlay.items);
+  // ─── Live updates: Binance websocket, REST polling as fallback ───
+  let ws = null;
+  function startStream() {
+    if (G.csv) return;
+    try {
+      ws = new WebSocket('wss://stream.binance.com:9443/stream?streams=' + TFS.map((t) => `paxgusdt@kline_${t.binance}`).join('/'));
+      const kill = setTimeout(() => { if (!G.live) { try { ws.close(); } catch (e) {} startPolling(); } }, 8000);
+      ws.onmessage = (m) => {
+        const d = JSON.parse(m.data).data, k = d && d.k; if (!k) return;
+        if (!G.live) { G.live = true; clearTimeout(kill); setStatus(); }
+        const tf = TFS.find((t) => t.binance === k.i);
+        if (tf) panes[tf.id].push({ time: k.t / 1000, open: +k.o, high: +k.h, low: +k.l, close: +k.c, closed: k.x });
+        $('ms-updated').textContent = new Date().toLocaleTimeString();
+      };
+      ws.onclose = () => { if (G.live) { G.live = false; setStatus(); setTimeout(startStream, 3000); } };
+      ws.onerror = () => {};
+    } catch (e) { startPolling(); }
+  }
+  let polling = false;
+  function startPolling() {
+    if (polling || G.csv) return; polling = true; setStatus();
+    TFS.forEach((tf) => {
+      const tick = async () => {
+        try { const r = await fetchBars(tf); const P = panes[tf.id]; P.raw = r.bars; P.rebuild(true); $('ms-updated').textContent = new Date().toLocaleTimeString(); }
+        catch (e) { /* keep last candles */ }
+        if (!G.csv) setTimeout(tick, tf.poll);
+      };
+      setTimeout(tick, tf.poll);
+    });
+  }
+  function setStatus() {
+    const dot = $('ms-live-dot'), txt = $('ms-live-txt');
+    if (G.csv) { dot.className = 'ms-live-dot'; txt.textContent = 'From your CSV'; return; }
+    if (G.live) { dot.className = 'ms-live-dot on'; txt.textContent = `Live · ${G.source} stream`; }
+    else if (polling) { dot.className = 'ms-live-dot poll'; txt.textContent = `Live · ${G.source} (refreshing)`; }
+    else { dot.className = 'ms-live-dot'; txt.textContent = 'Connecting…'; }
+    $('ms-feed-note').textContent = `Gold candles from ${G.source} PAXG/USD (1 token = 1 oz of LBMA gold), shifted ${G.offset >= 0 ? '+' : ''}${fmt(G.offset)} onto XAU/USD spot from gold-api.com. Times in your local zone. COMEX futures (MGC/GC) trade a few dollars above spot.`;
   }
 
-  function parseCSV(text) {
-    const rows = text.trim().split(/\r?\n/);
-    const head = rows.shift().split(',').map((h) => h.trim().toLowerCase().replace(/"/g, ''));
-    const ix = (k) => head.findIndex((h) => h === k || h.startsWith(k));
-    const it = ix('time'), io = ix('open'), ih = ix('high'), il = ix('low'), ic = ix('close');
-    if ([it, io, ih, il, ic].some((v) => v < 0)) throw new Error('The CSV needs time, open, high, low and close columns.');
-    const out = [];
-    for (const r of rows) {
-      const c = r.split(',');
-      let t = c[it].replace(/"/g, '').trim();
-      t = /^\d+$/.test(t) ? +t : Math.floor(Date.parse(t) / 1000);
-      const b = { time: t, open: +c[io], high: +c[ih], low: +c[il], close: +c[ic] };
-      if (Number.isFinite(t) && [b.open, b.high, b.low, b.close].every(Number.isFinite)) out.push(b);
+  async function boot() {
+    const res = await Promise.allSettled(TFS.map((tf) => fetchBars(tf)));
+    const ok = res.filter((r) => r.status === 'fulfilled');
+    if (!ok.length) {
+      const why = res.map((r) => r.reason && r.reason.message).filter(Boolean)[0] || '';
+      root.classList.add('ms-offline');
+      $('ms-offline-why').textContent = why;
+      $('ms-live-txt').textContent = 'Offline';
+      $('ms-td-now').textContent = 'No live candles: the price feeds could not be reached from this page.';
+      $('ms-td-steps').innerHTML = '';
+      return;
     }
-    out.sort((a, b) => a.time - b.time);
-    if (out.length < 60) throw new Error('Need at least 60 bars to mark structure.');
-    return out;
+    G.source = ok[0].value.src;
+    res.forEach((r, k) => { if (r.status === 'fulfilled') { panes[TFS[k].id].raw = r.value.bars; } });
+    await refreshSpot();
+    const m1 = panes['1m'].raw;
+    if (G.spot && m1) { const off = G.spot - m1[m1.length - 1].close; if (Math.abs(off) < 150) G.offset = off; }
+    TFS.forEach((tf) => { const P = panes[tf.id]; if (P.raw) P.rebuild(false); });
+    topDown(); setStatus();
+    $('ms-updated').textContent = new Date().toLocaleTimeString();
+    setInterval(refreshSpot, 60e3);
+    if (G.source === 'Binance') startStream(); else startPolling();
   }
 
-  document.querySelectorAll('#ms-tv [data-tf]').forEach((b) => b.addEventListener('click', () => {
-    state.tf = b.dataset.tf;
-    document.querySelectorAll('#ms-tv [data-tf]').forEach((x) => x.classList.toggle('on', x === b));
-    render(false);
+  // ─── Controls ───
+  root.querySelectorAll('[data-show]').forEach((cb) => cb.addEventListener('change', () => {
+    G.show[cb.dataset.show] = cb.checked; Object.values(panes).forEach((p) => p.A && p.draw());
   }));
-  document.querySelectorAll('#ms-tv [data-show]').forEach((cb) => cb.addEventListener('change', () => {
-    state.show[cb.dataset.show] = cb.checked; render(true);
+  $('ms-theme').addEventListener('click', () => {
+    G.theme = G.theme === 'light' ? 'dark' : 'light'; const t = THEMES[G.theme];
+    Object.values(panes).forEach((p) => {
+      p.chart.applyOptions({ layout: { background: { type: 'solid', color: t.bg }, textColor: t.text }, grid: { vertLines: { color: t.grid }, horzLines: { color: t.grid } }, rightPriceScale: { borderColor: t.border }, timeScale: { borderColor: t.border } });
+      p.overlay.set(p.overlay.items);
+    });
+    root.dataset.chart = G.theme; $('ms-theme').textContent = G.theme === 'light' ? 'Dark charts' : 'Light charts';
+  });
+  $('ms-fit').addEventListener('click', () => Object.values(panes).forEach((p) => p.fit()));
+  root.querySelectorAll('[data-expand]').forEach((b) => b.addEventListener('click', () => {
+    const card = b.closest('.ms-pane'), on = !card.classList.contains('full');
+    root.querySelectorAll('.ms-pane').forEach((c) => c.classList.remove('full'));
+    root.querySelectorAll('[data-expand]').forEach((x) => { x.textContent = 'Expand'; x.setAttribute('aria-pressed', 'false'); });
+    if (on) { card.classList.add('full'); b.textContent = 'Collapse'; b.setAttribute('aria-pressed', 'true'); card.scrollIntoView({ block: 'nearest' }); }
+    setTimeout(() => panes[b.dataset.expand].fit(), 60);
   }));
-  $('ms-theme').addEventListener('click', () => { state.theme = state.theme === 'light' ? 'dark' : 'light'; applyTheme(); });
-  $('ms-fit').addEventListener('click', () => render(false));
   $('ms-csv').addEventListener('change', (ev) => {
     const f = ev.target.files[0]; if (!f) return;
     const rd = new FileReader();
     rd.onload = () => {
       try {
-        state.base = parseCSV(rd.result); state.source = 'csv';
-        state.symbol = (f.name.split(/[_,. ]/)[0] || 'CSV').replace(/^[A-Z]+:/, '').slice(0, 14);
-        $('ms-csv-err').textContent = ''; render(false);
+        const rows = rd.result.trim().split(/\r?\n/), head = rows.shift().split(',').map((h) => h.trim().toLowerCase().replace(/"/g, ''));
+        const ix = (k) => head.findIndex((h) => h === k || h.startsWith(k));
+        const [it, io, ih, il, ic] = ['time', 'open', 'high', 'low', 'close'].map(ix);
+        if ([it, io, ih, il, ic].some((v) => v < 0)) throw new Error('The CSV needs time, open, high, low and close columns.');
+        const bars = rows.map((r) => { const c = r.split(','); let t = c[it].replace(/"/g, '').trim(); t = /^\d+$/.test(t) ? +t : Date.parse(t) / 1000; return { time: t, open: +c[io], high: +c[ih], low: +c[il], close: +c[ic] }; })
+          .filter((b) => isFinite(b.time) && isFinite(b.close)).sort((a, b) => a.time - b.time);
+        if (bars.length < 60) throw new Error('Need at least 60 bars to mark structure.');
+        const step = bars[bars.length - 1].time - bars[bars.length - 2].time;
+        const tf = TFS.find((t) => t.sec === step);
+        if (!tf) throw new Error('Export the chart on H4, H1, M15 or M1 so the timeframe can be matched.');
+        G.csv = true; G.offset = 0; root.classList.remove('ms-offline');
+        const P = panes[tf.id]; P.raw = bars.slice(-BARS); P.rebuild(false);
+        $('ms-csv-err').textContent = `Loaded ${bars.length} ${tf.label} bars from ${f.name}.`; setStatus();
       } catch (err) { $('ms-csv-err').textContent = err.message; }
     };
     rd.readAsText(f);
   });
 
-  state.base = msGenerate();
-  render(false);
-  let fitted = el.clientWidth > 0;
-  new ResizeObserver(() => {
-    if (!fitted && el.clientWidth > 0) { fitted = true; requestAnimationFrame(() => render(false)); }
-  }).observe(el);
+  boot();
 })();
 </script>
 
