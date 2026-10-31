@@ -1167,6 +1167,7 @@
     }
   }
 </style>
+<script src="https://cdn.jsdelivr.net/npm/lightweight-charts@4.1.3/dist/lightweight-charts.standalone.production.js"></script>
 </head>
 <body>
 
@@ -2127,67 +2128,25 @@
     <div class="card">
       <div class="card-head"><div class="card-title">External — Bullish (HH / HL → BO Buy)</div></div>
       <div style="font-size: 11px; color: var(--ink-dim); line-height: 1.6; margin: 6px 0 10px;">Price forms <span style="color: var(--sage); font-weight: 600;">Higher High → Higher Low</span>, then breaks above prev HH = BO Buy ↑</div>
-      <svg viewBox="0 0 280 138" width="100%" height="138" style="display:block;">
-        <line x1="55" y1="60" x2="178" y2="60" stroke="#6db784" stroke-width="1" stroke-dasharray="4,3" opacity="0.3"/>
-        <polyline points="10,128 55,60 95,84 168,22 218,44 268,12" stroke="#6db784" fill="none" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>
-        <polygon points="268,4 274,17 262,17" fill="#6db784"/>
-        <circle cx="168" cy="22" r="6" fill="none" stroke="#6db784" stroke-width="1.5" opacity="0.65"/>
-        <text x="41" y="55" fill="#6db784" font-size="10" font-weight="700" font-family="monospace">HH¹</text>
-        <text x="89" y="100" fill="#6db784" font-size="10" font-weight="700" font-family="monospace">HL</text>
-        <text x="175" y="19" fill="#6db784" font-size="10" font-weight="700" font-family="monospace">BO Buy ↑</text>
-        <text x="6" y="135" fill="#5a6070" font-size="8" font-family="monospace">START</text>
-        <text x="228" y="9" fill="#5a6070" font-size="8" font-family="monospace">NEW HH</text>
-      </svg>
+      <div id="ms-chart-ext-bull" style="height:200px;width:100%;"></div>
     </div>
 
     <div class="card">
       <div class="card-head"><div class="card-title">External — Bearish (LH / LL → BO Sell)</div></div>
       <div style="font-size: 11px; color: var(--ink-dim); line-height: 1.6; margin: 6px 0 10px;">Price forms <span style="color: var(--rust); font-weight: 600;">Lower High → Lower Low</span>, then breaks below prev LL = BO Sell ↓</div>
-      <svg viewBox="0 0 280 138" width="100%" height="138" style="display:block;">
-        <line x1="55" y1="78" x2="178" y2="78" stroke="#c17a6f" stroke-width="1" stroke-dasharray="4,3" opacity="0.3"/>
-        <polyline points="10,10 55,78 95,54 168,116 218,94 268,126" stroke="#c17a6f" fill="none" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>
-        <polygon points="268,134 274,121 262,121" fill="#c17a6f"/>
-        <circle cx="168" cy="116" r="6" fill="none" stroke="#c17a6f" stroke-width="1.5" opacity="0.65"/>
-        <text x="41" y="97" fill="#c17a6f" font-size="10" font-weight="700" font-family="monospace">LL¹</text>
-        <text x="89" y="48" fill="#c17a6f" font-size="10" font-weight="700" font-family="monospace">LH</text>
-        <text x="175" y="133" fill="#c17a6f" font-size="10" font-weight="700" font-family="monospace">BO Sell ↓</text>
-        <text x="6" y="8" fill="#5a6070" font-size="8" font-family="monospace">START</text>
-        <text x="224" y="136" fill="#5a6070" font-size="8" font-family="monospace">NEW LL</text>
-      </svg>
+      <div id="ms-chart-ext-bear" style="height:200px;width:100%;"></div>
     </div>
 
     <div class="card">
       <div class="card-head"><div class="card-title">Internal — i-Breakout Sell</div></div>
-      <div style="font-size: 11px; color: var(--ink-dim); line-height: 1.6; margin: 6px 0 10px;">After E.High forms, <span style="color: var(--rust); font-weight: 600;">i-BO Sell</span> occurs within the HTF pullback — early bearish signal before new E.High is confirmed.</div>
-      <svg viewBox="0 0 280 145" width="100%" height="145" style="display:block;">
-        <polyline points="10,132 72,26" stroke="#4a6a8a" fill="none" stroke-width="2" stroke-dasharray="5,3" stroke-linecap="round"/>
-        <line x1="50" y1="26" x2="130" y2="26" stroke="#8899aa" stroke-width="1" stroke-dasharray="3,3" opacity="0.4"/>
-        <polyline points="72,26 100,62 130,46 158,82 185,65 220,95" stroke="#c17a6f" fill="none" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>
-        <rect x="122" y="46" width="44" height="36" rx="2" fill="rgba(193,122,111,0.12)" stroke="#c17a6f" stroke-width="1" opacity="0.7"/>
-        <polygon points="158,90 163,78 153,78" fill="#c17a6f"/>
-        <text x="73" y="22" fill="#8899aa" font-size="9" font-weight="700" font-family="monospace">E.High</text>
-        <text x="86" y="80" fill="#c17a6f" font-size="9" font-family="monospace">i-Low</text>
-        <text x="108" y="43" fill="#c17a6f" font-size="9" font-family="monospace">i-High</text>
-        <text x="162" y="104" fill="#c17a6f" font-size="10" font-weight="700" font-family="monospace">i-BO Sell ↓</text>
-        <text x="6" y="140" fill="#4a6a8a" font-size="8" font-family="monospace">E.Low (HTF)</text>
-      </svg>
+      <div style="font-size: 11px; color: var(--ink-dim); line-height: 1.6; margin: 6px 0 10px;">After E.High forms, <span style="color: var(--rust); font-weight: 600;">i-BO Sell</span> occurs within the HTF pullback — early bearish signal.</div>
+      <div id="ms-chart-int-sell" style="height:200px;width:100%;"></div>
     </div>
 
     <div class="card">
       <div class="card-head"><div class="card-title">Internal — i-Breakout Buy</div></div>
-      <div style="font-size: 11px; color: var(--ink-dim); line-height: 1.6; margin: 6px 0 10px;">After E.Low forms, <span style="color: var(--sage); font-weight: 600;">i-BO Buy</span> occurs within the HTF pullback — early bullish signal before new E.Low is confirmed.</div>
-      <svg viewBox="0 0 280 145" width="100%" height="145" style="display:block;">
-        <polyline points="10,13 72,119" stroke="#4a6a8a" fill="none" stroke-width="2" stroke-dasharray="5,3" stroke-linecap="round"/>
-        <line x1="50" y1="119" x2="130" y2="119" stroke="#8899aa" stroke-width="1" stroke-dasharray="3,3" opacity="0.4"/>
-        <polyline points="72,119 100,83 130,99 158,63 185,80 220,50" stroke="#6db784" fill="none" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>
-        <rect x="122" y="63" width="44" height="36" rx="2" fill="rgba(109,183,132,0.12)" stroke="#6db784" stroke-width="1" opacity="0.7"/>
-        <polygon points="158,55 163,67 153,67" fill="#6db784"/>
-        <text x="73" y="135" fill="#8899aa" font-size="9" font-weight="700" font-family="monospace">E.Low</text>
-        <text x="86" y="100" fill="#6db784" font-size="9" font-family="monospace">i-High</text>
-        <text x="108" y="116" fill="#6db784" font-size="9" font-family="monospace">i-Low</text>
-        <text x="162" y="56" fill="#6db784" font-size="10" font-weight="700" font-family="monospace">i-BO Buy ↑</text>
-        <text x="6" y="10" fill="#4a6a8a" font-size="8" font-family="monospace">E.High (HTF)</text>
-      </svg>
+      <div style="font-size: 11px; color: var(--ink-dim); line-height: 1.6; margin: 6px 0 10px;">After E.Low forms, <span style="color: var(--sage); font-weight: 600;">i-BO Buy</span> occurs within the HTF pullback — early bullish signal.</div>
+      <div id="ms-chart-int-buy" style="height:200px;width:100%;"></div>
     </div>
 
   </div>
@@ -2199,39 +2158,13 @@
     <div class="card">
       <div class="card-head"><div class="card-title" style="color: var(--sage);">Buy Setup</div></div>
       <div style="font-size: 11px; color: var(--ink-dim); margin: 6px 0 10px; line-height: 1.6;">H4 BO Buy → price rises into <span style="color: var(--amber); font-weight: 600;">H1 VR</span> → pulls back to <span style="color: var(--sage); font-weight: 600;">H1 CF</span> → Entry ↑</div>
-      <svg viewBox="0 0 300 168" width="100%" height="168" style="display:block;">
-        <line x1="0" y1="128" x2="300" y2="128" stroke="#d4a843" stroke-width="1" stroke-dasharray="5,4" opacity="0.45"/>
-        <text x="4" y="124" fill="#d4a843" font-size="8" font-family="monospace">H4 BO Buy</text>
-        <rect x="108" y="50" width="92" height="32" rx="2" fill="rgba(212,168,67,0.14)" stroke="#d4a843" stroke-width="1" opacity="0.8"/>
-        <text x="128" y="64" fill="#d4a843" font-size="9" font-weight="700" font-family="monospace">H1 VR</text>
-        <text x="118" y="76" fill="#d4a843" font-size="8" font-family="monospace">Value Range</text>
-        <rect x="186" y="98" width="78" height="28" rx="2" fill="rgba(109,183,132,0.17)" stroke="#6db784" stroke-width="1.5" opacity="0.9"/>
-        <text x="208" y="115" fill="#6db784" font-size="9" font-weight="700" font-family="monospace">H1 CF</text>
-        <polyline points="5,156 68,156 102,138 145,62 192,70 228,114 266,114 295,40" stroke="#6db784" fill="none" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>
-        <polygon points="295,31 301,44 289,44" fill="#6db784"/>
-        <text x="247" y="94" fill="#6db784" font-size="14" font-weight="700">↑</text>
-        <text x="239" y="86" fill="#6db784" font-size="8" font-family="monospace">ENTRY</text>
-        <circle cx="102" cy="138" r="4" fill="none" stroke="#d4a843" stroke-width="1.5" opacity="0.7"/>
-      </svg>
+      <div id="ms-chart-bo-buy" style="height:220px;width:100%;"></div>
     </div>
 
     <div class="card">
       <div class="card-head"><div class="card-title" style="color: var(--rust);">Sell Setup</div></div>
       <div style="font-size: 11px; color: var(--ink-dim); margin: 6px 0 10px; line-height: 1.6;">H4 BO Sell → price falls into <span style="color: var(--amber); font-weight: 600;">H1 VR</span> → pulls back to <span style="color: var(--rust); font-weight: 600;">H1 CF</span> → Entry ↓</div>
-      <svg viewBox="0 0 300 168" width="100%" height="168" style="display:block;">
-        <line x1="0" y1="42" x2="300" y2="42" stroke="#d4a843" stroke-width="1" stroke-dasharray="5,4" opacity="0.45"/>
-        <text x="4" y="38" fill="#d4a843" font-size="8" font-family="monospace">H4 BO Sell</text>
-        <rect x="108" y="88" width="92" height="32" rx="2" fill="rgba(212,168,67,0.14)" stroke="#d4a843" stroke-width="1" opacity="0.8"/>
-        <text x="128" y="102" fill="#d4a843" font-size="9" font-weight="700" font-family="monospace">H1 VR</text>
-        <text x="118" y="114" fill="#d4a843" font-size="8" font-family="monospace">Value Range</text>
-        <rect x="186" y="44" width="78" height="28" rx="2" fill="rgba(193,122,111,0.17)" stroke="#c17a6f" stroke-width="1.5" opacity="0.9"/>
-        <text x="208" y="61" fill="#c17a6f" font-size="9" font-weight="700" font-family="monospace">H1 CF</text>
-        <polyline points="5,14 68,14 102,32 145,108 192,100 228,56 266,56 295,130" stroke="#c17a6f" fill="none" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>
-        <polygon points="295,139 301,126 289,126" fill="#c17a6f"/>
-        <text x="247" y="84" fill="#c17a6f" font-size="14" font-weight="700">↓</text>
-        <text x="239" y="96" fill="#c17a6f" font-size="8" font-family="monospace">ENTRY</text>
-        <circle cx="102" cy="32" r="4" fill="none" stroke="#d4a843" stroke-width="1.5" opacity="0.7"/>
-      </svg>
+      <div id="ms-chart-bo-sell" style="height:220px;width:100%;"></div>
     </div>
 
   </div>
@@ -2243,25 +2176,13 @@
       <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-top: 10px;">
         <div>
           <div style="font-size: 10px; font-weight: 700; color: var(--sage); margin-bottom: 4px;">Case 1: Normal Clean</div>
-          <div style="font-size: 10px; color: var(--ink-dim); line-height: 1.5; margin-bottom: 8px;">Clean BO → VR → CF. "Continuation after CF is like God giving money."</div>
-          <svg viewBox="0 0 128 92" width="100%" height="80" style="display:block;">
-            <polyline points="5,82 26,50 44,65 68,20 90,36 122,8" stroke="#6db784" fill="none" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
-            <polygon points="122,1 127,13 117,13" fill="#6db784"/>
-            <text x="20" y="46" fill="#6db784" font-size="9" font-family="monospace">HH</text>
-            <text x="38" y="80" fill="#6db784" font-size="9" font-family="monospace">HL</text>
-            <text x="56" y="17" fill="#6db784" font-size="9" font-family="monospace">BO CF ↑</text>
-          </svg>
+          <div style="font-size: 10px; color: var(--ink-dim); line-height: 1.5; margin-bottom: 6px;">Clean BO → VR → CF. Cleanest setup.</div>
+          <div id="ms-chart-case1" style="height:130px;width:100%;"></div>
         </div>
         <div>
           <div style="font-size: 10px; font-weight: 700; color: var(--sage); margin-bottom: 4px;">Case 2: CF inside VR</div>
-          <div style="font-size: 10px; color: var(--ink-dim); line-height: 1.5; margin-bottom: 8px;">CF forms right inside VR. Fake CF right after VR likely fails — wait for HTF to confirm.</div>
-          <svg viewBox="0 0 128 92" width="100%" height="80" style="display:block;">
-            <rect x="35" y="25" width="52" height="28" rx="2" fill="rgba(212,168,67,0.15)" stroke="#d4a843" stroke-width="1" opacity="0.7"/>
-            <text x="38" y="37" fill="#d4a843" font-size="7" font-family="monospace">VR</text>
-            <text x="38" y="47" fill="#6db784" font-size="7" font-family="monospace">+ CF inside</text>
-            <polyline points="5,82 28,55 40,42 68,36 82,44 122,8" stroke="#6db784" fill="none" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
-            <polygon points="122,1 127,13 117,13" fill="#6db784"/>
-          </svg>
+          <div style="font-size: 10px; color: var(--ink-dim); line-height: 1.5; margin-bottom: 6px;">CF forms right inside VR. Wait for HTF confirm.</div>
+          <div id="ms-chart-case2" style="height:130px;width:100%;"></div>
         </div>
       </div>
     </div>
@@ -2271,25 +2192,13 @@
       <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-top: 10px;">
         <div>
           <div style="font-size: 10px; font-weight: 700; color: var(--amber); margin-bottom: 4px;">Case 3: CF breaks VR ⚠</div>
-          <div style="font-size: 10px; color: var(--ink-dim); line-height: 1.5; margin-bottom: 8px;">HTF liquidity sweep / manipulation. If HTF BO is clean too, setup may recover. Risky — repeat SOP.</div>
-          <svg viewBox="0 0 128 92" width="100%" height="80" style="display:block;">
-            <rect x="28" y="22" width="48" height="26" rx="2" fill="rgba(212,168,67,0.10)" stroke="#d4a843" stroke-width="1" opacity="0.5"/>
-            <text x="32" y="34" fill="#d4a843" font-size="7" font-family="monospace">VR</text>
-            <polyline points="5,82 28,56 48,32 62,10 75,26 96,16 120,6" stroke="#6db784" fill="none" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
-            <polygon points="120,0 125,11 115,11" fill="#6db784"/>
-            <text x="55" y="8" fill="#d4a843" font-size="8" font-family="monospace">⚠ Sweep</text>
-          </svg>
+          <div style="font-size: 10px; color: var(--ink-dim); line-height: 1.5; margin-bottom: 6px;">HTF sweep / manipulation. Risky — repeat SOP.</div>
+          <div id="ms-chart-case3" style="height:130px;width:100%;"></div>
         </div>
         <div>
           <div style="font-size: 10px; font-weight: 700; color: var(--rust); margin-bottom: 4px;">Case 4: Sideways</div>
-          <div style="font-size: 10px; color: var(--ink-dim); line-height: 1.5; margin-bottom: 8px;">Price cannot break VR or CF. Choppy — VR, CF &amp; Origin are the strongest barriers. Barrier Entry only.</div>
-          <svg viewBox="0 0 128 92" width="100%" height="80" style="display:block;">
-            <rect x="5" y="16" width="118" height="16" rx="2" fill="rgba(109,183,132,0.08)" stroke="#6db784" stroke-width="0.8" opacity="0.6"/>
-            <rect x="5" y="60" width="118" height="16" rx="2" fill="rgba(193,122,111,0.08)" stroke="#c17a6f" stroke-width="0.8" opacity="0.6"/>
-            <polyline points="5,68 18,50 30,65 44,36 56,62 68,34 80,60 92,38 108,60 122,40" stroke="#8899aa" fill="none" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round" stroke-dasharray="3,2"/>
-            <text x="6" y="14" fill="#6db784" font-size="7" font-family="monospace">VR</text>
-            <text x="6" y="58" fill="#c17a6f" font-size="7" font-family="monospace">CF</text>
-          </svg>
+          <div style="font-size: 10px; color: var(--ink-dim); line-height: 1.5; margin-bottom: 6px;">Price cannot break VR or CF. Barrier Entry only.</div>
+          <div id="ms-chart-case4" style="height:130px;width:100%;"></div>
         </div>
       </div>
     </div>
@@ -2304,37 +2213,14 @@
       <div class="card-head"><div class="card-title">Barrier Type 1 — Simple CF</div></div>
       <div style="font-size: 11px; color: var(--ink-dim); line-height: 1.6; margin: 6px 0 6px;">Mark barrier zone → price enters zone → wait for <span style="color: var(--sage); font-weight: 600;">CF pullback (QM pattern)</span> → Entry ↑</div>
       <div style="font-size: 10px; display: flex; gap: 16px; margin-bottom: 10px;"><span style="color: var(--sage);">✓ Early entry, tighter zone</span><span style="color: var(--rust);">✗ Rejection only if counter-direction</span></div>
-      <svg viewBox="0 0 280 152" width="100%" height="152" style="display:block;">
-        <rect x="72" y="68" width="138" height="40" rx="2" fill="rgba(109,183,132,0.10)" stroke="#6db784" stroke-width="1.2" opacity="0.8"/>
-        <text x="78" y="83" fill="#6db784" font-size="9" font-weight="700" font-family="monospace">BARRIER ZONE</text>
-        <text x="78" y="100" fill="#6db784" font-size="8" font-family="monospace">(VR / Origin / CF)</text>
-        <polyline points="5,18 46,18 72,78" stroke="#c17a6f" fill="none" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>
-        <polyline points="72,78 100,95 122,80 148,100 175,84" stroke="#8899aa" fill="none" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round"/>
-        <polyline points="175,84 210,88 240,58 268,20" stroke="#6db784" fill="none" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>
-        <polygon points="268,12 274,25 262,25" fill="#6db784"/>
-        <text x="142" y="116" fill="#8899aa" font-size="8" font-family="monospace">QM / CF</text>
-        <text x="234" y="54" fill="#6db784" font-size="9" font-weight="700" font-family="monospace">ENTRY ↑</text>
-      </svg>
+      <div id="ms-chart-barrier-simple" style="height:200px;width:100%;"></div>
     </div>
 
     <div class="card">
       <div class="card-head"><div class="card-title">Barrier Type 2 — Janda</div></div>
       <div style="font-size: 11px; color: var(--ink-dim); line-height: 1.6; margin: 6px 0 6px;">Mark barrier → <span style="color: var(--amber); font-weight: 600;">BO Structure</span> break → <span style="color: var(--sage); font-weight: 600;">BO Buy</span> → pullback → Entry ↑</div>
       <div style="font-size: 10px; color: var(--ink-faint); margin-bottom: 10px;">Entry rule: wick on left candle broken by body of right candle (CMP)</div>
-      <svg viewBox="0 0 280 152" width="100%" height="152" style="display:block;">
-        <rect x="58" y="70" width="182" height="42" rx="2" fill="rgba(193,122,111,0.10)" stroke="#c17a6f" stroke-width="1.2" opacity="0.7"/>
-        <text x="62" y="84" fill="#c17a6f" font-size="8" font-family="monospace">M15 BARRIER / ORIGIN</text>
-        <line x1="58" y1="84" x2="240" y2="84" stroke="#d4a843" stroke-width="1" stroke-dasharray="4,3" opacity="0.55"/>
-        <text x="62" y="81" fill="#d4a843" font-size="7" font-family="monospace">BO Structure</text>
-        <line x1="148" y1="99" x2="240" y2="99" stroke="#6db784" stroke-width="1" stroke-dasharray="4,3" opacity="0.55"/>
-        <text x="152" y="110" fill="#6db784" font-size="7" font-family="monospace">BO Buy</text>
-        <polyline points="5,16 58,84" stroke="#8899aa" fill="none" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>
-        <polyline points="58,84 88,104 115,90 148,108 180,94" stroke="#c17a6f" fill="none" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
-        <polyline points="180,94 200,82 218,92 242,74 268,24" stroke="#6db784" fill="none" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>
-        <polygon points="268,15 274,28 262,28" fill="#6db784"/>
-        <text x="218" y="88" fill="#6db784" font-size="8" font-family="monospace">Pullback</text>
-        <text x="242" y="68" fill="#6db784" font-size="9" font-weight="700" font-family="monospace">ENTRY ↑</text>
-      </svg>
+      <div id="ms-chart-barrier-janda" style="height:200px;width:100%;"></div>
     </div>
 
   </div>
@@ -5246,6 +5132,408 @@ try {
     console.error(`Error: ${msg} at line ${lineNo}:${columnNo}`, error);
     return false;
   };
+
+// ═══════════════════════════════════════════════════════════
+// MARKET STRUCTURE CHARTS — TradingView Lightweight Charts
+// ═══════════════════════════════════════════════════════════
+(function() {
+  const LW = window.LightweightCharts;
+  if (!LW) return;
+
+  const UP   = '#6db784';
+  const DOWN = '#c17a6f';
+  const AMBE = '#d4a843';
+  const STEE = '#4a7090';
+  const GREY = '#8899aa';
+
+  function baseChart(el, h) {
+    if (!el) return null;
+    const ch = LW.createChart(el, {
+      width: el.offsetWidth || 400,
+      height: h || 200,
+      layout: { background: { color: '#0d1117' }, textColor: '#6b7a8d' },
+      grid: { vertLines: { color: '#131a23' }, horzLines: { color: '#131a23' } },
+      crosshair: { mode: 0 },
+      rightPriceScale: { borderColor: '#1e2836', scaleMargins: { top: 0.08, bottom: 0.08 } },
+      timeScale: { borderColor: '#1e2836', timeVisible: false, tickMarkFormatter: () => '' },
+      handleScroll: false,
+      handleScale: false,
+    });
+    window.addEventListener('resize', () => {
+      const w = el.offsetWidth;
+      if (w > 0) ch.applyOptions({ width: w });
+    });
+    return ch;
+  }
+
+  function candleSeries(chart, upC, downC) {
+    upC = upC || UP; downC = downC || DOWN;
+    return chart.addCandlestickSeries({
+      upColor: upC, downColor: downC,
+      borderUpColor: upC, borderDownColor: downC,
+      wickUpColor: upC, wickDownColor: downC,
+    });
+  }
+
+  function zoneSeries(chart, color) {
+    return chart.addHistogramSeries({
+      color: color,
+      priceLineVisible: false,
+      lastValueVisible: false,
+      priceScaleId: 'right',
+    });
+  }
+
+  function priceLabel(series, price, color, title) {
+    series.createPriceLine({ price, color, lineWidth: 1, lineStyle: 2, axisLabelVisible: true, title });
+  }
+
+  function d(n) {
+    const base = new Date('2024-01-01');
+    base.setDate(base.getDate() + n);
+    return base.toISOString().slice(0,10);
+  }
+
+  // ── 1. External Bullish ──────────────────────────────────
+  (function() {
+    const el = document.getElementById('ms-chart-ext-bull');
+    const ch = baseChart(el, 200);
+    if (!ch) return;
+    const cs = candleSeries(ch);
+    cs.setData([
+      {time:d(0),open:106,high:108,low:100,close:103},
+      {time:d(1),open:103,high:106,low:101,close:105},
+      {time:d(2),open:105,high:112,low:104,close:110}, // HH¹ = 112
+      {time:d(3),open:110,high:111,low:106,close:108},
+      {time:d(4),open:108,high:109,low:104,close:106}, // HL = 104
+      {time:d(5),open:106,high:110,low:105,close:109},
+      {time:d(6),open:109,high:116,low:108,close:115}, // BO Buy
+      {time:d(7),open:115,high:121,low:114,close:120},
+    ]);
+    priceLabel(cs, 112, UP, 'HH¹');
+    cs.setMarkers([
+      {time:d(2), position:'aboveBar', color:UP,   shape:'circle',  text:'HH¹', size:1},
+      {time:d(4), position:'belowBar', color:STEE, shape:'circle',  text:'HL',  size:1},
+      {time:d(6), position:'aboveBar', color:UP,   shape:'arrowUp', text:'BO Buy ↑', size:2},
+    ]);
+    ch.timeScale().fitContent();
+  })();
+
+  // ── 2. External Bearish ──────────────────────────────────
+  (function() {
+    const el = document.getElementById('ms-chart-ext-bear');
+    const ch = baseChart(el, 200);
+    if (!ch) return;
+    const cs = candleSeries(ch);
+    cs.setData([
+      {time:d(0),open:114,high:120,low:110,close:112}, // initial high at 120
+      {time:d(1),open:112,high:116,low:109,close:110},
+      {time:d(2),open:110,high:112,low:102,close:103}, // LL¹ = 102
+      {time:d(3),open:103,high:110,low:102,close:108},
+      {time:d(4),open:108,high:115,low:107,close:111}, // LH = 115 (< 120)
+      {time:d(5),open:111,high:112,low:105,close:106},
+      {time:d(6),open:106,high:107,low: 96,close: 97}, // BO Sell
+      {time:d(7),open: 97,high: 98,low: 90,close: 92},
+    ]);
+    priceLabel(cs, 102, DOWN, 'LL¹');
+    cs.setMarkers([
+      {time:d(2), position:'belowBar', color:DOWN, shape:'circle',    text:'LL¹',    size:1},
+      {time:d(4), position:'aboveBar', color:STEE, shape:'circle',    text:'LH',     size:1},
+      {time:d(6), position:'belowBar', color:DOWN, shape:'arrowDown', text:'BO Sell ↓', size:2},
+    ]);
+    ch.timeScale().fitContent();
+  })();
+
+  // ── 3. Internal i-BO Sell ────────────────────────────────
+  (function() {
+    const el = document.getElementById('ms-chart-int-sell');
+    const ch = baseChart(el, 200);
+    if (!ch) return;
+    const cs = candleSeries(ch);
+    cs.setData([
+      {time:d(0),open:116,high:122,low:114,close:120}, // approaching E.High
+      {time:d(1),open:120,high:122,low:114,close:115}, // E.High = 122, pullback
+      {time:d(2),open:115,high:117,low:109,close:110}, // i-Low¹ = 109
+      {time:d(3),open:110,high:116,low:109,close:115}, // bounce to i-High = 116
+      {time:d(4),open:115,high:116,low:111,close:112},
+      {time:d(5),open:112,high:113,low:106,close:107}, // i-BO Sell: breaks 109
+      {time:d(6),open:107,high:108,low:101,close:102},
+    ]);
+    priceLabel(cs, 122, STEE, 'E.High');
+    priceLabel(cs, 109, DOWN, 'i-Low');
+    cs.setMarkers([
+      {time:d(1), position:'aboveBar', color:STEE, shape:'circle',    text:'E.High', size:1},
+      {time:d(2), position:'belowBar', color:DOWN, shape:'circle',    text:'i-Low',  size:1},
+      {time:d(3), position:'aboveBar', color:DOWN, shape:'circle',    text:'i-High', size:1},
+      {time:d(5), position:'belowBar', color:DOWN, shape:'arrowDown', text:'i-BO Sell ↓', size:2},
+    ]);
+    ch.timeScale().fitContent();
+  })();
+
+  // ── 4. Internal i-BO Buy ─────────────────────────────────
+  (function() {
+    const el = document.getElementById('ms-chart-int-buy');
+    const ch = baseChart(el, 200);
+    if (!ch) return;
+    const cs = candleSeries(ch);
+    cs.setData([
+      {time:d(0),open: 98,high:100,low: 92,close: 94}, // approaching E.Low
+      {time:d(1),open: 94,high:100,low: 90,close: 95}, // E.Low = 90
+      {time:d(2),open: 95,high:102,low: 94,close:101}, // i-High¹ = 102
+      {time:d(3),open:101,high:102,low: 95,close: 96}, // pullback, i-Low = 95
+      {time:d(4),open: 96,high:100,low: 95,close: 99},
+      {time:d(5),open: 99,high:108,low: 98,close:107}, // i-BO Buy: breaks 102
+      {time:d(6),open:107,high:114,low:106,close:112},
+    ]);
+    priceLabel(cs, 90, STEE, 'E.Low');
+    priceLabel(cs, 102, UP, 'i-High');
+    cs.setMarkers([
+      {time:d(1), position:'belowBar', color:STEE, shape:'circle',  text:'E.Low',  size:1},
+      {time:d(2), position:'aboveBar', color:UP,   shape:'circle',  text:'i-High', size:1},
+      {time:d(3), position:'belowBar', color:UP,   shape:'circle',  text:'i-Low',  size:1},
+      {time:d(5), position:'aboveBar', color:UP,   shape:'arrowUp', text:'i-BO Buy ↑', size:2},
+    ]);
+    ch.timeScale().fitContent();
+  })();
+
+  // ── 5. BO→VR→CF Buy Setup ───────────────────────────────
+  (function() {
+    const el = document.getElementById('ms-chart-bo-buy');
+    const ch = baseChart(el, 220);
+    if (!ch) return;
+    const cs = candleSeries(ch);
+    // H4 BO Buy at 114; VR = 107-112; CF = 107-109
+    cs.setData([
+      {time:d(0),open:100,high:103,low: 98,close:102},
+      {time:d(1),open:102,high:107,low:101,close:106},
+      {time:d(2),open:106,high:112,low:105,close:111},
+      {time:d(3),open:111,high:116,low:110,close:115}, // BO Buy breaks 114
+      {time:d(4),open:115,high:117,low:112,close:113}, // retracing into VR
+      {time:d(5),open:113,high:114,low:109,close:110}, // inside VR
+      {time:d(6),open:110,high:111,low:107,close:108}, // CF zone 107-109
+      {time:d(7),open:108,high:114,low:107,close:113}, // bounce from CF
+      {time:d(8),open:113,high:120,low:112,close:119}, // entry continuation
+    ]);
+    // VR zone 107-112 across d4-d7
+    const vrZ = zoneSeries(ch, 'rgba(212,168,67,0.18)');
+    vrZ.setData([d(4),d(5),d(6),d(7)].map(t=>({time:t, value:112})));
+    vrZ.applyOptions({ base: 107 });
+    // CF zone 107-109 across d6-d7
+    const cfZ = zoneSeries(ch, 'rgba(109,183,132,0.25)');
+    cfZ.setData([d(6),d(7)].map(t=>({time:t, value:109})));
+    cfZ.applyOptions({ base: 107 });
+    priceLabel(cs, 114, AMBE, 'H4 BO Buy');
+    cs.setMarkers([
+      {time:d(3), position:'aboveBar', color:AMBE, shape:'circle',  text:'H4 BO Buy', size:1},
+      {time:d(5), position:'aboveBar', color:AMBE, shape:'circle',  text:'H1 VR',     size:1},
+      {time:d(6), position:'belowBar', color:UP,   shape:'circle',  text:'H1 CF',     size:1},
+      {time:d(8), position:'aboveBar', color:UP,   shape:'arrowUp', text:'ENTRY ↑',   size:2},
+    ]);
+    ch.timeScale().fitContent();
+  })();
+
+  // ── 6. BO→VR→CF Sell Setup ──────────────────────────────
+  (function() {
+    const el = document.getElementById('ms-chart-bo-sell');
+    const ch = baseChart(el, 220);
+    if (!ch) return;
+    const cs = candleSeries(ch);
+    // H4 BO Sell at 106; VR = 108-113; CF = 111-113
+    cs.setData([
+      {time:d(0),open:120,high:122,low:116,close:118},
+      {time:d(1),open:118,high:120,low:114,close:115},
+      {time:d(2),open:115,high:116,low:110,close:111},
+      {time:d(3),open:111,high:112,low:104,close:105}, // BO Sell breaks 106
+      {time:d(4),open:105,high:110,low:104,close:109}, // retracing into VR
+      {time:d(5),open:109,high:113,low:108,close:112}, // inside VR
+      {time:d(6),open:112,high:114,low:111,close:113}, // CF zone 111-113
+      {time:d(7),open:113,high:114,low:108,close:109}, // rejected at CF
+      {time:d(8),open:109,high:110,low:102,close:103}, // entry continuation
+    ]);
+    // VR zone 108-113 across d4-d7
+    const vrZ = zoneSeries(ch, 'rgba(212,168,67,0.18)');
+    vrZ.setData([d(4),d(5),d(6),d(7)].map(t=>({time:t, value:113})));
+    vrZ.applyOptions({ base: 108 });
+    // CF zone 111-113 across d6-d7
+    const cfZ = zoneSeries(ch, 'rgba(193,122,111,0.28)');
+    cfZ.setData([d(6),d(7)].map(t=>({time:t, value:113})));
+    cfZ.applyOptions({ base: 111 });
+    priceLabel(cs, 106, AMBE, 'H4 BO Sell');
+    cs.setMarkers([
+      {time:d(3), position:'belowBar', color:AMBE, shape:'circle',    text:'H4 BO Sell', size:1},
+      {time:d(5), position:'belowBar', color:AMBE, shape:'circle',    text:'H1 VR',      size:1},
+      {time:d(6), position:'aboveBar', color:DOWN, shape:'circle',    text:'H1 CF',      size:1},
+      {time:d(8), position:'belowBar', color:DOWN, shape:'arrowDown', text:'ENTRY ↓',    size:2},
+    ]);
+    ch.timeScale().fitContent();
+  })();
+
+  // ── 7. Case 1: Normal Clean ──────────────────────────────
+  (function() {
+    const el = document.getElementById('ms-chart-case1');
+    const ch = baseChart(el, 130);
+    if (!ch) return;
+    const cs = candleSeries(ch);
+    cs.setData([
+      {time:d(0),open:100,high:102,low: 97,close:101},
+      {time:d(1),open:101,high:106,low:100,close:105}, // HH
+      {time:d(2),open:105,high:107,low:102,close:103}, // pullback
+      {time:d(3),open:103,high:105,low:101,close:104}, // HL
+      {time:d(4),open:104,high:110,low:103,close:109}, // BO CF
+      {time:d(5),open:109,high:115,low:108,close:114},
+    ]);
+    priceLabel(cs, 106, UP, 'HH');
+    cs.setMarkers([
+      {time:d(1), position:'aboveBar', color:UP,   shape:'circle',  text:'HH',    size:1},
+      {time:d(3), position:'belowBar', color:STEE, shape:'circle',  text:'HL',    size:1},
+      {time:d(4), position:'aboveBar', color:UP,   shape:'arrowUp', text:'BO CF ↑', size:1},
+    ]);
+    ch.timeScale().fitContent();
+  })();
+
+  // ── 8. Case 2: CF inside VR ──────────────────────────────
+  (function() {
+    const el = document.getElementById('ms-chart-case2');
+    const ch = baseChart(el, 130);
+    if (!ch) return;
+    const cs = candleSeries(ch);
+    cs.setData([
+      {time:d(0),open:100,high:102,low: 97,close:101},
+      {time:d(1),open:101,high:108,low:100,close:107}, // BO
+      {time:d(2),open:107,high:108,low:103,close:104}, // enters VR
+      {time:d(3),open:104,high:106,low:103,close:105}, // CF inside VR
+      {time:d(4),open:105,high:113,low:104,close:112}, // ENTRY
+      {time:d(5),open:112,high:116,low:111,close:115},
+    ]);
+    const vrZ = zoneSeries(ch, 'rgba(212,168,67,0.18)');
+    vrZ.setData([d(2),d(3)].map(t=>({time:t,value:108})));
+    vrZ.applyOptions({ base: 103 });
+    const cfZ = zoneSeries(ch, 'rgba(109,183,132,0.25)');
+    cfZ.setData([{time:d(3),value:106}]);
+    cfZ.applyOptions({ base: 103 });
+    cs.setMarkers([
+      {time:d(1), position:'aboveBar', color:AMBE, shape:'circle',  text:'BO',    size:1},
+      {time:d(3), position:'belowBar', color:UP,   shape:'circle',  text:'CF→VR', size:1},
+      {time:d(4), position:'aboveBar', color:UP,   shape:'arrowUp', text:'ENTRY', size:1},
+    ]);
+    ch.timeScale().fitContent();
+  })();
+
+  // ── 9. Case 3: CF breaks VR (Sweep) ─────────────────────
+  (function() {
+    const el = document.getElementById('ms-chart-case3');
+    const ch = baseChart(el, 130);
+    if (!ch) return;
+    const cs = candleSeries(ch);
+    cs.setData([
+      {time:d(0),open:100,high:103,low: 98,close:102},
+      {time:d(1),open:102,high:109,low:101,close:108}, // BO
+      {time:d(2),open:108,high:109,low:104,close:105}, // VR zone
+      {time:d(3),open:105,high:106,low: 99,close:100}, // ⚠ sweeps below VR
+      {time:d(4),open:100,high:107,low: 99,close:106}, // recovery
+      {time:d(5),open:106,high:114,low:105,close:113}, // ENTRY after repeat SOP
+    ]);
+    const vrZ = zoneSeries(ch, 'rgba(212,168,67,0.15)');
+    vrZ.setData([d(2),d(3),d(4)].map(t=>({time:t,value:109})));
+    vrZ.applyOptions({ base: 103 });
+    cs.setMarkers([
+      {time:d(1), position:'aboveBar', color:AMBE, shape:'circle',    text:'BO',       size:1},
+      {time:d(3), position:'belowBar', color:AMBE, shape:'arrowDown', text:'⚠ Sweep',  size:1},
+      {time:d(5), position:'aboveBar', color:UP,   shape:'arrowUp',   text:'ENTRY',    size:1},
+    ]);
+    ch.timeScale().fitContent();
+  })();
+
+  // ── 10. Case 4: Sideways ─────────────────────────────────
+  (function() {
+    const el = document.getElementById('ms-chart-case4');
+    const ch = baseChart(el, 130);
+    if (!ch) return;
+    const cs = candleSeries(ch);
+    cs.setData([
+      {time:d(0),open:104,high:108,low:102,close:106},
+      {time:d(1),open:106,high:110,low:104,close:105},
+      {time:d(2),open:105,high:109,low:103,close:107},
+      {time:d(3),open:107,high:111,low:103,close:104},
+      {time:d(4),open:104,high:109,low:103,close:108},
+      {time:d(5),open:108,high:110,low:102,close:103},
+    ]);
+    // Top zone (VR)
+    const topZ = zoneSeries(ch, 'rgba(212,168,67,0.12)');
+    topZ.setData([d(0),d(1),d(2),d(3),d(4),d(5)].map(t=>({time:t,value:111})));
+    topZ.applyOptions({ base: 109 });
+    // Bottom zone (CF)
+    const btmZ = zoneSeries(ch, 'rgba(109,183,132,0.12)');
+    btmZ.setData([d(0),d(1),d(2),d(3),d(4),d(5)].map(t=>({time:t,value:104})));
+    btmZ.applyOptions({ base: 102 });
+    priceLabel(cs, 109, AMBE, 'VR');
+    priceLabel(cs, 104, UP, 'CF');
+    ch.timeScale().fitContent();
+  })();
+
+  // ── 11. Barrier — Simple CF ──────────────────────────────
+  (function() {
+    const el = document.getElementById('ms-chart-barrier-simple');
+    const ch = baseChart(el, 200);
+    if (!ch) return;
+    const cs = candleSeries(ch);
+    // Price drops into barrier zone (108-113), QM/CF inside, then ENTRY up
+    cs.setData([
+      {time:d(0),open:122,high:124,low:119,close:120},
+      {time:d(1),open:120,high:121,low:115,close:116}, // approaching barrier
+      {time:d(2),open:116,high:117,low:109,close:111}, // enters zone top (113)
+      {time:d(3),open:111,high:114,low:108,close:113}, // QM: low at 108
+      {time:d(4),open:113,high:115,low:110,close:111}, // QM: pullback
+      {time:d(5),open:111,high:117,low:110,close:116}, // CF: break back up — ENTRY
+      {time:d(6),open:116,high:122,low:115,close:121},
+    ]);
+    const barZ = zoneSeries(ch, 'rgba(109,183,132,0.15)');
+    barZ.setData([d(2),d(3),d(4),d(5)].map(t=>({time:t,value:113})));
+    barZ.applyOptions({ base: 108 });
+    priceLabel(cs, 113, UP, 'Barrier Top');
+    priceLabel(cs, 108, UP, 'Barrier Bot');
+    cs.setMarkers([
+      {time:d(2), position:'belowBar', color:GREY, shape:'circle',  text:'Enter Zone', size:1},
+      {time:d(3), position:'belowBar', color:DOWN, shape:'circle',  text:'QM Low',     size:1},
+      {time:d(5), position:'aboveBar', color:UP,   shape:'arrowUp', text:'ENTRY ↑',    size:2},
+    ]);
+    ch.timeScale().fitContent();
+  })();
+
+  // ── 12. Barrier — Janda ──────────────────────────────────
+  (function() {
+    const el = document.getElementById('ms-chart-barrier-janda');
+    const ch = baseChart(el, 200);
+    if (!ch) return;
+    const cs = candleSeries(ch);
+    // Drops into M15 Origin zone, BO Structure Sell forms, BO Buy sets up, pullback → ENTRY
+    cs.setData([
+      {time:d(0),open:122,high:125,low:119,close:123},
+      {time:d(1),open:123,high:124,low:112,close:113}, // big drop into origin zone
+      {time:d(2),open:113,high:117,low:109,close:116}, // bounce (BO Structure break)
+      {time:d(3),open:116,high:118,low:111,close:112}, // BO Sell broken = BO Structure
+      {time:d(4),open:112,high:116,low:110,close:115}, // BO Buy forms
+      {time:d(5),open:115,high:117,low:112,close:113}, // pullback (CMP)
+      {time:d(6),open:113,high:120,low:112,close:119}, // ENTRY — body breaks wick
+      {time:d(7),open:119,high:126,low:118,close:124},
+    ]);
+    // Origin zone 109-115
+    const orgZ = zoneSeries(ch, 'rgba(193,122,111,0.15)');
+    orgZ.setData([d(1),d(2),d(3),d(4),d(5)].map(t=>({time:t,value:115})));
+    orgZ.applyOptions({ base: 109 });
+    priceLabel(cs, 115, AMBE, 'BO Structure');
+    priceLabel(cs, 112, UP,   'BO Buy');
+    cs.setMarkers([
+      {time:d(1), position:'belowBar', color:DOWN, shape:'circle',    text:'Origin Zone', size:1},
+      {time:d(2), position:'aboveBar', color:AMBE, shape:'circle',    text:'BO Struct',   size:1},
+      {time:d(4), position:'aboveBar', color:UP,   shape:'circle',    text:'BO Buy',      size:1},
+      {time:d(5), position:'belowBar', color:GREY, shape:'circle',    text:'Pullback',    size:1},
+      {time:d(6), position:'aboveBar', color:UP,   shape:'arrowUp',   text:'ENTRY ↑',     size:2},
+    ]);
+    ch.timeScale().fitContent();
+  })();
+
+})();
 </script>
 
 </body>
