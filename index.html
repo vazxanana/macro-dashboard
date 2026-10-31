@@ -2105,156 +2105,284 @@
     <div class="section-meta">MOSHATRADES METHODOLOGY</div>
   </div>
 
-  <!-- SOP Overview -->
-  <div style="margin: 0 24px 20px; padding: 16px 20px; background: var(--panel-raised); border: 1px solid var(--line); border-radius: 6px; border-left: 3px solid var(--sage);">
-    <div style="font-size: 10px; font-weight: 700; letter-spacing: 1.2px; color: var(--sage); margin-bottom: 12px; text-transform: uppercase;">Standard Operating Procedure</div>
-    <div style="display: flex; gap: 24px; flex-wrap: wrap;">
-      <div style="flex: 1; min-width: 200px;">
-        <div style="font-size: 11px; font-weight: 700; color: var(--ink); margin-bottom: 6px;">Step 1 — Mark Market Structure</div>
-        <div style="font-size: 11px; color: var(--ink-dim); line-height: 1.7;">Identify VR (Value Range), Origin, and CF zones. Minimum range requirement: <span style="color: var(--sage); font-weight: 600;">50%</span> of swing.</div>
+  <!-- SOP Banner -->
+  <div style="margin: 0 24px 20px; padding: 14px 20px; background: var(--panel-raised); border: 1px solid var(--line); border-radius: 6px; border-left: 3px solid var(--sage);">
+    <div style="font-size: 10px; font-weight: 700; letter-spacing: 1.2px; color: var(--sage); margin-bottom: 10px; text-transform: uppercase;">Standard Operating Procedure</div>
+    <div style="display: flex; gap: 40px; flex-wrap: wrap;">
+      <div>
+        <div style="font-size: 11px; font-weight: 700; color: var(--ink);">1 — Mark Market Structure</div>
+        <div style="font-size: 11px; color: var(--ink-dim); margin-top: 3px;">Identify VR (Value Range), Origin &amp; CF zones · Min 50% of swing</div>
       </div>
-      <div style="flex: 1; min-width: 200px;">
-        <div style="font-size: 11px; font-weight: 700; color: var(--ink); margin-bottom: 6px;">Step 2 — Entry Model</div>
-        <div style="font-size: 11px; color: var(--ink-dim); line-height: 1.7;">Choose: <span style="color: var(--amber);">Breakout System</span> (BO → VR → CF) or <span style="color: var(--amber);">Barrier Entry</span> (Simple CF / Janda). Pick one and master it.</div>
+      <div>
+        <div style="font-size: 11px; font-weight: 700; color: var(--ink);">2 — Choose Entry Model</div>
+        <div style="font-size: 11px; color: var(--ink-dim); margin-top: 3px;"><span style="color: var(--amber);">Breakout System</span> (BO → VR → CF)&nbsp;&nbsp;or&nbsp;&nbsp;<span style="color: var(--amber);">Barrier Entry</span> (Simple CF / Janda)</div>
       </div>
     </div>
+  </div>
+
+  <div style="margin: 0 24px 10px; font-size: 10px; font-weight: 700; letter-spacing: 1.4px; color: var(--ink-faint); text-transform: uppercase; padding-bottom: 6px; border-bottom: 1px solid var(--line-soft);">Market Structure</div>
+
+  <div class="grid grid-2" style="margin: 0 24px 20px;">
+
+    <div class="card">
+      <div class="card-head"><div class="card-title">External — Bullish (HH / HL → BO Buy)</div></div>
+      <div style="font-size: 11px; color: var(--ink-dim); line-height: 1.6; margin: 6px 0 10px;">Price forms <span style="color: var(--sage); font-weight: 600;">Higher High → Higher Low</span>, then breaks above prev HH = BO Buy ↑</div>
+      <svg viewBox="0 0 280 138" width="100%" height="138" style="display:block;">
+        <line x1="55" y1="60" x2="178" y2="60" stroke="#6db784" stroke-width="1" stroke-dasharray="4,3" opacity="0.3"/>
+        <polyline points="10,128 55,60 95,84 168,22 218,44 268,12" stroke="#6db784" fill="none" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>
+        <polygon points="268,4 274,17 262,17" fill="#6db784"/>
+        <circle cx="168" cy="22" r="6" fill="none" stroke="#6db784" stroke-width="1.5" opacity="0.65"/>
+        <text x="41" y="55" fill="#6db784" font-size="10" font-weight="700" font-family="monospace">HH¹</text>
+        <text x="89" y="100" fill="#6db784" font-size="10" font-weight="700" font-family="monospace">HL</text>
+        <text x="175" y="19" fill="#6db784" font-size="10" font-weight="700" font-family="monospace">BO Buy ↑</text>
+        <text x="6" y="135" fill="#5a6070" font-size="8" font-family="monospace">START</text>
+        <text x="228" y="9" fill="#5a6070" font-size="8" font-family="monospace">NEW HH</text>
+      </svg>
+    </div>
+
+    <div class="card">
+      <div class="card-head"><div class="card-title">External — Bearish (LH / LL → BO Sell)</div></div>
+      <div style="font-size: 11px; color: var(--ink-dim); line-height: 1.6; margin: 6px 0 10px;">Price forms <span style="color: var(--rust); font-weight: 600;">Lower High → Lower Low</span>, then breaks below prev LL = BO Sell ↓</div>
+      <svg viewBox="0 0 280 138" width="100%" height="138" style="display:block;">
+        <line x1="55" y1="78" x2="178" y2="78" stroke="#c17a6f" stroke-width="1" stroke-dasharray="4,3" opacity="0.3"/>
+        <polyline points="10,10 55,78 95,54 168,116 218,94 268,126" stroke="#c17a6f" fill="none" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>
+        <polygon points="268,134 274,121 262,121" fill="#c17a6f"/>
+        <circle cx="168" cy="116" r="6" fill="none" stroke="#c17a6f" stroke-width="1.5" opacity="0.65"/>
+        <text x="41" y="97" fill="#c17a6f" font-size="10" font-weight="700" font-family="monospace">LL¹</text>
+        <text x="89" y="48" fill="#c17a6f" font-size="10" font-weight="700" font-family="monospace">LH</text>
+        <text x="175" y="133" fill="#c17a6f" font-size="10" font-weight="700" font-family="monospace">BO Sell ↓</text>
+        <text x="6" y="8" fill="#5a6070" font-size="8" font-family="monospace">START</text>
+        <text x="224" y="136" fill="#5a6070" font-size="8" font-family="monospace">NEW LL</text>
+      </svg>
+    </div>
+
+    <div class="card">
+      <div class="card-head"><div class="card-title">Internal — i-Breakout Sell</div></div>
+      <div style="font-size: 11px; color: var(--ink-dim); line-height: 1.6; margin: 6px 0 10px;">After E.High forms, <span style="color: var(--rust); font-weight: 600;">i-BO Sell</span> occurs within the HTF pullback — early bearish signal before new E.High is confirmed.</div>
+      <svg viewBox="0 0 280 145" width="100%" height="145" style="display:block;">
+        <polyline points="10,132 72,26" stroke="#4a6a8a" fill="none" stroke-width="2" stroke-dasharray="5,3" stroke-linecap="round"/>
+        <line x1="50" y1="26" x2="130" y2="26" stroke="#8899aa" stroke-width="1" stroke-dasharray="3,3" opacity="0.4"/>
+        <polyline points="72,26 100,62 130,46 158,82 185,65 220,95" stroke="#c17a6f" fill="none" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>
+        <rect x="122" y="46" width="44" height="36" rx="2" fill="rgba(193,122,111,0.12)" stroke="#c17a6f" stroke-width="1" opacity="0.7"/>
+        <polygon points="158,90 163,78 153,78" fill="#c17a6f"/>
+        <text x="73" y="22" fill="#8899aa" font-size="9" font-weight="700" font-family="monospace">E.High</text>
+        <text x="86" y="80" fill="#c17a6f" font-size="9" font-family="monospace">i-Low</text>
+        <text x="108" y="43" fill="#c17a6f" font-size="9" font-family="monospace">i-High</text>
+        <text x="162" y="104" fill="#c17a6f" font-size="10" font-weight="700" font-family="monospace">i-BO Sell ↓</text>
+        <text x="6" y="140" fill="#4a6a8a" font-size="8" font-family="monospace">E.Low (HTF)</text>
+      </svg>
+    </div>
+
+    <div class="card">
+      <div class="card-head"><div class="card-title">Internal — i-Breakout Buy</div></div>
+      <div style="font-size: 11px; color: var(--ink-dim); line-height: 1.6; margin: 6px 0 10px;">After E.Low forms, <span style="color: var(--sage); font-weight: 600;">i-BO Buy</span> occurs within the HTF pullback — early bullish signal before new E.Low is confirmed.</div>
+      <svg viewBox="0 0 280 145" width="100%" height="145" style="display:block;">
+        <polyline points="10,13 72,119" stroke="#4a6a8a" fill="none" stroke-width="2" stroke-dasharray="5,3" stroke-linecap="round"/>
+        <line x1="50" y1="119" x2="130" y2="119" stroke="#8899aa" stroke-width="1" stroke-dasharray="3,3" opacity="0.4"/>
+        <polyline points="72,119 100,83 130,99 158,63 185,80 220,50" stroke="#6db784" fill="none" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>
+        <rect x="122" y="63" width="44" height="36" rx="2" fill="rgba(109,183,132,0.12)" stroke="#6db784" stroke-width="1" opacity="0.7"/>
+        <polygon points="158,55 163,67 153,67" fill="#6db784"/>
+        <text x="73" y="135" fill="#8899aa" font-size="9" font-weight="700" font-family="monospace">E.Low</text>
+        <text x="86" y="100" fill="#6db784" font-size="9" font-family="monospace">i-High</text>
+        <text x="108" y="116" fill="#6db784" font-size="9" font-family="monospace">i-Low</text>
+        <text x="162" y="56" fill="#6db784" font-size="10" font-weight="700" font-family="monospace">i-BO Buy ↑</text>
+        <text x="6" y="10" fill="#4a6a8a" font-size="8" font-family="monospace">E.High (HTF)</text>
+      </svg>
+    </div>
+
+  </div>
+
+  <div style="margin: 0 24px 10px; font-size: 10px; font-weight: 700; letter-spacing: 1.4px; color: var(--ink-faint); text-transform: uppercase; padding-bottom: 6px; border-bottom: 1px solid var(--line-soft);">Entry Model 1 — Breakout System (BO → VR → CF)</div>
+
+  <div class="grid grid-2" style="margin: 0 24px 20px;">
+
+    <div class="card">
+      <div class="card-head"><div class="card-title" style="color: var(--sage);">Buy Setup</div></div>
+      <div style="font-size: 11px; color: var(--ink-dim); margin: 6px 0 10px; line-height: 1.6;">H4 BO Buy → price rises into <span style="color: var(--amber); font-weight: 600;">H1 VR</span> → pulls back to <span style="color: var(--sage); font-weight: 600;">H1 CF</span> → Entry ↑</div>
+      <svg viewBox="0 0 300 168" width="100%" height="168" style="display:block;">
+        <line x1="0" y1="128" x2="300" y2="128" stroke="#d4a843" stroke-width="1" stroke-dasharray="5,4" opacity="0.45"/>
+        <text x="4" y="124" fill="#d4a843" font-size="8" font-family="monospace">H4 BO Buy</text>
+        <rect x="108" y="50" width="92" height="32" rx="2" fill="rgba(212,168,67,0.14)" stroke="#d4a843" stroke-width="1" opacity="0.8"/>
+        <text x="128" y="64" fill="#d4a843" font-size="9" font-weight="700" font-family="monospace">H1 VR</text>
+        <text x="118" y="76" fill="#d4a843" font-size="8" font-family="monospace">Value Range</text>
+        <rect x="186" y="98" width="78" height="28" rx="2" fill="rgba(109,183,132,0.17)" stroke="#6db784" stroke-width="1.5" opacity="0.9"/>
+        <text x="208" y="115" fill="#6db784" font-size="9" font-weight="700" font-family="monospace">H1 CF</text>
+        <polyline points="5,156 68,156 102,138 145,62 192,70 228,114 266,114 295,40" stroke="#6db784" fill="none" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>
+        <polygon points="295,31 301,44 289,44" fill="#6db784"/>
+        <text x="247" y="94" fill="#6db784" font-size="14" font-weight="700">↑</text>
+        <text x="239" y="86" fill="#6db784" font-size="8" font-family="monospace">ENTRY</text>
+        <circle cx="102" cy="138" r="4" fill="none" stroke="#d4a843" stroke-width="1.5" opacity="0.7"/>
+      </svg>
+    </div>
+
+    <div class="card">
+      <div class="card-head"><div class="card-title" style="color: var(--rust);">Sell Setup</div></div>
+      <div style="font-size: 11px; color: var(--ink-dim); margin: 6px 0 10px; line-height: 1.6;">H4 BO Sell → price falls into <span style="color: var(--amber); font-weight: 600;">H1 VR</span> → pulls back to <span style="color: var(--rust); font-weight: 600;">H1 CF</span> → Entry ↓</div>
+      <svg viewBox="0 0 300 168" width="100%" height="168" style="display:block;">
+        <line x1="0" y1="42" x2="300" y2="42" stroke="#d4a843" stroke-width="1" stroke-dasharray="5,4" opacity="0.45"/>
+        <text x="4" y="38" fill="#d4a843" font-size="8" font-family="monospace">H4 BO Sell</text>
+        <rect x="108" y="88" width="92" height="32" rx="2" fill="rgba(212,168,67,0.14)" stroke="#d4a843" stroke-width="1" opacity="0.8"/>
+        <text x="128" y="102" fill="#d4a843" font-size="9" font-weight="700" font-family="monospace">H1 VR</text>
+        <text x="118" y="114" fill="#d4a843" font-size="8" font-family="monospace">Value Range</text>
+        <rect x="186" y="44" width="78" height="28" rx="2" fill="rgba(193,122,111,0.17)" stroke="#c17a6f" stroke-width="1.5" opacity="0.9"/>
+        <text x="208" y="61" fill="#c17a6f" font-size="9" font-weight="700" font-family="monospace">H1 CF</text>
+        <polyline points="5,14 68,14 102,32 145,108 192,100 228,56 266,56 295,130" stroke="#c17a6f" fill="none" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>
+        <polygon points="295,139 301,126 289,126" fill="#c17a6f"/>
+        <text x="247" y="84" fill="#c17a6f" font-size="14" font-weight="700">↓</text>
+        <text x="239" y="96" fill="#c17a6f" font-size="8" font-family="monospace">ENTRY</text>
+        <circle cx="102" cy="32" r="4" fill="none" stroke="#d4a843" stroke-width="1.5" opacity="0.7"/>
+      </svg>
+    </div>
+
+  </div>
+
+  <div class="grid grid-2" style="margin: 0 24px 20px;">
+
+    <div class="card">
+      <div class="card-head"><div class="card-title">Cases 1 &amp; 2 — Best Setups ★</div></div>
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-top: 10px;">
+        <div>
+          <div style="font-size: 10px; font-weight: 700; color: var(--sage); margin-bottom: 4px;">Case 1: Normal Clean</div>
+          <div style="font-size: 10px; color: var(--ink-dim); line-height: 1.5; margin-bottom: 8px;">Clean BO → VR → CF. "Continuation after CF is like God giving money."</div>
+          <svg viewBox="0 0 128 92" width="100%" height="80" style="display:block;">
+            <polyline points="5,82 26,50 44,65 68,20 90,36 122,8" stroke="#6db784" fill="none" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
+            <polygon points="122,1 127,13 117,13" fill="#6db784"/>
+            <text x="20" y="46" fill="#6db784" font-size="9" font-family="monospace">HH</text>
+            <text x="38" y="80" fill="#6db784" font-size="9" font-family="monospace">HL</text>
+            <text x="56" y="17" fill="#6db784" font-size="9" font-family="monospace">BO CF ↑</text>
+          </svg>
+        </div>
+        <div>
+          <div style="font-size: 10px; font-weight: 700; color: var(--sage); margin-bottom: 4px;">Case 2: CF inside VR</div>
+          <div style="font-size: 10px; color: var(--ink-dim); line-height: 1.5; margin-bottom: 8px;">CF forms right inside VR. Fake CF right after VR likely fails — wait for HTF to confirm.</div>
+          <svg viewBox="0 0 128 92" width="100%" height="80" style="display:block;">
+            <rect x="35" y="25" width="52" height="28" rx="2" fill="rgba(212,168,67,0.15)" stroke="#d4a843" stroke-width="1" opacity="0.7"/>
+            <text x="38" y="37" fill="#d4a843" font-size="7" font-family="monospace">VR</text>
+            <text x="38" y="47" fill="#6db784" font-size="7" font-family="monospace">+ CF inside</text>
+            <polyline points="5,82 28,55 40,42 68,36 82,44 122,8" stroke="#6db784" fill="none" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
+            <polygon points="122,1 127,13 117,13" fill="#6db784"/>
+          </svg>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-head"><div class="card-title">Cases 3 &amp; 4 — Caution</div></div>
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-top: 10px;">
+        <div>
+          <div style="font-size: 10px; font-weight: 700; color: var(--amber); margin-bottom: 4px;">Case 3: CF breaks VR ⚠</div>
+          <div style="font-size: 10px; color: var(--ink-dim); line-height: 1.5; margin-bottom: 8px;">HTF liquidity sweep / manipulation. If HTF BO is clean too, setup may recover. Risky — repeat SOP.</div>
+          <svg viewBox="0 0 128 92" width="100%" height="80" style="display:block;">
+            <rect x="28" y="22" width="48" height="26" rx="2" fill="rgba(212,168,67,0.10)" stroke="#d4a843" stroke-width="1" opacity="0.5"/>
+            <text x="32" y="34" fill="#d4a843" font-size="7" font-family="monospace">VR</text>
+            <polyline points="5,82 28,56 48,32 62,10 75,26 96,16 120,6" stroke="#6db784" fill="none" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
+            <polygon points="120,0 125,11 115,11" fill="#6db784"/>
+            <text x="55" y="8" fill="#d4a843" font-size="8" font-family="monospace">⚠ Sweep</text>
+          </svg>
+        </div>
+        <div>
+          <div style="font-size: 10px; font-weight: 700; color: var(--rust); margin-bottom: 4px;">Case 4: Sideways</div>
+          <div style="font-size: 10px; color: var(--ink-dim); line-height: 1.5; margin-bottom: 8px;">Price cannot break VR or CF. Choppy — VR, CF &amp; Origin are the strongest barriers. Barrier Entry only.</div>
+          <svg viewBox="0 0 128 92" width="100%" height="80" style="display:block;">
+            <rect x="5" y="16" width="118" height="16" rx="2" fill="rgba(109,183,132,0.08)" stroke="#6db784" stroke-width="0.8" opacity="0.6"/>
+            <rect x="5" y="60" width="118" height="16" rx="2" fill="rgba(193,122,111,0.08)" stroke="#c17a6f" stroke-width="0.8" opacity="0.6"/>
+            <polyline points="5,68 18,50 30,65 44,36 56,62 68,34 80,60 92,38 108,60 122,40" stroke="#8899aa" fill="none" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round" stroke-dasharray="3,2"/>
+            <text x="6" y="14" fill="#6db784" font-size="7" font-family="monospace">VR</text>
+            <text x="6" y="58" fill="#c17a6f" font-size="7" font-family="monospace">CF</text>
+          </svg>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <div style="margin: 0 24px 10px; font-size: 10px; font-weight: 700; letter-spacing: 1.4px; color: var(--ink-faint); text-transform: uppercase; padding-bottom: 6px; border-bottom: 1px solid var(--line-soft);">Entry Model 2 — Barrier Entry</div>
+
+  <div class="grid grid-2" style="margin: 0 24px 20px;">
+
+    <div class="card">
+      <div class="card-head"><div class="card-title">Barrier Type 1 — Simple CF</div></div>
+      <div style="font-size: 11px; color: var(--ink-dim); line-height: 1.6; margin: 6px 0 6px;">Mark barrier zone → price enters zone → wait for <span style="color: var(--sage); font-weight: 600;">CF pullback (QM pattern)</span> → Entry ↑</div>
+      <div style="font-size: 10px; display: flex; gap: 16px; margin-bottom: 10px;"><span style="color: var(--sage);">✓ Early entry, tighter zone</span><span style="color: var(--rust);">✗ Rejection only if counter-direction</span></div>
+      <svg viewBox="0 0 280 152" width="100%" height="152" style="display:block;">
+        <rect x="72" y="68" width="138" height="40" rx="2" fill="rgba(109,183,132,0.10)" stroke="#6db784" stroke-width="1.2" opacity="0.8"/>
+        <text x="78" y="83" fill="#6db784" font-size="9" font-weight="700" font-family="monospace">BARRIER ZONE</text>
+        <text x="78" y="100" fill="#6db784" font-size="8" font-family="monospace">(VR / Origin / CF)</text>
+        <polyline points="5,18 46,18 72,78" stroke="#c17a6f" fill="none" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>
+        <polyline points="72,78 100,95 122,80 148,100 175,84" stroke="#8899aa" fill="none" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round"/>
+        <polyline points="175,84 210,88 240,58 268,20" stroke="#6db784" fill="none" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>
+        <polygon points="268,12 274,25 262,25" fill="#6db784"/>
+        <text x="142" y="116" fill="#8899aa" font-size="8" font-family="monospace">QM / CF</text>
+        <text x="234" y="54" fill="#6db784" font-size="9" font-weight="700" font-family="monospace">ENTRY ↑</text>
+      </svg>
+    </div>
+
+    <div class="card">
+      <div class="card-head"><div class="card-title">Barrier Type 2 — Janda</div></div>
+      <div style="font-size: 11px; color: var(--ink-dim); line-height: 1.6; margin: 6px 0 6px;">Mark barrier → <span style="color: var(--amber); font-weight: 600;">BO Structure</span> break → <span style="color: var(--sage); font-weight: 600;">BO Buy</span> → pullback → Entry ↑</div>
+      <div style="font-size: 10px; color: var(--ink-faint); margin-bottom: 10px;">Entry rule: wick on left candle broken by body of right candle (CMP)</div>
+      <svg viewBox="0 0 280 152" width="100%" height="152" style="display:block;">
+        <rect x="58" y="70" width="182" height="42" rx="2" fill="rgba(193,122,111,0.10)" stroke="#c17a6f" stroke-width="1.2" opacity="0.7"/>
+        <text x="62" y="84" fill="#c17a6f" font-size="8" font-family="monospace">M15 BARRIER / ORIGIN</text>
+        <line x1="58" y1="84" x2="240" y2="84" stroke="#d4a843" stroke-width="1" stroke-dasharray="4,3" opacity="0.55"/>
+        <text x="62" y="81" fill="#d4a843" font-size="7" font-family="monospace">BO Structure</text>
+        <line x1="148" y1="99" x2="240" y2="99" stroke="#6db784" stroke-width="1" stroke-dasharray="4,3" opacity="0.55"/>
+        <text x="152" y="110" fill="#6db784" font-size="7" font-family="monospace">BO Buy</text>
+        <polyline points="5,16 58,84" stroke="#8899aa" fill="none" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>
+        <polyline points="58,84 88,104 115,90 148,108 180,94" stroke="#c17a6f" fill="none" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
+        <polyline points="180,94 200,82 218,92 242,74 268,24" stroke="#6db784" fill="none" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>
+        <polygon points="268,15 274,28 262,28" fill="#6db784"/>
+        <text x="218" y="88" fill="#6db784" font-size="8" font-family="monospace">Pullback</text>
+        <text x="242" y="68" fill="#6db784" font-size="9" font-weight="700" font-family="monospace">ENTRY ↑</text>
+      </svg>
+    </div>
+
   </div>
 
   <div class="grid grid-2" style="margin: 0 24px 24px;">
-
-    <!-- External Structure -->
-    <div class="card">
-      <div class="card-head"><div class="card-title">External Market Structure</div></div>
-      <div style="font-size: 11px; color: var(--ink-dim); line-height: 1.8; margin-top: 8px;">
-        <div style="margin-bottom: 10px; padding: 8px; background: var(--sage-glow); border-radius: 4px;">
-          <div style="font-weight: 700; color: var(--sage); margin-bottom: 4px;">BULLISH — Higher Highs &amp; Higher Lows</div>
-          <div>HH → HL → <span style="color: var(--sage); font-weight: 600;">BO Buy</span> (break above prev HH)</div>
-          <div style="color: var(--ink-faint); font-size: 10px; margin-top: 4px;">Price forms HH, pulls back to HL, breaks above external high</div>
-        </div>
-        <div style="padding: 8px; background: var(--rust-glow); border-radius: 4px;">
-          <div style="font-weight: 700; color: var(--rust); margin-bottom: 4px;">BEARISH — Lower Highs &amp; Lower Lows</div>
-          <div>LH → LL → <span style="color: var(--rust); font-weight: 600;">BO Sell</span> (break below prev LL)</div>
-          <div style="color: var(--ink-faint); font-size: 10px; margin-top: 4px;">Price forms LH, fails to hold, breaks below external low</div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Internal Structure -->
-    <div class="card">
-      <div class="card-head"><div class="card-title">Internal Market Structure</div></div>
-      <div style="font-size: 11px; color: var(--ink-dim); line-height: 1.8; margin-top: 8px;">
-        <div style="margin-bottom: 8px; font-size: 10px; font-weight: 700; letter-spacing: 0.8px; color: var(--ink-faint); text-transform: uppercase;">i-Breakout (Internal Breakout)</div>
-        <div style="padding: 8px; background: var(--panel-raised); border-radius: 4px; margin-bottom: 8px;">
-          <div style="font-weight: 600; color: var(--ink); margin-bottom: 4px;">i-BO Sell (inside bullish swing)</div>
-          <div>E.High formed → i-Breakout Sell below E.Low</div>
-          <div style="color: var(--ink-faint); font-size: 10px; margin-top: 3px;">Internal bearish break within the pullback of a larger bullish move</div>
-        </div>
-        <div style="padding: 8px; background: var(--panel-raised); border-radius: 4px;">
-          <div style="font-weight: 600; color: var(--ink); margin-bottom: 4px;">i-BO Buy (inside bearish swing)</div>
-          <div>E.Low formed → i-Breakout Buy above E.High</div>
-          <div style="color: var(--ink-faint); font-size: 10px; margin-top: 3px;">Internal bullish break within the pullback of a larger bearish move</div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Breakout System -->
-    <div class="card">
-      <div class="card-head"><div class="card-title">Entry Model 1 — Breakout System</div></div>
-      <div style="font-size: 11px; color: var(--ink-dim); line-height: 1.8; margin-top: 8px;">
-        <div style="display: flex; gap: 8px; margin-bottom: 12px; align-items: center;">
-          <div style="padding: 6px 12px; background: var(--panel-raised); border: 1px solid var(--line); border-radius: 4px; font-weight: 700; font-size: 12px; color: var(--sage); font-family: var(--mono);">1. BO</div>
-          <div style="color: var(--line);">→</div>
-          <div style="padding: 6px 12px; background: var(--panel-raised); border: 1px solid var(--line); border-radius: 4px; font-weight: 700; font-size: 12px; color: var(--amber); font-family: var(--mono);">2. VR</div>
-          <div style="color: var(--line);">→</div>
-          <div style="padding: 6px 12px; background: var(--panel-raised); border: 1px solid var(--line); border-radius: 4px; font-weight: 700; font-size: 12px; color: var(--rust); font-family: var(--mono);">3. CF</div>
-        </div>
-        <div style="padding: 8px; background: var(--sage-glow); border-radius: 4px; margin-bottom: 6px;">
-          <div style="font-weight: 600; color: var(--sage);">Buy Setup</div>
-          <div>H4 BO Buy → H1 VR pullback → Entry at H1 CF</div>
-        </div>
-        <div style="padding: 8px; background: var(--rust-glow); border-radius: 4px;">
-          <div style="font-weight: 600; color: var(--rust);">Sell Setup</div>
-          <div>H4 BO Sell → H1 VR pullback → Entry at H1 CF</div>
-        </div>
-        <div style="margin-top: 8px; font-size: 10px; color: var(--amber); font-style: italic;">Note: Entry can be before or after CF using Barrier Entry</div>
-      </div>
-    </div>
-
-    <!-- 4 Cases -->
-    <div class="card">
-      <div class="card-head"><div class="card-title">BO System — 4 Setup Cases</div></div>
-      <div style="font-size: 11px; color: var(--ink-dim); line-height: 1.7; margin-top: 8px;">
-        <div style="display: flex; justify-content: space-between; align-items: flex-start; padding: 8px 0; border-bottom: 1px solid var(--line-soft);">
-          <div>
-            <div style="font-weight: 600; color: var(--sage);">Case 1: Normal Clean</div>
-            <div style="font-size: 10px;">Clean BO → VR → CF sequence. Best setup.</div>
-          </div>
-          <div style="font-size: 10px; color: var(--sage); font-weight: 700; white-space: nowrap; margin-left: 8px;">★ BEST</div>
-        </div>
-        <div style="display: flex; justify-content: space-between; align-items: flex-start; padding: 8px 0; border-bottom: 1px solid var(--line-soft);">
-          <div>
-            <div style="font-weight: 600; color: var(--sage);">Case 2: CF inside VR</div>
-            <div style="font-size: 10px;">CF forms right inside the VR zone. Also strong.</div>
-          </div>
-          <div style="font-size: 10px; color: var(--sage); font-weight: 700; white-space: nowrap; margin-left: 8px;">★ BEST</div>
-        </div>
-        <div style="display: flex; justify-content: space-between; align-items: flex-start; padding: 8px 0; border-bottom: 1px solid var(--line-soft);">
-          <div>
-            <div style="font-weight: 600; color: var(--amber);">Case 3: CF breaks VR</div>
-            <div style="font-size: 10px;">Manipulation / HTF liquidity sweep. Risky. Repeat SOP.</div>
-          </div>
-          <div style="font-size: 10px; color: var(--amber); font-weight: 700; white-space: nowrap; margin-left: 8px;">RISKY</div>
-        </div>
-        <div style="padding: 8px 0;">
-          <div style="font-weight: 600; color: var(--rust);">Case 4: Sideways</div>
-          <div style="font-size: 10px;">Price cannot break VR or CF → market is choppy. Use Barrier style entry only.</div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Barrier Entry -->
-    <div class="card">
-      <div class="card-head"><div class="card-title">Entry Model 2 — Barrier Entry</div></div>
-      <div style="font-size: 11px; color: var(--ink-dim); line-height: 1.8; margin-top: 8px;">
-        <div style="font-size: 10px; color: var(--amber); margin-bottom: 10px; font-style: italic;">Choose ONE strategy. Master it before moving to another.</div>
-        <div style="padding: 10px; background: var(--panel-raised); border-radius: 4px; margin-bottom: 8px; border-left: 2px solid var(--sage);">
-          <div style="font-weight: 700; color: var(--ink); margin-bottom: 4px;">1. Simple CF</div>
-          <div style="font-size: 10px; margin-bottom: 4px; color: var(--ink-dim);">Mark best barrier zone → Wait for CF pullback → Enter (CF must be QM pattern)</div>
-          <div style="font-size: 10px; color: var(--sage);">Pros: Early entry, smaller zone</div>
-          <div style="font-size: 10px; color: var(--rust);">Cons: Rejection only if against direction</div>
-        </div>
-        <div style="padding: 10px; background: var(--panel-raised); border-radius: 4px; border-left: 2px solid var(--amber);">
-          <div style="font-weight: 700; color: var(--ink); margin-bottom: 4px;">2. Janda</div>
-          <div style="font-size: 10px; color: var(--ink-dim);">Mark best barrier → Wait for BO Structure break → BO Buy/Sell → Pullback Entry</div>
-          <div style="font-size: 10px; margin-top: 4px; color: var(--ink-faint);">Entry rule: Wick on left candle must be broken by body of CMP (right candle)</div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Timeframe Reference -->
     <div class="card">
       <div class="card-head"><div class="card-title">Barrier Formula — Timeframe Map</div></div>
-      <div style="font-size: 11px; color: var(--ink-dim); margin-top: 12px;">
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1px; background: var(--line); border: 1px solid var(--line); border-radius: 4px; overflow: hidden; margin-bottom: 12px; font-family: var(--mono);">
-          <div style="background: var(--panel-raised); padding: 8px 10px; font-size: 10px; font-weight: 700; color: var(--ink-faint); text-transform: uppercase; letter-spacing: 0.8px;">Barrier / Zone</div>
-          <div style="background: var(--panel-raised); padding: 8px 10px; font-size: 10px; font-weight: 700; color: var(--ink-faint); text-transform: uppercase; letter-spacing: 0.8px;">Confirmation TF</div>
-          <div style="background: var(--panel); padding: 8px 10px; font-weight: 600; color: var(--ink);">D1 (Daily)</div>
-          <div style="background: var(--panel); padding: 8px 10px; color: var(--sage); font-weight: 600;">H1</div>
-          <div style="background: var(--panel-raised); padding: 8px 10px; font-weight: 600; color: var(--ink);">H4</div>
-          <div style="background: var(--panel-raised); padding: 8px 10px; color: var(--sage); font-weight: 600;">M15 <span style="color: var(--ink-faint); font-size: 9px;">(Janda: M15, M1)</span></div>
-          <div style="background: var(--panel); padding: 8px 10px; font-weight: 600; color: var(--ink);">H1</div>
-          <div style="background: var(--panel); padding: 8px 10px; color: var(--sage); font-weight: 600;">M5 <span style="color: var(--ink-faint); font-size: 9px;">(Janda: M5, M1)</span></div>
-          <div style="background: var(--panel-raised); padding: 8px 10px; font-weight: 600; color: var(--ink);">M15</div>
-          <div style="background: var(--panel-raised); padding: 8px 10px; color: var(--sage); font-weight: 600;">M1</div>
+      <div style="font-size: 11px; color: var(--ink-dim); margin-top: 10px;">
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1px; background: var(--line); border: 1px solid var(--line); border-radius: 4px; overflow: hidden; font-family: var(--mono);">
+          <div style="background: var(--panel-raised); padding: 7px 10px; font-size: 10px; font-weight: 700; color: var(--ink-faint); text-transform: uppercase;">Barrier</div>
+          <div style="background: var(--panel-raised); padding: 7px 10px; font-size: 10px; font-weight: 700; color: var(--ink-faint); text-transform: uppercase;">CF / Confirmation</div>
+          <div style="background: var(--panel); padding: 7px 10px; font-weight: 600; color: var(--ink);">D1</div>
+          <div style="background: var(--panel); padding: 7px 10px; color: var(--sage); font-weight: 600;">H1</div>
+          <div style="background: var(--panel-raised); padding: 7px 10px; font-weight: 600; color: var(--ink);">H4</div>
+          <div style="background: var(--panel-raised); padding: 7px 10px; color: var(--sage); font-weight: 600;">M15 <span style="color: var(--ink-faint); font-size: 9px;">(Janda: M15, M1)</span></div>
+          <div style="background: var(--panel); padding: 7px 10px; font-weight: 600; color: var(--ink);">H1</div>
+          <div style="background: var(--panel); padding: 7px 10px; color: var(--sage); font-weight: 600;">M5 <span style="color: var(--ink-faint); font-size: 9px;">(Janda: M5, M1)</span></div>
+          <div style="background: var(--panel-raised); padding: 7px 10px; font-weight: 600; color: var(--ink);">M15</div>
+          <div style="background: var(--panel-raised); padding: 7px 10px; color: var(--sage); font-weight: 600;">M1</div>
         </div>
-        <div style="font-size: 10px; line-height: 1.7; color: var(--ink-faint);">
-          <div><span style="color: var(--ink-dim); font-weight: 600;">Direction TFs:</span> D1, H4, H1 — read market direction only</div>
-          <div><span style="color: var(--ink-dim); font-weight: 600;">Execution TFs:</span> M15, M5, M1 — narrative &amp; entry confirmation</div>
+        <div style="font-size: 10px; color: var(--ink-faint); margin-top: 8px; line-height: 1.7;">CF after SOP repeat follows VR timeframe: if VR is M5 → CF also M5 or M1.</div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-head"><div class="card-title">Multi-Timeframe Analysis</div></div>
+      <div style="font-size: 11px; color: var(--ink-dim); margin-top: 10px; line-height: 1.9;">
+        <div style="margin-bottom: 14px;">
+          <div style="font-size: 10px; font-weight: 700; letter-spacing: 0.8px; color: var(--ink-faint); text-transform: uppercase; margin-bottom: 6px;">Direction Timeframes</div>
+          <div style="display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 5px;">
+            <span style="padding: 4px 12px; background: var(--panel-raised); border-radius: 3px; font-family: var(--mono); font-size: 12px; color: var(--amber); font-weight: 700; border: 1px solid rgba(212,168,67,0.25);">D1</span>
+            <span style="padding: 4px 12px; background: var(--panel-raised); border-radius: 3px; font-family: var(--mono); font-size: 12px; color: var(--amber); font-weight: 700; border: 1px solid rgba(212,168,67,0.25);">H4</span>
+            <span style="padding: 4px 12px; background: var(--panel-raised); border-radius: 3px; font-family: var(--mono); font-size: 12px; color: var(--amber); font-weight: 700; border: 1px solid rgba(212,168,67,0.25);">H1</span>
+          </div>
+          <div style="font-size: 10px; color: var(--ink-faint);">Read market direction. Identify HH/HL or LH/LL. Mark BO levels &amp; zones.</div>
+        </div>
+        <div>
+          <div style="font-size: 10px; font-weight: 700; letter-spacing: 0.8px; color: var(--ink-faint); text-transform: uppercase; margin-bottom: 6px;">Execution Timeframes</div>
+          <div style="display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 5px;">
+            <span style="padding: 4px 12px; background: var(--panel-raised); border-radius: 3px; font-family: var(--mono); font-size: 12px; color: var(--sage); font-weight: 700; border: 1px solid rgba(109,183,132,0.25);">M15</span>
+            <span style="padding: 4px 12px; background: var(--panel-raised); border-radius: 3px; font-family: var(--mono); font-size: 12px; color: var(--sage); font-weight: 700; border: 1px solid rgba(109,183,132,0.25);">M5</span>
+            <span style="padding: 4px 12px; background: var(--panel-raised); border-radius: 3px; font-family: var(--mono); font-size: 12px; color: var(--sage); font-weight: 700; border: 1px solid rgba(109,183,132,0.25);">M1</span>
+          </div>
+          <div style="font-size: 10px; color: var(--ink-faint);">Narrative &amp; entry confirmation. Wait for CF / Janda pattern before entering.</div>
         </div>
       </div>
     </div>
-
   </div>
+
 </div>
 
 <!-- INTELLIGENCE: DAILY BIAS -->
