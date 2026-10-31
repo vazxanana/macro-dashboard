@@ -2178,6 +2178,9 @@
     .ms-note { font-size: 11px; color: var(--ink-faint); line-height: 1.6; }
     .ms-offline-box { display: none; }
     .ms-live.ms-offline .ms-offline-box { display: block; }
+    .ms-live.ms-offline .ms-grid4, .ms-live.ms-offline .ms-td, .ms-live.ms-offline .ms-td + .card { display: none; }
+    .ms-open { display: inline-block; margin: 10px 0 6px; padding: 10px 18px; border-radius: 6px; background: #2962ff; color: #fff !important; font-weight: 700; font-size: 14px; text-decoration: none; }
+    .ms-open:focus-visible { outline: 2px solid #fff; outline-offset: 2px; }
     .ms-offline-box { border: 1px solid rgba(240,165,0,.5); background: rgba(240,165,0,.1); border-radius: 6px; padding: 12px 14px; color: var(--ink); font-size: 12px; line-height: 1.6; }
     .ms-offline-box code { font-family: var(--mono); font-size: 11px; }
     @media (max-width: 1000px) { .ms-grid4, .ms-td { grid-template-columns: minmax(0, 1fr); } .ms-chart { height: 360px; } .ms-pane.full .ms-chart { height: 480px; } }
@@ -2209,7 +2212,9 @@
 
     <div class="ms-offline-box" role="alert">
       <b>Live gold prices can't load here.</b> This viewer blocks network requests, so the charts can't reach the price feeds (Binance and Kraken).
-      Open the dashboard from its web address to see live candles, or use <b>Load CSV</b> with a TradingView export (H4, H1, M15 or M1).
+      Open the live version in your browser to see real-time H4, H1, M15 and M1 candles:
+      <a class="ms-open" href="https://raw.githack.com/vazxanana/macro-dashboard/refs/heads/claude/website-display-xoyadz/index.html#market-structure" target="_blank" rel="noopener">Open live charts ↗</a>
+      <span class="ms-note" style="display:block">Or use <b>Load CSV</b> with a TradingView export (H4, H1, M15 or M1).</span>
       <div class="ms-note" id="ms-offline-why"></div>
     </div>
 
@@ -5307,10 +5312,10 @@ try {
       handleScroll: false,
       handleScale: false,
     });
-    window.addEventListener('resize', () => {
-      const w = el.offsetWidth;
-      if (w > 0) ch.applyOptions({ width: w });
-    });
+    let shown = el.clientWidth > 0;
+    new ResizeObserver(() => {
+      if (!shown && el.clientWidth > 0) { shown = true; requestAnimationFrame(() => ch.timeScale().fitContent()); }
+    }).observe(el);
     return ch;
   }
 
