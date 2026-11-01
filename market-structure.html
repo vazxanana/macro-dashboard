@@ -282,7 +282,7 @@
       <li><b>BO (breakout):</b> on H4, a candle closes beyond the last swing low (BO Sell) or swing high (BO Buy). That sets the direction.</li>
       <li><b>Origin:</b> the zone from the BO line to the high (sell) or low (buy) where the breaking move started. Price usually comes back here.</li>
       <li><b>VR:</b> after the break, the move runs out and reverses on H1. That reversal area is the VR, and it is the first target.</li>
-      <li><b>Range:</b> price should retrace at least 50% of the range from the VR back towards the Origin.</li>
+      <li><b>50% rule:</b> measure the whole move after the BO, from the Origin edge where it started to the VR extreme. Its halfway point (like a Fibonacci 50%) is drawn as a dashed line. A CF only counts at or beyond that line, inside the Origin.</li>
       <li><b>CF:</b> only once price is back inside the Origin. A QM beats a normal BO. A <b>Janda</b> is the full pattern: BO Structure in the new direction, then a BO in the same direction.</li>
       <li><b>Entry:</b> on the pullback after the CF, using the Barrier timeframes: H4 → M15 / M1, H1 → M5 / M1, M15 → M1. Stop goes beyond the zone; a body close beyond the Origin cancels the idea.</li>
       <li><b>Clean breakout:</b> every BO needs a candle <b>body</b> to close beyond the wick on the left. A wick through the level is not a break.</li>
@@ -560,8 +560,8 @@ function msNextSetup(bars, A) {
     it.lines.forEach((ln, k) => {
       const x1 = X(ln.l1), x2 = X(ln.l2), y = Y(ln.p);
       if ([x1, x2, y].some((v) => v === null)) return;
-      ctx.strokeStyle = ln.color; ctx.lineWidth = 2;
-      ctx.beginPath(); ctx.moveTo(x1, Math.round(y) + 0.5); ctx.lineTo(x2, Math.round(y) + 0.5); ctx.stroke();
+      ctx.strokeStyle = ln.color; ctx.lineWidth = ln.w || 2; ctx.setLineDash(ln.dash ? [5, 4] : []);
+      ctx.beginPath(); ctx.moveTo(x1, Math.round(y) + 0.5); ctx.lineTo(x2, Math.round(y) + 0.5); ctx.stroke(); ctx.setLineDash([]);
       if (ln.text) texts.push({ pr: 3 - k / 1000, text: ln.text, x: (x1 + x2) / 2, y: ln.below ? y + 14 : y - 6, align: 'center', color: ln.color });
     });
     if (it.path.length > 1) {
@@ -720,6 +720,11 @@ function msNextSetup(bars, A) {
           items.boxes.push({ l1: f.i - 1, l2: f.i + 3, lo: f.lo, hi: f.hi, fill: c.cf, stroke: c.stroke });
           items.labels.push({ l: f.i + 1, p: sell ? f.hi : f.lo, dy: sell ? -6 : 15, text: f.post ? 'CF ✓' : 'CF', align: 'center', color: c.line });
         });
+        const vrPt = e.vr ? e.vr : (e === A.last && A.ext ? { i: A.ext.i, p: A.ext.p } : null);
+        if (G.show.vr && vrPt && (sell ? vrPt.p < e.bot : vrPt.p > e.top)) {
+          const mid = ((sell ? e.top : e.bot) + vrPt.p) / 2;
+          items.lines.push({ l1: vrPt.i, l2: end, p: mid, color: '#9aa4b8', w: 1, dash: true, text: `50% ${fmt(mid)}`, below: !sell });
+        }
         if (G.show.vr && e.vrBox) {
           items.boxes.push({ l1: e.vr.i - 2, l2: Math.min(end, e.vr.i + 14), lo: e.vrBox.lo, hi: e.vrBox.hi, fill: Z.vr.fill, stroke: Z.vr.stroke });
           items.labels.push({ l: e.vr.i, p: sell ? e.vrBox.lo : e.vrBox.hi, dy: sell ? 15 : -6, text: 'VR', align: 'center', color: Z.vr.stroke });
@@ -820,15 +825,19 @@ function msNextSetup(bars, A) {
     const breakT = h4.bars[e.breakIdx].time;
     const h1Events = h1.A.events.filter((x) => x.breakIdx < h1.bars.length && h1.bars[x.breakIdx].time >= breakT);
     const vrDone = !!e.vr || h1Events.some((x) => x.dir === -dir) || h1.A.trend === -dir;
-    const touched = (() => { const t0 = breakT; return h1.bars.some((b) => b.time > t0 && (sell ? b.high >= e.bot : b.low <= e.top)); })();
+    const vr4 = e.vr ? e.vr.p : h4.A.ext.p, fib4 = ((sell ? e.top : e.bot) + vr4) / 2;
+    const gate4 = sell ? Math.max(e.bot, fib4) : Math.min(e.top, fib4);
+    let touch4 = null;
+    for (const b of h1.bars) if (b.time > breakT && (sell ? b.high >= gate4 : b.low <= gate4)) { touch4 = b.time; break; }
+    const touched = touch4 !== null;
     const lastH1 = h1.A.last;
-    const cfDone = touched && lastH1 && lastH1.dir === dir && h1.bars[lastH1.breakIdx].time > breakT && vrDone;
+    const cfDone = touched && lastH1 && lastH1.dir === dir && h1.bars[lastH1.breakIdx].time >= touch4 && vrDone;
     const recentWith = (p, bars) => p.A && p.A.last && p.A.last.dir === dir && (p.bars.length - 1 - p.A.last.breakIdx) <= bars;
     const entry = (inOrigin || cfDone) && (recentWith(m15, 12) || recentWith(m1, 30));
     const steps = [
       { done: true,  t: `H4 BO ${word} at ${fmt(e.level)} (${ftime(breakT)}). Direction: ${word.toUpperCase()}.` },
       { done: vrDone, t: vrDone ? `H1 VR formed: the ${sell ? 'drop' : 'rally'} has reversed on H1.` : `H1 VR: wait for the ${sell ? 'selling' : 'buying'} to stop and reverse on H1.` },
-      { done: touched, t: touched ? `Price came back into the H4 Origin ${fmt(e.bot)} – ${fmt(e.top)}.` : `Wait for price to retrace into the H4 Origin ${fmt(e.bot)} – ${fmt(e.top)}.` },
+      { done: touched, t: touched ? `Price retraced past the 50% line (${fmt(fib4)}) and into the H4 Origin ${fmt(e.bot)} – ${fmt(e.top)}.` : `Wait for price to retrace at least 50% of the move (${fmt(fib4)}) and into the H4 Origin ${fmt(e.bot)} – ${fmt(e.top)}.` },
       { done: cfDone, t: cfDone ? `H1 CF confirmed: H1 printed a BO ${word} from inside the Origin.` : `H1 CF: inside the Origin, wait for an H1 ${sell ? 'lower high and BO Sell' : 'higher low and BO Buy'}.` },
       { done: entry, t: entry ? `Entry window: M15/M1 broke ${sell ? 'down' : 'up'} in line with H4. Barrier entry, stop beyond ${fmt(sell ? e.top : e.bot)}.` : `M15 / M1: enter only on a ${word} Barrier pattern (Simple CF or Janda) after the H1 CF.` },
     ];
@@ -886,8 +895,11 @@ function msNextSetup(bars, A) {
     const inOrigin = price >= e.bot && price <= e.top;
     const after = lp.A.events.filter((x) => lp.bars[x.breakIdx].time >= breakT);
     const vr = !!e.vr || after.some((x) => x.dir === -dir);
+    // 50% rule: halfway between the Origin edge where the move started and the VR extreme; a CF only counts at or beyond it
+    const vrP = e.vr ? e.vr.p : hp.A.ext.p, far = sell ? e.top : e.bot, fib = (far + vrP) / 2;
+    const gate = sell ? Math.max(e.bot, fib) : Math.min(e.top, fib);
     let touchT = null;
-    for (const b of lp.bars) if (b.time > breakT && (sell ? b.high >= e.bot : b.low <= e.top)) { touchT = b.time; break; }
+    for (const b of lp.bars) if (b.time > breakT && (sell ? b.high >= gate : b.low <= gate)) { touchT = b.time; break; }
     const touched = touchT !== null;
     const ll = lp.A.last;
     // PDF: the CF must form inside the Origin; QM beats a normal BO; Janda = BO Structure then BO in the same direction
@@ -898,13 +910,12 @@ function msNextSetup(bars, A) {
       const flip = inZone.findIndex((x) => x.dir === dir && x.structure);
       model = flip < 0 ? 'BO' : inZone.slice(flip + 1).some((x) => x.dir === dir) ? 'Janda' : 'QM';
     }
-    const vrP = e.vr ? e.vr.p : hp.A.ext.p, far = sell ? e.top : e.bot;
     const ext = lp.bars.filter((b) => b.time > breakT).reduce((m, b) => sell ? Math.max(m, b.high) : Math.min(m, b.low), sell ? -Infinity : Infinity);
     const retr = vr && isFinite(ext) && far !== vrP ? Math.max(0, Math.min(1.5, (ext - vrP) / (far - vrP))) : null;
     const buf = Math.max(0.08 * h, price * 0.00005);
     let entry, stop;
     if (cf) { entry = ll.level; stop = sell ? ll.top + buf / 2 : ll.bot - buf / 2; }
-    else { entry = sell ? e.bot + 0.5 * h : e.top - 0.5 * h; stop = sell ? e.top + buf : e.bot - buf; }
+    else { entry = gate; stop = sell ? e.top + buf : e.bot - buf; }
     const r = Math.abs(stop - entry);
     let t1 = hp.A.ext.p;
     if ((t1 - entry) * sgn < r) t1 = entry + sgn * 2 * r;
@@ -913,12 +924,13 @@ function msNextSetup(bars, A) {
     let state, cls, next;
     if (beyond) { state = 'INVALID'; cls = 'bad'; next = `Price is beyond the ${H} Origin. Wait for the next ${H} BO.`; }
     else if (cf) { state = 'READY'; cls = model === 'BO' ? 'near' : 'ready'; next = `${Lo} ${model === 'Janda' ? 'Janda (BO Structure, then BO ' + (sell ? 'Sell' : 'Buy') + ')' : model === 'QM' ? 'QM' : 'BO'} confirmed inside the ${H} Origin. Enter on the pullback to ${fmt(entry)} with an ${pr.e} Barrier, stop beyond ${fmt(stop)}.`; }
-    else if (inOrigin || touched) { state = 'IN ORIGIN'; cls = 'near'; next = `Price is in the ${H} Origin. Wait for ${Lo} to confirm with a QM or Janda (BO Structure ${sell ? 'Sell' : 'Buy'}, then BO ${sell ? 'Sell' : 'Buy'}), then ${word} the pullback.`; }
-    else if (vr) { state = 'WAIT RETRACE'; cls = ''; next = `${H} VR is in. Wait for price to come back ${sell ? 'up' : 'down'} into ${fmt(e.bot)} – ${fmt(e.top)} (${fmt(dist)} pts away).`; }
+    else if (inOrigin && !touched) { state = 'UNDER 50%'; cls = 'near'; next = `Price is in the ${H} Origin but hasn't reached the 50% line (${fmt(fib)}). A CF here doesn't count yet.`; }
+    else if (touched) { state = 'IN ORIGIN'; cls = 'near'; next = `Price is in the ${H} Origin. Wait for ${Lo} to confirm with a QM or Janda (BO Structure ${sell ? 'Sell' : 'Buy'}, then BO ${sell ? 'Sell' : 'Buy'}), then ${word} the pullback.`; }
+    else if (vr) { state = 'WAIT RETRACE'; cls = ''; next = `${H} VR is in. Wait for price to come back ${sell ? 'up' : 'down'} to ${fmt(gate)}: the 50% line of the move, inside the Origin ${fmt(e.bot)} – ${fmt(e.top)} (${fmt(dist)} away).`; }
     else { state = 'WAIT VR'; cls = ''; next = `${H} just broke ${sell ? 'down' : 'up'}. Let the move finish and reverse on ${Lo} before planning the ${word}.`; }
     const upP = pr.up && panes[pr.up];
     const align = !upP || !upP.A ? null : upP.A.trend === dir;
-    return { k: pr.k, name: pr.name, pair: `${H} → ${Lo}`, sell, entry, stop, t1, t2, rr, r, state, cls, next, align, upL: pr.up ? LBL[pr.up] : '', size: sizeText(r, price), invalid: beyond, model, retr };
+    return { k: pr.k, name: pr.name, pair: `${H} → ${Lo}`, sell, entry, stop, t1, t2, rr, r, state, cls, next, align, upL: pr.up ? LBL[pr.up] : '', size: sizeText(r, price), invalid: beyond, model, retr, fib };
   }
   function sizeText(r, price) {
     const usd = (v) => '$' + Math.ceil(v).toLocaleString('en-US');
@@ -936,7 +948,7 @@ function msNextSetup(bars, A) {
   function renderTrades(price) {
     const list = PAIRS.map((pr) => buildSetup(pr, price)).filter(Boolean);
     if (!list.length) return;
-    const order = { READY: 0, 'IN ORIGIN': 1, 'WAIT RETRACE': 2, 'WAIT VR': 3, INVALID: 4 };
+    const order = { READY: 0, 'IN ORIGIN': 1, 'UNDER 50%': 2, 'WAIT RETRACE': 3, 'WAIT VR': 4, INVALID: 5 };
     if (!G.sel || !list.some((t) => t.k === G.sel && !t.invalid)) {
       const best = list.slice().sort((a, b) => order[a.state] - order[b.state])[0];
       G.sel = best.k;
@@ -949,7 +961,7 @@ function msNextSetup(bars, A) {
         `<div class="ms-tr-g"><span>Entry<b>${fmt(t.entry)}</b></span><span>Stop<b class="neg">${fmt(t.stop)}</b></span><span>Target 1<b class="pos">${fmt(t.t1)}</b></span>` +
         `<span>Target 2<b class="pos">${fmt(t.t2)}</b></span><span>Reward : risk<b>${t.rr.toFixed(1)} R</b></span><span>Size<b>${size}</b></span></div>` +
         `<div class="ms-tr-q">${t.model ? `<span class="ms-q ${t.model === 'BO' ? 'weak' : 'good'}">CF · ${t.model === 'BO' ? 'BO normal' : t.model}</span>` : ''}` +
-        `${t.retr !== null ? `<span class="ms-q ${t.retr >= 0.5 ? 'good' : 'weak'}">Retrace ${t.retr >= 1 ? '100%+' : Math.round(t.retr * 100) + '%'} of VR→Origin${t.retr >= 0.5 ? ' ✓' : ' (under 50%)'}</span>` : ''}</div>` +
+        `${t.retr !== null ? `<span class="ms-q ${t.retr >= 0.5 ? 'good' : 'weak'}">50% line ${fmt(t.fib)} · ${t.retr >= 0.5 ? 'reached ✓' : `${Math.round(t.retr * 100)}% so far`}</span>` : ''}</div>` +
         `<div class="ms-tr-n">${t.next}</div></button>`;
     }).join('');
     $('ms-trades').querySelectorAll('.ms-trade').forEach((b) => b.addEventListener('click', () => { G.sel = b.dataset.k; G.planKey = ''; renderTrades(price); }));
