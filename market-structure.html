@@ -251,6 +251,41 @@
   .ms-sess b { color: #089981; font-weight: 700; }
   .ms-badge { font: 700 11px var(--mono); color: #fff; background: #089981; padding: 3px 9px; border-radius: 12px; text-decoration: none; white-space: nowrap; }
   .ms-badge[hidden] { display: none; }
+  .tabs { position: sticky; top: var(--top-h, 58px); z-index: 19; display: flex; gap: 4px; overflow-x: auto; scrollbar-width: none; margin: -6px calc(-1 * max(16px, env(safe-area-inset-left, 0px))) 0; padding: 8px max(16px, env(safe-area-inset-left, 0px));
+    background: color-mix(in srgb, var(--bg) 92%, transparent); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); border-bottom: 1px solid var(--line-soft); }
+  .tabs::-webkit-scrollbar { display: none; }
+  .tabs a { flex: none; padding: 7px 13px; border-radius: 6px; color: var(--ink-dim); text-decoration: none; font: 600 13px var(--sans); }
+  .tabs a:hover { color: var(--ink); background: var(--panel); }
+  .tabs a[aria-current="page"] { color: #fff; background: var(--accent); }
+  .tabs a:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+  .view { display: grid; gap: 14px; min-width: 0; }
+  .view[hidden] { display: none; }
+  .home { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+  .tile { display: flex; flex-direction: column; gap: 8px; min-height: 168px; padding: 16px; border: 1px solid var(--line); border-radius: 10px; background: var(--panel); color: var(--ink); text-decoration: none; transition: border-color .15s, transform .15s; min-width: 0; }
+  .tile:hover { border-color: var(--accent); transform: translateY(-1px); }
+  .tile:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  .tile.wide { grid-column: span 2; }
+  .tile-k { display: flex; align-items: center; justify-content: space-between; gap: 8px; font-size: 10px; letter-spacing: 1.2px; text-transform: uppercase; color: var(--ink-faint); font-weight: 600; }
+  .tile-big { font: 600 18px/1.35 var(--sans); color: var(--ink); }
+  .tile-big small { font-size: 13px; color: var(--ink-faint); font-weight: 500; }
+  .tile-big b { color: #089981; font-weight: 700; }
+  .tile.wide .tile-big { font-size: 15px; font-weight: 500; line-height: 1.5; }
+  .tile-sub { font-size: 12px; color: var(--ink-dim); line-height: 1.6; }
+  .tile-sub b { color: var(--ink); }
+  .tile-sub .ms-align { margin: 0; }
+  .tile-go { margin-top: auto; font: 600 12px var(--sans); color: var(--accent); }
+  .tile-go::after { content: " →"; }
+  .h-warn { padding: 10px 14px; border-radius: 8px; border: 1px solid rgba(240,165,0,.5); background: rgba(240,165,0,.12); font-size: 13px; line-height: 1.5; }
+  .h-warn[hidden] { display: none; }
+  .ms-sess-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; }
+  .ms-sess-list li { display: grid; grid-template-columns: 110px minmax(0, 1fr) auto; gap: 10px; align-items: center; padding: 10px 12px; border: 1px solid var(--line); border-radius: 6px; font-size: 12px; color: var(--ink-dim); }
+  .ms-sess-list li b { color: var(--ink); font-size: 13px; }
+  .ms-sess-list li em { font: 600 11px var(--mono); font-style: normal; color: var(--ink-faint); }
+  .ms-sess-list li.on { border-color: rgba(8,153,129,.5); background: rgba(8,153,129,.06); }
+  .ms-sess-list li.on em { color: #089981; }
+  .how ol { margin-top: 0; }
+  @media (max-width: 1000px) { .home { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+  @media (max-width: 620px) { .home { grid-template-columns: minmax(0, 1fr); } .tile.wide { grid-column: auto; } .tile { min-height: 0; } .ms-sess-list li { grid-template-columns: minmax(0, 1fr) auto; } .ms-sess-list li span { grid-column: 1 / -1; grid-row: 2; } }
   @media (max-width: 700px) {
     .px b { font-size: 18px; }
     .ms-status .upd { display: none; }
@@ -267,7 +302,7 @@
     <div class="brand"><i class="ms-coin" aria-hidden="true"></i><div><label class="sr" for="ms-inst">Market</label><select id="ms-inst" class="inst"><option>XAU/USD · Gold</option></select><span id="ms-inst-name">Gold · Mosha structure</span></div></div>
     <div class="px"><b id="ms-hdr-price">—</b><span id="ms-hdr-chg" class="hdr-chg"></span></div>
     <span class="ms-sess" id="ms-sess" title="Trading sessions"></span>
-    <a class="ms-badge" id="ms-scan-badge" href="#ms-scan-card" hidden></a>
+    <a class="ms-badge" id="ms-scan-badge" href="#scanner" hidden></a>
     <span class="ms-status"><i class="ms-live-dot" id="ms-live-dot"></i><span id="ms-live-txt">Connecting…</span><span class="upd"> · <span id="ms-updated">—</span></span></span>
     <div class="top-actions">
       <button type="button" class="ms-tbtn" id="ms-alerts" aria-pressed="false">Alerts off</button>
@@ -306,82 +341,170 @@
       </details>
     </div>
   </header>
+  <nav class="tabs" aria-label="Sections">
+    <a href="#home" data-go="home">Home</a><a href="#setup" data-go="setup">Setup</a><a href="#charts" data-go="charts">Charts</a><a href="#scanner" data-go="scanner">Scanner</a><a href="#news" data-go="news">News</a><a href="#journal" data-go="journal">Journal</a><a href="#backtest" data-go="backtest">Backtest</a><a href="#guide" data-go="guide">Guide</a>
+  </nav>
+
 
   <div class="ms-offline-box" role="alert">
     <b>Live prices couldn't load.</b> The page couldn't reach the price feeds (Binance and Kraken). Check your connection; some networks and countries block these exchanges. You can still use <b>Settings → Load CSV</b> with a TradingView export.
     <div class="ms-note" id="ms-offline-why"></div>
   </div>
 
-  <div class="card ms-td">
-    <div>
-      <div class="ms-news-warn" id="ms-news-warn" role="alert" hidden></div>
-      <div class="ms-k">What to do now <span class="ms-chip" id="ms-td-bias">—</span></div>
-      <ol class="ms-steps" id="ms-td-steps"><li><span class="ms-dot">…</span><span>Loading live candles.</span></li></ol>
-      <div class="ms-now" id="ms-td-now">Loading H4, H1, M15 and M1…</div>
+  <!-- ─── Home: one card per section ─── -->
+  <section class="view" id="v-home" aria-label="Home">
+    <div class="h-warn" id="h-warn" role="alert" hidden></div>
+    <div class="home">
+      <a class="tile wide" href="#setup">
+        <span class="tile-k">Setup now <span class="ms-chip" id="h-bias">—</span></span>
+        <span class="tile-big" id="h-step">Loading live candles…</span>
+        <span class="tile-sub" id="h-align"></span>
+        <span class="tile-go">Open setup</span>
+      </a>
+      <a class="tile" href="#setup">
+        <span class="tile-k">Possible trades</span>
+        <span class="tile-big" id="h-ready">—</span>
+        <span class="tile-sub" id="h-best"></span>
+        <span class="tile-go">See trades</span>
+      </a>
+      <a class="tile" href="#charts">
+        <span class="tile-k">Charts</span>
+        <span class="tile-big">D1 · H4 · H1 · M15 · M5 · M1</span>
+        <span class="tile-sub">Live candles with BO lines, Origin, VR, CF and the 50% line.</span>
+        <span class="tile-go">Open charts</span>
+      </a>
+      <a class="tile" href="#scanner">
+        <span class="tile-k">Scanner</span>
+        <span class="tile-big" id="h-scan">Scanning soon</span>
+        <span class="tile-sub" id="h-scan-list"></span>
+        <span class="tile-go">All markets</span>
+      </a>
+      <a class="tile" href="#news">
+        <span class="tile-k">Sessions &amp; news</span>
+        <span class="tile-big" id="h-sess">—</span>
+        <span class="tile-sub" id="h-news"></span>
+        <span class="tile-go">Calendar</span>
+      </a>
+      <a class="tile" href="#journal">
+        <span class="tile-k">Journal</span>
+        <span class="tile-big" id="h-j">No trades yet</span>
+        <span class="tile-sub" id="h-j-sub">Log trades from the Setup page and track your results.</span>
+        <span class="tile-go">Open journal</span>
+      </a>
+      <a class="tile" href="#backtest">
+        <span class="tile-k">Backtest</span>
+        <span class="tile-big" id="h-bt">Not run yet</span>
+        <span class="tile-sub">Replay the rules over recent history and see how each setup scored.</span>
+        <span class="tile-go">Run backtest</span>
+      </a>
+      <a class="tile" href="#guide">
+        <span class="tile-k">Guide</span>
+        <span class="tile-big">How the setup works</span>
+        <span class="tile-sub">BO, Origin, VR, the 50% line, CF and the stop.</span>
+        <span class="tile-go">Read</span>
+      </a>
     </div>
-    <div class="ms-kv">
-      <div><span>Spot price</span><b id="ms-td-price">—</b></div>
-      <div><span>H4 invalidation (close beyond)</span><b id="ms-td-inval">—</b></div>
-      <div style="display:block;border:0"><span>Timeframes agreeing with H4</span><div class="ms-align" id="ms-td-align"></div></div>
-      <div style="display:block;border:0"><span>High-impact news</span><ul class="ms-news" id="ms-news"><li>Loading calendar…</li></ul></div>
-      <div class="ms-note" id="ms-feed-note" style="display:block;border:0"></div>
+  </section>
+
+  <!-- ─── Setup: checklist + possible trades ─── -->
+  <section class="view" id="v-setup" aria-label="Setup" hidden>
+    <div class="ms-news-warn" id="ms-news-warn" role="alert" hidden></div>
+    <div class="card ms-td">
+      <div>
+        <div class="ms-k">What to do now <span class="ms-chip" id="ms-td-bias">—</span></div>
+        <ol class="ms-steps" id="ms-td-steps"><li><span class="ms-dot">…</span><span>Loading live candles.</span></li></ol>
+        <div class="ms-now" id="ms-td-now">Loading charts…</div>
+      </div>
+      <div class="ms-kv">
+        <div><span>Spot price</span><b id="ms-td-price">—</b></div>
+        <div><span>H4 invalidation (close beyond)</span><b id="ms-td-inval">—</b></div>
+        <div style="display:block;border:0"><span>Timeframes agreeing with H4</span><div class="ms-align" id="ms-td-align"></div></div>
+        <div class="ms-note" id="ms-feed-note" style="display:block;border:0"></div>
+      </div>
     </div>
-  </div>
-
-  <div class="card">
-    <div class="ms-k">Possible trades <span class="ms-risk"><label for="ms-risk">Risk per trade $</label><input id="ms-risk" type="number" min="1" step="10" value="100" inputmode="decimal"></span></div>
-    <div class="ms-trades" id="ms-trades"><div class="ms-note">Waiting for live candles…</div></div>
-    <div class="ms-tr-foot"><span class="ms-note">Tap a trade to draw it on the charts. Setups follow the Mosha rules and are not financial advice.</span><button type="button" class="ms-tbtn" id="ms-log">Log selected trade</button></div>
-  </div>
-
-  <div class="card" id="ms-scan-card">
-    <div class="ms-k">Scanner · all markets <span class="ms-scan-meta"><span id="ms-scan-meta">Starts after the charts load</span><button type="button" class="ms-tbtn" id="ms-scan-btn">Scan now</button></span></div>
-    <div class="ms-scan" id="ms-scan"></div>
-    <div class="ms-note" style="margin-top:10px">Every market runs the same Mosha rules on D1, H4, H1, M15, M5 and M1, refreshed every 5 minutes. Tap a market to open its charts. With Alerts on, you're told when any market turns Ready.</div>
-  </div>
-
-  <div class="sec-h">
-    <h2>Charts</h2>
-    <div class="seg" role="group" aria-label="Chart view">
-      <button type="button" data-view="1d">D1</button><button type="button" data-view="4h">H4</button><button type="button" data-view="1h">H1</button><button type="button" data-view="15m">M15</button><button type="button" data-view="5m">M5</button><button type="button" data-view="1m">M1</button><button type="button" data-view="all">All</button>
+    <div class="card">
+      <div class="ms-k">Possible trades <span class="ms-risk"><label for="ms-risk">Risk per trade $</label><input id="ms-risk" type="number" min="1" step="10" value="100" inputmode="decimal"></span></div>
+      <div class="ms-trades" id="ms-trades"><div class="ms-note">Waiting for live candles…</div></div>
+      <div class="ms-tr-foot"><span class="ms-note">Tap a trade to draw it on the charts. Setups follow the Mosha rules and are not financial advice.</span><button type="button" class="ms-tbtn" id="ms-log">Log selected trade</button></div>
     </div>
-  </div>
+  </section>
 
-  <div class="ms-grid4">
-    <div class="ms-pane" data-tf="1d"><div class="ms-ph"><b>D1</b><span class="ms-role">Bias · D1 → H1</span><span class="ms-chip" id="ms-t-1d">—</span><span class="ms-cd" id="ms-cd-1d" title="Time until this candle closes"></span></div><div class="ms-legend" id="ms-l-1d"></div><div class="ms-chart" id="ms-c-1d"></div><div class="ms-ro" id="ms-r-1d"></div></div>
-    <div class="ms-pane" data-tf="4h"><div class="ms-ph"><b>H4</b><span class="ms-role">Direction · BO</span><span class="ms-chip" id="ms-t-4h">—</span><span class="ms-cd" id="ms-cd-4h" title="Time until this candle closes"></span></div><div class="ms-legend" id="ms-l-4h"></div><div class="ms-chart" id="ms-c-4h"></div><div class="ms-ro" id="ms-r-4h"></div></div>
-    <div class="ms-pane" data-tf="1h"><div class="ms-ph"><b>H1</b><span class="ms-role">VR · CF</span><span class="ms-chip" id="ms-t-1h">—</span><span class="ms-cd" id="ms-cd-1h" title="Time until this candle closes"></span></div><div class="ms-legend" id="ms-l-1h"></div><div class="ms-chart" id="ms-c-1h"></div><div class="ms-ro" id="ms-r-1h"></div></div>
-    <div class="ms-pane" data-tf="15m"><div class="ms-ph"><b>M15</b><span class="ms-role">Narrative · Barrier</span><span class="ms-chip" id="ms-t-15m">—</span><span class="ms-cd" id="ms-cd-15m" title="Time until this candle closes"></span></div><div class="ms-legend" id="ms-l-15m"></div><div class="ms-chart" id="ms-c-15m"></div><div class="ms-ro" id="ms-r-15m"></div></div>
-    <div class="ms-pane" data-tf="5m"><div class="ms-ph"><b>M5</b><span class="ms-role">H1 barrier entry</span><span class="ms-chip" id="ms-t-5m">—</span><span class="ms-cd" id="ms-cd-5m" title="Time until this candle closes"></span></div><div class="ms-legend" id="ms-l-5m"></div><div class="ms-chart" id="ms-c-5m"></div><div class="ms-ro" id="ms-r-5m"></div></div>
-    <div class="ms-pane" data-tf="1m"><div class="ms-ph"><b>M1</b><span class="ms-role">Entry trigger</span><span class="ms-chip" id="ms-t-1m">—</span><span class="ms-cd" id="ms-cd-1m" title="Time until this candle closes"></span></div><div class="ms-legend" id="ms-l-1m"></div><div class="ms-chart" id="ms-c-1m"></div><div class="ms-ro" id="ms-r-1m"></div></div>
-  </div>
+  <!-- ─── Charts ─── -->
+  <section class="view" id="v-charts" aria-label="Charts" hidden>
+    <div class="sec-h">
+      <h2>Charts</h2>
+      <div class="seg" role="group" aria-label="Chart view">
+        <button type="button" data-view="1d">D1</button><button type="button" data-view="4h">H4</button><button type="button" data-view="1h">H1</button><button type="button" data-view="15m">M15</button><button type="button" data-view="5m">M5</button><button type="button" data-view="1m">M1</button><button type="button" data-view="all">All</button>
+      </div>
+    </div>
+    <div class="ms-grid4">
+      <div class="ms-pane" data-tf="1d"><div class="ms-ph"><b>D1</b><span class="ms-role">Bias</span><span class="ms-chip" id="ms-t-1d">—</span><span class="ms-cd" id="ms-cd-1d" title="Time until this candle closes"></span></div><div class="ms-legend" id="ms-l-1d"></div><div class="ms-chart" id="ms-c-1d"></div><div class="ms-ro" id="ms-r-1d"></div></div>
+      <div class="ms-pane" data-tf="4h"><div class="ms-ph"><b>H4</b><span class="ms-role">Direction · BO</span><span class="ms-chip" id="ms-t-4h">—</span><span class="ms-cd" id="ms-cd-4h" title="Time until this candle closes"></span></div><div class="ms-legend" id="ms-l-4h"></div><div class="ms-chart" id="ms-c-4h"></div><div class="ms-ro" id="ms-r-4h"></div></div>
+      <div class="ms-pane" data-tf="1h"><div class="ms-ph"><b>H1</b><span class="ms-role">VR · CF</span><span class="ms-chip" id="ms-t-1h">—</span><span class="ms-cd" id="ms-cd-1h" title="Time until this candle closes"></span></div><div class="ms-legend" id="ms-l-1h"></div><div class="ms-chart" id="ms-c-1h"></div><div class="ms-ro" id="ms-r-1h"></div></div>
+      <div class="ms-pane" data-tf="15m"><div class="ms-ph"><b>M15</b><span class="ms-role">Narrative</span><span class="ms-chip" id="ms-t-15m">—</span><span class="ms-cd" id="ms-cd-15m" title="Time until this candle closes"></span></div><div class="ms-legend" id="ms-l-15m"></div><div class="ms-chart" id="ms-c-15m"></div><div class="ms-ro" id="ms-r-15m"></div></div>
+      <div class="ms-pane" data-tf="5m"><div class="ms-ph"><b>M5</b><span class="ms-role">Entry timing</span><span class="ms-chip" id="ms-t-5m">—</span><span class="ms-cd" id="ms-cd-5m" title="Time until this candle closes"></span></div><div class="ms-legend" id="ms-l-5m"></div><div class="ms-chart" id="ms-c-5m"></div><div class="ms-ro" id="ms-r-5m"></div></div>
+      <div class="ms-pane" data-tf="1m"><div class="ms-ph"><b>M1</b><span class="ms-role">Entry trigger</span><span class="ms-chip" id="ms-t-1m">—</span><span class="ms-cd" id="ms-cd-1m" title="Time until this candle closes"></span></div><div class="ms-legend" id="ms-l-1m"></div><div class="ms-chart" id="ms-c-1m"></div><div class="ms-ro" id="ms-r-1m"></div></div>
+    </div>
+  </section>
 
-  <div class="card" id="ms-bt-card">
-    <div class="ms-k">Backtest <span class="ms-scan-meta"><span id="ms-bt-meta"></span><button type="button" class="ms-tbtn" id="ms-bt-btn">Run backtest</button></span></div>
-    <div id="ms-bt"><div class="ms-note">Replays the Mosha rules candle by candle over this market's recent history and scores every setup that turned Ready: a limit order at the entry, the stop and Target 1.</div></div>
-  </div>
+  <!-- ─── Scanner ─── -->
+  <section class="view" id="v-scanner" aria-label="Scanner" hidden>
+    <div class="card" id="ms-scan-card">
+      <div class="ms-k">Scanner · all markets <span class="ms-scan-meta"><span id="ms-scan-meta">Starts after the charts load</span><button type="button" class="ms-tbtn" id="ms-scan-btn">Scan now</button></span></div>
+      <div class="ms-scan" id="ms-scan"></div>
+      <div class="ms-note" style="margin-top:10px">Every market runs the same Mosha rules on D1, H4, H1, M15, M5 and M1, refreshed every 5 minutes. Tap a market to open it. With Alerts on, you're told when any market turns Ready.</div>
+    </div>
+  </section>
 
-  <div class="card" id="ms-j-card">
-    <div class="ms-k">Trade journal <span class="ms-scan-meta"><button type="button" class="ms-tbtn" id="ms-j-csv">Export CSV</button></span></div>
-    <div id="ms-j-stats" class="ms-j-stats"></div>
-    <div class="ms-j-wrap"><table class="ms-j"><thead><tr><th>Logged</th><th>Market</th><th>Setup</th><th>Side</th><th>Entry</th><th>Stop</th><th>Target 1</th><th>CF</th><th>Result</th><th>R</th><th>Notes</th><th><span class="sr">Delete</span></th></tr></thead><tbody id="ms-j-body"></tbody></table></div>
-    <div class="ms-note" style="margin-top:10px">Saved in this browser only. Open trades on the market you're viewing are checked against live candles and marked Win or Loss automatically; change the result any time.</div>
-  </div>
+  <!-- ─── Sessions & news ─── -->
+  <section class="view" id="v-news" aria-label="Sessions and news" hidden>
+    <div class="card">
+      <div class="ms-k">Trading sessions</div>
+      <ul class="ms-sess-list" id="ms-sess-list"></ul>
+    </div>
+    <div class="card">
+      <div class="ms-k">High-impact news</div>
+      <ul class="ms-news" id="ms-news"><li>Loading calendar…</li></ul>
+      <div class="ms-note" style="margin-top:10px">Spreads widen and breaks often fake out around high-impact releases. A warning shows 30 minutes before; wait until 15 minutes after the release before taking a setup.</div>
+    </div>
+  </section>
 
-  <details class="card how">
-    <summary>How the setup works</summary>
-    <ol>
-      <li><b>BO (breakout):</b> on H4, a candle closes beyond the last swing low (BO Sell) or swing high (BO Buy). That sets the direction.</li>
-      <li><b>Origin:</b> the zone from the BO line to the high (sell) or low (buy) where the breaking move started. Price usually comes back here.</li>
-      <li><b>VR:</b> after the break, the move runs out and reverses on H1. That reversal area is the VR, and it is the first target.</li>
-      <li><b>50% line:</b> measure the whole move after the BO, from the Origin edge where it started to the VR extreme. The halfway point (like a Fibonacci 50%) is drawn as a dashed line. A pullback that stays under it is <b>internal structure</b>; once price goes past it, it's the <b>main structure</b>.</li>
-      <li><b>CF:</b> only once price is back inside the Origin. A QM beats a normal BO. A <b>Janda</b> is the full pattern: BO Structure in the new direction, then a BO in the same direction.</li>
-      <li><b>Entry:</b> on the pullback after the CF, using the Barrier timeframes: H4 → M15 / M1, H1 → M5 / M1, M15 → M1. The stop goes just past the swing the confirming BO started from (the CF zone), padded by a small buffer sized to that timeframe's candles. A body close beyond the Origin cancels the idea.</li>
-      <li><b>Clean breakout:</b> every BO needs a candle <b>body</b> to close beyond the wick on the left. A wick through the level is not a break.</li>
-    </ol>
-  </details>
+  <!-- ─── Journal ─── -->
+  <section class="view" id="v-journal" aria-label="Journal" hidden>
+    <div class="card" id="ms-j-card">
+      <div class="ms-k">Trade journal <span class="ms-scan-meta"><button type="button" class="ms-tbtn" id="ms-j-csv">Export CSV</button></span></div>
+      <div id="ms-j-stats" class="ms-j-stats"></div>
+      <div class="ms-j-wrap"><table class="ms-j"><thead><tr><th>Logged</th><th>Market</th><th>Setup</th><th>Side</th><th>Entry</th><th>Stop</th><th>Target 1</th><th>Result</th><th>R</th><th>Notes</th><th><span class="sr">Delete</span></th></tr></thead><tbody id="ms-j-body"></tbody></table></div>
+      <div class="ms-note" style="margin-top:10px">Saved in this browser only. Open trades on the market you're viewing are checked against live candles and marked Win or Loss automatically; change the result any time.</div>
+    </div>
+  </section>
 
-  <p class="foot">Live candles from Binance and Kraken public feeds; gold is aligned to XAU/USD spot via gold-api.com. Times are in your local zone.<br>Version 1 Nov 2026 · precise stops</p>
+  <!-- ─── Backtest ─── -->
+  <section class="view" id="v-backtest" aria-label="Backtest" hidden>
+    <div class="card" id="ms-bt-card">
+      <div class="ms-k">Backtest <span class="ms-scan-meta"><span id="ms-bt-meta"></span><button type="button" class="ms-tbtn" id="ms-bt-btn">Run backtest</button></span></div>
+      <div id="ms-bt"><div class="ms-note">Replays the Mosha rules candle by candle over this market's recent history and scores every setup that turned Ready: a limit order at the entry, the stop and Target 1.</div></div>
+    </div>
+  </section>
+
+  <!-- ─── Guide ─── -->
+  <section class="view" id="v-guide" aria-label="Guide" hidden>
+    <div class="card how">
+      <div class="ms-k">How the setup works</div>
+      <ol>
+        <li><b>BO (breakout):</b> on H4, a candle closes beyond the last swing low (BO Sell) or swing high (BO Buy). That sets the direction. D1 shows whether the bigger picture agrees.</li>
+        <li><b>Clean breakout:</b> every BO needs a candle <b>body</b> to close beyond the wick on the left. A wick through the level is not a break.</li>
+        <li><b>Origin:</b> the zone from the BO line to the high (sell) or low (buy) where the breaking move started. Price usually comes back here.</li>
+        <li><b>VR:</b> after the break, the move runs out and reverses on H1. That reversal area is the VR, and it is the first target.</li>
+        <li><b>50% line:</b> measure the whole move after the BO, from the Origin edge where it started to the VR extreme. The halfway point (like a Fibonacci 50%) is drawn as a dashed line. A pullback that stays under it is <b>internal structure</b>; once price goes past it, it's the <b>main structure</b>.</li>
+        <li><b>CF:</b> once price is back inside the Origin, wait for the lower timeframe to break in the trade's direction. That break is the CF.</li>
+        <li><b>Entry and stop:</b> enter on the pullback to the CF level. The stop goes just past the swing the CF break started from, padded by a small buffer sized to that timeframe's candles. A body close beyond the Origin cancels the idea.</li>
+        <li><b>Timeframe pairs:</b> Position D1 → H1, Swing H4 → H1, Intraday H1 → M5, Scalp M15 → M1.</li>
+      </ol>
+    </div>
+  </section>
+
+  <p class="foot">Live candles from Binance and Kraken public feeds; gold is aligned to XAU/USD spot via gold-api.com. Times are in your local zone.<br>Version 1 Nov 2026 · home page</p>
   <div class="ms-toasts" id="ms-toasts" role="status" aria-live="polite"></div>
 </div>
 <script>
@@ -522,7 +645,7 @@ function msNextSetup(bars, A) {
     steps = [
       `Wait for the H1 VR: price ${sell ? 'stops making lower lows and reverses' : 'stops making higher highs and reverses'} near ${fmt(A.ext.p)}.`,
       `Let it retrace back into the Origin ${zone}. Do not chase the move.`,
-      `Inside the Origin, wait for an H1 CF (${sell ? 'lower high' : 'higher low'}), then ${sell ? 'sell' : 'buy'} with a Barrier entry on M15/M5.`,
+      `Inside the Origin, wait for an H1 CF (${sell ? 'lower high' : 'higher low'}), then ${sell ? 'sell' : 'buy'} the pullback on M15/M5.`,
     ];
   } else if (brokenAway) {
     phase = 'VR formed, retracing to Origin';
@@ -536,7 +659,7 @@ function msNextSetup(bars, A) {
     steps = [
       `Price is trading inside the Origin ${zone}.`,
       `Drop to H1: look for a CF (${sell ? 'lower high with an internal BO Sell' : 'higher low with an internal BO Buy'}).`,
-      `Enter on M15/M5 Barrier (Simple CF or Janda). Stop beyond the Origin.`,
+      `Enter on the pullback after the CF. Stop just past the CF swing.`,
     ];
   } else {
     phase = 'Origin under pressure';
@@ -565,11 +688,11 @@ function msNextSetup(bars, A) {
   if (!LW || !root) return;
 
   const TFS = [
-    { id: '1d',  label: 'D1',  role: 'Bias · D1 → H1',          sec: 86400, binance: '1d',  kraken: 1440, poll: 300e3 },
+    { id: '1d',  label: 'D1',  role: 'Bias',                    sec: 86400, binance: '1d',  kraken: 1440, poll: 300e3 },
     { id: '4h',  label: 'H4',  role: 'Direction · BO',          sec: 14400, binance: '4h',  kraken: 240, poll: 120e3 },
     { id: '1h',  label: 'H1',  role: 'VR · CF',                 sec: 3600,  binance: '1h',  kraken: 60,  poll: 60e3 },
-    { id: '15m', label: 'M15', role: 'Narrative · Barrier',     sec: 900,   binance: '15m', kraken: 15,  poll: 30e3 },
-    { id: '5m',  label: 'M5',  role: 'H1 barrier entry',        sec: 300,   binance: '5m',  kraken: 5,   poll: 20e3 },
+    { id: '15m', label: 'M15', role: 'Narrative',              sec: 900,   binance: '15m', kraken: 15,  poll: 30e3 },
+    { id: '5m',  label: 'M5',  role: 'Entry timing',            sec: 300,   binance: '5m',  kraken: 5,   poll: 20e3 },
     { id: '1m',  label: 'M1',  role: 'Entry trigger',           sec: 60,    binance: '1m',  kraken: 1,   poll: 10e3 },
   ];
   const BARS = 500, PIVOT = 6;
@@ -954,7 +1077,7 @@ function msNextSetup(bars, A) {
       { done: vrDone, t: vrDone ? `H1 VR formed: the ${sell ? 'drop' : 'rally'} has reversed on H1.` : `H1 VR: wait for the ${sell ? 'selling' : 'buying'} to stop and reverse on H1.` },
       { done: touched, t: touched ? `Price came back into the H4 Origin ${fmt(e.bot)} – ${fmt(e.top)}, ${main4 ? 'past the 50% line: main structure' : 'still under the 50% line: internal structure'} (50% at ${fmt(fib4)}).` : `Wait for price to retrace into the H4 Origin ${fmt(e.bot)} – ${fmt(e.top)}. Under the 50% line (${fmt(fib4)}) is internal structure, past it is main structure.` },
       { done: cfDone, t: cfDone ? `H1 CF confirmed: H1 printed a BO ${word} from inside the Origin.` : `H1 CF: inside the Origin, wait for an H1 ${sell ? 'lower high and BO Sell' : 'higher low and BO Buy'}.` },
-      { done: entry, t: entry ? `Entry window: M15/M1 broke ${sell ? 'down' : 'up'} in line with H4. Barrier entry, stop beyond ${fmt(sell ? e.top : e.bot)}.` : `M15 / M1: enter only on a ${word} Barrier pattern (Simple CF or Janda) after the H1 CF.` },
+      { done: entry, t: entry ? `Entry window: M15 / M1 broke ${sell ? 'down' : 'up'} in line with H4. Enter on the pullback, stop just past the CF swing.` : `Entry: after the H1 CF, ${sell ? 'sell' : 'buy'} the pullback to the CF level on M15 / M1.` },
     ];
     let now = steps.findIndex((s) => !s.done);
     $('ms-td-steps').innerHTML = steps.map((s, k) => `<li class="${s.done ? 'done' : k === now ? 'now' : ''}"><span class="ms-dot" aria-hidden="true">${s.done ? '✓' : k + 1}</span><span>${s.t}</span></li>`).join('');
@@ -983,6 +1106,7 @@ function msNextSetup(bars, A) {
 
     renderTrades(price);
     journalTick();
+    renderHome();
 
     // Alerts when a step completes or H4 prints a new BO
     const key = `${e.dir}:${breakT}`, done = steps.map((x) => x.done);
@@ -1026,14 +1150,9 @@ function msNextSetup(bars, A) {
     for (const b of lp.bars) if (b.time > breakT && (sell ? b.high >= e.bot : b.low <= e.top)) { touchT = b.time; break; }
     const touched = touchT !== null;
     const ll = lp.A.last;
-    // PDF: the CF must form inside the Origin; QM beats a normal BO; Janda = BO Structure then BO in the same direction
-    const inZone = touched ? lp.A.events.filter((x) => lp.bars[x.breakIdx].time >= touchT) : [];
+    // CF: once price is back inside the Origin, the lower timeframe breaks in the trade's direction
     const cf = touched && vr && ll && ll.dir === dir && lp.bars[ll.breakIdx].time >= touchT;
-    let model = null;
-    if (cf) {
-      const flip = inZone.findIndex((x) => x.dir === dir && x.structure);
-      model = flip < 0 ? 'BO' : inZone.slice(flip + 1).some((x) => x.dir === dir) ? 'Janda' : 'QM';
-    }
+    const model = null;
     const ext = lp.bars.filter((b) => b.time > breakT).reduce((m, b) => sell ? Math.max(m, b.high) : Math.min(m, b.low), sell ? -Infinity : Infinity);
     const retr = vr && isFinite(ext) && far !== vrP ? Math.max(0, Math.min(1.5, (ext - vrP) / (far - vrP))) : null;
     // Stop: just past the swing the confirming BO started from (the CF zone), padded by a slice of that timeframe's ATR and at least one spread.
@@ -1056,8 +1175,8 @@ function msNextSetup(bars, A) {
     const dist = Math.abs(price - entry);
     let state, cls, next;
     if (beyond) { state = 'INVALID'; cls = 'bad'; next = `Price is beyond the ${H} Origin. Wait for the next ${H} BO.`; }
-    else if (cf) { state = 'READY'; cls = model === 'BO' ? 'near' : 'ready'; next = `${Lo} ${model === 'Janda' ? 'Janda (BO Structure, then BO ' + (sell ? 'Sell' : 'Buy') + ')' : model === 'QM' ? 'QM' : 'BO'} confirmed inside the ${H} Origin${retr !== null ? `, ${retr >= 0.5 ? 'in main structure (past the 50% line)' : 'in internal structure (under the 50% line)'}` : ''}. Enter on the pullback to ${fmt(entry)} with an ${pr.e} Barrier, stop beyond ${fmt(stop)}.`; }
-    else if (touched) { state = 'IN ORIGIN'; cls = 'near'; next = `Price is in the ${H} Origin. Wait for ${Lo} to confirm with a QM or Janda (BO Structure ${sell ? 'Sell' : 'Buy'}, then BO ${sell ? 'Sell' : 'Buy'}), then ${word} the pullback.`; }
+    else if (cf) { state = 'READY'; cls = 'ready'; next = `${Lo} CF confirmed inside the ${H} Origin${retr !== null ? `, ${retr >= 0.5 ? 'in main structure (past the 50% line)' : 'in internal structure (under the 50% line)'}` : ''}. ${sell ? 'Sell' : 'Buy'} the pullback to ${fmt(entry)}, stop past ${fmt(stop)}.`; }
+    else if (touched) { state = 'IN ORIGIN'; cls = 'near'; next = `Price is in the ${H} Origin. Wait for ${Lo} to break ${sell ? 'down' : 'up'} (the CF), then ${word} the pullback.`; }
     else if (vr) { state = 'WAIT RETRACE'; cls = ''; next = `${H} VR is in. Wait for price to come back ${sell ? 'up' : 'down'} into the Origin ${fmt(e.bot)} – ${fmt(e.top)} (${fmt(dist)} away). Under the 50% line (${fmt(fib)}) is internal structure, past it is main structure.`; }
     else { state = 'WAIT VR'; cls = ''; next = `${H} just broke ${sell ? 'down' : 'up'}. Let the move finish and reverse on ${Lo} before planning the ${word}.`; }
     const upP = pr.up && src[pr.up];
@@ -1095,7 +1214,7 @@ function msNextSetup(bars, A) {
         `<div class="ms-tr-h"><span class="ms-chip ${t.sell ? 'ms-chip-sell' : 'ms-chip-buy'}">${t.sell ? 'SELL' : 'BUY'}</span><b>${t.name}</b><small>${t.pair}</small>${tag}<span class="ms-st ${t.cls}">${t.state}</span></div>` +
         `<div class="ms-tr-g"><span>Entry<b>${fmt(t.entry)}</b></span><span>Stop<b class="neg">${fmt(t.stop)}</b></span><span>Target 1<b class="pos">${fmt(t.t1)}</b></span>` +
         `<span>Target 2<b class="pos">${fmt(t.t2)}</b></span><span>Reward : risk<b>${t.rr.toFixed(1)} R</b></span><span>Size<b>${size}</b></span></div>` +
-        `<div class="ms-tr-q">${t.stopWhy && !t.invalid ? `<span class="ms-q">Stop past ${t.stopWhy} + ${fmt(t.buf)}</span>` : ''}${t.model ? `<span class="ms-q ${t.model === 'BO' ? 'weak' : 'good'}">CF · ${t.model === 'BO' ? 'BO normal' : t.model}</span>` : ''}` +
+        `<div class="ms-tr-q">${t.stopWhy && !t.invalid ? `<span class="ms-q">Stop past ${t.stopWhy} + ${fmt(t.buf)}</span>` : ''}}` +
         `${t.retr !== null ? `<span class="ms-q ${t.retr >= 0.5 ? 'good' : 'weak'}">Pullback ${t.retr >= 1 ? '100%+' : Math.round(t.retr * 100) + '%'} · ${t.retr >= 0.5 ? 'main structure' : 'internal structure'}</span>` : ''}</div>` +
         `<div class="ms-tr-n">${t.next}</div></button>`;
     }).join('');
@@ -1534,13 +1653,14 @@ function msNextSetup(bars, A) {
       const best = r.list[0], ready = r.list.filter((t) => t.state === 'READY');
       const chg = r.chg === null ? '' : ` <small style="color:${r.chg >= 0 ? UPC : DNC};font-weight:600">${r.chg >= 0 ? '+' : ''}${r.chg.toFixed(2)}%</small>`;
       const su = best ? `<span class="su"><span class="ms-chip ${best.sell ? 'ms-chip-sell' : 'ms-chip-buy'}">${best.sell ? 'SELL' : 'BUY'}</span><b>${best.name}</b><small>${best.pair}</small><span class="ms-st ${best.cls}">${best.state}</span>${ready.length > 1 ? `<small>+${ready.length - 1} more ready</small>` : ''}</span>` : '<span class="su">No setup</span>';
-      const lv = best && !best.invalid ? `<span class="lv">Entry ${fmtI(best.entry, I)} · Stop ${fmtI(best.stop, I)} · ${best.rr.toFixed(1)}R${best.model ? ` · ${best.model === 'BO' ? 'BO normal' : best.model}` : ''}</span>` : '<span class="lv"></span>';
+      const lv = best && !best.invalid ? `<span class="lv">Entry ${fmtI(best.entry, I)} · Stop ${fmtI(best.stop, I)} · ${best.rr.toFixed(1)}R</span>` : '<span class="lv"></span>';
       return `<a class="ms-srow${cur}${ready.length ? ' ready' : ''}" href="${href}">${mk}<span class="pr">${fmtI(r.price, I)}${chg}</span><span class="tr">${arrow(r.trend['1d'], 'D1')}${arrow(r.trend['4h'], 'H4')}${arrow(r.trend['1h'], 'H1')}</span>${su}${lv}</a>`;
     }).join('');
     const nReady = rows.filter((x) => x.r && !x.r.err && x.r.list.some((t) => t.state === 'READY')).length;
     const badge = document.getElementById('ms-scan-badge');
     if (badge) { badge.hidden = !nReady; badge.textContent = `${nReady} market${nReady === 1 ? '' : 's'} ready`; }
     const meta = document.getElementById('ms-scan-meta');
+    renderHome();
     if (meta) meta.textContent = SCAN.busy ? `Scanning ${Object.keys(SCAN.res).length} / ${keys.length}…` : SCAN.at ? `${nReady} ready · scanned ${new Date(SCAN.at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}` : '';
   }
   async function scanAll() {
@@ -1632,20 +1752,18 @@ function msNextSetup(bars, A) {
     const path = pts.map((v, i) => `${i ? 'L' : 'M'}${(i / Math.max(1, pts.length - 1) * W).toFixed(1)},${(H - 6 - (v - lo) / Math.max(1e-9, hi - lo) * (H - 12)).toFixed(1)}`).join('');
     const zeroY = (H - 6 - (0 - lo) / Math.max(1e-9, hi - lo) * (H - 12)).toFixed(1);
     const row = (label, sub, st, extra) => `<tr><td><b>${label}</b>${sub ? ` <small>${sub}</small>` : ''}</td><td class="n">${extra || ''}</td><td class="n">${st.n}</td><td class="n">${st.closed}</td><td class="n">${pct(st.wr)}</td><td class="n">${rtxt(st.avg)}</td><td class="n">${rtxt(st.closed ? st.R : null)}</td></tr>`;
-    const byModel = ['Janda', 'QM', 'BO'].map((m) => [m, stat(all.filter((x) => x.model === m))]);
     out.innerHTML =
       `<div class="ms-bt-sum"><div><span>Signals</span><b>${A.n}</b></div><div><span>Win rate</span><b>${pct(A.wr)}</b></div><div><span>Average</span><b class="${A.avg > 0 ? 'pos' : A.avg < 0 ? 'neg' : ''}">${A.avg === null ? '—' : (A.avg > 0 ? '+' : '') + A.avg.toFixed(2) + 'R'}</b></div><div><span>Total</span><b class="${A.R > 0 ? 'pos' : A.R < 0 ? 'neg' : ''}">${(A.R > 0 ? '+' : '') + A.R.toFixed(1)}R</b></div></div>` +
       (closed.length > 1 ? `<svg class="ms-bt-eq" viewBox="0 0 ${W} ${H}" preserveAspectRatio="none" role="img" aria-label="Cumulative R over ${closed.length} closed trades"><line x1="0" x2="${W}" y1="${zeroY}" y2="${zeroY}" stroke="var(--line)" stroke-dasharray="4 4" vector-effect="non-scaling-stroke"/><path d="${path}" fill="none" stroke="${eq >= 0 ? UPC : DNC}" stroke-width="2" vector-effect="non-scaling-stroke"/></svg>` : '') +
       `<div class="ms-bt-wrap"><table class="ms-bt-t"><thead><tr><th>Setup</th><th class="n">History</th><th class="n">Signals</th><th class="n">Closed</th><th class="n">Win rate</th><th class="n">Avg</th><th class="n">Total</th></tr></thead><tbody>` +
       runs.map((r) => row(r.pr.name, `${LBL[r.pr.h]} → ${LBL[r.pr.l]}`, stat(r.trades), `${day(r.from)} – ${day(r.to)}`)).join('') +
-      `<tr class="grp"><td colspan="7">By CF grade (all setups)</td></tr>` +
-      byModel.map(([m, st]) => row(m === 'BO' ? 'BO normal' : m, m === 'Janda' ? 'BO Structure, then BO' : m === 'QM' ? 'BO Structure' : 'no structure flip', st, '')).join('') +
       `</tbody></table></div>` +
-      (all.length ? `<div class="ms-k" style="margin-top:14px">Latest signals</div><div class="ms-bt-wrap"><table class="ms-bt-t"><thead><tr><th>Signal</th><th>Setup</th><th>Side</th><th>CF</th><th class="n">Entry</th><th class="n">Stop</th><th class="n">Target 1</th><th>Result</th></tr></thead><tbody>` +
-        all.slice().sort((a, b) => b.t0 - a.t0).slice(0, 10).map((x) => `<tr><td>${ftime(x.t0 + TZ)}</td><td>${esc(x.name)} <small>${esc(x.pair)}</small></td><td><span class="ms-chip ${x.sell ? 'ms-chip-sell' : 'ms-chip-buy'}">${x.sell ? 'SELL' : 'BUY'}</span></td><td>${x.model === 'BO' ? 'BO normal' : x.model || '—'}</td><td class="n">${fmt(x.entry)}</td><td class="n">${fmt(x.stop)}</td><td class="n">${fmt(x.t1)}</td><td>${x.res === 'win' ? rtxt(x.R) : x.res === 'loss' ? rtxt(-1) : esc(x.res === 'missed' ? 'Missed (ran to target unfilled)' : x.res === 'expired' ? 'Not filled' : x.res === 'open' ? 'Still open' : 'Waiting for fill')}</td></tr>`).join('') +
+      (all.length ? `<div class="ms-k" style="margin-top:14px">Latest signals</div><div class="ms-bt-wrap"><table class="ms-bt-t"><thead><tr><th>Signal</th><th>Setup</th><th>Side</th><th class="n">Entry</th><th class="n">Stop</th><th class="n">Target 1</th><th>Result</th></tr></thead><tbody>` +
+        all.slice().sort((a, b) => b.t0 - a.t0).slice(0, 10).map((x) => `<tr><td>${ftime(x.t0 + TZ)}</td><td>${esc(x.name)} <small>${esc(x.pair)}</small></td><td><span class="ms-chip ${x.sell ? 'ms-chip-sell' : 'ms-chip-buy'}">${x.sell ? 'SELL' : 'BUY'}</span></td><td class="n">${fmt(x.entry)}</td><td class="n">${fmt(x.stop)}</td><td class="n">${fmt(x.t1)}</td><td>${x.res === 'win' ? rtxt(x.R) : x.res === 'loss' ? rtxt(-1) : esc(x.res === 'missed' ? 'Missed (ran to target unfilled)' : x.res === 'expired' ? 'Not filled' : x.res === 'open' ? 'Still open' : 'Waiting for fill')}</td></tr>`).join('') +
         `</tbody></table></div>` : '') +
       `<p class="ms-note" style="margin:10px 0 0">How it's scored: each Ready setup places a limit order at its entry. A fill then the stop is −1R, a fill then Target 1 is +R at the card's reward : risk. A candle that touches both entry and stop counts as a loss. Orders not filled within ${BT_WAIT} candles are dropped. M1 and M5 only reach back a few days, so their samples are small. Past results don't predict future ones.</p>`;
     meta.textContent = `${INST.label} · ${A.n} signals`;
+    G.bt = { wr: A.wr, R: A.R }; renderHome();
   }
   if (document.getElementById('ms-bt-btn')) document.getElementById('ms-bt-btn').addEventListener('click', () => runBacktest().catch((e) => {
     document.getElementById('ms-bt-meta').textContent = `Backtest failed: ${e.message}`; document.getElementById('ms-bt-btn').disabled = false;
@@ -1663,12 +1781,12 @@ function msNextSetup(bars, A) {
     JEL.innerHTML = J.length ? J.map((x) => `<tr data-id="${esc(x.id)}">` +
       `<td>${ftime(x.t + TZ)}</td><td><b>${esc(x.label)}</b></td><td>${esc(x.name)} <small>${esc(x.pair)}</small></td>` +
       `<td><span class="ms-chip ${x.sell ? 'ms-chip-sell' : 'ms-chip-buy'}">${x.sell ? 'SELL' : 'BUY'}</span></td>` +
-      `<td class="m">${fmtI(x.entry, dI(x))}</td><td class="m">${fmtI(x.stop, dI(x))}</td><td class="m">${fmtI(x.t1, dI(x))}</td><td>${x.model ? (x.model === 'BO' ? 'BO normal' : esc(x.model)) : '—'}</td>` +
+      `<td class="m">${fmtI(x.entry, dI(x))}</td><td class="m">${fmtI(x.stop, dI(x))}</td><td class="m">${fmtI(x.t1, dI(x))}</td>` +
       `<td><select data-f="res" aria-label="Result">${Object.entries(RES).map(([k, v]) => `<option value="${k}"${x.res === k ? ' selected' : ''}>${v}</option>`).join('')}</select></td>` +
       `<td><input data-f="R" type="number" step="0.1" inputmode="decimal" aria-label="Result in R" value="${x.R === null || x.R === undefined ? '' : x.R}"></td>` +
       `<td><input data-f="note" type="text" aria-label="Notes" placeholder="Why, what you saw…" value="${esc(x.note)}"></td>` +
       `<td><button type="button" class="del" data-del aria-label="Delete this entry">✕</button></td></tr>`).join('')
-      : `<tr class="empty"><td colspan="12">No trades logged yet. Pick a setup under Possible trades and press <b>Log selected trade</b>.</td></tr>`;
+      : `<tr class="empty"><td colspan="11">No trades logged yet. Pick a setup under Possible trades and press <b>Log selected trade</b>.</td></tr>`;
     const st = document.getElementById('ms-j-stats');
     const done = J.filter((x) => x.res === 'win' || x.res === 'loss' || x.res === 'be');
     if (!done.length) { st.innerHTML = ''; return; }
@@ -1701,9 +1819,9 @@ function msNextSetup(bars, A) {
       notify('Logged to journal', `${t.name} ${t.sell ? 'sell' : 'buy'} at ${fmt(t.entry)}, stop ${fmt(t.stop)}, target ${fmt(t.t1)}.`);
     });
     document.getElementById('ms-j-csv').addEventListener('click', () => {
-      const head = ['logged', 'market', 'setup', 'pair', 'side', 'entry', 'stop', 'target1', 'rr', 'cf', 'state', 'result', 'R', 'note'];
+      const head = ['logged', 'market', 'setup', 'pair', 'side', 'entry', 'stop', 'target1', 'rr', 'state', 'result', 'R', 'note'];
       const q = (v) => `"${String(v == null ? '' : v).replace(/"/g, '""')}"`;
-      const rows = J.map((x) => [new Date(x.t * 1000).toISOString(), x.label, x.name, x.pair, x.sell ? 'sell' : 'buy', x.entry, x.stop, x.t1, x.rr, x.model || '', x.state, x.res, x.R == null ? '' : x.R, x.note].map(q).join(','));
+      const rows = J.map((x) => [new Date(x.t * 1000).toISOString(), x.label, x.name, x.pair, x.sell ? 'sell' : 'buy', x.entry, x.stop, x.t1, x.rr, x.state, x.res, x.R == null ? '' : x.R, x.note].map(q).join(','));
       const a = document.createElement('a');
       a.href = URL.createObjectURL(new Blob([head.join(',') + '\n' + rows.join('\n')], { type: 'text/csv' }));
       a.download = `mosha-journal-${new Date().toISOString().slice(0, 10)}.csv`; a.click();
@@ -1731,6 +1849,64 @@ function msNextSetup(bars, A) {
       if (x.res !== 'open') { changed = true; notify(`Journal: ${x.name} ${x.res === 'win' ? 'hit Target 1' : 'stopped out'}`, `${x.label} ${x.sell ? 'sell' : 'buy'} from ${fmt(x.entry)} closed at ${x.res === 'win' ? '+' + x.R + 'R' : '−1R'}.`); }
     });
     if (changed) { jSave(); renderJournal(); }
+  }
+
+
+  // ─── Sections: a home page of cards, each section on its own page ───
+  const VIEWS = ['home', 'setup', 'charts', 'scanner', 'news', 'journal', 'backtest', 'guide'];
+  function showView() {
+    const h = location.hash.slice(1), v = VIEWS.includes(h) ? h : 'home';
+    VIEWS.forEach((k) => { const el = document.getElementById('v-' + k); if (el) el.hidden = k !== v; });
+    document.querySelectorAll('[data-go]').forEach((a) => { if (a.dataset.go === v) a.setAttribute('aria-current', 'page'); else a.removeAttribute('aria-current'); });
+    if (v === 'charts') setTimeout(() => Object.values(panes).forEach((p) => p.fit()), 60);
+    window.scrollTo(0, 0);
+    renderHome();
+  }
+  function renderHome() {
+    if (!document.getElementById('v-home')) return;
+    const set = (id, html) => { const el = document.getElementById(id); if (el) el.innerHTML = html; };
+    try {
+      const bias = document.getElementById('ms-td-bias'), hb = document.getElementById('h-bias');
+      if (bias && hb) { hb.textContent = bias.textContent; hb.className = bias.className; }
+      set('h-step', esc((document.getElementById('ms-td-now') || {}).textContent || ''));
+      set('h-align', (document.getElementById('ms-td-align') || {}).innerHTML || '');
+      const list = (G.list || []).slice().sort((a, b) => ORDER[a.state] - ORDER[b.state]);
+      const ready = list.filter((t) => t.state === 'READY'), best = list.find((t) => !t.invalid);
+      set('h-ready', list.length ? `${ready.length} ready <small>of ${list.length}</small>` : '—');
+      set('h-best', best ? `<span class="ms-chip ${best.sell ? 'ms-chip-sell' : 'ms-chip-buy'}">${best.sell ? 'SELL' : 'BUY'}</span> ${best.name} ${best.pair} · <b>${best.state}</b><br>Entry ${fmt(best.entry)} · Stop ${fmt(best.stop)} · ${best.rr.toFixed(1)}R` : 'No valid setup right now.');
+      const res = Object.entries(SCAN.res).filter(([, r]) => r && r.list);
+      const rd = res.filter(([, r]) => r.list.some((t) => t.state === 'READY'));
+      set('h-scan', SCAN.busy && !SCAN.at ? 'Scanning…' : res.length ? `${rd.length} market${rd.length === 1 ? '' : 's'} ready` : 'Scanning soon');
+      const top = res.map(([k, r]) => ({ I: INSTRUMENTS[k], t: r.list[0] })).filter((x) => x.t).sort((a, b) => ORDER[a.t.state] - ORDER[b.t.state]).slice(0, 3);
+      set('h-scan-list', top.map((x) => `${x.I.label} · ${x.t.sell ? 'Sell' : 'Buy'} ${x.t.name} · <b>${x.t.state}</b>`).join('<br>') || 'Checks all 10 markets every 5 minutes.');
+      set('h-sess', sessEl ? sessEl.innerHTML : '');
+      const now = Date.now() / 1000, nx = NEWS.filter((x) => x.rel && x.t > now - 900).slice(0, 2);
+      set('h-news', nx.length ? nx.map((x) => `${esc(x.cur)} ${esc(x.title)} · <b>${x.t > now ? 'in ' + dur(x.t - now) : 'just out'}</b>`).join('<br>') : 'No high-impact news this week.');
+      const done = J.filter((x) => x.res === 'win' || x.res === 'loss' || x.res === 'be'), w = done.filter((x) => x.res === 'win').length, l = done.filter((x) => x.res === 'loss').length;
+      const R = done.reduce((a, x) => a + (+x.R || 0), 0), open = J.filter((x) => x.res === 'open').length;
+      if (J.length) { set('h-j', `${done.length ? `${R >= 0 ? '+' : ''}${R.toFixed(1)}R` : `${J.length} logged`}`); set('h-j-sub', `${done.length} closed${w + l ? ` · ${Math.round(w / (w + l) * 100)}% win rate` : ''} · ${open} open`); }
+      if (G.bt) set('h-bt', `${G.bt.wr === null ? '—' : Math.round(G.bt.wr * 100) + '%'} win · ${G.bt.R >= 0 ? '+' : ''}${G.bt.R.toFixed(1)}R`);
+      const warn = document.getElementById('ms-news-warn'), hw = document.getElementById('h-warn');
+      if (warn && hw) { hw.hidden = warn.hidden; hw.innerHTML = warn.innerHTML; }
+    } catch (e) { /* a section isn't ready yet */ }
+  }
+  // Session table on the News page
+  function renderSessList() {
+    const ul = document.getElementById('ms-sess-list'); if (!ul) return;
+    const now = Date.now() / 1000, tm = (t) => new Date(t * 1000).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    ul.innerHTML = SESS.map((se) => {
+      const opens = sessionOpens(se, now - 4 * 86400, now + 5 * 86400), len = (se.c - se.o) * 3600;
+      const last = opens.filter((t) => t <= now).pop(), next = opens.find((t) => t > now);
+      const isOpen = last !== undefined && now < last + len;
+      const ref = isOpen ? last : next;
+      return `<li class="${isOpen ? 'on' : ''}"><b>${se.name}</b><span>${ref ? `${tm(ref)} – ${tm(ref + len)} your time` : ''}</span><em>${isOpen ? `Open · closes in ${dur(last + len - now)}` : next ? `Opens in ${dur(next - now)}` : 'Closed'}</em></li>`;
+    }).join('');
+  }
+  if (document.getElementById('v-home')) {
+    const hdr = document.querySelector('.top');
+    if (hdr && window.ResizeObserver) new ResizeObserver(() => document.documentElement.style.setProperty('--top-h', hdr.offsetHeight + 'px')).observe(hdr);
+    addEventListener('hashchange', showView); showView();
+    setInterval(() => { renderSessList(); renderHome(); }, 30e3); renderSessList();
   }
 
   boot();
