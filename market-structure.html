@@ -376,12 +376,12 @@
       <li><b>VR:</b> after the break, the move runs out and reverses on H1. That reversal area is the VR, and it is the first target.</li>
       <li><b>50% line:</b> measure the whole move after the BO, from the Origin edge where it started to the VR extreme. The halfway point (like a Fibonacci 50%) is drawn as a dashed line. A pullback that stays under it is <b>internal structure</b>; once price goes past it, it's the <b>main structure</b>.</li>
       <li><b>CF:</b> only once price is back inside the Origin. A QM beats a normal BO. A <b>Janda</b> is the full pattern: BO Structure in the new direction, then a BO in the same direction.</li>
-      <li><b>Entry:</b> on the pullback after the CF, using the Barrier timeframes: H4 → M15 / M1, H1 → M5 / M1, M15 → M1. Stop goes beyond the zone; a body close beyond the Origin cancels the idea.</li>
+      <li><b>Entry:</b> on the pullback after the CF, using the Barrier timeframes: H4 → M15 / M1, H1 → M5 / M1, M15 → M1. The stop goes just past the swing the confirming BO started from (the CF zone), padded by a small buffer sized to that timeframe's candles. A body close beyond the Origin cancels the idea.</li>
       <li><b>Clean breakout:</b> every BO needs a candle <b>body</b> to close beyond the wick on the left. A wick through the level is not a break.</li>
     </ol>
   </details>
 
-  <p class="foot">Live candles from Binance and Kraken public feeds; gold is aligned to XAU/USD spot via gold-api.com. Times are in your local zone.<br>Version 1 Nov 2026 · internal / main structure</p>
+  <p class="foot">Live candles from Binance and Kraken public feeds; gold is aligned to XAU/USD spot via gold-api.com. Times are in your local zone.<br>Version 1 Nov 2026 · precise stops</p>
   <div class="ms-toasts" id="ms-toasts" role="status" aria-live="polite"></div>
 </div>
 <script>
@@ -1002,6 +1002,14 @@ function msNextSetup(bars, A) {
     { k: 'scalp',    name: 'Scalp',    h: '15m', l: '1m',  e: 'M1',  up: '1h' },
   ];
   const LBL = { '1d': 'D1', '4h': 'H4', '1h': 'H1', '15m': 'M15', '5m': 'M5', '1m': 'M1' };
+  // Average true range of the last n candles: sizes the stop buffer to how much the timeframe actually moves
+  function atr(bars, n = 14) {
+    const m = bars.length; let s = 0, k = 0;
+    for (let i = Math.max(1, m - n); i < m; i++) { const b = bars[i], pc = bars[i - 1].close; s += Math.max(b.high - b.low, Math.abs(b.high - pc), Math.abs(b.low - pc)); k++; }
+    return k ? s / k : 0;
+  }
+  // Smallest buffer worth placing: about one typical spread for the market
+  const spreadOf = (price) => CUR.group === 'Forex' ? 0.0001 : CUR.spot ? 0.3 : price * 0.0002;
   function buildSetup(pr, price, src = panes) {
     const hp = src[pr.h], lp = src[pr.l];
     if (!hp || !lp || !hp.A || !hp.A.last || !lp.A || !lp.bars) return null;
@@ -1028,10 +1036,19 @@ function msNextSetup(bars, A) {
     }
     const ext = lp.bars.filter((b) => b.time > breakT).reduce((m, b) => sell ? Math.max(m, b.high) : Math.min(m, b.low), sell ? -Infinity : Infinity);
     const retr = vr && isFinite(ext) && far !== vrP ? Math.max(0, Math.min(1.5, (ext - vrP) / (far - vrP))) : null;
-    const buf = Math.max(0.08 * h, price * 0.00005);
-    let entry, stop;
-    if (cf) { entry = ll.level; stop = sell ? ll.top + buf / 2 : ll.bot - buf / 2; }
-    else { entry = sell ? e.bot + 0.5 * h : e.top - 0.5 * h; stop = sell ? e.top + buf : e.bot - buf; }
+    // Stop: just past the swing the confirming BO started from (the CF zone), padded by a slice of that timeframe's ATR and at least one spread.
+    // Before the CF there is no CF swing yet, so the planned stop sits past the HTF Origin edge instead.
+    const spr = spreadOf(price);
+    let entry, stop, anchor, buf, stopWhy;
+    if (cf) {
+      anchor = sell ? ll.top : ll.bot; buf = Math.max(0.15 * atr(lp.bars), spr);
+      entry = ll.level; stop = anchor + (sell ? buf : -buf);
+      stopWhy = `${Lo} CF ${sell ? 'high' : 'low'} ${fmt(anchor)}`;
+    } else {
+      anchor = sell ? e.top : e.bot; buf = Math.max(0.1 * atr(hp.bars), spr);
+      entry = sell ? e.bot + 0.5 * h : e.top - 0.5 * h; stop = anchor + (sell ? buf : -buf);
+      stopWhy = `${H} Origin ${sell ? 'top' : 'bottom'} ${fmt(anchor)} (moves to the ${Lo} CF swing once it forms)`;
+    }
     const r = Math.abs(stop - entry);
     let t1 = hp.A.ext.p;
     if ((t1 - entry) * sgn < r) t1 = entry + sgn * 2 * r;
@@ -1045,7 +1062,7 @@ function msNextSetup(bars, A) {
     else { state = 'WAIT VR'; cls = ''; next = `${H} just broke ${sell ? 'down' : 'up'}. Let the move finish and reverse on ${Lo} before planning the ${word}.`; }
     const upP = pr.up && src[pr.up];
     const align = !upP || !upP.A ? null : upP.A.trend === dir;
-    return { k: pr.k, name: pr.name, pair: `${H} → ${Lo}`, sell, entry, stop, t1, t2, rr, r, state, cls, next, align, upL: pr.up ? LBL[pr.up] : '', size: sizeText(r, price), invalid: beyond, model, retr, fib,
+    return { k: pr.k, name: pr.name, pair: `${H} → ${Lo}`, sell, entry, stop, t1, t2, rr, r, state, cls, next, align, upL: pr.up ? LBL[pr.up] : '', size: sizeText(r, price), invalid: beyond, model, retr, fib, stopWhy, buf,
       sig: `${pr.k}|${hp.bars[e.start].time}|${cf ? lp.bars[ll.breakIdx].time : ''}` };
   }
   function sizeText(r, price) {
@@ -1078,7 +1095,7 @@ function msNextSetup(bars, A) {
         `<div class="ms-tr-h"><span class="ms-chip ${t.sell ? 'ms-chip-sell' : 'ms-chip-buy'}">${t.sell ? 'SELL' : 'BUY'}</span><b>${t.name}</b><small>${t.pair}</small>${tag}<span class="ms-st ${t.cls}">${t.state}</span></div>` +
         `<div class="ms-tr-g"><span>Entry<b>${fmt(t.entry)}</b></span><span>Stop<b class="neg">${fmt(t.stop)}</b></span><span>Target 1<b class="pos">${fmt(t.t1)}</b></span>` +
         `<span>Target 2<b class="pos">${fmt(t.t2)}</b></span><span>Reward : risk<b>${t.rr.toFixed(1)} R</b></span><span>Size<b>${size}</b></span></div>` +
-        `<div class="ms-tr-q">${t.model ? `<span class="ms-q ${t.model === 'BO' ? 'weak' : 'good'}">CF · ${t.model === 'BO' ? 'BO normal' : t.model}</span>` : ''}` +
+        `<div class="ms-tr-q">${t.stopWhy && !t.invalid ? `<span class="ms-q">Stop past ${t.stopWhy} + ${fmt(t.buf)}</span>` : ''}${t.model ? `<span class="ms-q ${t.model === 'BO' ? 'weak' : 'good'}">CF · ${t.model === 'BO' ? 'BO normal' : t.model}</span>` : ''}` +
         `${t.retr !== null ? `<span class="ms-q ${t.retr >= 0.5 ? 'good' : 'weak'}">Pullback ${t.retr >= 1 ? '100%+' : Math.round(t.retr * 100) + '%'} · ${t.retr >= 0.5 ? 'main structure' : 'internal structure'}</span>` : ''}</div>` +
         `<div class="ms-tr-n">${t.next}</div></button>`;
     }).join('');
