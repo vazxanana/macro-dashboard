@@ -6547,9 +6547,9 @@ if (/^#(market-structure|structure)$/.test(location.hash) || /market-structure\.
     else { dot.className = 'ms-live-dot'; txt.textContent = 'Connecting…'; }
     const srcSym = { Binance: INST.binance, Kraken: INST.kraken, Bitstamp: INST.bitstamp }[G.source] || '';
     const now = new Date(), wd = now.getUTCDay(), hr = now.getUTCHours();
-    const fxClosed = INST.group === 'Forex' && (wd === 6 || (wd === 0 && hr < 21) || (wd === 5 && hr >= 21));
+    const fxClosed = INST.group === 'Forex' && marketClosed();
     $('ms-feed-note').textContent = INST.spot
-      ? `Gold candles from ${G.source} PAXG/USD (1 token = 1 oz of LBMA gold), shifted ${G.offset >= 0 ? '+' : ''}${fmt(G.offset)} onto XAU/USD spot from gold-api.com. Times in your local zone. COMEX futures (MGC/GC) trade a few dollars above spot.`
+      ? `${marketClosed() ? 'Spot gold is closed for the weekend (opens Sunday 22:00 UTC); PAXG keeps trading, so setups now are weekend noise and the Traders skip them. ' : ''}Gold candles from ${G.source} PAXG/USD (1 token = 1 oz of LBMA gold), shifted ${G.offset >= 0 ? '+' : ''}${fmt(G.offset)} onto XAU/USD spot from gold-api.com. Times in your local zone. COMEX futures (MGC/GC) trade a few dollars above spot.`
       : INST.group === 'Forex'
         ? `${fxClosed ? 'Forex is closed for the weekend, so candles stay flat until it reopens Sunday evening (UTC). ' : ''}${INST.label} candles from ${G.source} (${srcSym}). Exchange forex can differ slightly from your broker's quotes. Times in your local zone.`
         : `${INST.label} candles from ${G.source} (${srcSym}). Times in your local zone.`;
@@ -7087,8 +7087,10 @@ if (/^#(market-structure|structure)$/.test(location.hash) || /market-structure\.
   // Browser Trader: every fresh Ready setup on this market becomes a saved paper trade (once per signal, even across reloads)
   let AUTO_SEEN = {};
   try { AUTO_SEEN = JSON.parse(localStorage.getItem('msAutoSeen') || '{}') || {}; } catch (e) { AUTO_SEEN = {}; }
+  // Spot gold and forex close Fri 21:00 – Sun 22:00 UTC (crypto never does)
+  const marketClosed = () => { if (INST.group === 'Crypto') return false; const d = new Date(), wd = d.getUTCDay(), h = d.getUTCHours(); return wd === 6 || (wd === 0 && h < 22) || (wd === 5 && h >= 21); };
   function autoTrade(list, price) {
-    if (!JEL) return;
+    if (!JEL || marketClosed()) return;
     const now = Date.now() / 1000; let added = 0;
     for (const t of list) {
       const id = `${instKey}|${t.sig}`;
