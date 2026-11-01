@@ -664,13 +664,13 @@
         <li><b>CF:</b> once price is back inside the Origin, wait for the lower timeframe to break in the trade's direction. That break is the CF.</li>
         <li><b>Entry and stop:</b> enter on the pullback to the CF level. The stop goes just past the swing the CF break started from, padded by a small buffer sized to that timeframe's candles, and never closer than 0.6 × its average candle range (ATR) or 5 × the typical spread, so normal noise can't stop it out. A body close beyond the Origin cancels the idea.</li>
         <li><b>Retracement trades:</b> once the HTF has made its VR, price pulls back toward the Origin. While that happens you can trade the lower timeframe the other way: in a sell, an H1 BO Buy is a buy up to the 50% line and the Origin, and vice versa. Take profit before the Origin, because that's where the main trend resumes. These cards are tagged <b>Retracement</b>.</li>
-        <li><b>Self-evolving council:</b> every paper trade records its conditions (D1 agreeing or not, main or internal structure, session). The Coach learns rules from what loses, such as "Swing: only with D1", and keeps following blocked setups as shadow trades. If the blocked trades start winning, it drops the rule. Every rule is re-tested after 21 days. It also tracks how far each trade went for and against before closing, and turns on a break-even stop at +1R when many losers had been well in profit first.</li>
+        <li><b>Self-evolving council:</b> every paper trade records its conditions (D1 agreeing or not, main or internal structure, session). The Coach learns rules from what loses, such as "Swing: only with D1", and keeps following blocked setups as shadow trades. If the blocked trades start winning, it drops the rule. Every rule is re-tested after 21 days. It also tracks how far each trade went for and against before closing, and turns on a break-even stop at +1R when many losers had been well in profit first. A market that keeps losing is paused for 3 days.</li>
         <li><b>Timeframe pairs:</b> Position D1 → H1, Swing H4 → H1, Intraday H1 → M5, Scalp M15 → M1.</li>
       </ol>
     </div>
   </section>
 
-  <p class="foot">Live candles from Binance and Kraken public feeds; gold is aligned to XAU/USD spot via gold-api.com. Times are in your local zone.<br>Version 1 Nov 2026 · council health</p>
+  <p class="foot">Live candles from Binance and Kraken public feeds; gold is aligned to XAU/USD spot via gold-api.com. Times are in your local zone.<br>Version 1 Nov 2026 · market pauses</p>
   <nav class="btab" aria-label="Main sections">
     <a href="#home" data-go="home"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M3 11l9-7 9 7v9a1 1 0 01-1 1h-5v-6H9v6H4a1 1 0 01-1-1z"></path></svg>Home</a>
     <a href="#setup" data-go="setup"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 6h16M4 12h10M4 18h6"></path></svg>Setup</a>
@@ -2327,6 +2327,7 @@ function msNextSetup(bars, A) {
     const cf = C.config || { buf: CFG.buf, minRR: CFG.minRR, paused: {}, history: [] };
     const paused = Object.entries(cf.paused || {});
     set('ms-c-rules', `<span class="ms-q">Stop buffer ${cf.buf} × ATR</span><span class="ms-q">Min stop ${cf.minRisk || 0.6} × ATR</span><span class="ms-q">${cf.be ? `Break-even at +${cf.be}R` : 'No break-even move'}</span><span class="ms-q">Min reward:risk ${cf.minRR}</span>` + (paused.length ? paused.map(([k, u]) => `<span class="ms-q weak">${esc(k)} paused to ${esc(u.slice(0, 10))}</span>`).join('') : '<span class="ms-q good">All setups active</span>') +
+      Object.entries(cf.pausedMarkets || {}).map(([m, u]) => `<span class="ms-q weak">${esc((INSTRUMENTS[m] || {}).label || m)} paused to ${esc(String(u).slice(0, 10))}</span>`).join('') +
       Object.entries(cf.filters || {}).map(([k, f]) => [f.d1 ? `${k}: only ${f.d1} D1` : '', f.struct ? `${k}: only ${f.struct} structure` : '', (f.noSession || []).length ? `${k}: skip ${f.noSession.join(', ')}` : ''].filter(Boolean).map((t) => `<span class="ms-q">Learned · ${esc(t)}</span>`).join('')).join(''));
     const sh = (C.trades || []).filter((x) => x.shadow && (x.status === 'win' || x.status === 'loss')), shR = sh.reduce((a, x) => a + x.R, 0);
     set('ms-c-shadow-sum', sh.length ? `Shadow trades (blocked by rules) closed: ${sh.length}, ${shR >= 0 ? '+' : ''}${shR.toFixed(1)}R. ${shR > 0 ? 'Blocked trades are winning: the Coach will loosen the rule that blocks them.' : 'The rules are keeping you out of losing trades.'}` : 'Blocked setups are followed as shadow trades so the Coach can check every rule it adds.');
