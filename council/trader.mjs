@@ -46,12 +46,13 @@ async function kraken(pair, interval) {
 }
 
 // ─── Config: the Coach's knobs, with their allowed ranges ───
-const LIMITS = { buf: [0.10, 0.25], minRR: [1.2, 2.5] };
-const config = Object.assign({ buf: 0.15, minRR: 1.2, paused: {}, filters: {}, history: [] }, rd('config.json', {}));
+const LIMITS = { buf: [0.10, 0.25], minRR: [1.2, 2.5], minRisk: [0.4, 1.2] };
+const config = Object.assign({ buf: 0.15, minRR: 1.2, minRisk: 0.6, paused: {}, filters: {}, history: [] }, rd('config.json', {}));
 config.filters = config.filters || {};
 const now = Math.floor(Date.now() / 1000), nowISO = new Date(now * 1000).toISOString();
 for (const [k, until] of Object.entries(config.paused)) if (Date.parse(until) / 1000 <= now) { delete config.paused[k]; config.history.push({ at: nowISO, by: 'coach-stats', change: `Resumed ${k}`, why: 'Pause period ended.' }); }
 CFG.buf = Math.min(LIMITS.buf[1], Math.max(LIMITS.buf[0], config.buf));
+CFG.minRisk = Math.min(LIMITS.minRisk[1], Math.max(LIMITS.minRisk[0], config.minRisk));
 const state = Object.assign({ seen: {}, lastRun: 0 }, rd('state.json', {}));
 let trades = rd('trades.json', []);
 const snapshot = { at: nowISO, markets: {}, errors: {} };
@@ -161,6 +162,7 @@ if (coach.date !== today) {
   }
   const recent = closed.filter((x) => now - x.closed < 14 * 86400), rs = stat(recent);
   if (rs.n >= 10) {
+    if (rs.wr < 0.35 && config.minRisk < LIMITS.minRisk[1]) { const v = +Math.min(LIMITS.minRisk[1], config.minRisk + 0.1).toFixed(2); change(`Minimum stop ${config.minRisk} → ${v} ATR`, `Win rate ${Math.round(rs.wr * 100)}% over ${rs.n} trades: stops get hit by normal candle noise.`); config.minRisk = v; }
     if (rs.wr < 0.35 && config.buf < LIMITS.buf[1]) { const v = +Math.min(LIMITS.buf[1], config.buf + 0.02).toFixed(2); change(`Stop buffer ${config.buf} → ${v} ATR`, `Win rate ${Math.round(rs.wr * 100)}% over ${rs.n} trades: stops may sit inside the noise.`); config.buf = v; }
     else if (rs.wr > 0.6 && config.buf > LIMITS.buf[0]) { const v = +Math.max(LIMITS.buf[0], config.buf - 0.01).toFixed(2); change(`Stop buffer ${config.buf} → ${v} ATR`, `Win rate ${Math.round(rs.wr * 100)}% over ${rs.n} trades: a tighter stop gives more R.`); config.buf = v; }
   }
