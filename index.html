@@ -7290,7 +7290,11 @@ if (/^#(market-structure|structure)$/.test(location.hash) || /market-structure\.
     const closed = list.filter((x) => x.status === 'win' || x.status === 'loss' || x.status === 'be');
     const w = closed.filter((x) => x.status === 'win').length, R = closed.reduce((a, x) => a + x.R, 0);
     const open = list.filter((x) => x.status === 'open' || x.status === 'pending');
-    set('ms-c-status', C.snap ? `Trader last ran ${ago(Date.parse(C.snap.at) / 1000)} · ${Object.keys(C.snap.markets || {}).length} markets watched` : 'Waiting for the first Trader run (every 15 minutes once enabled).');
+    if (C.snap) {
+      const age = (Date.now() - Date.parse(C.snap.at)) / 60000, mk = Object.values(C.snap.markets || {}), closed = mk.filter((m) => m.open === false).length, errs = Object.keys(C.snap.errors || {});
+      const health = age < 30 ? '<span class="c-ok">● Trader running</span>' : age < 90 ? '<span class="c-warn">● Trader late</span>' : '<span class="c-bad">● Trader stopped</span>';
+      set('ms-c-status', `${health} · last scan ${ago(Date.parse(C.snap.at) / 1000)} · ${mk.length} markets watched${closed ? ` (${closed} closed for the weekend)` : ''}${errs.length ? ` · ${errs.length} feed error${errs.length > 1 ? 's' : ''}: ${esc(errs.join(', '))}` : ''}`);
+    } else set('ms-c-status', 'Waiting for the first Trader run.');
     set('ms-c-kpi', `<div><span>Open</span><b>${open.length}</b></div><div><span>Closed</span><b>${closed.length}</b></div><div><span>Win rate</span><b>${closed.length ? Math.round(w / closed.length * 100) + '%' : '—'}</b></div><div><span>Total</span><b class="${R > 0 ? 'pos' : R < 0 ? 'neg' : ''}">${closed.length ? (R > 0 ? '+' : '') + R.toFixed(1) + 'R' : '—'}</b></div>`);
     // equity in R by close time
     const ch = closed.slice().sort((a, b) => a.closed - b.closed); let eq = 0; const pts = [0].concat(ch.map((x) => (eq += x.R)));
