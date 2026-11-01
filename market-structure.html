@@ -557,7 +557,7 @@
   <section class="view" id="v-council" aria-label="AI council" hidden>
     <div class="c-head">
       <div><h1 class="h-head">AI council</h1><p class="ms-note" id="ms-c-status">Loading council data…</p></div>
-      <label class="c-auto"><input type="checkbox" id="ms-auto"> <span><b>Browser Trader</b><small>Auto paper-trade Ready setups on this market into my journal while this page is open</small></span></label>
+      <label class="c-auto"><input type="checkbox" id="ms-auto"> <span><b>Browser Trader</b><small>On by default. Every fresh Ready setup on the market you're viewing is saved to your journal as a paper trade, then tracked to its stop or target.</small></span></label>
     </div>
     <div class="c-grid">
       <div class="card c-trader">
@@ -611,7 +611,7 @@
   <!-- ─── Journal ─── -->
   <section class="view" id="v-journal" aria-label="Journal" hidden>
     <div class="card" id="ms-j-card">
-      <div class="ms-k">Trade journal <span class="ms-scan-meta"><button type="button" class="ms-tbtn" id="ms-j-csv">Export CSV</button></span></div>
+      <div class="ms-k">Trade journal <span class="ms-scan-meta"><label class="c-mine"><input type="checkbox" id="ms-auto2"> Auto paper-trade</label><button type="button" class="ms-tbtn" id="ms-j-csv">Export CSV</button></span></div>
       <div id="ms-j-stats" class="ms-j-stats"></div>
       <div class="ms-j-wrap"><table class="ms-j"><thead><tr><th>Logged</th><th>Market</th><th>Setup</th><th>Side</th><th>Entry</th><th>Stop</th><th>Target 1</th><th>Result</th><th>R</th><th>Notes</th><th><span class="sr">Delete</span></th></tr></thead><tbody id="ms-j-body"></tbody></table></div>
       <div class="ms-note" style="margin-top:10px">Saved in this browser only. Open trades on the market you're viewing are checked against live candles and marked Win or Loss automatically; change the result any time.</div>
@@ -644,7 +644,7 @@
     </div>
   </section>
 
-  <p class="foot">Live candles from Binance and Kraken public feeds; gold is aligned to XAU/USD spot via gold-api.com. Times are in your local zone.<br>Version 1 Nov 2026 · council scorecard</p>
+  <p class="foot">Live candles from Binance and Kraken public feeds; gold is aligned to XAU/USD spot via gold-api.com. Times are in your local zone.<br>Version 1 Nov 2026 · auto paper trading</p>
   <div class="ms-toasts" id="ms-toasts" role="status" aria-live="polite"></div>
 </div>
 <script>
@@ -1431,9 +1431,9 @@ function msNextSetup(bars, A) {
     G.plan = sel && !sel.invalid ? { entry: sel.entry, stop: sel.stop, t1: sel.t1, t2: sel.t2, rr: sel.rr, sell: sel.sell, name: sel.name } : null;
     const key = G.plan ? [G.sel, G.plan.entry, G.plan.stop, G.plan.t1].map((v) => typeof v === 'number' ? v.toFixed(1) : v).join('|') : 'none';
     if (key !== G.planKey) { G.planKey = key; Object.values(panes).forEach((p) => p.A && p.draw()); }
+    if (G.auto) autoTrade(list, price);
     list.forEach((t) => {
       const was = G.prevStates[t.k];
-      if (was && was !== t.state && t.state === 'READY' && G.auto && !CFG.paused[t.k] && t.rr >= CFG.minRR) { jAdd(t, 'Auto paper trade · browser Trader'); notify(`Trader logged ${t.name} ${t.sell ? 'sell' : 'buy'}`, `Paper trade in your journal: entry ${fmt(t.entry)}, stop ${fmt(t.stop)}, target ${fmt(t.t1)}.`); }
       if (was && was !== t.state && t.state === 'READY') notify(`${t.name} ${t.sell ? 'sell' : 'buy'} ready (${t.pair})`, `${t.pair}: entry ${fmt(t.entry)}, stop ${fmt(t.stop)}, target ${fmt(t.t1)} (${t.rr.toFixed(1)}R).`);
       G.prevStates[t.k] = t.state;
     });
@@ -2036,6 +2036,33 @@ function msNextSetup(bars, A) {
     });
     renderJournal();
   }
+  // Browser Trader: every fresh Ready setup on this market becomes a saved paper trade (once per signal, even across reloads)
+  let AUTO_SEEN = {};
+  try { AUTO_SEEN = JSON.parse(localStorage.getItem('msAutoSeen') || '{}') || {}; } catch (e) { AUTO_SEEN = {}; }
+  function autoTrade(list, price) {
+    if (!JEL) return;
+    const now = Date.now() / 1000; let added = 0;
+    for (const t of list) {
+      const id = `${instKey}|${t.sig}`;
+      if (t.state !== 'READY' || AUTO_SEEN[id]) continue;
+      AUTO_SEEN[id] = now;
+      const def = PAIRS.concat(RETR).find((p) => p.k === t.k), cfT = +String(t.sig).split('|')[2] - TZ;
+      const lsec = (TFS.find((x) => x.id === def.l) || {}).sec || 60;
+      if (!cfT || now - cfT > 12 * lsec) continue;                 // old CF: the move already happened
+      if (CFG.paused[t.k] || t.rr < CFG.minRR) continue;          // the Coach's rules
+      const tr = Object.assign({}, t);
+      if (t.sell ? price >= t.entry : price <= t.entry) {        // already through the entry: fill at market
+        tr.entry = price; const r = Math.abs(price - t.stop), rw = (t.t1 - price) * (t.sell ? -1 : 1);
+        if (!(r > 0) || rw <= 0 || (t.sell ? price >= t.stop : price <= t.stop)) continue;
+        tr.rr = rw / r;
+      }
+      jAdd(tr, 'Auto paper trade · browser Trader'); added++;
+      notify(`Trader saved ${t.name} ${t.sell ? 'sell' : 'buy'}`, `${INST.label} ${t.pair}: entry ${fmt(tr.entry)}, stop ${fmt(tr.stop)}, target ${fmt(tr.t1)} (${tr.rr.toFixed(1)}R). It's in your journal.`);
+    }
+    for (const [k, v] of Object.entries(AUTO_SEEN)) if (now - v > 30 * 86400) delete AUTO_SEEN[k];
+    try { localStorage.setItem('msAutoSeen', JSON.stringify(AUTO_SEEN)); } catch (e) {}
+    return added;
+  }
   function jAdd(t, note) {
     if (!JEL) return;
     J.unshift({ id: Date.now().toString(36) + Math.random().toString(36).slice(2, 5), t: Math.floor(Date.now() / 1000), inst: instKey, label: INST.label, dec: INST.dec, name: t.name, pair: t.pair,
@@ -2229,8 +2256,11 @@ function msNextSetup(bars, A) {
     renderHome();
   }
   const autoEl = document.getElementById('ms-auto');
-  try { G.auto = localStorage.getItem('msAuto') === '1'; } catch (e) { G.auto = false; }
+  try { G.auto = localStorage.getItem('msAuto') !== '0'; } catch (e) { G.auto = true; }
   if (autoEl) { autoEl.checked = G.auto; autoEl.addEventListener('change', () => { G.auto = autoEl.checked; try { localStorage.setItem('msAuto', G.auto ? '1' : '0'); } catch (e) {} notify(G.auto ? 'Browser Trader on' : 'Browser Trader off', G.auto ? 'Ready setups on this market go into your journal as paper trades while this page is open.' : 'No more automatic journal entries.'); }); }
+  const auto2 = document.getElementById('ms-auto2');
+  if (auto2) { auto2.checked = G.auto; auto2.addEventListener('change', () => { if (autoEl) { autoEl.checked = auto2.checked; autoEl.dispatchEvent(new Event('change')); } }); }
+  if (autoEl) autoEl.addEventListener('change', () => { if (auto2) auto2.checked = autoEl.checked; const m1 = panes['1m']; if (G.auto && m1 && m1.bars) topDown(); });
   const mineEl = document.getElementById('ms-c-mine'); if (mineEl) mineEl.addEventListener('change', renderCouncil);
   if (document.getElementById('v-council')) { loadCouncil(); setInterval(loadCouncil, 5 * 60e3); }
 
