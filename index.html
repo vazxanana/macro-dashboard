@@ -6909,10 +6909,30 @@ if (/^#(market-structure|structure)$/.test(location.hash) || /market-structure\.
     if (badge) { badge.hidden = !nReady; badge.textContent = `${nReady} market${nReady === 1 ? '' : 's'} ready`; }
     const meta = document.getElementById('ms-scan-meta');
     renderHome(); renderMk();
-    if (meta) meta.textContent = SCAN.busy ? `Scanning ${Object.keys(SCAN.res).length} / ${keys.length}…` : SCAN.at ? `${nReady} ready · scanned ${new Date(SCAN.at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}` : '';
+    if (meta) meta.textContent = SCAN.busy ? `Scanning ${Object.keys(SCAN.res).length} / ${keys.length}…` : SCAN.at ? `${nReady} ready · ${SCAN.snapAt ? 'council scan' : 'scanned'} ${new Date(SCAN.at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}` : '';
   }
-  async function scanAll() {
+  // The council Trader scans every market every ~15 minutes: reuse its snapshot instead of downloading 54 candle sets again
+  const CLS = { READY: 'ready', 'IN ORIGIN': 'near', 'WAIT BO': 'near', 'AT EXTREME': 'near', 'UNDER 50%': 'near', INVALID: 'bad' };
+  const BAD = ['INVALID', 'PLAYED OUT', 'WAIT VR', 'NO SETUP'];
+  function fromSnapshot(k, m) {
+    const list = (m.setups || []).map((t) => ({ k: t.k, name: t.name, pair: t.pair, sell: t.side === 'sell', state: t.state, cls: CLS[t.state] || '', entry: t.entry, stop: t.stop, t1: t.t1, rr: +t.rr || 0, retrace: t.retrace, invalid: BAD.includes(t.state), model: null }))
+      .sort((a, b) => (ORDER[a.state] ?? 9) - (ORDER[b.state] ?? 9) || b.rr - a.rr);
+    return { price: m.price, list, trend: m.trend || {}, chg: null, from: 'council' };
+  }
+  async function scanAll(ev) {
     if (!SCAN.el || SCAN.busy || G.csv) return;
+    const force = !!(ev && ev.type === 'click');
+    if (!force && typeof councilReady !== 'undefined') {
+      await councilReady;
+      const snap = COUNCIL.snap, age = snap ? Date.now() - Date.parse(snap.at) : Infinity;
+      if (snap && age < 25 * 60e3 && Object.keys(snap.markets || {}).length) {
+        Object.keys(INSTRUMENTS).forEach((k) => { if (k !== instKey && snap.markets[k]) SCAN.res[k] = fromSnapshot(k, snap.markets[k]); });
+        SCAN.res[instKey] = evaluate(INST, srcFromPanes()) || SCAN.res[instKey];
+        SCAN.at = Date.parse(snap.at); SCAN.snapAt = snap.at; renderScan();
+        return;
+      }
+    }
+    SCAN.snapAt = null;
     SCAN.busy = true; SCAN.res = {}; renderScan();
     const btn = document.getElementById('ms-scan-btn'); if (btn) btn.disabled = true;
     await Promise.all(Object.keys(INSTRUMENTS).map(async (k) => {
@@ -7231,6 +7251,7 @@ if (/^#(market-structure|structure)$/.test(location.hash) || /market-structure\.
 
   // ─── Council: Analyst, Trader and Coach (always-on data from the council-data branch) ───
   const CDATA = 'https://raw.githubusercontent.com/vazxanana/macro-dashboard/council-data/';
+  var councilReady;
   const COUNCIL = { at: 0 };
   function md(src) {   // small, safe markdown: headings, bullets, bold, paragraphs
     const out = []; let list = false;
@@ -7332,7 +7353,7 @@ if (/^#(market-structure|structure)$/.test(location.hash) || /market-structure\.
   if (autoEl) autoEl.addEventListener('change', () => { if (auto2) auto2.checked = autoEl.checked; const m1 = panes['1m']; if (G.auto && m1 && m1.bars) topDown(); });
   const mineEl = document.getElementById('ms-c-mine'); if (mineEl) mineEl.addEventListener('change', renderCouncil);
   const shEl = document.getElementById('ms-c-shadow'); if (shEl) shEl.addEventListener('change', renderCouncil);
-  if (document.getElementById('v-council')) { loadCouncil(); setInterval(loadCouncil, 5 * 60e3); }
+  if (document.getElementById('v-council')) { councilReady = loadCouncil(); setInterval(loadCouncil, 5 * 60e3); }
 
   // ─── Sections: a home page of cards, each section on its own page ───
   const VIEWS = ['home', 'setup', 'charts', 'scanner', 'council', 'news', 'journal', 'backtest', 'guide'];
