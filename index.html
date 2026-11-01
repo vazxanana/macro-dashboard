@@ -7237,6 +7237,17 @@ if (/^#(market-structure|structure)$/.test(location.hash) || /market-structure\.
     const dI = (x) => ({ dec: x.dec != null ? x.dec : 2 });
     set('ms-c-trades', list.length ? list.slice(0, 25).map((x) => `<tr><td>${ftime(x.opened + TZ)}</td><td><b>${esc(x.label)}</b></td><td>${esc(x.name)} <small>${esc(x.pair)}</small></td><td><span class="ms-chip ${x.side === 'sell' ? 'ms-chip-sell' : 'ms-chip-buy'}">${x.side.toUpperCase()}</span></td><td class="n">${fmtI(x.entry, dI(x))}</td><td class="n">${fmtI(x.stop, dI(x))}</td><td class="n">${fmtI(x.t1, dI(x))}</td><td class="${(ST[x.status] || ['', ''])[0]}" title="${esc(x.note || '')}">${(ST[x.status] || ['', x.status])[1]}${x.R != null && (x.status === 'win' || x.status === 'loss') ? ` ${x.R > 0 ? '+' : ''}${x.R}R` : ''}</td></tr>`).join('')
       : `<tr><td colspan="8" class="empty">No council trades yet${only ? ' on this market' : ''}. The Trader takes every Ready setup it sees.</td></tr>`);
+    // Scorecard: closed council trades grouped by setup and by market
+    const allClosed = (C.trades || []).filter((x) => x.status === 'win' || x.status === 'loss');
+    const group = (keyFn, labelFn) => {
+      const g = {}; allClosed.forEach((x) => { const k = keyFn(x); (g[k] = g[k] || { label: labelFn(x), arr: [] }).arr.push(x); });
+      return Object.values(g).map(({ label, arr }) => { const w = arr.filter((x) => x.status === 'win').length, r = arr.reduce((a, x) => a + x.R, 0);
+        return { label, n: arr.length, wr: w / arr.length, avg: r / arr.length, R: r }; }).sort((a, b) => b.R - a.R);
+    };
+    const row = (g) => `<tr><td>${g.label}</td><td class="n">${g.n}</td><td class="n">${Math.round(g.wr * 100)}%</td><td class="n ${g.avg > 0 ? 'pos' : g.avg < 0 ? 'neg' : ''}">${g.avg > 0 ? '+' : ''}${g.avg.toFixed(2)}R</td><td class="n ${g.R > 0 ? 'pos' : g.R < 0 ? 'neg' : ''}">${g.R > 0 ? '+' : ''}${g.R.toFixed(1)}R</td><td>${g.n < 5 ? '<span class="c-few">few trades</span>' : g.avg > 0.2 ? '<span class="c-good">trust</span>' : g.avg < -0.2 ? '<span class="c-bad">avoid</span>' : '<span class="c-few">neutral</span>'}</td></tr>`;
+    const empty = '<tr><td colspan="6" class="empty">Builds up as the Trader closes trades.</td></tr>';
+    set('ms-c-sc-setup', allClosed.length ? group((x) => x.k, (x) => `${esc(x.name)} <small>${esc(x.pair)}</small>`).map(row).join('') : empty);
+    set('ms-c-sc-mkt', allClosed.length ? group((x) => x.market, (x) => `<b>${esc(x.label)}</b>`).map(row).join('') : empty);
     // Analyst
     const ready = C.snap ? Object.entries(C.snap.markets || {}).flatMap(([k, m]) => m.setups.filter((t) => t.state === 'READY').map((t) => ({ k, m, t }))) : [];
     set('ms-c-ready', ready.length ? ready.map(({ k, m, t }) => `<li><a href="?s=${k}#setup"><b>${esc(m.label)}</b> ${t.side === 'sell' ? 'Sell' : 'Buy'} ${esc(t.name)} <small>${esc(t.pair)}</small></a><span>${t.rr}R</span></li>`).join('') : '<li class="empty">No market is Ready at the last Trader run.</li>');
