@@ -132,7 +132,10 @@ for (const [key, M] of Object.entries(MARKETS)) {
       const f = config.filters[t.k] || {}, blockedBy = [];
       if (config.paused[t.k]) blockedBy.push('paused');
       if (config.pausedMarkets[key]) blockedBy.push('market');
-      if (t.rr < config.minRR) blockedBy.push('minRR');
+      // a market fill changes the reward:risk, so judge the rule on the price we would really get
+      const mkt = t.sell ? price >= t.entry : price <= t.entry;
+      const rrNow = mkt ? (t.t1 - price) * (t.sell ? -1 : 1) / Math.abs(price - t.stop) : t.rr;
+      if (!(rrNow >= config.minRR)) blockedBy.push('minRR');
       if (f.d1 && feat.d1 !== f.d1) blockedBy.push('d1');
       if (f.struct && feat.struct !== 'n/a' && feat.struct !== f.struct) blockedBy.push('struct');
       if (f.noSession && f.noSession.includes(feat.session)) blockedBy.push('session');
@@ -140,12 +143,12 @@ for (const [key, M] of Object.entries(MARKETS)) {
       const live = trades.filter((x) => x.market === key && !x.shadow && (x.status === 'open' || x.status === 'pending'));
       if (live.length >= MAX_OPEN || live.some((x) => x.side !== (t.sell ? 'sell' : 'buy'))) blockedBy.push('exposure');
       const shadow = blockedBy.length > 0;
-      const why = { paused: `paused until ${String(config.paused[t.k]).slice(0, 10)}`, minRR: `reward:risk ${t.rr.toFixed(2)} under ${config.minRR}`, d1: `rule: only ${f.d1} D1`, struct: `rule: only ${f.struct} structure`, session: `rule: not in ${feat.session}`, exposure: 'already 2 trades or an opposite trade open on this market', market: `market paused until ${String(config.pausedMarkets[key]).slice(0, 10)}` };
+      const why = { paused: `paused until ${String(config.paused[t.k]).slice(0, 10)}`, minRR: `reward:risk ${(isFinite(rrNow) ? rrNow : 0).toFixed(2)} under ${config.minRR}`, d1: `rule: only ${f.d1} D1`, struct: `rule: only ${f.struct} structure`, session: `rule: not in ${feat.session}`, exposure: 'already 2 trades or an opposite trade open on this market', market: `market paused until ${String(config.pausedMarkets[key]).slice(0, 10)}` };
       const h = def.h;
       const tr = { id: `${key}-${t.k}-${now}`, market: key, label: M.label, dec: M.dec, k: t.k, name: t.name, pair: t.pair, h, side: t.sell ? 'sell' : 'buy',
         entry: t.entry, stop: t.stop, t1: t.t1, rr: +t.rr.toFixed(2), buf: CFG.buf, opened: now, checked: now, status: 'pending', R: null, feat,
         shadow, blockedBy, note: shadow ? `Shadow (${blockedBy.map((b) => why[b]).join(', ')})` : t.next };
-      if (t.sell ? price >= t.entry : price <= t.entry) {
+      if (mkt) {
         // price is already through the entry: fill at the market price, never at a better level than was available
         tr.entry = price; tr.status = 'open'; tr.filled = now;
         const r = Math.abs(tr.entry - tr.stop), rw = (tr.t1 - tr.entry) * (t.sell ? -1 : 1);
