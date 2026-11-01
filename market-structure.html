@@ -321,6 +321,23 @@
   .sbar-ax em { position: absolute; top: 0; font: 500 10px var(--mono); font-style: normal; color: var(--ink-faint); transform: translateX(-50%); }
   .sbar-ax em:first-child { transform: none; }
   .sbar-ax b { position: absolute; bottom: 14px; width: 2px; height: 80px; background: #f2b33d; border-radius: 1px; }
+  .mk { position: relative; }
+  .mk summary { list-style: none; }
+  .mk summary::-webkit-details-marker { display: none; }
+  .mk-pop { position: absolute; left: -5px; top: calc(100% + 8px); z-index: 40; width: min(360px, calc(100vw - 32px)); background: var(--panel); border: 1px solid var(--line); border-radius: 12px; box-shadow: 0 16px 40px rgba(0,0,0,.45); padding: 10px; }
+  .mk-pop input { width: 100%; min-height: 40px; background: var(--panel-raised); color: var(--ink); border: 1px solid var(--line); border-radius: 8px; padding: 0 12px; font: 500 14px var(--sans); }
+  .mk-pop input:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+  .mk-list { list-style: none; margin: 8px 0 0; padding: 0; max-height: min(420px, 60vh); overflow-y: auto; }
+  .mk-g { font-size: 10px; letter-spacing: 1.2px; text-transform: uppercase; color: var(--ink-faint); padding: 10px 8px 4px; font-weight: 700; }
+  .mk-list a { display: grid; grid-template-columns: minmax(0, 1fr) auto auto; align-items: center; gap: 10px; min-height: 44px; padding: 4px 8px; border-radius: 8px; color: var(--ink); text-decoration: none; }
+  .mk-list a:hover, .mk-list a:focus-visible { background: var(--panel-raised); outline: none; }
+  .mk-list a.cur { background: color-mix(in srgb, var(--accent) 14%, transparent); }
+  .mk-n b { display: block; font-size: 13px; } .mk-n small { color: var(--ink-faint); font-size: 11px; }
+  .mk-p { font: 600 12px var(--mono); color: var(--ink-dim); font-variant-numeric: tabular-nums; }
+  .mk-list .ms-st { margin-left: 0; }
+  .mk-wait { color: var(--ink-faint); font-size: 12px; }
+  .kbd-hint { margin-left: 10px; font-size: 11px; letter-spacing: 0; text-transform: none; color: var(--ink-faint); font-weight: 500; }
+  @media (hover: none) { .kbd-hint { display: none; } }
   @media (max-width: 700px) {
     .px b { font-size: 18px; }
     .ms-status .upd { display: none; }
@@ -334,7 +351,7 @@
 <div class="ms-live app" id="ms-live" data-chart="dark">
 
   <header class="top">
-    <div class="brand"><i class="ms-coin" aria-hidden="true"></i><div><label class="sr" for="ms-inst">Market</label><select id="ms-inst" class="inst"><option>XAU/USD · Gold</option></select><span id="ms-inst-name">Gold · Mosha structure</span></div></div>
+    <div class="brand"><i class="ms-coin" aria-hidden="true"></i><div><details class="mk" id="ms-mk"><summary class="inst" id="ms-mk-btn">XAU/USD · Gold</summary><div class="mk-pop"><label class="sr" for="ms-mk-q">Search markets</label><input id="ms-mk-q" type="search" placeholder="Search markets…" autocomplete="off"><ul class="mk-list" id="ms-mk-list"></ul></div></details><select id="ms-inst" class="inst" hidden aria-hidden="true" tabindex="-1"><option>XAU/USD · Gold</option></select><span id="ms-inst-name">Gold · Mosha structure</span></div></div>
     <div class="px"><b id="ms-hdr-price">—</b><span id="ms-hdr-chg" class="hdr-chg"></span></div>
     <span class="ms-sess" id="ms-sess" title="Trading sessions"></span>
     <a class="ms-badge" id="ms-scan-badge" href="#scanner" hidden></a>
@@ -471,7 +488,7 @@
   <!-- ─── Charts ─── -->
   <section class="view" id="v-charts" aria-label="Charts" hidden>
     <div class="sec-h">
-      <h2>Charts</h2>
+      <h2>Charts <span class="kbd-hint">Keys 1–6 pick a chart, 0 shows all, F fits</span></h2>
       <div class="seg" role="group" aria-label="Chart view">
         <button type="button" data-view="1d">D1</button><button type="button" data-view="4h">H4</button><button type="button" data-view="1h">H1</button><button type="button" data-view="15m">M15</button><button type="button" data-view="5m">M5</button><button type="button" data-view="1m">M1</button><button type="button" data-view="all">All</button>
       </div>
@@ -545,7 +562,7 @@
     </div>
   </section>
 
-  <p class="foot">Live candles from Binance and Kraken public feeds; gold is aligned to XAU/USD spot via gold-api.com. Times are in your local zone.<br>Version 1 Nov 2026 · key levels & alerts</p>
+  <p class="foot">Live candles from Binance and Kraken public feeds; gold is aligned to XAU/USD spot via gold-api.com. Times are in your local zone.<br>Version 1 Nov 2026 · market switcher</p>
   <div class="ms-toasts" id="ms-toasts" role="status" aria-live="polite"></div>
 </div>
 <script>
@@ -1054,7 +1071,9 @@ function msNextSetup(bars, A) {
       chip.textContent = sell ? 'BEARISH' : 'BULLISH';
       chip.className = 'ms-chip ' + (sell ? 'ms-chip-sell' : 'ms-chip-buy');
       const lastBO = `${e.structure ? 'BO Structure' : e.dir < 0 ? 'BO Sell' : 'BO Buy'} ${fmt(e.level)} · ${ftime(P.bars[e.breakIdx].time)}`;
-      box.innerHTML = `<span>Last <b>${lastBO}</b></span><span>Origin <b>${fmt(e.bot)} – ${fmt(e.top)}</b></span><span>${P.S ? P.S.phase : ''}</span>`;
+      const vrP = e.vr ? e.vr.p : (A.ext ? A.ext.p : null), mid = vrP === null ? null : ((e.dir < 0 ? e.top : e.bot) + vrP) / 2;
+      box.innerHTML = `<span>Last <b>${lastBO}</b></span><span>Origin <b>${fmt(e.bot)} – ${fmt(e.top)}</b></span>` +
+        (mid !== null ? `<span>50% <b>${fmt(mid)}</b></span><span>${e.vr ? 'VR' : 'Extreme'} <b>${fmt(vrP)}</b></span>` : '') + `<span>${P.S ? P.S.phase : ''}</span>`;
     };
     P.legend = function (b, prev) {
       if (!b) return;
@@ -1764,7 +1783,7 @@ function msNextSetup(bars, A) {
     const badge = document.getElementById('ms-scan-badge');
     if (badge) { badge.hidden = !nReady; badge.textContent = `${nReady} market${nReady === 1 ? '' : 's'} ready`; }
     const meta = document.getElementById('ms-scan-meta');
-    renderHome();
+    renderHome(); renderMk();
     if (meta) meta.textContent = SCAN.busy ? `Scanning ${Object.keys(SCAN.res).length} / ${keys.length}…` : SCAN.at ? `${nReady} ready · scanned ${new Date(SCAN.at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}` : '';
   }
   async function scanAll() {
@@ -2006,6 +2025,42 @@ function msNextSetup(bars, A) {
     const mark = k ? '' : `<b style="left:${((now - t0) / 864).toFixed(2)}%" title="Now"></b>`;
     return `<div class="sbar"><div class="sbar-cap">${cap}</div>${rows}<div class="sbar-ax"><span></span><div class="sbar-t">${[0, 6, 12, 18].map((h) => `<em style="left:${h / 24 * 100}%">${String(h).padStart(2, '0')}:00</em>`).join('')}${mark}</div></div></div>`;
   }
+
+  // ─── Market switcher: search every market, see which ones are Ready ───
+  const mkList = document.getElementById('ms-mk-list'), mkQ = document.getElementById('ms-mk-q'), mkBox = document.getElementById('ms-mk');
+  function renderMk() {
+    const mkList = document.getElementById('ms-mk-list'), mkQ = document.getElementById('ms-mk-q');   // looked up here: renderScan can run before the consts below exist
+    if (!mkList) return;
+    const q = (mkQ && mkQ.value || '').trim().toLowerCase();
+    const groups = {};
+    Object.entries(INSTRUMENTS).forEach(([k, I]) => {
+      if (q && !(I.label + ' ' + I.name + ' ' + I.group).toLowerCase().includes(q)) return;
+      (groups[I.group] = groups[I.group] || []).push([k, I]);
+    });
+    const html = Object.entries(groups).map(([g, arr]) => `<li class="mk-g">${g}</li>` + arr.map(([k, I]) => {
+      const r = SCAN.res[k], best = r && r.list && r.list[0];
+      const st = best ? `<span class="ms-st ${best.cls}">${best.state}</span>` : '<span class="mk-wait">—</span>';
+      const px = r && r.price ? fmtI(r.price, I) : '';
+      return `<li><a href="?s=${k}"${k === instKey ? ' aria-current="true" class="cur"' : ''}><span class="mk-n"><b>${I.label}</b><small>${I.name}</small></span><span class="mk-p">${px}</span>${st}</a></li>`;
+    }).join('')).join('');
+    mkList.innerHTML = html || '<li class="mk-g">No market matches</li>';
+  }
+  if (mkList) {
+    const btn = document.getElementById('ms-mk-btn'); if (btn) btn.textContent = `${INST.label} · ${INST.name}`;
+    mkQ.addEventListener('input', renderMk);
+    mkQ.addEventListener('keydown', (ev) => { if (ev.key === 'Enter') { const a = mkList.querySelector('a'); if (a) location.href = a.href; } if (ev.key === 'Escape') mkBox.open = false; });
+    mkBox.addEventListener('toggle', () => { if (mkBox.open) { renderMk(); setTimeout(() => mkQ.focus(), 0); } });
+    document.addEventListener('click', (ev) => { if (mkBox.open && !mkBox.contains(ev.target)) mkBox.open = false; });
+    renderMk();
+  }
+
+  // ─── Keyboard: 1–6 pick a chart, 0 shows all, F fits, G goes home ───
+  document.addEventListener('keydown', (ev) => {
+    if (ev.metaKey || ev.ctrlKey || ev.altKey || /INPUT|TEXTAREA|SELECT/.test((ev.target || {}).tagName || '')) return;
+    const tfKeys = { 1: '1d', 2: '4h', 3: '1h', 4: '15m', 5: '5m', 6: '1m', 0: 'all' };
+    if (location.hash === '#charts' && tfKeys[ev.key] && document.querySelector(`[data-view="${tfKeys[ev.key]}"]`)) { document.querySelector(`[data-view="${tfKeys[ev.key]}"]`).click(); }
+    else if ((ev.key === 'f' || ev.key === 'F') && location.hash === '#charts') Object.values(panes).forEach((p) => p.fit());
+  });
 
   // ─── Sections: a home page of cards, each section on its own page ───
   const VIEWS = ['home', 'setup', 'charts', 'scanner', 'news', 'journal', 'backtest', 'guide'];
