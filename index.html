@@ -6297,7 +6297,7 @@ if (/^#(market-structure|structure)$/.test(location.hash) || /market-structure\.
 
   // ─── Possible trades: the Mosha setup on three timeframe pairs ───
   // Council rules (stop buffer, paused setups, minimum R) — the Coach tunes these; the page loads them from the council data
-  const CFG = { buf: 0.15, minRR: 1.2, paused: {} };
+  const CFG = { buf: 0.15, minRR: 1.2, minRisk: 0.6, paused: {} };
   const PAIRS = [
     { k: 'position', name: 'Position', h: '1d',  l: '1h',  e: 'H1 / M5', up: null },
     { k: 'swing',    name: 'Swing',    h: '4h',  l: '1h',  e: 'M15 / M1', up: '1d' },
@@ -6342,6 +6342,9 @@ if (/^#(market-structure|structure)$/.test(location.hash) || /market-structure\.
       anchor = sell ? ll.top : ll.bot; buf = Math.max(CFG.buf * atr(lp.bars), spr);
       entry = ll.level; stop = anchor + (sell ? buf : -buf);
       stopWhy = `${Lo} CF ${sell ? 'high' : 'low'} ${fmt(anchor)}`;
+      // never closer than minRisk × ATR: a stop inside one normal candle is just noise
+      const floor = CFG.minRisk * atr(lp.bars);
+      if (Math.abs(entry - stop) < floor) { stop = entry + (sell ? floor : -floor); buf = Math.abs(stop - anchor); stopWhy += ` (widened to ${CFG.minRisk} × ${Lo} ATR)`; }
     } else {
       anchor = sell ? e.top : e.bot; buf = Math.max(0.1 * atr(hp.bars), spr);
       entry = sell ? e.bot + 0.5 * h : e.top - 0.5 * h; stop = anchor + (sell ? buf : -buf);
@@ -6391,6 +6394,8 @@ if (/^#(market-structure|structure)$/.test(location.hash) || /market-structure\.
       anchor = buy ? ll.bot : ll.top; buf = Math.max(CFG.buf * atr(lp.bars), spr);
       entry = ll.level; stop = anchor - sgn * buf;
       stopWhy = `${Lo} ${buy ? 'low' : 'high'} ${fmt(anchor)}`;
+      const floor = CFG.minRisk * atr(lp.bars);
+      if (Math.abs(entry - stop) < floor) { stop = entry - sgn * floor; buf = Math.abs(stop - anchor); stopWhy += ` (widened to ${CFG.minRisk} × ${Lo} ATR)`; }
     } else {
       anchor = vrP; buf = Math.max(0.1 * atr(hp.bars), spr);
       entry = vrP + sgn * 0.2 * Math.abs(near - vrP); stop = anchor - sgn * buf;
@@ -7246,7 +7251,7 @@ if (/^#(market-structure|structure)$/.test(location.hash) || /market-structure\.
     const [trades, config, coach, snap, analysis, review] = await Promise.all([get('trades.json', 1), get('config.json', 1), get('coach.json', 1), get('snapshot.json', 1), get('analysis/latest.md'), get('reviews/latest.md')]);
     Object.assign(COUNCIL, { trades, config, coach, snap, analysis, review, at: Date.now() });
     if (config) {
-      CFG.buf = Math.min(0.25, Math.max(0.10, +config.buf || 0.15)); CFG.minRR = +config.minRR || 1.2; CFG.paused = config.paused || {};
+      CFG.buf = Math.min(0.25, Math.max(0.10, +config.buf || 0.15)); CFG.minRR = +config.minRR || 1.2; CFG.minRisk = Math.min(1.2, Math.max(0.4, +config.minRisk || 0.6)); CFG.paused = config.paused || {};
       const m1 = panes['1m']; if (m1 && m1.bars) topDown();
     }
     renderCouncil();
@@ -7293,7 +7298,7 @@ if (/^#(market-structure|structure)$/.test(location.hash) || /market-structure\.
     // Coach
     const cf = C.config || { buf: CFG.buf, minRR: CFG.minRR, paused: {}, history: [] };
     const paused = Object.entries(cf.paused || {});
-    set('ms-c-rules', `<span class="ms-q">Stop buffer ${cf.buf} × ATR</span><span class="ms-q">Min reward:risk ${cf.minRR}</span>` + (paused.length ? paused.map(([k, u]) => `<span class="ms-q weak">${esc(k)} paused to ${esc(u.slice(0, 10))}</span>`).join('') : '<span class="ms-q good">All setups active</span>') +
+    set('ms-c-rules', `<span class="ms-q">Stop buffer ${cf.buf} × ATR</span><span class="ms-q">Min stop ${cf.minRisk || 0.6} × ATR</span><span class="ms-q">Min reward:risk ${cf.minRR}</span>` + (paused.length ? paused.map(([k, u]) => `<span class="ms-q weak">${esc(k)} paused to ${esc(u.slice(0, 10))}</span>`).join('') : '<span class="ms-q good">All setups active</span>') +
       Object.entries(cf.filters || {}).map(([k, f]) => [f.d1 ? `${k}: only ${f.d1} D1` : '', f.struct ? `${k}: only ${f.struct} structure` : '', (f.noSession || []).length ? `${k}: skip ${f.noSession.join(', ')}` : ''].filter(Boolean).map((t) => `<span class="ms-q">Learned · ${esc(t)}</span>`).join('')).join(''));
     const sh = (C.trades || []).filter((x) => x.shadow && (x.status === 'win' || x.status === 'loss')), shR = sh.reduce((a, x) => a + x.R, 0);
     set('ms-c-shadow-sum', sh.length ? `Shadow trades (blocked by rules) closed: ${sh.length}, ${shR >= 0 ? '+' : ''}${shR.toFixed(1)}R. ${shR > 0 ? 'Blocked trades are winning: the Coach will loosen the rule that blocks them.' : 'The rules are keeping you out of losing trades.'}` : 'Blocked setups are followed as shadow trades so the Coach can check every rule it adds.');
