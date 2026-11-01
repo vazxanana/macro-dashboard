@@ -499,12 +499,13 @@
         <li><b>50% line:</b> measure the whole move after the BO, from the Origin edge where it started to the VR extreme. The halfway point (like a Fibonacci 50%) is drawn as a dashed line. A pullback that stays under it is <b>internal structure</b>; once price goes past it, it's the <b>main structure</b>.</li>
         <li><b>CF:</b> once price is back inside the Origin, wait for the lower timeframe to break in the trade's direction. That break is the CF.</li>
         <li><b>Entry and stop:</b> enter on the pullback to the CF level. The stop goes just past the swing the CF break started from, padded by a small buffer sized to that timeframe's candles. A body close beyond the Origin cancels the idea.</li>
+        <li><b>Retracement trades:</b> once the HTF has made its VR, price pulls back toward the Origin. While that happens you can trade the lower timeframe the other way: in a sell, an H1 BO Buy is a buy up to the 50% line and the Origin, and vice versa. Take profit before the Origin, because that's where the main trend resumes. These cards are tagged <b>Retracement</b>.</li>
         <li><b>Timeframe pairs:</b> Position D1 → H1, Swing H4 → H1, Intraday H1 → M5, Scalp M15 → M1.</li>
       </ol>
     </div>
   </section>
 
-  <p class="foot">Live candles from Binance and Kraken public feeds; gold is aligned to XAU/USD spot via gold-api.com. Times are in your local zone.<br>Version 1 Nov 2026 · home page</p>
+  <p class="foot">Live candles from Binance and Kraken public feeds; gold is aligned to XAU/USD spot via gold-api.com. Times are in your local zone.<br>Version 1 Nov 2026 · retracement trades</p>
   <div class="ms-toasts" id="ms-toasts" role="status" aria-live="polite"></div>
 </div>
 <script>
@@ -1184,6 +1185,58 @@ function msNextSetup(bars, A) {
     return { k: pr.k, name: pr.name, pair: `${H} → ${Lo}`, sell, entry, stop, t1, t2, rr, r, state, cls, next, align, upL: pr.up ? LBL[pr.up] : '', size: sizeText(r, price), invalid: beyond, model, retr, fib, stopWhy, buf,
       sig: `${pr.k}|${hp.bars[e.start].time}|${cf ? lp.bars[ll.breakIdx].time : ''}` };
   }
+  // ─── Retracement trades: while the HTF pulls back toward its Origin, trade the lower timeframe against the main direction ───
+  // e.g. H4 is a sell and has made its VR: an H1 BO Buy is a buy up to the 50% line / Origin, where the sells resume.
+  const RETR = [
+    { k: 'rswing', name: 'Retrace', h: '4h',  l: '1h' },
+    { k: 'rintra', name: 'Retrace', h: '1h',  l: '5m' },
+    { k: 'rscalp', name: 'Retrace', h: '15m', l: '1m' },
+  ];
+  function buildRetrace(pr, price, src = panes) {
+    const hp = src[pr.h], lp = src[pr.l];
+    if (!hp || !lp || !hp.A || !hp.A.last || !hp.A.ext || !lp.A || !lp.bars || lp.bars.length < 20) return null;
+    const e = hp.A.last, dir = e.dir, sell = dir < 0, rdir = -dir, buy = rdir > 0, sgn = buy ? 1 : -1;
+    const H = LBL[pr.h], Lo = LBL[pr.l], word = buy ? 'buy' : 'sell', main = sell ? 'sells' : 'buys', way = buy ? 'up' : 'down';
+    const breakT = hp.bars[e.breakIdx].time;
+    const vrP = e.vr ? e.vr.p : hp.A.ext.p, vrI = e.vr ? e.vr.i : hp.A.ext.i;
+    const vrT = hp.bars[Math.min(vrI, hp.bars.length - 1)].time;
+    const far = sell ? e.top : e.bot, fib = (far + vrP) / 2, near = e.level;
+    const after = lp.A.events.filter((x) => lp.bars[x.breakIdx].time >= breakT);
+    const vr = !!e.vr || after.some((x) => x.dir === rdir);
+    const beyond = sell ? price > e.top : price < e.bot;
+    const reached = sell ? price >= e.bot : price <= e.top;
+    const ll = lp.A.last;
+    const conf = vr && ll && ll.dir === rdir && lp.bars[ll.breakIdx].time >= vrT;
+    const spr = spreadOf(price);
+    let entry, stop, anchor, buf, stopWhy;
+    if (conf) {
+      anchor = buy ? ll.bot : ll.top; buf = Math.max(0.15 * atr(lp.bars), spr);
+      entry = ll.level; stop = anchor - sgn * buf;
+      stopWhy = `${Lo} ${buy ? 'low' : 'high'} ${fmt(anchor)}`;
+    } else {
+      anchor = vrP; buf = Math.max(0.1 * atr(hp.bars), spr);
+      entry = vrP + sgn * 0.2 * Math.abs(near - vrP); stop = anchor - sgn * buf;
+      stopWhy = `${H} VR ${fmt(vrP)} (moves to the ${Lo} swing once ${Lo} breaks ${way})`;
+    }
+    const r = Math.abs(entry - stop);
+    if (!(r > 0)) return null;
+    // Targets: the 50% line and the Origin edge, nearest first; never past the Origin, that's where the main trend resumes
+    const tg = [fib, near].sort((a, b) => (a - b) * sgn);
+    let t1 = tg[0], t2 = tg[1];
+    if ((t1 - entry) * sgn <= 0) t1 = t2;
+    if ((t2 - t1) * sgn <= 0) t2 = t1;
+    const rr = Math.max(0, (t1 - entry) * sgn) / r;
+    let state, cls, next, invalid = false;
+    if (beyond) { state = 'INVALID'; cls = 'bad'; invalid = true; next = `Price broke beyond the ${H} Origin, so the ${H} structure has flipped. No retracement trade.`; }
+    else if (reached) { state = 'PLAYED OUT'; cls = ''; invalid = true; next = `The retracement already reached the ${H} Origin ${fmt(e.bot)} – ${fmt(e.top)}. Look for ${main} there instead (the main setup cards).`; }
+    else if (!vr) { state = 'WAIT VR'; cls = ''; invalid = true; next = `${H} is still extending ${sell ? 'down' : 'up'}. A retracement ${word} only comes after the ${H} VR.`; }
+    else if (conf && (price - t1) * sgn >= 0) { state = 'PLAYED OUT'; cls = ''; invalid = true; next = `This ${Lo} ${word} already reached ${fmt(t1)}. Wait for the next ${Lo} break, or the ${main} at the Origin.`; }
+    else if (conf) { state = 'READY'; cls = 'ready'; next = `${H} made its VR and ${Lo} broke ${way}. ${buy ? 'Buy' : 'Sell'} the pullback to ${fmt(entry)}, stop past ${fmt(stop)}. Take profit at ${fmt(t1)}${t2 !== t1 ? ` then ${fmt(t2)}` : ''}, and be out before the Origin: that's where the ${H} ${main} resume.`; }
+    else { state = 'WAIT BO'; cls = 'near'; next = `${H} VR is in at ${fmt(vrP)}. Wait for ${Lo} to print a BO ${buy ? 'Buy' : 'Sell'}, then ${word} the retracement ${way} to the 50% line ${fmt(fib)} and the Origin ${fmt(near)}.`; }
+    return { k: pr.k, name: pr.name, pair: `${H} → ${Lo}`, sell: !buy, entry, stop, t1, t2, rr, r, state, cls, next, align: null, upL: H,
+      size: sizeText(r, price), invalid, model: null, retr: null, fib, stopWhy, buf, retrace: true,
+      sig: `${pr.k}|${vrT}|${conf ? lp.bars[ll.breakIdx].time : ''}` };
+  }
   function sizeText(r, price) {
     const usd = (v) => '$' + Math.ceil(v).toLocaleString('en-US');
     const INST = CUR;
@@ -1199,22 +1252,22 @@ function msNextSetup(bars, A) {
     return `${u >= 100 ? u.toFixed(0) : u >= 1 ? u.toFixed(2) : u.toFixed(4)} ${INST.unit}`;
   }
   function renderTrades(price) {
-    const list = PAIRS.map((pr) => buildSetup(pr, price)).filter(Boolean);
+    const list = PAIRS.map((pr) => buildSetup(pr, price)).concat(RETR.map((pr) => buildRetrace(pr, price))).filter(Boolean);
     if (!list.length) return;
     G.list = list;
-    const order = ORDER || { READY: 0, 'IN ORIGIN': 1, 'AT EXTREME': 2, 'UNDER 50%': 3, 'WAIT RETRACE': 4, 'WAIT VR': 5, 'NO SETUP': 6, 'PLAYED OUT': 7, INVALID: 8 };
+    const order = ORDER || { READY: 0, 'IN ORIGIN': 1, 'AT EXTREME': 2, 'UNDER 50%': 3, 'WAIT RETRACE': 4, 'WAIT BO': 4.5, 'WAIT VR': 5, 'NO SETUP': 6, 'PLAYED OUT': 7, INVALID: 8 };
     if (!G.sel || !list.some((t) => t.k === G.sel && !t.invalid)) {
       const best = list.slice().sort((a, b) => order[a.state] - order[b.state])[0];
       G.sel = best.k;
     }
     $('ms-trades').innerHTML = list.map((t) => {
       const size = t.size;
-      const tag = t.align === null ? '' : `<span class="ms-tag ${t.align ? 'with' : 'counter'}">${t.align ? `WITH ${t.upL}` : `AGAINST ${t.upL}`}</span>`;
+      const tag = t.retrace ? `<span class="ms-tag counter">RETRACEMENT · AGAINST ${t.upL}</span>` : t.align === null ? '' : `<span class="ms-tag ${t.align ? 'with' : 'counter'}">${t.align ? `WITH ${t.upL}` : `AGAINST ${t.upL}`}</span>`;
       return `<button type="button" class="ms-trade${t.k === G.sel ? ' sel' : ''}${t.invalid ? ' invalid' : ''}" data-k="${t.k}" aria-pressed="${t.k === G.sel}">` +
         `<div class="ms-tr-h"><span class="ms-chip ${t.sell ? 'ms-chip-sell' : 'ms-chip-buy'}">${t.sell ? 'SELL' : 'BUY'}</span><b>${t.name}</b><small>${t.pair}</small>${tag}<span class="ms-st ${t.cls}">${t.state}</span></div>` +
         `<div class="ms-tr-g"><span>Entry<b>${fmt(t.entry)}</b></span><span>Stop<b class="neg">${fmt(t.stop)}</b></span><span>Target 1<b class="pos">${fmt(t.t1)}</b></span>` +
         `<span>Target 2<b class="pos">${fmt(t.t2)}</b></span><span>Reward : risk<b>${t.rr.toFixed(1)} R</b></span><span>Size<b>${size}</b></span></div>` +
-        `<div class="ms-tr-q">${t.stopWhy && !t.invalid ? `<span class="ms-q">Stop past ${t.stopWhy} + ${fmt(t.buf)}</span>` : ''}}` +
+        `<div class="ms-tr-q">${t.stopWhy && !t.invalid ? `<span class="ms-q">Stop past ${t.stopWhy} + ${fmt(t.buf)}</span>` : ''}` +
         `${t.retr !== null ? `<span class="ms-q ${t.retr >= 0.5 ? 'good' : 'weak'}">Pullback ${t.retr >= 1 ? '100%+' : Math.round(t.retr * 100) + '%'} · ${t.retr >= 0.5 ? 'main structure' : 'internal structure'}</span>` : ''}</div>` +
         `<div class="ms-tr-n">${t.next}</div></button>`;
     }).join('');
@@ -1426,7 +1479,7 @@ function msNextSetup(bars, A) {
     rd.readAsText(f);
   });
 
-  const ORDER = { READY: 0, 'IN ORIGIN': 1, 'AT EXTREME': 2, 'UNDER 50%': 3, 'WAIT RETRACE': 4, 'WAIT VR': 5, 'NO SETUP': 6, 'PLAYED OUT': 7, INVALID: 8 };
+  const ORDER = { READY: 0, 'IN ORIGIN': 1, 'AT EXTREME': 2, 'UNDER 50%': 3, 'WAIT RETRACE': 4, 'WAIT BO': 4.5, 'WAIT VR': 5, 'NO SETUP': 6, 'PLAYED OUT': 7, INVALID: 8 };
   const esc = (v) => String(v == null ? '' : v).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
   const dur = (sec) => { sec = Math.max(0, Math.round(sec)); const d = Math.floor(sec / 86400), h = Math.floor(sec % 86400 / 3600), m = Math.floor(sec % 3600 / 60);
     return d ? `${d}d ${h}h` : h ? `${h}h ${String(m).padStart(2, '0')}m` : `${m}m`; };
@@ -1612,7 +1665,7 @@ function msNextSetup(bars, A) {
     const price = m.bars[m.bars.length - 1].close;
     const c = CUR; CUR = I;
     try {
-      const list = PAIRS.map((pr) => buildSetup(pr, price, src)).filter(Boolean);
+      const list = PAIRS.map((pr) => buildSetup(pr, price, src)).concat(RETR.map((pr) => buildRetrace(pr, price, src))).filter(Boolean);
       list.sort((a, b) => ORDER[a.state] - ORDER[b.state] || b.rr - a.rr);
       const trend = {}; ['1d', '4h', '1h'].forEach((k) => { trend[k] = src[k] && src[k].A ? src[k].A.trend : 0; });
       const h1 = src['1h'] && src['1h'].bars, ref = h1 && h1.length > 24 ? h1[h1.length - 25].close : null;
@@ -1685,7 +1738,7 @@ function msNextSetup(bars, A) {
   // ─── Backtest: replay the rules candle by candle and score every Ready setup ───
   const BT_LIM = { '1d': 1000, '4h': 1000, '1h': 2000, '15m': 2000, '5m': 3000, '1m': 3000 };
   const BT_WAIT = 48, BT_WIN = 500;
-  function btSimulate(pr, hist, isRev) {
+  function btSimulate(pr, hist, build) {
     const hb = hist[pr.h], lb = hist[pr.l];
     if (!hb || !lb || lb.length < 200 || hb.length < 80) return null;
     const hs = TFS.find((x) => x.id === pr.h).sec, ls = TFS.find((x) => x.id === pr.l).sec;
@@ -1713,7 +1766,7 @@ function msNextSetup(bars, A) {
       const lw = lb.slice(Math.max(0, i + 1 - BT_WIN), i + 1);
       const src = { [pr.h]: hSrc, [pr.l]: { bars: lw, A: msAnalyze(lw, PIVOT) } };
       let t = null;
-      try { t = buildSetup(pr, b.close, src); } catch (e) { t = null; }
+      try { t = build(pr, b.close, src); } catch (e) { t = null; }
       if (!t || t.state !== 'READY' || used.has(t.sig) || !(t.r > 0)) continue;
       used.add(t.sig);
       pos = { k: pr.k, name: pr.name, pair: t.pair, sell: t.sell, entry: t.entry, stop: t.stop, t1: t.t1, rr: t.rr, model: t.model, t0: T, i0: i, filled: false, done: false };
@@ -1735,11 +1788,11 @@ function msNextSetup(bars, A) {
     const hist = {};
     res.forEach((r, k) => { if (r.status === 'fulfilled') hist[TFS[k].id] = r.value.bars.map((b) => ({ time: b.time, open: b.open + G.offset, high: b.high + G.offset, low: b.low + G.offset, close: b.close + G.offset })); });
     const runs = [];
-    for (const [k, pr] of PAIRS.map((x) => [x, false]).entries()) {
-      meta.textContent = `Replaying ${pr[0].name} ${LBL[pr[0].h]} → ${LBL[pr[0].l]} (${k + 1} of ${PAIRS.length})…`;
+    for (const [k, pr] of PAIRS.map((x) => [x, buildSetup]).concat(RETR.map((x) => [x, buildRetrace])).entries()) {
+      meta.textContent = `Replaying ${pr[0].name} ${LBL[pr[0].h]} → ${LBL[pr[0].l]} (${k + 1} of ${PAIRS.length + RETR.length})…`;
       await new Promise((r) => setTimeout(r, 16));
       const sim = btSimulate(pr[0], hist, pr[1]);
-      if (sim) runs.push(Object.assign(sim, { pr: pr[0], rev: pr[1] }));
+      if (sim) runs.push(Object.assign(sim, { pr: pr[0] }));
     }
     btn.disabled = false; btn.textContent = 'Run again';
     if (!runs.length) { meta.textContent = ''; out.innerHTML = '<div class="ms-note">Not enough history loaded to backtest this market.</div>'; return; }
