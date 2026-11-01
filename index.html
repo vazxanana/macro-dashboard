@@ -6296,6 +6296,8 @@ if (/^#(market-structure|structure)$/.test(location.hash) || /market-structure\.
   }
 
   // ─── Possible trades: the Mosha setup on three timeframe pairs ───
+  // Council rules (stop buffer, paused setups, minimum R) — the Coach tunes these; the page loads them from the council data
+  const CFG = { buf: 0.15, minRR: 1.2, paused: {} };
   const PAIRS = [
     { k: 'position', name: 'Position', h: '1d',  l: '1h',  e: 'H1 / M5', up: null },
     { k: 'swing',    name: 'Swing',    h: '4h',  l: '1h',  e: 'M15 / M1', up: '1d' },
@@ -6337,7 +6339,7 @@ if (/^#(market-structure|structure)$/.test(location.hash) || /market-structure\.
     const spr = spreadOf(price);
     let entry, stop, anchor, buf, stopWhy;
     if (cf) {
-      anchor = sell ? ll.top : ll.bot; buf = Math.max(0.15 * atr(lp.bars), spr);
+      anchor = sell ? ll.top : ll.bot; buf = Math.max(CFG.buf * atr(lp.bars), spr);
       entry = ll.level; stop = anchor + (sell ? buf : -buf);
       stopWhy = `${Lo} CF ${sell ? 'high' : 'low'} ${fmt(anchor)}`;
     } else {
@@ -6386,7 +6388,7 @@ if (/^#(market-structure|structure)$/.test(location.hash) || /market-structure\.
     const spr = spreadOf(price);
     let entry, stop, anchor, buf, stopWhy;
     if (conf) {
-      anchor = buy ? ll.bot : ll.top; buf = Math.max(0.15 * atr(lp.bars), spr);
+      anchor = buy ? ll.bot : ll.top; buf = Math.max(CFG.buf * atr(lp.bars), spr);
       entry = ll.level; stop = anchor - sgn * buf;
       stopWhy = `${Lo} ${buy ? 'low' : 'high'} ${fmt(anchor)}`;
     } else {
@@ -6446,7 +6448,8 @@ if (/^#(market-structure|structure)$/.test(location.hash) || /market-structure\.
     $('ms-trades').innerHTML = (shown.length ? '' : '<div class="ms-note">No trades match this filter right now.</div>') + shown.map((t) => {
       const rw = Math.abs(t.t1 - t.entry), riskPct = Math.max(8, Math.min(92, t.r / (t.r + rw) * 100));
       const size = t.size;
-      const tag = t.retrace ? `<span class="ms-tag counter">RETRACEMENT · AGAINST ${t.upL}</span>` : t.align === null ? '' : `<span class="ms-tag ${t.align ? 'with' : 'counter'}">${t.align ? `WITH ${t.upL}` : `AGAINST ${t.upL}`}</span>`;
+      const paused = CFG.paused && CFG.paused[t.k] ? `<span class="ms-tag counter">PAUSED BY COACH</span>` : '';
+      const tag = paused + (t.retrace ? `<span class="ms-tag counter">RETRACEMENT · AGAINST ${t.upL}</span>` : t.align === null ? '' : `<span class="ms-tag ${t.align ? 'with' : 'counter'}">${t.align ? `WITH ${t.upL}` : `AGAINST ${t.upL}`}</span>`);
       return `<button type="button" class="ms-trade${t.k === G.sel ? ' sel' : ''}${t.invalid ? ' invalid' : ''}" data-k="${t.k}" aria-pressed="${t.k === G.sel}">` +
         `<div class="ms-tr-h"><span class="ms-chip ${t.sell ? 'ms-chip-sell' : 'ms-chip-buy'}">${t.sell ? 'SELL' : 'BUY'}</span><b>${t.name}</b><small>${t.pair}</small>${tag}<span class="ms-st ${t.cls}">${t.state}</span></div>` +
         `<div class="ms-rr" aria-hidden="true"><i style="width:${riskPct.toFixed(0)}%"></i><b></b><em></em></div>` +
@@ -6463,6 +6466,7 @@ if (/^#(market-structure|structure)$/.test(location.hash) || /market-structure\.
     if (key !== G.planKey) { G.planKey = key; Object.values(panes).forEach((p) => p.A && p.draw()); }
     list.forEach((t) => {
       const was = G.prevStates[t.k];
+      if (was && was !== t.state && t.state === 'READY' && G.auto && !CFG.paused[t.k] && t.rr >= CFG.minRR) { jAdd(t, 'Auto paper trade · browser Trader'); notify(`Trader logged ${t.name} ${t.sell ? 'sell' : 'buy'}`, `Paper trade in your journal: entry ${fmt(t.entry)}, stop ${fmt(t.stop)}, target ${fmt(t.t1)}.`); }
       if (was && was !== t.state && t.state === 'READY') notify(`${t.name} ${t.sell ? 'sell' : 'buy'} ready (${t.pair})`, `${t.pair}: entry ${fmt(t.entry)}, stop ${fmt(t.stop)}, target ${fmt(t.t1)} (${t.rr.toFixed(1)}R).`);
       G.prevStates[t.k] = t.state;
     });
@@ -7051,9 +7055,7 @@ if (/^#(market-structure|structure)$/.test(location.hash) || /market-structure\.
     document.getElementById('ms-log').addEventListener('click', () => {
       const t = (G.list || []).find((x) => x.k === G.sel);
       if (!t || t.invalid) { notify('Nothing to log', 'Pick a valid setup under Possible trades first.'); return; }
-      J.unshift({ id: Date.now().toString(36), t: Math.floor(Date.now() / 1000), inst: instKey, label: INST.label, dec: INST.dec, name: t.name, pair: t.pair,
-        sell: t.sell, entry: t.entry, stop: t.stop, t1: t.t1, rr: +t.rr.toFixed(2), model: t.model, state: t.state, res: 'open', R: null, auto: true, note: '' });
-      jSave(); renderJournal();
+      jAdd(t, '');
       notify('Logged to journal', `${t.name} ${t.sell ? 'sell' : 'buy'} at ${fmt(t.entry)}, stop ${fmt(t.stop)}, target ${fmt(t.t1)}.`);
     });
     document.getElementById('ms-j-csv').addEventListener('click', () => {
@@ -7066,6 +7068,12 @@ if (/^#(market-structure|structure)$/.test(location.hash) || /market-structure\.
       setTimeout(() => URL.revokeObjectURL(a.href), 1000);
     });
     renderJournal();
+  }
+  function jAdd(t, note) {
+    if (!JEL) return;
+    J.unshift({ id: Date.now().toString(36) + Math.random().toString(36).slice(2, 5), t: Math.floor(Date.now() / 1000), inst: instKey, label: INST.label, dec: INST.dec, name: t.name, pair: t.pair,
+      sell: t.sell, entry: t.entry, stop: t.stop, t1: t.t1, rr: +t.rr.toFixed(2), model: t.model, state: t.state, res: 'open', R: null, auto: true, note: note || '' });
+    jSave(); renderJournal();
   }
   // Open journal trades on this market: fill at entry, then first touch of stop or Target 1 decides the result
   function journalTick() {
@@ -7177,8 +7185,79 @@ if (/^#(market-structure|structure)$/.test(location.hash) || /market-structure\.
     else if ((ev.key === 'f' || ev.key === 'F') && location.hash === '#charts') Object.values(panes).forEach((p) => p.fit());
   });
 
+  // ─── Council: Analyst, Trader and Coach (always-on data from the council-data branch) ───
+  const CDATA = 'https://raw.githubusercontent.com/vazxanana/macro-dashboard/council-data/';
+  const COUNCIL = { at: 0 };
+  function md(src) {   // small, safe markdown: headings, bullets, bold, paragraphs
+    const out = []; let list = false;
+    String(src || '').split(/\r?\n/).forEach((line) => {
+      const t = esc(line).replace(/\*\*(.+?)\*\*/g, '<b>$1</b>').replace(/`(.+?)`/g, '<code>$1</code>');
+      if (/^\s*[-*] /.test(line)) { if (!list) { out.push('<ul>'); list = true; } out.push(`<li>${t.replace(/^\s*[-*] /, '')}</li>`); return; }
+      if (list) { out.push('</ul>'); list = false; }
+      if (/^### /.test(line)) out.push(`<h5>${t.slice(4)}</h5>`);
+      else if (/^## /.test(line)) out.push(`<h4>${t.slice(3)}</h4>`);
+      else if (/^# /.test(line)) out.push(`<h3>${t.slice(2)}</h3>`);
+      else if (line.trim()) out.push(`<p>${t}</p>`);
+    });
+    if (list) out.push('</ul>');
+    return out.join('');
+  }
+  const ago = (t) => { const d = Date.now() / 1000 - t; return d < 90 ? 'just now' : d < 3600 ? `${Math.round(d / 60)} min ago` : d < 86400 ? `${Math.round(d / 3600)} h ago` : `${Math.round(d / 86400)} d ago`; };
+  async function loadCouncil() {
+    if (!document.getElementById('v-council')) return;
+    const bust = Math.floor(Date.now() / 120000);
+    const get = (f, json) => fetch(`${CDATA}${f}?v=${bust}`, { cache: 'no-store' }).then((r) => r.ok ? (json ? r.json() : r.text()) : null).catch(() => null);
+    const [trades, config, coach, snap, analysis, review] = await Promise.all([get('trades.json', 1), get('config.json', 1), get('coach.json', 1), get('snapshot.json', 1), get('analysis/latest.md'), get('reviews/latest.md')]);
+    Object.assign(COUNCIL, { trades, config, coach, snap, analysis, review, at: Date.now() });
+    if (config) {
+      CFG.buf = Math.min(0.25, Math.max(0.10, +config.buf || 0.15)); CFG.minRR = +config.minRR || 1.2; CFG.paused = config.paused || {};
+      const m1 = panes['1m']; if (m1 && m1.bars) topDown();
+    }
+    renderCouncil();
+  }
+  function renderCouncil() {
+    const root = document.getElementById('v-council'); if (!root) return;
+    const set = (id, html) => { const el = document.getElementById(id); if (el) el.innerHTML = html; };
+    const C = COUNCIL, T = (C.trades || []).slice().reverse();
+    const mine = document.getElementById('ms-c-mine'), only = mine && mine.checked;
+    const list = only ? T.filter((x) => x.market === instKey) : T;
+    const closed = list.filter((x) => x.status === 'win' || x.status === 'loss');
+    const w = closed.filter((x) => x.status === 'win').length, R = closed.reduce((a, x) => a + x.R, 0);
+    const open = list.filter((x) => x.status === 'open' || x.status === 'pending');
+    set('ms-c-status', C.snap ? `Trader last ran ${ago(Date.parse(C.snap.at) / 1000)} · ${Object.keys(C.snap.markets || {}).length} markets watched` : 'Waiting for the first Trader run (every 15 minutes once enabled).');
+    set('ms-c-kpi', `<div><span>Open</span><b>${open.length}</b></div><div><span>Closed</span><b>${closed.length}</b></div><div><span>Win rate</span><b>${closed.length ? Math.round(w / closed.length * 100) + '%' : '—'}</b></div><div><span>Total</span><b class="${R > 0 ? 'pos' : R < 0 ? 'neg' : ''}">${closed.length ? (R > 0 ? '+' : '') + R.toFixed(1) + 'R' : '—'}</b></div>`);
+    // equity in R by close time
+    const ch = closed.slice().sort((a, b) => a.closed - b.closed); let eq = 0; const pts = [0].concat(ch.map((x) => (eq += x.R)));
+    if (pts.length > 2) {
+      const lo = Math.min(...pts), hi = Math.max(...pts), W = 600, H = 64;
+      const y = (v) => (H - 4 - (v - lo) / Math.max(1e-9, hi - lo) * (H - 8)).toFixed(1);
+      set('ms-c-eq', `<svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="none" role="img" aria-label="Trader equity in R over ${ch.length} closed trades"><line x1="0" x2="${W}" y1="${y(0)}" y2="${y(0)}" stroke="var(--line)" stroke-dasharray="4 4" vector-effect="non-scaling-stroke"/><path d="${pts.map((v, i) => `${i ? 'L' : 'M'}${(i / (pts.length - 1) * W).toFixed(1)},${y(v)}`).join('')}" fill="none" stroke="${eq >= 0 ? 'var(--buy)' : 'var(--sell)'}" stroke-width="2" vector-effect="non-scaling-stroke"/></svg>`);
+    } else set('ms-c-eq', '');
+    const ST = { win: ['pos', 'Win'], loss: ['neg', 'Loss'], open: ['', 'Open'], pending: ['', 'Waiting fill'], missed: ['', 'Missed'], expired: ['', 'Expired'], skipped: ['', 'Skipped'] };
+    const dI = (x) => ({ dec: x.dec != null ? x.dec : 2 });
+    set('ms-c-trades', list.length ? list.slice(0, 25).map((x) => `<tr><td>${ftime(x.opened + TZ)}</td><td><b>${esc(x.label)}</b></td><td>${esc(x.name)} <small>${esc(x.pair)}</small></td><td><span class="ms-chip ${x.side === 'sell' ? 'ms-chip-sell' : 'ms-chip-buy'}">${x.side.toUpperCase()}</span></td><td class="n">${fmtI(x.entry, dI(x))}</td><td class="n">${fmtI(x.stop, dI(x))}</td><td class="n">${fmtI(x.t1, dI(x))}</td><td class="${(ST[x.status] || ['', ''])[0]}" title="${esc(x.note || '')}">${(ST[x.status] || ['', x.status])[1]}${x.R != null && (x.status === 'win' || x.status === 'loss') ? ` ${x.R > 0 ? '+' : ''}${x.R}R` : ''}</td></tr>`).join('')
+      : `<tr><td colspan="8" class="empty">No council trades yet${only ? ' on this market' : ''}. The Trader takes every Ready setup it sees.</td></tr>`);
+    // Analyst
+    const ready = C.snap ? Object.entries(C.snap.markets || {}).flatMap(([k, m]) => m.setups.filter((t) => t.state === 'READY').map((t) => ({ k, m, t }))) : [];
+    set('ms-c-ready', ready.length ? ready.map(({ k, m, t }) => `<li><a href="?s=${k}#setup"><b>${esc(m.label)}</b> ${t.side === 'sell' ? 'Sell' : 'Buy'} ${esc(t.name)} <small>${esc(t.pair)}</small></a><span>${t.rr}R</span></li>`).join('') : '<li class="empty">No market is Ready at the last Trader run.</li>');
+    set('ms-c-analysis', C.analysis ? md(C.analysis) : '<p class="ms-note">The Analyst writes the weekly brief every Monday morning: bias per market, key levels, likely setups and the week\'s news.</p>');
+    // Coach
+    const cf = C.config || { buf: CFG.buf, minRR: CFG.minRR, paused: {}, history: [] };
+    const paused = Object.entries(cf.paused || {});
+    set('ms-c-rules', `<span class="ms-q">Stop buffer ${cf.buf} × ATR</span><span class="ms-q">Min reward:risk ${cf.minRR}</span>` + (paused.length ? paused.map(([k, u]) => `<span class="ms-q weak">${esc(k)} paused to ${esc(u.slice(0, 10))}</span>`).join('') : '<span class="ms-q good">All setups active</span>'));
+    set('ms-c-notes', C.coach ? (C.coach.notes || []).map((n) => `<li>${esc(n)}</li>`).join('') : '<li>The statistical Coach runs once a day with the Trader.</li>');
+    set('ms-c-hist', (cf.history || []).slice(-8).reverse().map((h) => `<li><span>${esc(String(h.at).slice(0, 10))} · ${esc(h.by)}</span><b>${esc(h.change)}</b><em>${esc(h.why)}</em></li>`).join('') || '<li class="empty">No rule changes yet.</li>');
+    set('ms-c-review', C.review ? md(C.review) : '<p class="ms-note">The AI Coach writes a review after each trading day: what worked, what didn\'t, and any rule it changed.</p>');
+    renderHome();
+  }
+  const autoEl = document.getElementById('ms-auto');
+  try { G.auto = localStorage.getItem('msAuto') === '1'; } catch (e) { G.auto = false; }
+  if (autoEl) { autoEl.checked = G.auto; autoEl.addEventListener('change', () => { G.auto = autoEl.checked; try { localStorage.setItem('msAuto', G.auto ? '1' : '0'); } catch (e) {} notify(G.auto ? 'Browser Trader on' : 'Browser Trader off', G.auto ? 'Ready setups on this market go into your journal as paper trades while this page is open.' : 'No more automatic journal entries.'); }); }
+  const mineEl = document.getElementById('ms-c-mine'); if (mineEl) mineEl.addEventListener('change', renderCouncil);
+  if (document.getElementById('v-council')) { loadCouncil(); setInterval(loadCouncil, 5 * 60e3); }
+
   // ─── Sections: a home page of cards, each section on its own page ───
-  const VIEWS = ['home', 'setup', 'charts', 'scanner', 'news', 'journal', 'backtest', 'guide'];
+  const VIEWS = ['home', 'setup', 'charts', 'scanner', 'council', 'news', 'journal', 'backtest', 'guide'];
   function showView() {
     const h = location.hash.slice(1), v = VIEWS.includes(h) ? h : 'home';
     VIEWS.forEach((k) => { const el = document.getElementById('v-' + k); if (el) el.hidden = k !== v; });
@@ -7220,6 +7299,7 @@ if (/^#(market-structure|structure)$/.test(location.hash) || /market-structure\.
       const done = J.filter((x) => x.res === 'win' || x.res === 'loss' || x.res === 'be'), w = done.filter((x) => x.res === 'win').length, l = done.filter((x) => x.res === 'loss').length;
       const R = done.reduce((a, x) => a + (+x.R || 0), 0), open = J.filter((x) => x.res === 'open').length;
       if (J.length) { set('h-j', `${done.length ? `${R >= 0 ? '+' : ''}${R.toFixed(1)}R` : `${J.length} logged`}`); set('h-j-sub', `${done.length} closed${w + l ? ` · ${Math.round(w / (w + l) * 100)}% win rate` : ''} · ${open} open`); }
+      if (COUNCIL.trades) { const cl = COUNCIL.trades.filter((x) => x.status === 'win' || x.status === 'loss'), cr = cl.reduce((a, x) => a + x.R, 0); set('h-council', cl.length ? `${cr >= 0 ? '+' : ''}${cr.toFixed(1)}R <small>from ${cl.length} trades</small>` : `${COUNCIL.trades.filter((x) => x.status === 'open' || x.status === 'pending').length} open trades`); }
       if (G.bt) set('h-bt', `${G.bt.wr === null ? '—' : Math.round(G.bt.wr * 100) + '%'} win · ${G.bt.R >= 0 ? '+' : ''}${G.bt.R.toFixed(1)}R`);
       const warn = document.getElementById('ms-news-warn'), hw = document.getElementById('h-warn');
       if (warn && hw) { hw.hidden = warn.hidden; hw.innerHTML = warn.innerHTML; }
