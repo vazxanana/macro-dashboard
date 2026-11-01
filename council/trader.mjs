@@ -34,9 +34,10 @@ const SEC = Object.fromEntries(TFS.map(([id, , s]) => [id, s]));
 // Trading session by UTC hour (rough, ignores daylight saving)
 const sessionOf = (t) => { const h = new Date(t * 1000).getUTCHours(); return h < 7 ? 'asia' : h < 12 ? 'london' : h < 16 ? 'overlap' : h < 21 ? 'newyork' : 'late'; };
 // Spot gold and forex close for the weekend (Fri 21:00 – Sun 22:00 UTC); crypto never closes.
-// PAXG keeps trading 24/7, but those candles aren't the gold market, so no new gold/forex trades then.
+// PAXG keeps trading 24/7, but those candles aren't the gold market, so no new gold/forex trades then,
+// nor in the first hour after the Sunday reopen.
 const marketOpen = (M, t) => { if (M.group === 'Crypto') return true; const d = new Date(t * 1000), wd = d.getUTCDay(), h = d.getUTCHours();
-  return !(wd === 6 || (wd === 0 && h < 22) || (wd === 5 && h >= 21)); };
+  return !(wd === 6 || (wd === 0 && h < 23) || (wd === 5 && h >= 21)); };   // Sunday 22:00–23:00 too: the reopen gaps and spreads are wide
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 async function kraken(pair, interval) {
   for (let a = 0; a < 4; a++) {
