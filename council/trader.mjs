@@ -26,6 +26,9 @@ const MARKETS = {
 const TFS = [['1d', 1440, 86400], ['4h', 240, 14400], ['1h', 60, 3600], ['15m', 15, 900], ['5m', 5, 300], ['1m', 1, 60]];
 // How long an unfilled order waits, by the higher timeframe of its pair
 const WAIT = { '1d': 5 * 86400, '4h': 2 * 86400, '1h': 12 * 3600, '15m': 3 * 3600 };
+// Only fresh signals: the CF break must be at most this many lower-timeframe candles old
+const FRESH = 12;
+const SEC = Object.fromEntries(TFS.map(([id, , s]) => [id, s]));
 
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 async function kraken(pair, interval) {
@@ -99,11 +102,19 @@ for (const [key, M] of Object.entries(MARKETS)) {
     for (const t of setups) {
       if (t.state !== 'READY' || state.seen[t.sig]) continue;
       state.seen[t.sig] = now;
+      const def = PAIRS.concat(RETR).find((p) => p.k === t.k), cfT = +String(t.sig).split('|')[2];
+      if (!cfT || now - cfT > FRESH * SEC[def.l]) continue;   // an old CF: the move already happened
       const skip = config.paused[t.k] ? `paused until ${config.paused[t.k].slice(0, 10)}` : t.rr < config.minRR ? `reward:risk ${t.rr.toFixed(2)} under ${config.minRR}` : null;
       const h = (PAIRS.concat(RETR)).find((p) => p.k === t.k).h;
       const tr = { id: `${key}-${t.k}-${now}`, market: key, label: M.label, dec: M.dec, k: t.k, name: t.name, pair: t.pair, h, side: t.sell ? 'sell' : 'buy',
         entry: t.entry, stop: t.stop, t1: t.t1, rr: +t.rr.toFixed(2), buf: CFG.buf, opened: now, checked: now, status: skip ? 'skipped' : 'pending', R: null, note: skip || t.next };
-      if (!skip && (t.sell ? price >= t.entry : price <= t.entry)) { tr.status = 'open'; tr.filled = now; }
+      if (!skip && (t.sell ? price >= t.entry : price <= t.entry)) {
+        // price is already through the entry: fill at the market price, never at a better level than was available
+        tr.entry = price; tr.status = 'open'; tr.filled = now;
+        const r = Math.abs(tr.entry - tr.stop), rw = (tr.t1 - tr.entry) * (t.sell ? -1 : 1);
+        if (!(r > 0) || (t.sell ? price >= tr.stop : price <= tr.stop) || rw <= 0) { tr.status = 'skipped'; tr.note = 'Price already past the stop or target when the signal came in.'; }
+        else tr.rr = +(rw / r).toFixed(2);
+      }
       trades.push(tr);
     }
   } catch (e) { snapshot.errors[key] = String(e.message || e); }
