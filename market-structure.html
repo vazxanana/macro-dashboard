@@ -205,6 +205,7 @@
   .inst { display: block; background: transparent; color: var(--ink); border: 1px solid transparent; border-radius: 6px; padding: 2px 22px 2px 4px; margin-left: -5px; font: 700 15px var(--sans); cursor: pointer; appearance: none; -webkit-appearance: none;
     background-image: linear-gradient(45deg, transparent 50%, var(--ink-faint) 50%), linear-gradient(135deg, var(--ink-faint) 50%, transparent 50%); background-position: right 9px center, right 4px center; background-size: 5px 5px; background-repeat: no-repeat; }
   .inst:hover, .inst:focus-visible { border-color: var(--line); outline: none; }
+  select.inst[hidden] { display: none; }
   .inst option, .inst optgroup { background: var(--panel); color: var(--ink); }
   .brand span { display: block; font-size: 11px; color: var(--ink-faint); }
   .ms-coin { width: 26px; height: 26px; border-radius: 50%; background: radial-gradient(circle at 35% 35%, #ffd768, #b58600); display: inline-block; flex: none; }
@@ -338,6 +339,35 @@
   .mk-wait { color: var(--ink-faint); font-size: 12px; }
   .kbd-hint { margin-left: 10px; font-size: 11px; letter-spacing: 0; text-transform: none; color: var(--ink-faint); font-weight: 500; }
   @media (hover: none) { .kbd-hint { display: none; } }
+  .c-head { display: flex; justify-content: space-between; align-items: flex-end; gap: 16px; flex-wrap: wrap; }
+  .c-head p { margin: 4px 0 0; }
+  .c-auto { display: flex; align-items: center; gap: 12px; background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 10px 14px; cursor: pointer; max-width: 420px; }
+  .c-auto input { width: 20px; height: 20px; accent-color: var(--accent); flex: none; }
+  .c-auto b { display: block; font-size: 13px; } .c-auto small { color: var(--ink-dim); font-size: 11px; line-height: 1.4; display: block; }
+  .c-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
+  .c-trader { grid-column: 1 / -1; }
+  .c-mine { display: inline-flex; align-items: center; gap: 6px; text-transform: none; letter-spacing: 0; font-size: 12px; color: var(--ink-dim); cursor: pointer; }
+  .c-kpi { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; margin-bottom: 10px; }
+  .c-kpi div { border: 1px solid var(--line); border-radius: 10px; padding: 10px 12px; }
+  .c-kpi span { display: block; font-size: 10px; letter-spacing: .8px; text-transform: uppercase; color: var(--ink-faint); }
+  .c-kpi b { font: 700 20px var(--mono); } .c-kpi b.pos { color: var(--buy); } .c-kpi b.neg { color: var(--sell); }
+  .c-eq svg { width: 100%; height: 64px; display: block; margin-bottom: 8px; }
+  .c-t td.pos { color: var(--buy); font-weight: 700; } .c-t td.neg { color: var(--sell); font-weight: 700; }
+  .c-t td.empty, .c-ready .empty, .c-hist .empty { color: var(--ink-faint); white-space: normal; }
+  .c-sub { font-size: 10px; letter-spacing: 1px; text-transform: uppercase; color: var(--ink-faint); font-weight: 700; margin: 14px 0 6px; }
+  .c-ready, .c-notes, .c-hist { list-style: none; margin: 0; padding: 0; display: grid; gap: 4px; font-size: 12px; color: var(--ink-dim); }
+  .c-ready li { display: flex; justify-content: space-between; gap: 8px; padding: 8px 10px; border: 1px solid var(--line); border-radius: 8px; }
+  .c-ready a { color: var(--ink); text-decoration: none; } .c-ready a:hover { color: var(--accent); }
+  .c-ready span { font: 600 12px var(--mono); color: var(--buy); }
+  .c-notes li::before { content: "• "; color: var(--ink-faint); }
+  .c-hist li { display: grid; gap: 2px; padding: 8px 10px; border-left: 2px solid var(--line); }
+  .c-hist li span { font: 500 10px var(--mono); color: var(--ink-faint); } .c-hist li b { color: var(--ink); font-size: 12px; } .c-hist li em { font-style: normal; }
+  .c-rules { display: flex; flex-wrap: wrap; gap: 6px; }
+  .c-md { font-size: 13px; color: var(--ink-dim); line-height: 1.6; }
+  .c-md h3, .c-md h4, .c-md h5 { color: var(--ink); margin: 12px 0 4px; font-size: 14px; } .c-md h3 { font-size: 16px; }
+  .c-md p { margin: 0 0 8px; } .c-md ul { margin: 0 0 8px; padding-left: 18px; } .c-md b { color: var(--ink); }
+  .c-md code { font-family: var(--mono); font-size: 12px; }
+  @media (max-width: 1000px) { .c-grid { grid-template-columns: minmax(0, 1fr); } .c-kpi { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
   @media (max-width: 700px) {
     .px b { font-size: 18px; }
     .ms-status .upd { display: none; }
@@ -394,7 +424,7 @@
     </div>
   </header>
   <nav class="tabs" aria-label="Sections">
-    <a href="#home" data-go="home">Home</a><a href="#setup" data-go="setup">Setup</a><a href="#charts" data-go="charts">Charts</a><a href="#scanner" data-go="scanner">Scanner</a><a href="#news" data-go="news">News</a><a href="#journal" data-go="journal">Journal</a><a href="#backtest" data-go="backtest">Backtest</a><a href="#guide" data-go="guide">Guide</a>
+    <a href="#home" data-go="home">Home</a><a href="#setup" data-go="setup">Setup</a><a href="#charts" data-go="charts">Charts</a><a href="#scanner" data-go="scanner">Scanner</a><a href="#council" data-go="council">Council</a><a href="#news" data-go="news">News</a><a href="#journal" data-go="journal">Journal</a><a href="#backtest" data-go="backtest">Backtest</a><a href="#guide" data-go="guide">Guide</a>
   </nav>
 
 
@@ -432,6 +462,12 @@
         <span class="tile-big" id="h-scan">Scanning soon</span>
         <span class="tile-sub" id="h-scan-list"></span>
         <span class="tile-go">All markets</span>
+      </a>
+      <a class="tile" href="#council">
+        <span class="tile-k">AI council</span>
+        <span class="tile-big" id="h-council">Starting up</span>
+        <span class="tile-sub">Analyst maps the week, Trader paper-trades every Ready setup, Coach reviews each day and tunes the rules.</span>
+        <span class="tile-go">Open council</span>
       </a>
       <a class="tile" href="#news">
         <span class="tile-k">Sessions &amp; news</span>
@@ -512,6 +548,39 @@
     </div>
   </section>
 
+  <!-- ─── Council ─── -->
+  <section class="view" id="v-council" aria-label="AI council" hidden>
+    <div class="c-head">
+      <div><h1 class="h-head">AI council</h1><p class="ms-note" id="ms-c-status">Loading council data…</p></div>
+      <label class="c-auto"><input type="checkbox" id="ms-auto"> <span><b>Browser Trader</b><small>Auto paper-trade Ready setups on this market into my journal while this page is open</small></span></label>
+    </div>
+    <div class="c-grid">
+      <div class="card c-trader">
+        <div class="ms-k"><span>Trader · paper trades, all markets, every 15 min</span><label class="c-mine"><input type="checkbox" id="ms-c-mine"> This market only</label></div>
+        <div class="c-kpi" id="ms-c-kpi"></div>
+        <div class="c-eq" id="ms-c-eq"></div>
+        <div class="ms-bt-wrap"><table class="ms-bt-t c-t"><thead><tr><th>Opened</th><th>Market</th><th>Setup</th><th>Side</th><th class="n">Entry</th><th class="n">Stop</th><th class="n">Target 1</th><th>Result</th></tr></thead><tbody id="ms-c-trades"></tbody></table></div>
+      </div>
+      <div class="card c-analyst">
+        <div class="ms-k">Analyst · weekly brief</div>
+        <div class="c-sub">Ready right now</div>
+        <ul class="c-ready" id="ms-c-ready"></ul>
+        <div class="c-md" id="ms-c-analysis"></div>
+      </div>
+      <div class="card c-coach">
+        <div class="ms-k">Coach · daily review and rules</div>
+        <div class="c-rules" id="ms-c-rules"></div>
+        <div class="c-sub">Today's statistics check</div>
+        <ul class="c-notes" id="ms-c-notes"></ul>
+        <div class="c-sub">Rule changes</div>
+        <ul class="c-hist" id="ms-c-hist"></ul>
+        <div class="c-sub">Latest AI review</div>
+        <div class="c-md" id="ms-c-review"></div>
+      </div>
+    </div>
+    <p class="ms-note">Paper trades only, no real money. The Coach may change the stop buffer (0.10–0.25 × ATR), the minimum reward:risk (1.2–2.5) and pause a setup for up to 7 days, and logs every change.</p>
+  </section>
+
   <!-- ─── Sessions & news ─── -->
   <section class="view" id="v-news" aria-label="Sessions and news" hidden>
     <div class="card">
@@ -562,7 +631,7 @@
     </div>
   </section>
 
-  <p class="foot">Live candles from Binance and Kraken public feeds; gold is aligned to XAU/USD spot via gold-api.com. Times are in your local zone.<br>Version 1 Nov 2026 · market switcher</p>
+  <p class="foot">Live candles from Binance and Kraken public feeds; gold is aligned to XAU/USD spot via gold-api.com. Times are in your local zone.<br>Version 1 Nov 2026 · AI council</p>
   <div class="ms-toasts" id="ms-toasts" role="status" aria-live="polite"></div>
 </div>
 <script>
@@ -1181,6 +1250,8 @@ function msNextSetup(bars, A) {
   }
 
   // ─── Possible trades: the Mosha setup on three timeframe pairs ───
+  // Council rules (stop buffer, paused setups, minimum R) — the Coach tunes these; the page loads them from the council data
+  const CFG = { buf: 0.15, minRR: 1.2, paused: {} };
   const PAIRS = [
     { k: 'position', name: 'Position', h: '1d',  l: '1h',  e: 'H1 / M5', up: null },
     { k: 'swing',    name: 'Swing',    h: '4h',  l: '1h',  e: 'M15 / M1', up: '1d' },
@@ -1222,7 +1293,7 @@ function msNextSetup(bars, A) {
     const spr = spreadOf(price);
     let entry, stop, anchor, buf, stopWhy;
     if (cf) {
-      anchor = sell ? ll.top : ll.bot; buf = Math.max(0.15 * atr(lp.bars), spr);
+      anchor = sell ? ll.top : ll.bot; buf = Math.max(CFG.buf * atr(lp.bars), spr);
       entry = ll.level; stop = anchor + (sell ? buf : -buf);
       stopWhy = `${Lo} CF ${sell ? 'high' : 'low'} ${fmt(anchor)}`;
     } else {
@@ -1271,7 +1342,7 @@ function msNextSetup(bars, A) {
     const spr = spreadOf(price);
     let entry, stop, anchor, buf, stopWhy;
     if (conf) {
-      anchor = buy ? ll.bot : ll.top; buf = Math.max(0.15 * atr(lp.bars), spr);
+      anchor = buy ? ll.bot : ll.top; buf = Math.max(CFG.buf * atr(lp.bars), spr);
       entry = ll.level; stop = anchor - sgn * buf;
       stopWhy = `${Lo} ${buy ? 'low' : 'high'} ${fmt(anchor)}`;
     } else {
@@ -1331,7 +1402,8 @@ function msNextSetup(bars, A) {
     $('ms-trades').innerHTML = (shown.length ? '' : '<div class="ms-note">No trades match this filter right now.</div>') + shown.map((t) => {
       const rw = Math.abs(t.t1 - t.entry), riskPct = Math.max(8, Math.min(92, t.r / (t.r + rw) * 100));
       const size = t.size;
-      const tag = t.retrace ? `<span class="ms-tag counter">RETRACEMENT · AGAINST ${t.upL}</span>` : t.align === null ? '' : `<span class="ms-tag ${t.align ? 'with' : 'counter'}">${t.align ? `WITH ${t.upL}` : `AGAINST ${t.upL}`}</span>`;
+      const paused = CFG.paused && CFG.paused[t.k] ? `<span class="ms-tag counter">PAUSED BY COACH</span>` : '';
+      const tag = paused + (t.retrace ? `<span class="ms-tag counter">RETRACEMENT · AGAINST ${t.upL}</span>` : t.align === null ? '' : `<span class="ms-tag ${t.align ? 'with' : 'counter'}">${t.align ? `WITH ${t.upL}` : `AGAINST ${t.upL}`}</span>`);
       return `<button type="button" class="ms-trade${t.k === G.sel ? ' sel' : ''}${t.invalid ? ' invalid' : ''}" data-k="${t.k}" aria-pressed="${t.k === G.sel}">` +
         `<div class="ms-tr-h"><span class="ms-chip ${t.sell ? 'ms-chip-sell' : 'ms-chip-buy'}">${t.sell ? 'SELL' : 'BUY'}</span><b>${t.name}</b><small>${t.pair}</small>${tag}<span class="ms-st ${t.cls}">${t.state}</span></div>` +
         `<div class="ms-rr" aria-hidden="true"><i style="width:${riskPct.toFixed(0)}%"></i><b></b><em></em></div>` +
@@ -1348,6 +1420,7 @@ function msNextSetup(bars, A) {
     if (key !== G.planKey) { G.planKey = key; Object.values(panes).forEach((p) => p.A && p.draw()); }
     list.forEach((t) => {
       const was = G.prevStates[t.k];
+      if (was && was !== t.state && t.state === 'READY' && G.auto && !CFG.paused[t.k] && t.rr >= CFG.minRR) { jAdd(t, 'Auto paper trade · browser Trader'); notify(`Trader logged ${t.name} ${t.sell ? 'sell' : 'buy'}`, `Paper trade in your journal: entry ${fmt(t.entry)}, stop ${fmt(t.stop)}, target ${fmt(t.t1)}.`); }
       if (was && was !== t.state && t.state === 'READY') notify(`${t.name} ${t.sell ? 'sell' : 'buy'} ready (${t.pair})`, `${t.pair}: entry ${fmt(t.entry)}, stop ${fmt(t.stop)}, target ${fmt(t.t1)} (${t.rr.toFixed(1)}R).`);
       G.prevStates[t.k] = t.state;
     });
@@ -1936,9 +2009,7 @@ function msNextSetup(bars, A) {
     document.getElementById('ms-log').addEventListener('click', () => {
       const t = (G.list || []).find((x) => x.k === G.sel);
       if (!t || t.invalid) { notify('Nothing to log', 'Pick a valid setup under Possible trades first.'); return; }
-      J.unshift({ id: Date.now().toString(36), t: Math.floor(Date.now() / 1000), inst: instKey, label: INST.label, dec: INST.dec, name: t.name, pair: t.pair,
-        sell: t.sell, entry: t.entry, stop: t.stop, t1: t.t1, rr: +t.rr.toFixed(2), model: t.model, state: t.state, res: 'open', R: null, auto: true, note: '' });
-      jSave(); renderJournal();
+      jAdd(t, '');
       notify('Logged to journal', `${t.name} ${t.sell ? 'sell' : 'buy'} at ${fmt(t.entry)}, stop ${fmt(t.stop)}, target ${fmt(t.t1)}.`);
     });
     document.getElementById('ms-j-csv').addEventListener('click', () => {
@@ -1951,6 +2022,12 @@ function msNextSetup(bars, A) {
       setTimeout(() => URL.revokeObjectURL(a.href), 1000);
     });
     renderJournal();
+  }
+  function jAdd(t, note) {
+    if (!JEL) return;
+    J.unshift({ id: Date.now().toString(36) + Math.random().toString(36).slice(2, 5), t: Math.floor(Date.now() / 1000), inst: instKey, label: INST.label, dec: INST.dec, name: t.name, pair: t.pair,
+      sell: t.sell, entry: t.entry, stop: t.stop, t1: t.t1, rr: +t.rr.toFixed(2), model: t.model, state: t.state, res: 'open', R: null, auto: true, note: note || '' });
+    jSave(); renderJournal();
   }
   // Open journal trades on this market: fill at entry, then first touch of stop or Target 1 decides the result
   function journalTick() {
@@ -2062,8 +2139,79 @@ function msNextSetup(bars, A) {
     else if ((ev.key === 'f' || ev.key === 'F') && location.hash === '#charts') Object.values(panes).forEach((p) => p.fit());
   });
 
+  // ─── Council: Analyst, Trader and Coach (always-on data from the council-data branch) ───
+  const CDATA = 'https://raw.githubusercontent.com/vazxanana/macro-dashboard/council-data/';
+  const COUNCIL = { at: 0 };
+  function md(src) {   // small, safe markdown: headings, bullets, bold, paragraphs
+    const out = []; let list = false;
+    String(src || '').split(/\r?\n/).forEach((line) => {
+      const t = esc(line).replace(/\*\*(.+?)\*\*/g, '<b>$1</b>').replace(/`(.+?)`/g, '<code>$1</code>');
+      if (/^\s*[-*] /.test(line)) { if (!list) { out.push('<ul>'); list = true; } out.push(`<li>${t.replace(/^\s*[-*] /, '')}</li>`); return; }
+      if (list) { out.push('</ul>'); list = false; }
+      if (/^### /.test(line)) out.push(`<h5>${t.slice(4)}</h5>`);
+      else if (/^## /.test(line)) out.push(`<h4>${t.slice(3)}</h4>`);
+      else if (/^# /.test(line)) out.push(`<h3>${t.slice(2)}</h3>`);
+      else if (line.trim()) out.push(`<p>${t}</p>`);
+    });
+    if (list) out.push('</ul>');
+    return out.join('');
+  }
+  const ago = (t) => { const d = Date.now() / 1000 - t; return d < 90 ? 'just now' : d < 3600 ? `${Math.round(d / 60)} min ago` : d < 86400 ? `${Math.round(d / 3600)} h ago` : `${Math.round(d / 86400)} d ago`; };
+  async function loadCouncil() {
+    if (!document.getElementById('v-council')) return;
+    const bust = Math.floor(Date.now() / 120000);
+    const get = (f, json) => fetch(`${CDATA}${f}?v=${bust}`, { cache: 'no-store' }).then((r) => r.ok ? (json ? r.json() : r.text()) : null).catch(() => null);
+    const [trades, config, coach, snap, analysis, review] = await Promise.all([get('trades.json', 1), get('config.json', 1), get('coach.json', 1), get('snapshot.json', 1), get('analysis/latest.md'), get('reviews/latest.md')]);
+    Object.assign(COUNCIL, { trades, config, coach, snap, analysis, review, at: Date.now() });
+    if (config) {
+      CFG.buf = Math.min(0.25, Math.max(0.10, +config.buf || 0.15)); CFG.minRR = +config.minRR || 1.2; CFG.paused = config.paused || {};
+      const m1 = panes['1m']; if (m1 && m1.bars) topDown();
+    }
+    renderCouncil();
+  }
+  function renderCouncil() {
+    const root = document.getElementById('v-council'); if (!root) return;
+    const set = (id, html) => { const el = document.getElementById(id); if (el) el.innerHTML = html; };
+    const C = COUNCIL, T = (C.trades || []).slice().reverse();
+    const mine = document.getElementById('ms-c-mine'), only = mine && mine.checked;
+    const list = only ? T.filter((x) => x.market === instKey) : T;
+    const closed = list.filter((x) => x.status === 'win' || x.status === 'loss');
+    const w = closed.filter((x) => x.status === 'win').length, R = closed.reduce((a, x) => a + x.R, 0);
+    const open = list.filter((x) => x.status === 'open' || x.status === 'pending');
+    set('ms-c-status', C.snap ? `Trader last ran ${ago(Date.parse(C.snap.at) / 1000)} · ${Object.keys(C.snap.markets || {}).length} markets watched` : 'Waiting for the first Trader run (every 15 minutes once enabled).');
+    set('ms-c-kpi', `<div><span>Open</span><b>${open.length}</b></div><div><span>Closed</span><b>${closed.length}</b></div><div><span>Win rate</span><b>${closed.length ? Math.round(w / closed.length * 100) + '%' : '—'}</b></div><div><span>Total</span><b class="${R > 0 ? 'pos' : R < 0 ? 'neg' : ''}">${closed.length ? (R > 0 ? '+' : '') + R.toFixed(1) + 'R' : '—'}</b></div>`);
+    // equity in R by close time
+    const ch = closed.slice().sort((a, b) => a.closed - b.closed); let eq = 0; const pts = [0].concat(ch.map((x) => (eq += x.R)));
+    if (pts.length > 2) {
+      const lo = Math.min(...pts), hi = Math.max(...pts), W = 600, H = 64;
+      const y = (v) => (H - 4 - (v - lo) / Math.max(1e-9, hi - lo) * (H - 8)).toFixed(1);
+      set('ms-c-eq', `<svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="none" role="img" aria-label="Trader equity in R over ${ch.length} closed trades"><line x1="0" x2="${W}" y1="${y(0)}" y2="${y(0)}" stroke="var(--line)" stroke-dasharray="4 4" vector-effect="non-scaling-stroke"/><path d="${pts.map((v, i) => `${i ? 'L' : 'M'}${(i / (pts.length - 1) * W).toFixed(1)},${y(v)}`).join('')}" fill="none" stroke="${eq >= 0 ? 'var(--buy)' : 'var(--sell)'}" stroke-width="2" vector-effect="non-scaling-stroke"/></svg>`);
+    } else set('ms-c-eq', '');
+    const ST = { win: ['pos', 'Win'], loss: ['neg', 'Loss'], open: ['', 'Open'], pending: ['', 'Waiting fill'], missed: ['', 'Missed'], expired: ['', 'Expired'], skipped: ['', 'Skipped'] };
+    const dI = (x) => ({ dec: x.dec != null ? x.dec : 2 });
+    set('ms-c-trades', list.length ? list.slice(0, 25).map((x) => `<tr><td>${ftime(x.opened + TZ)}</td><td><b>${esc(x.label)}</b></td><td>${esc(x.name)} <small>${esc(x.pair)}</small></td><td><span class="ms-chip ${x.side === 'sell' ? 'ms-chip-sell' : 'ms-chip-buy'}">${x.side.toUpperCase()}</span></td><td class="n">${fmtI(x.entry, dI(x))}</td><td class="n">${fmtI(x.stop, dI(x))}</td><td class="n">${fmtI(x.t1, dI(x))}</td><td class="${(ST[x.status] || ['', ''])[0]}" title="${esc(x.note || '')}">${(ST[x.status] || ['', x.status])[1]}${x.R != null && (x.status === 'win' || x.status === 'loss') ? ` ${x.R > 0 ? '+' : ''}${x.R}R` : ''}</td></tr>`).join('')
+      : `<tr><td colspan="8" class="empty">No council trades yet${only ? ' on this market' : ''}. The Trader takes every Ready setup it sees.</td></tr>`);
+    // Analyst
+    const ready = C.snap ? Object.entries(C.snap.markets || {}).flatMap(([k, m]) => m.setups.filter((t) => t.state === 'READY').map((t) => ({ k, m, t }))) : [];
+    set('ms-c-ready', ready.length ? ready.map(({ k, m, t }) => `<li><a href="?s=${k}#setup"><b>${esc(m.label)}</b> ${t.side === 'sell' ? 'Sell' : 'Buy'} ${esc(t.name)} <small>${esc(t.pair)}</small></a><span>${t.rr}R</span></li>`).join('') : '<li class="empty">No market is Ready at the last Trader run.</li>');
+    set('ms-c-analysis', C.analysis ? md(C.analysis) : '<p class="ms-note">The Analyst writes the weekly brief every Monday morning: bias per market, key levels, likely setups and the week\'s news.</p>');
+    // Coach
+    const cf = C.config || { buf: CFG.buf, minRR: CFG.minRR, paused: {}, history: [] };
+    const paused = Object.entries(cf.paused || {});
+    set('ms-c-rules', `<span class="ms-q">Stop buffer ${cf.buf} × ATR</span><span class="ms-q">Min reward:risk ${cf.minRR}</span>` + (paused.length ? paused.map(([k, u]) => `<span class="ms-q weak">${esc(k)} paused to ${esc(u.slice(0, 10))}</span>`).join('') : '<span class="ms-q good">All setups active</span>'));
+    set('ms-c-notes', C.coach ? (C.coach.notes || []).map((n) => `<li>${esc(n)}</li>`).join('') : '<li>The statistical Coach runs once a day with the Trader.</li>');
+    set('ms-c-hist', (cf.history || []).slice(-8).reverse().map((h) => `<li><span>${esc(String(h.at).slice(0, 10))} · ${esc(h.by)}</span><b>${esc(h.change)}</b><em>${esc(h.why)}</em></li>`).join('') || '<li class="empty">No rule changes yet.</li>');
+    set('ms-c-review', C.review ? md(C.review) : '<p class="ms-note">The AI Coach writes a review after each trading day: what worked, what didn\'t, and any rule it changed.</p>');
+    renderHome();
+  }
+  const autoEl = document.getElementById('ms-auto');
+  try { G.auto = localStorage.getItem('msAuto') === '1'; } catch (e) { G.auto = false; }
+  if (autoEl) { autoEl.checked = G.auto; autoEl.addEventListener('change', () => { G.auto = autoEl.checked; try { localStorage.setItem('msAuto', G.auto ? '1' : '0'); } catch (e) {} notify(G.auto ? 'Browser Trader on' : 'Browser Trader off', G.auto ? 'Ready setups on this market go into your journal as paper trades while this page is open.' : 'No more automatic journal entries.'); }); }
+  const mineEl = document.getElementById('ms-c-mine'); if (mineEl) mineEl.addEventListener('change', renderCouncil);
+  if (document.getElementById('v-council')) { loadCouncil(); setInterval(loadCouncil, 5 * 60e3); }
+
   // ─── Sections: a home page of cards, each section on its own page ───
-  const VIEWS = ['home', 'setup', 'charts', 'scanner', 'news', 'journal', 'backtest', 'guide'];
+  const VIEWS = ['home', 'setup', 'charts', 'scanner', 'council', 'news', 'journal', 'backtest', 'guide'];
   function showView() {
     const h = location.hash.slice(1), v = VIEWS.includes(h) ? h : 'home';
     VIEWS.forEach((k) => { const el = document.getElementById('v-' + k); if (el) el.hidden = k !== v; });
@@ -2105,6 +2253,7 @@ function msNextSetup(bars, A) {
       const done = J.filter((x) => x.res === 'win' || x.res === 'loss' || x.res === 'be'), w = done.filter((x) => x.res === 'win').length, l = done.filter((x) => x.res === 'loss').length;
       const R = done.reduce((a, x) => a + (+x.R || 0), 0), open = J.filter((x) => x.res === 'open').length;
       if (J.length) { set('h-j', `${done.length ? `${R >= 0 ? '+' : ''}${R.toFixed(1)}R` : `${J.length} logged`}`); set('h-j-sub', `${done.length} closed${w + l ? ` · ${Math.round(w / (w + l) * 100)}% win rate` : ''} · ${open} open`); }
+      if (COUNCIL.trades) { const cl = COUNCIL.trades.filter((x) => x.status === 'win' || x.status === 'loss'), cr = cl.reduce((a, x) => a + x.R, 0); set('h-council', cl.length ? `${cr >= 0 ? '+' : ''}${cr.toFixed(1)}R <small>from ${cl.length} trades</small>` : `${COUNCIL.trades.filter((x) => x.status === 'open' || x.status === 'pending').length} open trades`); }
       if (G.bt) set('h-bt', `${G.bt.wr === null ? '—' : Math.round(G.bt.wr * 100) + '%'} win · ${G.bt.R >= 0 ? '+' : ''}${G.bt.R.toFixed(1)}R`);
       const warn = document.getElementById('ms-news-warn'), hw = document.getElementById('h-warn');
       if (warn && hw) { hw.hidden = warn.hidden; hw.innerHTML = warn.innerHTML; }
