@@ -6278,6 +6278,7 @@ if (/^#(market-structure|structure)$/.test(location.hash) || /market-structure\.
       return `<span class="ms-al ${cls}">${tf.label} ${tr < 0 ? '▼' : tr > 0 ? '▲' : '–'}</span>`;
     }).join('');
 
+    renderLevels([['Origin top', e.top, sell ? 'var(--sell)' : 'var(--buy)'], ['50% line', fib4, 'var(--ink-faint)'], ['Origin bottom', e.bot, sell ? 'var(--sell)' : 'var(--buy)'], ['VR extreme', vr4, '#f2b33d']], price);
     renderTrades(price);
     journalTick();
     renderHome();
@@ -7087,6 +7088,57 @@ if (/^#(market-structure|structure)$/.test(location.hash) || /market-structure\.
   }
 
 
+  // ─── Key levels with one-tap price alerts (saved per market in this browser) ───
+  const LKEY = 'msLvl_' + instKey;
+  let LVL = [];
+  try { LVL = JSON.parse(localStorage.getItem(LKEY) || '[]'); if (!Array.isArray(LVL)) LVL = []; } catch (e) { LVL = []; }
+  const lvlSave = () => { try { localStorage.setItem(LKEY, JSON.stringify(LVL)); } catch (e) {} };
+  const BELL = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 8a6 6 0 1112 0c0 7 3 9 3 9H3s3-2 3-9"></path><path d="M10 21a2 2 0 004 0"></path></svg>';
+  let lastPx = null;
+  function renderLevels(levels, price) {
+    // fire alerts on a cross since the last tick
+    if (lastPx !== null && lastPx !== price) {
+      const hit = LVL.filter((a) => (lastPx - a.p) * (price - a.p) <= 0);
+      if (hit.length) {
+        hit.forEach((a) => notify(`${INST.label} reached ${a.n}`, `Price ${fmt(price)} touched your alert at ${fmt(a.p)}.`));
+        LVL = LVL.filter((a) => !hit.includes(a)); lvlSave();
+      }
+    }
+    lastPx = price;
+    const ul = document.getElementById('ms-levels'); if (!ul) return;
+    const rows = levels.filter((l) => isFinite(l[1])).map(([n, p, c]) => ({ n, p, c })).concat([{ n: 'Price now', p: price, cur: true }]).sort((a, b) => b.p - a.p);
+    ul.innerHTML = rows.map((r) => {
+      if (r.cur) return `<li class="cur"><i></i><span>Price now</span><b>${fmt(r.p)}</b><span class="ms-bell-gap"></span></li>`;
+      const on = LVL.some((a) => a.n === r.n && Math.abs(a.p - r.p) < 1e-9);
+      return `<li><i style="background:${r.c}"></i><span>${r.n}</span><b>${fmt(r.p)}</b><button type="button" class="ms-bell${on ? ' on' : ''}" data-n="${esc(r.n)}" data-p="${r.p}" aria-pressed="${on}" aria-label="${on ? 'Cancel' : 'Set'} alert at ${r.n} ${fmt(r.p)}">${BELL}</button></li>`;
+    }).join('');
+    const ac = document.getElementById('ms-lvl-count');
+    if (ac) ac.textContent = LVL.length ? `${LVL.length} alert${LVL.length === 1 ? '' : 's'} set` : 'Tap a bell to get alerted';
+  }
+  const lvlEl = document.getElementById('ms-levels');
+  if (lvlEl) lvlEl.addEventListener('click', (ev) => {
+    const b = ev.target.closest('.ms-bell'); if (!b) return;
+    const n = b.dataset.n, p = +b.dataset.p, i = LVL.findIndex((a) => a.n === n && Math.abs(a.p - p) < 1e-9);
+    if (i >= 0) LVL.splice(i, 1); else { LVL.push({ n, p }); notify('Level alert set', `You'll be alerted when ${INST.label} reaches ${n} ${fmt(p)}.`); }
+    lvlSave(); topDown();
+  });
+
+  // ─── Session timeline for today, in your local time ───
+  function sessTimeline() {
+    const now = Date.now() / 1000, col = { tky: '#5a6478', ldn: '#3d7bff', ny: '#b07bff' };
+    let t0, t1, segsBy, k;
+    for (k = 0; k < 4; k++) {   // weekends have no sessions: show the next trading day instead
+      const d0 = new Date(); d0.setHours(0, 0, 0, 0); d0.setDate(d0.getDate() + k);
+      t0 = d0.getTime() / 1000; t1 = t0 + 86400;
+      segsBy = SESS.map((se) => { const len = (se.c - se.o) * 3600; return sessionOpens(se, t0 - 86400, t1).map((t) => [Math.max(t, t0), Math.min(t + len, t1)]).filter(([a, b]) => b > a); });
+      if (segsBy.some((x) => x.length)) break;
+    }
+    const rows = SESS.map((se, i) => `<div class="sbar-r"><span>${se.name}</span><div class="sbar-t">${segsBy[i].map(([a, b]) => `<i style="left:${((a - t0) / 864).toFixed(2)}%;width:${((b - a) / 864).toFixed(2)}%;background:${col[se.k]}"></i>`).join('')}</div></div>`).join('');
+    const cap = k ? `Next trading day · ${new Date(t0 * 1000).toLocaleDateString('en-GB', { weekday: 'long' })}` : 'Today, your time';
+    const mark = k ? '' : `<b style="left:${((now - t0) / 864).toFixed(2)}%" title="Now"></b>`;
+    return `<div class="sbar"><div class="sbar-cap">${cap}</div>${rows}<div class="sbar-ax"><span></span><div class="sbar-t">${[0, 6, 12, 18].map((h) => `<em style="left:${h / 24 * 100}%">${String(h).padStart(2, '0')}:00</em>`).join('')}${mark}</div></div></div>`;
+  }
+
   // ─── Sections: a home page of cards, each section on its own page ───
   const VIEWS = ['home', 'setup', 'charts', 'scanner', 'news', 'journal', 'backtest', 'guide'];
   function showView() {
@@ -7124,6 +7176,7 @@ if (/^#(market-structure|structure)$/.test(location.hash) || /market-structure\.
       const top = res.map(([k, r]) => ({ I: INSTRUMENTS[k], t: r.list[0] })).filter((x) => x.t).sort((a, b) => ORDER[a.t.state] - ORDER[b.t.state]).slice(0, 3);
       set('h-scan-list', top.map((x) => `${x.I.label} · ${x.t.sell ? 'Sell' : 'Buy'} ${x.t.name} · <b>${x.t.state}</b>`).join('<br>') || 'Checks all 10 markets every 5 minutes.');
       set('h-sess', sessEl ? sessEl.innerHTML : '');
+      set('h-sbar', sessTimeline());
       const now = Date.now() / 1000, nx = NEWS.filter((x) => x.rel && x.t > now - 900).slice(0, 2);
       set('h-news', nx.length ? nx.map((x) => `${esc(x.cur)} ${esc(x.title)} · <b>${x.t > now ? 'in ' + dur(x.t - now) : 'just out'}</b>`).join('<br>') : 'No high-impact news this week.');
       const done = J.filter((x) => x.res === 'win' || x.res === 'loss' || x.res === 'be'), w = done.filter((x) => x.res === 'win').length, l = done.filter((x) => x.res === 'loss').length;
@@ -7136,6 +7189,7 @@ if (/^#(market-structure|structure)$/.test(location.hash) || /market-structure\.
   }
   // Session table on the News page
   function renderSessList() {
+    const sb = document.getElementById('ms-sbar'); if (sb) sb.innerHTML = sessTimeline();
     const ul = document.getElementById('ms-sess-list'); if (!ul) return;
     const now = Date.now() / 1000, tm = (t) => new Date(t * 1000).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
     ul.innerHTML = SESS.map((se) => {
