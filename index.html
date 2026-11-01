@@ -6464,9 +6464,9 @@ if (/^#(market-structure|structure)$/.test(location.hash) || /market-structure\.
     G.plan = sel && !sel.invalid ? { entry: sel.entry, stop: sel.stop, t1: sel.t1, t2: sel.t2, rr: sel.rr, sell: sel.sell, name: sel.name } : null;
     const key = G.plan ? [G.sel, G.plan.entry, G.plan.stop, G.plan.t1].map((v) => typeof v === 'number' ? v.toFixed(1) : v).join('|') : 'none';
     if (key !== G.planKey) { G.planKey = key; Object.values(panes).forEach((p) => p.A && p.draw()); }
+    if (G.auto) autoTrade(list, price);
     list.forEach((t) => {
       const was = G.prevStates[t.k];
-      if (was && was !== t.state && t.state === 'READY' && G.auto && !CFG.paused[t.k] && t.rr >= CFG.minRR) { jAdd(t, 'Auto paper trade · browser Trader'); notify(`Trader logged ${t.name} ${t.sell ? 'sell' : 'buy'}`, `Paper trade in your journal: entry ${fmt(t.entry)}, stop ${fmt(t.stop)}, target ${fmt(t.t1)}.`); }
       if (was && was !== t.state && t.state === 'READY') notify(`${t.name} ${t.sell ? 'sell' : 'buy'} ready (${t.pair})`, `${t.pair}: entry ${fmt(t.entry)}, stop ${fmt(t.stop)}, target ${fmt(t.t1)} (${t.rr.toFixed(1)}R).`);
       G.prevStates[t.k] = t.state;
     });
@@ -7069,6 +7069,33 @@ if (/^#(market-structure|structure)$/.test(location.hash) || /market-structure\.
     });
     renderJournal();
   }
+  // Browser Trader: every fresh Ready setup on this market becomes a saved paper trade (once per signal, even across reloads)
+  let AUTO_SEEN = {};
+  try { AUTO_SEEN = JSON.parse(localStorage.getItem('msAutoSeen') || '{}') || {}; } catch (e) { AUTO_SEEN = {}; }
+  function autoTrade(list, price) {
+    if (!JEL) return;
+    const now = Date.now() / 1000; let added = 0;
+    for (const t of list) {
+      const id = `${instKey}|${t.sig}`;
+      if (t.state !== 'READY' || AUTO_SEEN[id]) continue;
+      AUTO_SEEN[id] = now;
+      const def = PAIRS.concat(RETR).find((p) => p.k === t.k), cfT = +String(t.sig).split('|')[2] - TZ;
+      const lsec = (TFS.find((x) => x.id === def.l) || {}).sec || 60;
+      if (!cfT || now - cfT > 12 * lsec) continue;                 // old CF: the move already happened
+      if (CFG.paused[t.k] || t.rr < CFG.minRR) continue;          // the Coach's rules
+      const tr = Object.assign({}, t);
+      if (t.sell ? price >= t.entry : price <= t.entry) {        // already through the entry: fill at market
+        tr.entry = price; const r = Math.abs(price - t.stop), rw = (t.t1 - price) * (t.sell ? -1 : 1);
+        if (!(r > 0) || rw <= 0 || (t.sell ? price >= t.stop : price <= t.stop)) continue;
+        tr.rr = rw / r;
+      }
+      jAdd(tr, 'Auto paper trade · browser Trader'); added++;
+      notify(`Trader saved ${t.name} ${t.sell ? 'sell' : 'buy'}`, `${INST.label} ${t.pair}: entry ${fmt(tr.entry)}, stop ${fmt(tr.stop)}, target ${fmt(tr.t1)} (${tr.rr.toFixed(1)}R). It's in your journal.`);
+    }
+    for (const [k, v] of Object.entries(AUTO_SEEN)) if (now - v > 30 * 86400) delete AUTO_SEEN[k];
+    try { localStorage.setItem('msAutoSeen', JSON.stringify(AUTO_SEEN)); } catch (e) {}
+    return added;
+  }
   function jAdd(t, note) {
     if (!JEL) return;
     J.unshift({ id: Date.now().toString(36) + Math.random().toString(36).slice(2, 5), t: Math.floor(Date.now() / 1000), inst: instKey, label: INST.label, dec: INST.dec, name: t.name, pair: t.pair,
@@ -7262,8 +7289,11 @@ if (/^#(market-structure|structure)$/.test(location.hash) || /market-structure\.
     renderHome();
   }
   const autoEl = document.getElementById('ms-auto');
-  try { G.auto = localStorage.getItem('msAuto') === '1'; } catch (e) { G.auto = false; }
+  try { G.auto = localStorage.getItem('msAuto') !== '0'; } catch (e) { G.auto = true; }
   if (autoEl) { autoEl.checked = G.auto; autoEl.addEventListener('change', () => { G.auto = autoEl.checked; try { localStorage.setItem('msAuto', G.auto ? '1' : '0'); } catch (e) {} notify(G.auto ? 'Browser Trader on' : 'Browser Trader off', G.auto ? 'Ready setups on this market go into your journal as paper trades while this page is open.' : 'No more automatic journal entries.'); }); }
+  const auto2 = document.getElementById('ms-auto2');
+  if (auto2) { auto2.checked = G.auto; auto2.addEventListener('change', () => { if (autoEl) { autoEl.checked = auto2.checked; autoEl.dispatchEvent(new Event('change')); } }); }
+  if (autoEl) autoEl.addEventListener('change', () => { if (auto2) auto2.checked = autoEl.checked; const m1 = panes['1m']; if (G.auto && m1 && m1.bars) topDown(); });
   const mineEl = document.getElementById('ms-c-mine'); if (mineEl) mineEl.addEventListener('change', renderCouncil);
   if (document.getElementById('v-council')) { loadCouncil(); setInterval(loadCouncil, 5 * 60e3); }
 
