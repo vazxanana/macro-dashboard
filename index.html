@@ -7245,7 +7245,8 @@ if (/^#(market-structure|structure)$/.test(location.hash) || /market-structure\.
   function renderCouncil() {
     const root = document.getElementById('v-council'); if (!root) return;
     const set = (id, html) => { const el = document.getElementById(id); if (el) el.innerHTML = html; };
-    const C = COUNCIL, T = (C.trades || []).slice().reverse();
+    const C = COUNCIL, TA = (C.trades || []).slice().reverse(), T = TA.filter((x) => !x.shadow);
+    const showSh = document.getElementById('ms-c-shadow'), withSh = showSh && showSh.checked;
     const mine = document.getElementById('ms-c-mine'), only = mine && mine.checked;
     const list = only ? T.filter((x) => x.market === instKey) : T;
     const closed = list.filter((x) => x.status === 'win' || x.status === 'loss');
@@ -7260,12 +7261,13 @@ if (/^#(market-structure|structure)$/.test(location.hash) || /market-structure\.
       const y = (v) => (H - 4 - (v - lo) / Math.max(1e-9, hi - lo) * (H - 8)).toFixed(1);
       set('ms-c-eq', `<svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="none" role="img" aria-label="Trader equity in R over ${ch.length} closed trades"><line x1="0" x2="${W}" y1="${y(0)}" y2="${y(0)}" stroke="var(--line)" stroke-dasharray="4 4" vector-effect="non-scaling-stroke"/><path d="${pts.map((v, i) => `${i ? 'L' : 'M'}${(i / (pts.length - 1) * W).toFixed(1)},${y(v)}`).join('')}" fill="none" stroke="${eq >= 0 ? 'var(--buy)' : 'var(--sell)'}" stroke-width="2" vector-effect="non-scaling-stroke"/></svg>`);
     } else set('ms-c-eq', '');
+    const tableList = (withSh ? TA : T).filter((x) => !only || x.market === instKey);
     const ST = { win: ['pos', 'Win'], loss: ['neg', 'Loss'], open: ['', 'Open'], pending: ['', 'Waiting fill'], missed: ['', 'Missed'], expired: ['', 'Expired'], skipped: ['', 'Skipped'] };
     const dI = (x) => ({ dec: x.dec != null ? x.dec : 2 });
-    set('ms-c-trades', list.length ? list.slice(0, 25).map((x) => `<tr><td>${ftime(x.opened + TZ)}</td><td><b>${esc(x.label)}</b></td><td>${esc(x.name)} <small>${esc(x.pair)}</small></td><td><span class="ms-chip ${x.side === 'sell' ? 'ms-chip-sell' : 'ms-chip-buy'}">${x.side.toUpperCase()}</span></td><td class="n">${fmtI(x.entry, dI(x))}</td><td class="n">${fmtI(x.stop, dI(x))}</td><td class="n">${fmtI(x.t1, dI(x))}</td><td class="${(ST[x.status] || ['', ''])[0]}" title="${esc(x.note || '')}">${(ST[x.status] || ['', x.status])[1]}${x.R != null && (x.status === 'win' || x.status === 'loss') ? ` ${x.R > 0 ? '+' : ''}${x.R}R` : ''}</td></tr>`).join('')
+    set('ms-c-trades', tableList.length ? tableList.slice(0, 25).map((x) => `<tr class="${x.shadow ? 'sh' : ''}"><td>${ftime(x.opened + TZ)}</td><td><b>${esc(x.label)}</b></td><td>${esc(x.name)} <small>${esc(x.pair)}</small></td><td><span class="ms-chip ${x.side === 'sell' ? 'ms-chip-sell' : 'ms-chip-buy'}">${x.side.toUpperCase()}</span></td><td class="n">${fmtI(x.entry, dI(x))}</td><td class="n">${fmtI(x.stop, dI(x))}</td><td class="n">${fmtI(x.t1, dI(x))}</td><td class="${(ST[x.status] || ['', ''])[0]}" title="${esc(x.note || '')}">${x.shadow ? 'Shadow · ' : ''}${(ST[x.status] || ['', x.status])[1]}${x.R != null && (x.status === 'win' || x.status === 'loss') ? ` ${x.R > 0 ? '+' : ''}${x.R}R` : ''}</td></tr>`).join('')
       : `<tr><td colspan="8" class="empty">No council trades yet${only ? ' on this market' : ''}. The Trader takes every Ready setup it sees.</td></tr>`);
     // Scorecard: closed council trades grouped by setup and by market
-    const allClosed = (C.trades || []).filter((x) => x.status === 'win' || x.status === 'loss');
+    const allClosed = (C.trades || []).filter((x) => !x.shadow && (x.status === 'win' || x.status === 'loss'));
     const group = (keyFn, labelFn) => {
       const g = {}; allClosed.forEach((x) => { const k = keyFn(x); (g[k] = g[k] || { label: labelFn(x), arr: [] }).arr.push(x); });
       return Object.values(g).map(({ label, arr }) => { const w = arr.filter((x) => x.status === 'win').length, r = arr.reduce((a, x) => a + x.R, 0);
@@ -7282,7 +7284,10 @@ if (/^#(market-structure|structure)$/.test(location.hash) || /market-structure\.
     // Coach
     const cf = C.config || { buf: CFG.buf, minRR: CFG.minRR, paused: {}, history: [] };
     const paused = Object.entries(cf.paused || {});
-    set('ms-c-rules', `<span class="ms-q">Stop buffer ${cf.buf} × ATR</span><span class="ms-q">Min reward:risk ${cf.minRR}</span>` + (paused.length ? paused.map(([k, u]) => `<span class="ms-q weak">${esc(k)} paused to ${esc(u.slice(0, 10))}</span>`).join('') : '<span class="ms-q good">All setups active</span>'));
+    set('ms-c-rules', `<span class="ms-q">Stop buffer ${cf.buf} × ATR</span><span class="ms-q">Min reward:risk ${cf.minRR}</span>` + (paused.length ? paused.map(([k, u]) => `<span class="ms-q weak">${esc(k)} paused to ${esc(u.slice(0, 10))}</span>`).join('') : '<span class="ms-q good">All setups active</span>') +
+      Object.entries(cf.filters || {}).map(([k, f]) => [f.d1 ? `${k}: only ${f.d1} D1` : '', f.struct ? `${k}: only ${f.struct} structure` : '', (f.noSession || []).length ? `${k}: skip ${f.noSession.join(', ')}` : ''].filter(Boolean).map((t) => `<span class="ms-q">Learned · ${esc(t)}</span>`).join('')).join(''));
+    const sh = (C.trades || []).filter((x) => x.shadow && (x.status === 'win' || x.status === 'loss')), shR = sh.reduce((a, x) => a + x.R, 0);
+    set('ms-c-shadow-sum', sh.length ? `Shadow trades (blocked by rules) closed: ${sh.length}, ${shR >= 0 ? '+' : ''}${shR.toFixed(1)}R. ${shR > 0 ? 'Blocked trades are winning: the Coach will loosen the rule that blocks them.' : 'The rules are keeping you out of losing trades.'}` : 'Blocked setups are followed as shadow trades so the Coach can check every rule it adds.');
     set('ms-c-notes', C.coach ? (C.coach.notes || []).map((n) => `<li>${esc(n)}</li>`).join('') : '<li>The statistical Coach runs once a day with the Trader.</li>');
     set('ms-c-hist', (cf.history || []).slice(-8).reverse().map((h) => `<li><span>${esc(String(h.at).slice(0, 10))} · ${esc(h.by)}</span><b>${esc(h.change)}</b><em>${esc(h.why)}</em></li>`).join('') || '<li class="empty">No rule changes yet.</li>');
     set('ms-c-review', C.review ? md(C.review) : '<p class="ms-note">The AI Coach writes a review after each trading day: what worked, what didn\'t, and any rule it changed.</p>');
@@ -7295,6 +7300,7 @@ if (/^#(market-structure|structure)$/.test(location.hash) || /market-structure\.
   if (auto2) { auto2.checked = G.auto; auto2.addEventListener('change', () => { if (autoEl) { autoEl.checked = auto2.checked; autoEl.dispatchEvent(new Event('change')); } }); }
   if (autoEl) autoEl.addEventListener('change', () => { if (auto2) auto2.checked = autoEl.checked; const m1 = panes['1m']; if (G.auto && m1 && m1.bars) topDown(); });
   const mineEl = document.getElementById('ms-c-mine'); if (mineEl) mineEl.addEventListener('change', renderCouncil);
+  const shEl = document.getElementById('ms-c-shadow'); if (shEl) shEl.addEventListener('change', renderCouncil);
   if (document.getElementById('v-council')) { loadCouncil(); setInterval(loadCouncil, 5 * 60e3); }
 
   // ─── Sections: a home page of cards, each section on its own page ───
@@ -7340,7 +7346,7 @@ if (/^#(market-structure|structure)$/.test(location.hash) || /market-structure\.
       const done = J.filter((x) => x.res === 'win' || x.res === 'loss' || x.res === 'be'), w = done.filter((x) => x.res === 'win').length, l = done.filter((x) => x.res === 'loss').length;
       const R = done.reduce((a, x) => a + (+x.R || 0), 0), open = J.filter((x) => x.res === 'open').length;
       if (J.length) { set('h-j', `${done.length ? `${R >= 0 ? '+' : ''}${R.toFixed(1)}R` : `${J.length} logged`}`); set('h-j-sub', `${done.length} closed${w + l ? ` · ${Math.round(w / (w + l) * 100)}% win rate` : ''} · ${open} open`); }
-      if (COUNCIL.trades) { const cl = COUNCIL.trades.filter((x) => x.status === 'win' || x.status === 'loss'), cr = cl.reduce((a, x) => a + x.R, 0); set('h-council', cl.length ? `${cr >= 0 ? '+' : ''}${cr.toFixed(1)}R <small>from ${cl.length} trades</small>` : `${COUNCIL.trades.filter((x) => x.status === 'open' || x.status === 'pending').length} open trades`); }
+      if (COUNCIL.trades) { const cl = COUNCIL.trades.filter((x) => !x.shadow && (x.status === 'win' || x.status === 'loss')), cr = cl.reduce((a, x) => a + x.R, 0); set('h-council', cl.length ? `${cr >= 0 ? '+' : ''}${cr.toFixed(1)}R <small>from ${cl.length} trades</small>` : `${COUNCIL.trades.filter((x) => !x.shadow && (x.status === 'open' || x.status === 'pending')).length} open trades`); }
       if (G.bt) set('h-bt', `${G.bt.wr === null ? '—' : Math.round(G.bt.wr * 100) + '%'} win · ${G.bt.R >= 0 ? '+' : ''}${G.bt.R.toFixed(1)}R`);
       const warn = document.getElementById('ms-news-warn'), hw = document.getElementById('h-warn');
       if (warn && hw) { hw.hidden = warn.hidden; hw.innerHTML = warn.innerHTML; }
