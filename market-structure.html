@@ -137,6 +137,60 @@
     .ms-q { font: 600 10px var(--mono); padding: 2px 7px; border-radius: 3px; border: 1px solid var(--line); color: var(--ink-dim); }
     .ms-q.good { color: #089981; border-color: rgba(8,153,129,.45); background: rgba(8,153,129,.08); }
     .ms-q.weak { color: #f0a500; border-color: rgba(240,165,0,.45); background: rgba(240,165,0,.08); }
+    .ms-tr-foot { display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap; margin-top: 10px; }
+    .ms-tg { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 6px 10px; align-items: center; font-size: 12px; color: var(--ink-dim); }
+    .ms-tg input, .ms-j input, .ms-j select { width: 100%; min-width: 0; background: transparent; color: var(--ink); border: 1px solid var(--line); border-radius: 4px; padding: 5px 7px; font: 500 12px var(--mono); }
+    .ms-j select option { background: var(--panel); color: var(--ink); }
+    .ms-tg input:focus-visible, .ms-j input:focus-visible, .ms-j select:focus-visible { outline: 2px solid #2962ff; outline-offset: 1px; }
+    .ms-news-warn { margin: 0 0 12px; padding: 9px 12px; border-radius: 6px; border: 1px solid rgba(240,165,0,.5); background: rgba(240,165,0,.12); color: var(--ink); font-size: 12px; line-height: 1.5; }
+    .ms-news-warn[hidden] { display: none; }
+    .ms-news { list-style: none; margin: 6px 0 0; padding: 0; display: grid; gap: 4px; font-size: 11px; color: var(--ink-dim); }
+    .ms-news li { display: flex; justify-content: space-between; gap: 8px; }
+    .ms-news li b { font: 600 11px var(--mono); color: var(--ink); }
+    .ms-news li.soon b { color: #f0a500; }
+    .ms-scan-meta { display: inline-flex; align-items: center; gap: 10px; text-transform: none; letter-spacing: 0; font-size: 11px; color: var(--ink-faint); }
+    .ms-scan { display: grid; gap: 6px; }
+    .ms-srow { display: grid; grid-template-columns: minmax(120px, 1.1fr) minmax(90px, .7fr) minmax(130px, .9fr) minmax(0, 2.2fr) minmax(0, 1.4fr); gap: 6px 14px; align-items: center; padding: 9px 12px; border: 1px solid var(--line); border-radius: 6px; color: inherit; text-decoration: none; font-size: 12px; }
+    .ms-srow:hover { border-color: var(--ink-faint); }
+    .ms-srow:focus-visible { outline: 2px solid #2962ff; outline-offset: 2px; }
+    .ms-srow.cur { border-color: rgba(41,98,255,.6); }
+    .ms-srow.ready { border-color: rgba(8,153,129,.6); background: rgba(8,153,129,.06); }
+    .ms-srow .mk b { display: block; font-size: 13px; color: var(--ink); }
+    .ms-srow .mk small { color: var(--ink-faint); font-size: 10px; }
+    .ms-srow .pr { font: 700 13px var(--mono); color: var(--ink); font-variant-numeric: tabular-nums; }
+    .ms-srow .tr { display: flex; gap: 4px; flex-wrap: wrap; }
+    .ms-srow .tr .ms-al { padding: 1px 5px; font-size: 10px; }
+    .ms-srow .su { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; min-width: 0; }
+    .ms-srow .su .ms-st { margin-left: 0; }
+    .ms-srow .lv { font: 500 11px var(--mono); color: var(--ink-dim); font-variant-numeric: tabular-nums; }
+    .ms-srow .err { color: var(--ink-faint); grid-column: 2 / -1; font-size: 11px; }
+    @media (max-width: 1000px) { .ms-srow { grid-template-columns: minmax(0, 1fr) auto; } .ms-srow .tr, .ms-srow .lv { grid-column: 1 / -1; } .ms-srow .su { grid-column: 1 / -1; } .ms-srow .pr { text-align: right; } }
+    .ms-bt-t { width: 100%; border-collapse: collapse; font-size: 12px; }
+    .ms-bt-t th { text-align: left; font: 600 9px var(--sans); letter-spacing: .8px; text-transform: uppercase; color: var(--ink-faint); padding: 6px 8px; border-bottom: 1px solid var(--line); white-space: nowrap; }
+    .ms-bt-t td { padding: 7px 8px; border-bottom: 1px solid var(--line-soft); color: var(--ink-dim); white-space: nowrap; }
+    .ms-bt-t td.n, .ms-bt-t th.n { text-align: right; font-family: var(--mono); font-variant-numeric: tabular-nums; }
+    .ms-bt-t td b { color: var(--ink); }
+    .ms-bt-t .pos { color: #089981; } .ms-bt-t .neg { color: #f23645; }
+    .ms-bt-t tr.grp td { color: var(--ink-faint); font: 600 9px var(--sans); letter-spacing: .8px; text-transform: uppercase; padding-top: 14px; }
+    .ms-bt-sum { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; margin-bottom: 12px; }
+    .ms-bt-sum div { border: 1px solid var(--line); border-radius: 6px; padding: 10px 12px; }
+    .ms-bt-sum span { display: block; font-size: 9px; letter-spacing: .8px; text-transform: uppercase; color: var(--ink-faint); }
+    .ms-bt-sum b { font: 700 18px var(--mono); color: var(--ink); font-variant-numeric: tabular-nums; }
+    .ms-bt-sum b.pos { color: #089981; } .ms-bt-sum b.neg { color: #f23645; }
+    .ms-bt-eq { width: 100%; height: 70px; display: block; margin: 4px 0 12px; }
+    .ms-j-wrap, .ms-bt-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; position: relative; }
+    .ms-j:has(.empty) { min-width: 0; } .ms-j:has(.empty) thead { display: none; }
+    .ms-j { width: 100%; border-collapse: collapse; font-size: 12px; min-width: 860px; }
+    .ms-j th { text-align: left; font: 600 9px var(--sans); letter-spacing: .8px; text-transform: uppercase; color: var(--ink-faint); padding: 6px; border-bottom: 1px solid var(--line); white-space: nowrap; }
+    .ms-j td { padding: 5px 6px; border-bottom: 1px solid var(--line-soft); color: var(--ink-dim); white-space: nowrap; font-variant-numeric: tabular-nums; }
+    .ms-j td.m { font-family: var(--mono); }
+    .ms-j td:nth-child(10) input { width: 64px; } .ms-j td:nth-child(9) select { width: 92px; } .ms-j td:nth-child(11) input { min-width: 140px; }
+    .ms-j .del { all: unset; cursor: pointer; color: var(--ink-faint); padding: 4px 8px; border-radius: 4px; }
+    .ms-j .del:hover, .ms-j .del:focus-visible { color: #f23645; outline: 1px solid var(--line); }
+    .ms-j .empty td { text-align: center; padding: 18px; color: var(--ink-faint); white-space: normal; }
+    .ms-j-stats { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 10px; }
+    .ms-j-stats:empty { display: none; }
+    @media (max-width: 700px) { .ms-bt-sum { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
   </style>
 <style>
   .ms-live.app { max-width: 1440px; margin: 0 auto; padding: 12px max(16px, env(safe-area-inset-right, 0px)) 32px max(16px, env(safe-area-inset-left, 0px)); gap: 14px;
@@ -182,7 +236,7 @@
   .seg button:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
   .ms-kv > div:first-child { display: none; }
   .ms-grid4[data-view]:not([data-view="all"]) { grid-template-columns: minmax(0, 1fr); }
-  .ms-grid4[data-view="4h"] .ms-pane:not([data-tf="4h"]), .ms-grid4[data-view="1h"] .ms-pane:not([data-tf="1h"]),
+  .ms-grid4[data-view="1d"] .ms-pane:not([data-tf="1d"]), .ms-grid4[data-view="4h"] .ms-pane:not([data-tf="4h"]), .ms-grid4[data-view="1h"] .ms-pane:not([data-tf="1h"]),
   .ms-grid4[data-view="15m"] .ms-pane:not([data-tf="15m"]), .ms-grid4[data-view="5m"] .ms-pane:not([data-tf="5m"]), .ms-grid4[data-view="1m"] .ms-pane:not([data-tf="1m"]) { display: none; }
   .ms-grid4[data-view="all"] .ms-pane:last-child:nth-child(odd) { grid-column: 1 / -1; }
   .ms-grid4:not([data-view="all"]) .ms-chart { height: min(70vh, 660px); min-height: 380px; }
@@ -192,6 +246,11 @@
   .how ol { margin: 10px 0 0; padding-left: 20px; line-height: 1.7; max-width: 70ch; }
   .how b { color: var(--ink); }
   .foot { font-size: 11px; color: var(--ink-faint); line-height: 1.6; text-align: center; }
+  .menu-body { max-height: calc(100vh - 90px); overflow-y: auto; }
+  .ms-sess { font: 600 11px var(--mono); color: var(--ink-dim); padding: 3px 8px; border: 1px solid var(--line); border-radius: 12px; white-space: nowrap; }
+  .ms-sess b { color: #089981; font-weight: 700; }
+  .ms-badge { font: 700 11px var(--mono); color: #fff; background: #089981; padding: 3px 9px; border-radius: 12px; text-decoration: none; white-space: nowrap; }
+  .ms-badge[hidden] { display: none; }
   @media (max-width: 700px) {
     .px b { font-size: 18px; }
     .ms-status .upd { display: none; }
@@ -207,6 +266,8 @@
   <header class="top">
     <div class="brand"><i class="ms-coin" aria-hidden="true"></i><div><label class="sr" for="ms-inst">Market</label><select id="ms-inst" class="inst"><option>XAU/USD · Gold</option></select><span id="ms-inst-name">Gold · Mosha structure</span></div></div>
     <div class="px"><b id="ms-hdr-price">—</b><span id="ms-hdr-chg" class="hdr-chg"></span></div>
+    <span class="ms-sess" id="ms-sess" title="Trading sessions"></span>
+    <a class="ms-badge" id="ms-scan-badge" href="#ms-scan-card" hidden></a>
     <span class="ms-status"><i class="ms-live-dot" id="ms-live-dot"></i><span id="ms-live-txt">Connecting…</span><span class="upd"> · <span id="ms-updated">—</span></span></span>
     <div class="top-actions">
       <button type="button" class="ms-tbtn" id="ms-alerts" aria-pressed="false">Alerts off</button>
@@ -222,6 +283,8 @@
             <label><input type="checkbox" id="ms-show-htf" data-show="htf" checked><i style="border:1.5px dashed #2962ff"></i>HTF Origin</label>
             <label><input type="checkbox" id="ms-show-next" data-show="next" checked><i style="background:#2962ff;height:2px"></i>Next setup</label>
             <label><input type="checkbox" id="ms-show-plan" data-show="plan" checked><i style="background:#089981;height:2px"></i>Selected trade</label>
+            <label><input type="checkbox" id="ms-show-sess" data-show="sess" checked><i style="border-left:1.5px dashed #2962ff;width:2px;height:12px;border-radius:0"></i>Sessions</label>
+            <label><input type="checkbox" id="ms-show-news" data-show="news" checked><i style="border-left:1.5px dotted #f0a500;width:2px;height:12px;border-radius:0"></i>News</label>
             <label><input type="checkbox" id="ms-show-detail" data-show="detail"><i style="background:var(--ink-faint);height:6px"></i>Detailed view</label>
           </div>
           <div class="menu-h">Display</div>
@@ -232,6 +295,13 @@
             <input type="file" id="ms-csv" accept=".csv,text/csv" hidden>
           </div>
           <span class="ms-err" id="ms-csv-err" role="status"></span>
+          <div class="menu-h">Telegram alerts</div>
+          <div class="ms-tg">
+            <label for="ms-tg-token">Bot token</label><input id="ms-tg-token" type="password" autocomplete="off" spellcheck="false" placeholder="123456789:AA…">
+            <label for="ms-tg-chat">Chat ID</label><input id="ms-tg-chat" autocomplete="off" inputmode="numeric" placeholder="123456789">
+          </div>
+          <div class="menu-row"><button type="button" class="ms-tbtn" id="ms-tg-test">Send test</button><span class="ms-err" id="ms-tg-msg" role="status"></span></div>
+          <p class="ms-note" style="margin:0">In Telegram, message <b>@BotFather</b>, send /newbot and paste the token here. Send your new bot any message, then get your chat ID from <b>@userinfobot</b>. Both stay in this browser only. Alerts go out while this page is open and Alerts are on.</p>
         </div>
       </details>
     </div>
@@ -244,6 +314,7 @@
 
   <div class="card ms-td">
     <div>
+      <div class="ms-news-warn" id="ms-news-warn" role="alert" hidden></div>
       <div class="ms-k">What to do now <span class="ms-chip" id="ms-td-bias">—</span></div>
       <ol class="ms-steps" id="ms-td-steps"><li><span class="ms-dot">…</span><span>Loading live candles.</span></li></ol>
       <div class="ms-now" id="ms-td-now">Loading H4, H1, M15 and M1…</div>
@@ -252,6 +323,7 @@
       <div><span>Spot price</span><b id="ms-td-price">—</b></div>
       <div><span>H4 invalidation (close beyond)</span><b id="ms-td-inval">—</b></div>
       <div style="display:block;border:0"><span>Timeframes agreeing with H4</span><div class="ms-align" id="ms-td-align"></div></div>
+      <div style="display:block;border:0"><span>High-impact news</span><ul class="ms-news" id="ms-news"><li>Loading calendar…</li></ul></div>
       <div class="ms-note" id="ms-feed-note" style="display:block;border:0"></div>
     </div>
   </div>
@@ -259,22 +331,41 @@
   <div class="card">
     <div class="ms-k">Possible trades <span class="ms-risk"><label for="ms-risk">Risk per trade $</label><input id="ms-risk" type="number" min="1" step="10" value="100" inputmode="decimal"></span></div>
     <div class="ms-trades" id="ms-trades"><div class="ms-note">Waiting for live candles…</div></div>
-    <div class="ms-note" style="margin-top:10px">Tap a trade to draw it on the charts. Setups follow the Mosha rules and are not financial advice.</div>
+    <div class="ms-tr-foot"><span class="ms-note">Tap a trade to draw it on the charts. Setups follow the Mosha rules and are not financial advice.</span><button type="button" class="ms-tbtn" id="ms-log">Log selected trade</button></div>
+  </div>
+
+  <div class="card" id="ms-scan-card">
+    <div class="ms-k">Scanner · all markets <span class="ms-scan-meta"><span id="ms-scan-meta">Starts after the charts load</span><button type="button" class="ms-tbtn" id="ms-scan-btn">Scan now</button></span></div>
+    <div class="ms-scan" id="ms-scan"></div>
+    <div class="ms-note" style="margin-top:10px">Every market runs the same Mosha rules on D1, H4, H1, M15, M5 and M1, refreshed every 5 minutes. Tap a market to open its charts. With Alerts on, you're told when any market turns Ready.</div>
   </div>
 
   <div class="sec-h">
     <h2>Charts</h2>
     <div class="seg" role="group" aria-label="Chart view">
-      <button type="button" data-view="4h">H4</button><button type="button" data-view="1h">H1</button><button type="button" data-view="15m">M15</button><button type="button" data-view="5m">M5</button><button type="button" data-view="1m">M1</button><button type="button" data-view="all">All</button>
+      <button type="button" data-view="1d">D1</button><button type="button" data-view="4h">H4</button><button type="button" data-view="1h">H1</button><button type="button" data-view="15m">M15</button><button type="button" data-view="5m">M5</button><button type="button" data-view="1m">M1</button><button type="button" data-view="all">All</button>
     </div>
   </div>
 
   <div class="ms-grid4">
+    <div class="ms-pane" data-tf="1d"><div class="ms-ph"><b>D1</b><span class="ms-role">Bias · D1 → H1</span><span class="ms-chip" id="ms-t-1d">—</span><span class="ms-cd" id="ms-cd-1d" title="Time until this candle closes"></span></div><div class="ms-legend" id="ms-l-1d"></div><div class="ms-chart" id="ms-c-1d"></div><div class="ms-ro" id="ms-r-1d"></div></div>
     <div class="ms-pane" data-tf="4h"><div class="ms-ph"><b>H4</b><span class="ms-role">Direction · BO</span><span class="ms-chip" id="ms-t-4h">—</span><span class="ms-cd" id="ms-cd-4h" title="Time until this candle closes"></span></div><div class="ms-legend" id="ms-l-4h"></div><div class="ms-chart" id="ms-c-4h"></div><div class="ms-ro" id="ms-r-4h"></div></div>
     <div class="ms-pane" data-tf="1h"><div class="ms-ph"><b>H1</b><span class="ms-role">VR · CF</span><span class="ms-chip" id="ms-t-1h">—</span><span class="ms-cd" id="ms-cd-1h" title="Time until this candle closes"></span></div><div class="ms-legend" id="ms-l-1h"></div><div class="ms-chart" id="ms-c-1h"></div><div class="ms-ro" id="ms-r-1h"></div></div>
     <div class="ms-pane" data-tf="15m"><div class="ms-ph"><b>M15</b><span class="ms-role">Narrative · Barrier</span><span class="ms-chip" id="ms-t-15m">—</span><span class="ms-cd" id="ms-cd-15m" title="Time until this candle closes"></span></div><div class="ms-legend" id="ms-l-15m"></div><div class="ms-chart" id="ms-c-15m"></div><div class="ms-ro" id="ms-r-15m"></div></div>
     <div class="ms-pane" data-tf="5m"><div class="ms-ph"><b>M5</b><span class="ms-role">H1 barrier entry</span><span class="ms-chip" id="ms-t-5m">—</span><span class="ms-cd" id="ms-cd-5m" title="Time until this candle closes"></span></div><div class="ms-legend" id="ms-l-5m"></div><div class="ms-chart" id="ms-c-5m"></div><div class="ms-ro" id="ms-r-5m"></div></div>
     <div class="ms-pane" data-tf="1m"><div class="ms-ph"><b>M1</b><span class="ms-role">Entry trigger</span><span class="ms-chip" id="ms-t-1m">—</span><span class="ms-cd" id="ms-cd-1m" title="Time until this candle closes"></span></div><div class="ms-legend" id="ms-l-1m"></div><div class="ms-chart" id="ms-c-1m"></div><div class="ms-ro" id="ms-r-1m"></div></div>
+  </div>
+
+  <div class="card" id="ms-bt-card">
+    <div class="ms-k">Backtest <span class="ms-scan-meta"><span id="ms-bt-meta"></span><button type="button" class="ms-tbtn" id="ms-bt-btn">Run backtest</button></span></div>
+    <div id="ms-bt"><div class="ms-note">Replays the Mosha rules candle by candle over this market's recent history and scores every setup that turned Ready: a limit order at the entry, the stop and Target 1.</div></div>
+  </div>
+
+  <div class="card" id="ms-j-card">
+    <div class="ms-k">Trade journal <span class="ms-scan-meta"><button type="button" class="ms-tbtn" id="ms-j-csv">Export CSV</button></span></div>
+    <div id="ms-j-stats" class="ms-j-stats"></div>
+    <div class="ms-j-wrap"><table class="ms-j"><thead><tr><th>Logged</th><th>Market</th><th>Setup</th><th>Side</th><th>Entry</th><th>Stop</th><th>Target 1</th><th>CF</th><th>Result</th><th>R</th><th>Notes</th><th><span class="sr">Delete</span></th></tr></thead><tbody id="ms-j-body"></tbody></table></div>
+    <div class="ms-note" style="margin-top:10px">Saved in this browser only. Open trades on the market you're viewing are checked against live candles and marked Win or Loss automatically; change the result any time.</div>
   </div>
 
   <details class="card how">
@@ -291,7 +382,7 @@
     </ol>
   </details>
 
-  <p class="foot">Live candles from Binance and Kraken public feeds; gold is aligned to XAU/USD spot via gold-api.com. Times are in your local zone.<br>Version 1 Nov 2026 · clean charts</p>
+  <p class="foot">Live candles from Binance and Kraken public feeds; gold is aligned to XAU/USD spot via gold-api.com. Times are in your local zone.<br>Version 1 Nov 2026 · scanner, backtest, journal</p>
   <div class="ms-toasts" id="ms-toasts" role="status" aria-live="polite"></div>
 </div>
 <script>
@@ -475,6 +566,7 @@ function msNextSetup(bars, A) {
   if (!LW || !root) return;
 
   const TFS = [
+    { id: '1d',  label: 'D1',  role: 'Bias · D1 → H1',          sec: 86400, binance: '1d',  kraken: 1440, poll: 300e3 },
     { id: '4h',  label: 'H4',  role: 'Direction · BO',          sec: 14400, binance: '4h',  kraken: 240, poll: 120e3 },
     { id: '1h',  label: 'H1',  role: 'VR · CF',                 sec: 3600,  binance: '1h',  kraken: 60,  poll: 60e3 },
     { id: '15m', label: 'M15', role: 'Narrative · Barrier',     sec: 900,   binance: '15m', kraken: 15,  poll: 30e3 },
@@ -500,6 +592,7 @@ function msNextSetup(bars, A) {
   if (!INSTRUMENTS[instKey]) instKey = 'xau';
   try { localStorage.setItem('msInst', instKey); } catch (e) {}
   const INST = INSTRUMENTS[instKey];
+  let CUR = INST;
   window.MS_DEC = INST.dec;
   const TZ = -new Date().getTimezoneOffset() * 60;
   const THEMES = {
@@ -513,16 +606,17 @@ function msNextSetup(bars, A) {
     vr:   { fill: 'rgba(255,152,0,0.18)', stroke: 'rgba(224,134,0,0.9)' },
     htf:  'rgba(41,98,255,0.85)', proj: '#2962ff',
   };
-  const G = { theme: root.dataset.chart === 'dark' ? 'dark' : 'light', show: { bo: true, origin: true, cf: true, vr: true, next: true, htf: true, plan: true, detail: false }, risk: 100, alerts: false, plan: null, prev: null, sel: null, prevStates: {}, planKey: '',
+  const G = { theme: root.dataset.chart === 'dark' ? 'dark' : 'light', show: { bo: true, origin: true, cf: true, vr: true, next: true, htf: true, plan: true, detail: false, sess: true, news: true }, risk: 100, alerts: false, plan: null, prev: null, sel: null, prevStates: {}, planKey: '',
     offset: 0, spot: null, source: '', live: false, csv: false };
   const $ = (id) => document.getElementById(id);
   const $o = (id) => document.getElementById(id) || { set textContent(v) {}, set className(v) {}, set innerHTML(v) {}, style: {} };
-  const fmt = (v) => (v == null || !isFinite(v)) ? '—' : v.toLocaleString('en-US', { minimumFractionDigits: INST.dec, maximumFractionDigits: INST.dec });
+  const fmt = (v) => (v == null || !isFinite(v)) ? '—' : v.toLocaleString('en-US', { minimumFractionDigits: CUR.dec, maximumFractionDigits: CUR.dec });
+  const fmtI = (v, I) => { const c = CUR; CUR = I; try { return fmt(v); } finally { CUR = c; } };
   const ftime = (t) => new Date((t - TZ) * 1000).toLocaleString('en-GB', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' });
 
   // ─── Drawing overlay (series primitive) ───
   class Overlay {
-    constructor() { this.items = { boxes: [], lines: [], labels: [], path: [] }; this.views = [new View(this, 'bottom'), new View(this, 'top')]; }
+    constructor() { this.items = { boxes: [], lines: [], labels: [], path: [], vlines: [] }; this.views = [new View(this, 'bottom'), new View(this, 'top')]; }
     attached(p) { this.chart = p.chart; this.series = p.series; this.req = p.requestUpdate; }
     detached() {}
     updateAllViews() {}
@@ -548,6 +642,13 @@ function msNextSetup(bars, A) {
     const it = o.items, t = THEMES[G.theme];
     ctx.font = '600 11px -apple-system, BlinkMacSystemFont, "Trebuchet MS", Roboto, sans-serif';
     if (z === 'bottom') {
+      const HH = ctx.canvas.height / (window.devicePixelRatio || 1);
+      (it.vlines || []).forEach((v) => {
+        const x = X(v.l); if (x === null) return;
+        ctx.strokeStyle = v.color; ctx.lineWidth = 1; ctx.setLineDash(v.news ? [2, 3] : [4, 4]);
+        ctx.beginPath(); ctx.moveTo(Math.round(x) + 0.5, 0); ctx.lineTo(Math.round(x) + 0.5, HH); ctx.stroke(); ctx.setLineDash([]);
+        if (v.text) { ctx.save(); ctx.font = '600 10px -apple-system, BlinkMacSystemFont, "Trebuchet MS", Roboto, sans-serif'; ctx.fillStyle = v.color; ctx.textAlign = 'left'; ctx.fillText(v.text, x + 4, v.news ? 26 : 12); ctx.restore(); }
+      });
       for (const b of it.boxes) {
         const x1 = X(b.l1), x2 = X(b.l2), y1 = Y(b.hi), y2 = Y(b.lo);
         if ([x1, x2, y1, y2].some((v) => v === null)) continue;
@@ -625,21 +726,29 @@ function msNextSetup(bars, A) {
     krakenChain = run.catch(() => {}).then(() => new Promise((r) => setTimeout(r, 1100)));
     return run;
   }
-  async function fetchBars(tf) {
+  async function fetchBars(tf, I = INST, lim = BARS) {
     const errs = [];
-    if (INST.binance) try {
-      const raw = await getJSON(`https://api.binance.com/api/v3/klines?symbol=${INST.binance}&interval=${tf.binance}&limit=${BARS}`);
-      if (Array.isArray(raw) && raw.length) return { src: 'Binance', bars: raw.map((k) => ({ time: k[0] / 1000, open: +k[1], high: +k[2], low: +k[3], close: +k[4] })) };
+    if (I.binance) try {
+      let out = [], end = null;
+      while (out.length < lim) {
+        const n = Math.min(1000, lim - out.length);
+        const raw = await getJSON(`https://api.binance.com/api/v3/klines?symbol=${I.binance}&interval=${tf.binance}&limit=${n}${end ? `&endTime=${end}` : ''}`);
+        if (!Array.isArray(raw) || !raw.length) break;
+        out = raw.map((k) => ({ time: k[0] / 1000, open: +k[1], high: +k[2], low: +k[3], close: +k[4] })).concat(out);
+        if (raw.length < n) break;
+        end = raw[0][0] - 1;
+      }
+      if (out.length) return { src: 'Binance', bars: out };
     } catch (e) { errs.push(e.message || 'Binance blocked'); }
     try {
-      const j = await krakenGet(`https://api.kraken.com/0/public/OHLC?pair=${INST.kraken}&interval=${tf.kraken}`);
+      const j = await krakenGet(`https://api.kraken.com/0/public/OHLC?pair=${I.kraken}&interval=${tf.kraken}`);
       const key = j.result && Object.keys(j.result).find((k) => k !== 'last');
       const rows = key ? j.result[key] : null;
       if (j.error && j.error.length) throw new Error(`Kraken: ${j.error[0]}`);
-      if (Array.isArray(rows) && rows.length) return { src: 'Kraken', bars: rows.slice(-BARS).map((k) => ({ time: +k[0], open: +k[1], high: +k[2], low: +k[3], close: +k[4] })) };
+      if (Array.isArray(rows) && rows.length) return { src: 'Kraken', bars: rows.slice(-lim).map((k) => ({ time: +k[0], open: +k[1], high: +k[2], low: +k[3], close: +k[4] })) };
     } catch (e) { errs.push(e.message || 'Kraken blocked'); }
-    if (INST.bitstamp) try {
-      const j = await getJSON(`https://www.bitstamp.net/api/v2/ohlc/${INST.bitstamp}/?step=${tf.sec}&limit=${BARS}`);
+    if (I.bitstamp) try {
+      const j = await getJSON(`https://www.bitstamp.net/api/v2/ohlc/${I.bitstamp}/?step=${tf.sec}&limit=${Math.min(lim, 1000)}`);
       const rows = j && j.data && j.data.ohlc;
       if (Array.isArray(rows) && rows.length) return { src: 'Bitstamp', bars: rows.map((k) => ({ time: +k.timestamp, open: +k.open, high: +k.high, low: +k.low, close: +k.close })).sort((a, b) => a.time - b.time) };
     } catch (e) { errs.push(e.message || 'Bitstamp blocked'); }
@@ -705,8 +814,9 @@ function msNextSetup(bars, A) {
     };
     P.draw = function () {
       const bars = P.bars, n = bars.length, A = P.A, S = P.S;
-      const items = { boxes: [], lines: [], labels: [], path: [] };
+      const items = { boxes: [], lines: [], labels: [], path: [], vlines: [] };
       const D = G.show.detail, low = tf.sec <= 900;
+      if (low) items.vlines = markerLines(bars, tf, D);
       const recent = A.events.slice(D ? -2 : -1), seen = new Set();
       const evs = A.events.slice(D ? (low ? -8 : -14) : (low ? -3 : -5));
       evs.forEach((e, k) => {
@@ -826,6 +936,8 @@ function msNextSetup(bars, A) {
     const inOrigin = price >= e.bot && price <= e.top;
     const beyond = sell ? price > e.top : price < e.bot;
     const breakT = h4.bars[e.breakIdx].time;
+    const d1 = panes['1d'], d1t = d1 && d1.A ? d1.A.trend : 0;
+    const d1Note = !d1t ? '' : d1t === dir ? ` D1 agrees (${d1t < 0 ? 'down' : 'up'}trend).` : ` D1 is against it (${d1t < 0 ? 'down' : 'up'}trend), so take smaller size or wait.`;
     const h1Events = h1.A.events.filter((x) => x.breakIdx < h1.bars.length && h1.bars[x.breakIdx].time >= breakT);
     const vrDone = !!e.vr || h1Events.some((x) => x.dir === -dir) || h1.A.trend === -dir;
     const vr4 = e.vr ? e.vr.p : h4.A.ext.p, fib4 = ((sell ? e.top : e.bot) + vr4) / 2;
@@ -838,7 +950,7 @@ function msNextSetup(bars, A) {
     const recentWith = (p, bars) => p.A && p.A.last && p.A.last.dir === dir && (p.bars.length - 1 - p.A.last.breakIdx) <= bars;
     const entry = (inOrigin || cfDone) && (recentWith(m15, 12) || recentWith(m1, 30));
     const steps = [
-      { done: true,  t: `H4 BO ${word} at ${fmt(e.level)} (${ftime(breakT)}). Direction: ${word.toUpperCase()}.` },
+      { done: true,  t: `H4 BO ${word} at ${fmt(e.level)} (${ftime(breakT)}). Direction: ${word.toUpperCase()}.${d1Note}` },
       { done: vrDone, t: vrDone ? `H1 VR formed: the ${sell ? 'drop' : 'rally'} has reversed on H1.` : `H1 VR: wait for the ${sell ? 'selling' : 'buying'} to stop and reverse on H1.` },
       { done: touched, t: touched ? `Price retraced past the 50% line (${fmt(fib4)}) and into the H4 Origin ${fmt(e.bot)} – ${fmt(e.top)}.` : `Wait for price to retrace at least 50% of the move (${fmt(fib4)}) and into the H4 Origin ${fmt(e.bot)} – ${fmt(e.top)}.` },
       { done: cfDone, t: cfDone ? `H1 CF confirmed: H1 printed a BO ${word} from inside the Origin.` : `H1 CF: inside the Origin, wait for an H1 ${sell ? 'lower high and BO Sell' : 'higher low and BO Buy'}.` },
@@ -870,6 +982,7 @@ function msNextSetup(bars, A) {
     }).join('');
 
     renderTrades(price);
+    journalTick();
 
     // Alerts when a step completes or H4 prints a new BO
     const key = `${e.dir}:${breakT}`, done = steps.map((x) => x.done);
@@ -883,13 +996,14 @@ function msNextSetup(bars, A) {
 
   // ─── Possible trades: the Mosha setup on three timeframe pairs ───
   const PAIRS = [
-    { k: 'swing',    name: 'Swing',    h: '4h',  l: '1h',  e: 'M15 / M1', up: null },
+    { k: 'position', name: 'Position', h: '1d',  l: '1h',  e: 'H1 / M5', up: null },
+    { k: 'swing',    name: 'Swing',    h: '4h',  l: '1h',  e: 'M15 / M1', up: '1d' },
     { k: 'intraday', name: 'Intraday', h: '1h',  l: '5m',  e: 'M5 / M1', up: '4h' },
     { k: 'scalp',    name: 'Scalp',    h: '15m', l: '1m',  e: 'M1',  up: '1h' },
   ];
-  const LBL = { '4h': 'H4', '1h': 'H1', '15m': 'M15', '5m': 'M5', '1m': 'M1' };
-  function buildSetup(pr, price) {
-    const hp = panes[pr.h], lp = panes[pr.l];
+  const LBL = { '1d': 'D1', '4h': 'H4', '1h': 'H1', '15m': 'M15', '5m': 'M5', '1m': 'M1' };
+  function buildSetup(pr, price, src = panes) {
+    const hp = src[pr.h], lp = src[pr.l];
     if (!hp || !lp || !hp.A || !hp.A.last || !lp.A || !lp.bars) return null;
     const e = hp.A.last, dir = e.dir, sell = dir < 0, sgn = sell ? -1 : 1, h = e.top - e.bot;
     const H = LBL[pr.h], Lo = LBL[pr.l], word = sell ? 'sell' : 'buy';
@@ -931,12 +1045,14 @@ function msNextSetup(bars, A) {
     else if (touched) { state = 'IN ORIGIN'; cls = 'near'; next = `Price is in the ${H} Origin. Wait for ${Lo} to confirm with a QM or Janda (BO Structure ${sell ? 'Sell' : 'Buy'}, then BO ${sell ? 'Sell' : 'Buy'}), then ${word} the pullback.`; }
     else if (vr) { state = 'WAIT RETRACE'; cls = ''; next = `${H} VR is in. Wait for price to come back ${sell ? 'up' : 'down'} to ${fmt(gate)}: the 50% line of the move, inside the Origin ${fmt(e.bot)} – ${fmt(e.top)} (${fmt(dist)} away).`; }
     else { state = 'WAIT VR'; cls = ''; next = `${H} just broke ${sell ? 'down' : 'up'}. Let the move finish and reverse on ${Lo} before planning the ${word}.`; }
-    const upP = pr.up && panes[pr.up];
+    const upP = pr.up && src[pr.up];
     const align = !upP || !upP.A ? null : upP.A.trend === dir;
-    return { k: pr.k, name: pr.name, pair: `${H} → ${Lo}`, sell, entry, stop, t1, t2, rr, r, state, cls, next, align, upL: pr.up ? LBL[pr.up] : '', size: sizeText(r, price), invalid: beyond, model, retr, fib };
+    return { k: pr.k, name: pr.name, pair: `${H} → ${Lo}`, sell, entry, stop, t1, t2, rr, r, state, cls, next, align, upL: pr.up ? LBL[pr.up] : '', size: sizeText(r, price), invalid: beyond, model, retr, fib,
+      sig: `${pr.k}|${hp.bars[e.start].time}|${cf ? lp.bars[ll.breakIdx].time : ''}` };
   }
   function sizeText(r, price) {
     const usd = (v) => '$' + Math.ceil(v).toLocaleString('en-US');
+    const INST = CUR;
     if (INST.size === 'gold') {
       const mgc = Math.floor(G.risk / (r * 10)), gc = Math.floor(G.risk / (r * 100));
       return mgc ? `${mgc} MGC${gc ? ` · ${gc} GC` : ''}` : `${usd(r * 10)}/MGC`;
@@ -953,8 +1069,8 @@ function msNextSetup(bars, A) {
     { k: 'rev4', name: 'Reversal', h: '4h', l: '15m', e: 'M15' },
     { k: 'rev1', name: 'Reversal', h: '1h', l: '5m',  e: 'M5'  },
   ];
-  function buildReversal(pr, price) {
-    const hp = panes[pr.h], lp = panes[pr.l];
+  function buildReversal(pr, price, src = panes) {
+    const hp = src[pr.h], lp = src[pr.l];
     if (!hp || !lp || !hp.A || !hp.A.last || !hp.A.ext || !lp.A || !lp.bars) return null;
     const e = hp.A.last, trend = e.dir, rdir = -trend, buy = rdir > 0, sgn = buy ? 1 : -1;
     const H = LBL[pr.h], Lo = LBL[pr.l], word = buy ? 'buy' : 'sell';
@@ -1000,13 +1116,15 @@ function msNextSetup(bars, A) {
       next = `Price is away from the ${H} extreme ${fmt(ext)}. Reversal trades only form at the extreme or VR, against the ${H} ${trend < 0 ? 'down' : 'up'}trend.`;
     }
     return { k: pr.k, name: pr.name, pair: `${H} → ${Lo}`, sell: !buy, entry, stop, t1, t2, rr, r, state, cls, next, align: false, upL: H,
-      size: sizeText(r, price), invalid, model, retr: null, fib: null, reversal: true };
+      size: sizeText(r, price), invalid, model, retr: null, fib: null, reversal: true,
+      sig: `${pr.k}|${extT}|${conf ? lp.bars[ll.breakIdx].time : ''}` };
   }
 
   function renderTrades(price) {
     const list = PAIRS.map((pr) => buildSetup(pr, price)).concat(REVS.map((pr) => buildReversal(pr, price))).filter(Boolean);
     if (!list.length) return;
-    const order = { READY: 0, 'IN ORIGIN': 1, 'AT EXTREME': 2, 'UNDER 50%': 3, 'WAIT RETRACE': 4, 'WAIT VR': 5, 'NO SETUP': 6, 'PLAYED OUT': 7, INVALID: 8 };
+    G.list = list;
+    const order = ORDER || { READY: 0, 'IN ORIGIN': 1, 'AT EXTREME': 2, 'UNDER 50%': 3, 'WAIT RETRACE': 4, 'WAIT VR': 5, 'NO SETUP': 6, 'PLAYED OUT': 7, INVALID: 8 };
     if (!G.sel || !list.some((t) => t.k === G.sel && !t.invalid)) {
       const best = list.slice().sort((a, b) => order[a.state] - order[b.state])[0];
       G.sel = best.k;
@@ -1042,6 +1160,7 @@ function msNextSetup(bars, A) {
     box.appendChild(t); setTimeout(() => t.remove(), 12000);
     while (box.children.length > 3) box.firstChild.remove();
     if (!G.alerts) return;
+    tgSend(`${INST.label} · ${title}\n${body}`);
     try { if ('Notification' in window && Notification.permission === 'granted') new Notification(`${INST.label} · ${title}`, { body, tag: title }); } catch (e) {}
     try {
       actx = actx || new (window.AudioContext || window.webkitAudioContext)();
@@ -1132,6 +1251,7 @@ function msNextSetup(bars, A) {
     $('ms-updated').textContent = new Date().toLocaleTimeString();
     if (INST.spot) setInterval(refreshSpot, 60e3);
     if (G.source === 'Binance' && INST.binance) startStream(); else startPolling();
+    if (SCAN.el) { setTimeout(scanAll, 2500); setInterval(scanAll, 5 * 60e3); }
   }
 
   // ─── Controls ───
@@ -1227,6 +1347,432 @@ function msNextSetup(bars, A) {
     };
     rd.readAsText(f);
   });
+
+  const ORDER = { READY: 0, 'IN ORIGIN': 1, 'AT EXTREME': 2, 'UNDER 50%': 3, 'WAIT RETRACE': 4, 'WAIT VR': 5, 'NO SETUP': 6, 'PLAYED OUT': 7, INVALID: 8 };
+  const esc = (v) => String(v == null ? '' : v).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+  const dur = (sec) => { sec = Math.max(0, Math.round(sec)); const d = Math.floor(sec / 86400), h = Math.floor(sec % 86400 / 3600), m = Math.floor(sec % 3600 / 60);
+    return d ? `${d}d ${h}h` : h ? `${h}h ${String(m).padStart(2, '0')}m` : `${m}m`; };
+
+  // ─── Time zones: session opens follow local daylight-saving time in each city ───
+  const dtf = {};
+  function tzOffsetMin(tz, ms) {
+    const f = dtf[tz] || (dtf[tz] = new Intl.DateTimeFormat('en-US', { timeZone: tz, hourCycle: 'h23', year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' }));
+    const q = {}; f.formatToParts(new Date(ms)).forEach((x) => { q[x.type] = x.value; });
+    return (Date.UTC(+q.year, +q.month - 1, +q.day, +q.hour % 24, +q.minute) - Math.floor(ms / 60000) * 60000) / 60000;
+  }
+  function zoned(tz, y, m, d, h, mi) {
+    const g = Date.UTC(y, m, d, h, mi), o1 = tzOffsetMin(tz, g), o2 = tzOffsetMin(tz, g - o1 * 60000);
+    return (g - o2 * 60000) / 1000;
+  }
+  const SESS = [
+    { k: 'tky', name: 'Tokyo',    tz: 'Asia/Tokyo',       o: 9, c: 18, color: 'rgba(138,150,168,.7)', mark: false },
+    { k: 'ldn', name: 'London',   tz: 'Europe/London',    o: 8, c: 17, color: 'rgba(41,98,255,.75)',  mark: true },
+    { k: 'ny',  name: 'New York', tz: 'America/New_York', o: 8, c: 17, color: 'rgba(171,71,188,.8)',  mark: true },
+  ];
+  const openCache = {};
+  function sessionOpens(se, from, to) {
+    const out = [];
+    for (let day = Math.floor(from / 86400) - 1; day <= Math.floor(to / 86400) + 1; day++) {
+      const ck = se.k + day;
+      if (!(ck in openCache)) {
+        const dt = new Date(day * 86400000), wd = dt.getUTCDay();
+        openCache[ck] = wd === 0 || wd === 6 ? null : zoned(se.tz, dt.getUTCFullYear(), dt.getUTCMonth(), dt.getUTCDate(), se.o, 0);
+      }
+      const t = openCache[ck];
+      if (t !== null && t >= from && t <= to) out.push(t);
+    }
+    return out;
+  }
+  // Vertical markers on M15 / M5 / M1: London and New York opens, high-impact news
+  function markerLines(bars, tf, D) {
+    const out = [], n = bars.length;
+    if (!n) return out;
+    const t0 = bars[0].time - TZ, tN = bars[n - 1].time - TZ;
+    const idxOf = (t) => {
+      const tt = t + TZ;
+      if (tt > bars[n - 1].time) return n - 1 + (tt - bars[n - 1].time) / tf.sec;
+      let lo = 0, hi = n - 1; while (lo < hi) { const m = (lo + hi) >> 1; if (bars[m].time < tt) lo = m + 1; else hi = m; }
+      return lo;
+    };
+    if (G.show.sess) SESS.filter((x) => x.mark).forEach((se) => {
+      const opens = sessionOpens(se, t0, tN + tf.sec);
+      (D ? opens : opens.slice(-2)).forEach((t, k, arr) => out.push({ l: idxOf(t), color: se.color, text: k === arr.length - 1 || D ? `${se.name} open` : '' }));
+    });
+    if (G.show.news) NEWS.forEach((ev) => {
+      if (!ev.rel || ev.t < t0 || ev.t > tN + 28 * tf.sec) return;
+      out.push({ l: idxOf(ev.t), color: '#f0a500', text: `${ev.cur} ${ev.short}`, news: true });
+    });
+    return out;
+  }
+  const sessEl = document.getElementById('ms-sess');
+  function renderSession() {
+    if (!sessEl) return;
+    const now = Date.now() / 1000, open = []; let next = null;
+    SESS.forEach((se) => sessionOpens(se, now - 86400, now + 4 * 86400).forEach((t) => {
+      if (t <= now && now < t + (se.c - se.o) * 3600) open.push(se);
+      if (t > now && (!next || t < next.t)) next = { se, t };
+    }));
+    const wd = new Date().getUTCDay();
+    const lbl = open.length ? `<b>${open.map((x) => x.name).join(' + ')}</b> open` : wd === 6 || wd === 0 ? 'Weekend' : 'Between sessions';
+    sessEl.innerHTML = `${lbl}${next ? ` · ${next.se.name} in ${dur(next.t - now)}` : ''}`;
+  }
+
+  // ─── High-impact news: ForexFactory weekly calendar, with built-in NFP and FOMC dates as a fallback ───
+  let NEWS = [], newsSrc = '';
+  const FOMC = ['2026-01-28', '2026-03-18', '2026-04-29', '2026-06-17', '2026-07-29', '2026-09-16', '2026-10-28', '2026-12-09'];
+  const instCur = () => INST.group === 'Forex' ? INST.label.split('/') : ['USD'];
+  function shortName(title) {
+    if (/non-farm/i.test(title)) return 'NFP';
+    if (/FOMC|federal funds|fed chair|powell/i.test(title)) return 'FOMC';
+    if (/core cpi|^cpi|consumer price/i.test(title)) return 'CPI';
+    if (/PCE/i.test(title)) return 'PCE';
+    if (/GDP/i.test(title)) return 'GDP';
+    if (/rate statement|cash rate|official bank rate|main refinancing|monetary policy|rate decision|overnight rate|policy rate/i.test(title)) return 'Rates';
+    if (/unemployment|employment change|jobless/i.test(title)) return 'Jobs';
+    if (/retail sales/i.test(title)) return 'Retail';
+    if (/PMI/i.test(title)) return 'PMI';
+    return title.split(' ').slice(0, 2).join(' ');
+  }
+  function builtinNews() {
+    const out = [], d0 = new Date();
+    for (let k = -1; k <= 2; k++) {
+      const y = new Date(Date.UTC(d0.getUTCFullYear(), d0.getUTCMonth() + k, 1)), Y = y.getUTCFullYear(), M = y.getUTCMonth();
+      let day = 1; while (new Date(Date.UTC(Y, M, day)).getUTCDay() !== 5) day++;
+      out.push({ t: zoned('America/New_York', Y, M, day, 8, 30), title: 'Non-Farm Payrolls (usual date)', cur: 'USD', short: 'NFP' });
+    }
+    FOMC.forEach((x) => { const [Y, M, D] = x.split('-').map(Number); out.push({ t: zoned('America/New_York', Y, M - 1, D, 14, 0), title: 'FOMC rate decision', cur: 'USD', short: 'FOMC' }); });
+    return out;
+  }
+  async function loadNews() {
+    let list = builtinNews(), live = false;
+    try {
+      const j = await getJSON('https://nfs.faireconomy.media/ff_calendar_thisweek.json');
+      if (Array.isArray(j)) {
+        const ff = j.filter((x) => x.impact === 'High' && x.date).map((x) => ({ t: Date.parse(x.date) / 1000, title: x.title, cur: x.country, short: shortName(x.title) })).filter((x) => isFinite(x.t));
+        list = ff.concat(list.filter((b) => !ff.some((f) => f.short === b.short && Math.abs(f.t - b.t) < 3 * 86400)));
+        live = true;
+      }
+    } catch (e) { /* calendar feed blocked: built-in dates only */ }
+    const cur = instCur();
+    NEWS = list.map((x) => Object.assign(x, { rel: cur.includes(x.cur) })).sort((a, b) => a.t - b.t);
+    newsSrc = live ? 'ForexFactory calendar' : 'built-in NFP and FOMC dates (live calendar unavailable)';
+    renderNews();
+    Object.values(panes).forEach((p) => p.A && p.draw());
+  }
+  const newsWarned = new Set();
+  function renderNews() {
+    const ul = document.getElementById('ms-news'), warn = document.getElementById('ms-news-warn');
+    if (!ul) return;
+    const now = Date.now() / 1000, rel = NEWS.filter((x) => x.rel);
+    const up = rel.filter((x) => x.t > now - 3600).slice(0, 4);
+    ul.innerHTML = up.length ? up.map((x) => {
+      const d = x.t - now, soon = d < 2 * 3600 && d > -3600;
+      const when = new Date(x.t * 1000).toLocaleString('en-GB', { weekday: 'short', hour: '2-digit', minute: '2-digit' });
+      return `<li class="${soon ? 'soon' : ''}"><span>${esc(when)} · ${esc(x.cur)} ${esc(x.title)}</span><b>${d > 0 ? 'in ' + dur(d) : 'just out'}</b></li>`;
+    }).join('') + `<li><span class="ms-note">Source: ${esc(newsSrc)}</span></li>` : `<li>No high-impact ${instCur().join('/')} news in the calendar this week.</li>`;
+    if (!warn) return;
+    const hot = rel.find((x) => x.t - now < 30 * 60 && now - x.t < 15 * 60);
+    warn.hidden = !hot;
+    if (hot) {
+      const d = hot.t - now;
+      warn.innerHTML = `<b>News ${d > 0 ? `in ${dur(d)}` : 'just released'}: ${esc(hot.cur)} ${esc(hot.title)}.</b> Spreads widen and breaks often fake out around high-impact news. Wait until 15 minutes after the release before taking a setup.`;
+      const id = hot.short + hot.t;
+      if (d > 0 && !newsWarned.has(id)) { newsWarned.add(id); notify(`${hot.cur} ${hot.short} in ${dur(d)}`, `${hot.title}. Avoid new entries until 15 minutes after the release.`); }
+    }
+  }
+  renderSession(); setInterval(() => { renderSession(); renderNews(); }, 30e3);
+  loadNews(); setInterval(loadNews, 30 * 60e3);
+
+  // ─── Telegram alerts (bot token and chat ID stay in this browser) ───
+  const TG = { token: '', chat: '' };
+  try { Object.assign(TG, JSON.parse(localStorage.getItem('msTg') || '{}')); } catch (e) {}
+  const tgSent = {};
+  async function tgSend(text, force) {
+    if (!TG.token || !TG.chat) return 'missing';
+    const k = text.split('\n')[0];
+    if (!force && tgSent[k] && Date.now() - tgSent[k] < 60e3) return 'skipped';
+    tgSent[k] = Date.now();
+    const url = `https://api.telegram.org/bot${encodeURIComponent(TG.token).replace('%3A', ':')}/sendMessage`;
+    const body = new URLSearchParams({ chat_id: TG.chat, text: `${text}\n${location.href.split('#')[0]}`, disable_web_page_preview: 'true' });
+    try {
+      const r = await fetch(url, { method: 'POST', body });
+      const j = await r.json();
+      if (!j.ok) throw Object.assign(new Error(j.description || `Telegram answered ${r.status}`), { tg: true });
+      return 'ok';
+    } catch (e) {
+      if (e.tg) throw e;
+      await fetch(url, { method: 'POST', body, mode: 'no-cors' });   // browser blocked reading the reply; the message still goes out
+      return 'sent';
+    }
+  }
+  const tgTok = document.getElementById('ms-tg-token'), tgChat = document.getElementById('ms-tg-chat'), tgMsg = document.getElementById('ms-tg-msg');
+  if (tgTok && tgChat) {
+    tgTok.value = TG.token; tgChat.value = TG.chat;
+    const save = () => { TG.token = tgTok.value.trim(); TG.chat = tgChat.value.trim(); try { localStorage.setItem('msTg', JSON.stringify(TG)); } catch (e) {} };
+    tgTok.addEventListener('change', save); tgChat.addEventListener('change', save);
+    document.getElementById('ms-tg-test').addEventListener('click', async () => {
+      save();
+      if (!TG.token || !TG.chat) { tgMsg.textContent = 'Add the bot token and chat ID first.'; return; }
+      tgMsg.textContent = 'Sending…';
+      try {
+        const r = await tgSend(`${INST.label} · Test alert\nMosha alerts are connected.`, true);
+        tgMsg.textContent = r === 'ok' ? 'Sent. Check Telegram.' : 'Sent. Check Telegram (the browser hid the reply).';
+      } catch (e) { tgMsg.textContent = `Telegram said: ${e.message}`; }
+    });
+  }
+
+  // ─── Multi-market scanner ───
+  const SCAN = { el: document.getElementById('ms-scan'), res: {}, prev: {}, busy: false, at: 0, spot: null };
+  function srcFromPanes() {
+    const src = {};
+    ACTIVE.forEach((tf) => { const P = panes[tf.id]; if (P.A && P.bars) src[tf.id] = { bars: P.bars, A: P.A }; });
+    return src;
+  }
+  function evaluate(I, src) {
+    const m = src['1m'] || src['5m'] || src['15m'] || src['1h'];
+    if (!m) return null;
+    const price = m.bars[m.bars.length - 1].close;
+    const c = CUR; CUR = I;
+    try {
+      const list = PAIRS.map((pr) => buildSetup(pr, price, src)).concat(REVS.map((pr) => buildReversal(pr, price, src))).filter(Boolean);
+      list.sort((a, b) => ORDER[a.state] - ORDER[b.state] || b.rr - a.rr);
+      const trend = {}; ['1d', '4h', '1h'].forEach((k) => { trend[k] = src[k] && src[k].A ? src[k].A.trend : 0; });
+      const h1 = src['1h'] && src['1h'].bars, ref = h1 && h1.length > 24 ? h1[h1.length - 25].close : null;
+      return { price, list, trend, chg: ref ? (price - ref) / ref * 100 : null };
+    } finally { CUR = c; }
+  }
+  async function scanInst(key) {
+    const I = INSTRUMENTS[key];
+    if (key === instKey) return evaluate(I, srcFromPanes());
+    const res = await Promise.allSettled(TFS.map((tf) => fetchBars(tf, I, 300)));
+    let off = 0;
+    if (I.spot) {
+      const m1 = res[TFS.findIndex((t) => t.id === '1m')];
+      if (SCAN.spot === null) { try { const j = await getJSON('https://api.gold-api.com/price/XAU'); SCAN.spot = +j.price || 0; } catch (e) { SCAN.spot = 0; } }
+      if (SCAN.spot && m1.status === 'fulfilled') { const o = SCAN.spot - m1.value.bars[m1.value.bars.length - 1].close; if (Math.abs(o) < 150) off = o; }
+    }
+    const src = {};
+    res.forEach((r, k) => {
+      if (r.status !== 'fulfilled' || r.value.bars.length < 40) return;
+      const bars = r.value.bars.map((b) => ({ time: b.time, open: b.open + off, high: b.high + off, low: b.low + off, close: b.close + off }));
+      src[TFS[k].id] = { bars, A: msAnalyze(bars, PIVOT) };
+    });
+    if (!Object.keys(src).length) throw new Error((res.find((r) => r.status === 'rejected') || {}).reason?.message || 'No data');
+    return evaluate(I, src);
+  }
+  function renderScan() {
+    if (!SCAN.el) return;
+    const keys = Object.keys(INSTRUMENTS);
+    const rows = keys.map((k) => ({ k, I: INSTRUMENTS[k], r: SCAN.res[k] }));
+    const rank = (x) => !x.r ? 99 : x.r.err ? 98 : ORDER[x.r.list[0] ? x.r.list[0].state : 'NO SETUP'];
+    rows.sort((a, b) => rank(a) - rank(b) || keys.indexOf(a.k) - keys.indexOf(b.k));
+    const arrow = (v, l) => `<span class="ms-al ${v > 0 ? 'ok' : v < 0 ? 'against' : ''}">${l} ${v < 0 ? '▼' : v > 0 ? '▲' : '–'}</span>`;
+    SCAN.el.innerHTML = rows.map(({ k, I, r }) => {
+      const href = `?s=${k}`, cur = k === instKey ? ' cur' : '';
+      const mk = `<span class="mk"><b>${I.label}</b><small>${I.name}${k === instKey ? ' · on screen' : ''}</small></span>`;
+      if (!r) return `<a class="ms-srow${cur}" href="${href}">${mk}<span class="err">Waiting to scan…</span></a>`;
+      if (r.err) return `<a class="ms-srow${cur}" href="${href}">${mk}<span class="err">Couldn't load: ${esc(r.err)}</span></a>`;
+      const best = r.list[0], ready = r.list.filter((t) => t.state === 'READY');
+      const chg = r.chg === null ? '' : ` <small style="color:${r.chg >= 0 ? UPC : DNC};font-weight:600">${r.chg >= 0 ? '+' : ''}${r.chg.toFixed(2)}%</small>`;
+      const su = best ? `<span class="su"><span class="ms-chip ${best.sell ? 'ms-chip-sell' : 'ms-chip-buy'}">${best.sell ? 'SELL' : 'BUY'}</span><b>${best.reversal ? 'Reversal' : best.name}</b><small>${best.pair}</small><span class="ms-st ${best.cls}">${best.state}</span>${ready.length > 1 ? `<small>+${ready.length - 1} more ready</small>` : ''}</span>` : '<span class="su">No setup</span>';
+      const lv = best && !best.invalid ? `<span class="lv">Entry ${fmtI(best.entry, I)} · Stop ${fmtI(best.stop, I)} · ${best.rr.toFixed(1)}R${best.model ? ` · ${best.model === 'BO' ? 'BO normal' : best.model}` : ''}</span>` : '<span class="lv"></span>';
+      return `<a class="ms-srow${cur}${ready.length ? ' ready' : ''}" href="${href}">${mk}<span class="pr">${fmtI(r.price, I)}${chg}</span><span class="tr">${arrow(r.trend['1d'], 'D1')}${arrow(r.trend['4h'], 'H4')}${arrow(r.trend['1h'], 'H1')}</span>${su}${lv}</a>`;
+    }).join('');
+    const nReady = rows.filter((x) => x.r && !x.r.err && x.r.list.some((t) => t.state === 'READY')).length;
+    const badge = document.getElementById('ms-scan-badge');
+    if (badge) { badge.hidden = !nReady; badge.textContent = `${nReady} market${nReady === 1 ? '' : 's'} ready`; }
+    const meta = document.getElementById('ms-scan-meta');
+    if (meta) meta.textContent = SCAN.busy ? `Scanning ${Object.keys(SCAN.res).length} / ${keys.length}…` : SCAN.at ? `${nReady} ready · scanned ${new Date(SCAN.at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}` : '';
+  }
+  async function scanAll() {
+    if (!SCAN.el || SCAN.busy || G.csv) return;
+    SCAN.busy = true; SCAN.res = {}; renderScan();
+    const btn = document.getElementById('ms-scan-btn'); if (btn) btn.disabled = true;
+    await Promise.all(Object.keys(INSTRUMENTS).map(async (k) => {
+      try { SCAN.res[k] = await scanInst(k) || { err: 'No data' }; } catch (e) { SCAN.res[k] = { err: e.message || 'No data' }; }
+      const r = SCAN.res[k], I = INSTRUMENTS[k];
+      if (r.list && k !== instKey) r.list.forEach((t) => {
+        const id = `${k}:${t.k}`, was = SCAN.prev[id];
+        if (was && was !== 'READY' && t.state === 'READY') notify(`${I.label}: ${t.reversal ? 'Reversal' : t.name} ${t.sell ? 'sell' : 'buy'} ready`, `${t.pair} · entry ${fmtI(t.entry, I)}, stop ${fmtI(t.stop, I)}, ${t.rr.toFixed(1)}R. Open ${I.label} to see the charts.`);
+        SCAN.prev[id] = t.state;
+      });
+      renderScan();
+    }));
+    SCAN.busy = false; SCAN.at = Date.now(); renderScan();
+    if (btn) btn.disabled = false;
+  }
+  if (SCAN.el) { renderScan(); document.getElementById('ms-scan-btn').addEventListener('click', scanAll); }
+
+  // ─── Backtest: replay the rules candle by candle and score every Ready setup ───
+  const BT_LIM = { '1d': 1000, '4h': 1000, '1h': 2000, '15m': 2000, '5m': 3000, '1m': 3000 };
+  const BT_WAIT = 48, BT_WIN = 500;
+  function btSimulate(pr, hist, isRev) {
+    const hb = hist[pr.h], lb = hist[pr.l];
+    if (!hb || !lb || lb.length < 200 || hb.length < 80) return null;
+    const hs = TFS.find((x) => x.id === pr.h).sec, ls = TFS.find((x) => x.id === pr.l).sec;
+    const trades = [], used = new Set();
+    let hN = 0, hKey = -1, hSrc = null, pos = null;
+    const fin = (q, res, R, i) => { q.res = res; q.R = R; q.i1 = i; q.done = true; };
+    for (let i = 150; i < lb.length; i++) {
+      const b = lb[i];
+      if (pos) {
+        const s = pos.sell, hitStop = s ? b.high >= pos.stop : b.low <= pos.stop, hitT1 = s ? b.low <= pos.t1 : b.high >= pos.t1;
+        if (!pos.filled) {
+          const hitEntry = s ? b.high >= pos.entry : b.low <= pos.entry;
+          if (hitEntry) { pos.filled = true; if (hitStop) fin(pos, 'loss', -1, i); }
+          else if (hitT1) fin(pos, 'missed', 0, i);
+          else if (i - pos.i0 > BT_WAIT) fin(pos, 'expired', 0, i);
+        } else if (hitStop) fin(pos, 'loss', -1, i);
+        else if (hitT1) fin(pos, 'win', pos.rr, i);
+        if (pos.done) { trades.push(pos); pos = null; }
+        continue;
+      }
+      const T = b.time + ls;
+      while (hN < hb.length && hb[hN].time + hs <= T) hN++;
+      if (hN < 60) continue;
+      if (hN !== hKey) { const hw = hb.slice(Math.max(0, hN - BT_WIN), hN); hSrc = { bars: hw, A: msAnalyze(hw, PIVOT) }; hKey = hN; }
+      const lw = lb.slice(Math.max(0, i + 1 - BT_WIN), i + 1);
+      const src = { [pr.h]: hSrc, [pr.l]: { bars: lw, A: msAnalyze(lw, PIVOT) } };
+      let t = null;
+      try { t = isRev ? buildReversal(pr, b.close, src) : buildSetup(pr, b.close, src); } catch (e) { t = null; }
+      if (!t || t.state !== 'READY' || used.has(t.sig) || !(t.r > 0)) continue;
+      used.add(t.sig);
+      pos = { k: pr.k, name: isRev ? 'Reversal' : pr.name, pair: t.pair, sell: t.sell, entry: t.entry, stop: t.stop, t1: t.t1, rr: t.rr, model: t.model, t0: T, i0: i, filled: false, done: false };
+      if (t.sell ? b.close >= t.entry : b.close <= t.entry) pos.filled = true;
+    }
+    if (pos) { pos.res = pos.filled ? 'open' : 'pending'; pos.R = 0; trades.push(pos); }
+    return { trades, from: lb[150].time, to: lb[lb.length - 1].time, bars: lb.length - 150, tf: LBL[pr.l] };
+  }
+  const stat = (arr) => {
+    const w = arr.filter((x) => x.res === 'win').length, l = arr.filter((x) => x.res === 'loss').length, R = arr.reduce((a, x) => a + (x.res === 'win' || x.res === 'loss' ? x.R : 0), 0);
+    return { n: arr.length, w, l, closed: w + l, wr: w + l ? w / (w + l) : null, R, avg: w + l ? R / (w + l) : null };
+  };
+  const pct = (v) => v === null ? '—' : `${Math.round(v * 100)}%`;
+  const rtxt = (v) => v === null ? '—' : `<span class="${v > 0 ? 'pos' : v < 0 ? 'neg' : ''}">${v > 0 ? '+' : ''}${v.toFixed(2)}R</span>`;
+  async function runBacktest() {
+    const out = document.getElementById('ms-bt'), meta = document.getElementById('ms-bt-meta'), btn = document.getElementById('ms-bt-btn');
+    btn.disabled = true; meta.textContent = 'Loading history…';
+    const res = await Promise.allSettled(TFS.map((tf) => fetchBars(tf, INST, BT_LIM[tf.id] || 1000)));
+    const hist = {};
+    res.forEach((r, k) => { if (r.status === 'fulfilled') hist[TFS[k].id] = r.value.bars.map((b) => ({ time: b.time, open: b.open + G.offset, high: b.high + G.offset, low: b.low + G.offset, close: b.close + G.offset })); });
+    const runs = [];
+    for (const [k, pr] of PAIRS.map((x) => [x, false]).concat(REVS.map((x) => [x, true])).entries()) {
+      meta.textContent = `Replaying ${pr[0].name} ${LBL[pr[0].h]} → ${LBL[pr[0].l]} (${k + 1} of ${PAIRS.length + REVS.length})…`;
+      await new Promise((r) => setTimeout(r, 16));
+      const sim = btSimulate(pr[0], hist, pr[1]);
+      if (sim) runs.push(Object.assign(sim, { pr: pr[0], rev: pr[1] }));
+    }
+    btn.disabled = false; btn.textContent = 'Run again';
+    if (!runs.length) { meta.textContent = ''; out.innerHTML = '<div class="ms-note">Not enough history loaded to backtest this market.</div>'; return; }
+    const all = runs.flatMap((r) => r.trades), A = stat(all);
+    const day = (t) => new Date(t * 1000).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' });
+    // equity curve in R, by exit order
+    const closed = all.filter((x) => x.res === 'win' || x.res === 'loss').sort((a, b) => a.t0 - b.t0);
+    let eq = 0; const pts = [0].concat(closed.map((x) => (eq += x.R)));
+    const lo = Math.min(...pts), hi = Math.max(...pts), W = 600, H = 70;
+    const path = pts.map((v, i) => `${i ? 'L' : 'M'}${(i / Math.max(1, pts.length - 1) * W).toFixed(1)},${(H - 6 - (v - lo) / Math.max(1e-9, hi - lo) * (H - 12)).toFixed(1)}`).join('');
+    const zeroY = (H - 6 - (0 - lo) / Math.max(1e-9, hi - lo) * (H - 12)).toFixed(1);
+    const row = (label, sub, st, extra) => `<tr><td><b>${label}</b>${sub ? ` <small>${sub}</small>` : ''}</td><td class="n">${extra || ''}</td><td class="n">${st.n}</td><td class="n">${st.closed}</td><td class="n">${pct(st.wr)}</td><td class="n">${rtxt(st.avg)}</td><td class="n">${rtxt(st.closed ? st.R : null)}</td></tr>`;
+    const byModel = ['Janda', 'QM', 'BO'].map((m) => [m, stat(all.filter((x) => x.model === m))]);
+    out.innerHTML =
+      `<div class="ms-bt-sum"><div><span>Signals</span><b>${A.n}</b></div><div><span>Win rate</span><b>${pct(A.wr)}</b></div><div><span>Average</span><b class="${A.avg > 0 ? 'pos' : A.avg < 0 ? 'neg' : ''}">${A.avg === null ? '—' : (A.avg > 0 ? '+' : '') + A.avg.toFixed(2) + 'R'}</b></div><div><span>Total</span><b class="${A.R > 0 ? 'pos' : A.R < 0 ? 'neg' : ''}">${(A.R > 0 ? '+' : '') + A.R.toFixed(1)}R</b></div></div>` +
+      (closed.length > 1 ? `<svg class="ms-bt-eq" viewBox="0 0 ${W} ${H}" preserveAspectRatio="none" role="img" aria-label="Cumulative R over ${closed.length} closed trades"><line x1="0" x2="${W}" y1="${zeroY}" y2="${zeroY}" stroke="var(--line)" stroke-dasharray="4 4" vector-effect="non-scaling-stroke"/><path d="${path}" fill="none" stroke="${eq >= 0 ? UPC : DNC}" stroke-width="2" vector-effect="non-scaling-stroke"/></svg>` : '') +
+      `<div class="ms-bt-wrap"><table class="ms-bt-t"><thead><tr><th>Setup</th><th class="n">History</th><th class="n">Signals</th><th class="n">Closed</th><th class="n">Win rate</th><th class="n">Avg</th><th class="n">Total</th></tr></thead><tbody>` +
+      runs.map((r) => row(r.rev ? 'Reversal' : r.pr.name, `${LBL[r.pr.h]} → ${LBL[r.pr.l]}`, stat(r.trades), `${day(r.from)} – ${day(r.to)}`)).join('') +
+      `<tr class="grp"><td colspan="7">By CF grade (all setups)</td></tr>` +
+      byModel.map(([m, st]) => row(m === 'BO' ? 'BO normal' : m, m === 'Janda' ? 'BO Structure, then BO' : m === 'QM' ? 'BO Structure' : 'no structure flip', st, '')).join('') +
+      `</tbody></table></div>` +
+      (all.length ? `<div class="ms-k" style="margin-top:14px">Latest signals</div><div class="ms-bt-wrap"><table class="ms-bt-t"><thead><tr><th>Signal</th><th>Setup</th><th>Side</th><th>CF</th><th class="n">Entry</th><th class="n">Stop</th><th class="n">Target 1</th><th>Result</th></tr></thead><tbody>` +
+        all.slice().sort((a, b) => b.t0 - a.t0).slice(0, 10).map((x) => `<tr><td>${ftime(x.t0 + TZ)}</td><td>${esc(x.name)} <small>${esc(x.pair)}</small></td><td><span class="ms-chip ${x.sell ? 'ms-chip-sell' : 'ms-chip-buy'}">${x.sell ? 'SELL' : 'BUY'}</span></td><td>${x.model === 'BO' ? 'BO normal' : x.model || '—'}</td><td class="n">${fmt(x.entry)}</td><td class="n">${fmt(x.stop)}</td><td class="n">${fmt(x.t1)}</td><td>${x.res === 'win' ? rtxt(x.R) : x.res === 'loss' ? rtxt(-1) : esc(x.res === 'missed' ? 'Missed (ran to target unfilled)' : x.res === 'expired' ? 'Not filled' : x.res === 'open' ? 'Still open' : 'Waiting for fill')}</td></tr>`).join('') +
+        `</tbody></table></div>` : '') +
+      `<p class="ms-note" style="margin:10px 0 0">How it's scored: each Ready setup places a limit order at its entry. A fill then the stop is −1R, a fill then Target 1 is +R at the card's reward : risk. A candle that touches both entry and stop counts as a loss. Orders not filled within ${BT_WAIT} candles are dropped. M1 and M5 only reach back a few days, so their samples are small. Past results don't predict future ones.</p>`;
+    meta.textContent = `${INST.label} · ${A.n} signals`;
+  }
+  if (document.getElementById('ms-bt-btn')) document.getElementById('ms-bt-btn').addEventListener('click', () => runBacktest().catch((e) => {
+    document.getElementById('ms-bt-meta').textContent = `Backtest failed: ${e.message}`; document.getElementById('ms-bt-btn').disabled = false;
+  }));
+
+  // ─── Trade journal (this browser only) ───
+  const JEL = document.getElementById('ms-j-body');
+  let J = [];
+  try { J = JSON.parse(localStorage.getItem('msJournal') || '[]'); if (!Array.isArray(J)) J = []; } catch (e) { J = []; }
+  const jSave = () => { try { localStorage.setItem('msJournal', JSON.stringify(J)); } catch (e) {} };
+  const RES = { open: 'Open', win: 'Win', loss: 'Loss', be: 'Break-even', skip: 'Skipped' };
+  function renderJournal() {
+    if (!JEL) return;
+    const dI = (x) => ({ dec: x.dec != null ? x.dec : 2 });
+    JEL.innerHTML = J.length ? J.map((x) => `<tr data-id="${esc(x.id)}">` +
+      `<td>${ftime(x.t + TZ)}</td><td><b>${esc(x.label)}</b></td><td>${esc(x.name)} <small>${esc(x.pair)}</small></td>` +
+      `<td><span class="ms-chip ${x.sell ? 'ms-chip-sell' : 'ms-chip-buy'}">${x.sell ? 'SELL' : 'BUY'}</span></td>` +
+      `<td class="m">${fmtI(x.entry, dI(x))}</td><td class="m">${fmtI(x.stop, dI(x))}</td><td class="m">${fmtI(x.t1, dI(x))}</td><td>${x.model ? (x.model === 'BO' ? 'BO normal' : esc(x.model)) : '—'}</td>` +
+      `<td><select data-f="res" aria-label="Result">${Object.entries(RES).map(([k, v]) => `<option value="${k}"${x.res === k ? ' selected' : ''}>${v}</option>`).join('')}</select></td>` +
+      `<td><input data-f="R" type="number" step="0.1" inputmode="decimal" aria-label="Result in R" value="${x.R === null || x.R === undefined ? '' : x.R}"></td>` +
+      `<td><input data-f="note" type="text" aria-label="Notes" placeholder="Why, what you saw…" value="${esc(x.note)}"></td>` +
+      `<td><button type="button" class="del" data-del aria-label="Delete this entry">✕</button></td></tr>`).join('')
+      : `<tr class="empty"><td colspan="12">No trades logged yet. Pick a setup under Possible trades and press <b>Log selected trade</b>.</td></tr>`;
+    const st = document.getElementById('ms-j-stats');
+    const done = J.filter((x) => x.res === 'win' || x.res === 'loss' || x.res === 'be');
+    if (!done.length) { st.innerHTML = ''; return; }
+    const w = done.filter((x) => x.res === 'win').length, l = done.filter((x) => x.res === 'loss').length, R = done.reduce((a, x) => a + (+x.R || 0), 0);
+    const by = {}; done.forEach((x) => { const k = x.name; (by[k] = by[k] || []).push(x); });
+    st.innerHTML = `<span class="ms-q">${done.length} closed</span><span class="ms-q ${w >= l ? 'good' : 'weak'}">Win rate ${w + l ? Math.round(w / (w + l) * 100) : 0}%</span><span class="ms-q ${R >= 0 ? 'good' : 'weak'}">Total ${R >= 0 ? '+' : ''}${R.toFixed(1)}R</span>` +
+      Object.entries(by).map(([k, arr]) => { const r = arr.reduce((a, x) => a + (+x.R || 0), 0); return `<span class="ms-q">${esc(k)}: ${arr.length} · ${r >= 0 ? '+' : ''}${r.toFixed(1)}R</span>`; }).join('');
+  }
+  if (JEL) {
+    JEL.addEventListener('change', (ev) => {
+      const tr = ev.target.closest('tr[data-id]'), x = tr && J.find((q) => q.id === tr.dataset.id), f = ev.target.dataset.f;
+      if (!x || !f) return;
+      x.auto = false;
+      if (f === 'res') { x.res = ev.target.value; x.R = x.res === 'win' ? x.rr : x.res === 'loss' ? -1 : x.res === 'be' ? 0 : null; }
+      else if (f === 'R') x.R = ev.target.value === '' ? null : +ev.target.value;
+      else x.note = ev.target.value;
+      jSave(); renderJournal();
+    });
+    JEL.addEventListener('click', (ev) => {
+      if (!ev.target.closest('[data-del]')) return;
+      const id = ev.target.closest('tr[data-id]').dataset.id;
+      J = J.filter((q) => q.id !== id); jSave(); renderJournal();
+    });
+    document.getElementById('ms-log').addEventListener('click', () => {
+      const t = (G.list || []).find((x) => x.k === G.sel);
+      if (!t || t.invalid) { notify('Nothing to log', 'Pick a valid setup under Possible trades first.'); return; }
+      J.unshift({ id: Date.now().toString(36), t: Math.floor(Date.now() / 1000), inst: instKey, label: INST.label, dec: INST.dec, name: t.reversal ? 'Reversal' : t.name, pair: t.pair,
+        sell: t.sell, entry: t.entry, stop: t.stop, t1: t.t1, rr: +t.rr.toFixed(2), model: t.model, state: t.state, res: 'open', R: null, auto: true, note: '' });
+      jSave(); renderJournal();
+      notify('Logged to journal', `${t.name} ${t.sell ? 'sell' : 'buy'} at ${fmt(t.entry)}, stop ${fmt(t.stop)}, target ${fmt(t.t1)}.`);
+    });
+    document.getElementById('ms-j-csv').addEventListener('click', () => {
+      const head = ['logged', 'market', 'setup', 'pair', 'side', 'entry', 'stop', 'target1', 'rr', 'cf', 'state', 'result', 'R', 'note'];
+      const q = (v) => `"${String(v == null ? '' : v).replace(/"/g, '""')}"`;
+      const rows = J.map((x) => [new Date(x.t * 1000).toISOString(), x.label, x.name, x.pair, x.sell ? 'sell' : 'buy', x.entry, x.stop, x.t1, x.rr, x.model || '', x.state, x.res, x.R == null ? '' : x.R, x.note].map(q).join(','));
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(new Blob([head.join(',') + '\n' + rows.join('\n')], { type: 'text/csv' }));
+      a.download = `mosha-journal-${new Date().toISOString().slice(0, 10)}.csv`; a.click();
+      setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+    });
+    renderJournal();
+  }
+  // Open journal trades on this market: fill at entry, then first touch of stop or Target 1 decides the result
+  function journalTick() {
+    if (!JEL) return;
+    let changed = false;
+    J.forEach((x) => {
+      if (x.inst !== instKey || x.res !== 'open' || !x.auto) return;
+      const P = ['1m', '5m', '15m', '1h'].map((k) => panes[k]).find((p) => p && p.bars && p.bars.length && p.bars[0].time - TZ <= x.t);
+      if (!P) return;
+      let filled = !!x.filled;
+      for (const b of P.bars) {
+        if (b.time - TZ + P.tf.sec <= x.t) continue;
+        const s = x.sell;
+        if (!filled) { if (s ? b.high >= x.entry : b.low <= x.entry) filled = true; else continue; }
+        if (s ? b.high >= x.stop : b.low <= x.stop) { x.res = 'loss'; x.R = -1; break; }
+        if (s ? b.low <= x.t1 : b.high >= x.t1) { x.res = 'win'; x.R = x.rr; break; }
+      }
+      if (filled !== !!x.filled) { x.filled = filled; changed = true; }
+      if (x.res !== 'open') { changed = true; notify(`Journal: ${x.name} ${x.res === 'win' ? 'hit Target 1' : 'stopped out'}`, `${x.label} ${x.sell ? 'sell' : 'buy'} from ${fmt(x.entry)} closed at ${x.res === 'win' ? '+' + x.R + 'R' : '−1R'}.`); }
+    });
+    if (changed) { jSave(); renderJournal(); }
+  }
 
   boot();
 })();
