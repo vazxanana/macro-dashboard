@@ -6284,6 +6284,7 @@ if (/^#(market-structure|structure)$/.test(location.hash) || /market-structure\.
     renderTrades(price);
     journalTick();
     renderHome();
+    councilHere(price);
 
     // Alerts when a step completes or H4 prints a new BO
     const key = `${e.dir}:${breakT}`, done = steps.map((x) => x.done);
@@ -7306,6 +7307,20 @@ if (/^#(market-structure|structure)$/.test(location.hash) || /market-structure\.
     set('ms-c-hist', (cf.history || []).slice(-8).reverse().map((h) => `<li><span>${esc(String(h.at).slice(0, 10))} · ${esc(h.by)}</span><b>${esc(h.change)}</b><em>${esc(h.why)}</em></li>`).join('') || '<li class="empty">No rule changes yet.</li>');
     set('ms-c-review', C.review ? md(C.review) : '<p class="ms-note">The AI Coach writes a review after each trading day: what worked, what didn\'t, and any rule it changed.</p>');
     renderHome();
+    const m1p = panes['1m']; councilHere(m1p && m1p.bars ? m1p.bars[m1p.bars.length - 1].close : null);
+  }
+  // Council trades on the market you're viewing, with live result in R
+  function councilHere(price) {
+    const el = document.getElementById('ms-c-here'); if (!el) return;
+    const list = (COUNCIL.trades || []).filter((x) => x.market === instKey && !x.shadow && (x.status === 'open' || x.status === 'pending'));
+    const card = document.getElementById('ms-c-here-card'); if (card) card.hidden = !list.length;
+    if (!list.length) { el.innerHTML = ''; return; }
+    el.innerHTML = list.map((x) => {
+      const s = x.side === 'sell' ? -1 : 1, r = Math.abs(x.entry - x.stop), live = x.status === 'open' && price ? (price - x.entry) * s / r : null;
+      return `<div class="c-here"><span class="ms-chip ${s < 0 ? 'ms-chip-sell' : 'ms-chip-buy'}">${s < 0 ? 'SELL' : 'BUY'}</span><b>${esc(x.name)}</b><small>${esc(x.pair)}</small>` +
+        `<span class="c-here-l">Entry <b>${fmt(x.entry)}</b> · Stop <b class="neg">${fmt(x.stop)}</b> · Target <b class="pos">${fmt(x.t1)}</b></span>` +
+        `<span class="c-here-r ${live == null ? '' : live >= 0 ? 'pos' : 'neg'}">${live == null ? 'Waiting for fill' : `${live >= 0 ? '+' : ''}${live.toFixed(2)}R now`}</span></div>`;
+    }).join('');
   }
   const autoEl = document.getElementById('ms-auto');
   try { G.auto = localStorage.getItem('msAuto') !== '0'; } catch (e) { G.auto = true; }
