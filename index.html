@@ -6927,6 +6927,7 @@ if (/^#(market-structure|structure)$/.test(location.hash) || /market-structure\.
   // ─── Backtest: replay the rules candle by candle and score every Ready setup ───
   const BT_LIM = { '1d': 1000, '4h': 1000, '1h': 2000, '15m': 2000, '5m': 3000, '1m': 3000 };
   const BT_WAIT = 48, BT_WIN = 500;
+  try { G.bt = JSON.parse(localStorage.getItem('msBt_' + instKey) || 'null'); } catch (e) { G.bt = null; }
   function btSimulate(pr, hist, build) {
     const hb = hist[pr.h], lb = hist[pr.l];
     if (!hb || !lb || lb.length < 200 || hb.length < 80) return null;
@@ -7005,7 +7006,7 @@ if (/^#(market-structure|structure)$/.test(location.hash) || /market-structure\.
         `</tbody></table></div>` : '') +
       `<p class="ms-note" style="margin:10px 0 0">How it's scored: each Ready setup places a limit order at its entry. A fill then the stop is −1R, a fill then Target 1 is +R at the card's reward : risk. A candle that touches both entry and stop counts as a loss. Orders not filled within ${BT_WAIT} candles are dropped. M1 and M5 only reach back a few days, so their samples are small. Past results don't predict future ones.</p>`;
     meta.textContent = `${INST.label} · ${A.n} signals`;
-    G.bt = { wr: A.wr, R: A.R }; renderHome();
+    G.bt = { wr: A.wr, R: A.R, n: A.n, at: Date.now() }; try { localStorage.setItem('msBt_' + instKey, JSON.stringify(G.bt)); } catch (e) {} renderHome();
   }
   if (document.getElementById('ms-bt-btn')) document.getElementById('ms-bt-btn').addEventListener('click', () => runBacktest().catch((e) => {
     document.getElementById('ms-bt-meta').textContent = `Backtest failed: ${e.message}`; document.getElementById('ms-bt-btn').disabled = false;
@@ -7031,6 +7032,14 @@ if (/^#(market-structure|structure)$/.test(location.hash) || /market-structure\.
       : `<tr class="empty"><td colspan="11">No trades logged yet. Pick a setup under Possible trades and press <b>Log selected trade</b>.</td></tr>`;
     const st = document.getElementById('ms-j-stats');
     const done = J.filter((x) => x.res === 'win' || x.res === 'loss' || x.res === 'be');
+    const eqEl = document.getElementById('ms-j-eq');
+    if (eqEl) {
+      const ch = done.slice().sort((a, b) => a.t - b.t); let eq = 0; const pts = [0].concat(ch.map((x) => (eq += (+x.R || 0))));
+      if (pts.length > 2) {
+        const lo = Math.min(...pts), hi = Math.max(...pts), W = 600, H = 56, y = (v) => (H - 4 - (v - lo) / Math.max(1e-9, hi - lo) * (H - 8)).toFixed(1);
+        eqEl.innerHTML = `<svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="none" role="img" aria-label="Journal equity in R over ${ch.length} closed trades"><line x1="0" x2="${W}" y1="${y(0)}" y2="${y(0)}" stroke="var(--line)" stroke-dasharray="4 4" vector-effect="non-scaling-stroke"/><path d="${pts.map((v, i) => `${i ? 'L' : 'M'}${(i / (pts.length - 1) * W).toFixed(1)},${y(v)}`).join('')}" fill="none" stroke="${eq >= 0 ? 'var(--buy)' : 'var(--sell)'}" stroke-width="2" vector-effect="non-scaling-stroke"/></svg>`;
+      } else eqEl.innerHTML = '';
+    }
     if (!done.length) { st.innerHTML = ''; return; }
     const w = done.filter((x) => x.res === 'win').length, l = done.filter((x) => x.res === 'loss').length, R = done.reduce((a, x) => a + (+x.R || 0), 0);
     const by = {}; done.forEach((x) => { const k = x.name; (by[k] = by[k] || []).push(x); });
@@ -7347,7 +7356,7 @@ if (/^#(market-structure|structure)$/.test(location.hash) || /market-structure\.
       const R = done.reduce((a, x) => a + (+x.R || 0), 0), open = J.filter((x) => x.res === 'open').length;
       if (J.length) { set('h-j', `${done.length ? `${R >= 0 ? '+' : ''}${R.toFixed(1)}R` : `${J.length} logged`}`); set('h-j-sub', `${done.length} closed${w + l ? ` · ${Math.round(w / (w + l) * 100)}% win rate` : ''} · ${open} open`); }
       if (COUNCIL.trades) { const cl = COUNCIL.trades.filter((x) => !x.shadow && (x.status === 'win' || x.status === 'loss')), cr = cl.reduce((a, x) => a + x.R, 0); set('h-council', cl.length ? `${cr >= 0 ? '+' : ''}${cr.toFixed(1)}R <small>from ${cl.length} trades</small>` : `${COUNCIL.trades.filter((x) => !x.shadow && (x.status === 'open' || x.status === 'pending')).length} open trades`); }
-      if (G.bt) set('h-bt', `${G.bt.wr === null ? '—' : Math.round(G.bt.wr * 100) + '%'} win · ${G.bt.R >= 0 ? '+' : ''}${G.bt.R.toFixed(1)}R`);
+      if (G.bt) set('h-bt', `${G.bt.wr == null ? '—' : Math.round(G.bt.wr * 100) + '%'} win · ${G.bt.R >= 0 ? '+' : ''}${(+G.bt.R).toFixed(1)}R${G.bt.at ? ` <small>${new Date(G.bt.at).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })}</small>` : ''}`);
       const warn = document.getElementById('ms-news-warn'), hw = document.getElementById('h-warn');
       if (warn && hw) { hw.hidden = warn.hidden; hw.innerHTML = warn.innerHTML; }
     } catch (e) { /* a section isn't ready yet */ }
