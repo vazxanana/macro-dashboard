@@ -285,11 +285,12 @@
       <li><b>50% rule:</b> measure the whole move after the BO, from the Origin edge where it started to the VR extreme. Its halfway point (like a Fibonacci 50%) is drawn as a dashed line. A CF only counts at or beyond that line, inside the Origin.</li>
       <li><b>CF:</b> only once price is back inside the Origin. A QM beats a normal BO. A <b>Janda</b> is the full pattern: BO Structure in the new direction, then a BO in the same direction.</li>
       <li><b>Entry:</b> on the pullback after the CF, using the Barrier timeframes: H4 → M15 / M1, H1 → M5 / M1, M15 → M1. Stop goes beyond the zone; a body close beyond the Origin cancels the idea.</li>
+      <li><b>Reversal:</b> a counter-trend trade at the HTF extreme or VR, only after the lower timeframe prints a BO Structure the other way (QM or Janda). Targets stay short, at the 50% line and then the Origin edge, because rejections against the direction don't run far.</li>
       <li><b>Clean breakout:</b> every BO needs a candle <b>body</b> to close beyond the wick on the left. A wick through the level is not a break.</li>
     </ol>
   </details>
 
-  <p class="foot">Live candles from Binance and Kraken public feeds; gold is aligned to XAU/USD spot via gold-api.com. Times are in your local zone.<br>Version 1 Nov 2026 · 50% rule</p>
+  <p class="foot">Live candles from Binance and Kraken public feeds; gold is aligned to XAU/USD spot via gold-api.com. Times are in your local zone.<br>Version 1 Nov 2026 · reversals</p>
   <div class="ms-toasts" id="ms-toasts" role="status" aria-live="polite"></div>
 </div>
 <script>
@@ -945,17 +946,72 @@ function msNextSetup(bars, A) {
     const u = G.risk / r;
     return `${u >= 100 ? u.toFixed(0) : u >= 1 ? u.toFixed(2) : u.toFixed(4)} ${INST.unit}`;
   }
+  // ─── Reversal trades: counter-trend at the HTF extreme / VR, confirmed by a lower-TF BO Structure (QM or Janda) ───
+  const REVS = [
+    { k: 'rev4', name: 'Reversal', h: '4h', l: '15m', e: 'M15' },
+    { k: 'rev1', name: 'Reversal', h: '1h', l: '5m',  e: 'M5'  },
+  ];
+  function buildReversal(pr, price) {
+    const hp = panes[pr.h], lp = panes[pr.l];
+    if (!hp || !lp || !hp.A || !hp.A.last || !hp.A.ext || !lp.A || !lp.bars) return null;
+    const e = hp.A.last, trend = e.dir, rdir = -trend, buy = rdir > 0, sgn = buy ? 1 : -1;
+    const H = LBL[pr.h], Lo = LBL[pr.l], word = buy ? 'buy' : 'sell';
+    const ext = hp.A.ext.p, far = trend < 0 ? e.top : e.bot, range = Math.abs(far - ext);
+    if (!range) return null;
+    const extT = hp.bars[Math.min(hp.A.ext.i, hp.bars.length - 1)].time;
+    // Barrier = the VR box when it exists, otherwise the first 20% of the move away from the extreme
+    const vb = e.vrBox && e.vr && Math.abs(e.vr.p - ext) < 1e-9 ? e.vrBox : null;
+    const edge = vb ? (buy ? vb.hi : vb.lo) : ext + sgn * 0.2 * range;
+    const atBarrier = buy ? price <= edge + 0.05 * range : price >= edge - 0.05 * range;
+    const ll = lp.A.last;
+    // The confirming break must start at the barrier, not somewhere later in the move
+    const conf = ll && ll.dir === rdir && lp.bars[ll.breakIdx].time >= extT && (buy ? ll.bot <= edge + 0.05 * range : ll.top >= edge - 0.05 * range);
+    let model = null;
+    if (conf) {
+      const evs = lp.A.events.filter((x) => lp.bars[x.breakIdx].time >= extT);
+      const flip = evs.findIndex((x) => x.dir === rdir && x.structure);
+      model = flip < 0 ? 'BO' : evs.slice(flip + 1).some((x) => x.dir === rdir) ? 'Janda' : 'QM';
+    }
+    const buf = Math.max(0.05 * range, price * 0.00005);
+    let entry, stop;
+    if (conf) { entry = ll.level; stop = buy ? Math.min(ext, ll.bot) - buf : Math.max(ext, ll.top) + buf; }
+    else { entry = (ext + edge) / 2; stop = ext - sgn * buf; }
+    const r = Math.abs(entry - stop);
+    const fib = (far + ext) / 2, originEdge = e.level;
+    let t1 = buy ? Math.min(fib, originEdge) : Math.max(fib, originEdge);
+    let t2 = buy ? Math.max(fib, originEdge) : Math.min(fib, originEdge);
+    if ((t1 - entry) * sgn < r) t1 = entry + sgn * 1.5 * r;
+    if ((t2 - t1) * sgn <= 0) t2 = t1 + sgn * r;
+    const rr = Math.abs(t1 - entry) / r;
+    let state, cls, next, invalid = false;
+    if (conf && (price - t1) * sgn >= 0) {
+      state = 'PLAYED OUT'; cls = ''; invalid = true;
+      next = `The reversal from the ${H} extreme ${fmt(ext)} already reached its first target ${fmt(t1)}. Don't chase it; wait for the next extreme.`;
+    } else if (conf) {
+      state = 'READY'; cls = model === 'BO' ? 'near' : 'ready';
+      next = `${Lo} ${model === 'Janda' ? 'Janda' : model === 'QM' ? 'QM' : 'BO'} against the ${H} trend at the ${H} extreme ${fmt(ext)}. Counter-trend ${word} on the pullback to ${fmt(entry)}, stop beyond ${fmt(stop)}, take profit at ${fmt(t1)} then ${fmt(t2)}. Keep it small: the notes warn that rejections against the direction don't run far.`;
+    } else if (atBarrier) {
+      state = 'AT EXTREME'; cls = 'near';
+      next = `Price is at the ${H} ${vb ? 'VR' : 'extreme'} (${fmt(Math.min(ext, edge))} – ${fmt(Math.max(ext, edge))}). Wait for ${Lo} to print a BO Structure ${buy ? 'Buy' : 'Sell'} (QM or Janda) before a counter-trend ${word}.`;
+    } else {
+      state = 'NO SETUP'; cls = ''; invalid = true;
+      next = `Price is away from the ${H} extreme ${fmt(ext)}. Reversal trades only form at the extreme or VR, against the ${H} ${trend < 0 ? 'down' : 'up'}trend.`;
+    }
+    return { k: pr.k, name: pr.name, pair: `${H} → ${Lo}`, sell: !buy, entry, stop, t1, t2, rr, r, state, cls, next, align: false, upL: H,
+      size: sizeText(r, price), invalid, model, retr: null, fib: null, reversal: true };
+  }
+
   function renderTrades(price) {
-    const list = PAIRS.map((pr) => buildSetup(pr, price)).filter(Boolean);
+    const list = PAIRS.map((pr) => buildSetup(pr, price)).concat(REVS.map((pr) => buildReversal(pr, price))).filter(Boolean);
     if (!list.length) return;
-    const order = { READY: 0, 'IN ORIGIN': 1, 'UNDER 50%': 2, 'WAIT RETRACE': 3, 'WAIT VR': 4, INVALID: 5 };
+    const order = { READY: 0, 'IN ORIGIN': 1, 'AT EXTREME': 2, 'UNDER 50%': 3, 'WAIT RETRACE': 4, 'WAIT VR': 5, 'NO SETUP': 6, 'PLAYED OUT': 7, INVALID: 8 };
     if (!G.sel || !list.some((t) => t.k === G.sel && !t.invalid)) {
       const best = list.slice().sort((a, b) => order[a.state] - order[b.state])[0];
       G.sel = best.k;
     }
     $('ms-trades').innerHTML = list.map((t) => {
       const size = t.size;
-      const tag = t.align === null ? '' : `<span class="ms-tag ${t.align ? 'with' : 'counter'}">${t.align ? `WITH ${t.upL}` : `AGAINST ${t.upL}`}</span>`;
+      const tag = t.reversal ? `<span class="ms-tag counter">COUNTER-TREND</span>` : t.align === null ? '' : `<span class="ms-tag ${t.align ? 'with' : 'counter'}">${t.align ? `WITH ${t.upL}` : `AGAINST ${t.upL}`}</span>`;
       return `<button type="button" class="ms-trade${t.k === G.sel ? ' sel' : ''}${t.invalid ? ' invalid' : ''}" data-k="${t.k}" aria-pressed="${t.k === G.sel}">` +
         `<div class="ms-tr-h"><span class="ms-chip ${t.sell ? 'ms-chip-sell' : 'ms-chip-buy'}">${t.sell ? 'SELL' : 'BUY'}</span><b>${t.name}</b><small>${t.pair}</small>${tag}<span class="ms-st ${t.cls}">${t.state}</span></div>` +
         `<div class="ms-tr-g"><span>Entry<b>${fmt(t.entry)}</b></span><span>Stop<b class="neg">${fmt(t.stop)}</b></span><span>Target 1<b class="pos">${fmt(t.t1)}</b></span>` +
@@ -971,7 +1027,7 @@ function msNextSetup(bars, A) {
     if (key !== G.planKey) { G.planKey = key; Object.values(panes).forEach((p) => p.A && p.draw()); }
     list.forEach((t) => {
       const was = G.prevStates[t.k];
-      if (was && was !== t.state && t.state === 'READY') notify(`${t.name} ${t.sell ? 'sell' : 'buy'} ready`, `${t.pair}: entry ${fmt(t.entry)}, stop ${fmt(t.stop)}, target ${fmt(t.t1)} (${t.rr.toFixed(1)}R).`);
+      if (was && was !== t.state && t.state === 'READY') notify(`${t.reversal ? 'Reversal' : t.name} ${t.sell ? 'sell' : 'buy'} ready (${t.pair})`, `${t.pair}: entry ${fmt(t.entry)}, stop ${fmt(t.stop)}, target ${fmt(t.t1)} (${t.rr.toFixed(1)}R).`);
       G.prevStates[t.k] = t.state;
     });
   }
