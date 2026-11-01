@@ -30,6 +30,8 @@ const WAIT = { '1d': 5 * 86400, '4h': 2 * 86400, '1h': 12 * 3600, '15m': 3 * 360
 const FRESH = 12;
 const SEC = Object.fromEntries(TFS.map(([id, , s]) => [id, s]));
 
+// Trading session by UTC hour (rough, ignores daylight saving)
+const sessionOf = (t) => { const h = new Date(t * 1000).getUTCHours(); return h < 7 ? 'asia' : h < 12 ? 'london' : h < 16 ? 'overlap' : h < 21 ? 'newyork' : 'late'; };
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 async function kraken(pair, interval) {
   for (let a = 0; a < 4; a++) {
@@ -45,7 +47,8 @@ async function kraken(pair, interval) {
 
 // ─── Config: the Coach's knobs, with their allowed ranges ───
 const LIMITS = { buf: [0.10, 0.25], minRR: [1.2, 2.5] };
-const config = Object.assign({ buf: 0.15, minRR: 1.2, paused: {}, history: [] }, rd('config.json', {}));
+const config = Object.assign({ buf: 0.15, minRR: 1.2, paused: {}, filters: {}, history: [] }, rd('config.json', {}));
+config.filters = config.filters || {};
 const now = Math.floor(Date.now() / 1000), nowISO = new Date(now * 1000).toISOString();
 for (const [k, until] of Object.entries(config.paused)) if (Date.parse(until) / 1000 <= now) { delete config.paused[k]; config.history.push({ at: nowISO, by: 'coach-stats', change: `Resumed ${k}`, why: 'Pause period ended.' }); }
 CFG.buf = Math.min(LIMITS.buf[1], Math.max(LIMITS.buf[0], config.buf));
@@ -104,11 +107,22 @@ for (const [key, M] of Object.entries(MARKETS)) {
       state.seen[t.sig] = now;
       const def = PAIRS.concat(RETR).find((p) => p.k === t.k), cfT = +String(t.sig).split('|')[2];
       if (!cfT || now - cfT > FRESH * SEC[def.l]) continue;   // an old CF: the move already happened
-      const skip = config.paused[t.k] ? `paused until ${config.paused[t.k].slice(0, 10)}` : t.rr < config.minRR ? `reward:risk ${t.rr.toFixed(2)} under ${config.minRR}` : null;
-      const h = (PAIRS.concat(RETR)).find((p) => p.k === t.k).h;
+      // Conditions at the signal: the Coach learns which of them win
+      const feat = { d1: src['1d'].A.trend === (t.sell ? -1 : 1) ? 'with' : 'against', struct: t.retr == null ? 'n/a' : t.retr >= 0.5 ? 'main' : 'internal', session: sessionOf(now) };
+      // Rules from the Coach. A blocked setup is still followed as a SHADOW trade (no score), so the Coach can check the rule was right
+      const f = config.filters[t.k] || {}, blockedBy = [];
+      if (config.paused[t.k]) blockedBy.push('paused');
+      if (t.rr < config.minRR) blockedBy.push('minRR');
+      if (f.d1 && feat.d1 !== f.d1) blockedBy.push('d1');
+      if (f.struct && feat.struct !== 'n/a' && feat.struct !== f.struct) blockedBy.push('struct');
+      if (f.noSession && f.noSession.includes(feat.session)) blockedBy.push('session');
+      const shadow = blockedBy.length > 0;
+      const why = { paused: `paused until ${String(config.paused[t.k]).slice(0, 10)}`, minRR: `reward:risk ${t.rr.toFixed(2)} under ${config.minRR}`, d1: `rule: only ${f.d1} D1`, struct: `rule: only ${f.struct} structure`, session: `rule: not in ${feat.session}` };
+      const h = def.h;
       const tr = { id: `${key}-${t.k}-${now}`, market: key, label: M.label, dec: M.dec, k: t.k, name: t.name, pair: t.pair, h, side: t.sell ? 'sell' : 'buy',
-        entry: t.entry, stop: t.stop, t1: t.t1, rr: +t.rr.toFixed(2), buf: CFG.buf, opened: now, checked: now, status: skip ? 'skipped' : 'pending', R: null, note: skip || t.next };
-      if (!skip && (t.sell ? price >= t.entry : price <= t.entry)) {
+        entry: t.entry, stop: t.stop, t1: t.t1, rr: +t.rr.toFixed(2), buf: CFG.buf, opened: now, checked: now, status: 'pending', R: null, feat,
+        shadow, blockedBy, note: shadow ? `Shadow (${blockedBy.map((b) => why[b]).join(', ')})` : t.next };
+      if (t.sell ? price >= t.entry : price <= t.entry) {
         // price is already through the entry: fill at the market price, never at a better level than was available
         tr.entry = price; tr.status = 'open'; tr.filled = now;
         const r = Math.abs(tr.entry - tr.stop), rw = (tr.t1 - tr.entry) * (t.sell ? -1 : 1);
@@ -129,7 +143,8 @@ state.lastRun = now;
 const coach = rd('coach.json', { date: '' });
 const today = nowISO.slice(0, 10);
 if (coach.date !== today) {
-  const closed = trades.filter((x) => (x.status === 'win' || x.status === 'loss') && now - x.closed < 30 * 86400);
+  const closedAll = trades.filter((x) => (x.status === 'win' || x.status === 'loss') && now - x.closed < 30 * 86400);
+  const closed = closedAll.filter((x) => !x.shadow), shadows = closedAll.filter((x) => x.shadow);
   const stat = (arr) => { const w = arr.filter((x) => x.status === 'win').length; const R = arr.reduce((a, x) => a + x.R, 0); return { n: arr.length, w, wr: arr.length ? w / arr.length : null, R: +R.toFixed(2), exp: arr.length ? +(R / arr.length).toFixed(2) : null }; };
   const bySetup = {};
   for (const t of closed) (bySetup[t.k] = bySetup[t.k] || []).push(t);
@@ -151,6 +166,45 @@ if (coach.date !== today) {
   }
   const low = recent.filter((x) => x.rr < 1.5), ls = stat(low);
   if (ls.n >= 6 && ls.exp < 0 && config.minRR < 1.5) { change(`Minimum reward:risk ${config.minRR} → 1.5`, `Trades under 1.5R returned ${ls.exp}R each over ${ls.n} trades.`); config.minRR = 1.5; }
+  // ─── Self-evolution: learn filters from the conditions that lose, and drop them when shadow trades prove them wrong ───
+  const exp = (arr) => arr.length ? arr.reduce((a, x) => a + x.R, 0) / arr.length : 0;
+  for (const [k, arr] of Object.entries(bySetup)) {
+    if (arr.length < 8) continue;
+    const fl = config.filters[k] = config.filters[k] || {};
+    for (const fe of ['d1', 'struct']) {
+      if (fl[fe]) continue;
+      const g = {}; arr.forEach((x) => { const v = x.feat && x.feat[fe]; if (v && v !== 'n/a') (g[v] = g[v] || []).push(x); });
+      const vals = Object.entries(g).map(([v, a]) => ({ v, n: a.length, e: exp(a) }));
+      const bad = vals.find((x) => x.n >= 5 && x.e < -0.2), good = vals.find((x) => x.n >= 3 && x.e > 0.1);
+      if (bad && good) { fl[fe] = good.v; (fl.since = fl.since || {})[fe] = nowISO; change(`${k}: only ${good.v} ${fe === 'd1' ? 'D1' : 'structure'}`, `${bad.v}: ${bad.e.toFixed(2)}R over ${bad.n} trades; ${good.v}: +${good.e.toFixed(2)}R over ${good.n}.`); }
+    }
+    const gs = {}; arr.forEach((x) => { const v = x.feat && x.feat.session; if (v) (gs[v] = gs[v] || []).push(x); });
+    for (const [v, a] of Object.entries(gs)) {
+      if ((fl.noSession || []).includes(v) || a.length < 5 || exp(a) >= -0.2) continue;
+      const rest = arr.filter((x) => !(x.feat && x.feat.session === v));
+      if (rest.length >= 3 && exp(rest) > 0) { fl.noSession = (fl.noSession || []).concat(v); (fl.since = fl.since || {})['session:' + v] = nowISO; change(`${k}: skip the ${v} session`, `${exp(a).toFixed(2)}R over ${a.length} trades there; +${exp(rest).toFixed(2)}R elsewhere.`); }
+    }
+  }
+  // drop a rule when the trades it blocked would have paid (shadow expectancy > +0.2R over 5+), or after 21 days to re-test it
+  for (const [k, fl] of Object.entries(config.filters)) {
+    for (const fe of ['d1', 'struct']) {
+      if (!fl[fe]) continue;
+      const sh = shadows.filter((x) => x.k === k && (x.blockedBy || []).includes(fe));
+      const old = fl.since && fl.since[fe] && now - Date.parse(fl.since[fe]) / 1000 > 21 * 86400;
+      if ((sh.length >= 5 && exp(sh) > 0.2) || old) { change(`${k}: dropped the ${fe === 'd1' ? 'D1' : 'structure'} rule`, old ? '21 days old: re-testing without it.' : `The trades it blocked made +${exp(sh).toFixed(2)}R over ${sh.length}.`); delete fl[fe]; if (fl.since) delete fl.since[fe]; }
+    }
+    for (const v of (fl.noSession || []).slice()) {
+      const sh = shadows.filter((x) => x.k === k && (x.blockedBy || []).includes('session') && x.feat && x.feat.session === v);
+      const old = fl.since && fl.since['session:' + v] && now - Date.parse(fl.since['session:' + v]) / 1000 > 21 * 86400;
+      if ((sh.length >= 5 && exp(sh) > 0.2) || old) { fl.noSession = fl.noSession.filter((x) => x !== v); if (fl.since) delete fl.since['session:' + v]; change(`${k}: trading the ${v} session again`, old ? '21 days old: re-testing.' : `Blocked trades made +${exp(sh).toFixed(2)}R over ${sh.length}.`); }
+    }
+    if (!fl.d1 && !fl.struct && !(fl.noSession || []).length) delete config.filters[k];
+  }
+  // resume a paused setup early when its shadow trades recover
+  for (const k of Object.keys(config.paused)) {
+    const sh = shadows.filter((x) => x.k === k && (x.blockedBy || []).includes('paused'));
+    if (sh.length >= 4 && exp(sh) > 0.3) { delete config.paused[k]; change(`Resumed ${k} early`, `Shadow trades while paused made +${exp(sh).toFixed(2)}R over ${sh.length}.`); }
+  }
   wr('coach.json', { date: today, at: nowISO, stats, last14: rs, notes: notes.length ? notes : ['No change today: not enough evidence to move a rule.'] });
 }
 config.history = config.history.slice(-200);

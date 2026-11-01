@@ -16,3 +16,11 @@ stop buffer 0.10–0.25 × ATR, minimum reward:risk 1.2–2.5, pause a setup for
 ## Scorecard
 
 The Council page groups closed paper trades by setup and by market. A verdict needs at least 5 trades: "trust" averages more than +0.2R a trade, "avoid" loses more than 0.2R.
+
+## Self-evolution
+
+Every trade records its conditions at the signal (`feat`: D1 with/against, main/internal structure, session).
+Once a setup has 8+ closed trades, the daily Coach adds a rule when one condition loses (≤ −0.2R over 5+) while another wins
+(e.g. "swing: only with D1"), stored in `config.json` → `filters`. Setups a rule blocks are still followed as **shadow** trades
+(`shadow: true`, `blockedBy`), never scored; if they make more than +0.2R over 5+, the rule is dropped. Every rule is re-tested after 21 days,
+and a paused setup resumes early if its shadow trades recover.
