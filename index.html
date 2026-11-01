@@ -2210,6 +2210,11 @@
     .ms-offline-box code { font-family: var(--mono); font-size: 11px; }
     @media (max-width: 1000px) { .ms-grid4, .ms-td { grid-template-columns: minmax(0, 1fr); } .ms-chart { height: 360px; } .ms-pane.full .ms-chart { height: 480px; } }
     @media (max-width: 520px) { .ms-live { margin: 0 12px 16px; } .ms-right { margin-left: 0; } .ms-legend { position: static; padding: 5px 10px 0; } }
+    .ms-tr-q { display: flex; flex-wrap: wrap; gap: 6px; }
+    .ms-tr-q:empty { display: none; }
+    .ms-q { font: 600 10px var(--mono); padding: 2px 7px; border-radius: 3px; border: 1px solid var(--line); color: var(--ink-dim); }
+    .ms-q.good { color: #089981; border-color: rgba(8,153,129,.45); background: rgba(8,153,129,.08); }
+    .ms-q.weak { color: #f0a500; border-color: rgba(240,165,0,.45); background: rgba(240,165,0,.08); }
   </style>
 
   <div class="ms-live" id="ms-live" data-chart="light">
@@ -5758,8 +5763,20 @@ function msAnalyze(bars, N) {
       if ((e.dir < 0 && C[j] > e.top) || (e.dir > 0 && C[j] < e.bot)) e.endIdx = j;
     }
     if (e.vr) {
-      const d = Math.max(0.3*h, Math.abs(e.level - e.vr.p) * 0.25);
-      e.vrBox = e.dir < 0 ? { lo: e.vr.p, hi: e.vr.p + d } : { lo: e.vr.p - d, hi: e.vr.p };
+      // VR runs from the extreme to the last internal swing before it; a body close back through that swing confirms the reversal
+      const nextBrk = events[k+1] ? events[k+1].breakIdx : n - 1;
+      let lvl = null;
+      for (let j = e.vr.i - 1; j > e.breakIdx; j--) {
+        if (e.dir < 0 ? pivH(j, 2) : pivL(j, 2)) { lvl = e.dir < 0 ? H[j] : L[j]; break; }
+      }
+      if (lvl !== null && (e.dir < 0 ? lvl >= e.level : lvl <= e.level)) lvl = null;
+      if (lvl !== null) {
+        for (let j = e.vr.i + 1; j <= nextBrk && j < n; j++) if (e.dir < 0 ? C[j] > lvl : C[j] < lvl) { e.vrConfirmIdx = j; break; }
+        e.vrBox = e.dir < 0 ? { lo: e.vr.p, hi: lvl } : { lo: lvl, hi: e.vr.p };
+      } else {
+        const d = Math.max(0.3*h, Math.abs(e.level - e.vr.p) * 0.25);
+        e.vrBox = e.dir < 0 ? { lo: e.vr.p, hi: e.vr.p + d } : { lo: e.vr.p - d, hi: e.vr.p };
+      }
     }
     const stop = Math.min(n-1-w, events[k+1] ? events[k+1].breakIdx : n-1);
     for (let j = e.start+1; j <= stop; j++) {
@@ -5847,6 +5864,7 @@ if (/^#(market-structure|structure)$/.test(location.hash) || /market-structure\.
     { id: '4h',  label: 'H4',  role: 'Direction · BO',          sec: 14400, binance: '4h',  kraken: 240, poll: 120e3 },
     { id: '1h',  label: 'H1',  role: 'VR · CF',                 sec: 3600,  binance: '1h',  kraken: 60,  poll: 60e3 },
     { id: '15m', label: 'M15', role: 'Narrative · Barrier',     sec: 900,   binance: '15m', kraken: 15,  poll: 30e3 },
+    { id: '5m',  label: 'M5',  role: 'H1 barrier entry',        sec: 300,   binance: '5m',  kraken: 5,   poll: 20e3 },
     { id: '1m',  label: 'M1',  role: 'Entry trigger',           sec: 60,    binance: '1m',  kraken: 1,   poll: 10e3 },
   ];
   const BARS = 500, PIVOT = 6;
@@ -6030,7 +6048,8 @@ if (/^#(market-structure|structure)$/.test(location.hash) || /market-structure\.
   // ─── One chart pane per timeframe ───
   const panes = {};
   function makePane(tf) {
-    const el = $(`ms-c-${tf.id}`);
+    const el = document.getElementById(`ms-c-${tf.id}`);
+    if (!el) return null;
     const chart = LW.createChart(el, {
       autoSize: true,
       layout: { background: { type: 'solid', color: THEMES.light.bg }, textColor: THEMES.light.text, fontSize: 11 },
@@ -6096,8 +6115,8 @@ if (/^#(market-structure|structure)$/.test(location.hash) || /market-structure\.
       });
       // Higher-timeframe origins as dashed reference boxes (the barrier this TF trades from)
       if (G.show.htf) {
-        const idx = TFS.findIndex((x) => x.id === tf.id);
-        TFS.slice(0, idx).slice(-2).forEach((h) => {
+        const idx = ACTIVE.findIndex((x) => x.id === tf.id);
+        ACTIVE.slice(0, idx).filter((h) => h.id !== '5m').slice(-2).forEach((h) => {
           const hp = panes[h.id];
           const he = hp && hp.A && hp.A.last;
           if (!he || he.endIdx !== null) return;
@@ -6175,7 +6194,8 @@ if (/^#(market-structure|structure)$/.test(location.hash) || /market-structure\.
     new ResizeObserver(() => { if (!P.fitted && el.clientWidth > 0 && P.bars) requestAnimationFrame(P.fit); }).observe(el);
     return P;
   }
-  TFS.forEach((tf) => { panes[tf.id] = makePane(tf); });
+  TFS.forEach((tf) => { const p = makePane(tf); if (p) panes[tf.id] = p; });
+  const ACTIVE = TFS.filter((tf) => panes[tf.id]);
 
   // ─── Top-down checklist (Mosha SOP across timeframes) ───
   function topDown() {
@@ -6219,7 +6239,7 @@ if (/^#(market-structure|structure)$/.test(location.hash) || /market-structure\.
       document.title = `${fmt(price)} · ${INST.label} Structure`;
     }
     $('ms-td-inval').textContent = fmt(sell ? e.top : e.bot);
-    $('ms-td-align').innerHTML = TFS.map((tf) => {
+    $('ms-td-align').innerHTML = ACTIVE.map((tf) => {
       const p = panes[tf.id], tr = p.A ? p.A.trend : 0;
       const cls = tr === dir ? 'ok' : tr === -dir ? 'against' : '';
       return `<span class="ms-al ${cls}">${tf.label} ${tr < 0 ? '▼' : tr > 0 ? '▲' : '–'}</span>`;
@@ -6239,14 +6259,14 @@ if (/^#(market-structure|structure)$/.test(location.hash) || /market-structure\.
 
   // ─── Possible trades: the Mosha setup on three timeframe pairs ───
   const PAIRS = [
-    { k: 'swing',    name: 'Swing',    h: '4h',  l: '1h',  e: 'M15', up: null },
-    { k: 'intraday', name: 'Intraday', h: '1h',  l: '15m', e: 'M1',  up: '4h' },
+    { k: 'swing',    name: 'Swing',    h: '4h',  l: '1h',  e: 'M15 / M1', up: null },
+    { k: 'intraday', name: 'Intraday', h: '1h',  l: '5m',  e: 'M5 / M1', up: '4h' },
     { k: 'scalp',    name: 'Scalp',    h: '15m', l: '1m',  e: 'M1',  up: '1h' },
   ];
-  const LBL = { '4h': 'H4', '1h': 'H1', '15m': 'M15', '1m': 'M1' };
+  const LBL = { '4h': 'H4', '1h': 'H1', '15m': 'M15', '5m': 'M5', '1m': 'M1' };
   function buildSetup(pr, price) {
     const hp = panes[pr.h], lp = panes[pr.l];
-    if (!hp.A || !hp.A.last || !lp.A || !lp.bars) return null;
+    if (!hp || !lp || !hp.A || !hp.A.last || !lp.A || !lp.bars) return null;
     const e = hp.A.last, dir = e.dir, sell = dir < 0, sgn = sell ? -1 : 1, h = e.top - e.bot;
     const H = LBL[pr.h], Lo = LBL[pr.l], word = sell ? 'sell' : 'buy';
     const breakT = hp.bars[e.breakIdx].time;
@@ -6254,9 +6274,21 @@ if (/^#(market-structure|structure)$/.test(location.hash) || /market-structure\.
     const inOrigin = price >= e.bot && price <= e.top;
     const after = lp.A.events.filter((x) => lp.bars[x.breakIdx].time >= breakT);
     const vr = !!e.vr || after.some((x) => x.dir === -dir);
-    const touched = lp.bars.some((b) => b.time > breakT && (sell ? b.high >= e.bot : b.low <= e.top));
+    let touchT = null;
+    for (const b of lp.bars) if (b.time > breakT && (sell ? b.high >= e.bot : b.low <= e.top)) { touchT = b.time; break; }
+    const touched = touchT !== null;
     const ll = lp.A.last;
-    const cf = touched && vr && ll && ll.dir === dir && lp.bars[ll.breakIdx].time > breakT;
+    // PDF: the CF must form inside the Origin; QM beats a normal BO; Janda = BO Structure then BO in the same direction
+    const inZone = touched ? lp.A.events.filter((x) => lp.bars[x.breakIdx].time >= touchT) : [];
+    const cf = touched && vr && ll && ll.dir === dir && lp.bars[ll.breakIdx].time >= touchT;
+    let model = null;
+    if (cf) {
+      const flip = inZone.findIndex((x) => x.dir === dir && x.structure);
+      model = flip < 0 ? 'BO' : inZone.slice(flip + 1).some((x) => x.dir === dir) ? 'Janda' : 'QM';
+    }
+    const vrP = e.vr ? e.vr.p : hp.A.ext.p, far = sell ? e.top : e.bot;
+    const ext = lp.bars.filter((b) => b.time > breakT).reduce((m, b) => sell ? Math.max(m, b.high) : Math.min(m, b.low), sell ? -Infinity : Infinity);
+    const retr = vr && isFinite(ext) && far !== vrP ? Math.max(0, Math.min(1.5, (ext - vrP) / (far - vrP))) : null;
     const buf = Math.max(0.08 * h, price * 0.00005);
     let entry, stop;
     if (cf) { entry = ll.level; stop = sell ? ll.top + buf / 2 : ll.bot - buf / 2; }
@@ -6268,13 +6300,13 @@ if (/^#(market-structure|structure)$/.test(location.hash) || /market-structure\.
     const dist = Math.abs(price - entry);
     let state, cls, next;
     if (beyond) { state = 'INVALID'; cls = 'bad'; next = `Price is beyond the ${H} Origin. Wait for the next ${H} BO.`; }
-    else if (cf) { state = 'READY'; cls = 'ready'; next = `${Lo} CF confirmed inside the ${H} Origin. Enter on an ${pr.e} Barrier pattern near ${fmt(entry)}.`; }
-    else if (inOrigin || touched) { state = 'IN ORIGIN'; cls = 'near'; next = `Price is in the ${H} Origin. Wait for ${Lo} to print a BO ${sell ? 'Sell' : 'Buy'} (the CF), then ${word}.`; }
+    else if (cf) { state = 'READY'; cls = model === 'BO' ? 'near' : 'ready'; next = `${Lo} ${model === 'Janda' ? 'Janda (BO Structure, then BO ' + (sell ? 'Sell' : 'Buy') + ')' : model === 'QM' ? 'QM' : 'BO'} confirmed inside the ${H} Origin. Enter on the pullback to ${fmt(entry)} with an ${pr.e} Barrier, stop beyond ${fmt(stop)}.`; }
+    else if (inOrigin || touched) { state = 'IN ORIGIN'; cls = 'near'; next = `Price is in the ${H} Origin. Wait for ${Lo} to confirm with a QM or Janda (BO Structure ${sell ? 'Sell' : 'Buy'}, then BO ${sell ? 'Sell' : 'Buy'}), then ${word} the pullback.`; }
     else if (vr) { state = 'WAIT RETRACE'; cls = ''; next = `${H} VR is in. Wait for price to come back ${sell ? 'up' : 'down'} into ${fmt(e.bot)} – ${fmt(e.top)} (${fmt(dist)} pts away).`; }
     else { state = 'WAIT VR'; cls = ''; next = `${H} just broke ${sell ? 'down' : 'up'}. Let the move finish and reverse on ${Lo} before planning the ${word}.`; }
     const upP = pr.up && panes[pr.up];
     const align = !upP || !upP.A ? null : upP.A.trend === dir;
-    return { k: pr.k, name: pr.name, pair: `${H} → ${Lo}`, sell, entry, stop, t1, t2, rr, r, state, cls, next, align, upL: pr.up ? LBL[pr.up] : '', size: sizeText(r, price), invalid: beyond };
+    return { k: pr.k, name: pr.name, pair: `${H} → ${Lo}`, sell, entry, stop, t1, t2, rr, r, state, cls, next, align, upL: pr.up ? LBL[pr.up] : '', size: sizeText(r, price), invalid: beyond, model, retr };
   }
   function sizeText(r, price) {
     const usd = (v) => '$' + Math.ceil(v).toLocaleString('en-US');
@@ -6304,6 +6336,8 @@ if (/^#(market-structure|structure)$/.test(location.hash) || /market-structure\.
         `<div class="ms-tr-h"><span class="ms-chip ${t.sell ? 'ms-chip-sell' : 'ms-chip-buy'}">${t.sell ? 'SELL' : 'BUY'}</span><b>${t.name}</b><small>${t.pair}</small>${tag}<span class="ms-st ${t.cls}">${t.state}</span></div>` +
         `<div class="ms-tr-g"><span>Entry<b>${fmt(t.entry)}</b></span><span>Stop<b class="neg">${fmt(t.stop)}</b></span><span>Target 1<b class="pos">${fmt(t.t1)}</b></span>` +
         `<span>Target 2<b class="pos">${fmt(t.t2)}</b></span><span>Reward : risk<b>${t.rr.toFixed(1)} R</b></span><span>Size<b>${size}</b></span></div>` +
+        `<div class="ms-tr-q">${t.model ? `<span class="ms-q ${t.model === 'BO' ? 'weak' : 'good'}">CF · ${t.model === 'BO' ? 'BO normal' : t.model}</span>` : ''}` +
+        `${t.retr !== null ? `<span class="ms-q ${t.retr >= 0.5 ? 'good' : 'weak'}">Retrace ${t.retr >= 1 ? '100%+' : Math.round(t.retr * 100) + '%'} of VR→Origin${t.retr >= 0.5 ? ' ✓' : ' (under 50%)'}</span>` : ''}</div>` +
         `<div class="ms-tr-n">${t.next}</div></button>`;
     }).join('');
     $('ms-trades').querySelectorAll('.ms-trade').forEach((b) => b.addEventListener('click', () => { G.sel = b.dataset.k; G.planKey = ''; renderTrades(price); }));
@@ -6337,7 +6371,7 @@ if (/^#(market-structure|structure)$/.test(location.hash) || /market-structure\.
 
   function tickCountdowns() {
     const now = Date.now() / 1000;
-    TFS.forEach((tf) => {
+    ACTIVE.forEach((tf) => {
       const P = panes[tf.id], el = $(`ms-cd-${tf.id}`);
       if (!P.raw || !P.raw.length || G.csv) { el.textContent = ''; return; }
       const rem = Math.round(P.raw[P.raw.length - 1].time + tf.sec - now);
@@ -6353,13 +6387,13 @@ if (/^#(market-structure|structure)$/.test(location.hash) || /market-structure\.
   function startStream() {
     if (G.csv) return;
     try {
-      ws = new WebSocket('wss://stream.binance.com:9443/stream?streams=' + TFS.map((t) => `${INST.binance.toLowerCase()}@kline_${t.binance}`).join('/'));
+      ws = new WebSocket('wss://stream.binance.com:9443/stream?streams=' + ACTIVE.map((t) => `${INST.binance.toLowerCase()}@kline_${t.binance}`).join('/'));
       const kill = setTimeout(() => { if (!G.live) { try { ws.close(); } catch (e) {} startPolling(); } }, 8000);
       ws.onmessage = (m) => {
         const d = JSON.parse(m.data).data, k = d && d.k; if (!k) return;
         if (!G.live) { G.live = true; clearTimeout(kill); setStatus(); }
         const tf = TFS.find((t) => t.binance === k.i);
-        if (tf) panes[tf.id].push({ time: k.t / 1000, open: +k.o, high: +k.h, low: +k.l, close: +k.c, closed: k.x });
+        if (tf && panes[tf.id]) panes[tf.id].push({ time: k.t / 1000, open: +k.o, high: +k.h, low: +k.l, close: +k.c, closed: k.x });
         $('ms-updated').textContent = new Date().toLocaleTimeString();
       };
       ws.onclose = () => { if (G.live) { G.live = false; setStatus(); setTimeout(startStream, 3000); } };
@@ -6369,7 +6403,7 @@ if (/^#(market-structure|structure)$/.test(location.hash) || /market-structure\.
   let polling = false;
   function startPolling() {
     if (polling || G.csv) return; polling = true; setStatus();
-    TFS.forEach((tf) => {
+    ACTIVE.forEach((tf) => {
       const tick = async () => {
         try { const r = await fetchBars(tf); const P = panes[tf.id]; P.raw = r.bars; P.rebuild(true); $('ms-updated').textContent = new Date().toLocaleTimeString(); }
         catch (e) { /* keep last candles */ }
@@ -6395,7 +6429,7 @@ if (/^#(market-structure|structure)$/.test(location.hash) || /market-structure\.
   }
 
   async function boot() {
-    const res = await Promise.allSettled(TFS.map((tf) => fetchBars(tf)));
+    const res = await Promise.allSettled(ACTIVE.map((tf) => fetchBars(tf)));
     const ok = res.filter((r) => r.status === 'fulfilled');
     if (!ok.length) {
       const why = res.map((r) => r.reason && r.reason.message).filter(Boolean)[0] || '';
@@ -6407,11 +6441,11 @@ if (/^#(market-structure|structure)$/.test(location.hash) || /market-structure\.
       return;
     }
     G.source = ok[0].value.src;
-    res.forEach((r, k) => { if (r.status === 'fulfilled') { panes[TFS[k].id].raw = r.value.bars; } });
+    res.forEach((r, k) => { if (r.status === 'fulfilled') { panes[ACTIVE[k].id].raw = r.value.bars; } });
     if (INST.spot) await refreshSpot();
     const m1 = panes['1m'].raw;
     if (G.spot && m1) { const off = G.spot - m1[m1.length - 1].close; if (Math.abs(off) < 150) G.offset = off; }
-    TFS.forEach((tf) => { const P = panes[tf.id]; if (P.raw) P.rebuild(false); });
+    ACTIVE.forEach((tf) => { const P = panes[tf.id]; if (P.raw) P.rebuild(false); });
     topDown(); setStatus();
     $('ms-updated').textContent = new Date().toLocaleTimeString();
     if (INST.spot) setInterval(refreshSpot, 60e3);
@@ -6502,7 +6536,7 @@ if (/^#(market-structure|structure)$/.test(location.hash) || /market-structure\.
           .filter((b) => isFinite(b.time) && isFinite(b.close)).sort((a, b) => a.time - b.time);
         if (bars.length < 60) throw new Error('Need at least 60 bars to mark structure.');
         const step = bars[bars.length - 1].time - bars[bars.length - 2].time;
-        const tf = TFS.find((t) => t.sec === step);
+        const tf = ACTIVE.find((t) => t.sec === step);
         if (!tf) throw new Error('Export the chart on H4, H1, M15 or M1 so the timeframe can be matched.');
         G.csv = true; G.offset = 0; root.classList.remove('ms-offline');
         const P = panes[tf.id]; P.raw = bars.slice(-BARS); P.rebuild(false);
