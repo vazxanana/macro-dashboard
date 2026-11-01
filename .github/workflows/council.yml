@@ -1,13 +1,17 @@
 name: Council trader
 
-# Paper-trades every Mosha setup on all markets every 15 minutes and runs the
-# daily statistical Coach. Results go to the `council-data` branch (never main,
-# so Pages doesn't redeploy every run); the market-structure page reads them.
+# Paper-trades every Mosha setup on all markets and runs the daily statistical
+# Coach. Results go to the `council-data` branch (never main, so Pages doesn't
+# redeploy every run); the market-structure page reads them.
+#
+# Keeps itself alive: a push/dispatch run trades every 14 minutes for ~4.7 h,
+# then dispatches the next run (workflow_dispatch from GITHUB_TOKEN is allowed),
+# so the Trader runs 24/7 even if GitHub's cron is delayed. Cron runs do a
+# single round.
 on:
   schedule:
     - cron: '7,22,37,52 * * * *'
   workflow_dispatch:
-  # also run right away whenever the trader code changes on main
   push:
     branches: [main]
     paths:
@@ -16,15 +20,16 @@ on:
 
 permissions:
   contents: write
+  actions: write
 
 concurrency:
   group: council
-  cancel-in-progress: false
+  cancel-in-progress: true
 
 jobs:
   trade:
     runs-on: ubuntu-latest
-    timeout-minutes: 12
+    timeout-minutes: 330
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -41,15 +46,25 @@ jobs:
         with:
           node-version: '20'
 
-      - name: Run trader and coach
-        run: node council/trader.mjs data
-
-      - name: Save results
-        working-directory: data
+      - name: Trade (loop)
         run: |
-          git config user.name "mosha-council"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add -A
-          if git diff --cached --quiet; then echo "No changes"; exit 0; fi
-          git commit -q -m "Council run $(date -u +%Y-%m-%dT%H:%MZ)"
-          for i in 1 2 3; do git pull -q --rebase origin council-data && git push -q origin HEAD:council-data && break; sleep 5; done
+          git -C data config user.name "mosha-council"
+          git -C data config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          ROUNDS=1
+          if [ "${{ github.event_name }}" != "schedule" ]; then ROUNDS=20; fi
+          for i in $(seq 1 $ROUNDS); do
+            git -C data pull -q --rebase origin council-data || true
+            node council/trader.mjs data || echo "Trader round $i failed"
+            git -C data add -A
+            if ! git -C data diff --cached --quiet; then
+              git -C data commit -q -m "Council run $(date -u +%Y-%m-%dT%H:%MZ)"
+              for j in 1 2 3; do git -C data pull -q --rebase origin council-data && git -C data push -q origin HEAD:council-data && break; sleep 5; done
+            fi
+            if [ "$i" -lt "$ROUNDS" ]; then sleep 840; fi
+          done
+
+      - name: Start the next run
+        if: github.event_name != 'schedule'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh workflow run council.yml --ref main -R "${{ github.repository }}"
