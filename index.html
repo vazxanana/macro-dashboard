@@ -7274,11 +7274,28 @@ if (/^#(market-structure|structure)$/.test(location.hash) || /market-structure\.
     const get = (f, json) => fetch(`${CDATA}${f}?v=${bust}`, { cache: 'no-store' }).then((r) => r.ok ? (json ? r.json() : r.text()) : null).catch(() => null);
     const [trades, config, coach, snap, analysis, review] = await Promise.all([get('trades.json', 1), get('config.json', 1), get('coach.json', 1), get('snapshot.json', 1), get('analysis/latest.md'), get('reviews/latest.md')]);
     Object.assign(COUNCIL, { trades, config, coach, snap, analysis, review, at: Date.now() });
+    councilAlerts(trades);
     if (config) {
       CFG.buf = Math.min(0.25, Math.max(0.10, +config.buf || 0.15)); CFG.minRR = +config.minRR || 1.2; CFG.minRisk = Math.min(1.2, Math.max(0.4, +config.minRisk || 0.6)); CFG.paused = config.paused || {};
       const m1 = panes['1m']; if (m1 && m1.bars) topDown();
     }
     renderCouncil();
+  }
+  // Tell the user when the always-on Trader opens or closes a trade (scored trades only, once each)
+  function councilAlerts(trades) {
+    if (!Array.isArray(trades)) return;
+    let seen = null; try { seen = JSON.parse(localStorage.getItem('msCouncilSeen') || 'null'); } catch (e) {}
+    const first = !seen; seen = seen || {};
+    const fmtT = (x, v) => fmtI(v, { dec: x.dec != null ? x.dec : 2 });
+    trades.filter((x) => !x.shadow).forEach((x) => {
+      const st = x.status === 'pending' ? 'open' : x.status, prev = seen[x.id];
+      if (prev === st) return;
+      seen[x.id] = st;
+      if (first) return;                                  // first visit: just remember what's there
+      if (st === 'open' && !prev) notify(`Council opened ${x.label} ${x.side}`, `${x.name} ${x.pair}: entry ${fmtT(x, x.entry)}, stop ${fmtT(x, x.stop)}, target ${fmtT(x, x.t1)} (${x.rr}R).`);
+      else if (['win', 'loss', 'be'].includes(st)) notify(`Council ${st === 'win' ? 'won' : st === 'loss' ? 'lost' : 'closed at break-even'} on ${x.label}`, `${x.name} ${x.pair} ${x.side}: ${st === 'win' ? '+' + x.R : st === 'loss' ? '−1' : '0'}R.`);
+    });
+    try { localStorage.setItem('msCouncilSeen', JSON.stringify(seen)); } catch (e) {}
   }
   function renderCouncil() {
     const root = document.getElementById('v-council'); if (!root) return;
