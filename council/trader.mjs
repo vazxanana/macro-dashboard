@@ -47,7 +47,7 @@ async function kraken(pair, interval) {
 
 // ─── Config: the Coach's knobs, with their allowed ranges ───
 const LIMITS = { buf: [0.10, 0.25], minRR: [1.2, 2.5], minRisk: [0.4, 1.2] };
-const config = Object.assign({ buf: 0.15, minRR: 1.2, minRisk: 0.6, paused: {}, filters: {}, history: [] }, rd('config.json', {}));
+const config = Object.assign({ buf: 0.15, minRR: 1.2, minRisk: 0.6, be: null, paused: {}, filters: {}, history: [] }, rd('config.json', {}));
 config.filters = config.filters || {};
 const now = Math.floor(Date.now() / 1000), nowISO = new Date(now * 1000).toISOString();
 for (const [k, until] of Object.entries(config.paused)) if (Date.parse(until) / 1000 <= now) { delete config.paused[k]; config.history.push({ at: nowISO, by: 'coach-stats', change: `Resumed ${k}`, why: 'Pause period ended.' }); }
@@ -95,8 +95,17 @@ for (const [key, M] of Object.entries(MARKETS)) {
           else if (s ? b.low <= tr.t1 : b.high >= tr.t1) { tr.status = 'missed'; tr.closed = b.time; tr.R = 0; break; }
           else continue;
         }
-        if (s ? b.high >= tr.stop : b.low <= tr.stop) { tr.status = 'loss'; tr.closed = b.time; tr.R = -1; break; }
+        const r0 = tr.r0 || (tr.r0 = Math.abs(tr.entry - tr.stop));
+        if (s ? b.high >= tr.stop : b.low <= tr.stop) {
+          if (tr.beMoved) { tr.status = 'be'; tr.R = 0; } else { tr.status = 'loss'; tr.R = -1; }
+          tr.closed = b.time; break;
+        }
         if (s ? b.low <= tr.t1 : b.high >= tr.t1) { tr.status = 'win'; tr.closed = b.time; tr.R = tr.rr; break; }
+        // how far the trade went for (MFE) and against (MAE), in R: the Coach learns trade management from these
+        tr.mfe = +Math.max(tr.mfe || 0, ((s ? tr.entry - b.low : b.high - tr.entry) / r0)).toFixed(2);
+        tr.mae = +Math.max(tr.mae || 0, ((s ? b.high - tr.entry : tr.entry - b.low) / r0)).toFixed(2);
+        // break-even rule from the Coach: once the trade is config.be R in profit, the stop moves to the entry
+        if (config.be && !tr.beMoved && tr.mfe >= config.be) { tr.stop = tr.entry; tr.beMoved = true; }
       }
       tr.checked = bars.at(-1).time;
       if (tr.status === 'pending' && now - tr.opened > (WAIT[tr.h] || 86400)) { tr.status = 'expired'; tr.closed = now; tr.R = 0; }
@@ -144,7 +153,7 @@ state.lastRun = now;
 const coach = rd('coach.json', { date: '' });
 const today = nowISO.slice(0, 10);
 if (coach.date !== today) {
-  const closedAll = trades.filter((x) => (x.status === 'win' || x.status === 'loss') && now - x.closed < 30 * 86400);
+  const closedAll = trades.filter((x) => (x.status === 'win' || x.status === 'loss' || x.status === 'be') && now - x.closed < 30 * 86400);
   const closed = closedAll.filter((x) => !x.shadow), shadows = closedAll.filter((x) => x.shadow);
   const stat = (arr) => { const w = arr.filter((x) => x.status === 'win').length; const R = arr.reduce((a, x) => a + x.R, 0); return { n: arr.length, w, wr: arr.length ? w / arr.length : null, R: +R.toFixed(2), exp: arr.length ? +(R / arr.length).toFixed(2) : null }; };
   const bySetup = {};
@@ -163,7 +172,7 @@ if (coach.date !== today) {
   const recent = closed.filter((x) => now - x.closed < 14 * 86400), rs = stat(recent);
   if (rs.n >= 10) {
     if (rs.wr < 0.35 && config.minRisk < LIMITS.minRisk[1]) { const v = +Math.min(LIMITS.minRisk[1], config.minRisk + 0.1).toFixed(2); change(`Minimum stop ${config.minRisk} → ${v} ATR`, `Win rate ${Math.round(rs.wr * 100)}% over ${rs.n} trades: stops get hit by normal candle noise.`); config.minRisk = v; }
-    if (rs.wr < 0.35 && config.buf < LIMITS.buf[1]) { const v = +Math.min(LIMITS.buf[1], config.buf + 0.02).toFixed(2); change(`Stop buffer ${config.buf} → ${v} ATR`, `Win rate ${Math.round(rs.wr * 100)}% over ${rs.n} trades: stops may sit inside the noise.`); config.buf = v; }
+    else if (rs.wr < 0.35 && config.buf < LIMITS.buf[1]) { const v = +Math.min(LIMITS.buf[1], config.buf + 0.02).toFixed(2); change(`Stop buffer ${config.buf} → ${v} ATR`, `Win rate ${Math.round(rs.wr * 100)}% over ${rs.n} trades: stops may sit inside the noise.`); config.buf = v; }
     else if (rs.wr > 0.6 && config.buf > LIMITS.buf[0]) { const v = +Math.max(LIMITS.buf[0], config.buf - 0.01).toFixed(2); change(`Stop buffer ${config.buf} → ${v} ATR`, `Win rate ${Math.round(rs.wr * 100)}% over ${rs.n} trades: a tighter stop gives more R.`); config.buf = v; }
   }
   const low = recent.filter((x) => x.rr < 1.5), ls = stat(low);
@@ -201,6 +210,16 @@ if (coach.date !== today) {
       if ((sh.length >= 5 && exp(sh) > 0.2) || old) { fl.noSession = fl.noSession.filter((x) => x !== v); if (fl.since) delete fl.since['session:' + v]; change(`${k}: trading the ${v} session again`, old ? '21 days old: re-testing.' : `Blocked trades made +${exp(sh).toFixed(2)}R over ${sh.length}.`); }
     }
     if (!fl.d1 && !fl.struct && !(fl.noSession || []).length) delete config.filters[k];
+  }
+  // trade management: turn break-even on when 40%+ of recent losers had been +1R first; re-test it after 21 days
+  const recentLoss = closed.filter((x) => x.status === 'loss' && now - x.closed < 14 * 86400);
+  if (!config.be && recentLoss.length >= 8) {
+    const gaveBack = recentLoss.filter((x) => (x.mfe || 0) >= 1).length;
+    if (gaveBack / recentLoss.length >= 0.4) { config.be = 1; config.beSince = nowISO; change('Break-even at +1R turned on', `${gaveBack} of ${recentLoss.length} recent losers were +1R or more before turning around.`); }
+  } else if (config.be && config.beSince && now - Date.parse(config.beSince) / 1000 > 21 * 86400) {
+    const bes = closed.filter((x) => x.status === 'be'), wins = closed.filter((x) => x.status === 'win');
+    change('Break-even rule off for a re-test', `${bes.length} trades closed at break-even and ${wins.length} won over the last 30 days; testing without it.`);
+    config.be = null; delete config.beSince;
   }
   // resume a paused setup early when its shadow trades recover
   for (const k of Object.keys(config.paused)) {

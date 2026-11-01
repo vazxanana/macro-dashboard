@@ -663,13 +663,13 @@
         <li><b>CF:</b> once price is back inside the Origin, wait for the lower timeframe to break in the trade's direction. That break is the CF.</li>
         <li><b>Entry and stop:</b> enter on the pullback to the CF level. The stop goes just past the swing the CF break started from, padded by a small buffer sized to that timeframe's candles, and never closer than 0.6 × its average candle range (ATR), so normal noise can't stop it out. A body close beyond the Origin cancels the idea.</li>
         <li><b>Retracement trades:</b> once the HTF has made its VR, price pulls back toward the Origin. While that happens you can trade the lower timeframe the other way: in a sell, an H1 BO Buy is a buy up to the 50% line and the Origin, and vice versa. Take profit before the Origin, because that's where the main trend resumes. These cards are tagged <b>Retracement</b>.</li>
-        <li><b>Self-evolving council:</b> every paper trade records its conditions (D1 agreeing or not, main or internal structure, session). The Coach learns rules from what loses, such as "Swing: only with D1", and keeps following blocked setups as shadow trades. If the blocked trades start winning, it drops the rule. Every rule is re-tested after 21 days.</li>
+        <li><b>Self-evolving council:</b> every paper trade records its conditions (D1 agreeing or not, main or internal structure, session). The Coach learns rules from what loses, such as "Swing: only with D1", and keeps following blocked setups as shadow trades. If the blocked trades start winning, it drops the rule. Every rule is re-tested after 21 days. It also tracks how far each trade went for and against before closing, and turns on a break-even stop at +1R when many losers had been well in profit first.</li>
         <li><b>Timeframe pairs:</b> Position D1 → H1, Swing H4 → H1, Intraday H1 → M5, Scalp M15 → M1.</li>
       </ol>
     </div>
   </section>
 
-  <p class="foot">Live candles from Binance and Kraken public feeds; gold is aligned to XAU/USD spot via gold-api.com. Times are in your local zone.<br>Version 1 Nov 2026 · council on this market</p>
+  <p class="foot">Live candles from Binance and Kraken public feeds; gold is aligned to XAU/USD spot via gold-api.com. Times are in your local zone.<br>Version 1 Nov 2026 · break-even learning</p>
   <nav class="btab" aria-label="Main sections">
     <a href="#home" data-go="home"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M3 11l9-7 9 7v9a1 1 0 01-1 1h-5v-6H9v6H4a1 1 0 01-1-1z"></path></svg>Home</a>
     <a href="#setup" data-go="setup"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 6h16M4 12h10M4 18h6"></path></svg>Setup</a>
@@ -2263,7 +2263,7 @@ function msNextSetup(bars, A) {
     const showSh = document.getElementById('ms-c-shadow'), withSh = showSh && showSh.checked;
     const mine = document.getElementById('ms-c-mine'), only = mine && mine.checked;
     const list = only ? T.filter((x) => x.market === instKey) : T;
-    const closed = list.filter((x) => x.status === 'win' || x.status === 'loss');
+    const closed = list.filter((x) => x.status === 'win' || x.status === 'loss' || x.status === 'be');
     const w = closed.filter((x) => x.status === 'win').length, R = closed.reduce((a, x) => a + x.R, 0);
     const open = list.filter((x) => x.status === 'open' || x.status === 'pending');
     set('ms-c-status', C.snap ? `Trader last ran ${ago(Date.parse(C.snap.at) / 1000)} · ${Object.keys(C.snap.markets || {}).length} markets watched` : 'Waiting for the first Trader run (every 15 minutes once enabled).');
@@ -2276,12 +2276,12 @@ function msNextSetup(bars, A) {
       set('ms-c-eq', `<svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="none" role="img" aria-label="Trader equity in R over ${ch.length} closed trades"><line x1="0" x2="${W}" y1="${y(0)}" y2="${y(0)}" stroke="var(--line)" stroke-dasharray="4 4" vector-effect="non-scaling-stroke"/><path d="${pts.map((v, i) => `${i ? 'L' : 'M'}${(i / (pts.length - 1) * W).toFixed(1)},${y(v)}`).join('')}" fill="none" stroke="${eq >= 0 ? 'var(--buy)' : 'var(--sell)'}" stroke-width="2" vector-effect="non-scaling-stroke"/></svg>`);
     } else set('ms-c-eq', '');
     const tableList = (withSh ? TA : T).filter((x) => !only || x.market === instKey);
-    const ST = { win: ['pos', 'Win'], loss: ['neg', 'Loss'], open: ['', 'Open'], pending: ['', 'Waiting fill'], missed: ['', 'Missed'], expired: ['', 'Expired'], skipped: ['', 'Skipped'] };
+    const ST = { win: ['pos', 'Win'], loss: ['neg', 'Loss'], be: ['', 'Break-even'], open: ['', 'Open'], pending: ['', 'Waiting fill'], missed: ['', 'Missed'], expired: ['', 'Expired'], skipped: ['', 'Skipped'] };
     const dI = (x) => ({ dec: x.dec != null ? x.dec : 2 });
     set('ms-c-trades', tableList.length ? tableList.slice(0, 25).map((x) => `<tr class="${x.shadow ? 'sh' : ''}"><td>${ftime(x.opened + TZ)}</td><td><b>${esc(x.label)}</b></td><td>${esc(x.name)} <small>${esc(x.pair)}</small></td><td><span class="ms-chip ${x.side === 'sell' ? 'ms-chip-sell' : 'ms-chip-buy'}">${x.side.toUpperCase()}</span></td><td class="n">${fmtI(x.entry, dI(x))}</td><td class="n">${fmtI(x.stop, dI(x))}</td><td class="n">${fmtI(x.t1, dI(x))}</td><td class="${(ST[x.status] || ['', ''])[0]}" title="${esc(x.note || '')}">${x.shadow ? 'Shadow · ' : ''}${(ST[x.status] || ['', x.status])[1]}${x.R != null && (x.status === 'win' || x.status === 'loss') ? ` ${x.R > 0 ? '+' : ''}${x.R}R` : ''}</td></tr>`).join('')
       : `<tr><td colspan="8" class="empty">No council trades yet${only ? ' on this market' : ''}. The Trader takes every Ready setup it sees.</td></tr>`);
     // Scorecard: closed council trades grouped by setup and by market
-    const allClosed = (C.trades || []).filter((x) => !x.shadow && (x.status === 'win' || x.status === 'loss'));
+    const allClosed = (C.trades || []).filter((x) => !x.shadow && (x.status === 'win' || x.status === 'loss' || x.status === 'be'));
     const group = (keyFn, labelFn) => {
       const g = {}; allClosed.forEach((x) => { const k = keyFn(x); (g[k] = g[k] || { label: labelFn(x), arr: [] }).arr.push(x); });
       return Object.values(g).map(({ label, arr }) => { const w = arr.filter((x) => x.status === 'win').length, r = arr.reduce((a, x) => a + x.R, 0);
@@ -2298,7 +2298,7 @@ function msNextSetup(bars, A) {
     // Coach
     const cf = C.config || { buf: CFG.buf, minRR: CFG.minRR, paused: {}, history: [] };
     const paused = Object.entries(cf.paused || {});
-    set('ms-c-rules', `<span class="ms-q">Stop buffer ${cf.buf} × ATR</span><span class="ms-q">Min stop ${cf.minRisk || 0.6} × ATR</span><span class="ms-q">Min reward:risk ${cf.minRR}</span>` + (paused.length ? paused.map(([k, u]) => `<span class="ms-q weak">${esc(k)} paused to ${esc(u.slice(0, 10))}</span>`).join('') : '<span class="ms-q good">All setups active</span>') +
+    set('ms-c-rules', `<span class="ms-q">Stop buffer ${cf.buf} × ATR</span><span class="ms-q">Min stop ${cf.minRisk || 0.6} × ATR</span><span class="ms-q">${cf.be ? `Break-even at +${cf.be}R` : 'No break-even move'}</span><span class="ms-q">Min reward:risk ${cf.minRR}</span>` + (paused.length ? paused.map(([k, u]) => `<span class="ms-q weak">${esc(k)} paused to ${esc(u.slice(0, 10))}</span>`).join('') : '<span class="ms-q good">All setups active</span>') +
       Object.entries(cf.filters || {}).map(([k, f]) => [f.d1 ? `${k}: only ${f.d1} D1` : '', f.struct ? `${k}: only ${f.struct} structure` : '', (f.noSession || []).length ? `${k}: skip ${f.noSession.join(', ')}` : ''].filter(Boolean).map((t) => `<span class="ms-q">Learned · ${esc(t)}</span>`).join('')).join(''));
     const sh = (C.trades || []).filter((x) => x.shadow && (x.status === 'win' || x.status === 'loss')), shR = sh.reduce((a, x) => a + x.R, 0);
     set('ms-c-shadow-sum', sh.length ? `Shadow trades (blocked by rules) closed: ${sh.length}, ${shR >= 0 ? '+' : ''}${shR.toFixed(1)}R. ${shR > 0 ? 'Blocked trades are winning: the Coach will loosen the rule that blocks them.' : 'The rules are keeping you out of losing trades.'}` : 'Blocked setups are followed as shadow trades so the Coach can check every rule it adds.');
@@ -2374,7 +2374,7 @@ function msNextSetup(bars, A) {
       const done = J.filter((x) => x.res === 'win' || x.res === 'loss' || x.res === 'be'), w = done.filter((x) => x.res === 'win').length, l = done.filter((x) => x.res === 'loss').length;
       const R = done.reduce((a, x) => a + (+x.R || 0), 0), open = J.filter((x) => x.res === 'open').length;
       if (J.length) { set('h-j', `${done.length ? `${R >= 0 ? '+' : ''}${R.toFixed(1)}R` : `${J.length} logged`}`); set('h-j-sub', `${done.length} closed${w + l ? ` · ${Math.round(w / (w + l) * 100)}% win rate` : ''} · ${open} open`); }
-      if (COUNCIL.trades) { const cl = COUNCIL.trades.filter((x) => !x.shadow && (x.status === 'win' || x.status === 'loss')), cr = cl.reduce((a, x) => a + x.R, 0); set('h-council', cl.length ? `${cr >= 0 ? '+' : ''}${cr.toFixed(1)}R <small>from ${cl.length} trades</small>` : `${COUNCIL.trades.filter((x) => !x.shadow && (x.status === 'open' || x.status === 'pending')).length} open trades`); }
+      if (COUNCIL.trades) { const cl = COUNCIL.trades.filter((x) => !x.shadow && (x.status === 'win' || x.status === 'loss' || x.status === 'be')), cr = cl.reduce((a, x) => a + x.R, 0); set('h-council', cl.length ? `${cr >= 0 ? '+' : ''}${cr.toFixed(1)}R <small>from ${cl.length} trades</small>` : `${COUNCIL.trades.filter((x) => !x.shadow && (x.status === 'open' || x.status === 'pending')).length} open trades`); }
       if (G.bt) set('h-bt', `${G.bt.wr == null ? '—' : Math.round(G.bt.wr * 100) + '%'} win · ${G.bt.R >= 0 ? '+' : ''}${(+G.bt.R).toFixed(1)}R${G.bt.at ? ` <small>${new Date(G.bt.at).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })}</small>` : ''}`);
       const warn = document.getElementById('ms-news-warn'), hw = document.getElementById('h-warn');
       if (warn && hw) { hw.hidden = warn.hidden; hw.innerHTML = warn.innerHTML; }
