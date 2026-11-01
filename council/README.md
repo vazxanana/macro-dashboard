@@ -12,3 +12,7 @@ All results live on the `council-data` branch. Limits the Coach may change on it
 stop buffer 0.10–0.25 × ATR, minimum reward:risk 1.2–2.5, pause a setup for up to 7 days.
 
 `council/engine.mjs` is generated from the market-structure page's engine; regenerate it when the page's setup rules change.
+
+## Scorecard
+
+The Council page groups closed paper trades by setup and by market. A verdict needs at least 5 trades: "trust" averages more than +0.2R a trade, "avoid" loses more than 0.2R.

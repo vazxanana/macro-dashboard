@@ -7,6 +7,12 @@ on:
   schedule:
     - cron: '7,22,37,52 * * * *'
   workflow_dispatch:
+  # also run right away whenever the trader code changes on main
+  push:
+    branches: [main]
+    paths:
+      - 'council/**'
+      - '.github/workflows/council.yml'
 
 permissions:
   contents: write
