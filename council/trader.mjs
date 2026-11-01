@@ -5,6 +5,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { msAnalyze, CFG, PAIRS, RETR, buildSetup, buildRetrace, setMarket } from './engine.mjs';
+import { entryContext, startReview, watchReview, newsNear, lessons } from './review.mjs';
 
 const DIR = process.argv[2] || 'data';
 fs.mkdirSync(DIR, { recursive: true });
@@ -53,7 +54,7 @@ async function kraken(pair, interval) {
 
 // ─── Config: the Coach's knobs, with their allowed ranges ───
 const LIMITS = { buf: [0.10, 0.25], minRR: [1.2, 2.5], minRisk: [0.4, 1.2] };
-const config = Object.assign({ buf: 0.15, minRR: 1.2, minRisk: 0.6, be: null, paused: {}, pausedMarkets: {}, filters: {}, history: [] }, rd('config.json', {}));
+const config = Object.assign({ buf: 0.15, minRR: 1.2, minRisk: 0.6, be: null, fresh: FRESH, newsGuard: false, paused: {}, pausedMarkets: {}, filters: {}, history: [] }, rd('config.json', {}));
 config.filters = config.filters || {};
 const now = Math.floor(Date.now() / 1000), nowISO = new Date(now * 1000).toISOString();
 config.pausedMarkets = config.pausedMarkets || {};
@@ -64,6 +65,12 @@ CFG.minRisk = Math.min(LIMITS.minRisk[1], Math.max(LIMITS.minRisk[0], config.min
 const state = Object.assign({ seen: {}, lastRun: 0 }, rd('state.json', {}));
 let trades = rd('trades.json', []);
 const snapshot = { at: nowISO, markets: {}, errors: {} };
+
+// This week's economic calendar (high-impact news), refreshed every 6 hours: the review checks every loss against it
+if (!state.news || now - (state.news.at || 0) > 6 * 3600) {
+  try { const j = await (await fetch('https://nfs.faireconomy.media/ff_calendar_thisweek.json')).json(); if (Array.isArray(j)) state.news = { at: now, data: j.filter((e) => e.impact === 'High').map((e) => ({ title: e.title, country: e.country, date: e.date, impact: e.impact })) }; } catch (e) {}
+}
+const NEWS = (state.news && state.news.data) || [];
 
 let spot = null;
 try { const j = await (await fetch('https://api.gold-api.com/price/XAU')).json(); spot = +j.price || null; } catch (e) {}
@@ -96,6 +103,7 @@ for (const [key, M] of Object.entries(MARKETS)) {
     for (const tr of trades.filter((x) => x.market === key && (x.status === 'pending' || x.status === 'open'))) {
       const bars = (src['1m'].bars[0].time <= tr.checked ? src['1m'] : src['5m'].bars[0].time <= tr.checked ? src['5m'] : src['15m']).bars;
       const s = tr.side === 'sell';
+      let exitBar = null;
       for (const b of bars) {
         if (b.time < tr.checked) continue;
         if (tr.status === 'pending') {
@@ -106,9 +114,9 @@ for (const [key, M] of Object.entries(MARKETS)) {
         const r0 = tr.r0 || (tr.r0 = Math.abs(tr.entry - tr.stop));
         if (s ? b.high >= tr.stop : b.low <= tr.stop) {
           if (tr.beMoved) { tr.status = 'be'; tr.R = 0; } else { tr.status = 'loss'; tr.R = -1; }
-          tr.closed = b.time; break;
+          tr.closed = b.time; exitBar = b; break;
         }
-        if (s ? b.low <= tr.t1 : b.high >= tr.t1) { tr.status = 'win'; tr.closed = b.time; tr.R = tr.rr; break; }
+        if (s ? b.low <= tr.t1 : b.high >= tr.t1) { tr.status = 'win'; tr.closed = b.time; tr.R = tr.rr; exitBar = b; break; }
         // how far the trade went for (MFE) and against (MAE), in R: the Coach learns trade management from these
         tr.mfe = +Math.max(tr.mfe || 0, ((s ? tr.entry - b.low : b.high - tr.entry) / r0)).toFixed(2);
         tr.mae = +Math.max(tr.mae || 0, ((s ? b.high - tr.entry : tr.entry - b.low) / r0)).toFixed(2);
@@ -116,7 +124,15 @@ for (const [key, M] of Object.entries(MARKETS)) {
         if (config.be && !tr.beMoved && tr.mfe >= config.be) { tr.stop = tr.entry; tr.beMoved = true; }
       }
       tr.checked = bars.at(-1).time;
+      if (exitBar) startReview(tr, exitBar, key, NEWS);
       if (tr.status === 'pending' && now - tr.opened > (WAIT[tr.h] || 86400)) { tr.status = 'expired'; tr.closed = now; tr.R = 0; }
+    }
+
+    // ─── Review closed trades: keep watching price after the exit, then give a verdict (system error or market) ───
+    for (const tr of trades.filter((x) => x.market === key && (x.status === 'win' || x.status === 'loss' || x.status === 'be') && (!x.pm || x.pm.phase === 'watch'))) {
+      if (!tr.pm) { if (now - tr.closed > 7 * 86400) continue; startReview(tr, null, key, NEWS); }   // trades closed before reviews existed
+      const bars = (src['1m'].bars[0].time <= tr.pm.checked ? src['1m'] : src['5m'].bars[0].time <= tr.pm.checked ? src['5m'] : src['15m']).bars;
+      watchReview(tr, bars);
     }
 
     // ─── Take new Ready setups ───
@@ -125,7 +141,7 @@ for (const [key, M] of Object.entries(MARKETS)) {
       if (t.state !== 'READY' || state.seen[t.sig]) continue;
       state.seen[t.sig] = now;
       const def = PAIRS.concat(RETR).find((p) => p.k === t.k), cfT = +String(t.sig).split('|')[2];
-      if (!cfT || now - cfT > FRESH * SEC[def.l]) continue;   // an old CF: the move already happened
+      if (!cfT || now - cfT > (config.fresh || FRESH) * SEC[def.l]) continue;   // an old CF: the move already happened
       // Conditions at the signal: the Coach learns which of them win
       const feat = { d1: src['1d'].A.trend === (t.sell ? -1 : 1) ? 'with' : 'against', struct: t.retr == null ? 'n/a' : t.retr >= 0.5 ? 'main' : 'internal', session: sessionOf(now) };
       // Rules from the Coach. A blocked setup is still followed as a SHADOW trade (no score), so the Coach can check the rule was right
@@ -136,6 +152,8 @@ for (const [key, M] of Object.entries(MARKETS)) {
       const mkt = t.sell ? price >= t.entry : price <= t.entry;
       const rrNow = mkt ? (t.t1 - price) * (t.sell ? -1 : 1) / Math.abs(price - t.stop) : t.rr;
       if (!(rrNow >= config.minRR)) blockedBy.push('minRR');
+      // news guard (the Coach turns it on when news keeps stopping trades out): no short-term trade from 15 min before to 45 min after high-impact news
+      if (config.newsGuard && (def.h === '15m' || def.h === '1h') && newsNear(key, M.label, NEWS, now - 15 * 60, now + 45 * 60).length) blockedBy.push('news');
       if (f.d1 && feat.d1 !== f.d1) blockedBy.push('d1');
       if (f.struct && feat.struct !== 'n/a' && feat.struct !== f.struct) blockedBy.push('struct');
       if (f.noSession && f.noSession.includes(feat.session)) blockedBy.push('session');
@@ -143,11 +161,12 @@ for (const [key, M] of Object.entries(MARKETS)) {
       const live = trades.filter((x) => x.market === key && !x.shadow && (x.status === 'open' || x.status === 'pending'));
       if (live.length >= MAX_OPEN || live.some((x) => x.side !== (t.sell ? 'sell' : 'buy'))) blockedBy.push('exposure');
       const shadow = blockedBy.length > 0;
-      const why = { paused: `paused until ${String(config.paused[t.k]).slice(0, 10)}`, minRR: `reward:risk ${(isFinite(rrNow) ? rrNow : 0).toFixed(2)} under ${config.minRR}`, d1: `rule: only ${f.d1} D1`, struct: `rule: only ${f.struct} structure`, session: `rule: not in ${feat.session}`, exposure: 'already 2 trades or an opposite trade open on this market', market: `market paused until ${String(config.pausedMarkets[key]).slice(0, 10)}` };
+      const why = { paused: `paused until ${String(config.paused[t.k]).slice(0, 10)}`, minRR: `reward:risk ${(isFinite(rrNow) ? rrNow : 0).toFixed(2)} under ${config.minRR}`, d1: `rule: only ${f.d1} D1`, struct: `rule: only ${f.struct} structure`, session: `rule: not in ${feat.session}`, exposure: 'already 2 trades or an opposite trade open on this market', news: 'high-impact news within the hour', market: `market paused until ${String(config.pausedMarkets[key]).slice(0, 10)}` };
       const h = def.h;
       const tr = { id: `${key}-${t.k}-${now}`, market: key, label: M.label, dec: M.dec, k: t.k, name: t.name, pair: t.pair, h, side: t.sell ? 'sell' : 'buy',
         entry: t.entry, stop: t.stop, t1: t.t1, rr: +t.rr.toFixed(2), buf: CFG.buf, opened: now, checked: now, status: 'pending', R: null, feat,
         shadow, blockedBy, note: shadow ? `Shadow (${blockedBy.map((b) => why[b]).join(', ')})` : t.next };
+      try { tr.ctx = entryContext(t, src, def, M, price); } catch (e) {}
       if (mkt) {
         // price is already through the entry: fill at the market price, never at a better level than was available
         tr.entry = price; tr.status = 'open'; tr.filled = now;
@@ -237,6 +256,26 @@ if (coach.date !== today) {
     change('Break-even rule off for a re-test', `${bes.length} trades closed at break-even and ${wins.length} won over the last 30 days; testing without it.`);
     config.be = null; delete config.beSince;
   }
+  // ─── Lessons from the trade reviews: act on system errors that keep repeating (live and shadow losses, last 14 days) ───
+  const rl = trades.filter((x) => x.status === 'loss' && x.pm && x.pm.phase === 'done' && now - x.closed < 14 * 86400);
+  const cnt = (c) => rl.filter((x) => x.pm.cause === c || (x.pm.factors || []).includes(c)).length, share = (c) => rl.length ? cnt(c) / rl.length : 0;
+  if (rl.length >= 6) {
+    if (cnt('hunt') >= 3 && share('hunt') >= 0.3 && config.buf < LIMITS.buf[1]) { const v = +Math.min(LIMITS.buf[1], config.buf + 0.02).toFixed(2); change(`Stop buffer ${config.buf} → ${v} ATR`, `Reviews: ${cnt('hunt')} of ${rl.length} losses were stopped out and then went to the target (stop hunted).`); config.buf = v; }
+    if (cnt('noise') >= 3 && config.minRisk < LIMITS.minRisk[1]) { const v = +Math.min(LIMITS.minRisk[1], config.minRisk + 0.1).toFixed(2); change(`Minimum stop ${config.minRisk} → ${v} ATR`, `Reviews: ${cnt('noise')} losses had a stop inside one normal candle.`); config.minRisk = v; }
+    if (cnt('late') >= 3 && share('late') >= 0.3 && (config.fresh || FRESH) > 6) { const v = (config.fresh || FRESH) - 2; change(`Fresh signals only: ${config.fresh || FRESH} → ${v} candles`, `Reviews: ${cnt('late')} of ${rl.length} losses were late entries.`); config.fresh = v; }
+    if (cnt('news') >= 3 && !config.newsGuard) { config.newsGuard = true; config.newsSince = nowISO; change('News guard on', `Reviews: ${cnt('news')} losses came from high-impact news; no short-term trades from 15 min before to 45 min after news.`); }
+  }
+  // break-even that keeps costing wins: move it later
+  const beR = trades.filter((x) => x.status === 'be' && x.pm && x.pm.phase === 'done' && now - x.closed < 14 * 86400);
+  const beCost = beR.filter((x) => x.pm.cause === 'becost').length;
+  if (config.be && config.be < 2 && beCost >= 3 && beCost > beR.length - beCost) { change(`Break-even ${config.be}R → ${config.be + 0.5}R`, `Reviews: ${beCost} of ${beR.length} break-even exits then went on to the target.`); config.be = config.be + 0.5; }
+  // re-test the news guard after 21 days, using its shadow trades
+  if (config.newsGuard && config.newsSince && now - Date.parse(config.newsSince) / 1000 > 21 * 86400) {
+    const sh = shadows.filter((x) => (x.blockedBy || []).includes('news'));
+    if (!(sh.length >= 3 && exp(sh) < 0)) { config.newsGuard = false; delete config.newsSince; change('News guard off for a re-test', sh.length ? `Trades it blocked made ${exp(sh).toFixed(2)}R over ${sh.length}.` : '21 days old: re-testing without it.'); }
+    else config.newsSince = nowISO;
+  }
+
   // markets: pause one for 3 days when it loses (6+ trades, worse than -0.3R each); resume early if its shadow trades recover
   const byMarket = {}; closed.forEach((x) => (byMarket[x.market] = byMarket[x.market] || []).push(x));
   for (const [m, arr] of Object.entries(byMarket)) {
@@ -253,13 +292,14 @@ if (coach.date !== today) {
     const sh = shadows.filter((x) => x.k === k && (x.blockedBy || []).includes('paused'));
     if (sh.length >= 4 && exp(sh) > 0.3) { delete config.paused[k]; change(`Resumed ${k} early`, `Shadow trades while paused made +${exp(sh).toFixed(2)}R over ${sh.length}.`); }
   }
-  wr('coach.json', { date: today, at: nowISO, stats, last14: rs, notes: notes.length ? notes : ['No change today: not enough evidence to move a rule.'] });
+  wr('coach.json', { date: today, at: nowISO, stats, last14: rs, lessons: lessons(trades, now), notes: notes.length ? notes : ['No change today: not enough evidence to move a rule.'] });
 }
 config.history = config.history.slice(-200);
 
 wr('config.json', config);
 wr('state.json', state);
 wr('trades.json', trades);
+snapshot.lessons = lessons(trades, now);
 wr('snapshot.json', snapshot);
 const open = trades.filter((x) => x.status === 'open' || x.status === 'pending').length;
 console.log(`Council run ${nowISO}: ${Object.keys(snapshot.markets).length} markets, ${Object.keys(snapshot.errors).length} errors, ${open} open/pending trades, ${trades.length} total.`);

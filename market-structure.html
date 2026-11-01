@@ -345,7 +345,21 @@
   .c-auto input { width: 20px; height: 20px; accent-color: var(--accent); flex: none; }
   .c-auto b { display: block; font-size: 13px; } .c-auto small { color: var(--ink-dim); font-size: 11px; line-height: 1.4; display: block; }
   .c-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
-  .c-trader, .c-score { grid-column: 1 / -1; }
+  .c-trader, .c-score, .c-pmc { grid-column: 1 / -1; }
+  .c-pm-bar { display: flex; height: 10px; border-radius: 5px; overflow: hidden; background: var(--line-soft); gap: 2px; }
+  .c-pm-bar i, .c-pm-k i { display: block; }
+  .c-pm-bar .sys, .c-pm-k .sys { background: #f2b33d; } .c-pm-bar .mkt, .c-pm-k .mkt { background: var(--ink-faint); }
+  .c-pm-k { display: flex; flex-wrap: wrap; gap: 14px; margin: 8px 0 4px; font-size: 12px; color: var(--ink-dim); }
+  .c-pm-k span { display: inline-flex; align-items: center; gap: 6px; } .c-pm-k i { width: 10px; height: 10px; border-radius: 3px; }
+  .c-pm { list-style: none; margin: 10px 0 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 340px), 1fr)); gap: 10px; }
+  .c-pm-i { border: 1px solid var(--line); border-left: 3px solid var(--ink-faint); border-radius: 10px; padding: 10px 12px; font-size: 12px; color: var(--ink-dim); }
+  .c-pm-i.system { border-left-color: #f2b33d; }
+  .c-pm-i p { margin: 6px 0 0; line-height: 1.45; }
+  .c-pm-h { display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px 8px; } .c-pm-h b { color: var(--ink); font-size: 13px; } .c-pm-h small { flex-basis: 100%; color: var(--ink-faint); }
+  .c-pm-l { color: var(--ink); } .c-pm-f { color: var(--ink-faint); }
+  .c-pm-v { display: inline-block; font-size: 10px; font-weight: 700; letter-spacing: .4px; text-transform: uppercase; padding: 2px 6px; border-radius: 5px; background: var(--panel-raised); color: var(--ink-dim); margin-left: 6px; white-space: nowrap; }
+  .c-pm-h .c-pm-v { margin-left: 0; }
+  .c-pm-v.system { background: color-mix(in srgb, #f2b33d 18%, transparent); color: #f2b33d; }
   .c-sc { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
   .c-t td.n.pos { color: var(--buy); } .c-t td.n.neg { color: var(--sell); }
   .c-good, .c-bad, .c-few { font: 700 10px var(--mono); padding: 2px 7px; border-radius: 4px; }
@@ -584,7 +598,7 @@
     </div>
     <div class="c-grid">
       <div class="card c-trader">
-        <div class="ms-k"><span>Trader · paper trades, all markets, every 15 min</span><span class="c-tog"><label class="c-mine"><input type="checkbox" id="ms-c-shadow"> Show shadow trades</label><label class="c-mine"><input type="checkbox" id="ms-c-mine"> This market only</label></span></div>
+        <div class="ms-k"><span>Trader · paper trades, all markets, every 4 min</span><span class="c-tog"><label class="c-mine"><input type="checkbox" id="ms-c-shadow"> Show shadow trades</label><label class="c-mine"><input type="checkbox" id="ms-c-mine"> This market only</label></span></div>
         <div class="c-kpi" id="ms-c-kpi"></div>
         <div class="c-eq" id="ms-c-eq"></div>
         <div class="ms-bt-wrap"><table class="ms-bt-t c-t"><thead><tr><th>Opened</th><th>Market</th><th>Setup</th><th>Side</th><th class="n">Entry</th><th class="n">Stop</th><th class="n">Target 1</th><th>Result</th></tr></thead><tbody id="ms-c-trades"></tbody></table></div>
@@ -596,6 +610,11 @@
           <div class="ms-bt-wrap"><table class="ms-bt-t c-t"><thead><tr><th>Market</th><th class="n">Trades</th><th class="n">Win rate</th><th class="n">Avg</th><th class="n">Total</th><th>Verdict</th></tr></thead><tbody id="ms-c-sc-mkt"></tbody></table></div>
         </div>
         <p class="ms-note" style="margin:10px 0 0">From the council's closed paper trades. A verdict needs at least 5 trades: "trust" averages more than +0.2R a trade, "avoid" loses more than 0.2R.</p>
+      </div>
+      <div class="card c-pmc">
+        <div class="ms-k">Trade reviews · was it our system or the market?</div>
+        <div id="ms-c-pm-sum"></div>
+        <ul class="c-pm" id="ms-c-pm"></ul>
       </div>
       <div class="card c-analyst">
         <div class="ms-k">Analyst · weekly brief</div>
@@ -851,7 +870,6 @@ function msNextSetup(bars, A) {
   }
   return { sell, phase, steps, zone, invalid: sell ? e.top : e.bot, target, proj, e, price };
 }
-
 
 
 // ═══ MOSHA LIVE MULTI-TIMEFRAME CHARTS — live candles for gold, crypto and forex ═══
@@ -2323,8 +2341,16 @@ function msNextSetup(bars, A) {
     const tableList = (withSh ? TA : T).filter((x) => !only || x.market === instKey);
     const ST = { win: ['pos', 'Win'], loss: ['neg', 'Loss'], be: ['', 'Break-even'], open: ['', 'Open'], pending: ['', 'Waiting fill'], missed: ['', 'Missed'], expired: ['', 'Expired'], skipped: ['', 'Skipped'] };
     const dI = (x) => ({ dec: x.dec != null ? x.dec : 2 });
-    set('ms-c-trades', tableList.length ? tableList.slice(0, 25).map((x) => `<tr class="${x.shadow ? 'sh' : ''}"><td>${ftime(x.opened + TZ)}</td><td><b>${esc(x.label)}</b></td><td>${esc(x.name)} <small>${esc(x.pair)}</small></td><td><span class="ms-chip ${x.side === 'sell' ? 'ms-chip-sell' : 'ms-chip-buy'}">${x.side.toUpperCase()}</span></td><td class="n">${fmtI(x.entry, dI(x))}</td><td class="n">${fmtI(x.stop, dI(x))}</td><td class="n">${fmtI(x.t1, dI(x))}</td><td class="${(ST[x.status] || ['', ''])[0]}" title="${esc(x.note || '')}">${x.shadow ? 'Shadow · ' : ''}${(ST[x.status] || ['', x.status])[1]}${x.R != null && (x.status === 'win' || x.status === 'loss') ? ` ${x.R > 0 ? '+' : ''}${x.R}R` : ''}</td></tr>`).join('')
+    set('ms-c-trades', tableList.length ? tableList.slice(0, 25).map((x) => `<tr class="${x.shadow ? 'sh' : ''}"><td>${ftime(x.opened + TZ)}</td><td><b>${esc(x.label)}</b></td><td>${esc(x.name)} <small>${esc(x.pair)}</small></td><td><span class="ms-chip ${x.side === 'sell' ? 'ms-chip-sell' : 'ms-chip-buy'}">${x.side.toUpperCase()}</span></td><td class="n">${fmtI(x.entry, dI(x))}</td><td class="n">${fmtI(x.stop, dI(x))}</td><td class="n">${fmtI(x.t1, dI(x))}</td><td class="${(ST[x.status] || ['', ''])[0]}" title="${esc(x.note || '')}">${x.shadow ? 'Shadow · ' : ''}${(ST[x.status] || ['', x.status])[1]}${x.R != null && (x.status === 'win' || x.status === 'loss') ? ` ${x.R > 0 ? '+' : ''}${x.R}R` : ''}${pmChip(x)}</td></tr>`).join('')
       : `<tr><td colspan="8" class="empty">No council trades yet${only ? ' on this market' : ''}. The Trader takes every Ready setup it sees.</td></tr>`);
+    // Trade reviews: every loss studied — our system's error, or just the market?
+    const rv = (C.trades || []).filter((x) => x.pm && x.pm.cause && (withSh || !x.shadow) && (!only || x.market === instKey)).sort((a, b) => b.closed - a.closed);
+    const rvL = rv.filter((x) => x.status === 'loss'), sysL = rvL.filter((x) => x.pm.verdict === 'system').length;
+    const L = C.snap && C.snap.lessons;
+    set('ms-c-pm-sum', rvL.length ? `<div class="c-pm-bar" role="img" aria-label="${sysL} of ${rvL.length} losses were system errors"><i class="sys" style="flex:${sysL}"></i><i class="mkt" style="flex:${rvL.length - sysL}"></i></div><p class="c-pm-k"><span><i class="sys"></i>System error <b>${sysL}</b></span><span><i class="mkt"></i>Market <b>${rvL.length - sysL}</b></span><span>of ${rvL.length} reviewed loss${rvL.length === 1 ? '' : 'es'}</span></p>` +
+      (L && L.top && L.top.length ? `<div class="c-sub">What to fix</div><ul class="c-notes">${L.top.map((t) => `<li>${esc(t)}</li>`).join('')}</ul>` : '')
+      : '<p class="ms-note">Each closed trade is studied: what price did before, during and after it. Losses get a verdict: a system error to fix, or just the market.</p>');
+    set('ms-c-pm', rv.slice(0, 12).map((x) => `<li class="c-pm-i ${x.pm.verdict}"><div class="c-pm-h"><span class="c-pm-v ${x.pm.verdict}">${x.pm.verdict === 'system' ? 'System' : 'Market'}</span><b>${esc(x.pm.title)}</b><small>${esc(x.label)} · ${esc(x.name)} ${esc(x.pair)} · ${x.side} · ${x.status === 'loss' ? 'loss' : x.status === 'win' ? `win +${x.R}R` : 'break-even'}${x.shadow ? ' · shadow' : ''} · ${ago(x.closed)}${x.pm.phase === 'watch' ? ' · still watching' : ''}</small></div><p>${esc(x.pm.detail)}</p><p class="c-pm-l">Lesson: ${esc(x.pm.lesson)}</p>${(x.pm.factors || []).length ? `<p class="c-pm-f">Also: ${x.pm.factors.map((f) => esc(PM_NAME[f] || f)).join(', ')}</p>` : ''}</li>`).join('') || '');
     // Scorecard: closed council trades grouped by setup and by market
     const allClosed = (C.trades || []).filter((x) => !x.shadow && (x.status === 'win' || x.status === 'loss' || x.status === 'be'));
     const group = (keyFn, labelFn) => {
@@ -2354,6 +2380,8 @@ function msNextSetup(bars, A) {
     renderHome();
     const m1p = panes['1m']; councilHere(m1p && m1p.bars ? m1p.bars[m1p.bars.length - 1].close : null);
   }
+  const PM_NAME = { news: 'news spike', gap: 'gap through the stop', noise: 'stop too tight', hunt: 'stop hunted', gaveback: 'gave back profit', late: 'late entry', against: 'against D1', 'retrace-fail': 'retracement never came', reversal: 'real reversal', normal: 'normal loss', becost: 'break-even cost a win', besaved: 'break-even saved it', leftmoney: 'left money', clean: 'clean win' };
+  const pmChip = (x) => x.pm && x.pm.cause ? `<span class="c-pm-v ${x.pm.verdict}" title="${esc(x.pm.detail + ' Lesson: ' + x.pm.lesson)}">${esc(PM_NAME[x.pm.cause] || x.pm.cause)}</span>` : '';
   // Council trades on the market you're viewing, with live result in R
   function councilHere(price) {
     const el = document.getElementById('ms-c-here'); if (!el) return;
@@ -2455,7 +2483,6 @@ function msNextSetup(bars, A) {
 
   boot();
 })();
-
 </script>
 </body>
 </html>
