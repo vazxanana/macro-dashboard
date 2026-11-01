@@ -1,5 +1,5 @@
-// Mosha structure engine for the council trader (Node). Generated from the market-structure page:
-// the same msAnalyze + setup rules, so the always-on trader and the page agree.
+// Mosha structure engine for the council trader (Node). Generated from the market-structure page
+// (scratchpad gen_engine.py): the same msAnalyze + setup rules, so the always-on trader and the page agree.
 // ═══ MOSHA STRUCTURE ENGINE (pure functions, no DOM) ═══
 function msAnalyze(bars, N) {
   const H = bars.map(b=>b.high), L = bars.map(b=>b.low), C = bars.map(b=>b.close), n = bars.length;
@@ -178,7 +178,7 @@ const panes = {};
 const fmt = (v) => (v == null || !isFinite(v)) ? '—' : Number(v).toLocaleString('en-US', { minimumFractionDigits: CUR.dec, maximumFractionDigits: CUR.dec });
 const sizeText = () => '';
 // Council rules (stop buffer, paused setups, minimum R) — the Coach tunes these; the page loads them from the council data
-const CFG = { buf: 0.15, minRR: 1.2, paused: {} };
+const CFG = { buf: 0.15, minRR: 1.2, minRisk: 0.6, paused: {} };
 const PAIRS = [
   { k: 'position', name: 'Position', h: '1d',  l: '1h',  e: 'H1 / M5', up: null },
   { k: 'swing',    name: 'Swing',    h: '4h',  l: '1h',  e: 'M15 / M1', up: '1d' },
@@ -223,6 +223,9 @@ function buildSetup(pr, price, src = panes) {
     anchor = sell ? ll.top : ll.bot; buf = Math.max(CFG.buf * atr(lp.bars), spr);
     entry = ll.level; stop = anchor + (sell ? buf : -buf);
     stopWhy = `${Lo} CF ${sell ? 'high' : 'low'} ${fmt(anchor)}`;
+    // never closer than minRisk × ATR: a stop inside one normal candle is just noise
+    const floor = CFG.minRisk * atr(lp.bars);
+    if (Math.abs(entry - stop) < floor) { stop = entry + (sell ? floor : -floor); buf = Math.abs(stop - anchor); stopWhy += ` (widened to ${CFG.minRisk} × ${Lo} ATR)`; }
   } else {
     anchor = sell ? e.top : e.bot; buf = Math.max(0.1 * atr(hp.bars), spr);
     entry = sell ? e.bot + 0.5 * h : e.top - 0.5 * h; stop = anchor + (sell ? buf : -buf);
@@ -272,6 +275,8 @@ function buildRetrace(pr, price, src = panes) {
     anchor = buy ? ll.bot : ll.top; buf = Math.max(CFG.buf * atr(lp.bars), spr);
     entry = ll.level; stop = anchor - sgn * buf;
     stopWhy = `${Lo} ${buy ? 'low' : 'high'} ${fmt(anchor)}`;
+    const floor = CFG.minRisk * atr(lp.bars);
+    if (Math.abs(entry - stop) < floor) { stop = entry - sgn * floor; buf = Math.abs(stop - anchor); stopWhy += ` (widened to ${CFG.minRisk} × ${Lo} ATR)`; }
   } else {
     anchor = vrP; buf = Math.max(0.1 * atr(hp.bars), spr);
     entry = vrP + sgn * 0.2 * Math.abs(near - vrP); stop = anchor - sgn * buf;
