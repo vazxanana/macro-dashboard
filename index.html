@@ -6186,7 +6186,9 @@ if (/^#(market-structure|structure)$/.test(location.hash) || /market-structure\.
       chip.textContent = sell ? 'BEARISH' : 'BULLISH';
       chip.className = 'ms-chip ' + (sell ? 'ms-chip-sell' : 'ms-chip-buy');
       const lastBO = `${e.structure ? 'BO Structure' : e.dir < 0 ? 'BO Sell' : 'BO Buy'} ${fmt(e.level)} · ${ftime(P.bars[e.breakIdx].time)}`;
-      box.innerHTML = `<span>Last <b>${lastBO}</b></span><span>Origin <b>${fmt(e.bot)} – ${fmt(e.top)}</b></span><span>${P.S ? P.S.phase : ''}</span>`;
+      const vrP = e.vr ? e.vr.p : (A.ext ? A.ext.p : null), mid = vrP === null ? null : ((e.dir < 0 ? e.top : e.bot) + vrP) / 2;
+      box.innerHTML = `<span>Last <b>${lastBO}</b></span><span>Origin <b>${fmt(e.bot)} – ${fmt(e.top)}</b></span>` +
+        (mid !== null ? `<span>50% <b>${fmt(mid)}</b></span><span>${e.vr ? 'VR' : 'Extreme'} <b>${fmt(vrP)}</b></span>` : '') + `<span>${P.S ? P.S.phase : ''}</span>`;
     };
     P.legend = function (b, prev) {
       if (!b) return;
@@ -6896,7 +6898,7 @@ if (/^#(market-structure|structure)$/.test(location.hash) || /market-structure\.
     const badge = document.getElementById('ms-scan-badge');
     if (badge) { badge.hidden = !nReady; badge.textContent = `${nReady} market${nReady === 1 ? '' : 's'} ready`; }
     const meta = document.getElementById('ms-scan-meta');
-    renderHome();
+    renderHome(); renderMk();
     if (meta) meta.textContent = SCAN.busy ? `Scanning ${Object.keys(SCAN.res).length} / ${keys.length}…` : SCAN.at ? `${nReady} ready · scanned ${new Date(SCAN.at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}` : '';
   }
   async function scanAll() {
@@ -7138,6 +7140,42 @@ if (/^#(market-structure|structure)$/.test(location.hash) || /market-structure\.
     const mark = k ? '' : `<b style="left:${((now - t0) / 864).toFixed(2)}%" title="Now"></b>`;
     return `<div class="sbar"><div class="sbar-cap">${cap}</div>${rows}<div class="sbar-ax"><span></span><div class="sbar-t">${[0, 6, 12, 18].map((h) => `<em style="left:${h / 24 * 100}%">${String(h).padStart(2, '0')}:00</em>`).join('')}${mark}</div></div></div>`;
   }
+
+  // ─── Market switcher: search every market, see which ones are Ready ───
+  const mkList = document.getElementById('ms-mk-list'), mkQ = document.getElementById('ms-mk-q'), mkBox = document.getElementById('ms-mk');
+  function renderMk() {
+    const mkList = document.getElementById('ms-mk-list'), mkQ = document.getElementById('ms-mk-q');   // looked up here: renderScan can run before the consts below exist
+    if (!mkList) return;
+    const q = (mkQ && mkQ.value || '').trim().toLowerCase();
+    const groups = {};
+    Object.entries(INSTRUMENTS).forEach(([k, I]) => {
+      if (q && !(I.label + ' ' + I.name + ' ' + I.group).toLowerCase().includes(q)) return;
+      (groups[I.group] = groups[I.group] || []).push([k, I]);
+    });
+    const html = Object.entries(groups).map(([g, arr]) => `<li class="mk-g">${g}</li>` + arr.map(([k, I]) => {
+      const r = SCAN.res[k], best = r && r.list && r.list[0];
+      const st = best ? `<span class="ms-st ${best.cls}">${best.state}</span>` : '<span class="mk-wait">—</span>';
+      const px = r && r.price ? fmtI(r.price, I) : '';
+      return `<li><a href="?s=${k}"${k === instKey ? ' aria-current="true" class="cur"' : ''}><span class="mk-n"><b>${I.label}</b><small>${I.name}</small></span><span class="mk-p">${px}</span>${st}</a></li>`;
+    }).join('')).join('');
+    mkList.innerHTML = html || '<li class="mk-g">No market matches</li>';
+  }
+  if (mkList) {
+    const btn = document.getElementById('ms-mk-btn'); if (btn) btn.textContent = `${INST.label} · ${INST.name}`;
+    mkQ.addEventListener('input', renderMk);
+    mkQ.addEventListener('keydown', (ev) => { if (ev.key === 'Enter') { const a = mkList.querySelector('a'); if (a) location.href = a.href; } if (ev.key === 'Escape') mkBox.open = false; });
+    mkBox.addEventListener('toggle', () => { if (mkBox.open) { renderMk(); setTimeout(() => mkQ.focus(), 0); } });
+    document.addEventListener('click', (ev) => { if (mkBox.open && !mkBox.contains(ev.target)) mkBox.open = false; });
+    renderMk();
+  }
+
+  // ─── Keyboard: 1–6 pick a chart, 0 shows all, F fits, G goes home ───
+  document.addEventListener('keydown', (ev) => {
+    if (ev.metaKey || ev.ctrlKey || ev.altKey || /INPUT|TEXTAREA|SELECT/.test((ev.target || {}).tagName || '')) return;
+    const tfKeys = { 1: '1d', 2: '4h', 3: '1h', 4: '15m', 5: '5m', 6: '1m', 0: 'all' };
+    if (location.hash === '#charts' && tfKeys[ev.key] && document.querySelector(`[data-view="${tfKeys[ev.key]}"]`)) { document.querySelector(`[data-view="${tfKeys[ev.key]}"]`).click(); }
+    else if ((ev.key === 'f' || ev.key === 'F') && location.hash === '#charts') Object.values(panes).forEach((p) => p.fit());
+  });
 
   // ─── Sections: a home page of cards, each section on its own page ───
   const VIEWS = ['home', 'setup', 'charts', 'scanner', 'news', 'journal', 'backtest', 'guide'];
