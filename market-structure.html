@@ -661,7 +661,7 @@
         <li><b>VR:</b> after the break, the move runs out and reverses on H1. That reversal area is the VR, and it is the first target.</li>
         <li><b>50% line:</b> measure the whole move after the BO, from the Origin edge where it started to the VR extreme. The halfway point (like a Fibonacci 50%) is drawn as a dashed line. A pullback that stays under it is <b>internal structure</b>; once price goes past it, it's the <b>main structure</b>.</li>
         <li><b>CF:</b> once price is back inside the Origin, wait for the lower timeframe to break in the trade's direction. That break is the CF.</li>
-        <li><b>Entry and stop:</b> enter on the pullback to the CF level. The stop goes just past the swing the CF break started from, padded by a small buffer sized to that timeframe's candles, and never closer than 0.6 × its average candle range (ATR), so normal noise can't stop it out. A body close beyond the Origin cancels the idea.</li>
+        <li><b>Entry and stop:</b> enter on the pullback to the CF level. The stop goes just past the swing the CF break started from, padded by a small buffer sized to that timeframe's candles, and never closer than 0.6 × its average candle range (ATR) or 5 × the typical spread, so normal noise can't stop it out. A body close beyond the Origin cancels the idea.</li>
         <li><b>Retracement trades:</b> once the HTF has made its VR, price pulls back toward the Origin. While that happens you can trade the lower timeframe the other way: in a sell, an H1 BO Buy is a buy up to the 50% line and the Origin, and vice versa. Take profit before the Origin, because that's where the main trend resumes. These cards are tagged <b>Retracement</b>.</li>
         <li><b>Self-evolving council:</b> every paper trade records its conditions (D1 agreeing or not, main or internal structure, session). The Coach learns rules from what loses, such as "Swing: only with D1", and keeps following blocked setups as shadow trades. If the blocked trades start winning, it drops the rule. Every rule is re-tested after 21 days. It also tracks how far each trade went for and against before closing, and turns on a break-even stop at +1R when many losers had been well in profit first.</li>
         <li><b>Timeframe pairs:</b> Position D1 → H1, Swing H4 → H1, Intraday H1 → M5, Scalp M15 → M1.</li>
@@ -669,7 +669,7 @@
     </div>
   </section>
 
-  <p class="foot">Live candles from Binance and Kraken public feeds; gold is aligned to XAU/USD spot via gold-api.com. Times are in your local zone.<br>Version 1 Nov 2026 · market hours</p>
+  <p class="foot">Live candles from Binance and Kraken public feeds; gold is aligned to XAU/USD spot via gold-api.com. Times are in your local zone.<br>Version 1 Nov 2026 · spread-based minimum stop</p>
   <nav class="btab" aria-label="Main sections">
     <a href="#home" data-go="home"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M3 11l9-7 9 7v9a1 1 0 01-1 1h-5v-6H9v6H4a1 1 0 01-1-1z"></path></svg>Home</a>
     <a href="#setup" data-go="setup"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 6h16M4 12h10M4 18h6"></path></svg>Setup</a>
@@ -1343,8 +1343,8 @@ function msNextSetup(bars, A) {
       entry = ll.level; stop = anchor + (sell ? buf : -buf);
       stopWhy = `${Lo} CF ${sell ? 'high' : 'low'} ${fmt(anchor)}`;
       // never closer than minRisk × ATR: a stop inside one normal candle is just noise
-      const floor = CFG.minRisk * atr(lp.bars);
-      if (Math.abs(entry - stop) < floor) { stop = entry + (sell ? floor : -floor); buf = Math.abs(stop - anchor); stopWhy += ` (widened to ${CFG.minRisk} × ${Lo} ATR)`; }
+      const floor = Math.max(CFG.minRisk * atr(lp.bars), 5 * spr);   // and never inside 5 spreads, for quiet markets
+      if (Math.abs(entry - stop) < floor) { stop = entry + (sell ? floor : -floor); buf = Math.abs(stop - anchor); stopWhy += ` (widened to the minimum stop)`; }
     } else {
       anchor = sell ? e.top : e.bot; buf = Math.max(0.1 * atr(hp.bars), spr);
       entry = sell ? e.bot + 0.5 * h : e.top - 0.5 * h; stop = anchor + (sell ? buf : -buf);
@@ -1394,8 +1394,8 @@ function msNextSetup(bars, A) {
       anchor = buy ? ll.bot : ll.top; buf = Math.max(CFG.buf * atr(lp.bars), spr);
       entry = ll.level; stop = anchor - sgn * buf;
       stopWhy = `${Lo} ${buy ? 'low' : 'high'} ${fmt(anchor)}`;
-      const floor = CFG.minRisk * atr(lp.bars);
-      if (Math.abs(entry - stop) < floor) { stop = entry - sgn * floor; buf = Math.abs(stop - anchor); stopWhy += ` (widened to ${CFG.minRisk} × ${Lo} ATR)`; }
+      const floor = Math.max(CFG.minRisk * atr(lp.bars), 5 * spr);   // and never inside 5 spreads, for quiet markets
+      if (Math.abs(entry - stop) < floor) { stop = entry - sgn * floor; buf = Math.abs(stop - anchor); stopWhy += ` (widened to the minimum stop)`; }
     } else {
       anchor = vrP; buf = Math.max(0.1 * atr(hp.bars), spr);
       entry = vrP + sgn * 0.2 * Math.abs(near - vrP); stop = anchor - sgn * buf;

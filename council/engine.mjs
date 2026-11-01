@@ -224,8 +224,8 @@ function buildSetup(pr, price, src = panes) {
     entry = ll.level; stop = anchor + (sell ? buf : -buf);
     stopWhy = `${Lo} CF ${sell ? 'high' : 'low'} ${fmt(anchor)}`;
     // never closer than minRisk × ATR: a stop inside one normal candle is just noise
-    const floor = CFG.minRisk * atr(lp.bars);
-    if (Math.abs(entry - stop) < floor) { stop = entry + (sell ? floor : -floor); buf = Math.abs(stop - anchor); stopWhy += ` (widened to ${CFG.minRisk} × ${Lo} ATR)`; }
+    const floor = Math.max(CFG.minRisk * atr(lp.bars), 5 * spr);   // and never inside 5 spreads, for quiet markets
+    if (Math.abs(entry - stop) < floor) { stop = entry + (sell ? floor : -floor); buf = Math.abs(stop - anchor); stopWhy += ` (widened to the minimum stop)`; }
   } else {
     anchor = sell ? e.top : e.bot; buf = Math.max(0.1 * atr(hp.bars), spr);
     entry = sell ? e.bot + 0.5 * h : e.top - 0.5 * h; stop = anchor + (sell ? buf : -buf);
@@ -275,8 +275,8 @@ function buildRetrace(pr, price, src = panes) {
     anchor = buy ? ll.bot : ll.top; buf = Math.max(CFG.buf * atr(lp.bars), spr);
     entry = ll.level; stop = anchor - sgn * buf;
     stopWhy = `${Lo} ${buy ? 'low' : 'high'} ${fmt(anchor)}`;
-    const floor = CFG.minRisk * atr(lp.bars);
-    if (Math.abs(entry - stop) < floor) { stop = entry - sgn * floor; buf = Math.abs(stop - anchor); stopWhy += ` (widened to ${CFG.minRisk} × ${Lo} ATR)`; }
+    const floor = Math.max(CFG.minRisk * atr(lp.bars), 5 * spr);   // and never inside 5 spreads, for quiet markets
+    if (Math.abs(entry - stop) < floor) { stop = entry - sgn * floor; buf = Math.abs(stop - anchor); stopWhy += ` (widened to the minimum stop)`; }
   } else {
     anchor = vrP; buf = Math.max(0.1 * atr(hp.bars), spr);
     entry = vrP + sgn * 0.2 * Math.abs(near - vrP); stop = anchor - sgn * buf;
