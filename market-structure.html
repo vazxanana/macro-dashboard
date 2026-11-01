@@ -351,6 +351,13 @@
   .c-good, .c-bad, .c-few { font: 700 10px var(--mono); padding: 2px 7px; border-radius: 4px; }
   .c-good { color: var(--buy); background: color-mix(in srgb, var(--buy) 14%, transparent); } .c-bad { color: var(--sell); background: color-mix(in srgb, var(--sell) 14%, transparent); } .c-few { color: var(--ink-faint); background: var(--line-soft); }
   @media (max-width: 1000px) { .c-sc { grid-template-columns: minmax(0, 1fr); } }
+  .c-here-list { display: grid; gap: 8px; }
+  .c-here { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; padding: 10px 12px; border: 1px solid var(--line); border-radius: 10px; font-size: 13px; }
+  .c-here small { color: var(--ink-faint); font: 600 11px var(--mono); }
+  .c-here-l { color: var(--ink-dim); font-size: 12px; } .c-here-l b { font-family: var(--mono); color: var(--ink); } .c-here-l b.neg { color: var(--sell); } .c-here-l b.pos { color: var(--buy); }
+  .c-here-r { margin-left: auto; font: 700 13px var(--mono); } .c-here-r.pos { color: var(--buy); } .c-here-r.neg { color: var(--sell); }
+  .c-link { text-transform: none; letter-spacing: 0; font-size: 12px; font-weight: 600; text-decoration: none; color: var(--accent); }
+  #ms-c-here-card[hidden] { display: none; }
   .c-tog { display: inline-flex; gap: 14px; flex-wrap: wrap; }
   .c-t tr.sh td { opacity: .55; }
   .c-mine { display: inline-flex; align-items: center; gap: 6px; text-transform: none; letter-spacing: 0; font-size: 12px; color: var(--ink-dim); cursor: pointer; }
@@ -530,6 +537,10 @@
         <div class="ms-note" id="ms-feed-note" style="display:block;border:0"></div>
       </div>
     </div>
+    <div class="card" id="ms-c-here-card" hidden>
+      <div class="ms-k">Council on this market <a href="#council" class="c-link">Open council</a></div>
+      <div id="ms-c-here" class="c-here-list"></div>
+    </div>
     <div class="card">
       <div class="ms-k">Possible trades <span class="ms-tr-tools"><span class="seg ms-fseg" id="ms-tr-filter" role="group" aria-label="Filter trades"><button type="button" data-f="all" data-label="All">All</button><button type="button" data-f="ready" data-label="Ready">Ready</button><button type="button" data-f="main" data-label="Main">Main</button><button type="button" data-f="retrace" data-label="Retrace">Retrace</button></span><span class="ms-risk"><label for="ms-risk">Risk per trade $</label><input id="ms-risk" type="number" min="1" step="10" value="100" inputmode="decimal"></span></span></div>
       <div class="ms-trades" id="ms-trades"><div class="ms-note">Waiting for live candles…</div></div>
@@ -658,7 +669,7 @@
     </div>
   </section>
 
-  <p class="foot">Live candles from Binance and Kraken public feeds; gold is aligned to XAU/USD spot via gold-api.com. Times are in your local zone.<br>Version 1 Nov 2026 · minimum stop distance</p>
+  <p class="foot">Live candles from Binance and Kraken public feeds; gold is aligned to XAU/USD spot via gold-api.com. Times are in your local zone.<br>Version 1 Nov 2026 · council on this market</p>
   <nav class="btab" aria-label="Main sections">
     <a href="#home" data-go="home"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M3 11l9-7 9 7v9a1 1 0 01-1 1h-5v-6H9v6H4a1 1 0 01-1-1z"></path></svg>Home</a>
     <a href="#setup" data-go="setup"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 6h16M4 12h10M4 18h6"></path></svg>Setup</a>
@@ -1272,6 +1283,7 @@ function msNextSetup(bars, A) {
     renderTrades(price);
     journalTick();
     renderHome();
+    councilHere(price);
 
     // Alerts when a step completes or H4 prints a new BO
     const key = `${e.dir}:${breakT}`, done = steps.map((x) => x.done);
@@ -2294,6 +2306,20 @@ function msNextSetup(bars, A) {
     set('ms-c-hist', (cf.history || []).slice(-8).reverse().map((h) => `<li><span>${esc(String(h.at).slice(0, 10))} · ${esc(h.by)}</span><b>${esc(h.change)}</b><em>${esc(h.why)}</em></li>`).join('') || '<li class="empty">No rule changes yet.</li>');
     set('ms-c-review', C.review ? md(C.review) : '<p class="ms-note">The AI Coach writes a review after each trading day: what worked, what didn\'t, and any rule it changed.</p>');
     renderHome();
+    const m1p = panes['1m']; councilHere(m1p && m1p.bars ? m1p.bars[m1p.bars.length - 1].close : null);
+  }
+  // Council trades on the market you're viewing, with live result in R
+  function councilHere(price) {
+    const el = document.getElementById('ms-c-here'); if (!el) return;
+    const list = (COUNCIL.trades || []).filter((x) => x.market === instKey && !x.shadow && (x.status === 'open' || x.status === 'pending'));
+    const card = document.getElementById('ms-c-here-card'); if (card) card.hidden = !list.length;
+    if (!list.length) { el.innerHTML = ''; return; }
+    el.innerHTML = list.map((x) => {
+      const s = x.side === 'sell' ? -1 : 1, r = Math.abs(x.entry - x.stop), live = x.status === 'open' && price ? (price - x.entry) * s / r : null;
+      return `<div class="c-here"><span class="ms-chip ${s < 0 ? 'ms-chip-sell' : 'ms-chip-buy'}">${s < 0 ? 'SELL' : 'BUY'}</span><b>${esc(x.name)}</b><small>${esc(x.pair)}</small>` +
+        `<span class="c-here-l">Entry <b>${fmt(x.entry)}</b> · Stop <b class="neg">${fmt(x.stop)}</b> · Target <b class="pos">${fmt(x.t1)}</b></span>` +
+        `<span class="c-here-r ${live == null ? '' : live >= 0 ? 'pos' : 'neg'}">${live == null ? 'Waiting for fill' : `${live >= 0 ? '+' : ''}${live.toFixed(2)}R now`}</span></div>`;
+    }).join('');
   }
   const autoEl = document.getElementById('ms-auto');
   try { G.auto = localStorage.getItem('msAuto') !== '0'; } catch (e) { G.auto = true; }
