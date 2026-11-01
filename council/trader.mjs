@@ -28,6 +28,7 @@ const TFS = [['1d', 1440, 86400], ['4h', 240, 14400], ['1h', 60, 3600], ['15m', 
 const WAIT = { '1d': 5 * 86400, '4h': 2 * 86400, '1h': 12 * 3600, '15m': 3 * 3600 };
 // Only fresh signals: the CF break must be at most this many lower-timeframe candles old
 const FRESH = 12;
+const MAX_OPEN = 2;   // live trades per market
 const SEC = Object.fromEntries(TFS.map(([id, , s]) => [id, s]));
 
 // Trading session by UTC hour (rough, ignores daylight saving)
@@ -131,8 +132,11 @@ for (const [key, M] of Object.entries(MARKETS)) {
       if (f.d1 && feat.d1 !== f.d1) blockedBy.push('d1');
       if (f.struct && feat.struct !== 'n/a' && feat.struct !== f.struct) blockedBy.push('struct');
       if (f.noSession && f.noSession.includes(feat.session)) blockedBy.push('session');
+      // exposure: at most MAX_OPEN live trades per market, and never long and short the same market at once
+      const live = trades.filter((x) => x.market === key && !x.shadow && (x.status === 'open' || x.status === 'pending'));
+      if (live.length >= MAX_OPEN || live.some((x) => x.side !== (t.sell ? 'sell' : 'buy'))) blockedBy.push('exposure');
       const shadow = blockedBy.length > 0;
-      const why = { paused: `paused until ${String(config.paused[t.k]).slice(0, 10)}`, minRR: `reward:risk ${t.rr.toFixed(2)} under ${config.minRR}`, d1: `rule: only ${f.d1} D1`, struct: `rule: only ${f.struct} structure`, session: `rule: not in ${feat.session}` };
+      const why = { paused: `paused until ${String(config.paused[t.k]).slice(0, 10)}`, minRR: `reward:risk ${t.rr.toFixed(2)} under ${config.minRR}`, d1: `rule: only ${f.d1} D1`, struct: `rule: only ${f.struct} structure`, session: `rule: not in ${feat.session}`, exposure: 'already 2 trades or an opposite trade open on this market' };
       const h = def.h;
       const tr = { id: `${key}-${t.k}-${now}`, market: key, label: M.label, dec: M.dec, k: t.k, name: t.name, pair: t.pair, h, side: t.sell ? 'sell' : 'buy',
         entry: t.entry, stop: t.stop, t1: t.t1, rr: +t.rr.toFixed(2), buf: CFG.buf, opened: now, checked: now, status: 'pending', R: null, feat,
