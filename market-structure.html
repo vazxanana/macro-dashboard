@@ -3,29 +3,29 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="theme-color" content="#0e1117">
+<meta name="theme-color" content="#0b0e14">
 <title>Market Structure</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap">
 <script src="https://cdn.jsdelivr.net/npm/lightweight-charts@4.1.3/dist/lightweight-charts.standalone.production.js"></script>
 <style>
   /* Layout: one focused column; top bar → what to do now → possible trades → charts → method notes */
   :root {
-    --bg: #0e1117; --panel: #151a23; --panel-raised: #1a2130; --line: #273042; --line-soft: #1e2635;
-    --ink: #e7eaf0; --ink-dim: #a4adbd; --ink-faint: #6e788b; --accent: #2962ff;
-    --sans: "IBM Plex Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-    --mono: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    --bg: #0b0e14; --panel: #121722; --panel-raised: #0e131c; --line: #1e2533; --line-soft: #1a2130;
+    --ink: #e8ecf2; --ink-dim: #a9b2c3; --ink-faint: #8a94a8; --accent: #3d7bff; --buy: #2bd4a4; --sell: #ff5c7a;
+    --sans: Manrope, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    --mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
     color-scheme: dark;
   }
   :root[data-theme="light"] {
     --bg: #f4f6f9; --panel: #ffffff; --panel-raised: #f7f8fb; --line: #dfe3ea; --line-soft: #eceff4;
-    --ink: #131722; --ink-dim: #4a5160; --ink-faint: #848b99; color-scheme: light;
+    --ink: #131722; --ink-dim: #4a5160; --ink-faint: #6b7280; --accent: #2f6bff; --buy: #08876f; --sell: #d92d4b; color-scheme: light;
   }
   * { box-sizing: border-box; }
   html, body { margin: 0; background: var(--bg); color: var(--ink); font: 14px/1.5 var(--sans); -webkit-text-size-adjust: 100%; }
   body { padding-top: env(safe-area-inset-top, 0px); padding-bottom: env(safe-area-inset-bottom, 0px); }
-  .card { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 16px; min-width: 0; }
+  .card { background: var(--panel); border: 1px solid var(--line); border-radius: 14px; padding: 20px; min-width: 0; }
   button { font-family: var(--sans); }
 </style>
   <style>
@@ -261,7 +261,7 @@
   .view { display: grid; gap: 14px; min-width: 0; }
   .view[hidden] { display: none; }
   .home { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
-  .tile { display: flex; flex-direction: column; gap: 8px; min-height: 168px; padding: 16px; border: 1px solid var(--line); border-radius: 10px; background: var(--panel); color: var(--ink); text-decoration: none; transition: border-color .15s, transform .15s; min-width: 0; }
+  .tile { display: flex; flex-direction: column; gap: 8px; min-height: 168px; padding: 16px; border: 1px solid var(--line); border-radius: 16px; background: var(--panel); color: var(--ink); text-decoration: none; transition: border-color .15s, transform .15s; min-width: 0; }
   .tile:hover { border-color: var(--accent); transform: translateY(-1px); }
   .tile:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
   .tile.wide { grid-column: span 2; }
@@ -286,6 +286,19 @@
   .how ol { margin-top: 0; }
   @media (max-width: 1000px) { .home { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
   @media (max-width: 620px) { .home { grid-template-columns: minmax(0, 1fr); } .tile.wide { grid-column: auto; } .tile { min-height: 0; } .ms-sess-list li { grid-template-columns: minmax(0, 1fr) auto; } .ms-sess-list li span { grid-column: 1 / -1; grid-row: 2; } }
+  .h-top { display: flex; justify-content: space-between; align-items: flex-end; gap: 12px; flex-wrap: wrap; }
+  .h-date { font-size: 11px; letter-spacing: 1.4px; text-transform: uppercase; color: var(--ink-faint); font-weight: 600; }
+  .h-head { margin: 4px 0 0; font-size: clamp(20px, 2.6vw, 30px); font-weight: 800; letter-spacing: -0.5px; line-height: 1.25; }
+  .h-prog-row { display: flex; align-items: center; gap: 12px; }
+  .h-prog { flex: 1; display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 6px; }
+  .h-prog i { height: 6px; border-radius: 3px; background: var(--line); }
+  .h-prog i.d { background: var(--buy); } .h-prog i.n { background: var(--accent); }
+  .h-prog-t { font-size: 12px; color: var(--ink-dim); white-space: nowrap; }
+  .ms-tr-tools { display: inline-flex; align-items: center; gap: 10px; flex-wrap: wrap; text-transform: none; letter-spacing: 0; }
+  .ms-fseg button { min-width: 0; padding: 6px 12px; font: 600 12px var(--sans); }
+  .ms-rr { display: flex; height: 6px; border-radius: 3px; overflow: hidden; background: var(--line); }
+  .ms-rr i { background: var(--sell); } .ms-rr b { width: 2px; background: var(--ink); } .ms-rr em { flex: 1; background: var(--buy); }
+  .ms-trade.invalid .ms-rr { opacity: .5; }
   @media (max-width: 700px) {
     .px b { font-size: 18px; }
     .ms-status .upd { display: none; }
@@ -353,10 +366,12 @@
 
   <!-- ─── Home: one card per section ─── -->
   <section class="view" id="v-home" aria-label="Home">
+    <div class="h-top"><div><div class="h-date" id="h-date"></div><h1 class="h-head" id="h-head">Loading live candles…</h1></div></div>
     <div class="h-warn" id="h-warn" role="alert" hidden></div>
     <div class="home">
       <a class="tile wide" href="#setup">
         <span class="tile-k">Setup now <span class="ms-chip" id="h-bias">—</span></span>
+        <span class="h-prog-row"><span class="h-prog" id="h-prog" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></span><span class="h-prog-t" id="h-prog-t"></span></span>
         <span class="tile-big" id="h-step">Loading live candles…</span>
         <span class="tile-sub" id="h-align"></span>
         <span class="tile-go">Open setup</span>
@@ -423,7 +438,7 @@
       </div>
     </div>
     <div class="card">
-      <div class="ms-k">Possible trades <span class="ms-risk"><label for="ms-risk">Risk per trade $</label><input id="ms-risk" type="number" min="1" step="10" value="100" inputmode="decimal"></span></div>
+      <div class="ms-k">Possible trades <span class="ms-tr-tools"><span class="seg ms-fseg" id="ms-tr-filter" role="group" aria-label="Filter trades"><button type="button" data-f="all" data-label="All">All</button><button type="button" data-f="ready" data-label="Ready">Ready</button><button type="button" data-f="main" data-label="Main">Main</button><button type="button" data-f="retrace" data-label="Retrace">Retrace</button></span><span class="ms-risk"><label for="ms-risk">Risk per trade $</label><input id="ms-risk" type="number" min="1" step="10" value="100" inputmode="decimal"></span></span></div>
       <div class="ms-trades" id="ms-trades"><div class="ms-note">Waiting for live candles…</div></div>
       <div class="ms-tr-foot"><span class="ms-note">Tap a trade to draw it on the charts. Setups follow the Mosha rules and are not financial advice.</span><button type="button" class="ms-tbtn" id="ms-log">Log selected trade</button></div>
     </div>
@@ -505,7 +520,7 @@
     </div>
   </section>
 
-  <p class="foot">Live candles from Binance and Kraken public feeds; gold is aligned to XAU/USD spot via gold-api.com. Times are in your local zone.<br>Version 1 Nov 2026 · retracement trades</p>
+  <p class="foot">Live candles from Binance and Kraken public feeds; gold is aligned to XAU/USD spot via gold-api.com. Times are in your local zone.<br>Version 1 Nov 2026 · Night Desk design</p>
   <div class="ms-toasts" id="ms-toasts" role="status" aria-live="polite"></div>
 </div>
 <script>
@@ -1081,6 +1096,7 @@ function msNextSetup(bars, A) {
       { done: entry, t: entry ? `Entry window: M15 / M1 broke ${sell ? 'down' : 'up'} in line with H4. Enter on the pullback, stop just past the CF swing.` : `Entry: after the H1 CF, ${sell ? 'sell' : 'buy'} the pullback to the CF level on M15 / M1.` },
     ];
     let now = steps.findIndex((s) => !s.done);
+    G.td = { word, done: steps.map((x) => x.done), now, beyond, entry };
     $('ms-td-steps').innerHTML = steps.map((s, k) => `<li class="${s.done ? 'done' : k === now ? 'now' : ''}"><span class="ms-dot" aria-hidden="true">${s.done ? '✓' : k + 1}</span><span>${s.t}</span></li>`).join('');
     const status = beyond ? `Price is beyond the H4 Origin. A close past ${fmt(sell ? e.top : e.bot)} flips H4 structure, so stand aside.`
       : entry ? `${word} setup is live.` : steps[now] ? `Next: ${steps[now].t}` : '';
@@ -1260,11 +1276,20 @@ function msNextSetup(bars, A) {
       const best = list.slice().sort((a, b) => order[a.state] - order[b.state])[0];
       G.sel = best.k;
     }
-    $('ms-trades').innerHTML = list.map((t) => {
+    const FIL = { all: () => true, ready: (t) => t.state === 'READY', main: (t) => !t.retrace, retrace: (t) => t.retrace };
+    const fb = document.getElementById('ms-tr-filter');
+    if (fb) fb.querySelectorAll('button').forEach((b) => {
+      const n = list.filter(FIL[b.dataset.f]).length, on = (G.filter || 'all') === b.dataset.f;
+      b.textContent = `${b.dataset.label} ${n}`; b.classList.toggle('on', on); b.setAttribute('aria-pressed', String(on));
+    });
+    const shown = list.filter(FIL[G.filter || 'all']);
+    $('ms-trades').innerHTML = (shown.length ? '' : '<div class="ms-note">No trades match this filter right now.</div>') + shown.map((t) => {
+      const rw = Math.abs(t.t1 - t.entry), riskPct = Math.max(8, Math.min(92, t.r / (t.r + rw) * 100));
       const size = t.size;
       const tag = t.retrace ? `<span class="ms-tag counter">RETRACEMENT · AGAINST ${t.upL}</span>` : t.align === null ? '' : `<span class="ms-tag ${t.align ? 'with' : 'counter'}">${t.align ? `WITH ${t.upL}` : `AGAINST ${t.upL}`}</span>`;
       return `<button type="button" class="ms-trade${t.k === G.sel ? ' sel' : ''}${t.invalid ? ' invalid' : ''}" data-k="${t.k}" aria-pressed="${t.k === G.sel}">` +
         `<div class="ms-tr-h"><span class="ms-chip ${t.sell ? 'ms-chip-sell' : 'ms-chip-buy'}">${t.sell ? 'SELL' : 'BUY'}</span><b>${t.name}</b><small>${t.pair}</small>${tag}<span class="ms-st ${t.cls}">${t.state}</span></div>` +
+        `<div class="ms-rr" aria-hidden="true"><i style="width:${riskPct.toFixed(0)}%"></i><b></b><em></em></div>` +
         `<div class="ms-tr-g"><span>Entry<b>${fmt(t.entry)}</b></span><span>Stop<b class="neg">${fmt(t.stop)}</b></span><span>Target 1<b class="pos">${fmt(t.t1)}</b></span>` +
         `<span>Target 2<b class="pos">${fmt(t.t2)}</b></span><span>Reward : risk<b>${t.rr.toFixed(1)} R</b></span><span>Size<b>${size}</b></span></div>` +
         `<div class="ms-tr-q">${t.stopWhy && !t.invalid ? `<span class="ms-q">Stop past ${t.stopWhy} + ${fmt(t.buf)}</span>` : ''}` +
@@ -1922,6 +1947,15 @@ function msNextSetup(bars, A) {
       const bias = document.getElementById('ms-td-bias'), hb = document.getElementById('h-bias');
       if (bias && hb) { hb.textContent = bias.textContent; hb.className = bias.className; }
       set('h-step', esc((document.getElementById('ms-td-now') || {}).textContent || ''));
+      if (G.td) {
+        const td = G.td, w = td.word.toLowerCase();
+        const phase = td.beyond ? 'price broke past the H4 Origin, so stand aside' : td.entry ? 'the entry window is open'
+          : ['', 'waiting for the H1 VR', 'waiting for the retrace into the Origin', 'waiting for the H1 CF', 'waiting for the entry'][td.now] || 'watching';
+        set('h-date', new Date().toLocaleString('en-GB', { weekday: 'long', day: 'numeric', month: 'long', hour: '2-digit', minute: '2-digit' }));
+        set('h-head', `${esc(INST.name)} is in a ${w} setup, ${phase}`);
+        set('h-prog', td.done.map((d, k) => `<i class="${d ? 'd' : k === td.now ? 'n' : ''}"></i>`).join(''));
+        set('h-prog-t', td.now < 0 ? 'All 5 steps done' : `Step ${td.now + 1} of 5`);
+      }
       set('h-align', (document.getElementById('ms-td-align') || {}).innerHTML || '');
       const list = (G.list || []).slice().sort((a, b) => ORDER[a.state] - ORDER[b.state]);
       const ready = list.filter((t) => t.state === 'READY'), best = list.find((t) => !t.invalid);
@@ -1955,6 +1989,13 @@ function msNextSetup(bars, A) {
       return `<li class="${isOpen ? 'on' : ''}"><b>${se.name}</b><span>${ref ? `${tm(ref)} – ${tm(ref + len)} your time` : ''}</span><em>${isOpen ? `Open · closes in ${dur(last + len - now)}` : next ? `Opens in ${dur(next - now)}` : 'Closed'}</em></li>`;
     }).join('');
   }
+  const fbar = document.getElementById('ms-tr-filter');
+  if (fbar) fbar.addEventListener('click', (ev) => {
+    const b = ev.target.closest('button[data-f]'); if (!b) return;
+    G.filter = b.dataset.f; try { localStorage.setItem('msFilter', G.filter); } catch (e) {}
+    const m1 = panes['1m']; if (m1 && m1.bars) renderTrades(m1.bars[m1.bars.length - 1].close);
+  });
+  try { G.filter = localStorage.getItem('msFilter') || 'all'; } catch (e) { G.filter = 'all'; }
   if (document.getElementById('v-home')) {
     const hdr = document.querySelector('.top');
     if (hdr && window.ResizeObserver) new ResizeObserver(() => document.documentElement.style.setProperty('--top-h', hdr.offsetHeight + 'px')).observe(hdr);
