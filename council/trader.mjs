@@ -52,9 +52,11 @@ async function kraken(pair, interval) {
 
 // ─── Config: the Coach's knobs, with their allowed ranges ───
 const LIMITS = { buf: [0.10, 0.25], minRR: [1.2, 2.5], minRisk: [0.4, 1.2] };
-const config = Object.assign({ buf: 0.15, minRR: 1.2, minRisk: 0.6, be: null, paused: {}, filters: {}, history: [] }, rd('config.json', {}));
+const config = Object.assign({ buf: 0.15, minRR: 1.2, minRisk: 0.6, be: null, paused: {}, pausedMarkets: {}, filters: {}, history: [] }, rd('config.json', {}));
 config.filters = config.filters || {};
 const now = Math.floor(Date.now() / 1000), nowISO = new Date(now * 1000).toISOString();
+config.pausedMarkets = config.pausedMarkets || {};
+for (const [k, until] of Object.entries(config.pausedMarkets)) if (Date.parse(until) / 1000 <= now) { delete config.pausedMarkets[k]; config.history.push({ at: nowISO, by: 'coach-stats', change: `Resumed market ${k}`, why: 'Pause period ended.' }); }
 for (const [k, until] of Object.entries(config.paused)) if (Date.parse(until) / 1000 <= now) { delete config.paused[k]; config.history.push({ at: nowISO, by: 'coach-stats', change: `Resumed ${k}`, why: 'Pause period ended.' }); }
 CFG.buf = Math.min(LIMITS.buf[1], Math.max(LIMITS.buf[0], config.buf));
 CFG.minRisk = Math.min(LIMITS.minRisk[1], Math.max(LIMITS.minRisk[0], config.minRisk));
@@ -128,6 +130,7 @@ for (const [key, M] of Object.entries(MARKETS)) {
       // Rules from the Coach. A blocked setup is still followed as a SHADOW trade (no score), so the Coach can check the rule was right
       const f = config.filters[t.k] || {}, blockedBy = [];
       if (config.paused[t.k]) blockedBy.push('paused');
+      if (config.pausedMarkets[key]) blockedBy.push('market');
       if (t.rr < config.minRR) blockedBy.push('minRR');
       if (f.d1 && feat.d1 !== f.d1) blockedBy.push('d1');
       if (f.struct && feat.struct !== 'n/a' && feat.struct !== f.struct) blockedBy.push('struct');
@@ -136,7 +139,7 @@ for (const [key, M] of Object.entries(MARKETS)) {
       const live = trades.filter((x) => x.market === key && !x.shadow && (x.status === 'open' || x.status === 'pending'));
       if (live.length >= MAX_OPEN || live.some((x) => x.side !== (t.sell ? 'sell' : 'buy'))) blockedBy.push('exposure');
       const shadow = blockedBy.length > 0;
-      const why = { paused: `paused until ${String(config.paused[t.k]).slice(0, 10)}`, minRR: `reward:risk ${t.rr.toFixed(2)} under ${config.minRR}`, d1: `rule: only ${f.d1} D1`, struct: `rule: only ${f.struct} structure`, session: `rule: not in ${feat.session}`, exposure: 'already 2 trades or an opposite trade open on this market' };
+      const why = { paused: `paused until ${String(config.paused[t.k]).slice(0, 10)}`, minRR: `reward:risk ${t.rr.toFixed(2)} under ${config.minRR}`, d1: `rule: only ${f.d1} D1`, struct: `rule: only ${f.struct} structure`, session: `rule: not in ${feat.session}`, exposure: 'already 2 trades or an opposite trade open on this market', market: `market paused until ${String(config.pausedMarkets[key]).slice(0, 10)}` };
       const h = def.h;
       const tr = { id: `${key}-${t.k}-${now}`, market: key, label: M.label, dec: M.dec, k: t.k, name: t.name, pair: t.pair, h, side: t.sell ? 'sell' : 'buy',
         entry: t.entry, stop: t.stop, t1: t.t1, rr: +t.rr.toFixed(2), buf: CFG.buf, opened: now, checked: now, status: 'pending', R: null, feat,
@@ -229,6 +232,17 @@ if (coach.date !== today) {
     const bes = closed.filter((x) => x.status === 'be'), wins = closed.filter((x) => x.status === 'win');
     change('Break-even rule off for a re-test', `${bes.length} trades closed at break-even and ${wins.length} won over the last 30 days; testing without it.`);
     config.be = null; delete config.beSince;
+  }
+  // markets: pause one for 3 days when it loses (6+ trades, worse than -0.3R each); resume early if its shadow trades recover
+  const byMarket = {}; closed.forEach((x) => (byMarket[x.market] = byMarket[x.market] || []).push(x));
+  for (const [m, arr] of Object.entries(byMarket)) {
+    if (config.pausedMarkets[m] || arr.length < 6) continue;
+    const e = exp(arr);
+    if (e < -0.3) { config.pausedMarkets[m] = new Date((now + 3 * 86400) * 1000).toISOString(); change(`Paused market ${m} for 3 days`, `${e.toFixed(2)}R per trade over ${arr.length} trades.`); }
+  }
+  for (const m of Object.keys(config.pausedMarkets)) {
+    const sh = shadows.filter((x) => x.market === m && (x.blockedBy || []).includes('market'));
+    if (sh.length >= 4 && exp(sh) > 0.3) { delete config.pausedMarkets[m]; change(`Resumed market ${m} early`, `Shadow trades while paused made +${exp(sh).toFixed(2)}R over ${sh.length}.`); }
   }
   // resume a paused setup early when its shadow trades recover
   for (const k of Object.keys(config.paused)) {

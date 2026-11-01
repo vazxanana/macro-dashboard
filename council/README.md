@@ -9,7 +9,7 @@ Three roles work the Mosha market-structure setups:
 | **Coach** | Statistics daily in the trader job, plus a Claude daily review | Pauses losing setups, tunes the stop buffer and minimum reward:risk inside fixed limits, logs every change in `config.json` → `history`, and writes `reviews/latest.md`. |
 
 All results live on the `council-data` branch. Limits the Coach may change on its own:
-break-even at +1R on/off, stop buffer 0.10–0.25 × ATR, minimum stop distance 0.4–1.2 × ATR, minimum reward:risk 1.2–2.5, pause a setup for up to 7 days.
+break-even at +1R on/off, stop buffer 0.10–0.25 × ATR, minimum stop distance 0.4–1.2 × ATR, minimum reward:risk 1.2–2.5, pause a setup for up to 7 days, pause a losing market for 3 days.
 
 `council/engine.mjs` is generated from the market-structure page's engine; regenerate it when the page's setup rules change.
 
