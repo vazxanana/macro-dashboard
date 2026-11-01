@@ -1,5 +1,5 @@
 // Council · Trader (+ daily statistical Coach)
-// Runs every 15 minutes in GitHub Actions: pulls candles for every market, runs the Mosha rules,
+// Runs every ~4 minutes in GitHub Actions: pulls candles for every market, runs the Mosha rules,
 // paper-trades every Ready setup, manages open trades and writes everything to the data folder.
 // Usage: node council/trader.mjs <dataDir>
 import fs from 'node:fs';

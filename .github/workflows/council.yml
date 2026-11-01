@@ -4,7 +4,7 @@ name: Council trader
 # Coach. Results go to the `council-data` branch (never main, so Pages doesn't
 # redeploy every run); the market-structure page reads them.
 #
-# Keeps itself alive: a push/dispatch run trades every 14 minutes for ~4.7 h,
+# Keeps itself alive: a push/dispatch run trades every ~4 minutes for ~4.5 h (M1 signals stay fresh 12 min, so no scalp is missed),
 # then dispatches the next run (workflow_dispatch from GITHUB_TOKEN is allowed),
 # so the Trader runs 24/7 even if GitHub's cron is delayed. Cron runs do a
 # single round.
@@ -51,7 +51,7 @@ jobs:
           git -C data config user.name "mosha-council"
           git -C data config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           ROUNDS=1
-          if [ "${{ github.event_name }}" != "schedule" ]; then ROUNDS=20; fi
+          if [ "${{ github.event_name }}" != "schedule" ]; then ROUNDS=60; fi
           for i in $(seq 1 $ROUNDS); do
             git -C data pull -q --rebase origin council-data || true
             node council/trader.mjs data || echo "Trader round $i failed"
@@ -60,7 +60,7 @@ jobs:
               git -C data commit -q -m "Council run $(date -u +%Y-%m-%dT%H:%MZ)"
               for j in 1 2 3; do git -C data pull -q --rebase origin council-data && git -C data push -q origin HEAD:council-data && break; sleep 5; done
             fi
-            if [ "$i" -lt "$ROUNDS" ]; then sleep 840; fi
+            if [ "$i" -lt "$ROUNDS" ]; then sleep 240; fi
           done
 
       - name: Start the next run
