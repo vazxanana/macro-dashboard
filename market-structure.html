@@ -375,6 +375,15 @@
   .c-md p { margin: 0 0 8px; } .c-md ul { margin: 0 0 8px; padding-left: 18px; } .c-md b { color: var(--ink); }
   .c-md code { font-family: var(--mono); font-size: 12px; }
   @media (max-width: 1000px) { .c-grid { grid-template-columns: minmax(0, 1fr); } .c-kpi { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+  .btab { display: none; }
+  @media (max-width: 700px) {
+    .btab { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); position: fixed; left: 0; right: 0; bottom: 0; z-index: 25; padding: 6px 4px calc(6px + env(safe-area-inset-bottom, 0px)); background: color-mix(in srgb, var(--bg) 94%, transparent); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); border-top: 1px solid var(--line-soft); }
+    .btab a { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; min-height: 48px; font: 600 11px var(--sans); color: var(--ink-faint); text-decoration: none; border-radius: 10px; }
+    .btab a[aria-current="page"] { color: var(--accent); }
+    .btab a:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
+    .ms-live.app { padding-bottom: calc(84px + env(safe-area-inset-bottom, 0px)); }
+    .ms-toasts { bottom: calc(76px + env(safe-area-inset-bottom, 0px)); }
+  }
   @media (max-width: 700px) {
     .px b { font-size: 18px; }
     .ms-status .upd { display: none; }
@@ -616,6 +625,7 @@
     <div class="card" id="ms-j-card">
       <div class="ms-k">Trade journal <span class="ms-scan-meta"><label class="c-mine"><input type="checkbox" id="ms-auto2"> Auto paper-trade</label><button type="button" class="ms-tbtn" id="ms-j-csv">Export CSV</button></span></div>
       <div id="ms-j-stats" class="ms-j-stats"></div>
+      <div class="c-eq" id="ms-j-eq"></div>
       <div class="ms-j-wrap"><table class="ms-j"><thead><tr><th>Logged</th><th>Market</th><th>Setup</th><th>Side</th><th>Entry</th><th>Stop</th><th>Target 1</th><th>Result</th><th>R</th><th>Notes</th><th><span class="sr">Delete</span></th></tr></thead><tbody id="ms-j-body"></tbody></table></div>
       <div class="ms-note" style="margin-top:10px">Saved in this browser only. Open trades on the market you're viewing are checked against live candles and marked Win or Loss automatically; change the result any time.</div>
     </div>
@@ -648,7 +658,14 @@
     </div>
   </section>
 
-  <p class="foot">Live candles from Binance and Kraken public feeds; gold is aligned to XAU/USD spot via gold-api.com. Times are in your local zone.<br>Version 1 Nov 2026 · self-evolving council</p>
+  <p class="foot">Live candles from Binance and Kraken public feeds; gold is aligned to XAU/USD spot via gold-api.com. Times are in your local zone.<br>Version 1 Nov 2026 · phone tab bar</p>
+  <nav class="btab" aria-label="Main sections">
+    <a href="#home" data-go="home"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M3 11l9-7 9 7v9a1 1 0 01-1 1h-5v-6H9v6H4a1 1 0 01-1-1z"></path></svg>Home</a>
+    <a href="#setup" data-go="setup"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 6h16M4 12h10M4 18h6"></path></svg>Setup</a>
+    <a href="#charts" data-go="charts"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M7 4v16M17 4v16M4 8h6v8H4zM14 6h6v6h-6z"></path></svg>Charts</a>
+    <a href="#council" data-go="council"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="8" cy="9" r="3"></circle><circle cx="16" cy="9" r="3"></circle><path d="M3 20c0-3 2.5-5 5-5s5 2 5 5M11 20c0-3 2.5-5 5-5s5 2 5 5"></path></svg>Council</a>
+    <a href="#journal" data-go="journal"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 3h11a1 1 0 011 1v16a1 1 0 01-1 1H6zM6 3v18M10 8h5M10 12h5"></path></svg>Journal</a>
+  </nav>
   <div class="ms-toasts" id="ms-toasts" role="status" aria-live="polite"></div>
 </div>
 <script>
@@ -1898,6 +1915,7 @@ function msNextSetup(bars, A) {
   // ─── Backtest: replay the rules candle by candle and score every Ready setup ───
   const BT_LIM = { '1d': 1000, '4h': 1000, '1h': 2000, '15m': 2000, '5m': 3000, '1m': 3000 };
   const BT_WAIT = 48, BT_WIN = 500;
+  try { G.bt = JSON.parse(localStorage.getItem('msBt_' + instKey) || 'null'); } catch (e) { G.bt = null; }
   function btSimulate(pr, hist, build) {
     const hb = hist[pr.h], lb = hist[pr.l];
     if (!hb || !lb || lb.length < 200 || hb.length < 80) return null;
@@ -1976,7 +1994,7 @@ function msNextSetup(bars, A) {
         `</tbody></table></div>` : '') +
       `<p class="ms-note" style="margin:10px 0 0">How it's scored: each Ready setup places a limit order at its entry. A fill then the stop is −1R, a fill then Target 1 is +R at the card's reward : risk. A candle that touches both entry and stop counts as a loss. Orders not filled within ${BT_WAIT} candles are dropped. M1 and M5 only reach back a few days, so their samples are small. Past results don't predict future ones.</p>`;
     meta.textContent = `${INST.label} · ${A.n} signals`;
-    G.bt = { wr: A.wr, R: A.R }; renderHome();
+    G.bt = { wr: A.wr, R: A.R, n: A.n, at: Date.now() }; try { localStorage.setItem('msBt_' + instKey, JSON.stringify(G.bt)); } catch (e) {} renderHome();
   }
   if (document.getElementById('ms-bt-btn')) document.getElementById('ms-bt-btn').addEventListener('click', () => runBacktest().catch((e) => {
     document.getElementById('ms-bt-meta').textContent = `Backtest failed: ${e.message}`; document.getElementById('ms-bt-btn').disabled = false;
@@ -2002,6 +2020,14 @@ function msNextSetup(bars, A) {
       : `<tr class="empty"><td colspan="11">No trades logged yet. Pick a setup under Possible trades and press <b>Log selected trade</b>.</td></tr>`;
     const st = document.getElementById('ms-j-stats');
     const done = J.filter((x) => x.res === 'win' || x.res === 'loss' || x.res === 'be');
+    const eqEl = document.getElementById('ms-j-eq');
+    if (eqEl) {
+      const ch = done.slice().sort((a, b) => a.t - b.t); let eq = 0; const pts = [0].concat(ch.map((x) => (eq += (+x.R || 0))));
+      if (pts.length > 2) {
+        const lo = Math.min(...pts), hi = Math.max(...pts), W = 600, H = 56, y = (v) => (H - 4 - (v - lo) / Math.max(1e-9, hi - lo) * (H - 8)).toFixed(1);
+        eqEl.innerHTML = `<svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="none" role="img" aria-label="Journal equity in R over ${ch.length} closed trades"><line x1="0" x2="${W}" y1="${y(0)}" y2="${y(0)}" stroke="var(--line)" stroke-dasharray="4 4" vector-effect="non-scaling-stroke"/><path d="${pts.map((v, i) => `${i ? 'L' : 'M'}${(i / (pts.length - 1) * W).toFixed(1)},${y(v)}`).join('')}" fill="none" stroke="${eq >= 0 ? 'var(--buy)' : 'var(--sell)'}" stroke-width="2" vector-effect="non-scaling-stroke"/></svg>`;
+      } else eqEl.innerHTML = '';
+    }
     if (!done.length) { st.innerHTML = ''; return; }
     const w = done.filter((x) => x.res === 'win').length, l = done.filter((x) => x.res === 'loss').length, R = done.reduce((a, x) => a + (+x.R || 0), 0);
     const by = {}; done.forEach((x) => { const k = x.name; (by[k] = by[k] || []).push(x); });
@@ -2318,7 +2344,7 @@ function msNextSetup(bars, A) {
       const R = done.reduce((a, x) => a + (+x.R || 0), 0), open = J.filter((x) => x.res === 'open').length;
       if (J.length) { set('h-j', `${done.length ? `${R >= 0 ? '+' : ''}${R.toFixed(1)}R` : `${J.length} logged`}`); set('h-j-sub', `${done.length} closed${w + l ? ` · ${Math.round(w / (w + l) * 100)}% win rate` : ''} · ${open} open`); }
       if (COUNCIL.trades) { const cl = COUNCIL.trades.filter((x) => !x.shadow && (x.status === 'win' || x.status === 'loss')), cr = cl.reduce((a, x) => a + x.R, 0); set('h-council', cl.length ? `${cr >= 0 ? '+' : ''}${cr.toFixed(1)}R <small>from ${cl.length} trades</small>` : `${COUNCIL.trades.filter((x) => !x.shadow && (x.status === 'open' || x.status === 'pending')).length} open trades`); }
-      if (G.bt) set('h-bt', `${G.bt.wr === null ? '—' : Math.round(G.bt.wr * 100) + '%'} win · ${G.bt.R >= 0 ? '+' : ''}${G.bt.R.toFixed(1)}R`);
+      if (G.bt) set('h-bt', `${G.bt.wr == null ? '—' : Math.round(G.bt.wr * 100) + '%'} win · ${G.bt.R >= 0 ? '+' : ''}${(+G.bt.R).toFixed(1)}R${G.bt.at ? ` <small>${new Date(G.bt.at).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })}</small>` : ''}`);
       const warn = document.getElementById('ms-news-warn'), hw = document.getElementById('h-warn');
       if (warn && hw) { hw.hidden = warn.hidden; hw.innerHTML = warn.innerHTML; }
     } catch (e) { /* a section isn't ready yet */ }
