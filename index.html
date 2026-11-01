@@ -5890,7 +5890,7 @@ if (/^#(market-structure|structure)$/.test(location.hash) || /market-structure\.
   const TZ = -new Date().getTimezoneOffset() * 60;
   const THEMES = {
     light: { bg: '#ffffff', text: '#131722', grid: '#f0f3fa', border: '#e0e3eb' },
-    dark:  { bg: '#151a23', text: '#8f98aa', grid: '#1b2230', border: '#273042' },
+    dark:  { bg: '#151a23', text: '#8f98aa', grid: '#19202c', border: '#273042' },
   };
   const UPC = '#089981', DNC = '#f23645';
   const Z = {
@@ -5899,7 +5899,7 @@ if (/^#(market-structure|structure)$/.test(location.hash) || /market-structure\.
     vr:   { fill: 'rgba(255,152,0,0.18)', stroke: 'rgba(224,134,0,0.9)' },
     htf:  'rgba(41,98,255,0.85)', proj: '#2962ff',
   };
-  const G = { theme: root.dataset.chart === 'dark' ? 'dark' : 'light', show: { bo: true, origin: true, cf: true, vr: true, next: true, htf: true, plan: true }, risk: 100, alerts: false, plan: null, prev: null, sel: null, prevStates: {}, planKey: '',
+  const G = { theme: root.dataset.chart === 'dark' ? 'dark' : 'light', show: { bo: true, origin: true, cf: true, vr: true, next: true, htf: true, plan: true, detail: false }, risk: 100, alerts: false, plan: null, prev: null, sel: null, prevStates: {}, planKey: '',
     offset: 0, spot: null, source: '', live: false, csv: false };
   const $ = (id) => document.getElementById(id);
   const $o = (id) => document.getElementById(id) || { set textContent(v) {}, set className(v) {}, set innerHTML(v) {}, style: {} };
@@ -6053,7 +6053,7 @@ if (/^#(market-structure|structure)$/.test(location.hash) || /market-structure\.
     const chart = LW.createChart(el, {
       autoSize: true,
       layout: { background: { type: 'solid', color: THEMES.light.bg }, textColor: THEMES.light.text, fontSize: 11 },
-      grid: { vertLines: { color: THEMES.light.grid }, horzLines: { color: THEMES.light.grid } },
+      grid: { vertLines: { visible: false }, horzLines: { color: THEMES.light.grid } },
       crosshair: { mode: LW.CrosshairMode.Normal },
       rightPriceScale: { borderColor: THEMES.light.border, scaleMargins: { top: 0.08, bottom: 0.08 } },
       timeScale: { borderColor: THEMES.light.border, timeVisible: true, secondsVisible: false, rightOffset: 30, barSpacing: 6 },
@@ -6092,11 +6092,12 @@ if (/^#(market-structure|structure)$/.test(location.hash) || /market-structure\.
     P.draw = function () {
       const bars = P.bars, n = bars.length, A = P.A, S = P.S;
       const items = { boxes: [], lines: [], labels: [], path: [] };
-      const recent = A.events.slice(-2), seen = new Set();
-      const evs = A.events.slice(tf.sec <= 900 ? -8 : -14);
+      const D = G.show.detail, low = tf.sec <= 900;
+      const recent = A.events.slice(D ? -2 : -1), seen = new Set();
+      const evs = A.events.slice(D ? (low ? -8 : -14) : (low ? -3 : -5));
       evs.forEach((e, k) => {
         const c = e.dir < 0 ? Z.sell : Z.buy, sell = e.dir < 0;
-        if (G.show.bo) items.lines.push({ l1: e.fromIdx, l2: e.breakIdx, p: e.level, color: c.line, text: k >= evs.length - 5 ? (e.structure ? 'BO Structure' : (sell ? 'BO Sell' : 'BO Buy')) : '', below: sell });
+        if (G.show.bo) items.lines.push({ l1: e.fromIdx, l2: e.breakIdx, p: e.level, color: c.line, text: k >= evs.length - (D ? 5 : 2) ? (e.structure ? 'BO Structure' : (sell ? 'BO Sell' : 'BO Buy')) : '', below: sell });
         if (!recent.includes(e)) return;
         const end = e.endIdx !== null ? e.endIdx : n + 26;
         if (G.show.origin) {
@@ -6104,7 +6105,7 @@ if (/^#(market-structure|structure)$/.test(location.hash) || /market-structure\.
           items.labels.push({ l: e.endIdx === null ? n + 1 : e.start + 1, dx: 4, p: sell ? e.bot : e.top, dy: sell ? -6 : 14, text: `Origin ${fmt(e.bot)}–${fmt(e.top)}`, color: c.line });
         }
         if (G.show.cf) e.cf.forEach((f) => {
-          if (seen.has(f.i)) return; seen.add(f.i);
+          if (seen.has(f.i) || (!D && !f.post)) return; seen.add(f.i);
           items.boxes.push({ l1: f.i - 1, l2: f.i + 3, lo: f.lo, hi: f.hi, fill: c.cf, stroke: c.stroke });
           items.labels.push({ l: f.i + 1, p: sell ? f.hi : f.lo, dy: sell ? -6 : 15, text: f.post ? 'CF ✓' : 'CF', align: 'center', color: c.line });
         });
@@ -6121,7 +6122,7 @@ if (/^#(market-structure|structure)$/.test(location.hash) || /market-structure\.
       // Higher-timeframe origins as dashed reference boxes (the barrier this TF trades from)
       if (G.show.htf) {
         const idx = ACTIVE.findIndex((x) => x.id === tf.id);
-        ACTIVE.slice(0, idx).filter((h) => h.id !== '5m').slice(-2).forEach((h) => {
+        ACTIVE.slice(0, idx).filter((h) => h.id !== '5m').slice(D ? -2 : -1).forEach((h) => {
           const hp = panes[h.id];
           const he = hp && hp.A && hp.A.last;
           if (!he || he.endIdx !== null) return;
@@ -6145,7 +6146,7 @@ if (/^#(market-structure|structure)$/.test(location.hash) || /market-structure\.
       P.pv = items.path.map((q) => q.p);
       overlay.set(items);
       P.priceLines.forEach((pl) => series.removePriceLine(pl)); P.priceLines = [];
-      if (S) P.priceLines.push(series.createPriceLine({ price: S.invalid, color: '#787b86', lineWidth: 1, lineStyle: LW.LineStyle.Dashed, axisLabelVisible: true, title: 'Invalidation' }));
+      if (S) P.priceLines.push(series.createPriceLine({ price: S.invalid, color: '#787b86', lineWidth: 1, lineStyle: LW.LineStyle.Dashed, axisLabelVisible: true, title: 'Invalidation', lineVisible: G.show.detail }));
       P.planLinesDraw();
     };
     P.planLines = [];
@@ -6153,7 +6154,7 @@ if (/^#(market-structure|structure)$/.test(location.hash) || /market-structure\.
       P.planLines.forEach((pl) => series.removePriceLine(pl)); P.planLines = [];
       const pl = G.plan;
       if (!G.show.plan || !pl || tf.id === '4h') return;
-      const add = (price, color, title, style) => P.planLines.push(series.createPriceLine({ price, color, lineWidth: 1, lineStyle: style, axisLabelVisible: true, title }));
+      const add = (price, color, title, style) => P.planLines.push(series.createPriceLine({ price, color, lineWidth: 1, lineStyle: style, axisLabelVisible: true, title, lineVisible: G.show.detail }));
       add(pl.entry, '#2962ff', 'Entry', LW.LineStyle.Solid);
       add(pl.stop, '#f23645', 'Stop', LW.LineStyle.Solid);
       add(pl.t1, '#089981', 'T1', LW.LineStyle.Dashed);
@@ -6526,7 +6527,7 @@ if (/^#(market-structure|structure)$/.test(location.hash) || /market-structure\.
   function applyTheme() {
     const t = THEMES[G.theme];
     Object.values(panes).forEach((p) => {
-      p.chart.applyOptions({ layout: { background: { type: 'solid', color: t.bg }, textColor: t.text }, grid: { vertLines: { color: t.grid }, horzLines: { color: t.grid } }, rightPriceScale: { borderColor: t.border }, timeScale: { borderColor: t.border } });
+      p.chart.applyOptions({ layout: { background: { type: 'solid', color: t.bg }, textColor: t.text }, grid: { vertLines: { visible: false }, horzLines: { color: t.grid } }, rightPriceScale: { borderColor: t.border }, timeScale: { borderColor: t.border } });
       p.overlay.set(p.overlay.items);
     });
     root.dataset.chart = G.theme; document.documentElement.dataset.theme = G.theme;
