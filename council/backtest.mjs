@@ -176,9 +176,35 @@ function asiaRun(src, price, t, spr = 0) {
       const buf = Math.max(3 * spr, 0.05 * rng), stop = ext + (sell ? buf : -buf), t1 = sell ? AL : AH;
       const r = Math.abs(stop - price), rr = Math.abs(t1 - price) / r;
       if (!(r > 0) || rr < 1) continue;
-      out.push({ k, sell, entry: price, stop, t1, rr, sig: `${k}|${d}|${sell ? 's' : 'b'}` });
+      out.push({ k, sell, entry: price, stop, t1, t2: price + (sell ? -3 : 3) * r, rr, sig: `${k}|${d}|${sell ? 's' : 'b'}` });
     }
   }
+  return out;
+}
+
+// ─── Research: the Daily Cycle (Liquidity Trading notes, 2 Nov) ───
+// London (07:00–12:00 UTC) sets the bias: bullish when London's low came before its high and price is above the London open
+// at 12:00 (bearish mirrored). In the New York open (12:00–15:00 UTC), when price retraces into 62–70% of the London leg
+// (the OTE), buy (sell) at the 62% level, stop past the London low (high), target 3R; R_ts8 shows closing before day end.
+function dailyCycle(src, price, t, spr = 0) {
+  const out = [], d = Math.floor(t / 86400) * 86400;
+  if (t < d + 12 * 3600 || t >= d + 15 * 3600) return out;
+  const b5 = src['5m'].bars, ldn = b5.filter((b) => b.time >= d + 7 * 3600 && b.time < d + 12 * 3600);
+  if (ldn.length < 50) return out;
+  let hi = -Infinity, lo = Infinity, hiT = 0, loT = 0;
+  for (const b of ldn) { if (b.high > hi) { hi = b.high; hiT = b.time; } if (b.low < lo) { lo = b.low; loT = b.time; } }
+  const open = ldn[0].open, close = ldn[ldn.length - 1].close, leg = hi - lo;
+  if (!(leg > 0)) return out;
+  const bull = loT < hiT && close > open, bear = hiT < loT && close < open;
+  if (!bull && !bear) return out;
+  const ny = b5.filter((b) => b.time >= d + 12 * 3600);
+  if (bull && ny.some((b) => b.low < lo)) return out;    // London low taken: the bias failed
+  if (bear && ny.some((b) => b.high > hi)) return out;
+  const e62 = bull ? hi - 0.62 * leg : lo + 0.62 * leg, e70 = bull ? hi - 0.70 * leg : lo + 0.70 * leg;
+  if (bull ? !(price <= e62 && price >= e70) : !(price >= e62 && price <= e70)) return out;
+  const buf = Math.max(3 * spr, 0.05 * leg), stop = bull ? lo - buf : hi + buf, r = Math.abs(price - stop);
+  if (!(r > 0)) return out;
+  out.push({ k: 'cycle', sell: bear, entry: price, stop, t1: price + (bull ? 3 : -3) * r, t2: bull ? hi : lo, rr: 3, sig: `cycle|${d}` });
   return out;
 }
 
@@ -428,11 +454,11 @@ for (const [key, M] of Object.entries(MARKETS)) {
         tw.v = VARIANTS.map(([n, be, t2, pt, ts]) => ({ n, be, t2, pt, ts, stop: tw.stop, beMoved: false, done: false, R: null }));
         open.push(tw);
       }
-      for (const sw of sweepSetups(src, price, t, null, spreadOf(M, price)).concat(chochSetups(src, price, t, null, spreadOf(M, price)), asiaRun(src, price, t, spreadOf(M, price)))) {
+      for (const sw of sweepSetups(src, price, t, null, spreadOf(M, price)).concat(chochSetups(src, price, t, null, spreadOf(M, price)), asiaRun(src, price, t, spreadOf(M, price)), dailyCycle(src, price, t, spreadOf(M, price)))) {
         if (seen.has(sw.sig)) continue; seen.add(sw.sig);
         const side = sw.sell ? 'sell' : 'buy';
         if (open.some((x) => x.k === sw.k && x.side === side)) continue;   // one sweep trade per side at a time
-        const tr = { m: key, k: sw.k, h: '1h', side, entry: sw.entry, stop: sw.stop, t1: sw.t1, rr: sw.rr, opened: t, filled: t, status: 'open', mfe: 0,
+        const tr = { m: key, k: sw.k, h: '1h', side, entry: sw.entry, stop: sw.stop, t1: sw.t1, t2: sw.t2 != null ? sw.t2 : null, rr: sw.rr, opened: t, filled: t, status: 'open', mfe: 0,
           feat: { d1: src['1d'].A.trend === (sw.sell ? -1 : 1) ? 'with' : 'against', struct: 'n/a', session: sessionOf(t), ...structFeat(sw.sell, '1m', src, t), m15c: m15cOf(src['15m'].bars, sw.sell, t), m15c1: m15cOf(src['15m'].bars, sw.sell, t, 1) } };
         tr.r0 = Math.abs(tr.entry - tr.stop); tr.cost = tr.r0 > 0 ? spreadOf(M, tr.entry) / tr.r0 : 0;
         tr.v = VARIANTS.map(([n, be, t2, pt, ts]) => ({ n, be, t2, pt, ts, stop: tr.stop, beMoved: false, done: false, R: null }));
