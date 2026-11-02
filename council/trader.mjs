@@ -34,6 +34,20 @@ const MAX_USD = 3;    // live gold/forex trades betting the same way on the US d
 // +1 = the trade wins if the dollar rises, -1 if it falls, 0 = not a dollar pair (crypto is left out)
 const usdDir = (M, side) => { if (M.group === 'Crypto') return 0; const [a, b] = M.label.split('/'), buy = side === 'buy' ? 1 : -1; return b === 'USD' ? -buy : a === 'USD' ? buy : 0; };
 const SEC = Object.fromEntries(TFS.map(([id, , s]) => [id, s]));
+// Market-structure conditions at a signal (the backtest computes the same two):
+//   cf    — is the confirming lower-timeframe break itself a CHoCH (it flipped that timeframe's trend) or a continuation BO?
+//   choch — has M15 or M5 printed a fresh CHoCH in the trade's direction (within its last FRESH candles)? The user's rule:
+//           "once we had a CHoCH on M15 or M5, we enter".
+function structFeat(t, def, src, at) {
+  const dir = t.sell ? -1 : 1, lp = src[def.l], ll = lp && lp.A && lp.A.last;
+  const cf = ll && ll.dir === dir && ll.structure ? 'choch' : 'bo';
+  const choch = ['15m', '5m'].some((id) => { const s = src[id]; return s && s.A && s.A.events.some((e) => e.dir === dir && e.structure && at - s.bars[e.breakIdx].time <= FRESH * SEC[id]); }) ? 'yes' : 'no';
+  return { cf, choch };
+}
+// conditions a setup can be filtered on, the two sides of each, and how a rule reads
+const CONDS = [['d1', 'with', 'against', (v) => `${v} D1`], ['cf', 'choch', 'bo', (v) => v === 'choch' ? 'a CHoCH as the confirming break' : 'a continuation BO as the confirming break'], ['choch', 'yes', 'no', (v) => v === 'yes' ? 'a fresh M15/M5 CHoCH' : 'no fresh M15/M5 CHoCH']];
+const passesFilters = (t, f) => CONDS.every(([c]) => !f[c] || t[c] === f[c]);
+function emptyFilter(fl) { return !fl.struct && !(fl.noSession || []).length && CONDS.every(([c]) => !fl[c]); }
 
 // Trading session by UTC hour (rough, ignores daylight saving)
 const sessionOf = (t) => { const h = new Date(t * 1000).getUTCHours(); return h < 7 ? 'asia' : h < 12 ? 'london' : h < 16 ? 'overlap' : h < 21 ? 'newyork' : 'late'; };
@@ -153,7 +167,7 @@ for (const [key, M] of Object.entries(MARKETS)) {
       const def = PAIRS.concat(RETR).find((p) => p.k === t.k), cfT = +String(t.sig).split('|')[2];
       if (!cfT || now - cfT > (config.fresh || FRESH) * SEC[def.l]) continue;   // an old CF: the move already happened
       // Conditions at the signal: the Coach learns which of them win
-      const feat = { d1: src['1d'].A.trend === (t.sell ? -1 : 1) ? 'with' : 'against', struct: t.retr == null ? 'n/a' : t.retr >= 0.5 ? 'main' : 'internal', session: sessionOf(now) };
+      const feat = { d1: src['1d'].A.trend === (t.sell ? -1 : 1) ? 'with' : 'against', struct: t.retr == null ? 'n/a' : t.retr >= 0.5 ? 'main' : 'internal', session: sessionOf(now), ...structFeat(t, def, src, now) };
       // Rules from the Coach. A blocked setup is still followed as a SHADOW trade (no score), so the Coach can check the rule was right
       const f = config.filters[t.k] || {}, blockedBy = [];
       if (config.paused[t.k]) blockedBy.push('paused');
@@ -167,6 +181,8 @@ for (const [key, M] of Object.entries(MARKETS)) {
       // news guard (the Coach turns it on when news keeps stopping trades out): no short-term trade from 15 min before to 45 min after high-impact news
       if (config.newsGuard && (def.h === '15m' || def.h === '1h') && newsNear(key, M.label, NEWS, now - 15 * 60, now + 45 * 60).length) blockedBy.push('news');
       if (f.d1 && feat.d1 !== f.d1) blockedBy.push('d1');
+      if (f.cf && feat.cf !== f.cf) blockedBy.push('cf');
+      if (f.choch && feat.choch !== f.choch) blockedBy.push('choch');
       if (f.struct && feat.struct !== 'n/a' && feat.struct !== f.struct) blockedBy.push('struct');
       if (f.noSession && f.noSession.includes(feat.session)) blockedBy.push('session');
       // exposure: at most MAX_OPEN live trades per market, and never long and short the same market at once
@@ -178,7 +194,7 @@ for (const [key, M] of Object.entries(MARKETS)) {
       const ud = usdDir(M, t.sell ? 'sell' : 'buy');
       if (ud && trades.filter((x) => !x.shadow && (x.status === 'open' || x.status === 'pending') && MARKETS[x.market] && usdDir(MARKETS[x.market], x.side) === ud).length >= (config.maxUsd || MAX_USD)) blockedBy.push('usd');
       const shadow = blockedBy.length > 0;
-      const why = { paused: `paused until ${String(config.paused[t.k]).slice(0, 10)}`, minRR: `reward:risk ${(isFinite(rrNow) ? rrNow : 0).toFixed(2)} under ${config.minRR}`, d1: `rule: only ${f.d1} D1`, struct: `rule: only ${f.struct} structure`, session: `rule: not in ${feat.session}`, exposure: 'already 2 trades or an opposite trade open on this market', news: 'high-impact news within the hour', duplicate: 'same stop and target as a trade already open', usd: `already ${config.maxUsd || MAX_USD} trades betting the same way on the dollar`, market: `market paused until ${String(config.pausedMarkets[key]).slice(0, 10)}` };
+      const why = { paused: `paused until ${String(config.paused[t.k]).slice(0, 10)}`, minRR: `reward:risk ${(isFinite(rrNow) ? rrNow : 0).toFixed(2)} under ${config.minRR}`, d1: `rule: only ${f.d1} D1`, cf: `rule: only ${f.cf === 'choch' ? 'a CHoCH' : 'a continuation BO'} as the confirming break`, choch: `rule: ${f.choch === 'yes' ? 'needs' : 'no'} fresh M15/M5 CHoCH`, struct: `rule: only ${f.struct} structure`, session: `rule: not in ${feat.session}`, exposure: 'already 2 trades or an opposite trade open on this market', news: 'high-impact news within the hour', duplicate: 'same stop and target as a trade already open', usd: `already ${config.maxUsd || MAX_USD} trades betting the same way on the dollar`, market: `market paused until ${String(config.pausedMarkets[key]).slice(0, 10)}` };
       const h = def.h;
       const tr = { id: `${key}-${t.k}-${now}`, market: key, label: M.label, dec: M.dec, k: t.k, name: t.name, pair: t.pair, h, side: t.sell ? 'sell' : 'buy',
         entry: t.entry, stop: t.stop, t1: t.t1, rr: +t.rr.toFixed(2), buf: CFG.buf, opened: now, checked: now, status: 'pending', R: null, feat,
@@ -242,7 +258,7 @@ const tTxt = (t) => !isFinite(t) ? 'every trade alike' : `t = ${t.toFixed(1)}`;
 // the backtest's verdict on a setup as it trades now (with its D1 filter): clearly profitable?
 function btPositive(k) {
   if (!BT) return null;
-  const f = config.filters[k] || {}, a = BT.T.filter((t) => t.setup === k && (!f.d1 || t.d1 === f.d1)), all = btE(a), [h1, h2] = btHalves(a);
+  const f = config.filters[k] || {}, a = BT.T.filter((t) => t.setup === k && passesFilters(t, f)), all = btE(a), [h1, h2] = btHalves(a);
   return all.n >= 100 && all.e >= 0.1 && all.t >= 2.5 && h1.e > 0 && h2.e > 0 ? all : null;
 }
 function learnFromBacktest(change) {
@@ -250,30 +266,32 @@ function learnFromBacktest(change) {
   config.btAt = BT.b.at;
   const days = BT.b.days || 30, f2 = (v) => `${v >= 0 ? '+' : ''}${v.toFixed(2)}R`;
   const setups = [...new Set(BT.T.map((t) => t.setup))];
-  const d1Sides = (k) => { const a = BT.T.filter((t) => t.setup === k);
-    return Object.fromEntries(['with', 'against'].map((v) => { const arr = a.filter((t) => t.d1 === v); return [v, { ...btE(arr), h: btHalves(arr) }]; })); };
-  // 1. D1 filter per setup: one side clearly wins and the other clearly loses, in both halves, and the gap is
-  //    statistically clear (t >= 3: about 7 setups are tested at once, so a looser bar would find chance "rules")
-  for (const k of setups) {
-    const S = d1Sides(k), fl = config.filters[k] || {};
+  const sides = (k, c, vals) => { const a = BT.T.filter((t) => t.setup === k);
+    return Object.fromEntries(vals.map((v) => { const arr = a.filter((t) => t[c] === v); return [v, { ...btE(arr), h: btHalves(arr) }]; })); };
+  // 1. condition filters per setup (D1 with/against; confirming break CHoCH/BO; fresh M15/M5 CHoCH yes/no): one side
+  //    clearly wins and the other clearly loses, in both halves, and the gap is statistically clear (t >= 3: about 7
+  //    setups x 3 conditions are tested at once, so a looser bar would find chance "rules")
+  for (const k of setups) for (const [c, v1, v2, txt] of CONDS) {
+    if (!BT.b.tradeCols.includes(c)) continue;   // an older backtest without this condition
+    const S = sides(k, c, [v1, v2]), fl = config.filters[k] || {}, other = (v) => v === v1 ? v2 : v1;
     // a filter the backtest set earlier, whose excluded side is no longer worse: drop it
-    if (fl.d1 && (fl.src || {}).d1 === 'backtest') {
-      const kept = S[fl.d1], out = S[fl.d1 === 'with' ? 'against' : 'with'];
+    if (fl[c] && (fl.src || {})[c] === 'backtest') {
+      const kept = S[fl[c]], out = S[other(fl[c])];
       if (kept.n >= 15 && out.n >= 15 && out.e >= kept.e) {
-        change(`${k}: D1 filter dropped (backtest)`, `${fl.d1} ${f2(kept.e)} each over ${kept.n}, the excluded side ${f2(out.e)} over ${out.n}: the filter no longer helps.`);
-        delete fl.d1; if (fl.since) delete fl.since.d1; if (fl.src) delete fl.src.d1;
+        change(`${k}: "only ${txt(fl[c])}" dropped (backtest)`, `${f2(kept.e)} each over ${kept.n}, the excluded side ${f2(out.e)} over ${out.n}: the filter no longer helps.`);
+        delete fl[c]; if (fl.since) delete fl.since[c]; if (fl.src) delete fl.src[c];
       }
     }
-    if (S.with.n < 30 || S.against.n < 30) continue;
-    const win = S.with.e > S.against.e ? 'with' : 'against', lose = win === 'with' ? 'against' : 'with', gap = btGapT(S[win], S[lose]);
+    if (S[v1].n < 30 || S[v2].n < 30) continue;
+    const win = S[v1].e > S[v2].e ? v1 : v2, lose = other(win), gap = btGapT(S[win], S[lose]);
     if (!(S[win].e >= 0.1 && S[lose].e <= -0.1 && gap >= 3 && S[win].h[0].e > S[lose].h[0].e && S[win].h[1].e > S[lose].h[1].e)) continue;
     const f = config.filters[k] = config.filters[k] || {};
-    if (f.d1 === win && (f.src || {}).d1 === 'backtest') continue;
-    const was = f.d1;
-    f.d1 = win; (f.since = f.since || {}).d1 = nowISO; (f.src = f.src || {}).d1 = 'backtest';
-    change(`${k}: only ${win} D1 (backtest)${was && was !== win ? `, replacing "only ${was} D1"` : ''}`, `${S[win].n + S[lose].n} trades over the last ${days} days: ${win} ${f2(S[win].e)} each, ${lose} ${f2(S[lose].e)} (gap ${tTxt(gap)}); true in both halves.`);
+    if (f[c] === win && (f.src || {})[c] === 'backtest') continue;
+    const was = f[c];
+    f[c] = win; (f.since = f.since || {})[c] = nowISO; (f.src = f.src || {})[c] = 'backtest';
+    change(`${k}: only ${txt(win)} (backtest)${was && was !== win ? `, replacing "only ${txt(was)}"` : ''}`, `${S[win].n + S[lose].n} trades over the last ${days} days: ${txt(win)} ${f2(S[win].e)} each, ${txt(lose)} ${f2(S[lose].e)} (gap ${tTxt(gap)}); true in both halves.`);
   }
-  for (const [k, fl] of Object.entries(config.filters)) if (!fl.d1 && !fl.struct && !(fl.noSession || []).length) delete config.filters[k];
+  for (const [k, fl] of Object.entries(config.filters)) if (emptyFilter(fl)) delete config.filters[k];
   // 2. Break-even: compared trade by trade with no break-even; a level is used only if it clearly adds R (t >= 2)
   //    and adds R in both halves
   if (BT.T.length >= 300) {
@@ -292,7 +310,7 @@ function learnFromBacktest(change) {
   //    -0.5R or worse; negative in both halves; t <= -2): pause it until the next backtest can re-check it
   for (const k of setups) {
     if (!DEF_KEYS.has(k) || config.paused[k]) continue;
-    const f = config.filters[k] || {}, a = BT.T.filter((t) => t.setup === k && (!f.d1 || t.d1 === f.d1)), all = btE(a), [h1, h2] = btHalves(a);
+    const f = config.filters[k] || {}, a = BT.T.filter((t) => t.setup === k && passesFilters(t, f)), all = btE(a), [h1, h2] = btHalves(a);
     if (((all.n >= 10 && all.e <= -0.3) || (all.n >= 8 && all.e <= -0.5)) && all.t <= -2 && h1.e < 0 && h2.e < 0) {
       config.paused[k] = new Date((now + 3 * 86400) * 1000).toISOString();
       change(`Paused ${k} for 3 days (backtest)`, `${all.n} past trades as it trades now made ${f2(all.e)} each (${tTxt(all.t)}, ${all.g} market-days), negative in both halves of the last ${days} days.`);
@@ -309,7 +327,7 @@ function learnFromBacktest(change) {
   //    once on, it stays while it is still ahead.
   config.entry = config.entry || {};
   for (const k of setups.filter((x) => DEF_KEYS.has(x))) {
-    const f = config.filters[k] || {}, lim = new Map(BT.TA.filter((t) => t.setup === k && (!f.d1 || t.d1 === f.d1)).map((t) => [`${t.market}|${t.opened}`, t]));
+    const f = config.filters[k] || {}, lim = new Map(BT.TA.filter((t) => t.setup === k && passesFilters(t, f)).map((t) => [`${t.market}|${t.opened}`, t]));
     const pairs = BT.TA.filter((t) => t.setup === `${k}@mkt` && lim.has(`${t.market}|${t.opened}`)).map((t) => ({ market: t.market, opened: t.opened, d: t.R_none - lim.get(`${t.market}|${t.opened}`).R_none }));
     if (pairs.length < 30) continue;
     const dd = btE(pairs, 'd'), h1 = btE(pairs.filter((p) => p.opened < BT.mid), 'd'), h2 = btE(pairs.filter((p) => p.opened >= BT.mid), 'd');
@@ -417,7 +435,7 @@ if (coach.date !== today) {
       const old = fl.since && fl.since['session:' + v] && now - Date.parse(fl.since['session:' + v]) / 1000 > 21 * 86400;
       if ((sh.length >= 5 && exp(sh) > 0.2) || old) { fl.noSession = fl.noSession.filter((x) => x !== v); if (fl.since) delete fl.since['session:' + v]; change(`${k}: trading the ${v} session again`, old ? '21 days old: re-testing.' : `Blocked trades made +${exp(sh).toFixed(2)}R over ${sh.length}.`); }
     }
-    if (!fl.d1 && !fl.struct && !(fl.noSession || []).length) delete config.filters[k];
+    if (emptyFilter(fl)) delete config.filters[k];
   }
   // trade management: turn break-even on when 40%+ of recent losers had been +1R first; re-test it after 21 days
   const recentLoss = closed.filter((x) => x.status === 'loss' && now - x.closed < 14 * 86400);
@@ -493,7 +511,7 @@ const fslot = nowISO.slice(0, 11) + String(Math.floor(+nowISO.slice(11, 13) / 6)
     const ch = (what, why) => { config.history.push({ at: nowISO, by: 'coach-stats', change: what, why }); added.push(`${what}: ${why}`); };
     learnFilters(closedAll, ch);
     learnManagement(closedAll, ch);
-    for (const [k, fl] of Object.entries(config.filters)) if (!fl.d1 && !fl.struct && !(fl.noSession || []).length) delete config.filters[k];
+    for (const [k, fl] of Object.entries(config.filters)) if (emptyFilter(fl)) delete config.filters[k];
     cj.fslot = fslot;
     if (added.length) cj.notes = (cj.notes || []).filter((n) => !/^No change today/.test(n)).concat(added);
     wr('coach.json', cj);
