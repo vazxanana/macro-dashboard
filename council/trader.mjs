@@ -242,6 +242,22 @@ function learnFilters(closedAll, change) {
   }
 }
 
+// setups: pause one for 3 days when its live trades lose (6+ trades worse than -0.25R each, or 4 losses in a row).
+// Checked on every run, not once a day: a pause only stops new live trades (they keep running as shadows),
+// and waiting until midnight let a broken setup keep losing for most of a day.
+function learnPauses(closedLive, change) {
+  const bySetup = {};
+  for (const t of [...closedLive].sort((a, b) => a.closed - b.closed)) (bySetup[t.k] = bySetup[t.k] || []).push(t);
+  for (const [k, arr] of Object.entries(bySetup)) {
+    if (config.paused[k]) continue;
+    const n = arr.length, e = n ? arr.reduce((a, x) => a + x.R, 0) / n : 0, last4 = arr.slice(-4);
+    if ((n >= 6 && e < -0.25) || (last4.length === 4 && last4.every((x) => x.status === 'loss'))) {
+      config.paused[k] = new Date((now + 3 * 86400) * 1000).toISOString();
+      change(`Paused ${k} for 3 days`, n >= 6 && e < -0.25 ? `Expectancy ${e.toFixed(2)}R over ${n} trades.` : 'Four losses in a row.');
+    }
+  }
+}
+
 const coach = rd('coach.json', { date: '' });
 const today = nowISO.slice(0, 10);
 if (coach.date !== today) {
@@ -253,14 +269,7 @@ if (coach.date !== today) {
   const stats = Object.fromEntries(Object.entries(bySetup).map(([k, arr]) => [k, stat(arr)]));
   const notes = [];
   const change = (what, why) => { config.history.push({ at: nowISO, by: 'coach-stats', change: what, why }); notes.push(`${what}: ${why}`); };
-  for (const [k, arr] of Object.entries(bySetup)) {
-    const st = stats[k], last4 = arr.slice(-4);
-    if (config.paused[k]) continue;
-    if ((st.n >= 6 && st.exp < -0.25) || (last4.length === 4 && last4.every((x) => x.status === 'loss'))) {
-      config.paused[k] = new Date((now + 3 * 86400) * 1000).toISOString();
-      change(`Paused ${k} for 3 days`, st.n >= 6 && st.exp < -0.25 ? `Expectancy ${st.exp}R over ${st.n} trades.` : 'Four losses in a row.');
-    }
-  }
+  learnPauses(closed, change);
   const recent = closed.filter((x) => now - x.closed < 14 * 86400), rs = stat(recent);
   if (rs.n >= 10) {
     if (rs.wr < 0.35 && config.minRisk < LIMITS.minRisk[1]) { const v = +Math.min(LIMITS.minRisk[1], config.minRisk + 0.1).toFixed(2); change(`Minimum stop ${config.minRisk} → ${v} ATR`, `Win rate ${Math.round(rs.wr * 100)}% over ${rs.n} trades: stops get hit by normal candle noise.`); config.minRisk = v; }
@@ -341,6 +350,13 @@ if (coach.date !== today) {
     if (sh.length >= 4 && exp(sh) > 0.3) { delete config.paused[k]; change(`Resumed ${k} early`, `Shadow trades while paused made +${exp(sh).toFixed(2)}R over ${sh.length}.`); }
   }
   wr('coach.json', { date: today, at: nowISO, stats, last14: rs, lessons: lessons(trades, now), fslot: nowISO.slice(0, 11) + String(Math.floor(+nowISO.slice(11, 13) / 6) * 6).padStart(2, '0'), notes: notes.length ? notes : ['No change today: not enough evidence to move a rule.'] });
+}
+// every run: pause a setup as soon as its live record says so
+{
+  const live = trades.filter((x) => !x.shadow && (x.status === 'win' || x.status === 'loss' || x.status === 'be') && now - x.closed < 30 * 86400).sort((a, b) => a.closed - b.closed);
+  const added = [];
+  learnPauses(live, (what, why) => { config.history.push({ at: nowISO, by: 'coach-stats', change: what, why }); added.push(`${what}: ${why}`); });
+  if (added.length) { const cj = rd('coach.json', {}); cj.notes = (cj.notes || []).filter((n) => !/^No change today/.test(n)).concat(added); wr('coach.json', cj); }
 }
 // between the daily runs: re-check the condition filters every 6 hours
 const fslot = nowISO.slice(0, 11) + String(Math.floor(+nowISO.slice(11, 13) / 6) * 6).padStart(2, '0');
