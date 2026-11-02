@@ -205,8 +205,60 @@ state.lastRun = now;
 const exp = (arr) => arr.length ? arr.reduce((a, x) => a + x.R, 0) / arr.length : 0;
 // trade management: losers that were +1R or more first (live and shadow, last 14 days) turn break-even at +1R on.
 // mfe is known at the close, so this doesn't wait for the post-exit review window.
+// ─── Backtest evidence (council/backtest.mjs replays 30 days of real candles through these same rules, daily) ───
+// A finding is used only when it is large and holds in BOTH halves of the replayed period, so one market
+// phase can't create a rule. It outranks the small live samples (a handful of trades) it would otherwise fight.
+const BT = (() => {
+  const b = rd('backtest.json', null);
+  if (!b || b.fake || !Array.isArray(b.trades) || !b.trades.length || now - Date.parse(b.at) / 1000 > 3 * 86400) return null;
+  const T = b.trades.map((r) => Object.fromEntries(b.tradeCols.map((c, i) => [c, r[i]])));
+  return { b, T, mid: T.map((t) => t.opened).sort((x, y) => x - y)[T.length >> 1] };
+})();
+const btE = (arr, key = 'R_none') => ({ n: arr.length, e: arr.length ? arr.reduce((a, t) => a + t[key], 0) / arr.length : 0 });
+const btHalves = (arr, key) => [btE(arr.filter((t) => t.opened < BT.mid), key), btE(arr.filter((t) => t.opened >= BT.mid), key)];
+// the backtest's verdict on a setup as it trades now (with its D1 filter): clearly profitable?
+function btPositive(k) {
+  if (!BT) return null;
+  const f = config.filters[k] || {}, a = BT.T.filter((t) => t.setup === k && (!f.d1 || t.d1 === f.d1)), all = btE(a), [h1, h2] = btHalves(a);
+  return all.n >= 100 && all.e >= 0.1 && h1.e > 0 && h2.e > 0 ? all : null;
+}
+function learnFromBacktest(change) {
+  if (!BT || config.btAt === BT.b.at) return;
+  config.btAt = BT.b.at;
+  const days = BT.b.days || 30, f2 = (v) => `${v >= 0 ? '+' : ''}${v.toFixed(2)}R`;
+  // 1. D1 filter per setup: one side clearly wins and the other clearly loses, in both halves
+  for (const k of [...new Set(BT.T.map((t) => t.setup))]) {
+    const a = BT.T.filter((t) => t.setup === k), side = { with: a.filter((t) => t.d1 === 'with'), against: a.filter((t) => t.d1 === 'against') };
+    const S = Object.fromEntries(Object.entries(side).map(([v, arr]) => [v, { ...btE(arr), h: btHalves(arr) }]));
+    if (S.with.n < 30 || S.against.n < 30) continue;
+    const win = S.with.e > S.against.e ? 'with' : 'against', lose = win === 'with' ? 'against' : 'with';
+    if (!(S[win].e >= 0.1 && S[lose].e <= -0.1 && S[win].h[0].e > S[lose].h[0].e && S[win].h[1].e > S[lose].h[1].e)) continue;
+    const fl = config.filters[k] = config.filters[k] || {};
+    if (fl.d1 === win && (fl.src || {}).d1 === 'backtest') continue;
+    const was = fl.d1;
+    fl.d1 = win; (fl.since = fl.since || {}).d1 = nowISO; (fl.src = fl.src || {}).d1 = 'backtest';
+    change(`${k}: only ${win} D1 (backtest)${was && was !== win ? `, replacing "only ${was} D1"` : ''}`, `${S[win].n + S[lose].n} trades over the last ${days} days: ${win} ${f2(S[win].e)} each, ${lose} ${f2(S[lose].e)}; true in both halves.`);
+  }
+  // 2. Break-even: off unless a break-even level beats no break-even in both halves
+  const opts = [[null, 'R_none'], [1, 'R_be1'], [1.5, 'R_be15']].map(([be, key]) => ({ be, key, all: btE(BT.T, key), h: btHalves(BT.T, key) }));
+  if (opts[0].all.n >= 300) {
+    const none = opts[0], better = opts.slice(1).filter((o) => o.h[0].e >= none.h[0].e + 0.02 && o.h[1].e >= none.h[1].e + 0.02).sort((x, y) => y.all.e - x.all.e)[0];
+    const want = better ? better.be : null;
+    if ((config.be || null) !== want) {
+      change(want ? `Break-even at +${want}R (backtest)` : 'Break-even turned off (backtest)', `${none.all.n} trades over the last ${days} days: no break-even ${f2(none.all.e)} each, at +1R ${f2(opts[1].all.e)}, at +1.5R ${f2(opts[2].all.e)}.`);
+      config.be = want; if (want) config.beSince = nowISO; else delete config.beSince;
+    }
+    config.beSrc = 'backtest';
+  }
+  // 3. a setup paused on a small live sample that the backtest shows is clearly profitable: resume it
+  for (const k of Object.keys(config.paused)) {
+    const pos = btPositive(k), live = pauseSample(trades.filter((x) => x.k === k && (x.status === 'win' || x.status === 'loss' || x.status === 'be') && now - x.closed < 30 * 86400));
+    if (pos && live.length < 15) { delete config.paused[k]; change(`Resumed ${k} (backtest)`, `Paused on ${live.length} trades, but ${pos.n} past trades as it trades now made ${f2(pos.e)} each, in both halves of the last ${days} days.`); }
+  }
+}
+
 function learnManagement(closedAll, change) {
-  if (config.be) return;
+  if (config.be || config.beSrc === 'backtest') return;
   const losses = closedAll.filter((x) => x.status === 'loss' && now - x.closed < 14 * 86400), gave = losses.filter((x) => (x.mfe || 0) >= 1);
   if (losses.length >= 6 && gave.length >= 4 && gave.length / losses.length >= 0.25) {
     config.be = 1; config.beSince = nowISO;
@@ -255,6 +307,7 @@ function learnPauses(sample, change) {
   for (const t of [...sample].sort((a, b) => a.closed - b.closed)) (bySetup[t.k] = bySetup[t.k] || []).push(t);
   for (const [k, arr] of Object.entries(bySetup)) {
     if (config.paused[k]) continue;
+    if (btPositive(k) && arr.length < 15) continue;   // the backtest says it pays: a few live losses aren't enough to pause it
     const n = arr.length, e = n ? arr.reduce((a, x) => a + x.R, 0) / n : 0, last4 = arr.slice(-4);
     if ((n >= 6 && e < -0.25) || (last4.length === 4 && last4.every((x) => x.status === 'loss'))) {
       config.paused[k] = new Date((now + 3 * 86400) * 1000).toISOString();
@@ -289,7 +342,7 @@ if (coach.date !== today) {
   // drop a rule when the trades it blocked would have paid (shadow expectancy > +0.2R over 5+), or after 21 days to re-test it
   for (const [k, fl] of Object.entries(config.filters)) {
     for (const fe of ['d1', 'struct']) {
-      if (!fl[fe]) continue;
+      if (!fl[fe] || (fl.src || {})[fe] === 'backtest') continue;
       const sh = shadows.filter((x) => x.k === k && (x.blockedBy || []).includes(fe));
       const old = fl.since && fl.since[fe] && now - Date.parse(fl.since[fe]) / 1000 > 21 * 86400;
       if ((sh.length >= 5 && exp(sh) > 0.2) || old) { change(`${k}: dropped the ${fe === 'd1' ? 'D1' : 'structure'} rule`, old ? '21 days old: re-testing without it.' : `The trades it blocked made +${exp(sh).toFixed(2)}R over ${sh.length}.`); delete fl[fe]; if (fl.since) delete fl.since[fe]; }
@@ -361,6 +414,7 @@ if (coach.date !== today) {
 {
   const sample = pauseSample(trades.filter((x) => (x.status === 'win' || x.status === 'loss' || x.status === 'be') && now - x.closed < 30 * 86400));
   const added = [];
+  learnFromBacktest((what, why) => { config.history.push({ at: nowISO, by: 'coach-backtest', change: what, why }); added.push(`${what}: ${why}`); });
   learnPauses(sample, (what, why) => { config.history.push({ at: nowISO, by: 'coach-stats', change: what, why }); added.push(`${what}: ${why}`); });
   if (added.length) { const cj = rd('coach.json', {}); cj.notes = (cj.notes || []).filter((n) => !/^No change today/.test(n)).concat(added); wr('coach.json', cj); }
 }
