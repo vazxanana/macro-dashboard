@@ -77,6 +77,10 @@ const LIMITS = { buf: [0.10, 0.25], minRR: [1.2, 2.5], minRisk: [0.4, 1.2], maxU
 const config = Object.assign({ buf: 0.15, minRR: 1.2, minRisk: 0.6, be: null, fresh: FRESH, newsGuard: false, maxUsd: MAX_USD, paused: {}, pausedMarkets: {}, filters: {}, history: [] }, rd('config.json', {}));
 config.filters = config.filters || {};
 const now = Math.floor(Date.now() / 1000), nowISO = new Date(now * 1000).toISOString();
+// a rule change stamped in the future (the AI Coach wrote 21:30 at 21:10 on 2 Nov) would hide the shadow trades a rule is
+// re-checked on until then: any future history time or filter 'since' is set to now
+for (const h of config.history || []) if (Date.parse(h.at) / 1000 > now) h.at = nowISO;
+for (const f of Object.values(config.filters)) for (const [c, v] of Object.entries(f.since || {})) if (Date.parse(v) / 1000 > now) f.since[c] = nowISO;
 config.pausedMarkets = config.pausedMarkets || {};
 for (const [k, until] of Object.entries(config.pausedMarkets)) if (Date.parse(until) / 1000 <= now) { delete config.pausedMarkets[k]; config.history.push({ at: nowISO, by: 'coach-stats', change: `Resumed market ${k}`, why: 'Pause period ended.' }); }
 for (const [k, until] of Object.entries(config.paused)) if (Date.parse(until) / 1000 <= now) { delete config.paused[k]; (config.resumedAt = config.resumedAt || {})[k] = now; config.history.push({ at: nowISO, by: 'coach-stats', change: `Resumed ${k}`, why: 'Pause period ended.' }); }

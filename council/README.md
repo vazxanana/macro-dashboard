@@ -78,7 +78,7 @@ The backtest replays this model as the research setups `sweep_vr` / `sweep_ext` 
 
 ## Guide for the AI Coach (read before every review)
 
-Read **The trader's method** above and `examples.json` first: they are the standard every review and rule change is held to.
+Read **The trader's method** above and `examples.json` first: they are the standard every review and rule change is held to. Stamp every change (`history[].at`, a filter's `since`) with the actual current UTC time (`date -u`), never a rounded or future one: the Trader resets future times to the moment it sees them.
 
 **Trade fields** in `trades.json`:
 - `status`: pending | open | win | loss | `be` (break-even, 0R) | missed | expired
