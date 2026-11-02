@@ -199,6 +199,17 @@ state.lastRun = now;
 // ─── Self-evolution: learn condition filters (D1 / structure / session) from the trades that lose.
 // Runs every 6 hours (the other Coach rules stay daily), so a clearly losing condition is filtered within hours, not a day.
 const exp = (arr) => arr.length ? arr.reduce((a, x) => a + x.R, 0) / arr.length : 0;
+// trade management: losers that were +1R or more first (live and shadow, last 14 days) turn break-even at +1R on.
+// mfe is known at the close, so this doesn't wait for the post-exit review window.
+function learnManagement(closedAll, change) {
+  if (config.be) return;
+  const losses = closedAll.filter((x) => x.status === 'loss' && now - x.closed < 14 * 86400), gave = losses.filter((x) => (x.mfe || 0) >= 1);
+  if (losses.length >= 6 && gave.length >= 4 && gave.length / losses.length >= 0.25) {
+    config.be = 1; config.beSince = nowISO;
+    change('Break-even at +1R turned on', `${gave.length} of ${losses.length} recent losers (live and shadow) were +1R or more before turning around.`);
+  }
+}
+
 function learnFilters(closedAll, change) {
   // ─── Self-evolution: learn filters from the conditions that lose, and drop them when shadow trades prove them wrong ───
   // evidence for condition filters: scored trades plus shadow trades blocked for reasons unrelated to the conditions
@@ -257,6 +268,7 @@ if (coach.date !== today) {
   const low = recent.filter((x) => x.rr < 1.5), ls = stat(low);
   if (ls.n >= 6 && ls.exp < 0 && config.minRR < 1.5) { change(`Minimum reward:risk ${config.minRR} → 1.5`, `Trades under 1.5R returned ${ls.exp}R each over ${ls.n} trades.`); config.minRR = 1.5; }
   learnFilters(closedAll, change);
+  learnManagement(closedAll, change);
   // drop a rule when the trades it blocked would have paid (shadow expectancy > +0.2R over 5+), or after 21 days to re-test it
   for (const [k, fl] of Object.entries(config.filters)) {
     for (const fe of ['d1', 'struct']) {
@@ -335,7 +347,9 @@ const fslot = nowISO.slice(0, 11) + String(Math.floor(+nowISO.slice(11, 13) / 6)
   if (cj.fslot !== fslot) {
     const closedAll = trades.filter((x) => (x.status === 'win' || x.status === 'loss' || x.status === 'be') && now - x.closed < 30 * 86400);
     const added = [];
-    learnFilters(closedAll, (what, why) => { config.history.push({ at: nowISO, by: 'coach-stats', change: what, why }); added.push(`${what}: ${why}`); });
+    const ch = (what, why) => { config.history.push({ at: nowISO, by: 'coach-stats', change: what, why }); added.push(`${what}: ${why}`); };
+    learnFilters(closedAll, ch);
+    learnManagement(closedAll, ch);
     for (const [k, fl] of Object.entries(config.filters)) if (!fl.d1 && !fl.struct && !(fl.noSession || []).length) delete config.filters[k];
     cj.fslot = fslot;
     if (added.length) cj.notes = (cj.notes || []).filter((n) => !/^No change today/.test(n)).concat(added);
