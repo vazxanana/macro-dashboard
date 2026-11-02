@@ -370,6 +370,13 @@ for (const [key, M] of Object.entries(MARKETS)) {
           feat.vrAge = !he || !he.vr ? 'novr' : (cfT - hb[he.vr.i].time) / SEC[def.h] <= 3 ? 'fast' : 'slow';
           const okey = String(st.sig).split('|').slice(0, 2).join('|'), nT = (touches.get(okey) || 0) + 1; touches.set(okey, nT);
           feat.touch = nT === 1 ? 'first' : nT === 2 ? 'second' : 'third+';
+          // Photon's fractal chain (HTF trend → MTF CHoCH → LTF CHoCH): upTF = the timeframe above the setup's zone trends the
+          // trade's way ("4H is bullish"); ltfChoch = the timeframe below the CF has since printed a CHoCH the same way
+          // ("M1 CHoCH confirms the M15 higher low")
+          if (st.align !== null && st.align !== undefined) feat.upTF = st.align ? 'with' : 'against';
+          const below = { '1h': '15m', '15m': '1m', '5m': '1m' }[def.l];
+          if (below && src[below]) { const bl = src[below].A.last, bb = src[below].bars;
+            feat.ltfChoch = bl && bl.structure && bl.dir === (st.sell ? -1 : 1) && bb[bl.breakIdx].time >= cfT ? 'yes' : 'no'; }
         } catch (e) {}
         const tr = { m: key, k: st.k, h: def.h, side, entry: st.entry, stop: st.stop, t1: st.t1, t2: st.t2 != null && (st.t2 - st.t1) * (st.sell ? -1 : 1) > 0 ? st.t2 : null, rr: st.rr, opened: t, status: 'pending', feat, mfe: 0 };
         if (st.sell ? price >= st.entry : price <= st.entry) {   // already through the entry: fill at market, like the Trader
@@ -427,8 +434,8 @@ const out = {
   byMarket: group(all, (x) => x.m),
   byRR: group(all, rrBand),
   bySetupCond: Object.fromEntries(setups.map((k) => { const a = all.filter((x) => x.k === k); return [k, { d1: group(a, (x) => x.feat.d1), struct: group(a, (x) => x.feat.struct), session: group(a, (x) => x.feat.session), rr: group(a, rrBand) }]; })),
-  trades: all.concat(twins, unfilled).map((x) => [x.m, x.k, x.side, x.opened, x.filled || null, +x.rr.toFixed(2), x.feat.d1, x.feat.struct, x.feat.session, ...x.v.map((v) => v.R == null ? null : +v.R.toFixed(2)), +x.mfe.toFixed(2), +x.cost.toFixed(3), x.status === 'closed' ? 1 : 0, x.feat.cf, x.feat.choch, x.feat.m15c, x.feat.m15c1, x.feat.h4 || null, x.feat.h1 || null, x.v[0].closed || x.ended || null, x.h, x.feat.janda || null, x.feat.vrAge || null, x.feat.touch || null]),
-  tradeCols: ['market', 'setup', 'side', 'opened', 'filled', 'rr', 'd1', 'struct', 'session', 'R_none', 'R_be1', 'R_be15', 'R_tp2', 'R_pt2', 'R_ts4', 'R_ts8', 'R_ts12', 'mfe', 'cost', 'fill', 'cf', 'choch', 'm15c', 'm15c1', 'h4', 'h1', 'closed', 'tf', 'janda', 'vrAge', 'touch'],
+  trades: all.concat(twins, unfilled).map((x) => [x.m, x.k, x.side, x.opened, x.filled || null, +x.rr.toFixed(2), x.feat.d1, x.feat.struct, x.feat.session, ...x.v.map((v) => v.R == null ? null : +v.R.toFixed(2)), +x.mfe.toFixed(2), +x.cost.toFixed(3), x.status === 'closed' ? 1 : 0, x.feat.cf, x.feat.choch, x.feat.m15c, x.feat.m15c1, x.feat.h4 || null, x.feat.h1 || null, x.v[0].closed || x.ended || null, x.h, x.feat.janda || null, x.feat.vrAge || null, x.feat.touch || null, x.feat.upTF || null, x.feat.ltfChoch || null]),
+  tradeCols: ['market', 'setup', 'side', 'opened', 'filled', 'rr', 'd1', 'struct', 'session', 'R_none', 'R_be1', 'R_be15', 'R_tp2', 'R_pt2', 'R_ts4', 'R_ts8', 'R_ts12', 'mfe', 'cost', 'fill', 'cf', 'choch', 'm15c', 'm15c1', 'h4', 'h1', 'closed', 'tf', 'janda', 'vrAge', 'touch', 'upTF', 'ltfChoch'],
   twins: twins.length, unfilled: unfilled.length,
   examples: EX.map((x) => ({ id: x.id, market: x.market, side: x.side, entry: x.entry, stop: x.stop, target: x.target, entryFrom: x.entryFrom, entryTo: x.entryTo,
     caught: x.caught, setups: x.setups.map(({ s, ...v }) => v), sweep: x.sweep.map(({ s, ...v }) => v), m15: x.m15.map(({ s, ...v }) => v) })),
