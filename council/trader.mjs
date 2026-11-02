@@ -235,6 +235,11 @@ if (coach.date !== today) {
       const vals = Object.entries(g).map(([v, a]) => ({ v, n: a.length, e: exp(a) }));
       const bad = vals.find((x) => x.n >= 5 && x.e < -0.2), good = vals.find((x) => x.n >= 3 && x.e > 0.1);
       if (bad && good) { fl[fe] = good.v; (fl.since = fl.since || {})[fe] = nowISO; change(`${k}: only ${good.v} ${fe === 'd1' ? 'D1' : 'structure'}`, `${bad.v}: ${bad.e.toFixed(2)}R over ${bad.n} trades; ${good.v}: +${good.e.toFixed(2)}R over ${good.n}.`); }
+      else if (bad && bad.n >= 6 && bad.e <= -0.6) {
+        // a condition that keeps losing badly is filtered even before the other side has proven itself; its shadow trades can undo this
+        const other = { against: 'with', internal: 'main' }[bad.v];   // only ever narrows to the trend side / main structure
+        if (other) { fl[fe] = other; (fl.since = fl.since || {})[fe] = nowISO; change(`${k}: only ${other} ${fe === 'd1' ? 'D1' : 'structure'}`, `${bad.v}: ${bad.e.toFixed(2)}R over ${bad.n} trades, too costly to keep taking while ${other} is tested.`); }
+      }
     }
     const gs = {}; arr.forEach((x) => { const v = x.feat && x.feat.session; if (v) (gs[v] = gs[v] || []).push(x); });
     for (const [v, a] of Object.entries(gs)) {
