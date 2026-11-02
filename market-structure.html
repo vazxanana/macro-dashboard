@@ -2493,7 +2493,7 @@ function msNextSetup(bars, A) {
     const g = cl.size; let ss = 0; cl.forEach((u) => { ss += u * u; });
     return { n, e, se: g > 1 ? Math.sqrt(ss * g / (g - 1)) / n : Infinity, w: v.filter((t) => t[key] > 0).length / n };
   }
-  const BT_NAME = { sweep_vr: 'Sweep → VR → BO <small>stop past M5 VR · research</small>', sweep_ext: 'Sweep → VR → BO <small>stop past sweep · research</small>', sweep_m1: 'Sweep → VR → BO <small>stop past M1 origin · research</small>' };
+  const BT_NAME = { sweep_vr: 'Sweep → VR → BO <small>stop past M5 VR · research</small>', sweep_ext: 'Sweep → VR → BO <small>stop past sweep · research</small>', sweep_m1: 'Sweep → VR → BO <small>stop past M1 origin · research</small>', sweep_h1: 'Sweep → VR → BO <small>M1 stop, H1 Origin target · research</small>' };
   function renderBacktest(b, cf) {
     const sum = document.getElementById('ms-c-bt-sum'); if (!sum) return;
     const set = (id, html) => { const el = document.getElementById(id); if (el) el.innerHTML = html; };
@@ -2510,7 +2510,7 @@ function msNextSetup(bars, A) {
     sum.innerHTML = `${T.length} trades from ${day(b.from)} to ${day(b.to)}${net ? ', after spread' : ''} · run ${ago(Date.parse(b.at) / 1000)}${errs.length ? ` · <span class="c-warn">no history this run for ${errs.map((k) => esc((INSTRUMENTS[k] || {}).label || k)).join(', ')} (its history source failed this run; the next run retries)</span>` : ''}`;
     const mk = [...new Set(T.map((t) => t.market))].map((m) => ({ m, s: btStat(T.filter((t) => t.market === m)) })).sort((x, y) => y.s.e - x.s.e);
     set('ms-c-bt-mkt', mk.map(({ m, s }) => `<span class="ms-q ${cls(s) === 'pos' ? 'good' : cls(s) === 'neg' ? 'weak' : ''}">${esc((INSTRUMENTS[m] || {}).label || m)} ${f2(s.e)} · ${s.n}</span>`).join(''));
-    const defs = PAIRS.concat(RETR), order = defs.map((p) => p.k).concat(['sweep_vr', 'sweep_ext', 'sweep_m1']);
+    const defs = PAIRS.concat(RETR), order = defs.map((p) => p.k).concat(['sweep_vr', 'sweep_ext', 'sweep_m1', 'sweep_h1']);
     const keys = [...new Set(T.map((t) => t.setup))].sort((a, z) => order.indexOf(a) - order.indexOf(z));
     set('ms-c-bt', keys.map((k) => {
       const a = T.filter((t) => t.setup === k), s = btStat(a), lo = s.e - 1.96 * s.se, hi = s.e + 1.96 * s.se, d = defs.find((p) => p.k === k);
