@@ -1,8 +1,10 @@
 // Council · Backtest: replay past candles through the same engine and rules the Trader uses,
 // so the Coach can judge a setup on hundreds of historical trades instead of waiting days for live ones.
 // Usage: node council/backtest.mjs <dataDir> [days=30]
-// Data: Binance public market data (1m history) for crypto and gold (PAXG); for forex Yahoo Finance's chart API
-// (council/yahoo.mjs), with Dukascopy's free candle files as the fallback (council/duka.mjs).
+// Data: Binance public market data (1m history) for crypto and gold (PAXG); for forex Kraken's trade history (the
+// feed the live Trader uses; council/krakenhist.mjs), then Yahoo Finance (yahoo.mjs), then Dukascopy (duka.mjs).
+// Entry styles: every signal also gets a twin entered at market (setup '<k>@mkt'), and resting orders that never fill
+// are kept as 0R rows (fill = 0), so the Coach can compare the two entry styles signal by signal.
 // Costs: every trade carries its spread in R (one spread per round trip: bid/ask), so results can be judged net.
 // Writes <dataDir>/backtest.json: expectancy by setup, by condition, by reward:risk, by market, for three
 // trade-management variants (no break-even, break-even at +1R, at +1.5R).
@@ -11,6 +13,7 @@ import path from 'node:path';
 import { msAnalyze, CFG, PAIRS, RETR, buildSetup, buildRetrace, setMarket } from './engine.mjs';
 import { dukaMinutes, dukaHours, dukaDays, dukaReset } from './duka.mjs';
 import { yahooBars } from './yahoo.mjs';
+import { krakenTrades, minuteCandles, krakenOHLC } from './krakenhist.mjs';
 
 const DIR = process.argv[2] || 'data', DAYS = +(process.argv[3] || 30);
 const FAKE = !!process.env.BT_FAKE;   // offline self-test with a synthetic random walk
@@ -20,11 +23,11 @@ const MARKETS = {
   eth: { label: 'ETH/USD', name: 'Ethereum', group: 'Crypto', sym: 'ETHUSDT', dec: 2 },
   sol: { label: 'SOL/USD', name: 'Solana', group: 'Crypto', sym: 'SOLUSDT', dec: 2 },
   xrp: { label: 'XRP/USD', name: 'XRP', group: 'Crypto', sym: 'XRPUSDT', dec: 4 },
-  eurusd: { label: 'EUR/USD', name: 'Euro', group: 'Forex', duka: 'EURUSD', yahoo: 'EURUSD=X', dec: 5 },
-  gbpusd: { label: 'GBP/USD', name: 'Pound', group: 'Forex', duka: 'GBPUSD', yahoo: 'GBPUSD=X', dec: 5 },
-  audusd: { label: 'AUD/USD', name: 'Aussie', group: 'Forex', duka: 'AUDUSD', yahoo: 'AUDUSD=X', dec: 5 },
-  usdcad: { label: 'USD/CAD', name: 'Loonie', group: 'Forex', duka: 'USDCAD', yahoo: 'USDCAD=X', dec: 5 },
-  usdchf: { label: 'USD/CHF', name: 'Swissy', group: 'Forex', duka: 'USDCHF', yahoo: 'USDCHF=X', dec: 5 },
+  eurusd: { label: 'EUR/USD', name: 'Euro', group: 'Forex', duka: 'EURUSD', kraken: 'EURUSD', yahoo: 'EURUSD=X', dec: 5 },
+  gbpusd: { label: 'GBP/USD', name: 'Pound', group: 'Forex', duka: 'GBPUSD', kraken: 'GBPUSD', yahoo: 'GBPUSD=X', dec: 5 },
+  audusd: { label: 'AUD/USD', name: 'Aussie', group: 'Forex', duka: 'AUDUSD', kraken: 'AUDUSD', yahoo: 'AUDUSD=X', dec: 5 },
+  usdcad: { label: 'USD/CAD', name: 'Loonie', group: 'Forex', duka: 'USDCAD', kraken: 'USDCAD', yahoo: 'USDCAD=X', dec: 5 },
+  usdchf: { label: 'USD/CHF', name: 'Swissy', group: 'Forex', duka: 'USDCHF', kraken: 'USDCHF', yahoo: 'USDCHF=X', dec: 5 },
 };
 const TFS = [['1d', '1d', 86400], ['4h', '4h', 14400], ['1h', '1h', 3600], ['30m', '30m', 1800], ['15m', '15m', 900], ['5m', '5m', 300], ['1m', '1m', 60]];
 const SEC = Object.fromEntries(TFS.map(([id, , s]) => [id, s]));
@@ -156,7 +159,7 @@ function sweepSetups(src, price, t) {
 const spreadOf = (M, price) => M.group === 'Forex' ? 0.0001 : M.spot ? 0.3 : price * 0.0002;
 const BUILDERS = PAIRS.map((p) => [p, buildSetup]).concat(RETR.map((p) => [p, buildRetrace]));
 const DEFS = PAIRS.concat(RETR);
-const all = [], meta = { errors: {} };
+const all = [], twins = [], unfilled = [], meta = { errors: {} };   // closed trades; their market-entry twins; resting orders that never filled
 const endT = Math.floor(Date.now() / 1000 / 60) * 60 - 60, startT = endT - DAYS * 86400;
 const t0wall = Date.now();
 
@@ -169,7 +172,18 @@ for (const [key, M] of Object.entries(MARKETS)) {
     } else if (M.duka) {
       // forex: every timeframe straight from Yahoo (1m only reaches back ~29.5 days, so the replay starts once
       // 720 1m candles exist); if Yahoo fails, Dukascopy's files: 1m (5m/15m/30m built from it), 1h monthly, 1d yearly
-      try {
+      let done = false;
+      try {   // 1. Kraken trades → 1m (38 days); 1h = Kraken's 720 hourly candles plus older hours from the trades; 4h/1d = Kraken OHLC
+        const tr0 = Date.now(), trades = await krakenTrades(M.kraken, startT - 8 * 86400, endT), m1 = minuteCandles(trades);
+        if (m1.length < 5000) throw new Error(`only ${m1.length} 1m candles from ${trades.length} trades`);
+        const o60 = await krakenOHLC(M.kraken, 60), o240 = await krakenOHLC(M.kraken, 240), o1440 = await krakenOHLC(M.kraken, 1440);
+        const firstH = o60.length ? o60[0].time : Infinity, h1 = aggregate(m1.filter((b) => b.time < firstH), 3600).concat(o60);
+        Object.assign(data, { '1m': m1, '5m': aggregate(m1, 300), '15m': aggregate(m1, 900), '30m': aggregate(m1, 1800), '1h': h1, '4h': o240, '1d': o1440 });
+        meta.source = Object.assign(meta.source || {}, { [key]: 'Kraken' });
+        console.log(`${key}: ${trades.length} Kraken trades → ${m1.length} 1m candles, ${h1.length} 1h, ${o240.length} 4h, ${o1440.length} 1d (${((Date.now() - tr0) / 1000).toFixed(0)}s)`);
+        done = true;
+      } catch (ke) { console.log(`${key}: Kraken history failed (${ke.message}); trying Yahoo`); }
+      if (!done) try {
         const y = async (iv, back) => yahooBars(M.yahoo, iv, back, endT);
         const m1 = await y('1m', startT - WIN * 60);
         if (m1.length < 5000) throw new Error(`only ${m1.length} 1m candles`);
@@ -219,7 +233,7 @@ for (const [key, M] of Object.entries(MARKETS)) {
           for (const v of tr.v) manage(v, tr, b);
           if (tr.v.every((v) => v.done)) tr.status = 'closed';
         }
-        for (let k = open.length - 1; k >= 0; k--) if (open[k].status !== 'pending' && open[k].status !== 'open') { const tr = open.splice(k, 1)[0]; if (tr.status === 'closed') all.push(tr); }
+        for (let k = open.length - 1; k >= 0; k--) if (open[k].status !== 'pending' && open[k].status !== 'open') { const tr = open.splice(k, 1)[0]; if (tr.status === 'closed') (tr.twin ? twins : all).push(tr); else if (!tr.twin) { tr.v.forEach((v) => { v.R = 0; }); tr.cost = 0; unfilled.push(tr); } }
       }
       if (i1 < WIN) continue;
       // the Trader's view at time t: the last 720 closed candles of every timeframe plus the forming one
@@ -260,6 +274,16 @@ for (const [key, M] of Object.entries(MARKETS)) {
         if (!(tr.r0 > 0)) continue;
         tr.v = VARIANTS.map(([n, be, t2]) => ({ n, be, t2, stop: tr.stop, beMoved: false, done: false, R: null }));
         open.push(tr);
+        // its twin entered at market at the signal (same stop and targets): the other entry style, for a fair comparison
+        const tw = { ...tr, k: st.k + '@mkt', twin: true, mfe: 0 };
+        if (tr.status === 'pending') {
+          const r = Math.abs(price - st.stop), rw = (st.t1 - price) * (st.sell ? -1 : 1);
+          if (!(r > 0) || (st.sell ? price >= st.stop : price <= st.stop) || rw <= 0) continue;
+          Object.assign(tw, { entry: price, rr: rw / r, status: 'open', filled: t });
+        }
+        tw.r0 = Math.abs(tw.entry - tw.stop); tw.cost = tw.r0 > 0 ? spreadOf(M, tw.entry) / tw.r0 : 0;
+        tw.v = VARIANTS.map(([n, be, t2]) => ({ n, be, t2, stop: tw.stop, beMoved: false, done: false, R: null }));
+        open.push(tw);
       }
       for (const sw of sweepSetups(src, price, t)) {
         if (seen.has(sw.sig)) continue; seen.add(sw.sig);
@@ -292,8 +316,9 @@ const out = {
   byMarket: group(all, (x) => x.m),
   byRR: group(all, rrBand),
   bySetupCond: Object.fromEntries(setups.map((k) => { const a = all.filter((x) => x.k === k); return [k, { d1: group(a, (x) => x.feat.d1), struct: group(a, (x) => x.feat.struct), session: group(a, (x) => x.feat.session), rr: group(a, rrBand) }]; })),
-  trades: all.map((x) => [x.m, x.k, x.side, x.opened, x.filled, +x.rr.toFixed(2), x.feat.d1, x.feat.struct, x.feat.session, ...x.v.map((v) => v.R == null ? null : +v.R.toFixed(2)), +x.mfe.toFixed(2), +x.cost.toFixed(3)]),
-  tradeCols: ['market', 'setup', 'side', 'opened', 'filled', 'rr', 'd1', 'struct', 'session', 'R_none', 'R_be1', 'R_be15', 'R_tp2', 'mfe', 'cost'],
+  trades: all.concat(twins, unfilled).map((x) => [x.m, x.k, x.side, x.opened, x.filled || null, +x.rr.toFixed(2), x.feat.d1, x.feat.struct, x.feat.session, ...x.v.map((v) => v.R == null ? null : +v.R.toFixed(2)), +x.mfe.toFixed(2), +x.cost.toFixed(3), x.status === 'closed' ? 1 : 0]),
+  tradeCols: ['market', 'setup', 'side', 'opened', 'filled', 'rr', 'd1', 'struct', 'session', 'R_none', 'R_be1', 'R_be15', 'R_tp2', 'mfe', 'cost', 'fill'],
+  twins: twins.length, unfilled: unfilled.length,
 };
 fs.writeFileSync(path.join(DIR, 'backtest.json'), JSON.stringify(out));
 console.log(`\n${all.length} trades over ${DAYS} days (${((Date.now() - t0wall) / 1000).toFixed(0)}s)`);

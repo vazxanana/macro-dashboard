@@ -159,7 +159,9 @@ for (const [key, M] of Object.entries(MARKETS)) {
       if (config.paused[t.k]) blockedBy.push('paused');
       if (config.pausedMarkets[key]) blockedBy.push('market');
       // a market fill changes the reward:risk, so judge the rule on the price we would really get
-      const mkt = t.sell ? price >= t.entry : price <= t.entry;
+      // fill at market when price is already through the entry, or when the Coach set this setup to enter at market
+      // (the backtest showed waiting for the pullback misses more than it saves)
+      const mktEntry = (config.entry || {})[t.k] === 'market', mkt = (t.sell ? price >= t.entry : price <= t.entry) || mktEntry;
       const rrNow = mkt ? (t.t1 - price) * (t.sell ? -1 : 1) / Math.abs(price - t.stop) : t.rr;
       if (!(rrNow >= config.minRR)) blockedBy.push('minRR');
       // news guard (the Coach turns it on when news keeps stopping trades out): no short-term trade from 15 min before to 45 min after high-impact news
@@ -183,7 +185,8 @@ for (const [key, M] of Object.entries(MARKETS)) {
         shadow, blockedBy, note: shadow ? `Shadow (${blockedBy.map((b) => why[b]).join(', ')})` : t.next };
       try { tr.ctx = entryContext(t, src, def, M, price); } catch (e) {}
       if (mkt) {
-        // price is already through the entry: fill at the market price, never at a better level than was available
+        // fill at the market price, never at a better level than was available
+        if (mktEntry) tr.entryMode = 'market';
         tr.entry = price; tr.status = 'open'; tr.filled = now;
         const r = Math.abs(tr.entry - tr.stop), rw = (tr.t1 - tr.entry) * (t.sell ? -1 : 1);
         if (!(r > 0) || (t.sell ? price >= tr.stop : price <= tr.stop) || rw <= 0) { tr.status = 'skipped'; tr.note = 'Price already past the stop or target when the signal came in.'; }
@@ -213,7 +216,10 @@ const BT = (() => {
   const T = b.trades.map((r) => Object.fromEntries(b.tradeCols.map((c, i) => [c, r[i]])));
   // judge every result after costs: each backtest trade carries its spread in R (one spread per round trip)
   if (b.tradeCols.includes('cost')) for (const t of T) for (const k of ['R_none', 'R_be1', 'R_be15', 'R_tp2']) if (t[k] != null) t[k] = +(t[k] - (t.cost || 0)).toFixed(3);
-  return { b, T, mid: T.map((t) => t.opened).sort((x, y) => x - y)[T.length >> 1] };
+  // TA: every row, incl. market-entry twins ('<k>@mkt') and resting orders that never filled (fill 0, 0R);
+  // T: the trades as the Trader takes them now (filled, no twins) — what every rule except the entry style is judged on
+  const TA = T, TT = TA.filter((t) => t.fill !== 0 && !String(t.setup).includes('@'));
+  return { b, T: TT, TA, mid: TT.map((t) => t.opened).sort((x, y) => x - y)[TT.length >> 1] };
 })();
 const DEF_KEYS = new Set(PAIRS.concat(RETR).map((p) => p.k));   // setups the Trader actually trades (research setups are only backtested)
 // mean R with a market-day clustered standard error (CR1) and its t-value; g = number of market-day clusters
@@ -296,6 +302,21 @@ function learnFromBacktest(change) {
   for (const k of Object.keys(config.paused)) {
     const pos = btPositive(k), live = pauseSample(trades.filter((x) => x.k === k && (x.status === 'win' || x.status === 'loss' || x.status === 'be') && now - x.closed < 30 * 86400));
     if (pos && live.length < 15) { delete config.paused[k]; change(`Resumed ${k} (backtest)`, `Paused on ${live.length} trades, but ${pos.n} past trades as it trades now made ${f2(pos.e)} each (${tTxt(pos.t)}), in both halves of the last ${days} days.`); }
+  }
+  // 5. entry style per setup: a resting order at the CF level (default) or entering at market at the signal. Compared
+  //    signal by signal on the same signals (a resting order that never fills counts 0R), after spread, on the signals
+  //    the setup's D1 filter lets through. Market entry needs >= +0.05R per signal at t >= 2.5 and to win in both halves;
+  //    once on, it stays while it is still ahead.
+  config.entry = config.entry || {};
+  for (const k of setups.filter((x) => DEF_KEYS.has(x))) {
+    const f = config.filters[k] || {}, lim = new Map(BT.TA.filter((t) => t.setup === k && (!f.d1 || t.d1 === f.d1)).map((t) => [`${t.market}|${t.opened}`, t]));
+    const pairs = BT.TA.filter((t) => t.setup === `${k}@mkt` && lim.has(`${t.market}|${t.opened}`)).map((t) => ({ market: t.market, opened: t.opened, d: t.R_none - lim.get(`${t.market}|${t.opened}`).R_none }));
+    if (pairs.length < 30) continue;
+    const dd = btE(pairs, 'd'), h1 = btE(pairs.filter((p) => p.opened < BT.mid), 'd'), h2 = btE(pairs.filter((p) => p.opened >= BT.mid), 'd');
+    const clear = dd.e >= 0.05 && dd.t >= 2.5 && h1.e > 0 && h2.e > 0, want = clear || (config.entry[k] === 'market' && dd.e > 0) ? 'market' : 'limit';
+    if ((config.entry[k] || 'limit') === want) continue;
+    if (want === 'market') config.entry[k] = 'market'; else delete config.entry[k];
+    change(want === 'market' ? `${k}: enter at market (backtest)` : `${k}: back to waiting for the pullback (backtest)`, `${pairs.length} signals over the last ${days} days: entering at market ${f2(dd.e)} per signal versus the resting order (${tTxt(dd.t)}), ${f2(h1.e)} and ${f2(h2.e)} in the two halves.`);
   }
 }
 

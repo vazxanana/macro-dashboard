@@ -2490,15 +2490,16 @@ function msNextSetup(bars, A) {
     const sum = document.getElementById('ms-c-bt-sum'); if (!sum) return;
     const set = (id, html) => { const el = document.getElementById(id); if (el) el.innerHTML = html; };
     if (!b || !Array.isArray(b.trades) || !b.trades.length) { sum.textContent = 'No backtest yet: it runs daily and after every engine change.'; ['ms-c-bt', 'ms-c-bt-mkt', 'ms-c-bt-lines'].forEach((id) => set(id, '')); return; }
-    const T = b.trades.map((r) => Object.fromEntries(b.tradeCols.map((c, i) => [c, r[i]])));
+    const TA = b.trades.map((r) => Object.fromEntries(b.tradeCols.map((c, i) => [c, r[i]])));
     const net = b.tradeCols.includes('cost');   // results after a typical spread (one per round trip), as the Coach judges them
-    if (net) T.forEach((t) => ['R_none', 'R_be1', 'R_be15', 'R_tp2'].forEach((k) => { if (t[k] != null) t[k] -= t.cost || 0; }));
+    if (net) TA.forEach((t) => ['R_none', 'R_be1', 'R_be15', 'R_tp2'].forEach((k) => { if (t[k] != null) t[k] -= t.cost || 0; }));
+    const T = TA.filter((t) => t.fill !== 0 && !String(t.setup).includes('@'));   // the trades as the Trader takes them (no market-entry twins, no unfilled orders)
     const f2 = (v) => `${v > 0 ? '+' : v < 0 ? '−' : ''}${Math.abs(v).toFixed(2)}R`;
     const cls = (s) => !isFinite(s.se) || s.n < 5 ? '' : s.e - 1.96 * s.se > 0 ? 'pos' : s.e + 1.96 * s.se < 0 ? 'neg' : '';
     const cell = (s) => s.n ? `<span class="c-bt-r ${cls(s)}">${f2(s.e)} <small>n${s.n}</small></span>` : '<span class="c-few">—</span>';
     const errs = Object.keys((b.markets || {}).errors || {});
     const day = (iso) => new Date(iso).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' });
-    sum.innerHTML = `${T.length} trades from ${day(b.from)} to ${day(b.to)}${net ? ', after spread' : ''} · run ${ago(Date.parse(b.at) / 1000)}${errs.length ? ` · <span class="c-warn">no history this run for ${errs.map((k) => esc((INSTRUMENTS[k] || {}).label || k)).join(', ')} (data feed throttled; it fills in over the next runs)</span>` : ''}`;
+    sum.innerHTML = `${T.length} trades from ${day(b.from)} to ${day(b.to)}${net ? ', after spread' : ''} · run ${ago(Date.parse(b.at) / 1000)}${errs.length ? ` · <span class="c-warn">no history this run for ${errs.map((k) => esc((INSTRUMENTS[k] || {}).label || k)).join(', ')} (its history source failed this run; the next run retries)</span>` : ''}`;
     const mk = [...new Set(T.map((t) => t.market))].map((m) => ({ m, s: btStat(T.filter((t) => t.market === m)) })).sort((x, y) => y.s.e - x.s.e);
     set('ms-c-bt-mkt', mk.map(({ m, s }) => `<span class="ms-q ${cls(s) === 'pos' ? 'good' : cls(s) === 'neg' ? 'weak' : ''}">${esc((INSTRUMENTS[m] || {}).label || m)} ${f2(s.e)} · ${s.n}</span>`).join(''));
     const defs = PAIRS.concat(RETR), order = defs.map((p) => p.k).concat(['sweep_vr', 'sweep_ext']);
@@ -2515,6 +2516,18 @@ function msNextSetup(bars, A) {
     const be = diff('R_be1', 'R_none'), be15 = diff('R_be15', 'R_none');
     lines.push(`Break-even at +1R: ${f2(be.e)} per trade versus no break-even (${clear(be) ? 'a clear difference' : 'no clear difference'}); at +1.5R: ${f2(be15.e)}. ${cf.be ? `The Trader uses break-even at +${cf.be}R.` : 'The Trader uses no break-even.'}`);
     if (b.tradeCols.includes('R_tp2')) { const tp = diff('R_tp2', 'R_none'); lines.push(`Holding to the second target: ${f2(tp.e)} per trade versus the first target (${clear(tp) ? 'a clear difference' : 'no clear difference'}).`); }
+    // entry style: entering at market at the signal versus waiting for the pullback, signal by signal (a missed order is 0R)
+    if (TA.some((t) => String(t.setup).endsWith('@mkt'))) {
+      const parts = keys.filter((k) => defs.some((p) => p.k === k)).map((k) => {
+        const fl = (cf.filters || {})[k] || {}, lim = new Map(TA.filter((t) => t.setup === k && (!fl.d1 || t.d1 === fl.d1)).map((t) => [`${t.market}|${t.opened}`, t]));
+        const pr = TA.filter((t) => t.setup === `${k}@mkt` && lim.has(`${t.market}|${t.opened}`)).map((t) => ({ market: t.market, opened: t.opened, d: t.R_none - lim.get(`${t.market}|${t.opened}`).R_none }));
+        if (pr.length < 30) return '';
+        const s = btStat(pr, 'd'), d = defs.find((p) => p.k === k), on = (cf.entry || {})[k] === 'market';
+        return `${esc(d.name)} ${LBL[d.h]}→${LBL[d.l]} <b class="${clear(s) ? (s.e > 0 ? 'pos' : 'neg') : ''}">${f2(s.e)}</b>${on ? ' <span class="c-bt-st on">enters at market</span>' : ''}`;
+      }).filter(Boolean);
+      const miss = TA.filter((t) => t.fill === 0 && !String(t.setup).includes('@')).length;
+      if (parts.length) lines.push(`Entering at market instead of waiting for the pullback, per signal (${miss} resting orders never filled): ${parts.join(' · ')}.`);
+    }
     set('ms-c-bt-lines', lines.map((l) => `<li>${l}</li>`).join(''));
   }
   // Council trades on the market you're viewing, with live result in R
