@@ -53,6 +53,7 @@ Every run writes `snapshot.json` → `lessons` (counts by cause, system vs marke
 The statistical Coach acts on repeated system errors (6+ reviewed losses in 14 days): 3+ `hunt` (30%+) → buffer +0.02; 3+ `noise` → minimum stop +0.1;
 3+ `late` (30%+) → `fresh` −2 candles (min 6); 3+ `news` → `newsGuard` on (no M15/H1 trades from 15 min before to 45 min after high-impact news; re-tested after 21 days);
 3+ `becost` outnumbering saves → break-even moves 0.5R later.
+The dollar cap (`maxUsd`, 2–4, default 3) rises by 1 when trades blocked only by it make more than +0.3R over 5+ (14 days), and falls by 1 when those would have lost and live gold/forex trades lose too.
 
 ## Guide for the AI Coach (read before every review)
 
@@ -80,6 +81,7 @@ never a rule change from a single trade.
 - `minRR` 1.2–2.5 (±0.1)
 - `be`: null, 1, 1.5 or 2
 - `fresh` 6–12 candles (±2), `newsGuard` true/false
+- `maxUsd` 2–4 (±1)
 - pause a setup for at most 7 days, or a market for at most 3 days, or resume either early
 - add or remove `filters[k]` entries (`d1`, `struct`, `noSession`), setting `since`
 
