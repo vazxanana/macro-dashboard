@@ -346,6 +346,21 @@
   .c-auto b { display: block; font-size: 13px; } .c-auto small { color: var(--ink-dim); font-size: 11px; line-height: 1.4; display: block; }
   .c-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
   .c-trader, .c-score, .c-pmc, .c-btc { grid-column: 1 / -1; }
+  /* P&L calendar: one cell per day, result in R of the trades closed that day */
+  .c-cal { grid-column: 1 / -1; }
+  .cal-nav { display: inline-flex; align-items: center; gap: 8px; } .cal-nav b { min-width: 120px; text-align: center; color: var(--ink); }
+  .cal-nav button { background: none; border: 1px solid var(--line-soft); color: var(--ink); border-radius: 6px; width: 28px; height: 26px; cursor: pointer; font-size: 15px; line-height: 1; }
+  .cal { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 4px; margin-top: 10px; }
+  .cal-h { font-size: 11px; color: var(--ink-dim); text-align: center; padding-bottom: 2px; }
+  .cal-d { min-height: 62px; border: 1px solid var(--line-soft); border-radius: 6px; padding: 5px 6px; display: flex; flex-direction: column; gap: 2px; font-size: 11px; color: var(--ink-dim); background: none; text-align: left; cursor: pointer; font: inherit; }
+  .cal-d.out { visibility: hidden; } .cal-d.today { border-color: var(--accent); } .cal-d.sel { outline: 2px solid var(--accent); outline-offset: -1px; }
+  .cal-d .cn { font-size: 11px; } .cal-d .cr { font-family: var(--mono); font-size: 13px; font-weight: 600; color: var(--ink); } .cal-d .ct { font-size: 10.5px; }
+  .cal-d.win { background: color-mix(in srgb, var(--buy) 14%, transparent); } .cal-d.win .cr { color: var(--buy); }
+  .cal-d.loss { background: color-mix(in srgb, var(--sell) 14%, transparent); } .cal-d.loss .cr { color: var(--sell); }
+  .cal-day { list-style: none; margin: 8px 0 0; padding: 0; display: grid; gap: 4px; font-size: 12.5px; }
+  .cal-day li { display: flex; gap: 8px; flex-wrap: wrap; padding: 6px 8px; border: 1px solid var(--line-soft); border-radius: 6px; cursor: pointer; }
+  .cal-day li b.pos { color: var(--buy); } .cal-day li b.neg { color: var(--sell); }
+  @media (max-width: 560px) { .cal-d { min-height: 52px; padding: 3px 4px; } .cal-d .cr { font-size: 11.5px; } .cal-d .ct { font-size: 9.5px; } }
   .c-bt-meta { display: flex; flex-wrap: wrap; gap: 6px; margin: 2px 0 10px; }
   .c-bt-r { font-family: var(--mono); white-space: nowrap; } .c-bt-r small { color: var(--ink-faint); font-family: var(--mono); }
   .c-bt-st { font-size: 11px; white-space: nowrap; } .c-bt-st.on { color: var(--buy); } .c-bt-st.off { color: var(--sell); } .c-bt-st.res { color: var(--ink-faint); }
@@ -621,6 +636,12 @@
         <div class="c-kpi" id="ms-c-kpi"></div>
         <div class="c-eq" id="ms-c-eq"></div>
         <div class="ms-bt-wrap"><table class="ms-bt-t c-t"><thead><tr><th>Opened</th><th>Market</th><th>Setup</th><th>Side</th><th class="n">Entry</th><th class="n">Stop</th><th class="n">Target 1</th><th>Result</th></tr></thead><tbody id="ms-c-trades"></tbody></table></div>
+      </div>
+      <div class="card c-cal">
+        <div class="ms-k"><span>Calendar · result by day (R, trades closed that day)</span><span class="c-tog"><span class="cal-nav"><button type="button" id="ms-cal-prev" aria-label="Previous month">‹</button><b id="ms-cal-m"></b><button type="button" id="ms-cal-next" aria-label="Next month">›</button></span><label class="c-mine"><input type="checkbox" id="ms-cal-sh"> Include shadow trades</label></span></div>
+        <div class="cal" id="ms-cal"></div>
+        <p class="ms-note" id="ms-cal-sum"></p>
+        <ul class="cal-day" id="ms-cal-day"></ul>
       </div>
       <div class="card c-score">
         <div class="ms-k">Scorecard · which setups and markets pay</div>
@@ -2343,10 +2364,39 @@ function msNextSetup(bars, A) {
     });
     try { localStorage.setItem('msCouncilSeen', JSON.stringify(seen)); } catch (e) {}
   }
+  // P&L calendar: the trades closed each local day, their total R and count; tap a day for its trades
+  const CAL = { y: null, m: null, sel: null };
+  function renderCalendar() {
+    const el = document.getElementById('ms-cal'); if (!el) return;
+    const withSh = (document.getElementById('ms-cal-sh') || {}).checked;
+    const done = (COUNCIL.trades || []).filter((x) => ['win', 'loss', 'be'].includes(x.status) && x.closed && x.R != null && (withSh || !x.shadow));
+    const key = (t) => { const d = new Date(t * 1000); return `${d.getFullYear()}-${d.getMonth()}-${d.getDate()}`; };
+    const byDay = new Map(); for (const x of done) { const k = key(x.closed); (byDay.get(k) || byDay.set(k, []).get(k)).push(x); }
+    const now = new Date(); if (CAL.y === null) { CAL.y = now.getFullYear(); CAL.m = now.getMonth(); }
+    const first = new Date(CAL.y, CAL.m, 1), days = new Date(CAL.y, CAL.m + 1, 0).getDate(), lead = (first.getDay() + 6) % 7;
+    const fR = (v) => `${v > 0 ? '+' : v < 0 ? '−' : ''}${Math.abs(v).toFixed(2)}R`;
+    let html = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].map((d) => `<div class="cal-h">${d}</div>`).join('') + '<div class="cal-d out"></div>'.repeat(lead);
+    let mR = 0, mN = 0, up = 0, dn = 0, best = null, worst = null;
+    for (let d = 1; d <= days; d++) {
+      const k = `${CAL.y}-${CAL.m}-${d}`, arr = byDay.get(k) || [], R = arr.reduce((a, x) => a + x.R, 0);
+      if (arr.length) { mR += R; mN += arr.length; if (R > 0) up++; else if (R < 0) dn++; if (!best || R > best.R) best = { d, R }; if (!worst || R < worst.R) worst = { d, R }; }
+      const cls = arr.length ? (R > 0 ? 'win' : R < 0 ? 'loss' : '') : '', isT = now.getFullYear() === CAL.y && now.getMonth() === CAL.m && now.getDate() === d;
+      html += `<button type="button" class="cal-d ${cls}${isT ? ' today' : ''}${CAL.sel === k ? ' sel' : ''}" data-day="${k}" aria-label="${d}: ${arr.length ? `${fR(R)}, ${arr.length} trades` : 'no trades'}"><span class="cn">${d}</span>${arr.length ? `<span class="cr">${fR(R)}</span><span class="ct">${arr.length} trade${arr.length > 1 ? 's' : ''} · ${arr.filter((x) => x.status === 'win').length}W</span>` : ''}</button>`;
+    }
+    el.innerHTML = html;
+    document.getElementById('ms-cal-m').textContent = first.toLocaleDateString(undefined, { month: 'long', year: 'numeric' });
+    document.getElementById('ms-cal-sum').innerHTML = mN ? `Month: <b class="${mR >= 0 ? 'pos' : 'neg'}">${fR(mR)}</b> over ${mN} trades · ${up} green day${up === 1 ? '' : 's'}, ${dn} red · best day ${best.d} (${fR(best.R)}), worst day ${worst.d} (${fR(worst.R)}). ${withSh ? 'Live and shadow trades.' : 'Live trades only.'} 1R = the risk of one trade.` : `No closed ${withSh ? '' : 'live '}trades this month.`;
+    const sel = CAL.sel && byDay.get(CAL.sel);
+    document.getElementById('ms-cal-day').innerHTML = sel ? sel.slice().sort((a, b) => a.closed - b.closed).map((x) => `<li data-tid="${esc(x.id)}" tabindex="0" title="Show this trade on a chart"><span>${ftime(x.closed + TZ)}</span><b>${esc(x.label)}</b><span>${esc(x.name)} ${esc(x.pair)} · ${x.side}${x.shadow ? ' · shadow' : ''}</span><b class="${x.R > 0 ? 'pos' : x.R < 0 ? 'neg' : ''}">${x.status === 'be' ? 'break-even' : fR(x.R)}</b></li>`).join('') : '';
+  }
+  ['ms-cal-prev', 'ms-cal-next'].forEach((id, i) => { const b = document.getElementById(id); if (b) b.addEventListener('click', () => { CAL.m += i ? 1 : -1; if (CAL.m < 0) { CAL.m = 11; CAL.y--; } if (CAL.m > 11) { CAL.m = 0; CAL.y++; } CAL.sel = null; renderCalendar(); }); });
+  { const sh = document.getElementById('ms-cal-sh'); if (sh) sh.addEventListener('change', renderCalendar); }
+  { const g = document.getElementById('ms-cal'); if (g) g.addEventListener('click', (ev) => { const d = ev.target.closest('[data-day]'); if (!d) return; CAL.sel = CAL.sel === d.dataset.day ? null : d.dataset.day; renderCalendar(); }); }
   function renderCouncil() {
     const root = document.getElementById('v-council'); if (!root) return;
     const set = (id, html) => { const el = document.getElementById(id); if (el) el.innerHTML = html; };
     const C = COUNCIL, TA = (C.trades || []).slice().reverse(), T = TA.filter((x) => !x.shadow);
+    renderCalendar();
     const showSh = document.getElementById('ms-c-shadow'), withSh = showSh && showSh.checked;
     const mine = document.getElementById('ms-c-mine'), only = mine && mine.checked;
     const list = only ? T.filter((x) => x.market === instKey) : T;
@@ -2476,7 +2526,7 @@ function msNextSetup(bars, A) {
   }
   const ST_NAME = { open: 'Open', pending: 'Waiting fill', missed: 'Missed', expired: 'Expired', skipped: 'Skipped' };
   const SESSION_NAME = { asia: 'Asia session', london: 'London session', overlap: 'London/New York overlap', newyork: 'New York session', late: 'Late session' };
-  ['ms-c-trades', 'ms-c-pm'].forEach((cid) => {
+  ['ms-c-trades', 'ms-c-pm', 'ms-cal-day'].forEach((cid) => {
     const el = document.getElementById(cid); if (!el) return;
     el.addEventListener('click', (ev) => { const r = ev.target.closest('[data-tid]'); if (r) openTrade(r.dataset.tid); });
     el.addEventListener('keydown', (ev) => { if (ev.key !== 'Enter' && ev.key !== ' ') return; const r = ev.target.closest('[data-tid]'); if (r) { ev.preventDefault(); openTrade(r.dataset.tid); } });
