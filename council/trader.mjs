@@ -437,14 +437,30 @@ function learnFilters(closedAll, change) {
 // before 6 live ones triggered the pause). Checked on every run, not once a day.
 const NEUTRAL = new Set(['exposure', 'usd', 'duplicate']);
 const pauseSample = (closedAll) => closedAll.filter((x) => !x.shadow || ((x.blockedBy || []).length && x.blockedBy.every((b) => NEUTRAL.has(b))));
+// the backtest's verdict on a setup as it trades now: at least break-even over 50+ trades (after spread)?
+function btNonNeg(k) {
+  if (!BT) return null;
+  const f = config.filters[k] || {}, all = btE(BT.T.filter((t) => t.setup === k && passesFilters(t, f)));
+  return all.n >= 50 && all.e >= 0 ? all : null;
+}
 function learnPauses(sample, change) {
   const bySetup = {};
   for (const t of [...sample].sort((a, b) => a.closed - b.closed)) (bySetup[t.k] = bySetup[t.k] || []).push(t);
+  const ex = (arr) => arr.length ? arr.reduce((a, x) => a + x.R, 0) / arr.length : 0;
+  // a losing streak inside a record that pays is variance: a setup paused on one resumes once its own trades and the
+  // backtest both make money (2 Nov: rintra paused at 19:07 on four losses in a row, its 9 trades +0.68R overall, two
+  // gold winners zeroed by the old break-even rule, the backtest +0.16R a trade over 96)
+  for (const k of Object.keys(config.paused)) {
+    const arr = bySetup[k] || [], bt = btNonNeg(k);
+    if (arr.length >= 6 && ex(arr) >= 0 && bt) { delete config.paused[k]; change(`Resumed ${k}`, `Its last ${arr.length} trades made ${ex(arr) >= 0 ? '+' : ''}${ex(arr).toFixed(2)}R each and the backtest ${bt.e >= 0 ? '+' : ''}${bt.e.toFixed(2)}R over ${bt.n}: a losing streak inside a record that pays is variance.`); }
+  }
   for (const [k, arr] of Object.entries(bySetup)) {
     if (config.paused[k]) continue;
     if (btPositive(k) && arr.length < 15) continue;   // the backtest says it pays: a few live losses aren't enough to pause it
-    const n = arr.length, e = n ? arr.reduce((a, x) => a + x.R, 0) / n : 0, last4 = arr.slice(-4);
-    if ((n >= 6 && e < -0.25) || (last4.length === 4 && last4.every((x) => x.status === 'loss'))) {
+    const n = arr.length, e = ex(arr), last4 = arr.slice(-4);
+    // four losses in a row pause only a setup that is losing overall and that the backtest doesn't show paying
+    const streak = last4.length === 4 && last4.every((x) => x.status === 'loss') && e < 0 && !btNonNeg(k);
+    if ((n >= 6 && e < -0.25) || streak) {
       config.paused[k] = new Date((now + 3 * 86400) * 1000).toISOString();
       const sh = arr.filter((x) => x.shadow).length, mix = sh ? ` (${n - sh} live, ${sh} shadow blocked only by exposure or the dollar cap)` : '';
       change(`Paused ${k} for 3 days`, n >= 6 && e < -0.25 ? `Expectancy ${e.toFixed(2)}R over ${n} trades${mix}.` : `Four losses in a row${mix}.`);
