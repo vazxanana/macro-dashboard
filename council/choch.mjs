@@ -6,10 +6,10 @@
 const atr = (bars, n = 14) => { const b = bars.slice(-n - 1); let s = 0; for (let i = 1; i < b.length; i++) s += Math.max(b[i].high - b[i].low, Math.abs(b[i].high - b[i - 1].close), Math.abs(b[i].low - b[i - 1].close)); return b.length > 1 ? s / (b.length - 1) : 0; };
 
 // the trader's M15 CHoCH on one side: the leg, the level, and the closed candle that closed through it (iC, or -1)
-export function m15Choch(B, sell) {
+export function m15Choch(B, sell, w = 2) {
   const n = B.length, L = 48;
   if (n < L + 5) return null;
-  const piv = (j, hi) => { for (let k = 1; k <= 2; k++) { if (j - k < 0 || j + k > n - 2) return false; if (hi ? (B[j - k].high > B[j].high || B[j + k].high >= B[j].high) : (B[j - k].low < B[j].low || B[j + k].low <= B[j].low)) return false; } return true; };
+  const piv = (j, hi) => { for (let k = 1; k <= w; k++) { if (j - k < 0 || j + k > n - 2) return false; if (hi ? (B[j - k].high > B[j].high || B[j + k].high >= B[j].high) : (B[j - k].low < B[j].low || B[j + k].low <= B[j].low)) return false; } return true; };
   const x = (b) => sell ? b.high : -b.low, y = (b) => sell ? -b.low : b.high;
   // the leg: from the last 12 h's high (low), closed candles, to the lowest low (highest high) after it: the pullback
   // the CHoCH ends (2 Nov: 3,918 at 05:45 -> 3,891 at 08:00; Sunday's lower open is before the high and doesn't count)
@@ -23,5 +23,6 @@ export function m15Choch(B, sell) {
   let iC = -1; for (let j = iE + 1; j <= n - 2; j++) if (sell ? B[j].close < lvl : B[j].close > lvl) { iC = j; break; }
   return { leg: true, iS, iE, iP, iC, ext, lvl };
 }
+// w: candles each side of the swing (2 by default; 1 catches the smaller lower high the trader may mean, tested as m15c1)
 // every signal: did the trader's M15 CHoCH in its direction close within the last hour (4 M15 candles)?
-export const m15cFeat = (B, sell, t) => { const c = m15Choch(B, sell); return c && c.leg && c.iC >= 0 && t - (B[c.iC].time + 900) <= 4 * 900 ? 'yes' : 'no'; };
+export const m15cFeat = (B, sell, t, w = 2) => { const c = m15Choch(B, sell, w); return c && c.leg && c.iC >= 0 && t - (B[c.iC].time + 900) <= 4 * 900 ? 'yes' : 'no'; };
