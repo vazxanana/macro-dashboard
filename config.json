@@ -14,20 +14,28 @@
   "scalp": {
    "d1": "against",
    "since": {
-    "d1": "2026-11-02T11:52:07.000Z"
+    "d1": "2026-11-02T11:52:07.000Z",
+    "session:asia": "2026-11-02T21:30:00.000Z"
    },
    "src": {
     "d1": "backtest"
-   }
+   },
+   "noSession": [
+    "asia"
+   ]
   },
   "rscalp": {
    "d1": "with",
    "since": {
-    "d1": "2026-11-02T11:52:07.000Z"
+    "d1": "2026-11-02T11:52:07.000Z",
+    "session:asia": "2026-11-02T21:30:00.000Z"
    },
    "src": {
     "d1": "backtest"
-   }
+   },
+   "noSession": [
+    "asia"
+   ]
   },
   "intraday": {
    "d1": "against",
@@ -105,6 +113,12 @@
    "by": "coach-stats",
    "change": "Resumed rintra",
    "why": "Its last 9 trades made +0.08R each and the backtest +0.16R over 96: a losing streak inside a record that pays is variance."
+  },
+  {
+   "at": "2026-11-02T21:30:00.000Z",
+   "by": "coach-ai",
+   "change": "scalp, rscalp: skip the asia session",
+   "why": "2 Nov: Asia lost -15.9R over 29 trades (2 wins, live and shadow) while New York made +12.9R over 13; all 8 live Asia trades lost (-6R). One day only: blocked Asia trades keep running as shadow and the rule drops itself if they make +0.2R over 5."
   }
  ],
  "btAt": "2026-11-02T19:40:46.466Z",
