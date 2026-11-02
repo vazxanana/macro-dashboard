@@ -232,8 +232,10 @@ function structFeat(sell, l, src, at) {
 }
 // typical spread (same model as the trade reviews): one spread is paid per round trip
 const spreadOf = (M, price) => M.group === 'Forex' ? 0.0001 : M.spot ? 0.3 : price * 0.0002;
-const BUILDERS = PAIRS.map((p) => [p, buildSetup]).concat(RETR.map((p) => [p, buildRetrace]));
-const DEFS = PAIRS.concat(RETR);
+// research: the Mosha notes' barrier formula pairs H4 with M15 (the engine's swing uses H4 → H1)
+const PAIRS_R = PAIRS.concat([{ k: 'swing15', name: 'Swing M15', h: '4h', l: '15m', e: 'M15 / M1', up: '1d' }]);
+const BUILDERS = PAIRS_R.map((p) => [p, buildSetup]).concat(RETR.map((p) => [p, buildRetrace]));
+const DEFS = PAIRS_R.concat(RETR);
 const all = [], twins = [], unfilled = [], meta = { errors: {} };   // closed trades; their market-entry twins; resting orders that never filled
 const endT = Math.floor(Date.now() / 1000 / 60) * 60 - 60, startT = endT - DAYS * 86400;
 const t0wall = Date.now();
@@ -297,7 +299,7 @@ for (const [key, M] of Object.entries(MARKETS)) {
     const m1 = data['1m'];
     setMarket(M);
     const ptr = Object.fromEntries(TFS.map(([id]) => [id, 0]));
-    const seen = new Set(), open = [];
+    const seen = new Set(), open = [], touches = new Map();
     let i1 = 0, steps = 0;
     for (let t = startT; t <= endT; t += STEP) {
       // manage open trades on the 1m candles of the last step
@@ -358,6 +360,17 @@ for (const [key, M] of Object.entries(MARKETS)) {
         if (!cfT || t - cfT > FRESH * SEC[def.l]) continue;
         const feat = { d1: src['1d'].A.trend === (st.sell ? -1 : 1) ? 'with' : 'against', struct: st.retr == null ? 'n/a' : st.retr >= 0.5 ? 'main' : 'internal', session: sessionOf(t), ...structFeat(st.sell, def.l, src, t), m15c: m15cOf(src['15m'].bars, st.sell, t), m15c1: m15cOf(src['15m'].bars, st.sell, t, 1),
           h4: src['4h'].A.trend === (st.sell ? -1 : 1) ? 'with' : 'against', h1: src['1h'].A.trend === (st.sell ? -1 : 1) ? 'with' : 'against' };
+        // features from the trader's notes (research): Janda = the lower timeframe printed a BO Structure and then a BO the same
+        // way (two breaks, "breakout 2 times"); vrAge = how soon after the higher-timeframe VR the CF came ("a CF right after the
+        // VR likely fails"); touch = which signal this is from the same higher-timeframe Origin (fresh zone = the first)
+        try {
+          const le = src[def.l].A.events, e1 = le[le.length - 1], e0 = le[le.length - 2];
+          feat.janda = e1 && e0 && !e1.structure && e0.structure && e0.dir === e1.dir ? 'yes' : 'no';
+          const he = src[def.h].A.last, hb = src[def.h].bars;
+          feat.vrAge = !he || !he.vr ? 'novr' : (cfT - hb[he.vr.i].time) / SEC[def.h] <= 3 ? 'fast' : 'slow';
+          const okey = String(st.sig).split('|').slice(0, 2).join('|'), nT = (touches.get(okey) || 0) + 1; touches.set(okey, nT);
+          feat.touch = nT === 1 ? 'first' : nT === 2 ? 'second' : 'third+';
+        } catch (e) {}
         const tr = { m: key, k: st.k, h: def.h, side, entry: st.entry, stop: st.stop, t1: st.t1, t2: st.t2 != null && (st.t2 - st.t1) * (st.sell ? -1 : 1) > 0 ? st.t2 : null, rr: st.rr, opened: t, status: 'pending', feat, mfe: 0 };
         if (st.sell ? price >= st.entry : price <= st.entry) {   // already through the entry: fill at market, like the Trader
           const r = Math.abs(price - st.stop), rw = (st.t1 - price) * (st.sell ? -1 : 1);
@@ -414,8 +427,8 @@ const out = {
   byMarket: group(all, (x) => x.m),
   byRR: group(all, rrBand),
   bySetupCond: Object.fromEntries(setups.map((k) => { const a = all.filter((x) => x.k === k); return [k, { d1: group(a, (x) => x.feat.d1), struct: group(a, (x) => x.feat.struct), session: group(a, (x) => x.feat.session), rr: group(a, rrBand) }]; })),
-  trades: all.concat(twins, unfilled).map((x) => [x.m, x.k, x.side, x.opened, x.filled || null, +x.rr.toFixed(2), x.feat.d1, x.feat.struct, x.feat.session, ...x.v.map((v) => v.R == null ? null : +v.R.toFixed(2)), +x.mfe.toFixed(2), +x.cost.toFixed(3), x.status === 'closed' ? 1 : 0, x.feat.cf, x.feat.choch, x.feat.m15c, x.feat.m15c1, x.feat.h4 || null, x.feat.h1 || null, x.v[0].closed || x.ended || null, x.h]),
-  tradeCols: ['market', 'setup', 'side', 'opened', 'filled', 'rr', 'd1', 'struct', 'session', 'R_none', 'R_be1', 'R_be15', 'R_tp2', 'R_pt2', 'R_ts4', 'R_ts8', 'R_ts12', 'mfe', 'cost', 'fill', 'cf', 'choch', 'm15c', 'm15c1', 'h4', 'h1', 'closed', 'tf'],
+  trades: all.concat(twins, unfilled).map((x) => [x.m, x.k, x.side, x.opened, x.filled || null, +x.rr.toFixed(2), x.feat.d1, x.feat.struct, x.feat.session, ...x.v.map((v) => v.R == null ? null : +v.R.toFixed(2)), +x.mfe.toFixed(2), +x.cost.toFixed(3), x.status === 'closed' ? 1 : 0, x.feat.cf, x.feat.choch, x.feat.m15c, x.feat.m15c1, x.feat.h4 || null, x.feat.h1 || null, x.v[0].closed || x.ended || null, x.h, x.feat.janda || null, x.feat.vrAge || null, x.feat.touch || null]),
+  tradeCols: ['market', 'setup', 'side', 'opened', 'filled', 'rr', 'd1', 'struct', 'session', 'R_none', 'R_be1', 'R_be15', 'R_tp2', 'R_pt2', 'R_ts4', 'R_ts8', 'R_ts12', 'mfe', 'cost', 'fill', 'cf', 'choch', 'm15c', 'm15c1', 'h4', 'h1', 'closed', 'tf', 'janda', 'vrAge', 'touch'],
   twins: twins.length, unfilled: unfilled.length,
   examples: EX.map((x) => ({ id: x.id, market: x.market, side: x.side, entry: x.entry, stop: x.stop, target: x.target, entryFrom: x.entryFrom, entryTo: x.entryTo,
     caught: x.caught, setups: x.setups.map(({ s, ...v }) => v), sweep: x.sweep.map(({ s, ...v }) => v), m15: x.m15.map(({ s, ...v }) => v) })),
