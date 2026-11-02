@@ -214,6 +214,7 @@ const BT = (() => {
   const T = b.trades.map((r) => Object.fromEntries(b.tradeCols.map((c, i) => [c, r[i]])));
   return { b, T, mid: T.map((t) => t.opened).sort((x, y) => x - y)[T.length >> 1] };
 })();
+const DEF_KEYS = new Set(PAIRS.concat(RETR).map((p) => p.k));   // setups the Trader actually trades (research setups are only backtested)
 const btE = (arr, key = 'R_none') => ({ n: arr.length, e: arr.length ? arr.reduce((a, t) => a + t[key], 0) / arr.length : 0 });
 const btHalves = (arr, key) => [btE(arr.filter((t) => t.opened < BT.mid), key), btE(arr.filter((t) => t.opened >= BT.mid), key)];
 // the backtest's verdict on a setup as it trades now (with its D1 filter): clearly profitable?
@@ -250,7 +251,17 @@ function learnFromBacktest(change) {
     }
     config.beSrc = 'backtest';
   }
-  // 3. a setup paused on a small live sample that the backtest shows is clearly profitable: resume it
+  // 3. a setup the backtest shows clearly losing (10+ trades at -0.3R or worse each, negative in both halves): pause it
+  //    until the next backtest can re-check it (it keeps running as shadow trades meanwhile)
+  for (const k of [...new Set(BT.T.map((t) => t.setup))]) {
+    if (!DEF_KEYS.has(k) || config.paused[k]) continue;
+    const f = config.filters[k] || {}, a = BT.T.filter((t) => t.setup === k && (!f.d1 || t.d1 === f.d1)), all = btE(a), [h1, h2] = btHalves(a);
+    if (all.n >= 10 && all.e <= -0.3 && h1.e < 0 && h2.e < 0) {
+      config.paused[k] = new Date((now + 3 * 86400) * 1000).toISOString();
+      change(`Paused ${k} for 3 days (backtest)`, `${all.n} past trades as it trades now made ${f2(all.e)} each, negative in both halves of the last ${days} days.`);
+    }
+  }
+  // 4. a setup paused on a small live sample that the backtest shows is clearly profitable: resume it
   for (const k of Object.keys(config.paused)) {
     const pos = btPositive(k), live = pauseSample(trades.filter((x) => x.k === k && (x.status === 'win' || x.status === 'loss' || x.status === 'be') && now - x.closed < 30 * 86400));
     if (pos && live.length < 15) { delete config.paused[k]; change(`Resumed ${k} (backtest)`, `Paused on ${live.length} trades, but ${pos.n} past trades as it trades now made ${f2(pos.e)} each, in both halves of the last ${days} days.`); }

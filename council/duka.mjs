@@ -33,33 +33,33 @@ export function decodeBi5(buf, base, point = 1e5) {
 const UA = 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36';
 let firstErr = true, failsInRow = 0;
 // one file: Node fetch first; on a network error (resets, IPv6, TLS) fall back to curl, which retries on its own
+// Dukascopy throttles with HTTP 503 when files come too fast: wait and retry those (they are "slow down", not
+// "unreachable"). Connection failures fall back to curl; after 3 files in a row fail that way, give up for the run.
 async function get(url) {
-  // circuit breaker: after 3 files in a row fail even with retries, treat Dukascopy as unreachable for this run
-  if (failsInRow >= 3) throw new Error('Dukascopy unreachable from this runner (3 files in a row failed)');
-  const res = await getOnce(url).catch((e) => { failsInRow++; throw e; });
-  failsInRow = 0;
-  return res;
-}
-async function getOnce(url) {
-  for (let a = 0; a < 3; a++) {
-    try {
-      const r = await fetch(url, { headers: { 'User-Agent': UA, Accept: '*/*' } });
-      if (r.status === 404) return null;
-      if (!r.ok) throw new Error(`HTTP ${r.status}`);
-      return Buffer.from(await r.arrayBuffer());
-    } catch (e) {
+  if (failsInRow >= 3) throw new Error('Dukascopy unreachable from this runner (3 files in a row failed to connect)');
+  for (let a = 0; a < 6; a++) {
+    let r;
+    try { r = await fetch(url, { headers: { 'User-Agent': UA, Accept: '*/*' } }); }
+    catch (e) {
       if (firstErr) { firstErr = false; console.log(`dukascopy fetch error: ${e.message}${e.cause ? ` (${e.cause.code || ''} ${e.cause.message || e.cause})` : ''}`); }
-      if (/^HTTP 4/.test(e.message)) return null;
-      await sleep(700 * (a + 1));
+      return viaCurl(url);
     }
+    if (r.status === 404) { failsInRow = 0; return null; }
+    if (r.ok) { failsInRow = 0; return Buffer.from(await r.arrayBuffer()); }
+    if (r.status === 503 || r.status === 429) { await sleep(3000 * 2 ** a); continue; }   // 3, 6, 12, 24, 48, 96 s
+    throw new Error(`${url}: HTTP ${r.status}`);
   }
+  throw new Error(`${url}: still throttled (HTTP 503) after 6 retries`);
+}
+function viaCurl(url) {
   const tmp = path.join(os.tmpdir(), `duka-${process.pid}-${Math.random().toString(36).slice(2)}`);
   try {
-    const code = execFileSync('curl', ['-sS', '-A', UA, '--retry', '2', '--retry-delay', '2', '--max-time', '30', '--retry-all-errors', '-o', tmp, '-w', '%{http_code}', url], { encoding: 'utf8' }).trim();
-    if (code === '404') return null;
+    const code = execFileSync('curl', ['-sS', '-A', UA, '--retry', '2', '--retry-delay', '2', '--max-time', '30', '-o', tmp, '-w', '%{http_code}', url], { encoding: 'utf8' }).trim();
+    if (code === '404') { failsInRow = 0; return null; }
     if (code !== '200') throw new Error(`HTTP ${code}`);
+    failsInRow = 0;
     return fs.readFileSync(tmp);
-  } catch (e) { throw new Error(`${url}: ${String(e.message || e).split('\n')[0]}`); }
+  } catch (e) { failsInRow++; throw new Error(`${url}: ${String(e.message || e).split('\n')[0]}`); }
   finally { try { fs.unlinkSync(tmp); } catch (e) {} }
 }
 
@@ -68,13 +68,13 @@ export async function dukaMinutes(sym, from, to, point = 1e5) {
   const days = [];
   for (let d = Math.floor(from / 86400) * 86400; d < to; d += 86400) days.push(d);
   const out = [];
-  for (let i = 0; i < days.length; i += 2) {
-    const part = await Promise.all(days.slice(i, i + 2).map(async (d) => {
+  for (let i = 0; i < days.length; i += 1) {
+    const part = await Promise.all(days.slice(i, i + 1).map(async (d) => {
       const t = new Date(d * 1000), buf = await get(`${HOST}/${sym}/${t.getUTCFullYear()}/${p2(t.getUTCMonth())}/${p2(t.getUTCDate())}/BID_candles_min_1.bi5`);
       return buf ? decodeBi5(buf, d, point) : [];
     }));
     for (const arr of part) out.push(...arr);
-    await sleep(250);
+    await sleep(400);
   }
   return out.filter((b) => b.time >= from && b.time < to).sort((a, b) => a.time - b.time);
 }
