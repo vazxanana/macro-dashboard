@@ -345,7 +345,12 @@
   .c-auto input { width: 20px; height: 20px; accent-color: var(--accent); flex: none; }
   .c-auto b { display: block; font-size: 13px; } .c-auto small { color: var(--ink-dim); font-size: 11px; line-height: 1.4; display: block; }
   .c-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
-  .c-trader, .c-score, .c-pmc { grid-column: 1 / -1; }
+  .c-trader, .c-score, .c-pmc, .c-btc { grid-column: 1 / -1; }
+  .c-bt-meta { display: flex; flex-wrap: wrap; gap: 6px; margin: 2px 0 10px; }
+  .c-bt-r { font-family: var(--mono); white-space: nowrap; } .c-bt-r small { color: var(--ink-faint); font-family: var(--mono); }
+  .c-bt-st { font-size: 11px; white-space: nowrap; } .c-bt-st.on { color: var(--buy); } .c-bt-st.off { color: var(--sell); } .c-bt-st.res { color: var(--ink-faint); }
+  @media (max-width: 600px) { .c-btc .bt-w, .c-btc .bt-d { display: none; } .c-btc .c-bt-ci { display: block; } .c-btc .c-bt-st { white-space: normal; } .c-btc td:first-child { white-space: normal; } .c-btc td:first-child small { display: block; } .c-btc .ms-bt-t td, .c-btc .ms-bt-t th { padding-left: 4px; padding-right: 4px; } }
+  .c-bt-lines { list-style: none; margin: 10px 0 0; padding: 0; display: grid; gap: 4px; font-size: 12px; color: var(--ink-dim); }
   .c-pm-bar { display: flex; height: 10px; border-radius: 5px; overflow: hidden; background: var(--line-soft); gap: 2px; }
   .c-pm-bar i, .c-pm-k i { display: block; }
   .c-pm-bar .sys, .c-pm-k .sys { background: #f2b33d; } .c-pm-bar .mkt, .c-pm-k .mkt { background: var(--ink-faint); }
@@ -623,6 +628,14 @@
           <div class="ms-bt-wrap"><table class="ms-bt-t c-t"><thead><tr><th>Market</th><th class="n">Trades</th><th class="n">Win rate</th><th class="n">Avg</th><th class="n">Total</th><th>Verdict</th></tr></thead><tbody id="ms-c-sc-mkt"></tbody></table></div>
         </div>
         <p class="ms-note" style="margin:10px 0 0">From the council's closed paper trades. A verdict needs at least 5 trades: "trust" averages more than +0.2R a trade, "avoid" loses more than 0.2R.</p>
+      </div>
+      <div class="card c-btc">
+        <div class="ms-k">Backtest · the Trader's rules replayed on the last 30 days</div>
+        <p class="ms-note" id="ms-c-bt-sum">Loading the backtest…</p>
+        <div class="c-bt-meta" id="ms-c-bt-mkt"></div>
+        <div class="ms-bt-wrap"><table class="ms-bt-t c-t"><thead><tr><th>Setup</th><th class="n">Trades</th><th class="n bt-w">Win rate</th><th class="n">R per trade <small>(95% range)</small></th><th class="n bt-d">With D1</th><th class="n bt-d">Against D1</th><th>Now</th></tr></thead><tbody id="ms-c-bt"></tbody></table></div>
+        <ul class="c-bt-lines" id="ms-c-bt-lines"></ul>
+        <p class="ms-note" style="margin:10px 0 0">Every setup the Trader would have taken, managed candle by candle on real prices. The range is clustered by market and day (one move often fires several setups), so it is honest about how sure we are: green when the whole range is above zero, red when it is below. The Coach turns only clear findings into rules.</p>
       </div>
       <div class="card c-pmc">
         <div class="ms-k">Trade reviews · was it our system or the market?</div>
@@ -2304,8 +2317,8 @@ function msNextSetup(bars, A) {
     if (!document.getElementById('v-council')) return;
     const bust = Math.floor(Date.now() / 120000);
     const get = (f, json) => fetch(`${CDATA}${f}?v=${bust}`, { cache: 'no-store' }).then((r) => r.ok ? (json ? r.json() : r.text()) : null).catch(() => null);
-    const [trades, config, coach, snap, analysis, review] = await Promise.all([get('trades.json', 1), get('config.json', 1), get('coach.json', 1), get('snapshot.json', 1), get('analysis/latest.md'), get('reviews/latest.md')]);
-    Object.assign(COUNCIL, { trades, config, coach, snap, analysis, review, at: Date.now() });
+    const [trades, config, coach, snap, analysis, review, backtest] = await Promise.all([get('trades.json', 1), get('config.json', 1), get('coach.json', 1), get('snapshot.json', 1), get('analysis/latest.md'), get('reviews/latest.md'), get('backtest.json', 1)]);
+    Object.assign(COUNCIL, { trades, config, coach, snap, analysis, review, backtest, at: Date.now() });
     councilAlerts(trades);
     if (config) {
       CFG.buf = Math.min(0.25, Math.max(0.10, +config.buf || 0.15)); CFG.minRR = +config.minRR || 1.2; CFG.minRisk = Math.min(1.2, Math.max(0.4, +config.minRisk || 0.6)); CFG.paused = config.paused || {};
@@ -2376,6 +2389,7 @@ function msNextSetup(bars, A) {
     const empty = '<tr><td colspan="6" class="empty">Builds up as the Trader closes trades.</td></tr>';
     set('ms-c-sc-setup', allClosed.length ? group((x) => x.k, (x) => `${esc(x.name)} <small>${esc(x.pair)}</small>`).map(row).join('') : empty);
     set('ms-c-sc-mkt', allClosed.length ? group((x) => x.market, (x) => `<b>${esc(x.label)}</b>`).map(row).join('') : empty);
+    renderBacktest(C.backtest, C.config || {});
     // Analyst
     const ready = C.snap ? Object.entries(C.snap.markets || {}).flatMap(([k, m]) => m.setups.filter((t) => t.state === 'READY').map((t) => ({ k, m, t }))) : [];
     set('ms-c-ready', ready.length ? ready.map(({ k, m, t }) => `<li><a href="?s=${k}#setup"><b>${esc(m.label)}</b> ${t.side === 'sell' ? 'Sell' : 'Buy'} ${esc(t.name)} <small>${esc(t.pair)}</small></a><span>${t.rr}R</span></li>`).join('') : '<li class="empty">No market is Ready at the last Trader run.</li>');
@@ -2462,6 +2476,45 @@ function msNextSetup(bars, A) {
   { const dlg = document.getElementById('ms-tv'), bx = document.getElementById('ms-tv-x');
     if (bx) bx.addEventListener('click', () => dlg.close());
     if (dlg) dlg.addEventListener('click', (ev) => { if (ev.target === dlg) dlg.close(); }); }
+  // ─── Backtest card: the same clustered statistics the Coach uses, so the page shows exactly what it decides on ───
+  function btStat(arr, key = 'R_none') {
+    const v = arr.filter((t) => t[key] != null && isFinite(t[key])), n = v.length;
+    if (!n) return { n: 0, e: 0, se: Infinity };
+    const e = v.reduce((a, t) => a + t[key], 0) / n, cl = new Map();
+    v.forEach((t) => { const c = `${t.market}|${Math.floor(t.opened / 86400)}`; cl.set(c, (cl.get(c) || 0) + (t[key] - e)); });
+    const g = cl.size; let ss = 0; cl.forEach((u) => { ss += u * u; });
+    return { n, e, se: g > 1 ? Math.sqrt(ss * g / (g - 1)) / n : Infinity, w: v.filter((t) => t[key] > 0).length / n };
+  }
+  const BT_NAME = { sweep_vr: 'Sweep → VR → BO <small>stop past M5 VR · research</small>', sweep_ext: 'Sweep → VR → BO <small>stop past sweep · research</small>' };
+  function renderBacktest(b, cf) {
+    const sum = document.getElementById('ms-c-bt-sum'); if (!sum) return;
+    const set = (id, html) => { const el = document.getElementById(id); if (el) el.innerHTML = html; };
+    if (!b || !Array.isArray(b.trades) || !b.trades.length) { sum.textContent = 'No backtest yet: it runs daily and after every engine change.'; ['ms-c-bt', 'ms-c-bt-mkt', 'ms-c-bt-lines'].forEach((id) => set(id, '')); return; }
+    const T = b.trades.map((r) => Object.fromEntries(b.tradeCols.map((c, i) => [c, r[i]])));
+    const f2 = (v) => `${v > 0 ? '+' : v < 0 ? '−' : ''}${Math.abs(v).toFixed(2)}R`;
+    const cls = (s) => !isFinite(s.se) || s.n < 5 ? '' : s.e - 1.96 * s.se > 0 ? 'pos' : s.e + 1.96 * s.se < 0 ? 'neg' : '';
+    const cell = (s) => s.n ? `<span class="c-bt-r ${cls(s)}">${f2(s.e)} <small>n${s.n}</small></span>` : '<span class="c-few">—</span>';
+    const errs = Object.keys((b.markets || {}).errors || {});
+    const day = (iso) => new Date(iso).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' });
+    sum.innerHTML = `${T.length} trades from ${day(b.from)} to ${day(b.to)} · run ${ago(Date.parse(b.at) / 1000)}${errs.length ? ` · <span class="c-warn">no history this run for ${errs.map((k) => esc((INSTRUMENTS[k] || {}).label || k)).join(', ')} (data feed throttled; it fills in over the next runs)</span>` : ''}`;
+    const mk = [...new Set(T.map((t) => t.market))].map((m) => ({ m, s: btStat(T.filter((t) => t.market === m)) })).sort((x, y) => y.s.e - x.s.e);
+    set('ms-c-bt-mkt', mk.map(({ m, s }) => `<span class="ms-q ${cls(s) === 'pos' ? 'good' : cls(s) === 'neg' ? 'weak' : ''}">${esc((INSTRUMENTS[m] || {}).label || m)} ${f2(s.e)} · ${s.n}</span>`).join(''));
+    const defs = PAIRS.concat(RETR), order = defs.map((p) => p.k).concat(['sweep_vr', 'sweep_ext']);
+    const keys = [...new Set(T.map((t) => t.setup))].sort((a, z) => order.indexOf(a) - order.indexOf(z));
+    set('ms-c-bt', keys.map((k) => {
+      const a = T.filter((t) => t.setup === k), s = btStat(a), lo = s.e - 1.96 * s.se, hi = s.e + 1.96 * s.se, d = defs.find((p) => p.k === k);
+      const fl = (cf.filters || {})[k] || {}, pz = (cf.paused || {})[k];
+      const now = !d ? '<span class="c-bt-st res">Research only</span>' : pz ? `<span class="c-bt-st off">Paused to ${esc(String(pz).slice(5, 10))}</span>` : `<span class="c-bt-st on">Trading${fl.d1 ? ` · only ${esc(fl.d1)} D1` : ''}</span>`;
+      return `<tr><td>${d ? `${esc(d.name)} <small>${LBL[d.h]} → ${LBL[d.l]}</small>` : (BT_NAME[k] || esc(k))}</td><td class="n">${s.n}</td><td class="n bt-w">${Math.round(s.w * 100)}%</td><td class="n"><span class="c-bt-r ${cls(s)}">${f2(s.e)}</span>${isFinite(lo) ? ` <small class="c-bt-r c-bt-ci">(${f2(lo)} to ${f2(hi)})</small>` : ''}</td><td class="n bt-d">${cell(btStat(a.filter((t) => t.d1 === 'with')))}</td><td class="n bt-d">${cell(btStat(a.filter((t) => t.d1 === 'against')))}</td><td>${now}</td></tr>`;
+    }).join(''));
+    const diff = (k1, k2) => btStat(T.map((t) => ({ market: t.market, opened: t.opened, d: t[k1] != null && t[k2] != null ? t[k1] - t[k2] : null })), 'd');
+    const clear = (s) => isFinite(s.se) && Math.abs(s.e) > 1.96 * s.se;
+    const lines = [];
+    const be = diff('R_be1', 'R_none'), be15 = diff('R_be15', 'R_none');
+    lines.push(`Break-even at +1R: ${f2(be.e)} per trade versus no break-even (${clear(be) ? 'a clear difference' : 'no clear difference'}); at +1.5R: ${f2(be15.e)}. ${cf.be ? `The Trader uses break-even at +${cf.be}R.` : 'The Trader uses no break-even.'}`);
+    if (b.tradeCols.includes('R_tp2')) { const tp = diff('R_tp2', 'R_none'); lines.push(`Holding to the second target: ${f2(tp.e)} per trade versus the first target (${clear(tp) ? 'a clear difference' : 'no clear difference'}).`); }
+    set('ms-c-bt-lines', lines.map((l) => `<li>${l}</li>`).join(''));
+  }
   // Council trades on the market you're viewing, with live result in R
   function councilHere(price) {
     const el = document.getElementById('ms-c-here'); if (!el) return;
