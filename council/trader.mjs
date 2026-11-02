@@ -56,8 +56,8 @@ async function kraken(pair, interval) {
 }
 
 // ─── Config: the Coach's knobs, with their allowed ranges ───
-const LIMITS = { buf: [0.10, 0.25], minRR: [1.2, 2.5], minRisk: [0.4, 1.2] };
-const config = Object.assign({ buf: 0.15, minRR: 1.2, minRisk: 0.6, be: null, fresh: FRESH, newsGuard: false, paused: {}, pausedMarkets: {}, filters: {}, history: [] }, rd('config.json', {}));
+const LIMITS = { buf: [0.10, 0.25], minRR: [1.2, 2.5], minRisk: [0.4, 1.2], maxUsd: [2, 4] };
+const config = Object.assign({ buf: 0.15, minRR: 1.2, minRisk: 0.6, be: null, fresh: FRESH, newsGuard: false, maxUsd: MAX_USD, paused: {}, pausedMarkets: {}, filters: {}, history: [] }, rd('config.json', {}));
 config.filters = config.filters || {};
 const now = Math.floor(Date.now() / 1000), nowISO = new Date(now * 1000).toISOString();
 config.pausedMarkets = config.pausedMarkets || {};
@@ -167,9 +167,9 @@ for (const [key, M] of Object.entries(MARKETS)) {
       const tick = Math.abs(t.entry) * 1e-5;
       if (live.some((x) => Math.abs(x.stop - t.stop) <= tick && Math.abs(x.t1 - t.t1) <= tick)) blockedBy.push('duplicate');
       const ud = usdDir(M, t.sell ? 'sell' : 'buy');
-      if (ud && trades.filter((x) => !x.shadow && (x.status === 'open' || x.status === 'pending') && MARKETS[x.market] && usdDir(MARKETS[x.market], x.side) === ud).length >= MAX_USD) blockedBy.push('usd');
+      if (ud && trades.filter((x) => !x.shadow && (x.status === 'open' || x.status === 'pending') && MARKETS[x.market] && usdDir(MARKETS[x.market], x.side) === ud).length >= (config.maxUsd || MAX_USD)) blockedBy.push('usd');
       const shadow = blockedBy.length > 0;
-      const why = { paused: `paused until ${String(config.paused[t.k]).slice(0, 10)}`, minRR: `reward:risk ${(isFinite(rrNow) ? rrNow : 0).toFixed(2)} under ${config.minRR}`, d1: `rule: only ${f.d1} D1`, struct: `rule: only ${f.struct} structure`, session: `rule: not in ${feat.session}`, exposure: 'already 2 trades or an opposite trade open on this market', news: 'high-impact news within the hour', duplicate: 'same stop and target as a trade already open', usd: `already ${MAX_USD} trades betting the same way on the dollar`, market: `market paused until ${String(config.pausedMarkets[key]).slice(0, 10)}` };
+      const why = { paused: `paused until ${String(config.paused[t.k]).slice(0, 10)}`, minRR: `reward:risk ${(isFinite(rrNow) ? rrNow : 0).toFixed(2)} under ${config.minRR}`, d1: `rule: only ${f.d1} D1`, struct: `rule: only ${f.struct} structure`, session: `rule: not in ${feat.session}`, exposure: 'already 2 trades or an opposite trade open on this market', news: 'high-impact news within the hour', duplicate: 'same stop and target as a trade already open', usd: `already ${config.maxUsd || MAX_USD} trades betting the same way on the dollar`, market: `market paused until ${String(config.pausedMarkets[key]).slice(0, 10)}` };
       const h = def.h;
       const tr = { id: `${key}-${t.k}-${now}`, market: key, label: M.label, dec: M.dec, k: t.k, name: t.name, pair: t.pair, h, side: t.sell ? 'sell' : 'buy',
         entry: t.entry, stop: t.stop, t1: t.t1, rr: +t.rr.toFixed(2), buf: CFG.buf, opened: now, checked: now, status: 'pending', R: null, feat,
@@ -297,6 +297,14 @@ if (coach.date !== today) {
     const sh = shadows.filter((x) => (x.blockedBy || []).includes('news'));
     if (!(sh.length >= 3 && exp(sh) < 0)) { config.newsGuard = false; delete config.newsSince; change('News guard off for a re-test', sh.length ? `Trades it blocked made ${exp(sh).toFixed(2)}R over ${sh.length}.` : '21 days old: re-testing without it.'); }
     else config.newsSince = nowISO;
+  }
+
+  // dollar cap: loosen it when the trades it blocks keep winning, tighten it when correlated dollar trades lose together
+  {
+    const cap = config.maxUsd || MAX_USD, sh = shadows.filter((x) => (x.blockedBy || []).length === 1 && x.blockedBy[0] === 'usd' && now - x.closed < 14 * 86400);
+    const fx = closed.filter((x) => ['xau', 'eurusd', 'gbpusd', 'audusd', 'usdcad', 'usdchf'].includes(x.market) && now - x.closed < 14 * 86400);
+    if (sh.length >= 5 && exp(sh) > 0.3 && cap < LIMITS.maxUsd[1]) { config.maxUsd = cap + 1; change(`Dollar cap ${cap} → ${cap + 1} trades`, `Trades blocked only by the dollar cap made +${exp(sh).toFixed(2)}R over ${sh.length}.`); }
+    else if (sh.length >= 5 && exp(sh) < -0.3 && fx.length >= 8 && exp(fx) < -0.3 && cap > LIMITS.maxUsd[0]) { config.maxUsd = cap - 1; change(`Dollar cap ${cap} → ${cap - 1} trades`, `Gold/forex trades lost ${exp(fx).toFixed(2)}R each and the blocked ones would have lost too.`); }
   }
 
   // markets: pause one for 3 days when it loses (6+ trades, worse than -0.3R each); resume early if its shadow trades recover
