@@ -375,6 +375,7 @@
   .tv-k { display: flex; flex-wrap: wrap; gap: 6px 14px; padding: 10px 16px 14px; font-size: 12px; color: var(--ink-dim); border-top: 1px solid var(--line-soft); }
   .tv-k span { display: inline-flex; align-items: center; gap: 6px; } .tv-k i { width: 14px; height: 2px; display: block; } .tv-k b { color: var(--ink); font-family: var(--mono); }
   .tv-k a { margin-left: auto; color: var(--accent); }
+  .tv-k .tv-cond { flex-basis: 100%; flex-wrap: wrap; } .tv-k .tv-cond b { font-family: inherit; font-weight: 600; }
   .c-pm-v { display: inline-block; font-size: 10px; font-weight: 700; letter-spacing: .4px; text-transform: uppercase; padding: 2px 6px; border-radius: 5px; background: var(--panel-raised); color: var(--ink-dim); margin-left: 6px; white-space: nowrap; }
   .c-pm-h .c-pm-v { margin-left: 0; }
   .c-pm-v.system { background: color-mix(in srgb, #f2b33d 18%, transparent); color: #f2b33d; }
@@ -2432,8 +2433,12 @@ function msNextSetup(bars, A) {
     const r0 = x.r0 || (x.beMoved ? 0 : Math.abs(x.entry - x.stop)), stop0 = x.beMoved && r0 ? x.entry - s * r0 : x.stop;
     const res = x.status === 'win' ? `Win +${x.R}R` : x.status === 'loss' ? 'Loss −1R' : x.status === 'be' ? 'Break-even 0R' : (ST_NAME[x.status] || x.status);
     document.getElementById('ms-tv-t').textContent = `${x.label} · ${x.name} ${x.pair} · ${x.side === 'sell' ? 'Sell' : 'Buy'} · ${res}${x.shadow ? ' (shadow)' : ''}`;
-    document.getElementById('ms-tv-s').innerHTML = x.pm && x.pm.title ? `<b class="c-pm-v ${x.pm.verdict}" style="margin:0 6px 0 0">${x.pm.verdict === 'system' ? 'System' : 'Market'}</b><b>${esc(x.pm.title)}</b> · ${esc(x.pm.detail)} <br>Lesson: ${esc(x.pm.lesson)}` : esc(x.note || '');
-    document.getElementById('ms-tv-k').innerHTML = `<span><i style="background:#2962ff"></i>Entry <b>${f(x.entry)}</b></span><span><i style="background:${DNC}"></i>Stop <b>${f(stop0)}</b></span>${x.beMoved ? `<span><i style="background:#8a94a8"></i>Stop moved to entry</span>` : ''}<span><i style="background:${UPC}"></i>Target <b>${f(x.t1)}</b>${x.tp1 != null ? ` (${/^r/.test(x.k) ? 'the Origin' : 'target 2'}; target 1 ${f(x.tp1)})` : ''}</span><span>Reward:risk <b>${x.rr}R</b></span>${x.mfe != null ? `<span>Best <b>+${x.mfe}R</b></span>` : ''}<span>${ftime(x.opened + TZ)}${x.closed ? ' → ' + ftime(x.closed + TZ) : ''}</span><a href="?s=${esc(x.market)}#charts">Open ${esc(I.label)} charts</a>`;
+    document.getElementById('ms-tv-s').innerHTML = x.pm && x.pm.title ? `<b class="c-pm-v ${x.pm.verdict}" style="margin:0 6px 0 0">${x.pm.verdict === 'system' ? 'System' : 'Market'}</b><b>${esc(x.pm.title)}</b> · ${esc(x.pm.detail)} <br>Lesson: ${esc(x.pm.lesson)}${x.shadow && x.note ? `<br>${esc(x.note)}` : ''}` : esc(x.note || '');
+    // the conditions at the signal, the ones the Coach learns from (D1, structure, the CHoCH rule, session) and the entry style
+    const ft = x.feat || {}, cond = [ft.d1 && `${ft.d1 === 'with' ? 'With' : 'Against'} D1`, ft.struct && ft.struct !== 'n/a' && `${ft.struct === 'main' ? 'Main' : 'Internal'} structure`,
+      ft.cf && (ft.cf === 'choch' ? 'CF is a CHoCH' : 'CF is a continuation BO'), ft.choch && (ft.choch === 'yes' ? 'Fresh M15/M5 CHoCH' : 'No fresh M15/M5 CHoCH'),
+      ft.session && (SESSION_NAME[ft.session] || ft.session), x.entryMode === 'market' && 'Market entry'].filter(Boolean);
+    document.getElementById('ms-tv-k').innerHTML = `${cond.length ? `<span class="tv-cond">At the signal <b>${cond.map(esc).join(' · ')}</b></span>` : ''}<span><i style="background:#2962ff"></i>Entry <b>${f(x.entry)}</b></span><span><i style="background:${DNC}"></i>Stop <b>${f(stop0)}</b></span>${x.beMoved ? `<span><i style="background:#8a94a8"></i>Stop moved to entry</span>` : ''}<span><i style="background:${UPC}"></i>Target <b>${f(x.t1)}</b>${x.tp1 != null ? ` (${/^r/.test(x.k) ? 'the Origin' : 'target 2'}; target 1 ${f(x.tp1)})` : ''}</span><span>Reward:risk <b>${x.rr}R</b></span>${x.mfe != null ? `<span>Best <b>+${x.mfe}R</b></span>` : ''}<span>${ftime(x.opened + TZ)}${x.closed ? ' → ' + ftime(x.closed + TZ) : ''}</span><a href="?s=${esc(x.market)}#charts">Open ${esc(I.label)} charts</a>`;
     const msg = document.getElementById('ms-tv-m'); msg.hidden = false; msg.textContent = 'Loading candles…';
     if (!dlg.open) dlg.showModal();
     const host = document.getElementById('ms-tv-c'), th = THEMES[G.theme];
@@ -2470,6 +2475,7 @@ function msNextSetup(bars, A) {
     TV.chart.timeScale().setVisibleRange({ from: from + TZ, to: to + TZ });
   }
   const ST_NAME = { open: 'Open', pending: 'Waiting fill', missed: 'Missed', expired: 'Expired', skipped: 'Skipped' };
+  const SESSION_NAME = { asia: 'Asia session', london: 'London session', overlap: 'London/New York overlap', newyork: 'New York session', late: 'Late session' };
   ['ms-c-trades', 'ms-c-pm'].forEach((cid) => {
     const el = document.getElementById(cid); if (!el) return;
     el.addEventListener('click', (ev) => { const r = ev.target.closest('[data-tid]'); if (r) openTrade(r.dataset.tid); });
@@ -2487,7 +2493,7 @@ function msNextSetup(bars, A) {
     const g = cl.size; let ss = 0; cl.forEach((u) => { ss += u * u; });
     return { n, e, se: g > 1 ? Math.sqrt(ss * g / (g - 1)) / n : Infinity, w: v.filter((t) => t[key] > 0).length / n };
   }
-  const BT_NAME = { sweep_vr: 'Sweep → VR → BO <small>stop past M5 VR · research</small>', sweep_ext: 'Sweep → VR → BO <small>stop past sweep · research</small>' };
+  const BT_NAME = { sweep_vr: 'Sweep → VR → BO <small>stop past M5 VR · research</small>', sweep_ext: 'Sweep → VR → BO <small>stop past sweep · research</small>', sweep_m1: 'Sweep → VR → BO <small>stop past M1 origin · research</small>' };
   function renderBacktest(b, cf) {
     const sum = document.getElementById('ms-c-bt-sum'); if (!sum) return;
     const set = (id, html) => { const el = document.getElementById(id); if (el) el.innerHTML = html; };
@@ -2504,7 +2510,7 @@ function msNextSetup(bars, A) {
     sum.innerHTML = `${T.length} trades from ${day(b.from)} to ${day(b.to)}${net ? ', after spread' : ''} · run ${ago(Date.parse(b.at) / 1000)}${errs.length ? ` · <span class="c-warn">no history this run for ${errs.map((k) => esc((INSTRUMENTS[k] || {}).label || k)).join(', ')} (its history source failed this run; the next run retries)</span>` : ''}`;
     const mk = [...new Set(T.map((t) => t.market))].map((m) => ({ m, s: btStat(T.filter((t) => t.market === m)) })).sort((x, y) => y.s.e - x.s.e);
     set('ms-c-bt-mkt', mk.map(({ m, s }) => `<span class="ms-q ${cls(s) === 'pos' ? 'good' : cls(s) === 'neg' ? 'weak' : ''}">${esc((INSTRUMENTS[m] || {}).label || m)} ${f2(s.e)} · ${s.n}</span>`).join(''));
-    const defs = PAIRS.concat(RETR), order = defs.map((p) => p.k).concat(['sweep_vr', 'sweep_ext']);
+    const defs = PAIRS.concat(RETR), order = defs.map((p) => p.k).concat(['sweep_vr', 'sweep_ext', 'sweep_m1']);
     const keys = [...new Set(T.map((t) => t.setup))].sort((a, z) => order.indexOf(a) - order.indexOf(z));
     set('ms-c-bt', keys.map((k) => {
       const a = T.filter((t) => t.setup === k), s = btStat(a), lo = s.e - 1.96 * s.se, hi = s.e + 1.96 * s.se, d = defs.find((p) => p.k === k);
@@ -2529,6 +2535,13 @@ function msNextSetup(bars, A) {
       }).filter(Boolean);
       const miss = TA.filter((t) => t.fill === 0 && !String(t.setup).includes('@')).length;
       if (parts.length) lines.push(`Entering at market instead of waiting for the pullback, per signal (${miss} resting orders never filled): ${parts.join(' · ')}.`);
+    }
+    // the trader's marked trades (examples.json): did any setup take them, and if not, how far the sweep model got
+    for (const x of b.examples || []) {
+      const hit = (x.caught || []).filter((c) => c.filled), sw = (x.sweep || []).filter((v) => v.t <= Date.parse(x.entryTo) / 1000).pop();
+      const what = `Your ${esc((INSTRUMENTS[x.market] || {}).label || x.market)} ${x.side} ${fmtI(x.entry, { dec: 2 })} (${esc(String(x.entryFrom).slice(5, 10))})`;
+      lines.push(hit.length ? `${what}: taken by ${hit.map((c) => `${esc(c.setup)}${c.R != null ? ` <b class="${c.R > 0 ? 'pos' : 'neg'}">${f2(c.R)}</b>` : ''}`).join(', ')}.`
+        : `${what}: <b class="neg">missed</b>${sw ? ` · sweep model: ${esc(sw.stage)}` : ''}.`);
     }
     set('ms-c-bt-lines', lines.map((l) => `<li>${l}</li>`).join(''));
   }
