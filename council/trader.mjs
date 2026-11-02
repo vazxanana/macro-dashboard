@@ -203,11 +203,10 @@ state.lastRun = now;
 // ─── Self-evolution: learn condition filters (D1 / structure / session) from the trades that lose.
 // Runs every 6 hours (the other Coach rules stay daily), so a clearly losing condition is filtered within hours, not a day.
 const exp = (arr) => arr.length ? arr.reduce((a, x) => a + x.R, 0) / arr.length : 0;
-// trade management: losers that were +1R or more first (live and shadow, last 14 days) turn break-even at +1R on.
-// mfe is known at the close, so this doesn't wait for the post-exit review window.
 // ─── Backtest evidence (council/backtest.mjs replays 30 days of real candles through these same rules, daily) ───
-// A finding is used only when it is large and holds in BOTH halves of the replayed period, so one market
-// phase can't create a rule. It outranks the small live samples (a handful of trades) it would otherwise fight.
+// A finding becomes a rule only when it is large, holds in BOTH halves of the replayed period, and is statistically
+// clear. Trades on the same market and UTC day are not independent (one move fires several setups), so standard
+// errors are clustered by market-day. It outranks the small live samples (a handful of trades) it would otherwise fight.
 const BT = (() => {
   const b = rd('backtest.json', null);
   if (!b || b.fake || !Array.isArray(b.trades) || !b.trades.length || now - Date.parse(b.at) / 1000 > 3 * 86400) return null;
@@ -215,59 +214,91 @@ const BT = (() => {
   return { b, T, mid: T.map((t) => t.opened).sort((x, y) => x - y)[T.length >> 1] };
 })();
 const DEF_KEYS = new Set(PAIRS.concat(RETR).map((p) => p.k));   // setups the Trader actually trades (research setups are only backtested)
-const btE = (arr, key = 'R_none') => ({ n: arr.length, e: arr.length ? arr.reduce((a, t) => a + t[key], 0) / arr.length : 0 });
+// mean R with a market-day clustered standard error (CR1) and its t-value; g = number of market-day clusters
+function btE(arr, key = 'R_none') {
+  const v = arr.filter((t) => t[key] != null && isFinite(t[key])), n = v.length;
+  if (!n) return { n: 0, e: 0, se: Infinity, t: 0, g: 0 };
+  const e = v.reduce((a, t) => a + t[key], 0) / n, cl = new Map();
+  for (const t of v) { const c = `${t.market}|${Math.floor(t.opened / 86400)}`; cl.set(c, (cl.get(c) || 0) + (t[key] - e)); }
+  const g = cl.size; let ss = 0; for (const u of cl.values()) ss += u * u;
+  const se = g > 1 ? Math.sqrt(ss * g / (g - 1)) / n : Infinity;
+  const t = !isFinite(se) ? 0 : se > 0 ? e / se : e === 0 ? 0 : Math.sign(e) * Infinity;   // identical results in 2+ clusters: as clear as it gets
+  return { n, e, se, t, g };
+}
 const btHalves = (arr, key) => [btE(arr.filter((t) => t.opened < BT.mid), key), btE(arr.filter((t) => t.opened >= BT.mid), key)];
+// two groups: t-value of the gap between their means (their covariance is ignored, which only makes this stricter)
+const btGapT = (a, b) => { const se = Math.hypot(a.se, b.se); return isFinite(se) && se > 0 ? (a.e - b.e) / se : 0; };
+// one group, two management variants of the same trades: clustered mean and t-value of the per-trade difference
+const btPaired = (arr, k1, k2) => btE(arr.map((t) => ({ market: t.market, opened: t.opened, d: t[k1] - t[k2] })), 'd');
+const tTxt = (t) => !isFinite(t) ? 'every trade alike' : `t = ${t.toFixed(1)}`;
 // the backtest's verdict on a setup as it trades now (with its D1 filter): clearly profitable?
 function btPositive(k) {
   if (!BT) return null;
   const f = config.filters[k] || {}, a = BT.T.filter((t) => t.setup === k && (!f.d1 || t.d1 === f.d1)), all = btE(a), [h1, h2] = btHalves(a);
-  return all.n >= 100 && all.e >= 0.1 && h1.e > 0 && h2.e > 0 ? all : null;
+  return all.n >= 100 && all.e >= 0.1 && all.t >= 2.5 && h1.e > 0 && h2.e > 0 ? all : null;
 }
 function learnFromBacktest(change) {
   if (!BT || config.btAt === BT.b.at) return;
   config.btAt = BT.b.at;
   const days = BT.b.days || 30, f2 = (v) => `${v >= 0 ? '+' : ''}${v.toFixed(2)}R`;
-  // 1. D1 filter per setup: one side clearly wins and the other clearly loses, in both halves
-  for (const k of [...new Set(BT.T.map((t) => t.setup))]) {
-    const a = BT.T.filter((t) => t.setup === k), side = { with: a.filter((t) => t.d1 === 'with'), against: a.filter((t) => t.d1 === 'against') };
-    const S = Object.fromEntries(Object.entries(side).map(([v, arr]) => [v, { ...btE(arr), h: btHalves(arr) }]));
+  const setups = [...new Set(BT.T.map((t) => t.setup))];
+  const d1Sides = (k) => { const a = BT.T.filter((t) => t.setup === k);
+    return Object.fromEntries(['with', 'against'].map((v) => { const arr = a.filter((t) => t.d1 === v); return [v, { ...btE(arr), h: btHalves(arr) }]; })); };
+  // 1. D1 filter per setup: one side clearly wins and the other clearly loses, in both halves, and the gap is
+  //    statistically clear (t >= 3: about 7 setups are tested at once, so a looser bar would find chance "rules")
+  for (const k of setups) {
+    const S = d1Sides(k), fl = config.filters[k] || {};
+    // a filter the backtest set earlier, whose excluded side is no longer worse: drop it
+    if (fl.d1 && (fl.src || {}).d1 === 'backtest') {
+      const kept = S[fl.d1], out = S[fl.d1 === 'with' ? 'against' : 'with'];
+      if (kept.n >= 15 && out.n >= 15 && out.e >= kept.e) {
+        change(`${k}: D1 filter dropped (backtest)`, `${fl.d1} ${f2(kept.e)} each over ${kept.n}, the excluded side ${f2(out.e)} over ${out.n}: the filter no longer helps.`);
+        delete fl.d1; if (fl.since) delete fl.since.d1; if (fl.src) delete fl.src.d1;
+      }
+    }
     if (S.with.n < 30 || S.against.n < 30) continue;
-    const win = S.with.e > S.against.e ? 'with' : 'against', lose = win === 'with' ? 'against' : 'with';
-    if (!(S[win].e >= 0.1 && S[lose].e <= -0.1 && S[win].h[0].e > S[lose].h[0].e && S[win].h[1].e > S[lose].h[1].e)) continue;
-    const fl = config.filters[k] = config.filters[k] || {};
-    if (fl.d1 === win && (fl.src || {}).d1 === 'backtest') continue;
-    const was = fl.d1;
-    fl.d1 = win; (fl.since = fl.since || {}).d1 = nowISO; (fl.src = fl.src || {}).d1 = 'backtest';
-    change(`${k}: only ${win} D1 (backtest)${was && was !== win ? `, replacing "only ${was} D1"` : ''}`, `${S[win].n + S[lose].n} trades over the last ${days} days: ${win} ${f2(S[win].e)} each, ${lose} ${f2(S[lose].e)}; true in both halves.`);
+    const win = S.with.e > S.against.e ? 'with' : 'against', lose = win === 'with' ? 'against' : 'with', gap = btGapT(S[win], S[lose]);
+    if (!(S[win].e >= 0.1 && S[lose].e <= -0.1 && gap >= 3 && S[win].h[0].e > S[lose].h[0].e && S[win].h[1].e > S[lose].h[1].e)) continue;
+    const f = config.filters[k] = config.filters[k] || {};
+    if (f.d1 === win && (f.src || {}).d1 === 'backtest') continue;
+    const was = f.d1;
+    f.d1 = win; (f.since = f.since || {}).d1 = nowISO; (f.src = f.src || {}).d1 = 'backtest';
+    change(`${k}: only ${win} D1 (backtest)${was && was !== win ? `, replacing "only ${was} D1"` : ''}`, `${S[win].n + S[lose].n} trades over the last ${days} days: ${win} ${f2(S[win].e)} each, ${lose} ${f2(S[lose].e)} (gap ${tTxt(gap)}); true in both halves.`);
   }
-  // 2. Break-even: off unless a break-even level beats no break-even in both halves
-  const opts = [[null, 'R_none'], [1, 'R_be1'], [1.5, 'R_be15']].map(([be, key]) => ({ be, key, all: btE(BT.T, key), h: btHalves(BT.T, key) }));
-  if (opts[0].all.n >= 300) {
-    const none = opts[0], better = opts.slice(1).filter((o) => o.h[0].e >= none.h[0].e + 0.02 && o.h[1].e >= none.h[1].e + 0.02).sort((x, y) => y.all.e - x.all.e)[0];
-    const want = better ? better.be : null;
+  for (const [k, fl] of Object.entries(config.filters)) if (!fl.d1 && !fl.struct && !(fl.noSession || []).length) delete config.filters[k];
+  // 2. Break-even: compared trade by trade with no break-even; a level is used only if it clearly adds R (t >= 2)
+  //    and adds R in both halves
+  if (BT.T.length >= 300) {
+    const none = btE(BT.T, 'R_none'), cand = [[1, 'R_be1'], [1.5, 'R_be15']].map(([be, key]) => {
+      const d = btPaired(BT.T, key, 'R_none'), [h1, h2] = [btPaired(BT.T.filter((t) => t.opened < BT.mid), key, 'R_none'), btPaired(BT.T.filter((t) => t.opened >= BT.mid), key, 'R_none')];
+      return { be, d, ok: d.e >= 0.02 && d.t >= 2 && h1.e > 0 && h2.e > 0 };
+    });
+    const best = cand.filter((c) => c.ok).sort((x, y) => y.d.e - x.d.e)[0], want = best ? best.be : null;
     if ((config.be || null) !== want) {
-      change(want ? `Break-even at +${want}R (backtest)` : 'Break-even turned off (backtest)', `${none.all.n} trades over the last ${days} days: no break-even ${f2(none.all.e)} each, at +1R ${f2(opts[1].all.e)}, at +1.5R ${f2(opts[2].all.e)}.`);
+      change(want ? `Break-even at +${want}R (backtest)` : 'Break-even turned off (backtest)', `${none.n} trades over the last ${days} days: no break-even ${f2(none.e)} each; break-even at +1R changes that by ${f2(cand[0].d.e)} (${tTxt(cand[0].d.t)}), at +1.5R by ${f2(cand[1].d.e)} (${tTxt(cand[1].d.t)}).`);
       config.be = want; if (want) config.beSince = nowISO; else delete config.beSince;
     }
     config.beSrc = 'backtest';
   }
-  // 3. a setup the backtest shows clearly losing (10+ trades at -0.3R or worse each, or 8+ at -0.5R or worse; negative in both halves): pause it
-  //    until the next backtest can re-check it (it keeps running as shadow trades meanwhile)
-  for (const k of [...new Set(BT.T.map((t) => t.setup))]) {
+  // 3. a setup the backtest shows clearly losing as it trades now (10+ trades at -0.3R or worse each, or 8+ at
+  //    -0.5R or worse; negative in both halves; t <= -2): pause it until the next backtest can re-check it
+  for (const k of setups) {
     if (!DEF_KEYS.has(k) || config.paused[k]) continue;
     const f = config.filters[k] || {}, a = BT.T.filter((t) => t.setup === k && (!f.d1 || t.d1 === f.d1)), all = btE(a), [h1, h2] = btHalves(a);
-    if (((all.n >= 10 && all.e <= -0.3) || (all.n >= 8 && all.e <= -0.5)) && h1.e < 0 && h2.e < 0) {
+    if (((all.n >= 10 && all.e <= -0.3) || (all.n >= 8 && all.e <= -0.5)) && all.t <= -2 && h1.e < 0 && h2.e < 0) {
       config.paused[k] = new Date((now + 3 * 86400) * 1000).toISOString();
-      change(`Paused ${k} for 3 days (backtest)`, `${all.n} past trades as it trades now made ${f2(all.e)} each, negative in both halves of the last ${days} days.`);
+      change(`Paused ${k} for 3 days (backtest)`, `${all.n} past trades as it trades now made ${f2(all.e)} each (${tTxt(all.t)}, ${all.g} market-days), negative in both halves of the last ${days} days.`);
     }
   }
   // 4. a setup paused on a small live sample that the backtest shows is clearly profitable: resume it
   for (const k of Object.keys(config.paused)) {
     const pos = btPositive(k), live = pauseSample(trades.filter((x) => x.k === k && (x.status === 'win' || x.status === 'loss' || x.status === 'be') && now - x.closed < 30 * 86400));
-    if (pos && live.length < 15) { delete config.paused[k]; change(`Resumed ${k} (backtest)`, `Paused on ${live.length} trades, but ${pos.n} past trades as it trades now made ${f2(pos.e)} each, in both halves of the last ${days} days.`); }
+    if (pos && live.length < 15) { delete config.paused[k]; change(`Resumed ${k} (backtest)`, `Paused on ${live.length} trades, but ${pos.n} past trades as it trades now made ${f2(pos.e)} each (${tTxt(pos.t)}), in both halves of the last ${days} days.`); }
   }
 }
 
+// trade management: losers that were +1R or more first (live and shadow, last 14 days) turn break-even at +1R on.
+// mfe is known at the close, so this doesn't wait for the post-exit review window. Defers to the backtest once it has spoken.
 function learnManagement(closedAll, change) {
   if (config.be || config.beSrc === 'backtest') return;
   const losses = closedAll.filter((x) => x.status === 'loss' && now - x.closed < 14 * 86400), gave = losses.filter((x) => (x.mfe || 0) >= 1);
