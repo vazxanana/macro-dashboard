@@ -1,9 +1,11 @@
 name: Council backtest
 
-# RESEARCH BRANCH ONLY (council-research, never merged). Started by hand with workflow_dispatch on this branch.
+# RESEARCH BRANCH ONLY (council-research, never merged). Runs on every push to this branch (or by hand).
 # Replays a long period (default 150 days) one market per job, then merges the trades into
 # council-data/research/backtest-<days>d.json. It never writes backtest.json, so the Coach's live rules are untouched.
 on:
+  push:
+    branches: [council-research]
   workflow_dispatch:
     inputs:
       days:
