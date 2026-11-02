@@ -2550,7 +2550,7 @@ function msNextSetup(bars, A) {
     if (!b || !Array.isArray(b.trades) || !b.trades.length) { sum.textContent = 'No backtest yet: it runs daily and after every engine change.'; ['ms-c-bt', 'ms-c-bt-mkt', 'ms-c-bt-lines'].forEach((id) => set(id, '')); return; }
     const TA = b.trades.map((r) => Object.fromEntries(b.tradeCols.map((c, i) => [c, r[i]])));
     const net = b.tradeCols.includes('cost');   // results after a typical spread (one per round trip), as the Coach judges them
-    if (net) TA.forEach((t) => ['R_none', 'R_be1', 'R_be15', 'R_tp2'].forEach((k) => { if (t[k] != null) t[k] -= t.cost || 0; }));
+    if (net) TA.forEach((t) => ['R_none', 'R_be1', 'R_be15', 'R_tp2', 'R_pt2'].forEach((k) => { if (t[k] != null) t[k] -= t.cost || 0; }));
     const T = TA.filter((t) => t.fill !== 0 && !String(t.setup).includes('@'));   // the trades as the Trader takes them (no market-entry twins, no unfilled orders)
     const f2 = (v) => `${v > 0 ? '+' : v < 0 ? '−' : ''}${Math.abs(v).toFixed(2)}R`;
     const cls = (s) => !isFinite(s.se) || s.n < 5 ? '' : s.e - 1.96 * s.se > 0 ? 'pos' : s.e + 1.96 * s.se < 0 ? 'neg' : '';
@@ -2574,6 +2574,7 @@ function msNextSetup(bars, A) {
     const be = diff('R_be1', 'R_none'), be15 = diff('R_be15', 'R_none');
     lines.push(`Break-even at +1R: ${f2(be.e)} per trade versus no break-even (${clear(be) ? 'a clear difference' : 'no clear difference'}); at +1.5R: ${f2(be15.e)}. ${cf.be ? `The Trader uses break-even at +${cf.be}R.` : 'The Trader uses no break-even.'}`);
     if (b.tradeCols.includes('R_tp2')) { const tp = diff('R_tp2', 'R_none'); lines.push(`Holding to the second target: ${f2(tp.e)} per trade versus the first target (${clear(tp) ? 'a clear difference' : 'no clear difference'}).`); }
+    if (b.tradeCols.includes('R_pt2')) { const far = T.filter((t) => t.rr > 5), pt = btStat(far.map((t) => ({ market: t.market, opened: t.opened, d: t.R_pt2 != null && t.R_none != null ? t.R_pt2 - t.R_none : null })), 'd'); lines.push(`Half off at +2R on targets more than 5R away: ${f2(pt.e)} per trade over ${far.length} such trades versus holding it all (${clear(pt) ? 'a clear difference' : 'no clear difference'}). ${cf.partial ? `The Trader takes the partial (${cf.partialBy === 'user' ? "the trader's rule" : 'set by the backtest'}).` : 'The Trader holds it all.'}`); }
     // entry style: entering at market at the signal versus waiting for the pullback, signal by signal (a missed order is 0R)
     if (TA.some((t) => String(t.setup).endsWith('@mkt'))) {
       const parts = keys.filter((k) => defs.some((p) => p.k === k)).map((k) => {
