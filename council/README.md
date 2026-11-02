@@ -86,3 +86,7 @@ never a rule change from a single trade.
 - add or remove `filters[k]` entries (`d1`, `struct`, `noSession`), setting `since`
 
 Log every change in `history` with `"by": "coach-ai"` and a `why`. Never edit `trades.json`, `state.json` or `snapshot.json`.
+
+## Backtest
+
+`backtest.mjs` replays the last 30 days of real candles (Binance 1m history: BTC, ETH, SOL, XRP and gold via PAXG; forex has no free 1m history yet) through the same engine and entry rules as the Trader: every 5 minutes it rebuilds the 720-candle view of each timeframe, including the forming candle, takes every fresh Ready setup and manages it on 1m candles. Each trade is scored three ways (no break-even, break-even at +1R, at +1.5R). The results go to `backtest.json` on `council-data` (expectancy by setup, by condition, by reward:risk and by market, plus every trade), refreshed daily by the "Council backtest" workflow.
