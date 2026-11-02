@@ -5,7 +5,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { msAnalyze, CFG, PAIRS, RETR, buildSetup, buildRetrace, setMarket } from './engine.mjs';
-import { entryContext, startReview, watchReview, newsNear, lessons } from './review.mjs';
+import { entryContext, startReview, watchReview, judge, newsNear, lessons } from './review.mjs';
 
 const DIR = process.argv[2] || 'data';
 fs.mkdirSync(DIR, { recursive: true });
@@ -67,6 +67,8 @@ CFG.buf = Math.min(LIMITS.buf[1], Math.max(LIMITS.buf[0], config.buf));
 CFG.minRisk = Math.min(LIMITS.minRisk[1], Math.max(LIMITS.minRisk[0], config.minRisk));
 const state = Object.assign({ seen: {}, lastRun: 0 }, rd('state.json', {}));
 let trades = rd('trades.json', []);
+// Reviews written before the entry-slip sign fix scored better-than-planned fills as "late entry": flip and re-judge them once
+for (const x of trades) if (x.pm && x.pm.slip != null && x.pm.sv !== 2) { x.pm.slip = -x.pm.slip; x.pm.sv = 2; Object.assign(x.pm, judge(x)); }
 const snapshot = { at: nowISO, markets: {}, errors: {} };
 
 // This week's economic calendar (high-impact news), refreshed every 6 hours: the review checks every loss against it

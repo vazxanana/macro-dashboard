@@ -47,7 +47,9 @@ export function startReview(tr, exitBar, key, news) {
     if (slip > 0.2) pm.gap = +slip.toFixed(2);
   }
   pm.news = newsNear(key, tr.label, news, (tr.filled || tr.opened) - 1800, tr.closed + 300);
-  if (tr.filled && tr.ctx && tr.ctx.planned != null) pm.slip = +((tr.entry - tr.ctx.planned) * s / r0).toFixed(2);   // < 0: we paid worse than planned
+  // < 0: the fill was worse than planned (a buy above / a sell below the planned entry: the move had started without us).
+  // A market fill on the other side of the plan (deeper toward the stop) is a better price, not a late entry.
+  if (tr.filled && tr.ctx && tr.ctx.planned != null) { pm.slip = +((tr.ctx.planned - tr.entry) * s / r0).toFixed(2); pm.sv = 2; }
   tr.pm = pm;
 }
 
