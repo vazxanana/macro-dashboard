@@ -1,0 +1,56 @@
+name: Council backtest
+
+# Replays the last weeks of real candles through the Trader's engine and rules (council/backtest.mjs)
+# and saves the results to council-data/backtest.json, where the Coach and the page read them.
+on:
+  workflow_dispatch:
+    inputs:
+      days:
+        description: 'Days of history to replay'
+        default: '30'
+  push:
+    branches: [main]
+    paths:
+      - 'council/backtest.mjs'
+      - 'council/engine.mjs'
+      - '.github/workflows/backtest.yml'
+  schedule:
+    - cron: '17 3 * * *'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: council-backtest
+  cancel-in-progress: true
+
+jobs:
+  backtest:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          sparse-checkout: council
+
+      - name: Checkout council data
+        uses: actions/checkout@v4
+        with:
+          ref: council-data
+          path: data
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Backtest
+        run: node council/backtest.mjs data "${{ github.event.inputs.days || '30' }}"
+
+      - name: Save results
+        run: |
+          git -C data config user.name "mosha-council"
+          git -C data config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git -C data add backtest.json
+          git -C data commit -q -m "Council backtest $(date -u +%Y-%m-%dT%H:%MZ)" || exit 0
+          for j in 1 2 3 4 5; do git -C data pull -q --rebase origin council-data && git -C data push -q origin HEAD:council-data && break; sleep 7; done
