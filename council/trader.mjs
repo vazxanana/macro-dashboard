@@ -222,7 +222,11 @@ if (coach.date !== today) {
   if (ls.n >= 6 && ls.exp < 0 && config.minRR < 1.5) { change(`Minimum reward:risk ${config.minRR} → 1.5`, `Trades under 1.5R returned ${ls.exp}R each over ${ls.n} trades.`); config.minRR = 1.5; }
   // ─── Self-evolution: learn filters from the conditions that lose, and drop them when shadow trades prove them wrong ───
   const exp = (arr) => arr.length ? arr.reduce((a, x) => a + x.R, 0) / arr.length : 0;
-  for (const [k, arr] of Object.entries(bySetup)) {
+  // evidence for condition filters: scored trades plus shadow trades blocked for reasons unrelated to the conditions
+  // (reward:risk, exposure, duplicate, dollar cap…): their outcomes are just as informative about D1/structure/session
+  const learnBy = {};
+  for (const t of closedAll) if (!t.shadow || !(t.blockedBy || []).some((b) => b === 'd1' || b === 'struct' || b === 'session')) (learnBy[t.k] = learnBy[t.k] || []).push(t);
+  for (const [k, arr] of Object.entries(learnBy)) {
     if (arr.length < 8) continue;
     const fl = config.filters[k] = config.filters[k] || {};
     for (const fe of ['d1', 'struct']) {
