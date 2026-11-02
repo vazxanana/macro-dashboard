@@ -13,7 +13,7 @@ import path from 'node:path';
 import { msAnalyze, CFG, PAIRS, RETR, buildSetup, buildRetrace, setMarket } from './engine.mjs';
 import { dukaMinutes, dukaHours, dukaDays, dukaReset } from './duka.mjs';
 import { yahooBars } from './yahoo.mjs';
-import { krakenTrades, minuteCandles, krakenOHLC } from './krakenhist.mjs';
+import { krakenMinutes, krakenOHLC } from './krakenhist.mjs';
 
 const DIR = process.argv[2] || 'data', DAYS = +(process.argv[3] || 30);
 const FAKE = !!process.env.BT_FAKE;   // offline self-test with a synthetic random walk
@@ -199,14 +199,15 @@ for (const [key, M] of Object.entries(MARKETS)) {
       // forex: every timeframe straight from Yahoo (1m only reaches back ~29.5 days, so the replay starts once
       // 720 1m candles exist); if Yahoo fails, Dukascopy's files: 1m (5m/15m/30m built from it), 1h monthly, 1d yearly
       let done = false;
-      try {   // 1. Kraken trades → 1m (38 days); 1h = Kraken's 720 hourly candles plus older hours from the trades; 4h/1d = Kraken OHLC
-        const tr0 = Date.now(), trades = await krakenTrades(M.kraken, startT - 8 * 86400, endT), m1 = minuteCandles(trades);
-        if (m1.length < 5000) throw new Error(`only ${m1.length} 1m candles from ${trades.length} trades`);
+      try {   // 1. Kraken trades → 1m (38 days, cached per day); 1h = Kraken's 720 hourly candles plus older hours from the trades; 4h/1d = Kraken OHLC
+        const tr0 = Date.now(), K = await krakenMinutes(M.kraken, startT - 8 * 86400, endT, { cacheDir: process.env.DUKA_CACHE || null, budget: +(process.env.KRAKEN_BUDGET || 400) }), m1 = K.bars;
+        if (m1.length < 5000) throw new Error(`only ${m1.length} 1m candles (${K.calls} calls, ${K.cached} days cached)`);
+        meta.coverage = Object.assign(meta.coverage || {}, { [key]: new Date(K.from * 1000).toISOString().slice(0, 10) });
         const o60 = await krakenOHLC(M.kraken, 60), o240 = await krakenOHLC(M.kraken, 240), o1440 = await krakenOHLC(M.kraken, 1440);
         const firstH = o60.length ? o60[0].time : Infinity, h1 = aggregate(m1.filter((b) => b.time < firstH), 3600).concat(o60);
         Object.assign(data, { '1m': m1, '5m': aggregate(m1, 300), '15m': aggregate(m1, 900), '30m': aggregate(m1, 1800), '1h': h1, '4h': o240, '1d': o1440 });
         meta.source = Object.assign(meta.source || {}, { [key]: 'Kraken' });
-        console.log(`${key}: ${trades.length} Kraken trades → ${m1.length} 1m candles, ${h1.length} 1h, ${o240.length} 4h, ${o1440.length} 1d (${((Date.now() - tr0) / 1000).toFixed(0)}s)`);
+        console.log(`${key}: Kraken 1m from ${meta.coverage[key]} (${K.cached} days cached, ${K.fetched} downloaded, ${K.calls} calls) → ${m1.length} 1m candles, ${h1.length} 1h, ${o240.length} 4h, ${o1440.length} 1d (${((Date.now() - tr0) / 1000).toFixed(0)}s)`);
         done = true;
       } catch (ke) { console.log(`${key}: Kraken history failed (${ke.message}); trying Yahoo`); }
       if (!done) try {
