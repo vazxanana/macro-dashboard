@@ -2,7 +2,7 @@
  "buf": 0.15,
  "minRR": 1.2,
  "minRisk": 0.6,
- "be": 1,
+ "be": null,
  "fresh": 12,
  "newsGuard": false,
  "maxUsd": 3,
@@ -12,9 +12,30 @@
  "pausedMarkets": {},
  "filters": {
   "scalp": {
+   "d1": "against",
+   "since": {
+    "d1": "2026-11-02T11:52:07.000Z"
+   },
+   "src": {
+    "d1": "backtest"
+   }
+  },
+  "rscalp": {
    "d1": "with",
    "since": {
-    "d1": "2026-11-02T02:26:39.000Z"
+    "d1": "2026-11-02T11:52:07.000Z"
+   },
+   "src": {
+    "d1": "backtest"
+   }
+  },
+  "intraday": {
+   "d1": "against",
+   "since": {
+    "d1": "2026-11-02T11:52:07.000Z"
+   },
+   "src": {
+    "d1": "backtest"
    }
   }
  },
@@ -36,7 +57,32 @@
    "by": "coach-stats",
    "change": "Paused scalp for 3 days",
    "why": "Expectancy -0.83R over 6 trades."
+  },
+  {
+   "at": "2026-11-02T11:52:07.000Z",
+   "by": "coach-backtest",
+   "change": "rscalp: only with D1 (backtest)",
+   "why": "300 trades over the last 30 days: with +0.17R each, against -0.20R; true in both halves."
+  },
+  {
+   "at": "2026-11-02T11:52:07.000Z",
+   "by": "coach-backtest",
+   "change": "scalp: only against D1 (backtest), replacing \"only with D1\"",
+   "why": "484 trades over the last 30 days: against +0.43R each, with -0.30R; true in both halves."
+  },
+  {
+   "at": "2026-11-02T11:52:07.000Z",
+   "by": "coach-backtest",
+   "change": "intraday: only against D1 (backtest)",
+   "why": "122 trades over the last 30 days: against +0.41R each, with -0.80R; true in both halves."
+  },
+  {
+   "at": "2026-11-02T11:52:07.000Z",
+   "by": "coach-backtest",
+   "change": "Break-even turned off (backtest)",
+   "why": "1013 trades over the last 30 days: no break-even +0.06R each, at +1R -0.04R, at +1.5R -0.01R."
   }
  ],
- "beSince": "2026-11-02T06:04:06.000Z"
+ "btAt": "2026-11-02T11:37:14.611Z",
+ "beSrc": "backtest"
 }
