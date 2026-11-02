@@ -297,7 +297,8 @@ function learnFromBacktest(change) {
   if (!BT || config.btAt === BT.b.at) return;
   config.btAt = BT.b.at;
   const days = BT.b.days || 30, f2 = (v) => `${v >= 0 ? '+' : ''}${v.toFixed(2)}R`;
-  const setups = [...new Set(BT.T.map((t) => t.setup))];
+  // decisions only for the setups the Trader trades (research setups such as the sweeps are only reported)
+  const setups = [...new Set(BT.T.map((t) => t.setup))].filter((k) => DEF_KEYS.has(k)), TD = BT.T.filter((t) => DEF_KEYS.has(t.setup));
   const sides = (k, c, vals) => { const a = BT.T.filter((t) => t.setup === k);
     return Object.fromEntries(vals.map((v) => { const arr = a.filter((t) => t[c] === v); return [v, { ...btE(arr), h: btHalves(arr) }]; })); };
   // 1. condition filters per setup (D1 with/against; confirming break CHoCH/BO; fresh M15/M5 CHoCH yes/no): one side
@@ -326,9 +327,9 @@ function learnFromBacktest(change) {
   for (const [k, fl] of Object.entries(config.filters)) if (emptyFilter(fl)) delete config.filters[k];
   // 2. Break-even: compared trade by trade with no break-even; a level is used only if it clearly adds R (t >= 2)
   //    and adds R in both halves
-  if (BT.T.length >= 300) {
-    const none = btE(BT.T, 'R_none'), cand = [[1, 'R_be1'], [1.5, 'R_be15']].map(([be, key]) => {
-      const d = btPaired(BT.T, key, 'R_none'), [h1, h2] = [btPaired(BT.T.filter((t) => t.opened < BT.mid), key, 'R_none'), btPaired(BT.T.filter((t) => t.opened >= BT.mid), key, 'R_none')];
+  if (TD.length >= 300) {
+    const none = btE(TD, 'R_none'), cand = [[1, 'R_be1'], [1.5, 'R_be15']].map(([be, key]) => {
+      const d = btPaired(TD, key, 'R_none'), [h1, h2] = [btPaired(TD.filter((t) => t.opened < BT.mid), key, 'R_none'), btPaired(TD.filter((t) => t.opened >= BT.mid), key, 'R_none')];
       return { be, d, ok: d.e >= 0.02 && d.t >= 2 && h1.e > 0 && h2.e > 0 };
     });
     const best = cand.filter((c) => c.ok).sort((x, y) => y.d.e - x.d.e)[0], want = best ? best.be : null;

@@ -103,11 +103,13 @@ function manage(v, tr, b) {
 // other way = the VR; then a fresh M1 BO the same way = the entry, at market. Target: the nearest still-valid opposing
 // M30/H1 Origin. Two stops are tested as separate setups: past the M5 VR structure (sweep_vr) and past the sweep extreme (sweep_ext).
 function atr(bars, n = 14) { const b = bars.slice(-n - 1); let s = 0; for (let i = 1; i < b.length; i++) s += Math.max(b[i].high - b[i].low, Math.abs(b[i].high - b[i - 1].close), Math.abs(b[i].low - b[i - 1].close)); return b.length > 1 ? s / (b.length - 1) : 0; }
-function sweepSetups(src, price, t) {
+// why (optional): the stage each side reached, for the trader's examples (examples.json): which condition stopped it
+function sweepSetups(src, price, t, why, spr = 0) {
   const out = [], B = src['30m'].bars, n = B.length, W = 3;
   if (n < 80) return out;
   for (const sell of [true, false]) {
     const sg = sell ? 1 : -1, hi = (b) => sell ? b.high : -b.low, cl = (b) => sell ? b.close : -b.close;
+    const note = (stage, extra) => { if (why) why[sell ? 'sell' : 'buy'] = { stage, ...extra }; };
     // pivot highs (lows) of the last 60 closed M30 candles
     let sweep = null;
     for (let s = n - 2; s >= n - 13 && !sweep; s--) {          // a sweep in the last ~6 h (closed candles)
@@ -121,17 +123,18 @@ function sweepSetups(src, price, t) {
         break;
       }
     }
-    if (!sweep) continue;
+    if (!sweep) { note('no M30 sweep in the last 6 h'); continue; }
     let failed = false, ext = -Infinity; for (let j = sweep.s; j < n; j++) { ext = Math.max(ext, hi(B[j])); if (j > sweep.s && cl(B[j]) > sweep.P) failed = true; }
-    if (failed) continue;
-    if (sell ? price >= sweep.P : price <= -sweep.P) continue;
+    const lvl = sell ? sweep.P : -sweep.P;
+    if (failed) { note('an M30 candle closed beyond the swept level', { level: lvl }); continue; }
+    if (sell ? price >= sweep.P : price <= -sweep.P) { note('price back beyond the swept level', { level: lvl }); continue; }
     // M5 VR: an M5 break of structure the other way after the sweep, its Origin still valid
     const B5 = src['5m'].bars, e5 = src['5m'].A.events.find((e) => e.dir === -sg && B5[e.breakIdx].time >= sweep.time && e.endIdx === null);
-    if (!e5) continue;
+    if (!e5) { note('swept, waiting for the M5 VR', { level: lvl }); continue; }
     // M1 BO the same way after the M5 VR, fresh
     const B1 = src['1m'].bars, ev1 = src['1m'].A.events.filter((e) => e.dir === -sg && B1[e.breakIdx].time >= B5[e5.breakIdx].time);
     const e1 = ev1[ev1.length - 1];
-    if (!e1 || t - B1[e1.breakIdx].time > 12 * 60) continue;
+    if (!e1 || t - B1[e1.breakIdx].time > 12 * 60) { note(e1 ? 'M1 BO older than 12 min' : 'M5 VR in, waiting for the M1 BO', { level: lvl }); continue; }
     // target: nearest valid opposing Origin on M30 / H1 beyond the entry
     let t1 = null;
     for (const id of ['30m', '1h']) for (const e of src[id].A.events) {
@@ -143,14 +146,21 @@ function sweepSetups(src, price, t) {
       let lo = Infinity; for (let j = Math.max(0, n - 60); j <= sweep.s; j++) lo = Math.min(lo, sell ? B[j].low : -B[j].high);
       const edge = sell ? lo : -lo; if (sell ? edge < price : edge > price) t1 = edge;
     }
-    if (t1 === null) continue;
+    if (t1 === null) { note('no target (no Origin or range edge beyond price)', { level: lvl }); continue; }
     const buf = 0.1 * atr(B5), sweepExt = sell ? ext : -ext;
-    const stops = { sweep_vr: sell ? e5.top + buf : e5.bot - buf, sweep_ext: sell ? sweepExt + buf : sweepExt - buf };
+    // stops: past the M5 VR structure; past the sweep extreme (the trader's short, 2 Nov); just past the M1 BO's
+    // origin (the trader's long, 2 Nov: 3.9 points of risk for 16R), never inside the 0.1 ATR buffer
+    const b1 = 0.1 * atr(B1), floor = Math.max(CFG.minRisk * atr(B1), 5 * spr);   // the engine's minimum stop
+    let m1s = sell ? e1.top + b1 : e1.bot - b1; if ((m1s - price) * sg < floor) m1s = price + sg * floor;
+    const stops = { sweep_vr: sell ? e5.top + buf : e5.bot - buf, sweep_ext: sell ? sweepExt + buf : sweepExt - buf, sweep_m1: m1s };
+    const rrs = {};
     for (const [k, stop] of Object.entries(stops)) {
       const r = (stop - price) * sg, rr = (price - t1) * sg / r;
+      rrs[k] = +rr.toFixed(2);
       if (!(r > 0) || !(rr >= 1.2)) continue;
       out.push({ k, sell, entry: price, stop, t1, rr, sig: `${k}|${sell ? 's' : 'b'}|${B1[e1.breakIdx].time}|${sweep.time}` });
     }
+    note(out.some((x) => x.sell === sell) ? 'signal' : 'reward:risk under 1.2', { level: lvl, target: +t1.toFixed(5), rr: rrs });
   }
   return out;
 }
@@ -170,6 +180,14 @@ const DEFS = PAIRS.concat(RETR);
 const all = [], twins = [], unfilled = [], meta = { errors: {} };   // closed trades; their market-entry twins; resting orders that never filled
 const endT = Math.floor(Date.now() / 1000 / 60) * 60 - 60, startT = endT - DAYS * 86400;
 const t0wall = Date.now();
+// the trader's marked trades (examples.json): for each one inside the replay, what every setup was doing in its entry
+// window, why the sweep model did or didn't fire, and which signals (if any) the backtest took there
+const EX = (() => { try { return JSON.parse(fs.readFileSync(new URL('./examples.json', import.meta.url))).trades || []; } catch (e) { return []; } })()
+  .map((x) => ({ ...x, from: Date.parse(x.entryFrom) / 1000, to: Date.parse(x.entryTo) / 1000, setups: [], sweep: [], caught: [] }))
+  .filter((x) => x.from >= startT && x.to <= endT);
+const PAD = 30 * 60;
+// keep a running list of states, adding a row only when it changes
+const pushChange = (arr, t, v, extra) => { const s = JSON.stringify(v); if (!arr.length || arr[arr.length - 1].s !== s) arr.push({ t, s, ...v, ...extra }); };
 
 for (const [key, M] of Object.entries(MARKETS)) {
   try {
@@ -263,6 +281,13 @@ for (const [key, M] of Object.entries(MARKETS)) {
       steps++;
       const price = src['1m'].bars.at(-1).close;
       if (!marketOpen(M, t)) continue;
+      const exNow = EX.filter((x) => x.market === key && t >= x.from - PAD && t <= x.to + PAD);
+      for (const x of exNow) {
+        const st = BUILDERS.map(([pr, fn]) => { try { return fn(pr, price, src); } catch (e) { return null; } }).filter((v) => v && (v.sell ? 'sell' : 'buy') === x.side);
+        pushChange(x.setups, t, { states: st.map((v) => `${v.k} ${v.state}`).join(', ') || 'none on this side' }, { price: +price.toFixed(2) });
+        const why = {}; sweepSetups(src, price, t, why, spreadOf(M, price));
+        pushChange(x.sweep, t, why[x.side] || { stage: 'n/a' });
+      }
       for (const [pr, fn] of BUILDERS) {
         let st; try { st = fn(pr, price, src); } catch (e) { st = null; }
         if (!st || st.state !== 'READY' || seen.has(st.sig)) continue;
@@ -293,7 +318,7 @@ for (const [key, M] of Object.entries(MARKETS)) {
         tw.v = VARIANTS.map(([n, be, t2]) => ({ n, be, t2, stop: tw.stop, beMoved: false, done: false, R: null }));
         open.push(tw);
       }
-      for (const sw of sweepSetups(src, price, t)) {
+      for (const sw of sweepSetups(src, price, t, null, spreadOf(M, price))) {
         if (seen.has(sw.sig)) continue; seen.add(sw.sig);
         const side = sw.sell ? 'sell' : 'buy';
         if (open.some((x) => x.k === sw.k && x.side === side)) continue;   // one sweep trade per side at a time
@@ -303,6 +328,10 @@ for (const [key, M] of Object.entries(MARKETS)) {
         tr.v = VARIANTS.map(([n, be, t2]) => ({ n, be, t2, stop: tr.stop, beMoved: false, done: false, R: null }));
         open.push(tr);
       }
+    }
+    for (const x of EX.filter((e) => e.market === key)) {
+      for (const tr of all.concat(twins, unfilled, open).filter((v) => v.m === key && v.side === x.side && v.opened >= x.from - 2 * PAD && v.opened <= x.to + 2 * PAD))
+        x.caught.push({ setup: tr.k, opened: tr.opened, entry: +tr.entry.toFixed(2), stop: +tr.stop.toFixed(2), target: +tr.t1.toFixed(2), rr: +tr.rr.toFixed(2), filled: !!tr.filled, R: tr.v[0].R == null ? null : +tr.v[0].R.toFixed(2), status: tr.status });
     }
     meta[key] = { steps, trades: all.filter((x) => x.m === key).length };
     console.log(`${key}: ${steps} steps, ${meta[key].trades} closed trades, ${((Date.now() - t0wall) / 1000).toFixed(0)}s`);
@@ -327,6 +356,8 @@ const out = {
   trades: all.concat(twins, unfilled).map((x) => [x.m, x.k, x.side, x.opened, x.filled || null, +x.rr.toFixed(2), x.feat.d1, x.feat.struct, x.feat.session, ...x.v.map((v) => v.R == null ? null : +v.R.toFixed(2)), +x.mfe.toFixed(2), +x.cost.toFixed(3), x.status === 'closed' ? 1 : 0, x.feat.cf, x.feat.choch]),
   tradeCols: ['market', 'setup', 'side', 'opened', 'filled', 'rr', 'd1', 'struct', 'session', 'R_none', 'R_be1', 'R_be15', 'R_tp2', 'mfe', 'cost', 'fill', 'cf', 'choch'],
   twins: twins.length, unfilled: unfilled.length,
+  examples: EX.map((x) => ({ id: x.id, market: x.market, side: x.side, entry: x.entry, stop: x.stop, target: x.target, entryFrom: x.entryFrom, entryTo: x.entryTo,
+    caught: x.caught, setups: x.setups.map(({ s, ...v }) => v), sweep: x.sweep.map(({ s, ...v }) => v) })),
 };
 fs.writeFileSync(path.join(DIR, 'backtest.json'), JSON.stringify(out));
 console.log(`\n${all.length} trades over ${DAYS} days (${((Date.now() - t0wall) / 1000).toFixed(0)}s)`);
@@ -335,4 +366,10 @@ for (const [k, v] of Object.entries(out.bySetup)) console.log(k.padEnd(9), Objec
 for (const [k, v] of Object.entries(out.byRR)) console.log('rr ' + k.padEnd(7), `n${v.none.n} exp${v.none.exp} be1 ${v.be1.exp}`);
 for (const k of setups) { const a = all.filter((x) => x.k === k), m = (arr) => arr.length ? (arr.reduce((q, x) => q + x.v[0].R - x.cost, 0) / arr.length).toFixed(2) : '-';
   console.log(k.padEnd(9), 'net', m(a), '| CF choch', m(a.filter((x) => x.feat.cf === 'choch')), 'n' + a.filter((x) => x.feat.cf === 'choch').length, 'bo', m(a.filter((x) => x.feat.cf === 'bo')), '| M15/M5 CHoCH yes', m(a.filter((x) => x.feat.choch === 'yes')), 'n' + a.filter((x) => x.feat.choch === 'yes').length, 'no', m(a.filter((x) => x.feat.choch === 'no'))); }
+for (const x of out.examples) {
+  const hm = (t) => new Date(t * 1000).toISOString().slice(11, 16);
+  console.log(`\nexample ${x.id} (${x.side} ${x.entry}, stop ${x.stop}, target ${x.target}): ${x.caught.length ? x.caught.map((c) => `${c.setup} ${hm(c.opened)} ${c.entry}/${c.stop}/${c.target} R ${c.R}`).join('; ') : 'no signal from any setup'}`);
+  for (const v of x.sweep) console.log(`  sweep ${hm(v.t)} ${v.stage}${v.level != null ? ` (level ${v.level})` : ''}${v.target != null ? ` target ${v.target} rr ${JSON.stringify(v.rr)}` : ''}`);
+  for (const v of x.setups) console.log(`  setups ${hm(v.t)} @${v.price}: ${v.states}`);
+}
 for (const [k, c] of Object.entries(out.bySetupCond)) console.log(k.padEnd(9), 'd1', Object.entries(c.d1).map(([a, s]) => `${a}:n${s.none.n} ${s.none.exp}`).join(' '), '| struct', Object.entries(c.struct).map(([a, s]) => `${a}:n${s.none.n} ${s.none.exp}`).join(' '));

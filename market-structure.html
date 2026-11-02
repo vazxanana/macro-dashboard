@@ -2493,7 +2493,7 @@ function msNextSetup(bars, A) {
     const g = cl.size; let ss = 0; cl.forEach((u) => { ss += u * u; });
     return { n, e, se: g > 1 ? Math.sqrt(ss * g / (g - 1)) / n : Infinity, w: v.filter((t) => t[key] > 0).length / n };
   }
-  const BT_NAME = { sweep_vr: 'Sweep → VR → BO <small>stop past M5 VR · research</small>', sweep_ext: 'Sweep → VR → BO <small>stop past sweep · research</small>' };
+  const BT_NAME = { sweep_vr: 'Sweep → VR → BO <small>stop past M5 VR · research</small>', sweep_ext: 'Sweep → VR → BO <small>stop past sweep · research</small>', sweep_m1: 'Sweep → VR → BO <small>stop past M1 origin · research</small>' };
   function renderBacktest(b, cf) {
     const sum = document.getElementById('ms-c-bt-sum'); if (!sum) return;
     const set = (id, html) => { const el = document.getElementById(id); if (el) el.innerHTML = html; };
@@ -2510,7 +2510,7 @@ function msNextSetup(bars, A) {
     sum.innerHTML = `${T.length} trades from ${day(b.from)} to ${day(b.to)}${net ? ', after spread' : ''} · run ${ago(Date.parse(b.at) / 1000)}${errs.length ? ` · <span class="c-warn">no history this run for ${errs.map((k) => esc((INSTRUMENTS[k] || {}).label || k)).join(', ')} (its history source failed this run; the next run retries)</span>` : ''}`;
     const mk = [...new Set(T.map((t) => t.market))].map((m) => ({ m, s: btStat(T.filter((t) => t.market === m)) })).sort((x, y) => y.s.e - x.s.e);
     set('ms-c-bt-mkt', mk.map(({ m, s }) => `<span class="ms-q ${cls(s) === 'pos' ? 'good' : cls(s) === 'neg' ? 'weak' : ''}">${esc((INSTRUMENTS[m] || {}).label || m)} ${f2(s.e)} · ${s.n}</span>`).join(''));
-    const defs = PAIRS.concat(RETR), order = defs.map((p) => p.k).concat(['sweep_vr', 'sweep_ext']);
+    const defs = PAIRS.concat(RETR), order = defs.map((p) => p.k).concat(['sweep_vr', 'sweep_ext', 'sweep_m1']);
     const keys = [...new Set(T.map((t) => t.setup))].sort((a, z) => order.indexOf(a) - order.indexOf(z));
     set('ms-c-bt', keys.map((k) => {
       const a = T.filter((t) => t.setup === k), s = btStat(a), lo = s.e - 1.96 * s.se, hi = s.e + 1.96 * s.se, d = defs.find((p) => p.k === k);
@@ -2535,6 +2535,13 @@ function msNextSetup(bars, A) {
       }).filter(Boolean);
       const miss = TA.filter((t) => t.fill === 0 && !String(t.setup).includes('@')).length;
       if (parts.length) lines.push(`Entering at market instead of waiting for the pullback, per signal (${miss} resting orders never filled): ${parts.join(' · ')}.`);
+    }
+    // the trader's marked trades (examples.json): did any setup take them, and if not, how far the sweep model got
+    for (const x of b.examples || []) {
+      const hit = (x.caught || []).filter((c) => c.filled), sw = (x.sweep || []).filter((v) => v.t <= Date.parse(x.entryTo) / 1000).pop();
+      const what = `Your ${esc((INSTRUMENTS[x.market] || {}).label || x.market)} ${x.side} ${fmtI(x.entry, { dec: 2 })} (${esc(String(x.entryFrom).slice(5, 10))})`;
+      lines.push(hit.length ? `${what}: taken by ${hit.map((c) => `${esc(c.setup)}${c.R != null ? ` <b class="${c.R > 0 ? 'pos' : 'neg'}">${f2(c.R)}</b>` : ''}`).join(', ')}.`
+        : `${what}: <b class="neg">missed</b>${sw ? ` · sweep model: ${esc(sw.stage)}` : ''}.`);
     }
     set('ms-c-bt-lines', lines.map((l) => `<li>${l}</li>`).join(''));
   }
