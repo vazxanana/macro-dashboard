@@ -24,7 +24,7 @@ const MARKETS = {
   usdcad: { label: 'USD/CAD', name: 'Loonie', group: 'Forex', duka: 'USDCAD', dec: 5 },
   usdchf: { label: 'USD/CHF', name: 'Swissy', group: 'Forex', duka: 'USDCHF', dec: 5 },
 };
-const TFS = [['1d', '1d', 86400], ['4h', '4h', 14400], ['1h', '1h', 3600], ['15m', '15m', 900], ['5m', '5m', 300], ['1m', '1m', 60]];
+const TFS = [['1d', '1d', 86400], ['4h', '4h', 14400], ['1h', '1h', 3600], ['30m', '30m', 1800], ['15m', '15m', 900], ['5m', '5m', 300], ['1m', '1m', 60]];
 const SEC = Object.fromEntries(TFS.map(([id, , s]) => [id, s]));
 const WAIT = { '1d': 5 * 86400, '4h': 2 * 86400, '1h': 12 * 3600, '15m': 3 * 3600 };
 const FRESH = 12, WIN = 720, STEP = 300;
@@ -91,6 +91,63 @@ function manage(v, tr, b) {
   if (v.be && !v.beMoved && ((s ? tr.entry - b.low : b.high - tr.entry) / r0) >= v.be) { v.stop = tr.entry; v.beMoved = true; }
 }
 
+// ─── Research setup: liquidity sweep → VR → BO (the user's marked gold trade, 2 Nov) ───
+// M30 wicks beyond a recent M30 swing high (low) and closes back inside it = the sweep; then M5 breaks structure the
+// other way = the VR; then a fresh M1 BO the same way = the entry, at market. Target: the nearest still-valid opposing
+// M30/H1 Origin. Two stops are tested as separate setups: past the M5 VR structure (sweep_vr) and past the sweep extreme (sweep_ext).
+function atr(bars, n = 14) { const b = bars.slice(-n - 1); let s = 0; for (let i = 1; i < b.length; i++) s += Math.max(b[i].high - b[i].low, Math.abs(b[i].high - b[i - 1].close), Math.abs(b[i].low - b[i - 1].close)); return b.length > 1 ? s / (b.length - 1) : 0; }
+function sweepSetups(src, price, t) {
+  const out = [], B = src['30m'].bars, n = B.length, W = 3;
+  if (n < 80) return out;
+  for (const sell of [true, false]) {
+    const sg = sell ? 1 : -1, hi = (b) => sell ? b.high : -b.low, cl = (b) => sell ? b.close : -b.close;
+    // pivot highs (lows) of the last 60 closed M30 candles
+    let sweep = null;
+    for (let s = n - 2; s >= n - 13 && !sweep; s--) {          // a sweep in the last ~6 h (closed candles)
+      for (let p = s - 3; p >= Math.max(W, n - 60); p--) {
+        let piv = true; for (let k = 1; k <= W; k++) if (hi(B[p - k]) > hi(B[p]) || hi(B[p + k]) >= hi(B[p])) { piv = false; break; }
+        if (!piv) continue;
+        const P = hi(B[p]);
+        let clean = true; for (let j = p + 1; j < s; j++) if (hi(B[j]) > P) { clean = false; break; }   // the first run above it is the sweep
+        if (!clean) break;
+        if (hi(B[s]) > P && cl(B[s]) < P) { sweep = { s, p, P, time: B[s].time }; }
+        break;
+      }
+    }
+    if (!sweep) continue;
+    let failed = false, ext = -Infinity; for (let j = sweep.s; j < n; j++) { ext = Math.max(ext, hi(B[j])); if (j > sweep.s && cl(B[j]) > sweep.P) failed = true; }
+    if (failed) continue;
+    if (sell ? price >= sweep.P : price <= -sweep.P) continue;
+    // M5 VR: an M5 break of structure the other way after the sweep, its Origin still valid
+    const B5 = src['5m'].bars, e5 = src['5m'].A.events.find((e) => e.dir === -sg && B5[e.breakIdx].time >= sweep.time && e.endIdx === null);
+    if (!e5) continue;
+    // M1 BO the same way after the M5 VR, fresh
+    const B1 = src['1m'].bars, ev1 = src['1m'].A.events.filter((e) => e.dir === -sg && B1[e.breakIdx].time >= B5[e5.breakIdx].time);
+    const e1 = ev1[ev1.length - 1];
+    if (!e1 || t - B1[e1.breakIdx].time > 12 * 60) continue;
+    // target: nearest valid opposing Origin on M30 / H1 beyond the entry
+    let t1 = null;
+    for (const id of ['30m', '1h']) for (const e of src[id].A.events) {
+      if (e.dir !== (sell ? 1 : -1) || e.endIdx !== null) continue;   // a sell targets the last valid buy Origin below, and vice versa
+      const edge = sell ? e.top : e.bot;
+      if (sell ? edge < price : edge > price) if (t1 === null || (sell ? edge > t1 : edge < t1)) t1 = edge;
+    }
+    if (t1 === null) {   // no valid Origin there: the other side of the M30 range before the sweep (~30 h; its liquidity)
+      let lo = Infinity; for (let j = Math.max(0, n - 60); j <= sweep.s; j++) lo = Math.min(lo, sell ? B[j].low : -B[j].high);
+      const edge = sell ? lo : -lo; if (sell ? edge < price : edge > price) t1 = edge;
+    }
+    if (t1 === null) continue;
+    const buf = 0.1 * atr(B5), sweepExt = sell ? ext : -ext;
+    const stops = { sweep_vr: sell ? e5.top + buf : e5.bot - buf, sweep_ext: sell ? sweepExt + buf : sweepExt - buf };
+    for (const [k, stop] of Object.entries(stops)) {
+      const r = (stop - price) * sg, rr = (price - t1) * sg / r;
+      if (!(r > 0) || !(rr >= 1.2)) continue;
+      out.push({ k, sell, entry: price, stop, t1, rr, sig: `${k}|${sell ? 's' : 'b'}|${B1[e1.breakIdx].time}|${sweep.time}` });
+    }
+  }
+  return out;
+}
+
 const BUILDERS = PAIRS.map((p) => [p, buildSetup]).concat(RETR.map((p) => [p, buildRetrace]));
 const DEFS = PAIRS.concat(RETR);
 const all = [], meta = { errors: {} };
@@ -113,7 +170,7 @@ for (const [key, M] of Object.entries(MARKETS)) {
       let d1 = await dukaDays(M.duka, startT - 1100 * 86400, endT);
       const lastD = d1.length ? d1.at(-1).time : 0;
       d1 = d1.concat(aggregate(h1.filter((b) => b.time >= lastD + 86400), 86400));
-      Object.assign(data, { '1m': m1, '5m': aggregate(m1, 300), '15m': aggregate(m1, 900), '1h': h1, '4h': aggregate(h1, 14400), '1d': d1 });
+      Object.assign(data, { '1m': m1, '5m': aggregate(m1, 300), '15m': aggregate(m1, 900), '30m': aggregate(m1, 1800), '1h': h1, '4h': aggregate(h1, 14400), '1d': d1 });
       console.log(`${key}: ${m1.length} 1m, ${h1.length} 1h, ${d1.length} 1d candles from Dukascopy`);
     } else {
       for (const [id, iv, sec] of TFS) data[id] = await klines(M.sym, iv, startT - (WIN + 2) * sec, endT);
@@ -180,6 +237,16 @@ for (const [key, M] of Object.entries(MARKETS)) {
         }
         tr.r0 = Math.abs(tr.entry - tr.stop);
         if (!(tr.r0 > 0)) continue;
+        tr.v = VARIANTS.map(([n, be]) => ({ n, be, stop: tr.stop, beMoved: false, done: false, R: null }));
+        open.push(tr);
+      }
+      for (const sw of sweepSetups(src, price, t)) {
+        if (seen.has(sw.sig)) continue; seen.add(sw.sig);
+        const side = sw.sell ? 'sell' : 'buy';
+        if (open.some((x) => x.k === sw.k && x.side === side)) continue;   // one sweep trade per side at a time
+        const tr = { m: key, k: sw.k, h: '1h', side, entry: sw.entry, stop: sw.stop, t1: sw.t1, rr: sw.rr, opened: t, filled: t, status: 'open', mfe: 0,
+          feat: { d1: src['1d'].A.trend === (sw.sell ? -1 : 1) ? 'with' : 'against', struct: 'n/a', session: sessionOf(t) } };
+        tr.r0 = Math.abs(tr.entry - tr.stop);
         tr.v = VARIANTS.map(([n, be]) => ({ n, be, stop: tr.stop, beMoved: false, done: false, R: null }));
         open.push(tr);
       }
