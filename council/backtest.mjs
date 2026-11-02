@@ -1,13 +1,14 @@
 // Council · Backtest: replay past candles through the same engine and rules the Trader uses,
 // so the Coach can judge a setup on hundreds of historical trades instead of waiting days for live ones.
 // Usage: node council/backtest.mjs <dataDir> [days=30]
-// Data: Binance public market data (1m history) for crypto and gold (PAXG). Forex has no free 1m history
-// source reachable from Actions, so it is left out for now.
+// Data: Binance public market data (1m history) for crypto and gold (PAXG); Dukascopy's free candle files
+// for forex (1m per day, 1h per month, 1d per year; council/duka.mjs).
 // Writes <dataDir>/backtest.json: expectancy by setup, by condition, by reward:risk, by market, for three
 // trade-management variants (no break-even, break-even at +1R, at +1.5R).
 import fs from 'node:fs';
 import path from 'node:path';
 import { msAnalyze, CFG, PAIRS, RETR, buildSetup, buildRetrace, setMarket } from './engine.mjs';
+import { dukaMinutes, dukaHours, dukaDays } from './duka.mjs';
 
 const DIR = process.argv[2] || 'data', DAYS = +(process.argv[3] || 30);
 const FAKE = !!process.env.BT_FAKE;   // offline self-test with a synthetic random walk
@@ -17,6 +18,11 @@ const MARKETS = {
   eth: { label: 'ETH/USD', name: 'Ethereum', group: 'Crypto', sym: 'ETHUSDT', dec: 2 },
   sol: { label: 'SOL/USD', name: 'Solana', group: 'Crypto', sym: 'SOLUSDT', dec: 2 },
   xrp: { label: 'XRP/USD', name: 'XRP', group: 'Crypto', sym: 'XRPUSDT', dec: 4 },
+  eurusd: { label: 'EUR/USD', name: 'Euro', group: 'Forex', duka: 'EURUSD', dec: 5 },
+  gbpusd: { label: 'GBP/USD', name: 'Pound', group: 'Forex', duka: 'GBPUSD', dec: 5 },
+  audusd: { label: 'AUD/USD', name: 'Aussie', group: 'Forex', duka: 'AUDUSD', dec: 5 },
+  usdcad: { label: 'USD/CAD', name: 'Loonie', group: 'Forex', duka: 'USDCAD', dec: 5 },
+  usdchf: { label: 'USD/CHF', name: 'Swissy', group: 'Forex', duka: 'USDCHF', dec: 5 },
 };
 const TFS = [['1d', '1d', 86400], ['4h', '4h', 14400], ['1h', '1h', 3600], ['15m', '15m', 900], ['5m', '5m', 300], ['1m', '1m', 60]];
 const SEC = Object.fromEntries(TFS.map(([id, , s]) => [id, s]));
@@ -97,6 +103,18 @@ for (const [key, M] of Object.entries(MARKETS)) {
     if (FAKE) {
       const m1 = fakeBars(startT - 760 * 86400, endT, key.length * 7919 + 1);
       for (const [id, , sec] of TFS) data[id] = id === '1m' ? m1.filter((b) => b.time >= startT - WIN * 60) : aggregate(m1, sec);
+    } else if (M.duka) {
+      // forex: 1m for the replay plus the 15m window, 1h from the monthly files (+ recent hours from 1m), 1d from the yearly ones
+      const m1 = await dukaMinutes(M.duka, startT - 8 * 86400, endT);
+      if (m1.length < 5000) throw new Error(`only ${m1.length} 1m candles from Dukascopy`);
+      let h1 = await dukaHours(M.duka, startT - 140 * 86400, endT);
+      const lastH = h1.length ? h1.at(-1).time : 0;
+      h1 = h1.concat(aggregate(m1.filter((b) => b.time >= lastH + 3600), 3600));
+      let d1 = await dukaDays(M.duka, startT - 1100 * 86400, endT);
+      const lastD = d1.length ? d1.at(-1).time : 0;
+      d1 = d1.concat(aggregate(h1.filter((b) => b.time >= lastD + 86400), 86400));
+      Object.assign(data, { '1m': m1, '5m': aggregate(m1, 300), '15m': aggregate(m1, 900), '1h': h1, '4h': aggregate(h1, 14400), '1d': d1 });
+      console.log(`${key}: ${m1.length} 1m, ${h1.length} 1h, ${d1.length} 1d candles from Dukascopy`);
     } else {
       for (const [id, iv, sec] of TFS) data[id] = await klines(M.sym, iv, startT - (WIN + 2) * sec, endT);
     }
