@@ -32,6 +32,8 @@ export function decodeBi5(buf, base, point = 1e5) {
 
 const UA = 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36';
 let firstErr = true, failsInRow = 0;
+// the give-up breaker is per market: one pair's connection failures must not skip the next pair
+export function dukaReset() { failsInRow = 0; }
 // one file: Node fetch first; on a network error (resets, IPv6, TLS) fall back to curl, which retries on its own
 // Finished files never change: keep them in DUKA_CACHE (an Actions cache) so each run only downloads new days.
 // Files for the current day, month or year are still growing and are never cached.

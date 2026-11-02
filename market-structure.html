@@ -2491,12 +2491,14 @@ function msNextSetup(bars, A) {
     const set = (id, html) => { const el = document.getElementById(id); if (el) el.innerHTML = html; };
     if (!b || !Array.isArray(b.trades) || !b.trades.length) { sum.textContent = 'No backtest yet: it runs daily and after every engine change.'; ['ms-c-bt', 'ms-c-bt-mkt', 'ms-c-bt-lines'].forEach((id) => set(id, '')); return; }
     const T = b.trades.map((r) => Object.fromEntries(b.tradeCols.map((c, i) => [c, r[i]])));
+    const net = b.tradeCols.includes('cost');   // results after a typical spread (one per round trip), as the Coach judges them
+    if (net) T.forEach((t) => ['R_none', 'R_be1', 'R_be15', 'R_tp2'].forEach((k) => { if (t[k] != null) t[k] -= t.cost || 0; }));
     const f2 = (v) => `${v > 0 ? '+' : v < 0 ? '−' : ''}${Math.abs(v).toFixed(2)}R`;
     const cls = (s) => !isFinite(s.se) || s.n < 5 ? '' : s.e - 1.96 * s.se > 0 ? 'pos' : s.e + 1.96 * s.se < 0 ? 'neg' : '';
     const cell = (s) => s.n ? `<span class="c-bt-r ${cls(s)}">${f2(s.e)} <small>n${s.n}</small></span>` : '<span class="c-few">—</span>';
     const errs = Object.keys((b.markets || {}).errors || {});
     const day = (iso) => new Date(iso).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' });
-    sum.innerHTML = `${T.length} trades from ${day(b.from)} to ${day(b.to)} · run ${ago(Date.parse(b.at) / 1000)}${errs.length ? ` · <span class="c-warn">no history this run for ${errs.map((k) => esc((INSTRUMENTS[k] || {}).label || k)).join(', ')} (data feed throttled; it fills in over the next runs)</span>` : ''}`;
+    sum.innerHTML = `${T.length} trades from ${day(b.from)} to ${day(b.to)}${net ? ', after spread' : ''} · run ${ago(Date.parse(b.at) / 1000)}${errs.length ? ` · <span class="c-warn">no history this run for ${errs.map((k) => esc((INSTRUMENTS[k] || {}).label || k)).join(', ')} (data feed throttled; it fills in over the next runs)</span>` : ''}`;
     const mk = [...new Set(T.map((t) => t.market))].map((m) => ({ m, s: btStat(T.filter((t) => t.market === m)) })).sort((x, y) => y.s.e - x.s.e);
     set('ms-c-bt-mkt', mk.map(({ m, s }) => `<span class="ms-q ${cls(s) === 'pos' ? 'good' : cls(s) === 'neg' ? 'weak' : ''}">${esc((INSTRUMENTS[m] || {}).label || m)} ${f2(s.e)} · ${s.n}</span>`).join(''));
     const defs = PAIRS.concat(RETR), order = defs.map((p) => p.k).concat(['sweep_vr', 'sweep_ext']);
