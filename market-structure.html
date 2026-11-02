@@ -2399,6 +2399,7 @@ function msNextSetup(bars, A) {
     const paused = Object.entries(cf.paused || {});
     set('ms-c-rules', `<span class="ms-q">Stop buffer ${cf.buf} × ATR</span><span class="ms-q">Min stop ${cf.minRisk || 0.6} × ATR</span><span class="ms-q">${cf.be ? `Break-even at +${cf.be}R` : 'No break-even move'}</span><span class="ms-q">Min reward:risk ${cf.minRR}</span><span class="ms-q">Dollar cap ${cf.maxUsd || 3} trades</span>${cf.newsGuard ? '<span class="ms-q">News guard on</span>' : ''}` + (paused.length ? paused.map(([k, u]) => `<span class="ms-q weak">${esc(k)} paused to ${esc(u.slice(0, 10))}</span>`).join('') : '<span class="ms-q good">All setups active</span>') +
       Object.entries(cf.pausedMarkets || {}).map(([m, u]) => `<span class="ms-q weak">${esc((INSTRUMENTS[m] || {}).label || m)} paused to ${esc(String(u).slice(0, 10))}</span>`).join('') +
+      Object.entries(cf.target || {}).filter(([, v]) => v === 't2').map(([k]) => `<span class="ms-q">${(cf.targetBy || {})[k] === 'user' ? 'Your rule' : 'Learned'} · ${esc(k)}: ${/^r/.test(k) ? 'hold to the Origin' : 'hold to the second target'}</span>`).join('') +
       Object.entries(cf.filters || {}).map(([k, f]) => [f.d1 ? `${k}: only ${f.d1} D1` : '', f.cf ? `${k}: only ${f.cf === 'choch' ? 'CHoCH' : 'continuation BO'} confirmations` : '', f.choch ? `${k}: ${f.choch === 'yes' ? 'needs' : 'skips on'} a fresh M15/M5 CHoCH` : '', f.struct ? `${k}: only ${f.struct} structure` : '', (f.noSession || []).length ? `${k}: skip ${f.noSession.join(', ')}` : ''].filter(Boolean).map((t) => `<span class="ms-q">Learned · ${esc(t)}</span>`).join('')).join(''));
     const sh = (C.trades || []).filter((x) => x.shadow && (x.status === 'win' || x.status === 'loss')), shR = sh.reduce((a, x) => a + x.R, 0);
     set('ms-c-shadow-sum', sh.length ? `Shadow trades (blocked by rules) closed: ${sh.length}, ${shR >= 0 ? '+' : ''}${shR.toFixed(1)}R. ${shR > 0 ? 'Blocked trades are winning: the Coach will loosen the rule that blocks them.' : 'The rules are keeping you out of losing trades.'}` : 'Blocked setups are followed as shadow trades so the Coach can check every rule it adds.');
@@ -2432,7 +2433,7 @@ function msNextSetup(bars, A) {
     const res = x.status === 'win' ? `Win +${x.R}R` : x.status === 'loss' ? 'Loss −1R' : x.status === 'be' ? 'Break-even 0R' : (ST_NAME[x.status] || x.status);
     document.getElementById('ms-tv-t').textContent = `${x.label} · ${x.name} ${x.pair} · ${x.side === 'sell' ? 'Sell' : 'Buy'} · ${res}${x.shadow ? ' (shadow)' : ''}`;
     document.getElementById('ms-tv-s').innerHTML = x.pm && x.pm.title ? `<b class="c-pm-v ${x.pm.verdict}" style="margin:0 6px 0 0">${x.pm.verdict === 'system' ? 'System' : 'Market'}</b><b>${esc(x.pm.title)}</b> · ${esc(x.pm.detail)} <br>Lesson: ${esc(x.pm.lesson)}` : esc(x.note || '');
-    document.getElementById('ms-tv-k').innerHTML = `<span><i style="background:#2962ff"></i>Entry <b>${f(x.entry)}</b></span><span><i style="background:${DNC}"></i>Stop <b>${f(stop0)}</b></span>${x.beMoved ? `<span><i style="background:#8a94a8"></i>Stop moved to entry</span>` : ''}<span><i style="background:${UPC}"></i>Target <b>${f(x.t1)}</b></span><span>Reward:risk <b>${x.rr}R</b></span>${x.mfe != null ? `<span>Best <b>+${x.mfe}R</b></span>` : ''}<span>${ftime(x.opened + TZ)}${x.closed ? ' → ' + ftime(x.closed + TZ) : ''}</span><a href="?s=${esc(x.market)}#charts">Open ${esc(I.label)} charts</a>`;
+    document.getElementById('ms-tv-k').innerHTML = `<span><i style="background:#2962ff"></i>Entry <b>${f(x.entry)}</b></span><span><i style="background:${DNC}"></i>Stop <b>${f(stop0)}</b></span>${x.beMoved ? `<span><i style="background:#8a94a8"></i>Stop moved to entry</span>` : ''}<span><i style="background:${UPC}"></i>Target <b>${f(x.t1)}</b>${x.tp1 != null ? ` (${/^r/.test(x.k) ? 'the Origin' : 'target 2'}; target 1 ${f(x.tp1)})` : ''}</span><span>Reward:risk <b>${x.rr}R</b></span>${x.mfe != null ? `<span>Best <b>+${x.mfe}R</b></span>` : ''}<span>${ftime(x.opened + TZ)}${x.closed ? ' → ' + ftime(x.closed + TZ) : ''}</span><a href="?s=${esc(x.market)}#charts">Open ${esc(I.label)} charts</a>`;
     const msg = document.getElementById('ms-tv-m'); msg.hidden = false; msg.textContent = 'Loading candles…';
     if (!dlg.open) dlg.showModal();
     const host = document.getElementById('ms-tv-c'), th = THEMES[G.theme];
@@ -2451,10 +2452,11 @@ function msNextSetup(bars, A) {
     if (!data.length) { msg.textContent = `The ${W.tf.label} candles for this trade are no longer available from the data feed.`; return; }
     msg.hidden = true;
     TV.series.applyOptions({ priceFormat: { type: 'price', precision: d.dec, minMove: Math.pow(10, -d.dec) } });
-    TV.pv = [x.entry, stop0, x.t1].filter(isFinite);
+    TV.pv = [x.entry, stop0, x.t1, x.tp1].filter(isFinite);
     TV.series.setData(data);
     const line = (price, color, title, style) => TV.lines.push(TV.series.createPriceLine({ price, color, lineWidth: 2, lineStyle: style || LW.LineStyle.Solid, axisLabelVisible: true, title }));
-    line(x.entry, '#2962ff', 'Entry'); line(stop0, DNC, 'Stop'); line(x.t1, UPC, 'Target');
+    line(x.entry, '#2962ff', 'Entry'); line(stop0, DNC, 'Stop'); line(x.t1, UPC, x.tp1 != null ? (/^r/.test(x.k) ? 'Target (Origin)' : 'Target 2') : 'Target');
+    if (x.tp1 != null) line(x.tp1, UPC, 'Target 1', LW.LineStyle.Dashed);
     if (x.beMoved) line(x.entry, '#8a94a8', 'Stop at entry', LW.LineStyle.Dashed);
     const snap = (t) => { let best = data[0].time; for (const b of data) { if (b.time <= t + TZ) best = b.time; else break; } return best; };
     const mk = [];
@@ -2507,7 +2509,7 @@ function msNextSetup(bars, A) {
     set('ms-c-bt', keys.map((k) => {
       const a = T.filter((t) => t.setup === k), s = btStat(a), lo = s.e - 1.96 * s.se, hi = s.e + 1.96 * s.se, d = defs.find((p) => p.k === k);
       const fl = (cf.filters || {})[k] || {}, pz = (cf.paused || {})[k];
-      const now = !d ? '<span class="c-bt-st res">Research only</span>' : pz ? `<span class="c-bt-st off">Paused to ${esc(String(pz).slice(5, 10))}</span>` : `<span class="c-bt-st on">Trading${fl.d1 ? ` · only ${esc(fl.d1)} D1` : ''}${fl.cf ? ` · only ${fl.cf === 'choch' ? 'CHoCH' : 'BO'} CF` : ''}${fl.choch ? ` · ${fl.choch === 'yes' ? 'needs' : 'no'} M15/M5 CHoCH` : ''}</span>`;
+      const now = !d ? '<span class="c-bt-st res">Research only</span>' : pz ? `<span class="c-bt-st off">Paused to ${esc(String(pz).slice(5, 10))}</span>` : `<span class="c-bt-st on">Trading${fl.d1 ? ` · only ${esc(fl.d1)} D1` : ''}${fl.cf ? ` · only ${fl.cf === 'choch' ? 'CHoCH' : 'BO'} CF` : ''}${fl.choch ? ` · ${fl.choch === 'yes' ? 'needs' : 'no'} M15/M5 CHoCH` : ''}${(cf.target || {})[k] === 't2' ? (/^r/.test(k) ? ' · to the Origin' : ' · to target 2') : ''}</span>`;
       return `<tr><td>${d ? `${esc(d.name)} <small>${LBL[d.h]} → ${LBL[d.l]}</small>` : (BT_NAME[k] || esc(k))}</td><td class="n">${s.n}</td><td class="n bt-w">${Math.round(s.w * 100)}%</td><td class="n"><span class="c-bt-r ${cls(s)}">${f2(s.e)}</span>${isFinite(lo) ? ` <small class="c-bt-r c-bt-ci">(${f2(lo)} to ${f2(hi)})</small>` : ''}</td><td class="n bt-d">${cell(btStat(a.filter((t) => t.d1 === 'with')))}</td><td class="n bt-d">${cell(btStat(a.filter((t) => t.d1 === 'against')))}</td><td>${now}</td></tr>`;
     }).join(''));
     const diff = (k1, k2) => btStat(T.map((t) => ({ market: t.market, opened: t.opened, d: t[k1] != null && t[k2] != null ? t[k1] - t[k2] : null })), 'd');
