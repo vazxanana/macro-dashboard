@@ -21,7 +21,7 @@ The Council page groups closed paper trades by setup and by market. A verdict ne
 
 Every trade records its conditions at the signal (`feat`: D1 with/against, main/internal structure, session).
 Once a setup has 8+ closed trades (scored trades plus shadow trades blocked for unrelated reasons such as reward:risk, exposure, duplicate or the dollar cap), the daily Coach adds a rule when one condition loses (≤ −0.2R over 5+) while another wins
-(e.g. "swing: only with D1"), stored in `config.json` → `filters`. A condition that loses badly on its own (against D1 or internal structure, 6+ trades at −0.6R or worse) is filtered even before the other side has proven itself. Setups a rule blocks are still followed as **shadow** trades
+(e.g. "swing: only with D1"), stored in `config.json` → `filters`. A condition that loses badly on its own (against D1 or internal structure, 6+ trades at −0.6R or worse) is filtered even before the other side has proven itself. Condition filters are re-checked every 6 hours; the other Coach rules run once a day. Setups a rule blocks are still followed as **shadow** trades
 (`shadow: true`, `blockedBy`), never scored; if they make more than +0.2R over 5+, the rule is dropped. Every rule is re-tested after 21 days,
 and a paused setup resumes early if its shadow trades recover.
 
