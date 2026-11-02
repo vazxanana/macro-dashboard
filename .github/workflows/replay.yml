@@ -2,7 +2,10 @@ name: Council replay
 
 # Replays one market's morning minute by minute on real candles (council/replay.mjs) to see which rule reproduces one
 # of the trader's marked trades. Read-only: prints a timeline and the candidate entries to the job log.
+# Run it from the Actions tab, or by pushing a branch named claude/replay-* (the defaults below apply).
 on:
+  push:
+    branches: ['claude/replay-*']
   workflow_dispatch:
     inputs:
       market:
@@ -38,4 +41,4 @@ jobs:
           DAY: ${{ github.event.inputs.day }}
           FROM: ${{ github.event.inputs.from }}
           TO: ${{ github.event.inputs.to }}
-        run: node council/replay.mjs "$MARKET" "$DAY" "$FROM" "$TO"
+        run: node council/replay.mjs "${MARKET:-xau}" "${DAY:-2026-11-02}" "${FROM:-05:00}" "${TO:-14:30}"
