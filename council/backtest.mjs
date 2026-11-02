@@ -153,6 +153,35 @@ function chochSetups(src, price, t, info, spr = 0) {
 }
 
 // why (optional): the stage each side reached, for the trader's examples (examples.json): which condition stopped it
+// ─── Research: the Asia liquidity run (JeaFX notes, 2 Nov) ───
+// Asia range = 00:00–07:00 UTC. Between 07:00 and 12:00 UTC (pre-London, early London): price sweeps the range high (low),
+// then structure reverses (the 5m, or 1m for asia1, breaks the other way after the sweep) and price is back inside the range:
+// sell (buy) at market, stop past the sweep extreme, target the opposite side of the Asian range. One per side per day.
+function asiaRun(src, price, t, spr = 0) {
+  const out = [], d = Math.floor(t / 86400) * 86400;
+  if (t < d + 7 * 3600 || t >= d + 12 * 3600) return out;
+  const b5 = src['5m'].bars, asia = b5.filter((b) => b.time >= d && b.time < d + 7 * 3600);
+  if (asia.length < 60) return out;
+  const AH = Math.max(...asia.map((b) => b.high)), AL = Math.min(...asia.map((b) => b.low)), rng = AH - AL;
+  if (!(rng > 0)) return out;
+  const after = b5.filter((b) => b.time >= d + 7 * 3600);
+  for (const sell of [true, false]) {
+    const sw = after.findIndex((b) => sell ? b.high > AH : b.low < AL);
+    if (sw < 0) continue;
+    const swT = after[sw].time, ext = after.slice(sw).reduce((m, b) => sell ? Math.max(m, b.high) : Math.min(m, b.low), sell ? -Infinity : Infinity);
+    if (sell ? price >= AH : price <= AL) continue;   // not back inside the range yet
+    for (const [k, tf] of [['asia', '5m'], ['asia1', '1m']]) {
+      const A = src[tf].A, ll = A.last;
+      if (!ll || ll.dir !== (sell ? -1 : 1) || src[tf].bars[ll.breakIdx].time <= swT) continue;
+      const buf = Math.max(3 * spr, 0.05 * rng), stop = ext + (sell ? buf : -buf), t1 = sell ? AL : AH;
+      const r = Math.abs(stop - price), rr = Math.abs(t1 - price) / r;
+      if (!(r > 0) || rr < 1) continue;
+      out.push({ k, sell, entry: price, stop, t1, rr, sig: `${k}|${d}|${sell ? 's' : 'b'}` });
+    }
+  }
+  return out;
+}
+
 function sweepSetups(src, price, t, why, spr = 0) {
   const out = [], B = src['30m'].bars, n = B.length, W = 3;
   if (n < 80) return out;
@@ -399,7 +428,7 @@ for (const [key, M] of Object.entries(MARKETS)) {
         tw.v = VARIANTS.map(([n, be, t2, pt, ts]) => ({ n, be, t2, pt, ts, stop: tw.stop, beMoved: false, done: false, R: null }));
         open.push(tw);
       }
-      for (const sw of sweepSetups(src, price, t, null, spreadOf(M, price)).concat(chochSetups(src, price, t, null, spreadOf(M, price)))) {
+      for (const sw of sweepSetups(src, price, t, null, spreadOf(M, price)).concat(chochSetups(src, price, t, null, spreadOf(M, price)), asiaRun(src, price, t, spreadOf(M, price)))) {
         if (seen.has(sw.sig)) continue; seen.add(sw.sig);
         const side = sw.sell ? 'sell' : 'buy';
         if (open.some((x) => x.k === sw.k && x.side === side)) continue;   // one sweep trade per side at a time
