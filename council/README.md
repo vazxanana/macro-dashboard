@@ -55,7 +55,26 @@ The statistical Coach acts on repeated system errors (6+ reviewed losses in 14 d
 3+ `becost` outnumbering saves → break-even moves 0.5R later.
 The dollar cap (`maxUsd`, 2–4, default 3) rises by 1 when trades blocked only by it make more than +0.3R over 5+ (14 days), and falls by 1 when those would have lost and live gold/forex trades lose too.
 
+## The trader's method (the guide)
+
+The trader's own marked trades are the reference: `examples.json` lists them with entry, stop, target and an entry window, and every new rule, setup or review is checked against them (would the Trader have taken them?). From the marked gold chart of 2 Nov 2026 (XAU/USD spot, M30; times UTC):
+
+- **Context.** Friday's sell-off ran from about 3,995 to 3,868, breaking 3,975 and then 3,888 (purple lines: breaks of structure). The low is the VR (green box) with the Origin of the reversal just above it (lavender, 3,871–3,886). The H1 Origin of the sell-off, the zone it broke down from, is 3,965–3,975.
+- **Short, about 07:00.** Sunday night's rally topped at 3,913 (purple). The M30 high at about 3,916–3,918 swept it, then structure broke down through 3,902 (purple). Sell 3,908.27, stop 3,916.10 just past the sweep high, take profit 3,891.46 at the prior swing low: 2.1R, hit about 08:00.
+- **Long, about 11:45.** The short's target swept the 3,891 low and price based at 3,891–3,907 (green box). M5 turned up and M1 broke up. Buy 3,900.71, stop 3,896.79 just under the M1 origin (pink), take profit 3,965.08 at the bottom of the H1 Origin of the sell-off: 16.4R, hit about 14:12.
+
+**What it teaches.**
+1. **Liquidity first.** The entries come right after a swing high or low is swept (a wick beyond it, a close back inside), inside the base, not after the breakout. The Trader's H1 retracement buy signalled at 13:43, after the move, and its pullback order never filled.
+2. **Structure confirms.** After the sweep the lower timeframes break the other way: a VR or CHoCH on M5 (or M15), then an M1 BO. In the trader's words: "once we had a CHoCH in M15 or M5 we enter".
+3. **Tight stops at the structure that made the entry.** The stop goes just past the sweep extreme, or just under the M1 origin. The reward:risk comes from the stop, not from waiting for a better price.
+4. **Targets are the opposing liquidity or Origin.** For the short, the prior swing low. For the long, the near edge of the H1 Origin of the sell-off (the last H1 break's Origin), not the start of the whole leg.
+5. **Don't fight the flip.** The Trader's M15 scalp sold the low at 08:29, after the short had played out. The trader flipped long there.
+
+The backtest replays this model as the research setups `sweep_vr` / `sweep_ext` (see Backtest). Neither caught these two trades yet: matching them is the target.
+
 ## Guide for the AI Coach (read before every review)
+
+Read **The trader's method** above and `examples.json` first: they are the standard every review and rule change is held to.
 
 **Trade fields** in `trades.json`:
 - `status`: pending | open | win | loss | `be` (break-even, 0R) | missed | expired
@@ -99,7 +118,7 @@ The Coach uses it (`learnFromBacktest`, once per new backtest, logged as `coach-
 
 **Target per setup.** By default a trade takes profit at its first target; a retracement's first target is the 50% line of the higher-timeframe leg and its second is that timeframe's Origin, where the main trend resumes. `config.target[setup] = 't2'` holds the trade to the second target instead (`target: 't2'` and the passed first target `tp1` on the trade), and a resting order then stays valid until price reaches it. The backtest's `R_tp2` column is the same trades held to the second target. The Coach sets it at ≥ +0.05R per trade, t ≥ 2.5, both halves, keeps it while it stays ahead, and judges the entry style at the target each setup uses.
 
-**The trader's rules** (`USER_RULES` in `trader.mjs`, applied once, logged with `by: 'user'`, listed in `config.userRules`). `rintra-origin` (2 Nov): "From what I've seen in gold there's no reason to miss this buy till the H1 origin": the H1 → M5 retracement holds to the H1 Origin (the 15:10 backtest agreed, +0.12R per trade, +0.25R on gold, both halves). The Coach overrides a trader's rule only when a backtest shows it clearly losing (≤ −0.05R per trade, t ≤ −2, both halves), and logs that it did.
+**The trader's rules** (`USER_RULES` in `trader.mjs`, applied once, logged with `by: 'user'`, listed in `config.userRules`). The Coach overrides a trader's rule only when a backtest shows it clearly losing (≤ −0.05R per trade, t ≤ −2, both halves), and logs that it did. History: `rintra-origin` (2 Nov 16:10) held the H1 → M5 retracement to the engine's H1 Origin (4,019.8, the start of the whole sell-off leg) after "no reason to miss this buy till the H1 origin"; the trader's marked chart then showed their H1 origin is the Origin of the sell-off's last H1 break (TP 3,965.08), which the first target already matched, so `rintra-origin-chart` undid it.
 
 **Gold prices.** Gold trades on Kraken PAXG candles shifted onto XAU/USD spot (gold-api.com). The shift is the median of the last 2 hours of samples (`state.basis`), each spot quote matched to the PAXG minute it was quoted in; a stale quote adds nothing and the last shift is kept. One quote per run used to move every gold level by $2.70 per run on average (up to $8), more than a gold scalp's whole risk.
 
