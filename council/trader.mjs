@@ -143,6 +143,9 @@ for (const [key, M] of Object.entries(MARKETS)) {
     for (const t of (marketOpen(M, now) ? setups : [])) {
       if (t.state !== 'READY' || state.seen[t.sig]) continue;
       state.seen[t.sig] = now;
+      // the same setup re-signalling the same idea (same side and target, a fresh M1 break a few candles later) while
+      // that idea is still open: skip it, live or shadow, so risk isn't stacked and the Coach doesn't count one idea three times
+      if (trades.some((x) => x.market === key && x.k === t.k && x.side === (t.sell ? 'sell' : 'buy') && (x.status === 'open' || x.status === 'pending') && Math.abs(x.t1 - t.t1) <= Math.abs(t.t1) * 1e-5)) continue;
       const def = PAIRS.concat(RETR).find((p) => p.k === t.k), cfT = +String(t.sig).split('|')[2];
       if (!cfT || now - cfT > (config.fresh || FRESH) * SEC[def.l]) continue;   // an old CF: the move already happened
       // Conditions at the signal: the Coach learns which of them win
