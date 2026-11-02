@@ -31,9 +31,16 @@ export function decodeBi5(buf, base, point = 1e5) {
 }
 
 const UA = 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36';
-let firstErr = true;
+let firstErr = true, failsInRow = 0;
 // one file: Node fetch first; on a network error (resets, IPv6, TLS) fall back to curl, which retries on its own
 async function get(url) {
+  // circuit breaker: after 3 files in a row fail even with retries, treat Dukascopy as unreachable for this run
+  if (failsInRow >= 3) throw new Error('Dukascopy unreachable from this runner (3 files in a row failed)');
+  const res = await getOnce(url).catch((e) => { failsInRow++; throw e; });
+  failsInRow = 0;
+  return res;
+}
+async function getOnce(url) {
   for (let a = 0; a < 3; a++) {
     try {
       const r = await fetch(url, { headers: { 'User-Agent': UA, Accept: '*/*' } });
@@ -48,7 +55,7 @@ async function get(url) {
   }
   const tmp = path.join(os.tmpdir(), `duka-${process.pid}-${Math.random().toString(36).slice(2)}`);
   try {
-    const code = execFileSync('curl', ['-sS', '-A', UA, '--retry', '4', '--retry-delay', '2', '--retry-all-errors', '-o', tmp, '-w', '%{http_code}', url], { encoding: 'utf8' }).trim();
+    const code = execFileSync('curl', ['-sS', '-A', UA, '--retry', '2', '--retry-delay', '2', '--max-time', '30', '--retry-all-errors', '-o', tmp, '-w', '%{http_code}', url], { encoding: 'utf8' }).trim();
     if (code === '404') return null;
     if (code !== '200') throw new Error(`HTTP ${code}`);
     return fs.readFileSync(tmp);

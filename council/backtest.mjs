@@ -28,7 +28,8 @@ const TFS = [['1d', '1d', 86400], ['4h', '4h', 14400], ['1h', '1h', 3600], ['30m
 const SEC = Object.fromEntries(TFS.map(([id, , s]) => [id, s]));
 const WAIT = { '1d': 5 * 86400, '4h': 2 * 86400, '1h': 12 * 3600, '15m': 3 * 3600 };
 const FRESH = 12, WIN = 720, STEP = 300;
-const VARIANTS = [['none', null], ['be1', 1], ['be15', 1.5]];
+// trade management variants: [name, break-even level, hold to the second target]
+const VARIANTS = [['none', null, false], ['be1', 1, false], ['be15', 1.5, false], ['tp2', null, true]];
 const sessionOf = (t) => { const h = new Date(t * 1000).getUTCHours(); return h < 7 ? 'asia' : h < 12 ? 'london' : h < 16 ? 'overlap' : h < 21 ? 'newyork' : 'late'; };
 const marketOpen = (M, t) => { if (M.group === 'Crypto') return true; const d = new Date(t * 1000), wd = d.getUTCDay(), h = d.getUTCHours(); return !(wd === 6 || (wd === 0 && h < 23) || (wd === 5 && h >= 21)); };
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
@@ -87,7 +88,8 @@ function manage(v, tr, b) {
   if (v.done) return;
   const s = tr.side === 'sell', r0 = tr.r0;
   if (s ? b.high >= v.stop : b.low <= v.stop) { v.done = true; v.R = v.beMoved ? 0 : -1; v.closed = b.time; return; }
-  if (s ? b.low <= tr.t1 : b.high >= tr.t1) { v.done = true; v.R = tr.rr; v.closed = b.time; return; }
+  const tgt = v.t2 && tr.t2 != null ? tr.t2 : tr.t1;
+  if (s ? b.low <= tgt : b.high >= tgt) { v.done = true; v.R = tgt === tr.t1 ? tr.rr : Math.abs(tgt - tr.entry) / r0; v.closed = b.time; return; }
   if (v.be && !v.beMoved && ((s ? tr.entry - b.low : b.high - tr.entry) / r0) >= v.be) { v.stop = tr.entry; v.beMoved = true; }
 }
 
@@ -229,7 +231,7 @@ for (const [key, M] of Object.entries(MARKETS)) {
         const def = DEFS.find((p) => p.k === st.k), cfT = +String(st.sig).split('|')[2];
         if (!cfT || t - cfT > FRESH * SEC[def.l]) continue;
         const feat = { d1: src['1d'].A.trend === (st.sell ? -1 : 1) ? 'with' : 'against', struct: st.retr == null ? 'n/a' : st.retr >= 0.5 ? 'main' : 'internal', session: sessionOf(t) };
-        const tr = { m: key, k: st.k, h: def.h, side, entry: st.entry, stop: st.stop, t1: st.t1, rr: st.rr, opened: t, status: 'pending', feat, mfe: 0 };
+        const tr = { m: key, k: st.k, h: def.h, side, entry: st.entry, stop: st.stop, t1: st.t1, t2: st.t2 != null && (st.t2 - st.t1) * (st.sell ? -1 : 1) > 0 ? st.t2 : null, rr: st.rr, opened: t, status: 'pending', feat, mfe: 0 };
         if (st.sell ? price >= st.entry : price <= st.entry) {   // already through the entry: fill at market, like the Trader
           const r = Math.abs(price - st.stop), rw = (st.t1 - price) * (st.sell ? -1 : 1);
           if (!(r > 0) || (st.sell ? price >= st.stop : price <= st.stop) || rw <= 0) continue;
@@ -237,7 +239,7 @@ for (const [key, M] of Object.entries(MARKETS)) {
         }
         tr.r0 = Math.abs(tr.entry - tr.stop);
         if (!(tr.r0 > 0)) continue;
-        tr.v = VARIANTS.map(([n, be]) => ({ n, be, stop: tr.stop, beMoved: false, done: false, R: null }));
+        tr.v = VARIANTS.map(([n, be, t2]) => ({ n, be, t2, stop: tr.stop, beMoved: false, done: false, R: null }));
         open.push(tr);
       }
       for (const sw of sweepSetups(src, price, t)) {
@@ -247,7 +249,7 @@ for (const [key, M] of Object.entries(MARKETS)) {
         const tr = { m: key, k: sw.k, h: '1h', side, entry: sw.entry, stop: sw.stop, t1: sw.t1, rr: sw.rr, opened: t, filled: t, status: 'open', mfe: 0,
           feat: { d1: src['1d'].A.trend === (sw.sell ? -1 : 1) ? 'with' : 'against', struct: 'n/a', session: sessionOf(t) } };
         tr.r0 = Math.abs(tr.entry - tr.stop);
-        tr.v = VARIANTS.map(([n, be]) => ({ n, be, stop: tr.stop, beMoved: false, done: false, R: null }));
+        tr.v = VARIANTS.map(([n, be, t2]) => ({ n, be, t2, stop: tr.stop, beMoved: false, done: false, R: null }));
         open.push(tr);
       }
     }
@@ -272,7 +274,7 @@ const out = {
   byRR: group(all, rrBand),
   bySetupCond: Object.fromEntries(setups.map((k) => { const a = all.filter((x) => x.k === k); return [k, { d1: group(a, (x) => x.feat.d1), struct: group(a, (x) => x.feat.struct), session: group(a, (x) => x.feat.session), rr: group(a, rrBand) }]; })),
   trades: all.map((x) => [x.m, x.k, x.side, x.opened, x.filled, +x.rr.toFixed(2), x.feat.d1, x.feat.struct, x.feat.session, ...x.v.map((v) => v.R == null ? null : +v.R.toFixed(2)), +x.mfe.toFixed(2)]),
-  tradeCols: ['market', 'setup', 'side', 'opened', 'filled', 'rr', 'd1', 'struct', 'session', 'R_none', 'R_be1', 'R_be15', 'mfe'],
+  tradeCols: ['market', 'setup', 'side', 'opened', 'filled', 'rr', 'd1', 'struct', 'session', 'R_none', 'R_be1', 'R_be15', 'R_tp2', 'mfe'],
 };
 fs.writeFileSync(path.join(DIR, 'backtest.json'), JSON.stringify(out));
 console.log(`\n${all.length} trades over ${DAYS} days (${((Date.now() - t0wall) / 1000).toFixed(0)}s)`);
