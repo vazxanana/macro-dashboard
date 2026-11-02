@@ -79,6 +79,14 @@ for (const [k, until] of Object.entries(config.pausedMarkets)) if (Date.parse(un
 for (const [k, until] of Object.entries(config.paused)) if (Date.parse(until) / 1000 <= now) { delete config.paused[k]; config.history.push({ at: nowISO, by: 'coach-stats', change: `Resumed ${k}`, why: 'Pause period ended.' }); }
 CFG.buf = Math.min(LIMITS.buf[1], Math.max(LIMITS.buf[0], config.buf));
 CFG.minRisk = Math.min(LIMITS.minRisk[1], Math.max(LIMITS.minRisk[0], config.minRisk));
+// Rules from the trader (the user), applied once and logged. The Coach undoes one only when a backtest shows it clearly losing.
+const USER_RULES = [
+  { id: 'rintra-origin', apply: (c) => { (c.target = c.target || {}).rintra = 't2'; (c.targetBy = c.targetBy || {}).rintra = 'user'; },
+    change: 'rintra: hold to the H1 Origin (user)',
+    why: 'The trader: "From what I\'ve seen in gold there\'s no reason to miss this buy till the H1 origin." The H1 retracement now targets the H1 Origin instead of the 50% line, and its order stays valid until price gets there. The 15:10 backtest agrees: +0.12R per trade (+0.25R on gold), positive in both halves.' },
+];
+config.userRules = config.userRules || [];
+for (const u of USER_RULES) if (!config.userRules.includes(u.id)) { u.apply(config); config.userRules.push(u.id); config.history.push({ at: nowISO, by: 'user', change: u.change, why: u.why }); }
 const state = Object.assign({ seen: {}, lastRun: 0 }, rd('state.json', {}));
 let trades = rd('trades.json', []);
 // Reviews written before the entry-slip sign fix scored better-than-planned fills as "late entry": flip and re-judge them once
@@ -91,8 +99,22 @@ if (!state.news || now - (state.news.at || 0) > 6 * 3600) {
 }
 const NEWS = (state.news && state.news.data) || [];
 
-let spot = null;
-try { const j = await (await fetch('https://api.gold-api.com/price/XAU')).json(); spot = +j.price || null; } catch (e) {}
+let spot = null, spotAt = null;
+try { const j = await (await fetch('https://api.gold-api.com/price/XAU')).json(); spot = +j.price || null; const u = Date.parse(j.updatedAt); if (isFinite(u)) spotAt = Math.floor(u / 1000); } catch (e) {}
+// Gold trades on PAXG candles shifted onto XAU/USD spot. One spot quote against one PAXG close is noisy: a fixed D1 level
+// moved $2.70 per run on average (up to $8), more than a gold scalp's whole risk, so stops and targets were hit by the
+// shift, not by price. The shift is now the median of the last 2 hours of samples, each quote matched to the PAXG minute
+// it was quoted in; a stale quote (weekend, feed down) adds no sample and the last shift is kept.
+function basisFor(key, bars) {
+  const B = (state.basis = state.basis || {}), b = (B[key] = B[key] || { s: [], off: null });
+  b.s = b.s.filter(([t]) => now - t <= 2 * 3600);
+  if (spot && (!spotAt || now - spotAt <= 600)) {
+    const m = Math.floor((spotAt || now) / 60) * 60, bar = bars.find((x) => x.time === m) || bars.at(-1), o = spot - bar.close;
+    if (Math.abs(o) < 150) b.s = b.s.concat([[now, +o.toFixed(3)]]).slice(-24);
+  }
+  if (b.s.length) { const v = b.s.map(([, o]) => o).sort((x, y) => x - y), n = v.length; b.off = +(n % 2 ? v[n >> 1] : (v[n / 2 - 1] + v[n / 2]) / 2).toFixed(3); }
+  return b.off || 0;
+}
 
 const BUILDERS = PAIRS.map((p) => [p, buildSetup]).concat(RETR.map((p) => [p, buildRetrace]));
 for (const [key, M] of Object.entries(MARKETS)) {
@@ -103,8 +125,7 @@ for (const [key, M] of Object.entries(MARKETS)) {
       await sleep(1100);
       src[id] = { bars };
     }
-    let off = 0;
-    if (M.spot && spot) { const o = spot - src['1m'].bars.at(-1).close; if (Math.abs(o) < 150) off = o; }
+    const off = M.spot ? basisFor(key, src['1m'].bars) : 0;
     for (const id of Object.keys(src)) {
       src[id].bars = src[id].bars.map((b) => ({ time: b.time, open: b.open + off, high: b.high + off, low: b.low + off, close: b.close + off }));
       src[id].A = msAnalyze(src[id].bars, 6);
@@ -159,8 +180,12 @@ for (const [key, M] of Object.entries(MARKETS)) {
     // ─── Take new Ready setups ───
     snapshot.markets[key].open = marketOpen(M, now);
     for (const t of (marketOpen(M, now) ? setups : [])) {
-      if (t.state !== 'READY' || state.seen[t.sig]) continue;
-      state.seen[t.sig] = now;
+      // signals are remembered per market: the signature is only the setup and two candle times, which correlated
+      // markets (EUR/USD and GBP/USD on the same dollar news) share, so a global memory dropped the second market's signal.
+      // An unprefixed key is from before this and still counts, so nothing already handled is taken again.
+      const sk = `${key}|${t.sig}`;
+      if (t.state !== 'READY' || state.seen[sk] || state.seen[t.sig]) continue;
+      state.seen[sk] = now;
       // the same setup re-signalling the same idea (same side and target, a fresh M1 break a few candles later) while
       // that idea is still open: skip it, live or shadow, so risk isn't stacked and the Coach doesn't count one idea three times
       if (trades.some((x) => x.market === key && x.k === t.k && x.side === (t.sell ? 'sell' : 'buy') && (x.status === 'open' || x.status === 'pending') && Math.abs(x.t1 - t.t1) <= Math.abs(t.t1) * 1e-5)) continue;
@@ -176,7 +201,9 @@ for (const [key, M] of Object.entries(MARKETS)) {
       // fill at market when price is already through the entry, or when the Coach set this setup to enter at market
       // (the backtest showed waiting for the pullback misses more than it saves)
       const mktEntry = (config.entry || {})[t.k] === 'market', mkt = (t.sell ? price >= t.entry : price <= t.entry) || mktEntry;
-      const rrNow = mkt ? (t.t1 - price) * (t.sell ? -1 : 1) / Math.abs(price - t.stop) : t.rr;
+      // target: the first target (default) or, where the trader or the backtest set it, the second (a retracement's Origin)
+      const toT2 = (config.target || {})[t.k] === 't2' && t.t2 != null && (t.t2 - t.t1) * (t.sell ? -1 : 1) > 0, T1 = toT2 ? t.t2 : t.t1;
+      const rrNow = (T1 - (mkt ? price : t.entry)) * (t.sell ? -1 : 1) / Math.abs((mkt ? price : t.entry) - t.stop);
       if (!(rrNow >= config.minRR)) blockedBy.push('minRR');
       // news guard (the Coach turns it on when news keeps stopping trades out): no short-term trade from 15 min before to 45 min after high-impact news
       if (config.newsGuard && (def.h === '15m' || def.h === '1h') && newsNear(key, M.label, NEWS, now - 15 * 60, now + 45 * 60).length) blockedBy.push('news');
@@ -197,8 +224,10 @@ for (const [key, M] of Object.entries(MARKETS)) {
       const why = { paused: `paused until ${String(config.paused[t.k]).slice(0, 10)}`, minRR: `reward:risk ${(isFinite(rrNow) ? rrNow : 0).toFixed(2)} under ${config.minRR}`, d1: `rule: only ${f.d1} D1`, cf: `rule: only ${f.cf === 'choch' ? 'a CHoCH' : 'a continuation BO'} as the confirming break`, choch: `rule: ${f.choch === 'yes' ? 'needs' : 'no'} fresh M15/M5 CHoCH`, struct: `rule: only ${f.struct} structure`, session: `rule: not in ${feat.session}`, exposure: 'already 2 trades or an opposite trade open on this market', news: 'high-impact news within the hour', duplicate: 'same stop and target as a trade already open', usd: `already ${config.maxUsd || MAX_USD} trades betting the same way on the dollar`, market: `market paused until ${String(config.pausedMarkets[key]).slice(0, 10)}` };
       const h = def.h;
       const tr = { id: `${key}-${t.k}-${now}`, market: key, label: M.label, dec: M.dec, k: t.k, name: t.name, pair: t.pair, h, side: t.sell ? 'sell' : 'buy',
-        entry: t.entry, stop: t.stop, t1: t.t1, rr: +t.rr.toFixed(2), buf: CFG.buf, opened: now, checked: now, status: 'pending', R: null, feat,
+        entry: t.entry, stop: t.stop, t1: T1, rr: +(toT2 ? Math.abs(T1 - t.entry) / Math.abs(t.entry - t.stop) : t.rr).toFixed(2), buf: CFG.buf, opened: now, checked: now, status: 'pending', R: null, feat,
         shadow, blockedBy, note: shadow ? `Shadow (${blockedBy.map((b) => why[b]).join(', ')})` : t.next };
+      // held to the second target: the first one is kept for the record, and the order stays valid until price reaches the Origin
+      if (toT2) { tr.tp1 = t.t1; tr.target = 't2'; if (!shadow) tr.note += ` Holding to ${T1.toFixed(M.dec)}, ${t.retrace ? `the ${String(t.pair).split(' ')[0]} Origin` : 'the second target'} (${(config.targetBy || {})[t.k] === 'user' ? "the trader's rule" : 'backtest'}).`; }
       try { tr.ctx = entryContext(t, src, def, M, price); } catch (e) {}
       if (mkt) {
         // fill at the market price, never at a better level than was available
@@ -321,14 +350,29 @@ function learnFromBacktest(change) {
     const pos = btPositive(k), live = pauseSample(trades.filter((x) => x.k === k && (x.status === 'win' || x.status === 'loss' || x.status === 'be') && now - x.closed < 30 * 86400));
     if (pos && live.length < 15) { delete config.paused[k]; change(`Resumed ${k} (backtest)`, `Paused on ${live.length} trades, but ${pos.n} past trades as it trades now made ${f2(pos.e)} each (${tTxt(pos.t)}), in both halves of the last ${days} days.`); }
   }
-  // 5. entry style per setup: a resting order at the CF level (default) or entering at market at the signal. Compared
+  // 5. target per setup: the first target, or the
+  //    second one (a retracement's Origin, a main setup's next level). Compared trade by trade with the first. The
+  //    backtest sets the second at >= +0.05R per trade, t >= 2.5, both halves, and keeps it while it is still ahead; a
+  //    target the trader set stays unless the second target is clearly worse (<= -0.05R per trade, t <= -2, both halves).
+  config.target = config.target || {}; config.targetBy = config.targetBy || {};
+  for (const k of setups.filter((x) => DEF_KEYS.has(x))) {
+    const f = config.filters[k] || {}, a = BT.T.filter((t) => t.setup === k && passesFilters(t, f) && t.R_tp2 != null);
+    if (a.length < 30) continue;
+    const d = btPaired(a, 'R_tp2', 'R_none'), h1 = btPaired(a.filter((t) => t.opened < BT.mid), 'R_tp2', 'R_none'), h2 = btPaired(a.filter((t) => t.opened >= BT.mid), 'R_tp2', 'R_none');
+    const on = config.target[k] === 't2', by = config.targetBy[k];
+    const why = `${a.length} trades over the last ${days} days: the second target ${f2(d.e)} per trade versus the first (${tTxt(d.t)}), ${f2(h1.e)} and ${f2(h2.e)} in the two halves.`;
+    if (!on && d.e >= 0.05 && d.t >= 2.5 && h1.e > 0 && h2.e > 0) { config.target[k] = 't2'; config.targetBy[k] = 'backtest'; change(`${k}: hold to the second target (backtest)`, why); }
+    else if (on && (by === 'user' ? d.e <= -0.05 && d.t <= -2 && h1.e < 0 && h2.e < 0 : d.e <= 0)) { delete config.target[k]; delete config.targetBy[k]; change(`${k}: back to the first target (backtest${by === 'user' ? ", overriding the trader's rule" : ''})`, why); }
+  }
+  // 6. entry style per setup: a resting order at the CF level (default) or entering at market at the signal. Compared
   //    signal by signal on the same signals (a resting order that never fills counts 0R), after spread, on the signals
   //    the setup's D1 filter lets through. Market entry needs >= +0.05R per signal at t >= 2.5 and to win in both halves;
-  //    once on, it stays while it is still ahead.
+  //    once on, it stays while it is still ahead. Judged at the target the setup uses (step 5).
   config.entry = config.entry || {};
   for (const k of setups.filter((x) => DEF_KEYS.has(x))) {
     const f = config.filters[k] || {}, lim = new Map(BT.TA.filter((t) => t.setup === k && passesFilters(t, f)).map((t) => [`${t.market}|${t.opened}`, t]));
-    const pairs = BT.TA.filter((t) => t.setup === `${k}@mkt` && lim.has(`${t.market}|${t.opened}`)).map((t) => ({ market: t.market, opened: t.opened, d: t.R_none - lim.get(`${t.market}|${t.opened}`).R_none }));
+    const col = config.target[k] === 't2' ? 'R_tp2' : 'R_none';
+    const pairs = BT.TA.filter((t) => t.setup === `${k}@mkt` && lim.has(`${t.market}|${t.opened}`)).map((t) => ({ market: t.market, opened: t.opened, d: t[col] - lim.get(`${t.market}|${t.opened}`)[col] }));
     if (pairs.length < 30) continue;
     const dd = btE(pairs, 'd'), h1 = btE(pairs.filter((p) => p.opened < BT.mid), 'd'), h2 = btE(pairs.filter((p) => p.opened >= BT.mid), 'd');
     const clear = dd.e >= 0.05 && dd.t >= 2.5 && h1.e > 0 && h2.e > 0, want = clear || (config.entry[k] === 'market' && dd.e > 0) ? 'market' : 'limit';
