@@ -1,0 +1,41 @@
+name: Council replay
+
+# Replays one market's morning minute by minute on real candles (council/replay.mjs) to see which rule reproduces one
+# of the trader's marked trades. Read-only: prints a timeline and the candidate entries to the job log.
+on:
+  workflow_dispatch:
+    inputs:
+      market:
+        description: 'Market (xau, btc, eth)'
+        default: 'xau'
+      day:
+        description: 'Day (YYYY-MM-DD)'
+        default: '2026-11-02'
+      from:
+        description: 'From (HH:MM UTC)'
+        default: '05:00'
+      to:
+        description: 'To (HH:MM UTC)'
+        default: '14:30'
+
+permissions:
+  contents: read
+
+jobs:
+  replay:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: council
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Replay
+        env:
+          MARKET: ${{ github.event.inputs.market }}
+          DAY: ${{ github.event.inputs.day }}
+          FROM: ${{ github.event.inputs.from }}
+          TO: ${{ github.event.inputs.to }}
+        run: node council/replay.mjs "$MARKET" "$DAY" "$FROM" "$TO"
