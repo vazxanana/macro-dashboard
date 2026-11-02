@@ -45,7 +45,16 @@ jobs:
         with:
           node-version: '20'
 
+      - name: Restore forex history cache
+        uses: actions/cache@v4
+        with:
+          path: .duka-cache
+          key: duka-${{ github.run_id }}
+          restore-keys: duka-
+
       - name: Backtest
+        env:
+          DUKA_CACHE: .duka-cache
         run: node council/backtest.mjs data "${{ github.event.inputs.days || '30' }}"
 
       - name: Save results

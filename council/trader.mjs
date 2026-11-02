@@ -251,12 +251,12 @@ function learnFromBacktest(change) {
     }
     config.beSrc = 'backtest';
   }
-  // 3. a setup the backtest shows clearly losing (10+ trades at -0.3R or worse each, negative in both halves): pause it
+  // 3. a setup the backtest shows clearly losing (10+ trades at -0.3R or worse each, or 8+ at -0.5R or worse; negative in both halves): pause it
   //    until the next backtest can re-check it (it keeps running as shadow trades meanwhile)
   for (const k of [...new Set(BT.T.map((t) => t.setup))]) {
     if (!DEF_KEYS.has(k) || config.paused[k]) continue;
     const f = config.filters[k] || {}, a = BT.T.filter((t) => t.setup === k && (!f.d1 || t.d1 === f.d1)), all = btE(a), [h1, h2] = btHalves(a);
-    if (all.n >= 10 && all.e <= -0.3 && h1.e < 0 && h2.e < 0) {
+    if (((all.n >= 10 && all.e <= -0.3) || (all.n >= 8 && all.e <= -0.5)) && h1.e < 0 && h2.e < 0) {
       config.paused[k] = new Date((now + 3 * 86400) * 1000).toISOString();
       change(`Paused ${k} for 3 days (backtest)`, `${all.n} past trades as it trades now made ${f2(all.e)} each, negative in both halves of the last ${days} days.`);
     }
