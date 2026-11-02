@@ -6,6 +6,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { msAnalyze, CFG, PAIRS, RETR, buildSetup, buildRetrace, setMarket } from './engine.mjs';
 import { entryContext, startReview, watchReview, judge, newsNear, lessons } from './review.mjs';
+import { m15cFeat } from './choch.mjs';
 
 const DIR = process.argv[2] || 'data';
 fs.mkdirSync(DIR, { recursive: true });
@@ -45,7 +46,9 @@ function structFeat(t, def, src, at) {
   return { cf, choch };
 }
 // conditions a setup can be filtered on, the two sides of each, and how a rule reads
-const CONDS = [['d1', 'with', 'against', (v) => `${v} D1`], ['cf', 'choch', 'bo', (v) => v === 'choch' ? 'a CHoCH as the confirming break' : 'a continuation BO as the confirming break'], ['choch', 'yes', 'no', (v) => v === 'yes' ? 'a fresh M15/M5 CHoCH' : 'no fresh M15/M5 CHoCH']];
+const CONDS = [['d1', 'with', 'against', (v) => `${v} D1`], ['cf', 'choch', 'bo', (v) => v === 'choch' ? 'a CHoCH as the confirming break' : 'a continuation BO as the confirming break'], ['choch', 'yes', 'no', (v) => v === 'yes' ? 'a fresh M15/M5 CHoCH' : 'no fresh M15/M5 CHoCH'],
+  // the trader's M15 CHoCH (choch.mjs): an M15 close back through the pullback's last lower high (higher low) within the hour
+  ['m15c', 'yes', 'no', (v) => v === 'yes' ? "the trader's M15 CHoCH within the hour" : "no M15 CHoCH (the trader's) within the hour"]];
 const passesFilters = (t, f) => CONDS.every(([c]) => !f[c] || t[c] === f[c]);
 function emptyFilter(fl) { return !fl.struct && !(fl.noSession || []).length && CONDS.every(([c]) => !fl[c]); }
 
@@ -195,7 +198,7 @@ for (const [key, M] of Object.entries(MARKETS)) {
       const def = PAIRS.concat(RETR).find((p) => p.k === t.k), cfT = +String(t.sig).split('|')[2];
       if (!cfT || now - cfT > (config.fresh || FRESH) * SEC[def.l]) continue;   // an old CF: the move already happened
       // Conditions at the signal: the Coach learns which of them win
-      const feat = { d1: src['1d'].A.trend === (t.sell ? -1 : 1) ? 'with' : 'against', struct: t.retr == null ? 'n/a' : t.retr >= 0.5 ? 'main' : 'internal', session: sessionOf(now), ...structFeat(t, def, src, now) };
+      const feat = { d1: src['1d'].A.trend === (t.sell ? -1 : 1) ? 'with' : 'against', struct: t.retr == null ? 'n/a' : t.retr >= 0.5 ? 'main' : 'internal', session: sessionOf(now), ...structFeat(t, def, src, now), m15c: m15cFeat(src['15m'].bars, t.sell, now) };
       // Rules from the Coach. A blocked setup is still followed as a SHADOW trade (no score), so the Coach can check the rule was right
       const f = config.filters[t.k] || {}, blockedBy = [];
       if (config.paused[t.k]) blockedBy.push('paused');
@@ -213,6 +216,7 @@ for (const [key, M] of Object.entries(MARKETS)) {
       if (f.d1 && feat.d1 !== f.d1) blockedBy.push('d1');
       if (f.cf && feat.cf !== f.cf) blockedBy.push('cf');
       if (f.choch && feat.choch !== f.choch) blockedBy.push('choch');
+      if (f.m15c && feat.m15c !== f.m15c) blockedBy.push('m15c');
       if (f.struct && feat.struct !== 'n/a' && feat.struct !== f.struct) blockedBy.push('struct');
       if (f.noSession && f.noSession.includes(feat.session)) blockedBy.push('session');
       // exposure: at most MAX_OPEN live trades per market, and never long and short the same market at once
@@ -224,7 +228,7 @@ for (const [key, M] of Object.entries(MARKETS)) {
       const ud = usdDir(M, t.sell ? 'sell' : 'buy');
       if (ud && trades.filter((x) => !x.shadow && (x.status === 'open' || x.status === 'pending') && MARKETS[x.market] && usdDir(MARKETS[x.market], x.side) === ud).length >= (config.maxUsd || MAX_USD)) blockedBy.push('usd');
       const shadow = blockedBy.length > 0;
-      const why = { paused: `paused until ${String(config.paused[t.k]).slice(0, 10)}`, minRR: `reward:risk ${(isFinite(rrNow) ? rrNow : 0).toFixed(2)} under ${config.minRR}`, d1: `rule: only ${f.d1} D1`, cf: `rule: only ${f.cf === 'choch' ? 'a CHoCH' : 'a continuation BO'} as the confirming break`, choch: `rule: ${f.choch === 'yes' ? 'needs' : 'no'} fresh M15/M5 CHoCH`, struct: `rule: only ${f.struct} structure`, session: `rule: not in ${feat.session}`, exposure: 'already 2 trades or an opposite trade open on this market', news: 'high-impact news within the hour', duplicate: 'same stop and target as a trade already open', usd: `already ${config.maxUsd || MAX_USD} trades betting the same way on the dollar`, market: `market paused until ${String(config.pausedMarkets[key]).slice(0, 10)}` };
+      const why = { paused: `paused until ${String(config.paused[t.k]).slice(0, 10)}`, minRR: `reward:risk ${(isFinite(rrNow) ? rrNow : 0).toFixed(2)} under ${config.minRR}`, d1: `rule: only ${f.d1} D1`, cf: `rule: only ${f.cf === 'choch' ? 'a CHoCH' : 'a continuation BO'} as the confirming break`, choch: `rule: ${f.choch === 'yes' ? 'needs' : 'no'} fresh M15/M5 CHoCH`, m15c: `rule: ${f.m15c === 'yes' ? 'needs' : 'no'} M15 CHoCH (the trader's) within the hour`, struct: `rule: only ${f.struct} structure`, session: `rule: not in ${feat.session}`, exposure: 'already 2 trades or an opposite trade open on this market', news: 'high-impact news within the hour', duplicate: 'same stop and target as a trade already open', usd: `already ${config.maxUsd || MAX_USD} trades betting the same way on the dollar`, market: `market paused until ${String(config.pausedMarkets[key]).slice(0, 10)}` };
       const h = def.h;
       const tr = { id: `${key}-${t.k}-${now}`, market: key, label: M.label, dec: M.dec, k: t.k, name: t.name, pair: t.pair, h, side: t.sell ? 'sell' : 'buy',
         entry: t.entry, stop: t.stop, t1: T1, rr: +(toT2 ? Math.abs(T1 - t.entry) / Math.abs(t.entry - t.stop) : t.rr).toFixed(2), buf: CFG.buf, opened: now, checked: now, status: 'pending', R: null, feat,

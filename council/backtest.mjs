@@ -14,6 +14,7 @@ import { msAnalyze, CFG, PAIRS, RETR, buildSetup, buildRetrace, setMarket } from
 import { dukaMinutes, dukaHours, dukaDays, dukaReset } from './duka.mjs';
 import { yahooBars } from './yahoo.mjs';
 import { krakenMinutes, krakenOHLC } from './krakenhist.mjs';
+import { m15Choch, m15cFeat as m15cOf } from './choch.mjs';
 
 const DIR = process.argv[2] || 'data', DAYS = +(process.argv[3] || 30);
 const FAKE = !!process.env.BT_FAKE;   // offline self-test with a synthetic random walk
@@ -103,6 +104,44 @@ function manage(v, tr, b) {
 // other way = the VR; then a fresh M1 BO the same way = the entry, at market. Target: the nearest still-valid opposing
 // M30/H1 Origin. Two stops are tested as separate setups: past the M5 VR structure (sweep_vr) and past the sweep extreme (sweep_ext).
 function atr(bars, n = 14) { const b = bars.slice(-n - 1); let s = 0; for (let i = 1; i < b.length; i++) s += Math.max(b[i].high - b[i].low, Math.abs(b[i].high - b[i - 1].close), Math.abs(b[i].low - b[i - 1].close)); return b.length > 1 ? s / (b.length - 1) : 0; }
+// The trader's M15 CHoCH (2 Nov): "M15 CHoCH is a sign to enter: it tells when the trend is changing, or we move from
+// pullback/retracement to continuation and vice versa". A CHoCH up: the M15 leg down from the last 12 h's high to the
+// lowest low after it, then an M15 candle closes above the last lower high before that low (an M15 swing high, 2
+// candles each side); a CHoCH down mirrors it. (The engine's VR confirmation only counts swings beyond the break
+// level, so a straight drop like 2 Nov's 3,918 -> 3,905 -> 3,891 never confirms; its structure flip came only at the
+// 13:30 breakout.) Enter at market within two M15 candles of that close, stop just past the low (high), target the
+// nearest valid opposing M30/H1 Origin worth >= 1.2R. info (optional) gets each side's state, for the examples.
+function chochSetups(src, price, t, info, spr = 0) {
+  const out = [], B = src['15m'].bars;
+  const hm = (i) => new Date(B[i].time * 1000).toISOString().slice(11, 16), f2 = (v) => +v.toFixed(2);
+  const buf = Math.max(0.1 * atr(B), spr);
+  for (const sell of [false, true]) {
+    const sg = sell ? 1 : -1, side = sell ? 'sell' : 'buy', note = (v) => { if (info) info[side] = v; };
+    const c = m15Choch(B, sell);
+    if (!c) continue;
+    if (!c.leg) { note(`no M15 leg ${sell ? 'up' : 'down'} of 2 ATR in the last 12 h`); continue; }
+    const { iE, iP, iC, ext, lvl } = c;
+    const what = `M15 ${sell ? 'high' : 'low'} ${f2(ext)} (${hm(iE)}), CHoCH level ${f2(lvl)}${iP >= 0 ? ` (${hm(iP)})` : ' (the leg start)'}`;
+    if (iC < 0) { note(`${what}: no close through yet`); continue; }
+    const tc = B[iC].time + 900;
+    if (t - tc > 2 * 900) { note(`${what}: CHoCH ${sell ? 'down' : 'up'} at ${hm(iC)}, older than 2 candles`); continue; }
+    const stop = ext + sg * buf, r = (stop - price) * sg;
+    if (!(r > 0)) { note(`${what}: CHoCH at ${hm(iC)}, price beyond the stop`); continue; }
+    const edges = [];
+    for (const id of ['30m', '1h']) for (const e of src[id].A.events) {
+      if (e.dir !== (sell ? 1 : -1) || e.endIdx !== null) continue;
+      const edge = sell ? e.top : e.bot;
+      if (sell ? edge < price : edge > price) edges.push(edge);
+    }
+    edges.sort((p, q) => (p - q) * -sg);
+    const t1 = edges.find((edge) => (price - edge) * sg / r >= 1.2);
+    if (t1 == null) { note(`${what}: CHoCH ${sell ? 'down' : 'up'} at ${hm(iC)}, no Origin worth 1.2R`); continue; }
+    note(`${what}: CHoCH ${sell ? 'down' : 'up'} at ${hm(iC)} -> ${side} ${f2(price)}, stop ${f2(stop)}, target ${f2(t1)}`);
+    out.push({ k: 'm15choch', sell, entry: price, stop, t1, rr: (price - t1) * sg / r, sig: `m15choch|${side}|${B[iC].time}` });
+  }
+  return out;
+}
+
 // why (optional): the stage each side reached, for the trader's examples (examples.json): which condition stopped it
 function sweepSetups(src, price, t, why, spr = 0) {
   const out = [], B = src['30m'].bars, n = B.length, W = 3;
@@ -191,7 +230,7 @@ const t0wall = Date.now();
 // the trader's marked trades (examples.json): for each one inside the replay, what every setup was doing in its entry
 // window, why the sweep model did or didn't fire, and which signals (if any) the backtest took there
 const EX = (() => { try { return JSON.parse(fs.readFileSync(new URL('./examples.json', import.meta.url))).trades || []; } catch (e) { return []; } })()
-  .map((x) => ({ ...x, from: Date.parse(x.entryFrom) / 1000, to: Date.parse(x.entryTo) / 1000, setups: [], sweep: [], caught: [] }))
+  .map((x) => ({ ...x, from: Date.parse(x.entryFrom) / 1000, to: Date.parse(x.entryTo) / 1000, setups: [], sweep: [], m15: [], caught: [] }))
   .filter((x) => x.from >= startT && x.to <= endT);
 const PAD = 30 * 60;
 // keep a running list of states, adding a row only when it changes
@@ -296,6 +335,8 @@ for (const [key, M] of Object.entries(MARKETS)) {
         pushChange(x.setups, t, { states: st.map((v) => `${v.k} ${v.state}`).join(', ') || 'none on this side' }, { price: +price.toFixed(2) });
         const why = {}; sweepSetups(src, price, t, why, spreadOf(M, price));
         pushChange(x.sweep, t, why[x.side] || { stage: 'n/a' });
+        const info = {}; chochSetups(src, price, t, info, spreadOf(M, price));
+        pushChange(x.m15, t, { state: info[x.side] || 'n/a' }, { price: +price.toFixed(2) });
       }
       for (const [pr, fn] of BUILDERS) {
         let st; try { st = fn(pr, price, src); } catch (e) { st = null; }
@@ -305,7 +346,7 @@ for (const [key, M] of Object.entries(MARKETS)) {
         if (open.some((x) => x.k === st.k && x.side === side && Math.abs(x.t1 - st.t1) <= Math.abs(st.t1) * 1e-5)) continue;
         const def = DEFS.find((p) => p.k === st.k), cfT = +String(st.sig).split('|')[2];
         if (!cfT || t - cfT > FRESH * SEC[def.l]) continue;
-        const feat = { d1: src['1d'].A.trend === (st.sell ? -1 : 1) ? 'with' : 'against', struct: st.retr == null ? 'n/a' : st.retr >= 0.5 ? 'main' : 'internal', session: sessionOf(t), ...structFeat(st.sell, def.l, src, t) };
+        const feat = { d1: src['1d'].A.trend === (st.sell ? -1 : 1) ? 'with' : 'against', struct: st.retr == null ? 'n/a' : st.retr >= 0.5 ? 'main' : 'internal', session: sessionOf(t), ...structFeat(st.sell, def.l, src, t), m15c: m15cOf(src['15m'].bars, st.sell, t) };
         const tr = { m: key, k: st.k, h: def.h, side, entry: st.entry, stop: st.stop, t1: st.t1, t2: st.t2 != null && (st.t2 - st.t1) * (st.sell ? -1 : 1) > 0 ? st.t2 : null, rr: st.rr, opened: t, status: 'pending', feat, mfe: 0 };
         if (st.sell ? price >= st.entry : price <= st.entry) {   // already through the entry: fill at market, like the Trader
           const r = Math.abs(price - st.stop), rw = (st.t1 - price) * (st.sell ? -1 : 1);
@@ -327,12 +368,12 @@ for (const [key, M] of Object.entries(MARKETS)) {
         tw.v = VARIANTS.map(([n, be, t2]) => ({ n, be, t2, stop: tw.stop, beMoved: false, done: false, R: null }));
         open.push(tw);
       }
-      for (const sw of sweepSetups(src, price, t, null, spreadOf(M, price))) {
+      for (const sw of sweepSetups(src, price, t, null, spreadOf(M, price)).concat(chochSetups(src, price, t, null, spreadOf(M, price)))) {
         if (seen.has(sw.sig)) continue; seen.add(sw.sig);
         const side = sw.sell ? 'sell' : 'buy';
         if (open.some((x) => x.k === sw.k && x.side === side)) continue;   // one sweep trade per side at a time
         const tr = { m: key, k: sw.k, h: '1h', side, entry: sw.entry, stop: sw.stop, t1: sw.t1, rr: sw.rr, opened: t, filled: t, status: 'open', mfe: 0,
-          feat: { d1: src['1d'].A.trend === (sw.sell ? -1 : 1) ? 'with' : 'against', struct: 'n/a', session: sessionOf(t), ...structFeat(sw.sell, '1m', src, t) } };
+          feat: { d1: src['1d'].A.trend === (sw.sell ? -1 : 1) ? 'with' : 'against', struct: 'n/a', session: sessionOf(t), ...structFeat(sw.sell, '1m', src, t), m15c: m15cOf(src['15m'].bars, sw.sell, t) } };
         tr.r0 = Math.abs(tr.entry - tr.stop); tr.cost = tr.r0 > 0 ? spreadOf(M, tr.entry) / tr.r0 : 0;
         tr.v = VARIANTS.map(([n, be, t2]) => ({ n, be, t2, stop: tr.stop, beMoved: false, done: false, R: null }));
         open.push(tr);
@@ -362,11 +403,11 @@ const out = {
   byMarket: group(all, (x) => x.m),
   byRR: group(all, rrBand),
   bySetupCond: Object.fromEntries(setups.map((k) => { const a = all.filter((x) => x.k === k); return [k, { d1: group(a, (x) => x.feat.d1), struct: group(a, (x) => x.feat.struct), session: group(a, (x) => x.feat.session), rr: group(a, rrBand) }]; })),
-  trades: all.concat(twins, unfilled).map((x) => [x.m, x.k, x.side, x.opened, x.filled || null, +x.rr.toFixed(2), x.feat.d1, x.feat.struct, x.feat.session, ...x.v.map((v) => v.R == null ? null : +v.R.toFixed(2)), +x.mfe.toFixed(2), +x.cost.toFixed(3), x.status === 'closed' ? 1 : 0, x.feat.cf, x.feat.choch]),
-  tradeCols: ['market', 'setup', 'side', 'opened', 'filled', 'rr', 'd1', 'struct', 'session', 'R_none', 'R_be1', 'R_be15', 'R_tp2', 'mfe', 'cost', 'fill', 'cf', 'choch'],
+  trades: all.concat(twins, unfilled).map((x) => [x.m, x.k, x.side, x.opened, x.filled || null, +x.rr.toFixed(2), x.feat.d1, x.feat.struct, x.feat.session, ...x.v.map((v) => v.R == null ? null : +v.R.toFixed(2)), +x.mfe.toFixed(2), +x.cost.toFixed(3), x.status === 'closed' ? 1 : 0, x.feat.cf, x.feat.choch, x.feat.m15c]),
+  tradeCols: ['market', 'setup', 'side', 'opened', 'filled', 'rr', 'd1', 'struct', 'session', 'R_none', 'R_be1', 'R_be15', 'R_tp2', 'mfe', 'cost', 'fill', 'cf', 'choch', 'm15c'],
   twins: twins.length, unfilled: unfilled.length,
   examples: EX.map((x) => ({ id: x.id, market: x.market, side: x.side, entry: x.entry, stop: x.stop, target: x.target, entryFrom: x.entryFrom, entryTo: x.entryTo,
-    caught: x.caught, setups: x.setups.map(({ s, ...v }) => v), sweep: x.sweep.map(({ s, ...v }) => v) })),
+    caught: x.caught, setups: x.setups.map(({ s, ...v }) => v), sweep: x.sweep.map(({ s, ...v }) => v), m15: x.m15.map(({ s, ...v }) => v) })),
 };
 fs.writeFileSync(path.join(DIR, 'backtest.json'), JSON.stringify(out));
 console.log(`\n${all.length} trades over ${DAYS} days (${((Date.now() - t0wall) / 1000).toFixed(0)}s)`);
@@ -374,11 +415,13 @@ console.log('overall', JSON.stringify(out.overall));
 for (const [k, v] of Object.entries(out.bySetup)) console.log(k.padEnd(9), Object.entries(v).map(([n, s]) => `${n} n${s.n} wr${s.wr} exp${s.exp}`).join(' | '));
 for (const [k, v] of Object.entries(out.byRR)) console.log('rr ' + k.padEnd(7), `n${v.none.n} exp${v.none.exp} be1 ${v.be1.exp}`);
 for (const k of setups) { const a = all.filter((x) => x.k === k), m = (arr) => arr.length ? (arr.reduce((q, x) => q + x.v[0].R - x.cost, 0) / arr.length).toFixed(2) : '-';
+  console.log(k.padEnd(9), '| trader\'s M15 CHoCH within 1 h: yes', m(a.filter((x) => x.feat.m15c === 'yes')), 'n' + a.filter((x) => x.feat.m15c === 'yes').length, 'no', m(a.filter((x) => x.feat.m15c === 'no')));
   console.log(k.padEnd(9), 'net', m(a), '| CF choch', m(a.filter((x) => x.feat.cf === 'choch')), 'n' + a.filter((x) => x.feat.cf === 'choch').length, 'bo', m(a.filter((x) => x.feat.cf === 'bo')), '| M15/M5 CHoCH yes', m(a.filter((x) => x.feat.choch === 'yes')), 'n' + a.filter((x) => x.feat.choch === 'yes').length, 'no', m(a.filter((x) => x.feat.choch === 'no'))); }
 for (const x of out.examples) {
   const hm = (t) => new Date(t * 1000).toISOString().slice(11, 16);
   console.log(`\nexample ${x.id} (${x.side} ${x.entry}, stop ${x.stop}, target ${x.target}): ${x.caught.length ? x.caught.map((c) => `${c.setup} ${hm(c.opened)} ${c.entry}/${c.stop}/${c.target} R ${c.R}`).join('; ') : 'no signal from any setup'}`);
   for (const v of x.sweep) console.log(`  sweep ${hm(v.t)} ${v.stage}${v.level != null ? ` (level ${v.level})` : ''}${v.target != null ? ` target ${v.target} rr ${JSON.stringify(v.rr)}` : ''}`);
   for (const v of x.setups) console.log(`  setups ${hm(v.t)} @${v.price}: ${v.states}`);
+  for (const v of x.m15) console.log(`  m15 ${hm(v.t)} @${v.price}: ${v.state}`);
 }
 for (const [k, c] of Object.entries(out.bySetupCond)) console.log(k.padEnd(9), 'd1', Object.entries(c.d1).map(([a, s]) => `${a}:n${s.none.n} ${s.none.exp}`).join(' '), '| struct', Object.entries(c.struct).map(([a, s]) => `${a}:n${s.none.n} ${s.none.exp}`).join(' '));
