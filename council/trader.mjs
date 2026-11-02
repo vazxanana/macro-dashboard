@@ -124,7 +124,9 @@ for (const [key, M] of Object.entries(MARKETS)) {
         tr.mfe = +Math.max(tr.mfe || 0, ((s ? tr.entry - b.low : b.high - tr.entry) / r0)).toFixed(2);
         tr.mae = +Math.max(tr.mae || 0, ((s ? b.high - tr.entry : tr.entry - b.low) / r0)).toFixed(2);
         // break-even rule from the Coach: once the trade is config.be R in profit, the stop moves to the entry
-        if (config.be && !tr.beMoved && tr.mfe >= config.be) { tr.stop = tr.entry; tr.beMoved = true; }
+        // only on a candle that actually reached +be R: a trade that was past it before the rule existed and is now
+        // back near the entry can't place a stop on the wrong side of price, so it waits until it gets there again
+        if (config.be && !tr.beMoved && ((s ? tr.entry - b.low : b.high - tr.entry) / r0) >= config.be) { tr.stop = tr.entry; tr.beMoved = true; }
       }
       tr.checked = bars.at(-1).time;
       if (exitBar) startReview(tr, exitBar, key, NEWS);
