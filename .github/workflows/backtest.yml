@@ -2,7 +2,7 @@ name: Council backtest
 
 # RESEARCH BRANCH ONLY (council-research, never merged). Runs on every push to this branch (or by hand).
 # Replays a long period (default 150 days) one market per job, then merges the trades into
-# council-data/research/backtest-<days>d.json. It never writes backtest.json, so the Coach's live rules are untouched.
+# council-data/research/backtest-<days>d-pf.json (with close times and time-stop variants for the portfolio replay). It never writes backtest.json, so the Coach's live rules are untouched.
 on:
   push:
     branches: [council-research]
@@ -16,7 +16,7 @@ permissions:
   contents: write
 
 concurrency:
-  group: council-research
+  group: council-research-pf
   cancel-in-progress: false
 
 jobs:
@@ -101,7 +101,7 @@ jobs:
               Object.assign(out.errors, (b.markets || {}).errors || {});
               out.trades.push(...b.trades);
             }
-            fs.writeFileSync(`data/research/backtest-${days}d.json`, JSON.stringify(out));
+            fs.writeFileSync(`data/research/backtest-${days}d-pf.json`, JSON.stringify(out));
             console.log(`${out.trades.length} rows from ${Object.keys(out.markets).length} markets`, out.coverage, out.errors);
           ' "$DAYS"
           git -C data config user.name "mosha-council"

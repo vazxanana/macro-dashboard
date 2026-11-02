@@ -40,7 +40,7 @@ const FRESH = 12, WIN = 720, STEP = 300;
 // pt2: on a trade whose target is more than PARTIAL.over R away, bank PARTIAL.frac of it at +PARTIAL.at R and move the
 // stop to the entry for the rest (the same rule as the Trader's config.partial)
 const PARTIAL = { at: 2, over: 5, frac: 0.5 };
-const VARIANTS = [['none', null, false, false], ['be1', 1, false, false], ['be15', 1.5, false, false], ['tp2', null, true, false], ['pt2', null, false, true]];
+const VARIANTS = [['none', null, false, false], ['be1', 1, false, false], ['be15', 1.5, false, false], ['tp2', null, true, false], ['pt2', null, false, true], ['ts4', null, false, false, 4], ['ts8', null, false, false, 8], ['ts12', null, false, false, 12]];
 const sessionOf = (t) => { const h = new Date(t * 1000).getUTCHours(); return h < 7 ? 'asia' : h < 12 ? 'london' : h < 16 ? 'overlap' : h < 21 ? 'newyork' : 'late'; };
 const marketOpen = (M, t) => { if (M.group === 'Crypto') return true; const d = new Date(t * 1000), wd = d.getUTCDay(), h = d.getUTCHours(); return !(wd === 6 || (wd === 0 && h < 23) || (wd === 5 && h >= 21)); };
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
@@ -103,6 +103,8 @@ function manage(v, tr, b) {
   if (s ? b.high >= v.stop : b.low <= v.stop) { v.done = true; v.R = v.part ? bank : v.beMoved ? 0 : -1; v.closed = b.time; return; }
   const tgt = v.t2 && tr.t2 != null ? tr.t2 : tr.t1;
   if (s ? b.low <= tgt : b.high >= tgt) { v.done = true; v.R = bank + rest * (tgt === tr.t1 ? tr.rr : Math.abs(tgt - tr.entry) / r0); v.closed = b.time; return; }
+  // research time stop: out at the candle's close once the trade has been open ts hours
+  if (v.ts && tr.filled && b.time - tr.filled >= v.ts * 3600) { v.done = true; v.R = (s ? tr.entry - b.close : b.close - tr.entry) / r0; v.closed = b.time; return; }
   if (v.pt && !v.part && tr.rr > PARTIAL.over && ((s ? tr.entry - b.low : b.high - tr.entry) / r0) >= PARTIAL.at) { v.part = true; v.stop = tr.entry; v.beMoved = true; }
   if (v.be && !v.beMoved && ((s ? tr.entry - b.low : b.high - tr.entry) / r0) >= v.be) { v.stop = tr.entry; v.beMoved = true; }
 }
@@ -306,8 +308,8 @@ for (const [key, M] of Object.entries(MARKETS)) {
             if (b.time < tr.opened) continue;
             const s = tr.side === 'sell';
             if (s ? b.high >= tr.entry : b.low <= tr.entry) { tr.status = 'open'; tr.filled = b.time; }
-            else if (s ? b.low <= tr.t1 : b.high >= tr.t1) { tr.status = 'missed'; continue; }
-            else { if (b.time - tr.opened > (WAIT[tr.h] || 86400)) tr.status = 'expired'; continue; }
+            else if (s ? b.low <= tr.t1 : b.high >= tr.t1) { tr.status = 'missed'; tr.ended = b.time; continue; }
+            else { if (b.time - tr.opened > (WAIT[tr.h] || 86400)) { tr.status = 'expired'; tr.ended = b.time; } continue; }
           }
           if (tr.status !== 'open') continue;
           const s = tr.side === 'sell';
@@ -364,7 +366,7 @@ for (const [key, M] of Object.entries(MARKETS)) {
         }
         tr.r0 = Math.abs(tr.entry - tr.stop); tr.cost = tr.r0 > 0 ? spreadOf(M, tr.entry) / tr.r0 : 0;
         if (!(tr.r0 > 0)) continue;
-        tr.v = VARIANTS.map(([n, be, t2, pt]) => ({ n, be, t2, pt, stop: tr.stop, beMoved: false, done: false, R: null }));
+        tr.v = VARIANTS.map(([n, be, t2, pt, ts]) => ({ n, be, t2, pt, ts, stop: tr.stop, beMoved: false, done: false, R: null }));
         open.push(tr);
         // its twin entered at market at the signal (same stop and targets): the other entry style, for a fair comparison
         const tw = { ...tr, k: st.k + '@mkt', twin: true, mfe: 0 };
@@ -374,7 +376,7 @@ for (const [key, M] of Object.entries(MARKETS)) {
           Object.assign(tw, { entry: price, rr: rw / r, status: 'open', filled: t });
         }
         tw.r0 = Math.abs(tw.entry - tw.stop); tw.cost = tw.r0 > 0 ? spreadOf(M, tw.entry) / tw.r0 : 0;
-        tw.v = VARIANTS.map(([n, be, t2, pt]) => ({ n, be, t2, pt, stop: tw.stop, beMoved: false, done: false, R: null }));
+        tw.v = VARIANTS.map(([n, be, t2, pt, ts]) => ({ n, be, t2, pt, ts, stop: tw.stop, beMoved: false, done: false, R: null }));
         open.push(tw);
       }
       for (const sw of sweepSetups(src, price, t, null, spreadOf(M, price)).concat(chochSetups(src, price, t, null, spreadOf(M, price)))) {
@@ -384,7 +386,7 @@ for (const [key, M] of Object.entries(MARKETS)) {
         const tr = { m: key, k: sw.k, h: '1h', side, entry: sw.entry, stop: sw.stop, t1: sw.t1, rr: sw.rr, opened: t, filled: t, status: 'open', mfe: 0,
           feat: { d1: src['1d'].A.trend === (sw.sell ? -1 : 1) ? 'with' : 'against', struct: 'n/a', session: sessionOf(t), ...structFeat(sw.sell, '1m', src, t), m15c: m15cOf(src['15m'].bars, sw.sell, t), m15c1: m15cOf(src['15m'].bars, sw.sell, t, 1) } };
         tr.r0 = Math.abs(tr.entry - tr.stop); tr.cost = tr.r0 > 0 ? spreadOf(M, tr.entry) / tr.r0 : 0;
-        tr.v = VARIANTS.map(([n, be, t2, pt]) => ({ n, be, t2, pt, stop: tr.stop, beMoved: false, done: false, R: null }));
+        tr.v = VARIANTS.map(([n, be, t2, pt, ts]) => ({ n, be, t2, pt, ts, stop: tr.stop, beMoved: false, done: false, R: null }));
         open.push(tr);
       }
     }
@@ -412,8 +414,8 @@ const out = {
   byMarket: group(all, (x) => x.m),
   byRR: group(all, rrBand),
   bySetupCond: Object.fromEntries(setups.map((k) => { const a = all.filter((x) => x.k === k); return [k, { d1: group(a, (x) => x.feat.d1), struct: group(a, (x) => x.feat.struct), session: group(a, (x) => x.feat.session), rr: group(a, rrBand) }]; })),
-  trades: all.concat(twins, unfilled).map((x) => [x.m, x.k, x.side, x.opened, x.filled || null, +x.rr.toFixed(2), x.feat.d1, x.feat.struct, x.feat.session, ...x.v.map((v) => v.R == null ? null : +v.R.toFixed(2)), +x.mfe.toFixed(2), +x.cost.toFixed(3), x.status === 'closed' ? 1 : 0, x.feat.cf, x.feat.choch, x.feat.m15c, x.feat.m15c1, x.feat.h4 || null, x.feat.h1 || null]),
-  tradeCols: ['market', 'setup', 'side', 'opened', 'filled', 'rr', 'd1', 'struct', 'session', 'R_none', 'R_be1', 'R_be15', 'R_tp2', 'R_pt2', 'mfe', 'cost', 'fill', 'cf', 'choch', 'm15c', 'm15c1', 'h4', 'h1'],
+  trades: all.concat(twins, unfilled).map((x) => [x.m, x.k, x.side, x.opened, x.filled || null, +x.rr.toFixed(2), x.feat.d1, x.feat.struct, x.feat.session, ...x.v.map((v) => v.R == null ? null : +v.R.toFixed(2)), +x.mfe.toFixed(2), +x.cost.toFixed(3), x.status === 'closed' ? 1 : 0, x.feat.cf, x.feat.choch, x.feat.m15c, x.feat.m15c1, x.feat.h4 || null, x.feat.h1 || null, x.v[0].closed || x.ended || null, x.h]),
+  tradeCols: ['market', 'setup', 'side', 'opened', 'filled', 'rr', 'd1', 'struct', 'session', 'R_none', 'R_be1', 'R_be15', 'R_tp2', 'R_pt2', 'R_ts4', 'R_ts8', 'R_ts12', 'mfe', 'cost', 'fill', 'cf', 'choch', 'm15c', 'm15c1', 'h4', 'h1', 'closed', 'tf'],
   twins: twins.length, unfilled: unfilled.length,
   examples: EX.map((x) => ({ id: x.id, market: x.market, side: x.side, entry: x.entry, stop: x.stop, target: x.target, entryFrom: x.entryFrom, entryTo: x.entryTo,
     caught: x.caught, setups: x.setups.map(({ s, ...v }) => v), sweep: x.sweep.map(({ s, ...v }) => v), m15: x.m15.map(({ s, ...v }) => v) })),
