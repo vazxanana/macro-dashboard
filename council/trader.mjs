@@ -79,7 +79,7 @@ config.filters = config.filters || {};
 const now = Math.floor(Date.now() / 1000), nowISO = new Date(now * 1000).toISOString();
 config.pausedMarkets = config.pausedMarkets || {};
 for (const [k, until] of Object.entries(config.pausedMarkets)) if (Date.parse(until) / 1000 <= now) { delete config.pausedMarkets[k]; config.history.push({ at: nowISO, by: 'coach-stats', change: `Resumed market ${k}`, why: 'Pause period ended.' }); }
-for (const [k, until] of Object.entries(config.paused)) if (Date.parse(until) / 1000 <= now) { delete config.paused[k]; config.history.push({ at: nowISO, by: 'coach-stats', change: `Resumed ${k}`, why: 'Pause period ended.' }); }
+for (const [k, until] of Object.entries(config.paused)) if (Date.parse(until) / 1000 <= now) { delete config.paused[k]; (config.resumedAt = config.resumedAt || {})[k] = now; config.history.push({ at: nowISO, by: 'coach-stats', change: `Resumed ${k}`, why: 'Pause period ended.' }); }
 CFG.buf = Math.min(LIMITS.buf[1], Math.max(LIMITS.buf[0], config.buf));
 CFG.minRisk = Math.min(LIMITS.minRisk[1], Math.max(LIMITS.minRisk[0], config.minRisk));
 // Rules from the trader (the user), applied once and logged. The Coach undoes one only when a backtest shows it clearly losing.
@@ -450,12 +450,23 @@ function learnPauses(sample, change) {
   // a losing streak inside a record that pays is variance: a setup paused on one resumes once its own trades and the
   // backtest both make money (2 Nov: rintra paused at 19:07 on four losses in a row, its 9 trades +0.68R overall, two
   // gold winners zeroed by the old break-even rule, the backtest +0.16R a trade over 96)
+  // resume a paused setup early when the trades it would really have taken recover: shadows blocked only by the pause
+  // and portfolio limits (a shadow its own D1/condition rules also block was never going to be taken). Every run.
+  // 2 Nov: scalp's 21 paused shadows made +0.16R each, but the 11 it would have taken +0.70R.
+  for (const k of Object.keys(config.paused)) {
+    const sh = trades.filter((x) => x.k === k && x.shadow && (x.status === 'win' || x.status === 'loss' || x.status === 'be') && now - x.closed < 30 * 86400
+      && (x.blockedBy || []).includes('paused') && x.blockedBy.every((b) => b === 'paused' || NEUTRAL.has(b)));
+    const e = ex(sh);
+    if (sh.length >= 4 && e > 0.3) { delete config.paused[k]; (config.resumedAt = config.resumedAt || {})[k] = now; change(`Resumed ${k} early`, `The ${sh.length} trades it would have taken while paused (blocked only by the pause or portfolio limits) made +${e.toFixed(2)}R each.`); }
+  }
   for (const k of Object.keys(config.paused)) {
     const arr = bySetup[k] || [], bt = btNonNeg(k);
-    if (arr.length >= 6 && ex(arr) >= 0 && bt) { delete config.paused[k]; change(`Resumed ${k}`, `Its last ${arr.length} trades made ${ex(arr) >= 0 ? '+' : ''}${ex(arr).toFixed(2)}R each and the backtest ${bt.e >= 0 ? '+' : ''}${bt.e.toFixed(2)}R over ${bt.n}: a losing streak inside a record that pays is variance.`); }
+    if (arr.length >= 6 && ex(arr) >= 0 && bt) { delete config.paused[k]; (config.resumedAt = config.resumedAt || {})[k] = now; change(`Resumed ${k}`, `Its last ${arr.length} trades made ${ex(arr) >= 0 ? '+' : ''}${ex(arr).toFixed(2)}R each and the backtest ${bt.e >= 0 ? '+' : ''}${bt.e.toFixed(2)}R over ${bt.n}: a losing streak inside a record that pays is variance.`); }
   }
-  for (const [k, arr] of Object.entries(bySetup)) {
+  for (const [k, all] of Object.entries(bySetup)) {
     if (config.paused[k]) continue;
+    // after a resume, only trades opened since then count: the ones that caused the pause were already judged
+    const arr = all.filter((x) => x.opened >= ((config.resumedAt || {})[k] || 0));
     if (btPositive(k) && arr.length < 15) continue;   // the backtest says it pays: a few live losses aren't enough to pause it
     const n = arr.length, e = ex(arr), last4 = arr.slice(-4);
     // four losses in a row pause only a setup that is losing overall and that the backtest doesn't show paying
@@ -553,11 +564,6 @@ if (coach.date !== today) {
   for (const m of Object.keys(config.pausedMarkets)) {
     const sh = shadows.filter((x) => x.market === m && (x.blockedBy || []).includes('market'));
     if (sh.length >= 4 && exp(sh) > 0.3) { delete config.pausedMarkets[m]; change(`Resumed market ${m} early`, `Shadow trades while paused made +${exp(sh).toFixed(2)}R over ${sh.length}.`); }
-  }
-  // resume a paused setup early when its shadow trades recover
-  for (const k of Object.keys(config.paused)) {
-    const sh = shadows.filter((x) => x.k === k && (x.blockedBy || []).includes('paused'));
-    if (sh.length >= 4 && exp(sh) > 0.3) { delete config.paused[k]; change(`Resumed ${k} early`, `Shadow trades while paused made +${exp(sh).toFixed(2)}R over ${sh.length}.`); }
   }
   wr('coach.json', { date: today, at: nowISO, stats, last14: rs, lessons: lessons(trades, now), fslot: nowISO.slice(0, 11) + String(Math.floor(+nowISO.slice(11, 13) / 6) * 6).padStart(2, '0'), notes: notes.length ? notes : ['No change today: not enough evidence to move a rule.'] });
 }
