@@ -94,7 +94,8 @@ export function judge(tr) {
     else f.push(['market', 'besaved', 'Break-even saved a loss', `Price came back to the entry${done && a.worst >= 1 ? ` and went on ${a.worst}R against` : ''}.`, 'The break-even rule protected this one.']);
   } else if (tr.status === 'win') {
     const more = +(a.best - tRR).toFixed(2);
-    if (done && more >= 1) f.push(['system', 'leftmoney', 'Target left money on the table', `After the target price ran another ${more}R.`, 'Consider holding part of the position for the next target.']);
+    if (tr.part && tr.R < tRR) f.push(['market', 'partial', 'Partial banked', `Half came off at +${tr.part.at}R, then the rest went back to the entry.`, 'The +2R partial kept part of a trade that would otherwise have been given back.']);
+    else if (done && more >= 1) f.push(['system', 'leftmoney', 'Target left money on the table', `After the target price ran another ${more}R.`, 'Consider holding part of the position for the next target.']);
     else f.push(['market', 'clean', 'Clean win', `Target hit${done ? `; price went only ${Math.max(0, more)}R further` : ''}.`, 'The setup worked as designed.']);
   }
   if (!f.length) return {};

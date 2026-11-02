@@ -94,6 +94,12 @@ const USER_RULES = [
   { id: 'rintra-origin-chart', apply: (c) => { if ((c.targetBy || {}).rintra === 'user') { delete c.target.rintra; delete c.targetBy.rintra; } },
     change: 'rintra: first target again (user chart)',
     why: 'The trader\'s marked gold chart (2 Nov): long 3,900.71, stop 3,896.79, take profit 3,965.08 = the bottom of the H1 Origin of the sell-off (the 3,975 break). That is where the H1 retracement\'s first target sits (the 50% line, 3,962.6), not the start of the whole leg (4,019.8) that "hold to the Origin" pointed at. The setup never got to trade it anyway: it signalled at 13:43, after the breakout; the trader was in at 11:45 from the base.' },
+  // 2 Nov, 21:30: after the day's review (five trades were +2R or more and still failed to win, one with its target 91R
+  // away), the trader asked for a partial: on a trade whose target is more than 5R away, take half off at +2R and move
+  // the stop to the entry for the rest. The backtest's 'pt2' variant measures it; the Coach drops it only if it clearly loses.
+  { id: 'partial-2r', apply: (c) => { c.partial = { at: 2, over: 5, frac: 0.5 }; c.partialBy = 'user'; },
+    change: 'Partial: half off at +2R when the target is more than 5R away (user)',
+    why: '2 Nov review: 5 trades were +2R or more and failed to win (gold Retrace x2, gold Intraday, GBP/USD and EUR/USD Scalp; the EUR/USD target was 91R away). Break-even at +1R cost more than it saved, so bank half at +2R instead and let the rest run to the target with the stop at the entry.' },
 ];
 config.userRules = config.userRules || [];
 for (const u of USER_RULES) if (!config.userRules.includes(u.id)) { u.apply(config); config.userRules.push(u.id); config.history.push({ at: nowISO, by: 'user', change: u.change, why: u.why }); }
@@ -162,11 +168,18 @@ for (const [key, M] of Object.entries(MARKETS)) {
           else continue;
         }
         const r0 = tr.r0 || (tr.r0 = Math.abs(tr.entry - tr.stop));
+        // after a partial (tr.part): part.frac was banked at +part.at R and the rest rides with the stop at the entry
+        const bank = tr.part ? tr.part.frac * tr.part.at : 0, rest = tr.part ? 1 - tr.part.frac : 1;
         if (s ? b.high >= tr.stop : b.low <= tr.stop) {
-          if (tr.beMoved) { tr.status = 'be'; tr.R = 0; } else { tr.status = 'loss'; tr.R = -1; }
+          if (tr.part) { tr.status = 'win'; tr.R = +bank.toFixed(2); }
+          else if (tr.beMoved) { tr.status = 'be'; tr.R = 0; } else { tr.status = 'loss'; tr.R = -1; }
           tr.closed = b.time; exitBar = b; break;
         }
-        if (s ? b.low <= tr.t1 : b.high >= tr.t1) { tr.status = 'win'; tr.closed = b.time; tr.R = tr.rr; exitBar = b; break; }
+        if (s ? b.low <= tr.t1 : b.high >= tr.t1) { tr.status = 'win'; tr.closed = b.time; tr.R = +(bank + rest * tr.rr).toFixed(2); exitBar = b; break; }
+        // partial (config.partial): on a trade whose target is more than P.over R away, bank P.frac at +P.at R and move
+        // the stop to the entry; only on a candle that actually reached +P.at R
+        const P = config.partial;
+        if (P && !tr.part && tr.rr > P.over && ((s ? tr.entry - b.low : b.high - tr.entry) / r0) >= P.at) { tr.part = { at: P.at, frac: P.frac, time: b.time, price: s ? tr.entry - P.at * r0 : tr.entry + P.at * r0 }; tr.stop = tr.entry; tr.beMoved = true; }
         // how far the trade went for (MFE) and against (MAE), in R: the Coach learns trade management from these
         tr.mfe = +Math.max(tr.mfe || 0, ((s ? tr.entry - b.low : b.high - tr.entry) / r0)).toFixed(2);
         tr.mae = +Math.max(tr.mae || 0, ((s ? b.high - tr.entry : tr.entry - b.low) / r0)).toFixed(2);
@@ -271,7 +284,7 @@ const BT = (() => {
   if (!b || b.fake || !Array.isArray(b.trades) || !b.trades.length || now - Date.parse(b.at) / 1000 > 3 * 86400) return null;
   const T = b.trades.map((r) => Object.fromEntries(b.tradeCols.map((c, i) => [c, r[i]])));
   // judge every result after costs: each backtest trade carries its spread in R (one spread per round trip)
-  if (b.tradeCols.includes('cost')) for (const t of T) for (const k of ['R_none', 'R_be1', 'R_be15', 'R_tp2']) if (t[k] != null) t[k] = +(t[k] - (t.cost || 0)).toFixed(3);
+  if (b.tradeCols.includes('cost')) for (const t of T) for (const k of ['R_none', 'R_be1', 'R_be15', 'R_tp2', 'R_pt2']) if (t[k] != null) t[k] = +(t[k] - (t.cost || 0)).toFixed(3);
   // TA: every row, incl. market-entry twins ('<k>@mkt') and resting orders that never filled (fill 0, 0R);
   // T: the trades as the Trader takes them now (filled, no twins) — what every rule except the entry style is judged on
   const TA = T, TT = TA.filter((t) => t.fill !== 0 && !String(t.setup).includes('@'));
@@ -346,6 +359,18 @@ function learnFromBacktest(change) {
       config.be = want; if (want) config.beSince = nowISO; else delete config.beSince;
     }
     config.beSrc = 'backtest';
+  }
+  // 2b. +2R partial on far targets (config.partial; the backtest's pt2 variant against no partial, trade by trade, on the
+  //     trades it changes: target more than 'over' R away). The trader's rule stays unless it clearly loses (<= -0.05R per
+  //     trade, t <= -2, both halves); without a rule the backtest turns it on at >= +0.05R, t >= 2.5, both halves.
+  if (BT.b.tradeCols.includes('R_pt2')) {
+    const P = config.partial || { at: 2, over: 5, frac: 0.5 }, a = TD.filter((t) => t.rr > P.over && t.R_pt2 != null);
+    if (a.length >= 30) {
+      const d = btPaired(a, 'R_pt2', 'R_none'), h1 = btPaired(a.filter((t) => t.opened < BT.mid), 'R_pt2', 'R_none'), h2 = btPaired(a.filter((t) => t.opened >= BT.mid), 'R_pt2', 'R_none');
+      const why = `${a.length} trades over the last ${days} days with the target more than ${P.over}R away: half off at +${P.at}R ${f2(d.e)} per trade versus holding it all (${tTxt(d.t)}), ${f2(h1.e)} and ${f2(h2.e)} in the two halves.`;
+      if (!config.partial && d.e >= 0.05 && d.t >= 2.5 && h1.e > 0 && h2.e > 0) { config.partial = P; config.partialBy = 'backtest'; change(`Partial: half off at +${P.at}R when the target is more than ${P.over}R away (backtest)`, why); }
+      else if (config.partial && (config.partialBy === 'user' ? d.e <= -0.05 && d.t <= -2 && h1.e < 0 && h2.e < 0 : d.e <= 0)) { delete config.partial; const by = config.partialBy; delete config.partialBy; change(`Partial turned off (backtest${by === 'user' ? ", overriding the trader's rule" : ''})`, why); }
+    }
   }
   // 3. a setup the backtest shows clearly losing as it trades now (10+ trades at -0.3R or worse each, or 8+ at
   //    -0.5R or worse; negative in both halves; t <= -2): pause it until the next backtest can re-check it
