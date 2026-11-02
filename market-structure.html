@@ -357,6 +357,19 @@
   .c-pm-i p { margin: 6px 0 0; line-height: 1.45; }
   .c-pm-h { display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px 8px; } .c-pm-h b { color: var(--ink); font-size: 13px; } .c-pm-h small { flex-basis: 100%; color: var(--ink-faint); }
   .c-pm-l { color: var(--ink); } .c-pm-f { color: var(--ink-faint); }
+  [data-tid] { cursor: pointer; } #ms-c-trades tr[data-tid]:hover td { background: var(--panel-raised); } .c-pm-i[data-tid]:hover { border-color: var(--ink-faint); }
+  [data-tid]:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  .tv { width: min(960px, calc(100vw - 24px)); max-height: calc(100vh - 24px); padding: 0; border: 1px solid var(--line); border-radius: 14px; background: var(--panel); color: var(--ink); }
+  .tv::backdrop { background: rgba(5, 8, 14, .6); }
+  .tv-h { display: flex; align-items: flex-start; gap: 12px; padding: 14px 16px 10px; border-bottom: 1px solid var(--line-soft); }
+  .tv-h > div { flex: 1; min-width: 0; } .tv-h h3 { margin: 0; font-size: 16px; } .tv-h p { margin: 4px 0 0; font-size: 12px; color: var(--ink-dim); line-height: 1.45; }
+  .tv-x { all: unset; cursor: pointer; width: 32px; height: 32px; display: grid; place-items: center; border-radius: 8px; border: 1px solid var(--line); color: var(--ink-dim); font-size: 18px; flex: none; }
+  .tv-x:hover { color: var(--ink); } .tv-x:focus-visible { outline: 2px solid var(--accent); }
+  .tv-c { height: min(440px, 55vh); position: relative; }
+  .tv-c .tv-msg { position: absolute; inset: 0; display: grid; place-items: center; color: var(--ink-faint); font-size: 13px; padding: 16px; text-align: center; }
+  .tv-k { display: flex; flex-wrap: wrap; gap: 6px 14px; padding: 10px 16px 14px; font-size: 12px; color: var(--ink-dim); border-top: 1px solid var(--line-soft); }
+  .tv-k span { display: inline-flex; align-items: center; gap: 6px; } .tv-k i { width: 14px; height: 2px; display: block; } .tv-k b { color: var(--ink); font-family: var(--mono); }
+  .tv-k a { margin-left: auto; color: var(--accent); }
   .c-pm-v { display: inline-block; font-size: 10px; font-weight: 700; letter-spacing: .4px; text-transform: uppercase; padding: 2px 6px; border-radius: 5px; background: var(--panel-raised); color: var(--ink-dim); margin-left: 6px; white-space: nowrap; }
   .c-pm-h .c-pm-v { margin-left: 0; }
   .c-pm-v.system { background: color-mix(in srgb, #f2b33d 18%, transparent); color: #f2b33d; }
@@ -615,6 +628,7 @@
         <div class="ms-k">Trade reviews · was it our system or the market?</div>
         <div id="ms-c-pm-sum"></div>
         <ul class="c-pm" id="ms-c-pm"></ul>
+        <dialog class="tv" id="ms-tv" aria-labelledby="ms-tv-t"><div class="tv-h"><div><h3 id="ms-tv-t">Trade</h3><p id="ms-tv-s"></p></div><button type="button" class="tv-x" id="ms-tv-x" aria-label="Close chart">×</button></div><div class="tv-c" id="ms-tv-c"><div class="tv-msg" id="ms-tv-m">Loading candles…</div></div><div class="tv-k" id="ms-tv-k"></div></dialog>
       </div>
       <div class="card c-analyst">
         <div class="ms-k">Analyst · weekly brief</div>
@@ -2341,7 +2355,7 @@ function msNextSetup(bars, A) {
     const tableList = (withSh ? TA : T).filter((x) => !only || x.market === instKey);
     const ST = { win: ['pos', 'Win'], loss: ['neg', 'Loss'], be: ['', 'Break-even'], open: ['', 'Open'], pending: ['', 'Waiting fill'], missed: ['', 'Missed'], expired: ['', 'Expired'], skipped: ['', 'Skipped'] };
     const dI = (x) => ({ dec: x.dec != null ? x.dec : 2 });
-    set('ms-c-trades', tableList.length ? tableList.slice(0, 25).map((x) => `<tr class="${x.shadow ? 'sh' : ''}"><td>${ftime(x.opened + TZ)}</td><td><b>${esc(x.label)}</b></td><td>${esc(x.name)} <small>${esc(x.pair)}</small></td><td><span class="ms-chip ${x.side === 'sell' ? 'ms-chip-sell' : 'ms-chip-buy'}">${x.side.toUpperCase()}</span></td><td class="n">${fmtI(x.entry, dI(x))}</td><td class="n">${fmtI(x.stop, dI(x))}</td><td class="n">${fmtI(x.t1, dI(x))}</td><td class="${(ST[x.status] || ['', ''])[0]}" title="${esc(x.note || '')}">${x.shadow ? 'Shadow · ' : ''}${(ST[x.status] || ['', x.status])[1]}${x.R != null && (x.status === 'win' || x.status === 'loss') ? ` ${x.R > 0 ? '+' : ''}${x.R}R` : ''}${liveR(x)}${pmChip(x)}</td></tr>`).join('')
+    set('ms-c-trades', tableList.length ? tableList.slice(0, 25).map((x) => `<tr class="${x.shadow ? 'sh' : ''}" data-tid="${esc(x.id)}" tabindex="0" title="Show this trade on a chart"><td>${ftime(x.opened + TZ)}</td><td><b>${esc(x.label)}</b></td><td>${esc(x.name)} <small>${esc(x.pair)}</small></td><td><span class="ms-chip ${x.side === 'sell' ? 'ms-chip-sell' : 'ms-chip-buy'}">${x.side.toUpperCase()}</span></td><td class="n">${fmtI(x.entry, dI(x))}</td><td class="n">${fmtI(x.stop, dI(x))}</td><td class="n">${fmtI(x.t1, dI(x))}</td><td class="${(ST[x.status] || ['', ''])[0]}" title="${esc(x.note || '')}">${x.shadow ? 'Shadow · ' : ''}${(ST[x.status] || ['', x.status])[1]}${x.R != null && (x.status === 'win' || x.status === 'loss') ? ` ${x.R > 0 ? '+' : ''}${x.R}R` : ''}${liveR(x)}${pmChip(x)}</td></tr>`).join('')
       : `<tr><td colspan="8" class="empty">No council trades yet${only ? ' on this market' : ''}. The Trader takes every Ready setup it sees.</td></tr>`);
     // Trade reviews: every loss studied — our system's error, or just the market?
     const rv = (C.trades || []).filter((x) => x.pm && x.pm.cause && (withSh || !x.shadow) && (!only || x.market === instKey)).sort((a, b) => b.closed - a.closed);
@@ -2350,7 +2364,7 @@ function msNextSetup(bars, A) {
     set('ms-c-pm-sum', rvL.length ? `<div class="c-pm-bar" role="img" aria-label="${sysL} of ${rvL.length} losses were system errors"><i class="sys" style="flex:${sysL}"></i><i class="mkt" style="flex:${rvL.length - sysL}"></i></div><p class="c-pm-k"><span><i class="sys"></i>System error <b>${sysL}</b></span><span><i class="mkt"></i>Market <b>${rvL.length - sysL}</b></span><span>of ${rvL.length} reviewed loss${rvL.length === 1 ? '' : 'es'}</span></p>` +
       (L && L.top && L.top.length ? `<div class="c-sub">What to fix</div><ul class="c-notes">${L.top.map((t) => `<li>${esc(t)}</li>`).join('')}</ul>` : '')
       : '<p class="ms-note">Each closed trade is studied: what price did before, during and after it. Losses get a verdict: a system error to fix, or just the market.</p>');
-    set('ms-c-pm', rv.slice(0, 12).map((x) => `<li class="c-pm-i ${x.pm.verdict}"><div class="c-pm-h"><span class="c-pm-v ${x.pm.verdict}">${x.pm.verdict === 'system' ? 'System' : 'Market'}</span><b>${esc(x.pm.title)}</b><small>${esc(x.label)} · ${esc(x.name)} ${esc(x.pair)} · ${x.side} · ${x.status === 'loss' ? 'loss' : x.status === 'win' ? `win +${x.R}R` : 'break-even'}${x.shadow ? ' · shadow' : ''} · ${ago(x.closed)}${x.pm.phase === 'watch' ? ' · still watching' : ''}</small></div><p>${esc(x.pm.detail)}</p><p class="c-pm-l">Lesson: ${esc(x.pm.lesson)}</p>${(x.pm.factors || []).length ? `<p class="c-pm-f">Also: ${x.pm.factors.map((f) => esc(PM_NAME[f] || f)).join(', ')}</p>` : ''}</li>`).join('') || '');
+    set('ms-c-pm', rv.slice(0, 12).map((x) => `<li class="c-pm-i ${x.pm.verdict}" data-tid="${esc(x.id)}" tabindex="0" title="Show this trade on a chart"><div class="c-pm-h"><span class="c-pm-v ${x.pm.verdict}">${x.pm.verdict === 'system' ? 'System' : 'Market'}</span><b>${esc(x.pm.title)}</b><small>${esc(x.label)} · ${esc(x.name)} ${esc(x.pair)} · ${x.side} · ${x.status === 'loss' ? 'loss' : x.status === 'win' ? `win +${x.R}R` : 'break-even'}${x.shadow ? ' · shadow' : ''} · ${ago(x.closed)}${x.pm.phase === 'watch' ? ' · still watching' : ''}</small></div><p>${esc(x.pm.detail)}</p><p class="c-pm-l">Lesson: ${esc(x.pm.lesson)}</p>${(x.pm.factors || []).length ? `<p class="c-pm-f">Also: ${x.pm.factors.map((f) => esc(PM_NAME[f] || f)).join(', ')}</p>` : ''}</li>`).join('') || '');
     // Scorecard: closed council trades grouped by setup and by market
     const allClosed = (C.trades || []).filter((x) => !x.shadow && (x.status === 'win' || x.status === 'loss' || x.status === 'be'));
     const group = (keyFn, labelFn) => {
@@ -2385,6 +2399,69 @@ function msNextSetup(bars, A) {
   const liveR = (x) => { if (x.status !== 'open') return ''; const m = COUNCIL.snap && COUNCIL.snap.markets && COUNCIL.snap.markets[x.market]; if (!m || !m.price) return '';
     const r = (m.price - x.entry) * (x.side === 'sell' ? -1 : 1) / Math.abs(x.entry - x.stop); return isFinite(r) ? ` <b class="${r >= 0 ? 'pos' : 'neg'}">${r >= 0 ? '+' : ''}${r.toFixed(2)}R</b>` : ''; };
   const pmChip = (x) => x.pm && x.pm.cause ? `<span class="c-pm-v ${x.pm.verdict}" title="${esc(x.pm.detail + ' Lesson: ' + x.pm.lesson)}">${esc(PM_NAME[x.pm.cause] || x.pm.cause)}</span>` : '';
+  // ─── Tap a council trade: see it on a chart (entry, stop, target, where it filled and where it exited) ───
+  const TV = { chart: null, series: null, lines: [], pv: [], req: 0 };
+  function tvPickTf(x) {
+    const now = Date.now() / 1000, start = x.filled || x.opened, end = x.closed || now, dur = Math.max(60, end - start);
+    for (const id of ['1m', '5m', '15m', '1h', '4h', '1d']) {
+      const tf = TFS.find((t) => t.id === id), pad = Math.max(dur * 0.5, 40 * tf.sec);
+      if (now - (start - pad) <= 700 * tf.sec && dur <= 250 * tf.sec) return { tf, pad, start, end };
+    }
+    const tf = TFS[0]; return { tf, pad: 40 * tf.sec, start, end };
+  }
+  async function openTrade(id) {
+    const x = (COUNCIL.trades || []).find((t) => t.id === id), dlg = document.getElementById('ms-tv');
+    if (!x || !dlg) return;
+    const I = INSTRUMENTS[x.market]; if (!I) return;
+    const s = x.side === 'sell' ? -1 : 1, d = { dec: x.dec != null ? x.dec : I.dec }, f = (v) => fmtI(v, d);
+    const r0 = x.r0 || (x.beMoved ? 0 : Math.abs(x.entry - x.stop)), stop0 = x.beMoved && r0 ? x.entry - s * r0 : x.stop;
+    const res = x.status === 'win' ? `Win +${x.R}R` : x.status === 'loss' ? 'Loss −1R' : x.status === 'be' ? 'Break-even 0R' : (ST_NAME[x.status] || x.status);
+    document.getElementById('ms-tv-t').textContent = `${x.label} · ${x.name} ${x.pair} · ${x.side === 'sell' ? 'Sell' : 'Buy'} · ${res}${x.shadow ? ' (shadow)' : ''}`;
+    document.getElementById('ms-tv-s').innerHTML = x.pm && x.pm.title ? `<b class="c-pm-v ${x.pm.verdict}" style="margin:0 6px 0 0">${x.pm.verdict === 'system' ? 'System' : 'Market'}</b><b>${esc(x.pm.title)}</b> · ${esc(x.pm.detail)} <br>Lesson: ${esc(x.pm.lesson)}` : esc(x.note || '');
+    document.getElementById('ms-tv-k').innerHTML = `<span><i style="background:#2962ff"></i>Entry <b>${f(x.entry)}</b></span><span><i style="background:${DNC}"></i>Stop <b>${f(stop0)}</b></span>${x.beMoved ? `<span><i style="background:#8a94a8"></i>Stop moved to entry</span>` : ''}<span><i style="background:${UPC}"></i>Target <b>${f(x.t1)}</b></span><span>Reward:risk <b>${x.rr}R</b></span>${x.mfe != null ? `<span>Best <b>+${x.mfe}R</b></span>` : ''}<span>${ftime(x.opened + TZ)}${x.closed ? ' → ' + ftime(x.closed + TZ) : ''}</span><a href="?s=${esc(x.market)}#charts">Open ${esc(I.label)} charts</a>`;
+    const msg = document.getElementById('ms-tv-m'); msg.hidden = false; msg.textContent = 'Loading candles…';
+    if (!dlg.open) dlg.showModal();
+    const host = document.getElementById('ms-tv-c'), th = THEMES[G.theme];
+    if (!TV.chart) {
+      TV.chart = LW.createChart(host, { autoSize: true, layout: { background: { type: 'solid', color: th.bg }, textColor: th.text, fontSize: 11 }, grid: { vertLines: { visible: false }, horzLines: { color: th.grid } }, crosshair: { mode: LW.CrosshairMode.Normal }, rightPriceScale: { borderColor: th.border }, timeScale: { borderColor: th.border, timeVisible: true, secondsVisible: false } });
+      TV.series = TV.chart.addCandlestickSeries({ upColor: UPC, downColor: DNC, borderUpColor: UPC, borderDownColor: DNC, wickUpColor: UPC, wickDownColor: DNC, priceLineVisible: false, lastValueVisible: false });
+      TV.series.applyOptions({ autoscaleInfoProvider: (orig) => { const r = orig(); if (r && r.priceRange && TV.pv.length) { r.priceRange.minValue = Math.min(r.priceRange.minValue, ...TV.pv); r.priceRange.maxValue = Math.max(r.priceRange.maxValue, ...TV.pv); } return r; } });
+    } else TV.chart.applyOptions({ layout: { background: { type: 'solid', color: th.bg }, textColor: th.text }, grid: { horzLines: { color: th.grid } }, rightPriceScale: { borderColor: th.border }, timeScale: { borderColor: th.border } });
+    TV.lines.forEach((l) => TV.series.removePriceLine(l)); TV.lines = []; TV.series.setData([]); TV.series.setMarkers([]);
+    const req = ++TV.req, W = tvPickTf(x);
+    let bars;
+    try { bars = (await fetchBars(W.tf, I, 720)).bars; } catch (e) { if (req === TV.req) msg.textContent = `Couldn't load ${I.label} candles: ${e.message || e}`; return; }
+    if (req !== TV.req) return;
+    const from = W.start - W.pad, to = Math.min(Date.now() / 1000, W.end + W.pad);
+    const data = bars.filter((b) => b.time >= from - 5 * W.tf.sec && b.time <= to + 5 * W.tf.sec).map((b) => ({ time: b.time + TZ, open: b.open, high: b.high, low: b.low, close: b.close }));
+    if (!data.length) { msg.textContent = `The ${W.tf.label} candles for this trade are no longer available from the data feed.`; return; }
+    msg.hidden = true;
+    TV.series.applyOptions({ priceFormat: { type: 'price', precision: d.dec, minMove: Math.pow(10, -d.dec) } });
+    TV.pv = [x.entry, stop0, x.t1].filter(isFinite);
+    TV.series.setData(data);
+    const line = (price, color, title, style) => TV.lines.push(TV.series.createPriceLine({ price, color, lineWidth: 2, lineStyle: style || LW.LineStyle.Solid, axisLabelVisible: true, title }));
+    line(x.entry, '#2962ff', 'Entry'); line(stop0, DNC, 'Stop'); line(x.t1, UPC, 'Target');
+    if (x.beMoved) line(x.entry, '#8a94a8', 'Stop at entry', LW.LineStyle.Dashed);
+    const snap = (t) => { let best = data[0].time; for (const b of data) { if (b.time <= t + TZ) best = b.time; else break; } return best; };
+    const mk = [];
+    if (x.filled && x.filled !== x.opened) mk.push({ time: snap(x.opened), position: s > 0 ? 'belowBar' : 'aboveBar', color: '#8a94a8', shape: 'circle', text: 'Signal' });
+    mk.push({ time: snap(x.filled || x.opened), position: s > 0 ? 'belowBar' : 'aboveBar', color: '#2962ff', shape: s > 0 ? 'arrowUp' : 'arrowDown', text: x.filled ? `${x.side === 'sell' ? 'Sell' : 'Buy'} ${f(x.entry)}` : 'Order placed' });
+    if (x.closed && ['win', 'loss', 'be'].includes(x.status)) {
+      const px = x.status === 'win' ? x.t1 : x.status === 'be' ? x.entry : stop0;
+      mk.push({ time: snap(x.closed), position: (x.status === 'win') === (s > 0) ? 'aboveBar' : 'belowBar', color: x.status === 'win' ? UPC : x.status === 'loss' ? DNC : '#8a94a8', shape: 'square', text: `${x.status === 'win' ? 'Target' : x.status === 'loss' ? 'Stopped' : 'Break-even'} ${f(px)}` });
+    }
+    TV.series.setMarkers(mk.sort((a, b) => a.time - b.time));
+    TV.chart.timeScale().setVisibleRange({ from: from + TZ, to: to + TZ });
+  }
+  const ST_NAME = { open: 'Open', pending: 'Waiting fill', missed: 'Missed', expired: 'Expired', skipped: 'Skipped' };
+  ['ms-c-trades', 'ms-c-pm'].forEach((cid) => {
+    const el = document.getElementById(cid); if (!el) return;
+    el.addEventListener('click', (ev) => { const r = ev.target.closest('[data-tid]'); if (r) openTrade(r.dataset.tid); });
+    el.addEventListener('keydown', (ev) => { if (ev.key !== 'Enter' && ev.key !== ' ') return; const r = ev.target.closest('[data-tid]'); if (r) { ev.preventDefault(); openTrade(r.dataset.tid); } });
+  });
+  { const dlg = document.getElementById('ms-tv'), bx = document.getElementById('ms-tv-x');
+    if (bx) bx.addEventListener('click', () => dlg.close());
+    if (dlg) dlg.addEventListener('click', (ev) => { if (ev.target === dlg) dlg.close(); }); }
   // Council trades on the market you're viewing, with live result in R
   function councilHere(price) {
     const el = document.getElementById('ms-c-here'); if (!el) return;
