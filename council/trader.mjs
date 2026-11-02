@@ -81,9 +81,12 @@ CFG.buf = Math.min(LIMITS.buf[1], Math.max(LIMITS.buf[0], config.buf));
 CFG.minRisk = Math.min(LIMITS.minRisk[1], Math.max(LIMITS.minRisk[0], config.minRisk));
 // Rules from the trader (the user), applied once and logged. The Coach undoes one only when a backtest shows it clearly losing.
 const USER_RULES = [
-  { id: 'rintra-origin', apply: (c) => { (c.target = c.target || {}).rintra = 't2'; (c.targetBy = c.targetBy || {}).rintra = 'user'; },
-    change: 'rintra: hold to the H1 Origin (user)',
-    why: 'The trader: "From what I\'ve seen in gold there\'s no reason to miss this buy till the H1 origin." The H1 retracement now targets the H1 Origin instead of the 50% line, and its order stays valid until price gets there. The 15:10 backtest agrees: +0.12R per trade (+0.25R on gold), positive in both halves.' },
+  // 2 Nov, 16:00: read as "hold the H1 retracement to the H1 Origin" (the engine's Origin, 4,019.8: the start of the
+  // whole sell-off leg). The trader's marked chart (TP 3,965.08) shows they meant the Origin of the sell-off's last H1
+  // break (3,965-3,975), which the first target (50% line, 3,962.6) already matched, so it is undone below.
+  { id: 'rintra-origin-chart', apply: (c) => { if ((c.targetBy || {}).rintra === 'user') { delete c.target.rintra; delete c.targetBy.rintra; } },
+    change: 'rintra: first target again (user chart)',
+    why: 'The trader\'s marked gold chart (2 Nov): long 3,900.71, stop 3,896.79, take profit 3,965.08 = the bottom of the H1 Origin of the sell-off (the 3,975 break). That is where the H1 retracement\'s first target sits (the 50% line, 3,962.6), not the start of the whole leg (4,019.8) that "hold to the Origin" pointed at. The setup never got to trade it anyway: it signalled at 13:43, after the breakout; the trader was in at 11:45 from the base.' },
 ];
 config.userRules = config.userRules || [];
 for (const u of USER_RULES) if (!config.userRules.includes(u.id)) { u.apply(config); config.userRules.push(u.id); config.history.push({ at: nowISO, by: 'user', change: u.change, why: u.why }); }
