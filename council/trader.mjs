@@ -193,6 +193,39 @@ trades = trades.slice(-3000);
 state.lastRun = now;
 
 // ─── Daily statistical Coach: small, bounded rule changes from the results ───
+// ─── Self-evolution: learn condition filters (D1 / structure / session) from the trades that lose.
+// Runs every 6 hours (the other Coach rules stay daily), so a clearly losing condition is filtered within hours, not a day.
+const exp = (arr) => arr.length ? arr.reduce((a, x) => a + x.R, 0) / arr.length : 0;
+function learnFilters(closedAll, change) {
+  // ─── Self-evolution: learn filters from the conditions that lose, and drop them when shadow trades prove them wrong ───
+  // evidence for condition filters: scored trades plus shadow trades blocked for reasons unrelated to the conditions
+  // (reward:risk, exposure, duplicate, dollar cap…): their outcomes are just as informative about D1/structure/session
+  const learnBy = {};
+  for (const t of closedAll) if (!t.shadow || !(t.blockedBy || []).some((b) => b === 'd1' || b === 'struct' || b === 'session')) (learnBy[t.k] = learnBy[t.k] || []).push(t);
+  for (const [k, arr] of Object.entries(learnBy)) {
+    if (arr.length < 8) continue;
+    const fl = config.filters[k] = config.filters[k] || {};
+    for (const fe of ['d1', 'struct']) {
+      if (fl[fe]) continue;
+      const g = {}; arr.forEach((x) => { const v = x.feat && x.feat[fe]; if (v && v !== 'n/a') (g[v] = g[v] || []).push(x); });
+      const vals = Object.entries(g).map(([v, a]) => ({ v, n: a.length, e: exp(a) }));
+      const bad = vals.find((x) => x.n >= 5 && x.e < -0.2), good = vals.find((x) => x.n >= 3 && x.e > 0.1);
+      if (bad && good) { fl[fe] = good.v; (fl.since = fl.since || {})[fe] = nowISO; change(`${k}: only ${good.v} ${fe === 'd1' ? 'D1' : 'structure'}`, `${bad.v}: ${bad.e.toFixed(2)}R over ${bad.n} trades; ${good.v}: +${good.e.toFixed(2)}R over ${good.n}.`); }
+      else if (bad && bad.n >= 6 && bad.e <= -0.6) {
+        // a condition that keeps losing badly is filtered even before the other side has proven itself; its shadow trades can undo this
+        const other = { against: 'with', internal: 'main' }[bad.v];   // only ever narrows to the trend side / main structure
+        if (other) { fl[fe] = other; (fl.since = fl.since || {})[fe] = nowISO; change(`${k}: only ${other} ${fe === 'd1' ? 'D1' : 'structure'}`, `${bad.v}: ${bad.e.toFixed(2)}R over ${bad.n} trades, too costly to keep taking while ${other} is tested.`); }
+      }
+    }
+    const gs = {}; arr.forEach((x) => { const v = x.feat && x.feat.session; if (v) (gs[v] = gs[v] || []).push(x); });
+    for (const [v, a] of Object.entries(gs)) {
+      if ((fl.noSession || []).includes(v) || a.length < 5 || exp(a) >= -0.2) continue;
+      const rest = arr.filter((x) => !(x.feat && x.feat.session === v));
+      if (rest.length >= 3 && exp(rest) > 0) { fl.noSession = (fl.noSession || []).concat(v); (fl.since = fl.since || {})['session:' + v] = nowISO; change(`${k}: skip the ${v} session`, `${exp(a).toFixed(2)}R over ${a.length} trades there; +${exp(rest).toFixed(2)}R elsewhere.`); }
+    }
+  }
+}
+
 const coach = rd('coach.json', { date: '' });
 const today = nowISO.slice(0, 10);
 if (coach.date !== today) {
@@ -220,34 +253,7 @@ if (coach.date !== today) {
   }
   const low = recent.filter((x) => x.rr < 1.5), ls = stat(low);
   if (ls.n >= 6 && ls.exp < 0 && config.minRR < 1.5) { change(`Minimum reward:risk ${config.minRR} → 1.5`, `Trades under 1.5R returned ${ls.exp}R each over ${ls.n} trades.`); config.minRR = 1.5; }
-  // ─── Self-evolution: learn filters from the conditions that lose, and drop them when shadow trades prove them wrong ───
-  const exp = (arr) => arr.length ? arr.reduce((a, x) => a + x.R, 0) / arr.length : 0;
-  // evidence for condition filters: scored trades plus shadow trades blocked for reasons unrelated to the conditions
-  // (reward:risk, exposure, duplicate, dollar cap…): their outcomes are just as informative about D1/structure/session
-  const learnBy = {};
-  for (const t of closedAll) if (!t.shadow || !(t.blockedBy || []).some((b) => b === 'd1' || b === 'struct' || b === 'session')) (learnBy[t.k] = learnBy[t.k] || []).push(t);
-  for (const [k, arr] of Object.entries(learnBy)) {
-    if (arr.length < 8) continue;
-    const fl = config.filters[k] = config.filters[k] || {};
-    for (const fe of ['d1', 'struct']) {
-      if (fl[fe]) continue;
-      const g = {}; arr.forEach((x) => { const v = x.feat && x.feat[fe]; if (v && v !== 'n/a') (g[v] = g[v] || []).push(x); });
-      const vals = Object.entries(g).map(([v, a]) => ({ v, n: a.length, e: exp(a) }));
-      const bad = vals.find((x) => x.n >= 5 && x.e < -0.2), good = vals.find((x) => x.n >= 3 && x.e > 0.1);
-      if (bad && good) { fl[fe] = good.v; (fl.since = fl.since || {})[fe] = nowISO; change(`${k}: only ${good.v} ${fe === 'd1' ? 'D1' : 'structure'}`, `${bad.v}: ${bad.e.toFixed(2)}R over ${bad.n} trades; ${good.v}: +${good.e.toFixed(2)}R over ${good.n}.`); }
-      else if (bad && bad.n >= 6 && bad.e <= -0.6) {
-        // a condition that keeps losing badly is filtered even before the other side has proven itself; its shadow trades can undo this
-        const other = { against: 'with', internal: 'main' }[bad.v];   // only ever narrows to the trend side / main structure
-        if (other) { fl[fe] = other; (fl.since = fl.since || {})[fe] = nowISO; change(`${k}: only ${other} ${fe === 'd1' ? 'D1' : 'structure'}`, `${bad.v}: ${bad.e.toFixed(2)}R over ${bad.n} trades, too costly to keep taking while ${other} is tested.`); }
-      }
-    }
-    const gs = {}; arr.forEach((x) => { const v = x.feat && x.feat.session; if (v) (gs[v] = gs[v] || []).push(x); });
-    for (const [v, a] of Object.entries(gs)) {
-      if ((fl.noSession || []).includes(v) || a.length < 5 || exp(a) >= -0.2) continue;
-      const rest = arr.filter((x) => !(x.feat && x.feat.session === v));
-      if (rest.length >= 3 && exp(rest) > 0) { fl.noSession = (fl.noSession || []).concat(v); (fl.since = fl.since || {})['session:' + v] = nowISO; change(`${k}: skip the ${v} session`, `${exp(a).toFixed(2)}R over ${a.length} trades there; +${exp(rest).toFixed(2)}R elsewhere.`); }
-    }
-  }
+  learnFilters(closedAll, change);
   // drop a rule when the trades it blocked would have paid (shadow expectancy > +0.2R over 5+), or after 21 days to re-test it
   for (const [k, fl] of Object.entries(config.filters)) {
     for (const fe of ['d1', 'struct']) {
@@ -309,7 +315,21 @@ if (coach.date !== today) {
     const sh = shadows.filter((x) => x.k === k && (x.blockedBy || []).includes('paused'));
     if (sh.length >= 4 && exp(sh) > 0.3) { delete config.paused[k]; change(`Resumed ${k} early`, `Shadow trades while paused made +${exp(sh).toFixed(2)}R over ${sh.length}.`); }
   }
-  wr('coach.json', { date: today, at: nowISO, stats, last14: rs, lessons: lessons(trades, now), notes: notes.length ? notes : ['No change today: not enough evidence to move a rule.'] });
+  wr('coach.json', { date: today, at: nowISO, stats, last14: rs, lessons: lessons(trades, now), fslot: nowISO.slice(0, 11) + String(Math.floor(+nowISO.slice(11, 13) / 6) * 6).padStart(2, '0'), notes: notes.length ? notes : ['No change today: not enough evidence to move a rule.'] });
+}
+// between the daily runs: re-check the condition filters every 6 hours
+const fslot = nowISO.slice(0, 11) + String(Math.floor(+nowISO.slice(11, 13) / 6) * 6).padStart(2, '0');
+{
+  const cj = rd('coach.json', {});
+  if (cj.fslot !== fslot) {
+    const closedAll = trades.filter((x) => (x.status === 'win' || x.status === 'loss' || x.status === 'be') && now - x.closed < 30 * 86400);
+    const added = [];
+    learnFilters(closedAll, (what, why) => { config.history.push({ at: nowISO, by: 'coach-stats', change: what, why }); added.push(`${what}: ${why}`); });
+    for (const [k, fl] of Object.entries(config.filters)) if (!fl.d1 && !fl.struct && !(fl.noSession || []).length) delete config.filters[k];
+    cj.fslot = fslot;
+    if (added.length) cj.notes = (cj.notes || []).filter((n) => !/^No change today/.test(n)).concat(added);
+    wr('coach.json', cj);
+  }
 }
 config.history = config.history.slice(-200);
 
