@@ -1,14 +1,16 @@
 // Council · Backtest: replay past candles through the same engine and rules the Trader uses,
 // so the Coach can judge a setup on hundreds of historical trades instead of waiting days for live ones.
 // Usage: node council/backtest.mjs <dataDir> [days=30]
-// Data: Binance public market data (1m history) for crypto and gold (PAXG); Dukascopy's free candle files
-// for forex (1m per day, 1h per month, 1d per year; council/duka.mjs).
+// Data: Binance public market data (1m history) for crypto and gold (PAXG); for forex Yahoo Finance's chart API
+// (council/yahoo.mjs), with Dukascopy's free candle files as the fallback (council/duka.mjs).
+// Costs: every trade carries its spread in R (one spread per round trip: bid/ask), so results can be judged net.
 // Writes <dataDir>/backtest.json: expectancy by setup, by condition, by reward:risk, by market, for three
 // trade-management variants (no break-even, break-even at +1R, at +1.5R).
 import fs from 'node:fs';
 import path from 'node:path';
 import { msAnalyze, CFG, PAIRS, RETR, buildSetup, buildRetrace, setMarket } from './engine.mjs';
-import { dukaMinutes, dukaHours, dukaDays } from './duka.mjs';
+import { dukaMinutes, dukaHours, dukaDays, dukaReset } from './duka.mjs';
+import { yahooBars } from './yahoo.mjs';
 
 const DIR = process.argv[2] || 'data', DAYS = +(process.argv[3] || 30);
 const FAKE = !!process.env.BT_FAKE;   // offline self-test with a synthetic random walk
@@ -18,11 +20,11 @@ const MARKETS = {
   eth: { label: 'ETH/USD', name: 'Ethereum', group: 'Crypto', sym: 'ETHUSDT', dec: 2 },
   sol: { label: 'SOL/USD', name: 'Solana', group: 'Crypto', sym: 'SOLUSDT', dec: 2 },
   xrp: { label: 'XRP/USD', name: 'XRP', group: 'Crypto', sym: 'XRPUSDT', dec: 4 },
-  eurusd: { label: 'EUR/USD', name: 'Euro', group: 'Forex', duka: 'EURUSD', dec: 5 },
-  gbpusd: { label: 'GBP/USD', name: 'Pound', group: 'Forex', duka: 'GBPUSD', dec: 5 },
-  audusd: { label: 'AUD/USD', name: 'Aussie', group: 'Forex', duka: 'AUDUSD', dec: 5 },
-  usdcad: { label: 'USD/CAD', name: 'Loonie', group: 'Forex', duka: 'USDCAD', dec: 5 },
-  usdchf: { label: 'USD/CHF', name: 'Swissy', group: 'Forex', duka: 'USDCHF', dec: 5 },
+  eurusd: { label: 'EUR/USD', name: 'Euro', group: 'Forex', duka: 'EURUSD', yahoo: 'EURUSD=X', dec: 5 },
+  gbpusd: { label: 'GBP/USD', name: 'Pound', group: 'Forex', duka: 'GBPUSD', yahoo: 'GBPUSD=X', dec: 5 },
+  audusd: { label: 'AUD/USD', name: 'Aussie', group: 'Forex', duka: 'AUDUSD', yahoo: 'AUDUSD=X', dec: 5 },
+  usdcad: { label: 'USD/CAD', name: 'Loonie', group: 'Forex', duka: 'USDCAD', yahoo: 'USDCAD=X', dec: 5 },
+  usdchf: { label: 'USD/CHF', name: 'Swissy', group: 'Forex', duka: 'USDCHF', yahoo: 'USDCHF=X', dec: 5 },
 };
 const TFS = [['1d', '1d', 86400], ['4h', '4h', 14400], ['1h', '1h', 3600], ['30m', '30m', 1800], ['15m', '15m', 900], ['5m', '5m', 300], ['1m', '1m', 60]];
 const SEC = Object.fromEntries(TFS.map(([id, , s]) => [id, s]));
@@ -150,6 +152,8 @@ function sweepSetups(src, price, t) {
   return out;
 }
 
+// typical spread (same model as the trade reviews): one spread is paid per round trip
+const spreadOf = (M, price) => M.group === 'Forex' ? 0.0001 : M.spot ? 0.3 : price * 0.0002;
 const BUILDERS = PAIRS.map((p) => [p, buildSetup]).concat(RETR.map((p) => [p, buildRetrace]));
 const DEFS = PAIRS.concat(RETR);
 const all = [], meta = { errors: {} };
@@ -163,17 +167,32 @@ for (const [key, M] of Object.entries(MARKETS)) {
       const m1 = fakeBars(startT - 760 * 86400, endT, key.length * 7919 + 1);
       for (const [id, , sec] of TFS) data[id] = id === '1m' ? m1.filter((b) => b.time >= startT - WIN * 60) : aggregate(m1, sec);
     } else if (M.duka) {
-      // forex: 1m for the replay plus the 15m window, 1h from the monthly files (+ recent hours from 1m), 1d from the yearly ones
-      const m1 = await dukaMinutes(M.duka, startT - 8 * 86400, endT);
-      if (m1.length < 5000) throw new Error(`only ${m1.length} 1m candles from Dukascopy`);
-      let h1 = await dukaHours(M.duka, startT - 140 * 86400, endT);
-      const lastH = h1.length ? h1.at(-1).time : 0;
-      h1 = h1.concat(aggregate(m1.filter((b) => b.time >= lastH + 3600), 3600));
-      let d1 = await dukaDays(M.duka, startT - 1100 * 86400, endT);
-      const lastD = d1.length ? d1.at(-1).time : 0;
-      d1 = d1.concat(aggregate(h1.filter((b) => b.time >= lastD + 86400), 86400));
-      Object.assign(data, { '1m': m1, '5m': aggregate(m1, 300), '15m': aggregate(m1, 900), '30m': aggregate(m1, 1800), '1h': h1, '4h': aggregate(h1, 14400), '1d': d1 });
-      console.log(`${key}: ${m1.length} 1m, ${h1.length} 1h, ${d1.length} 1d candles from Dukascopy`);
+      // forex: every timeframe straight from Yahoo (1m only reaches back ~29.5 days, so the replay starts once
+      // 720 1m candles exist); if Yahoo fails, Dukascopy's files: 1m (5m/15m/30m built from it), 1h monthly, 1d yearly
+      try {
+        const y = async (iv, back) => yahooBars(M.yahoo, iv, back, endT);
+        const m1 = await y('1m', startT - WIN * 60);
+        if (m1.length < 5000) throw new Error(`only ${m1.length} 1m candles`);
+        const h1 = await y('60m', startT - (WIN + 2) * 3600);
+        Object.assign(data, { '1m': m1, '5m': await y('5m', startT - (WIN + 2) * 300), '15m': await y('15m', startT - (WIN + 2) * 900), '30m': await y('30m', startT - (WIN + 2) * 1800),
+          '1h': h1, '4h': aggregate(h1, 14400), '1d': await y('1d', startT - 1100 * 86400) });
+        meta.source = Object.assign(meta.source || {}, { [key]: 'Yahoo' });
+        console.log(`${key}: ${m1.length} 1m, ${h1.length} 1h, ${data['1d'].length} 1d candles from Yahoo`);
+      } catch (ye) {
+        console.log(`${key}: Yahoo failed (${ye.message}); trying Dukascopy`);
+        dukaReset();
+        const m1 = await dukaMinutes(M.duka, startT - 8 * 86400, endT);
+        if (m1.length < 5000) throw new Error(`Yahoo: ${ye.message}; Dukascopy: only ${m1.length} 1m candles`);
+        let h1 = await dukaHours(M.duka, startT - 140 * 86400, endT);
+        const lastH = h1.length ? h1.at(-1).time : 0;
+        h1 = h1.concat(aggregate(m1.filter((b) => b.time >= lastH + 3600), 3600));
+        let d1 = await dukaDays(M.duka, startT - 1100 * 86400, endT);
+        const lastD = d1.length ? d1.at(-1).time : 0;
+        d1 = d1.concat(aggregate(h1.filter((b) => b.time >= lastD + 86400), 86400));
+        Object.assign(data, { '1m': m1, '5m': aggregate(m1, 300), '15m': aggregate(m1, 900), '30m': aggregate(m1, 1800), '1h': h1, '4h': aggregate(h1, 14400), '1d': d1 });
+        meta.source = Object.assign(meta.source || {}, { [key]: 'Dukascopy' });
+        console.log(`${key}: ${m1.length} 1m, ${h1.length} 1h, ${d1.length} 1d candles from Dukascopy`);
+      }
     } else {
       for (const [id, iv, sec] of TFS) data[id] = await klines(M.sym, iv, startT - (WIN + 2) * sec, endT);
     }
@@ -237,7 +256,7 @@ for (const [key, M] of Object.entries(MARKETS)) {
           if (!(r > 0) || (st.sell ? price >= st.stop : price <= st.stop) || rw <= 0) continue;
           tr.entry = price; tr.rr = rw / r; tr.status = 'open'; tr.filled = t;
         }
-        tr.r0 = Math.abs(tr.entry - tr.stop);
+        tr.r0 = Math.abs(tr.entry - tr.stop); tr.cost = tr.r0 > 0 ? spreadOf(M, tr.entry) / tr.r0 : 0;
         if (!(tr.r0 > 0)) continue;
         tr.v = VARIANTS.map(([n, be, t2]) => ({ n, be, t2, stop: tr.stop, beMoved: false, done: false, R: null }));
         open.push(tr);
@@ -248,7 +267,7 @@ for (const [key, M] of Object.entries(MARKETS)) {
         if (open.some((x) => x.k === sw.k && x.side === side)) continue;   // one sweep trade per side at a time
         const tr = { m: key, k: sw.k, h: '1h', side, entry: sw.entry, stop: sw.stop, t1: sw.t1, rr: sw.rr, opened: t, filled: t, status: 'open', mfe: 0,
           feat: { d1: src['1d'].A.trend === (sw.sell ? -1 : 1) ? 'with' : 'against', struct: 'n/a', session: sessionOf(t) } };
-        tr.r0 = Math.abs(tr.entry - tr.stop);
+        tr.r0 = Math.abs(tr.entry - tr.stop); tr.cost = tr.r0 > 0 ? spreadOf(M, tr.entry) / tr.r0 : 0;
         tr.v = VARIANTS.map(([n, be, t2]) => ({ n, be, t2, stop: tr.stop, beMoved: false, done: false, R: null }));
         open.push(tr);
       }
@@ -273,8 +292,8 @@ const out = {
   byMarket: group(all, (x) => x.m),
   byRR: group(all, rrBand),
   bySetupCond: Object.fromEntries(setups.map((k) => { const a = all.filter((x) => x.k === k); return [k, { d1: group(a, (x) => x.feat.d1), struct: group(a, (x) => x.feat.struct), session: group(a, (x) => x.feat.session), rr: group(a, rrBand) }]; })),
-  trades: all.map((x) => [x.m, x.k, x.side, x.opened, x.filled, +x.rr.toFixed(2), x.feat.d1, x.feat.struct, x.feat.session, ...x.v.map((v) => v.R == null ? null : +v.R.toFixed(2)), +x.mfe.toFixed(2)]),
-  tradeCols: ['market', 'setup', 'side', 'opened', 'filled', 'rr', 'd1', 'struct', 'session', 'R_none', 'R_be1', 'R_be15', 'R_tp2', 'mfe'],
+  trades: all.map((x) => [x.m, x.k, x.side, x.opened, x.filled, +x.rr.toFixed(2), x.feat.d1, x.feat.struct, x.feat.session, ...x.v.map((v) => v.R == null ? null : +v.R.toFixed(2)), +x.mfe.toFixed(2), +x.cost.toFixed(3)]),
+  tradeCols: ['market', 'setup', 'side', 'opened', 'filled', 'rr', 'd1', 'struct', 'session', 'R_none', 'R_be1', 'R_be15', 'R_tp2', 'mfe', 'cost'],
 };
 fs.writeFileSync(path.join(DIR, 'backtest.json'), JSON.stringify(out));
 console.log(`\n${all.length} trades over ${DAYS} days (${((Date.now() - t0wall) / 1000).toFixed(0)}s)`);
