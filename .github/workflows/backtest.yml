@@ -16,7 +16,7 @@ permissions:
   contents: write
 
 concurrency:
-  group: council-research-pf
+  group: council-research-parts
   cancel-in-progress: false
 
 jobs:
@@ -56,10 +56,21 @@ jobs:
         env:
           DUKA_CACHE: .duka-cache
           BT_MARKETS: ${{ matrix.market }}
-          KRAKEN_BUDGET: '4000'
+          KRAKEN_BUDGET: '400'
         run: |
           mkdir -p bt && cp data/config.json bt/
           node council/backtest.mjs bt "${{ github.event.inputs.days || '150' }}" 2>&1 | tail -60
+
+      - name: Save this market's part to council-data
+        run: |
+          DAYS="${{ github.event.inputs.days || '150' }}"
+          mkdir -p data/research/parts
+          cp bt/backtest.json "data/research/parts/${DAYS}d-pf-${{ matrix.market }}.json"
+          git -C data config user.name "mosha-council"
+          git -C data config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git -C data add research/parts
+          git -C data commit -q -m "Research backtest part ${{ matrix.market }} ${DAYS}d" || exit 0
+          for j in 1 2 3 4 5 6 7 8; do git -C data pull -q --rebase origin council-data && git -C data push -q origin HEAD:council-data && break; sleep $((j * 5)); done
 
       - uses: actions/upload-artifact@v4
         with:
