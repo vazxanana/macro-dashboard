@@ -119,12 +119,14 @@ function sweepSetups(src, price, t, why, spr = 0) {
         const P = hi(B[p]);
         let clean = true; for (let j = p + 1; j < s; j++) if (hi(B[j]) > P) { clean = false; break; }   // the first run above it is the sweep
         if (!clean) break;
-        if (hi(B[s]) > P && cl(B[s]) < P) { sweep = { s, p, P, time: B[s].time }; }
+        // the sweep: this candle trades beyond the swing and it, or one of the next two closed candles, closes back
+        // inside (a 30-90 minute deviation still takes the liquidity; the 2 Nov low at 3,891 needed it)
+        if (hi(B[s]) > P) { let r = -1; for (let j = s; j <= Math.min(s + 2, n - 2); j++) if (cl(B[j]) < P) { r = j; break; } if (r >= 0) sweep = { s, r, p, P, time: B[s].time }; }
         break;
       }
     }
     if (!sweep) { note('no M30 sweep in the last 6 h'); continue; }
-    let failed = false, ext = -Infinity; for (let j = sweep.s; j < n; j++) { ext = Math.max(ext, hi(B[j])); if (j > sweep.s && cl(B[j]) > sweep.P) failed = true; }
+    let failed = false, ext = -Infinity; for (let j = sweep.s; j < n; j++) { ext = Math.max(ext, hi(B[j])); if (j > sweep.r && cl(B[j]) > sweep.P) failed = true; }
     const lvl = sell ? sweep.P : -sweep.P;
     if (failed) { note('an M30 candle closed beyond the swept level', { level: lvl }); continue; }
     if (sell ? price >= sweep.P : price <= -sweep.P) { note('price back beyond the swept level', { level: lvl }); continue; }
@@ -142,6 +144,10 @@ function sweepSetups(src, price, t, why, spr = 0) {
       const edge = sell ? e.top : e.bot;
       if (sell ? edge < price : edge > price) if (t1 === null || (sell ? edge > t1 : edge < t1)) t1 = edge;
     }
+    // H1 Origins beyond price, nearest first: sweep_h1 takes the first one worth 1.2R with the tight stop (the trader's
+    // long of 2 Nov went past the spent M30/H1 supply 1.3 points above the entry to the H1 Origin of the sell-off)
+    const h1Edges = src['1h'].A.events.filter((e) => e.dir === (sell ? 1 : -1) && e.endIdx === null).map((e) => sell ? e.top : e.bot)
+      .filter((edge) => sell ? edge < price : edge > price).sort((a, b) => (a - b) * -sg);
     if (t1 === null) {   // no valid Origin there: the other side of the M30 range before the sweep (~30 h; its liquidity)
       let lo = Infinity; for (let j = Math.max(0, n - 60); j <= sweep.s; j++) lo = Math.min(lo, sell ? B[j].low : -B[j].high);
       const edge = sell ? lo : -lo; if (sell ? edge < price : edge > price) t1 = edge;
@@ -153,14 +159,16 @@ function sweepSetups(src, price, t, why, spr = 0) {
     const b1 = 0.1 * atr(B1), floor = Math.max(CFG.minRisk * atr(B1), 5 * spr);   // the engine's minimum stop
     let m1s = sell ? e1.top + b1 : e1.bot - b1; if ((m1s - price) * sg < floor) m1s = price + sg * floor;
     const stops = { sweep_vr: sell ? e5.top + buf : e5.bot - buf, sweep_ext: sell ? sweepExt + buf : sweepExt - buf, sweep_m1: m1s };
-    const rrs = {};
-    for (const [k, stop] of Object.entries(stops)) {
-      const r = (stop - price) * sg, rr = (price - t1) * sg / r;
+    const rM1 = (m1s - price) * sg, tH1 = rM1 > 0 ? h1Edges.find((edge) => (price - edge) * sg / rM1 >= 1.2) ?? null : null;
+    const rrs = {}, plans = Object.entries(stops).map(([k, stop]) => [k, stop, t1]);
+    if (tH1 !== null) plans.push(['sweep_h1', m1s, tH1]);   // the M1-origin stop, held to that H1 Origin
+    for (const [k, stop, tg] of plans) {
+      const r = (stop - price) * sg, rr = (price - tg) * sg / r;
       rrs[k] = +rr.toFixed(2);
       if (!(r > 0) || !(rr >= 1.2)) continue;
-      out.push({ k, sell, entry: price, stop, t1, rr, sig: `${k}|${sell ? 's' : 'b'}|${B1[e1.breakIdx].time}|${sweep.time}` });
+      out.push({ k, sell, entry: price, stop, t1: tg, rr, sig: `${k}|${sell ? 's' : 'b'}|${B1[e1.breakIdx].time}|${sweep.time}` });
     }
-    note(out.some((x) => x.sell === sell) ? 'signal' : 'reward:risk under 1.2', { level: lvl, target: +t1.toFixed(5), rr: rrs });
+    note(out.some((x) => x.sell === sell) ? 'signal' : 'reward:risk under 1.2', { level: lvl, target: +t1.toFixed(5), targetH1: tH1 === null ? null : +tH1.toFixed(5), rr: rrs });
   }
   return out;
 }
