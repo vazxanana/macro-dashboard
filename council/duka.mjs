@@ -30,15 +30,30 @@ export function decodeBi5(buf, base, point = 1e5) {
   return rows.filter((r) => r[5] > 0).map((r) => { const [o, h, l, c] = f(r); return { time: base + r[0], open: o / point, high: h / point, low: l / point, close: c / point }; });
 }
 
+const UA = 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36';
+let firstErr = true;
+// one file: Node fetch first; on a network error (resets, IPv6, TLS) fall back to curl, which retries on its own
 async function get(url) {
-  for (let a = 0; a < 4; a++) {
+  for (let a = 0; a < 3; a++) {
     try {
-      const r = await fetch(url);
+      const r = await fetch(url, { headers: { 'User-Agent': UA, Accept: '*/*' } });
       if (r.status === 404) return null;
       if (!r.ok) throw new Error(`HTTP ${r.status}`);
       return Buffer.from(await r.arrayBuffer());
-    } catch (e) { if (a === 3) throw new Error(`${url}: ${e.message || e}`); await sleep(800 * (a + 1)); }
+    } catch (e) {
+      if (firstErr) { firstErr = false; console.log(`dukascopy fetch error: ${e.message}${e.cause ? ` (${e.cause.code || ''} ${e.cause.message || e.cause})` : ''}`); }
+      if (/^HTTP 4/.test(e.message)) return null;
+      await sleep(700 * (a + 1));
+    }
   }
+  const tmp = path.join(os.tmpdir(), `duka-${process.pid}-${Math.random().toString(36).slice(2)}`);
+  try {
+    const code = execFileSync('curl', ['-sS', '-A', UA, '--retry', '4', '--retry-delay', '2', '--retry-all-errors', '-o', tmp, '-w', '%{http_code}', url], { encoding: 'utf8' }).trim();
+    if (code === '404') return null;
+    if (code !== '200') throw new Error(`HTTP ${code}`);
+    return fs.readFileSync(tmp);
+  } catch (e) { throw new Error(`${url}: ${String(e.message || e).split('\n')[0]}`); }
+  finally { try { fs.unlinkSync(tmp); } catch (e) {} }
 }
 
 // 1m candles for [from, to), one file per UTC day, a few days in parallel
@@ -46,12 +61,13 @@ export async function dukaMinutes(sym, from, to, point = 1e5) {
   const days = [];
   for (let d = Math.floor(from / 86400) * 86400; d < to; d += 86400) days.push(d);
   const out = [];
-  for (let i = 0; i < days.length; i += 6) {
-    const part = await Promise.all(days.slice(i, i + 6).map(async (d) => {
+  for (let i = 0; i < days.length; i += 2) {
+    const part = await Promise.all(days.slice(i, i + 2).map(async (d) => {
       const t = new Date(d * 1000), buf = await get(`${HOST}/${sym}/${t.getUTCFullYear()}/${p2(t.getUTCMonth())}/${p2(t.getUTCDate())}/BID_candles_min_1.bi5`);
       return buf ? decodeBi5(buf, d, point) : [];
     }));
     for (const arr of part) out.push(...arr);
+    await sleep(250);
   }
   return out.filter((b) => b.time >= from && b.time < to).sort((a, b) => a.time - b.time);
 }
