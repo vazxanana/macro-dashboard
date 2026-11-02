@@ -33,9 +33,27 @@ export function decodeBi5(buf, base, point = 1e5) {
 const UA = 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36';
 let firstErr = true, failsInRow = 0;
 // one file: Node fetch first; on a network error (resets, IPv6, TLS) fall back to curl, which retries on its own
+// Finished files never change: keep them in DUKA_CACHE (an Actions cache) so each run only downloads new days.
+// Files for the current day, month or year are still growing and are never cached.
+const CACHE = process.env.DUKA_CACHE || '';
+function cacheable(url) {
+  const m = url.match(/\/(\d{4})(?:\/(\d{2}))?(?:\/(\d{2}))?\/BID_candles_/); if (!m) return false;
+  const now = new Date(), y = +m[1], mo = m[2] != null ? +m[2] : null, d = m[3] != null ? +m[3] : null;
+  if (d != null) return Date.UTC(y, mo, d + 1) <= now.getTime() - 3600e3;
+  if (mo != null) return Date.UTC(y, mo + 1, 1) <= now.getTime() - 3600e3;
+  return Date.UTC(y + 1, 0, 1) <= now.getTime() - 3600e3;
+}
+async function get(url) {
+  const key = CACHE && cacheable(url) ? path.join(CACHE, url.replace(/^https?:\/\/[^/]+\/datafeed\//, '').replace(/\//g, '_')) : null;
+  if (key && fs.existsSync(key)) { const b = fs.readFileSync(key); return b.length ? b : null; }
+  const buf = await download(url);
+  if (key) { fs.mkdirSync(CACHE, { recursive: true }); fs.writeFileSync(key, buf || Buffer.alloc(0)); }
+  return buf;
+}
+
 // Dukascopy throttles with HTTP 503 when files come too fast: wait and retry those (they are "slow down", not
 // "unreachable"). Connection failures fall back to curl; after 3 files in a row fail that way, give up for the run.
-async function get(url) {
+async function download(url) {
   if (failsInRow >= 3) throw new Error('Dukascopy unreachable from this runner (3 files in a row failed to connect)');
   for (let a = 0; a < 6; a++) {
     let r;
