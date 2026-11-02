@@ -2399,7 +2399,7 @@ function msNextSetup(bars, A) {
     const paused = Object.entries(cf.paused || {});
     set('ms-c-rules', `<span class="ms-q">Stop buffer ${cf.buf} × ATR</span><span class="ms-q">Min stop ${cf.minRisk || 0.6} × ATR</span><span class="ms-q">${cf.be ? `Break-even at +${cf.be}R` : 'No break-even move'}</span><span class="ms-q">Min reward:risk ${cf.minRR}</span><span class="ms-q">Dollar cap ${cf.maxUsd || 3} trades</span>${cf.newsGuard ? '<span class="ms-q">News guard on</span>' : ''}` + (paused.length ? paused.map(([k, u]) => `<span class="ms-q weak">${esc(k)} paused to ${esc(u.slice(0, 10))}</span>`).join('') : '<span class="ms-q good">All setups active</span>') +
       Object.entries(cf.pausedMarkets || {}).map(([m, u]) => `<span class="ms-q weak">${esc((INSTRUMENTS[m] || {}).label || m)} paused to ${esc(String(u).slice(0, 10))}</span>`).join('') +
-      Object.entries(cf.filters || {}).map(([k, f]) => [f.d1 ? `${k}: only ${f.d1} D1` : '', f.struct ? `${k}: only ${f.struct} structure` : '', (f.noSession || []).length ? `${k}: skip ${f.noSession.join(', ')}` : ''].filter(Boolean).map((t) => `<span class="ms-q">Learned · ${esc(t)}</span>`).join('')).join(''));
+      Object.entries(cf.filters || {}).map(([k, f]) => [f.d1 ? `${k}: only ${f.d1} D1` : '', f.cf ? `${k}: only ${f.cf === 'choch' ? 'CHoCH' : 'continuation BO'} confirmations` : '', f.choch ? `${k}: ${f.choch === 'yes' ? 'needs' : 'skips on'} a fresh M15/M5 CHoCH` : '', f.struct ? `${k}: only ${f.struct} structure` : '', (f.noSession || []).length ? `${k}: skip ${f.noSession.join(', ')}` : ''].filter(Boolean).map((t) => `<span class="ms-q">Learned · ${esc(t)}</span>`).join('')).join(''));
     const sh = (C.trades || []).filter((x) => x.shadow && (x.status === 'win' || x.status === 'loss')), shR = sh.reduce((a, x) => a + x.R, 0);
     set('ms-c-shadow-sum', sh.length ? `Shadow trades (blocked by rules) closed: ${sh.length}, ${shR >= 0 ? '+' : ''}${shR.toFixed(1)}R. ${shR > 0 ? 'Blocked trades are winning: the Coach will loosen the rule that blocks them.' : 'The rules are keeping you out of losing trades.'}` : 'Blocked setups are followed as shadow trades so the Coach can check every rule it adds.');
     set('ms-c-notes', C.coach ? (C.coach.notes || []).map((n) => `<li>${esc(n)}</li>`).join('') : '<li>The statistical Coach runs once a day with the Trader.</li>');
@@ -2507,7 +2507,7 @@ function msNextSetup(bars, A) {
     set('ms-c-bt', keys.map((k) => {
       const a = T.filter((t) => t.setup === k), s = btStat(a), lo = s.e - 1.96 * s.se, hi = s.e + 1.96 * s.se, d = defs.find((p) => p.k === k);
       const fl = (cf.filters || {})[k] || {}, pz = (cf.paused || {})[k];
-      const now = !d ? '<span class="c-bt-st res">Research only</span>' : pz ? `<span class="c-bt-st off">Paused to ${esc(String(pz).slice(5, 10))}</span>` : `<span class="c-bt-st on">Trading${fl.d1 ? ` · only ${esc(fl.d1)} D1` : ''}</span>`;
+      const now = !d ? '<span class="c-bt-st res">Research only</span>' : pz ? `<span class="c-bt-st off">Paused to ${esc(String(pz).slice(5, 10))}</span>` : `<span class="c-bt-st on">Trading${fl.d1 ? ` · only ${esc(fl.d1)} D1` : ''}${fl.cf ? ` · only ${fl.cf === 'choch' ? 'CHoCH' : 'BO'} CF` : ''}${fl.choch ? ` · ${fl.choch === 'yes' ? 'needs' : 'no'} M15/M5 CHoCH` : ''}</span>`;
       return `<tr><td>${d ? `${esc(d.name)} <small>${LBL[d.h]} → ${LBL[d.l]}</small>` : (BT_NAME[k] || esc(k))}</td><td class="n">${s.n}</td><td class="n bt-w">${Math.round(s.w * 100)}%</td><td class="n"><span class="c-bt-r ${cls(s)}">${f2(s.e)}</span>${isFinite(lo) ? ` <small class="c-bt-r c-bt-ci">(${f2(lo)} to ${f2(hi)})</small>` : ''}</td><td class="n bt-d">${cell(btStat(a.filter((t) => t.d1 === 'with')))}</td><td class="n bt-d">${cell(btStat(a.filter((t) => t.d1 === 'against')))}</td><td>${now}</td></tr>`;
     }).join(''));
     const diff = (k1, k2) => btStat(T.map((t) => ({ market: t.market, opened: t.opened, d: t[k1] != null && t[k2] != null ? t[k1] - t[k2] : null })), 'd');
@@ -2519,7 +2519,7 @@ function msNextSetup(bars, A) {
     // entry style: entering at market at the signal versus waiting for the pullback, signal by signal (a missed order is 0R)
     if (TA.some((t) => String(t.setup).endsWith('@mkt'))) {
       const parts = keys.filter((k) => defs.some((p) => p.k === k)).map((k) => {
-        const fl = (cf.filters || {})[k] || {}, lim = new Map(TA.filter((t) => t.setup === k && (!fl.d1 || t.d1 === fl.d1)).map((t) => [`${t.market}|${t.opened}`, t]));
+        const fl = (cf.filters || {})[k] || {}, lim = new Map(TA.filter((t) => t.setup === k && ['d1', 'cf', 'choch'].every((x) => !fl[x] || t[x] === fl[x])).map((t) => [`${t.market}|${t.opened}`, t]));
         const pr = TA.filter((t) => t.setup === `${k}@mkt` && lim.has(`${t.market}|${t.opened}`)).map((t) => ({ market: t.market, opened: t.opened, d: t.R_none - lim.get(`${t.market}|${t.opened}`).R_none }));
         if (pr.length < 30) return '';
         const s = btStat(pr, 'd'), d = defs.find((p) => p.k === k), on = (cf.entry || {})[k] === 'market';
