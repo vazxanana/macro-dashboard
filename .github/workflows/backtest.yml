@@ -1,37 +1,30 @@
 name: Council backtest
 
-# Replays the last weeks of real candles through the Trader's engine and rules (council/backtest.mjs)
-# and saves the results to council-data/backtest.json, where the Coach and the page read them.
+# RESEARCH BRANCH ONLY (council-research, never merged). Started by hand with workflow_dispatch on this branch.
+# Replays a long period (default 150 days) one market per job, then merges the trades into
+# council-data/research/backtest-<days>d.json. It never writes backtest.json, so the Coach's live rules are untouched.
 on:
   workflow_dispatch:
     inputs:
       days:
         description: 'Days of history to replay'
-        default: '30'
-  push:
-    branches: [main]
-    paths:
-      - 'council/backtest.mjs'
-      - 'council/engine.mjs'
-      - 'council/duka.mjs'
-      - 'council/yahoo.mjs'
-      - 'council/krakenhist.mjs'
-      - 'council/choch.mjs'
-      - '.github/workflows/backtest.yml'
-  schedule:
-    - cron: '17 3 * * *'
+        default: '150'
 
 permissions:
   contents: write
 
 concurrency:
-  group: council-backtest
-  cancel-in-progress: true
+  group: council-research
+  cancel-in-progress: false
 
 jobs:
   backtest:
     runs-on: ubuntu-latest
-    timeout-minutes: 90
+    timeout-minutes: 340
+    strategy:
+      fail-fast: false
+      matrix:
+        market: [xau, btc, eth, sol, xrp, eurusd, gbpusd, audusd, usdcad, usdchf]
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -52,18 +45,65 @@ jobs:
         uses: actions/cache@v4
         with:
           path: .duka-cache
-          key: duka-${{ github.run_id }}
-          restore-keys: duka-
+          key: duka-research-${{ matrix.market }}-${{ github.run_id }}
+          restore-keys: |
+            duka-research-${{ matrix.market }}-
+            duka-
 
-      - name: Backtest
+      - name: Backtest ${{ matrix.market }}
         env:
           DUKA_CACHE: .duka-cache
-        run: node council/backtest.mjs data "${{ github.event.inputs.days || '30' }}"
-
-      - name: Save results
+          BT_MARKETS: ${{ matrix.market }}
+          KRAKEN_BUDGET: '4000'
         run: |
+          mkdir -p bt && cp data/config.json bt/
+          node council/backtest.mjs bt "${{ github.event.inputs.days || '150' }}" 2>&1 | tail -60
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: bt-${{ matrix.market }}
+          path: bt/backtest.json
+          retention-days: 7
+
+  merge:
+    needs: backtest
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout council data
+        uses: actions/checkout@v4
+        with:
+          ref: council-data
+          path: data
+
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: bt-*
+          path: parts
+
+      - name: Merge and save
+        run: |
+          DAYS="${{ github.event.inputs.days || '150' }}"
+          mkdir -p data/research
+          node -e '
+            const fs = require("fs"), days = process.argv[1];
+            const out = { at: null, days: +days, from: null, to: null, fake: false, cfg: null, tradeCols: null, markets: {}, coverage: {}, source: {}, errors: {}, trades: [] };
+            for (const d of fs.readdirSync("parts").sort()) {
+              const b = JSON.parse(fs.readFileSync(`parts/${d}/backtest.json`, "utf8")), m = d.replace(/^bt-/, "");
+              if (!out.tradeCols) out.tradeCols = b.tradeCols;
+              if (JSON.stringify(out.tradeCols) !== JSON.stringify(b.tradeCols)) throw new Error(`columns differ for ${m}`);
+              Object.assign(out, { at: b.at, from: b.from, to: b.to, cfg: b.cfg });
+              out.markets[m] = b.markets[m] || null;
+              Object.assign(out.coverage, (b.markets || {}).coverage || {});
+              Object.assign(out.source, (b.markets || {}).source || {});
+              Object.assign(out.errors, (b.markets || {}).errors || {});
+              out.trades.push(...b.trades);
+            }
+            fs.writeFileSync(`data/research/backtest-${days}d.json`, JSON.stringify(out));
+            console.log(`${out.trades.length} rows from ${Object.keys(out.markets).length} markets`, out.coverage, out.errors);
+          ' "$DAYS"
           git -C data config user.name "mosha-council"
           git -C data config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git -C data add backtest.json
-          git -C data commit -q -m "Council backtest $(date -u +%Y-%m-%dT%H:%MZ)" || exit 0
+          git -C data add research
+          git -C data commit -q -m "Research backtest ${DAYS}d $(date -u +%Y-%m-%dT%H:%MZ)" || exit 0
           for j in 1 2 3 4 5; do git -C data pull -q --rebase origin council-data && git -C data push -q origin HEAD:council-data && break; sleep 7; done
