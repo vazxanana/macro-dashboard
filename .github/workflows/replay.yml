@@ -41,4 +41,4 @@ jobs:
           DAY: ${{ github.event.inputs.day }}
           FROM: ${{ github.event.inputs.from }}
           TO: ${{ github.event.inputs.to }}
-        run: node council/replay.mjs "${MARKET:-xau}" "${DAY:-2026-11-02}" "${FROM:-05:00}" "${TO:-14:30}"
+        run: node council/probe.mjs; node council/replay.mjs "${MARKET:-xau}" "${DAY:-2026-11-02}" "${FROM:-05:00}" "${TO:-14:30}"
