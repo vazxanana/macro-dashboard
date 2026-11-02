@@ -55,14 +55,38 @@ function chochW(B, w, L) {
   return { leg: true, iS, iE, iP, lvl, iC, iB, iC2, low: B[iE].low };
 }
 
+// Pyth's TradingView feed: the trader's own chart ("Gold Spot / U.S. Dollar · Pyth"); free, no key. Paged by range.
+const PYTH = { xau: 'Metal.XAU/USD', eurusd: 'FX.EUR/USD', gbpusd: 'FX.GBP/USD' }, PRES = { '1m': ['1', 86400], '5m': ['5', 5 * 86400], '15m': ['15', 15 * 86400], '30m': ['30', 30 * 86400], '1h': ['60', 60 * 86400], '4h': ['240', 240 * 86400], '1d': ['1D', 3 * 365 * 86400] };
+async function pythBars(sym, id, from, to) {
+  const [res, span] = PRES[id], seen = new Map();
+  for (let a = from; a < to; a += span) {
+    const b = Math.min(to, a + span), url = `https://benchmarks.pyth.network/v1/shims/tradingview/history?symbol=${encodeURIComponent(sym)}&resolution=${res}&from=${a}&to=${b}`;
+    let j = null;
+    for (let k = 0; k < 4 && !j; k++) { try { const r = await fetch(url); if (!r.ok) throw new Error(`HTTP ${r.status}`); j = await r.json(); } catch (e) { if (k === 3) throw new Error(`Pyth ${sym} ${res}: ${e.message}`); await sleep(1000 * (k + 1)); } }
+    if (j.s === 'ok') for (let i = 0; i < j.t.length; i++) seen.set(j.t[i], { time: j.t[i], open: +j.o[i], high: +j.h[i], low: +j.l[i], close: +j.c[i] });
+    else if (j.s !== 'no_data') throw new Error(`Pyth ${sym} ${res}: ${JSON.stringify(j).slice(0, 120)}`);
+    await sleep(250);
+  }
+  return [...seen.values()].sort((x, y) => x.time - y.time);
+}
 const data = {};
-for (const [id, sec] of TFS) {
+let source = 'binance';
+if (PYTH[market] && process.env.SOURCE !== 'binance') {
+  try {
+    for (const [id, sec] of TFS) { data[id] = await pythBars(PYTH[market], id, t0 - (WIN + 2) * sec - (id === '1m' ? 3 * 86400 : 0), t1 + 6 * 3600); console.log(`Pyth ${id}: ${data[id].length} candles`); }
+    source = 'pyth';
+  } catch (e) { console.log(`Pyth failed (${e.message}); Binance instead`); }
+}
+if (source === 'binance') for (const [id, sec] of TFS) {
   data[id] = await klines(MK.sym, id, t0 - (WIN + 2) * sec - (id === '1m' ? 3 * 86400 : 0), t1 + 6 * 3600);
   console.log(`${id}: ${data[id].length} candles`);
 }
 // shift onto the trader's spot chart with the reference M30 candle
 let off = 0;
-if (ref) {
+if (ref && source === 'pyth') {
+  const c = data['30m'].find((b) => b.time === T(ref.m30.time));
+  console.log(`Pyth ${ref.m30.time} M30: O ${f(c && c.open)} H ${f(c && c.high)} L ${f(c && c.low)} vs the trader's chart O ${ref.m30.open} H ${ref.m30.high} L ${ref.m30.low} (no shift: the same feed)`);
+} else if (ref) {
   const c = data['30m'].find((b) => b.time === T(ref.m30.time));
   if (c) off = ((c.open - ref.m30.open) + (c.high - ref.m30.high) + (c.low - ref.m30.low)) / 3;
   console.log(`PAXG -> spot: ${ref.m30.time} M30 PAXG O ${f(c && c.open)} H ${f(c && c.high)} L ${f(c && c.low)} vs spot O ${ref.m30.open} H ${ref.m30.high} L ${ref.m30.low}: shift ${off.toFixed(2)}`);
