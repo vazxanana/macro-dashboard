@@ -283,26 +283,32 @@ function sweepSetups(src, price, t, why, spr = 0) {
 // until a later candle trades through its far side. fvgIn = an unfilled gap the trade's way, made in the last `look` closed
 // candles, contains the price `lvl`; fvgSince = a gap the trade's way was made after time `since` (displacement after the CF).
 // Bad prints: thin feeds (Kraken FX trades, stitched Yahoo/Dukascopy) carry the odd off-market tick that makes a 1,000-pip
-// candle and a fake 160R trade. A wick longer than K times the median candle range of the last 100 candles is clipped to the
-// body plus one median range; a candle whose body jumps K ranges away and comes straight back is flattened to the prior close.
-const BAD_K = 50;   // a real news candle (NFP ≈ 30–50 median 1m ranges) is mostly body, so it is not touched
-function cleanBars(arr) {
-  let fixed = 0; const win = [];
+// candle and a fake 160R trade. A wick longer than 50 times the median candle range of the last 100 candles is clipped to the
+// body plus one median range; a candle whose body jumps 50 ranges away and comes straight back is flattened to the prior close.
+// Forex and gold (opts.wickK = 15) also clip a lone wick past 15 ranges that the next 3 candles never trade back into: on
+// 3 Nov 10:12 one Kraken order spiked AUD/USD 35 pips for a minute (Yahoo saw nothing) and hit five stops. News spikes get revisited.
+function cleanBars(arr, o = {}) {
+  const K = o.k || 50, WK = o.wickK || 0, RV = o.revisit || 3;
+  let fixed = 0; const win = [], log = [];
   for (let i = 0; i < arr.length; i++) {
     const b = arr[i];
     const med = win.length >= 20 ? [...win].sort((x, y) => x - y)[win.length >> 1] : 0;
     if (med > 0) {
-      const lim = BAD_K * med, p = arr[i - 1], n = arr[i + 1];
+      const lim = K * med, p = arr[i - 1], n = arr[i + 1];
       if (p && n && Math.abs(b.close - p.close) > lim && Math.abs(n.open - p.close) < lim / 2) {
-        Object.assign(b, { open: p.close, high: p.close, low: p.close, close: p.close }); fixed++;
+        Object.assign(b, { open: p.close, high: p.close, low: p.close, close: p.close }); fixed++; log.push([b.time, 'body']);
       }
       const top = Math.max(b.open, b.close), bot = Math.min(b.open, b.close);
-      if (b.high - top > lim) { b.high = top + med; fixed++; }
-      if (bot - b.low > lim) { b.low = bot - med; fixed++; }
+      // a lone wick: far past the body and never traded near again in the next RV candles (needs those candles to exist)
+      const next = arr.slice(i + 1, i + 1 + RV), lone = WK && next.length === RV;
+      const hiLim = lone && next.every((x) => x.high < top + (b.high - top) / 2) ? WK * med : lim;
+      const loLim = lone && next.every((x) => x.low > bot - (bot - b.low) / 2) ? WK * med : lim;
+      if (b.high - top > hiLim) { log.push([b.time, 'high', +((b.high - top) / med).toFixed(0)]); b.high = top + med; fixed++; }
+      if (bot - b.low > loLim) { log.push([b.time, 'low', +((bot - b.low) / med).toFixed(0)]); b.low = bot - med; fixed++; }
     }
     const r = b.high - b.low; if (r > 0) { win.push(r); if (win.length > 100) win.shift(); }
   }
-  return fixed;
+  return o.log ? log : fixed;
 }
 function fvgScan(bars, sell, look = 60) {
   const out = [], n = bars.length - 1;   // the last bar is still forming
@@ -396,7 +402,7 @@ for (const [key, M] of Object.entries(MARKETS)) {
       for (const [id, iv, sec] of TFS) data[id] = await klines(M.sym, iv, startT - (WIN + 2) * sec, endT);
     }
     if (!FAKE) {
-      const fx = Object.fromEntries(Object.entries(data).map(([id, arr]) => [id, cleanBars(arr)]).filter(([, n]) => n));
+      const fx = Object.fromEntries(Object.entries(data).map(([id, arr]) => [id, cleanBars(arr, M.group === 'Crypto' ? {} : { wickK: 15 })]).filter(([, n]) => n));
       if (Object.keys(fx).length) { meta.cleaned = Object.assign(meta.cleaned || {}, { [key]: fx }); console.log(`${key}: bad prints clipped`, fx); }
     }
     const m1 = data['1m'];
