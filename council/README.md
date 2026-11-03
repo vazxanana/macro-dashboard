@@ -150,3 +150,8 @@ candle whose body jumps 50 ranges and comes straight back. Real news candles are
 longer than 15 ranges when the next 3 candles never trade back into its outer half: on 3 Nov at 10:12 a single Kraken order
 spiked AUD/USD 35 pips for one minute (Yahoo showed nothing) and stopped five shadow trades. Real news spikes get revisited. Counts
 per market and timeframe go to `snapshot.cleaned`.
+
+Because a lone spike can only be judged once 3 later candles exist, forex trades are managed on 1m candles at least 3
+minutes old (exits come up to 3 minutes late, never on a spike that is about to be clipped). Trades already closed by a
+bad print (listed in `BAD_PRINT_CLOSES`, found with the raw-candle probe) are reopened once, keep the old result in
+`badPrint`, and finish on the cleaned candles.
