@@ -109,3 +109,18 @@ not adopted.
 
 **Shipped to the live trader today:** bad-print clipping (#144), lone forex wicks (#146, #147), forex exits wait 3 minutes
 and the 7 trades closed by bad prints were reopened (#148), gold trade chart on spot (#145).
+
+## 3 Nov 21:45 — Scalp re-entry after a loss (shipped, #157)
+
+Question: today's live gold loss was five Scalp sells in a row (10:04–12:10), all −1R. Does re-entering after a loss lose?
+Replay: xaum30.json (150 days gold, cleaned, take-all, every signal, R net of cost). "After loss" = same setup and side, a loss closed in the previous 3 h.
+
+| setup | after loss, first 100 d | after loss, last 50 d | rest |
+|---|---|---|---|
+| scalp | −0.24R ×138 (t −1.8) | −0.52R ×91 (t −4.1) | −2.1R / −15.9R |
+| rscalp | −0.24R ×62 | +0.14R ×34 | mixed |
+| m30m1 | +0.01R ×134 | −0.42R ×96 | mixed (June +0.88R/tr) |
+
+Scalp after a loss is negative in all six months (−5.1, −7.4, −16.7, −15.8, −31.2, −4.3); 1/2/6 h windows agree.
+After a *win* is positive (+0.53R/tr last 50 d): scalps cluster by regime. Shipped: `reentry` blocker for Scalp only, a hard shadow under take-all.
+Not shipped: rscalp/m30m1 (not consistent across halves). Side check: replica code runs clean on real candles; no signals live yet because it only went live at 20:33 UTC (last signal of the day 14:15).
