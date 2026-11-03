@@ -163,3 +163,9 @@ dollar cap, the minimum reward:risk or a session rule would block. Those trades 
 in their note), so the results can always be split into what the rules would take and what they would block. Only a
 literal duplicate (same stop and target as an open trade) is still a shadow. The 150-day replay says trading every signal
 loses about 0.2R a trade; this is the trader's forward test of that. Remove the user rule (and `config.takeAll`) to go back.
+
+## Gold only (user rule, 3 Nov)
+
+`config.focus = ['xau']` (user rule `gold-only`): only XAU/USD trades live. Signals on the other markets are still taken as
+shadow trades with `blockedBy` containing `focus`, so their statistics keep building. Remove the user rule (and
+`config.focus`) to trade every market again.
