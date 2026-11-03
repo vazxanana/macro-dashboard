@@ -80,5 +80,12 @@ Verdict: replicates his trades, not his edge (break-even overall). Shipped as a 
 `research.json` k = replica) to compare with his trades day by day. Also shipped: gold-only (#151), gold M30 → M1 against
 D1 (#152, +12R → +33R portfolio on gold), take-all (#150, user's call; gold take-all was −146R vs +53R with rules in 150 days).
 
+**Replica v2 (#154):** engine and engulfing context on the 1,164 gold replica signals (market entry, 2R). Clear of every live
+H1 Origin (engine N=6): +0.093R / +0.060R, keeps 4/4 of his trades, not concentrated (+23R of +33R without the top 5).
+M5 engulfing at the extreme: +0.045R / +0.065R; without one, −0.175R in the last third. Clear of H1 OR M5 engulfing:
++0.075R (593) / +0.077R (352), t 1.7 / 1.4, +72R in 150 days, keeps 4/4 — shipped as the replica's filter (paper).
+Rejected: entry at the engulfing candle's open (−24R / +51R), H1-clear AND engulfing (+0.074 / −0.016), retest entries
+with the filter (negative), D1-against (+0.063 / +0.133 but keeps only 2/4).
+
 **Shipped to the live trader today:** bad-print clipping (#144), lone forex wicks (#146, #147), forex exits wait 3 minutes
 and the 7 trades closed by bad prints were reopened (#148), gold trade chart on spot (#145).
