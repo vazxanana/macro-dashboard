@@ -50,7 +50,7 @@ const CONDS = [['d1', 'with', 'against', (v) => `${v} D1`], ['cf', 'choch', 'bo'
   // the trader's M15 CHoCH (choch.mjs): an M15 close back through the pullback's last lower high (higher low) within the hour
   ['m15c', 'yes', 'no', (v) => v === 'yes' ? "the trader's M15 CHoCH within the hour" : "no M15 CHoCH (the trader's) within the hour"]];
 const passesFilters = (t, f) => CONDS.every(([c]) => !f[c] || t[c] === f[c]);
-function emptyFilter(fl) { return !fl.struct && !(fl.noSession || []).length && CONDS.every(([c]) => !fl[c]); }
+function emptyFilter(fl) { return !fl.struct && !(fl.noSession || []).length && !fl.off && !fl.minRR && !fl.maxRR && !(fl.noMarket || []).length && CONDS.every(([c]) => !fl[c]); }
 
 // Trading session by UTC hour (rough, ignores daylight saving)
 const sessionOf = (t) => { const h = new Date(t * 1000).getUTCHours(); return h < 7 ? 'asia' : h < 12 ? 'london' : h < 16 ? 'overlap' : h < 21 ? 'newyork' : 'late'; };
@@ -94,6 +94,17 @@ const USER_RULES = [
   { id: 'rintra-origin-chart', apply: (c) => { if ((c.targetBy || {}).rintra === 'user') { delete c.target.rintra; delete c.targetBy.rintra; } },
     change: 'rintra: first target again (user chart)',
     why: 'The trader\'s marked gold chart (2 Nov): long 3,900.71, stop 3,896.79, take profit 3,965.08 = the bottom of the H1 Origin of the sell-off (the 3,975 break). That is where the H1 retracement\'s first target sits (the 50% line, 3,962.6), not the start of the whole leg (4,019.8) that "hold to the Origin" pointed at. The setup never got to trade it anyway: it signalled at 13:43, after the breakout; the trader was in at 11:45 from the base.' },
+  // 2 Nov, 23:00: the trader asked for the final rule set from the 150-day research (5 Jun – 2 Nov, 20,524 replayed signals).
+  // Each rule was picked on the first 100 days only and kept because it also helped on the last 50 days.
+  { id: 'research-150d', apply: (c) => {
+      c.filters = c.filters || {};
+      const set = (k, v) => { c.filters[k] = Object.assign(c.filters[k] || {}, v); (c.filters[k].src = c.filters[k].src || {}); for (const x of Object.keys(v)) c.filters[k].src[x] = 'user'; };
+      set('position', { off: true }); set('swing', { d1: 'against' }); set('intraday', { maxRR: 10 });
+      set('scalp', { noMarket: ['audusd'] }); set('rscalp', { minRR: 3 }); set('rintra', { noMarket: ['usdchf'] });
+      c.maxUsd = 2;
+    },
+    change: 'Research rule set (user): Position off; Swing only against D1; Intraday reward:risk ≤ 10; Scalp skips AUD/USD; Retrace M15→M1 only at reward:risk ≥ 3; Retrace H1→M5 skips USD/CHF; dollar cap 2',
+    why: '150-day replay (5 Jun – 2 Nov): today\'s rules −0.09R a trade (−369R over 4,113). With this set −0.001R (−3R over 2,565); on the last 50 days, which did not pick the rules, +0.031R a trade, +161R better than today\'s rules (t = 6.4). The dollar cap of 2 instead of 3 cut the portfolio loss from −176R to −56R in the same replay. Break-even, not a proven edge: paper trading only.' },
 ];
 config.userRules = config.userRules || [];
 for (const u of USER_RULES) if (!config.userRules.includes(u.id)) { u.apply(config); config.userRules.push(u.id); config.history.push({ at: nowISO, by: 'user', change: u.change, why: u.why }); }
@@ -223,6 +234,11 @@ for (const [key, M] of Object.entries(MARKETS)) {
       if (f.m15c && feat.m15c !== f.m15c) blockedBy.push('m15c');
       if (f.struct && feat.struct !== 'n/a' && feat.struct !== f.struct) blockedBy.push('struct');
       if (f.noSession && f.noSession.includes(feat.session)) blockedBy.push('session');
+      // per-setup rules from the 150-day research (2 Nov): a setup switched off, a reward:risk band, markets it skips
+      if (f.off) blockedBy.push('off');
+      if (f.minRR && !(rrNow >= f.minRR)) blockedBy.push('rrBand');
+      if (f.maxRR && rrNow > f.maxRR) blockedBy.push('rrBand');
+      if ((f.noMarket || []).includes(key)) blockedBy.push('market');
       // exposure: at most MAX_OPEN live trades per market, and never long and short the same market at once
       const live = trades.filter((x) => x.market === key && !x.shadow && (x.status === 'open' || x.status === 'pending'));
       if (live.length >= MAX_OPEN || live.some((x) => x.side !== (t.sell ? 'sell' : 'buy'))) blockedBy.push('exposure');
@@ -232,7 +248,7 @@ for (const [key, M] of Object.entries(MARKETS)) {
       const ud = usdDir(M, t.sell ? 'sell' : 'buy');
       if (ud && trades.filter((x) => !x.shadow && (x.status === 'open' || x.status === 'pending') && MARKETS[x.market] && usdDir(MARKETS[x.market], x.side) === ud).length >= (config.maxUsd || MAX_USD)) blockedBy.push('usd');
       const shadow = blockedBy.length > 0;
-      const why = { paused: `paused until ${String(config.paused[t.k]).slice(0, 10)}`, minRR: `reward:risk ${(isFinite(rrNow) ? rrNow : 0).toFixed(2)} under ${config.minRR}`, d1: `rule: only ${f.d1} D1`, cf: `rule: only ${f.cf === 'choch' ? 'a CHoCH' : 'a continuation BO'} as the confirming break`, choch: `rule: ${f.choch === 'yes' ? 'needs' : 'no'} fresh M15/M5 CHoCH`, m15c: `rule: ${f.m15c === 'yes' ? 'needs' : 'no'} M15 CHoCH (the trader's) within the hour`, struct: `rule: only ${f.struct} structure`, session: `rule: not in ${feat.session}`, exposure: 'already 2 trades or an opposite trade open on this market', news: 'high-impact news within the hour', duplicate: 'same stop and target as a trade already open', usd: `already ${config.maxUsd || MAX_USD} trades betting the same way on the dollar`, market: `market paused until ${String(config.pausedMarkets[key]).slice(0, 10)}` };
+      const why = { paused: `paused until ${String(config.paused[t.k]).slice(0, 10)}`, minRR: `reward:risk ${(isFinite(rrNow) ? rrNow : 0).toFixed(2)} under ${config.minRR}`, d1: `rule: only ${f.d1} D1`, cf: `rule: only ${f.cf === 'choch' ? 'a CHoCH' : 'a continuation BO'} as the confirming break`, choch: `rule: ${f.choch === 'yes' ? 'needs' : 'no'} fresh M15/M5 CHoCH`, m15c: `rule: ${f.m15c === 'yes' ? 'needs' : 'no'} M15 CHoCH (the trader's) within the hour`, struct: `rule: only ${f.struct} structure`, session: `rule: not in ${feat.session}`, exposure: 'already 2 trades or an opposite trade open on this market', news: 'high-impact news within the hour', duplicate: 'same stop and target as a trade already open', usd: `already ${config.maxUsd || MAX_USD} trades betting the same way on the dollar`, market: (f.noMarket || []).includes(key) ? `rule: ${t.k} skips ${key}` : `market paused until ${String(config.pausedMarkets[key]).slice(0, 10)}`, off: `rule: ${t.k} is switched off`, rrBand: `rule: ${t.k} only at reward:risk ${f.minRR ? `≥ ${f.minRR}` : ''}${f.minRR && f.maxRR ? ' and ' : ''}${f.maxRR ? `≤ ${f.maxRR}` : ''}` };
       const h = def.h;
       const tr = { id: `${key}-${t.k}-${now}`, market: key, label: M.label, dec: M.dec, k: t.k, name: t.name, pair: t.pair, h, side: t.sell ? 'sell' : 'buy',
         entry: t.entry, stop: t.stop, t1: T1, rr: +(toT2 ? Math.abs(T1 - t.entry) / Math.abs(t.entry - t.stop) : t.rr).toFixed(2), buf: CFG.buf, opened: now, checked: now, status: 'pending', R: null, feat,
