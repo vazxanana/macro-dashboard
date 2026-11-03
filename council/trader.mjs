@@ -115,6 +115,21 @@ config.userRules = config.userRules || [];
 for (const u of USER_RULES) if (!config.userRules.includes(u.id)) { u.apply(config); config.userRules.push(u.id); config.history.push({ at: nowISO, by: 'user', change: u.change, why: u.why }); }
 const state = Object.assign({ seen: {}, lastRun: 0 }, rd('state.json', {}));
 let trades = rd('trades.json', []);
+// Trades closed by a bad print (a Kraken-only spike, found by the raw-candle probe) are reopened once, so they keep running on the
+// cleaned candles and end with their real result instead of teaching the Coach a move that never happened
+const BAD_PRINT_CLOSES = [
+  { at: '2026-11-03', ids: ['audusd-intraday-1793666828', 'audusd-intraday-1793676728', 'audusd-intraday-1793681494', 'audusd-intraday-1793694924', 'audusd-scalp-1793694924', 'usdcad-intraday-1793648789', 'usdcad-scalp-1793673149'],
+    why: 'AUD/USD 10:12 (one order spiked 35 pips for a minute; Yahoo saw nothing), USD/CAD and USD/CHF 06:14 (582-range spike)' },
+];
+config.repairs = config.repairs || [];
+for (const rp of BAD_PRINT_CLOSES) {
+  const key = 'badprint-' + rp.at + '-' + rp.ids.length; if (config.repairs.includes(key)) continue;
+  let n = 0;
+  for (const tr of trades) if (rp.ids.includes(tr.id) && (tr.status === 'win' || tr.status === 'loss' || tr.status === 'be') && tr.closed) {
+    tr.badPrint = { status: tr.status, R: tr.R, closed: tr.closed }; tr.checked = tr.closed; tr.status = 'open'; tr.R = null; delete tr.closed; delete tr.pm; n++;
+  }
+  config.repairs.push(key); config.history.push({ at: nowISO, by: 'system', change: `Reopened ${n} trades closed by a bad print`, why: rp.why });
+}
 // Reviews written before the entry-slip sign fix scored better-than-planned fills as "late entry": flip and re-judge them once
 for (const x of trades) if (x.pm && x.pm.slip != null && x.pm.sv !== 2) { x.pm.slip = -x.pm.slip; x.pm.sv = 2; Object.assign(x.pm, judge(x)); }
 const snapshot = { at: nowISO, markets: {}, errors: {} };
@@ -227,9 +242,13 @@ for (const [key, M] of Object.entries(MARKETS)) {
     for (const tr of trades.filter((x) => x.market === key && (x.status === 'pending' || x.status === 'open'))) {
       const bars = (src['1m'].bars[0].time <= tr.checked ? src['1m'] : src['5m'].bars[0].time <= tr.checked ? src['5m'] : src['15m']).bars;
       const s = tr.side === 'sell';
-      let exitBar = null;
+      let exitBar = null, next = bars.at(-1).time;
+      // forex: leave the newest 3 one-minute candles for the next run, so a lone spike is judged (and clipped) before it can
+      // fill, stop or target a trade
+      const settle = M.group === 'Forex' && bars === src['1m'].bars ? bars.at(-1).time - 3 * 60 : Infinity;
       for (const b of bars) {
         if (b.time < tr.checked) continue;
+        if (b.time > settle) { next = b.time; break; }
         if (tr.status === 'pending') {
           if (s ? b.high >= tr.entry : b.low <= tr.entry) { tr.status = 'open'; tr.filled = b.time; }
           else if (s ? b.low <= tr.t1 : b.high >= tr.t1) { tr.status = 'missed'; tr.closed = b.time; tr.R = 0; break; }
@@ -249,7 +268,7 @@ for (const [key, M] of Object.entries(MARKETS)) {
         // back near the entry can't place a stop on the wrong side of price, so it waits until it gets there again
         if (config.be && !tr.beMoved && ((s ? tr.entry - b.low : b.high - tr.entry) / r0) >= config.be) { tr.stop = tr.entry; tr.beMoved = true; }
       }
-      tr.checked = bars.at(-1).time;
+      tr.checked = exitBar ? bars.at(-1).time : next;
       if (exitBar) startReview(tr, exitBar, key, NEWS);
       if (tr.status === 'pending' && now - tr.opened > (WAIT[tr.h] || 86400)) { tr.status = 'expired'; tr.closed = now; tr.R = 0; }
     }
