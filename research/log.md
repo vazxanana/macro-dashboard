@@ -51,5 +51,15 @@ H1 was too slow (still bearish from 4,040.75), M30 too fast (bearish again after
 choosing the leg, which a few examples can't pin down: keep collecting his marked trades in `council/examples.json`.
 
 
+### 3 Nov evening: live trader vs replay
+
+Matched today's live/shadow trades against the replay (same market, setup, side, within 20 min). Where both took a trade
+they agree: 49 of 63 same result, reward:risk within about 8%. But the live trader takes 1.5–3× more trades on every market
+and setup (2–3 Nov: 171 vs 80), most likely because it analyses Kraken's still-forming 1m candle while the replay uses only
+closed 1m candles. Since 28 Oct the extra live signals made +10.6R over 86 closed (+0.12R/trade, 29% win) against −6.8R over
+66 for the matched ones, so they are not worse; no change. Caveat: replay totals understate how many trades live takes.
+News check: trades that closed with high-impact news in their window made +13.6R over 13 (live +2.2R/4, shadow +11.4R/9)
+vs −9.4R over 149 without, so the news guard stays off (the Coach turns it on after 3 news-caused losses).
+
 **Shipped to the live trader today:** bad-print clipping (#144), lone forex wicks (#146, #147), forex exits wait 3 minutes
 and the 7 trades closed by bad prints were reopened (#148), gold trade chart on spot (#145).
