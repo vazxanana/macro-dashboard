@@ -110,6 +110,12 @@ const USER_RULES = [
   { id: 'no-pause', apply: (c) => { c.noPause = true; c.paused = {}; c.pausedMarkets = {}; },
     change: 'No pauses (user): every setup and market keeps trading; what the Coach would pause is kept in wouldPause',
     why: 'The trader wants every setup producing trades to study and analyse. Retrace H1→M5 (paused 06:05 after four live losses) resumes now.' },
+  // 3 Nov, 19:50: the trader's rule: take the shadow trades live. Every signal trades (paper); the rule, limit or cap that
+  // would have blocked it is still recorded in blockedBy, so results split into "the rules would take it" and "would block it".
+  // Only a literal duplicate (same stop and target as a trade already open) is still skipped.
+  { id: 'take-all', apply: (c) => { c.takeAll = true; },
+    change: 'Take all signals (user): the shadow trades trade live; blockedBy still records which rule would have blocked each',
+    why: 'On 3 Nov live made −3.8R while the blocked signals made +16.2R. The 150-day replay says trading every signal loses (about −0.2R a trade); the trader wants to see it forward on paper.' },
 ];
 config.userRules = config.userRules || [];
 for (const u of USER_RULES) if (!config.userRules.includes(u.id)) { u.apply(config); config.userRules.push(u.id); config.history.push({ at: nowISO, by: 'user', change: u.change, why: u.why }); }
@@ -351,12 +357,13 @@ for (const [key, M] of Object.entries(MARKETS)) {
       if (live.some((x) => Math.abs(x.stop - t.stop) <= tick && Math.abs(x.t1 - t.t1) <= tick)) blockedBy.push('duplicate');
       const ud = usdDir(M, t.sell ? 'sell' : 'buy');
       if (ud && trades.filter((x) => !x.shadow && (x.status === 'open' || x.status === 'pending') && MARKETS[x.market] && usdDir(MARKETS[x.market], x.side) === ud).length >= (config.maxUsd || MAX_USD)) blockedBy.push('usd');
-      const shadow = blockedBy.length > 0;
+      // take-all (user): only a literal duplicate stays a shadow; every other blocked signal trades, with its blockers recorded
+      const shadow = config.takeAll ? blockedBy.includes('duplicate') : blockedBy.length > 0;
       const why = { paused: `paused until ${String(config.paused[t.k]).slice(0, 10)}`, minRR: `reward:risk ${(isFinite(rrNow) ? rrNow : 0).toFixed(2)} under ${config.minRR}`, d1: `rule: only ${f.d1} D1`, cf: `rule: only ${f.cf === 'choch' ? 'a CHoCH' : 'a continuation BO'} as the confirming break`, choch: `rule: ${f.choch === 'yes' ? 'needs' : 'no'} fresh M15/M5 CHoCH`, m15c: `rule: ${f.m15c === 'yes' ? 'needs' : 'no'} M15 CHoCH (the trader's) within the hour`, struct: `rule: only ${f.struct} structure`, session: `rule: not in ${feat.session}`, exposure: 'already 2 trades or an opposite trade open on this market', news: 'high-impact news within the hour', duplicate: 'same stop and target as a trade already open', usd: `already ${config.maxUsd || MAX_USD} trades betting the same way on the dollar`, market: (f.noMarket || []).includes(key) ? `rule: ${t.k} skips ${key}` : `market paused until ${String(config.pausedMarkets[key]).slice(0, 10)}`, off: `rule: ${t.k} is switched off`, rrBand: `rule: ${t.k} only at reward:risk ${f.minRR ? `≥ ${f.minRR}` : ''}${f.minRR && f.maxRR ? ' and ' : ''}${f.maxRR ? `≤ ${f.maxRR}` : ''}` };
       const h = def.h;
       const tr = { id: `${key}-${t.k}-${now}`, market: key, label: M.label, dec: M.dec, k: t.k, name: t.name, pair: t.pair, h, side: t.sell ? 'sell' : 'buy',
         entry: t.entry, stop: t.stop, t1: T1, rr: +(toT2 ? Math.abs(T1 - t.entry) / Math.abs(t.entry - t.stop) : t.rr).toFixed(2), buf: CFG.buf, opened: now, checked: now, status: 'pending', R: null, feat,
-        shadow, blockedBy, note: shadow ? `Shadow (${blockedBy.map((b) => why[b]).join(', ')})` : t.next };
+        shadow, blockedBy, note: shadow ? `Shadow (${blockedBy.map((b) => why[b]).join(', ')})` : blockedBy.length ? `${t.next} Taken under take-all; the rules would block it (${blockedBy.map((b) => why[b]).join(', ')}).` : t.next };
       // held to the second target: the first one is kept for the record, and the order stays valid until price reaches the Origin
       if (toT2) { tr.tp1 = t.t1; tr.target = 't2'; if (!shadow) tr.note += ` Holding to ${T1.toFixed(M.dec)}, ${t.retrace ? `the ${String(t.pair).split(' ')[0]} Origin` : 'the second target'} (${(config.targetBy || {})[t.k] === 'user' ? "the trader's rule" : 'backtest'}).`; }
       try { tr.ctx = entryContext(t, src, def, M, price); } catch (e) {}
