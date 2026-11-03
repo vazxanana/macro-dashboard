@@ -100,5 +100,12 @@ replica's ★ tag; pass = H1 clear or ★ (+0.142 / +0.074, keeps 4/4). Candidat
 1.1–3.4 ATR. Filter H1 clear or ★ AND stop ≥ 1 ATR: +0.188R (319, t 2.9) / +0.125R (208, t 1.9), no losing month,
 keeps 4/4; 3 Nov 5 signals +0.4R. Shipped (paper).
 
+**Replica v4, last weeks and two fixes (rejected):** last week (26–30 Oct) v4 +2.1R over 32 (all signals +2.9R/57); last
+6 weeks v4 +19.3R over 197 (+0.10R/trade; all signals −8.3R/371; ★ +13.0R/82) but lumpy (3 of 7 weeks positive, 5 Oct
++17.4R). Fixes for the losing weeks: cooldown (no opposite trade within 1/2/4 h, or none while one is open) — 2 h improves
+R/trade both halves (+0.241/+0.141) but total 82R vs 86R and last week −3.5R vs +2.1R; trend guard (skip if the 8/24 h move
+against the trade > k M15 ATR) — 24 h > 15 ATR: +0.176/+0.157, June −4R, total 84R; both 78R. All within noise of v4 (86R):
+not adopted.
+
 **Shipped to the live trader today:** bad-print clipping (#144), lone forex wicks (#146, #147), forex exits wait 3 minutes
 and the 7 trades closed by bad prints were reopened (#148), gold trade chart on spot (#145).
