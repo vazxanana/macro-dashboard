@@ -218,6 +218,12 @@
    "by": "user",
    "change": "Take all signals (user): the shadow trades trade live; blockedBy still records which rule would have blocked each",
    "why": "On 3 Nov live made −3.8R while the blocked signals made +16.2R. The 150-day replay says trading every signal loses (about −0.2R a trade); the trader wants to see it forward on paper."
+  },
+  {
+   "at": "2026-11-03T20:10:20.000Z",
+   "by": "user",
+   "change": "Gold only (user): only XAU/USD trades live; the other markets run as shadow trades (focus)",
+   "why": "The trader wants to concentrate on gold. On 3 Nov gold's blocked Retrace M15→M1 sells at the 3,946–3,969 supply made +25.7R while its live scalps into the demand box lost −3R."
   }
  ],
  "btAt": "2026-11-03T11:12:04.307Z",
@@ -227,7 +233,8 @@
   "rintra-origin-chart",
   "research-150d",
   "no-pause",
-  "take-all"
+  "take-all",
+  "gold-only"
  ],
  "target": {},
  "targetBy": {},
@@ -238,16 +245,19 @@
  "noPause": true,
  "wouldPause": {
   "rintra": {
-   "at": "2026-11-03T20:04:29.000Z",
+   "at": "2026-11-03T20:10:20.000Z",
    "why": "four losses in a row"
   },
   "scalp": {
-   "at": "2026-11-03T20:04:29.000Z",
+   "at": "2026-11-03T20:10:20.000Z",
    "why": "expectancy -1.00R over 11 trades"
   }
  },
  "repairs": [
   "badprint-2026-11-03-7"
  ],
- "takeAll": true
+ "takeAll": true,
+ "focus": [
+  "xau"
+ ]
 }
