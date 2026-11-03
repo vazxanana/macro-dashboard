@@ -176,3 +176,12 @@ Gold also reads M30 candles and trades a fifth main setup, `m30m1` (M30 Origin, 
 to trades against D1 (user rule `gold-m30`). The trader's 3 Nov markups (BO BUY 3,916 and the 3,891.5–3,916.1 box) are M30
 structure. On the 150-day replay it was the one new gold setup positive in both halves (+0.13R / +0.20R a trade against
 D1; portfolio +12R → +33R), but concentrated in a few big winners.
+
+## Gold replica (research, paper only, 3 Nov)
+
+Rebuilt from the trader's four marked gold trades (2–3 Nov, `council/examples.json`): a leg of at least 2 M15 ATRs in the
+last 3 h or 6 h, then an M5 close (1-candle swings) back through the last swing against the leg (the CHoCH). Limit entry at
+the 30% retest from the CHoCH level toward the extreme (valid 4 h), stop just past the extreme, target the leg's start, out
+after 48 h. On the cleaned 150-day gold replay it fires on all four of his trades (3 of 4 win on his days, the 4th never
+fills) but is about break-even overall (−15R / +3R over 762 trades), so it runs on paper in `research.json` (gold only),
+reported in `snapshot.json` → `research.replica`, to compare with his trades day by day and learn which turns he takes.
