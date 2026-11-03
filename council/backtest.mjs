@@ -34,7 +34,7 @@ const MARKETS = {
 if (process.env.BT_MARKETS) for (const k of Object.keys(MARKETS)) if (!process.env.BT_MARKETS.split(',').includes(k)) delete MARKETS[k];
 const TFS = [['1d', '1d', 86400], ['4h', '4h', 14400], ['1h', '1h', 3600], ['30m', '30m', 1800], ['15m', '15m', 900], ['5m', '5m', 300], ['1m', '1m', 60]];
 const SEC = Object.fromEntries(TFS.map(([id, , s]) => [id, s]));
-const WAIT = { '1d': 5 * 86400, '4h': 2 * 86400, '1h': 12 * 3600, '15m': 3 * 3600 };
+const WAIT = { '1d': 5 * 86400, '4h': 2 * 86400, '1h': 12 * 3600, '30m': 6 * 3600, '15m': 3 * 3600 };
 const FRESH = 12, WIN = 720, STEP = 300;
 // trade management variants: [name, break-even level, hold to the second target, +2R partial]
 // pt2: on a trade whose target is more than PARTIAL.over R away, bank PARTIAL.frac of it at +PARTIAL.at R and move the
@@ -420,7 +420,9 @@ function structFeat(sell, l, src, at) {
 // typical spread (same model as the trade reviews): one spread is paid per round trip
 const spreadOf = (M, price) => M.group === 'Forex' ? 0.0001 : M.spot ? 0.3 : price * 0.0002;
 // research: the Mosha notes' barrier formula pairs H4 with M15 (the engine's swing uses H4 → H1)
-const PAIRS_R = PAIRS.concat([{ k: 'swing15', name: 'Swing M15', h: '4h', l: '15m', e: 'M15 / M1', up: '1d' }]);
+// research: M30 structure (the trader's 3 Nov "BO BUY" at 3,916 is an M30 break; his demand box is its Origin)
+const PAIRS_R = PAIRS.concat([{ k: 'swing15', name: 'Swing M15', h: '4h', l: '15m', e: 'M15 / M1', up: '1d' },
+  { k: 'm30', name: 'M30', h: '30m', l: '5m', e: 'M5', up: '1h' }, { k: 'm30m1', name: 'M30 M1', h: '30m', l: '1m', e: 'M1', up: '1h' }]);
 const BUILDERS = PAIRS_R.map((p) => [p, buildSetup]).concat(RETR.map((p) => [p, buildRetrace]));
 const DEFS = PAIRS_R.concat(RETR);
 const all = [], twins = [], unfilled = [], meta = { errors: {} };   // closed trades; their market-entry twins; resting orders that never filled
