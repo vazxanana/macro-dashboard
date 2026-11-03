@@ -61,5 +61,24 @@ closed 1m candles. Since 28 Oct the extra live signals made +10.6R over 86 close
 News check: trades that closed with high-impact news in their window made +13.6R over 13 (live +2.2R/4, shadow +11.4R/9)
 vs −9.4R over 149 without, so the news guard stays off (the Coach turns it on after 3 news-caused losses).
 
+### 3 Nov night: replicating the trader's gold trades (gold-only, local 150-day candle dump)
+
+Rule that fires on all four marked trades (2–3 Nov): leg ≥ 2 M15 ATR within the last 3 h or 6 h, then an M5 close (1-candle
+swings) back through the last swing against the leg. M15 versions and a 12 h leg window miss them (he trades the latest swing).
+His entries sit at about the 30–50% retest between the extreme and the CHoCH level; his targets are the leg start or the
+bigger 12 h leg start. "Swept prior 24 h liquidity" did not help (negative in both halves).
+
+| Version (gold, 1,164 signals / 150 days) | First 100 days | Last 50 days | His four trades |
+|---|---|---|---|
+| Market entry, target 2R | +0.035R (751) | +0.000R (413) | −1, +1.9, −1, +2.0 |
+| Market entry, target 3R / leg start / 12 h start | +0.04 / −0.01 / −0.00 | −0.16 / −0.07 / −0.07 | |
+| 30% retest, target leg start | −0.032R (474) | +0.011R (288) | not filled, +2.1, +0.8, +1.7 |
+| 50% retest, target 12 h leg start | −0.131R | +0.020R | not filled, +7.4, not filled, +8.1 |
+| Market 2R, H4 trend against the trade | +0.080R (380) | +0.045R (222) | keeps 3 of 4 |
+
+Verdict: replicates his trades, not his edge (break-even overall). Shipped as a paper research setup on gold (#153,
+`research.json` k = replica) to compare with his trades day by day. Also shipped: gold-only (#151), gold M30 → M1 against
+D1 (#152, +12R → +33R portfolio on gold), take-all (#150, user's call; gold take-all was −146R vs +53R with rules in 150 days).
+
 **Shipped to the live trader today:** bad-print clipping (#144), lone forex wicks (#146, #147), forex exits wait 3 minutes
 and the 7 trades closed by bad prints were reopened (#148), gold trade chart on spot (#145).
