@@ -5,7 +5,7 @@
  "be": null,
  "fresh": 12,
  "newsGuard": false,
- "maxUsd": 3,
+ "maxUsd": 2,
  "paused": {
   "rintra": "2026-11-06T06:05:33.000Z"
  },
@@ -18,20 +18,27 @@
     "session:asia": "2026-11-02T21:25:27.000Z"
    },
    "src": {
-    "d1": "backtest"
+    "d1": "backtest",
+    "noMarket": "user"
    },
    "noSession": [
     "asia"
+   ],
+   "noMarket": [
+    "audusd"
    ]
   },
   "rscalp": {
    "since": {
     "session:asia": "2026-11-02T21:25:27.000Z"
    },
-   "src": {},
+   "src": {
+    "minRR": "user"
+   },
    "noSession": [
     "asia"
-   ]
+   ],
+   "minRR": 3
   },
   "intraday": {
    "d1": "against",
@@ -39,8 +46,10 @@
     "d1": "2026-11-02T11:52:07.000Z"
    },
    "src": {
-    "d1": "backtest"
-   }
+    "d1": "backtest",
+    "maxRR": "user"
+   },
+   "maxRR": 10
   },
   "rintra": {
    "d1": "with",
@@ -50,7 +59,25 @@
    },
    "noSession": [
     "late"
-   ]
+   ],
+   "noMarket": [
+    "usdchf"
+   ],
+   "src": {
+    "noMarket": "user"
+   }
+  },
+  "position": {
+   "off": true,
+   "src": {
+    "off": "user"
+   }
+  },
+  "swing": {
+   "d1": "against",
+   "src": {
+    "d1": "user"
+   }
   }
  },
  "history": [
@@ -161,13 +188,20 @@
    "by": "coach-stats",
    "change": "Paused rintra for 3 days",
    "why": "Four losses in a row (4 live, 6 shadow blocked only by exposure or the dollar cap)."
+  },
+  {
+   "at": "2026-11-03T07:06:38.000Z",
+   "by": "user",
+   "change": "Research rule set (user): Position off; Swing only against D1; Intraday reward:risk ≤ 10; Scalp skips AUD/USD; Retrace M15→M1 only at reward:risk ≥ 3; Retrace H1→M5 skips USD/CHF; dollar cap 2",
+   "why": "150-day replay (5 Jun – 2 Nov): today's rules −0.09R a trade (−369R over 4,113). With this set −0.001R (−3R over 2,565); on the last 50 days, which did not pick the rules, +0.031R a trade, +161R better than today's rules (t = 6.4). The dollar cap of 2 instead of 3 cut the portfolio loss from −176R to −56R in the same replay. Break-even, not a proven edge: paper trading only."
   }
  ],
  "btAt": "2026-11-02T21:48:33.200Z",
  "beSrc": "backtest",
  "userRules": [
   "rintra-origin",
-  "rintra-origin-chart"
+  "rintra-origin-chart",
+  "research-150d"
  ],
  "target": {},
  "targetBy": {},
