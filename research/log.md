@@ -87,5 +87,12 @@ M5 engulfing at the extreme: +0.045R / +0.065R; without one, −0.175R in the la
 Rejected: entry at the engulfing candle's open (−24R / +51R), H1-clear AND engulfing (+0.074 / −0.016), retest entries
 with the filter (negative), D1-against (+0.063 / +0.133 but keeps only 2/4).
 
+**Replica tick (targets, sessions) and v3 (#155):** filtered replica targets: 2R is the only one positive in both halves
+(1.5R +0.073/+0.040, 2.5R and 3R negative in the last third); sessions mixed (late +0.27/+0.28, New York +0.02/−0.09), no
+session filter added. Platform engulfing (gold-trading.html detectEngulfings, size + tolerance) at the extreme: on M5
++0.105/+0.013, on M15 +0.374/−0.157 (flips). With its ★ (mid within 0.12% of PDH/PDL, Asia H/L, $50/$100): +0.314R (163,
+t 3.3) / +0.160R (104); every month positive, +58R of +68R without the top 5, buys and sells, all sessions. Shipped as the
+replica's ★ tag; pass = H1 clear or ★ (+0.142 / +0.074, keeps 4/4). Candidate for live once forward ★ trades confirm.
+
 **Shipped to the live trader today:** bad-print clipping (#144), lone forex wicks (#146, #147), forex exits wait 3 minutes
 and the 7 trades closed by bad prints were reopened (#148), gold trade chart on spot (#145).
