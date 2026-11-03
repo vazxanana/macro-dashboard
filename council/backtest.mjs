@@ -542,7 +542,7 @@ for (const [key, M] of Object.entries(MARKETS)) {
         // the engine's H1/H4 marking in the trader's window, to compare with the boxes on the trader's chart
         x.hmarks = x.hmarks || [];
         for (const id of ['1h', '4h']) { const A = src[id].A, B = src[id].bars, f = (i) => (B[i] ? new Date(B[i].time * 1000).toISOString().slice(5, 16) : null);
-          pushChange(x.hmarks, t, { tf: id, trend: A.trend, events: A.events.slice(-4).map((e) => ({ dir: e.dir, choch: !!e.structure, level: +e.level.toFixed(2), at: f(e.breakIdx), top: +e.top.toFixed(2), bot: +e.bot.toFixed(2), live: e.endIdx == null, ended: e.endIdx != null ? f(e.endIdx) : null, vr: e.vr ? +e.vr.p.toFixed(2) : null })) }); }
+          pushChange(x.hmarks, t, { tf: id, trend: A.trend, events: A.events.slice(-4).map((e) => ({ dir: e.dir, choch: !!e.structure, level: +e.level.toFixed(2), at: f(e.breakIdx), top: +e.top.toFixed(2), bot: +e.bot.toFixed(2), live: e.endIdx == null, ended: e.endIdx != null ? f(e.endIdx) : null, vr: e.vr ? +e.vr.p.toFixed(2) : null, vrConf: e.vrConfirmIdx != null ? f(e.vrConfirmIdx) : null, vrBox: e.vrBox ? [+e.vrBox.lo.toFixed(2), +e.vrBox.hi.toFixed(2)] : null })), ltf: ['1m', '5m'].map((l) => ({ tf: l, ev: src[l].A.events.slice(-3).map((x) => ({ dir: x.dir, choch: !!x.structure, at: src[l].bars[x.breakIdx] ? new Date(src[l].bars[x.breakIdx].time * 1000).toISOString().slice(11, 16) : null })) })), vr: vrSetups(src, price, t, spreadOf(M, price)).map((v) => v.k) }); }
         pushChange(x.m15, t, { state: info[x.side] || 'n/a' }, { price: +price.toFixed(2) });
       }
       for (const [pr, fn] of BUILDERS) {
