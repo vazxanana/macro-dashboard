@@ -146,5 +146,7 @@ The Coach uses it (`learnFromBacktest`, once per new backtest, logged as `coach-
 Kraken's forex and PAXG candles are built from thin trade flow and carry the odd off-market tick (a 150-day replay found
 20–40 per forex pair on 1m, and one 1,000-pip EUR/USD candle that made a fake +160R scalp). Before analysing, the Trader
 clips any wick longer than 50 median candle ranges (of the last 100 candles) back to the body plus one range, and flattens a
-candle whose body jumps 50 ranges and comes straight back. Real news candles are mostly body and are not touched. Counts
+candle whose body jumps 50 ranges and comes straight back. Real news candles are mostly body and are not touched. Forex and gold also clip a lone wick
+longer than 15 ranges when the next 3 candles never trade back into its outer half: on 3 Nov at 10:12 a single Kraken order
+spiked AUD/USD 35 pips for one minute (Yahoo showed nothing) and stopped five shadow trades. Real news spikes get revisited. Counts
 per market and timeframe go to `snapshot.cleaned`.
