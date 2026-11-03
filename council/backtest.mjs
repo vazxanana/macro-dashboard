@@ -444,7 +444,12 @@ const pushChange = (arr, t, v, extra) => { const s = JSON.stringify(v); if (!arr
 for (const [key, M] of Object.entries(MARKETS)) {
   try {
     const data = {};
-    if (FAKE) {
+    if (process.env.BT_DATA && fs.existsSync(path.join(process.env.BT_DATA, `${key}.json`))) {   // local replay from a candle dump
+      const D = JSON.parse(fs.readFileSync(path.join(process.env.BT_DATA, `${key}.json`), 'utf8'));
+      for (const [id, arr] of Object.entries(D)) data[id] = arr.map(([time, open, high, low, close]) => ({ time, open, high, low, close }));
+      for (const [id, , sec] of TFS) if (!data[id]) data[id] = aggregate(data['1m'], sec);
+      console.log(`${key}: candles from ${process.env.BT_DATA}`);
+    } else if (FAKE) {
       const m1 = fakeBars(startT - 760 * 86400, endT, key.length * 7919 + 1);
       for (const [id, , sec] of TFS) data[id] = id === '1m' ? m1.filter((b) => b.time >= startT - WIN * 60) : aggregate(m1, sec);
     } else if (M.duka) {
@@ -492,6 +497,10 @@ for (const [key, M] of Object.entries(MARKETS)) {
     if (!FAKE) {
       const fx = Object.fromEntries(Object.entries(data).map(([id, arr]) => [id, cleanBars(arr, M.group === 'Forex' && ['1m', '5m', '15m', '30m'].includes(id) ? { wickK: 15 } : {})]).filter(([, n]) => n));
       if (Object.keys(fx).length) { meta.cleaned = Object.assign(meta.cleaned || {}, { [key]: fx }); console.log(`${key}: bad prints clipped`, fx); }
+    }
+    if (process.env.BT_DUMP && !process.env.BT_DATA) {   // write the (cleaned) candles for local replays
+      const D = {}; for (const id of ['1m', '5m', '15m', '30m', '1h', '4h', '1d']) D[id] = data[id].map((b) => [b.time, +b.open.toFixed(3), +b.high.toFixed(3), +b.low.toFixed(3), +b.close.toFixed(3)]);
+      fs.writeFileSync(path.join(DIR, `${key}.json`), JSON.stringify(D)); console.log(`${key}: candle dump written`);
     }
     const m1 = data['1m'];
     setMarket(M);

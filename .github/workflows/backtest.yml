@@ -16,7 +16,7 @@ permissions:
   contents: write
 
 concurrency:
-  group: council-research-h3
+  group: council-research-dump
   cancel-in-progress: false
 
 jobs:
@@ -26,7 +26,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        market: [xau, btc, eth, sol, xrp, eurusd, gbpusd, audusd, usdcad, usdchf]
+        market: [xau]
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -56,8 +56,7 @@ jobs:
         env:
           DUKA_CACHE: .duka-cache
           BT_MARKETS: ${{ matrix.market }}
-          BT_N: '6'
-          BT_N_HTF: '3'
+          BT_DUMP: '1'
           KRAKEN_BUDGET: '400'
         run: |
           mkdir -p bt && cp data/config.json bt/
@@ -67,10 +66,11 @@ jobs:
         run: |
           DAYS="${{ github.event.inputs.days || '150' }}"
           mkdir -p data/research/parts
-          cp bt/backtest.json "data/research/parts/${DAYS}d-h3-${{ matrix.market }}.json"
+          cp bt/backtest.json "data/research/parts/${DAYS}d-dump-${{ matrix.market }}.json"
+          mkdir -p data/research/candles && [ -f "bt/${{ matrix.market }}.json" ] && gzip -c "bt/${{ matrix.market }}.json" > "data/research/candles/${{ matrix.market }}-${DAYS}d.json.gz" || true
           git -C data config user.name "mosha-council"
           git -C data config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git -C data add research/parts
+          git -C data add research/parts research/candles
           git -C data commit -q -m "Research backtest part ${{ matrix.market }} ${DAYS}d" || exit 0
           for j in 1 2 3 4 5 6 7 8; do git -C data pull -q --rebase origin council-data && git -C data push -q origin HEAD:council-data && break; sleep $((j * 5)); done
 
@@ -115,7 +115,7 @@ jobs:
               out.cleaned = Object.assign(out.cleaned || {}, (b.markets || {}).cleaned || {});
               out.trades.push(...b.trades);
             }
-            fs.writeFileSync(`data/research/backtest-${days}d-h3.json`, JSON.stringify(out));
+            fs.writeFileSync(`data/research/backtest-${days}d-dump.json`, JSON.stringify(out));
             console.log(`${out.trades.length} rows from ${Object.keys(out.markets).length} markets`, out.coverage, out.errors);
           ' "$DAYS"
           git -C data config user.name "mosha-council"
