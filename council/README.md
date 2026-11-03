@@ -164,6 +164,10 @@ in their note), so the results can always be split into what the rules would tak
 literal duplicate (same stop and target as an open trade) is still a shadow. The 150-day replay says trading every signal
 loses about 0.2R a trade; this is the trader's forward test of that. Remove the user rule (and `config.takeAll`) to go back.
 
+## Scalp re-entry block (3 Nov)
+
+A Scalp signal in the same direction within 3 hours of a Scalp loss on the same market stays a shadow trade (`reentry`), even under take-all, the same way a duplicate does. On the 150-day gold replay (take-all, every signal) these re-entries lost in every one of the six months: −0.24R a trade on the first 100 days and −0.52R (t −4.1) on the last 50, −80R in all, while the other Scalps netted +0.6R. 1, 2 and 6 hour windows give the same picture. Retrace scalp and M30 → M1 re-entries are mixed, so they are not blocked. On 3 Nov it would have kept the 11:27 and 12:10 gold sells (both −1R) off the live book.
+
 ## Gold only (user rule, 3 Nov)
 
 `config.focus = ['xau']` (user rule `gold-only`): only XAU/USD trades live. Signals on the other markets are still taken as
