@@ -138,6 +138,33 @@ function basisFor(key, bars) {
 }
 
 const BUILDERS = PAIRS.map((p) => [p, buildSetup]).concat(RETR.map((p) => [p, buildRetrace]));
+
+// ─── Research setup, paper only: the Daily Cycle (Liquidity Trading notes; 150-day replay +0.17R a trade on crypto) ───
+// London (07:00–12:00 UTC) sets the bias: bullish when London's low came before its high and price closed above the London
+// open at 12:00 (bearish mirrored). In the New York open (12:00–15:00 UTC), when price retraces into 62–70% of the London leg,
+// buy (sell) at market, stop past the London low (high), target 3R, and close at 21:00 UTC if neither is hit. Crypto only.
+// Kept in research.json, never in trades.json, so the Coach's learning, stats and lessons never see it.
+function dailyCycle(src, price, t) {
+  const d = Math.floor(t / 86400) * 86400;
+  if (t < d + 12 * 3600 || t >= d + 15 * 3600) return null;
+  const b5 = src['5m'].bars, ldn = b5.filter((b) => b.time >= d + 7 * 3600 && b.time < d + 12 * 3600);
+  if (ldn.length < 50) return null;
+  let hi = -Infinity, lo = Infinity, hiT = 0, loT = 0;
+  for (const b of ldn) { if (b.high > hi) { hi = b.high; hiT = b.time; } if (b.low < lo) { lo = b.low; loT = b.time; } }
+  const open = ldn[0].open, close = ldn[ldn.length - 1].close, leg = hi - lo;
+  if (!(leg > 0)) return null;
+  const bull = loT < hiT && close > open, bear = hiT < loT && close < open;
+  if (!bull && !bear) return null;
+  const ny = b5.filter((b) => b.time >= d + 12 * 3600);
+  if (bull && ny.some((b) => b.low < lo)) return null;
+  if (bear && ny.some((b) => b.high > hi)) return null;
+  const e62 = bull ? hi - 0.62 * leg : lo + 0.62 * leg, e70 = bull ? hi - 0.70 * leg : lo + 0.70 * leg;
+  if (bull ? !(price <= e62 && price >= e70) : !(price >= e62 && price <= e70)) return null;
+  const spr = price * 0.0002, buf = Math.max(3 * spr, 0.05 * leg), stop = bull ? lo - buf : hi + buf, r = Math.abs(price - stop);
+  if (!(r > 0)) return null;
+  return { sell: bear, entry: price, stop, t1: price + (bull ? 3 : -3) * r, closeBy: d + 21 * 3600, day: d, londonHigh: hi, londonLow: lo };
+}
+let research = rd('research.json', []);
 for (const [key, M] of Object.entries(MARKETS)) {
   try {
     const src = {};
@@ -196,6 +223,28 @@ for (const [key, M] of Object.entries(MARKETS)) {
       if (!tr.pm) { if (now - tr.closed > 7 * 86400) continue; startReview(tr, null, key, NEWS); }   // trades closed before reviews existed
       const bars = (src['1m'].bars[0].time <= tr.pm.checked ? src['1m'] : src['5m'].bars[0].time <= tr.pm.checked ? src['5m'] : src['15m']).bars;
       watchReview(tr, bars);
+    }
+
+    // ─── Research (paper only, research.json): manage open Daily Cycle trades, then look for today's signal ───
+    for (const r of research.filter((x) => x.market === key && x.status === 'open')) {
+      const bars = (src['1m'].bars[0].time <= r.checked ? src['1m'] : src['5m'].bars[0].time <= r.checked ? src['5m'] : src['15m']).bars;
+      const s = r.side === 'sell', r0 = Math.abs(r.entry - r.stop);
+      for (const b of bars) {
+        if (b.time < r.checked) continue;
+        if (s ? b.high >= r.stop : b.low <= r.stop) { r.status = 'loss'; r.R = -1; r.closed = b.time; break; }
+        if (s ? b.low <= r.t1 : b.high >= r.t1) { r.status = 'win'; r.R = +((Math.abs(r.t1 - r.entry)) / r0).toFixed(2); r.closed = b.time; break; }
+        if (b.time >= r.closeBy) { const R = +((s ? r.entry - b.close : b.close - r.entry) / r0).toFixed(2); r.status = R > 0 ? 'win' : R < 0 ? 'loss' : 'be'; r.R = R; r.closed = b.time; r.exit = 'day end'; break; }
+      }
+      r.checked = bars.at(-1).time;
+    }
+    if (M.group === 'Crypto') {
+      let cyc = null; try { cyc = dailyCycle(src, price, now); } catch (e) {}
+      if (cyc && !research.some((x) => x.market === key && x.k === 'cycle' && x.day === cyc.day)) {
+        research.push({ id: `${key}-cycle-${now}`, market: key, label: M.label, dec: M.dec, k: 'cycle', name: 'Daily Cycle', side: cyc.sell ? 'sell' : 'buy',
+          entry: cyc.entry, stop: cyc.stop, t1: cyc.t1, rr: 3, opened: now, filled: now, checked: now, status: 'open', R: null, closeBy: cyc.closeBy, day: cyc.day,
+          londonHigh: cyc.londonHigh, londonLow: cyc.londonLow, d1: src['1d'].A.trend === (cyc.sell ? -1 : 1) ? 'with' : 'against',
+          note: `Research (paper only): London ${cyc.sell ? 'sold off' : 'rallied'} ${cyc.londonLow.toFixed(M.dec)}–${cyc.londonHigh.toFixed(M.dec)}; NY-open retracement into the 62–70% zone. Target 3R, out at 21:00 UTC.` });
+      }
     }
 
     // ─── Take new Ready setups ───
@@ -616,6 +665,10 @@ config.history = config.history.slice(-200);
 wr('config.json', config);
 wr('state.json', state);
 wr('trades.json', trades);
+research = research.slice(-2000);
+{ const done = research.filter((x) => x.status === 'win' || x.status === 'loss' || x.status === 'be'), R = done.reduce((a, x) => a + x.R, 0);
+  snapshot.research = { cycle: { closed: done.length, wins: done.filter((x) => x.status === 'win').length, R: +R.toFixed(2), open: research.filter((x) => x.status === 'open').length } }; }
+wr('research.json', research);
 snapshot.lessons = lessons(trades, now);
 wr('snapshot.json', snapshot);
 const open = trades.filter((x) => x.status === 'open' || x.status === 'pending').length;
