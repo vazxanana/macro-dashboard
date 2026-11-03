@@ -132,3 +132,13 @@ asia +0.19 | +0.15 · london +0.38 | +0.03 · overlap −0.08 | +0.25 · newyork
 3-hour blocks and session × D1 the same: no block negative in both halves (12–15 UTC −0.16 | +0.11; 06–09 +0.30 | −0.21).
 No session filter: every session is positive overall and the losers swap between halves. Late (21–24 UTC) is the steadiest,
 which covers the first live replica signal (buy 3,927.40, stop 3,918.79, 2R 3,944.62, 21:36 UTC, H1 clear, engulfing at the extreme, risk 2.9 ATR).
+
+## 3 Nov 22:40 — NQ New York open liquidity sweep (paper research, #161)
+
+The trader's rule: after the 9:30 ET open, price takes liquidity (overnight / previous-day / pre-market high or low), then
+trade the opposite way, target 1.2R. Data: Yahoo NQ=F, 5m 50 days (25 Aug – 3 Nov), 1m 21 days. Cost 0.5 pt.
+- Reclaim close (first candle back inside the swept level, reversal colour), stop extreme + 2 pt, 1.2R, out 16:00:
+  all six levels, first hour: 5m +0.02R ×35, 1m −0.06R ×15. Overnight only 5m −0.31R ×28; previous day −0.40R ×16.
+- M5/M1 CHoCH after the sweep instead: 5m all levels 60 min +0.20R ×12 but 1m −0.18R ×16; halves flip everywhere.
+- Min stop (1–2 ATR): no consistent help.
+Verdict: no edge shown in 50 days (1.2R needs a 45.5% win rate; it runs 22–47%). Runs forward on paper (research.json k 'nq-open').
