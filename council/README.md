@@ -181,6 +181,17 @@ to trades against D1 (user rule `gold-m30`). The trader's 3 Nov markups (BO BUY 
 structure. On the 150-day replay it was the one new gold setup positive in both halves (+0.13R / +0.20R a trade against
 D1; portfolio +12R → +33R), but concentrated in a few big winners.
 
+## NQ New York open sweep (research, paper only, 3 Nov)
+
+The trader's NQ rule: wait for the 9:30 New York open, let price take liquidity, then trade the other way, target 1.2R.
+Built as: after 9:30 ET, NQ (Yahoo NQ=F, 1-minute) trades through the overnight (18:00–9:30 ET), previous-day (9:30–16:00)
+or pre-market (8:00–9:30) high or low; the first 1-minute candle in the first hour that closes back inside that level,
+in the reversal's direction, is the signal. Market entry at its close, stop 2 points past the sweep's extreme, target 1.2R,
+out at 16:00, one trade a day. Kept in research.json (`k: 'nq-open'`), totals in snapshot.research.nq.
+History: about break-even (5-minute, 50 days: +0.02R a trade over 36; 1-minute, 21 days: −0.06R over 15); waiting for an
+M5/M1 CHoCH after the sweep, or keeping only one kind of level, splits the halves (positive in one, negative in the other).
+It goes live only if the forward record pays.
+
 ## Gold replica live (3 Nov, 22:00)
 
 User rule `replica-live` (`config.replicaLive = ['xau']`, take-all off): gold trades the replica live. Every passing v4

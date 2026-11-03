@@ -866,11 +866,75 @@ wr('config.json', config);
 wr('state.json', state);
 wr('trades.json', trades);
 research = research.slice(-2000);
-{ const done = research.filter((x) => x.k !== 'replica' && (x.status === 'win' || x.status === 'loss' || x.status === 'be')), R = done.reduce((a, x) => a + x.R, 0);
-  snapshot.research = { cycle: { closed: done.length, wins: done.filter((x) => x.status === 'win').length, R: +R.toFixed(2), open: research.filter((x) => x.k !== 'replica' && x.status === 'open').length } };
+// ─── Research (paper only): NQ New York open liquidity sweep (the trader's rule, 3 Nov) ───
+// After the 9:30 New York open, price takes liquidity: it trades through the overnight (18:00–9:30 ET), previous-day
+// (9:30–16:00) or pre-market (8:00–9:30) high or low. The first 1-minute candle that closes back inside the swept level, in
+// the reversal's direction, within the first hour is the signal: trade the opposite way at market, stop 2 points past the
+// sweep's extreme, target 1.2R, out at 16:00. One trade a day. Candles: Yahoo NQ=F (NQ futures, 1 minute).
+// On 50 days of 5-minute and 21 days of 1-minute history it is about break-even (+0.02R / −0.06R a trade), so it runs on
+// paper to build a forward record.
+const nyFmt = new Intl.DateTimeFormat('en-CA', { timeZone: 'America/New_York', year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', hourCycle: 'h23', weekday: 'short' });
+function nyParts(t) { const o = {}; for (const p of nyFmt.formatToParts(new Date(t * 1000))) o[p.type] = p.value; return { d: `${o.year}-${o.month}-${o.day}`, m: +o.hour * 60 + +o.minute, wd: o.weekday }; }
+async function yahoo1m(sym) {
+  const r = await fetch(`https://query1.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(sym)}?interval=1m&range=5d&includePrePost=true`, { headers: { 'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36', Accept: 'application/json' } });
+  const j = await r.json(), res = j && j.chart && j.chart.result && j.chart.result[0];
+  if (!res) throw new Error(`Yahoo ${sym}: HTTP ${r.status}`);
+  const ts = res.timestamp || [], q = res.indicators.quote[0], out = [];
+  for (let i = 0; i < ts.length; i++) { const o = q.open[i], h = q.high[i], l = q.low[i], c = q.close[i]; if ([o, h, l, c].every((v) => v != null && isFinite(v) && v > 0)) out.push({ time: ts[i], open: o, high: Math.max(h, o, c), low: Math.min(l, o, c), close: c }); }
+  return out;
+}
+function nqOpenSignal(bars, today) {
+  const B = bars.map((b) => ({ ...b, ...nyParts(b.time) })), days = [...new Set(B.filter((b) => b.m >= 570 && b.m < 960 && b.d < today).map((b) => b.d))].sort();
+  const pd = days.at(-1); if (!pd) return null;
+  const rthPrev = B.filter((b) => b.d === pd && b.m >= 570 && b.m < 960), on = B.filter((b) => (b.d === pd && b.m >= 1080) || (b.d === today && b.m < 570)), pre = B.filter((b) => b.d === today && b.m >= 480 && b.m < 570);
+  if (!rthPrev.length || !on.length) return null;
+  const mx = (a) => Math.max(...a.map((b) => b.high)), mn = (a) => Math.min(...a.map((b) => b.low));
+  const L = { PDH: mx(rthPrev), PDL: mn(rthPrev), ONH: mx(on), ONL: mn(on) }; if (pre.length) { L.PMH = mx(pre); L.PML = mn(pre); }
+  const hiL = ['ONH', 'PDH', 'PMH'].filter((k) => L[k] != null), loL = ['ONL', 'PDL', 'PML'].filter((k) => L[k] != null);
+  const S = B.filter((b) => b.d === today && b.m >= 570 && b.m < 630);
+  let swH = null, swL = null, eH = -Infinity, eL = Infinity;
+  for (const b of S) {
+    eH = Math.max(eH, b.high); eL = Math.min(eL, b.low);
+    if (swH == null) { const k = hiL.find((k) => b.high > L[k]); if (k) swH = k; }
+    if (swL == null) { const k = loL.find((k) => b.low < L[k]); if (k) swL = k; }
+    if (swH != null && b.close < L[swH] && b.close < b.open) return { sell: true, level: swH, lv: L[swH], ext: eH, stop: eH + 2, t: b.time, entry: b.close, L };
+    if (swL != null && b.close > L[swL] && b.close > b.open) return { sell: false, level: swL, lv: L[swL], ext: eL, stop: eL - 2, t: b.time, entry: b.close, L };
+  }
+  return null;
+}
+try {
+  const ny = nyParts(now), openNq = research.filter((x) => x.k === 'nq-open' && x.status === 'open');
+  if ((!['Sat', 'Sun'].includes(ny.wd) && ny.m >= 565 && ny.m <= 975) || openNq.length) {
+    const bars = (await yahoo1m('NQ=F')).filter((b) => b.time + 60 <= now);   // closed 1-minute candles
+    for (const r of openNq) {
+      const s = r.side === 'sell', r0 = Math.abs(r.entry - r.stop);
+      for (const b of bars) {
+        if (b.time <= r.checked) continue;
+        if (s ? b.high >= r.stop : b.low <= r.stop) { r.status = 'loss'; r.R = -1; r.closed = b.time; break; }
+        if (s ? b.low <= r.t1 : b.high >= r.t1) { r.status = 'win'; r.R = 1.2; r.closed = b.time; break; }
+        const p = nyParts(b.time);
+        if (p.d !== r.day || p.m >= 960) { const R = +((s ? r.entry - b.open : b.open - r.entry) / r0).toFixed(2); r.status = R > 0 ? 'win' : R < 0 ? 'loss' : 'be'; r.R = R; r.closed = b.time; r.exit = '16:00'; break; }
+      }
+      if (r.status === 'open' && bars.length) r.checked = bars.at(-1).time;
+    }
+    if (ny.m >= 570 && ny.m <= 635 && !research.some((x) => x.k === 'nq-open' && x.day === ny.d)) {
+      const g = nqOpenSignal(bars, ny.d);
+      if (g && now - (g.t + 60) <= 5 * 60) {   // the signal candle closed within the last 5 minutes: enter at its close
+        const r0 = Math.abs(g.entry - g.stop), t1 = g.entry + (g.sell ? -1.2 : 1.2) * r0;
+        research.push({ id: `nq-open-${ny.d}`, market: 'nq', label: 'NQ', dec: 2, k: 'nq-open', name: 'NQ NY open sweep', day: ny.d, side: g.sell ? 'sell' : 'buy',
+          entry: +g.entry.toFixed(2), stop: +g.stop.toFixed(2), t1: +t1.toFixed(2), rr: 1.2, opened: g.t + 60, filled: g.t + 60, checked: g.t + 60, status: 'open', R: null,
+          level: g.level, levelPrice: +g.lv.toFixed(2), ext: +g.ext.toFixed(2), levels: Object.fromEntries(Object.entries(g.L).map(([k, v]) => [k, +v.toFixed(2)])),
+          note: `Research (paper only): NQ swept the ${g.level} ${g.lv.toFixed(2)} after the New York open (extreme ${g.ext.toFixed(2)}) and closed back inside; ${g.sell ? 'sell' : 'buy'} ${g.entry.toFixed(2)}, stop ${g.stop.toFixed(2)}, target 1.2R ${t1.toFixed(2)}, out at 16:00.` });
+      }
+    }
+  }
+} catch (e) { snapshot.errors.nq = String(e.message || e); }
+{ const done = research.filter((x) => x.k === 'cycle' && (x.status === 'win' || x.status === 'loss' || x.status === 'be')), R = done.reduce((a, x) => a + x.R, 0);
+  snapshot.research = { cycle: { closed: done.length, wins: done.filter((x) => x.status === 'win').length, R: +R.toFixed(2), open: research.filter((x) => x.k === 'cycle' && x.status === 'open').length } };
   const rp = research.filter((x) => x.k === 'replica'), sum = (a) => { const d = a.filter((x) => x.status === 'win' || x.status === 'loss' || x.status === 'be');
     return { signals: a.length, closed: d.length, wins: d.filter((x) => x.status === 'win').length, R: +d.reduce((s, x) => s + x.R, 0).toFixed(2), open: a.filter((x) => x.status === 'open').length, pending: a.filter((x) => x.status === 'pending').length }; };
-  snapshot.research.replica = { all: sum(rp), pass: sum(rp.filter((x) => x.pass && x.v >= 2)), star: sum(rp.filter((x) => x.star)) }; }
+  snapshot.research.replica = { all: sum(rp), pass: sum(rp.filter((x) => x.pass && x.v >= 2)), star: sum(rp.filter((x) => x.star)) };
+  snapshot.research.nq = sum(research.filter((x) => x.k === 'nq-open')); }
 wr('research.json', research);
 snapshot.lessons = lessons(trades, now);
 wr('snapshot.json', snapshot);
