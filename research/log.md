@@ -124,3 +124,11 @@ Replay: xaum30.json (150 days gold, cleaned, take-all, every signal, R net of co
 Scalp after a loss is negative in all six months (−5.1, −7.4, −16.7, −15.8, −31.2, −4.3); 1/2/6 h windows agree.
 After a *win* is positive (+0.53R/tr last 50 d): scalps cluster by regime. Shipped: `reentry` blocker for Scalp only, a hard shadow under take-all.
 Not shipped: rscalp/m30m1 (not consistent across halves). Side check: replica code runs clean on real candles; no signals live yet because it only went live at 20:33 UTC (last signal of the day 14:15).
+
+## 3 Nov 22:10 — Replica v4 by session (rejected: no filter)
+
+v4 passing signals, 2R market trades, 150 d gold (first 100 d | last 50 d, R/trade):
+asia +0.19 | +0.15 · london +0.38 | +0.03 · overlap −0.08 | +0.25 · newyork +0.17 | −0.16 · late +0.32 | +0.45.
+3-hour blocks and session × D1 the same: no block negative in both halves (12–15 UTC −0.16 | +0.11; 06–09 +0.30 | −0.21).
+No session filter: every session is positive overall and the losers swap between halves. Late (21–24 UTC) is the steadiest,
+which covers the first live replica signal (buy 3,927.40, stop 3,918.79, 2R 3,944.62, 21:36 UTC, H1 clear, engulfing at the extreme, risk 2.9 ATR).

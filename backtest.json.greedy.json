@@ -1,0 +1,61 @@
+{
+ "chosen": [
+  [
+   "intraday: reward:risk \u2264 6",
+   15.811000000000002,
+   3.1555468090211947
+  ],
+  [
+   "scalp: skip newyork",
+   25.564000000000004,
+   2.970519925643918
+  ],
+  [
+   "rscalp: reward:risk \u2265 3",
+   27.115000000000002,
+   2.7274699741826334
+  ],
+  [
+   "intraday: skip usdchf",
+   11.324,
+   2.6991731152454648
+  ],
+  [
+   "rscalp: reward:risk \u2264 6",
+   11.799999999999999,
+   2.6718713748624
+  ],
+  [
+   "swing: only cf=choch",
+   8.135,
+   2.58471175987218
+  ]
+ ],
+ "filters": {
+  "scalp": {
+   "d1": "against",
+   "noSession": [
+    "asia",
+    "newyork"
+   ]
+  },
+  "rscalp": {
+   "d1": "with",
+   "noSession": [
+    "asia"
+   ],
+   "minRR": 3,
+   "maxRR": 6
+  },
+  "intraday": {
+   "d1": "against",
+   "maxRR": 6,
+   "noMarket": [
+    "usdchf"
+   ]
+  },
+  "swing": {
+   "cf": "choch"
+  }
+ }
+}
