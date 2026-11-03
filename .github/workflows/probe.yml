@@ -1,0 +1,24 @@
+name: Council data probe
+# RESEARCH ONLY: fetches raw Kraken candles to check suspected bad prints; writes to council-data/research/probe/.
+on:
+  push:
+    branches: [council-probe]
+permissions:
+  contents: write
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with: { ref: council-data, path: data }
+      - name: Fetch
+        run: |
+          mkdir -p data/research/probe
+          for p in AUDUSD EURUSD GBPUSD USDCAD USDCHF PAXGUSD; do
+            curl -sS "https://api.kraken.com/0/public/OHLC?pair=$p&interval=1" -o "data/research/probe/$p-1m.json"; sleep 2
+          done
+          curl -sS "https://query1.finance.yahoo.com/v8/finance/chart/AUDUSD=X?interval=1m&range=1d" -A "Mozilla/5.0" -o data/research/probe/AUDUSD-yahoo-1m.json || true
+          git -C data config user.name "mosha-council"
+          git -C data config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git -C data add research/probe && git -C data commit -qm "Probe: raw Kraken 1m candles $(date -u +%H:%MZ)" || exit 0
+          for j in 1 2 3 4 5; do git -C data pull -q --rebase origin council-data && git -C data push -q origin HEAD:council-data && break; sleep 5; done
