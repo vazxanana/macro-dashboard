@@ -182,7 +182,7 @@ function dailyCycle(src, price, t) {
   if (bull ? !(price <= e62 && price >= e70) : !(price >= e62 && price <= e70)) return null;
   const spr = price * 0.0002, buf = Math.max(3 * spr, 0.05 * leg), stop = bull ? lo - buf : hi + buf, r = Math.abs(price - stop);
   if (!(r > 0)) return null;
-  return { sell: bear, entry: price, stop, t1: price + (bull ? 3 : -3) * r, closeBy: d + 21 * 3600, day: d, londonHigh: hi, londonLow: lo };
+  return { sell: bear, entry: price, stop, t1: price + (bull ? 3 : -3) * r, closeBy: t + 8 * 3600, day: d, londonHigh: hi, londonLow: lo };
 }
 // Bad prints: thin feeds (Kraken FX trades, stitched Yahoo/Dukascopy) carry the odd off-market tick that makes a 1,000-pip
 // candle and a fake 160R trade. A wick longer than 50 times the median candle range of the last 100 candles is clipped to the
@@ -288,7 +288,7 @@ for (const [key, M] of Object.entries(MARKETS)) {
         if (b.time < r.checked) continue;
         if (s ? b.high >= r.stop : b.low <= r.stop) { r.status = 'loss'; r.R = -1; r.closed = b.time; break; }
         if (s ? b.low <= r.t1 : b.high >= r.t1) { r.status = 'win'; r.R = +((Math.abs(r.t1 - r.entry)) / r0).toFixed(2); r.closed = b.time; break; }
-        if (b.time >= r.closeBy) { const R = +((s ? r.entry - b.close : b.close - r.entry) / r0).toFixed(2); r.status = R > 0 ? 'win' : R < 0 ? 'loss' : 'be'; r.R = R; r.closed = b.time; r.exit = 'day end'; break; }
+        if (b.time >= r.closeBy) { const R = +((s ? r.entry - b.close : b.close - r.entry) / r0).toFixed(2); r.status = R > 0 ? 'win' : R < 0 ? 'loss' : 'be'; r.R = R; r.closed = b.time; r.exit = '8 h'; break; }
       }
       r.checked = bars.at(-1).time;
     }
