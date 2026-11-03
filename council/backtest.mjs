@@ -279,6 +279,28 @@ function sweepSetups(src, price, t, why, spr = 0) {
 
 // market-structure conditions at a signal, exactly as the live Trader computes them (trader.mjs structFeat):
 //   cf: the confirming lower-timeframe break is a CHoCH or a continuation BO; choch: a fresh M15/M5 CHoCH in the trade's direction
+// Fair value gaps (imbalance): a 3-candle gap, bull when candle i-1's high is below candle i+1's low (bear the mirror). It counts
+// until a later candle trades through its far side. fvgIn = an unfilled gap the trade's way, made in the last `look` closed
+// candles, contains the price `lvl`; fvgSince = a gap the trade's way was made after time `since` (displacement after the CF).
+function fvgScan(bars, sell, look = 60) {
+  const out = [], n = bars.length - 1;   // the last bar is still forming
+  for (let i = Math.max(1, n - look); i < n - 1; i++) {
+    const a = bars[i - 1], c = bars[i + 1];
+    const lo = sell ? c.high : a.high, hi = sell ? a.low : c.low;
+    if (!(hi > lo)) continue;
+    let alive = true;
+    for (let j = i + 2; j < n; j++) if (sell ? bars[j].high >= hi : bars[j].low <= lo) { alive = false; break; }
+    out.push({ lo, hi, t: bars[i].time, alive });
+  }
+  return out;
+}
+// Key levels (quarter theory: .00/.25/.50/.75): a round step near 0.25% of price (EUR/USD 0.0025, gold 10, BTC 250)
+function keyStep(price) { const raw = price * 0.0025, e = Math.pow(10, Math.floor(Math.log10(raw))), m = raw / e; return (m < 1.6 ? 1 : m < 3.5 ? 2.5 : m < 7.5 ? 5 : 10) * e; }
+function keyFeat(entry, stop) {
+  const s = keyStep(entry), r = Math.abs(entry - stop), near = Math.round(entry / s) * s;
+  const lo = Math.min(entry, stop), hi = Math.max(entry, stop), k = Math.ceil(lo / s) * s;
+  return { kl: Math.abs(entry - near) <= 0.25 * r ? 'near' : 'far', klStop: k < hi && k > lo ? 'yes' : 'no' };
+}
 function structFeat(sell, l, src, at) {
   const dir = sell ? -1 : 1, lp = src[l], ll = lp && lp.A && lp.A.last;
   const cf = ll && ll.dir === dir && ll.structure ? 'choch' : 'bo';
@@ -432,6 +454,11 @@ for (const [key, M] of Object.entries(MARKETS)) {
           const below = { '1h': '15m', '15m': '1m', '5m': '1m' }[def.l];
           if (below && src[below]) { const bl = src[below].A.last, bb = src[below].bars;
             feat.ltfChoch = bl && bl.structure && bl.dir === (st.sell ? -1 : 1) && bb[bl.breakIdx].time >= cfT ? 'yes' : 'no'; }
+          // imbalance and key levels (JeaFX, Liquidity Trading): fvgH = the entry sits in an unfilled HTF gap the trade's way;
+          // fvgL = the confirming timeframe left a gap the trade's way after the CF (displacement); kl / klStop = key levels
+          feat.fvgH = fvgScan(src[def.h].bars, st.sell).some((g) => g.alive && st.entry >= g.lo && st.entry <= g.hi) ? 'in' : 'out';
+          feat.fvgL = fvgScan(src[def.l].bars, st.sell, 120).some((g) => g.t >= cfT) ? 'yes' : 'no';
+          Object.assign(feat, keyFeat(st.entry, st.stop));
         } catch (e) {}
         const tr = { m: key, k: st.k, h: def.h, side, entry: st.entry, stop: st.stop, t1: st.t1, t2: st.t2 != null && (st.t2 - st.t1) * (st.sell ? -1 : 1) > 0 ? st.t2 : null, rr: st.rr, opened: t, status: 'pending', feat, mfe: 0 };
         if (st.sell ? price >= st.entry : price <= st.entry) {   // already through the entry: fill at market, like the Trader
@@ -489,8 +516,8 @@ const out = {
   byMarket: group(all, (x) => x.m),
   byRR: group(all, rrBand),
   bySetupCond: Object.fromEntries(setups.map((k) => { const a = all.filter((x) => x.k === k); return [k, { d1: group(a, (x) => x.feat.d1), struct: group(a, (x) => x.feat.struct), session: group(a, (x) => x.feat.session), rr: group(a, rrBand) }]; })),
-  trades: all.concat(twins, unfilled).map((x) => [x.m, x.k, x.side, x.opened, x.filled || null, +x.rr.toFixed(2), x.feat.d1, x.feat.struct, x.feat.session, ...x.v.map((v) => v.R == null ? null : +v.R.toFixed(2)), +x.mfe.toFixed(2), +x.cost.toFixed(3), x.status === 'closed' ? 1 : 0, x.feat.cf, x.feat.choch, x.feat.m15c, x.feat.m15c1, x.feat.h4 || null, x.feat.h1 || null, x.v[0].closed || x.ended || null, x.h, x.feat.janda || null, x.feat.vrAge || null, x.feat.touch || null, x.feat.upTF || null, x.feat.ltfChoch || null]),
-  tradeCols: ['market', 'setup', 'side', 'opened', 'filled', 'rr', 'd1', 'struct', 'session', 'R_none', 'R_be1', 'R_be15', 'R_tp2', 'R_pt2', 'R_ts4', 'R_ts8', 'R_ts12', 'mfe', 'cost', 'fill', 'cf', 'choch', 'm15c', 'm15c1', 'h4', 'h1', 'closed', 'tf', 'janda', 'vrAge', 'touch', 'upTF', 'ltfChoch'],
+  trades: all.concat(twins, unfilled).map((x) => [x.m, x.k, x.side, x.opened, x.filled || null, +x.rr.toFixed(2), x.feat.d1, x.feat.struct, x.feat.session, ...x.v.map((v) => v.R == null ? null : +v.R.toFixed(2)), +x.mfe.toFixed(2), +x.cost.toFixed(3), x.status === 'closed' ? 1 : 0, x.feat.cf, x.feat.choch, x.feat.m15c, x.feat.m15c1, x.feat.h4 || null, x.feat.h1 || null, x.v[0].closed || x.ended || null, x.h, x.feat.janda || null, x.feat.vrAge || null, x.feat.touch || null, x.feat.upTF || null, x.feat.ltfChoch || null, x.feat.fvgH || null, x.feat.fvgL || null, x.feat.kl || null, x.feat.klStop || null]),
+  tradeCols: ['market', 'setup', 'side', 'opened', 'filled', 'rr', 'd1', 'struct', 'session', 'R_none', 'R_be1', 'R_be15', 'R_tp2', 'R_pt2', 'R_ts4', 'R_ts8', 'R_ts12', 'mfe', 'cost', 'fill', 'cf', 'choch', 'm15c', 'm15c1', 'h4', 'h1', 'closed', 'tf', 'janda', 'vrAge', 'touch', 'upTF', 'ltfChoch', 'fvgH', 'fvgL', 'kl', 'klStop'],
   twins: twins.length, unfilled: unfilled.length,
   examples: EX.map((x) => ({ id: x.id, market: x.market, side: x.side, entry: x.entry, stop: x.stop, target: x.target, entryFrom: x.entryFrom, entryTo: x.entryTo,
     caught: x.caught, setups: x.setups.map(({ s, ...v }) => v), sweep: x.sweep.map(({ s, ...v }) => v), m15: x.m15.map(({ s, ...v }) => v) })),
