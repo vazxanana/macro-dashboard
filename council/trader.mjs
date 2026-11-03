@@ -239,6 +239,26 @@ let research = rd('research.json', []);
 // the CHoCH level toward the extreme, valid 4 h; stop past the extreme; target the leg's start; out after 48 h. On the
 // 150-day replay it fires on all four of his trades (3 of 4 win on his days) but is about break-even overall, so it runs on
 // paper to compare with his trades and learn which turns he takes.
+// The gold platform's own engulfing (gold-trading.html detectEngulfings): body at least the 20-candle average and bigger than
+// the engulfed body, 15% tolerance on the engulfed side; ★ when its mid sits within 0.12% of PDH/PDL, the Asia high/low or a
+// $50/$100 round number (VWAP left out: no volume here)
+function platformEngulfs(bars, bull) {
+  const out = [], body = bars.map((c) => Math.abs(c.close - c.open));
+  for (let i = 1; i < bars.length; i++) {
+    const p = bars[i - 1], c = bars[i], st = Math.max(0, i - 20), avg = body.slice(st, i).reduce((a, b) => a + b, 0) / (i - st);
+    if (body[i] < avg || body[i] < body[i - 1]) continue;
+    const eps = Math.max(0.05, body[i - 1] * 0.15), pT = Math.max(p.open, p.close), pB = Math.min(p.open, p.close);
+    if (bull ? c.close > c.open && p.close < p.open && c.close >= pT && c.open <= pB + eps : c.close < c.open && p.close > p.open && c.close <= pB && c.open >= pT - eps) out.push({ i, p, c });
+  }
+  return out;
+}
+function goldLevels(src, t) {
+  const d0 = Math.floor(t / 86400) * 86400, L = [];
+  const prev = src['1h'].bars.filter((b) => b.time >= d0 - 86400 && b.time < d0);
+  if (prev.length) L.push(Math.max(...prev.map((b) => b.high)), Math.min(...prev.map((b) => b.low)));
+  if (t >= d0 + 7 * 3600) { const asia = src['15m'].bars.filter((b) => b.time >= d0 && b.time < d0 + 7 * 3600); if (asia.length) L.push(Math.max(...asia.map((b) => b.high)), Math.min(...asia.map((b) => b.low))); }
+  return L;
+}
 function replicaSignals(src) {
   const B5 = src['5m'].bars.slice(0, -1), B15 = src['15m'].bars.slice(0, -1), out = [];
   if (B5.length < 90 || B15.length < 20) return out;
@@ -261,7 +281,18 @@ function replicaSignals(src) {
       for (let j = 1; j < B5r.length && !eg; j++) { const p = B5r[j - 1], c = B5r[j];
         const ok = sell ? (p.close > p.open && c.close < c.open && c.close <= p.close && c.open >= p.open) : (p.close < p.open && c.close > c.open && c.close >= p.open && c.open <= p.close);
         if (ok && Math.abs((sell ? Math.max(p.high, c.high) : Math.min(p.low, c.low)) - ext) <= 0.5 * atr15) eg = true; }
-      out.push({ sell, ext, lvl, start, atr: atr15, tc: bars[iC].time, L, eg });
+      // the platform's engulfing at the extreme (M5 last 2 h, M15 last 2 h) and its ★ (at structure)
+      let peg = false, star = false; const lv = goldLevels(src, bars.at(-1).time + 300);
+      for (const [B, look] of [[B5, 24], [B15, 8]]) {
+        const bb = B.slice(-(look + 25));
+        for (const { i, p, c } of platformEngulfs(bb, !sell)) {
+          if (i < bb.length - look) continue;
+          if (Math.abs((sell ? Math.max(p.high, c.high) : Math.min(p.low, c.low)) - ext) > 0.5 * atr15) continue;
+          peg = true; const mid = (c.high + c.low) / 2;
+          if (lv.concat([Math.round(mid / 100) * 100, Math.round(mid / 50) * 50]).some((l) => Math.abs(mid - l) <= mid * 0.0012)) star = true;
+        }
+      }
+      out.push({ sell, ext, lvl, start, atr: atr15, tc: bars[iC].time, L, eg, peg, star });
     }
   }
   return out;
@@ -359,11 +390,12 @@ for (const [key, M] of Object.entries(MARKETS)) {
         const entry = price, buf = Math.max(0.1 * g.atr, 0.3), stop = g.sell ? g.ext + buf : g.ext - buf, r0 = Math.abs(entry - stop);
         if (!(r0 > 0) || (g.sell ? entry >= stop : entry <= stop)) continue;
         const h1live = src['1h'].A.events.filter((e) => e.endIdx == null && e.top > e.bot), h1clear = !h1live.some((e) => entry <= e.top && entry >= e.bot);
-        const pass = h1clear || g.eg, t1 = entry + (g.sell ? -2 : 2) * r0;
+        // v3: pass = clear of H1 Origins or the platform's ★ engulfing at the extreme; star = the ★ engulfing alone
+        const pass = h1clear || g.star, t1 = entry + (g.sell ? -2 : 2) * r0;
         research.push({ id: `${key}-replica-${now}-${g.sell ? 's' : 'b'}`, sig, market: key, label: M.label, dec: M.dec, k: 'replica', name: 'Gold replica', side: g.sell ? 'sell' : 'buy',
-          entry: +entry.toFixed(2), stop: +stop.toFixed(2), t1: +t1.toFixed(2), rr: 2, opened: now, filled: now, checked: now, status: 'open', R: null, v: 2,
-          pass, h1clear, eg: g.eg, legStart: +g.start.toFixed(2), leg: g.L === 36 ? '3h' : '6h', ext: +g.ext.toFixed(2), chochLevel: +g.lvl.toFixed(2), d1: src['1d'].A.trend === (g.sell ? -1 : 1) ? 'with' : 'against', session: sessionOf(now),
-          note: `Research (paper only): gold replica v2${pass ? '' : ' (filter fails: inside a live H1 Origin, no M5 engulfing)'}. ${g.L === 36 ? '3 h' : '6 h'} leg to ${g.ext.toFixed(2)}, M5 CHoCH through ${g.lvl.toFixed(2)}${g.eg ? ', M5 engulfing at the extreme' : ''}${h1clear ? ', clear of H1 Origins' : ''}; ${g.sell ? 'sell' : 'buy'} ${entry.toFixed(2)}, stop ${stop.toFixed(2)}, target 2R ${t1.toFixed(2)}.` });
+          entry: +entry.toFixed(2), stop: +stop.toFixed(2), t1: +t1.toFixed(2), rr: 2, opened: now, filled: now, checked: now, status: 'open', R: null, v: 3,
+          pass, h1clear, eg: g.eg, peg: g.peg, star: g.star, legStart: +g.start.toFixed(2), leg: g.L === 36 ? '3h' : '6h', ext: +g.ext.toFixed(2), chochLevel: +g.lvl.toFixed(2), d1: src['1d'].A.trend === (g.sell ? -1 : 1) ? 'with' : 'against', session: sessionOf(now),
+          note: `Research (paper only): gold replica v3${pass ? '' : ' (filter fails: inside a live H1 Origin, no ★ engulfing)'}. ${g.L === 36 ? '3 h' : '6 h'} leg to ${g.ext.toFixed(2)}, M5 CHoCH through ${g.lvl.toFixed(2)}${g.star ? ', ★ engulfing at structure at the extreme' : g.peg ? ', engulfing at the extreme (not at a level)' : ''}${h1clear ? ', clear of H1 Origins' : ''}; ${g.sell ? 'sell' : 'buy'} ${entry.toFixed(2)}, stop ${stop.toFixed(2)}, target 2R ${t1.toFixed(2)}.` });
       }
     }
     for (const r of research.filter((x) => x.market === key && x.k !== 'replica' && x.status === 'open')) {
@@ -819,7 +851,7 @@ research = research.slice(-2000);
   snapshot.research = { cycle: { closed: done.length, wins: done.filter((x) => x.status === 'win').length, R: +R.toFixed(2), open: research.filter((x) => x.k !== 'replica' && x.status === 'open').length } };
   const rp = research.filter((x) => x.k === 'replica'), sum = (a) => { const d = a.filter((x) => x.status === 'win' || x.status === 'loss' || x.status === 'be');
     return { signals: a.length, closed: d.length, wins: d.filter((x) => x.status === 'win').length, R: +d.reduce((s, x) => s + x.R, 0).toFixed(2), open: a.filter((x) => x.status === 'open').length, pending: a.filter((x) => x.status === 'pending').length }; };
-  snapshot.research.replica = { all: sum(rp), pass: sum(rp.filter((x) => x.pass !== false && x.v === 2)) }; }
+  snapshot.research.replica = { all: sum(rp), pass: sum(rp.filter((x) => x.pass && x.v >= 2)), star: sum(rp.filter((x) => x.star)) }; }
 wr('research.json', research);
 snapshot.lessons = lessons(trades, now);
 wr('snapshot.json', snapshot);

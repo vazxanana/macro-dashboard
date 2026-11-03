@@ -190,3 +190,10 @@ reported in `snapshot.json` → `research.replica`, to compare with his trades d
 `h1clear` (entry outside every live H1 Origin), `eg` (an M5 engulfing at the extreme) and `pass` = either of them; the
 snapshot reports `research.replica.pass` and `.all`. On the 150-day gold replay the passing signals made +0.075R a trade
 on the first 100 days (593) and +0.077R on the last 50 (352), keeping all four of the trader's trades; all signals +0.035 / +0.000.
+
+**Replica v3 (3 Nov, later):** the engulfing check is now the gold platform's own (`detectEngulfings` in gold-trading.html:
+body ≥ the 20-candle average and > the engulfed body, 15% tolerance) on M5 and M15 at the extreme, with its ★ = the
+engulfing's mid within 0.12% of PDH/PDL, the Asia high/low or a $50/$100 level. On the 150-day gold replay (market entry,
+2R) ★ signals made +0.31R a trade on the first 100 days (163, t 3.3) and +0.16R on the last 50 (104); every full month
+positive (+3, +20, +17, +14, +18R), +58R without the top 5, both sides and every session positive. `pass` = clear of H1
+Origins or ★ (+0.14R / +0.07R, keeps all four of the trader's trades); the snapshot also reports `research.replica.star`.
