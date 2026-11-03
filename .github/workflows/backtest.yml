@@ -16,7 +16,7 @@ permissions:
   contents: write
 
 concurrency:
-  group: council-research-n2
+  group: council-research-h2
   cancel-in-progress: false
 
 jobs:
@@ -56,7 +56,8 @@ jobs:
         env:
           DUKA_CACHE: .duka-cache
           BT_MARKETS: ${{ matrix.market }}
-          BT_N: '2'
+          BT_N: '6'
+          BT_N_HTF: '2'
           KRAKEN_BUDGET: '400'
         run: |
           mkdir -p bt && cp data/config.json bt/
@@ -66,7 +67,7 @@ jobs:
         run: |
           DAYS="${{ github.event.inputs.days || '150' }}"
           mkdir -p data/research/parts
-          cp bt/backtest.json "data/research/parts/${DAYS}d-n2-${{ matrix.market }}.json"
+          cp bt/backtest.json "data/research/parts/${DAYS}d-h2-${{ matrix.market }}.json"
           git -C data config user.name "mosha-council"
           git -C data config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git -C data add research/parts
@@ -114,7 +115,7 @@ jobs:
               out.cleaned = Object.assign(out.cleaned || {}, (b.markets || {}).cleaned || {});
               out.trades.push(...b.trades);
             }
-            fs.writeFileSync(`data/research/backtest-${days}d-n2.json`, JSON.stringify(out));
+            fs.writeFileSync(`data/research/backtest-${days}d-h2.json`, JSON.stringify(out));
             console.log(`${out.trades.length} rows from ${Object.keys(out.markets).length} markets`, out.coverage, out.errors);
           ' "$DAYS"
           git -C data config user.name "mosha-council"
