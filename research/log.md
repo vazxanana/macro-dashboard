@@ -94,5 +94,11 @@ session filter added. Platform engulfing (gold-trading.html detectEngulfings, si
 t 3.3) / +0.160R (104); every month positive, +58R of +68R without the top 5, buys and sells, all sessions. Shipped as the
 replica's ★ tag; pass = H1 clear or ★ (+0.142 / +0.074, keeps 4/4). Candidate for live once forward ★ trades confirm.
 
+**Replica v4 (#156), selection after the 3 Nov range day (8 signals, −2.9R; he took 2):** range location of the extreme
+(12/24/48 h) — no consistent bucket (edge 0.85+: +0.067 / −0.018); room to the far side of 24 h — noisy (3R+: +0.060 /
++0.047). Stop size in M15 ATR: under 1 ATR −0.035 / −0.134 (the mid-range turns), 1–2 ATR +0.090 / +0.055, all his trades
+1.1–3.4 ATR. Filter H1 clear or ★ AND stop ≥ 1 ATR: +0.188R (319, t 2.9) / +0.125R (208, t 1.9), no losing month,
+keeps 4/4; 3 Nov 5 signals +0.4R. Shipped (paper).
+
 **Shipped to the live trader today:** bad-print clipping (#144), lone forex wicks (#146, #147), forex exits wait 3 minutes
 and the 7 trades closed by bad prints were reopened (#148), gold trade chart on spot (#145).
