@@ -197,3 +197,8 @@ engulfing's mid within 0.12% of PDH/PDL, the Asia high/low or a $50/$100 level. 
 2R) ★ signals made +0.31R a trade on the first 100 days (163, t 3.3) and +0.16R on the last 50 (104); every full month
 positive (+3, +20, +17, +14, +18R), +58R without the top 5, both sides and every session positive. `pass` = clear of H1
 Origins or ★ (+0.14R / +0.07R, keeps all four of the trader's trades); the snapshot also reports `research.replica.star`.
+
+**Replica v4 (3 Nov, night):** `pass` also needs a stop of at least one M15 ATR (`riskAtr`). Stops tighter than that lost
+on the replay (−0.04R / −0.13R a trade). Clear of H1 or ★, with stop ≥ 1 ATR: +0.188R a trade on the first 100 days (319,
+t 2.9) and +0.125R on the last 50 (208, t 1.9), no losing month, keeps all four of the trader's trades; on 3 Nov it would
+have taken 5 of the 8 signals for +0.4R instead of −2.9R. Range location and room-to-target were tested and rejected.
