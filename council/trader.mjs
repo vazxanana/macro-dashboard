@@ -169,6 +169,28 @@ function dailyCycle(src, price, t) {
   if (!(r > 0)) return null;
   return { sell: bear, entry: price, stop, t1: price + (bull ? 3 : -3) * r, closeBy: d + 21 * 3600, day: d, londonHigh: hi, londonLow: lo };
 }
+// Bad prints: thin feeds (Kraken FX trades, stitched Yahoo/Dukascopy) carry the odd off-market tick that makes a 1,000-pip
+// candle and a fake 160R trade. A wick longer than K times the median candle range of the last 100 candles is clipped to the
+// body plus one median range; a candle whose body jumps K ranges away and comes straight back is flattened to the prior close.
+const BAD_K = 50;   // a real news candle (NFP ≈ 30–50 median 1m ranges) is mostly body, so it is not touched
+function cleanBars(arr) {
+  let fixed = 0; const win = [];
+  for (let i = 0; i < arr.length; i++) {
+    const b = arr[i];
+    const med = win.length >= 20 ? [...win].sort((x, y) => x - y)[win.length >> 1] : 0;
+    if (med > 0) {
+      const lim = BAD_K * med, p = arr[i - 1], n = arr[i + 1];
+      if (p && n && Math.abs(b.close - p.close) > lim && Math.abs(n.open - p.close) < lim / 2) {
+        Object.assign(b, { open: p.close, high: p.close, low: p.close, close: p.close }); fixed++;
+      }
+      const top = Math.max(b.open, b.close), bot = Math.min(b.open, b.close);
+      if (b.high - top > lim) { b.high = top + med; fixed++; }
+      if (bot - b.low > lim) { b.low = bot - med; fixed++; }
+    }
+    const r = b.high - b.low; if (r > 0) { win.push(r); if (win.length > 100) win.shift(); }
+  }
+  return fixed;
+}
 let research = rd('research.json', []);
 for (const [key, M] of Object.entries(MARKETS)) {
   try {
@@ -176,6 +198,8 @@ for (const [key, M] of Object.entries(MARKETS)) {
     for (const [id, iv] of TFS) {
       const bars = await kraken(M.kraken, iv);
       await sleep(1100);
+      const nBad = cleanBars(bars);
+      if (nBad) { snapshot.cleaned = snapshot.cleaned || {}; (snapshot.cleaned[key] = snapshot.cleaned[key] || {})[id] = nBad; }
       src[id] = { bars };
     }
     const off = M.spot ? basisFor(key, src['1m'].bars) : 0;
