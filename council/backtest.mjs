@@ -402,7 +402,7 @@ for (const [key, M] of Object.entries(MARKETS)) {
       for (const [id, iv, sec] of TFS) data[id] = await klines(M.sym, iv, startT - (WIN + 2) * sec, endT);
     }
     if (!FAKE) {
-      const fx = Object.fromEntries(Object.entries(data).map(([id, arr]) => [id, cleanBars(arr, M.group === 'Forex' ? { wickK: 15 } : {})]).filter(([, n]) => n));
+      const fx = Object.fromEntries(Object.entries(data).map(([id, arr]) => [id, cleanBars(arr, M.group === 'Forex' && ['1m', '5m', '15m', '30m'].includes(id) ? { wickK: 15 } : {})]).filter(([, n]) => n));
       if (Object.keys(fx).length) { meta.cleaned = Object.assign(meta.cleaned || {}, { [key]: fx }); console.log(`${key}: bad prints clipped`, fx); }
     }
     const m1 = data['1m'];
