@@ -472,6 +472,7 @@
             <label><input type="checkbox" id="ms-show-htf" data-show="htf" checked><i style="border:1.5px dashed #2962ff"></i>HTF Origin</label>
             <label><input type="checkbox" id="ms-show-next" data-show="next" checked><i style="background:#2962ff;height:2px"></i>Next setup</label>
             <label><input type="checkbox" id="ms-show-plan" data-show="plan" checked><i style="background:#089981;height:2px"></i>Selected trade</label>
+            <label><input type="checkbox" id="ms-show-replica" data-show="replica" checked><i style="background:#7b61ff;height:2px"></i>Replica (gold M5)</label>
             <label><input type="checkbox" id="ms-show-sess" data-show="sess" checked><i style="border-left:1.5px dashed #2962ff;width:2px;height:12px;border-radius:0"></i>Sessions</label>
             <label><input type="checkbox" id="ms-show-news" data-show="news" checked><i style="border-left:1.5px dotted #f0a500;width:2px;height:12px;border-radius:0"></i>News</label>
             <label><input type="checkbox" id="ms-show-detail" data-show="detail"><i style="background:var(--ink-faint);height:6px"></i>Detailed view</label>
@@ -636,6 +637,13 @@
         <div class="c-kpi" id="ms-c-kpi"></div>
         <div class="c-eq" id="ms-c-eq"></div>
         <div class="ms-bt-wrap"><table class="ms-bt-t c-t"><thead><tr><th>Opened</th><th>Market</th><th>Setup</th><th>Side</th><th class="n">Entry</th><th class="n">Stop</th><th class="n">Target 1</th><th>Result</th></tr></thead><tbody id="ms-c-trades"></tbody></table></div>
+      </div>
+      <div class="card c-rep">
+        <div class="ms-k"><span>Gold replica · the live gold setup (your M5 CHoCH turns)</span></div>
+        <p class="ms-note">A leg of 2+ M15 ATRs in 3 h or 6 h, then an M5 CHoCH; taken when clear of live H1 Origins or with a ★ engulfing at the extreme, and a stop of at least one M15 ATR. Market entry, stop past the extreme, 2R, out after 48 h. The M5 gold chart marks every signal of the last 24 h.</p>
+        <div class="c-kpi" id="ms-rep-kpi"></div>
+        <p class="ms-note" id="ms-rep-paper"></p>
+        <ul class="cal-day" id="ms-rep-list"></ul>
       </div>
       <div class="card c-cal">
         <div class="ms-k"><span>Calendar · result by day (R, trades closed that day)</span><span class="c-tog"><span class="cal-nav"><button type="button" id="ms-cal-prev" aria-label="Previous month">‹</button><b id="ms-cal-m"></b><button type="button" id="ms-cal-next" aria-label="Next month">›</button></span><label class="c-mine"><input type="checkbox" id="ms-cal-sh"> Include shadow trades</label></span></div>
@@ -968,7 +976,7 @@ function msNextSetup(bars, A) {
     vr:   { fill: 'rgba(255,152,0,0.18)', stroke: 'rgba(224,134,0,0.9)' },
     htf:  'rgba(41,98,255,0.85)', proj: '#2962ff',
   };
-  const G = { theme: root.dataset.chart === 'dark' ? 'dark' : 'light', show: { bo: true, origin: true, cf: true, vr: true, next: true, htf: true, plan: true, detail: false, sess: true, news: true }, risk: 100, alerts: false, plan: null, prev: null, sel: null, prevStates: {}, planKey: '',
+  const G = { theme: root.dataset.chart === 'dark' ? 'dark' : 'light', show: { bo: true, origin: true, cf: true, vr: true, next: true, htf: true, plan: true, detail: false, sess: true, news: true, replica: true }, risk: 100, alerts: false, plan: null, prev: null, sel: null, prevStates: {}, planKey: '',
     offset: 0, spot: null, source: '', live: false, csv: false };
   const $ = (id) => document.getElementById(id);
   const $o = (id) => document.getElementById(id) || { set textContent(v) {}, set className(v) {}, set innerHTML(v) {}, style: {} };
@@ -978,7 +986,7 @@ function msNextSetup(bars, A) {
 
   // ─── Drawing overlay (series primitive) ───
   class Overlay {
-    constructor() { this.items = { boxes: [], lines: [], labels: [], path: [], vlines: [] }; this.views = [new View(this, 'bottom'), new View(this, 'top')]; }
+    constructor() { this.items = { boxes: [], lines: [], labels: [], path: [], vlines: [], segs: [] }; this.views = [new View(this, 'bottom'), new View(this, 'top')]; }
     attached(p) { this.chart = p.chart; this.series = p.series; this.req = p.requestUpdate; }
     detached() {}
     updateAllViews() {}
@@ -1022,6 +1030,12 @@ function msNextSetup(bars, A) {
       return;
     }
     const texts = [];
+    (it.segs || []).forEach((sg) => {
+      const x1 = X(sg.l1), x2 = X(sg.l2), y1 = Y(sg.p1), y2 = Y(sg.p2);
+      if ([x1, x2, y1, y2].some((v) => v === null)) return;
+      ctx.strokeStyle = sg.color; ctx.lineWidth = sg.w || 1.5; ctx.setLineDash(sg.dash ? [5, 4] : []);
+      ctx.beginPath(); ctx.moveTo(x1, y1); ctx.lineTo(x2, y2); ctx.stroke(); ctx.setLineDash([]);
+    });
     it.lines.forEach((ln, k) => {
       const x1 = X(ln.l1), x2 = X(ln.l2), y = Y(ln.p);
       if ([x1, x2, y].some((v) => v === null)) return;
@@ -1130,6 +1144,122 @@ function msNextSetup(bars, A) {
     }
   }
 
+  // ─── Gold replica (the Council's live gold setup, rebuilt from the trader's marked trades) ───
+  // Same rules as council/trader.mjs replicaSignals: a leg of at least 2 M15 ATRs in the last 3 h or 6 h, then an M5 close
+  // back through the last 1-candle swing against it (the CHoCH). Pass = clear of live H1 Origins or a ★ engulfing at the
+  // extreme (the platform's engulfing at PDH/PDL, the Asia high/low or a $50/$100 level), and a stop of at least one M15 ATR.
+  // Trade: market at the CHoCH, stop just past the extreme, target 2R, out after 48 h.
+  function repEngulfs(bars, bull) {
+    const out = [], body = bars.map((c) => Math.abs(c.close - c.open));
+    for (let i = 1; i < bars.length; i++) {
+      const p = bars[i - 1], c = bars[i], st = Math.max(0, i - 20), avg = body.slice(st, i).reduce((a, b) => a + b, 0) / (i - st);
+      if (body[i] < avg || body[i] < body[i - 1]) continue;
+      const eps = Math.max(0.05, body[i - 1] * 0.15), pT = Math.max(p.open, p.close), pB = Math.min(p.open, p.close);
+      if (bull ? c.close > c.open && p.close < p.open && c.close >= pT && c.open <= pB + eps : c.close < c.open && p.close > p.open && c.close <= pB && c.open >= pT - eps) out.push({ i, p, c });
+    }
+    return out;
+  }
+  function repLevels(H1, M15, t) {
+    const d0 = Math.floor(t / 86400) * 86400, L = [];
+    const prev = H1.filter((b) => b.time >= d0 - 86400 && b.time < d0);
+    if (prev.length) L.push(Math.max(...prev.map((b) => b.high)), Math.min(...prev.map((b) => b.low)));
+    if (t >= d0 + 7 * 3600) { const asia = M15.filter((b) => b.time >= d0 && b.time < d0 + 7 * 3600); if (asia.length) L.push(Math.max(...asia.map((b) => b.high)), Math.min(...asia.map((b) => b.low))); }
+    return L;
+  }
+  // B5/B15/H1: closed candles (UTC times, spot prices). Returns the signals firing on the newest closed M5 candle (or the one before).
+  function repSignals(B5, B15, H1) {
+    const out = [];
+    if (B5.length < 90 || B15.length < 20) return out;
+    const atr = (() => { const b = B15.slice(-15); let s = 0; for (let i = 1; i < b.length; i++) s += Math.max(b[i].high - b[i].low, Math.abs(b[i].high - b[i - 1].close), Math.abs(b[i].low - b[i - 1].close)); return s / (b.length - 1); })();
+    for (const L of [36, 72]) {
+      const base = B5.length - (L + 8), bars = B5.slice(base), n = bars.length;
+      for (const sell of [false, true]) {
+        const x = (b) => sell ? b.high : -b.low, y = (b) => sell ? -b.low : b.high;
+        let iS = n - 1; for (let j = n - 1; j >= n - L; j--) if (y(bars[j]) > y(bars[iS])) iS = j;
+        let iE = iS; for (let j = iS + 1; j < n; j++) if (x(bars[j]) > x(bars[iE])) iE = j;
+        const ext = sell ? bars[iE].high : bars[iE].low, start = sell ? bars[iS].low : bars[iS].high;
+        if (iS === iE || Math.abs(start - ext) < 2 * atr) continue;
+        const piv = (j, hi) => j - 1 >= 0 && j + 1 < n && (hi ? bars[j - 1].high <= bars[j].high && bars[j + 1].high < bars[j].high : bars[j - 1].low >= bars[j].low && bars[j + 1].low > bars[j].low);
+        let iP = -1; for (let j = iE - 1; j > iS; j--) if (piv(j, !sell)) { iP = j; break; }
+        const lvl = iP >= 0 ? (sell ? bars[iP].low : bars[iP].high) : start;
+        let iC = -1; for (let j = iE + 1; j < n; j++) if (sell ? bars[j].close < lvl : bars[j].close > lvl) { iC = j; break; }
+        if (iC < 0 || iC < n - 2) continue;
+        let peg = false, star = false, eg = null; const lv = repLevels(H1, B15, bars[n - 1].time + 300);
+        for (const [B, look, sec] of [[B5, 24, 300], [B15, 8, 900]]) {
+          const bb = B.slice(-(look + 25));
+          for (const { i, p, c } of repEngulfs(bb, !sell)) {
+            if (i < bb.length - look) continue;
+            if (Math.abs((sell ? Math.max(p.high, c.high) : Math.min(p.low, c.low)) - ext) > 0.5 * atr) continue;
+            const mid = (c.high + c.low) / 2, st = lv.concat([Math.round(mid / 100) * 100, Math.round(mid / 50) * 50]).some((l) => Math.abs(mid - l) <= mid * 0.0012);
+            peg = true; if (st) star = true;
+            if (!eg || (st && !eg.star)) eg = { t0: p.time, t1: c.time + sec, lo: Math.min(p.low, c.low), hi: Math.max(p.high, c.high), star: st };
+          }
+        }
+        out.push({ sell, ext, lvl, start, atr, L, peg, star, eg, iS: base + iS, iE: base + iE, iP: iP >= 0 ? base + iP : base + iS, iC: base + iC, tc: bars[iC].time });
+      }
+    }
+    return out;
+  }
+  // every replica signal of the last 24 h on the gold M5 candles, judged the way the Trader judges it, with its outcome
+  const REP = { key: '', sigs: [] };
+  function replicaScan() {
+    const p5 = panes['5m'], p15 = panes['15m'], p1 = panes['1h'];
+    if (instKey !== 'xau' || !p5 || !p15 || !p1 || !p5.raw || !p15.raw || !p1.raw) return [];
+    const off = G.offset, sp = (a) => a.map((b) => ({ time: b.time, open: b.open + off, high: b.high + off, low: b.low + off, close: b.close + off }));
+    const R5 = sp(p5.raw.slice(0, -1)), R15 = sp(p15.raw), R1 = sp(p1.raw);
+    const key = `${R5.length}|${R5.length && R5[R5.length - 1].time}|${off.toFixed(2)}|${R15.length}|${R1.length}`;
+    if (key === REP.key) return REP.sigs;
+    const sigs = [], seen = new Set(), from = Math.max(90, R5.length - 288);
+    for (let j = from; j <= R5.length; j++) {
+      const tEnd = R5[j - 1].time + 300, B5 = R5.slice(0, j), B15 = R15.filter((b) => b.time + 900 <= tEnd), H1 = R1.filter((b) => b.time + 3600 <= tEnd);
+      for (const g of repSignals(B5, B15, H1)) {
+        const id = `${g.sell ? 's' : 'b'}|${g.tc}`; if (seen.has(id)) continue; seen.add(id);
+        const iF = j - 1, entry = R5[iF].close, buf = Math.max(0.1 * g.atr, 0.3), stop = g.sell ? g.ext + buf : g.ext - buf, r0 = Math.abs(entry - stop);
+        if (!(r0 > 0) || (g.sell ? entry >= stop : entry <= stop)) continue;
+        let h1clear = true; try { const A = msAnalyze(R1.filter((b) => b.time <= tEnd), 6); h1clear = !A.events.some((e) => e.endIdx == null && e.top > e.bot && entry <= e.top && entry >= e.bot); } catch (e) {}
+        const riskAtr = r0 / g.atr, pass = (h1clear || g.star) && riskAtr >= 1, t1 = entry + (g.sell ? -2 : 2) * r0;
+        let res = null, iX = null;
+        for (let k = iF + 1; k < R5.length; k++) {
+          const b = R5[k];
+          if (g.sell ? b.high >= stop : b.low <= stop) { res = -1; iX = k; break; }
+          if (g.sell ? b.low <= t1 : b.high >= t1) { res = 2; iX = k; break; }
+          if (b.time >= R5[iF].time + 48 * 3600) { res = +((g.sell ? entry - b.close : b.close - entry) / r0).toFixed(2); iX = k; break; }
+        }
+        sigs.push({ ...g, iF, entry, stop, t1, r0, riskAtr, h1clear, pass, res, iX, t: tEnd });
+      }
+    }
+    REP.key = key; REP.sigs = sigs;
+    return sigs;
+  }
+  // the M5 markup: leg, CHoCH, engulfing at the extreme, the trade boxes and the result
+  function replicaItems(items, bars) {
+    if (!G.show.replica || instKey !== 'xau') return;
+    const sigs = replicaScan(), n = bars.length, ix = (t) => { const k = bars.findIndex((b) => b.time - TZ >= t); return k < 0 ? n : k; };
+    let live = []; try { live = (COUNCIL.trades || []).filter((x) => x.k === 'replica' && x.market === 'xau'); } catch (e) {}
+    sigs.filter((s, k) => s.pass || k === sigs.length - 1).slice(-4).forEach((s, k, arr) => {
+      const lastOne = k === arr.length - 1, sell = s.sell, col = sell ? '#f23645' : '#089981', fade = s.pass ? 1 : 0.45;
+      const rgba = (hex, a) => `rgba(${parseInt(hex.slice(1, 3), 16)},${parseInt(hex.slice(3, 5), 16)},${parseInt(hex.slice(5, 7), 16)},${a})`;
+      items.segs.push({ l1: s.iS, p1: s.start, l2: s.iE, p2: s.ext, color: rgba('#8a94a8', 0.9 * fade), dash: true });
+      items.labels.push({ l: s.iS, p: s.start, dy: sell ? 14 : -6, align: 'center', text: `${s.L === 36 ? '3 h' : '6 h'} leg`, color: rgba('#8a94a8', fade) });
+      items.lines.push({ l1: s.iP, l2: s.iC, p: s.lvl, color: rgba('#7b61ff', fade), w: 1.5, text: 'CHoCH M5', below: !sell });
+      if (s.eg) {
+        const l1 = ix(s.eg.t0) - 0.5, l2 = ix(s.eg.t1) - 0.5;
+        items.boxes.push({ l1, l2, lo: s.eg.lo, hi: s.eg.hi, fill: rgba('#f0a500', 0.18 * fade), stroke: rgba('#e08600', fade) });
+        items.labels.push({ l: (l1 + l2) / 2, p: sell ? s.eg.hi : s.eg.lo, dy: sell ? -6 : 15, align: 'center', text: s.eg.star ? 'EG ★' : 'EG', color: rgba('#e08600', fade) });
+      }
+      const real = live.find((x) => x.side === (sell ? 'sell' : 'buy') && Math.abs(x.opened - s.t) <= 900);
+      const entry = real ? real.entry : s.entry, stop = real ? real.stop : s.stop, t1 = real ? real.t1 : s.t1;
+      const l1 = s.iF + 1, l2 = s.iX != null ? s.iX + 1 : Math.min(n + 12, l1 + 40);
+      items.boxes.push({ l1, l2, lo: Math.min(entry, t1), hi: Math.max(entry, t1), fill: `rgba(8,153,129,${0.16 * fade})`, stroke: `rgba(6,122,103,${0.7 * fade})` });
+      items.boxes.push({ l1, l2, lo: Math.min(entry, stop), hi: Math.max(entry, stop), fill: `rgba(242,54,69,${0.16 * fade})`, stroke: `rgba(178,40,51,${0.7 * fade})` });
+      const tag = s.pass ? (real ? 'live' : 'passes') : (s.riskAtr < 1 ? 'filtered: stop < 1 ATR' : 'filtered: inside H1 Origin');
+      if (lastOne || s.pass) items.labels.push({ l: l1 + 1, dx: 2, p: t1, dy: sell ? 15 : -6, text: `Replica ${sell ? 'SELL' : 'BUY'} ${fmt(entry)} · ${tag}`, color: s.pass ? col : '#8a94a8' });
+      if (s.res != null) items.labels.push({ l: s.iX, p: s.res > 0 ? t1 : s.res === -1 ? stop : entry, dy: (s.res > 0) === sell ? 15 : -6, align: 'center', text: s.res === 2 ? '✓ +2R' : s.res === -1 ? '✗ −1R' : `${s.res > 0 ? '+' : ''}${s.res}R (48 h)`, color: s.res > 0 ? '#089981' : '#f23645' });
+      if (lastOne) P5pv.push(entry, stop, t1);
+    });
+  }
+  let P5pv = [];
+
   // ─── One chart pane per timeframe ───
   const panes = {};
   function makePane(tf) {
@@ -1176,7 +1306,7 @@ function msNextSetup(bars, A) {
     };
     P.draw = function () {
       const bars = P.bars, n = bars.length, A = P.A, S = P.S;
-      const items = { boxes: [], lines: [], labels: [], path: [], vlines: [] };
+      const items = { boxes: [], lines: [], labels: [], path: [], vlines: [], segs: [] };
       const D = G.show.detail, low = tf.sec <= 900;
       if (low) items.vlines = markerLines(bars, tf, D);
       const recent = A.events.slice(D ? -2 : -1), seen = new Set();
@@ -1229,7 +1359,9 @@ function msNextSetup(bars, A) {
         items.path = S.proj;
         S.proj.forEach((p) => { if (p.t) items.labels.push({ l: p.l, p: p.p, text: p.t, pill: true, bg: Z.proj, dy: p.t.startsWith('②') ? (S.sell ? -18 : 18) : (S.sell ? 18 : -18) }); });
       }
-      P.pv = items.path.map((q) => q.p);
+      P5pv = [];
+      if (tf.id === '5m') try { replicaItems(items, bars); } catch (e) { /* the other panes not loaded yet */ }
+      P.pv = items.path.map((q) => q.p).concat(tf.id === '5m' ? P5pv : []);
       overlay.set(items);
       P.priceLines.forEach((pl) => series.removePriceLine(pl)); P.priceLines = [];
       if (S) P.priceLines.push(series.createPriceLine({ price: S.invalid, color: '#787b86', lineWidth: 1, lineStyle: LW.LineStyle.Dashed, axisLabelVisible: true, title: 'Invalidation', lineVisible: G.show.detail }));
@@ -2392,11 +2524,23 @@ function msNextSetup(bars, A) {
   ['ms-cal-prev', 'ms-cal-next'].forEach((id, i) => { const b = document.getElementById(id); if (b) b.addEventListener('click', () => { CAL.m += i ? 1 : -1; if (CAL.m < 0) { CAL.m = 11; CAL.y--; } if (CAL.m > 11) { CAL.m = 0; CAL.y++; } CAL.sel = null; renderCalendar(); }); });
   { const sh = document.getElementById('ms-cal-sh'); if (sh) sh.addEventListener('change', renderCalendar); }
   { const g = document.getElementById('ms-cal'); if (g) g.addEventListener('click', (ev) => { const d = ev.target.closest('[data-day]'); if (!d) return; CAL.sel = CAL.sel === d.dataset.day ? null : d.dataset.day; renderCalendar(); }); }
+  function renderReplica() {
+    const C = COUNCIL, set = (id, html) => { const el = document.getElementById(id); if (el) el.innerHTML = html; };
+    const L = (C.trades || []).filter((x) => x.k === 'replica').sort((a, b) => b.opened - a.opened);
+    const done = L.filter((x) => ['win', 'loss', 'be'].includes(x.status)), R = done.reduce((a, x) => a + x.R, 0), w = done.filter((x) => x.R > 0).length;
+    const fR = (v) => `${v > 0 ? '+' : v < 0 ? '−' : ''}${Math.abs(v).toFixed(2)}R`;
+    set('ms-rep-kpi', `<div><span>Live trades</span><b>${L.length}${L.length - done.length ? ` <small>(${L.length - done.length} open)</small>` : ''}</b></div><div><span>Win rate</span><b>${done.length ? Math.round(w / done.length * 100) + '%' : '—'}</b></div><div><span>Total</span><b class="${R > 0 ? 'pos' : R < 0 ? 'neg' : ''}">${done.length ? fR(R) : '—'}</b></div><div><span>Per trade</span><b>${done.length ? fR(R / done.length) : '—'}</b></div>`);
+    const rp = C.snap && C.snap.research && C.snap.research.replica;
+    set('ms-rep-paper', rp ? `Every signal on paper since 3 Nov: ${rp.all.signals} (${rp.all.closed} closed, ${rp.all.closed ? fR(rp.all.R) : '—'}) · passing the filter ${rp.pass.signals} (${rp.pass.closed ? fR(rp.pass.R) : '—'}). 150-day replay: +0.19R / +0.13R a trade in the two halves. Judged after about 30 live trades.` : '');
+    const ST2 = { open: 'Open', win: 'Win', loss: 'Loss', be: 'Break-even' };
+    set('ms-rep-list', L.slice(0, 10).map((x) => `<li data-tid="${esc(x.id)}" tabindex="0" title="Show this trade on a chart"><span>${ftime(x.opened + TZ)}</span><b class="${x.side === 'sell' ? 'neg' : 'pos'}">${x.side.toUpperCase()}</b><span>${fmtI(x.entry, { dec: 2 })} · stop ${fmtI(x.stop, { dec: 2 })} · 2R ${fmtI(x.t1, { dec: 2 })}${x.feat && x.feat.star ? ' · ★' : ''}</span><b class="${x.R > 0 ? 'pos' : x.R < 0 ? 'neg' : ''}">${x.R != null ? fR(x.R) + (x.exit ? ` (${esc(x.exit)})` : '') : ST2[x.status] || x.status}</b></li>`).join('') || '<li class="empty">No live replica trade yet. The first passing signal goes live.</li>');
+  }
   function renderCouncil() {
     const root = document.getElementById('v-council'); if (!root) return;
     const set = (id, html) => { const el = document.getElementById(id); if (el) el.innerHTML = html; };
     const C = COUNCIL, TA = (C.trades || []).slice().reverse(), T = TA.filter((x) => !x.shadow);
     renderCalendar();
+    renderReplica();
     const showSh = document.getElementById('ms-c-shadow'), withSh = showSh && showSh.checked;
     const mine = document.getElementById('ms-c-mine'), only = mine && mine.checked;
     const list = only ? T.filter((x) => x.market === instKey) : T;
@@ -2534,7 +2678,7 @@ function msNextSetup(bars, A) {
   }
   const ST_NAME = { open: 'Open', pending: 'Waiting fill', missed: 'Missed', expired: 'Expired', skipped: 'Skipped' };
   const SESSION_NAME = { asia: 'Asia session', london: 'London session', overlap: 'London/New York overlap', newyork: 'New York session', late: 'Late session' };
-  ['ms-c-trades', 'ms-c-pm', 'ms-cal-day'].forEach((cid) => {
+  ['ms-c-trades', 'ms-c-pm', 'ms-cal-day', 'ms-rep-list'].forEach((cid) => {
     const el = document.getElementById(cid); if (!el) return;
     el.addEventListener('click', (ev) => { const r = ev.target.closest('[data-tid]'); if (r) openTrade(r.dataset.tid); });
     el.addEventListener('keydown', (ev) => { if (ev.key !== 'Enter' && ev.key !== ' ') return; const r = ev.target.closest('[data-tid]'); if (r) { ev.preventDefault(); openTrade(r.dataset.tid); } });
