@@ -155,3 +155,11 @@ Because a lone spike can only be judged once 3 later candles exist, forex trades
 minutes old (exits come up to 3 minutes late, never on a spike that is about to be clipped). Trades already closed by a
 bad print (listed in `BAD_PRINT_CLOSES`, found with the raw-candle probe) are reopened once, keep the old result in
 `badPrint`, and finish on the cleaned candles.
+
+## Take all signals (user rule, 3 Nov)
+
+`config.takeAll` (user rule `take-all`): every signal trades (paper), including the ones a filter, the exposure limit, the
+dollar cap, the minimum reward:risk or a session rule would block. Those trades keep the reasons in `blockedBy` (and say so
+in their note), so the results can always be split into what the rules would take and what they would block. Only a
+literal duplicate (same stop and target as an open trade) is still a shadow. The 150-day replay says trading every signal
+loses about 0.2R a trade; this is the trader's forward test of that. Remove the user rule (and `config.takeAll`) to go back.
