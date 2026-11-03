@@ -1,88 +1,166 @@
 {
- "date": "2026-11-02",
- "at": "2026-11-02T00:00:43.000Z",
+ "date": "2026-11-03",
+ "at": "2026-11-03T00:05:04.000Z",
  "stats": {
   "rscalp": {
+   "n": 4,
+   "w": 0,
+   "wr": 0,
+   "R": -3,
+   "exp": -0.75
+  },
+  "scalp": {
+   "n": 9,
+   "w": 0,
+   "wr": 0,
+   "R": -6,
+   "exp": -0.67
+  },
+  "intraday": {
    "n": 2,
+   "w": 1,
+   "wr": 0.5,
+   "R": 1.94,
+   "exp": 0.97
+  },
+  "rintra": {
+   "n": 3,
    "w": 0,
    "wr": 0,
    "R": -2,
-   "exp": -1
-  },
-  "scalp": {
-   "n": 1,
-   "w": 0,
-   "wr": 0,
-   "R": -1,
-   "exp": -1
+   "exp": -0.67
   }
  },
  "last14": {
-  "n": 3,
-  "w": 0,
-  "wr": 0,
-  "R": -3,
-  "exp": -1
+  "n": 18,
+  "w": 1,
+  "wr": 0.05555555555555555,
+  "R": -9.06,
+  "exp": -0.5
  },
  "lessons": {
-  "n": 7,
-  "losses": 4,
-  "system": 1,
-  "market": 3,
+  "n": 88,
+  "losses": 54,
+  "system": 27,
+  "market": 27,
   "byCause": {
    "retrace-fail": {
-    "n": 2,
-    "R": -2,
+    "n": 8,
+    "R": -8,
     "verdict": "market",
     "title": "The retracement never came",
     "lesson": "Retracement trades work best right after a strong HTF VR; skip them when the HTF move is still impulsive.",
-    "live": 1,
-    "shadow": 1
+    "live": 2,
+    "shadow": 6
    },
    "hunt": {
-    "n": 1,
-    "R": -1,
+    "n": 2,
+    "R": -2,
     "verdict": "system",
     "title": "Right idea, stopped out first",
     "lesson": "Put the stop past the next swing or the liquidity just beyond the CF, or wait for the sweep before entering.",
     "live": 1,
+    "shadow": 1
+   },
+   "leftmoney": {
+    "n": 8,
+    "R": 18.03,
+    "verdict": "system",
+    "title": "Target left money on the table",
+    "lesson": "Consider holding part of the position for the next target.",
+    "live": 1,
+    "shadow": 7
+   },
+   "reversal": {
+    "n": 4,
+    "R": -4,
+    "verdict": "market",
+    "title": "The market turned for real",
+    "lesson": "Valid loss: the stop did its job. Nothing to fix unless this setup keeps doing it.",
+    "live": 1,
+    "shadow": 3
+   },
+   "becost": {
+    "n": 3,
+    "R": 0,
+    "verdict": "system",
+    "title": "Break-even cost a win",
+    "lesson": "Move to break-even later (e.g. +1.5R) or only after a new structure break.",
+    "live": 2,
+    "shadow": 1
+   },
+   "normal": {
+    "n": 11,
+    "R": -11,
+    "verdict": "market",
+    "title": "Normal loss",
+    "lesson": "An accepted cost of trading. Count it, don't change the rules for it.",
+    "live": 3,
+    "shadow": 8
+   },
+   "late": {
+    "n": 1,
+    "R": -1,
+    "verdict": "system",
+    "title": "Late entry",
+    "lesson": "Take signals within the first few candles after the CF.",
+    "live": 1,
     "shadow": 0
    },
+   "besaved": {
+    "n": 7,
+    "R": 0,
+    "verdict": "market",
+    "title": "Break-even saved a loss",
+    "lesson": "The break-even rule protected this one.",
+    "live": 3,
+    "shadow": 4
+   },
+   "against": {
+    "n": 15,
+    "R": -15,
+    "verdict": "system",
+    "title": "Against the D1 trend",
+    "lesson": "Favour trades with the D1 trend, or demand more reward:risk against it.",
+    "live": 3,
+    "shadow": 12
+   },
+   "gaveback": {
+    "n": 9,
+    "R": -9,
+    "verdict": "system",
+    "title": "Gave back the profit",
+    "lesson": "Move the stop to break-even or take a partial at +1R.",
+    "live": 1,
+    "shadow": 8
+   },
    "clean": {
-    "n": 3,
-    "R": 2.24,
+    "n": 16,
+    "R": 26.5,
     "verdict": "market",
     "title": "Clean win",
     "lesson": "The setup worked as designed.",
     "live": 0,
-    "shadow": 3
+    "shadow": 16
    },
-   "normal": {
-    "n": 1,
-    "R": -1,
+   "gap": {
+    "n": 4,
+    "R": -4,
     "verdict": "market",
-    "title": "Normal loss",
-    "lesson": "An accepted cost of trading. Count it, don't change the rules for it.",
-    "live": 1,
-    "shadow": 0
+    "title": "Price gapped through the stop",
+    "lesson": "Gaps happen at reopens and on news; size so a gap is survivable.",
+    "live": 0,
+    "shadow": 4
    }
   },
   "top": [
-   "Right idea, stopped out first (1×): Put the stop past the next swing or the liquidity just beyond the CF, or wait for the sweep before entering."
+   "Against the D1 trend (15×): Favour trades with the D1 trend, or demand more reward:risk against it.",
+   "Gave back the profit (9×): Move the stop to break-even or take a partial at +1R.",
+   "Target left money on the table (8×): Consider holding part of the position for the next target."
   ]
  },
+ "fslot": "2026-11-03T00",
  "notes": [
-  "scalp: only with D1: against: -1.00R over 7 trades, too costly to keep taking while with is tested.",
-  "Break-even at +1R turned on: 5 of 20 recent losers (live and shadow) were +1R or more before turning around.",
-  "Paused scalp for 3 days: Expectancy -0.83R over 6 trades.",
-  "rscalp: only with D1 (backtest): 300 trades over the last 30 days: with +0.17R each, against -0.20R; true in both halves.",
-  "scalp: only against D1 (backtest), replacing \"only with D1\": 484 trades over the last 30 days: against +0.43R each, with -0.30R; true in both halves.",
-  "intraday: only against D1 (backtest): 122 trades over the last 30 days: against +0.41R each, with -0.80R; true in both halves.",
-  "Break-even turned off (backtest): 1013 trades over the last 30 days: no break-even +0.06R each, at +1R -0.04R, at +1.5R -0.01R.",
-  "Paused rintra for 3 days: Four losses in a row (3 live, 6 shadow blocked only by exposure or the dollar cap).",
-  "Resumed rintra: Its last 9 trades made +0.08R each and the backtest +0.16R over 96: a losing streak inside a record that pays is variance.",
-  "Resumed scalp early: The 11 trades it would have taken while paused (blocked only by the pause or portfolio limits) made +0.70R each.",
-  "rscalp: \"only with D1\" dropped (backtest): -0.16R each over 263, the excluded side -0.12R over 181: the filter no longer helps."
- ],
- "fslot": "2026-11-02T18"
+  "Minimum stop 0.6 → 0.7 ATR: Win rate 6% over 18 trades: stops get hit by normal candle noise."
+ ]
 }

@@ -1,7 +1,7 @@
 {
  "buf": 0.15,
  "minRR": 1.2,
- "minRisk": 0.6,
+ "minRisk": 0.7,
  "be": null,
  "fresh": 12,
  "newsGuard": false,
@@ -125,6 +125,12 @@
    "by": "coach-backtest",
    "change": "rscalp: \"only with D1\" dropped (backtest)",
    "why": "-0.16R each over 263, the excluded side -0.12R over 181: the filter no longer helps."
+  },
+  {
+   "at": "2026-11-03T00:05:04.000Z",
+   "by": "coach-stats",
+   "change": "Minimum stop 0.6 → 0.7 ATR",
+   "why": "Win rate 6% over 18 trades: stops get hit by normal candle noise."
   }
  ],
  "btAt": "2026-11-02T21:48:33.200Z",
