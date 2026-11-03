@@ -502,6 +502,10 @@ for (const [key, M] of Object.entries(MARKETS)) {
         const why = {}; sweepSetups(src, price, t, why, spreadOf(M, price));
         pushChange(x.sweep, t, why[x.side] || { stage: 'n/a' });
         const info = {}; chochSetups(src, price, t, info, spreadOf(M, price));
+        // the engine's H1/H4 marking in the trader's window, to compare with the boxes on the trader's chart
+        x.hmarks = x.hmarks || [];
+        for (const id of ['1h', '4h']) { const A = src[id].A, B = src[id].bars, f = (i) => (B[i] ? new Date(B[i].time * 1000).toISOString().slice(5, 16) : null);
+          pushChange(x.hmarks, t, { tf: id, trend: A.trend, events: A.events.slice(-4).map((e) => ({ dir: e.dir, choch: !!e.structure, level: +e.level.toFixed(2), at: f(e.breakIdx), top: +e.top.toFixed(2), bot: +e.bot.toFixed(2), live: e.endIdx == null, ended: e.endIdx != null ? f(e.endIdx) : null, vr: e.vr ? +e.vr.p.toFixed(2) : null })) }); }
         pushChange(x.m15, t, { state: info[x.side] || 'n/a' }, { price: +price.toFixed(2) });
       }
       for (const [pr, fn] of BUILDERS) {
@@ -598,7 +602,7 @@ const out = {
   tradeCols: ['market', 'setup', 'side', 'opened', 'filled', 'rr', 'd1', 'struct', 'session', 'R_none', 'R_be1', 'R_be15', 'R_tp2', 'R_pt2', 'R_ts4', 'R_ts8', 'R_ts12', 'mfe', 'cost', 'fill', 'cf', 'choch', 'm15c', 'm15c1', 'h4', 'h1', 'closed', 'tf', 'janda', 'vrAge', 'touch', 'upTF', 'ltfChoch', 'fvgH', 'fvgL', 'kl', 'klStop', 'closedT2', 'h1zone', 'h4zone'],
   twins: twins.length, unfilled: unfilled.length,
   examples: EX.map((x) => ({ id: x.id, market: x.market, side: x.side, entry: x.entry, stop: x.stop, target: x.target, entryFrom: x.entryFrom, entryTo: x.entryTo,
-    caught: x.caught, setups: x.setups.map(({ s, ...v }) => v), sweep: x.sweep.map(({ s, ...v }) => v), m15: x.m15.map(({ s, ...v }) => v) })),
+    caught: x.caught, setups: x.setups.map(({ s, ...v }) => v), sweep: x.sweep.map(({ s, ...v }) => v), m15: x.m15.map(({ s, ...v }) => v), hmarks: (x.hmarks || []).map(({ s, ...v }) => v) })),
 };
 fs.writeFileSync(path.join(DIR, 'backtest.json'), JSON.stringify(out));
 console.log(`\n${all.length} trades over ${DAYS} days (${((Date.now() - t0wall) / 1000).toFixed(0)}s)`);
