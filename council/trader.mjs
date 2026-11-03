@@ -172,7 +172,7 @@ function dailyCycle(src, price, t) {
 // Bad prints: thin feeds (Kraken FX trades, stitched Yahoo/Dukascopy) carry the odd off-market tick that makes a 1,000-pip
 // candle and a fake 160R trade. A wick longer than 50 times the median candle range of the last 100 candles is clipped to the
 // body plus one median range; a candle whose body jumps 50 ranges away and comes straight back is flattened to the prior close.
-// Forex and gold (opts.wickK = 15) also clip a lone wick past 15 ranges that the next 3 candles never trade back into: on
+// Forex (opts.wickK = 15) also clips a lone wick past 15 ranges that the next 3 candles never trade back into: on
 // 3 Nov 10:12 one Kraken order spiked AUD/USD 35 pips for a minute (Yahoo saw nothing) and hit five stops. News spikes get revisited.
 function cleanBars(arr, o = {}) {
   const K = o.k || 50, WK = o.wickK || 0, RV = o.revisit || 3;
@@ -204,7 +204,7 @@ for (const [key, M] of Object.entries(MARKETS)) {
     for (const [id, iv] of TFS) {
       const bars = await kraken(M.kraken, iv);
       await sleep(1100);
-      const nBad = cleanBars(bars, M.group === 'Crypto' ? {} : { wickK: 15 });
+      const nBad = cleanBars(bars, M.group === 'Forex' ? { wickK: 15 } : {});
       if (nBad) { snapshot.cleaned = snapshot.cleaned || {}; (snapshot.cleaned[key] = snapshot.cleaned[key] || {})[id] = nBad; }
       src[id] = { bars };
     }
