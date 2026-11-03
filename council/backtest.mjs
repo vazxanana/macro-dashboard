@@ -121,6 +121,38 @@ function atr(bars, n = 14) { const b = bars.slice(-n - 1); let s = 0; for (let i
 // level, so a straight drop like 2 Nov's 3,918 -> 3,905 -> 3,891 never confirms; its structure flip came only at the
 // 13:30 breakout.) Enter at market within two M15 candles of that close, stop just past the low (high), target the
 // nearest valid opposing M30/H1 Origin worth >= 1.2R. info (optional) gets each side's state, for the examples.
+// ─── Research setup: the trader's Origin entry (3 Nov) ───
+// Price is back inside the live Origin of the last H1 (or H4) BO after its run (VR made); the lower timeframe prints a CHoCH
+// the Origin's way = the entry, at market. Stop past the Origin's far edge; target the nearest opposing live H1/H4 Origin
+// (Origin to Origin), else the run's VR extreme. Keys: o1h_m1, o1h_m5 (H1 Origin), o4h_m5, o4h_m15 (H4 Origin).
+const ORIGIN_SETUPS = [['o1h_m1', '1h', '1m'], ['o1h_m5', '1h', '5m'], ['o4h_m5', '4h', '5m'], ['o4h_m15', '4h', '15m']];
+function originSetups(src, price, t, spr = 0) {
+  const out = [];
+  for (const [k, H, L] of ORIGIN_SETUPS) {
+    const hA = src[H] && src[H].A, lA = src[L] && src[L].A; if (!hA || !lA) continue;
+    for (const dir of [1, -1]) {
+      let e = null; for (let i = hA.events.length - 1; i >= 0; i--) if (hA.events[i].dir === dir) { e = hA.events[i]; break; }
+      if (!e || e.endIdx != null || !e.vr || !(e.top > e.bot) || price > e.top || price < e.bot) continue;
+      const vrT = src[H].bars[e.vr.i] ? src[H].bars[e.vr.i].time : 0, LB = src[L].bars, sec = SEC[L];
+      let c = null; for (let i = lA.events.length - 1; i >= 0; i--) { const x = lA.events[i]; if (x.dir === dir && x.structure) { c = x; break; } if (x.dir === dir) break; }
+      if (!c || !LB[c.breakIdx]) continue;
+      const tc = LB[c.breakIdx].time + sec; if (t - tc > 2 * sec || LB[c.breakIdx].time < vrT) continue;
+      const buf = Math.max(3 * spr, 0.05 * (e.top - e.bot)), stop = dir > 0 ? e.bot - buf : e.top + buf, r = (price - stop) * dir;
+      if (!(r > 0)) continue;
+      const edges = [];
+      for (const id of ['1h', '4h']) for (const o of src[id].A.events) {
+        if (o.dir !== -dir || o.endIdx != null) continue; const edge = dir > 0 ? o.bot : o.top;
+        if ((edge - price) * dir > 0) edges.push(edge);
+      }
+      edges.sort((a, b) => (a - b) * dir);
+      let t1 = edges.find((g) => (g - price) * dir / r >= 1.2);
+      if (t1 == null && (e.vr.p - price) * dir / r >= 1.2) t1 = e.vr.p;
+      if (t1 == null) continue;
+      out.push({ k, sell: dir < 0, entry: price, stop, t1, rr: (t1 - price) * dir / r, sig: `${k}|${dir}|${src[H].bars[e.breakIdx].time}|${LB[c.breakIdx].time}` });
+    }
+  }
+  return out;
+}
 function chochSetups(src, price, t, info, spr = 0) {
   const out = [], B = src['15m'].bars;
   const hm = (i) => new Date(B[i].time * 1000).toISOString().slice(11, 16), f2 = (v) => +v.toFixed(2);
@@ -527,7 +559,7 @@ for (const [key, M] of Object.entries(MARKETS)) {
         tw.v = VARIANTS.map(([n, be, t2, pt, ts]) => ({ n, be, t2, pt, ts, stop: tw.stop, beMoved: false, done: false, R: null }));
         open.push(tw);
       }
-      for (const sw of sweepSetups(src, price, t, null, spreadOf(M, price)).concat(chochSetups(src, price, t, null, spreadOf(M, price)), asiaRun(src, price, t, spreadOf(M, price)), dailyCycle(src, price, t, spreadOf(M, price)))) {
+      for (const sw of sweepSetups(src, price, t, null, spreadOf(M, price)).concat(chochSetups(src, price, t, null, spreadOf(M, price)), asiaRun(src, price, t, spreadOf(M, price)), dailyCycle(src, price, t, spreadOf(M, price)), originSetups(src, price, t, spreadOf(M, price)))) {
         if (seen.has(sw.sig)) continue; seen.add(sw.sig);
         const side = sw.sell ? 'sell' : 'buy';
         if (open.some((x) => x.k === sw.k && x.side === side)) continue;   // one sweep trade per side at a time
