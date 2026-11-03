@@ -329,6 +329,19 @@ function keyFeat(entry, stop) {
   const lo = Math.min(entry, stop), hi = Math.max(entry, stop), k = Math.ceil(lo / s) * s;
   return { kl: Math.abs(entry - near) <= 0.25 * r ? 'near' : 'far', klStop: k < hi && k > lo ? 'yes' : 'no' };
 }
+// The trader's Origin-to-Origin read (3 Nov): where the entry sits against the live H1/H4 Origins. opp-in = inside a live
+// Origin of the other direction (selling into fresh demand, as the 10:00 scalps did); with-in = inside a live Origin of the
+// trade's own direction (the trader's 09:45 buy); opp-path = an opposing live Origin sits between entry and target; clear.
+function zoneFeat(A, sell, entry, t1) {
+  if (!A || !A.events) return null;
+  const dir = sell ? -1 : 1, live = A.events.filter((e) => e.endIdx == null && e.top > e.bot);
+  const inside = (e) => entry <= e.top && entry >= e.bot;
+  if (live.some((e) => e.dir === -dir && inside(e))) return 'opp-in';
+  if (live.some((e) => e.dir === dir && inside(e))) return 'with-in';
+  const lo = Math.min(entry, t1), hi = Math.max(entry, t1);
+  if (live.some((e) => e.dir === -dir && e.bot < hi && e.top > lo)) return 'opp-path';
+  return 'clear';
+}
 function structFeat(sell, l, src, at) {
   const dir = sell ? -1 : 1, lp = src[l], ll = lp && lp.A && lp.A.last;
   const cf = ll && ll.dir === dir && ll.structure ? 'choch' : 'bo';
@@ -491,6 +504,7 @@ for (const [key, M] of Object.entries(MARKETS)) {
           feat.fvgH = fvgScan(src[def.h].bars, st.sell).some((g) => g.alive && st.entry >= g.lo && st.entry <= g.hi) ? 'in' : 'out';
           feat.fvgL = fvgScan(src[def.l].bars, st.sell, 120).some((g) => g.t >= cfT) ? 'yes' : 'no';
           Object.assign(feat, keyFeat(st.entry, st.stop));
+          feat.h1zone = zoneFeat(src['1h'].A, st.sell, st.entry, st.t1); feat.h4zone = zoneFeat(src['4h'].A, st.sell, st.entry, st.t1);
         } catch (e) {}
         const tr = { m: key, k: st.k, h: def.h, side, entry: st.entry, stop: st.stop, t1: st.t1, t2: st.t2 != null && (st.t2 - st.t1) * (st.sell ? -1 : 1) > 0 ? st.t2 : null, rr: st.rr, opened: t, status: 'pending', feat, mfe: 0 };
         if (st.sell ? price >= st.entry : price <= st.entry) {   // already through the entry: fill at market, like the Trader
@@ -548,8 +562,8 @@ const out = {
   byMarket: group(all, (x) => x.m),
   byRR: group(all, rrBand),
   bySetupCond: Object.fromEntries(setups.map((k) => { const a = all.filter((x) => x.k === k); return [k, { d1: group(a, (x) => x.feat.d1), struct: group(a, (x) => x.feat.struct), session: group(a, (x) => x.feat.session), rr: group(a, rrBand) }]; })),
-  trades: all.concat(twins, unfilled).map((x) => [x.m, x.k, x.side, x.opened, x.filled || null, +x.rr.toFixed(2), x.feat.d1, x.feat.struct, x.feat.session, ...x.v.map((v) => v.R == null ? null : +v.R.toFixed(2)), +x.mfe.toFixed(2), +x.cost.toFixed(3), x.status === 'closed' ? 1 : 0, x.feat.cf, x.feat.choch, x.feat.m15c, x.feat.m15c1, x.feat.h4 || null, x.feat.h1 || null, x.v[0].closed || x.ended || null, x.h, x.feat.janda || null, x.feat.vrAge || null, x.feat.touch || null, x.feat.upTF || null, x.feat.ltfChoch || null, x.feat.fvgH || null, x.feat.fvgL || null, x.feat.kl || null, x.feat.klStop || null, x.v[3].closed || x.ended || null]),
-  tradeCols: ['market', 'setup', 'side', 'opened', 'filled', 'rr', 'd1', 'struct', 'session', 'R_none', 'R_be1', 'R_be15', 'R_tp2', 'R_pt2', 'R_ts4', 'R_ts8', 'R_ts12', 'mfe', 'cost', 'fill', 'cf', 'choch', 'm15c', 'm15c1', 'h4', 'h1', 'closed', 'tf', 'janda', 'vrAge', 'touch', 'upTF', 'ltfChoch', 'fvgH', 'fvgL', 'kl', 'klStop', 'closedT2'],
+  trades: all.concat(twins, unfilled).map((x) => [x.m, x.k, x.side, x.opened, x.filled || null, +x.rr.toFixed(2), x.feat.d1, x.feat.struct, x.feat.session, ...x.v.map((v) => v.R == null ? null : +v.R.toFixed(2)), +x.mfe.toFixed(2), +x.cost.toFixed(3), x.status === 'closed' ? 1 : 0, x.feat.cf, x.feat.choch, x.feat.m15c, x.feat.m15c1, x.feat.h4 || null, x.feat.h1 || null, x.v[0].closed || x.ended || null, x.h, x.feat.janda || null, x.feat.vrAge || null, x.feat.touch || null, x.feat.upTF || null, x.feat.ltfChoch || null, x.feat.fvgH || null, x.feat.fvgL || null, x.feat.kl || null, x.feat.klStop || null, x.v[3].closed || x.ended || null, x.feat.h1zone || null, x.feat.h4zone || null]),
+  tradeCols: ['market', 'setup', 'side', 'opened', 'filled', 'rr', 'd1', 'struct', 'session', 'R_none', 'R_be1', 'R_be15', 'R_tp2', 'R_pt2', 'R_ts4', 'R_ts8', 'R_ts12', 'mfe', 'cost', 'fill', 'cf', 'choch', 'm15c', 'm15c1', 'h4', 'h1', 'closed', 'tf', 'janda', 'vrAge', 'touch', 'upTF', 'ltfChoch', 'fvgH', 'fvgL', 'kl', 'klStop', 'closedT2', 'h1zone', 'h4zone'],
   twins: twins.length, unfilled: unfilled.length,
   examples: EX.map((x) => ({ id: x.id, market: x.market, side: x.side, entry: x.entry, stop: x.stop, target: x.target, entryFrom: x.entryFrom, entryTo: x.entryTo,
     caught: x.caught, setups: x.setups.map(({ s, ...v }) => v), sweep: x.sweep.map(({ s, ...v }) => v), m15: x.m15.map(({ s, ...v }) => v) })),
