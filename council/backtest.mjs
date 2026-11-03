@@ -36,6 +36,8 @@ const TFS = [['1d', '1d', 86400], ['4h', '4h', 14400], ['1h', '1h', 3600], ['30m
 const SEC = Object.fromEntries(TFS.map(([id, , s]) => [id, s]));
 const WAIT = { '1d': 5 * 86400, '4h': 2 * 86400, '1h': 12 * 3600, '30m': 6 * 3600, '15m': 3 * 3600 };
 const FRESH = 12, WIN = 720, STEP = 300;
+// swing size for msAnalyze (6 = the Mosha engine; smaller = Photon-style structure, every valid pullback a swing)
+const SWING_N = +(process.env.BT_N || 6);
 // trade management variants: [name, break-even level, hold to the second target, +2R partial]
 // pt2: on a trade whose target is more than PARTIAL.over R away, bank PARTIAL.frac of it at +PARTIAL.at R and move the
 // stop to the entry for the rest (the same rule as the Trader's config.partial)
@@ -528,7 +530,7 @@ for (const [key, M] of Object.entries(MARKETS)) {
           if (f) bars.push(f);
         }
         if (bars.length < 60) { src.bad = true; break; }
-        src[id] = { bars, A: msAnalyze(bars, 6) };
+        src[id] = { bars, A: msAnalyze(bars, SWING_N) };
       }
       if (src.bad) continue;
       steps++;
@@ -631,7 +633,7 @@ const rrBand = (x) => x.rr < 1.5 ? '<1.5' : x.rr < 2.5 ? '1.5-2.5' : x.rr < 4 ? 
 const setups = [...new Set(all.map((x) => x.k))];
 const out = {
   at: new Date().toISOString(), days: DAYS, from: new Date(startT * 1000).toISOString(), to: new Date(endT * 1000).toISOString(), fake: FAKE,
-  cfg: { buf: CFG.buf, minRisk: CFG.minRisk }, markets: meta, n: all.length,
+  cfg: { buf: CFG.buf, minRisk: CFG.minRisk, swingN: SWING_N }, markets: meta, n: all.length,
   overall: byVar(all),
   bySetup: group(all, (x) => x.k),
   byMarket: group(all, (x) => x.m),
