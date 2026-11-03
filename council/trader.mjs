@@ -129,6 +129,12 @@ const USER_RULES = [
   { id: 'gold-m30', apply: (c) => { c.filters = c.filters || {}; c.filters.m30m1 = { d1: 'against', src: 'user', since: new Date().toISOString() }; },
     change: 'Gold M30 → M1 setup (user research): new setup on gold, only against D1',
     why: '150-day replay on gold: M30 → M1 against D1 made +0.13R a trade on the first 100 days (162) and +0.20R on the last 50 (110); with the live limits gold went from +12R to +33R (train +1 → +11, test +11 → +22). Concentrated: +3R without its 5 best trades; August and September negative.' },
+  // 3 Nov, 22:00: the gold replica goes live (the trader: "do what you think is best"). Gold trades only the replica's
+  // passing signals (v4); the engine's gold setups run as shadow trades (blockedBy 'replica', their other blockers still
+  // recorded); take-all ends, since every engine signal on gold loses about 0.2R a trade on the 150-day replay.
+  { id: 'replica-live', apply: (c) => { c.replicaLive = ['xau']; c.takeAll = false; },
+    change: 'Gold replica live (v4): gold trades the replica live; the engine setups run as shadows; take-all off',
+    why: '150-day gold replay: the replica v4 +0.19R a trade on the first 100 days and +0.13R on the last 50 (no losing month, +86R over 527 trades, all four of the trader\'s marked trades); the engine setups on gold, every signal taken, −0.15 to −0.2R a trade (−146R), with the rules +53R.' },
 ];
 config.userRules = config.userRules || [];
 for (const u of USER_RULES) if (!config.userRules.includes(u.id)) { u.apply(config); config.userRules.push(u.id); config.history.push({ at: nowISO, by: 'user', change: u.change, why: u.why }); }
@@ -343,13 +349,14 @@ for (const [key, M] of Object.entries(MARKETS)) {
           tr.closed = b.time; exitBar = b; break;
         }
         if (s ? b.low <= tr.t1 : b.high >= tr.t1) { tr.status = 'win'; tr.closed = b.time; tr.R = tr.rr; exitBar = b; break; }
+        if (tr.maxHold && b.time >= tr.filled + tr.maxHold) { const R = +((s ? tr.entry - b.close : b.close - tr.entry) / r0).toFixed(2); tr.status = R > 0 ? 'win' : R < 0 ? 'loss' : 'be'; tr.R = R; tr.closed = b.time; tr.exit = `${tr.maxHold / 3600} h`; exitBar = b; break; }
         // how far the trade went for (MFE) and against (MAE), in R: the Coach learns trade management from these
         tr.mfe = +Math.max(tr.mfe || 0, ((s ? tr.entry - b.low : b.high - tr.entry) / r0)).toFixed(2);
         tr.mae = +Math.max(tr.mae || 0, ((s ? b.high - tr.entry : tr.entry - b.low) / r0)).toFixed(2);
         // break-even rule from the Coach: once the trade is config.be R in profit, the stop moves to the entry
         // only on a candle that actually reached +be R: a trade that was past it before the rule existed and is now
         // back near the entry can't place a stop on the wrong side of price, so it waits until it gets there again
-        if (config.be && !tr.beMoved && ((s ? tr.entry - b.low : b.high - tr.entry) / r0) >= config.be) { tr.stop = tr.entry; tr.beMoved = true; }
+        if (config.be && !tr.noBe && !tr.beMoved && ((s ? tr.entry - b.low : b.high - tr.entry) / r0) >= config.be) { tr.stop = tr.entry; tr.beMoved = true; }
       }
       tr.checked = exitBar ? bars.at(-1).time : next;
       if (exitBar) startReview(tr, exitBar, key, NEWS);
@@ -397,6 +404,12 @@ for (const [key, M] of Object.entries(MARKETS)) {
           entry: +entry.toFixed(2), stop: +stop.toFixed(2), t1: +t1.toFixed(2), rr: 2, opened: now, filled: now, checked: now, status: 'open', R: null, v: 4,
           pass, h1clear, eg: g.eg, peg: g.peg, star: g.star, riskAtr: +riskAtr.toFixed(2), legStart: +g.start.toFixed(2), leg: g.L === 36 ? '3h' : '6h', ext: +g.ext.toFixed(2), chochLevel: +g.lvl.toFixed(2), d1: src['1d'].A.trend === (g.sell ? -1 : 1) ? 'with' : 'against', session: sessionOf(now),
           note: `Research (paper only): gold replica v4${pass ? '' : riskAtr < 1 ? ' (filter fails: stop under one M15 ATR)' : ' (filter fails: inside a live H1 Origin, no ★ engulfing)'}. ${g.L === 36 ? '3 h' : '6 h'} leg to ${g.ext.toFixed(2)}, M5 CHoCH through ${g.lvl.toFixed(2)}${g.star ? ', ★ engulfing at structure at the extreme' : g.peg ? ', engulfing at the extreme (not at a level)' : ''}${h1clear ? ', clear of H1 Origins' : ''}; ${g.sell ? 'sell' : 'buy'} ${entry.toFixed(2)}, stop ${stop.toFixed(2)}, target 2R ${t1.toFixed(2)}.` });
+        // live (config.replicaLive): every passing signal also trades on the live book, as on the replay (no slot limit),
+        // at market, 2R target, out after 48 h, no break-even move
+        if (pass && (config.replicaLive || []).includes(key)) trades.push({ id: `${key}-replica-${now}-${g.sell ? 's' : 'b'}`, market: key, label: M.label, dec: M.dec, k: 'replica', name: 'Replica', pair: 'M5 CHoCH', h: '5m', side: g.sell ? 'sell' : 'buy',
+          entry: +entry.toFixed(2), stop: +stop.toFixed(2), t1: +t1.toFixed(2), rr: 2, buf: CFG.buf, opened: now, filled: now, checked: now, status: 'open', R: null, r0: Math.abs(+entry.toFixed(2) - +stop.toFixed(2)), maxHold: 48 * 3600, noBe: true, entryMode: 'market',
+          feat: { d1: src['1d'].A.trend === (g.sell ? -1 : 1) ? 'with' : 'against', session: sessionOf(now), star: g.star, h1clear, riskAtr: +riskAtr.toFixed(2), leg: g.L === 36 ? '3h' : '6h' }, shadow: false, blockedBy: [],
+          note: `Gold replica (v4): ${g.L === 36 ? '3 h' : '6 h'} leg to ${g.ext.toFixed(2)}, M5 CHoCH through ${g.lvl.toFixed(2)}${g.star ? ', ★ engulfing at structure at the extreme' : g.peg ? ', engulfing at the extreme' : ''}${h1clear ? ', clear of H1 Origins' : ''}. ${g.sell ? 'Sell' : 'Buy'} at market, stop past the extreme, target 2R, out after 48 h.` });
       }
     }
     for (const r of research.filter((x) => x.market === key && x.k !== 'replica' && x.status === 'open')) {
@@ -470,14 +483,15 @@ for (const [key, M] of Object.entries(MARKETS)) {
       const ud = usdDir(M, t.sell ? 'sell' : 'buy');
       if (ud && trades.filter((x) => !x.shadow && (x.status === 'open' || x.status === 'pending') && MARKETS[x.market] && usdDir(MARKETS[x.market], x.side) === ud).length >= (config.maxUsd || MAX_USD)) blockedBy.push('usd');
       if (config.focus && config.focus.length && !config.focus.includes(key)) blockedBy.push('focus');
+      if ((config.replicaLive || []).includes(key)) blockedBy.push('replica');   // this market trades the replica live
       // re-entry (3 Nov, gold 150-day replay): a Scalp in the same direction within 3 h of a Scalp loss on this market loses
       // in every month (−0.24R a trade on the first 100 days, −0.52R, t −4.1, on the last 50; the other Scalps net +0.6R).
       // Like a duplicate it stays a shadow even under take-all, so its results keep being recorded.
       if (t.k === 'scalp' && trades.some((x) => x.market === key && x.k === 'scalp' && x.side === (t.sell ? 'sell' : 'buy') && x.status === 'loss' && x.closed && now - x.closed <= 3 * 3600)) blockedBy.push('reentry');
       // take-all (user): only a literal duplicate (or a market outside the focus) stays a shadow; every other blocked signal
       // trades, with its blockers recorded
-      const shadow = config.takeAll ? blockedBy.includes('duplicate') || blockedBy.includes('focus') || blockedBy.includes('reentry') : blockedBy.length > 0;
-      const why = { paused: `paused until ${String(config.paused[t.k]).slice(0, 10)}`, minRR: `reward:risk ${(isFinite(rrNow) ? rrNow : 0).toFixed(2)} under ${config.minRR}`, d1: `rule: only ${f.d1} D1`, cf: `rule: only ${f.cf === 'choch' ? 'a CHoCH' : 'a continuation BO'} as the confirming break`, choch: `rule: ${f.choch === 'yes' ? 'needs' : 'no'} fresh M15/M5 CHoCH`, m15c: `rule: ${f.m15c === 'yes' ? 'needs' : 'no'} M15 CHoCH (the trader's) within the hour`, struct: `rule: only ${f.struct} structure`, session: `rule: not in ${feat.session}`, exposure: 'already 2 trades or an opposite trade open on this market', news: 'high-impact news within the hour', duplicate: 'same stop and target as a trade already open', reentry: 'a Scalp the same way lost on this market in the last 3 hours', usd: `already ${config.maxUsd || MAX_USD} trades betting the same way on the dollar`, market: (f.noMarket || []).includes(key) ? `rule: ${t.k} skips ${key}` : `market paused until ${String(config.pausedMarkets[key]).slice(0, 10)}`, off: `rule: ${t.k} is switched off`, focus: `focus: only ${(config.focus || []).join(', ')} trades live`, rrBand: `rule: ${t.k} only at reward:risk ${f.minRR ? `≥ ${f.minRR}` : ''}${f.minRR && f.maxRR ? ' and ' : ''}${f.maxRR ? `≤ ${f.maxRR}` : ''}` };
+      const shadow = config.takeAll ? blockedBy.includes('duplicate') || blockedBy.includes('focus') || blockedBy.includes('reentry') || blockedBy.includes('replica') : blockedBy.length > 0;
+      const why = { paused: `paused until ${String(config.paused[t.k]).slice(0, 10)}`, minRR: `reward:risk ${(isFinite(rrNow) ? rrNow : 0).toFixed(2)} under ${config.minRR}`, d1: `rule: only ${f.d1} D1`, cf: `rule: only ${f.cf === 'choch' ? 'a CHoCH' : 'a continuation BO'} as the confirming break`, choch: `rule: ${f.choch === 'yes' ? 'needs' : 'no'} fresh M15/M5 CHoCH`, m15c: `rule: ${f.m15c === 'yes' ? 'needs' : 'no'} M15 CHoCH (the trader's) within the hour`, struct: `rule: only ${f.struct} structure`, session: `rule: not in ${feat.session}`, exposure: 'already 2 trades or an opposite trade open on this market', news: 'high-impact news within the hour', duplicate: 'same stop and target as a trade already open', reentry: 'a Scalp the same way lost on this market in the last 3 hours', replica: 'this market trades the gold replica live', usd: `already ${config.maxUsd || MAX_USD} trades betting the same way on the dollar`, market: (f.noMarket || []).includes(key) ? `rule: ${t.k} skips ${key}` : `market paused until ${String(config.pausedMarkets[key]).slice(0, 10)}`, off: `rule: ${t.k} is switched off`, focus: `focus: only ${(config.focus || []).join(', ')} trades live`, rrBand: `rule: ${t.k} only at reward:risk ${f.minRR ? `≥ ${f.minRR}` : ''}${f.minRR && f.maxRR ? ' and ' : ''}${f.maxRR ? `≤ ${f.maxRR}` : ''}` };
       const h = def.h;
       const tr = { id: `${key}-${t.k}-${now}`, market: key, label: M.label, dec: M.dec, k: t.k, name: t.name, pair: t.pair, h, side: t.sell ? 'sell' : 'buy',
         entry: t.entry, stop: t.stop, t1: T1, rr: +(toT2 ? Math.abs(T1 - t.entry) / Math.abs(t.entry - t.stop) : t.rr).toFixed(2), buf: CFG.buf, opened: now, checked: now, status: 'pending', R: null, feat,
