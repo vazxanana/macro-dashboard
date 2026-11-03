@@ -169,3 +169,10 @@ loses about 0.2R a trade; this is the trader's forward test of that. Remove the 
 `config.focus = ['xau']` (user rule `gold-only`): only XAU/USD trades live. Signals on the other markets are still taken as
 shadow trades with `blockedBy` containing `focus`, so their statistics keep building. Remove the user rule (and
 `config.focus`) to trade every market again.
+
+## Gold M30 → M1 (3 Nov)
+
+Gold also reads M30 candles and trades a fifth main setup, `m30m1` (M30 Origin, M1 CF, the engine's normal rules), filtered
+to trades against D1 (user rule `gold-m30`). The trader's 3 Nov markups (BO BUY 3,916 and the 3,891.5–3,916.1 box) are M30
+structure. On the 150-day replay it was the one new gold setup positive in both halves (+0.13R / +0.20R a trade against
+D1; portfolio +12R → +33R), but concentrated in a few big winners.

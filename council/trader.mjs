@@ -4,7 +4,7 @@
 // Usage: node council/trader.mjs <dataDir>
 import fs from 'node:fs';
 import path from 'node:path';
-import { msAnalyze, CFG, PAIRS, RETR, buildSetup, buildRetrace, setMarket } from './engine.mjs';
+import { msAnalyze, CFG, PAIRS, RETR, LBL, buildSetup, buildRetrace, setMarket } from './engine.mjs';
 import { entryContext, startReview, watchReview, judge, newsNear, lessons } from './review.mjs';
 import { m15cFeat } from './choch.mjs';
 
@@ -26,15 +26,20 @@ const MARKETS = {
   usdchf: { label: 'USD/CHF', name: 'Swissy',   group: 'Forex',  kraken: 'USDCHF',  dec: 5 },
 };
 const TFS = [['1d', 1440, 86400], ['4h', 240, 14400], ['1h', 60, 3600], ['15m', 15, 900], ['5m', 5, 300], ['1m', 1, 60]];
+// gold also reads M30: the trader marks M30 structure, and M30 → M1 against D1 is the gold setup that held in the 150-day replay
+const M30_MARKETS = new Set(['xau']);
+const TFS_M30 = TFS.slice(0, 3).concat([['30m', 30, 1800]], TFS.slice(3));
+LBL['30m'] = 'M30';
+const PAIRS_T = PAIRS.concat([{ k: 'm30m1', name: 'M30', h: '30m', l: '1m', e: 'M1', up: '1h' }]);
 // How long an unfilled order waits, by the higher timeframe of its pair
-const WAIT = { '1d': 5 * 86400, '4h': 2 * 86400, '1h': 12 * 3600, '15m': 3 * 3600 };
+const WAIT = { '1d': 5 * 86400, '4h': 2 * 86400, '1h': 12 * 3600, '30m': 6 * 3600, '15m': 3 * 3600 };
 // Only fresh signals: the CF break must be at most this many lower-timeframe candles old
 const FRESH = 12;
 const MAX_OPEN = 2;   // live trades per market
 const MAX_USD = 3;    // live gold/forex trades betting the same way on the US dollar (one USD move hits them all)
 // +1 = the trade wins if the dollar rises, -1 if it falls, 0 = not a dollar pair (crypto is left out)
 const usdDir = (M, side) => { if (M.group === 'Crypto') return 0; const [a, b] = M.label.split('/'), buy = side === 'buy' ? 1 : -1; return b === 'USD' ? -buy : a === 'USD' ? buy : 0; };
-const SEC = Object.fromEntries(TFS.map(([id, , s]) => [id, s]));
+const SEC = Object.fromEntries(TFS_M30.map(([id, , s]) => [id, s]));
 // Market-structure conditions at a signal (the backtest computes the same two):
 //   cf    — is the confirming lower-timeframe break itself a CHoCH (it flipped that timeframe's trend) or a continuation BO?
 //   choch — has M15 or M5 printed a fresh CHoCH in the trade's direction (within its last FRESH candles)? The user's rule:
@@ -120,6 +125,10 @@ const USER_RULES = [
   { id: 'gold-only', apply: (c) => { c.focus = ['xau']; },
     change: 'Gold only (user): only XAU/USD trades live; the other markets run as shadow trades (focus)',
     why: 'The trader wants to concentrate on gold. On 3 Nov gold\'s blocked Retrace M15→M1 sells at the 3,946–3,969 supply made +25.7R while its live scalps into the demand box lost −3R.' },
+  // 3 Nov, 20:30: M30 → M1 for gold, only against D1 (research, from the trader's M30 markups)
+  { id: 'gold-m30', apply: (c) => { c.filters = c.filters || {}; c.filters.m30m1 = { d1: 'against', src: 'user', since: new Date().toISOString() }; },
+    change: 'Gold M30 → M1 setup (user research): new setup on gold, only against D1',
+    why: '150-day replay on gold: M30 → M1 against D1 made +0.13R a trade on the first 100 days (162) and +0.20R on the last 50 (110); with the live limits gold went from +12R to +33R (train +1 → +11, test +11 → +22). Concentrated: +3R without its 5 best trades; August and September negative.' },
 ];
 config.userRules = config.userRules || [];
 for (const u of USER_RULES) if (!config.userRules.includes(u.id)) { u.apply(config); config.userRules.push(u.id); config.history.push({ at: nowISO, by: 'user', change: u.change, why: u.why }); }
@@ -167,7 +176,7 @@ function basisFor(key, bars) {
   return b.off || 0;
 }
 
-const BUILDERS = PAIRS.map((p) => [p, buildSetup]).concat(RETR.map((p) => [p, buildRetrace]));
+const BUILDERS = PAIRS_T.map((p) => [p, buildSetup]).concat(RETR.map((p) => [p, buildRetrace]));
 
 // ─── Research setup, paper only: the Daily Cycle (Liquidity Trading notes; 150-day replay +0.17R a trade on crypto) ───
 // London (07:00–12:00 UTC) sets the bias: bullish when London's low came before its high and price closed above the London
@@ -227,7 +236,7 @@ let research = rd('research.json', []);
 for (const [key, M] of Object.entries(MARKETS)) {
   try {
     const src = {};
-    for (const [id, iv] of TFS) {
+    for (const [id, iv] of (M30_MARKETS.has(key) ? TFS_M30 : TFS)) {
       const bars = await kraken(M.kraken, iv);
       await sleep(1100);
       const nBad = cleanBars(bars, M.group === 'Forex' && LTF_CLEAN.has(id) ? { wickK: 15 } : {});
@@ -324,7 +333,7 @@ for (const [key, M] of Object.entries(MARKETS)) {
       // the same setup re-signalling the same idea (same side and target, a fresh M1 break a few candles later) while
       // that idea is still open: skip it, live or shadow, so risk isn't stacked and the Coach doesn't count one idea three times
       if (trades.some((x) => x.market === key && x.k === t.k && x.side === (t.sell ? 'sell' : 'buy') && (x.status === 'open' || x.status === 'pending') && Math.abs(x.t1 - t.t1) <= Math.abs(t.t1) * 1e-5)) continue;
-      const def = PAIRS.concat(RETR).find((p) => p.k === t.k), cfT = +String(t.sig).split('|')[2];
+      const def = PAIRS_T.concat(RETR).find((p) => p.k === t.k), cfT = +String(t.sig).split('|')[2];
       if (!cfT || now - cfT > (config.fresh || FRESH) * SEC[def.l]) continue;   // an old CF: the move already happened
       // Conditions at the signal: the Coach learns which of them win
       const feat = { d1: src['1d'].A.trend === (t.sell ? -1 : 1) ? 'with' : 'against', struct: t.retr == null ? 'n/a' : t.retr >= 0.5 ? 'main' : 'internal', session: sessionOf(now), ...structFeat(t, def, src, now), m15c: m15cFeat(src['15m'].bars, t.sell, now) };
@@ -410,7 +419,7 @@ const BT = (() => {
   const TA = T, TT = TA.filter((t) => t.fill !== 0 && !String(t.setup).includes('@'));
   return { b, T: TT, TA, mid: TT.map((t) => t.opened).sort((x, y) => x - y)[TT.length >> 1] };
 })();
-const DEF_KEYS = new Set(PAIRS.concat(RETR).map((p) => p.k));   // setups the Trader actually trades (research setups are only backtested)
+const DEF_KEYS = new Set(PAIRS_T.concat(RETR).map((p) => p.k));   // setups the Trader actually trades (research setups are only backtested)
 // mean R with a market-day clustered standard error (CR1) and its t-value; g = number of market-day clusters
 function btE(arr, key = 'R_none') {
   const v = arr.filter((t) => t[key] != null && isFinite(t[key])), n = v.length;
