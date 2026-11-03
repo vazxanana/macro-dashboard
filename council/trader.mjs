@@ -256,7 +256,12 @@ function replicaSignals(src) {
       const lvl = iP >= 0 ? (sell ? bars[iP].low : bars[iP].high) : start;
       let iC = -1; for (let j = iE + 1; j < n; j++) if (sell ? bars[j].close < lvl : bars[j].close > lvl) { iC = j; break; }
       if (iC < 0 || iC < n - 2) continue;   // the CHoCH must be one of the last two closed M5 candles
-      out.push({ sell, ext, lvl, start, atr: atr15, tc: bars[iC].time, L });
+      // engulfing at the extreme (M5, last 2 h): the reversal candle body covers the previous opposite candle, near the extreme
+      let eg = false; const B5r = B5.slice(-25);
+      for (let j = 1; j < B5r.length && !eg; j++) { const p = B5r[j - 1], c = B5r[j];
+        const ok = sell ? (p.close > p.open && c.close < c.open && c.close <= p.close && c.open >= p.open) : (p.close < p.open && c.close > c.open && c.close >= p.open && c.open <= p.close);
+        if (ok && Math.abs((sell ? Math.max(p.high, c.high) : Math.min(p.low, c.low)) - ext) <= 0.5 * atr15) eg = true; }
+      out.push({ sell, ext, lvl, start, atr: atr15, tc: bars[iC].time, L, eg });
     }
   }
   return out;
@@ -349,12 +354,16 @@ for (const [key, M] of Object.entries(MARKETS)) {
       for (const g of sigs) {
         const sig = `replica|${g.sell ? 's' : 'b'}|${g.tc}`;
         if (research.some((x) => x.market === key && x.sig === sig)) continue;
-        const entry = g.lvl + 0.3 * (g.ext - g.lvl), buf = Math.max(0.1 * g.atr, 0.3), stop = g.sell ? g.ext + buf : g.ext - buf, r0 = Math.abs(entry - stop);
-        if (!(r0 > 0) || (g.start - entry) * (g.sell ? -1 : 1) <= 0) continue;
+        // v2 (3 Nov): market entry at the CHoCH, target 2R; the filter = clear of live H1 Origins OR an M5 engulfing at the
+        // extreme (150-day gold replay: +0.075R / +0.077R a trade in both halves, keeps all four of the trader's trades)
+        const entry = price, buf = Math.max(0.1 * g.atr, 0.3), stop = g.sell ? g.ext + buf : g.ext - buf, r0 = Math.abs(entry - stop);
+        if (!(r0 > 0) || (g.sell ? entry >= stop : entry <= stop)) continue;
+        const h1live = src['1h'].A.events.filter((e) => e.endIdx == null && e.top > e.bot), h1clear = !h1live.some((e) => entry <= e.top && entry >= e.bot);
+        const pass = h1clear || g.eg, t1 = entry + (g.sell ? -2 : 2) * r0;
         research.push({ id: `${key}-replica-${now}-${g.sell ? 's' : 'b'}`, sig, market: key, label: M.label, dec: M.dec, k: 'replica', name: 'Gold replica', side: g.sell ? 'sell' : 'buy',
-          entry: +entry.toFixed(2), stop: +stop.toFixed(2), t1: +g.start.toFixed(2), rr: +(Math.abs(g.start - entry) / r0).toFixed(2), opened: now, checked: now, status: 'pending', R: null,
-          validUntil: now + 4 * 3600, leg: g.L === 36 ? '3h' : '6h', ext: +g.ext.toFixed(2), chochLevel: +g.lvl.toFixed(2), d1: src['1d'].A.trend === (g.sell ? -1 : 1) ? 'with' : 'against', session: sessionOf(now),
-          note: `Research (paper only): gold replica. ${g.L === 36 ? '3 h' : '6 h'} leg to ${g.ext.toFixed(2)}, M5 CHoCH through ${g.lvl.toFixed(2)}; ${g.sell ? 'sell' : 'buy'} the 30% retest ${entry.toFixed(2)}, stop ${stop.toFixed(2)}, target the leg start ${g.start.toFixed(2)}.` });
+          entry: +entry.toFixed(2), stop: +stop.toFixed(2), t1: +t1.toFixed(2), rr: 2, opened: now, filled: now, checked: now, status: 'open', R: null, v: 2,
+          pass, h1clear, eg: g.eg, legStart: +g.start.toFixed(2), leg: g.L === 36 ? '3h' : '6h', ext: +g.ext.toFixed(2), chochLevel: +g.lvl.toFixed(2), d1: src['1d'].A.trend === (g.sell ? -1 : 1) ? 'with' : 'against', session: sessionOf(now),
+          note: `Research (paper only): gold replica v2${pass ? '' : ' (filter fails: inside a live H1 Origin, no M5 engulfing)'}. ${g.L === 36 ? '3 h' : '6 h'} leg to ${g.ext.toFixed(2)}, M5 CHoCH through ${g.lvl.toFixed(2)}${g.eg ? ', M5 engulfing at the extreme' : ''}${h1clear ? ', clear of H1 Origins' : ''}; ${g.sell ? 'sell' : 'buy'} ${entry.toFixed(2)}, stop ${stop.toFixed(2)}, target 2R ${t1.toFixed(2)}.` });
       }
     }
     for (const r of research.filter((x) => x.market === key && x.k !== 'replica' && x.status === 'open')) {
@@ -808,8 +817,9 @@ wr('trades.json', trades);
 research = research.slice(-2000);
 { const done = research.filter((x) => x.k !== 'replica' && (x.status === 'win' || x.status === 'loss' || x.status === 'be')), R = done.reduce((a, x) => a + x.R, 0);
   snapshot.research = { cycle: { closed: done.length, wins: done.filter((x) => x.status === 'win').length, R: +R.toFixed(2), open: research.filter((x) => x.k !== 'replica' && x.status === 'open').length } };
-  const rp = research.filter((x) => x.k === 'replica'), rpd = rp.filter((x) => x.status === 'win' || x.status === 'loss' || x.status === 'be');
-  snapshot.research.replica = { signals: rp.length, closed: rpd.length, wins: rpd.filter((x) => x.status === 'win').length, R: +rpd.reduce((a, x) => a + x.R, 0).toFixed(2), open: rp.filter((x) => x.status === 'open').length, pending: rp.filter((x) => x.status === 'pending').length }; }
+  const rp = research.filter((x) => x.k === 'replica'), sum = (a) => { const d = a.filter((x) => x.status === 'win' || x.status === 'loss' || x.status === 'be');
+    return { signals: a.length, closed: d.length, wins: d.filter((x) => x.status === 'win').length, R: +d.reduce((s, x) => s + x.R, 0).toFixed(2), open: a.filter((x) => x.status === 'open').length, pending: a.filter((x) => x.status === 'pending').length }; };
+  snapshot.research.replica = { all: sum(rp), pass: sum(rp.filter((x) => x.pass !== false && x.v === 2)) }; }
 wr('research.json', research);
 snapshot.lessons = lessons(trades, now);
 wr('snapshot.json', snapshot);

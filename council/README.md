@@ -185,3 +185,8 @@ the 30% retest from the CHoCH level toward the extreme (valid 4 h), stop just pa
 after 48 h. On the cleaned 150-day gold replay it fires on all four of his trades (3 of 4 win on his days, the 4th never
 fills) but is about break-even overall (−15R / +3R over 762 trades), so it runs on paper in `research.json` (gold only),
 reported in `snapshot.json` → `research.replica`, to compare with his trades day by day and learn which turns he takes.
+
+**Replica v2 (3 Nov, later):** market entry at the M5 CHoCH, stop past the extreme, target 2R. Every signal is recorded with
+`h1clear` (entry outside every live H1 Origin), `eg` (an M5 engulfing at the extreme) and `pass` = either of them; the
+snapshot reports `research.replica.pass` and `.all`. On the 150-day gold replay the passing signals made +0.075R a trade
+on the first 100 days (593) and +0.077R on the last 50 (352), keeping all four of the trader's trades; all signals +0.035 / +0.000.
