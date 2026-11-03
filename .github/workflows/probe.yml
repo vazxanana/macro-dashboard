@@ -1,5 +1,5 @@
 name: Council data probe
-# RESEARCH ONLY: fetches raw Kraken candles to check suspected bad prints; writes to council-data/research/probe/.
+# RESEARCH ONLY: fetches raw candles for local research; writes to council-data/research/.
 on:
   push:
     branches: [council-probe]
@@ -13,12 +13,15 @@ jobs:
         with: { ref: council-data, path: data }
       - name: Fetch
         run: |
-          mkdir -p data/research/probe
-          for p in AUDUSD EURUSD GBPUSD USDCAD USDCHF PAXGUSD; do
-            curl -sS "https://api.kraken.com/0/public/OHLC?pair=$p&interval=1" -o "data/research/probe/$p-1m.json"; sleep 2
-          done
-          curl -sS "https://query1.finance.yahoo.com/v8/finance/chart/AUDUSD=X?interval=1m&range=1d" -A "Mozilla/5.0" -o data/research/probe/AUDUSD-yahoo-1m.json || true
+          # NQ futures (Yahoo NQ=F): 1m for the last 29 days in 7-day chunks, 5m for 59 days, 1h for 2 years
+          mkdir -p data/research/candles/nq
+          now=$(date +%s)
+          for k in 0 1 2 3; do p2=$((now - k*7*86400)); p1=$((p2 - 7*86400 + 60))
+            curl -sS -A "Mozilla/5.0" "https://query1.finance.yahoo.com/v8/finance/chart/NQ%3DF?interval=1m&period1=$p1&period2=$p2&includePrePost=true" -o "data/research/candles/nq/1m-$k.json"; sleep 2; done
+          curl -sS -A "Mozilla/5.0" "https://query1.finance.yahoo.com/v8/finance/chart/NQ%3DF?interval=5m&range=60d&includePrePost=true" -o data/research/candles/nq/5m.json; sleep 2
+          curl -sS -A "Mozilla/5.0" "https://query1.finance.yahoo.com/v8/finance/chart/NQ%3DF?interval=60m&range=730d&includePrePost=true" -o data/research/candles/nq/1h.json
+          ls -la data/research/candles/nq
           git -C data config user.name "mosha-council"
           git -C data config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git -C data add research/probe && git -C data commit -qm "Probe: raw Kraken 1m candles $(date -u +%H:%MZ)" || exit 0
+          git -C data add research/candles/nq && git -C data commit -qm "Research: NQ futures candles (Yahoo) $(date -u +%H:%MZ)" || exit 0
           for j in 1 2 3 4 5; do git -C data pull -q --rebase origin council-data && git -C data push -q origin HEAD:council-data && break; sleep 5; done
