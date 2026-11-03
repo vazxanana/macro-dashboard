@@ -181,6 +181,17 @@ to trades against D1 (user rule `gold-m30`). The trader's 3 Nov markups (BO BUY 
 structure. On the 150-day replay it was the one new gold setup positive in both halves (+0.13R / +0.20R a trade against
 D1; portfolio +12R → +33R), but concentrated in a few big winners.
 
+## Gold replica live (3 Nov, 22:00)
+
+User rule `replica-live` (`config.replicaLive = ['xau']`, take-all off): gold trades the replica live. Every passing v4
+signal (clear of live H1 Origins or a ★ engulfing at the extreme, stop at least one M15 ATR) goes on the live book as
+`k: 'replica'`: market entry, stop past the extreme, target 2R, out after 48 h (`maxHold`), no break-even move, no slot
+limit (as on the replay). The research record in research.json keeps every signal, passing or not. The engine's gold
+setups run as shadow trades with `replica` in blockedBy (their other blockers still recorded, so "the rules would take
+it" stays measurable). Why: on the 150-day replay the replica made +0.19R / +0.13R a trade in the two halves with no losing
+month, while the engine's gold setups lose about 0.2R a trade with every signal taken. Check after about 30 live trades;
+to go back, remove `replicaLive` from config.json.
+
 ## Gold replica (research, paper only, 3 Nov)
 
 Rebuilt from the trader's four marked gold trades (2–3 Nov, `council/examples.json`): a leg of at least 2 M15 ATRs in the

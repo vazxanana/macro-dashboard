@@ -2481,7 +2481,7 @@ function msNextSetup(bars, A) {
     const I = INSTRUMENTS[x.market]; if (!I) return;
     const s = x.side === 'sell' ? -1 : 1, d = { dec: x.dec != null ? x.dec : I.dec }, f = (v) => fmtI(v, d);
     const r0 = x.r0 || (x.beMoved ? 0 : Math.abs(x.entry - x.stop)), stop0 = x.beMoved && r0 ? x.entry - s * r0 : x.stop;
-    const res = x.status === 'win' ? `Win +${x.R}R` : x.status === 'loss' ? 'Loss −1R' : x.status === 'be' ? 'Break-even 0R' : (ST_NAME[x.status] || x.status);
+    const res = x.status === 'win' ? `Win +${x.R}R` : x.status === 'loss' ? `Loss ${x.R != null && x.R !== -1 ? `${x.R}R (${x.exit || 'time'} exit)` : '−1R'}` : x.status === 'be' ? 'Break-even 0R' : (ST_NAME[x.status] || x.status);
     document.getElementById('ms-tv-t').textContent = `${x.label} · ${x.name} ${x.pair} · ${x.side === 'sell' ? 'Sell' : 'Buy'} · ${res}${x.shadow ? ' (shadow)' : ''}`;
     document.getElementById('ms-tv-s').innerHTML = x.pm && x.pm.title ? `<b class="c-pm-v ${x.pm.verdict}" style="margin:0 6px 0 0">${x.pm.verdict === 'system' ? 'System' : 'Market'}</b><b>${esc(x.pm.title)}</b> · ${esc(x.pm.detail)} <br>Lesson: ${esc(x.pm.lesson)}${x.shadow && x.note ? `<br>${esc(x.note)}` : ''}` : esc(x.note || '');
     // the conditions at the signal, the ones the Coach learns from (D1, structure, the CHoCH rule, session) and the entry style
@@ -2526,8 +2526,8 @@ function msNextSetup(bars, A) {
     if (x.filled && x.filled !== x.opened) mk.push({ time: snap(x.opened), position: s > 0 ? 'belowBar' : 'aboveBar', color: '#8a94a8', shape: 'circle', text: 'Signal' });
     mk.push({ time: snap(x.filled || x.opened), position: s > 0 ? 'belowBar' : 'aboveBar', color: '#2962ff', shape: s > 0 ? 'arrowUp' : 'arrowDown', text: x.filled ? `${x.side === 'sell' ? 'Sell' : 'Buy'} ${f(x.entry)}` : 'Order placed' });
     if (x.closed && ['win', 'loss', 'be'].includes(x.status)) {
-      const px = x.status === 'win' ? x.t1 : x.status === 'be' ? x.entry : stop0;
-      mk.push({ time: snap(x.closed), position: (x.status === 'win') === (s > 0) ? 'aboveBar' : 'belowBar', color: x.status === 'win' ? UPC : x.status === 'loss' ? DNC : '#8a94a8', shape: 'square', text: `${x.status === 'win' ? 'Target' : x.status === 'loss' ? 'Stopped' : 'Break-even'} ${f(px)}` });
+      const px = x.exit ? x.entry + s * x.R * (x.r0 || Math.abs(x.entry - stop0)) : x.status === 'win' ? x.t1 : x.status === 'be' ? x.entry : stop0;
+      mk.push({ time: snap(x.closed), position: (x.status === 'win') === (s > 0) ? 'aboveBar' : 'belowBar', color: x.status === 'win' ? UPC : x.status === 'loss' ? DNC : '#8a94a8', shape: 'square', text: `${x.exit ? `Out after ${x.exit}` : x.status === 'win' ? 'Target' : x.status === 'loss' ? 'Stopped' : 'Break-even'} ${f(px)}` });
     }
     TV.series.setMarkers(mk.sort((a, b) => a.time - b.time));
     TV.chart.timeScale().setVisibleRange({ from: from + TZ, to: to + TZ });
