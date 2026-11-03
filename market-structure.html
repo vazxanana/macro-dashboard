@@ -738,7 +738,7 @@
     </div>
   </section>
 
-  <p class="foot">Live candles from Binance and Kraken public feeds; gold is aligned to XAU/USD spot via gold-api.com. Times are in your local zone.<br>Version 1 Nov 2026 · reopen hour</p>
+  <p class="foot">Live candles from Binance and Kraken public feeds; gold is aligned to XAU/USD spot via gold-api.com. Times are in your local zone.<br>Version 3 Nov 2026 · gold trade charts on spot</p>
   <nav class="btab" aria-label="Main sections">
     <a href="#home" data-go="home"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M3 11l9-7 9 7v9a1 1 0 01-1 1h-5v-6H9v6H4a1 1 0 01-1-1z"></path></svg>Home</a>
     <a href="#setup" data-go="setup"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 6h16M4 12h10M4 18h6"></path></svg>Setup</a>
@@ -2502,8 +2502,16 @@ function msNextSetup(bars, A) {
     let bars;
     try { bars = (await fetchBars(W.tf, I, 720)).bars; } catch (e) { if (req === TV.req) msg.textContent = `Couldn't load ${I.label} candles: ${e.message || e}`; return; }
     if (req !== TV.req) return;
+    // gold: the candles are PAXG, the trade's levels are XAU/USD spot (the Trader shifts PAXG by the spot basis), so shift
+    // the candles the same way or the entry, stop and target sit a few dollars off the price they were set on
+    let off = 0;
+    if (I.spot && bars.length) {
+      try { const j = await getJSON('https://api.gold-api.com/price/XAU'), o = +j.price - bars[bars.length - 1].close; if (isFinite(o) && Math.abs(o) < 150) off = o; }
+      catch (e) { if (INST === I) off = G.offset || 0; }
+      if (req !== TV.req) return;
+    }
     const from = W.start - W.pad, to = Math.min(Date.now() / 1000, W.end + W.pad);
-    const data = bars.filter((b) => b.time >= from - 5 * W.tf.sec && b.time <= to + 5 * W.tf.sec).map((b) => ({ time: b.time + TZ, open: b.open, high: b.high, low: b.low, close: b.close }));
+    const data = bars.filter((b) => b.time >= from - 5 * W.tf.sec && b.time <= to + 5 * W.tf.sec).map((b) => ({ time: b.time + TZ, open: b.open + off, high: b.high + off, low: b.low + off, close: b.close + off }));
     if (!data.length) { msg.textContent = `The ${W.tf.label} candles for this trade are no longer available from the data feed.`; return; }
     msg.hidden = true;
     TV.series.applyOptions({ priceFormat: { type: 'price', precision: d.dec, minMove: Math.pow(10, -d.dec) } });
