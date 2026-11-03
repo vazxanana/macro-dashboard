@@ -110,7 +110,7 @@ jobs:
               Object.assign(out.coverage, (b.markets || {}).coverage || {});
               Object.assign(out.source, (b.markets || {}).source || {});
               Object.assign(out.errors, (b.markets || {}).errors || {});
-              out.loneed = Object.assign(out.loneed || {}, (b.markets || {}).loneed || {});
+              out.cleaned = Object.assign(out.cleaned || {}, (b.markets || {}).cleaned || {});
               out.trades.push(...b.trades);
             }
             fs.writeFileSync(`data/research/backtest-${days}d-lone.json`, JSON.stringify(out));
