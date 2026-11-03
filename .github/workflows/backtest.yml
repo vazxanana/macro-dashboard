@@ -16,7 +16,7 @@ permissions:
   contents: write
 
 concurrency:
-  group: council-research-marks
+  group: council-research-vr
   cancel-in-progress: false
 
 jobs:
@@ -65,7 +65,7 @@ jobs:
         run: |
           DAYS="${{ github.event.inputs.days || '150' }}"
           mkdir -p data/research/parts
-          cp bt/backtest.json "data/research/parts/${DAYS}d-marks-${{ matrix.market }}.json"
+          cp bt/backtest.json "data/research/parts/${DAYS}d-vr-${{ matrix.market }}.json"
           git -C data config user.name "mosha-council"
           git -C data config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git -C data add research/parts
@@ -113,7 +113,7 @@ jobs:
               out.cleaned = Object.assign(out.cleaned || {}, (b.markets || {}).cleaned || {});
               out.trades.push(...b.trades);
             }
-            fs.writeFileSync(`data/research/backtest-${days}d-marks.json`, JSON.stringify(out));
+            fs.writeFileSync(`data/research/backtest-${days}d-vr.json`, JSON.stringify(out));
             console.log(`${out.trades.length} rows from ${Object.keys(out.markets).length} markets`, out.coverage, out.errors);
           ' "$DAYS"
           git -C data config user.name "mosha-council"

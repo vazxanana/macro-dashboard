@@ -153,6 +153,43 @@ function originSetups(src, price, t, spr = 0) {
   }
   return out;
 }
+// ─── Research setups: the trader's H1 read of 3 Nov, in engine terms ───
+// After the HTF BO, the VR (run extreme) is confirmed by a close back through the last internal swing (the trader's "BO BUY"
+// label); the VR box (extreme → that swing) is his demand/supply box and the 50% line (Origin far edge ↔ VR) is where the
+// retracement stops. vb* = buy (sell) the retest of the VR box on an LTF CHoCH the retracement's way, stop past the VR
+// extreme, target the 50% line. f* = at the 50% line, an LTF CHoCH the main way, stop past the retracement extreme,
+// target the VR box. Both while the HTF Origin is still live.
+const VR_SETUPS = [['1h', '1m', 'vb1h_m1', 'f1h_m1'], ['1h', '5m', 'vb1h_m5', 'f1h_m5'], ['4h', '5m', 'vb4h_m5', 'f4h_m5'], ['4h', '15m', 'vb4h_m15', 'f4h_m15']];
+function vrSetups(src, price, t, spr = 0) {
+  const out = [];
+  for (const [H, L, kb, kf] of VR_SETUPS) {
+    const hp = src[H], lp = src[L]; if (!hp || !lp || !hp.A || !lp.A || !hp.A.last) continue;
+    const e = hp.A.last, d = e.dir, HB = hp.bars, LB = lp.bars, sec = SEC[L];
+    if (e.endIdx != null || !e.vr || e.vrConfirmIdx == null || !e.vrBox || !HB[e.vrConfirmIdx]) continue;
+    const far = d < 0 ? e.top : e.bot, fib = (far + e.vr.p) / 2, leg = Math.abs(far - e.vr.p), confT = HB[e.vrConfirmIdx].time;
+    if (!(leg > 0)) continue;
+    const lastCh = (dir) => { for (let i = lp.A.events.length - 1; i >= 0; i--) { const x = lp.A.events[i]; if (x.dir === dir) return x.structure ? x : null; } return null; };
+    const fresh = (c) => c && LB[c.breakIdx] && t - (LB[c.breakIdx].time + sec) <= 2 * sec && LB[c.breakIdx].time >= confT;
+    // retracement extreme since the VR confirmation (against the main direction)
+    let rx = null, rxT = 0;
+    for (let i = e.vrConfirmIdx; i < HB.length; i++) { const v = d < 0 ? HB[i].high : HB[i].low; if (rx == null || (d < 0 ? v > rx : v < rx)) { rx = v; rxT = HB[i].time; } }
+    const buf = (w) => Math.max(3 * spr, 0.05 * w);
+    // vb: retest of the VR box, trade the retracement (-d) toward the 50% line
+    { const c = lastCh(-d), lo = e.vrBox.lo, hi = e.vrBox.hi;
+      if (fresh(c) && price >= lo && price <= hi) {
+        const stop = d < 0 ? lo - buf(hi - lo) : hi + buf(hi - lo), r = Math.abs(price - stop), rr = (fib - price) * -d / r;
+        if (r > 0 && rr >= 1.2) out.push({ k: kb, sell: d > 0, entry: price, stop, t1: fib, rr, sig: `${kb}|${HB[e.breakIdx].time}|${LB[c.breakIdx].time}` });
+      } }
+    // f: the retracement reached the 50% line, trade the main direction (d) back to the VR box
+    { const c = lastCh(d), reached = rx != null && (d < 0 ? rx >= fib - 0.05 * leg : rx <= fib + 0.05 * leg);
+      const tgt = d < 0 ? e.vrBox.hi : e.vrBox.lo;
+      if (reached && fresh(c) && LB[c.breakIdx].time >= rxT) {
+        const stop = rx + (d < 0 ? 1 : -1) * buf(leg * 0.1), r = Math.abs(price - stop), rr = (tgt - price) * d / r;
+        if (r > 0 && (stop - price) * d < 0 && rr >= 1.2) out.push({ k: kf, sell: d < 0, entry: price, stop, t1: tgt, rr, sig: `${kf}|${HB[e.breakIdx].time}|${LB[c.breakIdx].time}` });
+      } }
+  }
+  return out;
+}
 function chochSetups(src, price, t, info, spr = 0) {
   const out = [], B = src['15m'].bars;
   const hm = (i) => new Date(B[i].time * 1000).toISOString().slice(11, 16), f2 = (v) => +v.toFixed(2);
@@ -563,7 +600,7 @@ for (const [key, M] of Object.entries(MARKETS)) {
         tw.v = VARIANTS.map(([n, be, t2, pt, ts]) => ({ n, be, t2, pt, ts, stop: tw.stop, beMoved: false, done: false, R: null }));
         open.push(tw);
       }
-      for (const sw of sweepSetups(src, price, t, null, spreadOf(M, price)).concat(chochSetups(src, price, t, null, spreadOf(M, price)), asiaRun(src, price, t, spreadOf(M, price)), dailyCycle(src, price, t, spreadOf(M, price)), originSetups(src, price, t, spreadOf(M, price)))) {
+      for (const sw of sweepSetups(src, price, t, null, spreadOf(M, price)).concat(chochSetups(src, price, t, null, spreadOf(M, price)), asiaRun(src, price, t, spreadOf(M, price)), dailyCycle(src, price, t, spreadOf(M, price)), originSetups(src, price, t, spreadOf(M, price)), vrSetups(src, price, t, spreadOf(M, price)))) {
         if (seen.has(sw.sig)) continue; seen.add(sw.sig);
         const side = sw.sell ? 'sell' : 'buy';
         if (open.some((x) => x.k === sw.k && x.side === side)) continue;   // one sweep trade per side at a time
