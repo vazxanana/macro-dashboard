@@ -105,6 +105,11 @@ const USER_RULES = [
     },
     change: 'Research rule set (user): Position off; Swing only against D1; Intraday reward:risk ≤ 10; Scalp skips AUD/USD; Retrace M15→M1 only at reward:risk ≥ 3; Retrace H1→M5 skips USD/CHF; dollar cap 2',
     why: '150-day replay (5 Jun – 2 Nov): today\'s rules −0.09R a trade (−369R over 4,113). With this set −0.001R (−3R over 2,565); on the last 50 days, which did not pick the rules, +0.031R a trade, +161R better than today\'s rules (t = 6.4). The dollar cap of 2 instead of 3 cut the portfolio loss from −176R to −56R in the same replay. Break-even, not a proven edge: paper trading only.' },
+  // 3 Nov, 07:30: the trader's rule: no pauses. Every setup and market keeps trading (paper) so there is content to study;
+  // the research filters still apply (their blocked signals run as shadow trades). Clears today's pauses.
+  { id: 'no-pause', apply: (c) => { c.noPause = true; c.paused = {}; c.pausedMarkets = {}; },
+    change: 'No pauses (user): every setup and market keeps trading; what the Coach would pause is kept in wouldPause',
+    why: 'The trader wants every setup producing trades to study and analyse. Retrace H1→M5 (paused 06:05 after four live losses) resumes now.' },
 ];
 config.userRules = config.userRules || [];
 for (const u of USER_RULES) if (!config.userRules.includes(u.id)) { u.apply(config); config.userRules.push(u.id); config.history.push({ at: nowISO, by: 'user', change: u.change, why: u.why }); }
@@ -418,6 +423,7 @@ function learnFromBacktest(change) {
     if (!DEF_KEYS.has(k) || config.paused[k]) continue;
     const f = config.filters[k] || {}, a = BT.T.filter((t) => t.setup === k && passesFilters(t, f)), all = btE(a), [h1, h2] = btHalves(a);
     if (((all.n >= 10 && all.e <= -0.3) || (all.n >= 8 && all.e <= -0.5)) && all.t <= -2 && h1.e < 0 && h2.e < 0) {
+      if (config.noPause) { wouldPause(k, `backtest: ${all.n} trades at ${f2(all.e)} each`); continue; }
       config.paused[k] = new Date((now + 3 * 86400) * 1000).toISOString();
       change(`Paused ${k} for 3 days (backtest)`, `${all.n} past trades as it trades now made ${f2(all.e)} each (${tTxt(all.t)}, ${all.g} market-days), negative in both halves of the last ${days} days.`);
     }
@@ -512,6 +518,9 @@ function btNonNeg(k) {
   const f = config.filters[k] || {}, all = btE(BT.T.filter((t) => t.setup === k && passesFilters(t, f)));
   return all.n >= 50 && all.e >= 0 ? all : null;
 }
+// config.noPause (the trader's rule, 3 Nov): nothing is paused, every setup and market keeps trading so there is data to
+// study; what the Coach would have paused is kept in config.wouldPause instead (latest reason per setup or market)
+function wouldPause(key, why) { config.wouldPause = config.wouldPause || {}; config.wouldPause[key] = { at: nowISO, why }; }
 function learnPauses(sample, change) {
   const bySetup = {};
   for (const t of [...sample].sort((a, b) => a.closed - b.closed)) (bySetup[t.k] = bySetup[t.k] || []).push(t);
@@ -541,6 +550,7 @@ function learnPauses(sample, change) {
     // four losses in a row pause only a setup that is losing overall and that the backtest doesn't show paying
     const streak = last4.length === 4 && last4.every((x) => x.status === 'loss') && e < 0 && !btNonNeg(k);
     if ((n >= 6 && e < -0.25) || streak) {
+      if (config.noPause) { wouldPause(k, n >= 6 && e < -0.25 ? `expectancy ${e.toFixed(2)}R over ${n} trades` : 'four losses in a row'); continue; }
       config.paused[k] = new Date((now + 3 * 86400) * 1000).toISOString();
       const sh = arr.filter((x) => x.shadow).length, mix = sh ? ` (${n - sh} live, ${sh} shadow blocked only by exposure or the dollar cap)` : '';
       change(`Paused ${k} for 3 days`, n >= 6 && e < -0.25 ? `Expectancy ${e.toFixed(2)}R over ${n} trades${mix}.` : `Four losses in a row${mix}.`);
@@ -628,6 +638,7 @@ if (coach.date !== today) {
   for (const [m, arr] of Object.entries(byMarket)) {
     if (config.pausedMarkets[m] || arr.length < 6) continue;
     const e = exp(arr);
+    if (e < -0.3 && config.noPause) { wouldPause(m, `market: ${e.toFixed(2)}R per trade over ${arr.length} trades`); continue; }
     if (e < -0.3) { config.pausedMarkets[m] = new Date((now + 3 * 86400) * 1000).toISOString(); change(`Paused market ${m} for 3 days`, `${e.toFixed(2)}R per trade over ${arr.length} trades.`); }
   }
   for (const m of Object.keys(config.pausedMarkets)) {
