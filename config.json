@@ -28,13 +28,15 @@
   },
   "rscalp": {
    "since": {
-    "session:asia": "2026-11-02T21:25:27.000Z"
+    "session:asia": "2026-11-02T21:25:27.000Z",
+    "session:overlap": "2026-11-03T18:05:34.000Z"
    },
    "src": {
     "minRR": "user"
    },
    "noSession": [
-    "asia"
+    "asia",
+    "overlap"
    ],
    "minRR": 3
   },
@@ -204,6 +206,12 @@
    "by": "system",
    "change": "Reopened 7 trades closed by a bad print",
    "why": "AUD/USD 10:12 (one order spiked 35 pips for a minute; Yahoo saw nothing), USD/CAD and USD/CHF 06:14 (582-range spike)"
+  },
+  {
+   "at": "2026-11-03T18:05:34.000Z",
+   "by": "coach-stats",
+   "change": "rscalp: skip the overlap session",
+   "why": "-0.51R over 5 trades there; +0.06R elsewhere."
   }
  ],
  "btAt": "2026-11-03T11:12:04.307Z",
@@ -223,11 +231,11 @@
  "noPause": true,
  "wouldPause": {
   "rintra": {
-   "at": "2026-11-03T17:59:54.000Z",
+   "at": "2026-11-03T18:05:34.000Z",
    "why": "four losses in a row"
   },
   "scalp": {
-   "at": "2026-11-03T17:59:54.000Z",
+   "at": "2026-11-03T18:05:34.000Z",
    "why": "expectancy -1.00R over 10 trades"
   }
  },
