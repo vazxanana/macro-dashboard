@@ -281,6 +281,12 @@
    "by": "user",
    "change": "Retire the older strategies (user): live trades left from the engine setups close at market; only the gold replica trades live",
    "why": "The trader asked for a clean live record: the replica v5 is the system. The engine setups keep running as shadow trades for research."
+  },
+  {
+   "at": "2026-11-04T18:43:53.000Z",
+   "by": "user",
+   "change": "Gold research only (user): the gold replica and the engine setups stop opening live paper trades; NQ New York open run is the system",
+   "why": "8-year spot gold test: the replica lost every year 2019-2025 (-312.5R over 4,484 trades), only 2026 positive; the NQ New York open run held on 3 years of NQ futures and every newer sample."
   }
  ],
  "btAt": "2026-11-04T11:20:16.389Z",
@@ -294,7 +300,8 @@
   "gold-only",
   "gold-m30",
   "replica-live",
-  "retire-legacy"
+  "retire-legacy",
+  "gold-shadow"
  ],
  "target": {},
  "targetBy": {},
@@ -305,11 +312,11 @@
  "noPause": true,
  "wouldPause": {
   "rintra": {
-   "at": "2026-11-04T18:40:23.000Z",
+   "at": "2026-11-04T18:43:53.000Z",
    "why": "four losses in a row"
   },
   "scalp": {
-   "at": "2026-11-04T18:40:23.000Z",
+   "at": "2026-11-04T18:43:53.000Z",
    "why": "expectancy -1.00R over 13 trades"
   },
   "xau": {
@@ -322,11 +329,9 @@
  ],
  "takeAll": false,
  "focus": [
-  "xau"
+  "none"
  ],
- "replicaLive": [
-  "xau"
- ],
+ "replicaLive": [],
  "newsSince": "2026-11-04T00:02:58.000Z",
  "retireLegacy": true
 }
