@@ -589,6 +589,7 @@
     .btab a { font: 500 11px var(--sans); }
     .card { padding: 16px; } .tile { padding: 16px; }
   }
+  .c-nq { grid-column: 1 / -1; }
 </style>
 </head>
 <body>
@@ -770,8 +771,16 @@
         <div class="c-eq" id="ms-c-eq"></div>
         <div class="ms-bt-wrap"><table class="ms-bt-t c-t"><thead><tr><th>Opened</th><th>Market</th><th>Setup</th><th>Side</th><th class="n">Entry</th><th class="n">Stop</th><th class="n">Target 1</th><th>Result</th></tr></thead><tbody id="ms-c-trades"></tbody></table></div>
       </div>
+      <div class="card c-nq">
+        <div class="ms-k"><span>NQ New York open run · our system (paper)</span></div>
+        <p class="ms-note">NQ runs 15+ points through the 09:30 ET opening price and closes back across it within 15 min; trade <b>with</b> the sweep (the reclaim tends to fail at the New York open), only when the midnight (00:00 ET) open lies ahead of the trade. Stop the same distance on the other side, 2R, out at 11:00 ET.</p>
+        <div class="c-kpi" id="ms-nq-kpi"></div>
+        <p class="ms-note" id="ms-nq-txt"></p>
+        <ul class="cal-day" id="ms-nq-list"></ul>
+      </div>
       <div class="card c-rep">
-        <div class="ms-k"><span>Gold replica · the live gold setup (your M5 CHoCH turns)</span></div>
+        <div class="ms-k"><span>Gold replica · research only (paper shadow, not traded)</span></div>
+        <p class="ms-note"><b>Research only since 4 Nov.</b> On 8 years of spot gold (HistData 2019–2026) the replica lost every year from 2019 to 2025 (−312.5R over 4,484 trades) and only 2026 was positive, so it no longer opens trades; every signal is still recorded here.</p>
         <p class="ms-note">A leg of 2+ M15 ATRs in 3 h or 6 h, then an M5 CHoCH; taken when clear of live H1 Origins or with a ★ engulfing at the extreme, with a stop of at least one M15 ATR, and (v5, 4 Nov) only against the H4 trend. Market entry, stop past the extreme, 2R, out after 48 h. The M5 gold chart marks every signal of the last 24 h.</p>
         <div class="c-kpi" id="ms-rep-kpi"></div>
         <div class="rep-track" id="ms-rep-track" aria-label="Live replica results against the replay expectation"></div>
@@ -2596,7 +2605,7 @@ function msNextSetup(bars, A) {
     try { localStorage.setItem('msCouncilSeen', JSON.stringify(seen)); } catch (e) {}
   }
   // P&L calendar: the trades closed each local day, their total R and count; tap a day for its trades
-  const CAL = { y: null, m: null, sel: null, mk: 'all' };
+  const CAL = { y: null, m: null, sel: null, mk: 'nq' };
   // NQ setups that are part of our system: the New York open run only (4 Nov: it held on 3 years of NQ futures; the open sweeps did not). The others were
   // retired on the same 1-minute test and their records are not counted here.
   const NQ_SYS = ['nyflip'], nqSys = (x) => x.market !== 'nq' || NQ_SYS.includes(x.session);
@@ -2625,7 +2634,7 @@ function msNextSetup(bars, A) {
     el.innerHTML = html;
     document.getElementById('ms-cal-m').textContent = first.toLocaleDateString(undefined, { month: 'long', year: 'numeric' });
     const inM = (x) => { const d = new Date(x.closed * 1000); return d.getFullYear() === CAL.y && d.getMonth() === CAL.m; }, rpM = rp.concat(nqF).filter((x) => mkSel === 'all' || x.market === mkSel).filter(inM);
-    const rpTxt = [['xau', 'gold replica (replay)'], ['nq', 'NQ New York open run (paper, replay + forward)']].map(([mk, nm]) => { const a = rpM.filter((x) => x.market === mk); return a.length ? `${nm} ${fR(a.reduce((q, x) => q + x.R, 0))} over ${a.length}` : ''; }).filter(Boolean).join(', ');
+    const rpTxt = [['xau', 'gold replica (research, replay)'], ['nq', 'NQ New York open run (paper, replay + forward)']].map(([mk, nm]) => { const a = rpM.filter((x) => x.market === mk); return a.length ? `${nm} ${fR(a.reduce((q, x) => q + x.R, 0))} over ${a.length}` : ''; }).filter(Boolean).join(', ');
     document.getElementById('ms-cal-sum').innerHTML = mN ? `Month: <b class="${mR >= 0 ? 'pos' : 'neg'}">${fR(mR)}</b> over ${mN} trades · ${up} green day${up === 1 ? '' : 's'}, ${dn} red · best day ${best.d} (${fR(best.R)}), worst day ${worst.d} (${fR(worst.R)}). ${withRp ? 'Our system only: live gold replica trades' : withSh ? 'Live and shadow trades' : 'Live trades'}${rpM.length ? `, plus the replay of our system (${(COUNCIL.replay && COUNCIL.replay.from) || ''} – ${(COUNCIL.replay && COUNCIL.replay.to) || ''}, backtest): ${rpTxt}` : ''}. 1R = the risk of one trade.` : `No closed ${withSh ? '' : 'live '}trades this month.`;
     const sel = CAL.sel && byDay.get(CAL.sel);
     const dw = document.getElementById('ms-cal-dayw');
@@ -2730,12 +2739,27 @@ function msNextSetup(bars, A) {
   }
   // Our system = the live gold replica trades (k 'replica') plus the backtest replay of the months before it went live
   const sysOn = () => { const el = document.getElementById('ms-c-sys'); return !el || el.checked; };
-  const sysTrades = () => (COUNCIL.trades || []).filter((x) => x.k === 'replica' && !x.shadow).concat(((COUNCIL.replay && COUNCIL.replay.trades) || []).filter(nqSys), (COUNCIL.research || []).filter((x) => x.k === 'nq-open' && nqSys(x)).map((x) => ({ ...x, pair: 'M1', paper: true, forward: true })));
+  // Our system (4 Nov, night) = the NQ New York open run: forward paper records + the replay since Dec 2022. Gold is research only.
+  const sysTrades = () => ((COUNCIL.replay && COUNCIL.replay.trades) || []).filter((x) => x.market === 'nq' && nqSys(x)).concat((COUNCIL.research || []).filter((x) => x.k === 'nq-open' && nqSys(x)).map((x) => ({ ...x, pair: 'M1', paper: true, forward: true })));
+  function renderNQ() {
+    const set = (id, html) => { const el = document.getElementById(id); if (el) el.innerHTML = html; };
+    const fR = (v) => `${v > 0 ? '+' : v < 0 ? '−' : ''}${Math.abs(v).toFixed(2)}R`;
+    const fw = (COUNCIL.research || []).filter((x) => x.k === 'nq-open' && x.session === 'nyflip').sort((a, b) => b.opened - a.opened);
+    const fd = fw.filter((x) => ['win', 'loss', 'be'].includes(x.status)), fRs = fd.reduce((a, x) => a + x.R, 0);
+    const rp = ((COUNCIL.replay && COUNCIL.replay.trades) || []).filter((x) => x.market === 'nq' && x.session === 'nyflip' && x.R != null).sort((a, b) => a.closed - b.closed);
+    let e = 0, pk = 0, dd = 0; const mo = {}; for (const x of rp) { e += x.R; pk = Math.max(pk, e); dd = Math.min(dd, e - pk); const k = new Date(x.closed * 1000).toISOString().slice(0, 7); mo[k] = (mo[k] || 0) + x.R; }
+    const mv = Object.values(mo), w = rp.filter((x) => x.R > 0).length;
+    set('ms-nq-kpi', `<div><span>Forward trades</span><b>${fw.length}${fw.length - fd.length ? ` <small>(${fw.length - fd.length} open)</small>` : ''}</b></div><div><span>Forward total</span><b class="${fRs > 0 ? 'pos' : fRs < 0 ? 'neg' : ''}">${fd.length ? fR(fRs) : '—'}</b></div><div><span>Replay since Dec 2022</span><b class="${e >= 0 ? 'pos' : 'neg'}">${rp.length ? fR(e) : '—'}</b></div><div><span>Replay win rate</span><b>${rp.length ? Math.round(w / rp.length * 100) + '%' : '—'}</b></div>`);
+    set('ms-nq-txt', rp.length ? `Replay: ${rp.length} trades, ${fR(e)} (${fR(e / rp.length)} a trade), ${mv.filter((v) => v > 0).length} of ${mv.length} months positive, worst drawdown ${fR(dd)}. Data: the trader's NQ futures file Dec 2022 – Dec 2025, Dukascopy cash index Dec 2025 – Sep 2026, Yahoo/CNBC futures since. Promote to live only after ~30 forward trades that match the replay.` : '');
+    const rows = fw.slice(0, 10);
+    set('ms-nq-list', rows.length ? rows.map((x) => `<li data-tid="${esc(x.id)}" tabindex="0" title="Show this trade on a chart"><span>${ftime(x.opened + TZ)}</span><b class="${x.side === 'sell' ? 'neg' : 'pos'}">${x.side.toUpperCase()}</b><span>${fmtI(x.entry, { dec: 2 })} · stop ${fmtI(x.stop, { dec: 2 })} · 2R ${fmtI(x.t1, { dec: 2 })}</span><b class="${x.R > 0 ? 'pos' : x.R < 0 ? 'neg' : ''}">${x.R != null ? fR(x.R) : 'Open'}</b></li>`).join('') : '<li class="empty">No forward trade yet: the first New York open that qualifies records one here.</li>');
+  }
   function renderCouncil() {
     const root = document.getElementById('v-council'); if (!root) return;
     const set = (id, html) => { const el = document.getElementById(id); if (el) el.innerHTML = html; };
     const C = COUNCIL, SYS = sysOn(), TA = (SYS ? sysTrades().sort((a, b) => a.opened - b.opened) : (C.trades || [])).slice().reverse(), T = TA.filter((x) => !x.shadow);
     renderCalendar();
+    renderNQ();
     renderReplica();
     renderActive();
     const showSh = document.getElementById('ms-c-shadow'), withSh = showSh && showSh.checked;
@@ -2947,7 +2971,7 @@ function msNextSetup(bars, A) {
   }
   const ST_NAME = { open: 'Open', pending: 'Waiting fill', missed: 'Missed', expired: 'Expired', skipped: 'Skipped' };
   const SESSION_NAME = { asia: 'Asia session', london: 'London session', overlap: 'London/New York overlap', newyork: 'New York session', late: 'Late session' };
-  ['ms-c-trades', 'ms-c-pm', 'ms-cal-day', 'ms-rep-list', 'ms-active'].forEach((cid) => {
+  ['ms-c-trades', 'ms-c-pm', 'ms-cal-day', 'ms-rep-list', 'ms-active', 'ms-nq-list'].forEach((cid) => {
     const el = document.getElementById(cid); if (!el) return;
     el.addEventListener('click', (ev) => { const r = ev.target.closest('[data-tid]'); if (r) openTrade(r.dataset.tid); });
     el.addEventListener('keydown', (ev) => { if (ev.key !== 'Enter' && ev.key !== ' ') return; const r = ev.target.closest('[data-tid]'); if (r) { ev.preventDefault(); openTrade(r.dataset.tid); } });
