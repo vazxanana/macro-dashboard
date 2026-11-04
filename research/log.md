@@ -206,3 +206,15 @@ the open; first close back inside a swept level within the first hour → opposi
 - 2-month replay (5m to 5 Oct, 1m after): Tokyo −1.35R ×25 (44% wins), Shanghai −0.73R ×20.
 Picking one level type (e.g. evening/pre-open for Tokyo 1m +0.63R) would be fitting 8–10 trades. Both run on paper (research.json
 k 'nq-open', session tokyo/shanghai). JS replay with a 10-min lag on the 1m history: Tokyo +2.0R ×9, Shanghai −1.6R ×6 (Python +2.9 / −1.8, before cost differences).
+
+## 4 Nov 10:30 — Gold replica v4 from 1 Jan 2026: the out-of-sample months are flat (important)
+
+Replayed with the live Trader's own code (replicaSignals + H1 Origins, market hours only) on Binance PAXGUSDT 1m.
+Jan −4.9R (161) · Feb +2.4 (72) · Mar +0.8 (105) · Apr −1.6 (90) · May −7.7 (73) · Jun +12.2 (96) · Jul +18.3 (56) · Aug +20.8 (121) ·
+Sep +28.9 (99) · Oct +14.6 (133) · 1–3 Nov −2.0 (14). Total +81.8R over 1,020 trades.
+Jan–May (never used to design v4): −11.0R over 501 trades (−0.02R a trade). Jun–Nov (the 150-day window v4 was built and
+filtered on): +92.8R over 519. The filter (H1 clear or ★ engulfing, risk ≥ 1 ATR) was chosen on Jun–Nov, so part of that edge is
+fitted. Forward record so far: 2 live trades, +1R. Keep the live test running (paper) to ~30 trades before judging, and treat
+v4's expected edge as closer to 0 than +0.15R until the forward record says otherwise.
+Also: Dukascopy USATECHIDXUSD returns 503 to GitHub runners (4 Nov); NQ history stays from 3 Sep. NQ Asia replay now includes
+Mondays: Tokyo −4.25R ×30, Shanghai +0.63R ×25 (3 Sep – 3 Nov).
