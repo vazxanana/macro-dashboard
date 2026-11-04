@@ -342,3 +342,14 @@ exit v2, risk rules: 602 trades +87.4R, drawdown −35.2R → 325 trades +63.8R,
 (+8.1R vs −22.2R), held on 2025-26 (+55.7R). In 2019-22 the opposite split held, so this is a last-4-years rule.
 Also checked on 2023-26: gate 1.5% kept (2023-24 has few gated trades), trading with the H4 trend loses (−52.7R),
 exit v2 kept (3R trails win 2025-26 but lose more in 2023-24), buys-only rejected (a bet on gold's direction).
+
+### Gold: H1 engulfing barriers (4 Nov, night; user rule `gold-eg-barrier`)
+
+The owner: Mosha's edge is market structure plus barriers (EG / OB). Tested on 2023-2026 spot gold, rules fixed first:
+a barrier model (fresh H1 OB or EG, touch, M5 CHoCH), a pure-structure model (H1 BOS trend, M15 pullback CHoCH) and the
+replica split by barrier. Pure structure lost (−16R to −246R by exit/gate); barrier-only lost overall, OB clearly; EG with
+gate + trailing +37.6R (both halves positive). The replica's signals whose extreme sits at a live H1 EG: +0.293R a trade
+over 151 (both halves positive), at an OB −0.124R. Live gold now: v5 + 1.5% gate + (daily trend direction OR extreme at a
+live H1 EG) → 392 trades +71.9R, drawdown −15.8R (was D1-with alone 325, +63.8R). `h1EgZones()` in the trader matches the
+research zones exactly on three 2026 checkpoints; research records carry `atEG`. Mosha's 2 Nov sell started inside a fresh
+H1 bearish EG (3,914.8-3,927.7, formed 03:00 UTC).
