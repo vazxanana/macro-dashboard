@@ -15,10 +15,10 @@ jobs:
         with: { ref: council-data, path: data }
       - name: Dump XAUUSD HistData
         run: |
-          mkdir -p data/research/candles/xau-histdata
-          python3 tools/histdata.py data/research/candles/xau-histdata 2>&1 | tail -40 || true
-          ls -la data/research/candles/xau-histdata
+          mkdir -p data/research/candles/udx-histdata
+          python3 tools/histdata.py data/research/candles/udx-histdata UDXUSD 2>&1 | tail -40 || true
+          ls -la data/research/candles/udx-histdata
           git -C data config user.name "mosha-council"
           git -C data config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git -C data add research/candles && git -C data commit -qm "Research: XAUUSD 1m HistData 2026 $(date -u +%H:%MZ)" || exit 0
+          git -C data add research/candles && git -C data commit -qm "Research: UDXUSD (dollar index) 1m HistData $(date -u +%H:%MZ)" || exit 0
           for j in 1 2 3 4 5; do git -C data pull -q --rebase origin council-data && git -C data push -q origin HEAD:council-data && break; sleep 5; done
