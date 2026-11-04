@@ -8,19 +8,23 @@ permissions:
 jobs:
   probe:
     runs-on: ubuntu-latest
+    timeout-minutes: 340
     steps:
       - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
+        with: { ref: main, path: main, sparse-checkout: council }
+      - uses: actions/checkout@v4
         with: { ref: council-data, path: data }
-      - name: Fetch
+      - uses: actions/setup-node@v4
+        with: { node-version: '20' }
+      - name: Dump history
         run: |
-          # Is the live site serving the new calendar?
-          mkdir -p data/research/probe
-          { for u in "https://vazxanana.github.io/macro-dashboard/market-structure.html" "https://vazxanana.github.io/macro-dashboard/gold-trading.html" "https://vazxanana.github.io/macro-dashboard/"; do
-              code=$(curl -sS -o /tmp/p.html -w "%{http_code}" "$u?nocache=$(date +%s)"); echo "$u $code bytes=$(wc -c </tmp/p.html) cal-seg=$(grep -c 'cal-seg' /tmp/p.html) ms-cal-rp=$(grep -c 'ms-cal-rp' /tmp/p.html) council=$(grep -ci 'council' /tmp/p.html) ms-link=$(grep -c 'market-structure' /tmp/p.html)"; done
-            curl -sSI "https://vazxanana.github.io/macro-dashboard/market-structure.html" | grep -i "last-modified\|cache-control\|age:"
-            curl -sS "https://raw.githubusercontent.com/vazxanana/macro-dashboard/council-data/research/replay-2w.json" | head -c 120; echo
-          } | tee data/research/probe/site-check.txt
+          cp -r main/council council
+          mkdir -p data/research/candles
+          node tools/histdump.mjs nq data/research/candles/nq-duka-2026.json.gz 2>&1 | tail -60 || true
+          node tools/histdump.mjs xau data/research/candles/xau-jan-jun.json.gz 2>&1 | tail -5 || true
+          ls -la data/research/candles
           git -C data config user.name "mosha-council"
           git -C data config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git -C data add research/probe && git -C data commit -qm "Probe: live site check $(date -u +%H:%MZ)" || exit 0
+          git -C data add research/candles && git -C data commit -qm "Research: gold Jan-Jun and NQ 2026 history dumps $(date -u +%H:%MZ)" || exit 0
           for j in 1 2 3 4 5; do git -C data pull -q --rebase origin council-data && git -C data push -q origin HEAD:council-data && break; sleep 5; done
