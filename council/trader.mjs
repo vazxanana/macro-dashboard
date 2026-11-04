@@ -934,6 +934,21 @@ async function yahoo1m(sym) {
   }
   throw new Error(`Yahoo ${sym}: throttled (${last})`);
 }
+// 4 Nov: Yahoo refused every GitHub runner from 14:26 UTC (429 on both hosts, NQ and MNQ). CNBC's chart service answers them:
+// @ND.1 = the front Nasdaq-100 future (the same contract as NQ=F), 1-minute bars, about 10 min delayed like Yahoo. Fallback.
+const etStamp = (t) => { const o = {}; for (const p of nyFmt.formatToParts(new Date(t * 1000))) o[p.type] = p.value; return `${o.year}${o.month}${o.day}${o.hour}${o.minute}00`; };
+async function cnbc1m(sym) {
+  const r = await fetch(`https://ts-api.cnbc.com/harmony/app/bars/${sym}/1M/${etStamp(now - 4 * 86400)}/${etStamp(now + 120)}/adjusted/EST5EDT.json`, { headers: { 'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36', Accept: 'application/json' }, signal: AbortSignal.timeout(20000) });
+  const j = await r.json().catch(() => null), pb = j && j.barData && j.barData.priceBars;
+  if (!pb || !pb.length) throw new Error(`CNBC ${sym}: ${(j && j.statusMessage) || `HTTP ${r.status}`}`);
+  const out = [];
+  for (const b of pb) { const o = +b.open, h = +b.high, l = +b.low, c = +b.close, t = Math.round(+b.tradeTimeinMills / 1000); if ([o, h, l, c, t].every((v) => isFinite(v) && v > 0)) out.push({ time: t, open: o, high: Math.max(h, o, c), low: Math.min(l, o, c), close: c }); }
+  return out.sort((a, b) => a.time - b.time);
+}
+async function nq1m() {
+  try { const b = await yahoo1m('NQ=F'); snapshot.nqSrc = 'yahoo'; return b; }
+  catch (e) { const b = await cnbc1m('@ND.1'); snapshot.nqSrc = 'cnbc'; snapshot.nqYahoo = String(e.message || e); return b; }
+}
 function nqOpenSignal(bars, today) {
   const B = bars.map((b) => ({ ...b, ...nyParts(b.time) })), days = [...new Set(B.filter((b) => b.m >= 570 && b.m < 960 && b.d < today).map((b) => b.d))].sort();
   const pd = days.at(-1); if (!pd) return null;
@@ -1003,7 +1018,7 @@ try {
   const ud = new Date(now * 1000), uMin = ud.getUTCHours() * 60 + ud.getUTCMinutes(), uWd = ud.getUTCDay(), asiaWin = uWd >= 1 && uWd <= 5 && uMin <= 200;
   if ((!['Sat', 'Sun'].includes(ny.wd) && ny.m >= 300 && ny.m <= 1000) || asiaWin || openNq.length) {
     // Yahoo's CME candles arrive 10 minutes late (probe 4 Nov: lag 600 s) and the newest one is still forming: drop it
-    const bars = (await yahoo1m('NQ=F')).slice(0, -1);
+    const bars = (await nq1m()).slice(0, -1);
     if (bars.length) nqLast = { price: +bars.at(-1).close.toFixed(2), at: bars.at(-1).time + 60 };   // shown as 'now' on the Active trades card (about 10 min late)
     for (const r of openNq) {
       const s = r.side === 'sell', r0 = Math.abs(r.entry - r.stop);
