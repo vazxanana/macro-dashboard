@@ -21,9 +21,9 @@ jobs:
         run: |
           cp -r main/council council
           mkdir -p data/research/candles
-          node tools/histdump.mjs nq data/research/candles/nq-duka-dec-sep.json.gz 2>&1 | tail -50 || true
+          node tools/histdump.mjs nq data/research/candles/nq-duka-mar-sep.json.gz 2>&1 | tail -50 || true
           ls -la data/research/candles
           git -C data config user.name "mosha-council"
           git -C data config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git -C data add research/candles && git -C data commit -qm "Research: NQ Dukascopy 1m Dec 2025 - Sep 2026 $(date -u +%H:%MZ)" || exit 0
+          git -C data add research/candles && git -C data commit -qm "Research: NQ Dukascopy 1m Mar - Sep 2026 $(date -u +%H:%MZ)" || exit 0
           for j in 1 2 3 4 5; do git -C data pull -q --rebase origin council-data && git -C data push -q origin HEAD:council-data && break; sleep 5; done
