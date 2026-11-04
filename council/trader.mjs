@@ -158,6 +158,9 @@ const USER_RULES = [
   { id: 'gold-vol-gate', apply: (c) => { c.replicaLive = ['xau']; c.goldVolMin = 1.5; },
     change: 'Gold replica trades live again, but only while gold is volatile: 20-day average daily range at least 1.5% of price; NQ stays the main system',
     why: '8-year spot gold split by volatility: the replica loses in calm gold every year (bottom fifth -0.21R a trade) and only pays in the top fifth (+0.05R, 6 of 8 years positive). With the risk rules and a 1.5% gate: 2019-2025 +18.9R instead of -312.5R, 2026 +43.2R. 2026 is the most volatile gold year in the sample (2.2% vs 0.9-1.5%), which is why the replica looked good this year.' },
+  { id: 'mosha-bo-weekly', apply: (c) => { c.moshaBoWeekly = true; },
+    change: "Mosha BO system: trades only in the weekly structure's direction (his \"Father\" timeframe); the M15 break no longer has to flip M15 structure",
+    why: "From his multi-timeframe slides (father/mother/son). Spot gold 2019-26, H4->H1->M15, limit at the broken level, 3R, with the weekly direction computed the way the trader sees it live (Monday weeks built from the last 720 daily candles, swing size 3): weekly agrees 2019-22 +32.2R (87 trades, +0.37R a trade), 2023-26 +34.2R (99, +0.35R), 7 of 8 years positive, worst drawdown -18.4R; weekly against -28.3R / -15.8R. The previous flip-only rule: +7.5R / +15.1R. Caveat: the weekly filter did not help the other timeframe chains, so it is watched by the kill switch like everything else." },
 ];
 config.userRules = config.userRules || [];
 for (const u of USER_RULES) if (!config.userRules.includes(u.id)) { u.apply(config); config.userRules.push(u.id); config.history.push({ at: nowISO, by: 'user', change: u.change, why: u.why }); }
@@ -442,8 +445,9 @@ for (const [key, M] of Object.entries(MARKETS)) {
     // 4 Nov: the replica runs unchanged on every market as research (paper, 2R): an out-of-sample test of the method itself.
     // Only gold trades it live (config.replicaLive). The 0.30 stop floor is in gold dollars, so other markets use 0.1 ATR alone.
     // Mosha breakout system (4 Nov, night; user rule mosha-bo), from his "All you need is this Breakout System" post:
-    // 1. H4 BO (bias)  2. H1 BO the other way (the retracement), after it  3. M15 BO back in the H4 direction (a structure
-    // flip)  4. pullback entry: limit at the broken M15 level, stop past the M15 Origin, target 3R (his 1:2 or 1:3), valid 24 h,
+    // 0. weekly structure in the trade's direction (user rule mosha-bo-weekly, 4 Nov; before it: the M15 BO had to flip M15)
+    // 1. H4 BO (bias)  2. H1 BO the other way (the retracement), after it  3. M15 BO back in the H4 direction
+    // 4. pullback entry: limit at the broken M15 level, stop past the M15 Origin, target 3R (his 1:2 or 1:3), valid 24 h,
     // out after 72 h. Spot gold, engine events causal: 2019-22 104 trades +7.5R (2R +11.5R), 2023-26 114 trades +15.1R
     // (+0.13R a trade), no volatility gate needed. Lower-timeframe chains (H1-M15-M5, M30-M15-M5) lost and are not used.
     if (key === 'xau' && config.moshaBo) {
@@ -451,15 +455,37 @@ for (const [key, M] of Object.entries(MARKETS)) {
       try {
         const E3 = ev('15m', 900), E2 = ev('1h', 3600), E1 = ev('4h', 14400), e3 = E3.at(-1);
         const before = (E, t) => E.filter((e) => e.t <= t).at(-1);
-        if (e3 && e3.flip && now - e3.t <= 3600) {
+        // weekly structure ("Father", user rule mosha-bo-weekly): Monday-aligned weeks built from about two years of daily candles,
+        // swing size 3; the direction of the last weekly BO on a closed week. Research: that window replayed on spot gold 2019-26
+        // kept +0.37R / +0.35R a trade (both halves) when it agrees, lost when it is against. The daily candles are spot gold
+        // from CNBC (XAU=): PAXG's premium over spot drifts over the months, so its weekly swings break in other places (3 Nov:
+        // spot closed the week through the weekly low, PAXG did not). CNBC matched the HistData spot weeks in 95 of 95 weeks
+        // since January 2025. If CNBC fails, the PAXG daily candles stand in (snapshot.goldW1Src says which).
+        let dly = src['1d'].bars;
+        if (config.moshaBoWeekly) try {
+          const ds = (t) => new Date(t * 1000).toISOString().slice(0, 10).replace(/-/g, '') + '000000';
+          const r = await fetch(`https://ts-api.cnbc.com/harmony/app/bars/XAU=/1D/${ds(now - 720 * 86400)}/${ds(now + 86400)}/adjusted/EST5EDT.json`, { headers: { 'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36', Accept: 'application/json' }, signal: AbortSignal.timeout(20000) });
+          const j = await r.json().catch(() => null), pb = (j && j.barData && j.barData.priceBars) || [];
+          const cd = pb.map((b) => ({ time: Math.floor(+b.tradeTimeinMills / 86400000) * 86400, open: +b.open, high: +b.high, low: +b.low, close: +b.close })).filter((b) => [b.time, b.open, b.high, b.low, b.close].every((v) => isFinite(v) && v > 0));
+          if (cd.length < 300) throw new Error(`CNBC XAU= daily: ${cd.length} candles (HTTP ${r.status})`);
+          dly = cd.sort((a, b) => a.time - b.time); snapshot.goldW1Src = 'cnbc-spot';
+        } catch (e) { snapshot.goldW1Src = 'paxg'; snapshot.errors.goldW1 = String(e.message || e); }
+        const wk = [];
+        for (const b of dly) { const k = Math.floor((b.time - 345600) / 604800) * 604800 + 345600, c = wk.at(-1);
+          if (!c || c.time !== k) wk.push({ time: k, open: b.open, high: b.high, low: b.low, close: b.close }); else { c.high = Math.max(c.high, b.high); c.low = Math.min(c.low, b.low); c.close = b.close; } }
+        const wEv = msAnalyze(wk, 3).events.map((e) => ({ t: wk[e.breakIdx].time + 604800, dir: e.dir })).filter((e) => e.t <= now);
+        const w1At = (t) => (before(wEv, t) || { dir: 0 }).dir;
+        snapshot.goldW1 = w1At(now) || null;
+        const okW = (e) => config.moshaBoWeekly ? w1At(e.t) === e.dir : e.flip;
+        if (e3 && okW(e3) && now - e3.t <= 3600) {
           const e2 = before(E2, e3.t), e1 = before(E1, e3.t), d = e3.dir, id = `xau-moshabo-${e3.t}`;
           if (e1 && e2 && e1.dir === d && e2.dir === -d && e2.t > e1.t && !trades.some((x) => x.id === id)) {
             const entry = +e3.level.toFixed(2), stop = +(d < 0 ? e3.top + 0.3 : e3.bot - 0.3).toFixed(2), r0 = Math.abs(entry - stop);
             const openBo = trades.filter((x) => x.k === 'mosha-bo' && (x.status === 'open' || x.status === 'pending')).length;
             if (r0 > 0.5 && openBo < 2 && (d < 0 ? price < stop : price > stop)) trades.push({ id, market: key, label: M.label, dec: M.dec, k: 'mosha-bo', name: 'Mosha BO system', pair: 'H4 → H1 → M15', h: '15m',
               side: d < 0 ? 'sell' : 'buy', entry, stop, t1: +(entry + d * 3 * r0).toFixed(2), rr: 3, buf: CFG.buf, opened: now, checked: now, status: 'pending', R: null, r0, validFor: 24 * 3600, maxHold: 72 * 3600, noBe: true, entryMode: 'limit',
-              feat: { h4At: e1.t, h1At: e2.t, m15At: e3.t }, shadow: false, blockedBy: [],
-              note: `Mosha BO system: H4 BO ${d < 0 ? 'sell' : 'buy'}, then H1 BO ${d < 0 ? 'buy' : 'sell'} (retracement), then M15 BO ${d < 0 ? 'sell' : 'buy'} through ${entry}. Pullback limit at the broken M15 level ${entry}, stop past the M15 Origin ${stop}, target 3R ${(entry + d * 3 * r0).toFixed(2)}; valid 24 h, out after 72 h.` });
+              feat: { h4At: e1.t, h1At: e2.t, m15At: e3.t, w1: w1At(e3.t) === d ? 'with' : 'against', m15Flip: !!e3.flip }, shadow: false, blockedBy: [],
+              note: `Mosha BO system: ${config.moshaBoWeekly ? `weekly structure ${d < 0 ? 'bearish' : 'bullish'}, ` : ''}H4 BO ${d < 0 ? 'sell' : 'buy'}, then H1 BO ${d < 0 ? 'buy' : 'sell'} (retracement), then M15 BO ${d < 0 ? 'sell' : 'buy'} through ${entry}. Pullback limit at the broken M15 level ${entry}, stop past the M15 Origin ${stop}, target 3R ${(entry + d * 3 * r0).toFixed(2)}; valid 24 h, out after 72 h.` });
           }
         }
       } catch (e) { snapshot.errors.moshaBo = String(e.message || e); }
