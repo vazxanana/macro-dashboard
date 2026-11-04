@@ -175,3 +175,11 @@ produce the same order. M30 → M1 adds no new trades; it only re-labels Scalps 
 the shadow split doubles the same result). No change while the engine runs as shadows on gold (live: the replica); if the engine
 ever goes live on gold again, drop m30m1 or give it its own entry (the M30 Origin / an M5 confirmation).
 Replica live buy 04:15 at +0.29R; Asia shadow sells (scalp/m30m1) keep losing into the rally.
+
+## 4 Nov 06:30 — Replica: does the last result matter? (rejected; look-ahead trap noted)
+
+Live: replica buy 04:15 won +2R at 05:54 (gold ran to 4,010); live replica 2 trades, +1R. Old 15:22 scalp sell stopped −1R.
+First pass ("previous signal of the day won/lost") looked strong: after a win −0.15 | −0.40 (t −2.8), after a loss +0.34 | +0.49.
+But that used the previous signal's final result before it had closed (look-ahead). Using only replica trades already closed at
+the signal (6/12/24 h windows): after a win +0.02 | +0.18, after a loss +0.29 | −0.03 (6 h) — the groups swap between halves.
+Nth signal of the day and "a replica trade already open" also show nothing consistent. No change.
