@@ -333,3 +333,12 @@ New live replica trades trail from +2R, 2R behind the best price (was +1.5R / 1R
 gold with the 1.5% volatility gate and the risk rules: 2019-22 +13.8R → +44.8R, 2023-26 +47.3R → +87.4R. Every wider
 setting tested beat the old one in both halves. Also tested and rejected the same night: a 15-minute trigger (no better
 agreement between feeds), dropping the H1/★ filter, and the NQ-style New York open run on gold (−177R over 8 years of spot).
+
+### Gold: daily-trend rule, judged on the last 4 years (4 Nov, night; user rule `gold-d1-with`)
+
+At the owner's request gold is now judged on 2023-2026 only. Live replica trades must be in the daily trend direction
+(still against the H4 trend, i.e. a pullback entry); others are research with `d1Skip: true`. 2023-26 spot, 1.5% gate,
+exit v2, risk rules: 602 trades +87.4R, drawdown −35.2R → 325 trades +63.8R, drawdown −15.8R. Chosen on 2023-24
+(+8.1R vs −22.2R), held on 2025-26 (+55.7R). In 2019-22 the opposite split held, so this is a last-4-years rule.
+Also checked on 2023-26: gate 1.5% kept (2023-24 has few gated trades), trading with the H4 trend loses (−52.7R),
+exit v2 kept (3R trails win 2025-26 but lose more in 2023-24), buys-only rejected (a bet on gold's direction).
