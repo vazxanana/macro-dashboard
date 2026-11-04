@@ -464,3 +464,37 @@ Proxy test on the BO system (limit deeper into the M15 BO leg, same stop past th
 H4→H1→M15 at the level 2019-22 +7.5R (3R) / 2023-26 +15.1R; 0.33 into the leg +9.6 / −14.2R; 0.5 into the leg −6.3 / −11.1R.
 H4→H1→M30: level +4.9 / +4.0R; deeper entries flat to −6R. Deeper fills are fewer and worse (when price returns that deep the
 breakout is failing). **Kept the entry at the broken level.** His BOOM 1 / BOOM 2 shapes themselves are not coded yet.
+
+## 4 Nov (late): everything from Mosha's TikTok slides, tested on spot gold 2019-2026 (walk-forward 2019-22 vs 2023-26)
+
+Owner: "test it in all the way possible". Engine events causal, limit fills on 1m candles, 0.30 spread, out after 72 h.
+Grid: 6 timeframe chains (D1-H4-H1, H4-H1-M30, H4-H1-M15, H1-M30-M15, H1-M15-M5, M30-M15-M5) x swing size 3 and 6 x three
+entries (broken level, 33% into the breakout candle, market) x exits (2R, 3R, leg-extreme target, trail), with filters
+recorded (weekly "Father" direction, daily direction, M15 flip, first BO back, volatility, hour, retracement depth).
+
+- **Breakout System H4 → H1 → M15, swing 6, limit at the broken level, 3R, weekly structure agrees** (weekly = Monday weeks,
+  swing 3): 2019-22 +32.2R / 87 (+0.37R a trade), 2023-26 +27.3R / 101 (+0.27R); 7 of 8 years positive (2023 the loser,
+  −7.1R); worst drawdown −18.4R. Weekly against: −28.3R / −8.9R. Old live rule (M15 flip only): +7.5R / +15.1R.
+  With the weekly read the way the Trader can read it live (last 720 days of daily candles only): +32.2R / +34.2R (99).
+  → **adopted** (user rule `mosha-bo-weekly`, PR #203). The M15 flip requirement is dropped: with the weekly agreeing,
+  non-flip M15 BOs did better (+0.50R / +0.48R a trade, 84) than flips (+0.26R / +0.11R, 104).
+- Daily direction on the same chain points the same way (agrees +0.20R / +0.19R, against −0.27R / +0.01R); weekly + daily
+  together +0.41R / +0.21R (147): no better than weekly alone, so not added.
+- **Caveat (multiple testing):** the weekly filter does NOT help the other chains (H4-H1-M30 +0.40R then −0.12R; H1-M15-M5
+  −0.30R / −0.18R; swing 3 on H4-H1-M15 −0.19R / +0.01R). One good cell in a grid of ~70; it is kept because it is the
+  owner's own top-down rule, both halves and 7 of 8 years agree, and the opposite side loses. Kill switch: −10R at 30
+  trades, −12R at 50, drawdown beyond −18R.
+- Targets on the adopted cell: 3R +32.2R / +27.3R; leg extreme (his "opposite zone") when ≥ 1R, else 3R +31.8R / +30.7R;
+  leg extreme only (skip when < 1R) +0.55R / +0.49R a trade but only 114 trades; 80% at 2R + 20% trail +24.7R / +21.9R.
+  3R kept (simplest, same total).
+- Entries: broken-level limit best; market entry +45.0R / +21.9R (weaker in 2023-26); 33% into the breakout (BOOM-style)
+  worse, as in the earlier BOOM test.
+- **Feed check for the weekly:** PAXG daily candles give a different weekly structure (premium over spot drifts over months:
+  on 3 Nov spot closed the week of 26 Oct through the weekly low 3,886 → bearish; PAXG still bullish). CNBC `XAU=` daily
+  (probe on council-probe, keyless) matched the HistData spot weekly direction in 95 of 95 weeks since Jan 2025; COMEX
+  @GC.1 daily also 95/95. Live uses CNBC XAU=, PAXG only as fallback. Stooq (JS wall) and Yahoo (429) failed from Actions.
+- **Engulfing SOP** (EG at a level, entry on the retest, stop past the EG): negative on every timeframe and filter tried.
+- **RSS / SRR strong levels:** strong levels beat weak ones, but limit entries at them lose. Best: H1 strong level + weekly
+  agrees + an M15 BO confirming off it, 3R: +0.06R / +0.11R a trade, +22.4R over 271 trades. Too thin to trade; not added.
+- **Replica (gold v5) + weekly filter:** inconsistent (gated, weekly agrees +0.03R / +0.21R; against +0.19R / +0.06R),
+  so the replica stays as it is.
