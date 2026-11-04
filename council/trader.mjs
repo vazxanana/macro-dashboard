@@ -146,6 +146,9 @@ const USER_RULES = [
   { id: 'gold-shadow', apply: (c) => { c.replicaLive = []; c.focus = ['none']; },
     change: 'Gold research only (user): the gold replica and the engine setups stop opening live paper trades; NQ New York open run is the system',
     why: '8-year spot gold test: the replica lost every year 2019-2025 (-312.5R over 4,484 trades), only 2026 positive; the NQ New York open run held on 3 years of NQ futures and every newer sample.' },
+  { id: 'gold-vol-gate', apply: (c) => { c.replicaLive = ['xau']; c.goldVolMin = 1.5; },
+    change: 'Gold replica trades live again, but only while gold is volatile: 20-day average daily range at least 1.5% of price; NQ stays the main system',
+    why: '8-year spot gold split by volatility: the replica loses in calm gold every year (bottom fifth -0.21R a trade) and only pays in the top fifth (+0.05R, 6 of 8 years positive). With the risk rules and a 1.5% gate: 2019-2025 +18.9R instead of -312.5R, 2026 +43.2R. 2026 is the most volatile gold year in the sample (2.2% vs 0.9-1.5%), which is why the replica looked good this year.' },
 ];
 config.userRules = config.userRules || [];
 for (const u of USER_RULES) if (!config.userRules.includes(u.id)) { u.apply(config); config.userRules.push(u.id); config.history.push({ at: nowISO, by: 'user', change: u.change, why: u.why }); }
@@ -411,6 +414,11 @@ for (const [key, M] of Object.entries(MARKETS)) {
     }
     // 4 Nov: the replica runs unchanged on every market as research (paper, 2R): an out-of-sample test of the method itself.
     // Only gold trades it live (config.replicaLive). The 0.30 stop floor is in gold dollars, so other markets use 0.1 ATR alone.
+    // volatility gate (4 Nov, user rule gold-vol-gate): 20-day average daily range as % of price, from the last 20 closed daily
+    // bars. The replica only trades gold live while this is at least config.goldVolMin (1.5%); below it signals stay research.
+    const dvb = src['1d'].bars.slice(-21, -1), volPct = dvb.length >= 15 ? dvb.reduce((a, b) => a + (b.high - b.low) / b.close * 100, 0) / dvb.length : null;
+    if (key === 'xau') { snapshot.goldVol = volPct == null ? null : +volPct.toFixed(2); snapshot.goldVolMin = config.goldVolMin || null; }
+    const volOk = !config.goldVolMin || (volPct != null && volPct >= config.goldVolMin);
     if (marketOpen(M, now)) {
       let sigs = []; try { sigs = replicaSignals(src); } catch (e) {}
       for (const g of sigs) {
@@ -463,7 +471,9 @@ for (const [key, M] of Object.entries(MARKETS)) {
         if (v5 && capped) research.at(-1).capped = true;
         if (v5 && dayStop) research.at(-1).dayStop = true;
         if (v5 && stale) research.at(-1).stale = true;
-        if (v5 && !capped && !dayStop && !stale && (config.replicaLive || []).includes(key)) trades.push({ id: `${key}-replica-${now}-${g.sell ? 's' : 'b'}`, market: key, label: M.label, dec: M.dec, k: 'replica', name: 'Replica', pair: 'M5 CHoCH', h: '5m', side: g.sell ? 'sell' : 'buy',
+        if (volPct != null) research.at(-1).vol = +volPct.toFixed(2);
+        if (v5 && !volOk) research.at(-1).calm = true;
+        if (v5 && volOk && !capped && !dayStop && !stale && (config.replicaLive || []).includes(key)) trades.push({ id: `${key}-replica-${now}-${g.sell ? 's' : 'b'}`, market: key, label: M.label, dec: M.dec, k: 'replica', name: 'Replica', pair: 'M5 CHoCH', h: '5m', side: g.sell ? 'sell' : 'buy',
           entry: +entry.toFixed(2), stop: +stop.toFixed(2), t1: +(entry + (g.sell ? -10 : 10) * r0).toFixed(2), tp1: +t1.toFixed(2), rr: 10, trail: [1.5, 1.0], size, buf: CFG.buf, opened: now, filled: now, checked: now, status: 'open', R: null, r0: Math.abs(+entry.toFixed(2) - +stop.toFixed(2)), maxHold: 48 * 3600, noBe: true, entryMode: 'market', lag,
           feat: { d1: src['1d'].A.trend === (g.sell ? -1 : 1) ? 'with' : 'against', h4, session: sessionOf(now), star: g.star, h1clear, riskAtr: +riskAtr.toFixed(2), leg: g.L === 36 ? '3h' : '6h' }, shadow: false, blockedBy: [],
           note: `Gold replica (v5, against the H4 trend): ${g.L === 36 ? '3 h' : '6 h'} leg to ${g.ext.toFixed(2)}, M5 CHoCH through ${g.lvl.toFixed(2)}${g.star ? ', ★ engulfing at structure at the extreme' : g.peg ? ', engulfing at the extreme' : ''}${h1clear ? ', clear of H1 Origins' : ''}. ${g.sell ? 'Sell' : 'Buy'} at market, stop past the extreme; from +1.5R the stop trails 1R behind the best price (2R mark ${t1.toFixed(2)}), out after 48 h.` });

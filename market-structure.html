@@ -779,8 +779,9 @@
         <ul class="cal-day" id="ms-nq-list"></ul>
       </div>
       <div class="card c-rep">
-        <div class="ms-k"><span>Gold replica · research only (paper shadow, not traded)</span></div>
-        <p class="ms-note"><b>Research only since 4 Nov.</b> On 8 years of spot gold (HistData 2019–2026) the replica lost every year from 2019 to 2025 (−312.5R over 4,484 trades) and only 2026 was positive, so it no longer opens trades; every signal is still recorded here.</p>
+        <div class="ms-k"><span>Gold replica · trades only when gold is volatile</span></div>
+        <p class="ms-note" id="ms-rep-vol"></p>
+        <p class="ms-note"><b>Volatility gate since 4 Nov.</b> On 8 years of spot gold (HistData 2019–2026) the replica loses in calm gold every year and only pays when gold moves a lot. It now trades live only while gold's 20-day average daily range is at least 1.5% of price (2019–2025 with the gate: +18.9R instead of −312.5R; 2026: +43.2R). Below that, every signal is still recorded here as research. NQ stays the main system.</p>
         <p class="ms-note">A leg of 2+ M15 ATRs in 3 h or 6 h, then an M5 CHoCH; taken when clear of live H1 Origins or with a ★ engulfing at the extreme, with a stop of at least one M15 ATR, and (v5, 4 Nov) only against the H4 trend. Market entry, stop past the extreme, 2R, out after 48 h. The M5 gold chart marks every signal of the last 24 h.</p>
         <div class="c-kpi" id="ms-rep-kpi"></div>
         <div class="rep-track" id="ms-rep-track" aria-label="Live replica results against the replay expectation"></div>
@@ -2726,6 +2727,8 @@ function msNextSetup(bars, A) {
     const L = (C.trades || []).filter((x) => x.k === 'replica').sort((a, b) => b.opened - a.opened);
     const done = L.filter((x) => ['win', 'loss', 'be'].includes(x.status)), R = done.reduce((a, x) => a + x.R, 0), w = done.filter((x) => x.R > 0).length;
     const fR = (v) => `${v > 0 ? '+' : v < 0 ? '−' : ''}${Math.abs(v).toFixed(2)}R`;
+    { const sn = COUNCIL.snap || {}, v = sn.goldVol, mn = sn.goldVolMin || 1.5;
+      set('ms-rep-vol', v == null ? 'Gold volatility: waiting for the Trader.' : `Gold volatility now: <b>${v.toFixed(2)}%</b> average daily range (gate ${mn}%) · <b class="${v >= mn ? 'pos' : 'neg'}">${v >= mn ? 'trading live' : 'calm: research only'}</b>`); }
     set('ms-rep-kpi', `<div><span>Live trades</span><b>${L.length}${L.length - done.length ? ` <small>(${L.length - done.length} open)</small>` : ''}</b></div><div><span>Win rate</span><b>${done.length ? Math.round(w / done.length * 100) + '%' : '—'}</b></div><div><span>Total</span><b class="${R > 0 ? 'pos' : R < 0 ? 'neg' : ''}">${done.length ? fR(R) : '—'}</b></div><div><span>Per trade</span><b>${done.length ? fR(R / done.length) : '—'}</b></div>`);
     renderTrack();
     const rp = C.snap && C.snap.research && C.snap.research.replica;
@@ -2739,7 +2742,7 @@ function msNextSetup(bars, A) {
   }
   // Our system = the live gold replica trades (k 'replica') plus the backtest replay of the months before it went live
   const sysOn = () => { const el = document.getElementById('ms-c-sys'); return !el || el.checked; };
-  // Our system (4 Nov, night) = the NQ New York open run: forward paper records + the replay since Dec 2022. Gold is research only.
+  // Our system (4 Nov, night) = the NQ New York open run: forward paper records + the replay since Dec 2022. Gold trades only while volatile (20-day range ≥ 1.5%).
   const sysTrades = () => ((COUNCIL.replay && COUNCIL.replay.trades) || []).filter((x) => x.market === 'nq' && nqSys(x)).concat((COUNCIL.research || []).filter((x) => x.k === 'nq-open' && nqSys(x)).map((x) => ({ ...x, pair: 'M1', paper: true, forward: true })));
   function renderNQ() {
     const set = (id, html) => { const el = document.getElementById(id); if (el) el.innerHTML = html; };
