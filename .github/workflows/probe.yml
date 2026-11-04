@@ -1,5 +1,5 @@
 name: Council data probe
-# RESEARCH ONLY: XAUUSD 1m history from HistData.com to council-data/research/candles/xau-histdata/.
+# RESEARCH ONLY: index 1m (S&P 500, Nasdaq 100) 1m history from HistData.com to council-data/research/candles/xau-histdata/.
 on:
   push:
     branches: [council-probe]
@@ -13,12 +13,11 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/checkout@v4
         with: { ref: council-data, path: data }
-      - name: Dump XAUUSD HistData
+      - name: Dump SPXUSD + NSXUSD HistData
         run: |
-          mkdir -p data/research/candles/udx-histdata
-          python3 tools/histdata.py data/research/candles/udx-histdata UDXUSD 2>&1 | tail -40 || true
-          ls -la data/research/candles/udx-histdata
+          for P in SPXUSD NSXUSD; do d=data/research/candles/$(echo $P | tr A-Z a-z)-histdata; mkdir -p $d; python3 tools/histdata.py $d $P 2>&1 | tail -40 || true; done
+          ls -la data/research/candles/
           git -C data config user.name "mosha-council"
           git -C data config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git -C data add research/candles && git -C data commit -qm "Research: UDXUSD (dollar index) 1m HistData $(date -u +%H:%MZ)" || exit 0
+          git -C data add research/candles && git -C data commit -qm "Research: SPXUSD + NSXUSD 1m HistData $(date -u +%H:%MZ)" || exit 0
           for j in 1 2 3 4 5; do git -C data pull -q --rebase origin council-data && git -C data push -q origin HEAD:council-data && break; sleep 5; done
