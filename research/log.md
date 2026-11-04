@@ -284,3 +284,8 @@ even with a true +0.2R edge).
 - Same 1m history for every NQ setup: NY open run (flipped open sweep) +0.73R (27, t 2.8, both months, all depth/reclaim settings positive), open sweeps before NY +0.40R (38), London low +0.23R (19), swing +0.15R (38), NY reversal 0.00R (26), Tokyo −0.14R (30). Only the first two run; the page counts only them. October NQ on the calendar +7.7R/54 → +24.5R/40.
 - Why open-sweep trades fail: 7 of 20 losers reached +1R first (break-even/partials/trailing all worse than 2R, kept 2R); trades on the daily-open side did better (+0.67R vs +0.25R) but the other side flipped sign between months, so no filter. NY sweeps run instead of reversing — hence the flip.
 - Watch: the NY run's buys carried October (+11.8R over 10) in a rising market; check it holds in a falling month.
+
+## 4 Nov (evening): gold, the NQ open rules carried over
+
+- Pre-registered transfer of the NQ rules to gold 1m (227 days, 0.30 spread, depth 0.054% of price): pre-NY open reversals −0.12R over 301 (3/12 months) — no; NY open run +0.13R over 143 (7/11 months; Jan–Jun +19.6R, Jun–Nov −1.5R), every depth/reclaim cell positive. Added as research (gold-nyrun), not live.
+- Replica filters: ~60 variants on the same 2026 data; the honest remaining gold levers are independent signals and forward trades, not more filters.
