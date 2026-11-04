@@ -290,3 +290,10 @@ The NQ open-sweep rules tested on gold unchanged (1-minute, 22 Dec – 3 Nov, 22
 ## Gold replica: round-number stops (4 Nov)
 
 From the trader's XAUUSD price-action PDF (a ChatGPT synthesis citing the New York Fed stop-cluster studies): stops cluster just beyond round prices and price runs to them. A replica stop sitting within $2 in front of a $10 level now moves to $0.50 past it (`stop0` keeps the original; the entry filter still judges `stop0`, so the trades taken are unchanged). Year replay of v5 + trailing with the 4-minute entry lag: the 76 trades it changes gain +16.7R (+0.22R each, paired t 1.8), both halves positive; every $10 setting tested gains, $5 levels gain less and fade past a $2 window. The PDF's other testable ideas did not help: a wick-sized buffer (+0.190R vs +0.197R) and its M15 direction gate (keeps 87 of 500 trades, −77R).
+
+## NQ: three-year out-of-sample test (4 Nov, night)
+
+The trader's NQ futures file (1-minute, 27 Dec 2022 – 11 Dec 2025, 763 full days; timestamps are candle closes, shifted back a minute) tested both live NQ rules unchanged:
+- **New York open run:** 447 trades +62.3R, +0.14R a trade (t 2.15), 42% wins; 2023 +35.9R, 2024 +7.6R, 2025 +19.4R; 24 of 37 months positive; buys +25.9R, sells +36.3R. **Kept** (paper).
+- **Open sweeps before New York:** 352 trades −22.4R (−0.06R), 2023 −11.3R, 2024 +4.8R, 2025 −15.9R; London −17.6R, 08:30 −8.4R, midnight +3.6R. **Switched off.**
+The calendar's NQ replay now runs from Dec 2022 (this file to 11 Dec 2025, Dukascopy cash index 12 Dec – 8 Mar, Yahoo + CNBC futures from 11 Sep).
