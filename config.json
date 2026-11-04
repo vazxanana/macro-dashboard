@@ -1,10 +1,10 @@
 {
  "buf": 0.15,
  "minRR": 1.2,
- "minRisk": 0.7,
+ "minRisk": 0.8,
  "be": null,
  "fresh": 12,
- "newsGuard": false,
+ "newsGuard": true,
  "maxUsd": 2,
  "paused": {},
  "pausedMarkets": {},
@@ -28,14 +28,12 @@
   },
   "rscalp": {
    "since": {
-    "session:asia": "2026-11-02T21:25:27.000Z",
     "session:overlap": "2026-11-03T18:05:34.000Z"
    },
    "src": {
     "minRR": "user"
    },
    "noSession": [
-    "asia",
     "overlap"
    ],
    "minRR": 3
@@ -241,6 +239,24 @@
    "by": "user",
    "change": "Gold replica live (v4): gold trades the replica live; the engine setups run as shadows; take-all off",
    "why": "150-day gold replay: the replica v4 +0.19R a trade on the first 100 days and +0.13R on the last 50 (no losing month, +86R over 527 trades, all four of the trader's marked trades); the engine setups on gold, every signal taken, −0.15 to −0.2R a trade (−146R), with the rules +53R."
+  },
+  {
+   "at": "2026-11-04T00:02:58.000Z",
+   "by": "coach-stats",
+   "change": "Minimum stop 0.7 → 0.8 ATR",
+   "why": "Win rate 10% over 29 trades: stops get hit by normal candle noise."
+  },
+  {
+   "at": "2026-11-04T00:02:58.000Z",
+   "by": "coach-stats",
+   "change": "rscalp: trading the asia session again",
+   "why": "Blocked trades made +0.29R over 5."
+  },
+  {
+   "at": "2026-11-04T00:02:58.000Z",
+   "by": "coach-stats",
+   "change": "News guard on",
+   "why": "Reviews: 4 losses came from high-impact news; no short-term trades from 15 min before to 45 min after news."
   }
  ],
  "btAt": "2026-11-03T11:12:04.307Z",
@@ -264,12 +280,16 @@
  "noPause": true,
  "wouldPause": {
   "rintra": {
-   "at": "2026-11-03T23:57:38.000Z",
+   "at": "2026-11-04T00:02:58.000Z",
    "why": "four losses in a row"
   },
   "scalp": {
-   "at": "2026-11-03T23:57:38.000Z",
+   "at": "2026-11-04T00:02:58.000Z",
    "why": "expectancy -1.00R over 12 trades"
+  },
+  "xau": {
+   "at": "2026-11-04T00:02:58.000Z",
+   "why": "market: -0.86R per trade over 7 trades"
   }
  },
  "repairs": [
@@ -281,5 +301,6 @@
  ],
  "replicaLive": [
   "xau"
- ]
+ ],
+ "newsSince": "2026-11-04T00:02:58.000Z"
 }
