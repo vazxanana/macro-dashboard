@@ -902,9 +902,34 @@ function nqOpenSignal(bars, today) {
   }
   return null;
 }
+// The same sweep rule at the Asian opens (the trader, 4 Nov): Tokyo 00:00 UTC and Shanghai 01:30 UTC. Liquidity = the previous
+// New York session's high/low (9:30–16:00 ET), the evening high/low since the 18:00 ET reopen, and the high/low of the hour
+// before the open. First 1-minute close back inside a swept level within the first hour → the other way, stop 2 points past
+// the extreme, 1.2R, out at 07:00 UTC (London open). One trade per session per day. History (4 Nov): Tokyo −0.19R a trade on
+// 50 days of 5-minute candles but +0.29R on the last 21 days of 1-minute; Shanghai about break-even to negative: paper only.
+const NQ_ASIA = [{ id: 'tokyo', name: 'NQ Tokyo open sweep', at: 0 }, { id: 'shanghai', name: 'NQ Shanghai open sweep', at: 90 }];
+function nqAsiaSignal(bars, t0) {
+  const nyd = nyParts(t0 - 8 * 3600).d, [Y, Mo, Da] = nyd.split('-').map(Number);
+  const B = bars.map((b) => ({ ...b, ...nyParts(b.time) }));
+  const rth = B.filter((b) => b.d === nyd && b.m >= 570 && b.m < 960), ev = B.filter((b) => b.time < t0 && b.time > t0 - 12 * 3600 && ((b.d === nyd && b.m >= 1080) || b.d > nyd)), pre = B.filter((b) => b.time >= t0 - 3600 && b.time < t0);
+  if (rth.length < 10 || ev.length < 5) return null;
+  const mx = (a) => Math.max(...a.map((b) => b.high)), mn = (a) => Math.min(...a.map((b) => b.low));
+  const L = { NYH: mx(rth), NYL: mn(rth), EVH: mx(ev), EVL: mn(ev) }; if (pre.length) { L.PRH = mx(pre); L.PRL = mn(pre); }
+  const hiL = ['NYH', 'EVH', 'PRH'].filter((k) => L[k] != null), loL = ['NYL', 'EVL', 'PRL'].filter((k) => L[k] != null);
+  let swH = null, swL = null, eH = -Infinity, eL = Infinity;
+  for (const b of bars.filter((b) => b.time >= t0 && b.time < t0 + 3600)) {
+    eH = Math.max(eH, b.high); eL = Math.min(eL, b.low);
+    if (swH == null) { const k = hiL.find((k) => b.high > L[k]); if (k) swH = k; }
+    if (swL == null) { const k = loL.find((k) => b.low < L[k]); if (k) swL = k; }
+    if (swH != null && b.close < L[swH] && b.close < b.open) return { sell: true, level: swH, lv: L[swH], ext: eH, stop: eH + 2, t: b.time, entry: b.close, L };
+    if (swL != null && b.close > L[swL] && b.close > b.open) return { sell: false, level: swL, lv: L[swL], ext: eL, stop: eL - 2, t: b.time, entry: b.close, L };
+  }
+  return null;
+}
 try {
   const ny = nyParts(now), openNq = research.filter((x) => x.k === 'nq-open' && x.status === 'open');
-  if ((!['Sat', 'Sun'].includes(ny.wd) && ny.m >= 565 && ny.m <= 1000) || openNq.length) {
+  const ud = new Date(now * 1000), uMin = ud.getUTCHours() * 60 + ud.getUTCMinutes(), uWd = ud.getUTCDay(), asiaWin = uWd >= 1 && uWd <= 5 && uMin <= 200;
+  if ((!['Sat', 'Sun'].includes(ny.wd) && ny.m >= 565 && ny.m <= 1000) || asiaWin || openNq.length) {
     // Yahoo's CME candles arrive 10 minutes late (probe 4 Nov: lag 600 s) and the newest one is still forming: drop it
     const bars = (await yahoo1m('NQ=F')).slice(0, -1);
     for (const r of openNq) {
@@ -914,11 +939,11 @@ try {
         if (s ? b.high >= r.stop : b.low <= r.stop) { r.status = 'loss'; r.R = -1; r.closed = b.time; break; }
         if (s ? b.low <= r.t1 : b.high >= r.t1) { r.status = 'win'; r.R = 1.2; r.closed = b.time; break; }
         const p = nyParts(b.time);
-        if (p.d !== r.day || p.m >= 960) { const R = +((s ? r.entry - b.open : b.open - r.entry) / r0).toFixed(2); r.status = R > 0 ? 'win' : R < 0 ? 'loss' : 'be'; r.R = R; r.closed = b.time; r.exit = '16:00'; break; }
+        if (r.exitAt ? b.time >= r.exitAt : (p.d !== r.day || p.m >= 960)) { const R = +((s ? r.entry - b.open : b.open - r.entry) / r0).toFixed(2); r.status = R > 0 ? 'win' : R < 0 ? 'loss' : 'be'; r.R = R; r.closed = b.time; r.exit = r.exitAt ? '07:00 UTC' : '16:00'; break; }
       }
       if (r.status === 'open' && bars.length) r.checked = bars.at(-1).time;
     }
-    if (ny.m >= 570 && ny.m <= 720 && !research.some((x) => x.k === 'nq-open' && x.day === ny.d)) {   // to 12:00 ET: the feed lags
+    if (ny.m >= 570 && ny.m <= 720 && !research.some((x) => x.k === 'nq-open' && !x.session && x.day === ny.d)) {   // to 12:00 ET: the feed lags
       const g = nqOpenSignal(bars, ny.d);
       if (g) {   // the day's first signal: paper entry at the signal candle's close (as on the backtest), even though the feed shows it ~10 min late
         const r0 = Math.abs(g.entry - g.stop), t1 = g.entry + (g.sell ? -1.2 : 1.2) * r0;
@@ -928,6 +953,17 @@ try {
           note: `Research (paper only): NQ swept the ${g.level} ${g.lv.toFixed(2)} after the New York open (extreme ${g.ext.toFixed(2)}) and closed back inside; ${g.sell ? 'sell' : 'buy'} ${g.entry.toFixed(2)}, stop ${g.stop.toFixed(2)}, target 1.2R ${t1.toFixed(2)}, out at 16:00.` });
       }
     }
+    if (asiaWin) for (const A of NQ_ASIA) {
+      const d0 = Math.floor(now / 86400) * 86400, t0 = d0 + A.at * 60, day = new Date(d0 * 1000).toISOString().slice(0, 10), id = `nq-${A.id}-${day}`;
+      if (now < t0 + 60 || now > t0 + 150 * 60 || research.some((x) => x.id === id)) continue;   // the first hour, seen up to 90 min late (feed lag)
+      const g = nqAsiaSignal(bars, t0);
+      if (!g) continue;
+      const r0 = Math.abs(g.entry - g.stop), t1 = g.entry + (g.sell ? -1.2 : 1.2) * r0;
+      research.push({ id, market: 'nq', label: 'NQ', dec: 2, k: 'nq-open', session: A.id, name: A.name, day, side: g.sell ? 'sell' : 'buy',
+        entry: +g.entry.toFixed(2), stop: +g.stop.toFixed(2), t1: +t1.toFixed(2), rr: 1.2, opened: g.t + 60, filled: g.t + 60, checked: g.t + 60, status: 'open', R: null, exitAt: d0 + 7 * 3600,
+        seenAt: now, level: g.level, levelPrice: +g.lv.toFixed(2), ext: +g.ext.toFixed(2), levels: Object.fromEntries(Object.entries(g.L).map(([k, v]) => [k, +v.toFixed(2)])),
+        note: `Research (paper only): NQ swept the ${g.level} ${g.lv.toFixed(2)} after the ${A.id === 'tokyo' ? 'Tokyo' : 'Shanghai'} open (extreme ${g.ext.toFixed(2)}) and closed back inside; ${g.sell ? 'sell' : 'buy'} ${g.entry.toFixed(2)}, stop ${g.stop.toFixed(2)}, target 1.2R ${t1.toFixed(2)}, out at 07:00 UTC.` });
+    }
   }
 } catch (e) { snapshot.errors.nq = String(e.message || e); }
 { const done = research.filter((x) => x.k === 'cycle' && (x.status === 'win' || x.status === 'loss' || x.status === 'be')), R = done.reduce((a, x) => a + x.R, 0);
@@ -935,7 +971,8 @@ try {
   const rp = research.filter((x) => x.k === 'replica'), sum = (a) => { const d = a.filter((x) => x.status === 'win' || x.status === 'loss' || x.status === 'be');
     return { signals: a.length, closed: d.length, wins: d.filter((x) => x.status === 'win').length, R: +d.reduce((s, x) => s + x.R, 0).toFixed(2), open: a.filter((x) => x.status === 'open').length, pending: a.filter((x) => x.status === 'pending').length }; };
   snapshot.research.replica = { all: sum(rp), pass: sum(rp.filter((x) => x.pass && x.v >= 2)), star: sum(rp.filter((x) => x.star)) };
-  snapshot.research.nq = sum(research.filter((x) => x.k === 'nq-open')); }
+  snapshot.research.nq = sum(research.filter((x) => x.k === 'nq-open'));
+  for (const sid of ['ny', 'tokyo', 'shanghai']) snapshot.research['nq_' + sid] = sum(research.filter((x) => x.k === 'nq-open' && (x.session || 'ny') === sid)); }
 wr('research.json', research);
 snapshot.lessons = lessons(trades, now);
 wr('snapshot.json', snapshot);
