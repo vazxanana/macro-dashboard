@@ -43,13 +43,17 @@
   "intraday": {
    "d1": "against",
    "since": {
-    "d1": "2026-11-02T11:52:07.000Z"
+    "d1": "2026-11-02T11:52:07.000Z",
+    "session:asia": "2026-11-04T12:04:20.000Z"
    },
    "src": {
     "d1": "backtest",
     "maxRR": "user"
    },
-   "maxRR": 10
+   "maxRR": 10,
+   "noSession": [
+    "asia"
+   ]
   },
   "rintra": {
    "d1": "with",
@@ -265,6 +269,12 @@
    "by": "coach-stats",
    "change": "rscalp: skip the asia session",
    "why": "-0.57R over 9 trades there; +0.14R elsewhere."
+  },
+  {
+   "at": "2026-11-04T12:04:20.000Z",
+   "by": "coach-stats",
+   "change": "intraday: skip the asia session",
+   "why": "-0.38R over 6 trades there; +1.74R elsewhere."
   }
  ],
  "btAt": "2026-11-04T11:20:16.389Z",
@@ -288,11 +298,11 @@
  "noPause": true,
  "wouldPause": {
   "rintra": {
-   "at": "2026-11-04T11:59:04.000Z",
+   "at": "2026-11-04T12:04:20.000Z",
    "why": "four losses in a row"
   },
   "scalp": {
-   "at": "2026-11-04T11:59:04.000Z",
+   "at": "2026-11-04T12:04:20.000Z",
    "why": "expectancy -1.00R over 13 trades"
   },
   "xau": {
