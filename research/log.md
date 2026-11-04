@@ -456,3 +456,11 @@ D1→H4→H1 39, ~0; H1→M30→M15 −16R; H1→M15→M5 −61.5R; M30→M15→
 +13.4R / +10.5R, H4→H1→M30 +9.5R, D1→H4→H1 −1.9R. With the trader's own limit rules (cancel if 3R is hit first): valid 3 h
 weak; 12-24 h: 2019-22 +7.5 to +11.5R, 2023-26 +8.9 to +15.1R. **Applied H4→H1→M15, 3R, 24 h (PR #202, user rule mosha-bo).**
 Note: his posted examples use H1→M30→M15, which lost here; the higher chain held.
+
+## 4 Nov (night): "Sharp Entry / BOOM" — entry inside the breakout leg instead of at the broken level
+
+Mosha: the broken level is a "No Trade Zone"; find the entry zone inside the breakout (BOOM on the lower timeframe).
+Proxy test on the BO system (limit deeper into the M15 BO leg, same stop past the Origin, 24 h, missed rule):
+H4→H1→M15 at the level 2019-22 +7.5R (3R) / 2023-26 +15.1R; 0.33 into the leg +9.6 / −14.2R; 0.5 into the leg −6.3 / −11.1R.
+H4→H1→M30: level +4.9 / +4.0R; deeper entries flat to −6R. Deeper fills are fewer and worse (when price returns that deep the
+breakout is failing). **Kept the entry at the broken level.** His BOOM 1 / BOOM 2 shapes themselves are not coded yet.
