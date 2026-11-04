@@ -313,3 +313,9 @@ even with a true +0.2R edge).
 
 - HistData XAUUSD times are New York local WITH daylight saving (checked against Binance PAXG: winter aligned at +5 h, summer at +4 h). The first 7-year gold run used fixed UTC−5 (an hour off April–October). Corrected rerun, v5 live rules: 2019 −52.2 / 2020 −73.9 / 2021 −33.0 / 2022 −42.3 / 2023 −16.6 / 2024 −70.3 / 2025 −60.0 / 2026 +35.9 R; gross before spread ≈ 0 in 2019–2025, +0.08R/trade in 2026. Verdict unchanged: the gold replica's edge is 2026-specific; PAXG inflates 2026 further (+95.6R vs +35.9R on spot). Same 2026 signals on both feeds: only 88/493 coincide; matched trades +0.185R on PAXG vs +0.032R on spot.
 - NQ New York open run, Dukascopy 9 Mar – 10 Sep 2026, midnight-open filter: 33 trades +19.3R → calendar.
+
+## 4 Nov (night): DXY report + XAU/USD guide, tested on HistData gold 2019–2026
+
+- DXY (HistData UDXUSD 1m, pre-registered): base v5 −0.070R/trade; veto (dollar >0.05%/60 min against) −0.081; confirmation only −0.083; confirmation in inverse regime (corr60 ≤ −0.3) −0.069. Fewer trades, same per-trade loss: no edge from DXY.
+- Guide: v5 in London open/overlap windows −0.032R vs −0.089R outside (6/8 years still negative). Asian-range sweep at London open: reversal −0.30R/trade (t −7.7, 7/8 years negative); flipped continuation −0.18R at 1R–3R. Tight sweep stops vs 0.30 spread: no edge either way.
+- Gold conclusion: no robust intraday gold setup found on 8 years of spot data; only 2026 is positive for the replica.
