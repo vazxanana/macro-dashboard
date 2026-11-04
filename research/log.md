@@ -196,3 +196,13 @@ Replayed the Trader's replicaSignals on fresh Kraken PAXG candles (probe 08:25) 
 (21:35 buy, 00:35 sell, 04:10 buy), all passing; all 3 are in research.json with the same side and verdict (the 04:10 one recorded at
 04:15, the next run). No missed signals from the 10-minute CHoCH window. Entry prices differ by the spot shift (replay used today's
 offset for the whole night). Shadows: the 07:09 rscalp sell lost −1R into the rally; gold 4,031.
+
+## 4 Nov 09:30 — NQ sweep at the Tokyo (00:00 UTC) and Shanghai (01:30 UTC) opens (paper, #168)
+
+Same rule as NY: liquidity = previous NY session high/low, evening high/low since the 18:00 ET reopen, high/low of the hour before
+the open; first close back inside a swept level within the first hour → opposite, stop 2 pt past the extreme, 1.2R, out 07:00 UTC.
+- Tokyo, all levels, 60 min: 5m 50 days −0.19R ×31 (first half −0.29, second −0.10); 1m 21 days +0.29R ×10. Lately good, not proven.
+- Shanghai: 5m +0.03R ×23; 1m −0.30R ×6.
+- 2-month replay (5m to 5 Oct, 1m after): Tokyo −1.35R ×25 (44% wins), Shanghai −0.73R ×20.
+Picking one level type (e.g. evening/pre-open for Tokyo 1m +0.63R) would be fitting 8–10 trades. Both run on paper (research.json
+k 'nq-open', session tokyo/shanghai). JS replay with a 10-min lag on the 1m history: Tokyo +2.0R ×9, Shanghai −1.6R ×6 (Python +2.9 / −1.8, before cost differences).
