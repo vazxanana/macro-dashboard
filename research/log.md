@@ -331,3 +331,14 @@ even with a true +0.2R edge).
   FOMC days 7 live-rule trades −4.9R: too few to act on.
 - **Gold replica by volatility (8 years spot)**: per-trade R rises with the 20-day avg daily range. Gate at 1.5% with the risk
   rules: 2019-2025 +18.9R (vs −312.5R ungated), 2026 +43.2R. Applied as user rule gold-vol-gate (PR #195).
+
+## 4 Nov (night): gold gate walk-forward + feed check
+
+- **Volatility gate walk-forward** (risk rules on, spot HistData): gate chosen on 2019-2022 = 1.5% (the same) → 2023-2026
+  +47.3R (2023 −2.7, 2024 −10.7, 2025 +17.6, 2026 +43.2) vs −111.1R ungated. Reverse (choose on 2023-26 → 1.7%) → 2019-22
+  −3.6R. The gate reliably removes the big losses; outside 2025-26 gated gold is about breakeven. Kept at 1.5%.
+- **Feeds**: CNBC XAU= 1m is unusable (99.8% flat bars, last price only). CNBC @GC.1 (COMEX) 1m is real OHLC, live to the
+  minute from GitHub runners, closes track spot twice as tightly as PAXG (0.59 vs 1.16 median deviation from the daily basis).
+  But replica v5 signals Jan 12 - Oct 31 2026 matched against spot (same side, within 15 min): GC 160 of 469 spot signals (34%),
+  PAXG 175 (37%). **No feed reproduces the spot signals: the M5 CHoCH trigger depends on single-wick details.** Feed not
+  changed. Any broker's XAUUSD is another feed again, so live results will differ from every replay.
