@@ -345,7 +345,8 @@ for (const [key, M] of Object.entries(MARKETS)) {
         }
         const r0 = tr.r0 || (tr.r0 = Math.abs(tr.entry - tr.stop));
         if (s ? b.high >= tr.stop : b.low <= tr.stop) {
-          if (tr.beMoved) { tr.status = 'be'; tr.R = 0; } else { tr.status = 'loss'; tr.R = -1; }
+          if (tr.trail && tr.trailMoved) { tr.R = +(((s ? tr.entry - tr.stop : tr.stop - tr.entry)) / r0).toFixed(2); tr.status = tr.R > 0 ? 'win' : tr.R < 0 ? 'loss' : 'be'; tr.exit = 'trailing stop'; }
+          else if (tr.beMoved) { tr.status = 'be'; tr.R = 0; } else { tr.status = 'loss'; tr.R = -1; }
           tr.closed = b.time; exitBar = b; break;
         }
         if (s ? b.low <= tr.t1 : b.high >= tr.t1) { tr.status = 'win'; tr.closed = b.time; tr.R = tr.rr; exitBar = b; break; }
@@ -356,6 +357,8 @@ for (const [key, M] of Object.entries(MARKETS)) {
         // break-even rule from the Coach: once the trade is config.be R in profit, the stop moves to the entry
         // only on a candle that actually reached +be R: a trade that was past it before the rule existed and is now
         // back near the entry can't place a stop on the wrong side of price, so it waits until it gets there again
+        // trailing stop (replica, 4 Nov): once the trade is trail[0] R in profit, the stop follows trail[1] R behind the best price
+        if (tr.trail && tr.mfe >= tr.trail[0]) { const ns = tr.entry + (s ? -1 : 1) * (tr.mfe - tr.trail[1]) * r0; if (s ? ns < tr.stop : ns > tr.stop) { tr.stop = +ns.toFixed(2); tr.trailMoved = true; } }
         if (config.be && !tr.noBe && !tr.beMoved && ((s ? tr.entry - b.low : b.high - tr.entry) / r0) >= config.be) { tr.stop = tr.entry; tr.beMoved = true; }
       }
       tr.checked = exitBar ? bars.at(-1).time : next;
@@ -410,10 +413,12 @@ for (const [key, M] of Object.entries(MARKETS)) {
           note: `Research (paper only): gold replica v5${!pass ? '' : h4 !== 'against' ? ' (v4 passes; v5 skips it: H4 trend not against the trade)' : ''}${pass ? '' : riskAtr < 1 ? ' (filter fails: stop under one M15 ATR)' : ' (filter fails: inside a live H1 Origin, no ★ engulfing)'}. ${g.L === 36 ? '3 h' : '6 h'} leg to ${g.ext.toFixed(2)}, M5 CHoCH through ${g.lvl.toFixed(2)}${g.star ? ', ★ engulfing at structure at the extreme' : g.peg ? ', engulfing at the extreme (not at a level)' : ''}${h1clear ? ', clear of H1 Origins' : ''}; ${g.sell ? 'sell' : 'buy'} ${entry.toFixed(2)}, stop ${stop.toFixed(2)}, target 2R ${t1.toFixed(2)}.` });
         // live (config.replicaLive): every passing signal also trades on the live book, as on the replay (no slot limit),
         // at market, 2R target, out after 48 h, no break-even move
+        // exit (4 Nov): no fixed 2R target; once +1.5R the stop trails 1R behind the best price (cap 10R, out after 48 h). Year replay
+        // of v5: 2R +74.8R (Jan-Jun +0.08R / Jun-Nov +0.22R a trade) vs trailing +98.7R (+0.17R / +0.23R); every nearby setting beat 2R
         if (v5 && (config.replicaLive || []).includes(key)) trades.push({ id: `${key}-replica-${now}-${g.sell ? 's' : 'b'}`, market: key, label: M.label, dec: M.dec, k: 'replica', name: 'Replica', pair: 'M5 CHoCH', h: '5m', side: g.sell ? 'sell' : 'buy',
-          entry: +entry.toFixed(2), stop: +stop.toFixed(2), t1: +t1.toFixed(2), rr: 2, buf: CFG.buf, opened: now, filled: now, checked: now, status: 'open', R: null, r0: Math.abs(+entry.toFixed(2) - +stop.toFixed(2)), maxHold: 48 * 3600, noBe: true, entryMode: 'market',
+          entry: +entry.toFixed(2), stop: +stop.toFixed(2), t1: +(entry + (g.sell ? -10 : 10) * r0).toFixed(2), tp1: +t1.toFixed(2), rr: 10, trail: [1.5, 1.0], buf: CFG.buf, opened: now, filled: now, checked: now, status: 'open', R: null, r0: Math.abs(+entry.toFixed(2) - +stop.toFixed(2)), maxHold: 48 * 3600, noBe: true, entryMode: 'market',
           feat: { d1: src['1d'].A.trend === (g.sell ? -1 : 1) ? 'with' : 'against', h4, session: sessionOf(now), star: g.star, h1clear, riskAtr: +riskAtr.toFixed(2), leg: g.L === 36 ? '3h' : '6h' }, shadow: false, blockedBy: [],
-          note: `Gold replica (v5, against the H4 trend): ${g.L === 36 ? '3 h' : '6 h'} leg to ${g.ext.toFixed(2)}, M5 CHoCH through ${g.lvl.toFixed(2)}${g.star ? ', ★ engulfing at structure at the extreme' : g.peg ? ', engulfing at the extreme' : ''}${h1clear ? ', clear of H1 Origins' : ''}. ${g.sell ? 'Sell' : 'Buy'} at market, stop past the extreme, target 2R, out after 48 h.` });
+          note: `Gold replica (v5, against the H4 trend): ${g.L === 36 ? '3 h' : '6 h'} leg to ${g.ext.toFixed(2)}, M5 CHoCH through ${g.lvl.toFixed(2)}${g.star ? ', ★ engulfing at structure at the extreme' : g.peg ? ', engulfing at the extreme' : ''}${h1clear ? ', clear of H1 Origins' : ''}. ${g.sell ? 'Sell' : 'Buy'} at market, stop past the extreme; from +1.5R the stop trails 1R behind the best price (2R mark ${t1.toFixed(2)}), out after 48 h.` });
       }
     }
     for (const r of research.filter((x) => x.market === key && x.k !== 'replica' && x.status === 'open')) {
