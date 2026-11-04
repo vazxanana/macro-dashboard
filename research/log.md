@@ -426,3 +426,14 @@ BO direction; stop past the pullback extreme; one trade per VR. Exits 2R / trail
 - H1 → M5: 465, +13.0R (2R; 2023-24 −25.2, 2025-26 +38.2) / +3.7R trail; gated trail +19.0R (144, 2023-24 −4.6).
 - Target at the VR extreme is worse everywhere; pullback depth (main past 50% vs internal) has no consistent sign.
 **About breakeven over 4 years, positive only in 2025-26. Not better than the live gold replica (+71.9R, DD −15.8R).**
+
+## 4 Nov (night): Mosha CF entry with the opposite zone as target (gold 2023-2026, causal)
+
+Owner: "on CF you should enter, that's why it is called CF, and target the opposite zone". Two readings tested:
+1. Entry at the moment the CF prints (LTF close back through the pullback's last swing after the W VR), target = the VR
+   extreme (`ms/sop.mjs`, Rv): H1→M5 −11.0R (326), H1→M15 −26.9R (243), H4→M15 −10.0R (77), H4→M5 −30.0R (95).
+   With an Origin wait first: H1→M5 −3.7R, H1→M15 −21.2R, H4 −12.5 / −21.2R.
+2. Limit entry on the engine's CF box (near edge), stop past the box, target the VR box (`ms/cfentry.mjs`):
+   M30 1,224 trades −462R (29% wins), H1 638 −221R, H4 183 −83R; reward ≥ 3R and the 1.5% gate still negative.
+**Neither reading has an edge on gold as coded.** The CF box the engine draws (pivot ± 0.35 of the leg) is wide, so
+entries at its near edge carry wide stops and small rewards; Mosha's CF zone is probably tighter.
