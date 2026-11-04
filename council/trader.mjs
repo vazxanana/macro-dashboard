@@ -146,6 +146,9 @@ const USER_RULES = [
   { id: 'gold-shadow', apply: (c) => { c.replicaLive = []; c.focus = ['none']; },
     change: 'Gold research only (user): the gold replica and the engine setups stop opening live paper trades; NQ New York open run is the system',
     why: '8-year spot gold test: the replica lost every year 2019-2025 (-312.5R over 4,484 trades), only 2026 positive; the NQ New York open run held on 3 years of NQ futures and every newer sample.' },
+  { id: 'mosha-bo', apply: (c) => { c.moshaBo = true; },
+    change: "Gold: Mosha's breakout system (H4 BO → H1 BO against → M15 BO back → pullback limit at the broken level, stop past the M15 Origin, 3R) trades on paper next to the replica",
+    why: 'From his post. Spot gold, causal: H4→H1→M15 2019-22 +7.5R (104 trades, 2R +11.5R), 2023-26 +15.1R (114, +0.13R a trade); the only Mosha setup tested that held over 8 years without the volatility gate.' },
   { id: 'gold-eg-barrier', apply: (c) => { c.goldEgBarrier = true; },
     change: 'Gold replica: a signal against the daily trend is still taken when its extreme sits at a live H1 engulfing barrier',
     why: "Owner: Mosha's edge is structure plus barriers (EG/OB). 2023-26 spot, gated v5, exit v2: signals at an H1 EG +0.293R a trade (151, both halves positive), at an OB -0.124R; pure-structure and barrier-only models lost. D1-with OR at-EG: 392 trades +71.9R, drawdown -15.8R vs D1-with alone 325 trades +63.8R. Mosha's 2 Nov sell started inside a fresh H1 bearish EG." },
@@ -367,7 +370,7 @@ for (const [key, M] of Object.entries(MARKETS)) {
       setups: setups.map((t) => ({ k: t.k, name: t.name, pair: t.pair, side: t.sell ? 'sell' : 'buy', state: t.state, entry: t.entry, stop: t.stop, t1: t.t1, rr: +t.rr.toFixed(2), next: t.next, retrace: !!t.retrace })),
     };
 
-    if (config.retireLegacy) for (const tr of trades.filter((x) => x.market === key && !x.shadow && x.k !== 'replica' && (x.status === 'open' || x.status === 'pending'))) {
+    if (config.retireLegacy) for (const tr of trades.filter((x) => x.market === key && !x.shadow && x.k !== 'replica' && x.k !== 'mosha-bo' && (x.status === 'open' || x.status === 'pending'))) {
       if (tr.status === 'pending') { tr.status = 'expired'; tr.R = 0; } else { const r0 = tr.r0 || Math.abs(tr.entry - tr.stop), R = +(((tr.side === 'sell' ? -1 : 1) * (price - tr.entry)) / r0).toFixed(2); tr.R = R; tr.status = R > 0 ? 'win' : R < 0 ? 'loss' : 'be'; }
       tr.closed = now; tr.exit = 'retired';
     }
@@ -409,7 +412,7 @@ for (const [key, M] of Object.entries(MARKETS)) {
       // half-size trades (replica equity filter): the score counts R × size; rawR keeps the full-size result
       if (tr.size && tr.size !== 1 && tr.R != null && tr.rawR == null) { tr.rawR = tr.R; tr.R = +(tr.R * tr.size).toFixed(2); }
       if (exitBar) startReview(tr, exitBar, key, NEWS);
-      if (tr.status === 'pending' && now - tr.opened > (WAIT[tr.h] || 86400)) { tr.status = 'expired'; tr.closed = now; tr.R = 0; }
+      if (tr.status === 'pending' && now - tr.opened > (tr.validFor || WAIT[tr.h] || 86400)) { tr.status = 'expired'; tr.closed = now; tr.R = 0; }
     }
 
     // ─── Review closed trades: keep watching price after the exit, then give a verdict (system error or market) ───
@@ -438,6 +441,29 @@ for (const [key, M] of Object.entries(MARKETS)) {
     }
     // 4 Nov: the replica runs unchanged on every market as research (paper, 2R): an out-of-sample test of the method itself.
     // Only gold trades it live (config.replicaLive). The 0.30 stop floor is in gold dollars, so other markets use 0.1 ATR alone.
+    // Mosha breakout system (4 Nov, night; user rule mosha-bo), from his "All you need is this Breakout System" post:
+    // 1. H4 BO (bias)  2. H1 BO the other way (the retracement), after it  3. M15 BO back in the H4 direction (a structure
+    // flip)  4. pullback entry: limit at the broken M15 level, stop past the M15 Origin, target 3R (his 1:2 or 1:3), valid 24 h,
+    // out after 72 h. Spot gold, engine events causal: 2019-22 104 trades +7.5R (2R +11.5R), 2023-26 114 trades +15.1R
+    // (+0.13R a trade), no volatility gate needed. Lower-timeframe chains (H1-M15-M5, M30-M15-M5) lost and are not used.
+    if (key === 'xau' && config.moshaBo) {
+      const ev = (id, sec) => { const bb = src[id].bars; return src[id].A.events.filter((e) => e.breakIdx < bb.length - 1).map((e) => ({ t: bb[e.breakIdx].time + sec, dir: e.dir, level: e.level, top: e.top, bot: e.bot, flip: e.structure })); };
+      try {
+        const E3 = ev('15m', 900), E2 = ev('1h', 3600), E1 = ev('4h', 14400), e3 = E3.at(-1);
+        const before = (E, t) => E.filter((e) => e.t <= t).at(-1);
+        if (e3 && e3.flip && now - e3.t <= 3600) {
+          const e2 = before(E2, e3.t), e1 = before(E1, e3.t), d = e3.dir, id = `xau-moshabo-${e3.t}`;
+          if (e1 && e2 && e1.dir === d && e2.dir === -d && e2.t > e1.t && !trades.some((x) => x.id === id)) {
+            const entry = +e3.level.toFixed(2), stop = +(d < 0 ? e3.top + 0.3 : e3.bot - 0.3).toFixed(2), r0 = Math.abs(entry - stop);
+            const openBo = trades.filter((x) => x.k === 'mosha-bo' && (x.status === 'open' || x.status === 'pending')).length;
+            if (r0 > 0.5 && openBo < 2 && (d < 0 ? price < stop : price > stop)) trades.push({ id, market: key, label: M.label, dec: M.dec, k: 'mosha-bo', name: 'Mosha BO system', pair: 'H4 → H1 → M15', h: '15m',
+              side: d < 0 ? 'sell' : 'buy', entry, stop, t1: +(entry + d * 3 * r0).toFixed(2), rr: 3, buf: CFG.buf, opened: now, checked: now, status: 'pending', R: null, r0, validFor: 24 * 3600, maxHold: 72 * 3600, noBe: true, entryMode: 'limit',
+              feat: { h4At: e1.t, h1At: e2.t, m15At: e3.t }, shadow: false, blockedBy: [],
+              note: `Mosha BO system: H4 BO ${d < 0 ? 'sell' : 'buy'}, then H1 BO ${d < 0 ? 'buy' : 'sell'} (retracement), then M15 BO ${d < 0 ? 'sell' : 'buy'} through ${entry}. Pullback limit at the broken M15 level ${entry}, stop past the M15 Origin ${stop}, target 3R ${(entry + d * 3 * r0).toFixed(2)}; valid 24 h, out after 72 h.` });
+          }
+        }
+      } catch (e) { snapshot.errors.moshaBo = String(e.message || e); }
+    }
     // volatility gate (4 Nov, user rule gold-vol-gate): 20-day average daily range as % of price, from the last 20 closed daily
     // bars. The replica only trades gold live while this is at least config.goldVolMin (1.5%); below it signals stay research.
     const dvb = src['1d'].bars.slice(-21, -1), volPct = dvb.length >= 15 ? dvb.reduce((a, b) => a + (b.high - b.low) / b.close * 100, 0) / dvb.length : null;

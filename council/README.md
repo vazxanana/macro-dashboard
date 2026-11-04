@@ -353,3 +353,13 @@ over 151 (both halves positive), at an OB −0.124R. Live gold now: v5 + 1.5% ga
 live H1 EG) → 392 trades +71.9R, drawdown −15.8R (was D1-with alone 325, +63.8R). `h1EgZones()` in the trader matches the
 research zones exactly on three 2026 checkpoints; research records carry `atEG`. Mosha's 2 Nov sell started inside a fresh
 H1 bearish EG (3,914.8-3,927.7, formed 03:00 UTC).
+
+### Mosha BO system (4 Nov, night; user rule `mosha-bo`)
+
+From the owner's screenshots of Mosha's posts ("All you need is this Breakout System": BO sell → BO buy → BO sell →
+pullback entry, one timeframe lower each step). Live paper trades (k `mosha-bo`, gold only): H4 BO in a direction, then the
+last H1 BO the other way after it, then a fresh M15 BO back in the H4 direction that flips M15 structure (closed candles
+only) → limit at the broken M15 level, stop $0.30 past the M15 Origin, target 3R, valid 24 h (`validFor`), out after 72 h,
+max 2 open. Exempt from the legacy retirement. Research (spot gold, engine events causal, limit with the trader's own
+"missed" rule): H4→H1→M15 2019-22 +7.5R / 104 (2R +11.5R), 2023-26 +15.1R / 114; H4→H1→M30 positive both periods (smaller);
+D1→H4→H1 flat; H1→M15→M5 −61R and H1→M30→M15 −16R (not used).
