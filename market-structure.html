@@ -27,6 +27,12 @@
   body { padding-top: env(safe-area-inset-top, 0px); padding-bottom: env(safe-area-inset-bottom, 0px); }
   .card { background: var(--panel); border: 1px solid var(--line); border-radius: 14px; padding: 20px; min-width: 0; }
   button { font-family: var(--sans); }
+  .rep-track { margin: 10px 0 2px; position: relative; }
+  .rep-track svg { display: block; width: 100%; height: 190px; overflow: visible; }
+  .rep-track text { font: 10.5px var(--mono); fill: var(--ink-faint); }
+  .rep-track .lg { display: flex; flex-wrap: wrap; gap: 4px 14px; font: 11px var(--sans); color: var(--ink-dim); margin-top: 4px; }
+  .rep-track .lg i { display: inline-block; width: 16px; height: 0; border-top: 2px solid; vertical-align: middle; margin-right: 6px; }
+  .rep-track .tip { position: absolute; pointer-events: none; background: var(--panel-raised); border: 1px solid var(--line); border-radius: 6px; padding: 5px 8px; font: 11px var(--mono); color: var(--ink); white-space: nowrap; display: none; z-index: 2; }
 </style>
   <style>
     .ms-live { margin: 0 24px 20px; display: grid; grid-template-columns: minmax(0, 1fr); gap: 12px; --ms-b: #e0e3eb; --ms-bg: #ffffff; --ms-fg: #131722; --ms-mute: #787b86; }
@@ -675,6 +681,8 @@
         <div class="ms-k"><span>Gold replica · the live gold setup (your M5 CHoCH turns)</span></div>
         <p class="ms-note">A leg of 2+ M15 ATRs in 3 h or 6 h, then an M5 CHoCH; taken when clear of live H1 Origins or with a ★ engulfing at the extreme, with a stop of at least one M15 ATR, and (v5, 4 Nov) only against the H4 trend. Market entry, stop past the extreme, 2R, out after 48 h. The M5 gold chart marks every signal of the last 24 h.</p>
         <div class="c-kpi" id="ms-rep-kpi"></div>
+        <div class="rep-track" id="ms-rep-track" aria-label="Live replica results against the replay expectation"></div>
+        <p class="ms-note" id="ms-rep-track-txt"></p>
         <p class="ms-note" id="ms-rep-paper"></p>
         <ul class="cal-day" id="ms-rep-list"></ul>
       </div>
@@ -2608,12 +2616,51 @@ function msNextSetup(bars, A) {
     const h = document.getElementById('h-active'); if (h) h.innerHTML = A.length ? `${A.length} open <small>floating ${fR(tot)}</small>` : '<small>none open</small>';
   }
   setInterval(() => { try { renderActive(); } catch (e) {} }, 15e3);
+  // Live vs expected (4 Nov): live replica R by trade number against the year replay's expectation (mean ± 1.645 SD·√n, 90%)
+  // and the kill switch (−7.2R at 30 trades, −7.8R at 50, −5.9R at 100; checked from trade 30)
+  function renderTrack() {
+    const el = document.getElementById('ms-rep-track'), txt = document.getElementById('ms-rep-track-txt'); if (!el) return;
+    const C = COUNCIL, live = (C.trades || []).filter((x) => x.k === 'replica' && !x.shadow && x.R != null && x.closed).sort((a, b) => a.closed - b.closed);
+    const rp = ((C.replay && C.replay.trades) || []).filter((x) => x.k === 'replica' && x.market === 'xau' && x.R != null).map((x) => x.R);
+    const mu = rp.length > 50 ? rp.reduce((a, v) => a + v, 0) / rp.length : 0.197, sd = rp.length > 50 ? Math.sqrt(rp.reduce((a, v) => a + (v - mu) ** 2, 0) / rp.length) : 1.54;
+    const n = live.length, N = Math.max(60, Math.ceil((n + 10) / 10) * 10), cum = [0]; live.forEach((x) => cum.push(cum.at(-1) + x.R));
+    const KS = [[30, -7.2], [50, -7.8], [100, -5.9]], ks = (k) => k < 30 ? null : k >= 100 ? -5.9 : (() => { const j = k < 50 ? 0 : 1, [a, ya] = KS[j], [b, yb] = KS[j + 1]; return ya + (yb - ya) * (k - a) / (b - a); })();
+    const lo = (k) => mu * k - 1.645 * sd * Math.sqrt(k), hi = (k) => mu * k + 1.645 * sd * Math.sqrt(k);
+    const ys = cum.concat([lo(N), hi(N), -7.8, 2]), yMin = Math.floor(Math.min(...ys) - 1), yMax = Math.ceil(Math.max(...ys) + 1);
+    const W = Math.max(280, el.clientWidth || 600), H = 190, pl = 34, pr = 10, pt = 8, pb = 22;
+    const X = (k) => pl + (W - pl - pr) * k / N, Y = (v) => pt + (H - pt - pb) * (yMax - v) / (yMax - yMin);
+    const K = []; for (let k = 0; k <= N; k++) K.push(k);
+    const band = `M${K.map((k) => `${X(k).toFixed(1)},${Y(hi(k)).toFixed(1)}`).join('L')}L${K.slice().reverse().map((k) => `${X(k).toFixed(1)},${Y(lo(k)).toFixed(1)}`).join('L')}Z`;
+    const mid = `M${X(0)},${Y(0)}L${X(N)},${Y(mu * N)}`, kl = `M${K.filter((k) => k >= 30).map((k) => `${X(k).toFixed(1)},${Y(ks(k)).toFixed(1)}`).join('L')}`;
+    const path = cum.length > 1 ? `M${cum.map((v, k) => `${X(k).toFixed(1)},${Y(v).toFixed(1)}`).join('L')}` : '';
+    const step = (yMax - yMin) > 24 ? 10 : 5, ticks = []; for (let v = Math.ceil(yMin / step) * step; v <= yMax; v += step) ticks.push(v);
+    const fR = (v) => `${v > 0 ? '+' : v < 0 ? '−' : ''}${Math.abs(v).toFixed(1)}R`;
+    el.innerHTML = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Cumulative live R by trade number">`
+      + ticks.map((v) => `<line x1="${pl}" x2="${W - pr}" y1="${Y(v)}" y2="${Y(v)}" stroke="var(--line-soft)" stroke-width="1"/><text x="${pl - 6}" y="${Y(v) + 3.5}" text-anchor="end">${v}</text>`).join('')
+      + `<line x1="${pl}" x2="${W - pr}" y1="${Y(0)}" y2="${Y(0)}" stroke="var(--line)" stroke-width="1"/>`
+      + [0, N / 2, N].map((k) => `<text x="${X(k)}" y="${H - 6}" text-anchor="${k === 0 ? 'start' : k === N ? 'end' : 'middle'}">${k}${k === N ? ' trades' : ''}</text>`).join('')
+      + `<path d="${band}" fill="var(--ink-faint)" fill-opacity=".14"/><path d="${mid}" stroke="var(--ink-faint)" stroke-width="1.5" stroke-dasharray="4 4" fill="none"/>`
+      + (N >= 30 ? `<path d="${kl}" stroke="var(--sell)" stroke-width="2" stroke-dasharray="6 4" fill="none"/><text x="${X(N) - 2}" y="${Y(ks(N)) - 6}" text-anchor="end" style="fill:var(--sell)">kill switch</text>` : '')
+      + (path ? `<path d="${path}" stroke="var(--accent)" stroke-width="2" fill="none" stroke-linejoin="round"/>` : '')
+      + cum.slice(1).map((v, i) => `<circle cx="${X(i + 1)}" cy="${Y(v)}" r="${(W - pl - pr) / N >= 10 ? 4 : 2.5}" fill="var(--accent)" stroke="var(--panel)" stroke-width="2" data-i="${i}"/>`).join('')
+      + `<rect x="${pl}" y="${pt}" width="${W - pl - pr}" height="${H - pt - pb}" fill="transparent" class="hit"/></svg>`
+      + `<div class="tip"></div><div class="lg"><span><i style="border-color:var(--accent)"></i>Live (closed trades)</span><span><i style="border-color:var(--ink-faint);border-top-style:dashed"></i>Replay expectation, shaded 90% range</span><span><i style="border-color:var(--sell);border-top-style:dashed"></i>Kill switch (from trade 30)</span></div>`;
+    const tip = el.querySelector('.tip'), hit = el.querySelector('.hit');
+    const show = (ev) => { const r = el.querySelector('svg').getBoundingClientRect(), k = Math.max(0, Math.min(N, Math.round((ev.clientX - r.left - pl) / (r.width - pl - pr) * N)));
+      tip.innerHTML = `Trade ${k}: ${k <= n ? `live <b>${fR(cum[k])}</b>${k ? ` (${esc(live[k - 1].side)} ${fR(live[k - 1].R)})` : ''}<br>` : ''}expected ${fR(mu * k)} (${fR(lo(k))} to ${fR(hi(k))})${ks(k) != null ? `<br>kill switch ${fR(ks(k))}` : ''}`;
+      tip.style.display = 'block'; const x = X(k) * r.width / W; tip.style.left = `${Math.min(Math.max(0, x - tip.offsetWidth / 2), r.width - tip.offsetWidth)}px`; tip.style.top = '-6px'; };
+    hit.addEventListener('pointermove', show); hit.addEventListener('pointerleave', () => { tip.style.display = 'none'; });
+    if (txt) { const st = n === 0 ? 'No closed live trade yet.' : cum[n] < lo(n) ? `Below the expected range after ${n} trades.` : cum[n] > hi(n) ? `Above the expected range after ${n} trades.` : `Inside the expected range after ${n} trades.`;
+      txt.textContent = `${st} Live ${fR(cum[n] || 0)}; the replay expects ${fR(mu * n)} (90% range ${fR(lo(n))} to ${fR(hi(n))}). Expectation from ${rp.length || 500} replay trades: ${mu >= 0 ? '+' : ''}${mu.toFixed(2)}R a trade, SD ${sd.toFixed(2)}R. The kill switch is checked from trade 30.`; }
+  }
+  window.addEventListener('resize', () => { try { renderTrack(); } catch (e) {} });
   function renderReplica() {
     const C = COUNCIL, set = (id, html) => { const el = document.getElementById(id); if (el) el.innerHTML = html; };
     const L = (C.trades || []).filter((x) => x.k === 'replica').sort((a, b) => b.opened - a.opened);
     const done = L.filter((x) => ['win', 'loss', 'be'].includes(x.status)), R = done.reduce((a, x) => a + x.R, 0), w = done.filter((x) => x.R > 0).length;
     const fR = (v) => `${v > 0 ? '+' : v < 0 ? '−' : ''}${Math.abs(v).toFixed(2)}R`;
     set('ms-rep-kpi', `<div><span>Live trades</span><b>${L.length}${L.length - done.length ? ` <small>(${L.length - done.length} open)</small>` : ''}</b></div><div><span>Win rate</span><b>${done.length ? Math.round(w / done.length * 100) + '%' : '—'}</b></div><div><span>Total</span><b class="${R > 0 ? 'pos' : R < 0 ? 'neg' : ''}">${done.length ? fR(R) : '—'}</b></div><div><span>Per trade</span><b>${done.length ? fR(R / done.length) : '—'}</b></div>`);
+    renderTrack();
     const rp = C.snap && C.snap.research && C.snap.research.replica;
     set('ms-rep-paper', rp ? `Every signal on paper since 3 Nov: ${rp.all.signals} (${rp.all.closed} closed, ${rp.all.closed ? fR(rp.all.R) : '—'}) · passing the filter ${rp.pass.signals} (${rp.pass.closed ? fR(rp.pass.R) : '—'}). Year replay (v5): +74.8R over 500 trades, 9 of 11 months positive. Judged after about 30 live trades.` : '');
     const ST2 = { open: 'Open', win: 'Win', loss: 'Loss', be: 'Break-even' };
