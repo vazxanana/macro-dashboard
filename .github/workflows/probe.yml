@@ -1,5 +1,5 @@
 name: Council data probe
-# RESEARCH ONLY: index 1m (S&P 500, Nasdaq 100) 1m history from HistData.com to council-data/research/candles/xau-histdata/.
+# RESEARCH ONLY: spot gold daily candles from keyless sources (for the weekly structure of the Mosha BO system).
 on:
   push:
     branches: [council-probe]
@@ -13,20 +13,21 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/checkout@v4
         with: { ref: council-data, path: data }
-      - name: CNBC spot gold (XAU=) 1m history + live delay
+      - name: Spot gold daily candles
         run: |
-          D=data/research/probe/cnbc-gc; mkdir -p $D
-          for sym in "%40GC.1"; do
-            n=$(echo $sym | tr -dc 'A-Za-z0-9'); now=$(TZ=America/New_York date +%Y%m%d%H%M%S)
-            curl -sS -A "Mozilla/5.0" -m 60 -o $D/$n-live.json "https://ts-api.cnbc.com/harmony/app/bars/$sym/1M/$(TZ=America/New_York date -d '-3 hours' +%Y%m%d%H%M%S)/$now/adjusted/EST5EDT.json" || true
-            echo "$n live fetched at $(date -u +%FT%TZ)" >> $D/when.txt
-          done
-          d=2026-01-01
-          while [ "$d" \< "$(date -u +%F)" ]; do e=$(date -u -d "$d +14 days" +%F)
-            curl -sS -A "Mozilla/5.0" -m 90 -o $D/gc-${d//-/}.json "https://ts-api.cnbc.com/harmony/app/bars/%40GC.1/1M/${d//-/}000000/${e//-/}000000/adjusted/EST5EDT.json" || true
-            sleep 2; d=$e; done
-          ls -la $D; gzip -9f $D/*.json
+          D=data/research/probe/spotd; mkdir -p $D
+          UA="Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36"
+          now=$(TZ=America/New_York date +%Y%m%d%H%M%S)
+          curl -sS -A "$UA" -m 60 -o $D/cnbc-xau-1d.json "https://ts-api.cnbc.com/harmony/app/bars/XAU=/1D/20240101000000/$now/adjusted/EST5EDT.json" || true
+          curl -sS -A "$UA" -m 60 -o $D/cnbc-gc-1d.json "https://ts-api.cnbc.com/harmony/app/bars/%40GC.1/1D/20240101000000/$now/adjusted/EST5EDT.json" || true
+          curl -sS -A "$UA" -m 60 -o $D/stooq-xau.csv "https://stooq.com/q/d/l/?s=xauusd&i=d" || true
+          curl -sS -A "$UA" -m 60 -o $D/yahoo-gc.json "https://query1.finance.yahoo.com/v8/finance/chart/GC%3DF?interval=1d&range=5y" || true
+          curl -sS -A "$UA" -m 60 -o $D/yahoo-xau.json "https://query1.finance.yahoo.com/v8/finance/chart/XAUUSD%3DX?interval=1d&range=5y" || true
+          curl -sS -A "$UA" -m 60 -o $D/kraken-paxg-1w.json "https://api.kraken.com/0/public/OHLC?pair=PAXGUSD&interval=10080" || true
+          echo "fetched at $(date -u +%FT%TZ)" > $D/when.txt
+          ls -la $D; for f in $D/*; do echo "== $f"; head -c 400 $f; echo; done
+          gzip -9f $D/*.json $D/*.csv || true
           git -C data config user.name "mosha-council"
           git -C data config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git -C data add research/probe && git -C data commit -qm "Probe: CNBC COMEX gold @GC.1 1m $(date -u +%H:%MZ)" || exit 0
+          git -C data add research/probe && git -C data commit -qm "Probe: spot gold daily candles $(date -u +%H:%MZ)" || exit 0
           for j in 1 2 3 4 5; do git -C data pull -q --rebase origin council-data && git -C data push -q origin HEAD:council-data && break; sleep 5; done
