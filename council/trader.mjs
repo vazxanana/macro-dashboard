@@ -1041,7 +1041,7 @@ try {
           note: `Research (paper only): NQ swept the ${g.level} ${g.lv.toFixed(2)} after the New York open (extreme ${g.ext.toFixed(2)}) and closed back inside; ${g.sell ? 'sell' : 'buy'} ${g.entry.toFixed(2)}, stop ${g.stop.toFixed(2)}, target 1.2R ${t1.toFixed(2)}, out at 16:00.` });
       }
     }
-    if (!['Sat', 'Sun'].includes(ny.wd) && ny.m >= 301 && ny.m <= 600 && !research.some((x) => x.id === `nq-london-${ny.d}`)) {   // seen up to ~35 min late (feed lag)
+    if (!['Sat', 'Sun'].includes(ny.wd) && ny.m >= 301 && ny.m < 660 && !research.some((x) => x.id === `nq-london-${ny.d}`)) {   // the day's first signal, recorded until its 11:00 ET exit (feed lag, outages)
       const g = nqLondonSignal(bars, ny.d);
       if (g) {
         const r0 = Math.abs(g.entry - g.stop), t1 = g.entry + (g.sell ? -2 : 2) * r0;
