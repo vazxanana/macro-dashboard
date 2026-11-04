@@ -2585,6 +2585,7 @@ function msNextSetup(bars, A) {
   }
   function nowPrice(x) {
     if (x.market === instKey) { const m1 = panes['1m']; if (m1 && m1.bars && m1.bars.length) return m1.bars[m1.bars.length - 1].close; }
+    const nl = COUNCIL.snap && COUNCIL.snap.nqLast; if (x.market === 'nq') return nl && nl.at >= (x.opened || 0) ? nl.price : null;   // the Trader's last NQ=F candle (~10 min late)
     const m = COUNCIL.snap && COUNCIL.snap.markets && COUNCIL.snap.markets[x.market]; return m && m.price ? m.price : null;
   }
   function renderActive() {
@@ -2600,7 +2601,7 @@ function msNextSetup(bars, A) {
       return `<li data-tid="${esc(x.id)}" tabindex="0" title="Show this trade on a chart"><span class="chip ${x.side}">${x.side.toUpperCase()}</span>`
         + `<span class="a-t"><b>${esc(x.label)}</b> ${esc(x.name)}${x.paper ? '<span class="tag">paper</span>' : ''}${!x.paper && x.k !== 'replica' ? '<span class="tag" title="Opened by the earlier council strategies, still managed to its exit">older strategy</span>' : ''}${size !== 1 ? `<span class="tag">${size}× size</span>` : ''}${x.status === 'pending' ? '<span class="tag">waiting fill</span>' : ''}</span>`
         + `<span class="a-r ${fl == null ? '' : fl >= 0 ? 'pos' : 'neg'}">${fl == null ? '—' : fR(fl)}</span>`
-        + `<span class="a-d">Entry ${fmtI(x.entry, d)} · stop ${fmtI(x.stop, d)} · ${x.trail ? '2R mark' : 'target'} ${fmtI(mark, d)}${px != null ? ` · now ${fmtI(px, d)}` : ''} · open ${ageT}${x.mfe ? ` · best +${(+x.mfe).toFixed(2)}R` : ''}${trail ? ` · ${trail}` : ''}</span></li>`;
+        + `<span class="a-d">Entry ${fmtI(x.entry, d)} · stop ${fmtI(x.stop, d)} · ${x.trail ? '2R mark' : 'target'} ${fmtI(mark, d)}${px != null ? ` · now ${fmtI(px, d)}${x.market === 'nq' ? ' (10 min delayed)' : ''}` : ''} · open ${ageT}${x.mfe ? ` · best +${(+x.mfe).toFixed(2)}R` : ''}${trail ? ` · ${trail}` : ''}</span></li>`;
     }).join('') : '<li class="empty">No open trades right now. The system opens one when a replica signal passes (gold) or an NQ open sweep fires (paper).</li>';
     const sum = document.getElementById('ms-active-sum');
     if (sum) sum.innerHTML = A.length ? `${A.length} open · at risk ${risk.toFixed(1)}R · floating <b class="${tot >= 0 ? 'pos' : 'neg'}">${fR(tot)}</b>` : '';

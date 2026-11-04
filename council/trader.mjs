@@ -953,12 +953,14 @@ function nqAsiaSignal(bars, t0) {
   }
   return null;
 }
+let nqLast = null;
 try {
   const ny = nyParts(now), openNq = research.filter((x) => x.k === 'nq-open' && x.status === 'open');
   const ud = new Date(now * 1000), uMin = ud.getUTCHours() * 60 + ud.getUTCMinutes(), uWd = ud.getUTCDay(), asiaWin = uWd >= 1 && uWd <= 5 && uMin <= 200;
   if ((!['Sat', 'Sun'].includes(ny.wd) && ny.m >= 565 && ny.m <= 1000) || asiaWin || openNq.length) {
     // Yahoo's CME candles arrive 10 minutes late (probe 4 Nov: lag 600 s) and the newest one is still forming: drop it
     const bars = (await yahoo1m('NQ=F')).slice(0, -1);
+    if (bars.length) nqLast = { price: +bars.at(-1).close.toFixed(2), at: bars.at(-1).time + 60 };   // shown as 'now' on the Active trades card (about 10 min late)
     for (const r of openNq) {
       const s = r.side === 'sell', r0 = Math.abs(r.entry - r.stop);
       for (const b of bars) {
@@ -1000,6 +1002,7 @@ try {
   snapshot.research.replica = { all: sum(rp), pass: sum(rp.filter((x) => x.pass && x.v >= 2)), v5: sum(rp.filter((x) => x.v5)), star: sum(rp.filter((x) => x.star)) };
   snapshot.research.nq = sum(research.filter((x) => x.k === 'nq-open'));
   for (const sid of ['ny', 'tokyo', 'shanghai']) snapshot.research['nq_' + sid] = sum(research.filter((x) => x.k === 'nq-open' && (x.session || 'ny') === sid)); }
+if (nqLast) snapshot.nqLast = nqLast;
 wr('research.json', research);
 snapshot.lessons = lessons(trades, now);
 wr('snapshot.json', snapshot);
