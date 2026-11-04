@@ -13,15 +13,15 @@ jobs:
         with: { ref: council-data, path: data }
       - name: Fetch
         run: |
-          # NQ futures (Yahoo NQ=F): 1m for the last 29 days in 7-day chunks, 5m for 59 days, 1h for 2 years
-          mkdir -p data/research/candles/nq
-          now=$(date +%s)
-          for k in 0 1 2 3; do p2=$((now - k*7*86400)); p1=$((p2 - 7*86400 + 60))
-            curl -sS -A "Mozilla/5.0" "https://query1.finance.yahoo.com/v8/finance/chart/NQ%3DF?interval=1m&period1=$p1&period2=$p2&includePrePost=true" -o "data/research/candles/nq/1m-$k.json"; sleep 2; done
-          curl -sS -A "Mozilla/5.0" "https://query1.finance.yahoo.com/v8/finance/chart/NQ%3DF?interval=5m&range=60d&includePrePost=true" -o data/research/candles/nq/5m.json; sleep 2
-          curl -sS -A "Mozilla/5.0" "https://query1.finance.yahoo.com/v8/finance/chart/NQ%3DF?interval=60m&range=730d&includePrePost=true" -o data/research/candles/nq/1h.json
-          ls -la data/research/candles/nq
+          # How fresh are Yahoo's NQ=F 1-minute candles? (CME data on Yahoo may be delayed)
+          mkdir -p data/research/probe
+          for k in 1 2 3; do
+            now=$(date +%s)
+            curl -sS -A "Mozilla/5.0" "https://query1.finance.yahoo.com/v8/finance/chart/NQ%3DF?interval=1m&range=1d&includePrePost=true" -o /tmp/nq.json
+            python3 -c "import json,sys;r=json.load(open('/tmp/nq.json'))['chart']['result'][0];t=r['timestamp'];m=r['meta'];print('fetched',$now,'last candle',t[-1],'lag_s',$now-t[-1],'regularMarketTime',m.get('regularMarketTime'),'lag_meta',$now-m.get('regularMarketTime',0),'delay',m.get('dataGranularity'),m.get('exchangeDataDelayedBy'))" | tee -a data/research/probe/nq-lag.txt
+            sleep 20
+          done
           git -C data config user.name "mosha-council"
           git -C data config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git -C data add research/candles/nq && git -C data commit -qm "Research: NQ futures candles (Yahoo) $(date -u +%H:%MZ)" || exit 0
+          git -C data add research/probe && git -C data commit -qm "Probe: NQ Yahoo lag $(date -u +%H:%MZ)" || exit 0
           for j in 1 2 3 4 5; do git -C data pull -q --rebase origin council-data && git -C data push -q origin HEAD:council-data && break; sleep 5; done
