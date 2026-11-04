@@ -1137,11 +1137,16 @@ try {
     // October +14.9R; every depth (0–30 points) and reclaim window (5–30 min) positive (+0.46 to +1.19R). Paper.
     if (NQ_ON.nyflip && !['Sat', 'Sun'].includes(ny.wd) && ny.m > 571 && ny.m < 660 && !research.some((x) => x.id === `nq-nyflip-${ny.d}`)) {
       const g = nqOpenSweep(bars, ny.d, 570, 0);
-      if (g) {
+      // midnight-open filter (4 Nov, from the trader's NQ research report: "the New Day Open should be the next target"): only when
+      // the 00:00 ET opening price lies ahead of the trade. 3-year futures file: ahead +0.22R a trade over 237 (every year positive),
+      // behind +0.05R over 210 (2024 negative); outside the file (Dec–Mar cash index + Sep–Nov 2026): ahead +0.68R over 29, behind +0.19R over 32.
+      const ndoBar = bars.find((b) => { const p = nyParts(b.time); return p.d === ny.d && p.m === 0; });
+      const ndoOk = g && ndoBar && (ndoBar.open - g.entry) * (g.sell ? 1 : -1) > 0;
+      if (g && ndoOk) {
         const sell = !g.sell, r0 = Math.abs(g.entry - g.stop), stop = g.entry + (sell ? r0 : -r0), t1 = g.entry + (sell ? -2 : 2) * r0;
         research.push({ id: `nq-nyflip-${ny.d}`, market: 'nq', label: 'NQ', dec: 2, k: 'nq-open', session: 'nyflip', name: 'NQ New York open run', day: ny.d, side: sell ? 'sell' : 'buy',
           entry: +g.entry.toFixed(2), stop: +stop.toFixed(2), t1: +t1.toFixed(2), rr: 2, opened: g.t + 60, filled: g.t + 60, checked: g.t + 60, status: 'open', R: null, exitAt: g.t + (660 - g.m) * 60, exitLabel: '11:00 ET',
-          seenAt: now, entrySeen: bars.length ? +bars.at(-1).close.toFixed(2) : null, level: 'OPEN', levelPrice: +g.lv.toFixed(2), ext: +g.ext.toFixed(2),
+          seenAt: now, entrySeen: bars.length ? +bars.at(-1).close.toFixed(2) : null, level: 'OPEN', levelPrice: +g.lv.toFixed(2), ext: +g.ext.toFixed(2), ndo: +ndoBar.open.toFixed(2),
           note: `Research (paper only): NQ ran ${Math.abs(g.ext - g.lv).toFixed(1)} points through the New York open ${g.lv.toFixed(2)} and closed back across it; at New York that reclaim tends to fail, so ${sell ? 'sell' : 'buy'} ${g.entry.toFixed(2)} with the sweep, stop ${stop.toFixed(2)}, target 2R ${t1.toFixed(2)}, out at 11:00 ET.` });
       }
     }
