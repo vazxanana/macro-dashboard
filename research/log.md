@@ -374,3 +374,18 @@ Asia 22-07 UTC +0.25 | +0.21 (NY 13-22 UTC −0.12 | +0.08); leg ≥ 4 ATR +0.29
 total (live +44.8 | +87.4, max DD −38.5R; skip NY +42.6 | +74.5, DD −33.3; leg ≥ 4 ATR +13.8 | +58.2, DD −20.6): no change.
 Gold kill switch set from the gated distribution (865 trades, +0.153R, SD 1.77R; 20,000 resamples): 5th percentile
 −10.3R at 30 trades, −11.9R at 50, drawdown −19.7R within 60 trades → alert at −10.5R / −12R / −20R drawdown.
+
+## 4 Nov (night): barrier vs pure market structure (gold 2023-2026, owner's question)
+
+Rules fixed first (`ms/models.py` in the session scratchpad): H1 fractal swings (2/2), BOS on close; OB = last opposite
+H1 candle before the BOS leg; EG = H1 engulfing with body ≥ 0.5 ATR (zone: pair's extreme to the engulfed open); zones die
+on an H1 close through the far side or after 10 days. A = barrier touch + M5 CHoCH within 12 h (stop past the touch extreme);
+B = H1 trend + M15 lower-high/higher-low + M15 CHoCH. Max 3 open, 0.30 spread.
+- B (pure structure): −246R (2R) / −220R (trail) ungated; −43R / −16R gated. Loses.
+- A all barriers: −157R / −67R ungated; gated trail −13.6R. OB loses everywhere (gated trail −73R); EG gated trail +37.6R
+  (+6.0 | +31.6). Barrier against the H1 trend (reversal) gated trail +40.1R (+8.1 | +31.9); in-trend −72.5R.
+- Barrier as target (next opposing zone ≥ 1.5R): worse than 2R or trailing in every group.
+- Replica v5 gated, exit v2, by where its extreme sits: at an H1 EG 151 trades +0.293R (+6.6 | +37.6); at an OB −0.124R;
+  not at a barrier +0.113R. Applied (PR #199): live = D1-with OR at-EG → 392 trades +71.9R, DD −15.8R.
+- Mosha's 2 Nov sell: extreme 3,916 inside a fresh H1 bearish EG 3,914.8-3,927.7 (03:00 UTC). His buy's extreme 3,891 is
+  ~10 below the nearest bullish EG (3,900.9-3,914.3): his barrier there was Friday's reversal Origin (higher timeframe).
