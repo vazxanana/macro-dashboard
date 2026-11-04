@@ -189,3 +189,10 @@ Nth signal of the day and "a replica trade already open" also show nothing consi
 Regime = the signal's M15 ATR vs the median M15 true range of the previous 10 days (no look-ahead); terciles at 1.25× and 1.72×.
 calm +0.22 | +0.13 · normal +0.10 | +0.35 · volatile +0.25 | −0.11 (first 100 d | last 50 d, R/trade).
 Volatile flips from best to worst between halves; no regime filter. Gold rallied to 4,019 this morning; the 04:15 live buy caught it (+2R).
+
+## 4 Nov 08:30 — Live vs replay: the Trader catches every replica signal (check passed)
+
+Replayed the Trader's replicaSignals on fresh Kraken PAXG candles (probe 08:25) for every M5 close since 3 Nov 20:35: 3 signals
+(21:35 buy, 00:35 sell, 04:10 buy), all passing; all 3 are in research.json with the same side and verdict (the 04:10 one recorded at
+04:15, the next run). No missed signals from the 10-minute CHoCH window. Entry prices differ by the spot shift (replay used today's
+offset for the whole night). Shadows: the 07:09 rscalp sell lost −1R into the rally; gold 4,031.
