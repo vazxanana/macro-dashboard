@@ -17,14 +17,16 @@ jobs:
           mkdir -p data/research/probe; o=data/research/probe/nq-feeds.txt; date -u > $o
           UA="Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36"
           for u in \
-            "https://query1.finance.yahoo.com/v8/finance/chart/NQ%3DF?interval=1m&range=1d&includePrePost=true" \
-            "https://query2.finance.yahoo.com/v8/finance/chart/NQ%3DF?interval=1m&range=1d&includePrePost=true" \
-            "https://query2.finance.yahoo.com/v8/finance/chart/MNQ%3DF?interval=1m&range=1d&includePrePost=true" \
-            "https://ts-api.cnbc.com/harmony/app/charts/1D.json?symbol=@NQ.1" \
-            "https://stooq.com/q/d/l/?s=nq.f&i=5" \
-            "https://stooq.com/q/l/?s=nq.f&f=sd2t2ohlcv&h&e=csv" ; do
+            "https://ts-api.cnbc.com/harmony/app/charts/1D.json?symbol=@ND.1" \
+            "https://ts-api.cnbc.com/harmony/app/charts/1D.json?symbol=%40ND.1" \
+            "https://ts-api.cnbc.com/harmony/app/charts/5D.json?symbol=@ND.1" \
+            "https://ts-api.cnbc.com/harmony/app/bars/@ND.1/1M/20261104000000/20261104160000/adjusted/EST5EDT.json" \
+            "https://ts-api.cnbc.com/harmony/app/bars/@NQ.1/1M/20261104000000/20261104160000/adjusted/EST5EDT.json" \
+            "https://ts-api.cnbc.com/harmony/app/charts/1D.json?symbol=.NDX" \
+            "https://quote.cnbc.com/quote-html-webservice/restQuote/symbolType/symbol?symbols=@ND.1&requestMethod=itv&noform=1&partnerId=2&fund=1&exthrs=1&output=json&events=1" \
+            ; do
             code=$(curl -sS -A "$UA" -m 20 -o /tmp/b -w "%{http_code} %{size_download}" "$u" || echo fail)
-            echo "$code $u :: $(head -c 300 /tmp/b | tr '\n\r' '  ')" >> $o
+            echo "$code $u :: $(head -c 400 /tmp/b | tr '\n\r' '  ')" >> $o
           done
           cat $o
           git -C data config user.name "mosha-council"
