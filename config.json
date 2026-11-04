@@ -293,6 +293,12 @@
    "by": "user",
    "change": "Gold replica trades live again, but only while gold is volatile: 20-day average daily range at least 1.5% of price; NQ stays the main system",
    "why": "8-year spot gold split by volatility: the replica loses in calm gold every year (bottom fifth -0.21R a trade) and only pays in the top fifth (+0.05R, 6 of 8 years positive). With the risk rules and a 1.5% gate: 2019-2025 +18.9R instead of -312.5R, 2026 +43.2R. 2026 is the most volatile gold year in the sample (2.2% vs 0.9-1.5%), which is why the replica looked good this year."
+  },
+  {
+   "at": "2026-11-04T19:35:24.000Z",
+   "by": "user",
+   "change": "Gold replica trades live only in the daily trend direction (still against the H4 trend: a pullback entry)",
+   "why": "Owner: judge gold on the last 4 years. 2023-26 spot, 1.5% gate, exit v2, risk rules: 602 trades +87.4R, worst drawdown -35.2R -> D1-with 325 trades +63.8R, drawdown -15.8R (+0.196R a trade). Chosen on 2023-24 (+8.1R vs -22.2R), held on 2025-26 (+55.7R). In 2019-22 the opposite held (D1-against better), so this is a last-4-years rule."
   }
  ],
  "btAt": "2026-11-04T11:20:16.389Z",
@@ -308,7 +314,8 @@
   "replica-live",
   "retire-legacy",
   "gold-shadow",
-  "gold-vol-gate"
+  "gold-vol-gate",
+  "gold-d1-with"
  ],
  "target": {},
  "targetBy": {},
@@ -319,11 +326,11 @@
  "noPause": true,
  "wouldPause": {
   "rintra": {
-   "at": "2026-11-04T19:31:10.000Z",
+   "at": "2026-11-04T19:35:24.000Z",
    "why": "four losses in a row"
   },
   "scalp": {
-   "at": "2026-11-04T19:31:10.000Z",
+   "at": "2026-11-04T19:35:24.000Z",
    "why": "expectancy -1.00R over 13 trades"
   },
   "xau": {
@@ -343,5 +350,6 @@
  ],
  "newsSince": "2026-11-04T00:02:58.000Z",
  "retireLegacy": true,
- "goldVolMin": 1.5
+ "goldVolMin": 1.5,
+ "goldD1With": true
 }
