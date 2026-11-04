@@ -282,3 +282,7 @@ Same 1-minute history for every NQ setup (Yahoo NQ=F + CNBC @ND.1, 11 Sep – 4 
 **New York open run:** the open-sweep signal at the 09:30 opening price (≥ 15 points through it, 1-minute close back across within 15 min), traded with the sweep: at New York the reclaim fails and the move runs (the reversal version loses −0.45R a trade). Stop the same distance on the other side, 2R, out at 11:00 ET. 27 trades +19.8R, 67% wins, t 2.8, September +4.9R and October +14.9R; every depth 0–30 points and reclaim window 5–30 min positive. Records `nq-nyflip-<day>`.
 
 Losing open-sweep trades: 7 of 20 were +1R before reversing, but break-even, partials and trailing all scored below the plain 2R; trades on the side of the 18:00 ET daily open did better (+0.67R vs +0.25R) but the other side flipped sign between months, so no filter.
+
+## Gold: the NQ open rules carried over (research, 4 Nov)
+
+The NQ open-sweep rules tested on gold unchanged (1-minute, 22 Dec – 3 Nov, 227 days, 0.30 spread; depth scaled to price, 15 NQ points ≈ 0.054%): pre-New York open reversals −0.12R a trade over 301 (3 of 12 months positive), so they do not carry over. The New York open run does, weakly: 143 trades +18.1R, +0.13R a trade, 7 of 11 months positive, but January–June +19.6R and June–November −1.5R; every depth (0–0.12%) and reclaim window (5–30 min) positive. It runs as research on paper (`k: 'gold-nyrun'`, `snapshot.research.goldNyrun`), next to the replica; it does not trade live.
