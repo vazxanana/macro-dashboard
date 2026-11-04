@@ -904,8 +904,9 @@ function nqOpenSignal(bars, today) {
 }
 try {
   const ny = nyParts(now), openNq = research.filter((x) => x.k === 'nq-open' && x.status === 'open');
-  if ((!['Sat', 'Sun'].includes(ny.wd) && ny.m >= 565 && ny.m <= 975) || openNq.length) {
-    const bars = (await yahoo1m('NQ=F')).filter((b) => b.time + 60 <= now);   // closed 1-minute candles
+  if ((!['Sat', 'Sun'].includes(ny.wd) && ny.m >= 565 && ny.m <= 1000) || openNq.length) {
+    // Yahoo's CME candles arrive 10 minutes late (probe 4 Nov: lag 600 s) and the newest one is still forming: drop it
+    const bars = (await yahoo1m('NQ=F')).slice(0, -1);
     for (const r of openNq) {
       const s = r.side === 'sell', r0 = Math.abs(r.entry - r.stop);
       for (const b of bars) {
@@ -917,13 +918,13 @@ try {
       }
       if (r.status === 'open' && bars.length) r.checked = bars.at(-1).time;
     }
-    if (ny.m >= 570 && ny.m <= 635 && !research.some((x) => x.k === 'nq-open' && x.day === ny.d)) {
+    if (ny.m >= 570 && ny.m <= 720 && !research.some((x) => x.k === 'nq-open' && x.day === ny.d)) {   // to 12:00 ET: the feed lags
       const g = nqOpenSignal(bars, ny.d);
-      if (g && now - (g.t + 60) <= 5 * 60) {   // the signal candle closed within the last 5 minutes: enter at its close
+      if (g) {   // the day's first signal: paper entry at the signal candle's close (as on the backtest), even though the feed shows it ~10 min late
         const r0 = Math.abs(g.entry - g.stop), t1 = g.entry + (g.sell ? -1.2 : 1.2) * r0;
         research.push({ id: `nq-open-${ny.d}`, market: 'nq', label: 'NQ', dec: 2, k: 'nq-open', name: 'NQ NY open sweep', day: ny.d, side: g.sell ? 'sell' : 'buy',
           entry: +g.entry.toFixed(2), stop: +g.stop.toFixed(2), t1: +t1.toFixed(2), rr: 1.2, opened: g.t + 60, filled: g.t + 60, checked: g.t + 60, status: 'open', R: null,
-          level: g.level, levelPrice: +g.lv.toFixed(2), ext: +g.ext.toFixed(2), levels: Object.fromEntries(Object.entries(g.L).map(([k, v]) => [k, +v.toFixed(2)])),
+          seenAt: now, level: g.level, levelPrice: +g.lv.toFixed(2), ext: +g.ext.toFixed(2), levels: Object.fromEntries(Object.entries(g.L).map(([k, v]) => [k, +v.toFixed(2)])),
           note: `Research (paper only): NQ swept the ${g.level} ${g.lv.toFixed(2)} after the New York open (extreme ${g.ext.toFixed(2)}) and closed back inside; ${g.sell ? 'sell' : 'buy'} ${g.entry.toFixed(2)}, stop ${g.stop.toFixed(2)}, target 1.2R ${t1.toFixed(2)}, out at 16:00.` });
       }
     }

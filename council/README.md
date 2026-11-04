@@ -187,7 +187,7 @@ The trader's NQ rule: wait for the 9:30 New York open, let price take liquidity,
 Built as: after 9:30 ET, NQ (Yahoo NQ=F, 1-minute) trades through the overnight (18:00–9:30 ET), previous-day (9:30–16:00)
 or pre-market (8:00–9:30) high or low; the first 1-minute candle in the first hour that closes back inside that level,
 in the reversal's direction, is the signal. Market entry at its close, stop 2 points past the sweep's extreme, target 1.2R,
-out at 16:00, one trade a day. Kept in research.json (`k: 'nq-open'`), totals in snapshot.research.nq.
+out at 16:00, one trade a day. Yahoo delays these candles by 10 minutes, so the trader sees each signal late and records it at the signal candle's close (paper, as on the backtest). Kept in research.json (`k: 'nq-open'`), totals in snapshot.research.nq.
 History: about break-even (5-minute, 50 days: +0.02R a trade over 36; 1-minute, 21 days: −0.06R over 15); waiting for an
 M5/M1 CHoCH after the sweep, or keeping only one kind of level, splits the halves (positive in one, negative in the other).
 It goes live only if the forward record pays.
