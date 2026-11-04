@@ -146,6 +146,9 @@ const USER_RULES = [
   { id: 'gold-shadow', apply: (c) => { c.replicaLive = []; c.focus = ['none']; },
     change: 'Gold research only (user): the gold replica and the engine setups stop opening live paper trades; NQ New York open run is the system',
     why: '8-year spot gold test: the replica lost every year 2019-2025 (-312.5R over 4,484 trades), only 2026 positive; the NQ New York open run held on 3 years of NQ futures and every newer sample.' },
+  { id: 'gold-d1-with', apply: (c) => { c.goldD1With = true; },
+    change: 'Gold replica trades live only in the daily trend direction (still against the H4 trend: a pullback entry)',
+    why: 'Owner: judge gold on the last 4 years. 2023-26 spot, 1.5% gate, exit v2, risk rules: 602 trades +87.4R, worst drawdown -35.2R -> D1-with 325 trades +63.8R, drawdown -15.8R (+0.196R a trade). Chosen on 2023-24 (+8.1R vs -22.2R), held on 2025-26 (+55.7R). In 2019-22 the opposite held (D1-against better), so this is a last-4-years rule.' },
   { id: 'gold-vol-gate', apply: (c) => { c.replicaLive = ['xau']; c.goldVolMin = 1.5; },
     change: 'Gold replica trades live again, but only while gold is volatile: 20-day average daily range at least 1.5% of price; NQ stays the main system',
     why: '8-year spot gold split by volatility: the replica loses in calm gold every year (bottom fifth -0.21R a trade) and only pays in the top fifth (+0.05R, 6 of 8 years positive). With the risk rules and a 1.5% gate: 2019-2025 +18.9R instead of -312.5R, 2026 +43.2R. 2026 is the most volatile gold year in the sample (2.2% vs 0.9-1.5%), which is why the replica looked good this year.' },
@@ -476,7 +479,9 @@ for (const [key, M] of Object.entries(MARKETS)) {
         if (v5 && stale) research.at(-1).stale = true;
         if (volPct != null) research.at(-1).vol = +volPct.toFixed(2);
         if (v5 && !volOk) research.at(-1).calm = true;
-        if (v5 && volOk && !capped && !dayStop && !stale && (config.replicaLive || []).includes(key)) trades.push({ id: `${key}-replica-${now}-${g.sell ? 's' : 'b'}`, market: key, label: M.label, dec: M.dec, k: 'replica', name: 'Replica', pair: 'M5 CHoCH', h: '5m', side: g.sell ? 'sell' : 'buy',
+        const d1w = src['1d'].A.trend === (g.sell ? -1 : 1);
+        if (v5 && config.goldD1With && !d1w) research.at(-1).d1Skip = true;
+        if (v5 && volOk && (!config.goldD1With || d1w) && !capped && !dayStop && !stale && (config.replicaLive || []).includes(key)) trades.push({ id: `${key}-replica-${now}-${g.sell ? 's' : 'b'}`, market: key, label: M.label, dec: M.dec, k: 'replica', name: 'Replica', pair: 'M5 CHoCH', h: '5m', side: g.sell ? 'sell' : 'buy',
           entry: +entry.toFixed(2), stop: +stop.toFixed(2), t1: +(entry + (g.sell ? -10 : 10) * r0).toFixed(2), tp1: +t1.toFixed(2), rr: 10, trail: [2.0, 2.0], size, buf: CFG.buf, opened: now, filled: now, checked: now, status: 'open', R: null, r0: Math.abs(+entry.toFixed(2) - +stop.toFixed(2)), maxHold: 48 * 3600, noBe: true, entryMode: 'market', lag,
           feat: { d1: src['1d'].A.trend === (g.sell ? -1 : 1) ? 'with' : 'against', h4, session: sessionOf(now), star: g.star, h1clear, riskAtr: +riskAtr.toFixed(2), leg: g.L === 36 ? '3h' : '6h' }, shadow: false, blockedBy: [],
           note: `Gold replica (v5, against the H4 trend): ${g.L === 36 ? '3 h' : '6 h'} leg to ${g.ext.toFixed(2)}, M5 CHoCH through ${g.lvl.toFixed(2)}${g.star ? ', ★ engulfing at structure at the extreme' : g.peg ? ', engulfing at the extreme' : ''}${h1clear ? ', clear of H1 Origins' : ''}. ${g.sell ? 'Sell' : 'Buy'} at market, stop past the extreme; from +2R the stop trails 2R behind the best price (2R mark ${t1.toFixed(2)}), out after 48 h.` });
