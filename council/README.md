@@ -319,3 +319,10 @@ which is why the replica looked good this year. NQ stays the main system.
 
 News-day check on the NQ New York open run (3-year futures file): no filter adopted — 08:30 release mornings and overnight-range
 splits change sign between samples; FOMC days were weak (7 live-rule trades, −4.9R) but too few to act on.
+
+### Telegram alerts (4 Nov)
+
+The same trade alerts as ntfy (opens and closes from the last 15 min, each once) also go to Telegram when the repository
+secret `TELEGRAM_BOT_TOKEN` is set (create a bot with @BotFather). `TELEGRAM_CHAT_ID` is optional: without it the Trader
+reads the bot's updates, uses the first private chat that messaged the bot (send it /start), remembers it in
+`state.tgChat` and sends a one-time "connected" message. Send errors land in `snapshot.errors.telegram`.
