@@ -13,13 +13,8 @@ def fetch(year, month=None):
   zf = zipfile.ZipFile(io.BytesIO(z)); name = [n for n in zf.namelist() if n.endswith('.csv')][0]
   return zf.read(name)
 out = sys.argv[1]
-for y in range(2018, 2025):
+for m in range(1, 11):
   try:
-    b = fetch(y); open(f"{out}/XAUUSD_M1_{y}.csv.gz", 'wb').write(gzip.compress(b)); print(y, len(b))
-  except Exception as e: print('fail', y, e)
-  time.sleep(3)
-for m in range(1, 13):
-  try:
-    b = fetch(2025, m); open(f"{out}/XAUUSD_M1_2025{m:02d}.csv.gz", 'wb').write(gzip.compress(b)); print(2025, m, len(b))
-  except Exception as e: print('fail 2025', m, e)
+    b = fetch(2026, m); open(f"{out}/XAUUSD_M1_2026{m:02d}.csv.gz", 'wb').write(gzip.compress(b)); print(2026, m, len(b))
+  except Exception as e: print('fail 2026', m, e)
   time.sleep(3)
