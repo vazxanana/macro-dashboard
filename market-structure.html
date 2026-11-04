@@ -3,11 +3,11 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="theme-color" content="#0b0e14">
+<meta name="theme-color" content="#08090c">
 <title>Market Structure</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600;700&display=swap">
 <script src="https://cdn.jsdelivr.net/npm/lightweight-charts@4.1.3/dist/lightweight-charts.standalone.production.js"></script>
 <style>
   /* Layout: one focused column; top bar → what to do now → possible trades → charts → method notes */
@@ -476,6 +476,119 @@
     .brand span { display: none; }
     .seg { width: 100%; } .seg button { flex: 1; padding: 9px 4px; }
   }
+
+  /* ═══ Design pass (4 Nov): one slim top bar, deeper neutral surfaces, hairline borders, Inter, calmer colour ═══ */
+  :root, :root[data-theme="dark"] {
+    --bg: #08090c; --panel: #0f1116; --panel-raised: #14171e; --panel-hover: #161a22;
+    --line: rgba(255,255,255,.07); --line-soft: rgba(255,255,255,.045); --line-strong: rgba(255,255,255,.12);
+    --ink: #eceef2; --ink-dim: #a4abb8; --ink-faint: #737b8a; --accent: #5b8cff; --accent-soft: rgba(91,140,255,.12);
+    --buy: #2fbf8f; --sell: #f2576f; --buy-soft: rgba(47,191,143,.12); --sell-soft: rgba(242,87,111,.12);
+    --sans: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    --r: 12px; --r-sm: 8px;
+  }
+  html, body { background: var(--bg); font: 14px/1.5 var(--sans); font-feature-settings: "cv11", "ss01"; -webkit-font-smoothing: antialiased; }
+  body { background: radial-gradient(1200px 500px at 50% -200px, rgba(91,140,255,.06), transparent 70%), var(--bg); background-attachment: fixed; }
+  .ms-live.app { max-width: 1360px; gap: 16px; padding-top: 0; }
+  ::selection { background: rgba(91,140,255,.3); }
+
+  /* top bar: brand + price | tabs | status + actions, one row */
+  .top { flex-wrap: nowrap; gap: 20px; height: 60px; padding-top: 0; padding-bottom: 0; margin-bottom: 4px;
+    background: color-mix(in srgb, var(--bg) 82%, transparent); backdrop-filter: saturate(140%) blur(14px); -webkit-backdrop-filter: saturate(140%) blur(14px); border-bottom: 1px solid var(--line); }
+  .brand { gap: 10px; flex: none; }
+  .ms-coin { width: 22px; height: 22px; box-shadow: inset 0 -2px 4px rgba(0,0,0,.25); }
+  .inst { font: 600 14px var(--sans); letter-spacing: -.1px; padding: 4px 22px 4px 6px; }
+  .brand span#ms-inst-name, .ms-badge, .ms-sess { display: none !important; }
+  .px { flex: none; gap: 8px; padding-left: 16px; border-left: 1px solid var(--line); }
+  .px b { font: 600 18px var(--mono); letter-spacing: -.4px; }
+  .hdr-chg { font: 500 12px var(--mono); }
+  .hdr-chg.up { color: var(--buy); } .hdr-chg.down { color: var(--sell); }
+  .top .tabs { position: static; margin: 0 auto; padding: 4px; border: 1px solid var(--line); border-radius: 10px; background: rgba(255,255,255,.02); backdrop-filter: none; -webkit-backdrop-filter: none; gap: 2px; overflow-x: auto; }
+  .top .tabs a { padding: 6px 14px; border-radius: 7px; font: 500 13px var(--sans); color: var(--ink-dim); }
+  .top .tabs a:hover { background: rgba(255,255,255,.04); color: var(--ink); }
+  .top .tabs a[aria-current="page"] { background: var(--panel-raised); color: var(--ink); box-shadow: 0 0 0 1px var(--line-strong), 0 1px 2px rgba(0,0,0,.4); }
+  .top .ms-status { flex: none; font-size: 12px; color: var(--ink-faint); }
+  .top .ms-status .upd { display: none; }
+  .top-actions { margin-left: 0; flex: none; gap: 6px; }
+  .ms-tbtn { min-height: 32px; padding: 6px 12px; border-radius: var(--r-sm); border-color: var(--line); background: rgba(255,255,255,.02); font: 500 12.5px var(--sans); color: var(--ink-dim); transition: background .15s, color .15s, border-color .15s; }
+  .ms-tbtn:hover { background: rgba(255,255,255,.05); color: var(--ink); border-color: var(--line-strong); }
+  .ms-tbtn[aria-pressed="true"] { color: var(--accent); border-color: rgba(91,140,255,.4); background: var(--accent-soft); }
+  .menu-body { background: var(--panel-raised); border-color: var(--line-strong); border-radius: var(--r); box-shadow: 0 24px 48px rgba(0,0,0,.55); }
+
+  /* surfaces */
+  .card, .tile, .ms-pane, .c-card { background: var(--panel); border: 1px solid var(--line); border-radius: var(--r); box-shadow: inset 0 1px 0 rgba(255,255,255,.025); }
+  .card { padding: 20px 22px; }
+  .tile { padding: 18px 20px; min-height: 150px; gap: 6px; transition: border-color .15s, background .15s, transform .15s; }
+  .tile:hover { border-color: var(--line-strong); background: var(--panel-hover); transform: none; }
+  .tile-k, .ms-k, .sec-h h2, .menu-h { font: 600 11px var(--sans); letter-spacing: .06em; text-transform: uppercase; color: var(--ink-faint); }
+  .ms-k { margin-bottom: 12px; }
+  .tile-big { font: 600 19px/1.3 var(--sans); letter-spacing: -.2px; }
+  .tile.wide .tile-big { font: 500 15px/1.5 var(--sans); }
+  .tile-big b { color: var(--buy); }
+  .tile-sub { font-size: 12.5px; color: var(--ink-dim); }
+  .tile-go { font: 500 12.5px var(--sans); color: var(--ink-dim); }
+  .tile:hover .tile-go { color: var(--accent); }
+  .home { gap: 14px; }
+
+  /* headings */
+  .h-top { padding: 18px 2px 6px; }
+  .h-date { font: 500 12px var(--sans); letter-spacing: .04em; color: var(--ink-faint); text-transform: none; }
+  .h-head { font: 600 clamp(22px, 2.4vw, 30px)/1.2 var(--sans); letter-spacing: -.6px; margin-top: 6px; }
+  .c-head h1, .view > h1 { font: 600 clamp(22px, 2.4vw, 28px)/1.2 var(--sans); letter-spacing: -.5px; }
+  .ms-note { font-size: 12px; color: var(--ink-faint); }
+
+  /* chips, segments, numbers */
+  .ms-chip { border-radius: 6px; padding: 2px 7px; font: 600 10.5px var(--mono); letter-spacing: .3px; }
+  .ms-chip-sell { background: var(--sell-soft); color: var(--sell); border-color: rgba(242,87,111,.28); }
+  .ms-chip-buy { background: var(--buy-soft); color: var(--buy); border-color: rgba(47,191,143,.28); }
+  .pos { color: var(--buy) !important; } .neg { color: var(--sell) !important; }
+  .seg, .cal-seg { border: 1px solid var(--line); border-radius: 9px; background: rgba(255,255,255,.02); padding: 3px; gap: 2px; }
+  .seg button, .cal-seg button { border: 0 !important; border-radius: 6px; font: 500 12.5px var(--sans); color: var(--ink-dim); padding: 6px 12px; background: transparent; }
+  .seg button.on, .cal-seg button.on, .cal-seg button[aria-pressed="true"] { background: var(--panel-raised); color: var(--ink); box-shadow: 0 0 0 1px var(--line-strong); }
+
+  /* tables */
+  .c-t, .ms-bt-t, .ms-j { font-size: 12.5px; }
+  .c-t th, .ms-bt-t th, .ms-j th { font: 600 10.5px var(--sans); letter-spacing: .05em; color: var(--ink-faint); border-bottom: 1px solid var(--line); padding: 10px 8px; background: transparent; }
+  .c-t td, .ms-bt-t td, .ms-j td { border-bottom: 1px solid var(--line-soft); padding: 10px 8px; }
+  .c-t tbody tr, .ms-bt-t tbody tr { transition: background .12s; }
+  .c-t tbody tr:hover, .ms-bt-t tbody tr:hover, .ms-j tbody tr:hover { background: rgba(255,255,255,.025); }
+
+  /* lists, KPI boxes, calendar, active trades */
+  .c-kpi > div, .ms-j-stats > div { background: var(--panel-raised); border: 1px solid var(--line); border-radius: var(--r-sm); }
+  .c-kpi b { font-weight: 600; letter-spacing: -.3px; }
+  .cal-d { border-radius: 8px; border-color: var(--line-soft); background: rgba(255,255,255,.015); }
+  .cal-d.win { background: rgba(47,191,143,.09); border-color: rgba(47,191,143,.22); }
+  .cal-d.loss { background: rgba(242,87,111,.08); border-color: rgba(242,87,111,.2); }
+  .cal-d .cr { font-weight: 600; }
+  .c-act li, .cal-day li, .ms-srow { border-color: var(--line); border-radius: var(--r-sm); background: rgba(255,255,255,.012); }
+  .c-act li:hover, .cal-day li:hover, .ms-srow:hover { border-color: var(--line-strong); background: var(--panel-hover); }
+  .chip.buy, .c-act .chip.buy { background: var(--buy-soft); color: var(--buy); }
+  .chip.sell, .c-act .chip.sell { background: var(--sell-soft); color: var(--sell); }
+  .foot { padding: 12px 0 4px; color: var(--ink-faint); opacity: .8; }
+  :focus-visible { outline-color: var(--accent); }
+
+  /* charts frame */
+  .ms-pane { border-radius: var(--r); }
+
+  @media (max-width: 1100px) { .top .ms-status #ms-live-txt { display: none; } }
+  @media (max-width: 900px) {
+    .top { height: auto; flex-wrap: wrap; padding-top: 10px; padding-bottom: 10px; gap: 10px 14px; }
+    .top .tabs { order: 5; width: 100%; margin: 0; }
+  }
+  @media (max-width: 700px) {
+    .top { flex-wrap: nowrap; height: 56px; padding-top: 0; padding-bottom: 0; }
+    .top .tabs { display: none; }
+    .px { padding-left: 12px; } .px b { font-size: 16px; } .hdr-chg { display: none; }
+    .top .ms-status { display: none; }
+    .top-actions { width: auto; margin-left: auto; }
+    .top { gap: 10px; }
+    .inst { max-width: 118px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .top-actions .ms-tbtn { width: 36px; height: 36px; min-height: 36px; padding: 0; font-size: 0; display: inline-grid; place-items: center; }
+    .top-actions .ms-tbtn::before { content: ""; width: 17px; height: 17px; background: currentColor; -webkit-mask: var(--ico) center / contain no-repeat; mask: var(--ico) center / contain no-repeat; }
+    #ms-alerts { --ico: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9'/%3E%3Cpath d='M13.7 21a2 2 0 0 1-3.4 0'/%3E%3C/svg%3E"); } .top-actions .menu > summary { --ico: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round'%3E%3Cpath d='M4 7h10M18 7h2M4 17h4M12 17h8'/%3E%3Ccircle cx='16' cy='7' r='2'/%3E%3Ccircle cx='10' cy='17' r='2'/%3E%3C/svg%3E"); }
+    .btab { border-top: 1px solid var(--line); background: color-mix(in srgb, var(--bg) 88%, transparent); }
+    .btab a { font: 500 11px var(--sans); }
+    .card { padding: 16px; } .tile { padding: 16px; }
+  }
 </style>
 </head>
 <body>
@@ -484,7 +597,9 @@
   <header class="top">
     <div class="brand"><i class="ms-coin" aria-hidden="true"></i><div><details class="mk" id="ms-mk"><summary class="inst" id="ms-mk-btn">XAU/USD · Gold</summary><div class="mk-pop"><label class="sr" for="ms-mk-q">Search markets</label><input id="ms-mk-q" type="search" placeholder="Search markets…" autocomplete="off"><ul class="mk-list" id="ms-mk-list"></ul></div></details><select id="ms-inst" class="inst" hidden aria-hidden="true" tabindex="-1"><option>XAU/USD · Gold</option></select><span id="ms-inst-name">Gold · Mosha structure</span></div></div>
     <div class="px"><b id="ms-hdr-price">—</b><span id="ms-hdr-chg" class="hdr-chg"></span></div>
-    <span class="ms-sess" id="ms-sess" title="Trading sessions"></span>
+    <nav class="tabs" aria-label="Sections">
+      <a href="#home" data-go="home">Home</a><a href="#setup" data-go="setup">Setup</a><a href="#charts" data-go="charts">Charts</a><a href="#scanner" data-go="scanner">Scanner</a><a href="#council" data-go="council">Council</a><a href="#journal" data-go="journal">Journal</a>
+    </nav>
     <a class="ms-badge" id="ms-scan-badge" href="#scanner" hidden></a>
     <span class="ms-status"><i class="ms-live-dot" id="ms-live-dot"></i><span id="ms-live-txt">Connecting…</span><span class="upd"> · <span id="ms-updated">—</span></span></span>
     <div class="top-actions">
@@ -525,9 +640,6 @@
       </details>
     </div>
   </header>
-  <nav class="tabs" aria-label="Sections">
-    <a href="#home" data-go="home">Home</a><a href="#setup" data-go="setup">Setup</a><a href="#charts" data-go="charts">Charts</a><a href="#scanner" data-go="scanner">Scanner</a><a href="#council" data-go="council">Council</a><a href="#news" data-go="news">News</a><a href="#journal" data-go="journal">Journal</a><a href="#backtest" data-go="backtest">Backtest</a><a href="#guide" data-go="guide">Guide</a>
-  </nav>
 
 
   <div class="ms-offline-box" role="alert">
@@ -577,30 +689,11 @@
         <span class="tile-sub">Analyst maps the week, Trader paper-trades every Ready setup, Coach reviews each day and tunes the rules.</span>
         <span class="tile-go">Open council</span>
       </a>
-      <a class="tile" href="#news">
-        <span class="tile-k">Sessions &amp; news</span>
-        <span class="tile-big" id="h-sess">—</span>
-        <span class="tile-sub" id="h-sbar"></span>
-        <span class="tile-sub" id="h-news"></span>
-        <span class="tile-go">Calendar</span>
-      </a>
       <a class="tile" href="#journal">
         <span class="tile-k">Journal</span>
         <span class="tile-big" id="h-j">No trades yet</span>
         <span class="tile-sub" id="h-j-sub">Log trades from the Setup page and track your results.</span>
         <span class="tile-go">Open journal</span>
-      </a>
-      <a class="tile" href="#backtest">
-        <span class="tile-k">Backtest</span>
-        <span class="tile-big" id="h-bt">Not run yet</span>
-        <span class="tile-sub">Replay the rules over recent history and see how each setup scored.</span>
-        <span class="tile-go">Run backtest</span>
-      </a>
-      <a class="tile" href="#guide">
-        <span class="tile-k">Guide</span>
-        <span class="tile-big">How the setup works</span>
-        <span class="tile-sub">BO, Origin, VR, the 50% line, CF and the stop.</span>
-        <span class="tile-go">Read</span>
       </a>
     </div>
   </section>
@@ -736,19 +829,6 @@
     <p class="ms-note">Paper trades only, no real money. The Coach may change the stop buffer (0.10–0.25 × ATR), the minimum reward:risk (1.2–2.5) and pause a setup for up to 7 days, and logs every change.</p>
   </section>
 
-  <!-- ─── Sessions & news ─── -->
-  <section class="view" id="v-news" aria-label="Sessions and news" hidden>
-    <div class="card">
-      <div class="ms-k">Trading sessions</div>
-      <div id="ms-sbar" style="margin-bottom:14px"></div>
-      <ul class="ms-sess-list" id="ms-sess-list"></ul>
-    </div>
-    <div class="card">
-      <div class="ms-k">High-impact news</div>
-      <ul class="ms-news" id="ms-news"><li>Loading calendar…</li></ul>
-      <div class="ms-note" style="margin-top:10px">Spreads widen and breaks often fake out around high-impact releases. A warning shows 30 minutes before; wait until 15 minutes after the release before taking a setup.</div>
-    </div>
-  </section>
 
   <!-- ─── Journal ─── -->
   <section class="view" id="v-journal" aria-label="Journal" hidden>
@@ -761,34 +841,9 @@
     </div>
   </section>
 
-  <!-- ─── Backtest ─── -->
-  <section class="view" id="v-backtest" aria-label="Backtest" hidden>
-    <div class="card" id="ms-bt-card">
-      <div class="ms-k">Backtest <span class="ms-scan-meta"><span id="ms-bt-meta"></span><button type="button" class="ms-tbtn" id="ms-bt-btn">Run backtest</button></span></div>
-      <div id="ms-bt"><div class="ms-note">Replays the Mosha rules candle by candle over this market's recent history and scores every setup that turned Ready: a limit order at the entry, the stop and Target 1.</div></div>
-    </div>
-  </section>
 
-  <!-- ─── Guide ─── -->
-  <section class="view" id="v-guide" aria-label="Guide" hidden>
-    <div class="card how">
-      <div class="ms-k">How the setup works</div>
-      <ol>
-        <li><b>BO (breakout):</b> on H4, a candle closes beyond the last swing low (BO Sell) or swing high (BO Buy). That sets the direction. D1 shows whether the bigger picture agrees.</li>
-        <li><b>Clean breakout:</b> every BO needs a candle <b>body</b> to close beyond the wick on the left. A wick through the level is not a break.</li>
-        <li><b>Origin:</b> the zone from the BO line to the high (sell) or low (buy) where the breaking move started. Price usually comes back here.</li>
-        <li><b>VR:</b> after the break, the move runs out and reverses on H1. That reversal area is the VR, and it is the first target.</li>
-        <li><b>50% line:</b> measure the whole move after the BO, from the Origin edge where it started to the VR extreme. The halfway point (like a Fibonacci 50%) is drawn as a dashed line. A pullback that stays under it is <b>internal structure</b>; once price goes past it, it's the <b>main structure</b>.</li>
-        <li><b>CF:</b> once price is back inside the Origin, wait for the lower timeframe to break in the trade's direction. That break is the CF.</li>
-        <li><b>Entry and stop:</b> enter on the pullback to the CF level. The stop goes just past the swing the CF break started from, padded by a small buffer sized to that timeframe's candles, and never closer than 0.6 × its average candle range (ATR) or 5 × the typical spread, so normal noise can't stop it out. A body close beyond the Origin cancels the idea.</li>
-        <li><b>Retracement trades:</b> once the HTF has made its VR, price pulls back toward the Origin. While that happens you can trade the lower timeframe the other way: in a sell, an H1 BO Buy is a buy up to the 50% line and the Origin, and vice versa. Take profit before the Origin, because that's where the main trend resumes. These cards are tagged <b>Retracement</b>.</li>
-        <li><b>Self-evolving council:</b> every paper trade records its conditions (D1 agreeing or not, main or internal structure, session). The Coach learns rules from what loses, such as "Swing: only with D1", and keeps following blocked setups as shadow trades. If the blocked trades start winning, it drops the rule. Every rule is re-tested after 21 days. It also tracks how far each trade went for and against before closing, and turns on a break-even stop at +1R when many losers had been well in profit first. A market that keeps losing is paused for 3 days.</li>
-        <li><b>Timeframe pairs:</b> Position D1 → H1, Swing H4 → H1, Intraday H1 → M5, Scalp M15 → M1.</li>
-      </ol>
-    </div>
-  </section>
 
-  <p class="foot">Live candles from Binance and Kraken public feeds; gold is aligned to XAU/USD spot via gold-api.com. Times are in your local zone.<br>Version 3 Nov 2026 · gold trade charts on spot</p>
+  <p class="foot">Live candles from Binance and Kraken public feeds; gold is aligned to XAU/USD spot via gold-api.com. Times are in your local zone.<br>Version 4 Nov 2026 · redesign</p>
   <nav class="btab" aria-label="Main sections">
     <a href="#home" data-go="home"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M3 11l9-7 9 7v9a1 1 0 01-1 1h-5v-6H9v6H4a1 1 0 01-1-1z"></path></svg>Home</a>
     <a href="#setup" data-go="setup"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 6h16M4 12h10M4 18h6"></path></svg>Setup</a>
@@ -2983,7 +3038,7 @@ function msNextSetup(bars, A) {
   if (document.getElementById('v-council')) { councilReady = loadCouncil(); setInterval(loadCouncil, 5 * 60e3); }
 
   // ─── Sections: a home page of cards, each section on its own page ───
-  const VIEWS = ['home', 'setup', 'charts', 'scanner', 'council', 'news', 'journal', 'backtest', 'guide'];
+  const VIEWS = ['home', 'setup', 'charts', 'scanner', 'council', 'journal'];
   function showView() {
     const h = location.hash.slice(1), v = VIEWS.includes(h) ? h : 'home';
     VIEWS.forEach((k) => { const el = document.getElementById('v-' + k); if (el) el.hidden = k !== v; });
