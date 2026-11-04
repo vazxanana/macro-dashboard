@@ -289,3 +289,10 @@ even with a true +0.2R edge).
 
 - Pre-registered transfer of the NQ rules to gold 1m (227 days, 0.30 spread, depth 0.054% of price): pre-NY open reversals −0.12R over 301 (3/12 months) — no; NY open run +0.13R over 143 (7/11 months; Jan–Jun +19.6R, Jun–Nov −1.5R), every depth/reclaim cell positive. Added as research (gold-nyrun), not live.
 - Replica filters: ~60 variants on the same 2026 data; the honest remaining gold levers are independent signals and forward trades, not more filters.
+
+## 4 Nov (evening): the trader's XAUUSD price-action PDF
+
+- A ChatGPT synthesis (15m direction / 5m location / 1m timing, structural stops, NY Fed stop-cluster evidence). Three testable ideas on the v5 + trailing replay (4 min lag):
+  - Round-number stops: a stop within $2 in front of a $10 level moved $0.50 past it → the 76 affected trades +16.7R (+0.22R each, paired t 1.8), both halves; all $10 cells positive, $5 weaker. LIVE (PR #190).
+  - Wick-sized buffer (mean 1m range of 15 bars): +0.190R vs +0.197R — no.
+  - M15 direction gate: keeps 87/500 trades (+0.25R each) but −77R total — no.
