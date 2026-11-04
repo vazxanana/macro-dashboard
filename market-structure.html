@@ -354,6 +354,16 @@
   .cal-h { font-size: 11px; color: var(--ink-dim); text-align: center; padding-bottom: 2px; }
   .cal-d { min-height: 62px; border: 1px solid var(--line-soft); border-radius: 6px; padding: 5px 6px; display: flex; flex-direction: column; gap: 2px; font-size: 11px; color: var(--ink-dim); background: none; text-align: left; cursor: pointer; font: inherit; }
   .cal-d.out { visibility: hidden; } .cal-d.today { border-color: var(--accent); } .cal-d.sel { outline: 2px solid var(--accent); outline-offset: -1px; }
+  .cal-seg { display: inline-flex; margin: 0 0 8px; border: 1px solid var(--line-soft); border-radius: 8px; overflow: hidden; }
+  .cal-seg button { font: inherit; font-size: 12.5px; padding: 6px 14px; background: none; border: 0; color: var(--ink-dim); cursor: pointer; }
+  .cal-seg button + button { border-left: 1px solid var(--line-soft); }
+  .cal-seg button.on { background: var(--accent, #2962ff); color: #fff; font-weight: 600; }
+  .cal-dayw { margin: 10px 0 4px; padding: 8px; border: 1px solid var(--accent, #2962ff); border-radius: 8px; scroll-margin-top: 80px; scroll-margin-bottom: 100px; }
+  .cal-dayh { display: flex; justify-content: space-between; align-items: center; gap: 8px; font-size: 13px; margin-bottom: 6px; }
+  .cal-dayh button { font: inherit; font-size: 12px; background: none; border: 1px solid var(--line-soft); border-radius: 6px; color: var(--ink-dim); padding: 2px 8px; cursor: pointer; }
+  .cal-day li .chip { font-size: 10.5px; font-weight: 700; padding: 1px 6px; border-radius: 4px; color: #fff; } .cal-day li .chip.sell { background: var(--sell); } .cal-day li .chip.buy { background: var(--buy); }
+  .cal-day li small { color: var(--ink-faint); width: 100%; }
+  @media (max-width: 560px) { .cal-d .ct { display: none; } .cal-d .cq { font-size: 9px; } }
   .cal-mk { font: inherit; font-size: 11px; color: var(--ink-dim); background: var(--panel, transparent); border: 1px solid var(--line-soft); border-radius: 6px; padding: 2px 4px; }
   .cal-d .cq { font-size: 10px; color: var(--ink-faint); } .cal-d .cq b { font-family: var(--mono); font-weight: 600; } .cal-d .cq b.pos { color: var(--buy); } .cal-d .cq b.neg { color: var(--sell); }
   .cal-d .cn { font-size: 11px; } .cal-d .cr { font-family: var(--mono); font-size: 13px; font-weight: 600; color: var(--ink); } .cal-d .ct { font-size: 10.5px; }
@@ -648,10 +658,11 @@
         <ul class="cal-day" id="ms-rep-list"></ul>
       </div>
       <div class="card c-cal">
-        <div class="ms-k"><span>Calendar · result by day (R, trades closed that day)</span><span class="c-tog"><span class="cal-nav"><button type="button" id="ms-cal-prev" aria-label="Previous month">‹</button><b id="ms-cal-m"></b><button type="button" id="ms-cal-next" aria-label="Next month">›</button></span><label class="c-mine"><input type="checkbox" id="ms-cal-sh"> Include shadow trades</label><label class="c-mine" title="Only our system: the live gold replica trades, plus its backtest replay (gold replica v4, NQ New York open) for the 2 months before it traded live"><input type="checkbox" id="ms-cal-rp" checked> Our system only (+ replay)</label><select id="ms-cal-mk" class="cal-mk" aria-label="Markets in the calendar"><option value="all">Gold + NQ</option><option value="xau">Gold only</option><option value="nq">NQ only</option></select></span></div>
+        <div class="ms-k"><span>Calendar · result by day (R, trades closed that day)</span><span class="c-tog"><span class="cal-nav"><button type="button" id="ms-cal-prev" aria-label="Previous month">‹</button><b id="ms-cal-m"></b><button type="button" id="ms-cal-next" aria-label="Next month">›</button></span><label class="c-mine"><input type="checkbox" id="ms-cal-sh"> Include shadow trades</label><label class="c-mine" title="Only our system: the live gold replica trades, plus its backtest replay (gold replica v4, NQ New York open) for the 2 months before it traded live"><input type="checkbox" id="ms-cal-rp" checked> Our system only (+ replay)</label></span></div>
+        <div class="cal-seg" role="group" aria-label="Markets in the calendar"><button type="button" data-mk="all" class="on" aria-pressed="true">Gold + NQ</button><button type="button" data-mk="xau" aria-pressed="false">Gold</button><button type="button" data-mk="nq" aria-pressed="false">NQ</button></div>
         <div class="cal" id="ms-cal"></div>
+        <div class="cal-dayw" id="ms-cal-dayw" hidden><div class="cal-dayh" id="ms-cal-dayh"></div><ul class="cal-day" id="ms-cal-day"></ul></div>
         <p class="ms-note" id="ms-cal-sum"></p>
-        <ul class="cal-day" id="ms-cal-day"></ul>
       </div>
       <div class="card c-score">
         <div class="ms-k">Scorecard · which setups and markets pay</div>
@@ -2499,12 +2510,12 @@ function msNextSetup(bars, A) {
     try { localStorage.setItem('msCouncilSeen', JSON.stringify(seen)); } catch (e) {}
   }
   // P&L calendar: the trades closed each local day, their total R and count; tap a day for its trades
-  const CAL = { y: null, m: null, sel: null };
+  const CAL = { y: null, m: null, sel: null, mk: 'all' };
   function renderCalendar() {
     const el = document.getElementById('ms-cal'); if (!el) return;
     const withSh = (document.getElementById('ms-cal-sh') || {}).checked;
     const withRp = (document.getElementById('ms-cal-rp') || {}).checked, rp = withRp ? ((COUNCIL.replay && COUNCIL.replay.trades) || []) : [];
-    const mkSel = (document.getElementById('ms-cal-mk') || {}).value || 'all';
+    const mkSel = CAL.mk || 'all';
     // forward NQ trades the Trader records on paper each New York session (research.json, k 'nq-open')
     const nqF = withRp ? (COUNCIL.research || []).filter((x) => x.k === 'nq-open' && ['win', 'loss', 'be'].includes(x.status) && x.closed && x.R != null).map((x) => ({ ...x, pair: 'M1', paper: true, forward: true })) : [];
     const done = (COUNCIL.trades || []).filter((x) => ['win', 'loss', 'be'].includes(x.status) && x.closed && x.R != null && (withSh || !x.shadow) && (!withRp || x.k === 'replica')).concat(rp, nqF)
@@ -2528,11 +2539,21 @@ function msNextSetup(bars, A) {
     const rpTxt = [['xau', 'gold replica (replay)'], ['nq', 'NQ open (paper, replay + forward)']].map(([mk, nm]) => { const a = rpM.filter((x) => x.market === mk); return a.length ? `${nm} ${fR(a.reduce((q, x) => q + x.R, 0))} over ${a.length}` : ''; }).filter(Boolean).join(', ');
     document.getElementById('ms-cal-sum').innerHTML = mN ? `Month: <b class="${mR >= 0 ? 'pos' : 'neg'}">${fR(mR)}</b> over ${mN} trades · ${up} green day${up === 1 ? '' : 's'}, ${dn} red · best day ${best.d} (${fR(best.R)}), worst day ${worst.d} (${fR(worst.R)}). ${withRp ? 'Our system only: live gold replica trades' : withSh ? 'Live and shadow trades' : 'Live trades'}${rpM.length ? `, plus the replay of our system (${(COUNCIL.replay && COUNCIL.replay.from) || ''} – ${(COUNCIL.replay && COUNCIL.replay.to) || ''}, backtest): ${rpTxt}` : ''}. 1R = the risk of one trade.` : `No closed ${withSh ? '' : 'live '}trades this month.`;
     const sel = CAL.sel && byDay.get(CAL.sel);
-    document.getElementById('ms-cal-day').innerHTML = sel ? sel.slice().sort((a, b) => a.closed - b.closed).map((x) => `<li data-tid="${esc(x.id)}" tabindex="0" title="Show this trade on a chart"><span>${ftime(x.closed + TZ)}</span><b>${esc(x.label)}</b><span>${esc(x.name)} ${esc(x.pair)} · ${x.side}${x.shadow ? ' · shadow' : ''}${x.replay ? ` · <i>replay${x.paper ? ', paper setup' : ''}</i>` : x.forward ? ' · <i>paper, live forward</i>' : ''}</span><b class="${x.R > 0 ? 'pos' : x.R < 0 ? 'neg' : ''}">${x.status === 'be' ? 'break-even' : fR(x.R)}</b></li>`).join('') : '';
+    const dw = document.getElementById('ms-cal-dayw');
+    if (dw) dw.hidden = !sel;
+    if (sel) {
+      const [yy, mm, dd] = CAL.sel.split('-').map(Number), tot = sel.reduce((a, x) => a + x.R, 0), w = sel.filter((x) => x.R > 0).length;
+      document.getElementById('ms-cal-dayh').innerHTML = `<b>${new Date(yy, mm, dd).toLocaleDateString(undefined, { weekday: 'short', day: 'numeric', month: 'short' })} · <span class="${tot > 0 ? 'pos' : tot < 0 ? 'neg' : ''}">${fR(tot)}</span> · ${sel.length} trade${sel.length > 1 ? 's' : ''}, ${w} won</b><button type="button" id="ms-cal-dayx" aria-label="Close the day">Close</button>`;
+    }
+    document.getElementById('ms-cal-day').innerHTML = sel ? sel.slice().sort((a, b) => a.opened - b.opened).map((x) => `<li data-tid="${esc(x.id)}" tabindex="0" title="Show this trade on a chart"><span>${ftime(x.opened + TZ)}</span><b>${esc(x.label)}</b><span class="chip ${x.side}">${x.side.toUpperCase()}</span><span>${esc(x.name)}</span><b class="${x.R > 0 ? 'pos' : x.R < 0 ? 'neg' : ''}">${x.status === 'be' ? 'break-even' : fR(x.R)}</b><small>Entry ${fmtI(x.entry, { dec: 2 })} · stop ${fmtI(x.stop, { dec: 2 })} · target ${fmtI(x.t1, { dec: 2 })} · closed ${ftime(x.closed + TZ)}${x.exit ? ` (${esc(x.exit)})` : ''}${x.shadow ? ' · shadow' : ''}${x.replay ? ` · replay${x.paper ? ', paper setup' : ''}` : x.forward ? ' · paper, live forward' : ''}</small></li>`).join('') : '';
   }
   ['ms-cal-prev', 'ms-cal-next'].forEach((id, i) => { const b = document.getElementById(id); if (b) b.addEventListener('click', () => { CAL.m += i ? 1 : -1; if (CAL.m < 0) { CAL.m = 11; CAL.y--; } if (CAL.m > 11) { CAL.m = 0; CAL.y++; } CAL.sel = null; renderCalendar(); }); });
-  ['ms-cal-sh', 'ms-cal-rp', 'ms-cal-mk'].forEach((id) => { const el = document.getElementById(id); if (el) el.addEventListener('change', renderCalendar); });
-  { const g = document.getElementById('ms-cal'); if (g) g.addEventListener('click', (ev) => { const d = ev.target.closest('[data-day]'); if (!d) return; CAL.sel = CAL.sel === d.dataset.day ? null : d.dataset.day; renderCalendar(); }); }
+  ['ms-cal-sh', 'ms-cal-rp'].forEach((id) => { const el = document.getElementById(id); if (el) el.addEventListener('change', renderCalendar); });
+  { const g = document.getElementById('ms-cal'); if (g) g.addEventListener('click', (ev) => { const d = ev.target.closest('[data-day]'); if (!d) return; CAL.sel = CAL.sel === d.dataset.day ? null : d.dataset.day; renderCalendar();
+      const dw = document.getElementById('ms-cal-dayw'); if (CAL.sel && dw && !dw.hidden) dw.scrollIntoView({ behavior: 'smooth', block: 'center' }); }); }
+  { const sg = document.querySelector('.cal-seg'); if (sg) sg.addEventListener('click', (ev) => { const b = ev.target.closest('[data-mk]'); if (!b) return; CAL.mk = b.dataset.mk; CAL.sel = null;
+      sg.querySelectorAll('[data-mk]').forEach((x) => { const on = x === b; x.classList.toggle('on', on); x.setAttribute('aria-pressed', String(on)); }); renderCalendar(); }); }
+  { const dw = document.getElementById('ms-cal-dayw'); if (dw) dw.addEventListener('click', (ev) => { if (ev.target.id === 'ms-cal-dayx') { CAL.sel = null; renderCalendar(); } }); }
   function renderReplica() {
     const C = COUNCIL, set = (id, html) => { const el = document.getElementById(id); if (el) el.innerHTML = html; };
     const L = (C.trades || []).filter((x) => x.k === 'replica').sort((a, b) => b.opened - a.opened);
