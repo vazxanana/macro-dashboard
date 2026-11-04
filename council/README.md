@@ -363,3 +363,15 @@ only) → limit at the broken M15 level, stop $0.30 past the M15 Origin, target 
 max 2 open. Exempt from the legacy retirement. Research (spot gold, engine events causal, limit with the trader's own
 "missed" rule): H4→H1→M15 2019-22 +7.5R / 104 (2R +11.5R), 2023-26 +15.1R / 114; H4→H1→M30 positive both periods (smaller);
 D1→H4→H1 flat; H1→M15→M5 −61R and H1→M30→M15 −16R (not used).
+
+**Weekly structure filter (4 Nov, late; user rule `mosha-bo-weekly`).** From Mosha's multi-timeframe slides (father / mother /
+son). The system now trades only in the direction of the weekly structure, and the M15 BO no longer has to flip M15 structure.
+Weekly = Monday-aligned weeks built from the last 720 days of spot gold daily candles (CNBC `XAU=`), swing size 3, the
+direction of the last weekly BO on a closed week (`snapshot.goldW1`, source in `snapshot.goldW1Src`). PAXG daily candles are
+the fallback only: PAXG's premium over spot drifts over months, so its weekly swings break elsewhere (3 Nov: spot closed the
+week of 26 Oct through the weekly low at 3,886, PAXG did not), while CNBC matched the HistData spot weeks in 95 of 95 weeks
+since January 2025. Research (spot 2019-26, H4→H1→M15, limit at the broken level, 3R, weekly read from the same 720-day
+window): weekly agrees 2019-22 +32.2R / 87 (+0.37R a trade), 2023-26 +34.2R / 99 (+0.35R), 7 of 8 years positive, worst
+drawdown −18.4R; weekly against −28.3R / −15.8R; old flip-only rule +7.5R / +15.1R. Daily-trend agreement points the same
+way (+0.20R / +0.19R). Caveat: the weekly filter did not help the other chains (H4→H1→M30, H1→M15→M5, …), and swing size 3
+on the same chain lost, so this is one good cell in a grid. The kill switch watches it.
