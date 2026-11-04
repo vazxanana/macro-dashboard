@@ -319,3 +319,15 @@ even with a true +0.2R edge).
 - DXY (HistData UDXUSD 1m, pre-registered): base v5 −0.070R/trade; veto (dollar >0.05%/60 min against) −0.081; confirmation only −0.083; confirmation in inverse regime (corr60 ≤ −0.3) −0.069. Fewer trades, same per-trade loss: no edge from DXY.
 - Guide: v5 in London open/overlap windows −0.032R vs −0.089R outside (6/8 years still negative). Asian-range sweep at London open: reversal −0.30R/trade (t −7.7, 7/8 years negative); flipped continuation −0.18R at 1R–3R. Tight sweep stops vs 0.30 spread: no edge either way.
 - Gold conclusion: no robust intraday gold setup found on 8 years of spot data; only 2026 is positive for the replica.
+
+## 4 Nov (evening): NY open run on other indices + news days; gold volatility gate
+
+- **S&P 500 (HistData SPXUSD 1m, 2018-Oct 2026)**, the NQ rule with thresholds as % of price (15 NQ pts ≈ 0.08%):
+  all 962 trades −17.8R; NDO-ahead 506 trades −2.1R (−0.004R). **No edge on the S&P: ES not added.**
+- **Nasdaq 100 cash (HistData NSXUSD 1m, 2018-Oct 2026)**, same rule: NDO-ahead 710 trades +84.3R (+0.12R, t 2.34);
+  2023-2026 +76.9R (matches the futures file), but **2018-2022 (never seen before) +7.3R over ~380 trades, ~0.02R a trade**
+  (2020 −3.8, 2021 −3.0). The edge is NQ-specific and much stronger since 2023; plan on +0.1-0.2R a trade, not +0.3R.
+- **News days (NQ futures file)**: 08:30 release mornings and overnight-range splits flip sign between samples: no filter.
+  FOMC days 7 live-rule trades −4.9R: too few to act on.
+- **Gold replica by volatility (8 years spot)**: per-trade R rises with the 20-day avg daily range. Gate at 1.5% with the risk
+  rules: 2019-2025 +18.9R (vs −312.5R ungated), 2026 +43.2R. Applied as user rule gold-vol-gate (PR #195).
