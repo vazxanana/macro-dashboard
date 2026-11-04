@@ -365,3 +365,12 @@ Both datasets, live rule (NDO ahead). Futures file Dec 2022 - Dec 2025 (237 trad
 - Depth as a share of the 20-day average RTH range (0.04-0.10): futures +24.8 to +36.9 (all below the fixed 15 points);
   cash 0.08-0.10 +84-92R. Inconsistent: not adopted.
 **No change: the live NQ rule is the best or tied on the futures file in every test.**
+
+## 4 Nov (night): gold — where the gated edge lives, and a gold kill switch
+
+Gated v5 with exit v2 (trail +2R/2R), per trade, 2019-22 | 2023-26: all +0.110 | +0.112. Consistent in both halves:
+Asia 22-07 UTC +0.25 | +0.21 (NY 13-22 UTC −0.12 | +0.08); leg ≥ 4 ATR +0.29 | +0.28; ★ +0.14 | +0.14 vs H1-clear-only
++0.09 | +0.08; vol ≥ 2% +0.14 | +0.33 vs 1.5-2% +0.09 | −0.07. With risk rules none of the filters beats the live set on
+total (live +44.8 | +87.4, max DD −38.5R; skip NY +42.6 | +74.5, DD −33.3; leg ≥ 4 ATR +13.8 | +58.2, DD −20.6): no change.
+Gold kill switch set from the gated distribution (865 trades, +0.153R, SD 1.77R; 20,000 resamples): 5th percentile
+−10.3R at 30 trades, −11.9R at 50, drawdown −19.7R within 60 trades → alert at −10.5R / −12R / −20R drawdown.
