@@ -498,3 +498,32 @@ recorded (weekly "Father" direction, daily direction, M15 flip, first BO back, v
   agrees + an M15 BO confirming off it, 3R: +0.06R / +0.11R a trade, +22.4R over 271 trades. Too thin to trade; not added.
 - **Replica (gold v5) + weekly filter:** inconsistent (gated, weekly agrees +0.03R / +0.21R; against +0.19R / +0.06R),
   so the replica stays as it is.
+
+## 4 Nov (late): out-of-sample check of the Mosha BO system + another pass over the Private Room Notes PDF
+
+**Out of sample (same rule, other markets, HistData 1m 2019-26, spread/stop buffer sized per market).** H4→H1→M15, swing 6,
+weekly agrees, limit at the broken level, 3R — 2019-22 / 2023-26:
+gold +32.2R / +27.3R (in sample) · silver −48.9R / +22.8R · EUR/USD −29.7R / −14.2R · GBP/USD −29.7R / +4.7R ·
+USD/JPY −1.5R / −56.9R · Nasdaq +14.7R / −16.5R · S&P −45.8R / −19.3R. **0 of 6 other markets hold**; outside gold
+about −220R over ~1,430 trades. Without the weekly filter the system is also negative everywhere but gold.
+Placebo on gold (weekly direction shifted 26-350 weeks, 400 shifts): 3.3% of shifts beat +59.4R total, 2.0% beat it in
+both halves — significant for that one cell alone, not after picking it from ~80 cells, and contradicted by the six markets.
+**Verdict: the gold result is most likely luck.** The system stays on paper as a forward test with an expectation near 0.
+
+**Private Room Notes PDF, rules not tested before (gold, H4→H1→M15, weekly agrees):**
+- "50% of the range at least" as a retracement filter: depth ≥ 0.5 +0.15R / +0.34R vs < 0.5 +0.77R / +0.22R — flips.
+- "QM > BO normal (for VR and CF)": the opposite held — M15 CF continuation +0.50R / +0.48R vs flip +0.26R / +0.11R;
+  H1 VR continuation +0.62R / +0.44R vs VR flip +0.12R / −0.02R. But the VR effect appears only in this cell (other gold
+  chains, Nasdaq, S&P: mixed or reversed), so it is noise.
+- Janda (BO structure → the next BO the same way → pullback): +0.38R / +0.37R (45 trades), no better than the base.
+- Sessions: no consistent pattern. Exits: 3R ≈ leg-extreme target > trail ≈ 2R. Market entry +0.46R / +0.19R.
+- **Barrier formula** (zone TF → confirmation TF: D→H1, H4→M15, H1→M5; zone = lower half of the last zone-TF BO leg;
+  Simple CF = confirmation-TF flip starting in the zone; Janda = the next continuation BO): negative or flat in 30 of 36
+  cells; best H4→M15 Janda + weekly +10.2R over 26 trades (noise-sized).
+- **"50% of the range" structure engine** (a pullback counts as a swing only if it retraces half the leg; strict version is
+  scale-free and gives ~1 event a year on every timeframe, so the range was limited to the last 48 candles): BO system on it
+  across gold, silver, EUR/USD, Nasdaq, S&P x 4 chains: results scatter around 0, signs flip between halves; no edge.
+
+**Where an edge could still be:** the discretionary part (why a setup is skipped, "why failed?") is not in any mechanical
+rule tested. The direct test is Mosha's own call record: with 50-100 of his Private Room calls (time, entry, stop, target),
+his real hit rate can be measured and compared with what the engine flags at the same moments.
