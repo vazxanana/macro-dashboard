@@ -14,10 +14,18 @@ jobs:
         with: { ref: council-data, path: data }
       - name: Probe NQ feeds
         run: |
-          mkdir -p data/research/probe
-          curl -sS -A "Mozilla/5.0" -m 30 -o data/research/probe/cnbc-nd-20261104.json "https://ts-api.cnbc.com/harmony/app/bars/@ND.1/1M/20261103160000/20261104120000/adjusted/EST5EDT.json"
-          ls -la data/research/probe
+          mkdir -p data/research/probe/cnbc
+          curl -sS -A "Mozilla/5.0" -m 60 -o data/research/probe/cnbc/nd-20260601.json "https://ts-api.cnbc.com/harmony/app/bars/@ND.1/1M/20260601000000/20260615000000/adjusted/EST5EDT.json" || true
+          curl -sS -A "Mozilla/5.0" -m 60 -o data/research/probe/cnbc/nd-20260801.json "https://ts-api.cnbc.com/harmony/app/bars/@ND.1/1M/20260801000000/20260815000000/adjusted/EST5EDT.json" || true
+          curl -sS -A "Mozilla/5.0" -m 60 -o data/research/probe/cnbc/nd-20260901.json "https://ts-api.cnbc.com/harmony/app/bars/@ND.1/1M/20260901000000/20260915000000/adjusted/EST5EDT.json" || true
+          curl -sS -A "Mozilla/5.0" -m 60 -o data/research/probe/cnbc/nd-20260915.json "https://ts-api.cnbc.com/harmony/app/bars/@ND.1/1M/20260915000000/20261001000000/adjusted/EST5EDT.json" || true
+          curl -sS -A "Mozilla/5.0" -m 60 -o data/research/probe/cnbc/nd-20261001.json "https://ts-api.cnbc.com/harmony/app/bars/@ND.1/1M/20261001000000/20261015000000/adjusted/EST5EDT.json" || true
+          curl -sS -A "Mozilla/5.0" -m 60 -o data/research/probe/cnbc/nd-20260815.json "https://ts-api.cnbc.com/harmony/app/bars/@ND.1/1M/20260815000000/20260901000000/adjusted/EST5EDT.json" || true
+          curl -sS -A "Mozilla/5.0" -m 60 -o data/research/probe/cnbc/nd-20260701.json "https://ts-api.cnbc.com/harmony/app/bars/@ND.1/1M/20260701000000/20260715000000/adjusted/EST5EDT.json" || true
+          curl -sS -A "Mozilla/5.0" -m 60 -o data/research/probe/cnbc/nd-20260715.json "https://ts-api.cnbc.com/harmony/app/bars/@ND.1/1M/20260715000000/20260801000000/adjusted/EST5EDT.json" || true
+          curl -sS -A "Mozilla/5.0" -m 60 -o data/research/probe/cnbc/nd-20260615.json "https://ts-api.cnbc.com/harmony/app/bars/@ND.1/1M/20260615000000/20260701000000/adjusted/EST5EDT.json" || true
+          ls -la data/research/probe/cnbc; gzip -9 data/research/probe/cnbc/*.json
           git -C data config user.name "mosha-council"
           git -C data config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git -C data add research/probe && git -C data commit -qm "Probe: CNBC ND 1m 4 Nov $(date -u +%H:%MZ)" || exit 0
+          git -C data add research/probe && git -C data commit -qm "Probe: CNBC ND 1m history $(date -u +%H:%MZ)" || exit 0
           for j in 1 2 3 4 5; do git -C data pull -q --rebase origin council-data && git -C data push -q origin HEAD:council-data && break; sleep 5; done
