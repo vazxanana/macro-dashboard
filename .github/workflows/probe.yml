@@ -1,5 +1,5 @@
 name: Council data probe
-# RESEARCH ONLY: spot gold daily candles from keyless sources (for the weekly structure of the Mosha BO system).
+# RESEARCH ONLY: 1-minute history from HistData.com for out-of-sample tests of the Mosha BO system (other markets).
 on:
   push:
     branches: [council-probe]
@@ -8,26 +8,22 @@ permissions:
 jobs:
   probe:
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 45
+    strategy:
+      fail-fast: false
+      max-parallel: 2
+      matrix:
+        pair: [XAGUSD, EURUSD, GBPUSD, USDJPY]
     steps:
       - uses: actions/checkout@v4
       - uses: actions/checkout@v4
         with: { ref: council-data, path: data }
-      - name: Spot gold daily candles
+      - name: HistData 1m ${{ matrix.pair }}
         run: |
-          D=data/research/probe/spotd; mkdir -p $D
-          UA="Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36"
-          now=$(TZ=America/New_York date +%Y%m%d%H%M%S)
-          curl -sS -A "$UA" -m 60 -o $D/cnbc-xau-1d.json "https://ts-api.cnbc.com/harmony/app/bars/XAU=/1D/20240101000000/$now/adjusted/EST5EDT.json" || true
-          curl -sS -A "$UA" -m 60 -o $D/cnbc-gc-1d.json "https://ts-api.cnbc.com/harmony/app/bars/%40GC.1/1D/20240101000000/$now/adjusted/EST5EDT.json" || true
-          curl -sS -A "$UA" -m 60 -o $D/stooq-xau.csv "https://stooq.com/q/d/l/?s=xauusd&i=d" || true
-          curl -sS -A "$UA" -m 60 -o $D/yahoo-gc.json "https://query1.finance.yahoo.com/v8/finance/chart/GC%3DF?interval=1d&range=5y" || true
-          curl -sS -A "$UA" -m 60 -o $D/yahoo-xau.json "https://query1.finance.yahoo.com/v8/finance/chart/XAUUSD%3DX?interval=1d&range=5y" || true
-          curl -sS -A "$UA" -m 60 -o $D/kraken-paxg-1w.json "https://api.kraken.com/0/public/OHLC?pair=PAXGUSD&interval=10080" || true
-          echo "fetched at $(date -u +%FT%TZ)" > $D/when.txt
-          ls -la $D; for f in $D/*; do echo "== $f"; head -c 400 $f; echo; done
-          gzip -9f $D/*.json $D/*.csv || true
+          D=data/research/candles/${{ matrix.pair }}; mkdir -p $D
+          python3 tools/histdata.py $D ${{ matrix.pair }} || true
+          ls -la $D
           git -C data config user.name "mosha-council"
           git -C data config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git -C data add research/probe && git -C data commit -qm "Probe: spot gold daily candles $(date -u +%H:%MZ)" || exit 0
-          for j in 1 2 3 4 5; do git -C data pull -q --rebase origin council-data && git -C data push -q origin HEAD:council-data && break; sleep 5; done
+          git -C data add research/candles && git -C data commit -qm "Probe: HistData 1m ${{ matrix.pair }}" || exit 0
+          for j in 1 2 3 4 5 6 7 8; do git -C data pull -q --rebase origin council-data && git -C data push -q origin HEAD:council-data && break; sleep $((5*j)); done
