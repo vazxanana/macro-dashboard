@@ -1000,6 +1000,9 @@ let nqLast = null;
 // 09:25 ET, the first 1-minute close back inside after a sweep of that low (high) is a buy (sell); stop 2 points past the
 // extreme, target 2R, out at 11:00 ET. History (4 Nov): no reliable edge yet (5-minute, 44 days: +0.21R a trade at 2R, t 0.9;
 // 1-minute, 17 days: too few): paper only, to build a forward record.
+// v2 (4 Nov, the trader: "today's trade was a buy"): buys only, a sweep of the London LOW. 5-minute history at 2R: buys
+// +0.47R a trade over 27 (both halves positive, t 1.6), sells −0.20R over 22; NQ drifts up, so swept lows pay and swept
+// highs don't. The 1-minute history agrees (buys +0.22R over 12). Records: nq-london-<day>-b.
 function nqLondonSignal(bars, today) {
   const B = bars.map((b) => ({ ...b, ...nyParts(b.time) })), L = B.filter((b) => b.d === today && b.m >= 120 && b.m < 300);
   if (L.length < 30) return null;
@@ -1009,7 +1012,6 @@ function nqLondonSignal(bars, today) {
     eH = Math.max(eH, b.high); eL = Math.min(eL, b.low);
     if (b.high > H) swH = true; if (b.low < Lo) swL = true;
     if (swL && b.close > Lo && b.close > b.open) return { sell: false, level: 'LNL', lv: Lo, ext: eL, stop: eL - 2, t: b.time, m: b.m, entry: b.close, L: { LNH: H, LNL: Lo } };
-    if (swH && b.close < H && b.close < b.open) return { sell: true, level: 'LNH', lv: H, ext: eH, stop: eH + 2, t: b.time, m: b.m, entry: b.close, L: { LNH: H, LNL: Lo } };
   }
   return null;
 }
@@ -1041,11 +1043,11 @@ try {
           note: `Research (paper only): NQ swept the ${g.level} ${g.lv.toFixed(2)} after the New York open (extreme ${g.ext.toFixed(2)}) and closed back inside; ${g.sell ? 'sell' : 'buy'} ${g.entry.toFixed(2)}, stop ${g.stop.toFixed(2)}, target 1.2R ${t1.toFixed(2)}, out at 16:00.` });
       }
     }
-    if (!['Sat', 'Sun'].includes(ny.wd) && ny.m >= 301 && ny.m < 660 && !research.some((x) => x.id === `nq-london-${ny.d}`)) {   // the day's first signal, recorded until its 11:00 ET exit (feed lag, outages)
+    if (!['Sat', 'Sun'].includes(ny.wd) && ny.m >= 301 && ny.m < 660 && !research.some((x) => x.id === `nq-london-${ny.d}-b`)) {   // the day's first signal, recorded until its 11:00 ET exit (feed lag, outages)
       const g = nqLondonSignal(bars, ny.d);
       if (g) {
         const r0 = Math.abs(g.entry - g.stop), t1 = g.entry + (g.sell ? -2 : 2) * r0;
-        research.push({ id: `nq-london-${ny.d}`, market: 'nq', label: 'NQ', dec: 2, k: 'nq-open', session: 'london', name: 'NQ London sweep before NY', day: ny.d, side: g.sell ? 'sell' : 'buy',
+        research.push({ id: `nq-london-${ny.d}-b`, market: 'nq', label: 'NQ', dec: 2, k: 'nq-open', session: 'london', name: 'NQ London low sweep (buy)', v: 2, day: ny.d, side: g.sell ? 'sell' : 'buy',
           entry: +g.entry.toFixed(2), stop: +g.stop.toFixed(2), t1: +t1.toFixed(2), rr: 2, opened: g.t + 60, filled: g.t + 60, checked: g.t + 60, status: 'open', R: null, exitAt: g.t + (660 - g.m) * 60, exitLabel: '11:00 ET',
           seenAt: now, entrySeen: bars.length ? +bars.at(-1).close.toFixed(2) : null, level: g.level, levelPrice: +g.lv.toFixed(2), ext: +g.ext.toFixed(2), levels: Object.fromEntries(Object.entries(g.L).map(([k, v]) => [k, +v.toFixed(2)])),
           note: `Research (paper only): NQ swept the London ${g.sell ? 'high' : 'low'} ${g.lv.toFixed(2)} before New York (extreme ${g.ext.toFixed(2)}) and closed back inside; ${g.sell ? 'sell' : 'buy'} ${g.entry.toFixed(2)}, stop ${g.stop.toFixed(2)}, target 2R ${t1.toFixed(2)}, out at 11:00 ET.` });
