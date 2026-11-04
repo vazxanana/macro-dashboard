@@ -201,6 +201,14 @@ day, in research.json (`k: 'nq-open'`, `session: 'tokyo' | 'shanghai'`), totals 
 History: Tokyo −0.19R a trade on 50 days of 5-minute candles, +0.29R on the last 21 days of 1-minute; Shanghai about break-even
 to negative; 2-month replay Tokyo −1.35R over 25, Shanghai −0.73R over 20. Paper only until the forward record pays.
 
+## Gold replica v5: only against the H4 trend (4 Nov)
+
+Live replica trades now also need the H4 trend (Mosha N=6) to run against the trade; v4-passing signals with the H4 trend stay
+in research.json (`v5: false`, `h4`). Year replay with the Trader's own code on Binance PAXG 1m (1 Jan – 3 Nov): v4 +81.5R over
+1,020 trades with January–May −11.2R; v5 +74.8R over 500 with January–May +26.2R, 9 of 11 months positive, worst drawdown −23.6R
+(v4 −29.9R). The H4 split was logged as a candidate on June–November data before January–May was downloaded, so those months are
+its out-of-sample test. October was v5's bad month (−19.3R).
+
 ## Gold replica live (3 Nov, 22:00)
 
 User rule `replica-live` (`config.replicaLive = ['xau']`, take-all off): gold trades the replica live. Every passing v4

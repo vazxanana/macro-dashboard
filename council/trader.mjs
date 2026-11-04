@@ -400,16 +400,20 @@ for (const [key, M] of Object.entries(MARKETS)) {
         // v3: pass = clear of H1 Origins or the platform's ★ engulfing at the extreme; star = the ★ engulfing alone
         // v4: and a stop of at least one M15 ATR (tighter stops sit inside M15 noise: −0.04R / −0.13R a trade on the replay)
         const riskAtr = r0 / g.atr, pass = (h1clear || g.star) && riskAtr >= 1, t1 = entry + (g.sell ? -2 : 2) * r0;
+        // v5 (4 Nov): live only against the H4 trend (Mosha N=6). Year replay with this code: v4 +81.5R over 1,020 trades (Jan-May
+        // −11.2R), v5 +74.8R over 500 (Jan-May +26.2R), 9 of 11 months positive, max drawdown −23.6R vs −29.9R. The H4 split was
+        // logged as a candidate on Jun-Nov data before Jan-May existed, so Jan-May is its out-of-sample test.
+        const h4 = src['4h'].A.trend === (g.sell ? 1 : -1) ? 'against' : src['4h'].A.trend === (g.sell ? -1 : 1) ? 'with' : 'none', v5 = pass && h4 === 'against';
         research.push({ id: `${key}-replica-${now}-${g.sell ? 's' : 'b'}`, sig, market: key, label: M.label, dec: M.dec, k: 'replica', name: 'Gold replica', side: g.sell ? 'sell' : 'buy',
-          entry: +entry.toFixed(2), stop: +stop.toFixed(2), t1: +t1.toFixed(2), rr: 2, opened: now, filled: now, checked: now, status: 'open', R: null, v: 4,
-          pass, h1clear, eg: g.eg, peg: g.peg, star: g.star, riskAtr: +riskAtr.toFixed(2), legStart: +g.start.toFixed(2), leg: g.L === 36 ? '3h' : '6h', ext: +g.ext.toFixed(2), chochLevel: +g.lvl.toFixed(2), d1: src['1d'].A.trend === (g.sell ? -1 : 1) ? 'with' : 'against', session: sessionOf(now),
-          note: `Research (paper only): gold replica v4${pass ? '' : riskAtr < 1 ? ' (filter fails: stop under one M15 ATR)' : ' (filter fails: inside a live H1 Origin, no ★ engulfing)'}. ${g.L === 36 ? '3 h' : '6 h'} leg to ${g.ext.toFixed(2)}, M5 CHoCH through ${g.lvl.toFixed(2)}${g.star ? ', ★ engulfing at structure at the extreme' : g.peg ? ', engulfing at the extreme (not at a level)' : ''}${h1clear ? ', clear of H1 Origins' : ''}; ${g.sell ? 'sell' : 'buy'} ${entry.toFixed(2)}, stop ${stop.toFixed(2)}, target 2R ${t1.toFixed(2)}.` });
+          entry: +entry.toFixed(2), stop: +stop.toFixed(2), t1: +t1.toFixed(2), rr: 2, opened: now, filled: now, checked: now, status: 'open', R: null, v: 5,
+          pass, v5, h4, h1clear, eg: g.eg, peg: g.peg, star: g.star, riskAtr: +riskAtr.toFixed(2), legStart: +g.start.toFixed(2), leg: g.L === 36 ? '3h' : '6h', ext: +g.ext.toFixed(2), chochLevel: +g.lvl.toFixed(2), d1: src['1d'].A.trend === (g.sell ? -1 : 1) ? 'with' : 'against', session: sessionOf(now),
+          note: `Research (paper only): gold replica v5${!pass ? '' : h4 !== 'against' ? ' (v4 passes; v5 skips it: H4 trend not against the trade)' : ''}${pass ? '' : riskAtr < 1 ? ' (filter fails: stop under one M15 ATR)' : ' (filter fails: inside a live H1 Origin, no ★ engulfing)'}. ${g.L === 36 ? '3 h' : '6 h'} leg to ${g.ext.toFixed(2)}, M5 CHoCH through ${g.lvl.toFixed(2)}${g.star ? ', ★ engulfing at structure at the extreme' : g.peg ? ', engulfing at the extreme (not at a level)' : ''}${h1clear ? ', clear of H1 Origins' : ''}; ${g.sell ? 'sell' : 'buy'} ${entry.toFixed(2)}, stop ${stop.toFixed(2)}, target 2R ${t1.toFixed(2)}.` });
         // live (config.replicaLive): every passing signal also trades on the live book, as on the replay (no slot limit),
         // at market, 2R target, out after 48 h, no break-even move
-        if (pass && (config.replicaLive || []).includes(key)) trades.push({ id: `${key}-replica-${now}-${g.sell ? 's' : 'b'}`, market: key, label: M.label, dec: M.dec, k: 'replica', name: 'Replica', pair: 'M5 CHoCH', h: '5m', side: g.sell ? 'sell' : 'buy',
+        if (v5 && (config.replicaLive || []).includes(key)) trades.push({ id: `${key}-replica-${now}-${g.sell ? 's' : 'b'}`, market: key, label: M.label, dec: M.dec, k: 'replica', name: 'Replica', pair: 'M5 CHoCH', h: '5m', side: g.sell ? 'sell' : 'buy',
           entry: +entry.toFixed(2), stop: +stop.toFixed(2), t1: +t1.toFixed(2), rr: 2, buf: CFG.buf, opened: now, filled: now, checked: now, status: 'open', R: null, r0: Math.abs(+entry.toFixed(2) - +stop.toFixed(2)), maxHold: 48 * 3600, noBe: true, entryMode: 'market',
-          feat: { d1: src['1d'].A.trend === (g.sell ? -1 : 1) ? 'with' : 'against', session: sessionOf(now), star: g.star, h1clear, riskAtr: +riskAtr.toFixed(2), leg: g.L === 36 ? '3h' : '6h' }, shadow: false, blockedBy: [],
-          note: `Gold replica (v4): ${g.L === 36 ? '3 h' : '6 h'} leg to ${g.ext.toFixed(2)}, M5 CHoCH through ${g.lvl.toFixed(2)}${g.star ? ', ★ engulfing at structure at the extreme' : g.peg ? ', engulfing at the extreme' : ''}${h1clear ? ', clear of H1 Origins' : ''}. ${g.sell ? 'Sell' : 'Buy'} at market, stop past the extreme, target 2R, out after 48 h.` });
+          feat: { d1: src['1d'].A.trend === (g.sell ? -1 : 1) ? 'with' : 'against', h4, session: sessionOf(now), star: g.star, h1clear, riskAtr: +riskAtr.toFixed(2), leg: g.L === 36 ? '3h' : '6h' }, shadow: false, blockedBy: [],
+          note: `Gold replica (v5, against the H4 trend): ${g.L === 36 ? '3 h' : '6 h'} leg to ${g.ext.toFixed(2)}, M5 CHoCH through ${g.lvl.toFixed(2)}${g.star ? ', ★ engulfing at structure at the extreme' : g.peg ? ', engulfing at the extreme' : ''}${h1clear ? ', clear of H1 Origins' : ''}. ${g.sell ? 'Sell' : 'Buy'} at market, stop past the extreme, target 2R, out after 48 h.` });
       }
     }
     for (const r of research.filter((x) => x.market === key && x.k !== 'replica' && x.status === 'open')) {
@@ -972,7 +976,7 @@ try {
   snapshot.research = { cycle: { closed: done.length, wins: done.filter((x) => x.status === 'win').length, R: +R.toFixed(2), open: research.filter((x) => x.k === 'cycle' && x.status === 'open').length } };
   const rp = research.filter((x) => x.k === 'replica'), sum = (a) => { const d = a.filter((x) => x.status === 'win' || x.status === 'loss' || x.status === 'be');
     return { signals: a.length, closed: d.length, wins: d.filter((x) => x.status === 'win').length, R: +d.reduce((s, x) => s + x.R, 0).toFixed(2), open: a.filter((x) => x.status === 'open').length, pending: a.filter((x) => x.status === 'pending').length }; };
-  snapshot.research.replica = { all: sum(rp), pass: sum(rp.filter((x) => x.pass && x.v >= 2)), star: sum(rp.filter((x) => x.star)) };
+  snapshot.research.replica = { all: sum(rp), pass: sum(rp.filter((x) => x.pass && x.v >= 2)), v5: sum(rp.filter((x) => x.v5)), star: sum(rp.filter((x) => x.star)) };
   snapshot.research.nq = sum(research.filter((x) => x.k === 'nq-open'));
   for (const sid of ['ny', 'tokyo', 'shanghai']) snapshot.research['nq_' + sid] = sum(research.filter((x) => x.k === 'nq-open' && (x.session || 'ny') === sid)); }
 wr('research.json', research);

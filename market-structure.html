@@ -653,7 +653,7 @@
       </div>
       <div class="card c-rep">
         <div class="ms-k"><span>Gold replica · the live gold setup (your M5 CHoCH turns)</span></div>
-        <p class="ms-note">A leg of 2+ M15 ATRs in 3 h or 6 h, then an M5 CHoCH; taken when clear of live H1 Origins or with a ★ engulfing at the extreme, and a stop of at least one M15 ATR. Market entry, stop past the extreme, 2R, out after 48 h. The M5 gold chart marks every signal of the last 24 h.</p>
+        <p class="ms-note">A leg of 2+ M15 ATRs in 3 h or 6 h, then an M5 CHoCH; taken when clear of live H1 Origins or with a ★ engulfing at the extreme, with a stop of at least one M15 ATR, and (v5, 4 Nov) only against the H4 trend. Market entry, stop past the extreme, 2R, out after 48 h. The M5 gold chart marks every signal of the last 24 h.</p>
         <div class="c-kpi" id="ms-rep-kpi"></div>
         <p class="ms-note" id="ms-rep-paper"></p>
         <ul class="cal-day" id="ms-rep-list"></ul>
@@ -1161,7 +1161,8 @@ function msNextSetup(bars, A) {
   // ─── Gold replica (the Council's live gold setup, rebuilt from the trader's marked trades) ───
   // Same rules as council/trader.mjs replicaSignals: a leg of at least 2 M15 ATRs in the last 3 h or 6 h, then an M5 close
   // back through the last 1-candle swing against it (the CHoCH). Pass = clear of live H1 Origins or a ★ engulfing at the
-  // extreme (the platform's engulfing at PDH/PDL, the Asia high/low or a $50/$100 level), and a stop of at least one M15 ATR.
+  // extreme (the platform's engulfing at PDH/PDL, the Asia high/low or a $50/$100 level), a stop of at least one M15 ATR, and (v5)
+  // against the H4 trend.
   // Trade: market at the CHoCH, stop just past the extreme, target 2R, out after 48 h.
   function repEngulfs(bars, bull) {
     const out = [], body = bars.map((c) => Math.abs(c.close - c.open));
@@ -1231,7 +1232,8 @@ function msNextSetup(bars, A) {
         const iF = j - 1, entry = R5[iF].close, buf = Math.max(0.1 * g.atr, 0.3), stop = g.sell ? g.ext + buf : g.ext - buf, r0 = Math.abs(entry - stop);
         if (!(r0 > 0) || (g.sell ? entry >= stop : entry <= stop)) continue;
         let h1clear = true; try { const A = msAnalyze(R1.filter((b) => b.time <= tEnd), 6); h1clear = !A.events.some((e) => e.endIdx == null && e.top > e.bot && entry <= e.top && entry >= e.bot); } catch (e) {}
-        const riskAtr = r0 / g.atr, pass = (h1clear || g.star) && riskAtr >= 1, t1 = entry + (g.sell ? -2 : 2) * r0;
+        let h4t = 0; try { const p4 = panes['4h']; if (p4 && p4.raw) h4t = msAnalyze(sp(p4.raw.filter((b) => b.time + 14400 <= tEnd)), 6).trend; } catch (e) {}
+        const riskAtr = r0 / g.atr, v4 = (h1clear || g.star) && riskAtr >= 1, h4against = h4t === (g.sell ? 1 : -1), pass = v4 && h4against, t1 = entry + (g.sell ? -2 : 2) * r0;
         let res = null, iX = null;
         for (let k = iF + 1; k < R5.length; k++) {
           const b = R5[k];
@@ -1239,7 +1241,7 @@ function msNextSetup(bars, A) {
           if (g.sell ? b.low <= t1 : b.high >= t1) { res = 2; iX = k; break; }
           if (b.time >= R5[iF].time + 48 * 3600) { res = +((g.sell ? entry - b.close : b.close - entry) / r0).toFixed(2); iX = k; break; }
         }
-        sigs.push({ ...g, iF, entry, stop, t1, r0, riskAtr, h1clear, pass, res, iX, t: tEnd });
+        sigs.push({ ...g, iF, entry, stop, t1, r0, riskAtr, h1clear, v4, pass, res, iX, t: tEnd });
       }
     }
     REP.key = key; REP.sigs = sigs;
@@ -1266,7 +1268,7 @@ function msNextSetup(bars, A) {
       const l1 = s.iF + 1, l2 = s.iX != null ? s.iX + 1 : Math.min(n + 12, l1 + 40);
       items.boxes.push({ l1, l2, lo: Math.min(entry, t1), hi: Math.max(entry, t1), fill: `rgba(8,153,129,${0.16 * fade})`, stroke: `rgba(6,122,103,${0.7 * fade})` });
       items.boxes.push({ l1, l2, lo: Math.min(entry, stop), hi: Math.max(entry, stop), fill: `rgba(242,54,69,${0.16 * fade})`, stroke: `rgba(178,40,51,${0.7 * fade})` });
-      const tag = s.pass ? (real ? 'live' : 'passes') : (s.riskAtr < 1 ? 'filtered: stop < 1 ATR' : 'filtered: inside H1 Origin');
+      const tag = s.pass ? (real ? 'live' : 'passes') : s.v4 ? 'filtered: not against H4' : (s.riskAtr < 1 ? 'filtered: stop < 1 ATR' : 'filtered: inside H1 Origin');
       if (lastOne || s.pass) items.labels.push({ l: l1 + 1, dx: 2, p: t1, dy: sell ? 15 : -6, text: `Replica ${sell ? 'SELL' : 'BUY'} ${fmt(entry)} · ${tag}`, color: s.pass ? col : '#8a94a8' });
       if (s.res != null) items.labels.push({ l: s.iX, p: s.res > 0 ? t1 : s.res === -1 ? stop : entry, dy: (s.res > 0) === sell ? 15 : -6, align: 'center', text: s.res === 2 ? '✓ +2R' : s.res === -1 ? '✗ −1R' : `${s.res > 0 ? '+' : ''}${s.res}R (48 h)`, color: s.res > 0 ? '#089981' : '#f23645' });
       if (lastOne) P5pv.push(entry, stop, t1);
@@ -2562,7 +2564,7 @@ function msNextSetup(bars, A) {
     const fR = (v) => `${v > 0 ? '+' : v < 0 ? '−' : ''}${Math.abs(v).toFixed(2)}R`;
     set('ms-rep-kpi', `<div><span>Live trades</span><b>${L.length}${L.length - done.length ? ` <small>(${L.length - done.length} open)</small>` : ''}</b></div><div><span>Win rate</span><b>${done.length ? Math.round(w / done.length * 100) + '%' : '—'}</b></div><div><span>Total</span><b class="${R > 0 ? 'pos' : R < 0 ? 'neg' : ''}">${done.length ? fR(R) : '—'}</b></div><div><span>Per trade</span><b>${done.length ? fR(R / done.length) : '—'}</b></div>`);
     const rp = C.snap && C.snap.research && C.snap.research.replica;
-    set('ms-rep-paper', rp ? `Every signal on paper since 3 Nov: ${rp.all.signals} (${rp.all.closed} closed, ${rp.all.closed ? fR(rp.all.R) : '—'}) · passing the filter ${rp.pass.signals} (${rp.pass.closed ? fR(rp.pass.R) : '—'}). 150-day replay: +0.19R / +0.13R a trade in the two halves. Judged after about 30 live trades.` : '');
+    set('ms-rep-paper', rp ? `Every signal on paper since 3 Nov: ${rp.all.signals} (${rp.all.closed} closed, ${rp.all.closed ? fR(rp.all.R) : '—'}) · passing the filter ${rp.pass.signals} (${rp.pass.closed ? fR(rp.pass.R) : '—'}). Year replay (v5): +74.8R over 500 trades, 9 of 11 months positive. Judged after about 30 live trades.` : '');
     const ST2 = { open: 'Open', win: 'Win', loss: 'Loss', be: 'Break-even' };
     set('ms-rep-list', L.slice(0, 10).map((x) => `<li data-tid="${esc(x.id)}" tabindex="0" title="Show this trade on a chart"><span>${ftime(x.opened + TZ)}</span><b class="${x.side === 'sell' ? 'neg' : 'pos'}">${x.side.toUpperCase()}</b><span>${fmtI(x.entry, { dec: 2 })} · stop ${fmtI(x.stop, { dec: 2 })} · 2R ${fmtI(x.t1, { dec: 2 })}${x.feat && x.feat.star ? ' · ★' : ''}</span><b class="${x.R > 0 ? 'pos' : x.R < 0 ? 'neg' : ''}">${x.R != null ? fR(x.R) + (x.exit ? ` (${esc(x.exit)})` : '') : ST2[x.status] || x.status}</b></li>`).join('') || '<li class="empty">No live replica trade yet. The first passing signal goes live.</li>');
   }
