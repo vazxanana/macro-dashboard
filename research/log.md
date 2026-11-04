@@ -296,3 +296,10 @@ even with a true +0.2R edge).
   - Round-number stops: a stop within $2 in front of a $10 level moved $0.50 past it → the 76 affected trades +16.7R (+0.22R each, paired t 1.8), both halves; all $10 cells positive, $5 weaker. LIVE (PR #190).
   - Wick-sized buffer (mean 1m range of 15 bars): +0.190R vs +0.197R — no.
   - M15 direction gate: keeps 87/500 trades (+0.25R each) but −77R total — no.
+
+## 4 Nov (night): NQ three-year out-of-sample test
+
+- Trader's NQ futures 1m file (27 Dec 2022 – 11 Dec 2025, 763 days; timestamps = candle close). Rules unchanged:
+  - NY open run: 447 trades +62.3R (+0.14R, t 2.15), 2023 +35.9 / 2024 +7.6 / 2025 +19.4, 24/37 months, buys +25.9 / sells +36.3 → KEPT.
+  - Open sweeps (midnight/London/08:30): 352 trades −22.4R (−0.06R), 2023 −11.3 / 2024 +4.8 / 2025 −15.9 → OFF. The Sep–Oct 2026 +0.40R was period luck; Dukascopy Dec–Mar agreed (−4.9R over 52).
+- Calendar NQ = NY open run only, from Dec 2022 (516 records, +89.9R incl. Dukascopy Dec–Mar and futures Sep–Nov). March–September 2026 still loading.
