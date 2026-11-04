@@ -412,12 +412,20 @@ for (const [key, M] of Object.entries(MARKETS)) {
         if (research.some((x) => x.market === key && x.sig === sig)) continue;
         // v2 (3 Nov): market entry at the CHoCH, target 2R; the filter = clear of live H1 Origins OR an M5 engulfing at the
         // extreme (150-day gold replay: +0.075R / +0.077R a trade in both halves, keeps all four of the trader's trades)
-        const entry = price, buf = key === 'xau' ? Math.max(0.1 * g.atr, 0.3) : 0.1 * g.atr, stop = g.sell ? g.ext + buf : g.ext - buf, r0 = Math.abs(entry - stop);
-        if (!(r0 > 0) || (g.sell ? entry >= stop : entry <= stop)) continue;
+        const entry = price, buf = key === 'xau' ? Math.max(0.1 * g.atr, 0.3) : 0.1 * g.atr, stop0 = g.sell ? g.ext + buf : g.ext - buf, r00 = Math.abs(entry - stop0);
+        if (!(r00 > 0) || (g.sell ? entry >= stop0 : entry <= stop0)) continue;
+        // round-number stop (4 Nov, from the trader's XAUUSD price-action PDF and the New York Fed stop-cluster studies it cites):
+        // a gold stop sitting within $2 in front of a $10 level moves to $0.50 past it, because stops cluster there and price
+        // runs to the round number. Year replay of v5 + trailing (4 min entry lag): the 76 trades it changes gain +16.7R
+        // (+0.22R each, paired t 1.8), both halves positive; every $10 setting tested ($1–3, 0.5–1.0 past) gains. The filter
+        // below still judges the original stop, so the trades taken are unchanged.
+        let stop = stop0;
+        if (key === 'xau') { const rn = g.sell ? Math.ceil(stop0 / 10) * 10 : Math.floor(stop0 / 10) * 10; if (Math.abs(stop0 - rn) <= 2) stop = g.sell ? rn + 0.5 : rn - 0.5; }
+        const r0 = Math.abs(entry - stop);
         const h1live = src['1h'].A.events.filter((e) => e.endIdx == null && e.top > e.bot), h1clear = !h1live.some((e) => entry <= e.top && entry >= e.bot);
         // v3: pass = clear of H1 Origins or the platform's ★ engulfing at the extreme; star = the ★ engulfing alone
         // v4: and a stop of at least one M15 ATR (tighter stops sit inside M15 noise: −0.04R / −0.13R a trade on the replay)
-        const riskAtr = r0 / g.atr, pass = (h1clear || g.star) && riskAtr >= 1, t1 = entry + (g.sell ? -2 : 2) * r0;
+        const riskAtr = r00 / g.atr, pass = (h1clear || g.star) && riskAtr >= 1, t1 = entry + (g.sell ? -2 : 2) * r0;
         // v5 (4 Nov): live only against the H4 trend (Mosha N=6). Year replay with this code: v4 +81.5R over 1,020 trades (Jan-May
         // −11.2R), v5 +74.8R over 500 (Jan-May +26.2R), 9 of 11 months positive, max drawdown −23.6R vs −29.9R. The H4 split was
         // logged as a candidate on Jun-Nov data before Jan-May existed, so Jan-May is its out-of-sample test.
@@ -427,7 +435,7 @@ for (const [key, M] of Object.entries(MARKETS)) {
         const lag = now - g.tc - 300, stale = lag > 480;
         const h4 = src['4h'].A.trend === (g.sell ? 1 : -1) ? 'against' : src['4h'].A.trend === (g.sell ? -1 : 1) ? 'with' : 'none', v5 = pass && h4 === 'against';
         research.push({ id: `${key}-replica-${now}-${g.sell ? 's' : 'b'}`, sig, market: key, label: M.label, dec: M.dec, k: 'replica', name: key === 'xau' ? 'Gold replica' : `${M.label} replica (method test)`, lag, side: g.sell ? 'sell' : 'buy',
-          entry: +entry.toFixed(2), stop: +stop.toFixed(2), t1: +t1.toFixed(2), rr: 2, opened: now, filled: now, checked: now, status: 'open', R: null, v: 5,
+          entry: +entry.toFixed(2), stop: +stop.toFixed(2), stop0: +stop0.toFixed(2), t1: +t1.toFixed(2), rr: 2, opened: now, filled: now, checked: now, status: 'open', R: null, v: 5,
           pass, v5, h4, h1clear, eg: g.eg, peg: g.peg, star: g.star, riskAtr: +riskAtr.toFixed(2), legStart: +g.start.toFixed(2), leg: g.L === 36 ? '3h' : '6h', ext: +g.ext.toFixed(2), chochLevel: +g.lvl.toFixed(2), d1: src['1d'].A.trend === (g.sell ? -1 : 1) ? 'with' : 'against', session: sessionOf(now),
           note: `Research (paper only): gold replica v5${!pass ? '' : h4 !== 'against' ? ' (v4 passes; v5 skips it: H4 trend not against the trade)' : ''}${pass ? '' : riskAtr < 1 ? ' (filter fails: stop under one M15 ATR)' : ' (filter fails: inside a live H1 Origin, no ★ engulfing)'}. ${g.L === 36 ? '3 h' : '6 h'} leg to ${g.ext.toFixed(2)}, M5 CHoCH through ${g.lvl.toFixed(2)}${g.star ? ', ★ engulfing at structure at the extreme' : g.peg ? ', engulfing at the extreme (not at a level)' : ''}${h1clear ? ', clear of H1 Origins' : ''}; ${g.sell ? 'sell' : 'buy'} ${entry.toFixed(2)}, stop ${stop.toFixed(2)}, target 2R ${t1.toFixed(2)}.` });
         // live (config.replicaLive): every passing signal also trades on the live book, as on the replay (no slot limit),
