@@ -1049,6 +1049,11 @@ function nqSwingSignal(bars, today) {
 // both positive. Shallow sweeps lose (every depth under 10 points negative across all opens) and New York 09:30 open
 // sweeps lose (they tend to run, −0.45R a trade). The New York exclusion and the 15 points were chosen on this data: paper only.
 const NQ_OPENS = [0, 180, 510];
+// 4 Nov (evening): NQ focus. On the same 1-minute history (39 days) the setups scored: New York open flipped +0.73R a trade
+// (27), open sweeps before New York +0.40R (38), London low sweep +0.23R (19, overlaps the open sweeps), swing sweep +0.15R
+// (38, September −4.6R), New York open sweep (reversal) 0.00R (26), Tokyo −0.14R (30). Only the first two keep running;
+// the others stay in the code, switched off here.
+const NQ_ON = { ny: false, london: false, swing: false, opens: true, nyflip: true, asia: false };
 function nqOpenSweep(bars, today, o, tFree) {
   const D = bars.map((b) => ({ ...b, ...nyParts(b.time) })).filter((b) => b.d === today);
   const first = D.find((b) => b.m === o); if (!first) return null;
@@ -1083,7 +1088,7 @@ try {
       }
       if (r.status === 'open' && bars.length) r.checked = bars.at(-1).time;
     }
-    if (ny.m >= 570 && ny.m <= 720 && !research.some((x) => x.k === 'nq-open' && !x.session && x.day === ny.d)) {   // to 12:00 ET: the feed lags
+    if (NQ_ON.ny && ny.m >= 570 && ny.m <= 720 && !research.some((x) => x.k === 'nq-open' && !x.session && x.day === ny.d)) {   // to 12:00 ET: the feed lags
       const g = nqOpenSignal(bars, ny.d);
       if (g) {   // the day's first signal: paper entry at the signal candle's close (as on the backtest), even though the feed shows it ~10 min late
         const r0 = Math.abs(g.entry - g.stop), t1 = g.entry + (g.sell ? -1.2 : 1.2) * r0;
@@ -1093,7 +1098,7 @@ try {
           note: `Research (paper only): NQ swept the ${g.level} ${g.lv.toFixed(2)} after the New York open (extreme ${g.ext.toFixed(2)}) and closed back inside; ${g.sell ? 'sell' : 'buy'} ${g.entry.toFixed(2)}, stop ${g.stop.toFixed(2)}, target 1.2R ${t1.toFixed(2)}, out at 16:00.` });
       }
     }
-    if (!['Sat', 'Sun'].includes(ny.wd) && ny.m >= 301 && ny.m < 660 && !research.some((x) => x.id === `nq-london-${ny.d}-b`)) {   // the day's first signal, recorded until its 11:00 ET exit (feed lag, outages)
+    if (NQ_ON.london && !['Sat', 'Sun'].includes(ny.wd) && ny.m >= 301 && ny.m < 660 && !research.some((x) => x.id === `nq-london-${ny.d}-b`)) {   // the day's first signal, recorded until its 11:00 ET exit (feed lag, outages)
       const g = nqLondonSignal(bars, ny.d);
       if (g) {
         const r0 = Math.abs(g.entry - g.stop), t1 = g.entry + (g.sell ? -2 : 2) * r0;
@@ -1103,7 +1108,7 @@ try {
           note: `Research (paper only): NQ swept the London ${g.sell ? 'high' : 'low'} ${g.lv.toFixed(2)} before New York (extreme ${g.ext.toFixed(2)}) and closed back inside; ${g.sell ? 'sell' : 'buy'} ${g.entry.toFixed(2)}, stop ${g.stop.toFixed(2)}, target 2R ${t1.toFixed(2)}, out at 11:00 ET.` });
       }
     }
-    if (!['Sat', 'Sun'].includes(ny.wd) && ny.m >= 301 && ny.m < 660 && !research.some((x) => x.id === `nq-swing-${ny.d}`)) {
+    if (NQ_ON.swing && !['Sat', 'Sun'].includes(ny.wd) && ny.m >= 301 && ny.m < 660 && !research.some((x) => x.id === `nq-swing-${ny.d}`)) {
       const g = nqSwingSignal(bars, ny.d);
       if (g) {
         const r0 = Math.abs(g.entry - g.stop), t1 = g.entry + (g.sell ? -2 : 2) * r0;
@@ -1113,7 +1118,21 @@ try {
           note: `Research (paper only): NQ swept the M15 swing ${g.sell ? 'high' : 'low'} ${g.lv.toFixed(2)} before New York (extreme ${g.ext.toFixed(2)}) and closed back ${g.sell ? 'below' : 'above'} within 15 min; ${g.sell ? 'sell' : 'buy'} ${g.entry.toFixed(2)}, stop ${g.stop.toFixed(2)}, target 2R ${t1.toFixed(2)}, out at 11:00 ET.` });
       }
     }
-    if (!['Sat', 'Sun'].includes(ny.wd) && ny.m >= 1 && ny.m < 660) for (const o of NQ_OPENS) {
+    // New York open, flipped (4 Nov): the same sweep of the 09:30 opening price (≥ 15 points, 1-minute close back across within
+    // 15 min), but traded WITH the sweep: at New York the reclaim fails and the move runs. Stop the same distance on the other
+    // side, 2R, out at 11:00 ET. 1-minute history: 27 trades +19.8R, +0.73R a trade (t 2.8), 67% wins, September +4.9R,
+    // October +14.9R; every depth (0–30 points) and reclaim window (5–30 min) positive (+0.46 to +1.19R). Paper.
+    if (NQ_ON.nyflip && !['Sat', 'Sun'].includes(ny.wd) && ny.m > 571 && ny.m < 660 && !research.some((x) => x.id === `nq-nyflip-${ny.d}`)) {
+      const g = nqOpenSweep(bars, ny.d, 570, 0);
+      if (g) {
+        const sell = !g.sell, r0 = Math.abs(g.entry - g.stop), stop = g.entry + (sell ? r0 : -r0), t1 = g.entry + (sell ? -2 : 2) * r0;
+        research.push({ id: `nq-nyflip-${ny.d}`, market: 'nq', label: 'NQ', dec: 2, k: 'nq-open', session: 'nyflip', name: 'NQ New York open run', day: ny.d, side: sell ? 'sell' : 'buy',
+          entry: +g.entry.toFixed(2), stop: +stop.toFixed(2), t1: +t1.toFixed(2), rr: 2, opened: g.t + 60, filled: g.t + 60, checked: g.t + 60, status: 'open', R: null, exitAt: g.t + (660 - g.m) * 60, exitLabel: '11:00 ET',
+          seenAt: now, entrySeen: bars.length ? +bars.at(-1).close.toFixed(2) : null, level: 'OPEN', levelPrice: +g.lv.toFixed(2), ext: +g.ext.toFixed(2),
+          note: `Research (paper only): NQ ran ${Math.abs(g.ext - g.lv).toFixed(1)} points through the New York open ${g.lv.toFixed(2)} and closed back across it; at New York that reclaim tends to fail, so ${sell ? 'sell' : 'buy'} ${g.entry.toFixed(2)} with the sweep, stop ${stop.toFixed(2)}, target 2R ${t1.toFixed(2)}, out at 11:00 ET.` });
+      }
+    }
+    if (NQ_ON.opens && !['Sat', 'Sun'].includes(ny.wd) && ny.m >= 1 && ny.m < 660) for (const o of NQ_OPENS) {
       const id = `nq-opens-${ny.d}-${o}`, mine = research.filter((x) => x.session === 'opens' && x.day === ny.d);
       if (ny.m <= o || research.some((x) => x.id === id) || mine.some((x) => x.status === 'open')) continue;
       const g = nqOpenSweep(bars, ny.d, o, Math.max(0, ...mine.map((x) => x.closed || 0)));
@@ -1125,7 +1144,7 @@ try {
         note: `Research (paper only): NQ ran ${Math.abs(g.ext - g.lv).toFixed(1)} points through the ${nm} open ${g.lv.toFixed(2)} and closed back ${g.sell ? 'below' : 'above'} it within 15 min; ${g.sell ? 'sell' : 'buy'} ${g.entry.toFixed(2)}, stop ${g.stop.toFixed(2)}, target 2R ${t1.toFixed(2)}, out at 11:00 ET.` });
       break;
     }
-    if (asiaWin) for (const A of NQ_ASIA) {
+    if (NQ_ON.asia && asiaWin) for (const A of NQ_ASIA) {
       const d0 = Math.floor(now / 86400) * 86400, t0 = d0 + A.at * 60, day = new Date(d0 * 1000).toISOString().slice(0, 10), id = `nq-${A.id}-${day}`;
       if (now < t0 + 60 || now > t0 + 150 * 60 || research.some((x) => x.id === id)) continue;   // the first hour, seen up to 90 min late (feed lag)
       const g = nqAsiaSignal(bars, t0);
@@ -1147,7 +1166,7 @@ try {
   // the method test on the other markets (paper, 2R, no spread): v5 signals per market and all together
   const oth = rp.filter((x) => x.market !== 'xau' && x.v5); snapshot.research.replicaX = { all: sum(oth), markets: Object.fromEntries([...new Set(oth.map((x) => x.market))].map((m) => [m, sum(oth.filter((x) => x.market === m))])) };
   snapshot.research.nq = sum(research.filter((x) => x.k === 'nq-open'));
-  for (const sid of ['ny', 'london', 'swing', 'opens', 'tokyo', 'shanghai']) snapshot.research['nq_' + sid] = sum(research.filter((x) => x.k === 'nq-open' && (x.session || 'ny') === sid)); }
+  for (const sid of ['ny', 'london', 'swing', 'opens', 'nyflip', 'tokyo', 'shanghai']) snapshot.research['nq_' + sid] = sum(research.filter((x) => x.k === 'nq-open' && (x.session || 'ny') === sid)); }
 if (nqLast) snapshot.nqLast = nqLast;
 // ─── Phone alerts (4 Nov): a push via ntfy.sh (free, no account) when a live trade or an NQ paper trade opens or closes.
 // Subscribe in the ntfy app to the topic below (or set the repository secret NTFY_TOPIC to use your own). Only events from

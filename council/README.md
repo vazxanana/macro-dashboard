@@ -274,3 +274,11 @@ The trader's own rule ("either a sweep of a low or a high"): M15 swing points of
 The trader: "NQ works mostly by sweeping the opens and trading the opposite way." The opening price of the midnight (00:00 ET), London (03:00) and 08:30 opens; within 90 min of each, price runs ≥ 15 points through it and a 1-minute close comes back across within 15 min of the first cross → the other way; stop 2 points past the extreme, 2R, out at 11:00 ET, one trade at a time. Records `nq-opens-<day>-<minute>`, session `opens`.
 
 Tested on 1-minute NQ (Yahoo NQ=F + CNBC @ND.1, 11 Sep – 4 Nov, 39 days; both feeds gave identical signals where they overlap): 38 trades, +15.3R, +0.40R a trade (t 1.7), September +11.7R and October +3.6R, buys +4.7R and sells +10.6R. Across all 10 open setups tested (open price and prior-range sweeps at midnight, 02:00, 03:00, 08:30, 09:30), shallow sweeps lose (−0.20R a trade over 282 with no depth rule) and the edge peaks at 15–20 points. New York 09:30 open sweeps lose (−0.45R a trade over 27: they tend to run). The New York exclusion and the 15-point depth were picked on this data, so it is paper only until it holds forward.
+
+## NQ focus (4 Nov, evening)
+
+Same 1-minute history for every NQ setup (Yahoo NQ=F + CNBC @ND.1, 11 Sep – 4 Nov): New York open run +0.73R a trade (27), open sweeps before New York +0.40R (38), London low sweep +0.23R (19), swing sweep +0.15R (38, September −4.6R), New York open sweep (reversal) 0.00R (26), Tokyo −0.14R (30). Only the first two run (`NQ_ON` in trader.mjs); the calendar counts only them (`NQ_SYS` in the page).
+
+**New York open run:** the open-sweep signal at the 09:30 opening price (≥ 15 points through it, 1-minute close back across within 15 min), traded with the sweep: at New York the reclaim fails and the move runs (the reversal version loses −0.45R a trade). Stop the same distance on the other side, 2R, out at 11:00 ET. 27 trades +19.8R, 67% wins, t 2.8, September +4.9R and October +14.9R; every depth 0–30 points and reclaim window 5–30 min positive. Records `nq-nyflip-<day>`.
+
+Losing open-sweep trades: 7 of 20 were +1R before reversing, but break-even, partials and trailing all scored below the plain 2R; trades on the side of the 18:00 ET daily open did better (+0.67R vs +0.25R) but the other side flipped sign between months, so no filter.
