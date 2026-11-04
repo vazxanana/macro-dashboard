@@ -257,3 +257,16 @@ v5 + trailing, year, ranked by profit / max drawdown: none 4.52 · max 3 open 4.
 losing day 4.63 · half after 3 losses 4.85 · equity filter 20 5.45 · equity filter 50 5.66 · max3 + eq50 6.03 · max3 + eq50 + daily −1.5R
 6.42 (+91.2R, DD −14.2, worst month −8.4; DD lower in both halves) · max3 + eq50 + daily −3R 6.24 (+97.2, DD −15.6).
 Shipped: max 3 open + daily stop −1.5R + half size below the 50-trade equity average (seeded with the replay).
+
+## 4 Nov 14:00 — Edge research round (report: "Gold replica edge improvements"); 3 pre-registered tests
+
+v5 + trailing (no risk rules): n 500, +0.197R, SD 1.54, t 2.87, per-trade Sharpe 0.128; Deflated Sharpe vs 60 trials 0.71 (gate 0.95)
+→ borderline after the search; the forward record is the only clean holdout.
+1. News blackout (leg or ±30 min contains NFP/CPI/FOMC, standard 2026 dates, 8:30/14:00 ET): removes 14 trades, −0.37R mean,
+   t −1.11 (gate t ≤ −2) → FAIL, not shipped. NFP −1.4R (7), CPI −2.5R (4), FOMC −1.3R (3). Tag and re-check on the forward record.
+2. Trailing stop on an M15 close beyond the trail (emergency stop at the original stop): paired −0.017R, t −0.68 → FAIL.
+3. Equity filter vs random halving (same 110 trades, max 3 + daily −1.5R): filter ratio 6.35 vs no filter 5.24; only 4% of 500
+   random halvings matched it → PASS (kept).
+Forward test redefined: kill switch at the 5th percentile of a bootstrap of Jan–May trades (−7.2R at 30, −7.8R at 50, −5.9R at
+100; drawdown beyond −23R); pass bar ~200 live trades with t ≥ 2. 30 trades cannot confirm the edge (negative ~23% of the time
+even with a true +0.2R edge).
