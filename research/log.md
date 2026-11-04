@@ -445,3 +445,14 @@ at entry). Full stack aligned (H4 + H1 agree with the trade): M15/M5 −25.1R (2
 H1/M5 −12.7R (294), H1/M15 −33.1R (261). H4 against: H1/M5 +25.6R (171, +0.150, 2023-24 −4.9), H1/M15 0.0R.
 **Stacking the timeframes in agreement adds no edge; the only positive split is the cycle against H4 (a pullback),
 the same thing the live replica already trades.**
+
+## 4 Nov (night): Mosha "Breakout System" (BO → opposite BO → BO, 3 timeframes, pullback entry) — gold
+
+From the owner's TikTok screenshots (moshatrades, Nov 2024 / Jun 2025): "breakout only, 3 timeframes": sell = T1 BO sell →
+T2 BO buy → T3 BO sell → wait for pullback & entry (buy mirrored); his table D1/H4/H1, H4/H1/M30, H1/M30/M15, M30/M15/M5.
+Test (`ms/bo3.mjs`, engine events causal, T3 must flip structure, limit at the broken T3 level, stop $0.30 past the T3 Origin,
+1:2 / 1:3, 72 h): 2023-26 H4→H1→M15 115 trades +10.8R / +18.0R (both halves +); H4→H1→M30 58, +3.9 / +4.0 (gated +13.8);
+D1→H4→H1 39, ~0; H1→M30→M15 −16R; H1→M15→M5 −61.5R; M30→M15→M5 −2.7R. 2019-22 (never seen): H4→H1→M15 105 trades
++13.4R / +10.5R, H4→H1→M30 +9.5R, D1→H4→H1 −1.9R. With the trader's own limit rules (cancel if 3R is hit first): valid 3 h
+weak; 12-24 h: 2019-22 +7.5 to +11.5R, 2023-26 +8.9 to +15.1R. **Applied H4→H1→M15, 3R, 24 h (PR #202, user rule mosha-bo).**
+Note: his posted examples use H1→M30→M15, which lost here; the higher chain held.
