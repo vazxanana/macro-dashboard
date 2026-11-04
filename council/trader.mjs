@@ -454,7 +454,10 @@ for (const [key, M] of Object.entries(MARKETS)) {
           note: `Research (paper only): gold replica v5${!pass ? '' : h4 !== 'against' ? ' (v4 passes; v5 skips it: H4 trend not against the trade)' : ''}${pass ? '' : riskAtr < 1 ? ' (filter fails: stop under one M15 ATR)' : ' (filter fails: inside a live H1 Origin, no ★ engulfing)'}. ${g.L === 36 ? '3 h' : '6 h'} leg to ${g.ext.toFixed(2)}, M5 CHoCH through ${g.lvl.toFixed(2)}${g.star ? ', ★ engulfing at structure at the extreme' : g.peg ? ', engulfing at the extreme (not at a level)' : ''}${h1clear ? ', clear of H1 Origins' : ''}; ${g.sell ? 'sell' : 'buy'} ${entry.toFixed(2)}, stop ${stop.toFixed(2)}, target 2R ${t1.toFixed(2)}.` });
         // live (config.replicaLive): every passing signal also trades on the live book, as on the replay (no slot limit),
         // at market, 2R target, out after 48 h, no break-even move
-        // exit (4 Nov): no fixed 2R target; once +1.5R the stop trails 1R behind the best price (cap 10R, out after 48 h). Year replay
+        // exit v2 (4 Nov, night): once +2R the stop trails 2R behind the best price (was +1.5R / 1R). 8-year spot gold, 1.5% gate,
+        // risk rules: 2019-22 +13.8R -> +44.8R, 2023-26 +47.3R -> +87.4R; every wider setting tried (2-3R start, 2-3R behind,
+        // 48-144 h) beat 1.5/1.0 in both halves, and the best on 2019-22 alone also beat it on 2023-26 (walk-forward).
+        // exit v1 (4 Nov): no fixed 2R target; once +1.5R the stop trails 1R behind the best price (cap 10R, out after 48 h). Year replay
         // of v5: 2R +74.8R (Jan-Jun +0.08R / Jun-Nov +0.22R a trade) vs trailing +98.7R (+0.17R / +0.23R); every nearby setting beat 2R
         // risk cap (4 Nov): at most 3 replica trades open at once (3R at risk). Year replay: +101.5R vs +98.7R uncapped, both halves
         // slightly better, worst drawdown −20.8R vs −21.8R. A daily −2R stop was tested and rejected (−4.4R a year: the skipped trades won).
@@ -474,9 +477,9 @@ for (const [key, M] of Object.entries(MARKETS)) {
         if (volPct != null) research.at(-1).vol = +volPct.toFixed(2);
         if (v5 && !volOk) research.at(-1).calm = true;
         if (v5 && volOk && !capped && !dayStop && !stale && (config.replicaLive || []).includes(key)) trades.push({ id: `${key}-replica-${now}-${g.sell ? 's' : 'b'}`, market: key, label: M.label, dec: M.dec, k: 'replica', name: 'Replica', pair: 'M5 CHoCH', h: '5m', side: g.sell ? 'sell' : 'buy',
-          entry: +entry.toFixed(2), stop: +stop.toFixed(2), t1: +(entry + (g.sell ? -10 : 10) * r0).toFixed(2), tp1: +t1.toFixed(2), rr: 10, trail: [1.5, 1.0], size, buf: CFG.buf, opened: now, filled: now, checked: now, status: 'open', R: null, r0: Math.abs(+entry.toFixed(2) - +stop.toFixed(2)), maxHold: 48 * 3600, noBe: true, entryMode: 'market', lag,
+          entry: +entry.toFixed(2), stop: +stop.toFixed(2), t1: +(entry + (g.sell ? -10 : 10) * r0).toFixed(2), tp1: +t1.toFixed(2), rr: 10, trail: [2.0, 2.0], size, buf: CFG.buf, opened: now, filled: now, checked: now, status: 'open', R: null, r0: Math.abs(+entry.toFixed(2) - +stop.toFixed(2)), maxHold: 48 * 3600, noBe: true, entryMode: 'market', lag,
           feat: { d1: src['1d'].A.trend === (g.sell ? -1 : 1) ? 'with' : 'against', h4, session: sessionOf(now), star: g.star, h1clear, riskAtr: +riskAtr.toFixed(2), leg: g.L === 36 ? '3h' : '6h' }, shadow: false, blockedBy: [],
-          note: `Gold replica (v5, against the H4 trend): ${g.L === 36 ? '3 h' : '6 h'} leg to ${g.ext.toFixed(2)}, M5 CHoCH through ${g.lvl.toFixed(2)}${g.star ? ', ★ engulfing at structure at the extreme' : g.peg ? ', engulfing at the extreme' : ''}${h1clear ? ', clear of H1 Origins' : ''}. ${g.sell ? 'Sell' : 'Buy'} at market, stop past the extreme; from +1.5R the stop trails 1R behind the best price (2R mark ${t1.toFixed(2)}), out after 48 h.` });
+          note: `Gold replica (v5, against the H4 trend): ${g.L === 36 ? '3 h' : '6 h'} leg to ${g.ext.toFixed(2)}, M5 CHoCH through ${g.lvl.toFixed(2)}${g.star ? ', ★ engulfing at structure at the extreme' : g.peg ? ', engulfing at the extreme' : ''}${h1clear ? ', clear of H1 Origins' : ''}. ${g.sell ? 'Sell' : 'Buy'} at market, stop past the extreme; from +2R the stop trails 2R behind the best price (2R mark ${t1.toFixed(2)}), out after 48 h.` });
       }
     }
     for (const r of research.filter((x) => x.market === key && x.k !== 'replica' && x.status === 'open')) {

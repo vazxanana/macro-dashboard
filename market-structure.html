@@ -2673,7 +2673,7 @@ function msNextSetup(bars, A) {
       const fl = px != null && x.status === 'open' && r0 ? (px - x.entry) * s / r0 * size : null; if (fl != null) tot += fl;
       const stopR = r0 ? (x.stop - x.entry) * s / r0 : -1; risk += Math.max(0, -stopR) * size;
       const age = Math.max(0, Date.now() / 1000 - (x.filled || x.opened)), ageT = age < 3600 ? `${Math.round(age / 60)} min` : `${(age / 3600).toFixed(1)} h`;
-      const mark = x.tp1 != null ? x.tp1 : x.t1, trail = x.trail ? (x.trailMoved ? `trailing, stop locks ${fR(stopR)}` : 'trailing from +1.5R') : '';
+      const mark = x.tp1 != null ? x.tp1 : x.t1, trail = x.trail ? (x.trailMoved ? `trailing, stop locks ${fR(stopR)}` : `trailing from +${x.trail[0]}R`) : '';
       return `<li data-tid="${esc(x.id)}" tabindex="0" title="Show this trade on a chart"><span class="chip ${x.side}">${x.side.toUpperCase()}</span>`
         + `<span class="a-t"><b>${esc(x.label)}</b> ${esc(x.name)}${x.paper ? '<span class="tag">paper</span>' : ''}${!x.paper && x.k !== 'replica' ? '<span class="tag" title="Opened by the earlier council strategies, still managed to its exit">older strategy</span>' : ''}${size !== 1 ? `<span class="tag">${size}× size</span>` : ''}${x.status === 'pending' ? '<span class="tag">waiting fill</span>' : ''}</span>`
         + `<span class="a-r ${fl == null ? '' : fl >= 0 ? 'pos' : 'neg'}">${fl == null ? '—' : fR(fl)}</span>`

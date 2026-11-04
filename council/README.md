@@ -326,3 +326,10 @@ The same trade alerts as ntfy (opens and closes from the last 15 min, each once)
 secret `TELEGRAM_BOT_TOKEN` is set (create a bot with @BotFather). `TELEGRAM_CHAT_ID` is optional: without it the Trader
 reads the bot's updates, uses the first private chat that messaged the bot (send it /start), remembers it in
 `state.tgChat` and sends a one-time "connected" message. Send errors land in `snapshot.errors.telegram`.
+
+### Gold replica exit v2 (4 Nov, night)
+
+New live replica trades trail from +2R, 2R behind the best price (was +1.5R / 1R); cap 10R and 48 h unchanged. 8-year spot
+gold with the 1.5% volatility gate and the risk rules: 2019-22 +13.8R → +44.8R, 2023-26 +47.3R → +87.4R. Every wider
+setting tested beat the old one in both halves. Also tested and rejected the same night: a 15-minute trigger (no better
+agreement between feeds), dropping the H1/★ filter, and the NQ-style New York open run on gold (−177R over 8 years of spot).
