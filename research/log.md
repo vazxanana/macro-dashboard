@@ -270,3 +270,11 @@ v5 + trailing (no risk rules): n 500, +0.197R, SD 1.54, t 2.87, per-trade Sharpe
 Forward test redefined: kill switch at the 5th percentile of a bootstrap of Jan–May trades (−7.2R at 30, −7.8R at 50, −5.9R at
 100; drawdown beyond −23R); pass bar ~200 live trades with t ≥ 2. 30 trades cannot confirm the edge (negative ~23% of the time
 even with a true +0.2R edge).
+
+## 4 Nov (afternoon): NQ sweeps, the opens
+
+- Yahoo refused every GitHub runner from 14:26 UTC (429); the NQ feed now falls back to CNBC @ND.1 1m (same contract, identical signals on overlap days). CNBC also serves 1m history: full days from 11 Sep.
+- Trader's 4 Nov NQ buy = a sweep of the 03:30 ET M15 swing low (28,308.5) at 07:55, buy 08:02, 2R. Swing-sweep setup (paper) over 39 days: 38 trades +5.6R (+0.15R), Sep −4.6R / Oct +10.2R: unstable.
+- Open sweeps (10 setups: open price and prior-range sweeps at 00:00, 02:00, 03:00, 08:30, 09:30 ET; 1m, 39 days): shallow sweeps lose (no depth rule −0.20R a trade over 282); the edge rises with sweep depth to +0.11R at 15–20 points, then fades; NY 09:30 sweeps lose at every depth (open price −0.45R over 27: they run).
+- New paper setup: open-price sweeps of the midnight, London (03:00) and 08:30 opens, ≥ 15 points, 1m close back within 15 min, 2R, out 11:00 ET, one at a time: 38 trades +15.3R, +0.40R (t 1.7), Sep +11.7 / Oct +3.6, buys +4.7 / sells +10.6. Exclusion of NY and the 15 points chosen on this data → forward test.
+- London-range sweep v2 (buys only): 5m history buys +0.47R over 27, sells −0.20R over 22. The NY open sweep setup (paper) is on the wrong side of the evidence above; kept for the record.
