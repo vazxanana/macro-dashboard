@@ -1,5 +1,5 @@
 name: Council data probe
-# RESEARCH ONLY: fetches raw candles for local research; writes to council-data/research/.
+# RESEARCH ONLY: checks which keyless NQ intraday feeds answer GitHub's runners; writes to council-data/research/probe/.
 on:
   push:
     branches: [council-probe]
@@ -8,24 +8,26 @@ permissions:
 jobs:
   probe:
     runs-on: ubuntu-latest
-    timeout-minutes: 340
+    timeout-minutes: 10
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/checkout@v4
-        with: { ref: main, path: main, sparse-checkout: council }
-      - uses: actions/checkout@v4
         with: { ref: council-data, path: data }
-      - uses: actions/setup-node@v4
-        with: { node-version: '20' }
-      - name: Dump history
+      - name: Probe NQ feeds
         run: |
-          cp -r main/council council
-          mkdir -p data/research/candles
-          node tools/histdump.mjs xaub data/research/candles/xau-jan-jun.json.gz 2>&1 | tail -5 || true
-          # one-call probe: does the Dukascopy legacy datafeed still serve runners? (NQ CFD, 2 Jan 2026)
-          curl -sS -A "Mozilla/5.0" -o /tmp/d.bi5 -w "duka USATECHIDXUSD http %{http_code} bytes %{size_download}\n" "https://datafeed.dukascopy.com/datafeed/USATECHIDXUSD/2026/00/02/BID_candles_min_1.bi5" | tee data/research/probe/duka-check.txt || true
-          ls -la data/research/candles
+          mkdir -p data/research/probe; o=data/research/probe/nq-feeds.txt; date -u > $o
+          UA="Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36"
+          for u in \
+            "https://query1.finance.yahoo.com/v8/finance/chart/NQ%3DF?interval=1m&range=1d&includePrePost=true" \
+            "https://query2.finance.yahoo.com/v8/finance/chart/NQ%3DF?interval=1m&range=1d&includePrePost=true" \
+            "https://query2.finance.yahoo.com/v8/finance/chart/MNQ%3DF?interval=1m&range=1d&includePrePost=true" \
+            "https://ts-api.cnbc.com/harmony/app/charts/1D.json?symbol=@NQ.1" \
+            "https://stooq.com/q/d/l/?s=nq.f&i=5" \
+            "https://stooq.com/q/l/?s=nq.f&f=sd2t2ohlcv&h&e=csv" ; do
+            code=$(curl -sS -A "$UA" -m 20 -o /tmp/b -w "%{http_code} %{size_download}" "$u" || echo fail)
+            echo "$code $u :: $(head -c 300 /tmp/b | tr '\n\r' '  ')" >> $o
+          done
+          cat $o
           git -C data config user.name "mosha-council"
           git -C data config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git -C data add research/candles research/probe && git -C data commit -qm "Research: gold Jan-Jun (Binance PAXG) dump + Dukascopy probe $(date -u +%H:%MZ)" || exit 0
+          git -C data add research/probe && git -C data commit -qm "Probe: NQ feeds $(date -u +%H:%MZ)" || exit 0
           for j in 1 2 3 4 5; do git -C data pull -q --rebase origin council-data && git -C data push -q origin HEAD:council-data && break; sleep 5; done
