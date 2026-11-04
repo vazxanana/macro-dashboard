@@ -342,3 +342,13 @@ even with a true +0.2R edge).
   But replica v5 signals Jan 12 - Oct 31 2026 matched against spot (same side, within 15 min): GC 160 of 469 spot signals (34%),
   PAXG 175 (37%). **No feed reproduces the spot signals: the M5 CHoCH trigger depends on single-wick details.** Feed not
   changed. Any broker's XAUUSD is another feed again, so live results will differ from every replay.
+
+## 4 Nov (night): sturdier gold trigger?
+
+- **M15 trigger** (same rules on 15-minute candles, 3 h / 6 h legs): v5 signals matched against spot Jan-Oct 2026 —
+  GC 36%, PAXG 38% (M5: 34% / 37%). No gain in agreement; 2026 results flat (spot −3.4R, GC +0.6R, PAXG −40.9R, 2R exit).
+- **Where the feeds diverge** (M5, share of spot signals reproduced): raw trigger GC 53% / PAXG 69%; + stop ≥ 1 ATR 52/67;
+  + H1-clear-or-★ 39/45; + against H4 34/37. The structure filters (H1 Origins, ★, H4 trend) cause most of the disagreement.
+- **Simpler filters on 8-year spot, 1.5% gate, risk rules, trailing**: v5 +61.1R (2019-25 +18.0, 2026 +43.2);
+  no H1/★ filter +35.8R (2019-25 +30.5, 2026 +5.0); stop ≥ 1 ATR only −18.3R. No variant is both sturdier and better:
+  **v5 kept unchanged.**
