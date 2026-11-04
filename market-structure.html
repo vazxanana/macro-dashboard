@@ -395,6 +395,7 @@
   .tv::backdrop { background: rgba(5, 8, 14, .6); }
   .tv-h { display: flex; align-items: flex-start; gap: 12px; padding: 14px 16px 10px; border-bottom: 1px solid var(--line-soft); }
   .tv-h > div { flex: 1; min-width: 0; } .tv-h h3 { margin: 0; font-size: 16px; } .tv-h p { margin: 4px 0 0; font-size: 12px; color: var(--ink-dim); line-height: 1.45; }
+  .tv-ba { display: inline-flex; gap: 4px; margin-left: auto; margin-right: 8px; flex: none; } .tv-ba button { font: inherit; font-size: 12px; padding: 5px 10px; border-radius: 7px; border: 1px solid var(--line); background: none; color: var(--ink-dim); cursor: pointer; } .tv-ba button.on { background: var(--accent, #2962ff); border-color: transparent; color: #fff; font-weight: 600; }
   .tv-x { all: unset; cursor: pointer; width: 32px; height: 32px; display: grid; place-items: center; border-radius: 8px; border: 1px solid var(--line); color: var(--ink-dim); font-size: 18px; flex: none; }
   .tv-x:hover { color: var(--ink); } .tv-x:focus-visible { outline: 2px solid var(--accent); }
   .tv-c { height: min(440px, 55vh); position: relative; }
@@ -684,7 +685,7 @@
         <div class="ms-k">Trade reviews · was it our system or the market?</div>
         <div id="ms-c-pm-sum"></div>
         <ul class="c-pm" id="ms-c-pm"></ul>
-        <dialog class="tv" id="ms-tv" aria-labelledby="ms-tv-t"><div class="tv-h"><div><h3 id="ms-tv-t">Trade</h3><p id="ms-tv-s"></p></div><button type="button" class="tv-x" id="ms-tv-x" aria-label="Close chart">×</button></div><div class="tv-c" id="ms-tv-c"><div class="tv-msg" id="ms-tv-m">Loading candles…</div></div><div class="tv-k" id="ms-tv-k"></div></dialog>
+        <dialog class="tv" id="ms-tv" aria-labelledby="ms-tv-t"><div class="tv-h"><div><h3 id="ms-tv-t">Trade</h3><p id="ms-tv-s"></p></div><div class="tv-ba" role="group" aria-label="Prediction before, result after"><button type="button" data-ba="before">Before</button><button type="button" data-ba="after" class="on">After</button><button type="button" data-ba="save" title="Save the before and after charts as images">Save</button></div><button type="button" class="tv-x" id="ms-tv-x" aria-label="Close chart">×</button></div><div class="tv-c" id="ms-tv-c"><div class="tv-msg" id="ms-tv-m">Loading candles…</div></div><div class="tv-k" id="ms-tv-k"></div></dialog>
       </div>
       <div class="card c-analyst">
         <div class="ms-k">Analyst · weekly brief</div>
@@ -1040,8 +1041,8 @@ function msNextSetup(bars, A) {
         ctx.strokeRect(Math.round(x1) + 0.5, Math.round(y1) + 0.5, Math.round(x2 - x1), Math.round(y2 - y1));
         ctx.setLineDash([]);
       }
-      return;
-    }
+      if (!o.allBottom) return;   // screenshots only capture the bottom layer: draw everything there while saving
+    } else if (o.allBottom) return;
     const texts = [];
     (it.segs || []).forEach((sg) => {
       const x1 = X(sg.l1), x2 = X(sg.l2), y1 = Y(sg.p1), y2 = Y(sg.p2);
@@ -2643,7 +2644,7 @@ function msNextSetup(bars, A) {
     const r = (m.price - x.entry) * (x.side === 'sell' ? -1 : 1) / Math.abs(x.entry - x.stop); return isFinite(r) ? ` <b class="${r >= 0 ? 'pos' : 'neg'}">${r >= 0 ? '+' : ''}${r.toFixed(2)}R</b>` : ''; };
   const pmChip = (x) => x.pm && x.pm.cause ? `<span class="c-pm-v ${x.pm.verdict}" title="${esc(x.pm.detail + ' Lesson: ' + x.pm.lesson)}">${esc(PM_NAME[x.pm.cause] || x.pm.cause)}</span>` : '';
   // ─── Tap a council trade: see it on a chart (entry, stop, target, where it filled and where it exited) ───
-  const TV = { chart: null, series: null, lines: [], pv: [], req: 0 };
+  const TV = { chart: null, series: null, lines: [], pv: [], req: 0, mode: 'after', ov: null, ctx: null };
   function tvPickTf(x) {
     const now = Date.now() / 1000, start = x.filled || x.opened, end = x.closed || now, dur = Math.max(60, end - start);
     for (const id of ['1m', '5m', '15m', '1h', '4h', '1d']) {
@@ -2672,6 +2673,7 @@ function msNextSetup(bars, A) {
     if (!TV.chart) {
       TV.chart = LW.createChart(host, { autoSize: true, layout: { background: { type: 'solid', color: th.bg }, textColor: th.text, fontSize: 11 }, grid: { vertLines: { visible: false }, horzLines: { color: th.grid } }, crosshair: { mode: LW.CrosshairMode.Normal }, rightPriceScale: { borderColor: th.border }, timeScale: { borderColor: th.border, timeVisible: true, secondsVisible: false } });
       TV.series = TV.chart.addCandlestickSeries({ upColor: UPC, downColor: DNC, borderUpColor: UPC, borderDownColor: DNC, wickUpColor: UPC, wickDownColor: DNC, priceLineVisible: false, lastValueVisible: false });
+      TV.ov = new Overlay(); TV.series.attachPrimitive(TV.ov);
       TV.series.applyOptions({ autoscaleInfoProvider: (orig) => { const r = orig(); if (r && r.priceRange && TV.pv.length) { r.priceRange.minValue = Math.min(r.priceRange.minValue, ...TV.pv); r.priceRange.maxValue = Math.max(r.priceRange.maxValue, ...TV.pv); } return r; } });
     } else TV.chart.applyOptions({ layout: { background: { type: 'solid', color: th.bg }, textColor: th.text }, grid: { horzLines: { color: th.grid } }, rightPriceScale: { borderColor: th.border }, timeScale: { borderColor: th.border } });
     TV.lines.forEach((l) => TV.series.removePriceLine(l)); TV.lines = []; TV.series.setData([]); TV.series.setMarkers([]);
@@ -2708,6 +2710,49 @@ function msNextSetup(bars, A) {
     }
     TV.series.setMarkers(mk.sort((a, b) => a.time - b.time));
     TV.chart.timeScale().setVisibleRange({ from: from + TZ, to: to + TZ });
+    // keep what the before/after views need: the candles, the entry and exit bars, the markers
+    const idxOf = (t) => { const tt = snap(t); return data.findIndex((b) => b.time === tt); };
+    TV.ctx = { x, data, mk: mk.slice(), iE: idxOf(x.filled || x.opened), iX: x.closed ? idxOf(x.closed) : -1, s, stop0, f, from, to, title: document.getElementById('ms-tv-t').textContent };
+    tvApply(TV.mode);
+  }
+  // Before = the chart as it was when the trade was taken, with the prediction arrow (entry → target); After = what happened
+  function tvApply(mode) {
+    const C = TV.ctx; if (!C || !TV.series) return;
+    TV.mode = mode;
+    document.querySelectorAll('.tv-ba [data-ba]').forEach((b) => b.classList.toggle('on', b.dataset.ba === mode));
+    const { x, data, iE, iX, s, f } = C, before = mode === 'before', n = data.length;
+    TV.series.setData(before ? data.map((b, i) => (i <= iE ? b : { time: b.time })) : data);
+    TV.series.setMarkers(before ? C.mk.filter((m) => m.time <= data[Math.max(0, iE)].time && !/Target|Stopped|Break-even|Out after/.test(m.text)) : C.mk);
+    const tgtIdx = iX > iE ? iX : Math.min(n + 10, iE + 30), sell = s < 0, items = { boxes: [], lines: [], labels: [], path: [], vlines: [], segs: [] };
+    if (iE >= 0) {
+      items.path = [{ l: iE, p: x.entry }, { l: tgtIdx, p: x.t1 }];   // dashed arrow: the predicted move
+      items.labels.push({ l: Math.round((iE + tgtIdx) / 2), p: (x.entry + x.t1) / 2, pill: true, bg: '#2962ff', dy: sell ? 18 : -18, text: `Prediction: ${sell ? 'SELL' : 'BUY'} to ${f(x.t1)} (${x.rr}R)` });
+      items.vlines.push({ l: iE, color: '#2962ff', text: before ? 'Signal (now)' : 'Signal' });
+      if (!before && iX > 0 && ['win', 'loss', 'be'].includes(x.status)) {
+        const px = x.status === 'win' && !x.exit ? x.t1 : x.status === 'loss' && !x.exit ? C.stop0 : x.entry + s * (x.R || 0) * Math.abs(x.entry - C.stop0);
+        items.labels.push({ l: iX, p: px, pill: true, bg: x.R > 0 ? '#089981' : x.R < 0 ? '#f23645' : '#8a94a8', dy: (px > x.entry) ? -30 : 30, text: `Result: ${x.R > 0 ? 'win' : x.R < 0 ? 'loss' : 'break-even'} ${x.R > 0 ? '+' : ''}${x.R}R` });
+      }
+    }
+    if (TV.ov) TV.ov.set(items);
+    // Before: show the run-up to the signal and room for the predicted move; After: the whole trade
+    if (before && iE >= 0) TV.chart.timeScale().setVisibleLogicalRange({ from: Math.max(0, iE - 70), to: tgtIdx + 12 });
+    else TV.chart.timeScale().setVisibleRange({ from: C.from + TZ, to: C.to + TZ });
+  }
+  async function tvSaveBoth() {
+    const C = TV.ctx; if (!C || !TV.chart) return;
+    const wait = () => new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r))), keep = TV.mode, name = `${C.x.label}-${C.x.name}-${new Date((C.x.opened) * 1000).toISOString().slice(0, 16).replace(':', '')}`.replace(/[^\w-]+/g, '_');
+    if (TV.ov) TV.ov.allBottom = true;
+    for (const m of ['before', 'after']) {
+      tvApply(m); await wait();
+      const cv = TV.chart.takeScreenshot(), out = document.createElement('canvas'), ctx = out.getContext('2d');
+      out.width = cv.width; out.height = cv.height + 34; ctx.fillStyle = THEMES[G.theme].bg; ctx.fillRect(0, 0, out.width, out.height);
+      ctx.drawImage(cv, 0, 34); ctx.fillStyle = THEMES[G.theme].text; ctx.font = '600 15px -apple-system, Roboto, sans-serif';
+      ctx.fillText(`${m === 'before' ? 'BEFORE — the prediction' : 'AFTER — what happened'} · ${C.title}`, 10, 22);
+      const a = document.createElement('a'); a.download = `${name}-${m}.png`; a.href = out.toDataURL('image/png'); document.body.appendChild(a); a.click(); a.remove();
+      await new Promise((r) => setTimeout(r, 300));
+    }
+    if (TV.ov) TV.ov.allBottom = false;
+    tvApply(keep);
   }
   const ST_NAME = { open: 'Open', pending: 'Waiting fill', missed: 'Missed', expired: 'Expired', skipped: 'Skipped' };
   const SESSION_NAME = { asia: 'Asia session', london: 'London session', overlap: 'London/New York overlap', newyork: 'New York session', late: 'Late session' };
@@ -2718,6 +2763,7 @@ function msNextSetup(bars, A) {
   });
   { const dlg = document.getElementById('ms-tv'), bx = document.getElementById('ms-tv-x');
     if (bx) bx.addEventListener('click', () => dlg.close());
+    const ba = document.querySelector('.tv-ba'); if (ba) ba.addEventListener('click', (ev) => { const b = ev.target.closest('[data-ba]'); if (!b) return; if (b.dataset.ba === 'save') tvSaveBoth(); else tvApply(b.dataset.ba); });
     if (dlg) dlg.addEventListener('click', (ev) => { if (ev.target === dlg) dlg.close(); }); }
   // ─── Backtest card: the same clustered statistics the Coach uses, so the page shows exactly what it decides on ───
   function btStat(arr, key = 'R_none') {
