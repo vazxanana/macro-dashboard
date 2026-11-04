@@ -909,8 +909,10 @@ function nqOpenSignal(bars, today) {
 // 50 days of 5-minute candles but +0.29R on the last 21 days of 1-minute; Shanghai about break-even to negative: paper only.
 const NQ_ASIA = [{ id: 'tokyo', name: 'NQ Tokyo open sweep', at: 0 }, { id: 'shanghai', name: 'NQ Shanghai open sweep', at: 90 }];
 function nqAsiaSignal(bars, t0) {
-  const nyd = nyParts(t0 - 8 * 3600).d, [Y, Mo, Da] = nyd.split('-').map(Number);
   const B = bars.map((b) => ({ ...b, ...nyParts(b.time) }));
+  // the last New York session that ended before this open (on Monday that is Friday, not Sunday)
+  const nyd = [...new Set(B.filter((b) => b.m >= 570 && b.m < 960 && b.time < t0).map((b) => b.d))].sort().at(-1);
+  if (!nyd) return null;
   const rth = B.filter((b) => b.d === nyd && b.m >= 570 && b.m < 960), ev = B.filter((b) => b.time < t0 && b.time > t0 - 12 * 3600 && ((b.d === nyd && b.m >= 1080) || b.d > nyd)), pre = B.filter((b) => b.time >= t0 - 3600 && b.time < t0);
   if (rth.length < 10 || ev.length < 5) return null;
   const mx = (a) => Math.max(...a.map((b) => b.high)), mn = (a) => Math.min(...a.map((b) => b.low));
@@ -949,7 +951,7 @@ try {
         const r0 = Math.abs(g.entry - g.stop), t1 = g.entry + (g.sell ? -1.2 : 1.2) * r0;
         research.push({ id: `nq-open-${ny.d}`, market: 'nq', label: 'NQ', dec: 2, k: 'nq-open', name: 'NQ NY open sweep', day: ny.d, side: g.sell ? 'sell' : 'buy',
           entry: +g.entry.toFixed(2), stop: +g.stop.toFixed(2), t1: +t1.toFixed(2), rr: 1.2, opened: g.t + 60, filled: g.t + 60, checked: g.t + 60, status: 'open', R: null,
-          seenAt: now, level: g.level, levelPrice: +g.lv.toFixed(2), ext: +g.ext.toFixed(2), levels: Object.fromEntries(Object.entries(g.L).map(([k, v]) => [k, +v.toFixed(2)])),
+          seenAt: now, entrySeen: bars.length ? +bars.at(-1).close.toFixed(2) : null, level: g.level, levelPrice: +g.lv.toFixed(2), ext: +g.ext.toFixed(2), levels: Object.fromEntries(Object.entries(g.L).map(([k, v]) => [k, +v.toFixed(2)])),
           note: `Research (paper only): NQ swept the ${g.level} ${g.lv.toFixed(2)} after the New York open (extreme ${g.ext.toFixed(2)}) and closed back inside; ${g.sell ? 'sell' : 'buy'} ${g.entry.toFixed(2)}, stop ${g.stop.toFixed(2)}, target 1.2R ${t1.toFixed(2)}, out at 16:00.` });
       }
     }
@@ -961,7 +963,7 @@ try {
       const r0 = Math.abs(g.entry - g.stop), t1 = g.entry + (g.sell ? -1.2 : 1.2) * r0;
       research.push({ id, market: 'nq', label: 'NQ', dec: 2, k: 'nq-open', session: A.id, name: A.name, day, side: g.sell ? 'sell' : 'buy',
         entry: +g.entry.toFixed(2), stop: +g.stop.toFixed(2), t1: +t1.toFixed(2), rr: 1.2, opened: g.t + 60, filled: g.t + 60, checked: g.t + 60, status: 'open', R: null, exitAt: d0 + 7 * 3600,
-        seenAt: now, level: g.level, levelPrice: +g.lv.toFixed(2), ext: +g.ext.toFixed(2), levels: Object.fromEntries(Object.entries(g.L).map(([k, v]) => [k, +v.toFixed(2)])),
+        seenAt: now, entrySeen: bars.length ? +bars.at(-1).close.toFixed(2) : null, level: g.level, levelPrice: +g.lv.toFixed(2), ext: +g.ext.toFixed(2), levels: Object.fromEntries(Object.entries(g.L).map(([k, v]) => [k, +v.toFixed(2)])),
         note: `Research (paper only): NQ swept the ${g.level} ${g.lv.toFixed(2)} after the ${A.id === 'tokyo' ? 'Tokyo' : 'Shanghai'} open (extreme ${g.ext.toFixed(2)}) and closed back inside; ${g.sell ? 'sell' : 'buy'} ${g.entry.toFixed(2)}, stop ${g.stop.toFixed(2)}, target 1.2R ${t1.toFixed(2)}, out at 07:00 UTC.` });
     }
   }
