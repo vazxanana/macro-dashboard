@@ -399,3 +399,19 @@ entry at that M1 close, stop past the extreme as before. Gated, against H4, exit
   M1 265 +13.1R (DD −19.4). Without the stop ≥ 1 ATR filter: M1 +35.6R at best. At-EG only: M1 +28.9R vs M5 +4.8R.
 - Exits re-tuned for M1 (1.5/1, 3/3, 4/3 trails): M1 +5.0 to +15.2R vs M5 +18.0 to +85.3R.
 **M1 entries are earlier but get stopped more often; M5 kept.**
+
+## 4 Nov (night): Mosha "Barrier style" from his Telegram posts (gold 2023-2026)
+
+From the owner's screenshots of the Mosha Private Room: HTF BO = bias (mark High/Low); VR = the turn at the extreme
+(phase 2 = pullback; "at least H1 make VR first"); Origin; CF = lower-timeframe confirmation (e.g. H1 BO buy → M30 BO →
+M15 VR → M15 CF); external vs internal structure by the 0.382/0.5/0.618 of the leg; Case 4 = ranging between VR and CF →
+"Barrier style": "price come to our strong Barrier (m30 VR) → trade M5 cf"; exits close 80% / hold 20%.
+Test: barriers = the engine's VR boxes (born at the VR confirmation close) and post-VR CF boxes on M30/H1/H4; first touch,
+then an M5 CF (CHoCH) away from the zone within 12 h; stop past the touch extreme; 2R / trail 2-2 / 80% at 2R + 20% trail.
+- First pass looked strong (M30 CF +111.5R, both halves) but was hindsight: msAnalyze run once on the whole history keeps
+  only each event's last 4 CF swings (`e.cf.slice(-4)`), which is only known after the event ends. The live trader runs it
+  on bars up to now, so the live engine is not affected; only that research shortcut was.
+- Causal zones (every post-VR CF swing, born when both the swing and the VR are confirmed, dead at the next break):
+  all barriers 2,804 trades −371.7R (2R) / −408.3R (trail); M30 CF −202.7R; H1 CF −71.9R; VR barriers −72R over 142;
+  gated 1.5% −81R. Only inside the H4 VR phase (Case 4): −271R; with H4 structure −105R, against −168R.
+**Encoded barrier style loses. No change; the current gold system stays.**
