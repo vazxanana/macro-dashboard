@@ -166,3 +166,12 @@ v4 passing signals split by trend at the signal (first 100 d | last 50 d, R/trad
 Reading: the replica is a counter-trend turn; it pays mostly when it fades the H4 trend. But an H4-against filter would drop the
 trader's 2 Nov short (H4 with), and the live rules stay frozen until ~30 live trades. Kept as the first v5 candidate: re-test with
 the forward record before any change.
+
+## 4 Nov 05:30 — Gold M30 → M1 is a copy of the Scalp (finding, no change)
+
+All 7 live-era gold m30m1 trades have exactly the Scalp's entry, stop and target, opened in the same run. Cause: the engine takes
+entry, stop and target from the M1 confirming break (buildSetup), so when the M30 and M15 trends agree at an M1 CF both setups
+produce the same order. M30 → M1 adds no new trades; it only re-labels Scalps that agree with M30 (and, with its D1-against rule,
+the shadow split doubles the same result). No change while the engine runs as shadows on gold (live: the replica); if the engine
+ever goes live on gold again, drop m30m1 or give it its own entry (the M30 Origin / an M5 confirmation).
+Replica live buy 04:15 at +0.29R; Asia shadow sells (scalp/m30m1) keep losing into the rally.
