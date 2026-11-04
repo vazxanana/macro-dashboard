@@ -2542,13 +2542,16 @@ function msNextSetup(bars, A) {
   }
   // P&L calendar: the trades closed each local day, their total R and count; tap a day for its trades
   const CAL = { y: null, m: null, sel: null, mk: 'all' };
+  // NQ setups that are part of our system (4 Nov): open sweeps before New York and the New York open run. The others were
+  // retired on the same 1-minute test and their records are not counted here.
+  const NQ_SYS = ['opens', 'nyflip'], nqSys = (x) => x.market !== 'nq' || NQ_SYS.includes(x.session);
   function renderCalendar() {
     const el = document.getElementById('ms-cal'); if (!el) return;
     const withSh = (document.getElementById('ms-cal-sh') || {}).checked;
-    const withRp = (document.getElementById('ms-cal-rp') || {}).checked, rp = withRp ? ((COUNCIL.replay && COUNCIL.replay.trades) || []) : [];
+    const withRp = (document.getElementById('ms-cal-rp') || {}).checked, rp = withRp ? ((COUNCIL.replay && COUNCIL.replay.trades) || []).filter(nqSys) : [];
     const mkSel = CAL.mk || 'all';
     // forward NQ trades the Trader records on paper each New York session (research.json, k 'nq-open')
-    const nqF = withRp ? (COUNCIL.research || []).filter((x) => x.k === 'nq-open' && ['win', 'loss', 'be'].includes(x.status) && x.closed && x.R != null).map((x) => ({ ...x, pair: 'M1', paper: true, forward: true })) : [];
+    const nqF = withRp ? (COUNCIL.research || []).filter((x) => x.k === 'nq-open' && nqSys(x) && ['win', 'loss', 'be'].includes(x.status) && x.closed && x.R != null).map((x) => ({ ...x, pair: 'M1', paper: true, forward: true })) : [];
     const done = (COUNCIL.trades || []).filter((x) => ['win', 'loss', 'be'].includes(x.status) && x.closed && x.R != null && (withSh || !x.shadow) && (!withRp || x.k === 'replica')).concat(rp, nqF)
       .filter((x) => mkSel === 'all' || x.market === mkSel);
     const key = (t) => { const d = new Date(t * 1000); return `${d.getFullYear()}-${d.getMonth()}-${d.getDate()}`; };
@@ -2567,7 +2570,7 @@ function msNextSetup(bars, A) {
     el.innerHTML = html;
     document.getElementById('ms-cal-m').textContent = first.toLocaleDateString(undefined, { month: 'long', year: 'numeric' });
     const inM = (x) => { const d = new Date(x.closed * 1000); return d.getFullYear() === CAL.y && d.getMonth() === CAL.m; }, rpM = rp.concat(nqF).filter((x) => mkSel === 'all' || x.market === mkSel).filter(inM);
-    const rpTxt = [['xau', 'gold replica (replay)'], ['nq', 'NQ open (paper, replay + forward)']].map(([mk, nm]) => { const a = rpM.filter((x) => x.market === mk); return a.length ? `${nm} ${fR(a.reduce((q, x) => q + x.R, 0))} over ${a.length}` : ''; }).filter(Boolean).join(', ');
+    const rpTxt = [['xau', 'gold replica (replay)'], ['nq', 'NQ open sweeps + New York open run (paper, replay + forward)']].map(([mk, nm]) => { const a = rpM.filter((x) => x.market === mk); return a.length ? `${nm} ${fR(a.reduce((q, x) => q + x.R, 0))} over ${a.length}` : ''; }).filter(Boolean).join(', ');
     document.getElementById('ms-cal-sum').innerHTML = mN ? `Month: <b class="${mR >= 0 ? 'pos' : 'neg'}">${fR(mR)}</b> over ${mN} trades · ${up} green day${up === 1 ? '' : 's'}, ${dn} red · best day ${best.d} (${fR(best.R)}), worst day ${worst.d} (${fR(worst.R)}). ${withRp ? 'Our system only: live gold replica trades' : withSh ? 'Live and shadow trades' : 'Live trades'}${rpM.length ? `, plus the replay of our system (${(COUNCIL.replay && COUNCIL.replay.from) || ''} – ${(COUNCIL.replay && COUNCIL.replay.to) || ''}, backtest): ${rpTxt}` : ''}. 1R = the risk of one trade.` : `No closed ${withSh ? '' : 'live '}trades this month.`;
     const sel = CAL.sel && byDay.get(CAL.sel);
     const dw = document.getElementById('ms-cal-dayw');
@@ -2668,7 +2671,7 @@ function msNextSetup(bars, A) {
   }
   // Our system = the live gold replica trades (k 'replica') plus the backtest replay of the months before it went live
   const sysOn = () => { const el = document.getElementById('ms-c-sys'); return !el || el.checked; };
-  const sysTrades = () => (COUNCIL.trades || []).filter((x) => x.k === 'replica' && !x.shadow).concat((COUNCIL.replay && COUNCIL.replay.trades) || [], (COUNCIL.research || []).filter((x) => x.k === 'nq-open').map((x) => ({ ...x, pair: 'M1', paper: true, forward: true })));
+  const sysTrades = () => (COUNCIL.trades || []).filter((x) => x.k === 'replica' && !x.shadow).concat(((COUNCIL.replay && COUNCIL.replay.trades) || []).filter(nqSys), (COUNCIL.research || []).filter((x) => x.k === 'nq-open' && nqSys(x)).map((x) => ({ ...x, pair: 'M1', paper: true, forward: true })));
   function renderCouncil() {
     const root = document.getElementById('v-council'); if (!root) return;
     const set = (id, html) => { const el = document.getElementById(id); if (el) el.innerHTML = html; };
