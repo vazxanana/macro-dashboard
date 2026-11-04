@@ -201,6 +201,13 @@ day, in research.json (`k: 'nq-open'`, `session: 'tokyo' | 'shanghai'`), totals 
 History: Tokyo −0.19R a trade on 50 days of 5-minute candles, +0.29R on the last 21 days of 1-minute; Shanghai about break-even
 to negative; 2-month replay Tokyo −1.35R over 25, Shanghai −0.73R over 20. Paper only until the forward record pays.
 
+## Gold replica exit: trailing stop (4 Nov)
+
+Live replica trades no longer take a fixed 2R: once the trade is +1.5R the stop follows 1R behind the best price (`trail: [1.5, 1]`),
+capped at 10R and out after 48 h; a stop hit after the trail moved is a `trailing stop` exit at its real R. Year replay of v5:
+fixed 2R +74.8R (Jan–Jun +0.08R / Jun–Nov +0.22R a trade); trailing +98.7R (+0.17R / +0.23R), 9 of 11 months positive. Every nearby
+setting (start +1 to +2.5R, trail 0.75 to 1.5R) beat 2R on January–June; on v4's 1,020 trades it lifts the year from +81.5R to +149R.
+
 ## Gold replica v5: only against the H4 trend (4 Nov)
 
 Live replica trades now also need the H4 trend (Mosha N=6) to run against the trade; v4-passing signals with the H4 trend stay
