@@ -286,3 +286,7 @@ Losing open-sweep trades: 7 of 20 were +1R before reversing, but break-even, par
 ## Gold: the NQ open rules carried over (research, 4 Nov)
 
 The NQ open-sweep rules tested on gold unchanged (1-minute, 22 Dec – 3 Nov, 227 days, 0.30 spread; depth scaled to price, 15 NQ points ≈ 0.054%): pre-New York open reversals −0.12R a trade over 301 (3 of 12 months positive), so they do not carry over. The New York open run does, weakly: 143 trades +18.1R, +0.13R a trade, 7 of 11 months positive, but January–June +19.6R and June–November −1.5R; every depth (0–0.12%) and reclaim window (5–30 min) positive. It runs as research on paper (`k: 'gold-nyrun'`, `snapshot.research.goldNyrun`), next to the replica; it does not trade live.
+
+## Gold replica: round-number stops (4 Nov)
+
+From the trader's XAUUSD price-action PDF (a ChatGPT synthesis citing the New York Fed stop-cluster studies): stops cluster just beyond round prices and price runs to them. A replica stop sitting within $2 in front of a $10 level now moves to $0.50 past it (`stop0` keeps the original; the entry filter still judges `stop0`, so the trades taken are unchanged). Year replay of v5 + trailing with the 4-minute entry lag: the 76 trades it changes gain +16.7R (+0.22R each, paired t 1.8), both halves positive; every $10 setting tested gains, $5 levels gain less and fade past a $2 window. The PDF's other testable ideas did not help: a wick-sized buffer (+0.190R vs +0.197R) and its M15 direction gate (keeps 87 of 500 trades, −77R).
