@@ -415,3 +415,14 @@ then an M5 CF (CHoCH) away from the zone within 12 h; stop past the touch extrem
   all barriers 2,804 trades −371.7R (2R) / −408.3R (trail); M30 CF −202.7R; H1 CF −71.9R; VR barriers −72R over 142;
   gated 1.5% −81R. Only inside the H4 VR phase (Case 4): −271R; with H4 structure −105R, against −168R.
 **Encoded barrier style loses. No change; the current gold system stays.**
+
+## 4 Nov (night): Mosha SOP "BO → VR → CF, repeat" on a wide frame (gold 2023-2026, causal)
+
+Engine msAnalyze (N=6) on the wide frame, run on bars up to each lower-timeframe close (no hindsight). Once the VR is fixed,
+wait for the pullback, then enter on the first LTF close back through the last LTF swing (2/2) against the pullback, in the
+BO direction; stop past the pullback extreme; one trade per VR. Exits 2R / trail 2-2 / target = the VR extreme.
+- H4 → M15: 96 trades, −10.1R (2R), −4.3R (trail). H4 → M5: 107, −9.5R / −6.5R.
+- H1 → M15: 418, −33.1R / −1.9R (2023-24 −29.8, 2025-26 +27.9); gated 1.5% trail +23.6R (132, 2023-24 −4.0).
+- H1 → M5: 465, +13.0R (2R; 2023-24 −25.2, 2025-26 +38.2) / +3.7R trail; gated trail +19.0R (144, 2023-24 −4.6).
+- Target at the VR extreme is worse everywhere; pullback depth (main past 50% vs internal) has no consistent sign.
+**About breakeven over 4 years, positive only in 2025-26. Not better than the live gold replica (+71.9R, DD −15.8R).**
