@@ -139,7 +139,13 @@ const USER_RULES = [
   // opened before gold-only) close at market on the next run, and any non-replica live trade is closed the same way from now on.
   { id: 'retire-legacy', apply: (c) => { c.retireLegacy = true; },
     change: 'Retire the older strategies (user): live trades left from the engine setups close at market; only the gold replica trades live',
-    why: 'The trader asked for a clean live record: the replica v5 is the system. The engine setups keep running as shadow trades for research.' },
+    why: 'The trader asked for a clean live record: the replica v5 is the system. The engine setups keep running as shadow trades for research.' },  // 4 Nov (night): the trader agreed: gold becomes research only. On 8 years of HistData spot gold (2019–2026, the live v5 code,
+  // trailing exit, round stops, risk rules) the replica lost every year 2019–2025 (−312.5R over 4,484 trades, gross ≈ 0 before the
+  // spread) and only 2026 was positive; DXY filters, session windows and Asian-range sweeps added nothing. No gold or engine setup
+  // opens live paper trades any more; every replica signal is still recorded in research.json. The NQ New York open run is the system.
+  { id: 'gold-shadow', apply: (c) => { c.replicaLive = []; c.focus = ['none']; },
+    change: 'Gold research only (user): the gold replica and the engine setups stop opening live paper trades; NQ New York open run is the system',
+    why: '8-year spot gold test: the replica lost every year 2019-2025 (-312.5R over 4,484 trades), only 2026 positive; the NQ New York open run held on 3 years of NQ futures and every newer sample.' },
 ];
 config.userRules = config.userRules || [];
 for (const u of USER_RULES) if (!config.userRules.includes(u.id)) { u.apply(config); config.userRules.push(u.id); config.history.push({ at: nowISO, by: 'user', change: u.change, why: u.why }); }

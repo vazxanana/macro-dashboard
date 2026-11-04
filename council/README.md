@@ -301,3 +301,7 @@ The calendar's NQ replay now runs from Dec 2022 (this file to 11 Dec 2025, Dukas
 ## NQ New York open run: midnight-open filter (4 Nov, night)
 
 From the trader's NQ research report ("the New Day Open should be the next logical target"): the New York open run trades only when the 00:00 ET opening price lies ahead of the trade. 3-year futures file: ahead +0.22R a trade over 237 (t 2.4, every year positive), behind +0.05R over 210 (2024 negative). Outside the file (Dukascopy Dec–Mar, futures Sep–Nov 2026): ahead +0.68R over 29, behind +0.19R over 32. The report's other checks: a next-minute fill gives the same +0.14R (no fill sensitivity); every target 1R–3R is positive (2R kept); its prior-RTH high/low sweep fade scored −0.04R over 309 on the same file.
+
+## NQ is the system; gold is research (4 Nov, night)
+
+With the trader's agreement: on 8 years of HistData spot gold (2019–2026) the gold replica lost every year 2019–2025 (−312.5R over 4,484 trades; gross ≈ 0 before the spread) and only 2026 was positive; DXY filters, session windows and Asian-range sweeps added nothing. User rule `gold-shadow`: no gold or engine setup opens live paper trades (`replicaLive: []`, `focus: ['none']`); replica signals keep recording in research.json. The page's "our system" is the NQ New York open run (forward records + replay since Dec 2022), shown in its own Council card; the calendar opens on NQ; the gold card is labelled research.
