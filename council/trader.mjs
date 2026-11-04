@@ -1231,7 +1231,25 @@ if (nqLast) snapshot.nqLast = nqLast;
     if (!x.ntfyO && x.status === 'open' && x.filled >= now - 900) { x.ntfyO = 1; ev.push({ title: `${x.side.toUpperCase()} ${nm}`, msg: `Entry ${fmt(x.entry, x.dec)}, stop ${fmt(x.stop, x.dec)}${x.tp1 != null ? `, 2R mark ${fmt(x.tp1, x.dec)}, then trailing` : `, target ${fmt(x.t1, x.dec)}`}${x.size && x.size !== 1 ? ` · ${x.size}× size` : ''}`, tags: x.side === 'sell' ? 'chart_with_downwards_trend' : 'chart_with_upwards_trend' }); }
     if (!x.ntfyC && x.R != null && x.closed && x.closed >= now - 900 && ['win', 'loss', 'be'].includes(x.status)) { x.ntfyC = 1; ev.push({ title: `${x.status === 'win' ? 'Win' : x.status === 'loss' ? 'Loss' : 'Break-even'} ${fR(x.R)} · ${nm}`, msg: `${x.side.toUpperCase()} from ${fmt(x.entry, x.dec)}${x.exit ? ` · ${x.exit}` : ''}`, tags: x.R > 0 ? 'white_check_mark' : x.R < 0 ? 'x' : 'heavy_minus_sign' }); }
   }
+  // Telegram (4 Nov): the same events to a Telegram chat. Needs the repository secret TELEGRAM_BOT_TOKEN (from @BotFather).
+  // TELEGRAM_CHAT_ID is optional: without it the bot uses the first private chat that messaged it (send the bot /start),
+  // remembered in state.tgChat, and says once that it is connected.
+  const tgTok = process.env.TELEGRAM_BOT_TOKEN, tgApi = (m) => `https://api.telegram.org/bot${tgTok}/${m}`;
+  let tgChat = process.env.TELEGRAM_CHAT_ID || state.tgChat || null;
+  if (tgTok && !tgChat) {
+    try { const j = await (await fetch(tgApi('getUpdates'), { signal: AbortSignal.timeout(8000) })).json();
+      const m = (j.result || []).map((u) => u.message || u.edited_message).find((m) => m && m.chat && m.chat.type === 'private');
+      if (m) { tgChat = state.tgChat = String(m.chat.id); wr('state.json', state); ev.unshift({ title: 'Mosha council connected', msg: 'Paper trade alerts (NQ New York open run, gold replica when gold is volatile) will arrive here.' }); } }
+    catch (err) { snapshot.errors.telegram = String(err.message || err); }
+  }
+  if (tgTok && tgChat) for (const e of ev.slice(0, 8)) {
+    try { const r = await fetch(tgApi('sendMessage'), { method: 'POST', headers: { 'Content-Type': 'application/json' }, signal: AbortSignal.timeout(8000),
+        body: JSON.stringify({ chat_id: tgChat, text: `${e.title}\n${e.msg}\nhttps://vazxanana.github.io/macro-dashboard/market-structure.html#council`, disable_web_page_preview: true }) });
+      if (!r.ok) snapshot.errors.telegram = `HTTP ${r.status}`; }
+    catch (err) { snapshot.errors.telegram = String(err.message || err); }
+  }
   for (const e of ev.slice(0, 8)) {
+    if (!e.tags) continue;   // the Telegram-only 'connected' note
     try { await fetch(`https://ntfy.sh/${topic}`, { method: 'POST', body: e.msg, headers: { Title: e.title, Tags: e.tags, Click: 'https://vazxanana.github.io/macro-dashboard/market-structure.html#council' }, signal: AbortSignal.timeout(5000) }); }
     catch (err) { snapshot.errors.ntfy = String(err.message || err); }
   }
