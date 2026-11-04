@@ -156,3 +156,13 @@ v4 passing signals, same entries/stops, 48 h cap (first 100 d | last 50 d, R/tra
 1.5R +0.13 | +0.09 · **2R +0.19 | +0.13** · 2.5R +0.16 | −0.02 · 3R +0.14 | −0.03 · 4R +0.13 | −0.02 · leg start +0.04 | +0.01 ·
 half at 2R + BE + rest 4R +0.20 | +0.09 · half at 1R + BE + rest 3R +0.08 | 0.00.
 2R stays: best or tied in the first 100 days and clearly best in the last 50. Wider targets lose their edge out of sample.
+
+## 4 Nov 04:30 — Replica v4 vs the higher-timeframe trend (v5 candidate, not shipped)
+
+New live replica buy 04:15: 3,949.82 / stop 3,926.45 / 2R 3,996.56.
+v4 passing signals split by trend at the signal (first 100 d | last 50 d, R/trade):
+- H4 trend against the trade: +0.31 (164, t 2.7) | +0.21 (115, t 1.5) · H4 with: +0.06 | +0.03 ← the one split that holds in both halves
+- D1 against +0.23 | +0.05, with +0.15 | +0.21 (flips) · H1 against +0.21 | +0.18, with +0.16 | +0.03 · Mosha N=6 trend splits flip between halves.
+Reading: the replica is a counter-trend turn; it pays mostly when it fades the H4 trend. But an H4-against filter would drop the
+trader's 2 Nov short (H4 with), and the live rules stay frozen until ~30 live trades. Kept as the first v5 candidate: re-test with
+the forward record before any change.
