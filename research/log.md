@@ -234,3 +234,12 @@ v5 trades, same entries: 2R +0.084 | +0.216 (year +74.8R); 3R +0.218 | +0.146 (+
 trail 1R behind after +1.5R +0.165 | +0.231 (+98.7); trail 1.5R after +2R +0.172 | +0.243 (+103.5, 10/11 months).
 Sensitivity: all 9 trail settings beat 2R on Jan–Jun; activation +1.5–2R best on Jun–Nov. Break-even moves and shorter caps hurt.
 v4 + trail: +149.3R over 1,020 (Jan–Jun +0.09R a trade). Shipped: start +1.5R, trail 1R, cap 10R, 48 h.
+
+## 4 Nov 12:00 — Walk-forward of the filter candidates (all rejected) → rules frozen
+
+8 fixed rules on the trailing exit; each month from April the rule with the best R/trade on all prior months (≥30 trades) is applied
+to the next month. The picker chose "v5 + Asia only" every month: walk-forward Apr–Nov +16.7R vs plain v5 +62.1R. Year totals:
+v5 +98.7 (500) · v5+Asia +35.9 (126) · v5 not London +59.9 · v5 against D1 +50.9 · v5 leg ≥4 ATR +38.9 · v5 ∪ (D1 & H4 against)
++113.0 (726) · v4 +149.3 (1,020) · v4 against D1 +83.4. The extra filters only look good in hindsight.
+Decision: freeze gold replica v5 + trailing stop (start +1.5R, trail 1R, cap 10R, 48 h) for the forward test (~30 live trades,
+mid/late Nov). Judge at ~30 trades: keep if ≥ +0.1R a trade. Open option for the owner: v4 + trail (+149R, more trades, lower R/trade).
