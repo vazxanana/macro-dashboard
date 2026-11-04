@@ -243,3 +243,10 @@ v5 +98.7 (500) · v5+Asia +35.9 (126) · v5 not London +59.9 · v5 against D1 +5
 +113.0 (726) · v4 +149.3 (1,020) · v4 against D1 +83.4. The extra filters only look good in hindsight.
 Decision: freeze gold replica v5 + trailing stop (start +1.5R, trail 1R, cap 10R, 48 h) for the forward test (~30 live trades,
 mid/late Nov). Judge at ~30 trades: keep if ≥ +0.1R a trade. Open option for the owner: v4 + trail (+149R, more trades, lower R/trade).
+
+## 4 Nov 12:30 — Daily loss stop vs open-trade cap (owner: "stop after −2R?")
+
+v5 + trailing, year: none +98.7R (DD −21.8, 21 days ≤ −3R) · daily stop −1R +52.4 · −1.5R/−2R +94.3 (DD −19.0, 14 such days; the 47
+skipped trades netted +4.4R, 40% wins) · −3R +102.5 (DD −23.0). Max open: 1 → +53.6 · 2 → +89.3 · 3 → +101.5 (DD −20.8, both halves
+slightly better). The −3R days come mostly from trades open together, not from trading after losses. Shipped: max 3 open (#174).
+Daily stop rejected (costs profit).
