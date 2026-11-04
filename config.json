@@ -311,6 +311,12 @@
    "by": "user",
    "change": "Gold: Mosha's breakout system (H4 BO → H1 BO against → M15 BO back → pullback limit at the broken level, stop past the M15 Origin, 3R) trades on paper next to the replica",
    "why": "From his post. Spot gold, causal: H4→H1→M15 2019-22 +7.5R (104 trades, 2R +11.5R), 2023-26 +15.1R (114, +0.13R a trade); the only Mosha setup tested that held over 8 years without the volatility gate."
+  },
+  {
+   "at": "2026-11-04T21:01:23.000Z",
+   "by": "user",
+   "change": "Mosha BO system: trades only in the weekly structure's direction (his \"Father\" timeframe); the M15 break no longer has to flip M15 structure",
+   "why": "From his multi-timeframe slides (father/mother/son). Spot gold 2019-26, H4->H1->M15, limit at the broken level, 3R, with the weekly direction computed the way the trader sees it live (Monday weeks built from the last 720 daily candles, swing size 3): weekly agrees 2019-22 +32.2R (87 trades, +0.37R a trade), 2023-26 +34.2R (99, +0.35R), 7 of 8 years positive, worst drawdown -18.4R; weekly against -28.3R / -15.8R. The previous flip-only rule: +7.5R / +15.1R. Caveat: the weekly filter did not help the other timeframe chains, so it is watched by the kill switch like everything else."
   }
  ],
  "btAt": "2026-11-04T11:20:16.389Z",
@@ -329,7 +335,8 @@
   "gold-vol-gate",
   "gold-d1-with",
   "gold-eg-barrier",
-  "mosha-bo"
+  "mosha-bo",
+  "mosha-bo-weekly"
  ],
  "target": {},
  "targetBy": {},
@@ -340,11 +347,11 @@
  "noPause": true,
  "wouldPause": {
   "rintra": {
-   "at": "2026-11-04T20:54:51.000Z",
+   "at": "2026-11-04T21:01:23.000Z",
    "why": "four losses in a row"
   },
   "scalp": {
-   "at": "2026-11-04T20:54:51.000Z",
+   "at": "2026-11-04T21:01:23.000Z",
    "why": "expectancy -1.00R over 13 trades"
   },
   "xau": {
@@ -367,5 +374,6 @@
  "goldVolMin": 1.5,
  "goldD1With": true,
  "goldEgBarrier": true,
- "moshaBo": true
+ "moshaBo": true,
+ "moshaBoWeekly": true
 }
