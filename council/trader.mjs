@@ -971,10 +971,27 @@ function nqAsiaSignal(bars, t0) {
   return null;
 }
 let nqLast = null;
+// London sweep before New York (the trader's NQ chart, 4 Nov): the London range = 02:00–05:00 ET high/low. Between 05:00 and
+// 09:25 ET, the first 1-minute close back inside after a sweep of that low (high) is a buy (sell); stop 2 points past the
+// extreme, target 2R, out at 11:00 ET. History (4 Nov): no reliable edge yet (5-minute, 44 days: +0.21R a trade at 2R, t 0.9;
+// 1-minute, 17 days: too few): paper only, to build a forward record.
+function nqLondonSignal(bars, today) {
+  const B = bars.map((b) => ({ ...b, ...nyParts(b.time) })), L = B.filter((b) => b.d === today && b.m >= 120 && b.m < 300);
+  if (L.length < 30) return null;
+  const H = Math.max(...L.map((b) => b.high)), Lo = Math.min(...L.map((b) => b.low));
+  let swH = false, swL = false, eH = -Infinity, eL = Infinity;
+  for (const b of B.filter((b) => b.d === today && b.m >= 300 && b.m < 565)) {
+    eH = Math.max(eH, b.high); eL = Math.min(eL, b.low);
+    if (b.high > H) swH = true; if (b.low < Lo) swL = true;
+    if (swL && b.close > Lo && b.close > b.open) return { sell: false, level: 'LNL', lv: Lo, ext: eL, stop: eL - 2, t: b.time, m: b.m, entry: b.close, L: { LNH: H, LNL: Lo } };
+    if (swH && b.close < H && b.close < b.open) return { sell: true, level: 'LNH', lv: H, ext: eH, stop: eH + 2, t: b.time, m: b.m, entry: b.close, L: { LNH: H, LNL: Lo } };
+  }
+  return null;
+}
 try {
   const ny = nyParts(now), openNq = research.filter((x) => x.k === 'nq-open' && x.status === 'open');
   const ud = new Date(now * 1000), uMin = ud.getUTCHours() * 60 + ud.getUTCMinutes(), uWd = ud.getUTCDay(), asiaWin = uWd >= 1 && uWd <= 5 && uMin <= 200;
-  if ((!['Sat', 'Sun'].includes(ny.wd) && ny.m >= 565 && ny.m <= 1000) || asiaWin || openNq.length) {
+  if ((!['Sat', 'Sun'].includes(ny.wd) && ny.m >= 300 && ny.m <= 1000) || asiaWin || openNq.length) {
     // Yahoo's CME candles arrive 10 minutes late (probe 4 Nov: lag 600 s) and the newest one is still forming: drop it
     const bars = (await yahoo1m('NQ=F')).slice(0, -1);
     if (bars.length) nqLast = { price: +bars.at(-1).close.toFixed(2), at: bars.at(-1).time + 60 };   // shown as 'now' on the Active trades card (about 10 min late)
@@ -983,9 +1000,9 @@ try {
       for (const b of bars) {
         if (b.time <= r.checked) continue;
         if (s ? b.high >= r.stop : b.low <= r.stop) { r.status = 'loss'; r.R = -1; r.closed = b.time; break; }
-        if (s ? b.low <= r.t1 : b.high >= r.t1) { r.status = 'win'; r.R = 1.2; r.closed = b.time; break; }
+        if (s ? b.low <= r.t1 : b.high >= r.t1) { r.status = 'win'; r.R = +(Math.abs(r.t1 - r.entry) / r0).toFixed(2); r.closed = b.time; break; }
         const p = nyParts(b.time);
-        if (r.exitAt ? b.time >= r.exitAt : (p.d !== r.day || p.m >= 960)) { const R = +((s ? r.entry - b.open : b.open - r.entry) / r0).toFixed(2); r.status = R > 0 ? 'win' : R < 0 ? 'loss' : 'be'; r.R = R; r.closed = b.time; r.exit = r.exitAt ? '07:00 UTC' : '16:00'; break; }
+        if (r.exitAt ? b.time >= r.exitAt : (p.d !== r.day || p.m >= 960)) { const R = +((s ? r.entry - b.open : b.open - r.entry) / r0).toFixed(2); r.status = R > 0 ? 'win' : R < 0 ? 'loss' : 'be'; r.R = R; r.closed = b.time; r.exit = r.exitLabel || (r.exitAt ? '07:00 UTC' : '16:00'); break; }
       }
       if (r.status === 'open' && bars.length) r.checked = bars.at(-1).time;
     }
@@ -997,6 +1014,16 @@ try {
           entry: +g.entry.toFixed(2), stop: +g.stop.toFixed(2), t1: +t1.toFixed(2), rr: 1.2, opened: g.t + 60, filled: g.t + 60, checked: g.t + 60, status: 'open', R: null,
           seenAt: now, entrySeen: bars.length ? +bars.at(-1).close.toFixed(2) : null, level: g.level, levelPrice: +g.lv.toFixed(2), ext: +g.ext.toFixed(2), levels: Object.fromEntries(Object.entries(g.L).map(([k, v]) => [k, +v.toFixed(2)])),
           note: `Research (paper only): NQ swept the ${g.level} ${g.lv.toFixed(2)} after the New York open (extreme ${g.ext.toFixed(2)}) and closed back inside; ${g.sell ? 'sell' : 'buy'} ${g.entry.toFixed(2)}, stop ${g.stop.toFixed(2)}, target 1.2R ${t1.toFixed(2)}, out at 16:00.` });
+      }
+    }
+    if (!['Sat', 'Sun'].includes(ny.wd) && ny.m >= 301 && ny.m <= 600 && !research.some((x) => x.id === `nq-london-${ny.d}`)) {   // seen up to ~35 min late (feed lag)
+      const g = nqLondonSignal(bars, ny.d);
+      if (g) {
+        const r0 = Math.abs(g.entry - g.stop), t1 = g.entry + (g.sell ? -2 : 2) * r0;
+        research.push({ id: `nq-london-${ny.d}`, market: 'nq', label: 'NQ', dec: 2, k: 'nq-open', session: 'london', name: 'NQ London sweep before NY', day: ny.d, side: g.sell ? 'sell' : 'buy',
+          entry: +g.entry.toFixed(2), stop: +g.stop.toFixed(2), t1: +t1.toFixed(2), rr: 2, opened: g.t + 60, filled: g.t + 60, checked: g.t + 60, status: 'open', R: null, exitAt: g.t + (660 - g.m) * 60, exitLabel: '11:00 ET',
+          seenAt: now, entrySeen: bars.length ? +bars.at(-1).close.toFixed(2) : null, level: g.level, levelPrice: +g.lv.toFixed(2), ext: +g.ext.toFixed(2), levels: Object.fromEntries(Object.entries(g.L).map(([k, v]) => [k, +v.toFixed(2)])),
+          note: `Research (paper only): NQ swept the London ${g.sell ? 'high' : 'low'} ${g.lv.toFixed(2)} before New York (extreme ${g.ext.toFixed(2)}) and closed back inside; ${g.sell ? 'sell' : 'buy'} ${g.entry.toFixed(2)}, stop ${g.stop.toFixed(2)}, target 2R ${t1.toFixed(2)}, out at 11:00 ET.` });
       }
     }
     if (asiaWin) for (const A of NQ_ASIA) {
@@ -1021,7 +1048,7 @@ try {
   // the method test on the other markets (paper, 2R, no spread): v5 signals per market and all together
   const oth = rp.filter((x) => x.market !== 'xau' && x.v5); snapshot.research.replicaX = { all: sum(oth), markets: Object.fromEntries([...new Set(oth.map((x) => x.market))].map((m) => [m, sum(oth.filter((x) => x.market === m))])) };
   snapshot.research.nq = sum(research.filter((x) => x.k === 'nq-open'));
-  for (const sid of ['ny', 'tokyo', 'shanghai']) snapshot.research['nq_' + sid] = sum(research.filter((x) => x.k === 'nq-open' && (x.session || 'ny') === sid)); }
+  for (const sid of ['ny', 'london', 'tokyo', 'shanghai']) snapshot.research['nq_' + sid] = sum(research.filter((x) => x.k === 'nq-open' && (x.session || 'ny') === sid)); }
 if (nqLast) snapshot.nqLast = nqLast;
 // ─── Phone alerts (4 Nov): a push via ntfy.sh (free, no account) when a live trade or an NQ paper trade opens or closes.
 // Subscribe in the ntfy app to the topic below (or set the repository secret NTFY_TOPIC to use your own). Only events from
