@@ -13,15 +13,11 @@ jobs:
         with: { ref: council-data, path: data }
       - name: Fetch
         run: |
-          # How fresh are Yahoo's NQ=F 1-minute candles? (CME data on Yahoo may be delayed)
+          # Fresh Kraken PAXG candles to replay the gold replica against what the live Trader recorded
           mkdir -p data/research/probe
-          for k in 1 2 3; do
-            now=$(date +%s)
-            curl -sS -A "Mozilla/5.0" "https://query1.finance.yahoo.com/v8/finance/chart/NQ%3DF?interval=1m&range=1d&includePrePost=true" -o /tmp/nq.json
-            python3 -c "import json,sys;r=json.load(open('/tmp/nq.json'))['chart']['result'][0];t=r['timestamp'];m=r['meta'];print('fetched',$now,'last candle',t[-1],'lag_s',$now-t[-1],'regularMarketTime',m.get('regularMarketTime'),'lag_meta',$now-m.get('regularMarketTime',0),'delay',m.get('dataGranularity'),m.get('exchangeDataDelayedBy'))" | tee -a data/research/probe/nq-lag.txt
-            sleep 20
-          done
+          for iv in 1 5 15 60; do curl -sS "https://api.kraken.com/0/public/OHLC?pair=PAXGUSD&interval=$iv" -o "data/research/probe/PAXG-$iv.json"; sleep 2; done
+          curl -sS "https://api.gold-api.com/price/XAU" -o data/research/probe/spot.json
           git -C data config user.name "mosha-council"
           git -C data config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git -C data add research/probe && git -C data commit -qm "Probe: NQ Yahoo lag $(date -u +%H:%MZ)" || exit 0
+          git -C data add research/probe && git -C data commit -qm "Probe: Kraken PAXG candles $(date -u +%H:%MZ)" || exit 0
           for j in 1 2 3 4 5; do git -C data pull -q --rebase origin council-data && git -C data push -q origin HEAD:council-data && break; sleep 5; done
