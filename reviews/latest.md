@@ -1,91 +1,73 @@
-# Daily review, 2026-11-03: a small live loss (−3.8R) on a range day; the blocked trades made +19.6R, almost all from two gold sells
+# Daily review, 2026-11-04: a quiet −1.5R day as the old setups were retired; the new volatility gate kept gold out of a −3R afternoon
 
 ## Today
 
-**Live:** 10 closed, 2 wins, 8 losses, **−3.78R** (9 opened).
+**Live:** 7 closed, 3 wins, 4 losses, **−1.53R**. Two opened, both gold replica, before the new gold rules took effect.
 
 | Market | Closed | R |
 |---|---|---|
-| AUD/USD | 2 | +4.22 |
-| BTC | 3 | −3.00 |
-| Gold | 3 | −3.00 |
-| GBP/USD | 1 | −1.00 |
-| USD/CHF | 1 | −1.00 |
+| Gold | 3 | 0.00 |
+| ETH | 1 | −1.00 |
+| BTC | 1 | −1.00 |
+| USD/CHF | 1 | +0.44 |
+| EUR/USD | 1 | +0.03 |
 
 | Setup | Closed | R |
 |---|---|---|
-| Intraday H1→M5 | 2 | +1.11 |
-| Scalp M15→M1 | 5 | −1.89 |
-| Retrace M15→M1 | 2 | −2.00 |
+| Replica (gold, M5 CHoCH) | 2 | +1.00 |
+| Scalp M15→M1 | 1 | −1.00 |
+| Intraday H1→M5 | 1 | −1.00 |
 | Retrace H1→M5 | 1 | −1.00 |
+| Swing / Position (closed at market when retired) | 2 | +0.47 |
 
-**Shadow (blocked):** 73 closed, 28 wins, **+19.62R**. Gold contributed +17.71R (13 trades) and AUD/USD +7.42R. USD/CHF lost −6.03R and SOL −4.00R. By setup, Retrace M15→M1 made +22.4R over 24 trades; Scalp was flat (+0.17R over 38).
-
-Seven shadow trades closed by bad prints (AUD/USD 10:12, USD/CAD 06:14) were reopened and finished on cleaned candles, all as losses. The fake +2.03R USD/CAD win is gone.
+**Not traded live:**
+- **NQ New York open run:** no setup today (no 15-point run and close back across the 09:30 ET open).
+- **Mosha BO system:** no setup. The weekly structure turned **bearish** (spot gold closed the week of 26 Oct through the weekly low at 3,886), so it only takes sells.
+- **Gold replica, gated:** gold's 20-day average daily range is 1.25%, under the 1.5% gate. The six gold replica signals after the gate went in were research only: 2 wins, 4 losses, **−3R**. The gate saved those.
 
 ## What worked / What didn't
 
 **Worked**
-- **AUD/USD Intraday and Scalp sells at 0.70188** (stop 0.70374, target 0.69795, opened 1 Nov 23:01): both hit the target at 03:31 for **+2.11R each**, a clean run from the H1 Origin.
-- **Gold Retrace M15→M1 sells into the 3,946–3,969 supply (shadow):**
-  - 2 Nov 16:48 at 3,969.0: **+10.29R**; 17:14 at 3,968.2: **+9.74R**. Both were blocked by the old D1 rule, which the 07:06 research rule set removed, so they would trade live now.
-  - 00:41 at 3,956.7: +2.56R; 01:13 at 3,954.6: +1.90R. Both were blocked by the Asia rule.
-  - These match the trader's own 01:30 sell at 3,948.59 (stop 3,964.33, target 3,908.27, +2.6R).
+- **Gold replica buy at 3,949.82** (stop 3,926.45, target 3,996.56, 04:15, with the daily trend): target at 05:54 for **+2R**, a clean run.
+- **USD/CHF swing sell at 0.82021** and **EUR/USD position buy at 1.12262**: closed at market at 15:11 when the old setups were retired, for +0.44R and +0.03R.
 
 **Didn't**
-- **Gold Scalp sells into the trader's demand box** (3,891.5–3,916.1, the Origin of the M30 BO buy):
-  - 10:04 at 3,910.9: was **+4.75R** before reversing to the stop.
-  - 10:26 at 3,906.9 and 11:27 at 3,905.6: stopped.
-  - That's −3R. The trader bought this box at 09:45 (3,901.13).
-- **BTC:**
-  - Retrace M15→M1 buy at 76,696: was +1.2R, then gave it back.
-  - Retrace H1→M5 buy at 76,873: the retracement failed.
-  - Scalp sell at 76,402: −1R against the move.
-  - That's −3R.
-- **The 15:00 US data stopped two trades:**
-  - USD/CHF Intraday at 0.81985 (had been +1.91R).
-  - GBP/USD Retrace M15→M1 at 1.3407.
-  - Over the log, trades closing near news are still net positive (+13.6R over 13), so the news guard stays off.
-- **Three of the 8 live losers were +1R or more first** (+4.75R, +1.91R, +1.2R). Over 150 days, break-even at +1R still costs more than it saves (−60R vs −10R on the last 50 days), so no change.
+- **Gold replica sell at 3,924.0** (stop 3,941.86, 00:35, against the daily trend): stopped at 01:15 (−1R) when the up-move simply carried on. Under today's rules it would not trade: it was against the daily trend and not at an H1 engulfing barrier.
+- **Gold scalp sell at 3,933.11** (opened 3 Nov, against D1): stopped at 05:34 (−1R) on the same rally.
+- **BTC Retrace H1→M5 buy at 76,986.8** and **ETH Intraday sell at 2,288.24**: both stopped (−1R each). These are the last trades of the retired setups.
+- **Gated gold signals in the afternoon chop:** sells at 4,041.55, 4,041.97 and 4,061.21, buys at 4,063.40 and 4,063.74 were stopped; one buy at 4,043.72 made +2R. Gold churned in a $25 range around 4,040–4,065, the kind of calm market the gate exists for.
 
 ## Patterns over the last 30 days
 
-| Setup | Live | Shadow |
-|---|---|---|
-| Intraday H1→M5 | 4, 50% win, +0.76R a trade | 10, 40%, +0.42R |
-| Retrace H1→M5 | 4, 0%, −0.75R | 13, 46%, +0.18R |
-| Retrace M15→M1 | 6, 0%, −0.83R | 46, 52%, **+0.48R** |
-| Scalp M15→M1 | 14, 7%, **−0.56R** | 74, 23%, −0.13R |
+| Setup | Live closed | Win rate | Expectancy |
+|---|---|---|---|
+| Scalp M15→M1 (retired) | 16 | 6% | −0.62R |
+| Retrace M15→M1 (retired) | 6 | 0% | −0.83R |
+| Intraday H1→M5 (retired) | 5 | 40% | +0.41R |
+| Retrace H1→M5 (retired) | 5 | 0% | −0.80R |
+| Gold replica | 2 | 50% | +0.50R |
 
-- **D1 agreement** made little difference this month: against D1 +0.10R over 85, with D1 −0.02R over 85. Over the cleaned 150-day replay it matters a lot for Scalp: removing the "only against D1" rule costs −127R and −189R.
-- **Structure:** main +0.03R (54) and internal −0.25R (48).
-- **Sessions:** New York +1.10R (34), late +0.28R (23), Asia −0.29R (54), London −0.50R (30).
+- **The old engine setups are retired** (owner's call): live they made −16.4R over 29 closed trades.
+- **D1 agreement:** today's live trades with the daily trend were flat (0.0R over 4), against it −1.56R over 3. That's too few to read on its own. The gold rule now requires the daily trend, or an H1 engulfing barrier, for live replica trades.
+- **Main vs internal structure:** no live retracement trade today, so nothing new.
 
 ## Rule changes
 
-**No change.** The trader's rules from today now decide what trades:
+**No change.** The coach's knobs (`buf`, `minRR`, pauses) only steer the retired engine setups. The three live systems (NQ open run, gold replica, Mosha BO) run on the owner's rules and have fewer than 5 forward trades each.
 
-- **Take-all** (19:47): every signal trades on paper, with its blockers recorded.
-- **Gold only** (20:10).
-- **Gold M30 → M1, against D1** (20:17).
-- **No pauses** (07:27).
+Two things changed on the research side today:
+- The Mosha BO system now trades only with the weekly structure.
+- That rule failed an out-of-sample check on six other markets, so it runs as a forward test with an expectation near 0R.
 
-So the filters no longer block anything. Live Scalp has 14 closed at −0.56R a trade, enough to pause under the Coach's limits, but the trader asked for no pauses. buf (0.15) and minRR (1.2) have no gold-only evidence behind a change yet.
+## Watch tomorrow
 
-The automated check added "Retrace M15→M1: skip the overlap session" at 18:05. Under take-all it only records.
+- **Gold (4,063):** daily trend up, H4 down, H1 up.
+  - The replica stays research-only until the 20-day range reaches 1.5% (now 1.25%).
+  - The Mosha BO system needs, in order:
+    1. an H4 sell BO;
+    2. then an H1 buy BO (the pullback);
+    3. then an M15 sell BO back down.
 
-All of today's research is in `research/log.md`, including the gold replica of the trader's trades (paper, v4).
-
-## Watch tomorrow (gold first)
-
-- **Gold 3,924.5:**
-  - Scalp sell READY (1.75R) and M30→M1 sell READY (1.75R).
-  - Position buy and Swing sell both inside their Origins.
-  - Two live Scalp sells are open (15:22 at 3,933.1 and 19:58 at 3,922.6).
-  - The trader's levels to watch: demand 3,891.5–3,916.1, supply 3,950–3,970.
-- **Other markets (shadow only):**
-  - USD/CAD: Position, Swing and Intraday buys READY (Intraday 7.5R).
-  - GBP/USD: Swing sell READY.
-  - SOL: Swing sell READY.
-  - BTC: Retrace H1→M5 buy READY.
-  - USD/CHF: Scalp buy READY.
+    It only sells while the weekly is bearish.
+- **NQ:** New York open at 14:30 UTC. A 15-point run through the open that closes back across within 15 minutes, with the midnight open ahead, is the setup.
+- **Other markets:** research only (replica shadow). Nothing to act on.
