@@ -24,8 +24,8 @@ if (mode === 'xaub') {
   const { dukaMinutes } = await import('../council/duka.mjs');
   let all = [];
   for (const pt of [1e3]) {
-    for (let d = T('2026-01-01'); d < T('2026-11-04'); d += 7 * 86400) {
-      try { const b = await dukaMinutes('USATECHIDXUSD', d, Math.min(d + 7 * 86400, T('2026-11-04')), pt); all = all.concat(b); console.log(new Date(d * 1000).toISOString().slice(0, 10), b.length, b[0] && b[0].close); }
+    for (let d = T('2025-12-01'); d < T('2026-09-20'); d += 7 * 86400) {
+      try { const b = await dukaMinutes('USATECHIDXUSD', d, Math.min(d + 7 * 86400, T('2026-09-20')), pt); all = all.concat(b); console.log(new Date(d * 1000).toISOString().slice(0, 10), b.length, b[0] && b[0].close); }
       catch (e) { console.log('fail', new Date(d * 1000).toISOString().slice(0, 10), e.message); }
     }
   }

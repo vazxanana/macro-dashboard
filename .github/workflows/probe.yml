@@ -1,5 +1,5 @@
 name: Council data probe
-# RESEARCH ONLY: checks which keyless NQ intraday feeds answer GitHub's runners; writes to council-data/research/probe/.
+# RESEARCH ONLY: dumps NQ (Dukascopy USATECHIDXUSD) 1m candles Dec 2025 - Sep 2026 to council-data/research/candles/.
 on:
   push:
     branches: [council-probe]
@@ -8,31 +8,22 @@ permissions:
 jobs:
   probe:
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 120
     steps:
       - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
+        with: { ref: main, path: main, sparse-checkout: council }
+      - uses: actions/checkout@v4
         with: { ref: council-data, path: data }
-      - name: Probe NQ feeds
+      - uses: actions/setup-node@v4
+        with: { node-version: '20' }
+      - name: Dump NQ history
         run: |
-          mkdir -p data/research/probe/cnbc2
-          curl -sS -A "Mozilla/5.0" -m 60 -o data/research/probe/cnbc2/nd-20251201.json "https://ts-api.cnbc.com/harmony/app/bars/@ND.1/1M/20251201000000/20251215000000/adjusted/EST5EDT.json" || true
-          curl -sS -A "Mozilla/5.0" -m 60 -o data/research/probe/cnbc2/nd-20251215.json "https://ts-api.cnbc.com/harmony/app/bars/@ND.1/1M/20251215000000/20251229000000/adjusted/EST5EDT.json" || true
-          curl -sS -A "Mozilla/5.0" -m 60 -o data/research/probe/cnbc2/nd-20251229.json "https://ts-api.cnbc.com/harmony/app/bars/@ND.1/1M/20251229000000/20260112000000/adjusted/EST5EDT.json" || true
-          curl -sS -A "Mozilla/5.0" -m 60 -o data/research/probe/cnbc2/nd-20260112.json "https://ts-api.cnbc.com/harmony/app/bars/@ND.1/1M/20260112000000/20260126000000/adjusted/EST5EDT.json" || true
-          curl -sS -A "Mozilla/5.0" -m 60 -o data/research/probe/cnbc2/nd-20260126.json "https://ts-api.cnbc.com/harmony/app/bars/@ND.1/1M/20260126000000/20260209000000/adjusted/EST5EDT.json" || true
-          curl -sS -A "Mozilla/5.0" -m 60 -o data/research/probe/cnbc2/nd-20260209.json "https://ts-api.cnbc.com/harmony/app/bars/@ND.1/1M/20260209000000/20260223000000/adjusted/EST5EDT.json" || true
-          curl -sS -A "Mozilla/5.0" -m 60 -o data/research/probe/cnbc2/nd-20260223.json "https://ts-api.cnbc.com/harmony/app/bars/@ND.1/1M/20260223000000/20260309000000/adjusted/EST5EDT.json" || true
-          curl -sS -A "Mozilla/5.0" -m 60 -o data/research/probe/cnbc2/nd-20260309.json "https://ts-api.cnbc.com/harmony/app/bars/@ND.1/1M/20260309000000/20260323000000/adjusted/EST5EDT.json" || true
-          curl -sS -A "Mozilla/5.0" -m 60 -o data/research/probe/cnbc2/nd-20260323.json "https://ts-api.cnbc.com/harmony/app/bars/@ND.1/1M/20260323000000/20260406000000/adjusted/EST5EDT.json" || true
-          curl -sS -A "Mozilla/5.0" -m 60 -o data/research/probe/cnbc2/nd-20260406.json "https://ts-api.cnbc.com/harmony/app/bars/@ND.1/1M/20260406000000/20260420000000/adjusted/EST5EDT.json" || true
-          curl -sS -A "Mozilla/5.0" -m 60 -o data/research/probe/cnbc2/nd-20260420.json "https://ts-api.cnbc.com/harmony/app/bars/@ND.1/1M/20260420000000/20260504000000/adjusted/EST5EDT.json" || true
-          curl -sS -A "Mozilla/5.0" -m 60 -o data/research/probe/cnbc2/nd-20260504.json "https://ts-api.cnbc.com/harmony/app/bars/@ND.1/1M/20260504000000/20260518000000/adjusted/EST5EDT.json" || true
-          curl -sS -A "Mozilla/5.0" -m 60 -o data/research/probe/cnbc2/nd-20260518.json "https://ts-api.cnbc.com/harmony/app/bars/@ND.1/1M/20260518000000/20260601000000/adjusted/EST5EDT.json" || true
-          curl -sS -A "Mozilla/5.0" -m 60 -o data/research/probe/cnbc2/nd-20260601.json "https://ts-api.cnbc.com/harmony/app/bars/@ND.1/1M/20260601000000/20260615000000/adjusted/EST5EDT.json" || true
-          curl -sS -A "Mozilla/5.0" -m 60 -o data/research/probe/cnbc2/nd5-20251201.json "https://ts-api.cnbc.com/harmony/app/bars/@ND.1/5M/20251201000000/20260301000000/adjusted/EST5EDT.json" || true
-          curl -sS -A "Mozilla/5.0" -o /tmp/d.bi5 -w "duka %{http_code} %{size_download}\n" "https://datafeed.dukascopy.com/datafeed/USATECHIDXUSD/2025/11/02/BID_candles_min_1.bi5" > data/research/probe/cnbc2/duka.txt || true
-          ls -la data/research/probe/cnbc2; gzip -9 data/research/probe/cnbc2/*.json
+          cp -r main/council council
+          mkdir -p data/research/candles
+          node tools/histdump.mjs nq data/research/candles/nq-duka-dec-sep.json.gz 2>&1 | tail -50 || true
+          ls -la data/research/candles
           git -C data config user.name "mosha-council"
           git -C data config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git -C data add research/probe && git -C data commit -qm "Probe: CNBC ND 1m Dec-Jun $(date -u +%H:%MZ)" || exit 0
+          git -C data add research/candles && git -C data commit -qm "Research: NQ Dukascopy 1m Dec 2025 - Sep 2026 $(date -u +%H:%MZ)" || exit 0
           for j in 1 2 3 4 5; do git -C data pull -q --rebase origin council-data && git -C data push -q origin HEAD:council-data && break; sleep 5; done
