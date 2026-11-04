@@ -633,7 +633,7 @@
     </div>
     <div class="c-grid">
       <div class="card c-trader">
-        <div class="ms-k"><span>Trader · paper trades, all markets, every 4 min</span><span class="c-tog"><label class="c-mine"><input type="checkbox" id="ms-c-shadow"> Show shadow trades</label><label class="c-mine"><input type="checkbox" id="ms-c-mine"> This market only</label></span></div>
+        <div class="ms-k"><span>Trader · paper trades, all markets, every 4 min</span><span class="c-tog"><label class="c-mine" title="Only our system: the live gold replica trades plus the replay of the 2 months before it went live"><input type="checkbox" id="ms-c-sys" checked> Our system only</label><label class="c-mine"><input type="checkbox" id="ms-c-shadow"> Show shadow trades</label><label class="c-mine"><input type="checkbox" id="ms-c-mine"> This market only</label></span></div>
         <div class="c-kpi" id="ms-c-kpi"></div>
         <div class="c-eq" id="ms-c-eq"></div>
         <div class="ms-bt-wrap"><table class="ms-bt-t c-t"><thead><tr><th>Opened</th><th>Market</th><th>Setup</th><th>Side</th><th class="n">Entry</th><th class="n">Stop</th><th class="n">Target 1</th><th>Result</th></tr></thead><tbody id="ms-c-trades"></tbody></table></div>
@@ -2538,10 +2538,13 @@ function msNextSetup(bars, A) {
     const ST2 = { open: 'Open', win: 'Win', loss: 'Loss', be: 'Break-even' };
     set('ms-rep-list', L.slice(0, 10).map((x) => `<li data-tid="${esc(x.id)}" tabindex="0" title="Show this trade on a chart"><span>${ftime(x.opened + TZ)}</span><b class="${x.side === 'sell' ? 'neg' : 'pos'}">${x.side.toUpperCase()}</b><span>${fmtI(x.entry, { dec: 2 })} · stop ${fmtI(x.stop, { dec: 2 })} · 2R ${fmtI(x.t1, { dec: 2 })}${x.feat && x.feat.star ? ' · ★' : ''}</span><b class="${x.R > 0 ? 'pos' : x.R < 0 ? 'neg' : ''}">${x.R != null ? fR(x.R) + (x.exit ? ` (${esc(x.exit)})` : '') : ST2[x.status] || x.status}</b></li>`).join('') || '<li class="empty">No live replica trade yet. The first passing signal goes live.</li>');
   }
+  // Our system = the live gold replica trades (k 'replica') plus the backtest replay of the months before it went live
+  const sysOn = () => { const el = document.getElementById('ms-c-sys'); return !el || el.checked; };
+  const sysTrades = () => (COUNCIL.trades || []).filter((x) => x.k === 'replica' && !x.shadow).concat((COUNCIL.replay && COUNCIL.replay.trades) || []);
   function renderCouncil() {
     const root = document.getElementById('v-council'); if (!root) return;
     const set = (id, html) => { const el = document.getElementById(id); if (el) el.innerHTML = html; };
-    const C = COUNCIL, TA = (C.trades || []).slice().reverse(), T = TA.filter((x) => !x.shadow);
+    const C = COUNCIL, SYS = sysOn(), TA = (SYS ? sysTrades().sort((a, b) => a.opened - b.opened) : (C.trades || [])).slice().reverse(), T = TA.filter((x) => !x.shadow);
     renderCalendar();
     renderReplica();
     const showSh = document.getElementById('ms-c-shadow'), withSh = showSh && showSh.checked;
@@ -2563,13 +2566,13 @@ function msNextSetup(bars, A) {
       const y = (v) => (H - 4 - (v - lo) / Math.max(1e-9, hi - lo) * (H - 8)).toFixed(1);
       set('ms-c-eq', `<svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="none" role="img" aria-label="Trader equity in R over ${ch.length} closed trades"><line x1="0" x2="${W}" y1="${y(0)}" y2="${y(0)}" stroke="var(--line)" stroke-dasharray="4 4" vector-effect="non-scaling-stroke"/><path d="${pts.map((v, i) => `${i ? 'L' : 'M'}${(i / (pts.length - 1) * W).toFixed(1)},${y(v)}`).join('')}" fill="none" stroke="${eq >= 0 ? 'var(--buy)' : 'var(--sell)'}" stroke-width="2" vector-effect="non-scaling-stroke"/></svg>`);
     } else set('ms-c-eq', '');
-    const tableList = (withSh ? TA : T).filter((x) => !only || x.market === instKey);
+    const tableList = (withSh && !SYS ? TA : T).filter((x) => !only || x.market === instKey);
     const ST = { win: ['pos', 'Win'], loss: ['neg', 'Loss'], be: ['', 'Break-even'], open: ['', 'Open'], pending: ['', 'Waiting fill'], missed: ['', 'Missed'], expired: ['', 'Expired'], skipped: ['', 'Skipped'] };
     const dI = (x) => ({ dec: x.dec != null ? x.dec : 2 });
-    set('ms-c-trades', tableList.length ? tableList.slice(0, 25).map((x) => `<tr class="${x.shadow ? 'sh' : ''}" data-tid="${esc(x.id)}" tabindex="0" title="Show this trade on a chart"><td>${ftime(x.opened + TZ)}</td><td><b>${esc(x.label)}</b></td><td>${esc(x.name)} <small>${esc(x.pair)}</small></td><td><span class="ms-chip ${x.side === 'sell' ? 'ms-chip-sell' : 'ms-chip-buy'}">${x.side.toUpperCase()}</span></td><td class="n">${fmtI(x.entry, dI(x))}</td><td class="n">${fmtI(x.stop, dI(x))}</td><td class="n">${fmtI(x.t1, dI(x))}</td><td class="${(ST[x.status] || ['', ''])[0]}" title="${esc(x.note || '')}">${x.shadow ? 'Shadow · ' : ''}${(ST[x.status] || ['', x.status])[1]}${x.R != null && (x.status === 'win' || x.status === 'loss') ? ` ${x.R > 0 ? '+' : ''}${x.R}R` : ''}${liveR(x)}${pmChip(x)}</td></tr>`).join('')
+    set('ms-c-trades', tableList.length ? tableList.slice(0, 25).map((x) => `<tr class="${x.shadow ? 'sh' : ''}" data-tid="${esc(x.id)}" tabindex="0" title="Show this trade on a chart"><td>${ftime(x.opened + TZ)}</td><td><b>${esc(x.label)}</b></td><td>${esc(x.name)} <small>${esc(x.pair)}</small></td><td><span class="ms-chip ${x.side === 'sell' ? 'ms-chip-sell' : 'ms-chip-buy'}">${x.side.toUpperCase()}</span></td><td class="n">${fmtI(x.entry, dI(x))}</td><td class="n">${fmtI(x.stop, dI(x))}</td><td class="n">${fmtI(x.t1, dI(x))}</td><td class="${(ST[x.status] || ['', ''])[0]}" title="${esc(x.note || '')}">${x.shadow ? 'Shadow · ' : ''}${x.replay ? 'Replay · ' : ''}${(ST[x.status] || ['', x.status])[1]}${x.R != null && (x.status === 'win' || x.status === 'loss') ? ` ${x.R > 0 ? '+' : ''}${x.R}R` : ''}${liveR(x)}${pmChip(x)}</td></tr>`).join('')
       : `<tr><td colspan="8" class="empty">No council trades yet${only ? ' on this market' : ''}. The Trader takes every Ready setup it sees.</td></tr>`);
     // Trade reviews: every loss studied — our system's error, or just the market?
-    const rv = (C.trades || []).filter((x) => x.pm && x.pm.cause && (withSh || !x.shadow) && (!only || x.market === instKey)).sort((a, b) => b.closed - a.closed);
+    const rv = (C.trades || []).filter((x) => x.pm && x.pm.cause && (withSh || !x.shadow) && (!only || x.market === instKey) && (!SYS || x.k === 'replica')).sort((a, b) => b.closed - a.closed);
     const rvL = rv.filter((x) => x.status === 'loss'), sysL = rvL.filter((x) => x.pm.verdict === 'system').length;
     const L = C.snap && C.snap.lessons;
     set('ms-c-pm-sum', rvL.length ? `<div class="c-pm-bar" role="img" aria-label="${sysL} of ${rvL.length} losses were system errors"><i class="sys" style="flex:${sysL}"></i><i class="mkt" style="flex:${rvL.length - sysL}"></i></div><p class="c-pm-k"><span><i class="sys"></i>System error <b>${sysL}</b></span><span><i class="mkt"></i>Market <b>${rvL.length - sysL}</b></span><span>of ${rvL.length} reviewed loss${rvL.length === 1 ? '' : 'es'}</span></p>` +
@@ -2577,7 +2580,7 @@ function msNextSetup(bars, A) {
       : '<p class="ms-note">Each closed trade is studied: what price did before, during and after it. Losses get a verdict: a system error to fix, or just the market.</p>');
     set('ms-c-pm', rv.slice(0, 12).map((x) => `<li class="c-pm-i ${x.pm.verdict}" data-tid="${esc(x.id)}" tabindex="0" title="Show this trade on a chart"><div class="c-pm-h"><span class="c-pm-v ${x.pm.verdict}">${x.pm.verdict === 'system' ? 'System' : 'Market'}</span><b>${esc(x.pm.title)}</b><small>${esc(x.label)} · ${esc(x.name)} ${esc(x.pair)} · ${x.side} · ${x.status === 'loss' ? 'loss' : x.status === 'win' ? `win +${x.R}R` : 'break-even'}${x.shadow ? ' · shadow' : ''} · ${ago(x.closed)}${x.pm.phase === 'watch' ? ' · still watching' : ''}</small></div><p>${esc(x.pm.detail)}</p><p class="c-pm-l">Lesson: ${esc(x.pm.lesson)}</p>${(x.pm.factors || []).length ? `<p class="c-pm-f">Also: ${x.pm.factors.map((f) => esc(PM_NAME[f] || f)).join(', ')}</p>` : ''}</li>`).join('') || '');
     // Scorecard: closed council trades grouped by setup and by market
-    const allClosed = (C.trades || []).filter((x) => !x.shadow && (x.status === 'win' || x.status === 'loss' || x.status === 'be'));
+    const allClosed = (SYS ? sysTrades() : (C.trades || [])).filter((x) => !x.shadow && (x.status === 'win' || x.status === 'loss' || x.status === 'be'));
     const group = (keyFn, labelFn) => {
       const g = {}; allClosed.forEach((x) => { const k = keyFn(x); (g[k] = g[k] || { label: labelFn(x), arr: [] }).arr.push(x); });
       return Object.values(g).map(({ label, arr }) => { const w = arr.filter((x) => x.status === 'win').length, r = arr.reduce((a, x) => a + x.R, 0);
@@ -2771,6 +2774,7 @@ function msNextSetup(bars, A) {
   if (autoEl) autoEl.addEventListener('change', () => { if (auto2) auto2.checked = autoEl.checked; const m1 = panes['1m']; if (G.auto && m1 && m1.bars) topDown(); });
   const mineEl = document.getElementById('ms-c-mine'); if (mineEl) mineEl.addEventListener('change', renderCouncil);
   const shEl = document.getElementById('ms-c-shadow'); if (shEl) shEl.addEventListener('change', renderCouncil);
+  const sysEl = document.getElementById('ms-c-sys'); if (sysEl) sysEl.addEventListener('change', () => { renderCouncil(); renderHome(); });
   if (document.getElementById('v-council')) { councilReady = loadCouncil(); setInterval(loadCouncil, 5 * 60e3); }
 
   // ─── Sections: a home page of cards, each section on its own page ───
@@ -2816,7 +2820,7 @@ function msNextSetup(bars, A) {
       const done = J.filter((x) => x.res === 'win' || x.res === 'loss' || x.res === 'be'), w = done.filter((x) => x.res === 'win').length, l = done.filter((x) => x.res === 'loss').length;
       const R = done.reduce((a, x) => a + (+x.R || 0), 0), open = J.filter((x) => x.res === 'open').length;
       if (J.length) { set('h-j', `${done.length ? `${R >= 0 ? '+' : ''}${R.toFixed(1)}R` : `${J.length} logged`}`); set('h-j-sub', `${done.length} closed${w + l ? ` · ${Math.round(w / (w + l) * 100)}% win rate` : ''} · ${open} open`); }
-      if (COUNCIL.trades) { const cl = COUNCIL.trades.filter((x) => !x.shadow && (x.status === 'win' || x.status === 'loss' || x.status === 'be')), cr = cl.reduce((a, x) => a + x.R, 0); set('h-council', cl.length ? `${cr >= 0 ? '+' : ''}${cr.toFixed(1)}R <small>from ${cl.length} trades</small>` : `${COUNCIL.trades.filter((x) => !x.shadow && (x.status === 'open' || x.status === 'pending')).length} open trades`); }
+      if (COUNCIL.trades) { const cl = sysTrades().filter((x) => !x.shadow && (x.status === 'win' || x.status === 'loss' || x.status === 'be')), cr = cl.reduce((a, x) => a + x.R, 0); set('h-council', cl.length ? `${cr >= 0 ? '+' : ''}${cr.toFixed(1)}R <small>our system, ${cl.length} trades (live + replay)</small>` : `${COUNCIL.trades.filter((x) => !x.shadow && (x.status === 'open' || x.status === 'pending')).length} open trades`); }
       if (G.bt) set('h-bt', `${G.bt.wr == null ? '—' : Math.round(G.bt.wr * 100) + '%'} win · ${G.bt.R >= 0 ? '+' : ''}${(+G.bt.R).toFixed(1)}R${G.bt.at ? ` <small>${new Date(G.bt.at).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })}</small>` : ''}`);
       const warn = document.getElementById('ms-news-warn'), hw = document.getElementById('h-warn');
       if (warn && hw) { hw.hidden = warn.hidden; hw.innerHTML = warn.innerHTML; }
