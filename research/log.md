@@ -352,3 +352,16 @@ even with a true +0.2R edge).
 - **Simpler filters on 8-year spot, 1.5% gate, risk rules, trailing**: v5 +61.1R (2019-25 +18.0, 2026 +43.2);
   no H1/★ filter +35.8R (2019-25 +30.5, 2026 +5.0); stop ≥ 1 ATR only −18.3R. No variant is both sturdier and better:
   **v5 kept unchanged.**
+
+## 4 Nov (night): NQ New York open run — exits, a 10:00 window, volatility-scaled depth
+
+Both datasets, live rule (NDO ahead). Futures file Dec 2022 - Dec 2025 (237 trades) | Nasdaq cash HistData 2018 - Oct 2026 (704).
+- Live (2R, out 11:00): +51.1R (+0.216) | +83.0R (+0.118).
+- Later cutoff 11:30 / 12:00: +46.2 / +43.1 | +69.0 / +65.4. Worse on both.
+- Half at 1R + break-even: +40.5 | +66.8 (smoother, less total). 3R at 12:00: +37.2 | +71.8 with double the drawdown.
+- Trailing (from 1.5R, 1R behind, cap 4R, 12:00): +45.8 | +90.5; (from 2R, 1.5R behind, cap 5R): +52.2 | +101.6 but drawdown
+  −11.1 / −26.1. Better on cash only, flat on futures: not adopted.
+- 10:00 open window alone: −29.0R | +3.8R. Rejected.
+- Depth as a share of the 20-day average RTH range (0.04-0.10): futures +24.8 to +36.9 (all below the fixed 15 points);
+  cash 0.08-0.10 +84-92R. Inconsistent: not adopted.
+**No change: the live NQ rule is the best or tied on the futures file in every test.**
