@@ -305,3 +305,17 @@ From the trader's NQ research report ("the New Day Open should be the next logic
 ## NQ is the system; gold is research (4 Nov, night)
 
 With the trader's agreement: on 8 years of HistData spot gold (2019–2026) the gold replica lost every year 2019–2025 (−312.5R over 4,484 trades; gross ≈ 0 before the spread) and only 2026 was positive; DXY filters, session windows and Asian-range sweeps added nothing. User rule `gold-shadow`: no gold or engine setup opens live paper trades (`replicaLive: []`, `focus: ['none']`); replica signals keep recording in research.json. The page's "our system" is the NQ New York open run (forward records + replay since Dec 2022), shown in its own Council card; the calendar opens on NQ; the gold card is labelled research.
+
+### Gold volatility gate (4 Nov, user rule `gold-vol-gate`)
+
+The gold replica trades live again, but only while gold's 20-day average daily range (last 20 closed daily bars) is at least
+1.5% of price (`config.goldVolMin`). Below that, signals are recorded as research with `calm: true`. Every replica research
+record carries `vol`; the snapshot carries `goldVol` / `goldVolMin` and the gold card shows them.
+
+Why: on 8 years of spot gold (HistData) the replica's per-trade result rises with volatility — bottom fifth −0.21R a trade
+(negative in 6 of 7 years), top fifth +0.05R (positive in 6 of 8 years). With the risk rules and a 1.5% gate, 2019–2025
+make +18.9R instead of −312.5R, and 2026 makes +43.2R. 2026 is the most volatile gold year in the sample (2.2% vs 0.9–1.5%),
+which is why the replica looked good this year. NQ stays the main system.
+
+News-day check on the NQ New York open run (3-year futures file): no filter adopted — 08:30 release mornings and overnight-range
+splits change sign between samples; FOMC days were weak (7 live-rule trades, −4.9R) but too few to act on.
