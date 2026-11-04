@@ -252,3 +252,11 @@ Origins or ★ (+0.14R / +0.07R, keeps all four of the trader's trades); the sna
 on the replay (−0.04R / −0.13R a trade). Clear of H1 or ★, with stop ≥ 1 ATR: +0.188R a trade on the first 100 days (319,
 t 2.9) and +0.125R on the last 50 (208, t 1.9), no losing month, keeps all four of the trader's trades; on 3 Nov it would
 have taken 5 of the 8 signals for +0.4R instead of −2.9R. Range location and room-to-target were tested and rejected.
+
+## Live hygiene (4 Nov)
+
+- **Latency guard:** gold replica entries more than 8 min after the CHoCH candle closes are skipped (`stale` in research.json); every record stores `lag`. Year replay of v5 + trailing + 0.30 spread: on time +0.20R a trade, 4–5 min late +0.19R (+0.16R with 0.2 slippage), 10 min +0.14R; a limit entry back at the signal close was worse (+0.08R).
+- **Method test:** the replica runs unchanged on every market as research (paper, 2R, no spread, 0.1 ATR stop buffer off gold); `snapshot.research.replicaX` sums the v5 signals per market. Only gold trades it live.
+- **Retired older strategies:** live trades left from the engine setups close at market (`exit: 'retired'`); they keep running as shadows.
+- **NQ Shanghai dropped** (negative on every test); Tokyo and New York stay on paper.
+- **Phone alerts:** ntfy.sh topic `mosha-council-d200fdc484` (or the `NTFY_TOPIC` secret) gets a push when a live trade or an NQ paper trade opens or closes.

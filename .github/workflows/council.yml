@@ -63,6 +63,8 @@ jobs:
           node-version: '20'
 
       - name: Trade (loop)
+        env:
+          NTFY_TOPIC: ${{ secrets.NTFY_TOPIC }}
         run: |
           git -C data config user.name "mosha-council"
           git -C data config user.email "41898282+github-actions[bot]@users.noreply.github.com"

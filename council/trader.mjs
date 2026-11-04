@@ -135,6 +135,11 @@ const USER_RULES = [
   { id: 'replica-live', apply: (c) => { c.replicaLive = ['xau']; c.takeAll = false; },
     change: 'Gold replica live (v4): gold trades the replica live; the engine setups run as shadows; take-all off',
     why: '150-day gold replay: the replica v4 +0.19R a trade on the first 100 days and +0.13R on the last 50 (no losing month, +86R over 527 trades, all four of the trader\'s marked trades); the engine setups on gold, every signal taken, −0.15 to −0.2R a trade (−146R), with the rules +53R.' },
+  // 4 Nov: only v5 counts. The two trades still open from the earlier council strategies (EUR/USD Position, USD/CHF Swing,
+  // opened before gold-only) close at market on the next run, and any non-replica live trade is closed the same way from now on.
+  { id: 'retire-legacy', apply: (c) => { c.retireLegacy = true; },
+    change: 'Retire the older strategies (user): live trades left from the engine setups close at market; only the gold replica trades live',
+    why: 'The trader asked for a clean live record: the replica v5 is the system. The engine setups keep running as shadow trades for research.' },
 ];
 config.userRules = config.userRules || [];
 for (const u of USER_RULES) if (!config.userRules.includes(u.id)) { u.apply(config); config.userRules.push(u.id); config.history.push({ at: nowISO, by: 'user', change: u.change, why: u.why }); }
@@ -327,6 +332,10 @@ for (const [key, M] of Object.entries(MARKETS)) {
       setups: setups.map((t) => ({ k: t.k, name: t.name, pair: t.pair, side: t.sell ? 'sell' : 'buy', state: t.state, entry: t.entry, stop: t.stop, t1: t.t1, rr: +t.rr.toFixed(2), next: t.next, retrace: !!t.retrace })),
     };
 
+    if (config.retireLegacy) for (const tr of trades.filter((x) => x.market === key && !x.shadow && x.k !== 'replica' && (x.status === 'open' || x.status === 'pending'))) {
+      if (tr.status === 'pending') { tr.status = 'expired'; tr.R = 0; } else { const r0 = tr.r0 || Math.abs(tr.entry - tr.stop), R = +(((tr.side === 'sell' ? -1 : 1) * (price - tr.entry)) / r0).toFixed(2); tr.R = R; tr.status = R > 0 ? 'win' : R < 0 ? 'loss' : 'be'; }
+      tr.closed = now; tr.exit = 'retired';
+    }
     // ─── Manage open trades on this market with the candles since the last check ───
     for (const tr of trades.filter((x) => x.market === key && (x.status === 'pending' || x.status === 'open'))) {
       const bars = (src['1m'].bars[0].time <= tr.checked ? src['1m'] : src['5m'].bars[0].time <= tr.checked ? src['5m'] : src['15m']).bars;
@@ -392,14 +401,16 @@ for (const [key, M] of Object.entries(MARKETS)) {
       }
       r.checked = bars.at(-1).time;
     }
-    if (key === 'xau' && marketOpen(M, now)) {
+    // 4 Nov: the replica runs unchanged on every market as research (paper, 2R): an out-of-sample test of the method itself.
+    // Only gold trades it live (config.replicaLive). The 0.30 stop floor is in gold dollars, so other markets use 0.1 ATR alone.
+    if (marketOpen(M, now)) {
       let sigs = []; try { sigs = replicaSignals(src); } catch (e) {}
       for (const g of sigs) {
         const sig = `replica|${g.sell ? 's' : 'b'}|${g.tc}`;
         if (research.some((x) => x.market === key && x.sig === sig)) continue;
         // v2 (3 Nov): market entry at the CHoCH, target 2R; the filter = clear of live H1 Origins OR an M5 engulfing at the
         // extreme (150-day gold replay: +0.075R / +0.077R a trade in both halves, keeps all four of the trader's trades)
-        const entry = price, buf = Math.max(0.1 * g.atr, 0.3), stop = g.sell ? g.ext + buf : g.ext - buf, r0 = Math.abs(entry - stop);
+        const entry = price, buf = key === 'xau' ? Math.max(0.1 * g.atr, 0.3) : 0.1 * g.atr, stop = g.sell ? g.ext + buf : g.ext - buf, r0 = Math.abs(entry - stop);
         if (!(r0 > 0) || (g.sell ? entry >= stop : entry <= stop)) continue;
         const h1live = src['1h'].A.events.filter((e) => e.endIdx == null && e.top > e.bot), h1clear = !h1live.some((e) => entry <= e.top && entry >= e.bot);
         // v3: pass = clear of H1 Origins or the platform's ★ engulfing at the extreme; star = the ★ engulfing alone
@@ -408,8 +419,12 @@ for (const [key, M] of Object.entries(MARKETS)) {
         // v5 (4 Nov): live only against the H4 trend (Mosha N=6). Year replay with this code: v4 +81.5R over 1,020 trades (Jan-May
         // −11.2R), v5 +74.8R over 500 (Jan-May +26.2R), 9 of 11 months positive, max drawdown −23.6R vs −29.9R. The H4 split was
         // logged as a candidate on Jun-Nov data before Jan-May existed, so Jan-May is its out-of-sample test.
+        // latency (4 Nov): entries come about 4 min after the CHoCH candle closes. Year replay of v5 + trailing + 0.30 spread: on time
+        // +0.20R a trade, 4–5 min late +0.19–0.20R (+0.16R with 0.2 slippage), 8 min +0.17R, 10 min +0.14R. A limit order back at the
+        // signal close was worse (+0.08R: it fills the losers). Live entries more than 8 min late are skipped (kept as research).
+        const lag = now - g.tc - 300, stale = lag > 480;
         const h4 = src['4h'].A.trend === (g.sell ? 1 : -1) ? 'against' : src['4h'].A.trend === (g.sell ? -1 : 1) ? 'with' : 'none', v5 = pass && h4 === 'against';
-        research.push({ id: `${key}-replica-${now}-${g.sell ? 's' : 'b'}`, sig, market: key, label: M.label, dec: M.dec, k: 'replica', name: 'Gold replica', side: g.sell ? 'sell' : 'buy',
+        research.push({ id: `${key}-replica-${now}-${g.sell ? 's' : 'b'}`, sig, market: key, label: M.label, dec: M.dec, k: 'replica', name: key === 'xau' ? 'Gold replica' : `${M.label} replica (method test)`, lag, side: g.sell ? 'sell' : 'buy',
           entry: +entry.toFixed(2), stop: +stop.toFixed(2), t1: +t1.toFixed(2), rr: 2, opened: now, filled: now, checked: now, status: 'open', R: null, v: 5,
           pass, v5, h4, h1clear, eg: g.eg, peg: g.peg, star: g.star, riskAtr: +riskAtr.toFixed(2), legStart: +g.start.toFixed(2), leg: g.L === 36 ? '3h' : '6h', ext: +g.ext.toFixed(2), chochLevel: +g.lvl.toFixed(2), d1: src['1d'].A.trend === (g.sell ? -1 : 1) ? 'with' : 'against', session: sessionOf(now),
           note: `Research (paper only): gold replica v5${!pass ? '' : h4 !== 'against' ? ' (v4 passes; v5 skips it: H4 trend not against the trade)' : ''}${pass ? '' : riskAtr < 1 ? ' (filter fails: stop under one M15 ATR)' : ' (filter fails: inside a live H1 Origin, no ★ engulfing)'}. ${g.L === 36 ? '3 h' : '6 h'} leg to ${g.ext.toFixed(2)}, M5 CHoCH through ${g.lvl.toFixed(2)}${g.star ? ', ★ engulfing at structure at the extreme' : g.peg ? ', engulfing at the extreme (not at a level)' : ''}${h1clear ? ', clear of H1 Origins' : ''}; ${g.sell ? 'sell' : 'buy'} ${entry.toFixed(2)}, stop ${stop.toFixed(2)}, target 2R ${t1.toFixed(2)}.` });
@@ -431,8 +446,9 @@ for (const [key, M] of Object.entries(MARKETS)) {
           if (hist.length > 50) { let e = 0; const eq = hist.map((x) => (e += x.R)); const avg = eq.slice(-50).reduce((a, v) => a + v, 0) / 50; if (eq.at(-1) < avg) size = 0.5; } }
         if (v5 && capped) research.at(-1).capped = true;
         if (v5 && dayStop) research.at(-1).dayStop = true;
-        if (v5 && !capped && !dayStop && (config.replicaLive || []).includes(key)) trades.push({ id: `${key}-replica-${now}-${g.sell ? 's' : 'b'}`, market: key, label: M.label, dec: M.dec, k: 'replica', name: 'Replica', pair: 'M5 CHoCH', h: '5m', side: g.sell ? 'sell' : 'buy',
-          entry: +entry.toFixed(2), stop: +stop.toFixed(2), t1: +(entry + (g.sell ? -10 : 10) * r0).toFixed(2), tp1: +t1.toFixed(2), rr: 10, trail: [1.5, 1.0], size, buf: CFG.buf, opened: now, filled: now, checked: now, status: 'open', R: null, r0: Math.abs(+entry.toFixed(2) - +stop.toFixed(2)), maxHold: 48 * 3600, noBe: true, entryMode: 'market',
+        if (v5 && stale) research.at(-1).stale = true;
+        if (v5 && !capped && !dayStop && !stale && (config.replicaLive || []).includes(key)) trades.push({ id: `${key}-replica-${now}-${g.sell ? 's' : 'b'}`, market: key, label: M.label, dec: M.dec, k: 'replica', name: 'Replica', pair: 'M5 CHoCH', h: '5m', side: g.sell ? 'sell' : 'buy',
+          entry: +entry.toFixed(2), stop: +stop.toFixed(2), t1: +(entry + (g.sell ? -10 : 10) * r0).toFixed(2), tp1: +t1.toFixed(2), rr: 10, trail: [1.5, 1.0], size, buf: CFG.buf, opened: now, filled: now, checked: now, status: 'open', R: null, r0: Math.abs(+entry.toFixed(2) - +stop.toFixed(2)), maxHold: 48 * 3600, noBe: true, entryMode: 'market', lag,
           feat: { d1: src['1d'].A.trend === (g.sell ? -1 : 1) ? 'with' : 'against', h4, session: sessionOf(now), star: g.star, h1clear, riskAtr: +riskAtr.toFixed(2), leg: g.L === 36 ? '3h' : '6h' }, shadow: false, blockedBy: [],
           note: `Gold replica (v5, against the H4 trend): ${g.L === 36 ? '3 h' : '6 h'} leg to ${g.ext.toFixed(2)}, M5 CHoCH through ${g.lvl.toFixed(2)}${g.star ? ', ★ engulfing at structure at the extreme' : g.peg ? ', engulfing at the extreme' : ''}${h1clear ? ', clear of H1 Origins' : ''}. ${g.sell ? 'Sell' : 'Buy'} at market, stop past the extreme; from +1.5R the stop trails 1R behind the best price (2R mark ${t1.toFixed(2)}), out after 48 h.` });
       }
@@ -932,7 +948,8 @@ function nqOpenSignal(bars, today) {
 // before the open. First 1-minute close back inside a swept level within the first hour → the other way, stop 2 points past
 // the extreme, 1.2R, out at 07:00 UTC (London open). One trade per session per day. History (4 Nov): Tokyo −0.19R a trade on
 // 50 days of 5-minute candles but +0.29R on the last 21 days of 1-minute; Shanghai about break-even to negative: paper only.
-const NQ_ASIA = [{ id: 'tokyo', name: 'NQ Tokyo open sweep', at: 0 }, { id: 'shanghai', name: 'NQ Shanghai open sweep', at: 90 }];
+// 4 Nov: Shanghai dropped (negative on every test: 5-minute history, the 1-minute replay −2.4R over 9, forward). Tokyo stays.
+const NQ_ASIA = [{ id: 'tokyo', name: 'NQ Tokyo open sweep', at: 0 }];
 function nqAsiaSignal(bars, t0) {
   const B = bars.map((b) => ({ ...b, ...nyParts(b.time) }));
   // the last New York session that ended before this open (on Monday that is Friday, not Sunday)
@@ -999,10 +1016,29 @@ try {
   snapshot.research = { cycle: { closed: done.length, wins: done.filter((x) => x.status === 'win').length, R: +R.toFixed(2), open: research.filter((x) => x.k === 'cycle' && x.status === 'open').length } };
   const rp = research.filter((x) => x.k === 'replica'), sum = (a) => { const d = a.filter((x) => x.status === 'win' || x.status === 'loss' || x.status === 'be');
     return { signals: a.length, closed: d.length, wins: d.filter((x) => x.status === 'win').length, R: +d.reduce((s, x) => s + x.R, 0).toFixed(2), open: a.filter((x) => x.status === 'open').length, pending: a.filter((x) => x.status === 'pending').length }; };
-  snapshot.research.replica = { all: sum(rp), pass: sum(rp.filter((x) => x.pass && x.v >= 2)), v5: sum(rp.filter((x) => x.v5)), star: sum(rp.filter((x) => x.star)) };
+  const rpx = rp.filter((x) => x.market === 'xau');
+  snapshot.research.replica = { all: sum(rpx), pass: sum(rpx.filter((x) => x.pass && x.v >= 2)), v5: sum(rpx.filter((x) => x.v5)), star: sum(rpx.filter((x) => x.star)) };
+  // the method test on the other markets (paper, 2R, no spread): v5 signals per market and all together
+  const oth = rp.filter((x) => x.market !== 'xau' && x.v5); snapshot.research.replicaX = { all: sum(oth), markets: Object.fromEntries([...new Set(oth.map((x) => x.market))].map((m) => [m, sum(oth.filter((x) => x.market === m))])) };
   snapshot.research.nq = sum(research.filter((x) => x.k === 'nq-open'));
   for (const sid of ['ny', 'tokyo', 'shanghai']) snapshot.research['nq_' + sid] = sum(research.filter((x) => x.k === 'nq-open' && (x.session || 'ny') === sid)); }
 if (nqLast) snapshot.nqLast = nqLast;
+// ─── Phone alerts (4 Nov): a push via ntfy.sh (free, no account) when a live trade or an NQ paper trade opens or closes.
+// Subscribe in the ntfy app to the topic below (or set the repository secret NTFY_TOPIC to use your own). Only events from
+// the last 15 min are sent, each once (ntfyO / ntfyC flags), so a restart never floods the phone with old trades.
+{ const topic = process.env.NTFY_TOPIC || 'mosha-council-d200fdc484', fmt = (v, d) => (+v).toFixed(d != null ? d : 2), fR = (v) => `${v > 0 ? '+' : ''}${(+v).toFixed(2)}R`;
+  const ev = [];
+  for (const x of trades.filter((x) => !x.shadow).concat(research.filter((x) => x.k === 'nq-open'))) {
+    const nm = `${x.label} ${x.k === 'nq-open' ? x.name + ' (paper)' : x.name}`;
+    if (!x.ntfyO && x.status === 'open' && x.filled >= now - 900) { x.ntfyO = 1; ev.push({ title: `${x.side.toUpperCase()} ${nm}`, msg: `Entry ${fmt(x.entry, x.dec)}, stop ${fmt(x.stop, x.dec)}${x.tp1 != null ? `, 2R mark ${fmt(x.tp1, x.dec)}, then trailing` : `, target ${fmt(x.t1, x.dec)}`}${x.size && x.size !== 1 ? ` · ${x.size}× size` : ''}`, tags: x.side === 'sell' ? 'chart_with_downwards_trend' : 'chart_with_upwards_trend' }); }
+    if (!x.ntfyC && x.R != null && x.closed && x.closed >= now - 900 && ['win', 'loss', 'be'].includes(x.status)) { x.ntfyC = 1; ev.push({ title: `${x.status === 'win' ? 'Win' : x.status === 'loss' ? 'Loss' : 'Break-even'} ${fR(x.R)} · ${nm}`, msg: `${x.side.toUpperCase()} from ${fmt(x.entry, x.dec)}${x.exit ? ` · ${x.exit}` : ''}`, tags: x.R > 0 ? 'white_check_mark' : x.R < 0 ? 'x' : 'heavy_minus_sign' }); }
+  }
+  for (const e of ev.slice(0, 8)) {
+    try { await fetch(`https://ntfy.sh/${topic}`, { method: 'POST', body: e.msg, headers: { Title: e.title, Tags: e.tags, Click: 'https://vazxanana.github.io/macro-dashboard/market-structure.html#council' }, signal: AbortSignal.timeout(5000) }); }
+    catch (err) { snapshot.errors.ntfy = String(err.message || err); }
+  }
+  if (ev.length) wr('trades.json', trades);
+}
 wr('research.json', research);
 snapshot.lessons = lessons(trades, now);
 wr('snapshot.json', snapshot);
