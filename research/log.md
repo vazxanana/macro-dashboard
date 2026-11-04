@@ -183,3 +183,9 @@ First pass ("previous signal of the day won/lost") looked strong: after a win �
 But that used the previous signal's final result before it had closed (look-ahead). Using only replica trades already closed at
 the signal (6/12/24 h windows): after a win +0.02 | +0.18, after a loss +0.29 | −0.03 (6 h) — the groups swap between halves.
 Nth signal of the day and "a replica trade already open" also show nothing consistent. No change.
+
+## 4 Nov 07:30 — Replica v4 by volatility regime (no change)
+
+Regime = the signal's M15 ATR vs the median M15 true range of the previous 10 days (no look-ahead); terciles at 1.25× and 1.72×.
+calm +0.22 | +0.13 · normal +0.10 | +0.35 · volatile +0.25 | −0.11 (first 100 d | last 50 d, R/trade).
+Volatile flips from best to worst between halves; no regime filter. Gold rallied to 4,019 this morning; the 04:15 live buy caught it (+2R).
