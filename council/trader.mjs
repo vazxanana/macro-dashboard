@@ -308,6 +308,7 @@ function replicaSignals(src) {
   }
   return out;
 }
+let goldM1 = null;   // gold's 1-minute candles (spot-shifted), for the gold New York open run check after the NQ section
 for (const [key, M] of Object.entries(MARKETS)) {
   try {
     const src = {};
@@ -324,6 +325,7 @@ for (const [key, M] of Object.entries(MARKETS)) {
       src[id].A = msAnalyze(src[id].bars, 6);
     }
     const price = src['1m'].bars.at(-1).close;
+    if (key === 'xau') goldM1 = src['1m'].bars;
     setMarket(M);
     const setups = BUILDERS.map(([pr, fn]) => { try { return fn(pr, price, src); } catch (e) { return null; } }).filter(Boolean);
     snapshot.markets[key] = {
@@ -460,7 +462,7 @@ for (const [key, M] of Object.entries(MARKETS)) {
         if (b.time < r.checked) continue;
         if (s ? b.high >= r.stop : b.low <= r.stop) { r.status = 'loss'; r.R = -1; r.closed = b.time; break; }
         if (s ? b.low <= r.t1 : b.high >= r.t1) { r.status = 'win'; r.R = +((Math.abs(r.t1 - r.entry)) / r0).toFixed(2); r.closed = b.time; break; }
-        if (b.time >= r.closeBy) { const R = +((s ? r.entry - b.close : b.close - r.entry) / r0).toFixed(2); r.status = R > 0 ? 'win' : R < 0 ? 'loss' : 'be'; r.R = R; r.closed = b.time; r.exit = '8 h'; break; }
+        if (b.time >= r.closeBy) { const R = +((s ? r.entry - b.close : b.close - r.entry) / r0).toFixed(2); r.status = R > 0 ? 'win' : R < 0 ? 'loss' : 'be'; r.R = R; r.closed = b.time; r.exit = r.exitLabel || '8 h'; break; }
       }
       r.checked = bars.at(-1).time;
     }
@@ -1054,7 +1056,7 @@ const NQ_OPENS = [0, 180, 510];
 // (38, September −4.6R), New York open sweep (reversal) 0.00R (26), Tokyo −0.14R (30). Only the first two keep running;
 // the others stay in the code, switched off here.
 const NQ_ON = { ny: false, london: false, swing: false, opens: true, nyflip: true, asia: false };
-function nqOpenSweep(bars, today, o, tFree) {
+function nqOpenSweep(bars, today, o, tFree, minPen = 15) {
   const D = bars.map((b) => ({ ...b, ...nyParts(b.time) })).filter((b) => b.d === today);
   const first = D.find((b) => b.m === o); if (!first) return null;
   const O = first.open, live = new Map();
@@ -1063,7 +1065,7 @@ function nqOpenSweep(bars, today, o, tFree) {
     if (!live.has('H') && b.high > O) live.set('H', { t: b.time, ext: b.high });
     for (const [k, v] of live) {
       v.ext = k === 'L' ? Math.min(v.ext, b.low) : Math.max(v.ext, b.high);
-      if (b.time - v.t > 900 || Math.abs(v.ext - O) < 15) continue;
+      if (b.time - v.t > 900 || Math.abs(v.ext - O) < minPen) continue;
       if (k === 'L' && b.close > O && b.close > b.open) return { sell: false, lv: O, ext: v.ext, stop: v.ext - 2, t: b.time, m: b.m, entry: b.close };
       if (k === 'H' && b.close < O && b.close < b.open) return { sell: true, lv: O, ext: v.ext, stop: v.ext + 2, t: b.time, m: b.m, entry: b.close };
     }
@@ -1157,6 +1159,24 @@ try {
     }
   }
 } catch (e) { snapshot.errors.nq = String(e.message || e); }
+// Gold New York open run (4 Nov, research, paper): the NQ New York open run carried over to gold unchanged, depth scaled to
+// price (15 NQ points ≈ 0.054%, stop buffer 2 points ≈ 0.007%). Gold 1-minute history Jan–Nov (227 days): 143 trades +18.1R,
+// +0.13R a trade after a 0.30 spread, 7 of 11 months positive, but January–June +19.6R and June–November −1.5R; every depth
+// and reclaim window positive (+0.02 to +0.40R). The other NQ open rules did not carry over (pre-NY reversals −0.12R over 301).
+try {
+  const gn = nyParts(now), id = `gold-nyrun-${gn.d}`;
+  if (goldM1 && !['Sat', 'Sun'].includes(gn.wd) && gn.m > 571 && gn.m < 660 && !research.some((x) => x.id === id)) {
+    const o0 = goldM1.find((b) => { const p = nyParts(b.time); return p.d === gn.d && p.m === 570; });
+    const g = o0 && nqOpenSweep(goldM1, gn.d, 570, 0, o0.open * 0.054 / 100);
+    if (g) {
+      const bf = o0.open * 0.0072 / 100, st0 = g.sell ? g.ext + bf : g.ext - bf, r0 = Math.abs(g.entry - st0), sell = !g.sell, stop = g.entry + (sell ? r0 : -r0), t1 = g.entry + (sell ? -2 : 2) * r0;
+      research.push({ id, market: 'xau', label: 'XAU/USD', dec: 2, k: 'gold-nyrun', name: 'Gold New York open run', day: gn.d, side: sell ? 'sell' : 'buy',
+        entry: +g.entry.toFixed(2), stop: +stop.toFixed(2), t1: +t1.toFixed(2), rr: 2, opened: g.t + 60, filled: g.t + 60, checked: g.t + 60, status: 'open', R: null, closeBy: g.t + (660 - g.m) * 60, exitLabel: '11:00 ET',
+        levelPrice: +g.lv.toFixed(2), ext: +g.ext.toFixed(2),
+        note: `Research (paper only): gold ran ${Math.abs(g.ext - g.lv).toFixed(2)} through the New York open ${g.lv.toFixed(2)} and closed back across it; ${sell ? 'sell' : 'buy'} ${g.entry.toFixed(2)} with the sweep, stop ${stop.toFixed(2)}, target 2R ${t1.toFixed(2)}, out at 11:00 ET.` });
+    }
+  }
+} catch (e) { snapshot.errors.goldNyrun = String(e.message || e); }
 { const done = research.filter((x) => x.k === 'cycle' && (x.status === 'win' || x.status === 'loss' || x.status === 'be')), R = done.reduce((a, x) => a + x.R, 0);
   snapshot.research = { cycle: { closed: done.length, wins: done.filter((x) => x.status === 'win').length, R: +R.toFixed(2), open: research.filter((x) => x.k === 'cycle' && x.status === 'open').length } };
   const rp = research.filter((x) => x.k === 'replica'), sum = (a) => { const d = a.filter((x) => x.status === 'win' || x.status === 'loss' || x.status === 'be');
@@ -1166,6 +1186,7 @@ try {
   // the method test on the other markets (paper, 2R, no spread): v5 signals per market and all together
   const oth = rp.filter((x) => x.market !== 'xau' && x.v5); snapshot.research.replicaX = { all: sum(oth), markets: Object.fromEntries([...new Set(oth.map((x) => x.market))].map((m) => [m, sum(oth.filter((x) => x.market === m))])) };
   snapshot.research.nq = sum(research.filter((x) => x.k === 'nq-open'));
+  snapshot.research.goldNyrun = sum(research.filter((x) => x.k === 'gold-nyrun'));
   for (const sid of ['ny', 'london', 'swing', 'opens', 'nyflip', 'tokyo', 'shanghai']) snapshot.research['nq_' + sid] = sum(research.filter((x) => x.k === 'nq-open' && (x.session || 'ny') === sid)); }
 if (nqLast) snapshot.nqLast = nqLast;
 // ─── Phone alerts (4 Nov): a push via ntfy.sh (free, no account) when a live trade or an NQ paper trade opens or closes.
