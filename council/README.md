@@ -268,3 +268,9 @@ From the trader's 4 Nov NQ chart (v2: buys only, sweeps of the London low; 5-min
 ## NQ swing sweep before New York (paper, 4 Nov)
 
 The trader's own rule ("either a sweep of a low or a high"): M15 swing points of the day (2 candles each side); between 05:00 and 09:25 ET, a sweep of one and a 1-minute close back past it within 15 min, the candle the trade's way → the reversal; stop 2 points past the extreme, 2R, out at 11:00 ET. On 4 Nov it finds the trader's buy (swing low 28,308.5 swept at 07:55, buy 28,323 at 08:02, 2R). History: 1-minute (17 days) +0.46R a trade over 20; 5-minute replay (44 days) −0.11R, so paper only. Records `nq-swing-<day>`.
+
+## NQ open sweeps before New York (paper, 4 Nov)
+
+The trader: "NQ works mostly by sweeping the opens and trading the opposite way." The opening price of the midnight (00:00 ET), London (03:00) and 08:30 opens; within 90 min of each, price runs ≥ 15 points through it and a 1-minute close comes back across within 15 min of the first cross → the other way; stop 2 points past the extreme, 2R, out at 11:00 ET, one trade at a time. Records `nq-opens-<day>-<minute>`, session `opens`.
+
+Tested on 1-minute NQ (Yahoo NQ=F + CNBC @ND.1, 11 Sep – 4 Nov, 39 days; both feeds gave identical signals where they overlap): 38 trades, +15.3R, +0.40R a trade (t 1.7), September +11.7R and October +3.6R, buys +4.7R and sells +10.6R. Across all 10 open setups tested (open price and prior-range sweeps at midnight, 02:00, 03:00, 08:30, 09:30), shallow sweeps lose (−0.20R a trade over 282 with no depth rule) and the edge peaks at 15–20 points. New York 09:30 open sweeps lose (−0.45R a trade over 27: they tend to run). The New York exclusion and the 15-point depth were picked on this data, so it is paper only until it holds forward.
