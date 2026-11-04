@@ -917,12 +917,22 @@ research = research.slice(-2000);
 const nyFmt = new Intl.DateTimeFormat('en-CA', { timeZone: 'America/New_York', year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', hourCycle: 'h23', weekday: 'short' });
 function nyParts(t) { const o = {}; for (const p of nyFmt.formatToParts(new Date(t * 1000))) o[p.type] = p.value; return { d: `${o.year}-${o.month}-${o.day}`, m: +o.hour * 60 + +o.minute, wd: o.weekday }; }
 async function yahoo1m(sym) {
-  const r = await fetch(`https://query1.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(sym)}?interval=1m&range=5d&includePrePost=true`, { headers: { 'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36', Accept: 'application/json' } });
-  const j = await r.json(), res = j && j.chart && j.chart.result && j.chart.result[0];
-  if (!res) throw new Error(`Yahoo ${sym}: HTTP ${r.status}`);
-  const ts = res.timestamp || [], q = res.indicators.quote[0], out = [];
-  for (let i = 0; i < ts.length; i++) { const o = q.open[i], h = q.high[i], l = q.low[i], c = q.close[i]; if ([o, h, l, c].every((v) => v != null && isFinite(v) && v > 0)) out.push({ time: ts[i], open: o, high: Math.max(h, o, c), low: Math.min(l, o, c), close: c }); }
-  return out;
+  // 4 Nov: Yahoo answers GitHub's runners with 429 "Too Many Requests" now and then: try both hosts, back off, retry (3 rounds)
+  let last = '';
+  for (let a = 0; a < 3; a++) {
+    for (const host of ['query1', 'query2']) {
+      let r; try { r = await fetch(`https://${host}.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(sym)}?interval=1m&range=5d&includePrePost=true`, { headers: { 'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36', Accept: 'application/json' }, signal: AbortSignal.timeout(15000) }); }
+      catch (e) { last = String(e.message || e); continue; }
+      if (r.status === 429 || r.status >= 500) { last = `HTTP ${r.status}`; continue; }
+      const j = await r.json().catch(() => null), res = j && j.chart && j.chart.result && j.chart.result[0];
+      if (!res) throw new Error(`Yahoo ${sym}: HTTP ${r.status}`);
+      const ts = res.timestamp || [], q = res.indicators.quote[0], out = [];
+      for (let i = 0; i < ts.length; i++) { const o = q.open[i], h = q.high[i], l = q.low[i], c = q.close[i]; if ([o, h, l, c].every((v) => v != null && isFinite(v) && v > 0)) out.push({ time: ts[i], open: o, high: Math.max(h, o, c), low: Math.min(l, o, c), close: c }); }
+      return out;
+    }
+    await sleep(3000 * (a + 1));
+  }
+  throw new Error(`Yahoo ${sym}: throttled (${last})`);
 }
 function nqOpenSignal(bars, today) {
   const B = bars.map((b) => ({ ...b, ...nyParts(b.time) })), days = [...new Set(B.filter((b) => b.m >= 570 && b.m < 960 && b.d < today).map((b) => b.d))].sort();
