@@ -1063,7 +1063,10 @@ const NQ_OPENS = [0, 180, 510];
 // (27), open sweeps before New York +0.40R (38), London low sweep +0.23R (19, overlaps the open sweeps), swing sweep +0.15R
 // (38, September −4.6R), New York open sweep (reversal) 0.00R (26), Tokyo −0.14R (30). Only the first two keep running;
 // the others stay in the code, switched off here.
-const NQ_ON = { ny: false, london: false, swing: false, opens: true, nyflip: true, asia: false };
+// 4 Nov (night): the trader's 3-year NQ futures file (1m, Dec 2022 – Dec 2025, never used to build the rules) settles it:
+// New York open run 447 trades +62.3R, +0.14R a trade (t 2.15), 2023 +35.9R / 2024 +7.6R / 2025 +19.4R, both sides positive;
+// open sweeps 352 trades −22.4R (−0.06R), 2023 and 2025 negative (London −17.6R). Only the New York open run stays on.
+const NQ_ON = { ny: false, london: false, swing: false, opens: false, nyflip: true, asia: false };
 function nqOpenSweep(bars, today, o, tFree, minPen = 15) {
   const D = bars.map((b) => ({ ...b, ...nyParts(b.time) })).filter((b) => b.d === today);
   const first = D.find((b) => b.m === o); if (!first) return null;
