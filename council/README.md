@@ -297,3 +297,7 @@ The trader's NQ futures file (1-minute, 27 Dec 2022 – 11 Dec 2025, 763 full da
 - **New York open run:** 447 trades +62.3R, +0.14R a trade (t 2.15), 42% wins; 2023 +35.9R, 2024 +7.6R, 2025 +19.4R; 24 of 37 months positive; buys +25.9R, sells +36.3R. **Kept** (paper).
 - **Open sweeps before New York:** 352 trades −22.4R (−0.06R), 2023 −11.3R, 2024 +4.8R, 2025 −15.9R; London −17.6R, 08:30 −8.4R, midnight +3.6R. **Switched off.**
 The calendar's NQ replay now runs from Dec 2022 (this file to 11 Dec 2025, Dukascopy cash index 12 Dec – 8 Mar, Yahoo + CNBC futures from 11 Sep).
+
+## NQ New York open run: midnight-open filter (4 Nov, night)
+
+From the trader's NQ research report ("the New Day Open should be the next logical target"): the New York open run trades only when the 00:00 ET opening price lies ahead of the trade. 3-year futures file: ahead +0.22R a trade over 237 (t 2.4, every year positive), behind +0.05R over 210 (2024 negative). Outside the file (Dukascopy Dec–Mar, futures Sep–Nov 2026): ahead +0.68R over 29, behind +0.19R over 32. The report's other checks: a next-minute fill gives the same +0.14R (no fill sensitivity); every target 1R–3R is positive (2R kept); its prior-RTH high/low sweep fade scored −0.04R over 309 on the same file.
