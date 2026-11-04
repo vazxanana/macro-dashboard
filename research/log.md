@@ -437,3 +437,11 @@ Owner: "on CF you should enter, that's why it is called CF, and target the oppos
    M30 1,224 trades −462R (29% wins), H1 638 −221R, H4 183 −83R; reward ≥ 3R and the 1.5% gate still negative.
 **Neither reading has an edge on gold as coded.** The CF box the engine draws (pivot ± 0.35 of the leg) is wide, so
 entries at its near edge carry wide stops and small rewards; Mosha's CF zone is probably tighter.
+
+## 4 Nov (night): top-down stack H4 → H1 → M15 → M5 (gold 2023-2026, causal)
+
+The BO → VR → CF cycle on M15 (CF on M5 or M1) and on H1 (CF on M5 or M15), split by the H4 and H1 structure (engine trend
+at entry). Full stack aligned (H4 + H1 agree with the trade): M15/M5 −25.1R (2R, 628), M15/M1 +16.6R (700, +0.024),
+H1/M5 −12.7R (294), H1/M15 −33.1R (261). H4 against: H1/M5 +25.6R (171, +0.150, 2023-24 −4.9), H1/M15 0.0R.
+**Stacking the timeframes in agreement adds no edge; the only positive split is the cycle against H4 (a pullback),
+the same thing the live replica already trades.**
