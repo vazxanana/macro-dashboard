@@ -146,6 +146,9 @@ const USER_RULES = [
   { id: 'gold-shadow', apply: (c) => { c.replicaLive = []; c.focus = ['none']; },
     change: 'Gold research only (user): the gold replica and the engine setups stop opening live paper trades; NQ New York open run is the system',
     why: '8-year spot gold test: the replica lost every year 2019-2025 (-312.5R over 4,484 trades), only 2026 positive; the NQ New York open run held on 3 years of NQ futures and every newer sample.' },
+  { id: 'gold-eg-barrier', apply: (c) => { c.goldEgBarrier = true; },
+    change: 'Gold replica: a signal against the daily trend is still taken when its extreme sits at a live H1 engulfing barrier',
+    why: "Owner: Mosha's edge is structure plus barriers (EG/OB). 2023-26 spot, gated v5, exit v2: signals at an H1 EG +0.293R a trade (151, both halves positive), at an OB -0.124R; pure-structure and barrier-only models lost. D1-with OR at-EG: 392 trades +71.9R, drawdown -15.8R vs D1-with alone 325 trades +63.8R. Mosha's 2 Nov sell started inside a fresh H1 bearish EG." },
   { id: 'gold-d1-with', apply: (c) => { c.goldD1With = true; },
     change: 'Gold replica trades live only in the daily trend direction (still against the H4 trend: a pullback entry)',
     why: 'Owner: judge gold on the last 4 years. 2023-26 spot, 1.5% gate, exit v2, risk rules: 602 trades +87.4R, worst drawdown -35.2R -> D1-with 325 trades +63.8R, drawdown -15.8R (+0.196R a trade). Chosen on 2023-24 (+8.1R vs -22.2R), held on 2025-26 (+55.7R). In 2019-22 the opposite held (D1-against better), so this is a last-4-years rule.' },
@@ -281,6 +284,24 @@ function goldLevels(src, t) {
   if (prev.length) L.push(Math.max(...prev.map((b) => b.high)), Math.min(...prev.map((b) => b.low)));
   if (t >= d0 + 7 * 3600) { const asia = src['15m'].bars.filter((b) => b.time >= d0 && b.time < d0 + 7 * 3600); if (asia.length) L.push(Math.max(...asia.map((b) => b.high)), Math.min(...asia.map((b) => b.low))); }
   return L;
+}
+// H1 engulfing barriers (4 Nov, night: the owner's "barriers"): an H1 engulfing candle with a body of at least 0.5 H1 ATR(14)
+// marks a zone — demand: from the lower low of the pair up to the engulfed candle's open; supply: from the engulfed candle's
+// open up to the higher high. A zone lives until an H1 close passes its far side, or 10 days. Same rules as the research replay.
+function h1EgZones(bars) {
+  const B = bars, z = [];
+  const tr = (i) => Math.max(B[i].high - B[i].low, Math.abs(B[i].high - B[i - 1].close), Math.abs(B[i].low - B[i - 1].close));
+  for (let i = 1; i < B.length; i++) {
+    let s = 0, k = 0; for (let j = Math.max(1, i - 13); j <= i; j++) { s += tr(j); k++; } const a = s / Math.max(k, 1);
+    const p = B[i - 1], b = B[i];
+    if (Math.abs(b.close - b.open) >= 0.5 * a) {
+      if (p.close < p.open && b.close > b.open && b.close >= p.open && b.open <= p.close) z.push({ d: 1, top: p.open, bot: Math.min(p.low, b.low), t: b.time + 3600 });
+      if (p.close > p.open && b.close < b.open && b.close <= p.open && b.open >= p.close) z.push({ d: -1, top: Math.max(p.high, b.high), bot: p.open, t: b.time + 3600 });
+    }
+    for (const q of z) if (!q.dead && q.t <= b.time && ((q.d === 1 && b.close < q.bot) || (q.d === -1 && b.close > q.top) || b.time - q.t > 10 * 86400)) q.dead = true;
+  }
+  const last = B.at(-1).time + 3600;
+  return z.filter((q) => !q.dead && last - q.t <= 10 * 86400);
 }
 function replicaSignals(src) {
   const B5 = src['5m'].bars.slice(0, -1), B15 = src['15m'].bars.slice(0, -1), out = [];
@@ -480,8 +501,11 @@ for (const [key, M] of Object.entries(MARKETS)) {
         if (volPct != null) research.at(-1).vol = +volPct.toFixed(2);
         if (v5 && !volOk) research.at(-1).calm = true;
         const d1w = src['1d'].A.trend === (g.sell ? -1 : 1);
-        if (v5 && config.goldD1With && !d1w) research.at(-1).d1Skip = true;
-        if (v5 && volOk && (!config.goldD1With || d1w) && !capped && !dayStop && !stale && (config.replicaLive || []).includes(key)) trades.push({ id: `${key}-replica-${now}-${g.sell ? 's' : 'b'}`, market: key, label: M.label, dec: M.dec, k: 'replica', name: 'Replica', pair: 'M5 CHoCH', h: '5m', side: g.sell ? 'sell' : 'buy',
+        let atEG = false; try { atEG = h1EgZones(src['1h'].bars.slice(0, -1).slice(-300)).some((q) => q.d === (g.sell ? -1 : 1) && stop0 >= q.bot - 1 && stop0 <= q.top + 1); } catch (e) {}
+        research.at(-1).atEG = atEG;
+        const dirOk = !config.goldD1With || d1w || (config.goldEgBarrier && atEG);
+        if (v5 && !dirOk) research.at(-1).d1Skip = true;
+        if (v5 && volOk && dirOk && !capped && !dayStop && !stale && (config.replicaLive || []).includes(key)) trades.push({ id: `${key}-replica-${now}-${g.sell ? 's' : 'b'}`, market: key, label: M.label, dec: M.dec, k: 'replica', name: 'Replica', pair: 'M5 CHoCH', h: '5m', side: g.sell ? 'sell' : 'buy',
           entry: +entry.toFixed(2), stop: +stop.toFixed(2), t1: +(entry + (g.sell ? -10 : 10) * r0).toFixed(2), tp1: +t1.toFixed(2), rr: 10, trail: [2.0, 2.0], size, buf: CFG.buf, opened: now, filled: now, checked: now, status: 'open', R: null, r0: Math.abs(+entry.toFixed(2) - +stop.toFixed(2)), maxHold: 48 * 3600, noBe: true, entryMode: 'market', lag,
           feat: { d1: src['1d'].A.trend === (g.sell ? -1 : 1) ? 'with' : 'against', h4, session: sessionOf(now), star: g.star, h1clear, riskAtr: +riskAtr.toFixed(2), leg: g.L === 36 ? '3h' : '6h' }, shadow: false, blockedBy: [],
           note: `Gold replica (v5, against the H4 trend): ${g.L === 36 ? '3 h' : '6 h'} leg to ${g.ext.toFixed(2)}, M5 CHoCH through ${g.lvl.toFixed(2)}${g.star ? ', ★ engulfing at structure at the extreme' : g.peg ? ', engulfing at the extreme' : ''}${h1clear ? ', clear of H1 Origins' : ''}. ${g.sell ? 'Sell' : 'Buy'} at market, stop past the extreme; from +2R the stop trails 2R behind the best price (2R mark ${t1.toFixed(2)}), out after 48 h.` });
