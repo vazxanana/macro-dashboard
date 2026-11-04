@@ -264,3 +264,7 @@ have taken 5 of the 8 signals for +0.4R instead of −2.9R. Range location and r
 ## NQ London sweep before New York (paper, 4 Nov)
 
 From the trader's 4 Nov NQ chart (v2: buys only, sweeps of the London low; 5-minute history buys +0.47R a trade over 27, sells −0.20R over 22): the London range is 02:00–05:00 ET. Between 05:00 and 09:25 ET, the first 1-minute close back inside after a sweep of the London low (high) is a buy (sell); stop 2 points past the extreme, 2R, out at 11:00 ET. Recorded in research.json (k `nq-open`, session `london`, `nq-london-<day>`). History has no reliable edge yet (5-minute, 44 days: +0.21R a trade, t 0.9), so it is paper only. NQ wins now score their real R (the London target is 2R, not 1.2R).
+
+## NQ swing sweep before New York (paper, 4 Nov)
+
+The trader's own rule ("either a sweep of a low or a high"): M15 swing points of the day (2 candles each side); between 05:00 and 09:25 ET, a sweep of one and a 1-minute close back past it within 15 min, the candle the trade's way → the reversal; stop 2 points past the extreme, 2R, out at 11:00 ET. On 4 Nov it finds the trader's buy (swing low 28,308.5 swept at 07:55, buy 28,323 at 08:02, 2R). History: 1-minute (17 days) +0.46R a trade over 20; 5-minute replay (44 days) −0.11R, so paper only. Records `nq-swing-<day>`.

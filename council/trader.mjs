@@ -1015,6 +1015,32 @@ function nqLondonSignal(bars, today) {
   }
   return null;
 }
+// The trader's swing sweep (4 Nov: "either a sweep of a low or a high"; their trade: the 03:30 ET swing low 28,308.5 swept at
+// 07:55, buy 28,323 at 08:02, 2R into the New York open). M15 swing points of the day (2 candles each side, known once
+// confirmed); between 05:00 and 09:25 ET, a sweep of one and a 1-minute close back past it within 15 min (candle the trade's
+// way) → the reversal. Stop 2 points past the sweep's extreme, 2R, out at 11:00 ET. History: 1-minute, 17 days +0.46R a
+// trade (n 20); 5-minute replay, 44 days −0.11R: unproven, paper only.
+function nqSwingSignal(bars, today) {
+  const D = bars.map((b) => ({ ...b, ...nyParts(b.time) })).filter((b) => b.d === today);
+  if (D.length < 100) return null;
+  const M = []; for (const b of D.filter((b) => b.m < 565)) { const t = Math.floor(b.time / 900) * 900, c = M.at(-1);
+    if (!c || c.time !== t) M.push({ time: t, high: b.high, low: b.low }); else { c.high = Math.max(c.high, b.high); c.low = Math.min(c.low, b.low); } }
+  const P = []; for (let i = 2; i < M.length - 2; i++) { const nb = [i - 2, i - 1, i + 1, i + 2];
+    if (nb.every((j) => M[i].high > M[j].high)) P.push({ k: 'H', lv: M[i].high, at: M[i].time + 2700 });
+    if (nb.every((j) => M[i].low < M[j].low)) P.push({ k: 'L', lv: M[i].low, at: M[i].time + 2700 }); }
+  const live = new Map();
+  for (const b of D.filter((b) => b.m >= 300 && b.m < 565)) {
+    for (const p of P) { if (p.at > b.time) continue; const key = p.k + p.lv; if (live.has(key)) continue;
+      if (p.k === 'L' && b.low < p.lv) live.set(key, { ...p, t: b.time, ext: b.low }); if (p.k === 'H' && b.high > p.lv) live.set(key, { ...p, t: b.time, ext: b.high }); }
+    for (const v of live.values()) {
+      v.ext = v.k === 'L' ? Math.min(v.ext, b.low) : Math.max(v.ext, b.high);
+      if (b.time - v.t > 900) continue;
+      if (v.k === 'L' && b.close > v.lv && b.close > b.open) return { sell: false, level: 'SWL', lv: v.lv, ext: v.ext, stop: v.ext - 2, t: b.time, m: b.m, entry: b.close, L: { SWL: v.lv } };
+      if (v.k === 'H' && b.close < v.lv && b.close < b.open) return { sell: true, level: 'SWH', lv: v.lv, ext: v.ext, stop: v.ext + 2, t: b.time, m: b.m, entry: b.close, L: { SWH: v.lv } };
+    }
+  }
+  return null;
+}
 try {
   const ny = nyParts(now), openNq = research.filter((x) => x.k === 'nq-open' && x.status === 'open');
   const ud = new Date(now * 1000), uMin = ud.getUTCHours() * 60 + ud.getUTCMinutes(), uWd = ud.getUTCDay(), asiaWin = uWd >= 1 && uWd <= 5 && uMin <= 200;
@@ -1053,6 +1079,16 @@ try {
           note: `Research (paper only): NQ swept the London ${g.sell ? 'high' : 'low'} ${g.lv.toFixed(2)} before New York (extreme ${g.ext.toFixed(2)}) and closed back inside; ${g.sell ? 'sell' : 'buy'} ${g.entry.toFixed(2)}, stop ${g.stop.toFixed(2)}, target 2R ${t1.toFixed(2)}, out at 11:00 ET.` });
       }
     }
+    if (!['Sat', 'Sun'].includes(ny.wd) && ny.m >= 301 && ny.m < 660 && !research.some((x) => x.id === `nq-swing-${ny.d}`)) {
+      const g = nqSwingSignal(bars, ny.d);
+      if (g) {
+        const r0 = Math.abs(g.entry - g.stop), t1 = g.entry + (g.sell ? -2 : 2) * r0;
+        research.push({ id: `nq-swing-${ny.d}`, market: 'nq', label: 'NQ', dec: 2, k: 'nq-open', session: 'swing', name: 'NQ swing sweep before NY', day: ny.d, side: g.sell ? 'sell' : 'buy',
+          entry: +g.entry.toFixed(2), stop: +g.stop.toFixed(2), t1: +t1.toFixed(2), rr: 2, opened: g.t + 60, filled: g.t + 60, checked: g.t + 60, status: 'open', R: null, exitAt: g.t + (660 - g.m) * 60, exitLabel: '11:00 ET',
+          seenAt: now, entrySeen: bars.length ? +bars.at(-1).close.toFixed(2) : null, level: g.level, levelPrice: +g.lv.toFixed(2), ext: +g.ext.toFixed(2), levels: Object.fromEntries(Object.entries(g.L).map(([k, v]) => [k, +v.toFixed(2)])),
+          note: `Research (paper only): NQ swept the M15 swing ${g.sell ? 'high' : 'low'} ${g.lv.toFixed(2)} before New York (extreme ${g.ext.toFixed(2)}) and closed back ${g.sell ? 'below' : 'above'} within 15 min; ${g.sell ? 'sell' : 'buy'} ${g.entry.toFixed(2)}, stop ${g.stop.toFixed(2)}, target 2R ${t1.toFixed(2)}, out at 11:00 ET.` });
+      }
+    }
     if (asiaWin) for (const A of NQ_ASIA) {
       const d0 = Math.floor(now / 86400) * 86400, t0 = d0 + A.at * 60, day = new Date(d0 * 1000).toISOString().slice(0, 10), id = `nq-${A.id}-${day}`;
       if (now < t0 + 60 || now > t0 + 150 * 60 || research.some((x) => x.id === id)) continue;   // the first hour, seen up to 90 min late (feed lag)
@@ -1075,7 +1111,7 @@ try {
   // the method test on the other markets (paper, 2R, no spread): v5 signals per market and all together
   const oth = rp.filter((x) => x.market !== 'xau' && x.v5); snapshot.research.replicaX = { all: sum(oth), markets: Object.fromEntries([...new Set(oth.map((x) => x.market))].map((m) => [m, sum(oth.filter((x) => x.market === m))])) };
   snapshot.research.nq = sum(research.filter((x) => x.k === 'nq-open'));
-  for (const sid of ['ny', 'london', 'tokyo', 'shanghai']) snapshot.research['nq_' + sid] = sum(research.filter((x) => x.k === 'nq-open' && (x.session || 'ny') === sid)); }
+  for (const sid of ['ny', 'london', 'swing', 'tokyo', 'shanghai']) snapshot.research['nq_' + sid] = sum(research.filter((x) => x.k === 'nq-open' && (x.session || 'ny') === sid)); }
 if (nqLast) snapshot.nqLast = nqLast;
 // ─── Phone alerts (4 Nov): a push via ntfy.sh (free, no account) when a live trade or an NQ paper trade opens or closes.
 // Subscribe in the ntfy app to the topic below (or set the repository secret NTFY_TOPIC to use your own). Only events from
