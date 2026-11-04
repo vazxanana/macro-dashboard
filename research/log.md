@@ -389,3 +389,13 @@ B = H1 trend + M15 lower-high/higher-low + M15 CHoCH. Max 3 open, 0.30 spread.
   not at a barrier +0.113R. Applied (PR #199): live = D1-with OR at-EG → 392 trades +71.9R, DD −15.8R.
 - Mosha's 2 Nov sell: extreme 3,916 inside a fresh H1 bearish EG 3,914.8-3,927.7 (03:00 UTC). His buy's extreme 3,891 is
   ~10 below the nearest bullish EG (3,900.9-3,914.3): his barrier there was Friday's reversal Origin (higher timeframe).
+
+## 4 Nov (night): M1 CHoCH entry vs M5 (gold 2023-2026)
+
+Same leg (2+ M15 ATR on M5, 3 h / 6 h), trigger = the first M1 close back through the last M1 swing before the extreme;
+entry at that M1 close, stop past the extreme as before. Gated, against H4, exit v2, risk rules.
+- Median stop $12.60 (M5) vs $7.06 (M1).
+- v5 filter: M5 617 trades +88.0R | M1 567 +19.1R. Live rule (v5 + D1-with or at-EG): M5 392 +71.9R (DD −15.8) |
+  M1 265 +13.1R (DD −19.4). Without the stop ≥ 1 ATR filter: M1 +35.6R at best. At-EG only: M1 +28.9R vs M5 +4.8R.
+- Exits re-tuned for M1 (1.5/1, 3/3, 4/3 trails): M1 +5.0 to +15.2R vs M5 +18.0 to +85.3R.
+**M1 entries are earlier but get stopped more often; M5 kept.**
