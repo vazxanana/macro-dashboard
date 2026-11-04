@@ -227,3 +227,10 @@ max DD −23.6R vs −29.9R. Pre-registered (logged 4 Nov 04:30 on Jun–Nov onl
 Also seen in the same scan (not shipped: found by searching ~40 splits, could be luck): all signals against D1 +0.09 | +0.13;
 v4 in Asia +0.32 | +0.18; leg 4–6 ATR +0.12 | +0.22. Candidates for later, to be re-tested on the forward record.
 Rejected (flip between periods): sessions other than Asia, risk bands, ★ alone, H1/D1 with, leg window.
+
+## 4 Nov 11:30 — Replica exit: trailing stop beats the fixed 2R on both halves of the year (shipped)
+
+v5 trades, same entries: 2R +0.084 | +0.216 (year +74.8R); 3R +0.218 | +0.146 (+91.2); half at 2R, rest 4R +0.154 | +0.189 (+85.9);
+trail 1R behind after +1.5R +0.165 | +0.231 (+98.7); trail 1.5R after +2R +0.172 | +0.243 (+103.5, 10/11 months).
+Sensitivity: all 9 trail settings beat 2R on Jan–Jun; activation +1.5–2R best on Jun–Nov. Break-even moves and shorter caps hurt.
+v4 + trail: +149.3R over 1,020 (Jan–Jun +0.09R a trade). Shipped: start +1.5R, trail 1R, cap 10R, 48 h.
