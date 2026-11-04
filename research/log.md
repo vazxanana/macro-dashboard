@@ -250,3 +250,10 @@ v5 + trailing, year: none +98.7R (DD −21.8, 21 days ≤ −3R) · daily stop �
 skipped trades netted +4.4R, 40% wins) · −3R +102.5 (DD −23.0). Max open: 1 → +53.6 · 2 → +89.3 · 3 → +101.5 (DD −20.8, both halves
 slightly better). The −3R days come mostly from trades open together, not from trading after losses. Shipped: max 3 open (#174).
 Daily stop rejected (costs profit).
+
+## 4 Nov 13:00 — Best drawdown reduction (19 rules; shipped #175)
+
+v5 + trailing, year, ranked by profit / max drawdown: none 4.52 · max 3 open 4.88 · daily −1.5R 5.24 · daily −2R 4.96 · half after a
+losing day 4.63 · half after 3 losses 4.85 · equity filter 20 5.45 · equity filter 50 5.66 · max3 + eq50 6.03 · max3 + eq50 + daily −1.5R
+6.42 (+91.2R, DD −14.2, worst month −8.4; DD lower in both halves) · max3 + eq50 + daily −3R 6.24 (+97.2, DD −15.6).
+Shipped: max 3 open + daily stop −1.5R + half size below the 50-trade equity average (seeded with the replay).
