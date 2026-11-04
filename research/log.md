@@ -278,3 +278,9 @@ even with a true +0.2R edge).
 - Open sweeps (10 setups: open price and prior-range sweeps at 00:00, 02:00, 03:00, 08:30, 09:30 ET; 1m, 39 days): shallow sweeps lose (no depth rule −0.20R a trade over 282); the edge rises with sweep depth to +0.11R at 15–20 points, then fades; NY 09:30 sweeps lose at every depth (open price −0.45R over 27: they run).
 - New paper setup: open-price sweeps of the midnight, London (03:00) and 08:30 opens, ≥ 15 points, 1m close back within 15 min, 2R, out 11:00 ET, one at a time: 38 trades +15.3R, +0.40R (t 1.7), Sep +11.7 / Oct +3.6, buys +4.7 / sells +10.6. Exclusion of NY and the 15 points chosen on this data → forward test.
 - London-range sweep v2 (buys only): 5m history buys +0.47R over 27, sells −0.20R over 22. The NY open sweep setup (paper) is on the wrong side of the evidence above; kept for the record.
+
+## 4 Nov (evening): NQ focus
+
+- Same 1m history for every NQ setup: NY open run (flipped open sweep) +0.73R (27, t 2.8, both months, all depth/reclaim settings positive), open sweeps before NY +0.40R (38), London low +0.23R (19), swing +0.15R (38), NY reversal 0.00R (26), Tokyo −0.14R (30). Only the first two run; the page counts only them. October NQ on the calendar +7.7R/54 → +24.5R/40.
+- Why open-sweep trades fail: 7 of 20 losers reached +1R first (break-even/partials/trailing all worse than 2R, kept 2R); trades on the daily-open side did better (+0.67R vs +0.25R) but the other side flipped sign between months, so no filter. NY sweeps run instead of reversing — hence the flip.
+- Watch: the NY run's buys carried October (+11.8R over 10) in a rising market; check it holds in a falling month.
