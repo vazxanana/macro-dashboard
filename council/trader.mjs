@@ -362,6 +362,8 @@ for (const [key, M] of Object.entries(MARKETS)) {
         if (config.be && !tr.noBe && !tr.beMoved && ((s ? tr.entry - b.low : b.high - tr.entry) / r0) >= config.be) { tr.stop = tr.entry; tr.beMoved = true; }
       }
       tr.checked = exitBar ? bars.at(-1).time : next;
+      // half-size trades (replica equity filter): the score counts R × size; rawR keeps the full-size result
+      if (tr.size && tr.size !== 1 && tr.R != null && tr.rawR == null) { tr.rawR = tr.R; tr.R = +(tr.R * tr.size).toFixed(2); }
       if (exitBar) startReview(tr, exitBar, key, NEWS);
       if (tr.status === 'pending' && now - tr.opened > (WAIT[tr.h] || 86400)) { tr.status = 'expired'; tr.closed = now; tr.R = 0; }
     }
@@ -418,9 +420,19 @@ for (const [key, M] of Object.entries(MARKETS)) {
         // risk cap (4 Nov): at most 3 replica trades open at once (3R at risk). Year replay: +101.5R vs +98.7R uncapped, both halves
         // slightly better, worst drawdown −20.8R vs −21.8R. A daily −2R stop was tested and rejected (−4.4R a year: the skipped trades won).
         const capped = trades.filter((x) => x.k === 'replica' && x.market === key && !x.shadow && x.status === 'open').length >= 3;
+        // risk (4 Nov, year replay: drawdown −20.8R → −14.2R, worst month −14.1R → −8.4R, profit +101.5R → +91.2R, both halves):
+        // daily stop: no new replica trade once today's closed replica trades reach −1.5R (UTC day);
+        // equity filter: half size while the replica's equity is below its own 50-trade average (seeded with the replay history)
+        const liveRp = trades.filter((x) => x.k === 'replica' && x.market === key && !x.shadow && x.R != null && x.closed);
+        const dayR = liveRp.filter((x) => Math.floor(x.closed / 86400) === Math.floor(now / 86400)).reduce((a, x) => a + x.R, 0), dayStop = dayR <= -1.5;
+        let size = 1;
+        { const hist = rd('research/replay-2w.json', { trades: [] }).trades.filter((x) => x.market === key && x.k === 'replica' && x.R != null && x.closed < (liveRp.length ? Math.min(...liveRp.map((y) => y.opened)) : Infinity))
+            .concat(liveRp.map((x) => ({ R: x.rawR != null ? x.rawR : x.R, closed: x.closed }))).sort((a, b) => a.closed - b.closed);
+          if (hist.length > 50) { let e = 0; const eq = hist.map((x) => (e += x.R)); const avg = eq.slice(-50).reduce((a, v) => a + v, 0) / 50; if (eq.at(-1) < avg) size = 0.5; } }
         if (v5 && capped) research.at(-1).capped = true;
-        if (v5 && !capped && (config.replicaLive || []).includes(key)) trades.push({ id: `${key}-replica-${now}-${g.sell ? 's' : 'b'}`, market: key, label: M.label, dec: M.dec, k: 'replica', name: 'Replica', pair: 'M5 CHoCH', h: '5m', side: g.sell ? 'sell' : 'buy',
-          entry: +entry.toFixed(2), stop: +stop.toFixed(2), t1: +(entry + (g.sell ? -10 : 10) * r0).toFixed(2), tp1: +t1.toFixed(2), rr: 10, trail: [1.5, 1.0], buf: CFG.buf, opened: now, filled: now, checked: now, status: 'open', R: null, r0: Math.abs(+entry.toFixed(2) - +stop.toFixed(2)), maxHold: 48 * 3600, noBe: true, entryMode: 'market',
+        if (v5 && dayStop) research.at(-1).dayStop = true;
+        if (v5 && !capped && !dayStop && (config.replicaLive || []).includes(key)) trades.push({ id: `${key}-replica-${now}-${g.sell ? 's' : 'b'}`, market: key, label: M.label, dec: M.dec, k: 'replica', name: 'Replica', pair: 'M5 CHoCH', h: '5m', side: g.sell ? 'sell' : 'buy',
+          entry: +entry.toFixed(2), stop: +stop.toFixed(2), t1: +(entry + (g.sell ? -10 : 10) * r0).toFixed(2), tp1: +t1.toFixed(2), rr: 10, trail: [1.5, 1.0], size, buf: CFG.buf, opened: now, filled: now, checked: now, status: 'open', R: null, r0: Math.abs(+entry.toFixed(2) - +stop.toFixed(2)), maxHold: 48 * 3600, noBe: true, entryMode: 'market',
           feat: { d1: src['1d'].A.trend === (g.sell ? -1 : 1) ? 'with' : 'against', h4, session: sessionOf(now), star: g.star, h1clear, riskAtr: +riskAtr.toFixed(2), leg: g.L === 36 ? '3h' : '6h' }, shadow: false, blockedBy: [],
           note: `Gold replica (v5, against the H4 trend): ${g.L === 36 ? '3 h' : '6 h'} leg to ${g.ext.toFixed(2)}, M5 CHoCH through ${g.lvl.toFixed(2)}${g.star ? ', ★ engulfing at structure at the extreme' : g.peg ? ', engulfing at the extreme' : ''}${h1clear ? ', clear of H1 Origins' : ''}. ${g.sell ? 'Sell' : 'Buy'} at market, stop past the extreme; from +1.5R the stop trails 1R behind the best price (2R mark ${t1.toFixed(2)}), out after 48 h.` });
       }
