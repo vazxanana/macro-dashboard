@@ -14,22 +14,10 @@ jobs:
         with: { ref: council-data, path: data }
       - name: Probe NQ feeds
         run: |
-          mkdir -p data/research/probe; o=data/research/probe/nq-feeds.txt; date -u > $o
-          UA="Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36"
-          for u in \
-            "https://ts-api.cnbc.com/harmony/app/charts/1D.json?symbol=@ND.1" \
-            "https://ts-api.cnbc.com/harmony/app/charts/1D.json?symbol=%40ND.1" \
-            "https://ts-api.cnbc.com/harmony/app/charts/5D.json?symbol=@ND.1" \
-            "https://ts-api.cnbc.com/harmony/app/bars/@ND.1/1M/20261104000000/20261104160000/adjusted/EST5EDT.json" \
-            "https://ts-api.cnbc.com/harmony/app/bars/@NQ.1/1M/20261104000000/20261104160000/adjusted/EST5EDT.json" \
-            "https://ts-api.cnbc.com/harmony/app/charts/1D.json?symbol=.NDX" \
-            "https://quote.cnbc.com/quote-html-webservice/restQuote/symbolType/symbol?symbols=@ND.1&requestMethod=itv&noform=1&partnerId=2&fund=1&exthrs=1&output=json&events=1" \
-            ; do
-            code=$(curl -sS -A "$UA" -m 20 -o /tmp/b -w "%{http_code} %{size_download}" "$u" || echo fail)
-            echo "$code $u :: $(head -c 400 /tmp/b | tr '\n\r' '  ')" >> $o
-          done
-          cat $o
+          mkdir -p data/research/probe
+          curl -sS -A "Mozilla/5.0" -m 30 -o data/research/probe/cnbc-nd-20261104.json "https://ts-api.cnbc.com/harmony/app/bars/@ND.1/1M/20261103160000/20261104120000/adjusted/EST5EDT.json"
+          ls -la data/research/probe
           git -C data config user.name "mosha-council"
           git -C data config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git -C data add research/probe && git -C data commit -qm "Probe: NQ feeds $(date -u +%H:%MZ)" || exit 0
+          git -C data add research/probe && git -C data commit -qm "Probe: CNBC ND 1m 4 Nov $(date -u +%H:%MZ)" || exit 0
           for j in 1 2 3 4 5; do git -C data pull -q --rebase origin council-data && git -C data push -q origin HEAD:council-data && break; sleep 5; done
