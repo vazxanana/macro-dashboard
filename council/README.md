@@ -192,6 +192,15 @@ History: about break-even (5-minute, 50 days: +0.02R a trade over 36; 1-minute, 
 M5/M1 CHoCH after the sweep, or keeping only one kind of level, splits the halves (positive in one, negative in the other).
 It goes live only if the forward record pays.
 
+## NQ Tokyo and Shanghai open sweeps (research, paper only, 4 Nov)
+
+The same rule at the Asian opens: Tokyo 00:00 UTC and Shanghai 01:30 UTC. Liquidity = the previous New York session's high/low,
+the evening high/low since the 18:00 ET reopen and the high/low of the hour before the open; the first 1-minute close back inside a
+swept level in the first hour → the other way, stop 2 points past the extreme, 1.2R, out at 07:00 UTC. One trade per session a
+day, in research.json (`k: 'nq-open'`, `session: 'tokyo' | 'shanghai'`), totals in snapshot.research.nq_tokyo / nq_shanghai.
+History: Tokyo −0.19R a trade on 50 days of 5-minute candles, +0.29R on the last 21 days of 1-minute; Shanghai about break-even
+to negative; 2-month replay Tokyo −1.35R over 25, Shanghai −0.73R over 20. Paper only until the forward record pays.
+
 ## Gold replica live (3 Nov, 22:00)
 
 User rule `replica-live` (`config.replicaLive = ['xau']`, take-all off): gold trades the replica live. Every passing v4
