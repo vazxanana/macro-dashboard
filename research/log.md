@@ -308,3 +308,8 @@ even with a true +0.2R edge).
 
 - GOLD (HistData XAUUSD 1m, 2019–2025, the live v5 code + trailing + round stops + risk rules): −347.9R over 4,102 trades, every year negative, 18/84 months positive. Gross before the 0.30 spread ≈ 0 every year (−0.10 to +0.03R/trade). The 2026 PAXG replay (+0.2R) does not generalise; "against both H4 and D1 skipped" (pre-chosen) halves the loss but stays negative. COMEX GC 16 Sep – 14 Oct 2025 (strong rally): v5 −32.9R over 66 (1m and 5m exits agree). Pending: HistData 2026 months to compare the same period with PAXG.
 - NQ report (trader's PDF): next-minute fills same (+0.14R); 1R–3R all positive; PDH/PDL fade −0.04R. Midnight-open filter (00:00 ET open ahead of the trade): file +0.22R over 237 vs +0.05R over 210; outside +0.68R over 29 vs +0.19R over 32 → LIVE (PR #193).
+
+## 4 Nov (night, later): HistData time-zone fix
+
+- HistData XAUUSD times are New York local WITH daylight saving (checked against Binance PAXG: winter aligned at +5 h, summer at +4 h). The first 7-year gold run used fixed UTC−5 (an hour off April–October). Corrected rerun, v5 live rules: 2019 −52.2 / 2020 −73.9 / 2021 −33.0 / 2022 −42.3 / 2023 −16.6 / 2024 −70.3 / 2025 −60.0 / 2026 +35.9 R; gross before spread ≈ 0 in 2019–2025, +0.08R/trade in 2026. Verdict unchanged: the gold replica's edge is 2026-specific; PAXG inflates 2026 further (+95.6R vs +35.9R on spot). Same 2026 signals on both feeds: only 88/493 coincide; matched trades +0.185R on PAXG vs +0.032R on spot.
+- NQ New York open run, Dukascopy 9 Mar – 10 Sep 2026, midnight-open filter: 33 trades +19.3R → calendar.
