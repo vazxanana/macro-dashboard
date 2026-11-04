@@ -218,3 +218,12 @@ fitted. Forward record so far: 2 live trades, +1R. Keep the live test running (p
 v4's expected edge as closer to 0 than +0.15R until the forward record says otherwise.
 Also: Dukascopy USATECHIDXUSD returns 503 to GitHub runners (4 Nov); NQ history stays from 3 Sep. NQ Asia replay now includes
 Mondays: Tokyo −4.25R ×30, Shanghai +0.63R ×25 (3 Sep – 3 Nov).
+
+## 4 Nov 11:00 — Replica v5 shipped: only against the H4 trend (out-of-sample confirmed on Jan–May)
+
+Year replay, Trader's own code (all features recorded per signal): v4 pass Jan–Jun −0.01R ×518 | Jun–Nov +0.17R ×502.
+v4 + H4 against: +0.08R ×252 | +0.22R ×248, positive in all four quarters; monthly 9 of 11 positive; year +74.8R ×500 vs v4 +81.5R ×1,020;
+max DD −23.6R vs −29.9R. Pre-registered (logged 4 Nov 04:30 on Jun–Nov only), so Jan–May is out-of-sample.
+Also seen in the same scan (not shipped: found by searching ~40 splits, could be luck): all signals against D1 +0.09 | +0.13;
+v4 in Asia +0.32 | +0.18; leg 4–6 ATR +0.12 | +0.22. Candidates for later, to be re-tested on the forward record.
+Rejected (flip between periods): sessions other than Asia, risk bands, ★ alone, H1/D1 with, leg window.
