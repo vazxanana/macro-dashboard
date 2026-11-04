@@ -21,9 +21,11 @@ jobs:
         run: |
           cp -r main/council council
           mkdir -p data/research/candles
-          node tools/histdump.mjs xau data/research/candles/xau-jan-jun.json.gz 2>&1 | tail -5 || true
+          node tools/histdump.mjs xaub data/research/candles/xau-jan-jun.json.gz 2>&1 | tail -5 || true
+          # one-call probe: does the Dukascopy legacy datafeed still serve runners? (NQ CFD, 2 Jan 2026)
+          curl -sS -A "Mozilla/5.0" -o /tmp/d.bi5 -w "duka USATECHIDXUSD http %{http_code} bytes %{size_download}\n" "https://datafeed.dukascopy.com/datafeed/USATECHIDXUSD/2026/00/02/BID_candles_min_1.bi5" | tee data/research/probe/duka-check.txt || true
           ls -la data/research/candles
           git -C data config user.name "mosha-council"
           git -C data config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git -C data add research/candles && git -C data commit -qm "Research: gold Jan-Jun history dump $(date -u +%H:%MZ)" || exit 0
+          git -C data add research/candles research/probe && git -C data commit -qm "Research: gold Jan-Jun (Binance PAXG) dump + Dukascopy probe $(date -u +%H:%MZ)" || exit 0
           for j in 1 2 3 4 5; do git -C data pull -q --rebase origin council-data && git -C data push -q origin HEAD:council-data && break; sleep 5; done
