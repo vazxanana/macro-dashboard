@@ -142,3 +142,10 @@ trade the opposite way, target 1.2R. Data: Yahoo NQ=F, 5m 50 days (25 Aug – 3 
 - M5/M1 CHoCH after the sweep instead: 5m all levels 60 min +0.20R ×12 but 1m −0.18R ×16; halves flip everywhere.
 - Min stop (1–2 ATR): no consistent help.
 Verdict: no edge shown in 50 days (1.2R needs a 45.5% win rate; it runs 22–47%). Runs forward on paper (research.json k 'nq-open').
+
+## 4 Nov 02:30 — Replica v4 by stop size (no change)
+
+First live replica trade: sell 3,924.00 at 00:35, stop 3,941.86 (wide), stopped 01:15, −1R. Paper buy of 3 Nov 21:36 won +2R.
+Question: do wide stops hurt? v4 passing signals by risk in M15 ATRs (first 100 d | last 50 d, R/trade):
+1–1.5 +0.08 | +0.02 · 1.5–2 +0.35 | +0.13 · 2–3 +0.18 | +0.16 · 3–4 −0.03 | +0.53 · 4+ +0.96 (5) | −0.34 (9).
+No consistent penalty for wide stops; the 1–1.5 ATR band is the weakest but still positive. No change (and no live rule change before ~30 live trades).
