@@ -149,3 +149,10 @@ First live replica trade: sell 3,924.00 at 00:35, stop 3,941.86 (wide), stopped 
 Question: do wide stops hurt? v4 passing signals by risk in M15 ATRs (first 100 d | last 50 d, R/trade):
 1–1.5 +0.08 | +0.02 · 1.5–2 +0.35 | +0.13 · 2–3 +0.18 | +0.16 · 3–4 −0.03 | +0.53 · 4+ +0.96 (5) | −0.34 (9).
 No consistent penalty for wide stops; the 1–1.5 ATR band is the weakest but still positive. No change (and no live rule change before ~30 live trades).
+
+## 4 Nov 03:30 — Replica v4 target (2R confirmed)
+
+v4 passing signals, same entries/stops, 48 h cap (first 100 d | last 50 d, R/trade):
+1.5R +0.13 | +0.09 · **2R +0.19 | +0.13** · 2.5R +0.16 | −0.02 · 3R +0.14 | −0.03 · 4R +0.13 | −0.02 · leg start +0.04 | +0.01 ·
+half at 2R + BE + rest 4R +0.20 | +0.09 · half at 1R + BE + rest 3R +0.08 | 0.00.
+2R stays: best or tied in the first 100 days and clearly best in the last 50. Wider targets lose their edge out of sample.
