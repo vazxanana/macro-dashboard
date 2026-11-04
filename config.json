@@ -299,6 +299,12 @@
    "by": "user",
    "change": "Gold replica trades live only in the daily trend direction (still against the H4 trend: a pullback entry)",
    "why": "Owner: judge gold on the last 4 years. 2023-26 spot, 1.5% gate, exit v2, risk rules: 602 trades +87.4R, worst drawdown -35.2R -> D1-with 325 trades +63.8R, drawdown -15.8R (+0.196R a trade). Chosen on 2023-24 (+8.1R vs -22.2R), held on 2025-26 (+55.7R). In 2019-22 the opposite held (D1-against better), so this is a last-4-years rule."
+  },
+  {
+   "at": "2026-11-04T20:00:37.000Z",
+   "by": "user",
+   "change": "Gold replica: a signal against the daily trend is still taken when its extreme sits at a live H1 engulfing barrier",
+   "why": "Owner: Mosha's edge is structure plus barriers (EG/OB). 2023-26 spot, gated v5, exit v2: signals at an H1 EG +0.293R a trade (151, both halves positive), at an OB -0.124R; pure-structure and barrier-only models lost. D1-with OR at-EG: 392 trades +71.9R, drawdown -15.8R vs D1-with alone 325 trades +63.8R. Mosha's 2 Nov sell started inside a fresh H1 bearish EG."
   }
  ],
  "btAt": "2026-11-04T11:20:16.389Z",
@@ -315,7 +321,8 @@
   "retire-legacy",
   "gold-shadow",
   "gold-vol-gate",
-  "gold-d1-with"
+  "gold-d1-with",
+  "gold-eg-barrier"
  ],
  "target": {},
  "targetBy": {},
@@ -326,11 +333,11 @@
  "noPause": true,
  "wouldPause": {
   "rintra": {
-   "at": "2026-11-04T19:58:02.000Z",
+   "at": "2026-11-04T20:00:37.000Z",
    "why": "four losses in a row"
   },
   "scalp": {
-   "at": "2026-11-04T19:58:02.000Z",
+   "at": "2026-11-04T20:00:37.000Z",
    "why": "expectancy -1.00R over 13 trades"
   },
   "xau": {
@@ -351,5 +358,6 @@
  "newsSince": "2026-11-04T00:02:58.000Z",
  "retireLegacy": true,
  "goldVolMin": 1.5,
- "goldD1With": true
+ "goldD1With": true,
+ "goldEgBarrier": true
 }
