@@ -375,3 +375,12 @@ window): weekly agrees 2019-22 +32.2R / 87 (+0.37R a trade), 2023-26 +34.2R / 99
 drawdown −18.4R; weekly against −28.3R / −15.8R; old flip-only rule +7.5R / +15.1R. Daily-trend agreement points the same
 way (+0.20R / +0.19R). Caveat: the weekly filter did not help the other chains (H4→H1→M30, H1→M15→M5, …), and swing size 3
 on the same chain lost, so this is one good cell in a grid. The kill switch watches it.
+
+**Out-of-sample check (4 Nov, late) — the weekly rule did not hold.** The identical rule (H4→H1→M15, swing 6, weekly
+agrees, limit at the broken level, 3R; market-sized spread and stop buffer) on HistData 1m 2019-26: silver −48.9R / +22.8R,
+EUR/USD −29.7R / −14.2R, GBP/USD −29.7R / +4.7R, USD/JPY −1.5R / −56.9R, Nasdaq +14.7R / −16.5R, S&P −45.8R / −19.3R
+(2019-22 / 2023-26). Placebo on gold (weekly direction shifted in time, 400 shifts): only 3% beat the real +59.4R, but the
+cell was picked from ~80. Also tested from the Private Room Notes PDF, all without a consistent edge: "50% of the range"
+(retracement depth), QM-style VR/CF, Janda (BO structure → BO → pullback), the barrier formula (D→H1, H4→M15, H1→M5 with
+the weekly direction), and a "50% of the range" structure engine (pullbacks must retrace half the visible leg). So the Mosha
+BO system runs on paper as a forward test with an expectation near zero; the kill switch applies as before.
