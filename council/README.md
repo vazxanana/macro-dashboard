@@ -481,3 +481,10 @@ of gold's own 20-day ranges over the last 365 daily candles (`snapshot.goldVolP`
 Tested at the same time and **not** adopted: tighter stops (0.5–0.85× the current distance lost expectancy in both halves:
 45% of trades that reached +2R first went more than half-way to the stop) and fixed 2/2.5/3/3.5/4R targets (4R +0.08 / +0.19R
 ≈ the current trail +0.09 / +0.16R).
+
+## Gold replica fixed 4R target (5 Nov, user rule `gold-4r`)
+
+Owner: judge gold on the last 2–3 years. The replica now takes a fixed 4R target (stop unchanged, out after 48 h) instead of
+trailing 2R behind from +2R. Replay with the live risk rules, spot gold: 2025–26 +84.7R vs +64.2R with the trail; 2023–26
++102.7R (439 trades) vs +95.2R (456); but 2024 +25.6R vs +37.4R, 2026 +29.9R vs +32.8R, and the worst drawdown −24.7R vs
+−15.8R. To revert, drop `gold-4r` from `config.userRules` and unset `config.goldFixedR`.
