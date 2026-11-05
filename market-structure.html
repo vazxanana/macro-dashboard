@@ -34,7 +34,13 @@
   .rep-track .lg i { display: inline-block; width: 16px; height: 0; border-top: 2px solid; vertical-align: middle; margin-right: 6px; }
   .rep-track .tip { position: absolute; pointer-events: none; background: var(--panel-raised); border: 1px solid var(--line); border-radius: 6px; padding: 5px 8px; font: 11px var(--mono); color: var(--ink); white-space: nowrap; display: none; z-index: 2; }
   @media (max-width: 600px) { .top .inst { max-width: 80px; } .top { gap: 8px; } }
-  .hdr-open .ho-l { display: none; } .top .ms-status #ms-live-txt { display: none; }
+  .top .ms-status #ms-live-txt { display: none; }
+  @media (max-width: 1100px) { .hdr-open .ho-l { display: none; } }
+  /* 5 Nov (owner): small market selector, no price in the header */
+  .top .px { display: none !important; }
+  .top .inst { font: 600 12px var(--sans); padding: 3px 18px 3px 5px; color: var(--ink-faint); }
+  .top .ms-coin { width: 16px; height: 16px; }
+  .top .mk-pop { max-width: calc(100vw - 24px); }
   @media (max-width: 1100px) { .top .hdr-chg { display: none; } }
 </style>
   <style>
@@ -603,7 +609,7 @@
 <div class="ms-live app" id="ms-live" data-chart="dark">
 
   <header class="top">
-    <div class="brand"><i class="ms-coin" aria-hidden="true"></i><div><details class="mk" id="ms-mk"><summary class="inst" id="ms-mk-btn">XAU/USD · Gold</summary><div class="mk-pop"><label class="sr" for="ms-mk-q">Search markets</label><input id="ms-mk-q" type="search" placeholder="Search markets…" autocomplete="off"><ul class="mk-list" id="ms-mk-list"></ul></div></details><select id="ms-inst" class="inst" hidden aria-hidden="true" tabindex="-1"><option>XAU/USD · Gold</option></select><span id="ms-inst-name">Gold · Mosha structure</span></div></div>
+    <div class="brand"><i class="ms-coin" aria-hidden="true"></i><div><details class="mk" id="ms-mk"><summary class="inst" id="ms-mk-btn" title="Market (click to change)">XAU/USD</summary><div class="mk-pop"><label class="sr" for="ms-mk-q">Search markets</label><input id="ms-mk-q" type="search" placeholder="Search markets…" autocomplete="off"><ul class="mk-list" id="ms-mk-list"></ul></div></details><select id="ms-inst" class="inst" hidden aria-hidden="true" tabindex="-1"><option>XAU/USD · Gold</option></select><span id="ms-inst-name">Gold · Mosha structure</span></div></div>
     <div class="px"><b id="ms-hdr-price">—</b><span id="ms-hdr-chg" class="hdr-chg"></span></div>
     <nav class="tabs" aria-label="Sections">
       <a href="#home" data-go="home">Home</a><a href="#setup" data-go="setup">Setup</a><a href="#charts" data-go="charts">Charts</a><a href="#scanner" data-go="scanner">Scanner</a><a href="#council" data-go="council">Council</a><a href="#journal" data-go="journal">Journal</a>
@@ -2558,7 +2564,7 @@ function msNextSetup(bars, A) {
     mkList.innerHTML = html || '<li class="mk-g">No market matches</li>';
   }
   if (mkList) {
-    const btn = document.getElementById('ms-mk-btn'); if (btn) btn.textContent = `${INST.label} · ${INST.name}`;
+    const btn = document.getElementById('ms-mk-btn'); if (btn) { btn.textContent = INST.label; btn.title = `Market: ${INST.label} · ${INST.name} (click to change)`; }
     mkQ.addEventListener('input', renderMk);
     mkQ.addEventListener('keydown', (ev) => { if (ev.key === 'Enter') { const a = mkList.querySelector('a'); if (a) location.href = a.href; } if (ev.key === 'Escape') mkBox.open = false; });
     mkBox.addEventListener('toggle', () => { if (mkBox.open) { renderMk(); setTimeout(() => mkQ.focus(), 0); } });
