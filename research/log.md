@@ -873,3 +873,19 @@ Harness `ms/mosha_msnr.py` on the Mosha chain records (`lab/mv3_XAU.json`, spot 
 - H4-H1-M30 and D1-H4-H1 chains: same picture, MSNR-agree rows negative or tiny.
 
 Decision: the Mosha BO paper system keeps the weekly as its direction filter. No forward tag added (the sample is 2 live Mosha fills a month; it would take years to read).
+
+## 2026-11-05 — MSNR scalp from the Direction SOP (external BO on M15/M5 after a tapped higher-TF level): negative, rejected
+
+The SOP defines direction only, so the scalp was built the only honest way: trade the switch itself. Working TF W (M5 / M15 / H1), one rung above A (M15 / H1 / H4) carrying the key levels (A/V pivots with a 5% band, engulfing zones, DOM zones; levels live 2 / 5 / 20 days). A switch = W close through the last W pivot that formed **before** the latest tap of an A-level on the trade's side (the SOP's external breakout). Entry at the next 1m open after the switch candle, stop past the pullback extreme (the leg origin) − 0.30 cost, targets 1R / 2R / 3R / 2R-then-trail, max hold 4 / 8 / 24 h. Spot gold 2019–26, harness `ms/msnr_scalp.py` + `ms/msnr_scalp2.py` (scratchpad). R sum per window (2019–22 | 2023–24 | 2025–26):
+
+| variant | 2019–22 | 2023–24 | 2025–26 |
+|---|---|---|---|
+| M5/M15, 2R (nw=3, n≈9.7k/4.5k/4.5k) | −1418 | −481 | −172 |
+| M15/H1, 2R (nw=3, n≈3.2k/1.5k/1.4k) | −255 | −149 | +12 |
+| M15/H1, 2R buys only | −126 | −33 | +39 |
+| M15/H1, 2R, H4 MSNR direction agrees | −107 | −68 | +24 |
+| M15/H1, limit retest at the broken level, 3R | −185 | −134 | +2 |
+| H1/H4, 2R trail, H4 direction agrees (n=349/142/141) | +14 | +16 | +1 |
+| H1/H4, limit retest 2R, H4 agrees | −11 | +12 | −4 |
+
+Every M5 and M15 variant loses in both 2019–22 and 2023–24 at −0.07 to −0.16R per trade: the switch candle is a late, wide-stop market entry and the stop past the pullback extreme is hit on the retest more often than not. The only non-negative line (H1/H4 with the H4 direction agreeing and a trail) is +0.04R per trade on 630 trades, essentially zero in 2025–26 → noise, not a system. The ladder filter and the limit retest do not change the sign. **No scalp from the SOP is adopted.** The SOP's value for us stays what the earlier step found: the direction state as a tag on the gold replica (`feat.msnr`, "pullback phase" reading), forward-tested.
