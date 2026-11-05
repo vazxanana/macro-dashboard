@@ -1,5 +1,5 @@
 name: Council data probe
-# RESEARCH ONLY: history for the council's other markets (forex 1m from HistData, crypto 5m from Binance public data).
+# RESEARCH ONLY: Binance daily candles 2017-2026 for the crypto trend-following check (council pairs).
 on:
   push:
     branches: [council-probe]
@@ -8,27 +8,17 @@ permissions:
 jobs:
   probe:
     runs-on: ubuntu-latest
-    timeout-minutes: 45
-    strategy:
-      fail-fast: false
-      max-parallel: 4
-      matrix:
-        job: [AUDUSD, USDCAD, USDCHF, crypto]
+    timeout-minutes: 30
     steps:
       - uses: actions/checkout@v4
       - uses: actions/checkout@v4
         with: { ref: council-data, path: data }
-      - name: History ${{ matrix.job }}
+      - name: Binance daily candles
         run: |
-          if [ "${{ matrix.job }}" = crypto ]; then
-            D=data/research/candles/crypto5m; mkdir -p $D
-            for s in BTCUSDT ETHUSDT SOLUSDT XRPUSDT; do python3 tools/binance5m.py $D $s 2022 || true; done
-          else
-            D=data/research/candles/${{ matrix.job }}; mkdir -p $D
-            python3 tools/histdata.py $D ${{ matrix.job }} || true
-          fi
+          D=data/research/candles/crypto1d; mkdir -p $D
+          python3 tools/binance1d.py $D BTCUSDT ETHUSDT XRPUSDT SOLUSDT BNBUSDT ADAUSDT LTCUSDT LINKUSDT DOGEUSDT TRXUSDT || true
           ls -la $D
           git -C data config user.name "mosha-council"
           git -C data config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git -C data add research/candles && git -C data commit -qm "Probe: history ${{ matrix.job }}" || exit 0
-          for j in 1 2 3 4 5 6 7 8; do git -C data pull -q --rebase origin council-data && git -C data push -q origin HEAD:council-data && break; sleep $((5*j)); done
+          git -C data add research/candles && git -C data commit -qm "Probe: Binance daily candles 2017-2026" || exit 0
+          for j in 1 2 3 4 5 6; do git -C data pull -q --rebase origin council-data && git -C data push -q origin HEAD:council-data && break; sleep $((5*j)); done
