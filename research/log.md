@@ -713,3 +713,10 @@ Deep research (report: reports/Chart Fanatics strategy library.md in the working
 - NQ open run long/short: 2018–22 longs −0.02R (n211), shorts +0.06R (n224); 2023–26 longs +0.37R (n118), shorts +0.21R (n157); 2022 shorts +0.40R. Not just AI-rally long beta.
 - **Threshold drift (PR #213):** the backtest used 0.08% of the open (≈20 pts now); live used a fixed 15 pts ≈ 0.06%. Live rule by threshold: 0.04% +0.059R; 0.06% +0.106R; 0.08% +0.119R; 0.10% +0.135R (2018–22 +0.047R); 0.14% +0.093R. Live now uses 0.08% / 0.011% of the open.
 - Queue from the report: VIX/GVZ regime buckets (free daily closes), wide trailing exit for NQ, adaptive gold gate (percentile / GVZ), crypto lookback ensemble + vol sizing, CUSUM kill rule replacing the 30/50-trade checks.
+
+## 2026-11-05 — Owner: "apply everything"; gold stop/target grid
+- **Gold replica stop/target grid** (`lab/replica_grid.mjs`, live config, 2019–22 / 2023–26): MAE median 1.02 stop units; 45% of trades that reached +2R first went > 0.5 stop. Stop ×1 trail +0.09 / +0.16R; ×0.85 +0.00 / +0.16; ×0.7 +0.01 / +0.07; ×0.6 +0.03 / −0.02; ×0.5 −0.14 / −0.05. Fixed targets at ×1: 2R +0.06/+0.08, 2.5R +0.06/+0.11, 3R +0.07/+0.16, 3.5R +0.03/+0.15, 4R +0.08/+0.19. **Kept: current stop and trail.**
+- **Gold adaptive gate (PR #215):** 1.5% OR top fifth of own year: +0.104R (341) / +0.192R (513) vs 1.5%: +0.093R (214) / +0.164R (443). Applied.
+- **Crypto v3 exit (PR #214):** channel-midpoint ratchet exit: Sharpe 1.67 / 0.81 vs 1.50 / 0.58, max DD −28% / −21% vs −39% / −27%. 20–360 ensemble and vol-target sizing not better in 2022–26. BTC 200-day gate: tiny. Applied.
+- **NQ wide exit** (half at 2R, rest trailed 1R or behind the time-weighted mean to 16:00): −0.04R / +0.27R vs +0.02R / +0.28R. Not applied.
+- **Monitoring:** the scheduled check now uses CUSUM (k = half the edge, review at 12, pause proposal at 20) plus catastrophe checks, instead of the 30/50-trade cumulative-R rules.
