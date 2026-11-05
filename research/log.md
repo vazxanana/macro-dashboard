@@ -618,3 +618,15 @@ extreme / past the FVG; targets the next half SD back ("next opposite one"), one
 - Next-half-SD targets ≈ 0 or negative at most levels; 2.5-4 SD fades and all continuation IFVGs negative on NSX.
 Verdict: the IFVG entry is better than the opposite-candle entry (the 2 SD fade turns mildly positive on three of four
 samples) but nothing is statistically significant. Paper-track candidate only.
+
+## 5 Nov (loop 1): HistData time convention settled
+
+The 08:30 and 09:30 New York volatility spikes sit on the same HistData labels in winter and summer (NSXUSD, EURUSD, GBPUSD 2024),
+so HistData labels are New York wall-clock time including daylight saving, not fixed EST as its docs say.
+- The NQ New York open run's 8-year Nasdaq cash check (idx/run.py parses labels as New York time) was right: NDO-ahead +89.3R
+  over 642 (+0.139R, t 2.64). Parsing as fixed EST instead gives ~0R, which shows how timing-sensitive the open run is.
+- Loaders that added a fixed 5 h (lab/core2.mjs for forex / NSX / SPX, nq4h/load.py) were 1 hour late in US summer. Affected:
+  the pairs' replica / session-system studies and the bo_mkt NSX/SPX runs (summer sessions shifted 1 h); daily systems barely.
+  The forex "no edge" verdict rests on many families and both seasons, so it stands; the SD-level study after the DST fix
+  (sdx_*, ifvg.py) already used corrected NSX sessions. core2 now converts with New York DST.
+- Gold HistData (hd/xau_*.json) was converted from New York local time correctly.
