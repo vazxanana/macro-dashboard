@@ -443,3 +443,8 @@ The NQ fetch now also runs 22:00-24:00 ET (Sun-Thu) for these.
 daily 2018-21 → 2022-26, 10 coins, 0.8% costs: 5 ATR was the best of 3.5/4/5/6 on 2018-21 and held (+0.40R vs +0.30R a trade);
 55 + 100 together +96.5R over 186 (+0.52R); council coins +52.3R over 70 (+0.75R), worst drawdown −7.9R (4 ATR 55-day: +34.1R).
 A BTC-above-200-day filter helped 2022-26 slightly but not 2018-21, so it is not used. Trades carry `sys` (55/100) and `kATR`.
+
+**Record everything (5 Nov, owner).** Signals that fit a system but are skipped by one of its filters are now recorded too, outside
+our system: the NQ New York open run when the midnight open lies behind (research session `nyflip-x`), and Mosha BO chains that
+fail the weekly filter, the 2-open cap or the price check (shadow trades with `blockedBy` weekly / cap / price). The gold replica
+and forex/crypto replica signals were already recorded as research.
