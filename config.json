@@ -389,6 +389,12 @@
    "by": "user",
    "change": "Crypto trend: scale in once. When a daily close is +1R (5 ATR) above the entry, a second unit buys at market with its own 5 ATR stop; it exits with the first trade on the channel-midpoint close",
    "why": "Owner: we leave money on the table in crypto, try scaling. Binance daily 2018-26, 0.8% costs, R on the first unit's 5 ATR risk: the live exit keeps 45% of each trade's best excursion and every other exit tested (10/20-day low, 3/4 ATR trails, partials) keeps less. One add at +1R: council coins 2023-26 +103.6R vs +61.6R with the worst drawdown -6.7R vs -5.5R (ratio 15.5 vs 11.3; 2023-24 +108.9R vs +62.1R at the same -5.5R drawdown, 2025-26 -5.3R vs -0.5R); the six other coins +169.9R vs +106.2R, ratio 8.9 vs 6.3. Adds at +0.5R, +2R, two adds and turtle-style pyramids raise drawdown faster than profit. Sizing guide: 0.5% on the first unit and 0.5% on the add (1% exposure on winners only)."
+  },
+  {
+   "at": "2026-11-05T23:32:55.000Z",
+   "by": "user",
+   "change": "Gold trend (new paper system): a daily close above the prior 20 daily highs buys gold at market on the next run; stop 2 x ATR(D1,14) below, lifted to (daily close - 2 ATR) on every closed day; no target, no time limit; one position",
+   "why": "Owner supplied a 13-edge cTrader bot; its daily breakout was the one gold edge that held on our 8 years of spot gold 1m (0.42 cost): N20 trail 2 ATR +0.31R | +1.07R | +2.42R a trade in 2019-22 | 2023-24 | 2025-26 (n29/12/10, worst drawdown -4.4R | -1.4R | -0.9R), N10 and N55 and a 3 ATR trail all positive in every period, the mirrored short loses in every period. By year: 2019 +6.1R, 2020 +3.3, 2021 +0.5, 2022 -1.1, 2023 +4.0, 2024 +8.8, 2025 +19.4, 2026 +4.7. Long only: it rides the secular bull and caps each loss near -1R. Sizing guide 0.5% per trade."
   }
  ],
  "btAt": "2026-11-05T11:21:05.226Z",
@@ -419,7 +425,8 @@
   "nq-runner",
   "mosha-add",
   "gold-news-veto",
-  "crypto-add"
+  "crypto-add",
+  "gold-trend"
  ],
  "target": {},
  "targetBy": {},
@@ -430,11 +437,11 @@
  "noPause": true,
  "wouldPause": {
   "rintra": {
-   "at": "2026-11-05T23:25:58.000Z",
+   "at": "2026-11-05T23:32:55.000Z",
    "why": "four losses in a row"
   },
   "scalp": {
-   "at": "2026-11-05T23:25:58.000Z",
+   "at": "2026-11-05T23:32:55.000Z",
    "why": "expectancy -1.00R over 13 trades"
   },
   "xau": {
@@ -511,5 +518,9 @@
  "cryptoAdd": {
   "atR": 1,
   "size": 1
+ },
+ "goldTrend": {
+  "n": 20,
+  "k": 2
  }
 }
