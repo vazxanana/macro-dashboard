@@ -158,6 +158,9 @@ const USER_RULES = [
   { id: 'gold-vol-gate', apply: (c) => { c.replicaLive = ['xau']; c.goldVolMin = 1.5; },
     change: 'Gold replica trades live again, but only while gold is volatile: 20-day average daily range at least 1.5% of price; NQ stays the main system',
     why: '8-year spot gold split by volatility: the replica loses in calm gold every year (bottom fifth -0.21R a trade) and only pays in the top fifth (+0.05R, 6 of 8 years positive). With the risk rules and a 1.5% gate: 2019-2025 +18.9R instead of -312.5R, 2026 +43.2R. 2026 is the most volatile gold year in the sample (2.2% vs 0.9-1.5%), which is why the replica looked good this year.' },
+  { id: 'pairs-live', apply: (c) => { c.replicaLive = Object.keys(MARKETS); c.pairsLiveAt = Math.floor(Date.now() / 1000); c.pairVolPct = 80; c.pairStopR = -10; },
+    change: 'Council: the other pairs (forex and crypto) trade the replica live on paper next to gold, each with its own volatility gate (20-day range in the top fifth of its last 365 daily candles) and a kill switch at −10R',
+    why: "Owner: include gold and the other pairs in the council. Same rules as gold (v5, daily trend or H1 engulfing barrier, trail from +2R, max 3 open, −1.5R daily stop); gold's 1.5% gate is replaced on the pairs by the same idea measured against each pair's own history. Replay 2019-26 says the method loses on the pairs (see README), so each pair stops trading live once its forward total reaches −10R." },
   { id: 'mosha-bo-weekly', apply: (c) => { c.moshaBoWeekly = true; },
     change: "Mosha BO system: trades only in the weekly structure's direction (his \"Father\" timeframe); the M15 break no longer has to flip M15 structure",
     why: "From his multi-timeframe slides (father/mother/son). Spot gold 2019-26, H4->H1->M15, limit at the broken level, 3R, with the weekly direction computed the way the trader sees it live (Monday weeks built from the last 720 daily candles, swing size 3): weekly agrees 2019-22 +32.2R (87 trades, +0.37R a trade), 2023-26 +34.2R (99, +0.35R), 7 of 8 years positive, worst drawdown -18.4R; weekly against -28.3R / -15.8R. The previous flip-only rule: +7.5R / +15.1R. Caveat: the weekly filter did not help the other timeframe chains, so it is watched by the kill switch like everything else." },
@@ -408,7 +411,7 @@ for (const [key, M] of Object.entries(MARKETS)) {
         // only on a candle that actually reached +be R: a trade that was past it before the rule existed and is now
         // back near the entry can't place a stop on the wrong side of price, so it waits until it gets there again
         // trailing stop (replica, 4 Nov): once the trade is trail[0] R in profit, the stop follows trail[1] R behind the best price
-        if (tr.trail && tr.mfe >= tr.trail[0]) { const ns = tr.entry + (s ? -1 : 1) * (tr.mfe - tr.trail[1]) * r0; if (s ? ns < tr.stop : ns > tr.stop) { tr.stop = +ns.toFixed(2); tr.trailMoved = true; } }
+        if (tr.trail && tr.mfe >= tr.trail[0]) { const ns = tr.entry + (s ? -1 : 1) * (tr.mfe - tr.trail[1]) * r0; if (s ? ns < tr.stop : ns > tr.stop) { tr.stop = +ns.toFixed(Math.max(2, (tr.dec ?? 2) + 1)); tr.trailMoved = true; } }
         if (config.be && !tr.noBe && !tr.beMoved && ((s ? tr.entry - b.low : b.high - tr.entry) / r0) >= config.be) { tr.stop = tr.entry; tr.beMoved = true; }
       }
       tr.checked = exitBar ? bars.at(-1).time : next;
@@ -494,7 +497,22 @@ for (const [key, M] of Object.entries(MARKETS)) {
     // bars. The replica only trades gold live while this is at least config.goldVolMin (1.5%); below it signals stay research.
     const dvb = src['1d'].bars.slice(-21, -1), volPct = dvb.length >= 15 ? dvb.reduce((a, b) => a + (b.high - b.low) / b.close * 100, 0) / dvb.length : null;
     if (key === 'xau') { snapshot.goldVol = volPct == null ? null : +volPct.toFixed(2); snapshot.goldVolMin = config.goldVolMin || null; }
-    const volOk = !config.goldVolMin || (volPct != null && volPct >= config.goldVolMin);
+    // pairs (4 Nov, user rule pairs-live): the gate is relative to each market's own history: today's 20-day range must be in the
+    // top fifth (config.pairVolPct) of the 20-day ranges over its last 365 daily candles. Gold keeps its 1.5% gate.
+    let volGate = key === 'xau' ? config.goldVolMin || null : null;
+    if (key !== 'xau' && config.pairVolPct) {
+      const db = src['1d'].bars.slice(0, -1), ser = [];
+      for (let i = 20; i < db.length; i++) ser.push(db.slice(i - 20, i).reduce((a, b) => a + (b.high - b.low) / b.close * 100, 0) / 20);
+      const past = ser.slice(-366, -1).sort((a, b) => a - b);
+      volGate = past.length >= 200 ? +past[Math.floor(config.pairVolPct / 100 * (past.length - 1))].toFixed(3) : Infinity;
+    }
+    const volOk = key === 'xau' ? !config.goldVolMin || (volPct != null && volPct >= config.goldVolMin) : !config.pairVolPct || (volPct != null && volPct >= volGate);
+    const pxr = (v) => +v.toFixed(Math.max(2, (M.dec ?? 2) + 1));   // price rounding by market (forex has 5 decimals)
+    // pair kill switch (user rule pairs-live): a pair stops trading live once its live replica trades since the switch-on sum to
+    // config.pairStopR (−10R); its signals stay research
+    const pairLive = trades.filter((x) => x.k === 'replica' && x.market === key && !x.shadow && x.R != null && x.closed && x.opened >= (config.pairsLiveAt || 0));
+    const pairR = pairLive.reduce((a, x) => a + x.R, 0), pairStop = key !== 'xau' && config.pairStopR != null && pairR <= config.pairStopR;
+    if (key !== 'xau') (snapshot.pairs = snapshot.pairs || {})[key] = { label: M.label, vol: volPct == null ? null : +volPct.toFixed(2), gate: isFinite(volGate) ? volGate : null, on: volOk && !pairStop && (config.replicaLive || []).includes(key), n: pairLive.length, R: +pairR.toFixed(2), stopped: pairStop };
     if (marketOpen(M, now)) {
       let sigs = []; try { sigs = replicaSignals(src); } catch (e) {}
       for (const g of sigs) {
@@ -524,8 +542,8 @@ for (const [key, M] of Object.entries(MARKETS)) {
         // signal close was worse (+0.08R: it fills the losers). Live entries more than 8 min late are skipped (kept as research).
         const lag = now - g.tc - 300, stale = lag > 480;
         const h4 = src['4h'].A.trend === (g.sell ? 1 : -1) ? 'against' : src['4h'].A.trend === (g.sell ? -1 : 1) ? 'with' : 'none', v5 = pass && h4 === 'against';
-        research.push({ id: `${key}-replica-${now}-${g.sell ? 's' : 'b'}`, sig, market: key, label: M.label, dec: M.dec, k: 'replica', name: key === 'xau' ? 'Gold replica' : `${M.label} replica (method test)`, lag, side: g.sell ? 'sell' : 'buy',
-          entry: +entry.toFixed(2), stop: +stop.toFixed(2), stop0: +stop0.toFixed(2), t1: +t1.toFixed(2), rr: 2, opened: now, filled: now, checked: now, status: 'open', R: null, v: 5,
+        research.push({ id: `${key}-replica-${now}-${g.sell ? 's' : 'b'}`, sig, market: key, label: M.label, dec: M.dec, k: 'replica', name: key === 'xau' ? 'Gold replica' : `${M.label} replica`, lag, side: g.sell ? 'sell' : 'buy',
+          entry: pxr(entry), stop: pxr(stop), stop0: pxr(stop0), t1: pxr(t1), rr: 2, opened: now, filled: now, checked: now, status: 'open', R: null, v: 5,
           pass, v5, h4, h1clear, eg: g.eg, peg: g.peg, star: g.star, riskAtr: +riskAtr.toFixed(2), legStart: +g.start.toFixed(2), leg: g.L === 36 ? '3h' : '6h', ext: +g.ext.toFixed(2), chochLevel: +g.lvl.toFixed(2), d1: src['1d'].A.trend === (g.sell ? -1 : 1) ? 'with' : 'against', session: sessionOf(now),
           note: `Research (paper only): gold replica v5${!pass ? '' : h4 !== 'against' ? ' (v4 passes; v5 skips it: H4 trend not against the trade)' : ''}${pass ? '' : riskAtr < 1 ? ' (filter fails: stop under one M15 ATR)' : ' (filter fails: inside a live H1 Origin, no ★ engulfing)'}. ${g.L === 36 ? '3 h' : '6 h'} leg to ${g.ext.toFixed(2)}, M5 CHoCH through ${g.lvl.toFixed(2)}${g.star ? ', ★ engulfing at structure at the extreme' : g.peg ? ', engulfing at the extreme (not at a level)' : ''}${h1clear ? ', clear of H1 Origins' : ''}; ${g.sell ? 'sell' : 'buy'} ${entry.toFixed(2)}, stop ${stop.toFixed(2)}, target 2R ${t1.toFixed(2)}.` });
         // live (config.replicaLive): every passing signal also trades on the live book, as on the replay (no slot limit),
@@ -551,16 +569,19 @@ for (const [key, M] of Object.entries(MARKETS)) {
         if (v5 && dayStop) research.at(-1).dayStop = true;
         if (v5 && stale) research.at(-1).stale = true;
         if (volPct != null) research.at(-1).vol = +volPct.toFixed(2);
+        if (key !== 'xau' && isFinite(volGate)) research.at(-1).gate = volGate;
         if (v5 && !volOk) research.at(-1).calm = true;
         const d1w = src['1d'].A.trend === (g.sell ? -1 : 1);
-        let atEG = false; try { atEG = h1EgZones(src['1h'].bars.slice(0, -1).slice(-300)).some((q) => q.d === (g.sell ? -1 : 1) && stop0 >= q.bot - 1 && stop0 <= q.top + 1); } catch (e) {}
+        const egTol = key === 'xau' ? 1 : 0.1 * g.atr;   // $1 on gold; a tenth of an M15 ATR elsewhere
+        let atEG = false; try { atEG = h1EgZones(src['1h'].bars.slice(0, -1).slice(-300)).some((q) => q.d === (g.sell ? -1 : 1) && stop0 >= q.bot - egTol && stop0 <= q.top + egTol); } catch (e) {}
         research.at(-1).atEG = atEG;
         const dirOk = !config.goldD1With || d1w || (config.goldEgBarrier && atEG);
         if (v5 && !dirOk) research.at(-1).d1Skip = true;
-        if (v5 && volOk && dirOk && !capped && !dayStop && !stale && (config.replicaLive || []).includes(key)) trades.push({ id: `${key}-replica-${now}-${g.sell ? 's' : 'b'}`, market: key, label: M.label, dec: M.dec, k: 'replica', name: 'Replica', pair: 'M5 CHoCH', h: '5m', side: g.sell ? 'sell' : 'buy',
-          entry: +entry.toFixed(2), stop: +stop.toFixed(2), t1: +(entry + (g.sell ? -10 : 10) * r0).toFixed(2), tp1: +t1.toFixed(2), rr: 10, trail: [2.0, 2.0], size, buf: CFG.buf, opened: now, filled: now, checked: now, status: 'open', R: null, r0: Math.abs(+entry.toFixed(2) - +stop.toFixed(2)), maxHold: 48 * 3600, noBe: true, entryMode: 'market', lag,
+        if (v5 && pairStop) research.at(-1).pairStop = true;
+        if (v5 && volOk && dirOk && !capped && !dayStop && !stale && !pairStop && (config.replicaLive || []).includes(key)) trades.push({ id: `${key}-replica-${now}-${g.sell ? 's' : 'b'}`, market: key, label: M.label, dec: M.dec, k: 'replica', name: 'Replica', pair: 'M5 CHoCH', h: '5m', side: g.sell ? 'sell' : 'buy',
+          entry: pxr(entry), stop: pxr(stop), t1: pxr(entry + (g.sell ? -10 : 10) * r0), tp1: pxr(t1), rr: 10, trail: [2.0, 2.0], size, buf: CFG.buf, opened: now, filled: now, checked: now, status: 'open', R: null, r0: Math.abs(pxr(entry) - pxr(stop)), maxHold: 48 * 3600, noBe: true, entryMode: 'market', lag,
           feat: { d1: src['1d'].A.trend === (g.sell ? -1 : 1) ? 'with' : 'against', h4, session: sessionOf(now), star: g.star, h1clear, riskAtr: +riskAtr.toFixed(2), leg: g.L === 36 ? '3h' : '6h' }, shadow: false, blockedBy: [],
-          note: `Gold replica (v5, against the H4 trend): ${g.L === 36 ? '3 h' : '6 h'} leg to ${g.ext.toFixed(2)}, M5 CHoCH through ${g.lvl.toFixed(2)}${g.star ? ', ★ engulfing at structure at the extreme' : g.peg ? ', engulfing at the extreme' : ''}${h1clear ? ', clear of H1 Origins' : ''}. ${g.sell ? 'Sell' : 'Buy'} at market, stop past the extreme; from +2R the stop trails 2R behind the best price (2R mark ${t1.toFixed(2)}), out after 48 h.` });
+          note: `${key === 'xau' ? 'Gold' : M.label} replica (v5, against the H4 trend): ${g.L === 36 ? '3 h' : '6 h'} leg to ${g.ext.toFixed(2)}, M5 CHoCH through ${g.lvl.toFixed(2)}${g.star ? ', ★ engulfing at structure at the extreme' : g.peg ? ', engulfing at the extreme' : ''}${h1clear ? ', clear of H1 Origins' : ''}. ${g.sell ? 'Sell' : 'Buy'} at market, stop past the extreme; from +2R the stop trails 2R behind the best price (2R mark ${t1.toFixed(2)}), out after 48 h.` });
       }
     }
     for (const r of research.filter((x) => x.market === key && x.k !== 'replica' && x.status === 'open')) {
