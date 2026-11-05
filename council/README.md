@@ -513,3 +513,10 @@ best price (parent `trail [4, 1]`, add `[1, 0.5]` in its own R), cap 10R, instea
 the max-3-open cap; their losses count toward the −1.5R daily stop. Spot gold 2023–26 with the live rules: base +93.0R /
 worst drawdown −11.7R (ratio 7.9) → add + runner +185.9R / −17.6R (10.6), better in both halves and every year. The gold
 history in `research/replay-2w.json` records one combined R per signal.
+
+## NQ New York open run: 1R runner after +2R (5 Nov, user rule `nq-runner`)
+
+After +2R the research record's stop trails 1R behind the best price (`trail [2, 1]`, `tp1` keeps the 2R mark, `t1` is a
+10R cap) instead of exiting at 2R; the 11:00 ET exit stays. Nasdaq cash 1m 2018–Oct 2026, live rule: fixed 2R +7.4R
+(2018–22, worst drawdown −23.4R) / +76.9R (2023–26, −7.7R); runner +21.1R (−19.3R) / +93.7R (−7.9R). Adds at +1R were
+rejected (2018–22 −17R, drawdown −52R). The NQ history in `research/replay-2w.json` is rebuilt on the runner.
