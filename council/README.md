@@ -503,3 +503,13 @@ Owner: more profit, less drawdown, judged on 2023 onwards. The gate is now the p
 (`beAt` on the trade). With the live risk rules: current gate +111R / worst drawdown −25.1R (ratio 4.4) → top fifth only
 +88R / −14.8R (6.0) → top fifth + breakeven +93R / −11.7R (7.9), better in both halves (2023–24 +37.9R vs +34.0R, 2025–26
 +55.0R vs +54.4R). At equal drawdown the new rule earns about 80% more.
+
+## Gold replica: pyramid add at +2R and runner after +4R (5 Nov, user rule `gold-add`)
+
+Owner: scale on profitable running trades and catch more of the move. When a gold replica trade reaches +2R (the same bar
+that moves its stop to breakeven), a second unit opens at that level (`<id>-add`, `addOf`), stop at the first entry, so its
+2R-wide stop counts as 2R of risk (`size` 2 scales its R). After the first trade's +4R the whole position trails 1R behind the
+best price (parent `trail [4, 1]`, add `[1, 0.5]` in its own R), cap 10R, instead of exiting at 4R. Adds do not count toward
+the max-3-open cap; their losses count toward the −1.5R daily stop. Spot gold 2023–26 with the live rules: base +93.0R /
+worst drawdown −11.7R (ratio 7.9) → add + runner +185.9R / −17.6R (10.6), better in both halves and every year. The gold
+history in `research/replay-2w.json` records one combined R per signal.
