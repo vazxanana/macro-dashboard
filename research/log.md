@@ -630,3 +630,14 @@ so HistData labels are New York wall-clock time including daylight saving, not f
   The forex "no edge" verdict rests on many families and both seasons, so it stands; the SD-level study after the DST fix
   (sdx_*, ifvg.py) already used corrected NSX sessions. core2 now converts with New York DST.
 - Gold HistData (hd/xau_*.json) was converted from New York local time correctly.
+
+## 5 Nov (loop 2): Mosha SOP with closing-price market structure
+
+Structure built on closes only (line chart: every candle's open/high/low = its close, so swings, BOs, VR and CF all come
+from closing prices); the chain H4 BO → H1 BO against (VR) → M15 BO back (CF), plus H4-H1-M30, H1-M15-M5, D1-H4-H1; swing
+size 3 and 6; filters weekly (close-based) agrees / against, daily agrees, CF is a flip; limit at the broken close level or
+market; 2R / 3R / leg-extreme targets; real 1-minute fills and costs. Gold, EUR/USD, Nasdaq cash, silver 2019-26 (lab/bo_close.mjs,
+lab/bomc_rep.py). 1,129 cells: positive in both 2019-22 and 2023-26 in 18% (gold), 15% (Nasdaq), 1% (EUR/USD, silver); mean R
+negative everywhere. No configuration is positive in both periods on 3 of the 4 markets. Best gold cell: H4-H1-M15, swing 6,
+weekly agrees + M15 flip, limit, 3R: +0.306R (82) / +0.316R (97), t 1.6 / 1.9 — about the same as the live wick-based rule
+(+0.370 / +0.270). Verdict: closing-price structure neither adds nor removes the gold result; no change to the live rule.
