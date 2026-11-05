@@ -42,7 +42,7 @@ namespace cAlgo.Robots
         [Parameter("Max signal age (min)", DefaultValue = 10)] public int MaxLateMin { get; set; }
         [Parameter("Max slippage (x R)", DefaultValue = 0.5)] public double MaxSlipR { get; set; }
 
-        private static readonly HttpClient Http = new HttpClient { Timeout = TimeSpan.FromSeconds(8) };
+        private static readonly HttpClient _http = new HttpClient { Timeout = TimeSpan.FromSeconds(8) };
         private const string LabelPrefix = "CB:";
         private readonly HashSet<string> _skipped = new HashSet<string>();   // signal ids we decided not to take
         private bool _blockedForever;
@@ -129,7 +129,7 @@ namespace cAlgo.Robots
             string txt;
             // raw.githubusercontent.com caches for up to 5 min; a changing query string bypasses that cache
             string url = Url + (Url.Contains("?") ? "&" : "?") + "cb=" + ((long)(DateTime.UtcNow - new DateTime(1970, 1, 1)).TotalSeconds).ToString();
-            try { txt = Http.GetStringAsync(url).Result; } catch (Exception e) { Print("CouncilBridge: fetch failed {0}", e.Message); return null; }
+            try { txt = _http.GetStringAsync(url).Result; } catch (Exception e) { Print("CouncilBridge: fetch failed {0}", e.Message); return null; }
             var lines = txt.Split('\n'); string[] head = null; var outp = new List<Sig>();
             foreach (var raw in lines)
             {
@@ -200,7 +200,7 @@ namespace cAlgo.Robots
             {
                 if (s.ValidFor > 0 && now > s.Opened + s.ValidFor) { _skipped.Add(s.Id); return; }
                 DateTime? exp = s.ValidFor > 0 ? (DateTime?)new DateTime(1970, 1, 1).AddSeconds(s.Opened + s.ValidFor) : null;
-                var r = PlaceLimitOrder(buy ? TradeType.Buy : TradeType.Sell, symName, units, Math.Round(s.Entry, sym.Digits), LabelPrefix + s.Id, slPips, tpPips > 0 ? (double?)tpPips : null, exp, s.Id);
+                var r = PlaceLimitOrder(buy ? TradeType.Buy : TradeType.Sell, symName, units, Math.Round(s.Entry, sym.Digits), LabelPrefix + s.Id, sl, tp > 0 ? (double?)tp : null, exp, s.Id);   // absolute stop / target prices
                 if (r.IsSuccessful) Print("CouncilBridge: limit {0} {1} {2} @ {3} {4}", s.Side, symName, units, s.Entry, s.Id); else { Print("CouncilBridge: limit failed {0}: {1}", s.Id, r.Error); _skipped.Add(s.Id); }
                 return;
             }
