@@ -188,6 +188,9 @@ const USER_RULES = [
   { id: 'gold-news-veto', apply: (c) => { c.goldNewsVeto = [[505, 525]]; },
     change: 'Gold replica: no new entry between 08:25 and 08:45 ET on weekdays (the US data-release window); such signals are recorded as research',
     why: 'Spot gold 2023-26, top-fifth gate, daily trend, 4R with breakeven: the 5 signals that fired inside 08:25-08:45 ET all lost (-5.2R); with the risk rules the veto makes +95.7R vs +93.0R (2023-24 +40.0R vs +37.9R, 2025-26 +55.6R vs +55.0R), same worst drawdown. Gold absorbs US macro news within minutes and the release-minute spread is several times normal, so the window is skipped for entries only. The FOMC window (Wed 13:55-14:15 ET) had 3 entries, all positive, and is not vetoed.' },
+  { id: 'crypto-add', apply: (c) => { c.cryptoAdd = { atR: 1, size: 1 }; },
+    change: 'Crypto trend: scale in once. When a daily close is +1R (5 ATR) above the entry, a second unit buys at market with its own 5 ATR stop; it exits with the first trade on the channel-midpoint close',
+    why: 'Owner: we leave money on the table in crypto, try scaling. Binance daily 2018-26, 0.8% costs, R on the first unit\'s 5 ATR risk: the live exit keeps 45% of each trade\'s best excursion and every other exit tested (10/20-day low, 3/4 ATR trails, partials) keeps less. One add at +1R: council coins 2023-26 +103.6R vs +61.6R with the worst drawdown -6.7R vs -5.5R (ratio 15.5 vs 11.3; 2023-24 +108.9R vs +62.1R at the same -5.5R drawdown, 2025-26 -5.3R vs -0.5R); the six other coins +169.9R vs +106.2R, ratio 8.9 vs 6.3. Adds at +0.5R, +2R, two adds and turtle-style pyramids raise drawdown faster than profit. Sizing guide: 0.5% on the first unit and 0.5% on the add (1% exposure on winners only).' },
   { id: 'mosha-bo-weekly', apply: (c) => { c.moshaBoWeekly = true; },
     change: "Mosha BO system: trades only in the weekly structure's direction (his \"Father\" timeframe); the M15 break no longer has to flip M15 structure",
     why: "From his multi-timeframe slides (father/mother/son). Spot gold 2019-26, H4->H1->M15, limit at the broken level, 3R, with the weekly direction computed the way the trader sees it live (Monday weeks built from the last 720 daily candles, swing size 3): weekly agrees 2019-22 +32.2R (87 trades, +0.37R a trade), 2023-26 +34.2R (99, +0.35R), 7 of 8 years positive, worst drawdown -18.4R; weekly against -28.3R / -15.8R. The previous flip-only rule: +7.5R / +15.1R. Caveat: the weekly filter did not help the other timeframe chains, so it is watched by the kill switch like everything else." },
@@ -511,7 +514,7 @@ for (const [key, M] of Object.entries(MARKETS)) {
         const fwdR = mine.filter((x) => x.R != null && x.closed && x.opened >= (config.cryptoTrendAt || 0)).reduce((a, x) => a + x.R, 0);
         const stopped = config.cryptoTrendStopR != null && fwdR <= config.cryptoTrendStopR, dp = Math.max(2, (M.dec ?? 2) + 1);
         for (const S of SYSX) {
-          const open = mine.find((x) => x.status === 'open' && (x.sys || 55) === S.sys), xN = open ? (open.sys === 100 ? 50 : 27) : S.x;
+          const open = mine.find((x) => x.status === 'open' && !x.addOf && (x.sys || 55) === S.sys), xN = open ? (open.sys === 100 ? 50 : 27) : S.x;
           if (open) {
             for (const b of D.filter((b) => b.time > (open.lastD || open.filled - 86400) && b.time >= Math.floor(open.filled / 86400) * 86400)) {
               const i = D.indexOf(b); if (i < xN + 1) continue;
@@ -520,7 +523,16 @@ for (const [key, M] of Object.entries(MARKETS)) {
                 // v3: the channel midpoint of the system's own lookback ratchets up; a daily close under it exits at market
                 const N = open.sys || 55, mid = (Math.max(...D.slice(i - N, i).map((x) => x.high)) + Math.min(...D.slice(i - N, i).map((x) => x.low))) / 2;
                 open.midStop = +Math.max(open.midStop || 0, mid).toFixed(dp);
-                if (b.close < open.midStop && i === n - 1) { const R = +((price - open.entry) / open.r0).toFixed(2); open.status = R > 0 ? 'win' : R < 0 ? 'loss' : 'be'; open.R = R; open.closed = now; open.exit = `${N}-day channel midpoint`; }
+                if (b.close < open.midStop && i === n - 1) { const R = +((price - open.entry) / open.r0).toFixed(2); open.status = R > 0 ? 'win' : R < 0 ? 'loss' : 'be'; open.R = R; open.closed = now; open.exit = `${N}-day channel midpoint`;
+                  // the add (crypto-add) leaves with the first trade, at its own R
+                  for (const a of trades.filter((x) => x.addOf === open.id && x.status === 'open')) { const Ra = +((price - a.entry) / a.r0).toFixed(2); a.status = Ra > 0 ? 'win' : Ra < 0 ? 'loss' : 'be'; a.R = Ra; a.closed = now; a.exit = `${N}-day channel midpoint (with the first trade)`; } }
+                // crypto-add (5 Nov): one add when a daily close is +atR R above the entry; same 5 ATR (at entry) stop under the add's own price
+                else if (config.cryptoAdd && !open.addDone && i === n - 1 && b.close >= open.entry + config.cryptoAdd.atR * open.r0 && !trades.some((x) => x.id === `${open.id}-add`)) {
+                  open.addDone = true; const ae = +price.toFixed(dp), rA = open.r0, st = +(ae - rA).toFixed(dp);
+                  if (ae > open.entry && st > 0) trades.push({ id: `${open.id}-add`, market: key, label: M.label, dec: M.dec, k: 'trend', sys: open.sys, kATR: open.kATR, name: 'Crypto trend add', pair: open.pair, h: '1d', side: 'buy',
+                    entry: ae, stop: st, t1: +(ae * 100).toFixed(2), rr: 99, trail: [1e6, 0], size: config.cryptoAdd.size, buf: CFG.buf, opened: now, filled: now, checked: now, status: 'open', R: null, r0: rA, noBe: true, entryMode: 'market', addOf: open.id, shadow: false, blockedBy: [],
+                    note: `Crypto trend add: the trade from ${open.entry} closed the day +${config.cryptoAdd.atR}R (5 ATR) higher, so a second unit buys ${ae} with its own catastrophe stop ${st} (5 ATR at entry); it exits with the first trade on a daily close under the channel midpoint ${open.midStop}.` });
+                }
               } else {
                 const ns = +(open.best - (open.kATR || 4) * atrAt(i)).toFixed(dp);
                 if (ns > open.stop) { open.stop = ns; open.trailMoved = true; }
