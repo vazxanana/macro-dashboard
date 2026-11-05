@@ -839,3 +839,18 @@ Replayed on HistData spot gold 1m (UTC, 0.42 cost, `ms/omni.py`, `ms/omni_grid.p
 - **E5 daily breakout long with a chandelier trail is robust:** N10 trail 2 ATR +0.29 | +0.43 | +1.50 (n38/21/15); **N20 trail 2 ATR +0.31 | +1.07 | +2.42 (n29/12/10, DD −4.4 | −1.4 | −0.9)**; N20 trail 3 +0.38 | +1.56 | +1.19; N55 trail 2 +0.76 | +0.78 | +2.96; the crypto-style midpoint exit is weaker on gold (+0.10 | +0.36 | +0.65). Shorts of the mirrored rule lose in every period (N20 −0.22 | −0.42 | +0.02). N20 trail 2 by year: 2019 +6.1, 2020 +3.3, 2021 +0.5, 2022 −1.1, 2023 +4.0, 2024 +8.8, 2025 +19.4, 2026 +4.7; 51 trades, 51% wins, best +13.0R, worst −1.02R. A long-only gold trend system: it rides the secular bull and will go flat, not negative, in a bear (the trail caps losses at about −1R each, ~6 trades a year).
 - FX satellites on HistData daily (GBP/USD, USD/JPY, USD/CAD, EUR/USD; month-turn long/short, 3-down buy): every cell between −0.13 and +0.09R a trade, none consistent. Not added. Oil spread: no data.
 **Adopted: gold trend (user rule `gold-trend`):** daily close above the prior 20 daily highs → long at market on the bot's next run, stop 2 × ATR(D1,14) below, stop ratchets to (daily close − 2 ATR) on every closed day, no target, no time limit; sizing guide 0.5%. Independent of the replica (days-to-weeks hold).
+
+## 2026-11-05 — MSNR direction SOP on the NQ open run: no edge, nothing changed
+
+Question: does the Malaysian SnR direction (H4 external breakouts gated by tapped Daily levels, the rule that helped the gold replica as a "pullback phase" tag) say anything about the NQ New York open run? Harness: `nq/nq_msnr.py` (scratchpad), the 5 Nov nyflip rule replayed on the trader's NQ futures 1m file + HistData cash (2023–Oct 2026, 0.5 pt cost), H4/D1 built from the same 1m stream (daily bars from 18:00 ET), direction read at the entry bar.
+
+| n4 | half | all | MSNR agrees | MSNR against |
+|---|---|---|---|---|
+| 2 | 2023–24 | 154 tr, +51.1R, DD −8.2 | 75 tr, +33.6R | 79 tr, +17.5R |
+| 2 | 2025–26 | 142 tr, +48.6R, DD −7.8 | 78 tr, +20.4R | 64 tr, +28.2R |
+| 3 | 2023–24 | | +33.5R | +17.6R |
+| 3 | 2025–26 | | +24.0R | +24.6R |
+| 5 | 2023–24 | | +22.5R | +28.6R |
+| 5 | 2025–26 | | +28.7R | +19.9R |
+
+The run is profitable on both sides of the H4 direction in both halves and the better side flips between halves for every pivot width. Buys-with-direction look best in 2025–26 (n4=3: +0.71R/trade) but not in 2023–24 (+0.44, same as the rest), and the sell side flips too. Neither a gate nor a sizing tilt holds in both halves. The NQ open run stays as it is: direction-agnostic, midnight-open filter only. Not adopted; nothing recorded forward (the gold `feat.msnr` tag stays).
