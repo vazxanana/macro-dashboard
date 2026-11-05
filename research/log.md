@@ -889,3 +889,16 @@ The SOP defines direction only, so the scalp was built the only honest way: trad
 | H1/H4, limit retest 2R, H4 agrees | −11 | +12 | −4 |
 
 Every M5 and M15 variant loses in both 2019–22 and 2023–24 at −0.07 to −0.16R per trade: the switch candle is a late, wide-stop market entry and the stop past the pullback extreme is hit on the retest more often than not. The only non-negative line (H1/H4 with the H4 direction agreeing and a trail) is +0.04R per trade on 630 trades, essentially zero in 2025–26 → noise, not a system. The ladder filter and the limit retest do not change the sign. **No scalp from the SOP is adopted.** The SOP's value for us stays what the earlier step found: the direction state as a tag on the gold replica (`feat.msnr`, "pullback phase" reading), forward-tested.
+
+## 2026-11-05 — MSNR scalp, owner's follow-up: the storyline ladder and every timeframe pair
+
+Same harness (`ms/msnr_scalp3.py`), spot gold 2019–26, market entry on the switch candle, stop past the pullback extreme, 2R fixed and 2R-then-trail (2Rt). R sum (2019–22 | 2023–24 | 2025–26).
+
+**(B) every pair, working TF / level TF** (30 pairs tested): all 12 M5 pairs and all 10 M15 pairs are negative in 2019–22 and 2023–24 (−0.07 to −0.18R per trade); M30 pairs negative 2019–24 and only M30/W1 positive in 2025–26 (+34R on 285); H1 pairs about zero (H1/H4 2Rt −7 | +7 | −4; H1/W1 −8 | +5 | +9); the slow pairs are the only ones with two positive halves: **H4/D1 2R −16.1 | +6.4 | +14.7 (n 255/108/108, DD −6)**, H4/W1 −8 | +6 | +2.
+
+**(A) storyline ladder** (D1 vs W1 → H4 vs D1 → H1 vs H4 → M15 vs H1 → M5 vs M15, trade the lowest switch only when the rungs above agree):
+- M5 with the full ladder agreeing: −142 | −99 | +4; with H4+H1+M15: −199 | −122 | +25 (2Rt +52 in 2025–26 only).
+- M15 with D1+H4+H1: −37 | −42 | +33 (2Rt −39 | −46 | +40); with H4+H1: −51 | −43 | +23.
+- **H1 with H4 agreeing: 2R +10.1 | +14.2 | +2.2, 2Rt +23.0 | +16.8 | +0.8 (n 307/134/125, DD −13/−7/−8)**; with D1+H4: +12 | +8 | −4.
+
+Reading: the alignment helps monotonically in 2025–26 (the more rungs agree, the better the lower-TF switch does) but that is the bull year; in 2023–24 every M5/M15 line is negative whatever agrees above it, so the storyline does not rescue the scalp. The only lines with the same sign in all three windows are the H1 switch with H4 agreement (+0.07 / +0.13 / +0.01R per trade) and H4/D1 after 2023 — too thin and too few to be a system (+1R a month at best), and nothing beats the gold replica's +0.5R per trade. **Not adopted; no tracker** (the forward sample would take years to read).
