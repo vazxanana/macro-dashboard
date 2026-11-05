@@ -730,3 +730,4 @@ From now on gold decisions use 2023 – Oct 2026 only, split 2023–24 | 2025–
 - Direction: D1 with OR at EG (live) +0.31 | +0.16R; D1 with only +0.49 | +0.15R; any +0.01 | +0.15R; D1 against −0.31 | +0.15R. H4 against (live) +0.31 | +0.16R vs H4 with +0.10 | +0.07R.
 - Exit at the current stop: 2R +0.06 | +0.09R; 3R +0.12 | +0.16R; **4R +0.23 | +0.20R (+105R)**; trail (live) +0.31 | +0.16R (+98R). Tighter stops (0.85×, 0.7×) worse or equal in every column.
 - Verdict: live gate, direction and H4 rules all hold on 2023+. 4R fixed is the only close alternative (better in 2025–26, worse in 2023–24, total +7R over ~510 trades: inside noise). Kept the trail.
+- **Gold 4R adopted (PR #219, owner: weight the last 2–3 years).** Replay with live rules: 2024 +25.6R (trail +37.4R), 2025 +54.8R (+31.4R), 2026 +29.9R (+32.8R); 2023–26 +102.7R / 439 vs +95.2R / 456; worst drawdown −24.7R vs −15.8R. Calendar history rebuilt on 4R.
