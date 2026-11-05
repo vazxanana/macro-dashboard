@@ -82,6 +82,11 @@ const LIMITS = { buf: [0.10, 0.25], minRR: [1.2, 2.5], minRisk: [0.4, 1.2], maxU
 const config = Object.assign({ buf: 0.15, minRR: 1.2, minRisk: 0.6, be: null, fresh: FRESH, newsGuard: false, maxUsd: MAX_USD, paused: {}, pausedMarkets: {}, filters: {}, history: [] }, rd('config.json', {}));
 config.filters = config.filters || {};
 const now = Math.floor(Date.now() / 1000), nowISO = new Date(now * 1000).toISOString();
+// New York wall-clock parts of a unix time (used by the NQ research, the gold news veto and the MT5 feed). Declared here, before the
+// market loop runs: on 5 Nov the veto read it from inside the loop while it was still declared further down (temporal dead zone),
+// which threw on every replica signal and dropped the signal for that round.
+const nyFmt = new Intl.DateTimeFormat('en-CA', { timeZone: 'America/New_York', year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', hourCycle: 'h23', weekday: 'short' });
+function nyParts(t) { const o = {}; for (const p of nyFmt.formatToParts(new Date(t * 1000))) o[p.type] = p.value; return { d: `${o.year}-${o.month}-${o.day}`, m: +o.hour * 60 + +o.minute, wd: o.weekday }; }
 // a rule change stamped in the future (the AI Coach wrote 21:30 at 21:10 on 2 Nov) would hide the shadow trades a rule is
 // re-checked on until then: any future history time or filter 'since' is set to now
 for (const h of config.history || []) if (Date.parse(h.at) / 1000 > now) h.at = nowISO;
@@ -1201,8 +1206,7 @@ research = research.slice(-2000);
 // sweep's extreme, target 1.2R, out at 16:00. One trade a day. Candles: Yahoo NQ=F (NQ futures, 1 minute).
 // On 50 days of 5-minute and 21 days of 1-minute history it is about break-even (+0.02R / −0.06R a trade), so it runs on
 // paper to build a forward record.
-const nyFmt = new Intl.DateTimeFormat('en-CA', { timeZone: 'America/New_York', year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', hourCycle: 'h23', weekday: 'short' });
-function nyParts(t) { const o = {}; for (const p of nyFmt.formatToParts(new Date(t * 1000))) o[p.type] = p.value; return { d: `${o.year}-${o.month}-${o.day}`, m: +o.hour * 60 + +o.minute, wd: o.weekday }; }
+// (nyFmt / nyParts are declared near the top of the file: the replica's news veto uses them inside the market loop)
 async function yahoo1m(sym) {
   // 4 Nov: Yahoo answers GitHub's runners with 429 "Too Many Requests" now and then: try both hosts, back off, retry (3 rounds)
   let last = '';
