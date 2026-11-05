@@ -335,6 +335,12 @@
    "by": "user",
    "change": "Pairs, best settings (owner asked): crypto trades a daily trend system (55-day breakout, long only, 4 ATR trailing stop, out on a close under the 27-day low); forex stops trading live (research only)",
    "why": "Walk-forward search on the pairs only. The replica: ~11,000 settings per pair, chosen on 2019-22 (forex) / 2022-23 (crypto): the 20 best on 7 of 9 pairs lost in the later years. Asia-range breakouts/fades and open sweeps lose on forex and crypto after costs. Daily trend-following on forex lost 2023-26 (0 of 5 pairs). Crypto daily trend (Binance 2017-2026, 0.8% round-trip cost), picked on 2018-21: 55-day breakout long-only with a 4 ATR trail +1.05R a trade, then 2022-26 +0.30R a trade with 8 of 10 coins positive; on the council's coins 2022-26 BTC +0.50R, ETH +0.39R, SOL +0.74R, XRP +1.29R a trade, worst drawdown 2-4R, ~3 trades a coin a year. Tight 2 ATR trails lose on every coin."
+  },
+  {
+   "at": "2026-11-05T11:42:26.000Z",
+   "by": "user",
+   "change": "Gold replica: the volatility gate also opens when gold's 20-day range is in the top fifth of its own last year (as well as at 1.5% or more)",
+   "why": "Owner: apply the research. Live config, spot gold, trail exit: fixed 1.5% 2019-22 +0.093R (214 trades) / 2023-26 +0.164R (443); 1.5% OR top-fifth +0.104R (341) / +0.192R (513): better in both halves with more trades. Tighter stops (0.5-0.85x) and fixed 2-4R targets were tested at the same time and did not beat the current stop and trail."
   }
  ],
  "btAt": "2026-11-05T11:21:05.226Z",
@@ -356,7 +362,8 @@
   "mosha-bo",
   "mosha-bo-weekly",
   "pairs-live",
-  "pairs-best"
+  "pairs-best",
+  "gold-adaptive-gate"
  ],
  "target": {},
  "targetBy": {},
@@ -367,11 +374,11 @@
  "noPause": true,
  "wouldPause": {
   "rintra": {
-   "at": "2026-11-05T11:35:32.000Z",
+   "at": "2026-11-05T11:42:26.000Z",
    "why": "four losses in a row"
   },
   "scalp": {
-   "at": "2026-11-05T11:35:32.000Z",
+   "at": "2026-11-05T11:42:26.000Z",
    "why": "expectancy -1.00R over 13 trades"
   },
   "xau": {
@@ -414,5 +421,6 @@
   "xrp"
  ],
  "cryptoTrendStopR": -8,
- "cryptoTrendAt": 1793839317
+ "cryptoTrendAt": 1793839317,
+ "goldVolPct": 80
 }
