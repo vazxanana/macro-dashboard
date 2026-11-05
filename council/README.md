@@ -426,3 +426,14 @@ daily close under the prior 27 daily lows; one trade per coin; a coin stops at �
 **Forex is research only** (replica signals still recorded) and the crypto replica stops trading live
 (`config.replicaLive = ['xau']`). The replay file now counts crypto trend 2023 - Oct 2026 (44 trades, +37.0R) instead of
 the pairs' replica records.
+
+### NQ opening-4H standard-deviation trackers (5 Nov; research, paper)
+
+From the owner's indicator ("NQ Opening 4H Candle High/Low"): the CME day's first 4H candle (18:00-22:00 ET) and SD levels
+H + k·range / L − k·range. Two research records (`research.json`, k `nq-open`, sessions `sd2ifvg` and `sd3mom`), not counted
+in our system, to build a forward record:
+- `sd2ifvg`: at the 2 SD line a 1-minute IFVG (an FVG of the push inverted by a close through it, within 60 min) → fade;
+  stop 1 pt past the extreme; target 1 SD back; out 16:00 ET. Backtest +0.04 to +0.16R a trade, not significant.
+- `sd3mom`: at 3 SD → with the move; stop 0.25 range; target 4 SD; out 16:00 ET. Backtest +0.19 to +0.41R a trade
+  (t 1.6-2.5), chosen after seeing the data. Judge both after ~60 forward trades.
+The NQ fetch now also runs 22:00-24:00 ET (Sun-Thu) for these.
