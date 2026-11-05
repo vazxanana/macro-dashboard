@@ -651,3 +651,13 @@ weekly agrees + M15 flip, limit, 3R: +0.306R (82) / +0.316R (97), t 1.6 / 1.9 �
   difference; BTC-above-100/200-day filter: 2018-21 slightly worse, not used; 55 + 100-day slots (5 ATR) 2022-26 +96.5R / 186
   (+0.52R), N100 alone +0.73R / 68. Council coins two-slot +52.3R / 70 (+0.75R), dd −7.9R. Adopted (PR #209); replay records
   for the council coins rebuilt (2023 - Oct 2026).
+
+## 5 Nov (loop 3): gold replica settings, walk-forward
+
+Full replay of the replica on spot gold 2019-26 (lab/replica_full.mjs XAU, 18,913 raw signals; costs 0.30), grid around the live
+rules (filter, stop size 0.5/1/1.5 ATR, H4 against/any, direction D1-or-EG / D1 / any, volatility gate 1.0-2.0%, session, 7 exits):
+4,858 configs; pick on 2019-22, judge on 2023-26. Live config (v5, D1 or EG, gate 1.5%, trail 2/2): 2019-22 +0.093R (214),
+2023-26 +0.164R (443, +72.8R). Train→test rank correlation 0.09; the 15 best on 2019-22 averaged +0.145R on 2023-26 (below live).
+Single changes from live: skipping 21:00-24:00 UTC entries +0.102 / +0.194R (only consistent gain, ~+0.01-0.03R, noise-sized);
+3R fixed ≈ trail; gate 1.75% / 2.0% worse on 2019-22. Verdict: no change; the live gold rules are about as good as anything
+that can be picked honestly from this grid.
