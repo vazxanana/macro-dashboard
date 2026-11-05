@@ -18,9 +18,9 @@ input int     InpPollSec    = 30;        // poll every N seconds
 input long    InpMagic      = 260511;    // magic number
 // symbols on this broker ("" = do not trade that market)
 input string  InpSymGold    = "XAUUSD";
-input string  InpSymNQ      = "";        // e.g. NAS100 / USTEC (NQ open run is 10 min late in the feed: off unless you accept that)
-input string  InpSymBTC     = "";        // e.g. BTCUSD
-input string  InpSymETH     = "";
+input string  InpSymNQ      = "NAS100";  // NQ open run: the feed is 10 min late, mirrored only if InpMirrorNQ is on
+input string  InpSymBTC     = "BTCUSD";
+input string  InpSymETH     = "ETHUSD";
 input string  InpSymSOL     = "";
 input string  InpSymXRP     = "";
 // risk (% of equity per first unit; an add uses the same lots as its first trade)
