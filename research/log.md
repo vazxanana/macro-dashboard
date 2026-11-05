@@ -854,3 +854,22 @@ Question: does the Malaysian SnR direction (H4 external breakouts gated by tappe
 | 5 | 2025–26 | | +28.7R | +19.9R |
 
 The run is profitable on both sides of the H4 direction in both halves and the better side flips between halves for every pivot width. Buys-with-direction look best in 2025–26 (n4=3: +0.71R/trade) but not in 2023–24 (+0.44, same as the rest), and the sell side flips too. Neither a gate nor a sizing tilt holds in both halves. The NQ open run stays as it is: direction-agnostic, midnight-open filter only. Not adopted; nothing recorded forward (the gold `feat.msnr` tag stays).
+
+## 2026-11-05 — MSNR direction as the Mosha weekly filter: not a replacement, not a robust add-on
+
+Harness `ms/mosha_msnr.py` on the Mosha chain records (`lab/mv3_XAU.json`, spot gold, limit at the broken T3 level, 3R, 24 h). MSNR direction (H4 external BO gated by tapped Daily levels, n4 = 2/3/5) read at the chain's CF time. Live chain H4-H1-M15, R per half (2019–22 | 2023–24 | 2025–26, n / sum / DD):
+
+| filter | 2019–22 | 2023–24 | 2025–26 |
+|---|---|---|---|
+| weekly agrees (live) | 87 / +32.2 / −7.3 | 36 / +6.3 / −10.5 | 65 / +21.0 / −17.4 |
+| MSNR agrees instead of weekly (n4=2) | 73 / −20.4 / −29.1 | 30 / +9.5 / −7.5 | 52 / +9.8 / −7.8 |
+| weekly & MSNR agree (n4=2) | 24 / +2.4 / −3.8 | 20 / +11.7 / −2.8 | 26 / +17.4 / −4.1 |
+| weekly & MSNR agree (n4=3) | 19 / +3.2 | 18 / +11.6 | 28 / +6.5 |
+| weekly & MSNR agree (n4=5) | 39 / +3.7 | 15 / +5.8 | 32 / +2.2 |
+| weekly agrees, MSNR against (n4=2) | 63 / +29.8 | 16 / −5.4 | 39 / +3.6 |
+
+- **As a replacement** for the weekly: negative 2019–22 (−20R, DD −29), roughly flat 2025–26 → rejected outright. "Weekly against, MSNR agrees" is negative in all three windows, so MSNR never rescues a counter-weekly chain.
+- **As an add-on** (both must agree): n4=2 cuts the drawdown in both halves (−2.8 / −4.1 vs −10.5 / −17.4) and beats the live line in 2023–24, but gives up 3.6R in 2025–26 and almost all of 2019–22 (+2.4 vs +32.2); n4=3 and n4=5 lose most of the 2025–26 profit. The double filter fails the "more profit AND less drawdown in both halves" rule and is fragile to the pivot width → not adopted.
+- H4-H1-M30 and D1-H4-H1 chains: same picture, MSNR-agree rows negative or tiny.
+
+Decision: the Mosha BO paper system keeps the weekly as its direction filter. No forward tag added (the sample is 2 live Mosha fills a month; it would take years to read).
