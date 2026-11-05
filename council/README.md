@@ -528,3 +528,9 @@ unit opens (`<id>-add`, k `mosha-bo`, `addOf`), stop at the first entry, counted
 trail 1R behind the best price (parent `trail [3, 1]`, add `[1, 0.667]`), cap 10R; `tp1` keeps the 3R mark. Spot gold 2023–26
 (`lab/bo_lever.mjs`, 101 fills): fixed 3R +6.3R / +21.0R (2023–24 / 2025–26), drawdown −18.4R → add + runner +8.8R /
 +35.3R, −20.3R. The add block in the management loop now carries the parent's `k` and name, so it serves any system.
+
+## Gold replica: US data-window veto (5 Nov, user rule `gold-news-veto`)
+
+No new gold replica entry between 08:25 and 08:45 ET on weekdays (`config.goldNewsVeto`, minutes of the New York day);
+the signal is still recorded as research with `news: true`. 2023–26 the 5 signals inside that window all lost (−5.2R);
+with the live rules the veto makes +95.7R vs +93.0R, same drawdown. Open trades and adds are not affected.
