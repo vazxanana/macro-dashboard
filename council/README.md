@@ -488,3 +488,9 @@ Owner: judge gold on the last 2–3 years. The replica now takes a fixed 4R targ
 trailing 2R behind from +2R. Replay with the live risk rules, spot gold: 2025–26 +84.7R vs +64.2R with the trail; 2023–26
 +102.7R (439 trades) vs +95.2R (456); but 2024 +25.6R vs +37.4R, 2026 +29.9R vs +32.8R, and the worst drawdown −24.7R vs
 −15.8R. To revert, drop `gold-4r` from `config.userRules` and unset `config.goldFixedR`.
+
+## Gold replica: engulfing-barrier exception off (5 Nov, user rule `gold-no-eg`)
+
+With the 4R exit, trades against the daily trend taken from an H1 engulfing barrier lose in every year 2023–26 (−15R over 82),
+while daily-trend trades make +0.42R / +0.25R a trade (2023–24 / 2025–26). `config.goldEgBarrier` is now false; the gold
+replica trades only with the daily trend. `atEG` is still recorded on every signal for research.
