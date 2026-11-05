@@ -1277,7 +1277,8 @@ function nqSdSignals(bars, now) {
 // NQ 80% rule (5 Nov, research only, paper; from the owner's video "Worlds BEST NQ Scalper Reveals His A+ Trading Strategy",
 // auction market theory). Yesterday's value area = 70% of its 09:30-16:00 time-at-price (2-point bins, grown from the POC).
 // Today opens outside it; 30 consecutive 1-minute closes back inside before 12:00 ET → trade toward the far edge; stop 0.03%
-// past the extreme since the open; out 16:00 ET. Nasdaq cash 2018-22 +0.10R (n120), 2023-26 +0.12R (n89), t 2.2, 76% wins.
+// past the extreme since the open; out 16:00 ET. Nasdaq cash 2018-22 +0.04R (n153), 2023-26 +0.05R (n106), t ~1: weak.
+// (Corrected 5 Nov: the first backtest dropped trades still open at 16:00 and showed +0.10R / +0.12R.)
 function nq80Signal(bars, today) {
   const B = bars.map((b) => ({ ...b, ...nyParts(b.time) })), pd = [...new Set(B.filter((b) => b.m >= 570 && b.m < 960 && b.d < today).map((b) => b.d))].sort().at(-1);
   if (!pd) return null;

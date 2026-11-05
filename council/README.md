@@ -455,5 +455,6 @@ From the owner's video ("Worlds BEST NQ Scalper Reveals His A+ Trading Strategy"
 area is 70% of its 09:30–16:00 ET time-at-price (2-point bins grown from the POC). When NQ opens outside it and then makes 30
 consecutive 1-minute closes back inside before 12:00 ET, the trader records a paper trade toward the far edge, stop 0.03% past
 the extreme since the open, out at 16:00 ET. Research session `80pct` (k `nq-open`), id `nq-80pct-<day>`; summary in
-`snapshot.research.nq_80pct` (the summary now also lists `nyflip-x`, `sd2ifvg`, `sd3mom`). Nasdaq cash 2018–22 +0.10R (120
-trades), 2023–26 +0.12R (89), 76% wins, about 25 a year. Not part of the live system until ~30 forward trades agree.
+`snapshot.research.nq_80pct` (the summary now also lists `nyflip-x`, `sd2ifvg`, `sd3mom`). Nasdaq cash 2018–22 +0.04R (153
+trades), 2023–26 +0.05R (106), about 30 a year: weak (t ~1). Corrected 5 Nov: the first backtest dropped trades still open at
+16:00 and showed +0.10R / +0.12R. Kept as a cheap paper tracker, not a candidate for live trading on this evidence.
