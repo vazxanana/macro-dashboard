@@ -39,7 +39,7 @@ input double  InpStartBalance = 0;       // 0 = balance when the EA first runs (
 input double  InpMaxOpenRiskPct = 2.0;   // no new trade when the open risk (sum of |entry-stop| x lots) is above this (%)
 // execution
 input int     InpMaxLateMin   = 8;       // a market signal older than this is not taken
-input double  InpMaxSlipR     = 0.3;     // a market signal is not taken if price moved more than this x R from the signal entry
+input double  InpMaxSlipR     = 0.5;     // a market signal is not taken if price moved more than this x R from the signal entry (gold 2023-26: 0.5R keeps the full replay result, 0.3R skipped too many)
 input int     InpSlippagePts  = 50;      // deviation in points for market orders
 
 CTrade trade;
