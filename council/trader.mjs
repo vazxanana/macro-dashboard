@@ -465,30 +465,41 @@ for (const [key, M] of Object.entries(MARKETS)) {
         const D = src['1d'].bars.slice(0, -1), n = D.length, last = D[n - 1];
         const tr = (i) => Math.max(D[i].high - D[i].low, Math.abs(D[i].high - D[i - 1].close), Math.abs(D[i].low - D[i - 1].close));
         const atrAt = (i) => { let a = 0; for (let j = i - 19; j <= i; j++) a += tr(j); return a / 20; };
-        const hi55 = Math.max(...D.slice(n - 56, n - 1).map((b) => b.high)), lo27 = Math.min(...D.slice(n - 28, n - 1).map((b) => b.low)), A = atrAt(n - 1);
+        // v2 (5 Nov, loop): two slots per coin, the 55-day breakout (out under the 27-day low) and the 100-day breakout (out under
+        // the 50-day low), both with a 5 ATR trail. Walk-forward (picked on 2018-21, judged on 2022-26, 10 coins, 0.8% costs):
+        // 5 ATR beat 3.5/4/6 on 2018-21 and held (+0.40R vs +0.30R a trade); the pair made +96.5R over 186 (+0.52R) vs +40.0R
+        // for the 55-day alone; council coins +52.3R over 70 (+0.75R), worst drawdown −7.9R. Older trades keep their own kATR.
+        const SYSX = [{ sys: 55, x: 27, k: 5, id: 'trend' }, { sys: 100, x: 50, k: 5, id: 'trend100' }], A = atrAt(n - 1);
+        const hiN = (N) => Math.max(...D.slice(n - 1 - N, n - 1).map((b) => b.high)), hi55 = hiN(55), lo27 = Math.min(...D.slice(n - 28, n - 1).map((b) => b.low));
         const mine = trades.filter((x) => x.k === 'trend' && x.market === key && !x.shadow);
-        const open = mine.find((x) => x.status === 'open'), fwdR = mine.filter((x) => x.R != null && x.closed && x.opened >= (config.cryptoTrendAt || 0)).reduce((a, x) => a + x.R, 0);
-        const stopped = config.cryptoTrendStopR != null && fwdR <= config.cryptoTrendStopR;
-        if (open) {
-          // daily management on every closed day since the last one handled
-          for (const b of D.filter((b) => b.time > (open.lastD || open.filled - 86400) && b.time >= Math.floor(open.filled / 86400) * 86400)) {
-            const i = D.indexOf(b); if (i < 28) continue;
-            open.best = Math.max(open.best || open.entry, b.close);
-            const ns = +(open.best - 4 * atrAt(i)).toFixed(Math.max(2, (M.dec ?? 2) + 1));
-            if (ns > open.stop) { open.stop = ns; open.trailMoved = true; }
-            const l27 = Math.min(...D.slice(i - 27, i).map((x) => x.low));
-            if (b.close < l27 && i === n - 1) { const r0 = open.r0, R = +((price - open.entry) / r0).toFixed(2); open.status = R > 0 ? 'win' : R < 0 ? 'loss' : 'be'; open.R = R; open.closed = now; open.exit = '27-day low'; }
-            open.lastD = b.time;
+        const fwdR = mine.filter((x) => x.R != null && x.closed && x.opened >= (config.cryptoTrendAt || 0)).reduce((a, x) => a + x.R, 0);
+        const stopped = config.cryptoTrendStopR != null && fwdR <= config.cryptoTrendStopR, dp = Math.max(2, (M.dec ?? 2) + 1);
+        for (const S of SYSX) {
+          const open = mine.find((x) => x.status === 'open' && (x.sys || 55) === S.sys), xN = open ? (open.sys === 100 ? 50 : 27) : S.x;
+          if (open) {
+            for (const b of D.filter((b) => b.time > (open.lastD || open.filled - 86400) && b.time >= Math.floor(open.filled / 86400) * 86400)) {
+              const i = D.indexOf(b); if (i < xN + 1) continue;
+              open.best = Math.max(open.best || open.entry, b.close);
+              const ns = +(open.best - (open.kATR || 4) * atrAt(i)).toFixed(dp);
+              if (ns > open.stop) { open.stop = ns; open.trailMoved = true; }
+              const lx = Math.min(...D.slice(i - xN, i).map((x) => x.low));
+              if (b.close < lx && i === n - 1) { const R = +((price - open.entry) / open.r0).toFixed(2); open.status = R > 0 ? 'win' : R < 0 ? 'loss' : 'be'; open.R = R; open.closed = now; open.exit = `${xN}-day low`; }
+              open.lastD = b.time;
+            }
+            continue;
           }
-        } else if (last.close > hi55 && !stopped && !trades.some((x) => x.id === `${key}-trend-${last.time}`) && now - (last.time + 86400) < 86400) {
-          const dp = Math.max(2, (M.dec ?? 2) + 1), entry = +price.toFixed(dp), stop = +(entry - 4 * A).toFixed(dp), r0 = entry - stop;
-          if (r0 > 0) trades.push({ id: `${key}-trend-${last.time}`, market: key, label: M.label, dec: M.dec, k: 'trend', name: 'Crypto trend', pair: 'D1 55-day breakout', h: '1d', side: 'buy',
-            entry, stop, t1: +(entry * 100).toFixed(2), rr: 99, trail: [1e6, 0], buf: CFG.buf, opened: now, filled: now, checked: now, status: 'open', R: null, r0, noBe: true, entryMode: 'market', lastD: last.time, best: last.close,
-            feat: { hi55: +hi55.toFixed(4), atr: +A.toFixed(4) }, shadow: false, blockedBy: [],
-            note: `Crypto trend: daily close ${last.close} above the 55-day high ${hi55}. Buy at market, stop 4 ATR below (${stop}); each daily close lifts the stop to 4 ATR under the best close; out on a daily close under the 27-day low.` });
+          const hi = hiN(S.sys), id = `${key}-${S.id}-${last.time}`;
+          if (last.close > hi && !stopped && !trades.some((x) => x.id === id) && now - (last.time + 86400) < 86400) {
+            const entry = +price.toFixed(dp), stop = +(entry - S.k * A).toFixed(dp), r0 = entry - stop;
+            if (r0 > 0) trades.push({ id, market: key, label: M.label, dec: M.dec, k: 'trend', sys: S.sys, kATR: S.k, name: 'Crypto trend', pair: `D1 ${S.sys}-day breakout`, h: '1d', side: 'buy',
+              entry, stop, t1: +(entry * 100).toFixed(2), rr: 99, trail: [1e6, 0], buf: CFG.buf, opened: now, filled: now, checked: now, status: 'open', R: null, r0, noBe: true, entryMode: 'market', lastD: last.time, best: last.close,
+              feat: { hi: +hi.toFixed(4), atr: +A.toFixed(4) }, shadow: false, blockedBy: [],
+              note: `Crypto trend: daily close ${last.close} above the ${S.sys}-day high ${+hi.toFixed(4)}. Buy at market, stop ${S.k} ATR below (${stop}); each daily close lifts the stop to ${S.k} ATR under the best close; out on a daily close under the ${S.x}-day low.` });
+          }
         }
-        (snapshot.trend = snapshot.trend || {})[key] = { label: M.label, close: last.close, hi55: +hi55.toFixed(4), lo27: +lo27.toFixed(4), atr: +A.toFixed(4), open: !!open || trades.some((x) => x.id === `${key}-trend-${last.time}` && x.status === 'open'),
-          stop: open ? open.stop : null, toBreakout: +((hi55 / price - 1) * 100).toFixed(2), n: mine.filter((x) => x.R != null).length, R: +fwdR.toFixed(2), stopped };
+        const openT = trades.filter((x) => x.k === 'trend' && x.market === key && x.status === 'open');
+        (snapshot.trend = snapshot.trend || {})[key] = { label: M.label, close: last.close, hi55: +hi55.toFixed(4), hi100: +hiN(100).toFixed(4), lo27: +lo27.toFixed(4), atr: +A.toFixed(4), open: openT.length > 0, nOpen: openT.length,
+          stop: openT.length ? Math.max(...openT.map((x) => x.stop)) : null, toBreakout: +((hi55 / price - 1) * 100).toFixed(2), n: mine.filter((x) => x.R != null).length, R: +fwdR.toFixed(2), stopped };
       } catch (e) { snapshot.errors.trend = String(e.message || e); }
     }
     if (key === 'xau' && config.moshaBo) {
