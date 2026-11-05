@@ -173,6 +173,9 @@ const USER_RULES = [
   { id: 'gold-no-eg', apply: (c) => { c.goldEgBarrier = false; },
     change: 'Gold replica: trades only with the daily trend; the H1 engulfing-barrier exception (a trade against the daily trend) is off',
     why: 'Owner: judge gold on 2023 onwards. With the 4R exit the exception loses every year: 2023 -5.6R (5), 2024 -4.6R (21), 2025 -2.8R (19), 2026 -2.1R (37), -15R over 82 trades, while daily-trend trades make +0.42R (2023-24) / +0.25R (2025-26) a trade. It only paid under the old trail exit in 2025-26 (+0.22R).' },
+  { id: 'gold-top-be', apply: (c) => { c.goldVolMin = null; c.goldVolPct = 80; c.goldBeR = 2; },
+    change: "Gold replica: trades only while gold's 20-day range is in the top fifth of its own last year (the 1.5% leg is dropped), and the stop moves to breakeven once a trade reaches +2R",
+    why: 'Owner: more profit, less drawdown, judged on 2023 onwards. Spot gold with the live risk rules, 4R: current gate +111R, worst drawdown -25.1R (ratio 4.4); top fifth only +88R / -14.8R (6.0); top fifth + breakeven at +2R +93R / -11.7R (7.9), better than the current gate in both halves (2023-24 +37.9R vs +34.0R, 2025-26 +55.0R vs +54.4R). Trades at 1.5-2.4% volatility but below the top fifth made +0.02R a trade (168 trades); top-fifth trades +0.40R in both halves.' },
   { id: 'mosha-bo-weekly', apply: (c) => { c.moshaBoWeekly = true; },
     change: "Mosha BO system: trades only in the weekly structure's direction (his \"Father\" timeframe); the M15 break no longer has to flip M15 structure",
     why: "From his multi-timeframe slides (father/mother/son). Spot gold 2019-26, H4->H1->M15, limit at the broken level, 3R, with the weekly direction computed the way the trader sees it live (Monday weeks built from the last 720 daily candles, swing size 3): weekly agrees 2019-22 +32.2R (87 trades, +0.37R a trade), 2023-26 +34.2R (99, +0.35R), 7 of 8 years positive, worst drawdown -18.4R; weekly against -28.3R / -15.8R. The previous flip-only rule: +7.5R / +15.1R. Caveat: the weekly filter did not help the other timeframe chains, so it is watched by the kill switch like everything else." },
@@ -425,6 +428,8 @@ for (const [key, M] of Object.entries(MARKETS)) {
         // trailing stop (replica, 4 Nov): once the trade is trail[0] R in profit, the stop follows trail[1] R behind the best price
         if (tr.trail && tr.mfe >= tr.trail[0]) { const ns = tr.entry + (s ? -1 : 1) * (tr.mfe - tr.trail[1]) * r0; if (s ? ns < tr.stop : ns > tr.stop) { tr.stop = +ns.toFixed(Math.max(2, (tr.dec ?? 2) + 1)); tr.trailMoved = true; } }
         if (config.be && !tr.noBe && !tr.beMoved && ((s ? tr.entry - b.low : b.high - tr.entry) / r0) >= config.be) { tr.stop = tr.entry; tr.beMoved = true; }
+        // per-trade breakeven (gold replica, 5 Nov, gold-top-be): once the trade reaches +beAt R the stop moves to the entry
+        if (tr.beAt && !tr.beMoved && ((s ? tr.entry - b.low : b.high - tr.entry) / r0) >= tr.beAt) { tr.stop = tr.entry; tr.beMoved = true; }
       }
       tr.checked = exitBar ? bars.at(-1).time : next;
       // half-size trades (replica equity filter): the score counts R × size; rawR keeps the full-size result
@@ -592,7 +597,8 @@ for (const [key, M] of Object.entries(MARKETS)) {
       goldP = past.length >= 200 ? +past[Math.floor(config.goldVolPct / 100 * (past.length - 1))].toFixed(3) : null;
       snapshot.goldVolP = goldP; snapshot.goldVolPn = past.length;
     }
-    const volOk = key === 'xau' ? !config.goldVolMin || (volPct != null && (volPct >= config.goldVolMin || (goldP != null && volPct >= goldP))) : !config.pairVolPct || (pairVol != null && pairVol >= volGate);
+    // gold gate: goldVolMin (fixed %) OR goldVolPct (own top fifth); since 5 Nov (gold-top-be) only the percentile leg is set
+    const volOk = key === 'xau' ? (!config.goldVolMin && !config.goldVolPct) || (volPct != null && ((config.goldVolMin != null && volPct >= config.goldVolMin) || (goldP != null && volPct >= goldP))) : !config.pairVolPct || (pairVol != null && pairVol >= volGate);
     const pxr = (v) => +v.toFixed(Math.max(2, (M.dec ?? 2) + 1));   // price rounding by market (forex has 5 decimals)
     // pair kill switch (user rule pairs-live): a pair stops trading live once its live replica trades since the switch-on sum to
     // config.pairStopR (−10R); its signals stay research
@@ -667,8 +673,9 @@ for (const [key, M] of Object.entries(MARKETS)) {
         if (v5 && volOk && dirOk && !capped && !dayStop && !stale && !pairStop && (config.replicaLive || []).includes(key)) trades.push({ id: `${key}-replica-${now}-${g.sell ? 's' : 'b'}`, market: key, label: M.label, dec: M.dec, k: 'replica', name: 'Replica', pair: 'M5 CHoCH', h: '5m', side: g.sell ? 'sell' : 'buy',
           entry: pxr(entry), stop: pxr(stop), t1: pxr(entry + (g.sell ? -10 : 10) * r0), tp1: pxr(t1), rr: 10, trail: [2.0, 2.0], size, buf: CFG.buf, opened: now, filled: now, checked: now, status: 'open', R: null, r0: Math.abs(pxr(entry) - pxr(stop)), maxHold: 48 * 3600, noBe: true, entryMode: 'market', lag,
           ...(key === 'xau' && config.goldFixedR ? { t1: pxr(entry + (g.sell ? -1 : 1) * config.goldFixedR * Math.abs(pxr(entry) - pxr(stop))), rr: config.goldFixedR, trail: undefined, tp1: undefined } : {}),
+          ...(key === 'xau' && config.goldBeR ? { beAt: config.goldBeR } : {}),
           feat: { d1: src['1d'].A.trend === (g.sell ? -1 : 1) ? 'with' : 'against', h4, session: sessionOf(now), star: g.star, h1clear, riskAtr: +riskAtr.toFixed(2), leg: g.L === 36 ? '3h' : '6h' }, shadow: false, blockedBy: [],
-          note: `${key === 'xau' ? 'Gold' : M.label} replica (v5, against the H4 trend): ${g.L === 36 ? '3 h' : '6 h'} leg to ${g.ext.toFixed(2)}, M5 CHoCH through ${g.lvl.toFixed(2)}${g.star ? ', ★ engulfing at structure at the extreme' : g.peg ? ', engulfing at the extreme' : ''}${h1clear ? ', clear of H1 Origins' : ''}. ${g.sell ? 'Sell' : 'Buy'} at market, stop past the extreme; ${key === 'xau' && config.goldFixedR ? `fixed target ${config.goldFixedR}R, no trail` : `from +2R the stop trails 2R behind the best price (2R mark ${t1.toFixed(2)})`}, out after 48 h.` });
+          note: `${key === 'xau' ? 'Gold' : M.label} replica (v5, against the H4 trend): ${g.L === 36 ? '3 h' : '6 h'} leg to ${g.ext.toFixed(2)}, M5 CHoCH through ${g.lvl.toFixed(2)}${g.star ? ', ★ engulfing at structure at the extreme' : g.peg ? ', engulfing at the extreme' : ''}${h1clear ? ', clear of H1 Origins' : ''}. ${g.sell ? 'Sell' : 'Buy'} at market, stop past the extreme; ${key === 'xau' && config.goldFixedR ? `fixed target ${config.goldFixedR}R${config.goldBeR ? `, stop to breakeven at +${config.goldBeR}R` : ''}, no trail` : `from +2R the stop trails 2R behind the best price (2R mark ${t1.toFixed(2)})`}, out after 48 h.` });
       }
     }
     for (const r of research.filter((x) => x.market === key && x.k !== 'replica' && x.status === 'open')) {
