@@ -682,3 +682,11 @@ Script `idx/run_feat.py` (NSX 1m 2018 – Oct 2026, 15-pt equivalent, costs in).
 - Decision: no change to the NQ rule.
 - Crypto trend fees (loop item 9): `lab/crypto_trend.py` already charges 0.3% and 0.8% round trip (Kraken Pro taker is 0.4% a side = 0.8%); v2 was chosen under the 0.8% case. Done.
 - **Same run-and-reverse rule at other NQ opens** (`idx/run_open.py`, 90-min window and exit): London 03:00 ET n587 +0.07R (2018–22 +0.02R, 2023–26 +0.19R, n187), midnight-open filter doesn't help there; 08:00, 08:30, 10:00, 20:00 ET all ≤ 0 in 2023–26. London is a lead with the same "recent only" shape as New York; not adopted (t 1.4).
+
+## 2026-11-05 — Owner's video: Chart Fanatics "Worlds BEST NQ Scalper Reveals His A+ Trading Strategy" (youtu.be/HNuRp9Z1bMs)
+
+YouTube is blocked from this environment, so no transcript; the guest is unconfirmed. Tested the auction-market-theory toolkit publicly attributed to that channel's NQ scalper (Fabio Valentini): opening range, value area, 80% rule. Order-flow parts (footprint, delta, absorption) need tick volume we don't have. Value area = 70% of prior-day RTH time-at-price (TPO, 2-pt bins), NSX 1m 2018 – Oct 2026, costs in. Scripts `idx/amt.py`, `idx/amt80.py`.
+- 30-min opening range breakout (stop mid-range, 2R, out 12:00): +0.02R / −0.01R (n1178 / 810). Nothing.
+- Fade the first touch of VAH/VAL when the open is inside value (stop 0.25 VA, target POC): −0.01R / −0.12R. Nothing.
+- **80% rule** (open outside yesterday's value area; 30 consecutive 1m closes back inside before 12:00 ET; target the far VA edge; stop just past the open-side extreme; out 16:00): **+0.10R / +0.12R (n120 / 89), t 2.2 over 2018–26, 76% win**, ~25 trades a year. Neighbours agree: 15-min acceptance +0.07 / +0.06R; VA-edge stop +0.12 / +0.15R. S&P 500 same rule: +0.01 / +0.08R (weaker, not negative).
+- Verdict: the first candidate in a while that is positive in both halves with the textbook setting (one 30-min period). Next: add as an NQ research tracker (session '80pct'), not live.
