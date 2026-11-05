@@ -520,3 +520,11 @@ After +2R the research record's stop trails 1R behind the best price (`trail [2,
 10R cap) instead of exiting at 2R; the 11:00 ET exit stays. Nasdaq cash 1m 2018–Oct 2026, live rule: fixed 2R +7.4R
 (2018–22, worst drawdown −23.4R) / +76.9R (2023–26, −7.7R); runner +21.1R (−19.3R) / +93.7R (−7.9R). Adds at +1R were
 rejected (2018–22 −17R, drawdown −52R). The NQ history in `research/replay-2w.json` is rebuilt on the runner.
+
+## Mosha BO: breakeven, add at +1.5R and runner after +3R (5 Nov, user rule `mosha-add`)
+
+Same mechanism as the gold replica add (`beAt`, `addAt`/`addSize`, `trail`): at +1.5R the stop moves to the entry and a second
+unit opens (`<id>-add`, k `mosha-bo`, `addOf`), stop at the first entry, counted as 1.5R of risk (`size` 1.5); after +3R both
+trail 1R behind the best price (parent `trail [3, 1]`, add `[1, 0.667]`), cap 10R; `tp1` keeps the 3R mark. Spot gold 2023–26
+(`lab/bo_lever.mjs`, 101 fills): fixed 3R +6.3R / +21.0R (2023–24 / 2025–26), drawdown −18.4R → add + runner +8.8R /
++35.3R, −20.3R. The add block in the management loop now carries the parent's `k` and name, so it serves any system.

@@ -182,6 +182,9 @@ const USER_RULES = [
   { id: 'nq-runner', apply: (c) => { c.nqRun = { atR: 2, trail: 1 }; },
     change: 'NQ New York open run: after +2R the stop trails 1R behind the best price (cap 10R) instead of exiting at 2R; still out at 11:00 ET',
     why: 'Owner: catch more of the move. Nasdaq cash 1m 2018-Oct 2026, live rule with the midnight-open filter, costs in: fixed 2R +7.4R (2018-22, n435, worst drawdown -23.4R) / +76.9R (2023-26, n275, -7.7R); runner +21.1R (-19.3R) / +93.7R (-7.9R), +0.048 and +0.341R a trade, better in both halves. Adding a unit at +1R was rejected (2018-22 -17R, drawdown -52R).' },
+  { id: 'mosha-add', apply: (c) => { c.moshaBeR = 1.5; c.moshaAdd = { atR: 1.5, size: 1 }; c.moshaRun = { atR: 3, trail: 1 }; },
+    change: 'Mosha BO system: at +1.5R the stop moves to breakeven and a second unit is added (stop at the first entry); after +3R the whole position trails 1R behind the best price (cap 10R) instead of exiting at 3R',
+    why: 'Owner: scale on running trades, judged on 2023 onwards. Spot gold, weekly agrees, limit at the broken level, 101 fills: fixed 3R +6.3R (2023-24, n36) / +21.0R (2025-26, n65), worst drawdown -18.4R; add + runner +8.8R / +35.3R, drawdown -20.3R (return per unit of drawdown 2.2 vs 1.5). Still a forward test: the base system failed out of sample on other markets.' },
   { id: 'mosha-bo-weekly', apply: (c) => { c.moshaBoWeekly = true; },
     change: "Mosha BO system: trades only in the weekly structure's direction (his \"Father\" timeframe); the M15 break no longer has to flip M15 structure",
     why: "From his multi-timeframe slides (father/mother/son). Spot gold 2019-26, H4->H1->M15, limit at the broken level, 3R, with the weekly direction computed the way the trader sees it live (Monday weeks built from the last 720 daily candles, swing size 3): weekly agrees 2019-22 +32.2R (87 trades, +0.37R a trade), 2023-26 +34.2R (99, +0.35R), 7 of 8 years positive, worst drawdown -18.4R; weekly against -28.3R / -15.8R. The previous flip-only rule: +7.5R / +15.1R. Caveat: the weekly filter did not help the other timeframe chains, so it is watched by the kill switch like everything else." },
@@ -441,10 +444,10 @@ for (const [key, M] of Object.entries(MARKETS)) {
         // the add's 2R-wide stop counts as 2R of account risk. Adds don't count toward the max-3-open cap.
         if (tr.addAt && !tr.addDone && tr.status === 'open' && tr.mfe >= tr.addAt) {
           tr.addDone = true; const dp = Math.max(2, (tr.dec ?? 2) + 1), dir = s ? -1 : 1, ae = +(tr.entry + dir * tr.addAt * r0).toFixed(dp), rA = Math.abs(ae - tr.entry);
-          if (rA > 0 && !trades.some((x) => x.id === `${tr.id}-add`)) trades.push({ id: `${tr.id}-add`, market: tr.market, label: tr.label, dec: tr.dec, k: 'replica', name: 'Replica add', pair: tr.pair, h: tr.h, side: tr.side,
+          if (rA > 0 && !trades.some((x) => x.id === `${tr.id}-add`)) trades.push({ id: `${tr.id}-add`, market: tr.market, label: tr.label, dec: tr.dec, k: tr.k, name: `${tr.name} add`, pair: tr.pair, h: tr.h, side: tr.side,
             entry: ae, stop: tr.entry, t1: tr.t1, rr: +(Math.abs(tr.t1 - ae) / rA).toFixed(2), trail: tr.trail ? [+((tr.trail[0] - tr.addAt) / tr.addAt).toFixed(3), +(tr.trail[1] / tr.addAt).toFixed(3)] : undefined,
             size: +(tr.addAt * (tr.size || 1)).toFixed(2), buf: tr.buf, opened: b.time, filled: b.time, checked: b.time, status: 'open', R: null, r0: rA, maxHold: Math.max(300, (tr.filled + (tr.maxHold || 48 * 3600)) - b.time), noBe: true, entryMode: 'market', addOf: tr.id, shadow: false, blockedBy: [],
-            note: `Gold replica add: the trade from ${tr.entry} reached +${tr.addAt}R, so a second unit ${tr.side === 'sell' ? 'sells' : 'buys'} ${ae} with the stop at the first entry ${tr.entry} (${tr.addAt}R of risk, counted as size ${tr.addAt}); ${tr.trail ? `after the first trade's +${tr.trail[0]}R both trail ${tr.trail[1]}R behind the best price` : `target ${tr.t1}`}; out with the first trade.` });
+            note: `${tr.name} add: the trade from ${tr.entry} reached +${tr.addAt}R, so a second unit ${tr.side === 'sell' ? 'sells' : 'buys'} ${ae} with the stop at the first entry ${tr.entry} (${tr.addAt}R of risk, counted as size ${tr.addAt}); ${tr.trail ? `after the first trade's +${tr.trail[0]}R both trail ${tr.trail[1]}R behind the best price` : `target ${tr.t1}`}; out with the first trade.` });
         }
       }
       tr.checked = exitBar ? bars.at(-1).time : next;
@@ -580,6 +583,9 @@ for (const [key, M] of Object.entries(MARKETS)) {
             const blk = [!okW(e3) && 'weekly', openBo >= 2 && 'cap', !(d < 0 ? price < stop : price > stop) && 'price'].filter(Boolean);
             if (r0 > 0.5) trades.push({ id, market: key, label: M.label, dec: M.dec, k: 'mosha-bo', name: 'Mosha BO system', pair: 'H4 → H1 → M15', h: '15m',
               side: d < 0 ? 'sell' : 'buy', entry, stop, t1: +(entry + d * 3 * r0).toFixed(2), rr: 3, buf: CFG.buf, opened: now, checked: now, status: 'pending', R: null, r0, validFor: 24 * 3600, maxHold: 72 * 3600, noBe: true, entryMode: 'limit',
+              // mosha-add (5 Nov): breakeven and a second unit at +1.5R, after +3R trail 1R behind the best price (cap 10R)
+              ...(config.moshaBeR ? { beAt: config.moshaBeR } : {}), ...(config.moshaAdd ? { addAt: config.moshaAdd.atR, addSize: config.moshaAdd.size } : {}),
+              ...(config.moshaRun ? { t1: +(entry + d * 10 * r0).toFixed(2), rr: 10, tp1: +(entry + d * config.moshaRun.atR * r0).toFixed(2), trail: [config.moshaRun.atR, config.moshaRun.trail] } : {}),
               feat: { h4At: e1.t, h1At: e2.t, m15At: e3.t, w1: w1At(e3.t) === d ? 'with' : 'against', m15Flip: !!e3.flip }, shadow: blk.length > 0, blockedBy: blk,
               note: `Mosha BO system: ${config.moshaBoWeekly ? `weekly structure ${d < 0 ? 'bearish' : 'bullish'}, ` : ''}H4 BO ${d < 0 ? 'sell' : 'buy'}, then H1 BO ${d < 0 ? 'buy' : 'sell'} (retracement), then M15 BO ${d < 0 ? 'sell' : 'buy'} through ${entry}. Pullback limit at the broken M15 level ${entry}, stop past the M15 Origin ${stop}, target 3R ${(entry + d * 3 * r0).toFixed(2)}; valid 24 h, out after 72 h.` });
           }
