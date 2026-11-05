@@ -185,6 +185,9 @@ const USER_RULES = [
   { id: 'mosha-add', apply: (c) => { c.moshaBeR = 1.5; c.moshaAdd = { atR: 1.5, size: 1 }; c.moshaRun = { atR: 3, trail: 1 }; },
     change: 'Mosha BO system: at +1.5R the stop moves to breakeven and a second unit is added (stop at the first entry); after +3R the whole position trails 1R behind the best price (cap 10R) instead of exiting at 3R',
     why: 'Owner: scale on running trades, judged on 2023 onwards. Spot gold, weekly agrees, limit at the broken level, 101 fills: fixed 3R +6.3R (2023-24, n36) / +21.0R (2025-26, n65), worst drawdown -18.4R; add + runner +8.8R / +35.3R, drawdown -20.3R (return per unit of drawdown 2.2 vs 1.5). Still a forward test: the base system failed out of sample on other markets.' },
+  { id: 'gold-news-veto', apply: (c) => { c.goldNewsVeto = [[505, 525]]; },
+    change: 'Gold replica: no new entry between 08:25 and 08:45 ET on weekdays (the US data-release window); such signals are recorded as research',
+    why: 'Spot gold 2023-26, top-fifth gate, daily trend, 4R with breakeven: the 5 signals that fired inside 08:25-08:45 ET all lost (-5.2R); with the risk rules the veto makes +95.7R vs +93.0R (2023-24 +40.0R vs +37.9R, 2025-26 +55.6R vs +55.0R), same worst drawdown. Gold absorbs US macro news within minutes and the release-minute spread is several times normal, so the window is skipped for entries only. The FOMC window (Wed 13:55-14:15 ET) had 3 entries, all positive, and is not vetoed.' },
   { id: 'mosha-bo-weekly', apply: (c) => { c.moshaBoWeekly = true; },
     change: "Mosha BO system: trades only in the weekly structure's direction (his \"Father\" timeframe); the M15 break no longer has to flip M15 structure",
     why: "From his multi-timeframe slides (father/mother/son). Spot gold 2019-26, H4->H1->M15, limit at the broken level, 3R, with the weekly direction computed the way the trader sees it live (Monday weeks built from the last 720 daily candles, swing size 3): weekly agrees 2019-22 +32.2R (87 trades, +0.37R a trade), 2023-26 +34.2R (99, +0.35R), 7 of 8 years positive, worst drawdown -18.4R; weekly against -28.3R / -15.8R. The previous flip-only rule: +7.5R / +15.1R. Caveat: the weekly filter did not help the other timeframe chains, so it is watched by the kill switch like everything else." },
@@ -690,9 +693,13 @@ for (const [key, M] of Object.entries(MARKETS)) {
         let atEG = false; try { atEG = h1EgZones(src['1h'].bars.slice(0, -1).slice(-300)).some((q) => q.d === (g.sell ? -1 : 1) && stop0 >= q.bot - egTol && stop0 <= q.top + egTol); } catch (e) {}
         research.at(-1).atEG = atEG;
         const dirOk = !config.goldD1With || d1w || (config.goldEgBarrier && atEG);
+        // gold-news-veto (5 Nov): no new gold replica entry inside the US 08:30 ET data window (08:25-08:45 ET, weekdays); the signal
+        // is still recorded as research with news: true
+        const nyNow = nyParts(now), newsVeto = key === 'xau' && !!config.goldNewsVeto && !['Sat', 'Sun'].includes(nyNow.wd) && config.goldNewsVeto.some(([a, b]) => nyNow.m >= a && nyNow.m <= b);
+        if (v5 && newsVeto) research.at(-1).news = true;
         if (v5 && !dirOk) research.at(-1).d1Skip = true;
         if (v5 && pairStop) research.at(-1).pairStop = true;
-        if (v5 && volOk && dirOk && !capped && !dayStop && !stale && !pairStop && (config.replicaLive || []).includes(key)) trades.push({ id: `${key}-replica-${now}-${g.sell ? 's' : 'b'}`, market: key, label: M.label, dec: M.dec, k: 'replica', name: 'Replica', pair: 'M5 CHoCH', h: '5m', side: g.sell ? 'sell' : 'buy',
+        if (v5 && volOk && dirOk && !capped && !dayStop && !stale && !pairStop && !newsVeto && (config.replicaLive || []).includes(key)) trades.push({ id: `${key}-replica-${now}-${g.sell ? 's' : 'b'}`, market: key, label: M.label, dec: M.dec, k: 'replica', name: 'Replica', pair: 'M5 CHoCH', h: '5m', side: g.sell ? 'sell' : 'buy',
           entry: pxr(entry), stop: pxr(stop), t1: pxr(entry + (g.sell ? -10 : 10) * r0), tp1: pxr(t1), rr: 10, trail: [2.0, 2.0], size, buf: CFG.buf, opened: now, filled: now, checked: now, status: 'open', R: null, r0: Math.abs(pxr(entry) - pxr(stop)), maxHold: 48 * 3600, noBe: true, entryMode: 'market', lag,
           ...(key === 'xau' && config.goldFixedR ? { t1: pxr(entry + (g.sell ? -1 : 1) * config.goldFixedR * Math.abs(pxr(entry) - pxr(stop))), rr: config.goldFixedR, trail: undefined, tp1: undefined } : {}),
           ...(key === 'xau' && config.goldBeR ? { beAt: config.goldBeR } : {}),
