@@ -553,3 +553,25 @@ one trade a session, 22:00-16:00 ET, 0.5 pt (futures) / 1 pt (cash) cost:
   target the opposite 4H edge +0.158R on NQ but +0.006R in its first half and −0.108R on NSX 2018-26.
 Verdict: no edge in any reading on 3 years of NQ futures or 8 years of Nasdaq cash. Not added. If the owner has the exact
 stop/entry rules, test that version only.
+
+## 5 Nov: best settings and edge for the pairs (owner: "not NQ and gold")
+
+Walk-forward throughout (forex: pick on 2019-22, judge on 2023-26; crypto intraday: 2022-23 vs 2024-26; crypto daily: Binance
+2018-21 vs 2022-26). Costs: forex spread 1.2-1.8 pips; crypto 0.04% intraday (too kind for Kraken, whose spot fees are about
+0.25-0.4% a side), 0.3% and 0.8% round trip for the daily systems.
+- **Replica grid** (lab/pairs_grid.py; filter x stop 0.5/1/1.5 ATR x H4 against/with/any x D1 with/against/any x own-history
+  volatility high/low/any x EG barrier x session x 7 exits ≈ 11,000 settings a pair): best-on-train lost on test on 7 of 9
+  pairs (only USD/CAD +0.63R on 22 trades and XRP +0.09R positive); top-20 on train averaged −0.33 to +0.02R on test; 7-21%
+  of settings positive on test. No edge.
+- **Session systems** (lab/pairs_alt.py): Asia range (00:00-07:00 UTC) breakout at London (stop mid-range, 1R/2R) and fade
+  (wick out, close back in): −0.05 to −0.27R a trade on forex and crypto. Open sweeps at 07:00 / 13:00 UTC (0.1 / 0.2 ADR,
+  with / fade): negative except "13:00, with the sweep, 0.2 ADR" on forex (+0.27 / +0.16R, 24 + 31 trades: too few).
+- **Daily trend on forex**: Donchian 20/55/100 with 2/3/4 ATR, MA 20/100 and 50/200, long+short: 2023-26 negative on every
+  pair for every rule (0/5).
+- **Daily trend on crypto** (lab/crypto_trend.py, 10 coins): wide trails work, tight trails don't (2 ATR: −0.13 to −0.33R on
+  every rule, 1-2 coins positive). Donchian 55 / exit 27, 4 ATR trail, long only: train +1.05R, test +0.30-0.33R (8/10 coins);
+  N100: +0.97 / +0.42-0.45R (9/10); N20: +0.70 / +0.22-0.25R (8/10). MA 20/100 long-only +5.5 / +0.68-0.72R (9/10; R per trade
+  inflated by 2020 runaway winners). 2022 negative, 2023-24 positive, 2025-26 slightly negative.
+  Council coins, N55 long 4 ATR, 0.8%: 2022-26 BTC +6.5R (13), ETH +5.0R (13), SOL +9.6R (13), XRP +12.9R (10); drawdowns 2-4R.
+**Adopted (PR #207, user rule pairs-best):** crypto trend live on paper on BTC/ETH/SOL/XRP (N55 long-only 4 ATR); forex and
+the crypto replica research only. Expect roughly +0.3R a trade, ~12 trades a year across the four coins, long flat spells.
