@@ -641,3 +641,13 @@ lab/bomc_rep.py). 1,129 cells: positive in both 2019-22 and 2023-26 in 18% (gold
 negative everywhere. No configuration is positive in both periods on 3 of the 4 markets. Best gold cell: H4-H1-M15, swing 6,
 weekly agrees + M15 flip, limit, 3R: +0.306R (82) / +0.316R (97), t 1.6 / 1.9 — about the same as the live wick-based rule
 (+0.370 / +0.270). Verdict: closing-price structure neither adds nor removes the gold result; no change to the live rule.
+
+## 5 Nov (loop 2, cont.): NQ SD trackers live (paper) and crypto trend v2
+
+- NQ opening-4H SD trackers in the trader as research (PR #208): `sd2ifvg` (2 SD + 1-minute IFVG fade, target 1 SD back)
+  and `sd3mom` (3 SD with the move, stop 0.25 range, target 4 SD). Signal replay Sep-Nov 2026: 15 / 10 vs 16 / 9 backtest.
+- Crypto trend walk-forward (Binance daily, 10 coins, pick 2018-21 / check 2022-26, 0.8%): trail 3.5/4/5/6 ATR on 2018-21
+  +0.54 / +1.03 / +1.90 / +1.59R → 5 ATR, 2022-26 +0.40R (live 4 ATR +0.30R); exit channel 10/20/27/40/55 days: no real
+  difference; BTC-above-100/200-day filter: 2018-21 slightly worse, not used; 55 + 100-day slots (5 ATR) 2022-26 +96.5R / 186
+  (+0.52R), N100 alone +0.73R / 68. Council coins two-slot +52.3R / 70 (+0.75R), dd −7.9R. Adopted (PR #209); replay records
+  for the council coins rebuilt (2023 - Oct 2026).
