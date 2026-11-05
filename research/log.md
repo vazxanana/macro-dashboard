@@ -690,3 +690,10 @@ YouTube is blocked from this environment, so no transcript; the guest is unconfi
 - Fade the first touch of VAH/VAL when the open is inside value (stop 0.25 VA, target POC): −0.01R / −0.12R. Nothing.
 - **80% rule** (open outside yesterday's value area; 30 consecutive 1m closes back inside before 12:00 ET; target the far VA edge; stop just past the open-side extreme; out 16:00): **+0.10R / +0.12R (n120 / 89), t 2.2 over 2018–26, 76% win**, ~25 trades a year. Neighbours agree: 15-min acceptance +0.07 / +0.06R; VA-edge stop +0.12 / +0.15R. S&P 500 same rule: +0.01 / +0.08R (weaker, not negative).
 - Verdict: the first candidate in a while that is positive in both halves with the textbook setting (one 30-min period). Next: add as an NQ research tracker (session '80pct'), not live.
+
+## 2026-11-05 — Chart Fanatics strategy library (owner's link)
+
+Deep research (report: reports/Chart Fanatics strategy library.md in the working copy; site itself unreachable, rules from search excerpts). ~48 strategies; ~20 price-only testable. First tests (1m cash index CFDs 2018 – Oct 2026, costs in):
+- **Noise-area intraday momentum** (Zarattini/Aziz/Barbon benchmark; boundary = open × (1 ± 14-day mean move at that time), checks every 30 min from 10:00, out at close, no VWAP): Nasdaq 2018–22 +14.3%/yr Sharpe 1.58, 2023–26 +4.8%/yr Sharpe 0.61; S&P 2018–22 Sharpe 1.23, 2023–26 −0.42. Decaying; S&P fails recently. Candidate only for NQ, not adopted.
+- **Forrest Knight 1H failed break** (hourly RTH candle through PDH/PDL/ONH/ONL, close back inside, stop past wick, target opposite overnight extreme): all −0.02R (2023–26, n749) on Nasdaq, −0.07R on S&P. No edge.
+- Queue: JJ Simon fair price (09:30 / 14:00 displacement + structure), Kane Lab model (10:00 4H sweep + NQ/SPX SMT + iFVG), TG Capital London Trident on gold/FX.
