@@ -353,6 +353,12 @@
    "by": "user",
    "change": "Gold replica: trades only with the daily trend; the H1 engulfing-barrier exception (a trade against the daily trend) is off",
    "why": "Owner: judge gold on 2023 onwards. With the 4R exit the exception loses every year: 2023 -5.6R (5), 2024 -4.6R (21), 2025 -2.8R (19), 2026 -2.1R (37), -15R over 82 trades, while daily-trend trades make +0.42R (2023-24) / +0.25R (2025-26) a trade. It only paid under the old trail exit in 2025-26 (+0.22R)."
+  },
+  {
+   "at": "2026-11-05T13:38:28.000Z",
+   "by": "user",
+   "change": "Gold replica: trades only while gold's 20-day range is in the top fifth of its own last year (the 1.5% leg is dropped), and the stop moves to breakeven once a trade reaches +2R",
+   "why": "Owner: more profit, less drawdown, judged on 2023 onwards. Spot gold with the live risk rules, 4R: current gate +111R, worst drawdown -25.1R (ratio 4.4); top fifth only +88R / -14.8R (6.0); top fifth + breakeven at +2R +93R / -11.7R (7.9), better than the current gate in both halves (2023-24 +37.9R vs +34.0R, 2025-26 +55.0R vs +54.4R). Trades at 1.5-2.4% volatility but below the top fifth made +0.02R a trade (168 trades); top-fifth trades +0.40R in both halves."
   }
  ],
  "btAt": "2026-11-05T11:21:05.226Z",
@@ -377,7 +383,8 @@
   "pairs-best",
   "gold-adaptive-gate",
   "gold-4r",
-  "gold-no-eg"
+  "gold-no-eg",
+  "gold-top-be"
  ],
  "target": {},
  "targetBy": {},
@@ -388,11 +395,11 @@
  "noPause": true,
  "wouldPause": {
   "rintra": {
-   "at": "2026-11-05T13:33:08.000Z",
+   "at": "2026-11-05T13:38:28.000Z",
    "why": "four losses in a row"
   },
   "scalp": {
-   "at": "2026-11-05T13:33:08.000Z",
+   "at": "2026-11-05T13:38:28.000Z",
    "why": "expectancy -1.00R over 13 trades"
   },
   "xau": {
@@ -420,7 +427,7 @@
  ],
  "newsSince": "2026-11-04T00:02:58.000Z",
  "retireLegacy": true,
- "goldVolMin": 1.5,
+ "goldVolMin": null,
  "goldD1With": true,
  "goldEgBarrier": false,
  "moshaBo": true,
@@ -437,5 +444,6 @@
  "cryptoTrendStopR": -8,
  "cryptoTrendAt": 1793839317,
  "goldVolPct": 80,
- "goldFixedR": 4
+ "goldFixedR": 4,
+ "goldBeR": 2
 }
