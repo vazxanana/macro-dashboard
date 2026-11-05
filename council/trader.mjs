@@ -179,6 +179,9 @@ const USER_RULES = [
   { id: 'gold-add', apply: (c) => { c.goldAdd = { atR: 2, size: 1 }; c.goldRun = { atR: 4, trail: 1 }; },
     change: 'Gold replica: scale in and run winners. At +2R a second unit opens with the stop at the first entry; after +4R the whole position trails 1R behind the best price (cap 10R) instead of exiting at 4R',
     why: 'Owner: scale on profitable running trades and catch more of the move. Spot gold 2023-26, top-fifth gate, daily trend, breakeven at +2R, live risk rules: base 4R +93.0R / worst drawdown -11.7R (ratio 7.9); add 1.0 at +2R +157.6R / -17.4R (9.1); runner after 4R trailing 1R +103.8R / -12.4R (8.4); both +185.9R / -17.6R (10.6), better in both halves (2023-24 +73.9R vs +37.9R, 2025-26 +112.0R vs +55.0R) and every year. 23% of signals reach +4R; after that the median run before a 2R pullback is 5.4-6.7R.' },
+  { id: 'nq-runner', apply: (c) => { c.nqRun = { atR: 2, trail: 1 }; },
+    change: 'NQ New York open run: after +2R the stop trails 1R behind the best price (cap 10R) instead of exiting at 2R; still out at 11:00 ET',
+    why: 'Owner: catch more of the move. Nasdaq cash 1m 2018-Oct 2026, live rule with the midnight-open filter, costs in: fixed 2R +7.4R (2018-22, n435, worst drawdown -23.4R) / +76.9R (2023-26, n275, -7.7R); runner +21.1R (-19.3R) / +93.7R (-7.9R), +0.048 and +0.341R a trade, better in both halves. Adding a unit at +1R was rejected (2018-22 -17R, drawdown -52R).' },
   { id: 'mosha-bo-weekly', apply: (c) => { c.moshaBoWeekly = true; },
     change: "Mosha BO system: trades only in the weekly structure's direction (his \"Father\" timeframe); the M15 break no longer has to flip M15 structure",
     why: "From his multi-timeframe slides (father/mother/son). Spot gold 2019-26, H4->H1->M15, limit at the broken level, 3R, with the weekly direction computed the way the trader sees it live (Monday weeks built from the last 720 daily candles, swing size 3): weekly agrees 2019-22 +32.2R (87 trades, +0.37R a trade), 2023-26 +34.2R (99, +0.35R), 7 of 8 years positive, worst drawdown -18.4R; weekly against -28.3R / -15.8R. The previous flip-only rule: +7.5R / +15.1R. Caveat: the weekly filter did not help the other timeframe chains, so it is watched by the kill switch like everything else." },
@@ -1387,8 +1390,13 @@ try {
       const s = r.side === 'sell', r0 = Math.abs(r.entry - r.stop);
       for (const b of bars) {
         if (b.time <= r.checked) continue;
-        if (s ? b.high >= r.stop : b.low <= r.stop) { r.status = 'loss'; r.R = -1; r.closed = b.time; break; }
+        if (s ? b.high >= r.stop : b.low <= r.stop) {
+          if (r.trailMoved) { const R = +((s ? r.entry - r.stop : r.stop - r.entry) / r0).toFixed(2); r.status = R > 0 ? 'win' : R < 0 ? 'loss' : 'be'; r.R = R; r.exit = 'trailing stop'; } else { r.status = 'loss'; r.R = -1; }
+          r.closed = b.time; break; }
         if (s ? b.low <= r.t1 : b.high >= r.t1) { r.status = 'win'; r.R = +(Math.abs(r.t1 - r.entry) / r0).toFixed(2); r.closed = b.time; break; }
+        // runner (nq-runner, 5 Nov): once the trade is trail[0] R in profit the stop follows trail[1] R behind the best price
+        r.mfe = +Math.max(r.mfe || 0, (s ? r.entry - b.low : b.high - r.entry) / r0).toFixed(2);
+        if (r.trail && r.mfe >= r.trail[0]) { const ns = +(r.entry + (s ? -1 : 1) * (r.mfe - r.trail[1]) * r0).toFixed(2); if (s ? ns < r.stop : ns > r.stop) { r.stop = ns; r.trailMoved = true; } }
         const p = nyParts(b.time);
         if (r.exitAt ? b.time >= r.exitAt : (p.d !== r.day || p.m >= 960)) { const R = +((s ? r.entry - b.open : b.open - r.entry) / r0).toFixed(2); r.status = R > 0 ? 'win' : R < 0 ? 'loss' : 'be'; r.R = R; r.closed = b.time; r.exit = r.exitLabel || (r.exitAt ? '07:00 UTC' : '16:00'); break; }
       }
@@ -1447,9 +1455,10 @@ try {
       if (g && ndoOk) {
         const sell = !g.sell, r0 = Math.abs(g.entry - g.stop), stop = g.entry + (sell ? r0 : -r0), t1 = g.entry + (sell ? -2 : 2) * r0;
         research.push({ id: `nq-nyflip-${ny.d}`, market: 'nq', label: 'NQ', dec: 2, k: 'nq-open', session: 'nyflip', name: 'NQ New York open run', day: ny.d, side: sell ? 'sell' : 'buy',
-          entry: +g.entry.toFixed(2), stop: +stop.toFixed(2), t1: +t1.toFixed(2), rr: 2, opened: g.t + 60, filled: g.t + 60, checked: g.t + 60, status: 'open', R: null, exitAt: g.t + (660 - g.m) * 60, exitLabel: '11:00 ET',
+          entry: +g.entry.toFixed(2), stop: +stop.toFixed(2), t1: +t1.toFixed(2), rr: 2,
+          ...(config.nqRun ? { t1: +(g.entry + (sell ? -10 : 10) * r0).toFixed(2), rr: 10, tp1: +t1.toFixed(2), trail: [config.nqRun.atR, config.nqRun.trail] } : {}), opened: g.t + 60, filled: g.t + 60, checked: g.t + 60, status: 'open', R: null, exitAt: g.t + (660 - g.m) * 60, exitLabel: '11:00 ET',
           seenAt: now, entrySeen: bars.length ? +bars.at(-1).close.toFixed(2) : null, level: 'OPEN', levelPrice: +g.lv.toFixed(2), ext: +g.ext.toFixed(2), ndo: +ndoBar.open.toFixed(2),
-          note: `Research (paper only): NQ ran ${Math.abs(g.ext - g.lv).toFixed(1)} points through the New York open ${g.lv.toFixed(2)} and closed back across it; at New York that reclaim tends to fail, so ${sell ? 'sell' : 'buy'} ${g.entry.toFixed(2)} with the sweep, stop ${stop.toFixed(2)}, target 2R ${t1.toFixed(2)}, out at 11:00 ET.` });
+          note: `Research (paper only): NQ ran ${Math.abs(g.ext - g.lv).toFixed(1)} points through the New York open ${g.lv.toFixed(2)} and closed back across it; at New York that reclaim tends to fail, so ${sell ? 'sell' : 'buy'} ${g.entry.toFixed(2)} with the sweep, stop ${stop.toFixed(2)}, ${config.nqRun ? `after +${config.nqRun.atR}R (${t1.toFixed(2)}) the stop trails ${config.nqRun.trail}R behind the best price` : `target 2R ${t1.toFixed(2)}`}, out at 11:00 ET.` });
       }
     }
     if (NQ_ON.p80 && !['Sat', 'Sun'].includes(ny.wd) && ny.m > 600 && ny.m < 960 && !research.some((x) => x.id === `nq-80pct-${ny.d}`)) {
