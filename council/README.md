@@ -448,3 +448,12 @@ A BTC-above-200-day filter helped 2022-26 slightly but not 2018-21, so it is not
 our system: the NQ New York open run when the midnight open lies behind (research session `nyflip-x`), and Mosha BO chains that
 fail the weekly filter, the 2-open cap or the price check (shadow trades with `blockedBy` weekly / cap / price). The gold replica
 and forex/crypto replica signals were already recorded as research.
+
+## NQ 80% rule tracker (5 Nov, research only, paper)
+
+From the owner's video ("Worlds BEST NQ Scalper Reveals His A+ Trading Strategy", auction market theory). Yesterday's value
+area is 70% of its 09:30–16:00 ET time-at-price (2-point bins grown from the POC). When NQ opens outside it and then makes 30
+consecutive 1-minute closes back inside before 12:00 ET, the trader records a paper trade toward the far edge, stop 0.03% past
+the extreme since the open, out at 16:00 ET. Research session `80pct` (k `nq-open`), id `nq-80pct-<day>`; summary in
+`snapshot.research.nq_80pct` (the summary now also lists `nyflip-x`, `sd2ifvg`, `sd3mom`). Nasdaq cash 2018–22 +0.10R (120
+trades), 2023–26 +0.12R (89), 76% wins, about 25 a year. Not part of the live system until ~30 forward trades agree.

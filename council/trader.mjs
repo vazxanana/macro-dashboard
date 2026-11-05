@@ -1243,7 +1243,7 @@ const NQ_OPENS = [0, 180, 510];
 // 4 Nov (night): the trader's 3-year NQ futures file (1m, Dec 2022 – Dec 2025, never used to build the rules) settles it:
 // New York open run 447 trades +62.3R, +0.14R a trade (t 2.15), 2023 +35.9R / 2024 +7.6R / 2025 +19.4R, both sides positive;
 // open sweeps 352 trades −22.4R (−0.06R), 2023 and 2025 negative (London −17.6R). Only the New York open run stays on.
-const NQ_ON = { ny: false, london: false, swing: false, opens: false, nyflip: true, asia: false, sd: true };
+const NQ_ON = { ny: false, london: false, swing: false, opens: false, nyflip: true, asia: false, sd: true, p80: true };
 // NQ opening-4H standard-deviation trackers (5 Nov, owner's indicator "NQ Opening 4H Candle High/Low"; research only, paper,
 // not part of our system). The CME day's first 4H candle (18:00-22:00 ET): H, L, range rg; SD levels H + k·rg / L - k·rg.
 // sd2ifvg: price reaches 2 SD ("2r"); an FVG the push left (in the 30 one-minute candles before) is inverted by a 1-minute close
@@ -1273,6 +1273,32 @@ function nqSdSignals(bars, now) {
       out.push({ kind: 'sd3mom', side: u ? 'buy' : 'sell', t: b.time - 60, entry: e, stop: e - d * 0.25 * rg, t1: u ? H + 4 * rg : L - 4 * rg, H, L, rg, day, exitAt, lvl: lv3 }); }
   }
   return out;
+}
+// NQ 80% rule (5 Nov, research only, paper; from the owner's video "Worlds BEST NQ Scalper Reveals His A+ Trading Strategy",
+// auction market theory). Yesterday's value area = 70% of its 09:30-16:00 time-at-price (2-point bins, grown from the POC).
+// Today opens outside it; 30 consecutive 1-minute closes back inside before 12:00 ET → trade toward the far edge; stop 0.03%
+// past the extreme since the open; out 16:00 ET. Nasdaq cash 2018-22 +0.10R (n120), 2023-26 +0.12R (n89), t 2.2, 76% wins.
+function nq80Signal(bars, today) {
+  const B = bars.map((b) => ({ ...b, ...nyParts(b.time) })), pd = [...new Set(B.filter((b) => b.m >= 570 && b.m < 960 && b.d < today).map((b) => b.d))].sort().at(-1);
+  if (!pd) return null;
+  const P = B.filter((b) => b.d === pd && b.m >= 570 && b.m < 960), D = B.filter((b) => b.d === today && b.m >= 570 && b.m < 720);
+  if (P.length < 300 || !D.length || D[0].m !== 570) return null;
+  const tick = 2, cnt = new Map();
+  for (const b of P) { const a = Math.floor(b.low / tick), z = Math.floor(b.high / tick); for (let k = a; k <= z; k++) cnt.set(k, (cnt.get(k) || 0) + 1 / (z - a + 1)); }
+  const ks = [...cnt.keys()].sort((x, y) => x - y), tot = [...cnt.values()].reduce((a, v) => a + v, 0);
+  let pi = 0; for (let i = 1; i < ks.length; i++) if (cnt.get(ks[i]) > cnt.get(ks[pi])) pi = i;
+  let lo = pi, hi = pi, s = cnt.get(ks[pi]);
+  while (s < 0.7 * tot) { const up = hi + 1 < ks.length ? cnt.get(ks[hi + 1]) : -1, dn = lo > 0 ? cnt.get(ks[lo - 1]) : -1; if (up >= dn) { hi++; s += up; } else { lo--; s += dn; } }
+  const vl = ks[lo] * tick, vh = (ks[hi] + 1) * tick, O = D[0].open; if (O <= vh && O >= vl) return null;
+  const sell = O > vh; let ext = O;
+  for (let j = 0; j < D.length; j++) {
+    const b = D[j]; ext = sell ? Math.max(ext, b.high) : Math.min(ext, b.low);
+    if (j >= 29 && D.slice(j - 29, j + 1).every((x) => x.close > vl && x.close < vh)) {
+      const e = b.close, stop = sell ? ext + 0.0003 * e : ext - 0.0003 * e, t1 = sell ? vl : vh;
+      return (t1 - e) * (sell ? -1 : 1) > 0 ? { sell, t: b.time, entry: e, stop, t1, vl, vh, poc: ks[pi] * tick, open: O, pd } : null;
+    }
+  }
+  return null;
 }
 function nqOpenSweep(bars, today, o, tFree, minPen = 15) {
   const D = bars.map((b) => ({ ...b, ...nyParts(b.time) })).filter((b) => b.d === today);
@@ -1367,6 +1393,13 @@ try {
           note: `Research (paper only): NQ ran ${Math.abs(g.ext - g.lv).toFixed(1)} points through the New York open ${g.lv.toFixed(2)} and closed back across it; at New York that reclaim tends to fail, so ${sell ? 'sell' : 'buy'} ${g.entry.toFixed(2)} with the sweep, stop ${stop.toFixed(2)}, target 2R ${t1.toFixed(2)}, out at 11:00 ET.` });
       }
     }
+    if (NQ_ON.p80 && !['Sat', 'Sun'].includes(ny.wd) && ny.m > 600 && ny.m < 960 && !research.some((x) => x.id === `nq-80pct-${ny.d}`)) {
+      const g = nq80Signal(bars, ny.d), r0 = g && Math.abs(g.entry - g.stop);
+      if (g && r0 > 0) research.push({ id: `nq-80pct-${ny.d}`, market: 'nq', label: 'NQ', dec: 2, k: 'nq-open', session: '80pct', name: 'NQ 80% rule (value area)', day: ny.d, side: g.sell ? 'sell' : 'buy',
+        entry: +g.entry.toFixed(2), stop: +g.stop.toFixed(2), t1: +g.t1.toFixed(2), rr: +(Math.abs(g.t1 - g.entry) / r0).toFixed(2), opened: g.t + 60, filled: g.t + 60, checked: g.t + 60, status: 'open', R: null,
+        exitAt: g.t + 60 + (960 - nyParts(g.t).m - 1) * 60, exitLabel: '16:00 ET', seenAt: now, levels: { VAL: +g.vl.toFixed(2), VAH: +g.vh.toFixed(2), POC: +g.poc.toFixed(2), open: +g.open.toFixed(2) },
+        note: `Research (paper only, not our system): NQ opened ${g.open.toFixed(2)} ${g.sell ? 'above' : 'below'} yesterday's value area ${g.vl.toFixed(2)}-${g.vh.toFixed(2)} (${g.pd}) and held back inside it for 30 minutes: ${g.sell ? 'sell' : 'buy'} ${g.entry.toFixed(2)} toward the far edge ${g.t1.toFixed(2)}, stop past the extreme ${g.stop.toFixed(2)}, out at 16:00 ET.` });
+    }
     if (sdWin) for (const g of nqSdSignals(bars, now)) {
       const id = `nq-${g.kind}-${g.day}-${g.side}`; if (research.some((x) => x.id === id)) continue;
       const r0 = Math.abs(g.entry - g.stop); if (!(r0 > 0)) continue;
@@ -1428,7 +1461,7 @@ try {
   const oth = rp.filter((x) => x.market !== 'xau' && x.v5); snapshot.research.replicaX = { all: sum(oth), markets: Object.fromEntries([...new Set(oth.map((x) => x.market))].map((m) => [m, sum(oth.filter((x) => x.market === m))])) };
   snapshot.research.nq = sum(research.filter((x) => x.k === 'nq-open'));
   snapshot.research.goldNyrun = sum(research.filter((x) => x.k === 'gold-nyrun'));
-  for (const sid of ['ny', 'london', 'swing', 'opens', 'nyflip', 'tokyo', 'shanghai']) snapshot.research['nq_' + sid] = sum(research.filter((x) => x.k === 'nq-open' && (x.session || 'ny') === sid)); }
+  for (const sid of ['ny', 'london', 'swing', 'opens', 'nyflip', 'nyflip-x', 'sd2ifvg', 'sd3mom', '80pct', 'tokyo', 'shanghai']) snapshot.research['nq_' + sid] = sum(research.filter((x) => x.k === 'nq-open' && (x.session || 'ny') === sid)); }
 if (nqLast) snapshot.nqLast = nqLast;
 // ─── Phone alerts (4 Nov): a push via ntfy.sh (free, no account) when a live trade or an NQ paper trade opens or closes.
 // Subscribe in the ntfy app to the topic below (or set the repository secret NTFY_TOPIC to use your own). Only events from
