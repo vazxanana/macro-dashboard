@@ -404,3 +404,25 @@ EUR/USD −15.5R (128 trades), GBP/USD −31.2R (123), AUD/USD −25.4R (142), U
 BTC −46.2R (271), ETH +1.9R (293), SOL +10.5R (133), XRP +4.3R (156): pairs together −161.7R over 1,467 trades. In 2019-22 the
 forex pairs were also negative except EUR/USD (+53R). Gold in the same harness: +86R over 377 (2023-26). These records are in
 `research/replay-2w.json`, so the site's "our system" total includes what the pairs cost.
+
+### Pairs: best settings (5 Nov; user rule `pairs-best`)
+
+Owner: "check the best settings and edge for the other pairs, not NQ and gold". Walk-forward only (settings picked on
+2019-22 forex / 2022-23 crypto, judged on 2023-26 / 2024-26; daily systems on 2018-21 vs 2022-26):
+- **Replica**, ~11,000 settings per pair (filter, stop size, H4/D1 direction, own-history volatility high/low, EG barrier,
+  session, 7 exits): the 20 best on the early years lost in the later years on 7 of 9 pairs; only 7-21% of all settings
+  were positive later. No edge. Kraken crypto fees (~0.25-0.4% a side) make the intraday crypto replica worse still.
+- **Asia range** (00:00-07:00 UTC) breakouts and fades at London, **open sweeps** at 07:00 and 13:00 UTC (with / fade):
+  negative after costs on forex and crypto (one tiny positive cell, 55 trades).
+- **Daily trend-following**: forex lost in 2023-26 on all 5 pairs (Donchian 20/55/100, 4 ATR, MA 20/100, 50/200).
+  Crypto (Binance daily 2017-2026, 10 coins, 0.8% round trip) held: chosen on 2018-21, the 55-day breakout long-only with
+  a 4 ATR trail made +1.05R a trade, then +0.30R in 2022-26 with 8 of 10 coins positive (100-day: +0.42R, 9 of 10).
+  Tight 2 ATR trails lose on every coin. Council coins 2022-26: BTC +0.50R (13 trades), ETH +0.39R (13), SOL +0.74R (13),
+  XRP +1.29R (10), worst drawdown 2-4R. 2022 (bear market) was negative.
+
+Live from now (paper): **crypto trend** on BTC, ETH, SOL, XRP (k `trend`): buy the first run after a daily close above the
+prior 55 daily highs, stop 4 ATR(20) below; after each daily close the stop rises to 4 ATR under the best close; out on a
+daily close under the prior 27 daily lows; one trade per coin; a coin stops at −8R forward (`snapshot.trend[key]`).
+**Forex is research only** (replica signals still recorded) and the crypto replica stops trading live
+(`config.replicaLive = ['xau']`). The replay file now counts crypto trend 2023 - Oct 2026 (44 trades, +37.0R) instead of
+the pairs' replica records.

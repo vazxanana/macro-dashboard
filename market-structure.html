@@ -794,10 +794,10 @@
         <ul class="cal-day" id="ms-rep-list"></ul>
       </div>
       <div class="card c-pairs">
-        <div class="ms-k"><span>Pairs · the replica on forex and crypto (paper, since 5 Nov)</span><span id="ms-pairs-sum" class="c-act-sum"></span></div>
-        <p class="ms-note">Same rules as gold: a 2+ M15 ATR leg, then an M5 CHoCH against the H4 trend, in the daily trend direction or from a live H1 engulfing barrier; stop past the extreme, from +2R the stop trails 2R behind, out after 48 h; max 3 open per pair, −1.5R daily stop. Gold's 1.5% gate becomes a gate measured on each pair's own history: it trades only while its 20-day range is in the top fifth of its last 365 daily candles. A pair stops trading live once its forward total reaches <b>−10R</b>.</p>
-        <p class="ms-note"><b>What the history says:</b> the same rules replayed on 1-minute history lost on every forex pair in 2023–26 (about −0.2R a trade, after spread), while gold made money. They trade here because the owner wants the whole council on paper. Judge them by their own totals, not by gold's.</p>
-        <div class="ms-bt-wrap"><table class="ms-bt-t c-t"><thead><tr><th>Pair</th><th class="n">20-day range</th><th class="n">Gate</th><th>Now</th><th class="n">Forward</th><th class="n">Replay 2023–26</th></tr></thead><tbody id="ms-pairs"></tbody></table></div>
+        <div class="ms-k"><span>Pairs · crypto trend (live paper) · forex research only</span><span id="ms-pairs-sum" class="c-act-sum"></span></div>
+        <p class="ms-note"><b>Crypto (BTC, ETH, SOL, XRP), since 5 Nov: daily trend.</b> Buy when a daily candle closes above the 55-day high; stop 4 ATR(20) below, lifted after each daily close to 4 ATR under the best close; out on a daily close under the 27-day low. Long only, one trade per coin, about 3 trades a coin a year. Chosen on 2018–21 Binance history and checked on 2022–26 with 0.8% round-trip costs: +0.30R a trade over 10 coins (8 positive); on these four BTC +0.50R, ETH +0.39R, SOL +0.74R, XRP +1.29R a trade, worst drawdown 2–4R. A coin stops at −8R forward.</p>
+        <p class="ms-note"><b>Forex: research only.</b> Nothing tested on the five pairs held out of sample: the replica (about 11,000 settings each), Mosha BO, Asia-range breakouts and fades, open sweeps and daily trend-following all lost in 2023–26 after spread. Their replica signals keep being recorded.</p>
+        <div class="ms-bt-wrap"><table class="ms-bt-t c-t"><thead><tr><th>Coin</th><th class="n">Close</th><th class="n">55-day high</th><th class="n">To breakout</th><th>Now</th><th class="n">Forward</th><th class="n">Replay 2023–26</th></tr></thead><tbody id="ms-pairs"></tbody></table></div>
       </div>
       <div class="card c-cal">
         <div class="ms-k"><span>Calendar · result by day (R, trades closed that day)</span><span class="c-tog"><span class="cal-nav"><button type="button" id="ms-cal-prev" aria-label="Previous month">‹</button><b id="ms-cal-m"></b><button type="button" id="ms-cal-next" aria-label="Next month">›</button></span><label class="c-mine"><input type="checkbox" id="ms-cal-sh"> Include shadow trades</label><label class="c-mine" title="Only our system: NQ, gold and the pairs, live paper trades plus their replays"><input type="checkbox" id="ms-cal-rp" checked> Our system only (+ replay)</label></span></div>
@@ -2620,7 +2620,7 @@ function msNextSetup(bars, A) {
   // NQ setups that are part of our system: the New York open run only (4 Nov: it held on 3 years of NQ futures; the open sweeps did not). The others were
   // retired on the same 1-minute test and their records are not counted here.
   const NQ_SYS = ['nyflip'], nqSys = (x) => x.market !== 'nq' || NQ_SYS.includes(x.session);
-  const SYS_K = ['replica', 'mosha-bo'];   // live paper systems on gold and the pairs (the replica on every market, Mosha BO on gold)
+  const SYS_K = ['replica', 'mosha-bo', 'trend'];   // live paper systems: the gold replica, Mosha BO (gold), crypto trend (BTC, ETH, SOL, XRP)
   function renderCalendar() {
     const el = document.getElementById('ms-cal'); if (!el) return;
     const withSh = (document.getElementById('ms-cal-sh') || {}).checked;
@@ -2684,12 +2684,12 @@ function msNextSetup(bars, A) {
       const fl = px != null && x.status === 'open' && r0 ? (px - x.entry) * s / r0 * size : null; if (fl != null) tot += fl;
       const stopR = r0 ? (x.stop - x.entry) * s / r0 : -1; risk += Math.max(0, -stopR) * size;
       const age = Math.max(0, Date.now() / 1000 - (x.filled || x.opened)), ageT = age < 3600 ? `${Math.round(age / 60)} min` : `${(age / 3600).toFixed(1)} h`;
-      const mark = x.tp1 != null ? x.tp1 : x.t1, trail = x.trail ? (x.trailMoved ? `trailing, stop locks ${fR(stopR)}` : `trailing from +${x.trail[0]}R`) : '';
+      const mark = x.tp1 != null ? x.tp1 : x.t1, trail = x.k === 'trend' ? (x.trailMoved ? `stop trails 4 ATR, locks ${fR(stopR)}` : 'stop trails 4 ATR from each daily close') : x.trail ? (x.trailMoved ? `trailing, stop locks ${fR(stopR)}` : `trailing from +${x.trail[0]}R`) : '';
       return `<li data-tid="${esc(x.id)}" tabindex="0" title="Show this trade on a chart"><span class="chip ${x.side}">${x.side.toUpperCase()}</span>`
         + `<span class="a-t"><b>${esc(x.label)}</b> ${esc(x.name)}${x.paper ? '<span class="tag">paper</span>' : ''}${!x.paper && !SYS_K.includes(x.k) ? '<span class="tag" title="Opened by the earlier council strategies, still managed to its exit">older strategy</span>' : ''}${size !== 1 ? `<span class="tag">${size}× size</span>` : ''}${x.status === 'pending' ? '<span class="tag">waiting fill</span>' : ''}</span>`
         + `<span class="a-r ${fl == null ? '' : fl >= 0 ? 'pos' : 'neg'}">${fl == null ? '—' : fR(fl)}</span>`
-        + `<span class="a-d">Entry ${fmtI(x.entry, d)} · stop ${fmtI(x.stop, d)} · ${x.trail ? '2R mark' : 'target'} ${fmtI(mark, d)}${px != null ? ` · now ${fmtI(px, d)}${x.market === 'nq' ? ' (10 min delayed)' : ''}` : ''} · open ${ageT}${x.mfe ? ` · best +${(+x.mfe).toFixed(2)}R` : ''}${trail ? ` · ${trail}` : ''}</span></li>`;
-    }).join('') : '<li class="empty">No open trades right now. The system opens one when a replica signal passes (gold or a pair, while it is volatile), a Mosha BO setup completes (gold), or the NQ open run fires (paper).</li>';
+        + `<span class="a-d">Entry ${fmtI(x.entry, d)} · stop ${fmtI(x.stop, d)} · ${x.k === 'trend' ? 'no fixed target' : `${x.trail ? '2R mark' : 'target'} ${fmtI(mark, d)}`}${px != null ? ` · now ${fmtI(px, d)}${x.market === 'nq' ? ' (10 min delayed)' : ''}` : ''} · open ${ageT}${x.mfe ? ` · best +${(+x.mfe).toFixed(2)}R` : ''}${trail ? ` · ${trail}` : ''}</span></li>`;
+    }).join('') : '<li class="empty">No open trades right now. The system opens one when a gold replica signal passes (while gold is volatile), a Mosha BO setup completes (gold), a coin closes above its 55-day high (crypto trend), or the NQ open run fires (paper).</li>';
     const sum = document.getElementById('ms-active-sum');
     if (sum) sum.innerHTML = A.length ? `${A.length} open · at risk ${risk.toFixed(1)}R · floating <b class="${tot >= 0 ? 'pos' : 'neg'}">${fR(tot)}</b>` : '';
     const h = document.getElementById('h-active'); if (h) h.innerHTML = A.length ? `${A.length} open <small>floating ${fR(tot)}</small>` : '<small>none open</small>';
@@ -2756,18 +2756,18 @@ function msNextSetup(bars, A) {
   // Pairs card (5 Nov): each pair's volatility against its own gate (snapshot.pairs), its forward paper result and its replay
   function renderPairs() {
     const el = document.getElementById('ms-pairs'); if (!el) return;
-    const P = (COUNCIL.snap && COUNCIL.snap.pairs) || {}, fR = (v) => `${v > 0 ? '+' : v < 0 ? '−' : ''}${Math.abs(v).toFixed(1)}R`;
-    const rp = ((COUNCIL.replay && COUNCIL.replay.trades) || []).filter((x) => x.k === 'replica' && x.market !== 'xau' && x.R != null);
-    const keys = Object.keys(P).length ? Object.keys(P) : [...new Set(rp.map((x) => x.market))];
-    let on = 0, fN = 0, fT = 0;
-    el.innerHTML = keys.length ? keys.map((k) => {
-      const p = P[k] || {}, r = rp.filter((x) => x.market === k), rR = r.reduce((a, x) => a + x.R, 0), lab = p.label || (r[0] && r[0].label) || k.toUpperCase();
-      if (p.on) on++; fN += p.n || 0; fT += p.R || 0;
-      const st = p.stopped ? '<b class="neg">stopped (−10R)</b>' : p.on ? '<b class="pos">trading</b>' : p.vol == null ? '—' : 'calm';
-      return `<tr><td><b>${esc(lab)}</b></td><td class="n">${p.vol == null ? '—' : p.vol.toFixed(2) + '%'}</td><td class="n">${p.gate == null ? '—' : p.gate.toFixed(2) + '%'}</td><td>${st}</td>`
+    const P = (COUNCIL.snap && COUNCIL.snap.trend) || {}, fR = (v) => `${v > 0 ? '+' : v < 0 ? '−' : ''}${Math.abs(v).toFixed(1)}R`;
+    const rp = ((COUNCIL.replay && COUNCIL.replay.trades) || []).filter((x) => x.k === 'trend' && x.R != null);
+    const keys = Object.keys(P).length ? Object.keys(P) : ['btc', 'eth', 'sol', 'xrp'];
+    let inT = 0, fN = 0, fT = 0;
+    el.innerHTML = keys.map((k) => {
+      const p = P[k] || {}, r = rp.filter((x) => x.market === k), rR = r.reduce((a, x) => a + x.R, 0), lab = p.label || (r[0] && r[0].label) || k.toUpperCase(), d = { dec: k === 'xrp' ? 4 : 2 };
+      if (p.open) inT++; fN += p.n || 0; fT += p.R || 0;
+      const st = p.stopped ? '<b class="neg">stopped (−8R)</b>' : p.open ? `<b class="pos">in trade</b>${p.stop ? ` · stop ${fmtI(p.stop, d)}` : ''}` : p.close == null ? '—' : 'waiting';
+      return `<tr><td><b>${esc(lab)}</b></td><td class="n">${p.close == null ? '—' : fmtI(p.close, d)}</td><td class="n">${p.hi55 == null ? '—' : fmtI(p.hi55, d)}</td><td class="n">${p.toBreakout == null || p.open ? '—' : (p.toBreakout > 0 ? '+' : '') + p.toBreakout.toFixed(1) + '%'}</td><td>${st}</td>`
         + `<td class="n">${p.n ? `${p.n} · <span class="${p.R > 0 ? 'pos' : p.R < 0 ? 'neg' : ''}">${fR(p.R)}</span>` : '—'}</td><td class="n">${r.length ? `${r.length} · <span class="${rR > 0 ? 'pos' : rR < 0 ? 'neg' : ''}">${fR(rR)}</span>` : '—'}</td></tr>`;
-    }).join('') : '<tr><td colspan="6" class="empty">Waiting for the Trader.</td></tr>';
-    const sm = document.getElementById('ms-pairs-sum'); if (sm) sm.innerHTML = keys.length ? `${on} of ${keys.length} trading now${fN ? ` · forward ${fN} trades, <b class="${fT >= 0 ? 'pos' : 'neg'}">${fR(fT)}</b>` : ''}` : '';
+    }).join('');
+    const sm = document.getElementById('ms-pairs-sum'); if (sm) sm.innerHTML = `${inT} of ${keys.length} coins in a trade${fN ? ` · forward ${fN} trades, <b class="${fT >= 0 ? 'pos' : 'neg'}">${fR(fT)}</b>` : ''}`;
   }
   // Our system = the live gold replica trades (k 'replica') plus the backtest replay of the months before it went live
   const sysOn = () => { const el = document.getElementById('ms-c-sys'); return !el || el.checked; };
