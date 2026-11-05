@@ -681,3 +681,4 @@ Script `idx/run_feat.py` (NSX 1m 2018 – Oct 2026, 15-pt equivalent, costs in).
 - **S&P 500 (SPX 1m, same rule):** live rule n506, −0.00R; 2022 −34R. On days only SPX triggers: +0.06R. The setup is not a general index effect; it is NQ-specific.
 - Decision: no change to the NQ rule.
 - Crypto trend fees (loop item 9): `lab/crypto_trend.py` already charges 0.3% and 0.8% round trip (Kraken Pro taker is 0.4% a side = 0.8%); v2 was chosen under the 0.8% case. Done.
+- **Same run-and-reverse rule at other NQ opens** (`idx/run_open.py`, 90-min window and exit): London 03:00 ET n587 +0.07R (2018–22 +0.02R, 2023–26 +0.19R, n187), midnight-open filter doesn't help there; 08:00, 08:30, 10:00, 20:00 ET all ≤ 0 in 2023–26. London is a lead with the same "recent only" shape as New York; not adopted (t 1.4).
