@@ -1181,6 +1181,18 @@ config.history = config.history.slice(-200);
 wr('config.json', config);
 wr('state.json', state);
 wr('trades.json', trades);
+// ─── MT5 bridge feed (5 Nov): a flat CSV of our system's records for the CouncilBridge Expert Advisor (mt5/CouncilBridge.mq5).
+// Our live systems only (gold replica, Mosha BO, crypto trend, with their adds) plus the NQ open run (research, 10-min-late feed,
+// the EA mirrors it only if the owner turns that on); shadow trades never. Rows for the last 7 days so the EA can close what it holds.
+try {
+  const SYSK = ['replica', 'mosha-bo', 'trend'], cut = now - 7 * 86400;
+  const rows = trades.filter((x) => !x.shadow && SYSK.includes(x.k) && (x.status === 'open' || x.status === 'pending' || (x.closed || x.opened || 0) >= cut))
+    .concat(research.filter((x) => x.k === 'nq-open' && x.session === 'nyflip' && (x.status === 'open' || (x.closed || x.opened || 0) >= cut)).map((x) => ({ ...x, k: 'nq-open', market: 'nq' })));
+  const f = (v) => v == null || v === '' ? '' : typeof v === 'number' ? String(v) : String(v).replace(/[,\n"]/g, ' ');
+  const head = ['id', 'market', 'k', 'side', 'status', 'entryMode', 'entry', 'stop', 't1', 'tp1', 'trail0', 'trail1', 'beAt', 'addOf', 'size', 'opened', 'filled', 'closed', 'validFor', 'maxHold', 'exitRule', 'midStop', 'exitAt', 'R', 'exit'];
+  const lines = [`# council-bridge v1 generated ${now} ${new Date(now * 1000).toISOString()}`, head.join(',')].concat(rows.map((x) => [x.id, x.market, x.k, x.side, x.status, x.entryMode || (x.k === 'mosha-bo' ? 'limit' : 'market'), x.entry, x.stop, x.t1, x.tp1, x.trail ? x.trail[0] : '', x.trail ? x.trail[1] : '', x.beAt, x.addOf, x.size, x.opened, x.filled, x.closed, x.validFor, x.maxHold, x.exitRule, x.midStop, x.exitAt, x.R, x.exit].map(f).join(',')));
+  fs.mkdirSync(path.join(DIR, 'mt5'), { recursive: true }); fs.writeFileSync(path.join(DIR, 'mt5', 'signals.csv'), lines.join('\n') + '\n');
+} catch (e) { snapshot.errors.mt5 = String(e.message || e); }
 research = research.slice(-2000);
 // ─── Research (paper only): NQ New York open liquidity sweep (the trader's rule, 3 Nov) ───
 // After the 9:30 New York open, price takes liquidity: it trades through the overnight (18:00–9:30 ET), previous-day

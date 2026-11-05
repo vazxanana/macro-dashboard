@@ -1,0 +1,49 @@
+# MT5 bridge (CouncilBridge.mq5)
+
+Mirrors the council's paper trades on a MetaTrader 5 account. The council bot keeps running on GitHub Actions
+exactly as before; every run it also writes `mt5/signals.csv` on the `council-data` branch (our live systems only:
+gold replica, Mosha BO, crypto trend, with their adds; the NQ open run is included but the feed is ~10 min late,
+so it is off by default). The Expert Advisor polls that file every 30 s and mirrors it:
+
+| council record | EA action |
+|---|---|
+| `pending`, limit (Mosha BO) | buy/sell limit at the entry, stop and target set, expires with the record's `validFor` |
+| `open`, market (replica, crypto trend, adds) | market order, only if the signal is younger than `InpMaxLateMin` and price is within `InpMaxSlipR` × R of the signal entry; otherwise skipped (and noted) |
+| stop / target changes (breakeven, trailing) | the position's stop and target follow the record; a stop is never loosened |
+| `win` / `loss` / `be` / `expired` / `missed` | position closed or order deleted |
+| add (`addOf` set) | same lots as its first trade (same notional, as in the research) |
+
+**Sizing.** `InpRisk*` is the % of equity lost if the first unit hits its stop (default 0.25% each). Lots are
+computed from the symbol's tick value and rounded down to the volume step; a trade whose minimum lot would risk
+more is skipped.
+
+**Prop-firm guards (built in, independent of the council).**
+- `InpDailyLossPct` (1.5%): when equity falls that far under the day's starting equity, everything is closed and no
+  trade is taken until the next server day.
+- `InpMaxDDPct` (6%): when equity falls that far under the starting balance (stored on first run, or `InpStartBalance`),
+  everything is closed and the EA stops for good (clear the global variable `CB.blockedForever` to restart).
+- `InpMaxOpenRiskPct` (2%): no new trade while the open risk (distance to stop × lots, all positions and orders) is above it.
+
+Set these inside the challenge's own limits (for a 3% daily / 10% max rule: 1.5% / 6% leaves room for slippage and
+for a stop hit while the EA is offline).
+
+## Setup
+1. MT5 → Tools → Options → Expert Advisors: tick **Allow WebRequest for listed URL** and add
+   `https://raw.githubusercontent.com`. Tick **Allow algorithmic trading**.
+2. Copy `CouncilBridge.mq5` to `MQL5/Experts/`, open it in MetaEditor, **Compile**. Send any compile error back.
+3. Attach it to any chart (one instance per account). Inputs: the broker's symbol names (`InpSymGold` = XAUUSD,
+   `InpSymNQ` = NAS100 / USTEC, `InpSymBTC` … leave empty to skip a market), the risk per system, the guards.
+4. Watch the **Experts** log: it prints every order it places, skips and why, and the guard events.
+5. The terminal must stay on: a VPS or a machine that never sleeps. Offline = no new trades and no stop updates
+   (broker-side stops and targets still protect open positions).
+
+## What the replay says at 0.25% risk per trade (2025–26, all systems)
++1.8% a month, worst drawdown −3.9%, worst day −1.3%, +5% reached after ~45 trades (about two months);
+shuffled trade orders breach an 8% drawdown before +5% in 0.1% of runs. At 0.5% gold / 0.5% crypto the pace is
++3.0% a month but the worst day is −2.3% and 4.5% of runs breach −8% first. Forward results will be worse than the
+replay: expect it, size small, and treat the first month on the account as a test.
+
+## Not in this version
+- The NQ open run executed natively from the broker's 1-minute feed (the council's NQ feed is 10 min late). Planned
+  as a second module once the mirror runs cleanly.
+- Partial closes and a Telegram/ntfy message per MT5 fill.
