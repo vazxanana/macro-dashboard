@@ -38,7 +38,7 @@ input double  InpMaxDDPct     = 6.0;     // close everything and stop for good a
 input double  InpStartBalance = 0;       // 0 = balance when the EA first runs (stored)
 input double  InpMaxOpenRiskPct = 2.0;   // no new trade when the open risk (sum of |entry-stop| x lots) is above this (%)
 // execution
-input int     InpMaxLateMin   = 8;       // a market signal older than this is not taken
+input int     InpMaxLateMin   = 10;      // a market signal older than this is not taken (bot round 4 min + poll + fetch)
 input double  InpMaxSlipR     = 0.5;     // a market signal is not taken if price moved more than this x R from the signal entry (gold 2023-26: 0.5R keeps the full replay result, 0.3R skipped too many)
 input int     InpSlippagePts  = 50;      // deviation in points for market orders
 
@@ -141,7 +141,9 @@ long flong(string &f[], int i) { string v = fld(f, i); return v == "" ? 0 : (lon
 
 bool fetchSignals(Sig &out[]) {
   char data[], result[]; string headers; ResetLastError();
-  int code = WebRequest("GET", InpUrl, "", 5000, data, result, headers);
+  // raw.githubusercontent.com caches a file for up to 5 min; a changing query string bypasses that cache so a signal is seen within one bot round
+  string url = InpUrl + (StringFind(InpUrl, "?") >= 0 ? "&" : "?") + "cb=" + IntegerToString((long)TimeGMT());
+  int code = WebRequest("GET", url, "", 5000, data, result, headers);
   if (code != 200) { Print("CouncilBridge: WebRequest ", code, " error ", GetLastError(), " (is raw.githubusercontent.com in the allowed URL list?)"); return false; }
   string txt = CharArrayToString(result, 0, WHOLE_ARRAY, CP_UTF8);
   string lines[]; int n = StringSplit(txt, '\n', lines); if (n < 2) return false;

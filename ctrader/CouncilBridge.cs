@@ -39,7 +39,7 @@ namespace cAlgo.Robots
         [Parameter("Max drawdown stop %", DefaultValue = 6.0)] public double MaxDDPct { get; set; }
         [Parameter("Start balance (0 = first run)", DefaultValue = 0)] public double StartBalance { get; set; }
         [Parameter("Max open risk %", DefaultValue = 2.0)] public double MaxOpenRiskPct { get; set; }
-        [Parameter("Max signal age (min)", DefaultValue = 8)] public int MaxLateMin { get; set; }
+        [Parameter("Max signal age (min)", DefaultValue = 10)] public int MaxLateMin { get; set; }
         [Parameter("Max slippage (x R)", DefaultValue = 0.5)] public double MaxSlipR { get; set; }
 
         private static readonly HttpClient Http = new HttpClient { Timeout = TimeSpan.FromSeconds(8) };
@@ -127,7 +127,9 @@ namespace cAlgo.Robots
         private List<Sig> Fetch()
         {
             string txt;
-            try { txt = Http.GetStringAsync(Url).Result; } catch (Exception e) { Print("CouncilBridge: fetch failed {0}", e.Message); return null; }
+            // raw.githubusercontent.com caches for up to 5 min; a changing query string bypasses that cache
+            string url = Url + (Url.Contains("?") ? "&" : "?") + "cb=" + ((long)(DateTime.UtcNow - new DateTime(1970, 1, 1)).TotalSeconds).ToString();
+            try { txt = Http.GetStringAsync(url).Result; } catch (Exception e) { Print("CouncilBridge: fetch failed {0}", e.Message); return null; }
             var lines = txt.Split('\n'); string[] head = null; var outp = new List<Sig>();
             foreach (var raw in lines)
             {
