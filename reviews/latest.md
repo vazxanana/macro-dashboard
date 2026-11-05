@@ -1,73 +1,24 @@
-# Daily review, 2026-11-04: a quiet −1.5R day as the old setups were retired; the new volatility gate kept gold out of a −3R afternoon
+# Daily review, 2026-11-05: the live systems sat out a one-way day; the filters and the gate did their job.
 
 ## Today
+- **Live systems (gold replica, NQ open run, crypto trend, Mosha BO): no trade opened, none closed.** Gold fired 11 replica signals between 03:53 and 20:51 UTC and every one failed the entry filter (clean H1 / star plus stop size); 7 of the 11 were sells against the daily trend. The volatility gate was off anyway (20-day range 1.35% vs the top-fifth level 2.42%). Followed on paper, those 11 signals are −1R net with 4 still open.
+- NQ: no open-run signal. The index fell from 28,205 at the 09:30 ET open to 26,914 without one 1-minute close back above the open, so there was no reclaim to trade. The 2-SD fade tracker (research only) lost 1R.
+- Mosha BO: no H4 → H1 → M15 chain completed. Crypto trend: BTC 15%, ETH 26%, SOL 40%, XRP 36% under their 55-day highs; nothing to do.
+- Retired desk strategies (shadow only): 87 opened, 78 closed, −11.1R. Scalp 6 wins / 26 losses; Retrace-scalp 13 wins / 19 losses.
 
-**Live:** 7 closed, 3 wins, 4 losses, **−1.53R**. Two opened, both gold replica, before the new gold rules took effect.
+## What worked / what didn't
+- Worked: the gate and the daily-trend filter. The gold sells against the daily trend (4138.6 → 4100 region) looked right on the day, but the replay says those signals lose over 2023–26; today they were a coin flip (2 wins, 3 losses, 4 open). Staying out cost nothing.
+- Didn't: the legacy Scalp on gold (41 closed over 30 days, 12% wins, −23R) and on GBP/USD (−10.7R) keep losing in shadow. They are retired; nothing to change.
+- Bug fixed today (PR #239): the news veto from the morning threw on every replica signal; two rounds on the fixed code show zero errors.
 
-| Market | Closed | R |
-|---|---|---|
-| Gold | 3 | 0.00 |
-| ETH | 1 | −1.00 |
-| BTC | 1 | −1.00 |
-| USD/CHF | 1 | +0.44 |
-| EUR/USD | 1 | +0.03 |
-
-| Setup | Closed | R |
-|---|---|---|
-| Replica (gold, M5 CHoCH) | 2 | +1.00 |
-| Scalp M15→M1 | 1 | −1.00 |
-| Intraday H1→M5 | 1 | −1.00 |
-| Retrace H1→M5 | 1 | −1.00 |
-| Swing / Position (closed at market when retired) | 2 | +0.47 |
-
-**Not traded live:**
-- **NQ New York open run:** no setup today (no 15-point run and close back across the 09:30 ET open).
-- **Mosha BO system:** no setup. The weekly structure turned **bearish** (spot gold closed the week of 26 Oct through the weekly low at 3,886), so it only takes sells.
-- **Gold replica, gated:** gold's 20-day average daily range is 1.25%, under the 1.5% gate. The six gold replica signals after the gate went in were research only: 2 wins, 4 losses, **−3R**. The gate saved those.
-
-## What worked / What didn't
-
-**Worked**
-- **Gold replica buy at 3,949.82** (stop 3,926.45, target 3,996.56, 04:15, with the daily trend): target at 05:54 for **+2R**, a clean run.
-- **USD/CHF swing sell at 0.82021** and **EUR/USD position buy at 1.12262**: closed at market at 15:11 when the old setups were retired, for +0.44R and +0.03R.
-
-**Didn't**
-- **Gold replica sell at 3,924.0** (stop 3,941.86, 00:35, against the daily trend): stopped at 01:15 (−1R) when the up-move simply carried on. Under today's rules it would not trade: it was against the daily trend and not at an H1 engulfing barrier.
-- **Gold scalp sell at 3,933.11** (opened 3 Nov, against D1): stopped at 05:34 (−1R) on the same rally.
-- **BTC Retrace H1→M5 buy at 76,986.8** and **ETH Intraday sell at 2,288.24**: both stopped (−1R each). These are the last trades of the retired setups.
-- **Gated gold signals in the afternoon chop:** sells at 4,041.55, 4,041.97 and 4,061.21, buys at 4,063.40 and 4,063.74 were stopped; one buy at 4,043.72 made +2R. Gold churned in a $25 range around 4,040–4,065, the kind of calm market the gate exists for.
-
-## Patterns over the last 30 days
-
-| Setup | Live closed | Win rate | Expectancy |
-|---|---|---|---|
-| Scalp M15→M1 (retired) | 16 | 6% | −0.62R |
-| Retrace M15→M1 (retired) | 6 | 0% | −0.83R |
-| Intraday H1→M5 (retired) | 5 | 40% | +0.41R |
-| Retrace H1→M5 (retired) | 5 | 0% | −0.80R |
-| Gold replica | 2 | 50% | +0.50R |
-
-- **The old engine setups are retired** (owner's call): live they made −16.4R over 29 closed trades.
-- **D1 agreement:** today's live trades with the daily trend were flat (0.0R over 4), against it −1.56R over 3. That's too few to read on its own. The gold rule now requires the daily trend, or an H1 engulfing barrier, for live replica trades.
-- **Main vs internal structure:** no live retracement trade today, so nothing new.
+## Patterns over the last 30 days (shadow, 408 closed)
+- Per setup: Scalp gold −0.56R a trade (n41), Scalp AUD/USD +0.21 (37), Retrace-scalp gold +0.09 (34), Scalp USD/CAD −0.46 (22), Retrace-scalp BTC +0.34 (15), Scalp BTC +1.05 (13, carried by two trades). Only Retrace-scalp is positive across markets (+18.9R over 113 since 1 Nov); it goes to the long-history test before any reconsideration.
+- D1 agreement did not separate: with D1 −0.07R (213), against −0.03R (194). Structure: main −0.02R (171), internal −0.30R (88): internal-structure entries lose, as the retired rules already said.
 
 ## Rule changes
-
-**No change.** The coach's knobs (`buf`, `minRR`, pauses) only steer the retired engine setups. The three live systems (NQ open run, gold replica, Mosha BO) run on the owner's rules and have fewer than 5 forward trades each.
-
-Two things changed on the research side today:
-- The Mosha BO system now trades only with the weekly structure.
-- That rule failed an out-of-sample check on six other markets, so it runs as a forward test with an expectation near 0R.
+No change. The live systems took no trade; the legacy setups are retired (retireLegacy on) and only run as shadow, so buf / minRR / pauses would change nothing that trades.
 
 ## Watch tomorrow
-
-- **Gold (4,063):** daily trend up, H4 down, H1 up.
-  - The replica stays research-only until the 20-day range reaches 1.5% (now 1.25%).
-  - The Mosha BO system needs, in order:
-    1. an H4 sell BO;
-    2. then an H1 buy BO (the pullback);
-    3. then an M15 sell BO back down.
-
-    It only sells while the weekly is bearish.
-- **NQ:** New York open at 14:30 UTC. A 15-point run through the open that closes back across within 15 minutes, with the midnight open ahead, is the setup.
-- **Other markets:** research only (replica shadow). Nothing to act on.
+- Gold: the replica stays off until the 20-day range climbs back toward 2.4%; the engine shows Position buy and Retrace sell as Ready, but those are legacy setups (shadow only). Weekly structure is bearish, so a Mosha BO chain would be a sell.
+- NQ: Friday open; after today's 1,300-point drop the 00:00 ET open will sit well above the 09:30 open, which favours a SELL open-run if the reclaim pattern appears.
+- Crypto: no coin within 15% of a breakout; BTC closest.
