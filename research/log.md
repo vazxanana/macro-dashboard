@@ -575,3 +575,18 @@ Walk-forward throughout (forex: pick on 2019-22, judge on 2023-26; crypto intrad
   Council coins, N55 long 4 ATR, 0.8%: 2022-26 BTC +6.5R (13), ETH +5.0R (13), SOL +9.6R (13), XRP +12.9R (10); drawdowns 2-4R.
 **Adopted (PR #207, user rule pairs-best):** crypto trend live on paper on BTC/ETH/SOL/XRP (N55 long-only 4 ATR); forex and
 the crypto replica research only. Expect roughly +0.3R a trade, ~12 trades a year across the four coins, long flat spells.
+
+## 5 Nov: NQ opening 4H candle, owner's exact entry (first opposite 1-minute candle after ±50%)
+
+Rule from the owner: opening 4H candle 18:00-22:00 ET; after it closes, when price reaches 4h+50% (4l−50%), enter on the first
+1-minute candle that closes the opposite colour (bearish → sell, bullish → buy) at its close. One trade a session.
+Stops tested: 1 pt past the extreme since the touch / 1 pt past the entry candle / the 2r line; targets 1R, 2R, 3R, the 4H
+edge, mid, the opposite edge, the opposite 50% line; cost 0.5 pt (futures) / 1 pt (cash). Script: nq4h/opp1m.py.
+- NQ futures 2023-25 (741 trades): stop past the extreme, 2R −67.0R (−0.090R a trade; gross of costs −0.013R); every
+  extreme/candle-stop variant negative (−0.05 to −0.16R); 2r-line stop ≈ 0 (−0.002 to −0.028R).
+- Nasdaq cash 2018-26 (824): stop past the extreme, 2R −204R (−0.248R; gross −0.055R); 2r-line stop ≈ 0.
+- Sub-cases: Asia entries (before 03:00 ET) worst (−0.22R futures, −0.41R cash); 09:30-16:00 ET −0.03R; "touch candle
+  excluded", "within 5 min", 3 pt buffer: no change.
+- Recent: NSX Nov 2025 - Mar 2026 positive months (+6.5, +3.8, +3.5, +8.1, +0.5R) and NQ Nov-Dec 2025 positive, a streak after
+  years of losses; NQ 14 Sep - 4 Nov 2026 (37 trades): −8.8R.
+Verdict: no edge as a mechanical rule; the 1-minute stops (median 6-7.5 pts) make costs alone 0.07-0.16R a trade.
