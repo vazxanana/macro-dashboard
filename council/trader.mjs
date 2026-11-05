@@ -654,6 +654,9 @@ for (const [key, M] of Object.entries(MARKETS)) {
     if (key !== 'xau') (snapshot.pairs = snapshot.pairs || {})[key] = { label: M.label, vol: pairVol == null ? null : +pairVol.toFixed(2), gate: isFinite(volGate) ? volGate : null, on: volOk && !pairStop && (config.replicaLive || []).includes(key), n: pairLive.length, R: +pairR.toFixed(2), stopped: pairStop };
     if (marketOpen(M, now)) {
       let sigs = []; try { sigs = replicaSignals(src); } catch (e) {}
+      // closed H4 and D1 candles only (the last bar of each series is still forming)
+      let msnrDir = 0; if (key === 'xau') try { msnrDir = msnrDirection(src['4h'].bars.slice(0, -1), src['1d'].bars.slice(0, -1)); } catch (e) { msnrDir = 0; }
+      const msnrOf = (sell) => msnrDir === 0 ? 'none' : msnrDir === (sell ? -1 : 1) ? 'with' : 'against';
       for (const g of sigs) {
         const sig = `replica|${g.sell ? 's' : 'b'}|${g.tc}`;
         if (research.some((x) => x.market === key && x.sig === sig)) continue;
@@ -683,7 +686,7 @@ for (const [key, M] of Object.entries(MARKETS)) {
         const h4 = src['4h'].A.trend === (g.sell ? 1 : -1) ? 'against' : src['4h'].A.trend === (g.sell ? -1 : 1) ? 'with' : 'none', v5 = pass && h4 === 'against';
         research.push({ id: `${key}-replica-${now}-${g.sell ? 's' : 'b'}`, sig, market: key, label: M.label, dec: M.dec, k: 'replica', name: key === 'xau' ? 'Gold replica' : `${M.label} replica`, lag, side: g.sell ? 'sell' : 'buy',
           entry: pxr(entry), stop: pxr(stop), stop0: pxr(stop0), t1: pxr(t1), rr: 2, opened: now, filled: now, checked: now, status: 'open', R: null, v: 5,
-          pass, v5, h4, h1clear, eg: g.eg, peg: g.peg, star: g.star, riskAtr: +riskAtr.toFixed(2), legStart: +g.start.toFixed(2), leg: g.L === 36 ? '3h' : '6h', ext: +g.ext.toFixed(2), chochLevel: +g.lvl.toFixed(2), d1: src['1d'].A.trend === (g.sell ? -1 : 1) ? 'with' : 'against', session: sessionOf(now),
+          pass, v5, h4, h1clear, msnr: msnrOf(g.sell), eg: g.eg, peg: g.peg, star: g.star, riskAtr: +riskAtr.toFixed(2), legStart: +g.start.toFixed(2), leg: g.L === 36 ? '3h' : '6h', ext: +g.ext.toFixed(2), chochLevel: +g.lvl.toFixed(2), d1: src['1d'].A.trend === (g.sell ? -1 : 1) ? 'with' : 'against', session: sessionOf(now),
           note: `Research (paper only): gold replica v5${!pass ? '' : h4 !== 'against' ? ' (v4 passes; v5 skips it: H4 trend not against the trade)' : ''}${pass ? '' : riskAtr < 1 ? ' (filter fails: stop under one M15 ATR)' : ' (filter fails: inside a live H1 Origin, no ★ engulfing)'}. ${g.L === 36 ? '3 h' : '6 h'} leg to ${g.ext.toFixed(2)}, M5 CHoCH through ${g.lvl.toFixed(2)}${g.star ? ', ★ engulfing at structure at the extreme' : g.peg ? ', engulfing at the extreme (not at a level)' : ''}${h1clear ? ', clear of H1 Origins' : ''}; ${g.sell ? 'sell' : 'buy'} ${entry.toFixed(2)}, stop ${stop.toFixed(2)}, target 2R ${t1.toFixed(2)}.` });
         // live (config.replicaLive): every passing signal also trades on the live book, as on the replay (no slot limit),
         // at market, 2R target, out after 48 h, no break-even move
@@ -729,7 +732,7 @@ for (const [key, M] of Object.entries(MARKETS)) {
           // a fixed target; at +goldAdd.atR R a second unit of goldAdd.size opens at market with the stop at this entry (see the loop)
           ...(key === 'xau' && config.goldRun ? { t1: pxr(entry + (g.sell ? -10 : 10) * Math.abs(pxr(entry) - pxr(stop))), rr: 10, trail: [config.goldRun.atR, config.goldRun.trail], runAfter: config.goldRun.atR } : {}),
           ...(key === 'xau' && config.goldAdd ? { addAt: config.goldAdd.atR, addSize: config.goldAdd.size } : {}),
-          feat: { d1: src['1d'].A.trend === (g.sell ? -1 : 1) ? 'with' : 'against', h4, session: sessionOf(now), star: g.star, h1clear, riskAtr: +riskAtr.toFixed(2), leg: g.L === 36 ? '3h' : '6h' }, shadow: false, blockedBy: [],
+          feat: { d1: src['1d'].A.trend === (g.sell ? -1 : 1) ? 'with' : 'against', h4, msnr: msnrOf(g.sell), session: sessionOf(now), star: g.star, h1clear, riskAtr: +riskAtr.toFixed(2), leg: g.L === 36 ? '3h' : '6h' }, shadow: false, blockedBy: [],
           note: `${key === 'xau' ? 'Gold' : M.label} replica (v5, against the H4 trend): ${g.L === 36 ? '3 h' : '6 h'} leg to ${g.ext.toFixed(2)}, M5 CHoCH through ${g.lvl.toFixed(2)}${g.star ? ', ★ engulfing at structure at the extreme' : g.peg ? ', engulfing at the extreme' : ''}${h1clear ? ', clear of H1 Origins' : ''}. ${g.sell ? 'Sell' : 'Buy'} at market, stop past the extreme; ${key === 'xau' && config.goldFixedR ? `${config.goldRun ? `after +${config.goldRun.atR}R the stop trails ${config.goldRun.trail}R behind the best price (cap 10R)` : `fixed target ${config.goldFixedR}R`}${config.goldBeR ? `, stop to breakeven at +${config.goldBeR}R` : ''}${config.goldAdd ? `, a second unit added at +${config.goldAdd.atR}R` : ''}` : `from +2R the stop trails 2R behind the best price (2R mark ${t1.toFixed(2)})`}, out after 48 h.` });
       }
     }
@@ -1407,6 +1410,38 @@ function nq80Signal(bars, today) {
 }
 // minPen / buf below 1 are fractions of the opening price (5 Nov: the 8-year backtest used 0.08% and 0.011%, which is ~20 and
 // ~2.8 points at NQ 25,000; the fixed 15 points had drifted to 0.06%, the weaker end: +0.106R vs +0.119R, 2018-22 +0.005 vs +0.017R)
+// Malaysian SnR direction SOP (owner's L3 session 2; research 5 Nov, ms/msnr_dir.py): working TF H4 with A/V pivot levels (half-width 5),
+// BO buy = close above the last A-level, BO sell = close below the last V-level; Daily key levels = pivots (+-0.1 ATR), engulfing and
+// DOM zones alive 90 days; a breakout switches the direction only when it is external (the broken level formed before the first tap
+// of a Daily level on that side) and that level was tapped before the breakout candle. Recorded on gold replica records as feat.msnr
+// (forward test only): on 2023-26 replica trades WITH the D1 trend but AGAINST this H4 direction (a confirmed pullback phase) made
+// +172R at a -10.3R drawdown vs +186R / -17.6R for all of them; not a rule until the forward sample agrees.
+function msnrDirection(H4, D, n4 = 5, nD = 2) {
+  const Z = [];   // daily key levels: [known, side (+1 support-type / -1 resistance-type), lo, hi]
+  const isPivH = (B, i, n) => { for (let k = i - n; k <= i + n; k++) if (k !== i && B[k].high >= B[i].high) return false; return true; };
+  const isPivL = (B, i, n) => { for (let k = i - n; k <= i + n; k++) if (k !== i && B[k].low <= B[i].low) return false; return true; };
+  const atr = (i) => { let s = 0, k = 0; for (let j = Math.max(0, i - 13); j <= i; j++) { s += D[j].high - D[j].low; k++; } return s / Math.max(1, k); };
+  for (let i = nD; i < D.length - nD; i++) { const a = atr(i);
+    if (isPivH(D, i, nD)) Z.push([D[i + nD].time + 86400, -1, D[i].high - 0.1 * a, D[i].high + 0.1 * a]);
+    if (isPivL(D, i, nD)) Z.push([D[i + nD].time + 86400, 1, D[i].low - 0.1 * a, D[i].low + 0.1 * a]); }
+  for (let i = 1; i < D.length; i++) { const p = D[i - 1], b = D[i], kn = b.time + 86400;
+    if (p.close < p.open && b.close > b.open && b.close > p.open && b.open <= p.close) Z.push([kn, 1, Math.min(p.low, b.low), p.open]);
+    if (p.close > p.open && b.close < b.open && b.close < p.open && b.open >= p.close) Z.push([kn, -1, p.open, Math.max(p.high, b.high)]);
+    if (p.close > p.open && b.close > b.open && b.high > p.high && b.close > p.high) Z.push([kn, 1, Math.min(p.open, p.close), Math.max(p.open, p.close)]);
+    if (p.close < p.open && b.close < b.open && b.low < p.low && b.close < p.low) Z.push([kn, -1, Math.min(p.open, p.close), Math.max(p.open, p.close)]); }
+  Z.sort((a, b) => a[0] - b[0]);
+  const A = [], V = [], lastTap = { 1: null, '-1': null }; let d = 0, zi = 0;
+  for (let i = 0; i < H4.length; i++) {
+    const b = H4[i], j = i - n4;
+    if (j >= n4) { if (isPivH(H4, j, n4)) A.push([b.time, H4[j].high, j]); if (isPivL(H4, j, n4)) V.push([b.time, H4[j].low, j]); }
+    while (zi < Z.length && Z[zi][0] <= b.time) zi++;
+    for (let q = Math.max(0, zi - 400); q < zi; q++) { const z = Z[q]; if (b.time - z[0] > 90 * 86400) continue; if (b.low <= z[3] && b.high >= z[2]) lastTap[z[1]] = i; }
+    if (d <= 0 && A.length) { const [, px, pj] = A[A.length - 1]; if (b.close > px) { const tap = lastTap[1]; if (tap != null && pj < tap && tap <= i) d = 1; } }
+    else if (d >= 0 && V.length) { const [, px, pj] = V[V.length - 1]; if (b.close < px) { const tap = lastTap['-1']; if (tap != null && pj < tap && tap <= i) d = -1; } }
+    if (d === 0 && A.length && V.length) { if (b.close > A[A.length - 1][1]) d = 1; else if (b.close < V[V.length - 1][1]) d = -1; }
+  }
+  return d;
+}
 function nqOpenSweep(bars, today, o, tFree, minPen = 15, buf = 2) {
   const D = bars.map((b) => ({ ...b, ...nyParts(b.time) })).filter((b) => b.d === today);
   const first = D.find((b) => b.m === o); if (!first) return null;
