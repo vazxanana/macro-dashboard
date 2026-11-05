@@ -480,26 +480,37 @@ for (const [key, M] of Object.entries(MARKETS)) {
             for (const b of D.filter((b) => b.time > (open.lastD || open.filled - 86400) && b.time >= Math.floor(open.filled / 86400) * 86400)) {
               const i = D.indexOf(b); if (i < xN + 1) continue;
               open.best = Math.max(open.best || open.entry, b.close);
-              const ns = +(open.best - (open.kATR || 4) * atrAt(i)).toFixed(dp);
-              if (ns > open.stop) { open.stop = ns; open.trailMoved = true; }
-              const lx = Math.min(...D.slice(i - xN, i).map((x) => x.low));
-              if (b.close < lx && i === n - 1) { const R = +((price - open.entry) / open.r0).toFixed(2); open.status = R > 0 ? 'win' : R < 0 ? 'loss' : 'be'; open.R = R; open.closed = now; open.exit = `${xN}-day low`; }
+              if (open.exitRule === 'mid') {
+                // v3: the channel midpoint of the system's own lookback ratchets up; a daily close under it exits at market
+                const N = open.sys || 55, mid = (Math.max(...D.slice(i - N, i).map((x) => x.high)) + Math.min(...D.slice(i - N, i).map((x) => x.low))) / 2;
+                open.midStop = +Math.max(open.midStop || 0, mid).toFixed(dp);
+                if (b.close < open.midStop && i === n - 1) { const R = +((price - open.entry) / open.r0).toFixed(2); open.status = R > 0 ? 'win' : R < 0 ? 'loss' : 'be'; open.R = R; open.closed = now; open.exit = `${N}-day channel midpoint`; }
+              } else {
+                const ns = +(open.best - (open.kATR || 4) * atrAt(i)).toFixed(dp);
+                if (ns > open.stop) { open.stop = ns; open.trailMoved = true; }
+                const lx = Math.min(...D.slice(i - xN, i).map((x) => x.low));
+                if (b.close < lx && i === n - 1) { const R = +((price - open.entry) / open.r0).toFixed(2); open.status = R > 0 ? 'win' : R < 0 ? 'loss' : 'be'; open.R = R; open.closed = now; open.exit = `${xN}-day low`; }
+              }
               open.lastD = b.time;
             }
             continue;
           }
+          // v3 (5 Nov, owner "apply everything"): exit on a daily close under the ratcheting midpoint of the N-day channel (Zarattini,
+          // Pagani & Barbon 2025); the 5 ATR stop stays fixed as a catastrophe stop. 4 coins, 0.8% costs, equal notional, daily equity:
+          // Sharpe 2018-21 1.67 vs 1.50, 2022-26 0.81 vs 0.58; worst drawdown -28% vs -39% and -21% vs -27% (lab/crypto_ens2.py).
           const hi = hiN(S.sys), id = `${key}-${S.id}-${last.time}`;
+          const midNow = (hi + Math.min(...D.slice(n - 1 - S.sys, n - 1).map((b) => b.low))) / 2;
           if (last.close > hi && !stopped && !trades.some((x) => x.id === id) && now - (last.time + 86400) < 86400) {
             const entry = +price.toFixed(dp), stop = +(entry - S.k * A).toFixed(dp), r0 = entry - stop;
             if (r0 > 0) trades.push({ id, market: key, label: M.label, dec: M.dec, k: 'trend', sys: S.sys, kATR: S.k, name: 'Crypto trend', pair: `D1 ${S.sys}-day breakout`, h: '1d', side: 'buy',
-              entry, stop, t1: +(entry * 100).toFixed(2), rr: 99, trail: [1e6, 0], buf: CFG.buf, opened: now, filled: now, checked: now, status: 'open', R: null, r0, noBe: true, entryMode: 'market', lastD: last.time, best: last.close,
+              entry, stop, t1: +(entry * 100).toFixed(2), rr: 99, trail: [1e6, 0], buf: CFG.buf, opened: now, filled: now, checked: now, status: 'open', R: null, r0, noBe: true, entryMode: 'market', lastD: last.time, best: last.close, exitRule: 'mid', midStop: +midNow.toFixed(dp),
               feat: { hi: +hi.toFixed(4), atr: +A.toFixed(4) }, shadow: false, blockedBy: [],
-              note: `Crypto trend: daily close ${last.close} above the ${S.sys}-day high ${+hi.toFixed(4)}. Buy at market, stop ${S.k} ATR below (${stop}); each daily close lifts the stop to ${S.k} ATR under the best close; out on a daily close under the ${S.x}-day low.` });
+              note: `Crypto trend: daily close ${last.close} above the ${S.sys}-day high ${+hi.toFixed(4)}. Buy at market, catastrophe stop ${S.k} ATR below (${stop}); out on a daily close under the ${S.sys}-day channel midpoint (now ${+midNow.toFixed(dp)}), which only ratchets up.` });
           }
         }
         const openT = trades.filter((x) => x.k === 'trend' && x.market === key && x.status === 'open');
         (snapshot.trend = snapshot.trend || {})[key] = { label: M.label, close: last.close, hi55: +hi55.toFixed(4), hi100: +hiN(100).toFixed(4), lo27: +lo27.toFixed(4), atr: +A.toFixed(4), open: openT.length > 0, nOpen: openT.length,
-          stop: openT.length ? Math.max(...openT.map((x) => x.stop)) : null, toBreakout: +((hi55 / price - 1) * 100).toFixed(2), n: mine.filter((x) => x.R != null).length, R: +fwdR.toFixed(2), stopped };
+          stop: openT.length ? Math.max(...openT.map((x) => x.stop)) : null, midStop: openT.length ? Math.max(...openT.map((x) => x.midStop || 0)) || null : null, toBreakout: +((hi55 / price - 1) * 100).toFixed(2), n: mine.filter((x) => x.R != null).length, R: +fwdR.toFixed(2), stopped };
       } catch (e) { snapshot.errors.trend = String(e.message || e); }
     }
     if (key === 'xau' && config.moshaBo) {
@@ -1474,7 +1485,7 @@ if (nqLast) snapshot.nqLast = nqLast;
   const ev = [];
   for (const x of trades.filter((x) => !x.shadow).concat(research.filter((x) => x.k === 'nq-open'))) {
     const nm = `${x.label} ${x.k === 'nq-open' ? x.name + ' (paper)' : x.name}`;
-    if (!x.ntfyO && x.status === 'open' && x.filled >= now - 900) { x.ntfyO = 1; ev.push({ title: `${x.side.toUpperCase()} ${nm}`, msg: `Entry ${fmt(x.entry, x.dec)}, stop ${fmt(x.stop, x.dec)}${x.k === 'trend' ? ' (4 ATR, trails each daily close), no fixed target' : x.tp1 != null ? `, 2R mark ${fmt(x.tp1, x.dec)}, then trailing` : `, target ${fmt(x.t1, x.dec)}`}${x.size && x.size !== 1 ? ` · ${x.size}× size` : ''}`, tags: x.side === 'sell' ? 'chart_with_downwards_trend' : 'chart_with_upwards_trend' }); }
+    if (!x.ntfyO && x.status === 'open' && x.filled >= now - 900) { x.ntfyO = 1; ev.push({ title: `${x.side.toUpperCase()} ${nm}`, msg: `Entry ${fmt(x.entry, x.dec)}, stop ${fmt(x.stop, x.dec)}${x.k === 'trend' ? ' (catastrophe stop; exits on a daily close under the channel midpoint), no fixed target' : x.tp1 != null ? `, 2R mark ${fmt(x.tp1, x.dec)}, then trailing` : `, target ${fmt(x.t1, x.dec)}`}${x.size && x.size !== 1 ? ` · ${x.size}× size` : ''}`, tags: x.side === 'sell' ? 'chart_with_downwards_trend' : 'chart_with_upwards_trend' }); }
     if (!x.ntfyC && x.R != null && x.closed && x.closed >= now - 900 && ['win', 'loss', 'be'].includes(x.status)) { x.ntfyC = 1; ev.push({ title: `${x.status === 'win' ? 'Win' : x.status === 'loss' ? 'Loss' : 'Break-even'} ${fR(x.R)} · ${nm}`, msg: `${x.side.toUpperCase()} from ${fmt(x.entry, x.dec)}${x.exit ? ` · ${x.exit}` : ''}`, tags: x.R > 0 ? 'white_check_mark' : x.R < 0 ? 'x' : 'heavy_minus_sign' }); }
   }
   // Telegram (4 Nov): the same events to a Telegram chat. Needs the repository secret TELEGRAM_BOT_TOKEN (from @BotFather).
