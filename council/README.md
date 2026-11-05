@@ -546,3 +546,14 @@ record `<id>-add`, `addOf`). Council coins 2023–26: +103.6R vs +61.6R, worst d
 2023–24 +108.9R vs +62.1R at the same −5.5R; 2025–26 −5.3R vs −0.5R (flat period). The six other coins: +169.9R vs +106.2R,
 ratio 8.9 vs 6.3. Adds at +0.5R, +1.5R, +2R, two adds, and turtle pyramids raise drawdown faster than profit.
 Sizing guide: 0.5% on the first unit, 0.5% on the add. The add counts toward the crypto kill switch like any other trade.
+
+## Gold trend (5 Nov, user rule `gold-trend`)
+
+From the owner's "OmniBook" cBot: its daily breakout was the one gold edge that held on 8 years of spot gold 1m. Rule
+(`config.goldTrend = { n: 20, k: 2 }`, records `k: 'gtrend'`): a closed daily candle above the prior 20 daily highs buys
+gold at market on the next run (within a day of that close); stop 2 × ATR(D1,14) below the entry; on every newly closed
+day the stop is lifted to (daily close − 2 ATR) and never lowered; no target, no time limit, one position at a time.
+Spot gold 2019–22 | 2023–24 | 2025–26: +0.31 | +1.07 | +2.42R a trade (n29/12/10), worst drawdown −4.4 | −1.4 | −0.9R;
+N10, N55 and a 3 ATR trail are positive in every period too; the mirrored short loses in every period, so long only.
+About 6 trades a year, half of them winners, best +13R, worst −1.02R. Sizing guide 0.5% per trade. `snapshot.goldTrend`
+shows the 20-day high, the last close and the open position's stop.

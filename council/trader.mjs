@@ -196,6 +196,9 @@ const USER_RULES = [
   { id: 'crypto-add', apply: (c) => { c.cryptoAdd = { atR: 1, size: 1 }; },
     change: 'Crypto trend: scale in once. When a daily close is +1R (5 ATR) above the entry, a second unit buys at market with its own 5 ATR stop; it exits with the first trade on the channel-midpoint close',
     why: 'Owner: we leave money on the table in crypto, try scaling. Binance daily 2018-26, 0.8% costs, R on the first unit\'s 5 ATR risk: the live exit keeps 45% of each trade\'s best excursion and every other exit tested (10/20-day low, 3/4 ATR trails, partials) keeps less. One add at +1R: council coins 2023-26 +103.6R vs +61.6R with the worst drawdown -6.7R vs -5.5R (ratio 15.5 vs 11.3; 2023-24 +108.9R vs +62.1R at the same -5.5R drawdown, 2025-26 -5.3R vs -0.5R); the six other coins +169.9R vs +106.2R, ratio 8.9 vs 6.3. Adds at +0.5R, +2R, two adds and turtle-style pyramids raise drawdown faster than profit. Sizing guide: 0.5% on the first unit and 0.5% on the add (1% exposure on winners only).' },
+  { id: 'gold-trend', apply: (c) => { c.goldTrend = { n: 20, k: 2 }; },
+    change: 'Gold trend (new paper system): a daily close above the prior 20 daily highs buys gold at market on the next run; stop 2 x ATR(D1,14) below, lifted to (daily close - 2 ATR) on every closed day; no target, no time limit; one position',
+    why: 'Owner supplied a 13-edge cTrader bot; its daily breakout was the one gold edge that held on our 8 years of spot gold 1m (0.42 cost): N20 trail 2 ATR +0.31R | +1.07R | +2.42R a trade in 2019-22 | 2023-24 | 2025-26 (n29/12/10, worst drawdown -4.4R | -1.4R | -0.9R), N10 and N55 and a 3 ATR trail all positive in every period, the mirrored short loses in every period. By year: 2019 +6.1R, 2020 +3.3, 2021 +0.5, 2022 -1.1, 2023 +4.0, 2024 +8.8, 2025 +19.4, 2026 +4.7. Long only: it rides the secular bull and caps each loss near -1R. Sizing guide 0.5% per trade.' },
   { id: 'mosha-bo-weekly', apply: (c) => { c.moshaBoWeekly = true; },
     change: "Mosha BO system: trades only in the weekly structure's direction (his \"Father\" timeframe); the M15 break no longer has to flip M15 structure",
     why: "From his multi-timeframe slides (father/mother/son). Spot gold 2019-26, H4->H1->M15, limit at the broken level, 3R, with the weekly direction computed the way the trader sees it live (Monday weeks built from the last 720 daily candles, swing size 3): weekly agrees 2019-22 +32.2R (87 trades, +0.37R a trade), 2023-26 +34.2R (99, +0.35R), 7 of 8 years positive, worst drawdown -18.4R; weekly against -28.3R / -15.8R. The previous flip-only rule: +7.5R / +15.1R. Caveat: the weekly filter did not help the other timeframe chains, so it is watched by the kill switch like everything else." },
@@ -565,6 +568,33 @@ for (const [key, M] of Object.entries(MARKETS)) {
         (snapshot.trend = snapshot.trend || {})[key] = { label: M.label, close: last.close, hi55: +hi55.toFixed(4), hi100: +hiN(100).toFixed(4), lo27: +lo27.toFixed(4), atr: +A.toFixed(4), open: openT.length > 0, nOpen: openT.length,
           stop: openT.length ? Math.max(...openT.map((x) => x.stop)) : null, midStop: openT.length ? Math.max(...openT.map((x) => x.midStop || 0)) || null : null, toBreakout: +((hi55 / price - 1) * 100).toFixed(2), n: mine.filter((x) => x.R != null).length, R: +fwdR.toFixed(2), stopped };
       } catch (e) { snapshot.errors.trend = String(e.message || e); }
+    }
+    // Gold trend (5 Nov, user rule gold-trend): daily close above the prior N daily highs -> long at market on the next run; stop k x ATR(D1,14)
+    // below, lifted to (daily close - k ATR) on each closed day (chandelier); no target, no time limit. Spot gold 2019-26: +0.31 | +1.07 | +2.42R a
+    // trade (2019-22 | 2023-24 | 2025-26), shorts lose in every period, so long only. The general loop manages the stop hit.
+    if (key === 'xau' && config.goldTrend) {
+      try {
+        const GT = config.goldTrend, D = src['1d'].bars.slice(0, -1), n = D.length, last = D[n - 1], dp = Math.max(2, (M.dec ?? 2) + 1);
+        const tr14 = (i) => Math.max(D[i].high - D[i].low, Math.abs(D[i].high - D[i - 1].close), Math.abs(D[i].low - D[i - 1].close));
+        const atr14 = (i) => { let a = 0; for (let j = i - 13; j <= i; j++) a += tr14(j); return a / 14; };
+        const open = trades.find((x) => x.k === 'gtrend' && x.market === key && !x.shadow && x.status === 'open');
+        if (n > GT.n + 15) {
+          if (open) {
+            // one ratchet per newly closed daily candle
+            if (last.time > (open.lastD || 0)) { const ns = +(last.close - GT.k * atr14(n - 1)).toFixed(dp); if (ns > open.stop) { open.stop = ns; open.trailMoved = true; } open.lastD = last.time; }
+          } else {
+            const hi = Math.max(...D.slice(n - 1 - GT.n, n - 1).map((b) => b.high)), A = atr14(n - 1), id = `${key}-gtrend-${last.time}`;
+            if (last.close > hi && A > 0 && !trades.some((x) => x.id === id) && now - (last.time + 86400) < 86400) {
+              const entry = +price.toFixed(dp), stop = +(entry - GT.k * A).toFixed(dp), r0 = entry - stop;
+              if (r0 > 0) trades.push({ id, market: key, label: M.label, dec: M.dec, k: 'gtrend', name: 'Gold trend', pair: `D1 ${GT.n}-day breakout`, h: '1d', side: 'buy',
+                entry, stop, t1: +(entry * 100).toFixed(2), rr: 99, trail: [1e6, 0], buf: CFG.buf, opened: now, filled: now, checked: now, status: 'open', R: null, r0, noBe: true, entryMode: 'market', lastD: last.time,
+                feat: { hi: +hi.toFixed(2), atr: +A.toFixed(2) }, shadow: false, blockedBy: [],
+                note: `Gold trend: daily close ${last.close} above the ${GT.n}-day high ${hi.toFixed(2)}. Buy at market, stop ${GT.k} x ATR(D1) below (${stop}); the stop rises to (daily close - ${GT.k} ATR) on every closed day; no target.` });
+            }
+          }
+        }
+        (snapshot.goldTrend = snapshot.goldTrend || {}).state = { hi20: n > GT.n ? +Math.max(...D.slice(n - 1 - GT.n, n - 1).map((b) => b.high)).toFixed(2) : null, lastClose: last && last.close, open: !!open, stop: open ? open.stop : null };
+      } catch (e) { snapshot.errors.goldTrend = String(e.message || e); }
     }
     if (key === 'xau' && config.moshaBo) {
       const ev = (id, sec) => { const bb = src[id].bars; return src[id].A.events.filter((e) => e.breakIdx < bb.length - 1).map((e) => ({ t: bb[e.breakIdx].time + sec, dir: e.dir, level: e.level, top: e.top, bot: e.bot, flip: e.structure })); };
@@ -1193,7 +1223,7 @@ wr('trades.json', trades);
 // Our live systems only (gold replica, Mosha BO, crypto trend, with their adds) plus the NQ open run (research, 10-min-late feed,
 // the EA mirrors it only if the owner turns that on); shadow trades never. Rows for the last 7 days so the EA can close what it holds.
 try {
-  const SYSK = ['replica', 'mosha-bo', 'trend'], cut = now - 7 * 86400;
+  const SYSK = ['replica', 'mosha-bo', 'trend', 'gtrend'], cut = now - 7 * 86400;
   const rows = trades.filter((x) => !x.shadow && SYSK.includes(x.k) && (x.status === 'open' || x.status === 'pending' || (x.closed || x.opened || 0) >= cut))
     .concat(research.filter((x) => x.k === 'nq-open' && x.session === 'nyflip' && (x.status === 'open' || (x.closed || x.opened || 0) >= cut)).map((x) => ({ ...x, k: 'nq-open', market: 'nq' })));
   const f = (v) => v == null || v === '' ? '' : typeof v === 'number' ? String(v) : String(v).replace(/[,\n"]/g, ' ');
