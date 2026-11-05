@@ -529,14 +529,17 @@ for (const [key, M] of Object.entries(MARKETS)) {
         const w1At = (t) => (before(wEv, t) || { dir: 0 }).dir;
         snapshot.goldW1 = w1At(now) || null;
         const okW = (e) => config.moshaBoWeekly ? w1At(e.t) === e.dir : e.flip;
-        if (e3 && okW(e3) && now - e3.t <= 3600) {
+        // 5 Nov (owner: record everything): a chain that fails the weekly filter, the 2-open cap or the price check is kept as a
+        // shadow trade (managed the same way, not our system), so each filter's cost shows forward
+        if (e3 && now - e3.t <= 3600) {
           const e2 = before(E2, e3.t), e1 = before(E1, e3.t), d = e3.dir, id = `xau-moshabo-${e3.t}`;
           if (e1 && e2 && e1.dir === d && e2.dir === -d && e2.t > e1.t && !trades.some((x) => x.id === id)) {
             const entry = +e3.level.toFixed(2), stop = +(d < 0 ? e3.top + 0.3 : e3.bot - 0.3).toFixed(2), r0 = Math.abs(entry - stop);
-            const openBo = trades.filter((x) => x.k === 'mosha-bo' && (x.status === 'open' || x.status === 'pending')).length;
-            if (r0 > 0.5 && openBo < 2 && (d < 0 ? price < stop : price > stop)) trades.push({ id, market: key, label: M.label, dec: M.dec, k: 'mosha-bo', name: 'Mosha BO system', pair: 'H4 → H1 → M15', h: '15m',
+            const openBo = trades.filter((x) => x.k === 'mosha-bo' && !x.shadow && (x.status === 'open' || x.status === 'pending')).length;
+            const blk = [!okW(e3) && 'weekly', openBo >= 2 && 'cap', !(d < 0 ? price < stop : price > stop) && 'price'].filter(Boolean);
+            if (r0 > 0.5) trades.push({ id, market: key, label: M.label, dec: M.dec, k: 'mosha-bo', name: 'Mosha BO system', pair: 'H4 → H1 → M15', h: '15m',
               side: d < 0 ? 'sell' : 'buy', entry, stop, t1: +(entry + d * 3 * r0).toFixed(2), rr: 3, buf: CFG.buf, opened: now, checked: now, status: 'pending', R: null, r0, validFor: 24 * 3600, maxHold: 72 * 3600, noBe: true, entryMode: 'limit',
-              feat: { h4At: e1.t, h1At: e2.t, m15At: e3.t, w1: w1At(e3.t) === d ? 'with' : 'against', m15Flip: !!e3.flip }, shadow: false, blockedBy: [],
+              feat: { h4At: e1.t, h1At: e2.t, m15At: e3.t, w1: w1At(e3.t) === d ? 'with' : 'against', m15Flip: !!e3.flip }, shadow: blk.length > 0, blockedBy: blk,
               note: `Mosha BO system: ${config.moshaBoWeekly ? `weekly structure ${d < 0 ? 'bearish' : 'bullish'}, ` : ''}H4 BO ${d < 0 ? 'sell' : 'buy'}, then H1 BO ${d < 0 ? 'buy' : 'sell'} (retracement), then M15 BO ${d < 0 ? 'sell' : 'buy'} through ${entry}. Pullback limit at the broken M15 level ${entry}, stop past the M15 Origin ${stop}, target 3R ${(entry + d * 3 * r0).toFixed(2)}; valid 24 h, out after 72 h.` });
           }
         }
@@ -1347,6 +1350,15 @@ try {
       // behind +0.05R over 210 (2024 negative); outside the file (Dec–Mar cash index + Sep–Nov 2026): ahead +0.68R over 29, behind +0.19R over 32.
       const ndoBar = bars.find((b) => { const p = nyParts(b.time); return p.d === ny.d && p.m === 0; });
       const ndoOk = g && ndoBar && (ndoBar.open - g.entry) * (g.sell ? 1 : -1) > 0;
+      // 5 Nov (owner: "record everything that fits the system"): a trigger the midnight-open filter skips is recorded too, as
+      // session 'nyflip-x' (not our system), so the filter's cost/benefit shows forward. 4 Nov was one: +2R skipped.
+      if (g && ndoBar && !ndoOk && !research.some((x) => x.id === `nq-nyflipx-${ny.d}`)) {
+        const sell = !g.sell, r0 = Math.abs(g.entry - g.stop), stop = g.entry + (sell ? r0 : -r0), t1 = g.entry + (sell ? -2 : 2) * r0;
+        research.push({ id: `nq-nyflipx-${ny.d}`, market: 'nq', label: 'NQ', dec: 2, k: 'nq-open', session: 'nyflip-x', name: 'NQ open run, midnight open behind (skipped)', day: ny.d, side: sell ? 'sell' : 'buy',
+          entry: +g.entry.toFixed(2), stop: +stop.toFixed(2), t1: +t1.toFixed(2), rr: 2, opened: g.t + 60, filled: g.t + 60, checked: g.t + 60, status: 'open', R: null, exitAt: g.t + (660 - g.m) * 60,
+          seenAt: now, level: 'OPEN', levelPrice: +g.lv.toFixed(2), ext: +g.ext.toFixed(2), ndo: +ndoBar.open.toFixed(2),
+          note: `Research (paper only, not our system): the New York open run fired (${Math.abs(g.ext - g.lv).toFixed(1)} points through ${g.lv.toFixed(2)} and back) but the midnight open ${ndoBar.open.toFixed(2)} lies behind the trade, so the live rule skips it. Recorded to measure the filter.` });
+      }
       if (g && ndoOk) {
         const sell = !g.sell, r0 = Math.abs(g.entry - g.stop), stop = g.entry + (sell ? r0 : -r0), t1 = g.entry + (sell ? -2 : 2) * r0;
         research.push({ id: `nq-nyflip-${ny.d}`, market: 'nq', label: 'NQ', dec: 2, k: 'nq-open', session: 'nyflip', name: 'NQ New York open run', day: ny.d, side: sell ? 'sell' : 'buy',
