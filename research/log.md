@@ -673,3 +673,11 @@ Rebuilt a mechanical rulebook from every upload (BO → VR → CF, BO-BO-BO one-
 - Only weak lead: Nasdaq D1-H4-H1 flip, layered, +0.19 / +0.20R 3R (n49 / 40), +0.26 / +0.25R trail. Small n, one of ~120 cells; not adopted, noted for the NQ tracker list.
 - 80/20 partials ≈ the average of 3R and trail; they change nothing on their own.
 - **Decision:** the live Mosha BO paper system stays as it is (H4→H1→M15, weekly, level limit, 3R) as a forward test; every chain, including blocked ones, is already recorded with `blockedBy` since PR #210.
+
+## 2026-11-05 — NQ open run: walk-forward filters, S&P cross-check
+
+Script `idx/run_feat.py` (NSX 1m 2018 – Oct 2026, 15-pt equivalent, costs in). Live rule (midnight open ahead): n710, +0.119R, t 2.3. **By period: 2018–22 +0.02R (n435), 2023–26 +0.28R (n275, t 3.3).** The edge is a recent one; expect it to be weaker if the regime turns.
+- Filters chosen on 2018–22 terciles, judged on 2023–26 (base +0.28R): gap direction, prior-day direction, entry vs the opening 4H candle (18–22 ET), position in the overnight range, overnight range size, run size, stop size, weekday. **None beats the base out of sample.** The two best in 2018–22 (entry far below the 4H candle +0.25R; mid-size stop +0.20R) did +0.27R and +0.24R later, i.e. no gain. Mondays −0.05R in 2023–26 (n55) but +0.08R before: noise.
+- **S&P 500 (SPX 1m, same rule):** live rule n506, −0.00R; 2022 −34R. On days only SPX triggers: +0.06R. The setup is not a general index effect; it is NQ-specific.
+- Decision: no change to the NQ rule.
+- Crypto trend fees (loop item 9): `lab/crypto_trend.py` already charges 0.3% and 0.8% round trip (Kraken Pro taker is 0.4% a side = 0.8%); v2 was chosen under the 0.8% case. Done.
