@@ -365,6 +365,12 @@
    "by": "user",
    "change": "Gold replica: scale in and run winners. At +2R a second unit opens with the stop at the first entry; after +4R the whole position trails 1R behind the best price (cap 10R) instead of exiting at 4R",
    "why": "Owner: scale on profitable running trades and catch more of the move. Spot gold 2023-26, top-fifth gate, daily trend, breakeven at +2R, live risk rules: base 4R +93.0R / worst drawdown -11.7R (ratio 7.9); add 1.0 at +2R +157.6R / -17.4R (9.1); runner after 4R trailing 1R +103.8R / -12.4R (8.4); both +185.9R / -17.6R (10.6), better in both halves (2023-24 +73.9R vs +37.9R, 2025-26 +112.0R vs +55.0R) and every year. 23% of signals reach +4R; after that the median run before a 2R pullback is 5.4-6.7R."
+  },
+  {
+   "at": "2026-11-05T14:08:01.000Z",
+   "by": "user",
+   "change": "NQ New York open run: after +2R the stop trails 1R behind the best price (cap 10R) instead of exiting at 2R; still out at 11:00 ET",
+   "why": "Owner: catch more of the move. Nasdaq cash 1m 2018-Oct 2026, live rule with the midnight-open filter, costs in: fixed 2R +7.4R (2018-22, n435, worst drawdown -23.4R) / +76.9R (2023-26, n275, -7.7R); runner +21.1R (-19.3R) / +93.7R (-7.9R), +0.048 and +0.341R a trade, better in both halves. Adding a unit at +1R was rejected (2018-22 -17R, drawdown -52R)."
   }
  ],
  "btAt": "2026-11-05T11:21:05.226Z",
@@ -391,7 +397,8 @@
   "gold-4r",
   "gold-no-eg",
   "gold-top-be",
-  "gold-add"
+  "gold-add",
+  "nq-runner"
  ],
  "target": {},
  "targetBy": {},
@@ -402,11 +409,11 @@
  "noPause": true,
  "wouldPause": {
   "rintra": {
-   "at": "2026-11-05T14:02:43.000Z",
+   "at": "2026-11-05T14:08:01.000Z",
    "why": "four losses in a row"
   },
   "scalp": {
-   "at": "2026-11-05T14:02:43.000Z",
+   "at": "2026-11-05T14:08:01.000Z",
    "why": "expectancy -1.00R over 13 trades"
   },
   "xau": {
@@ -459,6 +466,10 @@
  },
  "goldRun": {
   "atR": 4,
+  "trail": 1
+ },
+ "nqRun": {
+  "atR": 2,
   "trail": 1
  }
 }
