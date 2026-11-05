@@ -1229,7 +1229,37 @@ const NQ_OPENS = [0, 180, 510];
 // 4 Nov (night): the trader's 3-year NQ futures file (1m, Dec 2022 – Dec 2025, never used to build the rules) settles it:
 // New York open run 447 trades +62.3R, +0.14R a trade (t 2.15), 2023 +35.9R / 2024 +7.6R / 2025 +19.4R, both sides positive;
 // open sweeps 352 trades −22.4R (−0.06R), 2023 and 2025 negative (London −17.6R). Only the New York open run stays on.
-const NQ_ON = { ny: false, london: false, swing: false, opens: false, nyflip: true, asia: false };
+const NQ_ON = { ny: false, london: false, swing: false, opens: false, nyflip: true, asia: false, sd: true };
+// NQ opening-4H standard-deviation trackers (5 Nov, owner's indicator "NQ Opening 4H Candle High/Low"; research only, paper,
+// not part of our system). The CME day's first 4H candle (18:00-22:00 ET): H, L, range rg; SD levels H + k·rg / L - k·rg.
+// sd2ifvg: price reaches 2 SD ("2r"); an FVG the push left (in the 30 one-minute candles before) is inverted by a 1-minute close
+//   through its far side within 60 min → fade at that close; stop 1 pt past the extreme since the touch; target 1 SD back.
+//   History (nq4h/ifvg.py): NQ 2023-24 +0.068R, 2025 +0.162R, Nasdaq cash 2018-26 +0.040R a trade; Sep-Nov 2026 −0.078R (16).
+// sd3mom: price reaches 3 SD → with the move at the level; stop 0.25 range back; target 4 SD. History (nq4h/sdx_*): NQ 2023-24
+//   +0.32R, 2025 +0.41R, Nasdaq cash +0.19R a trade (t 2.4 / 1.6 / 2.5), chosen after seeing the data. One per side a session.
+function nqSdSignals(bars, now) {
+  const B = bars.map((b) => ({ ...b, ...nyParts(b.time) }));
+  let i0 = -1; for (let i = B.length - 1; i >= 0; i--) if (B[i].m >= 1080 && B[i].m < 1085 && B[i].time <= now) { i0 = i; break; }
+  if (i0 < 0) return [];
+  const t0 = B[i0].time - (B[i0].m - 1080) * 60, S = B.filter((b) => b.time >= t0 && b.time < t0 + 22 * 3600);
+  const orb = S.filter((b) => b.time < t0 + 4 * 3600); if (orb.length < 200) return [];
+  const H = Math.max(...orb.map((b) => b.high)), L = Math.min(...orb.map((b) => b.low)), rg = H - L; if (!(rg > 0)) return [];
+  const W = S.filter((b) => b.time >= t0 + 4 * 3600), day = nyParts(t0 + 8 * 3600).d, out = [], exitAt = t0 + 22 * 3600;
+  for (const u of [true, false]) {
+    const d = u ? 1 : -1, lv2 = u ? H + 2 * rg : L - 2 * rg, ti = W.findIndex((b) => u ? b.high >= lv2 : b.low <= lv2);
+    if (ti >= 0) { let ext = u ? W[ti].high : W[ti].low;
+      for (let i = ti; i < Math.min(W.length, ti + 60); i++) { const b = W[i]; ext = u ? Math.max(ext, b.high) : Math.min(ext, b.low); let hit = null;
+        for (let j = Math.max(2, i - 30); j < i && !hit; j++) { const a = W[j - 2], c3 = W[j];
+          if (u && a.high < c3.low && b.close < a.high && W[i - 1].close >= a.high) hit = true;
+          if (!u && a.low > c3.high && b.close > a.low && W[i - 1].close <= a.low) hit = true; }
+        if (hit) { const stop = u ? ext + 1 : ext - 1, t1 = u ? H + rg : L - rg;
+          if ((t1 - b.close) * -d > 0) out.push({ kind: 'sd2ifvg', side: u ? 'sell' : 'buy', t: b.time, entry: b.close, stop, t1, H, L, rg, day, exitAt, lvl: lv2 }); break; } } }
+    const lv3 = u ? H + 3 * rg : L - 3 * rg, tj = W.findIndex((b) => u ? b.high >= lv3 : b.low <= lv3);
+    if (tj >= 0) { const b = W[tj], e = u ? Math.max(lv3, b.open) : Math.min(lv3, b.open);
+      out.push({ kind: 'sd3mom', side: u ? 'buy' : 'sell', t: b.time - 60, entry: e, stop: e - d * 0.25 * rg, t1: u ? H + 4 * rg : L - 4 * rg, H, L, rg, day, exitAt, lvl: lv3 }); }
+  }
+  return out;
+}
 function nqOpenSweep(bars, today, o, tFree, minPen = 15) {
   const D = bars.map((b) => ({ ...b, ...nyParts(b.time) })).filter((b) => b.d === today);
   const first = D.find((b) => b.m === o); if (!first) return null;
@@ -1249,7 +1279,8 @@ function nqOpenSweep(bars, today, o, tFree, minPen = 15) {
 try {
   const ny = nyParts(now), openNq = research.filter((x) => x.k === 'nq-open' && x.status === 'open');
   const ud = new Date(now * 1000), uMin = ud.getUTCHours() * 60 + ud.getUTCMinutes(), uWd = ud.getUTCDay(), asiaWin = uWd >= 1 && uWd <= 5 && uMin <= 200;
-  if ((!['Sat', 'Sun'].includes(ny.wd) && ny.m >= 1 && ny.m <= 1000) || asiaWin || openNq.length) {
+  const sdWin = NQ_ON.sd && ((!['Fri', 'Sat'].includes(ny.wd) && ny.m >= 1320) || (!['Sat', 'Sun'].includes(ny.wd) && ny.m < 960));
+  if ((!['Sat', 'Sun'].includes(ny.wd) && ny.m >= 1 && ny.m <= 1000) || asiaWin || openNq.length || sdWin) {
     // Yahoo's CME candles arrive 10 minutes late (probe 4 Nov: lag 600 s) and the newest one is still forming: drop it
     const bars = (await nq1m()).slice(0, -1);
     if (bars.length) nqLast = { price: +bars.at(-1).close.toFixed(2), at: bars.at(-1).time + 60 };   // shown as 'now' on the Active trades card (about 10 min late)
@@ -1312,6 +1343,14 @@ try {
           seenAt: now, entrySeen: bars.length ? +bars.at(-1).close.toFixed(2) : null, level: 'OPEN', levelPrice: +g.lv.toFixed(2), ext: +g.ext.toFixed(2), ndo: +ndoBar.open.toFixed(2),
           note: `Research (paper only): NQ ran ${Math.abs(g.ext - g.lv).toFixed(1)} points through the New York open ${g.lv.toFixed(2)} and closed back across it; at New York that reclaim tends to fail, so ${sell ? 'sell' : 'buy'} ${g.entry.toFixed(2)} with the sweep, stop ${stop.toFixed(2)}, target 2R ${t1.toFixed(2)}, out at 11:00 ET.` });
       }
+    }
+    if (sdWin) for (const g of nqSdSignals(bars, now)) {
+      const id = `nq-${g.kind}-${g.day}-${g.side}`; if (research.some((x) => x.id === id)) continue;
+      const r0 = Math.abs(g.entry - g.stop); if (!(r0 > 0)) continue;
+      research.push({ id, market: 'nq', label: 'NQ', dec: 2, k: 'nq-open', session: g.kind, name: g.kind === 'sd2ifvg' ? 'NQ 2 SD IFVG fade' : 'NQ 3 SD momentum', day: g.day, side: g.side,
+        entry: +g.entry.toFixed(2), stop: +g.stop.toFixed(2), t1: +g.t1.toFixed(2), rr: +(Math.abs(g.t1 - g.entry) / r0).toFixed(2), opened: g.t + 60, filled: g.t + 60, checked: g.t + 60, status: 'open', R: null, exitAt: g.exitAt, exitLabel: '16:00 ET',
+        seenAt: now, levels: { H4: +g.H.toFixed(2), L4: +g.L.toFixed(2), range: +g.rg.toFixed(2), level: +g.lvl.toFixed(2) },
+        note: `Research (paper only, not our system): opening 4H candle ${g.L.toFixed(2)}-${g.H.toFixed(2)} (range ${g.rg.toFixed(2)}). ${g.kind === 'sd2ifvg' ? `Price reached the 2 SD line ${g.lvl.toFixed(2)} and a 1-minute IFVG formed: fade ${g.side} ${g.entry.toFixed(2)}, stop past the extreme ${g.stop.toFixed(2)}, target 1 SD ${g.t1.toFixed(2)}` : `Price reached 3 SD ${g.lvl.toFixed(2)}: ${g.side} with the move at ${g.entry.toFixed(2)}, stop 0.25 range ${g.stop.toFixed(2)}, target 4 SD ${g.t1.toFixed(2)}`}; out at 16:00 ET.` });
     }
     if (NQ_ON.opens && !['Sat', 'Sun'].includes(ny.wd) && ny.m >= 1 && ny.m < 660) for (const o of NQ_OPENS) {
       const id = `nq-opens-${ny.d}-${o}`, mine = research.filter((x) => x.session === 'opens' && x.day === ny.d);
