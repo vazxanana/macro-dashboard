@@ -164,6 +164,9 @@ const USER_RULES = [
   { id: 'pairs-best', apply: (c) => { c.replicaLive = ['xau']; c.cryptoTrend = ['btc', 'eth', 'sol', 'xrp']; c.cryptoTrendStopR = -8; c.cryptoTrendAt = Math.floor(Date.now() / 1000); },
     change: 'Pairs, best settings (owner asked): crypto trades a daily trend system (55-day breakout, long only, 4 ATR trailing stop, out on a close under the 27-day low); forex stops trading live (research only)',
     why: "Walk-forward search on the pairs only. The replica: ~11,000 settings per pair, chosen on 2019-22 (forex) / 2022-23 (crypto): the 20 best on 7 of 9 pairs lost in the later years. Asia-range breakouts/fades and open sweeps lose on forex and crypto after costs. Daily trend-following on forex lost 2023-26 (0 of 5 pairs). Crypto daily trend (Binance 2017-2026, 0.8% round-trip cost), picked on 2018-21: 55-day breakout long-only with a 4 ATR trail +1.05R a trade, then 2022-26 +0.30R a trade with 8 of 10 coins positive; on the council's coins 2022-26 BTC +0.50R, ETH +0.39R, SOL +0.74R, XRP +1.29R a trade, worst drawdown 2-4R, ~3 trades a coin a year. Tight 2 ATR trails lose on every coin." },
+  { id: 'gold-adaptive-gate', apply: (c) => { c.goldVolPct = 80; },
+    change: "Gold replica: the volatility gate also opens when gold's 20-day range is in the top fifth of its own last year (as well as at 1.5% or more)",
+    why: 'Owner: apply the research. Live config, spot gold, trail exit: fixed 1.5% 2019-22 +0.093R (214 trades) / 2023-26 +0.164R (443); 1.5% OR top-fifth +0.104R (341) / +0.192R (513): better in both halves with more trades. Tighter stops (0.5-0.85x) and fixed 2-4R targets were tested at the same time and did not beat the current stop and trail.' },
   { id: 'mosha-bo-weekly', apply: (c) => { c.moshaBoWeekly = true; },
     change: "Mosha BO system: trades only in the weekly structure's direction (his \"Father\" timeframe); the M15 break no longer has to flip M15 structure",
     why: "From his multi-timeframe slides (father/mother/son). Spot gold 2019-26, H4->H1->M15, limit at the broken level, 3R, with the weekly direction computed the way the trader sees it live (Monday weeks built from the last 720 daily candles, swing size 3): weekly agrees 2019-22 +32.2R (87 trades, +0.37R a trade), 2023-26 +34.2R (99, +0.35R), 7 of 8 years positive, worst drawdown -18.4R; weekly against -28.3R / -15.8R. The previous flip-only rule: +7.5R / +15.1R. Caveat: the weekly filter did not help the other timeframe chains, so it is watched by the kill switch like everything else." },
@@ -573,7 +576,17 @@ for (const [key, M] of Object.entries(MARKETS)) {
       const past = ser.slice(-367, -2).sort((a, b) => a - b);
       volGate = past.length >= 200 ? +past[Math.floor(config.pairVolPct / 100 * (past.length - 1))].toFixed(3) : Infinity;
     }
-    const volOk = key === 'xau' ? !config.goldVolMin || (volPct != null && volPct >= config.goldVolMin) : !config.pairVolPct || (pairVol != null && pairVol >= volGate);
+    // gold adaptive gate (5 Nov, user rule gold-adaptive-gate): live while the 20-day range is >= 1.5% OR in the top fifth
+    // (config.goldVolPct) of gold's own 20-day ranges over the last 365 daily candles (raw ranges, as in the backtest).
+    let goldP = null;
+    if (key === 'xau' && config.goldVolPct) {
+      const db = src['1d'].bars.slice(0, -1), rr = db.map((b) => (b.high - b.low) / b.close * 100), ser = [];
+      for (let i = 20; i <= rr.length; i++) ser.push(rr.slice(i - 20, i).reduce((a, v) => a + v, 0) / 20);
+      const past = ser.slice(-367, -2).sort((a, b) => a - b);
+      goldP = past.length >= 200 ? +past[Math.floor(config.goldVolPct / 100 * (past.length - 1))].toFixed(3) : null;
+      snapshot.goldVolP = goldP; snapshot.goldVolPn = past.length;
+    }
+    const volOk = key === 'xau' ? !config.goldVolMin || (volPct != null && (volPct >= config.goldVolMin || (goldP != null && volPct >= goldP))) : !config.pairVolPct || (pairVol != null && pairVol >= volGate);
     const pxr = (v) => +v.toFixed(Math.max(2, (M.dec ?? 2) + 1));   // price rounding by market (forex has 5 decimals)
     // pair kill switch (user rule pairs-live): a pair stops trading live once its live replica trades since the switch-on sum to
     // config.pairStopR (−10R); its signals stay research

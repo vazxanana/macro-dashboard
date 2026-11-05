@@ -472,3 +472,12 @@ before this change keep the old exit (`exitRule` unset). Daily-equity test on BT
 (`lab/crypto_ens2.py`): Sharpe 2018–21 1.67 vs 1.50, 2022–26 0.81 vs 0.58; worst drawdown −28% vs −39% and −21% vs −27%. A
 7-lookback ensemble (20–360 days) and volatility-target sizing did not beat this in 2022–26 (vol targeting only cuts drawdown).
 `snapshot.trend[key].midStop` shows the current exit level.
+
+## Gold adaptive volatility gate (5 Nov, user rule `gold-adaptive-gate`)
+
+The gold replica now trades live when the 20-day average daily range is ≥ 1.5% **or** in the top fifth (`config.goldVolPct` 80)
+of gold's own 20-day ranges over the last 365 daily candles (`snapshot.goldVolP`). Live config, trail exit, spot gold:
+1.5% only +0.093R (214 trades, 2019–22) / +0.164R (443, 2023–26); 1.5% or top fifth +0.104R (341) / +0.192R (513).
+Tested at the same time and **not** adopted: tighter stops (0.5–0.85× the current distance lost expectancy in both halves:
+45% of trades that reached +2R first went more than half-way to the stop) and fixed 2/2.5/3/3.5/4R targets (4R +0.08 / +0.19R
+≈ the current trail +0.09 / +0.16R).
