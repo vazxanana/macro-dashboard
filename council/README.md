@@ -534,3 +534,15 @@ trail 1R behind the best price (parent `trail [3, 1]`, add `[1, 0.667]`), cap 10
 No new gold replica entry between 08:25 and 08:45 ET on weekdays (`config.goldNewsVeto`, minutes of the New York day);
 the signal is still recorded as research with `news: true`. 2023–26 the 5 signals inside that window all lost (−5.2R);
 with the live rules the veto makes +95.7R vs +93.0R, same drawdown. Open trades and adds are not affected.
+
+## Crypto trend: one add at +1R (5 Nov, user rule `crypto-add`)
+
+Owner: "we are leaving money on the table in crypto, try scaling". On Binance daily candles 2018–26 (0.8% costs, R on the
+first unit's 5 ATR risk) the live midpoint exit keeps about 45% of each trade's best excursion, and every other exit tested
+(10- and 20-day lows, 3 and 4 ATR trails, half off at +1R or +2R) keeps less: the giveback is the price of the big winners.
+Scaling in does add: when a daily close is +1R (5 ATR) above the entry, a second unit buys at market with its own 5 ATR
+(at entry) catastrophe stop and leaves with the first trade on the midpoint close (`config.cryptoAdd = { atR: 1, size: 1 }`,
+record `<id>-add`, `addOf`). Council coins 2023–26: +103.6R vs +61.6R, worst drawdown −6.7R vs −5.5R (ratio 15.5 vs 11.3);
+2023–24 +108.9R vs +62.1R at the same −5.5R; 2025–26 −5.3R vs −0.5R (flat period). The six other coins: +169.9R vs +106.2R,
+ratio 8.9 vs 6.3. Adds at +0.5R, +1.5R, +2R, two adds, and turtle pyramids raise drawdown faster than profit.
+Sizing guide: 0.5% on the first unit, 0.5% on the add. The add counts toward the crypto kill switch like any other trade.
