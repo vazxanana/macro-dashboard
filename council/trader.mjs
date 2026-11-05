@@ -499,20 +499,24 @@ for (const [key, M] of Object.entries(MARKETS)) {
     if (key === 'xau') { snapshot.goldVol = volPct == null ? null : +volPct.toFixed(2); snapshot.goldVolMin = config.goldVolMin || null; }
     // pairs (4 Nov, user rule pairs-live): the gate is relative to each market's own history: today's 20-day range must be in the
     // top fifth (config.pairVolPct) of the 20-day ranges over its last 365 daily candles. Gold keeps its 1.5% gate.
-    let volGate = key === 'xau' ? config.goldVolMin || null : null;
+    // A day's range counts at most 3x the median of the 20 days before it: a lone Kraken bad print (USD/CAD and USD/CHF, 3 Nov,
+    // hundreds of pips for a minute) would otherwise inflate the 20-day range and open the gate. Gold keeps its raw ranges.
+    let volGate = key === 'xau' ? config.goldVolMin || null : null, pairVol = volPct;
     if (key !== 'xau' && config.pairVolPct) {
-      const db = src['1d'].bars.slice(0, -1), ser = [];
-      for (let i = 20; i < db.length; i++) ser.push(db.slice(i - 20, i).reduce((a, b) => a + (b.high - b.low) / b.close * 100, 0) / 20);
-      const past = ser.slice(-366, -1).sort((a, b) => a - b);
+      const db = src['1d'].bars.slice(0, -1), rr = db.map((b) => (b.high - b.low) / b.close * 100), cr = rr.slice(), ser = [];
+      for (let i = 20; i < rr.length; i++) { const med = rr.slice(i - 20, i).sort((a, b) => a - b)[10]; cr[i] = Math.min(rr[i], 3 * med); }
+      for (let i = 20; i <= cr.length; i++) ser.push(cr.slice(i - 20, i).reduce((a, v) => a + v, 0) / 20);
+      pairVol = ser.length ? ser.at(-1) : null;
+      const past = ser.slice(-367, -2).sort((a, b) => a - b);
       volGate = past.length >= 200 ? +past[Math.floor(config.pairVolPct / 100 * (past.length - 1))].toFixed(3) : Infinity;
     }
-    const volOk = key === 'xau' ? !config.goldVolMin || (volPct != null && volPct >= config.goldVolMin) : !config.pairVolPct || (volPct != null && volPct >= volGate);
+    const volOk = key === 'xau' ? !config.goldVolMin || (volPct != null && volPct >= config.goldVolMin) : !config.pairVolPct || (pairVol != null && pairVol >= volGate);
     const pxr = (v) => +v.toFixed(Math.max(2, (M.dec ?? 2) + 1));   // price rounding by market (forex has 5 decimals)
     // pair kill switch (user rule pairs-live): a pair stops trading live once its live replica trades since the switch-on sum to
     // config.pairStopR (−10R); its signals stay research
     const pairLive = trades.filter((x) => x.k === 'replica' && x.market === key && !x.shadow && x.R != null && x.closed && x.opened >= (config.pairsLiveAt || 0));
     const pairR = pairLive.reduce((a, x) => a + x.R, 0), pairStop = key !== 'xau' && config.pairStopR != null && pairR <= config.pairStopR;
-    if (key !== 'xau') (snapshot.pairs = snapshot.pairs || {})[key] = { label: M.label, vol: volPct == null ? null : +volPct.toFixed(2), gate: isFinite(volGate) ? volGate : null, on: volOk && !pairStop && (config.replicaLive || []).includes(key), n: pairLive.length, R: +pairR.toFixed(2), stopped: pairStop };
+    if (key !== 'xau') (snapshot.pairs = snapshot.pairs || {})[key] = { label: M.label, vol: pairVol == null ? null : +pairVol.toFixed(2), gate: isFinite(volGate) ? volGate : null, on: volOk && !pairStop && (config.replicaLive || []).includes(key), n: pairLive.length, R: +pairR.toFixed(2), stopped: pairStop };
     if (marketOpen(M, now)) {
       let sigs = []; try { sigs = replicaSignals(src); } catch (e) {}
       for (const g of sigs) {
@@ -568,7 +572,7 @@ for (const [key, M] of Object.entries(MARKETS)) {
         if (v5 && capped) research.at(-1).capped = true;
         if (v5 && dayStop) research.at(-1).dayStop = true;
         if (v5 && stale) research.at(-1).stale = true;
-        if (volPct != null) research.at(-1).vol = +volPct.toFixed(2);
+        if (volPct != null) research.at(-1).vol = +(key === 'xau' ? volPct : pairVol).toFixed(2);
         if (key !== 'xau' && isFinite(volGate)) research.at(-1).gate = volGate;
         if (v5 && !volOk) research.at(-1).calm = true;
         const d1w = src['1d'].A.trend === (g.sell ? -1 : 1);
