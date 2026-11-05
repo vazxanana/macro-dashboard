@@ -371,6 +371,18 @@
    "by": "user",
    "change": "NQ New York open run: after +2R the stop trails 1R behind the best price (cap 10R) instead of exiting at 2R; still out at 11:00 ET",
    "why": "Owner: catch more of the move. Nasdaq cash 1m 2018-Oct 2026, live rule with the midnight-open filter, costs in: fixed 2R +7.4R (2018-22, n435, worst drawdown -23.4R) / +76.9R (2023-26, n275, -7.7R); runner +21.1R (-19.3R) / +93.7R (-7.9R), +0.048 and +0.341R a trade, better in both halves. Adding a unit at +1R was rejected (2018-22 -17R, drawdown -52R)."
+  },
+  {
+   "at": "2026-11-05T14:50:57.000Z",
+   "by": "user",
+   "change": "Mosha BO system: at +1.5R the stop moves to breakeven and a second unit is added (stop at the first entry); after +3R the whole position trails 1R behind the best price (cap 10R) instead of exiting at 3R",
+   "why": "Owner: scale on running trades, judged on 2023 onwards. Spot gold, weekly agrees, limit at the broken level, 101 fills: fixed 3R +6.3R (2023-24, n36) / +21.0R (2025-26, n65), worst drawdown -18.4R; add + runner +8.8R / +35.3R, drawdown -20.3R (return per unit of drawdown 2.2 vs 1.5). Still a forward test: the base system failed out of sample on other markets."
+  },
+  {
+   "at": "2026-11-05T14:50:57.000Z",
+   "by": "user",
+   "change": "Gold replica: no new entry between 08:25 and 08:45 ET on weekdays (the US data-release window); such signals are recorded as research",
+   "why": "Spot gold 2023-26, top-fifth gate, daily trend, 4R with breakeven: the 5 signals that fired inside 08:25-08:45 ET all lost (-5.2R); with the risk rules the veto makes +95.7R vs +93.0R (2023-24 +40.0R vs +37.9R, 2025-26 +55.6R vs +55.0R), same worst drawdown. Gold absorbs US macro news within minutes and the release-minute spread is several times normal, so the window is skipped for entries only. The FOMC window (Wed 13:55-14:15 ET) had 3 entries, all positive, and is not vetoed."
   }
  ],
  "btAt": "2026-11-05T11:21:05.226Z",
@@ -398,7 +410,9 @@
   "gold-no-eg",
   "gold-top-be",
   "gold-add",
-  "nq-runner"
+  "nq-runner",
+  "mosha-add",
+  "gold-news-veto"
  ],
  "target": {},
  "targetBy": {},
@@ -409,11 +423,11 @@
  "noPause": true,
  "wouldPause": {
   "rintra": {
-   "at": "2026-11-05T14:47:10.000Z",
+   "at": "2026-11-05T14:50:57.000Z",
    "why": "four losses in a row"
   },
   "scalp": {
-   "at": "2026-11-05T14:47:10.000Z",
+   "at": "2026-11-05T14:50:57.000Z",
    "why": "expectancy -1.00R over 13 trades"
   },
   "xau": {
@@ -471,5 +485,20 @@
  "nqRun": {
   "atR": 2,
   "trail": 1
- }
+ },
+ "moshaBeR": 1.5,
+ "moshaAdd": {
+  "atR": 1.5,
+  "size": 1
+ },
+ "moshaRun": {
+  "atR": 3,
+  "trail": 1
+ },
+ "goldNewsVeto": [
+  [
+   505,
+   525
+  ]
+ ]
 }
