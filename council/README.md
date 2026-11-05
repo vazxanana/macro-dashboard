@@ -462,3 +462,13 @@ the extreme since the open, out at 16:00 ET. Research session `80pct` (k `nq-ope
 `snapshot.research.nq_80pct` (the summary now also lists `nyflip-x`, `sd2ifvg`, `sd3mom`). Nasdaq cash 2018–22 +0.04R (153
 trades), 2023–26 +0.05R (106), about 30 a year: weak (t ~1). Corrected 5 Nov: the first backtest dropped trades still open at
 16:00 and showed +0.10R / +0.12R. Kept as a cheap paper tracker, not a candidate for live trading on this evidence.
+
+
+## Crypto trend v3 exit (5 Nov)
+
+New crypto trend trades exit on a daily close under the ratcheting midpoint of their own N-day channel (55 or 100 days), the
+exit from Zarattini, Pagani & Barbon (2025). The 5 ATR stop stays as a fixed catastrophe stop and no longer trails. Trades opened
+before this change keep the old exit (`exitRule` unset). Daily-equity test on BTC/ETH/SOL/XRP, 0.8% round trip, equal notional
+(`lab/crypto_ens2.py`): Sharpe 2018–21 1.67 vs 1.50, 2022–26 0.81 vs 0.58; worst drawdown −28% vs −39% and −21% vs −27%. A
+7-lookback ensemble (20–360 days) and volatility-target sizing did not beat this in 2022–26 (vol targeting only cuts drawdown).
+`snapshot.trend[key].midStop` shows the current exit level.
