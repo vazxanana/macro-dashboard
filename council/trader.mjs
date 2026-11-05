@@ -583,13 +583,18 @@ for (const [key, M] of Object.entries(MARKETS)) {
           if (e1 && e2 && e1.dir === d && e2.dir === -d && e2.t > e1.t && !trades.some((x) => x.id === id)) {
             const entry = +e3.level.toFixed(2), stop = +(d < 0 ? e3.top + 0.3 : e3.bot - 0.3).toFixed(2), r0 = Math.abs(entry - stop);
             const openBo = trades.filter((x) => x.k === 'mosha-bo' && !x.shadow && (x.status === 'open' || x.status === 'pending')).length;
+            // pull (5 Nov, forward-test field only): H1 bars from the VR extreme (the H1 leg's extreme after the H1 BO) to the M15 CF.
+            // Research: on gold a slow pullback (>= 22 bars) did better than a fast one in every period, but silver reversed it, so it is recorded, not used.
+            let pull = null; try { const hb = src['1h'].bars, i2 = hb.findIndex((b) => b.time >= e2.t); let ext = d < 0 ? Infinity : -Infinity, iE = i2;
+              for (let i = Math.max(0, i2); i < hb.length && hb[i].time < e3.t; i++) { if (d < 0 ? hb[i].low < ext : hb[i].high > ext) { ext = d < 0 ? hb[i].low : hb[i].high; iE = i; } }
+              pull = i2 < 0 || !isFinite(ext) ? null : hb.filter((b) => b.time > hb[iE].time && b.time < e3.t).length; } catch (e) { pull = null; }
             const blk = [!okW(e3) && 'weekly', openBo >= 2 && 'cap', !(d < 0 ? price < stop : price > stop) && 'price'].filter(Boolean);
             if (r0 > 0.5) trades.push({ id, market: key, label: M.label, dec: M.dec, k: 'mosha-bo', name: 'Mosha BO system', pair: 'H4 → H1 → M15', h: '15m',
               side: d < 0 ? 'sell' : 'buy', entry, stop, t1: +(entry + d * 3 * r0).toFixed(2), rr: 3, buf: CFG.buf, opened: now, checked: now, status: 'pending', R: null, r0, validFor: 24 * 3600, maxHold: 72 * 3600, noBe: true, entryMode: 'limit',
               // mosha-add (5 Nov): breakeven and a second unit at +1.5R, after +3R trail 1R behind the best price (cap 10R)
               ...(config.moshaBeR ? { beAt: config.moshaBeR } : {}), ...(config.moshaAdd ? { addAt: config.moshaAdd.atR, addSize: config.moshaAdd.size } : {}),
               ...(config.moshaRun ? { t1: +(entry + d * 10 * r0).toFixed(2), rr: 10, tp1: +(entry + d * config.moshaRun.atR * r0).toFixed(2), trail: [config.moshaRun.atR, config.moshaRun.trail] } : {}),
-              feat: { h4At: e1.t, h1At: e2.t, m15At: e3.t, w1: w1At(e3.t) === d ? 'with' : 'against', m15Flip: !!e3.flip }, shadow: blk.length > 0, blockedBy: blk,
+              feat: { h4At: e1.t, h1At: e2.t, m15At: e3.t, w1: w1At(e3.t) === d ? 'with' : 'against', m15Flip: !!e3.flip, pull }, shadow: blk.length > 0, blockedBy: blk,
               note: `Mosha BO system: ${config.moshaBoWeekly ? `weekly structure ${d < 0 ? 'bearish' : 'bullish'}, ` : ''}H4 BO ${d < 0 ? 'sell' : 'buy'}, then H1 BO ${d < 0 ? 'buy' : 'sell'} (retracement), then M15 BO ${d < 0 ? 'sell' : 'buy'} through ${entry}. Pullback limit at the broken M15 level ${entry}, stop past the M15 Origin ${stop}, target 3R ${(entry + d * 3 * r0).toFixed(2)}; valid 24 h, out after 72 h.` });
           }
         }
