@@ -329,6 +329,12 @@
    "by": "coach-stats",
    "change": "Minimum stop 0.8 → 0.9 ATR",
    "why": "Win rate 17% over 36 trades: stops get hit by normal candle noise."
+  },
+  {
+   "at": "2026-11-05T00:41:57.000Z",
+   "by": "user",
+   "change": "Pairs, best settings (owner asked): crypto trades a daily trend system (55-day breakout, long only, 4 ATR trailing stop, out on a close under the 27-day low); forex stops trading live (research only)",
+   "why": "Walk-forward search on the pairs only. The replica: ~11,000 settings per pair, chosen on 2019-22 (forex) / 2022-23 (crypto): the 20 best on 7 of 9 pairs lost in the later years. Asia-range breakouts/fades and open sweeps lose on forex and crypto after costs. Daily trend-following on forex lost 2023-26 (0 of 5 pairs). Crypto daily trend (Binance 2017-2026, 0.8% round-trip cost), picked on 2018-21: 55-day breakout long-only with a 4 ATR trail +1.05R a trade, then 2022-26 +0.30R a trade with 8 of 10 coins positive; on the council's coins 2022-26 BTC +0.50R, ETH +0.39R, SOL +0.74R, XRP +1.29R a trade, worst drawdown 2-4R, ~3 trades a coin a year. Tight 2 ATR trails lose on every coin."
   }
  ],
  "btAt": "2026-11-04T11:20:16.389Z",
@@ -349,7 +355,8 @@
   "gold-eg-barrier",
   "mosha-bo",
   "mosha-bo-weekly",
-  "pairs-live"
+  "pairs-live",
+  "pairs-best"
  ],
  "target": {},
  "targetBy": {},
@@ -360,11 +367,11 @@
  "noPause": true,
  "wouldPause": {
   "rintra": {
-   "at": "2026-11-05T00:36:47.000Z",
+   "at": "2026-11-05T00:41:57.000Z",
    "why": "four losses in a row"
   },
   "scalp": {
-   "at": "2026-11-05T00:36:47.000Z",
+   "at": "2026-11-05T00:41:57.000Z",
    "why": "expectancy -1.00R over 13 trades"
   },
   "xau": {
@@ -384,16 +391,7 @@
   "none"
  ],
  "replicaLive": [
-  "xau",
-  "btc",
-  "eth",
-  "sol",
-  "xrp",
-  "eurusd",
-  "gbpusd",
-  "audusd",
-  "usdcad",
-  "usdchf"
+  "xau"
  ],
  "newsSince": "2026-11-04T00:02:58.000Z",
  "retireLegacy": true,
@@ -404,5 +402,13 @@
  "moshaBoWeekly": true,
  "pairsLiveAt": 1793836951,
  "pairVolPct": 80,
- "pairStopR": -10
+ "pairStopR": -10,
+ "cryptoTrend": [
+  "btc",
+  "eth",
+  "sol",
+  "xrp"
+ ],
+ "cryptoTrendStopR": -8,
+ "cryptoTrendAt": 1793839317
 }
