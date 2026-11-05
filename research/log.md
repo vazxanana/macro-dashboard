@@ -590,3 +590,18 @@ edge, mid, the opposite edge, the opposite 50% line; cost 0.5 pt (futures) / 1 p
 - Recent: NSX Nov 2025 - Mar 2026 positive months (+6.5, +3.8, +3.5, +8.1, +0.5R) and NQ Nov-Dec 2025 positive, a streak after
   years of losses; NQ 14 Sep - 4 Nov 2026 (37 trades): −8.8R.
 Verdict: no edge as a mechanical rule; the 1-minute stops (median 6-7.5 pts) make costs alone 0.07-0.16R a trade.
+
+## 5 Nov: NQ opening 4H candle as standard-deviation projections (owner: "it's a standard deviation")
+
+Levels = the opening 4H candle's range projected beyond its high/low in SD units (1 SD = one range): the indicator's "+50%" is
+0.5 SD, "2r" is 2 SD. Reach rates after 22:00 ET (NQ futures 2023-25 / NSX 2018-26): 0.5 SD 97/95%, 1 SD 87/83%, 1.5 SD 76/68%,
+2 SD 65/57%, 2.5 SD 54/46%, 3 SD 44/35%, 4 SD 29/22%. Fades at every level (first opposite 1-minute candle after the touch;
+stop 1 pt past the extreme or at the next half SD; targets 2R, 3R, the previous half SD, back to the 4H edge), script
+nq4h/sd.py, ~54 cells per dataset:
+- 0.5 SD: NQ −0.07 to +0.02R a trade, NSX −0.17 to −1.0R. Back to the 4H edge: NQ +1.4R / 1,037 (≈0), NSX −189.6R / 1,114.
+- 2 SD ("2r") fade back to the 4H edge: NQ +4.8R / 549 (+0.009R, t 0.06), NSX +50.5R / 527 (+0.096R, t 0.57); without each
+  side's 5 biggest winners (17-33R each): −100R / −81R. Lottery-shaped, not significant; 2023 −60R on futures vs +13R on cash.
+- 2.5 SD fade back to the edge: NQ +63.5R (+0.14R, both halves +) but NSX −84.1R (−0.20R). 4 SD: small samples, mixed.
+- Recent NQ 14 Sep - 4 Nov 2026: 0.5 SD fade back to the 4H edge +16.3R over 48 (+0.34R): a hot streak (also Nov 2025 -
+  Mar 2026 on NSX) inside a flat-to-negative 8-year record. That streak is likely what the owner sees on the chart.
+Verdict: no level/stop/target combination holds on both Nasdaq histories. Not added to the council.
