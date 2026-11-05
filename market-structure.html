@@ -797,7 +797,7 @@
         <div class="ms-k"><span>Gold replica · trades only when gold is volatile</span></div>
         <p class="ms-note" id="ms-rep-vol"></p>
         <p class="ms-note"><b>Volatility gate since 4 Nov.</b> On 8 years of spot gold (HistData 2019–2026) the replica loses in calm gold every year and only pays when gold moves a lot. Since 5 Nov it trades live only while gold's 20-day average daily range is in the top fifth of gold's own last year (judged on 2023 onwards: trades between 1.5% and that level made +0.02R a trade over 168, top-fifth trades +0.40R in both halves). Below that, every signal is still recorded here as research. It takes trades only in the daily trend direction (a pullback against the 4-hour trend); the engulfing-barrier exception was turned off on 5 Nov because it lost in every year 2023–26 (−15R over 82 trades). Replay 2023–Oct 2026 with the top-fifth gate, breakeven, the add at +2R and the runner: 212 positions, +185.9R (2024 +76.0R, 2025 +52.4R, 2026 +59.6R), worst drawdown −17.6R, best position +14.6R; the fixed-4R rules it replaces made +93.7R with a −11.7R drawdown (return per unit of drawdown 10.6 vs 7.9). Tighter stops, partial exits, session filters and stop buffers were tested on 5 Nov and rejected. Exit and scaling (since 5 Nov evening, judged on 2023 onwards): at +2R the stop moves to breakeven and a second unit is added at that level with its stop at the first entry (it shows as a separate “Replica add” trade, counted as 2R of risk); after +4R both units trail 1R behind the best price (cap 10R); out after 48 h. NQ stays the main system.</p>
-        <p class="ms-note"><b>Second gold system (paper, since 4 Nov): Mosha BO system.</b> Weekly structure (his “Father”) sets the side; then H4 BO that way, H1 BO the other way (the retracement), M15 BO back in the H4 direction; pullback limit at the broken M15 level, stop past the M15 Origin, target 3R, valid 24 h. On 8 years of spot gold, with the weekly read the way the Trader reads it live: 2019–22 +32.2R over 87 trades, 2023–26 +34.2R over 99 (about +0.35R a trade, 7 of 8 years positive); the same setups against the weekly lost 44R. <b>Out of sample it failed:</b> the identical rule lost on silver, EUR/USD, GBP/USD, USD/JPY, Nasdaq and the S&amp;P (about −220R over ~1,430 trades, 2019–26), so the gold result is probably luck in one cell of a large grid. It stays on paper as a forward test, not as a proven edge. Its trades show in Active trades and the calendar as “Mosha BO system”.</p>
+        <p class="ms-note"><b>Second gold system (paper, since 4 Nov): Mosha BO system.</b> Weekly structure (his “Father”) sets the side; then H4 BO that way, H1 BO the other way (the retracement), M15 BO back in the H4 direction; pullback limit at the broken M15 level, stop past the M15 Origin, target 3R, valid 24 h. On 8 years of spot gold, with the weekly read the way the Trader reads it live: 2019–22 +32.2R over 87 trades, 2023–26 +34.2R over 99 (about +0.35R a trade, 7 of 8 years positive); the same setups against the weekly lost 44R. <b>Out of sample it failed:</b> the identical rule lost on silver, EUR/USD, GBP/USD, USD/JPY, Nasdaq and the S&amp;P (about −220R over ~1,430 trades, 2019–26), so the gold result is probably luck in one cell of a large grid. It stays on paper as a forward test, not as a proven edge. Its trades show in Active trades and the calendar as “Mosha BO system”. Judged on 2023 onwards (5 Nov): +0.27R a trade over 101; buys against a bearish weekly when the daily trend or M15 structure agreed were tested and lost, so it stays weekly-only.</p>
         <p class="ms-note" id="ms-rep-w1"></p>
         <p class="ms-note">A leg of 2+ M15 ATRs in 3 h or 6 h, then an M5 CHoCH; taken when clear of live H1 Origins or with a ★ engulfing at the extreme, with a stop of at least one M15 ATR, and (v5, 4 Nov) only against the H4 trend. Market entry, stop past the extreme, 2R, out after 48 h. The M5 gold chart marks every signal of the last 24 h.</p>
         <div class="c-kpi" id="ms-rep-kpi"></div>
@@ -872,11 +872,17 @@
       <div class="ms-j-wrap"><table class="ms-j"><thead><tr><th>Logged</th><th>Market</th><th>Setup</th><th>Side</th><th>Entry</th><th>Stop</th><th>Target 1</th><th>Result</th><th>R</th><th>Notes</th><th><span class="sr">Delete</span></th></tr></thead><tbody id="ms-j-body"></tbody></table></div>
       <div class="ms-note" style="margin-top:10px">Saved in this browser only. Open trades on the market you're viewing are checked against live candles and marked Win or Loss automatically; change the result any time.</div>
     </div>
+    <div class="card" id="ms-js-card">
+      <div class="ms-k">System trades · closed paper trades placed by the council (read-only) <span class="ms-scan-meta"><button type="button" class="ms-tbtn" id="ms-js-csv">Export CSV</button></span></div>
+      <div id="ms-js-stats" class="ms-j-stats"></div>
+      <div class="ms-j-wrap"><table class="ms-j"><thead><tr><th>Closed</th><th>Market</th><th>System</th><th>Side</th><th>Entry</th><th>Stop</th><th>Exit</th><th>R</th></tr></thead><tbody id="ms-js-body"><tr class="empty"><td colspan="8">Loading…</td></tr></tbody></table></div>
+      <div class="ms-note" style="margin-top:10px">NQ New York open run, gold replica (a second unit added at +2R is folded into its first trade), Mosha BO and crypto trend; live paper trades only, newest first, last 200. 1R = the risk of one trade.</div>
+    </div>
   </section>
 
 
 
-  <p class="foot">Live candles from Binance and Kraken public feeds; gold is aligned to XAU/USD spot via gold-api.com. Times are in your local zone.<br>Version 4 Nov 2026 · redesign</p>
+  <p class="foot">Live candles from Binance and Kraken public feeds; gold is aligned to XAU/USD spot via gold-api.com. Times are in your local zone.<br>Version 5 Nov 2026 · scaling rules</p>
   <nav class="btab" aria-label="Main sections">
     <a href="#home" data-go="home"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M3 11l9-7 9 7v9a1 1 0 01-1 1h-5v-6H9v6H4a1 1 0 01-1-1z"></path></svg>Home</a>
     <a href="#setup" data-go="setup"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 6h16M4 12h10M4 18h6"></path></svg>Setup</a>
@@ -2375,6 +2381,30 @@ function msNextSetup(bars, A) {
   try { J = JSON.parse(localStorage.getItem('msJournal') || '[]'); if (!Array.isArray(J)) J = []; } catch (e) { J = []; }
   const jSave = () => { try { localStorage.setItem('msJournal', JSON.stringify(J)); } catch (e) {} };
   const RES = { open: 'Open', win: 'Win', loss: 'Loss', be: 'Break-even', skip: 'Skipped' };
+  // System trades journal (5 Nov): every closed paper trade the council placed, adds folded into their first trade
+  function systemClosed() {
+    const C = COUNCIL, tr = (C.trades || []).filter((x) => SYS_K.includes(x.k) && !x.shadow && x.R != null && x.closed);
+    const rows = tr.filter((x) => !x.addOf).map((x) => ({ ...x }));
+    for (const a of tr.filter((x) => x.addOf)) { const q = rows.find((x) => x.id === a.addOf); if (q) { q.R = +(q.R + a.R).toFixed(2); q.closed = Math.max(q.closed, a.closed); q.exit = (q.exit ? q.exit + ' + ' : '') + 'add ' + (a.R >= 0 ? '+' : '−') + Math.abs(a.R).toFixed(2) + 'R'; } else rows.push({ ...a }); }
+    for (const r of (C.research || []).filter((x) => x.k === 'nq-open' && x.session === 'nyflip' && x.R != null && x.closed)) rows.push({ ...r, paper: true });
+    return rows.sort((a, b) => b.closed - a.closed);
+  }
+  function renderSystemJournal() {
+    const body = document.getElementById('ms-js-body'), st = document.getElementById('ms-js-stats'); if (!body) return;
+    const rows = systemClosed(), fR = (v) => `${v > 0 ? '+' : v < 0 ? '−' : ''}${Math.abs(v).toFixed(2)}R`;
+    body.innerHTML = rows.length ? rows.slice(0, 200).map((x) => { const d = { dec: x.dec != null ? x.dec : 2 };
+      return `<tr data-tid="${esc(x.id)}"><td>${ftime(x.closed + TZ)}</td><td><b>${esc(x.label)}</b></td><td>${esc(x.name)}${x.paper ? ' <small>paper</small>' : ''}</td><td><span class="ms-chip ${x.side === 'sell' ? 'ms-chip-sell' : 'ms-chip-buy'}">${x.side === 'sell' ? 'SELL' : 'BUY'}</span></td><td class="m">${fmtI(x.entry, d)}</td><td class="m">${fmtI(x.stop, d)}</td><td>${esc(x.exit || (x.status === 'be' ? 'breakeven' : x.R > 0 ? 'target' : 'stop'))}</td><td class="m ${x.R > 0 ? 'pos' : x.R < 0 ? 'neg' : ''}">${fR(x.R)}</td></tr>`; }).join('')
+      : '<tr class="empty"><td colspan="8">No closed system trade yet.</td></tr>';
+    const by = {}; for (const x of rows) { const k = x.name; (by[k] = by[k] || []).push(x.R); }
+    const tot = rows.reduce((a, x) => a + x.R, 0);
+    st.innerHTML = rows.length ? `<span><b>${rows.length}</b> closed</span><span>total <b class="${tot >= 0 ? 'pos' : 'neg'}">${fR(tot)}</b></span><span>win rate <b>${Math.round(rows.filter((x) => x.R > 0).length / rows.length * 100)}%</b></span>`
+      + Object.entries(by).map(([k, v]) => `<span>${esc(k)}: <b class="${v.reduce((a, b) => a + b, 0) >= 0 ? 'pos' : 'neg'}">${fR(v.reduce((a, b) => a + b, 0))}</b> over ${v.length} (${fR(v.reduce((a, b) => a + b, 0) / v.length)} a trade)</span>`).join('') : '';
+    const csv = document.getElementById('ms-js-csv');
+    if (csv && !csv.dataset.wired) { csv.dataset.wired = '1'; csv.addEventListener('click', () => {
+      const lines = [['closed', 'market', 'system', 'side', 'entry', 'stop', 'exit', 'R'].join(',')].concat(systemClosed().map((x) => [new Date(x.closed * 1000).toISOString(), x.label, x.name, x.side, x.entry, x.stop, (x.exit || '').replace(/,/g, ';'), x.R].join(',')));
+      const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([lines.join('\n')], { type: 'text/csv' })); a.download = 'council-system-trades.csv'; a.click(); }); }
+    if (!body.dataset.wired) { body.dataset.wired = '1'; body.addEventListener('click', (ev) => { const r = ev.target.closest('[data-tid]'); if (r && typeof openTrade === 'function') openTrade(r.dataset.tid); }); }
+  }
   function renderJournal() {
     if (!JEL) return;
     const dI = (x) => ({ dec: x.dec != null ? x.dec : 2 });
@@ -2697,11 +2727,11 @@ function msNextSetup(bars, A) {
       const fl = px != null && x.status === 'open' && r0 ? (px - x.entry) * s / r0 * size : null; if (fl != null) { tot += fl; pct += fl * (x.k === 'trend' ? 0.5 : 0.25); }
       const stopR = r0 ? (x.stop - x.entry) * s / r0 : -1; risk += Math.max(0, -stopR) * size;
       const age = Math.max(0, Date.now() / 1000 - (x.filled || x.opened)), ageT = age < 3600 ? `${Math.round(age / 60)} min` : `${(age / 3600).toFixed(1)} h`;
-      const mark = x.tp1 != null ? x.tp1 : x.t1, trail = x.k === 'trend' ? (x.exitRule === 'mid' ? `out on a daily close under ${fmtI(x.midStop, { dec: x.dec ?? 2 })} (channel midpoint)` : x.trailMoved ? `stop trails ${x.kATR || 4} ATR, locks ${fR(stopR)}` : `stop trails ${x.kATR || 4} ATR from each daily close`) : x.trail ? (x.trailMoved ? `trailing, stop locks ${fR(stopR)}` : `trailing from +${x.trail[0]}R`) : '';
+      const mark = x.tp1 != null ? x.tp1 : x.t1, trail = x.k === 'trend' ? (x.exitRule === 'mid' ? `out on a daily close under ${fmtI(x.midStop, { dec: x.dec ?? 2 })} (channel midpoint)` : x.trailMoved ? `stop trails ${x.kATR || 4} ATR, locks ${fR(stopR)}` : `stop trails ${x.kATR || 4} ATR from each daily close`) : x.trail ? (x.addOf ? (x.trailMoved ? `trails with the first trade, stop locks ${fR(stopR)}` : 'trails with the first trade after its +4R') : x.trailMoved ? `trailing, stop locks ${fR(stopR)}` : `trailing from +${x.trail[0]}R`) : '';
       return `<li data-tid="${esc(x.id)}" tabindex="0" title="Show this trade on a chart"><span class="chip ${x.side}">${x.side.toUpperCase()}</span>`
-        + `<span class="a-t"><b>${esc(x.label)}</b> ${esc(x.name)}${x.paper ? '<span class="tag">paper</span>' : ''}${!x.paper && !SYS_K.includes(x.k) ? '<span class="tag" title="Opened by the earlier council strategies, still managed to its exit">older strategy</span>' : ''}${size !== 1 ? `<span class="tag">${size}× size</span>` : ''}${x.status === 'pending' ? '<span class="tag">waiting fill</span>' : ''}</span>`
+        + `<span class="a-t"><b>${esc(x.label)}</b> ${esc(x.name)}${x.paper ? '<span class="tag">paper</span>' : ''}${x.addOf ? '<span class="tag" title="Second unit added at +2R, stop at the first entry; counted as 2R of risk">add</span>' : ''}${!x.paper && !SYS_K.includes(x.k) ? '<span class="tag" title="Opened by the earlier council strategies, still managed to its exit">older strategy</span>' : ''}${size !== 1 ? `<span class="tag">${size}× size</span>` : ''}${x.status === 'pending' ? '<span class="tag">waiting fill</span>' : ''}</span>`
         + `<span class="a-r ${fl == null ? '' : fl >= 0 ? 'pos' : 'neg'}">${fl == null ? '—' : fR(fl)}</span>`
-        + `<span class="a-d">Entry ${fmtI(x.entry, d)} · stop ${fmtI(x.stop, d)} · ${x.k === 'trend' ? 'no fixed target' : `${x.trail ? '2R mark' : 'target'} ${fmtI(mark, d)}`}${px != null ? ` · now ${fmtI(px, d)}${x.market === 'nq' ? ' (10 min delayed)' : ''}` : ''} · open ${ageT}${x.mfe ? ` · best +${(+x.mfe).toFixed(2)}R` : ''}${trail ? ` · ${trail}` : ''}</span></li>`;
+        + `<span class="a-d">Entry ${fmtI(x.entry, d)} · stop ${fmtI(x.stop, d)} · ${x.k === 'trend' ? 'no fixed target' : `${x.tp1 != null ? `${Math.round(Math.abs(x.tp1 - x.entry) / (r0 || 1))}R mark` : x.trail ? `trail from +${x.trail[0]}R at` : 'target'} ${fmtI(x.tp1 != null ? x.tp1 : x.trail ? x.entry + s * x.trail[0] * r0 : mark, d)}`}${px != null ? ` · now ${fmtI(px, d)}${x.market === 'nq' ? ' (10 min delayed)' : ''}` : ''} · open ${ageT}${x.mfe ? ` · best +${(+x.mfe).toFixed(2)}R` : ''}${trail ? ` · ${trail}` : ''}</span></li>`;
     }).join('') : '<li class="empty">No open trades right now. The system opens one when a gold replica signal passes (while gold is volatile), a Mosha BO setup completes (gold), a coin closes above its 55-day high (crypto trend), or the NQ open run fires (paper).</li>';
     const sum = document.getElementById('ms-active-sum');
     if (sum) sum.innerHTML = A.length ? `${A.length} open · at risk ${risk.toFixed(1)}R · floating <b class="${tot >= 0 ? 'pos' : 'neg'}">${fR(tot)}</b>` : '';
@@ -2712,16 +2742,21 @@ function msNextSetup(bars, A) {
   }
   setInterval(() => { try { renderActive(); } catch (e) {} }, 15e3);
   // Live vs expected (4 Nov): live replica R by trade number against the year replay's expectation (mean ± 1.645 SD·√n, 90%)
-  // and the kill switch (−7.2R at 30 trades, −7.8R at 50, −5.9R at 100; checked from trade 30)
+  // and the pause-check levels (5 Nov: −10R at 30 signals, −12R at 50)
   function renderTrack() {
     const el = document.getElementById('ms-rep-track'), txt = document.getElementById('ms-rep-track-txt'); if (!el) return;
-    const C = COUNCIL, live = (C.trades || []).filter((x) => x.k === 'replica' && x.market === 'xau' && !x.shadow && x.R != null && x.closed).sort((a, b) => a.closed - b.closed);
+    const C = COUNCIL, raw = (C.trades || []).filter((x) => x.k === 'replica' && x.market === 'xau' && !x.shadow && x.R != null && x.closed);
+    // a gold add (second unit at +2R) is folded into its first trade so one signal = one point, like the replay
+    const live = raw.filter((x) => !x.addOf).map((x) => ({ ...x }));
+    for (const a of raw.filter((x) => x.addOf)) { const q = live.find((x) => x.id === a.addOf); if (q) { q.R = +(q.R + a.R).toFixed(2); q.closed = Math.max(q.closed, a.closed); } else live.push({ ...a }); }
+    live.sort((a, b) => a.closed - b.closed);
     const rp = ((C.replay && C.replay.trades) || []).filter((x) => x.k === 'replica' && x.market === 'xau' && x.R != null).map((x) => x.R);
     const mu = rp.length > 50 ? rp.reduce((a, v) => a + v, 0) / rp.length : 0.197, sd = rp.length > 50 ? Math.sqrt(rp.reduce((a, v) => a + (v - mu) ** 2, 0) / rp.length) : 1.54;
     const n = live.length, N = Math.max(60, Math.ceil((n + 10) / 10) * 10), cum = [0]; live.forEach((x) => cum.push(cum.at(-1) + x.R));
-    const KS = [[30, -7.2], [50, -7.8], [100, -5.9]], ks = (k) => k < 30 ? null : k >= 100 ? -5.9 : (() => { const j = k < 50 ? 0 : 1, [a, ya] = KS[j], [b, yb] = KS[j + 1]; return ya + (yb - ya) * (k - a) / (b - a); })();
+    // pause check (5 Nov): a pause is proposed at or below −10R after 30 signals, −12R after 50 (flat after); the drift (CUSUM) check runs in the twice-daily review
+    const KS = [[30, -10], [50, -12], [100, -12]], ks = (k) => k < 30 ? null : k >= 100 ? -12 : (() => { const j = k < 50 ? 0 : 1, [a, ya] = KS[j], [b, yb] = KS[j + 1]; return ya + (yb - ya) * (k - a) / (b - a); })();
     const lo = (k) => mu * k - 1.645 * sd * Math.sqrt(k), hi = (k) => mu * k + 1.645 * sd * Math.sqrt(k);
-    const ys = cum.concat([lo(N), hi(N), -7.8, 2]), yMin = Math.floor(Math.min(...ys) - 1), yMax = Math.ceil(Math.max(...ys) + 1);
+    const ys = cum.concat([lo(N), hi(N), -12, 2]), yMin = Math.floor(Math.min(...ys) - 1), yMax = Math.ceil(Math.max(...ys) + 1);
     const W = Math.max(280, el.clientWidth || 600), H = 190, pl = 34, pr = 10, pt = 8, pb = 22;
     const X = (k) => pl + (W - pl - pr) * k / N, Y = (v) => pt + (H - pt - pb) * (yMax - v) / (yMax - yMin);
     const K = []; for (let k = 0; k <= N; k++) K.push(k);
@@ -2735,18 +2770,18 @@ function msNextSetup(bars, A) {
       + `<line x1="${pl}" x2="${W - pr}" y1="${Y(0)}" y2="${Y(0)}" stroke="var(--line)" stroke-width="1"/>`
       + [0, N / 2, N].map((k) => `<text x="${X(k)}" y="${H - 6}" text-anchor="${k === 0 ? 'start' : k === N ? 'end' : 'middle'}">${k}${k === N ? ' trades' : ''}</text>`).join('')
       + `<path d="${band}" fill="var(--ink-faint)" fill-opacity=".14"/><path d="${mid}" stroke="var(--ink-faint)" stroke-width="1.5" stroke-dasharray="4 4" fill="none"/>`
-      + (N >= 30 ? `<path d="${kl}" stroke="var(--sell)" stroke-width="2" stroke-dasharray="6 4" fill="none"/><text x="${X(N) - 2}" y="${Y(ks(N)) - 6}" text-anchor="end" style="fill:var(--sell)">kill switch</text>` : '')
+      + (N >= 30 ? `<path d="${kl}" stroke="var(--sell)" stroke-width="2" stroke-dasharray="6 4" fill="none"/><text x="${X(N) - 2}" y="${Y(ks(N)) - 6}" text-anchor="end" style="fill:var(--sell)">pause check</text>` : '')
       + (path ? `<path d="${path}" stroke="var(--accent)" stroke-width="2" fill="none" stroke-linejoin="round"/>` : '')
       + cum.slice(1).map((v, i) => `<circle cx="${X(i + 1)}" cy="${Y(v)}" r="${(W - pl - pr) / N >= 10 ? 4 : 2.5}" fill="var(--accent)" stroke="var(--panel)" stroke-width="2" data-i="${i}"/>`).join('')
       + `<rect x="${pl}" y="${pt}" width="${W - pl - pr}" height="${H - pt - pb}" fill="transparent" class="hit"/></svg>`
       + `<div class="tip"></div><div class="lg"><span><i style="border-color:var(--accent)"></i>Live (closed trades)</span><span><i style="border-color:var(--ink-faint);border-top-style:dashed"></i>Replay expectation, shaded 90% range</span><span><i style="border-color:var(--sell);border-top-style:dashed"></i>Kill switch (from trade 30)</span></div>`;
     const tip = el.querySelector('.tip'), hit = el.querySelector('.hit');
     const show = (ev) => { const r = el.querySelector('svg').getBoundingClientRect(), k = Math.max(0, Math.min(N, Math.round((ev.clientX - r.left - pl) / (r.width - pl - pr) * N)));
-      tip.innerHTML = `Trade ${k}: ${k <= n ? `live <b>${fR(cum[k])}</b>${k ? ` (${esc(live[k - 1].side)} ${fR(live[k - 1].R)})` : ''}<br>` : ''}expected ${fR(mu * k)} (${fR(lo(k))} to ${fR(hi(k))})${ks(k) != null ? `<br>kill switch ${fR(ks(k))}` : ''}`;
+      tip.innerHTML = `Trade ${k}: ${k <= n ? `live <b>${fR(cum[k])}</b>${k ? ` (${esc(live[k - 1].side)} ${fR(live[k - 1].R)})` : ''}<br>` : ''}expected ${fR(mu * k)} (${fR(lo(k))} to ${fR(hi(k))})${ks(k) != null ? `<br>pause check ${fR(ks(k))}` : ''}`;
       tip.style.display = 'block'; const x = X(k) * r.width / W; tip.style.left = `${Math.min(Math.max(0, x - tip.offsetWidth / 2), r.width - tip.offsetWidth)}px`; tip.style.top = '-6px'; };
     hit.addEventListener('pointermove', show); hit.addEventListener('pointerleave', () => { tip.style.display = 'none'; });
     if (txt) { const st = n === 0 ? 'No closed live trade yet.' : cum[n] < lo(n) ? `Below the expected range after ${n} trades.` : cum[n] > hi(n) ? `Above the expected range after ${n} trades.` : `Inside the expected range after ${n} trades.`;
-      txt.textContent = `${st} Live ${fR(cum[n] || 0)}; the replay expects ${fR(mu * n)} (90% range ${fR(lo(n))} to ${fR(hi(n))}). Expectation from ${rp.length || 500} replay trades: ${mu >= 0 ? '+' : ''}${mu.toFixed(2)}R a trade, SD ${sd.toFixed(2)}R. The kill switch is checked from trade 30.`; }
+      txt.textContent = `${st} Live ${fR(cum[n] || 0)}; the replay expects ${fR(mu * n)} (90% range ${fR(lo(n))} to ${fR(hi(n))}). Expectation from ${rp.length || 500} replay trades: ${mu >= 0 ? '+' : ''}${mu.toFixed(2)}R a trade, SD ${sd.toFixed(2)}R. Pause is proposed at or below −10R after 30 signals or −12R after 50, or on a drawdown beyond −27R (bootstrap 95th percentile −24R); a drift check (CUSUM) runs in the twice-daily review. A gold add is counted with its first trade.`; }
   }
   window.addEventListener('resize', () => { try { renderTrack(); } catch (e) {} });
   function renderReplica() {
@@ -2815,6 +2850,7 @@ function msNextSetup(bars, A) {
     renderReplica();
     renderPairs();
     renderActive();
+    try { renderSystemJournal(); } catch (e) {}
     const showSh = document.getElementById('ms-c-shadow'), withSh = showSh && showSh.checked;
     const mine = document.getElementById('ms-c-mine'), only = mine && mine.checked;
     const list = only ? T.filter((x) => x.market === instKey) : T;
