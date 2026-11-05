@@ -605,3 +605,16 @@ nq4h/sd.py, ~54 cells per dataset:
 - Recent NQ 14 Sep - 4 Nov 2026: 0.5 SD fade back to the 4H edge +16.3R over 48 (+0.34R): a hot streak (also Nov 2025 -
   Mar 2026 on NSX) inside a flat-to-negative 8-year record. That streak is likely what the owner sees on the chart.
 Verdict: no level/stop/target combination holds on both Nasdaq histories. Not added to the council.
+
+## 5 Nov: NQ opening-4H SD levels with a 1-minute IFVG entry (owner's entry model)
+
+At SD level k (0.5-4), after the touch: fade = an FVG left by the push into the level is inverted by a 1m close through its
+far side (enter at that close, within 60 min); continuation = an opposite FVG inverted with the move. Stops 1 pt past the
+extreme / past the FVG; targets the next half SD back ("next opposite one"), one full SD back, the 4H edge, 2R. Costs 0.5 /
+1 pt. NSX uses the DST-fixed sessions. Script nq4h/ifvg.py. R a trade, NQ 2023-24 | NQ 2025 | NSX 2018-26 | Sep-Nov 2026:
+- Fade 0.5 SD, target next (= 4H edge): +0.055 | +0.120 | −0.052 (t −1.7, n 2,771) | +0.229 (48).
+- Fade 2 SD ("2r"), stop past extreme, target 1 SD back: +0.068 | +0.162 | +0.040 | −0.078 (16); target the 4H edge:
+  +0.072 | +0.327 | +0.047 | −0.095. Best consistent family, but every t ≤ 1.5.
+- Next-half-SD targets ≈ 0 or negative at most levels; 2.5-4 SD fades and all continuation IFVGs negative on NSX.
+Verdict: the IFVG entry is better than the opposite-candle entry (the 2 SD fade turns mildly positive on three of four
+samples) but nothing is statistically significant. Paper-track candidate only.
