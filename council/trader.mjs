@@ -161,6 +161,9 @@ const USER_RULES = [
   { id: 'pairs-live', apply: (c) => { c.replicaLive = Object.keys(MARKETS); c.pairsLiveAt = Math.floor(Date.now() / 1000); c.pairVolPct = 80; c.pairStopR = -10; },
     change: 'Council: the other pairs (forex and crypto) trade the replica live on paper next to gold, each with its own volatility gate (20-day range in the top fifth of its last 365 daily candles) and a kill switch at −10R',
     why: "Owner: include gold and the other pairs in the council. Same rules as gold (v5, daily trend or H1 engulfing barrier, trail from +2R, max 3 open, −1.5R daily stop); gold's 1.5% gate is replaced on the pairs by the same idea measured against each pair's own history. Replay 2019-26 says the method loses on the pairs (see README), so each pair stops trading live once its forward total reaches −10R." },
+  { id: 'pairs-best', apply: (c) => { c.replicaLive = ['xau']; c.cryptoTrend = ['btc', 'eth', 'sol', 'xrp']; c.cryptoTrendStopR = -8; c.cryptoTrendAt = Math.floor(Date.now() / 1000); },
+    change: 'Pairs, best settings (owner asked): crypto trades a daily trend system (55-day breakout, long only, 4 ATR trailing stop, out on a close under the 27-day low); forex stops trading live (research only)',
+    why: "Walk-forward search on the pairs only. The replica: ~11,000 settings per pair, chosen on 2019-22 (forex) / 2022-23 (crypto): the 20 best on 7 of 9 pairs lost in the later years. Asia-range breakouts/fades and open sweeps lose on forex and crypto after costs. Daily trend-following on forex lost 2023-26 (0 of 5 pairs). Crypto daily trend (Binance 2017-2026, 0.8% round-trip cost), picked on 2018-21: 55-day breakout long-only with a 4 ATR trail +1.05R a trade, then 2022-26 +0.30R a trade with 8 of 10 coins positive; on the council's coins 2022-26 BTC +0.50R, ETH +0.39R, SOL +0.74R, XRP +1.29R a trade, worst drawdown 2-4R, ~3 trades a coin a year. Tight 2 ATR trails lose on every coin." },
   { id: 'mosha-bo-weekly', apply: (c) => { c.moshaBoWeekly = true; },
     change: "Mosha BO system: trades only in the weekly structure's direction (his \"Father\" timeframe); the M15 break no longer has to flip M15 structure",
     why: "From his multi-timeframe slides (father/mother/son). Spot gold 2019-26, H4->H1->M15, limit at the broken level, 3R, with the weekly direction computed the way the trader sees it live (Monday weeks built from the last 720 daily candles, swing size 3): weekly agrees 2019-22 +32.2R (87 trades, +0.37R a trade), 2023-26 +34.2R (99, +0.35R), 7 of 8 years positive, worst drawdown -18.4R; weekly against -28.3R / -15.8R. The previous flip-only rule: +7.5R / +15.1R. Caveat: the weekly filter did not help the other timeframe chains, so it is watched by the kill switch like everything else." },
@@ -376,7 +379,7 @@ for (const [key, M] of Object.entries(MARKETS)) {
       setups: setups.map((t) => ({ k: t.k, name: t.name, pair: t.pair, side: t.sell ? 'sell' : 'buy', state: t.state, entry: t.entry, stop: t.stop, t1: t.t1, rr: +t.rr.toFixed(2), next: t.next, retrace: !!t.retrace })),
     };
 
-    if (config.retireLegacy) for (const tr of trades.filter((x) => x.market === key && !x.shadow && x.k !== 'replica' && x.k !== 'mosha-bo' && (x.status === 'open' || x.status === 'pending'))) {
+    if (config.retireLegacy) for (const tr of trades.filter((x) => x.market === key && !x.shadow && x.k !== 'replica' && x.k !== 'mosha-bo' && x.k !== 'trend' && (x.status === 'open' || x.status === 'pending'))) {
       if (tr.status === 'pending') { tr.status = 'expired'; tr.R = 0; } else { const r0 = tr.r0 || Math.abs(tr.entry - tr.stop), R = +(((tr.side === 'sell' ? -1 : 1) * (price - tr.entry)) / r0).toFixed(2); tr.R = R; tr.status = R > 0 ? 'win' : R < 0 ? 'loss' : 'be'; }
       tr.closed = now; tr.exit = 'retired';
     }
@@ -453,6 +456,41 @@ for (const [key, M] of Object.entries(MARKETS)) {
     // 4. pullback entry: limit at the broken M15 level, stop past the M15 Origin, target 3R (his 1:2 or 1:3), valid 24 h,
     // out after 72 h. Spot gold, engine events causal: 2019-22 104 trades +7.5R (2R +11.5R), 2023-26 114 trades +15.1R
     // (+0.13R a trade), no volatility gate needed. Lower-timeframe chains (H1-M15-M5, M30-M15-M5) lost and are not used.
+    // Crypto trend (5 Nov, user rule pairs-best): daily 55-day breakout, long only. Entry the first run after a daily close above
+    // the prior 55 daily highs (at market, about the close); initial stop 4 x ATR(20) below; each daily close lifts the stop to
+    // 4 ATR under the best close so far; out on a daily close under the prior 27 daily lows (at market). One trade per coin.
+    // A coin stops opening trend trades once its forward trend total reaches config.cryptoTrendStopR (−8R).
+    if ((config.cryptoTrend || []).includes(key)) {
+      try {
+        const D = src['1d'].bars.slice(0, -1), n = D.length, last = D[n - 1];
+        const tr = (i) => Math.max(D[i].high - D[i].low, Math.abs(D[i].high - D[i - 1].close), Math.abs(D[i].low - D[i - 1].close));
+        const atrAt = (i) => { let a = 0; for (let j = i - 19; j <= i; j++) a += tr(j); return a / 20; };
+        const hi55 = Math.max(...D.slice(n - 56, n - 1).map((b) => b.high)), lo27 = Math.min(...D.slice(n - 28, n - 1).map((b) => b.low)), A = atrAt(n - 1);
+        const mine = trades.filter((x) => x.k === 'trend' && x.market === key && !x.shadow);
+        const open = mine.find((x) => x.status === 'open'), fwdR = mine.filter((x) => x.R != null && x.closed && x.opened >= (config.cryptoTrendAt || 0)).reduce((a, x) => a + x.R, 0);
+        const stopped = config.cryptoTrendStopR != null && fwdR <= config.cryptoTrendStopR;
+        if (open) {
+          // daily management on every closed day since the last one handled
+          for (const b of D.filter((b) => b.time > (open.lastD || open.filled - 86400) && b.time >= Math.floor(open.filled / 86400) * 86400)) {
+            const i = D.indexOf(b); if (i < 28) continue;
+            open.best = Math.max(open.best || open.entry, b.close);
+            const ns = +(open.best - 4 * atrAt(i)).toFixed(Math.max(2, (M.dec ?? 2) + 1));
+            if (ns > open.stop) { open.stop = ns; open.trailMoved = true; }
+            const l27 = Math.min(...D.slice(i - 27, i).map((x) => x.low));
+            if (b.close < l27 && i === n - 1) { const r0 = open.r0, R = +((price - open.entry) / r0).toFixed(2); open.status = R > 0 ? 'win' : R < 0 ? 'loss' : 'be'; open.R = R; open.closed = now; open.exit = '27-day low'; }
+            open.lastD = b.time;
+          }
+        } else if (last.close > hi55 && !stopped && !trades.some((x) => x.id === `${key}-trend-${last.time}`) && now - (last.time + 86400) < 86400) {
+          const dp = Math.max(2, (M.dec ?? 2) + 1), entry = +price.toFixed(dp), stop = +(entry - 4 * A).toFixed(dp), r0 = entry - stop;
+          if (r0 > 0) trades.push({ id: `${key}-trend-${last.time}`, market: key, label: M.label, dec: M.dec, k: 'trend', name: 'Crypto trend', pair: 'D1 55-day breakout', h: '1d', side: 'buy',
+            entry, stop, t1: +(entry * 100).toFixed(2), rr: 99, trail: [1e6, 0], buf: CFG.buf, opened: now, filled: now, checked: now, status: 'open', R: null, r0, noBe: true, entryMode: 'market', lastD: last.time, best: last.close,
+            feat: { hi55: +hi55.toFixed(4), atr: +A.toFixed(4) }, shadow: false, blockedBy: [],
+            note: `Crypto trend: daily close ${last.close} above the 55-day high ${hi55}. Buy at market, stop 4 ATR below (${stop}); each daily close lifts the stop to 4 ATR under the best close; out on a daily close under the 27-day low.` });
+        }
+        (snapshot.trend = snapshot.trend || {})[key] = { label: M.label, close: last.close, hi55: +hi55.toFixed(4), lo27: +lo27.toFixed(4), atr: +A.toFixed(4), open: !!open || trades.some((x) => x.id === `${key}-trend-${last.time}` && x.status === 'open'),
+          stop: open ? open.stop : null, toBreakout: +((hi55 / price - 1) * 100).toFixed(2), n: mine.filter((x) => x.R != null).length, R: +fwdR.toFixed(2), stopped };
+      } catch (e) { snapshot.errors.trend = String(e.message || e); }
+    }
     if (key === 'xau' && config.moshaBo) {
       const ev = (id, sec) => { const bb = src[id].bars; return src[id].A.events.filter((e) => e.breakIdx < bb.length - 1).map((e) => ({ t: bb[e.breakIdx].time + sec, dir: e.dir, level: e.level, top: e.top, bot: e.bot, flip: e.structure })); };
       try {
@@ -1337,7 +1375,7 @@ if (nqLast) snapshot.nqLast = nqLast;
   const ev = [];
   for (const x of trades.filter((x) => !x.shadow).concat(research.filter((x) => x.k === 'nq-open'))) {
     const nm = `${x.label} ${x.k === 'nq-open' ? x.name + ' (paper)' : x.name}`;
-    if (!x.ntfyO && x.status === 'open' && x.filled >= now - 900) { x.ntfyO = 1; ev.push({ title: `${x.side.toUpperCase()} ${nm}`, msg: `Entry ${fmt(x.entry, x.dec)}, stop ${fmt(x.stop, x.dec)}${x.tp1 != null ? `, 2R mark ${fmt(x.tp1, x.dec)}, then trailing` : `, target ${fmt(x.t1, x.dec)}`}${x.size && x.size !== 1 ? ` · ${x.size}× size` : ''}`, tags: x.side === 'sell' ? 'chart_with_downwards_trend' : 'chart_with_upwards_trend' }); }
+    if (!x.ntfyO && x.status === 'open' && x.filled >= now - 900) { x.ntfyO = 1; ev.push({ title: `${x.side.toUpperCase()} ${nm}`, msg: `Entry ${fmt(x.entry, x.dec)}, stop ${fmt(x.stop, x.dec)}${x.k === 'trend' ? ' (4 ATR, trails each daily close), no fixed target' : x.tp1 != null ? `, 2R mark ${fmt(x.tp1, x.dec)}, then trailing` : `, target ${fmt(x.t1, x.dec)}`}${x.size && x.size !== 1 ? ` · ${x.size}× size` : ''}`, tags: x.side === 'sell' ? 'chart_with_downwards_trend' : 'chart_with_upwards_trend' }); }
     if (!x.ntfyC && x.R != null && x.closed && x.closed >= now - 900 && ['win', 'loss', 'be'].includes(x.status)) { x.ntfyC = 1; ev.push({ title: `${x.status === 'win' ? 'Win' : x.status === 'loss' ? 'Loss' : 'Break-even'} ${fR(x.R)} · ${nm}`, msg: `${x.side.toUpperCase()} from ${fmt(x.entry, x.dec)}${x.exit ? ` · ${x.exit}` : ''}`, tags: x.R > 0 ? 'white_check_mark' : x.R < 0 ? 'x' : 'heavy_minus_sign' }); }
   }
   // Telegram (4 Nov): the same events to a Telegram chat. Needs the repository secret TELEGRAM_BOT_TOKEN (from @BotFather).
