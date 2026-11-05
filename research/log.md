@@ -527,3 +527,29 @@ both halves — significant for that one cell alone, not after picking it from ~
 **Where an edge could still be:** the discretionary part (why a setup is skipped, "why failed?") is not in any mechanical
 rule tested. The direct test is Mosha's own call record: with 50-100 of his Private Room calls (time, entry, stop, target),
 his real hit rate can be measured and compared with what the engine flags at the same moments.
+
+## 5 Nov: pairs join the council; the owner's NQ "opening 4H candle" idea
+
+**Pairs (user rule `pairs-live`, PR #205).** The replica's live rules replayed on every council market (forex HistData 1m,
+crypto Binance 5m; gate = 20-day range in the top fifth of the market's own last 365 daily candles; daily trend or H1 EG
+barrier; trail from +2R; max 3 open, −1.5R daily stop), 2023 - Oct 2026: EUR/USD −15.5R (128), GBP/USD −31.2R (123),
+AUD/USD −25.4R (142), USD/CAD −22.6R (115), USD/CHF −37.5R (106), BTC −46.2R (271), ETH +1.9R (293), SOL +10.5R (133),
+XRP +4.3R (156) → pairs −161.7R over 1,467. 2019-22 forex also negative except EUR/USD +53R. Gold in the same harness
++86R over 377 (2023-26), which matches the live gold replay (+72R over 392). The pairs trade live on paper anyway (owner's
+call) with a −10R kill switch per pair; their replay is in replay-2w.json so the council total shows the cost. Found and
+fixed on the way: replica records rounded prices to 2 decimals (all forex research before 5 Nov is meaningless).
+
+**NQ opening 4H candle (owner's TradingView indicator "NQ Opening 4H Candle High/Low").** Levels: the high/low of the first
+4-hour candle of the CME day (18:00-22:00 ET = 23:00-03:00 UK), ±50% of its range beyond them, ±2x range ("2r"). Rule as
+given: after that candle closes, when price reaches +50% or −50%, trade the opposite way (or to 2r). Tested every reading,
+one trade a session, 22:00-16:00 ET, 0.5 pt (futures) / 1 pt (cash) cost:
+- The ±50% line is reached on 741 of 767 sessions (NQ futures 2023-25): it is a normal day's range, not an extreme.
+- Fade at the touch, 3 stops (the 2r line / 0.5 range / 0.25 range) x 6 targets (1R, 2R, the 4H edge, range mid, the
+  opposite edge, the opposite 50% line): NQ futures between −0.047 and +0.055R a trade; NSX 2018-26 between −0.162 and
+  +0.038R. The best pair on both (stop 0.5 range, target the opposite 50% line: +0.042 / +0.038R, ~800 trades) is far from
+  significant (t ≈ 0.6) and has losing years on both (NQ 2025 −45R, NSX 2018 −24R).
+- Follow-through to the 2r line (stop back at the 4H edge): NQ −0.025R, NSX +0.020R.
+- Rejection version (5-minute close back inside the 50% line, stop past the sweep extreme): 2R −0.084R (NQ) / −0.196R (NSX);
+  target the opposite 4H edge +0.158R on NQ but +0.006R in its first half and −0.108R on NSX 2018-26.
+Verdict: no edge in any reading on 3 years of NQ futures or 8 years of Nasdaq cash. Not added. If the owner has the exact
+stop/entry rules, test that version only.
