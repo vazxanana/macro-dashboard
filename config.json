@@ -1,7 +1,7 @@
 {
  "buf": 0.15,
  "minRR": 1.2,
- "minRisk": 0.8,
+ "minRisk": 0.9,
  "be": null,
  "fresh": 12,
  "newsGuard": true,
@@ -317,6 +317,18 @@
    "by": "user",
    "change": "Mosha BO system: trades only in the weekly structure's direction (his \"Father\" timeframe); the M15 break no longer has to flip M15 structure",
    "why": "From his multi-timeframe slides (father/mother/son). Spot gold 2019-26, H4->H1->M15, limit at the broken level, 3R, with the weekly direction computed the way the trader sees it live (Monday weeks built from the last 720 daily candles, swing size 3): weekly agrees 2019-22 +32.2R (87 trades, +0.37R a trade), 2023-26 +34.2R (99, +0.35R), 7 of 8 years positive, worst drawdown -18.4R; weekly against -28.3R / -15.8R. The previous flip-only rule: +7.5R / +15.1R. Caveat: the weekly filter did not help the other timeframe chains, so it is watched by the kill switch like everything else."
+  },
+  {
+   "at": "2026-11-05T00:02:31.000Z",
+   "by": "user",
+   "change": "Council: the other pairs (forex and crypto) trade the replica live on paper next to gold, each with its own volatility gate (20-day range in the top fifth of its last 365 daily candles) and a kill switch at −10R",
+   "why": "Owner: include gold and the other pairs in the council. Same rules as gold (v5, daily trend or H1 engulfing barrier, trail from +2R, max 3 open, −1.5R daily stop); gold's 1.5% gate is replaced on the pairs by the same idea measured against each pair's own history. Replay 2019-26 says the method loses on the pairs (see README), so each pair stops trading live once its forward total reaches −10R."
+  },
+  {
+   "at": "2026-11-05T00:02:31.000Z",
+   "by": "coach-stats",
+   "change": "Minimum stop 0.8 → 0.9 ATR",
+   "why": "Win rate 17% over 36 trades: stops get hit by normal candle noise."
   }
  ],
  "btAt": "2026-11-04T11:20:16.389Z",
@@ -336,7 +348,8 @@
   "gold-d1-with",
   "gold-eg-barrier",
   "mosha-bo",
-  "mosha-bo-weekly"
+  "mosha-bo-weekly",
+  "pairs-live"
  ],
  "target": {},
  "targetBy": {},
@@ -347,16 +360,20 @@
  "noPause": true,
  "wouldPause": {
   "rintra": {
-   "at": "2026-11-04T23:58:14.000Z",
+   "at": "2026-11-05T00:02:31.000Z",
    "why": "four losses in a row"
   },
   "scalp": {
-   "at": "2026-11-04T23:58:14.000Z",
+   "at": "2026-11-05T00:02:31.000Z",
    "why": "expectancy -1.00R over 13 trades"
   },
   "xau": {
-   "at": "2026-11-04T00:02:58.000Z",
-   "why": "market: -0.86R per trade over 7 trades"
+   "at": "2026-11-05T00:02:31.000Z",
+   "why": "market: -0.60R per trade over 10 trades"
+  },
+  "btc": {
+   "at": "2026-11-05T00:02:31.000Z",
+   "why": "market: -1.00R per trade over 6 trades"
   }
  },
  "repairs": [
@@ -367,7 +384,16 @@
   "none"
  ],
  "replicaLive": [
-  "xau"
+  "xau",
+  "btc",
+  "eth",
+  "sol",
+  "xrp",
+  "eurusd",
+  "gbpusd",
+  "audusd",
+  "usdcad",
+  "usdchf"
  ],
  "newsSince": "2026-11-04T00:02:58.000Z",
  "retireLegacy": true,
@@ -375,5 +401,8 @@
  "goldD1With": true,
  "goldEgBarrier": true,
  "moshaBo": true,
- "moshaBoWeekly": true
+ "moshaBoWeekly": true,
+ "pairsLiveAt": 1793836951,
+ "pairVolPct": 80,
+ "pairStopR": -10
 }

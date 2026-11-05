@@ -1,6 +1,6 @@
 {
- "date": "2026-11-04",
- "at": "2026-11-04T00:02:58.000Z",
+ "date": "2026-11-05",
+ "at": "2026-11-05T00:02:31.000Z",
  "stats": {
   "rscalp": {
    "n": 6,
@@ -10,84 +10,105 @@
    "exp": -0.83
   },
   "scalp": {
-   "n": 15,
+   "n": 16,
    "w": 1,
-   "wr": 0.06666666666666667,
-   "R": -8.89,
-   "exp": -0.59
+   "wr": 0.0625,
+   "R": -9.89,
+   "exp": -0.62
   },
   "intraday": {
-   "n": 4,
+   "n": 5,
    "w": 2,
-   "wr": 0.5,
-   "R": 3.05,
-   "exp": 0.76
+   "wr": 0.4,
+   "R": 2.05,
+   "exp": 0.41
   },
   "rintra": {
-   "n": 4,
+   "n": 5,
    "w": 0,
    "wr": 0,
-   "R": -3,
-   "exp": -0.75
+   "R": -4,
+   "exp": -0.8
+  },
+  "position": {
+   "n": 1,
+   "w": 1,
+   "wr": 1,
+   "R": 0.03,
+   "exp": 0.03
+  },
+  "swing": {
+   "n": 1,
+   "w": 1,
+   "wr": 1,
+   "R": 0.44,
+   "exp": 0.44
+  },
+  "replica": {
+   "n": 2,
+   "w": 1,
+   "wr": 0.5,
+   "R": 1,
+   "exp": 0.5
   }
  },
  "last14": {
-  "n": 29,
-  "w": 3,
-  "wr": 0.10344827586206896,
-  "R": -13.84,
-  "exp": -0.48
+  "n": 36,
+  "w": 6,
+  "wr": 0.16666666666666666,
+  "R": -15.37,
+  "exp": -0.43
  },
  "lessons": {
-  "n": 183,
-  "losses": 117,
-  "system": 63,
-  "market": 54,
+  "n": 330,
+  "losses": 218,
+  "system": 102,
+  "market": 116,
   "byCause": {
    "retrace-fail": {
-    "n": 11,
-    "R": -11,
+    "n": 19,
+    "R": -19,
     "verdict": "market",
     "title": "The retracement never came",
     "lesson": "Retracement trades work best right after a strong HTF VR; skip them when the HTF move is still impulsive.",
-    "live": 3,
-    "shadow": 8
+    "live": 4,
+    "shadow": 15
    },
    "hunt": {
-    "n": 5,
-    "R": -5,
+    "n": 7,
+    "R": -7,
     "verdict": "system",
     "title": "Right idea, stopped out first",
     "lesson": "Put the stop past the next swing or the liquidity just beyond the CF, or wait for the sweep before entering.",
     "live": 1,
-    "shadow": 4
+    "shadow": 6
    },
    "leftmoney": {
-    "n": 24,
-    "R": 65.61,
+    "n": 41,
+    "R": 99.36,
     "verdict": "system",
     "title": "Target left money on the table",
     "lesson": "Consider holding part of the position for the next target.",
     "live": 1,
-    "shadow": 23
+    "shadow": 40
    },
    "reversal": {
-    "n": 9,
-    "R": -9,
+    "n": 17,
+    "R": -17,
     "verdict": "market",
     "title": "The market turned for real",
     "lesson": "Valid loss: the stop did its job. Nothing to fix unless this setup keeps doing it.",
     "live": 1,
-    "shadow": 8
+    "shadow": 16
    },
    "clean": {
-    "n": 32,
-    "R": 48.6,
+    "n": 61,
+    "R": 108.34,
     "verdict": "market",
     "title": "Clean win",
     "lesson": "The setup worked as designed.",
-    "live": 2,
-    "shadow": 30
+    "live": 5,
+    "shadow": 56
    },
    "becost": {
     "n": 3,
@@ -99,22 +120,22 @@
     "shadow": 1
    },
    "normal": {
-    "n": 24,
-    "R": -24,
+    "n": 49,
+    "R": -49,
     "verdict": "market",
     "title": "Normal loss",
     "lesson": "An accepted cost of trading. Count it, don't change the rules for it.",
     "live": 3,
-    "shadow": 21
+    "shadow": 46
    },
    "late": {
-    "n": 1,
-    "R": -1,
+    "n": 2,
+    "R": -2,
     "verdict": "system",
     "title": "Late entry",
     "lesson": "Take signals within the first few candles after the CF.",
     "live": 1,
-    "shadow": 0
+    "shadow": 1
    },
    "besaved": {
     "n": 7,
@@ -126,54 +147,50 @@
     "shadow": 4
    },
    "against": {
-    "n": 31,
-    "R": -31,
+    "n": 44,
+    "R": -44,
     "verdict": "system",
     "title": "Against the D1 trend",
     "lesson": "Favour trades with the D1 trend, or demand more reward:risk against it.",
     "live": 7,
-    "shadow": 24
+    "shadow": 37
    },
    "gaveback": {
-    "n": 26,
-    "R": -26,
+    "n": 49,
+    "R": -49,
     "verdict": "system",
     "title": "Gave back the profit",
     "lesson": "Move the stop to break-even or take a partial at +1R.",
     "live": 3,
-    "shadow": 23
+    "shadow": 46
    },
    "gap": {
-    "n": 4,
-    "R": -4,
+    "n": 16,
+    "R": -16,
     "verdict": "market",
     "title": "Price gapped through the stop",
     "lesson": "Gaps happen at reopens and on news; size so a gap is survivable.",
     "live": 0,
-    "shadow": 4
+    "shadow": 16
    },
    "news": {
-    "n": 6,
-    "R": -6,
+    "n": 15,
+    "R": -15,
     "verdict": "market",
     "title": "News spike",
     "lesson": "Avoid holding scalps and intraday trades through high-impact news: check the calendar before entering.",
-    "live": 2,
-    "shadow": 4
+    "live": 5,
+    "shadow": 10
    }
   },
   "top": [
-   "Against the D1 trend (31×): Favour trades with the D1 trend, or demand more reward:risk against it.",
-   "Gave back the profit (26×): Move the stop to break-even or take a partial at +1R.",
-   "Target left money on the table (24×): Consider holding part of the position for the next target."
+   "Gave back the profit (49×): Move the stop to break-even or take a partial at +1R.",
+   "Against the D1 trend (44×): Favour trades with the D1 trend, or demand more reward:risk against it.",
+   "Target left money on the table (41×): Consider holding part of the position for the next target."
   ]
  },
- "fslot": "2026-11-04T18",
+ "fslot": "2026-11-05T00",
  "notes": [
-  "Minimum stop 0.7 → 0.8 ATR: Win rate 10% over 29 trades: stops get hit by normal candle noise.",
-  "rscalp: trading the asia session again: Blocked trades made +0.29R over 5.",
-  "News guard on: Reviews: 4 losses came from high-impact news; no short-term trades from 15 min before to 45 min after news.",
-  "rscalp: skip the asia session: -0.57R over 9 trades there; +0.14R elsewhere.",
-  "intraday: skip the asia session: -0.38R over 6 trades there; +1.74R elsewhere."
+  "Minimum stop 0.8 → 0.9 ATR: Win rate 17% over 36 trades: stops get hit by normal candle noise."
  ]
 }
