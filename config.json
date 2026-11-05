@@ -347,6 +347,12 @@
    "by": "user",
    "change": "Gold replica: fixed 4R target instead of the trail from +2R (stop unchanged, out after 48 h)",
    "why": "Owner: judge gold on the last 2-3 years. 2023-26 spot, live gate and direction rules, signals: 4R +0.23R a trade (2023-24) / +0.20R (2025-26), +105R; trail +0.31R / +0.16R, +98R. 4R is better in the recent half and steadier across both; tighter stops lost in every combination."
+  },
+  {
+   "at": "2026-11-05T13:33:08.000Z",
+   "by": "user",
+   "change": "Gold replica: trades only with the daily trend; the H1 engulfing-barrier exception (a trade against the daily trend) is off",
+   "why": "Owner: judge gold on 2023 onwards. With the 4R exit the exception loses every year: 2023 -5.6R (5), 2024 -4.6R (21), 2025 -2.8R (19), 2026 -2.1R (37), -15R over 82 trades, while daily-trend trades make +0.42R (2023-24) / +0.25R (2025-26) a trade. It only paid under the old trail exit in 2025-26 (+0.22R)."
   }
  ],
  "btAt": "2026-11-05T11:21:05.226Z",
@@ -370,7 +376,8 @@
   "pairs-live",
   "pairs-best",
   "gold-adaptive-gate",
-  "gold-4r"
+  "gold-4r",
+  "gold-no-eg"
  ],
  "target": {},
  "targetBy": {},
@@ -381,11 +388,11 @@
  "noPause": true,
  "wouldPause": {
   "rintra": {
-   "at": "2026-11-05T13:27:53.000Z",
+   "at": "2026-11-05T13:33:08.000Z",
    "why": "four losses in a row"
   },
   "scalp": {
-   "at": "2026-11-05T13:27:53.000Z",
+   "at": "2026-11-05T13:33:08.000Z",
    "why": "expectancy -1.00R over 13 trades"
   },
   "xau": {
@@ -415,7 +422,7 @@
  "retireLegacy": true,
  "goldVolMin": 1.5,
  "goldD1With": true,
- "goldEgBarrier": true,
+ "goldEgBarrier": false,
  "moshaBo": true,
  "moshaBoWeekly": true,
  "pairsLiveAt": 1793836951,
