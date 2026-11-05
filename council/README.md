@@ -494,3 +494,12 @@ trailing 2R behind from +2R. Replay with the live risk rules, spot gold: 2025–
 With the 4R exit, trades against the daily trend taken from an H1 engulfing barrier lose in every year 2023–26 (−15R over 82),
 while daily-trend trades make +0.42R / +0.25R a trade (2023–24 / 2025–26). `config.goldEgBarrier` is now false; the gold
 replica trades only with the daily trend. `atEG` is still recorded on every signal for research.
+
+## Gold replica: top-fifth gate and breakeven at +2R (5 Nov, user rule `gold-top-be`)
+
+Owner: more profit, less drawdown, judged on 2023 onwards. The gate is now the percentile leg only (`goldVolMin` null,
+`goldVolPct` 80): live while gold's 20-day range is in the top fifth of its own last year. Trades at ≥1.5% but below that made
++0.02R a trade (168, 2025–26); top-fifth trades +0.40R in both halves. Once a trade reaches +2R its stop moves to the entry
+(`beAt` on the trade). With the live risk rules: current gate +111R / worst drawdown −25.1R (ratio 4.4) → top fifth only
++88R / −14.8R (6.0) → top fifth + breakeven +93R / −11.7R (7.9), better in both halves (2023–24 +37.9R vs +34.0R, 2025–26
++55.0R vs +54.4R). At equal drawdown the new rule earns about 80% more.
