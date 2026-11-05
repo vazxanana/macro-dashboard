@@ -37,6 +37,13 @@ for a stop hit while the EA is offline).
 5. The terminal must stay on: a VPS or a machine that never sleeps. Offline = no new trades and no stop updates
    (broker-side stops and targets still protect open positions).
 
+## Late entries
+The bot runs every 4 min and the EA polls every 30 s, so a gold signal is mirrored 1–5 min after it fired. Replaying the
+live gold rules 2023–26 with the entry at the 1-minute close 2 / 4 / 6 min after the signal (council stop and target
+unchanged, skip when price has moved more than 0.5R either way): +188.6 / +190.0 / +195.5R vs the council's +185.9R, same
+or lower drawdown; the few signals that run more than 0.5R in the first minutes are net losers. A 0.3R band skipped too
+many good trades (+173R). Hence `InpMaxSlipR = 0.5`.
+
 ## What the replay says at 0.25% risk per trade (2025–26, all systems)
 +1.8% a month, worst drawdown −3.9%, worst day −1.3%, +5% reached after ~45 trades (about two months);
 shuffled trade orders breach an 8% drawdown before +5% in 0.1% of runs. At 0.5% gold / 0.5% crypto the pace is
