@@ -720,3 +720,4 @@ Deep research (report: reports/Chart Fanatics strategy library.md in the working
 - **Crypto v3 exit (PR #214):** channel-midpoint ratchet exit: Sharpe 1.67 / 0.81 vs 1.50 / 0.58, max DD −28% / −21% vs −39% / −27%. 20–360 ensemble and vol-target sizing not better in 2022–26. BTC 200-day gate: tiny. Applied.
 - **NQ wide exit** (half at 2R, rest trailed 1R or behind the time-weighted mean to 16:00): −0.04R / +0.27R vs +0.02R / +0.28R. Not applied.
 - **Monitoring:** the scheduled check now uses CUSUM (k = half the edge, review at 12, pause proposal at 20) plus catastrophe checks, instead of the 30/50-trade cumulative-R rules.
+- **NQ open run by volatility regime** (14-day avg RTH range %, terciles from 2018–22: 1.26 / 1.98%): low +0.01R (n144) | +0.30R (n130); mid +0.07R (144) | +0.25R (115); high −0.01R (145) | +0.33R (30). No volatility effect in either half; no filter. (VIX history not reachable from this environment; realised vol used instead.)
