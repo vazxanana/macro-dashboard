@@ -590,6 +590,7 @@
     .card { padding: 16px; } .tile { padding: 16px; }
   }
   .c-nq { grid-column: 1 / -1; }
+  .c-pairs { grid-column: 1 / -1; }
 </style>
 </head>
 <body>
@@ -766,7 +767,7 @@
         <ul class="c-act" id="ms-active"></ul>
       </div>
       <div class="card c-trader">
-        <div class="ms-k"><span>Trader · paper trades, all markets, every 4 min</span><span class="c-tog"><label class="c-mine" title="Only our system: the live gold replica trades plus the replay of the 2 months before it went live"><input type="checkbox" id="ms-c-sys" checked> Our system only</label><label class="c-mine"><input type="checkbox" id="ms-c-shadow"> Show shadow trades</label><label class="c-mine"><input type="checkbox" id="ms-c-mine"> This market only</label></span></div>
+        <div class="ms-k"><span>Trader · paper trades, all markets, every 4 min</span><span class="c-tog"><label class="c-mine" title="Only our system: NQ New York open run, gold (replica, Mosha BO) and the pairs (replica), live paper trades plus their replays"><input type="checkbox" id="ms-c-sys" checked> Our system only</label><label class="c-mine"><input type="checkbox" id="ms-c-shadow"> Show shadow trades</label><label class="c-mine"><input type="checkbox" id="ms-c-mine"> This market only</label></span></div>
         <div class="c-kpi" id="ms-c-kpi"></div>
         <div class="c-eq" id="ms-c-eq"></div>
         <div class="ms-bt-wrap"><table class="ms-bt-t c-t"><thead><tr><th>Opened</th><th>Market</th><th>Setup</th><th>Side</th><th class="n">Entry</th><th class="n">Stop</th><th class="n">Target 1</th><th>Result</th></tr></thead><tbody id="ms-c-trades"></tbody></table></div>
@@ -792,9 +793,15 @@
         <p class="ms-note" id="ms-rep-paper"></p>
         <ul class="cal-day" id="ms-rep-list"></ul>
       </div>
+      <div class="card c-pairs">
+        <div class="ms-k"><span>Pairs · the replica on forex and crypto (paper, since 5 Nov)</span><span id="ms-pairs-sum" class="c-act-sum"></span></div>
+        <p class="ms-note">Same rules as gold: a 2+ M15 ATR leg, then an M5 CHoCH against the H4 trend, in the daily trend direction or from a live H1 engulfing barrier; stop past the extreme, from +2R the stop trails 2R behind, out after 48 h; max 3 open per pair, −1.5R daily stop. Gold's 1.5% gate becomes a gate measured on each pair's own history: it trades only while its 20-day range is in the top fifth of its last 365 daily candles. A pair stops trading live once its forward total reaches <b>−10R</b>.</p>
+        <p class="ms-note"><b>What the history says:</b> the same rules replayed on 1-minute history lost on every forex pair in 2023–26 (about −0.2R a trade, after spread), while gold made money. They trade here because the owner wants the whole council on paper. Judge them by their own totals, not by gold's.</p>
+        <div class="ms-bt-wrap"><table class="ms-bt-t c-t"><thead><tr><th>Pair</th><th class="n">20-day range</th><th class="n">Gate</th><th>Now</th><th class="n">Forward</th><th class="n">Replay 2023–26</th></tr></thead><tbody id="ms-pairs"></tbody></table></div>
+      </div>
       <div class="card c-cal">
-        <div class="ms-k"><span>Calendar · result by day (R, trades closed that day)</span><span class="c-tog"><span class="cal-nav"><button type="button" id="ms-cal-prev" aria-label="Previous month">‹</button><b id="ms-cal-m"></b><button type="button" id="ms-cal-next" aria-label="Next month">›</button></span><label class="c-mine"><input type="checkbox" id="ms-cal-sh"> Include shadow trades</label><label class="c-mine" title="Only our system: the live gold replica trades, plus its backtest replay (gold replica v4, NQ New York open) for the 2 months before it traded live"><input type="checkbox" id="ms-cal-rp" checked> Our system only (+ replay)</label></span></div>
-        <div class="cal-seg" role="group" aria-label="Markets in the calendar"><button type="button" data-mk="all" class="on" aria-pressed="true">Gold + NQ</button><button type="button" data-mk="xau" aria-pressed="false">Gold</button><button type="button" data-mk="nq" aria-pressed="false">NQ</button></div>
+        <div class="ms-k"><span>Calendar · result by day (R, trades closed that day)</span><span class="c-tog"><span class="cal-nav"><button type="button" id="ms-cal-prev" aria-label="Previous month">‹</button><b id="ms-cal-m"></b><button type="button" id="ms-cal-next" aria-label="Next month">›</button></span><label class="c-mine"><input type="checkbox" id="ms-cal-sh"> Include shadow trades</label><label class="c-mine" title="Only our system: NQ, gold and the pairs, live paper trades plus their replays"><input type="checkbox" id="ms-cal-rp" checked> Our system only (+ replay)</label></span></div>
+        <div class="cal-seg" role="group" aria-label="Markets in the calendar"><button type="button" data-mk="all" class="on" aria-pressed="true">All</button><button type="button" data-mk="xau" aria-pressed="false">Gold</button><button type="button" data-mk="nq" aria-pressed="false">NQ</button><button type="button" data-mk="pairs" aria-pressed="false">Pairs</button></div>
         <div class="cal" id="ms-cal"></div>
         <div class="cal-dayw" id="ms-cal-dayw" hidden><div class="cal-dayh" id="ms-cal-dayh"></div><ul class="cal-day" id="ms-cal-day"></ul></div>
         <p class="ms-note" id="ms-cal-sum"></p>
@@ -2609,10 +2616,11 @@ function msNextSetup(bars, A) {
     try { localStorage.setItem('msCouncilSeen', JSON.stringify(seen)); } catch (e) {}
   }
   // P&L calendar: the trades closed each local day, their total R and count; tap a day for its trades
-  const CAL = { y: null, m: null, sel: null, mk: 'nq' };
+  const CAL = { y: null, m: null, sel: null, mk: 'all' };
   // NQ setups that are part of our system: the New York open run only (4 Nov: it held on 3 years of NQ futures; the open sweeps did not). The others were
   // retired on the same 1-minute test and their records are not counted here.
   const NQ_SYS = ['nyflip'], nqSys = (x) => x.market !== 'nq' || NQ_SYS.includes(x.session);
+  const SYS_K = ['replica', 'mosha-bo'];   // live paper systems on gold and the pairs (the replica on every market, Mosha BO on gold)
   function renderCalendar() {
     const el = document.getElementById('ms-cal'); if (!el) return;
     const withSh = (document.getElementById('ms-cal-sh') || {}).checked;
@@ -2620,8 +2628,8 @@ function msNextSetup(bars, A) {
     const mkSel = CAL.mk || 'all';
     // forward NQ trades the Trader records on paper each New York session (research.json, k 'nq-open')
     const nqF = withRp ? (COUNCIL.research || []).filter((x) => x.k === 'nq-open' && nqSys(x) && ['win', 'loss', 'be'].includes(x.status) && x.closed && x.R != null).map((x) => ({ ...x, pair: 'M1', paper: true, forward: true })) : [];
-    const done = (COUNCIL.trades || []).filter((x) => ['win', 'loss', 'be'].includes(x.status) && x.closed && x.R != null && (withSh || !x.shadow) && (!withRp || x.k === 'replica')).concat(rp, nqF)
-      .filter((x) => mkSel === 'all' || x.market === mkSel);
+    const done = (COUNCIL.trades || []).filter((x) => ['win', 'loss', 'be'].includes(x.status) && x.closed && x.R != null && (withSh || !x.shadow) && (!withRp || SYS_K.includes(x.k))).concat(rp, nqF)
+      .filter((x) => mkSel === 'all' || (mkSel === 'pairs' ? x.market !== 'xau' && x.market !== 'nq' : x.market === mkSel));
     const key = (t) => { const d = new Date(t * 1000); return `${d.getFullYear()}-${d.getMonth()}-${d.getDate()}`; };
     const byDay = new Map(); for (const x of done) { const k = key(x.closed); (byDay.get(k) || byDay.set(k, []).get(k)).push(x); }
     const now = new Date(); if (CAL.y === null) { CAL.y = now.getFullYear(); CAL.m = now.getMonth(); }
@@ -2678,10 +2686,10 @@ function msNextSetup(bars, A) {
       const age = Math.max(0, Date.now() / 1000 - (x.filled || x.opened)), ageT = age < 3600 ? `${Math.round(age / 60)} min` : `${(age / 3600).toFixed(1)} h`;
       const mark = x.tp1 != null ? x.tp1 : x.t1, trail = x.trail ? (x.trailMoved ? `trailing, stop locks ${fR(stopR)}` : `trailing from +${x.trail[0]}R`) : '';
       return `<li data-tid="${esc(x.id)}" tabindex="0" title="Show this trade on a chart"><span class="chip ${x.side}">${x.side.toUpperCase()}</span>`
-        + `<span class="a-t"><b>${esc(x.label)}</b> ${esc(x.name)}${x.paper ? '<span class="tag">paper</span>' : ''}${!x.paper && x.k !== 'replica' ? '<span class="tag" title="Opened by the earlier council strategies, still managed to its exit">older strategy</span>' : ''}${size !== 1 ? `<span class="tag">${size}× size</span>` : ''}${x.status === 'pending' ? '<span class="tag">waiting fill</span>' : ''}</span>`
+        + `<span class="a-t"><b>${esc(x.label)}</b> ${esc(x.name)}${x.paper ? '<span class="tag">paper</span>' : ''}${!x.paper && !SYS_K.includes(x.k) ? '<span class="tag" title="Opened by the earlier council strategies, still managed to its exit">older strategy</span>' : ''}${size !== 1 ? `<span class="tag">${size}× size</span>` : ''}${x.status === 'pending' ? '<span class="tag">waiting fill</span>' : ''}</span>`
         + `<span class="a-r ${fl == null ? '' : fl >= 0 ? 'pos' : 'neg'}">${fl == null ? '—' : fR(fl)}</span>`
         + `<span class="a-d">Entry ${fmtI(x.entry, d)} · stop ${fmtI(x.stop, d)} · ${x.trail ? '2R mark' : 'target'} ${fmtI(mark, d)}${px != null ? ` · now ${fmtI(px, d)}${x.market === 'nq' ? ' (10 min delayed)' : ''}` : ''} · open ${ageT}${x.mfe ? ` · best +${(+x.mfe).toFixed(2)}R` : ''}${trail ? ` · ${trail}` : ''}</span></li>`;
-    }).join('') : '<li class="empty">No open trades right now. The system opens one when a replica signal passes (gold) or an NQ open sweep fires (paper).</li>';
+    }).join('') : '<li class="empty">No open trades right now. The system opens one when a replica signal passes (gold or a pair, while it is volatile), a Mosha BO setup completes (gold), or the NQ open run fires (paper).</li>';
     const sum = document.getElementById('ms-active-sum');
     if (sum) sum.innerHTML = A.length ? `${A.length} open · at risk ${risk.toFixed(1)}R · floating <b class="${tot >= 0 ? 'pos' : 'neg'}">${fR(tot)}</b>` : '';
     const h = document.getElementById('h-active'); if (h) h.innerHTML = A.length ? `${A.length} open <small>floating ${fR(tot)}</small>` : '<small>none open</small>';
@@ -2691,7 +2699,7 @@ function msNextSetup(bars, A) {
   // and the kill switch (−7.2R at 30 trades, −7.8R at 50, −5.9R at 100; checked from trade 30)
   function renderTrack() {
     const el = document.getElementById('ms-rep-track'), txt = document.getElementById('ms-rep-track-txt'); if (!el) return;
-    const C = COUNCIL, live = (C.trades || []).filter((x) => x.k === 'replica' && !x.shadow && x.R != null && x.closed).sort((a, b) => a.closed - b.closed);
+    const C = COUNCIL, live = (C.trades || []).filter((x) => x.k === 'replica' && x.market === 'xau' && !x.shadow && x.R != null && x.closed).sort((a, b) => a.closed - b.closed);
     const rp = ((C.replay && C.replay.trades) || []).filter((x) => x.k === 'replica' && x.market === 'xau' && x.R != null).map((x) => x.R);
     const mu = rp.length > 50 ? rp.reduce((a, v) => a + v, 0) / rp.length : 0.197, sd = rp.length > 50 ? Math.sqrt(rp.reduce((a, v) => a + (v - mu) ** 2, 0) / rp.length) : 1.54;
     const n = live.length, N = Math.max(60, Math.ceil((n + 10) / 10) * 10), cum = [0]; live.forEach((x) => cum.push(cum.at(-1) + x.R));
@@ -2727,7 +2735,7 @@ function msNextSetup(bars, A) {
   window.addEventListener('resize', () => { try { renderTrack(); } catch (e) {} });
   function renderReplica() {
     const C = COUNCIL, set = (id, html) => { const el = document.getElementById(id); if (el) el.innerHTML = html; };
-    const L = (C.trades || []).filter((x) => x.k === 'replica').sort((a, b) => b.opened - a.opened);
+    const L = (C.trades || []).filter((x) => x.k === 'replica' && x.market === 'xau').sort((a, b) => b.opened - a.opened);
     const done = L.filter((x) => ['win', 'loss', 'be'].includes(x.status)), R = done.reduce((a, x) => a + x.R, 0), w = done.filter((x) => x.R > 0).length;
     const fR = (v) => `${v > 0 ? '+' : v < 0 ? '−' : ''}${Math.abs(v).toFixed(2)}R`;
     { const sn = COUNCIL.snap || {}, v = sn.goldVol, mn = sn.goldVolMin || 1.5;
@@ -2745,10 +2753,30 @@ function msNextSetup(bars, A) {
     const ST2 = { open: 'Open', win: 'Win', loss: 'Loss', be: 'Break-even' };
     set('ms-rep-list', L.slice(0, 10).map((x) => `<li data-tid="${esc(x.id)}" tabindex="0" title="Show this trade on a chart"><span>${ftime(x.opened + TZ)}</span><b class="${x.side === 'sell' ? 'neg' : 'pos'}">${x.side.toUpperCase()}</b><span>${fmtI(x.entry, { dec: 2 })} · stop ${fmtI(x.stop, { dec: 2 })} · 2R ${fmtI(x.t1, { dec: 2 })}${x.feat && x.feat.star ? ' · ★' : ''}</span><b class="${x.R > 0 ? 'pos' : x.R < 0 ? 'neg' : ''}">${x.R != null ? fR(x.R) + (x.exit ? ` (${esc(x.exit)})` : '') : ST2[x.status] || x.status}</b></li>`).join('') || '<li class="empty">No live replica trade yet. The first passing signal goes live.</li>');
   }
+  // Pairs card (5 Nov): each pair's volatility against its own gate (snapshot.pairs), its forward paper result and its replay
+  function renderPairs() {
+    const el = document.getElementById('ms-pairs'); if (!el) return;
+    const P = (COUNCIL.snap && COUNCIL.snap.pairs) || {}, fR = (v) => `${v > 0 ? '+' : v < 0 ? '−' : ''}${Math.abs(v).toFixed(1)}R`;
+    const rp = ((COUNCIL.replay && COUNCIL.replay.trades) || []).filter((x) => x.k === 'replica' && x.market !== 'xau' && x.R != null);
+    const keys = Object.keys(P).length ? Object.keys(P) : [...new Set(rp.map((x) => x.market))];
+    let on = 0, fN = 0, fT = 0;
+    el.innerHTML = keys.length ? keys.map((k) => {
+      const p = P[k] || {}, r = rp.filter((x) => x.market === k), rR = r.reduce((a, x) => a + x.R, 0), lab = p.label || (r[0] && r[0].label) || k.toUpperCase();
+      if (p.on) on++; fN += p.n || 0; fT += p.R || 0;
+      const st = p.stopped ? '<b class="neg">stopped (−10R)</b>' : p.on ? '<b class="pos">trading</b>' : p.vol == null ? '—' : 'calm';
+      return `<tr><td><b>${esc(lab)}</b></td><td class="n">${p.vol == null ? '—' : p.vol.toFixed(2) + '%'}</td><td class="n">${p.gate == null ? '—' : p.gate.toFixed(2) + '%'}</td><td>${st}</td>`
+        + `<td class="n">${p.n ? `${p.n} · <span class="${p.R > 0 ? 'pos' : p.R < 0 ? 'neg' : ''}">${fR(p.R)}</span>` : '—'}</td><td class="n">${r.length ? `${r.length} · <span class="${rR > 0 ? 'pos' : rR < 0 ? 'neg' : ''}">${fR(rR)}</span>` : '—'}</td></tr>`;
+    }).join('') : '<tr><td colspan="6" class="empty">Waiting for the Trader.</td></tr>';
+    const sm = document.getElementById('ms-pairs-sum'); if (sm) sm.innerHTML = keys.length ? `${on} of ${keys.length} trading now${fN ? ` · forward ${fN} trades, <b class="${fT >= 0 ? 'pos' : 'neg'}">${fR(fT)}</b>` : ''}` : '';
+  }
   // Our system = the live gold replica trades (k 'replica') plus the backtest replay of the months before it went live
   const sysOn = () => { const el = document.getElementById('ms-c-sys'); return !el || el.checked; };
-  // Our system (4 Nov, night) = the NQ New York open run: forward paper records + the replay since Dec 2022. Gold trades only while volatile (20-day range ≥ 1.5%).
-  const sysTrades = () => ((COUNCIL.replay && COUNCIL.replay.trades) || []).filter((x) => x.market === 'nq' && nqSys(x)).concat((COUNCIL.research || []).filter((x) => x.k === 'nq-open' && nqSys(x)).map((x) => ({ ...x, pair: 'M1', paper: true, forward: true })));
+  // Our system (5 Nov, owner: "include gold and the other pairs in council") = the NQ New York open run (replay since Dec 2022 +
+  // forward paper records) + the live paper trades of the gold and pair systems (replica, Mosha BO) + the replay of the replica
+  // rules on gold and the pairs since 2023.
+  const sysTrades = () => ((COUNCIL.replay && COUNCIL.replay.trades) || []).filter((x) => x.market === 'nq' ? nqSys(x) : SYS_K.includes(x.k))
+    .concat((COUNCIL.research || []).filter((x) => x.k === 'nq-open' && nqSys(x)).map((x) => ({ ...x, pair: 'M1', paper: true, forward: true })),
+      (COUNCIL.trades || []).filter((x) => !x.shadow && SYS_K.includes(x.k)));
   function renderNQ() {
     const set = (id, html) => { const el = document.getElementById(id); if (el) el.innerHTML = html; };
     const fR = (v) => `${v > 0 ? '+' : v < 0 ? '−' : ''}${Math.abs(v).toFixed(2)}R`;
@@ -2769,6 +2797,7 @@ function msNextSetup(bars, A) {
     renderCalendar();
     renderNQ();
     renderReplica();
+    renderPairs();
     renderActive();
     const showSh = document.getElementById('ms-c-shadow'), withSh = showSh && showSh.checked;
     const mine = document.getElementById('ms-c-mine'), only = mine && mine.checked;
@@ -2795,7 +2824,7 @@ function msNextSetup(bars, A) {
     set('ms-c-trades', tableList.length ? tableList.slice(0, 25).map((x) => `<tr class="${x.shadow ? 'sh' : ''}" data-tid="${esc(x.id)}" tabindex="0" title="Show this trade on a chart"><td>${ftime(x.opened + TZ)}</td><td><b>${esc(x.label)}</b></td><td>${esc(x.name)} <small>${esc(x.pair)}</small></td><td><span class="ms-chip ${x.side === 'sell' ? 'ms-chip-sell' : 'ms-chip-buy'}">${x.side.toUpperCase()}</span></td><td class="n">${fmtI(x.entry, dI(x))}</td><td class="n">${fmtI(x.stop, dI(x))}</td><td class="n">${fmtI(x.t1, dI(x))}</td><td class="${(ST[x.status] || ['', ''])[0]}" title="${esc(x.note || '')}">${x.shadow ? 'Shadow · ' : ''}${x.replay ? 'Replay · ' : ''}${(ST[x.status] || ['', x.status])[1]}${x.R != null && (x.status === 'win' || x.status === 'loss') ? ` ${x.R > 0 ? '+' : ''}${x.R}R` : ''}${liveR(x)}${pmChip(x)}</td></tr>`).join('')
       : `<tr><td colspan="8" class="empty">No council trades yet${only ? ' on this market' : ''}. The Trader takes every Ready setup it sees.</td></tr>`);
     // Trade reviews: every loss studied — our system's error, or just the market?
-    const rv = (C.trades || []).filter((x) => x.pm && x.pm.cause && (withSh || !x.shadow) && (!only || x.market === instKey) && (!SYS || x.k === 'replica')).sort((a, b) => b.closed - a.closed);
+    const rv = (C.trades || []).filter((x) => x.pm && x.pm.cause && (withSh || !x.shadow) && (!only || x.market === instKey) && (!SYS || SYS_K.includes(x.k))).sort((a, b) => b.closed - a.closed);
     const rvL = rv.filter((x) => x.status === 'loss'), sysL = rvL.filter((x) => x.pm.verdict === 'system').length;
     const L = C.snap && C.snap.lessons;
     set('ms-c-pm-sum', rvL.length ? `<div class="c-pm-bar" role="img" aria-label="${sysL} of ${rvL.length} losses were system errors"><i class="sys" style="flex:${sysL}"></i><i class="mkt" style="flex:${rvL.length - sysL}"></i></div><p class="c-pm-k"><span><i class="sys"></i>System error <b>${sysL}</b></span><span><i class="mkt"></i>Market <b>${rvL.length - sysL}</b></span><span>of ${rvL.length} reviewed loss${rvL.length === 1 ? '' : 'es'}</span></p>` +

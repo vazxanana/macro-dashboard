@@ -384,3 +384,23 @@ cell was picked from ~80. Also tested from the Private Room Notes PDF, all witho
 (retracement depth), QM-style VR/CF, Janda (BO structure → BO → pullback), the barrier formula (D→H1, H4→M15, H1→M5 with
 the weekly direction), and a "50% of the range" structure engine (pullbacks must retrace half the visible leg). So the Mosha
 BO system runs on paper as a forward test with an expectation near zero; the kill switch applies as before.
+
+### Pairs join the council (5 Nov; user rule `pairs-live`)
+
+Owner: "include gold and the other pairs in council". Every market (gold, the five forex pairs, BTC, ETH, SOL, XRP) now
+trades the replica live on paper with gold's rules (v5, daily trend or H1 engulfing barrier, trail from +2R 2R behind, cap
+10R, 48 h; max 3 open per market, −1.5R daily stop). Gold keeps its 1.5% volatility gate; a pair trades only while its 20-day
+range is in the top fifth of its own last 365 daily candles (`config.pairVolPct` 80; `snapshot.pairs[key]` shows vol, gate,
+on/off, forward trades and R). Kill switch: a pair stops trading live once its forward replica total reaches −10R
+(`config.pairStopR`), its signals stay research. Mosha BO stays gold-only (its weekly read is a spot-gold feed, and the rule
+lost on six other markets).
+
+Also fixed: replica research and live records rounded prices to 2 decimals, so forex research trades (1.12288 → 1.12) were
+meaningless; prices now round to the market's decimals + 1, and the H1 engulfing-barrier tolerance is $1 on gold, 0.1 M15 ATR
+elsewhere.
+
+Replay with these rules, 2023 - Oct 2026 (after spread; forex HistData 1m, crypto Binance 5m):
+EUR/USD −15.5R (128 trades), GBP/USD −31.2R (123), AUD/USD −25.4R (142), USD/CAD −22.6R (115), USD/CHF −37.5R (106),
+BTC −46.2R (271), ETH +1.9R (293), SOL +10.5R (133), XRP +4.3R (156): pairs together −161.7R over 1,467 trades. In 2019-22 the
+forex pairs were also negative except EUR/USD (+53R). Gold in the same harness: +86R over 377 (2023-26). These records are in
+`research/replay-2w.json`, so the site's "our system" total includes what the pairs cost.
