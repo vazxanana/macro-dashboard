@@ -661,3 +661,15 @@ rules (filter, stop size 0.5/1/1.5 ATR, H4 against/any, direction D1-or-EG / D1 
 Single changes from live: skipping 21:00-24:00 UTC entries +0.102 / +0.194R (only consistent gain, ~+0.01-0.03R, noise-sized);
 3R fixed ≈ trail; gate 1.75% / 2.0% worse on 2019-22. Verdict: no change; the live gold rules are about as good as anything
 that can be picked honestly from this grid.
+
+## 2026-11-05 — Mosha rulebook re-read (97 photos + Private Room PDF) and a faithful test
+
+Rebuilt a mechanical rulebook from every upload (BO → VR → CF, BO-BO-BO one-TF step-down table, 50% external range, QM confirmation, Janda, BOOM / "no trade zone" at the broken level, layered limits, 80/20 partials, father/mother/son direction). Tested on 1m data 2019–2026 (gold, Nasdaq, EUR/USD, silver), picked on 2019–22, judged on 2023–26, all costs in.
+
+- Chains (his table): D1-H4-H1, H4-H1-M30, H1-M30-M15, M30-M15-M5. Entries: broken level, 25% / 50% into the CF origin, and layered (half at the level, half at 50% of the origin). Exits: 3R, opposite external extreme, 2R trail, 80% at 3R + 20% trailed runner. Filters: CF is a structure flip, retracement ≥ 50%, weekly agrees, D1 agrees, VR is also a flip (QM), Janda (BO after BO Structure), first BO back.
+- **No robust edge.** Gold M30-M15-M5 faithful (flip + 50% + weekly) at the broken level: +0.18R / +0.01R (n86 / 70). Origin entries are not consistently better than the level. Silver negative almost everywhere; EUR/USD negative in 2019–22.
+- **Filters don't separate.** On gold M30-M15-M5 the controls do as well as the rules: D1 against +0.24R vs D1 with +0.26R; weekly against +0.18R; retracement under 50% +0.28R.
+- **Layered entries:** looked like +0.3R at first, but that counted a half fill as a full one. With correct sizing (each half risks 0.5R; an unfilled half earns 0) the gain is gone: gold M30-M15-M5 faithful +0.20 / −0.04R.
+- Only weak lead: Nasdaq D1-H4-H1 flip, layered, +0.19 / +0.20R 3R (n49 / 40), +0.26 / +0.25R trail. Small n, one of ~120 cells; not adopted, noted for the NQ tracker list.
+- 80/20 partials ≈ the average of 3R and trail; they change nothing on their own.
+- **Decision:** the live Mosha BO paper system stays as it is (H4→H1→M15, weekly, level limit, 3R) as a forward test; every chain, including blocked ones, is already recorded with `blockedBy` since PR #210.
