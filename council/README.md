@@ -281,6 +281,10 @@ Same 1-minute history for every NQ setup (Yahoo NQ=F + CNBC @ND.1, 11 Sep – 4 
 
 **New York open run:** the open-sweep signal at the 09:30 opening price (≥ 15 points through it, 1-minute close back across within 15 min), traded with the sweep: at New York the reclaim fails and the move runs (the reversal version loses −0.45R a trade). Stop the same distance on the other side, 2R, out at 11:00 ET. 27 trades +19.8R, 67% wins, t 2.8, September +4.9R and October +14.9R; every depth 0–30 points and reclaim window 5–30 min positive. Records `nq-nyflip-<day>`.
 
+*5 Nov:* the run threshold and stop buffer are now fractions of the opening price, 0.08% and 0.011% (≈20 and ≈2.8 points at
+25,000), the values the 8-year backtest used. The fixed 15 points had drifted to 0.06% as NQ rose; across thresholds 0.06–0.10%
+the live rule makes +0.11 to +0.14R a trade (0.06%: +0.005R in 2018–22; 0.08%: +0.017R; 0.10%: +0.047R).
+
 Losing open-sweep trades: 7 of 20 were +1R before reversing, but break-even, partials and trailing all scored below the plain 2R; trades on the side of the 18:00 ET daily open did better (+0.67R vs +0.25R) but the other side flipped sign between months, so no filter.
 
 ## Gold: the NQ open rules carried over (research, 4 Nov)

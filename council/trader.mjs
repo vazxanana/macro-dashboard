@@ -1222,8 +1222,8 @@ function nqSwingSignal(bars, today) {
     for (const v of live.values()) {
       v.ext = v.k === 'L' ? Math.min(v.ext, b.low) : Math.max(v.ext, b.high);
       if (b.time - v.t > 900) continue;
-      if (v.k === 'L' && b.close > v.lv && b.close > b.open) return { sell: false, level: 'SWL', lv: v.lv, ext: v.ext, stop: v.ext - 2, t: b.time, m: b.m, entry: b.close, L: { SWL: v.lv } };
-      if (v.k === 'H' && b.close < v.lv && b.close < b.open) return { sell: true, level: 'SWH', lv: v.lv, ext: v.ext, stop: v.ext + 2, t: b.time, m: b.m, entry: b.close, L: { SWH: v.lv } };
+      if (v.k === 'L' && b.close > v.lv && b.close > b.open) return { sell: false, level: 'SWL', lv: v.lv, ext: v.ext, stop: v.ext - buf, t: b.time, m: b.m, entry: b.close, L: { SWL: v.lv } };
+      if (v.k === 'H' && b.close < v.lv && b.close < b.open) return { sell: true, level: 'SWH', lv: v.lv, ext: v.ext, stop: v.ext + buf, t: b.time, m: b.m, entry: b.close, L: { SWH: v.lv } };
     }
   }
   return null;
@@ -1301,10 +1301,13 @@ function nq80Signal(bars, today) {
   }
   return null;
 }
-function nqOpenSweep(bars, today, o, tFree, minPen = 15) {
+// minPen / buf below 1 are fractions of the opening price (5 Nov: the 8-year backtest used 0.08% and 0.011%, which is ~20 and
+// ~2.8 points at NQ 25,000; the fixed 15 points had drifted to 0.06%, the weaker end: +0.106R vs +0.119R, 2018-22 +0.005 vs +0.017R)
+function nqOpenSweep(bars, today, o, tFree, minPen = 15, buf = 2) {
   const D = bars.map((b) => ({ ...b, ...nyParts(b.time) })).filter((b) => b.d === today);
   const first = D.find((b) => b.m === o); if (!first) return null;
   const O = first.open, live = new Map();
+  if (minPen < 1) minPen *= O; if (buf < 1) buf *= O;
   for (const b of D.filter((b) => b.m > o && b.m < o + 90 && b.time >= tFree)) {
     if (!live.has('L') && b.low < O) live.set('L', { t: b.time, ext: b.low });
     if (!live.has('H') && b.high > O) live.set('H', { t: b.time, ext: b.high });
@@ -1371,7 +1374,7 @@ try {
     // side, 2R, out at 11:00 ET. 1-minute history: 27 trades +19.8R, +0.73R a trade (t 2.8), 67% wins, September +4.9R,
     // October +14.9R; every depth (0–30 points) and reclaim window (5–30 min) positive (+0.46 to +1.19R). Paper.
     if (NQ_ON.nyflip && !['Sat', 'Sun'].includes(ny.wd) && ny.m > 571 && ny.m < 660 && !research.some((x) => x.id === `nq-nyflip-${ny.d}`)) {
-      const g = nqOpenSweep(bars, ny.d, 570, 0);
+      const g = nqOpenSweep(bars, ny.d, 570, 0, 0.0008, 0.00011);
       // midnight-open filter (4 Nov, from the trader's NQ research report: "the New Day Open should be the next target"): only when
       // the 00:00 ET opening price lies ahead of the trade. 3-year futures file: ahead +0.22R a trade over 237 (every year positive),
       // behind +0.05R over 210 (2024 negative); outside the file (Dec–Mar cash index + Sep–Nov 2026): ahead +0.68R over 29, behind +0.19R over 32.
