@@ -437,3 +437,9 @@ in our system, to build a forward record:
 - `sd3mom`: at 3 SD → with the move; stop 0.25 range; target 4 SD; out 16:00 ET. Backtest +0.19 to +0.41R a trade
   (t 1.6-2.5), chosen after seeing the data. Judge both after ~60 forward trades.
 The NQ fetch now also runs 22:00-24:00 ET (Sun-Thu) for these.
+
+**Crypto trend v2 (5 Nov, loop).** Two slots per coin: the 55-day breakout (out under the 27-day low) and the 100-day breakout
+(out under the 50-day low), both with a 5 ATR(20) trail from the best close (was 4 ATR, 55-day only). Walk-forward on Binance
+daily 2018-21 → 2022-26, 10 coins, 0.8% costs: 5 ATR was the best of 3.5/4/5/6 on 2018-21 and held (+0.40R vs +0.30R a trade);
+55 + 100 together +96.5R over 186 (+0.52R); council coins +52.3R over 70 (+0.75R), worst drawdown −7.9R (4 ATR 55-day: +34.1R).
+A BTC-above-200-day filter helped 2022-26 slightly but not 2018-21, so it is not used. Trades carry `sys` (55/100) and `kATR`.
