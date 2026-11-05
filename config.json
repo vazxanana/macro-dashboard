@@ -341,6 +341,12 @@
    "by": "user",
    "change": "Gold replica: the volatility gate also opens when gold's 20-day range is in the top fifth of its own last year (as well as at 1.5% or more)",
    "why": "Owner: apply the research. Live config, spot gold, trail exit: fixed 1.5% 2019-22 +0.093R (214 trades) / 2023-26 +0.164R (443); 1.5% OR top-fifth +0.104R (341) / +0.192R (513): better in both halves with more trades. Tighter stops (0.5-0.85x) and fixed 2-4R targets were tested at the same time and did not beat the current stop and trail."
+  },
+  {
+   "at": "2026-11-05T12:42:43.000Z",
+   "by": "user",
+   "change": "Gold replica: fixed 4R target instead of the trail from +2R (stop unchanged, out after 48 h)",
+   "why": "Owner: judge gold on the last 2-3 years. 2023-26 spot, live gate and direction rules, signals: 4R +0.23R a trade (2023-24) / +0.20R (2025-26), +105R; trail +0.31R / +0.16R, +98R. 4R is better in the recent half and steadier across both; tighter stops lost in every combination."
   }
  ],
  "btAt": "2026-11-05T11:21:05.226Z",
@@ -363,7 +369,8 @@
   "mosha-bo-weekly",
   "pairs-live",
   "pairs-best",
-  "gold-adaptive-gate"
+  "gold-adaptive-gate",
+  "gold-4r"
  ],
  "target": {},
  "targetBy": {},
@@ -374,11 +381,11 @@
  "noPause": true,
  "wouldPause": {
   "rintra": {
-   "at": "2026-11-05T12:38:53.000Z",
+   "at": "2026-11-05T12:42:43.000Z",
    "why": "four losses in a row"
   },
   "scalp": {
-   "at": "2026-11-05T12:38:53.000Z",
+   "at": "2026-11-05T12:42:43.000Z",
    "why": "expectancy -1.00R over 13 trades"
   },
   "xau": {
@@ -422,5 +429,6 @@
  ],
  "cryptoTrendStopR": -8,
  "cryptoTrendAt": 1793839317,
- "goldVolPct": 80
+ "goldVolPct": 80,
+ "goldFixedR": 4
 }
