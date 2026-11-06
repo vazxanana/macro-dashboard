@@ -610,6 +610,23 @@
   .c-nq { grid-column: 1 / -1; }
   .c-pairs { grid-column: 1 / -1; }
 </style>
+<script>
+// Public / admin split (6 Nov): the public page shows trades and chart markups only; the admin view (rule texts, setups, scanner,
+// shadow trades, scorecards, reviews) opens with the admin password. The password is never stored: only its SHA-256 is compared.
+(function () { var h = null; try { h = localStorage.getItem('ms-admin'); } catch (e) {}
+  document.documentElement.dataset.mode = h === '4622c0548320297ae6874ab045769a98f61c6c53247bd56b3856a472418002cf' ? 'admin' : 'public'; })();
+// admin login: SHA-256 of the typed password against MS_ADMIN_HASH; the hash is kept as the session token
+async function msSha256(t) { const b = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(t)); return Array.from(new Uint8Array(b)).map((x) => x.toString(16).padStart(2, '0')).join(''); }
+document.addEventListener('DOMContentLoaded', function () { var pub = document.documentElement.dataset.mode !== 'admin', a = document.getElementById('ms-admin-link'); if (!a) return;
+  a.textContent = pub ? 'Admin login' : 'Log out';
+  a.addEventListener('click', async function (ev) { ev.preventDefault();
+    if (!pub) { try { localStorage.removeItem('ms-admin'); } catch (e) {} location.hash = '#home'; location.reload(); return; }
+    var pw = prompt('Admin password'); if (!pw) return; var h = '';
+    try { h = await msSha256(pw); } catch (e) { alert('This browser cannot verify the password (it needs https).'); return; }
+    if (h === window.MS_ADMIN_HASH) { try { localStorage.setItem('ms-admin', h); } catch (e) {} location.reload(); } else alert('Wrong password.'); }); });
+window.MS_ADMIN_HASH = '4622c0548320297ae6874ab045769a98f61c6c53247bd56b3856a472418002cf';
+</script>
+<style>html[data-mode="public"] .adm{display:none!important} html[data-mode="admin"] .pubonly{display:none!important} .ms-admin-link{color:inherit;opacity:.6;text-decoration:underline dotted;cursor:pointer}</style>
 </head>
 <body>
 <div class="ms-live app" id="ms-live" data-chart="dark">
@@ -618,7 +635,7 @@
     <div class="brand"><i class="ms-coin" aria-hidden="true"></i><div><details class="mk" id="ms-mk"><summary class="inst" id="ms-mk-btn" title="Market (click to change)">XAU/USD</summary><div class="mk-pop"><label class="sr" for="ms-mk-q">Search markets</label><input id="ms-mk-q" type="search" placeholder="Search markets…" autocomplete="off"><ul class="mk-list" id="ms-mk-list"></ul></div></details><select id="ms-inst" class="inst" hidden aria-hidden="true" tabindex="-1"><option>XAU/USD · Gold</option></select><span id="ms-inst-name">Gold · Mosha structure</span></div></div>
     <div class="px"><b id="ms-hdr-price">—</b><span id="ms-hdr-chg" class="hdr-chg"></span></div>
     <nav class="tabs" aria-label="Sections">
-      <a href="#home" data-go="home">Home</a><a href="#setup" data-go="setup">Setup</a><a href="#charts" data-go="charts">Charts</a><a href="#scanner" data-go="scanner">Scanner</a><a href="#council" data-go="council">Council</a><a href="#journal" data-go="journal">Journal</a>
+      <a href="#home" data-go="home">Home</a><a href="#setup" data-go="setup" class="adm">Setup</a><a href="#charts" data-go="charts">Charts</a><a href="#scanner" data-go="scanner" class="adm">Scanner</a><a href="#council" data-go="council">Council</a><a href="#journal" data-go="journal">Journal</a>
     </nav>
     <a class="ms-badge" id="ms-scan-badge" href="#scanner" hidden></a>
     <span class="ms-status"><i class="ms-live-dot" id="ms-live-dot"></i><span id="ms-live-txt">Connecting…</span><span class="upd"> · <span id="ms-updated">—</span></span></span>
@@ -637,7 +654,7 @@
             <label><input type="checkbox" id="ms-show-htf" data-show="htf" checked><i style="border:1.5px dashed #2962ff"></i>HTF Origin</label>
             <label><input type="checkbox" id="ms-show-next" data-show="next" checked><i style="background:#2962ff;height:2px"></i>Next setup</label>
             <label><input type="checkbox" id="ms-show-plan" data-show="plan" checked><i style="background:#089981;height:2px"></i>Selected trade</label>
-            <label><input type="checkbox" id="ms-show-replica" data-show="replica" checked><i style="background:#7b61ff;height:2px"></i>Replica (gold M5)</label>
+            <label><input type="checkbox" id="ms-show-replica" data-show="replica" checked><i style="background:#7b61ff;height:2px"></i><span class="adm">Replica (gold M5)</span><span class="pubonly">Signals (gold M5)</span></label>
             <label><input type="checkbox" id="ms-show-sess" data-show="sess" checked><i style="border-left:1.5px dashed #2962ff;width:2px;height:12px;border-radius:0"></i>Sessions</label>
             <label><input type="checkbox" id="ms-show-news" data-show="news" checked><i style="border-left:1.5px dotted #f0a500;width:2px;height:12px;border-radius:0"></i>News</label>
             <label><input type="checkbox" id="ms-show-detail" data-show="detail"><i style="background:var(--ink-faint);height:6px"></i>Detailed view</label>
@@ -673,7 +690,7 @@
     <div class="h-top"><div><div class="h-date" id="h-date"></div><h1 class="h-head" id="h-head">Loading live candles…</h1></div></div>
     <div class="h-warn" id="h-warn" role="alert" hidden></div>
     <div class="home">
-      <a class="tile wide" href="#setup">
+      <a class="tile wide adm" href="#setup">
         <span class="tile-k">Setup now <span class="ms-chip" id="h-bias">—</span></span>
         <span class="h-prog-row"><span class="h-prog" id="h-prog" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></span><span class="h-prog-t" id="h-prog-t"></span></span>
         <span class="tile-big" id="h-step">Loading live candles…</span>
@@ -683,10 +700,10 @@
       <a class="tile" href="#council">
         <span class="tile-k">Active trades</span>
         <span class="tile-big" id="h-active">—</span>
-        <span class="tile-sub">Placed by the system: live gold replica, NQ paper</span>
+        <span class="tile-sub"><span class="adm">Placed by the system: live gold replica, NQ paper</span><span class="pubonly">Open positions placed by the system</span></span>
         <span class="tile-go">Open council</span>
       </a>
-      <a class="tile" href="#setup">
+      <a class="tile adm" href="#setup">
         <span class="tile-k">Possible trades</span>
         <span class="tile-big" id="h-ready">—</span>
         <span class="tile-sub" id="h-best"></span>
@@ -698,7 +715,7 @@
         <span class="tile-sub">Live candles with BO lines, Origin, VR, CF and the 50% line.</span>
         <span class="tile-go">Open charts</span>
       </a>
-      <a class="tile" href="#scanner">
+      <a class="tile adm" href="#scanner">
         <span class="tile-k">Scanner</span>
         <span class="tile-big" id="h-scan">Scanning soon</span>
         <span class="tile-sub" id="h-scan-list"></span>
@@ -707,13 +724,13 @@
       <a class="tile" href="#council">
         <span class="tile-k">AI council</span>
         <span class="tile-big" id="h-council">Starting up</span>
-        <span class="tile-sub">Analyst maps the week, Trader paper-trades every Ready setup, Coach reviews each day and tunes the rules.</span>
+        <span class="tile-sub"><span class="adm">Analyst maps the week, Trader paper-trades every Ready setup, Coach reviews each day and tunes the rules.</span><span class="pubonly">Every trade the system placed, with its result.</span></span>
         <span class="tile-go">Open council</span>
       </a>
       <a class="tile" href="#journal">
         <span class="tile-k">Journal</span>
         <span class="tile-big" id="h-j">No trades yet</span>
-        <span class="tile-sub" id="h-j-sub">Log trades from the Setup page and track your results.</span>
+        <span class="tile-sub" id="h-j-sub"><span class="adm">Log trades from the Setup page and track your results.</span><span class="pubonly">Closed system trades.</span></span>
         <span class="tile-go">Open journal</span>
       </a>
     </div>
@@ -778,22 +795,22 @@
   <section class="view" id="v-council" aria-label="AI council" hidden>
     <div class="c-head">
       <div><h1 class="h-head">AI council</h1><p class="ms-note" id="ms-c-status">Loading council data…</p></div>
-      <label class="c-auto"><input type="checkbox" id="ms-auto"> <span><b>Browser Trader</b><small>On by default. Every fresh Ready setup on the market you're viewing is saved to your journal as a paper trade, then tracked to its stop or target.</small></span></label>
+      <label class="c-auto adm"><input type="checkbox" id="ms-auto"> <span><b>Browser Trader</b><small>On by default. Every fresh Ready setup on the market you're viewing is saved to your journal as a paper trade, then tracked to its stop or target.</small></span></label>
     </div>
     <div class="c-grid">
       <div class="card c-active" id="ms-active-card">
-        <div class="ms-k"><span>Active trades · placed by the system now</span><span class="c-tog"><span id="ms-active-sum" class="c-act-sum"></span><label class="c-mine" title="Also list the open shadow trades: setups the rules blocked, followed on paper so each rule can be checked"><input type="checkbox" id="ms-act-sh"> Shadow too</label></span></div>
+        <div class="ms-k"><span>Active trades · placed by the system now</span><span class="c-tog"><span id="ms-active-sum" class="c-act-sum"></span><label class="c-mine adm" title="Also list the open shadow trades: setups the rules blocked, followed on paper so each rule can be checked"><input type="checkbox" id="ms-act-sh"> Shadow too</label></span></div>
         <ul class="c-act" id="ms-active"></ul>
       </div>
       <div class="card c-trader">
         <div class="ms-k"><span>Trader · paper trades, all markets, every 4 min</span><span class="c-tog"><label class="c-mine"><input type="checkbox" id="ms-c-mine"> This market only</label><input type="checkbox" id="ms-c-sys" checked hidden aria-hidden="true"></span></div>
-        <div class="c-tabs" id="ms-c-tabs" role="tablist" aria-label="Which trades to show"><button type="button" role="tab" data-ct="live" aria-selected="true">Live <small>our system</small></button><button type="button" role="tab" data-ct="shadow">Shadow <small>blocked by a rule</small></button><button type="button" role="tab" data-ct="journal">Journal <small>closed, as in the Journal tab</small></button><button type="button" role="tab" data-ct="all">Everything <small>incl. older strategies</small></button></div>
+        <div class="c-tabs" id="ms-c-tabs" role="tablist" aria-label="Which trades to show"><button type="button" role="tab" data-ct="live" aria-selected="true">Live <small>our system</small></button><button type="button" role="tab" data-ct="shadow" class="adm">Shadow <small>blocked by a rule</small></button><button type="button" role="tab" data-ct="journal">Journal <small>closed, as in the Journal tab</small></button><button type="button" role="tab" data-ct="all" class="adm">Everything <small>incl. older strategies</small></button></div>
         <p class="ms-note" id="ms-c-tabnote"></p>
         <div class="c-kpi" id="ms-c-kpi"></div>
         <div class="c-eq" id="ms-c-eq"></div>
         <div class="ms-bt-wrap"><table class="ms-bt-t c-t"><thead><tr><th>Opened</th><th>Market</th><th>Setup</th><th>Side</th><th class="n">Entry</th><th class="n">Stop</th><th class="n">Target 1</th><th>Result</th></tr></thead><tbody id="ms-c-trades"></tbody></table></div>
       </div>
-      <div class="card c-nq">
+      <div class="card c-nq adm">
         <div class="ms-k"><span>NQ New York open run · our system (paper)</span></div>
         <p class="ms-note">NQ runs at least 0.08% of the 09:30 ET opening price (≈20 points; was a fixed 15 until 5 Nov) through it and closes back across it within 15 min; trade <b>with</b> the sweep (the reclaim tends to fail at the New York open), only when the midnight (00:00 ET) open lies ahead of the trade. Stop the same distance on the other side; since 5 Nov evening, after +2R the stop trails 1R behind the best price (cap 10R) instead of a fixed 2R exit (8-year test: +21.1R vs +7.4R in 2018–22, +93.7R vs +76.9R in 2023–26, drawdown not worse); out at 11:00 ET.</p>
         <p class="ms-note"><b>Checked 4 Nov:</b> on 8 years of Nasdaq cash (2018–2026) the same rule made +0.12R a trade over 704 trades, but 2018–2022 was about flat, so expect +0.1–0.2R a trade rather than the replay's +0.30R. Tested and not adopted: later exits, trailing stops, half off at 1R, a 10:00 ET window, volatility-scaled depth, a news-day filter, and the same rule on the S&amp;P 500 (no edge).</p>
@@ -801,7 +818,7 @@
         <p class="ms-note" id="ms-nq-txt"></p>
         <ul class="cal-day" id="ms-nq-list"></ul>
       </div>
-      <div class="card c-rep">
+      <div class="card c-rep adm">
         <div class="ms-k"><span>Gold replica · trades only when gold is volatile</span></div>
         <p class="ms-note" id="ms-rep-vol"></p>
         <p class="ms-note"><b>Volatility gate since 4 Nov.</b> On 8 years of spot gold (HistData 2019–2026) the replica loses in calm gold every year and only pays when gold moves a lot. Since 5 Nov it trades live only while gold's 20-day average daily range is in the top fifth of gold's own last year (judged on 2023 onwards: trades between 1.5% and that level made +0.02R a trade over 168, top-fifth trades +0.40R in both halves). Below that, every signal is still recorded here as research. It takes trades only in the daily trend direction (a pullback against the 4-hour trend); the engulfing-barrier exception was turned off on 5 Nov because it lost in every year 2023–26 (−15R over 82 trades). Replay 2023–Oct 2026 with the top-fifth gate, breakeven, the add at +2R and the runner: 212 positions, +185.9R (2024 +76.0R, 2025 +52.4R, 2026 +59.6R), worst drawdown −17.6R, best position +14.6R; the fixed-4R rules it replaces made +93.7R with a −11.7R drawdown (return per unit of drawdown 10.6 vs 7.9). Tighter stops, partial exits, session filters and stop buffers were tested on 5 Nov and rejected. Exit and scaling (since 5 Nov evening, judged on 2023 onwards): at +2R the stop moves to breakeven and a second unit is added at that level with its stop at the first entry (it shows as a separate “Replica add” trade, counted as 2R of risk); after +4R both units trail 1R behind the best price (cap 10R); out after 48 h. NQ stays the main system.</p>
@@ -814,20 +831,20 @@
         <p class="ms-note" id="ms-rep-paper"></p>
         <ul class="cal-day" id="ms-rep-list"></ul>
       </div>
-      <div class="card c-pairs">
+      <div class="card c-pairs adm">
         <div class="ms-k"><span>Pairs · crypto trend (live paper) · forex research only</span><span id="ms-pairs-sum" class="c-act-sum"></span></div>
         <p class="ms-note"><b>Crypto (BTC, ETH, SOL, XRP), since 5 Nov: daily trend, two slots per coin.</b> Buy when a daily candle closes above the 55-day high, and separately above the 100-day high. Since 5 Nov (v3) a trade exits on a daily close under the midpoint of its own 55- or 100-day channel, a level that only moves up; the 5 ATR(20) stop stays as a catastrophe stop (Sharpe 2018–21 1.67 vs 1.50, 2022–26 0.81 vs 0.58; worst drawdown −28% vs −39%). Replay 2023–Oct 2026: 65 trades, +61.7R. Long only. Picked on 2018–21 Binance history, checked on 2022–26 with 0.8% round-trip costs: +0.52R a trade over 10 coins (186 trades); on these four +52.3R over 70 trades (+0.75R), worst drawdown −7.9R. A coin stops at −8R forward.</p>
         <p class="ms-note"><b>Forex: research only.</b> Nothing tested on the five pairs held out of sample: the replica (about 11,000 settings each), Mosha BO, Asia-range breakouts and fades, open sweeps and daily trend-following all lost in 2023–26 after spread. Their replica signals keep being recorded.</p>
         <div class="ms-bt-wrap"><table class="ms-bt-t c-t"><thead><tr><th>Coin</th><th class="n">Close</th><th class="n">55-day high</th><th class="n">To breakout</th><th>Now</th><th class="n">Forward</th><th class="n">Replay 2023–26</th></tr></thead><tbody id="ms-pairs"></tbody></table></div>
       </div>
       <div class="card c-cal">
-        <div class="ms-k"><span>Calendar · result by day (R, trades closed that day)</span><span class="c-tog"><span class="cal-nav"><button type="button" id="ms-cal-prev" aria-label="Previous month">‹</button><b id="ms-cal-m"></b><button type="button" id="ms-cal-next" aria-label="Next month">›</button></span><label class="c-mine"><input type="checkbox" id="ms-cal-sh"> Include shadow trades</label><label class="c-mine" title="Only our system: NQ, gold and the pairs, live paper trades plus their replays"><input type="checkbox" id="ms-cal-rp" checked> Our system only (+ replay)</label></span></div>
+        <div class="ms-k"><span>Calendar · result by day (R, trades closed that day)</span><span class="c-tog"><span class="cal-nav"><button type="button" id="ms-cal-prev" aria-label="Previous month">‹</button><b id="ms-cal-m"></b><button type="button" id="ms-cal-next" aria-label="Next month">›</button></span><label class="adm c-mine"><input type="checkbox" id="ms-cal-sh"> Include shadow trades</label><label class="adm c-mine" title="Only our system: NQ, gold and the pairs, live paper trades plus their replays"><input type="checkbox" id="ms-cal-rp" checked> Our system only (+ replay)</label></span></div>
         <div class="cal-seg" role="group" aria-label="Markets in the calendar"><button type="button" data-mk="all" class="on" aria-pressed="true">All</button><button type="button" data-mk="xau" aria-pressed="false">Gold</button><button type="button" data-mk="nq" aria-pressed="false">NQ</button><button type="button" data-mk="pairs" aria-pressed="false">Pairs</button></div>
         <div class="cal" id="ms-cal"></div>
         <div class="cal-dayw" id="ms-cal-dayw" hidden><div class="cal-dayh" id="ms-cal-dayh"></div><ul class="cal-day" id="ms-cal-day"></ul></div>
         <p class="ms-note" id="ms-cal-sum"></p>
       </div>
-      <div class="card c-score">
+      <div class="card c-score adm">
         <div class="ms-k">Scorecard · which setups and markets pay</div>
         <div class="c-sc">
           <div class="ms-bt-wrap"><table class="ms-bt-t c-t"><thead><tr><th>Setup</th><th class="n">Trades</th><th class="n">Win rate</th><th class="n">Avg</th><th class="n">Total</th><th>Verdict</th></tr></thead><tbody id="ms-c-sc-setup"></tbody></table></div>
@@ -835,7 +852,7 @@
         </div>
         <p class="ms-note" style="margin:10px 0 0">From the council's closed paper trades. A verdict needs at least 5 trades: "trust" averages more than +0.2R a trade, "avoid" loses more than 0.2R.</p>
       </div>
-      <div class="card c-btc">
+      <div class="card c-btc adm">
         <div class="ms-k">Backtest · the Trader's rules replayed on the last 30 days</div>
         <p class="ms-note" id="ms-c-bt-sum">Loading the backtest…</p>
         <div class="c-bt-meta" id="ms-c-bt-mkt"></div>
@@ -843,7 +860,7 @@
         <ul class="c-bt-lines" id="ms-c-bt-lines"></ul>
         <p class="ms-note" style="margin:10px 0 0">Every setup the Trader would have taken, managed candle by candle on real prices. The range is clustered by market and day (one move often fires several setups), so it is honest about how sure we are: green when the whole range is above zero, red when it is below. The Coach turns only clear findings into rules.</p>
       </div>
-      <div class="card c-pmc">
+      <div class="card c-pmc adm">
         <div class="ms-k">Trade reviews · was it our system or the market?</div>
         <div id="ms-c-pm-sum"></div>
         <ul class="c-pm" id="ms-c-pm"></ul>
@@ -873,7 +890,7 @@
 
   <!-- ─── Journal ─── -->
   <section class="view" id="v-journal" aria-label="Journal" hidden>
-    <div class="card" id="ms-j-card">
+    <div class="card adm" id="ms-j-card">
       <div class="ms-k">Trade journal <span class="ms-scan-meta"><label class="c-mine"><input type="checkbox" id="ms-auto2"> Auto paper-trade</label><button type="button" class="ms-tbtn" id="ms-j-csv">Export CSV</button></span></div>
       <div id="ms-j-stats" class="ms-j-stats"></div>
       <div class="c-eq" id="ms-j-eq"></div>
@@ -884,16 +901,16 @@
       <div class="ms-k">System trades · closed paper trades placed by the council (read-only) <span class="ms-scan-meta"><button type="button" class="ms-tbtn" id="ms-js-csv">Export CSV</button></span></div>
       <div id="ms-js-stats" class="ms-j-stats"></div>
       <div class="ms-j-wrap"><table class="ms-j"><thead><tr><th>Closed</th><th>Market</th><th>System</th><th>Side</th><th>Entry</th><th>Stop</th><th>Exit</th><th>R</th></tr></thead><tbody id="ms-js-body"><tr class="empty"><td colspan="8">Loading…</td></tr></tbody></table></div>
-      <div class="ms-note" style="margin-top:10px">NQ New York open run, gold replica (a second unit added at +2R is folded into its first trade), Mosha BO and crypto trend; live paper trades only, newest first, last 200. 1R = the risk of one trade.</div>
+      <div class="ms-note" style="margin-top:10px"><span class="adm">NQ New York open run, gold replica (a second unit added at +2R is folded into its first trade), Mosha BO and crypto trend; live paper trades only, newest first, last 200. 1R = the risk of one trade.</span><span class="pubonly">Closed trades placed by the system, newest first, last 200. 1R = the risk of one trade.</span></div>
     </div>
   </section>
 
 
 
-  <p class="foot">Live candles from Binance and Kraken public feeds; gold is aligned to XAU/USD spot via gold-api.com. Times are in your local zone.<br>Version 5 Nov 2026 · council tabs</p>
+  <p class="foot">Live candles from Binance and Kraken public feeds; gold is aligned to XAU/USD spot via gold-api.com. Times are in your local zone.<br>Version 6 Nov 2026 · public view<span class="adm"> · admin</span> · <a class="ms-admin-link" id="ms-admin-link"></a></p>
   <nav class="btab" aria-label="Main sections">
     <a href="#home" data-go="home"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M3 11l9-7 9 7v9a1 1 0 01-1 1h-5v-6H9v6H4a1 1 0 01-1-1z"></path></svg>Home</a>
-    <a href="#setup" data-go="setup"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 6h16M4 12h10M4 18h6"></path></svg>Setup</a>
+    <a href="#setup" data-go="setup" class="adm"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 6h16M4 12h10M4 18h6"></path></svg>Setup</a>
     <a href="#charts" data-go="charts"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M7 4v16M17 4v16M4 8h6v8H4zM14 6h6v6h-6z"></path></svg>Charts</a>
     <a href="#council" data-go="council"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="8" cy="9" r="3"></circle><circle cx="16" cy="9" r="3"></circle><path d="M3 20c0-3 2.5-5 5-5s5 2 5 5M11 20c0-3 2.5-5 5-5s5 2 5 5"></path></svg>Council</a>
     <a href="#journal" data-go="journal"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 3h11a1 1 0 011 1v16a1 1 0 01-1 1H6zM6 3v18M10 8h5M10 12h5"></path></svg>Journal</a>
@@ -901,6 +918,8 @@
   <div class="ms-toasts" id="ms-toasts" role="status" aria-live="polite"></div>
 </div>
 <script>
+// public / admin mode (see CLAUDE.md): PUB hides every rule, system name and note; the head script sets the mode
+const PUB = document.documentElement.dataset.mode !== 'admin';
 // ═══ MOSHA STRUCTURE ENGINE (pure functions, no DOM) ═══
 function msAnalyze(bars, N) {
   const H = bars.map(b=>b.high), L = bars.map(b=>b.low), C = bars.map(b=>b.close), n = bars.length;
@@ -1387,7 +1406,7 @@ function msNextSetup(bars, A) {
       const rgba = (hex, a) => `rgba(${parseInt(hex.slice(1, 3), 16)},${parseInt(hex.slice(3, 5), 16)},${parseInt(hex.slice(5, 7), 16)},${a})`;
       items.segs.push({ l1: s.iS, p1: s.start, l2: s.iE, p2: s.ext, color: rgba('#8a94a8', 0.9 * fade), dash: true });
       items.labels.push({ l: s.iS, p: s.start, dy: sell ? 14 : -6, align: 'center', text: `${s.L === 36 ? '3 h' : '6 h'} leg`, color: rgba('#8a94a8', fade) });
-      items.lines.push({ l1: s.iP, l2: s.iC, p: s.lvl, color: rgba('#7b61ff', fade), w: 1.5, text: 'CHoCH M5', below: !sell });
+      items.lines.push({ l1: s.iP, l2: s.iC, p: s.lvl, color: rgba('#7b61ff', fade), w: 1.5, text: PUB ? 'Signal' : 'CHoCH M5', below: !sell });
       if (s.eg) {
         const l1 = ix(s.eg.t0) - 0.5, l2 = ix(s.eg.t1) - 0.5;
         items.boxes.push({ l1, l2, lo: s.eg.lo, hi: s.eg.hi, fill: rgba('#f0a500', 0.18 * fade), stroke: rgba('#e08600', fade) });
@@ -1975,7 +1994,7 @@ function msNextSetup(bars, A) {
     picker.innerHTML = Object.entries(groups).map(([g, o]) => `<optgroup label="${g}">${o.join('')}</optgroup>`).join('');
     picker.addEventListener('change', () => { const u = new URL(location.href); u.searchParams.set('s', picker.value); location.href = u.toString(); });
   }
-  $o('ms-inst-name').textContent = `${INST.name} · Mosha structure`;
+  $o('ms-inst-name').textContent = PUB ? INST.name : `${INST.name} · Mosha structure`;
   root.querySelectorAll('.ms-coin').forEach((c) => { c.style.background = `radial-gradient(circle at 35% 35%, #ffffffaa, ${INST.color})`; });
   const grid4 = root.querySelector('.ms-grid4');
   function setView(v) {
@@ -2373,7 +2392,7 @@ function msNextSetup(bars, A) {
       runs.map((r) => row(r.pr.name, `${LBL[r.pr.h]} → ${LBL[r.pr.l]}`, stat(r.trades), `${day(r.from)} – ${day(r.to)}`)).join('') +
       `</tbody></table></div>` +
       (all.length ? `<div class="ms-k" style="margin-top:14px">Latest signals</div><div class="ms-bt-wrap"><table class="ms-bt-t"><thead><tr><th>Signal</th><th>Setup</th><th>Side</th><th class="n">Entry</th><th class="n">Stop</th><th class="n">Target 1</th><th>Result</th></tr></thead><tbody>` +
-        all.slice().sort((a, b) => b.t0 - a.t0).slice(0, 10).map((x) => `<tr><td>${ftime(x.t0 + TZ)}</td><td>${esc(x.name)} <small>${esc(x.pair)}</small></td><td><span class="ms-chip ${x.sell ? 'ms-chip-sell' : 'ms-chip-buy'}">${x.sell ? 'SELL' : 'BUY'}</span></td><td class="n">${fmt(x.entry)}</td><td class="n">${fmt(x.stop)}</td><td class="n">${fmt(x.t1)}</td><td>${x.res === 'win' ? rtxt(x.R) : x.res === 'loss' ? rtxt(-1) : esc(x.res === 'missed' ? 'Missed (ran to target unfilled)' : x.res === 'expired' ? 'Not filled' : x.res === 'open' ? 'Still open' : 'Waiting for fill')}</td></tr>`).join('') +
+        all.slice().sort((a, b) => b.t0 - a.t0).slice(0, 10).map((x) => `<tr><td>${ftime(x.t0 + TZ)}</td><td>${PUB ? esc(x.label || '') : `${esc(x.name)} <small>${esc(x.pair)}</small>`}</td><td><span class="ms-chip ${x.sell ? 'ms-chip-sell' : 'ms-chip-buy'}">${x.sell ? 'SELL' : 'BUY'}</span></td><td class="n">${fmt(x.entry)}</td><td class="n">${fmt(x.stop)}</td><td class="n">${fmt(x.t1)}</td><td>${x.res === 'win' ? rtxt(x.R) : x.res === 'loss' ? rtxt(-1) : esc(x.res === 'missed' ? 'Missed (ran to target unfilled)' : x.res === 'expired' ? 'Not filled' : x.res === 'open' ? 'Still open' : 'Waiting for fill')}</td></tr>`).join('') +
         `</tbody></table></div>` : '') +
       `<p class="ms-note" style="margin:10px 0 0">How it's scored: each Ready setup places a limit order at its entry. A fill then the stop is −1R, a fill then Target 1 is +R at the card's reward : risk. A candle that touches both entry and stop counts as a loss. Orders not filled within ${BT_WAIT} candles are dropped. M1 and M5 only reach back a few days, so their samples are small. Past results don't predict future ones.</p>`;
     meta.textContent = `${INST.label} · ${A.n} signals`;
@@ -2401,12 +2420,12 @@ function msNextSetup(bars, A) {
     const body = document.getElementById('ms-js-body'), st = document.getElementById('ms-js-stats'); if (!body) return;
     const rows = systemClosed(), fR = (v) => `${v > 0 ? '+' : v < 0 ? '−' : ''}${Math.abs(v).toFixed(2)}R`;
     body.innerHTML = rows.length ? rows.slice(0, 200).map((x) => { const d = { dec: x.dec != null ? x.dec : 2 };
-      return `<tr data-tid="${esc(x.id)}"><td>${ftime(x.closed + TZ)}</td><td><b>${esc(x.label)}</b></td><td>${esc(x.name)}${x.paper ? ' <small>paper</small>' : ''}</td><td><span class="ms-chip ${x.side === 'sell' ? 'ms-chip-sell' : 'ms-chip-buy'}">${x.side === 'sell' ? 'SELL' : 'BUY'}</span></td><td class="m">${fmtI(x.entry, d)}</td><td class="m">${fmtI(x.stop, d)}</td><td>${esc(x.exit || (x.status === 'be' ? 'breakeven' : x.R > 0 ? 'target' : 'stop'))}</td><td class="m ${x.R > 0 ? 'pos' : x.R < 0 ? 'neg' : ''}">${fR(x.R)}</td></tr>`; }).join('')
+      return `<tr data-tid="${esc(x.id)}"><td>${ftime(x.closed + TZ)}</td><td><b>${esc(x.label)}</b></td><td>${PUB ? '—' : `${esc(x.name)}${x.paper ? ' <small>paper</small>' : ''}`}</td><td><span class="ms-chip ${x.side === 'sell' ? 'ms-chip-sell' : 'ms-chip-buy'}">${x.side === 'sell' ? 'SELL' : 'BUY'}</span></td><td class="m">${fmtI(x.entry, d)}</td><td class="m">${fmtI(x.stop, d)}</td><td>${esc(x.exit || (x.status === 'be' ? 'breakeven' : x.R > 0 ? 'target' : 'stop'))}</td><td class="m ${x.R > 0 ? 'pos' : x.R < 0 ? 'neg' : ''}">${fR(x.R)}</td></tr>`; }).join('')
       : '<tr class="empty"><td colspan="8">No closed system trade yet.</td></tr>';
     const by = {}; for (const x of rows) { const k = x.name; (by[k] = by[k] || []).push(x.R); }
     const tot = rows.reduce((a, x) => a + x.R, 0);
     st.innerHTML = rows.length ? `<span><b>${rows.length}</b> closed</span><span>total <b class="${tot >= 0 ? 'pos' : 'neg'}">${fR(tot)}</b></span><span>win rate <b>${Math.round(rows.filter((x) => x.R > 0).length / rows.length * 100)}%</b></span>`
-      + Object.entries(by).map(([k, v]) => `<span>${esc(k)}: <b class="${v.reduce((a, b) => a + b, 0) >= 0 ? 'pos' : 'neg'}">${fR(v.reduce((a, b) => a + b, 0))}</b> over ${v.length} (${fR(v.reduce((a, b) => a + b, 0) / v.length)} a trade)</span>`).join('') : '';
+      + (PUB ? [] : Object.entries(by)).map(([k, v]) => `<span>${esc(k)}: <b class="${v.reduce((a, b) => a + b, 0) >= 0 ? 'pos' : 'neg'}">${fR(v.reduce((a, b) => a + b, 0))}</b> over ${v.length} (${fR(v.reduce((a, b) => a + b, 0) / v.length)} a trade)</span>`).join('') : '';
     const csv = document.getElementById('ms-js-csv');
     if (csv && !csv.dataset.wired) { csv.dataset.wired = '1'; csv.addEventListener('click', () => {
       const lines = [['closed', 'market', 'system', 'side', 'entry', 'stop', 'exit', 'R'].join(',')].concat(systemClosed().map((x) => [new Date(x.closed * 1000).toISOString(), x.label, x.name, x.side, x.entry, x.stop, (x.exit || '').replace(/,/g, ';'), x.R].join(',')));
@@ -2706,7 +2725,7 @@ function msNextSetup(bars, A) {
       const [yy, mm, dd] = CAL.sel.split('-').map(Number), tot = sel.reduce((a, x) => a + x.R, 0), w = sel.filter((x) => x.R > 0).length;
       document.getElementById('ms-cal-dayh').innerHTML = `<b>${new Date(yy, mm, dd).toLocaleDateString(undefined, { weekday: 'short', day: 'numeric', month: 'short' })} · <span class="${tot > 0 ? 'pos' : tot < 0 ? 'neg' : ''}">${fR(tot)}</span> · ${sel.length} trade${sel.length > 1 ? 's' : ''}, ${w} won</b><button type="button" id="ms-cal-dayx" aria-label="Close the day">Close</button>`;
     }
-    document.getElementById('ms-cal-day').innerHTML = sel ? sel.slice().sort((a, b) => a.opened - b.opened).map((x) => `<li data-tid="${esc(x.id)}" tabindex="0" title="Show this trade on a chart"><span>${ftime(x.opened + TZ)}</span><b>${esc(x.label)}</b><span class="chip ${x.side}">${x.side.toUpperCase()}</span><span>${esc(x.name)}</span><b class="${x.R > 0 ? 'pos' : x.R < 0 ? 'neg' : ''}">${x.status === 'be' ? 'break-even' : fR(x.R)}</b><small>Entry ${fmtI(x.entry, { dec: 2 })} · stop ${fmtI(x.stop, { dec: 2 })} · target ${fmtI(x.t1, { dec: 2 })} · closed ${ftime(x.closed + TZ)}${x.exit ? ` (${esc(x.exit)})` : ''}${x.shadow ? ' · shadow' : ''}${x.replay ? ` · replay${x.paper ? ', paper setup' : ''}` : x.forward ? ' · paper, live forward' : ''}</small></li>`).join('') : '';
+    document.getElementById('ms-cal-day').innerHTML = sel ? sel.slice().sort((a, b) => a.opened - b.opened).map((x) => `<li data-tid="${esc(x.id)}" tabindex="0" title="Show this trade on a chart"><span>${ftime(x.opened + TZ)}</span><b>${esc(x.label)}</b><span class="chip ${x.side}">${x.side.toUpperCase()}</span><span>${(PUB ? '' : esc(x.name))}</span><b class="${x.R > 0 ? 'pos' : x.R < 0 ? 'neg' : ''}">${x.status === 'be' ? 'break-even' : fR(x.R)}</b><small>Entry ${fmtI(x.entry, { dec: 2 })} · stop ${fmtI(x.stop, { dec: 2 })} · target ${fmtI(x.t1, { dec: 2 })} · closed ${ftime(x.closed + TZ)}${x.exit ? ` (${esc(x.exit)})` : ''}${x.shadow ? ' · shadow' : ''}${x.replay ? ` · replay${x.paper ? ', paper setup' : ''}` : x.forward ? ' · paper, live forward' : ''}</small></li>`).join('') : '';
   }
   ['ms-cal-prev', 'ms-cal-next'].forEach((id, i) => { const b = document.getElementById(id); if (b) b.addEventListener('click', () => { CAL.m += i ? 1 : -1; if (CAL.m < 0) { CAL.m = 11; CAL.y--; } if (CAL.m > 11) { CAL.m = 0; CAL.y++; } CAL.sel = null; renderCalendar(); }); });
   ['ms-cal-sh', 'ms-cal-rp'].forEach((id) => { const el = document.getElementById(id); if (el) el.addEventListener('change', renderCalendar); });
@@ -2741,10 +2760,10 @@ function msNextSetup(bars, A) {
       const age = Math.max(0, Date.now() / 1000 - (x.filled || x.opened)), ageT = age < 3600 ? `${Math.round(age / 60)} min` : `${(age / 3600).toFixed(1)} h`;
       const mark = x.tp1 != null ? x.tp1 : x.t1, trail = (x.k === 'trend' || x.k === 'gtrend') ? (x.addOf ? 'second unit: own 5 ATR stop, leaves with the first trade on its channel-midpoint close' : x.exitRule === 'mid' ? `out on a daily close under ${fmtI(x.midStop, { dec: x.dec ?? 2 })} (channel midpoint)` : x.trailMoved ? `stop trails ${x.kATR || (x.k === 'gtrend' ? 2 : 4)} ATR, locks ${fR(stopR)}` : `stop trails ${x.kATR || (x.k === 'gtrend' ? 2 : 4)} ATR from each daily close`) : x.trail ? (x.addOf ? (x.trailMoved ? `trails with the first trade, stop locks ${fR(stopR)}` : 'trails with the first trade after its +4R') : x.trailMoved ? `trailing, stop locks ${fR(stopR)}` : `trailing from +${x.trail[0]}R`) : '';
       return `<li data-tid="${esc(x.id)}" tabindex="0" title="Show this trade on a chart" class="${x.shadow ? 'sh' : ''}"><span class="chip ${x.side}">${x.side.toUpperCase()}</span>`
-        + `<span class="a-t"><b>${esc(x.label)}</b> ${esc(x.name)}${x.shadow ? `<span class="tag" title="Blocked by: ${esc((x.blockedBy || []).join(', '))}">shadow${x.blockedBy && x.blockedBy.length ? ' · ' + esc(x.blockedBy.join(', ')) : ''}</span>` : ''}${x.tracker ? '<span class="tag" title="A research tracker (not our system): recorded to judge the idea, not counted">tracker</span>' : x.paper ? '<span class="tag">paper</span>' : ''}${x.addOf ? `<span class="tag" title="${x.k === 'trend' ? 'Second unit added when a daily close was +1R above the first entry; its own 5 ATR stop' : 'Second unit added at the add level, stop at the first entry'}">add</span>` : ''}${!x.paper && !SYS_K.includes(x.k) ? '<span class="tag" title="Opened by the earlier council strategies, still managed to its exit">older strategy</span>' : ''}${size !== 1 ? `<span class="tag">${size}× size</span>` : ''}${x.status === 'pending' ? '<span class="tag">waiting fill</span>' : ''}</span>`
+        + `<span class="a-t"><b>${esc(x.label)}</b> ${PUB ? '' : esc(x.name)}${x.shadow ? `<span class="tag" title="Blocked by: ${esc((x.blockedBy || []).join(', '))}">shadow${x.blockedBy && x.blockedBy.length ? ' · ' + esc(x.blockedBy.join(', ')) : ''}</span>` : ''}${x.tracker ? '<span class="tag" title="A research tracker (not our system): recorded to judge the idea, not counted">tracker</span>' : x.paper ? '<span class="tag">paper</span>' : ''}${x.addOf ? `<span class="tag" title="${x.k === 'trend' ? 'Second unit added when a daily close was +1R above the first entry; its own 5 ATR stop' : 'Second unit added at the add level, stop at the first entry'}">add</span>` : ''}${!x.paper && !SYS_K.includes(x.k) ? '<span class="tag" title="Opened by the earlier council strategies, still managed to its exit">older strategy</span>' : ''}${size !== 1 ? `<span class="tag">${size}× size</span>` : ''}${x.status === 'pending' ? '<span class="tag">waiting fill</span>' : ''}</span>`
         + `<span class="a-r ${fl == null ? '' : fl >= 0 ? 'pos' : 'neg'}">${fl == null ? '—' : fR(fl)}</span>`
-        + `<span class="a-d">Entry ${fmtI(x.entry, d)} · stop ${fmtI(x.stop, d)} · ${(x.k === 'trend' || x.k === 'gtrend') ? 'no fixed target' : `${x.tp1 != null ? `${Math.round(Math.abs(x.tp1 - x.entry) / (r0 || 1))}R mark` : x.trail ? `trail from +${x.trail[0]}R at` : 'target'} ${fmtI(x.tp1 != null ? x.tp1 : x.trail ? x.entry + s * x.trail[0] * r0 : mark, d)}`}${px != null ? ` · now ${fmtI(px, d)}${x.market === 'nq' ? ' (10 min delayed)' : ''}` : ''} · open ${ageT}${x.mfe ? ` · best +${(+x.mfe).toFixed(2)}R` : ''}${trail ? ` · ${trail}` : ''}</span></li>`;
-    }).join('') : '<li class="empty">No open trades right now. The system opens one when a gold replica signal passes (while gold is volatile), a Mosha BO setup completes (gold), a coin closes above its 55-day high (crypto trend), or the NQ open run fires (paper).</li>';
+        + `<span class="a-d">Entry ${fmtI(x.entry, d)} · stop ${fmtI(x.stop, d)} · ${(x.k === 'trend' || x.k === 'gtrend') ? 'no fixed target' : `${x.tp1 != null ? `${Math.round(Math.abs(x.tp1 - x.entry) / (r0 || 1))}R mark` : x.trail ? `trail from +${x.trail[0]}R at` : 'target'} ${fmtI(x.tp1 != null ? x.tp1 : x.trail ? x.entry + s * x.trail[0] * r0 : mark, d)}`}${px != null ? ` · now ${fmtI(px, d)}${x.market === 'nq' ? ' (10 min delayed)' : ''}` : ''} · open ${ageT}${x.mfe ? ` · best +${(+x.mfe).toFixed(2)}R` : ''}${trail && !PUB ? ` · ${trail}` : ''}</span></li>`;
+    }).join('') : (PUB ? '<li class="empty">No open trades right now.</li>' : '<li class="empty">No open trades right now. The system opens one when a gold replica signal passes (while gold is volatile), a Mosha BO setup completes (gold), a coin closes above its 55-day high (crypto trend), or the NQ open run fires (paper).</li>');
     const sum = document.getElementById('ms-active-sum');
     const trk = A0.length - A1.length;
     if (sum) sum.innerHTML = A0.length ? `${A1.length} open${trk ? ` + ${trk} tracker` : ''}${SHO.length ? ` + ${SHO.length} shadow` : ''} · at risk ${risk.toFixed(1)}R · floating <b class="${tot >= 0 ? 'pos' : 'neg'}">${fR(tot)}</b>` : SHO.length ? `${SHO.length} shadow open` : '';
@@ -2893,7 +2912,7 @@ function msNextSetup(bars, A) {
     const LIM = window.CLIM = window.CLIM || 60;
     const ST = { win: ['pos', 'Win'], loss: ['neg', 'Loss'], be: ['', 'Break-even'], open: ['', 'Open'], pending: ['', 'Waiting fill'], missed: ['', 'Missed'], expired: ['', 'Expired'], skipped: ['', 'Skipped'] };
     const dI = (x) => ({ dec: x.dec != null ? x.dec : 2 });
-    set('ms-c-trades', tableList.length ? tableList.slice(0, LIM).map((x) => `<tr class="${x.shadow ? 'sh' : ''}" data-tid="${esc(x.id)}" tabindex="0" title="Show this trade on a chart"><td>${ftime(x.opened + TZ)}</td><td><b>${esc(x.label)}</b></td><td>${esc(x.name)} <small>${esc(x.pair)}</small></td><td><span class="ms-chip ${x.side === 'sell' ? 'ms-chip-sell' : 'ms-chip-buy'}">${x.side.toUpperCase()}</span></td><td class="n">${fmtI(x.entry, dI(x))}</td><td class="n">${fmtI(x.stop, dI(x))}</td><td class="n">${fmtI(x.t1, dI(x))}</td><td class="${(ST[x.status] || ['', ''])[0]}" title="${esc(x.note || '')}">${x.shadow ? 'Shadow · ' : ''}${x.replay ? 'Replay · ' : ''}${x.paper && !x.replay ? 'Paper · ' : ''}${(ST[x.status] || ['', x.status])[1]}${x.R != null && (x.status === 'win' || x.status === 'loss' || x.status === 'be') ? ` ${x.R > 0 ? '+' : ''}${x.R}R` : ''}${liveR(x)}${pmChip(x)}${x.shadow && x.blockedBy && x.blockedBy.length ? ` <small>${esc(x.blockedBy.join(', '))}</small>` : ''}${tab === 'journal' && x.exit ? ` <small>${esc(x.exit)}</small>` : ''}</td></tr>`).join('')
+    set('ms-c-trades', tableList.length ? tableList.slice(0, LIM).map((x) => `<tr class="${x.shadow ? 'sh' : ''}" data-tid="${esc(x.id)}" tabindex="0" title="Show this trade on a chart"><td>${ftime(x.opened + TZ)}</td><td><b>${esc(x.label)}</b></td><td>${PUB ? '—' : `${esc(x.name)} <small>${esc(x.pair)}</small>`}</td><td><span class="ms-chip ${x.side === 'sell' ? 'ms-chip-sell' : 'ms-chip-buy'}">${x.side.toUpperCase()}</span></td><td class="n">${fmtI(x.entry, dI(x))}</td><td class="n">${fmtI(x.stop, dI(x))}</td><td class="n">${fmtI(x.t1, dI(x))}</td><td class="${(ST[x.status] || ['', ''])[0]}" title="${PUB ? '' : esc(x.note || '')}">${x.shadow ? 'Shadow · ' : ''}${x.replay ? 'Replay · ' : ''}${x.paper && !x.replay ? 'Paper · ' : ''}${(ST[x.status] || ['', x.status])[1]}${x.R != null && (x.status === 'win' || x.status === 'loss' || x.status === 'be') ? ` ${x.R > 0 ? '+' : ''}${x.R}R` : ''}${liveR(x)}${pmChip(x)}${x.shadow && x.blockedBy && x.blockedBy.length ? ` <small>${esc(x.blockedBy.join(', '))}</small>` : ''}${tab === 'journal' && x.exit ? ` <small>${esc(x.exit)}</small>` : ''}</td></tr>`).join('')
         + (tableList.length > LIM ? `<tr class="more"><td colspan="8"><button type="button" class="ms-tbtn c-more" id="ms-c-more">Show more (${tableList.length - LIM} left of ${tableList.length})</button></td></tr>` : '')
       : `<tr><td colspan="8" class="empty">${tab === 'shadow' ? 'No shadow trade yet.' : tab === 'journal' ? 'No closed system trade yet.' : `No council trades yet${only ? ' on this market' : ''}. The Trader takes every Ready setup it sees.`}</td></tr>`);
     // Trade reviews: every loss studied — our system's error, or just the market?
@@ -2939,7 +2958,7 @@ function msNextSetup(bars, A) {
   // live result of an open council trade at the last Trader scan price
   const liveR = (x) => { if (x.status !== 'open') return ''; const m = COUNCIL.snap && COUNCIL.snap.markets && COUNCIL.snap.markets[x.market]; if (!m || !m.price) return '';
     const r = (m.price - x.entry) * (x.side === 'sell' ? -1 : 1) / Math.abs(x.entry - x.stop); return isFinite(r) ? ` <b class="${r >= 0 ? 'pos' : 'neg'}">${r >= 0 ? '+' : ''}${r.toFixed(2)}R</b>` : ''; };
-  const pmChip = (x) => x.pm && x.pm.cause ? `<span class="c-pm-v ${x.pm.verdict}" title="${esc(x.pm.detail + ' Lesson: ' + x.pm.lesson)}">${esc(PM_NAME[x.pm.cause] || x.pm.cause)}</span>` : '';
+  const pmChip = (x) => !PUB && x.pm && x.pm.cause ? `<span class="c-pm-v ${x.pm.verdict}" title="${esc(x.pm.detail + ' Lesson: ' + x.pm.lesson)}">${esc(PM_NAME[x.pm.cause] || x.pm.cause)}</span>` : '';
   // ─── Tap a council trade: see it on a chart (entry, stop, target, where it filled and where it exited) ───
   const TV = { chart: null, series: null, lines: [], pv: [], req: 0, mode: 'after', ov: null, ctx: null };
   function tvPickTf(x) {
@@ -2982,13 +3001,13 @@ function msNextSetup(bars, A) {
     const s = x.side === 'sell' ? -1 : 1, d = { dec: x.dec != null ? x.dec : I.dec }, f = (v) => fmtI(v, d);
     const r0 = x.r0 || (x.beMoved ? 0 : Math.abs(x.entry - x.stop)), stop0 = x.beMoved && r0 ? x.entry - s * r0 : x.stop;
     const res = x.status === 'win' ? `Win +${x.R}R` : x.status === 'loss' ? `Loss ${x.R != null && x.R !== -1 ? `${x.R}R${x.exit ? ` (${x.exit})` : ''}` : '−1R'}` : x.status === 'be' ? 'Break-even 0R' : (ST_NAME[x.status] || x.status);
-    document.getElementById('ms-tv-t').textContent = `${x.label} · ${x.name} ${x.pair} · ${x.side === 'sell' ? 'Sell' : 'Buy'} · ${res}${x.shadow ? ' (shadow)' : ''}`;
-    document.getElementById('ms-tv-s').innerHTML = x.pm && x.pm.title ? `<b class="c-pm-v ${x.pm.verdict}" style="margin:0 6px 0 0">${x.pm.verdict === 'system' ? 'System' : 'Market'}</b><b>${esc(x.pm.title)}</b> · ${esc(x.pm.detail)} <br>Lesson: ${esc(x.pm.lesson)}${x.shadow && x.note ? `<br>${esc(x.note)}` : ''}` : esc(x.note || '');
+    document.getElementById('ms-tv-t').textContent = PUB ? `${x.label} ${x.side === 'sell' ? 'sell' : 'buy'}` : `${x.label} · ${x.name} ${x.pair} · ${x.side === 'sell' ? 'Sell' : 'Buy'} · ${res}${x.shadow ? ' (shadow)' : ''}`;
+    document.getElementById('ms-tv-s').innerHTML = PUB ? '' : x.pm && x.pm.title ? `<b class="c-pm-v ${x.pm.verdict}" style="margin:0 6px 0 0">${x.pm.verdict === 'system' ? 'System' : 'Market'}</b><b>${esc(x.pm.title)}</b> · ${esc(x.pm.detail)} <br>Lesson: ${esc(x.pm.lesson)}${x.shadow && x.note ? `<br>${esc(x.note)}` : ''}` : esc(x.note || '');
     // the conditions at the signal, the ones the Coach learns from (D1, structure, the CHoCH rule, session) and the entry style
     const ft = x.feat || {}, cond = [ft.d1 && `${ft.d1 === 'with' ? 'With' : 'Against'} D1`, ft.struct && ft.struct !== 'n/a' && `${ft.struct === 'main' ? 'Main' : 'Internal'} structure`,
       ft.cf && (ft.cf === 'choch' ? 'CF is a CHoCH' : 'CF is a continuation BO'), ft.choch && (ft.choch === 'yes' ? 'Fresh M15/M5 CHoCH' : 'No fresh M15/M5 CHoCH'), ft.m15c && (ft.m15c === 'yes' ? 'Your M15 CHoCH within the hour' : 'No M15 CHoCH (yours) within the hour'),
       ft.session && (SESSION_NAME[ft.session] || ft.session), x.entryMode === 'market' && 'Market entry'].filter(Boolean);
-    document.getElementById('ms-tv-k').innerHTML = `${cond.length ? `<span class="tv-cond">At the signal <b>${cond.map(esc).join(' · ')}</b></span>` : ''}<span><i style="background:#2962ff"></i>Entry <b>${f(x.entry)}</b></span><span><i style="background:${DNC}"></i>Stop <b>${f(stop0)}</b></span>${x.beMoved ? `<span><i style="background:#8a94a8"></i>Stop moved to entry</span>` : ''}<span><i style="background:${UPC}"></i>Target <b>${f(x.t1)}</b>${x.tp1 != null ? ` (${/^r/.test(x.k) ? 'the Origin' : 'target 2'}; target 1 ${f(x.tp1)})` : ''}</span><span>Reward:risk <b>${x.rr}R</b></span>${x.mfe != null ? `<span>Best <b>+${x.mfe}R</b></span>` : ''}<span>${ftime(x.opened + TZ)}${x.closed ? ' → ' + ftime(x.closed + TZ) : ''}</span><a href="?s=${esc(x.market)}#charts">Open ${esc(I.label)} charts</a>`;
+    document.getElementById('ms-tv-k').innerHTML = `${cond.length && !PUB ? `<span class="tv-cond">At the signal <b>${cond.map(esc).join(' · ')}</b></span>` : ''}<span><i style="background:#2962ff"></i>Entry <b>${f(x.entry)}</b></span><span><i style="background:${DNC}"></i>Stop <b>${f(stop0)}</b></span>${x.beMoved ? `<span><i style="background:#8a94a8"></i>Stop moved to entry</span>` : ''}<span><i style="background:${UPC}"></i>Target <b>${f(x.t1)}</b>${x.tp1 != null ? ` (${/^r/.test(x.k) ? 'the Origin' : 'target 2'}; target 1 ${f(x.tp1)})` : ''}</span><span>Reward:risk <b>${x.rr}R</b></span>${x.mfe != null ? `<span>Best <b>+${x.mfe}R</b></span>` : ''}<span>${ftime(x.opened + TZ)}${x.closed ? ' → ' + ftime(x.closed + TZ) : ''}</span><a href="?s=${esc(x.market)}#charts">Open ${esc(I.label)} charts</a>`;
     const msg = document.getElementById('ms-tv-m'); msg.hidden = false; msg.textContent = 'Loading candles…';
     if (!dlg.open) dlg.showModal();
     const host = document.getElementById('ms-tv-c'), th = THEMES[G.theme];
@@ -3181,7 +3200,7 @@ function msNextSetup(bars, A) {
   // ─── Sections: a home page of cards, each section on its own page ───
   const VIEWS = ['home', 'setup', 'charts', 'scanner', 'council', 'journal'];
   function showView() {
-    const h = location.hash.slice(1), v = VIEWS.includes(h) ? h : 'home';
+    const h0 = location.hash.slice(1), h = PUB && (h0 === 'setup' || h0 === 'scanner') ? 'home' : h0, v = VIEWS.includes(h) ? h : 'home';
     VIEWS.forEach((k) => { const el = document.getElementById('v-' + k); if (el) el.hidden = k !== v; });
     document.querySelectorAll('[data-go]').forEach((a) => { if (a.dataset.go === v) a.setAttribute('aria-current', 'page'); else a.removeAttribute('aria-current'); });
     if (v === 'charts') setTimeout(() => Object.values(panes).forEach((p) => p.fit()), 60);

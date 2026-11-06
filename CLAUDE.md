@@ -42,3 +42,12 @@ call) — don't "fix" it to always vote a direction.
   keyless public data APIs).
 - Test headlessly with Playwright before deploying; verify the Pages
   deploy run goes green after merging.
+
+## Public / admin split (6 Nov 2026, owner request)
+
+`market-structure.html` has two modes: **public** (default) shows only trades (market, side, entry, stop, target, result)
+and the chart markups; **admin** (footer "Admin login", SHA-256 of the password compared with `MS_ADMIN_HASH` in the head
+script, token kept in localStorage `ms-admin`) shows everything (Setup, Scanner, system cards, shadow trades, scorecards,
+reviews, notes). Anything that describes a rule, a system name, a note or a reason must sit inside an element with class
+`adm`, or be guarded by `PUB` in the JS templates; `pubonly` is the public-only counterpart. Keep it that way in redesigns.
+To change the password: compute `sha256` of the new one (e.g. `printf %s 'new' | sha256sum`) and replace both copies of the hash.
