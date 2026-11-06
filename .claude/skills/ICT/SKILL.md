@@ -152,3 +152,14 @@ Second-filter search inside A-setups (trailing exit, cost included), 20 features
 - Fits ICT: displacement (a strong body) shows intent; the afternoon session is the low-quality part of the NY day.
 - About 20 features were tried, so expect some shrinkage live. Tracker/replay: `isAPlus`, records carry `aplus`;
   desk filter "A+" (A-setups stay the default until the forward sample confirms).
+
+## 18. Cross-check with the MMXM skill (owner's skill collection, 6 Nov 2026)
+The `mmxm-market-maker-model` skill (ICT Market Maker Model) is the closest relative of this edge. Its rules, tested here on
+the H1 iFVG model (NQ 2023-25, every signal independent, trailing exit):
+- **Kill zones** ("outside the kill zones the probabilities reduce drastically"): agrees with §17 — NY PM signals are the
+  weak ones; the A+ tier already drops them.
+- **Midnight-open filter** (buy below the 00:00 NY open, sell above): does NOT help this model. A-setups on the "wrong"
+  side did better in 2023 (+0.34R vs −0.06R) and 2025 (+0.17R vs −0.31R), equal in 2024; same for all signals. That rule
+  belongs to MMXM's intraday M5/M1 models, not to an H1 reversal; not adopted.
+- Still to test: previous-day high/low as the target (MMXM: the easiest daily target, ~90% of days), the Day-4 model, and
+  the NY 08:00-12:00 window with a 09:00-10:30 reversal sweet spot for an M5 version of the desk.
