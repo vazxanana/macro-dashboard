@@ -52,6 +52,16 @@ reviews, notes). Anything that describes a rule, a system name, a note or a reas
 `adm`, or be guarded by `PUB` in the JS templates; `pubonly` is the public-only counterpart. Keep it that way in redesigns.
 To change the password: compute `sha256` of the new one (e.g. `printf %s 'new' | sha256sum`) and replace both copies of the hash.
 
+### Accounts and sign-in (6 Nov 2026)
+
+The page opens on a centred sign-in card (`#ms-gate`, shown while `html[data-gate]`) unless the visitor is signed in or
+chose **Continue as guest** (localStorage `ms-guest`, public view). Owner: empty user name + the admin password.
+Reviewers live in `window.MS_USERS` (head script: `{ <username>: { name, hash: sha256(password), role: 'reviewer' } }`;
+currently **Fred**); a reviewer session stores `ms-admin` = their hash and `ms-user` = the user name, gets the admin view
+read-only (`html[data-role="reviewer"] .own` hides the owner's journal, log-trade button, CSV loader and Telegram
+settings) and can write loss reviews, which carry `by: <name>`. The footer link is "Log in" (opens the card) or
+"Log out (<name>)". To add a reviewer, add an entry with the SHA-256 of their password.
+
 ## Loss review (6 Nov 2026, owner request)
 
 Admin-only card `#ms-loss` on `market-structure.html`: every losing trade (live and shadow, 7 or 30 days) stacked by the
