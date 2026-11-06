@@ -1225,3 +1225,28 @@ Win rates 47–56% at 1R (his "~60% WR" claim is in the ballpark at 1R) but the 
 | RSI(2) 2/98, stop ≥ 1.5 / London-NY only | −0.17 / −0.35 | −0.12 / −0.10 | |
 
 Without the spread every M1 reversal is within ±0.04R per trade of zero (win rates 35–52%), i.e. M1 reversals on gold are a coin flip; with a 0.30 spread on M1-sized stops (median 0.6–1.5 points) the cost is 20–50% of R and every variant loses heavily. Even the best pre-spread line (RSI2 extremes with the trend, +0.03R) would need a spread under 0.05 to break even. **No M1 scalp.** The council's small, frequent edge stays the replica (M5 entry after a 3–6 h leg, top-fifth volatility, +1R a signal); nothing below it pays gold's spread.
+
+## 2026-11-06 — Raw-spread scalp search (owner): momentum pullback adopted as system 8 (PR #252); header float includes shadows (PR #251)
+
+Costs for a raw account: 0.15 all-in per round trip (bounds 0.10 / 0.20 / 0.30). `ms/m1rev_c.py`, `ms/m5scalp.py`, `ms/m5mom.py`, `ms/m5mom2.py`.
+
+- **M1 reversals at 0.15:** sweep-reclaim with trend −0.06 | −0.02, RSI(2) with trend −0.24 | −0.05, RSI(2) 2/98 −0.11 | −0.05 R/trade. Still negative: their pre-cost edge is ±0.04R.
+- **M5 EMA20 pullback in the H1 50-EMA trend** (stop under 6-bar low, 1.5R / 2R / trail, London+NY): −0.07 to −0.03 | −0.01 to +0.00.
+- **Previous-day high/low sweep and reclaim on M5:** −0.17 | −0.25 (2R), −0.40 | −0.38 (to yesterday's mid).
+- **H1 momentum candle + M5 pullback (adopted):** H1 range ≥ 1.5× the previous 14-bar average, close in the top/bottom 20%, with the 20-day average, close 07–17 UTC; first M5 candle within 6 h trading into the 38–62% pullback and closing in the trade direction → market; stop 0.1 past the H1 candle; trail 1R after +2R; 8 h.
+
+| | 2023–24 | 2025–26 |
+|---|---|---|
+| cost 0.10 / 0.15 / 0.20 / 0.30, trail | +0.114 / +0.105 / +0.096 / +0.077 R/tr | +0.175 / +0.171 / +0.167 / +0.158 |
+| at 0.15: trades, DD, wins | 234, −9.1R, 44% | 186, −9.5R, 45% |
+| range multiple 1.25 / 2.0 | +0.068 / −0.006 (125 tr) | +0.152 / +0.054 |
+| close in top 75% / 90% | +0.089 / +0.066 | +0.135 / +0.235 |
+| zone 23–50 / 50–79 | +0.145 / +0.131 | +0.097 / +0.275 |
+| no 20-day direction | +0.034 (502) | +0.118 |
+| wait 3 h / exits 1.5R, 3R fixed | +0.103 / +0.084, +0.107 | +0.180 / +0.088, +0.148 |
+| buys / sells | +0.197 / −0.031 | +0.182 / +0.154 |
+| by year | 2023 +6.2 (93), 2024 +18.3 (141) | 2025 +38.1 (111), 2026 −6.3 (75); Feb–Jun 2026 +2.8 |
+
+Median stop 7.8 points (10%–90%: 4.1–22.8), median wait from the H1 close to entry 50 min, signals 06–16 UTC (13 UTC weakest, −4.7R on 82). Positive in both halves across every cost and parameter except the strict 2.0× range multiple (too few trades); the 20-day direction is what makes it work. 2026 to date is −6.3R, a risk to watch (CUSUM k 0.1, catastrophe −15R). Both sides kept as tested (sells negative in 2023–24, positive after). This is the first short-holding entry in the whole search with a real pre-cost edge (≈ +0.12R before costs vs ±0.04 for every M1 scalp).
+
+**Site (PR #251):** with "Shadow too" on, open shadow trades count in the header and active-card floating result, labelled "+N shadow".
