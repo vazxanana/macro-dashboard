@@ -1062,3 +1062,19 @@ Gold items from the skills still to test (loop list): Zlankator CC/DC confirmati
 | DC, SL5 | −76R | −78R |
 
 Every variant, side and gate is negative in 2023–24 and at best flat in 2025–26; the fixed 30-pip stop on a line level is too tight for gold's range (median H4 range 2023–26 is far above 3.0) and widening it to 50 pips only shrinks the loss. The confirmation candles (CC/DC) do not improve on the plain touch. The Zlankator level model is a discretionary swing method; its mechanical core has no edge here. **Rejected.** Next gold items on the list: the 4-and-2 levels as a location filter for the daily engulf zone; CE at the H4 Apex; EG-then-EF overlap on D1; PITCHOU M15 rejection at a fresh H1 level; engulf stairs.
+
+## 2026-11-06 — Location filters on the daily engulf (Zlankator key levels, Ephron EG-then-EF overlap): not adopted
+
+`ms/eg_loc.py`, on the adopted daily engulf buys (SMA20 gate, limit at the zone high, trail 1R after +2R, 10 days):
+
+| filter | 2023–24 | 2025–26 |
+|---|---|---|
+| adopted | 77 tr, +25.5R, DD −9.8 | 69 tr, +47.0R, DD −6.3 |
+| zone holds a fresh D1 support level (4-use rule) | 72, +14.1, DD −9.8 | 60, +38.9, DD −7.7 |
+| zone holds any fresh D1 level | 73, +22.4, DD −9.8 | 63, +38.5, DD −8.7 |
+| zone holds a fresh H4 support level (2-use rule) | 65, +24.2, DD −7.3 | 65, +48.6, DD −6.0 |
+| no fresh D1 support in the zone (the removed trades) | 5, +11.4 | 9, +8.1 |
+| EG-then-EF overlap (a failed D1 sell zone under it) | 41, +18.9, DD −7.8 | 33, +16.6, DD −7.0 |
+| without the overlap | 36, +6.6 | 36, +30.4 |
+
+The D1-level filters remove the best trades (the 14 zones without a fresh support level made +19.5R). The H4-level filter is the only one that improves the drawdown in both halves and the profit in 2025–26, but it gives up 1.3R in 2023–24 → fails the strict rule; not applied. The Ephron overlap is better in 2023–24 and worse in 2025–26 → no rule. Daily engulf stays as adopted.
