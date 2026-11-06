@@ -62,7 +62,7 @@ currently **Fred**); a reviewer session stores `ms-admin` = their hash and `ms-u
 read-only (`html[data-role="reviewer"] .own` hides the owner's journal, log-trade button, CSV loader and Telegram
 settings) and can write loss reviews, which carry `by: <name>`. The footer link is "Log in" (opens the card) or
 "Log out (<name>)". To add a reviewer, add an entry with the SHA-256 of their password.
-Viewers (`role: 'viewer'`, currently **Orlando** and **Luxus**; `VIEWER` in the main script) are read-only with a reduced site: Home
+Viewers (`role: 'viewer'`, currently **Orlando**, **Luxus** and **Carlos**; `VIEWER` in the main script) are read-only with a reduced site: Home
 (Today strip, open positions, setup now), Setup, and the Council overview (active trades + P&L calendar); no charts,
 scanner, journal, other council panes, loss-review panel, alerts, settings, or photo/name changes.
 Guests (owner, 6 Nov) see only `#v-guest`: an H4 gold chart (`renderGuest()`) with one system trade (the open/pending
@@ -108,3 +108,11 @@ Home is a dashboard: quick-jump row (`.h-quick`), a "Today" strip (`#h-today`, `
 the live part shown), then two columns: Setup now (admin) + Open positions (`#h-act-list`, biggest market+side groups,
 rows open the trade chart) on the left, compact tiles (`.tile-s`) on the right. The bottom tab bar (`.btab`, now with
 Scanner for admin) becomes a fixed left sidebar at ≥1180 px, where the header's top tabs are hidden.
+
+## Users page (6 Nov 2026)
+
+Owner-only view `#users` (sidebar "Users"): lists the built-in accounts (`MS_USERS` in the head script) and the ones
+added or changed on the page, which live in `council-data/users.json` (`{ users: { key: { name, hash, role, disabled? } } }`,
+written with the owner's GitHub token, `msGhTok`). users.json overrides built-ins (`msMergeUsers`); `disabled: true`
+removes one. Sign-in fetches the list; a signed-in non-owner is re-checked after load and signed out if removed or if the
+password changed (`ms-user-rec` keeps an added user's record between visits). Passwords must stay unique per account.
