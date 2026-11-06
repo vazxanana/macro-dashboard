@@ -940,3 +940,22 @@ Same trendline-break rule run on M15, M30, H1, H4 and D1 (pivot width 3 and 5), 
 The edge improves monotonically with the timeframe: M15/M30 lose, H1 is flat-to-small, H4 is the best. **Best SOP timeframe: H4 breaks gated by the H4 direction (D1 levels), 2R then trail**, +0.19R/trade in 2023–24 and +0.43R in 2025–26 with small drawdowns (−9 / −7). Second: H1 breaks gated by the H4 SOP direction (+0.04 / +0.11R per trade).
 
 Year by year (H4, own-SOP, 2Rt): 2019 −8, 2020 −4, 2021 +15, 2022 −9, 2023 −1, 2024 +21, 2025 +28, 2026 +11 (45 trades). H1/H4 2Rt: 2019 0, 2020 −7, 2021 −11, 2022 +18, 2023 −15, 2024 +26, 2025 +28, 2026 +2. The profit sits in 2024–25 on both; 2019–23 is flat and 2023 alone is negative on both, and the H4 sells contribute nothing (+0 / −2 in 2024–25, buys +21 / +29). So this is the gold bull expressed through a breakout, not a timeframe edge that holds on its own; it fails the 2023–24-half-per-year check and the 2019–22 sign check. **Not adopted** (the gold trend system already captures the 2024–26 breakout regime with a cleaner rule, +37R on 22 trades). If the owner wants it watched, the H4 own-SOP line could be a shadow tracker, but the forward read would again take years.
+
+## 2026-11-06 — Rule change (owner): judge on 2023 onwards only. Gold H4 trendline adopted (PR #242)
+
+The owner dropped the 2019–22 sign check: from now on a rule needs more profit AND less drawdown in both 2023–24 and 2025–26. Re-read under that lens, the H4 trendline break (previous entry) passes as a new system, buys only, gated by the H4 Malaysian SnR direction (the trader's own `msnrDirection`, pivot width 2, Daily levels):
+
+| H4 trendline, buys, 2R then 1R trail, 96 h | 2023–24 | 2025–26 |
+|---|---|---|
+| pivot width 3 (adopted) | 54 tr, +23.8R, +0.44/tr, DD −4.1 | 49 tr, +32.9R, +0.67/tr, DD −6.6 |
+| pivot width 2 | 71, +17.4, DD −6.6 | 62, +40.3, DD −5.3 |
+| pivot width 4 | 38, +10.5, DD −5.5 | 42, +20.0, DD −8.6 |
+| hold 48 h / 240 h (width 3) | +20.1 / +37.7 | +25.6 / +40.8 |
+| entry 4 min after the H4 close | +19.8 | +30.5 |
+| no direction gate | 113, +24.0, DD −12.6 | 94, +43.9, DD −8.3 |
+| sells with the gate | −4.1 | +5.3 |
+| direction pivot width 5 instead of 2 | +8.6 | +17.9 |
+
+By year (adopted line): 2023 +3.3 (24), 2024 +20.5 (30), 2025 +29.4 (25), 2026 +3.5 (24). Overlap with the gold trend system: 32 of 54 and 35 of 49 trades fire while that system is flat (+22.1R / +13.5R), so it adds a second, faster breakout leg rather than doubling the same trades. The gate's main job is drawdown (−4.1 vs −12.6 in 2023–24). Fragility to note: direction pivot width 5 halves the result, and 2026 is small — the forward CUSUM (k 0.3, catastrophe −10R) watches it.
+
+**Merged PR #242:** system `gtl` (user rule `gold-h4-trendline`, `config.goldTL = { n: 3, span: 120, n4: 2, pad: 0.3, hold: 96 }`), site system list, both bridges map it to the gold risk, README. Also fixed in the same PR: the legacy-retirement block kept only replica / mosha-bo / trend, so a gold trend (`gtrend`) position would have been closed as "retired" on the run after it opened — found by the offline dry run of the new system. Dry run on saved candles (27 Oct 08:00 UTC break, line 4048.43, close 4078.14): opens at 4077.01 with stop 4013.91, survives the following runs, stops out later; `mt5/signals.csv` carries the row. Sizing guide 0.25%.
