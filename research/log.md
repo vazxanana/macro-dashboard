@@ -987,3 +987,27 @@ Owner supplied four consolidated rulebooks. Everything codable in them that was 
 **Mosha storyline**: BO→VR→CF is the live Mosha BO system; QM preference, the 4 cases, Janda and the barrier formula were tested on 3–5 Nov (nothing robust). **PITCHOU/Zlankator confirmations** (M1/M5 trendline break, M15 rejection, ECMTF two-TF-lower scalps): sub-H1 entries lose on gold after cost in every form tested this week (MSNR scalp, trendline break M1–M30) — not re-run.
 
 **Adopted (PR #245, system 7, `geg`, user rule `gold-daily-engulf`)**: D1 EG buy zone, limit at the zone high while the daily close is above the 20-day average, valid 20 days, cancelled by a daily close under the zone, stop 0.3 under the zone, trail 1R after +2R (cap 10R), out 10 days after the fill, max 3 open, 0.25% sizing guide. Offline dry run: 16 Oct zone → limit at the zone high → filled → stopped −1R on the drop; 31 Oct zone blocked (below the average); CSV row written; site clean. Council check prompt updated (CUSUM k 0.3, catastrophe −14R).
+
+## 2026-11-06 — Tweak round over all seven systems (owner: "find the best tweaks with all the info"); replica size tilt adopted (PR #246)
+
+Harnesses: `ms/msnr_eval3.py`, `ms/gtrend_n.py`, `ms/export_new.py`, `ms/portfolio.py` (scratchpad). 2023–24 | 2025–26.
+
+**1. Gold replica, size by the H4 Malaysian SnR direction (adopted, PR #246).** Live exits and risk rules (top-fifth gate, daily stop, max 3 open, equity half-size), `feat.msnr` with pivot width 5:
+
+| sizing | 2023–24 | 2025–26 |
+|---|---|---|
+| live (all size 1) | 64 tr, +73.9R, DD −10.5 | 148 tr, +112.0R, DD −17.6 |
+| **1.5 when MSNR against, 0.5 when it agrees** | **+109.6R, DD −9.7** | **+155.5R, DD −16.5** |
+| same with pivot width 2 | +77.5R, DD −6.9 | +141.2R, DD −17.5 |
+| skip the agreeing trades | +72.7R, DD −6.5 | +99.5R, DD −10.3 |
+| half size when against (opposite tilt) | +37.5R | +62.3R |
+
+Mechanism: the replica buys the daily trend against the H4 trend; while the H4 SOP direction still points against the trade the pullback is in progress and the counter-trend entry works; once the H4 direction has flipped with the trade, the move is already under way. More profit and less drawdown in both halves, same sign in 2019–22 (5 Nov entry). The bridges did not read the `size` column (the cTrader one did not parse it at all): fixed in the same PR, so the equity half-size and this tilt now reach MT5/cTrader.
+
+**2. Gold trend, N and an add at +1R** (D1 breakout, 2 ATR trail): N20 live +9.9R (DD −2.0) | +24.1R (DD −1.0); with one add at +1R (daily close) +13.2R (DD −2.5) | +41.1R (DD −1.0); N10 +6.3 | +22.9 (add +13.8 | +40.9); N55 +7.0 | +21.0 (add +11.2 | +35.3); 3 ATR trails lower everywhere. The add raises profit by a third / 70% but the 2023–24 drawdown goes from −2.0R to −2.5R → fails the strict "less drawdown" test by half an R; **offered to the owner, not applied**.
+
+**3. Gold H4 trendline + 20-day-average gate:** +9.8R (32) | +18.8R (26) vs base +23.8 (54) | +32.9 (49) → the gate only removes trades. Keep as is.
+
+**4. Daily engulf:** variants were exhausted in the adoption step (trail, hold, life, K, gate); nothing further.
+
+**5. Portfolio (all seven systems at the sizing guide: NQ 0.25%, replica 0.5% with the add at 1%, crypto 0.5% + 0.5% add, gold trend 0.5%, H4 trendline 0.25%, daily engulf 0.25%; replay records 2023–Oct 2026, replica before the tilt):** +219.6% over 86 months = +2.55% a month; worst drawdown −7.9%; worst day −2.03% (17 Nov 2025); worst months −4.8 / −3.0 / −2.8%; 52 of 86 months up. By half: 2023–24 +98.3% (DD −4.6%, worst day −1.5%); 2025–26 +122.2% (DD −7.9%, worst day −2.0%). Contribution: replica 93 points, crypto 52, NQ 25, gold trend 19, daily engulf 18, H4 trendline 13. For the owner's $50k challenge (3% daily, 10% max drawdown) the full guide leaves too little room: at 0.75× (replica 0.375%, crypto 0.375%, gold trend 0.375%, NQ/trendline/engulf 0.2%) the replay gives ≈ +1.9% a month, worst drawdown ≈ −5.9%, worst day ≈ −1.5%; that is the recommended bridge setting for the challenge account.
