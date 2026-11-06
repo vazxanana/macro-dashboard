@@ -137,3 +137,5 @@ Rules and research live in `.claude/skills/ICT/SKILL.md` (results also in counci
 - A-setup filter (research 6 Nov, skill §14): against the daily bias + grade >= 7 (`isASetup`, records carry `aset`).
   The desk defaults to A-setups (switch `ictFlt`: A-setups / All signals / One per cluster — the highest-grade index of
   same-side A-setups within 3 h, skill §16, computed on the page); every signal is still tracked.
+- A+ tier (skill §17): A-setup + inversion body >= 60% of range + not NY PM (`isAPlus`, records carry `aplus`); desk
+  filter "A+".

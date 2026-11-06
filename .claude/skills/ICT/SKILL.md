@@ -140,3 +140,15 @@ The indices move together: in the 2026 replay 154 A-setups fell into 120 cluster
 - Tested and rejected the same day: a limit entry on a pullback toward the stop (0.25-0.5R, 3-12 h) — mixed on all signals,
   worse on A-setups; session filters for A-setups — no pattern holds in all four sets (Asia positive but small samples).
 - Desk: "One per cluster" view (A-setups, ★ pick of n); clusters are computed on the page.
+
+## 17. A+ tier: strong displacement, not the NY afternoon (6 Nov 2026)
+Second-filter search inside A-setups (trailing exit, cost included), 20 features, kept only those better in ALL four sets
+(NQ 2023 / 2024 / 2025, every signal independent; 2026 replay of four indices):
+- body of the inversion candle >= 70% of its range: 4/4; not in NY PM (12-16 ET): 4/4; everything else (sweep of the
+  previous day, depth in the range, validity, speed, room, grade >= 8, side, DOL) at most 3/4.
+- Body threshold plateau 0.6-0.7 (0.8 too strict). **A+ = A-setup + body >= 0.6 + not NY PM**: total R
+  NQ23 +17.1 (A +9.5), NQ24 +12.2 (+9.6), NQ25 +3.1 (+0.6), 2026 +66.1 (+67.3, fewer trades); worst drawdown lower in all
+  four (10.4 / 8.0 / 8.6 / 9.5 vs 11.4 / 14.0 / 11.9 / 12.9). R a trade +0.37 / +0.24 / +0.08 / +0.62.
+- Fits ICT: displacement (a strong body) shows intent; the afternoon session is the low-quality part of the NY day.
+- About 20 features were tried, so expect some shrinkage live. Tracker/replay: `isAPlus`, records carry `aplus`;
+  desk filter "A+" (A-setups stay the default until the forward sample confirms).

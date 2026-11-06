@@ -118,6 +118,8 @@ export function signals(Hraw, D, side, tick) {
 // close vs its 50-day average) and its candle-closure grade is at least 7/10 (B+). Every signal is still recorded; A-setups
 // carry aset: true and are never blocked by a weaker open signal on the same market.
 export const isASetup = (g) => !!g.feat && g.feat.bias === 'against' && g.grade && g.grade.total >= 7;
+// A+ tier (skill §17): an A-setup whose inversion candle body is >= 60% of its range and that does not fire in the NY afternoon (12-16 ET)
+export const isAPlus = (g) => isASetup(g) && g.feat.body >= 0.6 && g.feat.session !== 'NY PM';
 export const letter = (g) => (g >= 10 ? 'A+' : g >= 9 ? 'A' : g >= 8 ? 'A-' : g >= 7 ? 'B+' : g >= 6 ? 'B' : g >= 5 ? 'B-' : g >= 3 ? 'C' : 'F');
 
 async function main() {
@@ -156,7 +158,7 @@ async function main() {
         trades.push({ id, market: key, label: M.label, short: M.short, side: s > 0 ? 'buy' : 'sell', model: 'H1 iFVG reversal', signalAt: g.close, signalPx: f(g.entry),
           entry, stop: f(g.stop), r0: +r0.toFixed(M.dec + 1), t1: null, trail: P.trail, stop0: f(g.stop), t2: f(entry + s * P.mark * r0), opened: now, checked: now, status: 'open', R: null,
           sweep: { t: g.sweepT, level: f(g.swept) }, fvg: g.fvg.map(f), ih: g.ih == null ? null : f(g.ih), dol: g.dol == null ? null : f(g.dol), valid: g.valid,
-          feat: g.feat, grade: { ...g.grade, letter: letter(g.grade.total) }, aset });
+          feat: g.feat, grade: { ...g.grade, letter: letter(g.grade.total) }, aset, aplus: isAPlus(g) });
       }
       // 3. snapshot + candles for the page
       const last = sig.at(-1), dd = D.at(-1);
