@@ -643,7 +643,7 @@
 // Public / admin split (6 Nov): the public page shows trades and chart markups only; the admin view (rule texts, setups, scanner,
 // shadow trades, scorecards, reviews) opens with the admin password. The password is never stored: only its SHA-256 is compared.
 (function () { var h = null; try { h = localStorage.getItem('ms-admin'); } catch (e) {}
-  document.documentElement.dataset.mode = h === '4622c0548320297ae6874ab045769a98f61c6c53247bd56b3856a472418002cf' ? 'admin' : 'public'; })();
+  document.documentElement.dataset.mode = h === '49c5624f2625ed8b42b6e1bf2819a3a41ddb9743aeca36ea34ea7eb96c252ca8' ? 'admin' : 'public'; })();
 // admin login: SHA-256 of the typed password against MS_ADMIN_HASH; the hash is kept as the session token
 async function msSha256(t) { const b = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(t)); return Array.from(new Uint8Array(b)).map((x) => x.toString(16).padStart(2, '0')).join(''); }
 document.addEventListener('DOMContentLoaded', function () { var pub = document.documentElement.dataset.mode !== 'admin', a = document.getElementById('ms-admin-link'); if (!a) return;
@@ -653,7 +653,7 @@ document.addEventListener('DOMContentLoaded', function () { var pub = document.d
     var pw = prompt('Admin password'); if (!pw) return; var h = '';
     try { h = await msSha256(pw); } catch (e) { alert('This browser cannot verify the password (it needs https).'); return; }
     if (h === window.MS_ADMIN_HASH) { try { localStorage.setItem('ms-admin', h); } catch (e) {} location.reload(); } else alert('Wrong password.'); }); });
-window.MS_ADMIN_HASH = '4622c0548320297ae6874ab045769a98f61c6c53247bd56b3856a472418002cf';
+window.MS_ADMIN_HASH = '49c5624f2625ed8b42b6e1bf2819a3a41ddb9743aeca36ea34ea7eb96c252ca8';
 </script>
 <style>html[data-mode="public"] .adm{display:none!important} html[data-mode="admin"] .pubonly{display:none!important} .ms-admin-link{color:inherit;opacity:.6;text-decoration:underline dotted;cursor:pointer}</style>
 <style>.ho-sh{opacity:.8;font-weight:500} .c-act li.grp{display:block;padding:0;cursor:default} .c-act li.grp>details>summary{display:grid;grid-template-columns:auto 1fr auto;gap:4px 10px;align-items:center;padding:8px 10px;cursor:pointer;list-style:none} .c-act li.grp>details>summary::-webkit-details-marker{display:none} .c-act li.grp>details>summary .a-d::after{content:' \25BE'} .c-act li.grp>details[open]>summary .a-d::after{content:' \25B4'} .c-act ul.sub{margin:0 8px 8px;padding:0} .c-act ul.sub li{background:rgba(127,127,127,.04)}</style>
