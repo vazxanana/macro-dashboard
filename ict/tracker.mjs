@@ -114,6 +114,10 @@ export function signals(Hraw, D, side, tick) {
   }
   return out;
 }
+// The A-setup filter (6 Nov 2026 research, .claude/skills/ICT/SKILL.md §14): the signal goes AGAINST the daily bias (prior
+// close vs its 50-day average) and its candle-closure grade is at least 7/10 (B+). Every signal is still recorded; A-setups
+// carry aset: true and are never blocked by a weaker open signal on the same market.
+export const isASetup = (g) => !!g.feat && g.feat.bias === 'against' && g.grade && g.grade.total >= 7;
 export const letter = (g) => (g >= 10 ? 'A+' : g >= 9 ? 'A' : g >= 8 ? 'A-' : g >= 7 ? 'B+' : g >= 6 ? 'B' : g >= 5 ? 'B-' : g >= 3 ? 'C' : 'F');
 
 async function main() {
@@ -143,13 +147,14 @@ async function main() {
       for (const g of sig) {
         const id = `${key}-${g.side > 0 ? 'b' : 's'}-${g.t}`;
         if (trades.some((x) => x.id === id) || now - g.close > P.fresh) continue;
-        if (trades.some((x) => x.market === key && x.status === 'open')) continue;
+        const aset = isASetup(g);
+        if (trades.some((x) => x.market === key && x.status === 'open' && (!aset || x.aset))) continue;   // one open per market; an A-setup is only blocked by another A-setup
         const s = g.side, entry = f(price), r0 = Math.abs(entry - g.stop);
         if ((entry - g.stop) * s <= 0 || r0 > 1.6 * g.r0) continue;   // price already through the stop, or ran far from the signal
         trades.push({ id, market: key, label: M.label, short: M.short, side: s > 0 ? 'buy' : 'sell', model: 'H1 iFVG reversal', signalAt: g.close, signalPx: f(g.entry),
           entry, stop: f(g.stop), r0: +r0.toFixed(M.dec + 1), t1: f(entry + s * P.rr * r0), t2: f(entry + s * P.mark * r0), opened: now, checked: now, status: 'open', R: null,
           sweep: { t: g.sweepT, level: f(g.swept) }, fvg: g.fvg.map(f), ih: g.ih == null ? null : f(g.ih), dol: g.dol == null ? null : f(g.dol), valid: g.valid,
-          feat: g.feat, grade: { ...g.grade, letter: letter(g.grade.total) } });
+          feat: g.feat, grade: { ...g.grade, letter: letter(g.grade.total) }, aset });
       }
       // 3. snapshot + candles for the page
       const last = sig.at(-1), dd = D.at(-1);
