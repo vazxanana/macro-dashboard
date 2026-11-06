@@ -1283,6 +1283,9 @@ window.MS_ADMIN_HASH = '49c5624f2625ed8b42b6e1bf2819a3a41ddb9743aeca36ea34ea7eb9
   .cal-d .cr { font-size: clamp(11px, 1.05vw, 13px); letter-spacing: -.02em; }
   @media (max-width: 560px) { .cal-d { overflow: hidden; } .cal-d .cr { font-size: 9.5px; letter-spacing: -.04em; } .cal-d .cq, .cal-d .cs { display: none; } }
   #ms-c-status .c-meta::before { margin: 0 6px 0 2px; }
+  /* design polish 4: accessibility safety nets (low specificity: any existing style wins) */
+  :where(button, a[href], summary, [tabindex]:not([tabindex="-1"]), select, input):focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; scroll-behavior: auto !important; } }
 </style>
 </head>
 <body>
