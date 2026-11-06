@@ -118,3 +118,15 @@ and the 2026 CNBC replay of NQ, ES, YM and RTY (cost 0.5 / 0.5 / 2 / 0.2 points 
 - In the tracker: `isASetup()`; records carry `aset`; an A-setup is never blocked by a weaker open signal; all signals are
   still recorded. The desk defaults to "A-setups" (switch to "All signals").
 - Forward samples are small; keep watching "What works" per market (NQ was the weak one in 2026).
+
+## 15. Better exit: trail from +2R (6 Nov 2026)
+Each signal's next 72 H1 candles ([best, worst, close] in R) were replayed under other exits, on NQ 2023 / 2024 / 2025
+(every signal as its own trade, cost 0.5 pt) and the 2026 replay of all four indices.
+- Fixed 3R (old): all signals +0.07 / +0.12 / +0.06 / +0.06R a signal. Fixed 2R is worse; 4R is better.
+- **No fixed target; from +2R the stop trails 1.5R behind the best price; 48 h max**: all signals +0.09 / +0.12 / +0.08 /
+  +0.16R; A-setups +0.13 / +0.12 / +0.01 / +0.42R (3R gave +0.12 / +0.15 / −0.11 / +0.29). Every trail between +1.5R and
+  +3R start and 1-2R distance beats the fixed 3R on all signals (a plateau, not a lucky point); this one has the best
+  worst-year for A-setups. Break-even at +1R / +1.5R adds nothing; 72 h holds help 2023-24 but hurt 2025.
+- A-setups on NQ alone, every signal counted: 2023 +, 2024 +, 2025 ~0 (with the 3R target 2025 was −0.11R): the
+  against-the-bias filter weakened in NQ's 2025 trend year; the 2026 replay on all four indices is strongly positive.
+- Tracker and replay: `P.trail = [2, 1.5]`, records carry `trail`, `stop0`, `trailMoved`, exit 'trail'; `t1` is null.

@@ -41,23 +41,25 @@ async function history(M) {
 }
 
 function simulate(g, M, key, src) {
-  const s = g.side, f = (v) => +(+v).toFixed(M.dec), entry = g.entry, r0 = g.r0, t1 = entry + s * P.rr * r0, t2 = entry + s * P.mark * r0, end = g.close + P.holdH * 3600;
+  const s = g.side, f = (v) => +(+v).toFixed(M.dec), entry = g.entry, r0 = g.r0, t2 = entry + s * P.mark * r0, end = g.close + P.holdH * 3600;
   const use5 = src.m5days && src.m5days.has(Math.floor(g.close / 86400)) && src.m5days.has(Math.floor((g.close + 86400) / 86400));
   const bars = use5 ? src.m5.filter((b) => b.time >= g.close && b.time < end) : src.H.filter((b) => b.time >= g.close && b.time < end);
   const step = use5 ? 300 : 3600;
-  let status = 'open', R = null, closed = null, exit = null, exitPx = null, mark2 = null, mfe = 0;
+  // same exit as the tracker: no fixed target; from +2R the stop trails 1.5R behind the best price (checked before the
+  // candle's own new high moves it, i.e. conservatively); 48 h max
+  let status = 'open', R = null, closed = null, exit = null, exitPx = null, mark2 = null, mfe = 0, stop = g.stop, moved = false;
   for (const b of bars) {
     if (!mark2 && (s > 0 ? b.high >= t2 : b.low <= t2)) mark2 = b.time + step;
+    if (s > 0 ? b.low <= stop : b.high >= stop) { R = +((s * (stop - entry)) / r0).toFixed(2); status = R > 0.001 ? 'win' : R < -0.001 ? 'loss' : 'be'; closed = b.time + step; exit = moved ? 'trail' : 'stop'; exitPx = stop; break; }
     mfe = Math.max(mfe, ((s > 0 ? b.high : -b.low) - s * entry) / r0);
-    if (s > 0 ? b.low <= g.stop : b.high >= g.stop) { status = 'loss'; R = -1; closed = b.time + step; exit = 'stop'; exitPx = g.stop; break; }
-    if (s > 0 ? b.high >= t1 : b.low <= t1) { status = 'win'; R = P.rr; closed = b.time + step; exit = 'target'; exitPx = t1; break; }
+    if (mfe >= P.trail[0]) { const ns = entry + s * (mfe - P.trail[1]) * r0; if ((ns - stop) * s > 0) { stop = ns; moved = true; } }
   }
   if (status === 'open' && end <= now && bars.length) { const last = bars.at(-1); R = +((s * (last.close - entry)) / r0).toFixed(2); status = R > 0 ? 'win' : R < 0 ? 'loss' : 'be'; closed = last.time + step; exit = 'time'; exitPx = last.close; }
   const R2 = closed ? (mark2 && mark2 <= closed ? 2 : R) : null;
   // research: the next 72 H1 candles after the entry as [best, worst, close] in R (sign-adjusted), to study other exits offline
   const path = src.H.filter((b) => b.time >= g.close && b.time < g.close + 72 * 3600).map((b) => [+(((s > 0 ? b.high : -b.low) - s * entry) / r0).toFixed(2), +(((s > 0 ? b.low : -b.high) - s * entry) / r0).toFixed(2), +((s * (b.close - entry)) / r0).toFixed(2)]);
   return { id: `${key}-${s > 0 ? 'b' : 's'}-${g.t}-r`, market: key, label: M.label, short: M.short, side: s > 0 ? 'buy' : 'sell', model: 'H1 iFVG reversal', replay: true, res: step === 300 ? '5m' : '1h',
-    signalAt: g.close, signalPx: f(entry), entry: f(entry), stop: f(g.stop), r0: +r0.toFixed(M.dec + 1), t1: f(t1), t2: f(t2), opened: g.close, status, R, R2, closed, exit, exitPx: exitPx == null ? null : f(exitPx), mfe: +mfe.toFixed(2), path,
+    signalAt: g.close, signalPx: f(entry), entry: f(entry), stop: f(g.stop), stop0: f(g.stop), r0: +r0.toFixed(M.dec + 1), t1: null, trail: P.trail, t2: f(t2), opened: g.close, status, R, R2, closed, exit, exitPx: exitPx == null ? null : f(exitPx), mfe: +mfe.toFixed(2), path,
     sweep: { t: g.sweepT, level: f(g.swept) }, fvg: g.fvg.map(f), ih: g.ih == null ? null : f(g.ih), dol: g.dol == null ? null : f(g.dol), valid: g.valid, feat: g.feat, grade: { ...g.grade, letter: letter(g.grade.total) } };
 }
 

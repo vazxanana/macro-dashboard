@@ -17,7 +17,7 @@ export const MARKETS = {
   ym:  { sym: 'YM=F',  cnbc: ['@DJ.1', '@YM.1'],  label: 'Dow Jones',    short: 'YM',  tick: 1,    dec: 0 },
   rty: { sym: 'RTY=F', cnbc: ['@TFS.1', '@RTY.1'], label: 'Russell 2000', short: 'RTY', tick: 0.1, dec: 1 },
 };
-export const P = { piv: 3, look: 96, vmax: 6, rr: 3, mark: 2, holdH: 48, maxAtr: 8, fresh: 3 * 3600 };
+export const P = { piv: 3, look: 96, vmax: 6, rr: 3, trail: [2, 1.5], mark: 2, holdH: 48, maxAtr: 8, fresh: 3 * 3600 };
 const UA = 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36';
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 const now = Math.floor(Date.now() / 1000);
@@ -134,8 +134,10 @@ async function main() {
         for (const b of m5.bars.filter((b) => b.time >= tr.checked && b.time + 300 <= now)) {
           if (!tr.mark2 && (s > 0 ? b.high >= tr.t2 : b.low <= tr.t2)) tr.mark2 = b.time + 300;
           tr.mfe = Math.max(tr.mfe || 0, +(((s > 0 ? b.high : -b.low) - s * tr.entry) / tr.r0).toFixed(2));
-          if (s > 0 ? b.low <= tr.stop : b.high >= tr.stop) { Object.assign(tr, { status: 'loss', R: -1, exitPx: tr.stop, closed: b.time + 300, exit: 'stop' }); break; }
-          if (s > 0 ? b.high >= tr.t1 : b.low <= tr.t1) { Object.assign(tr, { status: 'win', R: P.rr, exitPx: tr.t1, closed: b.time + 300, exit: 'target' }); break; }
+          if (s > 0 ? b.low <= tr.stop : b.high >= tr.stop) { const R = +((s * (tr.stop - tr.entry)) / tr.r0).toFixed(2);
+            Object.assign(tr, { status: R > 0.001 ? 'win' : R < -0.001 ? 'loss' : 'be', R, exitPx: tr.stop, closed: b.time + 300, exit: tr.trailMoved ? 'trail' : 'stop' }); break; }
+          if (tr.t1 != null && (s > 0 ? b.high >= tr.t1 : b.low <= tr.t1)) { Object.assign(tr, { status: 'win', R: P.rr, exitPx: tr.t1, closed: b.time + 300, exit: 'target' }); break; }
+          if (tr.trail && tr.mfe >= tr.trail[0]) { const ns = f(tr.entry + s * (tr.mfe - tr.trail[1]) * tr.r0); if ((ns - tr.stop) * s > 0) { tr.stop = ns; tr.trailMoved = true; } }   // trail from +2R, 1.5R behind the best
           tr.checked = b.time + 300;
         }
         if (tr.status === 'open' && now - tr.opened > P.holdH * 3600) { const R = +((s * (price - tr.entry)) / tr.r0).toFixed(2);
@@ -152,7 +154,7 @@ async function main() {
         const s = g.side, entry = f(price), r0 = Math.abs(entry - g.stop);
         if ((entry - g.stop) * s <= 0 || r0 > 1.6 * g.r0) continue;   // price already through the stop, or ran far from the signal
         trades.push({ id, market: key, label: M.label, short: M.short, side: s > 0 ? 'buy' : 'sell', model: 'H1 iFVG reversal', signalAt: g.close, signalPx: f(g.entry),
-          entry, stop: f(g.stop), r0: +r0.toFixed(M.dec + 1), t1: f(entry + s * P.rr * r0), t2: f(entry + s * P.mark * r0), opened: now, checked: now, status: 'open', R: null,
+          entry, stop: f(g.stop), r0: +r0.toFixed(M.dec + 1), t1: null, trail: P.trail, stop0: f(g.stop), t2: f(entry + s * P.mark * r0), opened: now, checked: now, status: 'open', R: null,
           sweep: { t: g.sweepT, level: f(g.swept) }, fvg: g.fvg.map(f), ih: g.ih == null ? null : f(g.ih), dol: g.dol == null ? null : f(g.dol), valid: g.valid,
           feat: g.feat, grade: { ...g.grade, letter: letter(g.grade.total) }, aset });
       }
