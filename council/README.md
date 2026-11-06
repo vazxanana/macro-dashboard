@@ -547,6 +547,13 @@ record `<id>-add`, `addOf`). Council coins 2023–26: +103.6R vs +61.6R, worst d
 ratio 8.9 vs 6.3. Adds at +0.5R, +1.5R, +2R, two adds, and turtle pyramids raise drawdown faster than profit.
 Sizing guide: 0.5% on the first unit, 0.5% on the add. The add counts toward the crypto kill switch like any other trade.
 
+## Mosha BO: momentum arrivals blocked (6 Nov, user rule `mosha-slow`)
+
+`config.moshaSlow = 12`: a chain whose pullback from the H1 VR extreme to the M15 CF took fewer than 12 H1 bars is a
+shadow trade (`blockedBy: ['momentum']`). Gold H4-H1-M15 with the weekly agreeing, 3R, 2023–24 | 2025–26: all chains
++6.3R (DD −10.5) | +21.0R (DD −17.4); slow (≥ 12 bars) +9.6R (DD −3.5) | +23.0R (DD −11.3); fast −3.3R | −2.0R. The split
+holds for thresholds 12–40 bars. The field `feat.pull` keeps recording the bar count on every chain.
+
 ## Replica size tilt by the H4 direction (6 Nov, user rule `replica-msnr-size`)
 
 `config.replicaMsnrSize = { against: 1.5, with: 0.5 }`: the replica trades with the daily trend against the H4 trend; the
