@@ -1279,6 +1279,10 @@ window.MS_ADMIN_HASH = '49c5624f2625ed8b42b6e1bf2819a3a41ddb9743aeca36ea34ea7eb9
 
   .ms-srow .lv { display: flex; flex-wrap: wrap; justify-content: flex-end; align-items: center; gap: 2px 10px; text-align: right; }
   .ms-srow .lv-p { white-space: nowrap; } .ms-srow .lv-r { font-family: var(--mono); font-weight: 600; color: var(--ink); border: 1px solid var(--line); border-radius: 4px; padding: 0 5px; white-space: nowrap; }
+  .cal-d .ct .nw { white-space: nowrap; } .cal-d .ct .ct-w { display: block; color: var(--ink-faint); }
+  .cal-d .cr { font-size: clamp(11px, 1.05vw, 13px); letter-spacing: -.02em; }
+  @media (max-width: 560px) { .cal-d { overflow: hidden; } .cal-d .cr { font-size: 9.5px; letter-spacing: -.04em; } .cal-d .cq, .cal-d .cs { display: none; } }
+  #ms-c-status .c-meta::before { margin: 0 6px 0 2px; }
 </style>
 </head>
 <body>
@@ -3578,7 +3582,7 @@ function msNextSetup(bars, A) {
       const k = `${CAL.y}-${CAL.m}-${d}`, arr = byDay.get(k) || [], R0 = arr.reduce((a, x) => a + x.R, 0), heat = arr.length ? Math.min(1, Math.abs(R0) / (window.CAL_MAX || 1)) : 0, R = arr.reduce((a, x) => a + x.R, 0);
       if (arr.length) { mR += R; mN += arr.length; if (R > 0) up++; else if (R < 0) dn++; if (!best || R > best.R) best = { d, R }; if (!worst || R < worst.R) worst = { d, R }; }
       const cls = arr.length ? (R > 0 ? 'win' : R < 0 ? 'loss' : '') : '', isT = now.getFullYear() === CAL.y && now.getMonth() === CAL.m && now.getDate() === d;
-      html += `<button type="button" style="--heat:${heat.toFixed(2)}" class="cal-d ${cls}${isT ? ' today' : ''}${CAL.sel === k ? ' sel' : ''}" data-day="${k}" aria-label="${d}: ${arr.length ? `${fR(R)}, ${arr.length} trades` : 'no trades'}"><span class="cn">${d}</span>${arr.length ? `<span class="cr">${fR(R)}</span>${(() => { const q = arr.filter((x) => x.market === 'nq'); if (!q.length || mkSel === 'nq') return ''; const v = q.reduce((a, x) => a + x.R, 0); return `<span class="cq">NQ <b class="${v > 0 ? 'pos' : v < 0 ? 'neg' : ''}">${fR(v)}</b></span>`; })()}${(() => { const q = arr.filter((x) => x.shadow); if (!q.length || q.length === arr.length) return q.length ? '<span class="cq">all shadow</span>' : ''; const v = q.reduce((a, x) => a + x.R, 0); return `<span class="cq">shadow <b class="${v > 0 ? 'pos' : v < 0 ? 'neg' : ''}">${fR(v)}</b></span>`; })()}<span class="ct">${arr.length} trade${arr.length > 1 ? 's' : ''} · ${arr.filter((x) => x.status === 'win').length}W</span>` : ''}</button>`;
+      html += `<button type="button" style="--heat:${heat.toFixed(2)}" class="cal-d ${cls}${isT ? ' today' : ''}${CAL.sel === k ? ' sel' : ''}" data-day="${k}" aria-label="${d}: ${arr.length ? `${fR(R)}, ${arr.length} trades` : 'no trades'}"><span class="cn">${d}</span>${arr.length ? `<span class="cr">${fR(R)}</span>${(() => { const q = arr.filter((x) => x.market === 'nq'); if (!q.length || mkSel === 'nq') return ''; const v = q.reduce((a, x) => a + x.R, 0); return `<span class="cq">NQ <b class="${v > 0 ? 'pos' : v < 0 ? 'neg' : ''}">${fR(v)}</b></span>`; })()}${(() => { const q = arr.filter((x) => x.shadow); if (!q.length || q.length === arr.length) return q.length ? '<span class="cq">all shadow</span>' : ''; const v = q.reduce((a, x) => a + x.R, 0); return `<span class="cq">shadow <b class="${v > 0 ? 'pos' : v < 0 ? 'neg' : ''}">${fR(v)}</b></span>`; })()}<span class="ct"><span class="nw">${arr.length} trade${arr.length > 1 ? 's' : ''}</span> <span class="nw ct-w">${arr.filter((x) => x.status === 'win').length} won</span></span>` : ''}</button>`;
     }
     el.innerHTML = html;
     document.getElementById('ms-cal-m').textContent = first.toLocaleDateString(undefined, { month: 'long', year: 'numeric' });
