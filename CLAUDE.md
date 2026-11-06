@@ -61,6 +61,9 @@ when the owner pastes a GitHub fine-grained token (localStorage `msGhTok`, Conte
 `council-data/reviews/losses.json`. The trader reads that file: tags hunt / noise / late / news count in its lesson
 rules; other tags repeating 3+ times on a setup become `snapshot.ownerReviews.candidates`, which the twice-daily council
 check tests before any rule change and answers in each review's `council: {at, verdict, note}`.
+The trade dialog has a timeframe row (`#ms-tv-tf`: Auto, M1–D1) and "More history" (+300 candles back each tap, up to
+~3,800); candles come from the trade's own dates (`rangeBars`: Binance pages, Bitstamp for forex, latest candles as a
+fallback). A timeframe switch keeps the review being written (`openTrade(id, keep)` skips `rvOpen`).
 
 ## Council layout (6 Nov 2026 renovation)
 
