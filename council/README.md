@@ -547,6 +547,16 @@ record `<id>-add`, `addOf`). Council coins 2023–26: +103.6R vs +61.6R, worst d
 ratio 8.9 vs 6.3. Adds at +0.5R, +1.5R, +2R, two adds, and turtle pyramids raise drawdown faster than profit.
 Sizing guide: 0.5% on the first unit, 0.5% on the add. The add counts toward the crypto kill switch like any other trade.
 
+## Replica size tilt by the H4 direction (6 Nov, user rule `replica-msnr-size`)
+
+`config.replicaMsnrSize = { against: 1.5, with: 0.5 }`: the replica trades with the daily trend against the H4 trend; the
+Malaysian SnR H4 direction (`feat.msnr`, pivot width 5, Daily levels) says whether that H4 pullback is still in progress.
+Size 1.5 when the direction is against the trade, 0.5 when it agrees, 1 when there is none; the add scales with it; the
+bridges multiply the first unit's risk by the record's `size`. Spot gold 2023–24 | 2025–26, live exits and risk rules:
+live +73.9R (DD −10.5) | +112.0R (DD −17.6); tilted +109.6R (DD −9.7) | +155.5R (DD −16.5). The opposite tilt (half size
+when against) loses in both halves; skipping the agreeing trades keeps most of the profit with half the drawdown but
+gives trades away. The same split had the same sign in 2019–22.
+
 ## Gold trend (5 Nov, user rule `gold-trend`)
 
 From the owner's "OmniBook" cBot: its daily breakout was the one gold edge that held on 8 years of spot gold 1m. Rule

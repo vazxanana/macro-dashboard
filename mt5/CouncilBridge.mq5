@@ -170,7 +170,8 @@ ulong ticketFor(string id) { return (ulong)gvGet("t." + id); }
 // the lots of the first trade of an add (same notional), else sized by risk
 double lotsFor(Sig &s, string sym) {
   if (s.addOf != "") { ulong pt = ticketFor(s.addOf); if (pt > 0 && PositionSelectByTicket(pt)) return normLots(sym, PositionGetDouble(POSITION_VOLUME)); }
-  return lotsForRisk(sym, s.entry, s.stop, riskFor(s.k));
+  double sz = (s.size > 0 && s.size < 4) ? s.size : 1.0;   // the Trader's size (replica 0.5 / 1.5 tilts); adds copy the parent's lots above
+  return lotsForRisk(sym, s.entry, s.stop, riskFor(s.k) * sz);
 }
 
 void handle(Sig &s) {
