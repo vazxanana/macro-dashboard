@@ -1,24 +1,25 @@
-# Daily review, 2026-11-05: the live systems sat out a one-way day; the filters and the gate did their job.
+# Daily review, 2026-11-06: a big shadow day (+88R) that the long history says not to chase; live systems quiet, one gold limit order waiting.
 
 ## Today
-- **Live systems (gold replica, NQ open run, crypto trend, Mosha BO): no trade opened, none closed.** Gold fired 11 replica signals between 03:53 and 20:51 UTC and every one failed the entry filter (clean H1 / star plus stop size); 7 of the 11 were sells against the daily trend. The volatility gate was off anyway (20-day range 1.35% vs the top-fifth level 2.42%). Followed on paper, those 11 signals are −1R net with 4 still open.
-- NQ: no open-run signal. The index fell from 28,205 at the 09:30 ET open to 26,914 without one 1-minute close back above the open, so there was no reclaim to trade. The 2-SD fade tracker (research only) lost 1R.
-- Mosha BO: no H4 → H1 → M15 chain completed. Crypto trend: BTC 15%, ETH 26%, SOL 40%, XRP 36% under their 55-day highs; nothing to do.
-- Retired desk strategies (shadow only): 87 opened, 78 closed, −11.1R. Scalp 6 wins / 26 losses; Retrace-scalp 13 wins / 19 losses.
+- **Live systems: none closed.** One order is live: the gold engulfing desk (geg) has a buy limit pending at 3979.36 (stop 3907.61) at the top of the H4 demand zone 3912–3984, with price 4091 above the 50-SMA 4043.
+- Gold replica: the volatility gate stayed off (20-day range 1.39% vs the top-fifth level 2.42%). Gold trend: 4091 vs the 20-day high 4204, no breakout. Weekly structure still bearish.
+- NQ: no open-run trade; last 27,118. Crypto trend: BTC 15% and ETH 26% under their 55-day highs; nothing to do.
+- Shadow (retired desk setups): 131 opened, 103 closed, 43 wins / 60 losses, **+88.1R**. Biggest: gold Scalp +20.75R (14), gold M30→M1 +22.75R (12, the same entries as the gold Scalp, counted twice: dedupe merged today, PR #259), XRP Scalp +16.5R, gold Retrace-intraday 5/5 +14.9R, EUR/USD Scalp +7.8R, GBP/USD Scalp +6.1R. Losers: XRP Retrace-scalp −3.9R, SOL Scalp −3R.
 
 ## What worked / what didn't
-- Worked: the gate and the daily-trend filter. The gold sells against the daily trend (4138.6 → 4100 region) looked right on the day, but the replay says those signals lose over 2023–26; today they were a coin flip (2 wins, 3 losses, 4 open). Staying out cost nothing.
-- Didn't: the legacy Scalp on gold (41 closed over 30 days, 12% wins, −23R) and on GBP/USD (−10.7R) keep losing in shadow. They are retired; nothing to change.
-- Bug fixed today (PR #239): the news veto from the morning threw on every replica signal; two rounds on the fixed code show zero errors.
+- Worked: the shadow setups caught a one-way gold move. Without the m30m1 duplicates the day is still about +65R.
+- Didn't: one good day doesn't change the long history. The 150-day shadow replay (Jun–Oct, 8,134 setups) runs about −0.15R a trade, and the 2023–26 gold backtest loses in both halves. Yesterday the same setups were −11R.
+- Owner loss reviews: none written yet (ownerReviews n=0), so no candidates to test.
 
-## Patterns over the last 30 days (shadow, 408 closed)
-- Per setup: Scalp gold −0.56R a trade (n41), Scalp AUD/USD +0.21 (37), Retrace-scalp gold +0.09 (34), Scalp USD/CAD −0.46 (22), Retrace-scalp BTC +0.34 (15), Scalp BTC +1.05 (13, carried by two trades). Only Retrace-scalp is positive across markets (+18.9R over 113 since 1 Nov); it goes to the long-history test before any reconsideration.
-- D1 agreement did not separate: with D1 −0.07R (213), against −0.03R (194). Structure: main −0.02R (171), internal −0.30R (88): internal-structure entries lose, as the retired rules already said.
+## Patterns over the last 30 days (all closed, live + shadow)
+- Scalp 266 trades, 26% wins, +0.07R a trade (live part 16, −0.62R). Retrace-scalp 153, 40%, +0.04R (live 6, −0.83R). Intraday 43, +0.12R. Retrace-intraday 31, 45%, +0.32R (live 5, −0.8R). M30→M1 28, +0.71R (inflated by today's duplicates).
+- Against the daily trend looks better than with it (Scalp +0.21 vs −0.05; Retrace-scalp +0.24 vs −0.23; Retrace-intraday +0.76 vs −0.08). This lean was tested on gold 2023–26 and failed the both-halves rule, so it stays a note, not a rule.
+- Structure: main +0.16R (194) vs internal −0.16R (72) on Scalp: internal entries still lose, as the retired rules say.
 
 ## Rule changes
-No change. The live systems took no trade; the legacy setups are retired (retireLegacy on) and only run as shadow, so buf / minRR / pauses would change nothing that trades.
+No change. The live part of every setup has fewer than 5 closed trades in 30 days or is already retired; buf 0.15 / minRR 1.2 stay. The positive 30-day shadow numbers come mostly from today and contradict the 2023–26 test.
 
 ## Watch tomorrow
-- Gold: the replica stays off until the 20-day range climbs back toward 2.4%; the engine shows Position buy and Retrace sell as Ready, but those are legacy setups (shadow only). Weekly structure is bearish, so a Mosha BO chain would be a sell.
-- NQ: Friday open; after today's 1,300-point drop the 00:00 ET open will sit well above the 09:30 open, which favours a SELL open-run if the reclaim pattern appears.
-- Crypto: no coin within 15% of a breakout; BTC closest.
+- Gold: geg buy limit 3979.36 (stop 3907.61); it fills only on a pullback of ~110 points into the demand zone. Replica stays off while the 20-day range sits near 1.4%.
+- Shadow m30m1 should now stop duplicating the gold Scalp; check that tomorrow's counts match.
+- NQ and crypto: no setup near; BTC closest at 15% under its high.
