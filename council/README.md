@@ -614,6 +614,8 @@ size tilt, 2023–24 | 2025–26: +109.6R (DD −9.7) | +155.5R (DD −16.5) →
 
 ## Gold momentum pullback (6 Nov, user rule `gold-momentum-pullback`)
 
+**On test (owner, 6 Nov):** its trades are recorded as shadow trades with `blockedBy: ['test']` (and `test: true`), so they show and count in the shadow float but not in the live systems; the calendar carries a 3-week replay of it.
+
 The scalp that survives a raw-spread account. Rule (`config.goldMP`, records `k: 'gmp'`): a closed H1 candle whose range is
 ≥ 1.5× the average of the previous 14 H1 ranges and which closes in its top (buy) / bottom (sell) 20%, in the direction of
 the 20-day average, closing between 07:00 and 17:00 UTC, opens a watch (kept in `state.json`); the first closed M5 candle
