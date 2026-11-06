@@ -199,6 +199,9 @@ const USER_RULES = [
   { id: 'gold-trend', apply: (c) => { c.goldTrend = { n: 20, k: 2 }; },
     change: 'Gold trend (new paper system): a daily close above the prior 20 daily highs buys gold at market on the next run; stop 2 x ATR(D1,14) below, lifted to (daily close - 2 ATR) on every closed day; no target, no time limit; one position',
     why: 'Owner supplied a 13-edge cTrader bot; its daily breakout was the one gold edge that held on our 8 years of spot gold 1m (0.42 cost): N20 trail 2 ATR +0.31R | +1.07R | +2.42R a trade in 2019-22 | 2023-24 | 2025-26 (n29/12/10, worst drawdown -4.4R | -1.4R | -0.9R), N10 and N55 and a 3 ATR trail all positive in every period, the mirrored short loses in every period. By year: 2019 +6.1R, 2020 +3.3, 2021 +0.5, 2022 -1.1, 2023 +4.0, 2024 +8.8, 2025 +19.4, 2026 +4.7. Long only: it rides the secular bull and caps each loss near -1R. Sizing guide 0.5% per trade.' },
+  { id: 'gold-h4-trendline', apply: (c) => { c.goldTL = { n: 3, span: 120, n4: 2, pad: 0.3, hold: 96 }; },
+    change: 'Gold H4 trendline (new paper system, buys only): a closed H4 candle above the falling line through the last two confirmed H4 pivot highs, while the H4 direction SOP (Malaysian SnR, Daily levels) reads up, buys at market; stop under the lowest low since the second anchor; after +2R the stop trails 1R behind the best price (cap 10R); out after 96 h; one trade per line, one position',
+    why: 'Owner: find the best SOP timeframe for the trendline break, judged on 2023 onwards (halves 2023-24 | 2025-26). M15/M30 lose, H1 is flat, H4 is the only timeframe with profit: buys gated by the H4 direction +0.44R | +0.67R a trade (n54/49, worst drawdown -4.1R | -6.6R), positive every year (2023 +3.3, 2024 +20.5, 2025 +29.4, 2026 +3.5), robust to pivot width 2-4 and hold 48-240 h, entry 4 min late still +0.37 | +0.62. Sells are inconsistent (-4R | +5R) and are not traded. Two thirds of the trades fire while the gold trend system is flat, so it adds to it rather than doubling it.' },
   { id: 'mosha-bo-weekly', apply: (c) => { c.moshaBoWeekly = true; },
     change: "Mosha BO system: trades only in the weekly structure's direction (his \"Father\" timeframe); the M15 break no longer has to flip M15 structure",
     why: "From his multi-timeframe slides (father/mother/son). Spot gold 2019-26, H4->H1->M15, limit at the broken level, 3R, with the weekly direction computed the way the trader sees it live (Monday weeks built from the last 720 daily candles, swing size 3): weekly agrees 2019-22 +32.2R (87 trades, +0.37R a trade), 2023-26 +34.2R (99, +0.35R), 7 of 8 years positive, worst drawdown -18.4R; weekly against -28.3R / -15.8R. The previous flip-only rule: +7.5R / +15.1R. Caveat: the weekly filter did not help the other timeframe chains, so it is watched by the kill switch like everything else." },
@@ -414,7 +417,7 @@ for (const [key, M] of Object.entries(MARKETS)) {
       setups: setups.map((t) => ({ k: t.k, name: t.name, pair: t.pair, side: t.sell ? 'sell' : 'buy', state: t.state, entry: t.entry, stop: t.stop, t1: t.t1, rr: +t.rr.toFixed(2), next: t.next, retrace: !!t.retrace })),
     };
 
-    if (config.retireLegacy) for (const tr of trades.filter((x) => x.market === key && !x.shadow && x.k !== 'replica' && x.k !== 'mosha-bo' && x.k !== 'trend' && (x.status === 'open' || x.status === 'pending'))) {
+    if (config.retireLegacy) for (const tr of trades.filter((x) => x.market === key && !x.shadow && !['replica', 'mosha-bo', 'trend', 'gtrend', 'gtl'].includes(x.k) && (x.status === 'open' || x.status === 'pending'))) {
       if (tr.status === 'pending') { tr.status = 'expired'; tr.R = 0; } else { const r0 = tr.r0 || Math.abs(tr.entry - tr.stop), R = +(((tr.side === 'sell' ? -1 : 1) * (price - tr.entry)) / r0).toFixed(2); tr.R = R; tr.status = R > 0 ? 'win' : R < 0 ? 'loss' : 'be'; }
       tr.closed = now; tr.exit = 'retired';
     }
@@ -595,6 +598,33 @@ for (const [key, M] of Object.entries(MARKETS)) {
         }
         (snapshot.goldTrend = snapshot.goldTrend || {}).state = { hi20: n > GT.n ? +Math.max(...D.slice(n - 1 - GT.n, n - 1).map((b) => b.high)).toFixed(2) : null, lastClose: last && last.close, open: !!open, stop: open ? open.stop : null };
       } catch (e) { snapshot.errors.goldTrend = String(e.message || e); }
+    }
+    if (key === 'xau' && config.goldTL) {
+      try {
+        const TL = config.goldTL, H = src['4h'].bars.slice(0, -1), D = src['1d'].bars.slice(0, -1), n = H.length, last = H[n - 1], dp = Math.max(2, (M.dec ?? 2) + 1);
+        const open = trades.find((x) => x.k === 'gtl' && x.market === key && !x.shadow && (x.status === 'open' || x.status === 'pending'));
+        // confirmed H4 pivot highs (half-width TL.n); the line runs through the last two when the second is lower
+        const piv = []; for (let i = TL.n; i < n - TL.n; i++) { let ok = true; for (let k = i - TL.n; k <= i + TL.n && ok; k++) if (k !== i && H[k].high >= H[i].high) ok = false; if (ok) piv.push([i, H[i].high]); }
+        let state = { line: null };
+        if (piv.length >= 2) {
+          const [a, pa] = piv[piv.length - 2], [b, pb] = piv[piv.length - 1];
+          if (pb < pa && b - a <= TL.span && n - 1 > b + TL.n) {
+            const slope = (pb - pa) / (b - a), lv = pa + slope * (n - 1 - a), id = `${key}-gtl-${H[a].time}-${H[b].time}`;
+            state = { line: +lv.toFixed(2), a: H[a].time, b: H[b].time, lastClose: last.close, traded: trades.some((x) => x.id === id) };
+            if (!open && last.close > lv && !state.traded && now - (last.time + 14400) < 3600) {
+              const dir = msnrDirection(H, D, TL.n4, 2); state.dir = dir;
+              if (dir === 1) {
+                const entry = +price.toFixed(dp), lo = Math.min(...H.slice(b).map((x) => x.low)), stop = +(lo - TL.pad).toFixed(dp), r0 = entry - stop;
+                if (r0 > 0) trades.push({ id, market: key, label: M.label, dec: M.dec, k: 'gtl', name: 'Gold H4 trendline', pair: 'H4 trendline break', h: '4h', side: 'buy',
+                  entry, stop, t1: +(entry + 10 * r0).toFixed(dp), tp1: +(entry + 2 * r0).toFixed(dp), rr: 10, trail: [2, 1], buf: CFG.buf, opened: now, filled: now, checked: now, status: 'open', R: null, r0, maxHold: TL.hold * 3600, noBe: true, entryMode: 'market',
+                  feat: { line: +lv.toFixed(2), anchors: [+pa.toFixed(2), +pb.toFixed(2)], lo: +lo.toFixed(2) }, shadow: false, blockedBy: [],
+                  note: `Gold H4 trendline: H4 close ${last.close} above the falling line ${lv.toFixed(2)} through the pivot highs ${pa.toFixed(2)} and ${pb.toFixed(2)}, H4 direction up (Malaysian SnR SOP). Buy at market, stop ${stop} under the low since the second anchor; after +2R (${(entry + 2 * r0).toFixed(2)}) the stop trails 1R behind the best price (cap 10R); out after ${TL.hold} h.` });
+              } else { state.blocked = 'direction'; }
+            }
+          }
+        }
+        (snapshot.goldTL = snapshot.goldTL || {}).state = { ...state, open: !!open, stop: open ? open.stop : null };
+      } catch (e) { snapshot.errors.goldTL = String(e.message || e); }
     }
     if (key === 'xau' && config.moshaBo) {
       const ev = (id, sec) => { const bb = src[id].bars; return src[id].A.events.filter((e) => e.breakIdx < bb.length - 1).map((e) => ({ t: bb[e.breakIdx].time + sec, dir: e.dir, level: e.level, top: e.top, bot: e.bot, flip: e.structure })); };
@@ -1223,7 +1253,7 @@ wr('trades.json', trades);
 // Our live systems only (gold replica, Mosha BO, crypto trend, with their adds) plus the NQ open run (research, 10-min-late feed,
 // the EA mirrors it only if the owner turns that on); shadow trades never. Rows for the last 7 days so the EA can close what it holds.
 try {
-  const SYSK = ['replica', 'mosha-bo', 'trend', 'gtrend'], cut = now - 7 * 86400;
+  const SYSK = ['replica', 'mosha-bo', 'trend', 'gtrend', 'gtl'], cut = now - 7 * 86400;
   const rows = trades.filter((x) => !x.shadow && SYSK.includes(x.k) && (x.status === 'open' || x.status === 'pending' || (x.closed || x.opened || 0) >= cut))
     .concat(research.filter((x) => x.k === 'nq-open' && x.session === 'nyflip' && (x.status === 'open' || (x.closed || x.opened || 0) >= cut)).map((x) => ({ ...x, k: 'nq-open', market: 'nq' })));
   const f = (v) => v == null || v === '' ? '' : typeof v === 'number' ? String(v) : String(v).replace(/[,\n"]/g, ' ');

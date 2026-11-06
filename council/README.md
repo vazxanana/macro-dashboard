@@ -557,3 +557,17 @@ Spot gold 2019–22 | 2023–24 | 2025–26: +0.31 | +1.07 | +2.42R a trade (n29
 N10, N55 and a 3 ATR trail are positive in every period too; the mirrored short loses in every period, so long only.
 About 6 trades a year, half of them winners, best +13R, worst −1.02R. Sizing guide 0.5% per trade. `snapshot.goldTrend`
 shows the 20-day high, the last close and the open position's stop.
+
+## Gold H4 trendline (6 Nov, user rule `gold-h4-trendline`)
+
+Owner's request to find the best SOP timeframe for a trendline break, judged on 2023 onwards. Rule
+(`config.goldTL = { n: 3, span: 120, n4: 2, pad: 0.3, hold: 96 }`, records `k: 'gtl'`): on closed H4 candles, the falling
+line through the last two confirmed pivot highs (half-width 3 bars, at most 120 bars apart); a close above the line, while
+the H4 direction SOP (Malaysian SnR: H4 external breakout after a tapped Daily level, pivot width 2) reads up, buys gold at
+market on the next run (within an hour of that H4 close); stop 0.3 under the lowest low since the second anchor; after +2R
+the stop trails 1R behind the best price (cap 10R); out after 96 h; one trade per line, one position, buys only.
+Spot gold 2023–24 | 2025–26: +0.44 | +0.67R a trade (n54/49), worst drawdown −4.1 | −6.6R, every year positive (2023 +3.3,
+2024 +20.5, 2025 +29.4, 2026 +3.5); pivot width 2–4 and hold 48–240 h all positive in both halves; entry 4 min late still
++0.37 | +0.62. M15/M30 versions lose, H1 is flat; sells are inconsistent and not traded. Two thirds of the trades fire
+while the gold trend system is flat. About 25 trades a year. Sizing guide 0.25% per trade. `snapshot.goldTL` shows the
+current line, its anchors, the last H4 close and whether the direction blocked a break.
