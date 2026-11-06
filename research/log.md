@@ -1155,3 +1155,23 @@ Remaining report ideas on the plan: a time gate 15–30 min after 08:30 ET relea
 | gate, then v/p80 sizing inside [0.5, 2] | +102.6R, DD −11.6 | +210.3R, DD −21.0 |
 
 Continuous sizing without the gate keeps every calm-market loser at a reduced size and quadruples the drawdown; sizing inside the gate adds profit only in 2025–26 and raises both drawdowns. The report's "vol-targeted sizing instead of a binary gate" does not hold for this system: the calm-gold signals have no edge at any size. **Unchanged.** That closes the deep-research list except the owner's pending gold-trend add decision.
+
+## 2026-11-06 — Replica exits and add timing re-checked under the size tilt: unchanged (add at +1.5R is a near miss)
+
+`ms/exits_tilt.py`, live risk rules + the MSNR tilt, 2023–24 | 2025–26:
+
+| exit / add | 2023–24 | 2025–26 |
+|---|---|---|
+| live: BE at +2R, add at +2R, run 1R after +4R | +109.6R, DD −9.7 | +155.5R, DD −16.5 |
+| fixed 4R, no add | +61.2, DD −6.5 | +84.6, DD −13.4 |
+| fixed 3R / 5R | +43.6 / +66.4 | +66.4 / +64.7 |
+| no breakeven | +86.5, DD −12.7 | +166.9, DD −20.2 |
+| run after +3R instead of +4R | +70.9 | +124.4 |
+| trail 2R behind after +4R | +115.2, DD −9.5 | +117.1, DD −17.9 |
+| add at +1.5R (BE still +2R) | **+120.2, DD −10.3** | **+170.3, DD −14.4** |
+| add at +1.5R, BE at +1.5R | +106.3, DD −12.7 | +151.0, DD −26.1 |
+| add at +1R | +120.1, DD −14.4 | +160.4, DD −25.5 |
+| add at +1.5R, run after +5R | +102.8 | +115.0 |
+| add half a unit at +2R | +86.9 | +129.2 |
+
+The live exit stack holds. Moving the add from +2R to +1.5R gains 10% / 10% profit and cuts the 2025–26 drawdown, but the 2023–24 drawdown worsens by 0.6R (−10.3 vs −9.7) → fails the strict rule by a hair; everything else (earlier BE, add at +1R, later run, half adds) is worse. Listed for the owner with the gold-trend add as "more profit, marginally more early drawdown" candidates; not applied.
