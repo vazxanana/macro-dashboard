@@ -1112,3 +1112,18 @@ Negative in both halves for every stop, target and gate; the direction gate halv
 ## 2026-11-06 — Combined gold exposure (replica, gold trend, H4 trendline, daily engulf) at the sizing guide, 2023–Oct 2026
 
 Replay records at 0.5% (replica, gold trend) and 0.25% (trendline, engulf): gold systems alone +143.7% over the period, worst drawdown −10.6%, worst day −2.53% (2 Apr 2026); maximum simultaneous gold open risk 2.5% of the account (23 Aug 2024); three or more gold positions open on 252 of 1,010 trading days. Daily P&L correlations between the four systems are all within ±0.06 — they are independent legs, not the same trade four times, so the diversification is real and the drawdown of the sum (−10.6%) is well under the sum of the drawdowns. For the challenge account the earlier 0.75× guide still holds (worst day ≈ −1.9%, drawdown ≈ −8%); the paper council keeps the full guide.
+
+## 2026-11-06 — MSNR direction variants from the deep research (reset, strict, body tap, level life): the replica tilt is insensitive to them
+
+Web research on the Malaysian SnR schools (search-snippet level; the session cannot open the pages) surfaced three codable variants of the direction rule not in the L3XUS SOP: (a) an H4 close beyond the tapped Daily level cancels the tap (MQL5 storyline products); (b) a newer pivot of the same side confirmed after the tap resets the setup (RWBTradeLab "double breakout"); (c) only a body tap counts (one generic guide). Judged through the replica size tilt (`ms/msnr_variants.py`, 1.5× when the H4 direction is against the trade, 0.5× when it agrees, pivot width 5):
+
+| direction rule | 2023–24 | 2025–26 | share "against" |
+|---|---|---|---|
+| no tilt (old live) | +73.9R, DD −10.5 | +112.0R, DD −17.6 | |
+| base (adopted, PR #246) | +109.6R, DD −9.7 | +155.5R, DD −16.5 | 65% |
+| reset on a close beyond the tapped level | +109.6 | +150.8 | 64% |
+| strict (newer pivot resets) | identical to base | | |
+| body tap only | identical to base | | |
+| Daily level life 30 d / 180 d | +104.8 / +109.6 | +155.5 / +155.5 | |
+
+The direction state at the replica's entry times is the same under every variant except the reset (slightly worse) and the 30-day life (slightly worse in 2023–24). The tilt is therefore not an artefact of a definitional detail; the adopted rule stays. Also from the research: gold's Feb–Jun 2026 drawdown (5,597 → 3,942) as a separate test window: replica +59.6R (81), gold trend −0.9R (1), H4 trendline −3.6R (14), daily engulf −6.8R (11) — the long-only legs lose modestly in a bear phase, the replica carries the book; drawdowns within each system's stated limits.
