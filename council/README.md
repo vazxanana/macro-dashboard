@@ -571,3 +571,19 @@ Spot gold 2023–24 | 2025–26: +0.44 | +0.67R a trade (n54/49), worst drawdown
 +0.37 | +0.62. M15/M30 versions lose, H1 is flat; sells are inconsistent and not traded. Two thirds of the trades fire
 while the gold trend system is flat. About 25 trades a year. Sizing guide 0.25% per trade. `snapshot.goldTL` shows the
 current line, its anchors, the last H4 close and whether the direction blocked a break.
+
+## Gold daily engulf (6 Nov, user rule `gold-daily-engulf`)
+
+From the owner's four school skills (engulfing EG/EF, Mosha storyline, PITCHOU and Zlankator Malaysian SnR): the engulf
+zone is the one codable rule that held on gold judged on 2023 onwards. Rule (`config.goldEG = { k: 3, life: 20, hold: 240,
+sma: 20, pad: 0.3, maxOpen: 3 }`, records `k: 'geg'`): a closed daily candle that body-closes above the HIGH of a red base
+candle (the base within the last 3 candles, no opposite candle between) makes an EG buy zone = the base candle's full
+range; while that close is above the 20-day average, a limit buy waits at the zone high for 20 days and is cancelled by a
+daily close under the zone low (the zone failed); stop 0.3 under the zone low; after +2R the stop trails 1R behind the best
+price (cap 10R); out 10 days after the fill; one trade per zone, at most 3 open, buys only. Spot gold 2023–24 | 2025–26:
++0.33 | +0.68R a trade (n77/69), worst drawdown −9.8 | −6.3R, every year positive (2023 +6.2, 2024 +19.3, 2025 +34.1,
+2026 +12.9); robust to the confirmation window (1–5 candles), zone life (10–100 days), hold (5–10 days) and every trail
+tested; without the average gate +0.27 | +0.54 with deeper drawdowns. H4/H1 engulf zones lose in 2023–24; sells lose
+everywhere; the EF-reversal trade and the storyline Apex entry (Daily reject Daily + H4 external breakout, 30-pip stop)
+are negative. Two thirds of the trades fire while the gold trend system is flat. About 35 trades a year. Sizing guide
+0.25% per trade. `snapshot.goldEG` shows the last close, the average, the zone of the day, waiting limits and open count.

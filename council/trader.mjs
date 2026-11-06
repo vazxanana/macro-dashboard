@@ -202,6 +202,9 @@ const USER_RULES = [
   { id: 'gold-h4-trendline', apply: (c) => { c.goldTL = { n: 3, span: 120, n4: 2, pad: 0.3, hold: 96 }; },
     change: 'Gold H4 trendline (new paper system, buys only): a closed H4 candle above the falling line through the last two confirmed H4 pivot highs, while the H4 direction SOP (Malaysian SnR, Daily levels) reads up, buys at market; stop under the lowest low since the second anchor; after +2R the stop trails 1R behind the best price (cap 10R); out after 96 h; one trade per line, one position',
     why: 'Owner: find the best SOP timeframe for the trendline break, judged on 2023 onwards (halves 2023-24 | 2025-26). M15/M30 lose, H1 is flat, H4 is the only timeframe with profit: buys gated by the H4 direction +0.44R | +0.67R a trade (n54/49, worst drawdown -4.1R | -6.6R), positive every year (2023 +3.3, 2024 +20.5, 2025 +29.4, 2026 +3.5), robust to pivot width 2-4 and hold 48-240 h, entry 4 min late still +0.37 | +0.62. Sells are inconsistent (-4R | +5R) and are not traded. Two thirds of the trades fire while the gold trend system is flat, so it adds to it rather than doubling it.' },
+  { id: 'gold-daily-engulf', apply: (c) => { c.goldEG = { k: 3, life: 20, hold: 240, sma: 20, pad: 0.3, maxOpen: 3 }; },
+    change: 'Gold daily engulf (new paper system, buys only): a closed daily candle that body-closes above the HIGH of a red base candle (within 3 same-colour candles) makes an EG buy zone = the base candle\'s full range; while that close is above the 20-day average, a limit buy waits at the zone high for 20 days (cancelled by a daily close under the zone low); stop 0.3 under the zone low; after +2R the stop trails 1R behind the best price (cap 10R); out after 10 days; one trade per zone, at most 3 open',
+    why: 'Owner supplied four school skills (engulfing EG/EF, Mosha storyline, PITCHOU and Zlankator Malaysian SnR). The engulf zone is the one codable rule that held on gold judged on 2023 onwards: D1 EG buys +0.33R | +0.68R a trade (n77/69, worst drawdown -9.8R | -6.3R), every year positive (2023 +6.2, 2024 +19.3, 2025 +34.1, 2026 +12.9), robust to the confirmation window (1-5 candles), zone life, hold and every trail tested; the 20-day-average gate keeps the profit and cuts the drawdown. Two thirds of the trades fire while the gold trend system is flat. H4 and H1 engulf zones lose in 2023-24, sells lose everywhere, the EF-reversal and the storyline Apex entries (DRD + H4 external breakout, 30-pip stop) are negative.' },
   { id: 'mosha-bo-weekly', apply: (c) => { c.moshaBoWeekly = true; },
     change: "Mosha BO system: trades only in the weekly structure's direction (his \"Father\" timeframe); the M15 break no longer has to flip M15 structure",
     why: "From his multi-timeframe slides (father/mother/son). Spot gold 2019-26, H4->H1->M15, limit at the broken level, 3R, with the weekly direction computed the way the trader sees it live (Monday weeks built from the last 720 daily candles, swing size 3): weekly agrees 2019-22 +32.2R (87 trades, +0.37R a trade), 2023-26 +34.2R (99, +0.35R), 7 of 8 years positive, worst drawdown -18.4R; weekly against -28.3R / -15.8R. The previous flip-only rule: +7.5R / +15.1R. Caveat: the weekly filter did not help the other timeframe chains, so it is watched by the kill switch like everything else." },
@@ -417,7 +420,7 @@ for (const [key, M] of Object.entries(MARKETS)) {
       setups: setups.map((t) => ({ k: t.k, name: t.name, pair: t.pair, side: t.sell ? 'sell' : 'buy', state: t.state, entry: t.entry, stop: t.stop, t1: t.t1, rr: +t.rr.toFixed(2), next: t.next, retrace: !!t.retrace })),
     };
 
-    if (config.retireLegacy) for (const tr of trades.filter((x) => x.market === key && !x.shadow && !['replica', 'mosha-bo', 'trend', 'gtrend', 'gtl'].includes(x.k) && (x.status === 'open' || x.status === 'pending'))) {
+    if (config.retireLegacy) for (const tr of trades.filter((x) => x.market === key && !x.shadow && !['replica', 'mosha-bo', 'trend', 'gtrend', 'gtl', 'geg'].includes(x.k) && (x.status === 'open' || x.status === 'pending'))) {
       if (tr.status === 'pending') { tr.status = 'expired'; tr.R = 0; } else { const r0 = tr.r0 || Math.abs(tr.entry - tr.stop), R = +(((tr.side === 'sell' ? -1 : 1) * (price - tr.entry)) / r0).toFixed(2); tr.R = R; tr.status = R > 0 ? 'win' : R < 0 ? 'loss' : 'be'; }
       tr.closed = now; tr.exit = 'retired';
     }
@@ -625,6 +628,33 @@ for (const [key, M] of Object.entries(MARKETS)) {
         }
         (snapshot.goldTL = snapshot.goldTL || {}).state = { ...state, open: !!open, stop: open ? open.stop : null };
       } catch (e) { snapshot.errors.goldTL = String(e.message || e); }
+    }
+    if (key === 'xau' && config.goldEG) {
+      try {
+        const EG = config.goldEG, D = src['1d'].bars.slice(0, -1), n = D.length, last = D[n - 1], dp = Math.max(2, (M.dec ?? 2) + 1);
+        const mine = trades.filter((x) => x.k === 'geg' && x.market === key && !x.shadow);
+        // cancel waiting orders whose zone was body-closed through (EF) on a newly closed day
+        for (const tr of mine.filter((x) => x.status === 'pending')) if (tr.zone && last.time > (tr.lastD || 0) && last.close < tr.zone[0]) { tr.status = 'expired'; tr.closed = now; tr.R = 0; tr.exit = 'zone failed'; }
+        for (const tr of mine.filter((x) => x.status === 'pending')) tr.lastD = last.time;
+        let state = { lastClose: last && last.close };
+        if (n > EG.sma + EG.k + 2) {
+          const sma = D.slice(n - EG.sma).reduce((a, b) => a + b.close, 0) / EG.sma, up = last.close > sma; state.sma = +sma.toFixed(2); state.up = up;
+          // the newly closed candle as the confirming candle: green, closing above the HIGH of a red base candle within k candles, no opposite candle in between
+          let base = null;
+          if (last.close > last.open) for (let j = n - 2; j >= n - 1 - EG.k && j >= 0; j--) { const b = D[j]; if (b.open > b.close) { if (last.close > b.high) base = b; break; } if (b.close < b.open) break; }
+          state.zone = base ? [base.low, base.high] : null;
+          const id = base ? `${key}-geg-${base.time}` : null;
+          const openCnt = mine.filter((x) => x.status === 'open' || x.status === 'pending').length;
+          if (base && up && !trades.some((x) => x.id === id) && now - (last.time + 86400) < 86400 && openCnt < EG.maxOpen) {
+            const entry = +base.high.toFixed(dp), stop = +(base.low - EG.pad).toFixed(dp), r0 = entry - stop;
+            if (r0 > 0 && price > entry) trades.push({ id, market: key, label: M.label, dec: M.dec, k: 'geg', name: 'Gold daily engulf', pair: 'D1 engulf zone', h: '1d', side: 'buy',
+              entry, stop, t1: +(entry + 10 * r0).toFixed(dp), tp1: +(entry + 2 * r0).toFixed(dp), rr: 10, trail: [2, 1], buf: CFG.buf, opened: now, checked: now, status: 'pending', R: null, r0, validFor: EG.life * 86400, maxHold: EG.hold * 3600, noBe: true, entryMode: 'limit',
+              zone: [+base.low.toFixed(dp), +base.high.toFixed(dp)], lastD: last.time, feat: { sma: +sma.toFixed(2), conf: last.close }, shadow: false, blockedBy: [],
+              note: `Gold daily engulf: daily close ${last.close} above the high ${base.high} of the red candle of ${new Date(base.time * 1000).toISOString().slice(0, 10)} (zone ${base.low}-${base.high}), close above the ${EG.sma}-day average ${sma.toFixed(2)}. Limit buy at the zone high ${entry} for ${EG.life} days (cancelled by a daily close under ${base.low}); stop ${stop}; after +2R (${(entry + 2 * r0).toFixed(2)}) the stop trails 1R behind the best price (cap 10R); out ${EG.hold / 24} days after the fill.` });
+          } else if (base && !up) state.blocked = 'below 20-day average';
+        }
+        (snapshot.goldEG = snapshot.goldEG || {}).state = { ...state, pending: mine.filter((x) => x.status === 'pending').map((x) => x.entry), open: mine.filter((x) => x.status === 'open').length };
+      } catch (e) { snapshot.errors.goldEG = String(e.message || e); }
     }
     if (key === 'xau' && config.moshaBo) {
       const ev = (id, sec) => { const bb = src[id].bars; return src[id].A.events.filter((e) => e.breakIdx < bb.length - 1).map((e) => ({ t: bb[e.breakIdx].time + sec, dir: e.dir, level: e.level, top: e.top, bot: e.bot, flip: e.structure })); };
@@ -1253,7 +1283,7 @@ wr('trades.json', trades);
 // Our live systems only (gold replica, Mosha BO, crypto trend, with their adds) plus the NQ open run (research, 10-min-late feed,
 // the EA mirrors it only if the owner turns that on); shadow trades never. Rows for the last 7 days so the EA can close what it holds.
 try {
-  const SYSK = ['replica', 'mosha-bo', 'trend', 'gtrend', 'gtl'], cut = now - 7 * 86400;
+  const SYSK = ['replica', 'mosha-bo', 'trend', 'gtrend', 'gtl', 'geg'], cut = now - 7 * 86400;
   const rows = trades.filter((x) => !x.shadow && SYSK.includes(x.k) && (x.status === 'open' || x.status === 'pending' || (x.closed || x.opened || 0) >= cut))
     .concat(research.filter((x) => x.k === 'nq-open' && x.session === 'nyflip' && (x.status === 'open' || (x.closed || x.opened || 0) >= cut)).map((x) => ({ ...x, k: 'nq-open', market: 'nq' })));
   const f = (v) => v == null || v === '' ? '' : typeof v === 'number' ? String(v) : String(v).replace(/[,\n"]/g, ' ');
