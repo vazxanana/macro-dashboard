@@ -1,24 +1,38 @@
 name: Council data probe
-# RESEARCH ONLY: Binance daily candles 2017-2026 for the crypto trend-following check (council pairs).
+# RESEARCH ONLY (ICT edge, owner 6 Nov): Nasdaq 100, S&P 500 and Dow 1m history (Dukascopy) saved as 5m candles.
 on:
   push:
     branches: [council-probe]
 permissions:
   contents: write
 jobs:
-  probe:
+  dump:
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 150
+    strategy:
+      fail-fast: false
+      max-parallel: 6
+      matrix:
+        sym: [USATECHIDXUSD, USA500IDXUSD, USA30IDXUSD]
+        year: ['2023', '2024', '2025', '2026']
     steps:
       - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 22 }
+      - run: node tools/idxdump.mjs ${{ matrix.sym }} ${{ matrix.year }} ${{ matrix.sym }}_${{ matrix.year }}.json.gz
+      - uses: actions/upload-artifact@v4
+        with: { name: '${{ matrix.sym }}_${{ matrix.year }}', path: '*.json.gz' }
+  save:
+    needs: dump
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
       - uses: actions/checkout@v4
-        with: { ref: council-data, path: data }
-      - name: Binance daily candles
-        run: |
-          D=data/research/candles/crypto1d; mkdir -p $D
-          python3 tools/binance1d.py $D BTCUSDT ETHUSDT XRPUSDT SOLUSDT BNBUSDT ADAUSDT LTCUSDT LINKUSDT DOGEUSDT TRXUSDT || true
-          ls -la $D
-          git -C data config user.name "mosha-council"
-          git -C data config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git -C data add research/candles && git -C data commit -qm "Probe: Binance daily candles 2017-2026" || exit 0
-          for j in 1 2 3 4 5 6; do git -C data pull -q --rebase origin council-data && git -C data push -q origin HEAD:council-data && break; sleep $((5*j)); done
+        with: { ref: council-data }
+      - uses: actions/download-artifact@v4
+        with: { path: dl, merge-multiple: true }
+      - run: |
+          mkdir -p research/candles/idx && mv dl/*.json.gz research/candles/idx/ && ls -la research/candles/idx
+          git config user.name "mosha-council"; git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add research/candles/idx && git commit -qm "Research (ICT): NQ, S&P 500, Dow 5m candles 2023-2026 (Dukascopy)" || exit 0
+          for j in 1 2 3 4 5; do git pull -q --rebase origin council-data && git push -q origin HEAD:council-data && break; sleep 5; done
