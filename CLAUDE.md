@@ -72,3 +72,11 @@ backtest). Deep links `#council/<name>`; the last pane is remembered (localStora
 overview and trades. The trade chart dialog `#ms-tv` lives at the end of the app container, not inside a card, so it opens
 from any pane. Card titles (`.ms-k`) are sentence-case headings, not uppercase eyebrows. New council cards go into the
 pane they belong to, not into one long grid.
+
+## Home and navigation (6 Nov 2026, renovation 2)
+
+Home is a dashboard: quick-jump row (`.h-quick`), a "Today" strip (`#h-today`, `renderToday()`: floating now from
+`window.FLOAT` set in `renderActive()`, closed R today / this week / this month from `COUNCIL.trades`, live + shadow with
+the live part shown), then two columns: Setup now (admin) + Open positions (`#h-act-list`, biggest market+side groups,
+rows open the trade chart) on the left, compact tiles (`.tile-s`) on the right. The bottom tab bar (`.btab`, now with
+Scanner for admin) becomes a fixed left sidebar at ≥1180 px, where the header's top tabs are hidden.
