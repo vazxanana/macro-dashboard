@@ -1286,6 +1286,10 @@ window.MS_ADMIN_HASH = '49c5624f2625ed8b42b6e1bf2819a3a41ddb9743aeca36ea34ea7eb9
   /* design polish 4: accessibility safety nets (low specificity: any existing style wins) */
   :where(button, a[href], summary, [tabindex]:not([tabindex="-1"]), select, input):focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
   @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; scroll-behavior: auto !important; } }
+  /* design polish 5: rows that scroll sideways fade at the edge with more to see */
+  .h-quick[data-more~="r"], .c-nav[data-more~="r"] { -webkit-mask-image: linear-gradient(90deg, #000 calc(100% - 36px), transparent); mask-image: linear-gradient(90deg, #000 calc(100% - 36px), transparent); }
+  .h-quick[data-more~="l"], .c-nav[data-more~="l"] { -webkit-mask-image: linear-gradient(90deg, transparent, #000 36px); mask-image: linear-gradient(90deg, transparent, #000 36px); }
+  .h-quick[data-more="l r"], .c-nav[data-more="l r"] { -webkit-mask-image: linear-gradient(90deg, transparent, #000 36px, #000 calc(100% - 36px), transparent); mask-image: linear-gradient(90deg, transparent, #000 36px, #000 calc(100% - 36px), transparent); }
 </style>
 </head>
 <body>
@@ -4815,6 +4819,16 @@ function msNextSetup(bars, A) {
   if (document.documentElement.dataset.ict) { load(); setInterval(load, 120e3); addEventListener('hashchange', () => { if (location.hash === '#ict') render(); }); }
 })();
 
+</script>
+<script>
+// design polish 5: mark sideways-scrolling rows with which edges hide more (the CSS fades those edges)
+(function () {
+  function mark(el) { var l = el.scrollLeft > 2, r = el.scrollLeft + el.clientWidth < el.scrollWidth - 2; var v = (l ? 'l' : '') + (l && r ? ' ' : '') + (r ? 'r' : ''); if (v) el.setAttribute('data-more', v); else el.removeAttribute('data-more'); }
+  function all() { document.querySelectorAll('.h-quick, .c-nav').forEach(mark); }
+  document.addEventListener('scroll', function (e) { if (e.target && e.target.matches && e.target.matches('.h-quick, .c-nav')) mark(e.target); }, true);
+  window.addEventListener('resize', all); window.addEventListener('hashchange', function () { setTimeout(all, 50); });
+  document.addEventListener('DOMContentLoaded', function () { all(); setTimeout(all, 800); });
+})();
 </script>
 </body>
 </html>
