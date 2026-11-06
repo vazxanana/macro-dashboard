@@ -6,7 +6,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import zlib from 'node:zlib';
-import { MARKETS, P, cnbcBars, agg, signals, letter, isASetup } from './tracker.mjs';
+import { MARKETS, P, cnbcBars, agg, signals, letter, isASetup, isAPlus } from './tracker.mjs';
 
 const DATA = process.argv[2] || 'data/ict';
 const FROM = Date.parse(process.argv[3] || '2026-01-01T00:00:00Z') / 1000;
@@ -92,7 +92,7 @@ for (const [key, M] of Object.entries(MARKETS)) {
     out.src[key] = { sym: src.sym, h1: src.H.length, m5: src.m5.length, m5from: src.m5from ? new Date(src.m5from * 1000).toISOString().slice(0, 10) : null, d1: src.D.length };
     const sig = signals(src.H, src.D, 1, M.tick).concat(signals(src.H, src.D, -1, M.tick)).filter((g) => g.close >= FROM).sort((a, b) => a.close - b.close);
     let busyAll = 0, busyA = 0;   // same rule as the tracker: an A-setup is only blocked by an open A-setup
-    for (const g of sig) { const a = isASetup(g); if (g.close < (a ? busyA : busyAll)) continue; const t = simulate(g, M, key, src); t.aset = a; out.trades.push(t);
+    for (const g of sig) { const a = isASetup(g); if (g.close < (a ? busyA : busyAll)) continue; const t = simulate(g, M, key, src); t.aset = a; t.aplus = isAPlus(g); out.trades.push(t);
       const end = t.closed || Infinity; busyAll = Math.max(busyAll, end); if (a) busyA = end; }
     console.log(key, JSON.stringify(out.src[key]), 'signals', sig.length, 'trades', out.trades.filter((x) => x.market === key).length);
   } catch (e) { out.errors[key] = String(e.message || e); console.log(key, out.errors[key]); }
