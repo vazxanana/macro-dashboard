@@ -1137,3 +1137,7 @@ Report: `scratchpad/reports/Malaysian SnR direction improvements.md` (sent to th
 **Two-target exit on the daily engulf** (half off at +1 / +1.5 / +2 / +3R, rest trails): +17.2 | +27.8, +16.1 | +34.1, +18.9 | +39.7, +21.1 | +44.7 vs the adopted +25.5 | +47.0 — every partial loses profit in both halves, with the drawdown only marginally better. **Rejected** (the Edgeful NQ improvement does not transfer).
 
 Remaining report ideas on the plan: a time gate 15–30 min after 08:30 ET releases on the engulf and trendline legs; vol-targeted sizing vs the replica's binary top-fifth gate.
+
+## 2026-11-06 — 08:30 ET release gate on the engulf and trendline legs: immaterial, no rule
+
+`ms/news_gate.py`. Release-sized days = the 94 of 940 weekdays whose 08:30–08:35 ET one-minute range is in the top decile (≥ 10.5 points). Daily engulf (adopted rule): skipping any fill between 08:25 and 09:00 ET, or only on release days, changes nothing (+25.5 | +47.0R either way: the limit fills again at the same price after the window); delaying the fill to a 09:00 market entry loses (+9.7 | +26.4). H4 trendline: no break can be entered in the hour after 08:30 (the H4 closes do not fall there). The replica already has its 08:25–08:45 veto. **No news rule for the other legs.**
