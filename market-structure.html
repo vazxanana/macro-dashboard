@@ -722,6 +722,12 @@
   html[data-role="public"] .me .me-out { color: var(--accent); }
   @media (max-width: 700px) { .me-hi { display: none; } .me > summary { padding: 2px; } .me-av { width: 32px; height: 37px; } }
   @media (prefers-reduced-motion: reduce) { .me-pop { animation: none; } .me > summary { transition: none; } }
+
+  /* Long lists (6 Nov, owner): fixed-height boxes that scroll, headers stay visible */
+  .t-scroll { max-height: min(62vh, 560px); overflow: auto; overscroll-behavior: contain; border: 1px solid var(--line); border-radius: var(--r-sm); scrollbar-width: thin; }
+  .t-scroll thead th { position: sticky; top: 0; z-index: 1; background: var(--panel-raised) !important; }
+  #ms-cal-day, #ms-nq-list, #ms-rep-list, .loss-rows, #ms-c-pm { max-height: min(52vh, 460px); overflow-y: auto; overscroll-behavior: contain; scrollbar-width: thin; }
+  #ms-cal-day, #ms-nq-list, #ms-rep-list { padding-right: 4px; }
   /* Guest view (6 Nov): only the H4 gold chart with one trade setup */
   html[data-role="public"] .btab, html[data-role="public"] .top .tabs, html[data-role="public"] #ms-hdr-open, html[data-role="public"] #ms-alerts,
   html[data-role="public"] .top details.menu, html[data-role="public"] .top .ms-status, html[data-role="public"] .ms-offline-box { display: none !important; }
@@ -1185,7 +1191,7 @@ window.MS_ADMIN_HASH = '49c5624f2625ed8b42b6e1bf2819a3a41ddb9743aeca36ea34ea7eb9
         <p class="ms-note" id="ms-c-tabnote"></p>
         <div class="c-kpi" id="ms-c-kpi"></div>
         <div class="c-eq" id="ms-c-eq"></div>
-        <div class="ms-bt-wrap"><table class="ms-bt-t c-t"><thead><tr><th>Opened</th><th>Market</th><th>Setup</th><th>Side</th><th class="n">Entry</th><th class="n">Stop</th><th class="n">Target 1</th><th>Result</th></tr></thead><tbody id="ms-c-trades"></tbody></table></div>
+        <div class="ms-bt-wrap t-scroll"><table class="ms-bt-t c-t"><thead><tr><th>Opened</th><th>Market</th><th>Setup</th><th>Side</th><th class="n">Entry</th><th class="n">Stop</th><th class="n">Target 1</th><th>Result</th></tr></thead><tbody id="ms-c-trades"></tbody></table></div>
       </div>
     </div>
     <div class="c-grid c-pane c-pane-systems adm" id="ms-cp-systems" role="tabpanel" aria-labelledby="ms-cn-systems" data-pane="systems" hidden>
@@ -1282,13 +1288,13 @@ window.MS_ADMIN_HASH = '49c5624f2625ed8b42b6e1bf2819a3a41ddb9743aeca36ea34ea7eb9
       <div class="ms-k">Trade journal <span class="ms-scan-meta"><label class="c-mine" hidden style="display:none"><input type="checkbox" id="ms-auto2" checked> Auto paper-trade</label><button type="button" class="ms-tbtn" id="ms-j-csv">Export CSV</button></span></div>
       <div id="ms-j-stats" class="ms-j-stats"></div>
       <div class="c-eq" id="ms-j-eq"></div>
-      <div class="ms-j-wrap"><table class="ms-j"><thead><tr><th>Logged</th><th>Market</th><th>Setup</th><th>Side</th><th>Entry</th><th>Stop</th><th>Target 1</th><th>Result</th><th>R</th><th>Notes</th><th><span class="sr">Delete</span></th></tr></thead><tbody id="ms-j-body"></tbody></table></div>
+      <div class="ms-j-wrap t-scroll"><table class="ms-j"><thead><tr><th>Logged</th><th>Market</th><th>Setup</th><th>Side</th><th>Entry</th><th>Stop</th><th>Target 1</th><th>Result</th><th>R</th><th>Notes</th><th><span class="sr">Delete</span></th></tr></thead><tbody id="ms-j-body"></tbody></table></div>
       <div class="ms-note" style="margin-top:10px">Saved in this browser only. Open trades on the market you're viewing are checked against live candles and marked Win or Loss automatically; change the result any time.</div>
     </div>
     <div class="card" id="ms-js-card">
       <div class="ms-k">System trades · closed paper trades placed by the council (read-only) <span class="ms-scan-meta"><button type="button" class="ms-tbtn" id="ms-js-csv">Export CSV</button></span></div>
       <div id="ms-js-stats" class="ms-j-stats"></div>
-      <div class="ms-j-wrap"><table class="ms-j"><thead><tr><th>Closed</th><th>Market</th><th>System</th><th>Side</th><th>Entry</th><th>Stop</th><th>Exit</th><th>R</th></tr></thead><tbody id="ms-js-body"><tr class="empty"><td colspan="8">Loading…</td></tr></tbody></table></div>
+      <div class="ms-j-wrap t-scroll"><table class="ms-j"><thead><tr><th>Closed</th><th>Market</th><th>System</th><th>Side</th><th>Entry</th><th>Stop</th><th>Exit</th><th>R</th></tr></thead><tbody id="ms-js-body"><tr class="empty"><td colspan="8">Loading…</td></tr></tbody></table></div>
       <div class="ms-note" style="margin-top:10px"><span class="adm">NQ New York open run, gold replica (a second unit added at +2R is folded into its first trade), Mosha BO and crypto trend; live paper trades only, newest first, last 200. 1R = the risk of one trade.</span><span class="pubonly">Closed trades placed by the system, newest first, last 200. 1R = the risk of one trade.</span></div>
     </div>
   </section>
