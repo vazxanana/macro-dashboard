@@ -1175,3 +1175,25 @@ Continuous sizing without the gate keeps every calm-market loser at a reduced si
 | add half a unit at +2R | +86.9 | +129.2 |
 
 The live exit stack holds. Moving the add from +2R to +1.5R gains 10% / 10% profit and cuts the 2025–26 drawdown, but the 2023–24 drawdown worsens by 0.6R (−10.3 vs −9.7) → fails the strict rule by a hair; everything else (earlier BE, add at +1R, later run, half adds) is worse. Listed for the owner with the gold-trend add as "more profit, marginally more early drawdown" candidates; not applied.
+
+## 2026-11-06 — Owner: apply the near-miss improvements (PR #250) and look for a small daily scalp edge
+
+**Applied (PR #250):** replica add at +1.5R (user rule `gold-add-1.5`; +109.6 → +120.2R | +155.5 → +170.3R with the tilt, DD −9.7 → −10.3 | −16.5 → −14.4) and the gold trend add at +1R on a daily close with the same ratcheting stop (`gold-trend-add`; +9.9 → +13.2R | +24.1 → +41.1R, DD −2.0 → −2.5 | −1.0). The owner accepted the half-R of extra early drawdown for both.
+
+**Scalp / daily-edge sweep** (`ms/scalp_sweep.py`, `ms/nyorb.py`, `ms/overnight.py`; spot gold 2023+, 0.30 cost; R = the trade's own risk, or 0.5% of price for session holds):
+
+| idea | 2023–24 | 2025–26 |
+|---|---|---|
+| Asia range (00–07 UTC) breakout in London, 1R / 2R / trail | +0.03 / +0.01 / +0.01 per trade | +0.06 / +0.10 / +0.09 |
+| Asia range fade to the midpoint | −0.21 | −0.13 |
+| London 08:00 15-min opening-range breakout, 1R / 2R | −0.21 / −0.22 | −0.05 / −0.11 |
+| NY 09:30 ET opening-range breakout, 15/30/45/60 min, 1.5–3R or trail (ET clock, full coverage) | −0.07 to −0.01 | −0.03 to +0.04 |
+| NY 30-min ORB 2R with the 20-day direction | +0.028 (221) | +0.100 (242) |
+| day-session long 08:00→22:00 / London 08→16 / NY 13:30→21:00 | +0.08 / −0.02 / −0.07 per day | +0.07 / −0.03 / −0.06 |
+| PM-fix short 14:30→16:00 UTC | −0.01 | +0.06 |
+| **overnight long 23:00→08:00 UTC, stop 0.5%, target 1%** | **+0.045 per night (462), DD −14.5, 54% wins** | **+0.129 (470), DD −17.9, 48%** |
+| same, no stop / stop 1% / out 07:00 | +0.059 / +0.057 / +0.052 | +0.121 / +0.109 / +0.108 |
+| overnight by year (stop 0.5%, target 1%) | 2023 +10.6, 2024 +10.1 | 2025 +33.3, 2026 +27.4 (Feb–Jun 2026 −1.9) |
+| overnight by entry weekday (stop 1%) | Mon +4.5, Tue +39.7, Wed +8.4, Thu +18.0, Sun +7.3 | |
+
+Every intraday breakout/fade scalp is flat to negative after the spread (the first NY-ORB run looked good only because a data-coverage artefact halved the sample; with the ET clock and full coverage it is zero). The one consistently positive daily line is the **overnight long** (buy at the 23:00 UTC reopen, out at the London open), positive every year including 2026 and near flat in the Feb–Jun 2026 bear window, in line with the peer-reviewed overnight-vs-day gold effect. Caveats before it can be traded: (1) the expectancy is +0.045R a night in 2023–24, i.e. about +0.02% of price, and CFD financing on a gold long is of the same order (≈ 0.02R a night at 4% rates), so the early-half edge is roughly zero after swaps and only the 2025–26 half survives; (2) Tuesday carries half the profit; (3) at 0.25% risk the drawdown is −3.6% of the account for about +0.3%/month in 2023–24. **Not added live.** Candidate for a paper tracker if the owner wants it watched; a futures-style venue without swap would be the only honest way to trade it.
