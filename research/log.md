@@ -1127,3 +1127,13 @@ Web research on the Malaysian SnR schools (search-snippet level; the session can
 | Daily level life 30 d / 180 d | +104.8 / +109.6 | +155.5 / +155.5 | |
 
 The direction state at the replica's entry times is the same under every variant except the reset (slightly worse) and the 30-day life (slightly worse in 2023–24). The tilt is therefore not an artefact of a definitional detail; the adopted rule stays. Also from the research: gold's Feb–Jun 2026 drawdown (5,597 → 3,942) as a separate test window: replica +59.6R (81), gold trend −0.9R (1), H4 trendline −3.6R (14), daily engulf −6.8R (11) — the long-only legs lose modestly in a bear phase, the replica carries the book; drawdowns within each system's stated limits.
+
+## 2026-11-06 — Deep research (three agents + report) and its first two ideas tested: session bands and a two-target exit — no change
+
+Report: `scratchpad/reports/Malaysian SnR direction improvements.md` (sent to the owner). Its reading: no independent, cost-inclusive evidence exists for Malaysian SnR direction rules, engulf zones or gold breakouts; the SOP's value is as a pullback detector (our replica tilt), engulf zones carry no edge beyond direction and location, breakout survivors are long-only and regime-bound; the only peer-reviewed material is intraday periodicity (opens, London PM fix, overnight vs day session) ending around 2015. Caveat: every external figure came from search snippets (the session cannot open the pages).
+
+**Session bands** (entry hour, UTC; R per trade 2023–24 | 2025–26): replica Asia +1.96 | +0.77, London AM +1.16 | +1.08, NY AM +0.05 | +0.61, PM-fix window +0.93 | +1.12, NY PM −0.08 | +0.32 (n 7 | 28); daily engulf fills Asia +0.11 | +0.48, London AM +0.86 | −0.03, NY AM +0.23 | +1.13, NY PM +0.60 | +0.99; H4 trendline breaks Asia +0.04 | +1.38, London AM +1.13 | +1.37, NY AM +0.49 | +0.40, PM-fix +0.23 | +0.04. No band is negative in both halves for any leg; dropping the replica's NY-PM entries would gain 0.6R in 2023–24 and lose 9R in 2025–26. **No session rule.**
+
+**Two-target exit on the daily engulf** (half off at +1 / +1.5 / +2 / +3R, rest trails): +17.2 | +27.8, +16.1 | +34.1, +18.9 | +39.7, +21.1 | +44.7 vs the adopted +25.5 | +47.0 — every partial loses profit in both halves, with the drawdown only marginally better. **Rejected** (the Edgeful NQ improvement does not transfer).
+
+Remaining report ideas on the plan: a time gate 15–30 min after 08:30 ET releases on the engulf and trendline legs; vol-targeted sizing vs the replica's binary top-fifth gate.
