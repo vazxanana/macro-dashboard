@@ -1628,7 +1628,7 @@ window.MS_ADMIN_HASH = '49c5624f2625ed8b42b6e1bf2819a3a41ddb9743aeca36ea34ea7eb9
   </section>
   <section class="view ictx" id="v-ict" aria-label="ICT desk" hidden>
     <div class="v-head ict-head">
-      <div><h1 class="h-head">ICT desk</h1><p class="ms-note">US index futures · H1 iFVG reversal (sweep → inversion → 3R). A separate edge from the council. <span id="ict-run"></span></p></div>
+      <div><h1 class="h-head">ICT desk</h1><p class="ms-note">US index futures · H1 iFVG reversal (sweep → inversion → trail from +2R). A separate edge from the council. <span id="ict-run"></span></p></div>
       <div class="ict-hr"><div class="ict-me" id="ict-me"></div><div class="ict-seg ict-src" id="ict-src" role="group" aria-label="Which signals"><button type="button" data-s="both" class="on">Both</button><button type="button" data-s="live">Live</button><button type="button" data-s="replay">Replay</button></div><div class="ict-seg ict-src" id="ict-flt" role="group" aria-label="Which setups"><button type="button" data-f="a" class="on" title="Against the daily bias and grade B+ or better">A-setups</button><button type="button" data-f="all">All signals</button></div></div>
     </div>
     <div class="ict-mkts" id="ict-mkts" role="list" aria-label="Markets"></div>
@@ -1639,7 +1639,7 @@ window.MS_ADMIN_HASH = '49c5624f2625ed8b42b6e1bf2819a3a41ddb9743aeca36ea34ea7eb9
         <ul class="ict-open" id="ict-open"><li class="empty">Loading…</li></ul>
       </div>
       <div class="card ict-card">
-        <div class="ms-k"><span>Equity</span><small>R per signal · <i class="ict-sw a"></i> 3R target <i class="ict-sw b"></i> 2R target</small></div>
+        <div class="ms-k"><span>Equity</span><small>R per signal · <i class="ict-sw a"></i> the model (trail) <i class="ict-sw b"></i> fixed 2R</small></div>
         <div class="ict-eq" id="ict-eq"></div>
       </div>
     </div>
@@ -1649,7 +1649,7 @@ window.MS_ADMIN_HASH = '49c5624f2625ed8b42b6e1bf2819a3a41ddb9743aeca36ea34ea7eb9
       <ul class="ict-cal-day" id="ict-cal-day"></ul>
     </div>
     <div class="card ict-card">
-      <div class="ms-k"><span>What works</span><small>closed signals split by each ICT feature · 3R target</small></div>
+      <div class="ms-k"><span>What works</span><small>closed signals split by each ICT feature · the model's exit</small></div>
       <div class="ict-break" id="ict-break"></div>
     </div>
     <div class="card ict-card">
@@ -1676,7 +1676,7 @@ window.MS_ADMIN_HASH = '49c5624f2625ed8b42b6e1bf2819a3a41ddb9743aeca36ea34ea7eb9
       <ol class="ict-rules">
         <li><b>Sweep</b>: price takes a confirmed H1 swing low (buys) or high (sells) from the last 4 days.</li>
         <li><b>Inversion</b>: within 6 H1 candles a candle body closes back through the last fair value gap of that move.</li>
-        <li><b>Entry</b> at the price when the tracker sees it (checks every 15 min), <b>stop</b> 2 ticks beyond the sweep, <b>target</b> 3R; the 2R mark is recorded as a second variant; out after 48 h.</li>
+        <li><b>Entry</b> at the price when the tracker sees it (checks every 15 min), <b>stop</b> 2 ticks beyond the sweep; <b>no fixed target</b>: from +2R the stop trails 1.5R behind the best price (since 6 Nov; signals before used a 3R target); a fixed-2R result is recorded as a second variant; out after 48 h.</li>
         <li><b>Grade</b> /10 (candle closure rating): candle strength /4 (body and close location), inversion speed /3, room to the next liquidity /3. A+ 10 · A 9 · A- 8 · B+ 7 · B 6 · B- 5 · C 3-4 · F.</li>
         <li><b>Recorded, not filtered</b>: daily bias (vs the 50-day average), premium / discount of the 20-day range, previous-day high/low sweep, session (Asia, London, NY AM, NY PM), internal high/low validity. "What works" shows which of them matter.</li>
         <li><b>A-setups</b> (the desk's default view): the signal goes <b>against</b> the daily bias (prior close vs its 50-day average) and grades <b>B+ or better</b> (≥ 7/10). Research 6 Nov: NQ 2023-24 +0.20R a signal, NQ 2025 +0.16R, 2026 replay on all four indices +0.23R, against +0.02-0.07R for all signals; the same grade WITH the bias loses. Every signal is still recorded; switch to "All signals" to see them.</li>
@@ -4635,21 +4635,21 @@ function msNextSetup(bars, A) {
     const fl = sum(O, liveR), mine = T.filter((x) => (myRev(x) || {}).act === 'taken'), rev = C.filter((x) => myRev(x) && myRev(x).text).length;
     const cell = (k, v, sub, c) => `<div><span>${k}</span><b class="${c || ''}">${v}</b><small>${sub}</small></div>`;
     $('ict-kpi').innerHTML = cell('Signals', T.length, `${O.length} open · ${C.length} closed`) + cell('Win rate', C.length ? Math.round((100 * w) / C.length) + '%' : '—', `${w} of ${C.length}`)
-      + cell('Total (3R)', fR(R3), C.length ? `${fR(R3 / C.length)} a signal` : 'no closed yet', cls(R3)) + cell('Total (2R)', fR(R2), C.length ? `${fR(R2 / C.length)} a signal` : '—', cls(R2))
+      + cell('Total', fR(R3), C.length ? `${fR(R3 / C.length)} a signal` : 'no closed yet', cls(R3)) + cell('Fixed 2R', fR(R2), C.length ? `${fR(R2 / C.length)} a signal` : '—', cls(R2))
       + cell('Floating', fR(O.length ? fl : null), `${O.length} open`, cls(fl)) + cell('Reviewed', `${rev}/${C.length}`, `${mine.length} taken by ${esc(who)}`);
     // open
     $('ict-open-n').textContent = O.length ? `${O.length} open` : '';
     $('ict-open').innerHTML = O.length ? O.map((x) => { const r = liveR(x), pct = Math.max(0, Math.min(100, ((r + 1) / 4) * 100));
       return `<li data-id="${esc(x.id)}" tabindex="0"><div class="r1"><span class="ms-chip ${x.side === 'sell' ? 'ms-chip-sell' : 'ms-chip-buy'}">${x.side.toUpperCase()}</span>${esc(x.short)} <span class="ict-g ${gcls(x.grade.letter)}">${esc(x.grade.letter)}</span>${isA(x) ? ' <span class="ict-a">A-setup</span>' : ''} <span class="ict-pill">${esc(x.feat.session)}</span><span class="live ${cls(r)}">${fR(r)}</span></div>`
-        + `<div class="ict-bar" title="−1R stop … +3R target"><i style="left:0;width:${pct.toFixed(0)}%"></i></div>`
-        + `<div class="r2">Entry ${fx(x.entry, x.market)} · stop ${fx(x.stop, x.market)} · 2R ${fx(x.t2, x.market)} · 3R ${fx(x.t1, x.market)} · ${ago(x.opened)}</div></li>`; }).join('')
+        + `<div class="ict-bar" title="−1R stop … +3R"><i style="left:0;width:${pct.toFixed(0)}%"></i></div>`
+        + `<div class="r2">Entry ${fx(x.entry, x.market)} · stop ${fx(x.stop, x.market)} · 2R ${fx(x.t2, x.market)} · ${x.t1 != null ? `3R ${fx(x.t1, x.market)}` : x.trailMoved ? 'trailing' : 'trail from 2R'} · ${ago(x.opened)}</div></li>`; }).join('')
       : '<li class="empty">No open signal. The tracker checks NQ, ES, YM and RTY every 15 minutes.</li>';
     // equity (3R and 2R)
     const Cs = C.slice().sort((a, b) => a.closed - b.closed), pts = (f) => { let e = 0; return [0].concat(Cs.map((x) => (e += f(x)))); };
     const A = pts((x) => x.R), B = pts((x) => x.R2 ?? x.R), allv = A.concat(B), lo = Math.min(0, ...allv), hi = Math.max(1, ...allv), W = 600, Hh = 180;
     const path = (P) => P.map((v, i) => `${i ? 'L' : 'M'}${((i / Math.max(1, P.length - 1)) * W).toFixed(1)},${(Hh - 8 - ((v - lo) / (hi - lo || 1)) * (Hh - 16)).toFixed(1)}`).join('');
     const y0 = (Hh - 8 - ((0 - lo) / (hi - lo || 1)) * (Hh - 16)).toFixed(1);
-    $('ict-eq').innerHTML = Cs.length ? `<svg viewBox="0 0 ${W} ${Hh}" preserveAspectRatio="none" role="img" aria-label="Equity: ${fR(R3)} with the 3R target, ${fR(R2)} with 2R"><line x1="0" x2="${W}" y1="${y0}" y2="${y0}" stroke="var(--line-strong)" stroke-dasharray="3 4"/><path d="${path(B)}" fill="none" stroke="#6f8fd6" stroke-width="2" vector-effect="non-scaling-stroke"/><path d="${path(A)}" fill="none" stroke="var(--gold)" stroke-width="2" vector-effect="non-scaling-stroke"/></svg>`
+    $('ict-eq').innerHTML = Cs.length ? `<svg viewBox="0 0 ${W} ${Hh}" preserveAspectRatio="none" role="img" aria-label="Equity: ${fR(R3)} with the model's exit, ${fR(R2)} with a fixed 2R"><line x1="0" x2="${W}" y1="${y0}" y2="${y0}" stroke="var(--line-strong)" stroke-dasharray="3 4"/><path d="${path(B)}" fill="none" stroke="#6f8fd6" stroke-width="2" vector-effect="non-scaling-stroke"/><path d="${path(A)}" fill="none" stroke="var(--gold)" stroke-width="2" vector-effect="non-scaling-stroke"/></svg>`
       : '<p class="ms-note">The curve starts with the first closed signal.</p>';
     // breakdowns
     const groups = [['Market', (x) => x.short], ['Side', (x) => x.side], ['Grade', (x) => x.grade.letter], ['Session', (x) => x.feat.session], ['Daily bias', (x) => x.feat.bias || 'n/a'], ['Premium / discount', (x) => x.feat.zone || 'n/a'],
@@ -4663,7 +4663,7 @@ function msNextSetup(bars, A) {
     const L = T.filter((x) => (!S.f.m || x.market === S.f.m) && (!S.f.s || (S.f.s === 'open' ? x.status === 'open' : S.f.s === 'closed' ? !!x.closed : S.f.s === 'todo' ? x.closed && !(myRev(x) && myRev(x).at) : (myRev(x) || {}).act === 'taken')));
     $('ict-body').innerHTML = L.length ? L.slice(0, 300).map((x) => { const rv = myRev(x), r = x.closed ? x.R : liveR(x);
       return `<tr data-id="${esc(x.id)}" tabindex="0"><td>${tm(x.signalAt)}</td><td><b>${esc(x.short)}</b></td><td><span class="ms-chip ${x.side === 'sell' ? 'ms-chip-sell' : 'ms-chip-buy'}">${x.side.toUpperCase()}</span></td><td><span class="ict-g ${gcls(x.grade.letter)}">${esc(x.grade.letter)}</span>${isA(x) ? ' <span class="ict-a" title="A-setup: against the daily bias, grade B+ or better">A</span>' : ''}</td><td>${esc(x.feat.session)}</td><td>${esc(x.feat.bias || '—')}</td><td>${esc(x.feat.zone || '—')}</td>`
-        + `<td class="n">${fx(x.entry, x.market)}</td><td class="n">${fx(x.stop, x.market)}</td><td class="n">${fx(x.t1, x.market)}</td><td class="${cls(r)}">${x.closed ? `${x.status === 'win' ? 'Win' : x.status === 'loss' ? 'Loss' : 'Flat'} ${fR(r)}${x.exit === 'time' ? ' <small>48 h</small>' : ''}${x.replay ? ' <span class="ict-pill">replay</span>' : ''}` : `Open ${fR(r)}`}</td>`
+        + `<td class="n">${fx(x.entry, x.market)}</td><td class="n">${fx(x.stop, x.market)}</td><td class="n">${x.t1 != null ? fx(x.t1, x.market) : 'trail'}</td><td class="${cls(r)}">${x.closed ? `${x.status === 'win' ? 'Win' : x.status === 'loss' ? 'Loss' : 'Flat'} ${fR(r)}${x.exit === 'time' ? ' <small>48 h</small>' : x.exit === 'trail' ? ' <small>trail</small>' : ''}${x.replay ? ' <span class="ict-pill">replay</span>' : ''}` : `Open ${fR(r)}`}</td>`
         + `<td>${rv ? `${rv.act ? `<span class="ict-pill">${esc(rv.act)}</span> ` : ''}${rv.grade ? `<span class="ict-g ${gcls(rv.grade)}">${esc(rv.grade)}</span>` : ''}${rv.text ? ' ✎' : ''}` : '<span class="ms-note">—</span>'}</td></tr>`; }).join('')
       : `<tr class="empty"><td colspan="12">${all().length ? 'No signal matches the filter.' : 'No signal yet. The first ones appear after an H1 sweep and inversion on NQ, ES, YM or RTY.'}</td></tr>`;
     // my trading
@@ -4716,7 +4716,7 @@ function msNextSetup(bars, A) {
     SER.setData(raw); SER.applyOptions({ priceFormat: { type: 'price', precision: DEC[x.market] ?? 2, minMove: Math.pow(10, -(DEC[x.market] ?? 2)) } });
     LINES.forEach((l) => SER.removePriceLine(l)); LINES = [];
     const add = (price, color, title, style) => { if (price != null) LINES.push(SER.createPriceLine({ price, color, lineWidth: 1, lineStyle: style ?? 0, axisLabelVisible: true, title })); };
-    add(x.entry, '#c9a24a', 'Entry'); add(x.stop, '#f23645', 'Stop'); add(x.t1, '#089981', '3R'); add(x.t2, '#089981', '2R', 2);
+    add(x.entry, '#c9a24a', 'Entry'); add(x.stop, '#f23645', 'Stop'); add(x.t1, '#089981', '3R'); add(x.t2, '#089981', '2R', 2); if (x.stop0 != null && x.stop0 !== x.stop) add(x.stop0, '#f23645', 'First stop', 2);
     add(x.sweep && x.sweep.level, '#9aa3b2', 'Swept', 2); if (x.fvg) { add(x.fvg[0], '#6f8fd6', 'FVG', 1); add(x.fvg[1], '#6f8fd6', 'FVG', 1); }
     if (x.dol != null) add(x.dol, '#c9a24a', 'DOL', 3);
     const mk = [{ time: x.signalAt - (S.tf === 'h1' ? 3600 : 300) - ((x.signalAt - (S.tf === 'h1' ? 3600 : 300)) % (S.tf === 'h1' ? 3600 : 300)), position: x.side === 'buy' ? 'belowBar' : 'aboveBar', color: '#c9a24a', shape: x.side === 'buy' ? 'arrowUp' : 'arrowDown', text: 'iFVG' }];
@@ -4731,7 +4731,7 @@ function msNextSetup(bars, A) {
     const f = x.feat, g = x.grade;
     $('ict-tv-t').innerHTML = `<span class="ms-chip ${x.side === 'sell' ? 'ms-chip-sell' : 'ms-chip-buy'}">${x.side.toUpperCase()}</span> ${esc(x.label)} <span class="ict-g ${gcls(g.letter)}">${esc(g.letter)}</span>`;
     $('ict-tv-s').textContent = `Signal ${tm(x.signalAt)} · ${f.session} · bias ${f.bias || 'n/a'} · ${f.zone || 'n/a'}${f.pdSweep ? ' · prev-day level swept' : ''} · grade ${g.total}/10 (strength ${g.strength}/4, speed ${g.speed}/3, room ${g.rr}/3) · `
-      + `entry ${fx(x.entry, x.market)}, stop ${fx(x.stop, x.market)}, target ${fx(x.t1, x.market)} · ${x.closed ? `${x.exit} ${fR(x.R)}` : `open ${fR(liveR(x))}`}`;
+      + `entry ${fx(x.entry, x.market)}, stop ${fx(x.stop, x.market)}, ${x.t1 != null ? `target ${fx(x.t1, x.market)}` : 'trail from +2R, 1.5R behind'} · ${x.closed ? `${x.exit} ${fR(x.R)}` : `open ${fR(liveR(x))}`}`;
     const rv = myRev(x) || {};
     S.rv = { act: rv.act || '', grade: rv.grade || '', tags: new Set(rv.tags || []) };
     $('ict-rv-fill').value = rv.fill ?? ''; $('ict-rv-r').value = rv.r ?? ''; $('ict-rv-text').value = rv.text || ''; $('ict-rv-msg').textContent = rv.at ? `Saved ${ago(rv.at)}${rv.by ? ` by ${rv.by}` : ''}` : '';
