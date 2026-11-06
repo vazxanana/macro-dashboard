@@ -627,6 +627,7 @@ document.addEventListener('DOMContentLoaded', function () { var pub = document.d
 window.MS_ADMIN_HASH = '4622c0548320297ae6874ab045769a98f61c6c53247bd56b3856a472418002cf';
 </script>
 <style>html[data-mode="public"] .adm{display:none!important} html[data-mode="admin"] .pubonly{display:none!important} .ms-admin-link{color:inherit;opacity:.6;text-decoration:underline dotted;cursor:pointer}</style>
+<style>.ho-sh{opacity:.8;font-weight:500}</style>
 </head>
 <body>
 <div class="ms-live app" id="ms-live" data-chart="dark">
@@ -2752,10 +2753,10 @@ function msNextSetup(bars, A) {
     const shBox = document.getElementById('ms-act-sh'), shOn = shBox && shBox.checked;
     const SHO = shOn ? (COUNCIL.trades || []).filter((x) => x.shadow && (x.status === 'open' || x.status === 'pending')).sort((a, b) => b.opened - a.opened) : [];
     const A = A0.concat(SHO), cnt = (x) => !x.shadow && !x.tracker, A1 = A0.filter(cnt);
-    let tot = 0, risk = 0, pct = 0;
+    let tot = 0, risk = 0, pct = 0, shTot = 0, shN = 0;
     el.innerHTML = A.length ? A.map((x) => {
       const s = x.side === 'sell' ? -1 : 1, r0 = x.r0 || Math.abs(x.entry - x.stop), size = x.size || 1, px = nowPrice(x), d = { dec: x.dec != null ? x.dec : 2 };
-      const fl = px != null && x.status === 'open' && r0 ? (px - x.entry) * s / r0 * size : null; if (fl != null && cnt(x)) { tot += fl; pct += fl * ((x.k === 'trend' || x.k === 'gtrend') ? 0.5 : 0.25); }
+      const fl = px != null && x.status === 'open' && r0 ? (px - x.entry) * s / r0 * size : null; if (fl != null && cnt(x)) { tot += fl; pct += fl * ((x.k === 'trend' || x.k === 'gtrend') ? 0.5 : 0.25); } if (fl != null && x.shadow) { shTot += fl; shN++; }
       const stopR = r0 ? (x.stop - x.entry) * s / r0 : -1; if (cnt(x)) risk += Math.max(0, -stopR) * size;
       const age = Math.max(0, Date.now() / 1000 - (x.filled || x.opened)), ageT = age < 3600 ? `${Math.round(age / 60)} min` : `${(age / 3600).toFixed(1)} h`;
       const mark = x.tp1 != null ? x.tp1 : x.t1, trail = (x.k === 'trend' || x.k === 'gtrend') ? (x.addOf ? 'second unit: own 5 ATR stop, leaves with the first trade on its channel-midpoint close' : x.exitRule === 'mid' ? `out on a daily close under ${fmtI(x.midStop, { dec: x.dec ?? 2 })} (channel midpoint)` : x.trailMoved ? `stop trails ${x.kATR || (x.k === 'gtrend' ? 2 : 4)} ATR, locks ${fR(stopR)}` : `stop trails ${x.kATR || (x.k === 'gtrend' ? 2 : 4)} ATR from each daily close`) : x.trail ? (x.addOf ? (x.trailMoved ? `trails with the first trade, stop locks ${fR(stopR)}` : 'trails with the first trade after its +4R') : x.trailMoved ? `trailing, stop locks ${fR(stopR)}` : `trailing from +${x.trail[0]}R`) : '';
@@ -2769,7 +2770,8 @@ function msNextSetup(bars, A) {
     if (sum) sum.innerHTML = A0.length ? `${A1.length} open${trk ? ` + ${trk} tracker` : ''}${SHO.length ? ` + ${SHO.length} shadow` : ''} · at risk ${risk.toFixed(1)}R · floating <b class="${tot >= 0 ? 'pos' : 'neg'}">${fR(tot)}</b>` : SHO.length ? `${SHO.length} shadow open` : '';
     const ho = document.getElementById('ms-hdr-open');
     if (ho) { const fp = (v) => `${v > 0 ? '+' : v < 0 ? '−' : ''}${Math.abs(v).toFixed(2)}%`;
-      ho.innerHTML = A1.length ? `<b>${A1.length}</b><span class="ho-l"> open</span> · <span class="${tot >= 0 ? 'pos' : 'neg'}"><span class="ho-l">${fR(tot)} · </span>${fp(pct)}</span>` : '<b>0</b><span class="ho-l"> open</span>'; }
+      const shPart = shOn && SHO.length ? ` · <span class="ho-sh" title="Open shadow trades (setups a rule blocked, followed on paper) and their floating result; not counted in the live total">${SHO.length} shadow <span class="${shTot >= 0 ? 'pos' : 'neg'}">${fR(shTot)}</span></span>` : '';
+      ho.innerHTML = (A1.length ? `<b>${A1.length}</b><span class="ho-l"> open</span> · <span class="${tot >= 0 ? 'pos' : 'neg'}"><span class="ho-l">${fR(tot)} · </span>${fp(pct)}</span>` : '<b>0</b><span class="ho-l"> open</span>') + shPart; }
     const h = document.getElementById('h-active'); if (h) h.innerHTML = A1.length ? `${A1.length} open <small>floating ${fR(tot)}</small>` : '<small>none open</small>';
   }
   setInterval(() => { try { renderActive(); } catch (e) {} }, 15e3);
@@ -3193,7 +3195,7 @@ function msNextSetup(bars, A) {
   const tabsEl = document.getElementById('ms-c-tabs'); if (tabsEl) tabsEl.addEventListener('click', (ev) => { const b = ev.target.closest('[data-ct]'); if (!b) return; window.CTAB = b.dataset.ct; window.CLIM = 60; try { localStorage.setItem('msCtab', window.CTAB); } catch (e) {} renderCouncil(); });
   try { const t0 = localStorage.getItem('msCtab'); if (['live', 'shadow', 'journal', 'all'].includes(t0)) window.CTAB = t0; } catch (e) {}
   document.addEventListener('click', (ev) => { if (ev.target.closest('#ms-c-more')) { window.CLIM = (window.CLIM || 60) + 60; renderCouncil(); } });
-  const actSh = document.getElementById('ms-act-sh'); if (actSh) actSh.addEventListener('change', renderActive);
+  const actSh = document.getElementById('ms-act-sh'); if (actSh) { try { actSh.checked = localStorage.getItem('ms-act-sh') === '1'; } catch (e) {} actSh.addEventListener('change', () => { try { localStorage.setItem('ms-act-sh', actSh.checked ? '1' : '0'); } catch (e) {} renderActive(); }); }
   const sysEl = document.getElementById('ms-c-sys'); if (sysEl) sysEl.addEventListener('change', () => { renderCouncil(); renderHome(); });
   if (document.getElementById('v-council')) { councilReady = loadCouncil(); setInterval(loadCouncil, 5 * 60e3); }
 
