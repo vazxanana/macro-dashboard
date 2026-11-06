@@ -1104,3 +1104,7 @@ Every line is negative in 2023–24 (buys −0.3 to −0.6R a trade); the 7-pip 
 | no direction gate, SL wick | −610R | −150R |
 
 Negative in both halves for every stop, target and gate; the direction gate halves the loss but never flips it. Another sub-H1 confirmation entry that cannot pay gold's spread. **Rejected.** This closes the sub-H1 entries from the four skills (MSNR switch scalp, trendline M1–M30, ECMTF-style two-TF-lower, M15 rejection): none works mechanically on gold 2023+.
+
+## 2026-11-06 — Daily engulf: concurrent positions and "stairs" re-entries — unchanged
+
+`ms/eg_stairs.py` (adopted rule, overlapping zones taken in time order): no cap +25.5R (DD −9.8) | +47.0R (DD −7.3); cap 1 +18.8 (DD −4.7) | +23.9 (DD −4.3); cap 2 +29.0 (DD −9.3) | +42.8 (DD −7.3); cap 3 (live) = no cap; stairs (a new zone only onto an open position already ≥ +1R) +19.4 (DD −4.7) | +23.5 (DD −4.3). Cap 2 gains in 2023–24 and loses in 2025–26; cap 1 and stairs halve the drawdown but give up a third to half of the profit. The live cap of 3 stands.
