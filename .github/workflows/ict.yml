@@ -1,0 +1,48 @@
+name: ICT desk tracker
+
+# A separate edge from the Mosha council (owner, 6 Nov 2026): paper-trades the ICT iFVG model on US index
+# futures (NQ, ES, YM, RTY) and writes council-data ict/ (trades.json, snapshot.json, bars.json), which the
+# ICT desk page reads. Never touches the council's files.
+on:
+  schedule:
+    - cron: '4,19,34,49 * * * *'
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'ict/**'
+      - '.github/workflows/ict.yml'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: ict
+  cancel-in-progress: false
+
+jobs:
+  track:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: ict
+      - uses: actions/checkout@v4
+        with:
+          ref: council-data
+          path: data
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Track the ICT signals
+        run: node ict/tracker.mjs data/ict
+      - name: Save to council-data
+        run: |
+          cd data
+          git config user.name "ict-desk"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add ict
+          git commit -qm "ICT desk $(date -u +%Y-%m-%dT%H:%MZ)" || exit 0
+          for i in 1 2 3 4 5; do git pull -q --rebase origin council-data && git push -q origin HEAD:council-data && exit 0; sleep $((i * 3)); done
+          exit 1
