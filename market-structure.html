@@ -688,6 +688,21 @@
   .h-quick a:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
   @media (max-width: 700px) { .h-quick { flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; margin-right: -16px; padding-right: 16px; } .h-quick a { flex: none; min-height: 40px; } }
   @media (prefers-reduced-motion: reduce) { .c-nav button, .c-how > summary::before, .h-quick a { transition: none; } }
+
+  /* Guest view (6 Nov): only the H4 gold chart with one trade setup */
+  html[data-role="public"] .btab, html[data-role="public"] .top .tabs, html[data-role="public"] #ms-hdr-open, html[data-role="public"] #ms-alerts,
+  html[data-role="public"] .top details.menu, html[data-role="public"] .top .ms-status, html[data-role="public"] .ms-offline-box { display: none !important; }
+  html[data-role="public"] body { padding-left: 0 !important; padding-bottom: 0 !important; }
+  html[data-role="public"] .top .mk { pointer-events: none; } html[data-role="public"] .top .mk summary::after, html[data-role="public"] .top .mk summary::marker { display: none; content: none; }
+  .g-head { padding: 18px 2px 0; }
+  .g-card { padding: 0; overflow: hidden; }
+  .g-chart { position: relative; height: min(70vh, 640px); min-height: 360px; }
+  .g-msg { position: absolute; inset: 0; display: grid; place-items: center; color: var(--ink-faint); font-size: 13px; z-index: 2; pointer-events: none; }
+  .g-msg[hidden] { display: none; }
+  .g-key { display: flex; flex-wrap: wrap; gap: 6px 18px; font: 500 12.5px var(--sans); color: var(--ink-dim); padding: 0 2px; }
+  .g-key span { display: inline-flex; align-items: center; gap: 7px; }
+  .g-key i { width: 18px; height: 10px; border-radius: 3px; display: inline-block; }
+  .g-key .k-e { height: 2px; background: #5b8cff; } .g-key .k-s { background: rgba(242,87,111,.3); border: 1px solid rgba(242,87,111,.6); } .g-key .k-t { background: rgba(47,191,143,.3); border: 1px solid rgba(47,191,143,.6); }
   /* ═══ Renovation 2 (6 Nov): Home dashboard, Today strip, left sidebar on wide screens ═══ */
   .h-today { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); border: 1px solid var(--line); border-radius: var(--r); background: var(--panel); overflow: hidden; }
   .h-today:empty { display: none; }
@@ -785,7 +800,11 @@ window.MS_ADMIN_HASH = '49c5624f2625ed8b42b6e1bf2819a3a41ddb9743aeca36ea34ea7eb9
 </script>
 <style>
   .gate { display: none; }
-  html[data-gate] .gate { display: grid; place-items: center; position: fixed; inset: 0; z-index: 100; padding: 24px 16px; overflow-y: auto; background: radial-gradient(900px 480px at 50% -10%, rgba(91,140,255,.10), transparent 70%), #08090c; }
+  html[data-gate] .gate { display: grid; place-items: center; position: fixed; inset: 0; z-index: 100; padding: 24px 16px; overflow-y: auto;
+    background: radial-gradient(900px 600px at 85% 15%, rgba(227,179,65,.16), transparent 65%), radial-gradient(800px 600px at 10% 100%, rgba(91,140,255,.10), transparent 70%), linear-gradient(180deg, #0b0b10 0%, #07070a 100%); }
+  .gate-bg { position: fixed; inset: 0; width: 100%; height: 100%; pointer-events: none; }
+  .gate-card { position: relative; backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); background: rgba(15,17,22,.88) !important; }
+  .gate-brand span { font: 700 16px Inter, -apple-system, sans-serif; letter-spacing: .2px; color: #f1d27f; }
   html[data-gate] body { overflow: hidden; }
   html[data-gate] #ms-live { visibility: hidden; }
   .gate-card { width: min(400px, 100%); background: #0f1116; border: 1px solid rgba(255,255,255,.08); border-radius: 16px; padding: 28px 28px 22px; box-shadow: 0 30px 80px rgba(0,0,0,.55); color: #eceef2; font: 14px/1.5 Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
@@ -800,14 +819,14 @@ window.MS_ADMIN_HASH = '49c5624f2625ed8b42b6e1bf2819a3a41ddb9743aeca36ea34ea7eb9
   .gate label { font: 500 13px Inter, -apple-system, sans-serif; color: #c9ced8; margin-top: 6px; }
   .gate input { min-height: 44px; padding: 10px 12px; border-radius: 10px; border: 1px solid rgba(255,255,255,.12); background: #14171e; color: #eceef2; font: 15px Inter, -apple-system, sans-serif; outline: none; transition: border-color .15s ease-out, box-shadow .15s ease-out; }
   .gate input::placeholder { color: #8b93a3; }
-  .gate input:focus { border-color: #5b8cff; box-shadow: 0 0 0 3px rgba(91,140,255,.22); }
+  .gate input:focus { border-color: #e3b341; box-shadow: 0 0 0 3px rgba(227,179,65,.22); }
   .gate-err { min-height: 20px; margin: 4px 0 0; color: #ff7d92; font-size: 13px; }
   .gate-go, .gate-guest { min-height: 44px; border-radius: 10px; font: 600 14px Inter, -apple-system, sans-serif; cursor: pointer; transition: background .15s ease-out, border-color .15s ease-out; touch-action: manipulation; }
-  .gate-go { border: 0; background: #5b8cff; color: #fff; margin-top: 4px; }
-  .gate-go:hover { background: #4a7bf0; } .gate-go:disabled { opacity: .6; cursor: progress; }
+  .gate-go { border: 0; background: #e3b341; color: #17130a; margin-top: 4px; }
+  .gate-go:hover { background: #efc35a; } .gate-go:disabled { opacity: .6; cursor: progress; }
   .gate-guest { width: 100%; border: 1px solid rgba(255,255,255,.14); background: transparent; color: #eceef2; }
   .gate-guest:hover { background: rgba(255,255,255,.04); border-color: rgba(255,255,255,.24); }
-  .gate-go:focus-visible, .gate-guest:focus-visible, .gate-x:focus-visible { outline: 2px solid #5b8cff; outline-offset: 2px; }
+  .gate-go:focus-visible, .gate-guest:focus-visible, .gate-x:focus-visible { outline: 2px solid #e3b341; outline-offset: 2px; }
   .gate-or { display: flex; align-items: center; gap: 12px; margin: 18px 0 14px; color: #737b8a; font-size: 12.5px; }
   .gate-or::before, .gate-or::after { content: ""; flex: 1; height: 1px; background: rgba(255,255,255,.08); }
   .gate-note { margin: 10px 0 0; text-align: center; color: #8b93a3; font-size: 12.5px; }
@@ -819,10 +838,21 @@ window.MS_ADMIN_HASH = '49c5624f2625ed8b42b6e1bf2819a3a41ddb9743aeca36ea34ea7eb9
 </head>
 <body>
 <div class="gate" id="ms-gate" role="dialog" aria-modal="true" aria-labelledby="ms-gate-t">
+  <svg class="gate-bg" viewBox="0 0 1440 900" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+    <defs>
+      <linearGradient id="gbA" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#e3b341" stop-opacity=".22"/><stop offset="1" stop-color="#e3b341" stop-opacity="0"/></linearGradient>
+      <linearGradient id="gbL" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#e3b341" stop-opacity="0"/><stop offset=".35" stop-color="#e3b341" stop-opacity=".55"/><stop offset="1" stop-color="#f5d27a" stop-opacity=".9"/></linearGradient>
+      <pattern id="gbG" width="72" height="72" patternUnits="userSpaceOnUse"><path d="M72 0H0V72" fill="none" stroke="#ffffff" stroke-opacity=".035"/></pattern>
+    </defs>
+    <rect width="1440" height="900" fill="url(#gbG)"/>
+    <path d="M0 700 L80 660 L150 690 L230 610 L300 640 L380 560 L450 590 L520 500 L600 540 L680 470 L760 500 L840 420 L910 450 L990 360 L1070 400 L1150 320 L1230 350 L1310 270 L1380 290 L1440 230 L1440 900 L0 900 Z" fill="url(#gbA)"/>
+    <path d="M0 700 L80 660 L150 690 L230 610 L300 640 L380 560 L450 590 L520 500 L600 540 L680 470 L760 500 L840 420 L910 450 L990 360 L1070 400 L1150 320 L1230 350 L1310 270 L1380 290 L1440 230" fill="none" stroke="url(#gbL)" stroke-width="2.5" stroke-linejoin="round"/>
+    <g fill="#e3b341" fill-opacity=".10" stroke="#e3b341" stroke-opacity=".22"><rect x="96" y="600" width="14" height="60" rx="2"/><line x1="103" y1="582" x2="103" y2="676"/><rect x="176" y="640" width="14" height="40" rx="2"/><line x1="183" y1="622" x2="183" y2="696"/><rect x="256" y="570" width="14" height="70" rx="2"/><line x1="263" y1="552" x2="263" y2="656"/><rect x="336" y="590" width="14" height="44" rx="2"/><line x1="343" y1="572" x2="343" y2="650"/><rect x="416" y="520" width="14" height="66" rx="2"/><line x1="423" y1="502" x2="423" y2="602"/><rect x="496" y="470" width="14" height="58" rx="2"/><line x1="503" y1="452" x2="503" y2="544"/><rect x="576" y="500" width="14" height="40" rx="2"/><line x1="583" y1="482" x2="583" y2="556"/><rect x="656" y="430" width="14" height="64" rx="2"/><line x1="663" y1="412" x2="663" y2="510"/><rect x="736" y="460" width="14" height="36" rx="2"/><line x1="743" y1="442" x2="743" y2="512"/><rect x="816" y="390" width="14" height="62" rx="2"/><line x1="823" y1="372" x2="823" y2="468"/><rect x="896" y="410" width="14" height="38" rx="2"/><line x1="903" y1="392" x2="903" y2="464"/><rect x="976" y="330" width="14" height="66" rx="2"/><line x1="983" y1="312" x2="983" y2="412"/><rect x="1056" y="360" width="14" height="40" rx="2"/><line x1="1063" y1="342" x2="1063" y2="416"/><rect x="1136" y="290" width="14" height="60" rx="2"/><line x1="1143" y1="272" x2="1143" y2="366"/><rect x="1216" y="310" width="14" height="36" rx="2"/><line x1="1223" y1="292" x2="1223" y2="362"/><rect x="1296" y="240" width="14" height="58" rx="2"/><line x1="1303" y1="222" x2="1303" y2="314"/><rect x="1376" y="250" width="14" height="34" rx="2"/><line x1="1383" y1="232" x2="1383" y2="300"/></g>
+  </svg>
   <div class="gate-card">
-    <div class="gate-brand"><i class="ms-coin" aria-hidden="true"></i><span>Mosha council</span><button type="button" class="gate-x" id="ms-gate-x" aria-label="Close sign-in">×</button></div>
+    <div class="gate-brand"><i class="ms-coin" aria-hidden="true"></i><span>Aurum Desk</span><button type="button" class="gate-x" id="ms-gate-x" aria-label="Close sign-in">×</button></div>
     <h1 id="ms-gate-t">Sign in</h1>
-    <p class="gate-sub">Trades, results and chart markups from the council. Sign in for the full view.</p>
+    <p class="gate-sub">Welcome back. Sign in to continue.</p>
     <form id="ms-gate-f" novalidate>
       <label for="ms-gate-u">User name</label>
       <input id="ms-gate-u" name="username" autocomplete="username" autocapitalize="none" spellcheck="false" placeholder="Leave empty if you are the owner">
@@ -833,7 +863,7 @@ window.MS_ADMIN_HASH = '49c5624f2625ed8b42b6e1bf2819a3a41ddb9743aeca36ea34ea7eb9
     </form>
     <div class="gate-or"><span>or</span></div>
     <button type="button" class="gate-guest" id="ms-gate-guest">Continue as guest</button>
-    <p class="gate-note">Guests see the trades, results and chart markups.</p>
+    <p class="gate-note">Guests see a live gold H4 chart with one trade setup.</p>
   </div>
 </div>
 <div class="ms-live app" id="ms-live" data-chart="dark">
@@ -892,6 +922,12 @@ window.MS_ADMIN_HASH = '49c5624f2625ed8b42b6e1bf2819a3a41ddb9743aeca36ea34ea7eb9
     <div class="ms-note" id="ms-offline-why"></div>
   </div>
 
+  <!-- ─── Guest: one H4 gold chart with one trade setup ─── -->
+  <section class="view" id="v-guest" aria-label="Gold H4 chart" hidden>
+    <div class="g-head"><h1 class="h-head">Gold · H4</h1></div>
+    <div class="card g-card"><div class="g-chart" id="g-chart"><div class="g-msg" id="g-msg">Loading the chart…</div></div></div>
+    <div class="g-key" aria-hidden="true"><span><i class="k-e"></i>Entry</span><span><i class="k-s"></i>Stop zone</span><span><i class="k-t"></i>Target zone</span></div>
+  </section>
   <!-- ─── Home: one card per section ─── -->
   <section class="view" id="v-home" aria-label="Home">
     <div class="h-top"><div><div class="h-date" id="h-date"></div><h1 class="h-head" id="h-head">Loading live candles…</h1></div></div>
@@ -3032,6 +3068,7 @@ function msNextSetup(bars, A) {
       ho.innerHTML = (A1.length || shLab) ? `<b>${A1.length}</b><span class="ho-l"> open</span>${shLab} · <span class="${tot >= 0 ? 'pos' : 'neg'}"><span class="ho-l">${fR(tot)} · </span>${fp(pct)}</span>` : '<b>0</b><span class="ho-l"> open</span>'; }
     const h = document.getElementById('h-active'); if (h) h.innerHTML = (A1.length || SHO.length) ? `${A1.length} open${SHO.length ? ` + ${SHO.length} shadow` : ''} · floating <b class="${tot >= 0 ? 'pos' : 'neg'}">${fR(tot)}</b>` : 'none open';
     window.FLOAT = { tot, pct, open: A1.length, sh: SHO.length, risk };
+    if (PUB) renderGuest();
     // Home: the biggest open positions (by size of the floating result), one row per market + side
     const hl = document.getElementById('h-act-list');
     if (hl) {
@@ -3044,6 +3081,45 @@ function msNextSetup(bars, A) {
     renderToday();
   }
   setInterval(() => { try { renderActive(); } catch (e) {} }, 15e3);
+  // Guest chart (6 Nov, owner): H4 gold candles with one system trade drawn as an entry line, a stop zone and a target zone
+  const GV = { chart: null, series: null, ov: null, bars: null, at: 0, off: 0, busy: false };
+  async function renderGuest() {
+    if (!PUB) return; const host = document.getElementById('g-chart'), msg = document.getElementById('g-msg'); if (!host || GV.busy) return;
+    const I = INSTRUMENTS.xau, tf = TFS.find((t) => t.id === '4h'), SYSG = ['replica', 'mosha-bo', 'gtrend', 'gtl', 'geg'];
+    const pool = (COUNCIL.trades || []).concat(typeof sysTrades === 'function' ? sysTrades() : []).filter((x) => x.market === 'xau' && !x.shadow && !x.replay && SYSG.includes(x.k) && x.entry && x.stop && !x.addOf);
+    const live = pool.filter((x) => x.status === 'open' || x.status === 'pending').sort((a, b) => b.opened - a.opened);
+    const x = live[0] || pool.filter((t) => t.closed).sort((a, b) => b.closed - a.closed)[0] || null;
+    GV.busy = true;
+    try {
+      if (!GV.bars || Date.now() - GV.at > 5 * 60e3) {
+        GV.bars = (await fetchBars(tf, I, 300)).bars; GV.at = Date.now();
+        try { const j = await getJSON('https://api.gold-api.com/price/XAU'), o = +j.price - GV.bars[GV.bars.length - 1].close; GV.off = isFinite(o) && Math.abs(o) < 150 ? o : (G.offset || 0); } catch (e) { GV.off = G.offset || 0; }
+      }
+      const th = THEMES[G.theme] || THEMES.dark;
+      if (!GV.chart) {
+        GV.chart = LW.createChart(host, { autoSize: true, layout: { background: { type: 'solid', color: th.bg }, textColor: th.text, fontSize: 11 }, grid: { vertLines: { visible: false }, horzLines: { color: th.grid } }, rightPriceScale: { borderColor: th.border }, timeScale: { borderColor: th.border, timeVisible: true, rightOffset: 18 }, crosshair: { mode: LW.CrosshairMode.Normal }, handleScroll: true, handleScale: true });
+        GV.series = GV.chart.addCandlestickSeries({ upColor: UPC, downColor: DNC, borderUpColor: UPC, borderDownColor: DNC, wickUpColor: UPC, wickDownColor: DNC, priceLineVisible: false, lastValueVisible: true });
+        GV.ov = new Overlay(); GV.series.attachPrimitive(GV.ov);
+      }
+      const data = GV.bars.map((b) => ({ time: b.time + TZ, open: b.open + GV.off, high: b.high + GV.off, low: b.low + GV.off, close: b.close + GV.off }));
+      GV.series.setData(data);
+      const items = { boxes: [], lines: [], labels: [], path: [], vlines: [], segs: [] };
+      if (x) {
+        const tgt = x.tp1 != null ? x.tp1 : x.t1, t0 = (x.filled || x.opened) + TZ;
+        let i0 = data.findIndex((b) => b.time + tf.sec > t0); if (i0 < 0) i0 = Math.max(0, data.length - 12);
+        const i1 = Math.max(data.length + 14, i0 + 20);
+        items.boxes.push({ l1: i0, l2: i1, hi: Math.max(x.entry, x.stop), lo: Math.min(x.entry, x.stop), fill: 'rgba(242,87,111,.16)', stroke: 'rgba(242,87,111,.55)' });
+        if (tgt != null) items.boxes.push({ l1: i0, l2: i1, hi: Math.max(x.entry, tgt), lo: Math.min(x.entry, tgt), fill: 'rgba(47,191,143,.15)', stroke: 'rgba(47,191,143,.55)' });
+        items.boxes.push({ l1: i0, l2: i1, hi: x.entry, lo: x.entry, fill: null, stroke: '#7aa2ff', dash: true });
+        GV.series.applyOptions({ autoscaleInfoProvider: (orig) => { const r = orig(); if (r && r.priceRange) { const v = [x.entry, x.stop, tgt].filter(isFinite); r.priceRange.minValue = Math.min(r.priceRange.minValue, ...v); r.priceRange.maxValue = Math.max(r.priceRange.maxValue, ...v); } return r; } });
+        GV.chart.timeScale().setVisibleLogicalRange({ from: Math.max(0, i0 - 90), to: i1 + 4 });
+      } else GV.chart.timeScale().fitContent();
+      GV.ov.set(items);
+      if (msg) { msg.hidden = !!x; msg.textContent = x ? '' : 'No trade setup on the chart right now.'; }
+    } catch (e) { if (msg) { msg.hidden = false; msg.textContent = "The chart couldn't load right now."; } }
+    finally { GV.busy = false; }
+  }
+  setInterval(() => { try { renderGuest(); } catch (e) {} }, 60e3);
   // Home "Today" strip (6 Nov renovation): floating now, and closed R today / this week / this month, live + shadow
   function renderToday() {
     const el = document.getElementById('h-today'); if (!el) return;
@@ -3705,7 +3781,7 @@ function msNextSetup(bars, A) {
   if (document.getElementById('v-council')) { councilReady = loadCouncil(); setInterval(loadCouncil, 5 * 60e3); }
 
   // ─── Sections: a home page of cards, each section on its own page ───
-  const VIEWS = ['home', 'setup', 'charts', 'scanner', 'council', 'journal'];
+  const VIEWS = ['home', 'setup', 'charts', 'scanner', 'council', 'journal', 'guest'];
   // Council sections (6 Nov renovation): Overview · Trades · Systems · Review · Research; deep links #council/<section>
   const CPANES = ['overview', 'trades', 'systems', 'review', 'research'], CPUB = ['overview', 'trades'];
   const CPANE = { cur: 'overview' };
@@ -3730,7 +3806,7 @@ function msNextSetup(bars, A) {
       });
     } }
   function showView() {
-    const [h0, sub] = location.hash.slice(1).split('/'), h = PUB && (h0 === 'setup' || h0 === 'scanner') ? 'home' : h0, v = VIEWS.includes(h) ? h : 'home';
+    const [h0, sub] = location.hash.slice(1).split('/'), h = PUB ? 'guest' : h0 === 'guest' ? 'home' : h0, v = VIEWS.includes(h) ? h : 'home';   // guests only get the H4 chart (owner, 6 Nov)
     if (v === 'council') setPane(sub || CPANE.cur, false);
     VIEWS.forEach((k) => { const el = document.getElementById('v-' + k); if (el) el.hidden = k !== v; });
     document.querySelectorAll('[data-go]').forEach((a) => { if (a.dataset.go === v) a.setAttribute('aria-current', 'page'); else a.removeAttribute('aria-current'); });
