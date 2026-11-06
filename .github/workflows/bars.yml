@@ -1,0 +1,44 @@
+name: Council bars snapshot
+
+# On demand: saves the last days of candles the Trader sees (Kraken PAXG gold 1m/4h/1d, Kraken BTC/ETH/SOL/XRP 1d,
+# CNBC Nasdaq-100 futures 1m) to council-data/research/bars/ so a day can be replayed exactly from a session
+# without market-data access.
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: council-bars
+  cancel-in-progress: true
+
+jobs:
+  bars:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout council data
+        uses: actions/checkout@v4
+        with:
+          ref: council-data
+          path: data
+
+      - name: Fetch candles
+        run: |
+          mkdir -p data/research/bars
+          UA='Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36'
+          for iv in 1 240 1440; do curl -sS -m 40 "https://api.kraken.com/0/public/OHLC?pair=PAXGUSD&interval=$iv" -o "data/research/bars/paxg-$iv.json"; done
+          for p in XBTUSD ETHUSD SOLUSD XRPUSD; do curl -sS -m 40 "https://api.kraken.com/0/public/OHLC?pair=$p&interval=1440" -o "data/research/bars/$p-1440.json"; done
+          from=$(date -u -d '5 days ago' +%Y%m%d000000); to=$(date -u +%Y%m%d%H%M%S)
+          curl -sS -m 40 -A "$UA" -H 'Accept: application/json' "https://ts-api.cnbc.com/harmony/app/bars/@ND.1/1M/$from/$to/adjusted/EST5EDT.json" -o data/research/bars/nq-1m.json || true
+          curl -sS -m 40 -A "$UA" -H 'Accept: application/json' "https://ts-api.cnbc.com/harmony/app/bars/XAU=/1M/$from/$to/adjusted/EST5EDT.json" -o data/research/bars/xau-cnbc-1m.json || true
+          ls -la data/research/bars
+
+      - name: Save
+        run: |
+          git -C data config user.name "mosha-council"
+          git -C data config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git -C data add research/bars
+          git -C data commit -q -m "Bars snapshot $(date -u +%Y-%m-%dT%H:%MZ)" || exit 0
+          for j in 1 2 3 4 5; do git -C data pull -q --rebase origin council-data && git -C data push -q origin HEAD:council-data && break; sleep 7; done
