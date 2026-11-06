@@ -228,6 +228,11 @@ config.userRules = config.userRules || [];
 for (const u of USER_RULES) if (!config.userRules.includes(u.id)) { u.apply(config); config.userRules.push(u.id); config.history.push({ at: nowISO, by: 'user', change: u.change, why: u.why }); }
 const state = Object.assign({ seen: {}, lastRun: 0 }, rd('state.json', {}));
 let trades = rd('trades.json', []);
+// Owner's loss reviews (6 Nov): written from the page's Loss review card into reviews/losses.json. Reasons that match the
+// trade reviews' own causes count in the lesson rules below; the rest are summarised per setup as rule ideas to test.
+const OWNER_REV = (rd('reviews/losses.json', {}) || {}).reviews || {};
+const OWNER_CAUSE = { hunt: 'hunt', noise: 'noise', late: 'late', news: 'news' };
+const ownTags = (x) => ((OWNER_REV[x.id] && !OWNER_REV[x.id].draft && OWNER_REV[x.id].tags) || []);
 // Trades closed by a bad print (a Kraken-only spike, found by the raw-candle probe) are reopened once, so they keep running on the
 // cleaned candles and end with their real result instead of teaching the Coach a move that never happened
 const BAD_PRINT_CLOSES = [
@@ -1267,8 +1272,8 @@ if (coach.date !== today) {
     config.be = null; delete config.beSince;
   }
   // ─── Lessons from the trade reviews: act on system errors that keep repeating (live and shadow losses, last 14 days) ───
-  const rl = trades.filter((x) => x.status === 'loss' && x.pm && x.pm.phase === 'done' && now - x.closed < 14 * 86400);
-  const cnt = (c) => rl.filter((x) => x.pm.cause === c || (x.pm.factors || []).includes(c)).length, share = (c) => rl.length ? cnt(c) / rl.length : 0;
+  const rl = trades.filter((x) => x.status === 'loss' && ((x.pm && x.pm.phase === 'done') || ownTags(x).length) && now - x.closed < 14 * 86400);
+  const cnt = (c) => rl.filter((x) => (x.pm && (x.pm.cause === c || (x.pm.factors || []).includes(c))) || ownTags(x).some((t) => OWNER_CAUSE[t] === c)).length, share = (c) => rl.length ? cnt(c) / rl.length : 0;
   if (rl.length >= 6) {
     if (cnt('hunt') >= 3 && share('hunt') >= 0.3 && config.buf < LIMITS.buf[1]) { const v = +Math.min(LIMITS.buf[1], config.buf + 0.02).toFixed(2); change(`Stop buffer ${config.buf} → ${v} ATR`, `Reviews: ${cnt('hunt')} of ${rl.length} losses were stopped out and then went to the target (stop hunted).`); config.buf = v; }
     if (cnt('noise') >= 3 && config.minRisk < LIMITS.minRisk[1]) { const v = +Math.min(LIMITS.minRisk[1], config.minRisk + 0.1).toFixed(2); change(`Minimum stop ${config.minRisk} → ${v} ATR`, `Reviews: ${cnt('noise')} losses had a stop inside one normal candle.`); config.minRisk = v; }
@@ -1796,6 +1801,15 @@ if (nqLast) snapshot.nqLast = nqLast;
 }
 wr('research.json', research);
 snapshot.lessons = lessons(trades, now);
+// owner's loss reviews, per setup (30 days): reason counts, rule ideas, and reasons that repeat (3+ and a third of the
+// reviewed losses of that setup) as candidates the twice-daily council check tests on the backtest before any rule changes
+{
+  const R = Object.values(OWNER_REV).filter((r) => r && !r.draft && r.k && now - (r.closed || r.at || 0) < 30 * 86400), byK = {};
+  for (const r of R) { const b = (byK[r.k] = byK[r.k] || { n: 0, tags: {}, ideas: [] }); b.n++; (r.tags || []).forEach((t) => { b.tags[t] = (b.tags[t] || 0) + 1; }); if (r.lesson) b.ideas.push({ id: r.id, text: String(r.lesson).slice(0, 300), council: r.council || null }); }
+  const candidates = [];
+  for (const [k, b] of Object.entries(byK)) for (const [t, n] of Object.entries(b.tags)) if (n >= 3 && n / b.n >= 1 / 3 && !OWNER_CAUSE[t]) candidates.push({ k, tag: t, n, of: b.n });
+  snapshot.ownerReviews = { n: R.length, byK, candidates, at: nowISO };
+}
 wr('snapshot.json', snapshot);
 const open = trades.filter((x) => x.status === 'open' || x.status === 'pending').length;
 console.log(`Council run ${nowISO}: ${Object.keys(snapshot.markets).length} markets, ${Object.keys(snapshot.errors).length} errors, ${open} open/pending trades, ${trades.length} total.`);

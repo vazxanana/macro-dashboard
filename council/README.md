@@ -624,3 +624,12 @@ within 6 h that trades into the 38–62% pullback of that H1 candle and closes i
 stop is touched first. Spot gold, 0.15 all-in cost: 2023–24 | 2025–26 +0.105 | +0.171R a trade (n234/186, DD −9.1 | −9.5R),
 positive at 0.10–0.30 cost and across the range multiple, close position, pullback zone, wait and exit variants; ≈110
 trades a year. Every M1 / session / ORB / school scalp tested was zero before costs; this one is not. Sizing guide 0.25%.
+
+## Owner loss reviews (6 Nov)
+
+`reviews/losses.json` on council-data holds the owner's reviews of losing trades from the page's Loss review card
+(`{reviews: {<trade id>: {k, market, side, R, tags, text, lesson, strokes, at, council?}}}`). The trader counts the tags
+hunt, noise, late and news with its own trade-review causes in the lesson rules (stop buffer, minimum stop, fresh signals,
+news guard), and publishes `snapshot.ownerReviews` (per setup: reason counts, rule ideas, repeating reasons as candidates).
+A candidate never changes a rule by itself: it is tested on the 2023+ backtest halves first, and the result is written
+back into the review's `council` field so the owner sees the answer on the card.

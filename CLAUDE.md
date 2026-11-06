@@ -51,3 +51,13 @@ script, token kept in localStorage `ms-admin`) shows everything (Setup, Scanner,
 reviews, notes). Anything that describes a rule, a system name, a note or a reason must sit inside an element with class
 `adm`, or be guarded by `PUB` in the JS templates; `pubonly` is the public-only counterpart. Keep it that way in redesigns.
 To change the password: compute `sha256` of the new one (e.g. `printf %s 'new' | sha256sum`) and replace both copies of the hash.
+
+## Loss review (6 Nov 2026, owner request)
+
+Admin-only card `#ms-loss` on `market-structure.html`: every losing trade (live and shadow, 7 or 30 days) stacked by the
+strategy that took it; a row opens the trade chart, where `#ms-tv-rv` adds drawing (pen, line, text; points stored as
+[UTC time, price]), reason tags, a "why it failed" note and a rule idea. Reviews are kept in localStorage `msLossRev` and,
+when the owner pastes a GitHub fine-grained token (localStorage `msGhTok`, Contents read/write on this repo), written to
+`council-data/reviews/losses.json`. The trader reads that file: tags hunt / noise / late / news count in its lesson
+rules; other tags repeating 3+ times on a setup become `snapshot.ownerReviews.candidates`, which the twice-daily council
+check tests before any rule change and answers in each review's `council: {at, verdict, note}`.
