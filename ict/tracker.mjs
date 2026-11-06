@@ -11,13 +11,13 @@ import fs from 'node:fs';
 import path from 'node:path';
 
 const DATA = process.argv[2] || 'data/ict';
-const MARKETS = {
+export const MARKETS = {
   nq:  { sym: 'NQ=F',  cnbc: ['@ND.1'],           label: 'Nasdaq 100',   short: 'NQ',  tick: 0.25, dec: 2 },
   es:  { sym: 'ES=F',  cnbc: ['@SP.1', '@ES.1'],  label: 'S&P 500',      short: 'ES',  tick: 0.25, dec: 2 },
   ym:  { sym: 'YM=F',  cnbc: ['@DJ.1', '@YM.1'],  label: 'Dow Jones',    short: 'YM',  tick: 1,    dec: 0 },
   rty: { sym: 'RTY=F', cnbc: ['@TFS.1', '@RTY.1'], label: 'Russell 2000', short: 'RTY', tick: 0.1, dec: 1 },
 };
-const P = { piv: 3, look: 96, vmax: 6, rr: 3, mark: 2, holdH: 48, maxAtr: 8, fresh: 3 * 3600 };
+export const P = { piv: 3, look: 96, vmax: 6, rr: 3, mark: 2, holdH: 48, maxAtr: 8, fresh: 3 * 3600 };
 const UA = 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36';
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 const now = Math.floor(Date.now() / 1000);
@@ -43,7 +43,7 @@ async function yahoo(sym, interval, range) {
 // since 4 Nov 2026 (429), so CNBC is first and Yahoo the fallback.
 const nyFmt = new Intl.DateTimeFormat('en-US', { timeZone: 'America/New_York', year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', hourCycle: 'h23' });
 const etStamp = (t) => { const o = {}; for (const p of nyFmt.formatToParts(new Date(t * 1000))) o[p.type] = p.value; return `${o.year}${o.month}${o.day}${o.hour}${o.minute}00`; };
-async function cnbcBars(sym, iv, from, to) {
+export async function cnbcBars(sym, iv, from, to) {
   const r = await fetch(`https://ts-api.cnbc.com/harmony/app/bars/${encodeURIComponent(sym)}/${iv}/${etStamp(from)}/${etStamp(to)}/adjusted/EST5EDT.json`, { headers: { 'User-Agent': UA, Accept: 'application/json' }, signal: AbortSignal.timeout(30000) });
   const j = await r.json().catch(() => null), pb = j && j.barData && j.barData.priceBars;
   if (!pb || !pb.length) throw new Error(`CNBC ${sym} ${iv}: ${(j && j.statusMessage) || `HTTP ${r.status}`}`);
@@ -51,7 +51,7 @@ async function cnbcBars(sym, iv, from, to) {
   for (const b of pb) { const o = +b.open, h = +b.high, l = +b.low, c = +b.close, t = Math.round(+b.tradeTimeinMills / 1000); if ([o, h, l, c, t].every((v) => isFinite(v) && v > 0)) out.push({ time: t, open: o, high: Math.max(h, o, c), low: Math.min(l, o, c), close: c }); }
   return out.sort((a, b) => a.time - b.time);
 }
-const agg = (bars, sec) => { const m = new Map(); for (const b of bars) { const k = Math.floor(b.time / sec) * sec, c = m.get(k); if (!c) m.set(k, { time: k, open: b.open, high: b.high, low: b.low, close: b.close }); else { c.high = Math.max(c.high, b.high); c.low = Math.min(c.low, b.low); c.close = b.close; } } return [...m.values()].sort((a, b) => a.time - b.time); };
+export const agg = (bars, sec) => { const m = new Map(); for (const b of bars) { const k = Math.floor(b.time / sec) * sec, c = m.get(k); if (!c) m.set(k, { time: k, open: b.open, high: b.high, low: b.low, close: b.close }); else { c.high = Math.max(c.high, b.high); c.low = Math.min(c.low, b.low); c.close = b.close; } } return [...m.values()].sort((a, b) => a.time - b.time); };
 // H1 (built from 5m, ~24 days), D1 (~1 year) and 5m (5 days) for one market
 async function feed(M) {
   for (const sym of M.cnbc) {
@@ -114,7 +114,7 @@ export function signals(Hraw, D, side, tick) {
   }
   return out;
 }
-const letter = (g) => (g >= 10 ? 'A+' : g >= 9 ? 'A' : g >= 8 ? 'A-' : g >= 7 ? 'B+' : g >= 6 ? 'B' : g >= 5 ? 'B-' : g >= 3 ? 'C' : 'F');
+export const letter = (g) => (g >= 10 ? 'A+' : g >= 9 ? 'A' : g >= 8 ? 'A-' : g >= 7 ? 'B+' : g >= 6 ? 'B' : g >= 5 ? 'B-' : g >= 3 ? 'C' : 'F');
 
 async function main() {
   fs.mkdirSync(DATA, { recursive: true });
