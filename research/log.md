@@ -1046,3 +1046,19 @@ Owner: focus the new content on gold. The Mosha "sideways arrival" rule (5 Nov: 
 Slow arrivals beat the live line on profit and drawdown in both halves at 12 and 30 bars (16–22 give up a few R in 2025–26 with better drawdown); fast arrivals lose everywhere → **adopted at 12 bars** (`mosha-slow`, PR #247): a fast chain is a shadow trade (`blockedBy: ['momentum']`), so the filter's cost keeps showing forward. The "strong leg" rule (≥ 2 pivots crossed in the breakout leg) points the same way but has one weak-leg trade in 2023–24, so it cannot be judged; the QM-type CF preference is not supported (plain CFs did better in 2025–26).
 
 Gold items from the skills still to test (loop list): Zlankator CC/DC confirmation candle at a fresh H4 A/V level (H1 rejection closing in the level's direction → limit at the level, SL 30 pips, TP 100 / next level); the "4 and 2 rule" key levels as entry levels for the daily engulf (level + zone overlap); CE (50% of the Daily wick, 7-pip stop) at the H4 Apex; Ephron's EG-then-EF overlap on D1 zones; PITCHOU M15 rejection candle at a fresh H1 level in the daily storyline direction (SL 13, 1:3); the engulf "stairs" re-entries.
+
+## 2026-11-06 — Zlankator H4 key levels (plain / CC / DC entries) on gold 2023+: negative, rejected
+
+`ms/zl_levels.py`. Levels per the skill (close of the first of two consecutive H4 candles; A = bull-then-bear → resistance, V = bear-then-bull → support; fresh until a wick touch, body through re-freshens, ≤ 2 uses, life 20 days). Entries: plain limit on the first touch; CC = an H1 candle wicking the level, body on the level's side, closing in its direction → limit for the next touch; DC = the same rejection closing against the level → limit for the next touch. SL 3.0 (30 pips), TP 10.0 (and 6.0), BE after 8.0, 5-day validity, 10-day hold, with and without the 20-day-average direction gate. 3,013 levels.
+
+| entry | 2023–24 | 2025–26 |
+|---|---|---|
+| plain, SL3 TP10 (n 1448/1327) | −150R | −4R |
+| plain, SMA20 gate, buys | −33R | +32R |
+| plain, SL5 TP10 | −84R | −14R |
+| CC, SL3 TP10 (n 528/506) | −35R | −28R |
+| CC, SL5 | −17R | −15R |
+| DC, SL3 TP10 (n 765/696) | −116R | −90R |
+| DC, SL5 | −76R | −78R |
+
+Every variant, side and gate is negative in 2023–24 and at best flat in 2025–26; the fixed 30-pip stop on a line level is too tight for gold's range (median H4 range 2023–26 is far above 3.0) and widening it to 50 pips only shrinks the loss. The confirmation candles (CC/DC) do not improve on the plain touch. The Zlankator level model is a discretionary swing method; its mechanical core has no edge here. **Rejected.** Next gold items on the list: the 4-and-2 levels as a location filter for the daily engulf zone; CE at the H4 Apex; EG-then-EF overlap on D1; PITCHOU M15 rejection at a fresh H1 level; engulf stairs.
