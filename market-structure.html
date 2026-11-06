@@ -2662,7 +2662,9 @@ function msNextSetup(bars, A) {
     if (!document.getElementById('v-council')) return;
     const bust = Math.floor(Date.now() / 120000);
     const get = (f, json) => fetch(`${CDATA}${f}?v=${bust}`, { cache: 'no-store' }).then((r) => r.ok ? (json ? r.json() : r.text()) : null).catch(() => null);
-    const [trades, config, coach, snap, analysis, review, backtest, replay, research, shadowRp] = await Promise.all([get('trades.json', 1), get('config.json', 1), get('coach.json', 1), get('snapshot.json', 1), get('analysis/latest.md'), get('reviews/latest.md'), get('backtest.json', 1), get('research/replay-2w.json', 1), get('research.json', 1), get('research/shadow-replay.json', 1)]);
+    let [trades, config, coach, snap, analysis, review, backtest, replay, research, shadowRp] = await Promise.all([get('trades.json', 1), get('config.json', 1), get('coach.json', 1), get('snapshot.json', 1), get('analysis/latest.md'), get('reviews/latest.md'), get('backtest.json', 1), get('research/replay-2w.json', 1), get('research.json', 1), get('research/shadow-replay.json', 1)]);
+    // m30m1 (M30 → M1) fires on the same M1 entry as the gold scalp: the same trade recorded twice; count it once (6 Nov)
+    if (Array.isArray(trades)) { const seen = new Set(trades.filter((x) => x.k !== 'm30m1').map((x) => `${x.market}|${x.side}|${x.opened}|${x.entry}`)); trades = trades.filter((x) => x.k !== 'm30m1' || !seen.has(`${x.market}|${x.side}|${x.opened}|${x.entry}`)); }
     Object.assign(COUNCIL, { trades, config, coach, snap, analysis, review, backtest, replay, research, shadowRp, shRpRows: null, at: Date.now() });
     councilAlerts(trades);
     if (config) {
