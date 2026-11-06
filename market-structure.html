@@ -627,7 +627,7 @@ document.addEventListener('DOMContentLoaded', function () { var pub = document.d
 window.MS_ADMIN_HASH = '4622c0548320297ae6874ab045769a98f61c6c53247bd56b3856a472418002cf';
 </script>
 <style>html[data-mode="public"] .adm{display:none!important} html[data-mode="admin"] .pubonly{display:none!important} .ms-admin-link{color:inherit;opacity:.6;text-decoration:underline dotted;cursor:pointer}</style>
-<style>.ho-sh{opacity:.8;font-weight:500}</style>
+<style>.ho-sh{opacity:.8;font-weight:500} .c-act li.grp{display:block;padding:0;cursor:default} .c-act li.grp>details>summary{display:grid;grid-template-columns:auto 1fr auto;gap:4px 10px;align-items:center;padding:8px 10px;cursor:pointer;list-style:none} .c-act li.grp>details>summary::-webkit-details-marker{display:none} .c-act li.grp>details>summary .a-d::after{content:' \25BE'} .c-act li.grp>details[open]>summary .a-d::after{content:' \25B4'} .c-act ul.sub{margin:0 8px 8px;padding:0} .c-act ul.sub li{background:rgba(127,127,127,.04)}</style>
 </head>
 <body>
 <div class="ms-live app" id="ms-live" data-chart="dark">
@@ -2754,17 +2754,35 @@ function msNextSetup(bars, A) {
     const SHO = shOn ? (COUNCIL.trades || []).filter((x) => x.shadow && (x.status === 'open' || x.status === 'pending')).sort((a, b) => b.opened - a.opened) : [];
     const A = A0.concat(SHO), cnt = (x) => !x.shadow && !x.tracker, A1 = A0.filter(cnt);
     let tot = 0, risk = 0, pct = 0, shTot = 0, shN = 0;
-    el.innerHTML = A.length ? A.map((x) => {
+    // grouped by market + side (6 Nov, owner): one row per group with the total floating result and lots, the trades in a dropdown
+    const ACC = 50000, CONTRACT = (x) => x.market === 'xau' ? 100 : x.market === 'nq' ? 1 : ['btc', 'eth', 'sol', 'xrp'].includes(x.market) ? 1 : 100000;
+    const pctOf = (x) => (x.k === 'trend' || x.k === 'gtrend') ? 0.5 : 0.25;
+    const items = A.length ? A.map((x) => {
       const s = x.side === 'sell' ? -1 : 1, r0 = x.r0 || Math.abs(x.entry - x.stop), size = x.size || 1, px = nowPrice(x), d = { dec: x.dec != null ? x.dec : 2 };
       const fl = px != null && x.status === 'open' && r0 ? (px - x.entry) * s / r0 * size : null; if (fl != null && (cnt(x) || x.shadow)) { tot += fl; pct += fl * ((x.k === 'trend' || x.k === 'gtrend') ? 0.5 : 0.25); } if (fl != null && x.shadow) { shTot += fl; shN++; }
       const stopR = r0 ? (x.stop - x.entry) * s / r0 : -1; if (cnt(x)) risk += Math.max(0, -stopR) * size;
       const age = Math.max(0, Date.now() / 1000 - (x.filled || x.opened)), ageT = age < 3600 ? `${Math.round(age / 60)} min` : `${(age / 3600).toFixed(1)} h`;
       const mark = x.tp1 != null ? x.tp1 : x.t1, trail = (x.k === 'trend' || x.k === 'gtrend') ? (x.addOf ? 'second unit: own 5 ATR stop, leaves with the first trade on its channel-midpoint close' : x.exitRule === 'mid' ? `out on a daily close under ${fmtI(x.midStop, { dec: x.dec ?? 2 })} (channel midpoint)` : x.trailMoved ? `stop trails ${x.kATR || (x.k === 'gtrend' ? 2 : 4)} ATR, locks ${fR(stopR)}` : `stop trails ${x.kATR || (x.k === 'gtrend' ? 2 : 4)} ATR from each daily close`) : x.trail ? (x.addOf ? (x.trailMoved ? `trails with the first trade, stop locks ${fR(stopR)}` : 'trails with the first trade after its +4R') : x.trailMoved ? `trailing, stop locks ${fR(stopR)}` : `trailing from +${x.trail[0]}R`) : '';
-      return `<li data-tid="${esc(x.id)}" tabindex="0" title="Show this trade on a chart" class="${x.shadow ? 'sh' : ''}"><span class="chip ${x.side}">${x.side.toUpperCase()}</span>`
+      const lots = r0 ? ACC * pctOf(x) / 100 * size / (r0 * CONTRACT(x)) : 0, usd = fl == null ? null : fl * ACC * pctOf(x) / 100;
+      return { x, fl, lots, usd, html: `<li data-tid="${esc(x.id)}" tabindex="0" title="Show this trade on a chart" class="${x.shadow ? 'sh' : ''}"><span class="chip ${x.side}">${x.side.toUpperCase()}</span>`
         + `<span class="a-t"><b>${esc(x.label)}</b> ${PUB ? '' : esc(x.name)}${x.shadow ? `<span class="tag" title="Blocked by: ${esc((x.blockedBy || []).join(', '))}">shadow${x.blockedBy && x.blockedBy.length ? ' · ' + esc(x.blockedBy.join(', ')) : ''}</span>` : ''}${x.tracker ? '<span class="tag" title="A research tracker (not our system): recorded to judge the idea, not counted">tracker</span>' : x.paper ? '<span class="tag">paper</span>' : ''}${x.addOf ? `<span class="tag" title="${x.k === 'trend' ? 'Second unit added when a daily close was +1R above the first entry; its own 5 ATR stop' : x.k === 'gtrend' ? 'Second unit added when a daily close was +1R above the first entry; same ratcheting stop' : 'Second unit added at the add level, stop at the first entry'}">add</span>` : ''}${!x.paper && !SYS_K.includes(x.k) ? '<span class="tag" title="Opened by the earlier council strategies, still managed to its exit">older strategy</span>' : ''}${size !== 1 ? `<span class="tag">${size}× size</span>` : ''}${x.status === 'pending' ? '<span class="tag">waiting fill</span>' : ''}</span>`
         + `<span class="a-r ${fl == null ? '' : fl >= 0 ? 'pos' : 'neg'}">${fl == null ? '—' : fR(fl)}</span>`
-        + `<span class="a-d">Entry ${fmtI(x.entry, d)} · stop ${fmtI(x.stop, d)} · ${(x.k === 'trend' || x.k === 'gtrend') ? 'no fixed target' : `${x.tp1 != null ? `${Math.round(Math.abs(x.tp1 - x.entry) / (r0 || 1))}R mark` : x.trail ? `trail from +${x.trail[0]}R at` : 'target'} ${fmtI(x.tp1 != null ? x.tp1 : x.trail ? x.entry + s * x.trail[0] * r0 : mark, d)}`}${px != null ? ` · now ${fmtI(px, d)}${x.market === 'nq' ? ' (10 min delayed)' : ''}` : ''} · open ${ageT}${x.mfe ? ` · best +${(+x.mfe).toFixed(2)}R` : ''}${trail && !PUB ? ` · ${trail}` : ''}</span></li>`;
+        + `<span class="a-d">Entry ${fmtI(x.entry, d)} · stop ${fmtI(x.stop, d)} · ${(x.k === 'trend' || x.k === 'gtrend') ? 'no fixed target' : `${x.tp1 != null ? `${Math.round(Math.abs(x.tp1 - x.entry) / (r0 || 1))}R mark` : x.trail ? `trail from +${x.trail[0]}R at` : 'target'} ${fmtI(x.tp1 != null ? x.tp1 : x.trail ? x.entry + s * x.trail[0] * r0 : mark, d)}`}${px != null ? ` · now ${fmtI(px, d)}${x.market === 'nq' ? ' (10 min delayed)' : ''}` : ''} · open ${ageT}${x.mfe ? ` · best +${(+x.mfe).toFixed(2)}R` : ''}${trail && !PUB ? ` · ${trail}` : ''}</span></li>` };
+    }) : [];
+    const fmtL = (v) => v >= 10 ? v.toFixed(1) : v >= 1 ? v.toFixed(2) : v.toFixed(3), fUsd = (v) => `${v >= 0 ? '+' : '−'}$${Math.abs(v).toFixed(0)}`;
+    const OPEN = (window.ACT_OPEN = window.ACT_OPEN || new Set()), groups = new Map();
+    for (const it of items) { const g = `${it.x.market}|${it.x.side}`; if (!groups.has(g)) groups.set(g, []); groups.get(g).push(it); }
+    el.innerHTML = items.length ? [...groups.entries()].map(([g, L]) => {
+      if (L.length === 1) return L[0].html;
+      const x0 = L[0].x, flN = L.filter((i) => i.fl != null), fl = flN.reduce((a, i) => a + i.fl, 0), usd = flN.reduce((a, i) => a + i.usd, 0), lots = L.reduce((a, i) => a + i.lots, 0);
+      const nSh = L.filter((i) => i.x.shadow).length, nWait = L.filter((i) => i.x.status === 'pending').length;
+      return `<li class="grp"><details data-g="${esc(g)}"${OPEN.has(g) ? ' open' : ''}><summary><span class="chip ${x0.side}">${x0.side.toUpperCase()}</span>`
+        + `<span class="a-t"><b>${esc(x0.label)}</b> ${L.length} trades${nSh ? ` <span class="tag">${nSh} shadow</span>` : ''}${nWait ? ` <span class="tag">${nWait} waiting fill</span>` : ''}</span>`
+        + `<span class="a-r ${flN.length ? (fl >= 0 ? 'pos' : 'neg') : ''}">${flN.length ? fR(fl) : '—'}</span>`
+        + `<span class="a-d">${['btc', 'eth', 'sol', 'xrp'].includes(x0.market) ? `${lots >= 100 ? Math.round(lots).toLocaleString() : fmtL(lots)} ${x0.market.toUpperCase()}` : `${fmtL(lots)} lots`} total <small>(on $50k at the sizing guide)</small>${flN.length ? ` · floating <b class="${usd >= 0 ? 'pos' : 'neg'}">${fUsd(usd)}</b>` : ''} · tap to see the ${L.length} trades</span></summary>`
+        + `<ul class="c-act sub">${L.map((i) => i.html).join('')}</ul></details></li>`;
     }).join('') : (PUB ? '<li class="empty">No open trades right now.</li>' : '<li class="empty">No open trades right now. The system opens one when a gold replica signal passes (while gold is volatile), a Mosha BO setup completes (gold), a coin closes above its 55-day high (crypto trend), or the NQ open run fires (paper).</li>');
+    el.querySelectorAll('details[data-g]').forEach((dEl) => dEl.addEventListener('toggle', () => { if (dEl.open) OPEN.add(dEl.dataset.g); else OPEN.delete(dEl.dataset.g); }));
     const sum = document.getElementById('ms-active-sum');
     const trk = A0.length - A1.length;
     if (sum) sum.innerHTML = A0.length ? `${A1.length} open${trk ? ` + ${trk} tracker` : ''}${SHO.length ? ` + ${SHO.length} shadow` : ''} · at risk ${risk.toFixed(1)}R · floating <b class="${tot >= 0 ? 'pos' : 'neg'}">${fR(tot)}</b>${SHO.length ? ` <small>(shadow ${fR(shTot)})</small>` : ''}` : SHO.length ? `${SHO.length} shadow open · floating <b class="${tot >= 0 ? 'pos' : 'neg'}">${fR(tot)}</b>` : '';
