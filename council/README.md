@@ -611,3 +611,14 @@ are negative. Two thirds of the trades fire while the gold trend system is flat.
 
 The second unit opens at +1.5R instead of +2R (stop at the first entry; breakeven still at +2R; run after +4R). With the MSNR
 size tilt, 2023–24 | 2025–26: +109.6R (DD −9.7) | +155.5R (DD −16.5) → +120.2R (DD −10.3) | +170.3R (DD −14.4).
+
+## Gold momentum pullback (6 Nov, user rule `gold-momentum-pullback`)
+
+The scalp that survives a raw-spread account. Rule (`config.goldMP`, records `k: 'gmp'`): a closed H1 candle whose range is
+≥ 1.5× the average of the previous 14 H1 ranges and which closes in its top (buy) / bottom (sell) 20%, in the direction of
+the 20-day average, closing between 07:00 and 17:00 UTC, opens a watch (kept in `state.json`); the first closed M5 candle
+within 6 h that trades into the 38–62% pullback of that H1 candle and closes in the trade direction enters at market; stop
+0.1 beyond the H1 candle (median 7.8 points); after +2R the stop trails 1R (cap 10R); out after 8 h; the watch dies if the
+stop is touched first. Spot gold, 0.15 all-in cost: 2023–24 | 2025–26 +0.105 | +0.171R a trade (n234/186, DD −9.1 | −9.5R),
+positive at 0.10–0.30 cost and across the range multiple, close position, pullback zone, wait and exit variants; ≈110
+trades a year. Every M1 / session / ORB / school scalp tested was zero before costs; this one is not. Sizing guide 0.25%.
