@@ -1315,6 +1315,14 @@ window.MS_ADMIN_HASH = '49c5624f2625ed8b42b6e1bf2819a3a41ddb9743aeca36ea34ea7eb9
 .ms-scan-meta:has(#ms-scan-meta:empty) { gap: 0; }
 @keyframes ms-wait { 50% { opacity: .45; } }
 .ms-srow .err { animation: ms-wait 1.6s ease-in-out infinite; }
+
+/* polish 9: journal tables */
+@media (hover: hover) { .ms-j tbody tr:not(.empty):hover td { background: color-mix(in srgb, var(--ink) 4%, transparent); } }
+@media (max-width: 760px) {
+  .ms-j tr > :first-child { position: sticky; left: 0; z-index: 1; background-color: var(--panel) !important; background-image: none !important; box-shadow: 1px 0 0 var(--line-soft); }
+  .ms-j .empty td { position: static; box-shadow: none; }
+  .ms-j thead tr > :first-child { z-index: 3; }
+}
 </style>
 </head>
 <body>
