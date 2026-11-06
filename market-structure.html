@@ -689,6 +689,39 @@
   @media (max-width: 700px) { .h-quick { flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; margin-right: -16px; padding-right: 16px; } .h-quick a { flex: none; min-height: 40px; } }
   @media (prefers-reduced-motion: reduce) { .c-nav button, .c-how > summary::before, .h-quick a { transition: none; } }
 
+
+  /* ═══ Header (6 Nov): icon buttons, account area with oval photo and greeting ═══ */
+  .top-actions { align-items: center; }
+  .top-actions .ms-tbtn { width: 38px; height: 38px; min-height: 38px; padding: 0; font-size: 0; display: inline-grid; place-items: center; border-radius: 11px; position: relative; }
+  .top-actions .ms-tbtn::before { content: ""; width: 18px; height: 18px; background: currentColor; -webkit-mask: var(--ico) center / contain no-repeat; mask: var(--ico) center / contain no-repeat; }
+    #ms-alerts { --ico: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9'/%3E%3Cpath d='M13.7 21a2 2 0 0 1-3.4 0'/%3E%3C/svg%3E"); } .top-actions .menu > summary { --ico: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round'%3E%3Cpath d='M4 7h10M18 7h2M4 17h4M12 17h8'/%3E%3Ccircle cx='16' cy='7' r='2'/%3E%3Ccircle cx='10' cy='17' r='2'/%3E%3C/svg%3E"); }
+  #ms-alerts[aria-pressed="true"]::after { content: ""; position: absolute; top: 8px; right: 8px; width: 7px; height: 7px; border-radius: 50%; background: var(--buy); box-shadow: 0 0 0 2px var(--bg); }
+  .me { position: relative; margin-left: 6px; }
+  .me > summary { list-style: none; display: flex; align-items: center; gap: 10px; padding: 3px 3px 3px 12px; border-radius: 999px; cursor: pointer; border: 1px solid transparent; transition: background .15s ease-out, border-color .15s ease-out; }
+  .me > summary::-webkit-details-marker { display: none; }
+  .me > summary:hover, .me[open] > summary { background: rgba(255,255,255,.04); border-color: var(--line); }
+  .me > summary:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  .me-hi { display: grid; text-align: right; line-height: 1.2; }
+  .me-hi small { font: 500 11.5px var(--sans); color: var(--ink-faint); }
+  .me-hi b { font: 600 14px var(--sans); color: var(--ink); letter-spacing: -.1px; max-width: 160px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .me-av { width: 36px; height: 42px; border-radius: 50%; overflow: hidden; flex: none; display: block; padding: 2px; background: conic-gradient(from 210deg, #f5d27a, #c9940a, #7a5a12, #f5d27a); box-shadow: 0 4px 14px rgba(227,179,65,.18); }
+  .me-av > svg, .me-av > img { width: 100%; height: 100%; display: block; border-radius: 50%; object-fit: cover; background: var(--panel); }
+  .me-av-lg { width: 54px; height: 62px; }
+  .me-pop { position: absolute; right: 0; top: calc(100% + 8px); z-index: 40; width: 260px; padding: 10px; display: grid; gap: 2px; background: var(--panel-raised); border: 1px solid var(--line-strong); border-radius: 14px; box-shadow: 0 24px 48px rgba(0,0,0,.55); transform-origin: top right; animation: mePop .16s cubic-bezier(.16,1,.3,1); }
+  @keyframes mePop { from { opacity: 0; transform: translateY(-4px) scale(.98); } to { opacity: 1; transform: none; } }
+  .me-card { display: flex; align-items: center; gap: 12px; padding: 6px 6px 10px; border-bottom: 1px solid var(--line); margin-bottom: 4px; }
+  .me-card b { display: block; font: 600 15px var(--sans); }
+  .me-card small { color: var(--ink-faint); font-size: 12px; }
+  .me-today:empty { display: none; }
+  .me-today { display: grid; grid-template-columns: auto 1fr; gap: 2px 12px; padding: 6px 8px 10px; border-bottom: 1px solid var(--line); margin-bottom: 4px; font-size: 12.5px; color: var(--ink-dim); }
+  .me-today b { justify-self: end; font: 600 13px var(--mono); color: var(--ink); } .me-today b small { color: var(--ink-faint); font: 500 11px var(--sans); }
+  .me-pop button { text-align: left; min-height: 38px; padding: 8px 10px; border: 0; border-radius: 8px; background: none; color: var(--ink); font: 500 13px var(--sans); cursor: pointer; }
+  .me-pop button:hover, .me-pop button:focus-visible { background: rgba(255,255,255,.05); outline: none; }
+  .me-pop button[hidden] { display: none; }
+  .me-pop .me-out { color: var(--sell); border-top: 1px solid var(--line); border-radius: 0 0 8px 8px; margin-top: 4px; }
+  html[data-role="public"] .me .me-out { color: var(--accent); }
+  @media (max-width: 700px) { .me-hi { display: none; } .me > summary { padding: 2px; } .me-av { width: 32px; height: 37px; } }
+  @media (prefers-reduced-motion: reduce) { .me-pop { animation: none; } .me > summary { transition: none; } }
   /* Guest view (6 Nov): only the H4 gold chart with one trade setup */
   html[data-role="public"] .btab, html[data-role="public"] .top .tabs, html[data-role="public"] #ms-hdr-open, html[data-role="public"] #ms-alerts,
   html[data-role="public"] .top details.menu, html[data-role="public"] .top .ms-status, html[data-role="public"] .ms-offline-box { display: none !important; }
@@ -705,6 +738,7 @@
   .g-res .chip { font: 600 10.5px var(--mono); padding: 2px 7px; border-radius: 6px; }
   .g-res .tag { font-size: 10.5px; border: 1px solid var(--line); border-radius: 4px; padding: 0 5px; color: var(--ink-dim); }
   .g-res-card .ms-k small { font: 500 12.5px var(--sans); color: var(--ink-faint); }
+  .g-cal-card .cal-d { cursor: default; }
   @media (max-width: 700px) { .g-res li { grid-template-columns: auto auto auto minmax(0, 1fr); } .g-res-t { grid-column: 1 / -1; margin-top: 6px; } }
   .g-card { padding: 0; overflow: hidden; }
   .g-chart { position: relative; height: min(70vh, 640px); min-height: 360px; }
@@ -807,6 +841,53 @@ document.addEventListener('DOMContentLoaded', function () {
   if (x) x.addEventListener('click', function () { msGate(false); });
   document.addEventListener('keydown', function (ev) { if (ev.key === 'Escape' && document.documentElement.dataset.gate && localStorage.getItem('ms-guest')) msGate(false); });
 });
+
+// ─── Account area (6 Nov): oval photo + time-of-day greeting; each person can set their own photo and display name ───
+(function () {
+  const who = window.MS_WHO || 'guest', key = (k) => `ms-${k}-${String(who).toLowerCase()}`;
+  const get = (k) => { try { return localStorage.getItem(key(k)); } catch (e) { return null; } }, put = (k, v) => { try { v == null ? localStorage.removeItem(key(k)) : localStorage.setItem(key(k), v); } catch (e) { alert('This browser could not save it (storage full or blocked).'); } };
+  const defName = who === 'guest' ? 'Guest' : who === 'owner' ? 'Admin' : who;
+  const role = who === 'guest' ? 'Guest · public view' : who === 'owner' ? 'Owner · full access' : 'Reviewer · read-only, loss reviews';
+  // default portrait: an abstract gold bust, unique hue per person
+  const hue = who === 'guest' ? 215 : 38;   // gold monogram for named users, cool silhouette for guests
+  const svg = (id) => `<svg viewBox="0 0 40 46" aria-hidden="true"><defs><linearGradient id="avb${id}" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="hsl(${hue} 70% 58%)"/><stop offset="1" stop-color="hsl(${(hue + 40) % 360} 65% 30%)"/></linearGradient><linearGradient id="avf${id}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff" stop-opacity=".95"/><stop offset="1" stop-color="#fff" stop-opacity=".7"/></linearGradient></defs><rect width="40" height="46" fill="url(#avb${id})"/>${who === 'guest' ? `<circle cx="20" cy="17.5" r="7.5" fill="url(#avf${id})"/><path d="M5 46c1.5-9 7.5-14 15-14s13.5 5 15 14z" fill="url(#avf${id})"/>` : `<ellipse cx="20" cy="23" rx="15" ry="17.5" fill="none" stroke="#fff" stroke-opacity=".28" stroke-width=".8"/><text x="20" y="30.5" text-anchor="middle" font-family="Georgia, 'Times New Roman', serif" font-size="21" font-style="italic" fill="url(#avf${id})">${esc1((get('name') || defName).trim().charAt(0).toUpperCase())}</text>`}</svg>`;
+  function esc1(c) { return c.replace(/[&<>"']/g, ''); }
+  const greet = () => { const h = new Date().getHours(); return h < 5 ? 'Good night' : h < 12 ? 'Good morning' : h < 17 ? 'Good afternoon' : h < 22 ? 'Good evening' : 'Good night'; };
+  const $ = (id) => document.getElementById(id);
+  function paint() {
+    const photo = get('photo'), name = get('name') || defName;
+    ['ms-me-av', 'ms-me-av2'].forEach((id, n) => { const el = $(id); if (el) el.innerHTML = photo ? `<img src="${photo}" alt="">` : svg(n); });
+    if ($('ms-me-greet')) $('ms-me-greet').textContent = greet();
+    if ($('ms-me-name')) $('ms-me-name').textContent = name;
+    if ($('ms-me-name2')) $('ms-me-name2').textContent = name;
+    if ($('ms-me-role')) $('ms-me-role').textContent = role;
+    if ($('ms-me-rmphoto')) $('ms-me-rmphoto').hidden = !photo;
+    if ($('ms-me-out')) $('ms-me-out').textContent = who === 'guest' ? 'Log in' : 'Log out';
+    const sm = document.querySelector('#ms-me > summary'); if (sm) sm.setAttribute('aria-label', `${greet()}, ${name}. Account menu`);
+  }
+  document.addEventListener('DOMContentLoaded', () => {
+    paint(); setInterval(paint, 60e3);
+    const me = $('ms-me'); if (!me) return;
+    me.addEventListener('toggle', () => { if (!me.open) return; const t = $('h-today') && $('h-today').innerText.trim() ? $('h-today') : $('g-today'); const fl = window.FLOAT;
+      const pub = who === 'guest', tv = fl ? (pub ? fl.liveTot || 0 : fl.tot) : 0;
+      $('ms-me-today').innerHTML = fl ? `<span>Open now</span><b>${fl.open}${fl.sh && !pub ? ` <small>+ ${fl.sh} shadow</small>` : ''}</b><span>Floating</span><b class="${tv >= 0 ? 'pos' : 'neg'}">${tv >= 0 ? '+' : '−'}${Math.abs(tv).toFixed(2)}R</b>` : ''; });
+    document.addEventListener('click', (ev) => { if (me.open && !me.contains(ev.target)) me.open = false; });
+    document.addEventListener('keydown', (ev) => { if (ev.key === 'Escape' && me.open) { me.open = false; me.querySelector('summary').focus(); } });
+    $('ms-me-photo').addEventListener('click', () => $('ms-me-file').click());
+    $('ms-me-file').addEventListener('change', () => {
+      const f = $('ms-me-file').files[0]; if (!f) return;
+      const img = new Image(), url = URL.createObjectURL(f);
+      img.onload = () => { const W = 160, H = 184, c = document.createElement('canvas'); c.width = W; c.height = H; const g = c.getContext('2d');
+        const sc = Math.max(W / img.width, H / img.height), w = img.width * sc, h = img.height * sc; g.drawImage(img, (W - w) / 2, (H - h) / 2, w, h);
+        put('photo', c.toDataURL('image/jpeg', 0.86)); URL.revokeObjectURL(url); $('ms-me-file').value = ''; paint(); };
+      img.onerror = () => { alert("That file isn't an image this browser can read."); URL.revokeObjectURL(url); };
+      img.src = url;
+    });
+    $('ms-me-rmphoto').addEventListener('click', () => { put('photo', null); paint(); });
+    $('ms-me-rename').addEventListener('click', () => { const n = prompt('Display name', get('name') || defName); if (n === null) return; put('name', n.trim().slice(0, 24) || null); paint(); });
+    $('ms-me-out').addEventListener('click', () => { me.open = false; const a = $('ms-admin-link'); if (a) a.click(); });
+  });
+})();
 window.MS_ADMIN_HASH = '49c5624f2625ed8b42b6e1bf2819a3a41ddb9743aeca36ea34ea7eb96c252ca8';
 </script>
 <style>
@@ -874,7 +955,7 @@ window.MS_ADMIN_HASH = '49c5624f2625ed8b42b6e1bf2819a3a41ddb9743aeca36ea34ea7eb9
     </form>
     <div class="gate-or"><span>or</span></div>
     <button type="button" class="gate-guest" id="ms-gate-guest">Continue as guest</button>
-    <p class="gate-note">Guests see a live gold H4 chart with one trade setup and the results.</p>
+    <p class="gate-note">Guests see a live gold H4 chart with one trade setup and the P&amp;L calendar.</p>
   </div>
 </div>
 <div class="ms-live app" id="ms-live" data-chart="dark">
@@ -889,7 +970,7 @@ window.MS_ADMIN_HASH = '49c5624f2625ed8b42b6e1bf2819a3a41ddb9743aeca36ea34ea7eb9
     <span class="ms-status"><i class="ms-live-dot" id="ms-live-dot"></i><span id="ms-live-txt">Connecting…</span><span class="upd"> · <span id="ms-updated">—</span></span></span>
     <div class="top-actions">
       <a class="hdr-open" id="ms-hdr-open" href="#council" title="Open trades placed by the system. % = floating result in account terms at the sizing guide: 0.25% risk per NQ / gold trade, 0.5% per crypto trend trade">—</a>
-      <button type="button" class="ms-tbtn" id="ms-alerts" aria-pressed="false">Alerts off</button>
+      <button type="button" class="ms-tbtn" id="ms-alerts" aria-pressed="false" title="Alerts off">Alerts off</button>
       <details class="menu">
         <summary class="ms-tbtn">Settings</summary>
         <div class="menu-body">
@@ -924,6 +1005,18 @@ window.MS_ADMIN_HASH = '49c5624f2625ed8b42b6e1bf2819a3a41ddb9743aeca36ea34ea7eb9
           <p class="ms-note own" style="margin:0">In Telegram, message <b>@BotFather</b>, send /newbot and paste the token here. Send your new bot any message, then get your chat ID from <b>@userinfobot</b>. Both stay in this browser only. Alerts go out while this page is open and Alerts are on.</p>
         </div>
       </details>
+      <details class="me" id="ms-me">
+        <summary aria-label="Account"><span class="me-hi"><small id="ms-me-greet">Hello</small><b id="ms-me-name">Guest</b></span><span class="me-av" id="ms-me-av" aria-hidden="true"></span></summary>
+        <div class="me-pop" role="menu">
+          <div class="me-card"><span class="me-av me-av-lg" id="ms-me-av2" aria-hidden="true"></span><div><b id="ms-me-name2">Guest</b><small id="ms-me-role">Guest</small></div></div>
+          <div class="me-today" id="ms-me-today"></div>
+          <button type="button" role="menuitem" id="ms-me-photo">Change photo</button>
+          <button type="button" role="menuitem" id="ms-me-rmphoto" hidden>Remove photo</button>
+          <button type="button" role="menuitem" id="ms-me-rename">Change display name</button>
+          <button type="button" role="menuitem" id="ms-me-out" class="me-out">Log out</button>
+          <input type="file" id="ms-me-file" accept="image/*" hidden>
+        </div>
+      </details>
     </div>
   </header>
 
@@ -940,7 +1033,8 @@ window.MS_ADMIN_HASH = '49c5624f2625ed8b42b6e1bf2819a3a41ddb9743aeca36ea34ea7eb9
     <div class="g-key" aria-hidden="true"><span><i class="k-e"></i>Entry</span><span><i class="k-s"></i>Stop zone</span><span><i class="k-t"></i>Target zone</span></div>
     <h2 class="g-h2">Results</h2>
     <div class="h-today" id="g-today" role="group" aria-label="Results"></div>
-    <div class="card g-res-card"><div class="ms-k"><span>Recent closed trades</span><small id="g-res-sum"></small></div><ul class="g-res" id="g-res"><li class="empty">Loading results…</li></ul></div>
+    <div class="card g-cal-card"><div class="ms-k"><span>P&amp;L calendar</span><span class="cal-nav"><button type="button" id="g-cal-prev" aria-label="Previous month">‹</button><b id="g-cal-m"></b><button type="button" id="g-cal-next" aria-label="Next month">›</button></span></div>
+      <div class="cal" id="g-cal"></div><p class="ms-note" id="g-cal-sum"></p></div>
   </section>
   <!-- ─── Home: one card per section ─── -->
   <section class="view" id="v-home" aria-label="Home">
@@ -2242,7 +2336,7 @@ function msNextSetup(bars, A) {
     $('ms-theme').textContent = G.theme === 'light' ? 'Dark charts' : 'Light charts';
   }
   function applyAlertsBtn() {
-    const b = $('ms-alerts'); b.textContent = G.alerts ? 'Alerts on' : 'Alerts off'; b.setAttribute('aria-pressed', String(G.alerts));
+    const b = $('ms-alerts'); b.textContent = G.alerts ? 'Alerts on' : 'Alerts off'; b.title = b.textContent; b.setAttribute('aria-pressed', String(G.alerts));
     b.style.background = G.alerts ? '#2962ff' : ''; b.style.color = G.alerts ? '#fff' : ''; b.style.borderColor = G.alerts ? '#2962ff' : '';
   }
   try {
@@ -2977,7 +3071,32 @@ function msNextSetup(bars, A) {
   // NQ setups that are part of our system: the New York open run only (4 Nov: it held on 3 years of NQ futures; the open sweeps did not). The others were
   // retired on the same 1-minute test and their records are not counted here.
   const NQ_SYS = ['nyflip'], nqSys = (x) => x.market !== 'nq' || NQ_SYS.includes(x.session);
-  const SYS_K = ['replica', 'mosha-bo', 'trend', 'gtrend', 'gtl', 'geg', 'gmp'];   // live paper systems: the gold replica, Mosha BO (gold), crypto trend (BTC, ETH, SOL, XRP)
+  const SYS_K = ['replica', 'mosha-bo', 'trend', 'gtrend', 'gtl', 'geg', 'gmp'];
+  // guests: our main system only (6 Nov, owner): live system trades + the system's replay + NQ forward paper, no shadow trades
+  const sysClosed = () => { const ok = (x) => !x.shadow && ['win', 'loss', 'be'].includes(x.status) && x.closed && x.R != null;
+    const live = (COUNCIL.trades || []).filter((x) => SYS_K.includes(x.k) && ok(x)), rp = ((COUNCIL.replay && COUNCIL.replay.trades) || []).filter((x) => nqSys(x) && ok(x));
+    const nqF = (COUNCIL.research || []).filter((x) => x.k === 'nq-open' && nqSys(x) && ok(x)); const seen = new Set();
+    return live.concat(rp, nqF).filter((x) => !seen.has(x.id) && seen.add(x.id)); };
+  const GCAL = { y: null, m: null };
+  function renderGuestCal() {
+    const el = document.getElementById('g-cal'); if (!el || !PUB) return;
+    const L = sysClosed(), byDay = new Map(), key = (t) => { const d = new Date(t * 1000); return `${d.getFullYear()}-${d.getMonth()}-${d.getDate()}`; };
+    for (const x of L) { const k = key(x.closed); byDay.set(k, (byDay.get(k) || 0) + x.R); }
+    const now = new Date(); if (GCAL.y === null) { GCAL.y = now.getFullYear(); GCAL.m = now.getMonth(); }
+    const first = new Date(GCAL.y, GCAL.m, 1), days = new Date(GCAL.y, GCAL.m + 1, 0).getDate(), lead = (first.getDay() + 6) % 7;
+    const fR = (v) => `${v > 0 ? '+' : v < 0 ? '−' : ''}${Math.abs(v).toFixed(2)}R`;
+    let html = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].map((d) => `<div class="cal-h">${d}</div>`).join('') + '<div class="cal-d out"></div>'.repeat(lead), mR = 0, up = 0, dn = 0;
+    for (let d = 1; d <= days; d++) {
+      const k = `${GCAL.y}-${GCAL.m}-${d}`, has = byDay.has(k), R = byDay.get(k) || 0, isT = now.getFullYear() === GCAL.y && now.getMonth() === GCAL.m && now.getDate() === d;
+      if (has) { mR += R; if (R > 0) up++; else if (R < 0) dn++; }
+      html += `<div class="cal-d ${has ? (R > 0 ? 'win' : R < 0 ? 'loss' : '') : ''}${isT ? ' today' : ''}" aria-label="${d}: ${has ? fR(R) : 'no trades'}"><span class="cn">${d}</span>${has ? `<span class="cr">${fR(R)}</span>` : ''}</div>`;
+    }
+    el.innerHTML = html;
+    document.getElementById('g-cal-m').textContent = first.toLocaleDateString(undefined, { month: 'long', year: 'numeric' });
+    const n = up + dn, sum = document.getElementById('g-cal-sum');
+    if (sum) sum.innerHTML = n ? `Month: <b class="${mR >= 0 ? 'pos' : 'neg'}">${fR(mR)}</b> · ${up} green day${up === 1 ? '' : 's'}, ${dn} red. Our system only; days before the live start come from its replay.` : 'No closed trades of our system this month.';
+  }
+  ['g-cal-prev', 'g-cal-next'].forEach((id, i) => { const b = document.getElementById(id); if (b) b.addEventListener('click', () => { GCAL.m += i ? 1 : -1; if (GCAL.m < 0) { GCAL.m = 11; GCAL.y--; } if (GCAL.m > 11) { GCAL.m = 0; GCAL.y++; } renderGuestCal(); }); });   // live paper systems: the gold replica, Mosha BO (gold), crypto trend (BTC, ETH, SOL, XRP)
   function renderCalendar() {
     const el = document.getElementById('ms-cal'); if (!el) return;
     const withSh = true;   // shadow trades always on the calendar, labelled (owner, 6 Nov)
@@ -3081,7 +3200,7 @@ function msNextSetup(bars, A) {
       const shLab = shOn && SHO.length ? `<span class="ho-sh" title="Includes ${SHO.length} open shadow trade${SHO.length > 1 ? 's' : ''} (setups a rule blocked, followed on paper), floating ${fR(shTot)}"> +${SHO.length} shadow</span>` : '';
       ho.innerHTML = (A1.length || shLab) ? `<b>${A1.length}</b><span class="ho-l"> open</span>${shLab} · <span class="${tot >= 0 ? 'pos' : 'neg'}"><span class="ho-l">${fR(tot)} · </span>${fp(pct)}</span>` : '<b>0</b><span class="ho-l"> open</span>'; }
     const h = document.getElementById('h-active'); if (h) h.innerHTML = (A1.length || SHO.length) ? `${A1.length} open${SHO.length ? ` + ${SHO.length} shadow` : ''} · floating <b class="${tot >= 0 ? 'pos' : 'neg'}">${fR(tot)}</b>` : 'none open';
-    window.FLOAT = { tot, pct, open: A1.length, sh: SHO.length, risk };
+    window.FLOAT = { tot, pct, open: A1.length, sh: SHO.length, risk, liveTot: items.filter((i) => !i.x.shadow && cnt(i.x) && i.fl != null).reduce((a, i) => a + i.fl, 0) };
     if (PUB) { renderGuest(); renderToday(); }
     // Home: the biggest open positions (by size of the floating result), one row per market + side
     const hl = document.getElementById('h-act-list');
@@ -3139,21 +3258,17 @@ function msNextSetup(bars, A) {
     const el = document.getElementById(PUB ? 'g-today' : 'h-today'); if (!el) return;
     const fR = (v) => `${v > 0 ? '+' : v < 0 ? '−' : ''}${Math.abs(v).toFixed(1)}R`, cls = (v) => (v > 0 ? 'pos' : v < 0 ? 'neg' : '');
     const now = new Date(), d0 = new Date(now.getFullYear(), now.getMonth(), now.getDate()) / 1000, w0 = d0 - ((now.getDay() + 6) % 7) * 86400, m0 = new Date(now.getFullYear(), now.getMonth(), 1) / 1000;
-    const closed = (COUNCIL.trades || []).filter((x) => ['win', 'loss', 'be'].includes(x.status) && x.closed && x.R != null);
+    const closed = PUB ? sysClosed() : (COUNCIL.trades || []).filter((x) => ['win', 'loss', 'be'].includes(x.status) && x.closed && x.R != null);
     const sum = (t) => { const a = closed.filter((x) => x.closed >= t), live = a.filter((x) => !x.shadow); return { n: a.length, R: a.reduce((q, x) => q + x.R, 0), lR: live.reduce((q, x) => q + x.R, 0), ln: live.length }; };
     const F = window.FLOAT || null, D = sum(d0), W = sum(w0), M = sum(m0);
     const cell = (k, v, sub, c) => `<div class="h-kpi"><span class="h-kpi-k">${k}</span><b class="${c}">${v}</b><span class="h-kpi-s">${sub}</span></div>`;
-    const sub = (S) => `${S.n} closed${S.ln ? ` · live ${fR(S.lR)}` : ''}`;
+    const sub = (S) => PUB ? `${S.n} closed` : `${S.n} closed${S.ln ? ` · live ${fR(S.lR)}` : ''}`;
     el.innerHTML = COUNCIL.trades ? [
-      cell('Floating now', F ? fR(F.tot) : '—', F ? `${F.open} open${F.sh ? ` + ${F.sh} shadow` : ''}${F.pct ? ` · ${F.pct >= 0 ? '+' : '−'}${Math.abs(F.pct).toFixed(2)}%` : ''}` : 'loading', F ? cls(F.tot) : ''),
+      PUB ? cell('Floating now', F ? fR(F.liveTot || 0) : '—', F ? `${F.open} open` : 'loading', F ? cls(F.liveTot || 0) : '')
+        : cell('Floating now', F ? fR(F.tot) : '—', F ? `${F.open} open${F.sh ? ` + ${F.sh} shadow` : ''}${F.pct ? ` · ${F.pct >= 0 ? '+' : '−'}${Math.abs(F.pct).toFixed(2)}%` : ''}` : 'loading', F ? cls(F.tot) : ''),
       cell('Today', fR(D.R), sub(D), cls(D.R)), cell('This week', fR(W.R), sub(W), cls(W.R)), cell('This month', fR(M.R), sub(M), cls(M.R)),
     ].join('') : '';
-    const gl = document.getElementById('g-res');
-    if (gl && PUB) {
-      const L = closed.slice().sort((a, b) => b.closed - a.closed).slice(0, 25), wins = L.filter((x) => x.R > 0).length;
-      gl.innerHTML = L.length ? L.map((x) => `<li><span class="g-res-t">${ftime(x.closed + TZ)}</span><b>${esc(x.label)}</b><span class="chip ${x.side}">${x.side.toUpperCase()}</span>${x.shadow ? '<span class="tag">shadow</span>' : '<span></span>'}<b class="g-res-r ${cls(x.R)}">${x.status === 'be' ? 'break-even' : fR(x.R)}</b></li>`).join('') : '<li class="empty">No closed trades yet.</li>';
-      const gs = document.getElementById('g-res-sum'); if (gs) gs.textContent = L.length ? `last ${L.length} · ${wins} won` : '';
-    }
+    if (PUB) renderGuestCal();
   }
   // Live vs expected (4 Nov): live replica R by trade number against the year replay's expectation (mean ± 1.645 SD·√n, 90%)
   // and the pause-check levels (5 Nov: −10R at 30 signals, −12R at 50)
