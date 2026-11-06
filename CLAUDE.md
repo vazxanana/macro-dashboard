@@ -115,3 +115,16 @@ added or changed on the page, which live in `council-data/users.json` (`{ users:
 written with the owner's GitHub token, `msGhTok`). users.json overrides built-ins (`msMergeUsers`); `disabled: true`
 removes one. Sign-in fetches the list; a signed-in non-owner is re-checked after load and signed out if removed or if the
 password changed (`ms-user-rec` keeps an added user's record between visits). Passwords must stay unique per account.
+
+## ICT desk (6 Nov 2026, owner: a separate edge)
+
+ICT is its own edge and approach: never mix it into the council systems, their rules, filters or reports.
+Rules and research live in `.claude/skills/ICT/SKILL.md` (results also in council-data `research/ict/`).
+- Tracker: `ict/tracker.mjs`, workflow `.github/workflows/ict.yml` (every 15 min), data in council-data `ict/`
+  (`trades.json`, `snapshot.json`, `bars.json`). Markets: NQ, ES, YM, RTY futures from Yahoo. Model: H1 iFVG
+  reversal (swing swept → body closes through the leg's FVG within 6 H1 candles; stop 2 ticks beyond the sweep;
+  3R target, 2R mark recorded as `R2`; 48 h max). Every signal records ICT features (`feat`) and a /10 grade.
+- Page: view `#ict` ("ICT desk", class `ictx`), shown only when `html[data-ict]` is set: the owner, and users
+  with `ict: true` (Fred, the main reviewer and trader, lands there after sign-in). The desk user marks signals
+  Taken / Skipped / Missed with fill and own R, grades them and writes notes: localStorage `ictDesk`, synced to
+  council-data `ict/desk.json` with the `msGhTok` token.

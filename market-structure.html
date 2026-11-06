@@ -942,6 +942,75 @@
     .c-tabs { flex-wrap: nowrap !important; overflow-x: auto; scrollbar-width: none; -webkit-overflow-scrolling: touch; }   /* r3-4 phone: Trader tabs in one scrolling row */
     .c-tabs::-webkit-scrollbar { display: none; } .c-tabs button { flex: none; }
   }
+  /* ═══ ICT desk (6 Nov): a separate edge; Fred and the owner ═══ */
+  .ict-head { display: flex; justify-content: space-between; align-items: flex-end; gap: 12px; flex-wrap: wrap; }
+  .ict-me { font: 500 12.5px var(--sans); color: var(--ink-dim); }
+  .ict-me b { color: var(--gold); font-weight: 600; }
+  .ict-mkts { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; }
+  .ict-m { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 12px 14px; display: grid; gap: 3px; min-width: 0; }
+  .ict-m .k { display: flex; justify-content: space-between; align-items: baseline; gap: 6px; font: 600 13px var(--sans); }
+  .ict-m .k small { font: 500 11px var(--sans); color: var(--ink-faint); }
+  .ict-m .px { font: 600 20px var(--mono); font-variant-numeric: tabular-nums; }
+  .ict-m .sub { font: 500 11.5px var(--sans); color: var(--ink-faint); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .ict-m.live { border-color: var(--gold-line); box-shadow: inset 0 0 0 1px var(--gold-soft); }
+  .ict-kpi { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 1px; background: var(--line); border: 1px solid var(--line); border-radius: 12px; overflow: hidden; }
+  .ict-kpi > div { background: var(--panel); padding: 12px 14px; display: grid; gap: 2px; }
+  .ict-kpi span { font: 500 12px var(--sans); color: var(--ink-dim); }
+  .ict-kpi b { font: 600 22px var(--mono); font-variant-numeric: tabular-nums; }
+  .ict-kpi small { font: 500 11.5px var(--sans); color: var(--ink-faint); }
+  .ict-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: var(--sp-4, 14px); }
+  .ict-card { min-width: 0; }
+  .ict-open { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+  .ict-open li { border: 1px solid var(--line); border-radius: 10px; padding: 10px 12px; display: grid; gap: 4px; cursor: pointer; }
+  .ict-open li:hover, .ict-open li:focus-visible { border-color: var(--gold-line); outline: none; }
+  .ict-open li.empty { cursor: default; color: var(--ink-dim); font-size: 13px; }
+  .ict-open .r1 { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; font: 600 13px var(--sans); }
+  .ict-open .r1 .live { margin-left: auto; font: 600 14px var(--mono); }
+  .ict-open .r2 { font: 500 12px var(--mono); color: var(--ink-dim); }
+  .ict-bar { height: 6px; border-radius: 3px; background: var(--panel-raised); position: relative; overflow: hidden; }
+  .ict-bar i { position: absolute; top: 0; bottom: 0; background: var(--gold); border-radius: 3px; }
+  .ict-g { display: inline-block; min-width: 26px; text-align: center; padding: 1px 6px; border-radius: 6px; font: 700 11px var(--mono); border: 1px solid var(--line-strong); }
+  .ict-g.ga { color: var(--gold); border-color: var(--gold-line); background: var(--gold-soft); }
+  .ict-g.gb { color: var(--ink); } .ict-g.gc { color: var(--ink-faint); }
+  .ict-pill { display: inline-block; padding: 1px 7px; border-radius: 999px; font: 500 11px var(--sans); background: var(--panel-raised); color: var(--ink-dim); border: 1px solid var(--line); }
+  .ict-eq svg { width: 100%; height: 180px; display: block; }
+  .ict-sw { display: inline-block; width: 10px; height: 3px; border-radius: 2px; vertical-align: middle; margin: 0 2px 0 6px; }
+  .ict-sw.a { background: var(--gold); } .ict-sw.b { background: #6f8fd6; }
+  .ict-break { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px 18px; align-items: start; }
+  .ict-break table { width: 100%; border-collapse: collapse; font: 500 12.5px var(--sans); }
+  .ict-break caption { text-align: left; font: 600 12.5px var(--sans); color: var(--ink); padding: 0 0 6px; }
+  .ict-break td, .ict-break th { padding: 5px 6px; border-bottom: 1px solid var(--line-soft); text-align: left; }
+  .ict-break th { font-weight: 500; color: var(--ink-faint); font-size: 11.5px; }
+  .ict-break td.n, .ict-break th.n { text-align: right; font-family: var(--mono); font-variant-numeric: tabular-nums; }
+  .ict-break .bar { display: inline-block; height: 6px; border-radius: 3px; vertical-align: middle; margin-left: 6px; }
+  .ict-f { display: inline-flex; gap: 6px; }
+  .ict-f select { font: 500 12px var(--sans); background: var(--panel-raised); color: var(--ink); border: 1px solid var(--line); border-radius: 8px; padding: 4px 8px; }
+  .ict-t tbody tr { cursor: pointer; } .ict-t tbody tr:hover td { background: var(--panel-raised); }
+  .ict-t td.n { text-align: right; font-family: var(--mono); font-variant-numeric: tabular-nums; }
+  .ict-tw { max-height: 520px; }
+  .ict-rules { margin: 8px 0 0; padding-left: 18px; display: grid; gap: 6px; font-size: 13px; line-height: 1.55; color: var(--ink-dim); }
+  .ict-rules b { color: var(--ink); }
+  .ict-mine-k { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; margin-bottom: 10px; }
+  .ict-mine-k > div { border: 1px solid var(--line); border-radius: 10px; padding: 8px 10px; display: grid; gap: 2px; }
+  .ict-mine-k span { font: 500 11.5px var(--sans); color: var(--ink-dim); } .ict-mine-k b { font: 600 17px var(--mono); }
+  .ict-tv { width: min(1100px, 96vw); }
+  .ict-tv-c { height: min(52vh, 460px); }
+  .ict-tv-tf { display: inline-flex; gap: 4px; margin-left: auto; }
+  .ict-tv-tf button, .ict-seg button { font: 600 12px var(--sans); background: var(--panel-raised); color: var(--ink-dim); border: 1px solid var(--line); border-radius: 8px; padding: 4px 10px; cursor: pointer; }
+  .ict-tv-tf button.on, .ict-seg button.on { color: #17130a; background: var(--gold); border-color: var(--gold); }
+  .ict-rv { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.4fr); gap: 12px; margin-top: 10px; }
+  .ict-rv fieldset { border: 1px solid var(--line); border-radius: 10px; padding: 10px 12px; display: grid; gap: 8px; min-width: 0; }
+  .ict-rv legend { font: 600 12.5px var(--sans); padding: 0 4px; }
+  .ict-rv label { display: grid; gap: 3px; font: 500 12px var(--sans); color: var(--ink-dim); }
+  .ict-rv input, .ict-rv textarea { font: 500 13px var(--sans); background: var(--bg, #0b0c10); color: var(--ink); border: 1px solid var(--line); border-radius: 8px; padding: 6px 8px; width: 100%; box-sizing: border-box; }
+  .ict-rv .u-actions { grid-column: 1 / -1; }
+  .ict-seg { display: flex; gap: 6px; flex-wrap: wrap; }
+  .ict-tags { display: flex; gap: 6px; flex-wrap: wrap; }
+  .ict-tags button { font: 500 11.5px var(--sans); padding: 3px 9px; border-radius: 999px; border: 1px solid var(--line); background: none; color: var(--ink-dim); cursor: pointer; }
+  .ict-tags button.on { border-color: var(--gold-line); color: var(--gold); background: var(--gold-soft); }
+  @media (max-width: 1000px) { .ict-mkts { grid-template-columns: repeat(2, minmax(0, 1fr)); } .ict-kpi { grid-template-columns: repeat(3, minmax(0, 1fr)); } .ict-grid, .ict-break, .ict-rv { grid-template-columns: minmax(0, 1fr); } }
+  @media (max-width: 520px) { .ict-kpi { grid-template-columns: repeat(2, minmax(0, 1fr)); } .ict-mine-k { grid-template-columns: repeat(2, minmax(0, 1fr)); } .ict-m .px { font-size: 17px; } }
+  .ict-tv > .ict-tv-c, .ict-tv > p, .ict-tv > form { margin: 10px 16px; } .ict-tv > form { margin-bottom: 16px; }
   /* Guest view (6 Nov): only the H4 gold chart with one trade setup */
   html[data-role="public"] .btab, html[data-role="public"] .top .tabs, html[data-role="public"] #ms-hdr-open, html[data-role="public"] #ms-alerts,
   html[data-role="public"] .top details.menu, html[data-role="public"] .top .ms-status, html[data-role="public"] .ms-offline-box { display: none !important; }
@@ -1024,7 +1093,8 @@
 // shadow trades, scorecards, reviews) opens with the admin password. The password is never stored: only its SHA-256 is compared.
 // Accounts (6 Nov): the owner (admin, everything) and reviewers (user name + password): reviewers see the whole admin view
 // read-only and can write loss reviews only. Reviewer tokens are the SHA-256 of their password, matched with the user name.
-window.MS_USERS = { fred: { name: 'Fred', hash: '370aed697dc503aecee7d8faad5de775f4f7019c86e672e8d93f3df590527058', role: 'reviewer' },
+window.MS_USERS = { fred: { name: 'Fred', hash: '370aed697dc503aecee7d8faad5de775f4f7019c86e672e8d93f3df590527058', role: 'reviewer', ict: true },   // ict: the ICT desk (main reviewer and trader, owner 6 Nov)
+ 
   orlando: { name: 'Orlando', hash: '037617a451df6fb39614002d57502a5f7bc240221b1715ed48280534cc478a06', role: 'viewer' },
   luxus: { name: 'Luxus', hash: 'dccc5d01dabcd1c0b9fa89c91e7f4bde603121ee0172b4ff394e6bb30d295e41', role: 'viewer' },
   carlos: { name: 'Carlos', hash: '511d45febaa8559a9071091951613e559f0b8b12b3995e6c13c94c81fbee59f0', role: 'viewer' } };
@@ -1038,6 +1108,7 @@ window.msFetchUsers = function () { return fetch(window.MS_USERS_URL + '?t=' + D
   document.documentElement.dataset.mode = owner || R ? 'admin' : 'public';
   document.documentElement.dataset.role = owner ? 'owner' : R ? R.role : 'public';
   window.MS_WHO = owner ? 'owner' : R ? R.name : null;
+  if (owner || (R && R.ict)) document.documentElement.dataset.ict = '1';   // ICT desk access (a separate edge, owner 6 Nov)
   var guest = null; try { guest = localStorage.getItem('ms-guest'); } catch (e) {}
   if (!owner && !R && !guest) document.documentElement.dataset.gate = '1'; if (guest && !owner && !R) document.documentElement.dataset.guest = '1'; })();
 // admin login: SHA-256 of the typed password against MS_ADMIN_HASH; the hash is kept as the session token
@@ -1057,7 +1128,7 @@ document.addEventListener('DOMContentLoaded', function () {
     var all = window.msMergeUsers(remote), R = all[u];
     if (!R || R.hash !== h) { try { localStorage.removeItem('ms-admin'); localStorage.removeItem('ms-user'); localStorage.removeItem('ms-user-rec'); } catch (e) {} location.reload(); return; }
     var rec = null; try { rec = JSON.parse(localStorage.getItem('ms-user-rec') || 'null'); } catch (e) {}
-    if (!rec || rec.role !== R.role || rec.name !== R.name) { try { localStorage.setItem('ms-user-rec', JSON.stringify({ key: u, name: R.name, role: R.role, hash: h })); } catch (e) {} if (!rec || rec.role !== R.role) location.reload(); }
+    if (!rec || rec.role !== R.role || rec.name !== R.name || !!rec.ict !== !!R.ict) { try { localStorage.setItem('ms-user-rec', JSON.stringify({ key: u, name: R.name, role: R.role, hash: h, ict: !!R.ict })); } catch (e) {} if (!rec || rec.role !== R.role || !!rec.ict !== !!R.ict) location.reload(); }
   });
 });
 // Sign-in card (6 Nov): first screen for anyone not signed in; "Continue as guest" opens the public view and is remembered
@@ -1077,7 +1148,7 @@ document.addEventListener('DOMContentLoaded', function () {
     var all = h === window.MS_ADMIN_HASH ? window.MS_USERS : window.msMergeUsers(await window.msFetchUsers());
     var un = Object.keys(all).find(function (k) { return all[k].hash === h; }), R = un && all[un];   // password only (6 Nov): each password belongs to one account
     if (h === window.MS_ADMIN_HASH) { try { localStorage.setItem('ms-admin', h); localStorage.removeItem('ms-user'); localStorage.removeItem('ms-guest'); } catch (e) {} location.reload(); return; }
-    if (R && h === R.hash) { try { localStorage.setItem('ms-admin', h); localStorage.setItem('ms-user', un); localStorage.setItem('ms-user-rec', JSON.stringify({ key: un, name: R.name, role: R.role, hash: h })); localStorage.removeItem('ms-guest'); } catch (e) {} location.reload(); return; }
+    if (R && h === R.hash) { try { localStorage.setItem('ms-admin', h); localStorage.setItem('ms-user', un); localStorage.setItem('ms-user-rec', JSON.stringify({ key: un, name: R.name, role: R.role, hash: h, ict: !!R.ict })); localStorage.removeItem('ms-guest'); } catch (e) {} location.reload(); return; }
     btn.disabled = false; btn.textContent = 'Sign in'; err.textContent = 'Wrong password.'; document.getElementById('ms-gate-p').select(); });
   if (gb) gb.addEventListener('click', function () { var was = document.documentElement.dataset.mode === 'public' && localStorage.getItem('ms-guest'); try { localStorage.setItem('ms-guest', '1'); } catch (e) {} if (was) msGate(false); else location.reload(); });
   if (x) x.addEventListener('click', function () { msGate(false); });
@@ -1177,7 +1248,7 @@ window.MS_ADMIN_HASH = '49c5624f2625ed8b42b6e1bf2819a3a41ddb9743aeca36ea34ea7eb9
   html[data-role="viewer"] .tv-ba [data-ba="save"] { display: none !important; }
   html[data-role="viewer"] .h-grid { grid-template-columns: minmax(0, 1fr); }
 </style>
-<style>html[data-role="reviewer"] .own{display:none!important} .ms-who{font-weight:600}</style>
+<style>html[data-role="reviewer"] .own{display:none!important} .ms-who{font-weight:600} html:not([data-ict]) .ictx{display:none!important}</style>
 <style>html[data-mode="public"] .adm{display:none!important} html[data-mode="admin"] .pubonly{display:none!important} .ms-admin-link{color:inherit;opacity:.6;text-decoration:underline dotted;cursor:pointer}</style>
 <style>.ho-sh{opacity:.8;font-weight:500} .c-act li.grp{display:block;padding:0;cursor:default} .c-act li.grp>details>summary{display:grid;grid-template-columns:auto 1fr auto;gap:4px 10px;align-items:center;padding:8px 10px;cursor:pointer;list-style:none} .c-act li.grp>details>summary::-webkit-details-marker{display:none} .c-act li.grp>details>summary .a-d::after{content:' \25BE'} .c-act li.grp>details[open]>summary .a-d::after{content:' \25B4'} .c-act ul.sub{margin:0 8px 8px;padding:0} .c-act ul.sub li{background:rgba(127,127,127,.04)}</style>
 </head>
@@ -1216,7 +1287,7 @@ window.MS_ADMIN_HASH = '49c5624f2625ed8b42b6e1bf2819a3a41ddb9743aeca36ea34ea7eb9
     <div class="brand"><i class="ms-coin" aria-hidden="true"></i><div><details class="mk" id="ms-mk"><summary class="inst" id="ms-mk-btn" title="Market (click to change)">XAU/USD</summary><div class="mk-pop"><label class="sr" for="ms-mk-q">Search markets</label><input id="ms-mk-q" type="search" placeholder="Search markets…" autocomplete="off"><ul class="mk-list" id="ms-mk-list"></ul></div></details><select id="ms-inst" class="inst" hidden aria-hidden="true" tabindex="-1"><option>XAU/USD · Gold</option></select><span id="ms-inst-name">Gold · Mosha structure</span></div></div>
     <div class="px"><b id="ms-hdr-price">—</b><span id="ms-hdr-chg" class="hdr-chg"></span></div>
     <nav class="tabs" aria-label="Sections">
-      <a href="#home" data-go="home">Home</a><a href="#setup" data-go="setup" class="adm">Setup</a><a href="#charts" data-go="charts">Charts</a><a href="#scanner" data-go="scanner" class="adm">Scanner</a><a href="#council" data-go="council">Council</a><a href="#journal" data-go="journal">Journal</a><a href="#users" data-go="users" class="adm own">Users</a>
+      <a href="#home" data-go="home">Home</a><a href="#setup" data-go="setup" class="adm">Setup</a><a href="#charts" data-go="charts">Charts</a><a href="#scanner" data-go="scanner" class="adm">Scanner</a><a href="#council" data-go="council">Council</a><a href="#journal" data-go="journal">Journal</a><a href="#ict" data-go="ict" class="ictx">ICT desk</a><a href="#users" data-go="users" class="adm own">Users</a>
     </nav>
     <a class="ms-badge" id="ms-scan-badge" href="#scanner" hidden></a>
     <span class="ms-status"><i class="ms-live-dot" id="ms-live-dot"></i><span id="ms-live-txt">Connecting…</span><span class="upd"> · <span id="ms-updated">—</span></span></span>
@@ -1538,6 +1609,76 @@ window.MS_ADMIN_HASH = '49c5624f2625ed8b42b6e1bf2819a3a41ddb9743aeca36ea34ea7eb9
       </form>
     </div>
   </section>
+  <section class="view ictx" id="v-ict" aria-label="ICT desk" hidden>
+    <div class="v-head ict-head">
+      <div><h1 class="h-head">ICT desk</h1><p class="ms-note">US index futures · H1 iFVG reversal (sweep → inversion → 3R). A separate edge from the council. <span id="ict-run"></span></p></div>
+      <div class="ict-me" id="ict-me"></div>
+    </div>
+    <div class="ict-mkts" id="ict-mkts" role="list" aria-label="Markets"></div>
+    <div class="ict-kpi" id="ict-kpi" role="group" aria-label="Results"></div>
+    <div class="ict-grid">
+      <div class="card ict-card">
+        <div class="ms-k"><span>Open signals</span><small id="ict-open-n"></small></div>
+        <ul class="ict-open" id="ict-open"><li class="empty">Loading…</li></ul>
+      </div>
+      <div class="card ict-card">
+        <div class="ms-k"><span>Equity</span><small>R per signal · <i class="ict-sw a"></i> 3R target <i class="ict-sw b"></i> 2R target</small></div>
+        <div class="ict-eq" id="ict-eq"></div>
+      </div>
+    </div>
+    <div class="card ict-card">
+      <div class="ms-k"><span>What works</span><small>closed signals split by each ICT feature · 3R target</small></div>
+      <div class="ict-break" id="ict-break"></div>
+    </div>
+    <div class="card ict-card">
+      <div class="ms-k"><span>Signals</span>
+        <span class="ict-f" id="ict-f" role="group" aria-label="Filter signals">
+          <select id="ict-f-m" aria-label="Market"><option value="">All markets</option><option value="nq">NQ</option><option value="es">ES</option><option value="ym">YM</option><option value="rty">RTY</option></select>
+          <select id="ict-f-s" aria-label="Status"><option value="">All</option><option value="open">Open</option><option value="closed">Closed</option><option value="todo">Not reviewed</option><option value="taken">Taken by me</option></select>
+        </span></div>
+      <div class="ms-j-wrap t-scroll ict-tw"><table class="ms-j ict-t"><thead><tr><th>Signal</th><th>Market</th><th>Side</th><th>Grade</th><th>Session</th><th>Bias</th><th>Zone</th><th class="n">Entry</th><th class="n">Stop</th><th class="n">Target</th><th>Result</th><th>Review</th></tr></thead><tbody id="ict-body"><tr class="empty"><td colspan="12">Loading…</td></tr></tbody></table></div>
+    </div>
+    <div class="ict-grid">
+      <div class="card ict-card">
+        <div class="ms-k"><span>My trading</span><small id="ict-mine-who"></small></div>
+        <div id="ict-mine"></div>
+      </div>
+      <div class="card ict-card">
+        <div class="ms-k"><span>Saving</span><small id="ict-sync"></small></div>
+        <p class="ms-note">Your reviews and taken trades are kept in this browser and, once GitHub is connected, saved to the council data (ict/desk.json) so they show on every device and for the owner.</p>
+        <p><button type="button" class="ms-tbtn" id="ict-gh">Connect GitHub</button> <button type="button" class="ms-tbtn" id="ict-sync-now">Sync now</button></p>
+      </div>
+    </div>
+    <details class="card ict-card c-how">
+      <summary>The model and the grade</summary>
+      <ol class="ict-rules">
+        <li><b>Sweep</b>: price takes a confirmed H1 swing low (buys) or high (sells) from the last 4 days.</li>
+        <li><b>Inversion</b>: within 6 H1 candles a candle body closes back through the last fair value gap of that move.</li>
+        <li><b>Entry</b> at the price when the tracker sees it (checks every 15 min), <b>stop</b> 2 ticks beyond the sweep, <b>target</b> 3R; the 2R mark is recorded as a second variant; out after 48 h.</li>
+        <li><b>Grade</b> /10 (candle closure rating): candle strength /4 (body and close location), inversion speed /3, room to the next liquidity /3. A+ 10 · A 9 · A- 8 · B+ 7 · B 6 · B- 5 · C 3-4 · F.</li>
+        <li><b>Recorded, not filtered</b>: daily bias (vs the 50-day average), premium / discount of the 20-day range, previous-day high/low sweep, session (Asia, London, NY AM, NY PM), internal high/low validity. "What works" shows which of them matter.</li>
+        <li>Backtest, NQ futures 2023-25: about +0.08R a signal, every year positive, mostly from buys. Gold liked bias + discount; NQ did not. Data from Yahoo, delayed about 10 minutes.</li>
+      </ol>
+    </details>
+    <dialog class="tv ict-tv" id="ict-tv" aria-labelledby="ict-tv-t">
+      <div class="tv-h"><div><h3 id="ict-tv-t">Signal</h3><p id="ict-tv-s"></p></div><div class="ict-tv-tf" role="group" aria-label="Timeframe"><button type="button" data-tf="h1" class="on">H1</button><button type="button" data-tf="m5">M5</button></div><button type="button" class="tv-x" id="ict-tv-x" aria-label="Close">×</button></div>
+      <div class="ict-tv-c" id="ict-tv-c"></div>
+      <p class="ms-note" id="ict-tv-n"></p>
+      <form class="ict-rv" id="ict-rv">
+        <fieldset><legend>My trade</legend>
+          <div class="ict-seg" id="ict-rv-act" role="group" aria-label="Did you take it"><button type="button" data-a="taken">Taken</button><button type="button" data-a="skipped">Skipped</button><button type="button" data-a="missed">Missed</button></div>
+          <label>Fill <input id="ict-rv-fill" inputmode="decimal" autocomplete="off"></label>
+          <label>My result (R) <input id="ict-rv-r" inputmode="decimal" autocomplete="off" placeholder="e.g. 2.5 or -1"></label>
+        </fieldset>
+        <fieldset><legend>Review</legend>
+          <div class="ict-seg" id="ict-rv-g" role="group" aria-label="My grade"><button type="button" data-g="A+">A+</button><button type="button" data-g="A">A</button><button type="button" data-g="B">B</button><button type="button" data-g="C">C</button><button type="button" data-g="F">F</button></div>
+          <div class="ict-tags" id="ict-rv-tags"></div>
+          <textarea id="ict-rv-text" rows="3" maxlength="3000" placeholder="What did the chart say: liquidity, draw on liquidity, premium / discount, time of day…"></textarea>
+        </fieldset>
+        <div class="u-actions"><button type="submit" class="u-btn">Save</button><span class="ms-note" id="ict-rv-msg" role="status"></span></div>
+      </form>
+    </dialog>
+  </section>
   <section class="view" id="v-journal" aria-label="Journal" hidden>
     <div class="v-head"><h1 class="h-head">Journal</h1><p class="ms-note">Closed trades and their results.</p></div>
     <div class="card adm own" id="ms-j-card">
@@ -1566,6 +1707,7 @@ window.MS_ADMIN_HASH = '49c5624f2625ed8b42b6e1bf2819a3a41ddb9743aeca36ea34ea7eb9
     <a href="#scanner" data-go="scanner" class="adm"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"></circle><path d="M20 20l-3.5-3.5M11 8v3l2 2"></path></svg><span>Scanner</span></a>
     <a href="#council" data-go="council"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="8" cy="9" r="3"></circle><circle cx="16" cy="9" r="3"></circle><path d="M3 20c0-3 2.5-5 5-5s5 2 5 5M11 20c0-3 2.5-5 5-5s5 2 5 5"></path></svg>Council</a>
     <a href="#journal" data-go="journal"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 3h11a1 1 0 011 1v16a1 1 0 01-1 1H6zM6 3v18M10 8h5M10 12h5"></path></svg>Journal</a>
+    <a href="#ict" data-go="ict" class="ictx"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 19h16M6 15l4-5 3 3 5-7"></path><path d="M15 6h3v3"></path></svg>ICT</a>
     <a href="#users" data-go="users" class="adm own"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="9" cy="8" r="3.5"></circle><path d="M2.5 20c.8-3.6 3.4-5.5 6.5-5.5s5.7 1.9 6.5 5.5"></path><path d="M17 8v6M14 11h6"></path></svg><span>Users</span></a>
   </nav>
   <dialog class="tv" id="ms-tv" aria-labelledby="ms-tv-t"><div class="tv-h"><div><h3 id="ms-tv-t">Trade</h3><p id="ms-tv-s"></p></div><div class="tv-ba" role="group" aria-label="Prediction before, result after"><button type="button" data-ba="before">Before</button><button type="button" data-ba="after" class="on">After</button><button type="button" data-ba="save" title="Save the before and after charts as images">Save</button></div><button type="button" class="tv-x" id="ms-tv-x" aria-label="Close chart">×</button></div><div class="tv-tf" id="ms-tv-tf" role="group" aria-label="Chart timeframe"><button type="button" data-tvtf="auto" class="on" aria-pressed="true">Auto</button><button type="button" data-tvtf="1m" aria-pressed="false">M1</button><button type="button" data-tvtf="5m" aria-pressed="false">M5</button><button type="button" data-tvtf="15m" aria-pressed="false">M15</button><button type="button" data-tvtf="1h" aria-pressed="false">H1</button><button type="button" data-tvtf="4h" aria-pressed="false">H4</button><button type="button" data-tvtf="1d" aria-pressed="false">D1</button><span class="tv-tf-sp"></span><button type="button" data-tvmore="1" title="Load more candles before the trade">More history</button><span class="tv-tf-n" id="ms-tv-tfn"></span></div><div class="tv-c" id="ms-tv-c"><div class="tv-msg" id="ms-tv-m">Loading candles…</div></div><div class="tv-k" id="ms-tv-k"></div><div class="tv-rv adm" id="ms-tv-rv" hidden><div class="rv-strat" id="ms-rv-strat"></div><div class="rv-tools"><b>Draw</b><button type="button" data-tool="pen">Pen</button><button type="button" data-tool="line">Line</button><button type="button" data-tool="text">Text</button><button type="button" class="rv-c on" data-col="#f23645" style="background:#f23645" aria-label="Colour #f23645"></button><button type="button" class="rv-c" data-col="#089981" style="background:#089981" aria-label="Colour #089981"></button><button type="button" class="rv-c" data-col="#f5a623" style="background:#f5a623" aria-label="Colour #f5a623"></button><button type="button" class="rv-c" data-col="#2962ff" style="background:#2962ff" aria-label="Colour #2962ff"></button><button type="button" class="rv-c" data-col="#ffffff" style="background:#ffffff" aria-label="Colour #ffffff"></button><button type="button" data-act="undo">Undo</button><button type="button" data-act="clear">Clear</button></div><div class="rv-tags" id="ms-rv-tags" aria-label="Why it failed"></div><textarea id="ms-rv-text" rows="3" placeholder="Why did this setup fail? What did the chart show before the entry?"></textarea><textarea id="ms-rv-lesson" rows="2" placeholder="Rule idea for the council (optional), e.g. no scalp sells while H4 makes higher lows"></textarea><div class="rv-save"><button type="button" id="ms-rv-save">Save review</button><span id="ms-rv-msg"></span></div><div class="rv-council" id="ms-rv-council"></div></div></dialog>
@@ -4192,7 +4334,7 @@ function msNextSetup(bars, A) {
   }
 
   // ─── Design pass 100 (6 Nov): small behaviours ───
-  { const NAMES = { home: 'Home', setup: 'Setup', charts: 'Charts', scanner: 'Scanner', council: 'Council', journal: 'Journal', users: 'Users', guest: 'Gold H4' };
+  { const NAMES = { home: 'Home', setup: 'Setup', charts: 'Charts', scanner: 'Scanner', council: 'Council', journal: 'Journal', users: 'Users', guest: 'Gold H4', ict: 'ICT desk' };
     const setTitle = () => { const v = document.querySelector('.view:not([hidden])'); const k = v ? v.id.replace('v-', '') : 'home'; document.title = `${NAMES[k] || 'Home'} · Aurum Desk`; };
     addEventListener('hashchange', () => setTimeout(setTitle, 0)); setTimeout(setTitle, 0);
     // card titles "Name · detail": the detail in a quieter tone
@@ -4307,7 +4449,7 @@ function msNextSetup(bars, A) {
   if (document.getElementById('v-council')) { councilReady = loadCouncil(); setInterval(loadCouncil, 5 * 60e3); }
 
   // ─── Sections: a home page of cards, each section on its own page ───
-  const VIEWS = ['home', 'setup', 'charts', 'scanner', 'council', 'journal', 'guest', 'users'];
+  const VIEWS = ['home', 'setup', 'charts', 'scanner', 'council', 'journal', 'guest', 'users', 'ict'];
   // Council sections (6 Nov renovation): Overview · Trades · Systems · Review · Research; deep links #council/<section>
   const CPANES = ['overview', 'trades', 'systems', 'review', 'research'], CPUB = ['overview', 'trades'];
   const CPANE = { cur: 'overview' };
@@ -4332,7 +4474,8 @@ function msNextSetup(bars, A) {
       });
     } }
   function showView() {
-    const [h0, sub] = location.hash.slice(1).split('/'), h = PUB ? 'guest' : h0 === 'guest' ? 'home' : VIEWER && !['home', 'setup', 'council'].includes(h0) ? 'home' : h0 === 'users' && document.documentElement.dataset.role !== 'owner' ? 'home' : h0, v = VIEWS.includes(h) ? h : 'home';
+    const [h0, sub] = location.hash.slice(1).split('/'), h = PUB ? 'guest' : h0 === 'guest' ? 'home' : VIEWER && !['home', 'setup', 'council'].includes(h0) ? 'home' : h0 === 'users' && document.documentElement.dataset.role !== 'owner' ? 'home' : h0 === 'ict' && !document.documentElement.dataset.ict ? 'home' : !h0 && document.documentElement.dataset.ict && document.documentElement.dataset.role === 'reviewer' ? 'ict' : h0, v = VIEWS.includes(h) ? h : 'home';
+    if (v === 'ict' && window.renderIct) setTimeout(window.renderIct, 0);
     if (v === 'users' && window.renderUsers) window.renderUsers();   // guests only get the H4 chart (owner, 6 Nov)
     if (v === 'council') setPane(sub || CPANE.cur, false);
     VIEWS.forEach((k) => { const el = document.getElementById('v-' + k); if (el) el.hidden = k !== v; });
@@ -4409,6 +4552,179 @@ function msNextSetup(bars, A) {
 
   boot();
 })();
+</script>
+<script>
+// ─── ICT desk (owner, 6 Nov 2026): a SEPARATE edge from the Mosha council. Reads council-data ict/ (written by
+// ict/tracker.mjs) and keeps the desk user's own reviews and taken trades (ictDesk in localStorage, ict/desk.json on
+// GitHub with the msGhTok token). Fred is the main reviewer and trader; the owner sees the same desk.
+(function () {
+  if (!document.getElementById('v-ict')) return;
+  const ROOT = 'https://raw.githubusercontent.com/vazxanana/macro-dashboard/council-data/ict/';
+  const GH = { repo: 'vazxanana/macro-dashboard', path: 'ict/desk.json', branch: 'council-data' };
+  const $ = (id) => document.getElementById(id);
+  const esc = (s) => String(s == null ? '' : s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+  const who = window.MS_WHO === 'owner' ? 'Owner' : window.MS_WHO || 'Guest';
+  const DEC = { nq: 2, es: 2, ym: 0, rty: 1 };
+  const fx = (v, k) => (v == null || !isFinite(v) ? '—' : (+v).toLocaleString('en-US', { minimumFractionDigits: DEC[k] ?? 2, maximumFractionDigits: DEC[k] ?? 2 }));
+  const fR = (r) => (r == null ? '—' : `${r > 0 ? '+' : r < 0 ? '−' : ''}${Math.abs(r).toFixed(2)}R`);
+  const cls = (r) => (r > 0 ? 'pos' : r < 0 ? 'neg' : '');
+  const tm = (t) => new Date(t * 1000).toLocaleString('en-GB', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' });
+  const ago = (t) => { const m = Math.round((Date.now() / 1000 - t) / 60); return m < 60 ? `${m} min ago` : m < 1440 ? `${Math.round(m / 60)} h ago` : `${Math.round(m / 1440)} d ago`; };
+  const gcls = (l) => (/^A/.test(l) ? 'ga' : /^B/.test(l) ? 'gb' : 'gc');
+  const TAGS = [['sweep', 'Clean sweep'], ['fvg', 'Obvious FVG'], ['dol', 'Clear DOL'], ['bias', 'With HTF bias'], ['pd', 'Right side of P/D'], ['time', 'Good time'], ['against', 'Against bias'], ['chop', 'Consolidation'], ['news', 'News'], ['late', 'Late entry'], ['nodol', 'No target liquidity']];
+  const S = { trades: [], snap: null, bars: {}, desk: { reviews: {} }, f: { m: '', s: '' }, cur: null, tf: 'h1' };
+  try { S.desk = JSON.parse(localStorage.getItem('ictDesk') || 'null') || S.desk; } catch (e) {}
+  const saveLocal = () => { try { localStorage.setItem('ictDesk', JSON.stringify(S.desk)); } catch (e) {} };
+  const tok = () => { try { return localStorage.getItem('msGhTok') || ''; } catch (e) { return ''; } };
+  const get = (f) => fetch(ROOT + f + '?t=' + Math.floor(Date.now() / 60000), { cache: 'no-store' }).then((r) => (r.ok ? r.json() : null)).catch(() => null);
+  const mergeDesk = (remote) => { for (const [id, r] of Object.entries((remote && remote.reviews) || {})) { const l = S.desk.reviews[id]; if (!l || (r.at || 0) > (l.at || 0)) S.desk.reviews[id] = r; } };
+
+  async function load() {
+    const [t, s, b, d] = await Promise.all([get('trades.json'), get('snapshot.json'), get('bars.json'), get('desk.json')]);
+    if (t) S.trades = t; if (s) S.snap = s; if (b) S.bars = b; if (d) { mergeDesk(d); saveLocal(); }
+    render();
+  }
+  const liveR = (x) => { const m = S.snap && S.snap.markets[x.market]; if (!m || x.status !== 'open') return null; return ((x.side === 'buy' ? 1 : -1) * (m.price - x.entry)) / x.r0; };
+  const myRev = (x) => S.desk.reviews[x.id];
+
+  function render() {
+    if ($('v-ict').hidden) return;
+    const T = S.trades.slice().sort((a, b) => b.opened - a.opened), C = T.filter((x) => x.closed), O = T.filter((x) => x.status === 'open'), snap = S.snap;
+    $('ict-me').innerHTML = `Desk of <b>${esc(who)}</b>${window.MS_WHO && window.MS_WHO !== 'owner' ? ' · main reviewer and trader' : ''}`;
+    $('ict-run').textContent = snap ? `Tracker checked ${ago(Date.parse(snap.at) / 1000)}${Object.keys(snap.errors || {}).length ? ` · feed issue: ${Object.keys(snap.errors).join(', ').toUpperCase()}` : ''}.` : 'Waiting for the first tracker run.';
+    // markets
+    const mk = snap ? snap.markets : {};
+    $('ict-mkts').innerHTML = ['nq', 'es', 'ym', 'rty'].map((k) => { const m = mk[k], o = O.find((x) => x.market === k);
+      return `<div class="ict-m${o ? ' live' : ''}" role="listitem"><div class="k">${m ? esc(m.short) : k.toUpperCase()} <small>${m ? esc(m.label) : ''}</small></div><div class="px">${m ? fx(m.price, k) : '—'}</div>`
+        + `<div class="sub">${o ? `<b class="${o.side === 'buy' ? 'pos' : 'neg'}">${o.side.toUpperCase()}</b> open · ${fR(liveR(o))}` : m && m.lastSignal ? `Last ${m.lastSignal.side} ${m.lastSignal.grade} · ${ago(m.lastSignal.at)}` : 'No signal yet'}</div>`
+        + `<div class="sub">PDH ${m ? fx(m.pdh, k) : '—'} · PDL ${m ? fx(m.pdl, k) : '—'}</div></div>`; }).join('');
+    // KPIs
+    const sum = (a, f) => a.reduce((s, x) => s + (f(x) || 0), 0), R3 = sum(C, (x) => x.R), R2 = sum(C, (x) => x.R2 ?? x.R), w = C.filter((x) => x.R > 0).length;
+    const fl = sum(O, liveR), mine = T.filter((x) => (myRev(x) || {}).act === 'taken'), rev = C.filter((x) => myRev(x) && myRev(x).text).length;
+    const cell = (k, v, sub, c) => `<div><span>${k}</span><b class="${c || ''}">${v}</b><small>${sub}</small></div>`;
+    $('ict-kpi').innerHTML = cell('Signals', T.length, `${O.length} open · ${C.length} closed`) + cell('Win rate', C.length ? Math.round((100 * w) / C.length) + '%' : '—', `${w} of ${C.length}`)
+      + cell('Total (3R)', fR(R3), C.length ? `${fR(R3 / C.length)} a signal` : 'no closed yet', cls(R3)) + cell('Total (2R)', fR(R2), C.length ? `${fR(R2 / C.length)} a signal` : '—', cls(R2))
+      + cell('Floating', fR(O.length ? fl : null), `${O.length} open`, cls(fl)) + cell('Reviewed', `${rev}/${C.length}`, `${mine.length} taken by ${esc(who)}`);
+    // open
+    $('ict-open-n').textContent = O.length ? `${O.length} open` : '';
+    $('ict-open').innerHTML = O.length ? O.map((x) => { const r = liveR(x), pct = Math.max(0, Math.min(100, ((r + 1) / 4) * 100));
+      return `<li data-id="${esc(x.id)}" tabindex="0"><div class="r1"><span class="ms-chip ${x.side === 'sell' ? 'ms-chip-sell' : 'ms-chip-buy'}">${x.side.toUpperCase()}</span>${esc(x.short)} <span class="ict-g ${gcls(x.grade.letter)}">${esc(x.grade.letter)}</span> <span class="ict-pill">${esc(x.feat.session)}</span><span class="live ${cls(r)}">${fR(r)}</span></div>`
+        + `<div class="ict-bar" title="−1R stop … +3R target"><i style="left:0;width:${pct.toFixed(0)}%"></i></div>`
+        + `<div class="r2">Entry ${fx(x.entry, x.market)} · stop ${fx(x.stop, x.market)} · 2R ${fx(x.t2, x.market)} · 3R ${fx(x.t1, x.market)} · ${ago(x.opened)}</div></li>`; }).join('')
+      : '<li class="empty">No open signal. The tracker checks NQ, ES, YM and RTY every 15 minutes.</li>';
+    // equity (3R and 2R)
+    const Cs = C.slice().sort((a, b) => a.closed - b.closed), pts = (f) => { let e = 0; return [0].concat(Cs.map((x) => (e += f(x)))); };
+    const A = pts((x) => x.R), B = pts((x) => x.R2 ?? x.R), all = A.concat(B), lo = Math.min(0, ...all), hi = Math.max(1, ...all), W = 600, Hh = 180;
+    const path = (P) => P.map((v, i) => `${i ? 'L' : 'M'}${((i / Math.max(1, P.length - 1)) * W).toFixed(1)},${(Hh - 8 - ((v - lo) / (hi - lo || 1)) * (Hh - 16)).toFixed(1)}`).join('');
+    const y0 = (Hh - 8 - ((0 - lo) / (hi - lo || 1)) * (Hh - 16)).toFixed(1);
+    $('ict-eq').innerHTML = Cs.length ? `<svg viewBox="0 0 ${W} ${Hh}" preserveAspectRatio="none" role="img" aria-label="Equity: ${fR(R3)} with the 3R target, ${fR(R2)} with 2R"><line x1="0" x2="${W}" y1="${y0}" y2="${y0}" stroke="var(--line-strong)" stroke-dasharray="3 4"/><path d="${path(B)}" fill="none" stroke="#6f8fd6" stroke-width="2" vector-effect="non-scaling-stroke"/><path d="${path(A)}" fill="none" stroke="var(--gold)" stroke-width="2" vector-effect="non-scaling-stroke"/></svg>`
+      : '<p class="ms-note">The curve starts with the first closed signal.</p>';
+    // breakdowns
+    const groups = [['Market', (x) => x.short], ['Side', (x) => x.side], ['Grade', (x) => x.grade.letter], ['Session', (x) => x.feat.session], ['Daily bias', (x) => x.feat.bias || 'n/a'], ['Premium / discount', (x) => x.feat.zone || 'n/a'],
+      ['Prev-day high/low swept', (x) => (x.feat.pdSweep ? 'yes' : 'no')], ['Valid (internal level untouched)', (x) => (x.valid ? 'yes' : 'no')], ['My review', (x) => (myRev(x) && myRev(x).grade) || 'not graded']];
+    const mx = Math.max(0.5, ...groups.flatMap(([, f]) => { const g = {}; C.forEach((x) => { const k = f(x); (g[k] = g[k] || []).push(x.R); }); return Object.values(g).map((a) => Math.abs(a.reduce((s, v) => s + v, 0) / a.length)); }));
+    $('ict-break').innerHTML = C.length ? groups.map(([name, f]) => { const g = {}; C.forEach((x) => { const k = f(x); (g[k] = g[k] || []).push(x.R); });
+      return `<table><caption>${esc(name)}</caption><thead><tr><th></th><th class="n">n</th><th class="n">Win</th><th class="n">R / signal</th></tr></thead><tbody>${Object.entries(g).sort((a, b) => b[1].length - a[1].length).map(([k, a]) => { const m = a.reduce((s, v) => s + v, 0) / a.length;
+        return `<tr><td>${esc(k)}</td><td class="n">${a.length}</td><td class="n">${Math.round((100 * a.filter((v) => v > 0).length) / a.length)}%</td><td class="n ${cls(m)}">${fR(m)}<i class="bar" style="width:${Math.round((Math.abs(m) / mx) * 40)}px;background:${m >= 0 ? 'var(--pos, #089981)' : 'var(--neg, #f23645)'}"></i></td></tr>`; }).join('')}</tbody></table>`; }).join('')
+      : '<p class="ms-note">Each closed signal is split by market, side, grade, session, daily bias, premium/discount, previous-day sweep, validity and your own grade, so the desk shows which ICT filter earns its keep. Small samples mislead: wait for 30+ signals per row.</p>';
+    // table
+    const L = T.filter((x) => (!S.f.m || x.market === S.f.m) && (!S.f.s || (S.f.s === 'open' ? x.status === 'open' : S.f.s === 'closed' ? !!x.closed : S.f.s === 'todo' ? x.closed && !(myRev(x) && myRev(x).at) : (myRev(x) || {}).act === 'taken')));
+    $('ict-body').innerHTML = L.length ? L.slice(0, 300).map((x) => { const rv = myRev(x), r = x.closed ? x.R : liveR(x);
+      return `<tr data-id="${esc(x.id)}" tabindex="0"><td>${tm(x.signalAt)}</td><td><b>${esc(x.short)}</b></td><td><span class="ms-chip ${x.side === 'sell' ? 'ms-chip-sell' : 'ms-chip-buy'}">${x.side.toUpperCase()}</span></td><td><span class="ict-g ${gcls(x.grade.letter)}">${esc(x.grade.letter)}</span></td><td>${esc(x.feat.session)}</td><td>${esc(x.feat.bias || '—')}</td><td>${esc(x.feat.zone || '—')}</td>`
+        + `<td class="n">${fx(x.entry, x.market)}</td><td class="n">${fx(x.stop, x.market)}</td><td class="n">${fx(x.t1, x.market)}</td><td class="${cls(r)}">${x.closed ? `${x.status === 'win' ? 'Win' : x.status === 'loss' ? 'Loss' : 'Flat'} ${fR(r)}${x.exit === 'time' ? ' <small>48 h</small>' : ''}` : `Open ${fR(r)}`}</td>`
+        + `<td>${rv ? `${rv.act ? `<span class="ict-pill">${esc(rv.act)}</span> ` : ''}${rv.grade ? `<span class="ict-g ${gcls(rv.grade)}">${esc(rv.grade)}</span>` : ''}${rv.text ? ' ✎' : ''}` : '<span class="ms-note">—</span>'}</td></tr>`; }).join('')
+      : `<tr class="empty"><td colspan="12">${S.trades.length ? 'No signal matches the filter.' : 'No signal yet. The first ones appear after an H1 sweep and inversion on NQ, ES, YM or RTY.'}</td></tr>`;
+    // my trading
+    $('ict-mine-who').textContent = esc(who);
+    const tk = mine.filter((x) => myRev(x).r != null && myRev(x).r !== ''), myR = tk.reduce((s, x) => s + +myRev(x).r, 0), sk = T.filter((x) => (myRev(x) || {}).act === 'skipped'), skR = sk.filter((x) => x.closed).reduce((s, x) => s + x.R, 0);
+    $('ict-mine').innerHTML = `<div class="ict-mine-k"><div><span>Taken</span><b>${mine.length}</b></div><div><span>My result</span><b class="${cls(myR)}">${tk.length ? fR(myR) : '—'}</b></div><div><span>Skipped</span><b>${sk.length}</b></div><div><span>Skipped would be</span><b class="${cls(skR)}">${sk.length ? fR(skR) : '—'}</b></div></div>`
+      + `<p class="ms-note">Mark each signal Taken, Skipped or Missed in its chart. "Skipped would be" is what the tracker made on the ones you passed: it shows whether your discretion adds to the model or costs it.</p>`;
+    $('ict-sync').textContent = tok() ? 'GitHub connected' : 'This browser only';
+    $('ict-gh').textContent = tok() ? 'GitHub connected' : 'Connect GitHub';
+  }
+  window.renderIct = () => { render(); };
+
+  // ─── chart dialog + review ───
+  let CH = null, SER = null, LINES = [];
+  function drawChart() {
+    const x = S.cur; if (!x) return;
+    const box = $('ict-tv-c'), LW = window.LightweightCharts; if (!LW) { box.innerHTML = '<p class="ms-note">Charts need the Lightweight Charts library.</p>'; return; }
+    if (!CH) { CH = LW.createChart(box, { autoSize: true, layout: { background: { color: 'transparent' }, textColor: getComputedStyle(document.documentElement).getPropertyValue('--ink-dim') || '#9aa3b2' },
+      grid: { vertLines: { color: 'rgba(128,128,128,.08)' }, horzLines: { color: 'rgba(128,128,128,.08)' } }, timeScale: { timeVisible: true, secondsVisible: false }, rightPriceScale: { borderVisible: false } });
+      SER = CH.addCandlestickSeries({ upColor: '#089981', downColor: '#f23645', borderUpColor: '#089981', borderDownColor: '#f23645', wickUpColor: '#089981', wickDownColor: '#f23645', priceLineVisible: false }); }
+    const raw = ((S.bars[x.market] || {})[S.tf] || []).map((b) => ({ time: b[0], open: b[1], high: b[2], low: b[3], close: b[4] }));
+    SER.setData(raw); SER.applyOptions({ priceFormat: { type: 'price', precision: DEC[x.market] ?? 2, minMove: Math.pow(10, -(DEC[x.market] ?? 2)) } });
+    LINES.forEach((l) => SER.removePriceLine(l)); LINES = [];
+    const add = (price, color, title, style) => { if (price != null) LINES.push(SER.createPriceLine({ price, color, lineWidth: 1, lineStyle: style ?? 0, axisLabelVisible: true, title })); };
+    add(x.entry, '#c9a24a', 'Entry'); add(x.stop, '#f23645', 'Stop'); add(x.t1, '#089981', '3R'); add(x.t2, '#089981', '2R', 2);
+    add(x.sweep && x.sweep.level, '#9aa3b2', 'Swept', 2); if (x.fvg) { add(x.fvg[0], '#6f8fd6', 'FVG', 1); add(x.fvg[1], '#6f8fd6', 'FVG', 1); }
+    if (x.dol != null) add(x.dol, '#c9a24a', 'DOL', 3);
+    const mk = [{ time: x.signalAt - (S.tf === 'h1' ? 3600 : 300) - ((x.signalAt - (S.tf === 'h1' ? 3600 : 300)) % (S.tf === 'h1' ? 3600 : 300)), position: x.side === 'buy' ? 'belowBar' : 'aboveBar', color: '#c9a24a', shape: x.side === 'buy' ? 'arrowUp' : 'arrowDown', text: 'iFVG' }];
+    if (x.sweep) mk.unshift({ time: x.sweep.t - (x.sweep.t % (S.tf === 'h1' ? 3600 : 300)), position: x.side === 'buy' ? 'belowBar' : 'aboveBar', color: '#9aa3b2', shape: 'circle', text: 'Sweep' });
+    if (x.closed) mk.push({ time: x.closed - (x.closed % (S.tf === 'h1' ? 3600 : 300)), position: 'inBar', color: x.R > 0 ? '#089981' : '#f23645', shape: 'square', text: `${x.exit} ${fR(x.R)}` });
+    const tset = new Set(raw.map((b) => b.time)); SER.setMarkers(mk.filter((m) => tset.has(m.time)).sort((a, b) => a.time - b.time));
+    if (raw.length) { const i = raw.findIndex((b) => b.time >= x.signalAt - 3600 * (S.tf === 'h1' ? 30 : 3)); CH.timeScale().setVisibleLogicalRange({ from: Math.max(0, i), to: Math.min(raw.length + 3, Math.max(0, i) + (S.tf === 'h1' ? 90 : 140)) }); }
+    $('ict-tv-n').textContent = raw.length ? `${S.tf.toUpperCase()} candles from Yahoo (about 10 min delayed). The tracker keeps the last ${S.tf === 'h1' ? '400 hours' : '600 five-minute candles'}; older signals may sit before the first candle.` : 'Candles appear after the tracker\'s next run.';
+  }
+  function openSig(id) {
+    const x = S.trades.find((t) => t.id === id); if (!x) return; S.cur = x;
+    const f = x.feat, g = x.grade;
+    $('ict-tv-t').innerHTML = `<span class="ms-chip ${x.side === 'sell' ? 'ms-chip-sell' : 'ms-chip-buy'}">${x.side.toUpperCase()}</span> ${esc(x.label)} <span class="ict-g ${gcls(g.letter)}">${esc(g.letter)}</span>`;
+    $('ict-tv-s').textContent = `Signal ${tm(x.signalAt)} · ${f.session} · bias ${f.bias || 'n/a'} · ${f.zone || 'n/a'}${f.pdSweep ? ' · prev-day level swept' : ''} · grade ${g.total}/10 (strength ${g.strength}/4, speed ${g.speed}/3, room ${g.rr}/3) · `
+      + `entry ${fx(x.entry, x.market)}, stop ${fx(x.stop, x.market)}, target ${fx(x.t1, x.market)} · ${x.closed ? `${x.exit} ${fR(x.R)}` : `open ${fR(liveR(x))}`}`;
+    const rv = myRev(x) || {};
+    S.rv = { act: rv.act || '', grade: rv.grade || '', tags: new Set(rv.tags || []) };
+    $('ict-rv-fill').value = rv.fill ?? ''; $('ict-rv-r').value = rv.r ?? ''; $('ict-rv-text').value = rv.text || ''; $('ict-rv-msg').textContent = rv.at ? `Saved ${ago(rv.at)}${rv.by ? ` by ${rv.by}` : ''}` : '';
+    paintRv(); const d = $('ict-tv'); if (!d.open) d.showModal(); setTimeout(drawChart, 30);
+  }
+  function paintRv() {
+    $('ict-rv-act').querySelectorAll('button').forEach((b) => { const on = b.dataset.a === S.rv.act; b.classList.toggle('on', on); b.setAttribute('aria-pressed', String(on)); });
+    $('ict-rv-g').querySelectorAll('button').forEach((b) => { const on = b.dataset.g === S.rv.grade; b.classList.toggle('on', on); b.setAttribute('aria-pressed', String(on)); });
+    $('ict-rv-tags').innerHTML = TAGS.map(([k, n]) => `<button type="button" data-t="${k}" class="${S.rv.tags.has(k) ? 'on' : ''}" aria-pressed="${S.rv.tags.has(k)}">${esc(n)}</button>`).join('');
+  }
+  async function push() {
+    const t = tok(); if (!t) return 'local';
+    const api = `https://api.github.com/repos/${GH.repo}/contents/${GH.path}`, h = { Authorization: `Bearer ${t}`, Accept: 'application/vnd.github+json' };
+    for (let a = 0; a < 3; a++) {
+      let sha = null; const g = await fetch(`${api}?ref=${GH.branch}&t=${Date.now()}`, { headers: h, cache: 'no-store' });
+      if (g.ok) { const j = await g.json(); sha = j.sha; try { mergeDesk(JSON.parse(decodeURIComponent(escape(atob(String(j.content).replace(/\s/g, '')))))); } catch (e) {} }
+      else if (g.status !== 404) throw new Error(`GitHub ${g.status}${g.status === 401 ? ' (token not accepted)' : ''}`);
+      const content = btoa(unescape(encodeURIComponent(JSON.stringify({ updated: new Date().toISOString(), reviews: S.desk.reviews }))));
+      const p = await fetch(api, { method: 'PUT', headers: h, body: JSON.stringify({ message: `ICT desk review ${new Date().toISOString().slice(0, 16)}Z`, content, branch: GH.branch, ...(sha ? { sha } : {}) }) });
+      if (p.ok) { saveLocal(); return 'synced'; }
+      if (p.status !== 409 && p.status !== 422) throw new Error(`GitHub ${p.status}`);
+    }
+    throw new Error('GitHub kept reporting a newer file; try again');
+  }
+  // wiring
+  const openFrom = (ev) => { const el = ev.target.closest('[data-id]'); if (el) openSig(el.dataset.id); };
+  ['ict-open', 'ict-body'].forEach((id) => { const el = $(id); el.addEventListener('click', openFrom); el.addEventListener('keydown', (ev) => { if (ev.key === 'Enter' || ev.key === ' ') { ev.preventDefault(); openFrom(ev); } }); });
+  $('ict-f-m').addEventListener('change', (e) => { S.f.m = e.target.value; render(); });
+  $('ict-f-s').addEventListener('change', (e) => { S.f.s = e.target.value; render(); });
+  $('ict-tv-x').addEventListener('click', () => $('ict-tv').close());
+  $('ict-tv').addEventListener('click', (ev) => { if (ev.target === $('ict-tv')) $('ict-tv').close(); });
+  $('ict-tv').querySelector('.ict-tv-tf').addEventListener('click', (ev) => { const b = ev.target.closest('button'); if (!b) return; S.tf = b.dataset.tf; b.parentNode.querySelectorAll('button').forEach((z) => z.classList.toggle('on', z === b)); drawChart(); });
+  $('ict-rv-act').addEventListener('click', (ev) => { const b = ev.target.closest('button'); if (!b) return; S.rv.act = S.rv.act === b.dataset.a ? '' : b.dataset.a; paintRv(); });
+  $('ict-rv-g').addEventListener('click', (ev) => { const b = ev.target.closest('button'); if (!b) return; S.rv.grade = S.rv.grade === b.dataset.g ? '' : b.dataset.g; paintRv(); });
+  $('ict-rv-tags').addEventListener('click', (ev) => { const b = ev.target.closest('button'); if (!b) return; const k = b.dataset.t; S.rv.tags.has(k) ? S.rv.tags.delete(k) : S.rv.tags.add(k); paintRv(); });
+  $('ict-rv').addEventListener('submit', async (ev) => {
+    ev.preventDefault(); const x = S.cur; if (!x) return;
+    const num = (v) => { const n = parseFloat(String(v).replace(',', '.')); return isFinite(n) ? n : null; };
+    S.desk.reviews[x.id] = { act: S.rv.act, grade: S.rv.grade, tags: [...S.rv.tags], fill: num($('ict-rv-fill').value), r: num($('ict-rv-r').value), text: $('ict-rv-text').value.trim().slice(0, 3000), by: who, at: Math.floor(Date.now() / 1000), market: x.market, side: x.side };
+    saveLocal(); render(); const msg = $('ict-rv-msg'); msg.textContent = 'Saving…';
+    try { const r = await push(); msg.textContent = r === 'synced' ? 'Saved and synced to GitHub.' : 'Saved in this browser. Connect GitHub on the desk to share it.'; }
+    catch (e) { msg.textContent = `Saved in this browser; GitHub: ${e.message || e}`; }
+  });
+  $('ict-gh').addEventListener('click', () => {
+    const cur = tok(), t = prompt(cur ? 'GitHub connected. Paste a new token, or leave empty to disconnect.' : 'Paste a GitHub fine-grained token with Contents: read and write on vazxanana/macro-dashboard only. It stays in this browser and is used only to save desk reviews to the council data.', '');
+    if (t === null) return;
+    try { if (t.trim()) localStorage.setItem('msGhTok', t.trim()); else localStorage.removeItem('msGhTok'); } catch (e) {}
+    render(); if (t.trim()) push().then(render).catch((e) => alert(`GitHub: ${e.message || e}`));
+  });
+  $('ict-sync-now').addEventListener('click', () => { $('ict-sync').textContent = 'Syncing…'; Promise.resolve(load()).then(() => push()).then((r) => { $('ict-sync').textContent = r === 'synced' ? 'Synced just now' : 'This browser only'; }).catch((e) => { $('ict-sync').textContent = `GitHub: ${e.message || e}`; }); });
+  if (document.documentElement.dataset.ict) { load(); setInterval(load, 120e3); addEventListener('hashchange', () => { if (location.hash === '#ict') render(); }); }
+})();
+
 </script>
 </body>
 </html>
