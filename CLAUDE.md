@@ -55,12 +55,16 @@ To change the password: compute `sha256` of the new one (e.g. `printf %s 'new' |
 ### Accounts and sign-in (6 Nov 2026)
 
 The page opens on a centred sign-in card (`#ms-gate`, shown while `html[data-gate]`) unless the visitor is signed in or
-chose **Continue as guest** (localStorage `ms-guest`, public view). Owner: empty user name + the admin password.
+chose **Continue as guest** (localStorage `ms-guest`, public view). Sign-in is password only (6 Nov): the password picks the account (owner = `MS_ADMIN_HASH`, others matched against
+`MS_USERS` hashes), so every password must be unique.
 Reviewers live in `window.MS_USERS` (head script: `{ <username>: { name, hash: sha256(password), role: 'reviewer' } }`;
 currently **Fred**); a reviewer session stores `ms-admin` = their hash and `ms-user` = the user name, gets the admin view
 read-only (`html[data-role="reviewer"] .own` hides the owner's journal, log-trade button, CSV loader and Telegram
 settings) and can write loss reviews, which carry `by: <name>`. The footer link is "Log in" (opens the card) or
 "Log out (<name>)". To add a reviewer, add an entry with the SHA-256 of their password.
+Viewers (`role: 'viewer'`, currently **Orlando** and **Luxus**; `VIEWER` in the main script) are read-only with a reduced site: Home
+(Today strip, open positions, setup now), Setup, and the Council overview (active trades + P&L calendar); no charts,
+scanner, journal, other council panes, loss-review panel, alerts, settings, or photo/name changes.
 Guests (owner, 6 Nov) see only `#v-guest`: an H4 gold chart (`renderGuest()`) with one system trade (the open/pending
 gold system trade, else the latest closed) drawn as an entry line, a stop zone and a target zone, no labels; all other
 views, the nav, the header badge, alerts and settings are hidden for `html[data-role="public"]`. Guests also see the results of
