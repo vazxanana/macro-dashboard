@@ -902,3 +902,21 @@ Same harness (`ms/msnr_scalp3.py`), spot gold 2019–26, market entry on the swi
 - **H1 with H4 agreeing: 2R +10.1 | +14.2 | +2.2, 2Rt +23.0 | +16.8 | +0.8 (n 307/134/125, DD −13/−7/−8)**; with D1+H4: +12 | +8 | −4.
 
 Reading: the alignment helps monotonically in 2025–26 (the more rungs agree, the better the lower-TF switch does) but that is the bull year; in 2023–24 every M5/M15 line is negative whatever agrees above it, so the storyline does not rescue the scalp. The only lines with the same sign in all three windows are the H1 switch with H4 agreement (+0.07 / +0.13 / +0.01R per trade) and H4/D1 after 2023 — too thin and too few to be a system (+1R a month at best), and nothing beats the gold replica's +0.5R per trade. **Not adopted; no tracker** (the forward sample would take years to read).
+
+## 2026-11-06 — Trendline-break scalp on gold M15 / M5 / M1 (owner request): negative everywhere, rejected
+
+Harness `ms/tl_break.py` + `ms/tl_break2.py`. Line through the last two confirmed pivot highs (falling → buy on a close above) or pivot lows (rising → sell on a close below), pivot half-width 3 and 5, second anchor confirmed before the break, one trade per line. Entry next 1m open after the break candle, stop past the extreme since the second anchor (+0.30 cost), 2R / 3R / 2R-then-trail, hold 8 / 4 / 2 h. Variants: H4 MSNR direction agreeing, buys only, sells only, and a limit retest at the line (valid 4 h). Spot gold 2019–26, R sum (2019–22 | 2023–24 | 2025–26):
+
+| | 2019–22 | 2023–24 | 2025–26 |
+|---|---|---|---|
+| M15 n=5, 2R (n 4100/1930/1895) | −427 | −259 | −97 |
+| M15 n=5, 2R trail, H4 agrees | −205 | −122 | +7 |
+| M15 n=3, buys only | −437 | −21 | +16 |
+| M5 n=5, 2R (n 12.2k/5.7k/5.5k) | −2150 | −826 | −122 |
+| M5 n=5, 2R trail | −2114 | −778 | −61 |
+| M1 n=5, 2R (n 54k/26k/27k) | −14095 | −5842 | −3007 |
+| M1 n=5, 2R trail, H4 agrees | −6616 | −2529 | −934 |
+| M15 retest at the line, 2R | −467 | −277 | −191 |
+| M5 retest at the line, 2R | −2292 | −924 | −340 |
+
+Per trade: M15 −0.10 to −0.15R, M5 −0.15 to −0.19R, M1 −0.25 to −0.30R, i.e. the loss grows as the timeframe shrinks, which is the cost (0.30 on a stop that shrinks with the timeframe) plus the fact that a two-anchor line breaks constantly. No filter (direction, side, pivot width, retest, trail) gets any window above zero except a few +7 to +16R lines in 2025–26 on thousands of trades. **Nothing adopted.** Together with the MSNR scalp (previous entries) this closes the "find scalps" thread for now: on gold, every sub-H1 mechanical entry tested this week loses after cost; the council's edges stay on D1/H4 structure (replica, Mosha, gold trend) and the NQ open run.
