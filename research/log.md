@@ -1290,3 +1290,16 @@ Below H1 the edge flips between halves even with zero fees: a 5–30-minute mome
 - Scalp −0.13 | −0.06, rscalp −0.21 | −0.17, intraday −0.03 | −0.02, swing −0.29 | 0.00, rswing −0.04 | −0.23.
 - Only two near-misses: position (with D1, mostly buys) +0.10 | +0.23R but n68 | 47, years −0.36, +0.60, +0.59, −0.47 and DD −19.7R for +7R — a gold-uptrend buy, already covered by gold trend / gtl / geg. rintra +0.01 | +0.19R (2024 −0.05); with the 2R target +0.01 | +0.23. Neither passes; not promoted.
 - Verdict: the shadow book has no fixable setup on gold; the council's blocks are right. Fixed today: m30m1 double count (site #258, trader #259).
+
+## 2026-11-06 — Owner's skill collection: strategy improvements checked against the council
+Source: the owner's combined skills file (gold-msnr-playbook, zlankator, pitchou, mosha S.CODE, 411, engulfing EG/EF,
+engulfing king, MMXM, msnr-direction-sop) and its 14-year gold summary.
+- Their strongest claim, **Mosha BO→VR→CF + Weekly agreeing + Daily not ranging (20-day ER ≥ 0.2)**, PF 1.35–1.42 on
+  2012–26, tested on our gold H4→H1→M15 chains 2023-24 | 2025-26 (3R): weekly agrees (live rule) +7.0R dd 5.5 |
+  +15.8R dd 9.1; adding ER ≥ 0.2: +9.7R dd 3.2 | +4.0R dd 5.1. Fails the both-halves rule (2025-26 ranging phases were
+  profitable). **No change.** ER ≥ 0.35 also fails (+0.4R in 2025-26).
+- Weekly agreement itself is confirmed (already live since 6 Nov, `mosha-bo-weekly`).
+- Their "wait for the Daily close" rule: our systems already act only on closed candles; nothing to change.
+- Engulf zone mechanics (EG first touch, H1 EG/EF confirmation, failed-zone continuation): their own 14-year tests show no
+  edge; matches our daily-engulf finding that the edge needs the 20-day-average context. No change.
+- Decision Level after the Daily close (PF ~1.2, ~12/yr, 2012-18 weak) and low-risk Apex (≤ 1.0): too thin to add.
