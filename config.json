@@ -474,6 +474,12 @@
    "by": "user",
    "change": "Gold trend: one add. When a closed daily candle is +1R (2 ATR at entry) above the entry, a second unit buys at market on the next run with the same ratcheting stop; it exits with the first unit",
    "why": "Owner: apply it. Spot gold 2023-24 | 2025-26, N20 with the 2 ATR trail: +9.9R (DD -2.0) | +24.1R (DD -1.0) without the add; +13.2R (DD -2.5) | +41.1R (DD -1.0) with it; N10 and N55 show the same gain. The add roughly doubles the 2025-26 result for half an R of extra early drawdown."
+  },
+  {
+   "at": "2026-11-06T14:00:03.000Z",
+   "by": "user",
+   "change": "Gold momentum pullback (new paper system, both sides): a closed H1 candle whose range is at least 1.5x the average of the previous 14 H1 ranges and which closes in its top (buys) / bottom (sells) 20%, in the direction of the 20-day average, between 07:00 and 17:00 UTC; then the first M5 candle within 6 h that trades into the 38-62% pullback of that H1 candle and closes in the trade direction enters at market; stop 0.1 beyond the H1 candle; after +2R the stop trails 1R behind the best price (cap 10R); out after 8 h; cancelled if the stop is hit before the entry",
+   "why": "Owner: find a good scalp for a raw-spread account. Every M1 and session scalp tested was zero before costs; this one is not. Spot gold 2023-24 | 2025-26 at 0.15 all-in cost: +0.105R | +0.171R a trade (n234/186, worst drawdown -9.1R | -9.5R), positive at 0.10, 0.20 and 0.30 cost, for range multiples 1.25-1.5, top 75-90%, pullback zones 23-50 / 38-62 / 50-79%, waits 3-6 h, 1.5R / 2R / 3R / trail; Feb-Jun 2026 bear window +2.8R. Without the 20-day direction it halves. Median stop 7.8 points, ~110 trades a year, entries 07-17 UTC."
   }
  ],
  "btAt": "2026-11-06T11:18:45.097Z",
@@ -511,7 +517,8 @@
   "replica-msnr-size",
   "mosha-slow",
   "gold-add-1.5",
-  "gold-trend-add"
+  "gold-trend-add",
+  "gold-momentum-pullback"
  ],
  "target": {},
  "targetBy": {},
@@ -522,11 +529,11 @@
  "noPause": true,
  "wouldPause": {
   "rintra": {
-   "at": "2026-11-06T13:56:36.000Z",
+   "at": "2026-11-06T14:00:03.000Z",
    "why": "four losses in a row"
   },
   "scalp": {
-   "at": "2026-11-06T13:56:36.000Z",
+   "at": "2026-11-06T14:00:03.000Z",
    "why": "expectancy -1.00R over 13 trades"
   },
   "xau": {
@@ -630,5 +637,13 @@
  "moshaSlow": 12,
  "goldTrendAdd": {
   "atR": 1
+ },
+ "goldMP": {
+  "mult": 1.5,
+  "top": 0.8,
+  "z1": 0.382,
+  "z2": 0.618,
+  "wait": 6,
+  "k": 2
  }
 }
