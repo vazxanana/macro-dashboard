@@ -1090,3 +1090,17 @@ The D1-level filters remove the best trades (the 14 zones without a fresh suppor
 | 3.0, 3R / 5R / trail | −32 / −42 / −23 | +5 / +27 / +22 |
 
 Every line is negative in 2023–24 (buys −0.3 to −0.6R a trade); the 7-pip stop version only pays with a trail in 2025–26, where a few runners of 20R+ carry it. A 0.7 stop on gold is cost-dominated (0.30 spread = 43% of the risk). **Rejected.** Remaining gold items from the skills: PITCHOU M15 rejection at a fresh H1 level in the storyline direction; engulf stairs re-entries; overlap sizing between the replica, the engulf and the trendline.
+
+## 2026-11-06 — PITCHOU M15 rejection candle at a fresh H1 level (storyline direction): negative, rejected
+
+`ms/pitchou_m15.py`. H1 key levels (close of the first of two consecutive candles, 11,101 levels), fresh until the first touch; direction = 20-day average (also the MSNR H4 direction, and none); confirmation = the first M15 candle that wicks into the level and closes back on the trade side; entry at that close; SL 13 pips / 20 pips / past the M15 wick; TP 1:3 (and 1:2); 24-h hold.
+
+| | 2023–24 | 2025–26 |
+|---|---|---|
+| SL 1.3, 1:3 (n 1194/1265) | −147R | −47R |
+| SL 2.0, 1:2 | −117R | −10R |
+| SL past the wick, 1:3 | −271R | −101R |
+| buys, SL 2.0, 1:2 | +4R | −3R |
+| no direction gate, SL wick | −610R | −150R |
+
+Negative in both halves for every stop, target and gate; the direction gate halves the loss but never flips it. Another sub-H1 confirmation entry that cannot pay gold's spread. **Rejected.** This closes the sub-H1 entries from the four skills (MSNR switch scalp, trendline M1–M30, ECMTF-style two-TF-lower, M15 rejection): none works mechanically on gold 2023+.
