@@ -63,7 +63,9 @@ settings) and can write loss reviews, which carry `by: <name>`. The footer link 
 "Log out (<name>)". To add a reviewer, add an entry with the SHA-256 of their password.
 Guests (owner, 6 Nov) see only `#v-guest`: an H4 gold chart (`renderGuest()`) with one system trade (the open/pending
 gold system trade, else the latest closed) drawn as an entry line, a stop zone and a target zone, no labels; all other
-views, the nav, the header badge, alerts and settings are hidden for `html[data-role="public"]`. The sign-in page is
+views, the nav, the header badge, alerts and settings are hidden for `html[data-role="public"]`. Guests also see the results:
+the Today / week / month strip (`#g-today`, same `renderToday()`) and the last 25 closed trades (`#g-res`: time, market,
+side, shadow tag, R; no setup names). The sign-in page is
 branded "Aurum Desk" with a gold chart background (no system names on it).
 
 ## Loss review (6 Nov 2026, owner request)

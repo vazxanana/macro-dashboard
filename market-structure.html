@@ -695,6 +695,17 @@
   html[data-role="public"] body { padding-left: 0 !important; padding-bottom: 0 !important; }
   html[data-role="public"] .top .mk { pointer-events: none; } html[data-role="public"] .top .mk summary::after, html[data-role="public"] .top .mk summary::marker { display: none; content: none; }
   .g-head { padding: 18px 2px 0; }
+  .g-h2 { font: 600 18px var(--sans); letter-spacing: -.2px; margin: 10px 2px 0; }
+  .g-res { list-style: none; margin: 0; padding: 0; }
+  .g-res li { display: grid; grid-template-columns: minmax(84px, auto) minmax(70px, auto) auto auto minmax(0, 1fr); align-items: center; gap: 10px; min-height: 40px; border-top: 1px solid var(--line-soft); font-size: 13px; }
+  .g-res li:first-child { border-top: 0; }
+  .g-res li.empty { display: block; color: var(--ink-faint); }
+  .g-res-t { color: var(--ink-faint); font: 500 12px var(--mono); }
+  .g-res-r { justify-self: end; font: 600 13.5px var(--mono); font-variant-numeric: tabular-nums; }
+  .g-res .chip { font: 600 10.5px var(--mono); padding: 2px 7px; border-radius: 6px; }
+  .g-res .tag { font-size: 10.5px; border: 1px solid var(--line); border-radius: 4px; padding: 0 5px; color: var(--ink-dim); }
+  .g-res-card .ms-k small { font: 500 12.5px var(--sans); color: var(--ink-faint); }
+  @media (max-width: 700px) { .g-res li { grid-template-columns: auto auto auto minmax(0, 1fr); } .g-res-t { grid-column: 1 / -1; margin-top: 6px; } }
   .g-card { padding: 0; overflow: hidden; }
   .g-chart { position: relative; height: min(70vh, 640px); min-height: 360px; }
   .g-msg { position: absolute; inset: 0; display: grid; place-items: center; color: var(--ink-faint); font-size: 13px; z-index: 2; pointer-events: none; }
@@ -863,7 +874,7 @@ window.MS_ADMIN_HASH = '49c5624f2625ed8b42b6e1bf2819a3a41ddb9743aeca36ea34ea7eb9
     </form>
     <div class="gate-or"><span>or</span></div>
     <button type="button" class="gate-guest" id="ms-gate-guest">Continue as guest</button>
-    <p class="gate-note">Guests see a live gold H4 chart with one trade setup.</p>
+    <p class="gate-note">Guests see a live gold H4 chart with one trade setup and the results.</p>
   </div>
 </div>
 <div class="ms-live app" id="ms-live" data-chart="dark">
@@ -927,6 +938,9 @@ window.MS_ADMIN_HASH = '49c5624f2625ed8b42b6e1bf2819a3a41ddb9743aeca36ea34ea7eb9
     <div class="g-head"><h1 class="h-head">Gold · H4</h1></div>
     <div class="card g-card"><div class="g-chart" id="g-chart"><div class="g-msg" id="g-msg">Loading the chart…</div></div></div>
     <div class="g-key" aria-hidden="true"><span><i class="k-e"></i>Entry</span><span><i class="k-s"></i>Stop zone</span><span><i class="k-t"></i>Target zone</span></div>
+    <h2 class="g-h2">Results</h2>
+    <div class="h-today" id="g-today" role="group" aria-label="Results"></div>
+    <div class="card g-res-card"><div class="ms-k"><span>Recent closed trades</span><small id="g-res-sum"></small></div><ul class="g-res" id="g-res"><li class="empty">Loading results…</li></ul></div>
   </section>
   <!-- ─── Home: one card per section ─── -->
   <section class="view" id="v-home" aria-label="Home">
@@ -3068,7 +3082,7 @@ function msNextSetup(bars, A) {
       ho.innerHTML = (A1.length || shLab) ? `<b>${A1.length}</b><span class="ho-l"> open</span>${shLab} · <span class="${tot >= 0 ? 'pos' : 'neg'}"><span class="ho-l">${fR(tot)} · </span>${fp(pct)}</span>` : '<b>0</b><span class="ho-l"> open</span>'; }
     const h = document.getElementById('h-active'); if (h) h.innerHTML = (A1.length || SHO.length) ? `${A1.length} open${SHO.length ? ` + ${SHO.length} shadow` : ''} · floating <b class="${tot >= 0 ? 'pos' : 'neg'}">${fR(tot)}</b>` : 'none open';
     window.FLOAT = { tot, pct, open: A1.length, sh: SHO.length, risk };
-    if (PUB) renderGuest();
+    if (PUB) { renderGuest(); renderToday(); }
     // Home: the biggest open positions (by size of the floating result), one row per market + side
     const hl = document.getElementById('h-act-list');
     if (hl) {
@@ -3122,7 +3136,7 @@ function msNextSetup(bars, A) {
   setInterval(() => { try { renderGuest(); } catch (e) {} }, 60e3);
   // Home "Today" strip (6 Nov renovation): floating now, and closed R today / this week / this month, live + shadow
   function renderToday() {
-    const el = document.getElementById('h-today'); if (!el) return;
+    const el = document.getElementById(PUB ? 'g-today' : 'h-today'); if (!el) return;
     const fR = (v) => `${v > 0 ? '+' : v < 0 ? '−' : ''}${Math.abs(v).toFixed(1)}R`, cls = (v) => (v > 0 ? 'pos' : v < 0 ? 'neg' : '');
     const now = new Date(), d0 = new Date(now.getFullYear(), now.getMonth(), now.getDate()) / 1000, w0 = d0 - ((now.getDay() + 6) % 7) * 86400, m0 = new Date(now.getFullYear(), now.getMonth(), 1) / 1000;
     const closed = (COUNCIL.trades || []).filter((x) => ['win', 'loss', 'be'].includes(x.status) && x.closed && x.R != null);
@@ -3134,6 +3148,12 @@ function msNextSetup(bars, A) {
       cell('Floating now', F ? fR(F.tot) : '—', F ? `${F.open} open${F.sh ? ` + ${F.sh} shadow` : ''}${F.pct ? ` · ${F.pct >= 0 ? '+' : '−'}${Math.abs(F.pct).toFixed(2)}%` : ''}` : 'loading', F ? cls(F.tot) : ''),
       cell('Today', fR(D.R), sub(D), cls(D.R)), cell('This week', fR(W.R), sub(W), cls(W.R)), cell('This month', fR(M.R), sub(M), cls(M.R)),
     ].join('') : '';
+    const gl = document.getElementById('g-res');
+    if (gl && PUB) {
+      const L = closed.slice().sort((a, b) => b.closed - a.closed).slice(0, 25), wins = L.filter((x) => x.R > 0).length;
+      gl.innerHTML = L.length ? L.map((x) => `<li><span class="g-res-t">${ftime(x.closed + TZ)}</span><b>${esc(x.label)}</b><span class="chip ${x.side}">${x.side.toUpperCase()}</span>${x.shadow ? '<span class="tag">shadow</span>' : '<span></span>'}<b class="g-res-r ${cls(x.R)}">${x.status === 'be' ? 'break-even' : fR(x.R)}</b></li>`).join('') : '<li class="empty">No closed trades yet.</li>';
+      const gs = document.getElementById('g-res-sum'); if (gs) gs.textContent = L.length ? `last ${L.length} · ${wins} won` : '';
+    }
   }
   // Live vs expected (4 Nov): live replica R by trade number against the year replay's expectation (mean ± 1.645 SD·√n, 90%)
   // and the pause-check levels (5 Nov: −10R at 30 signals, −12R at 50)
