@@ -2756,7 +2756,7 @@ function msNextSetup(bars, A) {
     let tot = 0, risk = 0, pct = 0, shTot = 0, shN = 0;
     el.innerHTML = A.length ? A.map((x) => {
       const s = x.side === 'sell' ? -1 : 1, r0 = x.r0 || Math.abs(x.entry - x.stop), size = x.size || 1, px = nowPrice(x), d = { dec: x.dec != null ? x.dec : 2 };
-      const fl = px != null && x.status === 'open' && r0 ? (px - x.entry) * s / r0 * size : null; if (fl != null && cnt(x)) { tot += fl; pct += fl * ((x.k === 'trend' || x.k === 'gtrend') ? 0.5 : 0.25); } if (fl != null && x.shadow) { shTot += fl; shN++; }
+      const fl = px != null && x.status === 'open' && r0 ? (px - x.entry) * s / r0 * size : null; if (fl != null && (cnt(x) || x.shadow)) { tot += fl; pct += fl * ((x.k === 'trend' || x.k === 'gtrend') ? 0.5 : 0.25); } if (fl != null && x.shadow) { shTot += fl; shN++; }
       const stopR = r0 ? (x.stop - x.entry) * s / r0 : -1; if (cnt(x)) risk += Math.max(0, -stopR) * size;
       const age = Math.max(0, Date.now() / 1000 - (x.filled || x.opened)), ageT = age < 3600 ? `${Math.round(age / 60)} min` : `${(age / 3600).toFixed(1)} h`;
       const mark = x.tp1 != null ? x.tp1 : x.t1, trail = (x.k === 'trend' || x.k === 'gtrend') ? (x.addOf ? 'second unit: own 5 ATR stop, leaves with the first trade on its channel-midpoint close' : x.exitRule === 'mid' ? `out on a daily close under ${fmtI(x.midStop, { dec: x.dec ?? 2 })} (channel midpoint)` : x.trailMoved ? `stop trails ${x.kATR || (x.k === 'gtrend' ? 2 : 4)} ATR, locks ${fR(stopR)}` : `stop trails ${x.kATR || (x.k === 'gtrend' ? 2 : 4)} ATR from each daily close`) : x.trail ? (x.addOf ? (x.trailMoved ? `trails with the first trade, stop locks ${fR(stopR)}` : 'trails with the first trade after its +4R') : x.trailMoved ? `trailing, stop locks ${fR(stopR)}` : `trailing from +${x.trail[0]}R`) : '';
@@ -2767,12 +2767,13 @@ function msNextSetup(bars, A) {
     }).join('') : (PUB ? '<li class="empty">No open trades right now.</li>' : '<li class="empty">No open trades right now. The system opens one when a gold replica signal passes (while gold is volatile), a Mosha BO setup completes (gold), a coin closes above its 55-day high (crypto trend), or the NQ open run fires (paper).</li>');
     const sum = document.getElementById('ms-active-sum');
     const trk = A0.length - A1.length;
-    if (sum) sum.innerHTML = A0.length ? `${A1.length} open${trk ? ` + ${trk} tracker` : ''}${SHO.length ? ` + ${SHO.length} shadow` : ''} · at risk ${risk.toFixed(1)}R · floating <b class="${tot >= 0 ? 'pos' : 'neg'}">${fR(tot)}</b>` : SHO.length ? `${SHO.length} shadow open` : '';
+    if (sum) sum.innerHTML = A0.length ? `${A1.length} open${trk ? ` + ${trk} tracker` : ''}${SHO.length ? ` + ${SHO.length} shadow` : ''} · at risk ${risk.toFixed(1)}R · floating <b class="${tot >= 0 ? 'pos' : 'neg'}">${fR(tot)}</b>${SHO.length ? ` <small>(shadow ${fR(shTot)})</small>` : ''}` : SHO.length ? `${SHO.length} shadow open · floating <b class="${tot >= 0 ? 'pos' : 'neg'}">${fR(tot)}</b>` : '';
     const ho = document.getElementById('ms-hdr-open');
     if (ho) { const fp = (v) => `${v > 0 ? '+' : v < 0 ? '−' : ''}${Math.abs(v).toFixed(2)}%`;
-      const shPart = shOn && SHO.length ? ` · <span class="ho-sh" title="Open shadow trades (setups a rule blocked, followed on paper) and their floating result; not counted in the live total">${SHO.length} shadow <span class="${shTot >= 0 ? 'pos' : 'neg'}">${fR(shTot)}</span></span>` : '';
-      ho.innerHTML = (A1.length ? `<b>${A1.length}</b><span class="ho-l"> open</span> · <span class="${tot >= 0 ? 'pos' : 'neg'}"><span class="ho-l">${fR(tot)} · </span>${fp(pct)}</span>` : '<b>0</b><span class="ho-l"> open</span>') + shPart; }
-    const h = document.getElementById('h-active'); if (h) h.innerHTML = A1.length ? `${A1.length} open <small>floating ${fR(tot)}</small>` : '<small>none open</small>';
+      // shadow trades (when "Shadow too" is on) count in the float like any other trade, labelled as shadow (6 Nov, owner)
+      const shLab = shOn && SHO.length ? `<span class="ho-sh" title="Includes ${SHO.length} open shadow trade${SHO.length > 1 ? 's' : ''} (setups a rule blocked, followed on paper), floating ${fR(shTot)}"> +${SHO.length} shadow</span>` : '';
+      ho.innerHTML = (A1.length || shLab) ? `<b>${A1.length}</b><span class="ho-l"> open</span>${shLab} · <span class="${tot >= 0 ? 'pos' : 'neg'}"><span class="ho-l">${fR(tot)} · </span>${fp(pct)}</span>` : '<b>0</b><span class="ho-l"> open</span>'; }
+    const h = document.getElementById('h-active'); if (h) h.innerHTML = (A1.length || SHO.length) ? `${A1.length} open${SHO.length ? ` + ${SHO.length} shadow` : ''} <small>floating ${fR(tot)}</small>` : '<small>none open</small>';
   }
   setInterval(() => { try { renderActive(); } catch (e) {} }, 15e3);
   // Live vs expected (4 Nov): live replica R by trade number against the year replay's expectation (mean ± 1.645 SD·√n, 90%)
