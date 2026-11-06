@@ -408,6 +408,12 @@
    "by": "coach-stats",
    "change": "m30m1: dropped the D1 rule",
    "why": "The trades it blocked made +0.45R over 9."
+  },
+  {
+   "at": "2026-11-06T00:13:08.000Z",
+   "by": "user",
+   "change": "Gold H4 trendline (new paper system, buys only): a closed H4 candle above the falling line through the last two confirmed H4 pivot highs, while the H4 direction SOP (Malaysian SnR, Daily levels) reads up, buys at market; stop under the lowest low since the second anchor; after +2R the stop trails 1R behind the best price (cap 10R); out after 96 h; one trade per line, one position",
+   "why": "Owner: find the best SOP timeframe for the trendline break, judged on 2023 onwards (halves 2023-24 | 2025-26). M15/M30 lose, H1 is flat, H4 is the only timeframe with profit: buys gated by the H4 direction +0.44R | +0.67R a trade (n54/49, worst drawdown -4.1R | -6.6R), positive every year (2023 +3.3, 2024 +20.5, 2025 +29.4, 2026 +3.5), robust to pivot width 2-4 and hold 48-240 h, entry 4 min late still +0.37 | +0.62. Sells are inconsistent (-4R | +5R) and are not traded. Two thirds of the trades fire while the gold trend system is flat, so it adds to it rather than doubling it."
   }
  ],
  "btAt": "2026-11-05T11:21:05.226Z",
@@ -439,7 +445,8 @@
   "mosha-add",
   "gold-news-veto",
   "crypto-add",
-  "gold-trend"
+  "gold-trend",
+  "gold-h4-trendline"
  ],
  "target": {},
  "targetBy": {},
@@ -450,11 +457,11 @@
  "noPause": true,
  "wouldPause": {
   "rintra": {
-   "at": "2026-11-06T00:10:03.000Z",
+   "at": "2026-11-06T00:13:08.000Z",
    "why": "four losses in a row"
   },
   "scalp": {
-   "at": "2026-11-06T00:10:03.000Z",
+   "at": "2026-11-06T00:13:08.000Z",
    "why": "expectancy -1.00R over 13 trades"
   },
   "xau": {
@@ -535,5 +542,12 @@
  "goldTrend": {
   "n": 20,
   "k": 2
+ },
+ "goldTL": {
+  "n": 3,
+  "span": 120,
+  "n4": 2,
+  "pad": 0.3,
+  "hold": 96
  }
 }
