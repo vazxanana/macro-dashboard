@@ -877,7 +877,8 @@
   @media (max-width: 1179px) { .to-top { bottom: calc(78px + env(safe-area-inset-bottom, 0px)); } }        /* 98 */
   .h-kpi { cursor: help; }                                                                                   /* 96 */
   #ms-cal-sum, #g-cal-sum { padding-top: 6px; border-top: 1px solid var(--line-soft); margin-top: 10px; }   /* 97 */
-  .h-date { font-variant-numeric: tabular-nums; }                                                            /* 100 */
+  .h-date { font-variant-numeric: tabular-nums; }
+  kbd { font: 600 11px var(--mono); padding: 1px 6px; border-radius: 5px; border: 1px solid var(--line-strong); border-bottom-width: 2px; background: var(--panel-raised); color: var(--ink-dim); }   /* r2-41 */                                                            /* 100 */
   .ho-l, .hdr-open { font-variant-numeric: tabular-nums; }                                                   /* 88 */
   .ms-status #ms-updated { font-variant-numeric: tabular-nums; }                                             /* 86 */
   .btab a span { white-space: nowrap; }                                                                      /* 93 */
@@ -887,6 +888,50 @@
   @media (prefers-reduced-motion: reduce) {
     html { scroll-behavior: auto; } .ms-toast, .tv[open], .menu-body, .me-pop, .mk-pop, .c-how[open] > p, .loss-g[open] .loss-rows, .to-top, .ms-live-dot.on, .ms-live-dot.live { animation: none !important; }
     .c-act li:hover, .cal-day li:hover, .loss-rows li:hover { transform: none; } .ms-tbtn:active, .seg button:active, .c-nav button:active { transform: none; }   /* 70 */
+  }
+
+  /* ═══ Design round 2 (6 Nov) — fixes found on screenshots of every page ═══ */
+  .t-scroll { -webkit-mask-image: none; mask-image: none; }                                                  /* r2-1 no fade on short tables */
+  .has-more { -webkit-mask-image: linear-gradient(180deg, #000 calc(100% - 32px), transparent) !important; mask-image: linear-gradient(180deg, #000 calc(100% - 32px), transparent) !important; }   /* r2-2 fade only when more is below */
+  .ms-live-dot { cursor: help; }                                                                             /* r2-3 named status dot */
+  .ms-steps li.now .ms-dot { background: var(--gold) !important; border-color: var(--gold) !important; color: #17130a !important; }   /* r2-4 current step in brand gold */
+  .ms-now { background: var(--gold-soft) !important; border: 1px solid var(--gold-line); border-radius: 10px !important; padding: 10px 12px !important; font-size: 13px !important; }   /* r2-5 "Next" box */
+  .c-tabs button[aria-selected="true"] { border-bottom-color: var(--gold) !important; }                      /* r2-6 trader tab underline */
+  .c-tabs button { padding-bottom: 8px; } .c-tabs button small { color: var(--ink-faint); }                  /* r2-7 */
+  .c-sub { font: 600 13px var(--sans) !important; letter-spacing: 0 !important; text-transform: none !important; color: var(--ink) !important; margin: 18px 0 8px !important; }   /* r2-8 section labels as headings */
+  .c-rules { gap: 8px !important; } .c-rules > * { padding: 4px 10px !important; border-radius: 999px !important; font-size: 11.5px !important; }   /* r2-9 coach rule chips */
+  .c-pm-v { text-transform: none !important; letter-spacing: 0 !important; border-radius: 999px !important; padding: 2px 9px !important; font: 600 11px var(--sans) !important; }   /* r2-10 review tags sentence case */
+  .c-kpi > div { padding: 12px 14px !important; } .c-kpi > div > span:first-child, .c-kpi small { font: 500 12px var(--sans) !important; color: var(--ink-dim) !important; } .c-kpi b { font-size: 22px; }   /* r2-11 KPI boxes */
+  .kbd-hint { display: inline-flex !important; gap: 4px; align-items: center; font: 500 12px var(--sans) !important; color: var(--ink-faint); } @media (max-width: 900px) { .kbd-hint { display: none !important; } }   /* r2-12 charts hint */
+  .ms-ph { gap: 8px; } .ms-ph .ms-role { color: var(--ink-faint); font-size: 12px; }                         /* r2-13 chart pane headers */
+  .ms-ph b { font: 700 13px var(--sans); }                                                                   /* r2-14 */
+  .c-head p.ms-note { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }                       /* r2-15 council status line */
+  .ms-td { align-items: start; }                                                                             /* r2-16 setup card top-aligned */
+  .ms-steps li { padding: 6px 0; line-height: 1.45; }                                                         /* r2-17 step spacing */
+  .ms-kv > div > span { color: var(--ink-dim); }                                                             /* r2-18 */
+  .ms-levels li { border-radius: 10px; }                                                                     /* r2-19 */
+  .c-eq { margin: 6px 0 14px; }                                                                              /* r2-20 equity curve spacing */
+  .c-t td:first-child, .ms-j td:first-child { color: var(--ink-dim); font-family: var(--mono); font-size: 12px; }   /* r2-21 time column */
+  .c-t td b, .ms-j td b { font-weight: 600; }                                                                /* r2-22 */
+  .c-t .ms-chip, .ms-j .chip { font-size: 10.5px; }                                                          /* r2-23 */
+  .ms-j-stats { gap: 12px 18px !important; font-size: 13px; }                                                /* r2-24 journal stats */
+  .ms-j-stats b { font-family: var(--mono); }                                                                /* r2-25 */
+  .ms-scan-meta { gap: 8px; }                                                                                /* r2-26 */
+  .c-act li .a-d small, .c-act li .a-d { color: var(--ink-faint); }                                          /* r2-27 */
+  .c-act li .a-t b { font-weight: 600; }                                                                     /* r2-28 */
+  .c-ready li { border-radius: 10px !important; }                                                            /* r2-29 analyst list */
+  .c-notes li, .c-hist li { line-height: 1.55; margin: 3px 0; }                                              /* r2-30 */
+  .c-how { border-radius: 10px; }                                                                            /* r2-31 */
+  .rep-track { margin-top: 6px; }                                                                            /* r2-32 */
+  .cal-seg { margin-bottom: 4px; }                                                                           /* r2-33 */
+  .g-key { justify-content: flex-start; }                                                                    /* r2-34 */
+  @media (max-width: 700px) {
+    .h-act .ms-k { flex-direction: column; align-items: flex-start; } .h-act .ms-k small { margin-left: 0 !important; display: block; }   /* r2-35 phone: open positions header */
+    .h-quick { -webkit-mask-image: linear-gradient(90deg, #000 85%, transparent); mask-image: linear-gradient(90deg, #000 85%, transparent); }   /* r2-36 phone: chips row hints more */
+    .ms-steps li { font-size: 13.5px; }                                                                      /* r2-37 */
+    .c-kpi { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; }                                  /* r2-38 */
+    .v-head .ms-note { font-size: 12.5px; }                                                                  /* r2-39 */
+    .h-kpi-s { white-space: normal; }                                                                        /* r2-40 phone: no cut-off sublines */
   }
   /* Guest view (6 Nov): only the H4 gold chart with one trade setup */
   html[data-role="public"] .btab, html[data-role="public"] .top .tabs, html[data-role="public"] #ms-hdr-open, html[data-role="public"] #ms-alerts,
@@ -1322,7 +1367,7 @@ window.MS_ADMIN_HASH = '49c5624f2625ed8b42b6e1bf2819a3a41ddb9743aeca36ea34ea7eb9
   <!-- ─── Charts ─── -->
   <section class="view" id="v-charts" aria-label="Charts" hidden>
     <div class="sec-h">
-      <h2>Charts <span class="kbd-hint">Keys 1–6 pick a chart, 0 shows all, F fits</span></h2>
+      <h2>Charts <span class="kbd-hint"><kbd>1</kbd>–<kbd>6</kbd> pick a chart · <kbd>0</kbd> all · <kbd>F</kbd> fit</span></h2>
       <div class="seg" role="group" aria-label="Chart view">
         <button type="button" data-view="1d">D1</button><button type="button" data-view="4h">H4</button><button type="button" data-view="1h">H1</button><button type="button" data-view="15m">M15</button><button type="button" data-view="5m">M5</button><button type="button" data-view="1m">M1</button><button type="button" data-view="all">All</button>
       </div>
@@ -4153,6 +4198,16 @@ function msNextSetup(bars, A) {
     // what each Today figure means
     const tip = { 'Floating now': 'Result of the open trades right now, in R (1R = the risk of one trade)', Today: 'Closed today, in R', 'This week': 'Closed since Monday, in R', 'This month': 'Closed since the 1st, in R' };
     new MutationObserver(() => document.querySelectorAll('.h-kpi').forEach((c) => { const k = c.querySelector('.h-kpi-k'); if (k && tip[k.textContent] && !c.title) c.title = tip[k.textContent]; })).observe(document.body, { childList: true, subtree: true });
+  }
+
+  // ─── Design round 2 (6 Nov): scroll boxes fade only while more rows are below; the status dot gets a name ───
+  { const upd = (el) => { const more = el.scrollHeight - el.clientHeight - el.scrollTop > 4; el.classList.toggle('has-more', more); };
+    const boxes = () => document.querySelectorAll('.t-scroll, #ms-cal-day, #ms-nq-list, #ms-rep-list, .loss-rows, #ms-c-pm, .c-pane-overview > .c-active .c-act');
+    const wire = () => boxes().forEach((el) => { if (!el.dataset.fadeWired) { el.dataset.fadeWired = '1'; el.addEventListener('scroll', () => upd(el), { passive: true }); } upd(el); });
+    new MutationObserver(() => requestAnimationFrame(wire)).observe(document.body, { childList: true, subtree: true }); addEventListener('resize', wire); wire();
+    const dot = document.getElementById('ms-live-dot'), txt = document.getElementById('ms-live-txt');
+    if (dot && txt) { const name = () => { const t = txt.textContent.trim() || (dot.classList.contains('on') ? 'Live' : dot.classList.contains('poll') ? 'Updating every few seconds' : 'Connecting'); dot.title = t; dot.setAttribute('role', 'img'); dot.setAttribute('aria-label', `Price feed: ${t}`); };
+      new MutationObserver(name).observe(txt, { childList: true, characterData: true, subtree: true }); new MutationObserver(name).observe(dot, { attributes: true, attributeFilter: ['class'] }); name(); }
   }
   // ─── Backtest card: the same clustered statistics the Coach uses, so the page shows exactly what it decides on ───
   function btStat(arr, key = 'R_none') {
