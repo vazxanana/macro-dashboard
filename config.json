@@ -438,6 +438,12 @@
    "by": "user",
    "change": "Gold replica: position size 1.5 when the H4 Malaysian SnR direction is AGAINST the trade (the H4 pullback is still in progress, feat.msnr against) and 0.5 when it agrees; 1 when there is no direction; the add scales with it",
    "why": "Owner: find the best tweaks with all the info. The replica trades with the daily trend against the H4 trend; the Malaysian SnR direction (H4 external breakouts gated by tapped Daily levels, pivot width 5) says whether that H4 pullback is still on. Spot gold 2023-24 | 2025-26 with the live exits and risk rules: live +73.9R (DD -10.5) | +112.0R (DD -17.6); 1.5x against / 0.5x agrees +109.6R (DD -9.7) | +155.5R (DD -16.5), more profit and less drawdown in both halves; skipping the agreeing trades keeps most of the profit with half the drawdown (+72.7 / -6.5 | +99.5 / -10.3) but gives trades away; half size when against (the opposite tilt) loses in both halves. The same split had the same sign in 2019-22 when it was first measured on 5 Nov."
+  },
+  {
+   "at": "2026-11-06T09:44:54.000Z",
+   "by": "user",
+   "change": "Mosha BO system: a chain whose pullback from the H1 VR extreme to the M15 CF took fewer than 12 H1 bars (a momentum arrival) is a shadow trade (blockedBy momentum), not a live one",
+   "why": "Owner: judge on 2023 onwards and focus on gold. Mosha: \"if price comes into our zone with momentum, risky\". Gold H4-H1-M15 chains with the weekly agreeing, 3R, 2023-24 | 2025-26: all +6.3R (DD -10.5) | +21.0R (DD -17.4); slow arrivals (>= 12 H1 bars) +9.6R (DD -3.5) | +23.0R (DD -11.3), fast arrivals -3.3R | -2.0R; the split holds for thresholds 12-40 bars (fast is negative or near zero in every window). Recorded as feat.pull since 5 Nov; silver reversed it in 2019-26, which no longer counts for a gold-only rule."
   }
  ],
  "btAt": "2026-11-05T11:21:05.226Z",
@@ -472,7 +478,8 @@
   "gold-trend",
   "gold-h4-trendline",
   "gold-daily-engulf",
-  "replica-msnr-size"
+  "replica-msnr-size",
+  "mosha-slow"
  ],
  "target": {},
  "targetBy": {},
@@ -483,11 +490,11 @@
  "noPause": true,
  "wouldPause": {
   "rintra": {
-   "at": "2026-11-06T09:42:16.000Z",
+   "at": "2026-11-06T09:44:54.000Z",
    "why": "four losses in a row"
   },
   "scalp": {
-   "at": "2026-11-06T09:42:16.000Z",
+   "at": "2026-11-06T09:44:54.000Z",
    "why": "expectancy -1.00R over 13 trades"
   },
   "xau": {
@@ -587,5 +594,6 @@
  "replicaMsnrSize": {
   "against": 1.5,
   "with": 0.5
- }
+ },
+ "moshaSlow": 12
 }
