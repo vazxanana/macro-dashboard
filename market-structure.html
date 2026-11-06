@@ -1301,6 +1301,13 @@ window.MS_ADMIN_HASH = '49c5624f2625ed8b42b6e1bf2819a3a41ddb9743aeca36ea34ea7eb9
 .ict-cal-d.today .d { color: var(--gold, var(--accent)); font-weight: 700; }
 .ict-cal-d:not([disabled]) { transition: transform .12s, box-shadow .12s; }
 @media (hover: hover) { .ict-cal-d:not([disabled]):hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(0,0,0,.12); } }
+
+/* polish 7: home setup card */
+#h-align { display: flex; flex-wrap: wrap; gap: 4px; }
+#h-align .ms-al { border-radius: 6px; }
+.tile-go::after { content: "\00a0→"; display: inline-block; transition: transform .15s; }
+@media (hover: hover) { .tile:hover .tile-go::after { transform: translateX(3px); } }
+.h-prog i { transition: background-color .3s; }
 </style>
 </head>
 <body>
