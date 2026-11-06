@@ -573,7 +573,9 @@ day the stop is lifted to (daily close − 2 ATR) and never lowered; no target, 
 Spot gold 2019–22 | 2023–24 | 2025–26: +0.31 | +1.07 | +2.42R a trade (n29/12/10), worst drawdown −4.4 | −1.4 | −0.9R;
 N10, N55 and a 3 ATR trail are positive in every period too; the mirrored short loses in every period, so long only.
 About 6 trades a year, half of them winners, best +13R, worst −1.02R. Sizing guide 0.5% per trade. `snapshot.goldTrend`
-shows the 20-day high, the last close and the open position's stop.
+shows the 20-day high, the last close and the open position's stop. **Add (6 Nov, `gold-trend-add`):** when a closed daily candle is
++1R (2 ATR at entry) above the entry, a second unit buys at market with the same ratcheting stop and exits with the first;
+2023–24 | 2025–26 +9.9 → +13.2R (DD −2.0 → −2.5) | +24.1 → +41.1R (DD −1.0).
 
 ## Gold H4 trendline (6 Nov, user rule `gold-h4-trendline`)
 
@@ -604,3 +606,8 @@ tested; without the average gate +0.27 | +0.54 with deeper drawdowns. H4/H1 engu
 everywhere; the EF-reversal trade and the storyline Apex entry (Daily reject Daily + H4 external breakout, 30-pip stop)
 are negative. Two thirds of the trades fire while the gold trend system is flat. About 35 trades a year. Sizing guide
 0.25% per trade. `snapshot.goldEG` shows the last close, the average, the zone of the day, waiting limits and open count.
+
+## Replica add at +1.5R (6 Nov, user rule `gold-add-1.5`)
+
+The second unit opens at +1.5R instead of +2R (stop at the first entry; breakeven still at +2R; run after +4R). With the MSNR
+size tilt, 2023–24 | 2025–26: +109.6R (DD −9.7) | +155.5R (DD −16.5) → +120.2R (DD −10.3) | +170.3R (DD −14.4).
