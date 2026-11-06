@@ -432,6 +432,12 @@
    "by": "user",
    "change": "Gold daily engulf (new paper system, buys only): a closed daily candle that body-closes above the HIGH of a red base candle (within 3 same-colour candles) makes an EG buy zone = the base candle's full range; while that close is above the 20-day average, a limit buy waits at the zone high for 20 days (cancelled by a daily close under the zone low); stop 0.3 under the zone low; after +2R the stop trails 1R behind the best price (cap 10R); out after 10 days; one trade per zone, at most 3 open",
    "why": "Owner supplied four school skills (engulfing EG/EF, Mosha storyline, PITCHOU and Zlankator Malaysian SnR). The engulf zone is the one codable rule that held on gold judged on 2023 onwards: D1 EG buys +0.33R | +0.68R a trade (n77/69, worst drawdown -9.8R | -6.3R), every year positive (2023 +6.2, 2024 +19.3, 2025 +34.1, 2026 +12.9), robust to the confirmation window (1-5 candles), zone life, hold and every trail tested; the 20-day-average gate keeps the profit and cuts the drawdown. Two thirds of the trades fire while the gold trend system is flat. H4 and H1 engulf zones lose in 2023-24, sells lose everywhere, the EF-reversal and the storyline Apex entries (DRD + H4 external breakout, 30-pip stop) are negative."
+  },
+  {
+   "at": "2026-11-06T09:30:50.000Z",
+   "by": "user",
+   "change": "Gold replica: position size 1.5 when the H4 Malaysian SnR direction is AGAINST the trade (the H4 pullback is still in progress, feat.msnr against) and 0.5 when it agrees; 1 when there is no direction; the add scales with it",
+   "why": "Owner: find the best tweaks with all the info. The replica trades with the daily trend against the H4 trend; the Malaysian SnR direction (H4 external breakouts gated by tapped Daily levels, pivot width 5) says whether that H4 pullback is still on. Spot gold 2023-24 | 2025-26 with the live exits and risk rules: live +73.9R (DD -10.5) | +112.0R (DD -17.6); 1.5x against / 0.5x agrees +109.6R (DD -9.7) | +155.5R (DD -16.5), more profit and less drawdown in both halves; skipping the agreeing trades keeps most of the profit with half the drawdown (+72.7 / -6.5 | +99.5 / -10.3) but gives trades away; half size when against (the opposite tilt) loses in both halves. The same split had the same sign in 2019-22 when it was first measured on 5 Nov."
   }
  ],
  "btAt": "2026-11-05T11:21:05.226Z",
@@ -465,7 +471,8 @@
   "crypto-add",
   "gold-trend",
   "gold-h4-trendline",
-  "gold-daily-engulf"
+  "gold-daily-engulf",
+  "replica-msnr-size"
  ],
  "target": {},
  "targetBy": {},
@@ -476,11 +483,11 @@
  "noPause": true,
  "wouldPause": {
   "rintra": {
-   "at": "2026-11-06T09:26:43.000Z",
+   "at": "2026-11-06T09:30:50.000Z",
    "why": "four losses in a row"
   },
   "scalp": {
-   "at": "2026-11-06T09:26:43.000Z",
+   "at": "2026-11-06T09:30:50.000Z",
    "why": "expectancy -1.00R over 13 trades"
   },
   "xau": {
@@ -576,5 +583,9 @@
   "sma": 20,
   "pad": 0.3,
   "maxOpen": 3
+ },
+ "replicaMsnrSize": {
+  "against": 1.5,
+  "with": 0.5
  }
 }
