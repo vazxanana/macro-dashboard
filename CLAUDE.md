@@ -121,10 +121,15 @@ password changed (`ms-user-rec` keeps an added user's record between visits). Pa
 ICT is its own edge and approach: never mix it into the council systems, their rules, filters or reports.
 Rules and research live in `.claude/skills/ICT/SKILL.md` (results also in council-data `research/ict/`).
 - Tracker: `ict/tracker.mjs`, workflow `.github/workflows/ict.yml` (every 15 min), data in council-data `ict/`
-  (`trades.json`, `snapshot.json`, `bars.json`). Markets: NQ, ES, YM, RTY futures from Yahoo. Model: H1 iFVG
+  (`trades.json`, `snapshot.json`, `bars.json`). Markets: NQ, ES, YM, RTY futures from CNBC (Yahoo fallback). Model: H1 iFVG
   reversal (swing swept → body closes through the leg's FVG within 6 H1 candles; stop 2 ticks beyond the sweep;
   3R target, 2R mark recorded as `R2`; 48 h max). Every signal records ICT features (`feat`) and a /10 grade.
 - Page: view `#ict` ("ICT desk", class `ictx`), shown only when `html[data-ict]` is set: the owner, and users
   with `ict: true` (Fred, the main reviewer and trader, lands there after sign-in). The desk user marks signals
   Taken / Skipped / Missed with fill and own R, grades them and writes notes: localStorage `ictDesk`, synced to
   council-data `ict/desk.json` with the `msGhTok` token.
+- Read-only desk: `ict: 'read'` on a user (Orlando) sets `html[data-ict-ro]`, which hides `.ict-rw` (the review form,
+  "My trading", GitHub saving); viewers with ICT access may open `#ict`.
+- Replay: `ict/replay.mjs` (workflow `ict-replay.yml`: on change, on demand with a start date, weekly) runs the same
+  `signals()` over CNBC history since 1 Apr 2026 and writes council-data `ict/replay.json` (records carry `replay: true`).
+  The desk has a Both / Live / Replay switch (localStorage `ictSrc`) and a P&L calendar of closed signals.

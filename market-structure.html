@@ -1011,6 +1011,21 @@
   @media (max-width: 1000px) { .ict-mkts { grid-template-columns: repeat(2, minmax(0, 1fr)); } .ict-kpi { grid-template-columns: repeat(3, minmax(0, 1fr)); } .ict-grid, .ict-break, .ict-rv { grid-template-columns: minmax(0, 1fr); } }
   @media (max-width: 520px) { .ict-kpi { grid-template-columns: repeat(2, minmax(0, 1fr)); } .ict-mine-k { grid-template-columns: repeat(2, minmax(0, 1fr)); } .ict-m .px { font-size: 17px; } }
   .ict-tv > .ict-tv-c, .ict-tv > p, .ict-tv > form { margin: 10px 16px; } .ict-tv > form { margin-bottom: 16px; }
+  .ict-hr { display: grid; gap: 6px; justify-items: end; } .ict-src button { padding: 3px 12px; }
+  .ict-cal-nav { display: inline-flex; align-items: center; gap: 8px; } .ict-cal-nav b { font: 600 13px var(--sans); min-width: 220px; text-align: center; } .ict-cal-nav small { font: 600 12px var(--mono); margin-left: 6px; }
+  .ict-cal { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 6px; }
+  .ict-cal-h { font: 500 11px var(--sans); color: var(--ink-faint); text-align: center; padding-bottom: 2px; }
+  .ict-cal-d { all: unset; box-sizing: border-box; min-height: 64px; border-radius: 10px; border: 1px solid var(--line-soft); padding: 6px 8px; display: grid; align-content: start; gap: 2px; cursor: pointer; background: var(--panel); }
+  .ict-cal-d[disabled] { cursor: default; opacity: .55; }
+  .ict-cal-d .d { font: 500 11px var(--sans); color: var(--ink-faint); }
+  .ict-cal-d b { font: 600 13px var(--mono); } .ict-cal-d small { font: 500 10.5px var(--sans); color: var(--ink-faint); }
+  .ict-cal-d.up { background: color-mix(in srgb, #089981 calc(8% + var(--heat) * 30%), var(--panel)); border-color: color-mix(in srgb, #089981 35%, var(--line)); } .ict-cal-d.up b { color: #2ebd85; }
+  .ict-cal-d.dn { background: color-mix(in srgb, #f23645 calc(8% + var(--heat) * 30%), var(--panel)); border-color: color-mix(in srgb, #f23645 35%, var(--line)); } .ict-cal-d.dn b { color: #f7525f; }
+  .ict-cal-d.sel { outline: 2px solid var(--gold); outline-offset: 1px; } .ict-cal-d:focus-visible { outline: 2px solid var(--gold); }
+  .ict-cal-day { list-style: none; margin: 10px 0 0; padding: 0; display: grid; gap: 6px; }
+  .ict-cal-day li { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; border: 1px solid var(--line); border-radius: 10px; padding: 8px 10px; font-size: 12.5px; cursor: pointer; }
+  .ict-cal-day li:hover { border-color: var(--gold-line); } .ict-cal-day .m { font-family: var(--mono); color: var(--ink-dim); } .ict-cal-day small { color: var(--ink-faint); margin-left: auto; }
+  @media (max-width: 600px) { .ict-cal { gap: 3px; } .ict-cal-d { min-height: 48px; padding: 4px; } .ict-cal-d b { font-size: 10.5px; } .ict-cal-d small { display: none; } .ict-cal-nav b { min-width: 0; } .ict-hr { justify-items: start; } }
   /* Guest view (6 Nov): only the H4 gold chart with one trade setup */
   html[data-role="public"] .btab, html[data-role="public"] .top .tabs, html[data-role="public"] #ms-hdr-open, html[data-role="public"] #ms-alerts,
   html[data-role="public"] .top details.menu, html[data-role="public"] .top .ms-status, html[data-role="public"] .ms-offline-box { display: none !important; }
@@ -1095,7 +1110,7 @@
 // read-only and can write loss reviews only. Reviewer tokens are the SHA-256 of their password, matched with the user name.
 window.MS_USERS = { fred: { name: 'Fred', hash: '370aed697dc503aecee7d8faad5de775f4f7019c86e672e8d93f3df590527058', role: 'reviewer', ict: true },   // ict: the ICT desk (main reviewer and trader, owner 6 Nov)
  
-  orlando: { name: 'Orlando', hash: '037617a451df6fb39614002d57502a5f7bc240221b1715ed48280534cc478a06', role: 'viewer' },
+  orlando: { name: 'Orlando', hash: '037617a451df6fb39614002d57502a5f7bc240221b1715ed48280534cc478a06', role: 'viewer', ict: 'read' },   // ICT desk read-only (owner 6 Nov)
   luxus: { name: 'Luxus', hash: 'dccc5d01dabcd1c0b9fa89c91e7f4bde603121ee0172b4ff394e6bb30d295e41', role: 'viewer' },
   carlos: { name: 'Carlos', hash: '511d45febaa8559a9071091951613e559f0b8b12b3995e6c13c94c81fbee59f0', role: 'viewer' } };
 // users added or changed on the Users page live in council-data users.json ({ users: { key: { name, hash, role, disabled? } } }); they override the built-ins
@@ -1109,6 +1124,7 @@ window.msFetchUsers = function () { return fetch(window.MS_USERS_URL + '?t=' + D
   document.documentElement.dataset.role = owner ? 'owner' : R ? R.role : 'public';
   window.MS_WHO = owner ? 'owner' : R ? R.name : null;
   if (owner || (R && R.ict)) document.documentElement.dataset.ict = '1';   // ICT desk access (a separate edge, owner 6 Nov)
+  if (!owner && R && R.ict === 'read') document.documentElement.dataset.ictRo = '1';   // read-only desk (Orlando)
   var guest = null; try { guest = localStorage.getItem('ms-guest'); } catch (e) {}
   if (!owner && !R && !guest) document.documentElement.dataset.gate = '1'; if (guest && !owner && !R) document.documentElement.dataset.guest = '1'; })();
 // admin login: SHA-256 of the typed password against MS_ADMIN_HASH; the hash is kept as the session token
@@ -1128,7 +1144,7 @@ document.addEventListener('DOMContentLoaded', function () {
     var all = window.msMergeUsers(remote), R = all[u];
     if (!R || R.hash !== h) { try { localStorage.removeItem('ms-admin'); localStorage.removeItem('ms-user'); localStorage.removeItem('ms-user-rec'); } catch (e) {} location.reload(); return; }
     var rec = null; try { rec = JSON.parse(localStorage.getItem('ms-user-rec') || 'null'); } catch (e) {}
-    if (!rec || rec.role !== R.role || rec.name !== R.name || !!rec.ict !== !!R.ict) { try { localStorage.setItem('ms-user-rec', JSON.stringify({ key: u, name: R.name, role: R.role, hash: h, ict: !!R.ict })); } catch (e) {} if (!rec || rec.role !== R.role || !!rec.ict !== !!R.ict) location.reload(); }
+    if (!rec || rec.role !== R.role || rec.name !== R.name || (rec.ict || false) !== (R.ict || false)) { try { localStorage.setItem('ms-user-rec', JSON.stringify({ key: u, name: R.name, role: R.role, hash: h, ict: R.ict || false })); } catch (e) {} if (!rec || rec.role !== R.role || (rec.ict || false) !== (R.ict || false)) location.reload(); }
   });
 });
 // Sign-in card (6 Nov): first screen for anyone not signed in; "Continue as guest" opens the public view and is remembered
@@ -1148,7 +1164,7 @@ document.addEventListener('DOMContentLoaded', function () {
     var all = h === window.MS_ADMIN_HASH ? window.MS_USERS : window.msMergeUsers(await window.msFetchUsers());
     var un = Object.keys(all).find(function (k) { return all[k].hash === h; }), R = un && all[un];   // password only (6 Nov): each password belongs to one account
     if (h === window.MS_ADMIN_HASH) { try { localStorage.setItem('ms-admin', h); localStorage.removeItem('ms-user'); localStorage.removeItem('ms-guest'); } catch (e) {} location.reload(); return; }
-    if (R && h === R.hash) { try { localStorage.setItem('ms-admin', h); localStorage.setItem('ms-user', un); localStorage.setItem('ms-user-rec', JSON.stringify({ key: un, name: R.name, role: R.role, hash: h, ict: !!R.ict })); localStorage.removeItem('ms-guest'); } catch (e) {} location.reload(); return; }
+    if (R && h === R.hash) { try { localStorage.setItem('ms-admin', h); localStorage.setItem('ms-user', un); localStorage.setItem('ms-user-rec', JSON.stringify({ key: un, name: R.name, role: R.role, hash: h, ict: R.ict || false })); localStorage.removeItem('ms-guest'); } catch (e) {} location.reload(); return; }
     btn.disabled = false; btn.textContent = 'Sign in'; err.textContent = 'Wrong password.'; document.getElementById('ms-gate-p').select(); });
   if (gb) gb.addEventListener('click', function () { var was = document.documentElement.dataset.mode === 'public' && localStorage.getItem('ms-guest'); try { localStorage.setItem('ms-guest', '1'); } catch (e) {} if (was) msGate(false); else location.reload(); });
   if (x) x.addEventListener('click', function () { msGate(false); });
@@ -1248,7 +1264,7 @@ window.MS_ADMIN_HASH = '49c5624f2625ed8b42b6e1bf2819a3a41ddb9743aeca36ea34ea7eb9
   html[data-role="viewer"] .tv-ba [data-ba="save"] { display: none !important; }
   html[data-role="viewer"] .h-grid { grid-template-columns: minmax(0, 1fr); }
 </style>
-<style>html[data-role="reviewer"] .own{display:none!important} .ms-who{font-weight:600} html:not([data-ict]) .ictx{display:none!important}</style>
+<style>html[data-role="reviewer"] .own{display:none!important} .ms-who{font-weight:600} html:not([data-ict]) .ictx{display:none!important} html[data-ict-ro] .ict-rw{display:none!important}</style>
 <style>html[data-mode="public"] .adm{display:none!important} html[data-mode="admin"] .pubonly{display:none!important} .ms-admin-link{color:inherit;opacity:.6;text-decoration:underline dotted;cursor:pointer}</style>
 <style>.ho-sh{opacity:.8;font-weight:500} .c-act li.grp{display:block;padding:0;cursor:default} .c-act li.grp>details>summary{display:grid;grid-template-columns:auto 1fr auto;gap:4px 10px;align-items:center;padding:8px 10px;cursor:pointer;list-style:none} .c-act li.grp>details>summary::-webkit-details-marker{display:none} .c-act li.grp>details>summary .a-d::after{content:' \25BE'} .c-act li.grp>details[open]>summary .a-d::after{content:' \25B4'} .c-act ul.sub{margin:0 8px 8px;padding:0} .c-act ul.sub li{background:rgba(127,127,127,.04)}</style>
 </head>
@@ -1612,7 +1628,7 @@ window.MS_ADMIN_HASH = '49c5624f2625ed8b42b6e1bf2819a3a41ddb9743aeca36ea34ea7eb9
   <section class="view ictx" id="v-ict" aria-label="ICT desk" hidden>
     <div class="v-head ict-head">
       <div><h1 class="h-head">ICT desk</h1><p class="ms-note">US index futures · H1 iFVG reversal (sweep → inversion → 3R). A separate edge from the council. <span id="ict-run"></span></p></div>
-      <div class="ict-me" id="ict-me"></div>
+      <div class="ict-hr"><div class="ict-me" id="ict-me"></div><div class="ict-seg ict-src" id="ict-src" role="group" aria-label="Which signals"><button type="button" data-s="both" class="on">Both</button><button type="button" data-s="live">Live</button><button type="button" data-s="replay">Replay</button></div></div>
     </div>
     <div class="ict-mkts" id="ict-mkts" role="list" aria-label="Markets"></div>
     <div class="ict-kpi" id="ict-kpi" role="group" aria-label="Results"></div>
@@ -1627,6 +1643,11 @@ window.MS_ADMIN_HASH = '49c5624f2625ed8b42b6e1bf2819a3a41ddb9743aeca36ea34ea7eb9
       </div>
     </div>
     <div class="card ict-card">
+      <div class="ms-k"><span>P&amp;L calendar</span><span class="ict-cal-nav"><button type="button" class="ms-tbtn" id="ict-cal-prev" aria-label="Previous month">‹</button><b id="ict-cal-m"></b><button type="button" class="ms-tbtn" id="ict-cal-next" aria-label="Next month">›</button></span></div>
+      <div class="ict-cal" id="ict-cal"></div>
+      <ul class="ict-cal-day" id="ict-cal-day"></ul>
+    </div>
+    <div class="card ict-card">
       <div class="ms-k"><span>What works</span><small>closed signals split by each ICT feature · 3R target</small></div>
       <div class="ict-break" id="ict-break"></div>
     </div>
@@ -1634,11 +1655,11 @@ window.MS_ADMIN_HASH = '49c5624f2625ed8b42b6e1bf2819a3a41ddb9743aeca36ea34ea7eb9
       <div class="ms-k"><span>Signals</span>
         <span class="ict-f" id="ict-f" role="group" aria-label="Filter signals">
           <select id="ict-f-m" aria-label="Market"><option value="">All markets</option><option value="nq">NQ</option><option value="es">ES</option><option value="ym">YM</option><option value="rty">RTY</option></select>
-          <select id="ict-f-s" aria-label="Status"><option value="">All</option><option value="open">Open</option><option value="closed">Closed</option><option value="todo">Not reviewed</option><option value="taken">Taken by me</option></select>
+          <select id="ict-f-s" aria-label="Status"><option value="">All</option><option value="open">Open</option><option value="closed">Closed</option><option value="todo">Not reviewed</option><option value="taken" class="ict-rw">Taken by me</option></select>
         </span></div>
       <div class="ms-j-wrap t-scroll ict-tw"><table class="ms-j ict-t"><thead><tr><th>Signal</th><th>Market</th><th>Side</th><th>Grade</th><th>Session</th><th>Bias</th><th>Zone</th><th class="n">Entry</th><th class="n">Stop</th><th class="n">Target</th><th>Result</th><th>Review</th></tr></thead><tbody id="ict-body"><tr class="empty"><td colspan="12">Loading…</td></tr></tbody></table></div>
     </div>
-    <div class="ict-grid">
+    <div class="ict-grid ict-rw">
       <div class="card ict-card">
         <div class="ms-k"><span>My trading</span><small id="ict-mine-who"></small></div>
         <div id="ict-mine"></div>
@@ -1664,7 +1685,7 @@ window.MS_ADMIN_HASH = '49c5624f2625ed8b42b6e1bf2819a3a41ddb9743aeca36ea34ea7eb9
       <div class="tv-h"><div><h3 id="ict-tv-t">Signal</h3><p id="ict-tv-s"></p></div><div class="ict-tv-tf" role="group" aria-label="Timeframe"><button type="button" data-tf="h1" class="on">H1</button><button type="button" data-tf="m5">M5</button></div><button type="button" class="tv-x" id="ict-tv-x" aria-label="Close">×</button></div>
       <div class="ict-tv-c" id="ict-tv-c"></div>
       <p class="ms-note" id="ict-tv-n"></p>
-      <form class="ict-rv" id="ict-rv">
+      <form class="ict-rv ict-rw" id="ict-rv">
         <fieldset><legend>My trade</legend>
           <div class="ict-seg" id="ict-rv-act" role="group" aria-label="Did you take it"><button type="button" data-a="taken">Taken</button><button type="button" data-a="skipped">Skipped</button><button type="button" data-a="missed">Missed</button></div>
           <label>Fill <input id="ict-rv-fill" inputmode="decimal" autocomplete="off"></label>
@@ -4474,7 +4495,7 @@ function msNextSetup(bars, A) {
       });
     } }
   function showView() {
-    const [h0, sub] = location.hash.slice(1).split('/'), h = PUB ? 'guest' : h0 === 'guest' ? 'home' : VIEWER && !['home', 'setup', 'council'].includes(h0) ? 'home' : h0 === 'users' && document.documentElement.dataset.role !== 'owner' ? 'home' : h0 === 'ict' && !document.documentElement.dataset.ict ? 'home' : !h0 && document.documentElement.dataset.ict && document.documentElement.dataset.role === 'reviewer' ? 'ict' : h0, v = VIEWS.includes(h) ? h : 'home';
+    const [h0, sub] = location.hash.slice(1).split('/'), h = PUB ? 'guest' : h0 === 'guest' ? 'home' : VIEWER && !['home', 'setup', 'council'].concat(document.documentElement.dataset.ict ? ['ict'] : []).includes(h0) ? 'home' : h0 === 'users' && document.documentElement.dataset.role !== 'owner' ? 'home' : h0 === 'ict' && !document.documentElement.dataset.ict ? 'home' : !h0 && document.documentElement.dataset.ict && document.documentElement.dataset.role === 'reviewer' ? 'ict' : h0, v = VIEWS.includes(h) ? h : 'home';
     if (v === 'ict' && window.renderIct) setTimeout(window.renderIct, 0);
     if (v === 'users' && window.renderUsers) window.renderUsers();   // guests only get the H4 chart (owner, 6 Nov)
     if (v === 'council') setPane(sub || CPANE.cur, false);
@@ -4572,7 +4593,10 @@ function msNextSetup(bars, A) {
   const ago = (t) => { const m = Math.round((Date.now() / 1000 - t) / 60); return m < 60 ? `${m} min ago` : m < 1440 ? `${Math.round(m / 60)} h ago` : `${Math.round(m / 1440)} d ago`; };
   const gcls = (l) => (/^A/.test(l) ? 'ga' : /^B/.test(l) ? 'gb' : 'gc');
   const TAGS = [['sweep', 'Clean sweep'], ['fvg', 'Obvious FVG'], ['dol', 'Clear DOL'], ['bias', 'With HTF bias'], ['pd', 'Right side of P/D'], ['time', 'Good time'], ['against', 'Against bias'], ['chop', 'Consolidation'], ['news', 'News'], ['late', 'Late entry'], ['nodol', 'No target liquidity']];
-  const S = { trades: [], snap: null, bars: {}, desk: { reviews: {} }, f: { m: '', s: '' }, cur: null, tf: 'h1' };
+  const S = { trades: [], replay: [], replayInfo: null, snap: null, bars: {}, desk: { reviews: {} }, f: { m: '', s: '' }, cur: null, tf: 'h1', src: 'both', cal: null, calDay: null };
+  const RO = !!document.documentElement.dataset.ictRo;   // read-only desk (Orlando)
+  try { S.src = localStorage.getItem('ictSrc') || 'both'; } catch (e) {}
+  const all = () => (S.src === 'live' ? S.trades : S.src === 'replay' ? S.replay : S.trades.concat(S.replay));
   try { S.desk = JSON.parse(localStorage.getItem('ictDesk') || 'null') || S.desk; } catch (e) {}
   const saveLocal = () => { try { localStorage.setItem('ictDesk', JSON.stringify(S.desk)); } catch (e) {} };
   const tok = () => { try { return localStorage.getItem('msGhTok') || ''; } catch (e) { return ''; } };
@@ -4580,8 +4604,9 @@ function msNextSetup(bars, A) {
   const mergeDesk = (remote) => { for (const [id, r] of Object.entries((remote && remote.reviews) || {})) { const l = S.desk.reviews[id]; if (!l || (r.at || 0) > (l.at || 0)) S.desk.reviews[id] = r; } };
 
   async function load() {
-    const [t, s, b, d] = await Promise.all([get('trades.json'), get('snapshot.json'), get('bars.json'), get('desk.json')]);
+    const [t, s, b, d, r] = await Promise.all([get('trades.json'), get('snapshot.json'), get('bars.json'), get('desk.json'), get('replay.json')]);
     if (t) S.trades = t; if (s) S.snap = s; if (b) S.bars = b; if (d) { mergeDesk(d); saveLocal(); }
+    if (r && r.trades) { S.replay = r.trades; S.replayInfo = r; }
     render();
   }
   const liveR = (x) => { const m = S.snap && S.snap.markets[x.market]; if (!m || x.status !== 'open') return null; return ((x.side === 'buy' ? 1 : -1) * (m.price - x.entry)) / x.r0; };
@@ -4589,9 +4614,11 @@ function msNextSetup(bars, A) {
 
   function render() {
     if ($('v-ict').hidden) return;
-    const T = S.trades.slice().sort((a, b) => b.opened - a.opened), C = T.filter((x) => x.closed), O = T.filter((x) => x.status === 'open'), snap = S.snap;
-    $('ict-me').innerHTML = `Desk of <b>${esc(who)}</b>${window.MS_WHO && window.MS_WHO !== 'owner' ? ' · main reviewer and trader' : ''}`;
-    $('ict-run').textContent = snap ? `Tracker checked ${ago(Date.parse(snap.at) / 1000)}${Object.keys(snap.errors || {}).length ? ` · feed issue: ${Object.keys(snap.errors).join(', ').toUpperCase()}` : ''}.` : 'Waiting for the first tracker run.';
+    const T = all().slice().sort((a, b) => b.opened - a.opened), C = T.filter((x) => x.closed), O = T.filter((x) => x.status === 'open'), snap = S.snap;
+    $('ict-me').innerHTML = `Desk of <b>${esc(who)}</b>${RO ? ' · read-only' : window.MS_WHO && window.MS_WHO !== 'owner' ? ' · main reviewer and trader' : ''}`;
+    $('ict-src').querySelectorAll('button').forEach((b) => { const on = b.dataset.s === S.src; b.classList.toggle('on', on); b.setAttribute('aria-pressed', String(on)); });
+    renderCal(T);
+    $('ict-run').textContent = snap ? `Tracker checked ${ago(Date.parse(snap.at) / 1000)}${Object.keys(snap.errors || {}).length ? ` · feed issue: ${Object.keys(snap.errors).join(', ').toUpperCase()}` : ''}.${S.replayInfo ? ` Replay since ${S.replayInfo.from}: ${S.replay.length} signals.` : ''}` : 'Waiting for the first tracker run.';
     // markets
     const mk = snap ? snap.markets : {};
     $('ict-mkts').innerHTML = ['nq', 'es', 'ym', 'rty'].map((k) => { const m = mk[k], o = O.find((x) => x.market === k);
@@ -4614,7 +4641,7 @@ function msNextSetup(bars, A) {
       : '<li class="empty">No open signal. The tracker checks NQ, ES, YM and RTY every 15 minutes.</li>';
     // equity (3R and 2R)
     const Cs = C.slice().sort((a, b) => a.closed - b.closed), pts = (f) => { let e = 0; return [0].concat(Cs.map((x) => (e += f(x)))); };
-    const A = pts((x) => x.R), B = pts((x) => x.R2 ?? x.R), all = A.concat(B), lo = Math.min(0, ...all), hi = Math.max(1, ...all), W = 600, Hh = 180;
+    const A = pts((x) => x.R), B = pts((x) => x.R2 ?? x.R), allv = A.concat(B), lo = Math.min(0, ...allv), hi = Math.max(1, ...allv), W = 600, Hh = 180;
     const path = (P) => P.map((v, i) => `${i ? 'L' : 'M'}${((i / Math.max(1, P.length - 1)) * W).toFixed(1)},${(Hh - 8 - ((v - lo) / (hi - lo || 1)) * (Hh - 16)).toFixed(1)}`).join('');
     const y0 = (Hh - 8 - ((0 - lo) / (hi - lo || 1)) * (Hh - 16)).toFixed(1);
     $('ict-eq').innerHTML = Cs.length ? `<svg viewBox="0 0 ${W} ${Hh}" preserveAspectRatio="none" role="img" aria-label="Equity: ${fR(R3)} with the 3R target, ${fR(R2)} with 2R"><line x1="0" x2="${W}" y1="${y0}" y2="${y0}" stroke="var(--line-strong)" stroke-dasharray="3 4"/><path d="${path(B)}" fill="none" stroke="#6f8fd6" stroke-width="2" vector-effect="non-scaling-stroke"/><path d="${path(A)}" fill="none" stroke="var(--gold)" stroke-width="2" vector-effect="non-scaling-stroke"/></svg>`
@@ -4631,9 +4658,9 @@ function msNextSetup(bars, A) {
     const L = T.filter((x) => (!S.f.m || x.market === S.f.m) && (!S.f.s || (S.f.s === 'open' ? x.status === 'open' : S.f.s === 'closed' ? !!x.closed : S.f.s === 'todo' ? x.closed && !(myRev(x) && myRev(x).at) : (myRev(x) || {}).act === 'taken')));
     $('ict-body').innerHTML = L.length ? L.slice(0, 300).map((x) => { const rv = myRev(x), r = x.closed ? x.R : liveR(x);
       return `<tr data-id="${esc(x.id)}" tabindex="0"><td>${tm(x.signalAt)}</td><td><b>${esc(x.short)}</b></td><td><span class="ms-chip ${x.side === 'sell' ? 'ms-chip-sell' : 'ms-chip-buy'}">${x.side.toUpperCase()}</span></td><td><span class="ict-g ${gcls(x.grade.letter)}">${esc(x.grade.letter)}</span></td><td>${esc(x.feat.session)}</td><td>${esc(x.feat.bias || '—')}</td><td>${esc(x.feat.zone || '—')}</td>`
-        + `<td class="n">${fx(x.entry, x.market)}</td><td class="n">${fx(x.stop, x.market)}</td><td class="n">${fx(x.t1, x.market)}</td><td class="${cls(r)}">${x.closed ? `${x.status === 'win' ? 'Win' : x.status === 'loss' ? 'Loss' : 'Flat'} ${fR(r)}${x.exit === 'time' ? ' <small>48 h</small>' : ''}` : `Open ${fR(r)}`}</td>`
+        + `<td class="n">${fx(x.entry, x.market)}</td><td class="n">${fx(x.stop, x.market)}</td><td class="n">${fx(x.t1, x.market)}</td><td class="${cls(r)}">${x.closed ? `${x.status === 'win' ? 'Win' : x.status === 'loss' ? 'Loss' : 'Flat'} ${fR(r)}${x.exit === 'time' ? ' <small>48 h</small>' : ''}${x.replay ? ' <span class="ict-pill">replay</span>' : ''}` : `Open ${fR(r)}`}</td>`
         + `<td>${rv ? `${rv.act ? `<span class="ict-pill">${esc(rv.act)}</span> ` : ''}${rv.grade ? `<span class="ict-g ${gcls(rv.grade)}">${esc(rv.grade)}</span>` : ''}${rv.text ? ' ✎' : ''}` : '<span class="ms-note">—</span>'}</td></tr>`; }).join('')
-      : `<tr class="empty"><td colspan="12">${S.trades.length ? 'No signal matches the filter.' : 'No signal yet. The first ones appear after an H1 sweep and inversion on NQ, ES, YM or RTY.'}</td></tr>`;
+      : `<tr class="empty"><td colspan="12">${all().length ? 'No signal matches the filter.' : 'No signal yet. The first ones appear after an H1 sweep and inversion on NQ, ES, YM or RTY.'}</td></tr>`;
     // my trading
     $('ict-mine-who').textContent = esc(who);
     const tk = mine.filter((x) => myRev(x).r != null && myRev(x).r !== ''), myR = tk.reduce((s, x) => s + +myRev(x).r, 0), sk = T.filter((x) => (myRev(x) || {}).act === 'skipped'), skR = sk.filter((x) => x.closed).reduce((s, x) => s + x.R, 0);
@@ -4642,6 +4669,33 @@ function msNextSetup(bars, A) {
     $('ict-sync').textContent = tok() ? 'GitHub connected' : 'This browser only';
     $('ict-gh').textContent = tok() ? 'GitHub connected' : 'Connect GitHub';
   }
+  // P&L calendar (closed signals by the local day they closed); a day lists its signals
+  const dkey = (t) => { const d = new Date(t * 1000); return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`; };
+  function renderCal(T) {
+    const C = T.filter((x) => x.closed), byDay = {};
+    C.forEach((x) => { (byDay[dkey(x.closed)] = byDay[dkey(x.closed)] || []).push(x); });
+    if (!S.cal) { const d = new Date(); S.cal = { y: d.getFullYear(), m: d.getMonth() }; }
+    const { y, m } = S.cal, first = new Date(y, m, 1), days = new Date(y, m + 1, 0).getDate(), lead = (first.getDay() + 6) % 7;
+    const mon = C.filter((x) => { const d = new Date(x.closed * 1000); return d.getFullYear() === y && d.getMonth() === m; }), mR = mon.reduce((a, x) => a + x.R, 0);
+    $('ict-cal-m').innerHTML = `${first.toLocaleString('en-GB', { month: 'long', year: 'numeric' })} <small class="${cls(mR)}">${mon.length ? `${fR(mR)} · ${mon.length} signals` : 'no closed signals'}</small>`;
+    const vals = Object.entries(byDay).filter(([k]) => k.startsWith(`${y}-${String(m + 1).padStart(2, '0')}`)).map(([, a]) => Math.abs(a.reduce((s, x) => s + x.R, 0))), mx = Math.max(3, ...vals);
+    let h = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].map((d) => `<div class="ict-cal-h">${d}</div>`).join('') + '<div></div>'.repeat(lead);
+    const wk = []; let wR = 0, wn = 0;
+    for (let d = 1; d <= days; d++) {
+      const k = `${y}-${String(m + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`, a = byDay[k] || [], R = a.reduce((s, x) => s + x.R, 0);
+      const heat = a.length ? Math.min(1, Math.abs(R) / mx) : 0, rp = a.filter((x) => x.replay).length;
+      h += `<button type="button" class="ict-cal-d${a.length ? (R > 0 ? ' up' : R < 0 ? ' dn' : ' fl') : ''}${S.calDay === k ? ' sel' : ''}" data-k="${k}" style="--heat:${heat.toFixed(2)}"${a.length ? '' : ' disabled'} aria-label="${d} ${first.toLocaleString('en-GB', { month: 'long' })}: ${a.length ? `${fR(R)}, ${a.length} signals` : 'no signals'}"><span class="d">${d}</span>${a.length ? `<b>${fR(R)}</b><small>${a.length}${rp && rp < a.length ? ` · ${rp} replay` : ''}</small>` : ''}</button>`;
+    }
+    $('ict-cal').innerHTML = h;
+    const sel = S.calDay && byDay[S.calDay];
+    $('ict-cal-day').innerHTML = sel ? sel.sort((a, b) => a.closed - b.closed).map((x) => `<li data-id="${esc(x.id)}" tabindex="0"><span class="ms-chip ${x.side === 'sell' ? 'ms-chip-sell' : 'ms-chip-buy'}">${x.side.toUpperCase()}</span><b>${esc(x.short)}</b><span class="ict-g ${gcls(x.grade.letter)}">${esc(x.grade.letter)}</span><span>${esc(x.feat.session)}</span><span class="m">${fx(x.entry, x.market)} → ${fx(x.exitPx, x.market)}</span><b class="${cls(x.R)}">${fR(x.R)}</b><small>${x.replay ? 'replay' : 'live'} · ${esc(x.exit || '')}</small></li>`).join('') : '';
+  }
+  $('ict-cal').addEventListener('click', (ev) => { const b = ev.target.closest('[data-k]'); if (!b) return; S.calDay = S.calDay === b.dataset.k ? null : b.dataset.k; render(); });
+  $('ict-cal-day').addEventListener('click', openFrom0);
+  $('ict-cal-prev').addEventListener('click', () => { S.cal.m--; if (S.cal.m < 0) { S.cal.m = 11; S.cal.y--; } S.calDay = null; render(); });
+  $('ict-cal-next').addEventListener('click', () => { S.cal.m++; if (S.cal.m > 11) { S.cal.m = 0; S.cal.y++; } S.calDay = null; render(); });
+  $('ict-src').addEventListener('click', (ev) => { const b = ev.target.closest('button'); if (!b) return; S.src = b.dataset.s; try { localStorage.setItem('ictSrc', S.src); } catch (e) {} render(); });
+  function openFrom0(ev) { const el = ev.target.closest('[data-id]'); if (el) openSig(el.dataset.id); }
   window.renderIct = () => { render(); };
 
   // ─── chart dialog + review ───
@@ -4667,7 +4721,7 @@ function msNextSetup(bars, A) {
     $('ict-tv-n').textContent = raw.length ? `${S.tf.toUpperCase()} candles from Yahoo (about 10 min delayed). The tracker keeps the last ${S.tf === 'h1' ? '400 hours' : '600 five-minute candles'}; older signals may sit before the first candle.` : 'Candles appear after the tracker\'s next run.';
   }
   function openSig(id) {
-    const x = S.trades.find((t) => t.id === id); if (!x) return; S.cur = x;
+    const x = S.trades.concat(S.replay).find((t) => t.id === id); if (!x) return; S.cur = x;
     const f = x.feat, g = x.grade;
     $('ict-tv-t').innerHTML = `<span class="ms-chip ${x.side === 'sell' ? 'ms-chip-sell' : 'ms-chip-buy'}">${x.side.toUpperCase()}</span> ${esc(x.label)} <span class="ict-g ${gcls(g.letter)}">${esc(g.letter)}</span>`;
     $('ict-tv-s').textContent = `Signal ${tm(x.signalAt)} · ${f.session} · bias ${f.bias || 'n/a'} · ${f.zone || 'n/a'}${f.pdSweep ? ' · prev-day level swept' : ''} · grade ${g.total}/10 (strength ${g.strength}/4, speed ${g.speed}/3, room ${g.rr}/3) · `
