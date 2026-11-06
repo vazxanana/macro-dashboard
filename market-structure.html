@@ -741,23 +741,101 @@
 <script>
 // Public / admin split (6 Nov): the public page shows trades and chart markups only; the admin view (rule texts, setups, scanner,
 // shadow trades, scorecards, reviews) opens with the admin password. The password is never stored: only its SHA-256 is compared.
-(function () { var h = null; try { h = localStorage.getItem('ms-admin'); } catch (e) {}
-  document.documentElement.dataset.mode = h === '49c5624f2625ed8b42b6e1bf2819a3a41ddb9743aeca36ea34ea7eb96c252ca8' ? 'admin' : 'public'; })();
+// Accounts (6 Nov): the owner (admin, everything) and reviewers (user name + password): reviewers see the whole admin view
+// read-only and can write loss reviews only. Reviewer tokens are the SHA-256 of their password, matched with the user name.
+window.MS_USERS = { fred: { name: 'Fred', hash: '370aed697dc503aecee7d8faad5de775f4f7019c86e672e8d93f3df590527058', role: 'reviewer' } };
+(function () { var h = null, u = null; try { h = localStorage.getItem('ms-admin'); u = localStorage.getItem('ms-user'); } catch (e) {}
+  var R = u && window.MS_USERS[u] && window.MS_USERS[u].hash === h ? window.MS_USERS[u] : null, owner = h === '49c5624f2625ed8b42b6e1bf2819a3a41ddb9743aeca36ea34ea7eb96c252ca8' && !u;
+  document.documentElement.dataset.mode = owner || R ? 'admin' : 'public';
+  document.documentElement.dataset.role = owner ? 'owner' : R ? R.role : 'public';
+  window.MS_WHO = owner ? 'owner' : R ? R.name : null;
+  var guest = null; try { guest = localStorage.getItem('ms-guest'); } catch (e) {}
+  if (!owner && !R && !guest) document.documentElement.dataset.gate = '1'; if (guest && !owner && !R) document.documentElement.dataset.guest = '1'; })();
 // admin login: SHA-256 of the typed password against MS_ADMIN_HASH; the hash is kept as the session token
 async function msSha256(t) { const b = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(t)); return Array.from(new Uint8Array(b)).map((x) => x.toString(16).padStart(2, '0')).join(''); }
-document.addEventListener('DOMContentLoaded', function () { var pub = document.documentElement.dataset.mode !== 'admin', a = document.getElementById('ms-admin-link'); if (!a) return;
-  a.textContent = pub ? 'Admin login' : 'Log out';
-  a.addEventListener('click', async function (ev) { ev.preventDefault();
-    if (!pub) { try { localStorage.removeItem('ms-admin'); } catch (e) {} location.hash = '#home'; location.reload(); return; }
-    var pw = prompt('Admin password'); if (!pw) return; var h = '';
-    try { h = await msSha256(pw); } catch (e) { alert('This browser cannot verify the password (it needs https).'); return; }
-    if (h === window.MS_ADMIN_HASH) { try { localStorage.setItem('ms-admin', h); } catch (e) {} location.reload(); } else alert('Wrong password.'); }); });
+document.addEventListener('DOMContentLoaded', function () { var pub = document.documentElement.dataset.mode !== 'admin', a = document.getElementById('ms-admin-link'), w = document.getElementById('ms-who');
+  if (w && window.MS_WHO) w.textContent = window.MS_WHO === 'owner' ? 'admin' : `${window.MS_WHO} (reviewer: read-only, loss reviews)`; if (!a) return;
+  a.textContent = pub ? 'Log in' : `Log out${window.MS_WHO && window.MS_WHO !== 'owner' ? ` (${window.MS_WHO})` : ''}`;
+  a.addEventListener('click', function (ev) { ev.preventDefault();
+    if (!pub) { try { localStorage.removeItem('ms-admin'); localStorage.removeItem('ms-user'); localStorage.removeItem('ms-guest'); } catch (e) {} location.hash = '#home'; location.reload(); return; }
+    msGate(true); }); });
+// Sign-in card (6 Nov): first screen for anyone not signed in; "Continue as guest" opens the public view and is remembered
+function msGate(show) {
+  var g = document.getElementById('ms-gate'); if (!g) return;
+  if (show) { document.documentElement.dataset.gate = '1'; setTimeout(function () { var u = document.getElementById('ms-gate-u'); if (u) u.focus(); }, 30); }
+  else delete document.documentElement.dataset.gate;
+}
+document.addEventListener('DOMContentLoaded', function () {
+  var f = document.getElementById('ms-gate-f'), err = document.getElementById('ms-gate-err'), gb = document.getElementById('ms-gate-guest'), x = document.getElementById('ms-gate-x');
+  if (document.documentElement.dataset.gate) setTimeout(function () { var u = document.getElementById('ms-gate-u'); if (u) u.focus(); }, 30);
+  if (f) f.addEventListener('submit', async function (ev) { ev.preventDefault();
+    var un = (document.getElementById('ms-gate-u').value || '').trim().toLowerCase(), pw = document.getElementById('ms-gate-p').value || '', h = '', btn = document.getElementById('ms-gate-go');
+    err.textContent = ''; if (!pw) { err.textContent = 'Type your password.'; document.getElementById('ms-gate-p').focus(); return; }
+    btn.disabled = true; btn.textContent = 'Signing in…';
+    try { h = await msSha256(pw); } catch (e) { err.textContent = 'This browser cannot check the password (the page needs https).'; btn.disabled = false; btn.textContent = 'Sign in'; return; }
+    var R = un && window.MS_USERS[un];
+    if ((!un || un === 'owner' || un === 'admin') && h === window.MS_ADMIN_HASH) { try { localStorage.setItem('ms-admin', h); localStorage.removeItem('ms-user'); localStorage.removeItem('ms-guest'); } catch (e) {} location.reload(); return; }
+    if (R && h === R.hash) { try { localStorage.setItem('ms-admin', h); localStorage.setItem('ms-user', un); localStorage.removeItem('ms-guest'); } catch (e) {} location.reload(); return; }
+    btn.disabled = false; btn.textContent = 'Sign in'; err.textContent = 'Wrong user name or password.'; document.getElementById('ms-gate-p').select(); });
+  if (gb) gb.addEventListener('click', function () { var was = document.documentElement.dataset.mode === 'public' && localStorage.getItem('ms-guest'); try { localStorage.setItem('ms-guest', '1'); } catch (e) {} if (was) msGate(false); else location.reload(); });
+  if (x) x.addEventListener('click', function () { msGate(false); });
+  document.addEventListener('keydown', function (ev) { if (ev.key === 'Escape' && document.documentElement.dataset.gate && localStorage.getItem('ms-guest')) msGate(false); });
+});
 window.MS_ADMIN_HASH = '49c5624f2625ed8b42b6e1bf2819a3a41ddb9743aeca36ea34ea7eb96c252ca8';
 </script>
+<style>
+  .gate { display: none; }
+  html[data-gate] .gate { display: grid; place-items: center; position: fixed; inset: 0; z-index: 100; padding: 24px 16px; overflow-y: auto; background: radial-gradient(900px 480px at 50% -10%, rgba(91,140,255,.10), transparent 70%), #08090c; }
+  html[data-gate] body { overflow: hidden; }
+  html[data-gate] #ms-live { visibility: hidden; }
+  .gate-card { width: min(400px, 100%); background: #0f1116; border: 1px solid rgba(255,255,255,.08); border-radius: 16px; padding: 28px 28px 22px; box-shadow: 0 30px 80px rgba(0,0,0,.55); color: #eceef2; font: 14px/1.5 Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+  .gate-brand { display: flex; align-items: center; gap: 10px; font-weight: 600; color: #a4abb8; margin-bottom: 18px; }
+  .gate-brand .ms-coin { width: 22px; height: 22px; }
+  .gate-x { margin-left: auto; width: 36px; height: 36px; border: 0; border-radius: 8px; background: none; color: #737b8a; font-size: 22px; cursor: pointer; display: none; }
+  html[data-gate][data-guest] .gate-x { display: inline-block; }
+  .gate-x:hover { background: rgba(255,255,255,.05); color: #eceef2; }
+  .gate h1 { font: 600 24px/1.2 Inter, -apple-system, sans-serif; letter-spacing: -.4px; margin: 0 0 6px; }
+  .gate-sub { margin: 0 0 20px; color: #a4abb8; font-size: 13.5px; }
+  .gate form { display: grid; gap: 6px; }
+  .gate label { font: 500 13px Inter, -apple-system, sans-serif; color: #c9ced8; margin-top: 6px; }
+  .gate input { min-height: 44px; padding: 10px 12px; border-radius: 10px; border: 1px solid rgba(255,255,255,.12); background: #14171e; color: #eceef2; font: 15px Inter, -apple-system, sans-serif; outline: none; transition: border-color .15s ease-out, box-shadow .15s ease-out; }
+  .gate input::placeholder { color: #8b93a3; }
+  .gate input:focus { border-color: #5b8cff; box-shadow: 0 0 0 3px rgba(91,140,255,.22); }
+  .gate-err { min-height: 20px; margin: 4px 0 0; color: #ff7d92; font-size: 13px; }
+  .gate-go, .gate-guest { min-height: 44px; border-radius: 10px; font: 600 14px Inter, -apple-system, sans-serif; cursor: pointer; transition: background .15s ease-out, border-color .15s ease-out; touch-action: manipulation; }
+  .gate-go { border: 0; background: #5b8cff; color: #fff; margin-top: 4px; }
+  .gate-go:hover { background: #4a7bf0; } .gate-go:disabled { opacity: .6; cursor: progress; }
+  .gate-guest { width: 100%; border: 1px solid rgba(255,255,255,.14); background: transparent; color: #eceef2; }
+  .gate-guest:hover { background: rgba(255,255,255,.04); border-color: rgba(255,255,255,.24); }
+  .gate-go:focus-visible, .gate-guest:focus-visible, .gate-x:focus-visible { outline: 2px solid #5b8cff; outline-offset: 2px; }
+  .gate-or { display: flex; align-items: center; gap: 12px; margin: 18px 0 14px; color: #737b8a; font-size: 12.5px; }
+  .gate-or::before, .gate-or::after { content: ""; flex: 1; height: 1px; background: rgba(255,255,255,.08); }
+  .gate-note { margin: 10px 0 0; text-align: center; color: #8b93a3; font-size: 12.5px; }
+  @media (prefers-reduced-motion: reduce) { .gate input, .gate-go, .gate-guest { transition: none; } }
+</style>
+<style>html[data-role="reviewer"] .own{display:none!important} .ms-who{font-weight:600}</style>
 <style>html[data-mode="public"] .adm{display:none!important} html[data-mode="admin"] .pubonly{display:none!important} .ms-admin-link{color:inherit;opacity:.6;text-decoration:underline dotted;cursor:pointer}</style>
 <style>.ho-sh{opacity:.8;font-weight:500} .c-act li.grp{display:block;padding:0;cursor:default} .c-act li.grp>details>summary{display:grid;grid-template-columns:auto 1fr auto;gap:4px 10px;align-items:center;padding:8px 10px;cursor:pointer;list-style:none} .c-act li.grp>details>summary::-webkit-details-marker{display:none} .c-act li.grp>details>summary .a-d::after{content:' \25BE'} .c-act li.grp>details[open]>summary .a-d::after{content:' \25B4'} .c-act ul.sub{margin:0 8px 8px;padding:0} .c-act ul.sub li{background:rgba(127,127,127,.04)}</style>
 </head>
 <body>
+<div class="gate" id="ms-gate" role="dialog" aria-modal="true" aria-labelledby="ms-gate-t">
+  <div class="gate-card">
+    <div class="gate-brand"><i class="ms-coin" aria-hidden="true"></i><span>Mosha council</span><button type="button" class="gate-x" id="ms-gate-x" aria-label="Close sign-in">×</button></div>
+    <h1 id="ms-gate-t">Sign in</h1>
+    <p class="gate-sub">Trades, results and chart markups from the council. Sign in for the full view.</p>
+    <form id="ms-gate-f" novalidate>
+      <label for="ms-gate-u">User name</label>
+      <input id="ms-gate-u" name="username" autocomplete="username" autocapitalize="none" spellcheck="false" placeholder="Leave empty if you are the owner">
+      <label for="ms-gate-p">Password</label>
+      <input id="ms-gate-p" name="password" type="password" autocomplete="current-password">
+      <p class="gate-err" id="ms-gate-err" role="alert"></p>
+      <button type="submit" class="gate-go" id="ms-gate-go">Sign in</button>
+    </form>
+    <div class="gate-or"><span>or</span></div>
+    <button type="button" class="gate-guest" id="ms-gate-guest">Continue as guest</button>
+    <p class="gate-note">Guests see the trades, results and chart markups.</p>
+  </div>
+</div>
 <div class="ms-live app" id="ms-live" data-chart="dark">
 
   <header class="top">
@@ -792,17 +870,17 @@ window.MS_ADMIN_HASH = '49c5624f2625ed8b42b6e1bf2819a3a41ddb9743aeca36ea34ea7eb9
           <div class="menu-row">
             <button type="button" class="ms-tbtn" id="ms-theme">Light charts</button>
             <button type="button" class="ms-tbtn" id="ms-fit">Reset view</button>
-            <label class="ms-tbtn" for="ms-csv">Load CSV</label>
+            <label class="ms-tbtn own" for="ms-csv">Load CSV</label>
             <input type="file" id="ms-csv" accept=".csv,text/csv" hidden>
           </div>
           <span class="ms-err" id="ms-csv-err" role="status"></span>
-          <div class="menu-h">Telegram alerts</div>
-          <div class="ms-tg">
+          <div class="menu-h own">Telegram alerts</div>
+          <div class="ms-tg own">
             <label for="ms-tg-token">Bot token</label><input id="ms-tg-token" type="password" autocomplete="off" spellcheck="false" placeholder="123456789:AA…">
             <label for="ms-tg-chat">Chat ID</label><input id="ms-tg-chat" autocomplete="off" inputmode="numeric" placeholder="123456789">
           </div>
-          <div class="menu-row"><button type="button" class="ms-tbtn" id="ms-tg-test">Send test</button><span class="ms-err" id="ms-tg-msg" role="status"></span></div>
-          <p class="ms-note" style="margin:0">In Telegram, message <b>@BotFather</b>, send /newbot and paste the token here. Send your new bot any message, then get your chat ID from <b>@userinfobot</b>. Both stay in this browser only. Alerts go out while this page is open and Alerts are on.</p>
+          <div class="menu-row own"><button type="button" class="ms-tbtn" id="ms-tg-test">Send test</button><span class="ms-err" id="ms-tg-msg" role="status"></span></div>
+          <p class="ms-note own" style="margin:0">In Telegram, message <b>@BotFather</b>, send /newbot and paste the token here. Send your new bot any message, then get your chat ID from <b>@userinfobot</b>. Both stay in this browser only. Alerts go out while this page is open and Alerts are on.</p>
         </div>
       </details>
     </div>
@@ -893,7 +971,7 @@ window.MS_ADMIN_HASH = '49c5624f2625ed8b42b6e1bf2819a3a41ddb9743aeca36ea34ea7eb9
     <div class="card">
       <div class="ms-k">Possible trades <span class="ms-tr-tools"><span class="seg ms-fseg" id="ms-tr-filter" role="group" aria-label="Filter trades"><button type="button" data-f="all" data-label="All">All</button><button type="button" data-f="ready" data-label="Ready">Ready</button><button type="button" data-f="main" data-label="Main">Main</button><button type="button" data-f="retrace" data-label="Retrace">Retrace</button></span><span class="ms-risk"><label for="ms-risk">Risk per trade $</label><input id="ms-risk" type="number" min="1" step="10" value="100" inputmode="decimal"></span></span></div>
       <div class="ms-trades" id="ms-trades"><div class="ms-note">Waiting for live candles…</div></div>
-      <div class="ms-tr-foot"><span class="ms-note">Tap a trade to draw it on the charts. Setups follow the Mosha rules and are not financial advice.</span><button type="button" class="ms-tbtn" id="ms-log">Log selected trade</button></div>
+      <div class="ms-tr-foot"><span class="ms-note">Tap a trade to draw it on the charts. Setups follow the Mosha rules and are not financial advice.</span><button type="button" class="ms-tbtn own" id="ms-log">Log selected trade</button></div>
     </div>
   </section>
 
@@ -1044,7 +1122,7 @@ window.MS_ADMIN_HASH = '49c5624f2625ed8b42b6e1bf2819a3a41ddb9743aeca36ea34ea7eb9
 
   <!-- ─── Journal ─── -->
   <section class="view" id="v-journal" aria-label="Journal" hidden>
-    <div class="card adm" id="ms-j-card">
+    <div class="card adm own" id="ms-j-card">
       <div class="ms-k">Trade journal <span class="ms-scan-meta"><label class="c-mine" hidden style="display:none"><input type="checkbox" id="ms-auto2" checked> Auto paper-trade</label><button type="button" class="ms-tbtn" id="ms-j-csv">Export CSV</button></span></div>
       <div id="ms-j-stats" class="ms-j-stats"></div>
       <div class="c-eq" id="ms-j-eq"></div>
@@ -1061,7 +1139,7 @@ window.MS_ADMIN_HASH = '49c5624f2625ed8b42b6e1bf2819a3a41ddb9743aeca36ea34ea7eb9
 
 
 
-  <p class="foot">Live candles from Binance and Kraken public feeds; gold is aligned to XAU/USD spot via gold-api.com. Times are in your local zone.<br>Version 6 Nov 2026 · public view<span class="adm"> · admin</span> · <a class="ms-admin-link" id="ms-admin-link"></a></p>
+  <p class="foot">Live candles from Binance and Kraken public feeds; gold is aligned to XAU/USD spot via gold-api.com. Times are in your local zone.<br>Version 6 Nov 2026 · public view<span class="adm"> · <span class="ms-who" id="ms-who">admin</span></span> · <a class="ms-admin-link" id="ms-admin-link"></a></p>
   <nav class="btab" aria-label="Main sections">
     <a href="#home" data-go="home"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M3 11l9-7 9 7v9a1 1 0 01-1 1h-5v-6H9v6H4a1 1 0 01-1-1z"></path></svg>Home</a>
     <a href="#setup" data-go="setup" class="adm"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 6h16M4 12h10M4 18h6"></path></svg>Setup</a>
@@ -3413,7 +3491,7 @@ function msNextSetup(bars, A) {
       const sh = a.filter((x) => x.shadow).length, cand = ((ow.candidates || []).filter((c) => c.k === x0.k));
       return `<details class="loss-g" data-g="${esc(key)}"${window.LOSS_OPEN.has(key) ? ' open' : ''}><summary><b>${esc(x0.name)}</b> <small>${esc(x0.pair || '')} · ${esc(x0.k)}</small><span class="loss-n">${a.length} loss${a.length > 1 ? 'es' : ''}${sh ? ` (${sh} shadow)` : ''} · <b class="neg">${R.toFixed(1)}R</b> · reviewed ${rv.length}/${a.length}</span>${top ? `<span class="loss-top">Your reasons: ${top}</span>` : ''}${cand.length ? `<span class="loss-top">Council: ${cand.map((c) => `${esc(rvTagName(c.tag))} in ${c.n} of ${c.of} reviewed, queued to test`).join('; ')}</span>` : ''}</summary>
         <ul class="loss-rows">${a.slice(0, 60).map((x) => { const r = RV.map[x.id], done = r && !r.draft;
-          return `<li data-lid="${esc(x.id)}" tabindex="0" title="Open the chart and review this loss"><span>${ftime(x.closed + TZ)}</span><b>${esc(x.label)}</b><span class="chip ${x.side}">${x.side.toUpperCase()}</span><b class="neg">${x.R != null ? x.R : -1}R</b><span class="loss-why">${x.shadow ? `shadow · ${esc((x.blockedBy || []).join(', '))}` : 'live'}${x.pm && x.pm.title ? ` · council: ${esc(x.pm.title)}` : ''}</span><span class="loss-st ${done ? 'ok' : ''}">${done ? `✓ ${esc((r.tags || []).map(rvTagName).join(', ') || 'reviewed')}` : r && r.draft ? 'draft' : 'review'}</span></li>`; }).join('')}${a.length > 60 ? `<li class="loss-more">${a.length - 60} older losses not shown; narrow the filter.</li>` : ''}</ul></details>`;
+          return `<li data-lid="${esc(x.id)}" tabindex="0" title="Open the chart and review this loss"><span>${ftime(x.closed + TZ)}</span><b>${esc(x.label)}</b><span class="chip ${x.side}">${x.side.toUpperCase()}</span><b class="neg">${x.R != null ? x.R : -1}R</b><span class="loss-why">${x.shadow ? `shadow · ${esc((x.blockedBy || []).join(', '))}` : 'live'}${x.pm && x.pm.title ? ` · council: ${esc(x.pm.title)}` : ''}</span><span class="loss-st ${done ? 'ok' : ''}">${done ? `✓ ${esc((r.tags || []).map(rvTagName).join(', ') || 'reviewed')}${r.by && r.by !== 'owner' ? ` · ${esc(r.by)}` : ''}` : r && r.draft ? 'draft' : 'review'}</span></li>`; }).join('')}${a.length > 60 ? `<li class="loss-more">${a.length - 60} older losses not shown; narrow the filter.</li>` : ''}</ul></details>`;
     }).join('') : '<p class="ms-note">No losing trade in this view.</p>';
     { const nb = document.getElementById('ms-cn-n-review'), now = Date.now() / 1000, seen = new Set();
       const todo = (COUNCIL.trades || []).concat(sysTrades().filter((x) => !x.replay)).filter((x) => x.status === 'loss' && x.closed && now - x.closed < 86400 && !seen.has(x.id) && seen.add(x.id) && !(RV.map[x.id] && !RV.map[x.id].draft)).length;
@@ -3489,14 +3567,14 @@ function msNextSetup(bars, A) {
     document.getElementById('ms-rv-strat').innerHTML = `<b>Strategy that took it:</b> ${esc(x.name)} <small>${esc(x.pair || '')} · ${esc(x.k)} · ${esc(x.h || '')}</small> · ${x.side === 'sell' ? 'Sell' : 'Buy'} ${esc(x.label)} at ${fmtI(x.entry, { dec: x.dec != null ? x.dec : 2 })}, stop ${fmtI(x.stop, { dec: x.dec != null ? x.dec : 2 })}, target ${fmtI(x.t1, { dec: x.dec != null ? x.dec : 2 })} (${x.rr}R) · ${x.shadow ? `shadow (${esc((x.blockedBy || []).join(', '))})` : 'live'}${ft.d1 ? ` · ${ft.d1} D1` : ''}${ft.session ? ` · ${esc(ft.session)}` : ''}<br>${x.note ? `<small>Trader: ${esc(String(x.note).slice(0, 300))}</small><br>` : ''}${x.pm && x.pm.title ? `<small>Council's own review: <b>${esc(x.pm.title)}</b>${x.pm.lesson ? ` · ${esc(x.pm.lesson)}` : ''}</small>` : ''}`;
     document.getElementById('ms-rv-tags').innerHTML = RV_TAGS.map(([t, n]) => `<button type="button" data-tag="${t}" aria-pressed="${RV.tags.has(t)}" class="${RV.tags.has(t) ? 'on' : ''}">${esc(n)}</button>`).join('');
     document.getElementById('ms-rv-text').value = r.text || ''; document.getElementById('ms-rv-lesson').value = r.lesson || '';
-    document.getElementById('ms-rv-msg').textContent = r.at && !r.draft ? `Saved ${new Date(r.at * 1000).toLocaleString()}` : '';
+    document.getElementById('ms-rv-msg').textContent = r.at && !r.draft ? `Saved ${new Date(r.at * 1000).toLocaleString()}${r.by && r.by !== 'owner' ? ` by ${r.by}` : ''}` : '';
     document.getElementById('ms-rv-council').innerHTML = r.council ? `<b>Council's answer:</b> ${esc(r.council.note || '')} <small>${esc(r.council.verdict || '')}${r.council.at ? ` · ${esc(String(r.council.at).slice(0, 10))}` : ''}</small>` : '';
   }
   async function rvSave() {
     const x = RV.x; if (!x) return;
     const msg = document.getElementById('ms-rv-msg'), old = RV.map[x.id] || {};
     RV.map[x.id] = { id: x.id, k: x.k, name: x.name, pair: x.pair, h: x.h, market: x.market, side: x.side, R: x.R, entry: x.entry, stop: x.stop, t1: x.t1, opened: x.opened, closed: x.closed, shadow: !!x.shadow, blockedBy: x.blockedBy || [], feat: x.feat || {},
-      tags: [...RV.tags], text: document.getElementById('ms-rv-text').value.trim().slice(0, 4000), lesson: document.getElementById('ms-rv-lesson').value.trim().slice(0, 1000), strokes: RV.strokes, at: Math.floor(Date.now() / 1000), ...(old.council ? { council: old.council } : {}) };
+      by: window.MS_WHO || 'owner', tags: [...RV.tags], text: document.getElementById('ms-rv-text').value.trim().slice(0, 4000), lesson: document.getElementById('ms-rv-lesson').value.trim().slice(0, 1000), strokes: RV.strokes, at: Math.floor(Date.now() / 1000), ...(old.council ? { council: old.council } : {}) };
     rvSaveLocal(); msg.textContent = 'Saving…'; renderLoss();
     try { const r = await rvPush(); msg.textContent = r === 'synced' ? 'Saved and sent to the council.' : 'Saved in this browser. Connect GitHub (Loss review card) so the council can read it.'; }
     catch (e) { msg.textContent = `Saved in this browser; sending failed: ${e.message || e}`; }
