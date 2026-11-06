@@ -61,3 +61,14 @@ when the owner pastes a GitHub fine-grained token (localStorage `msGhTok`, Conte
 `council-data/reviews/losses.json`. The trader reads that file: tags hunt / noise / late / news count in its lesson
 rules; other tags repeating 3+ times on a setup become `snapshot.ownerReviews.candidates`, which the twice-daily council
 check tests before any rule change and answers in each review's `council: {at, verdict, note}`.
+
+## Council layout (6 Nov 2026 renovation)
+
+The Council view is a workspace with a sticky section bar (`#ms-c-nav`, tab pattern, arrow keys) and five panes
+(`#ms-cp-<name>`): **overview** (active trades + calendar), **trades** (Trader table), **systems** (`adm`: NQ, gold
+replica, pairs; their static rule texts fold into `<details class="c-how">`), **review** (`adm`: loss review + trade
+reviews; the tab badge counts losses of the last 24 h not reviewed yet) and **research** (`adm`: analyst, coach, scorecard,
+backtest). Deep links `#council/<name>`; the last pane is remembered (localStorage `msCpane`); public mode only sees
+overview and trades. The trade chart dialog `#ms-tv` lives at the end of the app container, not inside a card, so it opens
+from any pane. Card titles (`.ms-k`) are sentence-case headings, not uppercase eyebrows. New council cards go into the
+pane they belong to, not into one long grid.

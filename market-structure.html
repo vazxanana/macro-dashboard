@@ -638,6 +638,49 @@
   }
   .c-nq { grid-column: 1 / -1; }
   .c-pairs { grid-column: 1 / -1; }
+  /* ═══ Renovation (6 Nov): card titles as headings, council sections, folded rule texts ═══ */
+  .ms-k { font: 600 14px/1.35 var(--sans); letter-spacing: -.1px; text-transform: none; color: var(--ink); margin-bottom: 14px; flex-wrap: wrap; row-gap: 6px; }
+  .ms-k > span:first-child { min-width: 0; }
+  .ms-k small, .ms-k .k-sub { font: 500 12.5px var(--sans); color: var(--ink-faint); }
+  .tile-k { font: 600 13px var(--sans); letter-spacing: 0; text-transform: none; color: var(--ink-dim); }
+  .menu-h { font: 600 12px var(--sans); letter-spacing: 0; text-transform: none; color: var(--ink-dim); }
+  .sec-h h2 { font: 600 16px var(--sans); letter-spacing: -.1px; text-transform: none; color: var(--ink); }
+  .c-nav { position: sticky; top: var(--top-h, 60px); z-index: 18; display: flex; gap: 2px; overflow-x: auto; scrollbar-width: none; padding: 4px; margin: 2px 0 2px;
+    border: 1px solid var(--line); border-radius: 11px; background: color-mix(in srgb, var(--bg) 88%, transparent); backdrop-filter: saturate(140%) blur(12px); -webkit-backdrop-filter: saturate(140%) blur(12px); }
+  .c-nav::-webkit-scrollbar { display: none; }
+  .c-nav button { flex: 1 0 auto; min-height: 40px; padding: 8px 16px; border: 0; border-radius: 8px; background: transparent; color: var(--ink-dim); font: 500 13.5px var(--sans); cursor: pointer;
+    display: inline-flex; align-items: center; justify-content: center; gap: 7px; transition: background .15s ease-out, color .15s ease-out; touch-action: manipulation; }
+  .c-nav button:hover { color: var(--ink); background: rgba(255,255,255,.04); }
+  .c-nav button[aria-selected="true"] { color: var(--ink); background: var(--panel-raised); box-shadow: 0 0 0 1px var(--line-strong); }
+  .c-nav button:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
+  .c-nav-n:empty { display: none; }
+  .c-nav-n { min-width: 18px; height: 18px; padding: 0 5px; border-radius: 9px; background: var(--accent-soft); color: var(--accent); font: 600 11px/18px var(--mono); text-align: center; }
+  .c-pane[hidden] { display: none; }
+  .c-pane > .c-trader, .c-pane > .c-loss, .c-pane > .c-pmc, .c-pane > .c-btc, .c-pane > .c-wide { grid-column: 1 / -1; }
+  .c-pane-overview { grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr); align-items: start; }
+  .c-pane-overview > .c-active, .c-pane-overview > .c-cal { grid-column: auto; }
+  .c-pane-overview > .c-active .c-act { max-height: min(72vh, 860px); overflow-y: auto; overscroll-behavior: contain; scrollbar-width: thin; }
+  @media (max-width: 700px) { .c-nav { -webkit-mask-image: linear-gradient(90deg, #000 88%, transparent); mask-image: linear-gradient(90deg, #000 88%, transparent); } .c-nav button:last-child { margin-right: 28px; } }
+  .c-pane-research { align-items: start; }
+  .c-pane-systems > .card { grid-column: 1 / -1; }
+  .c-how { margin: -4px 0 12px; border: 1px solid var(--line); border-radius: var(--r-sm); background: rgba(255,255,255,.012); }
+  .c-how > summary { cursor: pointer; padding: 9px 12px; font: 500 12.5px var(--sans); color: var(--ink-dim); list-style: none; display: flex; align-items: center; gap: 8px; min-height: 24px; }
+  .c-how > summary::-webkit-details-marker { display: none; }
+  .c-how > summary::before { content: ""; width: 6px; height: 6px; border-right: 1.5px solid currentColor; border-bottom: 1.5px solid currentColor; transform: rotate(-45deg); transition: transform .15s ease-out; }
+  .c-how[open] > summary::before { transform: rotate(45deg); }
+  .c-how > summary:hover { color: var(--ink); }
+  .c-how > summary:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; border-radius: var(--r-sm); }
+  .c-how > p { margin: 0 12px 10px; max-width: 75ch; }
+  .c-head { padding-top: 6px; }
+  @media (max-width: 1000px) { .c-pane-overview { grid-template-columns: minmax(0, 1fr); } }
+  @media (max-width: 700px) { .c-nav { top: 56px; margin: 0 -2px; } .c-nav button { padding: 8px 12px; font-size: 13px; min-height: 44px; } }
+  .h-quick { display: flex; flex-wrap: wrap; gap: 8px; margin: -4px 0 2px; }
+  .h-quick a { display: inline-flex; align-items: center; min-height: 36px; padding: 6px 14px; border: 1px solid var(--line); border-radius: 999px; color: var(--ink-dim); text-decoration: none; font: 500 13px var(--sans); background: rgba(255,255,255,.02); transition: color .15s ease-out, border-color .15s ease-out, background .15s ease-out; }
+  .h-quick a:hover { color: var(--ink); border-color: var(--line-strong); background: var(--panel-hover); }
+  .h-quick a:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  @media (max-width: 700px) { .h-quick { flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; margin-right: -16px; padding-right: 16px; } .h-quick a { flex: none; min-height: 40px; } }
+  @media (prefers-reduced-motion: reduce) { .c-nav button, .c-how > summary::before, .h-quick a { transition: none; } }
+
 </style>
 <script>
 // Public / admin split (6 Nov): the public page shows trades and chart markups only; the admin view (rule texts, setups, scanner,
@@ -718,6 +761,7 @@ window.MS_ADMIN_HASH = '49c5624f2625ed8b42b6e1bf2819a3a41ddb9743aeca36ea34ea7eb9
   <!-- ─── Home: one card per section ─── -->
   <section class="view" id="v-home" aria-label="Home">
     <div class="h-top"><div><div class="h-date" id="h-date"></div><h1 class="h-head" id="h-head">Loading live candles…</h1></div></div>
+    <nav class="h-quick" aria-label="Jump to"><a href="#council/overview">Active trades &amp; calendar</a><a href="#council/trades">All trades</a><a href="#council/review" class="adm">Loss review</a><a href="#council/systems" class="adm">Systems</a><a href="#council/research" class="adm">Research</a><a href="#journal">Journal</a></nav>
     <div class="h-warn" id="h-warn" role="alert" hidden></div>
     <div class="home">
       <a class="tile wide adm" href="#setup">
@@ -727,7 +771,7 @@ window.MS_ADMIN_HASH = '49c5624f2625ed8b42b6e1bf2819a3a41ddb9743aeca36ea34ea7eb9
         <span class="tile-sub" id="h-align"></span>
         <span class="tile-go">Open setup</span>
       </a>
-      <a class="tile" href="#council">
+      <a class="tile" href="#council/overview">
         <span class="tile-k">Active trades</span>
         <span class="tile-big" id="h-active">—</span>
         <span class="tile-sub"><span class="adm">Placed by the system: live gold replica, NQ paper</span><span class="pubonly">Open positions placed by the system</span></span>
@@ -827,45 +871,11 @@ window.MS_ADMIN_HASH = '49c5624f2625ed8b42b6e1bf2819a3a41ddb9743aeca36ea34ea7eb9
       <div><h1 class="h-head">AI council</h1><p class="ms-note" id="ms-c-status">Loading council data…</p></div>
       <label class="c-auto adm" hidden style="display:none"><input type="checkbox" id="ms-auto" checked> <span><b>Browser Trader</b><small>On by default. Every fresh Ready setup on the market you're viewing is saved to your journal as a paper trade, then tracked to its stop or target.</small></span></label>
     </div>
-    <div class="c-grid">
+    <nav class="c-nav" id="ms-c-nav" role="tablist" aria-label="Council sections"><button type="button" role="tab" class="" id="ms-cn-overview" data-pane="overview" aria-controls="ms-cp-overview" aria-selected="true">Overview<span class="c-nav-n" id="ms-cn-n-overview"></span></button><button type="button" role="tab" class="" id="ms-cn-trades" data-pane="trades" aria-controls="ms-cp-trades" aria-selected="false">Trades<span class="c-nav-n" id="ms-cn-n-trades"></span></button><button type="button" role="tab" class="adm" id="ms-cn-systems" data-pane="systems" aria-controls="ms-cp-systems" aria-selected="false">Systems<span class="c-nav-n" id="ms-cn-n-systems"></span></button><button type="button" role="tab" class="adm" id="ms-cn-review" data-pane="review" aria-controls="ms-cp-review" aria-selected="false">Review<span class="c-nav-n" id="ms-cn-n-review"></span></button><button type="button" role="tab" class="adm" id="ms-cn-research" data-pane="research" aria-controls="ms-cp-research" aria-selected="false">Research<span class="c-nav-n" id="ms-cn-n-research"></span></button></nav>
+    <div class="c-grid c-pane c-pane-overview" id="ms-cp-overview" role="tabpanel" aria-labelledby="ms-cn-overview" data-pane="overview">
       <div class="card c-active" id="ms-active-card">
         <div class="ms-k"><span>Active trades · placed by the system now</span><span class="c-tog"><span id="ms-active-sum" class="c-act-sum"></span><input type="checkbox" id="ms-act-sh" checked hidden style="display:none"></span></div>
         <ul class="c-act" id="ms-active"></ul>
-      </div>
-      <div class="card c-trader">
-        <div class="ms-k"><span>Trader · paper trades, all markets, every 4 min</span><span class="c-tog"><label class="c-mine"><input type="checkbox" id="ms-c-mine"> This market only</label><input type="checkbox" id="ms-c-sys" checked hidden aria-hidden="true"></span></div>
-        <div class="c-tabs" id="ms-c-tabs" role="tablist" aria-label="Which trades to show"><button type="button" role="tab" data-ct="live" aria-selected="true">Live <small>our system</small></button><button type="button" role="tab" data-ct="shadow" class="adm">Shadow <small>blocked by a rule</small></button><button type="button" role="tab" data-ct="journal">Journal <small>closed, as in the Journal tab</small></button><button type="button" role="tab" data-ct="all" class="adm">Everything <small>incl. older strategies</small></button></div>
-        <p class="ms-note" id="ms-c-tabnote"></p>
-        <div class="c-kpi" id="ms-c-kpi"></div>
-        <div class="c-eq" id="ms-c-eq"></div>
-        <div class="ms-bt-wrap"><table class="ms-bt-t c-t"><thead><tr><th>Opened</th><th>Market</th><th>Setup</th><th>Side</th><th class="n">Entry</th><th class="n">Stop</th><th class="n">Target 1</th><th>Result</th></tr></thead><tbody id="ms-c-trades"></tbody></table></div>
-      </div>
-      <div class="card c-nq adm">
-        <div class="ms-k"><span>NQ New York open run · our system (paper)</span></div>
-        <p class="ms-note">NQ runs at least 0.08% of the 09:30 ET opening price (≈20 points; was a fixed 15 until 5 Nov) through it and closes back across it within 15 min; trade <b>with</b> the sweep (the reclaim tends to fail at the New York open), only when the midnight (00:00 ET) open lies ahead of the trade. Stop the same distance on the other side; since 5 Nov evening, after +2R the stop trails 1R behind the best price (cap 10R) instead of a fixed 2R exit (8-year test: +21.1R vs +7.4R in 2018–22, +93.7R vs +76.9R in 2023–26, drawdown not worse); out at 11:00 ET.</p>
-        <p class="ms-note"><b>Checked 4 Nov:</b> on 8 years of Nasdaq cash (2018–2026) the same rule made +0.12R a trade over 704 trades, but 2018–2022 was about flat, so expect +0.1–0.2R a trade rather than the replay's +0.30R. Tested and not adopted: later exits, trailing stops, half off at 1R, a 10:00 ET window, volatility-scaled depth, a news-day filter, and the same rule on the S&amp;P 500 (no edge).</p>
-        <div class="c-kpi" id="ms-nq-kpi"></div>
-        <p class="ms-note" id="ms-nq-txt"></p>
-        <ul class="cal-day" id="ms-nq-list"></ul>
-      </div>
-      <div class="card c-rep adm">
-        <div class="ms-k"><span>Gold replica · trades only when gold is volatile</span></div>
-        <p class="ms-note" id="ms-rep-vol"></p>
-        <p class="ms-note"><b>Volatility gate since 4 Nov.</b> On 8 years of spot gold (HistData 2019–2026) the replica loses in calm gold every year and only pays when gold moves a lot. Since 5 Nov it trades live only while gold's 20-day average daily range is in the top fifth of gold's own last year (judged on 2023 onwards: trades between 1.5% and that level made +0.02R a trade over 168, top-fifth trades +0.40R in both halves). Below that, every signal is still recorded here as research. It takes trades only in the daily trend direction (a pullback against the 4-hour trend); the engulfing-barrier exception was turned off on 5 Nov because it lost in every year 2023–26 (−15R over 82 trades). Replay 2023–Oct 2026 with the top-fifth gate, breakeven, the add at +2R and the runner: 212 positions, +185.9R (2024 +76.0R, 2025 +52.4R, 2026 +59.6R), worst drawdown −17.6R, best position +14.6R; the fixed-4R rules it replaces made +93.7R with a −11.7R drawdown (return per unit of drawdown 10.6 vs 7.9). Tighter stops, partial exits, session filters and stop buffers were tested on 5 Nov and rejected. Exit and scaling (since 5 Nov evening, judged on 2023 onwards): at +2R the stop moves to breakeven and a second unit is added at that level with its stop at the first entry (it shows as a separate “Replica add” trade, counted as 2R of risk); after +4R both units trail 1R behind the best price (cap 10R); out after 48 h. NQ stays the main system.</p>
-        <p class="ms-note"><b>Second gold system (paper, since 4 Nov): Mosha BO system.</b> Weekly structure (his “Father”) sets the side; then H4 BO that way, H1 BO the other way (the retracement), M15 BO back in the H4 direction; pullback limit at the broken M15 level, stop past the M15 Origin, target 3R, valid 24 h. On 8 years of spot gold, with the weekly read the way the Trader reads it live: 2019–22 +32.2R over 87 trades, 2023–26 +34.2R over 99 (about +0.35R a trade, 7 of 8 years positive); the same setups against the weekly lost 44R. <b>Out of sample it failed:</b> the identical rule lost on silver, EUR/USD, GBP/USD, USD/JPY, Nasdaq and the S&amp;P (about −220R over ~1,430 trades, 2019–26), so the gold result is probably luck in one cell of a large grid. It stays on paper as a forward test, not as a proven edge. Its trades show in Active trades and the calendar as “Mosha BO system”. Judged on 2023 onwards (5 Nov): +0.27R a trade over 101; buys against a bearish weekly when the daily trend or M15 structure agreed were tested and lost, so it stays weekly-only.</p>
-        <p class="ms-note" id="ms-rep-w1"></p>
-        <p class="ms-note">A leg of 2+ M15 ATRs in 3 h or 6 h, then an M5 CHoCH; taken when clear of live H1 Origins or with a ★ engulfing at the extreme, with a stop of at least one M15 ATR, and (v5, 4 Nov) only against the H4 trend. Market entry, stop past the extreme, 2R, out after 48 h. The M5 gold chart marks every signal of the last 24 h.</p>
-        <div class="c-kpi" id="ms-rep-kpi"></div>
-        <div class="rep-track" id="ms-rep-track" aria-label="Live replica results against the replay expectation"></div>
-        <p class="ms-note" id="ms-rep-track-txt"></p>
-        <p class="ms-note" id="ms-rep-paper"></p>
-        <ul class="cal-day" id="ms-rep-list"></ul>
-      </div>
-      <div class="card c-pairs adm">
-        <div class="ms-k"><span>Pairs · crypto trend (live paper) · forex research only</span><span id="ms-pairs-sum" class="c-act-sum"></span></div>
-        <p class="ms-note"><b>Crypto (BTC, ETH, SOL, XRP), since 5 Nov: daily trend, two slots per coin.</b> Buy when a daily candle closes above the 55-day high, and separately above the 100-day high. Since 5 Nov (v3) a trade exits on a daily close under the midpoint of its own 55- or 100-day channel, a level that only moves up; the 5 ATR(20) stop stays as a catastrophe stop (Sharpe 2018–21 1.67 vs 1.50, 2022–26 0.81 vs 0.58; worst drawdown −28% vs −39%). Replay 2023–Oct 2026: 65 trades, +61.7R. Long only. Picked on 2018–21 Binance history, checked on 2022–26 with 0.8% round-trip costs: +0.52R a trade over 10 coins (186 trades); on these four +52.3R over 70 trades (+0.75R), worst drawdown −7.9R. A coin stops at −8R forward.</p>
-        <p class="ms-note"><b>Forex: research only.</b> Nothing tested on the five pairs held out of sample: the replica (about 11,000 settings each), Mosha BO, Asia-range breakouts and fades, open sweeps and daily trend-following all lost in 2023–26 after spread. Their replica signals keep being recorded.</p>
-        <div class="ms-bt-wrap"><table class="ms-bt-t c-t"><thead><tr><th>Coin</th><th class="n">Close</th><th class="n">55-day high</th><th class="n">To breakout</th><th>Now</th><th class="n">Forward</th><th class="n">Replay 2023–26</th></tr></thead><tbody id="ms-pairs"></tbody></table></div>
       </div>
       <div class="card c-cal">
         <div class="ms-k"><span>Calendar · result by day (R, trades closed that day)</span><span class="c-tog"><span class="cal-nav"><button type="button" id="ms-cal-prev" aria-label="Previous month">‹</button><b id="ms-cal-m"></b><button type="button" id="ms-cal-next" aria-label="Next month">›</button></span><input type="checkbox" id="ms-cal-sh" checked hidden style="display:none"><input type="checkbox" id="ms-cal-rp" checked hidden style="display:none"></span></div>
@@ -874,28 +884,53 @@ window.MS_ADMIN_HASH = '49c5624f2625ed8b42b6e1bf2819a3a41ddb9743aeca36ea34ea7eb9
         <div class="cal-dayw" id="ms-cal-dayw" hidden><div class="cal-dayh" id="ms-cal-dayh"></div><ul class="cal-day" id="ms-cal-day"></ul></div>
         <p class="ms-note" id="ms-cal-sum"></p>
       </div>
-      <div class="card c-score adm">
-        <div class="ms-k">Scorecard · which setups and markets pay</div>
-        <div class="c-sc">
-          <div class="ms-bt-wrap"><table class="ms-bt-t c-t"><thead><tr><th>Setup</th><th class="n">Trades</th><th class="n">Win rate</th><th class="n">Avg</th><th class="n">Total</th><th>Verdict</th></tr></thead><tbody id="ms-c-sc-setup"></tbody></table></div>
-          <div class="ms-bt-wrap"><table class="ms-bt-t c-t"><thead><tr><th>Market</th><th class="n">Trades</th><th class="n">Win rate</th><th class="n">Avg</th><th class="n">Total</th><th>Verdict</th></tr></thead><tbody id="ms-c-sc-mkt"></tbody></table></div>
-        </div>
-        <p class="ms-note" style="margin:10px 0 0">From the council's closed paper trades. A verdict needs at least 5 trades: "trust" averages more than +0.2R a trade, "avoid" loses more than 0.2R.</p>
+    </div>
+    <div class="c-grid c-pane c-pane-trades" id="ms-cp-trades" role="tabpanel" aria-labelledby="ms-cn-trades" data-pane="trades" hidden>
+      <div class="card c-trader">
+        <div class="ms-k"><span>Trader · paper trades, all markets, every 4 min</span><span class="c-tog"><label class="c-mine"><input type="checkbox" id="ms-c-mine"> This market only</label><input type="checkbox" id="ms-c-sys" checked hidden aria-hidden="true"></span></div>
+        <div class="c-tabs" id="ms-c-tabs" role="tablist" aria-label="Which trades to show"><button type="button" role="tab" data-ct="live" aria-selected="true">Live <small>our system</small></button><button type="button" role="tab" data-ct="shadow" class="adm">Shadow <small>blocked by a rule</small></button><button type="button" role="tab" data-ct="journal">Journal <small>closed, as in the Journal tab</small></button><button type="button" role="tab" data-ct="all" class="adm">Everything <small>incl. older strategies</small></button></div>
+        <p class="ms-note" id="ms-c-tabnote"></p>
+        <div class="c-kpi" id="ms-c-kpi"></div>
+        <div class="c-eq" id="ms-c-eq"></div>
+        <div class="ms-bt-wrap"><table class="ms-bt-t c-t"><thead><tr><th>Opened</th><th>Market</th><th>Setup</th><th>Side</th><th class="n">Entry</th><th class="n">Stop</th><th class="n">Target 1</th><th>Result</th></tr></thead><tbody id="ms-c-trades"></tbody></table></div>
       </div>
-      <div class="card c-btc adm">
-        <div class="ms-k">Backtest · the Trader's rules replayed on the last 30 days</div>
-        <p class="ms-note" id="ms-c-bt-sum">Loading the backtest…</p>
-        <div class="c-bt-meta" id="ms-c-bt-mkt"></div>
-        <div class="ms-bt-wrap"><table class="ms-bt-t c-t"><thead><tr><th>Setup</th><th class="n">Trades</th><th class="n bt-w">Win rate</th><th class="n">R per trade <small>(95% range)</small></th><th class="n bt-d">With D1</th><th class="n bt-d">Against D1</th><th>Now</th></tr></thead><tbody id="ms-c-bt"></tbody></table></div>
-        <ul class="c-bt-lines" id="ms-c-bt-lines"></ul>
-        <p class="ms-note" style="margin:10px 0 0">Every setup the Trader would have taken, managed candle by candle on real prices. The range is clustered by market and day (one move often fires several setups), so it is honest about how sure we are: green when the whole range is above zero, red when it is below. The Coach turns only clear findings into rules.</p>
+    </div>
+    <div class="c-grid c-pane c-pane-systems adm" id="ms-cp-systems" role="tabpanel" aria-labelledby="ms-cn-systems" data-pane="systems" hidden>
+      <div class="card c-nq adm">
+        <div class="ms-k"><span>NQ New York open run · our system (paper)</span></div>
+        <details class="c-how"><summary>How it works</summary>
+          <p class="ms-note">NQ runs at least 0.08% of the 09:30 ET opening price (≈20 points; was a fixed 15 until 5 Nov) through it and closes back across it within 15 min; trade <b>with</b> the sweep (the reclaim tends to fail at the New York open), only when the midnight (00:00 ET) open lies ahead of the trade. Stop the same distance on the other side; since 5 Nov evening, after +2R the stop trails 1R behind the best price (cap 10R) instead of a fixed 2R exit (8-year test: +21.1R vs +7.4R in 2018–22, +93.7R vs +76.9R in 2023–26, drawdown not worse); out at 11:00 ET.</p>
+          <p class="ms-note"><b>Checked 4 Nov:</b> on 8 years of Nasdaq cash (2018–2026) the same rule made +0.12R a trade over 704 trades, but 2018–2022 was about flat, so expect +0.1–0.2R a trade rather than the replay's +0.30R. Tested and not adopted: later exits, trailing stops, half off at 1R, a 10:00 ET window, volatility-scaled depth, a news-day filter, and the same rule on the S&amp;P 500 (no edge).</p>
+        </details>
+        <div class="c-kpi" id="ms-nq-kpi"></div>
+        <p class="ms-note" id="ms-nq-txt"></p>
+        <ul class="cal-day" id="ms-nq-list"></ul>
       </div>
-      <div class="card c-pmc adm">
-        <div class="ms-k">Trade reviews · was it our system or the market?</div>
-        <div id="ms-c-pm-sum"></div>
-        <ul class="c-pm" id="ms-c-pm"></ul>
-        <dialog class="tv" id="ms-tv" aria-labelledby="ms-tv-t"><div class="tv-h"><div><h3 id="ms-tv-t">Trade</h3><p id="ms-tv-s"></p></div><div class="tv-ba" role="group" aria-label="Prediction before, result after"><button type="button" data-ba="before">Before</button><button type="button" data-ba="after" class="on">After</button><button type="button" data-ba="save" title="Save the before and after charts as images">Save</button></div><button type="button" class="tv-x" id="ms-tv-x" aria-label="Close chart">×</button></div><div class="tv-c" id="ms-tv-c"><div class="tv-msg" id="ms-tv-m">Loading candles…</div></div><div class="tv-k" id="ms-tv-k"></div><div class="tv-rv adm" id="ms-tv-rv" hidden><div class="rv-strat" id="ms-rv-strat"></div><div class="rv-tools"><b>Draw</b><button type="button" data-tool="pen">Pen</button><button type="button" data-tool="line">Line</button><button type="button" data-tool="text">Text</button><button type="button" class="rv-c on" data-col="#f23645" style="background:#f23645" aria-label="Colour #f23645"></button><button type="button" class="rv-c" data-col="#089981" style="background:#089981" aria-label="Colour #089981"></button><button type="button" class="rv-c" data-col="#f5a623" style="background:#f5a623" aria-label="Colour #f5a623"></button><button type="button" class="rv-c" data-col="#2962ff" style="background:#2962ff" aria-label="Colour #2962ff"></button><button type="button" class="rv-c" data-col="#ffffff" style="background:#ffffff" aria-label="Colour #ffffff"></button><button type="button" data-act="undo">Undo</button><button type="button" data-act="clear">Clear</button></div><div class="rv-tags" id="ms-rv-tags" aria-label="Why it failed"></div><textarea id="ms-rv-text" rows="3" placeholder="Why did this setup fail? What did the chart show before the entry?"></textarea><textarea id="ms-rv-lesson" rows="2" placeholder="Rule idea for the council (optional), e.g. no scalp sells while H4 makes higher lows"></textarea><div class="rv-save"><button type="button" id="ms-rv-save">Save review</button><span id="ms-rv-msg"></span></div><div class="rv-council" id="ms-rv-council"></div></div></dialog>
+      <div class="card c-rep adm">
+        <div class="ms-k"><span>Gold replica · trades only when gold is volatile</span></div>
+        <details class="c-how"><summary>How it works</summary>
+          <p class="ms-note"><b>Volatility gate since 4 Nov.</b> On 8 years of spot gold (HistData 2019–2026) the replica loses in calm gold every year and only pays when gold moves a lot. Since 5 Nov it trades live only while gold's 20-day average daily range is in the top fifth of gold's own last year (judged on 2023 onwards: trades between 1.5% and that level made +0.02R a trade over 168, top-fifth trades +0.40R in both halves). Below that, every signal is still recorded here as research. It takes trades only in the daily trend direction (a pullback against the 4-hour trend); the engulfing-barrier exception was turned off on 5 Nov because it lost in every year 2023–26 (−15R over 82 trades). Replay 2023–Oct 2026 with the top-fifth gate, breakeven, the add at +2R and the runner: 212 positions, +185.9R (2024 +76.0R, 2025 +52.4R, 2026 +59.6R), worst drawdown −17.6R, best position +14.6R; the fixed-4R rules it replaces made +93.7R with a −11.7R drawdown (return per unit of drawdown 10.6 vs 7.9). Tighter stops, partial exits, session filters and stop buffers were tested on 5 Nov and rejected. Exit and scaling (since 5 Nov evening, judged on 2023 onwards): at +2R the stop moves to breakeven and a second unit is added at that level with its stop at the first entry (it shows as a separate “Replica add” trade, counted as 2R of risk); after +4R both units trail 1R behind the best price (cap 10R); out after 48 h. NQ stays the main system.</p>
+          <p class="ms-note"><b>Second gold system (paper, since 4 Nov): Mosha BO system.</b> Weekly structure (his “Father”) sets the side; then H4 BO that way, H1 BO the other way (the retracement), M15 BO back in the H4 direction; pullback limit at the broken M15 level, stop past the M15 Origin, target 3R, valid 24 h. On 8 years of spot gold, with the weekly read the way the Trader reads it live: 2019–22 +32.2R over 87 trades, 2023–26 +34.2R over 99 (about +0.35R a trade, 7 of 8 years positive); the same setups against the weekly lost 44R. <b>Out of sample it failed:</b> the identical rule lost on silver, EUR/USD, GBP/USD, USD/JPY, Nasdaq and the S&amp;P (about −220R over ~1,430 trades, 2019–26), so the gold result is probably luck in one cell of a large grid. It stays on paper as a forward test, not as a proven edge. Its trades show in Active trades and the calendar as “Mosha BO system”. Judged on 2023 onwards (5 Nov): +0.27R a trade over 101; buys against a bearish weekly when the daily trend or M15 structure agreed were tested and lost, so it stays weekly-only.</p>
+          <p class="ms-note">A leg of 2+ M15 ATRs in 3 h or 6 h, then an M5 CHoCH; taken when clear of live H1 Origins or with a ★ engulfing at the extreme, with a stop of at least one M15 ATR, and (v5, 4 Nov) only against the H4 trend. Market entry, stop past the extreme, 2R, out after 48 h. The M5 gold chart marks every signal of the last 24 h.</p>
+        </details>
+        <p class="ms-note" id="ms-rep-vol"></p>
+        <p class="ms-note" id="ms-rep-w1"></p>
+        <div class="c-kpi" id="ms-rep-kpi"></div>
+        <div class="rep-track" id="ms-rep-track" aria-label="Live replica results against the replay expectation"></div>
+        <p class="ms-note" id="ms-rep-track-txt"></p>
+        <p class="ms-note" id="ms-rep-paper"></p>
+        <ul class="cal-day" id="ms-rep-list"></ul>
       </div>
+      <div class="card c-pairs adm">
+        <div class="ms-k"><span>Pairs · crypto trend (live paper) · forex research only</span><span id="ms-pairs-sum" class="c-act-sum"></span></div>
+        <details class="c-how"><summary>How it works</summary>
+          <p class="ms-note"><b>Crypto (BTC, ETH, SOL, XRP), since 5 Nov: daily trend, two slots per coin.</b> Buy when a daily candle closes above the 55-day high, and separately above the 100-day high. Since 5 Nov (v3) a trade exits on a daily close under the midpoint of its own 55- or 100-day channel, a level that only moves up; the 5 ATR(20) stop stays as a catastrophe stop (Sharpe 2018–21 1.67 vs 1.50, 2022–26 0.81 vs 0.58; worst drawdown −28% vs −39%). Replay 2023–Oct 2026: 65 trades, +61.7R. Long only. Picked on 2018–21 Binance history, checked on 2022–26 with 0.8% round-trip costs: +0.52R a trade over 10 coins (186 trades); on these four +52.3R over 70 trades (+0.75R), worst drawdown −7.9R. A coin stops at −8R forward.</p>
+          <p class="ms-note"><b>Forex: research only.</b> Nothing tested on the five pairs held out of sample: the replica (about 11,000 settings each), Mosha BO, Asia-range breakouts and fades, open sweeps and daily trend-following all lost in 2023–26 after spread. Their replica signals keep being recorded.</p>
+        </details>
+        <div class="ms-bt-wrap"><table class="ms-bt-t c-t"><thead><tr><th>Coin</th><th class="n">Close</th><th class="n">55-day high</th><th class="n">To breakout</th><th>Now</th><th class="n">Forward</th><th class="n">Replay 2023–26</th></tr></thead><tbody id="ms-pairs"></tbody></table></div>
+      </div>
+    </div>
+    <div class="c-grid c-pane c-pane-review adm" id="ms-cp-review" role="tabpanel" aria-labelledby="ms-cn-review" data-pane="review" hidden>
       <div class="card adm c-loss" id="ms-loss">
         <div class="ms-k"><span>Loss review · why the setup failed</span></div>
         <p class="ms-note">Every losing trade, stacked by the strategy that took it (worst first). Open one, draw on its chart, tick the reasons and write why it failed. The council counts your reasons with its own trade reviews (stop hunt, stop too tight, late entry and news change its rules directly) and tests the rule ideas you write.</p>
@@ -903,6 +938,13 @@ window.MS_ADMIN_HASH = '49c5624f2625ed8b42b6e1bf2819a3a41ddb9743aeca36ea34ea7eb9
         <div id="ms-loss-list" class="loss-list"></div>
         <div class="loss-sync"><span id="ms-loss-sync"></span><button type="button" id="ms-loss-gh">Connect GitHub</button><button type="button" id="ms-loss-copy">Copy reviews</button></div>
       </div>
+      <div class="card c-pmc adm">
+        <div class="ms-k">Trade reviews · was it our system or the market?</div>
+        <div id="ms-c-pm-sum"></div>
+        <ul class="c-pm" id="ms-c-pm"></ul>
+      </div>
+    </div>
+    <div class="c-grid c-pane c-pane-research adm" id="ms-cp-research" role="tabpanel" aria-labelledby="ms-cn-research" data-pane="research" hidden>
       <div class="card c-analyst">
         <div class="ms-k">Analyst · weekly brief</div>
         <div class="c-sub">Ready right now</div>
@@ -920,8 +962,24 @@ window.MS_ADMIN_HASH = '49c5624f2625ed8b42b6e1bf2819a3a41ddb9743aeca36ea34ea7eb9
         <div class="c-sub">Latest AI review</div>
         <div class="c-md" id="ms-c-review"></div>
       </div>
+      <div class="card c-score adm">
+        <div class="ms-k">Scorecard · which setups and markets pay</div>
+        <div class="c-sc">
+          <div class="ms-bt-wrap"><table class="ms-bt-t c-t"><thead><tr><th>Setup</th><th class="n">Trades</th><th class="n">Win rate</th><th class="n">Avg</th><th class="n">Total</th><th>Verdict</th></tr></thead><tbody id="ms-c-sc-setup"></tbody></table></div>
+          <div class="ms-bt-wrap"><table class="ms-bt-t c-t"><thead><tr><th>Market</th><th class="n">Trades</th><th class="n">Win rate</th><th class="n">Avg</th><th class="n">Total</th><th>Verdict</th></tr></thead><tbody id="ms-c-sc-mkt"></tbody></table></div>
+        </div>
+        <p class="ms-note" style="margin:10px 0 0">From the council's closed paper trades. A verdict needs at least 5 trades: "trust" averages more than +0.2R a trade, "avoid" loses more than 0.2R.</p>
+      </div>
+      <div class="card c-btc adm">
+        <div class="ms-k">Backtest · the Trader's rules replayed on the last 30 days</div>
+        <p class="ms-note" id="ms-c-bt-sum">Loading the backtest…</p>
+        <div class="c-bt-meta" id="ms-c-bt-mkt"></div>
+        <div class="ms-bt-wrap"><table class="ms-bt-t c-t"><thead><tr><th>Setup</th><th class="n">Trades</th><th class="n bt-w">Win rate</th><th class="n">R per trade <small>(95% range)</small></th><th class="n bt-d">With D1</th><th class="n bt-d">Against D1</th><th>Now</th></tr></thead><tbody id="ms-c-bt"></tbody></table></div>
+        <ul class="c-bt-lines" id="ms-c-bt-lines"></ul>
+        <p class="ms-note" style="margin:10px 0 0">Every setup the Trader would have taken, managed candle by candle on real prices. The range is clustered by market and day (one move often fires several setups), so it is honest about how sure we are: green when the whole range is above zero, red when it is below. The Coach turns only clear findings into rules.</p>
+      </div>
+      <p class="ms-note c-wide">Paper trades only, no real money. The Coach may change the stop buffer (0.10–0.25 × ATR), the minimum reward:risk (1.2–2.5) and pause a setup for up to 7 days, and logs every change.</p>
     </div>
-    <p class="ms-note">Paper trades only, no real money. The Coach may change the stop buffer (0.10–0.25 × ATR), the minimum reward:risk (1.2–2.5) and pause a setup for up to 7 days, and logs every change.</p>
   </section>
 
 
@@ -952,6 +1010,7 @@ window.MS_ADMIN_HASH = '49c5624f2625ed8b42b6e1bf2819a3a41ddb9743aeca36ea34ea7eb9
     <a href="#council" data-go="council"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="8" cy="9" r="3"></circle><circle cx="16" cy="9" r="3"></circle><path d="M3 20c0-3 2.5-5 5-5s5 2 5 5M11 20c0-3 2.5-5 5-5s5 2 5 5"></path></svg>Council</a>
     <a href="#journal" data-go="journal"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 3h11a1 1 0 011 1v16a1 1 0 01-1 1H6zM6 3v18M10 8h5M10 12h5"></path></svg>Journal</a>
   </nav>
+  <dialog class="tv" id="ms-tv" aria-labelledby="ms-tv-t"><div class="tv-h"><div><h3 id="ms-tv-t">Trade</h3><p id="ms-tv-s"></p></div><div class="tv-ba" role="group" aria-label="Prediction before, result after"><button type="button" data-ba="before">Before</button><button type="button" data-ba="after" class="on">After</button><button type="button" data-ba="save" title="Save the before and after charts as images">Save</button></div><button type="button" class="tv-x" id="ms-tv-x" aria-label="Close chart">×</button></div><div class="tv-c" id="ms-tv-c"><div class="tv-msg" id="ms-tv-m">Loading candles…</div></div><div class="tv-k" id="ms-tv-k"></div><div class="tv-rv adm" id="ms-tv-rv" hidden><div class="rv-strat" id="ms-rv-strat"></div><div class="rv-tools"><b>Draw</b><button type="button" data-tool="pen">Pen</button><button type="button" data-tool="line">Line</button><button type="button" data-tool="text">Text</button><button type="button" class="rv-c on" data-col="#f23645" style="background:#f23645" aria-label="Colour #f23645"></button><button type="button" class="rv-c" data-col="#089981" style="background:#089981" aria-label="Colour #089981"></button><button type="button" class="rv-c" data-col="#f5a623" style="background:#f5a623" aria-label="Colour #f5a623"></button><button type="button" class="rv-c" data-col="#2962ff" style="background:#2962ff" aria-label="Colour #2962ff"></button><button type="button" class="rv-c" data-col="#ffffff" style="background:#ffffff" aria-label="Colour #ffffff"></button><button type="button" data-act="undo">Undo</button><button type="button" data-act="clear">Clear</button></div><div class="rv-tags" id="ms-rv-tags" aria-label="Why it failed"></div><textarea id="ms-rv-text" rows="3" placeholder="Why did this setup fail? What did the chart show before the entry?"></textarea><textarea id="ms-rv-lesson" rows="2" placeholder="Rule idea for the council (optional), e.g. no scalp sells while H4 makes higher lows"></textarea><div class="rv-save"><button type="button" id="ms-rv-save">Save review</button><span id="ms-rv-msg"></span></div><div class="rv-council" id="ms-rv-council"></div></div></dialog>
   <div class="ms-toasts" id="ms-toasts" role="status" aria-live="polite"></div>
 </div>
 <script>
@@ -3235,6 +3294,9 @@ function msNextSetup(bars, A) {
         <ul class="loss-rows">${a.slice(0, 60).map((x) => { const r = RV.map[x.id], done = r && !r.draft;
           return `<li data-lid="${esc(x.id)}" tabindex="0" title="Open the chart and review this loss"><span>${ftime(x.closed + TZ)}</span><b>${esc(x.label)}</b><span class="chip ${x.side}">${x.side.toUpperCase()}</span><b class="neg">${x.R != null ? x.R : -1}R</b><span class="loss-why">${x.shadow ? `shadow · ${esc((x.blockedBy || []).join(', '))}` : 'live'}${x.pm && x.pm.title ? ` · council: ${esc(x.pm.title)}` : ''}</span><span class="loss-st ${done ? 'ok' : ''}">${done ? `✓ ${esc((r.tags || []).map(rvTagName).join(', ') || 'reviewed')}` : r && r.draft ? 'draft' : 'review'}</span></li>`; }).join('')}${a.length > 60 ? `<li class="loss-more">${a.length - 60} older losses not shown; narrow the filter.</li>` : ''}</ul></details>`;
     }).join('') : '<p class="ms-note">No losing trade in this view.</p>';
+    { const nb = document.getElementById('ms-cn-n-review'), now = Date.now() / 1000, seen = new Set();
+      const todo = (COUNCIL.trades || []).concat(sysTrades().filter((x) => !x.replay)).filter((x) => x.status === 'loss' && x.closed && now - x.closed < 86400 && !seen.has(x.id) && seen.add(x.id) && !(RV.map[x.id] && !RV.map[x.id].draft)).length;
+      if (nb) { nb.textContent = todo ? String(todo > 99 ? '99+' : todo) : ''; nb.title = todo ? `${todo} losses from the last 24 hours not reviewed yet` : ''; nb.setAttribute('aria-label', nb.title); } }
     const n = Object.values(RV.map).filter((r) => !r.draft).length, s = document.getElementById('ms-loss-sync');
     if (s) s.textContent = `${n} review${n === 1 ? '' : 's'} saved${ghTok() ? ' · syncing to the council (GitHub connected)' : ' in this browser only · connect GitHub so the council can read them'}.`;
     const gb = document.getElementById('ms-loss-gh'); if (gb) gb.textContent = ghTok() ? 'GitHub connected' : 'Connect GitHub';
@@ -3445,8 +3507,32 @@ function msNextSetup(bars, A) {
 
   // ─── Sections: a home page of cards, each section on its own page ───
   const VIEWS = ['home', 'setup', 'charts', 'scanner', 'council', 'journal'];
+  // Council sections (6 Nov renovation): Overview · Trades · Systems · Review · Research; deep links #council/<section>
+  const CPANES = ['overview', 'trades', 'systems', 'review', 'research'], CPUB = ['overview', 'trades'];
+  const CPANE = { cur: 'overview' };
+  try { const p0 = localStorage.getItem('msCpane'); if (CPANES.includes(p0)) CPANE.cur = p0; } catch (e) {}
+  function setPane(p, push = true) {
+    if (!CPANES.includes(p) || (PUB && !CPUB.includes(p))) p = 'overview';
+    const changed = CPANE.cur !== p; CPANE.cur = p;
+    try { localStorage.setItem('msCpane', p); } catch (e) {}
+    CPANES.forEach((k) => { const el = document.getElementById('ms-cp-' + k), b = document.getElementById('ms-cn-' + k); if (el) el.hidden = k !== p; if (b) { b.setAttribute('aria-selected', String(k === p)); b.tabIndex = k === p ? 0 : -1; } });
+    if (push && location.hash !== '#council/' + p) history.replaceState(null, '', '#council/' + p);
+    { const b = document.getElementById('ms-cn-' + p); if (b && b.scrollIntoView && b.offsetParent) b.scrollIntoView({ block: 'nearest', inline: 'nearest' }); }
+    if (changed && COUNCIL.trades && typeof renderCouncil === 'function') requestAnimationFrame(() => renderCouncil());
+  }
+  { const nav = document.getElementById('ms-c-nav');
+    if (nav) {
+      nav.addEventListener('click', (ev) => { const b = ev.target.closest('[data-pane]'); if (!b) return; setPane(b.dataset.pane); const top = document.getElementById('v-council'); if (top && nav.getBoundingClientRect().top < 0) top.scrollIntoView({ block: 'start' }); });
+      nav.addEventListener('keydown', (ev) => {   // arrow keys move between sections (tab pattern)
+        if (!['ArrowLeft', 'ArrowRight', 'Home', 'End'].includes(ev.key)) return;
+        const bs = [...nav.querySelectorAll('[data-pane]')].filter((b) => b.offsetParent !== null), i = bs.indexOf(document.activeElement);
+        const j = ev.key === 'Home' ? 0 : ev.key === 'End' ? bs.length - 1 : (i + (ev.key === 'ArrowRight' ? 1 : -1) + bs.length) % bs.length;
+        ev.preventDefault(); bs[j].focus(); setPane(bs[j].dataset.pane);
+      });
+    } }
   function showView() {
-    const h0 = location.hash.slice(1), h = PUB && (h0 === 'setup' || h0 === 'scanner') ? 'home' : h0, v = VIEWS.includes(h) ? h : 'home';
+    const [h0, sub] = location.hash.slice(1).split('/'), h = PUB && (h0 === 'setup' || h0 === 'scanner') ? 'home' : h0, v = VIEWS.includes(h) ? h : 'home';
+    if (v === 'council') setPane(sub || CPANE.cur, false);
     VIEWS.forEach((k) => { const el = document.getElementById('v-' + k); if (el) el.hidden = k !== v; });
     document.querySelectorAll('[data-go]').forEach((a) => { if (a.dataset.go === v) a.setAttribute('aria-current', 'page'); else a.removeAttribute('aria-current'); });
     if (v === 'charts') setTimeout(() => Object.values(panes).forEach((p) => p.fit()), 60);
