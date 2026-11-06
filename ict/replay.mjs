@@ -14,29 +14,37 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 const dedupe = (a) => { const m = new Map(); for (const b of a) m.set(b.time, b); return [...m.values()].sort((x, y) => x.time - y.time); };
 
 async function history(M) {
-  const warm = FROM - 40 * 86400; let m5 = [], h1 = [], used = null;
+  // Signals need H1 only: CNBC 1H over the whole period (10-day requests). 5m (2-day requests) is used only for exits where
+  // CNBC still has it; H1 gaps are filled from 5m. Each request's candle count is logged so coverage can be checked.
+  const warm = FROM - 40 * 86400;
   for (const sym of M.cnbc) {
-    m5 = []; h1 = [];
-    for (let t = warm; t < now; t += 6 * 86400) {
-      const to = Math.min(now + 300, t + 6 * 86400); let got = [];
-      try { got = await cnbcBars(sym, '5M', t, to); } catch (e) { got = []; }
-      if (got.length) m5 = m5.concat(got);
-      else { try { h1 = h1.concat(await cnbcBars(sym, '1H', t, to)); } catch (e) { /* gap */ } }
-      await sleep(350);
+    let h1 = [], m5 = [], log = [];
+    for (let t = warm; t < now; t += 10 * 86400) {
+      let got = []; try { got = await cnbcBars(sym, '1H', t, Math.min(now + 3600, t + 10 * 86400)); } catch (e) { got = []; }
+      h1 = h1.concat(got); log.push(`1H ${new Date(t * 1000).toISOString().slice(0, 10)}:${got.length}`); await sleep(300);
     }
-    if (m5.length + h1.length > 500) { used = sym; break; }
+    for (let t = FROM; t < now; t += 2 * 86400) {
+      let got = []; try { got = await cnbcBars(sym, '5M', t, Math.min(now + 300, t + 2 * 86400)); } catch (e) { got = []; }
+      m5 = m5.concat(got); await sleep(250);
+    }
+    h1 = dedupe(h1); m5 = dedupe(m5);
+    console.log(M.short, sym, 'H1', h1.length, 'M5', m5.length, log.join(' '));
+    if (h1.length + m5.length < 500) continue;
+    const have = new Set(h1.map((b) => b.time)), H = dedupe(h1.concat(agg(m5, 3600).filter((b) => !have.has(b.time)))).filter((b) => b.time + 3600 <= now);
+    const D = (await cnbcBars(sym, '1D', FROM - 500 * 86400, now + 86400)).filter((b) => b.time + 86400 <= now);
+    // 5m counts as exit data from the first day with a near-full 5m session onwards
+    const days = new Map(); for (const b of m5) { const d = Math.floor(b.time / 86400); days.set(d, (days.get(d) || 0) + 1); }
+    const full = [...days.entries()].filter(([, n]) => n >= 200).map(([d]) => d).sort((a, b) => a - b);
+    return { sym, m5, H, D, m5from: full.length ? full[0] * 86400 : null, m5days: new Set(full) };
   }
-  if (!used) throw new Error(`no CNBC history for ${M.short}`);
-  m5 = dedupe(m5); h1 = dedupe(h1);
-  const H = dedupe(h1.filter((b) => !m5.length || b.time < m5[0].time).concat(agg(m5, 3600))).filter((b) => b.time + 3600 <= now);
-  const D = (await cnbcBars(used, '1D', FROM - 500 * 86400, now + 86400)).filter((b) => b.time + 86400 <= now);
-  return { sym: used, m5, H, D, m5from: m5.length ? m5[0].time : null };
+  throw new Error(`no CNBC history for ${M.short}`);
 }
 
 function simulate(g, M, key, src) {
   const s = g.side, f = (v) => +(+v).toFixed(M.dec), entry = g.entry, r0 = g.r0, t1 = entry + s * P.rr * r0, t2 = entry + s * P.mark * r0, end = g.close + P.holdH * 3600;
-  const bars = src.m5from != null && g.close >= src.m5from ? src.m5.filter((b) => b.time >= g.close && b.time < end) : src.H.filter((b) => b.time >= g.close && b.time < end);
-  const step = src.m5from != null && g.close >= src.m5from ? 300 : 3600;
+  const use5 = src.m5days && src.m5days.has(Math.floor(g.close / 86400)) && src.m5days.has(Math.floor((g.close + 86400) / 86400));
+  const bars = use5 ? src.m5.filter((b) => b.time >= g.close && b.time < end) : src.H.filter((b) => b.time >= g.close && b.time < end);
+  const step = use5 ? 300 : 3600;
   let status = 'open', R = null, closed = null, exit = null, exitPx = null, mark2 = null, mfe = 0;
   for (const b of bars) {
     if (!mark2 && (s > 0 ? b.high >= t2 : b.low <= t2)) mark2 = b.time + step;
