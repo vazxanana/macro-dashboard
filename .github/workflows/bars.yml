@@ -3,8 +3,12 @@ name: Council bars snapshot
 # On demand: saves the last days of candles the Trader sees (Kraken PAXG gold 1m/4h/1d, Kraken BTC/ETH/SOL/XRP 1d,
 # CNBC Nasdaq-100 futures 1m) to council-data/research/bars/ so a day can be replayed exactly from a session
 # without market-data access.
+# run marker: 2026-11-06T00:20Z
 on:
   workflow_dispatch:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/bars.yml']   # touching this file (e.g. the run marker below) takes a snapshot
 
 permissions:
   contents: write
