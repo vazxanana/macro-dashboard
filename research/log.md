@@ -1250,3 +1250,18 @@ Costs for a raw account: 0.15 all-in per round trip (bounds 0.10 / 0.20 / 0.30).
 Median stop 7.8 points (10%–90%: 4.1–22.8), median wait from the H1 close to entry 50 min, signals 06–16 UTC (13 UTC weakest, −4.7R on 82). Positive in both halves across every cost and parameter except the strict 2.0× range multiple (too few trades); the 20-day direction is what makes it work. 2026 to date is −6.3R, a risk to watch (CUSUM k 0.1, catastrophe −15R). Both sides kept as tested (sells negative in 2023–24, positive after). This is the first short-holding entry in the whole search with a real pre-cost edge (≈ +0.12R before costs vs ±0.04 for every M1 scalp).
 
 **Site (PR #251):** with "Shadow too" on, open shadow trades count in the header and active-card floating result, labelled "+N shadow".
+
+## 2026-11-06 — Fee-free scalp search (owner: "find the best scalping edge, don't worry about fees")
+
+`ms/scalp_grid.py`, `ms/scalp_tune.py`, cost 0. Generalised the one ingredient that worked (momentum candle with the 20-day trend → pullback entry → stop past the candle → trail after 2R) down the ladder, with and without the top-fifth volatility gate:
+
+| momentum TF → entry TF | 2023–24 | 2025–26 |
+|---|---|---|
+| M5 → M1 | +0.051 (1281) | −0.047 (1273) |
+| M15 → M1 / M5 | −0.002 / −0.004 | +0.082 / +0.117 |
+| M30 → M1 / M5 | +0.009 / −0.005 | +0.063 / +0.064 |
+| **H1 → M5 (live system 8)** | **+0.125 (233), DD −8.7** | **+0.190 (185), DD −9.2** |
+| H1 → M1 | +0.111 | +0.120 |
+| any TF + top-fifth vol gate | −0.08 to +0.10 on 35–320 trades, sign flips | |
+
+Below H1 the edge flips between halves even with zero fees: a 5–30-minute momentum candle is noise, an H1 one is information. Tuning the H1 version (fee-free): MSNR H4 direction agreeing +0.213 (DD −5.7) | +0.183 (DD −9.0) — better early, less profit late; H4 20-SMA agreeing +0.151 | +0.209 (DD −10.0 | −7.5); trail from 1.5R +0.152 | +0.147; trail from 3R +0.142 | +0.165; hold 4 h +0.119 | +0.149; hold 12 h +0.093 | +0.211; looser candle (1.25×, zone 23–50%) +57.8 | +36.0R on 387/356 trades (DD −13.0 | −11.6); no session filter +0.038 | +0.139. None beats the live rule on profit AND drawdown in both halves. Together with every M1 reversal (±0.04R fee-free), the session ORBs and the four schools' scalps, the conclusion is firm: **on gold the best short-hold edge is the live H1 momentum pullback (+0.12 to +0.19R a trade before costs); nothing faster has a stable edge even with zero fees.** No change.
