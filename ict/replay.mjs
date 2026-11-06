@@ -5,6 +5,7 @@
 // council-data ict/replay.json; every record carries replay: true. Never mixed with the council's data.
 import fs from 'node:fs';
 import path from 'node:path';
+import zlib from 'node:zlib';
 import { MARKETS, P, cnbcBars, agg, signals, letter, isASetup } from './tracker.mjs';
 
 const DATA = process.argv[2] || 'data/ict';
@@ -28,6 +29,27 @@ async function history(M) {
       m5 = m5.concat(got); await sleep(250);
     }
     h1 = dedupe(h1); m5 = dedupe(m5);
+    // CNBC keeps only ~6 months of intraday candles: fill the earlier part from the research probe's Dukascopy cash-index
+    // 5m files (council-data research/candles/idx/), scaled to the futures level by the median ratio over the overlap
+    const DUKA = { NQ: 'USATECHIDXUSD', ES: 'USA500IDXUSD', YM: 'USA30IDXUSD' }[M.short];
+    if (DUKA && h1.length && h1[0].time > FROM) {
+      let d5 = [];
+      for (const y of [...new Set([warm, now].map((t) => new Date(t * 1000).getUTCFullYear()))]) {
+        const f = path.join(DATA, '..', 'research', 'candles', 'idx', `${DUKA}_${y}.json.gz`);
+        try { d5 = d5.concat(JSON.parse(zlib.gunzipSync(fs.readFileSync(f))).map((r) => ({ time: r[0], open: r[1], high: r[2], low: r[3], close: r[4] }))); } catch (e) { /* not there yet */ }
+      }
+      d5 = dedupe(d5);
+      if (d5.length) {
+        const dh = agg(d5, 3600), byT = new Map(dh.map((b) => [b.time, b])), first = h1[0].time;
+        const ratios = h1.filter((b) => b.time < first + 20 * 86400 && byT.has(b.time)).map((b) => b.close / byT.get(b.time).close).sort((a, b) => a - b);
+        if (ratios.length >= 20) {
+          const k = ratios[Math.floor(ratios.length / 2)], sc = (b) => ({ time: b.time, open: b.open * k, high: b.high * k, low: b.low * k, close: b.close * k });
+          const fill = dh.filter((b) => b.time >= warm && b.time < first).map(sc);
+          h1 = dedupe(fill.concat(h1)); m5 = dedupe(d5.filter((b) => b.time >= FROM && b.time < first).map(sc).concat(m5));
+          log.push(`duka ${DUKA} fill ${fill.length} H1 before ${new Date(first * 1000).toISOString().slice(0, 10)}, scale ${k.toFixed(4)}`);
+        } else log.push(`duka ${DUKA}: overlap too small (${ratios.length})`);
+      }
+    }
     console.log(M.short, sym, 'H1', h1.length, 'M5', m5.length, log.join(' '));
     if (h1.length + m5.length < 500) continue;
     const have = new Set(h1.map((b) => b.time)), H = dedupe(h1.concat(agg(m5, 3600).filter((b) => !have.has(b.time)))).filter((b) => b.time + 3600 <= now);
