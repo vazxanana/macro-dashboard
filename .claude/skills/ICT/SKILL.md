@@ -89,4 +89,16 @@ stop 0.10 under the sweep low; mirror for sells. Costs 0.30 spread + 0.20 extra 
   added nothing on top. M5 entries lose with every filter (noise + spread).
 - Turtle soup on the previous day's range (H1 runs PDL/PDH and closes back inside): weak and inconsistent
   (best +0.18R | +0.04R with the discount filter); not an edge alone.
-- Status: research result only; nothing trades it. Next: a separate ICT paper tracker if the owner wants it.
+- Status: research result only; nothing trades it.
+
+## 13. Target markets: US indices (owner, 6 Nov 2026): NQ, S&P 500, Dow and similar
+Gold was only the first test bed. The edge is meant for index futures/CFDs (the course is NQ-centred:
+9:30 ET open, relative equal highs/lows engineered daily).
+- NQ futures 1m (owner file, Dec 2022 → Dec 2025, cost 0.5 pt a trade), same mechanical iFVG:
+  - H1, 3R: +0.08R | +0.09R a trade (n 450 | 203), every year positive (2023 +24.8R, 2024 +12.6R, 2025 +18.7R);
+    buys +0.22R | +0.37R, sells lose (−0.05 | −0.16) — most of the edge is NQ's 2023-25 up-drift.
+  - M15 / M5: about zero or negative in every session; the 9-11 ET window is +0.05R (2R), not enough.
+  - The gold filter (daily trend + discount/premium of the 20-day range) leaves too few NQ trades
+    (NQ rarely sits in discount while trending up) and does not hold on NQ.
+- S&P 500 and Dow: Dukascopy 1m → 5m pulled by the research probe into council-data
+  research/candles/idx/ (USATECHIDXUSD, USA500IDXUSD, USA30IDXUSD, 2023 → today); results to follow.
