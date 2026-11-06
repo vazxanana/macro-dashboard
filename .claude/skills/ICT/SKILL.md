@@ -163,3 +163,22 @@ the H1 iFVG model (NQ 2023-25, every signal independent, trailing exit):
   belongs to MMXM's intraday M5/M1 models, not to an H1 reversal; not adopted.
 - Still to test: previous-day high/low as the target (MMXM: the easiest daily target, ~90% of days), the Day-4 model, and
   the NY 08:00-12:00 window with a 09:00-10:30 reversal sweet spot for an M5 version of the desk.
+
+## 19. Reality check: S&P 500 and Dow 2023-26 (6 Nov 2026) — the edge is NOT proven
+Dukascopy cash-index CFDs (USATECHIDXUSD, USA500IDXUSD, USA30IDXUSD) 1m → 5m → H1, Jan 2023 - Nov 2026, the tracker's
+own signals(), every signal independent, CFD costs NQ 1 / ES 0.5 / YM 2.5 points, R a signal:
+| | 2023 | 2024 | 2025 | 2026 |
+|---|---|---|---|---|
+| NQ A+ trail | +0.51 | +0.27 | −0.04 | 0.00 |
+| ES A+ trail | −0.13 | +0.08 | −0.43 | −0.07 |
+| YM A+ trail | +0.41 | +0.18 | −0.03 | −0.13 |
+| 3 indices A+ trail (sum) | +23.5R | +22.2R | −23.3R | −6.8R |
+| 3 indices A trail (sum) | +2.2R | +27.2R | −23.6R | −2.2R |
+| 3 indices all signals trail | +36.4R | +70.8R | −19.0R | −71.1R |
+- Futures (CNBC 2026, owner's NQ file 2023-25) and cash CFDs give DIFFERENT H1 signals: only ~40% of signal times match
+  in Apr-Nov 2026, and 2026 A-setups were +0.49R (NQ futures) vs +0.09R (NQ cash), +0.14R vs −0.24R (YM). The model is
+  sensitive to the data feed; the tracker trades futures, so futures results matter most, but our futures history is short.
+- Honest summary: positive in 2023-24, flat to negative in 2025, feed-dependent in 2026. The A / A+ filters and the trail
+  were chosen on data that now looks favourable; treat them as hypotheses. **Paper only; forward-test before any risk.**
+  S&P (ES) is the weakest index on cash data in every year but 2024.
+- Replay records from the January-February Dukascopy fill carry `cash: true`.

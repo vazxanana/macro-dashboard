@@ -29,6 +29,7 @@ async function history(M) {
       m5 = m5.concat(got); await sleep(250);
     }
     h1 = dedupe(h1); m5 = dedupe(m5);
+    const cnbc1 = h1.length ? h1[0].time : null;   // signals before this come from the Dukascopy cash-index fill
     // CNBC keeps only ~6 months of intraday candles: fill the earlier part from the research probe's Dukascopy cash-index
     // 5m files (council-data research/candles/idx/), scaled to the futures level by the median ratio over the overlap
     const DUKA = { NQ: 'USATECHIDXUSD', ES: 'USA500IDXUSD', YM: 'USA30IDXUSD' }[M.short];
@@ -57,7 +58,7 @@ async function history(M) {
     // 5m counts as exit data from the first day with a near-full 5m session onwards
     const days = new Map(); for (const b of m5) { const d = Math.floor(b.time / 86400); days.set(d, (days.get(d) || 0) + 1); }
     const full = [...days.entries()].filter(([, n]) => n >= 200).map(([d]) => d).sort((a, b) => a - b);
-    return { sym, m5, H, D, m5from: full.length ? full[0] * 86400 : null, m5days: new Set(full) };
+    return { sym, m5, H, D, m5from: full.length ? full[0] * 86400 : null, m5days: new Set(full), cnbcFrom: cnbc1 };
   }
   throw new Error(`no CNBC history for ${M.short}`);
 }
@@ -80,7 +81,7 @@ function simulate(g, M, key, src) {
   const R2 = closed ? (mark2 && mark2 <= closed ? 2 : R) : null;
   // research: the next 72 H1 candles after the entry as [best, worst, close] in R (sign-adjusted), to study other exits offline
   const path = src.H.filter((b) => b.time >= g.close && b.time < g.close + 72 * 3600).map((b) => [+(((s > 0 ? b.high : -b.low) - s * entry) / r0).toFixed(2), +(((s > 0 ? b.low : -b.high) - s * entry) / r0).toFixed(2), +((s * (b.close - entry)) / r0).toFixed(2)]);
-  return { id: `${key}-${s > 0 ? 'b' : 's'}-${g.t}-r`, market: key, label: M.label, short: M.short, side: s > 0 ? 'buy' : 'sell', model: 'H1 iFVG reversal', replay: true, res: step === 300 ? '5m' : '1h',
+  return { id: `${key}-${s > 0 ? 'b' : 's'}-${g.t}-r`, market: key, label: M.label, short: M.short, side: s > 0 ? 'buy' : 'sell', model: 'H1 iFVG reversal', replay: true, res: step === 300 ? '5m' : '1h', ...(src.cnbcFrom && g.close < src.cnbcFrom ? { cash: true } : {}),
     signalAt: g.close, signalPx: f(entry), entry: f(entry), stop: f(g.stop), stop0: f(g.stop), r0: +r0.toFixed(M.dec + 1), t1: null, trail: P.trail, t2: f(t2), opened: g.close, status, R, R2, closed, exit, exitPx: exitPx == null ? null : f(exitPx), mfe: +mfe.toFixed(2), path,
     sweep: { t: g.sweepT, level: f(g.swept) }, fvg: g.fvg.map(f), ih: g.ih == null ? null : f(g.ih), dol: g.dol == null ? null : f(g.dol), valid: g.valid, feat: g.feat, grade: { ...g.grade, letter: letter(g.grade.total) } };
 }
