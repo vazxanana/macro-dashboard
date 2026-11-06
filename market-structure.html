@@ -1350,6 +1350,12 @@ h1, .h-head { text-wrap: balance; }
 /* polish 15: loading charts shimmer instead of sitting blank */
 @keyframes ms-shimmer { from { background-position: 150% 0; } to { background-position: -50% 0; } }
 [data-loading="1"] { background-image: linear-gradient(100deg, transparent 30%, color-mix(in srgb, var(--ink) 5%, transparent) 50%, transparent 70%); background-size: 200% 100%; animation: ms-shimmer 1.6s linear infinite; border-radius: inherit; }
+
+/* polish 16: council calendar month total beside the month name */
+#ms-cal-m { white-space: nowrap; }
+.cal-mt { font: 600 12px var(--mono); margin-left: 8px; padding: 2px 7px; border-radius: 999px; border: 1px solid var(--line); vertical-align: 2px; }
+.cal-mt.pos { color: var(--buy); background: var(--buy-soft); border-color: color-mix(in srgb, var(--buy) 35%, transparent); }
+.cal-mt.neg { color: var(--sell); background: var(--sell-soft); border-color: color-mix(in srgb, var(--sell) 35%, transparent); }
 </style>
 </head>
 <body>
@@ -3652,7 +3658,7 @@ function msNextSetup(bars, A) {
       html += `<button type="button" style="--heat:${heat.toFixed(2)}" class="cal-d ${cls}${isT ? ' today' : ''}${CAL.sel === k ? ' sel' : ''}" data-day="${k}" aria-label="${d}: ${arr.length ? `${fR(R)}, ${arr.length} trades` : 'no trades'}"><span class="cn">${d}</span>${arr.length ? `<span class="cr">${fR(R)}</span>${(() => { const q = arr.filter((x) => x.market === 'nq'); if (!q.length || mkSel === 'nq') return ''; const v = q.reduce((a, x) => a + x.R, 0); return `<span class="cq">NQ <b class="${v > 0 ? 'pos' : v < 0 ? 'neg' : ''}">${fR(v)}</b></span>`; })()}${(() => { const q = arr.filter((x) => x.shadow); if (!q.length || q.length === arr.length) return q.length ? '<span class="cq">all shadow</span>' : ''; const v = q.reduce((a, x) => a + x.R, 0); return `<span class="cq">shadow <b class="${v > 0 ? 'pos' : v < 0 ? 'neg' : ''}">${fR(v)}</b></span>`; })()}<span class="ct"><span class="nw">${arr.length} trade${arr.length > 1 ? 's' : ''}</span> <span class="nw ct-w">${arr.filter((x) => x.status === 'win').length} won</span></span>` : ''}</button>`;
     }
     el.innerHTML = html;
-    document.getElementById('ms-cal-m').textContent = first.toLocaleDateString(undefined, { month: 'long', year: 'numeric' });
+    document.getElementById('ms-cal-m').innerHTML = `${first.toLocaleDateString(undefined, { month: 'long', year: 'numeric' })}${mN ? ` <small class="cal-mt ${mR > 0 ? 'pos' : mR < 0 ? 'neg' : ''}" title="Month total over ${mN} trades">${fR(mR)}</small>` : ''}`;
     const inM = (x) => { const d = new Date(x.closed * 1000); return d.getFullYear() === CAL.y && d.getMonth() === CAL.m; }, rpM = rp.concat(nqF).filter((x) => mkSel === 'all' || x.market === mkSel).filter(inM);
     const rpTxt = [['xau', 'gold replica (research, replay)'], ['nq', 'NQ New York open run (paper, replay + forward)']].map(([mk, nm]) => { const a = rpM.filter((x) => x.market === mk); return a.length ? `${nm} ${fR(a.reduce((q, x) => q + x.R, 0))} over ${a.length}` : ''; }).filter(Boolean).join(', ');
     document.getElementById('ms-cal-sum').innerHTML = mN ? `Month: <b class="${mR >= 0 ? 'pos' : 'neg'}">${fR(mR)}</b> over ${mN} trades · ${up} green day${up === 1 ? '' : 's'}, ${dn} red · best day ${best.d} (${fR(best.R)}), worst day ${worst.d} (${fR(worst.R)}). Live and shadow trades${(() => { const a = (COUNCIL.shRpRows || []).filter((x) => mkSel === 'all' || (mkSel === 'pairs' ? x.market !== 'xau' && x.market !== 'nq' : x.market === mkSel)).filter(inM); return a.length ? `, the shadow setups' backtest replay (${a.length} trades, ${fR(a.reduce((q, x) => q + x.R, 0))}; live shadow trades start 1 Nov)` : ''; })()}${rpM.length ? `, plus the replay of our system (${(COUNCIL.replay && COUNCIL.replay.from) || ''} – ${(COUNCIL.replay && COUNCIL.replay.to) || ''}, backtest): ${rpTxt}` : ''}. 1R = the risk of one trade.` : `No closed ${withSh ? '' : 'live '}trades this month.`;
