@@ -1329,6 +1329,13 @@ window.MS_ADMIN_HASH = '49c5624f2625ed8b42b6e1bf2819a3a41ddb9743aeca36ea34ea7eb9
 :root[data-theme="light"] .ms-al.ok { color: #067a66; }
 :root[data-theme="light"] .ms-al.against { color: #d01f30; }
 h1, .h-head { text-wrap: balance; }
+
+/* polish 11: setup steps read as a timeline */
+.ms-steps li { position: relative; }
+.ms-steps li:not(:last-child)::after { content: ""; position: absolute; left: 9.5px; width: 1px; top: 29px; bottom: -10px; background: var(--line-strong, var(--line)); }
+.ms-steps li.done:not(:last-child)::after { background: rgba(8,153,129,.45); }
+.ms-steps .ms-dot { position: relative; z-index: 1; background-color: var(--panel); }
+.ms-steps li.now .ms-dot { box-shadow: 0 0 0 4px color-mix(in srgb, var(--gold, #d4a017) 22%, transparent); }
 </style>
 </head>
 <body>
