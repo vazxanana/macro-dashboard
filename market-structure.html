@@ -428,6 +428,34 @@
   .tv-x { all: unset; cursor: pointer; width: 32px; height: 32px; display: grid; place-items: center; border-radius: 8px; border: 1px solid var(--line); color: var(--ink-dim); font-size: 18px; flex: none; }
   .tv-x:hover { color: var(--ink); } .tv-x:focus-visible { outline: 2px solid var(--accent); }
   .tv-c { height: min(440px, 55vh); position: relative; }
+  .rv-cv { position: absolute; inset: 0; width: 100%; height: 100%; z-index: 4; pointer-events: none; }
+  .rv-cv.on { pointer-events: auto; cursor: crosshair; touch-action: none; }
+  .tv-rv { border-top: 1px solid var(--line); padding: 10px 2px 2px; display: grid; gap: 8px; font-size: 13px; }
+  .tv-rv[hidden] { display: none; }
+  .rv-strat small { color: var(--ink-dim); }
+  .rv-tools, .rv-tags, .rv-save, .loss-f, .loss-sync { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+  .rv-tools button, .rv-tags button, .rv-save button, .loss-sync button { font: inherit; font-size: 12px; padding: 5px 10px; border-radius: 7px; border: 1px solid var(--line); background: none; color: var(--ink); cursor: pointer; }
+  .rv-tools button.on, .rv-tags button.on, .rv-save button { background: var(--accent, #2962ff); border-color: transparent; color: #fff; }
+  .rv-tools .rv-c { width: 22px; height: 22px; padding: 0; border-radius: 50%; border: 2px solid var(--line); }
+  .rv-tools .rv-c.on { outline: 2px solid var(--accent, #2962ff); outline-offset: 1px; background-clip: padding-box; }
+  .tv-rv textarea { width: 100%; box-sizing: border-box; font: inherit; font-size: 13px; padding: 8px; border-radius: 8px; border: 1px solid var(--line); background: var(--panel); color: var(--ink); resize: vertical; }
+  .rv-save span, .loss-sync span { color: var(--ink-dim); font-size: 12px; }
+  .rv-council:empty { display: none; }
+  .rv-council { padding: 8px; border-radius: 8px; background: var(--panel); }
+  .loss-f { margin: 8px 0; }
+  .loss-g { border: 1px solid var(--line); border-radius: 8px; margin: 6px 0; }
+  .loss-g > summary { cursor: pointer; padding: 8px 10px; display: flex; flex-wrap: wrap; gap: 4px 10px; align-items: baseline; }
+  .loss-g > summary small, .loss-top { color: var(--ink-dim); font-size: 12px; }
+  .loss-top { flex-basis: 100%; }
+  .loss-n { margin-left: auto; font-size: 12px; }
+  .loss-rows { list-style: none; margin: 0; padding: 0 6px 6px; }
+  .loss-rows li { display: flex; flex-wrap: wrap; gap: 4px 10px; align-items: center; padding: 6px 4px; border-top: 1px solid var(--line); cursor: pointer; font-size: 12px; }
+  .loss-rows li:hover { background: var(--panel); }
+  .loss-why { color: var(--ink-dim); flex: 1 1 200px; min-width: 0; }
+  .loss-st { margin-left: auto; color: var(--accent, #2962ff); font-weight: 600; }
+  .loss-st.ok { color: var(--up, #089981); }
+  .loss-more { cursor: default !important; color: var(--ink-dim); }
+  .loss-sync { margin-top: 8px; }
   .tv-c .tv-msg { position: absolute; inset: 0; display: grid; place-items: center; color: var(--ink-faint); font-size: 13px; padding: 16px; text-align: center; }
   .tv-k { display: flex; flex-wrap: wrap; gap: 6px 14px; padding: 10px 16px 14px; font-size: 12px; color: var(--ink-dim); border-top: 1px solid var(--line-soft); }
   .tv-k span { display: inline-flex; align-items: center; gap: 6px; } .tv-k i { width: 14px; height: 2px; display: block; } .tv-k b { color: var(--ink); font-family: var(--mono); }
@@ -866,7 +894,14 @@ window.MS_ADMIN_HASH = '4622c0548320297ae6874ab045769a98f61c6c53247bd56b3856a472
         <div class="ms-k">Trade reviews · was it our system or the market?</div>
         <div id="ms-c-pm-sum"></div>
         <ul class="c-pm" id="ms-c-pm"></ul>
-        <dialog class="tv" id="ms-tv" aria-labelledby="ms-tv-t"><div class="tv-h"><div><h3 id="ms-tv-t">Trade</h3><p id="ms-tv-s"></p></div><div class="tv-ba" role="group" aria-label="Prediction before, result after"><button type="button" data-ba="before">Before</button><button type="button" data-ba="after" class="on">After</button><button type="button" data-ba="save" title="Save the before and after charts as images">Save</button></div><button type="button" class="tv-x" id="ms-tv-x" aria-label="Close chart">×</button></div><div class="tv-c" id="ms-tv-c"><div class="tv-msg" id="ms-tv-m">Loading candles…</div></div><div class="tv-k" id="ms-tv-k"></div></dialog>
+        <dialog class="tv" id="ms-tv" aria-labelledby="ms-tv-t"><div class="tv-h"><div><h3 id="ms-tv-t">Trade</h3><p id="ms-tv-s"></p></div><div class="tv-ba" role="group" aria-label="Prediction before, result after"><button type="button" data-ba="before">Before</button><button type="button" data-ba="after" class="on">After</button><button type="button" data-ba="save" title="Save the before and after charts as images">Save</button></div><button type="button" class="tv-x" id="ms-tv-x" aria-label="Close chart">×</button></div><div class="tv-c" id="ms-tv-c"><div class="tv-msg" id="ms-tv-m">Loading candles…</div></div><div class="tv-k" id="ms-tv-k"></div><div class="tv-rv adm" id="ms-tv-rv" hidden><div class="rv-strat" id="ms-rv-strat"></div><div class="rv-tools"><b>Draw</b><button type="button" data-tool="pen">Pen</button><button type="button" data-tool="line">Line</button><button type="button" data-tool="text">Text</button><button type="button" class="rv-c on" data-col="#f23645" style="background:#f23645" aria-label="Colour #f23645"></button><button type="button" class="rv-c" data-col="#089981" style="background:#089981" aria-label="Colour #089981"></button><button type="button" class="rv-c" data-col="#f5a623" style="background:#f5a623" aria-label="Colour #f5a623"></button><button type="button" class="rv-c" data-col="#2962ff" style="background:#2962ff" aria-label="Colour #2962ff"></button><button type="button" class="rv-c" data-col="#ffffff" style="background:#ffffff" aria-label="Colour #ffffff"></button><button type="button" data-act="undo">Undo</button><button type="button" data-act="clear">Clear</button></div><div class="rv-tags" id="ms-rv-tags" aria-label="Why it failed"></div><textarea id="ms-rv-text" rows="3" placeholder="Why did this setup fail? What did the chart show before the entry?"></textarea><textarea id="ms-rv-lesson" rows="2" placeholder="Rule idea for the council (optional), e.g. no scalp sells while H4 makes higher lows"></textarea><div class="rv-save"><button type="button" id="ms-rv-save">Save review</button><span id="ms-rv-msg"></span></div><div class="rv-council" id="ms-rv-council"></div></div></dialog>
+      </div>
+      <div class="card adm c-loss" id="ms-loss">
+        <div class="ms-k"><span>Loss review · why the setup failed</span></div>
+        <p class="ms-note">Every losing trade, stacked by the strategy that took it (worst first). Open one, draw on its chart, tick the reasons and write why it failed. The council counts your reasons with its own trade reviews (stop hunt, stop too tight, late entry and news change its rules directly) and tests the rule ideas you write.</p>
+        <div class="loss-f" id="ms-loss-f"><span class="seg"><button type="button" data-src="all" class="on" aria-pressed="true">All</button><button type="button" data-src="live" aria-pressed="false">Live</button><button type="button" data-src="shadow" aria-pressed="false">Shadow</button></span><span class="seg"><button type="button" data-days="7" aria-pressed="false">7 days</button><button type="button" data-days="30" class="on" aria-pressed="true">30 days</button></span><span class="seg"><button type="button" data-todo="0" class="on" aria-pressed="true">Everything</button><button type="button" data-todo="1" aria-pressed="false">To review</button></span></div>
+        <div id="ms-loss-list" class="loss-list"></div>
+        <div class="loss-sync"><span id="ms-loss-sync"></span><button type="button" id="ms-loss-gh">Connect GitHub</button><button type="button" id="ms-loss-copy">Copy reviews</button></div>
       </div>
       <div class="card c-analyst">
         <div class="ms-k">Analyst · weekly brief</div>
@@ -2662,9 +2697,10 @@ function msNextSetup(bars, A) {
     if (!document.getElementById('v-council')) return;
     const bust = Math.floor(Date.now() / 120000);
     const get = (f, json) => fetch(`${CDATA}${f}?v=${bust}`, { cache: 'no-store' }).then((r) => r.ok ? (json ? r.json() : r.text()) : null).catch(() => null);
-    let [trades, config, coach, snap, analysis, review, backtest, replay, research, shadowRp] = await Promise.all([get('trades.json', 1), get('config.json', 1), get('coach.json', 1), get('snapshot.json', 1), get('analysis/latest.md'), get('reviews/latest.md'), get('backtest.json', 1), get('research/replay-2w.json', 1), get('research.json', 1), get('research/shadow-replay.json', 1)]);
+    let [trades, config, coach, snap, analysis, review, backtest, replay, research, shadowRp, lossRev] = await Promise.all([get('trades.json', 1), get('config.json', 1), get('coach.json', 1), get('snapshot.json', 1), get('analysis/latest.md'), get('reviews/latest.md'), get('backtest.json', 1), get('research/replay-2w.json', 1), get('research.json', 1), get('research/shadow-replay.json', 1), get('reviews/losses.json', 1)]);
     // m30m1 (M30 → M1) fires on the same M1 entry as the gold scalp: the same trade recorded twice; count it once (6 Nov)
     if (Array.isArray(trades)) { const seen = new Set(trades.filter((x) => x.k !== 'm30m1').map((x) => `${x.market}|${x.side}|${x.opened}|${x.entry}`)); trades = trades.filter((x) => x.k !== 'm30m1' || !seen.has(`${x.market}|${x.side}|${x.opened}|${x.entry}`)); }
+    if (lossRev && lossRev.reviews) rvMerge(lossRev);
     Object.assign(COUNCIL, { trades, config, coach, snap, analysis, review, backtest, replay, research, shadowRp, shRpRows: null, at: Date.now() });
     councilAlerts(trades);
     if (config) {
@@ -2907,6 +2943,7 @@ function msNextSetup(bars, A) {
     const sysBox = document.getElementById('ms-c-sys'); if (sysBox) sysBox.checked = tab !== 'all';
     const C = COUNCIL, SYS = sysOn(), TA = (SYS ? sysTrades().sort((a, b) => a.opened - b.opened) : (C.trades || [])).slice().reverse(), T = TA.filter((x) => !x.shadow);
     renderCalendar();
+    renderLoss();
     renderNQ();
     renderReplica();
     renderPairs();
@@ -3037,6 +3074,7 @@ function msNextSetup(bars, A) {
     document.getElementById('ms-tv-k').innerHTML = `${cond.length && !PUB ? `<span class="tv-cond">At the signal <b>${cond.map(esc).join(' · ')}</b></span>` : ''}<span><i style="background:#2962ff"></i>Entry <b>${f(x.entry)}</b></span><span><i style="background:${DNC}"></i>Stop <b>${f(stop0)}</b></span>${x.beMoved ? `<span><i style="background:#8a94a8"></i>Stop moved to entry</span>` : ''}<span><i style="background:${UPC}"></i>Target <b>${f(x.t1)}</b>${x.tp1 != null ? ` (${/^r/.test(x.k) ? 'the Origin' : 'target 2'}; target 1 ${f(x.tp1)})` : ''}</span><span>Reward:risk <b>${x.rr}R</b></span>${x.mfe != null ? `<span>Best <b>+${x.mfe}R</b></span>` : ''}<span>${ftime(x.opened + TZ)}${x.closed ? ' → ' + ftime(x.closed + TZ) : ''}</span><a href="?s=${esc(x.market)}#charts">Open ${esc(I.label)} charts</a>`;
     const msg = document.getElementById('ms-tv-m'); msg.hidden = false; msg.textContent = 'Loading candles…';
     if (!dlg.open) dlg.showModal();
+    rvOpen(x);
     const host = document.getElementById('ms-tv-c'), th = THEMES[G.theme];
     if (!TV.chart) {
       TV.chart = LW.createChart(host, { autoSize: true, layout: { background: { type: 'solid', color: th.bg }, textColor: th.text, fontSize: 11 }, grid: { vertLines: { visible: false }, horzLines: { color: th.grid } }, crosshair: { mode: LW.CrosshairMode.Normal }, rightPriceScale: { borderColor: th.border }, timeScale: { borderColor: th.border, timeVisible: true, secondsVisible: false } });
@@ -3136,6 +3174,187 @@ function msNextSetup(bars, A) {
     if (bx) bx.addEventListener('click', () => dlg.close());
     const ba = document.querySelector('.tv-ba'); if (ba) ba.addEventListener('click', (ev) => { const b = ev.target.closest('[data-ba]'); if (!b) return; if (b.dataset.ba === 'save') tvSaveBoth(); else tvApply(b.dataset.ba); });
     if (dlg) dlg.addEventListener('click', (ev) => { if (ev.target === dlg) dlg.close(); }); }
+  // ─── Loss review (owner, 6 Nov): every losing trade stacked by the strategy that took it; draw on its chart and write why
+  // the setup failed. Reviews live in this browser (localStorage msLossRev) and, with a GitHub token, in council-data
+  // reviews/losses.json, which the trader reads: the reasons that match its own review causes (stop hunt, stop too tight,
+  // late entry, news) count in its lesson rules, and the rest are summarised per strategy as rule ideas to test.
+  const RV_TAGS = [['htf', 'Against the higher-timeframe trend'], ['level', 'Into a key level or zone'], ['hunt', 'Stop swept, then it went to target'], ['noise', 'Stop too tight'], ['late', 'Late entry, chased'], ['chop', 'Range or chop, no trend'], ['news', 'News or volatility'], ['setup', 'Not a valid setup'], ['market', 'Good setup, the market just turned']];
+  const RV_COLORS = ['#f23645', '#089981', '#f5a623', '#2962ff', '#ffffff'];
+  const RV = { map: {}, x: null, tool: null, color: RV_COLORS[0], strokes: [], cur: null, raf: 0, tags: new Set() };
+  const RVW = { src: 'all', days: 30, todo: false };
+  try { RV.map = JSON.parse(localStorage.getItem('msLossRev') || '{}') || {}; } catch (e) { RV.map = {}; }
+  const rvSaveLocal = () => { try { localStorage.setItem('msLossRev', JSON.stringify(RV.map)); } catch (e) {} };
+  function rvMerge(remote) {
+    for (const [id, r] of Object.entries((remote && remote.reviews) || {})) {
+      const l = RV.map[id];
+      if (!l || (r.at || 0) > (l.at || 0)) RV.map[id] = r; else if (r.council && JSON.stringify(r.council) !== JSON.stringify(l.council)) l.council = r.council;
+    }
+    rvSaveLocal();
+  }
+  const GHR = { repo: 'vazxanana/macro-dashboard', path: 'reviews/losses.json', branch: 'council-data' };
+  const ghTok = () => { try { return localStorage.getItem('msGhTok') || ''; } catch (e) { return ''; } };
+  async function rvPush() {
+    const tok = ghTok(); if (!tok) return 'local';
+    const api = `https://api.github.com/repos/${GHR.repo}/contents/${GHR.path}`, h = { Authorization: `Bearer ${tok}`, Accept: 'application/vnd.github+json' };
+    for (let a = 0; a < 3; a++) {
+      let sha = null;
+      const g = await fetch(`${api}?ref=${GHR.branch}&t=${Date.now()}`, { headers: h, cache: 'no-store' });
+      if (g.ok) { const j = await g.json(); sha = j.sha; try { rvMerge(JSON.parse(decodeURIComponent(escape(atob(String(j.content).replace(/\s/g, '')))))); } catch (e) {} }
+      else if (g.status !== 404) throw new Error(`GitHub ${g.status}${g.status === 401 ? ' (token not accepted)' : ''}`);
+      const content = btoa(unescape(encodeURIComponent(JSON.stringify({ updated: new Date().toISOString(), reviews: RV.map }))));
+      const p = await fetch(api, { method: 'PUT', headers: h, body: JSON.stringify({ message: `Loss review ${new Date().toISOString().slice(0, 16)}Z`, content, branch: GHR.branch, ...(sha ? { sha } : {}) }) });
+      if (p.ok) return 'synced';
+      if (p.status !== 409 && p.status !== 422) throw new Error(`GitHub ${p.status}`);
+    }
+    throw new Error('GitHub kept reporting a newer file; try again');
+  }
+  function lossTrades() {
+    const now = Date.now() / 1000, seen = new Set();
+    return (COUNCIL.trades || []).concat(sysTrades().filter((x) => !x.replay)).filter((x) => {
+      if (x.status !== 'loss' || !x.closed || now - x.closed > RVW.days * 86400 || seen.has(x.id)) return false;
+      seen.add(x.id);
+      if (RVW.src === 'live' && x.shadow) return false; if (RVW.src === 'shadow' && !x.shadow) return false;
+      if (RVW.todo && RV.map[x.id] && !RV.map[x.id].draft) return false;
+      return true;
+    }).sort((a, b) => b.closed - a.closed);
+  }
+  const rvTagName = (t) => (RV_TAGS.find((z) => z[0] === t) || [t, t])[1];
+  function renderLoss() {
+    const box = document.getElementById('ms-loss-list'); if (!box || PUB) return;
+    const L = lossTrades(), G = new Map();
+    for (const x of L) { const key = `${x.k}|${x.name}|${x.pair}`; (G.get(key) || G.set(key, []).get(key)).push(x); }
+    const groups = [...G.entries()].map(([key, a]) => ({ key, a, R: a.reduce((s, x) => s + (x.R || 0), 0) })).sort((p, q) => p.R - q.R);
+    window.LOSS_OPEN = window.LOSS_OPEN || new Set();
+    const ow = (COUNCIL.snap && COUNCIL.snap.ownerReviews) || {};
+    box.innerHTML = groups.length ? groups.map(({ key, a, R }) => {
+      const x0 = a[0], rv = a.filter((x) => RV.map[x.id] && !RV.map[x.id].draft), tc = {};
+      rv.forEach((x) => (RV.map[x.id].tags || []).forEach((t) => { tc[t] = (tc[t] || 0) + 1; }));
+      const top = Object.entries(tc).sort((p, q) => q[1] - p[1]).slice(0, 3).map(([t, n]) => `${esc(rvTagName(t))} ×${n}`).join(' · ');
+      const sh = a.filter((x) => x.shadow).length, cand = ((ow.candidates || []).filter((c) => c.k === x0.k));
+      return `<details class="loss-g" data-g="${esc(key)}"${window.LOSS_OPEN.has(key) ? ' open' : ''}><summary><b>${esc(x0.name)}</b> <small>${esc(x0.pair || '')} · ${esc(x0.k)}</small><span class="loss-n">${a.length} loss${a.length > 1 ? 'es' : ''}${sh ? ` (${sh} shadow)` : ''} · <b class="neg">${R.toFixed(1)}R</b> · reviewed ${rv.length}/${a.length}</span>${top ? `<span class="loss-top">Your reasons: ${top}</span>` : ''}${cand.length ? `<span class="loss-top">Council: ${cand.map((c) => `${esc(rvTagName(c.tag))} in ${c.n} of ${c.of} reviewed, queued to test`).join('; ')}</span>` : ''}</summary>
+        <ul class="loss-rows">${a.slice(0, 60).map((x) => { const r = RV.map[x.id], done = r && !r.draft;
+          return `<li data-lid="${esc(x.id)}" tabindex="0" title="Open the chart and review this loss"><span>${ftime(x.closed + TZ)}</span><b>${esc(x.label)}</b><span class="chip ${x.side}">${x.side.toUpperCase()}</span><b class="neg">${x.R != null ? x.R : -1}R</b><span class="loss-why">${x.shadow ? `shadow · ${esc((x.blockedBy || []).join(', '))}` : 'live'}${x.pm && x.pm.title ? ` · council: ${esc(x.pm.title)}` : ''}</span><span class="loss-st ${done ? 'ok' : ''}">${done ? `✓ ${esc((r.tags || []).map(rvTagName).join(', ') || 'reviewed')}` : r && r.draft ? 'draft' : 'review'}</span></li>`; }).join('')}${a.length > 60 ? `<li class="loss-more">${a.length - 60} older losses not shown; narrow the filter.</li>` : ''}</ul></details>`;
+    }).join('') : '<p class="ms-note">No losing trade in this view.</p>';
+    const n = Object.values(RV.map).filter((r) => !r.draft).length, s = document.getElementById('ms-loss-sync');
+    if (s) s.textContent = `${n} review${n === 1 ? '' : 's'} saved${ghTok() ? ' · syncing to the council (GitHub connected)' : ' in this browser only · connect GitHub so the council can read them'}.`;
+    const gb = document.getElementById('ms-loss-gh'); if (gb) gb.textContent = ghTok() ? 'GitHub connected' : 'Connect GitHub';
+  }
+  // drawing layer over the trade chart: points kept as [time (UTC s), price] so they stay on the candles when zoomed
+  function rvStep() { const d = TV.ctx && TV.ctx.data; return d && d.length > 1 ? d[1].time - d[0].time : 60; }
+  function rvToTP(px, py) {
+    const C = TV.ctx; if (!C || !TV.chart) return null;
+    const lg = TV.chart.timeScale().coordinateToLogical(px), p = TV.series.coordinateToPrice(py); if (lg == null || p == null) return null;
+    const d = C.data, i = Math.max(0, Math.min(d.length - 1, Math.floor(lg)));
+    return [d[i].time + (lg - i) * rvStep() - TZ, +p];
+  }
+  function rvFromTP(tp) {
+    const C = TV.ctx; if (!C || !TV.chart) return null;
+    const d = C.data, tt = tp[0] + TZ; let lo = 0, hi = d.length - 1;
+    while (lo < hi) { const m = (lo + hi + 1) >> 1; if (d[m].time <= tt) lo = m; else hi = m - 1; }
+    const x = TV.chart.timeScale().logicalToCoordinate(lo + (tt - d[lo].time) / rvStep()), y = TV.series.priceToCoordinate(tp[1]);
+    return x == null || y == null ? null : [x, y];
+  }
+  function rvDraw() {
+    const cv = document.getElementById('ms-rv-cv'), dlg = document.getElementById('ms-tv');
+    if (!cv || !dlg || !dlg.open) { RV.raf = 0; return; }
+    const host = cv.parentElement, dpr = window.devicePixelRatio || 1, w = host.clientWidth, h = host.clientHeight;
+    if (cv.width !== Math.round(w * dpr) || cv.height !== Math.round(h * dpr)) { cv.width = Math.round(w * dpr); cv.height = Math.round(h * dpr); }
+    const g = cv.getContext('2d'); g.setTransform(dpr, 0, 0, dpr, 0, 0); g.clearRect(0, 0, w, h);
+    for (const s of RV.strokes.concat(RV.cur ? [RV.cur] : [])) {
+      const pts = s.pts.map(rvFromTP).filter(Boolean); if (!pts.length) continue;
+      g.strokeStyle = g.fillStyle = s.c; g.lineWidth = s.w || 2; g.lineJoin = g.lineCap = 'round';
+      if (s.tool === 'text') { g.font = '600 13px -apple-system, Roboto, sans-serif'; g.fillText(s.text || '', pts[0][0] + 4, pts[0][1] - 4); g.beginPath(); g.arc(pts[0][0], pts[0][1], 3, 0, 7); g.fill(); continue; }
+      g.beginPath(); pts.forEach(([x, y], i) => (i ? g.lineTo(x, y) : g.moveTo(x, y))); g.stroke();
+    }
+    RV.raf = requestAnimationFrame(rvDraw);
+  }
+  function rvKeepDraft() {
+    const x = RV.x; if (!x) return;
+    const r = RV.map[x.id];
+    if (r && !r.draft) { r.strokes = RV.strokes; } else if (RV.strokes.length) RV.map[x.id] = { ...(r || {}), id: x.id, draft: true, strokes: RV.strokes, at: Math.floor(Date.now() / 1000) };
+    rvSaveLocal();
+  }
+  function rvCanvas() {
+    let cv = document.getElementById('ms-rv-cv'); if (cv) return cv;
+    cv = document.createElement('canvas'); cv.id = 'ms-rv-cv'; cv.className = 'rv-cv'; document.getElementById('ms-tv-c').appendChild(cv);
+    const pos = (ev) => { const b = cv.getBoundingClientRect(); return [ev.clientX - b.left, ev.clientY - b.top]; };
+    cv.addEventListener('pointerdown', (ev) => {
+      if (!RV.tool) return; ev.preventDefault(); const tp = rvToTP(...pos(ev)); if (!tp) { document.getElementById('ms-rv-msg').textContent = 'Wait for the candles to load, then draw.'; return; }
+      if (RV.tool === 'text') { const t = prompt('Text on the chart'); if (t) { RV.strokes.push({ tool: 'text', c: RV.color, pts: [tp], text: t.slice(0, 200) }); rvKeepDraft(); } return; }
+      cv.setPointerCapture(ev.pointerId); RV.cur = { tool: RV.tool, c: RV.color, w: 2, pts: RV.tool === 'line' ? [tp, tp] : [tp] };
+    });
+    cv.addEventListener('pointermove', (ev) => { if (!RV.cur) return; const tp = rvToTP(...pos(ev)); if (!tp) return; if (RV.cur.tool === 'line') RV.cur.pts[1] = tp; else RV.cur.pts.push(tp); });
+    const end = () => { if (!RV.cur) return; if (RV.cur.tool === 'pen' && RV.cur.pts.length > 400) RV.cur.pts = RV.cur.pts.filter((p, i, a) => i % Math.ceil(a.length / 400) === 0 || i === a.length - 1); RV.strokes.push(RV.cur); RV.cur = null; rvKeepDraft(); };
+    cv.addEventListener('pointerup', end); cv.addEventListener('pointercancel', end);
+    return cv;
+  }
+  function rvSetTool(t) {
+    RV.tool = RV.tool === t ? null : t;
+    document.querySelectorAll('#ms-tv-rv [data-tool]').forEach((b) => b.classList.toggle('on', b.dataset.tool === RV.tool));
+    rvCanvas().classList.toggle('on', !!RV.tool);
+  }
+  function rvOpen(x) {
+    const p = document.getElementById('ms-tv-rv'); if (!p) return;
+    const show = !PUB && x && x.status === 'loss'; p.hidden = !show;
+    TV.ctx = null;   // the previous trade's candles must not catch drawings while this one loads
+    RV.x = show ? x : null; RV.tool = null; RV.cur = null; rvCanvas().classList.remove('on');
+    document.querySelectorAll('#ms-tv-rv [data-tool]').forEach((b) => b.classList.remove('on'));
+    const r = (show && RV.map[x.id]) || {}; RV.strokes = (r.strokes || []).slice(); RV.tags = new Set(r.tags || []);
+    if (!RV.raf) RV.raf = requestAnimationFrame(rvDraw);
+    if (!show) { RV.strokes = []; return; }
+    const ft = x.feat || {};
+    document.getElementById('ms-rv-strat').innerHTML = `<b>Strategy that took it:</b> ${esc(x.name)} <small>${esc(x.pair || '')} · ${esc(x.k)} · ${esc(x.h || '')}</small> · ${x.side === 'sell' ? 'Sell' : 'Buy'} ${esc(x.label)} at ${fmtI(x.entry, { dec: x.dec != null ? x.dec : 2 })}, stop ${fmtI(x.stop, { dec: x.dec != null ? x.dec : 2 })}, target ${fmtI(x.t1, { dec: x.dec != null ? x.dec : 2 })} (${x.rr}R) · ${x.shadow ? `shadow (${esc((x.blockedBy || []).join(', '))})` : 'live'}${ft.d1 ? ` · ${ft.d1} D1` : ''}${ft.session ? ` · ${esc(ft.session)}` : ''}<br>${x.note ? `<small>Trader: ${esc(String(x.note).slice(0, 300))}</small><br>` : ''}${x.pm && x.pm.title ? `<small>Council's own review: <b>${esc(x.pm.title)}</b>${x.pm.lesson ? ` · ${esc(x.pm.lesson)}` : ''}</small>` : ''}`;
+    document.getElementById('ms-rv-tags').innerHTML = RV_TAGS.map(([t, n]) => `<button type="button" data-tag="${t}" aria-pressed="${RV.tags.has(t)}" class="${RV.tags.has(t) ? 'on' : ''}">${esc(n)}</button>`).join('');
+    document.getElementById('ms-rv-text').value = r.text || ''; document.getElementById('ms-rv-lesson').value = r.lesson || '';
+    document.getElementById('ms-rv-msg').textContent = r.at && !r.draft ? `Saved ${new Date(r.at * 1000).toLocaleString()}` : '';
+    document.getElementById('ms-rv-council').innerHTML = r.council ? `<b>Council's answer:</b> ${esc(r.council.note || '')} <small>${esc(r.council.verdict || '')}${r.council.at ? ` · ${esc(String(r.council.at).slice(0, 10))}` : ''}</small>` : '';
+  }
+  async function rvSave() {
+    const x = RV.x; if (!x) return;
+    const msg = document.getElementById('ms-rv-msg'), old = RV.map[x.id] || {};
+    RV.map[x.id] = { id: x.id, k: x.k, name: x.name, pair: x.pair, h: x.h, market: x.market, side: x.side, R: x.R, entry: x.entry, stop: x.stop, t1: x.t1, opened: x.opened, closed: x.closed, shadow: !!x.shadow, blockedBy: x.blockedBy || [], feat: x.feat || {},
+      tags: [...RV.tags], text: document.getElementById('ms-rv-text').value.trim().slice(0, 4000), lesson: document.getElementById('ms-rv-lesson').value.trim().slice(0, 1000), strokes: RV.strokes, at: Math.floor(Date.now() / 1000), ...(old.council ? { council: old.council } : {}) };
+    rvSaveLocal(); msg.textContent = 'Saving…'; renderLoss();
+    try { const r = await rvPush(); msg.textContent = r === 'synced' ? 'Saved and sent to the council.' : 'Saved in this browser. Connect GitHub (Loss review card) so the council can read it.'; }
+    catch (e) { msg.textContent = `Saved in this browser; sending failed: ${e.message || e}`; }
+    renderLoss();
+  }
+  {
+    const p = document.getElementById('ms-tv-rv');
+    if (p) p.addEventListener('click', (ev) => {
+      const b = ev.target.closest('button'); if (!b) return;
+      if (b.dataset.tool) rvSetTool(b.dataset.tool);
+      else if (b.dataset.col) { RV.color = b.dataset.col; p.querySelectorAll('[data-col]').forEach((z) => z.classList.toggle('on', z === b)); }
+      else if (b.dataset.act === 'undo') { RV.strokes.pop(); rvKeepDraft(); }
+      else if (b.dataset.act === 'clear') { if (RV.strokes.length && confirm('Remove every drawing on this chart?')) { RV.strokes = []; rvKeepDraft(); } }
+      else if (b.dataset.tag) { const t = b.dataset.tag; RV.tags.has(t) ? RV.tags.delete(t) : RV.tags.add(t); b.classList.toggle('on', RV.tags.has(t)); b.setAttribute('aria-pressed', String(RV.tags.has(t))); }
+      else if (b.id === 'ms-rv-save') rvSave();
+    });
+    const lst = document.getElementById('ms-loss-list');
+    if (lst) {
+      const go = (ev) => { const r = ev.target.closest('[data-lid]'); if (r) openTrade(r.dataset.lid); };
+      lst.addEventListener('click', go);
+      lst.addEventListener('keydown', (ev) => { if (ev.key === 'Enter' || ev.key === ' ') { ev.preventDefault(); go(ev); } });
+      lst.addEventListener('toggle', (ev) => { const d = ev.target; if (!d.dataset || !d.dataset.g) return; window.LOSS_OPEN = window.LOSS_OPEN || new Set(); d.open ? window.LOSS_OPEN.add(d.dataset.g) : window.LOSS_OPEN.delete(d.dataset.g); }, true);
+    }
+    const f = document.getElementById('ms-loss-f');
+    if (f) f.addEventListener('click', (ev) => {
+      const b = ev.target.closest('button'); if (!b) return;
+      if (b.dataset.src) RVW.src = b.dataset.src; if (b.dataset.days) RVW.days = +b.dataset.days; if (b.dataset.todo) RVW.todo = b.dataset.todo === '1';
+      f.querySelectorAll('button').forEach((z) => { const on = (z.dataset.src && z.dataset.src === RVW.src) || (z.dataset.days && +z.dataset.days === RVW.days) || (z.dataset.todo && (z.dataset.todo === '1') === RVW.todo); z.classList.toggle('on', !!on); z.setAttribute('aria-pressed', String(!!on)); });
+      renderLoss();
+    });
+    const gh = document.getElementById('ms-loss-gh');
+    if (gh) gh.addEventListener('click', () => {
+      const cur = ghTok(), t = prompt(cur ? 'GitHub connected. Paste a new token, or leave empty to disconnect.' : 'Paste a GitHub fine-grained token with Contents: read and write on vazxanana/macro-dashboard only. It stays in this browser and is used only to save your loss reviews to the council-data branch.', '');
+      if (t === null) return;
+      try { if (t.trim()) localStorage.setItem('msGhTok', t.trim()); else localStorage.removeItem('msGhTok'); } catch (e) {}
+      renderLoss(); if (t.trim()) rvPush().then(() => renderLoss()).catch((e) => alert(`GitHub: ${e.message || e}`));
+    });
+    const cp = document.getElementById('ms-loss-copy');
+    if (cp) cp.addEventListener('click', async () => { const s = JSON.stringify({ updated: new Date().toISOString(), reviews: RV.map }); try { await navigator.clipboard.writeText(s); cp.textContent = 'Copied'; } catch (e) { prompt('Copy the reviews', s); } setTimeout(() => { cp.textContent = 'Copy reviews'; }, 1500); });
+    const dlg = document.getElementById('ms-tv'); if (dlg) dlg.addEventListener('close', () => { rvKeepDraft(); RV.tool = null; const cv = document.getElementById('ms-rv-cv'); if (cv) cv.classList.remove('on'); renderLoss(); });
+  }
   // ─── Backtest card: the same clustered statistics the Coach uses, so the page shows exactly what it decides on ───
   function btStat(arr, key = 'R_none') {
     const v = arr.filter((t) => t[key] != null && isFinite(t[key])), n = v.length;
