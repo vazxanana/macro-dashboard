@@ -2691,7 +2691,7 @@ function msNextSetup(bars, A) {
   // NQ setups that are part of our system: the New York open run only (4 Nov: it held on 3 years of NQ futures; the open sweeps did not). The others were
   // retired on the same 1-minute test and their records are not counted here.
   const NQ_SYS = ['nyflip'], nqSys = (x) => x.market !== 'nq' || NQ_SYS.includes(x.session);
-  const SYS_K = ['replica', 'mosha-bo', 'trend', 'gtrend', 'gtl', 'geg'];   // live paper systems: the gold replica, Mosha BO (gold), crypto trend (BTC, ETH, SOL, XRP)
+  const SYS_K = ['replica', 'mosha-bo', 'trend', 'gtrend', 'gtl', 'geg', 'gmp'];   // live paper systems: the gold replica, Mosha BO (gold), crypto trend (BTC, ETH, SOL, XRP)
   function renderCalendar() {
     const el = document.getElementById('ms-cal'); if (!el) return;
     const withSh = (document.getElementById('ms-cal-sh') || {}).checked;

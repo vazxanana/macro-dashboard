@@ -217,6 +217,9 @@ const USER_RULES = [
   { id: 'gold-trend-add', apply: (c) => { c.goldTrendAdd = { atR: 1 }; },
     change: 'Gold trend: one add. When a closed daily candle is +1R (2 ATR at entry) above the entry, a second unit buys at market on the next run with the same ratcheting stop; it exits with the first unit',
     why: 'Owner: apply it. Spot gold 2023-24 | 2025-26, N20 with the 2 ATR trail: +9.9R (DD -2.0) | +24.1R (DD -1.0) without the add; +13.2R (DD -2.5) | +41.1R (DD -1.0) with it; N10 and N55 show the same gain. The add roughly doubles the 2025-26 result for half an R of extra early drawdown.' },
+  { id: 'gold-momentum-pullback', apply: (c) => { c.goldMP = { mult: 1.5, top: 0.8, z1: 0.382, z2: 0.618, wait: 6, k: 2 }; },
+    change: 'Gold momentum pullback (new paper system, both sides): a closed H1 candle whose range is at least 1.5x the average of the previous 14 H1 ranges and which closes in its top (buys) / bottom (sells) 20%, in the direction of the 20-day average, between 07:00 and 17:00 UTC; then the first M5 candle within 6 h that trades into the 38-62% pullback of that H1 candle and closes in the trade direction enters at market; stop 0.1 beyond the H1 candle; after +2R the stop trails 1R behind the best price (cap 10R); out after 8 h; cancelled if the stop is hit before the entry',
+    why: 'Owner: find a good scalp for a raw-spread account. Every M1 and session scalp tested was zero before costs; this one is not. Spot gold 2023-24 | 2025-26 at 0.15 all-in cost: +0.105R | +0.171R a trade (n234/186, worst drawdown -9.1R | -9.5R), positive at 0.10, 0.20 and 0.30 cost, for range multiples 1.25-1.5, top 75-90%, pullback zones 23-50 / 38-62 / 50-79%, waits 3-6 h, 1.5R / 2R / 3R / trail; Feb-Jun 2026 bear window +2.8R. Without the 20-day direction it halves. Median stop 7.8 points, ~110 trades a year, entries 07-17 UTC.' },
   { id: 'mosha-bo-weekly', apply: (c) => { c.moshaBoWeekly = true; },
     change: "Mosha BO system: trades only in the weekly structure's direction (his \"Father\" timeframe); the M15 break no longer has to flip M15 structure",
     why: "From his multi-timeframe slides (father/mother/son). Spot gold 2019-26, H4->H1->M15, limit at the broken level, 3R, with the weekly direction computed the way the trader sees it live (Monday weeks built from the last 720 daily candles, swing size 3): weekly agrees 2019-22 +32.2R (87 trades, +0.37R a trade), 2023-26 +34.2R (99, +0.35R), 7 of 8 years positive, worst drawdown -18.4R; weekly against -28.3R / -15.8R. The previous flip-only rule: +7.5R / +15.1R. Caveat: the weekly filter did not help the other timeframe chains, so it is watched by the kill switch like everything else." },
@@ -432,7 +435,7 @@ for (const [key, M] of Object.entries(MARKETS)) {
       setups: setups.map((t) => ({ k: t.k, name: t.name, pair: t.pair, side: t.sell ? 'sell' : 'buy', state: t.state, entry: t.entry, stop: t.stop, t1: t.t1, rr: +t.rr.toFixed(2), next: t.next, retrace: !!t.retrace })),
     };
 
-    if (config.retireLegacy) for (const tr of trades.filter((x) => x.market === key && !x.shadow && !['replica', 'mosha-bo', 'trend', 'gtrend', 'gtl', 'geg'].includes(x.k) && (x.status === 'open' || x.status === 'pending'))) {
+    if (config.retireLegacy) for (const tr of trades.filter((x) => x.market === key && !x.shadow && !['replica', 'mosha-bo', 'trend', 'gtrend', 'gtl', 'geg', 'gmp'].includes(x.k) && (x.status === 'open' || x.status === 'pending'))) {
       if (tr.status === 'pending') { tr.status = 'expired'; tr.R = 0; } else { const r0 = tr.r0 || Math.abs(tr.entry - tr.stop), R = +(((tr.side === 'sell' ? -1 : 1) * (price - tr.entry)) / r0).toFixed(2); tr.R = R; tr.status = R > 0 ? 'win' : R < 0 ? 'loss' : 'be'; }
       tr.closed = now; tr.exit = 'retired';
     }
@@ -675,6 +678,37 @@ for (const [key, M] of Object.entries(MARKETS)) {
         }
         (snapshot.goldEG = snapshot.goldEG || {}).state = { ...state, pending: mine.filter((x) => x.status === 'pending').map((x) => x.entry), open: mine.filter((x) => x.status === 'open').length };
       } catch (e) { snapshot.errors.goldEG = String(e.message || e); }
+    }
+    if (key === 'xau' && config.goldMP) {
+      try {
+        const MP = config.goldMP, H = src['1h'].bars.slice(0, -1), B5 = src['5m'].bars.slice(0, -1), D = src['1d'].bars.slice(0, -1), n = H.length, dp = Math.max(2, (M.dec ?? 2) + 1);
+        const sma = D.length >= 20 ? D.slice(-20).reduce((a, b) => a + b.close, 0) / 20 : null, dDir = sma == null ? 0 : (D[D.length - 1].close > sma ? 1 : -1);
+        const W = (state.goldMP = state.goldMP || { watch: [] });
+        // 1. a new momentum H1 candle → a watch (zone, stop, side), kept in state.json until it triggers, stops out or expires
+        if (n > 16) { const b = H[n - 1], tc = b.time + 3600, rg = b.high - b.low, avg = H.slice(n - 15, n - 1).reduce((a, x) => a + (x.high - x.low), 0) / 14, hr = new Date(tc * 1000).getUTCHours();
+          if (rg >= MP.mult * avg && hr >= 7 && hr < 17 && !W.watch.some((w) => w.t === b.time) && now - tc < 2 * 3600) {
+            const up = b.close > b.open && b.close - b.low >= MP.top * rg, dn = b.close < b.open && b.high - b.close >= MP.top * rg, d = up ? 1 : dn ? -1 : 0;
+            if (d && d === dDir) W.watch.push(d > 0 ? { t: b.time, d, zhi: b.high - MP.z1 * rg, zlo: b.high - MP.z2 * rg, stop: b.low - 0.1, until: tc + MP.wait * 3600 } : { t: b.time, d, zlo: b.low + MP.z1 * rg, zhi: b.low + MP.z2 * rg, stop: b.high + 0.1, until: tc + MP.wait * 3600 });
+          } }
+        // 2. each watch: first closed M5 candle after the H1 close that trades into the zone and closes in the trade direction → market entry (if that close is recent)
+        const keep = [];
+        for (const w of W.watch) {
+          let done = false;
+          for (const c of B5) { if (c.time < w.t + 3600) continue; if (c.time + 300 > w.until) { done = true; break; }
+            if (w.d > 0 ? c.low <= w.stop : c.high >= w.stop) { done = true; break; }
+            const ok = w.d > 0 ? (c.low <= w.zhi && c.close > c.open && c.close >= w.zlo) : (c.high >= w.zlo && c.close < c.open && c.close <= w.zhi);
+            if (ok) { done = true; const id = `${key}-gmp-${w.t}`;
+              if (!trades.some((x) => x.id === id) && now - (c.time + 300) < 15 * 60) { const entry = +price.toFixed(dp), stop = +w.stop.toFixed(dp), r0 = Math.abs(entry - stop);
+                if (r0 > 0.5 && (entry - stop) * w.d > 0) trades.push({ id, market: key, label: M.label, dec: M.dec, k: 'gmp', name: 'Gold momentum pullback', pair: 'H1 momentum → M5 pullback', h: '5m', side: w.d > 0 ? 'buy' : 'sell',
+                  entry, stop, t1: +(entry + w.d * 10 * r0).toFixed(dp), tp1: +(entry + w.d * MP.k * r0).toFixed(dp), rr: 10, trail: [MP.k, 1], buf: CFG.buf, opened: now, filled: now, checked: now, status: 'open', R: null, r0, maxHold: 8 * 3600, noBe: true, entryMode: 'market',
+                  feat: { h1: w.t, zone: [+w.zlo.toFixed(2), +w.zhi.toFixed(2)], d1: dDir }, shadow: false, blockedBy: [],
+                  note: `Gold momentum pullback: the H1 candle of ${new Date(w.t * 1000).toISOString().slice(11, 16)} UTC was a momentum candle with the 20-day trend; an M5 candle pulled back into ${w.zlo.toFixed(2)}-${w.zhi.toFixed(2)} and closed ${w.d > 0 ? 'up' : 'down'}. ${w.d > 0 ? 'Buy' : 'Sell'} at market, stop ${stop} beyond the H1 candle; after +${MP.k}R the stop trails 1R behind the best price (cap 10R); out after 8 h.` }); }
+              break; } }
+          if (!done && now < w.until) keep.push(w);
+        }
+        W.watch = keep.slice(-10);
+        (snapshot.goldMP = snapshot.goldMP || {}).state = { d1: dDir, watching: W.watch.map((w) => ({ side: w.d > 0 ? 'buy' : 'sell', zone: [+w.zlo.toFixed(2), +w.zhi.toFixed(2)], until: w.until })), open: trades.filter((x) => x.k === 'gmp' && x.status === 'open').length };
+      } catch (e) { snapshot.errors.goldMP = String(e.message || e); }
     }
     if (key === 'xau' && config.moshaBo) {
       const ev = (id, sec) => { const bb = src[id].bars; return src[id].A.events.filter((e) => e.breakIdx < bb.length - 1).map((e) => ({ t: bb[e.breakIdx].time + sec, dir: e.dir, level: e.level, top: e.top, bot: e.bot, flip: e.structure })); };
@@ -1305,7 +1339,7 @@ wr('trades.json', trades);
 // Our live systems only (gold replica, Mosha BO, crypto trend, with their adds) plus the NQ open run (research, 10-min-late feed,
 // the EA mirrors it only if the owner turns that on); shadow trades never. Rows for the last 7 days so the EA can close what it holds.
 try {
-  const SYSK = ['replica', 'mosha-bo', 'trend', 'gtrend', 'gtl', 'geg'], cut = now - 7 * 86400;
+  const SYSK = ['replica', 'mosha-bo', 'trend', 'gtrend', 'gtl', 'geg', 'gmp'], cut = now - 7 * 86400;
   const rows = trades.filter((x) => !x.shadow && SYSK.includes(x.k) && (x.status === 'open' || x.status === 'pending' || (x.closed || x.opened || 0) >= cut))
     .concat(research.filter((x) => x.k === 'nq-open' && x.session === 'nyflip' && (x.status === 'open' || (x.closed || x.opened || 0) >= cut)).map((x) => ({ ...x, k: 'nq-open', market: 'nq' })));
   const f = (v) => v == null || v === '' ? '' : typeof v === 'number' ? String(v) : String(v).replace(/[,\n"]/g, ' ');
