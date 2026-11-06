@@ -1346,6 +1346,10 @@ h1, .h-head { text-wrap: balance; }
 .u-who b { font: 600 13.5px var(--sans); color: var(--ink); }
 .u-av { width: 28px; height: 28px; flex: none; border-radius: 50%; display: grid; place-items: center; font: 700 12px var(--sans); color: #17130a; background: linear-gradient(145deg, #f3d27a, #c9962c); box-shadow: inset 0 -2px 4px rgba(0,0,0,.18); }
 .u-off .u-av { filter: grayscale(1); opacity: .5; }
+
+/* polish 15: loading charts shimmer instead of sitting blank */
+@keyframes ms-shimmer { from { background-position: 150% 0; } to { background-position: -50% 0; } }
+[data-loading="1"] { background-image: linear-gradient(100deg, transparent 30%, color-mix(in srgb, var(--ink) 5%, transparent) 50%, transparent 70%); background-size: 200% 100%; animation: ms-shimmer 1.6s linear infinite; border-radius: inherit; }
 </style>
 </head>
 <body>
@@ -4892,6 +4896,12 @@ function msNextSetup(bars, A) {
   document.addEventListener('click', (ev) => { if (m.open && !m.contains(ev.target)) m.open = false; });
   document.addEventListener('keydown', (ev) => { if (ev.key === 'Escape' && m.open) { m.open = false; const s = m.querySelector('summary'); if (s) s.focus(); } });
 })();
+</script>
+<script>
+/* polish 15: mark chart messages that say Loading so they shimmer */
+(() => { ['g-msg', 'ms-tv-m'].forEach((id) => { const m = document.getElementById(id); if (!m) return;
+  const f = () => { const on = !m.hidden && /^Loading/.test(m.textContent.trim()); if (on) m.dataset.loading = '1'; else delete m.dataset.loading; };
+  f(); new MutationObserver(f).observe(m, { childList: true, characterData: true, subtree: true, attributes: true, attributeFilter: ['hidden'] }); }); })();
 </script>
 </body>
 </html>
