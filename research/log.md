@@ -920,3 +920,23 @@ Harness `ms/tl_break.py` + `ms/tl_break2.py`. Line through the last two confirme
 | M5 retest at the line, 2R | −2292 | −924 | −340 |
 
 Per trade: M15 −0.10 to −0.15R, M5 −0.15 to −0.19R, M1 −0.25 to −0.30R, i.e. the loss grows as the timeframe shrinks, which is the cost (0.30 on a stop that shrinks with the timeframe) plus the fact that a two-anchor line breaks constantly. No filter (direction, side, pivot width, retest, trail) gets any window above zero except a few +7 to +16R lines in 2025–26 on thousands of trades. **Nothing adopted.** Together with the MSNR scalp (previous entries) this closes the "find scalps" thread for now: on gold, every sub-H1 mechanical entry tested this week loses after cost; the council's edges stay on D1/H4 structure (replica, Mosha, gold trend) and the NQ open run.
+
+## 2026-11-06 — Trendline break: best SOP timeframe (owner request)
+
+Same trendline-break rule run on M15, M30, H1, H4 and D1 (pivot width 3 and 5), alone and gated by the Direction SOP of the rung above (M15←H1, M30←H4, H1←H4, H4←D1) or of the working TF itself; 2R, 3R, 2R-trail. `ms/tl_break3.py`, `ms/tl_break4.py`. R sum (2019–22 | 2023–24 | 2025–26, n):
+
+| TF | gate | 2019–22 | 2023–24 | 2025–26 |
+|---|---|---|---|---|
+| M15 n5 | H1 SOP agrees, 2R | −232 (1622) | −120 (788) | −0 (753) |
+| M30 n5 | H4 SOP agrees, 3R | −39 (885) | +18 (432) | −1 (389) |
+| **H1 n3** | **H4 SOP agrees, 2R trail** | +0.3 (638) | +11.1 (312) | +30.6 (287) |
+| H1 n3 | H4 SOP agrees, 2R | −7.0 | +17.8 | +27.3 |
+| H1 n5 | own-TF SOP agrees, 2R trail | +19.7 (434) | +6.3 (205) | +7.2 (192) |
+| **H4 n3** | **own-TF SOP agrees, 2R trail** | −6.6 (192) | +19.7 (105) | +38.2 (88) |
+| H4 n3 | alone, 2R trail | −6.1 (448) | +13.2 (220) | +41.6 (193) |
+| H4 n5 | D1 SOP agrees, 2R | +15.9 (106) | −12.3 (49) | +2.8 (54) |
+| D1 n3 | own-TF SOP agrees, 2R trail | −1.8 (45) | +8.1 (18) | +3.5 (11) |
+
+The edge improves monotonically with the timeframe: M15/M30 lose, H1 is flat-to-small, H4 is the best. **Best SOP timeframe: H4 breaks gated by the H4 direction (D1 levels), 2R then trail**, +0.19R/trade in 2023–24 and +0.43R in 2025–26 with small drawdowns (−9 / −7). Second: H1 breaks gated by the H4 SOP direction (+0.04 / +0.11R per trade).
+
+Year by year (H4, own-SOP, 2Rt): 2019 −8, 2020 −4, 2021 +15, 2022 −9, 2023 −1, 2024 +21, 2025 +28, 2026 +11 (45 trades). H1/H4 2Rt: 2019 0, 2020 −7, 2021 −11, 2022 +18, 2023 −15, 2024 +26, 2025 +28, 2026 +2. The profit sits in 2024–25 on both; 2019–23 is flat and 2023 alone is negative on both, and the H4 sells contribute nothing (+0 / −2 in 2024–25, buys +21 / +29). So this is the gold bull expressed through a breakout, not a timeframe edge that holds on its own; it fails the 2023–24-half-per-year check and the 2019–22 sign check. **Not adopted** (the gold trend system already captures the 2024–26 breakout regime with a cleaner rule, +37R on 22 trades). If the owner wants it watched, the H4 own-SOP line could be a shadow tracker, but the forward read would again take years.
