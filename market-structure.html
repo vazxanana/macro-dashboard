@@ -4,7 +4,9 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#08090c">
-<title>Market Structure</title>
+<title>Aurum Desk</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cdefs%3E%3CradialGradient id='g' cx='.35' cy='.3' r='.8'%3E%3Cstop offset='0' stop-color='%23fbe7a6'/%3E%3Cstop offset='.55' stop-color='%23e3b341'/%3E%3Cstop offset='1' stop-color='%238a6312'/%3E%3C/radialGradient%3E%3C/defs%3E%3Ccircle cx='16' cy='16' r='14' fill='url(%23g)'/%3E%3Ccircle cx='16' cy='16' r='10.5' fill='none' stroke='%23fff' stroke-opacity='.35'/%3E%3C/svg%3E">
+<meta name="color-scheme" content="dark">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600;700&display=swap">
@@ -785,6 +787,107 @@
   .u-actions { grid-column: 2; display: flex; align-items: center; gap: 12px; }
   .u-btn { margin: 0; background: #e3b341; color: #17130a; border: 0; font-weight: 600; min-height: 40px; padding: 8px 18px; }
   @media (max-width: 700px) { .u-form { grid-template-columns: minmax(0, 1fr); } .u-actions { grid-column: 1; } }
+
+  /* ═══════════ Design pass 100 (6 Nov) ═══════════
+     Typography 1–10 · colour & surfaces 11–20 · layout 21–35 · components 36–60 · motion 61–70 · access 71–85 · details 86–100 */
+  :root { --gold: #e3b341; --gold-soft: rgba(227,179,65,.14); --gold-line: rgba(227,179,65,.45);
+    --sh-1: 0 1px 2px rgba(0,0,0,.35); --sh-2: 0 10px 28px -10px rgba(0,0,0,.6); --sh-3: 0 24px 60px -18px rgba(0,0,0,.7);
+    --sp-1: 4px; --sp-2: 8px; --sp-3: 12px; --sp-4: 16px; --sp-5: 24px; --sp-6: 32px; --ink-faint: #858d9c; }   /* 11, 18, 24, 75 */
+  /* typography */
+  html, body { font-size: 14.5px; line-height: 1.55; }                                                     /* 1 */
+  h1, h2, h3, .h-head, .ms-k { text-wrap: balance; }                                                       /* 2 */
+  .ms-note, .tile-sub, .c-how > p { text-wrap: pretty; }                                                   /* 3 */
+  .ms-note { max-width: 78ch; }                                                                            /* 4 */
+  .h-head { font-size: clamp(22px, 2.2vw, 28px); }  .v-head .h-head, .c-head .h-head, .g-head .h-head { font-size: clamp(22px, 2vw, 26px); }  /* 5 */
+  .ms-k { font-size: 15px; } .ms-k .k-sub { font: 500 12.5px var(--sans); color: var(--ink-faint); margin-left: 8px; }   /* 6 */
+  .c-t th, .ms-bt-t th, .ms-j th { text-transform: none; letter-spacing: 0; font: 600 12px var(--sans); }  /* 7 */
+  .c-t td.n, .ms-bt-t td.n, .ms-j td:nth-child(n+5) { font-family: var(--mono); font-size: 12.5px; }     /* 8 */
+  ::selection { background: var(--gold-soft); color: #fff; }                                               /* 9 */
+  a { color: var(--accent); text-underline-offset: 3px; } a:hover { text-decoration-thickness: 1.5px; }    /* 10 */
+  /* colour & surfaces */
+  .card, .tile { border-radius: 14px; }                                                                    /* 14 */
+  .card { transition: border-color .15s ease-out; } .card:hover { border-color: var(--line-strong); }      /* 12, 61 */
+  body { background: radial-gradient(1100px 520px at 100% -10%, rgba(227,179,65,.05), transparent 65%), radial-gradient(900px 500px at -10% 110%, rgba(91,140,255,.05), transparent 70%), var(--bg); background-attachment: fixed; }  /* 15 */
+  :root { --buy: #34c99a; --sell: #f45f77; }                                                                /* 16 */
+  .chip.buy, .ms-chip-buy, .c-act .chip.buy { box-shadow: inset 0 0 0 1px rgba(52,201,154,.35); } .chip.sell, .ms-chip-sell, .c-act .chip.sell { box-shadow: inset 0 0 0 1px rgba(244,95,119,.35); }  /* 17 */
+  .c-t td, .ms-bt-t td, .ms-j td, .cal-day li, .h-act-list li { border-color: var(--line-soft) !important; }   /* 19 */
+  :where(a, button, summary, select, input, textarea, [tabindex]):focus-visible { outline: 2px solid var(--gold) !important; outline-offset: 2px; }   /* 20, 72 */
+  .tv { box-shadow: var(--sh-3); border-radius: 16px; } .me-pop, .menu-body, .mk-pop { box-shadow: var(--sh-3) !important; }   /* 13 */
+  /* layout */
+  .ms-live.app { max-width: 1440px; }                                                                       /* 21 */
+  .view { gap: var(--sp-4); } .c-grid { gap: var(--sp-4); } .h-grid, .h-main, .h-side { gap: var(--sp-4); }   /* 22, 24 */
+  .card { padding: 22px 24px; } @media (max-width: 700px) { .card { padding: 14px; } .v-head .h-head, .c-head .h-head { font-size: 22px; } }   /* 23, 34, 35 */
+  .cal-d { min-height: 64px; } @media (max-width: 700px) { .cal-d { min-height: 52px; } }                  /* 25 */
+  .h-kpi { min-width: 0; }                                                                                  /* 26 */
+  .h-side .tile-s { height: auto; }                                                                         /* 27 */
+  .c-nav { box-shadow: var(--sh-1); }                                                                       /* 28 */
+  .c-t tbody tr:nth-child(even) td, .ms-j tbody tr:nth-child(even) td { background: rgba(255,255,255,.012); }   /* 29 */
+  .c-t td, .ms-bt-t td, .ms-j td { height: 40px; }                                                          /* 31 */
+  .t-scroll { -webkit-mask-image: linear-gradient(180deg, #000 calc(100% - 28px), transparent); mask-image: linear-gradient(180deg, #000 calc(100% - 28px), transparent); }   /* 33 */
+  .home, .h-grid { align-items: start; }                                                                    /* 32 */
+  .ms-td { gap: var(--sp-5); } .ms-kv > div { padding: 8px 0; }                                             /* 30 */
+  /* components */
+  .ms-tbtn, .seg button, .cal-seg button, .tv-tf button, .rv-tools button, .u-acts button { min-height: 36px; border-radius: 9px; transition: background .15s ease-out, border-color .15s ease-out, color .15s ease-out, transform .1s ease-out; }   /* 36 */
+  .ms-tbtn:active, .seg button:active, .cal-seg button:active, .c-nav button:active, .u-btn:active, .gate-go:active, .gate-guest:active { transform: scale(.98); }   /* 62 */
+  .seg button.on, .cal-seg button.on, .cal-seg button[aria-pressed="true"] { box-shadow: 0 0 0 1px var(--gold-line); color: var(--ink); }   /* 37 */
+  .ms-chip, .chip { border-radius: 6px; }                                                                   /* 38 */
+  .tag, .c-act .tag, .loss-st { border-radius: 999px !important; }                                          /* 39 */
+  .ms-j input, .ms-j select, .ms-tg input, .tv-rv textarea, .u-form input, .u-form select { border-radius: 10px; border: 1px solid var(--line-strong); background: var(--panel-raised); color: var(--ink); }   /* 40, 41 */
+  input[type="checkbox"], input[type="radio"] { accent-color: var(--gold); }                               /* 42 */
+  .loss-g > summary, .c-act li.grp > details > summary { list-style: none; } .loss-g > summary::-webkit-details-marker { display: none; }
+  .loss-g > summary::before { content: ""; width: 6px; height: 6px; border-right: 1.5px solid var(--ink-faint); border-bottom: 1.5px solid var(--ink-faint); transform: rotate(-45deg); transition: transform .15s ease-out; margin-right: 4px; align-self: center; }
+  .loss-g[open] > summary::before { transform: rotate(45deg); }                                             /* 43 */
+  .ms-toast { background: var(--panel-raised) !important; color: var(--ink) !important; border: 1px solid var(--line-strong) !important; border-radius: 12px !important; padding: 12px 14px !important; box-shadow: var(--sh-2) !important; font-size: 13px !important; animation: toastIn .22s cubic-bezier(.16,1,.3,1); }
+  .ms-toast b { text-transform: none !important; letter-spacing: 0 !important; color: var(--gold) !important; font-size: 12.5px !important; }   /* 45, 68 */
+  @keyframes toastIn { from { opacity: 0; transform: translateY(8px) scale(.98); } to { opacity: 1; transform: none; } }
+  .tv::backdrop { background: rgba(4,6,10,.62); backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px); }   /* 46 */
+  .tv[open] { animation: dlgIn .22s cubic-bezier(.16,1,.3,1); }                                              /* 67 */
+  @keyframes dlgIn { from { opacity: 0; transform: translateY(10px) scale(.985); } to { opacity: 1; transform: none; } }
+  .tv-x { width: 40px; height: 40px; border-radius: 10px; }                                                 /* 47 */
+  .menu-body, .me-pop, .mk-pop { border-radius: 14px !important; animation: mePop .16s cubic-bezier(.16,1,.3,1); }   /* 48, 49 */
+  td.empty, .c-t .empty { color: var(--ink-faint); text-align: center; padding: 22px 8px !important; }     /* 50 */
+  .c-kpi > div span, .c-kpi > div small { text-transform: none !important; letter-spacing: 0 !important; } .c-kpi b { font-family: var(--mono); }   /* 51 */
+  .h-prog i.n { background: var(--gold) !important; }                                                       /* 52 */
+  .ms-live-dot { position: relative; } @keyframes livePulse { 0% { box-shadow: 0 0 0 0 rgba(52,201,154,.55); } 70% { box-shadow: 0 0 0 7px rgba(52,201,154,0); } 100% { box-shadow: 0 0 0 0 rgba(52,201,154,0); } }
+  .ms-live-dot.on, .ms-live-dot.live { animation: livePulse 2.2s ease-out infinite; }                       /* 53, 69 */
+  .me > summary:hover .me-av { box-shadow: 0 0 0 3px var(--gold-soft), 0 4px 14px rgba(227,179,65,.25); }   /* 55 */
+  .cal-nav button { width: 36px; height: 36px; border-radius: 50%; border: 1px solid var(--line); background: none; color: var(--ink-dim); cursor: pointer; } .cal-nav button:hover { border-color: var(--line-strong); color: var(--ink); }   /* 56 */
+  .cal-h { font: 500 11.5px var(--sans); color: var(--ink-faint); text-transform: none; }                  /* 57 */
+  .cal-d.sel { box-shadow: inset 0 0 0 1.5px var(--accent) !important; }                                    /* 58 */
+  .c-act li:hover, .cal-day li:hover, .loss-rows li:hover { transform: translateY(-1px); } .c-act li, .cal-day li, .loss-rows li { transition: transform .12s ease-out, background .12s ease-out, border-color .12s ease-out; }   /* 59 */
+  .loss-st.ok { background: var(--buy-soft); padding: 2px 10px; }                                           /* 60 */
+  .tile:hover { box-shadow: var(--sh-2); }                                                                  /* 54 */
+  .c-how[open] > p { animation: fadeIn .2s ease-out; } @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }   /* 66 */
+  .loss-g[open] .loss-rows, .c-act li.grp details[open] > .c-act { animation: fadeIn .18s ease-out; }       /* 63 */
+  html { scroll-behavior: smooth; scroll-padding-top: 76px; }                                               /* 65 */
+  /* accessibility */
+  .skip { position: absolute; left: 12px; top: -60px; z-index: 200; padding: 10px 14px; border-radius: 10px; background: var(--gold); color: #17130a; font-weight: 600; text-decoration: none; }
+  .skip:focus { top: 12px; }                                                                                 /* 71 */
+  @media (max-width: 700px) { .seg button, .cal-seg button, .c-nav button, .cal-nav button, .tv-tf button { min-height: 40px; } .cal-nav button { width: 40px; height: 40px; } }   /* 73 */
+  @media (prefers-contrast: more) { :root { --line: rgba(255,255,255,.22); --line-strong: rgba(255,255,255,.35); --ink-dim: #d0d5de; --ink-faint: #b4bbc8; } }   /* 76 */
+  @media (forced-colors: active) { .card, .tile, .c-nav button[aria-selected="true"], .seg button.on { border: 1px solid CanvasText; } .chip, .ms-chip { forced-color-adjust: none; } }   /* 77 */
+  @media (prefers-reduced-transparency: reduce) { .top, .c-nav, .gate-card, .btab { backdrop-filter: none !important; -webkit-backdrop-filter: none !important; background: var(--bg) !important; } }   /* 80 */
+  @media print { .btab, .top, .c-nav, .to-top, .ms-toasts, .gate, .h-quick { display: none !important; } body { background: #fff !important; color: #000; padding: 0 !important; } .card, .tile { border-color: #ccc; box-shadow: none; } }   /* 81 */
+  .t-scroll:focus-visible, #ms-cal-day:focus-visible { outline-offset: -2px !important; }                   /* 79 */
+  .me > summary { min-height: 44px; }                                                                       /* 85 */
+  .btab a { min-height: 48px; }                                                                             /* 74 */
+  /* details */
+  .to-top { position: fixed; right: max(18px, env(safe-area-inset-right, 0px)); bottom: calc(22px + env(safe-area-inset-bottom, 0px)); z-index: 35; width: 44px; height: 44px; border-radius: 50%; border: 1px solid var(--line-strong); background: var(--panel-raised); color: var(--ink); display: grid; place-items: center; cursor: pointer; box-shadow: var(--sh-2); animation: fadeIn .2s ease-out; }
+  .to-top:hover { border-color: var(--gold-line); color: var(--gold); } .to-top[hidden] { display: none; }
+  @media (max-width: 1179px) { .to-top { bottom: calc(78px + env(safe-area-inset-bottom, 0px)); } }        /* 98 */
+  .h-kpi { cursor: help; }                                                                                   /* 96 */
+  #ms-cal-sum, #g-cal-sum { padding-top: 6px; border-top: 1px solid var(--line-soft); margin-top: 10px; }   /* 97 */
+  .h-date { font-variant-numeric: tabular-nums; }                                                            /* 100 */
+  .ho-l, .hdr-open { font-variant-numeric: tabular-nums; }                                                   /* 88 */
+  .ms-status #ms-updated { font-variant-numeric: tabular-nums; }                                             /* 86 */
+  .btab a span { white-space: nowrap; }                                                                      /* 93 */
+  .gate-go[disabled] { cursor: progress; }                                                                   /* 99 */
+  .c-act, .cal-day, .h-act-list, .loss-rows { overscroll-behavior: contain; }                               /* 92 */
+  .h-quick a[href="#council/overview"] { border-color: var(--gold-line); color: var(--ink); }               /* 95 */
+  @media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; } .ms-toast, .tv[open], .menu-body, .me-pop, .mk-pop, .c-how[open] > p, .loss-g[open] .loss-rows, .to-top, .ms-live-dot.on, .ms-live-dot.live { animation: none !important; }
+    .c-act li:hover, .cal-day li:hover, .loss-rows li:hover { transform: none; } .ms-tbtn:active, .seg button:active, .c-nav button:active { transform: none; }   /* 70 */
+  }
   /* Guest view (6 Nov): only the H4 gold chart with one trade setup */
   html[data-role="public"] .btab, html[data-role="public"] .top .tabs, html[data-role="public"] #ms-hdr-open, html[data-role="public"] #ms-alerts,
   html[data-role="public"] .top details.menu, html[data-role="public"] .top .ms-status, html[data-role="public"] .ms-offline-box { display: none !important; }
@@ -1052,6 +1155,7 @@ window.MS_ADMIN_HASH = '49c5624f2625ed8b42b6e1bf2819a3a41ddb9743aeca36ea34ea7eb9
     <p class="gate-note">Guests see a live gold H4 chart with one trade setup and the P&amp;L calendar.</p>
   </div>
 </div>
+<a class="skip" href="#ms-main-start">Skip to content</a>
 <div class="ms-live app" id="ms-live" data-chart="dark">
 
   <header class="top">
@@ -1115,6 +1219,7 @@ window.MS_ADMIN_HASH = '49c5624f2625ed8b42b6e1bf2819a3a41ddb9743aeca36ea34ea7eb9
   </header>
 
 
+  <span id="ms-main-start" tabindex="-1"></span>
   <div class="ms-offline-box" role="alert">
     <b>Live prices couldn't load.</b> The page couldn't reach the price feeds (Binance and Kraken). Check your connection; some networks and countries block these exchanges. You can still use <b>Settings → Load CSV</b> with a TradingView export.
     <div class="ms-note" id="ms-offline-why"></div>
@@ -1410,6 +1515,7 @@ window.MS_ADMIN_HASH = '49c5624f2625ed8b42b6e1bf2819a3a41ddb9743aeca36ea34ea7eb9
     <a href="#users" data-go="users" class="adm own"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="9" cy="8" r="3.5"></circle><path d="M2.5 20c.8-3.6 3.4-5.5 6.5-5.5s5.7 1.9 6.5 5.5"></path><path d="M17 8v6M14 11h6"></path></svg><span>Users</span></a>
   </nav>
   <dialog class="tv" id="ms-tv" aria-labelledby="ms-tv-t"><div class="tv-h"><div><h3 id="ms-tv-t">Trade</h3><p id="ms-tv-s"></p></div><div class="tv-ba" role="group" aria-label="Prediction before, result after"><button type="button" data-ba="before">Before</button><button type="button" data-ba="after" class="on">After</button><button type="button" data-ba="save" title="Save the before and after charts as images">Save</button></div><button type="button" class="tv-x" id="ms-tv-x" aria-label="Close chart">×</button></div><div class="tv-tf" id="ms-tv-tf" role="group" aria-label="Chart timeframe"><button type="button" data-tvtf="auto" class="on" aria-pressed="true">Auto</button><button type="button" data-tvtf="1m" aria-pressed="false">M1</button><button type="button" data-tvtf="5m" aria-pressed="false">M5</button><button type="button" data-tvtf="15m" aria-pressed="false">M15</button><button type="button" data-tvtf="1h" aria-pressed="false">H1</button><button type="button" data-tvtf="4h" aria-pressed="false">H4</button><button type="button" data-tvtf="1d" aria-pressed="false">D1</button><span class="tv-tf-sp"></span><button type="button" data-tvmore="1" title="Load more candles before the trade">More history</button><span class="tv-tf-n" id="ms-tv-tfn"></span></div><div class="tv-c" id="ms-tv-c"><div class="tv-msg" id="ms-tv-m">Loading candles…</div></div><div class="tv-k" id="ms-tv-k"></div><div class="tv-rv adm" id="ms-tv-rv" hidden><div class="rv-strat" id="ms-rv-strat"></div><div class="rv-tools"><b>Draw</b><button type="button" data-tool="pen">Pen</button><button type="button" data-tool="line">Line</button><button type="button" data-tool="text">Text</button><button type="button" class="rv-c on" data-col="#f23645" style="background:#f23645" aria-label="Colour #f23645"></button><button type="button" class="rv-c" data-col="#089981" style="background:#089981" aria-label="Colour #089981"></button><button type="button" class="rv-c" data-col="#f5a623" style="background:#f5a623" aria-label="Colour #f5a623"></button><button type="button" class="rv-c" data-col="#2962ff" style="background:#2962ff" aria-label="Colour #2962ff"></button><button type="button" class="rv-c" data-col="#ffffff" style="background:#ffffff" aria-label="Colour #ffffff"></button><button type="button" data-act="undo">Undo</button><button type="button" data-act="clear">Clear</button></div><div class="rv-tags" id="ms-rv-tags" aria-label="Why it failed"></div><textarea id="ms-rv-text" rows="3" placeholder="Why did this setup fail? What did the chart show before the entry?"></textarea><textarea id="ms-rv-lesson" rows="2" placeholder="Rule idea for the council (optional), e.g. no scalp sells while H4 makes higher lows"></textarea><div class="rv-save"><button type="button" id="ms-rv-save">Save review</button><span id="ms-rv-msg"></span></div><div class="rv-council" id="ms-rv-council"></div></div></dialog>
+  <button type="button" class="to-top" id="ms-to-top" aria-label="Back to top" hidden><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 19V5M5 12l7-7 7 7"/></svg></button>
   <div class="ms-toasts" id="ms-toasts" role="status" aria-live="polite"></div>
 </div>
 <script>
@@ -4029,6 +4135,24 @@ function msNextSetup(bars, A) {
       const h = await msSha256(pw); if (await hashTaken(h)) { msg.textContent = 'That password is already used by another account.'; return; }
       if (await saveUsers((d) => { d.users[k] = { name, role, hash: h }; }, `added ${name} (${role})`)) { f.reset(); }
     });
+  }
+
+  // ─── Design pass 100 (6 Nov): small behaviours ───
+  { const NAMES = { home: 'Home', setup: 'Setup', charts: 'Charts', scanner: 'Scanner', council: 'Council', journal: 'Journal', users: 'Users', guest: 'Gold H4' };
+    const setTitle = () => { const v = document.querySelector('.view:not([hidden])'); const k = v ? v.id.replace('v-', '') : 'home'; document.title = `${NAMES[k] || 'Home'} · Aurum Desk`; };
+    addEventListener('hashchange', () => setTimeout(setTitle, 0)); setTimeout(setTitle, 0);
+    // card titles "Name · detail": the detail in a quieter tone
+    document.querySelectorAll('.card > .ms-k').forEach((k) => { const t = k.firstElementChild && k.firstElementChild.tagName === 'SPAN' ? k.firstElementChild : null;
+      const node = t ? t.firstChild : k.firstChild; if (!node || node.nodeType !== 3) return; const i = node.textContent.indexOf(' · '); if (i < 0) return;
+      const rest = node.textContent.slice(i + 3); node.textContent = node.textContent.slice(0, i); const sm = document.createElement('small'); sm.className = 'k-sub'; sm.textContent = rest; node.after(sm); });
+    // scroll boxes reachable by keyboard
+    document.querySelectorAll('.t-scroll, #ms-cal-day, #ms-nq-list, #ms-rep-list, #ms-c-pm').forEach((el) => { el.tabIndex = 0; if (!el.getAttribute('aria-label')) el.setAttribute('aria-label', 'Scrollable list'); });
+    // back to top
+    const tt = document.getElementById('ms-to-top');
+    if (tt) { addEventListener('scroll', () => { tt.hidden = scrollY < 900; }, { passive: true }); tt.addEventListener('click', () => { scrollTo({ top: 0, behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' }); const m = document.getElementById('ms-main-start'); if (m) m.focus({ preventScroll: true }); }); }
+    // what each Today figure means
+    const tip = { 'Floating now': 'Result of the open trades right now, in R (1R = the risk of one trade)', Today: 'Closed today, in R', 'This week': 'Closed since Monday, in R', 'This month': 'Closed since the 1st, in R' };
+    new MutationObserver(() => document.querySelectorAll('.h-kpi').forEach((c) => { const k = c.querySelector('.h-kpi-k'); if (k && tip[k.textContent] && !c.title) c.title = tip[k.textContent]; })).observe(document.body, { childList: true, subtree: true });
   }
   // ─── Backtest card: the same clustered statistics the Coach uses, so the page shows exactly what it decides on ───
   function btStat(arr, key = 'R_none') {
