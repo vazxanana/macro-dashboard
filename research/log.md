@@ -1029,3 +1029,20 @@ The live bot reads NQ from CNBC about 13 minutes late (Yahoo throttled, HTTP 429
 Half the edge is gone by 5 minutes and almost all of it by 13–20. The slip band does not rescue a late entry (it only removes trades). Consequences: (1) the council's paper record of the open run will understate the system, as the 5 Nov note already assumed (+0.1R live); (2) the open run must be executed natively on broker ticks — `mt5/NQOpenRun.mq5` does that (ET clock, 0.08% run, reclaim, 2R then 1R trail, 11:00 exit); the bridges keep `MirrorNQ = false` by default and should stay so; (3) a cTrader port of NQOpenRun stays on the list once the MT5 one is validated on demo. No council rule change.
 
 **Forward record to date (paper, since 5 Nov):** gold replica 2 trades +1.0R (Nov 4, before the gate went off); NQ open run: no signal on 5 Nov (the rule went live that evening), none yet on 6 Nov; Mosha BO, crypto trend, gold trend, H4 trendline: no trades; daily engulf: one limit waiting at 3,979.4 (zone 3,908–3,980 from the 3 Nov candle). Too thin for a monthly summary; the first one is due at the end of November.
+
+## 2026-11-06 — Gold focus with the four skills: Mosha momentum arrival re-judged on 2023+ and adopted (PR #247)
+
+Owner: focus the new content on gold. The Mosha "sideways arrival" rule (5 Nov: gold-only positive, silver reversed → recorded as `feat.pull`, not used) re-read under the 2023-onward gold-only rule, chains H4-H1-M15 with the weekly agreeing, 3R (`lab/mv3_XAU.json`):
+
+| | 2023–24 | 2025–26 |
+|---|---|---|
+| all (live) | 36 tr, +6.3R, DD −10.5 | 65 tr, +21.0R, DD −17.4 |
+| **slow arrival ≥ 12 H1 bars** | **19 tr, +9.6R, DD −3.5** | **41 tr, +23.0R, DD −11.3** |
+| fast arrival < 12 | 17 tr, −3.3R | 24 tr, −2.0R |
+| slow ≥ 16 / 22 / 30 / 40 | +11.7 / +10.3 / +10.3 / +10.3 | +15.2 / +16.8 / +19.0 / +17.1 |
+| strong leg (≥ 2 pivots crossed) / weak | +7.4 / −1.1 (n1) | +28.9 / −8.0 |
+| QM-type (structure-flipping) CF / plain | +3.8 / +2.5 | +2.4 / +18.6 |
+
+Slow arrivals beat the live line on profit and drawdown in both halves at 12 and 30 bars (16–22 give up a few R in 2025–26 with better drawdown); fast arrivals lose everywhere → **adopted at 12 bars** (`mosha-slow`, PR #247): a fast chain is a shadow trade (`blockedBy: ['momentum']`), so the filter's cost keeps showing forward. The "strong leg" rule (≥ 2 pivots crossed in the breakout leg) points the same way but has one weak-leg trade in 2023–24, so it cannot be judged; the QM-type CF preference is not supported (plain CFs did better in 2025–26).
+
+Gold items from the skills still to test (loop list): Zlankator CC/DC confirmation candle at a fresh H4 A/V level (H1 rejection closing in the level's direction → limit at the level, SL 30 pips, TP 100 / next level); the "4 and 2 rule" key levels as entry levels for the daily engulf (level + zone overlap); CE (50% of the Daily wick, 7-pip stop) at the H4 Apex; Ephron's EG-then-EF overlap on D1 zones; PITCHOU M15 rejection candle at a fresh H1 level in the daily storyline direction (SL 13, 1:3); the engulf "stairs" re-entries.
