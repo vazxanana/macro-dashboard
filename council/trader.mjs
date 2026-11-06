@@ -977,6 +977,8 @@ for (const [key, M] of Object.entries(MARKETS)) {
         if (!(r > 0) || (t.sell ? price >= tr.stop : price <= tr.stop) || rw <= 0) { tr.status = 'skipped'; tr.note = 'Price already past the stop or target when the signal came in.'; }
         else tr.rr = +(rw / r).toFixed(2);
       }
+      // m30m1 (M30 → M1) fires on the same M1 entry as the Scalp: the same trade recorded twice (6 Nov, 29 of 31). Keep one.
+      if (t.k === 'm30m1' && trades.some((x) => x.market === key && x.k !== 'm30m1' && x.side === tr.side && x.opened === tr.opened && x.entry === tr.entry)) continue;
       trades.push(tr);
     }
   } catch (e) { snapshot.errors[key] = String(e.message || e); }
