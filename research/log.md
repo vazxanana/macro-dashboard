@@ -1141,3 +1141,17 @@ Remaining report ideas on the plan: a time gate 15–30 min after 08:30 ET relea
 ## 2026-11-06 — 08:30 ET release gate on the engulf and trendline legs: immaterial, no rule
 
 `ms/news_gate.py`. Release-sized days = the 94 of 940 weekdays whose 08:30–08:35 ET one-minute range is in the top decile (≥ 10.5 points). Daily engulf (adopted rule): skipping any fill between 08:25 and 09:00 ET, or only on release days, changes nothing (+25.5 | +47.0R either way: the limit fills again at the same price after the window); delaying the fill to a 09:00 market entry loses (+9.7 | +26.4). H4 trendline: no break can be entered in the hour after 08:30 (the H4 closes do not fall there). The replica already has its 08:25–08:45 veto. **No news rule for the other legs.**
+
+## 2026-11-06 — Replica: volatility-targeted sizing vs the binary top-fifth gate — the gate stays
+
+`ms/vol_size.py`, every passing replica signal 2023–26 (D1 with, H4 against), live exits and risk rules, the MSNR tilt on top; size = (v / p80)^k clipped, where v is gold's 20-day range measure and p80 its own-year 80th percentile:
+
+| sizing | 2023–24 | 2025–26 |
+|---|---|---|
+| live: top-fifth gate, size 1 (+ tilt) | +109.6R, DD −9.7 | +155.5R, DD −16.5 |
+| no gate, size 1 | +57.3R, DD −52.4 | +48.6R, DD −49.8 |
+| vol-sized (v/p80), clip [0, 2] | +60.2R, DD −45.5 | +166.3R, DD −37.3 |
+| vol-sized (v/p80)², clip [0, 2] | +68.8R, DD −39.6 | +229.7R, DD −31.1 |
+| gate, then v/p80 sizing inside [0.5, 2] | +102.6R, DD −11.6 | +210.3R, DD −21.0 |
+
+Continuous sizing without the gate keeps every calm-market loser at a reduced size and quadruples the drawdown; sizing inside the gate adds profit only in 2025–26 and raises both drawdowns. The report's "vol-targeted sizing instead of a binary gate" does not hold for this system: the calm-gold signals have no edge at any size. **Unchanged.** That closes the deep-research list except the owner's pending gold-trend add decision.
