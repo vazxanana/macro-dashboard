@@ -12,10 +12,10 @@ import path from 'node:path';
 
 const DATA = process.argv[2] || 'data/ict';
 const MARKETS = {
-  nq:  { sym: 'NQ=F',  label: 'Nasdaq 100', short: 'NQ',  tick: 0.25, dec: 2 },
-  es:  { sym: 'ES=F',  label: 'S&P 500',    short: 'ES',  tick: 0.25, dec: 2 },
-  ym:  { sym: 'YM=F',  label: 'Dow Jones',  short: 'YM',  tick: 1,    dec: 0 },
-  rty: { sym: 'RTY=F', label: 'Russell 2000', short: 'RTY', tick: 0.1, dec: 1 },
+  nq:  { sym: 'NQ=F',  cnbc: ['@ND.1'],           label: 'Nasdaq 100',   short: 'NQ',  tick: 0.25, dec: 2 },
+  es:  { sym: 'ES=F',  cnbc: ['@SP.1', '@ES.1'],  label: 'S&P 500',      short: 'ES',  tick: 0.25, dec: 2 },
+  ym:  { sym: 'YM=F',  cnbc: ['@DJ.1', '@YM.1'],  label: 'Dow Jones',    short: 'YM',  tick: 1,    dec: 0 },
+  rty: { sym: 'RTY=F', cnbc: ['@TFS.1', '@RTY.1'], label: 'Russell 2000', short: 'RTY', tick: 0.1, dec: 1 },
 };
 const P = { piv: 3, look: 96, vmax: 6, rr: 3, mark: 2, holdH: 48, maxAtr: 8, fresh: 3 * 3600 };
 const UA = 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36';
@@ -38,6 +38,33 @@ async function yahoo(sym, interval, range) {
     await sleep(1500 * (a + 1));
   }
   throw new Error(`Yahoo ${sym} ${interval} unreachable`);
+}
+// CNBC's chart service (front-month futures, ~10 min delayed) answers GitHub's runners; Yahoo has refused them
+// since 4 Nov 2026 (429), so CNBC is first and Yahoo the fallback.
+const nyFmt = new Intl.DateTimeFormat('en-US', { timeZone: 'America/New_York', year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', hourCycle: 'h23' });
+const etStamp = (t) => { const o = {}; for (const p of nyFmt.formatToParts(new Date(t * 1000))) o[p.type] = p.value; return `${o.year}${o.month}${o.day}${o.hour}${o.minute}00`; };
+async function cnbcBars(sym, iv, from, to) {
+  const r = await fetch(`https://ts-api.cnbc.com/harmony/app/bars/${encodeURIComponent(sym)}/${iv}/${etStamp(from)}/${etStamp(to)}/adjusted/EST5EDT.json`, { headers: { 'User-Agent': UA, Accept: 'application/json' }, signal: AbortSignal.timeout(30000) });
+  const j = await r.json().catch(() => null), pb = j && j.barData && j.barData.priceBars;
+  if (!pb || !pb.length) throw new Error(`CNBC ${sym} ${iv}: ${(j && j.statusMessage) || `HTTP ${r.status}`}`);
+  const out = [];
+  for (const b of pb) { const o = +b.open, h = +b.high, l = +b.low, c = +b.close, t = Math.round(+b.tradeTimeinMills / 1000); if ([o, h, l, c, t].every((v) => isFinite(v) && v > 0)) out.push({ time: t, open: o, high: Math.max(h, o, c), low: Math.min(l, o, c), close: c }); }
+  return out.sort((a, b) => a.time - b.time);
+}
+const agg = (bars, sec) => { const m = new Map(); for (const b of bars) { const k = Math.floor(b.time / sec) * sec, c = m.get(k); if (!c) m.set(k, { time: k, open: b.open, high: b.high, low: b.low, close: b.close }); else { c.high = Math.max(c.high, b.high); c.low = Math.min(c.low, b.low); c.close = b.close; } } return [...m.values()].sort((a, b) => a.time - b.time); };
+// H1 (built from 5m, ~24 days), D1 (~1 year) and 5m (5 days) for one market
+async function feed(M) {
+  for (const sym of M.cnbc) {
+    try {
+      let m5 = [];
+      for (let t = now - 24 * 86400; t < now; t += 6 * 86400) { m5 = m5.concat(await cnbcBars(sym, '5M', t, Math.min(now + 300, t + 6 * 86400))); await sleep(400); }
+      const seen = new Set(); m5 = m5.filter((b) => !seen.has(b.time) && seen.add(b.time)).sort((a, b) => a.time - b.time);
+      const d1 = await cnbcBars(sym, '1D', now - 400 * 86400, now + 86400);
+      if (m5.length > 500 && d1.length > 60) return { src: `cnbc ${sym}`, h1: agg(m5, 3600), d1, m5: m5.filter((b) => b.time >= now - 5 * 86400) };
+    } catch (e) { console.log(String(e.message || e)); }
+  }
+  const [h1, d1, m5] = [await yahoo(M.sym, '60m', '60d'), await yahoo(M.sym, '1d', '1y'), await yahoo(M.sym, '5m', '5d')];
+  return { src: `yahoo ${M.sym}`, h1: h1.bars, d1: d1.bars, m5: m5.bars };
 }
 const load = (f, d) => { try { return JSON.parse(fs.readFileSync(path.join(DATA, f), 'utf8')); } catch (e) { return d; } };
 const save = (f, v) => fs.writeFileSync(path.join(DATA, f), JSON.stringify(v, null, f === 'trades.json' ? 0 : 1));
@@ -94,8 +121,8 @@ async function main() {
   const trades = load('trades.json', []), snap = { at: new Date().toISOString(), markets: {}, errors: {}, model: { ...P, name: 'H1 iFVG reversal' } }, bars = {};
   for (const [key, M] of Object.entries(MARKETS)) {
     try {
-      const [h1, d1, m5] = [await yahoo(M.sym, '60m', '60d'), await yahoo(M.sym, '1d', '1y'), await yahoo(M.sym, '5m', '5d')];
-      const H = h1.bars.filter((b) => b.time + 3600 <= now), D = d1.bars.filter((b) => b.time + 86400 <= now), price = m5.bars.length ? m5.bars.at(-1).close : h1.price;
+      const F = await feed(M), m5 = { bars: F.m5 };
+      const H = F.h1.filter((b) => b.time + 3600 <= now), D = F.d1.filter((b) => b.time + 86400 <= now), price = F.m5.length ? F.m5.at(-1).close : F.h1.at(-1).close;
       const f = (v) => +(+v).toFixed(M.dec);
       // 1. manage open trades on 5m candles
       for (const tr of trades.filter((x) => x.market === key && x.status === 'open')) {
@@ -126,7 +153,7 @@ async function main() {
       }
       // 3. snapshot + candles for the page
       const last = sig.at(-1), dd = D.at(-1);
-      snap.markets[key] = { label: M.label, short: M.short, price: f(price), at: m5.bars.length ? m5.bars.at(-1).time + 300 : now,
+      snap.markets[key] = { label: M.label, short: M.short, src: F.src, price: f(price), at: m5.bars.length ? m5.bars.at(-1).time + 300 : now,
         lastSignal: last ? { side: last.side > 0 ? 'buy' : 'sell', at: last.close, entry: f(last.entry), grade: letter(last.grade.total) } : null,
         pdh: dd ? f(dd.high) : null, pdl: dd ? f(dd.low) : null, open: trades.filter((x) => x.market === key && x.status === 'open').length };
       bars[key] = { h1: H.slice(-400).map((b) => [b.time, f(b.open), f(b.high), f(b.low), f(b.close)]), m5: m5.bars.slice(-600).map((b) => [b.time, f(b.open), f(b.high), f(b.low), f(b.close)]),
