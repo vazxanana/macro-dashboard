@@ -1210,3 +1210,18 @@ Every intraday breakout/fade scalp is flat to negative after the spread (the fir
 | M15 → M1 (TP M5) | fixed 15 pips, 1R | 2688, −502R (−0.19) | 2742, −228R (−0.08) | −0.08 to −0.33 |
 
 Win rates 47–56% at 1R (his "~60% WR" claim is in the ballpark at 1R) but the average win is smaller than the loss plus cost, so every combination loses; the "nearest fresh higher-TF level" target is the worst exit (it is usually too far, so the trade times out or stops first). Buys and sells both lose; no ladder is positive in either half. Consistent with every other sub-H1 mechanical entry tested this week (MSNR switch, trendline M1–M30, PITCHOU M15 rejection, CE, NY/London/Asia ORBs). **Rejected; no tracker.**
+
+## 2026-11-06 — Plain M1 reversal scalps (owner: "not even just M1 reversal?"): negative; the pre-spread edge is ~0
+
+`ms/m1rev.py` (0.30 spread) and `ms/m1rev0.py` (no spread), spot gold 2023+, entry at the next 1m open:
+
+| idea | 2023–24 | 2025–26 | before spread |
+|---|---|---|---|
+| sweep of the last 30/60/240-min high/low, 1m close back inside, stop past the sweep, 1R/2R | −0.59 to −0.72 R/tr (7–22k tr) | −0.33 to −0.43 | N60 1R −0.003 / −0.064 |
+| same, stop ≥ 1.5 (spread ≤ 20% of R), London/NY or with the daily trend | −0.13 to −0.19 | −0.08 to −0.16 | N240 2R + trend +0.013 / +0.038 |
+| 3-SD band (20-bar) close back inside, fade to the middle | −0.57 | −0.33 | |
+| same, 1R, stop ≥ 1.5 | −0.14 (451) | −0.14 (1772) | −0.010 / −0.037 |
+| RSI(2) < 5 / > 95 with the daily trend, 1R or 15 min | −0.48 (16k) | −0.13 (16k) | +0.008 / +0.032 |
+| RSI(2) 2/98, stop ≥ 1.5 / London-NY only | −0.17 / −0.35 | −0.12 / −0.10 | |
+
+Without the spread every M1 reversal is within ±0.04R per trade of zero (win rates 35–52%), i.e. M1 reversals on gold are a coin flip; with a 0.30 spread on M1-sized stops (median 0.6–1.5 points) the cost is 20–50% of R and every variant loses heavily. Even the best pre-spread line (RSI2 extremes with the trend, +0.03R) would need a spread under 0.05 to break even. **No M1 scalp.** The council's small, frequent edge stays the replica (M5 entry after a 3–6 h leg, top-fifth volatility, +1R a signal); nothing below it pays gold's spread.
