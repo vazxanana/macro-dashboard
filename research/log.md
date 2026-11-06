@@ -1011,3 +1011,21 @@ Mechanism: the replica buys the daily trend against the H4 trend; while the H4 S
 **4. Daily engulf:** variants were exhausted in the adoption step (trail, hold, life, K, gate); nothing further.
 
 **5. Portfolio (all seven systems at the sizing guide: NQ 0.25%, replica 0.5% with the add at 1%, crypto 0.5% + 0.5% add, gold trend 0.5%, H4 trendline 0.25%, daily engulf 0.25%; replay records 2023–Oct 2026, replica before the tilt):** +219.6% over 86 months = +2.55% a month; worst drawdown −7.9%; worst day −2.03% (17 Nov 2025); worst months −4.8 / −3.0 / −2.8%; 52 of 86 months up. By half: 2023–24 +98.3% (DD −4.6%, worst day −1.5%); 2025–26 +122.2% (DD −7.9%, worst day −2.0%). Contribution: replica 93 points, crypto 52, NQ 25, gold trend 19, daily engulf 18, H4 trendline 13. For the owner's $50k challenge (3% daily, 10% max drawdown) the full guide leaves too little room: at 0.75× (replica 0.375%, crypto 0.375%, gold trend 0.375%, NQ/trendline/engulf 0.2%) the replay gives ≈ +1.9% a month, worst drawdown ≈ −5.9%, worst day ≈ −1.5%; that is the recommended bridge setting for the challenge account.
+
+## 2026-11-06 — NQ open run: the edge decays with entry delay; the council's late feed cannot trade it
+
+The live bot reads NQ from CNBC about 13 minutes late (Yahoo throttled, HTTP 429) and polls every 4 minutes. Replay of the 5 Nov rule (`nq/nq_late.py`, trader's NQ 1m file + HistData cash, 0.5 pt cost) with the entry taken at the open of the bar `delay` minutes after the signal bar, same stop, 2R then 1R trail, out 11:00 ET:
+
+| entry delay | 2023–24 | 2025–26 |
+|---|---|---|
+| 0 min (backtest) | 154 tr, +51.2R, +0.33/tr, DD −8.1 | 142 tr, +48.6R, +0.34/tr, DD −7.8 |
+| 5 min | +31.3R, +0.21 | +29.8R, +0.22 |
+| 10 min | +20.6R, +0.15 | +23.8R, +0.19 |
+| 13 min (the feed lag) | +7.3R, +0.05 | +34.4R, +0.29 |
+| 13 min, 0.5R slip band (the bridge's rule) | 70 tr, −1.6R | 56 tr, +32.3R |
+| 15 min | +12.1R, +0.09 | +24.8R, +0.20 |
+| 20 min | +4.3R, +0.03 | +5.1R, +0.04 |
+
+Half the edge is gone by 5 minutes and almost all of it by 13–20. The slip band does not rescue a late entry (it only removes trades). Consequences: (1) the council's paper record of the open run will understate the system, as the 5 Nov note already assumed (+0.1R live); (2) the open run must be executed natively on broker ticks — `mt5/NQOpenRun.mq5` does that (ET clock, 0.08% run, reclaim, 2R then 1R trail, 11:00 exit); the bridges keep `MirrorNQ = false` by default and should stay so; (3) a cTrader port of NQOpenRun stays on the list once the MT5 one is validated on demo. No council rule change.
+
+**Forward record to date (paper, since 5 Nov):** gold replica 2 trades +1.0R (Nov 4, before the gate went off); NQ open run: no signal on 5 Nov (the rule went live that evening), none yet on 6 Nov; Mosha BO, crypto trend, gold trend, H4 trendline: no trades; daily engulf: one limit waiting at 3,979.4 (zone 3,908–3,980 from the 3 Nov candle). Too thin for a monthly summary; the first one is due at the end of November.
