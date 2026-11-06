@@ -680,6 +680,54 @@
   .h-quick a:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
   @media (max-width: 700px) { .h-quick { flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; margin-right: -16px; padding-right: 16px; } .h-quick a { flex: none; min-height: 40px; } }
   @media (prefers-reduced-motion: reduce) { .c-nav button, .c-how > summary::before, .h-quick a { transition: none; } }
+  /* ═══ Renovation 2 (6 Nov): Home dashboard, Today strip, left sidebar on wide screens ═══ */
+  .h-today { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); border: 1px solid var(--line); border-radius: var(--r); background: var(--panel); overflow: hidden; }
+  .h-today:empty { display: none; }
+  .h-kpi { display: grid; gap: 2px; padding: 14px 18px; min-width: 0; }
+  .h-kpi + .h-kpi { border-left: 1px solid var(--line); }
+  .h-kpi-k { font: 500 12.5px var(--sans); color: var(--ink-dim); }
+  .h-kpi b { font: 600 24px/1.2 var(--mono); letter-spacing: -.6px; font-variant-numeric: tabular-nums; }
+  .h-kpi-s { font: 500 12px var(--sans); color: var(--ink-faint); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .h-grid { display: grid; grid-template-columns: minmax(0, 1.7fr) minmax(0, 1fr); gap: 14px; align-items: start; }
+  .h-main, .h-side { display: grid; gap: 14px; min-width: 0; }
+  .h-main .tile.wide { min-height: 0; }
+  .h-act .ms-k small { margin-left: 6px; }
+  .h-act-list { list-style: none; margin: 0; padding: 0; display: grid; }
+  .h-act-list li { display: grid; grid-template-columns: auto auto minmax(0, 1fr) auto; align-items: center; gap: 10px; min-height: 44px; padding: 6px 4px; border-top: 1px solid var(--line-soft); cursor: pointer; border-radius: 6px; transition: background .12s ease-out; }
+  .h-act-list li:first-child { border-top: 0; }
+  .h-act-list li:hover { background: var(--panel-hover); }
+  .h-act-list li:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
+  .h-act-list li.empty, .h-act-list li.h-act-more { display: block; cursor: default; color: var(--ink-faint); font-size: 12.5px; }
+  .h-act-list li.h-act-more:hover, .h-act-list li.empty:hover { background: none; }
+  .h-act-list .chip { font: 600 10.5px var(--mono); padding: 2px 7px; border-radius: 6px; }
+  .h-act-n { color: var(--ink-faint); font-size: 12.5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .h-act-r { font: 600 14px var(--mono); font-variant-numeric: tabular-nums; }
+  .h-act-more a { color: var(--accent); text-decoration: none; }
+  .tile.tile-s { min-height: 0; padding: 14px 18px; gap: 4px; }
+  .tile.tile-s .tile-big { font-size: 16px; }
+  .tile.tile-s .tile-sub { display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+  .tile.tile-s .tile-go { margin-top: 2px; }
+  @media (max-width: 1000px) { .h-grid { grid-template-columns: minmax(0, 1fr); } .h-side { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+  @media (max-width: 700px) {
+    .h-today { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .h-kpi:nth-child(3) { border-left: 0; } .h-kpi:nth-child(n+3) { border-top: 1px solid var(--line); }
+    .h-kpi { padding: 12px 14px; } .h-kpi b { font-size: 20px; }
+    .h-side { grid-template-columns: minmax(0, 1fr); }
+    .btab { grid-template-columns: none; grid-auto-flow: column; grid-auto-columns: minmax(0, 1fr); }
+  }
+  @media (min-width: 1180px) {
+    .btab { display: flex; flex-direction: column; gap: 4px; position: fixed; top: 0; bottom: 0; left: 0; width: 84px; padding: 14px 8px; z-index: 30; border-right: 1px solid var(--line); background: var(--bg); }
+    .btab a { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; min-height: 58px; border-radius: 10px; font: 500 11.5px var(--sans); color: var(--ink-faint); text-decoration: none; transition: background .15s ease-out, color .15s ease-out; }
+    .btab a:hover { color: var(--ink); background: rgba(255,255,255,.04); }
+    .btab a[aria-current="page"] { color: var(--ink); background: var(--panel-raised); box-shadow: 0 0 0 1px var(--line-strong); }
+    .btab a[aria-current="page"] svg { color: var(--accent); }
+    .btab a:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
+    body { padding-left: 84px; }
+    .top .tabs { display: none; }
+    .top .ms-status { margin-left: auto; }
+  }
+  @media (prefers-reduced-motion: reduce) { .btab a, .h-act-list li { transition: none; } }
+
 
 </style>
 <script>
@@ -763,7 +811,9 @@ window.MS_ADMIN_HASH = '49c5624f2625ed8b42b6e1bf2819a3a41ddb9743aeca36ea34ea7eb9
     <div class="h-top"><div><div class="h-date" id="h-date"></div><h1 class="h-head" id="h-head">Loading live candles…</h1></div></div>
     <nav class="h-quick" aria-label="Jump to"><a href="#council/overview">Active trades &amp; calendar</a><a href="#council/trades">All trades</a><a href="#council/review" class="adm">Loss review</a><a href="#council/systems" class="adm">Systems</a><a href="#council/research" class="adm">Research</a><a href="#journal">Journal</a></nav>
     <div class="h-warn" id="h-warn" role="alert" hidden></div>
-    <div class="home">
+    <div class="h-today" id="h-today" role="group" aria-label="Results today"></div>
+    <div class="h-grid">
+      <div class="h-main">
       <a class="tile wide adm" href="#setup">
         <span class="tile-k">Setup now <span class="ms-chip" id="h-bias">—</span></span>
         <span class="h-prog-row"><span class="h-prog" id="h-prog" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></span><span class="h-prog-t" id="h-prog-t"></span></span>
@@ -771,42 +821,43 @@ window.MS_ADMIN_HASH = '49c5624f2625ed8b42b6e1bf2819a3a41ddb9743aeca36ea34ea7eb9
         <span class="tile-sub" id="h-align"></span>
         <span class="tile-go">Open setup</span>
       </a>
-      <a class="tile" href="#council/overview">
-        <span class="tile-k">Active trades</span>
-        <span class="tile-big" id="h-active">—</span>
-        <span class="tile-sub"><span class="adm">Placed by the system: live gold replica, NQ paper</span><span class="pubonly">Open positions placed by the system</span></span>
-        <span class="tile-go">Open council</span>
-      </a>
-      <a class="tile adm" href="#setup">
-        <span class="tile-k">Possible trades</span>
-        <span class="tile-big" id="h-ready">—</span>
-        <span class="tile-sub" id="h-best"></span>
-        <span class="tile-go">See trades</span>
-      </a>
-      <a class="tile" href="#charts">
-        <span class="tile-k">Charts</span>
-        <span class="tile-big">D1 · H4 · H1 · M15 · M5 · M1</span>
-        <span class="tile-sub">Live candles with BO lines, Origin, VR, CF and the 50% line.</span>
-        <span class="tile-go">Open charts</span>
-      </a>
-      <a class="tile adm" href="#scanner">
-        <span class="tile-k">Scanner</span>
-        <span class="tile-big" id="h-scan">Scanning soon</span>
-        <span class="tile-sub" id="h-scan-list"></span>
-        <span class="tile-go">All markets</span>
-      </a>
-      <a class="tile" href="#council">
+      <div class="card h-act">
+        <div class="ms-k"><span>Open positions <small id="h-active">—</small></span><a href="#council/overview" class="c-link">All active trades</a></div>
+        <ul class="h-act-list" id="h-act-list"><li class="empty">Loading the council…</li></ul>
+      </div>
+      </div>
+      <div class="h-side">
+      <a class="tile tile-s" href="#council">
         <span class="tile-k">AI council</span>
         <span class="tile-big" id="h-council">Starting up</span>
         <span class="tile-sub"><span class="adm">Analyst maps the week, Trader paper-trades every Ready setup, Coach reviews each day and tunes the rules.</span><span class="pubonly">Every trade the system placed, with its result.</span></span>
         <span class="tile-go">Open council</span>
       </a>
-      <a class="tile" href="#journal">
+      <a class="tile tile-s adm" href="#setup">
+        <span class="tile-k">Possible trades</span>
+        <span class="tile-big" id="h-ready">—</span>
+        <span class="tile-sub" id="h-best"></span>
+        <span class="tile-go">See trades</span>
+      </a>
+      <a class="tile tile-s adm" href="#scanner">
+        <span class="tile-k">Scanner</span>
+        <span class="tile-big" id="h-scan">Scanning soon</span>
+        <span class="tile-sub" id="h-scan-list"></span>
+        <span class="tile-go">All markets</span>
+      </a>
+      <a class="tile tile-s" href="#charts">
+        <span class="tile-k">Charts</span>
+        <span class="tile-big">D1 · H4 · H1 · M15 · M5 · M1</span>
+        <span class="tile-sub">Live candles with BO lines, Origin, VR, CF and the 50% line.</span>
+        <span class="tile-go">Open charts</span>
+      </a>
+      <a class="tile tile-s" href="#journal">
         <span class="tile-k">Journal</span>
         <span class="tile-big" id="h-j">No trades yet</span>
         <span class="tile-sub" id="h-j-sub"><span class="adm">Log trades from the Setup page and track your results.</span><span class="pubonly">Closed system trades.</span></span>
         <span class="tile-go">Open journal</span>
       </a>
+      </div>
     </div>
   </section>
 
@@ -1007,6 +1058,7 @@ window.MS_ADMIN_HASH = '49c5624f2625ed8b42b6e1bf2819a3a41ddb9743aeca36ea34ea7eb9
     <a href="#home" data-go="home"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M3 11l9-7 9 7v9a1 1 0 01-1 1h-5v-6H9v6H4a1 1 0 01-1-1z"></path></svg>Home</a>
     <a href="#setup" data-go="setup" class="adm"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 6h16M4 12h10M4 18h6"></path></svg>Setup</a>
     <a href="#charts" data-go="charts"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M7 4v16M17 4v16M4 8h6v8H4zM14 6h6v6h-6z"></path></svg>Charts</a>
+    <a href="#scanner" data-go="scanner" class="adm"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"></circle><path d="M20 20l-3.5-3.5M11 8v3l2 2"></path></svg><span>Scanner</span></a>
     <a href="#council" data-go="council"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="8" cy="9" r="3"></circle><circle cx="16" cy="9" r="3"></circle><path d="M3 20c0-3 2.5-5 5-5s5 2 5 5M11 20c0-3 2.5-5 5-5s5 2 5 5"></path></svg>Council</a>
     <a href="#journal" data-go="journal"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 3h11a1 1 0 011 1v16a1 1 0 01-1 1H6zM6 3v18M10 8h5M10 12h5"></path></svg>Journal</a>
   </nav>
@@ -2892,9 +2944,35 @@ function msNextSetup(bars, A) {
       // shadow trades (when "Shadow too" is on) count in the float like any other trade, labelled as shadow (6 Nov, owner)
       const shLab = shOn && SHO.length ? `<span class="ho-sh" title="Includes ${SHO.length} open shadow trade${SHO.length > 1 ? 's' : ''} (setups a rule blocked, followed on paper), floating ${fR(shTot)}"> +${SHO.length} shadow</span>` : '';
       ho.innerHTML = (A1.length || shLab) ? `<b>${A1.length}</b><span class="ho-l"> open</span>${shLab} · <span class="${tot >= 0 ? 'pos' : 'neg'}"><span class="ho-l">${fR(tot)} · </span>${fp(pct)}</span>` : '<b>0</b><span class="ho-l"> open</span>'; }
-    const h = document.getElementById('h-active'); if (h) h.innerHTML = (A1.length || SHO.length) ? `${A1.length} open${SHO.length ? ` + ${SHO.length} shadow` : ''} <small>floating ${fR(tot)}</small>` : '<small>none open</small>';
+    const h = document.getElementById('h-active'); if (h) h.innerHTML = (A1.length || SHO.length) ? `${A1.length} open${SHO.length ? ` + ${SHO.length} shadow` : ''} · floating <b class="${tot >= 0 ? 'pos' : 'neg'}">${fR(tot)}</b>` : 'none open';
+    window.FLOAT = { tot, pct, open: A1.length, sh: SHO.length, risk };
+    // Home: the biggest open positions (by size of the floating result), one row per market + side
+    const hl = document.getElementById('h-act-list');
+    if (hl) {
+      const G2 = [...groups.entries()].map(([g, L]) => { const flN = L.filter((i) => i.fl != null); return { x: L[0].x, n: L.length, sh: L.filter((i) => i.x.shadow).length, fl: flN.length ? flN.reduce((a, i) => a + i.fl, 0) : null, id: L[0].x.id }; })
+        .sort((a, b) => Math.abs(b.fl || 0) - Math.abs(a.fl || 0));
+      hl.innerHTML = G2.length ? G2.slice(0, 7).map((g) => `<li data-tid="${esc(g.id)}" tabindex="0" title="${g.n > 1 ? 'Open the first of these trades on a chart' : 'Show this trade on a chart'}"><span class="chip ${g.x.side}">${g.x.side.toUpperCase()}</span><b>${esc(g.x.label)}</b><span class="h-act-n">${[g.n > 1 ? `${g.n} trades` : PUB ? '' : esc(g.x.name || ''), g.sh ? (g.sh === g.n ? 'shadow' : g.sh + ' shadow') : ''].filter(Boolean).join(' · ')}</span><span class="h-act-r ${g.fl == null ? '' : g.fl >= 0 ? 'pos' : 'neg'}">${g.fl == null ? 'waiting' : fR(g.fl)}</span></li>`).join('')
+        + (G2.length > 7 ? `<li class="h-act-more"><a href="#council/overview">${G2.length - 7} more in the council</a></li>` : '')
+        : '<li class="empty">No open positions right now.</li>';
+    }
+    renderToday();
   }
   setInterval(() => { try { renderActive(); } catch (e) {} }, 15e3);
+  // Home "Today" strip (6 Nov renovation): floating now, and closed R today / this week / this month, live + shadow
+  function renderToday() {
+    const el = document.getElementById('h-today'); if (!el) return;
+    const fR = (v) => `${v > 0 ? '+' : v < 0 ? '−' : ''}${Math.abs(v).toFixed(1)}R`, cls = (v) => (v > 0 ? 'pos' : v < 0 ? 'neg' : '');
+    const now = new Date(), d0 = new Date(now.getFullYear(), now.getMonth(), now.getDate()) / 1000, w0 = d0 - ((now.getDay() + 6) % 7) * 86400, m0 = new Date(now.getFullYear(), now.getMonth(), 1) / 1000;
+    const closed = (COUNCIL.trades || []).filter((x) => ['win', 'loss', 'be'].includes(x.status) && x.closed && x.R != null);
+    const sum = (t) => { const a = closed.filter((x) => x.closed >= t), live = a.filter((x) => !x.shadow); return { n: a.length, R: a.reduce((q, x) => q + x.R, 0), lR: live.reduce((q, x) => q + x.R, 0), ln: live.length }; };
+    const F = window.FLOAT || null, D = sum(d0), W = sum(w0), M = sum(m0);
+    const cell = (k, v, sub, c) => `<div class="h-kpi"><span class="h-kpi-k">${k}</span><b class="${c}">${v}</b><span class="h-kpi-s">${sub}</span></div>`;
+    const sub = (S) => `${S.n} closed${S.ln ? ` · live ${fR(S.lR)}` : ''}`;
+    el.innerHTML = COUNCIL.trades ? [
+      cell('Floating now', F ? fR(F.tot) : '—', F ? `${F.open} open${F.sh ? ` + ${F.sh} shadow` : ''}${F.pct ? ` · ${F.pct >= 0 ? '+' : '−'}${Math.abs(F.pct).toFixed(2)}%` : ''}` : 'loading', F ? cls(F.tot) : ''),
+      cell('Today', fR(D.R), sub(D), cls(D.R)), cell('This week', fR(W.R), sub(W), cls(W.R)), cell('This month', fR(M.R), sub(M), cls(M.R)),
+    ].join('') : '';
+  }
   // Live vs expected (4 Nov): live replica R by trade number against the year replay's expectation (mean ± 1.645 SD·√n, 90%)
   // and the pause-check levels (5 Nov: −10R at 30 signals, −12R at 50)
   function renderTrack() {
@@ -3224,7 +3302,7 @@ function msNextSetup(bars, A) {
   }
   const ST_NAME = { open: 'Open', pending: 'Waiting fill', missed: 'Missed', expired: 'Expired', skipped: 'Skipped' };
   const SESSION_NAME = { asia: 'Asia session', london: 'London session', overlap: 'London/New York overlap', newyork: 'New York session', late: 'Late session' };
-  ['ms-c-trades', 'ms-c-pm', 'ms-cal-day', 'ms-rep-list', 'ms-active', 'ms-nq-list'].forEach((cid) => {
+  ['ms-c-trades', 'ms-c-pm', 'ms-cal-day', 'ms-rep-list', 'ms-active', 'ms-nq-list', 'h-act-list'].forEach((cid) => {
     const el = document.getElementById(cid); if (!el) return;
     el.addEventListener('click', (ev) => { const r = ev.target.closest('[data-tid]'); if (r) openTrade(r.dataset.tid); });
     el.addEventListener('keydown', (ev) => { if (ev.key !== 'Enter' && ev.key !== ' ') return; const r = ev.target.closest('[data-tid]'); if (r) { ev.preventDefault(); openTrade(r.dataset.tid); } });
