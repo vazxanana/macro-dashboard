@@ -4880,5 +4880,12 @@ function msNextSetup(bars, A) {
   document.addEventListener('DOMContentLoaded', function () { all(); setTimeout(all, 800); });
 })();
 </script>
+<script>
+/* polish 13: the settings menu closes on an outside click or Escape, like the account menu, so the two never overlap */
+(() => { const m = document.querySelector('.top-actions details.menu'); if (!m) return;
+  document.addEventListener('click', (ev) => { if (m.open && !m.contains(ev.target)) m.open = false; });
+  document.addEventListener('keydown', (ev) => { if (ev.key === 'Escape' && m.open) { m.open = false; const s = m.querySelector('summary'); if (s) s.focus(); } });
+})();
+</script>
 </body>
 </html>
