@@ -1340,6 +1340,12 @@ h1, .h-head { text-wrap: balance; }
 /* polish 12: buttons inside the settings menu keep their text labels (the top bar's icon-only rule was leaking in) */
 .top-actions .menu-body .ms-tbtn { width: auto; height: auto; min-height: 34px; padding: 6px 12px; font-size: 12.5px; display: inline-flex; align-items: center; justify-content: center; border-radius: 9px; white-space: nowrap; }
 .top-actions .menu-body .ms-tbtn::before { content: none; }
+
+/* polish 14: users table, initials avatar and calmer name type */
+.u-who { display: inline-flex; align-items: center; gap: 10px; }
+.u-who b { font: 600 13.5px var(--sans); color: var(--ink); }
+.u-av { width: 28px; height: 28px; flex: none; border-radius: 50%; display: grid; place-items: center; font: 700 12px var(--sans); color: #17130a; background: linear-gradient(145deg, #f3d27a, #c9962c); box-shadow: inset 0 -2px 4px rgba(0,0,0,.18); }
+.u-off .u-av { filter: grayscale(1); opacity: .5; }
 </style>
 </head>
 <body>
@@ -4394,7 +4400,7 @@ function msNextSetup(bars, A) {
     const rem = (US.remote && US.remote.users) || {}, keys = [...new Set(Object.keys(window.MS_USERS).concat(Object.keys(rem)))];
     body.innerHTML = keys.map((k) => {
       const u = rem[k] || window.MS_USERS[k], off = !!(rem[k] && rem[k].disabled), src = window.MS_USERS[k] ? (rem[k] ? 'built-in, changed here' : 'built-in') : 'added here';
-      return `<tr class="${off ? 'u-off' : ''}" data-u="${esc(k)}"><td><b>${esc(u.name || k)}</b>${off ? ' <small>removed</small>' : ''}</td><td>${off ? '—' : `<select data-act="role" aria-label="Access for ${esc(u.name || k)}">${Object.entries(ROLE_NAME).map(([r, l]) => `<option value="${r}"${u.role === r ? ' selected' : ''}>${l}</option>`).join('')}</select>`}</td><td><small>${esc(src)}</small></td>`
+      return `<tr class="${off ? 'u-off' : ''}" data-u="${esc(k)}"><td><span class="u-who"><span class="u-av" aria-hidden="true">${esc(String(u.name || k).trim().charAt(0).toUpperCase())}</span><b>${esc(u.name || k)}</b></span>${off ? ' <small>removed</small>' : ''}</td><td>${off ? '—' : `<select data-act="role" aria-label="Access for ${esc(u.name || k)}">${Object.entries(ROLE_NAME).map(([r, l]) => `<option value="${r}"${u.role === r ? ' selected' : ''}>${l}</option>`).join('')}</select>`}</td><td><small>${esc(src)}</small></td>`
         + `<td class="n u-acts">${off ? '<button type="button" data-act="restore">Restore</button>' : '<button type="button" data-act="pw">New password</button><button type="button" data-act="del" class="u-del">Remove</button>'}</td></tr>`;
     }).join('') || '<tr><td colspan="4" class="empty">No users yet.</td></tr>';
   }
