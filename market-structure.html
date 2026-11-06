@@ -1336,6 +1336,10 @@ h1, .h-head { text-wrap: balance; }
 .ms-steps li.done:not(:last-child)::after { background: rgba(8,153,129,.45); }
 .ms-steps .ms-dot { position: relative; z-index: 1; background-color: var(--panel); }
 .ms-steps li.now .ms-dot { box-shadow: 0 0 0 4px color-mix(in srgb, var(--gold, #d4a017) 22%, transparent); }
+
+/* polish 12: buttons inside the settings menu keep their text labels (the top bar's icon-only rule was leaking in) */
+.top-actions .menu-body .ms-tbtn { width: auto; height: auto; min-height: 34px; padding: 6px 12px; font-size: 12.5px; display: inline-flex; align-items: center; justify-content: center; border-radius: 9px; white-space: nowrap; }
+.top-actions .menu-body .ms-tbtn::before { content: none; }
 </style>
 </head>
 <body>
