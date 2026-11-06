@@ -116,6 +116,15 @@ written with the owner's GitHub token, `msGhTok`). users.json overrides built-in
 removes one. Sign-in fetches the list; a signed-in non-owner is re-checked after load and signed out if removed or if the
 password changed (`ms-user-rec` keeps an added user's record between visits). Passwords must stay unique per account.
 
+## Gold playbook check (6 Nov 2026, owner's skills)
+
+Admin card `#ms-pb` on the Setup view (`renderPlaybook()`, called from `renderHome()`), from the owner's skill collection
+(gold-msnr-playbook §2-5, Mosha S.CODE, Zlankator, MMXM): context tiles (council Weekly structure `goldW1` vs the setup,
+Daily regime = 20-day efficiency ratio on closed D1 candles, countdown to the 17:00 New York Daily close, NY midnight
+open and price above/below it, session / kill zone), the playbook's pre-trade checklist (auto items + manual ticks kept
+per day in localStorage `msPb-<inst>-<NY date>`), a verdict, and the management rules. Guidance only: the Daily-ER filter
+failed the council's own 2023-26 test (council-data research/log.md, 6 Nov), so it is not a council rule.
+
 ## ICT desk (6 Nov 2026, owner: a separate edge)
 
 ICT is its own edge and approach: never mix it into the council systems, their rules, filters or reports.
@@ -139,3 +148,6 @@ Rules and research live in `.claude/skills/ICT/SKILL.md` (results also in counci
   same-side A-setups within 3 h, skill §16, computed on the page); every signal is still tracked.
 - A+ tier (skill §17): A-setup + inversion body >= 60% of range + not NY PM (`isAPlus`, records carry `aplus`); desk
   filter "A+".
+- Desk extras (6 Nov): New York clock with kill zones (`#ict-clock`), a live forward-test card on futures signals only
+  (`#ict-fwd`, replay excluded; verdict needs ~30 closed A+), an auto checklist per signal (`#ict-tv-ck`), and NY 00:00 /
+  PDH / PDL lines on the signal chart. Skill §19: the edge is not proven on 2023-26 cash data — paper only.

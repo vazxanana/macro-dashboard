@@ -1011,6 +1011,16 @@
   @media (max-width: 1000px) { .ict-mkts { grid-template-columns: repeat(2, minmax(0, 1fr)); } .ict-kpi { grid-template-columns: repeat(3, minmax(0, 1fr)); } .ict-grid, .ict-break, .ict-rv { grid-template-columns: minmax(0, 1fr); } }
   @media (max-width: 520px) { .ict-kpi { grid-template-columns: repeat(2, minmax(0, 1fr)); } .ict-mine-k { grid-template-columns: repeat(2, minmax(0, 1fr)); } .ict-m .px { font-size: 17px; } }
   .ict-tv > .ict-tv-c, .ict-tv > p, .ict-tv > form { margin: 10px 16px; } .ict-tv > form { margin-bottom: 16px; }
+  .ict-clock { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; font: 500 12.5px var(--sans); color: var(--ink-dim); }
+  .ict-clock .kz { padding: 3px 10px; border-radius: 999px; border: 1px solid var(--line); background: var(--panel); }
+  .ict-clock .kz.on { border-color: var(--gold-line); color: var(--gold); background: var(--gold-soft); font-weight: 600; } .ict-clock .kz.weak { color: var(--ink-faint); }
+  .ict-fwd { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 6px 16px; align-items: center; }
+  .ict-fwd .t { font: 600 13px var(--sans); } .ict-fwd .row { display: flex; flex-wrap: wrap; gap: 6px 14px; font: 500 12.5px var(--sans); color: var(--ink-dim); }
+  .ict-fwd .row b { font-family: var(--mono); color: var(--ink); } .ict-fwd .msg { grid-column: 1 / -1; font-size: 12.5px; color: var(--ink-dim); line-height: 1.5; }
+  .ict-ck { list-style: none; margin: 8px 16px 0; padding: 0; display: flex; flex-wrap: wrap; gap: 6px; }
+  .ict-ck li { font: 500 12px var(--sans); padding: 3px 9px; border-radius: 999px; border: 1px solid var(--line); color: var(--ink-dim); }
+  .ict-ck li.y { border-color: color-mix(in srgb, #089981 45%, var(--line)); color: #2ebd85; } .ict-ck li.n { border-color: color-mix(in srgb, #f23645 40%, var(--line)); color: #f7525f; }
+  @media (max-width: 600px) { .ict-fwd { grid-template-columns: minmax(0, 1fr); } }
   .ict-a { display: inline-block; padding: 1px 6px; border-radius: 6px; font: 700 10.5px var(--sans); color: #17130a; background: var(--gold); }
   .ict-hr { display: grid; gap: 6px; justify-items: end; } .ict-src button { padding: 3px 12px; }
   .ict-cal-nav { display: inline-flex; align-items: center; gap: 8px; } .ict-cal-nav b { font: 600 13px var(--sans); min-width: 220px; text-align: center; } .ict-cal-nav small { font: 600 12px var(--mono); margin-left: 6px; }
@@ -1027,6 +1037,23 @@
   .ict-cal-day li { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; border: 1px solid var(--line); border-radius: 10px; padding: 8px 10px; font-size: 12.5px; cursor: pointer; }
   .ict-cal-day li:hover { border-color: var(--gold-line); } .ict-cal-day .m { font-family: var(--mono); color: var(--ink-dim); } .ict-cal-day small { color: var(--ink-faint); margin-left: auto; }
   @media (max-width: 600px) { .ict-cal { gap: 3px; } .ict-cal-d { min-height: 48px; padding: 4px; } .ict-cal-d b { font-size: 10.5px; } .ict-cal-d small { display: none; } .ict-cal-nav b { min-width: 0; } .ict-hr { justify-items: start; } }
+  /* ═══ Gold playbook check (6 Nov, owner's skills) ═══ */
+  .pb-ctx { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 8px; margin-bottom: 12px; }
+  .pb-ctx > div { border: 1px solid var(--line); border-radius: 10px; padding: 8px 10px; display: grid; gap: 2px; min-width: 0; }
+  .pb-ctx span { font: 500 11.5px var(--sans); color: var(--ink-dim); } .pb-ctx b { font: 600 14px var(--sans); } .pb-ctx small { font: 500 11px var(--sans); color: var(--ink-faint); }
+  .pb-ctx .ok { border-color: color-mix(in srgb, #089981 45%, var(--line)); } .pb-ctx .bad { border-color: color-mix(in srgb, #f23645 45%, var(--line)); } .pb-ctx .warn { border-color: var(--gold-line); }
+  .pb-cols { display: grid; grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr); gap: 16px; align-items: start; }
+  .pb-ck { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; }
+  .pb-ck li { display: flex; align-items: flex-start; gap: 10px; font-size: 13px; line-height: 1.45; padding: 6px 8px; border-radius: 8px; border: 1px solid var(--line-soft); }
+  .pb-ck li .st { flex: none; width: 20px; height: 20px; border-radius: 6px; display: grid; place-items: center; font: 700 12px var(--sans); border: 1px solid var(--line-strong); }
+  .pb-ck li.yes .st { background: #089981; border-color: #089981; color: #fff; } .pb-ck li.no .st { background: #f23645; border-color: #f23645; color: #fff; }
+  .pb-ck li small { display: block; color: var(--ink-faint); font-size: 11.5px; }
+  .pb-ck label { display: flex; gap: 10px; cursor: pointer; align-items: flex-start; width: 100%; } .pb-ck input { margin-top: 3px; accent-color: var(--gold); }
+  .pb-side { font-size: 12.5px; color: var(--ink-dim); line-height: 1.55; display: grid; gap: 8px; }
+  .pb-side b { color: var(--ink); } .pb-verdict { padding: 10px 12px; border-radius: 10px; font: 600 13px var(--sans); border: 1px solid var(--line); }
+  .pb-verdict.go { background: color-mix(in srgb, #089981 14%, var(--panel)); border-color: color-mix(in srgb, #089981 45%, var(--line)); }
+  .pb-verdict.wait { background: var(--gold-soft); border-color: var(--gold-line); } .pb-verdict.no { background: color-mix(in srgb, #f23645 12%, var(--panel)); border-color: color-mix(in srgb, #f23645 40%, var(--line)); }
+  @media (max-width: 1000px) { .pb-ctx { grid-template-columns: repeat(2, minmax(0, 1fr)); } .pb-cols { grid-template-columns: minmax(0, 1fr); } }
   /* Guest view (6 Nov): only the H4 gold chart with one trade setup */
   html[data-role="public"] .btab, html[data-role="public"] .top .tabs, html[data-role="public"] #ms-hdr-open, html[data-role="public"] #ms-alerts,
   html[data-role="public"] .top details.menu, html[data-role="public"] .top .ms-status, html[data-role="public"] .ms-offline-box { display: none !important; }
@@ -1473,6 +1500,14 @@ window.MS_ADMIN_HASH = '49c5624f2625ed8b42b6e1bf2819a3a41ddb9743aeca36ea34ea7eb9
         <div style="display:block;border:0"><span>Timeframes agreeing with H4</span><div class="ms-align" id="ms-td-align"></div></div>
       </div>
     </div>
+    <div class="card adm pb-card" id="ms-pb" aria-labelledby="ms-pb-t">
+      <div class="ms-k"><span id="ms-pb-t">Gold playbook check</span><small>from the owner's skills: MSNR playbook, Mosha S.CODE, Zlankator, MMXM</small></div>
+      <div class="pb-ctx" id="ms-pb-ctx"></div>
+      <div class="pb-cols">
+        <ul class="pb-ck" id="ms-pb-ck" aria-label="Pre-trade checklist"></ul>
+        <div class="pb-side" id="ms-pb-side"></div>
+      </div>
+    </div>
     <div class="card" id="ms-c-here-card" hidden>
       <div class="ms-k">Council on this market <a href="#council" class="c-link">Open council</a></div>
       <div id="ms-c-here" class="c-here-list"></div>
@@ -1654,8 +1689,10 @@ window.MS_ADMIN_HASH = '49c5624f2625ed8b42b6e1bf2819a3a41ddb9743aeca36ea34ea7eb9
       <div><h1 class="h-head">ICT desk</h1><p class="ms-note">US index futures · H1 iFVG reversal (sweep → inversion → trail from +2R). A separate edge from the council. <span id="ict-run"></span></p></div>
       <div class="ict-hr"><div class="ict-me" id="ict-me"></div><div class="ict-seg ict-src" id="ict-src" role="group" aria-label="Which signals"><button type="button" data-s="both" class="on">Both</button><button type="button" data-s="live">Live</button><button type="button" data-s="replay">Replay</button></div><div class="ict-seg ict-src" id="ict-flt" role="group" aria-label="Which setups"><button type="button" data-f="ap" title="A-setups with a strong inversion candle (body at least 60% of its range), not in the NY afternoon">A+</button><button type="button" data-f="a" class="on" title="Against the daily bias and grade B+ or better">A-setups</button><button type="button" data-f="all">All signals</button><button type="button" data-f="pick" title="A-setups, one bet per cluster: when several indices give the same-side setup within 3 hours, only the highest grade">One per cluster</button></div></div>
     </div>
+    <div class="ict-clock" id="ict-clock" aria-live="polite"></div>
     <div class="ict-mkts" id="ict-mkts" role="list" aria-label="Markets"></div>
     <div class="ict-kpi" id="ict-kpi" role="group" aria-label="Results"></div>
+    <div class="card ict-card ict-fwd" id="ict-fwd"></div>
     <div class="ict-grid">
       <div class="card ict-card">
         <div class="ms-k"><span>Open signals</span><small id="ict-open-n"></small></div>
@@ -1712,6 +1749,7 @@ window.MS_ADMIN_HASH = '49c5624f2625ed8b42b6e1bf2819a3a41ddb9743aeca36ea34ea7eb9
     <dialog class="tv ict-tv" id="ict-tv" aria-labelledby="ict-tv-t">
       <div class="tv-h"><div><h3 id="ict-tv-t">Signal</h3><p id="ict-tv-s"></p></div><div class="ict-tv-tf" role="group" aria-label="Timeframe"><button type="button" data-tf="h1" class="on">H1</button><button type="button" data-tf="m5">M5</button></div><button type="button" class="tv-x" id="ict-tv-x" aria-label="Close">×</button></div>
       <div class="ict-tv-c" id="ict-tv-c"></div>
+      <ul class="ict-ck" id="ict-tv-ck" aria-label="Signal checklist"></ul>
       <p class="ms-note" id="ict-tv-n"></p>
       <form class="ict-rv ict-rw" id="ict-rv">
         <fieldset><legend>My trade</legend>
@@ -4533,7 +4571,64 @@ function msNextSetup(bars, A) {
     window.scrollTo(0, 0);
     renderHome();
   }
+
+  // ─── Gold playbook check (6 Nov; the owner's skills: gold-msnr-playbook §2-4, mosha S.CODE, zlankator, MMXM) ───
+  // Context the page can read itself (weekly structure from the council, the Daily regime, the Daily close, the NY midnight
+  // open, the session) plus the playbook's pre-trade checklist; manual items are ticked by hand and kept for the day.
+  const NYP = new Intl.DateTimeFormat('en-US', { timeZone: 'America/New_York', year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', weekday: 'short', hourCycle: 'h23' });
+  const nyParts = (t) => { const o = {}; for (const x of NYP.formatToParts(new Date(t * 1000))) o[x.type] = x.value; return { d: `${o.year}-${o.month}-${o.day}`, h: +o.hour, m: +o.minute, wd: o.weekday }; };
+  const PB_MANUAL = [['closed', 'Signal candles CLOSED (DRD, BO, CF, EG)', 'Never act on a candle still forming; most of the old "edge" was knowing the close early.'],
+    ['origin', 'The zone is the extreme / origin of the leg, not a roadblock in the middle', ''], ['fresh', 'Entry zone fresh (or within its reuse limit)', 'EG zone 2 uses, EF zone 1.'],
+    ['sl', 'Stop beyond the structural extreme; size from the stop distance', 'Fixed 20-30 pip stops do not fit today\'s gold.'], ['tgt', 'Target = next barrier / opposing same-TF zone, at least 2R', '']];
+  function renderPlaybook() {
+    const box = document.getElementById('ms-pb'); if (!box || PUB) return;
+    const now = Date.now() / 1000, ny = nyParts(now), gold = instKey === 'xau', sn = COUNCIL.snap || {};
+    const dir = G.td ? (G.td.word === 'Sell' ? -1 : 1) : 0;
+    // weekly structure (council's W1, gold only)
+    const w1 = gold ? sn.goldW1 : null, wOk = w1 && dir ? w1 === dir : null;
+    // Daily regime: 20-day efficiency ratio on closed daily candles
+    const d1 = panes['1d'] && panes['1d'].raw ? panes['1d'].raw.slice(0, -1) : [];
+    let er = null; if (d1.length > 21) { const c = d1.slice(-21).map((b) => b.close); let path = 0; for (let i = 1; i < c.length; i++) path += Math.abs(c[i] - c[i - 1]); er = path ? Math.abs(c[20] - c[0]) / path : 0; }
+    const regime = er == null ? '—' : er >= 0.35 ? 'strong trend' : er >= 0.2 ? 'trending' : 'ranging';
+    // Daily close (17:00 New York) and the NY midnight open (MMXM)
+    let toClose = ((17 - ny.h) * 60 - ny.m) * 60; if (toClose <= 0) toClose += 86400;
+    const weekend = ny.wd === 'Sat' || (ny.wd === 'Sun' && ny.h < 18) || (ny.wd === 'Fri' && ny.h >= 17);
+    const src = (panes['15m'] && panes['15m'].raw) || (panes['1h'] && panes['1h'].raw) || [];
+    const mo = src.find((b) => { const p = nyParts(b.time); return p.d === ny.d && p.h === 0 && p.m === 0; });
+    const price = panes['1m'] && panes['1m'].raw && panes['1m'].raw.length ? panes['1m'].raw[panes['1m'].raw.length - 1].close : null;
+    const moSide = mo && price != null ? (price > mo.open ? 'above' : 'below') : null;
+    // session / kill zones (ET): Asia 20-24, London 02-05, NY 08-12 (sweet spot 09:00-10:30), NY PM 12-16
+    const hm = ny.h + ny.m / 60;
+    const ses = hm >= 2 && hm < 5 ? ['London kill zone', 'ok'] : hm >= 8 && hm < 12 ? [hm >= 9 && hm < 10.5 ? 'NY kill zone · reversal sweet spot' : 'NY kill zone', 'ok'] : hm >= 12 && hm < 16 ? ['NY afternoon (weaker)', 'warn'] : hm >= 20 ? ['Asia', 'warn'] : ['Between sessions', 'warn'];
+    const news = (typeof NEWS !== 'undefined' ? NEWS : []).filter((x) => x.rel).find((x) => x.t - now < 30 * 60 && now - x.t < 15 * 60);
+    const mondayOpen = ny.wd === 'Mon' && ny.h < 3;
+    const cell = (k, v, sub, c) => `<div class="${c || ''}"><span>${k}</span><b>${v}</b><small>${sub}</small></div>`;
+    document.getElementById('ms-pb-ctx').innerHTML =
+      cell('Weekly structure', !gold ? 'gold only' : w1 ? (w1 > 0 ? 'Bullish' : 'Bearish') : 'waiting', !gold || !dir || !w1 ? 'last W1 break' : wOk ? `agrees with the ${G.td.word.toLowerCase()} setup` : `against the ${G.td.word.toLowerCase()} setup`, wOk == null ? '' : wOk ? 'ok' : 'bad')
+      + cell('Daily regime', regime, er == null ? 'needs 21 daily candles' : `20-day efficiency ${er.toFixed(2)} · ${er >= 0.2 ? 'BO→VR→CF style' : 'barrier style or no trade'}`, er == null ? '' : er >= 0.2 ? 'ok' : 'warn')
+      + cell('Daily close', weekend ? 'weekend' : `in ${dur(toClose)}`, '17:00 New York · act only on closed candles', weekend ? 'warn' : '')
+      + cell('NY midnight open', mo ? fmt(mo.open) : '—', moSide ? `price ${moSide} it · MMXM: buy below, sell above` : 'MMXM day profile', moSide && dir ? ((dir > 0) === (moSide === 'below') ? 'ok' : 'warn') : '')
+      + cell('Session', ses[0], `${String(ny.h).padStart(2, '0')}:${String(ny.m).padStart(2, '0')} New York`, ses[1]);
+    // checklist: auto items + manual items (kept per day and instrument)
+    const key = `msPb-${instKey}-${ny.d}`; let man = {}; try { man = JSON.parse(localStorage.getItem(key) || '{}'); } catch (e) {}
+    const autoItems = [
+      ['Weekly structure and Daily storyline known; the trade is with them', !gold || wOk == null ? null : wOk && (!(panes['1d'] && panes['1d'].A) || !panes['1d'].A.trend || panes['1d'].A.trend === dir), 'Counter-storyline = small scalp, nearest target, or skip. Against the Weekly in a trend: PF ~0.8 over 14 years.'],
+      ['Daily not ranging (or use barrier style)', er == null ? null : er >= 0.2, 'Mosha BO in ranges ~PF 1.0 (14 y); on our 2023-26 gold chains the ER filter did NOT pass the council test, so this is guidance, not a rule.'],
+      ['No high-impact news within ~15 min; not the Monday open; London or NY session', !news && !mondayOpen && ses[1] === 'ok', news ? `${news.cur} ${news.title} is close.` : mondayOpen ? 'Monday open: wait.' : ses[1] === 'ok' ? '' : 'Outside the London / NY kill zones.']];
+    const li = (txt, st, sub) => `<li class="${st === true ? 'yes' : st === false ? 'no' : ''}"><span class="st" aria-hidden="true">${st === true ? '✓' : st === false ? '✕' : '?'}</span><span>${esc(txt)}${sub ? `<small>${esc(sub)}</small>` : ''}</span></li>`;
+    document.getElementById('ms-pb-ck').innerHTML = autoItems.map(([t, st, sub]) => li(t, st, sub)).join('')
+      + PB_MANUAL.map(([k, t, sub]) => `<li class="${man[k] ? 'yes' : ''}"><label><input type="checkbox" data-pb="${k}"${man[k] ? ' checked' : ''}> <span>${esc(t)}${sub ? `<small>${esc(sub)}</small>` : ''}</span></label></li>`).join('');
+    const autoOk = autoItems.every(([, st]) => st !== false), allMan = PB_MANUAL.every(([k]) => man[k]);
+    const v = !autoOk ? ['no', 'Not a playbook trade right now: see the red items.'] : allMan ? ['go', 'All checks pass. Size from the structural stop; 3 losses in a row = stop for the day.'] : ['wait', 'Context is fine; tick the manual checks on the chart before entering.'];
+    document.getElementById('ms-pb-side').innerHTML = `<div class="pb-verdict ${v[0]}">${v[1]}</div>`
+      + `<div><b>Management</b> (playbook §5): cut only on a candle CLOSE through the zone; break-even only after ≥ 1.5R (early BE on gold gets hunted); 70-80% off at the first barrier; a failed zone flips — trade its pullback the other way.</div>`
+      + `<div><b>What 14 years of gold say</b>: wait for the Daily close; structural stops; trend regime matters for breakouts; Mosha BO + Weekly agreeing is the best honest edge (PF ~1.35). Engulf mechanics and raw key levels alone have no edge.</div>`;
+    box.dataset.key = key;
+  }
+  { const ck = document.getElementById('ms-pb-ck');
+    if (ck) ck.addEventListener('change', (ev) => { const i = ev.target.closest('input[data-pb]'); if (!i) return; const key = document.getElementById('ms-pb').dataset.key; let man = {}; try { man = JSON.parse(localStorage.getItem(key) || '{}'); } catch (e) {} man[i.dataset.pb] = i.checked; try { localStorage.setItem(key, JSON.stringify(man)); } catch (e) {} renderPlaybook(); }); }
   function renderHome() {
+    try { renderPlaybook(); } catch (e) { console.warn('playbook', e); }
     if (!document.getElementById('v-home')) return;
     const set = (id, html) => { const el = document.getElementById(id); if (el) el.innerHTML = html; };
     try {
@@ -4648,7 +4743,7 @@ function msNextSetup(bars, A) {
     const [t, s, b, d, r] = await Promise.all([get('trades.json'), get('snapshot.json'), get('bars.json'), get('desk.json'), get('replay.json')]);
     if (t) S.trades = t; if (s) S.snap = s; if (b) S.bars = b; if (d) { mergeDesk(d); saveLocal(); }
     if (r && r.trades) { S.replay = r.trades; S.replayInfo = r; }
-    render();
+    window.renderIct();
   }
   const liveR = (x) => { const m = S.snap && S.snap.markets[x.market]; if (!m || x.status !== 'open') return null; return ((x.side === 'buy' ? 1 : -1) * (m.price - x.entry)) / x.r0; };
   const myRev = (x) => S.desk.reviews[x.id];
@@ -4739,7 +4834,26 @@ function msNextSetup(bars, A) {
   $('ict-flt').addEventListener('click', (ev) => { const b = ev.target.closest('button'); if (!b) return; S.flt = b.dataset.f; try { localStorage.setItem('ictFlt', S.flt); } catch (e) {} S.calDay = null; render(); });
   $('ict-src').addEventListener('click', (ev) => { const b = ev.target.closest('button'); if (!b) return; S.src = b.dataset.s; try { localStorage.setItem('ictSrc', S.src); } catch (e) {} render(); });
   function openFrom0(ev) { const el = ev.target.closest('[data-id]'); if (el) openSig(el.dataset.id); }
-  window.renderIct = () => { render(); };
+  // session clock (ET) with the ICT / MMXM kill zones; A+ skips NY PM
+  const ET = new Intl.DateTimeFormat('en-US', { timeZone: 'America/New_York', hour: '2-digit', minute: '2-digit', weekday: 'short', hourCycle: 'h23' });
+  function renderClock() {
+    const el = $('ict-clock'); if (!el) return; const o = {}; for (const x of ET.formatToParts(new Date())) o[x.type] = x.value;
+    const hm = +o.hour + +o.minute / 60, Z = [['Asia', 20, 24, ''], ['London', 2, 5, ''], ['NY AM', 8, 12, ''], ['NY PM', 12, 16, 'weak']];
+    const cur = Z.find((z) => hm >= z[1] && hm < z[2]), nxt = Z.map((z) => ({ z, d: ((z[1] - hm) + 24) % 24 })).filter((q) => !cur || q.z !== cur).sort((a, b) => a.d - b.d)[0];
+    el.innerHTML = `<span>${o.weekday} ${o.hour}:${o.minute} New York</span>` + Z.map((z) => `<span class="kz${cur === z ? ' on' : ''}${z[3] ? ' weak' : ''}" title="${z[3] ? 'Signals here are excluded from A+' : 'Kill zone'}">${z[0]} ${String(z[1]).padStart(2, '0')}-${String(z[2] % 24).padStart(2, '0')}</span>`).join('')
+      + `<span>${cur ? `${cur[0]} now${cur[0] === 'NY AM' && hm >= 9 && hm < 10.5 ? ' · reversal sweet spot' : ''}` : `next: ${nxt.z[0]} in ${Math.floor(nxt.d)} h ${Math.round((nxt.d % 1) * 60)} min`}</span>`;
+  }
+  // forward test: live futures signals only (never the replay), A and A+, against what the backtests suggest
+  function renderFwd() {
+    const L = S.trades.filter((x) => x.closed), seg = (f) => { const a = L.filter(f), r = a.reduce((s2, x) => s2 + x.R, 0); return { n: a.length, r, m: a.length ? r / a.length : 0, w: a.filter((x) => x.R > 0).length }; };
+    const A = seg(isA), AP = seg(isAP), ALL = seg(() => true);
+    const t = (k, v) => `<span>${k} <b>${v.n ? `${fR(v.r)} · ${v.n} closed · ${fR(v.m)} a signal` : 'none closed yet'}</b></span>`;
+    const verdict = AP.n < 30 ? `Too early to judge: ${AP.n} closed A+ signals (need about 30). Backtests disagree by data feed: 2023-24 positive, 2025 negative on cash data, 2026 futures positive. The live futures record here is the real test; paper only until then.`
+      : AP.m > 0.15 ? 'A+ is holding up live (above +0.15R a signal over 30+). Keep sizing small and watch the drawdown.' : AP.m > 0 ? 'A+ is barely positive live: no real edge yet; keep it on paper.' : 'A+ is losing live after 30+ signals: stop and review the model.';
+    $('ict-fwd').innerHTML = `<div class="t">Live forward test</div><div class="row">${t('A+', AP)}${t('A-setups', A)}${t('All signals', ALL)}</div><div class="msg">${verdict}</div>`;
+  }
+  window.renderIct = () => { render(); renderClock(); renderFwd(); };
+  setInterval(() => { if (!$('v-ict').hidden) renderClock(); }, 30e3);
 
   // ─── chart dialog + review ───
   let CH = null, SER = null, LINES = [];
@@ -4756,6 +4870,12 @@ function msNextSetup(bars, A) {
     add(x.entry, '#c9a24a', 'Entry'); add(x.stop, '#f23645', 'Stop'); add(x.t1, '#089981', '3R'); add(x.t2, '#089981', '2R', 2); if (x.stop0 != null && x.stop0 !== x.stop) add(x.stop0, '#f23645', 'First stop', 2);
     add(x.sweep && x.sweep.level, '#9aa3b2', 'Swept', 2); if (x.fvg) { add(x.fvg[0], '#6f8fd6', 'FVG', 1); add(x.fvg[1], '#6f8fd6', 'FVG', 1); }
     if (x.dol != null) add(x.dol, '#c9a24a', 'DOL', 3);
+    // NY midnight open of the signal day and the previous day's high/low (from the stored candles)
+    const etd = (t) => new Intl.DateTimeFormat('en-CA', { timeZone: 'America/New_York' }).format(new Date(t * 1000)), eth = (t) => +new Intl.DateTimeFormat('en-US', { timeZone: 'America/New_York', hour: '2-digit', hourCycle: 'h23' }).format(new Date(t * 1000));
+    const h1b = (S.bars[x.market] || {}).h1 || [], mob = h1b.find((b) => etd(b[0]) === etd(x.signalAt) && eth(b[0]) === 0);
+    if (mob) add(mob[1], '#9aa3b2', 'NY 00:00', 3);
+    const d1b = ((S.bars[x.market] || {}).d1 || []).filter((b) => b[0] + 86400 <= x.signalAt); const pd = d1b[d1b.length - 1];
+    if (pd) { add(pd[2], '#7d8590', 'PDH', 1); add(pd[3], '#7d8590', 'PDL', 1); }
     const mk = [{ time: x.signalAt - (S.tf === 'h1' ? 3600 : 300) - ((x.signalAt - (S.tf === 'h1' ? 3600 : 300)) % (S.tf === 'h1' ? 3600 : 300)), position: x.side === 'buy' ? 'belowBar' : 'aboveBar', color: '#c9a24a', shape: x.side === 'buy' ? 'arrowUp' : 'arrowDown', text: 'iFVG' }];
     if (x.sweep) mk.unshift({ time: x.sweep.t - (x.sweep.t % (S.tf === 'h1' ? 3600 : 300)), position: x.side === 'buy' ? 'belowBar' : 'aboveBar', color: '#9aa3b2', shape: 'circle', text: 'Sweep' });
     if (x.closed) mk.push({ time: x.closed - (x.closed % (S.tf === 'h1' ? 3600 : 300)), position: 'inBar', color: x.R > 0 ? '#089981' : '#f23645', shape: 'square', text: `${x.exit} ${fR(x.R)}` });
@@ -4767,6 +4887,8 @@ function msNextSetup(bars, A) {
     const x = S.trades.concat(S.replay).find((t) => t.id === id); if (!x) return; S.cur = x;
     const f = x.feat, g = x.grade;
     $('ict-tv-t').innerHTML = `<span class="ms-chip ${x.side === 'sell' ? 'ms-chip-sell' : 'ms-chip-buy'}">${x.side.toUpperCase()}</span> ${esc(x.label)} <span class="ict-g ${gcls(g.letter)}">${esc(g.letter)}</span>`;
+    { const f = x.feat, ck = [['Liquidity swept', true], ['Inversion within 6 H1 candles', true], ['Against the daily bias', f.bias === 'against'], ['Grade B+ or better', x.grade.total >= 7], ['Strong body (≥ 60%)', f.body >= 0.6], ['Not NY PM', f.session !== 'NY PM'], ['Room to the next liquidity ≥ 2R', x.grade.rr >= 2], ['Internal level untouched', !!x.valid]];
+      $('ict-tv-ck').innerHTML = ck.map(([t, ok]) => `<li class="${ok ? 'y' : 'n'}">${ok ? '✓' : '✕'} ${esc(t)}</li>`).join('') + `<li>${isAP(x) ? 'A+ setup' : isA(x) ? 'A-setup' : 'Not an A-setup'}</li>`; }
     $('ict-tv-s').textContent = `Signal ${tm(x.signalAt)} · ${f.session} · bias ${f.bias || 'n/a'} · ${f.zone || 'n/a'}${f.pdSweep ? ' · prev-day level swept' : ''} · grade ${g.total}/10 (strength ${g.strength}/4, speed ${g.speed}/3, room ${g.rr}/3) · `
       + `entry ${fx(x.entry, x.market)}, stop ${fx(x.stop, x.market)}, ${x.t1 != null ? `target ${fx(x.t1, x.market)}` : 'trail from +2R, 1.5R behind'} · ${x.closed ? `${x.exit} ${fR(x.R)}` : `open ${fR(liveR(x))}`}`;
     const rv = myRev(x) || {};
