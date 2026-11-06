@@ -1629,7 +1629,7 @@ window.MS_ADMIN_HASH = '49c5624f2625ed8b42b6e1bf2819a3a41ddb9743aeca36ea34ea7eb9
   <section class="view ictx" id="v-ict" aria-label="ICT desk" hidden>
     <div class="v-head ict-head">
       <div><h1 class="h-head">ICT desk</h1><p class="ms-note">US index futures · H1 iFVG reversal (sweep → inversion → trail from +2R). A separate edge from the council. <span id="ict-run"></span></p></div>
-      <div class="ict-hr"><div class="ict-me" id="ict-me"></div><div class="ict-seg ict-src" id="ict-src" role="group" aria-label="Which signals"><button type="button" data-s="both" class="on">Both</button><button type="button" data-s="live">Live</button><button type="button" data-s="replay">Replay</button></div><div class="ict-seg ict-src" id="ict-flt" role="group" aria-label="Which setups"><button type="button" data-f="a" class="on" title="Against the daily bias and grade B+ or better">A-setups</button><button type="button" data-f="all">All signals</button></div></div>
+      <div class="ict-hr"><div class="ict-me" id="ict-me"></div><div class="ict-seg ict-src" id="ict-src" role="group" aria-label="Which signals"><button type="button" data-s="both" class="on">Both</button><button type="button" data-s="live">Live</button><button type="button" data-s="replay">Replay</button></div><div class="ict-seg ict-src" id="ict-flt" role="group" aria-label="Which setups"><button type="button" data-f="a" class="on" title="Against the daily bias and grade B+ or better">A-setups</button><button type="button" data-f="all">All signals</button><button type="button" data-f="pick" title="A-setups, one bet per cluster: when several indices give the same-side setup within 3 hours, only the highest grade">One per cluster</button></div></div>
     </div>
     <div class="ict-mkts" id="ict-mkts" role="list" aria-label="Markets"></div>
     <div class="ict-kpi" id="ict-kpi" role="group" aria-label="Results"></div>
@@ -1679,6 +1679,7 @@ window.MS_ADMIN_HASH = '49c5624f2625ed8b42b6e1bf2819a3a41ddb9743aeca36ea34ea7eb9
         <li><b>Entry</b> at the price when the tracker sees it (checks every 15 min), <b>stop</b> 2 ticks beyond the sweep; <b>no fixed target</b>: from +2R the stop trails 1.5R behind the best price (since 6 Nov; signals before used a 3R target); a fixed-2R result is recorded as a second variant; out after 48 h.</li>
         <li><b>Grade</b> /10 (candle closure rating): candle strength /4 (body and close location), inversion speed /3, room to the next liquidity /3. A+ 10 · A 9 · A- 8 · B+ 7 · B 6 · B- 5 · C 3-4 · F.</li>
         <li><b>Recorded, not filtered</b>: daily bias (vs the 50-day average), premium / discount of the 20-day range, previous-day high/low sweep, session (Asia, London, NY AM, NY PM), internal high/low validity. "What works" shows which of them matter.</li>
+        <li><b>One per cluster</b>: the four indices often give the same setup within hours, which is one bet, not four. This view keeps only the highest-grade index of each cluster (★). 2026 replay: 154 A-setups in 120 clusters; one per cluster +53R with a 8.9R worst drawdown vs every trade +67R with 12.9R.</li>
         <li><b>A-setups</b> (the desk's default view): the signal goes <b>against</b> the daily bias (prior close vs its 50-day average) and grades <b>B+ or better</b> (≥ 7/10). Research 6 Nov: NQ 2023-24 +0.20R a signal, NQ 2025 +0.16R, 2026 replay on all four indices +0.23R, against +0.02-0.07R for all signals; the same grade WITH the bias loses. Every signal is still recorded; switch to "All signals" to see them.</li>
         <li>Backtest, NQ futures 2023-25: about +0.08R a signal, every year positive, mostly from buys. Gold liked bias + discount; NQ did not. Data from Yahoo, delayed about 10 minutes.</li>
       </ol>
@@ -4600,7 +4601,17 @@ function msNextSetup(bars, A) {
   try { S.src = localStorage.getItem('ictSrc') || 'both'; } catch (e) {}
   S.flt = 'a'; try { S.flt = localStorage.getItem('ictFlt') || 'a'; } catch (e) {}
   const isA = (x) => (x.aset != null ? x.aset : !!(x.feat && x.feat.bias === 'against' && x.grade && x.grade.total >= 7));   // A-setup: against the daily bias, grade >= 7 (research 6 Nov)
-  const all = () => (S.src === 'live' ? S.trades : S.src === 'replay' ? S.replay : S.trades.concat(S.replay)).filter((x) => S.flt === 'all' || isA(x));
+  // clusters (research 6 Nov, skill §16): A-setups on different indices, same side, within 3 h of the cluster's first signal are one
+  // bet; the pick is the highest grade (then the strongest body, then the first). Computed on the page for live and replay alike.
+  const PICK = new Map();
+  function markClusters(L) {
+    PICK.clear(); const A = L.filter(isA).sort((a, b) => a.signalAt - b.signalAt), cl = [];
+    for (const x of A) { const c = cl[cl.length - 1]; if (c && c[0].side === x.side && x.signalAt - c[0].signalAt <= 3 * 3600 && !c.some((y) => y.market === x.market)) c.push(x); else cl.push([x]); }
+    for (const c of cl) { const best = c.slice().sort((a, b) => (b.grade.total - a.grade.total) || ((b.feat.body || 0) - (a.feat.body || 0)) || (a.signalAt - b.signalAt))[0]; for (const x of c) PICK.set(x.id, { pick: x === best, n: c.length }); }
+  }
+  const all = () => { const L = S.src === 'live' ? S.trades : S.src === 'replay' ? S.replay : S.trades.concat(S.replay); markClusters(L);
+    return L.filter((x) => S.flt === 'all' || (isA(x) && (S.flt !== 'pick' || (PICK.get(x.id) || {}).pick))); };
+  const clTag = (x) => { const c = PICK.get(x.id); return c && c.n > 1 ? (c.pick ? ` <span class="ict-a" title="Best of ${c.n} same-side setups within 3 h">★ pick of ${c.n}</span>` : ` <span class="ict-pill" title="Another index in this cluster has the higher grade">cluster of ${c.n}</span>`) : ''; };
   try { S.desk = JSON.parse(localStorage.getItem('ictDesk') || 'null') || S.desk; } catch (e) {}
   const saveLocal = () => { try { localStorage.setItem('ictDesk', JSON.stringify(S.desk)); } catch (e) {} };
   const tok = () => { try { return localStorage.getItem('msGhTok') || ''; } catch (e) { return ''; } };
@@ -4640,7 +4651,7 @@ function msNextSetup(bars, A) {
     // open
     $('ict-open-n').textContent = O.length ? `${O.length} open` : '';
     $('ict-open').innerHTML = O.length ? O.map((x) => { const r = liveR(x), pct = Math.max(0, Math.min(100, ((r + 1) / 4) * 100));
-      return `<li data-id="${esc(x.id)}" tabindex="0"><div class="r1"><span class="ms-chip ${x.side === 'sell' ? 'ms-chip-sell' : 'ms-chip-buy'}">${x.side.toUpperCase()}</span>${esc(x.short)} <span class="ict-g ${gcls(x.grade.letter)}">${esc(x.grade.letter)}</span>${isA(x) ? ' <span class="ict-a">A-setup</span>' : ''} <span class="ict-pill">${esc(x.feat.session)}</span><span class="live ${cls(r)}">${fR(r)}</span></div>`
+      return `<li data-id="${esc(x.id)}" tabindex="0"><div class="r1"><span class="ms-chip ${x.side === 'sell' ? 'ms-chip-sell' : 'ms-chip-buy'}">${x.side.toUpperCase()}</span>${esc(x.short)} <span class="ict-g ${gcls(x.grade.letter)}">${esc(x.grade.letter)}</span>${isA(x) ? ' <span class="ict-a">A-setup</span>' : ''}${clTag(x)} <span class="ict-pill">${esc(x.feat.session)}</span><span class="live ${cls(r)}">${fR(r)}</span></div>`
         + `<div class="ict-bar" title="−1R stop … +3R"><i style="left:0;width:${pct.toFixed(0)}%"></i></div>`
         + `<div class="r2">Entry ${fx(x.entry, x.market)} · stop ${fx(x.stop, x.market)} · 2R ${fx(x.t2, x.market)} · ${x.t1 != null ? `3R ${fx(x.t1, x.market)}` : x.trailMoved ? 'trailing' : 'trail from 2R'} · ${ago(x.opened)}</div></li>`; }).join('')
       : '<li class="empty">No open signal. The tracker checks NQ, ES, YM and RTY every 15 minutes.</li>';
@@ -4662,7 +4673,7 @@ function msNextSetup(bars, A) {
     // table
     const L = T.filter((x) => (!S.f.m || x.market === S.f.m) && (!S.f.s || (S.f.s === 'open' ? x.status === 'open' : S.f.s === 'closed' ? !!x.closed : S.f.s === 'todo' ? x.closed && !(myRev(x) && myRev(x).at) : (myRev(x) || {}).act === 'taken')));
     $('ict-body').innerHTML = L.length ? L.slice(0, 300).map((x) => { const rv = myRev(x), r = x.closed ? x.R : liveR(x);
-      return `<tr data-id="${esc(x.id)}" tabindex="0"><td>${tm(x.signalAt)}</td><td><b>${esc(x.short)}</b></td><td><span class="ms-chip ${x.side === 'sell' ? 'ms-chip-sell' : 'ms-chip-buy'}">${x.side.toUpperCase()}</span></td><td><span class="ict-g ${gcls(x.grade.letter)}">${esc(x.grade.letter)}</span>${isA(x) ? ' <span class="ict-a" title="A-setup: against the daily bias, grade B+ or better">A</span>' : ''}</td><td>${esc(x.feat.session)}</td><td>${esc(x.feat.bias || '—')}</td><td>${esc(x.feat.zone || '—')}</td>`
+      return `<tr data-id="${esc(x.id)}" tabindex="0"><td>${tm(x.signalAt)}</td><td><b>${esc(x.short)}</b></td><td><span class="ms-chip ${x.side === 'sell' ? 'ms-chip-sell' : 'ms-chip-buy'}">${x.side.toUpperCase()}</span></td><td><span class="ict-g ${gcls(x.grade.letter)}">${esc(x.grade.letter)}</span>${isA(x) ? ' <span class="ict-a" title="A-setup: against the daily bias, grade B+ or better">A</span>' : ''}${clTag(x)}</td><td>${esc(x.feat.session)}</td><td>${esc(x.feat.bias || '—')}</td><td>${esc(x.feat.zone || '—')}</td>`
         + `<td class="n">${fx(x.entry, x.market)}</td><td class="n">${fx(x.stop, x.market)}</td><td class="n">${x.t1 != null ? fx(x.t1, x.market) : 'trail'}</td><td class="${cls(r)}">${x.closed ? `${x.status === 'win' ? 'Win' : x.status === 'loss' ? 'Loss' : 'Flat'} ${fR(r)}${x.exit === 'time' ? ' <small>48 h</small>' : x.exit === 'trail' ? ' <small>trail</small>' : ''}${x.replay ? ' <span class="ict-pill">replay</span>' : ''}` : `Open ${fR(r)}`}</td>`
         + `<td>${rv ? `${rv.act ? `<span class="ict-pill">${esc(rv.act)}</span> ` : ''}${rv.grade ? `<span class="ict-g ${gcls(rv.grade)}">${esc(rv.grade)}</span>` : ''}${rv.text ? ' ✎' : ''}` : '<span class="ms-note">—</span>'}</td></tr>`; }).join('')
       : `<tr class="empty"><td colspan="12">${all().length ? 'No signal matches the filter.' : 'No signal yet. The first ones appear after an H1 sweep and inversion on NQ, ES, YM or RTY.'}</td></tr>`;

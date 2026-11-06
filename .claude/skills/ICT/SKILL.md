@@ -130,3 +130,13 @@ Each signal's next 72 H1 candles ([best, worst, close] in R) were replayed under
 - A-setups on NQ alone, every signal counted: 2023 +, 2024 +, 2025 ~0 (with the 3R target 2025 was −0.11R): the
   against-the-bias filter weakened in NQ's 2025 trend year; the 2026 replay on all four indices is strongly positive.
 - Tracker and replay: `P.trail = [2, 1.5]`, records carry `trail`, `stop0`, `trailMoved`, exit 'trail'; `t1` is null.
+
+## 16. Clusters: one bet, not four (6 Nov 2026)
+The indices move together: in the 2026 replay 154 A-setups fell into 120 clusters (same side, different indices, within
+3 h of the first): 93 single, 20 of two, 7 of three. With the trailing exit:
+- every trade at 1R: +66.8R, worst drawdown 12.9R; one bet per cluster at 1R split across its trades: +43.5R, DD 8.9R;
+  **the highest-grade index of each cluster only: +53.2R (+0.44R a bet), DD 8.9R** (best return per drawdown); first to
+  signal +46.2R. No index is a reliably better pick than the grade.
+- Tested and rejected the same day: a limit entry on a pullback toward the stop (0.25-0.5R, 3-12 h) — mixed on all signals,
+  worse on A-setups; session filters for A-setups — no pattern holds in all four sets (Asia positive but small samples).
+- Desk: "One per cluster" view (A-setups, ★ pick of n); clusters are computed on the page.
