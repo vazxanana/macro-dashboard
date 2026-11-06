@@ -933,6 +933,15 @@
     .v-head .ms-note { font-size: 12.5px; }                                                                  /* r2-39 */
     .h-kpi-s { white-space: normal; }                                                                        /* r2-40 phone: no cut-off sublines */
   }
+
+  /* ═══ Design round 3 (6 Nov) ═══ */
+  .ms-td .ms-feed-wide { max-width: none; border-top: 1px solid var(--line-soft); padding-top: 12px; margin: 18px 0 0; font-size: 12px; color: var(--ink-faint); line-height: 1.6; }   /* r3-1 setup source note fills the space under the steps */
+  table tr.empty td, .ms-j .empty td { font-family: var(--sans) !important; font-size: 13px; color: var(--ink-dim); padding: 22px 12px !important; }   /* r3-2 empty rows in plain type */
+  @media (max-width: 700px) {
+    .h-today .h-kpi-s { white-space: normal; overflow: visible; }                                             /* r3-3 phone: full sublines in the Today strip */
+    .c-tabs { flex-wrap: nowrap !important; overflow-x: auto; scrollbar-width: none; -webkit-overflow-scrolling: touch; }   /* r3-4 phone: Trader tabs in one scrolling row */
+    .c-tabs::-webkit-scrollbar { display: none; } .c-tabs button { flex: none; }
+  }
   /* Guest view (6 Nov): only the H4 gold chart with one trade setup */
   html[data-role="public"] .btab, html[data-role="public"] .top .tabs, html[data-role="public"] #ms-hdr-open, html[data-role="public"] #ms-alerts,
   html[data-role="public"] .top details.menu, html[data-role="public"] .top .ms-status, html[data-role="public"] .ms-offline-box { display: none !important; }
@@ -1344,13 +1353,13 @@ window.MS_ADMIN_HASH = '49c5624f2625ed8b42b6e1bf2819a3a41ddb9743aeca36ea34ea7eb9
         <div class="ms-k">What to do now <span class="ms-chip" id="ms-td-bias">—</span></div>
         <ol class="ms-steps" id="ms-td-steps"><li><span class="ms-dot">…</span><span>Loading live candles.</span></li></ol>
         <div class="ms-now" id="ms-td-now">Loading charts…</div>
+        <div class="ms-note ms-feed-wide" id="ms-feed-note"></div>
       </div>
       <div class="ms-kv">
         <div><span>Spot price</span><b id="ms-td-price">—</b></div>
         <div><span>H4 invalidation (close beyond)</span><b id="ms-td-inval">—</b></div>
         <div style="display:block;border:0"><span class="lv-h">Key levels · H4 <em id="ms-lvl-count">Tap a bell to get alerted</em></span><ul class="ms-levels" id="ms-levels"></ul></div>
         <div style="display:block;border:0"><span>Timeframes agreeing with H4</span><div class="ms-align" id="ms-td-align"></div></div>
-        <div class="ms-note" id="ms-feed-note" style="display:block;border:0"></div>
       </div>
     </div>
     <div class="card" id="ms-c-here-card" hidden>
@@ -2560,7 +2569,7 @@ function msNextSetup(bars, A) {
     const now = new Date(), wd = now.getUTCDay(), hr = now.getUTCHours();
     const fxClosed = INST.group === 'Forex' && marketClosed();
     $('ms-feed-note').textContent = INST.spot
-      ? `${marketClosed() ? 'Spot gold is closed for the weekend or just reopened (the Traders wait until Sunday 23:00 UTC, an hour after the reopen); PAXG keeps trading, so setups now are noise and the Traders skip them. ' : ''}Gold candles from ${G.source} PAXG/USD (1 token = 1 oz of LBMA gold), shifted ${G.offset >= 0 ? '+' : ''}${fmt(G.offset)} onto XAU/USD spot from gold-api.com. Times in your local zone. COMEX futures (MGC/GC) trade a few dollars above spot.`
+      ? `${marketClosed() ? 'Weekend window for spot gold (the Traders stop on Friday at 21:00 UTC and wait until Sunday 23:00 UTC); PAXG keeps trading, so setups now are noise and the Traders skip them. ' : ''}Gold candles from ${G.source} PAXG/USD (1 token = 1 oz of LBMA gold), shifted ${G.offset >= 0 ? '+' : ''}${fmt(G.offset)} onto XAU/USD spot from gold-api.com. Times in your local zone. COMEX futures (MGC/GC) trade a few dollars above spot.`
       : INST.group === 'Forex'
         ? `${fxClosed ? 'Forex is closed for the weekend, so candles stay flat until it reopens Sunday evening (UTC). ' : ''}${INST.label} candles from ${G.source} (${srcSym}). Exchange forex can differ slightly from your broker's quotes. Times in your local zone.`
         : `${INST.label} candles from ${G.source} (${srcSym}). Times in your local zone.`;
@@ -3067,7 +3076,7 @@ function msNextSetup(bars, A) {
     const body = document.getElementById('ms-js-body'), st = document.getElementById('ms-js-stats'); if (!body) return;
     const rows = systemClosed(), fR = (v) => `${v > 0 ? '+' : v < 0 ? '−' : ''}${Math.abs(v).toFixed(2)}R`;
     body.innerHTML = rows.length ? rows.slice(0, 200).map((x) => { const d = { dec: x.dec != null ? x.dec : 2 };
-      return `<tr data-tid="${esc(x.id)}"><td>${ftime(x.closed + TZ)}</td><td><b>${esc(x.label)}</b></td><td>${PUB ? '—' : `${esc(x.name)}${x.paper ? ' <small>paper</small>' : ''}`}</td><td><span class="ms-chip ${x.side === 'sell' ? 'ms-chip-sell' : 'ms-chip-buy'}">${x.side === 'sell' ? 'SELL' : 'BUY'}</span></td><td class="m">${fmtI(x.entry, d)}</td><td class="m">${fmtI(x.stop, d)}</td><td>${esc(x.exit || (x.status === 'be' ? 'breakeven' : x.R > 0 ? 'target' : 'stop'))}</td><td class="m ${x.R > 0 ? 'pos' : x.R < 0 ? 'neg' : ''}">${fR(x.R)}</td></tr>`; }).join('')
+      return `<tr data-tid="${esc(x.id)}"><td>${ftime(x.closed + TZ)}</td><td><b>${esc(x.label)}</b></td><td>${PUB ? '—' : `${esc(x.name)}${x.paper ? ' <small>paper</small>' : ''}`}</td><td><span class="ms-chip ${x.side === 'sell' ? 'ms-chip-sell' : 'ms-chip-buy'}">${x.side === 'sell' ? 'SELL' : 'BUY'}</span></td><td class="m">${fmtI(x.entry, d)}</td><td class="m">${fmtI(x.stop, d)}</td><td>${esc(x.exit ? x.exit.charAt(0).toUpperCase() + x.exit.slice(1) : (x.status === 'be' ? 'Break-even' : x.R > 0 ? 'Target' : 'Stop'))}</td><td class="m ${x.R > 0 ? 'pos' : x.R < 0 ? 'neg' : ''}">${fR(x.R)}</td></tr>`; }).join('')
       : '<tr class="empty"><td colspan="8">No closed system trade yet.</td></tr>';
     const by = {}; for (const x of rows) { const k = x.name; (by[k] = by[k] || []).push(x.R); }
     const tot = rows.reduce((a, x) => a + x.R, 0);
