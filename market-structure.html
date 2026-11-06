@@ -796,11 +796,11 @@ window.MS_ADMIN_HASH = '4622c0548320297ae6874ab045769a98f61c6c53247bd56b3856a472
   <section class="view" id="v-council" aria-label="AI council" hidden>
     <div class="c-head">
       <div><h1 class="h-head">AI council</h1><p class="ms-note" id="ms-c-status">Loading council data…</p></div>
-      <label class="c-auto adm"><input type="checkbox" id="ms-auto"> <span><b>Browser Trader</b><small>On by default. Every fresh Ready setup on the market you're viewing is saved to your journal as a paper trade, then tracked to its stop or target.</small></span></label>
+      <label class="c-auto adm" hidden style="display:none"><input type="checkbox" id="ms-auto" checked> <span><b>Browser Trader</b><small>On by default. Every fresh Ready setup on the market you're viewing is saved to your journal as a paper trade, then tracked to its stop or target.</small></span></label>
     </div>
     <div class="c-grid">
       <div class="card c-active" id="ms-active-card">
-        <div class="ms-k"><span>Active trades · placed by the system now</span><span class="c-tog"><span id="ms-active-sum" class="c-act-sum"></span><label class="c-mine adm" title="Also list the open shadow trades: setups the rules blocked, followed on paper so each rule can be checked"><input type="checkbox" id="ms-act-sh"> Shadow too</label></span></div>
+        <div class="ms-k"><span>Active trades · placed by the system now</span><span class="c-tog"><span id="ms-active-sum" class="c-act-sum"></span><input type="checkbox" id="ms-act-sh" checked hidden style="display:none"></span></div>
         <ul class="c-act" id="ms-active"></ul>
       </div>
       <div class="card c-trader">
@@ -892,7 +892,7 @@ window.MS_ADMIN_HASH = '4622c0548320297ae6874ab045769a98f61c6c53247bd56b3856a472
   <!-- ─── Journal ─── -->
   <section class="view" id="v-journal" aria-label="Journal" hidden>
     <div class="card adm" id="ms-j-card">
-      <div class="ms-k">Trade journal <span class="ms-scan-meta"><label class="c-mine"><input type="checkbox" id="ms-auto2"> Auto paper-trade</label><button type="button" class="ms-tbtn" id="ms-j-csv">Export CSV</button></span></div>
+      <div class="ms-k">Trade journal <span class="ms-scan-meta"><label class="c-mine" hidden style="display:none"><input type="checkbox" id="ms-auto2" checked> Auto paper-trade</label><button type="button" class="ms-tbtn" id="ms-j-csv">Export CSV</button></span></div>
       <div id="ms-j-stats" class="ms-j-stats"></div>
       <div class="c-eq" id="ms-j-eq"></div>
       <div class="ms-j-wrap"><table class="ms-j"><thead><tr><th>Logged</th><th>Market</th><th>Setup</th><th>Side</th><th>Entry</th><th>Stop</th><th>Target 1</th><th>Result</th><th>R</th><th>Notes</th><th><span class="sr">Delete</span></th></tr></thead><tbody id="ms-j-body"></tbody></table></div>
@@ -2750,7 +2750,7 @@ function msNextSetup(bars, A) {
   function renderActive() {
     const el = document.getElementById('ms-active'); if (!el) return;
     const A0 = activeTrades(), fR = (v) => `${v > 0 ? '+' : v < 0 ? '−' : ''}${Math.abs(v).toFixed(2)}R`;
-    const shBox = document.getElementById('ms-act-sh'), shOn = shBox && shBox.checked;
+    const shOn = true;   // shadow trades always listed and counted in the float, labelled shadow (owner, 6 Nov)
     const SHO = shOn ? (COUNCIL.trades || []).filter((x) => x.shadow && (x.status === 'open' || x.status === 'pending')).sort((a, b) => b.opened - a.opened) : [];
     const A = A0.concat(SHO), cnt = (x) => !x.shadow && !x.tracker, A1 = A0.filter(cnt);
     let tot = 0, risk = 0, pct = 0, shTot = 0, shN = 0;
@@ -3187,7 +3187,7 @@ function msNextSetup(bars, A) {
     }).join('');
   }
   const autoEl = document.getElementById('ms-auto');
-  try { G.auto = localStorage.getItem('msAuto') !== '0'; } catch (e) { G.auto = true; }
+  G.auto = true;   // Browser Trader always on (owner, 6 Nov): no toggle
   if (autoEl) { autoEl.checked = G.auto; autoEl.addEventListener('change', () => { G.auto = autoEl.checked; try { localStorage.setItem('msAuto', G.auto ? '1' : '0'); } catch (e) {} notify(G.auto ? 'Browser Trader on' : 'Browser Trader off', G.auto ? 'Ready setups on this market go into your journal as paper trades while this page is open.' : 'No more automatic journal entries.'); }); }
   const auto2 = document.getElementById('ms-auto2');
   if (auto2) { auto2.checked = G.auto; auto2.addEventListener('change', () => { if (autoEl) { autoEl.checked = auto2.checked; autoEl.dispatchEvent(new Event('change')); } }); }
@@ -3196,7 +3196,7 @@ function msNextSetup(bars, A) {
   const tabsEl = document.getElementById('ms-c-tabs'); if (tabsEl) tabsEl.addEventListener('click', (ev) => { const b = ev.target.closest('[data-ct]'); if (!b) return; window.CTAB = b.dataset.ct; window.CLIM = 60; try { localStorage.setItem('msCtab', window.CTAB); } catch (e) {} renderCouncil(); });
   try { const t0 = localStorage.getItem('msCtab'); if (['live', 'shadow', 'journal', 'all'].includes(t0)) window.CTAB = t0; } catch (e) {}
   document.addEventListener('click', (ev) => { if (ev.target.closest('#ms-c-more')) { window.CLIM = (window.CLIM || 60) + 60; renderCouncil(); } });
-  const actSh = document.getElementById('ms-act-sh'); if (actSh) { try { actSh.checked = localStorage.getItem('ms-act-sh') === '1'; } catch (e) {} actSh.addEventListener('change', () => { try { localStorage.setItem('ms-act-sh', actSh.checked ? '1' : '0'); } catch (e) {} renderActive(); }); }
+  
   const sysEl = document.getElementById('ms-c-sys'); if (sysEl) sysEl.addEventListener('change', () => { renderCouncil(); renderHome(); });
   if (document.getElementById('v-council')) { councilReady = loadCouncil(); setInterval(loadCouncil, 5 * 60e3); }
 
