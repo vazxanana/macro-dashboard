@@ -52,7 +52,7 @@ namespace cAlgo.Robots
         private class Sig
         {
             public string Id, Market, K, Side, Status, EntryMode, AddOf;
-            public double Entry, Stop, T1;
+            public double Entry, Stop, T1, Size;
             public long Opened, Filled, ValidFor;
         }
 
@@ -139,7 +139,7 @@ namespace cAlgo.Robots
                 Func<string, string> g = name => { int i = Array.IndexOf(head, name); return i >= 0 && i < f.Length ? f[i].Trim() : ""; };
                 Func<string, double> gd = name => { double d; return double.TryParse(g(name), NumberStyles.Any, CultureInfo.InvariantCulture, out d) ? d : 0; };
                 Func<string, long> gl = name => { long d; return long.TryParse(g(name), NumberStyles.Any, CultureInfo.InvariantCulture, out d) ? d : 0; };
-                var s = new Sig { Id = g("id"), Market = g("market"), K = g("k"), Side = g("side"), Status = g("status"), EntryMode = g("entryMode"), AddOf = g("addOf"), Entry = gd("entry"), Stop = gd("stop"), T1 = gd("t1"), Opened = gl("opened"), Filled = gl("filled"), ValidFor = gl("validFor") };
+                var s = new Sig { Id = g("id"), Market = g("market"), K = g("k"), Side = g("side"), Status = g("status"), EntryMode = g("entryMode"), AddOf = g("addOf"), Entry = gd("entry"), Stop = gd("stop"), T1 = gd("t1"), Size = gd("size"), Opened = gl("opened"), Filled = gl("filled"), ValidFor = gl("validFor") };
                 if (s.Id.Length > 0) outp.Add(s);
             }
             return outp;
@@ -192,7 +192,8 @@ namespace cAlgo.Robots
             // lots: an add takes the same volume as its first trade
             double units = 0;
             if (!string.IsNullOrEmpty(s.AddOf)) { var parent = PosFor(s.AddOf); if (parent != null) units = parent.VolumeInUnits; }
-            if (units <= 0) units = UnitsForRisk(sym, s.Entry, s.Stop, RiskFor(s.K));
+            double sz = (s.Size > 0 && s.Size < 4) ? s.Size : 1.0;   // the Trader's size (replica 0.5 / 1.5 tilts); adds copy the parent's volume above
+            if (units <= 0) units = UnitsForRisk(sym, s.Entry, s.Stop, RiskFor(s.K) * sz);
             if (units <= 0) { Print("CouncilBridge: volume too small for {0}, skipped", s.Id); _skipped.Add(s.Id); return; }
             long now = (long)(DateTime.UtcNow - new DateTime(1970, 1, 1)).TotalSeconds;
             double slPips = Math.Abs(s.Entry - sl) / sym.PipSize, tpPips = tp > 0 ? Math.Abs(tp - s.Entry) / sym.PipSize : 0;
