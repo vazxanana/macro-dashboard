@@ -1283,3 +1283,10 @@ Below H1 the edge flips between halves even with zero fees: a 5–30-minute mome
 - Concentration: 10 trades made +88.6R; the other 82 made +5.7R. Sells +104R, buys −9.6R; against the daily trend +94R, with it +0.3R.
 - Live shadow since 1 Nov (m30m1 copies removed): +60.5R over 456, of which today +70.6R; the five days before −10.1R over 375. Against D1 +0.34R a trade vs with D1 −0.06R; gold against D1 +0.53R (67). Same direction as the backtest (against beats with), but the backtest says the against side is still negative outside gold scalps, and the gold scalp sell edge there is a Jun–Oct down-drift.
 - Verdict: today is one outlier day of the same setups, not a new edge. Forward-track "gold scalp against D1" (scalp/rscalp/rintra) as a watch list; promotion needs ~100 forward trades holding > +0.15R.
+
+## 6 Nov — the council engine's shadow setups on gold 2023–Oct 2026 (council/backtest.mjs run offline on HistData spot gold, current engine and config)
+- 10,402 filled gold trades. All seven shadow setups together: −0.125R a trade (2023–24, n3,988) | −0.064R (2025–26, n4,101), after cost.
+- The watch slice from today (scalp / rscalp / rintra against the daily trend) fails: −0.145 | −0.131R (n1,695 | 1,654); sells −0.19 | −0.12. Gold scalp against D1 by year: −0.09, −0.17, −0.23, −0.15. Today's +70R day and the Jun–Oct sell drift do not survive four years. Watch item dropped.
+- Scalp −0.13 | −0.06, rscalp −0.21 | −0.17, intraday −0.03 | −0.02, swing −0.29 | 0.00, rswing −0.04 | −0.23.
+- Only two near-misses: position (with D1, mostly buys) +0.10 | +0.23R but n68 | 47, years −0.36, +0.60, +0.59, −0.47 and DD −19.7R for +7R — a gold-uptrend buy, already covered by gold trend / gtl / geg. rintra +0.01 | +0.19R (2024 −0.05); with the 2R target +0.01 | +0.23. Neither passes; not promoted.
+- Verdict: the shadow book has no fixable setup on gold; the council's blocks are right. Fixed today: m30m1 double count (site #258, trader #259).
