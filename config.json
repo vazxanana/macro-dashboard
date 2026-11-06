@@ -462,6 +462,18 @@
    "by": "coach-stats",
    "change": "scalp: skip the overlap session",
    "why": "-1.00R over 9 trades there; +0.04R elsewhere."
+  },
+  {
+   "at": "2026-11-06T12:31:39.000Z",
+   "by": "user",
+   "change": "Gold replica: the second unit now opens at +1.5R instead of +2R (stop at the first entry; breakeven of the first unit still at +2R; run after +4R unchanged)",
+   "why": "Owner: apply the near-miss improvements. Spot gold 2023-24 | 2025-26, live risk rules and the MSNR size tilt: add at +2R +109.6R (DD -9.7) | +155.5R (DD -16.5); add at +1.5R +120.2R (DD -10.3) | +170.3R (DD -14.4). Add at +1R, breakeven at +1.5R, a later run or a half-size add are all worse."
+  },
+  {
+   "at": "2026-11-06T12:31:39.000Z",
+   "by": "user",
+   "change": "Gold trend: one add. When a closed daily candle is +1R (2 ATR at entry) above the entry, a second unit buys at market on the next run with the same ratcheting stop; it exits with the first unit",
+   "why": "Owner: apply it. Spot gold 2023-24 | 2025-26, N20 with the 2 ATR trail: +9.9R (DD -2.0) | +24.1R (DD -1.0) without the add; +13.2R (DD -2.5) | +41.1R (DD -1.0) with it; N10 and N55 show the same gain. The add roughly doubles the 2025-26 result for half an R of extra early drawdown."
   }
  ],
  "btAt": "2026-11-06T11:18:45.097Z",
@@ -497,7 +509,9 @@
   "gold-h4-trendline",
   "gold-daily-engulf",
   "replica-msnr-size",
-  "mosha-slow"
+  "mosha-slow",
+  "gold-add-1.5",
+  "gold-trend-add"
  ],
  "target": {},
  "targetBy": {},
@@ -508,11 +522,11 @@
  "noPause": true,
  "wouldPause": {
   "rintra": {
-   "at": "2026-11-06T12:28:40.000Z",
+   "at": "2026-11-06T12:31:39.000Z",
    "why": "four losses in a row"
   },
   "scalp": {
-   "at": "2026-11-06T12:28:40.000Z",
+   "at": "2026-11-06T12:31:39.000Z",
    "why": "expectancy -1.00R over 13 trades"
   },
   "xau": {
@@ -560,7 +574,7 @@
  "goldFixedR": 4,
  "goldBeR": 2,
  "goldAdd": {
-  "atR": 2,
+  "atR": 1.5,
   "size": 1
  },
  "goldRun": {
@@ -613,5 +627,8 @@
   "against": 1.5,
   "with": 0.5
  },
- "moshaSlow": 12
+ "moshaSlow": 12,
+ "goldTrendAdd": {
+  "atR": 1
+ }
 }
