@@ -211,6 +211,12 @@ const USER_RULES = [
   { id: 'mosha-slow', apply: (c) => { c.moshaSlow = 12; },
     change: 'Mosha BO system: a chain whose pullback from the H1 VR extreme to the M15 CF took fewer than 12 H1 bars (a momentum arrival) is a shadow trade (blockedBy momentum), not a live one',
     why: 'Owner: judge on 2023 onwards and focus on gold. Mosha: "if price comes into our zone with momentum, risky". Gold H4-H1-M15 chains with the weekly agreeing, 3R, 2023-24 | 2025-26: all +6.3R (DD -10.5) | +21.0R (DD -17.4); slow arrivals (>= 12 H1 bars) +9.6R (DD -3.5) | +23.0R (DD -11.3), fast arrivals -3.3R | -2.0R; the split holds for thresholds 12-40 bars (fast is negative or near zero in every window). Recorded as feat.pull since 5 Nov; silver reversed it in 2019-26, which no longer counts for a gold-only rule.' },
+  { id: 'gold-add-1.5', apply: (c) => { c.goldAdd = { atR: 1.5, size: 1 }; },
+    change: 'Gold replica: the second unit now opens at +1.5R instead of +2R (stop at the first entry; breakeven of the first unit still at +2R; run after +4R unchanged)',
+    why: 'Owner: apply the near-miss improvements. Spot gold 2023-24 | 2025-26, live risk rules and the MSNR size tilt: add at +2R +109.6R (DD -9.7) | +155.5R (DD -16.5); add at +1.5R +120.2R (DD -10.3) | +170.3R (DD -14.4). Add at +1R, breakeven at +1.5R, a later run or a half-size add are all worse.' },
+  { id: 'gold-trend-add', apply: (c) => { c.goldTrendAdd = { atR: 1 }; },
+    change: 'Gold trend: one add. When a closed daily candle is +1R (2 ATR at entry) above the entry, a second unit buys at market on the next run with the same ratcheting stop; it exits with the first unit',
+    why: 'Owner: apply it. Spot gold 2023-24 | 2025-26, N20 with the 2 ATR trail: +9.9R (DD -2.0) | +24.1R (DD -1.0) without the add; +13.2R (DD -2.5) | +41.1R (DD -1.0) with it; N10 and N55 show the same gain. The add roughly doubles the 2025-26 result for half an R of extra early drawdown.' },
   { id: 'mosha-bo-weekly', apply: (c) => { c.moshaBoWeekly = true; },
     change: "Mosha BO system: trades only in the weekly structure's direction (his \"Father\" timeframe); the M15 break no longer has to flip M15 structure",
     why: "From his multi-timeframe slides (father/mother/son). Spot gold 2019-26, H4->H1->M15, limit at the broken level, 3R, with the weekly direction computed the way the trader sees it live (Monday weeks built from the last 720 daily candles, swing size 3): weekly agrees 2019-22 +32.2R (87 trades, +0.37R a trade), 2023-26 +34.2R (99, +0.35R), 7 of 8 years positive, worst drawdown -18.4R; weekly against -28.3R / -15.8R. The previous flip-only rule: +7.5R / +15.1R. Caveat: the weekly filter did not help the other timeframe chains, so it is watched by the kill switch like everything else." },
@@ -593,7 +599,15 @@ for (const [key, M] of Object.entries(MARKETS)) {
         if (n > GT.n + 15) {
           if (open) {
             // one ratchet per newly closed daily candle
-            if (last.time > (open.lastD || 0)) { const ns = +(last.close - GT.k * atr14(n - 1)).toFixed(dp); if (ns > open.stop) { open.stop = ns; open.trailMoved = true; } open.lastD = last.time; }
+            const gAdd = trades.find((x) => x.addOf === open.id && x.status === 'open');
+            if (last.time > (open.lastD || 0)) { const ns = +(last.close - GT.k * atr14(n - 1)).toFixed(dp); if (ns > open.stop) { open.stop = ns; open.trailMoved = true; } if (gAdd && ns > gAdd.stop) { gAdd.stop = ns; gAdd.trailMoved = true; } open.lastD = last.time;
+              // gold-trend-add (6 Nov): one add at market when a closed daily candle is +atR R above the entry; same stop, exits with the first unit
+              if (config.goldTrendAdd && !gAdd && !trades.some((x) => x.addOf === open.id) && last.close - open.entry >= config.goldTrendAdd.atR * open.r0) {
+                const ae = +price.toFixed(dp), rA = ae - open.stop;
+                if (rA > 0) trades.push({ id: `${open.id}-add`, market: key, label: M.label, dec: M.dec, k: 'gtrend', name: 'Gold trend add', pair: open.pair, h: '1d', side: 'buy',
+                  entry: ae, stop: open.stop, t1: +(ae * 100).toFixed(2), rr: 99, trail: [1e6, 0], size: 1, buf: CFG.buf, opened: now, filled: now, checked: now, status: 'open', R: null, r0: rA, noBe: true, entryMode: 'market', addOf: open.id, shadow: false, blockedBy: [],
+                  note: `Gold trend add: daily close ${last.close} is +${config.goldTrendAdd.atR}R above the first entry ${open.entry}, so a second unit buys ${ae} with the same stop ${open.stop}; the stop keeps rising with the daily closes; out with the first unit.` });
+              } }
           } else {
             const hi = Math.max(...D.slice(n - 1 - GT.n, n - 1).map((b) => b.high)), A = atr14(n - 1), id = `${key}-gtrend-${last.time}`;
             if (last.close > hi && A > 0 && !trades.some((x) => x.id === id) && now - (last.time + 86400) < 86400) {
