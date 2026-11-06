@@ -1197,3 +1197,16 @@ The live exit stack holds. Moving the add from +2R to +1.5R gains 10% / 10% prof
 | overnight by entry weekday (stop 1%) | Mon +4.5, Tue +39.7, Wed +8.4, Thu +18.0, Sun +7.3 | |
 
 Every intraday breakout/fade scalp is flat to negative after the spread (the first NY-ORB run looked good only because a data-coverage artefact halved the sample; with the ET clock and full coverage it is zero). The one consistently positive daily line is the **overnight long** (buy at the 23:00 UTC reopen, out at the London open), positive every year including 2026 and near flat in the Feb–Jun 2026 bear window, in line with the peer-reviewed overnight-vs-day gold effect. Caveats before it can be traded: (1) the expectancy is +0.045R a night in 2023–24, i.e. about +0.02% of price, and CFD financing on a gold long is of the same order (≈ 0.02R a night at 4% rates), so the early-half edge is roughly zero after swaps and only the 2025–26 half survives; (2) Tuesday carries half the profit; (3) at 0.25% risk the drawdown is −3.6% of the account for about +0.3%/month in 2023–24. **Not added live.** Candidate for a paper tracker if the owner wants it watched; a futures-style venue without swap would be the only honest way to trade it.
+
+## 2026-11-06 — Zlankator ECMTF scalping (owner request) on gold 2023+: negative on every ladder, rejected
+
+`ms/ecmtf.py`, rules from the skill's section D: fresh A/V level (close of the first of two consecutive candles, no gaps, fresh until the first wick touch) on the level TF; after the first touch, an EXTERNAL breakout two TFs lower (close through the last entry-TF A/V formed before the touch, within 30 bars); limit at the fresh engulf (last opposite-colour entry-TF candle before the breakout), valid 12 bars; stop 25 pips fixed (15 on M1) or the engulf's far side; TP 1R, 2R, or the nearest fresh A/V one TF above the entry (his "trade control" first target); London + NY entries only (07–17 UTC); 0.30 cost; 8 h max hold.
+
+| ladder | best variant | 2023–24 | 2025–26 | all other variants |
+|---|---|---|---|---|
+| H4 → M30 (TP H1) | engulf stop, 2R | 247 tr, −6.0R (−0.02/tr) | 157 tr, −16.3R | −0.04 to −0.41/tr |
+| H1 → M15 (TP M30) | engulf stop, 2R | 955, −18.8R (−0.02) | 870, −17.7R (−0.02) | −0.01 to −0.23 |
+| M30 → M5 (TP M15) | fixed 25 pips, 1R | 1545, −210R (−0.14) | 1637, −203R (−0.12) | −0.12 to −0.25 |
+| M15 → M1 (TP M5) | fixed 15 pips, 1R | 2688, −502R (−0.19) | 2742, −228R (−0.08) | −0.08 to −0.33 |
+
+Win rates 47–56% at 1R (his "~60% WR" claim is in the ballpark at 1R) but the average win is smaller than the loss plus cost, so every combination loses; the "nearest fresh higher-TF level" target is the worst exit (it is usually too far, so the trade times out or stops first). Buys and sells both lose; no ladder is positive in either half. Consistent with every other sub-H1 mechanical entry tested this week (MSNR switch, trendline M1–M30, PITCHOU M15 rejection, CE, NY/London/Asia ORBs). **Rejected; no tracker.**
