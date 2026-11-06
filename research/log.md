@@ -1108,3 +1108,7 @@ Negative in both halves for every stop, target and gate; the direction gate halv
 ## 2026-11-06 — Daily engulf: concurrent positions and "stairs" re-entries — unchanged
 
 `ms/eg_stairs.py` (adopted rule, overlapping zones taken in time order): no cap +25.5R (DD −9.8) | +47.0R (DD −7.3); cap 1 +18.8 (DD −4.7) | +23.9 (DD −4.3); cap 2 +29.0 (DD −9.3) | +42.8 (DD −7.3); cap 3 (live) = no cap; stairs (a new zone only onto an open position already ≥ +1R) +19.4 (DD −4.7) | +23.5 (DD −4.3). Cap 2 gains in 2023–24 and loses in 2025–26; cap 1 and stairs halve the drawdown but give up a third to half of the profit. The live cap of 3 stands.
+
+## 2026-11-06 — Combined gold exposure (replica, gold trend, H4 trendline, daily engulf) at the sizing guide, 2023–Oct 2026
+
+Replay records at 0.5% (replica, gold trend) and 0.25% (trendline, engulf): gold systems alone +143.7% over the period, worst drawdown −10.6%, worst day −2.53% (2 Apr 2026); maximum simultaneous gold open risk 2.5% of the account (23 Aug 2024); three or more gold positions open on 252 of 1,010 trading days. Daily P&L correlations between the four systems are all within ±0.06 — they are independent legs, not the same trade four times, so the diversification is real and the drawdown of the sum (−10.6%) is well under the sum of the drawdowns. For the challenge account the earlier 0.75× guide still holds (worst day ≈ −1.9%, drawdown ≈ −8%); the paper council keeps the full guide.
