@@ -5,7 +5,7 @@
 // council-data ict/replay.json; every record carries replay: true. Never mixed with the council's data.
 import fs from 'node:fs';
 import path from 'node:path';
-import { MARKETS, P, cnbcBars, agg, signals, letter } from './tracker.mjs';
+import { MARKETS, P, cnbcBars, agg, signals, letter, isASetup } from './tracker.mjs';
 
 const DATA = process.argv[2] || 'data/ict';
 const FROM = Date.parse(process.argv[3] || '2026-04-01T00:00:00Z') / 1000;
@@ -57,13 +57,16 @@ for (const [key, M] of Object.entries(MARKETS)) {
     const src = await history(M);
     out.src[key] = { sym: src.sym, h1: src.H.length, m5: src.m5.length, m5from: src.m5from ? new Date(src.m5from * 1000).toISOString().slice(0, 10) : null, d1: src.D.length };
     const sig = signals(src.H, src.D, 1, M.tick).concat(signals(src.H, src.D, -1, M.tick)).filter((g) => g.close >= FROM).sort((a, b) => a.close - b.close);
-    let busyUntil = 0;
-    for (const g of sig) { if (g.close < busyUntil) continue; const t = simulate(g, M, key, src); out.trades.push(t); busyUntil = t.closed || Infinity; }
+    let busyAll = 0, busyA = 0;   // same rule as the tracker: an A-setup is only blocked by an open A-setup
+    for (const g of sig) { const a = isASetup(g); if (g.close < (a ? busyA : busyAll)) continue; const t = simulate(g, M, key, src); t.aset = a; out.trades.push(t);
+      const end = t.closed || Infinity; busyAll = Math.max(busyAll, end); if (a) busyA = end; }
     console.log(key, JSON.stringify(out.src[key]), 'signals', sig.length, 'trades', out.trades.filter((x) => x.market === key).length);
   } catch (e) { out.errors[key] = String(e.message || e); console.log(key, out.errors[key]); }
 }
 out.trades.sort((a, b) => a.opened - b.opened);
 const C = out.trades.filter((x) => x.closed);
+const CA = C.filter((x) => x.aset);
+out.totalsA = { n: CA.length, wins: CA.filter((x) => x.R > 0).length, R: +CA.reduce((a, x) => a + x.R, 0).toFixed(2) };
 out.totals = { n: C.length, wins: C.filter((x) => x.R > 0).length, R: +C.reduce((a, x) => a + x.R, 0).toFixed(2), R2: +C.reduce((a, x) => a + (x.R2 ?? x.R), 0).toFixed(2) };
 fs.mkdirSync(DATA, { recursive: true });
 fs.writeFileSync(path.join(DATA, 'replay.json'), JSON.stringify(out));

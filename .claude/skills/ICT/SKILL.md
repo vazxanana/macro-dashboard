@@ -102,3 +102,19 @@ Gold was only the first test bed. The edge is meant for index futures/CFDs (the 
     (NQ rarely sits in discount while trending up) and does not hold on NQ.
 - S&P 500 and Dow: Dukascopy 1m → 5m pulled by the research probe into council-data
   research/candles/idx/ (USATECHIDXUSD, USA500IDXUSD, USA30IDXUSD, 2023 → today); results to follow.
+
+## 14. Best filter: the A-setup (6 Nov 2026)
+Search: ~30 features (side, daily bias, premium/discount, depth, previous-day sweep, session, grade and its parts,
+validity, body, close location) alone and in pairs, ranked on NQ futures 2023-24, judged ONLY on unseen data: NQ 2025
+and the 2026 CNBC replay of NQ, ES, YM and RTY (cost 0.5 / 0.5 / 2 / 0.2 points a trade).
+- The best-looking filters on 2023-24 (e.g. deep discount without a previous-day sweep: +0.68R) mostly FAILED out of
+  sample: classic overfitting. Only filters positive in all three sets count.
+- **A-setup = the signal goes AGAINST the daily bias (prior close vs its 50-day average) AND grades >= 7/10 (B+).**
+  3R target, R a signal: NQ 2023-24 +0.20 (n 94), NQ 2025 +0.16 (36), 2026 replay all indices +0.23 (111),
+  vs all signals +0.04 / +0.07 / +0.02. NQ by year +10.8R, +7.5R, +5.8R; replay ES +16.1, YM +6.8, RTY +6.5, NQ −4.5.
+  Both sides positive. Grade >= 8 is similar with fewer trades; >= 5-6 breaks in NQ 2025. 2R target is weaker.
+- Control: the same grade WITH the bias loses (−0.28R / +0.13R / −0.14R) — the bias side is what matters. A reversal
+  model works as a turn at an extended move (ICT: turtle soup at a HTF key level), not as a with-trend pullback.
+- In the tracker: `isASetup()`; records carry `aset`; an A-setup is never blocked by a weaker open signal; all signals are
+  still recorded. The desk defaults to "A-setups" (switch to "All signals").
+- Forward samples are small; keep watching "What works" per market (NQ was the weak one in 2026).
