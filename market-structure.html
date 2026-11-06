@@ -1308,6 +1308,13 @@ window.MS_ADMIN_HASH = '49c5624f2625ed8b42b6e1bf2819a3a41ddb9743aeca36ea34ea7eb9
 .tile-go::after { content: "\00a0→"; display: inline-block; transition: transform .15s; }
 @media (hover: hover) { .tile:hover .tile-go::after { transform: translateX(3px); } }
 .h-prog i { transition: background-color .3s; }
+
+/* polish 8: scanner status and waiting rows */
+#ms-scan-meta { white-space: nowrap; overflow: visible !important; text-overflow: clip !important; max-width: none !important; font-variant-numeric: tabular-nums; }
+.ms-scan-meta { flex-wrap: wrap; justify-content: flex-end; }
+.ms-scan-meta:has(#ms-scan-meta:empty) { gap: 0; }
+@keyframes ms-wait { 50% { opacity: .45; } }
+.ms-srow .err { animation: ms-wait 1.6s ease-in-out infinite; }
 </style>
 </head>
 <body>
