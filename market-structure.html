@@ -1290,6 +1290,17 @@ window.MS_ADMIN_HASH = '49c5624f2625ed8b42b6e1bf2819a3a41ddb9743aeca36ea34ea7eb9
   .h-quick[data-more~="r"], .c-nav[data-more~="r"] { -webkit-mask-image: linear-gradient(90deg, #000 calc(100% - 36px), transparent); mask-image: linear-gradient(90deg, #000 calc(100% - 36px), transparent); }
   .h-quick[data-more~="l"], .c-nav[data-more~="l"] { -webkit-mask-image: linear-gradient(90deg, transparent, #000 36px); mask-image: linear-gradient(90deg, transparent, #000 36px); }
   .h-quick[data-more="l r"], .c-nav[data-more="l r"] { -webkit-mask-image: linear-gradient(90deg, transparent, #000 36px, #000 calc(100% - 36px), transparent); mask-image: linear-gradient(90deg, transparent, #000 36px, #000 calc(100% - 36px), transparent); }
+
+/* polish 6: ICT desk cards and calendar */
+.ict-m .px { border-left: 0; padding-left: 0; display: block; }
+.ict-m .k small:empty { display: none; }
+.ict-m { transition: border-color .15s, transform .15s; }
+@media (hover: hover) { .ict-m:hover { border-color: var(--gold-line, var(--line)); } }
+.ict-cal-d.we:not(.up):not(.dn) { background: transparent; border-style: dashed; }
+.ict-cal-d.today { border-color: var(--gold, var(--accent)); }
+.ict-cal-d.today .d { color: var(--gold, var(--accent)); font-weight: 700; }
+.ict-cal-d:not([disabled]) { transition: transform .12s, box-shadow .12s; }
+@media (hover: hover) { .ict-cal-d:not([disabled]):hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(0,0,0,.12); } }
 </style>
 </head>
 <body>
@@ -4723,7 +4734,7 @@ function msNextSetup(bars, A) {
     for (let d = 1; d <= days; d++) {
       const k = `${y}-${String(m + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`, a = byDay[k] || [], R = a.reduce((s, x) => s + x.R, 0);
       const heat = a.length ? Math.min(1, Math.abs(R) / mx) : 0, rp = a.filter((x) => x.replay).length;
-      h += `<button type="button" class="ict-cal-d${a.length ? (R > 0 ? ' up' : R < 0 ? ' dn' : ' fl') : ''}${S.calDay === k ? ' sel' : ''}" data-k="${k}" style="--heat:${heat.toFixed(2)}"${a.length ? '' : ' disabled'} aria-label="${d} ${first.toLocaleString('en-GB', { month: 'long' })}: ${a.length ? `${fR(R)}, ${a.length} signals` : 'no signals'}"><span class="d">${d}</span>${a.length ? `<b>${fR(R)}</b><small>${a.length}${rp && rp < a.length ? ` · ${rp} replay` : ''}</small>` : ''}</button>`;
+      h += `<button type="button" class="ict-cal-d${a.length ? (R > 0 ? ' up' : R < 0 ? ' dn' : ' fl') : ''}${S.calDay === k ? ' sel' : ''}${k === dkey(Date.now() / 1000) ? ' today' : ''}${(lead + d - 1) % 7 >= 5 ? ' we' : ''}" data-k="${k}" style="--heat:${heat.toFixed(2)}"${a.length ? '' : ' disabled'} aria-label="${d} ${first.toLocaleString('en-GB', { month: 'long' })}: ${a.length ? `${fR(R)}, ${a.length} signals` : 'no signals'}"><span class="d">${d}</span>${a.length ? `<b>${fR(R)}</b><small>${a.length}${rp && rp < a.length ? ` · ${rp} replay` : ''}</small>` : ''}</button>`;
     }
     $('ict-cal').innerHTML = h;
     const sel = S.calDay && byDay[S.calDay];
