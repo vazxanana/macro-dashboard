@@ -959,3 +959,31 @@ The owner dropped the 2019–22 sign check: from now on a rule needs more profit
 By year (adopted line): 2023 +3.3 (24), 2024 +20.5 (30), 2025 +29.4 (25), 2026 +3.5 (24). Overlap with the gold trend system: 32 of 54 and 35 of 49 trades fire while that system is flat (+22.1R / +13.5R), so it adds a second, faster breakout leg rather than doubling the same trades. The gate's main job is drawdown (−4.1 vs −12.6 in 2023–24). Fragility to note: direction pivot width 5 halves the result, and 2026 is small — the forward CUSUM (k 0.3, catastrophe −10R) watches it.
 
 **Merged PR #242:** system `gtl` (user rule `gold-h4-trendline`, `config.goldTL = { n: 3, span: 120, n4: 2, pad: 0.3, hold: 96 }`), site system list, both bridges map it to the gold risk, README. Also fixed in the same PR: the legacy-retirement block kept only replica / mosha-bo / trend, so a gold trend (`gtrend`) position would have been closed as "retired" on the run after it opened — found by the offline dry run of the new system. Dry run on saved candles (27 Oct 08:00 UTC break, line 4048.43, close 4078.14): opens at 4077.01 with stop 4013.91, survives the following runs, stops out later; `mt5/signals.csv` carries the row. Sizing guide 0.25%.
+
+## 2026-11-06 — Four school skills (engulfing EG/EF, Mosha storyline, PITCHOU, Zlankator Malaysian SnR): daily engulf adopted (PR #245), the rest rejected
+
+Owner supplied four consolidated rulebooks. Everything codable in them that was not already tested (Mosha BO chain is live; the MSNR direction, barrier/Janda and the scalps were tested earlier) went through the 2023+ harness on spot gold (0.30 cost): `ms/eg_zone*.py`, `ms/storyline.py` (scratchpad).
+
+**EG/EF zones** (engulfing skill §1/§6: base candle red, a later candle within 3 same-colour candles body-closes above its HIGH; zone = base range; limit at the zone edge on the first return, cancelled if a body close beyond the far side comes first; stop beyond the zone − cost):
+
+| | 2023–24 | 2025–26 |
+|---|---|---|
+| H4 zones, 2R (n 1074/953) | −71.3R | +31.9R |
+| H4 buys only | −20.3 | +51.0 |
+| H4 inside a fresh D1 zone (location) | −89.5 | +32.7 |
+| H1 zones, 2R (n 3672/3560) | −231.6 | −66.1 |
+| EF reversal (flipped H4 box, other way), 2R | +12.1 | +3.4 |
+| EF reversal buys | +27.3 (352) | +46.0 (303) |
+| D1 zones, 2R (n 193/173) | −35.6 | +7.9 |
+| D1 sells | −43.8 | −21.4 |
+| **D1 buys, 2R then 1R trail, 10 days** (n 96/86) | **+25.9, DD −11.2** | **+46.5, DD −13.3** |
+| D1 buys, trail, close above the 20-day average (n 77/69) | **+25.5, DD −9.8** | **+47.0, DD −6.3** |
+| same, per year | 2023 +6.2 (25), 2024 +19.3 (52) | 2025 +34.1 (44), 2026 +12.9 (25) |
+| robustness (buys + trail + gate) | K=1/5 candles +17.4/+20.6 \| +22.0/+57.6; zone life 10/100 d +20.6/+7.6 \| +42.8/+47.1; hold 5 d +18.0 \| +31.3; trail after +3R +23.2 \| +35.6; 2R behind +28.8 \| +45.6 | |
+| overlap with gold trend | while it is long 25 tr +13.9 \| 18 tr +15.8; while flat 52 tr +11.6 \| 51 tr +31.3 | |
+
+**Storyline** (Zlankator/PITCHOU: Daily key levels = close of the first of two consecutive candles, A/V/Gap, fresh until a wick touch, ≤4 uses; Daily reject Daily; H4 external breakout within two days; limit at the H4 Apex, SL 30 pips, BE after 80, TP 120/220 or next fresh Daily level): all 602/496 | buys 311/231 | sells 291/265: TP120 −115 \| +13; TP220 −100 \| −62 (buys +48 \| +53, sells −148 \| −115); next-Daily TP −16 \| −94; SL50 −127 \| +78; without the H4 breakout −190 \| −154 (the breakout requirement does help, as the skill says). The mechanical Apex entry with a 30-pip stop is negative; only buys with a far target survive, i.e. the bull. **Rejected.**
+
+**Mosha storyline**: BO→VR→CF is the live Mosha BO system; QM preference, the 4 cases, Janda and the barrier formula were tested on 3–5 Nov (nothing robust). **PITCHOU/Zlankator confirmations** (M1/M5 trendline break, M15 rejection, ECMTF two-TF-lower scalps): sub-H1 entries lose on gold after cost in every form tested this week (MSNR scalp, trendline break M1–M30) — not re-run.
+
+**Adopted (PR #245, system 7, `geg`, user rule `gold-daily-engulf`)**: D1 EG buy zone, limit at the zone high while the daily close is above the 20-day average, valid 20 days, cancelled by a daily close under the zone, stop 0.3 under the zone, trail 1R after +2R (cap 10R), out 10 days after the fill, max 3 open, 0.25% sizing guide. Offline dry run: 16 Oct zone → limit at the zone high → filled → stopped −1R on the drop; 31 Oct zone blocked (below the average); CSV row written; site clean. Council check prompt updated (CUSUM k 0.3, catastrophe −14R).
