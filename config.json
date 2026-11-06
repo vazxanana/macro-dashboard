@@ -426,6 +426,12 @@
    "by": "coach-stats",
    "change": "m30m1: only with D1",
    "why": "against: -0.62R over 8 trades, too costly to keep taking while with is tested."
+  },
+  {
+   "at": "2026-11-06T09:15:28.000Z",
+   "by": "user",
+   "change": "Gold daily engulf (new paper system, buys only): a closed daily candle that body-closes above the HIGH of a red base candle (within 3 same-colour candles) makes an EG buy zone = the base candle's full range; while that close is above the 20-day average, a limit buy waits at the zone high for 20 days (cancelled by a daily close under the zone low); stop 0.3 under the zone low; after +2R the stop trails 1R behind the best price (cap 10R); out after 10 days; one trade per zone, at most 3 open",
+   "why": "Owner supplied four school skills (engulfing EG/EF, Mosha storyline, PITCHOU and Zlankator Malaysian SnR). The engulf zone is the one codable rule that held on gold judged on 2023 onwards: D1 EG buys +0.33R | +0.68R a trade (n77/69, worst drawdown -9.8R | -6.3R), every year positive (2023 +6.2, 2024 +19.3, 2025 +34.1, 2026 +12.9), robust to the confirmation window (1-5 candles), zone life, hold and every trail tested; the 20-day-average gate keeps the profit and cuts the drawdown. Two thirds of the trades fire while the gold trend system is flat. H4 and H1 engulf zones lose in 2023-24, sells lose everywhere, the EF-reversal and the storyline Apex entries (DRD + H4 external breakout, 30-pip stop) are negative."
   }
  ],
  "btAt": "2026-11-05T11:21:05.226Z",
@@ -458,7 +464,8 @@
   "gold-news-veto",
   "crypto-add",
   "gold-trend",
-  "gold-h4-trendline"
+  "gold-h4-trendline",
+  "gold-daily-engulf"
  ],
  "target": {},
  "targetBy": {},
@@ -469,11 +476,11 @@
  "noPause": true,
  "wouldPause": {
   "rintra": {
-   "at": "2026-11-06T09:10:42.000Z",
+   "at": "2026-11-06T09:15:28.000Z",
    "why": "four losses in a row"
   },
   "scalp": {
-   "at": "2026-11-06T09:10:42.000Z",
+   "at": "2026-11-06T09:15:28.000Z",
    "why": "expectancy -1.00R over 13 trades"
   },
   "xau": {
@@ -561,5 +568,13 @@
   "n4": 2,
   "pad": 0.3,
   "hold": 96
+ },
+ "goldEG": {
+  "k": 3,
+  "life": 20,
+  "hold": 240,
+  "sma": 20,
+  "pad": 0.3,
+  "maxOpen": 3
  }
 }
