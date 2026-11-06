@@ -1,4 +1,4 @@
-// ICT desk replay (owner, 6 Nov 2026): the tracker's own H1 iFVG model run over the last ~7 months of CNBC futures
+// ICT desk replay (owner, 6 Nov 2026): the tracker's own H1 iFVG model run over the year so far (from 1 Jan 2026) of CNBC futures
 // candles (5m where CNBC still has them, H1 otherwise), so the desk calendar and stats have history before the live
 // tracker started. Same signal code (signals() in tracker.mjs), entry at the inversion candle's close, stop 2 ticks
 // beyond the sweep, 3R target with the 2R mark recorded, 48 h max, one trade per market at a time. Writes
@@ -8,7 +8,7 @@ import path from 'node:path';
 import { MARKETS, P, cnbcBars, agg, signals, letter, isASetup } from './tracker.mjs';
 
 const DATA = process.argv[2] || 'data/ict';
-const FROM = Date.parse(process.argv[3] || '2026-04-01T00:00:00Z') / 1000;
+const FROM = Date.parse(process.argv[3] || '2026-01-01T00:00:00Z') / 1000;
 const now = Math.floor(Date.now() / 1000);
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 const dedupe = (a) => { const m = new Map(); for (const b of a) m.set(b.time, b); return [...m.values()].sort((x, y) => x.time - y.time); };
