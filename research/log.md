@@ -1078,3 +1078,15 @@ Every variant, side and gate is negative in 2023–24 and at best flat in 2025�
 | without the overlap | 36, +6.6 | 36, +30.4 |
 
 The D1-level filters remove the best trades (the 14 zones without a fresh support level made +19.5R). The H4-level filter is the only one that improves the drawdown in both halves and the profit in 2025–26, but it gives up 1.3R in 2023–24 → fails the strict rule; not applied. The Ephron overlap is better in 2023–24 and worse in 2025–26 → no rule. Daily engulf stays as adopted.
+
+## 2026-11-06 — Zlankator CE (50% of the Daily wick) on gold 2023+: negative in 2023–24, rejected
+
+`ms/ce_wick.py`. A Daily candle whose rejection wick is ≥ 1.5× its body while the 20-day trend agrees; limit at 50% of the wick on the next touch within 5 days; stop 0.7 (his 7 pips) / 1.5 / 3.0 beyond the entry; 3R, 5R or trail 1R after +2R; 10-day hold. n 131 | 123:
+
+| stop, exit | 2023–24 | 2025–26 |
+|---|---|---|
+| 0.7, 3R / 5R / trail | −39 / −55 / −24 | −24 / −26 / +80 |
+| 1.5, 3R / 5R / trail | −45 / −55 / −23 | −16 / −10 / +40 |
+| 3.0, 3R / 5R / trail | −32 / −42 / −23 | +5 / +27 / +22 |
+
+Every line is negative in 2023–24 (buys −0.3 to −0.6R a trade); the 7-pip stop version only pays with a trail in 2025–26, where a few runners of 20R+ carry it. A 0.7 stop on gold is cost-dominated (0.30 spread = 43% of the risk). **Rejected.** Remaining gold items from the skills: PITCHOU M15 rejection at a fresh H1 level in the storyline direction; engulf stairs re-entries; overlap sizing between the replica, the engulf and the trendline.
