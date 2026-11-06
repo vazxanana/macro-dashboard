@@ -1356,6 +1356,13 @@ h1, .h-head { text-wrap: balance; }
 .cal-mt { font: 600 12px var(--mono); margin-left: 8px; padding: 2px 7px; border-radius: 999px; border: 1px solid var(--line); vertical-align: 2px; }
 .cal-mt.pos { color: var(--buy); background: var(--buy-soft); border-color: color-mix(in srgb, var(--buy) 35%, transparent); }
 .cal-mt.neg { color: var(--sell); background: var(--sell-soft); border-color: color-mix(in srgb, var(--sell) 35%, transparent); }
+
+/* polish 18: trade status dots (open = blue, waiting fill = pulsing amber, missed/expired/skipped dimmed) */
+td.st-open::before, td.st-pend::before { content: ""; display: inline-block; width: 7px; height: 7px; border-radius: 50%; margin-right: 7px; vertical-align: 1px; }
+td.st-open::before { background: var(--accent); box-shadow: 0 0 0 3px var(--accent-soft); }
+td.st-pend::before { background: #e0a526; animation: ms-wait 1.6s ease-in-out infinite; }
+td.st-pend { color: var(--ink); }
+td.st-dim { color: var(--ink-faint); }
 </style>
 </head>
 <body>
@@ -3950,7 +3957,7 @@ function msNextSetup(bars, A) {
     } else set('ms-c-eq', '');
     const tableList = tab === 'live' ? list.slice().sort((a, b) => ((b.status === 'open' || b.status === 'pending') - (a.status === 'open' || a.status === 'pending')) || b.opened - a.opened) : list;
     const LIM = window.CLIM = window.CLIM || 60;
-    const ST = { win: ['pos', 'Win'], loss: ['neg', 'Loss'], be: ['', 'Break-even'], open: ['', 'Open'], pending: ['', 'Waiting fill'], missed: ['', 'Missed'], expired: ['', 'Expired'], skipped: ['', 'Skipped'] };
+    const ST = { win: ['pos', 'Win'], loss: ['neg', 'Loss'], be: ['', 'Break-even'], open: ['st-open', 'Open'], pending: ['st-pend', 'Waiting fill'], missed: ['st-dim', 'Missed'], expired: ['st-dim', 'Expired'], skipped: ['st-dim', 'Skipped'] };
     const dI = (x) => ({ dec: x.dec != null ? x.dec : 2 });
     set('ms-c-trades', tableList.length ? tableList.slice(0, LIM).map((x) => `<tr class="${x.shadow ? 'sh' : ''}" data-tid="${esc(x.id)}" tabindex="0" title="Show this trade on a chart"><td>${ftime(x.opened + TZ)}</td><td><b>${esc(x.label)}</b></td><td>${PUB ? '—' : `${esc(x.name)} <small>${esc(x.pair)}</small>`}</td><td><span class="ms-chip ${x.side === 'sell' ? 'ms-chip-sell' : 'ms-chip-buy'}">${x.side.toUpperCase()}</span></td><td class="n">${fmtI(x.entry, dI(x))}</td><td class="n">${fmtI(x.stop, dI(x))}</td><td class="n">${fmtI(x.t1, dI(x))}</td><td class="${(ST[x.status] || ['', ''])[0]}" title="${PUB ? '' : esc(x.note || '')}">${x.shadow ? 'Shadow · ' : ''}${x.replay ? 'Replay · ' : ''}${x.paper && !x.replay ? 'Paper · ' : ''}${(ST[x.status] || ['', x.status])[1]}${x.R != null && (x.status === 'win' || x.status === 'loss' || x.status === 'be') ? ` ${x.R > 0 ? '+' : ''}${x.R}R` : ''}${liveR(x)}${pmChip(x)}${x.shadow && x.blockedBy && x.blockedBy.length ? ` <small>${esc(x.blockedBy.join(', '))}</small>` : ''}${tab === 'journal' && x.exit ? ` <small>${esc(x.exit)}</small>` : ''}</td></tr>`).join('')
         + (tableList.length > LIM ? `<tr class="more"><td colspan="8"><button type="button" class="ms-tbtn c-more" id="ms-c-more">Show more (${tableList.length - LIM} left of ${tableList.length})</button></td></tr>` : '')
