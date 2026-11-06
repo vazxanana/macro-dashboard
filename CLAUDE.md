@@ -60,8 +60,7 @@ chose **Continue as guest** (localStorage `ms-guest`, public view). Sign-in is p
 Reviewers live in `window.MS_USERS` (head script: `{ <username>: { name, hash: sha256(password), role: 'reviewer' } }`;
 currently **Fred**); a reviewer session stores `ms-admin` = their hash and `ms-user` = the user name, gets the admin view
 read-only (`html[data-role="reviewer"] .own` hides the owner's journal, log-trade button, CSV loader and Telegram
-settings) and can write loss reviews, which carry `by: <name>`. The footer link is "Log in" (opens the card) or
-"Log out (<name>)". To add a reviewer, add an entry with the SHA-256 of their password.
+settings) and can write loss reviews, which carry `by: <name>`. The footer is hidden; log in / log out live in the account menu (`#ms-me`), which clicks the hidden `#ms-admin-link`. To add a reviewer, add an entry with the SHA-256 of their password.
 Viewers (`role: 'viewer'`, currently **Orlando**, **Luxus** and **Carlos**; `VIEWER` in the main script) are read-only with a reduced site: Home
 (Today strip, open positions, setup now), Setup, and the Council overview (active trades + P&L calendar); no charts,
 scanner, journal, other council panes, loss-review panel, alerts, settings, or photo/name changes.
