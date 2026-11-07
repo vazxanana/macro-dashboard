@@ -1,6 +1,6 @@
 # Robustness audit: which edges hold up?
 
-Generated 2026-11-07T21:26:17.602Z by `node research/robustness.mjs <council-data>`. Paper research only: no trading rule, config or tracker was changed. The owner decides on every flag below.
+Generated 2026-11-07T21:41:41.536Z by `node research/robustness.mjs <council-data>`. Paper research only: no trading rule, config or tracker was changed. The owner decides on every flag below.
 
 ## Short answer
 
@@ -17,7 +17,7 @@ Generated 2026-11-07T21:26:17.602Z by `node research/robustness.mjs <council-dat
   - Mosha BO, 2018-26 rebuild: **not proven**, +0.009R a trade over 147. out-of-sample −0.241 a trade; CI includes 0 (−0.320 to +0.353); −0.169 a trade at 2x costs; fails Bonferroni for N=424 (needs t 3.68, has 0.05); no untouched sample: the rule was chosen on data from 2019-01-01 on (9 trades before).
 - Robust: Crypto trend v3, 2018-26 rebuild, +2.804R a trade over 125 (note: the real drawdown (13.7R) is worse than 95% of reshuffles: losses cluster). The council's own replay of the same rule (2023-01-10 to 2026-09-19) is **fragile**: out-of-sample +0.045 a trade (t 0.18, n 39), so check whether the edge still holds now.
 - Shadow candidates with a positive record that is not yet robust (keep on paper): ICT A-setups, no Friday variant +0.283R over 219 (fragile); ICT A-setups, H1 structure opposed variant +0.335R over 176 (fragile); ICT dip-buy NQ/ES +0.593R over 62 (fragile); Gold momentum pullback, 2018-26 rebuild +0.041R over 1003 (fragile); Swing D1 ADX band 19.4-29.2 +0.156R over 278 (fragile).
-- No edge (zero or negative after costs): Gold momentum pullback (council replay) −0.024R over 74; Scalp live rule, 30-day replay −1.065R over 243; Scalp live rule, 30-day replay, gold + forex −0.285R over 143; Scalp live rule, 150d replay −0.011R over 915; Scalp live rule, 150d-clean replay −0.027R over 937; Scalp live rule, 2018-26 HistData −0.201R over 14083.
+- No edge (zero or negative after costs): Gold momentum pullback (council replay) −0.024R over 74; Scalp live rule, 30-day replay −1.305R over 239; Scalp live rule, 30-day replay, gold + forex −0.324R over 137; Scalp live rule, 150d replay −0.011R over 915; Scalp live rule, 150d-clean replay −0.027R over 937; Scalp live rule, 2018-26 HistData −0.201R over 14083.
 
 ## ICT desk
 
@@ -51,15 +51,15 @@ Generated 2026-11-07T21:26:17.602Z by `node research/robustness.mjs <council-dat
 | Gold momentum pullback (council replay) | shadow (test system) | 74 | −0.024 (t -0.18) | −0.209 (t -1.14, n 30) | none (fit 2023+) | −0.289 to +0.244 | −0.032 / −0.039 | 16.3R | N 424: p 1.000, DSR 0.00 | **not proven** |
 | Gold momentum pullback, 2018-26 rebuild | shadow (test system) | 1003 | +0.041 (t 1.01) | +0.169 (t 2.63, n 402) | −0.043 (n 633, before 2023) | −0.036 to +0.120 | +0.024 / +0.008 | 49.7R | N 424: p 1.000, DSR 0.02 | **fragile** |
 | Mosha BO, 2018-26 rebuild | live (paper) | 147 | +0.009 (t 0.05) | −0.241 (t -0.93, n 59) | −0.211 (n 9, before 2019) | −0.320 to +0.353 | −0.080 / −0.169 | 36.7R | N 424: p 1.000, DSR 0.00 | **not proven** |
-| Scalp live rule, 30-day replay | shadow (back from live paper 7 Nov) | 243 | −1.065 (t -6.28) | −0.816 (t -4.15, n 98) | none (fit 2026+) | −1.408 to −0.746 | −1.632 / −2.200 | 268.8R | N 1112: p 1.000, DSR 0.00 | **not proven** |
-| Scalp live rule, 30-day replay, gold + forex | shadow | 143 | −0.285 (t -2.42) | −0.289 (t -1.54, n 58) | none (fit 2026+) | −0.506 to −0.052 | −0.350 / −0.416 | 53.2R | N 1112: p 1.000, DSR 0.00 | **not proven** |
+| Scalp live rule, 30-day replay | shadow (back from live paper 7 Nov) | 239 | −1.305 (t -6.20) | −1.040 (t -4.24, n 96) | none (fit 2026+) | −1.734 to −0.920 | −1.967 / −2.628 | 321.0R | N 1112: p 1.000, DSR 0.00 | **not proven** |
+| Scalp live rule, 30-day replay, gold + forex | shadow | 137 | −0.324 (t -2.79) | −0.297 (t -1.53, n 55) | none (fit 2026+) | −0.546 to −0.094 | −0.390 / −0.456 | 55.5R | N 1112: p 1.000, DSR 0.00 | **not proven** |
 | Swing D1 ADX band, forward tags | shadow (paper sleeve) | 0 | – | – | – | – | – | – | – | **not proven** |
 | Scalp live rule, 150d replay | shadow | 915 | −0.011 (t -0.17) | −0.083 (t -0.85, n 366) | −0.067 (n 743, before 2026) | −0.142 to +0.127 | −0.057 / −0.103 | 102.6R | N 1112: p 1.000, DSR 0.00 | **not proven** |
 | Scalp live rule, 150d-clean replay | shadow | 937 | −0.027 (t -0.41) | −0.100 (t -1.03, n 375) | −0.110 (n 757, before 2026) | −0.151 to +0.108 | −0.073 / −0.119 | 110.7R | N 1112: p 1.000, DSR 0.00 | **not proven** |
 | Scalp live rule, 2018-26 HistData | shadow | 14083 | −0.201 (t -14.09) | −0.229 (t -9.00, n 4532) | – | −0.228 to −0.173* | −0.267 / −0.334 | – | N 1112: p 1.000, DSR 0.00 | **not proven** |
 | Swing D1 ADX band 19.4-29.2 | shadow (paper sleeve) | 278 | +0.156 (t 1.65) | +0.290 (t 1.46, n 67) | – | −0.030 to +0.341* | +0.143 / +0.130 | – | N 722: p 1.000, DSR 0.06 | **fragile** |
 | Coach promotions, forward record | Coach rule (proposals to the owner) | 0 | – | – | – | – | – | – | – | **not proven** |
-| Coach-stats session / D1 / stop toggles | Coach rule changes (applied automatically) | 35 changes | – | – | – | – | – | – | – | **not proven** |
+| Coach-stats session / D1 / stop toggles | Coach rule changes (applied automatically) | 36 changes | – | – | – | – | – | – | – | **not proven** |
 
 `*` normal approximation from a research summary (no trade list in council-data); its IS/OOS columns are that study's own split, not 60/40.
 
@@ -88,15 +88,15 @@ Generated 2026-11-07T21:26:17.602Z by `node research/robustness.mjs <council-dat
 - **Gold momentum pullback (council replay)** (shadow (test system); claim: council replay 2022-12-27 to 2026-11-03, costs included; source: `research/replay-2w.json k=gmp`): **not proven**. out-of-sample −0.209 a trade; CI includes 0 (−0.289 to +0.244); −0.039 a trade at 2x costs; fails Bonferroni for N=424 (needs t 3.68, has -0.18); no untouched sample: the rule was chosen on data from 2023-01-01 on (0 trades before). Note: decay: in-sample +0.102 vs out-of-sample −0.209 a trade.
 - **Gold momentum pullback, 2018-26 rebuild** (shadow (test system); claim: same rule rebuilt on 8 years of HistData (earlier rebuild audit); source: `research/edge/robustness/out/gmp.json`): **fragile**. CI includes 0 (−0.036 to +0.120); fails Bonferroni for N=424 (needs t 3.68, has 1.01); untouched period before 2023-01-01: −0.043 a trade over 633.
 - **Mosha BO, 2018-26 rebuild** (live (paper); claim: same rule rebuilt on 8 years of HistData (earlier rebuild audit); source: `research/edge/robustness/out/mosha.json`): **not proven**. out-of-sample −0.241 a trade; CI includes 0 (−0.320 to +0.353); −0.169 a trade at 2x costs; fails Bonferroni for N=424 (needs t 3.68, has 0.05); no untouched sample: the rule was chosen on data from 2019-01-01 on (9 trades before). Note: decay: in-sample +0.177 vs out-of-sample −0.241 a trade; the real drawdown (39.2R) is worse than 95% of reshuffles: losses cluster.
-- **Scalp live rule, 30-day replay** (shadow (back from live paper 7 Nov); claim: owner rule 7 Nov: +0.329R a trade over 500 in a 30-day replay (before crypto exchange fees); source: `backtest.json (scalp, live filters)`): **not proven**. out-of-sample −0.816 a trade; CI entirely below 0 (−1.408 to −0.746); −2.200 a trade at 2x costs; fails Bonferroni for N=1112 (needs t 3.92, has -6.28); no untouched sample: the rule was chosen on data from 2026-10-08 on (0 trades before).
-- **Scalp live rule, 30-day replay, gold + forex** (shadow; claim: the same without crypto (Kraken fees cost crypto scalps about 2R a trade); source: `backtest.json (scalp, live filters, no crypto)`): **not proven**. out-of-sample −0.289 a trade; CI entirely below 0 (−0.506 to −0.052); −0.416 a trade at 2x costs; fails Bonferroni for N=1112 (needs t 3.92, has -2.42); no untouched sample: the rule was chosen on data from 2026-10-08 on (0 trades before).
+- **Scalp live rule, 30-day replay** (shadow (back from live paper 7 Nov); claim: owner rule 7 Nov: +0.329R a trade over 500 in a 30-day replay (before crypto exchange fees); source: `backtest.json (scalp, live filters)`): **not proven**. out-of-sample −1.040 a trade; CI entirely below 0 (−1.734 to −0.920); −2.628 a trade at 2x costs; fails Bonferroni for N=1112 (needs t 3.92, has -6.20); no untouched sample: the rule was chosen on data from 2026-10-08 on (0 trades before).
+- **Scalp live rule, 30-day replay, gold + forex** (shadow; claim: the same without crypto (Kraken fees cost crypto scalps about 2R a trade); source: `backtest.json (scalp, live filters, no crypto)`): **not proven**. out-of-sample −0.297 a trade; CI entirely below 0 (−0.546 to −0.094); −0.456 a trade at 2x costs; fails Bonferroni for N=1112 (needs t 3.92, has -2.79); no untouched sample: the rule was chosen on data from 2026-10-08 on (0 trades before).
 - **Swing D1 ADX band, forward tags** (shadow (paper sleeve); claim: tags since #468; adopt only after 50+ forward trades at +0.10R or better; source: `backtest.json swing rows with adxBand`): **not proven**. no tagged in-band Swing trade yet.
 - **Scalp live rule, 150d replay** (shadow; claim: same rule on the 150-day engine replay; source: `research/backtest-150d.json (scalp, live filters)`): **not proven**. out-of-sample −0.083 a trade; CI includes 0 (−0.142 to +0.127); −0.103 a trade at 2x costs; fails Bonferroni for N=1112 (needs t 3.92, has -0.17); untouched period before 2026-10-08: −0.067 a trade over 743. Note: decay: in-sample +0.037 vs out-of-sample −0.083 a trade.
 - **Scalp live rule, 150d-clean replay** (shadow; claim: same rule on the 150-day engine replay; source: `research/backtest-150d-clean.json (scalp, live filters)`): **not proven**. out-of-sample −0.100 a trade; CI includes 0 (−0.151 to +0.108); −0.120 a trade at 2x costs; fails Bonferroni for N=1112 (needs t 3.92, has -0.41); untouched period before 2026-10-08: −0.110 a trade over 757. Note: decay: in-sample +0.021 vs out-of-sample −0.100 a trade.
 - **Scalp live rule, 2018-26 HistData** (shadow; claim: research/edge/regime baseline (IS 2018-23 / OOS 2024-26 split of that study); source: `research/edge/regime/RESULT.md (summary only)`): **not proven**. out-of-sample −0.229 a trade; CI entirely below 0 (−0.228 to −0.173); −0.334 a trade at 2x costs; fails Bonferroni for N=1112 (needs t 3.92, has -14.09).
 - **Swing D1 ADX band 19.4-29.2** (shadow (paper sleeve); claim: OOS 2024-26 +0.290R a trade over 67 (t 1.46); +0.277 at 1.5x cost; source: `research/edge/regime/proposal.md (summary only)`): **fragile**. out-of-sample t 1.46 < 2; CI includes 0 (−0.030 to +0.341); fails Bonferroni for N=722 (needs t 3.81, has 1.65).
 - **Coach promotions, forward record** (Coach rule (proposals to the owner); claim: promote: n>=100, +0.10R, both halves positive in the 30-day replay; source: `research/backtest-150d-clean.json, walk-forward 30-day look-back / 7-day hold`): **not proven**. the rule never promoted anything in this window.
-- **Coach-stats session / D1 / stop toggles** (Coach rule changes (applied automatically); claim: 35 automatic rule changes; source: `config.json history (coach-stats, coach-backtest)`): **not proven**. median evidence 10 trades; 20 of 26 cite fewer than 30; 11 topics changed 2+ times (5 at most). 15 topics, 11 of them changed more than once.
+- **Coach-stats session / D1 / stop toggles** (Coach rule changes (applied automatically); claim: 36 automatic rule changes; source: `config.json history (coach-stats, coach-backtest)`): **not proven**. median evidence 10 trades; 20 of 27 cite fewer than 30; 12 topics changed 2+ times (5 at most). 15 topics, 12 of them changed more than once.
 
 ## Method
 
@@ -121,7 +121,7 @@ Generated 2026-11-07T21:26:17.602Z by `node research/robustness.mjs <council-dat
 
 - `ict/replay.json`: at 2026-11-07T21:16:04.134Z, from 2025-08-01
 - `research/replay-2w.json`: from 2022-12-27, to 2026-11-03
-- `backtest.json`: at 2026-11-07T21:25:57.351Z, from 2026-10-08T21:04:00.000Z, to 2026-11-07T21:04:00.000Z, days 30
+- `backtest.json`: at 2026-11-07T21:41:23.838Z, from 2026-10-08T21:25:00.000Z, to 2026-11-07T21:25:00.000Z, days 30
 - `research/backtest-150d.json`: at 2026-11-02T21:57:46.797Z, from 2026-06-05T21:54:00.000Z, to 2026-11-02T21:54:00.000Z, days 150
 - `research/backtest-150d-clean.json`: at 2026-11-03T09:11:36.891Z, from 2026-06-06T09:08:00.000Z, to 2026-11-03T09:08:00.000Z, days 150
 - `research/edge/robustness/out/*.json` (this repo): 2018-2026 trade lists of the earlier rebuild audit (#435).
