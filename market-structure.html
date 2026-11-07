@@ -3949,8 +3949,8 @@ function msNextSetup(bars, A) {
 
   TFS.forEach((tf) => { const p = makePane(tf); if (p) panes[tf.id] = p; });
   // key levels (7 Nov loop): previous day / week high and low and today's open, as quiet dotted lines on the intraday charts
-  function keyLevels() {
-    const d = panes['1d'] && panes['1d'].raw; let L = [];
+  // the levels from a market's daily candles (raw prices): [title, price, pivot?]
+  function klList(d) { const L = [];
     if (G.showKL !== false && d && d.length > 8) {
       const now = Date.now() / 1000, day = Math.floor(now / 86400) * 86400, prev = d.filter((b) => b.time < day), cur = d.find((b) => b.time === day);
       const pd = prev[prev.length - 1], wk = (t) => Math.floor((t / 86400 + 3) / 7);   // weeks start Monday (UTC)
@@ -3962,10 +3962,16 @@ function msNextSetup(bars, A) {
     // daily floor pivots (7 Nov loop): from yesterday's high / low / close
     if (G.showPiv === true && d && d.length > 2) { const day = Math.floor(Date.now() / 1000 / 86400) * 86400, pd = d.filter((b) => b.time < day).pop();
       if (pd) { const P0 = (pd.high + pd.low + pd.close) / 3, rg = pd.high - pd.low; L.push(['P', P0, 1], ['R1', 2 * P0 - pd.low, 1], ['S1', 2 * P0 - pd.high, 1], ['R2', P0 + rg, 1], ['S2', P0 - rg, 1]); } }
-    const off = G.offset || 0;
+    return L;
+  }
+  // klList's levels as quiet price lines on a series (returned, for removal); off = the chart's price offset
+  const klLines = (series, L, off) => L.map(([t, v, pv]) => pv ? series.createPriceLine({ price: +v + off, color: t === 'P' ? 'rgba(156,39,176,.8)' : 'rgba(156,39,176,.45)', lineWidth: 1, lineStyle: LW.LineStyle.Dashed, axisLabelVisible: t === 'P', title: t }) : series.createPriceLine({ price: +v + off, color: t === 'DO' ? 'rgba(154,164,178,.55)' : /H$/.test(t) ? 'rgba(8,153,129,.55)' : 'rgba(242,54,69,.55)', lineWidth: 1, lineStyle: LW.LineStyle.SparseDotted, axisLabelVisible: true, title: t }));
+  function keyLevels() {
+    const L = klList(panes['1d'] && panes['1d'].raw), off = G.offset || 0;
     ['4h', '1h', '15m', '5m', '1m'].forEach((id) => { const P = panes[id]; if (!P || !P.series) return;
       (P._kl || []).forEach((l) => { try { P.series.removePriceLine(l); } catch (e) {} });
-      P._kl = L.map(([t, v, pv]) => pv ? P.series.createPriceLine({ price: v + off, color: t === 'P' ? 'rgba(156,39,176,.8)' : 'rgba(156,39,176,.45)', lineWidth: 1, lineStyle: LW.LineStyle.Dashed, axisLabelVisible: t === 'P', title: t }) : P.series.createPriceLine({ price: v + off, color: t === 'DO' ? 'rgba(154,164,178,.55)' : /H$/.test(t) ? 'rgba(8,153,129,.55)' : 'rgba(242,54,69,.55)', lineWidth: 1, lineStyle: LW.LineStyle.SparseDotted, axisLabelVisible: true, title: t })); });
+      P._kl = klLines(P.series, L, off); });
+    if (window.msSplitKL) window.msSplitKL();   // and the Split screen's free chart
   }
   setTimeout(keyLevels, 2500); setInterval(keyLevels, 60e3);
   // your own horizontal lines (drawn with the line tool), per market in localStorage
@@ -4900,7 +4906,12 @@ function msNextSetup(bars, A) {
   }
   // markups on the free chart (another market, or the left chart's own timeframe): the same Meridian / ICT drawing as the panes
   // (merItems / fvgItems + ictSess) with the price lines they use; the page's plan and higher-timeframe origins only for its own market
-  SP.ind = []; SP.ov = null; SP.pl = []; SP.d = null; SP.dk = '';
+  SP.ind = []; SP.ov = null; SP.pl = []; SP.d = null; SP.dk = ''; SP.kl = [];
+  // key levels on the free chart, from its own market's daily candles; like the panes: intraday only, in both markup modes
+  function spKL() { if (!SP.series) return; SP.kl.forEach((l) => { try { SP.series.removePriceLine(l); } catch (e) {} }); SP.kl = [];
+    const k = spSym(), own = k === instKey; if (!SP.on || spPane() || spTf() === '1d' || !SP.bars.length) return;
+    SP.kl = klLines(SP.series, klList(own ? panes['1d'] && panes['1d'].raw : SP.dk === k ? SP.d : null), own ? G.offset || 0 : 0); }
+  window.msSplitKL = () => { try { spKL(); } catch (e) {} };
   function spMarkup() { if (!SP.chart || !SP.series) return; SP.ind.forEach((s2) => { try { SP.chart.removeSeries(s2); } catch (e) {} }); SP.ind = [];
     SP.pl.forEach((l) => { try { SP.series.removePriceLine(l); } catch (e) {} }); SP.pl = [];
     if (!SP.ov) { SP.ov = new Overlay(); try { SP.series.attachPrimitive(SP.ov); } catch (e) {} }
@@ -4910,15 +4921,17 @@ function msNextSetup(bars, A) {
       if (G.mode === 'ict') { fvgItems(B, items); ictSess(B, B.map((b) => ({ time: b.time - TZ })), tf, items, PL, own ? panes['1d'] && panes['1d'].raw : SP.d, own ? G.offset || 0 : 0); }
       else { const A = msAnalyze(B, PIVOT), S = A.last ? msNextSetup(B, A) : null; merItems(B, A, S, tf, items, (v) => fmtI(v, I), own);
         if (S) PL(S.invalid, 'Invalidation', '#787b86', true, G.show.detail);
-        const pl = G.plan; if (own && G.show.plan && pl && tf.id !== '4h') { PL(pl.entry, 'Entry', '#2962ff', false, G.show.detail); PL(pl.stop, 'Stop', '#f23645', false, G.show.detail); PL(pl.t1, 'T1', '#089981', true, G.show.detail); if (tf.id !== '1m') PL(pl.t2, 'T2', '#089981', 2, G.show.detail); } }
+        const pl = G.plan; if (own && G.show.plan && pl && tf.id !== '4h') { PL(pl.entry, 'Entry', '#2962ff', false, G.show.detail); PL(pl.stop, 'Stop', '#f23645', false, G.show.detail); PL(pl.t1, 'T1', '#089981', true, G.show.detail); if (tf.id !== '1m') PL(pl.t2, 'T2', '#089981', 2, G.show.detail); }
+        // the gold M5 replica boxes, as on the M5 pane (they come from the page's own M5 / M15 / H1 panes)
+        if (own && tf.id === '5m') { const keep = P5pv; try { replicaItems(items, B); } catch (e) {} P5pv = keep; } }
     } catch (e) { /* not enough swings yet */ }
-    SP.ov.set(items); indDraw(SP.chart, B, SP.ind); }
+    SP.ov.set(items); indDraw(SP.chart, B, SP.ind); spKL(); }
   async function spLoad() {
     if (!SP.on) return; spControls(); grid4.dataset.splitR = spPane() ? spTf() : ''; if (spPane()) { setTimeout(() => { const R = spPane(); if (R) R.fit(); if (SP.sync.range || SP.sync.time) spFromLeft(); }, 60); return; } spChart(); const k = spSym(), tf = spTf(), I = INSTRUMENTS[k], key = `${k}|${tf}`; if (!I || !SP.series) return;
     const T = TFS.find((t) => t.id === tf); document.getElementById('ms-sp-t').textContent = `${I.label} · ${T ? T.label : tf}`;
     if (SP.key !== key) { SP.key = key; SP.series.setData([]); SP.bars = []; spMarkup(); }   // no old market's markups on an empty chart
-    // another market: its own daily bars, for the ICT 50%-of-yesterday line
-    if (k !== instKey && SP.dk !== k) { SP.dk = k; SP.d = null; fetchBars(TFS.find((t) => t.id === '1d') || TFS[0], I, 10).then((r) => { if (SP.dk === k && r && r.bars) { SP.d = r.bars; if (G.mode === 'ict' && SP.bars.length) spMarkup(); } }).catch(() => {}); }
+    // another market: its own daily bars (three weeks), for the key levels and the ICT 50%-of-yesterday line
+    if (k !== instKey && SP.dk !== k) { SP.dk = k; SP.d = null; fetchBars(TFS.find((t) => t.id === '1d') || TFS[0], I, 20).then((r) => { if (SP.dk === k && r && r.bars) { SP.d = r.bars; if (SP.bars.length) { if (G.mode === 'ict') spMarkup(); else spKL(); } } }).catch(() => {}); }
     try { const r = await fetchBars(TFS.find((t) => t.id === tf) || TFS[2], I, 500); if (SP.key !== key || !r || !r.bars || !r.bars.length) return;
       const off = k === instKey ? G.offset || 0 : 0;   // same market: the left chart's price offset, so the plan lines sit on the candles
       SP.bars = r.bars.map((b) => ({ time: b.time + TZ, open: +b.open + off, high: +b.high + off, low: +b.low + off, close: +b.close + off }));
