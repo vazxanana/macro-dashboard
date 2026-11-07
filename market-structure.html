@@ -1661,6 +1661,9 @@ html[data-role="viewer"] .j-empty-go { display: none; }
 .pw-eye { position: absolute; right: 4px; top: 50%; transform: translateY(-50%); width: 34px; height: 30px; border: 0; background: transparent; color: var(--ink-faint); cursor: pointer; border-radius: 6px; display: grid; place-items: center; padding: 0; }
 .pw-eye:hover { color: var(--ink); } .pw-eye:focus-visible { outline: 2px solid var(--accent); outline-offset: 0; }
 .pw-eye svg { width: 17px; height: 17px; }
+
+/* light theme: focus ring in a deeper gold so it meets 3:1 against white (was 1.95:1) */
+:root[data-theme="light"] :where(a, button, summary, select, input, textarea, [tabindex]):focus-visible { outline-color: #9a6b00 !important; }
 </style>
 <script>try{if(localStorage.getItem('msMotion')==='off')document.documentElement.dataset.motion='off'}catch(e){}</script>
 </head>
