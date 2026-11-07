@@ -1594,6 +1594,12 @@ html[data-motion="off"] .stagger-in > * { animation: none; }
 .h-strip i.w { background: var(--buy); } .h-strip i.l { background: var(--sell); } .h-strip i.f { background: var(--ink-faint); }
 .h-strip i:last-child { outline: 1px solid var(--ink-faint); outline-offset: 1px; }
 @media (max-width: 560px) { .h-strip { right: 10px; top: 12px; gap: 2px; } .h-strip i { width: 7px; height: 7px; } }
+
+/* council equity: underwater drawdown band under the curve */
+.c-dd { position: relative; margin-top: 2px; }
+.c-dd svg { display: block; width: 100%; height: 28px; }
+.c-dd-l { position: absolute; right: 0; bottom: 2px; font: 500 11px var(--sans); color: var(--ink-faint); background: color-mix(in srgb, var(--panel) 80%, transparent); padding: 0 4px; border-radius: 4px; }
+.c-dd-l b { color: var(--sell); font-family: var(--mono); font-weight: 600; }
 </style>
 <script>try{if(localStorage.getItem('msMotion')==='off')document.documentElement.dataset.motion='off'}catch(e){}</script>
 </head>
@@ -4209,6 +4215,11 @@ function msNextSetup(bars, A) {
       const lo = Math.min(...pts), hi = Math.max(...pts), W = 600, H = 64;
       const y = (v) => (H - 4 - (v - lo) / Math.max(1e-9, hi - lo) * (H - 8)).toFixed(1);
       set('ms-c-eq', `<svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="none" role="img" aria-label="Trader equity in R over ${ch.length} closed trades"><line x1="0" x2="${W}" y1="${y(0)}" y2="${y(0)}" stroke="var(--line)" stroke-dasharray="4 4" vector-effect="non-scaling-stroke"/>${((g, c, d) => `<defs><linearGradient id="${g}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${c}" stop-opacity=".22"/><stop offset="1" stop-color="${c}" stop-opacity="0"/></linearGradient></defs><path d="${d}L${W},${H}L0,${H}Z" fill="url(#${g})" stroke="none"/>`)('eqg' + Math.random().toString(36).slice(2, 8), eq >= 0 ? 'var(--buy)' : 'var(--sell)', pts.map((v, i) => `${i ? 'L' : 'M'}${(i / (pts.length - 1) * W).toFixed(1)},${y(v)}`).join(''))}<path d="${pts.map((v, i) => `${i ? 'L' : 'M'}${(i / (pts.length - 1) * W).toFixed(1)},${y(v)}`).join('')}" fill="none" stroke="${eq >= 0 ? 'var(--buy)' : 'var(--sell)'}" stroke-width="2" vector-effect="non-scaling-stroke"/></svg>`);
+      // underwater band: distance below the running high after each trade, worst drawdown labelled
+      { let peak = 0, worst = 0, wi = 0; const dd = pts.map((v, i) => { peak = Math.max(peak, v); const d = v - peak; if (d < worst) { worst = d; wi = i; } return d; });
+        if (worst < 0) { const DH = 28, yd = (v) => (v / worst * (DH - 3)).toFixed(1), xd = (i) => (i / (pts.length - 1) * W).toFixed(1);
+          const area = `M0,0${dd.map((v, i) => `L${xd(i)},${yd(v)}`).join('')}L${W},0Z`;
+          const host = document.getElementById('ms-c-eq'); if (host) host.insertAdjacentHTML('beforeend', `<div class="c-dd"><svg viewBox="0 0 ${W} ${DH}" preserveAspectRatio="none" role="img" aria-label="Drawdown: worst ${worst.toFixed(1)}R below the previous high"><path d="${area}" fill="var(--sell-soft, rgba(242,87,111,.14))" stroke="none"/><path d="M0,0${dd.map((v, i) => `L${xd(i)},${yd(v)}`).join('')}" fill="none" stroke="var(--sell)" stroke-width="1.2" vector-effect="non-scaling-stroke"/></svg><span class="c-dd-l">Drawdown · worst <b>${worst.toFixed(1)}R</b></span></div>`); } }
     } else set('ms-c-eq', '');
     const tableList = tab === 'live' ? list.slice().sort((a, b) => ((b.status === 'open' || b.status === 'pending') - (a.status === 'open' || a.status === 'pending')) || b.opened - a.opened) : list;
     const LIM = window.CLIM = window.CLIM || 60;
