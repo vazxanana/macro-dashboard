@@ -124,3 +124,234 @@ export function deskSection({ ict = [], shadow = null, mirror = null, now = Math
   out.push(DESK_END);
   return out.join('\n');
 }
+
+// ---- Loss post-mortems (Analyst, 7 Nov) -------------------------------------------------------------------------------
+// Every closed losing LIVE paper trade gets a short post-mortem built only from recorded facts: what price did after the
+// entry (MFE / MAE in R, time to the stop), what it did after the stop (did it come back to the target: stop too tight?),
+// whether the entry or the stop sat near a session open or high-impact news, and the higher-timeframe trends at entry.
+// Tags (hunt / noise / late / news, the owner's review tags) are set only where the evidence clearly supports them.
+// Stored in reviews/analyst.json, written only by the Trader round, so it never races the page's whole-file writes to
+// reviews/losses.json. The Trader's lesson rules read the owner's tags first and fall back to these (owner reviews win).
+// Reporting and tags only: nothing here opens, closes or changes a trade or a rule.
+export const PM_VERSION = 1;
+export const PM_START = '<!-- postmortems:start -->', PM_END = '<!-- postmortems:end -->';
+const TF = { '1d': 'D1', '4h': 'H4', '1h': 'H1' };
+const r2 = (x) => (Math.round(x * 100) / 100).toFixed(2);
+const dur = (sec) => { const m = Math.max(0, Math.round(sec / 60)); return m < 90 ? `${m} min` : m < 48 * 60 ? `${(m / 60).toFixed(1)} h` : `${(m / 1440).toFixed(1)} days`; };
+const hm = (t) => new Date(t * 1000).toISOString().slice(11, 16);
+const trendWord = (v) => v === 1 ? 'up' : v === -1 ? 'down' : 'flat';
+
+// UTC offset (ms) of an IANA zone at instant ms
+function zoneOffset(tz, ms) {
+  const p = Object.fromEntries(new Intl.DateTimeFormat('en-US', { timeZone: tz, hourCycle: 'h23', year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', second: '2-digit' })
+    .formatToParts(new Date(ms)).map((x) => [x.type, x.value]));
+  return Date.UTC(+p.year, +p.month - 1, +p.day, +p.hour, +p.minute, +p.second) - Math.floor(ms / 1000) * 1000;
+}
+// Session opens in local time (daylight saving moves them in UTC), weekdays only
+export const OPENS = [['Tokyo open', 'Asia/Tokyo', 9, 0], ['London open', 'Europe/London', 8, 0], ['New York open', 'America/New_York', 8, 0], ['US cash open', 'America/New_York', 9, 30]];
+export function opensNear(t, within = 1800) {
+  const out = [], seen = new Set();
+  for (const [name, tz, h, m] of OPENS) for (const dd of [-1, 0, 1]) {
+    const ms = t * 1000 + dd * 86400e3, loc = new Date(ms + zoneOffset(tz, ms));
+    if (loc.getUTCDay() === 0 || loc.getUTCDay() === 6) continue;
+    const wall = Date.UTC(loc.getUTCFullYear(), loc.getUTCMonth(), loc.getUTCDate(), h, m), ot = (wall - zoneOffset(tz, wall - zoneOffset(tz, wall))) / 1000;
+    if (Math.abs(t - ot) <= within && !seen.has(name + ot)) { seen.add(name + ot); out.push({ name, t: ot, mins: Math.round((t - ot) / 60) }); }
+  }
+  return out.sort((a, b) => Math.abs(a.mins) - Math.abs(b.mins));
+}
+const relOpen = (o, what) => `${what} ${Math.abs(o.mins)} min ${o.mins >= 0 ? 'after' : 'before'} the ${o.name} (${hm(o.t)} UTC)`;
+
+// One post-mortem. `events` (optional): [{ t, title, impact, country }] from a calendar; by default the news the Trader's
+// review recorded on the trade (pm.news: high-impact releases for its currencies, 30 min before the fill to the stop).
+export function postMortem(tr, { events = null } = {}) {
+  const s = tr.side === 'sell' ? -1 : 1, pm = tr.pm || {}, a = pm.phase === 'done' ? pm.after : null, c = tr.ctx || {};
+  const fill = tr.filled || tr.opened, closed = tr.closed, mfe = Math.max(0, +tr.mfe || 0), lossR = Math.abs(tr.R != null ? +tr.R : -1);
+  const tags = new Set(), lines = [], ev = { mfeR: +r2(mfe), maeR: +r2(Math.max(lossR, +tr.mae || 0)), toStopMin: Math.round((closed - fill) / 60) };
+  const finds = [];   // [rank, title]: the lowest rank is the headline
+  // 1. after the entry
+  lines.push(`After the entry: best +${r2(mfe)}R (MFE), worst −${r2(ev.maeR)}R (MAE); stopped ${dur(closed - fill)} after the fill.`);
+  const gap = +tr.gapR || +pm.gap || 0;
+  if (gap > 0) { ev.gapR = gap; lines.push(`The stop candle gapped: filled ${r2(gap)}R past the stop.`); }
+  if (Number.isFinite(tr.Rnet) && tr.Rnet !== tr.R) ev.Rnet = tr.Rnet;
+  if (mfe >= 1) finds.push([4.2, `Was +${r2(mfe)}R, then stopped`]);
+  // 2. after the stop: did price come back to the target?
+  if (a) {
+    const watch = (pm.until || closed) - closed;
+    ev.after = { bestR: a.best, worstR: a.worst, watchH: +(watch / 3600).toFixed(1), hitT1: a.hitT1 || null };
+    if (a.hitT1 != null) {
+      const past = Math.max(0, (a.worstPre != null ? a.worstPre : a.worst) - 1);
+      ev.after.pastStopR = +r2(past); ev.after.toTargetH = +((a.hitT1 - closed) / 3600).toFixed(1);
+      if (past <= 0.6) {
+        tags.add('hunt'); finds.push([1, 'Stop swept, then the target']);
+        lines.push(`After the stop price went only ${r2(past)}R past it, then reached the target ${dur(a.hitT1 - closed)} later: the direction was right and the stop sat where the market swept (stop too tight or too obvious).`);
+      } else lines.push(`Price reached the target ${dur(a.hitT1 - closed)} after the stop, but only after going ${r2(past)}R past the stop: a stop wide enough to survive that would have shrunk the trade a lot, so this is not tagged a stop hunt.`);
+    } else {
+      lines.push(`In the ${dur(watch)} after the stop price did not reach the target (best +${r2(a.best)}R, worst −${r2(a.worst)}R from the entry).`);
+      if (mfe < 0.3 && a.worst >= 2) { finds.push([6, 'Wrong direction; the stop did its job']); lines.push('It never went for the trade and carried on 2R+ against it: the read of direction was wrong, not the stop.'); }
+    }
+  } else lines.push('What price did after the stop was not recorded, so stop placement is not judged.');
+  // 3. timing: session opens and news
+  const oE = opensNear(fill)[0], oS = opensNear(closed)[0];
+  ev.opens = [oE && { at: 'entry', name: oE.name, mins: oE.mins }, oS && { at: 'stop', name: oS.name, mins: oS.mins }].filter(Boolean);
+  if (oE || oS) lines.push([oE && relOpen(oE, 'Entry'), oS && relOpen(oS, oE ? 'stopped' : 'Stopped')].filter(Boolean).join('; ') + '.');
+  else lines.push('No session open within 30 min of the entry or the stop.');
+  const news = Array.isArray(events) ? events.filter((e) => (!e.impact || e.impact === 'High') && e.t >= fill - 1800 && e.t <= closed + 300) : Array.isArray(pm.news) ? pm.news : null;
+  if (news && news.length) {
+    ev.news = news.map((e) => ({ t: e.t, title: `${e.country ? e.country + ' ' : ''}${e.title}` }));
+    const hit = news.filter((e) => e.t >= fill - 1800 && e.t <= closed && closed - e.t <= 7200);   // the stop came within 2 h of the release
+    if (hit.length) { tags.add('news'); finds.push([2, 'News during the trade']); }
+    lines.push(`High-impact news: ${news.map((e) => `${e.country ? e.country + ' ' : ''}${e.title} at ${hm(e.t)} UTC (${e.t <= closed ? `${dur(closed - e.t)} before the stop` : 'after the stop'})`).join('; ')}${hit.length ? '' : '; the stop was not within 2 h of it, so it is not tagged news'}.`);
+  } else if (news) lines.push('No high-impact news for its currencies from 30 min before the fill to the stop.');
+  else lines.push('News was not checked for this trade.');
+  // 4. stop size and entry timing
+  if ((c.stopAtr != null && c.stopAtr < 0.5) || (c.stopSpreads != null && c.stopSpreads < 5)) { tags.add('noise'); finds.push([3, 'Stop inside normal noise']); lines.push(`The stop was ${c.stopAtr}× ATR (${c.stopSpreads} spreads) from the entry: inside one normal candle.`); }
+  else if (c.stopAtr != null) lines.push(`The stop was ${c.stopAtr}× ATR from the entry, outside normal candle noise.`);
+  if (pm.slip != null && pm.slip < -0.25) { tags.add('late'); finds.push([4, 'Late entry']); lines.push(`Filled ${r2(-pm.slip)}R worse than the planned entry: the move had started without it.`); }
+  else if (c.sigAge != null && c.sigAge > 8) { tags.add('late'); finds.push([4, 'Late entry']); lines.push(`The signal was ${c.sigAge} candles old at the entry.`); }
+  // 5. higher-timeframe structure at entry
+  const t0 = c.trend || null, retrace = /^r/.test(tr.k || '');
+  if (t0) {
+    const ks = ['1d', '4h', '1h'].filter((k) => t0[k] != null), against = ks.filter((k) => t0[k] === -s);
+    ev.htf = Object.fromEntries(ks.map((k) => [TF[k], t0[k]])); ev.htfAgainst = against.map((k) => TF[k]);
+    lines.push(`Higher timeframes at entry: ${ks.map((k) => `${TF[k]} ${trendWord(t0[k])}`).join(', ')}. ${against.length ? `The ${tr.side} was against ${against.map((k) => TF[k]).join(' and ')}${retrace ? ' (a retracement setup trades against the higher trend by design)' : ''}.` : 'None was against the trade, so structure was not the problem.'}`);
+    if (!retrace && t0['1d'] === -s) finds.push([4.5, 'Against the D1 trend']);
+  } else if (tr.feat && tr.feat.d1) {
+    ev.htfAgainst = tr.feat.d1 === 'against' ? ['D1'] : [];
+    lines.push(`D1 at entry: ${tr.feat.d1} the trade${retrace && tr.feat.d1 === 'against' ? ' (by design for a retracement setup)' : ''}.`);
+    if (!retrace && tr.feat.d1 === 'against') finds.push([4.5, 'Against the D1 trend']);
+  }
+  const title = (finds.sort((x, y) => x[0] - y[0])[0] || [9, 'Ordinary loss'])[1];
+  return { id: tr.id, k: tr.k, name: tr.name, pair: tr.pair, h: tr.h, market: tr.market, label: tr.label, side: tr.side, R: tr.R, entry: tr.entry, stop: tr.stop, t1: tr.t1,
+    opened: tr.opened, closed, shadow: false, feat: tr.feat || {}, by: 'analyst', av: PM_VERSION, tags: [...tags].sort(), title, text: lines.join(' ').slice(0, 4000), evidence: ev };
+}
+
+// All live losses → { reviews, changed }. A post-mortem is written once the Trader's after-exit watch is done (or, for a trade
+// with no review, 5 days after the stop) and keeps its `at` unless its findings change. A post-mortem whose trade is gone from
+// trades.json is kept; a loss that was reopened (bad-print repair) loses it.
+export function analystReviews({ trades = [], prev = {}, now = Math.floor(Date.now() / 1000), events = null }) {
+  const out = {}, P = prev || {}, ids = new Set(trades.map((x) => x && x.id));
+  let changed = false;
+  for (const [id, r] of Object.entries(P)) if (!ids.has(id)) out[id] = r;
+  for (const x of trades) {
+    if (!x || x.shadow || x.replay || x.status !== 'loss' || !x.closed) continue;
+    const p = P[x.id];
+    if (!((x.pm && x.pm.phase === 'done') || (!x.pm && now - x.closed > 5 * 86400))) { if (p) out[x.id] = p; continue; }
+    const r = postMortem(x, { events });
+    if (p && p.av === r.av && p.text === r.text && (p.tags || []).join() === r.tags.join()) out[x.id] = p;
+    else { out[x.id] = { ...r, at: now }; changed = true; }
+  }
+  if (Object.keys(P).some((id) => !out[id])) changed = true;
+  return { reviews: out, changed };
+}
+
+// The report block: post-mortems of the last `days` days, tag counts, and how the tags compare with the owner's reviews
+export function postMortemSection({ reviews = {}, owner = {}, now = Math.floor(Date.now() / 1000), days = 7 }) {
+  const all = Object.values(reviews || {}).filter(Boolean), R = all.filter((r) => r.closed && now - r.closed < days * 86400).sort((a, b) => b.closed - a.closed);
+  const last = all.reduce((m, r) => Math.max(m, r.at || 0), 0), O = owner || {};
+  const out = [PM_START, '## Loss post-mortems', '',
+    `Built by the Analyst${last ? ` (last post-mortem ${new Date(last * 1000).toISOString().slice(0, 16).replace('T', ' ')} UTC)` : ''} from the live paper losses of the last ${days} days, once the Trader has watched what price did after the stop. Tags (hunt / noise / late / news) are set only when the evidence is clear; where the owner reviewed a loss, the owner's tags count instead.`, ''];
+  if (!R.length) { out.push(`No live loss with a finished post-mortem in the last ${days} days.`, PM_END); return out.join('\n'); }
+  const tc = {}; R.forEach((r) => ((r.tags || []).length ? r.tags : ['none']).forEach((t) => { tc[t] = (tc[t] || 0) + 1; }));
+  out.push(`**${R.length} loss${R.length === 1 ? '' : 'es'}:** ${Object.entries(tc).sort((a, b) => b[1] - a[1]).map(([t, n]) => `${t === 'none' ? 'no clear tag' : t} ${n}`).join(', ')}.${R.length < 10 ? ' Small sample: read these as single cases, not a pattern.' : ''}`, '',
+    '| Closed (UTC) | Trade | Finding | Tags | MFE; after the stop | Timing | HTF against |', '|---|---|---|---|---|---|---|');
+  for (const r of R.slice(0, 15)) {
+    const e = r.evidence || {}, a = e.after, o = (e.opens || [])[0], ow = O[r.id] && !O[r.id].draft ? O[r.id] : null;
+    const after = a ? (a.hitT1 ? `target ${a.toTargetH} h later, ${a.pastStopR}R past the stop first` : `no target in ${a.watchH} h`) : 'not watched';
+    const timing = [o && `${o.at} ${Math.abs(o.mins)} min ${o.mins >= 0 ? 'after' : 'before'} ${o.name}`, e.news && e.news.length && `news: ${e.news.map((n) => n.title).join(', ')}`].filter(Boolean).join('; ') || '—';
+    out.push(`| ${new Date(r.closed * 1000).toISOString().slice(5, 16).replace('T', ' ')} | ${r.label} ${r.name} ${r.side} | ${r.title} | ${(r.tags || []).join(', ') || '—'}${ow ? ` (owner: ${(ow.tags || []).join(', ') || 'no tags'})` : ''} | +${r2(e.mfeR || 0)}R; ${after} | ${timing.replace(/\|/g, '/')} | ${(e.htfAgainst || []).join(', ') || 'none'} |`);
+  }
+  if (R.length > 15) out.push('', `${R.length - 15} older post-mortems of this period are in reviews/analyst.json.`);
+  const both = R.filter((r) => O[r.id] && !O[r.id].draft), K = ['hunt', 'noise', 'late', 'news'];
+  if (both.length) {
+    const agree = both.filter((r) => K.every((t) => (r.tags || []).includes(t) === (O[r.id].tags || []).includes(t))).length;
+    out.push('', `**Owner check:** the owner reviewed ${both.length} of these; on the four shared tags the Analyst matched the owner on ${agree} of ${both.length}.`);
+  }
+  out.push(PM_END);
+  return out.join('\n');
+}
+
+// ---- What changed (daily): which setups are improving or decaying --------------------------------------------------
+// Rolling last-N expectancy per setup against its whole record, on every closed paper trade of the setup (live and shadow:
+// shadow trades are signals the rules blocked, followed on paper). The change is tested last N vs the trades before them
+// (Welch t). Nothing is called an edge without its n and t; small samples are marked as such.
+export const WC_START = '<!-- what-changed:start -->', WC_END = '<!-- what-changed:end -->';
+export function stats(a) {
+  const n = a.length; if (!n) return { n: 0, mean: 0, sd: 0, t: 0, wr: 0 };
+  const m = a.reduce((s, x) => s + x, 0) / n, sd = n > 1 ? Math.sqrt(a.reduce((s, x) => s + (x - m) ** 2, 0) / (n - 1)) : 0;
+  return { n, mean: m, sd, t: sd > 0 ? m / (sd / Math.sqrt(n)) : 0, wr: a.filter((x) => x > 0).length / n };
+}
+export function welchT(a, b) {
+  const A = stats(a), B = stats(b), se = Math.sqrt((A.n > 1 ? A.sd ** 2 / A.n : 0) + (B.n > 1 ? B.sd ** 2 / B.n : 0));
+  return se > 0 ? (A.mean - B.mean) / se : 0;
+}
+export function edgeWords(st) {
+  const nt = `n ${st.n}, t ${st.t.toFixed(1)}`;
+  if (st.n < 30) return `too few trades to judge an edge (${nt})`;
+  if (st.t >= 2) return `positive and unlikely to be luck (${nt}), on paper`;
+  if (st.t <= -2) return `reliably losing (${nt})`;
+  return `no proven edge (${nt})`;
+}
+const pc = (x) => `${Math.round(100 * x)}%`;
+// Plain-language reasons: the win rate, then the bucket (session / D1 side / market) whose share × result moved the mean most
+export function changeReasons(rec, pri) {
+  const S = (a) => a.reduce((s, x) => s + x.R, 0), d = S(rec) / rec.length - S(pri) / pri.length;
+  const out = [`won ${pc(stats(rec.map((x) => x.R)).wr)} of the last ${rec.length} (was ${pc(stats(pri.map((x) => x.R)).wr)})`];
+  let best = null;
+  for (const f of [(x) => x.feat && x.feat.session && `${x.feat.session} session`, (x) => x.feat && x.feat.d1 && `${x.feat.d1}-D1 trades`, (x) => x.label || x.market]) {
+    const B = new Set([...rec, ...pri].map(f).filter(Boolean));
+    if (B.size < 2) continue;   // one value for every trade explains nothing
+    for (const b of B) {
+      const r = rec.filter((x) => f(x) === b), p = pri.filter((x) => f(x) === b), diff = S(r) / rec.length - S(p) / pri.length;
+      if (Math.sign(diff) !== Math.sign(d) || r.length + p.length < 3) continue;
+      if (!best || Math.abs(diff) > Math.abs(best.diff)) best = { b, diff, r, p };
+    }
+  }
+  const avg = (a) => `${sgn(S(a) / a.length)}R a trade`;
+  if (best) out.push(!best.r.length ? `biggest mover: no ${best.b} in the last ${rec.length} (was ${pc(best.p.length / pri.length)} of trades, at ${avg(best.p)})`
+    : `biggest mover: ${best.b}, ${best.r.length} of the last ${rec.length} (was ${pc(best.p.length / pri.length)} of trades) at ${avg(best.r)} (was ${best.p.length ? avg(best.p) : 'none'})`);
+  return out;
+}
+export function whatChangedSection({ trades = [], now = Math.floor(Date.now() / 1000), win = 20 }) {
+  const day = new Date(now * 1000).toISOString().slice(0, 10);
+  // after costs (Rnet, council/fills.mjs) where the Trader recorded them, else the raw R
+  const C = trades.filter((x) => x && !x.replay && ['win', 'loss', 'be'].includes(x.status) && Number.isFinite(x.R) && x.closed && x.closed <= now)
+    .map((x) => (Number.isFinite(x.Rnet) ? { ...x, R: x.Rnet, net: true } : x)).sort((a, b) => a.closed - b.closed);
+  const nNet = C.filter((x) => x.net).length;
+  const by = new Map(); for (const x of C) { if (!by.has(x.k)) by.set(x.k, []); by.get(x.k).push(x); }
+  const d24 = C.filter((x) => x.closed > now - 86400), l24 = d24.filter((x) => !x.shadow), sum = (a) => a.reduce((s, x) => s + x.R, 0);
+  const out = [WC_START, '## What changed', '',
+    `Daily, for ${day} (UTC). Each setup's last ${win} closed paper trades (live and shadow) against its whole record, in R ${nNet === C.length && C.length ? 'after costs' : nNet ? `after costs for ${nNet} of ${C.length} trades (raw R for the rest)` : 'before costs (raw R)'}. The change is tested last ${win} vs the trades before them (Welch t): |t| under 1 is noise, 1 to 2 a weak sign, 2 or more (with 20+ earlier trades) a fair one. Nothing here is an edge unless its n and t say so.`, '',
+    `**Last 24 h:** ${d24.length} trade${d24.length === 1 ? '' : 's'} closed (${l24.length} live), ${sgn(sum(d24))}R (live ${sgn(sum(l24))}R).`, '',
+    `| Setup | Trades (live) | All-time R a trade | Last ${win} | ${win} as of 24 h ago | Change | Confidence |`, '|---|---|---|---|---|---|---|'];
+  const notes = [], rows = [];
+  for (const [k, a] of by) {
+    const all = stats(a.map((x) => x.R)), name = a[a.length - 1].name || k, live = a.filter((x) => !x.shadow).length;
+    const rec = a.slice(-win), pri = a.slice(0, -win), rs = stats(rec.map((x) => x.R));
+    const old = a.filter((x) => x.closed <= now - 86400).slice(-win), os = old.length >= win ? stats(old.map((x) => x.R)) : null;
+    let change = 'too few to compare', conf = `small sample (n ${a.length})`;
+    if (pri.length >= 10) {
+      const tW = welchT(rec.map((x) => x.R), pri.map((x) => x.R));
+      const lvl = Math.abs(tW) >= 2 && pri.length >= 20 ? 'fair' : Math.abs(tW) >= 1 ? 'low' : 'none';
+      change = lvl === 'none' ? 'steady (within noise)' : tW > 0 ? '**improving**' : '**decaying**';
+      conf = lvl === 'none' ? `none (t ${tW.toFixed(1)})` : `${lvl} (t ${tW.toFixed(1)}, ${win} vs ${pri.length})`;
+      if (lvl !== 'none') notes.push({ w: Math.abs(tW), s: `- **${name}** (${k}) is ${tW > 0 ? 'improving' : 'decaying'}: ${sgn(rs.mean)}R a trade over the last ${win} vs ${sgn(stats(pri.map((x) => x.R)).mean)}R before; ${changeReasons(rec, pri).join('; ')}. Confidence ${lvl} (t ${tW.toFixed(1)}). Whole record: ${edgeWords(all)}.` });
+    }
+    rows.push({ n: a.length, s: `| ${name} (${k}) | ${a.length} (${live}) | ${sgn(all.mean)} (t ${all.t.toFixed(1)}) | ${rec.length >= win ? sgn(rs.mean) : `${sgn(rs.mean)} (only ${rec.length})`} | ${os ? sgn(os.mean) : '—'} | ${change} | ${conf} |` });
+  }
+  if (!rows.length) out.push('| — | 0 | — | — | — | no closed trades | — |');
+  rows.sort((x, y) => y.n - x.n).forEach((r) => out.push(r.s));
+  out.push('', notes.length ? '**Why:**' : `No setup moved beyond noise over its last ${win} trades.`);
+  notes.sort((x, y) => y.w - x.w).forEach((x) => out.push(x.s));
+  const edges = [...by].map(([k, a]) => [k, stats(a.map((x) => x.R))]).filter(([, st]) => st.n >= 30 && st.t >= 2);
+  out.push('', edges.length ? `**Edge check:** ${edges.map(([k, st]) => `${k} ${sgn(st.mean)}R a trade (n ${st.n}, t ${st.t.toFixed(1)})`).join('; ')}: positive with t ≥ 2 on paper (${nNet === C.length ? 'after modelled costs' : 'partly before costs'}); live fills can still differ.` : '**Edge check:** no setup has a positive record with n ≥ 30 and t ≥ 2, so none is claimed as an edge.', WC_END);
+  return out.join('\n');
+}
+
+// Both Analyst blocks into the report: "What changed" is rebuilt once a UTC day, the post-mortem block whenever it changes.
+export function analystSections(md, { trades = [], reviews = {}, owner = {}, now = Math.floor(Date.now() / 1000) }) {
+  if (typeof md !== 'string') return md;
+  const day = new Date(now * 1000).toISOString().slice(0, 10), i = md.indexOf(WC_START), j = md.indexOf(WC_END);
+  let nx = injectSection(md, postMortemSection({ reviews, owner, now }), PM_START, PM_END);
+  if (!(i >= 0 && j > i && md.slice(i, j).includes(`for ${day} (UTC)`))) nx = injectSection(nx, whatChangedSection({ trades, now }), WC_START, WC_END);
+  return nx;
+}
