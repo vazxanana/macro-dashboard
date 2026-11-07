@@ -8016,7 +8016,7 @@ function gpDays(h1) {
     if (!cur || cur.d !== d) { cur = { d, time: b.time, open: b.open, high: b.high, low: b.low, close: b.close, n: 0 }; out.push(cur); }
     cur.high = Math.max(cur.high, b.high); cur.low = Math.min(cur.low, b.low); cur.close = b.close; cur.n++; cur.end = b.time + 3600;
   }
-  return out.filter((x) => x.n >= 4);
+  return out.filter((x, i) => x.n >= 4 || i === out.length - 1);   // the forming day shows from its first hour
 }
 // weeks: Monday..Friday NY days
 function gpWeeks(D) {
@@ -8060,7 +8060,7 @@ function gpSignals(D, W, WS, loc = 0.7) {
 }
 // each signal its own trade: buy the next day's open, stop $0.30 under the signal low, target rr x R, SL first if both in one day,
 // out at the 10th day's close; cost $0.35/oz
-function gpTrades(D, sigs, rr = 3, cost = 0.35, maxHold = 10) {
+function gpTrades(D, sigs, rr = 3, cost = 0.35, maxHold = 10, nc = D.length) {   // nc: days that have closed (the 10-day exit needs a closed close)
   const out = [];
   for (const s of sigs) {
     const j = s.i + 1; if (j >= D.length) { out.push({ ...s, open: true, pending: true }); continue; }
@@ -8070,7 +8070,7 @@ function gpTrades(D, sigs, rr = 3, cost = 0.35, maxHold = 10) {
       if (D[k].low <= sl) { res = { x: Math.min(sl, D[k].open), k, how: 'stop' }; break; }
       if (D[k].high >= tp) { res = { x: Math.max(tp, k === j ? tp : tp), k, how: 'target' }; break; }
     }
-    if (!res) { const k = j + maxHold - 1; if (k < D.length) res = { x: D[k].close, k, how: '10 days' }; }
+    if (!res) { const k = j + maxHold - 1; if (k < nc) res = { x: D[k].close, k, how: '10 days' }; }
     const t = { ...s, e, sl, tp, risk: R, entryD: D[j].d };
     if (!res) { const last = D[D.length - 1]; t.open = true; t.R = (last.close - e) / R; }
     else { t.R = (res.x - e - cost) / R; t.exitD = D[res.k].d; t.how = res.how; }
@@ -8122,6 +8122,8 @@ function gpStats(T) {
       var fresh = gpDays(h1), days = keep.concat(fresh.filter(function (x) { return !keep.length || x.time >= from; }));
       ST.days = days; ST.at = Date.now(); ST.last = h1.length ? h1[h1.length - 1].close : days[days.length - 1].close;
       var closed = days.filter(function (x) { return x.end <= now && ny17(x.d) <= now; });
+      // weekend: spot gold is frozen at Friday's 17:00 New York close while PAXG keeps trading, so measure the shift against Friday's close
+      if (wkEnd() && closed.length) ST.last = closed[closed.length - 1].close;
       ls.set(CK, { at: Date.now(), d: closed.map(function (x) { return [x.d, x.time, x.open, x.high, x.low, x.close, x.n, x.end]; }) });
       return getJ('https://api.gold-api.com/price/XAU').then(function (j) { var off = +j.price - ST.last; if (isFinite(off) && Math.abs(off) < 150) { ST.off = off; ST.offOk = true; } }).catch(function () {});
     }).then(function () { ST.busy = false; render(); }).catch(function (e) {
@@ -8140,7 +8142,7 @@ function gpStats(T) {
     // a week is complete once its Friday has closed (or a later week has started)
     var lwDone = lw && new Date(lw.lastD + 'T12:00:00Z').getUTCDay() === 5;
     var Wc = lwDone ? Wall : Wall.slice(0, -1), WS = gpWeekly(Wc);
-    var sig = gpSignals(Dc, Wc, WS, loc), T = gpTrades(D, sig, rr);   // signals from closed days only; trades run through the forming day
+    var sig = gpSignals(Dc, Wc, WS, loc), T = gpTrades(D, sig, rr, 0.35, 10, Dc.length);   // signals from closed days only; trades run through the forming day
     var wNow = WS[WS.length - 1] || { state: 0 };
     // forming-day preview with the current weekly state
     var prev = Dc[Dc.length - 1], fx = null;
@@ -8177,7 +8179,8 @@ function gpStats(T) {
     var wTxt = w.state === 1 ? 'bullish' : w.state === -1 ? 'bearish' : 'not set yet';
     var need = Math.round((1 - A.loc) * 100);
     var cur = !pend && t.sig ? A.T.filter(function (x) { return x.d === t.d; })[0] : null;
-    if (cur) { v.className = 'pb-verdict go'; v.innerHTML = 'Signal live: bought at today\'s Daily open, ' + f2(cur.e + off) + ' (stop ' + f2(cur.sl + off) + ', 3R ' + f2(cur.e + 3 * cur.risk + off) + '). ' + dLbl(cur.d) + ' closed in the top ' + Math.round((1 - cur.cl) * 100 + 0.5) + '% of its range with the Weekly bullish.'; }
+    if (cur && !cur.open) { v.className = 'pb-verdict ' + (cur.R > 0 ? 'go' : 'no'); v.innerHTML = 'Today\'s trade is already done: bought at the Daily open, ' + f2(cur.e + off) + ', it hit its ' + esc(cur.how) + ' today (' + sR(cur.R) + '). The signal day was ' + dLbl(cur.d) + '; wait for the next strong Daily close.'; }
+    else if (cur) { v.className = 'pb-verdict go'; v.innerHTML = 'Signal live: bought at today\'s Daily open, ' + f2(cur.e + off) + ' (stop ' + f2(cur.sl + off) + ', ' + A.rr + 'R ' + f2(cur.e + A.rr * cur.risk + off) + '). ' + dLbl(cur.d) + ' closed in the top ' + Math.round((1 - cur.cl) * 100 + 0.5) + '% of its range with the Weekly bullish.'; }
     else if (pend) { v.className = 'pb-verdict go'; v.innerHTML = 'BUY at the next Daily open (18:00 New York). ' + dLbl(pend.d) + ' closed in the top ' + Math.round((1 - pend.cl) * 100 + 0.5) + '% of its range, above the day before\'s low, with the Weekly bullish.'; }
     else if (w.state !== 1) { v.className = 'pb-verdict no'; v.innerHTML = 'No trade: the Weekly structure is <b>' + wTxt + '</b>' + (w.brk ? ' since the week of ' + dLbl(w.brk.at) + ' (weekly close ' + (w.state > 0 ? 'above ' : 'below ') + f2(w.brk.lvl + off) + ')' : '') + '. The edge only buys, so it stays off until a weekly close' + (w.sh != null ? ' above <b>' + f2(w.sh + off) + '</b>' : ' above the last weekly swing high') + '.'; }
     else { v.className = 'pb-verdict wait'; v.innerHTML = 'No signal from ' + dLbl(t.d) + ': it closed at ' + Math.round(t.cl * 100) + '% of its range' + (t.aboveLow ? '' : ' and below the day before\'s low') + ' (needs the top ' + need + '% and a close above the prior low). Weekly is bullish, so the next strong Daily close is a buy.'; }
@@ -8204,14 +8207,14 @@ function gpStats(T) {
     } else fm.innerHTML = wkEnd() ? 'Market closed for the weekend; the next Daily candle opens Sunday 18:00 New York.' : 'The Daily candle has closed; the next one opens at 18:00 New York.';
     sizeLine();
     // context
-    var er = er20(A.Dc), nyNow = nyp(now), hm = nyNow.h, ses = hm >= 2 && hm < 5 ? ['London', 'ok'] : hm >= 8 && hm < 12 ? ['New York', 'ok'] : hm >= 12 && hm < 17 ? ['NY afternoon', 'warn'] : hm >= 18 ? ['Asia', 'warn'] : ['Between sessions', 'warn'];
+    var er = er20(A.Dc), nyNow = nyp(now), hm = nyNow.h, ses = wkEnd() ? ['Weekend', 'warn'] : hm >= 2 && hm < 5 ? ['London', 'ok'] : hm >= 8 && hm < 12 ? ['New York', 'ok'] : hm >= 12 && hm < 17 ? ['NY afternoon', 'warn'] : hm >= 18 ? ['Asia', 'warn'] : ['Between sessions', 'warn'];
     var wcell = '<div class="' + (w.state === 1 ? 'ok' : w.state === -1 ? 'bad' : '') + '"><span>Weekly structure</span><b>' + (w.state === 1 ? 'Bullish' : w.state === -1 ? 'Bearish' : '—') + '</b><small>' + (w.brk ? 'weekly close ' + (w.state > 0 ? 'above ' : 'below ') + f2(w.brk.lvl + off) + ' · week of ' + dLbl(w.brk.at) : 'last weekly swing break') + '</small></div>';
     var flip = w.state === 1 ? (w.sl != null ? 'a weekly close below ' + f2(w.sl + off) + ' turns it bearish' : 'no confirmed weekly swing low below yet') : (w.sh != null ? 'a weekly close above ' + f2(w.sh + off) + ' turns it bullish' : 'waiting for a weekly swing high');
     $('gp-ctx').innerHTML = wcell
       + '<div><span>What flips it</span><b>' + (w.state === 1 ? 'Weekly low' : 'Weekly high') + '</b><small>' + flip + '</small></div>'
       + '<div class="' + (er == null ? '' : er >= 0.2 ? 'ok' : 'warn') + '"><span>Daily regime</span><b>' + (er == null ? '—' : er >= 0.35 ? 'Strong trend' : er >= 0.2 ? 'Trending' : 'Ranging') + '</b><small>20-day efficiency ' + (er == null ? '—' : er.toFixed(2)) + ' · ranges hurt breakouts</small></div>'
       + '<div><span>Daily close</span><b>' + (A.forming ? 'in ' + dur(close17 - now) : wkEnd() ? 'weekend' : 'closed') + '</b><small>17:00 New York · signals only after it</small></div>'
-      + '<div class="' + ses[1] + '"><span>Session now</span><b>' + ses[0] + '</b><small>' + String(nyNow.h).padStart(2, '0') + ':00 New York · London / NY for discretionary entries</small></div>'
+      + '<div class="' + ses[1] + '"><span>Session now</span><b>' + ses[0] + '</b><small>' + (wkEnd() ? 'gold reopens Sunday 18:00 New York' : String(nyNow.h).padStart(2, '0') + ':00 New York · London / NY for discretionary entries') + '</small></div>'
       + '<div><span>Edge this year</span><b>' + sR(gpStats(A.T.filter(function (x) { return x.d.slice(0, 4) === t.d.slice(0, 4); })).R) + '</b><small>' + gpStats(A.T.filter(function (x) { return x.d.slice(0, 4) === t.d.slice(0, 4); })).n + ' closed signals in ' + t.d.slice(0, 4) + '</small></div>';
     renderBt(A); renderCal(A); renderList(A); renderCk(A, pend); renderEv();
   }
