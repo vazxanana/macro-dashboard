@@ -2485,7 +2485,7 @@ html[data-motion="off"][data-gate] .gate-bg path[stroke] { animation: none; stro
       <div class="adr" id="ms-adr" role="status" aria-label="Daily range" hidden></div>
       <div class="pa-chips" id="ms-pa-chips" hidden></div>
       <div class="mtf" id="ms-mtf" role="group" aria-label="Timeframe alignment: last structure break per timeframe" hidden></div>
-      <div class="mk-mode seg" role="group" aria-label="Chart markup"><button type="button" data-mk="meridian" class="on" aria-pressed="true" title="Meridian: the council's Mosha structure, setups and trades">Meridian</button><button type="button" data-mk="ict" aria-pressed="false" title="ICT: fair value gaps, session liquidity, premium / discount and the ICT desk's signals">ICT</button></div>
+      <button type="button" class="ind-open" id="ms-ind-open" title="Add up to 10 indicators (saved for your account on this device)">Indicators <small id="ms-ind-n">0/10</small></button><div class="mk-mode seg" role="group" aria-label="Chart markup"><button type="button" data-mk="meridian" class="on" aria-pressed="true" title="Meridian: the council's Mosha structure, setups and trades">Meridian</button><button type="button" data-mk="ict" aria-pressed="false" title="ICT: fair value gaps, session liquidity, premium / discount and the ICT desk's signals">ICT</button></div>
       <div class="seg" role="group" aria-label="Chart view">
         <button type="button" data-view="1d">D1</button><button type="button" data-view="4h">H4</button><button type="button" data-view="1h">H1</button><button type="button" data-view="15m">M15</button><button type="button" data-view="5m">M5</button><button type="button" data-view="1m">M1</button><button type="button" data-view="all">All</button><button type="button" data-view="split" title="Two charts side by side, with sync settings">Split</button>
       </div>
@@ -2895,6 +2895,8 @@ html[data-motion="off"][data-gate] .gate-bg path[stroke] { animation: none; stro
     <a href="#ict" data-go="ict" class="ictx"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 19h16M6 15l4-5 3 3 5-7"></path><path d="M15 6h3v3"></path></svg>ICT</a>
     <a href="#users" data-go="users" class="adm own"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="9" cy="8" r="3.5"></circle><path d="M2.5 20c.8-3.6 3.4-5.5 6.5-5.5s5.7 1.9 6.5 5.5"></path><path d="M17 8v6M14 11h6"></path></svg><span>Users</span></a>
   </nav>
+  <dialog class="ind-dlg" id="ms-ind" aria-labelledby="ms-ind-t"><div class="ind-h"><h3 id="ms-ind-t">Indicators</h3><span class="ms-note">Up to 10, on every chart. Saved for your account on this device.</span><button type="button" class="tv-x" id="ms-ind-x" aria-label="Close">×</button></div>
+    <ul class="ind-cur" id="ms-ind-cur"></ul><div class="ind-lib" id="ms-ind-lib"></div></dialog>
   <dialog class="tv" id="ms-tv" aria-labelledby="ms-tv-t"><div class="tv-h"><div><h3 id="ms-tv-t">Trade</h3><p id="ms-tv-s"></p></div><div class="tv-ba" role="group" aria-label="Prediction before, result after"><button type="button" data-ba="before">Before</button><button type="button" data-ba="after" class="on">After</button><button type="button" data-ba="save" title="Save the before and after charts as images">Save</button></div><button type="button" class="tv-x" id="ms-tv-x" aria-label="Close chart">×</button></div><div class="tv-tf" id="ms-tv-tf" role="group" aria-label="Chart timeframe"><button type="button" data-tvtf="auto" class="on" aria-pressed="true">Auto</button><button type="button" data-tvtf="1m" aria-pressed="false">M1</button><button type="button" data-tvtf="5m" aria-pressed="false">M5</button><button type="button" data-tvtf="15m" aria-pressed="false">M15</button><button type="button" data-tvtf="1h" aria-pressed="false">H1</button><button type="button" data-tvtf="4h" aria-pressed="false">H4</button><button type="button" data-tvtf="1d" aria-pressed="false">D1</button><span class="tv-tf-sp"></span><button type="button" data-tvmore="1" title="Load more candles before the trade">More history</button><span class="tv-tf-n" id="ms-tv-tfn"></span></div><div class="tv-c" id="ms-tv-c"><div class="tv-msg" id="ms-tv-m">Loading candles…</div></div><div class="tv-k" id="ms-tv-k"></div><div class="tv-tk" id="ms-tv-tk" hidden></div><div class="tv-rv adm" id="ms-tv-rv" hidden><div class="rv-strat" id="ms-rv-strat"></div><div class="rv-tools"><b>Draw</b><button type="button" data-tool="pen">Pen</button><button type="button" data-tool="line">Line</button><button type="button" data-tool="text">Text</button><button type="button" class="rv-c on" data-col="#f23645" style="background:#f23645" aria-label="Colour #f23645"></button><button type="button" class="rv-c" data-col="#089981" style="background:#089981" aria-label="Colour #089981"></button><button type="button" class="rv-c" data-col="#f5a623" style="background:#f5a623" aria-label="Colour #f5a623"></button><button type="button" class="rv-c" data-col="#2962ff" style="background:#2962ff" aria-label="Colour #2962ff"></button><button type="button" class="rv-c" data-col="#ffffff" style="background:#ffffff" aria-label="Colour #ffffff"></button><button type="button" data-act="undo">Undo</button><button type="button" data-act="clear">Clear</button></div><div class="rv-tags" id="ms-rv-tags" aria-label="Why it failed"></div><textarea id="ms-rv-text" rows="3" placeholder="Why did this setup fail? What did the chart show before the entry?"></textarea><textarea id="ms-rv-lesson" rows="2" placeholder="Rule idea for the council (optional), e.g. no scalp sells while H4 makes higher lows"></textarea><div class="rv-save"><button type="button" id="ms-rv-save">Save review</button><span id="ms-rv-msg"></span></div><div class="rv-council" id="ms-rv-council"></div></div></dialog>
   <button type="button" class="to-top" id="ms-to-top" aria-label="Back to top" hidden><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 19V5M5 12l7-7 7 7"/></svg></button>
   <div class="ms-toasts" id="ms-toasts" role="status" aria-live="polite"></div>
@@ -3597,6 +3599,23 @@ function msNextSetup(bars, A) {
       try { e.s.update({ time: b.time, value: b.close * k + e.prev * (1 - k) }); } catch (err) {} }); };
     // daily VWAP (7 Nov loop): resets at 00:00 UTC on intraday charts; volume-weighted (tick volume), equal-weight when a feed has none
     const vwapS = tf.sec < 86400 ? chart.addLineSeries({ color: 'rgba(0,188,212,.9)', lineWidth: 1.5, lineStyle: LW.LineStyle.Solid, priceLineVisible: false, lastValueVisible: true, crosshairMarkerVisible: false, title: 'VWAP' }) : null;
+    // indicators (7 Nov, owner: "each user allowed to put up to 10 TradingView indicators"): our own versions of the common
+    // TradingView studies, computed on the candles; overlays share the price scale, oscillators get stacked bands under the price
+    P._ind = [];
+    P.setInd = function () {
+      P._ind.forEach((s2) => { try { chart.removeSeries(s2); } catch (e) {} }); P._ind = [];
+      const L = (window.msInd && window.msInd.list()) || [], osc = L.filter((x) => IND_DEF[x.type] && IND_DEF[x.type].osc), m = osc.length, band = m ? Math.min(0.16, 0.45 / m) : 0;
+      try { chart.priceScale('right').applyOptions({ scaleMargins: { top: 0.13, bottom: m ? 0.05 + band * m : 0.08 } }); } catch (e) {}
+      if (!P.bars || P.bars.length < 30 || P.rp) return;
+      const B = P.bars, T = B.map((b) => b.time);
+      L.forEach((x) => { const D = IND_DEF[x.type]; if (!D) return; let out; try { out = D.calc(B, x); } catch (e) { return; }
+        const k = D.osc ? osc.indexOf(x) : -1, sid = D.osc ? `osc${k}` : 'right';
+        out.forEach((o) => { const opt = { priceScaleId: sid, color: o.color || x.color, lineWidth: o.w || 1.5, lineStyle: o.dash ? LW.LineStyle.Dashed : LW.LineStyle.Solid, priceLineVisible: false, lastValueVisible: !!o.last, crosshairMarkerVisible: false, title: o.title || '' };
+          const s2 = o.hist ? chart.addHistogramSeries({ priceScaleId: sid, priceLineVisible: false, lastValueVisible: false }) : o.dots ? chart.addLineSeries({ ...opt, lineVisible: false, pointMarkersVisible: true, pointMarkersRadius: 1.5 }) : chart.addLineSeries(opt);
+          const data = []; o.v.forEach((v, i) => { if (v == null || !isFinite(v)) return; data.push(o.hist ? { time: T[i], value: v, color: v >= 0 ? 'rgba(8,153,129,.55)' : 'rgba(242,54,69,.55)' } : o.cols ? { time: T[i], value: v, color: o.cols[i] } : { time: T[i], value: v }); });
+          try { s2.setData(data); } catch (e) {} P._ind.push(s2); });
+        if (D.osc) { const top = 1 - 0.02 - band * (m - k); try { chart.priceScale(sid).applyOptions({ scaleMargins: { top: top + band * 0.08, bottom: Math.max(0, 1 - top - band + band * 0.08) }, visible: false }); } catch (e) {} } });
+    };
     P.setVwap = function () { if (!vwapS) return; if (G.showVwap !== true || !P.raw || !P.raw.length) { vwapS.setData([]); return; }
       const off = G.offset, hasV = P.raw.some((b) => b.volume > 0), out = []; let day = null, pv = 0, vv = 0;
       P.raw.forEach((b) => { const d = Math.floor(b.time / 86400); let gap = false; if (d !== day) { gap = day !== null; day = d; pv = 0; vv = 0; } const w = hasV ? (b.volume || 0) : 1; pv += (b.high + b.low + b.close) / 3 * w; vv += w;
@@ -3759,7 +3778,7 @@ function msNextSetup(bars, A) {
       if (P.rp) return;   // replaying: keep the hidden future hidden (analysis resumes on exit)
       series.setData(P.view(P.bars));
       P.setLog();
-      P.setVol(); P.setEma(); P.setShade(); P.setVwap(); if (P.drawTl) P.drawTl();
+      P.setVol(); P.setEma(); P.setShade(); P.setVwap(); if (P.drawTl) P.drawTl(); if (P.setInd) P.setInd();
       P.analyze();
       if (!keepView || !P.fitted) P.fit();
       P.legend();
@@ -3924,7 +3943,7 @@ function msNextSetup(bars, A) {
       if (!P.rp) series.update(P.viewBar(b));
       if (!lgHover && !P.rp) P.legend();
       const now = Date.now();
-      if (k.closed || !P._t || now - P._t > 2000) { P._t = now; P.analyze(); if (G.showVwap === true && !P.rp) P.setVwap(); }
+      if (k.closed || !P._t || now - P._t > 2000) { P._t = now; P.analyze(); if (G.showVwap === true && !P.rp) P.setVwap(); if (P._ind.length && !P.rp) P.setInd(); }
     };
     new ResizeObserver(() => { if (!P.fitted && el.clientWidth > 0 && P.bars) requestAnimationFrame(P.fit); }).observe(el);
     return P;
@@ -4749,6 +4768,67 @@ function msNextSetup(bars, A) {
   }
 
 
+  // ─── indicator library (TradingView-style studies, computed here) ───
+  const iSMA = (a, n) => { const o = Array(a.length).fill(null); let s = 0; for (let i = 0; i < a.length; i++) { s += a[i]; if (i >= n) s -= a[i - n]; if (i >= n - 1) o[i] = s / n; } return o; };
+  const iEMA = (a, n) => { const o = Array(a.length).fill(null), k = 2 / (n + 1); let v = null; for (let i = 0; i < a.length; i++) { v = v == null ? a[i] : a[i] * k + v * (1 - k); if (i >= n - 1) o[i] = v; } return o; };
+  const iWMA = (a, n) => { const o = Array(a.length).fill(null), d = n * (n + 1) / 2; for (let i = n - 1; i < a.length; i++) { let s = 0; for (let j = 0; j < n; j++) s += a[i - j] * (n - j); o[i] = s / d; } return o; };
+  const iRMA = (a, n) => { const o = Array(a.length).fill(null); let v = null; for (let i = 0; i < a.length; i++) { if (i < n - 1) continue; if (v == null) { let s = 0; for (let j = i - n + 1; j <= i; j++) s += a[j]; v = s / n; } else v = (v * (n - 1) + a[i]) / n; o[i] = v; } return o; };
+  const iSTD = (a, n) => { const m = iSMA(a, n); return a.map((_, i) => { if (m[i] == null) return null; let s = 0; for (let j = i - n + 1; j <= i; j++) s += (a[j] - m[i]) ** 2; return Math.sqrt(s / n); }); };
+  const iTR = (B) => B.map((b, i) => i ? Math.max(b.high - b.low, Math.abs(b.high - B[i - 1].close), Math.abs(b.low - B[i - 1].close)) : b.high - b.low);
+  const iHH = (B, n) => B.map((_, i) => i < n - 1 ? null : Math.max(...B.slice(i - n + 1, i + 1).map((b) => b.high)));
+  const iLL = (B, n) => B.map((_, i) => i < n - 1 ? null : Math.min(...B.slice(i - n + 1, i + 1).map((b) => b.low)));
+  const C_ = (B) => B.map((b) => b.close);
+  const IND_DEF = {
+    sma: { name: 'Moving Average (SMA)', p: { len: 50 }, calc: (B, x) => [{ v: iSMA(C_(B), x.len), title: `SMA ${x.len}`, last: true }] },
+    ema: { name: 'Moving Average Exponential (EMA)', p: { len: 21 }, calc: (B, x) => [{ v: iEMA(C_(B), x.len), title: `EMA ${x.len}`, last: true }] },
+    wma: { name: 'Moving Average Weighted (WMA)', p: { len: 20 }, calc: (B, x) => [{ v: iWMA(C_(B), x.len), title: `WMA ${x.len}` }] },
+    bb: { name: 'Bollinger Bands', p: { len: 20, mult: 2 }, calc: (B, x) => { const c = C_(B), m = iSMA(c, x.len), sd = iSTD(c, x.len); return [{ v: m, w: 1 }, { v: m.map((v, i) => v == null ? null : v + x.mult * sd[i]), w: 1 }, { v: m.map((v, i) => v == null ? null : v - x.mult * sd[i]), w: 1 }]; } },
+    donchian: { name: 'Donchian Channels', p: { len: 20 }, calc: (B, x) => { const h = iHH(B, x.len), l = iLL(B, x.len); return [{ v: h, w: 1 }, { v: l, w: 1 }, { v: h.map((v, i) => v == null ? null : (v + l[i]) / 2), w: 1, dash: true }]; } },
+    keltner: { name: 'Keltner Channels', p: { len: 20, mult: 2 }, calc: (B, x) => { const m = iEMA(C_(B), x.len), a = iRMA(iTR(B), 10); return [{ v: m, w: 1 }, { v: m.map((v, i) => v == null || a[i] == null ? null : v + x.mult * a[i]), w: 1 }, { v: m.map((v, i) => v == null || a[i] == null ? null : v - x.mult * a[i]), w: 1 }]; } },
+    st: { name: 'Supertrend', p: { len: 10, mult: 3 }, calc: (B, x) => { const a = iRMA(iTR(B), x.len), v = Array(B.length).fill(null), col = Array(B.length).fill(null); let up = null, dn = null, dir = 1;
+      for (let i = 0; i < B.length; i++) { if (a[i] == null) continue; const hl = (B[i].high + B[i].low) / 2, u = hl - x.mult * a[i], d = hl + x.mult * a[i], pc = i ? B[i - 1].close : B[i].close;
+        up = up != null && pc > up ? Math.max(u, up) : u; dn = dn != null && pc < dn ? Math.min(d, dn) : d;
+        if (dir === 1 && B[i].close < up) dir = -1; else if (dir === -1 && B[i].close > dn) dir = 1;
+        v[i] = dir === 1 ? up : dn; col[i] = dir === 1 ? '#089981' : '#f23645'; }
+      return [{ v, cols: col, w: 2, title: 'Supertrend' }]; } },
+    psar: { name: 'Parabolic SAR', p: { step: 0.02, max: 0.2 }, calc: (B, x) => { const v = Array(B.length).fill(null); if (B.length < 3) return [{ v, dots: true }]; let up = B[1].close >= B[0].close, sar = up ? B[0].low : B[0].high, ep = up ? B[1].high : B[1].low, af = x.step;
+      for (let i = 2; i < B.length; i++) { sar = sar + af * (ep - sar);
+        if (up) { sar = Math.min(sar, B[i - 1].low, B[i - 2].low); if (B[i].low < sar) { up = false; sar = ep; ep = B[i].low; af = x.step; } else if (B[i].high > ep) { ep = B[i].high; af = Math.min(x.max, af + x.step); } }
+        else { sar = Math.max(sar, B[i - 1].high, B[i - 2].high); if (B[i].high > sar) { up = true; sar = ep; ep = B[i].high; af = x.step; } else if (B[i].low < ep) { ep = B[i].low; af = Math.min(x.max, af + x.step); } }
+        v[i] = sar; } return [{ v, dots: true, title: 'SAR' }]; } },
+    rsi: { name: 'Relative Strength Index (RSI)', osc: true, p: { len: 14 }, calc: (B, x) => { const c = C_(B), g = c.map((v, i) => i ? Math.max(0, v - c[i - 1]) : 0), l = c.map((v, i) => i ? Math.max(0, c[i - 1] - v) : 0), ag = iRMA(g, x.len), al = iRMA(l, x.len);
+      const r = ag.map((v, i) => v == null ? null : al[i] === 0 ? 100 : 100 - 100 / (1 + v / al[i])); return [{ v: r, title: `RSI ${x.len}`, last: true }, { v: r.map((v) => v == null ? null : 70), color: 'rgba(138,148,168,.5)', w: 1, dash: true }, { v: r.map((v) => v == null ? null : 30), color: 'rgba(138,148,168,.5)', w: 1, dash: true }]; } },
+    macd: { name: 'MACD', osc: true, p: { fast: 12, slow: 26, sig: 9 }, calc: (B, x) => { const c = C_(B), f = iEMA(c, x.fast), s = iEMA(c, x.slow), m = f.map((v, i) => v == null || s[i] == null ? null : v - s[i]);
+      const st = m.findIndex((v) => v != null), sg = Array(m.length).fill(null); if (st >= 0) iEMA(m.slice(st), x.sig).forEach((v, i) => { sg[st + i] = v; });
+      return [{ v: m.map((v, i) => v == null || sg[i] == null ? null : v - sg[i]), hist: true }, { v: m, title: 'MACD', last: true }, { v: sg, color: '#ff9800', w: 1 }]; } },
+    stoch: { name: 'Stochastic', osc: true, p: { len: 14, smooth: 3 }, calc: (B, x) => { const h = iHH(B, x.len), l = iLL(B, x.len), k0 = B.map((b, i) => h[i] == null || h[i] === l[i] ? null : (b.close - l[i]) / (h[i] - l[i]) * 100);
+      const st = k0.findIndex((v) => v != null), K = Array(k0.length).fill(null), Dd = Array(k0.length).fill(null); if (st >= 0) { const ks = iSMA(k0.slice(st).map((v) => v ?? 50), x.smooth); ks.forEach((v, i) => { K[st + i] = v; }); const ds = iSMA(ks.map((v) => v ?? 50), 3); ds.forEach((v, i) => { if (ks[i] != null) Dd[st + i] = v; }); }
+      return [{ v: K, title: 'Stoch %K', last: true }, { v: Dd, color: '#ff9800', w: 1 }, { v: K.map((v) => v == null ? null : 80), color: 'rgba(138,148,168,.5)', w: 1, dash: true }, { v: K.map((v) => v == null ? null : 20), color: 'rgba(138,148,168,.5)', w: 1, dash: true }]; } },
+    atr: { name: 'Average True Range (ATR)', osc: true, p: { len: 14 }, calc: (B, x) => [{ v: iRMA(iTR(B), x.len), title: `ATR ${x.len}`, last: true }] },
+    cci: { name: 'Commodity Channel Index (CCI)', osc: true, p: { len: 20 }, calc: (B, x) => { const tp = B.map((b) => (b.high + b.low + b.close) / 3), m = iSMA(tp, x.len);
+      const v = tp.map((t, i) => { if (m[i] == null) return null; let d = 0; for (let j = i - x.len + 1; j <= i; j++) d += Math.abs(tp[j] - m[i]); d /= x.len; return d ? (t - m[i]) / (0.015 * d) : 0; });
+      return [{ v, title: `CCI ${x.len}`, last: true }, { v: v.map((q) => q == null ? null : 100), color: 'rgba(138,148,168,.5)', w: 1, dash: true }, { v: v.map((q) => q == null ? null : -100), color: 'rgba(138,148,168,.5)', w: 1, dash: true }]; } },
+  };
+  const IND_COLORS = ['#2962ff', '#ff9800', '#9c27b0', '#00bcd4', '#e91e63', '#4caf50', '#795548', '#607d8b', '#f44336', '#3f51b5'];
+  window.msInd = { key: () => 'ms-ind-' + (window.MS_WHO || 'guest'), max: 10,
+    list() { try { const L = JSON.parse(localStorage.getItem(this.key()) || '[]'); return Array.isArray(L) ? L.filter((x) => IND_DEF[x.type]).slice(0, 10) : []; } catch (e) { return []; } },
+    save(L) { try { localStorage.setItem(this.key(), JSON.stringify(L.slice(0, 10))); } catch (e) {} Object.values(panes).forEach((P) => P.setInd && P.setInd()); indRender(); } };
+  function indRender() {
+    const L = window.msInd.list(), cnt = document.getElementById('ms-ind-n'); if (cnt) cnt.textContent = `${L.length}/10`;
+    const lib = document.getElementById('ms-ind-lib'), cur = document.getElementById('ms-ind-cur'); if (!lib || !cur) return;
+    lib.innerHTML = Object.entries(IND_DEF).map(([k, d]) => `<button type="button" data-ind-add="${k}"${L.length >= 10 ? ' disabled' : ''}><b>${esc(d.name)}</b><small>${d.osc ? 'separate band' : 'on price'}</small></button>`).join('');
+    cur.innerHTML = L.length ? L.map((x, i) => { const d = IND_DEF[x.type]; return `<li><input type="color" value="${esc(x.color)}" data-ind-col="${i}" aria-label="Colour of ${esc(d.name)}"><span class="ind-nm">${esc(d.name)}</span>${Object.keys(d.p).map((pk) => `<label>${pk}<input type="number" step="${pk === 'step' || pk === 'max' ? '0.01' : pk === 'mult' ? '0.1' : '1'}" min="${pk === 'step' || pk === 'max' ? '0.01' : '1'}" value="${x[pk]}" data-ind-p="${i}" data-k="${pk}"></label>`).join('')}<button type="button" data-ind-rm="${i}" aria-label="Remove ${esc(d.name)}">×</button></li>`; }).join('') : '<li class="empty">No indicators yet. Pick up to 10 from the list.</li>';
+  }
+  document.addEventListener('click', (ev) => { const t = ev.target.closest && ev.target.closest('[data-ind-add],[data-ind-rm],#ms-ind-open,#ms-ind-x'); if (!t) return;
+    if (t.id === 'ms-ind-open') { const d = document.getElementById('ms-ind'); indRender(); if (d && d.showModal) d.showModal(); return; }
+    if (t.id === 'ms-ind-x') { document.getElementById('ms-ind').close(); return; }
+    const L = window.msInd.list();
+    if (t.dataset.indAdd) { if (L.length >= 10) return; const d = IND_DEF[t.dataset.indAdd]; L.push({ type: t.dataset.indAdd, color: IND_COLORS[L.length % IND_COLORS.length], ...d.p }); window.msInd.save(L); window.msTrack && msTrack('Indicator add', { type: t.dataset.indAdd }); }
+    else if (t.dataset.indRm) { L.splice(+t.dataset.indRm, 1); window.msInd.save(L); } });
+  document.addEventListener('change', (ev) => { const t = ev.target; if (!t || !t.dataset) return; const L = window.msInd.list();
+    if (t.dataset.indCol != null) { L[+t.dataset.indCol].color = t.value; window.msInd.save(L); }
+    else if (t.dataset.indP != null) { const v = +t.value; if (isFinite(v) && v > 0) { L[+t.dataset.indP][t.dataset.k] = t.dataset.k === 'step' || t.dataset.k === 'max' || t.dataset.k === 'mult' ? v : Math.min(500, Math.round(v)); window.msInd.save(L); } } });
+  setTimeout(indRender, 0);
   // Meridian / ICT markup switch (7 Nov, owner): one or the other on every chart, never mixed
   async function ictStrip() { const el = document.getElementById('ms-ict-strip'); if (!el) return; if (G.mode !== 'ict') { el.hidden = true; return; }
     let T = []; try { T = await (await fetch(window.MS_CDATA + 'ict/trades.json?t=' + Math.floor(Date.now() / 60000), { cache: 'no-store' })).json(); } catch (e) {}
@@ -8134,6 +8214,17 @@ html[data-mk="ict"] .mk-mode button[data-mk="ict"].on { background: color-mix(in
 .ms-live.app:has(> #v-charts:not([hidden])) { max-width: none; }
 .ms-grid4[data-view]:not([data-view="all"]) .ms-chart { height: max(420px, calc(100vh - 330px)); }
 @media (max-width: 900px) { .ms-grid4[data-view]:not([data-view="all"]) .ms-chart { height: min(62vh, 560px); min-height: 320px; } }
+.ind-open { margin-left: auto; min-height: 36px; padding: 4px 12px; border-radius: 10px; border: 1px solid var(--line); background: var(--panel); color: var(--ink); font: inherit; font-weight: 700; cursor: pointer; } .ind-open small { color: var(--ink-dim); font-weight: 500; margin-left: 4px; } .ind-open:hover { border-color: var(--accent); }
+.ind-open + .mk-mode { margin-left: 0; }
+.ind-dlg { width: min(720px, calc(100vw - 24px)); max-height: min(86vh, 760px); padding: 0; border-radius: 14px; border: 1px solid var(--line); background: var(--panel); color: var(--ink); }
+.ind-dlg::backdrop { background: rgba(0,0,0,.45); } .ind-h { display: flex; align-items: center; gap: 10px; padding: 14px 16px; border-bottom: 1px solid var(--line); position: sticky; top: 0; background: var(--panel); } .ind-h h3 { margin: 0; font-size: 16px; } .ind-h .tv-x { margin-left: auto; }
+.ind-cur { list-style: none; margin: 0; padding: 10px 16px; display: grid; gap: 6px; } .ind-cur li { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; padding: 6px 8px; border: 1px solid var(--line); border-radius: 10px; font-size: 13px; }
+.ind-cur li.empty { color: var(--ink-dim); border-style: dashed; } .ind-cur .ind-nm { font-weight: 700; margin-right: auto; }
+.ind-cur label { display: inline-flex; align-items: center; gap: 4px; color: var(--ink-dim); font-size: 12px; } .ind-cur input[type=number] { width: 62px; font: inherit; color: var(--ink); background: var(--bg, transparent); border: 1px solid var(--line); border-radius: 6px; padding: 3px 5px; }
+.ind-cur input[type=color] { width: 26px; height: 26px; padding: 0; border: none; background: none; cursor: pointer; } .ind-cur button { min-width: 30px; min-height: 30px; border-radius: 8px; border: 1px solid var(--line); background: var(--panel); color: var(--ink); cursor: pointer; }
+.ind-lib { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 6px; padding: 4px 16px 16px; }
+.ind-lib button { text-align: left; display: grid; gap: 2px; padding: 9px 10px; border-radius: 10px; border: 1px solid var(--line); background: var(--panel); color: var(--ink); font: inherit; cursor: pointer; } .ind-lib button:hover:not(:disabled) { border-color: var(--accent); } .ind-lib button:disabled { opacity: .45; cursor: not-allowed; }
+.ind-lib small { color: var(--ink-dim); font-size: 11.5px; } .ind-lib button:focus-visible, .ind-open:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 .sp-bar { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 10px; margin: 0 0 10px; font-size: 12.5px; color: var(--ink-dim); }
 .sp-bar[hidden] { display: none; } .sp-bar label { display: inline-flex; align-items: center; gap: 6px; }
 .sp-bar select { font: inherit; color: var(--ink); background: var(--panel); border: 1px solid var(--line); border-radius: 8px; min-height: 32px; padding: 2px 8px; }
