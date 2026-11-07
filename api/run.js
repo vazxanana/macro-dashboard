@@ -5,8 +5,10 @@
 //   3. commits just the changed files back to council-data through the GitHub API (retrying if the branch moved).
 // RUN_MODE=live commits and lets the alerts out for both jobs; RUN_MODE=ict (or council) does it for that job only; anything else is a dry run (no commit, no Telegram/ntfy), used to
 // compare with the GitHub loop before switching it off. ?mode=dry forces a dry run.
+// Edge Config (api/_flags.js) can pause a job or set the run mode without a redeploy; its runMode wins over RUN_MODE.
 // Environment: CRON_SECRET, GH_TOKEN (fine-grained, this repo: Contents read/write), RUN_MODE, and the trader's own
 // NTFY_TOPIC, TELEGRAM_BOT_TOKEN, TELEGRAM_CHAT_ID, FUT_ACCOUNT, FUT_RISK.
+const flags = require('./_flags');
 const fs = require('node:fs'), path = require('node:path'), os = require('node:os'), crypto = require('node:crypto');
 const { execFileSync } = require('node:child_process');
 const REPO = 'vazxanana/macro-dashboard', BR = 'council-data';
@@ -21,7 +23,9 @@ const walk = (d, b = d) => fs.readdirSync(d, { withFileTypes: true }).flatMap((e
 module.exports = async (req, res) => {
   if (!process.env.CRON_SECRET || req.headers.authorization !== `Bearer ${process.env.CRON_SECRET}`) return res.status(401).json({ error: 'unauthorised' });
   const job = String((req.query && req.query.job) || ''), J = JOBS[job]; if (!J) return res.status(400).json({ error: 'unknown job' });
-  const RM = String(process.env.RUN_MODE || '').split(',').map((x) => x.trim()), live = (RM.includes('live') || RM.includes(job)) && req.query.mode !== 'dry', tok = process.env.GH_TOKEN || process.env.GH_DISPATCH_TOKEN, t0 = Date.now();
+  const F = await flags(), paused = [].concat(F.paused || []);
+  if (paused.includes(job) || paused.includes('all')) { console.log(JSON.stringify({ job, paused: true })); return res.status(200).json({ job, paused: true }); }
+  const RM = String(F.runMode || process.env.RUN_MODE || '').split(',').map((x) => x.trim()), live = (RM.includes('live') || RM.includes(job)) && req.query.mode !== 'dry', tok = process.env.GH_TOKEN || process.env.GH_DISPATCH_TOKEN, t0 = Date.now();
   const gh = async (u, o = {}) => { const r = await fetch(`https://api.github.com/repos/${REPO}${u}`, { ...o, headers: { ...(tok ? { Authorization: `Bearer ${tok}` } : {}), Accept: 'application/vnd.github+json', 'X-GitHub-Api-Version': '2022-11-28', 'User-Agent': 'aurum-desk-runner', ...(o.body ? { 'Content-Type': 'application/json' } : {}), ...(o.headers || {}) } });
     if (!r.ok && !(o.ok || []).includes(r.status)) throw new Error(`GitHub ${r.status} ${u}: ${(await r.text()).slice(0, 200)}`); return r; };
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), `${job}-`)), before = {};
