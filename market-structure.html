@@ -5989,6 +5989,13 @@ function msNextSetup(bars, A) {
       const guard = done.length < 20 ? `${done.length}/20 trades before the guard can act` : e <= -0.3 ? 'guard threshold reached' : `${(e + 0.3).toFixed(2)}R a trade above the stop line`;
       return `<div class="sl-row"><div class="sl-h">${st}<b>${esc(k)}</b><small>${esc(rule)}${since ? ` · since ${new Date(since * 1000).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })}` : ''}</small></div>
         <div class="sl-k"><span><b>${done.length}</b> closed</span><span><b>${open.length}</b> open</span><span class="${e == null ? '' : e > 0 ? 'pos' : 'neg'}"><b>${e == null ? '—' : (e >= 0 ? '+' : '−') + Math.abs(e).toFixed(2) + 'R'}</b> a trade</span><span class="${sum > 0 ? 'pos' : sum < 0 ? 'neg' : ''}"><b>${(sum >= 0 ? '+' : '−') + Math.abs(sum).toFixed(1)}R</b> total</span></div>
+        ${(() => { const B = C.backtest, cols = B && B.tradeCols; if (!cols || !Array.isArray(B.trades)) return '';
+          // Replay rows that pass the same live rule (setup, D1 filter, skipped sessions/markets): what the 30-day replay expects per trade.
+          const ix = (c) => cols.indexOf(c), iS = ix('setup'), iD = ix('d1'), iSe = ix('session'), iM = ix('market'), iR = ix('R_none'); if (iS < 0 || iR < 0) return '';
+          const rp = B.trades.filter((r) => r[iS] === k && (!f.d1 || r[iD] === f.d1) && !(f.noSession || []).includes(r[iSe]) && !(f.noMarket || []).includes(r[iM]) && isFinite(r[iR]));
+          if (rp.length < 10) return ''; const re = rp.reduce((a, r) => a + r[iR], 0) / rp.length, fx = (v) => (v >= 0 ? '+' : '−') + Math.abs(v).toFixed(2) + 'R';
+          const gap = e == null ? null : e - re, note = e == null || done.length < 5 ? 'too few live trades to compare yet' : Math.abs(gap) < 0.25 ? 'live is tracking the replay' : gap < 0 ? 'live is running below the replay: watch fills, costs and the D1 label' : 'live is running above the replay';
+          return `<small class="sl-n" title="Replay ${esc(B.from ? B.from.slice(0, 10) : '')} – ${esc(B.to ? B.to.slice(0, 10) : '')}, no break-even, rows filtered by this setup's live rule">Replay expects <b class="${re >= 0 ? 'pos' : 'neg'}">${fx(re)}</b> a trade over ${rp.length} trades${gap == null ? '' : ` · live ${fx(e)} (gap ${fx(gap)})`} · ${note}</small>`; })()}
         <div class="sl-g"><i style="width:${Math.min(100, done.length / 20 * 100).toFixed(0)}%"></i></div><small class="sl-n">Guard: back to shadow at −0.30R a trade over 20+ live trades · ${guard}</small></div>`; }).join('');
     el.hidden = false; el.innerHTML = `<div class="ms-k"><span>Live setups · paper</span><span class="ms-note">engine setups trading live on every market</span></div>${rows}`; }
   function renderCouncil() {
