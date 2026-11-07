@@ -2896,6 +2896,12 @@ html[data-motion="off"] #v-ict .ict-cal-d:hover { transform: none !important; }
         <div class="dc-wrap" tabindex="0" role="region" aria-label="Edge decay monitor, scrolls sideways"><table class="dc-t"><thead><tr><th class="dc-l">System</th><th class="dc-l">Status</th><th>Last trades</th><th>CUSUM vs backtest</th><th>vs zero</th><th>Drawdown</th><th>Record</th><th class="dc-l">Why</th></tr></thead><tbody id="ms-decay-b"></tbody></table></div>
         <p class="ms-note dc-foot">Each live system's record after costs (the council replay up to its first forward trade, then the forward paper record) against its own backtest. <b>CUSUM</b> rises while a system runs below about half its backtest edge; its limit is what one year of normal luck stays under 19 times in 20. <b>Decaying</b>: past the limit, or a drawdown beyond the worst the system has had (gold replica: the owner's 40R allowance). <b>Watch</b>: 3/4 of either. Status only: the monitor never changes a rule; you decide. Method: research/edge/decay-monitor.</p>
       </div>
+      <div class="card c-expect adm" id="ms-expect">
+        <div class="ms-k"><span>What to expect · from the untouched data</span><span class="ms-note" id="ms-expect-at"></span></div>
+        <p class="ex-sum" id="ms-expect-sum">Waiting for the Coach…</p>
+        <div class="ex-wrap"><table class="ex-t" aria-describedby="ms-expect-foot"><thead><tr><th class="ex-l">System</th><th class="ex-l">Forward so far</th><th>Per trade</th><th>In a year</th><th>Drawdown</th><th>Trades a year</th><th class="ex-l">Verdict in</th></tr></thead><tbody id="ms-expect-b"></tbody></table></div>
+        <p class="ms-note ex-foot" id="ms-expect-foot">Not the backtest: what each rule did, unchanged and after costs, on data it never saw (gold systems 2006-17, NQ open run 2004-22, gold replica 2017-22, ICT A-setups 2008-17, Mosha BO an independent 2018-26 rebuild, crypto trend since June 2025). <b>Per trade</b>: that R a trade with the 5–95% band of the estimate. <b>In a year</b>: what one year of trades at that edge can show, 5–95%. <b>Drawdown</b>: from what luck alone gives when the backtest regime holds (95th percentile of reshuffled orders) to the worst the untouched years produced. <b>Verdict in</b>: trades until a forward record could reach t ≥ 2 if the edge is real, capped at 2 years. <b>Forward so far</b>: the live record against the band for its own trade count (from 10 trades); the daily digest names a system only when it leaves it. Expectations only: nothing here changes a rule; you decide. Method: council/expect.mjs, research/edge/expectations.</p>
+      </div>
       <div class="card c-book adm" id="ms-book">
         <div class="ms-k"><span>Book weights · live vs proposed</span><span class="bk-tag">Paper comparison · no live change</span></div>
         <p class="bk-sum" id="ms-book-sum">Waiting for the Coach…</p>
@@ -11294,6 +11300,96 @@ html[data-role="public"] #ms-me-ct { display: none; }
     }).join('');
   }
   W.MS_DECAY_RENDER = render;
+  document.addEventListener('ms:council', render);
+  setTimeout(render, 0);
+})(window);
+</script>
+<style id="ms-ex-css">
+/* What to expect (#ms-expect, 8 Nov): coach.json expect (council/expect.mjs). Research pane, next to the edge-decay card; admin only;
+   self-contained. Phone first: under 760 px each system is a block (name, forward, four labelled cells, the plain-English line). */
+.c-pane > .c-expect { grid-column: 1 / -1; min-width: 0; }
+.c-expect .ex-sum { margin: 0 0 10px; font-size: 13.5px; line-height: 1.5; color: var(--ink-dim); } .c-expect .ex-sum b { color: var(--ink); }
+.c-expect .ex-wrap { width: 0; min-width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; }
+.ex-t { width: 100%; border-collapse: collapse; font-size: 13px; font-variant-numeric: tabular-nums; }
+.ex-t th, .ex-t td { padding: 8px 8px; text-align: right; vertical-align: top; }
+.ex-t thead th { font-size: 11.5px; font-weight: 600; color: var(--ink-dim); white-space: nowrap; border-bottom: 1px solid var(--line); }
+.ex-t .ex-l { text-align: left; }
+.ex-t tr.ex-row td { padding-bottom: 2px; }
+.ex-t td.ex-name { min-width: 150px; } .ex-t td.ex-name b { display: block; color: var(--ink); font-weight: 600; } .ex-t td.ex-name small { color: var(--ink-faint); font-size: 11px; }
+.ex-t td.ex-val b { display: block; color: var(--ink); font-weight: 600; white-space: nowrap; } .ex-t td.ex-val small { display: block; color: var(--ink-faint); font-size: 11px; white-space: nowrap; }
+.ex-t td.ex-ver { text-align: left; font-size: 12px; line-height: 1.4; color: var(--ink-dim); min-width: 170px; max-width: 290px; }
+.ex-t tr.ex-note td { padding: 0 9px 12px; border-bottom: 1px solid var(--line); text-align: left; white-space: normal; font-size: 12px; line-height: 1.45; color: var(--ink-dim); }
+.ex-t tr.ex-note td i { font-style: normal; color: var(--ink-faint); }
+.ex-t tbody tr.ex-note:last-child td { border-bottom: 0; }
+.ex-t .pos { color: var(--buy); } .ex-t .neg { color: var(--sell); }
+.ex-st { display: inline-block; margin-top: 3px; padding: 1px 7px; border-radius: 6px; font-size: 11px; font-weight: 600; border: 1px solid var(--line); line-height: 1.5; white-space: nowrap; }
+.ex-st.st-in { color: var(--buy); border-color: color-mix(in srgb, var(--buy) 40%, transparent); }
+.ex-st.st-above { color: var(--accent); border-color: color-mix(in srgb, var(--accent) 45%, transparent); }
+.ex-st.st-below { color: var(--sell); border-color: color-mix(in srgb, var(--sell) 45%, transparent); background: color-mix(in srgb, var(--sell) 10%, transparent); }
+.ex-st.st-few { color: var(--ink-faint); border-style: dashed; }
+.ex-t tr.ex-shadow td.ex-name b, .ex-t tr.ex-shadow td.ex-val b { color: var(--ink-dim); }
+.c-expect .ex-foot { margin: 10px 0 0; font-size: 12px; line-height: 1.5; } .c-expect .ex-foot b { color: var(--ink); font-weight: 600; }
+@media (max-width: 760px) {
+  .ex-t thead { display: none; }
+  .ex-t, .ex-t tbody { display: block; }
+  .ex-t tr.ex-row { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px 12px; padding: 12px 0 6px; }
+  .ex-t tr.ex-row td { display: block; padding: 0; text-align: left; white-space: normal; min-width: 0; }
+  .ex-t tr.ex-row td.ex-name { grid-column: 1 / -1; }
+  .ex-t tr.ex-row td.ex-ver { grid-column: 1 / -1; max-width: none; }
+  .ex-t tr.ex-row td[data-l]::before { content: attr(data-l); display: block; font-size: 10.5px; font-weight: 600; color: var(--ink-faint); margin-bottom: 1px; }
+  .ex-t tr.ex-note { display: block; } .ex-t tr.ex-note td { display: block; padding: 0 0 12px; }
+}
+</style>
+<script id="ms-ex-js">
+// What to expect (8 Nov 2026): renders coach.json `expect` (council/expect.mjs, written by the Trader every 6 hours with the decay
+// monitor) into #ms-expect. Reads the copy the page already loaded (window.MS_COUNCIL, event ms:council); fetches nothing; changes nothing.
+(function (W) {
+  var $ = function (id) { return document.getElementById(id); };
+  var esc = function (s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); };
+  var num = function (v) { return typeof v === 'number' && isFinite(v); };
+  var fR = function (v, d) { d = d == null ? 2 : d; return num(v) ? (v > 0.5 * Math.pow(10, -d) ? '+' : v < -0.5 * Math.pow(10, -d) ? '−' : '') + Math.abs(v).toFixed(d) + 'R' : '—'; };
+  var cls = function (v) { return v > 0.005 ? 'pos' : v < -0.005 ? 'neg' : ''; };
+  // a band as the owner reads it: "−3 to +10R" (one decimal under 10R, none above; d forces the decimals)
+  var fBand = function (lo, hi, d) { if (!num(lo) || !num(hi)) return '—'; var f = function (v) { var a = Math.abs(v), s = a.toFixed(num(d) ? d : a < 10 ? 1 : 0); return (v < 0 && +s !== 0 ? '−' : v > 0 && +s !== 0 ? '+' : '') + s; }; return f(lo) + ' to ' + f(hi) + 'R'; };
+  var fDD = function (lo, hi) { if (!num(lo) || !num(hi)) return '—'; var f = function (v) { return Math.abs(v) < 10 ? Math.abs(v).toFixed(1) : Math.abs(v).toFixed(0); }; return lo === hi ? '−' + f(lo) + 'R' : '−' + f(lo) + ' to −' + f(hi) + 'R'; };
+  var fTime = function (y) { if (!num(y)) return ''; var m = Math.round(y * 12); return m < 1 ? 'under a month' : m < 24 ? '~' + m + ' mo' : '~' + y.toFixed(1) + ' yr'; };
+  var ST = { above: ['st-above', 'Above its band'], below: ['st-below', 'Below its band'] };
+  function fwdCell(s) {
+    var f = s.forward; if (!f || !num(f.n)) return '<small>No forward trade yet</small>';
+    var chip = !f.judged ? '<span class="ex-st st-few">Too few (' + f.n + ')</span>' : f.out ? '<span class="ex-st ' + ST[f.out][0] + '">' + ST[f.out][1] + '</span>' : '<span class="ex-st st-in">Inside its band</span>';
+    return '<b class="' + cls(f.exp) + '">' + fR(f.exp) + ' <small style="display:inline;color:var(--ink-faint)">× ' + f.n + '</small></b>' + chip + (f.judged ? '<small>band ' + esc(fBand(f.lo, f.hi, 2)) + '</small>' : '');
+  }
+  function verdictCell(s) {
+    var v = s.verdict || {}, h = v.honest || {}, b = v.backtest || {};
+    if (h.within) return '<b class="pos">' + h.n + ' trades · ' + esc(fTime(h.years)) + '</b> at its out-of-sample edge';
+    if (b.within) return '<b>' + b.n + ' trades · ' + esc(fTime(b.years)) + '</b> if it repeats its backtest (' + fR(s.backtest && s.backtest.exp) + '); the out-of-sample edge cannot be proven in 2 years';
+    return '<b class="neg">Not within 2 years</b>' + (b.n && num(b.years) && b.years <= 50 ? ': even its backtest edge needs ' + b.n.toLocaleString('en-GB') + ' trades (' + esc(fTime(b.years)) + ')' : ': the edge is too small to prove');
+  }
+  function render() {
+    var body = $('ms-expect-b'), sum = $('ms-expect-sum'); if (!body || !sum) return;
+    var C = W.MS_COUNCIL, D = C && C.coach && C.coach.expect;
+    if (!D || !Array.isArray(D.systems) || !D.systems.length) { sum.textContent = D && D.error ? 'What to expect: ' + D.error : 'No expectations yet: the Coach writes them every 6 hours with the edge-decay reading.'; body.innerHTML = ''; return; }
+    var S = D.systems.filter(function (s) { return s && !s.error; }), live = S.filter(function (s) { return s.live; });
+    var posEdge = live.filter(function (s) { return s.perTrade && s.perTrade.lo > 0; }), judged = live.filter(function (s) { return s.forward && s.forward.judged; });
+    var above = judged.filter(function (s) { return s.forward.out === 'above'; }), below = judged.filter(function (s) { return s.forward.out === 'below'; });
+    var names = function (a) { return a.length ? ' (' + a.map(function (s) { return esc(s.name); }).join(', ') + ')' : ''; };
+    sum.innerHTML = '<b>' + live.length + '</b> live systems. On data they never saw, <b>' + posEdge.length + '</b> kept a clearly positive edge' + names(posEdge) + '; the rest made about nothing. Forward records placed so far: <b>' + judged.length + '</b>'
+      + (judged.length ? ', ' + (judged.length - above.length - below.length) + ' inside their band, <b class="' + (above.length ? 'pos' : '') + '">' + above.length + ' above</b>' + names(above) + ', <b class="' + (below.length ? 'neg' : '') + '">' + below.length + ' below</b>' + names(below) : '') + '. Expectations only: nothing here changes a rule.';
+    var at = $('ms-expect-at'); if (at && D.at) at.textContent = new Date(D.at).toLocaleString('en-GB', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' });
+    var ORD = function (s) { return !s.live ? 3 : s.forward && s.forward.out === 'below' ? 0 : s.forward && s.forward.out === 'above' ? 1 : 2; };
+    body.innerHTML = S.slice().sort(function (a, b) { return ORD(a) - ORD(b); }).map(function (s) {
+      var h = s.honest || {}, pt = s.perTrade || {}, py = s.perYear || {}, d = s.dd || {}, sh = s.live ? '' : ' ex-shadow';
+      return '<tr class="ex-row' + sh + '"><td class="ex-l ex-name"><b>' + esc(s.name) + '</b><small>' + esc(s.desk) + (s.live ? '' : ' · shadow') + ' · ' + esc(h.window || '') + ', ' + (num(h.n) ? h.n.toLocaleString('en-GB') : '—') + ' trades</small></td>'
+        + '<td class="ex-l ex-val" data-l="Forward so far">' + fwdCell(s) + '</td>'
+        + '<td class="ex-val" data-l="Per trade"><b class="' + cls(pt.exp) + '">' + fR(pt.exp) + '</b><small>' + esc(fBand(pt.lo, pt.hi, 2)) + '</small></td>'
+        + '<td class="ex-val" data-l="In a year"><b class="' + cls(py.exp) + '">' + fR(py.exp, 1) + '</b><small>' + esc(fBand(py.lo, py.hi)) + '</small></td>'
+        + '<td class="ex-val" data-l="Drawdown"><b class="neg">' + esc(fDD(d.lo, d.hi)) + '</b><small>worst seen −' + esc(num(d.worst) ? (d.worst < 10 ? d.worst.toFixed(1) : d.worst.toFixed(0)) : '—') + 'R</small></td>'
+        + '<td class="ex-val" data-l="Trades a year"><b>' + (num(py.trades) ? Math.round(py.trades) : '—') + '</b><small>backtest ' + fR(s.backtest && s.backtest.exp) + ' a trade</small></td>'
+        + '<td class="ex-ver" data-l="Verdict in">' + verdictCell(s) + '</td></tr>'
+        + '<tr class="ex-note' + sh + '"><td colspan="7" title="' + esc(s.line || '') + '">' + (s.regime ? esc(s.regime.charAt(0).toUpperCase() + s.regime.slice(1)) + '.' : esc(s.line || '')) + '</td></tr>';
+    }).join('');
+  }
+  W.MS_EXPECT_RENDER = render;
   document.addEventListener('ms:council', render);
   setTimeout(render, 0);
 })(window);

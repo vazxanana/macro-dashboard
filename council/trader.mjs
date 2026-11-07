@@ -14,6 +14,7 @@ import { shrink, ebTau, shrunkClear, ruleState, sameRule, setRule, descRule, jud
 import { buildDecay } from './decay.mjs';
 import { recordVerdicts } from './digest.mjs';   // the shared verdict record (digest.json): decay statuses each 6-hour reading
 import { buildBook } from './book.mjs';
+import { buildExpect } from './expect.mjs';
 import { cleanBars, LTF_CLEAN } from './clean.mjs';
 import { voidRoundedReplicas, historyCatchUp, voidM30Twins } from './repairs.mjs';
 import { d1AdxFeat } from './adx.mjs';
@@ -1526,7 +1527,7 @@ if (coach.date !== today) {
     if (sh.length >= 4 && exp(sh) > 0.3) { delete config.pausedMarkets[m]; change(`Resumed market ${m} early`, `Shadow trades while paused made +${exp(sh).toFixed(2)}R over ${sh.length}.`); }
   }
   const prev = rd('coach.json', {});   // keep the owner-facing proposals, the ICT watch list (coachCarry) and the ledger between the daily runs
-  wr('coach.json', { ...coachCarry(prev), decay: prev.decay, book: prev.book, ledger: prev.ledger, ledgerSlot: prev.ledgerSlot, ledgerSince: prev.ledgerSince, date: today, at: nowISO, stats, last14: rs, lessons: lessons(trades, now), fslot: nowISO.slice(0, 11) + String(Math.floor(+nowISO.slice(11, 13) / 6) * 6).padStart(2, '0'), notes: notes.length ? notes : ['No change today: not enough evidence to move a rule.'] });
+  wr('coach.json', { ...coachCarry(prev), decay: prev.decay, book: prev.book, expect: prev.expect, ledger: prev.ledger, ledgerSlot: prev.ledgerSlot, ledgerSince: prev.ledgerSince, date: today, at: nowISO, stats, last14: rs, lessons: lessons(trades, now), fslot: nowISO.slice(0, 11) + String(Math.floor(+nowISO.slice(11, 13) / 6) * 6).padStart(2, '0'), notes: notes.length ? notes : ['No change today: not enough evidence to move a rule.'] });
 }
 // every run: pause a setup as soon as its live record says so
 {
@@ -2077,6 +2078,10 @@ wr('research.json', research);
 try { const cj = rd('coach.json', {});
   if (!cj.decay || cj.decay.slot !== CC_SLOT) {
     cj.decay = { ...buildDecay({ trades, research, ictTrades: rd('ict/trades.json', []), replay: rd('research/replay-2w.json', null), ictReplay: rd('ict/replay.json', null) }, { now }), slot: CC_SLOT };
+    // What to expect (8 Nov, council/expect.mjs): what the untouched-data studies say each live system should do (R a trade and
+    // a year with bands, drawdown to plan for, trades until a verdict) and whether the forward record sits inside that band.
+    // Expectations only: nothing here changes a rule either; the daily digest names a system only when it leaves its band.
+    try { cj.expect = { ...buildExpect(cj.decay, { now }), slot: CC_SLOT }; } catch (e) { console.log('expectations failed:', e.message); }
     wr('coach.json', cj);
     // record the new statuses (and the robustness verdicts) in digest.json, the shared record the week report reads, so a
     // 6-hour reading never waits on the digest's evening window (council/digest.mjs recordVerdicts: writes only on a change)

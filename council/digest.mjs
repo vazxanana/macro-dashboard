@@ -11,7 +11,8 @@
 //   3. the macro regime and the next day's event playbook headline (macro/forecast.json)
 //   4. what waits on the owner: Coach proposals (coach.json), data-feed problems (health.json), robustness verdict changes
 //      (research/robustness.json, against the last digest), and a live system the edge-decay monitor calls 'decaying'
-//      (coach.json decay, council/decay.mjs; one line, only when there is one)
+//      (coach.json decay, council/decay.mjs; one line, only when there is one), and a live system whose forward record left
+//      the band the untouched-data study gives it (coach.json expect, council/expect.mjs; one line, only when there is one)
 //   5. edge scoreboard movers: streams whose verdict changed since the last digest (the scoreboard's own pure functions,
 //      script#ms-sb-js of market-structure.html, run here without a page)
 //   6. Sundays only: one line of the book-weights paper comparison (coach.json book, council/book.mjs): live vs proposed R
@@ -35,6 +36,7 @@ import path from 'node:path';
 import vm from 'node:vm';
 import { sendAlerts, when, NTFY_DEFAULT, SITE, alertable, actionable, proposalLine } from './alerts.mjs';
 import { usHolidays } from './datacheck.mjs';
+import { expectLine } from './expect.mjs';
 
 export const COUNCIL_URL = SITE + 'market-structure.html#council';
 export const CFG = {
@@ -241,6 +243,9 @@ export function waiting(D, now, prev) {
   if (rc.length) out.push(`Robustness: ${trim(rc.slice(0, 2).map((c) => `${c.name} ${c.from} → ${c.to}`).join('; '), 100)}${rc.length > 2 ? ` +${rc.length - 2} more` : ''}`);
   const dl = decayLine(D.coach && D.coach.decay);
   if (dl) out.push(dl);
+  // What to expect (coach.json expect, council/expect.mjs): a live system whose forward record left the band the untouched-data study gives it
+  const el = expectLine(D.coach && D.coach.expect);
+  if (el) out.push(el);
   return out;
 }
 
