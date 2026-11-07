@@ -94,3 +94,31 @@ export function coachChurnSection({ config, now = Math.floor(Date.now() / 1000),
   out.push('', `${h.length} changes on ${by.size} rules${flips ? `; ${flips} rule${flips > 1 ? 's' : ''} went back and forth 3+ times` : ''}${ratchets ? `; ${ratchets} setting${ratchets > 1 ? 's' : ''} only ever moved one way` : ''}. A rule that keeps moving is reacting to noise: the 150-day study found the Coach's choices do no better than dropping the same number of trades at random (research/edge/coach-learning).`, CHURN_END);
   return out.join('\n');
 }
+
+// ---- Desk & mirror status (reporting only): the ICT desk's last 7 days and the cTrader DEMO mirror --------------------
+// The ICT desk is the edge that holds up after costs (research/edge/costs); its A-setups are what the demo mirror copies.
+// Built from data/ict/trades.json, data/ict/shadow.json and data/ctrader/mirror.json as the previous round left them.
+export const DESK_START = '<!-- desk-status:start -->', DESK_END = '<!-- desk-status:end -->';
+const MKT = { nq: 'NQ', es: 'ES', ym: 'YM', rty: 'RTY', gc: 'Gold (GC)' };
+export function deskSection({ ict = [], shadow = null, mirror = null, now = Math.floor(Date.now() / 1000), days = 7 }) {
+  const since = now - days * 86400, T = (Array.isArray(ict) ? ict : []).filter((t) => (t.opened || 0) >= since);
+  const A = T.filter((t) => t.aset), open = A.filter((t) => t.status === 'open'), closed = A.filter((t) => t.status !== 'open' && t.R != null);
+  const R = closed.reduce((s, t) => s + t.R, 0), when = new Date(now * 1000).toISOString().slice(0, 16).replace('T', ' ');
+  const out = [DESK_START, '## Desk & mirror status', '', `Built by the Trader at ${when} UTC. ICT desk: the last ${days} days; mirror: the cTrader DEMO account (0.01 lot, demo only).`, '',
+    `**ICT A-setups:** ${A.length} signal${A.length === 1 ? '' : 's'} (${open.length} open, ${closed.length} closed${closed.length ? `, ${sgn(R)}R, ${Math.round(100 * closed.filter((t) => t.R > 0).length / closed.length)}% won` : ''}); ${T.length - A.length} other signal${T.length - A.length === 1 ? '' : 's'} tracked, not A-setups.`];
+  for (const t of open) out.push(`- open: ${MKT[t.market] || t.market} ${t.side} from ${t.entry}, stop ${t.stop} (${t.model || 'iFVG'}${t.aplus ? ', A+' : ''})`);
+  const sh = shadow && Array.isArray(shadow.trades) ? shadow.trades.filter((t) => (t.opened || 0) >= since) : [];
+  const shC = sh.filter((t) => t.status !== 'open' && t.R != null);
+  out.push('', `**Dip-buy candidate (NQ/ES, paper only):** ${sh.length} signal${sh.length === 1 ? '' : 's'} in ${days} days${shC.length ? `, ${shC.length} closed ${sgn(shC.reduce((s, t) => s + t.R, 0))}R` : ''}${shadow && shadow.since ? ` · recording since ${String(shadow.since).slice(0, 10)}` : ''}.`);
+  const st = mirror && mirror.state;
+  if (!st) out.push('', '**cTrader mirror:** no status yet.');
+  else {
+    const op = Object.entries(st.map || {}).filter(([, m]) => m.status === 'open');
+    out.push('', `**cTrader mirror:** ${st.status || '—'}${st.lastRun ? ` (checked ${String(st.lastRun).slice(0, 16).replace('T', ' ')} UTC)` : ''}.`);
+    for (const [id, m] of op) out.push(`- open: ${m.symbol} ${m.side} ${m.setup || ''} (${id})`);
+    const L = ((mirror.log || []).slice(-5)).reverse();
+    if (L.length) { out.push('', 'Last mirror events:'); for (const l of L) out.push(`- ${String(l.at).slice(5, 16).replace('T', ' ')} ${String(l.msg).replace(/\|/g, '/')}`); }
+  }
+  out.push(DESK_END);
+  return out.join('\n');
+}

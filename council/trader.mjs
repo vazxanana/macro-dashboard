@@ -8,7 +8,7 @@ import { msAnalyze, CFG, PAIRS, RETR, LBL, buildSetup, buildRetrace, setMarket }
 import { entryContext, startReview, watchReview, judge, newsNear, lessons } from './review.mjs';
 import { m15cFeat } from './choch.mjs';
 import { alertable, alertEvents, sendAlerts, when, NTFY_DEFAULT, proposalDigest } from './alerts.mjs';
-import { liveRuleSection, injectSection, coachChurnSection, CHURN_START, CHURN_END } from './analyst.mjs';
+import { liveRuleSection, injectSection, coachChurnSection, CHURN_START, CHURN_END, deskSection, DESK_START, DESK_END } from './analyst.mjs';
 import { coachProposals, spotProposals } from './proposals.mjs';
 import { cleanBars, LTF_CLEAN } from './clean.mjs';
 import { voidRoundedReplicas, historyCatchUp } from './repairs.mjs';
@@ -1898,7 +1898,8 @@ wr('snapshot.json', snapshot);
 // Analyst report (reporting only): refresh the "Live Scalp rule check" block in analysis/latest.md, if the report is here
 try { const fA = path.join(DIR, 'analysis', 'latest.md');
   if (fs.existsSync(fA)) { const md = fs.readFileSync(fA, 'utf8'), nx = injectSection(injectSection(md, liveRuleSection({ snapshot, config, backtest: rd('backtest.json', null), now })), coachChurnSection({ config, now }), CHURN_START, CHURN_END);
-    if (nx !== md) fs.writeFileSync(fA, nx); } } catch (e) { console.log('analyst section:', e.message); }
+    const nx2 = injectSection(nx, deskSection({ ict: rd('ict/trades.json', []), shadow: rd('ict/shadow.json', null), mirror: rd('ctrader/mirror.json', null), now }), DESK_START, DESK_END);
+    if (nx2 !== md) fs.writeFileSync(fA, nx2); } } catch (e) { console.log('analyst section:', e.message); }
 const open = trades.filter((x) => x.status === 'open' || x.status === 'pending').length;
 console.log(`Council run ${nowISO}: ${Object.keys(snapshot.markets).length} markets, ${Object.keys(snapshot.errors).length} errors, ${open} open/pending trades, ${trades.length} total.`);
 if (Object.keys(snapshot.errors).length) console.log(snapshot.errors);
