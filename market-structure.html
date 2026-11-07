@@ -1894,6 +1894,49 @@ html[data-motion="off"] .is-loading, html[data-motion="off"] .srow-skel i { anim
 /* polish 4: future calendar days recede (the month reads past → today → ahead) */
 .cal .cal-d.fut { background: transparent; border-style: dashed; border-color: color-mix(in srgb, var(--line) 70%, transparent); }
 .cal .cal-d.fut .cn { opacity: .55; }
+
+/* ═══ POLISH 5 · structure ═══ */
+/* Home: the four "open a page" tiles become one grouped list with icons, instead of a stack of look-alike cards */
+.h-go { display: grid; border: 1px solid var(--line); border-radius: var(--r, 14px); background: var(--panel); overflow: hidden; }
+.h-go .h-go-i { all: unset; box-sizing: border-box; display: grid; grid-template-columns: 34px minmax(0, 1fr) auto; grid-template-rows: auto auto; column-gap: 12px; align-items: center; padding: 12px 16px; cursor: pointer; position: relative; min-height: 60px; }
+.h-go .h-go-i + .h-go-i { border-top: 1px solid var(--line); }
+.h-go .h-go-i::before { content: ""; grid-row: 1 / 3; width: 34px; height: 34px; border-radius: 9px; background: var(--panel-raised, var(--panel-hover)); border: 1px solid var(--line); box-sizing: border-box;
+  -webkit-mask: none; }
+.h-go .h-go-i::after { content: ""; grid-row: 1 / 3; grid-column: 3; width: 16px; height: 16px; background: var(--ink-faint); -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M9 6l6 6-6 6'/%3E%3C/svg%3E") center / contain no-repeat; mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M9 6l6 6-6 6'/%3E%3C/svg%3E") center / contain no-repeat; transition: transform .16s cubic-bezier(.16, 1, .3, 1), background-color .16s; }
+.h-go .h-go-i > i.h-go-ico { position: absolute; left: 25px; top: 50%; width: 16px; height: 16px; margin-top: -8px; background: var(--ink-dim); -webkit-mask: var(--gi) center / contain no-repeat; mask: var(--gi) center / contain no-repeat; pointer-events: none; }
+.h-go .tile-k { grid-column: 2; grid-row: 1; font: 600 14px/1.3 var(--sans); color: var(--ink); text-transform: none; letter-spacing: 0; margin: 0; }
+.h-go .tile-big { grid-column: 2; grid-row: 2; font: 500 12.5px/1.4 var(--sans) !important; color: var(--ink-dim) !important; margin: 0 !important; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; letter-spacing: 0 !important; }
+.h-go .tile-sub, .h-go .tile-go { display: none !important; }
+@media (hover: hover) { .h-go .h-go-i:hover { background: var(--panel-hover, color-mix(in srgb, var(--ink) 4%, transparent)); } .h-go .h-go-i:hover::after { transform: translateX(3px); background: var(--ink-dim); } }
+.h-go .h-go-i:focus-visible { outline-offset: -3px; }
+.h-go-council { --gi: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round'%3E%3Ccircle cx='9' cy='8' r='3'/%3E%3Ccircle cx='17' cy='9' r='2.4'/%3E%3Cpath d='M3 19c0-3 2.7-5 6-5s6 2 6 5M15 14.5c2.8-.3 6 1.2 6 4.5'/%3E%3C/svg%3E"); }
+.h-go-scanner { --gi: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round'%3E%3Ccircle cx='11' cy='11' r='7'/%3E%3Cpath d='M20 20l-3.5-3.5M8 11h6M11 8v6'/%3E%3C/svg%3E"); }
+.h-go-charts { --gi: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round'%3E%3Cpath d='M7 4v16M17 4v16'/%3E%3Crect x='5' y='8' width='4' height='7' rx='1'/%3E%3Crect x='15' y='6' width='4' height='9' rx='1'/%3E%3C/svg%3E"); }
+.h-go-journal { --gi: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round'%3E%3Crect x='5' y='3' width='14' height='18' rx='2'/%3E%3Cpath d='M9 8h6M9 12h6M9 16h3'/%3E%3C/svg%3E"); }
+/* Market pulse: ten markets as two even rows of five on wide screens (no orphan tile) */
+@media (min-width: 1100px) { .h-pulse-row { grid-template-columns: repeat(5, minmax(0, 1fr)); } }
+/* Council active trades: flat rows with dividers inside the card, not boxes inside a box */
+.c-act { gap: 0 !important; }
+.c-act > li:not(.empty) { border: 0 !important; border-radius: 10px !important; background: transparent !important; padding: 12px 10px !important; position: relative; }
+.c-act > li:not(.empty) + li::before { content: ""; position: absolute; left: 10px; right: 10px; top: 0; height: 1px; background: var(--line); }
+@media (hover: hover) { .c-act > li:not(.empty):hover { background: var(--panel-hover, color-mix(in srgb, var(--ink) 4%, transparent)) !important; } .c-act > li:not(.empty):hover::before, .c-act > li:not(.empty):hover + li::before { opacity: 0; } }
+.c-act > li:not(:first-child) .a-d small { display: none; }
+/* Council section bar: a quiet underline tab bar instead of a stretched segmented box */
+@media (min-width: 701px) {
+  .c-nav { justify-content: flex-start !important; gap: 4px !important; padding: 0 !important; border: 0 !important; border-bottom: 1px solid var(--line) !important; border-radius: 0 !important; background: transparent !important; box-shadow: none !important; }
+  .c-nav > button { flex: 0 0 auto !important; min-height: 44px; padding: 0 14px !important; border-radius: 0 !important; background: transparent !important; border: 0 !important; box-shadow: none !important; color: var(--ink-dim) !important; font-weight: 550; position: relative; }
+  .c-nav > button::after { content: ""; position: absolute; left: 10px; right: 10px; bottom: -1px; height: 2px; border-radius: 2px; background: var(--gold); transform: scaleX(0); transition: transform .22s cubic-bezier(.16, 1, .3, 1); }
+  .c-nav > button[aria-selected="true"] { color: var(--ink) !important; }
+  .c-nav > button[aria-selected="true"]::after { transform: scaleX(1); }
+  .c-nav > button:hover { color: var(--ink) !important; }
+}
+
+.c-act > li.grp { padding: 2px 0 !important; }
+.c-act > li.grp > details > summary { padding: 10px 10px !important; }
+.c-act li.grp details[open] > .c-act { margin: 0 0 6px 18px; }
+.h-pulse { margin-bottom: 12px !important; }
+
+@media (max-width: 700px) { .a-tap { display: none; } .c-act > li:not(.empty) { padding-left: 4px !important; padding-right: 4px !important; } }
 </style>
 <script>try{if(localStorage.getItem('msMotion')==='off')document.documentElement.dataset.motion='off'}catch(e){}</script>
 </head>
@@ -2033,36 +2076,38 @@ html[data-motion="off"] .is-loading, html[data-motion="off"] .srow-skel i { anim
           <ul class="h-ring-lg" aria-hidden="true"><li class="as"><i></i>Asia</li><li class="lo"><i></i>London</li><li class="ny"><i></i>New York</li><li class="nw"><i></i>High-impact news</li></ul></div>
         <p class="h-ring-n" id="h-ring-n" aria-live="polite"></p>
       </section>
-      <a class="tile tile-s" href="#council">
-        <span class="tile-k">AI council</span>
-        <span class="tile-big" id="h-council">Starting up</span>
-        <span class="tile-sub"><span class="adm">Analyst maps the week, Trader paper-trades every Ready setup, Coach reviews each day and tunes the rules.</span><span class="pubonly">Every trade the system placed, with its result.</span></span>
-        <span class="tile-go">Open council</span>
-      </a>
       <a class="tile tile-s adm" href="#setup">
         <span class="tile-k">Possible trades</span>
         <span class="tile-big" id="h-ready">—</span>
         <span class="tile-sub" id="h-best"></span>
         <span class="tile-go">See trades</span>
       </a>
-      <a class="tile tile-s adm" href="#scanner">
+      <nav class="h-go" aria-label="Go to">
+      <a class="tile tile-s h-go-i h-go-council" href="#council"><i class="h-go-ico" aria-hidden="true"></i>
+        <span class="tile-k">AI council</span>
+        <span class="tile-big" id="h-council">Starting up</span>
+        <span class="tile-sub"><span class="adm">Analyst maps the week, Trader paper-trades every Ready setup, Coach reviews each day and tunes the rules.</span><span class="pubonly">Every trade the system placed, with its result.</span></span>
+        <span class="tile-go">Open council</span>
+      </a>
+      <a class="tile tile-s h-go-i h-go-scanner adm" href="#scanner"><i class="h-go-ico" aria-hidden="true"></i>
         <span class="tile-k">Scanner</span>
         <span class="tile-big" id="h-scan">Scanning soon</span>
         <span class="tile-sub" id="h-scan-list"></span>
         <span class="tile-go">All markets</span>
       </a>
-      <a class="tile tile-s" href="#charts">
+      <a class="tile tile-s h-go-i h-go-charts" href="#charts"><i class="h-go-ico" aria-hidden="true"></i>
         <span class="tile-k">Charts</span>
         <span class="tile-big">D1 · H4 · H1 · M15 · M5 · M1</span>
         <span class="tile-sub">Live candles with BO lines, Origin, VR, CF and the 50% line.</span>
         <span class="tile-go">Open charts</span>
       </a>
-      <a class="tile tile-s" href="#journal">
+      <a class="tile tile-s h-go-i h-go-journal" href="#journal"><i class="h-go-ico" aria-hidden="true"></i>
         <span class="tile-k">Journal</span>
         <span class="tile-big" id="h-j">No trades yet</span>
         <span class="tile-sub" id="h-j-sub"><span class="adm">Log trades from the Setup page and track your results.</span><span class="pubonly">Closed system trades.</span></span>
         <span class="tile-go">Open journal</span>
       </a>
+      </nav>
       </div>
     </div>
   </section>
@@ -4306,7 +4351,7 @@ function msNextSetup(bars, A) {
       return `<li class="grp"><details data-g="${esc(g)}"${OPEN.has(g) ? ' open' : ''}><summary><span class="chip ${x0.side}">${x0.side.toUpperCase()}</span>`
         + `<span class="a-t"><b>${esc(x0.label)}</b> ${L.length} trades${nSh ? ` <span class="tag">${nSh} shadow</span>` : ''}${nWait ? ` <span class="tag">${nWait} waiting fill</span>` : ''}</span>`
         + `<span class="a-r ${flN.length ? (fl >= 0 ? 'pos' : 'neg') : ''}">${flN.length ? fR(fl) : '—'}</span>`
-        + `<span class="a-d">${['btc', 'eth', 'sol', 'xrp'].includes(x0.market) ? `${lots >= 100 ? Math.round(lots).toLocaleString() : fmtL(lots)} ${x0.market.toUpperCase()}` : `${fmtL(lots)} lots`} total <small>(on $50k at the sizing guide)</small>${flN.length ? ` · floating <b class="${usd >= 0 ? 'pos' : 'neg'}">${fUsd(usd)}</b>` : ''} · tap to see the ${L.length} trades</span></summary>`
+        + `<span class="a-d">${['btc', 'eth', 'sol', 'xrp'].includes(x0.market) ? `${lots >= 100 ? Math.round(lots).toLocaleString() : fmtL(lots)} ${x0.market.toUpperCase()}` : `${fmtL(lots)} lots`} total <small>(on $50k at the sizing guide)</small>${flN.length ? ` · floating <b class="${usd >= 0 ? 'pos' : 'neg'}">${fUsd(usd)}</b>` : ''}<span class="a-tap"> · tap to see the ${L.length} trades</span></span></summary>`
         + `<ul class="c-act sub">${L.map((i) => i.html).join('')}</ul></details></li>`;
     }).join('') : (PUB ? '<li class="empty">No open trades right now.</li>' : '<li class="empty">No open trades right now. The system opens one when a gold replica signal passes (while gold is volatile), a Mosha BO setup completes (gold), a coin closes above its 55-day high (crypto trend), or the NQ open run fires (paper).</li>');
     el.querySelectorAll('details[data-g]').forEach((dEl) => dEl.addEventListener('toggle', () => { if (dEl.open) OPEN.add(dEl.dataset.g); else OPEN.delete(dEl.dataset.g); }));
