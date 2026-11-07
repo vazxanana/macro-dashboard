@@ -1618,6 +1618,12 @@ html[data-motion="off"] .stagger-in > * { animation: none; }
 .c-act .a-m-e { width: 2px; height: 10px; background: var(--ink-faint); border-radius: 1px; }
 .c-act .a-m-p { width: 9px; height: 9px; border-radius: 50%; border: 2px solid var(--panel); box-sizing: content-box; }
 .c-act .a-m-p.up { background: var(--buy); } .c-act .a-m-p.dn { background: var(--sell); }
+
+/* key levels: click a price to copy it */
+#ms-levels b { cursor: copy; border-radius: 4px; padding: 0 3px; margin: 0 -3px; transition: background .15s; }
+@media (hover: hover) { #ms-levels b:hover { background: var(--accent-soft, rgba(91,140,255,.12)); } }
+.copy-tip { position: fixed; z-index: 120; pointer-events: none; padding: 4px 8px; border-radius: 6px; background: var(--ink); color: var(--bg); font: 600 11.5px var(--sans); transform: translate(-50%, -130%); animation: tipIn .14s cubic-bezier(.23,1,.32,1); }
+@keyframes tipIn { from { opacity: 0; transform: translate(-50%, -110%); } }
 </style>
 <script>try{if(localStorage.getItem('msMotion')==='off')document.documentElement.dataset.motion='off'}catch(e){}</script>
 </head>
@@ -5358,6 +5364,15 @@ function msNextSetup(bars, A) {
   v.addEventListener('pointermove', (ev) => { ev0 = ev; if (raf) return; raf = requestAnimationFrame(() => { raf = 0; const c = ev0.target.closest('#v-home .tile, #v-home .h-main > .card');
     if (last && last !== c) { last.style.removeProperty('--mx'); last.style.removeProperty('--my'); } last = c; if (!c) return; const r = c.getBoundingClientRect(); c.style.setProperty('--mx', (ev0.clientX - r.left) + 'px'); c.style.setProperty('--my', (ev0.clientY - r.top) + 'px'); }); }, { passive: true });
   v.addEventListener('pointerleave', () => { if (last) { last.style.removeProperty('--mx'); last.style.removeProperty('--my'); last = null; } }); })();
+</script>
+<script>
+/* Key levels: click a price to copy it (plain number, no thousands separators) */
+(() => { const ul = document.getElementById('ms-levels'); if (!ul) return;
+  ul.addEventListener('click', async (ev) => { const b = ev.target.closest('#ms-levels b'); if (!b) return; const raw = b.textContent.replace(/[^0-9.\-]/g, ''); if (!raw) return;
+    let ok = false; try { await navigator.clipboard.writeText(raw); ok = true; } catch (e) { try { const t = document.createElement('textarea'); t.value = raw; document.body.appendChild(t); t.select(); ok = document.execCommand('copy'); t.remove(); } catch (e2) {} }
+    const r = b.getBoundingClientRect(), tip = document.createElement('div'); tip.className = 'copy-tip'; tip.setAttribute('role', 'status'); tip.textContent = ok ? `Copied ${raw}` : 'Copy failed';
+    tip.style.left = (r.left + r.width / 2) + 'px'; tip.style.top = r.top + 'px'; document.body.appendChild(tip); setTimeout(() => tip.remove(), 1100); });
+  const lab = () => ul.querySelectorAll('b').forEach((b) => { b.title = 'Click to copy'; }); new MutationObserver(lab).observe(ul, { childList: true }); lab(); })();
 </script>
 </body>
 </html>
