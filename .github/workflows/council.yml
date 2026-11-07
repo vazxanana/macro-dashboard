@@ -62,7 +62,9 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
         with:
-          sparse-checkout: council
+          sparse-checkout: |
+            council
+            ict
 
       - name: Checkout council data
         uses: actions/checkout@v4
@@ -99,6 +101,9 @@ jobs:
             if [ "$SECONDS" -gt 18000 ]; then echo "Time budget reached after $((i - 1)) rounds"; break; fi
             git -C data pull -q --rebase origin council-data || true
             node council/trader.mjs data || echo "Trader round $i failed"
+            # ICT desk (7 Nov): GitHub fired ict.yml's 15-min schedule only 3 times in 22 h, so the desk runs here, every 3rd
+            # round (~17 min), before the mirror copies its A-setups. ict.yml keeps a manual trigger only (one writer of ict/).
+            if [ $((i % 3)) -eq 1 ]; then node ict/tracker.mjs data/ict || echo "ICT round $i failed"; fi
             node council/ctrader-mirror.mjs data || echo "cTrader mirror round $i failed"
             git -C data add -A
             if ! git -C data diff --cached --quiet; then
