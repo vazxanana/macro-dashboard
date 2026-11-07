@@ -8,7 +8,8 @@
 //   * OFF unless CTRADER_MIRROR=on. Without the CTRADER_* secrets it does nothing.
 //   * Only these message types can be sent: auth, account list, trader, reconcile, symbols, token refresh, heartbeat, NEW MARKET
 //     ORDER and CLOSE POSITION. No amend, no cancel, no pending orders.
-//   * Small and capped: 0.01 lot (or the symbol's minimum, refused above 0.1 lot or without a lot size), at most MAX_OPEN mirror
+//   * Small and capped: risk-based lots (see sizing below, valued with the broker's own specs from ctrader/symbols.json, written
+//     each round by council/ctrader-symbols.mjs), never above LIMITS.maxLots, at most MAX_OPEN mirror
 //     positions (unconfirmed orders included), no new order once the account is down DAY_STOP of its balance on the UTC day
 //     (closed P/L: balance), only trades opened in the last FRESH seconds (no catch-up of old trades).
 //   * It only ever touches positions it opened (label "council" + comment naming the trade, tracked in ctrader/mirror.json); a
@@ -51,7 +52,7 @@ const LABEL = 'council';
 const OPEN = new Set(['open']), isDone = (t) => !!t.status && t.status !== 'open' && t.status !== 'pending';
 // the order comment is also the key that finds our position at the broker again (ProtoOATradeData.label + comment)
 export const commentFor = (t) => `${String(t.id).startsWith('ict:') ? 'ict' : 'council'} ${t.k} ${t.id}`.slice(0, 100);
-const normName = (s) => String(s || '').toUpperCase().replace(/[^A-Z0-9.]/g, '');   // "EUR/USD" (the proto's own example) == "EURUSD"
+export const normName = (s) => String(s || '').toUpperCase().replace(/[^A-Z0-9.]/g, '');   // "EUR/USD" (the proto's own example) == "EURUSD"
 // broker answers meaning "not now" (the order was certainly not placed): retried while the trade is still fresh. Timeouts and
 // dropped connections are NOT retried (the order may have gone through); step 0 finds such a position next round.
 const RETRY = /MARKET_CLOSED|SYMBOL_HAS_HOLIDAY|NO_QUOTES|SERVER_IS_UNDER_MAINTENANCE|CH_SERVER_NOT_REACHABLE|REQUEST_FREQUENCY_EXCEEDED|TRADING_DISABLED|not tradable now/;
@@ -146,24 +147,49 @@ export function volumeFor(sym, lots = LIMITS.lots, maxLots = 0.1) {   // fixed-l
   if (sym.maxVolume && v > +sym.maxVolume) v = +sym.maxVolume;
   return v > lot * maxLots + 1e-9 ? null : v;
 }
-// risk-based volume: the account currency per 1 price unit per lot is lotSize/100 units (quote currency), converted to USD
-// (USD-quoted symbols 1; USD-base FX pairs 1/price). Returns { volume, riskCash, lots } or { skip: reason }.
-export function riskVolume({ info, t, balance, name, openRisk = 0 }) {
+// What one unit of the symbol's quote currency is worth in the account currency (the currency of the balance the risk is taken
+// from). cTrader values a position as volume/100 units x the price move, in the quote currency: there is no other contract-size
+// field in ProtoOASymbol, and the demo's own closed deals agree (BTCUSD 0.01 lot, 17.68 move: 0.18 USD gross; SOLUSD 0.01 lot,
+// 0.198 move: 1.98 USD with its 1,000-unit lot). spec = the symbol's entry in ctrader/symbols.json (council/ctrader-symbols.mjs:
+// the broker's own base / quote asset names, the account currency in `deposit`, and quoteToDeposit from the broker's quotes along
+// its conversion chain). Without a spec (file not written yet) the old rule, right for a USD account only: USD-quoted 1, USD-base
+// FX pairs 1/price, anything else (a USD-less cross) refused. Returns { rate, src } or null.
+export const RATE_MAX_AGE = 3 * 86400;   // a broker conversion rate older than this is not used
+export function quoteRate({ name, px, spec = null, now = Math.floor(Date.now() / 1000) }) {
+  if (spec && spec.quote && spec.deposit) {
+    const q = String(spec.quote).toUpperCase(), d = String(spec.deposit).toUpperCase(), b = String(spec.base || '').toUpperCase();
+    if (q === d) return { rate: 1, src: 'broker' };
+    if (b === d && px > 0) return { rate: 1 / px, src: 'broker' };   // e.g. USDCAD on a USD account: 1 CAD = 1/price USD, at the trade's own price
+    const r = +spec.quoteToDeposit, at = Date.parse(spec.rateAt || '') / 1000;
+    if (r > 0 && Number.isFinite(at) && now - at <= RATE_MAX_AGE) return { rate: r, src: 'broker quotes' };
+    return null;
+  }
+  const N = String(name || '').toUpperCase(), fx = /^[A-Z]{6}$/.test(N) && !/^XA[UG]/.test(N);
+  const rate = !fx || N.slice(3) === 'USD' ? 1 : N.slice(0, 3) === 'USD' && px > 0 ? 1 / px : null;
+  return rate ? { rate, src: 'assumed USD' } : null;
+}
+// ctrader/symbols.json -> the spec quoteRate() wants for one broker symbol (null when the file has none)
+export function specFor(file, name) {
+  const s = file && file.symbols && file.symbols[name], d = file && file.account && file.account.currency;
+  return s && d ? { ...s, deposit: d } : null;
+}
+// risk-based volume: one lot moves lotSize/100 units x the stop distance (quote currency), converted to the account currency by
+// quoteRate(). Returns { volume, riskCash, lots, perLot } (perLot: account currency lost at the stop per lot) or { skip: reason }.
+export function riskVolume({ info, t, balance, name, openRisk = 0, spec = null, now }) {
   const lot = +info.lotSize, dist = Math.abs(+t.entry - +t.stop), px = Math.abs(+t.entry);
   if (!(lot > 0)) return { skip: `${name}: no lot size` };
   if (!(dist > 0) || !(balance > 0)) return { skip: `${name}: no stop distance or balance` };
-  const N = String(name || '').toUpperCase(), fx = /^[A-Z]{6}$/.test(N) && !/^XA[UG]/.test(N);
-  const toUsd = !fx || N.slice(3) === 'USD' ? 1 : N.slice(0, 3) === 'USD' ? 1 / px : null;
-  if (!toUsd) return { skip: `${name}: cannot value its quote currency in USD` };
+  const qr = quoteRate({ name, px, spec, now }), toAcc = qr && qr.rate;
+  if (!toAcc) return { skip: `${name}: cannot value its quote currency${spec && spec.quote ? ` (${spec.quote})` : ''} in the account currency${spec && spec.deposit ? ` (${spec.deposit})` : ''}` };
   const isIct = String(t.id).startsWith('ict:'), size = isIct && Number.isFinite(+t.size) && +t.size > 0 ? +t.size : 1;
   const riskCash = balance * (isIct ? LIMITS.risk.ict : LIMITS.risk.council) * size;
   if (openRisk + riskCash > balance * LIMITS.maxOpenRisk + 1e-9) return { skip: `open risk would pass ${LIMITS.maxOpenRisk * 100}% of the balance` };
-  const perLot = (lot / 100) * dist * toUsd, lots = riskCash / perLot;
+  const perLot = (lot / 100) * dist * toAcc, lots = riskCash / perLot;
   const step = +info.stepVolume || 1, min = +info.minVolume || step;
   const v = Math.floor((lots * lot) / step + 1e-9) * step;   // epsilon: 0.01 lot must not floor to 0 on float noise
   if (v < min) return { skip: `${name}: ${lots.toFixed(4)} lot needed for ${(riskCash).toFixed(2)} risk is below the broker minimum (${min / lot} lot); a bigger demo balance fixes this` };
   if (v > lot * LIMITS.maxLots + 1e-9 || (info.maxVolume && v > +info.maxVolume)) return { skip: `${name}: ${(v / lot).toFixed(2)} lot is above the ${LIMITS.maxLots}-lot cap` };
-  return { volume: v, riskCash: +riskCash.toFixed(2), lots: +(v / lot).toFixed(4) };
+  return { volume: v, riskCash: +riskCash.toFixed(2), lots: +(v / lot).toFixed(4), perLot: +perLot.toFixed(4) };
 }
 // relative stop/target for a market order: in 1/100000 of the price, a multiple of the symbol's smallest step
 export function relative(dist, digits = 5) {
@@ -243,7 +269,7 @@ export function executionStats(map, { since = 0 } = {}) {
     medianLagSec: lag.length ? med(lag) : null, bySymbol: Object.fromEntries(Object.entries(by).map(([k, a]) => [k, { n: a.length, meanSlipR: +(a.reduce((x, y) => x + y, 0) / a.length).toFixed(3) }])) };
 }
 
-export async function mirrorRound({ env, trades, state, tokens, WS = globalThis.WebSocket, now = Math.floor(Date.now() / 1000), timeout, onTokens }) {
+export async function mirrorRound({ env, trades, state, tokens, specs = null, WS = globalThis.WebSocket, now = Math.floor(Date.now() / 1000), timeout, onTokens }) {
   const scrub = scrubber(env), log = [], say = (msg, x = {}) => log.push({ at: new Date(now * 1000).toISOString(), msg: scrub(msg), ...x });
   const st = { map: {}, day: null, startedAt: null, ...(state || {}) };
   const out = { state: st, tokens: tokens || null, log, sent: [], alerts: [] };
@@ -362,7 +388,7 @@ export async function mirrorRound({ env, trades, state, tokens, WS = globalThis.
         if (!symbolId) { skip(`none of ${SYMBOLS[t.market].join('/')} found at the broker`); continue; }
         const info = ((await s.send(PT.SYMBOL_BY_ID_REQ, { ctidTraderAccountId: ctid, symbolId: [symbolId] }, PT.SYMBOL_BY_ID_RES)).symbol || [])[0] || {};
         const openRisk = Object.values(st.map).filter((m) => m.status === 'open' || m.status === 'sent').reduce((a, m) => a + (+m.riskCash || 0), 0);
-        const rv = riskVolume({ info, t, balance, name, openRisk });
+        const rv = riskVolume({ info, t, balance, name, openRisk, spec: specFor(specs, name), now });
         if (rv.skip) { skip(rv.skip); continue; }
         const volume = rv.volume, sell = t.side === 'sell', d = Number.isFinite(+info.digits) ? +info.digits : 5;
         if (info.tradingMode != null && info.tradingMode !== 0 && info.tradingMode !== 'ENABLED') { later(`${name} not tradable now (mode ${info.tradingMode})`); continue; }
@@ -403,7 +429,7 @@ if (process.argv[1] && process.argv[1].endsWith('ctrader-mirror.mjs')) {
   let ict = []; try { ict = JSON.parse(fs.readFileSync(path.join(DIR, 'ict', 'trades.json'), 'utf8')); } catch (e) {}
   const trades = (Array.isArray(raw) ? raw : raw.trades || []).concat(ictCandidates(ict));
   const saveTokens = (t) => { fs.mkdirSync(CD, { recursive: true }); fs.writeFileSync(path.join(CD, 'tokens.json'), JSON.stringify(t)); };
-  const prev = rd('mirror.json', {}), r = await mirrorRound({ env: process.env, trades, state: prev.state, tokens: rd('tokens.json', null), onTokens: saveTokens });
+  const prev = rd('mirror.json', {}), r = await mirrorRound({ env: process.env, trades, state: prev.state, tokens: rd('tokens.json', null), specs: rd('symbols.json', null), onTokens: saveTokens });
   fs.mkdirSync(CD, { recursive: true });
   fs.writeFileSync(path.join(CD, 'mirror.json'), JSON.stringify({ state: r.state, log: (prev.log || []).concat(r.log).slice(-300), limits: LIMITS, symbols: SYMBOLS, execution: executionStats(r.state.map) }, null, 1));
   if (r.tokens && JSON.stringify(r.tokens) !== JSON.stringify(rd('tokens.json', null))) saveTokens(r.tokens);
