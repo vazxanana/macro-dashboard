@@ -9,7 +9,7 @@ import { entryContext, startReview, watchReview, judge, newsNear, lessons } from
 import { m15cFeat } from './choch.mjs';
 import { alertable, alertEvents, sendAlerts, when, NTFY_DEFAULT, proposalDigest } from './alerts.mjs';
 import { liveRuleSection, injectSection, coachChurnSection, CHURN_START, CHURN_END, deskSection, DESK_START, DESK_END } from './analyst.mjs';
-import { coachProposals, spotProposals } from './proposals.mjs';
+import { coachProposals, spotProposals, ictVariantVerdicts } from './proposals.mjs';
 import { cleanBars, LTF_CLEAN } from './clean.mjs';
 import { voidRoundedReplicas, historyCatchUp } from './repairs.mjs';
 import { d1AdxFeat } from './adx.mjs';
@@ -1421,8 +1421,14 @@ try {
   // v2: promotion/demotion proposals read every setup's filters, so any rule change recomputes them
   // v3: plus the data-source proposal from the nightly spot check (research/spotcheck.json)
   const spot = rd('research/spotcheck.json', null);
-  const key = b && b.at ? 'v4|' + b.at + '|' + (spot && spot.at || '') + '|' + JSON.stringify(snapshot.feed || {}) + '|' + JSON.stringify([config.focusSetups || [], config.filters || {}]) : '';
-  if (key && cj.proposalsKey !== key) { cj.proposals = coachProposals(b, config, nowISO).concat(spotProposals(spot, nowISO, { feed: snapshot.feed || {} })); cj.proposalsKey = key; cj.proposalsBt = b.at; wr('coach.json', cj); }
+  // v5: plus the ICT desk's paper filter variants (ict/replay.json); only 'ictFilter' verdicts are proposals, 'ictWatch' are kept as notes
+  const ir = rd('ict/replay.json', null);
+  const key = b && b.at ? 'v5|' + b.at + '|' + (spot && spot.at || '') + '|' + (ir && ir.at || '') + '|' + JSON.stringify(snapshot.feed || {}) + '|' + JSON.stringify([config.focusSetups || [], config.filters || {}]) : '';
+  if (key && cj.proposalsKey !== key) {
+    const iv = ictVariantVerdicts(ir, nowISO);
+    cj.proposals = coachProposals(b, config, nowISO).concat(spotProposals(spot, nowISO, { feed: snapshot.feed || {} }), iv.filter((p) => p.kind === 'ictFilter'));
+    cj.ictWatch = iv.filter((p) => p.kind === 'ictWatch'); cj.proposalsKey = key; cj.proposalsBt = b.at; wr('coach.json', cj);
+  }
 } catch (e) { console.log('coach proposals failed:', e.message); }
 config.history = config.history.slice(-200);
 
