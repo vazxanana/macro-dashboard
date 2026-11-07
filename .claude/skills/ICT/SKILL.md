@@ -196,3 +196,17 @@ weekday, and the stop as a share of the daily ATR (`feat.atrR` = r0 / ATR14 of c
   +11.1 / +13.8 / +8.3R (DD 7.5 / 6.5 / 9.2): more profit and less drawdown in every year.
 - A+ adds little once the floor is in (cash: +25.6 / +20.3 / −3.8 / +14.1 vs A +20.4 / +25.9 / +1.3 / +16.8); kept as a tier.
 - Code: `feat.atrR`, `RISK_FLOOR = 0.3` and `isASetup()` in ict/tracker.mjs (the replay re-runs on tracker changes).
+
+## 21. Exits and portfolio controls re-checked with the stop floor (7 Nov 2026)
+On A-setups with the stop floor (§20), cash NQ/ES/YM 2023-24 | 2025-26 and NQ futures 2023 / 2024 / 2025:
+- **Time exit 36 trading hours (36 closed H1 candles) instead of 48** — cash +37.0R dd 10.1 | +36.0R dd 11.7 (48 h:
+  +46.3R dd 12.3 | +18.0R dd 16.3); NQ futures +10.9 / +13.9 / +9.8R, dd 4.2 / 5.6 / 6.5 (48 h: +11.1 / +13.8 / +8.3R,
+  dd 7.5 / 6.5 / 9.2). Plateau 30-40 h; 60-72 h collapses in 2025-26. Total profit up, drawdown down in every set; only
+  2023-24 cash profit is lower, so it would NOT pass the council's strict both-halves rule (ICT is a separate edge).
+  The live tracker and the replay now count the hold in closed H1 candles (weekends don't count), as in the research.
+- Fixed 2R / 3R / 4R targets: less profit than the trail in 2023-24 and no better in 2025-26 (4R: dd 31). The trail stays.
+- Portfolio controls did not help: one bet per cluster (2025-26 return/DD 0.4 vs 1.1 for every trade), 1R split across a
+  cluster 0.8, daily loss caps 1-3R no change, half size after 3 losses 0.2. Take every A-setup at the same 1R.
+- External evidence (deep research report "ICT and gold system improvements"): stops placed just beyond swept levels sit
+  in stop-cascade zones (Osler); intraday momentum into the close argues against afternoon reversals; no peer-reviewed
+  test of FVG / iFVG / kill zones exists.
