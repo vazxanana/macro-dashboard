@@ -1,4 +1,4 @@
-// Regime switch study (pre-registered in preregistration.md, committed 75458a96 before any indicator met any trade).
+// Regime switch study (pre-registered in preregistration.md, committed 039ec953 (first pushed as 75458a96) before any indicator met any trade).
 // Can a simple causal indicator (VOL: trailing 12-month realised-vol percentile, TREND: 6-month trend strength,
 // META: the system's own trailing 12-month net R) tell in advance when the council's edges work? Thresholds are chosen on the
 // first half of each history and judged on the second half. Paper research only; nothing live reads this.
@@ -123,7 +123,7 @@ const corr = (x, y) => { const n = x.length, mx = x.reduce((a, b) => a + b, 0) /
 function analyse() {
   const I = JSON.parse(fs.readFileSync(INPUTS, 'utf8'));
   const D = Object.fromEntries(Object.entries(I.d1).map(([m, rows]) => [m, series(rows)]));
-  const out = { built: new Date().toISOString().slice(0, 10), preregistration: 'research/edge/regime-switch/preregistration.md (commit 75458a96)', tests: NTESTS, bonferroniT: BONF,
+  const out = { built: new Date().toISOString().slice(0, 10), preregistration: 'research/edge/regime-switch/preregistration.md (commit 039ec953, first pushed as 75458a96)', tests: NTESTS, bonferroniT: BONF,
     data: Object.fromEntries(Object.entries(I.d1).map(([m, r]) => [m, { days: r.length, from: new Date(r[0][0] * 1000).toISOString().slice(0, 10), to: new Date(r.at(-1)[0] * 1000).toISOString().slice(0, 10) }])), systems: {} };
   for (const [key, cfg] of Object.entries(SYS)) {
     const from = utc(cfg.from), to = utc(cfg.to), split = utc(cfg.split);

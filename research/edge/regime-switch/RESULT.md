@@ -4,7 +4,7 @@ Paper research only. No live rule, config or tracker was changed. Anything here 
 
 **Question.** Every live edge so far is regime-bound (#511, #512, #526, #530). If a simple indicator, known before each
 trade, could say "this edge is in season", the desk could trade only in season. Three indicators were fixed in advance
-(`preregistration.md`, commit 75458a96, pushed before any indicator met any trade):
+(`preregistration.md`, commit 039ec953, first pushed as 75458a96 before a rebase, pushed before any indicator met any trade):
 
 - **VOL**: trailing 12-month realised volatility of the traded market, as a percentile of its first-half readings.
 - **TREND**: 6-month trend strength, ln(C / C 126 days ago) / (6-month daily sd x sqrt 126). Signed for the long-only gold
