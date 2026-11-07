@@ -104,6 +104,9 @@ jobs:
             # ICT desk (7 Nov): GitHub fired ict.yml's 15-min schedule only 3 times in 22 h, so the desk runs here, every 3rd
             # round (~17 min), before the mirror copies its A-setups. ict.yml keeps a manual trigger only (one writer of ict/).
             if [ $((i % 3)) -eq 1 ]; then node ict/tracker.mjs data/ict || echo "ICT round $i failed"; fi
+            # Macro strategist (7 Nov, paper only): next-day odds, event playbook and scorecard → data/macro/; every 6th round
+            # (~25 min), capped at 3 min; a failure never stops the loop.
+            if [ $((i % 6)) -eq 1 ]; then timeout 180 node council/macro.mjs data || echo "Macro round $i failed"; fi
             node council/ctrader-mirror.mjs data || echo "cTrader mirror round $i failed"
             node council/ctrader-test.mjs data || echo "cTrader test round $i failed"   # one-off demo test order, only when ctrader/test.json asks
             node council/ctrader-suite.mjs data || echo "cTrader suite round $i failed"   # demo trade test suite (latency, SL/TP, limit, cancel), only when ctrader/suite.json asks
