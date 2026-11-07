@@ -129,6 +129,10 @@
   .row { padding-top: 14px; padding-bottom: 14px; border-top: 1px solid var(--line-soft); animation: in .5s var(--ease) backwards; animation-delay: calc(var(--i, 0) * 35ms); }
   .row:first-of-type { border-top: 0; }
   .row:hover { background: color-mix(in srgb, var(--ink) 2.5%, transparent); }
+  /* deep link #<topic> (the week pane's Studies list and the daily digest point here): the row is opened, scrolled under the sticky bar and marked */
+  .row { scroll-margin-top: 72px; }
+  .row.hit, .row.hit:hover { background: var(--accent-soft); box-shadow: inset 3px 0 0 var(--accent); }
+  .row.hit:focus { outline: none; }
   .table > .row:last-child { border-radius: 0 0 var(--r) var(--r); }
   @keyframes in { from { opacity: 0; transform: translateY(4px); } }
   .lbl { display: none; }
@@ -534,7 +538,27 @@
     $('groups').innerHTML = html;
     if (state.rendered) document.querySelectorAll('.row').forEach(function (r) { r.style.animation = 'none'; });
     state.rendered = true;
+    deepLink();
   }
+
+  // #<topic> opens that study's row: its candidate list unfolds, the row scrolls under the sticky bar and is marked. Runs after
+  // every render (the rows are rebuilt on each refresh) and on hashchange; the scroll happens once per hash.
+  var linked = { topic: null, scrolled: false };
+  function deepLink() {
+    var t = decodeURIComponent((location.hash || '').slice(1).split('/')[0]);
+    if (!t || !/^[a-z0-9][a-z0-9_-]*$/i.test(t)) return;
+    if (linked.topic !== t) linked = { topic: t, scrolled: false };
+    var row = document.querySelector('.row[data-topic="' + t + '"]'); if (!row) return;
+    document.querySelectorAll('.row.hit').forEach(function (r) { if (r !== row) r.classList.remove('hit'); });
+    row.classList.add('hit');
+    var d = row.querySelector('details.more'); if (d && !d.open) { d.open = true; if (state.studies[t]) state.studies[t].open = true; }
+    if (linked.scrolled) return;
+    linked.scrolled = true;
+    row.setAttribute('tabindex', '-1'); row.style.animation = 'none';
+    row.scrollIntoView({ block: 'start' });
+    try { row.focus({ preventScroll: true }); } catch (e) {}
+  }
+  window.addEventListener('hashchange', function () { linked = { topic: null, scrolled: false }; deepLink(); });
 
   function getJSON(url) {
     return fetch(url, { cache: 'no-store' }).then(function (r) {

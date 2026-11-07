@@ -16,6 +16,8 @@
 //   5. edge scoreboard movers: streams whose verdict changed since the last digest (the scoreboard's own pure functions,
 //      script#ms-sb-js of market-structure.html, run here without a page)
 //   6. Sundays only: one line of the book-weights paper comparison (coach.json book, council/book.mjs): live vs proposed R
+//   7. research: on the day a study lands (council-data research/ledger.json, council/research-ledger.mjs) one line
+//      "New study: <name> — <headline>"; the Sunday preview carries a "Research this week" block (count by verdict, up to three)
 //
 // Sent through alerts.mjs sendAlerts (ntfy + Telegram, the same env as the other alerts). Deduplicated per UTC day in
 // council-data digest.json, so a restart never sends twice; when every channel fails nothing is marked and the next round tries
@@ -37,11 +39,13 @@ import vm from 'node:vm';
 import { sendAlerts, when, NTFY_DEFAULT, SITE, alertable, actionable, proposalLine } from './alerts.mjs';
 import { usHolidays } from './datacheck.mjs';
 import { expectLine } from './expect.mjs';
+import { researchLines } from './research-ledger.mjs';
 
 export const COUNCIL_URL = SITE + 'market-structure.html#council';
 export const CFG = {
   at: 21 * 60 + 15,   // UTC minute of the day from which the digest may go out (about an hour after the 16:00 New York close)
   maxLines: 15,       // body lines at most
+  maxLinesPreview: 18,   // the Sunday preview may carry the "Research this week" block
   macroStaleH: 12,    // a forecast older than this is labelled with its date
   dataStaleH: 3,      // a data check older than this counts as a problem
   acctStaleH: 2,      // a cTrader account file older than this shows its time
@@ -270,8 +274,10 @@ export function buildDigest(D, { now, kind = 'daily', prev = {}, sbRows = null }
         : 'Scoreboard: no verdict changes.');
   } else L.push('Scoreboard: could not be built this time.');
   if (kind === 'preview') { const bl = bookLine(D.coach && D.coach.book); if (bl) L.push(bl); }   // Sundays only: the book-weights paper comparison
+  L.push(...researchLines(D.ledger, now, kind));   // nothing on a day without a new study
   L.push(when(now));
-  const lines = L.length > CFG.maxLines ? L.slice(0, CFG.maxLines - 1).concat(L.at(-1)) : L;
+  const max = kind === 'preview' ? CFG.maxLinesPreview : CFG.maxLines;
+  const lines = L.length > max ? L.slice(0, max - 1).concat(L.at(-1)) : L;
   const title = `${kind === 'preview' ? 'Week ahead' : 'Daily digest'} · ${dayLabel(now)}: Meridian ${fR(mer.net)} · ICT ${fR(ictA.net)} net`;
   return { title, msg: lines.join('\n'), lines, state: { sb: sbRows ? verdictMap(sbRows) : (prev && prev.sb) || null, robust: D.robust ? robustMap(D.robust) : (prev && prev.robust) || null } };
 }
@@ -281,7 +287,7 @@ export function readData(dir) {
   const rd = (f) => { try { return JSON.parse(fs.readFileSync(path.join(dir, f), 'utf8')); } catch (e) { return null; } };
   return { rd, trades: rd('trades.json'), research: rd('research.json'), ictTrades: rd('ict/trades.json'), snapshot: rd('snapshot.json'), ictSnap: rd('ict/snapshot.json'),
     account: rd('ctrader/account.json'), mirror: rd('ctrader/mirror.json'), forecast: rd('macro/forecast.json'), coach: rd('coach.json'), health: rd('health.json'),
-    robust: rd('research/robustness.json'), state: rd('state.json') };
+    robust: rd('research/robustness.json'), ledger: rd('research/ledger.json'), state: rd('state.json') };
 }
 // The edge scoreboard's own pure functions (market-structure.html, script#ms-sb-js), as the scoreboard test runs them
 export function loadScoreboard(file = new URL('../market-structure.html', import.meta.url)) {
