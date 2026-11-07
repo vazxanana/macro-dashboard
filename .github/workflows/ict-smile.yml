@@ -1,0 +1,75 @@
+name: ICT x Dollar Smile (out-of-sample test)
+
+# Paper research, run once (research/edge/ict-smile/preregistration.md): classifies the 2018-01 .. 2025-07 ICT A-setups by the
+# Macro strategist's Dollar Smile phase (council/macro.mjs, unchanged) on full FRED history, which the sandbox cannot reach,
+# and writes council-data research/ict-smile.json + .md. Free (FRED fredgraph.csv, Cboe CSV) and failure-tolerant: a failed
+# fetch writes an "incomplete" result and the nightly schedule tries again; once a complete result exists, every later run
+# skips (no re-running a finished test) unless dispatched with force. Changes no rule.
+on:
+  workflow_dispatch:
+    inputs:
+      force:
+        description: 'Run again even if a complete result exists'
+        default: 'false'
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/ict-smile.yml'
+      - 'research/edge/ict-smile/analyse.mjs'
+  schedule:
+    - cron: '23 5 * * *'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: ict-smile
+  cancel-in-progress: false
+
+jobs:
+  smile:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    continue-on-error: true
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            research/edge/ict-smile
+            council
+
+      - name: Checkout council data (only the result files)
+        uses: actions/checkout@v4
+        with:
+          ref: council-data
+          path: data
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            /research/ict-smile.json
+            /research/ict-smile.md
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Skip if the test already ran
+        id: done
+        run: |
+          if [ "${{ github.event.inputs.force }}" != "true" ] && [ -f data/research/ict-smile.json ] \
+             && node -e 'process.exit(require("./data/research/ict-smile.json").status === "ok" ? 0 : 1)'; then
+            echo "skip=true" >> "$GITHUB_OUTPUT"; echo "A complete result exists: not running the test again."
+          fi
+
+      - name: Out-of-sample test
+        if: steps.done.outputs.skip != 'true'
+        run: node research/edge/ict-smile/analyse.mjs data/research
+
+      - name: Save results
+        if: steps.done.outputs.skip != 'true'
+        run: |
+          git -C data config user.name "mosha-council"
+          git -C data config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git -C data add research/ict-smile.json research/ict-smile.md
+          git -C data commit -q -m "ICT x Dollar Smile out-of-sample test $(date -u +%Y-%m-%dT%H:%MZ)" || exit 0
+          for j in 1 2 3 4 5; do git -C data pull -q --rebase origin council-data && git -C data push -q origin HEAD:council-data && break; sleep 7; done

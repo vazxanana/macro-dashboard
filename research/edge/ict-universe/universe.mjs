@@ -82,7 +82,7 @@ for (const [key, u] of Object.entries(U)) {
       const t = simulate(g, M, key, src); if (!t) { gaps++; continue; }
       if (!t.closed) continue;
       const size = a ? sizeOf(g, mk) : 1, c = u.cost(g.entry) / g.r0;
-      res.trades.push([key, cfg, t.side === 'buy' ? 1 : -1, g.close, a ? 1 : 0, size, +t.R.toFixed(3), +c.toFixed(4), g.feat.session, g.feat.atrR, g.feat.bias === 'against' ? 1 : 0, g.grade.total, t.exit, t.res]);
+      res.trades.push([key, cfg, t.side === 'buy' ? 1 : -1, g.close, a ? 1 : 0, size, +t.R.toFixed(3), +c.toFixed(4), g.feat.session, g.feat.atrR, g.feat.bias === 'against' ? 1 : 0, g.grade.total, t.exit, t.res, t.closed]);
       const end = t.closed; busyAll = Math.max(busyAll, end); if (a) busyA = end;
     }
     res.src[key][cfg] = { signals: sig.length, gaps };
@@ -99,13 +99,13 @@ for (const [key, u] of Object.entries(U)) {
       const e = H[i].close, r0 = k * atrD, g = { side: s, entry: e, r0, stop: e - s * r0, close, t: H[i].time, sweepT: H[i].time, swept: e, fvg: [e, e], ih: null, dol: null, valid: true, feat: {}, grade: { total: 0 } };
       const j = lb(m5, close), t = simulate(g, { ...u.M, aRule: 'gold' }, key, { H: H.slice(i + 1, i + 121), m5: m5.slice(j, j + 12 * 24 * 12), m5days });
       if (!t || !t.closed) continue;
-      res.trades.push([key, s > 0 ? 'ctrlbuy' : 'ctrlsell', s, close, 1, 1, +t.R.toFixed(3), +(u.cost(e) / r0).toFixed(4), null, +k.toFixed(3), null, null, t.exit, t.res]);
+      res.trades.push([key, s > 0 ? 'ctrlbuy' : 'ctrlsell', s, close, 1, 1, +t.R.toFixed(3), +(u.cost(e) / r0).toFixed(4), null, +k.toFixed(3), null, null, t.exit, t.res, t.closed]);
     }
   }
   res.cost[key] = u.cost.toString();
   console.log(key, JSON.stringify(res.src[key]), ((Date.now() - t0) / 1000).toFixed(0) + 's');
 }
-res.cols = ['market', 'cfg', 'side', 'close', 'aset', 'size', 'Rraw', 'costR', 'session', 'atrR', 'against', 'grade', 'exit', 'res'];
+res.cols = ['market', 'cfg', 'side', 'close', 'aset', 'size', 'Rraw', 'costR', 'session', 'atrR', 'against', 'grade', 'exit', 'res', 'closed'];   // closed (exit time) added for research/edge/ict-smile's halves
 fs.mkdirSync(path.dirname(OUT), { recursive: true });
 fs.writeFileSync(OUT, JSON.stringify(res));
 console.log('trades', res.trades.length);
