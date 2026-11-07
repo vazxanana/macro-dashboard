@@ -1535,6 +1535,9 @@ td.st-dim { color: var(--ink-faint); }
 @media (prefers-reduced-motion: reduce) { #cmdk[open] { animation: none; } }
 #cmdk-q:focus, #cmdk-q:focus-visible { outline: none; box-shadow: none; }
 html[data-guest] #ms-cmdk-btn { display: none !important; }
+
+/* live dot: stale state (no new price for a while) is a hollow amber ring, no pulse */
+.ms-live-dot.stale { background: transparent !important; box-shadow: inset 0 0 0 2px #e0a526 !important; animation: none !important; }
 </style>
 </head>
 <body>
@@ -5174,6 +5177,16 @@ function msNextSetup(bars, A) {
   ['h-today', 'g-today'].forEach((id) => { const el = document.getElementById(id); if (!el) return; let done = false;
     const mo = new MutationObserver(() => { if (done) return; const bs = el.querySelectorAll('.h-kpi b'); if (!bs.length || ![...bs].some((b) => /\d/.test(b.textContent))) return; done = true; mo.disconnect(); bs.forEach(run); });
     mo.observe(el, { childList: true, subtree: true }); }); })();
+</script>
+<script>
+/* Live dot goes stale when the feed says live but no new price has arrived for 3 minutes */
+(() => { const dot = document.getElementById('ms-live-dot'), px = document.getElementById('ms-td-price'); if (!dot || !px) return;
+  let last = Date.now(); const LIM = () => window.__msStaleMs || 180000;
+  new MutationObserver(() => { last = Date.now(); if (dot.classList.contains('stale')) check(); }).observe(px, { childList: true, characterData: true, subtree: true });
+  function check() { const live = dot.classList.contains('on') || dot.classList.contains('poll'), age = Date.now() - last, st = live && age > LIM();
+    dot.classList.toggle('stale', st);
+    if (st) { const m = Math.round(age / 60000), t = `Stale: no new price for ${m < 1 ? 'under a minute' : m + ' min'} (the market may be closed or the feed paused)`; setTimeout(() => { if (dot.classList.contains('stale')) { dot.title = t; dot.setAttribute('aria-label', t); } }, 0); } }
+  setInterval(check, 15000); window.__msStaleCheck = check; })();
 </script>
 </body>
 </html>
