@@ -9,7 +9,7 @@ import { entryContext, startReview, watchReview, judge, newsNear, lessons } from
 import { m15cFeat } from './choch.mjs';
 import { alertable, alertEvents, sendAlerts, when, NTFY_DEFAULT, proposalDigest } from './alerts.mjs';
 import { liveRuleSection, injectSection, coachChurnSection, CHURN_START, CHURN_END } from './analyst.mjs';
-import { coachProposals } from './proposals.mjs';
+import { coachProposals, spotProposals } from './proposals.mjs';
 import { cleanBars, LTF_CLEAN } from './clean.mjs';
 import { voidRoundedReplicas, historyCatchUp } from './repairs.mjs';
 
@@ -1367,8 +1367,10 @@ const fslot = nowISO.slice(0, 11) + String(Math.floor(+nowISO.slice(11, 13) / 6)
 try {
   const b = rd('backtest.json', null), cj = rd('coach.json', {});
   // v2: promotion/demotion proposals read every setup's filters, so any rule change recomputes them
-  const key = b && b.at ? 'v2|' + b.at + '|' + JSON.stringify([config.focusSetups || [], config.filters || {}]) : '';
-  if (key && cj.proposalsKey !== key) { cj.proposals = coachProposals(b, config, nowISO); cj.proposalsKey = key; cj.proposalsBt = b.at; wr('coach.json', cj); }
+  // v3: plus the data-source proposal from the nightly spot check (research/spotcheck.json)
+  const spot = rd('research/spotcheck.json', null);
+  const key = b && b.at ? 'v3|' + b.at + '|' + (spot && spot.at || '') + '|' + JSON.stringify([config.focusSetups || [], config.filters || {}]) : '';
+  if (key && cj.proposalsKey !== key) { cj.proposals = coachProposals(b, config, nowISO).concat(spotProposals(spot, nowISO)); cj.proposalsKey = key; cj.proposalsBt = b.at; wr('coach.json', cj); }
 } catch (e) { console.log('coach proposals failed:', e.message); }
 config.history = config.history.slice(-200);
 

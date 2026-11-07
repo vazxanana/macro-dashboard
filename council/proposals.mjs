@@ -98,3 +98,18 @@ export function promoteDemote(rows, config, halves, at, opt = {}) {
   }
   return out;
 }
+
+// Data-source proposal (7 Nov): from research/spotcheck.json (council/spotcheck.mjs). The live Trader manages gold/forex
+// trades on Kraken candles; when the same trades re-judged on OANDA spot candles come out clearly worse, Kraken's thin forex
+// books are flattering the paper results. One proposal names the markets; never applied (the candle source is the owner's call).
+export function spotProposals(spot, at = new Date().toISOString(), opt = {}) {
+  const minN = opt.minN || 20, gap = opt.gap != null ? opt.gap : 8;
+  if (!spot || !spot.markets) return [];
+  const bad = Object.entries(spot.markets).filter(([, c]) => c && c.n >= minN && c.liveR - c.spotR >= gap).sort((a, b) => (b[1].liveR - b[1].spotR) - (a[1].liveR - a[1].spotR));
+  if (!bad.length) return [];
+  const n = bad.reduce((s, [, c]) => s + c.n, 0), liveR = r2(bad.reduce((s, [, c]) => s + c.liveR, 0)), spotR = r2(bad.reduce((s, [, c]) => s + c.spotR, 0));
+  const per = bad.map(([m, c]) => `${mName(m)} ${fR(c.liveR / c.n)} live vs ${fR(c.spotR / c.n)} spot (${c.n})`).join('; ');
+  return [{ setup: 'all', kind: 'dataSource', value: 'oanda:' + bad.map(([m]) => m).join(','), markets: bad.map(([m]) => m),
+    label: `manage ${bad.map(([m]) => mName(m)).join(', ')} trades on OANDA spot candles`, n, liveR, spotR, exp: r2((liveR - spotR) / n),
+    why: `The same closed live trades re-judged on OANDA spot candles: ${liveR >= 0 ? '+' : '−'}${Math.abs(liveR).toFixed(1)}R on Kraken candles vs ${spotR >= 0 ? '+' : '−'}${Math.abs(spotR).toFixed(1)}R on spot over ${n} trades (${per}). Kraken's thin forex books reach levels spot never touched, so the paper results look better than a broker would give.`, spotAt: spot.at, at }];
+}
