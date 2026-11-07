@@ -15,12 +15,15 @@
 
 // typical spread (same model as the trade reviews): one spread is paid per round trip
 export const spreadOf = (M, price) => M.group === 'Forex' ? 0.0001 : M.spot ? 0.3 : price * 0.0002;
-// Cost charged to a replay trade, in price: the spread, plus for crypto Kraken's exchange fees (the council's crypto prices are
-// Kraken spot; research/edge/costs: the spread alone was ~1/40 of the real cost). Kraken Pro's entry tier: 0.25% maker, 0.40% taker.
-// A limit entry pays maker, a market entry (twins, sweeps) taker; the exit is charged taker (stops are market orders). Forex and
-// gold keep the spread only (a raw-spread account's commission is about the spread again: research/edge/costs).
-export const FEE = { maker: 0.0025, taker: 0.004 };
-export const costOf = (M, price, limitEntry) => spreadOf(M, price) + (M.group === 'Crypto' ? price * ((limitEntry ? FEE.maker : FEE.taker) + FEE.taker) : 0);
+// Cost charged to a replay trade, in price: the spread, plus for crypto the rest of a CFD round trip. Until 7 Nov crypto was
+// charged Kraken Pro spot fees (0.25% maker / 0.40% taker a side, FEE below, kept for the research that cites them): the council's
+// crypto prices are Kraken spot, and research/edge/costs found the spread alone ~1/40 of that. The owner trades through cTrader
+// (CFD), so the Kraken venue was the wrong cost model (shadow-audit, 8 Nov: 300R of a −288R paper week was those fees); crypto
+// now pays the costs study's CFD figure, 0.04% a round trip (CFD_CRYPTO), of which spreadOf is the 0.02% spread. Forex and gold
+// keep the spread only (a raw-spread account's commission is about the spread again: research/edge/costs).
+export const FEE = { maker: 0.0025, taker: 0.004 };   // Kraken Pro entry tier: no longer charged, see above
+export const CFD_CRYPTO = 0.0004;                     // CFD round trip on crypto as a fraction of price (research/edge/costs "raw" column)
+export const costOf = (M, price, limitEntry) => spreadOf(M, price) + (M.group === 'Crypto' ? price * (CFD_CRYPTO - 0.0002) : 0);
 
 export const SLIP_SPREADS = 0.5;   // conservative default: half a spread of slippage on every market order until real fills exist
 export const MIN_FILLS = 5;        // demo fills a market needs before the mirror's slippage replaces the default
