@@ -9,6 +9,7 @@ import { entryContext, startReview, watchReview, judge, newsNear, lessons } from
 import { m15cFeat } from './choch.mjs';
 import { FUT, ticket, closeTicket } from './futures.mjs';
 import { liveRuleSection, injectSection } from './analyst.mjs';
+import { coachProposals } from './proposals.mjs';
 
 const DIR = process.argv[2] || 'data';
 fs.mkdirSync(DIR, { recursive: true });
@@ -1357,7 +1358,8 @@ if (coach.date !== today) {
     const sh = shadows.filter((x) => x.market === m && (x.blockedBy || []).includes('market'));
     if (sh.length >= 4 && exp(sh) > 0.3) { delete config.pausedMarkets[m]; change(`Resumed market ${m} early`, `Shadow trades while paused made +${exp(sh).toFixed(2)}R over ${sh.length}.`); }
   }
-  wr('coach.json', { date: today, at: nowISO, stats, last14: rs, lessons: lessons(trades, now), fslot: nowISO.slice(0, 11) + String(Math.floor(+nowISO.slice(11, 13) / 6) * 6).padStart(2, '0'), notes: notes.length ? notes : ['No change today: not enough evidence to move a rule.'] });
+  const prev = rd('coach.json', {});   // keep the owner-facing proposals between the daily runs
+  wr('coach.json', { proposals: prev.proposals || [], proposalsKey: prev.proposalsKey || '', date: today, at: nowISO, stats, last14: rs, lessons: lessons(trades, now), fslot: nowISO.slice(0, 11) + String(Math.floor(+nowISO.slice(11, 13) / 6) * 6).padStart(2, '0'), notes: notes.length ? notes : ['No change today: not enough evidence to move a rule.'] });
 }
 // every run: pause a setup as soon as its live record says so
 {
@@ -1383,6 +1385,13 @@ const fslot = nowISO.slice(0, 11) + String(Math.floor(+nowISO.slice(11, 13) / 6)
     wr('coach.json', cj);
   }
 }
+// Coach proposals (7 Nov): suggestions for the owner from the replay, for the setups trading live. Never applied here:
+// live rules change only with the owner's OK. Recomputed when backtest.json or the live setups' rules change.
+try {
+  const b = rd('backtest.json', null), cj = rd('coach.json', {});
+  const key = b && b.at ? b.at + '|' + JSON.stringify((config.focusSetups || []).map((k) => [k, (config.filters || {})[k] || null])) : '';
+  if (key && cj.proposalsKey !== key) { cj.proposals = coachProposals(b, config, nowISO); cj.proposalsKey = key; cj.proposalsBt = b.at; wr('coach.json', cj); }
+} catch (e) { console.log('coach proposals failed:', e.message); }
 config.history = config.history.slice(-200);
 
 wr('config.json', config);
