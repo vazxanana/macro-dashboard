@@ -3,7 +3,8 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
-import { voidM30Twins, m30Twin, M30_DEDUPE_AT } from '../council/repairs.mjs';
+import { voidM30Twins, m30Twin, M30_DEDUPE_AT, recostCrypto, RECOST_KEY } from '../council/repairs.mjs';
+import { annotateCosts } from '../council/fills.mjs';
 
 const NOW = '2026-11-08T00:00:00.000Z';
 const before = M30_DEDUPE_AT - 3600, after = M30_DEDUPE_AT + 3600;
@@ -59,4 +60,22 @@ test('the Trader runs the repair once per data set, after the trades are loaded'
   const load = src.indexOf("let trades = rd('trades.json'"), call = src.indexOf('voidM30Twins(trades, config, nowISO)');
   assert.ok(load > 0 && call > load, 'the repair runs after trades.json is read');
   assert.ok(call < src.indexOf('Take new Ready setups'), 'and before new trades are taken');
+});
+
+test('recostCrypto clears the Kraken-sized costR of closed crypto trades once; annotateCosts then re-costs them under the CFD model', () => {
+  const MK = { btc: { group: 'Crypto' }, xau: { group: 'Metals', spot: true } };
+  const T = [
+    { id: 'btc-1', market: 'btc', k: 'scalp', side: 'buy', entry: 100000, stop: 99500, t1: 101000, opened: 1, filled: 1, status: 'loss', R: -1, costR: 1.62, Rnet: -2.62, costSrc: 'default', shadow: true },
+    { id: 'btc-2', market: 'btc', k: 'trend', side: 'buy', entry: 100000, stop: 95000, opened: 2, filled: 2, status: 'open', R: null },
+    { id: 'xau-1', market: 'xau', k: 'scalp', side: 'buy', entry: 4000, stop: 3998, t1: 4006, opened: 3, filled: 3, status: 'win', R: 2, costR: 0.22, Rnet: 1.78, costSrc: 'default' },
+  ];
+  const config = {};
+  assert.equal(recostCrypto(T, MK, config, NOW), 1);
+  assert.equal(T[0].costR, undefined); assert.equal(T[0].Rnet, undefined);
+  assert.equal(T[2].costR, 0.22, 'gold untouched'); assert.equal(T[1].costR, undefined, 'open trade untouched');
+  assert.ok(config.repairs.includes(RECOST_KEY)); assert.match(config.history[0].change, /1 closed crypto paper trades re-costed/);
+  annotateCosts(T, MK, {});
+  assert.ok(T[0].costR > 0.08 && T[0].costR < 0.15, `CFD cost ${T[0].costR}`); assert.equal(T[0].R, -1, 'gross R unchanged'); assert.ok(T[0].Rnet > -1.2);
+  T[0].costR = 1.62;
+  assert.equal(recostCrypto(T, MK, config, NOW), 0, 'runs once'); assert.equal(T[0].costR, 1.62);
 });

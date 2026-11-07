@@ -73,3 +73,22 @@ export function voidM30Twins(trades, config, nowISO) {
     why: 'm30m1 fires on the same M1 entry as the Scalp. The Trader drops the copy since 6 Nov 18:03 UTC (#259); the copies recorded before that still counted the same trade twice in the shadow book and in the m30m1 rules.' });
   return n;
 }
+
+// 7 Nov (owner decision, #568): crypto paper trades pay the CFD round trip (0.04% of price), not Kraken spot fees. Trades closed
+// before that keep a Kraken-sized costR (0.8%+ of price: 1.6R and more on a 0.5% stop), so the shadow book, the week report and
+// the scoreboard still showed the old venue. The repair clears costR / Rnet / costSrc on closed crypto trades once; the Trader's
+// annotateCosts (same round) recomputes them under the CFD model. R (gross) is untouched; nothing is added or removed.
+export const RECOST_KEY = 'recost-crypto-cfd-2026-11-07';
+export function recostCrypto(trades, markets, config, nowISO) {
+  config.repairs = config.repairs || []; config.history = config.history || [];
+  if (config.repairs.includes(RECOST_KEY)) return 0;
+  let n = 0, was = 0;
+  for (const x of trades) {
+    const M = markets[x.market]; if (!M || M.group !== 'Crypto' || x.costR == null) continue;
+    was += +x.costR || 0; delete x.costR; delete x.Rnet; delete x.costSrc; n++;
+  }
+  config.repairs.push(RECOST_KEY);
+  config.history.push({ at: nowISO, by: 'repair', change: `Costs: ${n} closed crypto paper trades re-costed under the CFD model (0.04% a round trip); they had carried ${was.toFixed(1)}R of Kraken spot fees in total. Gross R unchanged.`,
+    why: 'Owner decision 7 Nov: the council trades through cTrader (CFD), so Kraken spot fees were the wrong venue (research/edge/shadow-audit: 300R of a −288R paper week).' });
+  return n;
+}

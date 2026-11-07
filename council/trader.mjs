@@ -16,7 +16,7 @@ import { recordVerdicts } from './digest.mjs';   // the shared verdict record (d
 import { buildBook } from './book.mjs';
 import { buildExpect } from './expect.mjs';
 import { cleanBars, LTF_CLEAN } from './clean.mjs';
-import { voidRoundedReplicas, historyCatchUp, voidM30Twins } from './repairs.mjs';
+import { voidRoundedReplicas, historyCatchUp, voidM30Twins, recostCrypto } from './repairs.mjs';
 import { d1AdxFeat } from './adx.mjs';
 // paper fills (8 Nov): costs (raw R + cost-adjusted Rnet), the stale-signal shadow stat, gap-aware stops (council/fills.mjs)
 import { costModel, annotateCosts, costSummary, driftR, backfillDrift, staleStats, stopFill, exitR, fillBarAmbiguous, spotSkip } from './fills.mjs';
@@ -413,6 +413,8 @@ let research = rd('research.json', []);
 // One-time data repairs (7 Nov, council/repairs.mjs): void the 4 Nov rounded-price replica signals; history catch-up lines;
 // 8 Nov: the pre-dedupe m30m1 copies of Scalp entries get status 'duplicate' (research/edge/shadow-audit)
 voidRoundedReplicas(research, config, nowISO); historyCatchUp(config, nowISO); voidM30Twins(trades, config, nowISO);
+// 7 Nov: closed crypto trades re-costed under the CFD model (#568); annotateCosts below recomputes costR / Rnet this round
+recostCrypto(trades, MARKETS, config, nowISO);
 // ─── Research setup (paper only): the trader's gold replica (3 Nov) ───
 // Rebuilt from the four marked gold trades of 2-3 Nov: a leg of at least 2 M15 ATRs in the last 3 h or 6 h; M5 (1-candle
 // swings) closes back through the last swing against the leg (the CHoCH) = the signal. Limit entry at the 30% retest from
