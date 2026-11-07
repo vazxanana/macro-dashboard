@@ -1637,6 +1637,11 @@ html[data-motion="off"] .stagger-in > * { animation: none; }
 .top { transition: box-shadow .2s ease-out; }
 html.scrolled .top { box-shadow: 0 6px 20px -10px rgba(0,0,0,.55); }
 :root[data-theme="light"].scrolled .top { box-shadow: 0 6px 18px -10px rgba(16,24,40,.18); }
+
+/* phone tab bar: active tab gets a soft pill behind its icon */
+.btab a svg { padding: 3px 14px; box-sizing: content-box; border-radius: 999px; transition: background-color .2s cubic-bezier(.23,1,.32,1); }
+.btab a[aria-current="page"] svg { background: color-mix(in srgb, var(--accent) 16%, transparent); }
+:root[data-theme="pro"] .btab a svg { border-radius: 6px; }
 </style>
 <script>try{if(localStorage.getItem('msMotion')==='off')document.documentElement.dataset.motion='off'}catch(e){}</script>
 </head>
