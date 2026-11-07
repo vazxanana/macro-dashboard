@@ -2651,7 +2651,7 @@ html[data-motion="off"] #v-ict .ict-cal-d:hover { transform: none !important; }
   <!-- ─── Home: one card per section ─── -->
   <section class="view" id="v-home" aria-label="Home">
     <div class="h-top"><div><div class="h-dl"><div class="h-date" id="h-date"></div><span class="h-clock" id="h-clock" hidden></span></div><h1 class="h-head" id="h-head">Loading live candles…</h1></div></div>
-    <nav class="h-quick" aria-label="Jump to"><a href="#council/calendar">Calendar</a><a href="#council/overview">Active trades</a><a href="#council/trades">All trades</a><a href="#council/review" class="adm">Loss review</a><a href="#council/systems" class="adm">Systems</a><a href="#council/research" class="adm">Research</a><a href="#journal">Journal</a></nav>
+    <nav class="h-quick" aria-label="Jump to"><a href="#council/calendar">Calendar</a><a href="#council/overview">Active trades</a><a href="#council/trades">All trades</a><a href="#council/review" class="adm">Loss review</a><a href="#council/systems" class="adm">Systems</a><a href="#council/research" class="adm">Research</a><a href="#council/scoreboard" class="adm">Edge scoreboard</a><a href="#journal">Journal</a></nav>
     <div class="h-warn" id="h-warn" role="alert" hidden></div>
     <div class="h-today" id="h-today" role="group" aria-label="Results today"></div>
     <section class="h-mk" id="h-mk" aria-labelledby="h-mk-t" aria-busy="true" hidden><div class="h-mk-h"><h2 id="h-mk-t">Markets now</h2><span class="h-mk-k" id="h-mk-k">% vs prior day's close (UTC) · line 24 h</span><span class="h-mk-st" id="h-mk-st" role="status" aria-live="polite"></span></div><div class="h-mk-row" id="h-mk-row"></div></section>
@@ -2888,6 +2888,16 @@ html[data-motion="off"] #v-ict .ict-cal-d:hover { transform: none !important; }
       </div>
     </div>
     <div class="c-grid c-pane c-pane-research adm" id="ms-cp-research" role="tabpanel" aria-labelledby="ms-cn-research" data-pane="research" hidden>
+      <div class="card c-sb adm" id="ms-sb">
+        <div class="ms-k"><span>Edge scoreboard · every strategy stream</span><span class="ms-note" id="ms-sb-at"></span></div>
+        <p class="sb-sum" id="ms-sb-sum">Loading the scoreboard…</p>
+        <div class="sb-bar">
+          <div class="sb-seg" role="group" aria-label="Show streams from"><button type="button" data-sbf="all" class="on" aria-pressed="true">All</button><button type="button" data-sbf="Meridian" aria-pressed="false">Meridian</button><button type="button" data-sbf="ICT" aria-pressed="false">ICT</button><button type="button" data-sbf="other" aria-pressed="false">Demo and macro</button></div>
+          <label class="sb-thin"><input type="checkbox" id="ms-sb-thin"> Thin shadow streams (under 20 trades)</label>
+        </div>
+        <div class="sb-wrap" tabindex="0" role="region" aria-label="Edge scoreboard, scrolls sideways"><table class="sb-t"><thead id="ms-sb-h"></thead><tbody id="ms-sb-b"><tr><td class="sb-empty">Loading…</td></tr></tbody></table></div>
+        <p class="ms-note sb-foot">Sorted by evidence: the t-statistic of R per trade, strongest edge first and strongest loser last; streams under 20 trades go to the end (thin shadow streams are hidden until you tick the box). Verdict: <b>Edge</b> t ≥ 2 with both halves positive · <b>Promising</b> positive, t ≥ 1 · <b>Losing</b> negative, t ≤ −1 · <b>Unclear</b> in between · <b>Too few</b> under 20 trades. Replay rows are net of spread; forward rows as recorded. Tap a stream for its equity curve.</p>
+      </div>
       <div class="card c-analyst">
         <div class="ms-k">Analyst · weekly brief</div>
         <div class="c-sub">Ready right now</div>
@@ -6031,6 +6041,7 @@ function msNextSetup(bars, A) {
       const m1 = panes['1m']; if (m1 && m1.bars) topDown();
     }
     renderCouncil();
+    try { window.MS_COUNCIL = COUNCIL; document.dispatchEvent(new CustomEvent('ms:council')); } catch (e) {}   // edge scoreboard (#ms-sb) reads the same copy
   }
   // Tell the user when the always-on Trader opens or closes a trade (scored trades only, once each)
   function councilAlerts(trades) {
@@ -9575,6 +9586,411 @@ html[data-role="public"] #ms-me-ct { display: none; }
   }
   load(); setInterval(load, 10 * 60e3);
 })();
+</script>
+<style>
+/* Edge scoreboard (#ms-sb, 7 Nov, owner: "where is the edge across both systems, at a glance"). Research pane, admin only. */
+.c-pane > .c-sb { grid-column: 1 / -1; min-width: 0; }
+.c-sb .sb-sum { margin: 0 0 10px; font-size: 13.5px; line-height: 1.5; color: var(--ink-dim); } .c-sb .sb-sum b { color: var(--ink); }
+.c-sb .sb-sum a, .sb-t .sb-ask a { color: var(--accent); font-weight: 600; text-decoration: none; } .c-sb .sb-sum a:hover, .sb-t .sb-ask a:hover { text-decoration: underline; }
+.c-sb .sb-bar { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 14px; margin: 0 0 10px; }
+.c-sb .sb-seg { display: flex; flex-wrap: wrap; gap: 6px; }
+.c-sb .sb-seg button { min-height: 32px; padding: 4px 10px; border-radius: 8px; border: 1px solid var(--line); background: var(--panel); color: var(--ink); font: inherit; font-size: 12.5px; font-weight: 600; cursor: pointer; }
+.c-sb .sb-seg button.on { border-color: var(--accent); background: color-mix(in srgb, var(--accent) 12%, var(--panel)); }
+.c-sb .sb-seg button:focus-visible, .sb-t button:focus-visible, .c-sb .sb-wrap:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.c-sb .sb-thin { display: inline-flex; align-items: center; gap: 6px; font-size: 12.5px; color: var(--ink-dim); min-height: 32px; cursor: pointer; }
+.c-sb .sb-wrap { width: 0; min-width: 100%; max-height: min(72vh, 760px); overflow: auto; -webkit-overflow-scrolling: touch; overscroll-behavior-x: contain; border: 1px solid var(--line); border-radius: var(--r-sm, 8px); }
+.sb-t { width: 100%; border-collapse: separate; border-spacing: 0; font-size: 13px; font-variant-numeric: tabular-nums; }
+.sb-t th, .sb-t td { padding: 7px 9px; border-bottom: 1px solid var(--line); text-align: right; white-space: nowrap; vertical-align: middle; }
+.sb-t thead th { position: sticky; top: 0; z-index: 2; background: var(--panel-raised, var(--panel)); font-size: 11.5px; font-weight: 600; color: var(--ink-dim); }
+.sb-t thead th button { all: unset; cursor: pointer; display: inline-flex; gap: 3px; align-items: center; } .sb-t thead th button:hover { color: var(--ink); }
+.sb-t thead th[aria-sort] { color: var(--ink); } .sb-t thead th .sb-ar { font-size: 10px; }
+.sb-t th.sb-l, .sb-t td.sb-l { text-align: left; }
+.sb-t thead th:first-child, .sb-t tbody th { position: sticky; left: 0; z-index: 1; background: var(--panel); text-align: left; }
+.sb-t thead th:first-child { z-index: 3; background: var(--panel-raised, var(--panel)); }
+.sb-t tbody th { font-weight: 400; min-width: 150px; max-width: 220px; white-space: normal; box-shadow: inset 3px 0 0 var(--sb-c, var(--line)), 1px 0 0 var(--line); }
+.sb-t .sb-name { all: unset; cursor: pointer; display: grid; gap: 1px; width: 100%; } .sb-t .sb-name b { color: var(--ink); font-size: 13px; font-weight: 600; line-height: 1.3; }
+.sb-t .sb-name small { color: var(--ink-faint); font-size: 11px; line-height: 1.3; } .sb-t .sb-name .sb-sys { color: var(--ink-dim); font-size: 10.5px; font-weight: 600; }
+.sb-t .sb-name::after { content: "Show curve ▾"; color: var(--accent); font-size: 10.5px; font-weight: 600; } .sb-t .sb-name[aria-expanded="true"]::after { content: "Hide curve ▴"; }
+.sb-t tr.v-edge { --sb-c: var(--buy); } .sb-t tr.v-promising { --sb-c: color-mix(in srgb, var(--buy) 55%, var(--line)); }
+.sb-t tr.v-losing { --sb-c: var(--sell); } .sb-t tr.v-unclear { --sb-c: var(--ink-faint); } .sb-t tr.v-few { --sb-c: var(--line); }
+.sb-t tr.v-edge td { background: color-mix(in srgb, var(--buy) 6%, transparent); } .sb-t tr.v-losing td { background: color-mix(in srgb, var(--sell) 5%, transparent); }
+.sb-t tr.v-few td { color: var(--ink-dim); }
+.sb-t .pos { color: var(--buy); font-weight: 600; } .sb-t .neg { color: var(--sell); font-weight: 600; } .sb-t small.sb-n { color: var(--ink-faint); font-weight: 400; }
+.sb-v, .sb-st, .sb-rb { display: inline-block; padding: 2px 7px; border-radius: 6px; font-size: 11.5px; font-weight: 600; border: 1px solid var(--line); color: var(--ink-dim); line-height: 1.4; }
+.sb-v.v-edge { background: var(--buy-soft, rgba(47,191,143,.12)); color: var(--buy); border-color: color-mix(in srgb, var(--buy) 40%, transparent); }
+.sb-v.v-promising { color: var(--buy); border-color: color-mix(in srgb, var(--buy) 40%, transparent); }
+.sb-v.v-losing { background: var(--sell-soft, rgba(242,87,111,.12)); color: var(--sell); border-color: color-mix(in srgb, var(--sell) 40%, transparent); }
+.sb-v.v-unclear { color: var(--ink); } .sb-v.v-few { border-style: dashed; color: var(--ink-faint); }
+.sb-st.st-live { color: var(--ink); border-color: var(--accent); background: var(--accent-soft, rgba(91,140,255,.12)); } .sb-st.st-paper { color: var(--ink); }
+.sb-st.st-watch { color: var(--gold, #e3b341); border-color: color-mix(in srgb, var(--gold, #e3b341) 45%, transparent); } .sb-st.st-failed { color: var(--sell); border-style: dashed; } .sb-st.st-shadow { color: var(--ink-faint); }
+.sb-rb.rb-robust { color: var(--buy); border-color: color-mix(in srgb, var(--buy) 40%, transparent); } .sb-rb.rb-fragile { color: var(--gold, #e3b341); border-color: color-mix(in srgb, var(--gold, #e3b341) 45%, transparent); } .sb-rb.rb-notproven { color: var(--ink-faint); border-style: dashed; }
+.sb-t td.sb-ask { text-align: left; white-space: normal; min-width: 200px; max-width: 280px; font-size: 12px; color: var(--ink-dim); line-height: 1.4; } .sb-t td.sb-ask b { color: var(--ink); }
+.sb-t tr.sb-x td { background: var(--panel-raised, var(--panel)); padding: 10px 9px 12px; text-align: left; white-space: normal; }
+.sb-t .sb-xin { position: sticky; left: 9px; width: min(560px, calc(100vw - 104px)); display: grid; gap: 6px; }
+.sb-t .sb-xin svg { width: 100%; height: auto; max-width: 560px; display: block; } .sb-t .sb-xin p { margin: 0; font-size: 12px; color: var(--ink-dim); line-height: 1.45; } .sb-t .sb-xin p b { color: var(--ink); }
+.sb-t td.sb-empty { text-align: left; color: var(--ink-dim); white-space: normal; }
+.c-sb .sb-foot { margin: 10px 0 0; font-size: 12px; line-height: 1.5; } .c-sb .sb-foot b { color: var(--ink); font-weight: 600; }
+@media (max-width: 520px) { .sb-t { font-size: 12.5px; } .sb-t th, .sb-t td { padding: 6px 7px; } .sb-t tbody th { min-width: 132px; max-width: 160px; } }
+@media (forced-colors: active) { .sb-v, .sb-st, .sb-rb { forced-color-adjust: none; } }
+:root[data-theme="light"] .sb-st.st-watch, :root[data-theme="light"] .sb-rb.rb-fragile { color: #8a5d00; border-color: rgba(138,93,0,.4); }
+</style>
+<script id="ms-sb-js">
+// Edge scoreboard (7 Nov 2026, owner: see where the edge is across both systems at a glance). Owner/admin only (#ms-sb, class adm).
+// One row per strategy stream: Meridian live + shadow setups (council trades.json forward, backtest.json 30-day replay under the
+// current rule, research/replay-2w.json system replays), the ICT A-rule (ict/replay.json + forward ict/trades.json), its paper
+// variants and the dip-buy stream (shadowByVariant / totalsByVariant, ict/shadow.json), the cTrader demo mirror (ctrader/mirror.json)
+// and, when the files exist, research/robustness.json (robust / fragile / not proven) and macro/forecast.json (macro scorecard row).
+// Pure functions are on window.MS_SB (tests/scoreboard.test.mjs runs them without a page).
+(function (W) {
+  'use strict';
+  var DAY = 86400;
+  var SYS_K = ['replica', 'mosha-bo', 'trend', 'gtrend', 'gtrend5', 'gtl', 'geg', 'gmp'];   // keep in step with SYS_K in the main script
+  var SYS_ON = { replica: function (c) { return (c.replicaLive || []).length > 0; }, 'mosha-bo': function (c) { return !!c.moshaBo; }, trend: function (c) { return (c.cryptoTrend || []).length > 0; },
+    gtrend: function (c) { return !!c.goldTrend; }, gtrend5: function (c) { return !!c.goldTrendFast; }, gtl: function (c) { return !!c.goldTL; }, geg: function (c) { return !!c.goldEG; }, gmp: function (c) { return !!c.goldMP; } };
+  var VARIANT = { nofri: 'ICT A-setups, skip Fridays', h1opp: 'ICT A-setups against or without H1 structure', dip: 'ICT dip-buy (NQ / ES)' };
+  var ASK = /^(promote|promoteIf|demote|skipMarket|skipSession|dataSource|ictFilter)$/;
+  var num = function (v) { return typeof v === 'number' && isFinite(v); };
+  var closedSt = function (s) { return s === 'win' || s === 'loss' || s === 'be'; };
+  var tsec = function (v) { if (num(v)) return v > 1e11 ? v / 1000 : v; var d = Date.parse(v); return isFinite(d) ? d / 1000 : null; };
+  var norm = function (s) { return String(s || '').toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim(); };
+  var cap = function (s) { s = String(s || ''); return s.charAt(0).toUpperCase() + s.slice(1); };
+
+  // n, win rate, R per trade, total, max drawdown (peak to trough of the cumulative R), t of the mean, halves by time, last 30 days
+  function stats(pts, now) {
+    var P = (pts || []).filter(function (p) { return p && num(p.R); }).slice().sort(function (a, b) { return (a.t || 0) - (b.t || 0); });
+    var n = P.length; if (!n) return { n: 0, curve: [] };
+    var sum = 0, w = 0, peak = 0, dd = 0, curve = [];
+    P.forEach(function (p) { sum += p.R; if (p.R > 0) w++; curve.push(sum); if (sum > peak) peak = sum; if (sum - peak < dd) dd = sum - peak; });
+    var m = sum / n, sd = n > 1 ? Math.sqrt(P.reduce(function (a, p) { return a + (p.R - m) * (p.R - m); }, 0) / (n - 1)) : 0;
+    var mean = function (A) { return A.length ? A.reduce(function (a, p) { return a + p.R; }, 0) / A.length : null; };
+    var h = n >> 1, A1 = P.slice(0, h), A2 = P.slice(h), L = now ? P.filter(function (p) { return p.t && p.t >= now - 30 * DAY; }) : [];
+    // t of the mean; when every trade has the same R (no spread) t is undefined: tFlat keeps its sign for the verdict and the sort
+    return { n: n, wins: w, wr: w / n, exp: m, R: sum, dd: dd, t: sd > 0 && n > 1 ? m / (sd / Math.sqrt(n)) : null, tFlat: sd === 0 && n > 1 && m !== 0 ? (m > 0 ? 1 : -1) : 0,
+      h1: A1.length ? { n: A1.length, exp: mean(A1) } : null, h2: A2.length ? { n: A2.length, exp: mean(A2) } : null,
+      l30: { n: L.length, exp: mean(L), R: L.reduce(function (a, p) { return a + p.R; }, 0) }, from: P[0].t || null, to: P[n - 1].t || null, split: h, curve: curve };
+  }
+  var tv = function (s) { return num(s.t) ? s.t : s.tFlat ? s.tFlat * 1e6 : 0; };
+  function verdict(s) {
+    if (!s || !s.n || s.n < 20) return 'few';
+    var t = tv(s);
+    if (t >= 2 && s.h1 && s.h2 && s.h1.exp > 0 && s.h2.exp > 0) return 'edge';
+    if (s.exp > 0 && t >= 1) return 'promising';
+    if (s.exp < 0 && t <= -1) return 'losing';
+    return 'unclear';
+  }
+  // evidence first: streams with 20+ trades by t (strongest edge first, strongest loser last), then the thin ones by n
+  function byEvidence(a, b) {
+    var ta = a.s.n >= 20, tb = b.s.n >= 20; if (ta !== tb) return ta ? -1 : 1;
+    if (!ta) return b.s.n - a.s.n;
+    return tv(b.s) - tv(a.s) || b.s.n - a.s.n;
+  }
+  // the Trader's live filters (council/proposals.mjs passesLive): the replay is judged under each setup's current rule
+  function passesLive(t, f) {
+    if (!f) return true;
+    for (var c of ['d1', 'cf', 'choch', 'm15c']) if (f[c] && t[c] !== undefined && t[c] !== f[c]) return false;
+    if (f.struct && t.struct && t.struct !== 'n/a' && t.struct !== f.struct) return false;
+    if ((f.noSession || []).indexOf(t.session) >= 0) return false;
+    if (f.minRR && !(t.rr >= f.minRR)) return false;
+    if (f.maxRR && t.rr > f.maxRR) return false;
+    if ((f.noMarket || []).indexOf(t.market) >= 0) return false;
+    return true;
+  }
+  // robustness.json is still being built elsewhere: take every object that carries a robust / fragile / not-proven verdict
+  function rv(v) { v = String(v || '').toLowerCase(); return /not[\s_-]*robust/.test(v) ? 'fragile' : /not[\s_-]*(proven|supported)|unproven|insufficient|inconclusive/.test(v) ? 'notproven' : /fragile/.test(v) ? 'fragile' : /robust/.test(v) ? 'robust' : null; }
+  function robustEntries(J) {
+    var out = [];
+    (function walk(o, hint, d) {
+      if (!o || typeof o !== 'object' || d > 6) return;
+      if (Array.isArray(o)) { o.forEach(function (x) { walk(x, hint, d + 1); }); return; }
+      var v = [o.verdict, o.robustness, o.robust, o.status].find(function (x) { return typeof x === 'string' && rv(x); });
+      if (v) out.push({ keys: [o.stream, o.id, o.key, o.rule, o.name, o.setup, o.system, o.label, hint].filter(function (x) { return typeof x === 'string' && x; }).map(norm), v: rv(v), why: String(o.why || o.note || o.reason || '') });
+      Object.keys(o).forEach(function (k) { if (o[k] && typeof o[k] === 'object') walk(o[k], k, d + 1); });
+    })(J, '', 0);
+    return out;
+  }
+  // each entry goes to the row(s) whose alias it matches best (exact, else the longest alias found as whole words in its name)
+  function applyRobust(rows, J) {
+    var E = robustEntries(J);
+    E.forEach(function (e) {
+      var best = 0, hit = [];
+      rows.forEach(function (r) {
+        var sc = 0; (r.aliases || []).map(norm).filter(Boolean).forEach(function (a) { e.keys.forEach(function (k) { var s = k === a ? 1000 + a.length : (' ' + k + ' ').indexOf(' ' + a + ' ') >= 0 ? a.length : 0; if (s > sc) sc = s; }); });
+        if (sc > best) { best = sc; hit = [r]; } else if (sc && sc === best) hit.push(r);
+      });
+      hit.forEach(function (r) { if (!r.robust || best > (r.robustScore || 0)) { r.robust = e.v; r.robustWhy = e.why; r.robustScore = best; } });
+    });
+    return E.length;
+  }
+  // macro/forecast.json (being built): graded calls with R, or hit/miss (+1R / −1R), or totals only
+  function macroRow(J, now) {
+    if (!J || typeof J !== 'object') return null;
+    // council/macro.mjs format: scorecard.live / .replay per asset = { n, hit, base, z, brier, pt }: the gold daily direction call, scored
+    // hit +1R / miss -1R, its t = the hit rate against the base rate (z); the live log once it has 20+ days, else the walk-forward replay
+    var SC = J.scorecard;
+    if (SC && SC.replay && typeof SC.replay === 'object' && !Array.isArray(SC.replay)) {
+      var lv = SC.live && SC.live.gold, use = lv && lv.n >= 20 ? lv : SC.replay.gold, isLive = use === lv;
+      var mrow = { id: 'macro', sys: 'Macro', name: 'Macro forecast (gold)', code: 'strategist', src: (isLive ? 'live forecast log' : 'walk-forward replay') + ', daily direction, hit +1R / miss −1R', status: 'watch',
+        statusWhy: 'paper only: the Macro strategist changes no rule or trade', pts: [], aliases: ['macro', 'macro forecast', 'forecast', 'macro strategist'], ask: { text: 'Nothing · a forecast scorecard, not a trading rule' } };
+      if (use && use.n) { mrow.agg = { n: use.n, wins: Math.round(use.hit * use.n), R: use.n * (2 * use.hit - 1), t: num(use.z) ? use.z : null };
+        mrow.note = 'Hit rate ' + Math.round(use.hit * 100) + '% against a ' + Math.round(use.base * 100) + '% base rate over ' + use.n + ' days (t = z of the hit rate against the base rate' + (num(use.brier) ? '; Brier ' + use.brier + ' vs 0.25 for a coin flip' : '') + (use.pt != null ? '; Pesaran-Timmermann ' + use.pt : '') + ').' + (lv && lv.n && !isLive ? ' Live log: ' + lv.n + ' days so far.' : ''); }
+      else mrow.note = 'No scored forecasts yet.';
+      return mrow;
+    }
+    var S = J.scorecard || J.score || J.track || J, hitMode = false;
+    var list = [S.calls, S.history, S.items, S.forecasts, S.record, S.graded, J.calls, J.history, J.forecasts, J.graded, Array.isArray(S) ? S : null].find(function (a) { return Array.isArray(a) && a.length; }) || [];
+    var pts = [];
+    list.forEach(function (x) {
+      if (!x || typeof x !== 'object') return;
+      var R = [x.R, x.r, x.ret, x.pnlR].find(num);
+      if (R == null) {
+        var h = [x.hit, x.correct, x.ok, x.right].find(function (v) { return typeof v === 'boolean'; });
+        var rs = x.result || x.outcome || x.grade;
+        if (h == null && typeof rs === 'string') { rs = rs.toLowerCase(); h = /^(hit|win|correct|right|yes)/.test(rs) ? true : /^(miss|loss|wrong|no)/.test(rs) ? false : null; }
+        if (h == null) return; R = h ? 1 : -1; hitMode = true;
+      }
+      pts.push({ t: tsec(x.resolved != null ? x.resolved : x.resolvedAt != null ? x.resolvedAt : x.closed != null ? x.closed : x.at != null ? x.at : x.date != null ? x.date : x.t), R: R });
+    });
+    var row = { id: 'macro', sys: 'Macro', name: 'Macro forecast', src: pts.length ? (hitMode ? 'graded calls, hit +1R / miss −1R' : 'graded calls') : 'scorecard', status: 'watch', pts: pts,
+      aliases: ['macro', 'macro forecast', 'forecast'], ask: { text: 'Nothing · a forecast scorecard, not a trading rule' } };
+    if (!pts.length) {
+      var n = [S.n, S.count, S.total, S.graded].find(num), hits = [S.hits, S.wins, S.correct].find(num);
+      if (num(n) && n > 0) row.agg = { n: n, wins: num(hits) ? hits : null, R: num(S.R) ? S.R : null };
+      else row.note = 'The forecast file has no graded calls yet.';
+    }
+    return row;
+  }
+  function build(D) {
+    D = D || {}; var now = D.now || Date.now() / 1000, cfg = D.config || {}, coach = D.coach || {}, rows = [];
+    var props = Array.isArray(coach.proposals) ? coach.proposals : [], watch = Array.isArray(coach.ictWatch) ? coach.ictWatch : [];
+    var F = cfg.filters || {}, focus = cfg.focusSetups || [], stopped = cfg.sleeveStopped || {}, names = {};
+    var T = Array.isArray(D.trades) ? D.trades : [];
+    T.forEach(function (x) { if (x && x.k && !names[x.k]) names[x.k] = (x.name || x.k) + (x.pair && !/^(Replica|Gold|Crypto)/.test(x.name || '') ? ' ' + x.pair : ''); });
+    var RP = D.replay && Array.isArray(D.replay.trades) ? D.replay.trades.filter(function (x) { return x.k !== 'nq-open' || x.session === 'nyflip'; }) : [];
+    RP.forEach(function (x) { if (x && x.k && !names[x.k]) names[x.k] = x.name || x.k; });
+    var status = function (k) {
+      if (SYS_K.indexOf(k) >= 0) return SYS_ON[k] && !SYS_ON[k](cfg) ? ['failed', 'switched off in the council config'] : ['live', 'main system, trades live on paper'];
+      if (k === 'nq-open') return ['live', 'main system (NQ New York open run), forward paper'];
+      var f = F[k] || {};
+      if (stopped[k]) return ['failed', 'stopped by the live guard'];
+      if (f.off) return ['failed', 'switched off in the council config'];
+      if (focus.indexOf(k) >= 0) return ['live', 'engine setup trading live'];
+      if (props.some(function (p) { return p.setup === k && (p.kind === 'promote' || p.kind === 'promoteIf'); })) return ['watch', 'the Coach proposes it for a live slot'];
+      return ['shadow', 'followed in the shadow book only'];
+    };
+    var ask = function (k, st) {
+      var P = props.filter(function (p) { return p.setup === k && ASK.test(p.kind); });
+      if (P.length) return { n: P.length, text: P.map(function (p) { return cap(p.label || p.kind); }).join(' · '), href: '#council/systems' };
+      if (st === 'failed') return { text: 'Nothing · switched off' };
+      if (st === 'live') return { text: SYS_K.indexOf(k) >= 0 || k === 'nq-open' ? 'Nothing pending' : 'Nothing pending · the guard moves it back at −0.30R a trade over 20+' };
+      return { text: 'Nothing yet · the Coach proposes a live slot at 100+ replay trades, +0.10R a trade, both halves up', shadow: 1 };
+    };
+    var add = function (k, src, sk, pts, extra) {
+      var st = status(k), r = { id: 'mer-' + k + '-' + sk, sys: 'Meridian', k: k, name: names[k] || k, code: k, src: src, status: st[0], statusWhy: st[1], pts: pts,
+        aliases: [k, names[k] || k, 'meridian ' + k], ask: ask(k, st[0]) };
+      rows.push(Object.assign(r, extra || {}));
+    };
+    // forward: closed live and shadow trades by setup
+    var G = {};
+    T.forEach(function (x) { if (!x || !x.k || !closedSt(x.status) || !num(x.R) || !x.closed) return; var key = x.k + (x.shadow ? '|sh' : '|lv'); (G[key] = G[key] || []).push({ t: x.closed, R: +x.R }); });
+    Object.keys(G).forEach(function (key) { var p = key.split('|'); add(p[0], p[1] === 'sh' ? 'forward, shadow book' : 'forward, live book', p[1] === 'sh' ? 'shadow' : 'live', G[key]); });
+    // 30-day replay of the engine setups (backtest.json): filled trades under the current rule, after spread
+    var B = D.backtest;
+    if (B && !B.fake && Array.isArray(B.tradeCols) && Array.isArray(B.trades)) {
+      var cols = B.tradeCols, BR = B.trades.map(function (r) { var o = {}; cols.forEach(function (c, i) { o[c] = r[i]; }); return o; })
+        .filter(function (t) { return t.fill !== 0 && t.status !== 'open' && String(t.setup).indexOf('@') < 0 && num(t.R_none); });
+      var BG = {}; BR.forEach(function (t) { (BG[t.setup] = BG[t.setup] || []).push(t); });
+      Object.keys(BG).forEach(function (k) {
+        var f = F[k] || {}, A = f.off ? BG[k] : BG[k].filter(function (t) { return passesLive(t, f); });
+        add(k, (B.days || 30) + '-day replay' + (f.off ? ', no rule (off)' : ', current rule'), 'replay', A.map(function (t) { return { t: t.opened, R: t.R_none - (+t.cost || 0) }; }));
+      });
+    }
+    // system replays (research/replay-2w.json): the main systems over years of history
+    var RG = {}; RP.forEach(function (x) { if (!closedSt(x.status) || !num(x.R) || !x.closed) return; (RG[x.k] = RG[x.k] || []).push({ t: x.closed, R: +x.R }); });
+    Object.keys(RG).forEach(function (k) { add(k, 'system replay' + (D.replay.from ? ' since ' + String(D.replay.from).slice(0, 4) : ''), 'sysreplay', RG[k]); });
+
+    // ICT desk
+    var IR = D.ictReplay || {}, IT = Array.isArray(D.ictTrades) ? D.ictTrades : [], IS = D.ictShadow || {};
+    var pt = function (x) { return x && closedSt(x.status) && num(x.R) && x.closed ? { t: x.closed, R: +x.R } : null; };
+    var ictFrom = IR.from && isFinite(Date.parse(IR.from)) ? 'replay since ' + new Date(Date.parse(IR.from)).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric', timeZone: 'UTC' }) : 'replay';
+    var ictProps = props.filter(function (p) { return p.kind === 'ictFilter'; });
+    if (Array.isArray(IR.trades) || IT.length || IR.totalsA) {
+      var fwdA = IT.filter(function (x) { return x && x.aset; }).map(pt).filter(Boolean);
+      var A = (IR.trades || []).filter(function (x) { return x && x.aset; }).map(pt).filter(Boolean).concat(fwdA);
+      var ra = { id: 'ict-a', sys: 'ICT', name: 'ICT A-rule', code: 'A-setups', src: ictFrom + ' + forward (' + fwdA.length + ')', status: 'paper', statusWhy: 'ICT desk: paper only, the edge is not proven on 2023-26 cash data',
+        pts: A, aliases: ['ict a', 'ict a rule', 'ict a setups', 'ict a setup', 'a rule', 'a setups', 'ict desk', 'ict'],
+        ask: ictProps.length ? { n: ictProps.length, text: ictProps.map(function (p) { return 'Adopt filter: ' + String(p.label || p.value).replace(/^ICT A-setups:\s*/, ''); }).join(' · '), href: '#council/systems' } : { text: 'Nothing yet · paper until about 30 closed forward A+ trades' } };
+      if (!A.length && IR.totalsA) ra.agg = IR.totalsA;
+      rows.push(ra);
+    }
+    var vs = {}; [IR.shadowByVariant, IR.totalsByVariant, IS.variants].forEach(function (o) { if (o && typeof o === 'object') Object.keys(o).forEach(function (v) { vs[v] = 1; }); });
+    if (Array.isArray(IR.shadow) || IR.totalsDip || IS.variant) vs[IS.variant || 'dip'] = 1;
+    Object.keys(vs).forEach(function (v) {
+      var dipV = v === (IS.variant || 'dip');
+      var rp = dipV ? (Array.isArray(IR.shadow) ? IR.shadow : (IR.shadowByVariant || {})[v]) : (IR.shadowByVariant || {})[v];
+      var fw = dipV ? IS.trades : ((IS.variants || {})[v] || {}).trades;
+      var fwP = (Array.isArray(fw) ? fw : []).map(pt).filter(Boolean), pts = (Array.isArray(rp) ? rp : []).map(pt).filter(Boolean).concat(fwP);
+      var pr = ictProps.find(function (p) { return p.value === v; }), w = watch.find(function (p) { return p.value === v; });
+      var r = { id: 'ict-' + v, sys: 'ICT', name: VARIANT[v] || 'ICT variant ' + v, code: v, src: ictFrom + ' + forward (' + fwP.length + ')',
+        status: pr || w ? 'watch' : 'shadow', statusWhy: pr ? 'the Coach proposes this filter' : w ? 'on the Coach’s ICT watch list' : 'paper variant, recorded next to the A-rule', pts: pts,
+        aliases: [v, VARIANT[v] || v, 'ict ' + v, v === 'dip' ? 'dip buy' : v, v === 'dip' ? 'ict dip' : v],
+        ask: pr ? { n: 1, text: 'Adopt filter: ' + String(pr.label || v).replace(/^ICT A-setups:\s*/, ''), href: '#council/systems' } : w ? { text: 'Nothing yet · on the Coach’s watch list (proposed when the trades it drops lose at t ≤ −2)', href: '#council/systems' } : { text: 'Nothing yet · paper candidate' } };
+      if (w && w.why) r.note = w.why;
+      if (!pts.length) { var tot = (IR.totalsByVariant || {})[v] || (dipV ? IR.totalsDip : null); if (tot && tot.n) r.agg = tot; }
+      rows.push(r);
+    });
+
+    // cTrader demo mirror: closed demo positions (council R less the fill slippage), plus the execution summary
+    var M = D.mirror;
+    if (M && (M.execution || M.state)) {
+      var X = M.execution || {}, map = (M.state && M.state.map) || {};
+      var mp = Object.keys(map).map(function (id) { return map[id]; }).filter(function (m) { return m && num(m.councilR) && m.closedAt; }).map(function (m) { return { t: tsec(m.closedAt), R: m.councilR - (num(m.slipR) ? m.slipR : 0) }; });
+      var sg = function (v) { return (v >= 0 ? '+' : '−') + Math.abs(v).toFixed(2) + 'R'; };
+      rows.push({ id: 'mirror', sys: 'cTrader', name: 'cTrader demo mirror', code: 'demo', src: 'demo fills, council R less slippage', status: 'paper', statusWhy: (M.state && M.state.status) || 'demo account',
+        pts: mp, aliases: ['mirror', 'ctrader', 'ctrader mirror', 'ctrader demo', 'demo mirror'], ask: { text: 'Nothing · demo account only' },
+        note: X.n ? X.n + ' demo fill' + (X.n === 1 ? '' : 's') + '; slippage against the council entry ' + sg(X.meanSlipR) + ' on average (median ' + sg(X.medianSlipR) + ', worst ' + sg(X.worstSlipR) + ')' + (X.medianLagSec != null ? ', median ' + X.medianLagSec + ' s to the demo order' : '') + '.' : 'No demo fills yet.' });
+    }
+    var mr = macroRow(D.macro, now); if (mr) rows.push(mr);
+
+    rows.forEach(function (r) {
+      r.s = r.agg && !(r.pts || []).length ? { n: +r.agg.n || 0, wins: r.agg.wins, wr: num(r.agg.wins) && r.agg.n ? r.agg.wins / r.agg.n : null, exp: num(r.agg.R) && r.agg.n ? r.agg.R / r.agg.n : null, R: num(r.agg.R) ? r.agg.R : null, dd: null, t: num(r.agg.t) ? r.agg.t : null, h1: null, h2: null, l30: null, curve: [], agg: true } : stats(r.pts, now);
+      r.v = verdict(r.s);
+      if (r.ask && r.ask.shadow && r.v === 'losing') r.ask = { text: 'Nothing · it loses, so it stays in the shadow book' };
+    });
+    if (D.robust) applyRobust(rows, D.robust);
+    return rows.sort(byEvidence);
+  }
+  // the approvals waiting for the owner (all Coach proposals that need an OK)
+  function waiting(coach) { return (coach && Array.isArray(coach.proposals) ? coach.proposals : []).filter(function (p) { return ASK.test(p.kind); }); }
+  var API = { stats: stats, verdict: verdict, byEvidence: byEvidence, build: build, robustEntries: robustEntries, applyRobust: applyRobust, macroRow: macroRow, passesLive: passesLive, waiting: waiting };
+  W.MS_SB = API;
+  if (typeof document === 'undefined' || !document.getElementById) return;
+
+  // ─── page ───
+  var VL = { edge: 'Edge', promising: 'Promising', unclear: 'Unclear', losing: 'Losing', few: 'Too few' };
+  var SL = { live: 'Live', paper: 'Paper', shadow: 'Shadow', watch: 'Watch', failed: 'Failed' };
+  var RL = { robust: 'Robust', fragile: 'Fragile', notproven: 'Not proven' };
+  var SB = { f: 'all', thin: false, sort: null, open: {}, rows: null, extra: null, extraAt: 0, loading: null, hasRobust: false };
+  try { SB.f = localStorage.getItem('msSbF') || 'all'; SB.thin = localStorage.getItem('msSbThin') === '1'; } catch (e) {}
+  var $ = function (id) { return document.getElementById(id); };
+  var esc = function (s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); };
+  var fR = function (v, d) { return num(v) ? (v > 0 ? '+' : v < 0 ? '−' : '') + Math.abs(v).toFixed(d == null ? 2 : d) + 'R' : '—'; };
+  var cR = function (v, d) { return num(v) ? '<span class="' + (v > 0.005 ? 'pos' : v < -0.005 ? 'neg' : '') + '">' + fR(v, d) + '</span>' : '<small class="sb-n">—</small>'; };
+  var fD = function (t) { return t ? new Date(t * 1000).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: '2-digit' }) : ''; };
+  var visible = function () { var p = $('ms-cp-research'); return document.documentElement.dataset.mode === 'admin' && p && !p.hidden && $('ms-sb'); };
+  function loadExtra() {
+    if (SB.extra && Date.now() - SB.extraAt < 5 * 60e3) return Promise.resolve(SB.extra);
+    if (SB.loading) return SB.loading;
+    var base = W.MS_CDATA || '', bust = Math.floor(Date.now() / 120000);
+    var get = function (f) { return fetch(base + f + '?v=' + bust, { cache: 'no-store' }).then(function (r) { return r.ok ? r.json() : null; }).catch(function () { return null; }); };
+    SB.loading = Promise.all([get('ict/replay.json'), get('ict/trades.json'), get('ict/shadow.json'), get('research/robustness.json'), get('macro/forecast.json')]).then(function (a) {
+      SB.extra = { ictReplay: a[0], ictTrades: a[1], ictShadow: a[2], robust: a[3], macro: a[4] }; SB.extraAt = Date.now(); SB.loading = null; return SB.extra; });
+    return SB.loading;
+  }
+  function refresh() {
+    if (!visible() || !W.MS_COUNCIL || !W.MS_COUNCIL.at) return;
+    loadExtra().then(function (x) {
+      var C = W.MS_COUNCIL;
+      SB.rows = build({ trades: C.trades, config: C.config, coach: C.coach, backtest: C.backtest, replay: C.replay, mirror: C.mirror, ictReplay: x.ictReplay, ictTrades: x.ictTrades, ictShadow: x.ictShadow, robust: x.robust, macro: x.macro, now: Date.now() / 1000 });
+      SB.hasRobust = !!x.robust; SB.coach = C.coach; SB.at = [C.backtest && C.backtest.at, x.ictReplay && x.ictReplay.at].filter(Boolean);
+      render();
+    });
+  }
+  var COLS = [
+    { k: 'name', h: 'Stream', l: 1, v: function (r) { return r.name; } },
+    { k: 'status', h: 'Status', l: 1, v: function (r) { return ['live', 'paper', 'watch', 'shadow', 'failed'].indexOf(r.status); } },
+    { k: 'verdict', h: 'Verdict', l: 1, v: function (r) { return ['edge', 'promising', 'unclear', 'few', 'losing'].indexOf(r.v); } },
+    { k: 'robust', h: 'Robustness', l: 1, only: 'robust', v: function (r) { return ['robust', 'fragile', 'notproven'].indexOf(r.robust); } },
+    { k: 'n', h: 'n', v: function (r) { return r.s.n; } },
+    { k: 'wr', h: 'Win %', v: function (r) { return r.s.wr; } },
+    { k: 'exp', h: 'R / trade (net)', v: function (r) { return r.s.exp; } },
+    { k: 'R', h: 'Total R', v: function (r) { return r.s.R; } },
+    { k: 'dd', h: 'Max DD', v: function (r) { return r.s.dd; } },
+    { k: 't', h: 't', v: function (r) { return r.s.t; } },
+    { k: 'halves', h: '1st / 2nd half', v: function (r) { return r.s.h2 ? r.s.h2.exp : null; } },
+    { k: 'l30', h: 'Last 30 days', v: function (r) { return r.s.l30 && r.s.l30.n ? r.s.l30.exp : null; } },
+    { k: 'ask', h: 'Owner approval needed', l: 1, nosort: 1 }
+  ];
+  function spark(r) {
+    var c = r.s.curve || []; if (c.length < 2) return '';
+    var Wd = 560, H = 96, px = 6, pr = 64, py = 10, pts = [0].concat(c), lo = Math.min.apply(null, pts.concat([0])), hi = Math.max.apply(null, pts.concat([0])), span = hi - lo || 1;
+    var X = function (i) { return px + (i / (pts.length - 1)) * (Wd - px - pr); }, Y = function (v) { return py + (hi - v) / span * (H - 2 * py); };
+    var d = pts.map(function (v, i) { return (i ? 'L' : 'M') + X(i).toFixed(1) + ' ' + Y(v).toFixed(1); }).join(''), end = pts[pts.length - 1], col = end >= 0 ? 'var(--buy)' : 'var(--sell)';
+    var sx = X(r.s.split || 0);
+    return '<svg viewBox="0 0 ' + Wd + ' ' + H + '" role="img" aria-label="Equity curve of ' + esc(r.name) + ': ' + fR(end, 1) + ' after ' + r.s.n + ' trades, lowest point ' + fR(lo, 1) + ', highest ' + fR(hi, 1) + '">'
+      + '<line x1="' + px + '" x2="' + (Wd - pr) + '" y1="' + Y(0).toFixed(1) + '" y2="' + Y(0).toFixed(1) + '" stroke="var(--ink-faint)" stroke-width="1" stroke-dasharray="3 4" opacity=".7"/>'
+      + (r.s.split ? '<line x1="' + sx.toFixed(1) + '" x2="' + sx.toFixed(1) + '" y1="' + py + '" y2="' + (H - py) + '" stroke="var(--ink-faint)" stroke-width="1" stroke-dasharray="2 3" opacity=".6"/>' : '')
+      + '<path d="' + d + '" fill="none" stroke="' + col + '" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" vector-effect="non-scaling-stroke"/>'
+      + '<circle cx="' + X(pts.length - 1).toFixed(1) + '" cy="' + Y(end).toFixed(1) + '" r="3.5" fill="' + col + '"/>'
+      + '<text x="' + (X(pts.length - 1) + 8).toFixed(1) + '" y="' + (Y(end) + 4).toFixed(1) + '" font-size="12" font-weight="600" fill="' + col + '">' + fR(end, 1) + '</text></svg>';
+  }
+  function detail(r, span) {
+    var s = r.s, bits = [];
+    if (s.curve && s.curve.length > 1) bits.push('Cumulative R, trade by trade' + (s.from && s.to ? ', ' + fD(s.from) + ' – ' + fD(s.to) : '') + '. The dotted line splits the two halves; dashes mark zero. Worst drawdown <b>' + fR(s.dd, 1) + '</b>.');
+    else if (s.agg) bits.push('Totals only: this file has no trade list for the stream, so no curve.');
+    else if (!s.n) bits.push('No closed trades yet.');
+    bits.push('<b>' + SL[r.status] + '</b>: ' + esc(r.statusWhy || '') + '.');
+    if (r.robust) bits.push('<b>' + RL[r.robust] + '</b> (research/robustness.json)' + (r.robustWhy ? ': ' + esc(r.robustWhy) : '.'));
+    if (r.note) bits.push(esc(r.note));
+    return '<tr class="sb-x" id="sb-x-' + esc(r.id) + '"><td colspan="' + span + '"><div class="sb-xin">' + spark(r) + bits.map(function (b) { return '<p>' + b + '</p>'; }).join('') + '</div></td></tr>';
+  }
+  function cell(c, r) {
+    var s = r.s;
+    switch (c.k) {
+      case 'name': return '<th scope="row"><button type="button" class="sb-name" aria-expanded="' + (SB.open[r.id] ? 'true' : 'false') + '" aria-controls="sb-x-' + esc(r.id) + '" data-sb-row="' + esc(r.id) + '"><span class="sb-sys">' + esc(r.sys) + (r.code && r.code !== r.name ? ' · ' + esc(r.code) : '') + '</span><b>' + esc(r.name) + '</b><small>' + esc(r.src) + '</small></button></th>';
+      case 'status': return '<td class="sb-l"><span class="sb-st st-' + r.status + '" title="' + esc(r.statusWhy || '') + '">' + SL[r.status] + '</span></td>';
+      case 'verdict': return '<td class="sb-l"><span class="sb-v v-' + r.v + '">' + VL[r.v] + '</span></td>';
+      case 'robust': return '<td class="sb-l">' + (r.robust ? '<span class="sb-rb rb-' + r.robust + '" title="' + esc(r.robustWhy) + '">' + RL[r.robust] + '</span>' : '<small class="sb-n">—</small>') + '</td>';
+      case 'n': return '<td>' + (s.n || 0) + '</td>';
+      case 'wr': return '<td>' + (num(s.wr) ? Math.round(s.wr * 100) + '%' : '<small class="sb-n">—</small>') + '</td>';
+      case 'exp': return '<td>' + cR(s.exp) + '</td>';
+      case 'R': return '<td>' + cR(s.R, 1) + '</td>';
+      case 'dd': return '<td>' + (num(s.dd) ? (s.dd < 0 ? '−' : '') + Math.abs(s.dd).toFixed(1) + 'R' : '<small class="sb-n">—</small>') + '</td>';
+      case 't': return '<td>' + (num(s.t) ? '<span class="' + (s.t >= 2 ? 'pos' : s.t <= -2 ? 'neg' : '') + '">' + (s.t < 0 ? '−' : '') + Math.abs(s.t).toFixed(2) + '</span>' : s.tFlat ? '<span class="' + (s.tFlat > 0 ? 'pos' : 'neg') + '" title="Every trade has the same result">' + (s.tFlat > 0 ? '∞' : '−∞') + '</span>' : '<small class="sb-n">—</small>') + '</td>';
+      case 'halves': return '<td>' + (s.h1 && s.h2 ? cR(s.h1.exp) + ' / ' + cR(s.h2.exp) : '<small class="sb-n">—</small>') + '</td>';
+      case 'l30': return '<td>' + (s.l30 && s.l30.n ? cR(s.l30.exp) + ' <small class="sb-n">(' + s.l30.n + ')</small>' : '<small class="sb-n">' + (s.l30 ? 'none' : '—') + '</small>') + '</td>';
+      case 'ask': var a = r.ask || {}; return '<td class="sb-ask">' + (a.n ? '<b>' + esc(a.text) + '</b> <a href="' + a.href + '" data-sb-go="ms-sleeve">Coach proposals →</a>' : esc(a.text || '—') + (a.href ? ' <a href="' + a.href + '" data-sb-go="ms-sleeve">See →</a>' : '')) + '</td>';
+    }
+    return '<td></td>';
+  }
+  function render() {
+    var body = $('ms-sb-b'), head = $('ms-sb-h'); if (!body || !head || !SB.rows) return;
+    var cols = COLS.filter(function (c) { return !c.only || SB.hasRobust; });
+    var inF = function (r) { return SB.f === 'all' || (SB.f === 'other' ? r.sys !== 'Meridian' && r.sys !== 'ICT' : r.sys === SB.f); };
+    var thin = function (r) { return r.s.n < 20 && (r.status === 'shadow' || r.status === 'failed'); };   // live, paper and watch streams always show
+    var all = SB.rows.filter(inF), thinN = all.filter(thin).length;
+    var rows = all.filter(function (r) { return SB.thin || !thin(r); });
+    if (SB.sort) { var c0 = COLS.find(function (c) { return c.k === SB.sort.k; }), dir = SB.sort.dir;
+      rows = rows.slice().sort(function (a, b) { var x = c0.v(a), y = c0.v(b), xn = x == null || x === -1, yn = y == null || y === -1; if (xn !== yn) return xn ? 1 : -1; if (xn) return byEvidence(a, b); return (typeof x === 'string' ? x.localeCompare(y) : x - y) * dir || byEvidence(a, b); }); }
+    head.innerHTML = '<tr>' + cols.map(function (c) { var on = SB.sort && SB.sort.k === c.k;
+      return '<th scope="col" class="' + (c.l ? 'sb-l' : '') + '"' + (on ? ' aria-sort="' + (SB.sort.dir > 0 ? 'ascending' : 'descending') + '"' : '') + '>' + (c.nosort ? c.h : '<button type="button" data-sb-sort="' + c.k + '">' + c.h + (on ? '<span class="sb-ar" aria-hidden="true">' + (SB.sort.dir > 0 ? '▲' : '▼') + '</span>' : '') + '</button>') + '</th>'; }).join('') + '</tr>';
+    body.innerHTML = rows.length ? rows.map(function (r) { return '<tr class="sb-r v-' + r.v + '">' + cols.map(function (c) { return cell(c, r); }).join('') + '</tr>' + (SB.open[r.id] ? detail(r, cols.length) : ''); }).join('')
+      : '<tr><td class="sb-empty" colspan="' + cols.length + '">' + (all.length ? 'Only thin shadow streams here: tick the box to see them.' : 'No streams to show yet.') + '</td></tr>';
+    document.querySelectorAll('[data-sbf]').forEach(function (b) { var on = b.dataset.sbf === SB.f; b.classList.toggle('on', on); b.setAttribute('aria-pressed', String(on)); });
+    var th = $('ms-sb-thin'); if (th) { th.checked = SB.thin; th.parentNode.lastChild.textContent = ' Thin shadow streams (under 20 trades' + (!SB.thin && thinN ? ', ' + thinN + ' hidden' : '') + ')'; }
+    // summary: how many streams show an edge, the strongest one, what waits for the owner
+    var big = SB.rows.filter(function (r) { return r.s.n >= 20; }), ed = big.filter(function (r) { return r.v === 'edge'; }), pr = big.filter(function (r) { return r.v === 'promising'; }), lo = big.filter(function (r) { return r.v === 'losing'; });
+    var top = big.filter(function (r) { return num(r.s.t) && r.s.t > 0; }).sort(byEvidence)[0], W8 = waiting(SB.coach);
+    var sum = $('ms-sb-sum'); if (sum) sum.innerHTML = '<b>' + SB.rows.length + '</b> streams, ' + big.length + ' with 20+ trades: <b class="' + (ed.length ? 'pos' : '') + '">' + ed.length + ' edge</b>, ' + pr.length + ' promising, <b class="' + (lo.length ? 'neg' : '') + '">' + lo.length + ' losing</b>.'
+      + (top ? ' Strongest evidence: <b>' + esc(top.name) + '</b> <small>(' + esc(top.src) + ')</small>, ' + fR(top.s.exp) + ' a trade over ' + top.s.n + ', t ' + top.s.t.toFixed(2) + '.' : '')
+      + ' ' + (W8.length ? '<b>' + W8.length + ' Coach proposal' + (W8.length === 1 ? '' : 's') + ' wait' + (W8.length === 1 ? 's' : '') + ' for your OK</b> · <a href="#council/systems" data-sb-go="ms-sleeve">open them →</a>' : 'Nothing waits for your OK.');
+    var at = $('ms-sb-at'); if (at) at.textContent = SB.at && SB.at.length ? 'replays ' + SB.at.map(function (a) { return new Date(a).toLocaleString('en-GB', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' }); }).join(' · ') : '';
+  }
+  document.addEventListener('click', function (e) {
+    var t = e.target.closest ? e.target : null; if (!t) return;
+    var f = t.closest('[data-sbf]'); if (f) { SB.f = f.dataset.sbf; try { localStorage.setItem('msSbF', SB.f); } catch (x) {} render(); return; }
+    var so = t.closest('[data-sb-sort]'); if (so) { var k = so.dataset.sbSort; SB.sort = SB.sort && SB.sort.k === k ? (SB.sort.dir < 0 ? { k: k, dir: 1 } : null) : { k: k, dir: k === 'name' || k === 'status' || k === 'verdict' || k === 'robust' ? 1 : -1 }; render(); var nb = document.querySelector('[data-sb-sort="' + k + '"]'); if (nb) nb.focus(); return; }
+    var rw = t.closest('[data-sb-row]'); if (rw) { var id = rw.dataset.sbRow; SB.open[id] = !SB.open[id]; render(); var nb2 = document.querySelector('[data-sb-row="' + id.replace(/"/g, '') + '"]'); if (nb2) nb2.focus(); return; }
+    var go = t.closest('[data-sb-go]'); if (go) { var tg = go.dataset.sbGo; setTimeout(function () { var el = $(tg); if (el && el.offsetParent) el.scrollIntoView({ block: 'start' }); }, 160); }
+  });
+  document.addEventListener('change', function (e) { if (e.target && e.target.id === 'ms-sb-thin') { SB.thin = e.target.checked; try { localStorage.setItem('msSbThin', SB.thin ? '1' : '0'); } catch (x) {} render(); } });
+  document.addEventListener('ms:council', refresh);
+  var pane = $('ms-cp-research'); if (pane) new MutationObserver(function () { if (!pane.hidden) refresh(); }).observe(pane, { attributes: true, attributeFilter: ['hidden'] });
+  // deep link #council/scoreboard: open the Research pane and scroll to the scoreboard
+  function goSb() { var b = $('ms-cn-research'); if (b && b.getAttribute('aria-selected') !== 'true') b.click(); setTimeout(function () { var c = $('ms-sb'); if (c && c.offsetParent) c.scrollIntoView({ block: 'start' }); refresh(); }, 120); }
+  W.addEventListener('hashchange', function () { if (/#council\/scoreboard$/.test(location.href)) setTimeout(goSb, 120); });
+  if (location.hash === '#council/scoreboard') setTimeout(goSb, 900);
+  setTimeout(refresh, 0);
+})(window);
 </script>
 </body>
 </html>
