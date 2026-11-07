@@ -2,7 +2,7 @@
 //   node --test tests/ctrader-mirror.test.mjs
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { mirrorRound, PT, ALLOWED, session, volumeFor, relative, seal, unseal, LIMITS, ictCandidates, orderStep, commentFor, mirrorAlertText, sendMirrorAlerts } from '../council/ctrader-mirror.mjs';
+import { mirrorRound, PT, ALLOWED, session, volumeFor, relative, seal, unseal, LIMITS, ictCandidates, orderStep, commentFor, mirrorAlertText, sendMirrorAlerts, riskVolume } from '../council/ctrader-mirror.mjs';
 
 const ENV = { CTRADER_CLIENT_ID: 'fake-client-id', CTRADER_CLIENT_SECRET: 'fake-client-secret', CTRADER_ACCESS_TOKEN: 'fake-access-old',
   CTRADER_REFRESH_TOKEN: 'fake-refresh-old', CTRADER_ACCOUNT_ID: '4242', CTRADER_ENV: 'demo', CTRADER_MIRROR: 'on' };
@@ -12,7 +12,7 @@ const INFO = { 7: { symbolId: 7, digits: 2, lotSize: 100, minVolume: 1, stepVolu
 // Like the real server, a market order / close gets ORDER_ACCEPTED (2) and then ORDER_FILLED (3), both with the request's clientMsgId,
 // enums as numbers. Options: reject (ORDER_ERROR_EVENT code), execReject (ORDER_REJECTED inside an execution event), fill: 'accepted-only'
 // (no fill event: the position opens/closes later) or 'silent' (order placed, no answer at all), info (symbol overrides).
-function broker({ isLive = false, balance = 100000, expireFirst = false, reject = null, execReject = false, fill = 'normal', closeFill = 'normal', info = {}, names = SYMS } = {}) {
+function broker({ isLive = false, balance = 1000000, expireFirst = false, reject = null, execReject = false, fill = 'normal', closeFill = 'normal', info = {}, names = SYMS } = {}) {
   const sent = [], positions = new Map(); let pid = 900, expired = expireFirst;
   const o = { reject, fill, closeFill };
   class WS {
@@ -93,9 +93,9 @@ test('never copies shadows, old trades, trades from before the mirror started, p
 });
 
 test('closes the position when the council closes the trade; marks broker-side closes', async () => {
-  const b = broker(); let r = await mirrorRound({ env: ENV, trades: [tr(), tr({ id: 'x2', market: 'xau', entry: 4000, stop: 3990, t1: 4030 })], state: started, WS: b.WS, now: NOW });
+  const b = broker(); let r = await mirrorRound({ env: ENV, trades: [tr(), tr({ id: 'x2', market: 'xau', entry: 4000, stop: 3998, t1: 4006 })], state: started, WS: b.WS, now: NOW });
   assert.equal(b.positions.size, 2);
-  const gold = b.sent.filter((m) => m.payloadType === PT.NEW_ORDER_REQ)[1].payload; assert.equal(gold.volume, 100); assert.equal(gold.relativeStopLoss, 1000000);
+  const gold = b.sent.filter((m) => m.payloadType === PT.NEW_ORDER_REQ)[1].payload; assert.equal(gold.volume, 100); assert.equal(gold.relativeStopLoss, 200000);
   [...b.positions.keys()].filter((k) => b.positions.get(k).tradeData.symbolId === 41).forEach((k) => b.positions.delete(k));   // gold stopped at the broker
   r = await mirrorRound({ env: ENV, trades: [tr({ status: 'loss' }), tr({ id: 'x2', market: 'xau', status: 'open' })], state: r.state, WS: b.WS, now: NOW + 300 });
   assert.equal(b.positions.size, 0); assert.equal(r.state.map['eurusd-intraday-1'].status, 'closed by council'); assert.equal(r.state.map.x2.status, 'closed at broker');
@@ -199,8 +199,8 @@ test('market closed: retried next round while fresh, at most LIMITS.retries time
   assert.equal(orders(b3).length, 0); assert.match(r.state.wait['eurusd-intraday-1'].why, /not tradable/);
 });
 
-test('sizing safety: no lot size -> no order (no forex-lot guess on an index); a minimum above 0.1 lot -> no order', async () => {
-  assert.equal(volumeFor({ digits: 2 }), null); assert.equal(volumeFor({ lotSize: 100, minVolume: 50, stepVolume: 1 }), null);
+test('sizing safety: no lot size -> no order (no forex-lot guess on an index); a minimum above the lot cap -> no order', async () => {
+  assert.equal(volumeFor({ digits: 2 }), null); assert.equal(volumeFor({ lotSize: 100, minVolume: 50, stepVolume: 1 }), null);   // fixed-lot helper: minimum above 0.1 lot
   assert.equal(volumeFor({ lotSize: 100, minVolume: 1, stepVolume: 1 }), 1); assert.equal(volumeFor(INFO[41]), 100);
   const b = broker({ info: { 1: { lotSize: undefined } } }); const r = await mirrorRound({ env: ENV, trades: [tr()], state: started, WS: b.WS, now: NOW });
   assert.equal(orders(b).length, 0); assert.match(r.state.skipped['eurusd-intraday-1'], /no lot size/);
@@ -243,8 +243,8 @@ test('housekeeping: skip notes dropped once the trade can no longer be copied; f
 
 test('daily stop: a day that started without a readable balance takes the first one it gets', async () => {
   const b = broker(); const st = { ...started, day: { date: new Date(NOW * 1000).toISOString().slice(0, 10), startBalance: null } };
-  let r = await mirrorRound({ env: ENV, trades: [], state: st, WS: b.WS, now: NOW }); assert.equal(r.state.day.startBalance, 1000);
-  b.setBalance(97000); r = await mirrorRound({ env: ENV, trades: [tr({ opened: NOW + 30, filled: NOW + 30 })], state: r.state, WS: b.WS, now: NOW + 60 });
+  let r = await mirrorRound({ env: ENV, trades: [], state: st, WS: b.WS, now: NOW }); assert.equal(r.state.day.startBalance, 10000);
+  b.setBalance(970000); r = await mirrorRound({ env: ENV, trades: [tr({ opened: NOW + 30, filled: NOW + 30 })], state: r.state, WS: b.WS, now: NOW + 60 });
   assert.equal(orders(b).length, 0); assert.match(r.state.skipped['eurusd-intraday-1'], /daily loss stop/);
 });
 
@@ -348,4 +348,26 @@ test('alerts never change the trading: same orders, alert flags kept in the save
   assert.deepEqual(types(b).filter((t) => t === PT.NEW_ORDER_REQ || t === PT.CLOSE_POSITION_REQ), [PT.NEW_ORDER_REQ, PT.CLOSE_POSITION_REQ]);
   assert.equal(r.state.map['eurusd-intraday-1'].status, 'closed by council'); assert.deepEqual(r.state.map['eurusd-intraday-1'].alerted, ['open', 'close']);
   assert.equal(ALLOWED.size, 11);
+});
+
+// ---- risk-based sizing (owner, 7 Nov: "risk-based lots, bigger demo") -----------------------------------------------------
+test('risk sizing: ICT 0.20% x size, Meridian 0.02% per 1R; USD-base pairs converted; open-risk cap; below the minimum is skipped', () => {
+  const fx = { lotSize: 10000000, minVolume: 100000, stepVolume: 100000 }, gold = { lotSize: 10000, minVolume: 100, stepVolume: 100 }, idx = { lotSize: 100, minVolume: 10, stepVolume: 10 };
+  // $50k, Meridian EURUSD with a 200-pip stop: $10 risk / ($2,000 a lot) = 0.005 lot -> below 0.01 -> skipped, never rounded up
+  assert.match(riskVolume({ info: fx, t: { id: 'm1', entry: 1.1, stop: 1.08 }, balance: 50000, name: 'EURUSD' }).skip, /below the broker minimum/);
+  // $50k, Meridian EURUSD with a 20-pip stop: $10 / $200 = 0.05 lot
+  assert.deepEqual(riskVolume({ info: fx, t: { id: 'm1', entry: 1.1, stop: 1.098 }, balance: 50000, name: 'EURUSD' }), { volume: 500000, riskCash: 10, lots: 0.05 });
+  // USDJPY 20-pip stop at 150: a lot moves 100,000 x 0.20 / 150 = $133.3; $50k Meridian $10 -> 0.0750 lot -> floor 0.07
+  assert.equal(riskVolume({ info: fx, t: { id: 'm2', entry: 150, stop: 149.8 }, balance: 50000, name: 'USDJPY' }).lots, 0.07);
+  // ICT gold A-setup (size 1), $20 stop: $100 / ($2,000 a lot) = 0.05 lot; an A+ half-size trade 0.02 (floored from 0.025)
+  assert.equal(riskVolume({ info: gold, t: { id: 'ict:gc-1', entry: 4000, stop: 3980, size: 1 }, balance: 50000, name: 'XAUUSD' }).lots, 0.05);
+  assert.equal(riskVolume({ info: gold, t: { id: 'ict:gc-2', entry: 4000, stop: 3980, size: 0.5 }, balance: 50000, name: 'XAUUSD' }).lots, 0.02);
+  // ICT NQ on a $1-a-point CFD, 90-point stop: $100 / $90 = 1.11 lot -> 1.1
+  assert.equal(riskVolume({ info: idx, t: { id: 'ict:nq-1', entry: 25000, stop: 24910 }, balance: 50000, name: 'US100' }).lots, 1.1);
+  // open risk: $450 already at risk + a $100 ICT trade passes 1% of $50k? no (550 > 500)
+  assert.match(riskVolume({ info: gold, t: { id: 'ict:gc-3', entry: 4000, stop: 3980 }, balance: 50000, name: 'XAUUSD', openRisk: 450 }).skip, /open risk/);
+  // a cross pair with no USD side is not guessed
+  assert.match(riskVolume({ info: fx, t: { id: 'm3', entry: 0.85, stop: 0.849 }, balance: 50000, name: 'EURGBP' }).skip, /quote currency/);
+  // on the old $1,000 demo an ICT gold trade is skipped instead of risking 4%
+  assert.match(riskVolume({ info: gold, t: { id: 'ict:gc-4', entry: 4000, stop: 3980 }, balance: 1000, name: 'XAUUSD' }).skip, /bigger demo balance/);
 });

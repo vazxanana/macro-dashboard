@@ -42,7 +42,11 @@ export const SYMBOLS = { xau: ['XAUUSD'], eurusd: ['EURUSD'], gbpusd: ['GBPUSD']
 // the ICT desk's trades as mirror candidates: only its A-setups (the part that holds up after costs: research/edge/costs), with
 // their own id space; everything else is treated like a shadow (never sent)
 export const ictCandidates = (ict) => (Array.isArray(ict) ? ict : []).map((t) => ({ ...t, id: 'ict:' + t.id, k: 'ict-' + (t.aplus ? 'A+' : 'A'), shadow: !t.aset, rr: t.t1 == null ? 99 : t.rr }));
-export const LIMITS = { lots: 0.01, maxLots: 0.1, maxOpen: 5, dayStop: 0.02, fresh: 15 * 60, retries: 3, keepDays: 30 };
+// sizing (owner, 7 Nov: "risk-based lots, bigger demo", from research/portfolio.md): each order risks a share of the balance per 1R:
+// ICT A-setups 0.20% x the desk's size field (A+ half-size trades 0.10%), Meridian 0.02%; total open risk at most 1%.
+// The lot follows from the stop distance; below the broker's minimum lot the trade is skipped (never rounded up to more risk).
+export const LIMITS = { lots: 0.01, maxLots: 5, maxOpen: 5, dayStop: 0.02, fresh: 15 * 60, retries: 3, keepDays: 30,
+  risk: { ict: 0.002, council: 0.0002 }, maxOpenRisk: 0.01 };
 const LABEL = 'council';
 const OPEN = new Set(['open']), isDone = (t) => !!t.status && t.status !== 'open' && t.status !== 'pending';
 // the order comment is also the key that finds our position at the broker again (ProtoOATradeData.label + comment)
@@ -134,13 +138,32 @@ export function session(WS, scrub, url = DEMO_HOST, { timeout = 10000 } = {}) {
 // cTrader volume is in hundredths of a unit; lotSize is the volume of one lot. 0.01 lot, rounded to the step, at least the minimum.
 // No lotSize (optional in ProtoOASymbol) -> null: guessing the forex lot (10,000,000) would make an index order 1,000 contracts.
 // A minimum above LIMITS.maxLots -> null too: never more than 0.1 lot just because the broker's minimum is large.
-export function volumeFor(sym, lots = LIMITS.lots) {
+export function volumeFor(sym, lots = LIMITS.lots, maxLots = 0.1) {   // fixed-lot helper (demo test order/suite): capped at 0.1 lot
   const lot = +sym.lotSize; if (!(lot > 0)) return null;
   const step = +sym.stepVolume || 1, min = +sym.minVolume || step;
   let v = Math.round((lot * lots) / step) * step;
   if (v < min) v = min;
   if (sym.maxVolume && v > +sym.maxVolume) v = +sym.maxVolume;
-  return v > lot * LIMITS.maxLots + 1e-9 ? null : v;
+  return v > lot * maxLots + 1e-9 ? null : v;
+}
+// risk-based volume: the account currency per 1 price unit per lot is lotSize/100 units (quote currency), converted to USD
+// (USD-quoted symbols 1; USD-base FX pairs 1/price). Returns { volume, riskCash, lots } or { skip: reason }.
+export function riskVolume({ info, t, balance, name, openRisk = 0 }) {
+  const lot = +info.lotSize, dist = Math.abs(+t.entry - +t.stop), px = Math.abs(+t.entry);
+  if (!(lot > 0)) return { skip: `${name}: no lot size` };
+  if (!(dist > 0) || !(balance > 0)) return { skip: `${name}: no stop distance or balance` };
+  const N = String(name || '').toUpperCase(), fx = /^[A-Z]{6}$/.test(N) && !/^XA[UG]/.test(N);
+  const toUsd = !fx || N.slice(3) === 'USD' ? 1 : N.slice(0, 3) === 'USD' ? 1 / px : null;
+  if (!toUsd) return { skip: `${name}: cannot value its quote currency in USD` };
+  const isIct = String(t.id).startsWith('ict:'), size = isIct && Number.isFinite(+t.size) && +t.size > 0 ? +t.size : 1;
+  const riskCash = balance * (isIct ? LIMITS.risk.ict : LIMITS.risk.council) * size;
+  if (openRisk + riskCash > balance * LIMITS.maxOpenRisk + 1e-9) return { skip: `open risk would pass ${LIMITS.maxOpenRisk * 100}% of the balance` };
+  const perLot = (lot / 100) * dist * toUsd, lots = riskCash / perLot;
+  const step = +info.stepVolume || 1, min = +info.minVolume || step;
+  const v = Math.floor((lots * lot) / step + 1e-9) * step;   // epsilon: 0.01 lot must not floor to 0 on float noise
+  if (v < min) return { skip: `${name}: ${lots.toFixed(4)} lot needed for ${(riskCash).toFixed(2)} risk is below the broker minimum (${min / lot} lot); a bigger demo balance fixes this` };
+  if (v > lot * LIMITS.maxLots + 1e-9 || (info.maxVolume && v > +info.maxVolume)) return { skip: `${name}: ${(v / lot).toFixed(2)} lot is above the ${LIMITS.maxLots}-lot cap` };
+  return { volume: v, riskCash: +riskCash.toFixed(2), lots: +(v / lot).toFixed(4) };
 }
 // relative stop/target for a market order: in 1/100000 of the price, a multiple of the symbol's smallest step
 export function relative(dist, digits = 5) {
@@ -338,8 +361,10 @@ export async function mirrorRound({ env, trades, state, tokens, WS = globalThis.
         const name = SYMBOLS[t.market].find((n) => idOf.has(normName(n))), symbolId = name && idOf.get(normName(name));
         if (!symbolId) { skip(`none of ${SYMBOLS[t.market].join('/')} found at the broker`); continue; }
         const info = ((await s.send(PT.SYMBOL_BY_ID_REQ, { ctidTraderAccountId: ctid, symbolId: [symbolId] }, PT.SYMBOL_BY_ID_RES)).symbol || [])[0] || {};
-        const volume = volumeFor(info), sell = t.side === 'sell', d = Number.isFinite(+info.digits) ? +info.digits : 5;
-        if (volume == null) { skip(`${name}: no lot size, or its minimum volume is above ${LIMITS.maxLots} lot`); continue; }
+        const openRisk = Object.values(st.map).filter((m) => m.status === 'open' || m.status === 'sent').reduce((a, m) => a + (+m.riskCash || 0), 0);
+        const rv = riskVolume({ info, t, balance, name, openRisk });
+        if (rv.skip) { skip(rv.skip); continue; }
+        const volume = rv.volume, sell = t.side === 'sell', d = Number.isFinite(+info.digits) ? +info.digits : 5;
         if (info.tradingMode != null && info.tradingMode !== 0 && info.tradingMode !== 'ENABLED') { later(`${name} not tradable now (mode ${info.tradingMode})`); continue; }
         const order = { ctidTraderAccountId: ctid, symbolId, orderType: 1, tradeSide: sell ? 2 : 1, volume, label: LABEL,
           comment: commentFor(t), clientOrderId: String(t.id).slice(0, 50), relativeStopLoss: relative(t.entry - t.stop, d) };
@@ -347,7 +372,7 @@ export async function mirrorRound({ env, trades, state, tokens, WS = globalThis.
         try {
           const ev = await s.send(PT.NEW_ORDER_REQ, order, PT.EXECUTION_EVENT, orderStep);
           const pid = (ev.position && ev.position.positionId) ?? (ev.order && ev.order.positionId), filled = !ev.interim && pid != null;
-          st.map[t.id] = { positionId: pid != null ? String(pid) : null, symbol: name, side: t.side, volume, lots: volume / +info.lotSize, digits: d, setup: t.k, status: filled ? 'open' : 'sent', openedAt: iso, councilEntry: t.entry, stop: t.stop, t1: t.t1,
+          st.map[t.id] = { positionId: pid != null ? String(pid) : null, symbol: name, side: t.side, volume, lots: volume / +info.lotSize, digits: d, setup: t.k, status: filled ? 'open' : 'sent', openedAt: iso, councilEntry: t.entry, stop: t.stop, t1: t.t1, riskCash: rv.riskCash,
             ...fillQuality(t, (ev.deal && ev.deal.executionPrice) ?? (filled && ev.position ? ev.position.price : null), now) };
           if (st.wait) delete st.wait[t.id];
           out.sent.push({ type: 'open', trade: t.id }); say(`${filled ? 'opened' : 'sent (fill not confirmed yet)'} ${sell ? 'sell' : 'buy'} ${name} ${volume / +info.lotSize} lot (council ${t.k})`, { trade: t.id });
