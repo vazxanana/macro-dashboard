@@ -1202,32 +1202,42 @@ function learnManagement(closedAll, change) {
   }
 }
 
+// ─── Coach evidence (owner delegated, 7 Nov; research/edge/coach-learning) ───
+// The old learning added a rule from trades that no condition had blocked and dropped it from the trades it had blocked
+// (plus an automatic drop after 21 days), on 5-8 trades: rules flipped back and forth (m30m1 D1 rule 4 times in 2 days)
+// and, over 150 days, picked trades no better than chance. Now both directions use the same sample (every closed signal of
+// the setup, live and shadow, whatever blocked it), the same bar (30+ trades, |t| >= 2, the same sign in both halves of the
+// sample) and a rule the Coach changed stays put for 14 days.
+const COACH_MIN_N = 30, COACH_T = 2, COACH_COOL = 14 * 86400;
+function solid(a, sign) {   // a: trades with R; sign +1 = clearly positive, -1 = clearly negative
+  if (a.length < COACH_MIN_N) return false;
+  const m = a.reduce((s, x) => s + x.R, 0) / a.length, sd = Math.sqrt(a.reduce((s, x) => s + (x.R - m) ** 2, 0) / (a.length - 1) || 0);
+  if (!(sd > 0) || sign * m / (sd / Math.sqrt(a.length)) < COACH_T) return false;
+  const o = a.slice().sort((x, y) => (x.closed || 0) - (y.closed || 0)), h = o.length >> 1;
+  return [o.slice(0, h), o.slice(h)].every((p) => p.length && sign * (p.reduce((s, x) => s + x.R, 0) / p.length) > 0);
+}
+const coolKey = (k, f) => `${k}:${f}`;
+function cooling(k, f) { const t = (config.coachChanged || {})[coolKey(k, f)]; return !!t && now - Date.parse(t) / 1000 < COACH_COOL; }
+function touched(k, f) { (config.coachChanged = config.coachChanged || {})[coolKey(k, f)] = nowISO; }
 function learnFilters(closedAll, change) {
-  // ─── Self-evolution: learn filters from the conditions that lose, and drop them when shadow trades prove them wrong ───
-  // evidence for condition filters: scored trades plus shadow trades blocked for reasons unrelated to the conditions
-  // (reward:risk, exposure, duplicate, dollar cap…): their outcomes are just as informative about D1/structure/session
+  // ─── Self-evolution: learn filters from the conditions that lose (strict evidence, see solid()) ───
   const learnBy = {};
-  for (const t of closedAll) if (!t.shadow || !(t.blockedBy || []).some((b) => b === 'd1' || b === 'struct' || b === 'session')) (learnBy[t.k] = learnBy[t.k] || []).push(t);
+  for (const t of closedAll) if (isFinite(t.R)) (learnBy[t.k] = learnBy[t.k] || []).push(t);
   for (const [k, arr] of Object.entries(learnBy)) {
-    if (arr.length < 8) continue;
+    if (arr.length < 2 * COACH_MIN_N) continue;
     const fl = config.filters[k] = config.filters[k] || {};
     for (const fe of ['d1', 'struct']) {
-      if (fl[fe]) continue;
+      if (fl[fe] || cooling(k, fe)) continue;
       const g = {}; arr.forEach((x) => { const v = x.feat && x.feat[fe]; if (v && v !== 'n/a') (g[v] = g[v] || []).push(x); });
-      const vals = Object.entries(g).map(([v, a]) => ({ v, n: a.length, e: exp(a) }));
-      const bad = vals.find((x) => x.n >= 5 && x.e < -0.2), good = vals.find((x) => x.n >= 3 && x.e > 0.1);
-      if (bad && good) { fl[fe] = good.v; (fl.since = fl.since || {})[fe] = nowISO; change(`${k}: only ${good.v} ${fe === 'd1' ? 'D1' : 'structure'}`, `${bad.v}: ${bad.e.toFixed(2)}R over ${bad.n} trades; ${good.v}: +${good.e.toFixed(2)}R over ${good.n}.`); }
-      else if (bad && bad.n >= 6 && bad.e <= -0.6) {
-        // a condition that keeps losing badly is filtered even before the other side has proven itself; its shadow trades can undo this
-        const other = { against: 'with', internal: 'main' }[bad.v];   // only ever narrows to the trend side / main structure
-        if (other) { fl[fe] = other; (fl.since = fl.since || {})[fe] = nowISO; change(`${k}: only ${other} ${fe === 'd1' ? 'D1' : 'structure'}`, `${bad.v}: ${bad.e.toFixed(2)}R over ${bad.n} trades, too costly to keep taking while ${other} is tested.`); }
-      }
+      const vals = Object.entries(g).map(([v, a]) => ({ v, a, n: a.length, e: exp(a) }));
+      const bad = vals.find((x) => solid(x.a, -1)), good = vals.find((x) => x !== bad && x.n >= COACH_MIN_N && x.e > 0);
+      if (bad && good) { fl[fe] = good.v; (fl.since = fl.since || {})[fe] = nowISO; touched(k, fe); change(`${k}: only ${good.v} ${fe === 'd1' ? 'D1' : 'structure'}`, `${bad.v}: ${bad.e.toFixed(2)}R over ${bad.n} trades (clearly negative, both halves); ${good.v}: +${good.e.toFixed(2)}R over ${good.n}.`); }
     }
     const gs = {}; arr.forEach((x) => { const v = x.feat && x.feat.session; if (v) (gs[v] = gs[v] || []).push(x); });
     for (const [v, a] of Object.entries(gs)) {
-      if ((fl.noSession || []).includes(v) || a.length < 5 || exp(a) >= -0.2) continue;
+      if ((fl.noSession || []).includes(v) || cooling(k, 'session:' + v) || !solid(a, -1)) continue;
       const rest = arr.filter((x) => !(x.feat && x.feat.session === v));
-      if (rest.length >= 3 && exp(rest) > 0) { fl.noSession = (fl.noSession || []).concat(v); (fl.since = fl.since || {})['session:' + v] = nowISO; change(`${k}: skip the ${v} session`, `${exp(a).toFixed(2)}R over ${a.length} trades there; +${exp(rest).toFixed(2)}R elsewhere.`); }
+      if (rest.length >= COACH_MIN_N && exp(rest) > 0) { fl.noSession = (fl.noSession || []).concat(v); (fl.since = fl.since || {})['session:' + v] = nowISO; touched(k, 'session:' + v); change(`${k}: skip the ${v} session`, `${exp(a).toFixed(2)}R over ${a.length} trades there (clearly negative, both halves); +${exp(rest).toFixed(2)}R over ${rest.length} elsewhere.`); }
     }
   }
 }
@@ -1298,27 +1308,28 @@ if (coach.date !== today) {
   learnPauses(pauseSample(closedAll), change);
   const recent = closed.filter((x) => now - x.closed < 14 * 86400), rs = stat(recent);
   if (rs.n >= 10) {
-    if (rs.wr < 0.35 && config.minRisk < LIMITS.minRisk[1]) { const v = +Math.min(LIMITS.minRisk[1], config.minRisk + 0.1).toFixed(2); change(`Minimum stop ${config.minRisk} → ${v} ATR`, `Win rate ${Math.round(rs.wr * 100)}% over ${rs.n} trades: stops get hit by normal candle noise.`); config.minRisk = v; }
-    else if (rs.wr < 0.35 && config.buf < LIMITS.buf[1]) { const v = +Math.min(LIMITS.buf[1], config.buf + 0.02).toFixed(2); change(`Stop buffer ${config.buf} → ${v} ATR`, `Win rate ${Math.round(rs.wr * 100)}% over ${rs.n} trades: stops may sit inside the noise.`); config.buf = v; }
-    else if (rs.wr > 0.6 && config.buf > LIMITS.buf[0]) { const v = +Math.max(LIMITS.buf[0], config.buf - 0.01).toFixed(2); change(`Stop buffer ${config.buf} → ${v} ATR`, `Win rate ${Math.round(rs.wr * 100)}% over ${rs.n} trades: a tighter stop gives more R.`); config.buf = v; }
+    // (7 Nov) the 'win rate under 35%' triggers for a wider minimum stop / buffer are gone: this engine's targets sit 2-4R away,
+    // so it normally wins 23-26% of trades and the trigger fired every night (minimum stop 0.6 -> 1.1 ATR in five nights).
+    if (rs.wr > 0.6 && config.buf > LIMITS.buf[0]) { const v = +Math.max(LIMITS.buf[0], config.buf - 0.01).toFixed(2); change(`Stop buffer ${config.buf} → ${v} ATR`, `Win rate ${Math.round(rs.wr * 100)}% over ${rs.n} trades: a tighter stop gives more R.`); config.buf = v; }
   }
   const low = recent.filter((x) => x.rr < 1.5), ls = stat(low);
   if (ls.n >= 6 && ls.exp < 0 && config.minRR < 1.5) { change(`Minimum reward:risk ${config.minRR} → 1.5`, `Trades under 1.5R returned ${ls.exp}R each over ${ls.n} trades.`); config.minRR = 1.5; }
   learnFilters(closedAll, change);
   learnManagement(closedAll, change);
-  // drop a rule when the trades it blocked would have paid (shadow expectancy > +0.2R over 5+), or after 21 days to re-test it
+  // drop a rule only on the same strict evidence that adds one (solid(): 30+ trades, t >= 2, both halves), never on a timer
   for (const [k, fl] of Object.entries(config.filters)) {
     for (const fe of ['d1', 'struct']) {
       if (!fl[fe] || (fl.src || {})[fe] === 'backtest' || userOwned(fl, fe)) continue;   // owner rules stay until the owner changes them
-      const sh = shadows.filter((x) => x.k === k && (x.blockedBy || []).includes(fe));
-      const old = fl.since && fl.since[fe] && now - Date.parse(fl.since[fe]) / 1000 > 21 * 86400;
-      if ((sh.length >= 5 && exp(sh) > 0.2) || old) { change(`${k}: dropped the ${fe === 'd1' ? 'D1' : 'structure'} rule`, old ? '21 days old: re-testing without it.' : `The trades it blocked made +${exp(sh).toFixed(2)}R over ${sh.length}.`); delete fl[fe]; if (fl.since) delete fl.since[fe]; }
+      if (cooling(k, fe)) continue;
+      // the side the rule keeps out, judged on every closed signal of the setup (live and shadow), as when it was added
+      const sh = closedAll.filter((x) => x.k === k && isFinite(x.R) && x.feat && x.feat[fe] && x.feat[fe] !== 'n/a' && x.feat[fe] !== fl[fe]);
+      if (solid(sh, 1)) { touched(k, fe); change(`${k}: dropped the ${fe === 'd1' ? 'D1' : 'structure'} rule`, `The side it kept out made +${exp(sh).toFixed(2)}R over ${sh.length} trades (clearly positive, both halves).`); delete fl[fe]; if (fl.since) delete fl.since[fe]; }
     }
     for (const v of (fl.noSession || []).slice()) {
       if (userOwned(fl, 'session:' + v)) continue;
-      const sh = shadows.filter((x) => x.k === k && (x.blockedBy || []).includes('session') && x.feat && x.feat.session === v);
-      const old = fl.since && fl.since['session:' + v] && now - Date.parse(fl.since['session:' + v]) / 1000 > 21 * 86400;
-      if ((sh.length >= 5 && exp(sh) > 0.2) || old) { fl.noSession = fl.noSession.filter((x) => x !== v); if (fl.since) delete fl.since['session:' + v]; change(`${k}: trading the ${v} session again`, old ? '21 days old: re-testing.' : `Blocked trades made +${exp(sh).toFixed(2)}R over ${sh.length}.`); }
+      if (cooling(k, 'session:' + v)) continue;
+      const sh = closedAll.filter((x) => x.k === k && isFinite(x.R) && x.feat && x.feat.session === v);
+      if (solid(sh, 1)) { fl.noSession = fl.noSession.filter((x) => x !== v); if (fl.since) delete fl.since['session:' + v]; touched(k, 'session:' + v); change(`${k}: trading the ${v} session again`, `Trades in that session made +${exp(sh).toFixed(2)}R over ${sh.length} (clearly positive, both halves).`); }
     }
     if (emptyFilter(fl)) delete config.filters[k];
   }
