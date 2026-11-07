@@ -3609,20 +3609,7 @@ function msNextSetup(bars, A) {
     // indicators (7 Nov, owner: "each user allowed to put up to 10 TradingView indicators"): our own versions of the common
     // TradingView studies, computed on the candles; overlays share the price scale, oscillators get stacked bands under the price
     P._ind = [];
-    P.setInd = function () {
-      P._ind.forEach((s2) => { try { chart.removeSeries(s2); } catch (e) {} }); P._ind = [];
-      const L = (window.msInd && window.msInd.list()) || [], osc = L.filter((x) => IND_DEF[x.type] && IND_DEF[x.type].osc), m = osc.length, band = m ? Math.min(0.16, 0.45 / m) : 0;
-      try { chart.priceScale('right').applyOptions({ scaleMargins: { top: 0.13, bottom: m ? 0.05 + band * m : 0.08 } }); } catch (e) {}
-      if (!P.bars || P.bars.length < 30 || P.rp) return;
-      const B = P.bars, T = B.map((b) => b.time);
-      L.forEach((x) => { const D = IND_DEF[x.type]; if (!D) return; let out; try { out = D.calc(B, x); } catch (e) { return; }
-        const k = D.osc ? osc.indexOf(x) : -1, sid = D.osc ? `osc${k}` : 'right';
-        out.forEach((o) => { const opt = { priceScaleId: sid, color: o.color || x.color, lineWidth: o.w || 1.5, lineStyle: o.dash ? LW.LineStyle.Dashed : LW.LineStyle.Solid, priceLineVisible: false, lastValueVisible: !!o.last, crosshairMarkerVisible: false, title: o.title || '' };
-          const s2 = o.hist ? chart.addHistogramSeries({ priceScaleId: sid, priceLineVisible: false, lastValueVisible: false }) : o.dots ? chart.addLineSeries({ ...opt, lineVisible: false, pointMarkersVisible: true, pointMarkersRadius: 1.5 }) : chart.addLineSeries(opt);
-          const data = []; o.v.forEach((v, i) => { if (v == null || !isFinite(v)) return; data.push(o.hist ? { time: T[i], value: v, color: v >= 0 ? 'rgba(8,153,129,.55)' : 'rgba(242,54,69,.55)' } : o.cols ? { time: T[i], value: v, color: o.cols[i] } : { time: T[i], value: v }); });
-          try { s2.setData(data); } catch (e) {} P._ind.push(s2); });
-        if (D.osc) { const top = 1 - 0.02 - band * (m - k); try { chart.priceScale(sid).applyOptions({ scaleMargins: { top: top + band * 0.08, bottom: Math.max(0, 1 - top - band + band * 0.08) }, visible: false }); } catch (e) {} } });
-    };
+    P.setInd = function () { P._ind.forEach((s2) => { try { chart.removeSeries(s2); } catch (e) {} }); P._ind = []; if (P.rp) { indDraw(chart, null, P._ind); return; } indDraw(chart, P.bars, P._ind); };
     P.setVwap = function () { if (!vwapS) return; if (G.showVwap !== true || !P.raw || !P.raw.length) { vwapS.setData([]); return; }
       const off = G.offset, hasV = P.raw.some((b) => b.volume > 0), out = []; let day = null, pv = 0, vv = 0;
       P.raw.forEach((b) => { const d = Math.floor(b.time / 86400); let gap = false; if (d !== day) { gap = day !== null; day = d; pv = 0; vv = 0; } const w = hasV ? (b.volume || 0) : 1; pv += (b.high + b.low + b.close) / 3 * w; vv += w;
@@ -3803,18 +3790,7 @@ function msNextSetup(bars, A) {
     P.ictDraw = function () {
       const B = P.bars, R = P.raw; if (!B || B.length < 30 || !R) return; const n = B.length, off = G.offset || 0;
       const items = { boxes: [], lines: [], labels: [], path: [], vlines: [], segs: [] };
-      let atr = 0; for (let i = Math.max(1, n - 50); i < n; i++) atr += B[i].high - B[i].low; atr /= Math.min(49, n - 1);
-      const up = [], dn = [];
-      for (let i = Math.max(2, n - 400); i < n; i++) {
-        if (B[i - 2].high < B[i].low && B[i].low - B[i - 2].high > atr * 0.15) up.push({ i, lo: B[i - 2].high, hi: B[i].low });
-        if (B[i - 2].low > B[i].high && B[i - 2].low - B[i].high > atr * 0.15) dn.push({ i, lo: B[i].high, hi: B[i - 2].low });
-      }
-      const live = (g, bull) => { for (let j = g.i + 1; j < n; j++) { if (bull ? B[j].low <= g.lo : B[j].high >= g.hi) return false; } return true; };
-      const pick = (arr, bull) => arr.filter((g) => live(g, bull)).slice(-4);
-      pick(up, true).forEach((g) => items.boxes.push({ l1: g.i - 1, l2: n + 3, hi: g.hi, lo: g.lo, kind: 'fvg', fill: 'rgba(41,98,255,0.16)', stroke: 'rgba(41,98,255,0.55)' }));
-      pick(dn, false).forEach((g) => items.boxes.push({ l1: g.i - 1, l2: n + 3, hi: g.hi, lo: g.lo, kind: 'fvg', fill: 'rgba(242,54,69,0.15)', stroke: 'rgba(242,54,69,0.55)' }));
-      items.labels = []; const fvgT = (g, bull) => items.lines.push({ l1: g.i - 1, l2: Math.min(n + 3, g.i + 8), p: bull ? g.hi : g.lo, color: bull ? 'rgba(41,98,255,0.9)' : 'rgba(242,54,69,0.9)', w: 0.01, text: bull ? 'FVG +' : 'FVG −', below: !bull });
-      pick(up, true).slice(-2).forEach((g) => fvgT(g, true)); pick(dn, false).slice(-2).forEach((g) => fvgT(g, false));
+      fvgItems(B, items);
       // session liquidity on intraday charts: today's (New York date) Asia 20:00-00:00 and London 02:00-05:00 ranges, the midnight open
       (P._ictPL || []).forEach((l) => { try { series.removePriceLine(l); } catch (e) {} }); P._ictPL = [];
       const PL = (price, title, color, dash) => P._ictPL.push(series.createPriceLine({ price, color, lineWidth: 1, lineStyle: dash ? LW.LineStyle.Dashed : LW.LineStyle.Solid, axisLabelVisible: true, title }));
@@ -4775,6 +4751,28 @@ function msNextSetup(bars, A) {
   }
 
 
+  // indicators on any chart (panes and the Split screen's free chart): overlays on the price scale, oscillators in stacked bands
+  function indDraw(chart, B, out) {
+    const L = (window.msInd && window.msInd.list()) || [], osc = L.filter((x) => IND_DEF[x.type] && IND_DEF[x.type].osc), m = osc.length, band = m ? Math.min(0.16, 0.45 / m) : 0;
+    try { chart.priceScale('right').applyOptions({ scaleMargins: { top: 0.13, bottom: m ? 0.05 + band * m : 0.08 } }); } catch (e) {}
+    if (!B || B.length < 30) return; const T = B.map((b) => b.time);
+    L.forEach((x) => { const D = IND_DEF[x.type]; if (!D) return; let res; try { res = D.calc(B, x); } catch (e) { return; }
+      const k = D.osc ? osc.indexOf(x) : -1, sid = D.osc ? `osc${k}` : 'right';
+      res.forEach((o) => { const opt = { priceScaleId: sid, color: o.color || x.color, lineWidth: o.w || 1.5, lineStyle: o.dash ? LW.LineStyle.Dashed : LW.LineStyle.Solid, priceLineVisible: false, lastValueVisible: !!o.last, crosshairMarkerVisible: false, title: o.title || '' };
+        const s2 = o.hist ? chart.addHistogramSeries({ priceScaleId: sid, priceLineVisible: false, lastValueVisible: false }) : o.dots ? chart.addLineSeries({ ...opt, lineVisible: false, pointMarkersVisible: true, pointMarkersRadius: 1.5 }) : chart.addLineSeries(opt);
+        const data = []; o.v.forEach((v, i) => { if (v == null || !isFinite(v)) return; data.push(o.hist ? { time: T[i], value: v, color: v >= 0 ? 'rgba(8,153,129,.55)' : 'rgba(242,54,69,.55)' } : o.cols ? { time: T[i], value: v, color: o.cols[i] } : { time: T[i], value: v }); });
+        try { s2.setData(data); } catch (e) {} out.push(s2); });
+      if (D.osc) { const top = 1 - 0.02 - band * (m - k); try { chart.priceScale(sid).applyOptions({ scaleMargins: { top: top + band * 0.08, bottom: Math.max(0, 1 - top - band + band * 0.08) }, visible: false }); } catch (e) {} } });
+  }
+  // unfilled fair value gaps (last 4 each way) as overlay boxes, shared by the panes and the free chart
+  function fvgItems(B, items) { const n = B.length; let atr = 0; for (let i = Math.max(1, n - 50); i < n; i++) atr += B[i].high - B[i].low; atr /= Math.max(1, Math.min(49, n - 1));
+    const up = [], dn = []; for (let i = Math.max(2, n - 400); i < n; i++) { if (B[i - 2].high < B[i].low && B[i].low - B[i - 2].high > atr * 0.15) up.push({ i, lo: B[i - 2].high, hi: B[i].low }); if (B[i - 2].low > B[i].high && B[i - 2].low - B[i].high > atr * 0.15) dn.push({ i, lo: B[i].high, hi: B[i - 2].low }); }
+    const live = (g, bull) => { for (let j = g.i + 1; j < n; j++) { if (bull ? B[j].low <= g.lo : B[j].high >= g.hi) return false; } return true; };
+    const U = up.filter((g) => live(g, true)).slice(-4), D = dn.filter((g) => live(g, false)).slice(-4);
+    U.forEach((g) => items.boxes.push({ l1: g.i - 1, l2: n + 3, hi: g.hi, lo: g.lo, kind: 'fvg', fill: 'rgba(41,98,255,0.16)', stroke: 'rgba(41,98,255,0.55)' }));
+    D.forEach((g) => items.boxes.push({ l1: g.i - 1, l2: n + 3, hi: g.hi, lo: g.lo, kind: 'fvg', fill: 'rgba(242,54,69,0.15)', stroke: 'rgba(242,54,69,0.55)' }));
+    U.slice(-2).forEach((g) => items.lines.push({ l1: g.i - 1, l2: Math.min(n + 3, g.i + 8), p: g.hi, color: 'rgba(41,98,255,0.9)', w: 0.01, text: 'FVG +' }));
+    D.slice(-2).forEach((g) => items.lines.push({ l1: g.i - 1, l2: Math.min(n + 3, g.i + 8), p: g.lo, color: 'rgba(242,54,69,0.9)', w: 0.01, text: 'FVG −', below: true })); }
   // ─── indicator library (TradingView-style studies, computed here) ───
   const iSMA = (a, n) => { const o = Array(a.length).fill(null); let s = 0; for (let i = 0; i < a.length; i++) { s += a[i]; if (i >= n) s -= a[i - n]; if (i >= n - 1) o[i] = s / n; } return o; };
   const iEMA = (a, n) => { const o = Array(a.length).fill(null), k = 2 / (n + 1); let v = null; for (let i = 0; i < a.length; i++) { v = v == null ? a[i] : a[i] * k + v * (1 - k); if (i >= n - 1) o[i] = v; } return o; };
@@ -4819,7 +4817,7 @@ function msNextSetup(bars, A) {
   const IND_COLORS = ['#2962ff', '#ff9800', '#9c27b0', '#00bcd4', '#e91e63', '#4caf50', '#795548', '#607d8b', '#f44336', '#3f51b5'];
   window.msInd = { key: () => 'ms-ind-' + (window.MS_WHO || 'guest'), max: 10,
     list() { try { const L = JSON.parse(localStorage.getItem(this.key()) || '[]'); return Array.isArray(L) ? L.filter((x) => IND_DEF[x.type]).slice(0, 10) : []; } catch (e) { return []; } },
-    save(L) { try { localStorage.setItem(this.key(), JSON.stringify(L.slice(0, 10))); } catch (e) {} Object.values(panes).forEach((P) => P.setInd && P.setInd()); indRender(); } };
+    save(L) { try { localStorage.setItem(this.key(), JSON.stringify(L.slice(0, 10))); } catch (e) {} Object.values(panes).forEach((P) => P.setInd && P.setInd()); if (window.msSplitMarkup) window.msSplitMarkup(); indRender(); } };
   function indRender() {
     const L = window.msInd.list(), cnt = document.getElementById('ms-ind-n'); if (cnt) cnt.textContent = `${L.length}/10`;
     const lib = document.getElementById('ms-ind-lib'), cur = document.getElementById('ms-ind-cur'); if (!lib || !cur) return;
@@ -4846,7 +4844,7 @@ function msNextSetup(bars, A) {
     document.documentElement.dataset.mk = G.mode;
     document.querySelectorAll('[data-mk]').forEach((b) => { if (b.tagName !== 'BUTTON') return; const on = b.dataset.mk === G.mode; b.classList.toggle('on', on); b.setAttribute('aria-pressed', String(on)); });
     Object.values(panes).forEach((P) => { if (P.setMode && P.bars) P.setMode(G.mode); });
-    try { councilLines(); councilMarkers(); } catch (e) {} ictStrip(); window.msTrack && msTrack('Chart markup', { mode: G.mode }); }
+    try { councilLines(); councilMarkers(); } catch (e) {} ictStrip(); if (window.msSplitMarkup) window.msSplitMarkup(); window.msTrack && msTrack('Chart markup', { mode: G.mode }); }
   document.addEventListener('click', (ev) => { const b = ev.target.closest && ev.target.closest('button[data-mk]'); if (b) setMode(b.dataset.mk); });
   document.documentElement.dataset.mk = G.mode;
   setTimeout(() => { if (G.mode === 'ict') setMode('ict'); else document.querySelectorAll('button[data-mk]').forEach((b) => { const on = b.dataset.mk === G.mode; b.classList.toggle('on', on); b.setAttribute('aria-pressed', String(on)); }); }, 3200);
@@ -4875,7 +4873,7 @@ function msNextSetup(bars, A) {
   function spTheme() { if (!SP.chart) return; const t = THEMES[G.theme] || THEMES.dark;
     SP.chart.applyOptions({ layout: { background: { type: 'gradient', topColor: t.bgTop || t.bg, bottomColor: t.bg }, textColor: t.text }, rightPriceScale: { borderVisible: false }, timeScale: { borderVisible: false } });
     if (SP.series) SP.series.applyOptions(candleCols()); }
-  window.msSplitTheme = spTheme;
+  window.msSplitTheme = spTheme; window.msSplitMarkup = () => { try { if (SP.on && !spPane()) spMarkup(); } catch (e) {} };
   function spChart() { if (SP.chart) return; const el = document.getElementById('ms-sp-c'); if (!el) return;
     SP.chart = LW.createChart(el, { autoSize: true, layout: { fontSize: 11, fontFamily: 'Figtree, -apple-system, "Segoe UI", Roboto, sans-serif' }, grid: { vertLines: { visible: false }, horzLines: { visible: false } }, crosshair: { mode: LW.CrosshairMode.Normal }, timeScale: { timeVisible: true, secondsVisible: false, rightOffset: 6 } });
     SP.series = SP.chart.addCandlestickSeries({ ...candleCols(), priceLineStyle: LW.LineStyle.Dotted });
@@ -4884,6 +4882,14 @@ function msNextSetup(bars, A) {
     SP.chart.subscribeCrosshairMove((pr) => { const b = pr && pr.time != null && SP.bars.find((x) => x.time === pr.time); const I = INSTRUMENTS[spSym()] || INST, d = I.dec ?? 2, f = (v) => (+v).toLocaleString('en-US', { minimumFractionDigits: d, maximumFractionDigits: d });
       const B = b || SP.bars[SP.bars.length - 1]; if (lg && B) lg.innerHTML = `<span class="k">O</span><b>${f(B.open)}</b> <span class="k">H</span><b>${f(B.high)}</b> <span class="k">L</span><b>${f(B.low)}</b> <span class="k">C</span><b class="${B.close >= B.open ? 'up' : 'dn'}">${f(B.close)}</b>`; });
   }
+  // markups on the free chart (another market): Meridian = the last structure breaks, ICT = fair value gaps; indicators in both
+  SP.ind = []; SP.ov = null;
+  function spMarkup() { if (!SP.chart || !SP.series) return; SP.ind.forEach((s2) => { try { SP.chart.removeSeries(s2); } catch (e) {} }); SP.ind = [];
+    if (!SP.ov) { SP.ov = new Overlay(); try { SP.series.attachPrimitive(SP.ov); } catch (e) {} }
+    const B = SP.bars, items = { boxes: [], lines: [], labels: [], path: [], vlines: [], segs: [] };
+    if (B && B.length > 40) { if (G.mode === 'ict') fvgItems(B, items);
+      else { try { const A = msAnalyze(B, 6); (A.events || []).slice(-3).forEach((e, k, arr) => { const c = e.dir < 0 ? '#f23645' : '#089981'; items.lines.push({ bo: true, l1: e.fromIdx, l2: e.breakIdx, p: e.level, color: c, text: k === arr.length - 1 ? (e.structure ? 'BO Structure' : e.dir < 0 ? 'BO Sell' : 'BO Buy') : '' }); }); } catch (e) {} } }
+    SP.ov.set(items); indDraw(SP.chart, B, SP.ind); }
   async function spLoad() {
     if (!SP.on) return; spControls(); grid4.dataset.splitR = spPane() ? spTf() : ''; if (spPane()) { setTimeout(() => { const R = spPane(); if (R) R.fit(); if (SP.sync.range || SP.sync.time) spFromLeft(); }, 60); return; } spChart(); const k = spSym(), tf = spTf(), I = INSTRUMENTS[k], key = `${k}|${tf}`; if (!I || !SP.series) return;
     const T = TFS.find((t) => t.id === tf); document.getElementById('ms-sp-t').textContent = `${I.label} · ${T ? T.label : tf}`;
@@ -4891,7 +4897,7 @@ function msNextSetup(bars, A) {
     try { const r = await fetchBars(TFS.find((t) => t.id === tf) || TFS[2], I, 500); if (SP.key !== key || !r || !r.bars || !r.bars.length) return;
       SP.bars = r.bars.map((b) => ({ time: b.time + TZ, open: +b.open, high: +b.high, low: +b.low, close: +b.close }));
       SP.series.applyOptions({ priceFormat: { type: 'price', precision: I.dec ?? 2, minMove: Math.pow(10, -(I.dec ?? 2)) } });
-      SP.series.setData(SP.bars); document.getElementById('ms-sp-src').textContent = r.src || '';
+      SP.series.setData(SP.bars); document.getElementById('ms-sp-src').textContent = r.src || ''; spMarkup();
       if (SP.sync.range || SP.sync.time) spFromLeft(); else SP.chart.timeScale().fitContent();
     } catch (e) { document.getElementById('ms-sp-src').textContent = 'no data'; }
   }
