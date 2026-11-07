@@ -9382,7 +9382,7 @@ html[data-role="public"] #ms-me-ct { display: none; }
 .ct-t tr:last-child td { border-bottom: 0; } .ct-t .n { text-align: right; }
 .ct-side { font-weight: 600; text-transform: capitalize; } .ct-side.buy { color: var(--buy); } .ct-side.sell { color: var(--sell); }
 .ct-empty { color: var(--ink-faint); font-size: 13px; padding: 12px; }
-.ct-chips { display: inline-flex; gap: 4px; margin-left: auto; } .ct-chips button { min-height: 30px; padding: 0 10px; border-radius: 999px; border: 1px solid var(--line); background: transparent; color: var(--ink-dim); font: inherit; font-size: 12px; cursor: pointer; }
+.ct-chips[hidden] { display: none; } .ct-chips { display: inline-flex; gap: 4px; margin-left: auto; } .ct-chips button { min-height: 30px; padding: 0 10px; border-radius: 999px; border: 1px solid var(--line); background: transparent; color: var(--ink-dim); font: inherit; font-size: 12px; cursor: pointer; }
 .ct-chips button[aria-pressed="true"] { background: var(--accent-soft, rgba(91,140,255,.14)); color: var(--ink); border-color: var(--accent); }
 .ct-f { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; color: var(--ink-faint); font-size: 12px; }
 .ct-f .sp { flex: 1; }
@@ -9451,18 +9451,24 @@ html[data-role="public"] #ms-me-ct { display: none; }
         <div><span>Closed P&amp;L · ${d.days} days</span><b class="${cls(net)}">${money(net, ccy, true)}</b></div></div>
       <section class="ct-sec"><h4>Open trades <small>${open.length}</small></h4>${open.length ? `<div class="ct-tw"><table class="ct-t"><thead><tr><th>Symbol</th><th>Side</th><th class="n">Lots</th><th class="n">Entry</th><th class="n hide-s">Stop</th><th class="n hide-s">Target</th><th class="hide-s">Opened</th><th class="n">P&amp;L</th></tr></thead><tbody>${openRows}</tbody></table></div>` : '<div class="ct-empty">No open trades.</div>'}</section>
       ${orders.length ? `<section class="ct-sec"><h4>Pending orders <small>${orders.length}</small></h4><div class="ct-tw"><table class="ct-t"><thead><tr><th>Symbol</th><th>Side</th><th>Type</th><th class="n">Lots</th><th class="n">Price</th><th class="n hide-s">Stop</th><th class="n hide-s">Target</th></tr></thead><tbody>${ordRows}</tbody></table></div></section>` : ''}
-      <section class="ct-sec"><h4>History <small>${hist.length} closed · ${hist.length ? Math.round((wins / hist.length) * 100) + '% winners' : '—'}</small><span class="ct-chips" role="group" aria-label="History period">${[7, 30, 90].map((n) => `<button type="button" data-days="${n}" aria-pressed="${state.days === n}">${n} days</button>`).join('')}</span></h4>
+      <section class="ct-sec"><h4>History <small>${hist.length} closed · ${hist.length ? Math.round((wins / hist.length) * 100) + '% winners' : '—'}</small><span class="ct-chips" role="group" aria-label="History period"${d.source === 'council' ? ' hidden' : ''}>${[7, 30, 90].map((n) => `<button type="button" data-days="${n}" aria-pressed="${state.days === n}">${n} days</button>`).join('')}</span></h4>
         ${hist.length ? `<div class="ct-tw"><table class="ct-t"><thead><tr><th>Closed</th><th>Symbol</th><th>Side</th><th class="n">Lots</th><th class="n hide-s">Entry</th><th class="n hide-s">Exit</th><th class="n hide-s">Fees + swap</th><th class="n">Net P&amp;L</th></tr></thead><tbody>${histRows}</tbody></table></div>` : `<div class="ct-empty">No closed trades in the last ${d.days} days.</div>`}</section>
-      <div class="ct-f"><span>Updated ${new Date(d.at).toLocaleTimeString()} · refreshes every 15 s while open</span><span class="sp"></span><button type="button" class="ct-btn ghost" id="ms-ct-relink">Link other accounts</button><button type="button" class="ct-btn ghost" id="ms-ct-un">Remove link</button></div>`;
+      <div class="ct-f"><span>${d.source === 'council' ? `From the council's own connection to your demo account · updated ${new Date(d.at).toLocaleTimeString()} (every few minutes)` : `Updated ${new Date(d.at).toLocaleTimeString()} · refreshes every 15 s while open`}</span><span class="sp"></span><button type="button" class="ct-btn ghost" id="ms-ct-relink">Link other accounts</button>${d.source === 'council' ? '' : '<button type="button" class="ct-btn ghost" id="ms-ct-un">Remove link</button>'}</div>`;
     const sel = $('ms-ct-acc'); if (sel) sel.addEventListener('change', () => { state.account = sel.value; ls('ms-ct-acc-' + (userKey() || 'x'), sel.value); load(true); });
     body().querySelectorAll('[data-days]').forEach((b) => b.addEventListener('click', () => { state.days = +b.dataset.days; load(true); }));
     $('ms-ct-relink').addEventListener('click', () => linkForm());
-    $('ms-ct-un').addEventListener('click', async () => { if (!confirm('Remove the cTrader link from your profile? You can link it again later.')) return; try { await call({ action: 'unlink', session: ls(sessKey()) }); state.data = null; linkForm('Link removed.', true); } catch (e) { alert(e.message); } });
+    if ($('ms-ct-un')) $('ms-ct-un').addEventListener('click', async () => { if (!confirm('Remove the cTrader link from your profile? You can link it again later.')) return; try { await call({ action: 'unlink', session: ls(sessKey()) }); state.data = null; linkForm('Link removed.', true); } catch (e) { alert(e.message); } });
   }
 
   async function load(showBusy) {
     if (state.busy || !dlg().open) return;
     if (!API) { body().innerHTML = '<div class="ct-empty">Open the site on meridianx.dev to link cTrader.</div>'; return; }
+    // the owner's demo account needs no link: the council loop publishes it (council/ctrader-account.mjs -> ctrader/account.json)
+    if (userKey() === 'owner' && !ls(sessKey())) {
+      try { const r = await fetch((window.MS_CDATA || '/cdata/') + 'ctrader/account.json?t=' + Date.now(), { cache: 'no-store' }); const d = r.ok ? await r.json() : null;
+        if (d && d.account && !d.error) { state.data = d; render(d); return; } } catch (e) {}
+      linkForm(); return;
+    }
     if (!ls(sessKey())) { linkForm(); return; }
     state.busy = true; if (showBusy || !state.data) { const m = body().querySelector('.ct-f span') || null; if (m) m.textContent = 'Updating…'; else body().innerHTML = '<div class="ct-empty">Loading your cTrader account…</div>'; }
     try {
