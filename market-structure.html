@@ -1666,6 +1666,13 @@ html[data-role="viewer"] .j-empty-go { display: none; }
 :root[data-theme="light"] :where(a, button, summary, select, input, textarea, [tabindex]):focus-visible { outline-color: #9a6b00 !important; }
   /* pass 73: light theme text selection was white text on a pale gold wash (unreadable) */
   :root[data-theme="light"] ::selection { background: rgba(154,107,0,.24); color: var(--ink); }
+  /* pass 74: phone Trader tabs (Live / Shadow / Journal / Everything) scroll sideways: fade the edge that hides more */
+  @media (max-width: 700px) {
+    .c-tabs[data-more~="r"] { -webkit-mask-image: linear-gradient(90deg, #000 calc(100% - 32px), transparent); mask-image: linear-gradient(90deg, #000 calc(100% - 32px), transparent); }
+    .c-tabs[data-more~="l"] { -webkit-mask-image: linear-gradient(90deg, transparent, #000 32px); mask-image: linear-gradient(90deg, transparent, #000 32px); }
+    .c-tabs[data-more="l r"] { -webkit-mask-image: linear-gradient(90deg, transparent, #000 32px, #000 calc(100% - 32px), transparent); mask-image: linear-gradient(90deg, transparent, #000 32px, #000 calc(100% - 32px), transparent); }
+    .c-tabs { scroll-padding-inline: 32px; }
+  }
 </style>
 <script>try{if(localStorage.getItem('msMotion')==='off')document.documentElement.dataset.motion='off'}catch(e){}</script>
 </head>
@@ -5237,9 +5244,9 @@ function msNextSetup(bars, A) {
 // design polish 5: mark sideways-scrolling rows with which edges hide more (the CSS fades those edges)
 (function () {
   function mark(el) { var l = el.scrollLeft > 2, r = el.scrollLeft + el.clientWidth < el.scrollWidth - 2; var v = (l ? 'l' : '') + (l && r ? ' ' : '') + (r ? 'r' : ''); if (v) el.setAttribute('data-more', v); else el.removeAttribute('data-more'); }
-  function all() { document.querySelectorAll('.h-quick, .c-nav').forEach(mark); }
-  document.addEventListener('scroll', function (e) { if (e.target && e.target.matches && e.target.matches('.h-quick, .c-nav')) mark(e.target); }, true);
-  window.addEventListener('resize', all); window.addEventListener('hashchange', function () { setTimeout(all, 50); });
+  function all() { document.querySelectorAll('.h-quick, .c-nav, .c-tabs').forEach(mark); }
+  document.addEventListener('scroll', function (e) { if (e.target && e.target.matches && e.target.matches('.h-quick, .c-nav, .c-tabs')) mark(e.target); }, true);
+  window.addEventListener('resize', all); document.addEventListener('click', function (e) { if (e.target.closest && e.target.closest('.c-nav, .c-tabs, .h-quick')) setTimeout(all, 60); }); window.addEventListener('hashchange', function () { setTimeout(all, 50); });
   document.addEventListener('DOMContentLoaded', function () { all(); setTimeout(all, 800); });
 })();
 </script>
