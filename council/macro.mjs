@@ -5,7 +5,7 @@
 // real yields as the master driver, macro composite, VIX, real-yield momentum, breakeven, 2Y, DXY momentum, COT, curve,
 // HY spreads, Dollar Smile regime with SOFR−EFFR and swap lines, Eurozone growth pulse, yen carry-unwind risk), the owner's
 // macro handbook as encoded there (Dollar Smile, global dollar liquidity, Germany/Eurozone, Japan carry), the Fed balance
-// sheet liquidity gauge (WALCL − RRP − TGA), the pre-FOMC drift, and the FOMC dates of research/edge/regime/replay.mjs.
+// sheet liquidity gauge (WALCL − RRP − TGA), the pre-FOMC drift, and the CPI / NFP / FOMC days of council/events.mjs.
 //
 // Finds its own data, free and keyless only: FRED fredgraph.csv, the Forex Factory calendar JSON (faireconomy), Fed and ECB
 // RSS, CFTC COT (Socrata), prices from the OANDA proxy (meridianx.dev/md/bars) with Kraken as a fallback. Every fetch has a
@@ -17,8 +17,9 @@
 //    toward a small prior, capped to 0.35-0.65: a score with no edge collapses to the base rate;
 //  - net liquidity and the pre-FOMC drift are context only (no weight); the VIX term structure (VIX/VIX3M) is the one
 //    equity input with forward evidence (inverted curve → positive next-day ES/NQ returns);
-//  - expected move = median absolute move on the last 24 same-type event days × (20-day vol / 1-year vol), naive 20-day
-//    mean absolute move otherwise, scored against that naive forecast;
+//  - expected move: four simple models (same-type event median × vol ratio, EWMA, HAR-lite, VIX-implied) run walk-forward
+//    against the naive 20-day mean absolute move on MAE and QLIKE; one is used for a market only if it is picked on the first
+//    half of the replay and beats naive again on the second half, otherwise the naive forecast is kept (research/edge/macro-vol);
 //  - scorecard: hit rate vs base rate, Brier skill vs base rate and coin flip, calibration, Pesaran-Timmermann test;
 //    a driver counts as proven only with a replay t-stat ≥ 3 (weights are NOT tuned automatically);
 //  - one immutable log entry per asset and day, written at the first run from 21:00 UTC before the day opens.
@@ -29,6 +30,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { injectSection } from './analyst.mjs';
+import { EVENTS, HISTORY } from './events.mjs';
 
 const DAY = 86400;
 export const MD_BASE = process.env.MD_BASE || 'https://meridianx.dev/md/';
@@ -49,17 +51,23 @@ export const LAG = { DFII10: 2, DGS2: 2, DGS10: 2, T10YIE: 2, T10Y3M: 2, BAMLH0A
 export const FRED = Object.keys(LAG);
 const COT_LAG = 4;   // CFTC: Tuesday positions, released Friday
 
-// FOMC decision days (from research/edge/regime/replay.mjs); live runs also read them off the calendar
-export const FOMC = new Set(('2023-02-01 2023-03-22 2023-05-03 2023-06-14 2023-07-26 2023-09-20 2023-11-01 2023-12-13 ' +
-  '2024-01-31 2024-03-20 2024-05-01 2024-06-12 2024-07-31 2024-09-18 2024-11-07 2024-12-18 ' +
-  '2025-01-29 2025-03-19 2025-05-07 2025-06-18 2025-07-30 2025-09-17 2025-10-29 2025-12-10 ' +
-  '2026-01-28 2026-03-18 2026-04-29 2026-06-17 2026-07-29 2026-09-16 2026-10-28 2026-12-09').split(' '));
-
 export const iso = (t) => new Date(t * 1000).toISOString().slice(0, 10);
 const r2 = (x, d = 2) => x == null || !isFinite(x) ? null : +(+x).toFixed(d);
 const sg = (x, d = 2) => (x >= 0 ? '+' : '−') + Math.abs(x).toFixed(d);
 const clamp = (x, a, b) => Math.max(a, Math.min(b, x));
 const logit = (p) => Math.log(p / (1 - p)), sigm = (z) => 1 / (1 + Math.exp(-z));
+
+// Event days come from the shared calendar council/events.mjs (#488): HISTORY (CPI, NFP, FOMC, Jan 2022 - Jul 2025, checked
+// against EUR/USD 1-minute bars) plus EVENTS (Aug 2025 - Dec 2026, exact release times). The volatility engine models CPI,
+// NFP and FOMC days, the types with 24+ events of history; on a shared day the bigger release wins (FOMC, then NFP, then CPI).
+// Past the end of the calendar, the faireconomy feed names them (dayKind).
+export const VOL_TYPES = ['FOMC', 'NFP', 'CPI'];
+export const CAL = Object.freeze([...HISTORY, ...EVENTS]);
+const CAL_TYPES = new Map();
+for (const e of CAL) if (VOL_TYPES.includes(e.type)) { const d = iso(e.t), o = CAL_TYPES.get(d); if (!o || VOL_TYPES.indexOf(e.type) < VOL_TYPES.indexOf(o)) CAL_TYPES.set(d, e.type); }
+export const CAL_END = CAL.reduce((m, e) => Math.max(m, e.t), 0);
+export const eventTypeOn = (t) => CAL_TYPES.get(iso(t)) || null;
+export const FOMC = new Set(CAL.filter((e) => e.type === 'FOMC').map((e) => iso(e.t)));
 
 // ─── parsers ──────────────────────────────────────────────────────────────────────────────────────────────────────────
 // fredgraph.csv: "observation_date,DFII10" (older files: "DATE,DFII10"), missing values "." or empty
@@ -324,28 +332,127 @@ export const verdictOf = (sc) => !sc || !sc.n ? 'no record yet' : sc.n < 250 ? `
   : sc.skillClim > 0 && sc.pt != null && sc.pt > 1.96 ? 'some edge (beats the base rate; Pesaran-Timmermann significant)' : sc.skillRW > 0 ? 'no proven edge (about the base rate)' : 'no edge (worse than a coin flip)';
 
 // ─── volatility engine ─────────────────────────────────────────────────────────────────────────────────────────────────
-// Event days with a history we can rebuild without a paid archive: FOMC decisions (fixed list) and payrolls (first Friday of
-// the month, the usual BLS rule; a holiday can move it a week). Other types use the prior table × the volatility ratio.
-export const isKind = (t, kind) => kind === 'fomc' ? FOMC.has(iso(t)) : kind === 'nfp' ? new Date(t * 1000).getUTCDay() === 5 && new Date(t * 1000).getUTCDate() <= 7 : false;
+// Target: the absolute open-to-close move (%) of the UTC weekday candle D, forecast from complete candles before D only.
+// Baseline: the naive mean absolute move of the last 20 days. Candidates (VOL_TRIED), each run walk-forward and scored on
+// MAE and QLIKE against that baseline, on all days and on CPI / NFP / FOMC days:
+//  evt  - the research recipe: median absolute move of the last 24 same-type event days × (20-day ÷ 1-year realized vol),
+//         clamped 0.5-2.5; naive on other days (needs 8 past events of the type)
+//  ewma - RiskMetrics EWMA variance (λ 0.94) × the asset's own E|r|/sd shape over the last year; on an event day × the mean
+//         ratio of actual move to that forecast on the last 24 same-type days (needs 8, clamped 0.7-3)
+//  har  - HAR-RV-lite on absolute moves: a + b·|r|(1d) + c·mean|r|(5d) + d·mean|r|(22d) + one dummy per event type, OLS on
+//         the last 750 days, refitted every 20 days (needs 250 rows; a type needs 8 days in the window to get a dummy)
+//  vix  - ES and NQ only: VIX/√252 × the mean ratio of actual move to it over the last year (VIX with its FRED lag)
+// `cur` is the model before this change (median of 20 days × median event-day multiplier), kept as a reference only.
+export const VOL_TRIED = ['evt', 'ewma', 'har', 'vix'];
+export const VOL_NAMES = { naive: 'naive 20-day mean absolute move', cur: 'previous model (20-day median × event multiplier)', evt: 'same-type event median × vol ratio',
+  ewma: 'EWMA vol × event-day ratio', har: 'HAR-lite with event dummies', vix: 'VIX-implied move' };
 const median = (a) => { const s = a.slice().sort((x, y) => x - y), m = s.length >> 1; return s.length ? (s.length % 2 ? s[m] : (s[m - 1] + s[m]) / 2) : null; };
 const sd = (a) => (a.length ? Math.sqrt(a.reduce((s, x) => s + x * x, 0) / a.length) : null);
-// expected absolute open-to-close move (%) of day D for one asset: the typical (median) move of the last 20 days, times the
-// event multiplier (median move on the last 24 same-type event days vs a normal day) on Fed / payrolls days, or the prior
-// table × the 20-day / 1-year volatility ratio for other events. Scored against the naive 20-day mean absolute move.
-// kind = 'fomc' | 'nfp' | null, prior = typical % for other events
-export function volForecast(bars, D, kind = null, prior = null) {
-  const b = barsBefore(bars, D).filter((x) => !x.live), abs = b.map((x) => ({ t: x.time, a: Math.abs(x.close / x.open - 1) * 100 }));
-  if (abs.length < 20) return null;
-  const naive = abs.slice(-20).reduce((s, x) => s + x.a, 0) / 20;
-  const rets = b.map((x, i) => (i ? Math.log(x.close / b[i - 1].close) : null)).slice(1);
-  const v20 = sd(rets.slice(-20)), v250 = sd(rets.slice(-250)), ratio = v20 && v250 ? clamp(v20 / v250, 0.5, 2.5) : 1;
-  const typ = median(abs.slice(-20).map((x) => x.a));
-  let exp = typ, basis = 'typical day: median absolute move of the last 20 days';
-  if (kind) { const ev = abs.filter((x) => isKind(x.t, kind)).slice(-24);
-    if (ev.length >= 6) { const m = clamp(median(ev.map((x) => x.a)) / median(abs.slice(-250).map((x) => x.a)), 0.7, 2.5); exp = typ * m;
-      basis = `median of the last 20 days × ${m.toFixed(2)} (median of the last ${ev.length} ${kind === 'fomc' ? 'Fed decision' : 'payrolls'} days vs a normal day)`; } }
-  if (basis.startsWith('typical') && prior != null) { exp = Math.max(typ, prior * ratio); basis = `event prior ${prior}% × vol ratio ${ratio.toFixed(2)} (no history for this event type)`; }
-  return { exp: r2(exp, 3), naive: r2(naive, 3), ratio: r2(ratio, 2), basis };
+const mean = (a) => (a.length ? a.reduce((s, x) => s + x, 0) / a.length : null);
+// least squares with a tiny ridge, Gauss-Jordan on the normal equations
+export function ols(X, y, ridge = 1e-6) {
+  const p = X[0].length, A = Array.from({ length: p }, () => new Array(p + 1).fill(0));
+  for (let r = 0; r < X.length; r++) { const x = X[r]; for (let i = 0; i < p; i++) { for (let j = 0; j < p; j++) A[i][j] += x[i] * x[j]; A[i][p] += x[i] * y[r]; } }
+  for (let i = 0; i < p; i++) A[i][i] += ridge * X.length;
+  for (let c = 0; c < p; c++) {
+    let pv = c; for (let r = c + 1; r < p; r++) if (Math.abs(A[r][c]) > Math.abs(A[pv][c])) pv = r;
+    [A[c], A[pv]] = [A[pv], A[c]]; const d = A[c][c]; if (Math.abs(d) < 1e-12) return null;
+    for (let j = c; j <= p; j++) A[c][j] /= d;
+    for (let r = 0; r < p; r++) if (r !== c && A[r][c]) { const f = A[r][c]; for (let j = c; j <= p; j++) A[r][j] -= f * A[c][j]; }
+  }
+  return A.map((row) => row[p]);
+}
+// One walk-forward pass over an asset's daily candles before D. rows[i].f holds every model's forecast for candle i, made
+// from candles 0..i-1 only; next(type, vix) is the forecast for D. typeOf(t) names the event type of a day (or null),
+// vixAt(t) the VIX value usable for day t (or null).
+export function volEngine(bars, { D = Infinity, typeOf = eventTypeOn, vixAt = null, lam = 0.94 } = {}) {
+  const S = (bars || []).filter((b) => weekday(b.time) && !b.live && b.time < D && b.open > 0 && b.close > 0)
+    .map((b) => ({ t: b.time, r: Math.log(b.close / b.open) * 100, a: Math.abs(b.close / b.open - 1) * 100, type: typeOf(b.time), v: vixAt ? vixAt(b.time) : null }));
+  const n = S.length, cum = [0]; for (const x of S) cum.push(cum[cum.length - 1] + x.a);
+  const am = (j, k) => (cum[j] - cum[j - k]) / k;   // mean |move| of the k days before j
+  const pastA = {}, pastR = {};                      // per type: past event-day moves; past move / EWMA-base ratios
+  let ew = null, har = null;
+  const harX = (j, type, cols) => cols.map((c) => c === 0 ? 1 : c === 1 ? S[j - 1].a : c === 2 ? am(j, 5) : c === 3 ? am(j, 22) : type === VOL_TYPES[c - 4] ? 1 : 0);
+  function fitHar(i) {
+    if (har && har.at > i - 20 && har.at <= i) return har;
+    const j0 = Math.max(22, i - 750); if (i - j0 < 250) return null;
+    const cols = [0, 1, 2, 3, ...VOL_TYPES.map((T, q) => q + 4).filter((c) => { let k = 0; for (let j = j0; j < i; j++) if (S[j].type === VOL_TYPES[c - 4]) k++; return k >= 8; })];
+    const X = [], y = []; for (let j = j0; j < i; j++) { X.push(harX(j, S[j].type, cols)); y.push(S[j].a); }
+    const b = ols(X, y); har = b ? { at: i, cols, b } : null; return har;
+  }
+  function fc(i, type, vx) {
+    if (i < 20) return null;
+    const A = S.slice(Math.max(0, i - 250), i), a20 = S.slice(i - 20, i).map((x) => x.a), naive = am(i, 20);
+    const ratio = clamp(sd(S.slice(i - 20, i).map((x) => x.r)) / sd(A.map((x) => x.r)) || 1, 0.5, 2.5);
+    const ev = type ? (pastA[type] || []).slice(-24) : [];
+    let cur = median(a20); if (ev.length >= 6) cur *= clamp(median(ev) / median(A.map((x) => x.a)), 0.7, 2.5);
+    const evt = ev.length >= 8 ? median(ev) * ratio : naive;
+    const shape = mean(A.map((x) => x.a)) / sd(A.map((x) => x.r)), base = ew != null && A.length >= 60 ? shape * Math.sqrt(ew) : null;
+    const rt = type ? (pastR[type] || []).slice(-24) : [], mult = rt.length >= 8 ? clamp(mean(rt), 0.7, 3) : 1;
+    const h = fitHar(i), harF = h ? Math.max(harX(i, type, h.cols).reduce((s, x, q) => s + x * h.b[q], 0), 0.25 * naive) : null;
+    let vix = null;
+    if (vixAt && vx > 0) { const cal = A.filter((x) => x.v > 0).map((x) => x.a / (x.v / Math.sqrt(252))); if (cal.length >= 120) vix = mean(cal) * vx / Math.sqrt(252); }
+    return { naive, cur, evt, ewma: base != null ? base * mult : null, har: harF, vix, ewmaBase: base, ratio, evN: ev.length, mult: rt.length >= 8 ? mult : null };
+  }
+  const rows = [];
+  for (let i = 0; i < n; i++) {
+    const x = S[i], f = fc(i, x.type, x.v); rows.push({ t: x.t, type: x.type, a: x.a, f });
+    if (x.type) { (pastA[x.type] = pastA[x.type] || []).push(x.a); if (f && f.ewmaBase) (pastR[x.type] = pastR[x.type] || []).push(x.a / f.ewmaBase); }
+    if (i === 19) ew = mean(S.slice(0, 20).map((y) => y.r * y.r)); else if (i > 19) ew = lam * ew + (1 - lam) * x.r * x.r;
+  }
+  return { rows, n, next: (type = null, vx = null) => fc(n, type, vx) };
+}
+// QLIKE of an absolute-move forecast e (%), read as E|r| of a normal day: variance h = (π/2)·e², loss = ln h + r²/h
+export const qlike = (e, a) => { const h = Math.PI / 2 * e * e; return Math.log(h) + a * a / h; };
+const absErr = (e, a) => Math.abs(e - a);
+// every model against the naive baseline on the same days: MAE, QLIKE, and the Diebold-Mariano t of the loss gap
+// (positive = the model's loss is lower); on all days and on event days
+export function volCompare(rows, keys = ['cur', ...VOL_TRIED]) {
+  const R = rows.filter((r) => r.f && r.f.naive != null);
+  const stat = (xs, k) => {
+    const P = xs.filter((r) => r.f[k] != null && r.f[k] > 0); if (!P.length) return null;
+    const dm = (L) => { const d = P.map((r) => L(r.f.naive, r.a) - L(r.f[k], r.a)), m = mean(d), s = sd(d.map((x) => x - m)); return s ? r2(m / (s / Math.sqrt(d.length)), 2) : null; };
+    return { n: P.length, mae: r2(mean(P.map((r) => absErr(r.f[k], r.a))), 3), maeNaive: r2(mean(P.map((r) => absErr(r.f.naive, r.a))), 3),
+      qlike: r2(mean(P.map((r) => qlike(r.f[k], r.a))), 3), qlikeNaive: r2(mean(P.map((r) => qlike(r.f.naive, r.a))), 3), dmMae: dm(absErr), dmQlike: dm(qlike) };
+  };
+  const ev = R.filter((r) => r.type), out = { n: R.length, eventDays: ev.length,
+    eventAvgAbs: ev.length ? r2(mean(ev.map((r) => r.a)), 3) : null, otherAvgAbs: R.length > ev.length ? r2(mean(R.filter((r) => !r.type).map((r) => r.a)), 3) : null,
+    from: R.length ? iso(R[0].t) : null, to: R.length ? iso(R[R.length - 1].t) : null, models: {} };
+  for (const k of keys) out.models[k] = { all: stat(R, k), event: stat(ev, k) };
+  return out;
+}
+// beats the baseline = lower MAE and lower QLIKE than naive, on all days and on event days
+export const beatsNaive = (m) => !!(m && m.all && m.event && m.all.mae < m.all.maeNaive && m.all.qlike < m.all.qlikeNaive && m.event.mae < m.event.maeNaive && m.event.qlike < m.event.qlikeNaive);
+const volGap = (m) => { const g = (x) => (x ? (x.maeNaive - x.mae) / x.maeNaive + (x.qlikeNaive - x.qlike) : 0); return g(m.all) + g(m.event); };
+// The VIX model is for the US index futures only; VIX as usable for day t (FRED close with its publication lag)
+export const VIX_ASSETS = ['nq', 'es'];
+export const vixOf = (data) => (t) => { const v = fredView(data.fred, 'VIXCLS', t).last; return v ? v.v : null; };
+export const volKeys = (asset) => VOL_TRIED.filter((k) => k !== 'vix' || !asset || VIX_ASSETS.includes(asset));
+// The selection protocol, the same in the research script and in every live run. Rows = days where naive and every
+// non-VIX candidate have a walk-forward forecast, split at the middle date. First half (selection): among the candidates that
+// beat naive there, the one with the largest loss gap. Second half (confirmation): it is used only if it beats naive again;
+// otherwise the naive 20-day mean is kept. With no candidate passing the first half, naive is kept as well.
+export function volSelect(rows, asset = null) {
+  const keys = volKeys(asset), cmpKeys = ['cur', ...keys];
+  const R = rows.filter((r) => r.f && ['naive', 'cur', 'evt', 'ewma', 'har'].every((m) => r.f[m] != null));
+  if (R.length < 120) return { used: 'naive', picked: null, tried: keys.length, reason: `only ${R.length} days with every forecast`, full: volCompare(R, cmpKeys) };
+  const mid = R[R.length >> 1].t, sel = volCompare(R.filter((r) => r.t < mid), cmpKeys), conf = volCompare(R.filter((r) => r.t >= mid), cmpKeys);
+  const picked = keys.filter((k) => beatsNaive(sel.models[k])).sort((a, b) => volGap(sel.models[b]) - volGap(sel.models[a]))[0] || null;
+  const used = picked && beatsNaive(conf.models[picked]) ? picked : 'naive';
+  const reason = !picked ? `none of the ${keys.length} models beat naive on the first half (to ${iso(mid)})` : used === 'naive' ? `${picked} won the first half but did not beat naive on the second half (from ${iso(mid)})`
+    : `${picked} beat naive on both halves (split ${iso(mid)})`;
+  return { used, picked, tried: keys.length, split: iso(mid), reason, full: volCompare(R, cmpKeys), selection: sel, confirmation: conf };
+}
+export const VOL_METHOD = 'Move size: the absolute open-to-close move of the next UTC weekday candle. Every model is run walk-forward on the replay days (only candles before each day; VIX with its FRED lag) and scored against the naive 20-day mean absolute move on MAE and QLIKE (ln h + r²/h, h = (π/2)·forecast²), on all days and on CPI / NFP / FOMC days (council/events.mjs). Models tried: evt (median of the last 24 same-type events × 20-day / 1-year vol), ewma (EWMA vol × event-day ratio), har (HAR-lite with event dummies), vix (VIX-implied, ES and NQ only); cur = the previous model, reference only. The rows are split at the middle date: a model is picked on the first half only if it beats naive on all four, and it is used only if it beats naive again on the second half. Otherwise the naive forecast is kept. dm* = Diebold-Mariano t of the loss gap (positive = better than naive).';
+// the forecast for D of one asset: the given model's expected move (naive when it has none), and its basis in words
+export function volForecast(bars, D, type = null, { vixAt = null, model = 'naive', engine = null } = {}) {
+  const E = engine || volEngine(bars, { D, vixAt }), f = E.next(type, vixAt ? vixAt(D) : null);
+  if (!f) return null;
+  const use = f[model] != null ? model : 'naive';
+  const basis = use === 'naive' ? 'naive: mean absolute move of the last 20 days'
+    : use === 'ewma' ? `EWMA volatility${type && f.mult ? ` × ${f.mult.toFixed(2)} (actual vs forecast on the last ${Math.min(24, f.evN)} ${type} days)` : ''}`
+    : use === 'evt' && type && f.evN >= 8 ? `median of the last ${Math.min(24, f.evN)} ${type} days × vol ratio ${f.ratio.toFixed(2)}` : VOL_NAMES[use] || use;
+  return { exp: r2(f[use], 3), naive: r2(f.naive, 3), ratio: r2(f.ratio, 2), model: use, basis, f };
 }
 
 // walk-forward replay over past weekday candles: features as known before each day, calibration refitted on earlier days only
@@ -357,27 +464,22 @@ export function replay(data, { days = 1000, minTrain = 120, refit = 20, upto: la
   for (const k of AK) idx[k] = new Map((data.bars[k] || []).filter((b) => !b.live).map((b) => [b.time, b]));
   let i = 0;
   for (const D of Ds) {
-    const f = features(data, D), { list } = drivers(f), kind = isKind(D, 'fomc') ? 'fomc' : isKind(D, 'nfp') ? 'nfp' : null;
+    const f = features(data, D), { list } = drivers(f);
     for (const k of AK) {
       const bar = idx[k].get(D); if (!bar || bar.close === bar.open || !(f.last[k] > 0)) continue;
       const y = bar.close > bar.open ? 1 : 0, sc = assetScore(list, k), past = rows[k];
       if (!fits[k] || i % refit === 0) fits[k] = past.length >= minTrain ? fitPlatt(past.map((r) => ({ s: r.s, y: r.y }))) : null;
       const p = fits[k] ? probOf(sc.s, fits[k]) : null;
       past.push({ D, s: sc.s, y, p });
-      const vf = volForecast(data.bars[k], D, kind); if (vf) vol[k].push({ D, kind, exp: vf.exp, naive: vf.naive, abs: Math.abs(bar.close / bar.open - 1) * 100 });
       for (const d of list) { const w = (W[d.k] || {})[k]; if (!w || d.v === null) continue; const v = d.map ? d.map[k] || 0 : Math.sign(d.v * w); if (!v) continue;
         const t = drv[k][d.k] || (drv[k][d.k] = { n: 0, hit: 0 }); t.n++; if ((v > 0 ? 1 : 0) === y) t.hit++; }
     }
     i++;
   }
-  return { Ds, rows, drv, vol };
-}
-// volatility forecast vs the naive one (MAE of the absolute move), all days and event days
-export function volScore(v) {
-  const mae = (xs, key) => xs.length ? r2(xs.reduce((s, x) => s + Math.abs(x[key] - x.abs), 0) / xs.length, 3) : null;
-  const ev = v.filter((x) => x.kind);
-  return { n: v.length, maeModel: mae(v, 'exp'), maeNaive: mae(v, 'naive'), eventDays: ev.length, eventMaeModel: mae(ev, 'exp'), eventMaeNaive: mae(ev, 'naive'),
-    eventAvgAbs: ev.length ? r2(ev.reduce((s, x) => s + x.abs, 0) / ev.length, 3) : null, otherAvgAbs: v.length > ev.length ? r2(v.filter((x) => !x.kind).reduce((s, x) => s + x.abs, 0) / (v.length - ev.length), 3) : null };
+  // the volatility engine: one walk-forward pass per asset; its rows are scored on the same replay days
+  const inD = new Set(Ds), eng = {};
+  for (const k of AK) { eng[k] = volEngine(data.bars[k], { D: lastD, vixAt: VIX_ASSETS.includes(k) ? vixOf(data) : null }); vol[k] = eng[k].rows.filter((r) => inD.has(r.t)); }
+  return { Ds, rows, drv, vol, eng };
 }
 
 // ─── event playbook ────────────────────────────────────────────────────────────────────────────────────────────────────
@@ -408,16 +510,18 @@ const ARROW = (v) => v > 0 ? 'up' : v < 0 ? 'down' : 'mixed';
 const fmtNum = (x, ref) => { if (x == null) return '—'; const u = /%/.test(ref) ? '%' : /K/i.test(ref) ? 'K' : /M/i.test(ref) ? 'M' : /B/i.test(ref) ? 'B' : '';
   const d = u === 'K' ? x / 1e3 : u === 'M' ? x / 1e6 : u === 'B' ? x / 1e9 : x; const dec = (String(ref).match(/\.(\d+)/) || ['', ''])[1].length; return d.toFixed(dec) + u; };
 const evKey = (e) => `${e.country}|${e.title.replace(/\s+/g, ' ').trim()}`;
-// the kind of event day D is for the volatility engine: Fed decision, payrolls, or another high-impact release (prior table)
+// a faireconomy calendar entry as a modelled event type (used past the end of council/events.mjs)
+export const feedType = (e) => e.country !== 'USD' ? null : /FOMC Statement|Federal Funds Rate/i.test(e.title) ? 'FOMC' : /Non-?Farm/i.test(e.title) ? 'NFP' : /\bCPI\b/.test(e.title) ? 'CPI' : null;
+// the event type of day D for the volatility engine (CPI / NFP / FOMC from council/events.mjs; the feed past its end), and
+// a label: the type's release, or else the day's top high-impact release on the feed (context only, not modelled)
 export function dayKind(D, cal = []) {
   const day = (cal || []).filter((e) => e.impact === 'High' && iso(e.at) === iso(D));
-  const fomc = FOMC.has(iso(D)) || day.some((e) => e.country === 'USD' && /FOMC Statement|Federal Funds Rate/i.test(e.title));
-  if (fomc) return { kind: 'fomc', title: 'FOMC decision' };
-  const nfp = day.find((e) => e.country === 'USD' && /Non-?Farm/i.test(e.title)) || (!cal.length && isKind(D, 'nfp') ? { title: 'Non-Farm Payrolls (first-Friday rule)' } : null);
-  if (nfp) return { kind: 'nfp', title: nfp.title };
+  let type = eventTypeOn(D);
+  if (!type && D > CAL_END) type = day.map(feedType).filter(Boolean).sort((a, b) => VOL_TYPES.indexOf(a) - VOL_TYPES.indexOf(b))[0] || null;
+  if (type) { const e = CAL.find((x) => x.type === type && iso(x.t) === iso(D)); return { type, title: e ? `${e.title}, ${e.at.slice(11, 16)} UTC` : type }; }
   const rank = (e) => (e.country === 'USD' ? 0 : e.country === 'EUR' || e.country === 'JPY' ? 1 : 2);
   const top = day.filter((e) => rank(e) < 2).sort((a, b) => rank(a) - rank(b))[0];
-  return top ? { kind: null, title: `${top.country} ${top.title}`, prior: classify(top).move } : { kind: null, title: null };
+  return top ? { type: null, title: `${top.country} ${top.title}` } : { type: null, title: null };
 }
 // Surprise log: the consensus of every high-impact release we saw, and its actual when the feed carries one, so the hot /
 // cool cut-offs can become ±1 SD of that release's past surprises once 8 are logged (until then: one reporting step).
@@ -436,17 +540,21 @@ export function surpriseStats(log, key) {
   const sdv = sd(s.map((x) => x - s.reduce((a, b) => a + b, 0) / s.length));
   return { n: s.length, sd: sdv, hot: s.filter((x) => x > sdv).length / s.length, cool: s.filter((x) => x < -sdv).length / s.length };
 }
-export function eventPlaybook(events, now, { bars = {}, log = [], days = 5 } = {}) {
-  const end = now + days * DAY;
+// vol: { asset: { engine, model, vixAt } } from the live run (the model each asset uses after the selection protocol); without
+// it, a fresh engine on `bars` and the naive forecast. The expected move is the day's: the engine's forecast for the event
+// day's type (CPI / NFP / FOMC), else a normal day; made with the candles known now.
+export function eventPlaybook(events, now, { bars = {}, log = [], days = 5, vol = null } = {}) {
+  const end = now + days * DAY, V = {};
+  for (const k of AK) V[k] = vol && vol[k] ? vol[k] : bars[k] && bars[k].length ? { engine: volEngine(bars[k]), model: 'naive' } : null;
   return events.filter((e) => e.impact === 'High' && e.at >= now - 3 * 3600 && e.at <= end).sort((a, b) => a.at - b.at).map((e) => {
     const t = classify(e), fc = parseNum(e.forecast), ac = parseNum(e.actual), st = surpriseStats(log, evKey(e));
     // a policy-rate decision is hot (hawkish) at any rate above consensus; data releases need one reporting step or ±1 SD
     const isRate = !!t.words && /Rate|Funds/i.test(e.title), step = stepOf(e.forecast);
     const tol = fc == null ? null : isRate ? 1e-6 : st ? st.sd : Math.max(step, (t.relTol || 0) * Math.abs(fc));
     const hotAt = fc == null ? null : t.low ? fc - tol : fc + tol, coolAt = fc == null ? null : t.low ? fc + tol : fc - tol;
-    const D = Math.floor(e.at / DAY) * DAY, kind = t.type.startsWith('Fed') && /FOMC|Funds Rate/i.test(e.title) ? 'fomc' : /Non-?Farm/i.test(e.title) ? 'nfp' : null;
+    const D = Math.floor(e.at / DAY) * DAY, type = dayKind(D, events).type;
     const exp = {}, basis = {};
-    for (const k of AK) { const vf = bars[k] ? volForecast(bars[k], D, kind, t.move[k]) : null; exp[k] = vf ? vf.exp : t.move[k]; basis[k] = vf ? vf.basis : 'event prior (no price history)'; }
+    for (const k of AK) { const vf = V[k] ? volForecast(null, D, type, V[k]) : null; exp[k] = vf ? r2(vf.exp, 2) : t.move[k]; basis[k] = vf ? vf.basis : 'event prior (no price history)'; }
     const hot = Object.fromEntries(AK.map((k) => [k, ARROW(t.hot[k])])), cool = Object.fromEntries(AK.map((k) => [k, ARROW(-t.hot[k])]));
     const [hw, cw] = t.words || ['hot', 'cool'];
     const rule = fc == null ? `no consensus published: judge it against the previous ${e.previous || 'print'}` : isRate ? `${hw} if the rate is above ${e.forecast} or the statement / press conference leans ${hw}, ${cw} if below ${e.forecast} or a ${cw} lean` :
@@ -577,7 +685,7 @@ export function updateHistory(hist, fc, now) {
   for (const a of AK) {
     const f = fc.assets[a]; if (!f || f.pUp == null) continue;
     const id = `${fc.target}-${a}`; if (H.some((h) => h.id === id)) continue;
-    H.push({ id, asset: a, target: fc.target, at: fc.at, p: f.pUp, s: f.score, base: f.fit ? f.fit.base : null, expAbs: f.expMovePct, naiveAbs: f.naiveMovePct, event: fc.targetEvent || null,
+    H.push({ id, asset: a, target: fc.target, at: fc.at, p: f.pUp, s: f.score, base: f.fit ? f.fit.base : null, expAbs: f.expMovePct, naiveAbs: f.naiveMovePct, volModel: f.volModel || null, event: fc.targetEvent || null,
       regime: fc.regime.label, top: f.drivers.slice(0, 3).map((d) => `${d.k}:${d.dir}`) });
   }
   return H;
@@ -608,14 +716,27 @@ export function makeBrief(fc) {
   L.push(`Macro strategist, ${WD.format(new Date(fc.at))} ${HM.format(new Date(fc.at))} UTC, for ${WD.format(tgt)} (UTC day, open to close). Regime: ${fc.regime.label}.${fc.targetEvent ? ` ${WD.format(tgt)} is an event day (${fc.targetEvent}): expect bigger moves.` : ''}`);
   for (const a of AK) { const f = fc.assets[a]; if (!f || f.pUp == null) { L.push(`${ASSETS[a].label}: no forecast (no price data).`); continue; }
     const up = f.score >= 0 ? 'up' : 'down', pro = f.drivers.filter((d) => d.dir === up).slice(0, 2).map((d) => short(d.name)), con = f.drivers.filter((d) => d.dir !== up).slice(0, 1).map((d) => short(d.name));
-    L.push(`${ASSETS[a].label}: ${pct(f.pUp)} up (base rate ${f.fit ? pct(f.fit.base) : '?'}; ${leanWord(f.pUp, f.fit ? f.fit.base : 0.5)}${f.fit && f.fit.b === 0 ? ', the replay finds no edge in its drivers' : ''}).${pro.length ? ` Drivers lean ${up}: ${pro.join(', ')}${con.length ? `; against: ${con[0]}` : ''}.` : ''} Typical move ±${f.expMovePct ?? '?'}%.`); }
+    L.push(`${ASSETS[a].label}: ${pct(f.pUp)} up (base rate ${f.fit ? pct(f.fit.base) : '?'}; ${leanWord(f.pUp, f.fit ? f.fit.base : 0.5)}${f.fit && f.fit.b === 0 ? ', the replay finds no edge in its drivers' : ''}).${pro.length ? ` Drivers lean ${up}: ${pro.join(', ')}${con.length ? `; against: ${con[0]}` : ''}.` : ''} Expected move ±${f.expMovePct ?? '?'}%${f.volModel && f.volModel !== 'naive' ? ` (${VOL_NAMES[f.volModel]})` : ' (20-day average)'}.`); }
   if (fc.dxy) L.push(`DXY: ${pct(fc.dxy.pUp)} up (mirror of EUR/USD).`);
   const ev = fc.playbook.slice(0, 4);
   if (ev.length) L.push('Coming up: ' + ev.map((e) => `${e.country} ${e.title} ${WD.format(new Date(e.at))} ${HM.format(new Date(e.at))} UTC${e.consensus ? ` (consensus ${e.consensus}, previous ${e.previous || '—'})` : ''}${e.outcome ? `, came in ${e.outcome}` : `: if ${e.scenarios[0].name}, gold ${e.scenarios[0].moves.gold}, USD ${usdOf(e.scenarios[0].moves.eurusd)}, NQ ${e.scenarios[0].moves.nq}; gold usually moves ±${e.expMovePct.gold}%`}`).join('; ') + '.');
   else L.push(`No high-impact events in the next 5 days on the calendar we could read${fc.sources && /failed/.test(fc.sources['calendar:nextweek'] || '') ? " (next week's calendar is not published yet; it usually appears over the weekend)" : ''}.`);
-  const g = fc.scorecard.replay.gold, v = fc.scorecard.vol && fc.scorecard.vol.gold;
-  if (g && g.n) L.push(`Honesty check: on the ${g.n}-day walk-forward replay the gold calls hit ${pct(g.hit)} against a ${pct(g.base)} base rate (Brier ${g.brier} vs ${g.brierRW} for a coin flip, Pesaran-Timmermann ${g.pt ?? 'n/a'}): ${verdictOf(g)}.${v && v.eventDays ? ` Event days moved gold ${v.eventAvgAbs}% on average against ${v.otherAvgAbs}% on other days: the size of the move is the more reliable forecast.` : ''} Treat the direction odds as context, not trade signals.`);
+  const g = fc.scorecard.replay.gold;
+  if (g && g.n) L.push(`Honesty check: on the ${g.n}-day walk-forward replay the gold calls hit ${pct(g.hit)} against a ${pct(g.base)} base rate (Brier ${g.brier} vs ${g.brierRW} for a coin flip, Pesaran-Timmermann ${g.pt ?? 'n/a'}): ${verdictOf(g)}. Treat the direction odds as context, not trade signals.`);
+  const vl = volLine(fc); if (vl) L.push(vl);
   return L.join(' ');
+}
+// the move-size model's own record, in words: which markets use a model and how it scored, and what the naive baseline does
+export function volLine(fc) {
+  const V = fc.scorecard && fc.scorecard.vol; if (!V || !V.gold || !V.gold.full) return '';
+  const tried = Math.max(...AK.map((a) => (V[a] ? V[a].tried : 0))), using = AK.filter((a) => V[a] && V[a].used !== 'naive');
+  const fm = (x) => `MAE ${x.mae} vs ${x.maeNaive}, QLIKE ${x.qlike} vs ${x.qlikeNaive}`;
+  const parts = using.map((a) => { const m = V[a].full.models[V[a].used];
+    return `${ASSETS[a].label} uses the ${VOL_NAMES[V[a].used]}, which beat the naive 20-day average on both halves of the replay (all days ${fm(m.all)}; CPI / NFP / FOMC days ${fm(m.event)})`; });
+  const rest = AK.filter((a) => !using.includes(a)), gf = V.gold.full;
+  const naiveTxt = rest.length ? `${rest.length === AK.length ? 'all five markets keep' : `${rest.map((a) => ASSETS[a].label).join(', ')} keep${rest.length === 1 ? 's' : ''}`} the naive 20-day average: none of the ${tried} models tried beat it out of sample on both MAE and QLIKE, on all days and on CPI / NFP / FOMC days` : '';
+  const ev = gf.eventDays ? ` CPI / NFP / FOMC days moved gold ${gf.eventAvgAbs}% on average against ${gf.otherAvgAbs}% on other days${rest.includes('gold') ? ', but no model turned that into a better forecast' : ''}.` : '';
+  return `Move size: ${[...parts, naiveTxt].filter(Boolean).join('. ')}.${ev}`;
 }
 export const MACRO_START = '<!-- macro:start -->', MACRO_END = '<!-- macro:end -->';
 export function macroSection(fc) {
@@ -623,7 +744,7 @@ export function macroSection(fc) {
   const out = [MACRO_START, '## Macro strategist', '', `Built by the Macro strategist at ${fc.at.slice(0, 16).replace('T', ' ')} UTC for ${fc.target} (paper only, changes no rule or trade; full view in macro/forecast.json). Regime: **${fc.regime.label}**.`, '',
     '| Market | P(up) | Lean | Exp. move | Main drivers | Replay hit / base | Brier vs coin |', '|---|---|---|---|---|---|---|'];
   for (const a of AK) { const f = fc.assets[a], sc = fc.scorecard.replay[a] || {};
-    out.push(`| ${ASSETS[a].label} | ${f && f.pUp != null ? pct(f.pUp) : '—'} | ${f && f.pUp != null ? leanWord(f.pUp, f.fit ? f.fit.base : 0.5) : '—'} | ${f && f.expMovePct != null ? `±${f.expMovePct}%` : '—'} | ${f ? f.drivers.slice(0, 3).map((d) => `${short(d.name)} ${d.dir}`).join('; ').replace(/\|/g, '/') : '—'} | ${sc.n ? `${pct(sc.hit)} / ${pct(sc.base)} (${sc.n} d)` : '—'} | ${sc.n ? `${sc.brier} vs 0.25` : '—'} |`); }
+    out.push(`| ${ASSETS[a].label} | ${f && f.pUp != null ? pct(f.pUp) : '—'} | ${f && f.pUp != null ? leanWord(f.pUp, f.fit ? f.fit.base : 0.5) : '—'} | ${f && f.expMovePct != null ? `±${f.expMovePct}% (${f.volModel === 'naive' || !f.volModel ? '20-day avg' : f.volModel})` : '—'} | ${f ? f.drivers.slice(0, 3).map((d) => `${short(d.name)} ${d.dir}`).join('; ').replace(/\|/g, '/') : '—'} | ${sc.n ? `${pct(sc.hit)} / ${pct(sc.base)} (${sc.n} d)` : '—'} | ${sc.n ? `${sc.brier} vs 0.25` : '—'} |`); }
   if (fc.playbook.length) { out.push('', 'Next high-impact events:'); for (const e of fc.playbook.slice(0, 6)) out.push(`- ${e.at.slice(0, 16).replace('T', ' ')} UTC ${e.country} ${e.title}${e.consensus ? ` (cons. ${e.consensus}, prev. ${e.previous || '—'})` : ''}: ${e.rule}; ${e.scenarios[0].name} → gold ${e.scenarios[0].moves.gold}, EUR/USD ${e.scenarios[0].moves.eurusd}, USD/JPY ${e.scenarios[0].moves.usdjpy}, NQ ${e.scenarios[0].moves.nq}.`); }
   out.push('', fc.brief.replace(/\|/g, '/'), MACRO_END);
   return out.join('\n');
@@ -633,22 +754,28 @@ export function macroSection(fc) {
 export function buildForecast(data, now, { src = {}, history = [], eventLog = [] } = {}) {
   const D = targetDay(now), Dn = iso(D), cal = data.cal || [];
   const dk = dayKind(D, cal);
-  const f = features(data, D, { fomcDay: dk.kind === 'fomc' }), { list, smile, carry } = drivers(f);
+  const f = features(data, D, { fomcDay: dk.type === 'FOMC' }), { list, smile, carry } = drivers(f);
   const rp = replay(data, { upto: D });
-  const assets = {}, scRe = {}, drvRe = {}, vs = {};
+  const assets = {}, scRe = {}, drvRe = {}, vs = {}, volUse = {};
   for (const a of AK) {
     const rows = rp.rows[a], fit = fitPlatt(rows.map((r) => ({ s: r.s, y: r.y }))), sc = assetScore(list, a), have = f.last[a] > 0;
-    const vf = data.bars[a] && data.bars[a].length ? volForecast(data.bars[a], D, dk.kind, dk.prior ? dk.prior[a] : null) : null;
+    // move size: the selection protocol on this asset's walk-forward rows decides the model; naive unless one passes both halves
+    const sel = volSelect(rp.vol[a], a), vixAt = VIX_ASSETS.includes(a) ? vixOf(data) : null;
+    volUse[a] = { engine: rp.eng[a], model: sel.used, vixAt };
+    const vf = rp.eng[a].n ? volForecast(null, D, dk.type, volUse[a]) : null;
     assets[a] = { label: ASSETS[a].label, pUp: have ? r2(probOf(sc.s, fit), 3) : null, score: r2(sc.s, 3), last: f.last[a] ?? null,
-      expMovePct: vf ? r2(vf.exp, 2) : null, naiveMovePct: vf ? r2(vf.naive, 2) : null, volRatio: vf ? vf.ratio : null, expBasis: vf ? vf.basis : null,
+      expMovePct: vf ? r2(vf.exp, 2) : null, naiveMovePct: vf ? r2(vf.naive, 2) : null, volModel: vf ? vf.model : null, volRatio: vf ? vf.ratio : null, expBasis: vf ? vf.basis : null,
       fit, drivers: sc.used.map((d) => ({ k: d.k, name: d.name, dir: d.dir, w: d.w, detail: d.detail })) };
     scRe[a] = scorecard(rows.filter((r) => r.p != null));
     // a driver counts as proven only with a t-stat of 3 or more on the replay (research: after counting every variant tried)
     drvRe[a] = Object.fromEntries(Object.entries(rp.drv[a]).filter(([, t]) => t.n >= 30).map(([k, t]) => { const h = t.hit / t.n, tt = (h - 0.5) / Math.sqrt(0.25 / t.n); return [k, { n: t.n, hit: r2(h, 3), t: r2(tt, 2), proven: tt >= 3 }]; }));
-    vs[a] = volScore(rp.vol[a]);
+    vs[a] = sel;
   }
+  // the live log: the move forecast that was used vs the naive one, MAE and QLIKE
   const live = Object.fromEntries(AK.map((a) => { const R = history.filter((h) => h.asset === a && h.y != null); const sc = scorecard(R.map((h) => ({ p: h.p, y: h.y })));
-    const V = R.filter((h) => h.expAbs != null && h.abs != null); if (V.length) Object.assign(sc, { volMaeModel: r2(V.reduce((s, h) => s + Math.abs(h.expAbs - h.abs), 0) / V.length, 3), volMaeNaive: r2(V.reduce((s, h) => s + Math.abs((h.naiveAbs ?? h.expAbs) - h.abs), 0) / V.length, 3) });
+    const V = R.filter((h) => h.expAbs > 0 && h.abs != null), nv = (h) => (h.naiveAbs > 0 ? h.naiveAbs : h.expAbs);
+    if (V.length) Object.assign(sc, { volN: V.length, volMaeModel: r2(mean(V.map((h) => absErr(h.expAbs, h.abs))), 3), volMaeNaive: r2(mean(V.map((h) => absErr(nv(h), h.abs))), 3),
+      volQlikeModel: r2(mean(V.map((h) => qlike(h.expAbs, h.abs))), 3), volQlikeNaive: r2(mean(V.map((h) => qlike(nv(h), h.abs))), 3) });
     return [a, sc]; }));
   const liqTag = f.liq && f.liq.chg != null ? (f.liq.chg >= 50 ? 'dollar liquidity rising' : f.liq.chg <= -50 ? 'dollar liquidity draining' : 'liquidity flat') : 'liquidity n/a';
   const volTag = carry ? 'yen carry-unwind risk' : f.vixTs != null && f.vixTs > 1 ? 'VIX curve inverted (stress)' : f.vix == null ? 'VIX n/a' : f.vix >= 28 ? 'high stress' : f.vix >= 22 ? 'elevated volatility' : f.vix < 15 ? 'calm' : 'normal volatility';
@@ -656,13 +783,13 @@ export function buildForecast(data, now, { src = {}, history = [], eventLog = []
   const regime = { label: `${smile ? phaseName[smile.phase] : 'regime unknown'} · ${liqTag} · ${volTag}`, smile: smile ? smile.phase : null, smileDetail: smile ? smile.detail : null, carryUnwind: !!carry,
     vix: f.vix, vixTermRatio: f.vixTs, liquidity: f.liq, realYield: f.ry ? { level: f.ry.level, chg: r2(f.ry.chg, 3), bias: f.ry.bias } : null, dxyProxy: r2(f.dxy, 2), dxy5d: r2(f.dm, 2), broadUsd20dPct: f.broad,
     sofrEffrBps: f.sofrBps, curve10y3m: f.curve, us2y: f.d2 ? f.d2.level : null, eu2y: f.eu2y ? f.eu2y.level : null, usEu2ySpread: f.d2 && f.eu2y ? r2(f.d2.level - f.eu2y.level, 2) : null };
-  const playbook = eventPlaybook(cal, now, { bars: data.bars, log: eventLog });
+  const playbook = eventPlaybook(cal, now, { bars: data.bars, log: eventLog, vol: volUse });
   const news = (data.rss || []).filter((n) => n.at == null || n.at >= now - 7 * DAY).sort((a, b) => (b.at || 0) - (a.at || 0)).slice(0, 8)
     .map((n) => ({ src: n.src, title: n.title, link: n.link, at: n.at ? new Date(n.at * 1000).toISOString() : null, policy: /FOMC statement|monetary policy decision|policy rate|interest rate|minutes/i.test(n.title) }));
   const fc = { v: 1, at: new Date(now * 1000).toISOString(), target: Dn, targetEvent: dk.title, paperOnly: true, regime, assets,
     dxy: assets.eurusd.pUp != null ? { pUp: r2(1 - assets.eurusd.pUp, 3), note: 'mirror of EUR/USD (EUR is 57.6% of the DXY)' } : null,
     drivers: list.map((d) => ({ k: d.k, name: d.name, cluster: d.cluster, vote: d.v, detail: d.detail, weights: W[d.k] || {}, ...(d.map ? { perAsset: d.map } : {}) })),
-    playbook, news, scorecard: { replay: scRe, live, vol: vs, replayDays: rp.Ds.length, driverHit: drvRe, logged: history.length, resolved: history.filter((h) => h.y != null).length,
+    playbook, news, scorecard: { replay: scRe, live, vol: vs, volMethod: VOL_METHOD, replayDays: rp.Ds.length, driverHit: drvRe, logged: history.length, resolved: history.filter((h) => h.y != null).length,
       method: 'Walk-forward: each replay day uses only data published before it (FRED with publication lags, candles before the day); the score-to-probability map (anchored on the base up-rate, strongly shrunk, capped 35-65%) is refitted every 20 days on earlier days only (needs 120). Target: the next UTC weekday candle, up if close > open. Base rate = the share of the more common direction; coin flip (random walk) = 50% every day, Brier 0.25. Pesaran-Timmermann above 1.96 = direction calls better than chance. A 53% hit rate needs about 1,100 forecasts to tell from luck. The live log is append-only, written from 21:00 UTC before each day opens.' },
     sources: src };
   fc.brief = makeBrief(fc);

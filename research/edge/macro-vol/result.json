@@ -1,0 +1,1486 @@
+{
+ "topic": "macro-vol",
+ "paperOnly": true,
+ "tried": [
+  "evt",
+  "ewma",
+  "har",
+  "vix"
+ ],
+ "vix": "council-data macro/cache.json, 300 days from 2025-09-09 (FRED was not reachable)",
+ "assets": {
+  "gold": {
+   "used": "naive",
+   "picked": null,
+   "tried": 3,
+   "split": "2025-02-14",
+   "reason": "none of the 3 models beat naive on the first half (to 2025-02-14)",
+   "full": {
+    "n": 898,
+    "eventDays": 107,
+    "eventAvgAbs": 0.972,
+    "otherAvgAbs": 0.859,
+    "from": "2023-05-26",
+    "to": "2026-11-06",
+    "models": {
+     "cur": {
+      "all": {
+       "n": 898,
+       "mae": 0.579,
+       "maeNaive": 0.587,
+       "qlike": 2.118,
+       "qlikeNaive": 1.335,
+       "dmMae": 0.99,
+       "dmQlike": -3.28
+      },
+      "event": {
+       "n": 107,
+       "mae": 0.692,
+       "maeNaive": 0.669,
+       "qlike": 2.96,
+       "qlikeNaive": 1.78,
+       "dmMae": -0.68,
+       "dmQlike": -1.17
+      }
+     },
+     "evt": {
+      "all": {
+       "n": 898,
+       "mae": 0.592,
+       "maeNaive": 0.587,
+       "qlike": 1.458,
+       "qlikeNaive": 1.335,
+       "dmMae": -1.25,
+       "dmQlike": -2.3
+      },
+      "event": {
+       "n": 107,
+       "mae": 0.709,
+       "maeNaive": 0.669,
+       "qlike": 2.813,
+       "qlikeNaive": 1.78,
+       "dmMae": -1.26,
+       "dmQlike": -2.35
+      }
+     },
+     "ewma": {
+      "all": {
+       "n": 898,
+       "mae": 0.583,
+       "maeNaive": 0.587,
+       "qlike": 1.284,
+       "qlikeNaive": 1.335,
+       "dmMae": 0.72,
+       "dmQlike": 1.08
+      },
+      "event": {
+       "n": 107,
+       "mae": 0.743,
+       "maeNaive": 0.669,
+       "qlike": 1.66,
+       "qlikeNaive": 1.78,
+       "dmMae": -2.81,
+       "dmQlike": 0.56
+      }
+     },
+     "har": {
+      "all": {
+       "n": 898,
+       "mae": 0.58,
+       "maeNaive": 0.587,
+       "qlike": 1.321,
+       "qlikeNaive": 1.335,
+       "dmMae": 0.93,
+       "dmQlike": 0.31
+      },
+      "event": {
+       "n": 107,
+       "mae": 0.752,
+       "maeNaive": 0.669,
+       "qlike": 1.73,
+       "qlikeNaive": 1.78,
+       "dmMae": -2.91,
+       "dmQlike": 0.28
+      }
+     }
+    }
+   },
+   "selection": {
+    "n": 449,
+    "eventDays": 55,
+    "eventAvgAbs": 0.8,
+    "otherAvgAbs": 0.613,
+    "from": "2023-05-26",
+    "to": "2025-02-13",
+    "models": {
+     "cur": {
+      "all": {
+       "n": 449,
+       "mae": 0.423,
+       "maeNaive": 0.432,
+       "qlike": 0.891,
+       "qlikeNaive": 0.699,
+       "dmMae": 1.05,
+       "dmQlike": -2.5
+      },
+      "event": {
+       "n": 55,
+       "mae": 0.58,
+       "maeNaive": 0.542,
+       "qlike": 1.209,
+       "qlikeNaive": 1.159,
+       "dmMae": -0.87,
+       "dmQlike": -0.27
+      }
+     },
+     "evt": {
+      "all": {
+       "n": 449,
+       "mae": 0.434,
+       "maeNaive": 0.432,
+       "qlike": 0.696,
+       "qlikeNaive": 0.699,
+       "dmMae": -0.63,
+       "dmQlike": 0.2
+      },
+      "event": {
+       "n": 55,
+       "mae": 0.561,
+       "maeNaive": 0.542,
+       "qlike": 1.137,
+       "qlikeNaive": 1.159,
+       "dmMae": -0.63,
+       "dmQlike": 0.2
+      }
+     },
+     "ewma": {
+      "all": {
+       "n": 449,
+       "mae": 0.433,
+       "maeNaive": 0.432,
+       "qlike": 0.747,
+       "qlikeNaive": 0.699,
+       "dmMae": -0.21,
+       "dmQlike": -1.31
+      },
+      "event": {
+       "n": 55,
+       "mae": 0.595,
+       "maeNaive": 0.542,
+       "qlike": 1.207,
+       "qlikeNaive": 1.159,
+       "dmMae": -1.41,
+       "dmQlike": -0.33
+      }
+     },
+     "har": {
+      "all": {
+       "n": 449,
+       "mae": 0.438,
+       "maeNaive": 0.432,
+       "qlike": 0.738,
+       "qlikeNaive": 0.699,
+       "dmMae": -0.78,
+       "dmQlike": -0.86
+      },
+      "event": {
+       "n": 55,
+       "mae": 0.637,
+       "maeNaive": 0.542,
+       "qlike": 1.22,
+       "qlikeNaive": 1.159,
+       "dmMae": -2.18,
+       "dmQlike": -0.35
+      }
+     }
+    }
+   },
+   "confirmation": {
+    "n": 449,
+    "eventDays": 52,
+    "eventAvgAbs": 1.153,
+    "otherAvgAbs": 1.104,
+    "from": "2025-02-14",
+    "to": "2026-11-06",
+    "models": {
+     "cur": {
+      "all": {
+       "n": 449,
+       "mae": 0.735,
+       "maeNaive": 0.742,
+       "qlike": 3.344,
+       "qlikeNaive": 1.971,
+       "dmMae": 0.52,
+       "dmQlike": -2.93
+      },
+      "event": {
+       "n": 52,
+       "mae": 0.81,
+       "maeNaive": 0.804,
+       "qlike": 4.811,
+       "qlikeNaive": 2.437,
+       "dmMae": -0.12,
+       "dmQlike": -1.16
+      }
+     },
+     "evt": {
+      "all": {
+       "n": 449,
+       "mae": 0.749,
+       "maeNaive": 0.742,
+       "qlike": 2.219,
+       "qlikeNaive": 1.971,
+       "dmMae": -1.08,
+       "dmQlike": -2.35
+      },
+      "event": {
+       "n": 52,
+       "mae": 0.866,
+       "maeNaive": 0.804,
+       "qlike": 4.586,
+       "qlikeNaive": 2.437,
+       "dmMae": -1.09,
+       "dmQlike": -2.47
+      }
+     },
+     "ewma": {
+      "all": {
+       "n": 449,
+       "mae": 0.733,
+       "maeNaive": 0.742,
+       "qlike": 1.821,
+       "qlikeNaive": 1.971,
+       "dmMae": 0.97,
+       "dmQlike": 1.73
+      },
+      "event": {
+       "n": 52,
+       "mae": 0.899,
+       "maeNaive": 0.804,
+       "qlike": 2.139,
+       "qlikeNaive": 2.437,
+       "dmMae": -2.63,
+       "dmQlike": 0.73
+      }
+     },
+     "har": {
+      "all": {
+       "n": 449,
+       "mae": 0.723,
+       "maeNaive": 0.742,
+       "qlike": 1.905,
+       "qlikeNaive": 1.971,
+       "dmMae": 1.58,
+       "dmQlike": 0.92
+      },
+      "event": {
+       "n": 52,
+       "mae": 0.874,
+       "maeNaive": 0.804,
+       "qlike": 2.268,
+       "qlikeNaive": 2.437,
+       "dmMae": -1.94,
+       "dmQlike": 0.52
+      }
+     }
+    }
+   }
+  },
+  "eurusd": {
+   "used": "naive",
+   "picked": null,
+   "tried": 3,
+   "split": "2025-02-18",
+   "reason": "none of the 3 models beat naive on the first half (to 2025-02-18)",
+   "full": {
+    "n": 898,
+    "eventDays": 108,
+    "eventAvgAbs": 0.44,
+    "otherAvgAbs": 0.288,
+    "from": "2023-05-31",
+    "to": "2026-11-06",
+    "models": {
+     "cur": {
+      "all": {
+       "n": 898,
+       "mae": 0.2,
+       "maeNaive": 0.204,
+       "qlike": -0.493,
+       "qlikeNaive": -0.706,
+       "dmMae": 1.62,
+       "dmQlike": -3.24
+      },
+      "event": {
+       "n": 108,
+       "mae": 0.315,
+       "maeNaive": 0.298,
+       "qlike": 0.509,
+       "qlikeNaive": 0.883,
+       "dmMae": -1.07,
+       "dmQlike": 1.18
+      }
+     },
+     "evt": {
+      "all": {
+       "n": 898,
+       "mae": 0.206,
+       "maeNaive": 0.204,
+       "qlike": -0.76,
+       "qlikeNaive": -0.706,
+       "dmMae": -1.16,
+       "dmQlike": 1.35
+      },
+      "event": {
+       "n": 108,
+       "mae": 0.315,
+       "maeNaive": 0.298,
+       "qlike": 0.436,
+       "qlikeNaive": 0.883,
+       "dmMae": -1.17,
+       "dmQlike": 1.36
+      }
+     },
+     "ewma": {
+      "all": {
+       "n": 898,
+       "mae": 0.202,
+       "maeNaive": 0.204,
+       "qlike": -0.848,
+       "qlikeNaive": -0.706,
+       "dmMae": 0.9,
+       "dmQlike": 3.73
+      },
+      "event": {
+       "n": 108,
+       "mae": 0.308,
+       "maeNaive": 0.298,
+       "qlike": 0.01,
+       "qlikeNaive": 0.883,
+       "dmMae": -0.63,
+       "dmQlike": 3
+      }
+     },
+     "har": {
+      "all": {
+       "n": 898,
+       "mae": 0.204,
+       "maeNaive": 0.204,
+       "qlike": -0.851,
+       "qlikeNaive": -0.706,
+       "dmMae": -0.03,
+       "dmQlike": 3.35
+      },
+      "event": {
+       "n": 108,
+       "mae": 0.316,
+       "maeNaive": 0.298,
+       "qlike": -0.003,
+       "qlikeNaive": 0.883,
+       "dmMae": -0.97,
+       "dmQlike": 2.74
+      }
+     }
+    }
+   },
+   "selection": {
+    "n": 449,
+    "eventDays": 55,
+    "eventAvgAbs": 0.455,
+    "otherAvgAbs": 0.281,
+    "from": "2023-05-31",
+    "to": "2025-02-17",
+    "models": {
+     "cur": {
+      "all": {
+       "n": 449,
+       "mae": 0.197,
+       "maeNaive": 0.2,
+       "qlike": -0.637,
+       "qlikeNaive": -0.717,
+       "dmMae": 0.61,
+       "dmQlike": -0.96
+      },
+      "event": {
+       "n": 55,
+       "mae": 0.329,
+       "maeNaive": 0.308,
+       "qlike": 0.105,
+       "qlikeNaive": 0.97,
+       "dmMae": -0.73,
+       "dmQlike": 2.07
+      }
+     },
+     "evt": {
+      "all": {
+       "n": 449,
+       "mae": 0.202,
+       "maeNaive": 0.2,
+       "qlike": -0.824,
+       "qlikeNaive": -0.717,
+       "dmMae": -0.62,
+       "dmQlike": 2.11
+      },
+      "event": {
+       "n": 55,
+       "mae": 0.323,
+       "maeNaive": 0.308,
+       "qlike": 0.096,
+       "qlikeNaive": 0.97,
+       "dmMae": -0.62,
+       "dmQlike": 2.19
+      }
+     },
+     "ewma": {
+      "all": {
+       "n": 449,
+       "mae": 0.2,
+       "maeNaive": 0.2,
+       "qlike": -0.856,
+       "qlikeNaive": -0.717,
+       "dmMae": 0.13,
+       "dmQlike": 2.88
+      },
+      "event": {
+       "n": 55,
+       "mae": 0.315,
+       "maeNaive": 0.308,
+       "qlike": 0.116,
+       "qlikeNaive": 0.97,
+       "dmMae": -0.32,
+       "dmQlike": 2.37
+      }
+     },
+     "har": {
+      "all": {
+       "n": 449,
+       "mae": 0.202,
+       "maeNaive": 0.2,
+       "qlike": -0.863,
+       "qlikeNaive": -0.717,
+       "dmMae": -0.53,
+       "dmQlike": 2.48
+      },
+      "event": {
+       "n": 55,
+       "mae": 0.328,
+       "maeNaive": 0.308,
+       "qlike": 0.033,
+       "qlikeNaive": 0.97,
+       "dmMae": -0.69,
+       "dmQlike": 2.1
+      }
+     }
+    }
+   },
+   "confirmation": {
+    "n": 449,
+    "eventDays": 53,
+    "eventAvgAbs": 0.424,
+    "otherAvgAbs": 0.296,
+    "from": "2025-02-18",
+    "to": "2026-11-06",
+    "models": {
+     "cur": {
+      "all": {
+       "n": 449,
+       "mae": 0.202,
+       "maeNaive": 0.209,
+       "qlike": -0.35,
+       "qlikeNaive": -0.695,
+       "dmMae": 1.75,
+       "dmQlike": -3.42
+      },
+      "event": {
+       "n": 53,
+       "mae": 0.301,
+       "maeNaive": 0.287,
+       "qlike": 0.928,
+       "qlikeNaive": 0.793,
+       "dmMae": -0.98,
+       "dmQlike": -0.29
+      }
+     },
+     "evt": {
+      "all": {
+       "n": 449,
+       "mae": 0.211,
+       "maeNaive": 0.209,
+       "qlike": -0.696,
+       "qlikeNaive": -0.695,
+       "dmMae": -1.3,
+       "dmQlike": 0.01
+      },
+      "event": {
+       "n": 53,
+       "mae": 0.306,
+       "maeNaive": 0.287,
+       "qlike": 0.789,
+       "qlikeNaive": 0.793,
+       "dmMae": -1.32,
+       "dmQlike": 0.01
+      }
+     },
+     "ewma": {
+      "all": {
+       "n": 449,
+       "mae": 0.205,
+       "maeNaive": 0.209,
+       "qlike": -0.841,
+       "qlikeNaive": -0.695,
+       "dmMae": 1.11,
+       "dmQlike": 2.46
+      },
+      "event": {
+       "n": 53,
+       "mae": 0.3,
+       "maeNaive": 0.287,
+       "qlike": -0.1,
+       "qlikeNaive": 0.793,
+       "dmMae": -0.56,
+       "dmQlike": 1.93
+      }
+     },
+     "har": {
+      "all": {
+       "n": 449,
+       "mae": 0.207,
+       "maeNaive": 0.209,
+       "qlike": -0.838,
+       "qlikeNaive": -0.695,
+       "dmMae": 0.53,
+       "dmQlike": 2.26
+      },
+      "event": {
+       "n": 53,
+       "mae": 0.303,
+       "maeNaive": 0.287,
+       "qlike": -0.04,
+       "qlikeNaive": 0.793,
+       "dmMae": -0.7,
+       "dmQlike": 1.78
+      }
+     }
+    }
+   }
+  },
+  "usdjpy": {
+   "used": "naive",
+   "picked": null,
+   "tried": 3,
+   "split": "2025-02-18",
+   "reason": "none of the 3 models beat naive on the first half (to 2025-02-18)",
+   "full": {
+    "n": 898,
+    "eventDays": 108,
+    "eventAvgAbs": 0.561,
+    "otherAvgAbs": 0.395,
+    "from": "2023-05-31",
+    "to": "2026-11-06",
+    "models": {
+     "cur": {
+      "all": {
+       "n": 898,
+       "mae": 0.28,
+       "maeNaive": 0.287,
+       "qlike": 0.987,
+       "qlikeNaive": 0.092,
+       "dmMae": 1.51,
+       "dmQlike": -3.75
+      },
+      "event": {
+       "n": 108,
+       "mae": 0.409,
+       "maeNaive": 0.348,
+       "qlike": 0.74,
+       "qlikeNaive": 1.136,
+       "dmMae": -2.68,
+       "dmQlike": 1.07
+      }
+     },
+     "evt": {
+      "all": {
+       "n": 898,
+       "mae": 0.288,
+       "maeNaive": 0.287,
+       "qlike": 0.011,
+       "qlikeNaive": 0.092,
+       "dmMae": -0.84,
+       "dmQlike": 1.56
+      },
+      "event": {
+       "n": 108,
+       "mae": 0.36,
+       "maeNaive": 0.348,
+       "qlike": 0.468,
+       "qlikeNaive": 1.136,
+       "dmMae": -0.84,
+       "dmQlike": 1.57
+      }
+     },
+     "ewma": {
+      "all": {
+       "n": 898,
+       "mae": 0.29,
+       "maeNaive": 0.287,
+       "qlike": -0.087,
+       "qlikeNaive": 0.092,
+       "dmMae": -0.98,
+       "dmQlike": 2.5
+      },
+      "event": {
+       "n": 108,
+       "mae": 0.396,
+       "maeNaive": 0.348,
+       "qlike": 0.432,
+       "qlikeNaive": 1.136,
+       "dmMae": -1.93,
+       "dmQlike": 1.48
+      }
+     },
+     "har": {
+      "all": {
+       "n": 898,
+       "mae": 0.296,
+       "maeNaive": 0.287,
+       "qlike": -0.139,
+       "qlikeNaive": 0.092,
+       "dmMae": -2.16,
+       "dmQlike": 2.6
+      },
+      "event": {
+       "n": 108,
+       "mae": 0.396,
+       "maeNaive": 0.348,
+       "qlike": 0.402,
+       "qlikeNaive": 1.136,
+       "dmMae": -1.7,
+       "dmQlike": 1.37
+      }
+     }
+    }
+   },
+   "selection": {
+    "n": 449,
+    "eventDays": 55,
+    "eventAvgAbs": 0.666,
+    "otherAvgAbs": 0.407,
+    "from": "2023-05-31",
+    "to": "2025-02-17",
+    "models": {
+     "cur": {
+      "all": {
+       "n": 449,
+       "mae": 0.303,
+       "maeNaive": 0.306,
+       "qlike": 0.71,
+       "qlikeNaive": 0.191,
+       "dmMae": 0.52,
+       "dmQlike": -2.19
+      },
+      "event": {
+       "n": 55,
+       "mae": 0.505,
+       "maeNaive": 0.409,
+       "qlike": 1.379,
+       "qlikeNaive": 2.094,
+       "dmMae": -2.27,
+       "dmQlike": 1.01
+      }
+     },
+     "evt": {
+      "all": {
+       "n": 449,
+       "mae": 0.307,
+       "maeNaive": 0.306,
+       "qlike": 0.038,
+       "qlikeNaive": 0.191,
+       "dmMae": -0.08,
+       "dmQlike": 1.53
+      },
+      "event": {
+       "n": 55,
+       "mae": 0.411,
+       "maeNaive": 0.409,
+       "qlike": 0.849,
+       "qlikeNaive": 2.094,
+       "dmMae": -0.08,
+       "dmQlike": 1.56
+      }
+     },
+     "ewma": {
+      "all": {
+       "n": 449,
+       "mae": 0.305,
+       "maeNaive": 0.306,
+       "qlike": -0.039,
+       "qlikeNaive": 0.191,
+       "dmMae": 0.22,
+       "dmQlike": 1.89
+      },
+      "event": {
+       "n": 55,
+       "mae": 0.43,
+       "maeNaive": 0.409,
+       "qlike": 0.789,
+       "qlikeNaive": 2.094,
+       "dmMae": -0.53,
+       "dmQlike": 1.47
+      }
+     },
+     "har": {
+      "all": {
+       "n": 449,
+       "mae": 0.316,
+       "maeNaive": 0.306,
+       "qlike": -0.043,
+       "qlikeNaive": 0.191,
+       "dmMae": -1.38,
+       "dmQlike": 1.61
+      },
+      "event": {
+       "n": 55,
+       "mae": 0.433,
+       "maeNaive": 0.409,
+       "qlike": 0.742,
+       "qlikeNaive": 2.094,
+       "dmMae": -0.52,
+       "dmQlike": 1.36
+      }
+     }
+    }
+   },
+   "confirmation": {
+    "n": 449,
+    "eventDays": 53,
+    "eventAvgAbs": 0.453,
+    "otherAvgAbs": 0.382,
+    "from": "2025-02-18",
+    "to": "2026-11-06",
+    "models": {
+     "cur": {
+      "all": {
+       "n": 449,
+       "mae": 0.257,
+       "maeNaive": 0.267,
+       "qlike": 1.264,
+       "qlikeNaive": -0.007,
+       "dmMae": 1.98,
+       "dmQlike": -3.08
+      },
+      "event": {
+       "n": 53,
+       "mae": 0.31,
+       "maeNaive": 0.284,
+       "qlike": 0.078,
+       "qlikeNaive": 0.141,
+       "dmMae": -1.73,
+       "dmQlike": 0.41
+      }
+     },
+     "evt": {
+      "all": {
+       "n": 449,
+       "mae": 0.269,
+       "maeNaive": 0.267,
+       "qlike": -0.015,
+       "qlikeNaive": -0.007,
+       "dmMae": -2.34,
+       "dmQlike": 0.31
+      },
+      "event": {
+       "n": 53,
+       "mae": 0.307,
+       "maeNaive": 0.284,
+       "qlike": 0.072,
+       "qlikeNaive": 0.141,
+       "dmMae": -2.46,
+       "dmQlike": 0.31
+      }
+     },
+     "ewma": {
+      "all": {
+       "n": 449,
+       "mae": 0.275,
+       "maeNaive": 0.267,
+       "qlike": -0.135,
+       "qlikeNaive": -0.007,
+       "dmMae": -1.84,
+       "dmQlike": 1.69
+      },
+      "event": {
+       "n": 53,
+       "mae": 0.36,
+       "maeNaive": 0.284,
+       "qlike": 0.061,
+       "qlikeNaive": 0.141,
+       "dmMae": -2.59,
+       "dmQlike": 0.3
+      }
+     },
+     "har": {
+      "all": {
+       "n": 449,
+       "mae": 0.276,
+       "maeNaive": 0.267,
+       "qlike": -0.235,
+       "qlikeNaive": -0.007,
+       "dmMae": -1.78,
+       "dmQlike": 2.25
+      },
+      "event": {
+       "n": 53,
+       "mae": 0.357,
+       "maeNaive": 0.284,
+       "qlike": 0.048,
+       "qlikeNaive": 0.141,
+       "dmMae": -2.36,
+       "dmQlike": 0.28
+      }
+     }
+    }
+   }
+  },
+  "nq": {
+   "used": "naive",
+   "picked": "ewma",
+   "tried": 4,
+   "split": "2025-02-17",
+   "reason": "ewma won the first half but did not beat naive on the second half (from 2025-02-17)",
+   "full": {
+    "n": 898,
+    "eventDays": 108,
+    "eventAvgAbs": 1.176,
+    "otherAvgAbs": 0.865,
+    "from": "2023-05-29",
+    "to": "2026-11-06",
+    "models": {
+     "cur": {
+      "all": {
+       "n": 898,
+       "mae": 0.616,
+       "maeNaive": 0.633,
+       "qlike": 1.679,
+       "qlikeNaive": 1.438,
+       "dmMae": 1.79,
+       "dmQlike": -3.58
+      },
+      "event": {
+       "n": 108,
+       "mae": 0.809,
+       "maeNaive": 0.778,
+       "qlike": 1.83,
+       "qlikeNaive": 2.219,
+       "dmMae": -0.69,
+       "dmQlike": 1.64
+      }
+     },
+     "evt": {
+      "all": {
+       "n": 898,
+       "mae": 0.635,
+       "maeNaive": 0.633,
+       "qlike": 1.405,
+       "qlikeNaive": 1.438,
+       "dmMae": -0.34,
+       "dmQlike": 1.47
+      },
+      "event": {
+       "n": 108,
+       "mae": 0.79,
+       "maeNaive": 0.778,
+       "qlike": 1.942,
+       "qlikeNaive": 2.219,
+       "dmMae": -0.34,
+       "dmQlike": 1.49
+      }
+     },
+     "ewma": {
+      "all": {
+       "n": 898,
+       "mae": 0.627,
+       "maeNaive": 0.633,
+       "qlike": 1.452,
+       "qlikeNaive": 1.438,
+       "dmMae": 0.94,
+       "dmQlike": -0.31
+      },
+      "event": {
+       "n": 108,
+       "mae": 0.806,
+       "maeNaive": 0.778,
+       "qlike": 1.879,
+       "qlikeNaive": 2.219,
+       "dmMae": -0.77,
+       "dmQlike": 1.65
+      }
+     },
+     "har": {
+      "all": {
+       "n": 898,
+       "mae": 0.625,
+       "maeNaive": 0.633,
+       "qlike": 1.386,
+       "qlikeNaive": 1.438,
+       "dmMae": 1.02,
+       "dmQlike": 1.15
+      },
+      "event": {
+       "n": 108,
+       "mae": 0.807,
+       "maeNaive": 0.778,
+       "qlike": 1.903,
+       "qlikeNaive": 2.219,
+       "dmMae": -0.65,
+       "dmQlike": 1.42
+      }
+     },
+     "vix": {
+      "all": {
+       "n": 182,
+       "mae": 0.678,
+       "maeNaive": 0.668,
+       "qlike": 1.792,
+       "qlikeNaive": 1.789,
+       "dmMae": -0.53,
+       "dmQlike": -0.05
+      },
+      "event": {
+       "n": 23,
+       "mae": 0.817,
+       "maeNaive": 0.778,
+       "qlike": 3.033,
+       "qlikeNaive": 2.829,
+       "dmMae": -0.7,
+       "dmQlike": -1.16
+      }
+     }
+    }
+   },
+   "selection": {
+    "n": 449,
+    "eventDays": 55,
+    "eventAvgAbs": 1.119,
+    "otherAvgAbs": 0.766,
+    "from": "2023-05-29",
+    "to": "2025-02-14",
+    "models": {
+     "cur": {
+      "all": {
+       "n": 449,
+       "mae": 0.549,
+       "maeNaive": 0.564,
+       "qlike": 1.337,
+       "qlikeNaive": 1.178,
+       "dmMae": 1.26,
+       "dmQlike": -2.07
+      },
+      "event": {
+       "n": 55,
+       "mae": 0.726,
+       "maeNaive": 0.735,
+       "qlike": 1.688,
+       "qlikeNaive": 2.107,
+       "dmMae": 0.14,
+       "dmQlike": 1.26
+      }
+     },
+     "evt": {
+      "all": {
+       "n": 449,
+       "mae": 0.56,
+       "maeNaive": 0.564,
+       "qlike": 1.126,
+       "qlikeNaive": 1.178,
+       "dmMae": 0.5,
+       "dmQlike": 1.37
+      },
+      "event": {
+       "n": 55,
+       "mae": 0.706,
+       "maeNaive": 0.735,
+       "qlike": 1.684,
+       "qlikeNaive": 2.107,
+       "dmMae": 0.5,
+       "dmQlike": 1.4
+      }
+     },
+     "ewma": {
+      "all": {
+       "n": 449,
+       "mae": 0.553,
+       "maeNaive": 0.564,
+       "qlike": 1.109,
+       "qlikeNaive": 1.178,
+       "dmMae": 1.44,
+       "dmQlike": 1.7
+      },
+      "event": {
+       "n": 55,
+       "mae": 0.704,
+       "maeNaive": 0.735,
+       "qlike": 1.657,
+       "qlikeNaive": 2.107,
+       "dmMae": 0.62,
+       "dmQlike": 1.49
+      }
+     },
+     "har": {
+      "all": {
+       "n": 449,
+       "mae": 0.556,
+       "maeNaive": 0.564,
+       "qlike": 1.122,
+       "qlikeNaive": 1.178,
+       "dmMae": 0.79,
+       "dmQlike": 1.24
+      },
+      "event": {
+       "n": 55,
+       "mae": 0.75,
+       "maeNaive": 0.735,
+       "qlike": 1.731,
+       "qlikeNaive": 2.107,
+       "dmMae": -0.19,
+       "dmQlike": 1.08
+      }
+     },
+     "vix": {
+      "all": null,
+      "event": null
+     }
+    }
+   },
+   "confirmation": {
+    "n": 449,
+    "eventDays": 53,
+    "eventAvgAbs": 1.234,
+    "otherAvgAbs": 0.963,
+    "from": "2025-02-17",
+    "to": "2026-11-06",
+    "models": {
+     "cur": {
+      "all": {
+       "n": 449,
+       "mae": 0.684,
+       "maeNaive": 0.703,
+       "qlike": 2.022,
+       "qlikeNaive": 1.699,
+       "dmMae": 1.29,
+       "dmQlike": -2.92
+      },
+      "event": {
+       "n": 53,
+       "mae": 0.895,
+       "maeNaive": 0.822,
+       "qlike": 1.978,
+       "qlikeNaive": 2.335,
+       "dmMae": -1.24,
+       "dmQlike": 1.05
+      }
+     },
+     "evt": {
+      "all": {
+       "n": 449,
+       "mae": 0.709,
+       "maeNaive": 0.703,
+       "qlike": 1.684,
+       "qlikeNaive": 1.699,
+       "dmMae": -1.52,
+       "dmQlike": 0.59
+      },
+      "event": {
+       "n": 53,
+       "mae": 0.877,
+       "maeNaive": 0.822,
+       "qlike": 2.21,
+       "qlikeNaive": 2.335,
+       "dmMae": -1.55,
+       "dmQlike": 0.59
+      }
+     },
+     "ewma": {
+      "all": {
+       "n": 449,
+       "mae": 0.701,
+       "maeNaive": 0.703,
+       "qlike": 1.794,
+       "qlikeNaive": 1.699,
+       "dmMae": 0.2,
+       "dmQlike": -1.25
+      },
+      "event": {
+       "n": 53,
+       "mae": 0.913,
+       "maeNaive": 0.822,
+       "qlike": 2.109,
+       "qlikeNaive": 2.335,
+       "dmMae": -1.75,
+       "dmQlike": 0.81
+      }
+     },
+     "har": {
+      "all": {
+       "n": 449,
+       "mae": 0.694,
+       "maeNaive": 0.703,
+       "qlike": 1.651,
+       "qlikeNaive": 1.699,
+       "dmMae": 0.68,
+       "dmQlike": 0.61
+      },
+      "event": {
+       "n": 53,
+       "mae": 0.867,
+       "maeNaive": 0.822,
+       "qlike": 2.08,
+       "qlikeNaive": 2.335,
+       "dmMae": -0.9,
+       "dmQlike": 0.92
+      }
+     },
+     "vix": {
+      "all": {
+       "n": 182,
+       "mae": 0.678,
+       "maeNaive": 0.668,
+       "qlike": 1.792,
+       "qlikeNaive": 1.789,
+       "dmMae": -0.53,
+       "dmQlike": -0.05
+      },
+      "event": {
+       "n": 23,
+       "mae": 0.817,
+       "maeNaive": 0.778,
+       "qlike": 3.033,
+       "qlikeNaive": 2.829,
+       "dmMae": -0.7,
+       "dmQlike": -1.16
+      }
+     }
+    }
+   }
+  },
+  "es": {
+   "used": "naive",
+   "picked": "ewma",
+   "tried": 4,
+   "split": "2025-02-17",
+   "reason": "ewma won the first half but did not beat naive on the second half (from 2025-02-17)",
+   "full": {
+    "n": 898,
+    "eventDays": 108,
+    "eventAvgAbs": 0.852,
+    "otherAvgAbs": 0.595,
+    "from": "2023-05-29",
+    "to": "2026-11-06",
+    "models": {
+     "cur": {
+      "all": {
+       "n": 898,
+       "mae": 0.429,
+       "maeNaive": 0.448,
+       "qlike": 1.077,
+       "qlikeNaive": 0.764,
+       "dmMae": 2.81,
+       "dmQlike": -3.19
+      },
+      "event": {
+       "n": 108,
+       "mae": 0.569,
+       "maeNaive": 0.559,
+       "qlike": 1.127,
+       "qlikeNaive": 1.806,
+       "dmMae": -0.33,
+       "dmQlike": 1.69
+      }
+     },
+     "evt": {
+      "all": {
+       "n": 898,
+       "mae": 0.45,
+       "maeNaive": 0.448,
+       "qlike": 0.734,
+       "qlikeNaive": 0.764,
+       "dmMae": -0.57,
+       "dmQlike": 0.7
+      },
+      "event": {
+       "n": 108,
+       "mae": 0.574,
+       "maeNaive": 0.559,
+       "qlike": 1.559,
+       "qlikeNaive": 1.806,
+       "dmMae": -0.57,
+       "dmQlike": 0.7
+      }
+     },
+     "ewma": {
+      "all": {
+       "n": 898,
+       "mae": 0.442,
+       "maeNaive": 0.448,
+       "qlike": 0.771,
+       "qlikeNaive": 0.764,
+       "dmMae": 1.14,
+       "dmQlike": -0.1
+      },
+      "event": {
+       "n": 108,
+       "mae": 0.606,
+       "maeNaive": 0.559,
+       "qlike": 1.241,
+       "qlikeNaive": 1.806,
+       "dmMae": -1.67,
+       "dmQlike": 1.5
+      }
+     },
+     "har": {
+      "all": {
+       "n": 898,
+       "mae": 0.44,
+       "maeNaive": 0.448,
+       "qlike": 0.643,
+       "qlikeNaive": 0.764,
+       "dmMae": 1.25,
+       "dmQlike": 1.81
+      },
+      "event": {
+       "n": 108,
+       "mae": 0.601,
+       "maeNaive": 0.559,
+       "qlike": 1.252,
+       "qlikeNaive": 1.806,
+       "dmMae": -1.17,
+       "dmQlike": 1.32
+      }
+     },
+     "vix": {
+      "all": {
+       "n": 182,
+       "mae": 0.409,
+       "maeNaive": 0.438,
+       "qlike": 0.706,
+       "qlikeNaive": 0.884,
+       "dmMae": 3.13,
+       "dmQlike": 2.21
+      },
+      "event": {
+       "n": 23,
+       "mae": 0.495,
+       "maeNaive": 0.543,
+       "qlike": 1.401,
+       "qlikeNaive": 1.734,
+       "dmMae": 1.96,
+       "dmQlike": 2.67
+      }
+     }
+    }
+   },
+   "selection": {
+    "n": 449,
+    "eventDays": 55,
+    "eventAvgAbs": 0.823,
+    "otherAvgAbs": 0.525,
+    "from": "2023-05-29",
+    "to": "2025-02-14",
+    "models": {
+     "cur": {
+      "all": {
+       "n": 449,
+       "mae": 0.369,
+       "maeNaive": 0.389,
+       "qlike": 0.696,
+       "qlikeNaive": 0.493,
+       "dmMae": 2.43,
+       "dmQlike": -1.54
+      },
+      "event": {
+       "n": 55,
+       "mae": 0.515,
+       "maeNaive": 0.535,
+       "qlike": 1.128,
+       "qlikeNaive": 1.989,
+       "dmMae": 0.43,
+       "dmQlike": 1.19
+      }
+     },
+     "evt": {
+      "all": {
+       "n": 449,
+       "mae": 0.385,
+       "maeNaive": 0.389,
+       "qlike": 0.388,
+       "qlikeNaive": 0.493,
+       "dmMae": 0.65,
+       "dmQlike": 1.29
+      },
+      "event": {
+       "n": 55,
+       "mae": 0.506,
+       "maeNaive": 0.535,
+       "qlike": 1.138,
+       "qlikeNaive": 1.989,
+       "dmMae": 0.65,
+       "dmQlike": 1.31
+      }
+     },
+     "ewma": {
+      "all": {
+       "n": 449,
+       "mae": 0.382,
+       "maeNaive": 0.389,
+       "qlike": 0.375,
+       "qlikeNaive": 0.493,
+       "dmMae": 1.21,
+       "dmQlike": 1.34
+      },
+      "event": {
+       "n": 55,
+       "mae": 0.514,
+       "maeNaive": 0.535,
+       "qlike": 1.082,
+       "qlikeNaive": 1.989,
+       "dmMae": 0.6,
+       "dmQlike": 1.32
+      }
+     },
+     "har": {
+      "all": {
+       "n": 449,
+       "mae": 0.386,
+       "maeNaive": 0.389,
+       "qlike": 0.379,
+       "qlikeNaive": 0.493,
+       "dmMae": 0.33,
+       "dmQlike": 1.18
+      },
+      "event": {
+       "n": 55,
+       "mae": 0.553,
+       "maeNaive": 0.535,
+       "qlike": 1.156,
+       "qlikeNaive": 1.989,
+       "dmMae": -0.32,
+       "dmQlike": 1.08
+      }
+     },
+     "vix": {
+      "all": null,
+      "event": null
+     }
+    }
+   },
+   "confirmation": {
+    "n": 449,
+    "eventDays": 53,
+    "eventAvgAbs": 0.882,
+    "otherAvgAbs": 0.664,
+    "from": "2025-02-17",
+    "to": "2026-11-06",
+    "models": {
+     "cur": {
+      "all": {
+       "n": 449,
+       "mae": 0.489,
+       "maeNaive": 0.508,
+       "qlike": 1.458,
+       "qlikeNaive": 1.036,
+       "dmMae": 1.71,
+       "dmQlike": -2.91
+      },
+      "event": {
+       "n": 53,
+       "mae": 0.625,
+       "maeNaive": 0.584,
+       "qlike": 1.127,
+       "qlikeNaive": 1.615,
+       "dmMae": -1.11,
+       "dmQlike": 1.53
+      }
+     },
+     "evt": {
+      "all": {
+       "n": 449,
+       "mae": 0.515,
+       "maeNaive": 0.508,
+       "qlike": 1.081,
+       "qlikeNaive": 1.036,
+       "dmMae": -2.12,
+       "dmQlike": -1.9
+      },
+      "event": {
+       "n": 53,
+       "mae": 0.645,
+       "maeNaive": 0.584,
+       "qlike": 1.996,
+       "qlikeNaive": 1.615,
+       "dmMae": -2.2,
+       "dmQlike": -1.96
+      }
+     },
+     "ewma": {
+      "all": {
+       "n": 449,
+       "mae": 0.502,
+       "maeNaive": 0.508,
+       "qlike": 1.166,
+       "qlikeNaive": 1.036,
+       "dmMae": 0.65,
+       "dmQlike": -1.4
+      },
+      "event": {
+       "n": 53,
+       "mae": 0.702,
+       "maeNaive": 0.584,
+       "qlike": 1.405,
+       "qlikeNaive": 1.615,
+       "dmMae": -2.72,
+       "dmQlike": 0.76
+      }
+     },
+     "har": {
+      "all": {
+       "n": 449,
+       "mae": 0.495,
+       "maeNaive": 0.508,
+       "qlike": 0.906,
+       "qlikeNaive": 1.036,
+       "dmMae": 1.29,
+       "dmQlike": 1.39
+      },
+      "event": {
+       "n": 53,
+       "mae": 0.651,
+       "maeNaive": 0.584,
+       "qlike": 1.352,
+       "qlikeNaive": 1.615,
+       "dmMae": -1.53,
+       "dmQlike": 0.93
+      }
+     },
+     "vix": {
+      "all": {
+       "n": 182,
+       "mae": 0.409,
+       "maeNaive": 0.438,
+       "qlike": 0.706,
+       "qlikeNaive": 0.884,
+       "dmMae": 3.13,
+       "dmQlike": 2.21
+      },
+      "event": {
+       "n": 23,
+       "mae": 0.495,
+       "maeNaive": 0.543,
+       "qlike": 1.401,
+       "qlikeNaive": 1.734,
+       "dmMae": 1.96,
+       "dmQlike": 2.67
+      }
+     }
+    }
+   }
+  }
+ }
+}

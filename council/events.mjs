@@ -94,6 +94,31 @@ function build() {
 export const EVENTS = Object.freeze(build().map((e) => Object.freeze(e)));
 export const TYPES = ['CPI', 'NFP', 'FOMC', 'PCE', 'ISM_M', 'ISM_S', 'CLAIMS', 'ECB', 'BOJ'];
 
+// HISTORY: CPI, NFP and FOMC from Jan 2022 to Jul 2025, before EVENTS starts. It is kept out of EVENTS, so nearEvent /
+// eventDay / newsFeat do not change. It exists for lookbacks such as the Macro strategist's "last 24 same-type events".
+// Dates come from the BLS and Fed schedules for those years. Each one was checked against EUR/USD 1-minute bars
+// (council-data research/candles): the 5-minute range from the release minute is at least 2x the median range of that
+// minute on the weekdays within ±25 days. All dates pass, except four where the bars are missing (NFP 2023-03-10, 2023-04-07
+// and 2023-06-02, and FOMC 2023-03-22). PCE is left out: its release-minute spike was too weak to confirm many of its dates.
+const HIST_RAW = {
+  CPI: ['2022-01-12', '2022-02-10', '2022-03-10', '2022-04-12', '2022-05-11', '2022-06-10', '2022-07-13', '2022-08-10', '2022-09-13', '2022-10-13', '2022-11-10', '2022-12-13',
+    '2023-01-12', '2023-02-14', '2023-03-14', '2023-04-12', '2023-05-10', '2023-06-13', '2023-07-12', '2023-08-10', '2023-09-13', '2023-10-12', '2023-11-14', '2023-12-12',
+    '2024-01-11', '2024-02-13', '2024-03-12', '2024-04-10', '2024-05-15', '2024-06-12', '2024-07-11', '2024-08-14', '2024-09-11', '2024-10-10', '2024-11-13', '2024-12-11',
+    '2025-01-15', '2025-02-12', '2025-03-12', '2025-04-10', '2025-05-13', '2025-06-11', '2025-07-15'],
+  NFP: ['2022-01-07', '2022-02-04', '2022-03-04', '2022-04-01', '2022-05-06', '2022-06-03', '2022-07-08', '2022-08-05', '2022-09-02', '2022-10-07', '2022-11-04', '2022-12-02',
+    '2023-01-06', '2023-02-03', '2023-03-10', '2023-04-07', '2023-05-05', '2023-06-02', '2023-07-07', '2023-08-04', '2023-09-01', '2023-10-06', '2023-11-03', '2023-12-08',
+    '2024-01-05', '2024-02-02', '2024-03-08', '2024-04-05', '2024-05-03', '2024-06-07', '2024-07-05', '2024-08-02', '2024-09-06', '2024-10-04', '2024-11-01', '2024-12-06',
+    '2025-01-10', '2025-02-07', '2025-03-07', '2025-04-04', '2025-05-02', '2025-06-06', '2025-07-03'],
+  FOMC: ['2022-01-26', '2022-03-16', '2022-05-04', '2022-06-15', '2022-07-27', '2022-09-21', '2022-11-02', '2022-12-14',
+    '2023-02-01', '2023-03-22', '2023-05-03', '2023-06-14', '2023-07-26', '2023-09-20', '2023-11-01', '2023-12-13',
+    '2024-01-31', '2024-03-20', '2024-05-01', '2024-06-12', '2024-07-31', '2024-09-18', '2024-11-07', '2024-12-18',
+    '2025-01-29', '2025-03-19', '2025-05-07', '2025-06-18', '2025-07-30'],
+};
+export const HISTORY = Object.freeze(Object.entries(HIST_RAW).flatMap(([type, ds]) => ds.map((date) => {
+  const R = RAW[type], t = zonedToUtc(date, R.at, R.tz);
+  return Object.freeze({ t, at: new Date(t * 1000).toISOString().replace('.000', ''), type, title: R.title, country: R.country, tier: R.tier, src: SOURCES[type], local: `${date} ${R.at} ${R.tz}`, history: true });
+})).sort((a, b) => a.t - b.t));
+
 const RANK = { 1: 0, cb: 1, 2: 2 };
 const sec = (ts) => (ts instanceof Date ? ts.getTime() / 1000 : ts > 1e11 ? ts / 1000 : ts);
 // opts: { tier: 1 | 2 | 'cb' | [..], type: 'CPI' | [..], country: 'USD' | [..], events: custom list }
