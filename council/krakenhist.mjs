@@ -82,3 +82,33 @@ export async function krakenOHLC(pair, minutes) {
   const key = Object.keys(res).find((k) => k !== 'last');
   return (res[key] || []).map((k) => ({ time: +k[0], open: +k[1], high: +k[2], low: +k[3], close: +k[4] }));
 }
+
+// Gold's spot offset through time, for the replay (backtest.mjs goldBasis): samples = spot H1 closes (H: [{time, close}],
+// time = the hour's open) minus the PAXG 1m close (m1, time-ordered) of the last minute before that hour ends (a minute more
+// than 10 min old adds no sample; |offset| >= 150 is ignored), as the live Trader's basisFor. offAt(t) = the median of the
+// samples of the last 2 hours; with none, the newest sample's (the offset live keeps); before the first sample, the first
+// one. null: no samples.
+export function basisSeries(H, m1) {
+  const S = []; let j = 0;   // samples [time, offset], time-ordered
+  for (const h of H.slice().sort((a, b) => a.time - b.time)) {
+    const s = h.time + 3600;
+    while (j < m1.length && m1[j].time < s) j++;
+    const p = m1[j - 1];   // the last PAXG minute before the hour closed; a stale one (> 10 min old) adds no sample
+    if (!p || s - p.time > 600 || !isFinite(h.close)) continue;
+    const o = h.close - p.close; if (Math.abs(o) < 150) S.push([s, +o.toFixed(3)]);
+  }
+  if (!S.length) return null;
+  const med = (v) => { v = v.slice().sort((x, y) => x - y); const n = v.length; return +(n % 2 ? v[n >> 1] : (v[n / 2 - 1] + v[n / 2]) / 2).toFixed(3); };
+  const offAt = (t) => {
+    let lo = 0, hi = S.length - 1, k = -1;   // last sample at or before t
+    while (lo <= hi) { const m = (lo + hi) >> 1; if (S[m][0] <= t) { k = m; lo = m + 1; } else hi = m - 1; }
+    if (k < 0) return S[0][1];   // before the first sample: the first offset (the live Trader had one already)
+    const w = []; for (let i = k; i >= 0 && t - S[i][0] <= 2 * 3600; i--) w.push(S[i][1]);
+    if (w.length) return med(w);
+    // no fresh sample (weekend, feed gap): the last offset is kept; live, the samples age out one by one, so the last
+    // offset it computed was the newest sample's alone
+    return S[k][1];
+  };
+  offAt.samples = S.length;
+  return offAt;
+}
