@@ -5789,7 +5789,9 @@ function msNextSetup(bars, A) {
   function md(src) {   // small, safe markdown: headings, bullets, bold, paragraphs, simple tables (Analyst's live-rule check)
     const out = []; let list = false, tbl = null;
     const inl = (x) => esc(x).replace(/\*\*(.+?)\*\*/g, '<b>$1</b>').replace(/(^|[\s(])_([^_\s][^_]*?)_(?=[\s.,;:)!?]|$)/g, '$1<i>$2</i>').replace(/`(.+?)`/g, '<code>$1</code>');   // _italic_ (word-bounded, so snake_case stays)
-    const endTbl = () => { if (!tbl) return; out.push(`<div class="c-md-tw"><table><thead><tr>${tbl[0].map((c) => `<th>${inl(c)}</th>`).join('')}</tr></thead><tbody>${tbl.slice(1).map((r) => `<tr>${r.map((c) => `<td>${inl(c)}</td>`).join('')}</tr>`).join('')}</tbody></table></div>`); tbl = null; };
+    // columns whose body cells are all plain numbers (+1.2R, 41%, 3,979.4, —) are right-aligned in tabular figures (layout only)
+    const numC = (i) => tbl.length > 1 && tbl.slice(1).every((r) => /^(?:[+\-−]?\$?[\d,.]+(?:%|R| ?pts?)?|—|-|)$/.test(String(r[i] || '').replace(/\*\*|`/g, '').trim())) && tbl.slice(1).some((r) => /\d/.test(r[i] || ''));
+    const endTbl = () => { if (!tbl) return; const N = tbl[0].map((_, i) => numC(i)); out.push(`<div class="c-md-tw" tabindex="0" role="region" aria-label="Table"><table><thead><tr>${tbl[0].map((c, i) => `<th${N[i] ? ' class="n"' : ''}>${inl(c)}</th>`).join('')}</tr></thead><tbody>${tbl.slice(1).map((r) => `<tr>${r.map((c, i) => `<td${N[i] ? ' class="n"' : ''}>${inl(c)}</td>`).join('')}</tr>`).join('')}</tbody></table></div>`); tbl = null; };
     String(src || '').split(/\r?\n/).forEach((line) => {
       if (/^\s*<!--.*-->\s*$/.test(line)) return;   // markers (e.g. the Trader's live-rule block)
       if (/^\s*\|.*\|\s*$/.test(line)) { if (list) { out.push('</ul>'); list = false; } const cells = line.trim().slice(1, -1).split('|').map((c) => c.trim());
@@ -8676,6 +8678,137 @@ html, body, button, input, select, textarea { font-family: Figtree, -apple-syste
 html { font-variant-numeric: tabular-nums; -webkit-font-smoothing: antialiased; }
 h1, h2, h3, .h-head { letter-spacing: -0.02em; }
 code, pre, kbd, .tva-src, .tvw-url, .tv-tk .tk-l { font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace !important; }
+</style>
+<style>
+/* ── Council design pass (Nov 2026): hierarchy, tables, touch targets, contrast. Everything scoped to #v-council. ── */
+/* light theme: profit / loss colours dark enough for 4.5:1 on white and on their own tints */
+:root[data-theme="light"] #v-council { --buy: #067562; --sell: #c2203d; --c-warn: #8a5a00; }
+#v-council { --c-warn: #f2b33d; --c-tap: 44px; }
+
+/* 1 · status line: state pill first, the scan details on their own line (no stray leading dot when it wraps) */
+#v-council .c-head p#ms-c-status { gap: 6px 10px; margin-top: 8px; font-size: 13px; }
+#v-council #ms-c-status .c-ok, #v-council #ms-c-status .c-warn, #v-council #ms-c-status .c-bad { display: inline-flex; align-items: center; gap: 6px; padding: 3px 10px 3px 8px; border-radius: 999px; font: 600 12.5px var(--sans); }
+#v-council #ms-c-status .c-ok { color: color-mix(in srgb, var(--buy) 85%, var(--ink)); background: color-mix(in srgb, var(--buy) 11%, transparent); }
+#v-council #ms-c-status .c-warn { color: var(--c-warn); background: color-mix(in srgb, var(--c-warn) 14%, transparent); }
+#v-council #ms-c-status .c-bad { color: var(--sell); background: color-mix(in srgb, var(--sell) 11%, transparent); }
+#v-council #ms-c-status .c-meta { flex-basis: 100%; display: block; margin: 0; color: var(--ink-dim); font-size: 12.5px; }
+#v-council #ms-c-status .c-meta::before { content: none; }
+#v-council .c-warn { color: var(--c-warn); }
+
+/* 2 · section nav and trade tabs: 44px targets, readable count badge */
+#v-council .c-nav button { min-height: var(--c-tap); }
+#v-council .c-nav-n { color: var(--ink); background: color-mix(in srgb, var(--accent) 18%, transparent); font-weight: 700; }
+#v-council #ms-c-tabs button { min-height: var(--c-tap); justify-content: center; padding-inline: 12px; }
+#v-council #ms-c-tabs button small { color: var(--ink-dim); }
+#v-council #ms-c-tabnote { margin: 4px 0 12px; color: var(--ink-dim); }
+#v-council .c-mine { min-height: var(--c-tap); display: inline-flex; align-items: center; gap: 8px; cursor: pointer; }
+#v-council .c-mine input { width: 18px; height: 18px; }
+
+/* 3 · tables: numbers right-aligned in tabular figures, scroll sideways inside the wrapper only */
+#v-council .ms-bt-wrap, #v-council .edge-wrap, #v-council .c-md-tw { max-width: 100%; overflow-x: auto; overscroll-behavior-x: contain; -webkit-overflow-scrolling: touch; }
+#v-council .c-t td.n, #v-council .c-t th.n, #v-council .edge-t td, #v-council .c-md td.n, #v-council .c-md th.n { text-align: right; font-variant-numeric: tabular-nums; }
+#v-council .edge-t td:nth-child(2) { text-align: left; }
+#v-council .c-t tr.sh td { opacity: 1; color: var(--ink-faint); }   /* shadow rows: dimmed by colour, not opacity (keeps 4.5:1 and works with the sticky column) */
+#v-council .c-t tr.sh td b { color: var(--ink-dim); }
+#v-council .c-pm-v.system { color: var(--c-warn); background: color-mix(in srgb, var(--c-warn) 14%, transparent); }
+#v-council .ms-more, #v-council .c-trader button:not([role="tab"]) { min-height: var(--c-tap); }
+@media (max-width: 700px) {
+  /* phones: the first column (time / setup / market / condition) stays put while the numbers scroll */
+  #v-council .c-t :is(th, td):first-child, #v-council .edge-t tr > :first-child, #v-council .c-md-tw :is(th, td):first-child {
+    position: sticky; left: 0; z-index: 1; background-color: var(--panel); box-shadow: inset -1px 0 0 var(--line); }
+  #v-council .c-t thead th:first-child, #v-council .edge-t thead th:first-child, #v-council .c-md-tw thead th:first-child { z-index: 2; }
+  #v-council .t-scroll .c-t thead th:first-child { background-color: var(--panel-raised); }
+  #v-council .c-t td:first-child { white-space: nowrap; }
+}
+@media (max-width: 700px) and (hover: hover) { #v-council tbody tr:hover > td:first-child { background-color: color-mix(in srgb, var(--ink) 3.5%, var(--panel)); } }
+
+/* 4 · Systems → Live setups: the Coach's proposals come first, as the one thing waiting for the owner */
+#v-council .c-sleeve { display: flex; flex-direction: column; }
+#v-council .c-sleeve > .ms-k { order: -2; margin-bottom: 4px; }
+#v-council .c-sleeve .sl-row { gap: 8px; padding: 16px 0; }
+#v-council .c-sleeve .sl-row + .sl-row { border-top: 1px solid var(--line-soft); }
+#v-council .c-sleeve .sl-h b { font-size: 16px; }
+#v-council .c-sleeve .sl-h small, #v-council .c-sleeve .sl-n { color: var(--ink-dim); font-size: 12.5px; line-height: 1.55; }
+#v-council .c-sleeve .sl-k { gap: 6px 22px; font-size: 12.5px; }
+#v-council .c-sleeve .sl-k b { font: 600 15px var(--mono); font-variant-numeric: tabular-nums; margin-right: 2px; }
+#v-council .c-sleeve .sl-g { height: 4px; margin-top: 2px; }
+/* the proposals row: its heading <b> is the first child (a setup row starts with its Live / Stopped chip).
+   With a Promote / Demote waiting it moves to the top of the card as the one thing that needs the owner; with nothing waiting it stays a quiet line at the bottom. */
+#v-council .c-sleeve .sl-row:has(> .sl-h > b:first-child) .sl-h b { text-transform: none; font-size: 15px; }
+#v-council .c-sleeve .sl-row:has(> .sl-h > b:first-child):has(.ms-chip) {
+  order: -1; margin: 6px 0 10px; padding: 14px 16px; border: 1px solid var(--gold-line, color-mix(in srgb, #e3b341 45%, transparent)); border-radius: var(--r, 8px);
+  background: color-mix(in srgb, var(--gold, #e3b341) 7%, var(--panel)); }
+#v-council .c-sleeve .sl-row:has(> .sl-h > b:first-child):has(.ms-chip) + .sl-row { border-top: 0; }
+#v-council .c-sleeve .sl-row:has(> .sl-h > b:first-child):has(.ms-chip) .sl-h b { display: inline-flex; align-items: center; gap: 8px; }
+#v-council .c-sleeve .sl-row:has(> .sl-h > b:first-child):has(.ms-chip) .sl-h b::before { content: "!"; display: inline-grid; place-items: center; width: 20px; height: 20px; border-radius: 50%; background: var(--gold, #e3b341); color: #1a1405; font: 800 12px/1 var(--sans); }
+#v-council .c-sleeve .sl-row:has(> .sl-h > b:first-child) .sl-n:has(.ms-chip) { display: block; color: var(--ink); font-size: 13px; padding: 10px 0 2px; }
+#v-council .c-sleeve .sl-row:has(> .sl-h > b:first-child) .sl-n:has(.ms-chip) + .sl-n { border-top: 1px solid color-mix(in srgb, var(--gold, #e3b341) 25%, transparent); }
+#v-council .c-sleeve .ms-chip-buy::before { content: "▲ "; font-size: .85em; }
+#v-council .c-sleeve .ms-chip-sell::before { content: "▼ "; font-size: .85em; }
+#v-council .c-sleeve .sl-h .ms-chip::before { content: none; }   /* Live / Stopped status chips: no arrow */
+/* a per-setup suggestion (skip a market / session) inside a live setup row: same "waiting for you" treatment */
+#v-council .c-sleeve small.sl-n[title^="From the 30-day replay"] { display: block; padding: 8px 12px; border-radius: var(--r-sm, 6px); color: var(--ink); background: color-mix(in srgb, var(--gold, #e3b341) 9%, transparent); border: 1px solid var(--gold-line, color-mix(in srgb, #e3b341 45%, transparent)); }
+
+/* 5 · Edge finder: 44px group buttons, quieter verdict, readable zebra */
+#v-council .c-edge .edge-by { gap: 8px; margin: 6px 0 14px; }
+#v-council .c-edge .edge-by button, #v-council .c-edge .edge-sc select { min-height: var(--c-tap); padding-inline: 14px; }
+#v-council .c-edge .edge-by button[aria-pressed="true"] { border-color: var(--accent); color: var(--ink); }
+#v-council .edge-t th, #v-council .edge-t td { padding: 10px 10px; }
+#v-council .edge-t tbody th { font-weight: 600; color: var(--ink); text-align: left; }
+#v-council .edge-t tr.edge > *, #v-council .edge-t tr.avoid > * { background-color: transparent; }
+#v-council .edge-t tr.edge { background: color-mix(in srgb, var(--buy) 7%, var(--panel)); }
+#v-council .edge-t tr.avoid { background: color-mix(in srgb, var(--sell) 6%, var(--panel)); }
+#v-council .c-how > summary { min-height: var(--c-tap); display: flex; align-items: center; }
+
+/* 6 · P&L calendar: 44px controls; weekends and future days dimmed by tone, not opacity */
+#v-council .cal-nav button { width: var(--c-tap); height: var(--c-tap); }
+#v-council .cal-seg button { min-height: var(--c-tap); padding-inline: 14px; }
+#v-council #ms-cal > .cal-d.we:not(.win):not(.loss), #v-council .cal > :nth-child(7n+6):not(.cal-h):not(.win):not(.loss), #v-council .cal > :nth-child(7n+7):not(.cal-h):not(.win):not(.loss) { opacity: 1; background: transparent; }
+#v-council .cal .cal-d.fut .cn { opacity: 1; }
+#v-council .cal-d .cn, #v-council .cal-wk .cn { color: var(--ink-dim); }
+#v-council .cal-d.we .cn, #v-council .cal-d.fut .cn { color: var(--ink-faint); }
+#v-council #ms-cal-sum { color: var(--ink-dim); }
+#v-council .cal-dayh button { min-height: 36px; padding-inline: 12px; }
+
+/* active trades: shadow positions dimmed by tone (opacity dropped them below 3:1) and a dashed edge */
+#v-council .c-act li.sh { opacity: 1; border-style: dashed; }
+#v-council .c-act li.sh .a-t, #v-council .c-act li.sh b { color: var(--ink-dim); }
+
+/* 7 · research: Ready list rows are whole-row links; backtest summary reads as a lede */
+#v-council .c-ready li { padding: 0; align-items: center; }
+#v-council .c-ready li > a { flex: 1; min-width: 0; min-height: var(--c-tap); display: flex; flex-wrap: wrap; align-items: center; gap: 2px 6px; padding: 8px 4px 8px 12px; }
+#v-council .c-ready li > span { padding-right: 12px; }
+#v-council #ms-c-bt-sum { color: var(--ink-dim); font-size: 13px; margin: 0 0 10px; }
+#v-council .ms-q.good { color: var(--buy); border-color: color-mix(in srgb, var(--buy) 45%, transparent); background: color-mix(in srgb, var(--buy) 8%, transparent); }
+#v-council .ms-q.weak { color: var(--c-warn); border-color: color-mix(in srgb, var(--c-warn) 45%, transparent); background: color-mix(in srgb, var(--c-warn) 8%, transparent); }
+#v-council .c-few { color: var(--ink-dim); }
+#v-council .c-wide { color: var(--ink-dim); }
+/* Coach rule log: no coloured side stripe; owner changes carry a "you" tag instead */
+#v-council .c-hist li { border: 1px solid var(--line-soft); border-radius: var(--r-sm, 6px); padding: 10px 12px; }
+#v-council .c-hist li span { color: var(--ink-dim); }
+#v-council .c-hist li.by-you { background: color-mix(in srgb, var(--gold, #e3b341) 7%, transparent); border-color: var(--gold-line, color-mix(in srgb, #e3b341 45%, transparent)); }
+#v-council .c-hist li.by-you span { color: var(--ink-dim); font-weight: 600; }
+/* calendar day cells with a result: secondary lines in ink-dim so they hold 4.5:1 on the heat tint */
+#v-council .cal-d:is(.win, .loss) .ct, #v-council .cal-d:is(.win, .loss) .ct-w, #v-council .cal-wk .ct { color: var(--ink-dim); }
+#v-council .cal-d.win .cr, #v-council .cal-wk.win .cr { color: color-mix(in srgb, var(--buy) 82%, var(--ink)); }
+#v-council .cal-d.loss .cr, #v-council .cal-wk.loss .cr { color: color-mix(in srgb, var(--sell) 82%, var(--ink)); }
+
+/* 8 · Analyst / Coach markdown: measure, heading rhythm, framed tables with numeric columns */
+#v-council .c-md { font-size: 13.5px; line-height: 1.65; }
+#v-council .c-md > p, #v-council .c-md > ul { max-width: 75ch; }
+#v-council .c-md li + li { margin-top: 4px; }
+#v-council .c-md h3 { font-size: 17px; margin: 22px 0 8px; padding-top: 16px; border-top: 1px solid var(--line-soft); text-wrap: balance; }
+#v-council .c-md > h3:first-child { margin-top: 4px; padding-top: 0; border-top: 0; }
+#v-council .c-md h4, #v-council .c-md h5 { font-size: 14px; margin: 18px 0 6px; }
+#v-council .c-md .c-md-tw { margin: 6px 0 14px; border: 1px solid var(--line); border-radius: var(--r-sm, 6px); }
+#v-council .c-md table { font-size: 12.5px; }
+#v-council .c-md th { background: var(--panel-raised); font-size: 12px; white-space: nowrap; }
+#v-council .c-md th, #v-council .c-md td { padding: 8px 10px; border-bottom-color: var(--line-soft); }
+#v-council .c-md tbody tr:last-child td { border-bottom: 0; }
+#v-council .c-md td.n { font-family: var(--mono); white-space: nowrap; }
+#v-council .c-md td:first-child { color: var(--ink); font-weight: 600; }
+#v-council .c-md-tw:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+@media (max-width: 700px) { #v-council .c-md td { min-width: 96px; } #v-council .c-md td:first-child { min-width: 84px; } }
 </style>
 </body>
 </html>
