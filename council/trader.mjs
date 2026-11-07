@@ -8,6 +8,7 @@ import { msAnalyze, CFG, PAIRS, RETR, LBL, buildSetup, buildRetrace, setMarket }
 import { entryContext, startReview, watchReview, judge, newsNear, lessons } from './review.mjs';
 import { m15cFeat } from './choch.mjs';
 import { FUT, ticket, closeTicket } from './futures.mjs';
+import { liveRuleSection, injectSection } from './analyst.mjs';
 import { coachProposals } from './proposals.mjs';
 
 const DIR = process.argv[2] || 'data';
@@ -1879,6 +1880,10 @@ snapshot.lessons = lessons(trades, now);
   snapshot.ownerReviews = { n: R.length, byK, candidates, at: nowISO };
 }
 wr('snapshot.json', snapshot);
+// Analyst report (reporting only): refresh the "Live Scalp rule check" block in analysis/latest.md, if the report is here
+try { const fA = path.join(DIR, 'analysis', 'latest.md');
+  if (fs.existsSync(fA)) { const md = fs.readFileSync(fA, 'utf8'), nx = injectSection(md, liveRuleSection({ snapshot, config, backtest: rd('backtest.json', null), now }));
+    if (nx !== md) fs.writeFileSync(fA, nx); } } catch (e) { console.log('analyst section:', e.message); }
 const open = trades.filter((x) => x.status === 'open' || x.status === 'pending').length;
 console.log(`Council run ${nowISO}: ${Object.keys(snapshot.markets).length} markets, ${Object.keys(snapshot.errors).length} errors, ${open} open/pending trades, ${trades.length} total.`);
 if (Object.keys(snapshot.errors).length) console.log(snapshot.errors);
