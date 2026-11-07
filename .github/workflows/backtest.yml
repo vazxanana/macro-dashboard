@@ -26,9 +26,12 @@ on:
 permissions:
   contents: write
 
+# 7 Nov: no longer cancel-in-progress. The replay takes ~30 min and merges touching the engine landed faster than that, so
+# 6 of the 8 push runs on 7 Nov were cancelled before saving (fidelity, spot check and the robustness audit never refreshed).
+# Now a running replay finishes and saves; GitHub keeps only the newest waiting run, which starts right after it.
 concurrency:
   group: council-backtest
-  cancel-in-progress: true
+  cancel-in-progress: false
 
 jobs:
   backtest:
