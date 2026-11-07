@@ -105,7 +105,8 @@ export function promoteDemote(rows, config, halves, at, opt = {}) {
 export function spotProposals(spot, at = new Date().toISOString(), opt = {}) {
   const minN = opt.minN || 20, gap = opt.gap != null ? opt.gap : 8;
   if (!spot || !spot.markets) return [];
-  const bad = Object.entries(spot.markets).filter(([, c]) => c && c.n >= minN && c.liveR - c.spotR >= gap).sort((a, b) => (b[1].liveR - b[1].spotR) - (a[1].liveR - a[1].spotR));
+  const feed = opt.feed || {};   // markets already managed on OANDA candles (snapshot.feed) need no proposal
+  const bad = Object.entries(spot.markets).filter(([m, c]) => c && feed[m] !== 'OANDA' && c.n >= minN && c.liveR - c.spotR >= gap).sort((a, b) => (b[1].liveR - b[1].spotR) - (a[1].liveR - a[1].spotR));
   if (!bad.length) return [];
   const n = bad.reduce((s, [, c]) => s + c.n, 0), liveR = r2(bad.reduce((s, [, c]) => s + c.liveR, 0)), spotR = r2(bad.reduce((s, [, c]) => s + c.spotR, 0));
   const per = bad.map(([m, c]) => `${mName(m)} ${fR(c.liveR / c.n)} live vs ${fR(c.spotR / c.n)} spot (${c.n})`).join('; ');
