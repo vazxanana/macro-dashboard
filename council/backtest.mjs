@@ -36,6 +36,11 @@ const WAIT = { '1d': 5 * 86400, '4h': 2 * 86400, '1h': 12 * 3600, '15m': 3 * 360
 const FRESH = 12, WIN = 720, STEP = 300;
 // trade management variants: [name, break-even level, hold to the second target]
 const VARIANTS = [['none', null, false], ['be1', 1, false], ['be15', 1.5, false], ['tp2', null, true]];
+// D1 trend labels from OANDA spot for gold and forex (7 Nov), the same source the live trader and the site charts use, so the
+// replay's "with / against D1" means the same thing as the live trades'. Only the label; the D1 candles stay as loaded.
+const OANDA_D1 = new Set(['xau', 'eurusd', 'gbpusd', 'audusd', 'usdcad', 'usdchf']), MD_BASE = process.env.MD_BASE || 'https://meridianx.dev/md/';
+async function oandaD1(key) { if (!OANDA_D1.has(key)) return null; try { const r = await fetch(`${MD_BASE}bars?sym=${key}&tf=1d&n=1500`, { signal: AbortSignal.timeout(15000) }); const j = r.ok ? await r.json() : null;
+  return j && j.src === 'OANDA' && Array.isArray(j.bars) && j.bars.length > 300 ? j.bars.map((b) => ({ time: b.time, open: +b.open, high: +b.high, low: +b.low, close: +b.close })) : null; } catch (e) { return null; } }
 const sessionOf = (t) => { const h = new Date(t * 1000).getUTCHours(); return h < 7 ? 'asia' : h < 12 ? 'london' : h < 16 ? 'overlap' : h < 21 ? 'newyork' : 'late'; };
 const marketOpen = (M, t) => { if (M.group === 'Crypto') return true; const d = new Date(t * 1000), wd = d.getUTCDay(), h = d.getUTCHours(); return !(wd === 6 || (wd === 0 && h < 23) || (wd === 5 && h >= 21)); };
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
@@ -285,6 +290,10 @@ for (const [key, M] of Object.entries(MARKETS)) {
       for (const [id, iv, sec] of TFS) data[id] = await klines(M.sym, iv, startT - (WIN + 2) * sec, endT);
     }
     const m1 = data['1m'];
+    // OANDA D1 trend per day (closed daily candles before that day, last 720), cached; null when OANDA can't be read
+    const OD = await oandaD1(key), odCache = new Map(); meta.d1src = Object.assign(meta.d1src || {}, { [key]: OD ? 'OANDA' : 'feed' });
+    const odTrend = (t) => { if (!OD) return null; const d = Math.floor(t / 86400) * 86400; if (odCache.has(d)) return odCache.get(d); const w = OD.filter((b) => b.time < d).slice(-720); const v = w.length > 100 ? msAnalyze(w, 6).trend : null; odCache.set(d, v); return v; };
+    const d1T = (src, t) => { const o = odTrend(t); return o === 1 || o === -1 ? o : src['1d'].A.trend; };
     setMarket(M);
     const ptr = Object.fromEntries(TFS.map(([id]) => [id, 0]));
     const seen = new Set(), open = [];
@@ -346,7 +355,7 @@ for (const [key, M] of Object.entries(MARKETS)) {
         if (open.some((x) => x.k === st.k && x.side === side && Math.abs(x.t1 - st.t1) <= Math.abs(st.t1) * 1e-5)) continue;
         const def = DEFS.find((p) => p.k === st.k), cfT = +String(st.sig).split('|')[2];
         if (!cfT || t - cfT > FRESH * SEC[def.l]) continue;
-        const feat = { d1: src['1d'].A.trend === (st.sell ? -1 : 1) ? 'with' : 'against', struct: st.retr == null ? 'n/a' : st.retr >= 0.5 ? 'main' : 'internal', session: sessionOf(t), ...structFeat(st.sell, def.l, src, t), m15c: m15cOf(src['15m'].bars, st.sell, t), m15c1: m15cOf(src['15m'].bars, st.sell, t, 1) };
+        const feat = { d1: d1T(src, t) === (st.sell ? -1 : 1) ? 'with' : 'against', struct: st.retr == null ? 'n/a' : st.retr >= 0.5 ? 'main' : 'internal', session: sessionOf(t), ...structFeat(st.sell, def.l, src, t), m15c: m15cOf(src['15m'].bars, st.sell, t), m15c1: m15cOf(src['15m'].bars, st.sell, t, 1) };
         const tr = { m: key, k: st.k, h: def.h, side, entry: st.entry, stop: st.stop, t1: st.t1, t2: st.t2 != null && (st.t2 - st.t1) * (st.sell ? -1 : 1) > 0 ? st.t2 : null, rr: st.rr, opened: t, status: 'pending', feat, mfe: 0 };
         if (st.sell ? price >= st.entry : price <= st.entry) {   // already through the entry: fill at market, like the Trader
           const r = Math.abs(price - st.stop), rw = (st.t1 - price) * (st.sell ? -1 : 1);
@@ -373,7 +382,7 @@ for (const [key, M] of Object.entries(MARKETS)) {
         const side = sw.sell ? 'sell' : 'buy';
         if (open.some((x) => x.k === sw.k && x.side === side)) continue;   // one sweep trade per side at a time
         const tr = { m: key, k: sw.k, h: '1h', side, entry: sw.entry, stop: sw.stop, t1: sw.t1, rr: sw.rr, opened: t, filled: t, status: 'open', mfe: 0,
-          feat: { d1: src['1d'].A.trend === (sw.sell ? -1 : 1) ? 'with' : 'against', struct: 'n/a', session: sessionOf(t), ...structFeat(sw.sell, '1m', src, t), m15c: m15cOf(src['15m'].bars, sw.sell, t), m15c1: m15cOf(src['15m'].bars, sw.sell, t, 1) } };
+          feat: { d1: d1T(src, t) === (sw.sell ? -1 : 1) ? 'with' : 'against', struct: 'n/a', session: sessionOf(t), ...structFeat(sw.sell, '1m', src, t), m15c: m15cOf(src['15m'].bars, sw.sell, t), m15c1: m15cOf(src['15m'].bars, sw.sell, t, 1) } };
         tr.r0 = Math.abs(tr.entry - tr.stop); tr.cost = tr.r0 > 0 ? spreadOf(M, tr.entry) / tr.r0 : 0;
         tr.v = VARIANTS.map(([n, be, t2]) => ({ n, be, t2, stop: tr.stop, beMoved: false, done: false, R: null }));
         open.push(tr);
