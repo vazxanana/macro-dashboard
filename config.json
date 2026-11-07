@@ -1,7 +1,7 @@
 {
  "buf": 0.15,
  "minRR": 1.2,
- "minRisk": 1,
+ "minRisk": 1.1,
  "be": null,
  "fresh": 12,
  "newsGuard": true,
@@ -13,16 +13,14 @@
    "d1": "against",
    "since": {
     "d1": "2026-11-02T11:52:07.000Z",
-    "session:asia": "2026-11-02T21:25:27.000Z",
-    "session:overlap": "2026-11-06T12:00:22.000Z"
+    "session:asia": "2026-11-02T21:25:27.000Z"
    },
    "src": {
     "d1": "backtest",
     "noMarket": "user"
    },
    "noSession": [
-    "asia",
-    "overlap"
+    "asia"
    ],
    "noMarket": [
     "audusd"
@@ -56,9 +54,7 @@
    ]
   },
   "rintra": {
-   "d1": "with",
    "since": {
-    "d1": "2026-11-03T06:00:12.000Z",
     "session:late": "2026-11-03T06:00:12.000Z"
    },
    "noSession": [
@@ -81,12 +77,6 @@
    "d1": "against",
    "src": {
     "d1": "user"
-   }
-  },
-  "m30m1": {
-   "d1": "with",
-   "since": {
-    "d1": "2026-11-06T07:00:02.000Z"
    }
   }
  },
@@ -480,6 +470,30 @@
    "by": "user",
    "change": "Gold momentum pullback (new paper system, both sides): a closed H1 candle whose range is at least 1.5x the average of the previous 14 H1 ranges and which closes in its top (buys) / bottom (sells) 20%, in the direction of the 20-day average, between 07:00 and 17:00 UTC; then the first M5 candle within 6 h that trades into the 38-62% pullback of that H1 candle and closes in the trade direction enters at market; stop 0.1 beyond the H1 candle; after +2R the stop trails 1R behind the best price (cap 10R); out after 8 h; cancelled if the stop is hit before the entry",
    "why": "Owner: find a good scalp for a raw-spread account. Every M1 and session scalp tested was zero before costs; this one is not. Spot gold 2023-24 | 2025-26 at 0.15 all-in cost: +0.105R | +0.171R a trade (n234/186, worst drawdown -9.1R | -9.5R), positive at 0.10, 0.20 and 0.30 cost, for range multiples 1.25-1.5, top 75-90%, pullback zones 23-50 / 38-62 / 50-79%, waits 3-6 h, 1.5R / 2R / 3R / trail; Feb-Jun 2026 bear window +2.8R. Without the 20-day direction it halves. Median stop 7.8 points, ~110 trades a year, entries 07-17 UTC."
+  },
+  {
+   "at": "2026-11-07T00:03:49.000Z",
+   "by": "coach-stats",
+   "change": "Minimum stop 1 → 1.1 ATR",
+   "why": "Win rate 17% over 36 trades: stops get hit by normal candle noise."
+  },
+  {
+   "at": "2026-11-07T00:03:49.000Z",
+   "by": "coach-stats",
+   "change": "scalp: trading the overlap session again",
+   "why": "Blocked trades made +0.27R over 12."
+  },
+  {
+   "at": "2026-11-07T00:03:49.000Z",
+   "by": "coach-stats",
+   "change": "rintra: dropped the D1 rule",
+   "why": "The trades it blocked made +1.33R over 10."
+  },
+  {
+   "at": "2026-11-07T00:03:49.000Z",
+   "by": "coach-stats",
+   "change": "m30m1: dropped the D1 rule",
+   "why": "The trades it blocked made +1.36R over 19."
   }
  ],
  "btAt": "2026-11-06T11:18:45.097Z",
@@ -529,19 +543,19 @@
  "noPause": true,
  "wouldPause": {
   "rintra": {
-   "at": "2026-11-06T23:58:34.000Z",
+   "at": "2026-11-07T00:03:49.000Z",
    "why": "four losses in a row"
   },
   "scalp": {
-   "at": "2026-11-06T23:58:34.000Z",
+   "at": "2026-11-07T00:03:49.000Z",
    "why": "expectancy -1.00R over 13 trades"
   },
   "xau": {
-   "at": "2026-11-06T00:04:29.000Z",
+   "at": "2026-11-07T00:03:49.000Z",
    "why": "market: -0.60R per trade over 10 trades"
   },
   "btc": {
-   "at": "2026-11-06T00:04:29.000Z",
+   "at": "2026-11-07T00:03:49.000Z",
    "why": "market: -1.00R per trade over 6 trades"
   },
   "position": {
