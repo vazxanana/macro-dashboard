@@ -1303,3 +1303,19 @@ engulfing king, MMXM, msnr-direction-sop) and its 14-year gold summary.
 - Engulf zone mechanics (EG first touch, H1 EG/EF confirmation, failed-zone continuation): their own 14-year tests show no
   edge; matches our daily-engulf finding that the edge needs the 20-day-average context. No change.
 - Decision Level after the Daily close (PF ~1.2, ~12/yr, 2012-18 weak) and low-risk Apex (≤ 1.0): too thin to add.
+
+## 2026-11-07 — Deep-research report's gold ideas + the playbook's daily stop, tested: no change
+Report: `reports/ICT and gold system improvements.md` (owner's skills: gold-msnr-playbook §5, Mosha, Zlankator, 411, engulfing). Windows 2023-24 | 2025-26, plus 2019-22 where the leg has data.
+- **Slow-trend gate** (3/6/12-month gold returns, `ms/tsmom.py`, `ms/gt_exit.py`), judged at the signal day:
+  - Gold trend live: +23.8R dd −4.6 (2019-22) | +17.0 dd −2.5 | +41.1 dd −1.0.
+    With "≥ 2 of 3 positive": +23.2 dd −3.0 | +17.6 dd −1.9 | +39.2 dd −1.5. Fails in 2025-26.
+    A first run that took the momentum at the exit date looked free; that was lookahead.
+  - H4 trendline, 12-month positive: +5.0 vs −3.4R in 2019-22, but −1.2R in 2023-24. Daily engulf, every gate: less profit in 2025-26. Not adopted.
+- **Wider gold trend exits** (close − 3/4 ATR, chandelier from the high, 10/20-day low): the live 2-ATR close trail is best in 2025-26 (+41.1R dd −1.0). Close − 3 ATR wins 2019-22 and 2023-24 but loses 11R in 2025-26. Unchanged.
+- **Daily loss stop / cool-off** (playbook §5 "3 losses → stop", `ms/daycap.py`, `ms/eg_daycap.py`):
+  - The entry-time version showed the daily engulf at +39.8 dd −4.7 | +49.5 dd −5.3 with a −1R day cap. That was lookahead: 33 of 146 fills share a day and the first loss had not closed yet.
+  - With real exit times: −1R cap +26.0 | +45.4; −2R cap +26.5 dd −8.8 | +47.0 (vs +25.5 dd −9.8 | +47.0); one fill a day +30.3 dd −5.7 | +31.9.
+  - Replica: −1R cap +67.6 | +101.4; −2R +64.5 | +113.9; cool-offs 4–24 h all lose profit.
+  - Scalp and trendline: no day ever hits the caps.
+  - Not adopted: the −2R engulf cap is +1R in one half only.
+- Conclusion: the live gold stack stays as it is. The open-risk cap and the session-by-side scalp test need trade-level side and exit data the records do not carry; they are next.
