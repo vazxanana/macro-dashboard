@@ -166,9 +166,10 @@ function session(WS, url) {
 const money = (v, d) => (v == null ? null : +(+v / 10 ** d).toFixed(d));
 const sideOf = (s) => (s === 2 || s === 'SELL' ? 'sell' : 'buy');
 
-async function readAccounts(WS, accessToken) {
+async function readAccounts(WS, accessToken, env) {   // cTrader answers the account list only after the app has authenticated
   const s = session(WS, HOSTS.demo);
   try {
+    await s.send(PT.APP_AUTH_REQ, { clientId: String(env.CTRADER_CLIENT_ID).trim(), clientSecret: String(env.CTRADER_CLIENT_SECRET).trim() });
     const list = await s.send(PT.ACCOUNTS_BY_TOKEN_REQ, { accessToken });
     return (list.ctidTraderAccount || []).map((a) => ({ id: String(a.ctidTraderAccountId), login: a.traderLogin != null ? String(a.traderLogin) : null, live: a.isLive === true, broker: a.brokerTitleShort || a.brokerName || null }));
   } finally { s.close(); }
@@ -262,7 +263,7 @@ async function handle(req, res, { env = process.env, WS = globalThis.WebSocket, 
       const rec = await freshTokens(env, deps, ses.u); if (!rec) return res.status(200).json({ linked: false });
       secrets.push(rec.accessToken, rec.refreshToken);
       if (!WS) return res.status(500).json({ error: 'WebSocket is not available on this server' });
-      const accounts = await readAccounts(WS, rec.accessToken);
+      const accounts = await readAccounts(WS, rec.accessToken, env);
       if (!accounts.length) return res.status(200).json({ linked: true, accounts: [], error: 'No cTrader accounts were shared with this link' });
       const acc = accounts.find((a) => a.id === String(b.account || '')) || accounts.find((a) => a.live) || accounts[0];
       const data = await readAccount(env, WS, rec.accessToken, acc, { days: b.days });

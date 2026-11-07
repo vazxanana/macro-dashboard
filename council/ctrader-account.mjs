@@ -16,7 +16,7 @@ export async function accountSnapshot({ env, tokens = null, WS = globalThis.WebS
   if (String(env.CTRADER_MIRROR || '').trim().toLowerCase() !== 'on' || need.some((k) => !String(env[k] || '').trim()) || String(env.CTRADER_ENV).trim().toLowerCase() !== 'demo') return null;
   let accessToken = String(env.CTRADER_ACCESS_TOKEN).trim();
   try { const t = tokens && unseal(tokens, env); if (t && t.accessToken) accessToken = t.accessToken; } catch (e) {}
-  const id = String(env.CTRADER_ACCOUNT_ID).trim(), accounts = await lib.readAccounts(WS, accessToken);
+  const id = String(env.CTRADER_ACCOUNT_ID).trim(), accounts = await lib.readAccounts(WS, accessToken, env);
   const acc = accounts.find((a) => a.id === id) || accounts.find((a) => a.login === id);
   if (!acc) return { error: 'account not found for this token', at: new Date(now).toISOString() };
   if (acc.live) return { error: 'refused: not a demo account', at: new Date(now).toISOString() };

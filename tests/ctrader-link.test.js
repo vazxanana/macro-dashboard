@@ -20,8 +20,9 @@ function fakeCtrader({ live = false } = {}) {
     send(text) { const m = JSON.parse(text); sent.push({ url: this.url, ...m }); const P = _t.PT, p = m.payload;
       const r = (t, pl) => setTimeout(() => this.onmessage({ data: JSON.stringify({ clientMsgId: m.clientMsgId, payloadType: t, payload: pl }) }), 0);
       switch (m.payloadType) {
-        case P.ACCOUNTS_BY_TOKEN_REQ: return r(P.ACCOUNTS_BY_TOKEN_RES, { ctidTraderAccount: [{ ctidTraderAccountId: 77, traderLogin: 1001, isLive: live, brokerTitleShort: 'Fake FX' }] });
-        case P.APP_AUTH_REQ: return r(P.APP_AUTH_RES, {});
+        case P.ACCOUNTS_BY_TOKEN_REQ: if (!this.app) return r(P.OA_ERROR_RES, { errorCode: 'CH_CLIENT_NOT_AUTHENTICATED' });   // like the real server
+          return r(P.ACCOUNTS_BY_TOKEN_RES, { ctidTraderAccount: [{ ctidTraderAccountId: 77, traderLogin: 1001, isLive: live, brokerTitleShort: 'Fake FX' }] });
+        case P.APP_AUTH_REQ: this.app = true; return r(P.APP_AUTH_RES, {});
         case P.ACCOUNT_AUTH_REQ: return r(P.ACCOUNT_AUTH_RES, {});
         case P.TRADER_REQ: return r(P.TRADER_RES, { trader: { balance: 123456, moneyDigits: 2, depositAssetId: 9, leverageInCents: 50000 } });
         case P.ASSET_LIST_REQ: return r(P.ASSET_LIST_RES, { asset: [{ assetId: 9, name: 'USD' }] });
