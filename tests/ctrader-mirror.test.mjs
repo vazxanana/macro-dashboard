@@ -2,12 +2,12 @@
 //   node --test tests/ctrader-mirror.test.mjs
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { mirrorRound, PT, ALLOWED, session, volumeFor, relative, unseal, LIMITS } from '../council/ctrader-mirror.mjs';
+import { mirrorRound, PT, ALLOWED, session, volumeFor, relative, unseal, LIMITS, ictCandidates } from '../council/ctrader-mirror.mjs';
 
 const ENV = { CTRADER_CLIENT_ID: 'fake-client-id', CTRADER_CLIENT_SECRET: 'fake-client-secret', CTRADER_ACCESS_TOKEN: 'fake-access-old',
   CTRADER_REFRESH_TOKEN: 'fake-refresh-old', CTRADER_ACCOUNT_ID: '4242', CTRADER_ENV: 'demo', CTRADER_MIRROR: 'on' };
-const SYMS = [{ symbolId: 1, symbolName: 'EURUSD' }, { symbolId: 41, symbolName: 'XAUUSD' }];
-const INFO = { 1: { symbolId: 1, digits: 5, lotSize: 10000000, minVolume: 100000, stepVolume: 100000 }, 41: { symbolId: 41, digits: 2, lotSize: 10000, minVolume: 100, stepVolume: 100 } };
+const SYMS = [{ symbolId: 1, symbolName: 'EURUSD' }, { symbolId: 41, symbolName: 'XAUUSD' }, { symbolId: 7, symbolName: 'NAS100' }];
+const INFO = { 7: { symbolId: 7, digits: 2, lotSize: 100, minVolume: 1, stepVolume: 1 }, 1: { symbolId: 1, digits: 5, lotSize: 10000000, minVolume: 100000, stepVolume: 100000 }, 41: { symbolId: 41, digits: 2, lotSize: 10000, minVolume: 100, stepVolume: 100 } };
 
 function broker({ isLive = false, balance = 100000, expireFirst = false, reject = false } = {}) {
   const sent = [], positions = new Map(); let pid = 900, expired = expireFirst;
@@ -112,4 +112,16 @@ test('expired token: refreshed and returned only encrypted; secrets never in sta
 test('sizing and relative distances', () => {
   assert.equal(volumeFor(INFO[1]), 100000); assert.equal(volumeFor({ lotSize: 10000000, minVolume: 1000000, stepVolume: 1000000 }), 1000000);
   assert.equal(relative(0.002, 5), 200); assert.equal(relative(10, 2), 1000000); assert.equal(relative(0.0000001, 5), 1);
+});
+
+test('ICT desk: A-setups mirrored on the cash index (no fixed target), others never; closed when the desk closes', async () => {
+  const ict = [{ id: 'nq-b-1', market: 'nq', side: 'buy', entry: 25000, stop: 24950, t1: null, status: 'open', opened: NOW - 120, aset: true, aplus: false },
+    { id: 'es-s-2', market: 'es', side: 'sell', entry: 7400, stop: 7430, t1: null, status: 'open', opened: NOW - 120, aset: false }];
+  const b = broker(); let r = await mirrorRound({ env: ENV, trades: ictCandidates(ict), state: started, WS: b.WS, now: NOW });
+  const orders = b.sent.filter((m) => m.payloadType === PT.NEW_ORDER_REQ).map((m) => m.payload);
+  assert.equal(orders.length, 1); assert.equal(orders[0].symbolId, 7); assert.equal(orders[0].relativeStopLoss, 5000000);
+  assert.equal('relativeTakeProfit' in orders[0], false); assert.match(orders[0].comment, /^ict ict-A ict:nq-b-1/);
+  assert.equal(r.state.map['ict:nq-b-1'].symbol, 'NAS100');
+  r = await mirrorRound({ env: ENV, trades: ictCandidates([{ ...ict[0], status: 'trail', R: 2.1 }]), state: r.state, WS: b.WS, now: NOW + 300 });
+  assert.equal(b.positions.size, 0); assert.equal(r.state.map['ict:nq-b-1'].status, 'closed by council');
 });

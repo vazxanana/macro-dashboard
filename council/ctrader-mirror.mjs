@@ -1,7 +1,7 @@
 // Council → cTrader DEMO mirror (owner, 7 Nov: "mirror to the cTrader demo, that's the goal of all this").
 //   node council/ctrader-mirror.mjs <dataDir>      (runs after each Trader round in council.yml)
 //
-// Copies the council's LIVE paper trades (never shadows) on gold and forex into the cTrader DEMO account as market orders with
+// Copies the council's LIVE paper trades (never shadows) on gold and forex, and the ICT desk's A-setups (NQ/ES/YM/RTY/GC), into the cTrader DEMO account as market orders with
 // the same stop and target, and closes the position when the council closes the trade. Safety, enforced here in code:
 //   * DEMO ONLY: the host is the cTrader demo endpoint, CTRADER_ENV must be "demo", and the account must report isLive:false
 //     before account auth is sent. A live account is refused (the owner decides on live separately, with demo results).
@@ -28,11 +28,17 @@ export const PT = {
 export const ALLOWED = new Set([PT.APP_AUTH_REQ, PT.ACCOUNTS_BY_TOKEN_REQ, PT.ACCOUNT_AUTH_REQ, PT.TRADER_REQ, PT.RECONCILE_REQ,
   PT.SYMBOLS_LIST_REQ, PT.SYMBOL_BY_ID_REQ, PT.REFRESH_TOKEN_REQ, PT.HEARTBEAT, PT.NEW_ORDER_REQ, PT.CLOSE_POSITION_REQ]);
 const NEED = ['CTRADER_CLIENT_ID', 'CTRADER_CLIENT_SECRET', 'CTRADER_ACCESS_TOKEN', 'CTRADER_REFRESH_TOKEN', 'CTRADER_ACCOUNT_ID', 'CTRADER_ENV'];
-// council market -> broker symbol name (Fusion Markets cTrader names)
-export const SYMBOLS = { xau: 'XAUUSD', eurusd: 'EURUSD', gbpusd: 'GBPUSD', audusd: 'AUDUSD', usdcad: 'USDCAD', usdchf: 'USDCHF' };
+// council / ICT desk market -> broker symbol names to try, in order (Fusion Markets cTrader names first). The ICT desk signals on
+// CME futures (NQ, ES, YM, RTY, GC); the demo trades the matching cash index / spot gold CFD: only the stop distance is copied,
+// so the futures-cash basis does not matter.
+export const SYMBOLS = { xau: ['XAUUSD'], eurusd: ['EURUSD'], gbpusd: ['GBPUSD'], audusd: ['AUDUSD'], usdcad: ['USDCAD'], usdchf: ['USDCHF'],
+  nq: ['US100', 'NAS100', 'USTEC'], es: ['US500', 'SPX500', 'US500.cash'], ym: ['US30', 'DJ30', 'US30.cash'], rty: ['US2000', 'RUSSELL2000'], gc: ['XAUUSD'] };
+// the ICT desk's trades as mirror candidates: only its A-setups (the part that holds up after costs: research/edge/costs), with
+// their own id space; everything else is treated like a shadow (never sent)
+export const ictCandidates = (ict) => (Array.isArray(ict) ? ict : []).map((t) => ({ ...t, id: 'ict:' + t.id, k: 'ict-' + (t.aplus ? 'A+' : 'A'), shadow: !t.aset, rr: t.t1 == null ? 99 : t.rr }));
 export const LIMITS = { lots: 0.01, maxOpen: 5, dayStop: 0.02, fresh: 15 * 60 };
 const LABEL = 'council';
-const OPEN = new Set(['open']), DONE = new Set(['win', 'loss', 'be', 'closed', 'expired', 'missed', 'cancelled', 'exit']);
+const OPEN = new Set(['open']), isDone = (t) => !!t.status && t.status !== 'open' && t.status !== 'pending';
 
 // ---- secrets ------------------------------------------------------------------------------------------------------
 export function scrubber(env) {
@@ -146,7 +152,7 @@ export async function mirrorRound({ env, trades, state, tokens, WS = globalThis.
     const byId = new Map(trades.map((t) => [t.id, t]));
     for (const [id, m] of Object.entries(st.map)) {
       if (m.status !== 'open') continue;
-      const t = byId.get(id); if (!t || !DONE.has(t.status)) continue;
+      const t = byId.get(id); if (!t || !isDone(t)) continue;
       const p = positions.get(String(m.positionId)); if (!p) continue;
       const vol = (p.tradeData && +p.tradeData.volume) || m.volume;
       try { await s.send(PT.CLOSE_POSITION_REQ, { ctidTraderAccountId: ctid, positionId: Number(m.positionId), volume: vol }, PT.EXECUTION_EVENT);
@@ -166,17 +172,18 @@ export async function mirrorRound({ env, trades, state, tokens, WS = globalThis.
         const skip = (why) => { (st.skipped = st.skipped || {})[t.id] = why; say(`not mirrored ${t.id}: ${why}`, { trade: t.id }); };
         if (dayDown >= LIMITS.dayStop) { skip(`daily loss stop (${(dayDown * 100).toFixed(1)}% down today)`); continue; }
         if (openCount() >= LIMITS.maxOpen) { skip(`${LIMITS.maxOpen} mirror positions already open`); continue; }
-        const symbolId = idOf.get(SYMBOLS[t.market]); if (!symbolId) { skip(`symbol ${SYMBOLS[t.market]} not found at the broker`); continue; }
+        const name = SYMBOLS[t.market].find((n) => idOf.has(n.toUpperCase())), symbolId = name && idOf.get(name.toUpperCase());
+        if (!symbolId) { skip(`none of ${SYMBOLS[t.market].join('/')} found at the broker`); continue; }
         const info = ((await s.send(PT.SYMBOL_BY_ID_REQ, { ctidTraderAccountId: ctid, symbolId: [symbolId] }, PT.SYMBOL_BY_ID_RES)).symbol || [])[0] || {};
         const volume = volumeFor(info), sell = t.side === 'sell', d = Number.isFinite(+info.digits) ? +info.digits : 5;
         const order = { ctidTraderAccountId: ctid, symbolId, orderType: 1, tradeSide: sell ? 2 : 1, volume, label: LABEL,
-          comment: `council ${t.k} ${t.id}`.slice(0, 100), clientOrderId: String(t.id).slice(0, 50), relativeStopLoss: relative(t.entry - t.stop, d) };
+          comment: `${String(t.id).startsWith('ict:') ? 'ict' : 'council'} ${t.k} ${t.id}`.slice(0, 100), clientOrderId: String(t.id).slice(0, 50), relativeStopLoss: relative(t.entry - t.stop, d) };
         if (t.t1 != null && !(t.rr >= 50)) order.relativeTakeProfit = relative(t.t1 - t.entry, d);   // trailing systems: no fixed target
         try {
           const ev = await s.send(PT.NEW_ORDER_REQ, order, PT.EXECUTION_EVENT);
           const pid = ev.position && ev.position.positionId;
-          st.map[t.id] = { positionId: pid != null ? String(pid) : null, symbol: SYMBOLS[t.market], side: t.side, volume, setup: t.k, status: pid != null ? 'open' : 'sent', openedAt: new Date(now * 1000).toISOString(), councilEntry: t.entry, stop: t.stop, t1: t.t1 };
-          out.sent.push({ type: 'open', trade: t.id }); say(`opened ${sell ? 'sell' : 'buy'} ${SYMBOLS[t.market]} ${volume / (+info.lotSize || 10000000)} lot (council ${t.k})`, { trade: t.id });
+          st.map[t.id] = { positionId: pid != null ? String(pid) : null, symbol: name, side: t.side, volume, setup: t.k, status: pid != null ? 'open' : 'sent', openedAt: new Date(now * 1000).toISOString(), councilEntry: t.entry, stop: t.stop, t1: t.t1 };
+          out.sent.push({ type: 'open', trade: t.id }); say(`opened ${sell ? 'sell' : 'buy'} ${name} ${volume / (+info.lotSize || 10000000)} lot (council ${t.k})`, { trade: t.id });
         } catch (e) { skip(`order rejected: ${e.message}`); }
       }
     }
@@ -191,7 +198,9 @@ if (process.argv[1] && process.argv[1].endsWith('ctrader-mirror.mjs')) {
   const DIR = process.argv[2] || 'data', CD = path.join(DIR, 'ctrader');
   const rd = (f, d) => { try { return JSON.parse(fs.readFileSync(path.join(CD, f), 'utf8')); } catch (e) { return d; } };
   if (String(process.env.CTRADER_MIRROR || '').toLowerCase() !== 'on' && !fs.existsSync(path.join(CD, 'mirror.json'))) process.exit(0);   // never set up: stay silent
-  const raw = JSON.parse(fs.readFileSync(path.join(DIR, 'trades.json'), 'utf8')), trades = Array.isArray(raw) ? raw : raw.trades || [];
+  const raw = JSON.parse(fs.readFileSync(path.join(DIR, 'trades.json'), 'utf8'));
+  let ict = []; try { ict = JSON.parse(fs.readFileSync(path.join(DIR, 'ict', 'trades.json'), 'utf8')); } catch (e) {}
+  const trades = (Array.isArray(raw) ? raw : raw.trades || []).concat(ictCandidates(ict));
   const prev = rd('mirror.json', {}), r = await mirrorRound({ env: process.env, trades, state: prev.state, tokens: rd('tokens.json', null) });
   fs.mkdirSync(CD, { recursive: true });
   fs.writeFileSync(path.join(CD, 'mirror.json'), JSON.stringify({ state: r.state, log: (prev.log || []).concat(r.log).slice(-300), limits: LIMITS, symbols: SYMBOLS }, null, 1));
