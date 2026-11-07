@@ -8,14 +8,14 @@ _Snapshot 2026-11-02 05:37 UTC. Paper trading only._
 <!-- live-rule:start -->
 ## Live Scalp rule check
 
-Built by the Trader at 2026-11-07 17:35 UTC from snapshot, config and the 30-day replay. Rule now: Scalp (M15 → M1) against D1 only, not in asia/overlap, skips audusd.
+Built by the Trader at 2026-11-07 17:41 UTC from snapshot, config and the 30-day replay. Rule now: Scalp (M15 → M1) against D1 only, not in asia/overlap, skips audusd.
 
 Session now: **newyork**.
 
 | Market | D1 (source) | Live Scalp would | Scalp now | Replay, live rule |
 |---|---|---|---|---|
 | XAU/USD | down (OANDA; Kraken says up) | no (trades the replica instead) | IN ORIGIN buy | 39 trades, 41% won, +0.19R a trade |
-| BTC/USD | up (Kraken) | **sell** only | READY sell | 25 trades, 32% won, +0.45R a trade |
+| BTC/USD | up (Kraken) | **sell** only | IN ORIGIN sell | 25 trades, 32% won, +0.45R a trade |
 | ETH/USD | down (Kraken) | **buy** only | IN ORIGIN buy | 21 trades, 43% won, +0.49R a trade |
 | SOL/USD | down (Kraken) | **buy** only | READY sell (blocked: wrong side) | 17 trades, 29% won, +0.52R a trade |
 | XRP/USD | up (Kraken) | **sell** only | IN ORIGIN sell | 31 trades, 32% won, +0.07R a trade |
