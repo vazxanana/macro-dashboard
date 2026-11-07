@@ -41,8 +41,9 @@ test('week report: council tab, pane, section list, quick link and script are wi
 test('week report: costs and the live list match the daily digest', () => {
   const MW = loadWeek();
   assert.deepEqual({ ...MW.ICT_COST_PTS }, ICT_COST_PTS, 'ICT micro round trip in step with council/digest.mjs');
-  assert.match(src('council/alerts.mjs'), /export const alertable = \(trades, research\) => trades\.filter\(\(x\) => !x\.shadow\)\s*\.concat\(research\.filter\(\(x\) => x\.k === 'nq-open' && !\/-x\$\/\.test\(x\.session \|\| ''\)\)\);/,
-    'the report mirrors alertable (live trades.json + NQ open run research trades): keep them in step');
+  assert.match(src('council/alerts.mjs'), /export const alertable = \(trades, research\) => trades\.filter\(\(x\) => !x\.shadow\)\s*\.concat\(research\.filter\(\(x\) => x\.k === 'nq-open' && !x\.shadow && !\/-x\$\/\.test\(x\.session \|\| ''\)\)\);/,
+    'the report mirrors alertable (live trades.json + NQ open run research trades, never a research shadow stream): keep them in step');
+  assert.match(html, /var nqLive = function \(x\) \{ return x\.k === 'nq-open' && !x\.shadow && !\/-x\$\/\.test\(x\.session \|\| ''\); \};/, 'the report\'s copy of alertable');
   assert.equal(MW.merNet({ R: 2, Rnet: 1.9 }), 1.9); assert.equal(MW.merNet({ R: 2, costR: 0.1, size: 2 }), 1.8); assert.equal(MW.merNet({ R: -1 }), -1);
   assert.equal(+MW.ictNet({ R: 2, market: 'nq', r0: 13.7 }).toFixed(4), 1.9);
   assert.equal(MW.weekOf(Date.UTC(2026, 10, 8, 23, 59) / 1000), Date.UTC(2026, 10, 2) / 1000, 'Sunday belongs to the week that started Monday');

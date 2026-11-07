@@ -200,6 +200,17 @@ admin switch `.cal-src` ("Main systems" / "+ Shadow", localStorage `msCalSrc`) a
 replay (research/shadow-replay.json, about −1,200R Jun–Oct, setups the live rules block). The Home Today strip
 (`renderToday`) headlines `sysClosed()` and floating live R; shadow and retired-engine trades sit on the second line.
 
+## NQ open run regime tags (8 Nov 2026, from the regime-switch study's proposal)
+`council/regime.mjs` (pure, tests/nq-regime.test.mjs checks it against research/edge/regime-switch run.mjs on all 1,869 study trades):
+every live NQ New York open run record (research.json `nq-nyflip-<day>`) gets `regime: { trend, ts, trendAsOf, meta, metaN, on, cut }`
+at entry: TREND = NAS100 6-month trend strength |ln(C/C-126) / (sd x sqrt 126)| from OANDA daily closes (`/md/bars?sym=nas100&tf=1d`,
+candles closed before the entry, weekend stubs dropped), META = the stream's own net R over the 365 days before. User rule
+`nq-regime-shadow` (`config.nqRegimeShadow = { trendMin: 0.295 }`, the study's frozen cut): when |TS| >= 0.295 a paper copy of the
+trade is pushed as `nq-nyflipt-<day>` (session `nyflip-trend`, `shadow: true`, `blockedBy ['regime-shadow']`, `of: <live id>`),
+managed by the same nq-open loop. The live rule is untouched (the test pins its block by sha256). The shadow never alerts or gets a
+futures ticket (`alertable` skips research shadows), is not "our system" on the page (`nqSys` / `nqLive`), and lands in the week
+report's shadow book as "NQ open run, trend-on only (shadow)"; `snapshot.nqRegime` carries the latest tag, shown on the NQ card.
+
 ## Gold trend fast (7 Nov 2026, owner goal: more profit from the skills)
 Second gold-trend leg `gtrend5` (user rule `gold-trend-fast`, `config.goldTrendFast = { n: 5, k: 2 }`): the gold trend rule on
 the prior 5 daily highs, its own position and add next to the 20-day leg (`gtrend`); the trader runs both from one loop

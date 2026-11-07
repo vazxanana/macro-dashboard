@@ -6504,9 +6504,13 @@ function msNextSetup(bars, A) {
     let e = 0, pk = 0, dd = 0; const mo = {}; for (const x of rp) { e += x.R; pk = Math.max(pk, e); dd = Math.min(dd, e - pk); const k = new Date(x.closed * 1000).toISOString().slice(0, 7); mo[k] = (mo[k] || 0) + x.R; }
     const mv = Object.values(mo), w = rp.filter((x) => x.R > 0).length;
     set('ms-nq-kpi', `<div><span>Forward trades</span><b>${fw.length}${fw.length - fd.length ? ` <small>(${fw.length - fd.length} open)</small>` : ''}</b></div><div><span>Forward total</span><b class="${fRs > 0 ? 'pos' : fRs < 0 ? 'neg' : ''}">${fd.length ? fR(fRs) : '—'}</b></div><div><span>Replay since Dec 2022</span><b class="${e >= 0 ? 'pos' : 'neg'}">${rp.length ? fR(e) : '—'}</b></div><div><span>Replay win rate</span><b>${rp.length ? Math.round(w / rp.length * 100) + '%' : '—'}</b></div>`);
-    set('ms-nq-txt', rp.length ? `Replay: ${rp.length} trades, ${fR(e)} (${fR(e / rp.length)} a trade), ${mv.filter((v) => v > 0).length} of ${mv.length} months positive, worst drawdown ${fR(dd)}. Data: the trader's NQ futures file Dec 2022 – Dec 2025, Dukascopy cash index Dec 2025 – Sep 2026, Yahoo/CNBC futures since. Promote to live only after ~30 forward trades that match the replay.` : '');
+    // regime tags (research/edge/regime-switch, paper): the latest trade's NAS100 6-month trend strength and the stream's 365-day net R,
+    // and the forward record of the 'nyflip-trend' shadow stream (the trade copied only when |TS| >= 0.295; never our system)
+    const rg = COUNCIL.snap && COUNCIL.snap.nqRegime, ts = (COUNCIL.research || []).filter((x) => x.k === 'nq-open' && x.session === 'nyflip-trend'), tsd = ts.filter((x) => ['win', 'loss', 'be'].includes(x.status));
+    const rgTxt = rg ? ` Regime tags (paper, not a rule): on ${esc(rg.day || '')} NAS100's 6-month trend strength |TS| was ${rg.trend != null ? rg.trend : 'unknown'}${rg.trendAsOf ? ` (to ${esc(rg.trendAsOf)})` : ''}, ${rg.on ? 'at or above' : 'below'} the study's frozen cut ${rg.cut}; this stream's trailing-year net ${fR(rg.meta)} over ${rg.metaN}. Trend-on shadow stream: ${ts.length} trade${ts.length === 1 ? '' : 's'}${tsd.length ? `, ${fR(tsd.reduce((a, x) => a + x.R, 0))} closed` : ''}.` : '';
+    set('ms-nq-txt', (rp.length ? `Replay: ${rp.length} trades, ${fR(e)} (${fR(e / rp.length)} a trade), ${mv.filter((v) => v > 0).length} of ${mv.length} months positive, worst drawdown ${fR(dd)}. Data: the trader's NQ futures file Dec 2022 – Dec 2025, Dukascopy cash index Dec 2025 – Sep 2026, Yahoo/CNBC futures since. Promote to live only after ~30 forward trades that match the replay.` : '') + rgTxt);
     const rows = fw.slice(0, 10);
-    set('ms-nq-list', rows.length ? rows.map((x) => `<li data-tid="${esc(x.id)}" tabindex="0" title="Show this trade on a chart"><span>${ftime(x.opened + TZ)}</span><b class="${x.side === 'sell' ? 'neg' : 'pos'}">${x.side.toUpperCase()}</b><span>${fmtI(x.entry, { dec: 2 })} · stop ${fmtI(x.stop, { dec: 2 })} · 2R ${fmtI(x.t1, { dec: 2 })}</span><b class="${x.R > 0 ? 'pos' : x.R < 0 ? 'neg' : ''}">${x.R != null ? fR(x.R) : 'Open'}</b></li>`).join('') : '<li class="empty">No forward trade yet: the first New York open that qualifies records one here.</li>');
+    set('ms-nq-list', rows.length ? rows.map((x) => `<li data-tid="${esc(x.id)}" tabindex="0" title="Show this trade on a chart"><span>${ftime(x.opened + TZ)}</span><b class="${x.side === 'sell' ? 'neg' : 'pos'}">${x.side.toUpperCase()}</b><span>${fmtI(x.entry, { dec: 2 })} · stop ${fmtI(x.stop, { dec: 2 })} · 2R ${fmtI(x.t1, { dec: 2 })}${x.regime ? ` · <small title="Regime tags at entry (paper): NAS100 6-month trend strength and this stream's trailing-year net R">|TS| ${x.regime.trend != null ? x.regime.trend : '—'} ${x.regime.on ? 'on' : 'off'} · META ${fR(x.regime.meta)}</small>` : ''}</span><b class="${x.R > 0 ? 'pos' : x.R < 0 ? 'neg' : ''}">${x.R != null ? fR(x.R) : 'Open'}</b></li>`).join('') : '<li class="empty">No forward trade yet: the first New York open that qualifies records one here.</li>');
   }
   // Edge finder (7 Nov loop, owner: "focus on the council, improve the trading system for more results"): expectancy by condition,
   // forward (live / shadow, trades.json) next to the 30-day replay (backtest.json), so a filter is only trusted when both agree
@@ -11208,7 +11212,9 @@ html[data-role="public"] #ms-me-ct { display: none; }
   // Monday 00:00 UTC of the week holding unix time t
   function weekOf(t) { var d = Math.floor(t / DAY), wd = (new Date(d * DAY * 1000).getUTCDay() + 6) % 7; return (d - wd) * DAY; }
   // the Trader's live Meridian list (council/alerts.mjs alertable): live trades.json plus the NQ open run's forward paper in research.json
-  var nqLive = function (x) { return x.k === 'nq-open' && !/-x$/.test(x.session || ''); };
+  var nqLive = function (x) { return x.k === 'nq-open' && !x.shadow && !/-x$/.test(x.session || ''); };
+  // research shadow streams (shadow: true in research.json, e.g. 'nyflip-trend': the regime study's trend-on copy of the NQ open run)
+  var nqShadow = function (x) { return x.k === 'nq-open' && !!x.shadow; };
   function merName(x, names) { if (names[x.k]) return names[x.k]; var n = x.name || x.k, p = x.pair || ''; return p && p.indexOf(n) === 0 ? p : n + (p && !/^(Replica|Gold|Crypto)/.test(n) ? ' ' + p : ''); }
 
   // every closed paper trade as one record: { key (system), name, grp live | shadow | research, desk, t (close), R gross, net, ck (cost on record) }
@@ -11222,6 +11228,7 @@ html[data-role="public"] #ms-me-ct { display: none; }
     arr(D.trades).forEach(function (x) { if (!isClosed(x)) return; rec(x, 'Meridian', x.shadow ? 'shadow' : 'live', 'm:' + x.k + (x.shadow ? ':s' : ''), merName(x, names), merNet(x), num(x.Rnet) || num(x.costR)); });
     arr(D.research).forEach(function (x) {
       if (!isClosed(x) || x.void) return;
+      if (nqShadow(x)) { rec(x, 'Meridian', 'shadow', 'm:nq-open:' + (x.session || 'shadow'), (x.name || 'NQ open run shadow') + ' (shadow)', merNet(x), num(x.Rnet) || num(x.costR)); return; }
       if (nqLive(x)) { var ny = x.session === 'nyflip'; rec(x, 'Meridian', 'live', 'm:nq-open' + (ny ? '' : ':old'), ny ? names['nq-open'] || 'NQ New York open run' : 'NQ open, retired sessions', merNet(x), num(x.Rnet) || num(x.costR)); return; }
       rec(x, 'Meridian', 'research', 'r:' + x.k, RES_NAME[x.k] || x.name || x.k, merNet(x), num(x.Rnet) || num(x.costR));
     });
@@ -11292,7 +11299,7 @@ html[data-role="public"] #ms-me-ct { display: none; }
         px: p, R: !pend && p > 0 && r0 > 0 ? r2(dir * (p - x.entry) / r0 * (x.size || 1)) : null, o: x.opened });
     };
     arr(D.trades).forEach(function (x) { if (!x || (x.status !== 'open' && x.status !== 'pending')) return; if (x.shadow) sh++; else add(x, 'Meridian'); });
-    arr(D.research).forEach(function (x) { if (x && x.status === 'open' && nqLive(x)) add(x, 'Meridian'); });
+    arr(D.research).forEach(function (x) { if (!x || x.status !== 'open') return; if (nqLive(x)) add(x, 'Meridian'); else if (nqShadow(x)) sh++; });
     arr(D.ictTrades).forEach(function (x) { if (x && x.status === 'open') add(x, 'ICT'); });
     return { list: out.sort(function (a, b) { return (b.o || 0) - (a.o || 0); }), shadow: sh };
   }

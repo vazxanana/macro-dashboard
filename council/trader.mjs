@@ -19,6 +19,7 @@ import { d1AdxFeat } from './adx.mjs';
 import { costModel, annotateCosts, costSummary, driftR, backfillDrift, staleStats, stopFill, exitR, fillBarAmbiguous, spotSkip } from './fills.mjs';
 import { SYMBOLS as BROKER_SYMBOLS } from './ctrader-mirror.mjs';
 import { newsFeat } from './events.mjs';
+import { fetchDaily as regimeDaily, regimeOf, regimeShadow } from './regime.mjs';
 
 const DIR = process.argv[2] || 'data';
 fs.mkdirSync(DIR, { recursive: true });
@@ -295,6 +296,12 @@ const USER_RULES = [
   { id: 'gold-trend-fast-shadow', apply: (c) => { c.goldTrendFastShadow = true; },
     change: 'Gold trend fast (5-day breakout) to shadow (owner, 7 Nov): new breakouts recorded as shadow trades; Gold trend (20-day) stays live; open trades run to their exits',
     why: '2006-17 untouched test (#530): both legs regime-bound (N20 +0.49R, N5 +0.37R a position); monthly R correlation 0.92, so running both doubles one long-gold bet; N20 return per drawdown 6.8 vs 4.5. Owner kept N20 live.' },
+  // 8 Nov, regime-switch study proposal (research/edge/regime-switch): every NQ New York open run trade is tagged with NAS100's 6-month
+  // trend strength and the stream's own 365-day net R at entry (council/regime.mjs), and a paper shadow stream 'nyflip-trend'
+  // (blockedBy 'regime-shadow') copies the trade only when |TS| >= 0.295. The live rule is untouched. Undo: a user rule clearing the flag.
+  { id: 'nq-regime-shadow', apply: (c) => { c.nqRegimeShadow = { trendMin: 0.295 }; },
+    change: 'NQ open run: regime tags (TREND, META) on every trade and a paper shadow stream "trend-on only" (|TS| >= 0.295); the live rule is unchanged',
+    why: 'Regime study (2004-26, pre-registered): NQ/TREND is the one consistent split: second half ON +0.119R vs OFF -0.200R a trade (t 2.73, nominal; Bonferroni bar 2.83), right sign in every era, but in 2023-26 the skipped trades won (+0.23R over 41). A loss filter for dead regimes, not a regime detector: recorded as tags and a shadow so the forward record decides.' },
 ];
 config.userRules = config.userRules || [];
 for (const u of USER_RULES) if (!config.userRules.includes(u.id)) { u.apply(config); config.userRules.push(u.id); config.history.push({ at: nowISO, by: 'user', change: u.change, why: u.why }); }
@@ -1925,6 +1932,16 @@ try {
           ...(config.nqRun ? { t1: +(g.entry + (sell ? -10 : 10) * r0).toFixed(2), rr: 10, tp1: +t1.toFixed(2), trail: [config.nqRun.atR, config.nqRun.trail] } : {}), opened: g.t + 60, filled: g.t + 60, checked: g.t + 60, status: 'open', R: null, exitAt: g.t + (660 - g.m) * 60, exitLabel: '11:00 ET',
           seenAt: now, entrySeen: bars.length ? +bars.at(-1).close.toFixed(2) : null, level: 'OPEN', levelPrice: +g.lv.toFixed(2), ext: +g.ext.toFixed(2), ndo: +ndoBar.open.toFixed(2),
           note: `Research (paper only): NQ ran ${Math.abs(g.ext - g.lv).toFixed(1)} points through the New York open ${g.lv.toFixed(2)} and closed back across it; at New York that reclaim tends to fail, so ${sell ? 'sell' : 'buy'} ${g.entry.toFixed(2)} with the sweep, stop ${stop.toFixed(2)}, ${config.nqRun ? `after +${config.nqRun.atR}R (${t1.toFixed(2)}) the stop trails ${config.nqRun.trail}R behind the best price` : `target 2R ${t1.toFixed(2)}`}, out at 11:00 ET.` });
+        // Regime tags (8 Nov, research/edge/regime-switch; council/regime.mjs): TREND = NAS100 6-month trend strength |TS| from OANDA
+        // daily closes known before the entry, META = this stream's net R over the last 365 days; written on the trade only, the rule
+        // above reads neither (tests/nq-regime.test.mjs pins it byte for byte). Shadow stream 'nyflip-trend' (user rule nq-regime-shadow):
+        // a paper copy of the trade, taken only when |TS| >= 0.295, managed by the open-trade loop above like every other nq-open record.
+        try {
+          const live = research.find((x) => x.id === `nq-nyflip-${ny.d}`), rows = await regimeDaily(MD_BASE);
+          live.regime = regimeOf(rows, research, live.opened, config.nqRegimeShadow);
+          if (!rows) snapshot.errors.nqRegime = 'no NAS100 daily candles: trend tag null, no trend shadow';
+          const sh = regimeShadow(live, live.regime, config.nqRegimeShadow); if (sh) research.push(sh);
+        } catch (e) { snapshot.errors.nqRegime = String(e.message || e); }
       }
     }
     if (NQ_ON.p80 && !['Sat', 'Sun'].includes(ny.wd) && ny.m > 600 && ny.m < 960 && !research.some((x) => x.id === `nq-80pct-${ny.d}`)) {
@@ -1995,7 +2012,9 @@ try {
   const oth = rp.filter((x) => x.market !== 'xau' && x.v5); snapshot.research.replicaX = { all: sum(oth), markets: Object.fromEntries([...new Set(oth.map((x) => x.market))].map((m) => [m, sum(oth.filter((x) => x.market === m))])) };
   snapshot.research.nq = sum(research.filter((x) => x.k === 'nq-open'));
   snapshot.research.goldNyrun = sum(research.filter((x) => x.k === 'gold-nyrun'));
-  for (const sid of ['ny', 'london', 'swing', 'opens', 'nyflip', 'nyflip-x', 'sd2ifvg', 'sd3mom', '80pct', 'tokyo', 'shanghai']) snapshot.research['nq_' + sid] = sum(research.filter((x) => x.k === 'nq-open' && (x.session || 'ny') === sid)); }
+  for (const sid of ['ny', 'london', 'swing', 'opens', 'nyflip', 'nyflip-x', 'nyflip-trend', 'sd2ifvg', 'sd3mom', '80pct', 'tokyo', 'shanghai']) snapshot.research['nq_' + sid] = sum(research.filter((x) => x.k === 'nq-open' && (x.session || 'ny') === sid));
+  // the regime tag of the latest tagged NQ open run trade (council/regime.mjs): what the page shows as the current switch state
+  const lt = research.filter((x) => x.k === 'nq-open' && x.session === 'nyflip' && x.regime).at(-1); if (lt) snapshot.nqRegime = { ...lt.regime, trade: lt.id, day: lt.day }; }
 if (nqLast) snapshot.nqLast = nqLast;
 // ─── Phone alerts (4 Nov): a push via ntfy.sh (free, no account) when a live trade or an NQ paper trade opens or closes.
 // Subscribe in the ntfy app to the topic below (or set the repository secret NTFY_TOPIC to use your own). Which events alert,
