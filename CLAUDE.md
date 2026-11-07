@@ -151,6 +151,8 @@ Rules and research live in `.claude/skills/ICT/SKILL.md` (results also in counci
 - Gold futures and FX (skill §26, 7 Nov): MARKETS also has `gc` (@GC.1), `eurusd` (EUR=), `gbpusd` (GBP=), each with its own
   `aRule`: gold = buys with a 0.3-0.75x ATR stop; EUR/USD = London-session signals; GBP/USD = none (tracked only). The index rule
   applies to nq/es/ym/rty only (`isASetup(g, mk)`); no A+ tier for these three; desk clusters stay index-only.
+- Size by room (skill §27): index A-setups 1.5x when the DOL is >= 2R away, else 0.5x (`DOL_ROOM`, `ROOM_SIZE`, `sizeOf`),
+  times the §25 tight-stop half; R is stored x size; desk pill "<n>× size".
   The desk defaults to A-setups (switch `ictFlt`: A-setups / All signals / One per cluster — the highest-grade index of
   same-side A-setups within 3 h, skill §16, computed on the page); every signal is still tracked.
 - A+ tier (skill §17): A-setup + inversion body >= 60% of range + not NY PM (`isAPlus`, records carry `aplus`); desk
