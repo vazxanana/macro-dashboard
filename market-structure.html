@@ -2529,6 +2529,12 @@ html[data-motion="off"][data-gate] .gate-bg path[stroke] { animation: none; stro
       </div>
     </div>
     <div class="c-grid c-pane c-pane-systems adm" id="ms-cp-systems" role="tabpanel" aria-labelledby="ms-cn-systems" data-pane="systems" hidden>
+      <div class="card c-edge adm" id="ms-edge">
+        <div class="ms-k"><span>Edge finder · where the council makes money</span><span class="ms-note" id="ms-edge-at"></span></div>
+        <div class="edge-by" role="group" aria-label="Group by"><button type="button" data-eby="d1" class="on" aria-pressed="true">D1 trend</button><button type="button" data-eby="session" aria-pressed="false">Session</button><button type="button" data-eby="cf" aria-pressed="false">Confirming break</button><button type="button" data-eby="rr" aria-pressed="false">Reward:risk</button><button type="button" data-eby="market" aria-pressed="false">Market</button><button type="button" data-eby="setup" aria-pressed="false">Setup</button><label class="edge-sc">Setup <select id="ms-edge-k" aria-label="Only this setup"><option value="">all</option></select></label></div>
+        <div class="edge-wrap"><table class="edge-t"><thead><tr><th scope="col">Condition</th><th scope="col">Verdict</th><th scope="col">Live</th><th scope="col">Shadow</th><th scope="col">30-day replay</th><th scope="col" title="Replay first half / second half">Halves</th></tr></thead><tbody id="ms-edge-b"></tbody></table></div>
+        <p class="ms-note">R per trade (number of trades). <b>Edge</b>: replay ≥ +0.2R over 100+ trades, both halves positive and the forward trades (live + shadow, 20+) positive. <b>Avoid</b>: replay ≤ −0.1R over 100+ and forward not positive. Shadow trades are signals the rules blocked; their results are simulated the same way as live paper trades.</p>
+      </div>
       <div class="card c-nq adm">
         <div class="ms-k"><span>NQ New York open run · our system (paper)</span></div>
         <details class="c-how"><summary>How it works</summary>
@@ -5688,7 +5694,31 @@ function msNextSetup(bars, A) {
     const rows = fw.slice(0, 10);
     set('ms-nq-list', rows.length ? rows.map((x) => `<li data-tid="${esc(x.id)}" tabindex="0" title="Show this trade on a chart"><span>${ftime(x.opened + TZ)}</span><b class="${x.side === 'sell' ? 'neg' : 'pos'}">${x.side.toUpperCase()}</b><span>${fmtI(x.entry, { dec: 2 })} · stop ${fmtI(x.stop, { dec: 2 })} · 2R ${fmtI(x.t1, { dec: 2 })}</span><b class="${x.R > 0 ? 'pos' : x.R < 0 ? 'neg' : ''}">${x.R != null ? fR(x.R) : 'Open'}</b></li>`).join('') : '<li class="empty">No forward trade yet: the first New York open that qualifies records one here.</li>');
   }
+  // Edge finder (7 Nov loop, owner: "focus on the council, improve the trading system for more results"): expectancy by condition,
+  // forward (live / shadow, trades.json) next to the 30-day replay (backtest.json), so a filter is only trusted when both agree
+  const EDGE = { by: 'd1', k: '' };
+  function renderEdge() {
+    const tb = document.getElementById('ms-edge-b'); if (!tb) return; const C = COUNCIL;
+    const rrB = (r) => r == null ? '—' : r < 1 ? '< 1' : r < 1.5 ? '1–1.5' : r < 2 ? '1.5–2' : r < 3 ? '2–3' : r < 5 ? '3–5' : '5+';
+    const val = (t, f) => EDGE.by === 'rr' ? rrB(t.rr) : EDGE.by === 'market' ? t.market : EDGE.by === 'setup' ? String(t.k || t.setup || '').replace('@mkt', '') : (f || {})[EDGE.by];
+    const fw = (Array.isArray(C.trades) ? C.trades : []).filter((t) => (t.status === 'win' || t.status === 'loss' || t.status === 'be') && isFinite(t.R) && (!EDGE.k || t.k === EDGE.k));
+    const bt = C.backtest && C.backtest.tradeCols ? C.backtest.trades.map((r) => Object.fromEntries(C.backtest.tradeCols.map((c, i) => [c, r[i]]))).filter((t) => t.fill && (!EDGE.k || String(t.setup).replace('@mkt', '') === EDGE.k)) : [];
+    const sel = document.getElementById('ms-edge-k'); if (sel && sel.options.length < 2) { const ks = [...new Set(fw.map((t) => t.k))].sort(); sel.innerHTML = '<option value="">all</option>' + ks.map((k) => `<option value="${esc(k)}">${esc(k)}</option>`).join(''); }
+    const mid = bt.length ? bt.map((t) => t.opened).sort((a, b) => a - b)[bt.length >> 1] : 0, G2 = new Map(), add = (key, slot, R) => { if (key == null) return; if (!G2.has(key)) G2.set(key, { live: [], sh: [], bt: [], h1: [], h2: [] }); G2.get(key)[slot].push(R); };
+    fw.forEach((t) => add(val(t, t.feat), t.shadow ? 'sh' : 'live', +t.R));
+    bt.forEach((t) => { const k = val(t, t); add(k, 'bt', +t.R_none); add(k, t.opened < mid ? 'h1' : 'h2', +t.R_none); });
+    const st = (a) => a.length ? { n: a.length, e: a.reduce((x, y) => x + y, 0) / a.length } : null;
+    const cell = (s) => s ? `<span class="${s.e > 0.05 ? 'pos' : s.e < -0.05 ? 'neg' : ''}">${s.e >= 0 ? '+' : '−'}${Math.abs(s.e).toFixed(2)}R</span> <small>(${s.n})</small>` : '<small>—</small>';
+    const rows = [...G2.entries()].map(([k, g]) => { const L = st(g.live), S = st(g.sh), B = st(g.bt), H1 = st(g.h1), H2 = st(g.h2), F = st(g.live.concat(g.sh));
+      const edge = B && B.n >= 100 && B.e >= 0.2 && H1 && H2 && H1.e > 0 && H2.e > 0 && F && F.n >= 20 && F.e > 0, avoid = B && B.n >= 100 && B.e <= -0.1 && (!F || F.e <= 0);
+      return { k, L, S, B, H1, H2, v: edge ? 'edge' : avoid ? 'avoid' : '', sort: B ? B.e : F ? F.e : -9 }; }).sort((a, b) => b.sort - a.sort);
+    tb.innerHTML = rows.length ? rows.map((r) => `<tr class="${r.v}"><th scope="row">${esc(String(r.k))}</th><td>${r.v === 'edge' ? '<span class="ms-chip ms-chip-buy">Edge</span>' : r.v === 'avoid' ? '<span class="ms-chip ms-chip-sell">Avoid</span>' : '<small>unclear</small>'}</td><td>${cell(r.L)}</td><td>${cell(r.S)}</td><td>${cell(r.B)}</td><td>${r.H1 && r.H2 ? `${cell(r.H1)} / ${cell(r.H2)}` : '<small>—</small>'}</td></tr>`).join('') : '<tr><td colspan="6"><small>No closed trades yet.</small></td></tr>';
+    const at = document.getElementById('ms-edge-at'); if (at) at.textContent = C.backtest && C.backtest.at ? `replay ${new Date(C.backtest.at).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })} · ${fw.length} forward trades` : `${fw.length} forward trades`;
+  }
+  document.addEventListener('click', (ev) => { const b = ev.target.closest && ev.target.closest('[data-eby]'); if (!b) return; EDGE.by = b.dataset.eby; document.querySelectorAll('[data-eby]').forEach((x) => { x.classList.toggle('on', x === b); x.setAttribute('aria-pressed', String(x === b)); }); renderEdge(); });
+  document.addEventListener('change', (ev) => { if (ev.target && ev.target.id === 'ms-edge-k') { EDGE.k = ev.target.value; renderEdge(); } });
   function renderCouncil() {
+    try { renderEdge(); } catch (e) { console.warn('edge', e); }
     const root = document.getElementById('v-council'); if (!root) return;
     const set = (id, html) => { const el = document.getElementById(id); if (el) el.innerHTML = html; };
     const tab = (window.CTAB = window.CTAB || 'live'), withSh = tab === 'shadow' || tab === 'all';
@@ -7921,6 +7951,15 @@ function gpStats(T) {
 .ms-lay button { flex: 1 1 auto; min-height: 32px; padding: 4px 10px; border-radius: 8px; border: 1px solid var(--line); background: var(--panel); color: var(--ink); font: inherit; font-size: 12.5px; font-weight: 600; cursor: pointer; }
 .ms-lay button:hover, .ms-lay button.on { border-color: var(--accent); } .ms-lay button.on { background: color-mix(in srgb, var(--accent) 12%, var(--panel)); }
 .ms-lay button.sv { color: var(--ink-dim); font-weight: 500; } .ms-lay button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.c-edge .edge-by { display: flex; flex-wrap: wrap; gap: 6px; margin: 4px 0 10px; align-items: center; }
+.c-edge .edge-by button { min-height: 32px; padding: 4px 10px; border-radius: 8px; border: 1px solid var(--line); background: var(--panel); color: var(--ink); font: inherit; font-size: 12.5px; font-weight: 600; cursor: pointer; }
+.c-edge .edge-by button.on { border-color: var(--accent); background: color-mix(in srgb, var(--accent) 12%, var(--panel)); } .c-edge .edge-by button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.c-edge .edge-sc { margin-left: auto; font-size: 12.5px; color: var(--ink-dim); display: inline-flex; gap: 6px; align-items: center; } .c-edge .edge-sc select { font: inherit; min-height: 32px; border-radius: 8px; border: 1px solid var(--line); background: var(--panel); color: var(--ink); padding: 2px 6px; }
+.c-edge .edge-wrap { width: 0; min-width: 100%; overflow-x: auto; }
+.edge-t { width: 100%; border-collapse: collapse; font-size: 13px; font-variant-numeric: tabular-nums; }
+.edge-t th, .edge-t td { padding: 7px 8px; border-bottom: 1px solid var(--line); text-align: right; white-space: nowrap; } .edge-t th:first-child, .edge-t td:nth-child(2) { text-align: left; } .edge-t thead th { font-size: 11.5px; color: var(--ink-dim); font-weight: 600; }
+.edge-t td small { color: var(--ink-dim); } .edge-t .pos { color: var(--buy); font-weight: 600; } .edge-t .neg { color: var(--sell); font-weight: 600; }
+.edge-t tr.edge { background: color-mix(in srgb, var(--buy) 7%, transparent); } .edge-t tr.avoid { background: color-mix(in srgb, var(--sell) 6%, transparent); }
 .wl { display: flex; gap: 6px; width: 0; min-width: 100%; box-sizing: border-box; overflow-x: auto; scrollbar-width: none; margin: 4px 0 12px; padding-bottom: 2px; }
 .wl[hidden] { display: none; } .wl::-webkit-scrollbar { display: none; }
 .wl-i { flex: none; display: inline-flex; align-items: baseline; gap: 6px; padding: 6px 10px; border-radius: 9px; border: 1px solid var(--line); background: var(--panel); color: var(--ink); text-decoration: none; font-size: 12.5px; font-variant-numeric: tabular-nums; }
