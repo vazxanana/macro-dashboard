@@ -3889,6 +3889,26 @@ function msNextSetup(bars, A) {
       ws.onerror = () => {};
     } catch (e) { startPolling(); }
   }
+  // OANDA ticks (Server-Sent Events from the /md/stream Vercel function): every price change moves the forming candle on all timeframes
+  function startTicks() {
+    if (G.csv || G.es || !MD.base || !INST.md || typeof EventSource === 'undefined') return;
+    if (marketClosed()) { setTimeout(startTicks, 5 * 60e3); return; }   // no ticks over the weekend: look again later
+    const es = new EventSource(`${MD.base}stream?sym=${INST.md}`); G.es = es; let upd = 0;
+    es.onmessage = (m) => {
+      let d; try { d = JSON.parse(m.data); } catch (e) { return; }
+      if (!d || d.error || !isFinite(d.b) || !isFinite(d.a)) return;
+      const px = (d.b + d.a) / 2, t = d.t || Date.now() / 1000; G.quote = d;
+      if (!G.live) { G.live = true; setStatus(); }
+      ACTIVE.forEach((tf) => {
+        const P = panes[tf.id]; if (!P || !P.raw || !P.raw.length) return;
+        const bt = Math.floor(t / tf.sec) * tf.sec, last = P.raw[P.raw.length - 1];
+        if (bt === last.time) P.push({ time: bt, open: last.open, high: Math.max(last.high, px), low: Math.min(last.low, px), close: px });
+        else if (bt > last.time) P.push({ time: bt, open: px, high: px, low: px, close: px });
+      });
+      const now = Date.now(); if (now - upd > 1000) { upd = now; $('ms-updated').textContent = new Date().toLocaleTimeString(); }
+    };
+    es.onerror = () => { if (es.readyState === 2) { G.es = null; if (G.live) { G.live = false; setStatus(); } setTimeout(startTicks, 5000); } };
+  }
   let polling = false;
   function startPolling() {
     if (polling || G.csv) return; polling = true; setStatus();
@@ -3896,17 +3916,18 @@ function msNextSetup(bars, A) {
       const tick = async () => {
         try { const r = await fetchBars(tf); const P = panes[tf.id]; P.raw = r.bars; P.rebuild(true); $('ms-updated').textContent = new Date().toLocaleTimeString(); }
         catch (e) { /* keep last candles */ }
-        if (!G.csv) setTimeout(tick, iv);
+        if (!G.csv) setTimeout(tick, iv());
       };
-      // OANDA answers from the edge cache, so the fast timeframes can refresh every few seconds
-      const iv = G.source === 'OANDA' ? Math.min(tf.poll, { '1m': 3e3, '5m': 5e3, '15m': 10e3 }[tf.id] || tf.poll) : tf.poll;
-      setTimeout(tick, iv);
+      // OANDA answers from the edge cache, so without the tick stream the fast timeframes refresh every few seconds;
+      // while ticks stream in, the poll only re-syncs whole candles at the normal pace
+      const iv = () => G.source === 'OANDA' && !G.live ? Math.min(tf.poll, { '1m': 3e3, '5m': 5e3, '15m': 10e3 }[tf.id] || tf.poll) : tf.poll;
+      setTimeout(tick, iv());
     });
   }
   function setStatus() {
     const dot = $('ms-live-dot'), txt = $('ms-live-txt');
     if (G.csv) { dot.className = 'ms-live-dot'; txt.textContent = 'From your CSV'; return; }
-    if (G.live) { dot.className = 'ms-live-dot on'; txt.textContent = `Live · ${G.source} stream`; }
+    if (G.live) { dot.className = 'ms-live-dot on'; txt.textContent = G.source === 'OANDA' ? 'Live · OANDA ticks' : `Live · ${G.source} stream`; }
     else if (polling) { dot.className = 'ms-live-dot poll'; txt.textContent = `Live · ${G.source} (refreshing)`; }
     else { dot.className = 'ms-live-dot'; txt.textContent = 'Connecting…'; }
     const srcSym = { Binance: INST.binance, Kraken: INST.kraken, Bitstamp: INST.bitstamp, OANDA: INST.label + ' mid' }[G.source] || '';
@@ -3942,7 +3963,7 @@ function msNextSetup(bars, A) {
     topDown(); setStatus();
     $('ms-updated').textContent = new Date().toLocaleTimeString();
     if (INST.spot) setInterval(refreshSpot, 60e3);
-    if (G.source === 'Binance' && INST.binance) startStream(); else startPolling();
+    if (G.source === 'Binance' && INST.binance) startStream(); else { startPolling(); if (G.source === 'OANDA') startTicks(); }
     if (SCAN.el) { setTimeout(scanAll, 2500); setInterval(scanAll, 5 * 60e3); }
   }
 

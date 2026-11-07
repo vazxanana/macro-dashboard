@@ -2,8 +2,7 @@
 // The page asks /md/bars?sym=xau&tf=5m&n=500, or &from=<unix>&to=<unix> for a past window (trade review).
 // Environment: OANDA_TOKEN (personal access token), OANDA_ENV "practice" (default, demo account) or "live".
 // Without a token it answers 503 and the page falls back to its exchange feeds.
-const SYM = { xau: 'XAU_USD', xag: 'XAG_USD', eurusd: 'EUR_USD', gbpusd: 'GBP_USD', audusd: 'AUD_USD', usdcad: 'USD_CAD', usdchf: 'USD_CHF',
-  usdjpy: 'USD_JPY', nzdusd: 'NZD_USD', eurjpy: 'EUR_JPY', gbpjpy: 'GBP_JPY', nas100: 'NAS100_USD', spx500: 'SPX500_USD', us30: 'US30_USD', de40: 'DE30_EUR' };
+const { SYM } = require('./_oanda');
 const TF = { '1m': ['M1', 60, 2], '5m': ['M5', 300, 5], '15m': ['M15', 900, 10], '1h': ['H1', 3600, 20], '4h': ['H4', 14400, 30], '1d': ['D', 86400, 60] };
 module.exports = async (req, res) => {
   const q = req.query || {}, inst = SYM[String(q.sym || '')], tf = TF[String(q.tf || '')];
