@@ -6453,10 +6453,13 @@ function msNextSetup(bars, A) {
     const L = (C.trades || []).filter((x) => x.k === 'replica' && x.market === 'xau').sort((a, b) => b.opened - a.opened);
     const done = L.filter((x) => ['win', 'loss', 'be'].includes(x.status)), R = done.reduce((a, x) => a + x.R, 0), w = done.filter((x) => x.R > 0).length;
     const fR = (v) => `${v > 0 ? '+' : v < 0 ? '−' : ''}${Math.abs(v).toFixed(2)}R`;
-    { const sn = COUNCIL.snap || {}, v = sn.goldVol, mn = sn.goldVolMin || 1.5;
-      set('ms-rep-vol', v == null ? 'Gold volatility: waiting for the Trader.' : `Gold volatility now: <b>${v.toFixed(2)}%</b> average daily range (gate ${mn}%) · <b class="${v >= mn ? 'pos' : 'neg'}">${v >= mn ? 'trading live' : 'calm: research only'}</b>`);
+    { const sn = COUNCIL.snap || {}, v = sn.goldVol;
+      // the gate the Trader runs (research/edge/param-drift): the fixed leg (goldVolMin) when set, else the top-fifth percentile it
+      // publishes as goldVolP; with both set the lower one opens the gate. Before 8 Nov this line showed the retired 1.5% leg.
+      const legs = [sn.goldVolMin, sn.goldVolP].filter((x) => x != null), mn = legs.length ? Math.min(...legs) : null;
+      set('ms-rep-vol', v == null ? 'Gold volatility: waiting for the Trader.' : `Gold volatility now: <b>${v.toFixed(2)}%</b> average daily range${mn == null ? '' : ` (gate ${mn.toFixed(2)}%${sn.goldVolMin ? '' : ', the top fifth of gold’s own last year'}) · <b class="${v >= mn ? 'pos' : 'neg'}">${v >= mn ? 'trading live' : 'calm: research only'}</b>`}`);
       const w = sn.goldW1;
-      set('ms-rep-w1', !w ? 'Weekly structure: waiting for the Trader.' : `Weekly structure now: <b class="${w > 0 ? 'pos' : 'neg'}">${w > 0 ? 'bullish' : 'bearish'}</b> · the Mosha BO system takes only <b>${w > 0 ? 'buys' : 'sells'}</b>${sn.goldW1Src === 'paxg' ? ' (read from PAXG: the spot feed failed this run)' : ''}`); }
+      set('ms-rep-w1', !w ? 'Weekly structure: waiting for the Trader.' : `Weekly structure now: <b class="${w > 0 ? 'pos' : 'neg'}">${w > 0 ? 'bullish' : 'bearish'}</b> · the Mosha BO system takes only <b>${w > 0 ? 'buys' : 'sells'}</b>${sn.goldW1Src && sn.goldW1Src !== 'cnbc-spot' ? ` (read from ${sn.goldW1Src === 'paxg' ? 'PAXG' : 'OANDA daily'} candles: the CNBC spot feed failed this run)` : ''}`); }
     set('ms-rep-kpi', `<div><span>Live trades</span><b>${L.length}${L.length - done.length ? ` <small>(${L.length - done.length} open)</small>` : ''}</b></div><div><span>Win rate</span><b>${done.length ? Math.round(w / done.length * 100) + '%' : '—'}</b></div><div><span>Total</span><b class="${R > 0 ? 'pos' : R < 0 ? 'neg' : ''}">${done.length ? fR(R) : '—'}</b></div><div><span>Per trade</span><b>${done.length ? fR(R / done.length) : '—'}</b></div>`);
     renderTrack();
     const rp = C.snap && C.snap.research && C.snap.research.replica;
