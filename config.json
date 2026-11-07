@@ -13,14 +13,16 @@
    "d1": "against",
    "since": {
     "d1": "2026-11-02T11:52:07.000Z",
-    "session:asia": "2026-11-02T21:25:27.000Z"
+    "session:asia": "2026-11-02T21:25:27.000Z",
+    "session:overlap": "2026-11-07T06:00:50.000Z"
    },
    "src": {
     "d1": "backtest",
     "noMarket": "user"
    },
    "noSession": [
-    "asia"
+    "asia",
+    "overlap"
    ],
    "noMarket": [
     "audusd"
@@ -77,6 +79,12 @@
    "d1": "against",
    "src": {
     "d1": "user"
+   }
+  },
+  "m30m1": {
+   "d1": "with",
+   "since": {
+    "d1": "2026-11-07T06:00:50.000Z"
    }
   }
  },
@@ -500,6 +508,18 @@
    "by": "user",
    "change": "Gold trend fast (new paper leg): the gold trend rule on the prior 5 daily highs instead of 20 (a daily close above them buys at market on the next run; stop 2 x ATR(D1,14), lifted to daily close - 2 ATR each closed day; one add at +1R); its own position next to the 20-day leg; sizing guide 0.25%",
    "why": "Owner goal: use all the skills to make the council more profitable with higher returns. Every skill rule was tested and none beat the live stack (research log 7 Nov); the gold book trades too rarely. Spot gold 1m, 0.30 cost, add at +1R: N5 alone +35.2R (2019-22, n43, DD -4.5) | +24.9R (2023-24, n22, DD -2.4) | +45.2R (2025-26, n18, DD -2.9), positive every year 2019-2026 (2022 +7.2, 2026 +9.7; Feb-Jun 2026 -2.3R over 4). Gold book in % of account (replica, trendline, engulf 0.25%, gold trend 0.5%): +39.3% DD -2.34% | +68.6% DD -6.21%; with N5 at 0.25%: +45.5% DD -2.61% | +79.9% DD -6.47% (return per drawdown 17.4 vs 16.8 | 12.3 vs 11.0). Judged on return per drawdown as a new leg, not as a rule change."
+  },
+  {
+   "at": "2026-11-07T06:00:50.000Z",
+   "by": "coach-stats",
+   "change": "scalp: skip the overlap session",
+   "why": "-0.61R over 10 trades there; +0.32R elsewhere."
+  },
+  {
+   "at": "2026-11-07T06:00:50.000Z",
+   "by": "coach-stats",
+   "change": "m30m1: only with D1",
+   "why": "against: -0.62R over 8 trades, too costly to keep taking while with is tested."
   }
  ],
  "btAt": "2026-11-06T11:18:45.097Z",
@@ -554,7 +574,7 @@
    "why": "four losses in a row"
   },
   "scalp": {
-   "at": "2026-11-07T05:55:35.000Z",
+   "at": "2026-11-07T06:00:50.000Z",
    "why": "expectancy -1.00R over 13 trades"
   },
   "xau": {
