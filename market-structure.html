@@ -2457,6 +2457,7 @@ html[data-motion="off"][data-gate] .gate-bg path[stroke] { animation: none; stro
   <section class="view" id="v-charts" aria-label="Charts" hidden>
     <div class="sec-h">
       <h2>Charts <span class="kbd-hint"><kbd>1</kbd>–<kbd>6</kbd> pick a chart · <kbd>0</kbd> all · <kbd>F</kbd> fit</span></h2>
+      <div class="adr" id="ms-adr" aria-live="polite" hidden></div>
       <div class="seg" role="group" aria-label="Chart view">
         <button type="button" data-view="1d">D1</button><button type="button" data-view="4h">H4</button><button type="button" data-view="1h">H1</button><button type="button" data-view="15m">M15</button><button type="button" data-view="5m">M5</button><button type="button" data-view="1m">M1</button><button type="button" data-view="all">All</button>
       </div>
@@ -3723,6 +3724,17 @@ function msNextSetup(bars, A) {
       P._kl = L.map(([t, v]) => P.series.createPriceLine({ price: v + off, color: t === 'DO' ? 'rgba(154,164,178,.55)' : /H$/.test(t) ? 'rgba(8,153,129,.55)' : 'rgba(242,54,69,.55)', lineWidth: 1, lineStyle: LW.LineStyle.SparseDotted, axisLabelVisible: true, title: t })); });
   }
   setTimeout(keyLevels, 2500); setInterval(keyLevels, 60e3);
+  // range meter (7 Nov loop): today's range against the 14-day average daily range, and where price sits inside today's range
+  function rangeMeter() {
+    const el = document.getElementById('ms-adr'), d = panes['1d'] && panes['1d'].raw; if (!el) return;
+    if (!d || d.length < 16) { el.hidden = true; return; }
+    const day = Math.floor(Date.now() / 86400e3) * 86400, cur = d[d.length - 1].time === day ? d[d.length - 1] : null, prev = d.filter((b) => b.time < day).slice(-14);
+    if (!cur || prev.length < 10) { el.hidden = true; return; }
+    const adr = prev.reduce((a, b) => a + (b.high - b.low), 0) / prev.length, rng = cur.high - cur.low, pct = rng / adr * 100, pos = rng ? (cur.close - cur.low) / rng * 100 : 50;
+    el.hidden = false; el.classList.toggle('hot', pct >= 100);
+    el.innerHTML = `<span class="adr-k">Range today</span><b>${fmt(rng)}</b><span class="adr-k">of ADR ${fmt(adr)}</span><span class="adr-bar" title="${pct.toFixed(0)}% of the 14-day average daily range used"><i style="width:${Math.min(100, pct).toFixed(1)}%"></i></span><b class="adr-p">${pct.toFixed(0)}%</b><span class="adr-sep"></span><span class="adr-k">In today's range</span><span class="adr-pos" title="0% = today's low, 100% = today's high"><i style="left:${pos.toFixed(1)}%"></i></span><b>${pos.toFixed(0)}%</b>`;
+  }
+  setTimeout(rangeMeter, 3000); setInterval(rangeMeter, 15e3);
   // council trades on the live charts (7 Nov loop): this market's open / pending council trades as entry, stop and target lines
   function councilLines() {
     let T = []; try { T = (COUNCIL.trades || []).filter((x) => x.market === instKey && !x.shadow && (x.status === 'open' || x.status === 'pending') && isFinite(x.entry) && isFinite(x.stop)); } catch (e) {}
@@ -7642,6 +7654,16 @@ function gpStats(T) {
 .ch-bell.on { color: #e0a526; }
 .tv-tk { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; margin: 8px 0 0; padding: 10px 12px; border: 1px solid color-mix(in srgb, var(--accent) 30%, var(--line)); border-radius: 10px; background: color-mix(in srgb, var(--accent) 6%, transparent); font-size: 12.5px; }
 .tv-tk[hidden] { display: none; }
+.adr { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 10px; margin: 6px 0 12px; font-size: 12.5px; color: var(--ink-dim); }
+.adr[hidden] { display: none; }
+.adr b { color: var(--ink); font-weight: 700; font-variant-numeric: tabular-nums; }
+.adr-bar, .adr-pos { position: relative; width: 120px; height: 6px; border-radius: 99px; background: color-mix(in srgb, var(--ink) 10%, transparent); overflow: hidden; }
+.adr-bar i { position: absolute; inset: 0 auto 0 0; border-radius: 99px; background: linear-gradient(90deg, #2962ff, #e0a526); }
+.adr.hot .adr-bar i { background: linear-gradient(90deg, #e0a526, #f23645); }
+.adr-pos { overflow: visible; background: linear-gradient(90deg, rgba(242,54,69,.35), rgba(8,153,129,.35)); }
+.adr-pos i { position: absolute; top: -3px; width: 4px; height: 12px; margin-left: -2px; border-radius: 2px; background: var(--ink); }
+.adr-sep { width: 1px; height: 14px; background: var(--line); margin: 0 4px; }
+@media (max-width: 600px) { .adr-sep { display: none; } .adr-bar, .adr-pos { width: 90px; } }
 .cmp-row { display: flex !important; align-items: center; gap: 8px; } .cmp-row select { flex: 1; min-width: 0; height: 30px; border-radius: 7px; border: 1px solid var(--line); background: var(--bg); color: var(--ink); font: inherit; font-size: 12.5px; padding: 0 6px; }
 /* trade viewer on phones (7 Nov loop): full-screen sheet, title + close on one row, Before/After/Save on their own row, long notes clamp to 3 lines (tap to expand) */
 @media (max-width: 600px) {
