@@ -321,8 +321,10 @@ Shadow / Research tabs; live = council/alerts.mjs `alertable`, costs = `merNet` 
 shows gross; ICT replay copies of forward signals are dropped), best / worst three trades with the post-mortem note, config.json history this
 week by you / Coach / fixes (Coach entries joined to the coach.json ledger for before-stats and the 30-day check), and "now" cards: decisions
 waiting (Coach proposals, live systems the decay monitor calls decaying, flagged ICT filters, robustness changes on a live system, data
-feeds, what the Coach would pause), open live positions with floating R, edge decay, robustness verdicts (changes against digest.json `robust`,
-else against the verdicts this browser last saw, localStorage `msWeekRobust`). UI state in localStorage `msWeekRpt`. Bar colours `--wk-up` /
+feeds, what the Coach would pause), open live positions with floating R, edge decay and robustness verdicts, each with "Changes this week" read
+from the shared verdict record digest.json `changes` (`changeLog` / `robustWeek` / `decayWeek`; the current week also diffs the live file against
+the record's last snapshot; a week before `since` says it was not tracked). Only while digest.json does not exist yet does the robustness card fall
+back to the verdicts this browser last saw (localStorage `msWeekRobust`). UI state in localStorage `msWeekRpt`. Bar colours `--wk-up` /
 `--wk-dn` were checked with the dataviz validator per theme. Tests: `tests/week-report.test.mjs` (wiring, and every field the report reads
 exists in what trader / fills / coach ledger / decay / robustness / digest / macro write).
 
@@ -383,7 +385,12 @@ playbook headline (macro/forecast.json), what waits on the owner (actionable Coa
 research/robustness.json verdict changes) and edge scoreboard movers (the page's `MS_SB.build` run headless from market-structure.html,
 compared with the last digest). Taps open `meridianx.dev/market-structure.html#council`. State in council-data `digest.json`
 (`sent.day`, verdict baselines `sb` / `robust`, `last`): a restart never resends; if every channel fails nothing is marked and the next
-round retries. `COUNCIL_ALERTS=off` sends and writes nothing; `--dry` prints, `--force` sends now. Tests: `tests/digest.test.mjs`.
+round retries. `COUNCIL_ALERTS=off` sends and marks nothing; `--dry` prints, `--force` sends now. Tests: `tests/digest.test.mjs`.
+**Shared verdict record** (8 Nov): digest.json is also written every round, in or out of the window (`recordVerdicts`): `robust`
+(research/robustness.json claim id → verdict), `decay` (coach.json decay system id → status), `changes` (`[{ at, kind: 'robust' | 'decay',
+id, name, from, to }]`, the last 200), `since`, `at`; the Trader calls the same function after each 6-hour decay rebuild. Written only when
+something changed. The digest's "Robustness:" line is the log since the last send (`changesSince`, per id first → last, round trips drop out);
+the week pane's robustness and edge-decay "Changes this week" read the log, so changes of past weeks are kept.
 
 ## cTrader symbol specs (7 Nov 2026)
 `council/ctrader-symbols.mjs` (each council round, before the mirror; read only through `api/ctrader-link.js`'s `READ_ONLY` session,

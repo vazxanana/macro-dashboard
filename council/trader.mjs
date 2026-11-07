@@ -12,6 +12,7 @@ import { liveRuleSection, injectSection, coachChurnSection, CHURN_START, CHURN_E
 import { coachProposals, spotProposals, ictVariantVerdicts, coachCarry } from './proposals.mjs';
 import { shrink, ebTau, shrunkClear, ruleState, sameRule, setRule, descRule, judgeTrial, ledgerStart, syncLedger, ledgerSection, LEDGER_START, LEDGER_END } from './coach.mjs';
 import { buildDecay } from './decay.mjs';
+import { recordVerdicts } from './digest.mjs';   // the shared verdict record (digest.json): decay statuses each 6-hour reading
 import { cleanBars, LTF_CLEAN } from './clean.mjs';
 import { voidRoundedReplicas, historyCatchUp } from './repairs.mjs';
 import { d1AdxFeat } from './adx.mjs';
@@ -2058,7 +2059,10 @@ wr('research.json', research);
 try { const cj = rd('coach.json', {});
   if (!cj.decay || cj.decay.slot !== CC_SLOT) {
     cj.decay = { ...buildDecay({ trades, research, ictTrades: rd('ict/trades.json', []), replay: rd('research/replay-2w.json', null), ictReplay: rd('ict/replay.json', null) }, { now }), slot: CC_SLOT };
-    wr('coach.json', cj); }
+    wr('coach.json', cj);
+    // record the new statuses (and the robustness verdicts) in digest.json, the shared record the week report reads, so a
+    // 6-hour reading never waits on the digest's evening window (council/digest.mjs recordVerdicts: writes only on a change)
+    recordVerdicts(DIR, { robust: rd('research/robustness.json', null), decay: cj.decay, now }); }
   // same-round phone ping when the set of decaying live systems changes (council/alerts.mjs decayDigest); marked once a channel took it
   const dg = process.env.COUNCIL_ALERTS === 'off' ? null : decayDigest(cj.decay, cj.decaySent, now);
   if (dg) { const topic = process.env.NTFY_TOPIC || NTFY_DEFAULT, tgTok = process.env.TELEGRAM_BOT_TOKEN || null, tgChat = process.env.TELEGRAM_CHAT_ID || state.tgChat || null;

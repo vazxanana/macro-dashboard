@@ -11186,8 +11186,8 @@ html[data-role="public"] #ms-me-ct { display: none; }
 // This week (8 Nov 2026, owner: "a beautiful weekly report on my phone"). Council → This week (#council/week), admin only.
 // Built only from council-data files: trades.json + research.json (Meridian live, shadow and research paper trades), ict/trades.json +
 // ict/replay.json + ict/shadow.json (ICT desk), coach.json (proposals, ledger, decay from council/decay.mjs), config.json history
-// (rule changes, by you or the Coach), research/robustness.json, macro/forecast.json, digest.json (the daily digest's robustness
-// baseline), snapshot.json + ict/snapshot.json (prices for open positions), health.json. It changes nothing.
+// (rule changes, by you or the Coach), research/robustness.json, macro/forecast.json, digest.json (the shared verdict record:
+// robustness and edge-decay changes, council/digest.mjs recordVerdicts), snapshot.json + ict/snapshot.json (prices for open positions), health.json. It changes nothing.
 // Weeks run Monday 00:00 to Sunday 24:00 UTC, as the council and the digest count days. After costs: Meridian Rnet (council/fills.mjs),
 // ICT less the CME micro round trip (council/digest.mjs ICT_COST_PTS), research trades carry no cost and show gross.
 // Pure functions are on window.MS_WEEK (tests/week-report.test.mjs runs them without a page).
@@ -11288,6 +11288,26 @@ html[data-role="public"] #ms-me-ct { display: none; }
     return arr(J && J.claims).filter(function (c) { return c && c.id && c.verdict && prev[c.id] && prev[c.id] !== c.verdict; })
       .map(function (c) { return { id: c.id, name: c.name || c.id, was: prev[c.id], to: c.verdict, status: c.status || '', why: arr(c.why) }; });
   }
+  // the shared verdict record (digest.json, council/digest.mjs recordVerdicts: written every council round and at each 6-hour
+  // decay reading): `changes` = [{ at, kind: 'robust' | 'decay', id, name, from, to }], the last 200. Those of one kind in the
+  // week [from, to), newest first.
+  function changeLog(dg, kind, from, to) {
+    return arr(dg && dg.changes).map(function (c) { var t = Date.parse(c && c.at) / 1000; return c && c.kind === kind && c.id && num(t) && t >= from && t < to ? { id: c.id, name: c.name || c.id, was: c.from, to: c.to, t: t } : null; })
+      .filter(Boolean).sort(function (a, b) { return b.t - a.t; });
+  }
+  // robustness verdict changes of the week: the record's log, and (current week only) what research/robustness.json shows against the
+  // record's last snapshot (the council writes it every round, so at most a few minutes of lag); status and reasons from the claim now
+  function robustWeek(J, dg, from, to, live) {
+    var L = changeLog(dg, 'robust', from, to), by = {}; arr(J && J.claims).forEach(function (c) { if (c && c.id) by[c.id] = c; });
+    if (live && dg && dg.robust) robustChanges(J, dg.robust).forEach(function (c) { if (!L.some(function (x) { return x.id === c.id && x.to === c.to; })) L.unshift({ id: c.id, name: c.name, was: c.was, to: c.to, t: null }); });
+    return L.map(function (c) { var q = by[c.id]; return { id: c.id, name: (q && q.name) || c.name, was: c.was, to: c.to, t: c.t, status: (q && q.status) || '', why: arr(q && q.why) }; });
+  }
+  // edge-decay status changes of the week (coach.json decay systems, council/decay.mjs), the same way
+  function decayWeek(decay, dg, from, to, live) {
+    var L = changeLog(dg, 'decay', from, to), by = {}; arr(decay && decay.systems).forEach(function (s) { if (s && s.id) by[s.id] = s; });
+    if (live && dg && dg.decay) arr(decay && decay.systems).forEach(function (s) { if (s && s.id && s.status && dg.decay[s.id] && dg.decay[s.id] !== s.status && !L.some(function (x) { return x.id === s.id && x.to === s.status; })) L.unshift({ id: s.id, name: s.name || s.id, was: dg.decay[s.id], to: s.status, t: null }); });
+    return L.map(function (c) { var q = by[c.id]; return { id: c.id, name: (q && q.name) || c.name, was: c.was, to: c.to, t: c.t, live: q ? !!q.live : null, desk: (q && q.desk) || '', why: arr(q && q.why) }; });
+  }
   // open now: live Meridian (trades.json, the NQ open run) and the ICT desk's forward record, floating R from the latest prices
   function openNow(D) {
     D = D || {}; var px = function (mk) { var a = D.snap && D.snap.markets && D.snap.markets[mk], b = D.ictSnap && D.ictSnap.markets && D.ictSnap.markets[mk];
@@ -11314,14 +11334,14 @@ html[data-role="public"] #ms-me-ct { display: none; }
       out.push({ k: 'decay', tone: 'bad', title: s.name + ' is decaying', detail: arr(s.why).join('; '), act: 'Keep it, move it to shadow or retire it: the monitor changes nothing.' });
     });
     arr(co.ictWatch).filter(function (w) { return w && w.flag; }).forEach(function (w) { out.push({ k: 'ict', tone: 'you', title: w.label || 'ICT filter ' + w.value, detail: w.why || '', href: '#council/systems', act: 'Adopt the filter or leave the A-rule as it is.' }); });
-    arr(rc).filter(function (c) { return /^live/.test(c.status); }).forEach(function (c) { out.push({ k: 'robust', tone: c.to === 'robust' ? 'you' : 'warn', title: c.name + ': ' + c.was + ' → ' + c.to, detail: c.why.join('; '), act: 'A live system’s evidence changed grade.' }); });
+    var seen = {}; arr(rc).filter(function (c) { return c && /^live/.test(c.status) && !seen[c.id] && (seen[c.id] = 1); }).forEach(function (c) { out.push({ k: 'robust', tone: c.to === 'robust' ? 'you' : 'warn', title: c.name + ': ' + c.was + ' → ' + c.to, detail: arr(c.why).join('; '), act: 'A live system’s evidence changed grade.' }); });
     var H = D.health; if (H && (H.status === 'bad' || H.status === 'warn')) out.push({ k: 'data', tone: H.status === 'bad' ? 'bad' : 'warn', title: 'Data feeds ' + (H.status === 'bad' ? 'bad' : 'shaky'), detail: H.summary || '', act: 'Check the Data chip on the Overview.' });
     var wp = (D.config && D.config.wouldPause) || {}, P = Object.keys(wp).filter(function (k) { var t = Date.parse(wp[k] && wp[k].at) / 1000; return num(t) && now - t <= WEEK; });
     if (P.length && D.config && D.config.noPause) out.push({ k: 'pause', tone: 'warn', title: 'The Coach would pause ' + P.length + ' setup' + (P.length > 1 ? 's or markets' : ' or market'), detail: P.map(function (k) { return k + ': ' + wp[k].why; }).join('; '), act: 'Your “No pauses” rule keeps them trading; nothing to do unless you want a pause.' });
     return out;
   }
   function fR(v, d) { return num(v) ? (v > 0.004 ? '+' : v < -0.004 ? '−' : '') + Math.abs(v).toFixed(d == null ? 2 : d) + 'R' : '—'; }
-  W.MS_WEEK = { DAY: DAY, WEEK: WEEK, ICT_COST_PTS: ICT_COST_PTS, weekOf: weekOf, records: records, tally: tally, build: build, weeks: weeks, rules: rules, robustMap: robustMap, robustChanges: robustChanges, openNow: openNow, decisions: decisions, merNet: merNet, ictNet: ictNet };
+  W.MS_WEEK = { DAY: DAY, WEEK: WEEK, ICT_COST_PTS: ICT_COST_PTS, weekOf: weekOf, records: records, tally: tally, build: build, weeks: weeks, rules: rules, robustMap: robustMap, robustChanges: robustChanges, changeLog: changeLog, robustWeek: robustWeek, decayWeek: decayWeek, openNow: openNow, decisions: decisions, merNet: merNet, ictNet: ictNet };
   if (typeof document === 'undefined' || !document.getElementById) return;
 
   // ─── page ───
@@ -11352,7 +11372,7 @@ html[data-role="public"] #ms-me-ct { display: none; }
   // a deep link to one week: #council/week/2026-11-02 (any day of that week)
   (function () { var m = /^#council\/week\/(\d{4}-\d{2}-\d{2})/.exec(location.hash); if (m) { var t = Date.parse(m[1] + 'T12:00:00Z') / 1000; if (num(t)) st.wk = weekOf(t); } })();
 
-  // per-viewer robustness baseline (only when the daily digest has written none yet): the last verdicts this browser saw
+  // per-viewer robustness baseline (only until the council has written the shared record digest.json): the last verdicts this browser saw
   function localRobust(map) {
     var o = null; try { o = JSON.parse(localStorage.getItem('msWeekRobust') || 'null'); } catch (e) {}
     var same = function (a, b) { return !!a && !!b && JSON.stringify(a) === JSON.stringify(b); };
@@ -11482,8 +11502,8 @@ html[data-role="public"] #ms-me-ct { display: none; }
     }).join('') + '</ul>' : '<p class="wk-empty">No live position open.</p>')
       + '<p class="wk-foot">' + (O.shadow ? '<b>' + O.shadow + '</b> shadow positions are open as well (not counted). ' : '') + 'Floating R uses the last price the council recorded.</p>';
   }
-  function renderDecay(D) {
-    var Dc = D.coach && D.coach.decay, el = $('ms-wk-decay');
+  function renderDecay(D, B) {
+    var Dc = D.coach && D.coach.decay, el = $('ms-wk-decay'), dc = decayWeek(Dc, D.digest, B.from, B.to, st.wk === weekOf(Date.now() / 1000));
     if (!Dc || !arr(Dc.systems).length) { el.innerHTML = '<p class="wk-empty">' + (Dc && Dc.error ? 'Edge-decay monitor: ' + esc(Dc.error) : 'No edge-decay reading yet: the Coach writes one every 6 hours.') + '</p>'; return; }
     if (Dc.at) $('ms-wk-decay-at').textContent = 'Now · ' + dmU.format(new Date(Dc.at)) + ' ' + hmU.format(new Date(Dc.at));
     var S = arr(Dc.systems).slice().sort(function (a, b) { return (a.live === b.live ? 0 : a.live ? -1 : 1) || ({ decaying: 0, watch: 1, healthy: 2 }[a.status] - { decaying: 0, watch: 1, healthy: 2 }[b.status]); });
@@ -11493,24 +11513,35 @@ html[data-role="public"] #ms-me-ct { display: none; }
       return '<li><button type="button" class="wk-it" data-open="' + esc(k) + '" aria-expanded="' + open + '" aria-controls="' + id + '"><span class="t"><b>' + esc(s.name) + '</b><small><span class="wk-st ' + stt + '">' + (s.few ? 'Too few' : esc(s.status.charAt(0).toUpperCase() + s.status.slice(1))) + '</span> ' + esc(s.desk || '') + (s.live ? '' : ' · shadow') + '</small></span>'
         + '<span class="v">' + (r.n ? fR(r.exp) + '<small style="display:block;font:500 11px var(--sans);color:var(--ink-faint)">last ' + r.n + '</small>' : '') + '</span>' + chev + '</button>'
         + '<div class="wk-x" id="' + id + '"' + (open ? '' : ' hidden') + '><p>' + esc(arr(s.why).join('; ')) + '</p>' + (num(s.ref) ? '<p>Backtest ' + fR(s.ref) + ' a trade' + (s.fwd && s.fwd.n ? '; forward ' + s.fwd.n + ' trades at ' + fR(s.fwd.exp) : '') + '.</p>' : '') + '</div></li>';
-    }).join('') + '</ul><p class="wk-foot">Status only: the monitor never changes a rule. A live system marked decaying lands in “Decisions waiting on you”.</p>';
+    }).join('') + '</ul>' + changesBlock(dc, D.digest, 'decay') + '<p class="wk-foot">Status only: the monitor never changes a rule. A live system marked decaying lands in “Decisions waiting on you”.</p>';
   }
-  function renderRob(D, base) {
+  // "Changes this week" of a verdict card from the shared record (digest.json); without the record only the current week can be
+  // judged, against the verdicts this browser last saw (localStorage), and past weeks say so
+  function changesBlock(L, dg, kind, local) {
+    var cur = st.wk === weekOf(Date.now() / 1000), since = dg && dg.since ? Date.parse(dg.since) / 1000 : NaN, before = num(since) && since >= st.wk + WEEK;
+    var head = '<div class="wk-sub">Changes ' + (cur ? 'this week' : 'that week') + (dg && Array.isArray(dg.changes) ? '' : local ? ' since you last looked' + (local.at ? ', ' + esc(dU.format(new Date(local.at))) : '') : '') + '</div>';
+    var item = function (c, i) { var id = 'ms-wk-ch-' + kind + i, k = 'ch:' + kind + ':' + c.id + ':' + (c.t || 'now'), open = !!st.open[k], cls = kind === 'decay' ? DL : VL;
+      return '<li><button type="button" class="wk-it" data-open="' + esc(k) + '" aria-expanded="' + open + '" aria-controls="' + id + '"><span class="t"><b>' + esc(c.name) + '</b><small><span class="wk-st ' + (cls[c.was] || '') + '">' + esc(c.was) + '</span> → <span class="wk-st ' + (cls[c.to] || '') + '">' + esc(c.to) + '</span> ' + esc(c.t ? when(c.t) + ' UTC' : 'just now') + (c.status ? ' · ' + esc(c.status) : c.live === false ? ' · shadow' : '') + '</small></span><span class="v"></span>' + chev + '</button>'
+        + '<div class="wk-x" id="' + id + '"' + (open ? '' : ' hidden') + '><p>' + esc(arr(c.why).join('; ') || 'No reasons recorded now.') + '</p></div></li>'; };
+    var empty = !dg || !Array.isArray(dg.changes) ? (cur ? (local ? 'No verdict changed.' : 'Verdicts recorded now in this browser; changes show from your next visit. The council writes the shared record (digest.json) from its next round.') : 'Not tracked: the council had not started the shared verdict record (digest.json).')
+      : before ? 'Not tracked that week: the shared record starts ' + esc(dU.format(new Date(since * 1000))) + '.' : 'No verdict changed.';
+    return head + (L.length ? '<ul class="wk-list">' + L.map(item).join('') + '</ul>' : '<p class="wk-empty">' + empty + '</p>');
+  }
+  // rc: the week's verdict changes (robustWeek from the shared record; else robustChanges against this browser's last look, `local`)
+  function renderRob(D, rc, local) {
     var J = D.robust, el = $('ms-wk-rob');
-    if (!J || !arr(J.claims).length) { el.innerHTML = '<p class="wk-empty">No robustness audit yet (research/robustness.json).</p>'; return []; }
+    if (!J || !arr(J.claims).length) { el.innerHTML = '<p class="wk-empty">No robustness audit yet (research/robustness.json).</p>'; return; }
     if (J.at) $('ms-wk-rob-at').textContent = 'Now · ' + dmU.format(new Date(J.at));
-    var C = arr(J.claims), rc = base ? robustChanges(J, base.map) : [], cnt = {}; C.forEach(function (c) { cnt[c.verdict] = (cnt[c.verdict] || 0) + 1; });
+    var C = arr(J.claims), cnt = {}; C.forEach(function (c) { cnt[c.verdict] = (cnt[c.verdict] || 0) + 1; });
     var item = function (c, i, tag) { var id = 'ms-wk-rb-' + tag + i, k = 'rb:' + c.id, open = !!st.open[k];
       return '<li><button type="button" class="wk-it" data-open="' + esc(k) + '" aria-expanded="' + open + '" aria-controls="' + id + '"><span class="t"><b>' + esc(c.name || c.id) + '</b><small>' + (c.was ? '<span class="wk-st ' + (VL[c.was] || '') + '">' + esc(c.was) + '</span> → ' : '') + '<span class="wk-st ' + (VL[c.verdict || c.to] || '') + '">' + esc(c.verdict || c.to) + '</span> ' + esc(c.status || '') + '</small></span><span class="v"></span>' + chev + '</button>'
         + '<div class="wk-x" id="' + id + '"' + (open ? '' : ' hidden') + '><p>' + esc(arr(c.why).join('; ') || 'No reasons recorded.') + '</p>' + (c.claim ? '<p>Claim: ' + esc(c.claim) + '</p>' : '') + '</div></li>'; };
     var live = C.filter(function (c) { return /^live/.test(c.status || ''); }), rest = C.filter(function (c) { return !/^live/.test(c.status || ''); });
     el.innerHTML = '<div class="wk-chips">' + ['robust', 'fragile', 'not proven'].map(function (v) { return '<span class="wk-chip"><b>' + (cnt[v] || 0) + '</b> ' + v + '</span>'; }).join('') + '</div>'
-      + '<div class="wk-sub">Changes' + (base ? ' since ' + esc(base.src === 'digest' ? 'the last digest' : 'you last looked') + (base.at ? ', ' + esc(dU.format(new Date(base.at))) : '') : '') + '</div>'
-      + (rc.length ? '<ul class="wk-list">' + rc.map(function (c, i) { return item(c, i, 'c'); }).join('') + '</ul>' : '<p class="wk-empty">' + (base ? 'No verdict changed.' : 'Verdicts recorded now; changes show from the next audit.') + '</p>')
+      + changesBlock(rc, D.digest, 'robust', local)
       + (live.length ? '<details class="wk-all"><summary>Live systems (' + live.length + ')</summary><ul class="wk-list">' + live.map(function (c, i) { return item(c, i, 'l'); }).join('') + '</ul></details>' : '')
       + (rest.length ? '<details class="wk-all"><summary>Shadow, research and Coach claims (' + rest.length + ')</summary><ul class="wk-list">' + rest.map(function (c, i) { return item(c, i, 'o'); }).join('') + '</ul></details>' : '')
       + '<p class="wk-foot">Bar: ' + esc(J.bar ? (J.bar.minN || 30) + '+ trades, out-of-sample t ≥ ' + (J.bar.oosT || 2) + ', survives the multiple-testing count' : 'see research/robustness.md') + '. Every live edge so far is regime-bound.</p>';
-    return rc;
   }
 
   // ─── render ───
@@ -11520,17 +11551,21 @@ html[data-role="public"] #ms-me-ct { display: none; }
     st.all = records(D);
     var rng = weeks(st.all, now); if (st.wk == null) st.wk = rng.last; st.wk = Math.max(rng.first, Math.min(rng.last, st.wk));
     var B = build(D, st.wk, st.all);
-    var base = D.digest && D.digest.robust ? { map: D.digest.robust, at: D.digest.sent && D.digest.sent.at, src: 'digest' } : D.robust ? localRobust(robustMap(D.robust)) : null;
+    // the week's robustness changes: from the shared record (digest.json) when the council has written it; until then only this
+    // week, against the verdicts this browser last saw (localStorage msWeekRobust)
+    var cur = st.wk === weekOf(now), dg = D.digest, local = null, rc = [];
+    if (dg && Array.isArray(dg.changes)) rc = robustWeek(D.robust, dg, B.from, B.to, cur);
+    else if (D.robust) { local = localRobust(robustMap(D.robust)); if (cur && local) rc = robustChanges(D.robust, local.map); }
     pane.classList.toggle('wk-busy', !st.extra);
     var safe = function (f) { try { return f(); } catch (e) { if (W.console) console.warn('week report', e); } };
     safe(function () { renderHead(B, D, rng, now); });
     safe(function () { renderPnl(B); });
     safe(function () { renderBw(B); });
     safe(function () { renderRules(D, B); });
-    var rc = safe(function () { return renderRob(D, base); }) || [];
+    safe(function () { renderRob(D, rc, local); });
     safe(function () { renderDec(D, rc, now); });
     safe(function () { renderOpen(D); });
-    safe(function () { renderDecay(D); });
+    safe(function () { renderDecay(D, B); });
     st.lastRender = Date.now();
   }
   function go(wk) { st.wk = wk; st.open = {}; st.rlAll = false; render(); }
