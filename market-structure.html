@@ -1562,6 +1562,12 @@ html[data-guest] #ms-cmdk-btn { display: none !important; }
 
 /* in-app motion switch: same effect as the OS reduced-motion setting */
 html[data-motion="off"] *, html[data-motion="off"] *::before, html[data-motion="off"] *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; scroll-behavior: auto !important; }
+
+/* first-render stagger for live lists (once per list, ~35 ms per row, ease-out; off with reduced motion / Motion off) */
+@keyframes rowIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: none; } }
+.stagger-in > * { animation: rowIn .32s cubic-bezier(.23,1,.32,1) both; animation-delay: calc(var(--i, 0) * 35ms); }
+@media (prefers-reduced-motion: reduce) { .stagger-in > * { animation: none; } }
+html[data-motion="off"] .stagger-in > * { animation: none; }
 </style>
 <script>try{if(localStorage.getItem('msMotion')==='off')document.documentElement.dataset.motion='off'}catch(e){}</script>
 </head>
@@ -5260,6 +5266,14 @@ function msNextSetup(bars, A) {
   const show = () => { const on = r.dataset.motion !== 'off'; b.textContent = `Motion: ${on ? 'on' : 'off'}`; b.setAttribute('aria-pressed', String(on)); b.title = on ? 'Turn animations off (count-ups, flashes, pulses, transitions)' : 'Turn animations back on'; };
   b.addEventListener('click', () => { if (r.dataset.motion === 'off') { delete r.dataset.motion; try { localStorage.removeItem('msMotion'); } catch (e) {} } else { r.dataset.motion = 'off'; try { localStorage.setItem('msMotion', 'off'); } catch (e) {} } show(); });
   show(); })();
+</script>
+<script>
+/* Stagger the rows of the main live lists the first time they fill with real rows */
+(() => { ['h-act-list', 'ms-active'].forEach((id) => { const el = document.getElementById(id); if (!el) return;
+  const mo = new MutationObserver(() => { const rows = [...el.children].filter((c) => !c.classList.contains('empty')); if (rows.length < 2) return;
+    mo.disconnect(); rows.slice(0, 14).forEach((c, i) => c.style.setProperty('--i', i)); el.classList.add('stagger-in');
+    setTimeout(() => { el.classList.remove('stagger-in'); rows.forEach((c) => c.style.removeProperty('--i')); }, 1200); });
+  mo.observe(el, { childList: true }); }); })();
 </script>
 </body>
 </html>
