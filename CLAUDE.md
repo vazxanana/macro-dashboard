@@ -209,7 +209,7 @@ LIMIT ticket when placed and a cancel when they expire; closes get a CLOSE ticke
 Vercel: `GH_DISPATCH_TOKEN` (fine-grained, this repo, Actions read/write) and `CRON_SECRET`; never commit either. GitHub Pages
 keeps deploying in parallel until the Vercel site is proven.
 Status 7 Nov: Vercel project `macro-dashboard` (prj_4krxNideb9D2LfdcXkAWtAwzPLST) in team `xau` (team_40SuZQP47lNHxjlzDc8PeRH5),
-production https://macro-dashboard-five-mu.vercel.app. Protection: previews only (production public). The build copies only the pages,
+production https://meridianx.dev. Protection: previews only (production public). The build copies only the pages,
 assets and icons to out/; council/ and ict/ ship inside the api/run.js bundle and are never served. Owner wants the repo PRIVATE:
 - api/data.js serves council-data files at /cdata/* with GH_TOKEN/GH_READ_TOKEN (falls back to the public raw file while none is set);
   the site uses /cdata on Vercel (window.MS_CDATA) and raw.githubusercontent elsewhere; MT5/cTrader bridges default to /cdata/mt5/signals.csv.

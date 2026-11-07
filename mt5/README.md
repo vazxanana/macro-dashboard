@@ -29,7 +29,7 @@ for a stop hit while the EA is offline).
 
 ## Setup
 1. MT5 → Tools → Options → Expert Advisors: tick **Allow WebRequest for listed URL** and add
-   `https://macro-dashboard-five-mu.vercel.app` (the site on Vercel serves the signals file; the repo is private). Tick **Allow algorithmic trading**.
+   `https://meridianx.dev` (the site on Vercel serves the signals file; the repo is private). Tick **Allow algorithmic trading**.
 2. Copy `CouncilBridge.mq5` to `MQL5/Experts/`, open it in MetaEditor, **Compile**. Send any compile error back.
 3. Attach it to any chart (one instance per account). Inputs: the broker's symbol names (`InpSymGold` = XAUUSD,
    `InpSymNQ` = NAS100 / USTEC, `InpSymBTC` … leave empty to skip a market), the risk per system, the guards.

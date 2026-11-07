@@ -14,7 +14,7 @@ namespace cAlgo.Robots
     [Robot(TimeZone = TimeZones.UTC, AccessRights = AccessRights.FullAccess)]
     public class CouncilBridge : Robot
     {
-        [Parameter("Signals URL", DefaultValue = "https://macro-dashboard-five-mu.vercel.app/cdata/mt5/signals.csv")]
+        [Parameter("Signals URL", DefaultValue = "https://meridianx.dev/cdata/mt5/signals.csv")]
         public string Url { get; set; }
         [Parameter("Poll seconds", DefaultValue = 30, MinValue = 5)]
         public int PollSec { get; set; }
