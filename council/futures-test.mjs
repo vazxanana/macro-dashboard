@@ -2,6 +2,7 @@
 // alerts, so the owner can check the format and the TradingView link. Run from the "Futures ticket test" workflow.
 import fs from 'node:fs';
 import { ticket } from './futures.mjs';
+import { sendAlerts, NTFY_DEFAULT } from './alerts.mjs';
 const DIR = process.argv[2] || 'data', rd = (f) => { try { return JSON.parse(fs.readFileSync(`${DIR}/${f}`, 'utf8')); } catch (e) { return null; } };
 const snap = rd('snapshot.json'), gs = rd('ict/snapshot.json'), now = Math.floor(Date.now() / 1000);
 const px = snap && snap.markets && snap.markets.xau && snap.markets.xau.price; if (!px) { console.log('no gold price'); process.exit(1); }
@@ -10,8 +11,7 @@ const x = { market: 'xau', side: 'buy', status: 'open', k: 'replica', entry: px,
 const tk = ticket(x, now, { account: +process.env.FUT_ACCOUNT || 10000, risk: +process.env.FUT_RISK || 0.25, basis });
 const title = `TEST ticket · BUY ${tk.n} ${tk.c.code}`, body = `${tk.text}\n(Test only: not a council signal. Tap to open the chart in TradingView.)`;
 console.log(title + '\n' + body + '\n' + tk.url);
-const topic = process.env.NTFY_TOPIC || 'mosha-council-d200fdc484';
-const r = await fetch(`https://ntfy.sh/${topic}`, { method: 'POST', body, headers: { Title: title, Tags: 'test_tube', Click: tk.url } });
-console.log('ntfy', r.status);
-const tok = process.env.TELEGRAM_BOT_TOKEN, chat = process.env.TELEGRAM_CHAT_ID || (rd('state.json') || {}).tgChat;
-if (tok && chat) { const t = await fetch(`https://api.telegram.org/bot${tok}/sendMessage`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ chat_id: chat, text: `${title}\n${body}\n${tk.url}`, disable_web_page_preview: true }) }); console.log('telegram', t.status); }
+// the same sender as the Trader (ntfy as JSON, so the '·' in the title arrives intact)
+const errors = await sendAlerts([{ title, msg: body, tags: 'test_tube', click: tk.url }], { topic: process.env.NTFY_TOPIC || NTFY_DEFAULT,
+  tgTok: process.env.TELEGRAM_BOT_TOKEN, tgChat: process.env.TELEGRAM_CHAT_ID || (rd('state.json') || {}).tgChat });
+console.log('sent', Object.keys(errors).length ? errors : 'ok');
