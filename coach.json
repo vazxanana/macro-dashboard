@@ -200,35 +200,32 @@
  ],
  "proposals": [
   {
-   "setup": "scalp",
-   "kind": "promoteIf",
-   "value": "session:london",
-   "label": "make scalp live, only in the London session",
-   "n": 99,
-   "exp": 0.27,
-   "h1": {
-    "n": 58,
-    "exp": 0.43
-   },
-   "h2": {
-    "n": 41,
-    "exp": 0.04
-   },
-   "all": {
-    "n": 235,
-    "exp": 0.09
-   },
-   "why": "scalp (shadow) in the London session: +0.27R a trade over 99 replay trades; first half +0.43R (58), second half +0.04R (41); all of scalp +0.09R over 235.",
-   "at": "2026-11-07T19:04:10.000Z"
+   "setup": "all",
+   "kind": "dataSource",
+   "value": "oanda:usdchf,eurusd,gbpusd,usdcad",
+   "markets": [
+    "usdchf",
+    "eurusd",
+    "gbpusd",
+    "usdcad"
+   ],
+   "label": "manage USD/CHF, EUR/USD, GBP/USD, USD/CAD trades on OANDA spot candles",
+   "n": 169,
+   "liveR": 8.84,
+   "spotR": -62.99,
+   "exp": 0.43,
+   "why": "The same closed live trades re-judged on OANDA spot candles: +8.8R on Kraken candles vs −63.0R on spot over 169 trades (USD/CHF +0.47R live vs −0.01R spot (54); EUR/USD +0.10R live vs −0.55R spot (34); GBP/USD −0.26R live vs −0.60R spot (45); USD/CAD −0.23R live vs −0.47R spot (36)). Kraken's thin forex books reach levels spot never touched, so the paper results look better than a broker would give.",
+   "spotAt": "2026-11-07T19:40:44.995Z",
+   "at": "2026-11-07T19:43:55.000Z"
   }
  ],
- "proposalsKey": "v3|2026-11-07T17:52:30.624Z||[[],{\"scalp\":{\"d1\":\"against\",\"since\":{\"d1\":\"2026-11-02T11:52:07.000Z\",\"session:asia\":\"2026-11-02T21:25:27.000Z\",\"session:overlap\":\"2026-11-07T06:00:50.000Z\"},\"src\":{\"d1\":\"user\",\"noMarket\":\"user\",\"session:asia\":\"user\"},\"noSession\":[\"asia\",\"overlap\"],\"noMarket\":[\"audusd\"]},\"rscalp\":{\"since\":{\"session:newyork\":\"2026-11-06T12:00:22.000Z\"},\"src\":{\"minRR\":\"user\"},\"noSession\":[\"newyork\"],\"minRR\":3},\"intraday\":{\"d1\":\"against\",\"since\":{\"d1\":\"2026-11-02T11:52:07.000Z\",\"session:asia\":\"2026-11-04T12:04:20.000Z\"},\"src\":{\"d1\":\"backtest\",\"maxRR\":\"user\"},\"maxRR\":10,\"noSession\":[\"asia\"]},\"rintra\":{\"since\":{\"session:late\":\"2026-11-03T06:00:12.000Z\"},\"noSession\":[\"late\"],\"noMarket\":[\"usdchf\"],\"src\":{\"noMarket\":\"user\"}},\"position\":{\"off\":true,\"src\":{\"off\":\"user\"}},\"swing\":{\"d1\":\"against\",\"src\":{\"d1\":\"user\"}},\"m30m1\":{\"d1\":\"with\",\"since\":{\"d1\":\"2026-11-07T06:00:50.000Z\"}}}]",
- "proposalsBt": "2026-11-07T17:52:30.624Z",
+ "proposalsKey": "v3|2026-11-07T19:40:43.064Z|2026-11-07T19:40:44.995Z|[[],{\"scalp\":{\"d1\":\"against\",\"since\":{\"d1\":\"2026-11-02T11:52:07.000Z\",\"session:asia\":\"2026-11-02T21:25:27.000Z\",\"session:overlap\":\"2026-11-07T06:00:50.000Z\"},\"src\":{\"d1\":\"user\",\"noMarket\":\"user\",\"session:asia\":\"user\"},\"noSession\":[\"asia\",\"overlap\"],\"noMarket\":[\"audusd\"]},\"rscalp\":{\"since\":{\"session:newyork\":\"2026-11-06T12:00:22.000Z\"},\"src\":{\"minRR\":\"user\"},\"noSession\":[\"newyork\"],\"minRR\":3},\"intraday\":{\"d1\":\"against\",\"since\":{\"d1\":\"2026-11-02T11:52:07.000Z\",\"session:asia\":\"2026-11-04T12:04:20.000Z\"},\"src\":{\"d1\":\"backtest\",\"maxRR\":\"user\"},\"maxRR\":10,\"noSession\":[\"asia\"]},\"rintra\":{\"since\":{\"session:late\":\"2026-11-03T06:00:12.000Z\"},\"noSession\":[\"late\"],\"noMarket\":[\"usdchf\"],\"src\":{\"noMarket\":\"user\"}},\"position\":{\"off\":true,\"src\":{\"off\":\"user\"}},\"swing\":{\"d1\":\"against\",\"src\":{\"d1\":\"user\"}},\"m30m1\":{\"d1\":\"with\",\"since\":{\"d1\":\"2026-11-07T06:00:50.000Z\"}}}]",
+ "proposalsBt": "2026-11-07T19:40:43.064Z",
  "proposalsSent": {
-  "key": "scalp:promoteIf:session:london",
-  "at": "2026-11-07T19:04:10.000Z",
+  "key": "all:dataSource:oanda:usdchf,eurusd,gbpusd,usdcad",
+  "at": "2026-11-07T19:43:55.000Z",
   "items": [
-   "make scalp live, only in the London session — +0.27R over 99 replay trades · halves +0.43R / +0.04R"
+   "Manage USD/CHF, EUR/USD, GBP/USD, USD/CAD trades on OANDA spot candles — live +0.05R vs spot −0.37R a trade over 169 trades"
   ]
  }
 }
