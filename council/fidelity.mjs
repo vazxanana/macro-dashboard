@@ -19,6 +19,14 @@ const TOL = 10 * 60, NEAR = 60 * 60;
 // the live trader takes gold/forex D1 labels from OANDA only since #384 (7 Nov 2026 16:01 UTC); before that its labels came from
 // Kraken's candles, while the replay labels every day from OANDA. Comparing those two is comparing two label sources, not a fault.
 const LIVE_OANDA_D1_SINCE = Date.parse('2026-11-07T16:01:37Z') / 1000;
+// Candle feed, not just the D1 label: the live trader trades gold/forex on OANDA spot candles since #449 (merged 7 Nov 2026
+// 19:00:06 UTC; first run 19:01), on Kraken (gold: PAXG shifted onto spot) before; crypto always on Kraken. The replay records its
+// feed per market in bt.markets.source (OANDA for gold/forex since #463; crypto Kraken or, until Kraken's cache covers the window,
+// Binance). A live signal and the replay only saw the same candles when those two agree: the 'sameFeed' block and the per-market
+// 'sameFeed' numbers judge the replay on those; the rest is a feed comparison, not a replay fault.
+const SPOT_MKTS = new Set(['xau', 'eurusd', 'gbpusd', 'audusd', 'usdcad', 'usdchf']);
+const LIVE_OANDA_CANDLES_SINCE = Date.parse('2026-11-07T19:00:06Z') / 1000;
+const liveFeed = (x) => (SPOT_MKTS.has(x.market) && x.opened >= LIVE_OANDA_CANDLES_SINCE ? 'OANDA' : 'Kraken');
 
 const rd = (f) => JSON.parse(fs.readFileSync(f, 'utf8'));
 const liveAll = (() => { const t = rd(TRADES); return Array.isArray(t) ? t : t.trades || []; })();
@@ -41,6 +49,8 @@ const R = replayRows.filter((r) => inWin(r.opened));
 const replaySetups = new Set(replayRows.map((r) => r.setup)), liveSetups = new Set(liveSig.map((x) => x.k));
 const replayMarkets = new Set(Object.keys(bt.markets || {}).filter((k) => bt.markets[k] && bt.markets[k].steps));
 const errors = (bt.markets && bt.markets.errors) || {};
+const replayFeed = (m) => ((bt.markets || {}).source || {})[m] || null;
+const sameFeed = (x) => replayFeed(x.market) === liveFeed(x);
 
 // ─── one-to-one matching, closest in time first ───
 const key = (m, k, s) => `${m}|${k}|${s}`;
@@ -97,6 +107,7 @@ function whyLive(x) {
   if (other) return [`replay fired ${other.setup} instead (same side, ±10 min)`, 'setup label'];
   const anyReplay = R.some((r) => r.market === x.market && Math.abs(r.opened - x.opened) <= 6 * 3600);
   if (!anyReplay) return ['replay silent on this market for ±6 h (replay feed gap / warm-up)', 'data feed'];
+  if (!sameFeed(x)) return [`replay saw no READY signal; replay on ${replayFeed(x.market)} candles, live on ${liveFeed(x)}`, 'feed differs'];
   return ['replay saw no READY signal (different candles or analysis state)', 'data feed'];
 }
 function whyReplay(r) {
@@ -110,6 +121,7 @@ function whyReplay(r) {
   const busy = liveSig.find((x) => x.market === r.market && x.k === r.setup && x.side === r.side && x.opened < r.opened && (x.closed || Infinity) > r.opened);
   if (busy) return ['live had the same setup+side still open (dedupe on a different earlier trade: state cascade)', 'state cascade'];
   if (forexClosed(r.market, r.opened)) return ['market closed for live (weekend window)', 'live-only guard'];
+  if (!sameFeed(r)) return [`live saw no READY signal; replay on ${replayFeed(r.market)} candles, live on ${liveFeed(r)}`, 'feed differs'];
   return ['live saw no READY signal (different candles, D1 source or seen-state)', 'data feed'];
 }
 
@@ -129,12 +141,32 @@ for (const k of [...new Set(comparableL.map((x) => x.k).concat(comparableR.map((
   const lm = li.filter(([, i]) => lMatch[i] >= 0).length, rm = ri.filter(([, i]) => rMatch[i] >= 0).length;
   perSetup[k] = { live: li.length, liveMatched: lm, replay: ri.length, replayMatched: rm, liveRate: pct(lm, li.length), replayRate: pct(rm, ri.length) };
 }
+// D1 label and outcome agreement on a set of matched pairs; gap = mean (live R - replay R) over the trades both closed
+// (gross: replay R_none; net: R_none - its cost), sums for the size of it
+function agreeOn(ps) {
+  const bc = ps.filter(([x, r]) => closedLive(x) && r.fill === 1 && rStatus(r) === 'closed' && r.R_none != null), sum = (a) => +a.reduce((s, v) => s + v, 0).toFixed(2);
+  return { pairs: ps.length, d1Rate: pct(ps.filter(([x, r]) => (x.feat || {}).d1 === r.d1).length, ps.length), bothClosed: bc.length,
+    signRate: pct(bc.filter(([x, r]) => sign(x.R) === sign(r.R_none)).length, bc.length), signRateNet: pct(bc.filter(([x, r]) => sign(x.R) === sign(r.R_none - r.cost)).length, bc.length),
+    meanLiveR: mean(bc.map(([x]) => x.R)), meanReplayR: mean(bc.map(([, r]) => r.R_none)), meanReplayRNet: mean(bc.map(([, r]) => r.R_none - r.cost)),
+    gapGross: mean(bc.map(([x, r]) => x.R - r.R_none)), gapNet: mean(bc.map(([x, r]) => x.R - (r.R_none - r.cost))),
+    sumLiveR: sum(bc.map(([x]) => x.R)), sumReplayR: sum(bc.map(([, r]) => r.R_none)), sumReplayRNet: sum(bc.map(([, r]) => r.R_none - r.cost)) };
+}
 const perMarket = {};
 for (const m of [...new Set(comparableL.map((x) => x.market).concat(comparableR.map((r) => r.market)))]) {
   const li = L.map((x, i) => [x, i]).filter(([x]) => x.market === m && replaySetups.has(x.k)), ri = R.map((r, i) => [r, i]).filter(([r]) => r.market === m && liveSetups.has(r.setup));
   const lm = li.filter(([, i]) => lMatch[i] >= 0).length, rm = ri.filter(([, i]) => rMatch[i] >= 0).length;
-  perMarket[m] = { live: li.length, liveMatched: lm, replay: ri.length, replayMatched: rm, liveRate: pct(lm, li.length), replayRate: pct(rm, ri.length) };
+  const mp = pairs.filter(([x]) => x.market === m), ls = li.filter(([x]) => sameFeed(x)), lsm = ls.filter(([, i]) => lMatch[i] >= 0).length;
+  const feeds = {}; for (const [x] of li) feeds[liveFeed(x)] = (feeds[liveFeed(x)] || 0) + 1;
+  perMarket[m] = { live: li.length, liveMatched: lm, replay: ri.length, replayMatched: rm, liveRate: pct(lm, li.length), replayRate: pct(rm, ri.length),
+    replayFeed: replayFeed(m), liveFeeds: feeds, ...agreeOn(mp),
+    sameFeed: { live: ls.length, liveMatched: lsm, liveRate: pct(lsm, ls.length), ...agreeOn(mp.filter(([x]) => sameFeed(x))) } };
 }
+// the whole replay judged only where both sides read the same candles
+const sameFeedL = comparableL.filter(sameFeed), sameFeedPairs = pairs.filter(([x]) => sameFeed(x));
+const sameFeedBlock = { live: sameFeedL.length, liveMatched: sameFeedL.filter((x) => lMatch[L.indexOf(x)] >= 0).length,
+  liveInReplay: pct(sameFeedL.filter((x) => lMatch[L.indexOf(x)] >= 0).length, sameFeedL.length), ...agreeOn(sameFeedPairs),
+  feedDiffersPairs: pairs.length - sameFeedPairs.length, markets: [...new Set(sameFeedL.map((x) => x.market))].sort(),
+  note: `live gold/forex ran on Kraken candles before ${new Date(LIVE_OANDA_CANDLES_SINCE * 1000).toISOString().slice(0, 16)} UTC (OANDA after); crypto live is Kraken. Pairs where the replay's feed (markets.source) differs from the live feed at that time are left out here` };
 
 const matched = pairs.length;
 const out = {
@@ -176,6 +208,7 @@ const out = {
       flips: outcomeFlip,
     },
   },
+  sameFeed: sameFeedBlock,
   perSetup, perMarket,
   unmatchedLive: { n: uL.length, top: top(uL, (x) => `${x.market}:${x.k}`), reasons: tally(uL, whyLive) },
   unmatchedReplay: { n: uR.length, top: top(uR, (r) => `${r.market}:${r.setup}`), reasons: tally(uR, whyReplay) },
@@ -190,4 +223,7 @@ console.log(`live signals ${L.length} (shadow ${out.counts.liveShadow}), replay 
 console.log(`match: live found in replay ${P(out.matchRate.liveInReplay)}, replay found in live ${P(out.matchRate.replayInLive)} | comparable setups/markets only: ${P(out.matchRate.comparable.liveInReplay)} / ${P(out.matchRate.comparable.replayInLive)}`);
 console.log(`agreement: d1 ${P(out.agreement.d1.rate)} (like-for-like ${P(out.agreement.d1.likeForLike.rate)} n${out.agreement.d1.likeForLike.n}; ${out.agreement.d1.likeForLike.labelSourceDiffers} pairs left out: live D1 was Kraken then), session ${P(out.agreement.session.rate)}, struct ${P(out.agreement.struct.rate)}, cf ${P(out.agreement.cf.rate)}, fill ${P(out.agreement.fill.rate)} (n${fillJudged.length})`);
 console.log(`outcome (both closed n${both.length}): sign ${P(o.signRate)} (net ${P(o.signRateNet)}), exact R ${o.exactR}, mean live ${o.meanLiveR} vs replay ${o.meanReplayR} (net ${o.meanReplayRNet}), mean diff ${o.meanDiffGross} gross (median ${o.medianDiffGross}) / ${o.meanDiffNet} net; rr differs on ${o.rrDiffer}`);
+const sf = out.sameFeed;
+console.log(`same feed only (n${sf.live} live, ${sf.markets.join(' ') || 'none'}): live found in replay ${P(sf.liveInReplay)}, d1 ${P(sf.d1Rate)}, sign ${P(sf.signRate)} (n${sf.bothClosed}), R gap ${sf.gapGross} gross / ${sf.gapNet} net; ${sf.feedDiffersPairs} pairs on different feeds left out`);
+for (const [m, v] of Object.entries(out.perMarket)) console.log(`  ${m.padEnd(7)} replay ${v.replayFeed}, live ${Object.entries(v.liveFeeds).map(([f, n]) => `${f}${n}`).join('/')}: match ${P(v.liveRate)}/${P(v.replayRate)}, d1 ${P(v.d1Rate)}, sign ${P(v.signRate)} (n${v.bothClosed}), live ${v.sumLiveR}R vs replay ${v.sumReplayR}R (net ${v.sumReplayRNet}), gap ${v.gapGross}/trade${v.sameFeed.live ? ` | same feed: match ${P(v.sameFeed.liveRate)} n${v.sameFeed.live}, gap ${v.sameFeed.gapGross}` : ''}`);
 for (const s of ['unmatchedLive', 'unmatchedReplay']) { console.log(`${s} ${out[s].n}:`); for (const r of out[s].reasons.slice(0, 6)) console.log(`  ${String(r.n).padStart(4)}  ${r.cls}: ${r.why}  ${Object.entries(r.bySetup).sort((a, b) => b[1] - a[1]).slice(0, 4).map(([k, n]) => `${k}${n}`).join(' ')}`); }
