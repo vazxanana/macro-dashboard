@@ -2460,6 +2460,7 @@ html[data-motion="off"][data-gate] .gate-bg path[stroke] { animation: none; stro
     <div class="sec-h">
       <h2>Charts <span class="kbd-hint"><kbd>1</kbd>–<kbd>6</kbd> pick a chart · <kbd>0</kbd> all · <kbd>F</kbd> fit</span></h2>
       <div class="adr" id="ms-adr" role="status" aria-label="Daily range" hidden></div>
+      <div class="pa-chips" id="ms-pa-chips" hidden></div>
       <div class="mtf" id="ms-mtf" role="group" aria-label="Timeframe alignment: last structure break per timeframe" hidden></div>
       <div class="seg" role="group" aria-label="Chart view">
         <button type="button" data-view="1d">D1</button><button type="button" data-view="4h">H4</button><button type="button" data-view="1h">H1</button><button type="button" data-view="15m">M15</button><button type="button" data-view="5m">M5</button><button type="button" data-view="1m">M1</button><button type="button" data-view="all">All</button>
@@ -3965,6 +3966,11 @@ function msNextSetup(bars, A) {
     function lines() {
       Object.values(panes).forEach((P) => { (P._pal || []).forEach((l) => { try { P.series.removePriceLine(l); } catch (e) {} }); P._pal = PA.list.filter((a) => a.sym === instKey).map((a) => P.series.createPriceLine({ price: a.price, color: '#e0a526', lineWidth: 1, lineStyle: LW.LineStyle.Dashed, axisLabelVisible: true, title: `🔔 ${a.dir === 'above' ? '↑' : '↓'}` })); });
       const b = document.querySelectorAll('.ch-bell'); b.forEach((x) => x.classList.toggle('on', PA.list.some((a) => a.sym === instKey)));
+      // active alerts as chips under the Charts title (this market first); tap one to open the alerts dialog
+      const box = document.getElementById('ms-pa-chips');
+      if (box) { const L = PA.list.slice().sort((a, c) => (c.sym === instKey) - (a.sym === instKey)); box.hidden = !L.length;
+        box.innerHTML = L.length ? `<span class="pa-chips-k">Alerts</span>` + L.slice(0, 8).map((a) => { const n = nowPx(a.sym), d = n ? (a.price - n) / n * 100 : null;
+          return `<button type="button" class="pa-chip ${a.dir}" data-pa-sym="${a.sym}" title="${esc(a.note || '')}">${a.dir === 'above' ? '↑' : '↓'} ${(INSTRUMENTS[a.sym] || {}).label || a.sym} ${fx(a.sym, a.price)}${d != null ? ` <small>${d >= 0 ? '+' : '−'}${Math.abs(d).toFixed(2)}%</small>` : ''}</button>`; }).join('') + (L.length > 8 ? `<span class="pa-chips-k">+${L.length - 8}</span>` : '') : ''; }
     }
     async function subscribe() {
       if (!PA.key) { const j = await (await fetch('/api/push?key=1')).json(); PA.key = j.key; }
@@ -4038,7 +4044,8 @@ function msNextSetup(bars, A) {
       dlg.querySelector('#pa-msg').textContent = can() ? '' : ios && !standalone ? 'On iPhone: Share → Add to Home Screen, then open Meridian X from the Home Screen to use alerts.' : MD.base ? 'This browser cannot receive notifications.' : 'Alerts work on meridianx.dev.';
       hint(); render(); dlg.showModal(); setTimeout(() => { const i = dlg.querySelector('#pa-price'); i.focus(); i.select(); }, 30);
     };
-    setTimeout(lines, 1500);
+    setTimeout(lines, 1500); setInterval(lines, 30e3);
+    document.addEventListener('click', (ev) => { const c = ev.target.closest && ev.target.closest('[data-pa-sym]'); if (c) window.msOpenAlerts(c.dataset.paSym); });
   }
   const ACTIVE = TFS.filter((tf) => panes[tf.id]);
   // Crosshair sync: hovering a moment on one timeframe marks the same moment on the others (bar containing that time)
@@ -7722,6 +7729,12 @@ function gpStats(T) {
 .adr[hidden] { display: none; }
 .mtf { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; margin: -4px 0 14px; }
 .mtf[hidden] { display: none; }
+.pa-chips { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; margin: -4px 0 12px; }
+.pa-chips[hidden] { display: none; }
+.pa-chips-k { font-size: 12px; color: var(--ink-faint); margin-right: 2px; }
+.pa-chip { height: 28px; padding: 0 10px; border-radius: 99px; border: 1px solid color-mix(in srgb, #e0a526 40%, var(--line)); background: color-mix(in srgb, #e0a526 8%, var(--panel)); color: var(--ink); font: inherit; font-size: 12px; font-weight: 600; cursor: pointer; font-variant-numeric: tabular-nums; }
+.pa-chip small { font-weight: 500; color: var(--ink-faint); margin-left: 2px; }
+.pa-chip:hover { border-color: #e0a526; } .pa-chip:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 .mtf-c { display: inline-flex; align-items: center; gap: 5px; height: 28px; padding: 0 10px; border-radius: 8px; border: 1px solid var(--line); background: var(--panel); color: var(--ink-faint); font: inherit; font-size: 12px; cursor: pointer; }
 .mtf-c b { color: var(--ink); font-weight: 600; }
 .mtf-c.up { color: var(--buy); border-color: color-mix(in srgb, var(--buy) 35%, var(--line)); background: color-mix(in srgb, var(--buy) 8%, var(--panel)); }
