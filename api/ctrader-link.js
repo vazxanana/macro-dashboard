@@ -13,6 +13,10 @@
 // random string: signs sessions and encrypts the stored tokens), BLOB_READ_WRITE_TOKEN; optional CTRADER_REDIRECT_URI (default
 // https://<host>/api/ctrader-link; it must be listed under the cTrader app's redirect URIs).
 // Tokens are stored encrypted (AES-256-GCM) in the private Blob store at ctlink/<user>/…json. Secrets are never logged.
+// Security review (7 Nov): a session (and the link cookie) carries a fingerprint of the user's password hash and is checked
+// against the current user list on every request, so removing a user, changing a password or re-using a user key ends it at
+// once; the user list fails closed (a Blob error never lets a disabled built-in user back in); the key "owner" is reserved;
+// every token in play is scrubbed from errors.
 const crypto = require('node:crypto');
 const fs = require('node:fs');
 const path = require('node:path');
@@ -28,6 +32,8 @@ const READ_ONLY = new Set([PT.APP_AUTH_REQ, PT.ACCOUNT_AUTH_REQ, PT.ASSET_LIST_R
   PT.RECONCILE_REQ, PT.DEAL_LIST_REQ, PT.ACCOUNTS_BY_TOKEN_REQ, PT.UNREALIZED_PNL_REQ, PT.HEARTBEAT]);
 
 const sha = (s) => crypto.createHash('sha256').update(String(s), 'utf8').digest('hex');
+// constant-time compare of two hex hashes (false for anything that is not a 64-char hex string)
+const same = (a, b) => /^[0-9a-f]{64}$/.test(String(a)) && /^[0-9a-f]{64}$/.test(String(b)) && crypto.timingSafeEqual(Buffer.from(String(a)), Buffer.from(String(b)));
 const b64u = (b) => Buffer.from(b).toString('base64url');
 const keyOf = (env, use) => crypto.createHash('sha256').update(`${use}|${env.CTRADER_LINK_KEY}`).digest();
 function sign(env, obj) { const body = b64u(JSON.stringify(obj)); return `${body}.${b64u(crypto.createHmac('sha256', keyOf(env, 'sign')).update(body).digest())}`; }
@@ -56,19 +62,37 @@ function builtInUsers(html) {
   let m; while ((m = re.exec(block))) out[m[1]] = { name: m[2], hash: m[3], role: m[4] };
   return out;
 }
+// built-in users overridden by the stored list. Fails closed: if the list cannot be read, it throws (never falls back to the
+// built-ins alone, which would let a user removed on the Users page back in).
 async function userList(deps) {
-  let html = ''; try { html = fs.readFileSync(path.join(process.cwd(), 'market-structure.html'), 'utf8'); } catch (e) {}
-  const users = builtInUsers(html);
-  try { const r = await deps.blobUsers(); for (const [k, u] of Object.entries((r && r.users) || {})) { if (u && u.disabled) delete users[k]; else users[k] = u; } } catch (e) {}
+  let html = deps.pageHtml;
+  if (html == null) { html = ''; try { html = fs.readFileSync(path.join(process.cwd(), 'market-structure.html'), 'utf8'); } catch (e) {} }
+  const users = Object.assign(Object.create(null), builtInUsers(html));
+  let r; try { r = await deps.blobUsers(); } catch (e) { const err = new Error('the user list could not be read'); err.status = 503; throw err; }
+  for (const [k, u] of Object.entries((r && r.users) || {})) { if (u && u.disabled) delete users[k]; else users[k] = u; }
+  delete users.owner;   // reserved: the owner's link lives under "owner"
   return users;
 }
+const KEY_RE = /^[a-z0-9-]{1,24}$/;
 async function identify(deps, user, pw) {
   if (!pw || String(pw).length > 200) return null;
   const h = sha(pw);
-  if (h === OWNER_HASH) return { u: 'owner', name: 'Owner' };
-  const key = String(user || '').toLowerCase(), all = await userList(deps), R = all[key];
-  if (R && R.hash === h && /^[a-z0-9-]{1,24}$/.test(key)) return { u: key, name: R.name || key };
+  if (same(h, OWNER_HASH)) return { u: 'owner', name: 'Owner', h };
+  const key = String(user || '').toLowerCase(); if (!KEY_RE.test(key) || key === 'owner') return null;
+  const R = (await userList(deps))[key];
+  if (R && same(R.hash, h)) return { u: key, name: R.name || key, h };
   return null;
+}
+// a short keyed fingerprint of the password hash: ties a session to the password it was made with (the hash itself stays out)
+const fpOf = (env, h) => crypto.createHmac('sha256', keyOf(env, 'fp')).update(String(h)).digest('base64url').slice(0, 22);
+// the session's user as the user list stands now: null when removed, disabled, or the password changed since
+async function current(env, deps, ses) {
+  if (!ses || typeof ses.u !== 'string' || typeof ses.f !== 'string') return null;
+  const ok = (h) => { const want = fpOf(env, h); return want.length === ses.f.length && crypto.timingSafeEqual(Buffer.from(want), Buffer.from(ses.f)); };
+  if (ses.u === 'owner') return ok(OWNER_HASH) ? ses.u : null;
+  if (!KEY_RE.test(ses.u)) return null;
+  const R = (await userList(deps))[ses.u];
+  return R && /^[0-9a-f]{64}$/.test(String(R.hash)) && ok(R.hash) ? ses.u : null;
 }
 
 // --- token storage (private Blob, one record per user) ---
@@ -81,12 +105,21 @@ function store(env) {
     async del(u) { const old = await files(u); if (old.length) await del(old.map((x) => x.url), { token }); },
   };
 }
-async function blobUsers(env) {
-  const { list } = require('@vercel/blob'), token = env.BLOB_READ_WRITE_TOKEN;
+// the stored user list, as /api/users serves it: the newest Blob users/…json, else council-data users.json (first run).
+// Throws when a list exists but cannot be read; null only when there is none at all.
+async function blobUsers(env, host, io = {}) {
+  const list = io.list || require('@vercel/blob').list, fetchFn = io.fetch || fetch, token = env.BLOB_READ_WRITE_TOKEN;
   const { blobs } = await list({ prefix: 'users/', token }); blobs.sort((a, b) => new Date(b.uploadedAt) - new Date(a.uploadedAt));
-  if (!blobs.length) return null;
-  const r = await fetch(blobs[0].url, { headers: { Authorization: `Bearer ${token}` }, cache: 'no-store', signal: AbortSignal.timeout(8000) });
-  return r.ok ? r.json() : null;
+  if (blobs.length) {
+    const r = await fetchFn(blobs[0].url, { headers: { Authorization: `Bearer ${token}` }, cache: 'no-store', signal: AbortSignal.timeout(8000) });
+    if (!r.ok) throw new Error(`users blob ${r.status}`);
+    return r.json();
+  }
+  if (!/^[a-z0-9.-]{1,253}(:\d{1,5})?$/i.test(String(host || ''))) throw new Error('bad host for users.json');
+  const r = await fetchFn(`https://${host}/cdata/users.json`, { cache: 'no-store', signal: AbortSignal.timeout(8000) });
+  if (r.status === 404) return null;
+  if (!r.ok) throw new Error(`users.json ${r.status}`);
+  return r.json();
 }
 
 // --- cTrader OAuth (HTTP) ---
@@ -194,15 +227,19 @@ async function handle(req, res, { env = process.env, WS = globalThis.WebSocket, 
   res.setHeader('Cache-Control', 'no-store');
   const ready = ['CTRADER_CLIENT_ID', 'CTRADER_CLIENT_SECRET', 'CTRADER_LINK_KEY', 'BLOB_READ_WRITE_TOKEN'].every((k) => String(env[k] || '').trim());
   if (!ready) return res.status(503).json({ error: 'cTrader linking is not set up on the server yet' });
-  const deps = { store: d.store || store(env), blobUsers: d.blobUsers || (() => blobUsers(env)), fetch: d.fetch || fetch };
+  const deps = { store: d.store || store(env), blobUsers: d.blobUsers || (() => blobUsers(env, req.headers.host)), fetch: d.fetch || fetch, pageHtml: d.pageHtml };
   const page = (q) => `/market-structure.html?${q}#ctrader`;
+  // every secret in play is scrubbed from errors: the app's own and, once read, the user's cTrader tokens and the grant code
+  const secrets = [env.CTRADER_CLIENT_SECRET, env.CTRADER_CLIENT_ID, env.CTRADER_LINK_KEY, env.BLOB_READ_WRITE_TOKEN];
   try {
     if (req.method === 'GET') {   // cTrader sends the browser back here with ?code=… (or ?error=…)
       const q = req.query || {}, st = verify(env, cookieOf(req));
       res.setHeader('Set-Cookie', `${COOKIE}=; Path=/api/ctrader-link; Max-Age=0; HttpOnly; Secure; SameSite=Lax`);
-      if (!st || st.k !== 'link') return res.redirect(302, page('ct=expired'));
+      if (!st || st.k !== 'link' || !(await current(env, deps, st))) return res.redirect(302, page('ct=expired'));
       if (!q.code) return res.redirect(302, page('ct=denied'));
-      const t = await tokenCall(env, { grant_type: 'authorization_code', code: String(q.code).slice(0, 400), redirect_uri: redirectUri(env, req) }, deps.fetch);
+      const code = String(q.code).slice(0, 400); secrets.push(code);
+      const t = await tokenCall(env, { grant_type: 'authorization_code', code, redirect_uri: redirectUri(env, req) }, deps.fetch);
+      secrets.push(t.accessToken, t.refreshToken);
       await deps.store.set(st.u, { ...t, linkedAt: new Date().toISOString() });
       console.log(`[ctrader-link] linked for ${st.u}`);
       return res.redirect(302, page('ct=linked'));
@@ -211,17 +248,19 @@ async function handle(req, res, { env = process.env, WS = globalThis.WebSocket, 
     let b; try { b = typeof req.body === 'string' ? JSON.parse(req.body || '{}') || {} : req.body || {}; } catch (e) { return res.status(400).json({ error: 'bad JSON' }); }
     if (b.action === 'session') {
       const who = await identify(deps, b.user, b.pw); if (!who) return res.status(403).json({ error: 'Password not accepted' });
-      return res.status(200).json({ session: sign(env, { k: 'sess', u: who.u, exp: Date.now() + 30 * 86400e3 }), user: who.u });
+      return res.status(200).json({ session: sign(env, { k: 'sess', u: who.u, f: fpOf(env, who.h), exp: Date.now() + 30 * 86400e3 }), user: who.u });
     }
-    const ses = verify(env, b.session); if (!ses || ses.k !== 'sess') return res.status(401).json({ error: 'Please confirm your password again' });
+    const ses = verify(env, b.session);
+    if (!ses || ses.k !== 'sess' || !(await current(env, deps, ses))) return res.status(401).json({ error: 'Please confirm your password again' });
     if (b.action === 'start') {
-      res.setHeader('Set-Cookie', `${COOKIE}=${encodeURIComponent(sign(env, { k: 'link', u: ses.u, exp: Date.now() + 15 * 60e3 }))}; Path=/api/ctrader-link; Max-Age=900; HttpOnly; Secure; SameSite=Lax`);
+      res.setHeader('Set-Cookie', `${COOKIE}=${encodeURIComponent(sign(env, { k: 'link', u: ses.u, f: ses.f, exp: Date.now() + 15 * 60e3 }))}; Path=/api/ctrader-link; Max-Age=900; HttpOnly; Secure; SameSite=Lax`);
       const q = new URLSearchParams({ client_id: env.CTRADER_CLIENT_ID, redirect_uri: redirectUri(env, req), scope: 'accounts', product: 'web' });
       return res.status(200).json({ url: `https://id.ctrader.com/my/settings/openapi/grantingaccess/?${q}` });
     }
     if (b.action === 'unlink') { await deps.store.del(ses.u); return res.status(200).json({ linked: false }); }
     if (b.action === 'summary') {
       const rec = await freshTokens(env, deps, ses.u); if (!rec) return res.status(200).json({ linked: false });
+      secrets.push(rec.accessToken, rec.refreshToken);
       if (!WS) return res.status(500).json({ error: 'WebSocket is not available on this server' });
       const accounts = await readAccounts(WS, rec.accessToken);
       if (!accounts.length) return res.status(200).json({ linked: true, accounts: [], error: 'No cTrader accounts were shared with this link' });
@@ -231,11 +270,12 @@ async function handle(req, res, { env = process.env, WS = globalThis.WebSocket, 
     }
     return res.status(400).json({ error: 'unknown action' });
   } catch (e) {
-    const msg = String(e.message || e).replace(new RegExp([env.CTRADER_CLIENT_SECRET, env.CTRADER_CLIENT_ID, env.CTRADER_LINK_KEY].filter(Boolean).map((s) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join('|') || '$^', 'g'), '***');
+    let msg = String((e && e.message) || e);
+    for (const v of secrets) if (v && String(v).length >= 4) msg = msg.split(String(v)).join('***');
     console.error(`[ctrader-link] ${msg}`);
-    return req.method === 'GET' ? res.redirect(302, page('ct=failed')) : res.status(502).json({ error: msg });
+    return req.method === 'GET' ? res.redirect(302, page('ct=failed')) : res.status(e && e.status === 503 ? 503 : 502).json({ error: msg });
   }
 }
 module.exports = (req, res) => handle(req, res);
 module.exports.handle = handle;
-module.exports._t = { sign, verify, seal, unseal, builtInUsers, identify, readAccount, readAccounts, session, READ_ONLY, PT, HOSTS };
+module.exports._t = { sign, verify, seal, unseal, builtInUsers, identify, current, blobUsers, same, fpOf, readAccount, readAccounts, session, READ_ONLY, PT, HOSTS };

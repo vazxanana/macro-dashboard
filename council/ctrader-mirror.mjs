@@ -53,9 +53,14 @@ const normName = (s) => String(s || '').toUpperCase().replace(/[^A-Z0-9.]/g, '')
 const RETRY = /MARKET_CLOSED|SYMBOL_HAS_HOLIDAY|NO_QUOTES|SERVER_IS_UNDER_MAINTENANCE|CH_SERVER_NOT_REACHABLE|REQUEST_FREQUENCY_EXCEEDED|TRADING_DISABLED|not tradable now/;
 
 // ---- secrets ------------------------------------------------------------------------------------------------------
+// scrub(text) hides the configured secrets; scrub.add(...) also hides tokens learnt later (the stored or rotated pair), so a
+// broker error that repeats one never reaches the published mirror.json / test.json / suite.json
 export function scrubber(env) {
-  const vals = NEED.map((k) => env[k]).filter((v) => v && String(v).length >= 6);
-  return (s) => { let t = String(s == null ? '' : s); for (const v of vals) t = t.split(v).join('[redacted]'); return t.slice(0, 300); };
+  const vals = [];
+  const scrub = (s) => { let t = String(s == null ? '' : s); for (const v of vals) t = t.split(v).join('[redacted]'); return t.slice(0, 300); };
+  scrub.add = (...xs) => { for (const v of xs) if (v && String(v).length >= 6 && !vals.includes(String(v))) vals.push(String(v)); vals.sort((a, b) => b.length - a.length); };
+  scrub.add(...NEED.map((k) => env[k]));
+  return scrub;
 }
 const baseOf = (env) => crypto.createHash('sha256').update(`${env.CTRADER_REFRESH_TOKEN}|base`).digest('hex').slice(0, 16);   // kept sealed only
 const keyFor = (env) => crypto.createHash('sha256').update(`${env.CTRADER_CLIENT_SECRET}|meridian-ctrader-tokens-v1`).digest();
@@ -228,7 +233,7 @@ export async function mirrorRound({ env, trades, state, tokens, WS = globalThis.
 
   let tok = { accessToken: env.CTRADER_ACCESS_TOKEN, refreshToken: env.CTRADER_REFRESH_TOKEN };
   // the stored (rotated) pair wins, unless the owner has since configured a new pair (re-authorised): then the configured one is used
-  if (tokens) { try { const t = unseal(tokens, env); if (t.accessToken && t.refreshToken) { if (t.base && t.base !== baseOf(env)) say('new tokens configured; stored ones ignored'); else tok = t; } } catch (e) { say('stored tokens unreadable; using the configured ones'); } }
+  if (tokens) { try { const t = unseal(tokens, env); scrub.add(t.accessToken, t.refreshToken); if (t.accessToken && t.refreshToken) { if (t.base && t.base !== baseOf(env)) say('new tokens configured; stored ones ignored'); else tok = t; } } catch (e) { say('stored tokens unreadable; using the configured ones'); } }
 
   const s = session(WS, scrub, DEMO_HOST, timeout ? { timeout } : {});
   try {
@@ -238,6 +243,7 @@ export async function mirrorRound({ env, trades, state, tokens, WS = globalThis.
     catch (e) {
       if (!TOKEN_ERR.test(String(e.code || e.message))) throw e;
       const r = await s.send(PT.REFRESH_TOKEN_REQ, { refreshToken: tok.refreshToken }, PT.REFRESH_TOKEN_RES);
+      scrub.add(r.accessToken, r.refreshToken);
       if (!r.accessToken || !r.refreshToken) throw new Error('token refresh returned no tokens');
       tok = { accessToken: r.accessToken, refreshToken: r.refreshToken, rotatedAt: new Date(now * 1000).toISOString(), base: baseOf(env) };
       out.tokens = seal(tok, env); say('access token refreshed (stored encrypted)');

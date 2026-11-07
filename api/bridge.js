@@ -9,7 +9,7 @@ module.exports = async (req, res) => {
   res.setHeader('Cache-Control', 'no-store');
   if (req.method === 'POST') {
     let b; try { b = typeof req.body === 'string' ? (JSON.parse(req.body || '{}') || {}) : (req.body || {}); } catch (e) { return res.status(400).json({ error: 'bad JSON' }); }
-    if (!b.ownerPw || crypto.createHash('sha256').update(String(b.ownerPw)).digest('hex') !== OWNER_HASH) return res.status(403).json({ error: 'Owner password not accepted' });
+    if (!b.ownerPw || String(b.ownerPw).length > 200 || !crypto.timingSafeEqual(Buffer.from(crypto.createHash('sha256').update(String(b.ownerPw)).digest('hex')), Buffer.from(OWNER_HASH))) return res.status(403).json({ error: 'Owner password not accepted' });
     const f = FILES[b.file]; if (!f) return res.status(400).json({ error: 'unknown file' });
     try { const txt = fs.readFileSync(path.join(process.cwd(), f), 'utf8'); res.setHeader('Content-Type', 'text/plain; charset=utf-8'); return res.status(200).send(txt); }
     catch (e) { return res.status(500).json({ error: 'file missing from the deployment' }); }

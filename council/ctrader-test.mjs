@@ -26,7 +26,7 @@ export async function testRound({ env, req, WS = globalThis.WebSocket, now = Mat
   if (String(env.CTRADER_MIRROR || '').trim().toLowerCase() !== 'on') { log('mirror is off: test not run'); req.done = true; return req; }
   if (NEED.some((k) => !env[k]) || String(env.CTRADER_ENV).trim().toLowerCase() !== 'demo') { log('not configured for demo: test not run'); req.done = true; return req; }
   let tok = { accessToken: env.CTRADER_ACCESS_TOKEN };
-  try { const t = req._tokens && unseal(req._tokens, env); if (t && t.accessToken) tok = t; } catch (e) {}
+  try { const t = req._tokens && unseal(req._tokens, env); if (t) scrub.add(t.accessToken, t.refreshToken); if (t && t.accessToken) tok = t; } catch (e) {}
   const s = session(WS, scrub);
   try {
     await s.send(PT.APP_AUTH_REQ, { clientId: env.CTRADER_CLIENT_ID, clientSecret: env.CTRADER_CLIENT_SECRET }, PT.APP_AUTH_RES);

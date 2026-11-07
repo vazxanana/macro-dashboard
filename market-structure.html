@@ -1283,13 +1283,18 @@ window.msFetchUsers = function () {
   if (!owner && R && R.ict === 'read') document.documentElement.dataset.ictRo = '1';   // read-only desk (Orlando)
   var guest = null; try { guest = localStorage.getItem('ms-guest'); } catch (e) {}
   if (!owner && !R && !guest) document.documentElement.dataset.gate = '1'; if (guest && !owner && !R) document.documentElement.dataset.guest = '1'; })();
+// signing out forgets the cTrader view-only session (and account choice) kept in this browser, so the next person on a shared
+// device cannot open someone's broker account with it (security review, 7 Nov)
+window.msForgetCt = function () {
+  try { for (var i = localStorage.length - 1; i >= 0; i--) { var k = localStorage.key(i); if (k && /^ms-ct-(sess|acc)-/.test(k)) localStorage.removeItem(k); } } catch (e) {}
+};
 // admin login: SHA-256 of the typed password against MS_ADMIN_HASH; the hash is kept as the session token
 async function msSha256(t) { const b = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(t)); return Array.from(new Uint8Array(b)).map((x) => x.toString(16).padStart(2, '0')).join(''); }
 document.addEventListener('DOMContentLoaded', function () { var pub = document.documentElement.dataset.mode !== 'admin', a = document.getElementById('ms-admin-link'), w = document.getElementById('ms-who');
   if (w && window.MS_WHO) w.textContent = window.MS_WHO === 'owner' ? 'admin' : document.documentElement.dataset.role === 'viewer' ? `${window.MS_WHO} (viewer: read-only)` : `${window.MS_WHO} (reviewer: read-only, loss reviews)`; if (!a) return;
   a.textContent = pub ? 'Log in' : `Log out${window.MS_WHO && window.MS_WHO !== 'owner' ? ` (${window.MS_WHO})` : ''}`;
   a.addEventListener('click', function (ev) { ev.preventDefault();
-    if (!pub) { try { localStorage.removeItem('ms-admin'); localStorage.removeItem('ms-user'); localStorage.removeItem('ms-user-rec'); localStorage.removeItem('ms-guest'); } catch (e) {} location.hash = '#home'; location.reload(); return; }
+    if (!pub) { try { localStorage.removeItem('ms-admin'); localStorage.removeItem('ms-user'); localStorage.removeItem('ms-user-rec'); localStorage.removeItem('ms-guest'); } catch (e) {} window.msForgetCt(); location.hash = '#home'; location.reload(); return; }
     msGate(true); }); });
 // a signed-in user (not the owner) is checked against the current user list once the page has loaded
 document.addEventListener('DOMContentLoaded', function () {
@@ -1298,7 +1303,7 @@ document.addEventListener('DOMContentLoaded', function () {
   window.msFetchUsers().then(function (remote) {
     if (!remote) return;   // offline or no list yet: keep the session
     var all = window.msMergeUsers(remote), R = all[u];
-    if (!R || R.hash !== h) { try { localStorage.removeItem('ms-admin'); localStorage.removeItem('ms-user'); localStorage.removeItem('ms-user-rec'); } catch (e) {} location.reload(); return; }
+    if (!R || R.hash !== h) { try { localStorage.removeItem('ms-admin'); localStorage.removeItem('ms-user'); localStorage.removeItem('ms-user-rec'); } catch (e) {} window.msForgetCt(); location.reload(); return; }
     var rec = null; try { rec = JSON.parse(localStorage.getItem('ms-user-rec') || 'null'); } catch (e) {}
     if (!rec || rec.role !== R.role || rec.name !== R.name || (rec.ict || false) !== (R.ict || false)) { try { localStorage.setItem('ms-user-rec', JSON.stringify({ key: u, name: R.name, role: R.role, hash: h, ict: R.ict || false })); } catch (e) {} if (!rec || rec.role !== R.role || (rec.ict || false) !== (R.ict || false)) location.reload(); }
   });
