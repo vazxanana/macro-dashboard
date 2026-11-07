@@ -574,6 +574,12 @@
    "by": "user",
    "change": "Gold trend fast (5-day breakout) to shadow (owner, 7 Nov): new breakouts recorded as shadow trades; Gold trend (20-day) stays live; open trades run to their exits",
    "why": "2006-17 untouched test (#530): both legs regime-bound (N20 +0.49R, N5 +0.37R a position); monthly R correlation 0.92, so running both doubles one long-gold bet; N20 return per drawdown 6.8 vs 4.5. Owner kept N20 live."
+  },
+  {
+   "at": "2026-11-07T22:49:47.000Z",
+   "by": "user",
+   "change": "NQ open run: regime tags (TREND, META) on every trade and a paper shadow stream \"trend-on only\" (|TS| >= 0.295); the live rule is unchanged",
+   "why": "Regime study (2004-26, pre-registered): NQ/TREND is the one consistent split: second half ON +0.119R vs OFF -0.200R a trade (t 2.73, nominal; Bonferroni bar 2.83), right sign in every era, but in 2023-26 the skipped trades won (+0.23R over 41). A loss filter for dead regimes, not a regime detector: recorded as tags and a shadow so the forward record decides."
   }
  ],
  "btAt": "2026-11-07T21:41:23.838Z",
@@ -618,7 +624,8 @@
   "scalp-shadow-research",
   "swing-shadow-research",
   "crypto-trend-shadow",
-  "gold-trend-fast-shadow"
+  "gold-trend-fast-shadow",
+  "nq-regime-shadow"
  ],
  "target": {},
  "targetBy": {},
@@ -629,11 +636,11 @@
  "noPause": true,
  "wouldPause": {
   "rintra": {
-   "at": "2026-11-07T22:47:33.000Z",
+   "at": "2026-11-07T22:49:47.000Z",
    "why": "four losses in a row"
   },
   "scalp": {
-   "at": "2026-11-07T22:47:33.000Z",
+   "at": "2026-11-07T22:49:47.000Z",
    "why": "expectancy -1.00R over 13 trades"
   },
   "xau": {
@@ -774,5 +781,8 @@
  "coachChanged": {
   "intraday:d1": "2026-11-07T21:26:49.000Z"
  },
- "goldTrendFastShadow": true
+ "goldTrendFastShadow": true,
+ "nqRegimeShadow": {
+  "trendMin": 0.295
+ }
 }
