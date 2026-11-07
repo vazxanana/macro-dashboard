@@ -95,6 +95,10 @@ function session(WS, url = DEMO_HOST) {
   return { send, close: () => { closed = true; clearInterval(beat); try { ws.close(); } catch (e) {} } };
 }
 
+// account numbers are shown only partly (last 3 digits), so the owner can tell which one to use without listing them in full
+const mask = (v) => (v == null ? null : '…' + String(v).slice(-3));
+const listing = (a) => ({ accountId: mask(a.ctidTraderAccountId), login: mask(a.traderLogin), demo: a.isLive === false, broker: a.brokerTitleShort || null });
+
 // ---- the read-only check ---------------------------------------------------------------------------------------
 const TOKEN_ERR = /ACCESS_TOKEN|INVALID_TOKEN|TOKEN_EXPIRED|CH_ACCESS_TOKEN_INVALID|NOT_AUTHORIZED|UNAUTHORIZED/i;
 async function check(env, { WS = globalThis.WebSocket, store = null } = {}) {
@@ -124,17 +128,20 @@ async function check(env, { WS = globalThis.WebSocket, store = null } = {}) {
       refreshed = true; tokenSource = 'rotated';
       list = await s.send(PT.ACCOUNTS_BY_TOKEN_REQ, { accessToken: tok.accessToken }, PT.ACCOUNTS_BY_TOKEN_RES);
     }
-    const acc = (list.ctidTraderAccount || []).find((a) => Number(a.ctidTraderAccountId) === accountId);
-    if (!acc) return { ok: false, status: 404, error: 'CTRADER_ACCOUNT_ID is not among the accounts this token can see', accounts: (list.ctidTraderAccount || []).length };
+    // CTRADER_ACCOUNT_ID may hold the Open API account id (ctidTraderAccountId) or the login number shown in cTrader (traderLogin)
+    const all = list.ctidTraderAccount || [];
+    const acc = all.find((a) => Number(a.ctidTraderAccountId) === accountId) || all.find((a) => Number(a.traderLogin) === accountId);
+    if (!acc) return { ok: false, status: 404, error: 'CTRADER_ACCOUNT_ID matches neither the account id nor the login of any account this token can see', accounts: all.map(listing) };
     if (acc.isLive !== false) return { ok: false, status: 403, error: 'account is not a demo account (isLive is not false): stopped before connecting to it' };
+    const ctid = Number(acc.ctidTraderAccountId), matchedBy = ctid === accountId ? 'accountId' : 'login';
 
-    await s.send(PT.ACCOUNT_AUTH_REQ, { ctidTraderAccountId: accountId, accessToken: tok.accessToken }, PT.ACCOUNT_AUTH_RES);
-    const tr = (await s.send(PT.TRADER_REQ, { ctidTraderAccountId: accountId }, PT.TRADER_RES)).trader || {};
-    const rc = await s.send(PT.RECONCILE_REQ, { ctidTraderAccountId: accountId }, PT.RECONCILE_RES);
+    await s.send(PT.ACCOUNT_AUTH_REQ, { ctidTraderAccountId: ctid, accessToken: tok.accessToken }, PT.ACCOUNT_AUTH_RES);
+    const tr = (await s.send(PT.TRADER_REQ, { ctidTraderAccountId: ctid }, PT.TRADER_RES)).trader || {};
+    const rc = await s.send(PT.RECONCILE_REQ, { ctidTraderAccountId: ctid }, PT.RECONCILE_RES);
     const digits = Number.isFinite(+tr.moneyDigits) ? +tr.moneyDigits : 2;
     return {
       ok: true, status: 200, host: 'demo', readOnly: true,
-      account: { id: accountId, login: acc.traderLogin || null, broker: acc.brokerTitleShort || tr.brokerName || null, isLive: false,
+      account: { id: ctid, matchedBy, login: acc.traderLogin || null, broker: acc.brokerTitleShort || tr.brokerName || null, isLive: false,
         balance: tr.balance != null ? Number(tr.balance) / 10 ** digits : null, depositAssetId: tr.depositAssetId || null },
       positions: (rc.position || []).length, orders: (rc.order || []).length,
       token: { source: tokenSource, refreshed },

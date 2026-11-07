@@ -90,6 +90,22 @@ test('expired token: refreshed, stored only encrypted, reused next time', async 
   assert.equal(b.sent.find((m) => m.payloadType === PT.ACCOUNTS_BY_TOKEN_REQ).payload.accessToken, 'fake-access-new');
 });
 
+test('CTRADER_ACCOUNT_ID may be the login number; the demo check still applies', async () => {
+  const { WS, sent } = fakeWS();
+  const r = await check({ ...ENV, CTRADER_ACCOUNT_ID: '99' }, { WS });
+  assert.equal(r.ok, true); assert.equal(r.account.id, 4242); assert.equal(r.account.matchedBy, 'login');
+  assert.equal(sent.find((m) => m.payloadType === PT.ACCOUNT_AUTH_REQ).payload.ctidTraderAccountId, 4242);
+  const live = fakeWS({ isLive: true });
+  const r2 = await check({ ...ENV, CTRADER_ACCOUNT_ID: '99' }, { WS: live.WS });
+  assert.equal(r2.status, 403); assert.equal(live.sent.some((m) => m.payloadType === PT.ACCOUNT_AUTH_REQ), false);
+});
+
+test('unknown account: 404 with a masked list, no full numbers', async () => {
+  const r = await check({ ...ENV, CTRADER_ACCOUNT_ID: '123456' }, { WS: fakeWS().WS });
+  assert.equal(r.status, 404); assert.deepEqual(r.accounts, [{ accountId: '…242', login: '…99', demo: true, broker: 'DemoBroker' }]);
+  assert.equal(JSON.stringify(r).includes('4242'), false);
+});
+
 test('expired token with no store fails loudly instead of losing the rotated pair', async () => {
   await assert.rejects(check(ENV, { WS: fakeWS({ expireFirst: true }).WS }), /no server-side store/);
 });
