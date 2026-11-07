@@ -26,6 +26,7 @@ Supporting scripts:
 | `clean.mjs` | Bad-print cleaner shared by the Trader and the replay, so both read the same candles. |
 | `review.mjs` | Post-mortem of every closed trade (`pm` on the trade). |
 | `krakenhist.mjs`, `duka.mjs`, `yahoo.mjs` | History feeds for the replay (Kraken trade history first, then Yahoo, then Dukascopy). |
+| `krakenfill.mjs` | Time-boxed Kraken backfill of the replay's crypto trade-history cache (workflow `kraken-backfill.yml`, every 30 min). |
 | `replay.mjs` | Minute-by-minute replay of one market's morning, printed to the job log (manual). |
 | `choch.mjs`, `futures.mjs`, `futures-test.mjs` | M15 CHoCH helper; futures tickets in alerts; one sample ticket (manual). |
 | `engine.mjs` | Generated from the market-structure page's engine; regenerate it when the page's setup rules change. |
@@ -150,9 +151,15 @@ The Analyst brief and the Coach's AI review are the other two places the council
 
 - **Daily replay** (`backtest.mjs` → `backtest.json`): every timeframe through the shared cleaner; gold and crypto from Kraken
   trade history (gold as PAXG shifted onto spot by OANDA spot H1 closes), the forex pairs from Kraken trade history built into 1m
-  candles, falling back to Binance / Yahoo / Dukascopy when a feed is short (`markets.source`, `markets.fallback`,
-  `markets.coverage`). Trades still open at the end are written with status `open`. Each trade carries its spread in R. The Coach
+  candles, falling back to Binance / Yahoo / Dukascopy when a feed is short (`markets.source`, `markets.feeds` per timeframe,
+  `markets.fallback`, `markets.coverage`, `markets.krakenCoverage`). A market is always replayed on one feed, never a mix.
+  Trades still open at the end are written with status `open`. Each trade carries its spread in R. The Coach
   uses it once per new replay (`coach-backtest`); research setups such as the sweeps are reported, never learned from.
+- **Kraken backfill** (`krakenfill.mjs`, workflow `kraken-backfill.yml`, every 30 min): fills the replay's per-day Kraken trade
+  cache in 25-minute boxes (calls paced 1.1 s apart, cursors kept in `.part.json`), fewest missing days first. BTC needs ~175
+  calls a day, ~5,600 for a 30-day window, far more than the nightly replay spends; a coin replays on Kraken from the first run
+  after its cache covers the window. Both workflows save the cache even when cancelled and merge the newest saved copy first.
+  `node council/krakenfill.mjs --status <cacheDir>` shows the coverage.
 - **Fidelity** (`fidelity.mjs` → `research/fidelity.json`): matches live signals (live and shadow) to replay rows by market,
   setup, side and signal time (±10 min) and compares outcomes. Runs after every daily replay. Not shown on the site yet.
 - **90-day research replay** (`research-replay.yml` → `research/replay-90d.json`): the same replay over a longer window, by hand.
