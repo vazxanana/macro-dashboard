@@ -65,11 +65,16 @@ jobs:
       - name: Replay fidelity
         run: node council/fidelity.mjs data || true
 
+      # Spot check: the live Trader's closed gold/forex trades re-judged on OANDA spot candles (Kraken forex books are thin)
+      - name: Spot check
+        run: node council/spotcheck.mjs data || true
+
       - name: Save results
         run: |
           git -C data config user.name "mosha-council"
           git -C data config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git -C data add backtest.json
           git -C data add research/fidelity.json || true
+          git -C data add research/spotcheck.json || true
           git -C data commit -q -m "Council backtest $(date -u +%Y-%m-%dT%H:%MZ)" || exit 0
           for j in 1 2 3 4 5; do git -C data pull -q --rebase origin council-data && git -C data push -q origin HEAD:council-data && break; sleep 7; done
