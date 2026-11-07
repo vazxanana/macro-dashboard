@@ -1,57 +1,85 @@
 {
  "v": 1,
- "at": "2026-11-07T20:43:05.000Z",
+ "at": "2026-11-07T20:44:47.000Z",
  "target": "2026-11-09",
  "targetEvent": null,
  "paperOnly": true,
  "regime": {
-  "label": "transitional dollar · liquidity n/a · VIX curve inverted (stress)",
-  "smile": "mid",
-  "smileDetail": "transitional: no dominant USD force",
+  "label": "Dollar Smile left side (stress) · dollar liquidity draining · VIX curve inverted (stress)",
+  "smile": "left",
+  "smileDetail": "crisis / dollar-funding stress: USD bid, risk sold, gold whipsaws then gets the haven bid",
   "carryUnwind": false,
-  "vix": 25.64,
-  "vixTermRatio": 1.042,
-  "liquidity": null,
-  "realYield": null,
+  "vix": 28.18,
+  "vixTermRatio": 1.103,
+  "liquidity": {
+   "level": 5791,
+   "chg": -76
+  },
+  "realYield": {
+   "level": 2.6,
+   "chg": -0.03,
+   "bias": "bear"
+  },
   "dxyProxy": 102.36,
   "dxy5d": 0.3,
-  "broadUsd20dPct": null,
-  "sofrEffrBps": null,
-  "curve10y3m": null,
-  "us2y": null,
+  "broadUsd20dPct": -0.1,
+  "sofrEffrBps": 4,
+  "curve10y3m": 0.67,
+  "us2y": 4.46,
   "eu2y": 2.9584015012,
-  "usEu2ySpread": null
+  "usEu2ySpread": 1.5
  },
  "assets": {
   "gold": {
    "label": "Gold",
-   "pUp": 0.536,
-   "score": 0.429,
+   "pUp": 0.539,
+   "score": 0.059,
    "last": 4070.59,
    "expMovePct": 0.6,
    "naiveMovePct": 1.01,
    "volRatio": 0.76,
    "expBasis": "typical day: median absolute move of the last 20 days",
    "fit": {
-    "a": 0.1442,
-    "b": 0,
+    "a": 0.1432,
+    "b": 0.2042,
     "n": 1000,
     "base": 0.536
    },
    "drivers": [
     {
-     "k": "macro",
-     "name": "Macro composite (TIPS, DXY, seasonal, CB buying, VIX)",
+     "k": "ry",
+     "name": "Real yields (master driver)",
+     "dir": "down",
+     "w": 3,
+     "detail": "10Y TIPS 2.60%, falling"
+    },
+    {
+     "k": "rymom",
+     "name": "Real-yield 1-week momentum",
      "dir": "up",
      "w": 2,
-     "detail": "73% gold-supportive, DXY ≈ 102.4"
+     "detail": "−3 bp a week"
     },
     {
      "k": "vix",
      "name": "Risk sentiment (VIX)",
      "dir": "up",
      "w": 1,
-     "detail": "VIX 25.6, elevated fear"
+     "detail": "VIX 28.2, elevated fear"
+    },
+    {
+     "k": "be",
+     "name": "Inflation expectations (10Y breakeven)",
+     "dir": "down",
+     "w": 1,
+     "detail": "2.23%, −11 bp a week"
+    },
+    {
+     "k": "dgs2",
+     "name": "Fed expectations (2Y yield trend)",
+     "dir": "up",
+     "w": 1,
+     "detail": "4.46%, −15 bp a week"
     },
     {
      "k": "dxymom",
@@ -59,6 +87,13 @@
      "dir": "down",
      "w": 1,
      "detail": "+0.30 pts in 5 sessions"
+    },
+    {
+     "k": "hy",
+     "name": "Credit stress (HY spreads)",
+     "dir": "up",
+     "w": 1,
+     "detail": "3.48%, +22 bp a week"
     },
     {
      "k": "trend",
@@ -72,7 +107,7 @@
   "eurusd": {
    "label": "EUR/USD",
    "pUp": 0.488,
-   "score": -0.714,
+   "score": -0.375,
    "last": 1.11407,
    "expMovePct": 0.22,
    "naiveMovePct": 0.24,
@@ -86,11 +121,39 @@
    },
    "drivers": [
     {
+     "k": "ry",
+     "name": "Real yields (master driver)",
+     "dir": "down",
+     "w": 1,
+     "detail": "10Y TIPS 2.60%, falling"
+    },
+    {
+     "k": "rymom",
+     "name": "Real-yield 1-week momentum",
+     "dir": "up",
+     "w": 1,
+     "detail": "−3 bp a week"
+    },
+    {
+     "k": "dgs2",
+     "name": "Fed expectations (2Y yield trend)",
+     "dir": "up",
+     "w": 1,
+     "detail": "4.46%, −15 bp a week"
+    },
+    {
      "k": "dxymom",
      "name": "USD 5-day momentum (ICE DXY on OANDA)",
      "dir": "down",
      "w": 1,
      "detail": "+0.30 pts in 5 sessions"
+    },
+    {
+     "k": "smile",
+     "name": "Dollar Smile regime (USD cycle)",
+     "dir": "down",
+     "w": 1,
+     "detail": "left: crisis / dollar-funding stress: USD bid, risk sold, gold whipsaws then gets the haven bid"
     },
     {
      "k": "trend",
@@ -104,32 +167,81 @@
      "name": "Risk sentiment (VIX)",
      "dir": "down",
      "w": 0.5,
-     "detail": "VIX 25.6, elevated fear"
+     "detail": "VIX 28.2, elevated fear"
+    },
+    {
+     "k": "hy",
+     "name": "Credit stress (HY spreads)",
+     "dir": "down",
+     "w": 0.5,
+     "detail": "3.48%, +22 bp a week"
     }
    ]
   },
   "usdjpy": {
    "label": "USD/JPY",
-   "pUp": 0.581,
-   "score": 0.429,
+   "pUp": 0.553,
+   "score": -0.263,
    "last": 158.508,
    "expMovePct": 0.18,
    "naiveMovePct": 0.27,
    "volRatio": 0.75,
    "expBasis": "typical day: median absolute move of the last 20 days",
    "fit": {
-    "a": 0.2425,
-    "b": 0.1964,
+    "a": 0.2461,
+    "b": 0.1338,
     "n": 999,
     "base": 0.565
    },
    "drivers": [
+    {
+     "k": "ry",
+     "name": "Real yields (master driver)",
+     "dir": "up",
+     "w": 1.5,
+     "detail": "10Y TIPS 2.60%, falling"
+    },
+    {
+     "k": "dgs10",
+     "name": "US 10Y yield trend (US-Japan rate gap)",
+     "dir": "down",
+     "w": 1.5,
+     "detail": "4.84%, −14 bp a week"
+    },
+    {
+     "k": "rymom",
+     "name": "Real-yield 1-week momentum",
+     "dir": "down",
+     "w": 1,
+     "detail": "−3 bp a week"
+    },
+    {
+     "k": "dgs2",
+     "name": "Fed expectations (2Y yield trend)",
+     "dir": "down",
+     "w": 1,
+     "detail": "4.46%, −15 bp a week"
+    },
     {
      "k": "dxymom",
      "name": "USD 5-day momentum (ICE DXY on OANDA)",
      "dir": "up",
      "w": 1,
      "detail": "+0.30 pts in 5 sessions"
+    },
+    {
+     "k": "hy",
+     "name": "Credit stress (HY spreads)",
+     "dir": "down",
+     "w": 1,
+     "detail": "3.48%, +22 bp a week"
+    },
+    {
+     "k": "smile",
+     "name": "Dollar Smile regime (USD cycle)",
+     "dir": "down",
+     "w": 1,
+     "detail": "left: crisis / dollar-funding stress: USD bid, risk sold, gold whipsaws then gets the haven bid"
     },
     {
      "k": "trend",
@@ -143,32 +255,53 @@
      "name": "Risk sentiment (VIX)",
      "dir": "down",
      "w": 0.5,
-     "detail": "VIX 25.6, elevated fear"
+     "detail": "VIX 28.2, elevated fear"
     }
    ]
   },
   "nq": {
    "label": "NQ (Nasdaq 100)",
-   "pUp": 0.554,
-   "score": 0,
+   "pUp": 0.548,
+   "score": -0.2,
    "last": 27012.4,
    "expMovePct": 1.24,
    "naiveMovePct": 1.44,
    "volRatio": 1.54,
    "expBasis": "typical day: median absolute move of the last 20 days",
    "fit": {
-    "a": 0.2184,
-    "b": 0.1985,
+    "a": 0.2404,
+    "b": 0.2303,
     "n": 999,
     "base": 0.56
    },
    "drivers": [
     {
+     "k": "ry",
+     "name": "Real yields (master driver)",
+     "dir": "down",
+     "w": 1.5,
+     "detail": "10Y TIPS 2.60%, falling"
+    },
+    {
+     "k": "rymom",
+     "name": "Real-yield 1-week momentum",
+     "dir": "up",
+     "w": 1,
+     "detail": "−3 bp a week"
+    },
+    {
+     "k": "hy",
+     "name": "Credit stress (HY spreads)",
+     "dir": "down",
+     "w": 1,
+     "detail": "3.48%, +22 bp a week"
+    },
+    {
      "k": "vixts",
      "name": "VIX term structure (VIX / VIX3M)",
      "dir": "up",
      "w": 1,
-     "detail": "1.04: inverted (stress), stocks tend to bounce next day"
+     "detail": "1.10: inverted (stress), stocks tend to bounce next day"
     },
     {
      "k": "trend",
@@ -182,7 +315,14 @@
      "name": "Risk sentiment (VIX)",
      "dir": "up",
      "w": 0.5,
-     "detail": "VIX 25.6, elevated fear"
+     "detail": "VIX 28.2, elevated fear"
+    },
+    {
+     "k": "dgs2",
+     "name": "Fed expectations (2Y yield trend)",
+     "dir": "up",
+     "w": 0.5,
+     "detail": "4.46%, −15 bp a week"
     },
     {
      "k": "dxymom",
@@ -190,31 +330,52 @@
      "dir": "down",
      "w": 0.5,
      "detail": "+0.30 pts in 5 sessions"
+    },
+    {
+     "k": "smile",
+     "name": "Dollar Smile regime (USD cycle)",
+     "dir": "down",
+     "w": 0.5,
+     "detail": "left: crisis / dollar-funding stress: USD bid, risk sold, gold whipsaws then gets the haven bid"
     }
    ]
   },
   "es": {
    "label": "ES (S&P 500)",
-   "pUp": 0.533,
-   "score": 0,
+   "pUp": 0.52,
+   "score": -0.231,
    "last": 7385,
    "expMovePct": 0.54,
    "naiveMovePct": 0.81,
    "volRatio": 1.56,
    "expBasis": "typical day: median absolute move of the last 20 days",
    "fit": {
-    "a": 0.1315,
-    "b": 0.2036,
+    "a": 0.149,
+    "b": 0.2997,
     "n": 997,
     "base": 0.539
    },
    "drivers": [
     {
+     "k": "ry",
+     "name": "Real yields (master driver)",
+     "dir": "down",
+     "w": 1,
+     "detail": "10Y TIPS 2.60%, falling"
+    },
+    {
+     "k": "hy",
+     "name": "Credit stress (HY spreads)",
+     "dir": "down",
+     "w": 1,
+     "detail": "3.48%, +22 bp a week"
+    },
+    {
      "k": "vixts",
      "name": "VIX term structure (VIX / VIX3M)",
      "dir": "up",
      "w": 1,
-     "detail": "1.04: inverted (stress), stocks tend to bounce next day"
+     "detail": "1.10: inverted (stress), stocks tend to bounce next day"
     },
     {
      "k": "trend",
@@ -228,7 +389,21 @@
      "name": "Risk sentiment (VIX)",
      "dir": "up",
      "w": 0.5,
-     "detail": "VIX 25.6, elevated fear"
+     "detail": "VIX 28.2, elevated fear"
+    },
+    {
+     "k": "rymom",
+     "name": "Real-yield 1-week momentum",
+     "dir": "up",
+     "w": 0.5,
+     "detail": "−3 bp a week"
+    },
+    {
+     "k": "dgs2",
+     "name": "Fed expectations (2Y yield trend)",
+     "dir": "up",
+     "w": 0.5,
+     "detail": "4.46%, −15 bp a week"
     },
     {
      "k": "dxymom",
@@ -236,6 +411,13 @@
      "dir": "down",
      "w": 0.5,
      "detail": "+0.30 pts in 5 sessions"
+    },
+    {
+     "k": "smile",
+     "name": "Dollar Smile regime (USD cycle)",
+     "dir": "down",
+     "w": 0.5,
+     "detail": "left: crisis / dollar-funding stress: USD bid, risk sold, gold whipsaws then gets the haven bid"
     }
    ]
   }
@@ -249,8 +431,8 @@
    "k": "ry",
    "name": "Real yields (master driver)",
    "cluster": "rates",
-   "vote": null,
-   "detail": "no data",
+   "vote": -1,
+   "detail": "10Y TIPS 2.60%, falling",
    "weights": {
     "gold": 3,
     "eurusd": 1,
@@ -263,7 +445,7 @@
    "k": "macro",
    "name": "Macro composite (TIPS, DXY, seasonal, CB buying, VIX)",
    "cluster": "dollar",
-   "vote": 1,
+   "vote": 0,
    "detail": "73% gold-supportive, DXY ≈ 102.4",
    "weights": {
     "gold": 2
@@ -274,7 +456,7 @@
    "name": "Risk sentiment (VIX)",
    "cluster": "risk",
    "vote": 1,
-   "detail": "VIX 25.6, elevated fear",
+   "detail": "VIX 28.2, elevated fear",
    "weights": {
     "gold": 1,
     "eurusd": -0.5,
@@ -287,8 +469,8 @@
    "k": "rymom",
    "name": "Real-yield 1-week momentum",
    "cluster": "rates",
-   "vote": null,
-   "detail": "no data",
+   "vote": 1,
+   "detail": "−3 bp a week",
    "weights": {
     "gold": 2,
     "eurusd": 1,
@@ -301,8 +483,8 @@
    "k": "be",
    "name": "Inflation expectations (10Y breakeven)",
    "cluster": "rates",
-   "vote": null,
-   "detail": "no data",
+   "vote": -1,
+   "detail": "2.23%, −11 bp a week",
    "weights": {
     "gold": 1
    }
@@ -311,8 +493,8 @@
    "k": "dgs2",
    "name": "Fed expectations (2Y yield trend)",
    "cluster": "rates",
-   "vote": null,
-   "detail": "no data",
+   "vote": 1,
+   "detail": "4.46%, −15 bp a week",
    "weights": {
     "gold": 1,
     "eurusd": 1,
@@ -325,8 +507,8 @@
    "k": "dgs10",
    "name": "US 10Y yield trend (US-Japan rate gap)",
    "cluster": "rates",
-   "vote": null,
-   "detail": "no data",
+   "vote": -1,
+   "detail": "4.84%, −14 bp a week",
    "weights": {
     "usdjpy": 1.5
    }
@@ -359,8 +541,8 @@
    "k": "curve",
    "name": "Yield curve (10Y−3M)",
    "cluster": "rates",
-   "vote": null,
-   "detail": "no data",
+   "vote": 0,
+   "detail": "0.67%",
    "weights": {
     "gold": 1
    }
@@ -369,8 +551,8 @@
    "k": "hy",
    "name": "Credit stress (HY spreads)",
    "cluster": "risk",
-   "vote": null,
-   "detail": "no data",
+   "vote": 1,
+   "detail": "3.48%, +22 bp a week",
    "weights": {
     "gold": 1,
     "eurusd": -0.5,
@@ -384,7 +566,7 @@
    "name": "Dollar Smile regime (USD cycle)",
    "cluster": "dollar",
    "vote": 0,
-   "detail": "mid: transitional: no dominant USD force",
+   "detail": "left: crisis / dollar-funding stress: USD bid, risk sold, gold whipsaws then gets the haven bid",
    "weights": {
     "gold": 1,
     "eurusd": 1,
@@ -394,18 +576,18 @@
    },
    "perAsset": {
     "gold": 0,
-    "eurusd": 0,
-    "usdjpy": 0,
-    "nq": 0,
-    "es": 0
+    "eurusd": -1,
+    "usdjpy": -1,
+    "nq": -1,
+    "es": -1
    }
   },
   {
    "k": "eugrowth",
    "name": "Eurozone growth pulse (OECD confidence, Germany)",
    "cluster": "dollar",
-   "vote": null,
-   "detail": "no data",
+   "vote": 0,
+   "detail": "98.9, −0.2 over 5 releases",
    "weights": {
     "gold": 1,
     "eurusd": 1
@@ -424,7 +606,7 @@
    "name": "VIX term structure (VIX / VIX3M)",
    "cluster": "risk",
    "vote": 1,
-   "detail": "1.04: inverted (stress), stocks tend to bounce next day",
+   "detail": "1.10: inverted (stress), stocks tend to bounce next day",
    "weights": {
     "nq": 1,
     "es": 1
@@ -434,8 +616,8 @@
    "k": "liq",
    "name": "Dollar liquidity (Fed balance sheet − RRP − TGA)",
    "cluster": "risk",
-   "vote": null,
-   "detail": "no data",
+   "vote": -1,
+   "detail": "$5.79tn, −76bn in 4 weeks",
    "weights": {}
   },
   {
@@ -532,18 +714,18 @@
    "gold": {
     "n": 880,
     "upRate": 0.537,
-    "hit": 0.534,
+    "hit": 0.526,
     "base": 0.537,
-    "edge": -0.003,
-    "z": -0.2,
-    "pt": 0.5,
-    "brier": 0.2494,
+    "edge": -0.011,
+    "z": -0.68,
+    "pt": 0.15,
+    "brier": 0.249,
     "brierRW": 0.25,
     "brierClim": 0.2486,
-    "skillRW": 0.0026,
-    "skillClim": -0.0031,
-    "logLoss": 0.6919,
-    "ece": 0.019,
+    "skillRW": 0.0039,
+    "skillClim": -0.0017,
+    "logLoss": 0.6912,
+    "ece": 0.027,
     "calib": [
      {
       "bin": "0-40%",
@@ -553,39 +735,39 @@
      },
      {
       "bin": "40-45%",
-      "n": 0,
-      "p": null,
-      "obs": null
+      "n": 5,
+      "p": 0.445,
+      "obs": 1
      },
      {
       "bin": "45-48%",
-      "n": 19,
-      "p": 0.47,
-      "obs": 0.579
+      "n": 54,
+      "p": 0.471,
+      "obs": 0.444
      },
      {
       "bin": "48-50%",
-      "n": 84,
-      "p": 0.489,
-      "obs": 0.5
+      "n": 97,
+      "p": 0.49,
+      "obs": 0.557
      },
      {
       "bin": "50-52%",
-      "n": 77,
+      "n": 110,
       "p": 0.512,
-      "obs": 0.623
+      "obs": 0.464
      },
      {
       "bin": "52-55%",
-      "n": 560,
-      "p": 0.536,
-      "obs": 0.53
+      "n": 325,
+      "p": 0.534,
+      "obs": 0.551
      },
      {
       "bin": "55-60%",
-      "n": 140,
-      "p": 0.551,
-      "obs": 0.536
+      "n": 289,
+      "p": 0.563,
+      "obs": 0.554
      },
      {
       "bin": "60-100%",
@@ -598,17 +780,17 @@
    "eurusd": {
     "n": 879,
     "upRate": 0.482,
-    "hit": 0.491,
+    "hit": 0.49,
     "base": 0.518,
-    "edge": -0.026,
-    "z": -1.55,
-    "pt": -0.33,
-    "brier": 0.2507,
+    "edge": -0.027,
+    "z": -1.62,
+    "pt": -0.45,
+    "brier": 0.251,
     "brierRW": 0.25,
     "brierClim": 0.2497,
-    "skillRW": -0.0027,
-    "skillClim": -0.004,
-    "logLoss": 0.6945,
+    "skillRW": -0.0039,
+    "skillClim": -0.0052,
+    "logLoss": 0.6951,
     "ece": 0.025,
     "calib": [
      {
@@ -625,33 +807,33 @@
      },
      {
       "bin": "45-48%",
-      "n": 0,
-      "p": null,
-      "obs": null
+      "n": 1,
+      "p": 0.478,
+      "obs": 1
      },
      {
       "bin": "48-50%",
-      "n": 364,
+      "n": 384,
       "p": 0.495,
-      "obs": 0.489
+      "obs": 0.49
      },
      {
       "bin": "50-52%",
-      "n": 327,
-      "p": 0.508,
-      "obs": 0.483
+      "n": 305,
+      "p": 0.507,
+      "obs": 0.495
      },
      {
       "bin": "52-55%",
-      "n": 172,
-      "p": 0.528,
-      "obs": 0.465
+      "n": 169,
+      "p": 0.525,
+      "obs": 0.462
      },
      {
       "bin": "55-60%",
-      "n": 16,
-      "p": 0.56,
-      "obs": 0.5
+      "n": 20,
+      "p": 0.565,
+      "obs": 0.3
      },
      {
       "bin": "60-100%",
@@ -664,18 +846,18 @@
    "usdjpy": {
     "n": 879,
     "upRate": 0.568,
-    "hit": 0.556,
+    "hit": 0.568,
     "base": 0.568,
-    "edge": -0.011,
-    "z": -0.68,
-    "pt": -0.43,
-    "brier": 0.2459,
+    "edge": 0,
+    "z": 0,
+    "pt": null,
+    "brier": 0.2462,
     "brierRW": 0.25,
     "brierClim": 0.2454,
-    "skillRW": 0.0165,
-    "skillClim": -0.0018,
-    "logLoss": 0.6848,
-    "ece": 0.031,
+    "skillRW": 0.0152,
+    "skillClim": -0.0032,
+    "logLoss": 0.6856,
+    "ece": 0.009,
     "calib": [
      {
       "bin": "0-40%",
@@ -685,63 +867,63 @@
      },
      {
       "bin": "40-45%",
-      "n": 12,
-      "p": 0.45,
-      "obs": 0.417
+      "n": 0,
+      "p": null,
+      "obs": null
      },
      {
       "bin": "45-48%",
-      "n": 9,
-      "p": 0.474,
-      "obs": 0.556
+      "n": 0,
+      "p": null,
+      "obs": null
      },
      {
       "bin": "48-50%",
-      "n": 31,
-      "p": 0.494,
-      "obs": 0.677
+      "n": 0,
+      "p": null,
+      "obs": null
      },
      {
       "bin": "50-52%",
-      "n": 79,
-      "p": 0.511,
-      "obs": 0.582
+      "n": 5,
+      "p": 0.507,
+      "obs": 1
      },
      {
       "bin": "52-55%",
-      "n": 185,
-      "p": 0.537,
-      "obs": 0.546
+      "n": 190,
+      "p": 0.539,
+      "obs": 0.558
      },
      {
       "bin": "55-60%",
-      "n": 428,
-      "p": 0.577,
-      "obs": 0.551
+      "n": 680,
+      "p": 0.57,
+      "obs": 0.569
      },
      {
       "bin": "60-100%",
-      "n": 135,
-      "p": 0.615,
-      "obs": 0.63
+      "n": 4,
+      "p": 0.602,
+      "obs": 0.25
      }
     ]
    },
    "nq": {
     "n": 879,
     "upRate": 0.555,
-    "hit": 0.555,
+    "hit": 0.557,
     "base": 0.555,
-    "edge": 0,
-    "z": 0,
-    "pt": null,
-    "brier": 0.248,
+    "edge": 0.002,
+    "z": 0.14,
+    "pt": 1.23,
+    "brier": 0.2476,
     "brierRW": 0.25,
     "brierClim": 0.247,
-    "skillRW": 0.008,
-    "skillClim": -0.0042,
-    "logLoss": 0.6892,
-    "ece": 0.036,
+    "skillRW": 0.0096,
+    "skillClim": -0.0026,
+    "logLoss": 0.6884,
+    "ece": 0.04,
     "calib": [
      {
       "bin": "0-40%",
@@ -763,51 +945,51 @@
      },
      {
       "bin": "48-50%",
-      "n": 0,
-      "p": null,
-      "obs": null
+      "n": 4,
+      "p": 0.497,
+      "obs": 0.25
      },
      {
       "bin": "50-52%",
-      "n": 12,
-      "p": 0.512,
-      "obs": 0.5
+      "n": 21,
+      "p": 0.511,
+      "obs": 0.619
      },
      {
       "bin": "52-55%",
-      "n": 150,
-      "p": 0.54,
-      "obs": 0.6
+      "n": 174,
+      "p": 0.538,
+      "obs": 0.592
      },
      {
       "bin": "55-60%",
-      "n": 648,
-      "p": 0.575,
-      "obs": 0.54
+      "n": 576,
+      "p": 0.572,
+      "obs": 0.533
      },
      {
       "bin": "60-100%",
-      "n": 69,
-      "p": 0.606,
-      "obs": 0.609
+      "n": 104,
+      "p": 0.612,
+      "obs": 0.615
      }
     ]
    },
    "es": {
     "n": 877,
     "upRate": 0.54,
-    "hit": 0.536,
+    "hit": 0.539,
     "base": 0.54,
-    "edge": -0.005,
-    "z": -0.27,
-    "pt": 0.13,
-    "brier": 0.2489,
+    "edge": -0.001,
+    "z": -0.07,
+    "pt": 0.69,
+    "brier": 0.2483,
     "brierRW": 0.25,
     "brierClim": 0.2484,
-    "skillRW": 0.0043,
-    "skillClim": -0.0023,
-    "logLoss": 0.691,
-    "ece": 0.01,
+    "skillRW": 0.0068,
+    "skillClim": 0.0003,
+    "logLoss": 0.6897,
+    "ece": 0.026,
     "calib": [
      {
       "bin": "0-40%",
@@ -823,39 +1005,39 @@
      },
      {
       "bin": "45-48%",
-      "n": 17,
-      "p": 0.475,
-      "obs": 0.647
+      "n": 23,
+      "p": 0.472,
+      "obs": 0.478
      },
      {
       "bin": "48-50%",
-      "n": 45,
-      "p": 0.491,
-      "obs": 0.489
+      "n": 64,
+      "p": 0.493,
+      "obs": 0.516
      },
      {
       "bin": "50-52%",
-      "n": 110,
-      "p": 0.512,
-      "obs": 0.509
+      "n": 143,
+      "p": 0.51,
+      "obs": 0.573
      },
      {
       "bin": "52-55%",
-      "n": 403,
-      "p": 0.538,
-      "obs": 0.543
+      "n": 358,
+      "p": 0.535,
+      "obs": 0.508
      },
      {
       "bin": "55-60%",
-      "n": 302,
-      "p": 0.562,
-      "obs": 0.55
+      "n": 285,
+      "p": 0.567,
+      "obs": 0.575
      },
      {
       "bin": "60-100%",
-      "n": 0,
-      "p": null,
-      "obs": null
+      "n": 4,
+      "p": 0.603,
+      "obs": 0.5
      }
     ]
    }
@@ -932,10 +1114,28 @@
   "replayDays": 1000,
   "driverHit": {
    "gold": {
-    "macro": {
-     "n": 864,
-     "hit": 0.529,
-     "t": 1.7,
+    "ry": {
+     "n": 752,
+     "hit": 0.516,
+     "t": 0.88,
+     "proven": false
+    },
+    "rymom": {
+     "n": 863,
+     "hit": 0.52,
+     "t": 1.19,
+     "proven": false
+    },
+    "be": {
+     "n": 745,
+     "hit": 0.487,
+     "t": -0.7,
+     "proven": false
+    },
+    "dgs2": {
+     "n": 804,
+     "hit": 0.537,
+     "t": 2.12,
      "proven": false
     },
     "dxymom": {
@@ -944,10 +1144,22 @@
      "t": -0.58,
      "proven": false
     },
+    "curve": {
+     "n": 592,
+     "hit": 0.534,
+     "t": 1.64,
+     "proven": false
+    },
     "smile": {
-     "n": 374,
-     "hit": 0.513,
-     "t": 0.52,
+     "n": 539,
+     "hit": 0.514,
+     "t": 0.65,
+     "proven": false
+    },
+    "eugrowth": {
+     "n": 291,
+     "hit": 0.502,
+     "t": 0.06,
      "proven": false
     },
     "trend": {
@@ -956,10 +1168,22 @@
      "t": -0.19,
      "proven": false
     },
+    "macro": {
+     "n": 608,
+     "hit": 0.538,
+     "t": 1.87,
+     "proven": false
+    },
     "vix": {
      "n": 388,
      "hit": 0.49,
      "t": -0.41,
+     "proven": false
+    },
+    "hy": {
+     "n": 410,
+     "hit": 0.532,
+     "t": 1.28,
      "proven": false
     },
     "cot": {
@@ -970,6 +1194,24 @@
     }
    },
    "eurusd": {
+    "ry": {
+     "n": 751,
+     "hit": 0.489,
+     "t": -0.62,
+     "proven": false
+    },
+    "rymom": {
+     "n": 862,
+     "hit": 0.485,
+     "t": -0.89,
+     "proven": false
+    },
+    "dgs2": {
+     "n": 803,
+     "hit": 0.486,
+     "t": -0.81,
+     "proven": false
+    },
     "dxymom": {
      "n": 759,
      "hit": 0.485,
@@ -977,9 +1219,15 @@
      "proven": false
     },
     "smile": {
-     "n": 394,
-     "hit": 0.464,
-     "t": -1.41,
+     "n": 652,
+     "hit": 0.486,
+     "t": -0.7,
+     "proven": false
+    },
+    "eugrowth": {
+     "n": 290,
+     "hit": 0.479,
+     "t": -0.7,
      "proven": false
     },
     "trend": {
@@ -993,9 +1241,39 @@
      "hit": 0.494,
      "t": -0.25,
      "proven": false
+    },
+    "hy": {
+     "n": 409,
+     "hit": 0.487,
+     "t": -0.54,
+     "proven": false
     }
    },
    "usdjpy": {
+    "ry": {
+     "n": 751,
+     "hit": 0.534,
+     "t": 1.86,
+     "proven": false
+    },
+    "rymom": {
+     "n": 862,
+     "hit": 0.517,
+     "t": 1.02,
+     "proven": false
+    },
+    "dgs2": {
+     "n": 803,
+     "hit": 0.518,
+     "t": 1.02,
+     "proven": false
+    },
+    "dgs10": {
+     "n": 640,
+     "hit": 0.508,
+     "t": 0.4,
+     "proven": false
+    },
     "dxymom": {
      "n": 760,
      "hit": 0.516,
@@ -1008,14 +1286,44 @@
      "t": 1.99,
      "proven": false
     },
+    "smile": {
+     "n": 349,
+     "hit": 0.533,
+     "t": 1.23,
+     "proven": false
+    },
     "vix": {
      "n": 388,
      "hit": 0.577,
      "t": 3.05,
      "proven": true
+    },
+    "hy": {
+     "n": 410,
+     "hit": 0.517,
+     "t": 0.69,
+     "proven": false
     }
    },
    "nq": {
+    "ry": {
+     "n": 752,
+     "hit": 0.505,
+     "t": 0.29,
+     "proven": false
+    },
+    "rymom": {
+     "n": 862,
+     "hit": 0.527,
+     "t": 1.57,
+     "proven": false
+    },
+    "dgs2": {
+     "n": 803,
+     "hit": 0.501,
+     "t": 0.04,
+     "proven": false
+    },
     "dxymom": {
      "n": 759,
      "hit": 0.51,
@@ -1023,9 +1331,9 @@
      "proven": false
     },
     "smile": {
-     "n": 393,
-     "hit": 0.562,
-     "t": 2.47,
+     "n": 417,
+     "hit": 0.537,
+     "t": 1.52,
      "proven": false
     },
     "trend": {
@@ -1040,6 +1348,12 @@
      "t": -0.41,
      "proven": false
     },
+    "hy": {
+     "n": 410,
+     "hit": 0.505,
+     "t": 0.2,
+     "proven": false
+    },
     "vixts": {
      "n": 44,
      "hit": 0.545,
@@ -1048,6 +1362,24 @@
     }
    },
    "es": {
+    "ry": {
+     "n": 750,
+     "hit": 0.516,
+     "t": 0.88,
+     "proven": false
+    },
+    "rymom": {
+     "n": 861,
+     "hit": 0.533,
+     "t": 1.94,
+     "proven": false
+    },
+    "dgs2": {
+     "n": 801,
+     "hit": 0.512,
+     "t": 0.67,
+     "proven": false
+    },
     "dxymom": {
      "n": 758,
      "hit": 0.515,
@@ -1055,9 +1387,9 @@
      "proven": false
     },
     "smile": {
-     "n": 392,
-     "hit": 0.551,
-     "t": 2.02,
+     "n": 416,
+     "hit": 0.538,
+     "t": 1.57,
      "proven": false
     },
     "trend": {
@@ -1070,6 +1402,12 @@
      "n": 387,
      "hit": 0.504,
      "t": 0.15,
+     "proven": false
+    },
+    "hy": {
+     "n": 409,
+     "hit": 0.526,
+     "t": 1.04,
      "proven": false
     },
     "vixts": {
@@ -1085,31 +1423,31 @@
   "method": "Walk-forward: each replay day uses only data published before it (FRED with publication lags, candles before the day); the score-to-probability map (anchored on the base up-rate, strongly shrunk, capped 35-65%) is refitted every 20 days on earlier days only (needs 120). Target: the next UTC weekday candle, up if close > open. Base rate = the share of the more common direction; coin flip (random walk) = 50% every day, Brier 0.25. Pesaran-Timmermann above 1.96 = direction calls better than chance. A 53% hit rate needs about 1,100 forecasts to tell from luck. The live log is append-only, written from 21:00 UTC before each day opens."
  },
  "sources": {
-  "fred:DFII10": "failed (The operation was aborted due to timeout)",
-  "fred:DGS2": "failed (The operation was aborted due to timeout)",
-  "fred:DGS10": "failed (The operation was aborted due to timeout)",
-  "fred:T10YIE": "failed (The operation was aborted due to timeout)",
-  "fred:T10Y3M": "failed (The operation was aborted due to timeout)",
-  "fred:BAMLH0A0HYM2": "failed (The operation was aborted due to timeout)",
-  "fred:DTWEXBGS": "failed (The operation was aborted due to timeout)",
-  "fred:WALCL": "failed (The operation was aborted due to timeout)",
-  "fred:RRPONTSYD": "failed (The operation was aborted due to timeout)",
-  "fred:WTREGEN": "failed (The operation was aborted due to timeout)",
-  "fred:SOFR": "failed (The operation was aborted due to timeout)",
-  "fred:EFFR": "failed (The operation was aborted due to timeout)",
-  "fred:SWPT": "failed (The operation was aborted due to timeout)",
-  "fred:BSCICP03DEM665S": "failed (The operation was aborted due to timeout)",
-  "fred:VXVCLS": "FRED failed (The operation was aborted due to timeout), Cboe ok, last 2026-11-06",
-  "fred:VIXCLS": "FRED failed (The operation was aborted due to timeout), Cboe ok, last 2026-11-06",
+  "fred:DGS10": "ok, last 2026-11-05",
+  "fred:T10YIE": "ok, last 2026-11-06",
+  "fred:DGS2": "ok, last 2026-11-05",
+  "fred:BAMLH0A0HYM2": "ok, last 2026-11-05",
+  "fred:VIXCLS": "ok, last 2026-11-05",
+  "fred:DTWEXBGS": "ok, last 2026-10-30",
+  "fred:DFII10": "ok, last 2026-11-05",
+  "fred:T10Y3M": "ok, last 2026-11-06",
+  "fred:RRPONTSYD": "ok, last 2026-11-06",
+  "fred:WALCL": "ok, last 2026-11-04",
+  "fred:WTREGEN": "ok, last 2026-11-04",
+  "fred:VXVCLS": "ok, last 2026-11-05",
+  "fred:SOFR": "ok, last 2026-11-05",
+  "fred:SWPT": "ok, last 2026-11-04",
+  "fred:EFFR": "ok, last 2026-11-05",
+  "fred:BSCICP03DEM665S": "ok, last 2024-01-01",
   "ecb:2y": "ok, last 2026-11-05",
   "bars:eurusd": "OANDA ok (1400 days)",
-  "bars:gold": "OANDA ok (1400 days)",
   "bars:usdjpy": "OANDA ok (1400 days)",
   "bars:nq": "OANDA ok (1400 days)",
-  "bars:usdcad": "OANDA ok (1400 days)",
+  "bars:gold": "OANDA ok (1400 days)",
   "bars:gbpusd": "OANDA ok (1400 days)",
-  "bars:usdchf": "OANDA ok (1400 days)",
   "bars:es": "OANDA ok (1400 days)",
+  "bars:usdcad": "OANDA ok (1400 days)",
+  "bars:usdchf": "OANDA ok (1400 days)",
   "calendar:thisweek": "ok (116 events)",
   "calendar:nextweek": "failed (HTTP 404)",
   "rss:Fed": "ok (20 items)",
@@ -1117,5 +1455,5 @@
   "rss:ECB": "ok (15 items)",
   "cot": "ok (200 weeks)"
  },
- "brief": "Macro strategist, Sat 7 Nov 20:43 UTC, for Mon 9 Nov (UTC day, open to close). Regime: transitional dollar · liquidity n/a · VIX curve inverted (stress). Gold: 54% up (base rate 54%; base rate, no macro tilt, the replay finds no edge in its drivers). Drivers lean up: macro composite, risk sentiment; against: usd 5-day momentum. Typical move ±0.6%. EUR/USD: 49% up (base rate 49%; base rate, no macro tilt, the replay finds no edge in its drivers). Drivers lean down: usd 5-day momentum, own price trend. Typical move ±0.22%. USD/JPY: 58% up (base rate 56%; macro tilt up 2 pts). Drivers lean up: usd 5-day momentum, own price trend; against: risk sentiment. Typical move ±0.18%. NQ (Nasdaq 100): 55% up (base rate 56%; base rate, no macro tilt). Drivers lean up: vix term structure, risk sentiment; against: own price trend. Typical move ±1.24%. ES (S&P 500): 53% up (base rate 54%; base rate, no macro tilt). Drivers lean up: vix term structure, risk sentiment; against: own price trend. Typical move ±0.54%. DXY: 51% up (mirror of EUR/USD). No high-impact events in the next 5 days on the calendar we could read. Honesty check: on the 880-day walk-forward replay the gold calls hit 53% against a 54% base rate (Brier 0.2494 vs 0.25 for a coin flip, Pesaran-Timmermann 0.5): no proven edge (about the base rate). Event days moved gold 1.118% on average against 0.836% on other days: the size of the move is the more reliable forecast. Treat the direction odds as context, not trade signals."
+ "brief": "Macro strategist, Sat 7 Nov 20:44 UTC, for Mon 9 Nov (UTC day, open to close). Regime: Dollar Smile left side (stress) · dollar liquidity draining · VIX curve inverted (stress). Gold: 54% up (base rate 54%; base rate, no macro tilt). Drivers lean up: real-yield 1-week momentum, risk sentiment; against: real yields. Typical move ±0.6%. EUR/USD: 49% up (base rate 49%; base rate, no macro tilt, the replay finds no edge in its drivers). Drivers lean down: real yields, usd 5-day momentum; against: real-yield 1-week momentum. Typical move ±0.22%. USD/JPY: 55% up (base rate 56%; macro tilt down 1 pt). Drivers lean down: us 10y yield trend, real-yield 1-week momentum; against: real yields. Typical move ±0.18%. NQ (Nasdaq 100): 55% up (base rate 56%; macro tilt down 1 pt). Drivers lean down: real yields, credit stress; against: real-yield 1-week momentum. Typical move ±1.24%. ES (S&P 500): 52% up (base rate 54%; macro tilt down 2 pts). Drivers lean down: real yields, credit stress; against: vix term structure. Typical move ±0.54%. DXY: 51% up (mirror of EUR/USD). No high-impact events in the next 5 days on the calendar we could read (next week's calendar is not published yet; it usually appears over the weekend). Honesty check: on the 880-day walk-forward replay the gold calls hit 53% against a 54% base rate (Brier 0.249 vs 0.25 for a coin flip, Pesaran-Timmermann 0.15): no proven edge (about the base rate). Event days moved gold 1.118% on average against 0.836% on other days: the size of the move is the more reliable forecast. Treat the direction odds as context, not trade signals."
 }
