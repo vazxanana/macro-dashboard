@@ -635,8 +635,13 @@ for (const [key, M] of Object.entries(MARKETS)) {
       const s = r.side === 'sell', r0 = Math.abs(r.entry - r.stop);
       for (const b of bars) {
         if (b.time < r.checked) continue;
+        // 8 Nov (gold-fidelity): research rows follow the live fills rules too: no fill or exit on a candle while spot is shut
+        // (weekend, 17:00 NY rollover minutes); a fill candle that also reached the target counts as missed, never as a win
+        if (M.group !== 'Crypto' && spotSkip(b.time)) continue;
         if (r.status === 'pending') {
-          if (s ? b.high >= r.entry : b.low <= r.entry) { r.status = 'open'; r.filled = b.time; }
+          if (s ? b.high >= r.entry : b.low <= r.entry) {
+            if (fillBarAmbiguous(b, s, r.entry, r.stop, r.t1)) { r.status = 'missed'; r.R = 0; r.closed = b.time; r.exit = 'fill and target in one candle'; break; }
+            r.status = 'open'; r.filled = b.time; }
           else if (s ? b.low <= r.t1 : b.high >= r.t1) { r.status = 'missed'; r.R = 0; r.closed = b.time; break; }
           else { if (b.time > r.validUntil) { r.status = 'expired'; r.R = 0; r.closed = b.time; break; } continue; }
         }
@@ -1030,6 +1035,7 @@ for (const [key, M] of Object.entries(MARKETS)) {
       const s = r.side === 'sell', r0 = Math.abs(r.entry - r.stop);
       for (const b of bars) {
         if (b.time < r.checked) continue;
+        if (M.group !== 'Crypto' && spotSkip(b.time)) continue;   // 8 Nov: spot shut (weekend / rollover) decides nothing, as live
         if (s ? b.high >= r.stop : b.low <= r.stop) { const px = stopFill(b, s, r.stop, b.time > (r.filled || r.opened)); r.status = 'loss'; r.R = px === r.stop ? -1 : exitR(s, r.entry, px, r0); r.closed = b.time; break; }
         if (s ? b.low <= r.t1 : b.high >= r.t1) { r.status = 'win'; r.R = +((Math.abs(r.t1 - r.entry)) / r0).toFixed(2); r.closed = b.time; break; }
         if (b.time >= r.closeBy) { const R = +((s ? r.entry - b.close : b.close - r.entry) / r0).toFixed(2); r.status = R > 0 ? 'win' : R < 0 ? 'loss' : 'be'; r.R = R; r.closed = b.time; r.exit = r.exitLabel || '8 h'; break; }
