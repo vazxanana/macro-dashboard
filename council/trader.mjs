@@ -217,6 +217,9 @@ const USER_RULES = [
   { id: 'gold-trend-add', apply: (c) => { c.goldTrendAdd = { atR: 1 }; },
     change: 'Gold trend: one add. When a closed daily candle is +1R (2 ATR at entry) above the entry, a second unit buys at market on the next run with the same ratcheting stop; it exits with the first unit',
     why: 'Owner: apply it. Spot gold 2023-24 | 2025-26, N20 with the 2 ATR trail: +9.9R (DD -2.0) | +24.1R (DD -1.0) without the add; +13.2R (DD -2.5) | +41.1R (DD -1.0) with it; N10 and N55 show the same gain. The add roughly doubles the 2025-26 result for half an R of extra early drawdown.' },
+  { id: 'gold-trend-fast', apply: (c) => { c.goldTrendFast = { n: 5, k: 2 }; },
+    change: 'Gold trend fast (new paper leg): the gold trend rule on the prior 5 daily highs instead of 20 (a daily close above them buys at market on the next run; stop 2 x ATR(D1,14), lifted to daily close - 2 ATR each closed day; one add at +1R); its own position next to the 20-day leg; sizing guide 0.25%',
+    why: 'Owner goal: use all the skills to make the council more profitable with higher returns. Every skill rule was tested and none beat the live stack (research log 7 Nov); the gold book trades too rarely. Spot gold 1m, 0.30 cost, add at +1R: N5 alone +35.2R (2019-22, n43, DD -4.5) | +24.9R (2023-24, n22, DD -2.4) | +45.2R (2025-26, n18, DD -2.9), positive every year 2019-2026 (2022 +7.2, 2026 +9.7; Feb-Jun 2026 -2.3R over 4). Gold book in % of account (replica, trendline, engulf 0.25%, gold trend 0.5%): +39.3% DD -2.34% | +68.6% DD -6.21%; with N5 at 0.25%: +45.5% DD -2.61% | +79.9% DD -6.47% (return per drawdown 17.4 vs 16.8 | 12.3 vs 11.0). Judged on return per drawdown as a new leg, not as a rule change.' },
   { id: 'gold-momentum-pullback', apply: (c) => { c.goldMP = { mult: 1.5, top: 0.8, z1: 0.382, z2: 0.618, wait: 6, k: 2 }; },
     change: 'Gold momentum pullback (TEST since 6 Nov: recorded as shadow trades labelled test, not counted as a live system; both sides): a closed H1 candle whose range is at least 1.5x the average of the previous 14 H1 ranges and which closes in its top (buys) / bottom (sells) 20%, in the direction of the 20-day average, between 07:00 and 17:00 UTC; then the first M5 candle within 6 h that trades into the 38-62% pullback of that H1 candle and closes in the trade direction enters at market; stop 0.1 beyond the H1 candle; after +2R the stop trails 1R behind the best price (cap 10R); out after 8 h; cancelled if the stop is hit before the entry',
     why: 'Owner: find a good scalp for a raw-spread account. Every M1 and session scalp tested was zero before costs; this one is not. Spot gold 2023-24 | 2025-26 at 0.15 all-in cost: +0.105R | +0.171R a trade (n234/186, worst drawdown -9.1R | -9.5R), positive at 0.10, 0.20 and 0.30 cost, for range multiples 1.25-1.5, top 75-90%, pullback zones 23-50 / 38-62 / 50-79%, waits 3-6 h, 1.5R / 2R / 3R / trail; Feb-Jun 2026 bear window +2.8R. Without the 20-day direction it halves. Median stop 7.8 points, ~110 trades a year, entries 07-17 UTC.' },
@@ -440,7 +443,7 @@ for (const [key, M] of Object.entries(MARKETS)) {
       setups: setups.map((t) => ({ k: t.k, name: t.name, pair: t.pair, side: t.sell ? 'sell' : 'buy', state: t.state, entry: t.entry, stop: t.stop, t1: t.t1, rr: +t.rr.toFixed(2), next: t.next, retrace: !!t.retrace })),
     };
 
-    if (config.retireLegacy) for (const tr of trades.filter((x) => x.market === key && !x.shadow && !['replica', 'mosha-bo', 'trend', 'gtrend', 'gtl', 'geg', 'gmp'].includes(x.k) && (x.status === 'open' || x.status === 'pending'))) {
+    if (config.retireLegacy) for (const tr of trades.filter((x) => x.market === key && !x.shadow && !['replica', 'mosha-bo', 'trend', 'gtrend', 'gtrend5', 'gtl', 'geg', 'gmp'].includes(x.k) && (x.status === 'open' || x.status === 'pending'))) {
       if (tr.status === 'pending') { tr.status = 'expired'; tr.R = 0; } else { const r0 = tr.r0 || Math.abs(tr.entry - tr.stop), R = +(((tr.side === 'sell' ? -1 : 1) * (price - tr.entry)) / r0).toFixed(2); tr.R = R; tr.status = R > 0 ? 'win' : R < 0 ? 'loss' : 'be'; }
       tr.closed = now; tr.exit = 'retired';
     }
@@ -598,12 +601,13 @@ for (const [key, M] of Object.entries(MARKETS)) {
     // Gold trend (5 Nov, user rule gold-trend): daily close above the prior N daily highs -> long at market on the next run; stop k x ATR(D1,14)
     // below, lifted to (daily close - k ATR) on each closed day (chandelier); no target, no time limit. Spot gold 2019-26: +0.31 | +1.07 | +2.42R a
     // trade (2019-22 | 2023-24 | 2025-26), shorts lose in every period, so long only. The general loop manages the stop hit.
-    if (key === 'xau' && config.goldTrend) {
+    // Gold trend fast (7 Nov, user rule gold-trend-fast): the same rule on the prior 5 daily highs runs as its own leg (k 'gtrend5')
+    for (const LEG of [{ cfg: config.goldTrend, k: 'gtrend', name: 'Gold trend', snap: 'goldTrend' }, { cfg: config.goldTrendFast, k: 'gtrend5', name: 'Gold trend fast', snap: 'goldTrendFast' }]) if (key === 'xau' && LEG.cfg) {
       try {
-        const GT = config.goldTrend, D = src['1d'].bars.slice(0, -1), n = D.length, last = D[n - 1], dp = Math.max(2, (M.dec ?? 2) + 1);
+        const GT = LEG.cfg, D = src['1d'].bars.slice(0, -1), n = D.length, last = D[n - 1], dp = Math.max(2, (M.dec ?? 2) + 1);
         const tr14 = (i) => Math.max(D[i].high - D[i].low, Math.abs(D[i].high - D[i - 1].close), Math.abs(D[i].low - D[i - 1].close));
         const atr14 = (i) => { let a = 0; for (let j = i - 13; j <= i; j++) a += tr14(j); return a / 14; };
-        const open = trades.find((x) => x.k === 'gtrend' && x.market === key && !x.shadow && x.status === 'open');
+        const open = trades.find((x) => x.k === LEG.k && x.market === key && !x.shadow && x.status === 'open');
         if (n > GT.n + 15) {
           if (open) {
             // one ratchet per newly closed daily candle
@@ -612,23 +616,23 @@ for (const [key, M] of Object.entries(MARKETS)) {
               // gold-trend-add (6 Nov): one add at market when a closed daily candle is +atR R above the entry; same stop, exits with the first unit
               if (config.goldTrendAdd && !gAdd && !trades.some((x) => x.addOf === open.id) && last.close - open.entry >= config.goldTrendAdd.atR * open.r0) {
                 const ae = +price.toFixed(dp), rA = ae - open.stop;
-                if (rA > 0) trades.push({ id: `${open.id}-add`, market: key, label: M.label, dec: M.dec, k: 'gtrend', name: 'Gold trend add', pair: open.pair, h: '1d', side: 'buy',
+                if (rA > 0) trades.push({ id: `${open.id}-add`, market: key, label: M.label, dec: M.dec, k: LEG.k, name: `${LEG.name} add`, pair: open.pair, h: '1d', side: 'buy',
                   entry: ae, stop: open.stop, t1: +(ae * 100).toFixed(2), rr: 99, trail: [1e6, 0], size: 1, buf: CFG.buf, opened: now, filled: now, checked: now, status: 'open', R: null, r0: rA, noBe: true, entryMode: 'market', addOf: open.id, shadow: false, blockedBy: [],
-                  note: `Gold trend add: daily close ${last.close} is +${config.goldTrendAdd.atR}R above the first entry ${open.entry}, so a second unit buys ${ae} with the same stop ${open.stop}; the stop keeps rising with the daily closes; out with the first unit.` });
+                  note: `${LEG.name} add: daily close ${last.close} is +${config.goldTrendAdd.atR}R above the first entry ${open.entry}, so a second unit buys ${ae} with the same stop ${open.stop}; the stop keeps rising with the daily closes; out with the first unit.` });
               } }
           } else {
-            const hi = Math.max(...D.slice(n - 1 - GT.n, n - 1).map((b) => b.high)), A = atr14(n - 1), id = `${key}-gtrend-${last.time}`;
+            const hi = Math.max(...D.slice(n - 1 - GT.n, n - 1).map((b) => b.high)), A = atr14(n - 1), id = `${key}-${LEG.k}-${last.time}`;
             if (last.close > hi && A > 0 && !trades.some((x) => x.id === id) && now - (last.time + 86400) < 86400) {
               const entry = +price.toFixed(dp), stop = +(entry - GT.k * A).toFixed(dp), r0 = entry - stop;
-              if (r0 > 0) trades.push({ id, market: key, label: M.label, dec: M.dec, k: 'gtrend', name: 'Gold trend', pair: `D1 ${GT.n}-day breakout`, h: '1d', side: 'buy',
+              if (r0 > 0) trades.push({ id, market: key, label: M.label, dec: M.dec, k: LEG.k, name: LEG.name, pair: `D1 ${GT.n}-day breakout`, h: '1d', side: 'buy',
                 entry, stop, t1: +(entry * 100).toFixed(2), rr: 99, trail: [1e6, 0], buf: CFG.buf, opened: now, filled: now, checked: now, status: 'open', R: null, r0, noBe: true, entryMode: 'market', lastD: last.time,
                 feat: { hi: +hi.toFixed(2), atr: +A.toFixed(2) }, shadow: false, blockedBy: [],
-                note: `Gold trend: daily close ${last.close} above the ${GT.n}-day high ${hi.toFixed(2)}. Buy at market, stop ${GT.k} x ATR(D1) below (${stop}); the stop rises to (daily close - ${GT.k} ATR) on every closed day; no target.` });
+                note: `${LEG.name}: daily close ${last.close} above the ${GT.n}-day high ${hi.toFixed(2)}. Buy at market, stop ${GT.k} x ATR(D1) below (${stop}); the stop rises to (daily close - ${GT.k} ATR) on every closed day; no target.` });
             }
           }
         }
-        (snapshot.goldTrend = snapshot.goldTrend || {}).state = { hi20: n > GT.n ? +Math.max(...D.slice(n - 1 - GT.n, n - 1).map((b) => b.high)).toFixed(2) : null, lastClose: last && last.close, open: !!open, stop: open ? open.stop : null };
-      } catch (e) { snapshot.errors.goldTrend = String(e.message || e); }
+        (snapshot[LEG.snap] = snapshot[LEG.snap] || {}).state = { hi20: n > GT.n ? +Math.max(...D.slice(n - 1 - GT.n, n - 1).map((b) => b.high)).toFixed(2) : null, lastClose: last && last.close, open: !!open, stop: open ? open.stop : null };
+      } catch (e) { snapshot.errors[LEG.snap] = String(e.message || e); }
     }
     if (key === 'xau' && config.goldTL) {
       try {
@@ -1346,7 +1350,7 @@ wr('trades.json', trades);
 // Our live systems only (gold replica, Mosha BO, crypto trend, with their adds) plus the NQ open run (research, 10-min-late feed,
 // the EA mirrors it only if the owner turns that on); shadow trades never. Rows for the last 7 days so the EA can close what it holds.
 try {
-  const SYSK = ['replica', 'mosha-bo', 'trend', 'gtrend', 'gtl', 'geg', 'gmp'], cut = now - 7 * 86400;
+  const SYSK = ['replica', 'mosha-bo', 'trend', 'gtrend', 'gtrend5', 'gtl', 'geg', 'gmp'], cut = now - 7 * 86400;
   const rows = trades.filter((x) => !x.shadow && SYSK.includes(x.k) && (x.status === 'open' || x.status === 'pending' || (x.closed || x.opened || 0) >= cut))
     .concat(research.filter((x) => x.k === 'nq-open' && x.session === 'nyflip' && (x.status === 'open' || (x.closed || x.opened || 0) >= cut)).map((x) => ({ ...x, k: 'nq-open', market: 'nq' })));
   const f = (v) => v == null || v === '' ? '' : typeof v === 'number' ? String(v) : String(v).replace(/[,\n"]/g, ' ');

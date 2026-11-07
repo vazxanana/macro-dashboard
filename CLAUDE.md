@@ -160,3 +160,10 @@ admin switch `.cal-src` ("Main systems" / "+ Shadow", localStorage `msCalSrc`) a
 replay (research/shadow-replay.json, about −1,200R Jun–Oct, setups the live rules block). The Home Today strip
 (`renderToday`) headlines `sysClosed()` and floating live R; shadow and retired-engine trades sit on the second line.
 
+## Gold trend fast (7 Nov 2026, owner goal: more profit from the skills)
+Second gold-trend leg `gtrend5` (user rule `gold-trend-fast`, `config.goldTrendFast = { n: 5, k: 2 }`): the gold trend rule on
+the prior 5 daily highs, its own position and add next to the 20-day leg (`gtrend`); the trader runs both from one loop
+(`LEG`). Sizing guide 0.25% (bridges: the shared gold risk). Replay 2023-Oct 2026 in research/replay-2w.json (39 trades).
+Adopted on return per drawdown of the gold book (+39.3% → +45.5% | +68.6% → +79.9%, worst drawdown −2.34 → −2.61% |
+−6.21 → −6.47%), positive every year 2019-26 alone.
+
