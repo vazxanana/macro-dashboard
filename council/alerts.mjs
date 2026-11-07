@@ -76,3 +76,34 @@ export async function sendAlerts(ev, { topic, tgTok, tgChat, fetchFn = fetch } =
   }
   return errors;
 }
+
+// Coach proposal digest (7 Nov): ONE phone message when the set of Coach proposals (council/proposals.mjs, coach.json
+// `proposals`) changes, and a reminder at most once a day while it stays the same and is not empty. Suggestions only:
+// nothing is applied, the owner OKs them on the site. The last digest sent is kept in coach.json `proposalsSent`
+// ({ key, at, items }), so a restart never resends. A stability line counts only when it is flagged (a losing half).
+export const SITE = 'https://meridianx.dev/';
+const fRm = (v) => `${v >= 0 ? '+' : '−'}${Math.abs(+v).toFixed(2)}R`, cap = (s) => String(s).charAt(0).toUpperCase() + String(s).slice(1);
+const actionable = (p) => !!p && !!p.setup && (['skipMarket', 'skipSession', 'promote', 'promoteIf', 'demote'].includes(p.kind) || (p.kind === 'stability' && !!p.flag));
+const halvesTxt = (p) => p.h1 && p.h2 ? `halves ${fRm(p.h1.exp)} / ${fRm(p.h2.exp)}` : '';
+export function proposalLine(p) {
+  const S = cap(p.setup), over = `${fRm(p.exp)} over ${p.n} replay trades`;
+  if (p.kind === 'stability') return `${S} edge unstable — ${halvesTxt(p)}`;
+  if (p.kind === 'skipMarket' || p.kind === 'skipSession') return `${p.label} for ${S} — ${over}`;
+  return `${p.label || p.kind + ' ' + p.setup} — ${over}${p.h1 && p.h2 ? ' · ' + halvesTxt(p) : ''}`;
+}
+export function proposalsKey(proposals) {
+  return (Array.isArray(proposals) ? proposals : []).filter(actionable).map((p) => `${p.setup}:${p.kind}:${p.value}`).sort().join('|');
+}
+// The digest to send now ({ ev, mark }), or null. `sent` is coach.json proposalsSent; `now` is unix seconds. Save `mark`
+// as proposalsSent once the send went out.
+export function proposalDigest(proposals, sent, now, { remindEvery = 86400 } = {}) {
+  const P = (Array.isArray(proposals) ? proposals : []).filter(actionable), key = proposalsKey(P), items = P.map(proposalLine);
+  const prev = sent && typeof sent === 'object' && typeof sent.key === 'string' ? sent : null, last = prev ? Date.parse(prev.at) / 1000 : NaN;
+  if (prev && prev.key === key && (!key || (isFinite(last) && now - last < remindEvery))) return null;   // same set: a daily reminder only
+  if (!key && !prev) return null;                                                                       // nothing suggested, nothing sent before
+  const mark = { key, at: new Date(now * 1000).toISOString(), items };
+  if (!key) return { mark, ev: { title: 'Coach suggestions withdrawn', msg: `The Coach no longer suggests: ${(prev.items || []).join('; ') || prev.key}.\nNothing to OK on the site.\n${when(now)}`, tags: 'heavy_minus_sign', click: SITE } };
+  const again = !!prev && prev.key === key;
+  return { mark, ev: { title: `Coach suggests (needs your OK on the site)${again ? ' · reminder' : ''}`,
+    msg: `${items.map((s) => '• ' + s).join('\n')}\nOpen meridianx.dev → Council → Systems. Nothing changes until you OK it (paper only).\n${when(now)}`, tags: 'bulb', click: SITE } };
+}

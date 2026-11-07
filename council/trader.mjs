@@ -7,10 +7,11 @@ import path from 'node:path';
 import { msAnalyze, CFG, PAIRS, RETR, LBL, buildSetup, buildRetrace, setMarket } from './engine.mjs';
 import { entryContext, startReview, watchReview, judge, newsNear, lessons } from './review.mjs';
 import { m15cFeat } from './choch.mjs';
-import { alertable, alertEvents, sendAlerts, when, NTFY_DEFAULT } from './alerts.mjs';
+import { alertable, alertEvents, sendAlerts, when, NTFY_DEFAULT, proposalDigest } from './alerts.mjs';
 import { liveRuleSection, injectSection } from './analyst.mjs';
 import { coachProposals } from './proposals.mjs';
 import { cleanBars, LTF_CLEAN } from './clean.mjs';
+import { voidRoundedReplicas, historyCatchUp } from './repairs.mjs';
 
 const DIR = process.argv[2] || 'data';
 fs.mkdirSync(DIR, { recursive: true });
@@ -339,6 +340,8 @@ function dailyCycle(src, price, t) {
   return { sell: bear, entry: price, stop, t1: price + (bull ? 3 : -3) * r, closeBy: t + 8 * 3600, day: d, londonHigh: hi, londonLow: lo };
 }
 let research = rd('research.json', []);
+// One-time data repairs (7 Nov, council/repairs.mjs): void the 4 Nov rounded-price replica signals; history catch-up lines
+voidRoundedReplicas(research, config, nowISO); historyCatchUp(config, nowISO);
 // ─── Research setup (paper only): the trader's gold replica (3 Nov) ───
 // Rebuilt from the four marked gold trades of 2-3 Nov: a leg of at least 2 M15 ATRs in the last 3 h or 6 h; M5 (1-candle
 // swings) closes back through the last swing against the leg (the CHoCH) = the signal. Limit entry at the 30% retest from
@@ -522,7 +525,7 @@ for (const [key, M] of Object.entries(MARKETS)) {
     }
 
     // ─── Research (paper only, research.json): manage open Daily Cycle trades, then look for today's signal ───
-    for (const r of research.filter((x) => x.market === key && x.k === 'replica' && (x.status === 'pending' || x.status === 'open'))) {
+    for (const r of research.filter((x) => x.market === key && x.k === 'replica' && !x.void && (x.status === 'pending' || x.status === 'open'))) {
       const bars = (src['1m'].bars[0].time <= r.checked ? src['1m'] : src['5m'].bars[0].time <= r.checked ? src['5m'] : src['15m']).bars;
       const s = r.side === 'sell', r0 = Math.abs(r.entry - r.stop);
       for (const b of bars) {
@@ -1333,7 +1336,7 @@ if (coach.date !== today) {
     if (sh.length >= 4 && exp(sh) > 0.3) { delete config.pausedMarkets[m]; change(`Resumed market ${m} early`, `Shadow trades while paused made +${exp(sh).toFixed(2)}R over ${sh.length}.`); }
   }
   const prev = rd('coach.json', {});   // keep the owner-facing proposals between the daily runs
-  wr('coach.json', { proposals: prev.proposals || [], proposalsKey: prev.proposalsKey || '', date: today, at: nowISO, stats, last14: rs, lessons: lessons(trades, now), fslot: nowISO.slice(0, 11) + String(Math.floor(+nowISO.slice(11, 13) / 6) * 6).padStart(2, '0'), notes: notes.length ? notes : ['No change today: not enough evidence to move a rule.'] });
+  wr('coach.json', { proposals: prev.proposals || [], proposalsKey: prev.proposalsKey || '', proposalsSent: prev.proposalsSent, date: today, at: nowISO, stats, last14: rs, lessons: lessons(trades, now), fslot: nowISO.slice(0, 11) + String(Math.floor(+nowISO.slice(11, 13) / 6) * 6).padStart(2, '0'), notes: notes.length ? notes : ['No change today: not enough evidence to move a rule.'] });
 }
 // every run: pause a setup as soon as its live record says so
 {
@@ -1783,9 +1786,9 @@ try {
     }
   }
 } catch (e) { snapshot.errors.goldNyrun = String(e.message || e); }
-{ const done = research.filter((x) => x.k === 'cycle' && (x.status === 'win' || x.status === 'loss' || x.status === 'be')), R = done.reduce((a, x) => a + x.R, 0);
+{ const done = research.filter((x) => x.k === 'cycle' && !x.void && (x.status === 'win' || x.status === 'loss' || x.status === 'be')), R = done.reduce((a, x) => a + x.R, 0);
   snapshot.research = { cycle: { closed: done.length, wins: done.filter((x) => x.status === 'win').length, R: +R.toFixed(2), open: research.filter((x) => x.k === 'cycle' && x.status === 'open').length } };
-  const rp = research.filter((x) => x.k === 'replica'), sum = (a) => { const d = a.filter((x) => x.status === 'win' || x.status === 'loss' || x.status === 'be');
+  const rp = research.filter((x) => x.k === 'replica' && !x.void), sum = (a) => { a = a.filter((x) => !x.void); const d = a.filter((x) => x.status === 'win' || x.status === 'loss' || x.status === 'be');
     return { signals: a.length, closed: d.length, wins: d.filter((x) => x.status === 'win').length, R: +d.reduce((s, x) => s + x.R, 0).toFixed(2), open: a.filter((x) => x.status === 'open').length, pending: a.filter((x) => x.status === 'pending').length }; };
   const rpx = rp.filter((x) => x.market === 'xau');
   snapshot.research.replica = { all: sum(rpx), pass: sum(rpx.filter((x) => x.pass && x.v >= 2)), v5: sum(rpx.filter((x) => x.v5)), star: sum(rpx.filter((x) => x.star)) };
@@ -1822,6 +1825,13 @@ try { const ev = [], quiet = process.env.COUNCIL_ALERTS === 'off', topic = proce
   }
   if (!quiet && ev.length) Object.assign(snapshot.errors, await sendAlerts(ev, { topic, tgTok, tgChat }));
   if (ev.length) wr('trades.json', trades);
+  // Coach proposal digest (7 Nov, council/alerts.mjs): one message when the set of proposals changes, else at most a daily
+  // reminder; marked in coach.json proposalsSent once a channel took it, so a restart never resends. Never applies anything.
+  try { const cj = rd('coach.json', {}), dg = quiet ? null : proposalDigest(cj.proposals, cj.proposalsSent, now);
+    if (dg) { const e = await sendAlerts([dg.ev], { topic, tgTok, tgChat }), tried = (topic ? 1 : 0) + (tgTok && tgChat ? 1 : 0);
+      if (Object.keys(e).length < tried) { cj.proposalsSent = dg.mark; wr('coach.json', cj); }
+      for (const [c, m] of Object.entries(e)) snapshot.errors[`digest_${c}`] = m; }
+  } catch (err) { snapshot.errors.digest = String(err.message || err); }
 } catch (err) { snapshot.errors.alerts = String(err.message || err); }
 wr('research.json', research);
 snapshot.lessons = lessons(trades, now);
