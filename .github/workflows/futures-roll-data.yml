@@ -10,6 +10,7 @@ on:
     paths:
       - '.github/workflows/futures-roll-data.yml'
       - 'research/edge/futures-roll/fetch-cnbc.mjs'
+      - 'research/edge/futures-roll/probe-cnbc.mjs'
 
 permissions:
   contents: write
@@ -40,13 +41,14 @@ jobs:
       - name: Dump CNBC candles
         run: |
           mkdir -p data/research/futures-roll
-          node research/edge/futures-roll/fetch-cnbc.mjs data/research/futures-roll/cnbc.json.gz
+          [ -f data/research/futures-roll/cnbc.json.gz ] || node research/edge/futures-roll/fetch-cnbc.mjs data/research/futures-roll/cnbc.json.gz
+          node research/edge/futures-roll/probe-cnbc.mjs data/research/futures-roll/probe.json.gz
       - name: Save to council-data
         run: |
           cd data
           git config user.name "futures-roll"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add research/futures-roll/cnbc.json.gz
+          git add research/futures-roll/
           git commit -qm "Futures roll research: CNBC candle dump $(date -u +%Y-%m-%dT%H:%MZ)" || exit 0
           for i in 1 2 3 4 5; do git pull -q --rebase origin council-data && git push -q origin HEAD:council-data && exit 0; sleep $((i * 3)); done
           exit 1
