@@ -274,6 +274,13 @@ const USER_RULES = [
   { id: 'scalp-shadow-research', apply: (c) => { c.focusSetups = (c.focusSetups || []).filter((k) => k !== 'scalp'); },
     change: 'Scalp back to shadow (owner delegated): no new live paper Scalp trades; signals still recorded as shadow',
     why: 'Live rule on HistData M1 2018-Oct 2026 (gold + 5 forex, live engine, 1 spread a trade): -0.187R a trade 2018-23 (n9,551), -0.229R 2024-26 (n4,532), negative every year and market (research/edge/regime); all 50 regime cells negative; no exit rescues it (research/edge/scalp-exits, best -0.18R); realistic costs -0.24 to -0.30R (research/edge/costs). The 30-day replay is -0.07R net now, and live forex results on spot candles were far worse than on Kraken (research/spotcheck.json).' },
+  // 7 Nov, owner's decision: Swing goes to shadow. 10-year OANDA replay of the live engine (research/edge/meridian-swing, #481):
+  // -0.095R a trade after one spread (n2,076, t -3.0), negative in both halves; no filter or exit of the 10 tested makes it
+  // positive. Swing has not traded live since 2 Nov (focus); this keeps it shadow whatever the focus lists, signals still recorded.
+  { id: 'swing-shadow-research', apply: (c) => { c.filters = c.filters || {}; const f = c.filters.swing = c.filters.swing || {}; f.off = true; (f.src = f.src || {}).off = 'user';
+      c.focusSetups = (c.focusSetups || []).filter((k) => k !== 'swing'); },
+    change: 'Swing to shadow (owner, 7 Nov): no live paper Swing trades; signals still recorded as shadow',
+    why: '10-year OANDA replay of the live engine (gold + 5 forex, one spread a trade): -0.095R a trade, n2,076, t -3.0, negative in both halves; no filter or exit of 10 tested turns it positive (research/edge/meridian-swing). Owner chose shadow.' },
 ];
 config.userRules = config.userRules || [];
 for (const u of USER_RULES) if (!config.userRules.includes(u.id)) { u.apply(config); config.userRules.push(u.id); config.history.push({ at: nowISO, by: 'user', change: u.change, why: u.why }); }

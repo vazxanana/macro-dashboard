@@ -79,3 +79,52 @@ jobs:
           git -C data add research/spotcheck.json || true
           git -C data commit -q -m "Council backtest $(date -u +%Y-%m-%dT%H:%MZ)" || exit 0
           for j in 1 2 3 4 5; do git -C data pull -q --rebase origin council-data && git -C data push -q origin HEAD:council-data && break; sleep 7; done
+
+  # Robustness audit (research/robustness.mjs): walk-forward, bootstrap, costs x1.5/x2, Monte Carlo drawdown and multiple-testing
+  # checks of every edge claim, refreshed after the nightly replay. Report only (council-data research/robustness.json + .md):
+  # it changes no rule, and a failure here never fails the backtest job.
+  robustness:
+    needs: backtest
+    if: ${{ !cancelled() }}
+    continue-on-error: true
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            research
+            council
+
+      - name: Checkout council data (only the files the audit reads)
+        uses: actions/checkout@v4
+        with:
+          ref: council-data
+          path: data
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            /backtest.json
+            /config.json
+            /ict/replay.json
+            /research/replay-2w.json
+            /research/backtest-150d.json
+            /research/backtest-150d-clean.json
+            /research/log.md
+            /research/robustness.json
+            /research/robustness.md
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Robustness audit
+        run: node research/robustness.mjs data --out data/research
+
+      - name: Save results
+        run: |
+          git -C data config user.name "mosha-council"
+          git -C data config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git -C data add research/robustness.json research/robustness.md
+          git -C data commit -q -m "Robustness audit $(date -u +%Y-%m-%dT%H:%MZ)" || exit 0
+          for j in 1 2 3 4 5; do git -C data pull -q --rebase origin council-data && git -C data push -q origin HEAD:council-data && break; sleep 7; done
