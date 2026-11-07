@@ -169,10 +169,42 @@ export const sizeOf = (g, mk) => { if (mk && MARKETS[mk] && MARKETS[mk].aRule) r
   const r = roomR(g); return +((aTight(g) ? TIGHT_SIZE : 1) * (r != null && r >= DOL_ROOM ? ROOM_SIZE[1] : ROOM_SIZE[0])).toFixed(2); };
 // A+ tier (skill §17): an A-setup whose inversion candle body is >= 60% of its range and that does not fire in the NY afternoon (12-16 ET)
 export const isAPlus = (g, mk) => !(mk && MARKETS[mk] && MARKETS[mk].aRule) && isASetup(g, mk) && g.feat.body >= 0.6 && g.feat.session !== 'NY PM';   // §26: no A+ tier for gold / FX (strong bodies did worse there)
-export const letter = (g) => (g >= 10 ? 'A+' : g >= 9 ? 'A' : g >= 8 ? 'A-' : g >= 7 ? 'B+' : g >= 6 ? 'B' : g >= 5 ? 'B-' : g >= 3 ? 'C' : 'F');
+// PAPER COMPARISON ONLY (research/edge/ict-index-longonly, merged 7 Nov 2026): candidate NQ/ES rule 'dip' = the gold rule's BUYS
+// (grade >= MIN_GRADE, stop 0.3-0.75x the daily ATR) taken only when the last completed daily close is below the close 20 trading
+// days earlier; size 1, no break-even, gold exit (trail from +2R, 36 H1 max). It is NOT live: its records go to their own file
+// (ict/shadow.json, replay.json .shadow), carry shadow: true + variant: 'dip', never alert and never touch the A-rule records.
+export const SHADOW = { dip: { markets: ['nq', 'es'], back: 20 } };
+export const dipGate = (g, D) => { const di = D.findLastIndex((d) => d.time + 86400 <= g.close);   // same daily candle as signals() uses
+  return di >= SHADOW.dip.back ? D[di].close < D[di - SHADOW.dip.back].close : null; };
+export const isDip = (g, mk, D) => SHADOW.dip.markets.includes(mk) && g.side > 0 && !!g.grade && g.grade.total >= MIN_GRADE && RULES.gold(g) && dipGate(g, D) === true;
+export const letter = (g) =>(g >= 10 ? 'A+' : g >= 9 ? 'A' : g >= 8 ? 'A-' : g >= 7 ? 'B+' : g >= 6 ? 'B' : g >= 5 ? 'B-' : g >= 3 ? 'C' : 'F');
+
+// manage one open trade on the closed 5m candles (shared by the live records and the shadow 'dip' records)
+function manageTrade(tr, H, m5, f) {
+  const s = tr.side === 'buy' ? 1 : -1;
+  // time exit after P.holdH closed H1 candles since the signal (trading hours, not clock hours: weekends don't count). Audit:
+  // the exit is at the close of the 36th candle and nothing after it is managed (it used the price at run time before)
+  const hold = H.filter((b) => b.time >= (tr.signalAt || tr.opened)), endT = hold.length >= P.holdH ? hold[P.holdH - 1].time + 3600 : Infinity;
+  for (const b of m5.bars.filter((b) => b.time >= tr.checked && b.time < endT)) {
+    if (!tr.mark2 && (s > 0 ? b.high >= tr.t2 : b.low <= tr.t2)) tr.mark2 = b.time + 300;
+    tr.mfe = Math.max(tr.mfe || 0, +(((s > 0 ? b.high : -b.low) - s * tr.entry) / tr.r0).toFixed(2));
+    if (s > 0 ? b.low <= tr.stop : b.high >= tr.stop) { const Rraw = +((s * (tr.stop - tr.entry)) / tr.r0).toFixed(2), R = +(Rraw * (tr.size || 1)).toFixed(2);
+      Object.assign(tr, { status: Rraw > 0.001 ? 'win' : Rraw < -0.001 ? 'loss' : 'be', R, Rraw, exitPx: tr.stop, closed: b.time + 300, exit: tr.trailMoved ? 'trail' : tr.beMoved ? 'breakeven' : 'stop' }); break; }
+    if (tr.t1 != null && (s > 0 ? b.high >= tr.t1 : b.low <= tr.t1)) { const Rraw = +((s * (tr.t1 - tr.entry)) / tr.r0).toFixed(2);   // older records with a fixed target; sized like every other exit
+      Object.assign(tr, { status: 'win', R: +(Rraw * (tr.size || 1)).toFixed(2), Rraw, exitPx: tr.t1, closed: b.time + 300, exit: 'target' }); break; }
+    if (tr.be && !tr.beMoved && tr.mfe >= tr.be && (tr.entry - tr.stop) * s > 0) { tr.stop = tr.entry; tr.beMoved = true; }   // break-even from +1.5R (index futures)
+    if (tr.trail && tr.mfe >= tr.trail[0]) { const ns = f(tr.entry + s * (tr.mfe - tr.trail[1]) * tr.r0); if ((ns - tr.stop) * s > 0) { tr.stop = ns; tr.trailMoved = true; } }   // trail from +2R, 1.5R behind the best
+    tr.checked = b.time + 300;
+  }
+  if (tr.status === 'open' && endT !== Infinity) { const px = hold[P.holdH - 1].close, Rraw = +((s * (px - tr.entry)) / tr.r0).toFixed(2), R = +(Rraw * (tr.size || 1)).toFixed(2);
+    Object.assign(tr, { status: Rraw > 0 ? 'win' : Rraw < 0 ? 'loss' : 'be', R, Rraw, exitPx: f(px), closed: endT, exit: 'time' }); }
+  if (tr.closed) tr.R2 = tr.mark2 && (!tr.closed || tr.mark2 <= tr.closed) ? +(2 * (tr.size || 1)).toFixed(2) : tr.R;   // the 2R-target variant
+}
 
 async function main() {
   fs.mkdirSync(DATA, { recursive: true });
+  // shadow 'dip' records (paper comparison, never alerted): a separate file so trades.json and the live stats stay as they were
+  const shadow = load('shadow.json', null) || { variant: 'dip', since: new Date(now * 1000).toISOString(), trades: [], errors: {} }; shadow.errors = shadow.errors || {};
   const trades = load('trades.json', []), snap = { at: new Date().toISOString(), markets: {}, errors: {}, model: { ...P, name: 'H1 iFVG reversal' } }, bars = {};
   for (const [key, M] of Object.entries(MARKETS)) {
     try {
@@ -185,26 +217,7 @@ async function main() {
       const H = F.h1.filter((b) => b.time + 3600 <= Math.min(now, frontier)), D = F.d1.filter((b) => b.time + 86400 <= now);
       const f = (v) => +(+v).toFixed(M.dec);
       // 1. manage open trades on 5m candles
-      for (const tr of trades.filter((x) => x.market === key && x.status === 'open')) {
-        const s = tr.side === 'buy' ? 1 : -1;
-        // time exit after P.holdH closed H1 candles since the signal (trading hours, not clock hours: weekends don't count). Audit:
-        // the exit is at the close of the 36th candle and nothing after it is managed (it used the price at run time before)
-        const hold = H.filter((b) => b.time >= (tr.signalAt || tr.opened)), endT = hold.length >= P.holdH ? hold[P.holdH - 1].time + 3600 : Infinity;
-        for (const b of m5.bars.filter((b) => b.time >= tr.checked && b.time < endT)) {
-          if (!tr.mark2 && (s > 0 ? b.high >= tr.t2 : b.low <= tr.t2)) tr.mark2 = b.time + 300;
-          tr.mfe = Math.max(tr.mfe || 0, +(((s > 0 ? b.high : -b.low) - s * tr.entry) / tr.r0).toFixed(2));
-          if (s > 0 ? b.low <= tr.stop : b.high >= tr.stop) { const Rraw = +((s * (tr.stop - tr.entry)) / tr.r0).toFixed(2), R = +(Rraw * (tr.size || 1)).toFixed(2);
-            Object.assign(tr, { status: Rraw > 0.001 ? 'win' : Rraw < -0.001 ? 'loss' : 'be', R, Rraw, exitPx: tr.stop, closed: b.time + 300, exit: tr.trailMoved ? 'trail' : tr.beMoved ? 'breakeven' : 'stop' }); break; }
-          if (tr.t1 != null && (s > 0 ? b.high >= tr.t1 : b.low <= tr.t1)) { const Rraw = +((s * (tr.t1 - tr.entry)) / tr.r0).toFixed(2);   // older records with a fixed target; sized like every other exit
-            Object.assign(tr, { status: 'win', R: +(Rraw * (tr.size || 1)).toFixed(2), Rraw, exitPx: tr.t1, closed: b.time + 300, exit: 'target' }); break; }
-          if (tr.be && !tr.beMoved && tr.mfe >= tr.be && (tr.entry - tr.stop) * s > 0) { tr.stop = tr.entry; tr.beMoved = true; }   // break-even from +1.5R (index futures)
-          if (tr.trail && tr.mfe >= tr.trail[0]) { const ns = f(tr.entry + s * (tr.mfe - tr.trail[1]) * tr.r0); if ((ns - tr.stop) * s > 0) { tr.stop = ns; tr.trailMoved = true; } }   // trail from +2R, 1.5R behind the best
-          tr.checked = b.time + 300;
-        }
-        if (tr.status === 'open' && endT !== Infinity) { const px = hold[P.holdH - 1].close, Rraw = +((s * (px - tr.entry)) / tr.r0).toFixed(2), R = +(Rraw * (tr.size || 1)).toFixed(2);
-          Object.assign(tr, { status: Rraw > 0 ? 'win' : Rraw < 0 ? 'loss' : 'be', R, Rraw, exitPx: f(px), closed: endT, exit: 'time' }); }
-        if (tr.closed) tr.R2 = tr.mark2 && (!tr.closed || tr.mark2 <= tr.closed) ? +(2 * (tr.size || 1)).toFixed(2) : tr.R;   // the 2R-target variant
-      }
+      for (const tr of trades.filter((x) => x.market === key && x.status === 'open')) manageTrade(tr, H, m5, f);
       // 2. new signals: an inversion candle closed in the last 3 h, not yet recorded, no open trade on this market
       const sig = signals(H, D, 1, M.tick).concat(signals(H, D, -1, M.tick)).sort((a, b) => a.close - b.close);
       for (const g of sig) {
@@ -226,12 +239,34 @@ async function main() {
         pdh: dd ? f(dd.high) : null, pdl: dd ? f(dd.low) : null, open: trades.filter((x) => x.market === key && x.status === 'open').length };
       bars[key] = { h1: H.slice(-400).map((b) => [b.time, f(b.open), f(b.high), f(b.low), f(b.close)]), m5: m5.bars.slice(-600).map((b) => [b.time, f(b.open), f(b.high), f(b.low), f(b.close)]),
         d1: D.slice(-120).map((b) => [b.time, f(b.open), f(b.high), f(b.low), f(b.close)]) };
+      // 4. shadow 'dip' (paper comparison only): its own open trade per market, own entries, own file; runs after everything
+      // the live desk does and cannot change it (own try: a shadow error is logged in shadow.json, not in the live snapshot)
+      if (SHADOW.dip.markets.includes(key)) {
+        try {
+          for (const tr of shadow.trades.filter((x) => x.market === key && x.status === 'open')) manageTrade(tr, H, m5, f);
+          for (const g of sig) {
+            const id = `${key}-b-${g.t}-dip`;
+            if (shadow.trades.some((x) => x.id === id) || now - g.close > P.fresh || !isDip(g, key, D)) continue;
+            if (shadow.trades.some((x) => x.market === key && x.status === 'open')) continue;   // one open shadow trade per market
+            const entry = f(price), r0 = Math.abs(entry - g.stop);
+            if (entry - g.stop <= 0 || r0 > 1.6 * g.r0) continue;
+            shadow.trades.push({ id, shadow: true, variant: 'dip', market: key, label: M.label, short: M.short, side: 'buy', model: 'H1 iFVG reversal', signalAt: g.close, signalPx: f(g.entry),
+              entry, stop: f(g.stop), r0: +r0.toFixed(M.dec + 1), t1: null, trail: P.trail, be: null, stop0: f(g.stop), t2: f(entry + P.mark * r0), opened: now, checked: frontier, status: 'open', R: null, size: 1,
+              sweep: { t: g.sweepT, level: f(g.swept) }, fvg: g.fvg.map(f), ih: g.ih == null ? null : f(g.ih), dol: g.dol == null ? null : f(g.dol), valid: g.valid,
+              feat: g.feat, grade: { ...g.grade, letter: letter(g.grade.total) }, aset: false });
+          }
+          delete shadow.errors[key];
+        } catch (e) { shadow.errors[key] = String(e.message || e); }
+      }
     } catch (e) { snap.errors[key] = String(e.message || e); }
     await sleep(800);
   }
   const C = trades.filter((x) => x.closed);
   snap.totals = { n: C.length, wins: C.filter((x) => x.R > 0).length, R: +C.reduce((a, x) => a + x.R, 0).toFixed(2), open: trades.filter((x) => x.status === 'open').length };
   save('trades.json', trades.slice(-3000)); save('snapshot.json', snap); save('bars.json', bars);
+  { const SC = shadow.trades.filter((x) => x.closed); shadow.at = snap.at;
+    shadow.totals = { n: SC.length, wins: SC.filter((x) => x.R > 0).length, R: +SC.reduce((a, x) => a + x.R, 0).toFixed(2), open: shadow.trades.filter((x) => x.status === 'open').length };
+    shadow.trades = shadow.trades.slice(-3000); save('shadow.json', shadow); }
   console.log(JSON.stringify(snap.totals), Object.keys(snap.errors).length ? snap.errors : 'no errors');
 }
 if (process.argv[1] && process.argv[1].endsWith('tracker.mjs')) main().catch((e) => { console.error(e); process.exit(1); });

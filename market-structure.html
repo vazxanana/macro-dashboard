@@ -2372,6 +2372,10 @@ html[data-motion="off"][data-gate] .gate-bg path[stroke] { animation: none; stro
 #v-ict .ict-break caption { font: 600 13px var(--sans); padding-bottom: 8px; }
 #v-ict .ict-break td, #v-ict .ict-break th { padding: 6px; }
 #v-ict .ict-break th { color: var(--ink-faint); font: 500 12px var(--sans); }
+#v-ict .ict-dip { grid-template-columns: minmax(0, 1fr); gap: 10px; }
+#v-ict .ict-dip td:first-child { white-space: normal; line-height: 1.6; }
+#v-ict .ict-dip td:first-child .ict-pill { margin-top: 2px; border-radius: 6px; }
+#v-ict .ict-dip .msg { margin: 0; font-size: 12.5px; line-height: 1.55; color: var(--ink-dim); }
 #v-ict .ict-break td.neg .bar { background-image: repeating-linear-gradient(135deg, transparent 0 2px, rgba(0,0,0,.4) 2px 3.5px); }   /* losing rows hatched */
 /* 3 · history: calendar and the signal log */
 #v-ict .ict-cal-nav .ms-tbtn { min-width: 36px; min-height: 36px; font-size: 16px; }
@@ -2958,6 +2962,10 @@ html[data-motion="off"] #v-ict .ict-cal-d:hover { transform: none !important; }
         <div class="ict-kpi" id="ict-kpi" role="group" aria-label="Results"></div>
         <div class="ict-eq-w"><div class="ict-eq-l"><span>Equity, R per signal</span><span><i class="ict-sw a"></i>the model (trail) <i class="ict-sw b"></i>fixed 2R</span></div><div class="ict-eq" id="ict-eq"></div></div>
       </div>
+    </div>
+    <div class="card ict-card ict-dip-c">
+      <div class="ms-k"><h2 class="ict-h">Candidate rule (paper comparison): dip-buy NQ/ES</h2><span class="ict-pill">Not live</span></div>
+      <div class="ict-break ict-dip" id="ict-dip"></div>
     </div>
     <div class="card ict-card">
       <div class="ms-k"><h2 class="ict-h">What works</h2><small>closed signals split by market, session and each ICT feature · the model's exit</small></div>
@@ -7328,9 +7336,10 @@ function msNextSetup(bars, A) {
   const mergeDesk = (remote) => { for (const [id, r] of Object.entries((remote && remote.reviews) || {})) { const l = S.desk.reviews[id]; if (!l || (r.at || 0) > (l.at || 0)) S.desk.reviews[id] = r; } };
 
   async function load() {
-    const [t, s, b, d, r] = await Promise.all([get('trades.json'), get('snapshot.json'), get('bars.json'), get('desk.json'), get('replay.json')]);
+    const [t, s, b, d, r, sh] = await Promise.all([get('trades.json'), get('snapshot.json'), get('bars.json'), get('desk.json'), get('replay.json'), get('shadow.json')]);
     if (t) S.trades = t.filter(KEEP); if (s) S.snap = s; if (b) S.bars = b; if (d) { mergeDesk(d); saveLocal(); }
     if (r && r.trades) { S.replay = r.trades.filter(KEEP); S.replayInfo = r; }
+    S.dip = sh && Array.isArray(sh.trades) ? sh : null; S.dipReplay = r && Array.isArray(r.shadow) ? r.shadow.filter(KEEP) : null;   // candidate 'dip' rule, paper comparison only
     window.renderIct();
   }
   const liveR = (x) => { const m = S.snap && S.snap.markets[x.market]; if (!m || x.status !== 'open') return null; return ((x.side === 'buy' ? 1 : -1) * (m.price - x.entry)) / x.r0; };
@@ -7440,9 +7449,27 @@ function msNextSetup(bars, A) {
       : AP.m > 0.15 ? 'A+ is holding up live (above +0.15R a signal over 30+). Keep sizing small and watch the drawdown.' : AP.m > 0 ? 'A+ is barely positive live: no real edge yet; keep it on paper.' : 'A+ is losing live after 30+ signals: stop and review the model.';
     $('ict-fwd').innerHTML = `<div class="t">Live forward test</div><div class="row">${t('A+', AP)}${t('A-setups', A)}${t('All signals', ALL)}</div><div class="msg">${verdict}</div>`;
   }
+  // candidate NQ/ES 'dip' rule (research/edge/ict-index-longonly): shadow records from ict/shadow.json (live forward) and replay.json
+  // .shadow, side by side with the current A-rule on NQ+ES. Never mixed into the desk's own views above.
+  function renderDip() {
+    const el = $('ict-dip'); if (!el) return;
+    const IX = (x) => x.market === 'nq' || x.market === 'es';
+    const since = S.dip && S.dip.since ? Date.parse(S.dip.since) / 1000 : null;
+    const st = (a) => { const c = a.filter((x) => x.closed), r = c.reduce((q, x) => q + x.R, 0); return { n: c.length, open: a.length - c.length, w: c.filter((x) => x.R > 0).length, m: c.length ? r / c.length : null, r }; };
+    const row = (k, v, note) => { note = [note, v && v.open ? `${v.open} open` : ''].filter(Boolean).join(' · ');
+      return `<tr><td>${k}${note ? `<br><small class="ict-pill">${note}</small>` : ''}</td><td class="n">${v ? v.n : '—'}</td><td class="n">${v && v.n ? Math.round((100 * v.w) / v.n) + '%' : '—'}</td><td class="n ${v && v.n ? cls(v.m) : ''}">${v && v.n ? fR(v.m) : '—'}</td><td class="n ${v && v.n ? cls(v.r) : ''}">${v && v.n ? fR(v.r) : '—'}</td></tr>`; };
+    const fromTxt = S.replayInfo && S.replayInfo.from ? new Date(S.replayInfo.from + 'T00:00:00Z').toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric', timeZone: 'UTC' }) : null;
+    const dl = S.dip ? st(S.dip.trades.filter(KEEP)) : null, al = since != null ? st(S.trades.filter((x) => IX(x) && isA(x) && x.signalAt >= since)) : null;
+    const dr = S.dipReplay ? st(S.dipReplay) : null, ar = S.replayInfo ? st(S.replay.filter((x) => IX(x) && isA(x))) : null;
+    const sinceTxt = since != null ? new Date(since * 1000).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }) : null;
+    el.innerHTML = `<table><thead><tr><th>NQ + ES, closed</th><th class="n">n</th><th class="n">Win</th><th class="n">R / trade</th><th class="n">Total</th></tr></thead><tbody>`
+      + row('Candidate · live forward', dl, sinceTxt ? `since ${sinceTxt}` : 'starts with the next tracker run') + row('Current A-rule · live forward', al, sinceTxt ? 'same period' : '')
+      + row('Candidate · replay', dr, fromTxt ? (dr ? `since ${fromTxt}` : 'after the next replay run') : '') + row('Current A-rule · replay', ar, fromTxt ? `since ${fromTxt}` : '') + '</tbody></table>'
+      + '<p class="msg">The rule: BUY signals only (grade C or better, stop 0.3-0.75x the daily ATR), taken only when the last daily close is below the close 20 trading days earlier; size 1, no break-even, trail from +2R, out after 36 H1 candles. Shadow records only: not live, no alerts, and the current A-rule is unchanged. A-rule R is sized. Compare for at least a month before any switch.</p>';
+  }
   // the desk data (~1.9 MB with replay + bars) loads when the ICT view first opens, then every 2 min while it is open (site audit 7 Nov)
   let loadedAt = 0; const fresh = () => { if (Date.now() - loadedAt > 110e3) { loadedAt = Date.now(); load(); } };
-  window.renderIct = () => { render(); renderClock(); renderFwd(); fresh(); };
+  window.renderIct = () => { render(); renderClock(); renderFwd(); renderDip(); fresh(); };
   setInterval(() => { if (!$('v-ict').hidden) renderClock(); }, 30e3);
 
   // ─── chart dialog + review ───
