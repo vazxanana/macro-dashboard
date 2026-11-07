@@ -6,7 +6,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import zlib from 'node:zlib';
-import { MARKETS, P, MIN_GRADE, cnbcBars, agg, signals, letter, isASetup, isAPlus, sizeOf, SHADOW, isDip, VARIANTS, variantRule, variantTags, loadMeridian, SHADOW_MARKETS, mdBars, dailyNY, strailLevel } from './tracker.mjs';
+import { MARKETS, P, MIN_GRADE, cnbcBars, closedBar, agg, signals, letter, isASetup, isAPlus, sizeOf, SHADOW, isDip, VARIANTS, variantRule, variantTags, loadMeridian, SHADOW_MARKETS, mdBars, dailyNY, strailLevel } from './tracker.mjs';
 
 const DATA = process.argv[2] || 'data/ict';
 const FROM = Date.parse(process.argv[3] || '2025-08-01T00:00:00Z') / 1000;   // owner, 7 Nov: 5 more months (was 1 Jan 2026)
@@ -54,7 +54,9 @@ async function history(M) {
           const t = Date.UTC(+d.slice(0, 4), +d.slice(4, 6) - 1, +d.slice(6, 8), +d.slice(9, 11), +d.slice(11, 13)) / 1000 + 5 * 3600; if (t >= warm) m1.push({ time: t, open: +o, high: +h, low: +l, close: +c }); }
         d5 = agg(m1.sort((a, b) => a.time - b.time), 300); }
       if (XAU) { try { d5 = agg(JSON.parse(zlib.gunzipSync(fs.readFileSync(XAU))).map((r) => ({ time: r[0], open: r[1], high: r[2], low: r[3], close: r[4] })).filter((b) => b.time >= warm), 300); } catch (e) { d5 = []; } }
-      d5 = dedupe(d5);
+      // calendar audit: the cash / spot fills trade through CME half-day afternoons and holiday eves (spot gold on MLK afternoon);
+      // the futures did not, so those bars are dropped exactly as cnbcBars() drops the feed's flat candles there
+      d5 = dedupe(d5).filter((b) => !closedBar(b.time));
       if (d5.length) {
         const dh = agg(d5, 3600), byT = new Map(dh.map((b) => [b.time, b])), first = h1[0].time;
         const ratios = h1.filter((b) => b.time < first + 20 * 86400 && byT.has(b.time)).map((b) => b.close / byT.get(b.time).close).sort((a, b) => a - b);

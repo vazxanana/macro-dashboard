@@ -150,6 +150,12 @@ Rules and research live in `.claude/skills/ICT/SKILL.md` (results also in counci
 - Replay: `ict/replay.mjs` (workflow `ict-replay.yml`: on change, on demand with a start date, weekly) runs the same
   `signals()` over CNBC history since 1 Aug 2025 (default; 1 Jan 2026 before 7 Nov; FX back-filled from HistData) and writes council-data `ict/replay.json` (records carry `replay: true`).
   The desk has a Both / Live / Replay switch (localStorage `ictSrc`) and a P&L calendar of closed signals.
+- CME calendar (`ict/calendar.mjs`, no network, derived from the CME rule set, checked date by date 2018-27 in
+  `tests/ict-calendar.test.mjs`): `cmeShut(t)` = weekend (Fri 17:00 - Sun 18:00 ET), full holidays (New Year, Good Friday,
+  Christmas; from the eve's 17:00 to the 18:00 reopen) and early closes (MLK, Presidents', Memorial, Juneteenth, 3-4 July, Labor Day,
+  Thanksgiving + the day after, Christmas Eve: shut from 13:00 ET until 18:00). CNBC prints flat candles into every shut period, so
+  `closedBar()` filters the feed and the replay's cash/spot fills with it; `council/datacheck.mjs` CME hours use the same calendar.
+  Signals on a normal week are byte-identical to the weekend-only filter (test on the pinned candles).
 - Audit (7 Nov): CNBC intraday requests start on the hour (bars are anchored at the request's start minute); bars in the
   17:00-18:00 ET halt are dropped; an H1 candle / 5m bar counts only once the feed has a later bar (or it is 20+ min old);
   the time exit is at the close of the 36th H1 candle; replay trades whose window has a > 4-day data hole are dropped

@@ -12,10 +12,10 @@ test('weekend: Friday 17:00 to Sunday 18:00 New York is shut, either side is ope
   assert.equal(cmeShut(T('2026-11-08T23:00:00Z')), false);   // Sun 18:00 EST reopen
   assert.equal(cmeShut(T('2026-11-09T14:30:00Z')), false);   // Monday cash open
 });
-test('full holidays are shut until the 18:00 reopen; early-close days are not touched', () => {
+test('full holidays are shut until the 18:00 reopen; early-close days trade until 13:00 (tests/ict-calendar.test.mjs)', () => {
   assert.equal(cmeShut(T('2026-04-03T14:00:00Z')), true);    // Good Friday 2026
   assert.equal(cmeShut(T('2027-01-01T15:00:00Z')), true);    // New Year 2027 (Friday)
   assert.equal(cmeShut(T('2025-12-25T15:00:00Z')), true);    // Christmas 2025 (Thursday)
   assert.equal(cmeShut(T('2025-12-25T23:30:00Z')), false);   // Thu 18:30 EST, reopened
-  assert.equal(cmeShut(T('2026-11-26T15:00:00Z')), false);   // Thanksgiving (early close), not dropped here
+  assert.equal(cmeShut(T('2026-11-26T15:00:00Z')), false);   // Thanksgiving 10:00 ET: open until the 13:00 early close
 });

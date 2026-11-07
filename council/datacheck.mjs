@@ -17,6 +17,7 @@ import path from 'node:path';
 import { sendAlerts, when, NTFY_DEFAULT, SITE } from './alerts.mjs';
 import { cleanBars } from './clean.mjs';
 import { MARKETS as ICT_MARKETS } from '../ict/tracker.mjs';
+import { cmeShut } from '../ict/calendar.mjs';
 
 export const CFG = {
   step: 300,                                   // 5-minute candles
@@ -67,6 +68,7 @@ export function sessionOpen(hours, t) {
   if (p.wd === 6 || (p.wd === 5 && p.m >= 1020) || (p.wd === 0 && p.m < 1080) || (p.m >= 1020 && p.m < 1080)) return false;
   const md = p.d.slice(5);
   if (hours === 'fx') return !(md === '12-25' || md === '01-01' || ((md === '12-24' || md === '12-31') && p.m >= 780));
+  if (hours === 'cme') return !cmeShut(t);   // the ICT desk's own CME calendar (eve of a full holiday, 3 July, 31 Dec 2021 open): one source of truth
   const hol = usHolidays(p.y).get(p.d);
   return !(hol === 'closed' || (hol === 'early' && p.m >= 780));
 }
