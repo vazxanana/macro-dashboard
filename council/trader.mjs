@@ -1082,6 +1082,7 @@ function learnFromBacktest(change) {
     const win = S[v1].e > S[v2].e ? v1 : v2, lose = other(win), gap = btGapT(S[win], S[lose]);
     if (!(S[win].e >= 0.1 && S[lose].e <= -0.1 && gap >= 3 && S[win].h[0].e > S[lose].h[0].e && S[win].h[1].e > S[lose].h[1].e)) continue;
     const f = config.filters[k] = config.filters[k] || {};
+    if (userOwned(f, c)) continue;   // the owner's rule stays until the owner changes it (Coach proposals can still flag it)
     if (f[c] === win && (f.src || {})[c] === 'backtest') continue;
     const was = f[c];
     f[c] = win; (f.since = f.since || {})[c] = nowISO; (f.src = f.src || {})[c] = 'backtest';

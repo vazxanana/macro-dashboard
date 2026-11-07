@@ -59,9 +59,7 @@ Supporting scripts:
 id to `config.userRules` and logs it in `config.history` with `by: "user"` and the reason. To change a live rule, add a new user
 rule (removing an id from `config.userRules` does not undo it; the new rule has to set the config back). Filter fields an owner
 rule sets are marked `src: "user"` (for example the live Scalp's "against D1" and "not in Asia"), and the statistical Coach never
-drops or re-tests those (`userOwned` in `trader.mjs`).
-*Known gap (7 Nov):* the backtest learner (`learnFromBacktest`) does not check that mark yet, so a clear replay result could still
-rewrite an owner's D1 filter (it would be logged as `coach-backtest`).
+drops, re-tests or overwrites those (`userOwned` in `trader.mjs`, checked by both the statistical and the backtest learner).
 
 **Coach rules.** Everything else in `config.json` the Coach may change on its own, always logged in `history`
 (`coach`, `coach-backtest`, `coach-guard` or `coach-ai`), only within these limits:
