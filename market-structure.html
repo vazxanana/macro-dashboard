@@ -2609,6 +2609,7 @@ html[data-motion="off"] #v-ict .ict-cal-d:hover { transform: none !important; }
           <button type="button" role="menuitem" id="ms-me-photo">Change photo</button>
           <button type="button" role="menuitem" id="ms-me-rmphoto" hidden>Remove photo</button>
           <button type="button" role="menuitem" id="ms-me-rename">Change display name</button>
+          <button type="button" role="menuitem" id="ms-me-ct">My cTrader account</button>
           <button type="button" role="menuitem" id="ms-me-theme" data-theme-set>Light theme</button>
           <button type="button" role="menuitem" id="ms-me-out" class="me-out">Log out</button>
           <input type="file" id="ms-me-file" accept="image/*" hidden>
@@ -9316,6 +9317,150 @@ html[data-motion="off"] .btab-more { transition: none; transform: none; }
   // no saved choice yet: keep following the device when it switches between light and dark
   if (window.matchMedia) { var mq = matchMedia('(prefers-color-scheme: light)'), on = function () { if (!R.dataset.themeAuto) return; var t = mq.matches ? 'light' : 'dark'; if (window.msSetTheme) window.msSetTheme(t, false); else R.dataset.theme = t; };
     if (mq.addEventListener) mq.addEventListener('change', on); }
+})();
+</script>
+
+<!-- My cTrader account (owner, 7 Nov 2026): each signed-in user links their own cTrader account (view only) and sees balance,
+     equity, live floating P&L, open trades, pending orders and closed-trade history. Server: api/ctrader-link.js. The page
+     only keeps a 30-day session token (localStorage ms-ct-sess-<user>); cTrader tokens stay encrypted on the server. -->
+<style>
+html[data-role="public"] #ms-me-ct { display: none; }
+.ct-dlg { width: min(860px, calc(100vw - 16px)); max-height: min(90vh, 900px); padding: 0; border-radius: 14px; border: 1px solid var(--line); background: var(--panel); color: var(--ink); font-variant-numeric: tabular-nums; }
+.ct-dlg::backdrop { background: rgba(0,0,0,.5); }
+.ct-h { display: flex; align-items: center; gap: 12px; padding: 14px 16px; border-bottom: 1px solid var(--line); position: sticky; top: 0; background: var(--panel); z-index: 2; }
+.ct-h h3 { margin: 0; font-size: 16px; } .ct-h .ct-sub { color: var(--ink-faint); font-size: 12px; }
+.ct-h .tv-x { margin-left: auto; }
+.ct-b { padding: 16px; display: grid; grid-template-columns: minmax(0, 1fr); gap: 18px; } .ct-b > * { min-width: 0; }
+.ct-acc { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.ct-acc select { flex: 1 1 200px; min-width: 0; min-height: 36px; background: var(--panel-raised); color: var(--ink); border: 1px solid var(--line); border-radius: 8px; padding: 0 10px; font: inherit; max-width: 100%; }
+.ct-tag { font-size: 11px; font-weight: 600; padding: 2px 8px; border-radius: 999px; border: 1px solid var(--line); color: var(--ink-dim); }
+.ct-tag.live { color: var(--sell); border-color: color-mix(in srgb, var(--sell) 45%, transparent); }
+.ct-stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1px; background: var(--line); border: 1px solid var(--line); border-radius: 10px; overflow: hidden; }
+.ct-stats > div { background: var(--panel-raised); padding: 12px 14px; display: grid; gap: 2px; }
+.ct-stats span { color: var(--ink-faint); font-size: 12px; } .ct-stats b { font-size: 20px; font-weight: 650; }
+.ct-pos { color: var(--buy); } .ct-neg { color: var(--sell); }
+.ct-sec h4 { margin: 0 0 8px; font-size: 14px; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.ct-sec h4 small { color: var(--ink-faint); font-weight: 500; }
+.ct-tw { overflow-x: auto; border: 1px solid var(--line); border-radius: 10px; }
+.ct-t { width: 100%; border-collapse: collapse; font-size: 13px; white-space: nowrap; }
+.ct-t th { text-align: left; color: var(--ink-faint); font-weight: 500; font-size: 12px; padding: 8px 10px; border-bottom: 1px solid var(--line); background: var(--panel-raised); }
+.ct-t td { padding: 8px 10px; border-bottom: 1px solid var(--line-soft, var(--line)); }
+.ct-t tr:last-child td { border-bottom: 0; } .ct-t .n { text-align: right; }
+.ct-side { font-weight: 600; text-transform: capitalize; } .ct-side.buy { color: var(--buy); } .ct-side.sell { color: var(--sell); }
+.ct-empty { color: var(--ink-faint); font-size: 13px; padding: 12px; }
+.ct-chips { display: inline-flex; gap: 4px; margin-left: auto; } .ct-chips button { min-height: 30px; padding: 0 10px; border-radius: 999px; border: 1px solid var(--line); background: transparent; color: var(--ink-dim); font: inherit; font-size: 12px; cursor: pointer; }
+.ct-chips button[aria-pressed="true"] { background: var(--accent-soft, rgba(91,140,255,.14)); color: var(--ink); border-color: var(--accent); }
+.ct-f { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; color: var(--ink-faint); font-size: 12px; }
+.ct-f .sp { flex: 1; }
+.ct-btn { min-height: 40px; padding: 0 16px; border-radius: 10px; border: 1px solid var(--accent); background: var(--accent); color: #fff; font: inherit; font-weight: 600; cursor: pointer; }
+.ct-btn.ghost { background: transparent; color: var(--ink-dim); border-color: var(--line); min-height: 34px; font-weight: 500; }
+.ct-btn:disabled { opacity: .5; cursor: progress; }
+.ct-link { display: grid; gap: 12px; max-width: 460px; }
+.ct-link p { margin: 0; color: var(--ink-dim); line-height: 1.5; }
+.ct-link label { display: grid; gap: 6px; font-size: 13px; color: var(--ink-dim); }
+.ct-link input { min-height: 42px; background: var(--panel-raised); color: var(--ink); border: 1px solid var(--line); border-radius: 10px; padding: 0 12px; font: inherit; font-size: 16px; }
+.ct-msg { font-size: 13px; color: var(--sell); min-height: 1em; }
+.ct-msg.ok { color: var(--buy); }
+.ct-live-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--buy); display: inline-block; }
+@media (prefers-reduced-motion: no-preference) { .ct-live-dot { animation: ctpulse 2s ease-in-out infinite; } @keyframes ctpulse { 50% { opacity: .35; } } }
+@media (max-width: 560px) { .ct-b { padding: 12px; } .ct-stats b { font-size: 17px; } .ct-t .hide-s { display: none; } }
+</style>
+<dialog class="ct-dlg" id="ms-ct" aria-labelledby="ms-ct-t">
+  <div class="ct-h"><div><h3 id="ms-ct-t">My cTrader account</h3><div class="ct-sub" id="ms-ct-sub">View only</div></div><button type="button" class="tv-x" id="ms-ct-x" aria-label="Close">×</button></div>
+  <div class="ct-b" id="ms-ct-b" aria-live="polite"></div>
+</dialog>
+<script>
+(function () {
+  const API = /^https?:$/.test(location.protocol) && !/github\.io$/.test(location.hostname) ? location.origin + '/api/ctrader-link' : null;
+  const $ = (id) => document.getElementById(id);
+  const ls = (k, v) => { try { if (v === undefined) return localStorage.getItem(k); if (v === null) localStorage.removeItem(k); else localStorage.setItem(k, v); } catch (e) { return null; } };
+  const userKey = () => ls('ms-user') || (ls('ms-admin') ? 'owner' : null);
+  const sessKey = () => 'ms-ct-sess-' + (userKey() || 'x');
+  const esc = (x) => String(x == null ? '' : x).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+  let state = { data: null, days: 30, account: ls('ms-ct-acc-' + (userKey() || 'x')) || '', timer: 0, busy: false };
+  const dlg = () => $('ms-ct'), body = () => $('ms-ct-b');
+  const money = (v, ccy, sign) => { if (v == null || !isFinite(v)) return '—'; let s; try { s = new Intl.NumberFormat(undefined, ccy ? { style: 'currency', currency: ccy, minimumFractionDigits: 2, maximumFractionDigits: 2 } : { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(Math.abs(v)); } catch (e) { s = Math.abs(v).toFixed(2); } return (v < 0 ? '−' : sign && v > 0 ? '+' : '') + s; };
+  const cls = (v) => (v > 0 ? 'ct-pos' : v < 0 ? 'ct-neg' : '');
+  const px = (v) => (v == null ? '—' : String(+v));
+  const when = (iso) => { if (!iso) return '—'; const d = new Date(iso); return d.toLocaleDateString(undefined, { month: 'short', day: 'numeric' }) + ' ' + d.toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' }); };
+  async function call(body) { const r = await fetch(API, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body), cache: 'no-store' }); const j = await r.json().catch(() => ({})); if (r.status === 401) { ls(sessKey(), null); } if (!r.ok) { const e = new Error(j.error || ('Error ' + r.status)); e.status = r.status; throw e; } return j; }
+
+  function linkForm(msg, ok) {
+    const has = !!ls(sessKey());
+    body().innerHTML = `<div class="ct-link"><p>Link your own cTrader account to see your balance, live floating P&amp;L, open trades and trade history here. The link is <b>view only</b>: it cannot place, change or close trades, and you can remove it any time.</p>
+      ${has ? '' : `<label>Your Aurum Desk password (to confirm it is you)<input type="password" id="ms-ct-pw" autocomplete="current-password"></label>`}
+      <div><button type="button" class="ct-btn" id="ms-ct-go">Connect cTrader</button></div><div class="ct-msg${ok ? ' ok' : ''}" id="ms-ct-msg" role="status">${esc(msg || '')}</div>
+      <p style="font-size:12px;color:var(--ink-faint)">You will sign in on cTrader's own page (id.ctrader.com) and choose which accounts to share. Your cTrader password never reaches this site.</p></div>`;
+    const go = $('ms-ct-go'), pw = $('ms-ct-pw');
+    if (pw) pw.addEventListener('keydown', (e) => { if (e.key === 'Enter') go.click(); });
+    go.addEventListener('click', async () => {
+      go.disabled = true; $('ms-ct-msg').className = 'ct-msg'; $('ms-ct-msg').textContent = 'Opening cTrader…';
+      try {
+        if (!ls(sessKey())) { const s = await call({ action: 'session', user: ls('ms-user') || '', pw: pw ? pw.value : '' }); ls(sessKey(), s.session); }
+        const st = await call({ action: 'start', session: ls(sessKey()) }); location.href = st.url;
+      } catch (e) { go.disabled = false; $('ms-ct-msg').textContent = e.status === 401 ? 'Please enter your password again.' : e.message; if (e.status === 401) linkForm('Please enter your password again.'); }
+    });
+    if (pw) setTimeout(() => pw.focus(), 50);
+  }
+
+  function render(d) {
+    const ccy = d.account && d.account.currency, open = d.open || [], hist = d.history || [], orders = d.orders || [];
+    const net = hist.reduce((a, h) => a + (h.net || 0), 0), wins = hist.filter((h) => h.net > 0).length;
+    $('ms-ct-sub').innerHTML = `${esc((d.account && d.account.broker) || 'cTrader')} · ${esc((d.account && (d.account.login || d.account.id)) || '')} · <span class="ct-tag${d.account && d.account.live ? ' live' : ''}">${d.account && d.account.live ? 'Live' : 'Demo'}</span> · view only`;
+    const accSel = (d.accounts || []).length > 1 ? `<div class="ct-acc"><label for="ms-ct-acc" style="font-size:13px;color:var(--ink-dim)">Account</label><select id="ms-ct-acc">${d.accounts.map((a) => `<option value="${esc(a.id)}"${a.id === d.account.id ? ' selected' : ''}>${esc(a.broker || 'cTrader')} · ${esc(a.login || a.id)} · ${a.live ? 'Live' : 'Demo'}</option>`).join('')}</select></div>` : '';
+    const openRows = open.map((p) => `<tr><td>${esc(p.symbol)}</td><td><span class="ct-side ${p.side}">${p.side}</span></td><td class="n">${p.lots ?? '—'}</td><td class="n">${px(p.entry)}</td><td class="n hide-s">${px(p.sl)}</td><td class="n hide-s">${px(p.tp)}</td><td class="hide-s">${when(p.openedAt)}</td><td class="n ${cls(p.pnl)}"><b>${money(p.pnl, ccy, true)}</b></td></tr>`).join('');
+    const ordRows = orders.map((o) => `<tr><td>${esc(o.symbol)}</td><td><span class="ct-side ${o.side}">${o.side}</span></td><td>${o.type === 2 ? 'Limit' : o.type === 3 ? 'Stop' : 'Order'}</td><td class="n">${o.lots ?? '—'}</td><td class="n">${px(o.price)}</td><td class="n hide-s">${px(o.sl)}</td><td class="n hide-s">${px(o.tp)}</td></tr>`).join('');
+    const histRows = hist.slice(0, 200).map((h) => `<tr><td>${when(h.closedAt)}</td><td>${esc(h.symbol)}</td><td><span class="ct-side ${h.side}">${h.side}</span></td><td class="n">${h.lots ?? '—'}</td><td class="n hide-s">${px(h.entry)}</td><td class="n hide-s">${px(h.exit)}</td><td class="n hide-s">${money((h.swap || 0) + (h.commission || 0), ccy)}</td><td class="n ${cls(h.net)}"><b>${money(h.net, ccy, true)}</b></td></tr>`).join('');
+    body().innerHTML = `${accSel}
+      <div class="ct-stats"><div><span>Balance</span><b>${money(d.balance, ccy)}</b></div><div><span>Equity</span><b>${money(d.equity, ccy)}</b></div>
+        <div><span><i class="ct-live-dot" aria-hidden="true"></i> Floating P&amp;L</span><b class="${cls(d.floating)}">${money(d.floating, ccy, true)}</b></div>
+        <div><span>Closed P&amp;L · ${d.days} days</span><b class="${cls(net)}">${money(net, ccy, true)}</b></div></div>
+      <section class="ct-sec"><h4>Open trades <small>${open.length}</small></h4>${open.length ? `<div class="ct-tw"><table class="ct-t"><thead><tr><th>Symbol</th><th>Side</th><th class="n">Lots</th><th class="n">Entry</th><th class="n hide-s">Stop</th><th class="n hide-s">Target</th><th class="hide-s">Opened</th><th class="n">P&amp;L</th></tr></thead><tbody>${openRows}</tbody></table></div>` : '<div class="ct-empty">No open trades.</div>'}</section>
+      ${orders.length ? `<section class="ct-sec"><h4>Pending orders <small>${orders.length}</small></h4><div class="ct-tw"><table class="ct-t"><thead><tr><th>Symbol</th><th>Side</th><th>Type</th><th class="n">Lots</th><th class="n">Price</th><th class="n hide-s">Stop</th><th class="n hide-s">Target</th></tr></thead><tbody>${ordRows}</tbody></table></div></section>` : ''}
+      <section class="ct-sec"><h4>History <small>${hist.length} closed · ${hist.length ? Math.round((wins / hist.length) * 100) + '% winners' : '—'}</small><span class="ct-chips" role="group" aria-label="History period">${[7, 30, 90].map((n) => `<button type="button" data-days="${n}" aria-pressed="${state.days === n}">${n} days</button>`).join('')}</span></h4>
+        ${hist.length ? `<div class="ct-tw"><table class="ct-t"><thead><tr><th>Closed</th><th>Symbol</th><th>Side</th><th class="n">Lots</th><th class="n hide-s">Entry</th><th class="n hide-s">Exit</th><th class="n hide-s">Fees + swap</th><th class="n">Net P&amp;L</th></tr></thead><tbody>${histRows}</tbody></table></div>` : `<div class="ct-empty">No closed trades in the last ${d.days} days.</div>`}</section>
+      <div class="ct-f"><span>Updated ${new Date(d.at).toLocaleTimeString()} · refreshes every 15 s while open</span><span class="sp"></span><button type="button" class="ct-btn ghost" id="ms-ct-relink">Link other accounts</button><button type="button" class="ct-btn ghost" id="ms-ct-un">Remove link</button></div>`;
+    const sel = $('ms-ct-acc'); if (sel) sel.addEventListener('change', () => { state.account = sel.value; ls('ms-ct-acc-' + (userKey() || 'x'), sel.value); load(true); });
+    body().querySelectorAll('[data-days]').forEach((b) => b.addEventListener('click', () => { state.days = +b.dataset.days; load(true); }));
+    $('ms-ct-relink').addEventListener('click', () => linkForm());
+    $('ms-ct-un').addEventListener('click', async () => { if (!confirm('Remove the cTrader link from your profile? You can link it again later.')) return; try { await call({ action: 'unlink', session: ls(sessKey()) }); state.data = null; linkForm('Link removed.', true); } catch (e) { alert(e.message); } });
+  }
+
+  async function load(showBusy) {
+    if (state.busy || !dlg().open) return;
+    if (!API) { body().innerHTML = '<div class="ct-empty">Open the site on meridianx.dev to link cTrader.</div>'; return; }
+    if (!ls(sessKey())) { linkForm(); return; }
+    state.busy = true; if (showBusy || !state.data) { const m = body().querySelector('.ct-f span') || null; if (m) m.textContent = 'Updating…'; else body().innerHTML = '<div class="ct-empty">Loading your cTrader account…</div>'; }
+    try {
+      const d = await call({ action: 'summary', session: ls(sessKey()), account: state.account, days: state.days });
+      if (!d.linked) { state.data = null; linkForm(); return; }
+      if (!d.account) { body().innerHTML = `<div class="ct-empty">${esc(d.error || 'No accounts shared.')}</div>`; return; }
+      state.data = d; render(d);
+    } catch (e) {
+      if (e.status === 401) linkForm('Your session ended. Please enter your password again.');
+      else if (state.data) { const f = body().querySelector('.ct-f span'); if (f) f.textContent = 'Could not refresh: ' + e.message; }
+      else body().innerHTML = `<div class="ct-empty">${esc(e.message)}</div><div><button type="button" class="ct-btn ghost" id="ms-ct-retry">Try again</button></div>`, $('ms-ct-retry') && $('ms-ct-retry').addEventListener('click', () => load(true));
+    } finally { state.busy = false; }
+  }
+  function open(msg) {
+    if (document.documentElement.dataset.role === 'public' || !userKey()) return;
+    const d = dlg(); if (!d.open) d.showModal();
+    if (msg) linkForm(msg.text, msg.ok);
+    if (!msg || msg.ok) load(true);
+    clearInterval(state.timer); state.timer = setInterval(() => { if (!document.hidden) load(false); }, 15000);
+  }
+  document.addEventListener('DOMContentLoaded', () => {
+    const b = $('ms-me-ct'); if (b) b.addEventListener('click', () => { const me = $('ms-me'); if (me) me.open = false; open(); });
+    $('ms-ct-x').addEventListener('click', () => dlg().close());
+    dlg().addEventListener('close', () => { clearInterval(state.timer); if (location.hash === '#ctrader') history.replaceState(null, '', location.pathname + location.search.replace(/([?&])ct=[a-z]+&?/, '$1').replace(/[?&]$/, '')); });
+    // back from cTrader's grant page: /market-structure.html?ct=linked#ctrader
+    const ct = new URLSearchParams(location.search).get('ct');
+    if (location.hash === '#ctrader' || ct) {
+      const M = { linked: { text: 'cTrader linked.', ok: true }, denied: { text: 'Access was not granted on cTrader.' }, expired: { text: 'The link request expired. Please try again.' }, failed: { text: 'cTrader did not accept the link. Please try again.' } };
+      setTimeout(() => open(ct === 'linked' ? null : M[ct] || null), 300);
+      if (ct) history.replaceState(null, '', location.pathname + '#ctrader');
+    }
+  });
 })();
 </script>
 </body>
