@@ -177,6 +177,29 @@ export const SHADOW = { dip: { markets: ['nq', 'es'], back: 20 } };
 export const dipGate = (g, D) => { const di = D.findLastIndex((d) => d.time + 86400 <= g.close);   // same daily candle as signals() uses
   return di >= SHADOW.dip.back ? D[di].close < D[di - SHADOW.dip.back].close : null; };
 export const isDip = (g, mk, D) => SHADOW.dip.markets.includes(mk) && g.side > 0 && !!g.grade && g.grade.total >= MIN_GRADE && RULES.gold(g) && dipGate(g, D) === true;
+// PAPER COMPARISON ONLY (8 Nov 2026): two more shadow variants of the CURRENT A-setup rule (same sizing, same exits incl. break-even
+// on indices, all five markets), each with its own one-open-trade-per-market rule, in ict/shadow.json .variants and replay.json
+// .shadowByVariant. Not live: shadow: true + variant, no alerts, the A-rule records are never touched.
+//  'nofri' (research/edge/ict-filters): A-setups except those whose signal candle closes on a New York Friday (OOS 2024-26 +0.156R vs +0.125R
+//    a trade, max drawdown 11.3R vs 16.0R; a weak pass).
+//  'h1opp' (research/edge/confluence): A-setups only when the Meridian H1 structure trend does NOT agree with the trade (council/engine.mjs
+//    msAnalyze, N = 6, on the last 720 closed H1 candles before the signal; 'opposed' = trend against the trade or none, exactly the research's
+//    mH1 != 'with'). OOS +0.361R a trade on 61% of the trades vs +0.223R, same total R: a forward-test idea, not a pass.
+SHADOW.nofri = { markets: Object.keys(MARKETS) };
+SHADOW.h1opp = { markets: Object.keys(MARKETS), N: 6, look: 720, min: 60 };
+export const VARIANTS = ['nofri', 'h1opp'];
+const NY_DOW = new Intl.DateTimeFormat('en-US', { timeZone: 'America/New_York', weekday: 'short' });
+export const nyFriday = (t) => NY_DOW.format(new Date(t * 1000)) === 'Fri';
+const aRecorded = (g, mk) => !!g.grade && g.grade.total >= MIN_GRADE && isASetup(g, mk);
+export const isNoFri = (g, mk) => SHADOW.nofri.markets.includes(mk) && aRecorded(g, mk) && !nyFriday(g.close);
+// Meridian structure engine, loaded only for the shadow (a missing council/ checkout can only fail the shadow, never the live desk)
+let meridian = null;
+export const loadMeridian = async () => (meridian = meridian || (await import('../council/engine.mjs')).msAnalyze);
+// Meridian H1 trend (+1 up, -1 down, 0 none) on the closed H1 candles before the signal closes (the research's trendAt)
+export const h1Trend = (g, H, ms) => { const i = H.findLastIndex((b) => b.time + 3600 <= g.close); if (i < SHADOW.h1opp.min) return 0;
+  return ms(H.slice(Math.max(0, i - SHADOW.h1opp.look + 1), i + 1), SHADOW.h1opp.N).trend; };
+export const isH1Opp = (g, mk, H, ms) => SHADOW.h1opp.markets.includes(mk) && aRecorded(g, mk) && h1Trend(g, H, ms) !== g.side;
+export const variantRule = (v, g, mk, ctx) => (v === 'nofri' ? isNoFri(g, mk) : v === 'h1opp' ? isH1Opp(g, mk, ctx.H, ctx.ms) : v === 'dip' ? isDip(g, mk, ctx.D) : false);
 export const letter = (g) =>(g >= 10 ? 'A+' : g >= 9 ? 'A' : g >= 8 ? 'A-' : g >= 7 ? 'B+' : g >= 6 ? 'B' : g >= 5 ? 'B-' : g >= 3 ? 'C' : 'F');
 
 // manage one open trade on the closed 5m candles (shared by the live records and the shadow 'dip' records)
@@ -205,6 +228,9 @@ async function main() {
   fs.mkdirSync(DATA, { recursive: true });
   // shadow 'dip' records (paper comparison, never alerted): a separate file so trades.json and the live stats stay as they were
   const shadow = load('shadow.json', null) || { variant: 'dip', since: new Date(now * 1000).toISOString(), trades: [], errors: {} }; shadow.errors = shadow.errors || {};
+  // 'nofri' / 'h1opp' live under .variants (the top-level fields stay the 'dip' stream, so older readers keep working)
+  shadow.variants = shadow.variants || {};
+  for (const v of VARIANTS) { const V = (shadow.variants[v] = shadow.variants[v] || { since: new Date(now * 1000).toISOString(), trades: [], errors: {} }); V.trades = V.trades || []; V.errors = V.errors || {}; }
   const trades = load('trades.json', []), snap = { at: new Date().toISOString(), markets: {}, errors: {}, model: { ...P, name: 'H1 iFVG reversal' } }, bars = {};
   for (const [key, M] of Object.entries(MARKETS)) {
     try {
@@ -258,6 +284,28 @@ async function main() {
           delete shadow.errors[key];
         } catch (e) { shadow.errors[key] = String(e.message || e); }
       }
+      // 5. shadow 'nofri' / 'h1opp' (paper comparison only): the A-setup rule with one extra condition, each its own stream (own open
+      // trade per market, own ids, own records in shadow.json .variants); runs last, own try per variant, errors kept there
+      for (const v of VARIANTS) {
+        const V = shadow.variants[v];
+        if (!SHADOW[v].markets.includes(key)) continue;
+        try {
+          for (const tr of V.trades.filter((x) => x.market === key && x.status === 'open')) manageTrade(tr, H, m5, f);
+          const ctx = { H, D, ms: v === 'h1opp' ? await loadMeridian() : null };
+          for (const g of sig) {
+            const s = g.side, id = `${key}-${s > 0 ? 'b' : 's'}-${g.t}-${v}`;
+            if (V.trades.some((x) => x.id === id) || now - g.close > P.fresh || !variantRule(v, g, key, ctx)) continue;
+            if (V.trades.some((x) => x.market === key && x.status === 'open')) continue;   // one open trade per market for this variant
+            const entry = f(price), r0 = Math.abs(entry - g.stop);
+            if ((entry - g.stop) * s <= 0 || r0 > 1.6 * g.r0) continue;
+            V.trades.push({ id, shadow: true, variant: v, market: key, label: M.label, short: M.short, side: s > 0 ? 'buy' : 'sell', model: 'H1 iFVG reversal', signalAt: g.close, signalPx: f(g.entry),
+              entry, stop: f(g.stop), r0: +r0.toFixed(M.dec + 1), t1: null, trail: P.trail, be: M.aRule ? null : P.be, stop0: f(g.stop), t2: f(entry + s * P.mark * r0), opened: now, checked: frontier, status: 'open', R: null, size: sizeOf(g, key),
+              sweep: { t: g.sweepT, level: f(g.swept) }, fvg: g.fvg.map(f), ih: g.ih == null ? null : f(g.ih), dol: g.dol == null ? null : f(g.dol), valid: g.valid,
+              feat: g.feat, grade: { ...g.grade, letter: letter(g.grade.total) }, aset: true, aplus: isAPlus(g, key), ...(v === 'h1opp' ? { mH1: h1Trend(g, H, ctx.ms) } : {}) });
+          }
+          delete V.errors[key];
+        } catch (e) { V.errors[key] = String(e.message || e); }
+      }
     } catch (e) { snap.errors[key] = String(e.message || e); }
     await sleep(800);
   }
@@ -266,7 +314,11 @@ async function main() {
   save('trades.json', trades.slice(-3000)); save('snapshot.json', snap); save('bars.json', bars);
   { const SC = shadow.trades.filter((x) => x.closed); shadow.at = snap.at;
     shadow.totals = { n: SC.length, wins: SC.filter((x) => x.R > 0).length, R: +SC.reduce((a, x) => a + x.R, 0).toFixed(2), open: shadow.trades.filter((x) => x.status === 'open').length };
-    shadow.trades = shadow.trades.slice(-3000); save('shadow.json', shadow); }
+    shadow.trades = shadow.trades.slice(-3000);
+    for (const v of VARIANTS) { const V = shadow.variants[v], VC = V.trades.filter((x) => x.closed);
+      V.totals = { n: VC.length, wins: VC.filter((x) => x.R > 0).length, R: +VC.reduce((a, x) => a + x.R, 0).toFixed(2), open: V.trades.filter((x) => x.status === 'open').length };
+      V.trades = V.trades.slice(-3000); }
+    save('shadow.json', shadow); }
   console.log(JSON.stringify(snap.totals), Object.keys(snap.errors).length ? snap.errors : 'no errors');
 }
 if (process.argv[1] && process.argv[1].endsWith('tracker.mjs')) main().catch((e) => { console.error(e); process.exit(1); });

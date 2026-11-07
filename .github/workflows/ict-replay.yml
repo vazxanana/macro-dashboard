@@ -31,7 +31,10 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          sparse-checkout: ict
+          # council/ for the shadow 'h1opp' variant (council/engine.mjs msAnalyze); the live A-rule does not need it
+          sparse-checkout: |
+            ict
+            council
       - uses: actions/checkout@v4
         with:
           ref: council-data
