@@ -234,3 +234,24 @@ On A-setups with the stop floor (§20), cash NQ/ES/YM 2023-24 | 2025-26 and NQ f
   A+ is also positive in all four (+37.6 dd 5.7 | +28.8 dd 9.0 | +26.9 dd 7.2 | +20.7 dd 7.7) and is the steadier view for 2026, but it is not better in every set.
 - Exits: 2026 prefers quicker exits (trail from +1.5R by 1R: +18.5R dd 9.5; 24 h: +21.0 dd 7.2). Both lose profit on 2025-26 cash and NQ futures. Unchanged.
 - Read: 2026 is the edge's weakest stretch (≈ +0.1R a signal), not a broken rule. Judge it on the forward A+ count (§19), not on the replay's all-signals line.
+
+## 25. Tight stops back in at half size when they have A+ quality (7 Nov 2026)
+- Owner: "we had way better results before". The desk's 2026 replay history (council-data `ict/replay.json` per commit):
+  - before 7 Nov: A-setups 166 trades +72.8R, A+ +74.9R;
+  - after the §20 floor: 104 trades +17.6R;
+  - after the 36 h hold: +10.4R;
+  - after the §22 cap: +2.6R;
+  - after §23: +12.8R.
+  The floor removed 62 A-setups worth about +55R in 2026. No code bug; the floor was tuned on 2023-26 cash and NQ futures 2023-25, where tight stops lose.
+- Four datasets (against + grade >= 7, cap 0.75, trail 2/1.5, 36 h, costs): cash 23-24 | cash 25-26 | NQ fut 23-25 | 2026 futures replay.
+
+  | rule | cash 23-24 | cash 25-26 | NQ fut 23-25 | 2026 replay | total |
+  |---|---|---|---|---|---|
+  | floor 0.3 | +37.7 dd 7.6 | +48.6 dd 10.8 | +42.1 dd 5.4 | +9.2 dd 16.2 | +137.6 |
+  | floor 0.15 | +12.0 dd 24.3 | +23.5 dd 19.6 | +24.0 dd 11.1 | +62.7 dd 14.5 | +122.2 |
+  | **floor 0.3 + tight 0.15-0.3 only with A+ quality (body >= 0.6, not NY PM) at half size** | +35.2 dd 9.8 | +39.3 dd 12.7 | +40.2 dd 7.4 | +29.8 dd 13.2 | +144.5 |
+  | same at full size | +32.8 dd 14.6 | +29.9 dd 19.7 | +38.3 dd 10.0 | +50.5 dd 12.8 | +151.5 |
+  | all tight at half size | +24.9 | +36.1 | +33.0 | +35.9 | +129.9 |
+
+- Adopted: the half-size A+ version. It is the only one positive in all four, best total at a moderate drawdown, and 2026 rises from +9 to +30R.
+- Code: `RISK_TIGHT = 0.15`, `TIGHT_SIZE = 0.5`, `sizeOf()` in ict/tracker.mjs. Records carry `size`; R is stored × size (`Rraw` = per unit), so every desk total counts them at half weight. The desk shows a "½ size" pill.
