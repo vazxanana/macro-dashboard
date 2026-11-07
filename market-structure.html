@@ -2783,10 +2783,10 @@ function msNextSetup(bars, A) {
   window.MS_DEC = INST.dec;
   const TZ = -new Date().getTimezoneOffset() * 60;
   const THEMES = {
-    light: { bg: '#ffffff', text: '#131722', grid: '#f0f3fa', border: '#e0e3eb' },
-    dark:  { bg: '#151a23', text: '#8f98aa', grid: '#19202c', border: '#273042' },
-    midnight: { bg: '#0c1530', text: '#9aa8cb', grid: '#121e3d', border: '#22335c' },
-    pro: { bg: '#121211', text: '#a3a29c', grid: '#1a1a18', border: '#2b2b28' },
+    light: { bg: '#ffffff', bgTop: '#f7f9fc', text: '#4a5262', grid: '#f0f3fa', border: '#e0e3eb' },
+    dark:  { bg: '#131821', bgTop: '#18202c', text: '#8f98aa', grid: '#19202c', border: '#273042' },
+    midnight: { bg: '#0b1430', bgTop: '#101c3d', text: '#9aa8cb', grid: '#121e3d', border: '#22335c' },
+    pro: { bg: '#11110f', bgTop: '#171715', text: '#a3a29c', grid: '#1a1a18', border: '#2b2b28' },
   };
   const UPC = '#089981', DNC = '#f23645';
   const Z = {
@@ -2832,6 +2832,7 @@ function msNextSetup(bars, A) {
     ctx.font = '600 11px -apple-system, BlinkMacSystemFont, "Trebuchet MS", Roboto, sans-serif';
     if (z === 'bottom') {
       const HH = ctx.canvas.height / (window.devicePixelRatio || 1);
+      (it.days || []).forEach((i) => { const x = X(i - 0.5); if (x === null) return; ctx.strokeStyle = G.theme === 'light' ? 'rgba(20,30,50,0.07)' : 'rgba(200,210,230,0.06)'; ctx.lineWidth = 1; ctx.beginPath(); ctx.moveTo(Math.round(x) + 0.5, 0); ctx.lineTo(Math.round(x) + 0.5, HH); ctx.stroke(); });
       const vrow = []; o._vr = [];
       (it.vlines || []).forEach((v) => {
         const x = X(v.l); if (x === null) return;
@@ -2853,7 +2854,7 @@ function msNextSetup(bars, A) {
         if ([x1, x2, y1, y2].some((v) => v === null)) continue;
         const w = x2 - x1, h = y2 - y1, k = b.kind;
         if (k === 'origin' || k === 'htf') {
-          const base = b.fill || rgba(b.stroke, 0.09), a = alpha(base) * (k === 'htf' ? 1 : 0.7), g = ctx.createLinearGradient(x1, 0, x2, 0);
+          const base = b.fill || rgba(b.stroke, 0.09), a = alpha(base) * (k === 'htf' ? 1 : 0.5), g = ctx.createLinearGradient(x1, 0, x2, 0);
           g.addColorStop(0, rgba(base, a * 1.15)); g.addColorStop(b.open ? 0.6 : 1, rgba(base, a * 0.8)); g.addColorStop(1, rgba(base, b.open ? a * 0.12 : a * 0.8));
           ctx.fillStyle = g; ctx.fillRect(x1, y1, w, h);
           const sg = ctx.createLinearGradient(x1, 0, x2, 0), sc = k === 'htf' ? b.stroke : b.stroke;
@@ -3134,7 +3135,7 @@ function msNextSetup(bars, A) {
     const chart = LW.createChart(el, {
       autoSize: true,
       layout: { background: { type: 'solid', color: THEMES.light.bg }, textColor: THEMES.light.text, fontSize: 11 },
-      grid: { vertLines: { visible: false }, horzLines: { color: THEMES.light.grid } },
+      grid: { vertLines: { visible: false }, horzLines: { visible: false } },
       crosshair: { mode: LW.CrosshairMode.Normal },
       rightPriceScale: { borderColor: THEMES.light.border, scaleMargins: { top: 0.13, bottom: 0.08 } },
       timeScale: { borderColor: THEMES.light.border, timeVisible: true, secondsVisible: false, rightOffset: 30, barSpacing: 6 },
@@ -3200,6 +3201,7 @@ function msNextSetup(bars, A) {
       const items = { boxes: [], lines: [], labels: [], path: [], vlines: [], segs: [] };
       const D = G.show.detail, low = tf.sec <= 900;
       if (low) items.vlines = markerLines(bars, tf, D);
+      if (tf.sec <= 3600) { items.days = []; for (let i = 1; i < n; i++) { const a = new Date((bars[i - 1].time - TZ) * 1000), b2 = new Date((bars[i].time - TZ) * 1000); if (a.getDate() !== b2.getDate()) items.days.push(i); } }
       const recent = A.events.slice(D ? -2 : -1), seen = new Set();
       const evs = A.events.slice(D ? (low ? -8 : -14) : (low ? -3 : -5));
       evs.forEach((e, k) => {
@@ -3670,7 +3672,7 @@ function msNextSetup(bars, A) {
   function applyTheme() {
     const t = THEMES[G.theme];
     Object.values(panes).forEach((p) => {
-      p.chart.applyOptions({ layout: { background: { type: 'solid', color: t.bg }, textColor: t.text }, grid: { vertLines: { visible: false }, horzLines: { color: t.grid } }, rightPriceScale: { borderColor: t.border }, timeScale: { borderColor: t.border } });
+      p.chart.applyOptions({ layout: { background: { type: 'gradient', topColor: t.bgTop || t.bg, bottomColor: t.bg }, textColor: t.text }, grid: { vertLines: { visible: false }, horzLines: { visible: false } }, rightPriceScale: { borderVisible: false }, timeScale: { borderVisible: false } });
       p.overlay.set(p.overlay.items);
     });
     root.dataset.chart = G.theme === 'light' ? 'light' : 'dark'; document.documentElement.dataset.theme = G.theme;
@@ -4586,7 +4588,7 @@ function msNextSetup(bars, A) {
       }
       const th = THEMES[G.theme] || THEMES.dark;
       if (!GV.chart) {
-        GV.chart = LW.createChart(host, { autoSize: true, layout: { background: { type: 'solid', color: th.bg }, textColor: th.text, fontSize: 11 }, grid: { vertLines: { visible: false }, horzLines: { color: th.grid } }, rightPriceScale: { borderColor: th.border }, timeScale: { borderColor: th.border, timeVisible: true, rightOffset: 18 }, crosshair: { mode: LW.CrosshairMode.Normal }, handleScroll: true, handleScale: true });
+        GV.chart = LW.createChart(host, { autoSize: true, layout: { background: { type: 'solid', color: th.bg }, textColor: th.text, fontSize: 11 }, grid: { vertLines: { visible: false }, horzLines: { visible: false } }, rightPriceScale: { borderColor: th.border }, timeScale: { borderColor: th.border, timeVisible: true, rightOffset: 18 }, crosshair: { mode: LW.CrosshairMode.Normal }, handleScroll: true, handleScale: true });
         GV.series = GV.chart.addCandlestickSeries({ upColor: UPC, downColor: DNC, borderUpColor: UPC, borderDownColor: DNC, wickUpColor: UPC, wickDownColor: DNC, priceLineVisible: false, lastValueVisible: true });
         GV.ov = new Overlay(); GV.series.attachPrimitive(GV.ov);
       }
@@ -4920,11 +4922,11 @@ function msNextSetup(bars, A) {
     if (keep) TV.ctx = null; else rvOpen(x);   // a timeframe switch keeps the review being written
     const host = document.getElementById('ms-tv-c'), th = THEMES[G.theme];
     if (!TV.chart) {
-      TV.chart = LW.createChart(host, { autoSize: true, layout: { background: { type: 'solid', color: th.bg }, textColor: th.text, fontSize: 11 }, grid: { vertLines: { visible: false }, horzLines: { color: th.grid } }, crosshair: { mode: LW.CrosshairMode.Normal }, rightPriceScale: { borderColor: th.border }, timeScale: { borderColor: th.border, timeVisible: true, secondsVisible: false } });
+      TV.chart = LW.createChart(host, { autoSize: true, layout: { background: { type: 'solid', color: th.bg }, textColor: th.text, fontSize: 11 }, grid: { vertLines: { visible: false }, horzLines: { visible: false } }, crosshair: { mode: LW.CrosshairMode.Normal }, rightPriceScale: { borderColor: th.border }, timeScale: { borderColor: th.border, timeVisible: true, secondsVisible: false } });
       TV.series = TV.chart.addCandlestickSeries({ upColor: UPC, downColor: DNC, borderUpColor: UPC, borderDownColor: DNC, wickUpColor: UPC, wickDownColor: DNC, priceLineVisible: false, lastValueVisible: false });
       TV.ov = new Overlay(); TV.series.attachPrimitive(TV.ov);
       TV.series.applyOptions({ autoscaleInfoProvider: (orig) => { const r = orig(); if (r && r.priceRange && TV.pv.length) { r.priceRange.minValue = Math.min(r.priceRange.minValue, ...TV.pv); r.priceRange.maxValue = Math.max(r.priceRange.maxValue, ...TV.pv); } return r; } });
-    } else TV.chart.applyOptions({ layout: { background: { type: 'solid', color: th.bg }, textColor: th.text }, grid: { horzLines: { color: th.grid } }, rightPriceScale: { borderColor: th.border }, timeScale: { borderColor: th.border } });
+    } else TV.chart.applyOptions({ layout: { background: { type: 'solid', color: th.bg }, textColor: th.text }, grid: { horzLines: { visible: false } }, rightPriceScale: { borderColor: th.border }, timeScale: { borderColor: th.border } });
     TV.lines.forEach((l) => TV.series.removePriceLine(l)); TV.lines = []; TV.series.setData([]); TV.series.setMarkers([]);
     const req = ++TV.req, W0 = (I.nq || rpGold) ? tvPickWin(x) : tvPickTf(x), tfC = TV.tfSel ? TFS.find((t) => t.id === TV.tfSel) : null;
     const W = tfC ? { tf: tfC, start: W0.start, end: W0.end, pad: Math.max(W0.pad, 60 * tfC.sec) } : { ...W0 };
@@ -5741,7 +5743,7 @@ function msNextSetup(bars, A) {
     const x = S.cur; if (!x) return;
     const box = $('ict-tv-c'), LW = window.LightweightCharts; if (!LW) { box.innerHTML = '<p class="ms-note">Charts need the Lightweight Charts library.</p>'; return; }
     if (!CH) { CH = LW.createChart(box, { autoSize: true, layout: { background: { color: 'transparent' }, textColor: getComputedStyle(document.documentElement).getPropertyValue('--ink-dim') || '#9aa3b2' },
-      grid: { vertLines: { color: 'rgba(128,128,128,.08)' }, horzLines: { color: 'rgba(128,128,128,.08)' } }, timeScale: { timeVisible: true, secondsVisible: false }, rightPriceScale: { borderVisible: false } });
+      grid: { vertLines: { visible: false }, horzLines: { visible: false } }, timeScale: { timeVisible: true, secondsVisible: false }, rightPriceScale: { borderVisible: false } });
       SER = CH.addCandlestickSeries({ upColor: '#089981', downColor: '#f23645', borderUpColor: '#089981', borderDownColor: '#f23645', wickUpColor: '#089981', wickDownColor: '#f23645', priceLineVisible: false }); }
     const raw = ((S.bars[x.market] || {})[S.tf] || []).map((b) => ({ time: b[0], open: b[1], high: b[2], low: b[3], close: b[4] }));
     SER.setData(raw); SER.applyOptions({ priceFormat: { type: 'price', precision: DEC[x.market] ?? 2, minMove: Math.pow(10, -(DEC[x.market] ?? 2)) } });
@@ -6313,9 +6315,9 @@ function msNextSetup(bars, A) {
     if (ST.chart || !window.LightweightCharts) return !!ST.chart;
     var host = $('cx-chart'), C = colors();
     ST.chart = LightweightCharts.createChart(host, { autoSize: true, layout: { background: { type: 'solid', color: 'transparent' }, textColor: C.text, fontFamily: getComputedStyle(R).getPropertyValue('--mono') || 'monospace', fontSize: 11 },
-      grid: { vertLines: { color: C.grid }, horzLines: { color: C.grid } }, rightPriceScale: { borderColor: C.grid }, timeScale: { borderColor: C.grid, timeVisible: true, secondsVisible: false }, crosshair: { mode: 0 } });
+      grid: { vertLines: { visible: false }, horzLines: { visible: false } }, rightPriceScale: { borderColor: C.grid }, timeScale: { borderColor: C.grid, timeVisible: true, secondsVisible: false }, crosshair: { mode: 0 } });
     ST.series = ST.chart.addCandlestickSeries({ upColor: C.up, downColor: C.dn, wickUpColor: C.up, wickDownColor: C.dn, borderVisible: false, priceLineVisible: true });
-    new MutationObserver(function () { if (!ST.chart) return; var K = colors(); ST.chart.applyOptions({ layout: { textColor: K.text }, grid: { vertLines: { color: K.grid }, horzLines: { color: K.grid } }, rightPriceScale: { borderColor: K.grid }, timeScale: { borderColor: K.grid } }); ST.series.applyOptions({ upColor: K.up, downColor: K.dn, wickUpColor: K.up, wickDownColor: K.dn }); levels(); }).observe(R, { attributes: true, attributeFilter: ['data-theme'] });
+    new MutationObserver(function () { if (!ST.chart) return; var K = colors(); ST.chart.applyOptions({ layout: { textColor: K.text }, grid: { vertLines: { visible: false }, horzLines: { visible: false } }, rightPriceScale: { borderColor: K.grid }, timeScale: { borderColor: K.grid } }); ST.series.applyOptions({ upColor: K.up, downColor: K.dn, wickUpColor: K.up, wickDownColor: K.dn }); levels(); }).observe(R, { attributes: true, attributeFilter: ['data-theme'] });
     return true;
   }
   function levelSrc() { var k = ST.sel;
