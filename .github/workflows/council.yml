@@ -7,7 +7,8 @@ name: Council trader
 # Keeps itself alive: a push/dispatch run trades every ~4 minutes for ~4.5 h (M1 signals stay fresh 12 min, so no scalp is missed),
 # then dispatches the next run (workflow_dispatch from GITHUB_TOKEN is allowed),
 # so the Trader runs 24/7. Cron runs are only a watchdog: they never cancel the
-# loop (own concurrency group) and start a new one only if none is running.
+# loop (own concurrency group) and start a new one only if none is running, or if the
+# last council save on council-data is over 20 min old (a stuck run).
 on:
   # 7 Nov 2026, 16:3x: the owner chose GitHub Actions as the council runner (repo public, so minutes are free). Self-restart,
   # watchdog and push trigger are back. The Vercel cron (api/run.js) stands down while this loop has saved in the last 10 min
@@ -40,7 +41,15 @@ jobs:
           n=$(gh run list -R "${{ github.repository }}" --workflow council.yml --limit 20 --json status,event \
             --jq '[.[] | select(.event != "schedule" and (.status == "in_progress" or .status == "queued" or .status == "waiting" or .status == "pending"))] | length')
           echo "Trader loop runs active: $n"
-          if [ "$n" = "0" ]; then gh workflow run council.yml --ref main -R "${{ github.repository }}"; echo "Started a new loop"; fi
+          if [ "$n" = "0" ]; then gh workflow run council.yml --ref main -R "${{ github.repository }}"; echo "Started a new loop"; exit 0; fi
+          # A run can show 'in progress' and save nothing (stuck). If the last "Council run" save on council-data (Actions or the
+          # Vercel fallback) is over 20 min old, start a new loop anyway: the trade job's concurrency group cancels the stuck one.
+          last=$(gh api "repos/${{ github.repository }}/commits?sha=council-data&per_page=50" \
+            --jq '[.[] | select(.commit.message | startswith("Council run"))][0].commit.committer.date // empty' || true)
+          if [ -z "$last" ]; then echo "No council save found in the last 50 commits: leaving the running loop alone"; exit 0; fi
+          age=$(( $(date -u +%s) - $(date -u -d "$last" +%s) ))
+          echo "Last council save: $last (${age}s ago)"
+          if [ "$age" -gt 1200 ]; then gh workflow run council.yml --ref main -R "${{ github.repository }}"; echo "Loop is stale: started a new one"; fi
 
   trade:
     if: github.event_name != 'schedule'
@@ -77,6 +86,9 @@ jobs:
           git -C data config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           ROUNDS=60
           for i in $(seq 1 $ROUNDS); do
+            # 60 rounds take ~5.6 h (~5.6 min each), longer than the 330-min job timeout, so the job was killed before "Start the
+            # next run" (6 Nov 05:44: 79 min with no run until the cron watchdog restarted it). Stop at 300 min so the hand-off runs.
+            if [ "$SECONDS" -gt 18000 ]; then echo "Time budget reached after $((i - 1)) rounds"; break; fi
             git -C data pull -q --rebase origin council-data || true
             node council/trader.mjs data || echo "Trader round $i failed"
             git -C data add -A

@@ -1,0 +1,659 @@
+{
+ "topic": "ict-exits",
+ "system": "ICT desk H1 iFVG (ict/tracker.mjs signals/isASetup, post-#413), HistData M1 2018-Oct 2026: NAS100 cash (NQ), SPX500 cash (ES), spot gold (GC)",
+ "baseline": {
+  "rule": "live exit: swing stop 2 ticks beyond sweep; index BE at +1.5R; trail from +2R 1.5R behind best; time exit after 36 closed H1 candles (gold: no BE)",
+  "is": {
+   "n": 971,
+   "wr": 0.384,
+   "exp": 0.088,
+   "R": 85.1,
+   "maxDD": 34.5,
+   "t": 1.77
+  },
+  "oos": {
+   "n": 440,
+   "wr": 0.409,
+   "exp": 0.145,
+   "R": 63.7,
+   "maxDD": 16.5,
+   "t": 2.05
+  },
+  "years": {
+   "2018": -10.2,
+   "2019": 15.3,
+   "2020": 26.4,
+   "2021": -8.3,
+   "2022": 32,
+   "2023": 29.9,
+   "2024": 21.8,
+   "2025": 28.4,
+   "2026": 13.5
+  },
+  "byGroup": {
+   "A_all": {
+    "is": {
+     "n": 971,
+     "wr": 0.384,
+     "exp": 0.088,
+     "R": 85.1,
+     "maxDD": 34.5,
+     "t": 1.77
+    },
+    "oos": {
+     "n": 440,
+     "wr": 0.409,
+     "exp": 0.145,
+     "R": 63.7,
+     "maxDD": 16.5,
+     "t": 2.05
+    }
+   },
+   "A_index": {
+    "is": {
+     "n": 577,
+     "wr": 0.354,
+     "exp": 0.041,
+     "R": 23.7,
+     "maxDD": 29.2,
+     "t": 0.65
+    },
+    "oos": {
+     "n": 263,
+     "wr": 0.388,
+     "exp": 0.141,
+     "R": 37.2,
+     "maxDD": 18,
+     "t": 1.53
+    }
+   },
+   "A_gold": {
+    "is": {
+     "n": 394,
+     "wr": 0.429,
+     "exp": 0.156,
+     "R": 61.4,
+     "maxDD": 20.6,
+     "t": 1.97
+    },
+    "oos": {
+     "n": 177,
+     "wr": 0.441,
+     "exp": 0.15,
+     "R": 26.5,
+     "maxDD": 7.6,
+     "t": 1.36
+    }
+   },
+   "all_signals": {
+    "is": {
+     "n": 4523,
+     "wr": 0.364,
+     "exp": 0.042,
+     "R": 191.7,
+     "maxDD": 82.4,
+     "t": 1.79
+    },
+    "oos": {
+     "n": 2037,
+     "wr": 0.377,
+     "exp": 0.036,
+     "R": 72.7,
+     "maxDD": 36.6,
+     "t": 1.12
+    }
+   }
+  }
+ },
+ "candidates": [
+  {
+   "group": "A_all",
+   "rule": "trail_be15",
+   "is": {
+    "n": 971,
+    "wr": 0.377,
+    "exp": 0.09,
+    "R": 87.6,
+    "maxDD": 33.8,
+    "t": 1.84
+   },
+   "oos": {
+    "n": 440,
+    "wr": 0.389,
+    "exp": 0.129,
+    "R": 56.8,
+    "maxDD": 16.5,
+    "t": 1.84
+   },
+   "years": {
+    "2018": -7.5,
+    "2019": 17.4,
+    "2020": 26.9,
+    "2021": -7.3,
+    "2022": 30.5,
+    "2023": 27.7,
+    "2024": 18.5,
+    "2025": 26.8,
+    "2026": 11.5
+   },
+   "vsBase": {
+    "is": {
+     "d": 0.003,
+     "t": 0.44
+    },
+    "oos": {
+     "d": -0.016,
+     "t": -1.79
+    }
+   },
+   "verdict": "FAIL: IS pick (+0.003R/t vs base, t 0.44); OOS worse than base (0.129 vs 0.145)"
+  },
+  {
+   "group": "A_index",
+   "rule": "part2_run36h",
+   "is": {
+    "n": 577,
+    "wr": 0.354,
+    "exp": 0.043,
+    "R": 25,
+    "maxDD": 24.6,
+    "t": 0.72
+   },
+   "oos": {
+    "n": 263,
+    "wr": 0.388,
+    "exp": 0.187,
+    "R": 49.1,
+    "maxDD": 18.6,
+    "t": 1.94
+   },
+   "years": {
+    "2018": 1.5,
+    "2019": -11.5,
+    "2020": 1.7,
+    "2021": 6.1,
+    "2022": 12.6,
+    "2023": 14.6,
+    "2024": 15.8,
+    "2025": 18.3,
+    "2026": 15
+   },
+   "vsBase": {
+    "is": {
+     "d": 0.002,
+     "t": 0.07
+    },
+    "oos": {
+     "d": 0.045,
+     "t": 1.02
+    }
+   },
+   "verdict": "NOT ADOPTED: IS pick but IS gain +0.002R/t (t 0.07) is noise; OOS +0.045R/t (t 1.02), DD not smaller; worse IS on gold and pooled"
+  },
+  {
+   "group": "A_gold",
+   "rule": "trail_be15",
+   "is": {
+    "n": 394,
+    "wr": 0.411,
+    "exp": 0.162,
+    "R": 63.9,
+    "maxDD": 18.7,
+    "t": 2.09
+   },
+   "oos": {
+    "n": 177,
+    "wr": 0.39,
+    "exp": 0.111,
+    "R": 19.6,
+    "maxDD": 7.6,
+    "t": 1.02
+   },
+   "years": {
+    "2018": -3.9,
+    "2019": 23.8,
+    "2020": 16.3,
+    "2021": -0.6,
+    "2022": 13.6,
+    "2023": 14.8,
+    "2024": 4.9,
+    "2025": 15.8,
+    "2026": -1.1
+   },
+   "vsBase": {
+    "is": {
+     "d": 0.006,
+     "t": 0.44
+    },
+    "oos": {
+     "d": -0.039,
+     "t": -1.8
+    }
+   },
+   "verdict": "FAIL: IS pick by expectancy; OOS 0.111 vs base 0.150, 2/3 OOS years"
+  },
+  {
+   "group": "A_gold",
+   "rule": "fix4R_be1",
+   "is": {
+    "n": 394,
+    "wr": 0.31,
+    "exp": 0.129,
+    "R": 51,
+    "maxDD": 10.9,
+    "t": 1.82
+   },
+   "oos": {
+    "n": 177,
+    "wr": 0.271,
+    "exp": 0.122,
+    "R": 21.6,
+    "maxDD": 9.8,
+    "t": 1.09
+   },
+   "years": {
+    "2018": 3.8,
+    "2019": 23.6,
+    "2020": 6.3,
+    "2021": -2.6,
+    "2022": 15.3,
+    "2023": 4.6,
+    "2024": 6.7,
+    "2025": 15.9,
+    "2026": -1
+   },
+   "vsBase": {
+    "is": {
+     "d": -0.026,
+     "t": -0.63
+    },
+    "oos": {
+     "d": -0.028,
+     "t": -0.47
+    }
+   },
+   "verdict": "FAIL: IS pick by R/DD; OOS 0.122 vs base 0.150"
+  },
+  {
+   "group": "all_signals",
+   "rule": "trail_be0",
+   "is": {
+    "n": 4523,
+    "wr": 0.384,
+    "exp": 0.053,
+    "R": 239.1,
+    "maxDD": 67.2,
+    "t": 2.17
+   },
+   "oos": {
+    "n": 2037,
+    "wr": 0.397,
+    "exp": 0.04,
+    "R": 81.4,
+    "maxDD": 29.9,
+    "t": 1.22
+   },
+   "years": {
+    "2018": 26.8,
+    "2019": 25.9,
+    "2020": 4.5,
+    "2021": 13.1,
+    "2022": 147.3,
+    "2023": 21.6,
+    "2024": 13.7,
+    "2025": 23.9,
+    "2026": 43.8
+   },
+   "vsBase": {
+    "is": {
+     "d": 0.01,
+     "t": 1.88
+    },
+    "oos": {
+     "d": 0.004,
+     "t": 0.61
+    }
+   },
+   "verdict": "FAIL: IS pick (+0.01R/t); OOS +0.004R/t, within noise"
+  },
+  {
+   "group": "A_all",
+   "rule": "fix4R_be0",
+   "is": {
+    "n": 971,
+    "wr": 0.349,
+    "exp": 0.068,
+    "R": 65.9,
+    "maxDD": 34.6,
+    "t": 1.3
+   },
+   "oos": {
+    "n": 440,
+    "wr": 0.386,
+    "exp": 0.196,
+    "R": 86.5,
+    "maxDD": 13.7,
+    "t": 2.44
+   },
+   "years": {
+    "2018": -5.6,
+    "2019": 8.1,
+    "2020": 13.7,
+    "2021": 7.6,
+    "2022": 18.1,
+    "2023": 24,
+    "2024": 38.2,
+    "2025": 21.4,
+    "2026": 26.8
+   },
+   "vsBase": {
+    "is": {
+     "d": -0.02,
+     "t": -0.76
+    },
+    "oos": {
+     "d": 0.052,
+     "t": 1.39
+    }
+   },
+   "verdict": "FAIL (hindsight only): best OOS (+0.196) but worse than base IS (0.068 vs 0.088)"
+  },
+  {
+   "group": "A_all",
+   "rule": "trail_be1",
+   "is": {
+    "n": 971,
+    "wr": 0.319,
+    "exp": 0.067,
+    "R": 65.5,
+    "maxDD": 25.9,
+    "t": 1.53
+   },
+   "oos": {
+    "n": 440,
+    "wr": 0.307,
+    "exp": 0.06,
+    "R": 26.6,
+    "maxDD": 17.2,
+    "t": 0.94
+   },
+   "years": {
+    "2018": -13,
+    "2019": 18.6,
+    "2020": 17.7,
+    "2021": -0.8,
+    "2022": 22.8,
+    "2023": 20.2,
+    "2024": 7.1,
+    "2025": 14,
+    "2026": 5.4
+   },
+   "vsBase": {
+    "is": {
+     "d": -0.02,
+     "t": -0.89
+    },
+    "oos": {
+     "d": -0.084,
+     "t": -2.86
+    }
+   },
+   "verdict": "REJECT: BE at +1R worse OOS (-0.084R/t, t -2.86)"
+  },
+  {
+   "group": "A_all",
+   "rule": "time12",
+   "is": {
+    "n": 971,
+    "wr": 0.452,
+    "exp": 0.005,
+    "R": 5.2,
+    "maxDD": 39.1,
+    "t": 0.16
+   },
+   "oos": {
+    "n": 440,
+    "wr": 0.459,
+    "exp": 0.052,
+    "R": 22.7,
+    "maxDD": 17.8,
+    "t": 0.96
+   },
+   "years": {
+    "2018": -7.3,
+    "2019": -12.5,
+    "2020": 8.6,
+    "2021": -5.3,
+    "2022": 1.7,
+    "2023": 20,
+    "2024": 14.6,
+    "2025": 7.8,
+    "2026": 0.2
+   },
+   "vsBase": {
+    "is": {
+     "d": -0.082,
+     "t": -2.43
+    },
+    "oos": {
+     "d": -0.093,
+     "t": -2.18
+    }
+   },
+   "verdict": "REJECT: 12-bar time exit worse IS and OOS (t -2.4 / -2.2)"
+  },
+  {
+   "group": "A_all",
+   "rule": "stop_fail",
+   "is": {
+    "n": 971,
+    "wr": 0.264,
+    "exp": 0.008,
+    "R": 7.3,
+    "maxDD": 38,
+    "t": 0.19
+   },
+   "oos": {
+    "n": 440,
+    "wr": 0.309,
+    "exp": 0.104,
+    "R": 45.9,
+    "maxDD": 16.3,
+    "t": 1.71
+   },
+   "years": {
+    "2018": -15.5,
+    "2019": -6.9,
+    "2020": 18.2,
+    "2021": -9.3,
+    "2022": 5.2,
+    "2023": 15.6,
+    "2024": 9.8,
+    "2025": 28.1,
+    "2026": 8
+   },
+   "vsBase": {
+    "is": {
+     "d": -0.08,
+     "t": -2.7
+    },
+    "oos": {
+     "d": -0.04,
+     "t": -1.1
+    }
+   },
+   "verdict": "REJECT: fail stop worse IS (-0.08R/t, t -2.7) and OOS"
+  }
+ ],
+ "variantsTried": "25 exit variants x 4 entry groups (A_all, A_index, A_gold, all_signals) = 100 comparisons",
+ "mfeMae": {
+  "A_all": {
+   "n": 1411,
+   "stoppedIn36": 0.581,
+   "mfeBeforeStop": {
+    "p25": 0.36,
+    "p50": 1.05,
+    "p75": 2.16,
+    "p90": 3.73
+   },
+   "reachBeforeStop": {
+    "1R": 0.517,
+    "1.5R": 0.371,
+    "2R": 0.277,
+    "3R": 0.143,
+    "4R": 0.086
+   },
+   "mae36": {
+    "p25": -2.4,
+    "p50": -1.27,
+    "p75": -0.58
+   },
+   "baseWinners": {
+    "n": 553,
+    "maeP50": -0.37,
+    "maeP10": -0.84,
+    "mfeP50": 2.36
+   },
+   "baseLosers": {
+    "n": 858,
+    "mfeP50": 0.46,
+    "mfeP75": 0.94,
+    "share_reached1R": 0.233
+   },
+   "costR_p50": 0.02,
+   "liqAvail": {
+    "pdh": 0.608,
+    "sess": 0.391,
+    "dol": 0.848
+   }
+  },
+  "A_index": {
+   "n": 840,
+   "stoppedIn36": 0.617,
+   "mfeBeforeStop": {
+    "p25": 0.34,
+    "p50": 1.04,
+    "p75": 2.29,
+    "p90": 3.98
+   },
+   "reachBeforeStop": {
+    "1R": 0.513,
+    "1.5R": 0.382,
+    "2R": 0.293,
+    "3R": 0.162,
+    "4R": 0.099
+   },
+   "mae36": {
+    "p25": -2.74,
+    "p50": -1.43,
+    "p75": -0.68
+   },
+   "baseWinners": {
+    "n": 306,
+    "maeP50": -0.4,
+    "maeP10": -0.85,
+    "mfeP50": 2.43
+   },
+   "baseLosers": {
+    "n": 534,
+    "mfeP50": 0.49,
+    "mfeP75": 1,
+    "share_reached1R": 0.253
+   },
+   "costR_p50": 0.02,
+   "liqAvail": {
+    "pdh": 0.673,
+    "sess": 0.442,
+    "dol": 0.894
+   }
+  },
+  "A_gold": {
+   "n": 571,
+   "stoppedIn36": 0.529,
+   "mfeBeforeStop": {
+    "p25": 0.38,
+    "p50": 1.06,
+    "p75": 2.01,
+    "p90": 3.24
+   },
+   "reachBeforeStop": {
+    "1R": 0.522,
+    "1.5R": 0.354,
+    "2R": 0.254,
+    "3R": 0.116,
+    "4R": 0.068
+   },
+   "mae36": {
+    "p25": -1.92,
+    "p50": -1.09,
+    "p75": -0.47
+   },
+   "baseWinners": {
+    "n": 247,
+    "maeP50": -0.36,
+    "maeP10": -0.84,
+    "mfeP50": 2.11
+   },
+   "baseLosers": {
+    "n": 324,
+    "mfeP50": 0.45,
+    "mfeP75": 0.9,
+    "share_reached1R": 0.201
+   },
+   "costR_p50": 0.03,
+   "liqAvail": {
+    "pdh": 0.513,
+    "sess": 0.315,
+    "dol": 0.781
+   }
+  },
+  "all_signals": {
+   "n": 6560,
+   "stoppedIn36": 0.63,
+   "mfeBeforeStop": {
+    "p25": 0.35,
+    "p50": 0.95,
+    "p75": 2.13,
+    "p90": 3.92
+   },
+   "reachBeforeStop": {
+    "1R": 0.487,
+    "1.5R": 0.353,
+    "2R": 0.271,
+    "3R": 0.159,
+    "4R": 0.095
+   },
+   "mae36": {
+    "p25": -2.99,
+    "p50": -1.51,
+    "p75": -0.64
+   },
+   "baseWinners": {
+    "n": 2415,
+    "maeP50": -0.39,
+    "maeP10": -0.83,
+    "mfeP50": 2.41
+   },
+   "baseLosers": {
+    "n": 4145,
+    "mfeP50": 0.48,
+    "mfeP75": 0.97,
+    "share_reached1R": 0.238
+   },
+   "costR_p50": 0.02,
+   "liqAvail": {
+    "pdh": 0.618,
+    "sess": 0.456,
+    "dol": 0.815
+   }
+  }
+ },
+ "verdict": "FAIL - no exit beats the live exit in-sample by more than noise; live exit stays",
+ "notes": [
+  "IS 2018-2023, OOS 2024-Oct 2026; every signal its own trade; same entries for all variants (signals where any variant lacked a full window dropped)",
+  "costs: NAS 1.0 pt, SPX 0.5 pt, gold 0.30 per trade (median ~0.02R)",
+  "unit R (1R per trade); live sizing (sec 25/27) reported for picks in detail.json",
+  "cash CFD and spot data stand in for futures (skill sec 19: H1 signals are feed-dependent)",
+  "index A-setups are weak IS 2018-23 (+0.041R/t, t 0.65): the entry edge, not the exit, is the main uncertainty"
+ ]
+}
