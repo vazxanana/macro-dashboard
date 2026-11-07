@@ -468,22 +468,66 @@ export function eventPlaybook(events, now, { bars = {}, log = [], days = 5 } = {
 
 // ─── fetching (injectable fetch; every call has a timeout and never throws) ───────────────────────────────────────────
 const UA = { 'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36' };
-async function get(fetchImpl, url, kind = 'text', ms = 15000) {
-  try { const r = await fetchImpl(url, { headers: UA, signal: AbortSignal.timeout(ms) }); if (!r.ok) return { err: `HTTP ${r.status}` };
+async function get(fetchImpl, url, kind = 'text', ms = 15000, headers = UA) {
+  try { const r = await fetchImpl(url, { headers, signal: AbortSignal.timeout(ms) }); if (!r.ok) return { err: `HTTP ${r.status}` };
     const body = kind === 'json' ? await r.json() : await r.text(); return { body }; } catch (e) { return { err: String((e && e.message) || e).slice(0, 80) }; }
+}
+// run async jobs a few at a time (FRED throttles a burst of parallel requests from one runner)
+async function pool(items, n, fn) { const q = items.slice(); await Promise.all(Array.from({ length: n }, async () => { while (q.length) await fn(q.shift()); })); }
+// US Treasury daily par and real yield curves (CSV per year): the fallback for DGS2, DGS10, T10Y3M, DFII10 and T10YIE
+export const TREASURY = (type, year) => `https://home.treasury.gov/resource-center/data-chart-center/interest-rates/daily-treasury-rates.csv/${year}/all?type=${type}&field_tdr_date_value=${year}&page&_format=csv`;
+export function parseTreasuryCsv(text) {
+  const lines = String(text || '').split(/\r?\n/).filter(Boolean); if (lines.length < 2) return {};
+  const h = lines[0].split(',').map((x) => x.replace(/"/g, '').trim().toLowerCase().replace(/\s+/g, ' ')), di = h.indexOf('date'); if (di < 0) return {};
+  const out = {};
+  for (const l of lines.slice(1)) { const c = l.split(',').map((x) => x.replace(/"/g, '').trim()), m = (c[di] || '').match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/); if (!m) continue;
+    const t = Date.UTC(+m[3], +m[1] - 1, +m[2]) / 1000;
+    h.forEach((k, i) => { if (i === di || c[i] === '' || !isFinite(+c[i])) return; (out[k] = out[k] || []).push({ t, v: +c[i] }); }); }
+  for (const k in out) out[k].sort((a, b) => a.t - b.t);
+  return out;
+}
+async function treasuryFallback(fetchImpl, now, data, src) {
+  const need = (id) => !data.fred[id] || !data.fred[id].length, Y = new Date(now * 1000).getUTCFullYear(), years = [Y - 4, Y - 3, Y - 2, Y - 1, Y];
+  if (!['DGS2', 'DGS10', 'T10Y3M', 'T10YIE', 'DFII10'].some(need)) return;
+  const grab = async (type) => { const cols = {}; let ok = 0, err = null;
+    await pool(years, 2, async (y) => { const r = await get(fetchImpl, TREASURY(type, y), 'text', 20000); const p = r.body ? parseTreasuryCsv(r.body) : {};
+      if (Object.keys(p).length) { ok++; for (const k in p) cols[k] = (cols[k] || []).concat(p[k]); } else err = r.err || 'empty'; });
+    for (const k in cols) cols[k].sort((a, b) => a.t - b.t);
+    return { cols, ok, err }; };
+  const col = (cols, ...names) => names.map((n) => cols[n]).find((a) => a && a.length);
+  const by = (a) => new Map((a || []).map((o) => [o.t, o.v])), note = (id, m) => { src[`fred:${id}`] = `${src[`fred:${id}`] || 'FRED failed'}; ${m}`; };
+  const nom = await grab('daily_treasury_yield_curve'), y2 = col(nom.cols, '2 yr'), y10 = col(nom.cols, '10 yr'), m3 = col(nom.cols, '3 mo');
+  src['treasury:nominal'] = nom.ok ? `ok (${nom.ok} years)` : `failed (${nom.err})`;
+  if (need('DGS2') && y2) { data.fred.DGS2 = y2; note('DGS2', 'Treasury 2Y ok'); }
+  if (need('DGS10') && y10) { data.fred.DGS10 = y10; note('DGS10', 'Treasury 10Y ok'); }
+  if (need('T10Y3M') && y10 && m3) { const b = by(m3); data.fred.T10Y3M = y10.filter((o) => b.has(o.t)).map((o) => ({ t: o.t, v: +(o.v - b.get(o.t)).toFixed(3) })); note('T10Y3M', 'Treasury 10Y − 3M ok'); }
+  if (need('DFII10')) { const r = await grab('daily_treasury_real_yield_curve'), r10 = col(r.cols, '10 yr');
+    src['treasury:real'] = r.ok ? `ok (${r.ok} years)` : `failed (${r.err})`;
+    if (r10) { data.fred.DFII10 = r10; note('DFII10', 'Treasury real 10Y ok'); } }
+  if (need('T10YIE') && y10 && data.fred.DFII10) { const b = by(data.fred.DFII10); data.fred.T10YIE = y10.filter((o) => b.has(o.t)).map((o) => ({ t: o.t, v: +(o.v - b.get(o.t)).toFixed(3) })); note('T10YIE', 'Treasury 10Y − real 10Y ok'); }
 }
 export async function gather(fetchImpl, now, cache = {}) {
   const src = {}, data = { fred: {}, bars: {}, cot: [], cal: [], rss: [] };
   const cosd = iso(now - 5 * 365 * DAY);
-  await Promise.all(FRED.map(async (id) => {
-    const r = await get(fetchImpl, `https://fred.stlouisfed.org/graph/fredgraph.csv?id=${id}&cosd=${cosd}`);
-    const obs = r.body ? parseFredCsv(r.body) : [];
+  // FRED: four at a time; a plain client first, then once more with a browser user agent. After 4 series in a row fail,
+  // FRED counts as unreachable for this run and the rest go straight to the fallbacks (the run has a 3-minute budget).
+  const FRED_TRY = [[{ 'User-Agent': 'macro-dashboard-council/1.0 (+https://meridianx.dev)', Accept: 'text/csv,*/*' }, 20000], [UA, 10000]];
+  let fredFails = 0;
+  await pool(FRED, 4, async (id) => {
+    let r = { err: 'skipped: FRED unreachable this run' }, obs = [];
+    if (fredFails < 4) {
+      for (const [h, ms] of FRED_TRY) { r = await get(fetchImpl, `https://fred.stlouisfed.org/graph/fredgraph.csv?id=${id}&cosd=${cosd}`, 'text', ms, h); obs = r.body ? parseFredCsv(r.body) : []; if (obs.length) break; }
+      fredFails = obs.length ? 0 : fredFails + 1;
+    }
     if (obs.length) { data.fred[id] = obs; src[`fred:${id}`] = `ok, last ${iso(obs[obs.length - 1].t)}`; return; }
     const cb = CBOE[id] ? await get(fetchImpl, CBOE[id]) : null, co = cb && cb.body ? parseCboeCsv(cb.body).filter((o) => o.t >= now - 5 * 365 * DAY) : [];
     if (co.length) { data.fred[id] = co; src[`fred:${id}`] = `FRED failed (${r.err || 'empty'}), Cboe ok, last ${iso(co[co.length - 1].t)}`; }
-    else if (cache.fred && cache.fred[id] && cache.fred[id].length) { data.fred[id] = cache.fred[id].map(([d, v]) => ({ t: Date.parse(d + 'T00:00:00Z') / 1000, v })); src[`fred:${id}`] = `failed (${r.err || 'empty'}), using cache to ${cache.fred[id][cache.fred[id].length - 1][0]}`; }
     else src[`fred:${id}`] = `failed (${r.err || 'empty'})`;
-  }));
+  });
+  await treasuryFallback(fetchImpl, now, data, src);
+  // still missing: the last good copy from an earlier run
+  for (const id of FRED) if ((!data.fred[id] || !data.fred[id].length) && cache.fred && cache.fred[id] && cache.fred[id].length) {
+    data.fred[id] = cache.fred[id].map(([d, v]) => ({ t: Date.parse(d + 'T00:00:00Z') / 1000, v })); src[`fred:${id}`] += `, using cache to ${cache.fred[id][cache.fred[id].length - 1][0]}`; }
   // euro-area 2Y government yield (ECB AAA curve), context for the US-euro rate gap
   { const r = await get(fetchImpl, 'https://data-api.ecb.europa.eu/service/data/YC/B.U2.EUR.4F.G_N_A.SV_C_YM.SR_2Y?format=csvdata&lastNObservations=60');
     const obs = r.body ? parseEcbCsv(r.body) : [];
@@ -566,7 +610,7 @@ export function makeBrief(fc) {
   if (fc.dxy) L.push(`DXY: ${pct(fc.dxy.pUp)} up (mirror of EUR/USD).`);
   const ev = fc.playbook.slice(0, 4);
   if (ev.length) L.push('Coming up: ' + ev.map((e) => `${e.country} ${e.title} ${WD.format(new Date(e.at))} ${HM.format(new Date(e.at))} UTC${e.consensus ? ` (consensus ${e.consensus}, previous ${e.previous || '—'})` : ''}${e.outcome ? `, came in ${e.outcome}` : `: if ${e.scenarios[0].name}, gold ${e.scenarios[0].moves.gold}, USD ${usdOf(e.scenarios[0].moves.eurusd)}, NQ ${e.scenarios[0].moves.nq}; gold usually moves ±${e.expMovePct.gold}%`}`).join('; ') + '.');
-  else L.push('No high-impact events in the next 5 days on the calendar we could read.');
+  else L.push(`No high-impact events in the next 5 days on the calendar we could read${fc.sources && /failed/.test(fc.sources['calendar:nextweek'] || '') ? " (next week's calendar is not published yet; it usually appears over the weekend)" : ''}.`);
   const g = fc.scorecard.replay.gold, v = fc.scorecard.vol && fc.scorecard.vol.gold;
   if (g && g.n) L.push(`Honesty check: on the ${g.n}-day walk-forward replay the gold calls hit ${pct(g.hit)} against a ${pct(g.base)} base rate (Brier ${g.brier} vs ${g.brierRW} for a coin flip, Pesaran-Timmermann ${g.pt ?? 'n/a'}): ${verdictOf(g)}.${v && v.eventDays ? ` Event days moved gold ${v.eventAvgAbs}% on average against ${v.otherAvgAbs}% on other days: the size of the move is the more reliable forecast.` : ''} Treat the direction odds as context, not trade signals.`);
   return L.join(' ');
