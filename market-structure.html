@@ -829,6 +829,18 @@
   .u-actions { grid-column: 2; display: flex; align-items: center; gap: 12px; }
   .u-btn { margin: 0; background: #e3b341; color: #17130a; border: 0; font-weight: 600; min-height: 40px; padding: 8px 18px; }
   @media (max-width: 700px) { .u-form { grid-template-columns: minmax(0, 1fr); } .u-actions { grid-column: 1; } }
+  /* phones: each account is a stacked block (name + source, access full width, actions) instead of an 830px-wide table */
+  @media (max-width: 700px) {
+    .u-t thead { display: none; }
+    .u-t, .u-t tbody, .u-t tr, .u-t td { display: block; }
+    .u-t { min-width: 0 !important; width: 100%; }
+    .u-t tr { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: 8px 10px; padding: 12px 0; border-bottom: 1px solid var(--line); }
+    .u-t td { padding: 0; border: 0; min-width: 0; text-align: left; }
+    .u-t td:nth-child(2), .u-t td.u-acts, .u-t td.empty { grid-column: 1 / -1; }
+    .u-t td select { width: 100%; min-height: 44px; font-size: 14px; }
+    .u-acts { display: flex; flex-wrap: wrap; gap: 8px; white-space: normal; }
+    .u-acts button { margin: 0; min-height: 44px; flex: 1 1 auto; }
+  }
 
   /* ═══════════ Design pass 100 (6 Nov) ═══════════
      Typography 1–10 · colour & surfaces 11–20 · layout 21–35 · components 36–60 · motion 61–70 · access 71–85 · details 86–100 */
