@@ -17,7 +17,7 @@
     "session:overlap": "2026-11-07T06:00:50.000Z"
    },
    "src": {
-    "d1": "backtest",
+    "d1": "user",
     "noMarket": "user"
    },
    "noSession": [
@@ -520,6 +520,12 @@
    "by": "coach-stats",
    "change": "m30m1: only with D1",
    "why": "against: -0.62R over 8 trades, too costly to keep taking while with is tested."
+  },
+  {
+   "at": "2026-11-07T16:31:59.000Z",
+   "by": "user",
+   "change": "Scalp against D1, outside Asia, trades live on paper on every market (the market focus no longer blocks Scalp); the other engine setups stay shadow",
+   "why": "30-day replay: Scalp against the D1 trend +0.329R a trade over 500 trades, positive in both halves (+0.24 / +0.42); Scalp with D1 -0.29R over 459. Forward shadow trades 1-7 Nov agree: +0.25R over 127. Against D1 in Asia is flat (+0.03R over 562), so Asia stays out."
   }
  ],
  "btAt": "2026-11-07T10:37:20.372Z",
@@ -559,7 +565,8 @@
   "gold-add-1.5",
   "gold-trend-add",
   "gold-momentum-pullback",
-  "gold-trend-fast"
+  "gold-trend-fast",
+  "scalp-against-live"
  ],
  "target": {},
  "targetBy": {},
@@ -574,7 +581,7 @@
    "why": "four losses in a row"
   },
   "scalp": {
-   "at": "2026-11-07T12:10:05.000Z",
+   "at": "2026-11-07T16:31:59.000Z",
    "why": "expectancy -1.00R over 13 trades"
   },
   "xau": {
@@ -690,5 +697,8 @@
  "goldTrendFast": {
   "n": 5,
   "k": 2
- }
+ },
+ "focusSetups": [
+  "scalp"
+ ]
 }
