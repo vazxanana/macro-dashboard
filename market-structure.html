@@ -2286,6 +2286,7 @@ html[data-motion="off"][data-gate] .gate-bg path[stroke] { animation: none; stro
           <button type="button" class="menu-pa menu-tv" id="ms-tvw-open">TradingView alerts in <small>log TradingView alerts here, push to your phone</small></button>
           <button type="button" class="menu-pa menu-tv" id="ms-tva-open">TradingView add-on <small>council trades on your TradingView chart</small></button>
           <div class="menu-h">Chart layers</div>
+          <div class="ms-lay" id="ms-lay" role="group" aria-label="Chart layout presets"><button type="button" data-lay="clean" title="Candles, structure lines and key levels only">Clean</button><button type="button" data-lay="full" title="Every layer on">Full</button><button type="button" data-lay="mine" title="Your saved layout">Mine</button><button type="button" data-lay="save" class="sv" title="Save the current layers as Mine">Save as Mine</button></div>
           <div class="ms-tog">
             <label><input type="checkbox" id="ms-show-bo" data-show="bo" checked><i style="background:#f23645;height:2px"></i>BO lines</label>
             <label><input type="checkbox" id="ms-show-origin" data-show="origin" checked><i style="background:rgba(242,54,69,.35);border:1px solid #b22833"></i>Origin</label>
@@ -3867,6 +3868,18 @@ function msNextSetup(bars, A) {
     } }
   { const k = document.getElementById('ms-show-shade'); try { G.showShade = localStorage.getItem('ms-shade') !== '0'; } catch (e) {} if (k) { k.checked = G.showShade !== false; k.addEventListener('change', () => { G.showShade = k.checked; try { localStorage.setItem('ms-shade', k.checked ? '1' : '0'); } catch (e) {} Object.values(panes).forEach((P) => P.setShade && P.setShade()); }); } }
   { const k = document.getElementById('ms-show-ema'); try { G.showEma = localStorage.getItem('ms-ema') === '1'; } catch (e) {} if (k) { k.checked = G.showEma === true; k.addEventListener('change', () => { G.showEma = k.checked; try { localStorage.setItem('ms-ema', k.checked ? '1' : '0'); } catch (e) {} Object.values(panes).forEach((P) => P.setEma && P.setEma()); }); } }
+  // chart layout presets (7 Nov loop): one tap flips the layer toggles; "Mine" is saved on this device
+  { const box = document.getElementById('ms-lay'); if (box) { const all = () => [...document.querySelectorAll('.ms-tog input[type=checkbox][id^="ms-show-"]')];
+    const OFF_CLEAN = ['ms-show-ema', 'ms-show-shade', 'ms-show-vol', 'ms-show-ha', 'ms-show-ct', 'ms-show-detail', 'ms-show-replica', 'ms-show-news', 'ms-show-sess', 'ms-show-next', 'ms-show-plan'];
+    const NOT_FULL = ['ms-show-ha', 'ms-show-log', 'ms-show-detail'];
+    const apply = (m) => all().forEach((c) => { if (!(c.id in m) || c.checked === m[c.id]) return; c.checked = m[c.id]; c.dispatchEvent(new Event('change', { bubbles: true })); });
+    const flash = (b, t) => { const o = b.textContent; b.textContent = t; setTimeout(() => { b.textContent = o; }, 1400); };
+    box.addEventListener('click', (ev) => { const b = ev.target.closest('[data-lay]'); if (!b) return; const k = b.dataset.lay;
+      if (k === 'save') { const m = {}; all().forEach((c) => { m[c.id] = c.checked; }); try { localStorage.setItem('ms-lay-mine', JSON.stringify(m)); } catch (e) {} flash(b, 'Saved ✓'); return; }
+      let m = {}; if (k === 'clean') all().forEach((c) => { if (c.id !== 'ms-show-log') m[c.id] = !OFF_CLEAN.includes(c.id); });
+      else if (k === 'full') all().forEach((c) => { if (c.id !== 'ms-show-log') m[c.id] = !NOT_FULL.includes(c.id); });
+      else { try { m = JSON.parse(localStorage.getItem('ms-lay-mine') || 'null'); } catch (e) { m = null; } if (!m) { flash(b, 'Save one first'); return; } }
+      apply(m); box.querySelectorAll('[data-lay]').forEach((x) => x.classList.toggle('on', x === b)); if (window.msTrack) try { window.msTrack('layout', { k }); } catch (e) {} }); } }
   { const v = document.getElementById('ms-show-log'); if (v) { v.checked = !!G.log; v.addEventListener('change', () => { G.log = v.checked; try { localStorage.setItem('ms-log', v.checked ? '1' : '0'); } catch (e) {} Object.values(panes).forEach((P) => P.setLog && P.setLog()); }); } }
   { const v = document.getElementById('ms-show-ha'); try { G.ha = localStorage.getItem('ms-ha') === '1'; } catch (e) {} if (v) { v.checked = !!G.ha; v.addEventListener('change', () => { G.ha = v.checked; try { localStorage.setItem('ms-ha', v.checked ? '1' : '0'); } catch (e) {} Object.values(panes).forEach((P) => { if (P.raw && P.raw.length && P.rebuild) P.rebuild(true); }); }); } }
   { const v = document.getElementById('ms-show-vol'); try { G.showVol = localStorage.getItem('ms-vol') !== '0'; } catch (e) {} if (v) { v.checked = G.showVol !== false; v.addEventListener('change', () => { G.showVol = v.checked; try { localStorage.setItem('ms-vol', v.checked ? '1' : '0'); } catch (e) {} Object.values(panes).forEach((P) => P.setVol && P.setVol()); }); } }
@@ -7781,6 +7794,10 @@ function gpStats(T) {
 .h-mk-sp.up .l { stroke: var(--buy); } .h-mk-sp.up .a, .h-mk-sp.up circle { fill: var(--buy); } .h-mk-sp.dn .l { stroke: var(--sell); } .h-mk-sp.dn .a, .h-mk-sp.dn circle { fill: var(--sell); }
 @media (max-width: 520px) { .h-mk-row { display: flex; width: 0; min-width: 100%; overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: none; padding-bottom: 2px; } .h-mk-row::-webkit-scrollbar { display: none; } .h-mk-i { flex: 0 0 140px; scroll-snap-align: start; } }
 @media (prefers-reduced-motion: reduce) { .h-mk-i { transition: none; } .h-mk-i:hover { transform: none; } }
+.ms-lay { display: flex; flex-wrap: wrap; gap: 6px; margin: 2px 0 8px; }
+.ms-lay button { flex: 1 1 auto; min-height: 32px; padding: 4px 10px; border-radius: 8px; border: 1px solid var(--line); background: var(--panel); color: var(--ink); font: inherit; font-size: 12.5px; font-weight: 600; cursor: pointer; }
+.ms-lay button:hover, .ms-lay button.on { border-color: var(--accent); } .ms-lay button.on { background: color-mix(in srgb, var(--accent) 12%, var(--panel)); }
+.ms-lay button.sv { color: var(--ink-dim); font-weight: 500; } .ms-lay button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 .wl { display: flex; gap: 6px; width: 0; min-width: 100%; box-sizing: border-box; overflow-x: auto; scrollbar-width: none; margin: 4px 0 12px; padding-bottom: 2px; }
 .wl[hidden] { display: none; } .wl::-webkit-scrollbar { display: none; }
 .wl-i { flex: none; display: inline-flex; align-items: baseline; gap: 6px; padding: 6px 10px; border-radius: 9px; border: 1px solid var(--line); background: var(--panel); color: var(--ink); text-decoration: none; font-size: 12.5px; font-variant-numeric: tabular-nums; }
