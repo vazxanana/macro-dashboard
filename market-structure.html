@@ -3949,8 +3949,8 @@ function msNextSetup(bars, A) {
 
   TFS.forEach((tf) => { const p = makePane(tf); if (p) panes[tf.id] = p; });
   // key levels (7 Nov loop): previous day / week high and low and today's open, as quiet dotted lines on the intraday charts
-  function keyLevels() {
-    const d = panes['1d'] && panes['1d'].raw; let L = [];
+  // the levels from a market's daily candles (raw prices): [title, price, pivot?]
+  function klList(d) { const L = [];
     if (G.showKL !== false && d && d.length > 8) {
       const now = Date.now() / 1000, day = Math.floor(now / 86400) * 86400, prev = d.filter((b) => b.time < day), cur = d.find((b) => b.time === day);
       const pd = prev[prev.length - 1], wk = (t) => Math.floor((t / 86400 + 3) / 7);   // weeks start Monday (UTC)
@@ -3962,10 +3962,16 @@ function msNextSetup(bars, A) {
     // daily floor pivots (7 Nov loop): from yesterday's high / low / close
     if (G.showPiv === true && d && d.length > 2) { const day = Math.floor(Date.now() / 1000 / 86400) * 86400, pd = d.filter((b) => b.time < day).pop();
       if (pd) { const P0 = (pd.high + pd.low + pd.close) / 3, rg = pd.high - pd.low; L.push(['P', P0, 1], ['R1', 2 * P0 - pd.low, 1], ['S1', 2 * P0 - pd.high, 1], ['R2', P0 + rg, 1], ['S2', P0 - rg, 1]); } }
-    const off = G.offset || 0;
+    return L;
+  }
+  // klList's levels as quiet price lines on a series (returned, for removal); off = the chart's price offset
+  const klLines = (series, L, off) => L.map(([t, v, pv]) => pv ? series.createPriceLine({ price: +v + off, color: t === 'P' ? 'rgba(156,39,176,.8)' : 'rgba(156,39,176,.45)', lineWidth: 1, lineStyle: LW.LineStyle.Dashed, axisLabelVisible: t === 'P', title: t }) : series.createPriceLine({ price: +v + off, color: t === 'DO' ? 'rgba(154,164,178,.55)' : /H$/.test(t) ? 'rgba(8,153,129,.55)' : 'rgba(242,54,69,.55)', lineWidth: 1, lineStyle: LW.LineStyle.SparseDotted, axisLabelVisible: true, title: t }));
+  function keyLevels() {
+    const L = klList(panes['1d'] && panes['1d'].raw), off = G.offset || 0;
     ['4h', '1h', '15m', '5m', '1m'].forEach((id) => { const P = panes[id]; if (!P || !P.series) return;
       (P._kl || []).forEach((l) => { try { P.series.removePriceLine(l); } catch (e) {} });
-      P._kl = L.map(([t, v, pv]) => pv ? P.series.createPriceLine({ price: v + off, color: t === 'P' ? 'rgba(156,39,176,.8)' : 'rgba(156,39,176,.45)', lineWidth: 1, lineStyle: LW.LineStyle.Dashed, axisLabelVisible: t === 'P', title: t }) : P.series.createPriceLine({ price: v + off, color: t === 'DO' ? 'rgba(154,164,178,.55)' : /H$/.test(t) ? 'rgba(8,153,129,.55)' : 'rgba(242,54,69,.55)', lineWidth: 1, lineStyle: LW.LineStyle.SparseDotted, axisLabelVisible: true, title: t })); });
+      P._kl = klLines(P.series, L, off); });
+    if (window.msSplitKL) window.msSplitKL();   // and the Split screen's free chart
   }
   setTimeout(keyLevels, 2500); setInterval(keyLevels, 60e3);
   // your own horizontal lines (drawn with the line tool), per market in localStorage
@@ -4900,7 +4906,12 @@ function msNextSetup(bars, A) {
   }
   // markups on the free chart (another market, or the left chart's own timeframe): the same Meridian / ICT drawing as the panes
   // (merItems / fvgItems + ictSess) with the price lines they use; the page's plan and higher-timeframe origins only for its own market
-  SP.ind = []; SP.ov = null; SP.pl = []; SP.d = null; SP.dk = '';
+  SP.ind = []; SP.ov = null; SP.pl = []; SP.d = null; SP.dk = ''; SP.kl = [];
+  // key levels on the free chart, from its own market's daily candles; like the panes: intraday only, in both markup modes
+  function spKL() { if (!SP.series) return; SP.kl.forEach((l) => { try { SP.series.removePriceLine(l); } catch (e) {} }); SP.kl = [];
+    const k = spSym(), own = k === instKey; if (!SP.on || spPane() || spTf() === '1d' || !SP.bars.length) return;
+    SP.kl = klLines(SP.series, klList(own ? panes['1d'] && panes['1d'].raw : SP.dk === k ? SP.d : null), own ? G.offset || 0 : 0); }
+  window.msSplitKL = () => { try { spKL(); } catch (e) {} };
   function spMarkup() { if (!SP.chart || !SP.series) return; SP.ind.forEach((s2) => { try { SP.chart.removeSeries(s2); } catch (e) {} }); SP.ind = [];
     SP.pl.forEach((l) => { try { SP.series.removePriceLine(l); } catch (e) {} }); SP.pl = [];
     if (!SP.ov) { SP.ov = new Overlay(); try { SP.series.attachPrimitive(SP.ov); } catch (e) {} }
@@ -4910,15 +4921,17 @@ function msNextSetup(bars, A) {
       if (G.mode === 'ict') { fvgItems(B, items); ictSess(B, B.map((b) => ({ time: b.time - TZ })), tf, items, PL, own ? panes['1d'] && panes['1d'].raw : SP.d, own ? G.offset || 0 : 0); }
       else { const A = msAnalyze(B, PIVOT), S = A.last ? msNextSetup(B, A) : null; merItems(B, A, S, tf, items, (v) => fmtI(v, I), own);
         if (S) PL(S.invalid, 'Invalidation', '#787b86', true, G.show.detail);
-        const pl = G.plan; if (own && G.show.plan && pl && tf.id !== '4h') { PL(pl.entry, 'Entry', '#2962ff', false, G.show.detail); PL(pl.stop, 'Stop', '#f23645', false, G.show.detail); PL(pl.t1, 'T1', '#089981', true, G.show.detail); if (tf.id !== '1m') PL(pl.t2, 'T2', '#089981', 2, G.show.detail); } }
+        const pl = G.plan; if (own && G.show.plan && pl && tf.id !== '4h') { PL(pl.entry, 'Entry', '#2962ff', false, G.show.detail); PL(pl.stop, 'Stop', '#f23645', false, G.show.detail); PL(pl.t1, 'T1', '#089981', true, G.show.detail); if (tf.id !== '1m') PL(pl.t2, 'T2', '#089981', 2, G.show.detail); }
+        // the gold M5 replica boxes, as on the M5 pane (they come from the page's own M5 / M15 / H1 panes)
+        if (own && tf.id === '5m') { const keep = P5pv; try { replicaItems(items, B); } catch (e) {} P5pv = keep; } }
     } catch (e) { /* not enough swings yet */ }
-    SP.ov.set(items); indDraw(SP.chart, B, SP.ind); }
+    SP.ov.set(items); indDraw(SP.chart, B, SP.ind); spKL(); }
   async function spLoad() {
     if (!SP.on) return; spControls(); grid4.dataset.splitR = spPane() ? spTf() : ''; if (spPane()) { setTimeout(() => { const R = spPane(); if (R) R.fit(); if (SP.sync.range || SP.sync.time) spFromLeft(); }, 60); return; } spChart(); const k = spSym(), tf = spTf(), I = INSTRUMENTS[k], key = `${k}|${tf}`; if (!I || !SP.series) return;
     const T = TFS.find((t) => t.id === tf); document.getElementById('ms-sp-t').textContent = `${I.label} · ${T ? T.label : tf}`;
     if (SP.key !== key) { SP.key = key; SP.series.setData([]); SP.bars = []; spMarkup(); }   // no old market's markups on an empty chart
-    // another market: its own daily bars, for the ICT 50%-of-yesterday line
-    if (k !== instKey && SP.dk !== k) { SP.dk = k; SP.d = null; fetchBars(TFS.find((t) => t.id === '1d') || TFS[0], I, 10).then((r) => { if (SP.dk === k && r && r.bars) { SP.d = r.bars; if (G.mode === 'ict' && SP.bars.length) spMarkup(); } }).catch(() => {}); }
+    // another market: its own daily bars (three weeks), for the key levels and the ICT 50%-of-yesterday line
+    if (k !== instKey && SP.dk !== k) { SP.dk = k; SP.d = null; fetchBars(TFS.find((t) => t.id === '1d') || TFS[0], I, 20).then((r) => { if (SP.dk === k && r && r.bars) { SP.d = r.bars; if (SP.bars.length) { if (G.mode === 'ict') spMarkup(); else spKL(); } } }).catch(() => {}); }
     try { const r = await fetchBars(TFS.find((t) => t.id === tf) || TFS[2], I, 500); if (SP.key !== key || !r || !r.bars || !r.bars.length) return;
       const off = k === instKey ? G.offset || 0 : 0;   // same market: the left chart's price offset, so the plan lines sit on the candles
       SP.bars = r.bars.map((b) => ({ time: b.time + TZ, open: +b.open + off, high: +b.high + off, low: +b.low + off, close: +b.close + off }));
@@ -5995,7 +6008,7 @@ function msNextSetup(bars, A) {
     const rrB = (r) => r == null ? '—' : r < 1 ? '< 1' : r < 1.5 ? '1–1.5' : r < 2 ? '1.5–2' : r < 3 ? '2–3' : r < 5 ? '3–5' : '5+';
     const val = (t, f) => EDGE.by === 'rr' ? rrB(t.rr) : EDGE.by === 'market' ? t.market : EDGE.by === 'setup' ? String(t.k || t.setup || '').replace('@mkt', '') : (f || {})[EDGE.by];
     const fw = (Array.isArray(C.trades) ? C.trades : []).filter((t) => (t.status === 'win' || t.status === 'loss' || t.status === 'be') && isFinite(t.R) && (!EDGE.k || t.k === EDGE.k));
-    const bt = C.backtest && C.backtest.tradeCols ? C.backtest.trades.map((r) => Object.fromEntries(C.backtest.tradeCols.map((c, i) => [c, r[i]]))).filter((t) => t.fill && (!EDGE.k || String(t.setup).replace('@mkt', '') === EDGE.k)) : [];
+    const bt = C.backtest && C.backtest.tradeCols ? C.backtest.trades.map((r) => Object.fromEntries(C.backtest.tradeCols.map((c, i) => [c, r[i]]))).filter((t) => t.fill && t.status !== 'open' && t.R_none != null && (!EDGE.k || String(t.setup).replace('@mkt', '') === EDGE.k)) : [];   // open rows (no result yet) left out
     const sel = document.getElementById('ms-edge-k'); if (sel && sel.options.length < 2) { const ks = [...new Set(fw.map((t) => t.k))].sort(); sel.innerHTML = '<option value="">all</option>' + ks.map((k) => `<option value="${esc(k)}">${esc(k)}</option>`).join(''); }
     const mid = bt.length ? bt.map((t) => t.opened).sort((a, b) => a - b)[bt.length >> 1] : 0, G2 = new Map(), add = (key, slot, R) => { if (key == null) return; if (!G2.has(key)) G2.set(key, { live: [], sh: [], bt: [], h1: [], h2: [] }); G2.get(key)[slot].push(R); };
     fw.forEach((t) => add(val(t, t.feat), t.shadow ? 'sh' : 'live', +t.R));
@@ -6013,7 +6026,12 @@ function msNextSetup(bars, A) {
   // live setups card (7 Nov): which engine setups trade live outside the market focus, their live record and the stop guard
   function renderSleeve() { const el = document.getElementById('ms-sleeve'), C = COUNCIL, cfg = C.config; if (!el || !cfg) return;
     const ks = cfg.focusSetups || [], stopped = cfg.sleeveStopped || {}; const all = ks.concat(Object.keys(stopped).filter((k) => !ks.includes(k)));
-    if (!all.length) { el.hidden = true; return; }
+    // Coach promotion / demotion proposals (7 Nov): shadow setups that earned a live slot, live setups that lost their edge.
+    // Shown even when nothing trades live; never applied: a setup moves in or out of live only with the owner's OK.
+    const PD = (C.coach && Array.isArray(C.coach.proposals) ? C.coach.proposals : []).filter((p) => p.kind === 'promote' || p.kind === 'promoteIf' || p.kind === 'demote');
+    const pfx = (v) => `<span class="${v >= 0 ? 'pos' : 'neg'}"><b>${v >= 0 ? '+' : '−'}${Math.abs(+v || 0).toFixed(2)}R</b></span>`;
+    const pd = !(C.coach && Array.isArray(C.coach.proposals)) ? '' : `<div class="sl-row"><div class="sl-h"><b>Coach suggests (needs your OK)</b><small>promote / demote · from the 30-day replay</small></div>${PD.length ? PD.map((p) => `<small class="sl-n" title="${esc(p.why || '')}"><span class="ms-chip ${p.kind === 'demote' ? 'ms-chip-sell' : 'ms-chip-buy'}">${p.kind === 'demote' ? 'Demote' : 'Promote'}</span> <b>${esc(p.label || (p.kind === 'demote' ? 'move ' + p.setup + ' back to shadow' : 'make ' + p.setup + ' live'))}</b> — ${pfx(p.exp)} a trade over ${+p.n} replay trades${p.h1 && p.h2 ? ` · halves ${pfx(p.h1.exp)} / ${pfx(p.h2.exp)}` : ''}${p.all ? ` · all of ${esc(p.setup)} ${pfx(p.all.exp)} over ${+p.all.n}` : ''}</small>`).join('') : '<small class="sl-n">No shadow setup has earned a live slot and no live setup has lost its edge (promote: 100+ replay trades, +0.10R a trade, both halves positive).</small>'}</div>`;
+    if (!all.length) { if (!PD.length) { el.hidden = true; return; } el.hidden = false; el.innerHTML = `<div class="ms-k"><span>Live setups · paper</span><span class="ms-note">no engine setup trades live yet</span></div>${pd}`; return; }
     const rows = all.map((k) => { const h = (cfg.history || []).find((x) => x.by === 'user' && /trades live on paper on every market/.test(x.change || '') && new RegExp('^' + k, 'i').test(x.change || '')), since = h ? Date.parse(h.at) / 1000 : 0;
       const L = (Array.isArray(C.trades) ? C.trades : []).filter((x) => x.k === k && !x.shadow && x.opened >= since), done = L.filter((x) => (x.status === 'win' || x.status === 'loss' || x.status === 'be') && isFinite(x.R)), open = L.filter((x) => x.status === 'open' || x.status === 'pending');
       const e = done.length ? done.reduce((a, x) => a + x.R, 0) / done.length : null, sum = done.reduce((a, x) => a + x.R, 0), f = cfg.filters && cfg.filters[k] || {};
@@ -6024,9 +6042,9 @@ function msNextSetup(bars, A) {
         <div class="sl-k"><span><b>${done.length}</b> closed</span><span><b>${open.length}</b> open</span><span class="${e == null ? '' : e > 0 ? 'pos' : 'neg'}"><b>${e == null ? '—' : (e >= 0 ? '+' : '−') + Math.abs(e).toFixed(2) + 'R'}</b> a trade</span><span class="${sum > 0 ? 'pos' : sum < 0 ? 'neg' : ''}"><b>${(sum >= 0 ? '+' : '−') + Math.abs(sum).toFixed(1)}R</b> total</span></div>
         ${(() => { const B = C.backtest, cols = B && B.tradeCols; if (!cols || !Array.isArray(B.trades)) return '';
           // Replay rows that pass the same live rule (setup, D1 filter, skipped sessions/markets): what the 30-day replay expects per trade.
-          const ix = (c) => cols.indexOf(c), iS = ix('setup'), iD = ix('d1'), iSe = ix('session'), iM = ix('market'), iR = ix('R_none'), iF = ix('fill'), iC = ix('cost'); if (iS < 0 || iR < 0) return '';
+          const ix = (c) => cols.indexOf(c), iS = ix('setup'), iD = ix('d1'), iSe = ix('session'), iM = ix('market'), iR = ix('R_none'), iF = ix('fill'), iC = ix('cost'), iSt = ix('status'); if (iS < 0 || iR < 0) return '';
           // filled trades only (a resting order that never filled is not a trade), judged after spread, as the Coach counts them
-          const rp = B.trades.filter((r) => r[iS] === k && (iF < 0 || r[iF] !== 0) && (!f.d1 || r[iD] === f.d1) && !(f.noSession || []).includes(r[iSe]) && !(f.noMarket || []).includes(r[iM]) && isFinite(r[iR]));
+          const rp = B.trades.filter((r) => r[iS] === k && (iF < 0 || r[iF] !== 0) && (!f.d1 || r[iD] === f.d1) && !(f.noSession || []).includes(r[iSe]) && !(f.noMarket || []).includes(r[iM]) && r[iR] != null && isFinite(r[iR]) && (iSt < 0 || r[iSt] !== 'open'));   // open rows: no result yet
           const Rn = (r) => r[iR] - (iC >= 0 ? +r[iC] || 0 : 0);
           if (rp.length < 10) return ''; const re = rp.reduce((a, r) => a + Rn(r), 0) / rp.length, fx = (v) => (v >= 0 ? '+' : '−') + Math.abs(v).toFixed(2) + 'R';
           const gap = e == null ? null : e - re, note = e == null || done.length < 5 ? 'too few live trades to compare yet' : Math.abs(gap) < 0.25 ? 'live is tracking the replay' : gap < 0 ? 'live is running below the replay: watch fills, costs and the D1 label' : 'live is running above the replay';
@@ -6038,7 +6056,7 @@ function msNextSetup(bars, A) {
           const s = P.find((p) => p.kind === 'stability'); if (s && s.h1 && s.h2) sk.push(`<small class="sl-n">Replay halves ${fx(s.h1.exp)} / ${fx(s.h2.exp)}${s.flag ? ' · one half lost money: the edge is not steady' : ' · positive in both halves'}</small>`);
           return sk.join(''); })()}
         <div class="sl-g"><i style="width:${Math.min(100, done.length / 20 * 100).toFixed(0)}%"></i></div><small class="sl-n">Guard: back to shadow at −0.30R a trade over 20+ live trades · ${guard}</small></div>`; }).join('');
-    el.hidden = false; el.innerHTML = `<div class="ms-k"><span>Live setups · paper</span><span class="ms-note">engine setups trading live on every market</span></div>${rows}`; }
+    el.hidden = false; el.innerHTML = `<div class="ms-k"><span>Live setups · paper</span><span class="ms-note">engine setups trading live on every market</span></div>${rows}${pd}`; }
   function renderCouncil() {
     try { renderEdge(); } catch (e) { console.warn('edge', e); }
     try { renderSleeve(); } catch (e) { console.warn('sleeve', e); }
@@ -6705,7 +6723,8 @@ function msNextSetup(bars, A) {
     const sum = document.getElementById('ms-c-bt-sum'); if (!sum) return;
     const set = (id, html) => { const el = document.getElementById(id); if (el) el.innerHTML = html; };
     if (!b || !Array.isArray(b.trades) || !b.trades.length) { sum.textContent = 'No backtest yet: it runs daily and after every engine change.'; ['ms-c-bt', 'ms-c-bt-mkt', 'ms-c-bt-lines'].forEach((id) => set(id, '')); return; }
-    const TA = b.trades.map((r) => Object.fromEntries(b.tradeCols.map((c, i) => [c, r[i]])));
+    // rows still open at the end of the replay window (status 'open', R null) have no result yet: left out of every number here
+    const TA = b.trades.map((r) => Object.fromEntries(b.tradeCols.map((c, i) => [c, r[i]]))).filter((t) => t.status !== 'open');
     const net = b.tradeCols.includes('cost');   // results after a typical spread (one per round trip), as the Coach judges them
     if (net) TA.forEach((t) => ['R_none', 'R_be1', 'R_be15', 'R_tp2'].forEach((k) => { if (t[k] != null) t[k] -= t.cost || 0; }));
     const T = TA.filter((t) => t.fill !== 0 && !String(t.setup).includes('@'));   // the trades as the Trader takes them (no market-entry twins, no unfilled orders)

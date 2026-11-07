@@ -20,8 +20,8 @@ module.exports = async (req, res) => {
   try {
     // with a token: the GitHub API (works on a private repo); without one: the public raw file (only while the repo is still public)
     const r = tok ? await fetch(`https://api.github.com/repos/${REPO}/contents/${enc}?ref=${BRANCH}`, {
-      headers: { Authorization: `Bearer ${tok}`, Accept: 'application/vnd.github.raw', 'X-GitHub-Api-Version': '2022-11-28', 'User-Agent': 'aurum-desk-data' } })
-      : await fetch(`https://raw.githubusercontent.com/${REPO}/${BRANCH}/${enc}?t=${Math.floor(Date.now() / 20000)}`);
+      headers: { Authorization: `Bearer ${tok}`, Accept: 'application/vnd.github.raw', 'X-GitHub-Api-Version': '2022-11-28', 'User-Agent': 'aurum-desk-data' }, signal: AbortSignal.timeout(10000) })
+      : await fetch(`https://raw.githubusercontent.com/${REPO}/${BRANCH}/${enc}?t=${Math.floor(Date.now() / 20000)}`, { signal: AbortSignal.timeout(10000) });
     if (!r.ok) { res.setHeader('Cache-Control', 's-maxage=15'); return res.status(r.status === 404 ? 404 : 502).json({ error: `GitHub ${r.status}` }); }
     const buf = Buffer.from(await r.arrayBuffer()), ext = (p.split('.').pop() || '').toLowerCase();
     res.setHeader('Content-Type', { json: 'application/json; charset=utf-8', md: 'text/markdown; charset=utf-8', csv: 'text/csv; charset=utf-8', js: 'application/javascript; charset=utf-8' }[ext] || 'text/plain; charset=utf-8');

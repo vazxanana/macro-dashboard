@@ -10,6 +10,7 @@ import { m15cFeat } from './choch.mjs';
 import { FUT, ticket, closeTicket } from './futures.mjs';
 import { liveRuleSection, injectSection } from './analyst.mjs';
 import { coachProposals } from './proposals.mjs';
+import { cleanBars, LTF_CLEAN } from './clean.mjs';
 
 const DIR = process.argv[2] || 'data';
 fs.mkdirSync(DIR, { recursive: true });
@@ -336,35 +337,6 @@ function dailyCycle(src, price, t) {
   const spr = price * 0.0002, buf = Math.max(3 * spr, 0.05 * leg), stop = bull ? lo - buf : hi + buf, r = Math.abs(price - stop);
   if (!(r > 0)) return null;
   return { sell: bear, entry: price, stop, t1: price + (bull ? 3 : -3) * r, closeBy: t + 8 * 3600, day: d, londonHigh: hi, londonLow: lo };
-}
-// Bad prints: thin feeds (Kraken FX trades, stitched Yahoo/Dukascopy) carry the odd off-market tick that makes a 1,000-pip
-// candle and a fake 160R trade. A wick longer than 50 times the median candle range of the last 100 candles is clipped to the
-// body plus one median range; a candle whose body jumps 50 ranges away and comes straight back is flattened to the prior close.
-// Forex (opts.wickK = 15) also clips a lone wick past 15 ranges that the next 3 candles never trade back into: on
-// 3 Nov 10:12 one Kraken order spiked AUD/USD 35 pips for a minute (Yahoo saw nothing) and hit five stops. News spikes get revisited.
-const LTF_CLEAN = new Set(['1m', '5m', '15m', '30m']);   // the lone-wick rule: the timeframes trades are managed on, not the structure TFs
-function cleanBars(arr, o = {}) {
-  const K = o.k || 50, WK = o.wickK || 0, RV = o.revisit || 3;
-  let fixed = 0; const win = [], log = [];
-  for (let i = 0; i < arr.length; i++) {
-    const b = arr[i];
-    const med = win.length >= 20 ? [...win].sort((x, y) => x - y)[win.length >> 1] : 0;
-    if (med > 0) {
-      const lim = K * med, p = arr[i - 1], n = arr[i + 1];
-      if (p && n && Math.abs(b.close - p.close) > lim && Math.abs(n.open - p.close) < lim / 2) {
-        Object.assign(b, { open: p.close, high: p.close, low: p.close, close: p.close }); fixed++; log.push([b.time, 'body']);
-      }
-      const top = Math.max(b.open, b.close), bot = Math.min(b.open, b.close);
-      // a lone wick: far past the body and never traded near again in the next RV candles (needs those candles to exist)
-      const next = arr.slice(i + 1, i + 1 + RV), lone = WK && next.length === RV;
-      const hiLim = lone && next.every((x) => x.high < top + (b.high - top) / 2) ? WK * med : lim;
-      const loLim = lone && next.every((x) => x.low > bot - (bot - b.low) / 2) ? WK * med : lim;
-      if (b.high - top > hiLim) { log.push([b.time, 'high', +((b.high - top) / med).toFixed(0)]); b.high = top + med; fixed++; }
-      if (bot - b.low > loLim) { log.push([b.time, 'low', +((bot - b.low) / med).toFixed(0)]); b.low = bot - med; fixed++; }
-    }
-    const r = b.high - b.low; if (r > 0) { win.push(r); if (win.length > 100) win.shift(); }
-  }
-  return o.log ? log : fixed;
 }
 let research = rd('research.json', []);
 // ─── Research setup (paper only): the trader's gold replica (3 Nov) ───
@@ -1051,7 +1023,8 @@ const exp = (arr) => arr.length ? arr.reduce((a, x) => a + x.R, 0) / arr.length 
 const BT = (() => {
   const b = rd('backtest.json', null);
   if (!b || b.fake || !Array.isArray(b.trades) || !b.trades.length || now - Date.parse(b.at) / 1000 > 3 * 86400) return null;
-  const T = b.trades.map((r) => Object.fromEntries(b.tradeCols.map((c, i) => [c, r[i]])));
+  // rows still open at the end of the replay window (status 'open', R null) have no result yet: left out of every stat here
+  const T = b.trades.map((r) => Object.fromEntries(b.tradeCols.map((c, i) => [c, r[i]]))).filter((t) => t.status !== 'open');
   // judge every result after costs: each backtest trade carries its spread in R (one spread per round trip)
   if (b.tradeCols.includes('cost')) for (const t of T) for (const k of ['R_none', 'R_be1', 'R_be15', 'R_tp2']) if (t[k] != null) t[k] = +(t[k] - (t.cost || 0)).toFixed(3);
   // TA: every row, incl. market-entry twins ('<k>@mkt') and resting orders that never filled (fill 0, 0R);
@@ -1386,10 +1359,11 @@ const fslot = nowISO.slice(0, 11) + String(Math.floor(+nowISO.slice(11, 13) / 6)
   }
 }
 // Coach proposals (7 Nov): suggestions for the owner from the replay, for the setups trading live. Never applied here:
-// live rules change only with the owner's OK. Recomputed when backtest.json or the live setups' rules change.
+// live rules change only with the owner's OK. Recomputed when backtest.json, the live setups or any setup's rules change.
 try {
   const b = rd('backtest.json', null), cj = rd('coach.json', {});
-  const key = b && b.at ? b.at + '|' + JSON.stringify((config.focusSetups || []).map((k) => [k, (config.filters || {})[k] || null])) : '';
+  // v2: promotion/demotion proposals read every setup's filters, so any rule change recomputes them
+  const key = b && b.at ? 'v2|' + b.at + '|' + JSON.stringify([config.focusSetups || [], config.filters || {}]) : '';
   if (key && cj.proposalsKey !== key) { cj.proposals = coachProposals(b, config, nowISO); cj.proposalsKey = key; cj.proposalsBt = b.at; wr('coach.json', cj); }
 } catch (e) { console.log('coach proposals failed:', e.message); }
 config.history = config.history.slice(-200);

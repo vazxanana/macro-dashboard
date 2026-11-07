@@ -1,0 +1,115 @@
+name: Research replay
+
+# A longer, out-of-sample run of the backtest replay (council/backtest.mjs) for research. It replays into a scratch
+# data dir and saves the result to council-data at <out> (default research/replay-90d.json); it never touches
+# council-data/backtest.json, which the Coach and the page read.
+# Forex minute history comes from Kraken's trade history, cached per day. This workflow keeps its own cache line
+# (research-duka-*, seeded from the daily backtest's duka-* cache) and saves it even when a run fails or times out,
+# so a long history builds up over runs without touching the daily run's Kraken budget.
+on:
+  workflow_dispatch:
+    inputs:
+      days:
+        description: 'Days of history to replay'
+        default: '90'
+      out:
+        description: 'Output path in council-data (not backtest.json)'
+        default: 'research/replay-90d.json'
+      budget:
+        description: 'Kraken calls per forex pair for days not yet cached'
+        default: '2500'
+  # a change to this file starts a run with the defaults (90 days → research/replay-90d.json)
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/research-replay.yml'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: research-replay
+  cancel-in-progress: false
+
+jobs:
+  replay:
+    runs-on: ubuntu-latest
+    timeout-minutes: 330
+    env:
+      DAYS: ${{ github.event.inputs.days || '90' }}
+      OUT: ${{ github.event.inputs.out || 'research/replay-90d.json' }}
+      KRAKEN_BUDGET: ${{ github.event.inputs.budget || '2500' }}
+      DUKA_CACHE: .duka-cache
+    steps:
+      - name: Check inputs
+        run: |
+          case "$OUT" in
+            backtest.json|./backtest.json|/*|*..*|'') echo "refusing output path '$OUT'"; exit 1 ;;
+          esac
+          case "$DAYS" in ''|*[!0-9]*) echo "days must be a whole number"; exit 1 ;; esac
+
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          sparse-checkout: council
+
+      - name: Checkout council data
+        uses: actions/checkout@v4
+        with:
+          ref: council-data
+          path: data
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Restore forex history cache
+        uses: actions/cache/restore@v4
+        with:
+          path: .duka-cache
+          key: research-duka-${{ github.run_id }}
+          restore-keys: |
+            research-duka-
+            duka-
+
+      - name: Scratch data dir
+        run: |
+          mkdir -p "$RUNNER_TEMP/rdata"
+          cp data/config.json "$RUNNER_TEMP/rdata/" 2>/dev/null || echo "no config.json in council-data"
+          echo "cached Kraken days per pair:"
+          ls .duka-cache 2>/dev/null | sed -n 's/^kraken-\([A-Z]*\)-.*/\1/p' | sort | uniq -c || true
+
+      - name: Replay
+        id: replay
+        continue-on-error: true
+        timeout-minutes: 240
+        run: node council/backtest.mjs "$RUNNER_TEMP/rdata" "$DAYS"
+
+      # too heavy (failed or timed out): the Kraken days it did fetch are cached; replay 60 days instead
+      - name: Replay (60-day fallback)
+        if: steps.replay.outcome != 'success' && env.DAYS != '60'
+        timeout-minutes: 60
+        run: |
+          rm -f "$RUNNER_TEMP/rdata/backtest.json"
+          node council/backtest.mjs "$RUNNER_TEMP/rdata" 60
+
+      - name: Save forex history cache
+        if: always()
+        uses: actions/cache/save@v4
+        with:
+          path: .duka-cache
+          key: research-duka-${{ github.run_id }}
+
+      - name: Save results
+        run: |
+          F="$RUNNER_TEMP/rdata/backtest.json"
+          test -s "$F"
+          node -e 'const j=require(process.argv[1]); console.log("days", j.days, "from", j.from, "to", j.to, "trades", j.n, "coverage", JSON.stringify(j.markets.coverage||{}), "errors", JSON.stringify(j.markets.errors||{}))' "$F"
+          D=$(node -e 'console.log(require(process.argv[1]).days)' "$F")
+          mkdir -p "data/$(dirname "$OUT")"
+          cp "$F" "data/$OUT"
+          git -C data config user.name "mosha-council"
+          git -C data config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git -C data add "$OUT"
+          git -C data commit -q -m "Research replay ${D}d to $OUT $(date -u +%Y-%m-%dT%H:%MZ)" || exit 0
+          for j in 1 2 3 4 5; do git -C data pull -q --rebase origin council-data && git -C data push -q origin HEAD:council-data && break; sleep 7; done

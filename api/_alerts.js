@@ -12,7 +12,7 @@ async function all() {
   return { by, blobs: out };
 }
 async function read(blob) {
-  const r = await fetch(blob.url, { headers: { Authorization: `Bearer ${tok()}` }, cache: 'no-store' });
+  const r = await fetch(blob.url, { headers: { Authorization: `Bearer ${tok()}` }, cache: 'no-store', signal: AbortSignal.timeout(8000) });
   if (!r.ok) throw new Error(`Blob ${r.status}`); return r.json();
 }
 async function save(id, data, blobs) {

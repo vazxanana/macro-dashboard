@@ -1,8 +1,10 @@
 // Council · Backtest: replay past candles through the same engine and rules the Trader uses,
 // so the Coach can judge a setup on hundreds of historical trades instead of waiting days for live ones.
 // Usage: node council/backtest.mjs <dataDir> [days=30]
-// Data: Binance public market data (1m history) for crypto and gold (PAXG); for forex Kraken's trade history (the
-// feed the live Trader uses; council/krakenhist.mjs), then Yahoo Finance (yahoo.mjs), then Dukascopy (duka.mjs).
+// Data: Kraken, the feed the live Trader trades on, for every market: its trade history built into 1m candles (cached per
+// day, council/krakenhist.mjs) plus its own 1h/4h/1d candles. Gold is PAXGUSD shifted onto spot like the live Trader does
+// (goldBasis below). Fallbacks: crypto and gold Binance (1m history; PAXGUSDT) until Kraken's cached history covers the
+// whole window; forex Yahoo Finance (yahoo.mjs), then Dukascopy (duka.mjs). markets.source says which feed each market used.
 // Entry styles: every signal also gets a twin entered at market (setup '<k>@mkt'), and resting orders that never fill
 // are kept as 0R rows (fill = 0), so the Coach can compare the two entry styles signal by signal.
 // Costs: every trade carries its spread in R (one spread per round trip: bid/ask), so results can be judged net.
@@ -13,17 +15,18 @@ import path from 'node:path';
 import { msAnalyze, CFG, PAIRS, RETR, buildSetup, buildRetrace, setMarket } from './engine.mjs';
 import { dukaMinutes, dukaHours, dukaDays, dukaReset } from './duka.mjs';
 import { yahooBars } from './yahoo.mjs';
-import { krakenMinutes, krakenOHLC } from './krakenhist.mjs';
+import { krakenMinutes, krakenOHLC, basisSeries } from './krakenhist.mjs';
 import { m15Choch, m15cFeat as m15cOf } from './choch.mjs';
+import { cleanBars, LTF_CLEAN } from './clean.mjs';
 
 const DIR = process.argv[2] || 'data', DAYS = +(process.argv[3] || 30);
 const FAKE = !!process.env.BT_FAKE;   // offline self-test with a synthetic random walk
 const MARKETS = {
-  xau: { label: 'XAU/USD', name: 'Gold', group: 'Metals', sym: 'PAXGUSDT', dec: 1, spot: true },
-  btc: { label: 'BTC/USD', name: 'Bitcoin', group: 'Crypto', sym: 'BTCUSDT', dec: 1 },
-  eth: { label: 'ETH/USD', name: 'Ethereum', group: 'Crypto', sym: 'ETHUSDT', dec: 2 },
-  sol: { label: 'SOL/USD', name: 'Solana', group: 'Crypto', sym: 'SOLUSDT', dec: 2 },
-  xrp: { label: 'XRP/USD', name: 'XRP', group: 'Crypto', sym: 'XRPUSDT', dec: 4 },
+  xau: { label: 'XAU/USD', name: 'Gold', group: 'Metals', kraken: 'PAXGUSD', sym: 'PAXGUSDT', dec: 1, spot: true },
+  btc: { label: 'BTC/USD', name: 'Bitcoin', group: 'Crypto', kraken: 'XBTUSD', sym: 'BTCUSDT', dec: 1 },
+  eth: { label: 'ETH/USD', name: 'Ethereum', group: 'Crypto', kraken: 'ETHUSD', sym: 'ETHUSDT', dec: 2 },
+  sol: { label: 'SOL/USD', name: 'Solana', group: 'Crypto', kraken: 'SOLUSD', sym: 'SOLUSDT', dec: 2 },
+  xrp: { label: 'XRP/USD', name: 'XRP', group: 'Crypto', kraken: 'XRPUSD', sym: 'XRPUSDT', dec: 4 },
   eurusd: { label: 'EUR/USD', name: 'Euro', group: 'Forex', duka: 'EURUSD', kraken: 'EURUSD', yahoo: 'EURUSD=X', dec: 5 },
   gbpusd: { label: 'GBP/USD', name: 'Pound', group: 'Forex', duka: 'GBPUSD', kraken: 'GBPUSD', yahoo: 'GBPUSD=X', dec: 5 },
   audusd: { label: 'AUD/USD', name: 'Aussie', group: 'Forex', duka: 'AUDUSD', kraken: 'AUDUSD', yahoo: 'AUDUSD=X', dec: 5 },
@@ -93,6 +96,28 @@ function aggregate(m1, sec) {
   }
   return out;
 }
+
+// Kraken history for one market: trades → 1m (whole UTC days, newest first, cached in DUKA_CACHE), 5m/15m/30m built from
+// them; 1h = Kraken's 720 hourly candles plus older hours from the trades; 4h/1d = Kraken's own OHLC (the live Trader's candles)
+async function krakenData(pair, from, budget) {
+  const K = await krakenMinutes(pair, from, endT, { cacheDir: process.env.DUKA_CACHE || null, budget }), m1 = K.bars;
+  if (!m1.length) return { K, data: null };
+  const o60 = await krakenOHLC(pair, 60), o240 = await krakenOHLC(pair, 240), o1440 = await krakenOHLC(pair, 1440);
+  const firstH = o60.length ? o60[0].time : Infinity, h1 = aggregate(m1.filter((b) => b.time < firstH), 3600).concat(o60);
+  return { K, data: { '1m': m1, '5m': aggregate(m1, 300), '15m': aggregate(m1, 900), '30m': aggregate(m1, 1800), '1h': h1, '4h': o240, '1d': o1440 } };
+}
+// Gold: the live Trader shifts every PAXG candle onto spot by one offset, the median of (spot quote - PAXG 1m close) over its
+// last 2 hours of runs, keeping the last offset when no fresh quote comes (trader.mjs basisFor). The replay has no history of
+// those spot quotes, so its samples are OANDA's spot H1 closes (the feed the site's charts and the D1 labels use) against the
+// PAXG 1m close of the minute before each hour ends: same 2-hour median, same |offset| < 150 guard, same keep-the-last rule.
+// Returns offAt(t) (the offset the Trader would have used at time t) or null when OANDA's H1 candles can't be read.
+async function goldBasis(m1) {
+  let H = null;
+  try { const r = await fetch(`${MD_BASE}bars?sym=xau&tf=1h&from=${startT - 3 * 86400}&to=${endT}`, { signal: AbortSignal.timeout(15000) }); const j = r.ok ? await r.json() : null;
+    H = j && j.src === 'OANDA' && Array.isArray(j.bars) ? j.bars.filter((b) => !b.live).map((b) => ({ time: +b.time, close: +b.close })) : null; } catch (e) { H = null; }
+  return H && H.length ? basisSeries(H, m1) : null;
+}
+const shiftBar = (b, o) => ({ time: b.time, open: b.open + o, high: b.high + o, low: b.low + o, close: b.close + o });
 
 // One trade, managed on 1m candles, under one break-even variant
 function manage(v, tr, b) {
@@ -229,7 +254,9 @@ function structFeat(sell, l, src, at) {
 const spreadOf = (M, price) => M.group === 'Forex' ? 0.0001 : M.spot ? 0.3 : price * 0.0002;
 const BUILDERS = PAIRS.map((p) => [p, buildSetup]).concat(RETR.map((p) => [p, buildRetrace]));
 const DEFS = PAIRS.concat(RETR);
-const all = [], twins = [], unfilled = [], meta = { errors: {} };   // closed trades; their market-entry twins; resting orders that never filled
+const all = [], twins = [], unfilled = [], stillOpen = [], meta = { errors: {} };   // closed trades; their market-entry twins; resting orders that never filled;
+// trades (and resting orders, twins included) still open when the replay window ends: written with status 'open' and null R, so the
+// replay keeps every signal the live Trader would show, while every expectancy stat skips them (they have no result yet)
 const endT = Math.floor(Date.now() / 1000 / 60) * 60 - 60, startT = endT - DAYS * 86400;
 const t0wall = Date.now();
 // the trader's marked trades (examples.json): for each one inside the replay, what every setup was doing in its entry
@@ -252,14 +279,12 @@ for (const [key, M] of Object.entries(MARKETS)) {
       // 720 1m candles exist); if Yahoo fails, Dukascopy's files: 1m (5m/15m/30m built from it), 1h monthly, 1d yearly
       let done = false;
       try {   // 1. Kraken trades → 1m (38 days, cached per day); 1h = Kraken's 720 hourly candles plus older hours from the trades; 4h/1d = Kraken OHLC
-        const tr0 = Date.now(), K = await krakenMinutes(M.kraken, startT - 8 * 86400, endT, { cacheDir: process.env.DUKA_CACHE || null, budget: +(process.env.KRAKEN_BUDGET || 400) }), m1 = K.bars;
+        const tr0 = Date.now(), { K, data: kd } = await krakenData(M.kraken, startT - 8 * 86400, +(process.env.KRAKEN_BUDGET || 400)), m1 = K.bars;
         if (m1.length < 5000) throw new Error(`only ${m1.length} 1m candles (${K.calls} calls, ${K.cached} days cached)`);
         meta.coverage = Object.assign(meta.coverage || {}, { [key]: new Date(K.from * 1000).toISOString().slice(0, 10) });
-        const o60 = await krakenOHLC(M.kraken, 60), o240 = await krakenOHLC(M.kraken, 240), o1440 = await krakenOHLC(M.kraken, 1440);
-        const firstH = o60.length ? o60[0].time : Infinity, h1 = aggregate(m1.filter((b) => b.time < firstH), 3600).concat(o60);
-        Object.assign(data, { '1m': m1, '5m': aggregate(m1, 300), '15m': aggregate(m1, 900), '30m': aggregate(m1, 1800), '1h': h1, '4h': o240, '1d': o1440 });
+        Object.assign(data, kd);
         meta.source = Object.assign(meta.source || {}, { [key]: 'Kraken' });
-        console.log(`${key}: Kraken 1m from ${meta.coverage[key]} (${K.cached} days cached, ${K.fetched} downloaded, ${K.calls} calls) → ${m1.length} 1m candles, ${h1.length} 1h, ${o240.length} 4h, ${o1440.length} 1d (${((Date.now() - tr0) / 1000).toFixed(0)}s)`);
+        console.log(`${key}: Kraken 1m from ${meta.coverage[key]} (${K.cached} days cached, ${K.fetched} downloaded, ${K.calls} calls) → ${m1.length} 1m candles, ${kd['1h'].length} 1h, ${kd['4h'].length} 4h, ${kd['1d'].length} 1d (${((Date.now() - tr0) / 1000).toFixed(0)}s)`);
         done = true;
       } catch (ke) { console.log(`${key}: Kraken history failed (${ke.message}); trying Yahoo`); }
       if (!done) try {
@@ -287,9 +312,39 @@ for (const [key, M] of Object.entries(MARKETS)) {
         console.log(`${key}: ${m1.length} 1m, ${h1.length} 1h, ${d1.length} 1d candles from Dukascopy`);
       }
     } else {
-      for (const [id, iv, sec] of TFS) data[id] = await klines(M.sym, iv, startT - (WIN + 2) * sec, endT);
+      // crypto and gold: Kraken (the live Trader's feed) once its cached trade history covers the whole window (the replay's
+      // first step needs 720 1m candles before the start). A busy pair (BTC) fills its days over a few runs within
+      // KRAKEN_BUDGET_CRYPTO calls per pair and run; until then, or if Kraken fails, Binance as before.
+      let done = false;
+      if (M.kraken) try {
+        const tr0 = Date.now(), need = startT - WIN * 60, { K, data: kd } = await krakenData(M.kraken, startT - 86400, +(process.env.KRAKEN_BUDGET_CRYPTO || 300));
+        const cov = new Date(K.from * 1000).toISOString().slice(0, 10);
+        (meta.krakenCoverage = meta.krakenCoverage || {})[key] = { from: cov, calls: K.calls, cached: K.cached, fetched: K.fetched };
+        if (!kd || K.from > need || kd['1m'].length < 2 * WIN) throw new Error(`Kraken history from ${cov} only (${K.bars.length} 1m candles, ${K.calls} calls, ${K.cached} days cached; needs ${new Date(need * 1000).toISOString().slice(0, 16)})`);
+        Object.assign(data, kd);
+        meta.coverage = Object.assign(meta.coverage || {}, { [key]: cov });
+        meta.source = Object.assign(meta.source || {}, { [key]: 'Kraken' });
+        console.log(`${key}: Kraken ${M.kraken} 1m from ${cov} (${K.cached} days cached, ${K.fetched} downloaded, ${K.calls} calls) → ${kd['1m'].length} 1m candles, ${kd['1h'].length} 1h, ${kd['4h'].length} 4h, ${kd['1d'].length} 1d (${((Date.now() - tr0) / 1000).toFixed(0)}s)`);
+        done = true;
+      } catch (ke) { console.log(`${key}: Kraken history not used (${ke.message}); Binance ${M.sym}`); (meta.fallback = meta.fallback || {})[key] = String(ke.message || ke).slice(0, 200); }
+      if (!done) {
+        for (const [id, iv, sec] of TFS) data[id] = await klines(M.sym, iv, startT - (WIN + 2) * sec, endT);
+        meta.source = Object.assign(meta.source || {}, { [key]: 'Binance' });
+      }
+    }
+    // bad prints: the same cleaner, timeframes and options the live Trader applies to its candles (clean.mjs), before any analysis
+    for (const [id] of TFS) {
+      const nBad = data[id] ? cleanBars(data[id], M.group === 'Forex' && LTF_CLEAN.has(id) ? { wickK: 15 } : {}) : 0;
+      if (nBad) { const C = (meta.cleaned = meta.cleaned || {}); (C[key] = C[key] || {})[id] = nBad; }
     }
     const m1 = data['1m'];
+    // gold onto spot (after cleaning, like the live Trader): offAt(t) is the offset the Trader would have used at step t
+    let offAt = null;
+    if (M.spot && !FAKE) {
+      offAt = await goldBasis(m1);
+      meta.goldShift = offAt ? { method: 'OANDA spot H1 close - PAXG 1m close, 2 h median, last kept when stale (live: gold-api.com spot quotes each run)', base: (meta.source || {})[key], samples: offAt.samples, now: offAt(endT) }
+        : { method: 'none: OANDA H1 candles unavailable, raw PAXG prices (same structure and signals; entry, stop and target prices sit at the PAXG premium over spot)', base: (meta.source || {})[key] };
+    }
     // OANDA D1 trend per day (closed daily candles before that day, last 720), cached; null when OANDA can't be read
     const OD = await oandaD1(key), odCache = new Map(); meta.d1src = Object.assign(meta.d1src || {}, { [key]: OD ? 'OANDA' : 'feed' });
     const odTrend = (t) => { if (!OD) return null; const d = Math.floor(t / 86400) * 86400; if (odCache.has(d)) return odCache.get(d); const w = OD.filter((b) => b.time < d).slice(-720); const v = w.length > 100 ? msAnalyze(w, 6).trend : null; odCache.set(d, v); return v; };
@@ -300,8 +355,9 @@ for (const [key, M] of Object.entries(MARKETS)) {
     let i1 = 0, steps = 0;
     for (let t = startT; t <= endT; t += STEP) {
       // manage open trades on the 1m candles of the last step
+      const off = offAt ? offAt(t) : 0;   // gold: the spot offset of this step (the live Trader manages on its run's shifted candles)
       while (i1 < m1.length && m1[i1].time < t) {
-        const b = m1[i1++];
+        const b = off ? shiftBar(m1[i1++], off) : m1[i1++];
         for (const tr of open) {
           if (tr.status === 'pending') {
             if (b.time < tr.opened) continue;
@@ -325,12 +381,13 @@ for (const [key, M] of Object.entries(MARKETS)) {
         const arr = data[id]; let p = ptr[id];
         while (p < arr.length && arr[p].time + sec <= t) p++;
         ptr[id] = p;
-        const bars = arr.slice(Math.max(0, p - (WIN - 1)), p);
+        let bars = arr.slice(Math.max(0, p - (WIN - 1)), p);
         if (id !== '1m') {
           const f0 = Math.floor(t / sec) * sec; let f = null;
           for (let j = i1 - 1; j >= 0 && m1[j].time >= f0; j--) { const b = m1[j]; f = f ? { time: f0, open: b.open, high: Math.max(f.high, b.high), low: Math.min(f.low, b.low), close: f.close } : { time: f0, open: b.open, high: b.high, low: b.low, close: b.close }; }
           if (f) bars.push(f);
         }
+        if (off) bars = bars.map((b) => shiftBar(b, off));   // gold: every timeframe shifted by the one offset, as live
         if (bars.length < 60) { src.bad = true; break; }
         src[id] = { bars, A: msAnalyze(bars, 6) };
       }
@@ -392,7 +449,8 @@ for (const [key, M] of Object.entries(MARKETS)) {
       for (const tr of all.concat(twins, unfilled, open).filter((v) => v.m === key && v.side === x.side && v.opened >= x.from - 2 * PAD && v.opened <= x.to + 2 * PAD))
         x.caught.push({ setup: tr.k, opened: tr.opened, entry: +tr.entry.toFixed(2), stop: +tr.stop.toFixed(2), target: +tr.t1.toFixed(2), rr: +tr.rr.toFixed(2), filled: !!tr.filled, R: tr.v[0].R == null ? null : +tr.v[0].R.toFixed(2), status: tr.status });
     }
-    meta[key] = { steps, trades: all.filter((x) => x.m === key).length };
+    stillOpen.push(...open);
+    meta[key] = { steps, trades: all.filter((x) => x.m === key).length, open: open.length };
     console.log(`${key}: ${steps} steps, ${meta[key].trades} closed trades, ${((Date.now() - t0wall) / 1000).toFixed(0)}s`);
   } catch (e) { meta.errors[key] = String(e.message || e); console.log(`${key}: ${e.message || e}`); }
 }
@@ -412,9 +470,12 @@ const out = {
   byMarket: group(all, (x) => x.m),
   byRR: group(all, rrBand),
   bySetupCond: Object.fromEntries(setups.map((k) => { const a = all.filter((x) => x.k === k); return [k, { d1: group(a, (x) => x.feat.d1), struct: group(a, (x) => x.feat.struct), session: group(a, (x) => x.feat.session), rr: group(a, rrBand) }]; })),
-  trades: all.concat(twins, unfilled).map((x) => [x.m, x.k, x.side, x.opened, x.filled || null, +x.rr.toFixed(2), x.feat.d1, x.feat.struct, x.feat.session, ...x.v.map((v) => v.R == null ? null : +v.R.toFixed(2)), +x.mfe.toFixed(2), +x.cost.toFixed(3), x.status === 'closed' ? 1 : 0, x.feat.cf, x.feat.choch, x.feat.m15c, x.feat.m15c1]),
-  tradeCols: ['market', 'setup', 'side', 'opened', 'filled', 'rr', 'd1', 'struct', 'session', 'R_none', 'R_be1', 'R_be15', 'R_tp2', 'mfe', 'cost', 'fill', 'cf', 'choch', 'm15c', 'm15c1'],
-  twins: twins.length, unfilled: unfilled.length,
+  // status (last column, so older column indexes hold): 'closed', 'unfilled' (a resting order that never filled, 0R) or 'open'
+  // (still running at the end of the window: R columns null; fill 1 once its entry filled, 0 while the order still rests)
+  trades: all.concat(twins, unfilled, stillOpen).map((x) => { const op = x.status === 'open' || x.status === 'pending', st = op ? 'open' : x.status === 'closed' ? 'closed' : 'unfilled';
+    return [x.m, x.k, x.side, x.opened, x.filled || null, +x.rr.toFixed(2), x.feat.d1, x.feat.struct, x.feat.session, ...x.v.map((v) => op || v.R == null ? null : +v.R.toFixed(2)), +x.mfe.toFixed(2), +x.cost.toFixed(3), op ? (x.filled ? 1 : 0) : x.status === 'closed' ? 1 : 0, x.feat.cf, x.feat.choch, x.feat.m15c, x.feat.m15c1, st]; }),
+  tradeCols: ['market', 'setup', 'side', 'opened', 'filled', 'rr', 'd1', 'struct', 'session', 'R_none', 'R_be1', 'R_be15', 'R_tp2', 'mfe', 'cost', 'fill', 'cf', 'choch', 'm15c', 'm15c1', 'status'],
+  twins: twins.length, unfilled: unfilled.length, open: stillOpen.length,
   examples: EX.map((x) => ({ id: x.id, market: x.market, side: x.side, entry: x.entry, stop: x.stop, target: x.target, entryFrom: x.entryFrom, entryTo: x.entryTo,
     caught: x.caught, setups: x.setups.map(({ s, ...v }) => v), sweep: x.sweep.map(({ s, ...v }) => v), m15: x.m15.map(({ s, ...v }) => v) })),
 };

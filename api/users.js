@@ -18,11 +18,11 @@ async function latest() {
 async function load(req) {
   const blobs = await latest();
   if (blobs.length) {
-    const r = await fetch(blobs[0].url, { headers: { Authorization: `Bearer ${tok()}` }, cache: 'no-store' });
+    const r = await fetch(blobs[0].url, { headers: { Authorization: `Bearer ${tok()}` }, cache: 'no-store', signal: AbortSignal.timeout(8000) });
     if (!r.ok) throw new Error(`Blob ${r.status}`);
     return r.json();
   }
-  try { const r = await fetch(`https://${req.headers.host}/cdata/users.json`); if (r.ok) { const j = await r.json(); if (j && j.users) return j; } } catch (e) {}
+  try { const r = await fetch(`https://${req.headers.host}/cdata/users.json`, { signal: AbortSignal.timeout(8000) }); if (r.ok) { const j = await r.json(); if (j && j.users) return j; } } catch (e) {}
   return { users: {} };
 }
 const clean = (users) => {
@@ -43,7 +43,7 @@ module.exports = async (req, res) => {
   try {
     if (req.method === 'GET') return res.status(200).json(await load(req));
     if (req.method !== 'POST') return res.status(405).json({ error: 'GET or POST' });
-    const b = typeof req.body === 'string' ? JSON.parse(req.body || '{}') : (req.body || {});
+    let b; try { b = typeof req.body === 'string' ? (JSON.parse(req.body || '{}') || {}) : (req.body || {}); } catch (e) { return res.status(400).json({ error: 'bad JSON' }); }
     if (!b.ownerPw || sha(b.ownerPw) !== OWNER_HASH) return res.status(403).json({ error: 'Owner password not accepted' });
     const users = clean(b.users); if (!users) return res.status(400).json({ error: 'Bad user list' });
     if (Object.values(users).some((u) => u.hash === OWNER_HASH)) return res.status(400).json({ error: 'That password is the owner\'s' });
