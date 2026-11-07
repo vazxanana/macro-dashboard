@@ -207,5 +207,10 @@ LIMIT ticket when placed and a cancel when they expire; closes get a CLOSE ticke
 `/gold`, no-cache on HTML) and `api/kick.js`: Vercel crons (Pro: per-minute) start the GitHub workflows through the API —
 `job=ict` dispatches ict.yml at :04/:19/:34/:49, `job=council` starts council.yml every 10 min only when no loop runs. Env on
 Vercel: `GH_DISPATCH_TOKEN` (fine-grained, this repo, Actions read/write) and `CRON_SECRET`; never commit either. GitHub Pages
-keeps deploying in parallel until the Vercel site is proven. Later stages: server-side login + private repo (the council and ICT
+keeps deploying in parallel until the Vercel site is proven.
+Status 7 Nov: Vercel project `macro-dashboard` (prj_4krxNideb9D2LfdcXkAWtAwzPLST) in team `xau` (team_40SuZQP47lNHxjlzDc8PeRH5),
+production https://macro-dashboard-five-mu.vercel.app (also macro-dashboard-xau.vercel.app). Deployment protection: previews only
+(production public, like Pages). `.vercelignore` keeps .claude, .github, council, ict, ctrader, mt5 and notes off the site. CRON_SECRET is
+set (random, sensitive); GH_DISPATCH_TOKEN still to be added by the owner. Not yet linked to GitHub (the owner's Vercel account needs a
+GitHub login connection first); until then deploys are file uploads through the Vercel API (POST /v2/files + /v13/deployments). Later stages: server-side login + private repo (the council and ICT
 loops then have to run off GitHub Actions or on paid minutes), then broker-order functions.
