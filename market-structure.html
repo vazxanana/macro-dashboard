@@ -2290,7 +2290,7 @@ html[data-motion="off"][data-gate] .gate-bg path[stroke] { animation: none; stro
             <label><input type="checkbox" id="ms-show-cf" data-show="cf" checked><i style="background:rgba(242,54,69,.5)"></i>CF</label>
             <label><input type="checkbox" id="ms-show-vr" data-show="vr" checked><i style="background:rgba(255,152,0,.4);border:1px solid #e08600"></i>VR</label>
             <label><input type="checkbox" id="ms-show-htf" data-show="htf" checked><i style="border:1.5px dashed #2962ff"></i>HTF Origin</label>
-            <label><input type="checkbox" id="ms-show-ct" checked><i style="background:#2962ff;height:2px"></i>Council trades</label>
+            <label><input type="checkbox" id="ms-show-ct" checked><i style="background:#2962ff;height:2px"></i>Council trades + history</label>
             <label><input type="checkbox" id="ms-show-kl" checked><i style="border-top:1.5px dotted #9aa4b2;height:0"></i>Key levels</label>
             <label><input type="checkbox" id="ms-show-ema"><i style="background:linear-gradient(90deg,#2962ff 33%,#e0a526 33% 66%,#9c27b0 66%);height:2px"></i>EMAs 21 / 50 / 200</label>
             <label><input type="checkbox" id="ms-show-shade" checked><i style="background:linear-gradient(90deg,rgba(38,166,154,.4) 33%,rgba(41,98,255,.4) 33% 66%,rgba(156,39,176,.4) 66%)"></i>Session shading</label>
@@ -3735,8 +3735,21 @@ function msNextSetup(bars, A) {
         P._ct.push(P.series.createPriceLine({ price: x.stop, color: '#f23645', lineWidth: 1, lineStyle: LW.LineStyle.Dashed, axisLabelVisible: true, title: 'SL' }));
         if (isFinite(x.t1)) P._ct.push(P.series.createPriceLine({ price: x.t1, color: '#089981', lineWidth: 1, lineStyle: LW.LineStyle.Dashed, axisLabelVisible: true, title: 'TP' })); }); });
   }
+  // council trade history as chart markers (7 Nov loop): entries (arrows) and exits (dots with the R result) on H4 / H1 / M15
+  function councilMarkers() {
+    let T = []; try { T = (COUNCIL.trades || []).filter((x) => x.market === instKey && !x.shadow && x.entry && (x.filled || x.opened) && x.status !== 'pending' && x.status !== 'missed' && x.status !== 'expired').sort((a, b) => (b.filled || b.opened) - (a.filled || a.opened)).slice(0, 60); } catch (e) {}
+    if (G.showCT === false) T = [];
+    ['4h', '1h', '15m'].forEach((id) => { const P = panes[id]; if (!P || !P.series || !P.bars || !P.bars.length) return;
+      const tf = TFS.find((t) => t.id === id), have = new Set(P.bars.map((b) => b.time)), bt = (t) => Math.floor(t / tf.sec) * tf.sec + TZ, mk = [];
+      T.forEach((x) => { const buy = x.side !== 'sell', te = bt(x.filled || x.opened);
+        if (have.has(te)) mk.push({ time: te, position: buy ? 'belowBar' : 'aboveBar', shape: buy ? 'arrowUp' : 'arrowDown', color: '#2962ff', text: id === '15m' ? (x.name || x.k) : '' });
+        if (x.closed && x.R != null && isFinite(x.R)) { const tc = bt(x.closed); if (have.has(tc)) mk.push({ time: tc, position: buy ? 'aboveBar' : 'belowBar', shape: 'circle', color: x.R > 0.05 ? '#089981' : x.R < -0.05 ? '#f23645' : '#8a94a8', text: `${x.R > 0 ? '+' : ''}${(+x.R).toFixed(1)}R` }); } });
+      const sig = JSON.stringify(mk.map((m) => [m.time, m.text, m.color])); if (P._mkSig === sig) return; P._mkSig = sig;
+      try { P.series.setMarkers(mk.sort((a, b) => a.time - b.time)); } catch (e) {} });
+  }
   setTimeout(councilLines, 4000); setInterval(councilLines, 15e3);
-  { const k = document.getElementById('ms-show-ct'); try { G.showCT = localStorage.getItem('ms-ct') !== '0'; } catch (e) {} if (k) { k.checked = G.showCT !== false; k.addEventListener('change', () => { G.showCT = k.checked; try { localStorage.setItem('ms-ct', k.checked ? '1' : '0'); } catch (e) {} Object.values(panes).forEach((P) => { P._ctSig = null; }); councilLines(); }); } }
+  setTimeout(councilMarkers, 4500); setInterval(councilMarkers, 30e3);
+  { const k = document.getElementById('ms-show-ct'); try { G.showCT = localStorage.getItem('ms-ct') !== '0'; } catch (e) {} if (k) { k.checked = G.showCT !== false; k.addEventListener('change', () => { G.showCT = k.checked; try { localStorage.setItem('ms-ct', k.checked ? '1' : '0'); } catch (e) {} Object.values(panes).forEach((P) => { P._ctSig = null; P._mkSig = null; }); councilLines(); councilMarkers(); }); } }
   { const k = document.getElementById('ms-show-kl'); try { G.showKL = localStorage.getItem('ms-kl') !== '0'; } catch (e) {} if (k) { k.checked = G.showKL !== false; k.addEventListener('change', () => { G.showKL = k.checked; try { localStorage.setItem('ms-kl', k.checked ? '1' : '0'); } catch (e) {} keyLevels(); }); } }
   // compare overlay control: pick a market, its candles (OANDA / exchange) are rebased onto every chart and refreshed each minute
   { const sel = document.getElementById('ms-cmp');
