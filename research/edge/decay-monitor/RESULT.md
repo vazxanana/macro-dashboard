@@ -219,6 +219,11 @@ column does not apply to them. For these two, the monitor only catches a system 
 | ICT A-setups | healthy | 234 desk replay | +0.67R (30) | 0.97 / 16.52 | 1.5R / 53.1R |
 | Crypto trend (shadow) | decaying | 65 replay positions | +0.15R (14) | 4.54 / 2.73 | 4.8R / 13.7R |
 
+**Mosha BO (update 8 Nov).** Since the out-of-sample study (`mosha-oos`, #560) showed three rebuilds of the live rule disagree on
+2018–22 and share a minority of trades, a system with no council replay is shown with its rebuild record but not judged on it:
+status "no verdict" until the forward record has 10 trades (then judged against the baseline as any other system). The
+7 Nov `decaying` flag below was a reading of the baseline choice, not of the rule.
+
 **Mosha BO.** The flag comes from the robustness rebuild of the rule (2018–26: +0.01R a trade, out of sample −0.24R), not from
 live trades. The `gold-systems` study rebuilt the live config ("weekly + slow, BE/add/run") separately and found +0.64R a
 trade out of sample, on only 18 positions. The two rebuilds disagree, and the monitor uses the one with a trade list. The

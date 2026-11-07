@@ -134,3 +134,16 @@ test('calibration: the NQ open run is never flagged in 2023-26 (shipped baseline
   const dead = N.filter((x) => x.y >= 2014 && x.y <= 2022), f = firstDecay(dead, b);
   assert.ok(f && dead.indexOf(f) < b.perYear, 'caught within a year of trades');
 });
+
+// mosha-oos (8 Nov): a system with no council replay is shown with its rebuild record but judged only on its forward trades
+test('a rebuild-only record (no council replay) gives no verdict until the forward record has minN trades', () => {
+  const b = makeBase(Array.from({ length: 60 }, (_, i) => (i % 3 ? 0.4 : -0.9)), { perYear: 18, maxDD: 10 });
+  const hist = Array.from({ length: 48 }, (_, i) => ({ t: T0 + i * DAY, R: -1.2, src: 'hist' }));   // a losing rebuild tail
+  const a = assess(hist, b);
+  assert.equal(a.status, 'healthy'); assert.equal(a.few, true); assert.match(a.why[0], /no council replay/);
+  const live = Array.from({ length: DK.minN }, (_, i) => ({ t: T0 + (60 + i) * DAY, R: -1.2, src: 'live' }));
+  const c = assess(hist.concat(live), b);
+  assert.equal(c.few, undefined); assert.equal(c.status, 'decaying', 'with enough forward trades the record is judged as before');
+  const r = assess(hist.map((p) => ({ ...p, src: 'replay' })), b);
+  assert.equal(r.status, 'decaying', 'a council replay record is judged as before');
+});
