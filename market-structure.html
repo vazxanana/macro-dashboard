@@ -2458,6 +2458,7 @@ html[data-motion="off"][data-gate] .gate-bg path[stroke] { animation: none; stro
     <div class="sec-h">
       <h2>Charts <span class="kbd-hint"><kbd>1</kbd>–<kbd>6</kbd> pick a chart · <kbd>0</kbd> all · <kbd>F</kbd> fit</span></h2>
       <div class="adr" id="ms-adr" aria-live="polite" hidden></div>
+      <div class="mtf" id="ms-mtf" hidden></div>
       <div class="seg" role="group" aria-label="Chart view">
         <button type="button" data-view="1d">D1</button><button type="button" data-view="4h">H4</button><button type="button" data-view="1h">H1</button><button type="button" data-view="15m">M15</button><button type="button" data-view="5m">M5</button><button type="button" data-view="1m">M1</button><button type="button" data-view="all">All</button>
       </div>
@@ -3735,6 +3736,18 @@ function msNextSetup(bars, A) {
     el.innerHTML = `<span class="adr-k">Range today</span><b>${fmt(rng)}</b><span class="adr-k">of ADR ${fmt(adr)}</span><span class="adr-bar" title="${pct.toFixed(0)}% of the 14-day average daily range used"><i style="width:${Math.min(100, pct).toFixed(1)}%"></i></span><b class="adr-p">${pct.toFixed(0)}%</b><span class="adr-sep"></span><span class="adr-k">In today's range</span><span class="adr-pos" title="0% = today's low, 100% = today's high"><i style="left:${pos.toFixed(1)}%"></i></span><b>${pos.toFixed(0)}%</b>`;
   }
   setTimeout(rangeMeter, 3000); setInterval(rangeMeter, 15e3);
+  // timeframe alignment strip (7 Nov loop): the last structure break direction on each timeframe at a glance; tap one to open that chart
+  function mtfStrip() {
+    const el = document.getElementById('ms-mtf'); if (!el) return;
+    const rows = TFS.map((tf) => { const P = panes[tf.id], e = P && P.A && P.A.last; return { tf, dir: e ? (e.dir < 0 ? -1 : 1) : 0 }; }).filter((r) => panes[r.tf.id]);
+    if (!rows.some((r) => r.dir)) { el.hidden = true; return; }
+    const up = rows.filter((r) => r.dir > 0).length, dn = rows.filter((r) => r.dir < 0).length, n = rows.length;
+    el.hidden = false;
+    el.innerHTML = rows.map((r) => `<button type="button" class="mtf-c ${r.dir > 0 ? 'up' : r.dir < 0 ? 'dn' : ''}" data-tfgo="${r.tf.id}" title="${r.tf.label}: last break ${r.dir > 0 ? 'up (BO Buy)' : r.dir < 0 ? 'down (BO Sell)' : 'none yet'}"><b>${r.tf.label}</b>${r.dir > 0 ? '▲' : r.dir < 0 ? '▼' : '–'}</button>`).join('')
+      + `<span class="mtf-sum ${up > dn ? 'up' : dn > up ? 'dn' : ''}">${up >= dn ? `${up}/${n} up` : `${dn}/${n} down`}</span>`;
+  }
+  setTimeout(mtfStrip, 3500); setInterval(mtfStrip, 10e3);
+  document.addEventListener('click', (ev) => { const b = ev.target.closest && ev.target.closest('[data-tfgo]'); if (!b) return; const v = document.querySelector(`[data-view="${b.dataset.tfgo}"]`); if (v) v.click(); });
   // council trades on the live charts (7 Nov loop): this market's open / pending council trades as entry, stop and target lines
   function councilLines() {
     let T = []; try { T = (COUNCIL.trades || []).filter((x) => x.market === instKey && !x.shadow && (x.status === 'open' || x.status === 'pending') && isFinite(x.entry) && isFinite(x.stop)); } catch (e) {}
@@ -7656,6 +7669,14 @@ function gpStats(T) {
 .tv-tk[hidden] { display: none; }
 .adr { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 10px; margin: 6px 0 12px; font-size: 12.5px; color: var(--ink-dim); }
 .adr[hidden] { display: none; }
+.mtf { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; margin: -4px 0 14px; }
+.mtf[hidden] { display: none; }
+.mtf-c { display: inline-flex; align-items: center; gap: 5px; height: 28px; padding: 0 10px; border-radius: 8px; border: 1px solid var(--line); background: var(--panel); color: var(--ink-faint); font: inherit; font-size: 12px; cursor: pointer; }
+.mtf-c b { color: var(--ink); font-weight: 600; }
+.mtf-c.up { color: var(--buy); border-color: color-mix(in srgb, var(--buy) 35%, var(--line)); background: color-mix(in srgb, var(--buy) 8%, var(--panel)); }
+.mtf-c.dn { color: var(--sell); border-color: color-mix(in srgb, var(--sell) 35%, var(--line)); background: color-mix(in srgb, var(--sell) 8%, var(--panel)); }
+.mtf-c:hover { border-color: var(--accent); }
+.mtf-sum { margin-left: 4px; font-size: 12.5px; font-weight: 700; color: var(--ink-dim); } .mtf-sum.up { color: var(--buy); } .mtf-sum.dn { color: var(--sell); }
 .adr b { color: var(--ink); font-weight: 700; font-variant-numeric: tabular-nums; }
 .adr-bar, .adr-pos { position: relative; width: 120px; height: 6px; border-radius: 99px; background: color-mix(in srgb, var(--ink) 10%, transparent); overflow: hidden; }
 .adr-bar i { position: absolute; inset: 0 auto 0 0; border-radius: 99px; background: linear-gradient(90deg, #2962ff, #e0a526); }
