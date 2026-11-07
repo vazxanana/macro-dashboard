@@ -3452,9 +3452,10 @@ function msNextSetup(bars, A) {
     { const pane = el.closest('.ms-pane'), ph = pane && pane.querySelector('.ms-ph');
       if (ph && !ph.querySelector('.ch-tools')) {
         const tl = document.createElement('span'); tl.className = 'ch-tools';
-        tl.innerHTML = `<button type="button" class="ch-b ch-bell" title="Price alert (notifies this device)" aria-label="Set a price alert"></button><button type="button" class="ch-b ch-fit" title="Fit the chart (double-click the chart)" aria-label="Fit the ${tf.label} chart"></button><button type="button" class="ch-b ch-fs" title="Full screen" aria-label="Show the ${tf.label} chart full screen"></button>`;
+        tl.innerHTML = `<button type="button" class="ch-b ch-snap" title="Save this chart as an image" aria-label="Save the chart as a PNG image"></button><button type="button" class="ch-b ch-bell" title="Price alert (notifies this device)" aria-label="Set a price alert"></button><button type="button" class="ch-b ch-fit" title="Fit the chart (double-click the chart)" aria-label="Fit the ${tf.label} chart"></button><button type="button" class="ch-b ch-fs" title="Full screen" aria-label="Show the ${tf.label} chart full screen"></button>`;
         ph.appendChild(tl);
         tl.querySelector('.ch-fit').addEventListener('click', () => P.fit());
+        tl.querySelector('.ch-snap').addEventListener('click', () => P.snapshot());
         tl.querySelector('.ch-bell').addEventListener('click', () => window.msOpenAlerts && window.msOpenAlerts());
         tl.querySelector('.ch-fs').addEventListener('click', () => { if (document.fullscreenElement) document.exitFullscreen(); else if (pane.requestFullscreen) pane.requestFullscreen().catch(() => {}); });
       }
@@ -3486,6 +3487,26 @@ function msNextSetup(bars, A) {
     const vcol = (b) => b.close >= b.open ? 'rgba(8,153,129,.26)' : 'rgba(242,54,69,.26)';
     P.vol = vol;
     P.setVol = function () { const on = P.raw && P.raw.some((b) => b.volume > 0) && G.showVol !== false; vol.setData(on ? P.raw.map((b) => ({ time: b.time + TZ, value: b.volume || 0, color: vcol(b) })) : []); };
+    // chart snapshot (7 Nov loop): the chart as a PNG with a title strip (market, timeframe, price, time) for sharing or a journal
+    P.snapshot = async function () {
+      try {
+        const c = chart.takeScreenshot(), pad = 44, out = document.createElement('canvas'), dpr = c.width / el.clientWidth || 1;
+        out.width = c.width; out.height = c.height + pad * dpr; const x = out.getContext('2d');
+        const th = THEMES[G.theme] || THEMES.dark; x.fillStyle = th.bgTop || th.bg; x.fillRect(0, 0, out.width, out.height);
+        x.drawImage(c, 0, pad * dpr); x.scale(dpr, dpr);
+        const L = P.bars && P.bars[P.bars.length - 1], ink = G.theme === 'light' ? '#131722' : '#eceef2', dim = G.theme === 'light' ? '#6b7280' : '#8a94a8';
+        x.font = '600 15px Inter, system-ui, sans-serif'; x.fillStyle = ink; x.fillText(`${CUR.label} · ${tf.label}`, 14, 27);
+        const w1 = x.measureText(`${CUR.label} · ${tf.label}`).width;
+        if (L) { x.font = '600 15px ui-monospace, monospace'; x.fillStyle = L.close >= L.open ? '#2bd4a4' : '#ff5c7a'; x.fillText(fmt(L.close), 26 + w1, 27); }
+        x.font = '12px Inter, system-ui, sans-serif'; x.fillStyle = dim; x.textAlign = 'right';
+        x.fillText(`Meridian X · ${new Date().toLocaleString(undefined, { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })}`, el.clientWidth - 14, 27);
+        const blob = await new Promise((r) => out.toBlob(r, 'image/png')), name = `${CUR.label.replace(/\W+/g, '')}-${tf.label}-${new Date().toISOString().slice(0, 16).replace(/[:T]/g, '')}.png`;
+        const file = new File([blob], name, { type: 'image/png' });
+        if (navigator.canShare && matchMedia('(pointer: coarse)').matches && navigator.canShare({ files: [file] })) { await navigator.share({ files: [file], title: `${CUR.label} ${tf.label}` }).catch(() => {}); return; }
+        const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = name; document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(a.href), 4000);
+        if (typeof toast === 'function') toast('Chart saved as an image');
+      } catch (e) { console.warn('snapshot', e); }
+    };
     P.rebuild = function (keepView) {
       const off = G.offset;
       P.bars = P.raw.map((b) => ({ time: b.time + TZ, open: b.open + off, high: b.high + off, low: b.low + off, close: b.close + off }));
@@ -7349,6 +7370,7 @@ function gpStats(T) {
 /* price alerts (7 Nov) */
 .ch-bell { --i: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 8a6 6 0 1 1 12 0c0 7 3 9 3 9H3s3-2 3-9M10.3 21a1.94 1.94 0 0 0 3.4 0'/%3E%3C/svg%3E"); }
 .ch-bell.on { color: #e0a526; }
+.ch-snap { --i: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M14.5 4h-5L7 7H4a1 1 0 0 0-1 1v11a1 1 0 0 0 1 1h16a1 1 0 0 0 1-1V8a1 1 0 0 0-1-1h-3z'/%3E%3Ccircle cx='12' cy='13' r='3.5'/%3E%3C/svg%3E"); }
 .menu-pa { display: flex; flex-direction: column; align-items: flex-start; gap: 2px; width: 100%; padding: 10px 12px; margin-bottom: 8px; border-radius: 10px; border: 1px solid color-mix(in srgb, #e0a526 35%, var(--line)); background: color-mix(in srgb, #e0a526 8%, transparent); color: var(--ink); font: inherit; font-weight: 600; text-align: left; cursor: pointer; }
 .menu-pa small { font-weight: 400; color: var(--ink-faint); font-size: 12px; }
 .menu-pa:hover { background: color-mix(in srgb, #e0a526 14%, transparent); }
