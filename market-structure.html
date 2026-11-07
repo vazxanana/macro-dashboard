@@ -290,6 +290,13 @@
   .ms-grid4[data-view="split"][data-split-l="15m"] .ms-pane:not([data-tf="15m"]):not(.ms-splitc) { display: none; }
   .ms-grid4[data-view="split"][data-split-l="5m"] .ms-pane:not([data-tf="5m"]):not(.ms-splitc) { display: none; }
   .ms-grid4[data-view="split"][data-split-l="1m"] .ms-pane:not([data-tf="1m"]):not(.ms-splitc) { display: none; }
+  .ms-grid4[data-view="split"][data-split-r="1d"] .ms-pane[data-tf="1d"] { display: block !important; order: 2; }
+  .ms-grid4[data-view="split"][data-split-r="4h"] .ms-pane[data-tf="4h"] { display: block !important; order: 2; }
+  .ms-grid4[data-view="split"][data-split-r="1h"] .ms-pane[data-tf="1h"] { display: block !important; order: 2; }
+  .ms-grid4[data-view="split"][data-split-r="15m"] .ms-pane[data-tf="15m"] { display: block !important; order: 2; }
+  .ms-grid4[data-view="split"][data-split-r="5m"] .ms-pane[data-tf="5m"] { display: block !important; order: 2; }
+  .ms-grid4[data-view="split"][data-split-r="1m"] .ms-pane[data-tf="1m"] { display: block !important; order: 2; }
+  .ms-grid4[data-view="split"][data-split-r]:not([data-split-r=""]) .ms-splitc { display: none; }
   @media (max-width: 900px) { .ms-grid4.ms-grid4[data-view="split"] { grid-template-columns: minmax(0, 1fr); } .ms-grid4[data-view="split"] .ms-chart { height: min(46vh, 420px); min-height: 300px; } }
 
   .ms-grid4:not([data-view="all"]) .ms-chart { height: min(70vh, 660px); min-height: 380px; }
@@ -4850,14 +4857,16 @@ function msNextSetup(bars, A) {
   try { Object.assign(SP, JSON.parse(localStorage.getItem('ms-split') || '{}'), { on: false, chart: null, series: null, bars: [], key: '', busy: false, unsub: [] }); SP.sync = Object.assign({ sym: true, tf: false, cross: true, time: true, range: true }, SP.sync || {}); } catch (e) {}
   const spSave = () => { try { localStorage.setItem('ms-split', JSON.stringify({ ltf: SP.ltf, rtf: SP.rtf, sym: SP.sym, sync: SP.sync })); } catch (e) {} };
   const spSym = () => (SP.sync.sym ? instKey : SP.sym), spTf = () => (SP.sync.tf ? SP.ltf : SP.rtf);
+  // same market and a different timeframe: the right side is a full analysed chart (Meridian / ICT markups, indicators, tools)
+  const spPane = () => (spSym() === instKey && spTf() !== SP.ltf && panes[spTf()] ? panes[spTf()] : null);
   function spInit() {
     const lt = document.getElementById('ms-sp-ltf'), rt = document.getElementById('ms-sp-rtf'), sy = document.getElementById('ms-sp-sym'); if (!lt || lt.options.length) return;
     const opts = TFS.map((t) => `<option value="${t.id}">${t.label}</option>`).join(''); lt.innerHTML = opts; rt.innerHTML = opts;
     const groups = {}; Object.entries(INSTRUMENTS).forEach(([k, v]) => { (groups[v.group] = groups[v.group] || []).push(`<option value="${k}">${v.label}</option>`); });
     sy.innerHTML = Object.entries(groups).map(([g, o]) => `<optgroup label="${g}">${o.join('')}</optgroup>`).join('');
     lt.addEventListener('change', () => { SP.ltf = lt.value; spSave(); spApply(); });
-    rt.addEventListener('change', () => { SP.rtf = rt.value; spSave(); spLoad(); });
-    sy.addEventListener('change', () => { SP.sym = sy.value; spSave(); spLoad(); });
+    rt.addEventListener('change', () => { SP.rtf = rt.value; spSave(); spApply(); });
+    sy.addEventListener('change', () => { SP.sym = sy.value; spSave(); spApply(); });
     document.querySelectorAll('[data-sync]').forEach((c) => { c.checked = !!SP.sync[c.dataset.sync]; c.addEventListener('change', () => { SP.sync[c.dataset.sync] = c.checked; spSave(); spApply(); }); });
     document.addEventListener('click', (ev) => { const d = document.querySelector('.sp-sync[open]'); if (d && !d.contains(ev.target)) d.open = false; });
   }
@@ -4876,7 +4885,7 @@ function msNextSetup(bars, A) {
       const B = b || SP.bars[SP.bars.length - 1]; if (lg && B) lg.innerHTML = `<span class="k">O</span><b>${f(B.open)}</b> <span class="k">H</span><b>${f(B.high)}</b> <span class="k">L</span><b>${f(B.low)}</b> <span class="k">C</span><b class="${B.close >= B.open ? 'up' : 'dn'}">${f(B.close)}</b>`; });
   }
   async function spLoad() {
-    if (!SP.on) return; spChart(); spControls(); const k = spSym(), tf = spTf(), I = INSTRUMENTS[k], key = `${k}|${tf}`; if (!I || !SP.series) return;
+    if (!SP.on) return; spControls(); grid4.dataset.splitR = spPane() ? spTf() : ''; if (spPane()) { setTimeout(() => { const R = spPane(); if (R) R.fit(); if (SP.sync.range || SP.sync.time) spFromLeft(); }, 60); return; } spChart(); const k = spSym(), tf = spTf(), I = INSTRUMENTS[k], key = `${k}|${tf}`; if (!I || !SP.series) return;
     const T = TFS.find((t) => t.id === tf); document.getElementById('ms-sp-t').textContent = `${I.label} · ${T ? T.label : tf}`;
     if (SP.key !== key) { SP.key = key; SP.series.setData([]); SP.bars = []; }
     try { const r = await fetchBars(TFS.find((t) => t.id === tf) || TFS[2], I, 500); if (SP.key !== key || !r || !r.bars || !r.bars.length) return;
@@ -4887,21 +4896,23 @@ function msNextSetup(bars, A) {
     } catch (e) { document.getElementById('ms-sp-src').textContent = 'no data'; }
   }
   const leftP = () => panes[SP.ltf];
-  function spFromLeft() { const L = leftP(); if (!L || !SP.chart || SP.busy) return; const vr = L.chart.timeScale().getVisibleRange(); if (!vr) return; SP.busy = true;
-    try { if (SP.sync.range) SP.chart.timeScale().setVisibleRange(vr);
-      else if (SP.sync.time) { const ts = SP.chart.timeScale(), cur = ts.getVisibleRange(); if (cur) { const w = cur.to - cur.from; ts.setVisibleRange({ from: vr.to - w, to: vr.to }); } } } catch (e) {} finally { setTimeout(() => { SP.busy = false; }, 0); } }
-  function spToLeft() { const L = leftP(); if (!L || !SP.chart || SP.busy) return; const vr = SP.chart.timeScale().getVisibleRange(); if (!vr) return; SP.busy = true;
+  const rightC = () => { const R = spPane(); return R ? { chart: R.chart, series: R.series, bars: R.bars, pane: true } : SP.chart ? { chart: SP.chart, series: SP.series, bars: SP.bars } : null; };
+  function spFromLeft() { const L = leftP(), RC = rightC(); if (!L || !RC || SP.busy) return; const vr = L.chart.timeScale().getVisibleRange(); if (!vr) return; SP.busy = true;
+    try { if (SP.sync.range) RC.chart.timeScale().setVisibleRange(vr);
+      else if (SP.sync.time) { const ts = RC.chart.timeScale(), cur = ts.getVisibleRange(); if (cur) { const w = cur.to - cur.from; ts.setVisibleRange({ from: vr.to - w, to: vr.to }); } } } catch (e) {} finally { setTimeout(() => { SP.busy = false; }, 0); } }
+  function spToLeft() { const L = leftP(), RC = rightC(); if (!L || !RC || SP.busy) return; const vr = RC.chart.timeScale().getVisibleRange(); if (!vr) return; SP.busy = true;
     try { if (SP.sync.range) L.chart.timeScale().setVisibleRange(vr);
       else if (SP.sync.time) { const ts = L.chart.timeScale(), cur = ts.getVisibleRange(); if (cur) ts.setVisibleRange({ from: vr.to - (cur.to - cur.from), to: vr.to }); } } catch (e) {} finally { setTimeout(() => { SP.busy = false; }, 0); } }
   const barAtT = (B, t) => { let lo = 0, hi = B.length - 1, r = null; while (lo <= hi) { const m = (lo + hi) >> 1; if (B[m].time <= t) { r = B[m]; lo = m + 1; } else hi = m - 1; } return r; };
-  function spWire() { SP.unsub.forEach((f) => { try { f(); } catch (e) {} }); SP.unsub = []; const L = leftP(); if (!L || !SP.chart) return;
+  function spWire() { SP.unsub.forEach((f) => { try { f(); } catch (e) {} }); SP.unsub = []; const L = leftP(), RC = rightC(); if (!L || !RC) return;
     const onL = () => { if (SP.on && (SP.sync.range || SP.sync.time)) spFromLeft(); }, onR = () => { if (SP.on && (SP.sync.range || SP.sync.time)) spToLeft(); };
-    L.chart.timeScale().subscribeVisibleTimeRangeChange(onL); SP.chart.timeScale().subscribeVisibleTimeRangeChange(onR);
+    L.chart.timeScale().subscribeVisibleTimeRangeChange(onL); RC.chart.timeScale().subscribeVisibleTimeRangeChange(onR);
+    if (RC.pane) { SP.unsub.push(() => L.chart.timeScale().unsubscribeVisibleTimeRangeChange(onL), () => RC.chart.timeScale().unsubscribeVisibleTimeRangeChange(onR)); return; }   // two analysed panes already share the crosshair
     const cxL = (pr) => { if (!SP.on || !SP.sync.cross || SP.cx) return; SP.cx = 1; try { const b = pr && pr.time != null ? barAtT(SP.bars, pr.time) : null; if (b) SP.chart.setCrosshairPosition(b.close, b.time, SP.series); else SP.chart.clearCrosshairPosition(); } catch (e) {} SP.cx = 0; };
     const cxR = (pr) => { if (!SP.on || !SP.sync.cross || SP.cx) return; SP.cx = 1; try { const b = pr && pr.time != null && L.bars ? barAtT(L.bars, pr.time) : null; if (b) L.chart.setCrosshairPosition(b.close, b.time, L.series); else L.chart.clearCrosshairPosition(); } catch (e) {} SP.cx = 0; };
     L.chart.subscribeCrosshairMove(cxL); SP.chart.subscribeCrosshairMove(cxR);
     SP.unsub.push(() => L.chart.timeScale().unsubscribeVisibleTimeRangeChange(onL), () => SP.chart.timeScale().unsubscribeVisibleTimeRangeChange(onR), () => L.chart.unsubscribeCrosshairMove(cxL), () => SP.chart.unsubscribeCrosshairMove(cxR)); }
-  function spApply() { grid4.dataset.splitL = SP.ltf; if (!SP.on) return; spChart(); spControls(); spWire(); spLoad(); }
+  function spApply() { grid4.dataset.splitL = SP.ltf; grid4.dataset.splitR = SP.on && spPane() ? spTf() : ''; if (!SP.on) return; if (!spPane()) spChart(); spControls(); spWire(); spLoad(); }
   window.msSplitView = (on) => { SP.on = on; const bar = document.getElementById('ms-sp-bar'); if (bar) bar.hidden = !on; if (on) { spInit(); spApply(); } };
   setInterval(async () => { if (!SP.on || document.hidden || !SP.series || !SP.bars.length) return; const k = spSym(), tf = spTf(), I = INSTRUMENTS[k], key = SP.key;
     try { const r = await fetchBars(TFS.find((t) => t.id === tf) || TFS[2], I, 3); if (SP.key !== key || !r || !r.bars) return; r.bars.forEach((b) => { const x = { time: b.time + TZ, open: +b.open, high: +b.high, low: +b.low, close: +b.close }; const last = SP.bars[SP.bars.length - 1];
