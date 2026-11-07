@@ -389,6 +389,7 @@
   .cal-seg button { font: inherit; font-size: 12.5px; padding: 6px 14px; background: none; border: 0; color: var(--ink-dim); cursor: pointer; }
   .cal-seg button + button { border-left: 1px solid var(--line-soft); }
   .cal-seg button.on { background: var(--accent, #2962ff); color: #fff; font-weight: 600; }
+  .cal-seg + .cal-seg { margin-left: 8px; }
   .cal-dayw { margin: 10px 0 4px; padding: 8px; border: 1px solid var(--accent, #2962ff); border-radius: 8px; scroll-margin-top: 80px; scroll-margin-bottom: 100px; }
   .cal-dayh { display: flex; justify-content: space-between; align-items: center; gap: 8px; font-size: 13px; margin-bottom: 6px; }
   .cal-dayh button { font: inherit; font-size: 12px; background: none; border: 1px solid var(--line-soft); border-radius: 6px; color: var(--ink-dim); padding: 2px 8px; cursor: pointer; }
@@ -1562,6 +1563,7 @@ window.MS_ADMIN_HASH = '49c5624f2625ed8b42b6e1bf2819a3a41ddb9743aeca36ea34ea7eb9
       <div class="card c-cal">
         <div class="ms-k"><span>Calendar · result by day (R, trades closed that day)</span><span class="c-tog"><span class="cal-nav"><button type="button" id="ms-cal-prev" aria-label="Previous month">‹</button><b id="ms-cal-m"></b><button type="button" id="ms-cal-next" aria-label="Next month">›</button></span><input type="checkbox" id="ms-cal-sh" checked hidden style="display:none"><input type="checkbox" id="ms-cal-rp" checked hidden style="display:none"></span></div>
         <div class="cal-seg" role="group" aria-label="Markets in the calendar"><button type="button" data-mk="all" class="on" aria-pressed="true">All</button><button type="button" data-mk="xau" aria-pressed="false">Gold</button><button type="button" data-mk="nq" aria-pressed="false">NQ</button><button type="button" data-mk="pairs" aria-pressed="false">Pairs</button></div>
+        <div class="cal-seg cal-src adm" role="group" aria-label="Trades in the calendar"><button type="button" data-src="sys" class="on" aria-pressed="true">Main systems</button><button type="button" data-src="all" aria-pressed="false">+ Shadow</button></div>
         <div class="cal" id="ms-cal"></div>
         <div class="cal-dayw" id="ms-cal-dayw" hidden><div class="cal-dayh" id="ms-cal-dayh"></div><ul class="cal-day" id="ms-cal-day"></ul></div>
         <p class="ms-note" id="ms-cal-sum"></p>
@@ -3577,7 +3579,7 @@ function msNextSetup(bars, A) {
     try { localStorage.setItem('msCouncilSeen', JSON.stringify(seen)); } catch (e) {}
   }
   // P&L calendar: the trades closed each local day, their total R and count; tap a day for its trades
-  const CAL = { y: null, m: null, sel: null, mk: 'all' };
+  const CAL = { y: null, m: null, sel: null, mk: 'all', src: (() => { try { return localStorage.getItem('msCalSrc') === 'all' ? 'all' : 'sys'; } catch (e) { return 'sys'; } })() };
   // NQ setups that are part of our system: the New York open run only (4 Nov: it held on 3 years of NQ futures; the open sweeps did not). The others were
   // retired on the same 1-minute test and their records are not counted here.
   const NQ_SYS = ['nyflip'], nqSys = (x) => x.market !== 'nq' || NQ_SYS.includes(x.session);
@@ -3610,15 +3612,17 @@ function msNextSetup(bars, A) {
   ['g-cal-prev', 'g-cal-next'].forEach((id, i) => { const b = document.getElementById(id); if (b) b.addEventListener('click', () => { GCAL.m += i ? 1 : -1; if (GCAL.m < 0) { GCAL.m = 11; GCAL.y--; } if (GCAL.m > 11) { GCAL.m = 0; GCAL.y++; } renderGuestCal(); }); });   // live paper systems: the gold replica, Mosha BO (gold), crypto trend (BTC, ETH, SOL, XRP)
   function renderCalendar() {
     const el = document.getElementById('ms-cal'); if (!el) return;
-    const withSh = true;   // shadow trades always on the calendar, labelled (owner, 6 Nov)
+    // 7 Nov (owner: "our main edge looks horrible"): the calendar defaults to the main systems; "+ Shadow" adds the shadow
+    // book and its back-filled replay (research/shadow-replay.json, about -1,200R Jun-Oct), which the live rules block
+    const withSh = CAL.src === 'all';
     const withRp = true;   // replays always on the calendar (owner, 6 Nov: fill the months before live)
     // backtest replay of the shadow setups (research/shadow-replay.json, compact rows), labelled shadow + replay
-    if (!COUNCIL.shRpRows) { const S = COUNCIL.shadowRp; COUNCIL.shRpRows = S && S.rows ? S.rows.map(([market, k, side, opened, closed, R, rr], i) => { const ki = (S.kinfo || {})[k] || [k, '', ''], mi = (S.mk || {})[market] || [market.toUpperCase(), 2]; return { id: `bt-${market}-${k}-${opened}-${i}`, market, label: mi[0], dec: mi[1], k, name: ki[0], pair: ki[1], h: ki[2], side, opened, filled: opened, closed, R, rr, status: R > 0 ? 'win' : R < 0 ? 'loss' : 'be', shadow: true, replay: true, bt: true }; }) : []; }
+    if (withSh && !COUNCIL.shRpRows) { const S = COUNCIL.shadowRp; COUNCIL.shRpRows = S && S.rows ? S.rows.map(([market, k, side, opened, closed, R, rr], i) => { const ki = (S.kinfo || {})[k] || [k, '', ''], mi = (S.mk || {})[market] || [market.toUpperCase(), 2]; return { id: `bt-${market}-${k}-${opened}-${i}`, market, label: mi[0], dec: mi[1], k, name: ki[0], pair: ki[1], h: ki[2], side, opened, filled: opened, closed, R, rr, status: R > 0 ? 'win' : R < 0 ? 'loss' : 'be', shadow: true, replay: true, bt: true }; }) : []; }
     const rp = withRp ? ((COUNCIL.replay && COUNCIL.replay.trades) || []).filter(nqSys) : [];
     const mkSel = CAL.mk || 'all';
     // forward NQ trades the Trader records on paper each New York session (research.json, k 'nq-open')
     const nqF = withRp ? (COUNCIL.research || []).filter((x) => x.k === 'nq-open' && nqSys(x) && ['win', 'loss', 'be'].includes(x.status) && x.closed && x.R != null).map((x) => ({ ...x, pair: 'M1', paper: true, forward: true })) : [];
-    const done = (COUNCIL.trades || []).filter((x) => ['win', 'loss', 'be'].includes(x.status) && x.closed && x.R != null && (withSh || !x.shadow) && (x.shadow || !withRp || SYS_K.includes(x.k))).concat(rp, nqF, COUNCIL.shRpRows || [])
+    const done = (COUNCIL.trades || []).filter((x) => ['win', 'loss', 'be'].includes(x.status) && x.closed && x.R != null && (withSh || !x.shadow) && (x.shadow || SYS_K.includes(x.k))).concat(rp, nqF, withSh ? COUNCIL.shRpRows || [] : [])
       .filter((x) => mkSel === 'all' || (mkSel === 'pairs' ? x.market !== 'xau' && x.market !== 'nq' : x.market === mkSel));
     const key = (t) => { const d = new Date(t * 1000); return `${d.getFullYear()}-${d.getMonth()}-${d.getDate()}`; };
     const byDay = new Map(); for (const x of done) { const k = key(x.closed); (byDay.get(k) || byDay.set(k, []).get(k)).push(x); }
@@ -3638,7 +3642,7 @@ function msNextSetup(bars, A) {
     document.getElementById('ms-cal-m').textContent = first.toLocaleDateString(undefined, { month: 'long', year: 'numeric' });
     const inM = (x) => { const d = new Date(x.closed * 1000); return d.getFullYear() === CAL.y && d.getMonth() === CAL.m; }, rpM = rp.concat(nqF).filter((x) => mkSel === 'all' || x.market === mkSel).filter(inM);
     const rpTxt = [['xau', 'gold replica (research, replay)'], ['nq', 'NQ New York open run (paper, replay + forward)']].map(([mk, nm]) => { const a = rpM.filter((x) => x.market === mk); return a.length ? `${nm} ${fR(a.reduce((q, x) => q + x.R, 0))} over ${a.length}` : ''; }).filter(Boolean).join(', ');
-    document.getElementById('ms-cal-sum').innerHTML = mN ? `Month: <b class="${mR >= 0 ? 'pos' : 'neg'}">${fR(mR)}</b> over ${mN} trades · ${up} green day${up === 1 ? '' : 's'}, ${dn} red · best day ${best.d} (${fR(best.R)}), worst day ${worst.d} (${fR(worst.R)}). Live and shadow trades${(() => { const a = (COUNCIL.shRpRows || []).filter((x) => mkSel === 'all' || (mkSel === 'pairs' ? x.market !== 'xau' && x.market !== 'nq' : x.market === mkSel)).filter(inM); return a.length ? `, the shadow setups' backtest replay (${a.length} trades, ${fR(a.reduce((q, x) => q + x.R, 0))}; live shadow trades start 1 Nov)` : ''; })()}${rpM.length ? `, plus the replay of our system (${(COUNCIL.replay && COUNCIL.replay.from) || ''} – ${(COUNCIL.replay && COUNCIL.replay.to) || ''}, backtest): ${rpTxt}` : ''}. 1R = the risk of one trade.` : `No closed ${withSh ? '' : 'live '}trades this month.`;
+    document.getElementById('ms-cal-sum').innerHTML = mN ? `Month: <b class="${mR >= 0 ? 'pos' : 'neg'}">${fR(mR)}</b> over ${mN} trades · ${up} green day${up === 1 ? '' : 's'}, ${dn} red · best day ${best.d} (${fR(best.R)}), worst day ${worst.d} (${fR(worst.R)}). ${withSh ? 'Live and shadow trades' : 'Main systems only (switch to + Shadow for the shadow book)'}${(() => { const a = (withSh ? (COUNCIL.shRpRows || []) : []).filter((x) => mkSel === 'all' || (mkSel === 'pairs' ? x.market !== 'xau' && x.market !== 'nq' : x.market === mkSel)).filter(inM); return a.length ? `, the shadow setups' backtest replay (${a.length} trades, ${fR(a.reduce((q, x) => q + x.R, 0))}; live shadow trades start 1 Nov)` : ''; })()}${rpM.length ? `, plus the replay of our system (${(COUNCIL.replay && COUNCIL.replay.from) || ''} – ${(COUNCIL.replay && COUNCIL.replay.to) || ''}, backtest): ${rpTxt}` : ''}. 1R = the risk of one trade.` : `No closed ${withSh ? '' : 'live '}trades this month.`;
     const sel = CAL.sel && byDay.get(CAL.sel);
     const dw = document.getElementById('ms-cal-dayw');
     if (dw) dw.hidden = !sel;
@@ -3654,6 +3658,8 @@ function msNextSetup(bars, A) {
       const dw = document.getElementById('ms-cal-dayw'); if (CAL.sel && dw && !dw.hidden) dw.scrollIntoView({ behavior: 'smooth', block: 'center' }); }); }
   { const sg = document.querySelector('.cal-seg'); if (sg) sg.addEventListener('click', (ev) => { const b = ev.target.closest('[data-mk]'); if (!b) return; CAL.mk = b.dataset.mk; CAL.sel = null;
       sg.querySelectorAll('[data-mk]').forEach((x) => { const on = x === b; x.classList.toggle('on', on); x.setAttribute('aria-pressed', String(on)); }); renderCalendar(); }); }
+  { const sg = document.querySelector('.cal-src'); if (sg) { const set = (v) => sg.querySelectorAll('[data-src]').forEach((x) => { const on = x.dataset.src === v; x.classList.toggle('on', on); x.setAttribute('aria-pressed', String(on)); }); set(CAL.src);
+      sg.addEventListener('click', (ev) => { const b = ev.target.closest('[data-src]'); if (!b) return; CAL.src = b.dataset.src; CAL.sel = null; try { localStorage.setItem('msCalSrc', CAL.src); } catch (e) {} set(CAL.src); renderCalendar(); }); } }
   { const dw = document.getElementById('ms-cal-dayw'); if (dw) dw.addEventListener('click', (ev) => { if (ev.target.id === 'ms-cal-dayx') { CAL.sel = null; renderCalendar(); } }); }
   // Active trades: every open trade the system has placed (live gold trades, NQ paper trades), with floating R
   function activeTrades() {
@@ -3772,15 +3778,17 @@ function msNextSetup(bars, A) {
     const el = document.getElementById(PUB ? 'g-today' : 'h-today'); if (!el) return;
     const fR = (v) => `${v > 0 ? '+' : v < 0 ? '−' : ''}${Math.abs(v).toFixed(1)}R`, cls = (v) => (v > 0 ? 'pos' : v < 0 ? 'neg' : '');
     const now = new Date(), d0 = new Date(now.getFullYear(), now.getMonth(), now.getDate()) / 1000, w0 = d0 - ((now.getDay() + 6) % 7) * 86400, m0 = new Date(now.getFullYear(), now.getMonth(), 1) / 1000;
-    const closed = PUB ? sysClosed() : (COUNCIL.trades || []).filter((x) => ['win', 'loss', 'be'].includes(x.status) && x.closed && x.R != null);
-    const sum = (t) => { const a = closed.filter((x) => x.closed >= t), live = a.filter((x) => !x.shadow); return { n: a.length, R: a.reduce((q, x) => q + x.R, 0), lR: live.reduce((q, x) => q + x.R, 0), ln: live.length }; };
+    // 7 Nov (owner: "our main edge looks horrible"): the headline is the main systems only (sysClosed: live system trades +
+    // their replays), as for guests; shadow and retired-engine trades move to the second line so they no longer drown it
+    const closed = sysClosed(), other = PUB ? [] : (COUNCIL.trades || []).filter((x) => ['win', 'loss', 'be'].includes(x.status) && x.closed && x.R != null && !(SYS_K.includes(x.k) && !x.shadow));
+    const sum = (t) => { const a = closed.filter((x) => x.closed >= t), o = other.filter((x) => x.closed >= t); return { n: a.length, R: a.reduce((q, x) => q + x.R, 0), oR: o.reduce((q, x) => q + x.R, 0), on: o.length }; };
     const F = window.FLOAT || null, D = sum(d0), W = sum(w0), M = sum(m0);
     const cell = (k, v, sub, c) => `<div class="h-kpi"><span class="h-kpi-k">${k}</span><b class="${c}">${v}</b><span class="h-kpi-s">${sub}</span></div>`;
-    const sub = (S) => PUB ? `${S.n} closed` : `${S.n} closed${S.ln ? ` · live ${fR(S.lR)}` : ''}`;
+    const sub = (S) => PUB ? `${S.n} closed` : `${S.n} system${S.on ? ` · shadow ${fR(S.oR)} (${S.on})` : ''}`;
     const prev = (window.TODAY_PREV = window.TODAY_PREV || {});
     el.innerHTML = COUNCIL.trades ? [
       PUB ? cell('Floating now', F ? fR(F.liveTot || 0) : '—', F ? `${F.open} open` : 'loading', F ? cls(F.liveTot || 0) : '')
-        : cell('Floating now', F ? fR(F.tot) : '—', F ? `${F.open} open${F.sh ? ` + ${F.sh} shadow` : ''}${F.pct ? ` · ${F.pct >= 0 ? '+' : '−'}${Math.abs(F.pct).toFixed(2)}%` : ''}` : 'loading', F ? cls(F.tot) : ''),
+        : cell('Floating now', F ? fR(F.liveTot || 0) : '—', F ? `${F.open} open${F.sh ? ` · shadow ${fR((F.tot || 0) - (F.liveTot || 0))} (${F.sh})` : ''}` : 'loading', F ? cls(F.liveTot || 0) : ''),
       cell('Today', fR(D.R), sub(D), cls(D.R)), cell('This week', fR(W.R), sub(W), cls(W.R)), cell('This month', fR(M.R), sub(M), cls(M.R)),
     ].join('') : '';
     // flash a figure that changed since the last render (green up, red down)

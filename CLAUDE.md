@@ -153,3 +153,10 @@ Rules and research live in `.claude/skills/ICT/SKILL.md` (results also in counci
 - Desk extras (6 Nov): New York clock with kill zones (`#ict-clock`), a live forward-test card on futures signals only
   (`#ict-fwd`, replay excluded; verdict needs ~30 closed A+), an auto checklist per signal (`#ict-tv-ck`), and NY 00:00 /
   PDH / PDL lines on the signal chart. Skill §19: the edge is not proven on 2023-26 cash data — paper only.
+
+## Main systems first (7 Nov 2026, owner: "our main edge looks horrible")
+The council calendar (`renderCalendar`) defaults to the main systems (`SYS_K` live trades + their replays + NQ paper); the
+admin switch `.cal-src` ("Main systems" / "+ Shadow", localStorage `msCalSrc`) adds the shadow book and its back-filled
+replay (research/shadow-replay.json, about −1,200R Jun–Oct, setups the live rules block). The Home Today strip
+(`renderToday`) headlines `sysClosed()` and floating live R; shadow and retired-engine trades sit on the second line.
+
