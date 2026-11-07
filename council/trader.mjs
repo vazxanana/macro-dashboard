@@ -1023,7 +1023,8 @@ const exp = (arr) => arr.length ? arr.reduce((a, x) => a + x.R, 0) / arr.length 
 const BT = (() => {
   const b = rd('backtest.json', null);
   if (!b || b.fake || !Array.isArray(b.trades) || !b.trades.length || now - Date.parse(b.at) / 1000 > 3 * 86400) return null;
-  const T = b.trades.map((r) => Object.fromEntries(b.tradeCols.map((c, i) => [c, r[i]])));
+  // rows still open at the end of the replay window (status 'open', R null) have no result yet: left out of every stat here
+  const T = b.trades.map((r) => Object.fromEntries(b.tradeCols.map((c, i) => [c, r[i]]))).filter((t) => t.status !== 'open');
   // judge every result after costs: each backtest trade carries its spread in R (one spread per round trip)
   if (b.tradeCols.includes('cost')) for (const t of T) for (const k of ['R_none', 'R_be1', 'R_be15', 'R_tp2']) if (t[k] != null) t[k] = +(t[k] - (t.cost || 0)).toFixed(3);
   // TA: every row, incl. market-entry twins ('<k>@mkt') and resting orders that never filled (fill 0, 0R);

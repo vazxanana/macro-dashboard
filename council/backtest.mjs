@@ -230,7 +230,9 @@ function structFeat(sell, l, src, at) {
 const spreadOf = (M, price) => M.group === 'Forex' ? 0.0001 : M.spot ? 0.3 : price * 0.0002;
 const BUILDERS = PAIRS.map((p) => [p, buildSetup]).concat(RETR.map((p) => [p, buildRetrace]));
 const DEFS = PAIRS.concat(RETR);
-const all = [], twins = [], unfilled = [], meta = { errors: {} };   // closed trades; their market-entry twins; resting orders that never filled
+const all = [], twins = [], unfilled = [], stillOpen = [], meta = { errors: {} };   // closed trades; their market-entry twins; resting orders that never filled;
+// trades (and resting orders, twins included) still open when the replay window ends: written with status 'open' and null R, so the
+// replay keeps every signal the live Trader would show, while every expectancy stat skips them (they have no result yet)
 const endT = Math.floor(Date.now() / 1000 / 60) * 60 - 60, startT = endT - DAYS * 86400;
 const t0wall = Date.now();
 // the trader's marked trades (examples.json): for each one inside the replay, what every setup was doing in its entry
@@ -398,7 +400,8 @@ for (const [key, M] of Object.entries(MARKETS)) {
       for (const tr of all.concat(twins, unfilled, open).filter((v) => v.m === key && v.side === x.side && v.opened >= x.from - 2 * PAD && v.opened <= x.to + 2 * PAD))
         x.caught.push({ setup: tr.k, opened: tr.opened, entry: +tr.entry.toFixed(2), stop: +tr.stop.toFixed(2), target: +tr.t1.toFixed(2), rr: +tr.rr.toFixed(2), filled: !!tr.filled, R: tr.v[0].R == null ? null : +tr.v[0].R.toFixed(2), status: tr.status });
     }
-    meta[key] = { steps, trades: all.filter((x) => x.m === key).length };
+    stillOpen.push(...open);
+    meta[key] = { steps, trades: all.filter((x) => x.m === key).length, open: open.length };
     console.log(`${key}: ${steps} steps, ${meta[key].trades} closed trades, ${((Date.now() - t0wall) / 1000).toFixed(0)}s`);
   } catch (e) { meta.errors[key] = String(e.message || e); console.log(`${key}: ${e.message || e}`); }
 }
@@ -418,9 +421,12 @@ const out = {
   byMarket: group(all, (x) => x.m),
   byRR: group(all, rrBand),
   bySetupCond: Object.fromEntries(setups.map((k) => { const a = all.filter((x) => x.k === k); return [k, { d1: group(a, (x) => x.feat.d1), struct: group(a, (x) => x.feat.struct), session: group(a, (x) => x.feat.session), rr: group(a, rrBand) }]; })),
-  trades: all.concat(twins, unfilled).map((x) => [x.m, x.k, x.side, x.opened, x.filled || null, +x.rr.toFixed(2), x.feat.d1, x.feat.struct, x.feat.session, ...x.v.map((v) => v.R == null ? null : +v.R.toFixed(2)), +x.mfe.toFixed(2), +x.cost.toFixed(3), x.status === 'closed' ? 1 : 0, x.feat.cf, x.feat.choch, x.feat.m15c, x.feat.m15c1]),
-  tradeCols: ['market', 'setup', 'side', 'opened', 'filled', 'rr', 'd1', 'struct', 'session', 'R_none', 'R_be1', 'R_be15', 'R_tp2', 'mfe', 'cost', 'fill', 'cf', 'choch', 'm15c', 'm15c1'],
-  twins: twins.length, unfilled: unfilled.length,
+  // status (last column, so older column indexes hold): 'closed', 'unfilled' (a resting order that never filled, 0R) or 'open'
+  // (still running at the end of the window: R columns null; fill 1 once its entry filled, 0 while the order still rests)
+  trades: all.concat(twins, unfilled, stillOpen).map((x) => { const op = x.status === 'open' || x.status === 'pending', st = op ? 'open' : x.status === 'closed' ? 'closed' : 'unfilled';
+    return [x.m, x.k, x.side, x.opened, x.filled || null, +x.rr.toFixed(2), x.feat.d1, x.feat.struct, x.feat.session, ...x.v.map((v) => op || v.R == null ? null : +v.R.toFixed(2)), +x.mfe.toFixed(2), +x.cost.toFixed(3), op ? (x.filled ? 1 : 0) : x.status === 'closed' ? 1 : 0, x.feat.cf, x.feat.choch, x.feat.m15c, x.feat.m15c1, st]; }),
+  tradeCols: ['market', 'setup', 'side', 'opened', 'filled', 'rr', 'd1', 'struct', 'session', 'R_none', 'R_be1', 'R_be15', 'R_tp2', 'mfe', 'cost', 'fill', 'cf', 'choch', 'm15c', 'm15c1', 'status'],
+  twins: twins.length, unfilled: unfilled.length, open: stillOpen.length,
   examples: EX.map((x) => ({ id: x.id, market: x.market, side: x.side, entry: x.entry, stop: x.stop, target: x.target, entryFrom: x.entryFrom, entryTo: x.entryTo,
     caught: x.caught, setups: x.setups.map(({ s, ...v }) => v), sweep: x.sweep.map(({ s, ...v }) => v), m15: x.m15.map(({ s, ...v }) => v) })),
 };

@@ -22,6 +22,9 @@ const liveAll = (() => { const t = rd(TRADES); return Array.isArray(t) ? t : t.t
 const bt = rd(BT);
 const cols = bt.tradeCols || [];
 const rows = (bt.trades || []).map((r) => Object.fromEntries(cols.map((c, i) => [c, r[i]])));
+// replay row status: 'closed' / 'unfilled' / 'open' (still running at the end of the window, R null); older files have no status column
+const rStatus = (r) => r.status || (r.fill ? 'closed' : 'unfilled');
+const hasStatus = cols.includes('status');
 
 const from0 = Date.parse(bt.from) / 1000, to = Date.parse(bt.to) / 1000;
 const replayRows = rows.filter((r) => !String(r.setup).endsWith('@mkt'));
@@ -56,9 +59,11 @@ const agree = (f) => { const ok = pairs.filter(f); return ok.length; };
 const pct = (a, b) => (b ? +(a / b).toFixed(3) : null);
 const median = (a) => { if (!a.length) return null; const v = [...a].sort((x, y) => x - y), n = v.length; return +(n % 2 ? v[n >> 1] : (v[n / 2 - 1] + v[n / 2]) / 2).toFixed(3); };
 const mean = (a) => (a.length ? +(a.reduce((s, v) => s + v, 0) / a.length).toFixed(3) : null);
-const both = pairs.filter(([x, r]) => closedLive(x) && r.fill === 1);
-const fillAgree = pairs.filter(([x, r]) => (closedLive(x) || unfilledLive(x)) && (closedLive(x) ? 1 : 0) === r.fill);
-const fillJudged = pairs.filter(([x]) => closedLive(x) || unfilledLive(x));
+const both = pairs.filter(([x, r]) => closedLive(x) && r.fill === 1 && rStatus(r) === 'closed' && r.R_none != null);
+// a replay order still resting at the window's end is not judged on fill (undecided); one already filled counts as filled
+const fillKnown = (r) => !(rStatus(r) === 'open' && !r.fill);
+const fillAgree = pairs.filter(([x, r]) => (closedLive(x) || unfilledLive(x)) && fillKnown(r) && (closedLive(x) ? 1 : 0) === r.fill);
+const fillJudged = pairs.filter(([x, r]) => (closedLive(x) || unfilledLive(x)) && fillKnown(r));
 const dGross = both.map(([x, r]) => x.R - r.R_none), dNet = both.map(([x, r]) => x.R - (r.R_none - r.cost));
 const signAgree = both.filter(([x, r]) => sign(x.R) === sign(r.R_none)).length;
 const signAgreeNet = both.filter(([x, r]) => sign(x.R) === sign(r.R_none - r.cost)).length;
@@ -82,7 +87,7 @@ function whyLive(x) {
   if (!replaySetups.has(x.k)) return ['setup not modelled in replay', 'replay gap'];
   if (errors[x.market] || !replayMarkets.has(x.market)) return ['market failed in replay', 'data feed'];
   if (x.status === 'skipped') return ['live skipped (price past stop/target at signal)', 'live-only guard'];
-  if ((x.status === 'open' || x.status === 'pending') && x.opened > to - 2 * 86400) return ['still open live; replay drops trades not closed by its end', 'replay bug'];
+  if (!hasStatus && (x.status === 'open' || x.status === 'pending') && x.opened > to - 2 * 86400) return ['still open live; replay drops trades not closed by its end', 'replay bug'];
   const near = R.filter((r) => r.market === x.market && r.setup === x.k && r.side === x.side && Math.abs(r.opened - x.opened) <= NEAR && rMatch[R.indexOf(r)] < 0);
   if (near.length) return ['replay fired the same signal 10-60 min apart (timing/candle-close drift)', 'data feed'];
   const other = R.find((r) => r.market === x.market && r.side === x.side && r.setup !== x.k && Math.abs(r.opened - x.opened) <= TOL);
@@ -107,7 +112,7 @@ function whyReplay(r) {
 
 const tally = (items, f) => { const o = {}; for (const it of items) { const [why, cls] = f(it); const k = `${cls}: ${why}`; (o[k] = o[k] || { cls, why, n: 0, bySetup: {}, byMarket: {}, examples: [] }); const e = o[k]; e.n++;
   const s = it.k || it.setup; e.bySetup[s] = (e.bySetup[s] || 0) + 1; e.byMarket[it.market] = (e.byMarket[it.market] || 0) + 1;
-  if (e.examples.length < 3) e.examples.push({ market: it.market, setup: s, side: it.side, opened: new Date(it.opened * 1000).toISOString(), status: it.status || (it.fill ? 'closed' : 'unfilled'), ...(it.id ? { id: it.id, shadow: !!it.shadow, blockedBy: it.blockedBy } : {}) }); }
+  if (e.examples.length < 3) e.examples.push({ market: it.market, setup: s, side: it.side, opened: new Date(it.opened * 1000).toISOString(), status: it.status || rStatus(it), ...(it.id ? { id: it.id, shadow: !!it.shadow, blockedBy: it.blockedBy } : {}) }); }
   return Object.values(o).sort((a, b) => b.n - a.n); };
 const uL = L.filter((x, i) => lMatch[i] < 0), uR = R.filter((r, i) => rMatch[i] < 0);
 const top = (items, f) => { const o = {}; for (const it of items) { const k = f(it); o[k] = (o[k] || 0) + 1; } return Object.entries(o).sort((a, b) => b[1] - a[1]).slice(0, 12).map(([k, n]) => ({ k, n })); };
@@ -132,7 +137,7 @@ const matched = pairs.length;
 const out = {
   at: new Date().toISOString(),
   window: { from: new Date(from * 1000).toISOString(), to: new Date(to * 1000).toISOString(), replayFrom: bt.from, replayAt: bt.at, firstLive: new Date(firstLive * 1000).toISOString() },
-  counts: { live: L.length, liveShadow: L.filter((x) => x.shadow).length, replay: R.length, matched, comparableLive: comparableL.length, comparableReplay: comparableR.length },
+  counts: { replayOpen: R.filter((r) => rStatus(r) === 'open').length, live: L.length, liveShadow: L.filter((x) => x.shadow).length, replay: R.length, matched, comparableLive: comparableL.length, comparableReplay: comparableR.length },
   matchRate: {
     liveInReplay: pct(matched, L.length), replayInLive: pct(matched, R.length),
     comparable: { liveInReplay: pct(comparableL.filter((x) => lMatch[L.indexOf(x)] >= 0).length, comparableL.length), replayInLive: pct(comparableR.filter((r) => rMatch[R.indexOf(r)] >= 0).length, comparableR.length) },
@@ -148,7 +153,7 @@ const out = {
     cf: { rate: pct(agree(([x, r]) => (x.feat || {}).cf === r.cf), matched) },
     choch: { rate: pct(agree(([x, r]) => (x.feat || {}).choch === r.choch), matched) },
     m15c: { rate: pct(agree(([x, r]) => (x.feat || {}).m15c === r.m15c), matched) },
-    fill: { judged: fillJudged.length, agree: fillAgree.length, rate: pct(fillAgree.length, fillJudged.length), table: crossTab((x) => x.status, (r) => (r.fill ? 'filled' : 'unfilled')) },
+    fill: { judged: fillJudged.length, agree: fillAgree.length, rate: pct(fillAgree.length, fillJudged.length), table: crossTab((x) => x.status, (r) => (rStatus(r) === 'open' ? (r.fill ? 'open (filled)' : 'open (resting)') : r.fill ? 'filled' : 'unfilled')) },
     outcome: {
       bothClosed: both.length,
       signAgree: signAgree, signRate: pct(signAgree, both.length),

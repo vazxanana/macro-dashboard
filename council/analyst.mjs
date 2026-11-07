@@ -13,7 +13,7 @@ export function liveRuleSection({ snapshot, config, backtest, now = Math.floor(D
   const sess = sessionOf(now), noSess = f.noSession || [];
   // the replay under the live rule: same conditions the Trader checks (D1, session), after costs, filled trades only
   const cols = backtest && !backtest.fake && backtest.tradeCols, rows = cols ? backtest.trades.map((r) => Object.fromEntries(cols.map((c, i) => [c, r[i]]))) : [];
-  const bt = rows.filter((t) => t.setup === k && t.fill !== 0 && t.R_none != null && (!f.d1 || t.d1 === f.d1) && !noSess.includes(t.session));
+  const bt = rows.filter((t) => t.setup === k && t.fill !== 0 && t.status !== 'open' && t.R_none != null && (!f.d1 || t.d1 === f.d1) && !noSess.includes(t.session));
   const rule = [f.d1 ? `${f.d1} D1 only` : null, noSess.length ? `not in ${noSess.join('/')}` : null, (f.noMarket || []).length ? `skips ${f.noMarket.join(', ')}` : null].filter(Boolean).join(', ');
   const out = [START, '## Live Scalp rule check', '',
     `Built by the Trader at ${new Date(now * 1000).toISOString().slice(0, 16).replace('T', ' ')} UTC from snapshot, config and the ${backtest && backtest.days || '?'}-day replay. Rule now: Scalp (M15 → M1) ${rule || 'no filters'}${live ? '' : '. **Scalp is not live right now** (not in focusSetups), so nothing below trades live'}.`, '',
