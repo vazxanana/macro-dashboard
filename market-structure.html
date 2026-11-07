@@ -1538,6 +1538,19 @@ html[data-guest] #ms-cmdk-btn { display: none !important; }
 
 /* live dot: stale state (no new price for a while) is a hollow amber ring, no pulse */
 .ms-live-dot.stale { background: transparent !important; box-shadow: inset 0 0 0 2px #e0a526 !important; animation: none !important; }
+
+/* council calendar: weekly totals column (desktop/tablet), weekend dimming by class instead of position */
+#ms-cal { grid-template-columns: repeat(7, minmax(0, 1fr)) minmax(0, .95fr); }
+#ms-cal > .cal-d { opacity: 1; }
+#ms-cal > .cal-d.we:not(.win):not(.loss) { opacity: .55; }
+#ms-cal > .cal-d.out { visibility: hidden; }
+.cal-wk { display: flex; flex-direction: column; gap: 2px; padding: 5px 7px; border-radius: 6px; border: 1px dashed var(--line); font-size: 11px; color: var(--ink-faint); min-height: 62px; }
+.cal-wk .cn { font: 600 10.5px var(--sans); color: var(--ink-faint); }
+.cal-wk .cr { font: 700 13px var(--mono); color: var(--ink); letter-spacing: -.02em; }
+.cal-wk.win { border-style: solid; border-color: color-mix(in srgb, var(--buy) 40%, transparent); background: var(--buy-soft, rgba(47,191,143,.1)); } .cal-wk.win .cr { color: var(--buy); }
+.cal-wk.loss { border-style: solid; border-color: color-mix(in srgb, var(--sell) 40%, transparent); background: var(--sell-soft, rgba(242,87,111,.1)); } .cal-wk.loss .cr { color: var(--sell); }
+.cal-wk .ct { font-size: 10.5px; }
+@media (max-width: 560px) { #ms-cal { grid-template-columns: repeat(7, minmax(0, 1fr)); } #ms-cal .cal-wk, #ms-cal .cal-wkh { display: none; } }
 </style>
 </head>
 <body>
@@ -3832,14 +3845,17 @@ function msNextSetup(bars, A) {
     const now = new Date(); if (CAL.y === null) { CAL.y = now.getFullYear(); CAL.m = now.getMonth(); }
     const first = new Date(CAL.y, CAL.m, 1), days = new Date(CAL.y, CAL.m + 1, 0).getDate(), lead = (first.getDay() + 6) % 7;
     const fR = (v) => `${v > 0 ? '+' : v < 0 ? '−' : ''}${Math.abs(v).toFixed(2)}R`;
-    let html = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].map((d) => `<div class="cal-h">${d}</div>`).join('') + '<div class="cal-d out"></div>'.repeat(lead);
-    let mR = 0, mN = 0, up = 0, dn = 0, best = null, worst = null;
+    let html = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].map((d) => `<div class="cal-h">${d}</div>`).join('') + '<div class="cal-h cal-wkh">Week</div>' + '<div class="cal-d out"></div>'.repeat(lead);
+    let mR = 0, mN = 0, up = 0, dn = 0, best = null, worst = null, wkR = 0, wkN = 0, wkI = 0;
     window.CAL_MAX = Math.max(1, ...Array.from({ length: days }, (_, i) => Math.abs((byDay.get(`${CAL.y}-${CAL.m}-${i + 1}`) || []).reduce((a, x) => a + x.R, 0))));
     for (let d = 1; d <= days; d++) {
       const k = `${CAL.y}-${CAL.m}-${d}`, arr = byDay.get(k) || [], R0 = arr.reduce((a, x) => a + x.R, 0), heat = arr.length ? Math.min(1, Math.abs(R0) / (window.CAL_MAX || 1)) : 0, R = arr.reduce((a, x) => a + x.R, 0);
       if (arr.length) { mR += R; mN += arr.length; if (R > 0) up++; else if (R < 0) dn++; if (!best || R > best.R) best = { d, R }; if (!worst || R < worst.R) worst = { d, R }; }
       const cls = arr.length ? (R > 0 ? 'win' : R < 0 ? 'loss' : '') : '', isT = now.getFullYear() === CAL.y && now.getMonth() === CAL.m && now.getDate() === d;
-      html += `<button type="button" style="--heat:${heat.toFixed(2)}" class="cal-d ${cls}${isT ? ' today' : ''}${CAL.sel === k ? ' sel' : ''}" data-day="${k}" aria-label="${d}: ${arr.length ? `${fR(R)}, ${arr.length} trades` : 'no trades'}"><span class="cn">${d}</span>${arr.length ? `<span class="cr">${fR(R)}</span>${(() => { const q = arr.filter((x) => x.market === 'nq'); if (!q.length || mkSel === 'nq') return ''; const v = q.reduce((a, x) => a + x.R, 0); return `<span class="cq">NQ <b class="${v > 0 ? 'pos' : v < 0 ? 'neg' : ''}">${fR(v)}</b></span>`; })()}${(() => { const q = arr.filter((x) => x.shadow); if (!q.length || q.length === arr.length) return q.length ? '<span class="cq">all shadow</span>' : ''; const v = q.reduce((a, x) => a + x.R, 0); return `<span class="cq">shadow <b class="${v > 0 ? 'pos' : v < 0 ? 'neg' : ''}">${fR(v)}</b></span>`; })()}<span class="ct"><span class="nw">${arr.length} trade${arr.length > 1 ? 's' : ''}</span> <span class="nw ct-w">${arr.filter((x) => x.status === 'win').length} won</span></span>` : ''}</button>`;
+      const col = (lead + d - 1) % 7; wkR += R; wkN += arr.length;
+      html += `<button type="button" style="--heat:${heat.toFixed(2)}" class="cal-d ${cls}${isT ? ' today' : ''}${col >= 5 ? ' we' : ''}${CAL.sel === k ? ' sel' : ''}" data-day="${k}" aria-label="${d}: ${arr.length ? `${fR(R)}, ${arr.length} trades` : 'no trades'}"><span class="cn">${d}</span>${arr.length ? `<span class="cr">${fR(R)}</span>${(() => { const q = arr.filter((x) => x.market === 'nq'); if (!q.length || mkSel === 'nq') return ''; const v = q.reduce((a, x) => a + x.R, 0); return `<span class="cq">NQ <b class="${v > 0 ? 'pos' : v < 0 ? 'neg' : ''}">${fR(v)}</b></span>`; })()}${(() => { const q = arr.filter((x) => x.shadow); if (!q.length || q.length === arr.length) return q.length ? '<span class="cq">all shadow</span>' : ''; const v = q.reduce((a, x) => a + x.R, 0); return `<span class="cq">shadow <b class="${v > 0 ? 'pos' : v < 0 ? 'neg' : ''}">${fR(v)}</b></span>`; })()}<span class="ct"><span class="nw">${arr.length} trade${arr.length > 1 ? 's' : ''}</span> <span class="nw ct-w">${arr.filter((x) => x.status === 'win').length} won</span></span>` : ''}</button>`;
+      if (col === 6 || d === days) { if (col < 6) html += '<div class="cal-d out"></div>'.repeat(6 - col); wkI++;
+        html += `<div class="cal-wk ${wkN ? (wkR > 0 ? 'win' : wkR < 0 ? 'loss' : '') : 'none'}" aria-label="Week ${wkI}: ${wkN ? `${fR(wkR)}, ${wkN} trades` : 'no trades'}"><span class="cn">W${wkI}</span>${wkN ? `<span class="cr">${fR(wkR)}</span><span class="ct">${wkN} trade${wkN > 1 ? 's' : ''}</span>` : '<span class="ct">—</span>'}</div>`; wkR = 0; wkN = 0; }
     }
     el.innerHTML = html;
     document.getElementById('ms-cal-m').innerHTML = `${first.toLocaleDateString(undefined, { month: 'long', year: 'numeric' })}${mN ? ` <small class="cal-mt ${mR > 0 ? 'pos' : mR < 0 ? 'neg' : ''}" title="Month total over ${mN} trades">${fR(mR)}</small>` : ''}`;
