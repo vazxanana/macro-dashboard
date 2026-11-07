@@ -54,6 +54,23 @@ const etStamp = (t) => { const o = {}; for (const p of nyFmt.formatToParts(new D
 // straddles the 18:00 reopen), which made a fake H1 candle each day
 const etH = new Intl.DateTimeFormat('en-US', { timeZone: 'America/New_York', hour: 'numeric', hourCycle: 'h23' });
 export const inHalt = (t) => +etH.format(new Date(t * 1000)) % 24 === 17;
+// 7 Nov (owner OK): CME shut for the weekend (Fri 17:00 - Sun 18:00 New York) or a full-day holiday (New Year, Good Friday,
+// Christmas, until the 18:00 reopen). CNBC prints flat candles (open = high = low = close = Friday's last price) into these
+// hours: 7-10 a market in 3 weeks of H1 on 7 Nov. They cannot sweep, but they add fake bars between real ones.
+const nyDay = new Intl.DateTimeFormat('en-US', { timeZone: 'America/New_York', year: 'numeric', month: '2-digit', day: '2-digit', weekday: 'short', hour: '2-digit', minute: '2-digit', hourCycle: 'h23' });
+const ymd = (y, m, d) => new Date(Date.UTC(y, m, d)).toISOString().slice(0, 10);
+const obs = (y, m, d) => { const w = new Date(Date.UTC(y, m, d)).getUTCDay(); return ymd(y, m, d + (w === 6 ? -1 : w === 0 ? 1 : 0)); };
+function goodFriday(y) { const a = y % 19, b = Math.floor(y / 100), c = y % 100, d = Math.floor(b / 4), e = b % 4, f = Math.floor((b + 8) / 25), g = Math.floor((b - f + 1) / 3),
+  h = (19 * a + b - d - g + 15) % 30, i = Math.floor(c / 4), k = c % 4, l = (32 + 2 * e + 2 * i - h - k) % 7, m = Math.floor((a + 11 * h + 22 * l) / 451), mo = Math.floor((h + l - 7 * m + 114) / 31), da = ((h + l - 7 * m + 114) % 31) + 1;
+  return new Date(Date.UTC(y, mo - 1, da) - 2 * 86400e3).toISOString().slice(0, 10); }
+const SHUT = new Map(), shutDays = (y) => SHUT.get(y) || SHUT.set(y, new Set([obs(y, 0, 1), goodFriday(y), obs(y, 11, 25)])).get(y);
+export function cmeShut(t) {
+  const o = {}; for (const p of nyDay.formatToParts(new Date(t * 1000))) o[p.type] = p.value;
+  const m = (+o.hour % 24) * 60 + +o.minute, wd = o.weekday;
+  if (wd === 'Sat' || (wd === 'Fri' && m >= 1020) || (wd === 'Sun' && m < 1080)) return true;
+  return m < 1080 && shutDays(+o.year).has(`${o.year}-${o.month}-${o.day}`);
+}
+const closedBar = (t) => inHalt(t) || cmeShut(t);
 export async function cnbcBars(sym, iv, from, to) {
   // audit (7 Nov): CNBC anchors intraday bars at the request's start minute (a run at hh:37 got 5m bars at :02/:07/...),
   // so H1 candles built from them were shifted and changed from run to run; start on the hour
@@ -62,7 +79,7 @@ export async function cnbcBars(sym, iv, from, to) {
   const j = await r.json().catch(() => null), pb = j && j.barData && j.barData.priceBars;
   if (!pb || !pb.length) throw new Error(`CNBC ${sym} ${iv}: ${(j && j.statusMessage) || `HTTP ${r.status}`}`);
   const out = [];
-  for (const b of pb) { const o = +b.open, h = +b.high, l = +b.low, c = +b.close, t = Math.round(+b.tradeTimeinMills / 1000); if ([o, h, l, c, t].every((v) => isFinite(v) && v > 0) && (iv === '1D' || !inHalt(t))) out.push({ time: t, open: o, high: Math.max(h, o, c), low: Math.min(l, o, c), close: c }); }
+  for (const b of pb) { const o = +b.open, h = +b.high, l = +b.low, c = +b.close, t = Math.round(+b.tradeTimeinMills / 1000); if ([o, h, l, c, t].every((v) => isFinite(v) && v > 0) && (iv === '1D' || !closedBar(t))) out.push({ time: t, open: o, high: Math.max(h, o, c), low: Math.min(l, o, c), close: c }); }
   return out.sort((a, b) => a.time - b.time);
 }
 export const agg = (bars, sec) => { const m = new Map(); for (const b of bars) { const k = Math.floor(b.time / sec) * sec, c = m.get(k); if (!c) m.set(k, { time: k, open: b.open, high: b.high, low: b.low, close: b.close }); else { c.high = Math.max(c.high, b.high); c.low = Math.min(c.low, b.low); c.close = b.close; } } return [...m.values()].sort((a, b) => a.time - b.time); };
@@ -78,7 +95,7 @@ async function feed(M) {
     } catch (e) { console.log(String(e.message || e)); }
   }
   const [h1, d1, m5] = [await yahoo(M.sym, '60m', '60d'), await yahoo(M.sym, '1d', '1y'), await yahoo(M.sym, '5m', '5d')];
-  return { src: `yahoo ${M.sym}`, h1: h1.bars.filter((b) => !inHalt(b.time)), d1: d1.bars, m5: m5.bars.filter((b) => !inHalt(b.time)) };
+  return { src: `yahoo ${M.sym}`, h1: h1.bars.filter((b) => !closedBar(b.time)), d1: d1.bars, m5: m5.bars.filter((b) => !closedBar(b.time)) };
 }
 const load = (f, d) => { try { return JSON.parse(fs.readFileSync(path.join(DATA, f), 'utf8')); } catch (e) { return d; } };
 const save = (f, v) => fs.writeFileSync(path.join(DATA, f), JSON.stringify(v, null, f === 'trades.json' ? 0 : 1));
