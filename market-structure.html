@@ -6989,7 +6989,8 @@ function msNextSetup(bars, A) {
     for (const x of A) { const c = cl[cl.length - 1]; if (c && IDX.has(x.market) && IDX.has(c[0].market) && c[0].side === x.side && x.signalAt - c[0].signalAt <= 3 * 3600 && !c.some((y) => y.market === x.market)) c.push(x); else cl.push([x]); }
     for (const c of cl) { const best = c.slice().sort((a, b) => (b.grade.total - a.grade.total) || ((b.feat.body || 0) - (a.feat.body || 0)) || (a.signalAt - b.signalAt))[0]; for (const x of c) PICK.set(x.id, { pick: x === best, n: c.length }); }
   }
-  const all = () => { const L = S.src === 'live' ? S.trades : S.src === 'replay' ? S.replay : S.trades.concat(S.replay); markClusters(L);
+  // audit (7 Nov): in Both, a signal the live tracker took is not counted again from the replay (same market, side and candle)
+  const all = () => { const lv = new Set(S.trades.map((x) => x.id)); const L = S.src === 'live' ? S.trades : S.src === 'replay' ? S.replay : S.trades.concat(S.replay.filter((x) => !lv.has(String(x.id).replace(/-r$/, '')))); markClusters(L);
     return L.filter((x) => S.flt === 'all' || (S.flt === 'ap' ? isAP(x) : isA(x) && (S.flt !== 'pick' || (PICK.get(x.id) || {}).pick))); };
   const clTag = (x) => { const c = PICK.get(x.id); return c && c.n > 1 ? (c.pick ? ` <span class="ict-a" title="Best of ${c.n} same-side setups within 3 h">★ pick of ${c.n}</span>` : ` <span class="ict-pill" title="Another index in this cluster has the higher grade">cluster of ${c.n}</span>`) : ''; };
   try { S.desk = JSON.parse(localStorage.getItem('ictDesk') || 'null') || S.desk; } catch (e) {}
@@ -7023,7 +7024,7 @@ function msNextSetup(bars, A) {
         + `<div class="sub">PDH ${m ? fx(m.pdh, k) : '—'} · PDL ${m ? fx(m.pdl, k) : '—'}</div></div>`; }).join('');
     // KPIs
     const sum = (a, f) => a.reduce((s, x) => s + (f(x) || 0), 0), R3 = sum(C, (x) => x.R), R2 = sum(C, (x) => x.R2 ?? x.R), w = C.filter((x) => x.R > 0).length;
-    const fl = sum(O, liveR), mine = T.filter((x) => (myRev(x) || {}).act === 'taken'), rev = C.filter((x) => myRev(x) && myRev(x).text).length;
+    const fl = sum(O, (x) => liveR(x) * (x.size || 1)), mine = T.filter((x) => (myRev(x) || {}).act === 'taken'), rev = C.filter((x) => myRev(x) && myRev(x).text).length;
     const cell = (k, v, sub, c) => `<div><span>${k}</span><b class="${c || ''}">${v}</b><small>${sub}</small></div>`;
     $('ict-kpi').innerHTML = cell('Signals', T.length, `${O.length} open · ${C.length} closed`) + cell('Win rate', C.length ? Math.round((100 * w) / C.length) + '%' : '—', `${w} of ${C.length}`)
       + cell('Total', fR(R3), C.length ? `${fR(R3 / C.length)} a signal` : 'no closed yet', cls(R3)) + cell('Fixed 2R', fR(R2), C.length ? `${fR(R2 / C.length)} a signal` : '—', cls(R2))
