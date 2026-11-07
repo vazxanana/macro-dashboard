@@ -1642,6 +1642,7 @@ html.scrolled .top { box-shadow: 0 6px 20px -10px rgba(0,0,0,.55); }
 .btab a svg { padding: 3px 14px; box-sizing: content-box; border-radius: 999px; transition: background-color .2s cubic-bezier(.23,1,.32,1); }
 .btab a[aria-current="page"] svg { background: color-mix(in srgb, var(--accent) 16%, transparent); }
 :root[data-theme="pro"] .btab a svg { border-radius: 6px; }
+#g-cal-m { white-space: nowrap; }
 </style>
 <script>try{if(localStorage.getItem('msMotion')==='off')document.documentElement.dataset.motion='off'}catch(e){}</script>
 </head>
@@ -3922,7 +3923,7 @@ function msNextSetup(bars, A) {
       html += `<div style="--heat:${has ? Math.min(1, Math.abs(R) / gMax).toFixed(2) : 0}" class="cal-d ${has ? (R > 0 ? 'win' : R < 0 ? 'loss' : '') : ''}${isT ? ' today' : ''}" aria-label="${d}: ${has ? fR(R) : 'no trades'}"><span class="cn">${d}</span>${has ? `<span class="cr">${fR(R)}</span>` : ''}</div>`;
     }
     el.innerHTML = html;
-    document.getElementById('g-cal-m').textContent = first.toLocaleDateString(undefined, { month: 'long', year: 'numeric' });
+    document.getElementById('g-cal-m').innerHTML = `${first.toLocaleDateString(undefined, { month: 'long', year: 'numeric' })}${up + dn ? ` <small class="cal-mt ${mR > 0 ? 'pos' : mR < 0 ? 'neg' : ''}">${fR(mR)}</small>` : ''}`;
     const n = up + dn, sum = document.getElementById('g-cal-sum');
     if (sum) sum.innerHTML = n ? `Month: <b class="${mR >= 0 ? 'pos' : 'neg'}">${fR(mR)}</b> · ${up} green day${up === 1 ? '' : 's'}, ${dn} red. Our system only; days before the live start come from its replay.` : 'No closed trades of our system this month.';
   }
