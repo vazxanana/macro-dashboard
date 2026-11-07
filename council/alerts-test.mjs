@@ -66,9 +66,10 @@ check('no topic and no token: nothing sent', () => assert.equal(calls.length, be
 // each round and proposalsSent written back after a send, so a "restart" is just the next round reading the file.
 if (fs.existsSync(`${DIR}/coach.json`)) {
   const coach0 = rd('coach.json'), tmp = fs.mkdtempSync(`${os.tmpdir()}/digest-`), cf = `${tmp}/coach.json`;
-  const real = (coach0.proposals || []).filter((p) => p.kind !== 'stability' || p.flag);
-  // the owner's example set: the real proposals plus a flagged stability line (so the digest is never empty in the test)
-  const props = real.length ? coach0.proposals : [...(coach0.proposals || []), { setup: 'scalp', kind: 'skipMarket', value: 'eurusd', label: 'skip EUR/USD', n: 22, exp: -0.86 }];
+  // the base set: the real proposals without stability lines (the test adds a flagged one itself to simulate a change, so a
+  // real flagged line would make the "new proposal" step a no-op); the EUR/USD skip the checks name is added when the real set lacks it
+  const base = (coach0.proposals || []).filter((p) => p.kind !== 'stability');
+  const props = base.some((p) => p.kind === 'skipMarket' && p.value === 'eurusd') ? base : [...base, { setup: 'scalp', kind: 'skipMarket', value: 'eurusd', label: 'skip EUR/USD', n: 22, exp: -0.86 }];
   const withUnstable = [...props.filter((p) => p.kind !== 'stability'), { setup: 'scalp', kind: 'stability', value: 'unstable', flag: true, n: 221, exp: 0.16, h1: { n: 104, exp: -0.05 }, h2: { n: 117, exp: 0.45 } }];
   delete coach0.proposalsSent; fs.writeFileSync(cf, JSON.stringify({ ...coach0, proposals: props }));
   const dcalls = []; const dstub = async (url, o) => { dcalls.push({ url, body: JSON.parse(o.body) }); return { ok: true, status: 200 }; };
