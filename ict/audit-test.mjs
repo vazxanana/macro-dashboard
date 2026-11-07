@@ -78,6 +78,27 @@ globalThis.fetch = async (u) => { const p = String(u).split('/'), i = p.indexOf(
   const sh = r2.shadow.trades;
   ok(r2.trades.every((q) => !q.shadow && !q.variant) && sh.every((q) => q.shadow === true && q.variant === 'dip' && q.side === 'buy' && ['nq', 'es'].includes(q.market) && q.size === 1 && q.be == null),
     `shadow records only in shadow.json and all flagged (${sh.length}); live records untouched`);
+  // shadow 'nofri' / 'h1opp': under shadow.json .variants, every record flagged with its own variant, A-setups only, one open per market
+  const V = r2.shadow.variants || {};
+  ok(['nofri', 'h1opp'].every((v) => V[v] && Array.isArray(V[v].trades) && V[v].since && V[v].totals && V[v].trades.every((q) => q.shadow === true && q.variant === v && q.aset === true && q.id.endsWith(`-${v}`))
+    && Object.keys(V[v].errors).length === 0 && ['nq', 'es', 'ym', 'rty', 'gc'].every((m) => V[v].trades.filter((q) => q.market === m && q.status === 'open').length <= 1)),
+    `variants nofri/h1opp in shadow.json .variants, flagged, no errors (${['nofri', 'h1opp'].map((v) => (V[v] ? V[v].trades.length : '-')).join('/')} records)`);
+}
+{
+  const { isNoFri, nyFriday, isH1Opp, h1Trend, loadMeridian } = await import('./tracker.mjs');
+  const a = { side: 1, grade: { total: 8 }, feat: { bias: 'against', atrR: 0.5, body: 0.5, session: 'NY AM' } };
+  const fri = Date.UTC(2026, 10, 6, 15) / 1000, thu = fri - 86400, friEve = Date.UTC(2026, 10, 7, 1) / 1000;   // Fri 10:00 ET, Thu 10:00 ET, Fri 20:00 ET
+  ok(nyFriday(fri) && !nyFriday(thu) && nyFriday(friEve) && !nyFriday(Date.UTC(2026, 10, 6, 4) / 1000), 'nofri: Friday is the New York day (Fri 20:00 ET yes, Thu 23:00 ET no)');
+  ok(isNoFri({ ...a, close: thu }, 'nq') && !isNoFri({ ...a, close: fri }, 'nq') && !isNoFri({ ...a, close: thu, feat: { ...a.feat, bias: 'with' } }, 'nq') && isNoFri({ ...a, close: thu, grade: { total: 3 }, feat: { atrR: 0.5 } }, 'gc'),
+    'nofri: A-setups (index or gold rule) except on Fridays');
+  const ms = await loadMeridian();
+  const up = Array.from({ length: 200 }, (_, i) => { const b = 100 + i + 6 * Math.sin(i / 3); return { time: 3600 * i, open: b, high: b + 2, low: b - 2, close: b + 1 }; });
+  const dn = up.map((b, i) => ({ ...up[i], open: 400 - b.open, high: 400 - b.low, low: 400 - b.high, close: 400 - b.close }));
+  const g = { ...a, close: 3600 * 200 };
+  ok(h1Trend(g, up, ms) === 1 && h1Trend(g, dn, ms) === -1 && h1Trend(g, up.slice(0, 50), ms) === 0, 'h1opp: Meridian H1 trend up / down, none with < 60 candles');
+  ok(!isH1Opp(g, 'nq', up, ms) && isH1Opp(g, 'nq', dn, ms) && isH1Opp({ ...g, side: -1, feat: { ...a.feat } }, 'nq', up, ms) && isH1Opp(g, 'nq', up.slice(0, 50), ms) && !isH1Opp({ ...g, grade: { total: 5 } }, 'nq', dn, ms),
+    'h1opp: A-setups only when the H1 trend is not with the trade (against or none)');
+  ok(h1Trend({ close: 3600 * 120 }, up, ms) === h1Trend({ close: 3600 * 120 }, up.slice(0, 120), ms), 'h1opp: only candles closed before the signal are used');
 }
 {
   const { isDip, dipGate } = await import('./tracker.mjs');
