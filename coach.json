@@ -1073,5 +1073,480 @@
   }
  ],
  "ledgerSince": "2026-11-07T20:36:23.000Z",
- "ledgerSlot": "2026-11-07T18"
+ "ledgerSlot": "2026-11-07T18",
+ "decay": {
+  "at": "2026-11-07T21:48:06.000Z",
+  "v": 1,
+  "baseAt": "2026-11-07T21:42:56.580Z",
+  "rule": "status and alert only: the monitor never changes a rule; the owner decides",
+  "systems": [
+   {
+    "id": "replica",
+    "name": "Gold replica",
+    "desk": "Meridian",
+    "live": true,
+    "base": "council replay 2022-12-27 to 2026-11-03 (research/replay-2w.json)",
+    "n": 214,
+    "nLive": 2,
+    "nReplay": 212,
+    "nHist": 0,
+    "from": 1702539420,
+    "to": 1793771640,
+    "ref": 0.877,
+    "sd": 3.343,
+    "fwd": {
+     "n": 2,
+     "exp": 0.48,
+     "R": 0.95
+    },
+    "roll": {
+     "n": 30,
+     "W": 30,
+     "exp": 0.33,
+     "t": 0.58,
+     "R": 9.81
+    },
+    "cusRef": {
+     "s": 8.13,
+     "h": 11.55,
+     "max": 8.59
+    },
+    "cusZero": {
+     "s": 1.83,
+     "h": 11.55
+    },
+    "dd": {
+     "cur": 16.63,
+     "max": 18.61,
+     "limit": 40.2,
+     "hist": 40.2
+    },
+    "status": "healthy",
+    "why": [
+     "in line with its backtest: last 30 trades +0.33R a trade, CUSUM 8.13 of 11.55"
+    ]
+   },
+   {
+    "id": "mosha-bo",
+    "name": "Mosha BO",
+    "desk": "Meridian",
+    "live": true,
+    "base": "Mosha BO 2018-26 rebuild (research/edge/robustness/out/mosha.json)",
+    "n": 48,
+    "nLive": 0,
+    "nReplay": 0,
+    "nHist": 48,
+    "from": 1718847960,
+    "to": 1781100000,
+    "ref": 0.009,
+    "sd": 2.04,
+    "fwd": {
+     "n": 0,
+     "exp": 0,
+     "R": 0
+    },
+    "roll": {
+     "n": 18,
+     "W": 18,
+     "exp": -0.94,
+     "t": -2.55,
+     "R": -16.94
+    },
+    "cusRef": {
+     "s": 8.54,
+     "h": 5.6,
+     "max": 8.54
+    },
+    "cusZero": {
+     "s": 8.46,
+     "h": 5.6
+    },
+    "dd": {
+     "cur": 20.73,
+     "max": 20.73,
+     "limit": 39.17,
+     "hist": 39.17
+    },
+    "status": "decaying",
+    "why": [
+     "running below half its backtest edge (+0.01R a trade): CUSUM 8.54 past its limit 5.6",
+     "losing money, not only short of its backtest: CUSUM vs zero 8.46 past 5.6",
+     "read on the last 48 trades of its research rebuild: there is no council replay of this rule"
+    ]
+   },
+   {
+    "id": "gtrend",
+    "name": "Gold trend",
+    "desk": "Meridian",
+    "live": true,
+    "base": "gold trend N20 2018-26 rebuild (robustness/out/gtrend.json)",
+    "n": 22,
+    "nLive": 0,
+    "nReplay": 22,
+    "nHist": 0,
+    "from": 1675153800,
+    "to": 1787933280,
+    "ref": 1.64,
+    "sd": 4.003,
+    "fwd": {
+     "n": 0,
+     "exp": 0,
+     "R": 0
+    },
+    "roll": {
+     "n": 10,
+     "W": 10,
+     "exp": 2.42,
+     "t": 1.86,
+     "R": 24.17
+    },
+    "cusRef": {
+     "s": 0.3,
+     "h": 2.86,
+     "max": 0.95
+    },
+    "cusZero": {
+     "s": 0,
+     "h": 2.86
+    },
+    "dd": {
+     "cur": 0,
+     "max": 1.4,
+     "limit": 6.88,
+     "hist": 3.7
+    },
+    "status": "healthy",
+    "why": [
+     "in line with its backtest: last 10 trades +2.42R a trade, CUSUM 0.3 of 2.86"
+    ]
+   },
+   {
+    "id": "gtrend5",
+    "name": "Gold trend fast",
+    "desk": "Meridian",
+    "live": true,
+    "base": "gold trend N5 2018-26 rebuild (robustness/out/gtrend.json)",
+    "n": 39,
+    "nLive": 0,
+    "nReplay": 39,
+    "nHist": 0,
+    "from": 1675382400,
+    "to": 1792627200,
+    "ref": 1.064,
+    "sd": 3.365,
+    "fwd": {
+     "n": 0,
+     "exp": 0,
+     "R": 0
+    },
+    "roll": {
+     "n": 10,
+     "W": 10,
+     "exp": 1.15,
+     "t": 1.05,
+     "R": 11.48
+    },
+    "cusRef": {
+     "s": 1.2,
+     "h": 2.92,
+     "max": 1.65
+    },
+    "cusZero": {
+     "s": 0.11,
+     "h": 2.92
+    },
+    "dd": {
+     "cur": 0.91,
+     "max": 2.88,
+     "limit": 9.23,
+     "hist": 6.6
+    },
+    "status": "healthy",
+    "why": [
+     "in line with its backtest: last 10 trades +1.15R a trade, CUSUM 1.2 of 2.92"
+    ]
+   },
+   {
+    "id": "gtl",
+    "name": "Gold H4 trendline",
+    "desk": "Meridian",
+    "live": true,
+    "base": "gold H4 trendline 2018-26 rebuild (robustness/out/gtl.json)",
+    "n": 24,
+    "nLive": 0,
+    "nReplay": 24,
+    "nHist": 0,
+    "from": 1767945600,
+    "to": 1793329560,
+    "ref": 0.142,
+    "sd": 1.241,
+    "fwd": {
+     "n": 0,
+     "exp": 0,
+     "R": 0
+    },
+    "roll": {
+     "n": 24,
+     "W": 30,
+     "exp": 0.15,
+     "t": 0.45,
+     "R": 3.51
+    },
+    "cusRef": {
+     "s": 1.25,
+     "h": 8.75,
+     "max": 5.48
+    },
+    "cusZero": {
+     "s": 0.91,
+     "h": 8.75
+    },
+    "dd": {
+     "cur": 1.5,
+     "max": 6.64,
+     "limit": 19.4,
+     "hist": 19.22
+    },
+    "status": "healthy",
+    "why": [
+     "in line with its backtest: last 24 trades +0.15R a trade, CUSUM 1.25 of 8.75"
+    ]
+   },
+   {
+    "id": "geg",
+    "name": "Gold daily engulf",
+    "desk": "Meridian",
+    "live": true,
+    "base": "gold daily engulf 2018-26 rebuild (robustness/out/geg.json)",
+    "n": 18,
+    "nLive": 0,
+    "nReplay": 18,
+    "nHist": 0,
+    "from": 1769799180,
+    "to": 1792647960,
+    "ref": 0.197,
+    "sd": 1.698,
+    "fwd": {
+     "n": 0,
+     "exp": 0,
+     "R": 0
+    },
+    "roll": {
+     "n": 18,
+     "W": 25,
+     "exp": 0.23,
+     "t": 0.49,
+     "R": 4.06
+    },
+    "cusRef": {
+     "s": 2.44,
+     "h": 7.01,
+     "max": 3.26
+    },
+    "cusZero": {
+     "s": 1.97,
+     "h": 7.01
+    },
+    "dd": {
+     "cur": 4.03,
+     "max": 5.27,
+     "limit": 22.33,
+     "hist": 14.78
+    },
+    "status": "healthy",
+    "why": [
+     "in line with its backtest: last 18 trades +0.23R a trade, CUSUM 2.44 of 7.01"
+    ]
+   },
+   {
+    "id": "gmp",
+    "name": "Gold momentum pullback",
+    "desk": "Meridian",
+    "live": true,
+    "base": "gold momentum pullback 2018-26 rebuild (robustness/out/gmp.json)",
+    "n": 74,
+    "nLive": 0,
+    "nReplay": 74,
+    "nHist": 0,
+    "from": 1767713880,
+    "to": 1792672980,
+    "ref": 0.041,
+    "sd": 1.282,
+    "fwd": {
+     "n": 0,
+     "exp": 0,
+     "R": 0
+    },
+    "roll": {
+     "n": 30,
+     "W": 30,
+     "exp": -0.21,
+     "t": -1.14,
+     "R": -6.28
+    },
+    "cusRef": {
+     "s": 3.66,
+     "h": 14.28,
+     "max": 4.83
+    },
+    "cusZero": {
+     "s": 2.89,
+     "h": 14.28
+    },
+    "dd": {
+     "cur": 6.78,
+     "max": 7.32,
+     "limit": 50.64,
+     "hist": 40.01
+    },
+    "status": "healthy",
+    "why": [
+     "in line with its backtest: last 30 trades −0.21R a trade, CUSUM 3.66 of 14.28"
+    ]
+   },
+   {
+    "id": "nq-open",
+    "name": "NQ New York open run",
+    "desk": "Meridian",
+    "live": true,
+    "base": "council replay 2022-12-27 to 2026-11-03, session nyflip",
+    "n": 299,
+    "nLive": 0,
+    "nReplay": 299,
+    "nHist": 0,
+    "from": 1672243200,
+    "to": 1793281800,
+    "ref": 0.331,
+    "sd": 1.561,
+    "fwd": {
+     "n": 0,
+     "exp": 0,
+     "R": 0
+    },
+    "roll": {
+     "n": 30,
+     "W": 30,
+     "exp": 0.2,
+     "t": 0.8,
+     "R": 6.05
+    },
+    "cusRef": {
+     "s": 1.51,
+     "h": 12.73,
+     "max": 8.29
+    },
+    "cusZero": {
+     "s": 1.08,
+     "h": 12.73
+    },
+    "dd": {
+     "cur": 2.02,
+     "max": 9.02,
+     "limit": 20,
+     "hist": 20
+    },
+    "status": "healthy",
+    "why": [
+     "in line with its backtest: last 30 trades +0.20R a trade, CUSUM 1.51 of 12.73"
+    ]
+   },
+   {
+    "id": "ict-a",
+    "name": "ICT A-setups",
+    "desk": "ICT",
+    "live": true,
+    "base": "ICT desk replay from 2025-08-01 (ict/replay.json, A-setups, after the micro round trip)",
+    "n": 234,
+    "nLive": 0,
+    "nReplay": 234,
+    "nHist": 0,
+    "from": 1754314500,
+    "to": 1793910900,
+    "ref": 0.2,
+    "sd": 1.582,
+    "fwd": {
+     "n": 0,
+     "exp": 0,
+     "R": 0
+    },
+    "roll": {
+     "n": 30,
+     "W": 30,
+     "exp": 0.67,
+     "t": 1.68,
+     "R": 20.15
+    },
+    "cusRef": {
+     "s": 0.99,
+     "h": 16.22,
+     "max": 8.18
+    },
+    "cusZero": {
+     "s": 0.86,
+     "h": 16.22
+    },
+    "dd": {
+     "cur": 1.52,
+     "max": 11.15,
+     "limit": 20.04,
+     "hist": 11.15
+    },
+    "status": "healthy",
+    "why": [
+     "in line with its backtest: last 30 trades +0.67R a trade, CUSUM 0.99 of 16.22"
+    ]
+   },
+   {
+    "id": "trend",
+    "name": "Crypto trend",
+    "desk": "Meridian",
+    "live": false,
+    "base": "crypto trend v3 2017-26 rebuild (robustness/out/crypto.json)",
+    "n": 65,
+    "nLive": 0,
+    "nReplay": 65,
+    "nHist": 0,
+    "from": 1677542400,
+    "to": 1793318400,
+    "ref": 2.804,
+    "sd": 8.489,
+    "fwd": {
+     "n": 0,
+     "exp": 0,
+     "R": 0
+    },
+    "roll": {
+     "n": 14,
+     "W": 14,
+     "exp": 0.15,
+     "t": 0.48,
+     "R": 2.07
+    },
+    "cusRef": {
+     "s": 4.54,
+     "h": 2.73,
+     "max": 4.54
+    },
+    "cusZero": {
+     "s": 0,
+     "h": 2.73
+    },
+    "dd": {
+     "cur": 4.83,
+     "max": 7.18,
+     "limit": 13.68,
+     "hist": 13.68
+    },
+    "status": "decaying",
+    "why": [
+     "running below half its backtest edge (+2.80R a trade): CUSUM 4.54 past its limit 2.73"
+    ]
+   }
+  ],
+  "decaying": [
+   "mosha-bo"
+  ],
+  "watch": [],
+  "slot": "2026-11-07T18"
+ }
 }
