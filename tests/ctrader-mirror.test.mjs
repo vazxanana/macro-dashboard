@@ -2,7 +2,7 @@
 //   node --test tests/ctrader-mirror.test.mjs
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { mirrorRound, PT, ALLOWED, session, volumeFor, relative, seal, unseal, LIMITS, ictCandidates, orderStep, commentFor } from '../council/ctrader-mirror.mjs';
+import { mirrorRound, PT, ALLOWED, session, volumeFor, relative, seal, unseal, LIMITS, ictCandidates, orderStep, commentFor, mirrorAlertText, sendMirrorAlerts } from '../council/ctrader-mirror.mjs';
 
 const ENV = { CTRADER_CLIENT_ID: 'fake-client-id', CTRADER_CLIENT_SECRET: 'fake-client-secret', CTRADER_ACCESS_TOKEN: 'fake-access-old',
   CTRADER_REFRESH_TOKEN: 'fake-refresh-old', CTRADER_ACCOUNT_ID: '4242', CTRADER_ENV: 'demo', CTRADER_MIRROR: 'on' };
@@ -39,12 +39,12 @@ function broker({ isLive = false, balance = 100000, expireFirst = false, reject 
           if (o.fill === 'silent') return;
           r(PT.EXECUTION_EVENT, { executionType: 2, position: { positionId: id, positionStatus: 3 }, order: { orderId: 5, positionId: id } });
           if (o.fill === 'accepted-only') return;
-          return r(PT.EXECUTION_EVENT, { executionType: 3, position: { ...pos }, order: { orderId: 5, positionId: id } }, 5);
+          return r(PT.EXECUTION_EVENT, { executionType: 3, position: { ...pos }, order: { orderId: 5, positionId: id }, deal: { executionPrice: 1.10012 } }, 5);
         }
         case PT.CLOSE_POSITION_REQ: {
           r(PT.EXECUTION_EVENT, { executionType: 2, position: { positionId: p.positionId } });
           if (o.closeFill === 'accepted-only') return;
-          positions.delete(String(p.positionId)); return r(PT.EXECUTION_EVENT, { executionType: 3, position: { positionId: p.positionId, positionStatus: 2 } }, 5);
+          positions.delete(String(p.positionId)); return r(PT.EXECUTION_EVENT, { executionType: 3, position: { positionId: p.positionId, positionStatus: 2 }, deal: { executionPrice: 1.10431, closePositionDetail: { grossProfit: 419, moneyDigits: 2 } } }, 5);
         }
         default: return r(PT.ERROR_RES, { errorCode: 'UNEXPECTED' });
       }
@@ -246,4 +246,87 @@ test('daily stop: a day that started without a readable balance takes the first 
   let r = await mirrorRound({ env: ENV, trades: [], state: st, WS: b.WS, now: NOW }); assert.equal(r.state.day.startBalance, 1000);
   b.setBalance(97000); r = await mirrorRound({ env: ENV, trades: [tr({ opened: NOW + 30, filled: NOW + 30 })], state: r.state, WS: b.WS, now: NOW + 60 });
   assert.equal(orders(b).length, 0); assert.match(r.state.skipped['eurusd-intraday-1'], /daily loss stop/);
+});
+
+// ---- phone alerts (mirror opens / closes / rejects) -----------------------------------------------------------------------
+const kinds = (r) => r.alerts.map((a) => a.kind);
+const again = (r) => JSON.parse(JSON.stringify(r.state));   // as saved in mirror.json and read back by the next run (restart)
+function fakeFetch({ fail = null } = {}) {
+  const calls = [];
+  const fn = async (url, opt) => { calls.push({ url, body: JSON.parse(opt.body) }); if (fail === 'throw') throw new Error(`network down ${url}`); return { ok: fail !== 'http', status: fail === 'http' ? 500 : 200 }; };
+  return { fn, calls };
+}
+const AENV = { ...ENV, NTFY_TOPIC: 'test-topic-xyz', TELEGRAM_BOT_TOKEN: 'tg-secret-token-123', TELEGRAM_CHAT_ID: '555' };
+
+test('alerts: one open alert with symbol, side, lots and fill price; one close alert; a restart never re-alerts', async () => {
+  const b = broker();
+  let r = await mirrorRound({ env: ENV, trades: [tr()], state: started, WS: b.WS, now: NOW });
+  assert.deepEqual(kinds(r), ['open']);
+  const o = r.alerts[0]; assert.equal(o.symbol, 'EURUSD'); assert.equal(o.side, 'buy'); assert.equal(o.lots, 0.01); assert.equal(o.price, 1.10012); assert.equal(o.filled, true);
+  const txt = mirrorAlertText(o, NOW);
+  assert.equal(txt.title, 'Demo mirror: BUY EURUSD 0.01 lot'); assert.match(txt.msg, /^Opened at 1\.10012 · council entry 1\.10000 · stop 1\.09800 · target 1\.10500\nCouncil intraday · eurusd-intraday-1\n/);
+  r = await mirrorRound({ env: ENV, trades: [tr()], state: again(r), WS: b.WS, now: NOW + 240 });   // restart: same position, no new alert
+  assert.deepEqual(kinds(r), []);
+  r = await mirrorRound({ env: ENV, trades: [tr({ status: 'win', R: 2.1 })], state: again(r), WS: b.WS, now: NOW + 480 });
+  assert.deepEqual(kinds(r), ['close']); const c = mirrorAlertText(r.alerts[0], NOW + 480);
+  assert.equal(c.title, 'Demo mirror: closed BUY EURUSD 0.01 lot'); assert.match(c.msg, /^Closed at 1\.10431 · gross P\/L \+4\.19\nThe council closed the trade: win \+2\.10R\n/); assert.match(c.tags, /white_check_mark/);
+  r = await mirrorRound({ env: ENV, trades: [tr({ status: 'win', R: 2.1 })], state: again(r), WS: b.WS, now: NOW + 720 });
+  assert.deepEqual(kinds(r), []);
+});
+
+test('alerts: a broker-side close alerts once; an accepted-only close alerts when the position is gone', async () => {
+  let b = broker(); let r = await mirrorRound({ env: ENV, trades: [tr()], state: started, WS: b.WS, now: NOW });
+  b.positions.clear(); r = await mirrorRound({ env: ENV, trades: [tr()], state: again(r), WS: b.WS, now: NOW + 240 });
+  assert.deepEqual(kinds(r), ['close']); assert.equal(r.alerts[0].by, 'broker'); assert.match(mirrorAlertText(r.alerts[0], NOW).msg, /^Closed at the broker \(its stop or target\)\n/);
+  b = broker({ closeFill: 'accepted-only' }); r = await mirrorRound({ env: ENV, trades: [tr()], state: started, WS: b.WS, now: NOW });
+  r = await mirrorRound({ env: ENV, trades: [tr({ status: 'loss', R: -1 })], state: again(r), WS: b.WS, now: NOW + 240, timeout: 30 });
+  assert.deepEqual(kinds(r), []);   // close accepted, not filled yet: no alert
+  b.positions.clear(); r = await mirrorRound({ env: ENV, trades: [tr({ status: 'loss', R: -1 })], state: again(r), WS: b.WS, now: NOW + 480 });
+  assert.deepEqual(kinds(r), ['close']); assert.equal(r.alerts[0].by, 'council'); assert.match(mirrorAlertText(r.alerts[0], NOW).tags, /,x$/);
+});
+
+test('alerts: a rejected order alerts once (with the reason); "not now" answers alert only when the retries run out', async () => {
+  const b = broker({ reject: 'NOT_ENOUGH_MONEY' }); let r = await mirrorRound({ env: ENV, trades: [tr({ side: 'sell' })], state: started, WS: b.WS, now: NOW });
+  assert.deepEqual(kinds(r), ['reject']); const t = mirrorAlertText(r.alerts[0], NOW);
+  assert.equal(t.title, 'Demo mirror: order rejected · SELL EURUSD 0.01 lot'); assert.match(t.msg, /NOT_ENOUGH_MONEY/);
+  r = await mirrorRound({ env: ENV, trades: [tr({ side: 'sell' })], state: again(r), WS: b.WS, now: NOW + 60 }); assert.deepEqual(kinds(r), []);
+  const b2 = broker({ reject: 'MARKET_CLOSED' }); r = { state: started }; const seen = [];
+  for (let i = 0; i < 4; i++) { r = await mirrorRound({ env: ENV, trades: [tr({ opened: NOW + 100, filled: NOW + 100 })], state: again(r), WS: b2.WS, now: NOW + 100 + i * 60 }); seen.push(...kinds(r)); }
+  assert.deepEqual(seen, ['reject']);
+});
+
+test('alerts: a position found again after a lost round is managed but not re-alerted as opened', async () => {
+  const b = broker(); await mirrorRound({ env: ENV, trades: [tr()], state: started, WS: b.WS, now: NOW });
+  let r = await mirrorRound({ env: ENV, trades: [tr()], state: started, WS: b.WS, now: NOW + 60 });   // state without the map
+  assert.equal(r.state.map['eurusd-intraday-1'].adopted, true); assert.deepEqual(kinds(r), []);
+  r = await mirrorRound({ env: ENV, trades: [tr({ status: 'loss', R: -1 })], state: again(r), WS: b.WS, now: NOW + 240 });
+  assert.deepEqual(kinds(r), ['close']);
+});
+
+test('alerts: sent through ntfy + Telegram (fake fetch); failures are returned scrubbed, never thrown; off with COUNCIL_ALERTS=off', async () => {
+  const b = broker(); const r = await mirrorRound({ env: ENV, trades: [tr()], state: started, WS: b.WS, now: NOW });
+  let f = fakeFetch(); let a = await sendMirrorAlerts(r.alerts, { env: AENV, now: NOW, fetchFn: f.fn });
+  assert.equal(a.sent, 1); assert.deepEqual(a.errors, {});
+  const tg = f.calls.find((c) => c.url.includes('api.telegram.org')), nt = f.calls.find((c) => c.url === 'https://ntfy.sh/');
+  assert.equal(tg.body.chat_id, '555'); assert.match(tg.body.text, /^Demo mirror: BUY EURUSD 0\.01 lot\nOpened at 1\.10012/);
+  assert.equal(nt.body.topic, 'test-topic-xyz'); assert.equal(nt.body.title, 'Demo mirror: BUY EURUSD 0.01 lot'); assert.deepEqual(nt.body.tags, ['robot', 'chart_with_upwards_trend']);
+  // the council's remembered chat is used when TELEGRAM_CHAT_ID is not set; the default topic without NTFY_TOPIC
+  f = fakeFetch(); await sendMirrorAlerts(r.alerts, { env: { TELEGRAM_BOT_TOKEN: 'tg-secret-token-123' }, tgChat: '777', now: NOW, fetchFn: f.fn });
+  assert.equal(f.calls.find((c) => c.url.includes('telegram')).body.chat_id, '777'); assert.ok(f.calls.find((c) => c.url === 'https://ntfy.sh/').body.topic);
+  for (const fail of ['throw', 'http']) {
+    f = fakeFetch({ fail }); a = await sendMirrorAlerts(r.alerts, { env: AENV, now: NOW, fetchFn: f.fn });
+    assert.ok(a.errors.telegram && a.errors.ntfy); const txt = JSON.stringify(a.errors);
+    for (const v of ['tg-secret-token-123', 'test-topic-xyz', 'fake-client-secret']) assert.equal(txt.includes(v), false);
+  }
+  a = await sendMirrorAlerts([{ kind: 'open', get symbol() { throw new Error('bad'); } }, null], { env: AENV, now: NOW, fetchFn: fakeFetch().fn });   // bad events never throw
+  assert.equal(a.sent, 0);
+  f = fakeFetch(); a = await sendMirrorAlerts(r.alerts, { env: { ...AENV, COUNCIL_ALERTS: 'off' }, now: NOW, fetchFn: f.fn }); assert.equal(f.calls.length, 0); assert.equal(a.sent, 0);
+});
+
+test('alerts never change the trading: same orders, alert flags kept in the saved state; message allowlist unchanged', async () => {
+  const b = broker(); let r = await mirrorRound({ env: ENV, trades: [tr()], state: started, WS: b.WS, now: NOW });
+  r = await mirrorRound({ env: ENV, trades: [tr({ status: 'win', R: 2 })], state: r.state, WS: b.WS, now: NOW + 240 });
+  assert.deepEqual(types(b).filter((t) => t === PT.NEW_ORDER_REQ || t === PT.CLOSE_POSITION_REQ), [PT.NEW_ORDER_REQ, PT.CLOSE_POSITION_REQ]);
+  assert.equal(r.state.map['eurusd-intraday-1'].status, 'closed by council'); assert.deepEqual(r.state.map['eurusd-intraday-1'].alerted, ['open', 'close']);
+  assert.equal(ALLOWED.size, 11);
 });
