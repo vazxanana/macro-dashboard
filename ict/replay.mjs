@@ -1,7 +1,7 @@
 // ICT desk replay (owner, 6 Nov 2026): the tracker's own H1 iFVG model run over the year so far (from 1 Jan 2026) of CNBC futures
 // candles (5m where CNBC still has them, H1 otherwise), so the desk calendar and stats have history before the live
 // tracker started. Same signal code (signals() in tracker.mjs), entry at the inversion candle's close, stop 2 ticks
-// beyond the sweep, 3R target with the 2R mark recorded, 48 h max, one trade per market at a time. Writes
+// beyond the sweep, 3R target with the 2R mark recorded, 36 trading hours max, one trade per market at a time. Writes
 // council-data ict/replay.json; every record carries replay: true. Never mixed with the council's data.
 import fs from 'node:fs';
 import path from 'node:path';
@@ -64,12 +64,13 @@ async function history(M) {
 }
 
 function simulate(g, M, key, src) {
-  const s = g.side, f = (v) => +(+v).toFixed(M.dec), entry = g.entry, r0 = g.r0, t2 = entry + s * P.mark * r0, end = g.close + P.holdH * 3600;
+  const s = g.side, f = (v) => +(+v).toFixed(M.dec), entry = g.entry, r0 = g.r0, t2 = entry + s * P.mark * r0;
+  const hb = src.H.filter((b) => b.time >= g.close).slice(0, P.holdH), end = hb.length === P.holdH ? hb[hb.length - 1].time + 3600 : g.close + P.holdH * 3600;   // P.holdH closed H1 candles
   const use5 = src.m5days && src.m5days.has(Math.floor(g.close / 86400)) && src.m5days.has(Math.floor((g.close + 86400) / 86400));
   const bars = use5 ? src.m5.filter((b) => b.time >= g.close && b.time < end) : src.H.filter((b) => b.time >= g.close && b.time < end);
   const step = use5 ? 300 : 3600;
   // same exit as the tracker: no fixed target; from +2R the stop trails 1.5R behind the best price (checked before the
-  // candle's own new high moves it, i.e. conservatively); 48 h max
+  // candle's own new high moves it, i.e. conservatively); 36 trading hours max
   let status = 'open', R = null, closed = null, exit = null, exitPx = null, mark2 = null, mfe = 0, stop = g.stop, moved = false;
   for (const b of bars) {
     if (!mark2 && (s > 0 ? b.high >= t2 : b.low <= t2)) mark2 = b.time + step;

@@ -6,7 +6,7 @@
 // Model (H1, both sides): a confirmed H1 swing low (3 bars each side, last 96 H1 bars) is swept; within 6 H1
 // candles a candle BODY closes above the most recent bearish FVG of the down-leg (the inversion) → buy at the
 // price when the tracker sees it; stop 2 ticks under the sweep low; target 3R (the 2R mark is recorded as a
-// second variant); out after 48 h. Sells mirror. One open trade per market.
+// second variant); out after 36 trading hours (36 closed H1 candles; skill §21). Sells mirror. One open trade per market.
 import fs from 'node:fs';
 import path from 'node:path';
 
@@ -17,7 +17,7 @@ export const MARKETS = {
   ym:  { sym: 'YM=F',  cnbc: ['@DJ.1', '@YM.1'],  label: 'Dow Jones',    short: 'YM',  tick: 1,    dec: 0 },
   rty: { sym: 'RTY=F', cnbc: ['@TFS.1', '@RTY.1'], label: 'Russell 2000', short: 'RTY', tick: 0.1, dec: 1 },
 };
-export const P = { piv: 3, look: 96, vmax: 6, rr: 3, trail: [2, 1.5], mark: 2, holdH: 48, maxAtr: 8, fresh: 3 * 3600 };
+export const P = { piv: 3, look: 96, vmax: 6, rr: 3, trail: [2, 1.5], mark: 2, holdH: 36, maxAtr: 8, fresh: 3 * 3600 };
 const UA = 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36';
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 const now = Math.floor(Date.now() / 1000);
@@ -147,7 +147,8 @@ async function main() {
           if (tr.trail && tr.mfe >= tr.trail[0]) { const ns = f(tr.entry + s * (tr.mfe - tr.trail[1]) * tr.r0); if ((ns - tr.stop) * s > 0) { tr.stop = ns; tr.trailMoved = true; } }   // trail from +2R, 1.5R behind the best
           tr.checked = b.time + 300;
         }
-        if (tr.status === 'open' && now - tr.opened > P.holdH * 3600) { const R = +((s * (price - tr.entry)) / tr.r0).toFixed(2);
+        // time exit after P.holdH closed H1 candles since the signal (trading hours, not clock hours: weekends don't count)
+        if (tr.status === 'open' && H.filter((b) => b.time >= (tr.signalAt || tr.opened)).length >= P.holdH) { const R = +((s * (price - tr.entry)) / tr.r0).toFixed(2);
           Object.assign(tr, { status: R > 0 ? 'win' : R < 0 ? 'loss' : 'be', R, exitPx: f(price), closed: now, exit: 'time' }); }
         if (tr.closed) tr.R2 = tr.mark2 && (!tr.closed || tr.mark2 <= tr.closed) ? 2 : tr.R;   // the 2R-target variant
       }
