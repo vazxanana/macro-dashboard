@@ -6,10 +6,15 @@ const h = (type, style, ...children) => ({ type, props: { style: { display: 'fle
 async function gold(host) {
   try {
     const r = await fetch(`https://${host}/md/bars?sym=xau&tf=1h&n=48`, { signal: AbortSignal.timeout(5000) });
-    const j = await r.json(); return Array.isArray(j.bars) && j.bars.length ? j.bars : null;
+    const j = await r.json(); return Array.isArray(j.bars) && j.bars.length > 1 ? j.bars : null;
   } catch (e) { return null; }
 }
+// a render failure answers a short-cached 503 instead of an uncaught FUNCTION_INVOCATION_FAILED
 export default async function handler(req, res) {
+  try { return await render(req, res); }
+  catch (e) { console.error(`[og] ${e.message}`); res.setHeader('Cache-Control', 's-maxage=60'); return res.status(503).json({ error: 'preview unavailable' }); }
+}
+async function render(req, res) {
   const bars = await gold(req.headers.host);
   const W = 1200, H = 630, last = bars ? bars[bars.length - 1].close : null, ref = bars && bars.length > 24 ? bars[bars.length - 25].close : bars ? bars[0].close : null;
   const ch = last && ref ? last - ref : 0, pct = ref ? ch / ref * 100 : 0, up = ch >= 0, col = up ? '#2bd4a4' : '#ff5c7a';
