@@ -218,3 +218,9 @@ On A-setups with the stop floor (§20), cash NQ/ES/YM 2023-24 | 2025-26 and NQ f
   - NQ futures 2023 / 2024 / 2025: drawdown 5.0 / 5.4 / 3.0 vs 6.3 / 7.5 / 6.1; R +8.9 / +13.1 / +20.1 vs +9.6 / +9.9 / +13.7.
 - Rejected: widening stops under 0.3 ATR to 0.3 ATR instead of skipping (-1.6R | +4.0R, dd 41): tight-stop signals are bad trades, not just noise-stopped ones.
 - Code: `RISK_CAP = 0.75` in `isASetup()` (ict/tracker.mjs).
+
+## 23. News days (7 Nov 2026): skip jobs-report mornings, keep FOMC days
+- A-setups with the §22 band, 2023-24 | 2025-26 cash NQ+ES+YM: live +37.7R dd 7.6 | +48.6R dd 10.8.
+- Skip signals on the first Friday of the month before 10:00 ET (the 08:30 jobs report): +41.8R dd 6.9 | +51.7R dd 10.8. NQ futures 2023 / 2024 / 2025: +9.9 / +15.2 / +21.1R vs +8.9 / +13.1 / +20.1R; all 4 such futures signals lost. Small sample (about 3 signals a year) but the logic fits: a sweep made by the release candle is news, not a liquidity run. Adopted (`nfpMorning` in `isASetup`).
+- FOMC days are NOT skipped: skipping them costs 20R in 2023-24 (6 signals, +20.4R); skipping only shorts, only before 14:00 ET, or the day before also fails.
+- First Friday of the month is a proxy for the jobs report (it can move to the second Friday); the proxy is what was tested.
