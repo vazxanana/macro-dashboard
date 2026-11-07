@@ -1319,3 +1319,19 @@ Report: `reports/ICT and gold system improvements.md` (owner's skills: gold-msnr
   - Scalp and trendline: no day ever hits the caps.
   - Not adopted: the −2R engulf cap is +1R in one half only.
 - Conclusion: the live gold stack stays as it is. The open-risk cap and the session-by-side scalp test need trade-level side and exit data the records do not carry; they are next.
+
+## 2026-11-07 — Owner: "our main edge looks horrible" — what the numbers say
+- **Live since 1 Nov:** 37 closed live trades for −15.4R. 35 of them are the old engine setups (scalp / rscalp / rintra / intraday on crypto and FX), live until `retireLegacy` (5–6 Nov). Main systems live so far: replica 2 trades, +1.0R.
+- **Calendar:** it carried the shadow setups' back-filled replay (−1,210R Jun–Oct). September read −379R; the main systems made −1.4R. Site now defaults to main systems (PR #299).
+- **Replica dormant since 22 Apr:** the volatility gate is shut (max v/p80 since May = 0.95). Looser gates, 2023-24 | 2025-26 | since May 2026 (`ms/rep_gate.py`):
+
+  | gate | 2023-24 | 2025-26 | since May 2026 |
+  |---|---|---|---|
+  | live (top fifth) | +109.6R dd −9.7 | +155.5R dd −16.5 | 0 trades |
+  | v ≥ 0.9×p80 | +80.2R dd −29.2 | +165.9R dd −18.6 | +4.7R (5) |
+  | v ≥ 0.8×p80 | −24.4R | +155.6R | +15.1R (23) |
+  | v ≥ 0.7×p80 | +58.9R | +105.3R | −19.4R (95) |
+
+  Calm gold has no replica edge. The gate stays.
+- **Momentum-pullback scalp** (TEST since 6 Nov, shadow): 2023 +6.2, 2024 +18.3, 2025 +38.1, 2026 −6.3R (75 trades, red in 6 of the last 7 months). Stays in test; promotion needs it to recover.
+- **2026 by leg:** replica +59.6R (Feb–Apr), daily engulf +12.9R, H4 trendline +3.5R, gold trend +4.7R. Jun–Oct is flat for every leg (gold trend +1.3, H4 trendline +4.0, daily engulf +4.1); the book waits for volatility.
