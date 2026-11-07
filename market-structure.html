@@ -1371,6 +1371,13 @@ td.st-dim { color: var(--ink-faint); }
 /* polish 20: coach chips label their source quietly, analyst rows colour the side */
 .ms-q .q-k { font: 600 9.5px var(--sans); letter-spacing: .04em; text-transform: uppercase; color: var(--ink-faint); margin-right: 5px; }
 .c-ready em.sd { font-style: normal; font-weight: 600; } .c-ready em.sd.b { color: var(--buy); } .c-ready em.sd.s { color: var(--sell); }
+
+/* polish 21: rule history marks who changed it (you in gold, coach in blue), lighter rule text */
+.c-hist li.by-you { border-left-color: var(--gold, #d4a017); }
+.c-hist li.by-coach { border-left-color: var(--accent); }
+.c-hist li.by-you span { color: var(--gold, #d4a017); }
+.c-hist li b { font-weight: 600; line-height: 1.5; }
+.c-hist li em { color: var(--ink-faint); }
 </style>
 </head>
 <body>
@@ -4004,7 +4011,7 @@ function msNextSetup(bars, A) {
     const sh = (C.trades || []).filter((x) => x.shadow && (x.status === 'win' || x.status === 'loss')), shR = sh.reduce((a, x) => a + x.R, 0);
     set('ms-c-shadow-sum', sh.length ? `Shadow trades (blocked by rules) closed: ${sh.length}, ${shR >= 0 ? '+' : ''}${shR.toFixed(1)}R. ${shR > 0 ? 'Blocked trades are winning: the Coach will loosen the rule that blocks them.' : 'The rules are keeping you out of losing trades.'}` : 'Blocked setups are followed as shadow trades so the Coach can check every rule it adds.');
     set('ms-c-notes', C.coach ? (C.coach.notes || []).map((n) => `<li>${esc(n)}</li>`).join('') : '<li>The statistical Coach runs once a day with the Trader.</li>');
-    set('ms-c-hist', (cf.history || []).slice(-8).reverse().map((h) => `<li><span>${esc(String(h.at).slice(0, 10))} · ${esc(h.by)}</span><b>${esc(h.change)}</b><em>${esc(h.why)}</em></li>`).join('') || '<li class="empty">No rule changes yet.</li>');
+    set('ms-c-hist', (cf.history || []).slice(-8).reverse().map((h) => `<li class="${/^user|owner/i.test(String(h.by)) ? 'by-you' : 'by-coach'}"><span>${esc(String(h.at).slice(0, 10))} · ${/^user|owner/i.test(String(h.by)) ? 'you' : esc(h.by)}</span><b>${esc(h.change)}</b><em>${esc(h.why)}</em></li>`).join('') || '<li class="empty">No rule changes yet.</li>');
     set('ms-c-review', C.review ? md(C.review) : '<p class="ms-note">The AI Coach writes a review after each trading day: what worked, what didn\'t, and any rule it changed.</p>');
     renderHome();
     const m1p = panes['1m']; councilHere(m1p && m1p.bars ? m1p.bars[m1p.bars.length - 1].close : null);
