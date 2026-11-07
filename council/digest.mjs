@@ -1,0 +1,246 @@
+// Daily owner digest (8 Nov 2026, owner: "I get too many separate alerts"): ONE phone message a day after the US close
+// (from 21:15 UTC, Monday to Friday, not on a CME full-closure holiday) and a Sunday-evening preview before the open (from
+// 21:15 UTC on Sunday, covering the past 7 days). Run by the council loop every round; outside the window, or once today's
+// digest went out, it does nothing.
+//
+// What it says (about 13 lines, plain words):
+//   1. today's closed paper trades, gross R and after costs: Meridian live (trades.json Rnet, council/fills.mjs) and the ICT
+//      desk's A-setups (ict/trades.json; costs = the CME micro round trip of research/portfolio.mjs), plus the cTrader demo
+//      account's balance and day P&L (ctrader/account.json, the day's start balance from ctrader/mirror.json)
+//   2. open positions and their floating R (prices from snapshot.json and ict/snapshot.json)
+//   3. the macro regime and the next day's event playbook headline (macro/forecast.json)
+//   4. what waits on the owner: Coach proposals (coach.json), data-feed problems (health.json), robustness verdict changes
+//      (research/robustness.json, against the last digest)
+//   5. edge scoreboard movers: streams whose verdict changed since the last digest (the scoreboard's own pure functions,
+//      script#ms-sb-js of market-structure.html, run here without a page)
+//
+// Sent through alerts.mjs sendAlerts (ntfy + Telegram, the same env as the other alerts). Deduplicated per UTC day in
+// council-data digest.json ({ sent: { day, at, kind, title }, sb, robust, last }), so a restart never sends twice; when every
+// channel fails nothing is marked and the next round tries again. COUNCIL_ALERTS=off sends nothing and writes nothing.
+//
+//   node council/digest.mjs <council-data dir> [--dry] [--force]
+//     --dry    print the digest that would go out now; send nothing, write nothing
+//     --force  build and send now, outside the window and even if today's went out (manual test)
+import fs from 'node:fs';
+import path from 'node:path';
+import vm from 'node:vm';
+import { sendAlerts, when, NTFY_DEFAULT, SITE, alertable, actionable, proposalLine } from './alerts.mjs';
+import { usHolidays } from './datacheck.mjs';
+
+export const COUNCIL_URL = SITE + 'market-structure.html#council';
+export const CFG = {
+  at: 21 * 60 + 15,   // UTC minute of the day from which the digest may go out (about an hour after the 16:00 New York close)
+  maxLines: 15,       // body lines at most
+  macroStaleH: 12,    // a forecast older than this is labelled with its date
+  dataStaleH: 3,      // a data check older than this counts as a problem
+  acctStaleH: 2,      // a cTrader account file older than this shows its time
+};
+// ICT micro-futures round trip in index points (1 tick spread + fees + 1 tick slip each way): research/portfolio.mjs ICT_COST_PTS
+export const ICT_COST_PTS = { nq: 1.37, es: 1.0, ym: 5.5, rty: 0.55, gc: 0.42 };
+
+const DONE = new Set(['win', 'loss', 'be']);
+const r2 = (v) => Math.round(v * 100) / 100;
+const fR = (v) => v == null || !Number.isFinite(+v) ? '–' : `${v > 0.004 ? '+' : v < -0.004 ? '−' : ''}${Math.abs(+v).toFixed(2)}R`;
+const money = (v, sign = true) => `${sign ? (v > 0.004 ? '+' : v < -0.004 ? '−' : '') : v < 0 ? '−' : ''}$${Math.abs(+v).toFixed(2)}`;
+const trim = (s, n) => { s = String(s || '').replace(/\s+/g, ' ').trim(); return s.length > n ? s.slice(0, n - 1).trimEnd() + '…' : s; };
+const DAYF = new Intl.DateTimeFormat('en-GB', { timeZone: 'UTC', weekday: 'short', day: 'numeric', month: 'short' });
+const HMF = new Intl.DateTimeFormat('en-GB', { timeZone: 'UTC', hour: '2-digit', minute: '2-digit', hourCycle: 'h23' });
+const dayLabel = (t) => DAYF.format(new Date(t * 1000));
+const isoDay = (t) => new Date(t * 1000).toISOString().slice(0, 10);
+const secs = (s) => { const v = Date.parse(s); return Number.isFinite(v) ? v / 1000 : NaN; };
+
+// ─── when ───
+// The digest slot at unix time `now`: { day, kind: 'daily' | 'preview' } or null (Saturday, a CME full-closure holiday, or
+// before 21:15 UTC). The window runs to the end of the UTC day, so a loop that was down at 21:15 still sends later that evening.
+export function slot(now) {
+  const d = new Date(now * 1000), wd = d.getUTCDay(), day = isoDay(now);
+  if (d.getUTCHours() * 60 + d.getUTCMinutes() < CFG.at || wd === 6) return null;
+  if (wd === 0) return { day, kind: 'preview' };
+  if (usHolidays(d.getUTCFullYear()).get(day) === 'closed') return null;
+  return { day, kind: 'daily' };
+}
+
+// ─── 1. results ───
+const closedAt = (x) => x.closed || x.exitAt || null;
+// Meridian after costs: the Trader's Rnet; older records without it: R − costR × size; none recorded: the raw R
+export const merNet = (x) => Number.isFinite(x.Rnet) ? x.Rnet : Number.isFinite(x.costR) ? x.R - x.costR * (x.size || 1) : x.R;
+// ICT after costs: R (already × size) less the micro round trip in R of the signal's initial risk
+const r0Of = (x) => +x.r0 || Math.abs(x.entry - (x.stop0 != null ? x.stop0 : x.stop));
+export const ictNet = (x) => { if (Number.isFinite(x.Rnet)) return x.Rnet; const r0 = r0Of(x), c = ICT_COST_PTS[x.market] || 0;
+  return r0 > 0 ? x.R - c / r0 * (x.size || 1) : x.R; };
+// closed trades with a close in (from, to]: { n, w, l, R, net }
+export function tally(list, from, to, net) {
+  const o = { n: 0, w: 0, l: 0, R: 0, net: 0 };
+  for (const x of Array.isArray(list) ? list : []) {
+    if (!x || !DONE.has(x.status) || !Number.isFinite(+x.R)) continue;
+    const t = closedAt(x); if (!(t > from && t <= to)) continue;
+    o.n++; if (x.R > 0) o.w++; else if (x.R < 0) o.l++; o.R += +x.R; o.net += +net(x);
+  }
+  o.R = r2(o.R); o.net = r2(o.net); return o;
+}
+const tallyTxt = (s) => s.n ? `${fR(s.R)} / ${fR(s.net)} (${s.n}: ${s.w}W ${s.l}L)` : 'no closed trades';
+const meridianList = (D) => alertable(Array.isArray(D.trades) ? D.trades : [], Array.isArray(D.research) ? D.research : []);
+const ictList = (D) => Array.isArray(D.ictTrades) ? D.ictTrades : [];
+
+// the cTrader demo account: balance and the day's P&L (equity − the mirror's start balance of the UTC day); for the Sunday
+// preview, or when the mirror has no start balance for today, closed P&L in the window from the account history + floating
+export function ctraderLine(acc, mirror, now, from, kind) {
+  if (!acc || !Number.isFinite(+acc.balance)) return 'cTrader demo: no account data yet.';
+  const day = mirror && mirror.state && mirror.state.day, eq = Number.isFinite(+acc.equity) ? +acc.equity : +acc.balance;
+  let pnl;
+  if (kind === 'daily' && day && day.date === isoDay(now) && Number.isFinite(+day.startBalance)) pnl = eq - +day.startBalance;
+  else pnl = (Array.isArray(acc.history) ? acc.history : []).filter((h) => { const t = secs(h.closedAt); return t > from && t <= now; })
+    .reduce((s, h) => s + (+h.net || 0), 0) + (+acc.floating || 0);
+  const open = Array.isArray(acc.open) ? acc.open.length : 0, age = now - secs(acc.at);
+  return `cTrader demo: balance ${money(+acc.balance, false)}, ${kind === 'preview' ? 'week' : 'day'} ${money(pnl)}, `
+    + (open ? `${open} open (${money(+acc.floating || 0)} floating)` : 'none open') + (age > CFG.acctStaleH * 3600 ? ` (as of ${dayLabel(secs(acc.at))} ${HMF.format(new Date(acc.at))} UTC)` : '');
+}
+
+// ─── 2. open positions ───
+// floating R = direction × (price − entry) / initial risk × size; null when no price is known
+export function openPositions(D) {
+  const cp = (mk) => { const a = D.snapshot && D.snapshot.markets && D.snapshot.markets[mk], b = D.ictSnap && D.ictSnap.markets && D.ictSnap.markets[mk];
+    return a && +a.price > 0 ? +a.price : b && +b.price > 0 ? +b.price : null; };
+  const out = [], add = (x, desk, px) => {
+    const r0 = r0Of(x), dir = x.side === 'sell' ? -1 : 1, R = px > 0 && r0 > 0 ? r2(dir * (px - x.entry) / r0 * (x.size || 1)) : null;
+    out.push({ desk, name: desk === 'ICT' ? `${x.short || String(x.market).toUpperCase()} ${x.side}` : `${x.label || String(x.market).toUpperCase()} ${x.side}`,
+      tag: desk === 'ICT' ? (x.aset ? 'ICT A' : 'ICT') : x.name || x.k, R });
+  };
+  for (const x of meridianList(D)) if (x && x.status === 'open') add(x, 'Meridian', cp(x.market));
+  for (const x of ictList(D)) if (x && x.status === 'open') add(x, 'ICT', D.ictSnap && D.ictSnap.markets && D.ictSnap.markets[x.market] ? +D.ictSnap.markets[x.market].price : null);
+  return out;
+}
+export function openLine(pos) {
+  if (!pos.length) return 'Open: none.';
+  const known = pos.filter((p) => p.R != null), tot = r2(known.reduce((s, p) => s + p.R, 0));
+  const by = pos.slice().sort((a, b) => Math.abs(b.R || 0) - Math.abs(a.R || 0)), shown = by.slice(0, 3);
+  return `Open: ${pos.length}, floating ${fR(tot)}: ` + shown.map((p) => `${p.name} ${fR(p.R)} (${p.tag})`).join(', ') + (pos.length > 3 ? ` +${pos.length - 3} more` : '');
+}
+
+// ─── 3. macro ───
+export function macroLines(fc, now) {
+  if (!fc || !fc.regime) return ['Macro: no forecast yet.'];
+  const at = secs(fc.at), old = !(now - at <= CFG.macroStaleH * 3600);
+  const L = [`Macro: ${trim(fc.regime.label || fc.regime.smile || 'no regime label', 110)}${old && Number.isFinite(at) ? ` (as of ${dayLabel(at)})` : ''}`];
+  const tgt = typeof fc.target === 'string' ? fc.target : null, tl = tgt ? DAYF.format(new Date(tgt + 'T12:00:00Z')) : 'Next day';
+  const pb = Array.isArray(fc.playbook) ? fc.playbook : [], on = pb.filter((e) => tgt && String(e.at).slice(0, 10) === tgt);
+  if (on.length) {
+    const e = on[0], m = e.expMovePct || {}, mv = [['gold', 'gold'], ['nq', 'NQ']].filter(([k]) => Number.isFinite(+m[k])).map(([k, n]) => `${n} ±${(+m[k]).toFixed(1)}%`);
+    const cp = [e.consensus ? `cons ${e.consensus}` : '', e.previous ? `prev ${e.previous}` : ''].filter(Boolean).join(', ');
+    L.push(`${tl}: ${trim(`${e.country || ''} ${e.title}`, 50)} ${String(e.at).slice(11, 16)} UTC${cp ? ` (${cp})` : ''}${mv.length ? ', ' + mv.join(', ') : ''}${on.length > 1 ? ` · +${on.length - 1} more` : ''}`);
+  } else {
+    const te = fc.targetEvent && typeof fc.targetEvent === 'object' ? fc.targetEvent.title : fc.targetEvent;
+    const next = pb.find((e) => String(e.at).slice(0, 10) > (tgt || ''));
+    L.push(te ? `${tl}: event day (${trim(te, 60)}), expect bigger moves.`
+      : `${tl}: no high-impact event on the calendar${next ? `; next ${DAYF.format(new Date(next.at))} ${trim(`${next.country || ''} ${next.title}`, 40)}` : ''}.`);
+  }
+  return L;
+}
+
+// ─── 4 + 5. what changed, what waits ───
+export const VERDICT = { edge: 'Edge', promising: 'Promising', unclear: 'Unclear', losing: 'Losing', few: 'Too few' };
+const SRC = [[/-sysreplay$/, 'replay'], [/-replay$/, '30-day replay'], [/-live$/, 'live'], [/-shadow$/, 'shadow']];
+const rowName = (r) => { const s = SRC.find(([re]) => re.test(r.id)); return s ? `${r.name} (${s[1]})` : r.name; };
+export const verdictMap = (rows) => Object.fromEntries((rows || []).filter((r) => r && r.id && r.v).map((r) => [r.id, r.v]));
+// streams whose scoreboard verdict differs from the last digest's (new streams are not movers)
+export function movers(rows, prev) {
+  if (!prev || typeof prev !== 'object') return [];
+  return (rows || []).filter((r) => r && r.id && r.v && prev[r.id] && prev[r.id] !== r.v).map((r) => ({ id: r.id, name: rowName(r), from: prev[r.id], to: r.v }));
+}
+export const robustMap = (J) => Object.fromEntries((J && Array.isArray(J.claims) ? J.claims : []).filter((c) => c && c.id && c.verdict).map((c) => [c.id, c.verdict]));
+export function robustChanges(J, prev) {
+  if (!prev || typeof prev !== 'object') return [];
+  return (J && Array.isArray(J.claims) ? J.claims : []).filter((c) => c && c.id && c.verdict && prev[c.id] && prev[c.id] !== c.verdict)
+    .map((c) => ({ id: c.id, name: c.name || c.id, from: prev[c.id], to: c.verdict }));
+}
+export function waiting(D, now, prev) {
+  const out = [], P = (D.coach && Array.isArray(D.coach.proposals) ? D.coach.proposals : []).filter(actionable);
+  if (P.length) out.push(`Coach: ${P.length} proposal${P.length > 1 ? 's' : ''} to OK: ${trim(P.slice(0, 2).map((p) => p.label || proposalLine(p)).join('; '), 90)}${P.length > 2 ? ` +${P.length - 2} more` : ''}`);
+  const H = D.health, hAt = H ? secs(H.at) : NaN;
+  if (!H) out.push('Data feeds: no data check yet.');
+  else if (H.status === 'bad' || H.status === 'warn') out.push(`Data feeds ${H.status === 'bad' ? 'bad' : 'shaky'}: ${trim(H.summary, 90)}`);
+  else if (!(now - hAt <= CFG.dataStaleH * 3600)) out.push(`Data feeds: last check ${Number.isFinite(hAt) ? `${dayLabel(hAt)} ${HMF.format(new Date(hAt * 1000))} UTC` : 'unknown'}.`);
+  const rc = robustChanges(D.robust, prev && prev.robust);
+  if (rc.length) out.push(`Robustness: ${trim(rc.slice(0, 2).map((c) => `${c.name} ${c.from} → ${c.to}`).join('; '), 100)}${rc.length > 2 ? ` +${rc.length - 2} more` : ''}`);
+  return out;
+}
+
+// ─── the message ───
+// D: the council-data files (see readData); prev: digest.json; sbRows: the scoreboard rows (null when they could not be built)
+export function buildDigest(D, { now, kind = 'daily', prev = {}, sbRows = null } = {}) {
+  const from = now - (kind === 'preview' ? 7 : 1) * 86400;
+  const mer = tally(meridianList(D), from, now, merNet);
+  const ictAll = ictList(D), ictA = tally(ictAll.filter((x) => x && x.aset), from, now, ictNet), ictEvery = tally(ictAll, from, now, ictNet);
+  const L = [`${kind === 'preview' ? 'Past 7 days' : 'Today'}, closed paper trades (gross / after costs):`,
+    `Meridian ${tallyTxt(mer)}`,
+    `ICT desk A-setups ${tallyTxt(ictA)}${ictEvery.n > ictA.n ? ` · all signals ${fR(ictEvery.R)} (${ictEvery.n})` : ''}`,
+    ctraderLine(D.account, D.mirror, now, from, kind),
+    openLine(openPositions(D)),
+    ...macroLines(D.forecast, now)];
+  const W = waiting(D, now, prev);
+  if (W.length) L.push('Waiting on you:', ...W.map((s) => '• ' + s)); else L.push('Nothing waiting on you.');
+  if (sbRows) {
+    const mv = movers(sbRows, prev && prev.sb);
+    L.push(!(prev && prev.sb) ? 'Scoreboard: verdicts recorded; movers show from the next digest.'
+      : mv.length ? `Scoreboard movers: ${trim(mv.slice(0, 3).map((m) => `${m.name} ${VERDICT[m.from] || m.from} → ${VERDICT[m.to] || m.to}`).join('; '), 140)}${mv.length > 3 ? ` +${mv.length - 3} more` : ''}`
+        : 'Scoreboard: no verdict changes.');
+  } else L.push('Scoreboard: could not be built this time.');
+  L.push(when(now));
+  const lines = L.length > CFG.maxLines ? L.slice(0, CFG.maxLines - 1).concat(L.at(-1)) : L;
+  const title = `${kind === 'preview' ? 'Week ahead' : 'Daily digest'} · ${dayLabel(now)}: Meridian ${fR(mer.net)} · ICT ${fR(ictA.net)} net`;
+  return { title, msg: lines.join('\n'), lines, state: { sb: sbRows ? verdictMap(sbRows) : (prev && prev.sb) || null, robust: D.robust ? robustMap(D.robust) : (prev && prev.robust) || null } };
+}
+
+// ─── I/O ───
+export function readData(dir) {
+  const rd = (f) => { try { return JSON.parse(fs.readFileSync(path.join(dir, f), 'utf8')); } catch (e) { return null; } };
+  return { rd, trades: rd('trades.json'), research: rd('research.json'), ictTrades: rd('ict/trades.json'), snapshot: rd('snapshot.json'), ictSnap: rd('ict/snapshot.json'),
+    account: rd('ctrader/account.json'), mirror: rd('ctrader/mirror.json'), forecast: rd('macro/forecast.json'), coach: rd('coach.json'), health: rd('health.json'),
+    robust: rd('research/robustness.json'), state: rd('state.json') };
+}
+// The edge scoreboard's own pure functions (market-structure.html, script#ms-sb-js), as the scoreboard test runs them
+export function loadScoreboard(file = new URL('../market-structure.html', import.meta.url)) {
+  const m = fs.readFileSync(file, 'utf8').match(/<script id="ms-sb-js">([\s\S]*?)<\/script>/);
+  if (!m) throw new Error('scoreboard script not found');
+  const W = {}; vm.runInNewContext(m[1], { window: W }); return W.MS_SB;
+}
+export function scoreboardRows(D, now, SB = loadScoreboard()) {
+  const rd = D.rd || (() => null);
+  return SB.build({ trades: D.trades, config: rd('config.json'), coach: D.coach, backtest: rd('backtest.json'), replay: rd('research/replay-2w.json'), mirror: D.mirror,
+    ictReplay: rd('ict/replay.json'), ictTrades: D.ictTrades, ictShadow: rd('ict/shadow.json'), robust: D.robust, macro: D.forecast, now });
+}
+
+// One round: { skipped } or { sent | dry, title, msg, errors }. `scoreboard(D, now)` returns the rows (injectable for tests).
+export async function main(dir, { env = process.env, fetchFn = fetch, now = Math.floor(Date.now() / 1000), dry = false, force = false, scoreboard = scoreboardRows } = {}) {
+  const file = path.join(dir, 'digest.json');
+  let prev = {}; try { prev = JSON.parse(fs.readFileSync(file, 'utf8')) || {}; } catch (e) { prev = {}; }
+  const s = force ? { day: isoDay(now), kind: new Date(now * 1000).getUTCDay() === 0 ? 'preview' : 'daily' } : slot(now);
+  if (!s) return { skipped: 'outside the digest window' };
+  if (!force && prev.sent && prev.sent.day === s.day) return { skipped: `already sent for ${s.day}` };
+  if (!dry && env.COUNCIL_ALERTS === 'off') return { skipped: 'COUNCIL_ALERTS=off' };
+  const D = readData(dir);
+  let rows = null, sbError = null;
+  try { rows = scoreboard(D, now); if (!Array.isArray(rows)) rows = null; } catch (e) { sbError = String((e && e.message) || e); }
+  const d = buildDigest(D, { now, kind: s.kind, prev, sbRows: rows });
+  if (dry) return { dry: true, title: d.title, msg: d.msg, lines: d.lines.length, sbError };
+  const topic = env.NTFY_TOPIC || NTFY_DEFAULT, tgTok = env.TELEGRAM_BOT_TOKEN || null, tgChat = env.TELEGRAM_CHAT_ID || (D.state || {}).tgChat || null;
+  const tried = 1 + (tgTok && tgChat ? 1 : 0);
+  const errors = await sendAlerts([{ title: d.title, msg: d.msg, tags: 'clipboard', click: COUNCIL_URL }], { topic, tgTok, tgChat, fetchFn });
+  const failed = Object.keys(errors).length >= tried, at = new Date(now * 1000).toISOString();
+  // every channel failed: keep the old mark (and the old verdict baselines) so the next round tries again
+  const out = failed ? { ...prev, error: { at, ...errors } }
+    : { sent: { day: s.day, at, kind: s.kind, title: d.title }, sb: d.state.sb, robust: d.state.robust, last: { title: d.title, msg: d.msg }, ...(Object.keys(errors).length ? { error: { at, ...errors } } : {}) };
+  fs.mkdirSync(dir, { recursive: true });
+  fs.writeFileSync(file, JSON.stringify(out, null, 1) + '\n');
+  return { sent: !failed, title: d.title, msg: d.msg, errors, sbError };
+}
+
+if (process.argv[1] && process.argv[1].endsWith('digest.mjs')) {
+  const args = process.argv.slice(2), dir = args.find((a) => !a.startsWith('--')) || 'data';
+  main(dir, { dry: args.includes('--dry'), force: args.includes('--force') }).then((r) => {
+    if (r.skipped) { console.log(`Digest: ${r.skipped}`); return; }
+    console.log(`Digest ${r.dry ? '(dry run)' : r.sent ? 'sent' : 'NOT sent'}: ${r.title}\n${r.msg}`);
+    if (r.errors && Object.keys(r.errors).length) console.log('  send errors:', JSON.stringify(r.errors));
+    if (r.sbError) console.log('  scoreboard:', r.sbError);
+  }).catch((e) => { console.log('Digest failed:', (e && e.message) || e); });   // never fails the round
+}

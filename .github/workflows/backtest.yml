@@ -50,17 +50,46 @@ jobs:
         with:
           node-version: '20'
 
-      - name: Restore forex history cache
-        uses: actions/cache@v4
+      # Kraken / Dukascopy history cache (per-day files). The Kraken backfill workflow (kraken-backfill.yml) fills its crypto days
+      # every 30 min on the same cache line; a coin replays on Kraken as soon as its days cover the window.
+      - name: Restore history cache
+        uses: actions/cache/restore@v4
         with:
           path: .duka-cache
-          key: duka-${{ github.run_id }}
+          key: duka-${{ github.run_id }}-${{ github.run_attempt }}
           restore-keys: duka-
 
       - name: Backtest
         env:
           DUKA_CACHE: .duka-cache
         run: node council/backtest.mjs data "${{ github.event.inputs.days || '30' }}"
+
+      # Saved even when the replay fails or is cancelled (a push to main cancels a running replay, and actions/cache saves only
+      # on success, so those runs lost every Kraken day they had downloaded). The backfill may have saved a newer copy meanwhile:
+      # restore it beside ours and merge (council/krakenfill.mjs --merge), so neither run's days are lost.
+      - name: Set the history cache aside
+        id: aside
+        if: always()
+        run: mv .duka-cache .duka-mine 2>/dev/null || mkdir -p .duka-mine
+
+      - name: Restore the newest saved cache
+        if: always() && steps.aside.outcome == 'success'
+        uses: actions/cache/restore@v4
+        with:
+          path: .duka-cache
+          key: duka-${{ github.run_id }}-${{ github.run_attempt }}
+          restore-keys: duka-
+
+      - name: Merge the history caches
+        if: always() && steps.aside.outcome == 'success'
+        run: mkdir -p .duka-cache && node council/krakenfill.mjs --merge .duka-mine .duka-cache
+
+      - name: Save history cache
+        if: always() && steps.aside.outcome == 'success'
+        uses: actions/cache/save@v4
+        with:
+          path: .duka-cache
+          key: duka-${{ github.run_id }}-${{ github.run_attempt }}
 
       # Replay fidelity: the replay's signals and outcomes against the live Trader's on the same days (no network)
       - name: Replay fidelity

@@ -2,7 +2,7 @@
 //   node --test tests/ctrader-mirror.test.mjs
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { mirrorRound, PT, ALLOWED, session, volumeFor, relative, seal, unseal, LIMITS, ictCandidates, orderStep, commentFor, mirrorAlertText, sendMirrorAlerts, riskVolume } from '../council/ctrader-mirror.mjs';
+import { mirrorRound, PT, ALLOWED, session, volumeFor, relative, seal, unseal, LIMITS, ictCandidates, orderStep, commentFor, mirrorAlertText, sendMirrorAlerts, riskVolume, quoteRate, specFor } from '../council/ctrader-mirror.mjs';
 
 const ENV = { CTRADER_CLIENT_ID: 'fake-client-id', CTRADER_CLIENT_SECRET: 'fake-client-secret', CTRADER_ACCESS_TOKEN: 'fake-access-old',
   CTRADER_REFRESH_TOKEN: 'fake-refresh-old', CTRADER_ACCOUNT_ID: '4242', CTRADER_ENV: 'demo', CTRADER_MIRROR: 'on' };
@@ -356,7 +356,7 @@ test('risk sizing: ICT 0.20% x size, Meridian 0.02% per 1R; USD-base pairs conve
   // $50k, Meridian EURUSD with a 200-pip stop: $10 risk / ($2,000 a lot) = 0.005 lot -> below 0.01 -> skipped, never rounded up
   assert.match(riskVolume({ info: fx, t: { id: 'm1', entry: 1.1, stop: 1.08 }, balance: 50000, name: 'EURUSD' }).skip, /below the broker minimum/);
   // $50k, Meridian EURUSD with a 20-pip stop: $10 / $200 = 0.05 lot
-  assert.deepEqual(riskVolume({ info: fx, t: { id: 'm1', entry: 1.1, stop: 1.098 }, balance: 50000, name: 'EURUSD' }), { volume: 500000, riskCash: 10, lots: 0.05 });
+  assert.deepEqual(riskVolume({ info: fx, t: { id: 'm1', entry: 1.1, stop: 1.098 }, balance: 50000, name: 'EURUSD' }), { volume: 500000, riskCash: 10, lots: 0.05, perLot: 200 });
   // USDJPY 20-pip stop at 150: a lot moves 100,000 x 0.20 / 150 = $133.3; $50k Meridian $10 -> 0.0750 lot -> floor 0.07
   assert.equal(riskVolume({ info: fx, t: { id: 'm2', entry: 150, stop: 149.8 }, balance: 50000, name: 'USDJPY' }).lots, 0.07);
   // ICT gold A-setup (size 1), $20 stop: $100 / ($2,000 a lot) = 0.05 lot; an A+ half-size trade 0.02 (floored from 0.025)
@@ -370,4 +370,34 @@ test('risk sizing: ICT 0.20% x size, Meridian 0.02% per 1R; USD-base pairs conve
   assert.match(riskVolume({ info: fx, t: { id: 'm3', entry: 0.85, stop: 0.849 }, balance: 50000, name: 'EURGBP' }).skip, /quote currency/);
   // on the old $1,000 demo an ICT gold trade is skipped instead of risking 4%
   assert.match(riskVolume({ info: gold, t: { id: 'ict:gc-4', entry: 4000, stop: 3980 }, balance: 1000, name: 'XAUUSD' }).skip, /bigger demo balance/);
+});
+
+// ---- broker specs (ctrader/symbols.json, council/ctrader-symbols.mjs) ---------------------------------------------------------
+test('risk sizing with the broker specs: the stop is valued in the account currency (an AUD account sizes gold smaller); no rate, no order', async () => {
+  const gc = [{ id: 'gc-b-1', market: 'gc', side: 'buy', entry: 4000, stop: 3980, t1: null, status: 'open', opened: NOW - 120, aset: true, aplus: false, size: 1 }];
+  const at = new Date((NOW - 600) * 1000).toISOString();
+  // USD account, gold quoted in USD: $100 / ($2,000 a lot) = 0.05 lot, as before
+  let b = broker({ balance: 5000000 }); await mirrorRound({ env: ENV, trades: ictCandidates(gc), state: started, WS: b.WS, now: NOW,
+    specs: { account: { currency: 'USD' }, symbols: { XAUUSD: { base: 'XAU', quote: 'USD' } } } });
+  assert.equal(orders(b)[0].payload.volume, 500);
+  // AUD account (balance A$50,000, risk A$100), 1 USD = 1.5 AUD at the broker: a lot loses A$3,000 at the stop -> 0.0333 -> 0.03 lot
+  b = broker({ balance: 5000000 }); let r = await mirrorRound({ env: ENV, trades: ictCandidates(gc), state: started, WS: b.WS, now: NOW,
+    specs: { account: { currency: 'AUD' }, symbols: { XAUUSD: { base: 'XAU', quote: 'USD', quoteToDeposit: 1.5, rateAt: at } } } });
+  assert.equal(orders(b)[0].payload.volume, 300); assert.equal(r.state.map['ict:gc-b-1'].riskCash, 100);
+  // the same account with a stale (or missing) rate: skipped, never sized as if the account were in USD
+  b = broker({ balance: 5000000 }); r = await mirrorRound({ env: ENV, trades: ictCandidates(gc), state: started, WS: b.WS, now: NOW,
+    specs: { account: { currency: 'AUD' }, symbols: { XAUUSD: { base: 'XAU', quote: 'USD', quoteToDeposit: 1.5, rateAt: new Date((NOW - 4 * 86400) * 1000).toISOString() } } } });
+  assert.equal(orders(b).length, 0); assert.match(r.state.skipped['ict:gc-b-1'], /cannot value its quote currency \(USD\) in the account currency \(AUD\)/);
+});
+
+test('quoteRate: quote = account currency 1, base = account currency 1/price, else the broker rate; old rule without specs', () => {
+  const now = 1794000000, fresh = new Date((now - 60) * 1000).toISOString();
+  assert.deepEqual(quoteRate({ name: 'US100', px: 25000, spec: { base: 'US100', quote: 'USD', deposit: 'USD' }, now }), { rate: 1, src: 'broker' });
+  assert.equal(quoteRate({ name: 'USDCAD', px: 1.25, spec: { base: 'USD', quote: 'CAD', deposit: 'USD' }, now }).rate, 0.8);
+  assert.equal(quoteRate({ name: 'EURGBP', px: 0.85, spec: { base: 'EUR', quote: 'GBP', deposit: 'USD', quoteToDeposit: 1.31, rateAt: fresh }, now }).rate, 1.31);
+  assert.equal(quoteRate({ name: 'EURGBP', px: 0.85, spec: { base: 'EUR', quote: 'GBP', deposit: 'USD' }, now }), null);
+  assert.equal(quoteRate({ name: 'US2000', px: 2400 }).rate, 1); assert.equal(quoteRate({ name: 'USDJPY', px: 150 }).rate, 1 / 150);
+  assert.equal(quoteRate({ name: 'EURGBP', px: 0.85 }), null);
+  assert.deepEqual(specFor({ account: { currency: 'USD' }, symbols: { XAUUSD: { quote: 'USD' } } }, 'XAUUSD'), { quote: 'USD', deposit: 'USD' });
+  assert.equal(specFor({ symbols: { XAUUSD: { quote: 'USD' } } }, 'XAUUSD'), null); assert.equal(specFor(null, 'XAUUSD'), null);
 });

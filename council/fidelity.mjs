@@ -158,7 +158,8 @@ for (const m of [...new Set(comparableL.map((x) => x.market).concat(comparableR.
   const mp = pairs.filter(([x]) => x.market === m), ls = li.filter(([x]) => sameFeed(x)), lsm = ls.filter(([, i]) => lMatch[i] >= 0).length;
   const feeds = {}; for (const [x] of li) feeds[liveFeed(x)] = (feeds[liveFeed(x)] || 0) + 1;
   perMarket[m] = { live: li.length, liveMatched: lm, replay: ri.length, replayMatched: rm, liveRate: pct(lm, li.length), replayRate: pct(rm, ri.length),
-    replayFeed: replayFeed(m), liveFeeds: feeds, ...agreeOn(mp),
+    // how far the replay's Kraken cache reached for this market (backtest.mjs markets.krakenCoverage; covers: the replay used it)
+    replayFeed: replayFeed(m), krakenCache: ((bt.markets || {}).krakenCoverage || {})[m] || null, liveFeeds: feeds, ...agreeOn(mp),
     sameFeed: { live: ls.length, liveMatched: lsm, liveRate: pct(lsm, ls.length), ...agreeOn(mp.filter(([x]) => sameFeed(x))) } };
 }
 // the whole replay judged only where both sides read the same candles
@@ -225,5 +226,5 @@ console.log(`agreement: d1 ${P(out.agreement.d1.rate)} (like-for-like ${P(out.ag
 console.log(`outcome (both closed n${both.length}): sign ${P(o.signRate)} (net ${P(o.signRateNet)}), exact R ${o.exactR}, mean live ${o.meanLiveR} vs replay ${o.meanReplayR} (net ${o.meanReplayRNet}), mean diff ${o.meanDiffGross} gross (median ${o.medianDiffGross}) / ${o.meanDiffNet} net; rr differs on ${o.rrDiffer}`);
 const sf = out.sameFeed;
 console.log(`same feed only (n${sf.live} live, ${sf.markets.join(' ') || 'none'}): live found in replay ${P(sf.liveInReplay)}, d1 ${P(sf.d1Rate)}, sign ${P(sf.signRate)} (n${sf.bothClosed}), R gap ${sf.gapGross} gross / ${sf.gapNet} net; ${sf.feedDiffersPairs} pairs on different feeds left out`);
-for (const [m, v] of Object.entries(out.perMarket)) console.log(`  ${m.padEnd(7)} replay ${v.replayFeed}, live ${Object.entries(v.liveFeeds).map(([f, n]) => `${f}${n}`).join('/')}: match ${P(v.liveRate)}/${P(v.replayRate)}, d1 ${P(v.d1Rate)}, sign ${P(v.signRate)} (n${v.bothClosed}), live ${v.sumLiveR}R vs replay ${v.sumReplayR}R (net ${v.sumReplayRNet}), gap ${v.gapGross}/trade${v.sameFeed.live ? ` | same feed: match ${P(v.sameFeed.liveRate)} n${v.sameFeed.live}, gap ${v.sameFeed.gapGross}` : ''}`);
+for (const [m, v] of Object.entries(out.perMarket)) console.log(`  ${m.padEnd(7)} replay ${v.replayFeed}${v.krakenCache && !v.krakenCache.covers && v.replayFeed !== 'Kraken' && v.replayFeed !== 'OANDA' ? ` (Kraken cache from ${v.krakenCache.from})` : ''}, live ${Object.entries(v.liveFeeds).map(([f, n]) => `${f}${n}`).join('/')}: match ${P(v.liveRate)}/${P(v.replayRate)}, d1 ${P(v.d1Rate)}, sign ${P(v.signRate)} (n${v.bothClosed}), live ${v.sumLiveR}R vs replay ${v.sumReplayR}R (net ${v.sumReplayRNet}), gap ${v.gapGross}/trade${v.sameFeed.live ? ` | same feed: match ${P(v.sameFeed.liveRate)} n${v.sameFeed.live}, gap ${v.sameFeed.gapGross}` : ''}`);
 for (const s of ['unmatchedLive', 'unmatchedReplay']) { console.log(`${s} ${out[s].n}:`); for (const r of out[s].reasons.slice(0, 6)) console.log(`  ${String(r.n).padStart(4)}  ${r.cls}: ${r.why}  ${Object.entries(r.bySetup).sort((a, b) => b[1] - a[1]).slice(0, 4).map(([k, n]) => `${k}${n}`).join(' ')}`); }

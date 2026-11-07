@@ -7,7 +7,10 @@
 // Crypto (and the gold/forex fallback): Kraken, the feed the live Trader trades on: its trade history built into 1m candles (cached per
 // day, council/krakenhist.mjs) plus its own 1h/4h/1d candles. Gold is PAXGUSD shifted onto spot like the live Trader does
 // (goldBasis below). Fallbacks: crypto and gold Binance (1m history; PAXGUSDT) until Kraken's cached history covers the
-// whole window; forex Yahoo Finance (yahoo.mjs), then Dukascopy (duka.mjs). markets.source says which feed each market used.
+// whole window (the Kraken backfill workflow, council/krakenfill.mjs, fills that cache every 30 min; a coin switches to Kraken
+// on the first replay after its cache covers the window); forex Yahoo Finance (yahoo.mjs), then Dukascopy (duka.mjs).
+// markets.source says which feed each market used, markets.feeds each timeframe's (one feed per market, never a mix),
+// markets.krakenCoverage how far the Kraken cache reaches (covers: true once the replay can use it), markets.fallback why not.
 // Entry styles: every signal also gets a twin entered at market (setup '<k>@mkt'), and resting orders that never fill
 // are kept as 0R rows (fill = 0), so the Coach can compare the two entry styles signal by signal.
 // Costs: every trade carries its spread in R (one spread per round trip: bid/ask), so results can be judged net.
@@ -18,7 +21,7 @@ import path from 'node:path';
 import { msAnalyze, CFG, PAIRS, RETR, buildSetup, buildRetrace, setMarket } from './engine.mjs';
 import { dukaMinutes, dukaHours, dukaDays, dukaReset } from './duka.mjs';
 import { yahooBars } from './yahoo.mjs';
-import { krakenMinutes, krakenOHLC, basisSeries } from './krakenhist.mjs';
+import { krakenData as krakenLoad, krakenGap, basisSeries, aggregate } from './krakenhist.mjs';
 import { m15Choch, m15cFeat as m15cOf } from './choch.mjs';
 import { cleanBars, LTF_CLEAN } from './clean.mjs';
 import { d1AdxFeat } from './adx.mjs';
@@ -68,7 +71,7 @@ CFG.minRisk = Math.min(1.2, Math.max(0.4, +cfg.minRisk || 0.6));
 
 async function klines(sym, iv, start, end) {
   const out = [];
-  for (const host of ['https://data-api.binance.vision', 'https://api.binance.com']) {
+  for (const host of (process.env.BINANCE_HOSTS || 'https://data-api.binance.vision,https://api.binance.com').split(',')) {   // tests: a fake server
     out.length = 0;
     let from = start * 1000, ok = true;
     while (from < end * 1000) {
@@ -99,24 +102,15 @@ function fakeBars(start, end, seed) {   // 1m random walk with trends, for the o
   }
   return out;
 }
-function aggregate(m1, sec) {
-  const out = []; let cur = null;
-  for (const b of m1) {
-    const t0 = Math.floor(b.time / sec) * sec;
-    if (!cur || cur.time !== t0) { cur = { time: t0, open: b.open, high: b.high, low: b.low, close: b.close }; out.push(cur); }
-    else { cur.high = Math.max(cur.high, b.high); cur.low = Math.min(cur.low, b.low); cur.close = b.close; }
-  }
-  return out;
-}
-
-// Kraken history for one market: trades → 1m (whole UTC days, newest first, cached in DUKA_CACHE), 5m/15m/30m built from
-// them; 1h = Kraken's 720 hourly candles plus older hours from the trades; 4h/1d = Kraken's own OHLC (the live Trader's candles)
-async function krakenData(pair, from, budget) {
-  const K = await krakenMinutes(pair, from, endT, { cacheDir: process.env.DUKA_CACHE || null, budget }), m1 = K.bars;
-  if (!m1.length) return { K, data: null };
-  const o60 = await krakenOHLC(pair, 60), o240 = await krakenOHLC(pair, 240), o1440 = await krakenOHLC(pair, 1440);
-  const firstH = o60.length ? o60[0].time : Infinity, h1 = aggregate(m1.filter((b) => b.time < firstH), 3600).concat(o60);
-  return { K, data: { '1m': m1, '5m': aggregate(m1, 300), '15m': aggregate(m1, 900), '30m': aggregate(m1, 1800), '1h': h1, '4h': o240, '1d': o1440 } };
+// Kraken history for one market (krakenhist.mjs krakenData): trades → 1m (whole UTC days, newest first, cached in DUKA_CACHE, which
+// the Kraken backfill workflow fills between runs), 5m/15m/30m built from them; 1h = Kraken's 720 hourly candles plus older hours
+// from the trades; 4h/1d = Kraken's own OHLC (the live Trader's candles)
+const krakenData = (pair, from, budget) => krakenLoad(pair, from, endT, { cacheDir: process.env.DUKA_CACHE || null, budget });
+// the feed a market was replayed on: markets.source[key] (one name) and markets.feeds[key] (where each timeframe came from). Every
+// timeframe of a market comes from that one feed, never a mix; a market that changes feed between replays shows it here.
+function setFeed(key, source, feeds) {
+  (meta.source = meta.source || {})[key] = source;
+  (meta.feeds = meta.feeds || {})[key] = feeds || Object.fromEntries(TFS.map(([id]) => [id, source]));
 }
 // Gold: the live Trader shifts every PAXG candle onto spot by one offset, the median of (spot quote - PAXG 1m close) over its
 // last 2 hours of runs, keeping the last offset when no fresh quote comes (trader.mjs basisFor). The replay has no history of
@@ -333,7 +327,7 @@ for (const [key, M] of Object.entries(MARKETS)) {
       const tr0 = Date.now(), O = await oandaData(key);
       Object.assign(data, O.data); oanda = true;
       meta.coverage = Object.assign(meta.coverage || {}, { [key]: new Date(O.data['1m'][0].time * 1000).toISOString().slice(0, 10) });
-      meta.source = Object.assign(meta.source || {}, { [key]: 'OANDA' });
+      setFeed(key, 'OANDA');
       console.log(`${key}: OANDA 1m from ${meta.coverage[key]} (${O.calls} calls) → ${O.data['1m'].length} 1m candles, ${O.data['1h'].length} 1h, ${O.data['4h'].length} 4h, ${O.data['1d'].length} 1d (${((Date.now() - tr0) / 1000).toFixed(0)}s)`);
     } catch (oe) { console.log(`${key}: OANDA not used (${oe.message}); Kraken`); (meta.fallback = meta.fallback || {})[key] = `OANDA: ${String(oe.message || oe).slice(0, 200)}`; }
     if (oanda) { /* loaded above */ }
@@ -345,11 +339,11 @@ for (const [key, M] of Object.entries(MARKETS)) {
       // 720 1m candles exist); if Yahoo fails, Dukascopy's files: 1m (5m/15m/30m built from it), 1h monthly, 1d yearly
       let done = false;
       try {   // 1. Kraken trades → 1m (38 days, cached per day); 1h = Kraken's 720 hourly candles plus older hours from the trades; 4h/1d = Kraken OHLC
-        const tr0 = Date.now(), { K, data: kd } = await krakenData(M.kraken, startT - 8 * 86400, +(process.env.KRAKEN_BUDGET || 400)), m1 = K.bars;
+        const tr0 = Date.now(), { K, data: kd, feeds: kfeeds } = await krakenData(M.kraken, startT - 8 * 86400, +(process.env.KRAKEN_BUDGET || 400)), m1 = K.bars;
         if (m1.length < 5000) throw new Error(`only ${m1.length} 1m candles (${K.calls} calls, ${K.cached} days cached)`);
         meta.coverage = Object.assign(meta.coverage || {}, { [key]: new Date(K.from * 1000).toISOString().slice(0, 10) });
         Object.assign(data, kd);
-        meta.source = Object.assign(meta.source || {}, { [key]: 'Kraken' });
+        setFeed(key, 'Kraken', kfeeds);
         console.log(`${key}: Kraken 1m from ${meta.coverage[key]} (${K.cached} days cached, ${K.fetched} downloaded, ${K.calls} calls) → ${m1.length} 1m candles, ${kd['1h'].length} 1h, ${kd['4h'].length} 4h, ${kd['1d'].length} 1d (${((Date.now() - tr0) / 1000).toFixed(0)}s)`);
         done = true;
       } catch (ke) { console.log(`${key}: Kraken history failed (${ke.message}); trying Yahoo`); }
@@ -360,7 +354,7 @@ for (const [key, M] of Object.entries(MARKETS)) {
         const h1 = await y('60m', startT - (WIN + 2) * 3600);
         Object.assign(data, { '1m': m1, '5m': await y('5m', startT - (WIN + 2) * 300), '15m': await y('15m', startT - (WIN + 2) * 900), '30m': await y('30m', startT - (WIN + 2) * 1800),
           '1h': h1, '4h': aggregate(h1, 14400), '1d': await y('1d', startT - 1100 * 86400) });
-        meta.source = Object.assign(meta.source || {}, { [key]: 'Yahoo' });
+        setFeed(key, 'Yahoo', { '1m': 'Yahoo', '5m': 'Yahoo', '15m': 'Yahoo', '30m': 'Yahoo', '1h': 'Yahoo', '4h': 'Yahoo (from 1h)', '1d': 'Yahoo' });
         console.log(`${key}: ${m1.length} 1m, ${h1.length} 1h, ${data['1d'].length} 1d candles from Yahoo`);
       } catch (ye) {
         console.log(`${key}: Yahoo failed (${ye.message}); trying Dukascopy`);
@@ -374,28 +368,29 @@ for (const [key, M] of Object.entries(MARKETS)) {
         const lastD = d1.length ? d1.at(-1).time : 0;
         d1 = d1.concat(aggregate(h1.filter((b) => b.time >= lastD + 86400), 86400));
         Object.assign(data, { '1m': m1, '5m': aggregate(m1, 300), '15m': aggregate(m1, 900), '30m': aggregate(m1, 1800), '1h': h1, '4h': aggregate(h1, 14400), '1d': d1 });
-        meta.source = Object.assign(meta.source || {}, { [key]: 'Dukascopy' });
+        setFeed(key, 'Dukascopy');
         console.log(`${key}: ${m1.length} 1m, ${h1.length} 1h, ${d1.length} 1d candles from Dukascopy`);
       }
     } else {
-      // crypto and gold: Kraken (the live Trader's feed) once its cached trade history covers the whole window (the replay's
-      // first step needs 720 1m candles before the start). A busy pair (BTC) fills its days over a few runs within
-      // KRAKEN_BUDGET_CRYPTO calls per pair and run; until then, or if Kraken fails, Binance as before.
+      // crypto and gold: Kraken (the live Trader's feed) as soon as its cached trade history covers the whole window (the
+      // replay's first step needs 720 1m candles before the start; krakenGap). The Kraken backfill workflow (kraken-backfill.yml,
+      // krakenfill.mjs) fills that cache every 30 min; this run tops it up with at most KRAKEN_BUDGET_CRYPTO calls per pair.
+      // Until the cache covers the window, or if Kraken fails, the whole market is Binance, and markets.fallback says why.
       let done = false;
       if (M.kraken) try {
-        const tr0 = Date.now(), need = startT - WIN * 60, { K, data: kd } = await krakenData(M.kraken, startT - 86400, +(process.env.KRAKEN_BUDGET_CRYPTO || 300));
-        const cov = new Date(K.from * 1000).toISOString().slice(0, 10);
-        (meta.krakenCoverage = meta.krakenCoverage || {})[key] = { from: cov, calls: K.calls, cached: K.cached, fetched: K.fetched };
-        if (!kd || K.from > need || kd['1m'].length < 2 * WIN) throw new Error(`Kraken history from ${cov} only (${K.bars.length} 1m candles, ${K.calls} calls, ${K.cached} days cached; needs ${new Date(need * 1000).toISOString().slice(0, 16)})`);
+        const tr0 = Date.now(), need = startT - WIN * 60, { K, data: kd, feeds: kfeeds } = await krakenData(M.kraken, startT - 86400, +(process.env.KRAKEN_BUDGET_CRYPTO || 300));
+        const cov = new Date(K.from * 1000).toISOString().slice(0, 10), gap = krakenGap(K, kd, need, 2 * WIN);
+        (meta.krakenCoverage = meta.krakenCoverage || {})[key] = { from: cov, need: new Date(need * 1000).toISOString().slice(0, 16), covers: !gap, calls: K.calls, cached: K.cached, fetched: K.fetched };
+        if (gap) throw new Error(gap);
         Object.assign(data, kd);
         meta.coverage = Object.assign(meta.coverage || {}, { [key]: cov });
-        meta.source = Object.assign(meta.source || {}, { [key]: 'Kraken' });
+        setFeed(key, 'Kraken', kfeeds);
         console.log(`${key}: Kraken ${M.kraken} 1m from ${cov} (${K.cached} days cached, ${K.fetched} downloaded, ${K.calls} calls) → ${kd['1m'].length} 1m candles, ${kd['1h'].length} 1h, ${kd['4h'].length} 4h, ${kd['1d'].length} 1d (${((Date.now() - tr0) / 1000).toFixed(0)}s)`);
         done = true;
       } catch (ke) { console.log(`${key}: Kraken history not used (${ke.message}); Binance ${M.sym}`); (meta.fallback = meta.fallback || {})[key] = String(ke.message || ke).slice(0, 200); }
       if (!done) {
         for (const [id, iv, sec] of TFS) data[id] = await klines(M.sym, iv, startT - (WIN + 2) * sec, endT);
-        meta.source = Object.assign(meta.source || {}, { [key]: 'Binance' });
+        setFeed(key, 'Binance', Object.fromEntries(TFS.map(([id]) => [id, `Binance ${M.sym}`])));
       }
     }
     // bad prints: the same cleaner, timeframes and options the live Trader applies to its candles (clean.mjs), before any analysis;

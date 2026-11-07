@@ -121,10 +121,16 @@ jobs:
             # Data-quality monitor (7 Nov): the OANDA proxy, Kraken and the ICT desk's CNBC feed, every 2nd round (~11 min) → health.json
             # and one deduplicated phone alert when a feed goes bad. Read-only for the bots; never fails the round.
             if [ $((i % 2)) -eq 1 ]; then timeout 150 node council/datacheck.mjs data || echo "Data check round $i failed"; fi
+            # broker symbol specs (read only): lot size, min/step lot, quote currency, conversion, spread → ctrader/symbols.json,
+            # which the mirror sizes its lots with and the Trader's cost model reads spreads from
+            timeout 90 node council/ctrader-symbols.mjs data || echo "cTrader symbols round $i failed"
             node council/ctrader-mirror.mjs data || echo "cTrader mirror round $i failed"
             node council/ctrader-test.mjs data || echo "cTrader test round $i failed"   # one-off demo test order, only when ctrader/test.json asks
             node council/ctrader-suite.mjs data || echo "cTrader suite round $i failed"   # demo trade test suite (latency, SL/TP, limit, cancel), only when ctrader/suite.json asks
             node council/ctrader-account.mjs data || echo "cTrader account round $i failed"   # the owner's demo account for the profile view (read only)
+            # Daily owner digest (8 Nov): one phone message after the US close (from 21:15 UTC Mon-Fri) and a Sunday-evening
+            # preview; deduplicated per UTC day in data/digest.json, so it does nothing on every other round. Never fails the round.
+            timeout 120 node council/digest.mjs data || echo "Digest round $i failed"
             git -C data add -A
             if ! git -C data diff --cached --quiet; then
               git -C data commit -q -m "Council run $(date -u +%Y-%m-%dT%H:%MZ)"
