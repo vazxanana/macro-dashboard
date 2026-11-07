@@ -718,14 +718,6 @@
   .c-how { margin: -4px 0 12px; border: 1px solid var(--line); border-radius: var(--r-sm); background: rgba(255,255,255,.012); }
   .c-how > summary { cursor: pointer; padding: 9px 12px; font: 500 12.5px var(--sans); color: var(--ink-dim); list-style: none; display: flex; align-items: center; gap: 8px; min-height: 24px; }
   .c-how > summary::-webkit-details-marker { display: none; }
-  /* Macro strategist card (7 Nov) */
-  .c-macro .mc-up { color: var(--buy); } .c-macro .mc-dn { color: var(--sell); } .c-macro .mc-mx { color: var(--ink-faint); }
-  .c-macro td small { display: block; color: var(--ink-faint); font-size: 11px; line-height: 1.4; }
-  .c-macro .mc-ev { border-top: 1px solid var(--line-soft); padding: 8px 0; display: grid; gap: 4px; min-width: 0; }
-  .c-macro .mc-ev:first-child { border-top: 0; }
-  .c-macro .mc-ev b { font-weight: 600; color: var(--ink); }
-  .c-macro .mc-ev .mc-row { display: flex; flex-wrap: wrap; gap: 6px 14px; font-size: 12px; color: var(--ink-dim); }
-  .c-macro .c-how { margin: 12px 0 0; } .c-macro .c-how > p { padding: 0 12px; }
   .c-how > summary::before { content: ""; width: 6px; height: 6px; border-right: 1.5px solid currentColor; border-bottom: 1.5px solid currentColor; transform: rotate(-45deg); transition: transform .15s ease-out; }
   .c-how[open] > summary::before { transform: rotate(45deg); }
   .c-how > summary:hover { color: var(--ink); }
@@ -2651,7 +2643,7 @@ html[data-motion="off"] #v-ict .ict-cal-d:hover { transform: none !important; }
   <!-- ─── Home: one card per section ─── -->
   <section class="view" id="v-home" aria-label="Home">
     <div class="h-top"><div><div class="h-dl"><div class="h-date" id="h-date"></div><span class="h-clock" id="h-clock" hidden></span></div><h1 class="h-head" id="h-head">Loading live candles…</h1></div></div>
-    <nav class="h-quick" aria-label="Jump to"><a href="#council/calendar">Calendar</a><a href="#council/overview">Active trades</a><a href="#council/trades">All trades</a><a href="#council/review" class="adm">Loss review</a><a href="#council/systems" class="adm">Systems</a><a href="#council/research" class="adm">Research</a><a href="#council/scoreboard" class="adm">Edge scoreboard</a><a href="#journal">Journal</a></nav>
+    <nav class="h-quick" aria-label="Jump to"><a href="#council/calendar">Calendar</a><a href="#council/overview">Active trades</a><a href="#council/trades">All trades</a><a href="#council/review" class="adm">Loss review</a><a href="#council/systems" class="adm">Systems</a><a href="#council/research" class="adm">Research</a><a href="#council/scoreboard" class="adm">Edge scoreboard</a><a href="#council/macro" class="adm">Macro desk</a><a href="#journal">Journal</a></nav>
     <div class="h-warn" id="h-warn" role="alert" hidden></div>
     <div class="h-today" id="h-today" role="group" aria-label="Results today"></div>
     <section class="h-mk" id="h-mk" aria-labelledby="h-mk-t" aria-busy="true" hidden><div class="h-mk-h"><h2 id="h-mk-t">Markets now</h2><span class="h-mk-k" id="h-mk-k">% vs prior day's close (UTC) · line 24 h</span><span class="h-mk-st" id="h-mk-st" role="status" aria-live="polite"></span></div><div class="h-mk-row" id="h-mk-row"></div></section>
@@ -2805,7 +2797,7 @@ html[data-motion="off"] #v-ict .ict-cal-d:hover { transform: none !important; }
       <div><h1 class="h-head">AI council</h1><p class="ms-note" id="ms-c-status">Loading council data…</p></div>
       <label class="c-auto adm" hidden style="display:none"><input type="checkbox" id="ms-auto" checked> <span><b>Browser Trader</b><small>On by default. Every fresh Ready setup on the market you're viewing is saved to your journal as a paper trade, then tracked to its stop or target.</small></span></label>
     </div>
-    <nav class="c-nav" id="ms-c-nav" role="tablist" aria-label="Council sections"><button type="button" role="tab" class="" id="ms-cn-overview" data-pane="overview" aria-controls="ms-cp-overview" aria-selected="true">Overview<span class="c-nav-n" id="ms-cn-n-overview"></span></button><button type="button" class="c-nav-jump" id="ms-cn-cal" aria-label="Jump to the calendar">Calendar</button><button type="button" role="tab" class="" id="ms-cn-trades" data-pane="trades" aria-controls="ms-cp-trades" aria-selected="false">Trades<span class="c-nav-n" id="ms-cn-n-trades"></span></button><button type="button" role="tab" class="adm" id="ms-cn-systems" data-pane="systems" aria-controls="ms-cp-systems" aria-selected="false">Systems<span class="c-nav-n" id="ms-cn-n-systems"></span></button><button type="button" role="tab" class="adm" id="ms-cn-review" data-pane="review" aria-controls="ms-cp-review" aria-selected="false">Review<span class="c-nav-n" id="ms-cn-n-review"></span></button><button type="button" role="tab" class="adm" id="ms-cn-research" data-pane="research" aria-controls="ms-cp-research" aria-selected="false">Research<span class="c-nav-n" id="ms-cn-n-research"></span></button></nav>
+    <nav class="c-nav" id="ms-c-nav" role="tablist" aria-label="Council sections"><button type="button" role="tab" class="" id="ms-cn-overview" data-pane="overview" aria-controls="ms-cp-overview" aria-selected="true">Overview<span class="c-nav-n" id="ms-cn-n-overview"></span></button><button type="button" class="c-nav-jump" id="ms-cn-cal" aria-label="Jump to the calendar">Calendar</button><button type="button" role="tab" class="" id="ms-cn-trades" data-pane="trades" aria-controls="ms-cp-trades" aria-selected="false">Trades<span class="c-nav-n" id="ms-cn-n-trades"></span></button><button type="button" role="tab" class="adm" id="ms-cn-systems" data-pane="systems" aria-controls="ms-cp-systems" aria-selected="false">Systems<span class="c-nav-n" id="ms-cn-n-systems"></span></button><button type="button" role="tab" class="adm" id="ms-cn-review" data-pane="review" aria-controls="ms-cp-review" aria-selected="false">Review<span class="c-nav-n" id="ms-cn-n-review"></span></button><button type="button" role="tab" class="adm" id="ms-cn-research" data-pane="research" aria-controls="ms-cp-research" aria-selected="false">Research<span class="c-nav-n" id="ms-cn-n-research"></span></button><button type="button" role="tab" class="adm" id="ms-cn-macro" data-pane="macro" aria-controls="ms-cp-macro" aria-selected="false">Macro<span class="c-nav-n" id="ms-cn-n-macro"></span></button></nav>
     <div class="c-grid c-pane c-pane-overview" id="ms-cp-overview" role="tabpanel" aria-labelledby="ms-cn-overview" data-pane="overview">
       <div class="card c-active" id="ms-active-card">
         <div class="ms-k"><span>Active trades · placed by the system now</span><span class="c-tog"><span id="ms-active-sum" class="c-act-sum"></span><input type="checkbox" id="ms-act-sh" checked hidden style="display:none"></span></div>
@@ -2910,18 +2902,6 @@ html[data-motion="off"] #v-ict .ict-cal-d:hover { transform: none !important; }
         <ul class="c-ready" id="ms-c-ready"></ul>
         <div class="c-md" id="ms-c-analysis"></div>
       </div>
-      <div class="card c-macro adm c-wide" id="ms-c-macro">
-        <div class="ms-k"><span>Macro strategist · next-day odds and event playbook</span><small id="ms-mc-at"></small></div>
-        <p class="ms-note" id="ms-mc-regime">Loading the macro view…</p>
-        <div class="ms-bt-wrap"><table class="ms-bt-t c-t"><thead><tr><th>Market</th><th class="n">P(up)</th><th class="n">Base rate</th><th class="n">Typical move</th><th>Drivers</th></tr></thead><tbody id="ms-mc-p"></tbody></table></div>
-        <div class="c-sub">Event playbook · next 5 days</div>
-        <div id="ms-mc-ev"></div>
-        <div class="c-sub">Scorecard · is it any good?</div>
-        <div class="ms-bt-wrap"><table class="ms-bt-t c-t"><thead><tr><th>Market</th><th class="n">Replay days</th><th class="n">Hit rate</th><th class="n">Base rate</th><th class="n">Brier <small>(coin 0.25; green beats the base rate)</small></th><th class="n">PT test</th><th class="n">Live log</th></tr></thead><tbody id="ms-mc-sc"></tbody></table></div>
-        <p class="ms-note" id="ms-mc-vol"></p>
-        <details class="c-how"><summary>Brief and method</summary><p class="ms-note" id="ms-mc-brief"></p><p class="ms-note" id="ms-mc-method"></p><p class="ms-note" id="ms-mc-src"></p></details>
-        <p class="ms-note" style="margin:8px 0 0">Paper only: the Macro strategist changes no rule and no trade. Next-day direction is barely forecastable, so the odds stay near each market's base rate; the size of event-day moves is the more reliable part.</p>
-      </div>
       <div class="card c-coach">
         <div class="ms-k">Coach · daily review and rules</div>
         <div class="c-rules" id="ms-c-rules"></div>
@@ -2950,6 +2930,63 @@ html[data-motion="off"] #v-ict .ict-cal-d:hover { transform: none !important; }
         <p class="ms-note" style="margin:10px 0 0">Every setup the Trader would have taken, managed candle by candle on real prices. The range is clustered by market and day (one move often fires several setups), so it is honest about how sure we are: green when the whole range is above zero, red when it is below. The Coach turns only clear findings into rules.</p>
       </div>
       <p class="ms-note c-wide">Paper trades only, no real money. The Coach may change the stop buffer (0.10–0.25 × ATR), the minimum reward:risk (1.2–2.5) and pause a setup for up to 7 days, and logs every change.</p>
+    </div>
+    <!-- Macro desk (7 Nov 2026, owner: make the Macro strategist visible): council-data macro/*.json, rendered by #ms-md-js. Paper only. -->
+    <div class="c-grid c-pane c-pane-macro adm" id="ms-cp-macro" role="tabpanel" aria-labelledby="ms-cn-macro" data-pane="macro" hidden>
+      <header class="md-head">
+        <div class="md-head-t">
+          <h2>Macro desk</h2>
+          <p id="ms-md-at">Loading the Macro strategist…</p>
+        </div>
+        <ul class="md-pills" id="ms-md-pills" aria-label="Status"></ul>
+        <ul class="md-regime-tags" id="ms-md-tags" aria-label="Regime right now"></ul>
+      </header>
+      <div class="md-col">
+        <div class="card md-next">
+          <div class="ms-k"><span>Next day · expected move per market</span><small id="ms-md-next-for"></small></div>
+          <p class="md-lede" id="ms-md-next-lede"></p>
+          <div class="md-evday" id="ms-md-evday" hidden></div>
+          <ul class="md-mv" id="ms-md-mv" aria-label="Expected move per market"></ul>
+          <p class="md-foot" id="ms-md-dxy"></p>
+        </div>
+        <div class="card md-ev">
+          <div class="ms-k"><span>Calendar · high-impact releases</span></div>
+          <div class="md-seg" id="ms-md-ev-seg" role="tablist" aria-label="Calendar view">
+            <button type="button" role="tab" data-v="next" id="ms-md-ev-t-next" aria-controls="ms-md-ev-list">Coming up <span class="md-n" id="ms-md-ev-n-next"></span></button>
+            <button type="button" role="tab" data-v="past" id="ms-md-ev-t-past" aria-controls="ms-md-ev-list">Recent <span class="md-n" id="ms-md-ev-n-past"></span></button>
+            <button type="button" role="tab" data-v="news" id="ms-md-ev-t-news" aria-controls="ms-md-ev-list">Central banks</button>
+          </div>
+          <div class="md-ev-list" id="ms-md-ev-list" role="tabpanel"></div>
+        </div>
+      </div>
+      <div class="md-col">
+        <div class="card md-reg">
+          <div class="ms-k"><span>Regime · where the dollar sits</span></div>
+          <figure class="md-smile">
+            <svg id="ms-md-smile" viewBox="0 0 320 156" role="img" aria-labelledby="ms-md-smile-t"><title id="ms-md-smile-t">Dollar Smile</title></svg>
+            <figcaption class="md-sr" id="ms-md-smile-cap"></figcaption>
+          </figure>
+          <div class="md-seg md-phase" id="ms-md-phase" role="tablist" aria-label="Dollar Smile phases"></div>
+          <div class="md-phase-x" id="ms-md-phase-x" role="tabpanel" aria-live="polite"></div>
+          <dl class="md-gauges" id="ms-md-gauges"></dl>
+        </div>
+        <div class="card md-rec">
+          <div class="ms-k"><span>Track record · is it any good?</span></div>
+          <p class="md-verdict" id="ms-md-verdict"></p>
+          <div class="md-seg" id="ms-md-rec-seg" role="tablist" aria-label="Track record view">
+            <button type="button" role="tab" data-v="dir" aria-controls="ms-md-rec-body">Direction</button>
+            <button type="button" role="tab" data-v="size" aria-controls="ms-md-rec-body">Move size</button>
+            <button type="button" role="tab" data-v="live" aria-controls="ms-md-rec-body">Live log <span class="md-n" id="ms-md-rec-n-live"></span></button>
+          </div>
+          <div class="md-rec-body" id="ms-md-rec-body" role="tabpanel"></div>
+        </div>
+      </div>
+      <div class="card md-more">
+        <details class="c-how"><summary>The strategist's brief, method and data sources</summary>
+          <p class="ms-note" id="ms-md-brief"></p><p class="ms-note" id="ms-md-method"></p><p class="ms-note" id="ms-md-volm"></p><p class="ms-note" id="ms-md-src"></p>
+        </details>
+        <p class="md-paper">Paper only. The Macro strategist changes no rule and places no trade. Next-day direction is barely forecastable, so its odds stay at each market's base rate; how far a market moves is the part worth reading.</p>
+      </div>
     </div>
   </section>
 
@@ -7253,8 +7290,8 @@ function msNextSetup(bars, A) {
 
   // ─── Sections: a home page of cards, each section on its own page ───
   const VIEWS = ['home', 'setup', 'charts', 'scanner', 'crypto', 'gold', 'council', 'journal', 'guest', 'users', 'ict'];
-  // Council sections (6 Nov renovation): Overview · Trades · Systems · Review · Research; deep links #council/<section>
-  const CPANES = ['overview', 'trades', 'systems', 'review', 'research'], CPUB = ['overview', 'trades'];
+  // Council sections (6 Nov renovation): Overview · Trades · Systems · Review · Research · Macro (7 Nov); deep links #council/<section>
+  const CPANES = ['overview', 'trades', 'systems', 'review', 'research', 'macro'], CPUB = ['overview', 'trades'];
   const CPANE = { cur: 'overview' };
   try { const p0 = localStorage.getItem('msCpane'); if (CPANES.includes(p0)) CPANE.cur = p0; } catch (e) {}
   function setPane(p, push = true) {
@@ -9588,57 +9625,545 @@ html[data-role="public"] #ms-me-ct { display: none; }
   });
 })();
 </script>
-<script>
-/* Macro strategist card (7 Nov 2026, admin): council-data macro/forecast.json from council/macro.mjs (paper only) */
+<style id="ms-md-css">
+/* ── Macro desk (#ms-cp-macro, 7 Nov 2026, owner: make the Macro strategist visible and enjoyable). Council → Macro, admin only.
+   Self-contained: every rule is scoped to #ms-cp-macro, the script is #ms-md-js. Phone first; no horizontal scroll at 375 px. ── */
+#ms-cp-macro { --md-ls: color-mix(in srgb, var(--ink) 16%, transparent); --md-soft: color-mix(in srgb, var(--ink) 4%, transparent); --md-warn: var(--c-warn, #f2b33d);
+  grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr); align-items: start; }
+#ms-cp-macro > .md-head, #ms-cp-macro > .md-more { grid-column: 1 / -1; }
+#ms-cp-macro .md-col { display: grid; gap: inherit; align-content: start; min-width: 0; }
+@media (max-width: 1000px) { #ms-cp-macro { grid-template-columns: minmax(0, 1fr); } }
+#ms-cp-macro .md-sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+#ms-cp-macro .md-up { color: var(--buy); } #ms-cp-macro .md-dn { color: var(--sell); } #ms-cp-macro .md-mx { color: var(--ink-faint); }
+#ms-cp-macro .md-n:empty { display: none; }
+#ms-cp-macro .md-n { min-width: 20px; height: 20px; padding: 0 6px; border-radius: 10px; background: var(--md-soft); color: var(--ink-dim); font: 600 11.5px/20px var(--sans); text-align: center; font-variant-numeric: tabular-nums; }
+
+/* header: title, status pills, today's regime in three words */
+#ms-cp-macro .md-head { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 10px 16px; align-items: end; padding: 6px 2px 2px; }
+#ms-cp-macro .md-head h2 { margin: 0; font: 700 22px/1.2 var(--sans); letter-spacing: -.3px; color: var(--ink); }
+#ms-cp-macro .md-head p { margin: 3px 0 0; color: var(--ink-dim); font-size: 13.5px; line-height: 1.45; }
+#ms-cp-macro .md-head p b { color: var(--ink); font-weight: 600; }
+#ms-cp-macro .md-pills, #ms-cp-macro .md-regime-tags { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 6px; }
+#ms-cp-macro .md-pills { justify-content: flex-end; }
+#ms-cp-macro .md-regime-tags { grid-column: 1 / -1; }
+#ms-cp-macro .md-pill { display: inline-flex; align-items: center; gap: 7px; padding: 5px 11px; border-radius: 999px; font: 600 12.5px var(--sans); border: 1px solid var(--line); color: var(--ink-dim); background: var(--panel); white-space: nowrap; }
+#ms-cp-macro .md-pill i { width: 7px; height: 7px; border-radius: 50%; background: currentColor; flex: none; }
+#ms-cp-macro .md-pill.ok { color: var(--buy); } #ms-cp-macro .md-pill.warn { color: var(--md-warn); border-color: color-mix(in srgb, var(--md-warn) 35%, var(--line)); }
+#ms-cp-macro .md-tag { display: inline-flex; align-items: center; gap: 8px; padding: 7px 12px; border-radius: 10px; font: 500 13px/1.3 var(--sans); color: var(--ink); background: var(--md-soft); border: 1px solid var(--line); }
+#ms-cp-macro .md-tag small { color: var(--ink-faint); font: 600 11px var(--sans); }
+#ms-cp-macro .md-tag.stress { background: color-mix(in srgb, var(--md-warn) 10%, transparent); border-color: color-mix(in srgb, var(--md-warn) 32%, transparent); }
+#ms-cp-macro .md-tag.calm { background: color-mix(in srgb, var(--buy) 9%, transparent); border-color: color-mix(in srgb, var(--buy) 28%, transparent); }
+@media (max-width: 700px) { #ms-cp-macro .md-head { grid-template-columns: minmax(0, 1fr); } #ms-cp-macro .md-pills { justify-content: flex-start; } }
+
+#ms-cp-macro .md-lede { margin: -4px 0 12px; color: var(--ink-dim); font-size: 13px; line-height: 1.5; max-width: 70ch; }
+#ms-cp-macro .md-foot { margin: 12px 0 0; font-size: 12.5px; color: var(--ink-faint); line-height: 1.5; }
+#ms-cp-macro .md-evday { margin: 0 0 12px; padding: 10px 12px; border-radius: var(--r-sm, 8px); border: 1px solid color-mix(in srgb, var(--md-warn) 35%, transparent); background: color-mix(in srgb, var(--md-warn) 9%, transparent); font-size: 13px; color: var(--ink); }
+
+/* next day: one row per market, tap to open the model, drivers and why */
+#ms-cp-macro .md-mv { list-style: none; margin: 0; padding: 0; border-top: 1px solid var(--line-soft); }
+#ms-cp-macro .md-mv > li { border-bottom: 1px solid var(--line-soft); }
+#ms-cp-macro .md-mv-b { all: unset; box-sizing: border-box; width: 100%; cursor: pointer; display: grid; grid-template-columns: minmax(0, 1fr) auto 22px; gap: 8px 12px; align-items: center; padding: 13px 6px; border-radius: 10px; min-height: 44px; -webkit-tap-highlight-color: transparent; transition: background .15s ease-out; }
+@media (hover: hover) { #ms-cp-macro .md-mv-b:hover { background: var(--md-soft); } }
+#ms-cp-macro .md-mv-b:focus-visible, #ms-cp-macro .md-e-b:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
+#ms-cp-macro .md-mv-nm { min-width: 0; display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap; }
+#ms-cp-macro .md-mv-nm b { font: 600 15.5px var(--sans); color: var(--ink); }
+#ms-cp-macro .md-mv-nm small { font-size: 12.5px; color: var(--ink-faint); font-variant-numeric: tabular-nums; }
+#ms-cp-macro .md-mv-pct { text-align: right; line-height: 1.1; }
+#ms-cp-macro .md-mv-pct b { display: block; font: 700 21px var(--sans); letter-spacing: -.4px; color: var(--ink); font-variant-numeric: tabular-nums; }
+#ms-cp-macro .md-mv-pct small { font-size: 11.5px; color: var(--ink-faint); font-variant-numeric: tabular-nums; }
+#ms-cp-macro .md-chev { grid-column: 3; grid-row: 1 / span 3; width: 22px; height: 22px; color: var(--ink-faint); transition: transform .2s cubic-bezier(.22, 1, .36, 1); }
+#ms-cp-macro [aria-expanded="true"] .md-chev { transform: rotate(180deg); color: var(--ink); }
+#ms-cp-macro .md-meter { grid-column: 1 / 3; display: grid; gap: 5px; }
+#ms-cp-macro .md-trk { position: relative; height: 6px; border-radius: 3px; background: var(--md-soft); box-shadow: inset 0 0 0 1px var(--line-soft); }
+#ms-cp-macro .md-trk .fill { position: absolute; top: 0; bottom: 0; border-radius: 3px; background: color-mix(in srgb, var(--ink) 30%, transparent); }
+#ms-cp-macro .md-trk .fill.busy { background: color-mix(in srgb, var(--md-warn) 70%, transparent); }
+#ms-cp-macro .md-trk .tick { position: absolute; top: -4px; bottom: -4px; width: 2px; margin-left: -1px; border-radius: 1px; background: var(--ink-dim); }
+#ms-cp-macro .md-trk .dot { position: absolute; top: 50%; width: 12px; height: 12px; margin: -6px 0 0 -6px; border-radius: 50%; background: var(--panel); border: 2.5px solid var(--ink-dim); }
+#ms-cp-macro .md-trk .dot.busy { border-color: var(--md-warn); }
+#ms-cp-macro .md-meter span { font-size: 12px; color: var(--ink-dim); }
+#ms-cp-macro .md-meter span b { color: var(--ink); font-weight: 600; font-variant-numeric: tabular-nums; }
+#ms-cp-macro .md-chips { grid-column: 1 / 3; display: flex; flex-wrap: wrap; gap: 6px; }
+#ms-cp-macro .md-chip { display: inline-flex; align-items: center; gap: 5px; padding: 3px 9px; border-radius: 7px; border: 1px solid var(--line); font: 500 12px var(--sans); color: var(--ink-dim); font-variant-numeric: tabular-nums; white-space: nowrap; }
+#ms-cp-macro .md-chip b { color: var(--ink); font-weight: 600; }
+#ms-cp-macro .md-chip.dir { color: var(--ink-faint); border-style: dashed; }
+#ms-cp-macro .md-x { padding: 2px 6px 16px; display: grid; gap: 14px; }
+#ms-cp-macro .md-x[hidden] { display: none; }
+#ms-cp-macro .md-x h4 { margin: 0 0 6px; font: 600 13px var(--sans); color: var(--ink); }
+#ms-cp-macro .md-x p { margin: 0; font-size: 12.5px; line-height: 1.55; color: var(--ink-dim); max-width: 72ch; }
+#ms-cp-macro .md-x p b { color: var(--ink); font-weight: 600; }
+@media (prefers-reduced-motion: no-preference) { #ms-cp-macro .md-x:not([hidden]) { animation: md-in .28s cubic-bezier(.22, 1, .36, 1); } }
+@keyframes md-in { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: none; } }
+/* model error vs naive: diverging bars, left of the centre line = better than naive */
+#ms-cp-macro .md-bars { display: grid; gap: 4px; margin-top: 8px; }
+#ms-cp-macro .md-bar { display: grid; grid-template-columns: 88px minmax(0, 1fr) 48px 48px; gap: 8px; align-items: center; font-size: 12px; color: var(--ink-dim); font-variant-numeric: tabular-nums; }
+#ms-cp-macro .md-bar.hd { font-size: 11px; color: var(--ink-faint); }
+#ms-cp-macro .md-bar > span:nth-child(n+3) { text-align: right; }
+#ms-cp-macro .md-bar b { color: var(--ink); font-weight: 600; }
+#ms-cp-macro .md-dv { position: relative; height: 10px; }
+#ms-cp-macro .md-dv::before { content: ""; position: absolute; left: 50%; top: -3px; bottom: -3px; width: 1px; background: var(--ink-faint); }
+#ms-cp-macro .md-dv i { position: absolute; top: 1px; bottom: 1px; border-radius: 2px; }
+#ms-cp-macro .md-dv i.better { background: var(--buy); } #ms-cp-macro .md-dv i.worse { background: color-mix(in srgb, var(--sell) 75%, transparent); }
+#ms-cp-macro .md-bar.used span:first-child { color: var(--ink); font-weight: 600; }
+/* drivers */
+#ms-cp-macro .md-drv { list-style: none; margin: 0; padding: 0; display: grid; gap: 2px; }
+#ms-cp-macro .md-drv li { display: grid; grid-template-columns: 18px minmax(0, 1fr) auto; gap: 2px 8px; align-items: baseline; padding: 6px 0; border-top: 1px solid var(--line-soft); font-size: 12.5px; }
+#ms-cp-macro .md-drv li:first-child { border-top: 0; }
+#ms-cp-macro .md-drv .ar { font-size: 11px; }
+#ms-cp-macro .md-drv .nm { color: var(--ink); min-width: 0; }
+#ms-cp-macro .md-drv .nm small { display: block; color: var(--ink-faint); font-size: 11.5px; }
+#ms-cp-macro .md-drv .hit { color: var(--ink-faint); font-size: 11.5px; text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+#ms-cp-macro .md-drv .hit.pr { color: var(--buy); font-weight: 600; }
+
+/* segmented controls (calendar, track record, smile phases) */
+#ms-cp-macro .md-seg { display: flex; gap: 2px; padding: 3px; border: 1px solid var(--line); border-radius: 11px; background: var(--panel-raised); margin: 0 0 12px; }
+#ms-cp-macro .md-seg button { flex: 1 1 auto; min-width: 0; min-height: 44px; padding: 6px 8px; white-space: nowrap; border: 0; border-radius: 8px; background: transparent; color: var(--ink-dim); font: 600 13px var(--sans); cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 6px; transition: background .15s ease-out, color .15s ease-out; touch-action: manipulation; }
+@media (hover: hover) { #ms-cp-macro .md-seg button:hover { color: var(--ink); } }
+#ms-cp-macro .md-seg button[aria-selected="true"] { background: var(--panel); color: var(--ink); box-shadow: 0 0 0 1px var(--md-ls), 0 1px 2px rgba(0,0,0,.12); }
+#ms-cp-macro .md-seg button:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
+#ms-cp-macro .md-seg button .now { width: 7px; height: 7px; border-radius: 50%; background: var(--accent); flex: none; }
+
+/* Dollar Smile */
+#ms-cp-macro .md-smile { margin: 0 0 10px; }
+#ms-cp-macro .md-smile svg { display: block; width: 100%; height: auto; max-height: 220px; overflow: visible; }
+#ms-cp-macro .md-smile .crv { fill: none; stroke: var(--md-ls); stroke-width: 3; stroke-linecap: round; }
+#ms-cp-macro .md-smile .crv-on { fill: none; stroke: var(--accent); stroke-width: 4; stroke-linecap: round; }
+#ms-cp-macro .md-smile .crv-sel { fill: none; stroke: var(--ink-faint); stroke-width: 4; stroke-linecap: round; stroke-dasharray: 2 6; }
+#ms-cp-macro .md-smile .ax { stroke: var(--line); stroke-width: 1; }
+#ms-cp-macro .md-smile text { font: 500 10.5px var(--sans); fill: var(--ink-faint); }
+#ms-cp-macro .md-smile text.on { fill: var(--ink); font-weight: 700; }
+#ms-cp-macro .md-smile text.sub { font-size: 9.5px; font-weight: 500; }
+#ms-cp-macro .md-smile .mk { fill: var(--accent); stroke: var(--panel); stroke-width: 3; }
+#ms-cp-macro .md-smile .mk.mid { fill: var(--panel); stroke: var(--accent); stroke-width: 2.5; }
+#ms-cp-macro .md-smile .halo { fill: var(--accent); opacity: .18; transform-box: fill-box; transform-origin: center; }
+@media (prefers-reduced-motion: no-preference) { #ms-cp-macro .md-smile .halo { animation: md-halo 2.4s cubic-bezier(.22, 1, .36, 1) infinite; } }
+@keyframes md-halo { 0% { transform: scale(.6); opacity: .35; } 100% { transform: scale(1.8); opacity: 0; } }
+#ms-cp-macro .md-smile .now-l { font: 700 10.5px var(--sans); fill: var(--accent); letter-spacing: .02em; }
+#ms-cp-macro .md-phase-x { margin: 0 0 14px; display: grid; gap: 8px; font-size: 13px; line-height: 1.5; color: var(--ink-dim); }
+#ms-cp-macro .md-phase-x p { margin: 0; max-width: 70ch; } #ms-cp-macro .md-phase-x b { color: var(--ink); font-weight: 600; }
+#ms-cp-macro .md-lean { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 4px; }
+#ms-cp-macro .md-lean > div { display: grid; justify-items: center; gap: 1px; padding: 6px 2px; border-radius: 8px; background: var(--md-soft); font-size: 11.5px; color: var(--ink-faint); text-align: center; }
+#ms-cp-macro .md-lean > div b { font: 600 13px var(--sans); }
+#ms-cp-macro .md-lean-h { font-size: 11.5px; color: var(--ink-faint); }
+
+/* regime gauges */
+#ms-cp-macro .md-gauges { margin: 0; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0 18px; border-top: 1px solid var(--line-soft); }
+#ms-cp-macro .md-gauges > div { padding: 11px 0; border-bottom: 1px solid var(--line-soft); min-width: 0; }
+#ms-cp-macro .md-gauges > div.wide { grid-column: 1 / -1; }
+#ms-cp-macro .md-gauges dt { font-size: 12px; color: var(--ink-faint); }
+#ms-cp-macro .md-gauges dd { margin: 1px 0 0; }
+#ms-cp-macro .md-gauges dd > b { font: 700 18px var(--sans); letter-spacing: -.3px; color: var(--ink); font-variant-numeric: tabular-nums; }
+#ms-cp-macro .md-gauges dd > b em { font-style: normal; font: 600 12px var(--sans); margin-left: 6px; letter-spacing: 0; }
+#ms-cp-macro .md-gauges dd > small { display: block; font-size: 12px; line-height: 1.45; color: var(--ink-dim); margin-top: 1px; }
+#ms-cp-macro .md-vix { position: relative; height: 8px; margin: 9px 0 4px; border-radius: 4px; display: flex; overflow: hidden; }
+#ms-cp-macro .md-vix i { height: 100%; }
+#ms-cp-macro .md-vix-w { position: relative; }
+#ms-cp-macro .md-vix-w .dot { position: absolute; top: 4px; width: 14px; height: 14px; margin-left: -7px; border-radius: 50%; background: var(--ink); border: 3px solid var(--panel); box-shadow: 0 0 0 1px var(--md-ls); }
+#ms-cp-macro .md-vix-l { position: relative; height: 15px; font-size: 10.5px; color: var(--ink-faint); font-variant-numeric: tabular-nums; }
+#ms-cp-macro .md-vix-l span { position: absolute; top: 0; transform: translateX(-50%); } #ms-cp-macro .md-vix-l span:first-child { transform: none; } #ms-cp-macro .md-vix-l span:last-child { transform: translateX(-100%); }
+
+/* calendar */
+#ms-cp-macro .md-ev-list { display: grid; gap: 0; }
+#ms-cp-macro .md-day { margin: 10px 0 4px; font: 600 12.5px var(--sans); color: var(--ink); display: flex; gap: 8px; align-items: baseline; }
+#ms-cp-macro .md-day:first-child { margin-top: 0; }
+#ms-cp-macro .md-day small { color: var(--ink-faint); font-weight: 500; }
+#ms-cp-macro .md-e { border-top: 1px solid var(--line-soft); }
+#ms-cp-macro .md-e-b { all: unset; box-sizing: border-box; width: 100%; display: grid; grid-template-columns: 66px minmax(0, 1fr) 22px; gap: 2px 10px; align-items: start; padding: 10px 4px; min-height: 44px; border-radius: 8px; }
+#ms-cp-macro button.md-e-b { cursor: pointer; }
+@media (hover: hover) { #ms-cp-macro button.md-e-b:hover { background: var(--md-soft); } }
+#ms-cp-macro .md-e-t { white-space: nowrap; font: 600 12.5px var(--sans); color: var(--ink); font-variant-numeric: tabular-nums; line-height: 1.35; }
+#ms-cp-macro .md-e-t small { display: block; font: 500 10.5px var(--sans); color: var(--ink-faint); }
+#ms-cp-macro .md-e-ttl { min-width: 0; font-size: 13.5px; color: var(--ink); line-height: 1.4; }
+#ms-cp-macro .md-cc { display: inline-block; margin-right: 6px; padding: 1px 6px; border-radius: 5px; font: 700 10.5px/1.5 var(--sans); letter-spacing: .03em; color: var(--ink-dim); border: 1px solid var(--line); vertical-align: 1px; }
+#ms-cp-macro .md-cc.usd { color: var(--accent); border-color: color-mix(in srgb, var(--accent) 40%, transparent); }
+#ms-cp-macro .md-e-n { display: flex; flex-wrap: wrap; gap: 2px 12px; margin-top: 3px; font-size: 12px; color: var(--ink-faint); font-variant-numeric: tabular-nums; }
+#ms-cp-macro .md-e-n b { color: var(--ink-dim); font-weight: 600; }
+#ms-cp-macro .md-e-x { padding: 0 4px 14px 80px; display: grid; gap: 10px; font-size: 12.5px; color: var(--ink-dim); line-height: 1.5; }
+#ms-cp-macro .md-e-x[hidden] { display: none; }
+#ms-cp-macro .md-sc { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px; }
+#ms-cp-macro .md-sc > div { padding: 8px; border-radius: 8px; border: 1px solid var(--line); display: grid; gap: 3px; align-content: start; font-size: 11.5px; }
+#ms-cp-macro .md-sc > div > b { font: 600 12.5px var(--sans); color: var(--ink); text-transform: capitalize; }
+#ms-cp-macro .md-sc > div > small { color: var(--ink-faint); }
+#ms-cp-macro .md-empty { padding: 14px 4px; color: var(--ink-dim); font-size: 13px; line-height: 1.55; }
+#ms-cp-macro .md-empty b { color: var(--ink); font-weight: 600; display: block; margin-bottom: 2px; }
+#ms-cp-macro .md-nw { display: grid; grid-template-columns: 44px minmax(0, 1fr); gap: 10px; align-items: start; padding: 10px 4px; min-height: 44px; border-top: 1px solid var(--line-soft); color: var(--ink); text-decoration: none; font-size: 13px; line-height: 1.4; border-radius: 8px; box-sizing: border-box; }
+#ms-cp-macro .md-nw:first-child { border-top: 0; }
+@media (hover: hover) { #ms-cp-macro .md-nw:hover { background: var(--md-soft); } }
+#ms-cp-macro .md-nw:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
+#ms-cp-macro .md-nw small { display: block; color: var(--ink-faint); font-size: 11.5px; margin-top: 2px; }
+#ms-cp-macro .md-nw .md-cc { margin: 2px 0 0; text-align: center; }
+@media (max-width: 420px) { #ms-cp-macro .md-e-x { padding-left: 4px; } #ms-cp-macro .md-seg .md-n { display: none; } #ms-cp-macro .md-seg button { padding: 6px 4px; } }
+
+/* track record */
+#ms-cp-macro .md-verdict { margin: -2px 0 12px; padding: 11px 13px; border-radius: 10px; font-size: 13px; line-height: 1.55; color: var(--ink-dim); background: var(--md-soft); border: 1px solid var(--line); }
+#ms-cp-macro .md-verdict b { color: var(--ink); font-weight: 600; }
+#ms-cp-macro .md-dp { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 6px 10px; align-items: baseline; padding: 10px 0 8px; border-top: 1px solid var(--line-soft); font-size: 12.5px; }
+#ms-cp-macro .md-dp:first-of-type { border-top: 0; }
+#ms-cp-macro .md-dp > b { font-weight: 600; color: var(--ink); }
+#ms-cp-macro .md-dp > span { text-align: right; color: var(--ink-dim); font-variant-numeric: tabular-nums; line-height: 1.3; }
+#ms-cp-macro .md-dp > span b { color: var(--ink); font-weight: 600; }
+#ms-cp-macro .md-dp > span small { font-size: 11.5px; color: var(--ink-faint); margin-left: 6px; }
+#ms-cp-macro .md-dp > .md-plot { grid-column: 1 / -1; grid-row: 2; } #ms-cp-macro .md-dp > span { grid-row: 1; grid-column: 2; }
+#ms-cp-macro .md-plot { position: relative; height: 22px; }
+#ms-cp-macro .md-plot::before { content: ""; position: absolute; left: 0; right: 0; top: 50%; height: 1px; background: var(--line); }
+#ms-cp-macro .md-plot .band { position: absolute; top: 3px; bottom: 3px; border-radius: 4px; background: color-mix(in srgb, var(--ink) 9%, transparent); }
+#ms-cp-macro .md-plot .base { position: absolute; top: 0; bottom: 0; width: 2px; margin-left: -1px; background: var(--ink-dim); border-radius: 1px; }
+#ms-cp-macro .md-plot .hit { position: absolute; top: 50%; width: 12px; height: 12px; margin: -6px 0 0 -6px; border-radius: 50%; background: var(--accent); border: 2px solid var(--panel); box-shadow: 0 0 0 1px var(--accent); }
+#ms-cp-macro .md-axis { position: relative; height: 16px; margin-top: 2px; font-size: 10.5px; color: var(--ink-faint); font-variant-numeric: tabular-nums; }
+
+#ms-cp-macro .md-axis span { position: absolute; top: 0; transform: translateX(-50%); }
+#ms-cp-macro .md-legend { display: flex; flex-wrap: wrap; gap: 4px 14px; margin: 10px 0 0; font-size: 11.5px; color: var(--ink-faint); }
+#ms-cp-macro .md-legend i { display: inline-block; vertical-align: -2px; margin-right: 5px; }
+#ms-cp-macro .md-legend i.l-base { width: 2px; height: 12px; background: var(--ink-dim); }
+#ms-cp-macro .md-legend i.l-band { width: 16px; height: 10px; border-radius: 3px; background: color-mix(in srgb, var(--ink) 12%, transparent); }
+#ms-cp-macro .md-legend i.l-hit { width: 10px; height: 10px; border-radius: 50%; background: var(--accent); }
+#ms-cp-macro .md-note { margin: 10px 0 0; font-size: 12px; line-height: 1.55; color: var(--ink-faint); max-width: 72ch; }
+#ms-cp-macro .md-note b { color: var(--ink-dim); font-weight: 600; }
+#ms-cp-macro .md-sz { display: grid; grid-template-columns: 70px minmax(0, 1fr) 70px; gap: 4px 10px; align-items: center; padding: 9px 0; border-top: 1px solid var(--line-soft); font-size: 12.5px; }
+#ms-cp-macro .md-sz:first-of-type { border-top: 0; }
+#ms-cp-macro .md-sz > b { font-weight: 600; color: var(--ink); grid-row: span 2; }
+#ms-cp-macro .md-sz .br { display: grid; grid-template-columns: minmax(0, 1fr) 44px; gap: 8px; align-items: center; font-size: 11.5px; color: var(--ink-faint); font-variant-numeric: tabular-nums; }
+#ms-cp-macro .md-sz .br i { display: block; height: 8px; border-radius: 2px; background: var(--md-ls); }
+#ms-cp-macro .md-sz .br.ev i { background: var(--md-warn); }
+#ms-cp-macro .md-sz > span { grid-row: span 2; text-align: right; font-weight: 600; color: var(--ink); font-variant-numeric: tabular-nums; }
+#ms-cp-macro .md-sz > span small { display: block; white-space: nowrap; font-weight: 500; font-size: 11px; color: var(--ink-faint); }
+#ms-cp-macro .md-live-row { display: grid; grid-template-columns: 64px minmax(0, 1fr) auto; gap: 2px 10px; align-items: baseline; padding: 8px 0; border-top: 1px solid var(--line-soft); font-size: 12.5px; color: var(--ink-dim); font-variant-numeric: tabular-nums; }
+#ms-cp-macro .md-live-row b { color: var(--ink); font-weight: 600; }
+#ms-cp-macro .md-live-row > span:last-child { text-align: right; } #ms-cp-macro .md-live-row small { display: block; font-size: 11px; color: var(--ink-faint); white-space: nowrap; }
+#ms-cp-macro .md-live-row.sum { grid-template-columns: 64px minmax(0, 1fr); }
+#ms-cp-macro .md-live-row .ok { color: var(--buy); font-weight: 600; } #ms-cp-macro .md-live-row .no { color: var(--sell); font-weight: 600; }
+
+#ms-cp-macro .md-more { padding-top: 14px; padding-bottom: 14px; }
+#ms-cp-macro .md-more .c-how { margin: 0; } #ms-cp-macro .md-more .c-how > summary { min-height: 44px; box-sizing: border-box; }
+#ms-cp-macro .md-more .c-how > p { padding: 0 12px; margin: 0 0 10px; }
+#ms-cp-macro .md-paper { margin: 12px 2px 0; font-size: 12.5px; line-height: 1.55; color: var(--ink-faint); max-width: 90ch; }
+@media (max-width: 520px) {
+  #ms-cp-macro .card { padding: 16px 14px; }
+  #ms-cp-macro .md-bar { grid-template-columns: 80px minmax(0, 1fr) 44px 44px; gap: 6px; }
+  #ms-cp-macro .md-sz { grid-template-columns: 62px minmax(0, 1fr) 66px; }
+}
+@media (prefers-reduced-motion: reduce) { #ms-cp-macro .md-chev, #ms-cp-macro .md-seg button, #ms-cp-macro .md-mv-b { transition: none; } }
+@media (forced-colors: active) { #ms-cp-macro .md-seg button[aria-selected="true"] { outline: 2px solid Highlight; } }
+</style>
+<script id="ms-md-js">
+/* Macro desk (7 Nov 2026, admin): council-data macro/forecast.json, macro/events.json and macro/history.json from
+   council/macro.mjs, rendered for people. Paper only: it changes no rule and no trade; nothing here feeds the council. */
 (function () {
-  var R = document.documentElement, box = document.getElementById('ms-c-macro');
-  if (!box || R.dataset.mode !== 'admin') return;
+  'use strict';
+  var R = document.documentElement, pane = document.getElementById('ms-cp-macro');
+  if (!pane || R.dataset.mode !== 'admin') return;
   var $ = function (id) { return document.getElementById(id); };
   var esc = function (s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); };
-  var pct = function (p) { return p == null ? '—' : Math.round(p * 100) + '%'; };
-  var arrow = function (m) { return m === 'up' ? '<span class="mc-up">▲ up</span>' : m === 'down' ? '<span class="mc-dn">▼ down</span>' : '<span class="mc-mx">mixed</span>'; };
-  var NAMES = { gold: 'Gold', eurusd: 'EUR/USD', usdjpy: 'USD/JPY', nq: 'NQ', es: 'ES' };
-  var when = function (iso) { var d = new Date(iso); return d.toLocaleString(undefined, { weekday: 'short', day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' }); };
-  function render(f) {
-    $('ms-mc-at').textContent = 'for ' + f.target + ' · built ' + when(f.at);
-    $('ms-mc-regime').innerHTML = 'Regime: <b>' + esc(f.regime && f.regime.label) + '</b>' + (f.targetEvent ? ' · event day: ' + esc(f.targetEvent) : '') + (f.dxy ? ' · DXY ' + pct(f.dxy.pUp) + ' up (mirror of EUR/USD)' : '');
-    var rows = Object.keys(NAMES).map(function (k) {
-      var a = f.assets[k]; if (!a) return '';
-      var base = a.fit ? a.fit.base : null, tilt = a.pUp != null && base != null ? Math.round((a.pUp - base) * 100) : null;
-      var dr = (a.drivers || []).slice(0, 3).map(function (d) { return (d.dir === 'up' ? '<span class="mc-up">▲</span> ' : '<span class="mc-dn">▼</span> ') + esc(d.name.replace(/\s*\(.*\)$/, '')); }).join(' · ');
-      return '<tr><td>' + esc(a.label) + '</td><td class="n"><b>' + pct(a.pUp) + '</b>' + (tilt ? '<small>' + (tilt > 0 ? '+' : '') + tilt + ' pts vs base</small>' : '<small>no macro tilt</small>') + '</td><td class="n">' + pct(base) + '</td><td class="n">' + (a.expMovePct != null ? '±' + a.expMovePct + '%' : '—') + '</td><td>' + (dr || '<span class="mc-mx">no driver has data</span>') + '</td></tr>';
-    });
-    $('ms-mc-p').innerHTML = rows.join('');
-    var ev = (f.playbook || []).slice(0, 8);
-    $('ms-mc-ev').innerHTML = ev.length ? ev.map(function (e) {
-      var sc = (e.scenarios || []).filter(function (s) { return s.name !== 'in line'; }).map(function (s) {
-        return '<div class="mc-row"><b>' + esc(s.name) + '</b> <span>(' + esc(s.when) + (s.odds != null ? ', ~' + pct(s.odds) : '') + ')</span>' + Object.keys(NAMES).map(function (k) { return '<span>' + NAMES[k] + ' ' + arrow(s.moves[k]) + '</span>'; }).join('') + '</div>';
-      }).join('');
-      var mv = Object.keys(NAMES).map(function (k) { return NAMES[k] + ' ±' + (e.expMovePct ? e.expMovePct[k] : '?') + '%'; }).join(' · ');
-      return '<div class="mc-ev"><div><b>' + esc(e.country) + ' ' + esc(e.title) + '</b> · ' + when(e.at) + (e.consensus ? ' · consensus ' + esc(e.consensus) : '') + (e.previous ? ' · previous ' + esc(e.previous) : '') + (e.outcome ? ' · came in <b>' + esc(e.outcome) + '</b>' : '') + '</div>'
-        + '<div class="mc-row"><span>' + esc(e.rule) + '</span></div><div class="mc-row"><span>Typical move: ' + mv + '</span></div>' + sc + (e.note ? '<div class="mc-row"><span>' + esc(e.note) + '</span></div>' : '') + '</div>';
-    }).join('') : '<p class="ms-note">No high-impact events in the next 5 days on the calendar the strategist could read.</p>';
-    var S = f.scorecard || {}, re = S.replay || {}, lv = S.live || {};
-    $('ms-mc-sc').innerHTML = Object.keys(NAMES).map(function (k) {
-      var r = re[k] || {}, l = lv[k] || {};
-      var good = r.n && r.skillClim > 0 && r.pt != null && r.pt > 1.96;
-      return '<tr><td>' + NAMES[k] + '</td><td class="n">' + (r.n || 0) + '</td><td class="n">' + pct(r.hit) + '</td><td class="n">' + pct(r.base) + '</td><td class="n ' + (r.brier == null ? '' : r.brier < r.brierClim ? 'mc-up' : r.brier > 0.25 ? 'mc-dn' : '') + '">' + (r.brier != null ? r.brier : '—') + '</td><td class="n' + (good ? ' mc-up' : '') + '">' + (r.pt != null ? r.pt : '—') + '</td><td class="n">' + (l.n ? l.n + ' days, ' + pct(l.hit) + ' hit, Brier ' + l.brier : 'logging…') + '</td></tr>';
+  var num = function (v) { return typeof v === 'number' && isFinite(v); };
+  var pct0 = function (p) { return num(p) ? Math.round(p * 100) + '%' : '—'; };
+  var sgn = function (v, d) { return num(v) ? (v > 0 ? '+' : v < 0 ? '−' : '') + Math.abs(v).toFixed(d == null ? 2 : d) : '—'; };
+  var clamp = function (x, a, b) { return Math.max(a, Math.min(b, x)); };
+  var AK = ['gold', 'eurusd', 'usdjpy', 'nq', 'es'];
+  var SHORT = { gold: 'Gold', eurusd: 'EUR/USD', usdjpy: 'USD/JPY', nq: 'NQ', es: 'ES' };
+  var DP = { gold: 1, eurusd: 4, usdjpy: 2, nq: 0, es: 1 };
+  var MODEL = { naive: 'naive 20-day', cur: 'old model', evt: 'event median', ewma: 'EWMA', har: 'HAR-lite', vix: 'VIX-implied' };
+  // Dollar Smile phases; the lean per market mirrors SMILE_MAP in council/macro.mjs (display only; the live run's own
+  // per-market lean, drivers[k=smile].perAsset, is used for the current phase)
+  var PH = {
+    left: { tab: 'Stress', name: 'Left side: stress', what: 'Crisis or dollar-funding stress. The dollar is bought as a haven and risk is sold; gold whipsaws, then gets the haven bid.',
+      when: 'HY spreads up 15+ bp in a week, VIX at 28 or more, SOFR − EFFR at 15 bp or more, or Fed swap lines at $5bn or more.', lean: { gold: 0, eurusd: -1, usdjpy: -1, nq: -1, es: -1 } },
+    trough: { tab: 'Growth', name: 'Trough: global growth', what: 'Synchronised global growth. The dollar is sold; gold, the euro and stocks tend to do well.',
+      when: 'DXY down 0.15+ in 5 sessions, VIX under 22 and credit calm.', lean: { gold: 1, eurusd: 1, usdjpy: 0, nq: 1, es: 1 } },
+    right: { tab: 'US leads', name: 'Right side: US outperformance', what: 'The US outgrows the rest. The dollar and US real rates are bid; gold and the euro lag, USD/JPY rises.',
+      when: 'DXY up 0.25+ in 5 sessions, VIX under 22, and real yields or the 2Y rising.', lean: { gold: -1, eurusd: -1, usdjpy: 1, nq: 0, es: 0 } },
+    mid: { tab: 'Between', name: 'Transitional', what: 'No dominant force on the dollar; the smile casts no vote today.', when: 'None of the three phases qualifies.', lean: { gold: 0, eurusd: 0, usdjpy: 0, nq: 0, es: 0 } } };
+  var PH_T = { left: 0.13, trough: 0.5, right: 0.87, mid: 0.5 }, PH_Z = { left: [0, 0.3], trough: [0.3, 0.7], right: [0.7, 1] };
+
+  var st = { ev: 'next', rec: 'dir', open: null, phase: null };
+  try { var s0 = JSON.parse(localStorage.getItem('msMacroDesk') || '{}'); if (s0 && typeof s0 === 'object') { if (/^(next|past|news)$/.test(s0.ev)) st.ev = s0.ev; if (/^(dir|size|live)$/.test(s0.rec)) st.rec = s0.rec; if (AK.indexOf(s0.open) >= 0) st.open = s0.open; } } catch (e) {}
+  var save = function () { try { localStorage.setItem('msMacroDesk', JSON.stringify({ ev: st.ev, rec: st.rec, open: st.open })); } catch (e) {} };
+  var D = { f: null, ev: [], hist: [] };
+
+  var dayFmt = new Intl.DateTimeFormat(undefined, { weekday: 'short', day: 'numeric', month: 'short' });
+  var dayUtc = new Intl.DateTimeFormat('en-GB', { weekday: 'short', day: 'numeric', month: 'short', timeZone: 'UTC' });
+  var hm = new Intl.DateTimeFormat(undefined, { hour: '2-digit', minute: '2-digit' });
+  var hmU = new Intl.DateTimeFormat('en-GB', { hour: '2-digit', minute: '2-digit', timeZone: 'UTC', hourCycle: 'h23' });
+  var dayKey = function (d) { return d.getFullYear() + '-' + d.getMonth() + '-' + d.getDate(); };
+  function ago(iso) { var m = Math.round((Date.now() - Date.parse(iso)) / 60000); return !num(m) ? '' : m < 1 ? 'just now' : m < 60 ? m + ' min ago' : m < 48 * 60 ? Math.round(m / 60) + ' h ago' : Math.round(m / 1440) + ' days ago'; }
+  var px = function (k, v) { return num(v) ? v.toLocaleString('en-US', { minimumFractionDigits: DP[k], maximumFractionDigits: DP[k] }) : '—'; };
+  var arrow = function (d) { return d === 'up' || d > 0 ? '<span class="md-up" aria-label="up">▲</span>' : d === 'down' || d < 0 ? '<span class="md-dn" aria-label="down">▼</span>' : '<span class="md-mx" aria-label="no lean">–</span>'; };
+  var chev = '<svg class="md-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>';
+  var targetDay = function (f) { return dayUtc.format(new Date(Date.parse(f.target + 'T00:00:00Z'))); };
+  // no direction edge anywhere: no market beats its base rate with a Pesaran-Timmermann test above 1.96 and Brier skill > 0
+  var edgeOf = function (r) { return !!(r && r.n && r.edge > 0 && r.pt != null && r.pt > 1.96 && r.skillClim > 0); };
+
+  // ─── header ───
+  function renderHead(f) {
+    var age = (Date.now() - Date.parse(f.at)) / 60000, stale = age > 90;
+    $('ms-md-at').innerHTML = 'Playbook for <b>' + esc(targetDay(f)) + '</b> (UTC day, open to close) · built ' + esc(dayFmt.format(new Date(f.at))) + ', ' + esc(hm.format(new Date(f.at)));
+    var re = (f.scorecard && f.scorecard.replay) || {}, anyEdge = AK.some(function (k) { return edgeOf(re[k]); });
+    $('ms-md-pills').innerHTML = '<li class="md-pill ' + (stale ? 'warn' : 'ok') + '"><i></i>' + (stale ? 'Last run ' : 'Updated ') + esc(ago(f.at)) + '</li>'
+      + '<li class="md-pill">Paper only</li>' + (anyEdge ? '' : '<li class="md-pill warn">No direction edge</li>');
+    var rg = f.regime || {}, tags = String(rg.label || '').split(' · ').filter(Boolean);
+    $('ms-md-tags').innerHTML = tags.map(function (t, i) {
+      var cls = /stress|draining|inverted|carry|high/i.test(t) ? 'stress' : /rising|calm|growth/i.test(t) ? 'calm' : '';
+      return '<li class="md-tag ' + cls + '"><small>' + ['Dollar', 'Liquidity', 'Volatility'][i] + '</small>' + esc(t.replace(/^Dollar Smile /, '').replace(/^dollar liquidity /, '')) + '</li>';
     }).join('');
-    var g = (S.vol || {}).gold;
-    $('ms-mc-vol').textContent = (g && g.eventDays ? 'Move size: on the replay, Fed and payrolls days moved gold ' + g.eventAvgAbs + '% on average against ' + g.otherAvgAbs + '% on other days; typical-move error ' + g.maeModel + ' vs ' + g.maeNaive + ' for the naive 20-day average. ' : '')
-      + 'Live log: ' + (S.logged || 0) + ' forecasts, ' + (S.resolved || 0) + ' resolved. A PT test above 1.96 means the direction calls beat chance; a 53% hit rate needs about 1,100 days to tell from luck.';
-    $('ms-mc-brief').textContent = f.brief || '';
-    $('ms-mc-method').textContent = S.method || '';
-    var src = f.sources || {}, okN = Object.keys(src).filter(function (k) { return /^(ok|OANDA ok|FRED failed .*Cboe ok)/.test(src[k]); }).length;
-    $('ms-mc-src').textContent = 'Sources: ' + okN + ' of ' + Object.keys(src).length + ' fetched live. ' + Object.keys(src).filter(function (k) { return !/^(ok|OANDA ok)/.test(src[k]); }).map(function (k) { return k + ' ' + src[k]; }).join(' · ');
   }
+
+  // ─── next day ───
+  function modelRows(k, f) {
+    var v = ((f.scorecard || {}).vol || {})[k]; if (!v) return '';
+    var half = v.confirmation || v.full; if (!half || !half.models) return '';
+    var ms = Object.keys(half.models).filter(function (m) { return m !== 'cur'; });
+    var rel = function (r) { return r && num(r.mae) && num(r.maeNaive) && r.maeNaive > 0 ? (r.mae / r.maeNaive - 1) * 100 : null; };
+    var bar = function (d) { if (!num(d)) return ''; var w = clamp(Math.abs(d), 0, 10) * 5; return '<i class="' + (d < 0 ? 'better' : 'worse') + '" style="' + (d < 0 ? 'right:50%' : 'left:50%') + ';width:' + w.toFixed(1) + '%"></i>'; };
+    var fmt = function (d) { return num(d) ? (d > 0 ? '+' : d < 0 ? '−' : '') + Math.abs(d).toFixed(1) + '%' : '—'; };
+    var rows = '<div class="md-bar used"><span>naive</span><div class="md-dv"></div><span><b>0%</b></span><span><b>0%</b></span></div>' + ms.map(function (m) {
+      var a = rel(half.models[m].all), e = rel(half.models[m].event);
+      return '<div class="md-bar' + (m === v.used ? ' used' : '') + '"><span>' + esc(MODEL[m] || m) + (m === v.picked ? ' *' : '') + '</span><div class="md-dv" aria-hidden="true">' + bar(a) + '</div><span>' + fmt(a) + '</span><span>' + fmt(e) + '</span></div>';
+    }).join('');
+    return '<div class="md-bars" role="table" aria-label="Typical-move error against naive"><div class="md-bar hd" role="row"><span>Model</span><span>← better · worse →</span><span>All days</span><span>Events</span></div>' + rows + '</div>'
+      + '<p class="md-note">Error (MAE) against the naive 20-day average on the hold-out half' + (half.from ? ', ' + esc(half.from) + ' to ' + esc(half.to) : '') + ' (' + (half.n || '?') + ' days, ' + (half.eventDays || '?') + ' CPI / NFP / FOMC days).' + (v.picked ? ' * won the first half.' : '') + ' A model replaces naive only if it beats it on typical error (MAE) and on QLIKE, on all days and on event days, first on the first half of the replay and then again on this hold-out half.</p>';
+  }
+  function driverRows(k, f) {
+    var a = f.assets[k], hits = (((f.scorecard || {}).driverHit || {})[k]) || {}, ds = (a.drivers || []);
+    if (!ds.length) return '<p>No driver has data today.</p>';
+    var proven = ds.filter(function (d) { return hits[d.k] && hits[d.k].proven; }).length;
+    return '<h4>Drivers today <span class="md-mx">· ' + (proven ? proven + ' of ' + ds.length + ' proven on the replay' : 'none proven on the replay') + '</span></h4><ul class="md-drv">' + ds.map(function (d) {
+      var h = hits[d.k];
+      return '<li><span class="ar">' + arrow(d.dir) + '</span><span class="nm">' + esc(d.name.replace(/\s*\(.*\)$/, '')) + '<small>' + esc(d.detail) + '</small></span>'
+        + (h ? '<span class="hit' + (h.proven ? ' pr' : '') + '" title="Replay hit rate and t-statistic of this driver alone">' + pct0(h.hit) + ' · t ' + (num(h.t) ? h.t.toFixed(1) : '—') + '</span>' : '<span class="hit"></span>') + '</li>';
+    }).join('') + '</ul>';
+  }
+  function renderNext(f) {
+    $('ms-md-next-for').textContent = targetDay(f);
+    $('ms-md-next-lede').textContent = 'How far each market typically travels from open to close. Tap a market for the model behind the number, its drivers and the evidence.';
+    var ed = $('ms-md-evday'); ed.hidden = !f.targetEvent; if (f.targetEvent) ed.innerHTML = '<b>Event day:</b> ' + esc(f.targetEvent) + '. Expect a bigger move than on an ordinary day.';
+    var vol = (f.scorecard || {}).vol || {};
+    $('ms-md-mv').innerHTML = AK.map(function (k) {
+      var a = f.assets[k]; if (!a) return '';
+      if (a.pUp == null && a.expMovePct == null) return '<li><div class="md-mv-b" style="cursor:default"><span class="md-mv-nm"><b>' + esc(SHORT[k]) + '</b><small>no price data</small></span></div></li>';
+      var exp = a.expMovePct, r = num(a.volRatio) ? a.volRatio : null, busy = r != null && r > 1.1, calm = r != null && r < 0.9;
+      var pos = function (x) { return clamp((x - 0.5) / 1.5, 0, 1) * 100; }, p1 = pos(1), pr = r != null ? pos(r) : null;
+      var lo = num(a.last) && num(exp) ? a.last * (1 - exp / 100) : null, hi = num(a.last) && num(exp) ? a.last * (1 + exp / 100) : null;
+      var base = a.fit ? a.fit.base : null, tilt = num(a.pUp) && num(base) ? Math.round((a.pUp - base) * 100) : null;
+      var open = st.open === k, v = vol[k] || {}, full = v.full || {};
+      var x = '<div class="md-x" id="ms-md-x-' + k + '"' + (open ? '' : ' hidden') + '>'
+        + '<div><h4>Why ' + esc(MODEL[a.volModel] || a.volModel || 'this model') + '</h4><p>' + esc(a.expBasis || '') + (v.reason ? '. Tried ' + (v.tried || 'several') + ' models: ' + esc(v.reason) + '.' : '') + '</p>' + modelRows(k, f) + '</div>'
+        + (num(full.eventAvgAbs) && num(full.otherAvgAbs) ? '<p>On CPI / NFP / FOMC days ' + esc(SHORT[k]) + ' moved <b>' + full.eventAvgAbs.toFixed(2) + '%</b> on average, against <b>' + full.otherAvgAbs.toFixed(2) + '%</b> on other days (' + full.eventDays + ' event days since ' + esc(full.from) + ').</p>' : '')
+        + '<div>' + driverRows(k, f) + '</div>'
+        + '<p>Direction: <b>' + pct0(a.pUp) + ' up</b> against a base rate of ' + pct0(base) + (tilt ? ' (macro tilt ' + (tilt > 0 ? '+' : '−') + Math.abs(tilt) + ' pt)' : ' (no macro tilt)') + (a.fit && a.fit.b === 0 ? '. The replay finds no edge in its drivers, so the odds are the base rate.' : '. Context only: the replay shows no proven edge.') + '</p>'
+        + '</div>';
+      return '<li><button type="button" class="md-mv-b" data-k="' + k + '" aria-expanded="' + open + '" aria-controls="ms-md-x-' + k + '">'
+        + '<span class="md-mv-nm"><b>' + esc(SHORT[k]) + '</b><small>' + px(k, a.last) + '</small></span>'
+        + '<span class="md-mv-pct"><b>±' + (num(exp) ? exp.toFixed(2) : '—') + '%</b><small>' + (num(exp) && num(a.last) ? '±' + px(k, a.last * exp / 100) : '') + '</small></span>' + chev
+        + (pr != null ? '<span class="md-meter"><span class="md-trk" aria-hidden="true"><span class="fill' + (busy ? ' busy' : '') + '" style="left:' + Math.min(p1, pr).toFixed(1) + '%;width:' + Math.abs(pr - p1).toFixed(1) + '%"></span><span class="tick" style="left:' + p1.toFixed(1) + '%"></span><span class="dot' + (busy ? ' busy' : '') + '" style="left:' + pr.toFixed(1) + '%"></span></span>'
+          + '<span>Recent moves <b>' + r.toFixed(2) + '×</b> the 1-year norm · ' + (busy ? 'busier than usual' : calm ? 'calmer than usual' : 'about usual') + '</span></span>' : '')
+        + '<span class="md-chips">' + (lo != null ? '<span class="md-chip">Range <b>' + px(k, lo) + ' – ' + px(k, hi) + '</b></span>' : '')
+        + '<span class="md-chip">' + esc(MODEL[a.volModel] || a.volModel || '?') + (num(a.naiveMovePct) && a.naiveMovePct !== exp ? ' · naive ±' + a.naiveMovePct.toFixed(2) + '%' : '') + '</span>'
+        + '<span class="md-chip dir" title="Direction odds: context, not a signal">' + pct0(a.pUp) + ' up · base ' + pct0(base) + '</span></span>'
+        + '</button>' + x + '</li>';
+    }).join('');
+    $('ms-md-dxy').textContent = f.dxy ? 'DXY: ' + pct0(f.dxy.pUp) + ' up, the ' + (f.dxy.note || 'mirror of EUR/USD') + '. Range = last price ± the expected move; the day is measured from its open.' : '';
+  }
+
+  // ─── regime: the smile and the gauges ───
+  var bez = function (t) { var u = 1 - t, P = [[22, 18], [92, 176], [228, 176], [298, 18]]; return [u * u * u * P[0][0] + 3 * u * u * t * P[1][0] + 3 * u * t * t * P[2][0] + t * t * t * P[3][0], u * u * u * P[0][1] + 3 * u * u * t * P[1][1] + 3 * u * t * t * P[2][1] + t * t * t * P[3][1]]; };
+  var seg = function (a, b) { var s = ''; for (var i = 0; i <= 30; i++) { var p = bez(a + (b - a) * i / 30); s += (i ? 'L' : 'M') + p[0].toFixed(1) + ' ' + p[1].toFixed(1); } return s; };
+  function renderSmile(f) {
+    var cur = (f.regime || {}).smile || null, sel = st.phase || cur || 'left', svg = $('ms-md-smile');
+    var g = '<title id="ms-md-smile-t">Dollar Smile: where the dollar cycle is now</title>'
+      + '<line class="ax" x1="12" y1="10" x2="12" y2="138"/><line class="ax" x1="12" y1="138" x2="308" y2="138"/>'
+      + '<text x="18" y="10">Dollar stronger</text>'
+      + '<path class="crv" d="' + seg(0, 1) + '"/>';
+    if (PH_Z[sel] && sel !== cur) g += '<path class="crv-sel" d="' + seg(PH_Z[sel][0], PH_Z[sel][1]) + '"/>';
+    if (PH_Z[cur]) g += '<path class="crv-on" d="' + seg(PH_Z[cur][0], PH_Z[cur][1]) + '"/>';
+    [['left', 0.1, 'Stress', 'USD bid'], ['trough', 0.5, 'Global growth', 'USD offered'], ['right', 0.9, 'US outperforms', 'USD bid']].forEach(function (z) {
+      var x = clamp(bez(z[1])[0], 44, 276); g += '<text x="' + x.toFixed(1) + '" y="151" text-anchor="middle" class="' + (z[0] === cur ? 'on' : '') + '">' + z[2] + '</text>';
+    });
+    if (cur && PH_T[cur] != null) {
+      var p = bez(PH_T[cur]), y = cur === 'mid' ? p[1] - 26 : p[1], lx = clamp(p[0] + (cur === 'left' ? 16 : cur === 'right' ? -16 : 0), 30, 290);
+      g += '<circle class="halo" cx="' + p[0].toFixed(1) + '" cy="' + y.toFixed(1) + '" r="13"/><circle class="mk' + (cur === 'mid' ? ' mid' : '') + '" cx="' + p[0].toFixed(1) + '" cy="' + y.toFixed(1) + '" r="7"/>'
+        + '<text class="now-l" x="' + lx.toFixed(1) + '" y="' + (y + 4).toFixed(1) + '" text-anchor="' + (cur === 'left' ? 'start' : cur === 'right' ? 'end' : 'middle') + '" dy="' + (cur === 'mid' ? -16 : 0) + '">' + (cur === 'left' || cur === 'right' ? ' ' : '') + 'NOW</text>';
+    }
+    svg.innerHTML = g;
+    $('ms-md-smile-cap').textContent = cur ? 'The strategist places the dollar on the ' + PH[cur].name + ' of the Dollar Smile.' : 'Phase unknown today.';
+    var keys = ['left', 'trough', 'right'].concat(cur === 'mid' ? ['mid'] : []);
+    $('ms-md-phase').innerHTML = keys.map(function (k) { return '<button type="button" role="tab" data-ph="' + k + '" aria-selected="' + (k === sel) + '" tabindex="' + (k === sel ? 0 : -1) + '">' + (k === cur ? '<span class="now" aria-hidden="true"></span>' : '') + PH[k].tab + (k === cur ? '<span class="md-sr"> (now)</span>' : '') + '</button>'; }).join('');
+    var P = PH[sel] || PH.mid, sm = (f.drivers || []).filter(function (d) { return d.k === 'smile'; })[0], lean = sel === cur && sm && sm.perAsset ? sm.perAsset : P.lean;
+    var rg = f.regime || {}, hy = (f.drivers || []).filter(function (d) { return d.k === 'hy'; })[0];
+    $('ms-md-phase-x').innerHTML = '<p><b>' + esc(P.name) + (sel === cur ? ' · now' : '') + '.</b> ' + esc(P.what) + '</p>'
+      + '<p><b>Triggers:</b> ' + esc(P.when) + (sel === cur ? ' Readings now: VIX ' + (num(rg.vix) ? rg.vix.toFixed(1) : '—') + ' · DXY ' + sgn(rg.dxy5d) + ' in 5 sessions · real yield ' + (num((rg.realYield || {}).chg) ? sgn(rg.realYield.chg * 100, 0) + ' bp a week' : '—') + ' · SOFR − EFFR ' + (num(rg.sofrEffrBps) ? rg.sofrEffrBps + ' bp' : '—') + (hy ? ' · HY ' + esc(hy.detail) : '') + '.' : '') + '</p>'
+      + '<div class="md-lean-h">How this phase leans each market (one driver of several, context only)</div>'
+      + '<div class="md-lean">' + AK.map(function (k) { var v = lean[k]; return '<div><b>' + arrow(v) + '</b>' + SHORT[k] + '</div>'; }).join('') + '</div>';
+  }
+  function renderGauges(f) {
+    var rg = f.regime || {}, out = [];
+    if (num(rg.vix)) {
+      var lo = 10, hi = 45, at = function (v) { return clamp((v - lo) / (hi - lo), 0, 1) * 100; }, word = rg.vix >= 28 ? 'high stress' : rg.vix >= 22 ? 'elevated' : rg.vix < 15 ? 'calm' : 'normal';
+      var band = [[lo, 15, 'var(--buy)', 18], [15, 22, 'var(--ink-faint)', 22], [22, 28, 'var(--md-warn)', 30], [28, hi, 'var(--sell)', 34]].map(function (b) { return '<i style="width:' + (at(b[1]) - at(b[0])).toFixed(1) + '%;background:color-mix(in srgb, ' + b[2] + ' ' + b[3] + '%, transparent)"></i>'; }).join('');
+      out.push('<div class="wide"><dt>VIX · stock-market fear gauge</dt><dd><b>' + rg.vix.toFixed(1) + '<em class="' + (rg.vix >= 22 ? 'md-dn' : 'md-up') + '">' + word + '</em></b>'
+        + '<div class="md-vix-w" aria-hidden="true"><div class="md-vix">' + band + '</div><span class="dot" style="left:' + at(rg.vix).toFixed(1) + '%"></span><div class="md-vix-l">' + [10, 15, 22, 28, 45].map(function (v) { return '<span style="left:' + at(v).toFixed(1) + '%">' + v + '</span>'; }).join('') + '</div></div>'
+        + (num(rg.vixTermRatio) ? '<small>VIX / VIX3M ' + rg.vixTermRatio.toFixed(2) + ': ' + (rg.vixTermRatio > 1 ? 'inverted, near-term fear above the 3-month (stress; stocks often bounce the next day)' : 'normal upward slope') + '</small>' : '') + '</dd></div>');
+    }
+    var L = rg.liquidity || {};
+    if (num(L.level)) out.push('<div><dt>Dollar liquidity</dt><dd><b>$' + (L.level / 1000).toFixed(2) + 'tn</b><small>' + (num(L.chg) ? sgn(L.chg, 0).replace(/^([+−])/, '$1$') + 'bn in 4 weeks · ' + (L.chg <= -50 ? 'draining' : L.chg >= 50 ? 'rising' : 'flat') : '') + '</small></dd></div>');
+    var Y = rg.realYield || {};
+    if (num(Y.level)) out.push('<div><dt>10Y real yield (TIPS)</dt><dd><b>' + Y.level.toFixed(2) + '%</b><small>' + (num(Y.chg) ? sgn(Y.chg * 100, 0) + ' bp in a week · ' : '') + (Y.bias === 'bull' ? 'tailwind for gold' : Y.bias === 'bear' ? 'headwind for gold' : 'neutral for gold') + '</small></dd></div>');
+    if (num(rg.dxyProxy)) out.push('<div><dt>DXY</dt><dd><b>' + rg.dxyProxy.toFixed(2) + '</b><small>' + (num(rg.dxy5d) ? sgn(rg.dxy5d) + ' in 5 sessions' : '') + (num(rg.broadUsd20dPct) ? ' · broad dollar ' + sgn(rg.broadUsd20dPct, 1) + '% in 20 days' : '') + '</small></dd></div>');
+    if (num(rg.usEu2ySpread)) out.push('<div><dt>US − euro 2Y gap</dt><dd><b>' + rg.usEu2ySpread.toFixed(2) + ' pts</b><small>US ' + (num(rg.us2y) ? rg.us2y.toFixed(2) + '%' : '—') + ' · euro ' + (num(rg.eu2y) ? rg.eu2y.toFixed(2) + '%' : '—') + '</small></dd></div>');
+    if (num(rg.curve10y3m)) out.push('<div><dt>Yield curve 10Y − 3M</dt><dd><b>' + sgn(rg.curve10y3m) + ' pts</b><small>' + (rg.curve10y3m < 0 ? 'inverted' : 'upward sloping') + '</small></dd></div>');
+    if (num(rg.sofrEffrBps)) out.push('<div><dt>Funding · SOFR − EFFR</dt><dd><b>' + rg.sofrEffrBps + ' bp</b><small>' + (rg.sofrEffrBps >= 15 ? 'funding stress' : 'calm; stress from 15 bp') + '</small></dd></div>');
+    if (rg.carryUnwind) out.push('<div class="wide"><dt>Yen carry</dt><dd><b class="md-dn">Unwind risk</b><small>Risk assets can be sold together for a day or two.</small></dd></div>');
+    $('ms-md-gauges').innerHTML = out.join('');
+  }
+
+  // ─── calendar ───
+  function evItems(f) {
+    var now = Date.now(), pb = (f.playbook || []).map(function (e) { return { at: e.at, country: e.country, title: e.title, consensus: e.consensus, previous: e.previous, actual: e.actual, outcome: e.outcome, pb: e }; });
+    var seen = {}; pb.forEach(function (e) { seen[e.country + '|' + e.title + '|' + e.at.slice(0, 10)] = 1; });
+    var log = (D.ev || []).map(function (e) { var p = String(e.key || '').split('|'); return { at: e.at, country: p[0], title: p.slice(1).join('|'), consensus: e.forecast, previous: e.previous, actual: e.actual }; })
+      .filter(function (e) { return e.at && !seen[e.country + '|' + e.title + '|' + e.at.slice(0, 10)]; });
+    var all = pb.concat(log).filter(function (e) { return num(Date.parse(e.at)); });
+    var next = all.filter(function (e) { return Date.parse(e.at) >= now - 3 * 3600e3 && !e.actual; }).sort(function (a, b) { return Date.parse(a.at) - Date.parse(b.at); });
+    var past = all.filter(function (e) { return next.indexOf(e) < 0 && Date.parse(e.at) >= now - 14 * 86400e3; }).sort(function (a, b) { return Date.parse(b.at) - Date.parse(a.at); });
+    return { next: next, past: past };
+  }
+  function evRow(e, i) {
+    var d = new Date(e.at), pb = e.pb, id = 'ms-md-e-' + i;
+    var notes = (e.consensus ? '<span>consensus <b>' + esc(e.consensus) + '</b></span>' : '') + (e.previous ? '<span>previous <b>' + esc(e.previous) + '</b></span>' : '')
+      + (e.actual ? '<span>actual <b>' + esc(e.actual) + '</b>' + (e.outcome ? ' · came in ' + esc(e.outcome) : '') + '</span>' : '');
+    var head = '<span class="md-e-t">' + esc(hm.format(d)) + '<small>' + esc(hmU.format(d)) + ' UTC</small></span><span class="md-e-ttl"><span class="md-cc' + (e.country === 'USD' ? ' usd' : '') + '">' + esc(e.country) + '</span>' + esc(e.title) + '<span class="md-e-n">' + notes + '</span></span>';
+    if (!pb) return '<div class="md-e"><div class="md-e-b">' + head + '</div></div>';
+    var open = false, sc = (pb.scenarios || []).map(function (s) {
+      var mv = s.name === 'in line' ? '<small>little; the prevailing trend resumes</small>' : AK.map(function (k) { return '<span>' + arrow(s.moves[k]) + ' ' + SHORT[k] + '</span>'; }).join('');
+      return '<div><b>' + esc(s.name) + '</b><small>' + esc(s.when) + (s.odds != null ? ' · ~' + pct0(s.odds) : '') + '</small>' + mv + '</div>';
+    }).join('');
+    var mv = pb.expMovePct ? AK.map(function (k) { return SHORT[k] + ' ±' + (num(pb.expMovePct[k]) ? pb.expMovePct[k].toFixed(2) : '?') + '%'; }).join(' · ') : '';
+    return '<div class="md-e"><button type="button" class="md-e-b" aria-expanded="' + open + '" aria-controls="' + id + '">' + head + chev.replace('md-chev', 'md-chev md-e-chev') + '</button>'
+      + '<div class="md-e-x" id="' + id + '" hidden><div>' + esc(pb.type || '') + (pb.type ? ': ' : '') + esc(pb.rule || '') + '</div><div class="md-sc">' + sc + '</div>'
+      + (mv ? '<div>Expected move that day: ' + esc(mv) + '</div>' : '') + (pb.note ? '<div>' + esc(pb.note) + '</div>' : '') + '<div class="md-mx">Odds basis: ' + esc(pb.oddsBasis || 'prior') + '</div></div></div>';
+  }
+  function renderEvents(f) {
+    var it = evItems(f), news = (f.news || []).slice(0, 12), src = f.sources || {};
+    $('ms-md-ev-n-next').textContent = it.next.length || ''; $('ms-md-ev-n-past').textContent = it.past.length || '';
+    var soon = it.next.filter(function (e) { return Date.parse(e.at) - Date.now() < 48 * 3600e3; }).length, nb = $('ms-cn-n-macro'); if (nb) nb.textContent = soon || '';
+    document.querySelectorAll('#ms-md-ev-seg [data-v]').forEach(function (b) { var on = b.dataset.v === st.ev; b.setAttribute('aria-selected', String(on)); b.tabIndex = on ? 0 : -1; });
+    var box = $('ms-md-ev-list'), html = '';
+    if (st.ev === 'news') {
+      html = news.length ? news.map(function (n) {
+        return '<a class="md-nw" href="' + esc(/^https?:\/\//.test(n.link) ? n.link : '#') + '" target="_blank" rel="noopener noreferrer"><span class="md-cc">' + esc(n.src) + '</span><span>' + esc(n.title) + '<small>' + esc(dayFmt.format(new Date(n.at))) + ' · ' + esc(ago(n.at)) + (n.policy ? ' · policy' : '') + '</small></span></a>';
+      }).join('') : '<p class="md-empty">No central-bank headlines in the last run.</p>';
+    } else {
+      var L = it[st.ev], last = '';
+      if (!L.length) {
+        var nw = src['calendar:nextweek'] && !/^ok/.test(src['calendar:nextweek']);
+        html = st.ev === 'next' ? '<div class="md-empty"><b>Nothing high-impact in the next 5 days on the calendar the strategist can read.</b>' + (nw ? 'Next week\'s calendar is not published yet; it usually appears over the weekend, and the desk picks it up on the next run (about every 25 minutes).' : 'The strategist checks the calendar about every 25 minutes.') + '</div>'
+          : '<p class="md-empty">No high-impact releases logged in the last 14 days.</p>';
+      } else html = L.map(function (e, i) {
+        var d = new Date(e.at), k = dayKey(d), h = '';
+        if (k !== last) { last = k; var dd = Math.round((new Date(d.getFullYear(), d.getMonth(), d.getDate()) - new Date(new Date().getFullYear(), new Date().getMonth(), new Date().getDate())) / 864e5); h = '<div class="md-day">' + esc(dayFmt.format(d)) + '<small>' + (dd === 0 ? 'today' : dd === 1 ? 'tomorrow' : dd === -1 ? 'yesterday' : dd < 0 ? -dd + ' days ago' : 'in ' + dd + ' days') + '</small></div>'; }
+        return h + evRow(e, st.ev + i);
+      }).join('') + (st.ev === 'past' && L.some(function (e) { return !e.actual; }) ? '<p class="md-note">Releases without an actual: the free calendar feed did not carry the print. The strategist logs consensus and actual to set its hot / cool cut-offs once 8 surprises per release are known.</p>' : '');
+    }
+    box.innerHTML = html; box.setAttribute('aria-labelledby', 'ms-md-ev-t-' + st.ev);
+  }
+
+  // ─── track record ───
+  function renderRecord(f) {
+    var S = f.scorecard || {}, re = S.replay || {}, vol = S.vol || {};
+    var ns = AK.map(function (k) { return (re[k] || {}).n || 0; }), nMax = Math.max.apply(null, ns);
+    var hitsTxt = AK.filter(function (k) { return re[k] && re[k].n; }).map(function (k) { return SHORT[k] + ' ' + pct0(re[k].hit) + ' vs ' + pct0(re[k].base); }).join(', ');
+    var bestPt = Math.max.apply(null, AK.map(function (k) { return re[k] && num(re[k].pt) ? re[k].pt : -9; }));
+    var edgeK = AK.filter(function (k) { return edgeOf(re[k]); });
+    var lifts = AK.map(function (k) { var x = (vol[k] || {}).full || {}; return num(x.eventAvgAbs) && x.otherAvgAbs > 0 ? x.eventAvgAbs / x.otherAvgAbs - 1 : null; }).filter(num);
+    var lift = lifts.length ? Math.round(lifts.reduce(function (a, b) { return a + b; }, 0) / lifts.length * 100) : null;
+    $('ms-md-verdict').innerHTML = (edgeK.length ? '<b>Possible direction edge in ' + edgeK.map(function (k) { return SHORT[k]; }).join(', ') + '</b> (Pesaran-Timmermann above 1.96 and a better Brier than the base rate). Paper only until the live log confirms it. '
+      : '<b>No direction edge.</b> Over about ' + nMax + ' replay days the up / down calls hit the base rate in every market (' + esc(hitsTxt) + '); the best Pesaran-Timmermann score is ' + (bestPt > -9 ? bestPt.toFixed(2) : '—') + ', and 1.96 is needed. Read the odds as context, never as a signal. ')
+      + (lift != null ? '<b>Move size carries information:</b> CPI / NFP / FOMC days moved ' + (lift >= 0 ? lift + '% more' : -lift + '% less') + ' than other days on average.' : '');
+    document.querySelectorAll('#ms-md-rec-seg [data-v]').forEach(function (b) { var on = b.dataset.v === st.rec; b.setAttribute('aria-selected', String(on)); b.tabIndex = on ? 0 : -1; });
+    var H = Array.isArray(D.hist) ? D.hist : [], res = H.filter(function (h) { return h && h.y != null; }), pend = H.filter(function (h) { return h && h.y == null && !h.void; });
+    $('ms-md-rec-n-live').textContent = res.length || '';
+    var out = '';
+    if (st.rec === 'dir') {
+      var lo = 0.40, hi = 0.65, at = function (p) { return clamp((p - lo) / (hi - lo), 0, 1) * 100; };
+      out = AK.map(function (k) {
+        var r = re[k]; if (!r || !r.n) return '<div class="md-dp"><b>' + SHORT[k] + '</b><div class="md-plot"></div><span>no replay</span></div>';
+        var se = Math.sqrt(r.base * (1 - r.base) / r.n) * 1.96, e = Math.round((r.hit - r.base) * 1000) / 10;
+        return '<div class="md-dp"><b>' + SHORT[k] + '</b><div class="md-plot" role="img" aria-label="' + SHORT[k] + ': hit ' + pct0(r.hit) + ', base rate ' + pct0(r.base) + '"><span class="band" style="left:' + at(r.base - se).toFixed(1) + '%;width:' + (at(r.base + se) - at(r.base - se)).toFixed(1) + '%"></span><span class="base" style="left:' + at(r.base).toFixed(1) + '%"></span><span class="hit" style="left:' + at(r.hit).toFixed(1) + '%"></span></div>'
+          + '<span><b>' + pct0(r.hit) + '</b> vs ' + pct0(r.base) + '<small>' + (e > 0 ? '+' : e < 0 ? '−' : '±') + Math.abs(e).toFixed(1) + ' pt · PT ' + (num(r.pt) ? r.pt.toFixed(2) : '—') + '</small></span></div>';
+      }).join('')
+        + '<div class="md-axis" aria-hidden="true">' + [0.45, 0.5, 0.55, 0.6].map(function (p) { return '<span style="left:' + at(p) + '%">' + Math.round(p * 100) + '%</span>'; }).join('') + '</div>'
+        + '<div class="md-legend"><span><i class="l-hit"></i>strategist\'s hit rate</span><span><i class="l-base"></i>base rate (always call the common side)</span><span><i class="l-band"></i>range luck alone produces (95%)</span></div>'
+        + '<p class="md-note">Walk-forward replay: each day uses only data published before it. A dot inside the grey band cannot be told from luck; a 53% hit rate needs about 1,100 forecasts to prove itself. Brier: ' + AK.filter(function (k) { return re[k] && num(re[k].brier); }).map(function (k) { return SHORT[k] + ' ' + re[k].brier.toFixed(4); }).join(' · ') + ' (coin flip 0.25).</p>';
+    } else if (st.rec === 'size') {
+      var mx = Math.max.apply(null, AK.map(function (k) { var x = (vol[k] || {}).full || {}; return Math.max(x.eventAvgAbs || 0, x.otherAvgAbs || 0); })) || 1;
+      out = AK.map(function (k) {
+        var v = vol[k] || {}, x = v.full || {}; if (!num(x.eventAvgAbs)) return '';
+        var l = x.otherAvgAbs > 0 ? Math.round((x.eventAvgAbs / x.otherAvgAbs - 1) * 100) : null, nv = (((x.models || {}).har || (x.models || {}).ewma || {}).all || {}).maeNaive;
+        return '<div class="md-sz"><b>' + SHORT[k] + '</b><div class="br"><i style="width:' + (x.otherAvgAbs / mx * 100).toFixed(1) + '%"></i><span>' + x.otherAvgAbs.toFixed(2) + '%</span></div>'
+          + '<span>' + (l != null ? (l >= 0 ? '+' : '−') + Math.abs(l) + '%' : '—') + '<small>' + (num(nv) ? 'miss ±' + nv.toFixed(2) : '') + '</small></span>'
+          + '<div class="br ev"><i style="width:' + (x.eventAvgAbs / mx * 100).toFixed(1) + '%"></i><span>' + x.eventAvgAbs.toFixed(2) + '%</span></div></div>';
+      }).join('')
+        + '<div class="md-legend"><span><i class="l-band" style="background:var(--md-ls)"></i>ordinary day, average move</span><span><i class="l-band" style="background:var(--md-warn)"></i>CPI / NFP / FOMC day</span></div>'
+        + '<p class="md-note">Right: how much bigger event days are, and the naive forecast\'s typical miss (MAE, % points) over all replay days. <b>Forecast in use:</b> ' + (AK.every(function (k) { return (vol[k] || {}).used === 'naive'; }) ? 'the naive 20-day average in all five markets; no model tried beat it on both halves of the replay.' : AK.map(function (k) { return SHORT[k] + ' ' + esc(MODEL[(vol[k] || {}).used] || (vol[k] || {}).used || '?'); }).join(' · ') + '.') + '</p>';
+    } else {
+      var lv = S.live || {}, any = AK.some(function (k) { return lv[k] && lv[k].n; });
+      if (!res.length) {
+        var t0 = Date.parse(f.target + 'T00:00:00Z') - 3 * 3600e3;
+        out = '<div class="md-empty"><b>Nothing scored yet.</b>' + (pend.length ? pend.length + ' forecast' + (pend.length === 1 ? '' : 's') + ' logged and waiting for the day to close. ' : 'The live log writes one forecast per market from 21:00 UTC before each weekday (' + esc(dayFmt.format(new Date(t0))) + ', ' + esc(hm.format(new Date(t0))) + ' your time for ' + esc(targetDay(f)) + '). ') + 'Each is scored at that day\'s close and never rewritten, so this is the honest out-of-sample record.</div>';
+      } else {
+        out = (any ? AK.map(function (k) { var l = lv[k]; if (!l || !l.n) return ''; return '<div class="md-live-row sum"><b>' + SHORT[k] + '</b><span>' + l.n + ' days · hit <b>' + pct0(l.hit) + '</b> vs base ' + pct0(l.base) + (num(l.brier) ? ' · Brier ' + l.brier.toFixed(3) : '') + (num(l.volMaeModel) ? ' · move miss ' + l.volMaeModel.toFixed(2) + (num(l.volMaeNaive) && l.volMaeNaive !== l.volMaeModel ? ' (naive ' + l.volMaeNaive.toFixed(2) + ')' : '') : '') + '</span></div>'; }).join('') : '')
+          + (function () {
+            var ord = res.slice().sort(function (a, b) { return a.target < b.target ? 1 : a.target > b.target ? -1 : AK.indexOf(a.asset) - AK.indexOf(b.asset); }).slice(0, 25), last = '';
+            return ord.map(function (h) {
+              var hd = h.target !== last ? '<div class="md-day" style="margin-top:12px">' + esc(dayUtc.format(new Date(Date.parse(h.target + 'T00:00:00Z')))) + '</div>' : ''; last = h.target;
+              return hd + '<div class="md-live-row"><b>' + esc(SHORT[h.asset] || h.asset) + '</b><span style="white-space:nowrap" title="P(up) → what the day did">' + pct0(h.p) + ' → ' + arrow(h.y ? 'up' : 'down') + ' ' + (num(h.ret) ? sgn(h.ret) + '%' : '') + '</span><span>' + (h.hit ? '<span class="ok">hit</span>' : '<span class="no">miss</span>') + (num(h.abs) && num(h.expAbs) ? '<small>moved ' + h.abs.toFixed(2) + ' vs ±' + h.expAbs.toFixed(2) + '</small>' : '') + '</span></div>';
+            }).join('');
+          })() + (pend.length ? '<p class="md-note">' + pend.length + ' more waiting for their close.</p>' : '');
+      }
+    }
+    var body = $('ms-md-rec-body'); body.innerHTML = out; body.setAttribute('aria-label', { dir: 'Direction', size: 'Move size', live: 'Live log' }[st.rec]);
+  }
+
+  function renderMore(f) {
+    var S = f.scorecard || {}, src = f.sources || {}, ks = Object.keys(src), bad = ks.filter(function (k) { return !/^(ok|OANDA ok)/.test(src[k]); });
+    $('ms-md-brief').textContent = f.brief || '';
+    $('ms-md-method').textContent = S.method || '';
+    $('ms-md-volm').textContent = S.volMethod || '';
+    $('ms-md-src').textContent = 'Sources: ' + (ks.length - bad.length) + ' of ' + ks.length + ' fetched live on the last run.' + (bad.length ? ' Not live: ' + bad.map(function (k) { return k + ' ' + src[k]; }).join(' · ') + '.' : '');
+  }
+  function render() {
+    var f = D.f; if (!f || !f.assets) return;
+    var parts = [renderHead, renderNext, renderSmile, renderGauges, renderEvents, renderRecord, renderMore];
+    parts.forEach(function (fn) { try { fn(f); } catch (e) { if (window.console) console.warn('macro desk: ' + (fn.name || 'part') + ' failed', e); } });
+  }
+
+  // ─── interaction ───
+  pane.addEventListener('click', function (ev) {
+    var b = ev.target.closest('.md-mv-b[data-k]');
+    if (b) { var k = b.dataset.k, x = $('ms-md-x-' + k), open = b.getAttribute('aria-expanded') !== 'true';
+      pane.querySelectorAll('.md-mv-b[aria-expanded="true"]').forEach(function (o) { if (o !== b) { o.setAttribute('aria-expanded', 'false'); var ox = $(o.getAttribute('aria-controls')); if (ox) ox.hidden = true; } });
+      b.setAttribute('aria-expanded', String(open)); if (x) x.hidden = !open; st.open = open ? k : null; save(); return; }
+    var e = ev.target.closest('button.md-e-b');
+    if (e) { var ex = $(e.getAttribute('aria-controls')), o2 = e.getAttribute('aria-expanded') !== 'true'; e.setAttribute('aria-expanded', String(o2)); if (ex) ex.hidden = !o2; return; }
+    var t = ev.target.closest('#ms-md-ev-seg [data-v]'); if (t) { st.ev = t.dataset.v; save(); renderEvents(D.f); return; }
+    var r = ev.target.closest('#ms-md-rec-seg [data-v]'); if (r) { st.rec = r.dataset.v; save(); renderRecord(D.f); return; }
+    var p = ev.target.closest('#ms-md-phase [data-ph]'); if (p) { st.phase = p.dataset.ph; renderSmile(D.f); var nb = pane.querySelector('#ms-md-phase [data-ph="' + st.phase + '"]'); if (nb) nb.focus(); }
+  });
+  pane.addEventListener('keydown', function (ev) {   // arrow keys move along each segmented control (tab pattern)
+    var g = ev.target.closest('.md-seg'); if (!g || ['ArrowLeft', 'ArrowRight', 'Home', 'End'].indexOf(ev.key) < 0) return;
+    var bs = Array.prototype.slice.call(g.querySelectorAll('button')), i = bs.indexOf(document.activeElement); if (i < 0) return;
+    var j = ev.key === 'Home' ? 0 : ev.key === 'End' ? bs.length - 1 : (i + (ev.key === 'ArrowRight' ? 1 : -1) + bs.length) % bs.length;
+    ev.preventDefault(); bs[j].click(); var nb = g.querySelectorAll('button')[j]; if (nb) nb.focus();
+  });
+
+  // ─── data ───
+  var get = function (p) { return fetch((window.MS_CDATA || '') + p + '?v=' + Math.floor(Date.now() / 300000), { cache: 'no-store' }).then(function (r) { return r.ok ? r.json() : null; }).catch(function () { return null; }); };
   function load() {
-    fetch((window.MS_CDATA || '') + 'macro/forecast.json?v=' + Math.floor(Date.now() / 300000), { cache: 'no-store' })
-      .then(function (r) { return r.ok ? r.json() : null; })
-      .then(function (f) { if (f && f.assets) render(f); else $('ms-mc-regime').textContent = 'No macro forecast yet: the strategist writes one every ~25 minutes once the council loop runs it.'; })
-      .catch(function () { $('ms-mc-regime').textContent = 'Could not load the macro forecast.'; });
+    Promise.all([get('macro/forecast.json'), get('macro/events.json'), get('macro/history.json')]).then(function (x) {
+      if (!x[0] || !x[0].assets) { if (!D.f) $('ms-md-at').textContent = x[0] === null ? 'Could not load the Macro strategist\'s forecast. It is written about every 25 minutes once the council loop runs it.' : 'No macro forecast yet.'; return; }
+      D.f = x[0]; D.ev = Array.isArray(x[1]) ? x[1] : []; D.hist = Array.isArray(x[2]) ? x[2] : [];
+      render();
+    });
   }
   load(); setInterval(load, 10 * 60e3);
+  setInterval(function () { if (D.f && !pane.hidden) { try { renderHead(D.f); } catch (e) {} } }, 60e3);   // keep "updated … ago" honest
 })();
 </script>
 <style>
