@@ -5962,11 +5962,11 @@ function msNextSetup(bars, A) {
     if (!document.getElementById('v-council')) return;
     const bust = Math.floor(Date.now() / 120000);
     const get = (f, json) => fetch(`${CDATA}${f}?v=${bust}`, { cache: 'no-store' }).then((r) => r.ok ? (json ? r.json() : r.text()) : null).catch(() => null);
-    let [trades, config, coach, snap, analysis, review, backtest, replay, research, shadowRp, lossRev] = await Promise.all([get('trades.json', 1), get('config.json', 1), get('coach.json', 1), get('snapshot.json', 1), get('analysis/latest.md'), get('reviews/latest.md'), get('backtest.json', 1), get('research/replay-2w.json', 1), get('research.json', 1), get('research/shadow-replay.json', 1), get('reviews/losses.json', 1)]);
+    let [trades, config, coach, snap, analysis, review, backtest, replay, research, shadowRp, lossRev, mirror] = await Promise.all([get('trades.json', 1), get('config.json', 1), get('coach.json', 1), get('snapshot.json', 1), get('analysis/latest.md'), get('reviews/latest.md'), get('backtest.json', 1), get('research/replay-2w.json', 1), get('research.json', 1), get('research/shadow-replay.json', 1), get('reviews/losses.json', 1), get('ctrader/mirror.json', 1)]);
     // m30m1 (M30 → M1) fires on the same M1 entry as the gold scalp: the same trade recorded twice; count it once (6 Nov)
     if (Array.isArray(trades)) { const seen = new Set(trades.filter((x) => x.k !== 'm30m1').map((x) => `${x.market}|${x.side}|${x.opened}|${x.entry}`)); trades = trades.filter((x) => x.k !== 'm30m1' || !seen.has(`${x.market}|${x.side}|${x.opened}|${x.entry}`)); }
     if (lossRev && lossRev.reviews) rvMerge(lossRev);
-    Object.assign(COUNCIL, { trades, config, coach, snap, analysis, review, backtest, replay, research, shadowRp, shRpRows: null, at: Date.now() });
+    Object.assign(COUNCIL, { trades, config, coach, snap, analysis, review, backtest, replay, research, shadowRp, mirror, shRpRows: null, at: Date.now() });
     councilAlerts(trades);
     if (config) {
       CFG.buf = Math.min(0.25, Math.max(0.10, +config.buf || 0.15)); CFG.minRR = +config.minRR || 1.2; CFG.minRisk = Math.min(1.2, Math.max(0.4, +config.minRisk || 0.6)); CFG.paused = config.paused || {};
@@ -6357,7 +6357,11 @@ function msNextSetup(bars, A) {
     const PD = (C.coach && Array.isArray(C.coach.proposals) ? C.coach.proposals : []).filter((p) => p.kind === 'promote' || p.kind === 'promoteIf' || p.kind === 'demote' || p.kind === 'dataSource');
     const pfx = (v) => `<span class="${v >= 0 ? 'pos' : 'neg'}"><b>${v >= 0 ? '+' : '−'}${Math.abs(+v || 0).toFixed(2)}R</b></span>`;
     const pd = !(C.coach && Array.isArray(C.coach.proposals)) ? '' : `<div class="sl-row"><div class="sl-h"><b>Coach suggests (needs your OK)</b><small>promote / demote · from the 30-day replay</small></div>${PD.length ? PD.map((p) => p.kind === 'dataSource' ? `<small class="sl-n" title="${esc(p.why || '')}"><span class="ms-chip ms-chip-sell">Data</span> <b>${esc(p.label)}</b> — closed live trades ${pfx(p.liveR / p.n)} a trade on Kraken candles, ${pfx(p.spotR / p.n)} on OANDA spot (${+p.n} trades)</small>` : `<small class="sl-n" title="${esc(p.why || '')}"><span class="ms-chip ${p.kind === 'demote' ? 'ms-chip-sell' : 'ms-chip-buy'}">${p.kind === 'demote' ? 'Demote' : 'Promote'}</span> <b>${esc(p.label || (p.kind === 'demote' ? 'move ' + p.setup + ' back to shadow' : 'make ' + p.setup + ' live'))}</b> — ${pfx(p.exp)} a trade over ${+p.n} replay trades${p.h1 && p.h2 ? ` · halves ${pfx(p.h1.exp)} / ${pfx(p.h2.exp)}` : ''}${p.all ? ` · all of ${esc(p.setup)} ${pfx(p.all.exp)} over ${+p.all.n}` : ''}</small>`).join('') : '<small class="sl-n">No shadow setup has earned a live slot and no live setup has lost its edge (promote: 100+ replay trades, +0.10R a trade, both halves positive).</small>'}</div>`;
-    if (!all.length) { if (!PD.length) { el.hidden = true; return; } el.hidden = false; el.innerHTML = `<div class="ms-k"><span>Live setups · paper</span><span class="ms-note">no engine setup trades live yet</span></div>${pd}`; return; }
+    // cTrader DEMO mirror (council/ctrader-mirror.mjs): status and the last orders, owner/admin view only
+    const MS = C.mirror && C.mirror.state, adminView = document.documentElement.dataset.mode === 'admin';
+    const tHM = (iso) => { const d = new Date(iso); return isNaN(d) ? '' : d.toLocaleString('en-GB', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' }); };
+    const mr = MS && adminView ? `<div class="sl-row"><div class="sl-h"><span class="ms-chip ${/^ok/.test(MS.status || '') ? 'ms-chip-buy' : 'ms-chip-sell'}">Demo</span><b>cTrader mirror</b><small>${esc(MS.status || '—')}${MS.lastRun ? ` · checked ${esc(tHM(MS.lastRun))}` : ''} · ${Object.values(MS.map || {}).filter((m) => m.status === 'open').length} open</small></div>${((C.mirror.log || []).slice(-5).reverse().map((l) => `<small class="sl-n">${esc(tHM(l.at))} · ${esc(l.msg)}</small>`).join('')) || '<small class="sl-n">No orders yet: it copies new live council trades and ICT A-setups (0.01 lot, demo only).</small>'}</div>` : '';
+    if (!all.length) { if (!PD.length && !mr) { el.hidden = true; return; } el.hidden = false; el.innerHTML = `<div class="ms-k"><span>Live setups · paper</span><span class="ms-note">no engine setup trades live yet</span></div>${pd}${mr}`; return; }
     const rows = all.map((k) => { const h = (cfg.history || []).find((x) => x.by === 'user' && /trades live on paper on every market/.test(x.change || '') && new RegExp('^' + k, 'i').test(x.change || '')), since = h ? Date.parse(h.at) / 1000 : 0;
       const L = (Array.isArray(C.trades) ? C.trades : []).filter((x) => x.k === k && !x.shadow && x.opened >= since), done = L.filter((x) => (x.status === 'win' || x.status === 'loss' || x.status === 'be') && isFinite(x.R)), open = L.filter((x) => x.status === 'open' || x.status === 'pending');
       const e = done.length ? done.reduce((a, x) => a + x.R, 0) / done.length : null, sum = done.reduce((a, x) => a + x.R, 0), f = cfg.filters && cfg.filters[k] || {};
@@ -6382,7 +6386,7 @@ function msNextSetup(bars, A) {
           const s = P.find((p) => p.kind === 'stability'); if (s && s.h1 && s.h2) sk.push(`<small class="sl-n">Replay halves ${fx(s.h1.exp)} / ${fx(s.h2.exp)}${s.flag ? ' · one half lost money: the edge is not steady' : ' · positive in both halves'}</small>`);
           return sk.join(''); })()}
         <div class="sl-g"><i style="width:${Math.min(100, done.length / 20 * 100).toFixed(0)}%"></i></div><small class="sl-n">Guard: back to shadow at −0.30R a trade over 20+ live trades · ${guard}</small></div>`; }).join('');
-    el.hidden = false; el.innerHTML = `<div class="ms-k"><span>Live setups · paper</span><span class="ms-note">engine setups trading live on every market</span></div>${rows}${pd}`; }
+    el.hidden = false; el.innerHTML = `<div class="ms-k"><span>Live setups · paper</span><span class="ms-note">engine setups trading live on every market</span></div>${rows}${pd}${mr}`; }
   function renderCouncil() {
     try { renderEdge(); } catch (e) { console.warn('edge', e); }
     try { renderSleeve(); } catch (e) { console.warn('sleeve', e); }
