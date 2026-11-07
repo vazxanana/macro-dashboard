@@ -1,0 +1,757 @@
+{
+ "topic": "ict-macro",
+ "system": "ICT desk A-setups (council-data ict/replay.json, H1 iFVG reversal) × council/macro.mjs regime on the trade's prior close",
+ "replayAt": "2026-11-07T20:36:09.833Z",
+ "from": "2025-08-01",
+ "baseline": {
+  "A": {
+   "is": {
+    "n": 121,
+    "R": 35.95,
+    "exp": 0.297,
+    "wr": 0.413,
+    "t": 1.904,
+    "pLow": 0.97
+   },
+   "oos": {
+    "n": 121,
+    "R": 34.67,
+    "exp": 0.287,
+    "wr": 0.38,
+    "t": 1.974,
+    "pLow": 0.975
+   }
+  }
+ },
+ "halfSplit": "2026-07-06",
+ "candidates": [
+  {
+   "rule": "H1: drop A-setups when VIX ≥ 22 or VIX/VIX3M > 1",
+   "verdict": "fail",
+   "is": {
+    "n": 103,
+    "R": 29.75,
+    "exp": 0.289,
+    "wr": 0.408,
+    "t": 1.657,
+    "pLow": 0.95
+   },
+   "oos": {
+    "n": 121,
+    "R": 34.67,
+    "exp": 0.287,
+    "wr": 0.38,
+    "t": 1.974,
+    "pLow": 0.975
+   }
+  },
+  {
+   "rule": "H2: drop A-setups when HY OAS widened ≥ +0.08 in 5 days",
+   "verdict": "fail",
+   "is": {
+    "n": 86,
+    "R": 24.25,
+    "exp": 0.282,
+    "wr": 0.395,
+    "t": 1.437,
+    "pLow": 0.923
+   },
+   "oos": {
+    "n": 87,
+    "R": 25.45,
+    "exp": 0.293,
+    "wr": 0.402,
+    "t": 1.894,
+    "pLow": 0.969
+   }
+  }
+ ],
+ "variantsTried": 12,
+ "totals": {
+  "all": {
+   "n": 257,
+   "R": 73.01,
+   "exp": 0.284,
+   "wr": 0.405,
+   "t": 2.796,
+   "pLow": 0.997
+  },
+  "withRegime": {
+   "n": 242,
+   "R": 70.62,
+   "exp": 0.292,
+   "wr": 0.397,
+   "t": 2.744,
+   "pLow": 0.997
+  },
+  "noRegime": {
+   "n": 15,
+   "R": 2.39,
+   "exp": 0.159,
+   "wr": 0.533,
+   "t": 0.524,
+   "pLow": 0.696,
+   "from": "2025-08-04",
+   "to": "2025-09-24"
+  }
+ },
+ "vixRange": {
+  "min": 14.08,
+  "median": 16.91,
+  "max": 27.44
+ },
+ "cells": [
+  {
+   "split": "VIX level",
+   "name": "VIX ≥ 22",
+   "n": 18,
+   "R": 6.2,
+   "exp": 0.344,
+   "wr": 0.444,
+   "t": 1.032,
+   "pLow": 0.842,
+   "h1": {
+    "n": 9,
+    "R": 3.69,
+    "exp": 0.41,
+    "wr": 0.333,
+    "t": 0.684,
+    "pLow": 0.743
+   },
+   "h2": {
+    "n": 9,
+    "R": 2.51,
+    "exp": 0.279,
+    "wr": 0.556,
+    "t": 0.83,
+    "pLow": 0.785
+   },
+   "from": "2025-11-19",
+   "to": "2026-04-07",
+   "vsRest": {
+    "diff": 0.057,
+    "t": 0.162,
+    "p2": 0.873,
+    "pHolm": 1
+   },
+   "pHolm": 1
+  },
+  {
+   "split": "VIX level",
+   "name": "VIX < 22",
+   "n": 224,
+   "R": 64.42,
+   "exp": 0.288,
+   "wr": 0.393,
+   "t": 2.57,
+   "pLow": 0.995,
+   "h1": {
+    "n": 112,
+    "R": 31.89,
+    "exp": 0.285,
+    "wr": 0.402,
+    "t": 1.743,
+    "pLow": 0.958
+   },
+   "h2": {
+    "n": 112,
+    "R": 32.53,
+    "exp": 0.29,
+    "wr": 0.384,
+    "t": 1.89,
+    "pLow": 0.969
+   },
+   "from": "2025-09-26",
+   "to": "2026-11-05",
+   "vsRest": {
+    "diff": -0.057,
+    "t": -0.162,
+    "p2": 0.873,
+    "pHolm": 1
+   },
+   "pHolm": 1
+  },
+  {
+   "split": "VIX curve",
+   "name": "inverted (VIX/VIX3M > 1)",
+   "n": 10,
+   "R": -0.1,
+   "exp": -0.01,
+   "wr": 0.3,
+   "t": -0.023,
+   "pLow": 0.491,
+   "h1": {
+    "n": 5,
+    "R": 0.11,
+    "exp": 0.022,
+    "wr": 0.2,
+    "t": 0.026,
+    "pLow": 0.51
+   },
+   "h2": {
+    "n": 5,
+    "R": -0.21,
+    "exp": -0.042,
+    "wr": 0.4,
+    "t": -0.13,
+    "pLow": 0.452
+   },
+   "from": "2025-11-19",
+   "to": "2026-03-27",
+   "vsRest": {
+    "diff": -0.315,
+    "t": -0.708,
+    "p2": 0.495,
+    "pHolm": 1
+   },
+   "pHolm": 1
+  },
+  {
+   "split": "VIX curve",
+   "name": "normal (≤ 1)",
+   "n": 232,
+   "R": 70.72,
+   "exp": 0.305,
+   "wr": 0.401,
+   "t": 2.785,
+   "pLow": 0.997,
+   "h1": {
+    "n": 116,
+    "R": 38.44,
+    "exp": 0.331,
+    "wr": 0.422,
+    "t": 2.068,
+    "pLow": 0.98
+   },
+   "h2": {
+    "n": 116,
+    "R": 32.28,
+    "exp": 0.278,
+    "wr": 0.379,
+    "t": 1.858,
+    "pLow": 0.967
+   },
+   "from": "2025-09-26",
+   "to": "2026-11-05",
+   "vsRest": {
+    "diff": 0.315,
+    "t": 0.708,
+    "p2": 0.495,
+    "pHolm": 1
+   },
+   "pHolm": 1
+  },
+  {
+   "split": "Dollar Smile side",
+   "name": "left",
+   "n": 39,
+   "R": -7.21,
+   "exp": -0.185,
+   "wr": 0.282,
+   "t": -1.103,
+   "pLow": 0.139,
+   "h1": {
+    "n": 19,
+    "R": 1.6,
+    "exp": 0.084,
+    "wr": 0.421,
+    "t": 0.314,
+    "pLow": 0.621
+   },
+   "h2": {
+    "n": 20,
+    "R": -8.81,
+    "exp": -0.441,
+    "wr": 0.15,
+    "t": -2.269,
+    "pLow": 0.018
+   },
+   "from": "2025-10-14",
+   "to": "2026-11-05",
+   "vsRest": {
+    "diff": -0.568,
+    "t": -2.743,
+    "p2": 0.007,
+    "pHolm": 0.063
+   },
+   "pHolm": 1
+  },
+  {
+   "split": "Dollar Smile side",
+   "name": "right",
+   "n": 67,
+   "R": -12.35,
+   "exp": -0.184,
+   "wr": 0.224,
+   "t": -1.032,
+   "pLow": 0.153,
+   "h1": {
+    "n": 33,
+    "R": -4.4,
+    "exp": -0.133,
+    "wr": 0.242,
+    "t": -0.459,
+    "pLow": 0.325
+   },
+   "h2": {
+    "n": 34,
+    "R": -7.95,
+    "exp": -0.234,
+    "wr": 0.206,
+    "t": -1.087,
+    "pLow": 0.143
+   },
+   "from": "2025-09-26",
+   "to": "2026-10-07",
+   "vsRest": {
+    "diff": -0.658,
+    "t": -2.997,
+    "p2": 0.003,
+    "pHolm": 0.03
+   },
+   "pHolm": 1
+  },
+  {
+   "split": "Dollar Smile side",
+   "name": "trough",
+   "n": 52,
+   "R": 35.84,
+   "exp": 0.689,
+   "wr": 0.538,
+   "t": 2.871,
+   "pLow": 0.997,
+   "h1": {
+    "n": 26,
+    "R": 12.75,
+    "exp": 0.49,
+    "wr": 0.423,
+    "t": 1.229,
+    "pLow": 0.885
+   },
+   "h2": {
+    "n": 26,
+    "R": 23.09,
+    "exp": 0.888,
+    "wr": 0.654,
+    "t": 3.293,
+    "pLow": 0.999
+   },
+   "from": "2025-10-06",
+   "to": "2026-10-23",
+   "vsRest": {
+    "diff": 0.506,
+    "t": 1.894,
+    "p2": 0.062,
+    "pHolm": 0.434
+   },
+   "pHolm": 1
+  },
+  {
+   "split": "Dollar Smile side",
+   "name": "mid",
+   "n": 84,
+   "R": 54.34,
+   "exp": 0.647,
+   "wr": 0.5,
+   "t": 3.222,
+   "pLow": 0.999,
+   "h1": {
+    "n": 42,
+    "R": 25.92,
+    "exp": 0.617,
+    "wr": 0.548,
+    "t": 2.288,
+    "pLow": 0.986
+   },
+   "h2": {
+    "n": 42,
+    "R": 28.42,
+    "exp": 0.677,
+    "wr": 0.452,
+    "t": 2.25,
+    "pLow": 0.985
+   },
+   "from": "2025-10-03",
+   "to": "2026-11-04",
+   "vsRest": {
+    "diff": 0.544,
+    "t": 2.321,
+    "p2": 0.022,
+    "pHolm": 0.176
+   },
+   "pHolm": 1
+  },
+  {
+   "split": "Credit stress",
+   "name": "HY widened ≥ 8bp in 5d",
+   "n": 69,
+   "R": 20.92,
+   "exp": 0.303,
+   "wr": 0.391,
+   "t": 1.47,
+   "pLow": 0.927,
+   "h1": {
+    "n": 34,
+    "R": 12.2,
+    "exp": 0.359,
+    "wr": 0.471,
+    "t": 1.426,
+    "pLow": 0.918
+   },
+   "h2": {
+    "n": 35,
+    "R": 8.72,
+    "exp": 0.249,
+    "wr": 0.314,
+    "t": 0.759,
+    "pLow": 0.774
+   },
+   "from": "2025-10-03",
+   "to": "2026-11-05",
+   "vsRest": {
+    "diff": 0.016,
+    "t": 0.066,
+    "p2": 0.947,
+    "pHolm": 1
+   },
+   "pHolm": 1
+  },
+  {
+   "split": "Credit stress",
+   "name": "HY not widening",
+   "n": 173,
+   "R": 49.7,
+   "exp": 0.287,
+   "wr": 0.399,
+   "t": 2.31,
+   "pLow": 0.989,
+   "h1": {
+    "n": 86,
+    "R": 24.25,
+    "exp": 0.282,
+    "wr": 0.395,
+    "t": 1.437,
+    "pLow": 0.923
+   },
+   "h2": {
+    "n": 87,
+    "R": 25.45,
+    "exp": 0.293,
+    "wr": 0.402,
+    "t": 1.894,
+    "pLow": 0.969
+   },
+   "from": "2025-09-26",
+   "to": "2026-11-03",
+   "vsRest": {
+    "diff": -0.016,
+    "t": -0.066,
+    "p2": 0.947,
+    "pHolm": 1
+   },
+   "pHolm": 1
+  }
+ ],
+ "hypotheses": [
+  {
+   "id": "H1",
+   "rule": "drop A-setups when VIX ≥ 22 or VIX/VIX3M > 1",
+   "dropped": {
+    "n": 18,
+    "R": 6.2,
+    "exp": 0.344,
+    "wr": 0.444,
+    "t": 1.032,
+    "pLow": 0.842,
+    "h1": {
+     "n": 9,
+     "R": 3.69,
+     "exp": 0.41,
+     "wr": 0.333,
+     "t": 0.684,
+     "pLow": 0.743
+    },
+    "h2": {
+     "n": 9,
+     "R": 2.51,
+     "exp": 0.279,
+     "wr": 0.556,
+     "t": 0.83,
+     "pLow": 0.785
+    },
+    "from": "2025-11-19",
+    "to": "2026-04-07",
+    "vsRest": {
+     "diff": 0.057,
+     "t": 0.162,
+     "p2": 0.873
+    },
+    "pHolm": 1
+   },
+   "kept": {
+    "n": 224,
+    "R": 64.42,
+    "exp": 0.288,
+    "wr": 0.393,
+    "t": 2.57,
+    "pLow": 0.995
+   },
+   "coachBar": false,
+   "bonferroni": false,
+   "pass": false
+  },
+  {
+   "id": "H2",
+   "rule": "drop A-setups when HY OAS widened ≥ +0.08 in 5 days",
+   "dropped": {
+    "n": 69,
+    "R": 20.92,
+    "exp": 0.303,
+    "wr": 0.391,
+    "t": 1.47,
+    "pLow": 0.927,
+    "h1": {
+     "n": 34,
+     "R": 12.2,
+     "exp": 0.359,
+     "wr": 0.471,
+     "t": 1.426,
+     "pLow": 0.918
+    },
+    "h2": {
+     "n": 35,
+     "R": 8.72,
+     "exp": 0.249,
+     "wr": 0.314,
+     "t": 0.759,
+     "pLow": 0.774
+    },
+    "from": "2025-10-03",
+    "to": "2026-11-05",
+    "vsRest": {
+     "diff": 0.016,
+     "t": 0.066,
+     "p2": 0.947
+    },
+    "pHolm": 1
+   },
+   "kept": {
+    "n": 173,
+    "R": 49.7,
+    "exp": 0.287,
+    "wr": 0.399,
+    "t": 2.31,
+    "pLow": 0.989
+   },
+   "coachBar": false,
+   "bonferroni": false,
+   "pass": false
+  }
+ ],
+ "exploratory": {
+  "rule": "Dollar Smile left or right (dollar bid) vs mid or trough",
+  "postHoc": true,
+  "all": {
+   "n": 106,
+   "R": -19.56,
+   "exp": -0.185,
+   "wr": 0.245,
+   "t": -1.44,
+   "pLow": 0.076,
+   "h1": {
+    "n": 53,
+    "R": -4.34,
+    "exp": -0.082,
+    "wr": 0.283,
+    "t": -0.405,
+    "pLow": 0.344
+   },
+   "h2": {
+    "n": 53,
+    "R": -15.22,
+    "exp": -0.287,
+    "wr": 0.208,
+    "t": -1.817,
+    "pLow": 0.037
+   },
+   "from": "2025-09-26",
+   "to": "2026-11-05",
+   "vsRest": {
+    "diff": -0.848,
+    "t": -4.235,
+    "p2": 0
+   }
+  },
+  "rest": {
+   "n": 136,
+   "R": 90.18,
+   "exp": 0.663,
+   "wr": 0.515,
+   "t": 4.313,
+   "pLow": 1
+  },
+  "byMarket": {
+   "es": {
+    "bid": {
+     "n": 27,
+     "R": -0.08,
+     "exp": -0.003,
+     "wr": 0.296,
+     "t": -0.009,
+     "pLow": 0.496
+    },
+    "rest": {
+     "n": 29,
+     "R": 24.07,
+     "exp": 0.83,
+     "wr": 0.517,
+     "t": 2.21,
+     "pLow": 0.982
+    }
+   },
+   "gc": {
+    "bid": {
+     "n": 28,
+     "R": -9.75,
+     "exp": -0.348,
+     "wr": 0.25,
+     "t": -1.453,
+     "pLow": 0.079
+    },
+    "rest": {
+     "n": 36,
+     "R": 19.8,
+     "exp": 0.55,
+     "wr": 0.583,
+     "t": 2.027,
+     "pLow": 0.975
+    }
+   },
+   "nq": {
+    "bid": {
+     "n": 15,
+     "R": -7.85,
+     "exp": -0.523,
+     "wr": 0.133,
+     "t": -2.595,
+     "pLow": 0.011
+    },
+    "rest": {
+     "n": 25,
+     "R": 21.87,
+     "exp": 0.875,
+     "wr": 0.56,
+     "t": 2.226,
+     "pLow": 0.982
+    }
+   },
+   "rty": {
+    "bid": {
+     "n": 15,
+     "R": 2.33,
+     "exp": 0.155,
+     "wr": 0.2,
+     "t": 0.348,
+     "pLow": 0.633
+    },
+    "rest": {
+     "n": 13,
+     "R": 11.89,
+     "exp": 0.915,
+     "wr": 0.462,
+     "t": 1.558,
+     "pLow": 0.927
+    }
+   },
+   "ym": {
+    "bid": {
+     "n": 21,
+     "R": -4.21,
+     "exp": -0.2,
+     "wr": 0.286,
+     "t": -1.133,
+     "pLow": 0.135
+    },
+    "rest": {
+     "n": 33,
+     "R": 12.55,
+     "exp": 0.38,
+     "wr": 0.424,
+     "t": 1.433,
+     "pLow": 0.919
+    }
+   }
+  }
+ },
+ "testsCounted": 12,
+ "verdict": "fail",
+ "passed": [],
+ "sources": {
+  "fred:DFII10": "failed (fetch failed), using cache to 2026-11-05",
+  "fred:DGS2": "failed (fetch failed), using cache to 2026-11-05",
+  "fred:T10YIE": "failed (fetch failed), using cache to 2026-11-06",
+  "fred:DGS10": "failed (fetch failed), using cache to 2026-11-05",
+  "fred:VXVCLS": "failed (skipped: FRED unreachable this run), using cache to 2026-11-05",
+  "fred:DTWEXBGS": "failed (skipped: FRED unreachable this run), using cache to 2026-10-30",
+  "fred:WALCL": "failed (skipped: FRED unreachable this run), using cache to 2026-11-04",
+  "fred:RRPONTSYD": "failed (skipped: FRED unreachable this run), using cache to 2026-11-06",
+  "fred:WTREGEN": "failed (skipped: FRED unreachable this run), using cache to 2026-11-04",
+  "fred:SOFR": "failed (skipped: FRED unreachable this run), using cache to 2026-11-05",
+  "fred:EFFR": "failed (skipped: FRED unreachable this run), using cache to 2026-11-05",
+  "fred:SWPT": "failed (skipped: FRED unreachable this run), using cache to 2026-11-04",
+  "fred:BSCICP03DEM665S": "failed (skipped: FRED unreachable this run), using cache to 2024-01-01",
+  "fred:BAMLH0A0HYM2": "failed (fetch failed), using cache to 2026-11-05",
+  "fred:T10Y3M": "failed (fetch failed), using cache to 2026-11-06",
+  "fred:VIXCLS": "failed (fetch failed), using cache to 2026-11-05",
+  "treasury:nominal": "failed (fetch failed)",
+  "treasury:real": "failed (fetch failed)",
+  "ecb:2y": "failed (fetch failed)",
+  "bars:usdchf": "OANDA ok (1400 days)",
+  "bars:usdcad": "OANDA ok (1400 days)",
+  "bars:gbpusd": "OANDA ok (1400 days)",
+  "bars:nq": "OANDA ok (1400 days)",
+  "bars:eurusd": "OANDA ok (1400 days)",
+  "bars:gold": "OANDA ok (1400 days)",
+  "bars:usdjpy": "OANDA ok (1400 days)",
+  "bars:es": "OANDA ok (1400 days)",
+  "calendar:thisweek": "failed (fetch failed)",
+  "calendar:nextweek": "failed (fetch failed)",
+  "calendar:cache": "using the last good copy (116 events)",
+  "rss:Fed": "failed (fetch failed)",
+  "rss:ECB": "failed (fetch failed)",
+  "rss:BoJ": "failed (fetch failed)",
+  "cot": "failed (fetch failed), using cache"
+ },
+ "fredCoverage": {
+  "DFII10": "2025-08-26 → 2026-11-05 (300)",
+  "DGS2": "2025-08-26 → 2026-11-05 (300)",
+  "DGS10": "2025-08-26 → 2026-11-05 (300)",
+  "T10YIE": "2025-08-27 → 2026-11-06 (300)",
+  "T10Y3M": "2025-08-27 → 2026-11-06 (300)",
+  "BAMLH0A0HYM2": "2025-09-16 → 2026-11-05 (300)",
+  "VIXCLS": "2025-09-09 → 2026-11-05 (300)",
+  "VXVCLS": "2025-08-28 → 2026-11-05 (300)",
+  "DTWEXBGS": "2025-08-20 → 2026-10-30 (300)",
+  "WALCL": "2021-11-10 → 2026-11-04 (261)",
+  "RRPONTSYD": "2025-08-26 → 2026-11-06 (300)",
+  "WTREGEN": "2021-11-10 → 2026-11-04 (261)",
+  "SOFR": "2025-08-25 → 2026-11-05 (300)",
+  "EFFR": "2025-08-27 → 2026-11-05 (300)",
+  "SWPT": "2021-11-10 → 2026-11-04 (261)",
+  "BSCICP03DEM665S": "2021-11-01 → 2024-01-01 (27)"
+ },
+ "barCoverage": {
+  "usdchf": "2022-05-16 → 2026-11-06 (1400)",
+  "usdcad": "2022-05-16 → 2026-11-06 (1400)",
+  "gbpusd": "2022-05-16 → 2026-11-06 (1400)",
+  "nq": "2022-05-12 → 2026-11-06 (1400)",
+  "eurusd": "2022-05-16 → 2026-11-06 (1400)",
+  "gold": "2022-05-10 → 2026-11-06 (1400)",
+  "usdjpy": "2022-05-16 → 2026-11-06 (1400)",
+  "es": "2022-05-12 → 2026-11-06 (1400)"
+ },
+ "notes": [
+  "Regime day = UTC day of signalAt; candles before it; FRED with macro.mjs LAG except VIX/VIX3M at 1 day (prior close).",
+  "Halves = each group sorted by close time, split by count (as ictVariantVerdicts). t = mean R / SE; pLow = one-sided P(mean ≥ 0 gives this t); pHolm over all cells + hypotheses."
+ ]
+}
