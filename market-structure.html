@@ -2565,6 +2565,7 @@ html[data-motion="off"][data-gate] .gate-bg path[stroke] { animation: none; stro
       </div>
     </div>
     <div class="c-grid c-pane c-pane-systems adm" id="ms-cp-systems" role="tabpanel" aria-labelledby="ms-cn-systems" data-pane="systems" hidden>
+      <div class="card c-sleeve adm" id="ms-sleeve" hidden></div>
       <div class="card c-edge adm" id="ms-edge">
         <div class="ms-k"><span>Edge finder · where the council makes money</span><span class="ms-note" id="ms-edge-at"></span></div>
         <div class="edge-by" role="group" aria-label="Group by"><button type="button" data-eby="d1" class="on" aria-pressed="true">D1 trend</button><button type="button" data-eby="session" aria-pressed="false">Session</button><button type="button" data-eby="cf" aria-pressed="false">Confirming break</button><button type="button" data-eby="rr" aria-pressed="false">Reward:risk</button><button type="button" data-eby="market" aria-pressed="false">Market</button><button type="button" data-eby="setup" aria-pressed="false">Setup</button><label class="edge-sc">Setup <select id="ms-edge-k" aria-label="Only this setup"><option value="">all</option></select></label></div>
@@ -5976,8 +5977,23 @@ function msNextSetup(bars, A) {
   }
   document.addEventListener('click', (ev) => { const b = ev.target.closest && ev.target.closest('[data-eby]'); if (!b) return; EDGE.by = b.dataset.eby; document.querySelectorAll('[data-eby]').forEach((x) => { x.classList.toggle('on', x === b); x.setAttribute('aria-pressed', String(x === b)); }); renderEdge(); });
   document.addEventListener('change', (ev) => { if (ev.target && ev.target.id === 'ms-edge-k') { EDGE.k = ev.target.value; renderEdge(); } });
+  // live setups card (7 Nov): which engine setups trade live outside the market focus, their live record and the stop guard
+  function renderSleeve() { const el = document.getElementById('ms-sleeve'), C = COUNCIL, cfg = C.config; if (!el || !cfg) return;
+    const ks = cfg.focusSetups || [], stopped = cfg.sleeveStopped || {}; const all = ks.concat(Object.keys(stopped).filter((k) => !ks.includes(k)));
+    if (!all.length) { el.hidden = true; return; }
+    const rows = all.map((k) => { const h = (cfg.history || []).find((x) => x.by === 'user' && /trades live on paper on every market/.test(x.change || '') && new RegExp('^' + k, 'i').test(x.change || '')), since = h ? Date.parse(h.at) / 1000 : 0;
+      const L = (Array.isArray(C.trades) ? C.trades : []).filter((x) => x.k === k && !x.shadow && x.opened >= since), done = L.filter((x) => (x.status === 'win' || x.status === 'loss' || x.status === 'be') && isFinite(x.R)), open = L.filter((x) => x.status === 'open' || x.status === 'pending');
+      const e = done.length ? done.reduce((a, x) => a + x.R, 0) / done.length : null, sum = done.reduce((a, x) => a + x.R, 0), f = cfg.filters && cfg.filters[k] || {};
+      const rule = [f.d1 ? `${f.d1} D1` : '', (f.noSession || []).length ? `not ${f.noSession.join(' / ')}` : '', (f.noMarket || []).length ? `skips ${f.noMarket.join(', ')}` : ''].filter(Boolean).join(' · ');
+      const st = stopped[k] ? `<span class="ms-chip ms-chip-sell">Stopped ${new Date(stopped[k]).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })}</span>` : '<span class="ms-chip ms-chip-buy">Live</span>';
+      const guard = done.length < 20 ? `${done.length}/20 trades before the guard can act` : e <= -0.3 ? 'guard threshold reached' : `${(e + 0.3).toFixed(2)}R a trade above the stop line`;
+      return `<div class="sl-row"><div class="sl-h">${st}<b>${esc(k)}</b><small>${esc(rule)}${since ? ` · since ${new Date(since * 1000).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })}` : ''}</small></div>
+        <div class="sl-k"><span><b>${done.length}</b> closed</span><span><b>${open.length}</b> open</span><span class="${e == null ? '' : e > 0 ? 'pos' : 'neg'}"><b>${e == null ? '—' : (e >= 0 ? '+' : '−') + Math.abs(e).toFixed(2) + 'R'}</b> a trade</span><span class="${sum > 0 ? 'pos' : sum < 0 ? 'neg' : ''}"><b>${(sum >= 0 ? '+' : '−') + Math.abs(sum).toFixed(1)}R</b> total</span></div>
+        <div class="sl-g"><i style="width:${Math.min(100, done.length / 20 * 100).toFixed(0)}%"></i></div><small class="sl-n">Guard: back to shadow at −0.30R a trade over 20+ live trades · ${guard}</small></div>`; }).join('');
+    el.hidden = false; el.innerHTML = `<div class="ms-k"><span>Live setups · paper</span><span class="ms-note">engine setups trading live on every market</span></div>${rows}`; }
   function renderCouncil() {
     try { renderEdge(); } catch (e) { console.warn('edge', e); }
+    try { renderSleeve(); } catch (e) { console.warn('sleeve', e); }
     const root = document.getElementById('v-council'); if (!root) return;
     const set = (id, html) => { const el = document.getElementById(id); if (el) el.innerHTML = html; };
     const tab = (window.CTAB = window.CTAB || 'live'), withSh = tab === 'shadow' || tab === 'all';
@@ -8219,6 +8235,9 @@ function gpStats(T) {
 .ms-lay button { flex: 1 1 auto; min-height: 32px; padding: 4px 10px; border-radius: 8px; border: 1px solid var(--line); background: var(--panel); color: var(--ink); font: inherit; font-size: 12.5px; font-weight: 600; cursor: pointer; }
 .ms-lay button:hover, .ms-lay button.on { border-color: var(--accent); } .ms-lay button.on { background: color-mix(in srgb, var(--accent) 12%, var(--panel)); }
 .ms-lay button.sv { color: var(--ink-dim); font-weight: 500; } .ms-lay button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.c-sleeve .sl-row { display: grid; gap: 6px; padding: 8px 0; } .c-sleeve .sl-h { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; } .c-sleeve .sl-h b { font-size: 15px; text-transform: capitalize; } .c-sleeve .sl-h small, .c-sleeve .sl-n { color: var(--ink-dim); font-size: 12px; }
+.c-sleeve .sl-k { display: flex; flex-wrap: wrap; gap: 6px 18px; font-size: 13px; font-variant-numeric: tabular-nums; color: var(--ink-dim); } .c-sleeve .sl-k b { color: var(--ink); } .c-sleeve .pos b { color: var(--buy); } .c-sleeve .neg b { color: var(--sell); }
+.c-sleeve .sl-g { height: 6px; border-radius: 3px; background: var(--line); overflow: hidden; } .c-sleeve .sl-g i { display: block; height: 100%; background: var(--accent); }
 .c-edge .edge-by { display: flex; flex-wrap: wrap; gap: 6px; margin: 4px 0 10px; align-items: center; }
 .c-edge .edge-by button { min-height: 32px; padding: 4px 10px; border-radius: 8px; border: 1px solid var(--line); background: var(--panel); color: var(--ink); font: inherit; font-size: 12.5px; font-weight: 600; cursor: pointer; }
 .c-edge .edge-by button.on { border-color: var(--accent); background: color-mix(in srgb, var(--accent) 12%, var(--panel)); } .c-edge .edge-by button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
