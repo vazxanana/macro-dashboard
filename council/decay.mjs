@@ -40,7 +40,7 @@ export const SYSTEMS = [
   { id: 'replica', name: 'Gold replica', desk: 'Meridian', k: 'replica' },
   { id: 'mosha-bo', name: 'Mosha BO', desk: 'Meridian', k: 'mosha-bo' },
   { id: 'gtrend', name: 'Gold trend', desk: 'Meridian', k: 'gtrend' },
-  { id: 'gtrend5', name: 'Gold trend fast', desk: 'Meridian', k: 'gtrend5' },
+  { id: 'gtrend5', name: 'Gold trend fast', desk: 'Meridian', k: 'gtrend5', shadow: true },   // owner moved to shadow 7 Nov (#530): shown, never alerted
   { id: 'gtl', name: 'Gold H4 trendline', desk: 'Meridian', k: 'gtl' },
   { id: 'geg', name: 'Gold daily engulf', desk: 'Meridian', k: 'geg' },
   { id: 'gmp', name: 'Gold momentum pullback', desk: 'Meridian', k: 'gmp' },
