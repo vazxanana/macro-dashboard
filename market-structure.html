@@ -1464,6 +1464,45 @@ td.st-dim { color: var(--ink-faint); }
 .ms-trade.sel { border-color: var(--accent); box-shadow: inset 0 0 0 1px var(--accent); }
 .ms-steps li.now .ms-dot { box-shadow: 0 0 0 4px color-mix(in srgb, var(--gold, #d4a017) 22%, transparent); }
 :root[data-theme="midnight"] .ms-trade.sel { border-color: var(--accent); box-shadow: inset 0 0 0 1px var(--accent), 0 0 0 4px var(--accent-soft); }
+
+/* ── Pro theme: a trading-desk workspace. Graphite surfaces tinted a hair toward the brand gold hue (85°),
+   hairline structure instead of glow and shadow, tighter radii, a muted gold used only for state,
+   and buy/sell separated by lightness as well as hue so they survive colour-blindness. ── */
+:root[data-theme="pro"] {
+  --bg: oklch(0.155 0.004 85); --panel: oklch(0.19 0.004 85); --panel-raised: oklch(0.215 0.005 85); --panel-hover: oklch(0.235 0.005 85);
+  --line: oklch(0.275 0.005 85); --line-soft: oklch(0.235 0.005 85); --line-strong: oklch(0.36 0.006 85);
+  --ink: oklch(0.955 0.004 85); --ink-dim: oklch(0.79 0.006 85); --ink-faint: oklch(0.665 0.008 85);
+  --accent: oklch(0.80 0.115 85); --accent-soft: oklch(0.80 0.115 85 / 0.13);
+  --gold: oklch(0.80 0.115 85); --gold-soft: oklch(0.80 0.115 85 / 0.12); --gold-line: oklch(0.80 0.115 85 / 0.42);
+  --buy: oklch(0.78 0.14 165); --sell: oklch(0.67 0.19 25); --buy-soft: oklch(0.78 0.14 165 / 0.13); --sell-soft: oklch(0.67 0.19 25 / 0.13);
+  --r: 8px; --r-sm: 6px;
+  color-scheme: dark;
+}
+:root[data-theme="pro"] body { background: var(--bg); }
+:root[data-theme="pro"] .top { background: var(--bg); backdrop-filter: none; -webkit-backdrop-filter: none; border-bottom-color: var(--line); }
+:root[data-theme="pro"] .card { border-radius: 8px; box-shadow: none; }
+:root[data-theme="pro"] .tile { border-radius: 8px; box-shadow: none; }
+:root[data-theme="pro"] .ict-m, :root[data-theme="pro"] .c-nav, :root[data-theme="pro"] .ms-trade, :root[data-theme="pro"] .menu-body, :root[data-theme="pro"] .me-pop, :root[data-theme="pro"] .mk-pop { border-radius: 8px; }
+:root[data-theme="pro"] .menu-body, :root[data-theme="pro"] .me-pop, :root[data-theme="pro"] .mk-pop { box-shadow: 0 12px 32px -8px oklch(0 0 0 / 0.6); }
+:root[data-theme="pro"] .card:hover, :root[data-theme="pro"] .tile:hover { transform: none; }
+:root[data-theme="pro"] .c-nav button[aria-selected="true"] { background: var(--panel-raised); box-shadow: inset 0 -2px 0 var(--accent); }
+:root[data-theme="pro"] .ms-now { background: var(--panel-raised) !important; border: 1px solid var(--gold-line); }
+:root[data-theme="pro"] #ms-alerts.is-on { background: var(--accent); color: oklch(0.2 0.02 85); border-color: var(--accent); }
+:root[data-theme="pro"] ::selection { background: oklch(0.80 0.115 85 / 0.3); }
+:root[data-theme="pro"] .ms-trade.sel { border-color: var(--accent); box-shadow: inset 0 0 0 1px var(--accent); }
+
+/* Pro: denser, squarer, data-first */
+:root[data-theme="pro"] .h-head { font-size: 22px; letter-spacing: -0.01em; font-weight: 600; }
+:root[data-theme="pro"] .ms-live.app, :root[data-theme="pro"] .h-grid, :root[data-theme="pro"] .h-main { gap: 10px; }
+:root[data-theme="pro"] .card { padding: 16px 18px; }
+:root[data-theme="pro"] .tile { padding: 14px 16px; min-height: 0; }
+:root[data-theme="pro"] .h-quick a, :root[data-theme="pro"] .seg, :root[data-theme="pro"] .seg button, :root[data-theme="pro"] .cal-seg, :root[data-theme="pro"] .cal-seg button,
+:root[data-theme="pro"] .ict-seg button, :root[data-theme="pro"] .ms-tbtn, :root[data-theme="pro"] .ms-q, :root[data-theme="pro"] .ms-j-stats > span, :root[data-theme="pro"] .cal-mt { border-radius: 4px; }
+:root[data-theme="pro"] .h-today { border-radius: 6px; }
+:root[data-theme="pro"] .h-today > * { padding-top: 12px; padding-bottom: 12px; }
+:root[data-theme="pro"] .ms-chip, :root[data-theme="pro"] .ms-al, :root[data-theme="pro"] .tag { border-radius: 3px; }
+:root[data-theme="pro"] .ms-dot { border-radius: 4px; }
+:root[data-theme="pro"] .u-av { border-radius: 4px; }
 </style>
 </head>
 <body>
@@ -2151,6 +2190,7 @@ function msNextSetup(bars, A) {
     light: { bg: '#ffffff', text: '#131722', grid: '#f0f3fa', border: '#e0e3eb' },
     dark:  { bg: '#151a23', text: '#8f98aa', grid: '#19202c', border: '#273042' },
     midnight: { bg: '#0c1530', text: '#9aa8cb', grid: '#121e3d', border: '#22335c' },
+    pro: { bg: '#121211', text: '#a3a29c', grid: '#1a1a18', border: '#2b2b28' },
   };
   const UPC = '#089981', DNC = '#f23645';
   const Z = {
@@ -2975,7 +3015,7 @@ function msNextSetup(bars, A) {
       p.overlay.set(p.overlay.items);
     });
     root.dataset.chart = G.theme === 'light' ? 'light' : 'dark'; document.documentElement.dataset.theme = G.theme;
-    $('ms-theme').textContent = `Theme: ${{ dark: 'Dark', light: 'Light', midnight: 'Midnight' }[G.theme] || 'Dark'}`; $('ms-theme').title = 'Switch theme: Dark, Light, Midnight';
+    $('ms-theme').textContent = `Theme: ${{ dark: 'Dark', light: 'Light', midnight: 'Midnight', pro: 'Pro' }[G.theme] || 'Dark'}`; $('ms-theme').title = 'Switch theme: Dark, Light, Midnight, Pro';
   }
   function applyAlertsBtn() {
     const b = $('ms-alerts'); b.textContent = G.alerts ? 'Alerts on' : 'Alerts off'; b.title = b.textContent; b.setAttribute('aria-pressed', String(G.alerts));
@@ -2985,7 +3025,7 @@ function msNextSetup(bars, A) {
     const pr = JSON.parse(localStorage.getItem('msPrefs') || '{}');
     if (pr.show) Object.assign(G.show, pr.show);
     if (pr.risk > 0) G.risk = +pr.risk;
-    if (pr.theme === 'dark' || pr.theme === 'light' || pr.theme === 'midnight') G.theme = pr.theme;
+    if (pr.theme === 'dark' || pr.theme === 'light' || pr.theme === 'midnight' || pr.theme === 'pro') G.theme = pr.theme;
     G.alerts = !!pr.alerts;
   } catch (e) {}
   root.querySelectorAll('[data-show]').forEach((cb) => { cb.checked = G.show[cb.dataset.show] !== false; });
@@ -2996,7 +3036,7 @@ function msNextSetup(bars, A) {
   root.querySelectorAll('[data-show]').forEach((cb) => cb.addEventListener('change', () => {
     G.show[cb.dataset.show] = cb.checked; savePrefs(); Object.values(panes).forEach((p) => p.A && p.draw());
   }));
-  $('ms-theme').addEventListener('click', () => { const order = ['dark', 'light', 'midnight']; G.theme = order[(order.indexOf(G.theme) + 1) % order.length]; applyTheme(); savePrefs(); });
+  $('ms-theme').addEventListener('click', () => { const order = ['dark', 'light', 'midnight', 'pro']; G.theme = order[(order.indexOf(G.theme) + 1) % order.length]; applyTheme(); savePrefs(); });
   $('ms-risk').addEventListener('input', () => { const v = +$('ms-risk').value; if (v > 0) { G.risk = v; savePrefs(); topDown(); } });
   $('ms-alerts').addEventListener('click', async () => {
     G.alerts = !G.alerts; applyAlertsBtn(); savePrefs();
@@ -5027,7 +5067,8 @@ function msNextSetup(bars, A) {
 <script>
 /* polish 31: the phone browser bar follows the page theme */
 (() => { const m = document.querySelector('meta[name="theme-color"]'); if (!m) return; const r = document.documentElement;
-  const f = () => { const bg = getComputedStyle(r).getPropertyValue('--bg').trim(); if (bg) m.setAttribute('content', bg); };
+  const cv = document.createElement('canvas').getContext('2d'); const hex = (c) => { try { cv.fillStyle = '#000'; cv.fillStyle = c; cv.fillRect(0, 0, 1, 1); const d = cv.getImageData(0, 0, 1, 1).data; return '#' + [d[0], d[1], d[2]].map((x) => x.toString(16).padStart(2, '0')).join(''); } catch (e) { return c; } };
+  const f = () => { const bg = getComputedStyle(r).getPropertyValue('--bg').trim(); if (bg) m.setAttribute('content', hex(bg)); };
   f(); new MutationObserver(f).observe(r, { attributes: true, attributeFilter: ['data-theme'] }); })();
 </script>
 </body>
