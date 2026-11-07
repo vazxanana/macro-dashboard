@@ -1,7 +1,10 @@
 // Council · Backtest: replay past candles through the same engine and rules the Trader uses,
 // so the Coach can judge a setup on hundreds of historical trades instead of waiting days for live ones.
 // Usage: node council/backtest.mjs <dataDir> [days=30]
-// Data: Kraken, the feed the live Trader trades on, for every market: its trade history built into 1m candles (cached per
+// Data (7 Nov): gold and forex from OANDA spot, the feed the live Trader switched them to (oandaData below: 1m paged through the
+// site's /md/bars proxy, 5m/15m/30m built from it, OANDA's own 1h/4h/1d; not cleaned and gold not shifted, as live); if OANDA
+// can't be read, that whole market falls back to the Kraken path below. markets.source[key] = 'OANDA' or the fallback's feed.
+// Crypto (and the gold/forex fallback): Kraken, the feed the live Trader trades on: its trade history built into 1m candles (cached per
 // day, council/krakenhist.mjs) plus its own 1h/4h/1d candles. Gold is PAXGUSD shifted onto spot like the live Trader does
 // (goldBasis below). Fallbacks: crypto and gold Binance (1m history; PAXGUSDT) until Kraken's cached history covers the
 // whole window; forex Yahoo Finance (yahoo.mjs), then Dukascopy (duka.mjs). markets.source says which feed each market used.
@@ -20,6 +23,7 @@ import { m15Choch, m15cFeat as m15cOf } from './choch.mjs';
 import { cleanBars, LTF_CLEAN } from './clean.mjs';
 
 const DIR = process.argv[2] || 'data', DAYS = +(process.argv[3] || 30);
+const ONLY = process.env.BT_MARKETS ? new Set(process.env.BT_MARKETS.split(',')) : null;   // local tests: BT_MARKETS=xau,eurusd
 const FAKE = !!process.env.BT_FAKE;   // offline self-test with a synthetic random walk
 const MARKETS = {
   xau: { label: 'XAU/USD', name: 'Gold', group: 'Metals', kraken: 'PAXGUSD', sym: 'PAXGUSDT', dec: 1, spot: true },
@@ -118,6 +122,41 @@ async function goldBasis(m1) {
   return H && H.length ? basisSeries(H, m1) : null;
 }
 const shiftBar = (b, o) => ({ time: b.time, open: b.open + o, high: b.high + o, low: b.low + o, close: b.close + o });
+
+// Gold and forex from OANDA spot (7 Nov), the feed the live Trader reads (trader.mjs oandaBars) through the site's /md/bars proxy:
+// mid candles, finished ones only. One timeframe over [from, to), paged forward by from/to in windows of 4,999 candles (OANDA
+// caps a call at 5,000), one call at a time with a short pause; any call that fails after 3 tries throws (the market then
+// falls back to Kraken whole, never a mix).
+async function oandaRange(key, tf, sec, from, to) {
+  const m = new Map(); let calls = 0;
+  for (let a = from; a < to;) {
+    const b = Math.min(to, a + 4999 * sec);
+    let j = null, err = null;
+    for (let k = 0; k < 3 && !j; k++) {
+      try { calls++; const r = await fetch(`${MD_BASE}bars?sym=${key}&tf=${tf}&from=${a}&to=${b}`, { signal: AbortSignal.timeout(20000) }); const x = r.ok ? await r.json() : null;
+        if (x && x.src === 'OANDA' && Array.isArray(x.bars)) j = x; else err = x && x.error ? String(x.error) : `HTTP ${r.status}`; }
+      catch (e) { err = String(e.message || e); }
+      if (!j) await sleep(1500 * (k + 1));
+    }
+    if (!j) throw new Error(`OANDA ${tf} ${new Date(a * 1000).toISOString().slice(0, 16)}: ${err}`);
+    for (const x of j.bars) if (!x.live && x.time >= a && x.time < b) m.set(+x.time, { time: +x.time, open: +x.open, high: +x.high, low: +x.low, close: +x.close });
+    a = b;
+    await sleep(250);   // polite to the proxy
+  }
+  const out = [...m.values()].sort((p, q) => p.time - q.time); out.calls = calls;
+  return out;
+}
+// One market from OANDA: 1m for the replay window plus 22 days of warm-up (enough for ~720 30m candles, as the live Trader's
+// 1,440 15m candles give it), 5m/15m/30m built from it; 1h/4h/1d OANDA's own candles (the live Trader's), deep enough for
+// 720 closed candles before the window starts. ~18 calls a market for a 30-day replay.
+async function oandaData(key) {
+  const m1 = await oandaRange(key, '1m', 60, startT - 22 * 86400, endT);
+  if (m1.length < 5000) throw new Error(`only ${m1.length} 1m candles`);
+  const h1 = await oandaRange(key, '1h', 3600, startT - 60 * 86400, endT);
+  const h4 = await oandaRange(key, '4h', 14400, startT - 200 * 86400, endT);
+  const d1 = await oandaRange(key, '1d', 86400, startT - 1100 * 86400, endT);
+  return { calls: m1.calls + h1.calls + h4.calls + d1.calls, data: { '1m': m1, '5m': aggregate(m1, 300), '15m': aggregate(m1, 900), '30m': aggregate(m1, 1800), '1h': h1, '4h': h4, '1d': d1 } };
+}
 
 // One trade, managed on 1m candles, under one break-even variant
 function manage(v, tr, b) {
@@ -275,9 +314,20 @@ const PAD = 30 * 60;
 const pushChange = (arr, t, v, extra) => { const s = JSON.stringify(v); if (!arr.length || arr[arr.length - 1].s !== s) arr.push({ t, s, ...v, ...extra }); };
 
 for (const [key, M] of Object.entries(MARKETS)) {
+  if (ONLY && !ONLY.has(key)) continue;
   try {
     const data = {};
-    if (FAKE) {
+    // gold and forex: OANDA spot first, like the live Trader (every timeframe from OANDA, or the whole market from Kraken below)
+    let oanda = false;
+    if (!FAKE && OANDA_D1.has(key)) try {
+      const tr0 = Date.now(), O = await oandaData(key);
+      Object.assign(data, O.data); oanda = true;
+      meta.coverage = Object.assign(meta.coverage || {}, { [key]: new Date(O.data['1m'][0].time * 1000).toISOString().slice(0, 10) });
+      meta.source = Object.assign(meta.source || {}, { [key]: 'OANDA' });
+      console.log(`${key}: OANDA 1m from ${meta.coverage[key]} (${O.calls} calls) → ${O.data['1m'].length} 1m candles, ${O.data['1h'].length} 1h, ${O.data['4h'].length} 4h, ${O.data['1d'].length} 1d (${((Date.now() - tr0) / 1000).toFixed(0)}s)`);
+    } catch (oe) { console.log(`${key}: OANDA not used (${oe.message}); Kraken`); (meta.fallback = meta.fallback || {})[key] = `OANDA: ${String(oe.message || oe).slice(0, 200)}`; }
+    if (oanda) { /* loaded above */ }
+    else if (FAKE) {
       const m1 = fakeBars(startT - 760 * 86400, endT, key.length * 7919 + 1);
       for (const [id, , sec] of TFS) data[id] = id === '1m' ? m1.filter((b) => b.time >= startT - WIN * 60) : aggregate(m1, sec);
     } else if (M.duka) {
@@ -338,15 +388,17 @@ for (const [key, M] of Object.entries(MARKETS)) {
         meta.source = Object.assign(meta.source || {}, { [key]: 'Binance' });
       }
     }
-    // bad prints: the same cleaner, timeframes and options the live Trader applies to its candles (clean.mjs), before any analysis
-    for (const [id] of TFS) {
+    // bad prints: the same cleaner, timeframes and options the live Trader applies to its candles (clean.mjs), before any analysis;
+    // like live, OANDA candles are not cleaned (live cleans only its Kraken candles)
+    if (!oanda) for (const [id] of TFS) {
       const nBad = data[id] ? cleanBars(data[id], M.group === 'Forex' && LTF_CLEAN.has(id) ? { wickK: 15 } : {}) : 0;
       if (nBad) { const C = (meta.cleaned = meta.cleaned || {}); (C[key] = C[key] || {})[id] = nBad; }
     }
     const m1 = data['1m'];
     // gold onto spot (after cleaning, like the live Trader): offAt(t) is the offset the Trader would have used at step t
     let offAt = null;
-    if (M.spot && !FAKE) {
+    if (M.spot && oanda) meta.goldShift = { method: 'none: OANDA gold is spot', base: 'OANDA' };
+    else if (M.spot && !FAKE) {
       offAt = await goldBasis(m1);
       meta.goldShift = offAt ? { method: 'OANDA spot H1 close - PAXG 1m close, 2 h median, last kept when stale (live: gold-api.com spot quotes each run)', base: (meta.source || {})[key], samples: offAt.samples, now: offAt(endT) }
         : { method: 'none: OANDA H1 candles unavailable, raw PAXG prices (same structure and signals; entry, stop and target prices sit at the PAXG premium over spot)', base: (meta.source || {})[key] };
