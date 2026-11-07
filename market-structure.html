@@ -3452,10 +3452,11 @@ function msNextSetup(bars, A) {
     { const pane = el.closest('.ms-pane'), ph = pane && pane.querySelector('.ms-ph');
       if (ph && !ph.querySelector('.ch-tools')) {
         const tl = document.createElement('span'); tl.className = 'ch-tools';
-        tl.innerHTML = `<button type="button" class="ch-b ch-snap" title="Save this chart as an image" aria-label="Save the chart as a PNG image"></button><button type="button" class="ch-b ch-bell" title="Price alert (notifies this device)" aria-label="Set a price alert"></button><button type="button" class="ch-b ch-fit" title="Fit the chart (double-click the chart)" aria-label="Fit the ${tf.label} chart"></button><button type="button" class="ch-b ch-fs" title="Full screen" aria-label="Show the ${tf.label} chart full screen"></button>`;
+        tl.innerHTML = `<button type="button" class="ch-b ch-ruler" title="Measure: drag on the chart (or hold Shift and drag)" aria-label="Measure price and time on the chart" aria-pressed="false"></button><button type="button" class="ch-b ch-snap" title="Save this chart as an image" aria-label="Save the chart as a PNG image"></button><button type="button" class="ch-b ch-bell" title="Price alert (notifies this device)" aria-label="Set a price alert"></button><button type="button" class="ch-b ch-fit" title="Fit the chart (double-click the chart)" aria-label="Fit the ${tf.label} chart"></button><button type="button" class="ch-b ch-fs" title="Full screen" aria-label="Show the ${tf.label} chart full screen"></button>`;
         ph.appendChild(tl);
         tl.querySelector('.ch-fit').addEventListener('click', () => P.fit());
         tl.querySelector('.ch-snap').addEventListener('click', () => P.snapshot());
+        tl.querySelector('.ch-ruler').addEventListener('click', (e) => { const on = !P.measureOn; P.measureOn = on; e.currentTarget.classList.toggle('on', on); e.currentTarget.setAttribute('aria-pressed', String(on)); el.classList.toggle('measuring', on); if (!on) P.clearMeasure(); });
         tl.querySelector('.ch-bell').addEventListener('click', () => window.msOpenAlerts && window.msOpenAlerts());
         tl.querySelector('.ch-fs').addEventListener('click', () => { if (document.fullscreenElement) document.exitFullscreen(); else if (pane.requestFullscreen) pane.requestFullscreen().catch(() => {}); });
       }
@@ -3507,6 +3508,28 @@ function msNextSetup(bars, A) {
         if (typeof toast === 'function') toast('Chart saved as an image');
       } catch (e) { console.warn('snapshot', e); }
     };
+    // measure tool (7 Nov loop): Shift+drag, or the ruler button then drag, shows the price move, %, candles and time between two points
+    { const box = document.createElement('div'); box.className = 'ch-ms'; box.hidden = true; const lab = document.createElement('div'); lab.className = 'ch-ms-l'; box.appendChild(lab); el.appendChild(box);
+      let a = null;
+      const pt = (ev) => { const r = el.getBoundingClientRect(), t = ev.touches ? ev.touches[0] : ev, x = t.clientX - r.left, y = t.clientY - r.top; return { x, y, p: series.coordinateToPrice(y), l: chart.timeScale().coordinateToLogical(x) }; };
+      const draw = (b) => {
+        if (!a || !b || a.p == null || b.p == null) return;
+        const up = b.p >= a.p, d = b.p - a.p, pc = d / a.p * 100, n = Math.round(b.l - a.l), secs = Math.abs(n) * tf.sec;
+        const dur = secs >= 86400 ? `${(secs / 86400).toFixed(secs % 86400 ? 1 : 0)}d` : secs >= 3600 ? `${(secs / 3600).toFixed(secs % 3600 ? 1 : 0)}h` : `${Math.round(secs / 60)}m`;
+        box.hidden = false; box.classList.toggle('dn', !up);
+        Object.assign(box.style, { left: `${Math.min(a.x, b.x)}px`, top: `${Math.min(a.y, b.y)}px`, width: `${Math.max(1, Math.abs(b.x - a.x))}px`, height: `${Math.max(1, Math.abs(b.y - a.y))}px` });
+        lab.textContent = `${up ? '+' : '−'}${fmt(Math.abs(d))} (${up ? '+' : '−'}${Math.abs(pc).toFixed(2)}%) · ${Math.abs(n)} bars, ${dur}`;
+        lab.classList.toggle('below', up ? false : true);
+      };
+      P.clearMeasure = () => { a = null; box.hidden = true; chart.applyOptions({ handleScroll: true, handleScale: true }); };
+      const start = (ev) => { if (!(P.measureOn || ev.shiftKey)) return; if (ev.target.closest && ev.target.closest('.ch-tools')) return; ev.preventDefault(); a = pt(ev); chart.applyOptions({ handleScroll: false, handleScale: false }); draw(a); };
+      const move = (ev) => { if (!a) return; ev.preventDefault(); draw(pt(ev)); };
+      const end = () => { if (!a) return; a = null; chart.applyOptions({ handleScroll: true, handleScale: true }); setTimeout(() => { if (!a) box.classList.add('done'); }, 0); };
+      el.addEventListener('mousedown', (ev) => { box.classList.remove('done'); if (!ev.shiftKey && !P.measureOn) { box.hidden = true; return; } start(ev); }, true);
+      el.addEventListener('touchstart', (ev) => { if (P.measureOn) { box.classList.remove('done'); start(ev); } }, { passive: false, capture: true });
+      addEventListener('mousemove', move); el.addEventListener('touchmove', move, { passive: false });
+      addEventListener('mouseup', end); el.addEventListener('touchend', end);
+      addEventListener('keydown', (ev) => { if (ev.key === 'Escape') P.clearMeasure(); }); }
     P.rebuild = function (keepView) {
       const off = G.offset;
       P.bars = P.raw.map((b) => ({ time: b.time + TZ, open: b.open + off, high: b.high + off, low: b.low + off, close: b.close + off }));
@@ -7370,6 +7393,14 @@ function gpStats(T) {
 /* price alerts (7 Nov) */
 .ch-bell { --i: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 8a6 6 0 1 1 12 0c0 7 3 9 3 9H3s3-2 3-9M10.3 21a1.94 1.94 0 0 0 3.4 0'/%3E%3C/svg%3E"); }
 .ch-bell.on { color: #e0a526; }
+.ch-ruler { --i: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M21.3 15.3a2.4 2.4 0 0 1 0 3.4l-2.6 2.6a2.4 2.4 0 0 1-3.4 0L2.7 8.7a2.4 2.4 0 0 1 0-3.4l2.6-2.6a2.4 2.4 0 0 1 3.4 0zM14.5 12.5l2-2M11.5 9.5l2-2M8.5 6.5l2-2M17.5 15.5l2-2'/%3E%3C/svg%3E"); }
+.ch-b.on { color: var(--accent); background: color-mix(in srgb, var(--accent) 14%, transparent); }
+.ms-chart.measuring { cursor: crosshair; }
+.ch-ms { position: absolute; z-index: 5; pointer-events: none; background: rgba(41,98,255,.14); border: 1px solid rgba(41,98,255,.7); border-radius: 2px; }
+.ch-ms.dn { background: rgba(242,54,69,.13); border-color: rgba(242,54,69,.7); }
+.ch-ms-l { position: absolute; left: 50%; bottom: calc(100% + 6px); transform: translateX(-50%); white-space: nowrap; padding: 4px 8px; border-radius: 6px; background: #2962ff; color: #fff; font: 600 11.5px var(--mono, ui-monospace, monospace); font-variant-numeric: tabular-nums; box-shadow: 0 4px 12px rgba(0,0,0,.3); }
+.ch-ms.dn .ch-ms-l { background: #f23645; }
+.ch-ms-l.below { bottom: auto; top: calc(100% + 6px); }
 .ch-snap { --i: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M14.5 4h-5L7 7H4a1 1 0 0 0-1 1v11a1 1 0 0 0 1 1h16a1 1 0 0 0 1-1V8a1 1 0 0 0-1-1h-3z'/%3E%3Ccircle cx='12' cy='13' r='3.5'/%3E%3C/svg%3E"); }
 .menu-pa { display: flex; flex-direction: column; align-items: flex-start; gap: 2px; width: 100%; padding: 10px 12px; margin-bottom: 8px; border-radius: 10px; border: 1px solid color-mix(in srgb, #e0a526 35%, var(--line)); background: color-mix(in srgb, #e0a526 8%, transparent); color: var(--ink); font: inherit; font-weight: 600; text-align: left; cursor: pointer; }
 .menu-pa small { font-weight: 400; color: var(--ink-faint); font-size: 12px; }
