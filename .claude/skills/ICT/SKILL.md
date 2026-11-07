@@ -302,3 +302,18 @@ Datasets: cash 23-24 | cash 25-26 | NQ futures 23-25 | 2026 replay.
 - **Code:** `DOL_ROOM = 2`, `ROOM_SIZE = [0.5, 1.5]`, `sizeOf(g, mk)`.
   - The size multiplies with the §25 tight-stop half, giving 0.25 / 0.5 / 0.75 / 1.5.
   - R is stored x size; the desk pill shows "1.5× size" etc.
+
+## 28. Intraday course rules tested on the H1 iFVG model (7 Nov 2026) — none adopted as filters
+The owner uploaded a second, longer study spec (an NQ-focused intraday course, kept outside this public repo as a local
+skill). Its codable rules were tested on cash NQ+ES+YM, 2023-24 | 2025-26, live exit, costs.
+The tracker's signals were rebuilt with the sweep time, the 00:00 / 08:30 ET opens, an SMT proxy and a relative-equal-high/low scan.
+A-setups base: +39.3R dd 14.6 | +35.0R dd 19.7.
+- **SMT** (at the sweep candle this index took its prior-24h low/high while ES or YM did not): −0.7 | +12.2R. Without SMT: −0.1 | +11.4R. No edge.
+- **Opening prices** (buys below both the 00:00 and 08:30 opens, sells above): +7.3 | −3.9R. The other side did better (+35.2 | +34.3R). Same as the midnight-only test (§18). Rejected.
+- **Equity window** (signal closes 10:00 ET): best per trade (+0.21 | +0.28R, n 28 | 29). As a 1.5x size-up on top of §27 it is better on cash and NQ futures but worse on the 2026 replay (+9.9 vs +11.0R, dd 11.0 vs 9.1). Rejected.
+- **London kill zone only:** +6.1 | 0.0R. **Skip the Asian session:** +30.3 | +24.1R (worse). **Skip Mondays:** mixed.
+- **NQ month seasonality** (no buys in Feb/Sep, no sells in May-Jul/Nov): +50.5 dd 12.6 | +28.0 dd 12.4. Rejected: the course's month map comes from the same years we test on (look-ahead), with no clean later window.
+- **Relative equal highs/lows beyond the entry:** almost every signal has them (+30.2 | +32.6R with vs +9.1 | +2.4R without). Not a filter. At >= 2R away it is close to the §27 room-to-DOL sizing already live.
+- **Read:** the course is a discretionary M5-M1 intraday framework built around a trader reading the higher, intermediate and short timeframes in order. Its codable pieces do not improve this mechanical H1 model.
+  - The pieces that agree are already in it: no NY afternoon (§17), the jobs-report morning (§23), room to the draw on liquidity (§27).
+- **Best use:** its sponsorship checklist as Fred's judgement on the desk. New review tags: beyond 00:00 & 08:30 opens, inducement, SMT, CISD body close, displacement + FVG, REH/REL target, 09:00-10:30 window. With ~50 reviewed trades, test which tags separate winners from losers.
