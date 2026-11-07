@@ -8,7 +8,7 @@ _Snapshot 2026-11-02 05:37 UTC. Paper trading only._
 <!-- live-rule:start -->
 ## Live Scalp rule check
 
-Built by the Trader at 2026-11-07 20:36 UTC from snapshot, config and the 30-day replay. Rule now: Scalp (M15 → M1) against D1 only, not in asia/overlap, skips audusd. **Scalp is not live right now** (not in focusSetups), so nothing below trades live.
+Built by the Trader at 2026-11-07 20:40 UTC from snapshot, config and the 30-day replay. Rule now: Scalp (M15 → M1) against D1 only, not in asia/overlap, skips audusd. **Scalp is not live right now** (not in focusSetups), so nothing below trades live.
 
 Session now: **newyork**.
 
@@ -31,7 +31,7 @@ Replay total on the markets it trades live: 205 trades, −0.98R a trade (−201
 <!-- coach-churn:start -->
 ## Coach rule changes
 
-Built by the Trader at 2026-11-07 20:36 UTC from the rule history. Rules the Coach changed by itself in the last 7 days (owner rules are not counted).
+Built by the Trader at 2026-11-07 20:40 UTC from the rule history. Rules the Coach changed by itself in the last 7 days (owner rules are not counted).
 
 | Rule | Changes | Steps (oldest first) |
 |---|---|---|
@@ -59,19 +59,19 @@ Built by the Trader at 2026-11-07 20:36 UTC from the rule history. Rules the Coa
 <!-- desk-status:start -->
 ## Desk & mirror status
 
-Built by the Trader at 2026-11-07 20:36 UTC. ICT desk: the last 7 days; mirror: the cTrader DEMO account (0.01 lot, demo only).
+Built by the Trader at 2026-11-07 20:40 UTC. ICT desk: the last 7 days; mirror: the cTrader DEMO account (0.01 lot, demo only).
 
 **ICT A-setups:** 0 signals (0 open, 0 closed); 1 other signal tracked, not A-setups.
 
 **Dip-buy candidate (NQ/ES, paper only):** 0 signals in 7 days · recording since 2026-11-07.
 
-**cTrader mirror:** ok · demo Fusion Markets · balance 997.73 · 0 open (checked 2026-11-07 20:30 UTC).
+**cTrader mirror:** ok · demo Fusion Markets · balance 997.73 · 0 open (checked 2026-11-07 20:37 UTC).
 <!-- desk-status:end -->
 
 <!-- coach-ledger:start -->
 ## Coach change ledger
 
-Built by the Trader at 2026-11-07 20:36 UTC. Every rule the Coach changed by itself, the evidence it used and what happened 30 days later. Filter changes run as champion/challenger trials: the old rule keeps running as a shadow and the change stays only if it beats it on the same forward signals (20 where they disagree, shrunk edge ≥ +0.05R a signal; else back to the old rule after 60 days). Owner rules and live setups are not Coach changes.
+Built by the Trader at 2026-11-07 20:40 UTC. Every rule the Coach changed by itself, the evidence it used and what happened 30 days later. Filter changes run as champion/challenger trials: the old rule keeps running as a shadow and the change stays only if it beats it on the same forward signals (20 where they disagree, shrunk edge ≥ +0.05R a signal; else back to the old rule after 60 days). Owner rules and live setups are not Coach changes.
 
 | Date | Change | Evidence | Before → after (the sample it used) | Trial | 30 days later |
 |---|---|---|---|---|---|
@@ -102,7 +102,7 @@ No 30-day results yet.
 <!-- macro:start -->
 ## Macro strategist
 
-Built by the Macro strategist at 2026-11-07 20:37 UTC for 2026-11-09 (paper only, changes no rule or trade; full view in macro/forecast.json). Regime: **transitional dollar · liquidity n/a · VIX curve inverted (stress)**.
+Built by the Macro strategist at 2026-11-07 20:41 UTC for 2026-11-09 (paper only, changes no rule or trade; full view in macro/forecast.json). Regime: **transitional dollar · liquidity n/a · VIX curve inverted (stress)**.
 
 | Market | P(up) | Lean | Exp. move | Main drivers | Replay hit / base | Brier vs coin |
 |---|---|---|---|---|---|---|
@@ -112,8 +112,63 @@ Built by the Macro strategist at 2026-11-07 20:37 UTC for 2026-11-09 (paper only
 | NQ (Nasdaq 100) | 55% | base rate, no macro tilt | ±1.24% | vix term structure up; own price trend down; risk sentiment up | 56% / 56% (879 d) | 0.248 vs 0.25 |
 | ES (S&P 500) | 53% | base rate, no macro tilt | ±0.54% | vix term structure up; own price trend down; risk sentiment up | 54% / 54% (877 d) | 0.2489 vs 0.25 |
 
-Macro strategist, Sat 7 Nov 20:37 UTC, for Mon 9 Nov (UTC day, open to close). Regime: transitional dollar · liquidity n/a · VIX curve inverted (stress). Gold: 54% up (base rate 54%; base rate, no macro tilt, the replay finds no edge in its drivers). Drivers lean up: macro composite, risk sentiment; against: usd 5-day momentum. Typical move ±0.6%. EUR/USD: 49% up (base rate 49%; base rate, no macro tilt, the replay finds no edge in its drivers). Drivers lean down: usd 5-day momentum, own price trend. Typical move ±0.22%. USD/JPY: 58% up (base rate 56%; macro tilt up 2 pts). Drivers lean up: usd 5-day momentum, own price trend; against: risk sentiment. Typical move ±0.18%. NQ (Nasdaq 100): 55% up (base rate 56%; base rate, no macro tilt). Drivers lean up: vix term structure, risk sentiment; against: own price trend. Typical move ±1.24%. ES (S&P 500): 53% up (base rate 54%; base rate, no macro tilt). Drivers lean up: vix term structure, risk sentiment; against: own price trend. Typical move ±0.54%. DXY: 51% up (mirror of EUR/USD). No high-impact events in the next 5 days on the calendar we could read. Honesty check: on the 880-day walk-forward replay the gold calls hit 53% against a 54% base rate (Brier 0.2494 vs 0.25 for a coin flip, Pesaran-Timmermann 0.5): no proven edge (about the base rate). Event days moved gold 1.118% on average against 0.836% on other days: the size of the move is the more reliable forecast. Treat the direction odds as context, not trade signals.
+Macro strategist, Sat 7 Nov 20:41 UTC, for Mon 9 Nov (UTC day, open to close). Regime: transitional dollar · liquidity n/a · VIX curve inverted (stress). Gold: 54% up (base rate 54%; base rate, no macro tilt, the replay finds no edge in its drivers). Drivers lean up: macro composite, risk sentiment; against: usd 5-day momentum. Typical move ±0.6%. EUR/USD: 49% up (base rate 49%; base rate, no macro tilt, the replay finds no edge in its drivers). Drivers lean down: usd 5-day momentum, own price trend. Typical move ±0.22%. USD/JPY: 58% up (base rate 56%; macro tilt up 2 pts). Drivers lean up: usd 5-day momentum, own price trend; against: risk sentiment. Typical move ±0.18%. NQ (Nasdaq 100): 55% up (base rate 56%; base rate, no macro tilt). Drivers lean up: vix term structure, risk sentiment; against: own price trend. Typical move ±1.24%. ES (S&P 500): 53% up (base rate 54%; base rate, no macro tilt). Drivers lean up: vix term structure, risk sentiment; against: own price trend. Typical move ±0.54%. DXY: 51% up (mirror of EUR/USD). No high-impact events in the next 5 days on the calendar we could read. Honesty check: on the 880-day walk-forward replay the gold calls hit 53% against a 54% base rate (Brier 0.2494 vs 0.25 for a coin flip, Pesaran-Timmermann 0.5): no proven edge (about the base rate). Event days moved gold 1.118% on average against 0.836% on other days: the size of the move is the more reliable forecast. Treat the direction odds as context, not trade signals.
 <!-- macro:end -->
+
+<!-- postmortems:start -->
+## Loss post-mortems
+
+Built by the Analyst (last post-mortem 2026-11-07 20:40 UTC) from the live paper losses of the last 7 days, once the Trader has watched what price did after the stop. Tags (hunt / noise / late / news) are set only when the evidence is clear; where the owner reviewed a loss, the owner's tags count instead.
+
+**25 losses:** no clear tag 21, news 2, hunt 2, late 1.
+
+| Closed (UTC) | Trade | Finding | Tags | MFE; after the stop | Timing | HTF against |
+|---|---|---|---|---|---|---|
+| 11-04 08:15 | ETH/USD Intraday sell | Was +2.44R, then stopped | — | +2.44R; no target in 12 h | stop 15 min after London open; news: USD ISM Manufacturing PMI, USD Congressional Elections | none |
+| 11-04 05:34 | XAU/USD Scalp sell | Against the D1 trend | — | +0.39R; no target in 4 h | news: USD Congressional Elections | D1 |
+| 11-04 02:59 | BTC/USD Retrace buy | Was +1.31R, then stopped | — | +1.31R; target 11.7 h later, 0.82R past the stop first | news: USD Congressional Elections | H4, H1 |
+| 11-04 01:15 | XAU/USD Replica sell | Wrong direction; the stop did its job | — (owner: htf) | +0.09R; no target in 24 h | — | D1 |
+| 11-03 23:35 | XAU/USD Scalp sell | Against the D1 trend | — | +0.23R; no target in 4 h | stop 25 min before Tokyo open | D1 |
+| 11-03 15:52 | GBP/USD Retrace sell | News during the trade | news | +0.17R; no target in 4 h | news: USD Congressional Elections | none |
+| 11-03 15:35 | USD/CHF Intraday sell | Stop swept, then the target | hunt, news | +1.91R; target 10.1 h later, 0R past the stop first | entry 5 min before New York open; news: USD ISM Manufacturing PMI, USD Congressional Elections | D1 |
+| 11-03 12:24 | XAU/USD Scalp sell | Was +4.75R, then stopped | — | +4.75R; no target in 4 h | — | D1 |
+| 11-03 12:20 | XAU/USD Scalp sell | Against the D1 trend | — | +0.85R; no target in 4 h | — | D1 |
+| 11-03 11:11 | XAU/USD Scalp sell | Against the D1 trend | — | +0.27R; no target in 4 h | — | D1 |
+| 11-03 09:31 | BTC/USD Scalp sell | Against the D1 trend | — | +0.04R; no target in 4 h | — | D1 |
+| 11-03 03:01 | BTC/USD Retrace buy | Ordinary loss | — | +0.13R; no target in 12 h | — | H4, H1 |
+| 11-03 00:08 | BTC/USD Retrace buy | Was +1.20R, then stopped | — | +1.20R; no target in 4 h | stop 8 min after Tokyo open | H4, H1 |
+| 11-02 15:58 | BTC/USD Retrace buy | Ordinary loss | — | +0.94R; no target in 12 h | entry 10 min after Tokyo open; news: USD ISM Manufacturing PMI | H4, H1 |
+| 11-02 11:17 | SOL/USD Scalp buy | Against the D1 trend | — | +0.92R; no target in 4 h | — | D1, H4, H1 |
+
+10 older post-mortems of this period are in reviews/analyst.json.
+
+**Owner check:** the owner reviewed 1 of these; on the four shared tags the Analyst matched the owner on 1 of 1.
+<!-- postmortems:end -->
+
+<!-- what-changed:start -->
+## What changed
+
+Daily, for 2026-11-07 (UTC). Each setup's last 20 closed paper trades (live and shadow) against its whole record, in R after costs. The change is tested last 20 vs the trades before them (Welch t): |t| under 1 is noise, 1 to 2 a weak sign, 2 or more (with 20+ earlier trades) a fair one. Nothing here is an edge unless its n and t say so.
+
+**Last 24 h:** 22 trades closed (0 live), −13.17R (live +0.00R).
+
+| Setup | Trades (live) | All-time R a trade | Last 20 | 20 as of 24 h ago | Change | Confidence |
+|---|---|---|---|---|---|---|
+| Scalp (scalp) | 276 (16) | −0.73 (t -3.7) | −0.98 | +1.41 | steady (within noise) | none (t -0.5) |
+| Retrace (rscalp) | 158 (6) | −0.90 (t -4.5) | −1.28 | −1.36 | **decaying** | low (t -1.1, 20 vs 138) |
+| Intraday (intraday) | 48 (5) | −0.03 (t -0.1) | −0.21 | −0.79 | steady (within noise) | none (t -0.6) |
+| Retrace (rintra) | 32 (5) | −0.36 (t -0.9) | −0.13 | −0.13 | steady (within noise) | none (t 0.9) |
+| M30 (m30m1) | 28 (0) | +0.58 (t 0.9) | +1.13 | +1.13 | too few to compare | small sample (n 28) |
+| Position (position) | 3 (1) | −0.74 (t -1.9) | −0.74 (only 3) | — | too few to compare | small sample (n 3) |
+| Replica (replica) | 2 (2) | +0.47 (t 0.3) | +0.47 (only 2) | — | too few to compare | small sample (n 2) |
+| Swing (swing) | 2 (1) | −0.45 (t -0.5) | −0.45 (only 2) | — | too few to compare | small sample (n 2) |
+| Retrace (rswing) | 2 (0) | +0.14 (t 2.0) | +0.14 (only 2) | — | too few to compare | small sample (n 2) |
+
+**Why:**
+- **Retrace** (rscalp) is decaying: −1.28R a trade over the last 20 vs −0.85R before; won 15% of the last 20 (was 28%); biggest mover: XRP/USD, 8 of the last 20 (was 10% of trades) at −2.21R a trade (was −2.68R a trade). Confidence low (t -1.1). Whole record: reliably losing (n 158, t -4.5).
+
+**Edge check:** no setup has a positive record with n ≥ 30 and t ≥ 2, so none is claimed as an edge.
+<!-- what-changed:end -->
 
 ## Top 3 to watch
 
