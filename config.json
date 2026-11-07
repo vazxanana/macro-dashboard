@@ -559,6 +559,12 @@
    "by": "user",
    "change": "Swing to shadow (owner, 7 Nov): no live paper Swing trades; signals still recorded as shadow",
    "why": "10-year OANDA replay of the live engine (gold + 5 forex, one spread a trade): -0.095R a trade, n2,076, t -3.0, negative in both halves; no filter or exit of 10 tested turns it positive (research/edge/meridian-swing). Owner chose shadow."
+  },
+  {
+   "at": "2026-11-07T21:05:52.000Z",
+   "by": "user",
+   "change": "Crypto trend (BTC, ETH, SOL, XRP) to shadow (owner, 7 Nov): new breakouts are recorded as shadow trades, not live paper; open trades run to their exits",
+   "why": "Decay study (#508): 2017-May 2025 strong (+2.8R a trade over 124 incl. the add), Jun 2025-Oct 2026 -0.13R a trade over 20 (t -0.56), Kraken candles from Mar 2025 -0.25R over 24. 2024-26 rests on one XRP run (without the top 5% +0.05R). Fees ~0.07R, not the cause; the BTC 200-day regime explains 2018/2022 but not the recent fade. About a 10% chance it is bad luck. Owner chose shadow."
   }
  ],
  "btAt": "2026-11-07T20:21:42.476Z",
@@ -601,7 +607,8 @@
   "gold-trend-fast",
   "scalp-against-live",
   "scalp-shadow-research",
-  "swing-shadow-research"
+  "swing-shadow-research",
+  "crypto-trend-shadow"
  ],
  "target": {},
  "targetBy": {},
@@ -612,11 +619,11 @@
  "noPause": true,
  "wouldPause": {
   "rintra": {
-   "at": "2026-11-07T21:03:38.000Z",
+   "at": "2026-11-07T21:05:52.000Z",
    "why": "four losses in a row"
   },
   "scalp": {
-   "at": "2026-11-07T21:03:38.000Z",
+   "at": "2026-11-07T21:05:52.000Z",
    "why": "expectancy -1.00R over 13 trades"
   },
   "xau": {
@@ -748,5 +755,6 @@
   "n": 5,
   "k": 2
  },
- "focusSetups": []
+ "focusSetups": [],
+ "cryptoTrendShadow": true
 }
