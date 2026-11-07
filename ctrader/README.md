@@ -42,3 +42,20 @@ no council bot needed. One instance trades every coin in its list.
 - State lives in the positions: labels CT55 / CT100, adds CT55A / CT100A. Restarting is safe.
 - Don't run CouncilBridge with "Mirror crypto trend" on at the same time, or each signal is traded twice.
 - Crypto CFDs charge overnight financing on longs. Trend trades last weeks, so check the swap rate first.
+
+# CryptoScalper.cs — BTC / ETH M15 scalper (7 Nov 2026)
+
+The ICT desk's iFVG reversal on closed M15 candles. A swing is swept, then a candle body closes back through the leg's fair
+value gap; the bot enters at market.
+- **Filters:** only WITH the daily bias (the last daily close vs its 50-day average), and only when the stop is at least 0.5% of price.
+- **Exit:** the stop trails 1.5R behind the best price from +2R; time exit after 24 h.
+- **Limits:** one trade per coin, and a daily loss stop (default 2%).
+
+**Research before building** (Binance 5m 2022 - Nov 2026, 0.06% round-trip cost):
+- The other crypto scalps lose after costs: H1 momentum pullback, Asia-range breakout, M15 RSI(2) dips, M5 iFVG.
+- This rule on BTC+ETH: 2022 +127.5R, 2023 −6.6R, 2024 +68.3R, 2025 +48.8R, 2026 +53.2R. That is about +0.07R a trade, ~900 trades a year, worst drawdown ~64R.
+- Stops of at least 0.4 / 0.6% hold too. SOL and XRP lose with the same rule.
+- Thin edge: spreads and fees decide it. Default risk 0.1% a trade; run it on demo / dry run first.
+
+**Setup:** Automate → New cBot → paste `CryptoScalper.cs` → Build (no access rights). Add one instance to any chart.
+Default symbols `BTCUSD,ETHUSD`; change them to your broker's names. cTrader Desktop must stay on.
