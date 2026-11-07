@@ -19,6 +19,8 @@ import { d1AdxFeat } from './adx.mjs';
 // paper fills (8 Nov): costs (raw R + cost-adjusted Rnet), the stale-signal shadow stat, gap-aware stops (council/fills.mjs)
 import { costModel, annotateCosts, costSummary, driftR, backfillDrift, staleStats, stopFill, exitR, fillBarAmbiguous, spotSkip } from './fills.mjs';
 import { SYMBOLS as BROKER_SYMBOLS } from './ctrader-mirror.mjs';
+// feed source on every record + re-quote / cancel / re-base when a market's candle feed changes source (8 Nov, council/feed.mjs)
+import { feedTag, requoteMarket, feedChangeText } from './feed.mjs';
 import { newsFeat } from './events.mjs';
 import { fetchDaily as regimeDaily, regimeOf, regimeShadow } from './regime.mjs';
 
@@ -501,6 +503,7 @@ for (const [key, M] of Object.entries(MARKETS)) {
       if (tfs.every(([id]) => got[id])) { feed = 'OANDA'; for (const [id] of tfs) src[id] = { bars: got[id] }; }
     }
     (snapshot.feed = snapshot.feed || {})[key] = feed;
+    const FEED = feedTag(feed);   // 'oanda' | 'kraken': written on every record this round creates
     if (feed === 'Kraken') for (const [id, iv] of tfs) {
       const bars = await kraken(M.kraken, iv);
       await sleep(1100);
@@ -525,6 +528,18 @@ for (const [key, M] of Object.entries(MARKETS)) {
       } catch (e) { (snapshot.d1src = snapshot.d1src || {})[key] = { src: 'Kraken', trend: kt, why: String(e.message || e).slice(0, 80) }; } }
     const price = src['1m'].bars.at(-1).close;
     if (key === 'xau') goldM1 = src['1m'].bars;
+    // feed change (8 Nov, council/feed.mjs): a record priced on one feed is never filled, stopped or targeted by the other feed's
+    // candles. Pending orders priced on the previous feed are re-derived from the rule's own levels on this feed (Gold daily engulf)
+    // or cancelled with the reason; open positions keep the fill and have stop / target / trail marks re-based by the basis measured
+    // on the switch minute (state.feedLast = the previous round's last closed 1-minute candle, same frame as these bars). Every live
+    // record gets its feed tag here; a switch is logged in state.feedChanges and shown in snapshot.errors / snapshot.feedChanges.
+    { const FL = (state.feedLast = state.feedLast || {}), prev = FL[key], dpF = Math.max(2, (M.dec ?? 2) + 1);
+      const q = requoteMarket({ trades, key, feed, src, price, now, dp: dpF, config, prev, oandaMarket: OANDA_D1.has(key) });
+      if (q.from || (prev && prev.feed !== FEED)) {
+        const c = { at: nowISO, market: key, label: M.label, from: q.from || prev.feed, to: FEED, basis: q.basis, rederived: q.rederived, cancelled: q.cancelled, rebased: q.rebased, kept: q.kept, ids: q.ids.slice(0, 20) };
+        state.feedChanges = (state.feedChanges || []).concat([c]).slice(-50); snapshot.errors['feed:' + key] = feedChangeText(c);
+      }
+      const lc = src['1m'].bars.at(-2) || src['1m'].bars.at(-1); FL[key] = { feed: FEED, t: lc.time, close: lc.close }; }
     setMarket(M);
     const setups = BUILDERS.map(([pr, fn]) => { try { return fn(pr, price, src); } catch (e) { return null; } }).filter(Boolean);
     snapshot.markets[key] = {
@@ -534,13 +549,13 @@ for (const [key, M] of Object.entries(MARKETS)) {
     };
 
     if (config.retireLegacy) for (const tr of trades.filter((x) => x.market === key && !x.shadow && !['replica', 'mosha-bo', 'trend', 'gtrend', 'gtrend5', 'gtl', 'geg', 'gmp'].includes(x.k) && (x.status === 'open' || x.status === 'pending'))) {
-      if (tr.status === 'pending') { tr.status = 'expired'; tr.R = 0; } else { const r0 = tr.r0 || Math.abs(tr.entry - tr.stop), R = +(((tr.side === 'sell' ? -1 : 1) * (price - tr.entry)) / r0).toFixed(2); tr.R = R; tr.status = R > 0 ? 'win' : R < 0 ? 'loss' : 'be'; }
+      if (tr.status === 'pending') { tr.status = 'expired'; tr.R = 0; } else { const r0 = tr.r0 || Math.abs(tr.entry - tr.stop), R = +(((tr.side === 'sell' ? -1 : 1) * (price - tr.entry - (tr.feedBasis || 0))) / r0).toFixed(2); tr.R = R; tr.status = R > 0 ? 'win' : R < 0 ? 'loss' : 'be'; }
       tr.closed = now; tr.exit = 'retired';
     }
     // ─── Manage open trades on this market with the candles since the last check ───
     for (const tr of trades.filter((x) => x.market === key && (x.status === 'pending' || x.status === 'open'))) {
       const bars = (src['1m'].bars[0].time <= tr.checked ? src['1m'] : src['5m'].bars[0].time <= tr.checked ? src['5m'] : src['15m']).bars;
-      const s = tr.side === 'sell';
+      const s = tr.side === 'sell', E = tr.entry + (tr.feedBasis || 0);   // E: the entry in this feed's frame (council/feed.mjs)
       let exitBar = null, next = bars.at(-1).time;
       // forex: leave the newest 3 one-minute candles for the next run, so a lone spike is judged (and clipped) before it can
       // fill, stop or target a trade
@@ -562,37 +577,37 @@ for (const [key, M] of Object.entries(MARKETS)) {
           else if (s ? b.low <= tr.t1 : b.high >= tr.t1) { tr.status = 'missed'; tr.closed = b.time; tr.R = 0; break; }
           else continue;
         }
-        const r0 = tr.r0 || (tr.r0 = Math.abs(tr.entry - tr.stop));
+        const r0 = tr.r0 || (tr.r0 = Math.abs(E - tr.stop));
         if (s ? b.high >= tr.stop : b.low <= tr.stop) {
           // 8 Nov: a candle that opens beyond the stop (weekend / news gap, missing candles) fills at its open, not at the stop
           const px = stopFill(b, s, tr.stop, b.time > tr.filled), gapped = px !== tr.stop;
-          if (tr.trail && tr.trailMoved) { tr.R = exitR(s, tr.entry, px, r0); tr.status = tr.R > 0 ? 'win' : tr.R < 0 ? 'loss' : 'be'; tr.exit = 'trailing stop'; }
-          else if (tr.beMoved) { tr.R = exitR(s, tr.entry, px, r0); tr.status = tr.R < 0 ? 'loss' : 'be'; } else { tr.status = 'loss'; tr.R = gapped ? exitR(s, tr.entry, px, r0) : -1; }
+          if (tr.trail && tr.trailMoved) { tr.R = exitR(s, E, px, r0); tr.status = tr.R > 0 ? 'win' : tr.R < 0 ? 'loss' : 'be'; tr.exit = 'trailing stop'; }
+          else if (tr.beMoved) { tr.R = exitR(s, E, px, r0); tr.status = tr.R < 0 ? 'loss' : 'be'; } else { tr.status = 'loss'; tr.R = gapped ? exitR(s, E, px, r0) : -1; }
           if (gapped) tr.gapR = +((s ? px - tr.stop : tr.stop - px) / r0).toFixed(2);   // R lost beyond the stop
           tr.exitPx = px; tr.exitKind = 'stop'; tr.closed = b.time; exitBar = b; break;
         }
         if (s ? b.low <= tr.t1 : b.high >= tr.t1) { tr.status = 'win'; tr.closed = b.time; tr.R = tr.rr; tr.exitPx = tr.t1; tr.exitKind = 'target'; exitBar = b; break; }
-        if (tr.maxHold && b.time >= tr.filled + tr.maxHold) { const R = +((s ? tr.entry - b.close : b.close - tr.entry) / r0).toFixed(2); tr.status = R > 0 ? 'win' : R < 0 ? 'loss' : 'be'; tr.R = R; tr.closed = b.time; tr.exit = `${tr.maxHold / 3600} h`; tr.exitPx = b.close; tr.exitKind = 'time'; exitBar = b; break; }
+        if (tr.maxHold && b.time >= tr.filled + tr.maxHold) { const R = +((s ? E - b.close : b.close - E) / r0).toFixed(2); tr.status = R > 0 ? 'win' : R < 0 ? 'loss' : 'be'; tr.R = R; tr.closed = b.time; tr.exit = `${tr.maxHold / 3600} h`; tr.exitPx = b.close; tr.exitKind = 'time'; exitBar = b; break; }
         // how far the trade went for (MFE) and against (MAE), in R: the Coach learns trade management from these
-        tr.mfe = +Math.max(tr.mfe || 0, ((s ? tr.entry - b.low : b.high - tr.entry) / r0)).toFixed(2);
-        tr.mae = +Math.max(tr.mae || 0, ((s ? b.high - tr.entry : tr.entry - b.low) / r0)).toFixed(2);
+        tr.mfe = +Math.max(tr.mfe || 0, ((s ? E - b.low : b.high - E) / r0)).toFixed(2);
+        tr.mae = +Math.max(tr.mae || 0, ((s ? b.high - E : E - b.low) / r0)).toFixed(2);
         // break-even rule from the Coach: once the trade is config.be R in profit, the stop moves to the entry
         // only on a candle that actually reached +be R: a trade that was past it before the rule existed and is now
         // back near the entry can't place a stop on the wrong side of price, so it waits until it gets there again
         // trailing stop (replica, 4 Nov): once the trade is trail[0] R in profit, the stop follows trail[1] R behind the best price
-        if (tr.trail && tr.mfe >= tr.trail[0]) { const ns = tr.entry + (s ? -1 : 1) * (tr.mfe - tr.trail[1]) * r0; if (s ? ns < tr.stop : ns > tr.stop) { tr.stop = +ns.toFixed(Math.max(2, (tr.dec ?? 2) + 1)); tr.trailMoved = true; } }
-        if (config.be && !tr.noBe && !tr.beMoved && ((s ? tr.entry - b.low : b.high - tr.entry) / r0) >= config.be) { tr.stop = tr.entry; tr.beMoved = true; }
+        if (tr.trail && tr.mfe >= tr.trail[0]) { const ns = E + (s ? -1 : 1) * (tr.mfe - tr.trail[1]) * r0; if (s ? ns < tr.stop : ns > tr.stop) { tr.stop = +ns.toFixed(Math.max(2, (tr.dec ?? 2) + 1)); tr.trailMoved = true; } }
+        if (config.be && !tr.noBe && !tr.beMoved && ((s ? E - b.low : b.high - E) / r0) >= config.be) { tr.stop = E; tr.beMoved = true; }
         // per-trade breakeven (gold replica, 5 Nov, gold-top-be): once the trade reaches +beAt R the stop moves to the entry
-        if (tr.beAt && !tr.beMoved && ((s ? tr.entry - b.low : b.high - tr.entry) / r0) >= tr.beAt) { tr.stop = tr.entry; tr.beMoved = true; }
+        if (tr.beAt && !tr.beMoved && ((s ? E - b.low : b.high - E) / r0) >= tr.beAt) { tr.stop = E; tr.beMoved = true; }
         // pyramid add (gold replica, 5 Nov, gold-add): at +addAt R a second unit opens at that level, stop at this trade's entry, same
         // target; its trail is this trade's trail re-expressed in its own R (parent [4,1] -> add [1,0.5]); size scales its R so
         // the add's 2R-wide stop counts as 2R of account risk. Adds don't count toward the max-3-open cap.
         if (tr.addAt && !tr.addDone && tr.status === 'open' && tr.mfe >= tr.addAt) {
-          tr.addDone = true; const dp = Math.max(2, (tr.dec ?? 2) + 1), dir = s ? -1 : 1, ae = +(tr.entry + dir * tr.addAt * r0).toFixed(dp), rA = Math.abs(ae - tr.entry);
+          tr.addDone = true; const dp = Math.max(2, (tr.dec ?? 2) + 1), dir = s ? -1 : 1, ae = +(E + dir * tr.addAt * r0).toFixed(dp), rA = Math.abs(ae - E);
           if (rA > 0 && !trades.some((x) => x.id === `${tr.id}-add`)) trades.push({ id: `${tr.id}-add`, market: tr.market, label: tr.label, dec: tr.dec, k: tr.k, name: `${tr.name} add`, pair: tr.pair, h: tr.h, side: tr.side,
-            entry: ae, stop: tr.entry, t1: tr.t1, rr: +(Math.abs(tr.t1 - ae) / rA).toFixed(2), trail: tr.trail ? [+((tr.trail[0] - tr.addAt) / tr.addAt).toFixed(3), +(tr.trail[1] / tr.addAt).toFixed(3)] : undefined,
+            entry: ae, stop: E, t1: tr.t1, rr: +(Math.abs(tr.t1 - ae) / rA).toFixed(2), trail: tr.trail ? [+((tr.trail[0] - tr.addAt) / tr.addAt).toFixed(3), +(tr.trail[1] / tr.addAt).toFixed(3)] : undefined,
             size: +(tr.addAt * (tr.size || 1)).toFixed(2), buf: tr.buf, opened: b.time, filled: b.time, checked: b.time, status: 'open', R: null, r0: rA, maxHold: Math.max(300, (tr.filled + (tr.maxHold || 48 * 3600)) - b.time), noBe: true, entryMode: 'market', addOf: tr.id, shadow: false, blockedBy: [],
-            note: `${tr.name} add: the trade from ${tr.entry} reached +${tr.addAt}R, so a second unit ${tr.side === 'sell' ? 'sells' : 'buys'} ${ae} with the stop at the first entry ${tr.entry} (${tr.addAt}R of risk, counted as size ${tr.addAt}); ${tr.trail ? `after the first trade's +${tr.trail[0]}R both trail ${tr.trail[1]}R behind the best price` : `target ${tr.t1}`}; out with the first trade.` });
+            feed: FEED, note: `${tr.name} add: the trade from ${E} reached +${tr.addAt}R, so a second unit ${tr.side === 'sell' ? 'sells' : 'buys'} ${ae} with the stop at the first entry ${E} (${tr.addAt}R of risk, counted as size ${tr.addAt}); ${tr.trail ? `after the first trade's +${tr.trail[0]}R both trail ${tr.trail[1]}R behind the best price` : `target ${tr.t1}`}; out with the first trade.` });
         }
       }
       tr.checked = exitBar ? bars.at(-1).time : next;
@@ -673,7 +688,7 @@ for (const [key, M] of Object.entries(MARKETS)) {
                   open.addDone = true; const ae = +price.toFixed(dp), rA = open.r0, st = +(ae - rA).toFixed(dp);
                   if (ae > open.entry && st > 0) trades.push({ id: `${open.id}-add`, market: key, label: M.label, dec: M.dec, k: 'trend', sys: open.sys, kATR: open.kATR, name: 'Crypto trend add', pair: open.pair, h: '1d', side: 'buy',
                     entry: ae, stop: st, t1: +(ae * 100).toFixed(2), rr: 99, trail: [1e6, 0], size: config.cryptoAdd.size, buf: CFG.buf, opened: now, filled: now, checked: now, status: 'open', R: null, r0: rA, noBe: true, entryMode: 'market', addOf: open.id, shadow: !!open.shadow, blockedBy: open.shadow ? ['owner-shadow'] : [],
-                    note: `Crypto trend add: the trade from ${open.entry} closed the day +${config.cryptoAdd.atR}R (5 ATR) higher, so a second unit buys ${ae} with its own catastrophe stop ${st} (5 ATR at entry); it exits with the first trade on a daily close under the channel midpoint ${open.midStop}.` });
+                    feed: FEED, note: `Crypto trend add: the trade from ${open.entry} closed the day +${config.cryptoAdd.atR}R (5 ATR) higher, so a second unit buys ${ae} with its own catastrophe stop ${st} (5 ATR at entry); it exits with the first trade on a daily close under the channel midpoint ${open.midStop}.` });
                 }
               } else {
                 const ns = +(open.best - (open.kATR || 4) * atrAt(i)).toFixed(dp);
@@ -695,7 +710,7 @@ for (const [key, M] of Object.entries(MARKETS)) {
             if (r0 > 0) trades.push({ id, market: key, label: M.label, dec: M.dec, k: 'trend', sys: S.sys, kATR: S.k, name: 'Crypto trend', pair: `D1 ${S.sys}-day breakout`, h: '1d', side: 'buy',
               entry, stop, t1: +(entry * 100).toFixed(2), rr: 99, trail: [1e6, 0], buf: CFG.buf, opened: now, filled: now, checked: now, status: 'open', R: null, r0, noBe: true, entryMode: 'market', lastD: last.time, best: last.close, drift: driftR('buy', last.close, entry, stop), exitRule: 'mid', midStop: +midNow.toFixed(dp),
               feat: { hi: +hi.toFixed(4), atr: +A.toFixed(4) }, shadow: sh, blockedBy: sh ? ['owner-shadow'] : [],
-              note: `Crypto trend: daily close ${last.close} above the ${S.sys}-day high ${+hi.toFixed(4)}. Buy at market, catastrophe stop ${S.k} ATR below (${stop}); out on a daily close under the ${S.sys}-day channel midpoint (now ${+midNow.toFixed(dp)}), which only ratchets up.` });
+              feed: FEED, note: `Crypto trend: daily close ${last.close} above the ${S.sys}-day high ${+hi.toFixed(4)}. Buy at market, catastrophe stop ${S.k} ATR below (${stop}); out on a daily close under the ${S.sys}-day channel midpoint (now ${+midNow.toFixed(dp)}), which only ratchets up.` });
           }
         }
         const openT = trades.filter((x) => x.k === 'trend' && x.market === key && x.status === 'open');
@@ -721,11 +736,11 @@ for (const [key, M] of Object.entries(MARKETS)) {
             const gAdd = trades.find((x) => x.addOf === open.id && x.status === 'open');
             if (last.time > (open.lastD || 0)) { const ns = +(last.close - GT.k * atr14(n - 1)).toFixed(dp); if (ns > open.stop) { open.stop = ns; open.trailMoved = true; } if (gAdd && ns > gAdd.stop) { gAdd.stop = ns; gAdd.trailMoved = true; } open.lastD = last.time;
               // gold-trend-add (6 Nov): one add at market when a closed daily candle is +atR R above the entry; same stop, exits with the first unit
-              if (config.goldTrendAdd && !gAdd && !trades.some((x) => x.addOf === open.id) && last.close - open.entry >= config.goldTrendAdd.atR * open.r0) {
+              if (config.goldTrendAdd && !gAdd && !trades.some((x) => x.addOf === open.id) && last.close - (open.entry + (open.feedBasis || 0)) >= config.goldTrendAdd.atR * open.r0) {
                 const ae = +price.toFixed(dp), rA = ae - open.stop;
                 if (rA > 0) trades.push({ id: `${open.id}-add`, market: key, label: M.label, dec: M.dec, k: LEG.k, name: `${LEG.name} add`, pair: open.pair, h: '1d', side: 'buy',
                   entry: ae, stop: open.stop, t1: +(ae * 100).toFixed(2), rr: 99, trail: [1e6, 0], size: 1, buf: CFG.buf, opened: now, filled: now, checked: now, status: 'open', R: null, r0: rA, noBe: true, entryMode: 'market', addOf: open.id, shadow: !!open.shadow, blockedBy: open.shadow ? ['owner-shadow'] : [],
-                  note: `${LEG.name} add: daily close ${last.close} is +${config.goldTrendAdd.atR}R above the first entry ${open.entry}, so a second unit buys ${ae} with the same stop ${open.stop}; the stop keeps rising with the daily closes; out with the first unit.` });
+                  feed: FEED, note: `${LEG.name} add: daily close ${last.close} is +${config.goldTrendAdd.atR}R above the first entry ${open.entry}, so a second unit buys ${ae} with the same stop ${open.stop}; the stop keeps rising with the daily closes; out with the first unit.` });
               } }
           } else {
             const hi = Math.max(...D.slice(n - 1 - GT.n, n - 1).map((b) => b.high)), A = atr14(n - 1), id = `${key}-${LEG.k}-${last.time}`;
@@ -734,7 +749,7 @@ for (const [key, M] of Object.entries(MARKETS)) {
               if (r0 > 0) trades.push({ id, market: key, label: M.label, dec: M.dec, k: LEG.k, name: LEG.name, pair: `D1 ${GT.n}-day breakout`, h: '1d', side: 'buy',
                 entry, stop, t1: +(entry * 100).toFixed(2), rr: 99, trail: [1e6, 0], buf: CFG.buf, opened: now, filled: now, checked: now, status: 'open', R: null, r0, noBe: true, entryMode: 'market', lastD: last.time, drift: driftR('buy', last.close, entry, stop),
                 feat: { hi: +hi.toFixed(2), atr: +A.toFixed(2) }, shadow: sh, blockedBy: sh ? ['owner-shadow'] : [],
-                note: `${LEG.name}: daily close ${last.close} above the ${GT.n}-day high ${hi.toFixed(2)}. Buy at market, stop ${GT.k} x ATR(D1) below (${stop}); the stop rises to (daily close - ${GT.k} ATR) on every closed day; no target.` });
+                feed: FEED, note: `${LEG.name}: daily close ${last.close} above the ${GT.n}-day high ${hi.toFixed(2)}. Buy at market, stop ${GT.k} x ATR(D1) below (${stop}); the stop rises to (daily close - ${GT.k} ATR) on every closed day; no target.` });
             }
           }
         }
@@ -760,7 +775,7 @@ for (const [key, M] of Object.entries(MARKETS)) {
                 if (r0 > 0) trades.push({ id, market: key, label: M.label, dec: M.dec, k: 'gtl', name: 'Gold H4 trendline', pair: 'H4 trendline break', h: '4h', side: 'buy',
                   entry, stop, t1: +(entry + 10 * r0).toFixed(dp), tp1: +(entry + 2 * r0).toFixed(dp), rr: 10, trail: [2, 1], buf: CFG.buf, opened: now, filled: now, checked: now, status: 'open', R: null, r0, maxHold: TL.hold * 3600, noBe: true, entryMode: 'market', drift: driftR('buy', last.close, entry, stop),
                   feat: { line: +lv.toFixed(2), anchors: [+pa.toFixed(2), +pb.toFixed(2)], lo: +lo.toFixed(2) }, shadow: false, blockedBy: [],
-                  note: `Gold H4 trendline: H4 close ${last.close} above the falling line ${lv.toFixed(2)} through the pivot highs ${pa.toFixed(2)} and ${pb.toFixed(2)}, H4 direction up (Malaysian SnR SOP). Buy at market, stop ${stop} under the low since the second anchor; after +2R (${(entry + 2 * r0).toFixed(2)}) the stop trails 1R behind the best price (cap 10R); out after ${TL.hold} h.` });
+                  feed: FEED, note: `Gold H4 trendline: H4 close ${last.close} above the falling line ${lv.toFixed(2)} through the pivot highs ${pa.toFixed(2)} and ${pb.toFixed(2)}, H4 direction up (Malaysian SnR SOP). Buy at market, stop ${stop} under the low since the second anchor; after +2R (${(entry + 2 * r0).toFixed(2)}) the stop trails 1R behind the best price (cap 10R); out after ${TL.hold} h.` });
               } else { state.blocked = 'direction'; }
             }
           }
@@ -789,7 +804,7 @@ for (const [key, M] of Object.entries(MARKETS)) {
             if (r0 > 0 && price > entry) trades.push({ id, market: key, label: M.label, dec: M.dec, k: 'geg', name: 'Gold daily engulf', pair: 'D1 engulf zone', h: '1d', side: 'buy',
               entry, stop, t1: +(entry + 10 * r0).toFixed(dp), tp1: +(entry + 2 * r0).toFixed(dp), rr: 10, trail: [2, 1], buf: CFG.buf, opened: now, checked: now, status: 'pending', R: null, r0, validFor: EG.life * 86400, maxHold: EG.hold * 3600, noBe: true, entryMode: 'limit',
               zone: [+base.low.toFixed(dp), +base.high.toFixed(dp)], lastD: last.time, feat: { sma: +sma.toFixed(2), conf: last.close }, shadow: false, blockedBy: [],
-              note: `Gold daily engulf: daily close ${last.close} above the high ${base.high} of the red candle of ${new Date(base.time * 1000).toISOString().slice(0, 10)} (zone ${base.low}-${base.high}), close above the ${EG.sma}-day average ${sma.toFixed(2)}. Limit buy at the zone high ${entry} for ${EG.life} days (cancelled by a daily close under ${base.low}); stop ${stop}; after +2R (${(entry + 2 * r0).toFixed(2)}) the stop trails 1R behind the best price (cap 10R); out ${EG.hold / 24} days after the fill.` });
+              feed: FEED, note: `Gold daily engulf: daily close ${last.close} above the high ${base.high} of the red candle of ${new Date(base.time * 1000).toISOString().slice(0, 10)} (zone ${base.low}-${base.high}), close above the ${EG.sma}-day average ${sma.toFixed(2)}. Limit buy at the zone high ${entry} for ${EG.life} days (cancelled by a daily close under ${base.low}); stop ${stop}; after +2R (${(entry + 2 * r0).toFixed(2)}) the stop trails 1R behind the best price (cap 10R); out ${EG.hold / 24} days after the fill.` });
           } else if (base && !up) state.blocked = 'below 20-day average';
         }
         (snapshot.goldEG = snapshot.goldEG || {}).state = { ...state, pending: mine.filter((x) => x.status === 'pending').map((x) => x.entry), open: mine.filter((x) => x.status === 'open').length };
@@ -818,7 +833,7 @@ for (const [key, M] of Object.entries(MARKETS)) {
                 if (r0 > 0.5 && (entry - stop) * w.d > 0) trades.push({ id, market: key, label: M.label, dec: M.dec, k: 'gmp', name: 'Gold momentum pullback', pair: 'H1 momentum → M5 pullback', h: '5m', side: w.d > 0 ? 'buy' : 'sell',
                   entry, stop, t1: +(entry + w.d * 10 * r0).toFixed(dp), tp1: +(entry + w.d * MP.k * r0).toFixed(dp), rr: 10, trail: [MP.k, 1], buf: CFG.buf, opened: now, filled: now, checked: now, status: 'open', R: null, r0, maxHold: 8 * 3600, noBe: true, entryMode: 'market', drift: driftR(w.d > 0 ? 'buy' : 'sell', c.close, entry, stop),
                   feat: { h1: w.t, zone: [+w.zlo.toFixed(2), +w.zhi.toFixed(2)], d1: dDir }, shadow: true, blockedBy: ['test'], test: true,   // owner 6 Nov: on test, tracked as a shadow trade labelled test
-                  note: `Gold momentum pullback: the H1 candle of ${new Date(w.t * 1000).toISOString().slice(11, 16)} UTC was a momentum candle with the 20-day trend; an M5 candle pulled back into ${w.zlo.toFixed(2)}-${w.zhi.toFixed(2)} and closed ${w.d > 0 ? 'up' : 'down'}. ${w.d > 0 ? 'Buy' : 'Sell'} at market, stop ${stop} beyond the H1 candle; after +${MP.k}R the stop trails 1R behind the best price (cap 10R); out after 8 h.` }); }
+                  feed: FEED, note: `Gold momentum pullback: the H1 candle of ${new Date(w.t * 1000).toISOString().slice(11, 16)} UTC was a momentum candle with the 20-day trend; an M5 candle pulled back into ${w.zlo.toFixed(2)}-${w.zhi.toFixed(2)} and closed ${w.d > 0 ? 'up' : 'down'}. ${w.d > 0 ? 'Buy' : 'Sell'} at market, stop ${stop} beyond the H1 candle; after +${MP.k}R the stop trails 1R behind the best price (cap 10R); out after 8 h.` }); }
               break; } }
           if (!done && now < w.until) keep.push(w);
         }
@@ -873,7 +888,7 @@ for (const [key, M] of Object.entries(MARKETS)) {
               ...(config.moshaBeR ? { beAt: config.moshaBeR } : {}), ...(config.moshaAdd ? { addAt: config.moshaAdd.atR, addSize: config.moshaAdd.size } : {}),
               ...(config.moshaRun ? { t1: +(entry + d * 10 * r0).toFixed(2), rr: 10, tp1: +(entry + d * config.moshaRun.atR * r0).toFixed(2), trail: [config.moshaRun.atR, config.moshaRun.trail] } : {}),
               feat: { h4At: e1.t, h1At: e2.t, m15At: e3.t, w1: w1At(e3.t) === d ? 'with' : 'against', m15Flip: !!e3.flip, pull }, shadow: blk.length > 0, blockedBy: blk,
-              note: `Mosha BO system: ${config.moshaBoWeekly ? `weekly structure ${d < 0 ? 'bearish' : 'bullish'}, ` : ''}H4 BO ${d < 0 ? 'sell' : 'buy'}, then H1 BO ${d < 0 ? 'buy' : 'sell'} (retracement), then M15 BO ${d < 0 ? 'sell' : 'buy'} through ${entry}. Pullback limit at the broken M15 level ${entry}, stop past the M15 Origin ${stop}, target 3R ${(entry + d * 3 * r0).toFixed(2)}; valid 24 h, out after 72 h.` });
+              feed: FEED, note: `Mosha BO system: ${config.moshaBoWeekly ? `weekly structure ${d < 0 ? 'bearish' : 'bullish'}, ` : ''}H4 BO ${d < 0 ? 'sell' : 'buy'}, then H1 BO ${d < 0 ? 'buy' : 'sell'} (retracement), then M15 BO ${d < 0 ? 'sell' : 'buy'} through ${entry}. Pullback limit at the broken M15 level ${entry}, stop past the M15 Origin ${stop}, target 3R ${(entry + d * 3 * r0).toFixed(2)}; valid 24 h, out after 72 h.` });
           }
         }
       } catch (e) { snapshot.errors.moshaBo = String(e.message || e); }
@@ -950,7 +965,7 @@ for (const [key, M] of Object.entries(MARKETS)) {
         research.push({ id: `${key}-replica-${now}-${g.sell ? 's' : 'b'}`, sig, market: key, label: M.label, dec: M.dec, k: 'replica', name: key === 'xau' ? 'Gold replica' : `${M.label} replica`, lag, side: g.sell ? 'sell' : 'buy',
           entry: pxr(entry), stop: pxr(stop), stop0: pxr(stop0), t1: pxr(t1), rr: 2, opened: now, filled: now, checked: now, status: 'open', R: null, v: 5, drift,
           pass, v5, h4, h1clear, msnr: msnrOf(g.sell), eg: g.eg, peg: g.peg, star: g.star, riskAtr: +riskAtr.toFixed(2), legStart: +g.start.toFixed(2), leg: g.L === 36 ? '3h' : '6h', ext: +g.ext.toFixed(2), chochLevel: +g.lvl.toFixed(2), d1: src['1d'].A.trend === (g.sell ? -1 : 1) ? 'with' : 'against', session: sessionOf(now),
-          note: `Research (paper only): gold replica v5${!pass ? '' : h4 !== 'against' ? ' (v4 passes; v5 skips it: H4 trend not against the trade)' : ''}${pass ? '' : riskAtr < 1 ? ' (filter fails: stop under one M15 ATR)' : ' (filter fails: inside a live H1 Origin, no ★ engulfing)'}. ${g.L === 36 ? '3 h' : '6 h'} leg to ${g.ext.toFixed(2)}, M5 CHoCH through ${g.lvl.toFixed(2)}${g.star ? ', ★ engulfing at structure at the extreme' : g.peg ? ', engulfing at the extreme (not at a level)' : ''}${h1clear ? ', clear of H1 Origins' : ''}; ${g.sell ? 'sell' : 'buy'} ${entry.toFixed(2)}, stop ${stop.toFixed(2)}, target 2R ${t1.toFixed(2)}.` });
+          feed: FEED, note: `Research (paper only): gold replica v5${!pass ? '' : h4 !== 'against' ? ' (v4 passes; v5 skips it: H4 trend not against the trade)' : ''}${pass ? '' : riskAtr < 1 ? ' (filter fails: stop under one M15 ATR)' : ' (filter fails: inside a live H1 Origin, no ★ engulfing)'}. ${g.L === 36 ? '3 h' : '6 h'} leg to ${g.ext.toFixed(2)}, M5 CHoCH through ${g.lvl.toFixed(2)}${g.star ? ', ★ engulfing at structure at the extreme' : g.peg ? ', engulfing at the extreme (not at a level)' : ''}${h1clear ? ', clear of H1 Origins' : ''}; ${g.sell ? 'sell' : 'buy'} ${entry.toFixed(2)}, stop ${stop.toFixed(2)}, target 2R ${t1.toFixed(2)}.` });
         // live (config.replicaLive): every passing signal also trades on the live book, as on the replay (no slot limit),
         // at market, 2R target, out after 48 h, no break-even move
         // exit v2 (4 Nov, night): once +2R the stop trails 2R behind the best price (was +1.5R / 1R). 8-year spot gold, 1.5% gate,
@@ -998,7 +1013,7 @@ for (const [key, M] of Object.entries(MARKETS)) {
           ...(key === 'xau' && config.goldRun ? { t1: pxr(entry + (g.sell ? -10 : 10) * Math.abs(pxr(entry) - pxr(stop))), rr: 10, trail: [config.goldRun.atR, config.goldRun.trail], runAfter: config.goldRun.atR } : {}),
           ...(key === 'xau' && config.goldAdd ? { addAt: config.goldAdd.atR, addSize: config.goldAdd.size } : {}),
           feat: { d1: src['1d'].A.trend === (g.sell ? -1 : 1) ? 'with' : 'against', h4, msnr: msnrOf(g.sell), session: sessionOf(now), star: g.star, h1clear, riskAtr: +riskAtr.toFixed(2), leg: g.L === 36 ? '3h' : '6h' }, shadow: false, blockedBy: [],
-          note: `${key === 'xau' ? 'Gold' : M.label} replica (v5, against the H4 trend): ${g.L === 36 ? '3 h' : '6 h'} leg to ${g.ext.toFixed(2)}, M5 CHoCH through ${g.lvl.toFixed(2)}${g.star ? ', ★ engulfing at structure at the extreme' : g.peg ? ', engulfing at the extreme' : ''}${h1clear ? ', clear of H1 Origins' : ''}. ${g.sell ? 'Sell' : 'Buy'} at market, stop past the extreme; ${key === 'xau' && config.goldFixedR ? `${config.goldRun ? `after +${config.goldRun.atR}R the stop trails ${config.goldRun.trail}R behind the best price (cap 10R)` : `fixed target ${config.goldFixedR}R`}${config.goldBeR ? `, stop to breakeven at +${config.goldBeR}R` : ''}${config.goldAdd ? `, a second unit added at +${config.goldAdd.atR}R` : ''}` : `from +2R the stop trails 2R behind the best price (2R mark ${t1.toFixed(2)})`}, out after 48 h.` });
+          feed: FEED, note: `${key === 'xau' ? 'Gold' : M.label} replica (v5, against the H4 trend): ${g.L === 36 ? '3 h' : '6 h'} leg to ${g.ext.toFixed(2)}, M5 CHoCH through ${g.lvl.toFixed(2)}${g.star ? ', ★ engulfing at structure at the extreme' : g.peg ? ', engulfing at the extreme' : ''}${h1clear ? ', clear of H1 Origins' : ''}. ${g.sell ? 'Sell' : 'Buy'} at market, stop past the extreme; ${key === 'xau' && config.goldFixedR ? `${config.goldRun ? `after +${config.goldRun.atR}R the stop trails ${config.goldRun.trail}R behind the best price (cap 10R)` : `fixed target ${config.goldFixedR}R`}${config.goldBeR ? `, stop to breakeven at +${config.goldBeR}R` : ''}${config.goldAdd ? `, a second unit added at +${config.goldAdd.atR}R` : ''}` : `from +2R the stop trails 2R behind the best price (2R mark ${t1.toFixed(2)})`}, out after 48 h.` });
       }
     }
     for (const r of research.filter((x) => x.market === key && x.k !== 'replica' && x.status === 'open')) {
@@ -1018,7 +1033,7 @@ for (const [key, M] of Object.entries(MARKETS)) {
         research.push({ id: `${key}-cycle-${now}`, market: key, label: M.label, dec: M.dec, k: 'cycle', name: 'Daily Cycle', side: cyc.sell ? 'sell' : 'buy',
           entry: cyc.entry, stop: cyc.stop, t1: cyc.t1, rr: 3, opened: now, filled: now, checked: now, status: 'open', R: null, closeBy: cyc.closeBy, day: cyc.day,
           londonHigh: cyc.londonHigh, londonLow: cyc.londonLow, d1: src['1d'].A.trend === (cyc.sell ? -1 : 1) ? 'with' : 'against',
-          note: `Research (paper only): London ${cyc.sell ? 'sold off' : 'rallied'} ${cyc.londonLow.toFixed(M.dec)}–${cyc.londonHigh.toFixed(M.dec)}; NY-open retracement into the 62–70% zone. Target 3R, out at 21:00 UTC.` });
+          feed: FEED, note: `Research (paper only): London ${cyc.sell ? 'sold off' : 'rallied'} ${cyc.londonLow.toFixed(M.dec)}–${cyc.londonHigh.toFixed(M.dec)}; NY-open retracement into the 62–70% zone. Target 3R, out at 21:00 UTC.` });
       }
     }
 
@@ -1090,7 +1105,7 @@ for (const [key, M] of Object.entries(MARKETS)) {
       const h = def.h;
       const tr = { id: `${key}-${t.k}-${now}`, market: key, label: M.label, dec: M.dec, k: t.k, name: t.name, pair: t.pair, h, side: t.sell ? 'sell' : 'buy',
         entry: t.entry, stop: t.stop, t1: T1, rr: +(toT2 ? Math.abs(T1 - t.entry) / Math.abs(t.entry - t.stop) : t.rr).toFixed(2), buf: CFG.buf, opened: now, checked: now, status: 'pending', R: null, feat,
-        shadow, blockedBy, note: shadow ? `Shadow (${blockedBy.map((b) => why[b]).join(', ')})` : blockedBy.length ? `${t.next} Taken under take-all; the rules would block it (${blockedBy.map((b) => why[b]).join(', ')}).` : t.next };
+        shadow, blockedBy, feed: FEED, note: shadow ? `Shadow (${blockedBy.map((b) => why[b]).join(', ')})` : blockedBy.length ? `${t.next} Taken under take-all; the rules would block it (${blockedBy.map((b) => why[b]).join(', ')}).` : t.next };
       // held to the second target: the first one is kept for the record, and the order stays valid until price reaches the Origin
       if (toT2) { tr.tp1 = t.t1; tr.target = 't2'; if (!shadow) tr.note += ` Holding to ${T1.toFixed(M.dec)}, ${t.retrace ? `the ${String(t.pair).split(' ')[0]} Origin` : 'the second target'} (${(config.targetBy || {})[t.k] === 'user' ? "the trader's rule" : 'backtest'}).`; }
       try { tr.ctx = entryContext(t, src, def, M, price); } catch (e) {}
@@ -1114,6 +1129,7 @@ for (const [key, M] of Object.entries(MARKETS)) {
 for (const [sig, t] of Object.entries(state.seen)) if (now - t > 30 * 86400) delete state.seen[sig];
 trades = trades.slice(-3000);
 state.lastRun = now;
+snapshot.feedChanges = (state.feedChanges || []).filter((c) => now - Date.parse(c.at) / 1000 < 7 * 86400);
 
 // ─── Daily statistical Coach: small, bounded rule changes from the results ───
 // ─── Self-evolution: learn condition filters (D1 / structure / session) from the trades that lose.
