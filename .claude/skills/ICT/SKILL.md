@@ -317,3 +317,15 @@ A-setups base: +39.3R dd 14.6 | +35.0R dd 19.7.
 - **Read:** the course is a discretionary M5-M1 intraday framework built around a trader reading the higher, intermediate and short timeframes in order. Its codable pieces do not improve this mechanical H1 model.
   - The pieces that agree are already in it: no NY afternoon (§17), the jobs-report morning (§23), room to the draw on liquidity (§27).
 - **Best use:** its sponsorship checklist as Fred's judgement on the desk. New review tags: beyond 00:00 & 08:30 opens, inducement, SMT, CISD body close, displacement + FVG, REH/REL target, 09:00-10:30 window. With ~50 reviewed trades, test which tags separate winners from losers.
+
+## 29. Course update: H4/H1 reading (owner upload, 7 Nov 2026) — tested, recorded as forward features
+The updated course spec (kept as a local skill) adds the missing H4/H1 chapter.
+On the intermediate timeframe, price heading to the daily draw does one of two things: rebalance an imbalance, or run stops.
+The best version is both: stops run INTO an imbalance. Each day the bias is re-read from the daily candle closure (wick beyond the prior day and close back, or a close beyond it).
+Tested on cash NQ+ES+YM (`idxrec5.mjs`), live exit, costs, 2023-24 | 2025-26. A-setups base +39.3R | +35.0R.
+- **Sweep candle traded into an unfilled D1 FVG:** +2.6R (12) | +29.7R (25). Into an H4 FVG: +1.7R (29) | +9.0R (51). Either: −0.9R | +30.1R. None: +40.2R | +4.9R. Inconsistent and thin (37 D1 cases in four years). Not a filter.
+- **Daily candle-closure bias agrees with the signal:** +18.3R | +4.9R. Against: +16.2R | +27.8R. Flips between halves. Not a filter.
+- All signals: the H4-FVG sweep +44.3R | −22.0R; no stable pattern.
+- **Kept as forward-test features, not rules:** every signal now records `feat.htfFvg` ('D1' / 'H4' / null) and `feat.cc` (+1 agrees, −1 against, 0).
+  - The desk's "What works" table splits by both; review tag "Stops run into a D1/H4 FVG".
+  - Re-judge with ~100 forward A-setups, judging D1 separately.
