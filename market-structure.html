@@ -2295,6 +2295,7 @@ html[data-motion="off"][data-gate] .gate-bg path[stroke] { animation: none; stro
             <label><input type="checkbox" id="ms-show-htf" data-show="htf" checked><i style="border:1.5px dashed #2962ff"></i>HTF Origin</label>
             <label><input type="checkbox" id="ms-show-ct" checked><i style="background:#2962ff;height:2px"></i>Council trades + history</label>
             <label><input type="checkbox" id="ms-show-kl" checked><i style="border-top:1.5px dotted #9aa4b2;height:0"></i>Key levels</label>
+            <label><input type="checkbox" id="ms-show-vwap"><i style="background:#00bcd4;height:2px"></i>VWAP (daily, intraday charts)</label>
             <label><input type="checkbox" id="ms-show-ema"><i style="background:linear-gradient(90deg,#2962ff 33%,#e0a526 33% 66%,#9c27b0 66%);height:2px"></i>EMAs 21 / 50 / 200</label>
             <label><input type="checkbox" id="ms-show-shade" checked><i style="background:linear-gradient(90deg,rgba(38,166,154,.4) 33%,rgba(41,98,255,.4) 33% 66%,rgba(156,39,176,.4) 66%)"></i>Session shading</label>
             <label class="cmp-row">Compare with <select id="ms-cmp" aria-label="Compare with another market"><option value="">none</option></select></label>
@@ -3545,6 +3546,14 @@ function msNextSetup(bars, A) {
     P.tickEma = function (b) { if (G.showEma !== true) return; EMA.forEach((e) => { if (e.prev == null) return; const k = 2 / (e.n + 1);
       if (b.time !== e.lastT) { const d = e.s.data(); e.prev = d.length ? d[d.length - 1].value : e.prev; e.lastT = b.time; }
       try { e.s.update({ time: b.time, value: b.close * k + e.prev * (1 - k) }); } catch (err) {} }); };
+    // daily VWAP (7 Nov loop): resets at 00:00 UTC on intraday charts; volume-weighted (tick volume), equal-weight when a feed has none
+    const vwapS = tf.sec < 86400 ? chart.addLineSeries({ color: 'rgba(0,188,212,.9)', lineWidth: 1.5, lineStyle: LW.LineStyle.Solid, priceLineVisible: false, lastValueVisible: true, crosshairMarkerVisible: false, title: 'VWAP' }) : null;
+    P.setVwap = function () { if (!vwapS) return; if (G.showVwap !== true || !P.raw || !P.raw.length) { vwapS.setData([]); return; }
+      const off = G.offset, hasV = P.raw.some((b) => b.volume > 0), out = []; let day = null, pv = 0, vv = 0;
+      P.raw.forEach((b) => { const d = Math.floor(b.time / 86400); let gap = false; if (d !== day) { gap = day !== null; day = d; pv = 0; vv = 0; } const w = hasV ? (b.volume || 0) : 1; pv += (b.high + b.low + b.close) / 3 * w; vv += w;
+        if (gap && out.length) out[out.length - 1].color = 'rgba(0,0,0,0)';   // a transparent segment hides the jump at each daily reset
+        if (vv > 0) out.push({ time: b.time + TZ, value: pv / vv + off }); });
+      try { vwapS.setData(out); } catch (e) {} };
     P.setVol = function () { const on = P.raw && P.raw.some((b) => b.volume > 0) && G.showVol !== false; vol.setData(on ? P.raw.map((b) => ({ time: b.time + TZ, value: b.volume || 0, color: vcol(b) })) : []); };
     // chart snapshot (7 Nov loop): the chart as a PNG with a title strip (market, timeframe, price, time) for sharing or a journal
     P.snapshot = async function () {
@@ -3627,7 +3636,7 @@ function msNextSetup(bars, A) {
       const step = (d) => { if (!P.rp) return; P.rp.i = Math.max(20, Math.min(P.bars.length, P.rp.i + d)); show(); if (P.rp.i >= P.bars.length) stop(); };
       const stop = () => { clearInterval(timer); timer = null; bar.querySelector('[data-rp="play"]').textContent = '▶'; };
       // the structure drawings are worked out from all candles, so they are hidden while replaying (they would show the future)
-      P.replay = (on) => { if (on && P.bars && P.bars.length > 40) { P.rp = { i: Math.max(20, P.bars.length - 120) }; bar.hidden = false; try { series.detachPrimitive(overlay); } catch (e) {} try { series.setMarkers([]); } catch (e) {} (P.priceLines || []).concat(P._ct || []).forEach((l) => { try { l.applyOptions({ lineVisible: false, axisLabelVisible: false, title: '' }); } catch (e) {} }); el.classList.add('replaying'); show(); chart.timeScale().scrollToRealTime(); }
+      P.replay = (on) => { if (on && P.bars && P.bars.length > 40) { P.rp = { i: Math.max(20, P.bars.length - 120) }; bar.hidden = false; try { series.detachPrimitive(overlay); } catch (e) {} try { series.setMarkers([]); } catch (e) {} (P.priceLines || []).concat(P._ct || []).forEach((l) => { try { l.applyOptions({ lineVisible: false, axisLabelVisible: false, title: '' }); } catch (e) {} }); try { if (vwapS) vwapS.setData([]); } catch (e) {} el.classList.add('replaying'); show(); chart.timeScale().scrollToRealTime(); }
         else { stop(); P.rp = null; bar.hidden = true; el.classList.remove('replaying'); try { series.attachPrimitive(overlay); } catch (e) {} P._mkSig = null; P._ctSig = null; P.rebuild(true); } };
       bar.addEventListener('click', (ev) => { const b = ev.target.closest('[data-rp]'); if (!b) return; const a = b.dataset.rp;
         if (a === 'x') { P.replay(false); const t = el.closest('.ms-pane') && el.closest('.ms-pane').querySelector('.ch-rp'); if (t) { t.classList.remove('on'); t.setAttribute('aria-pressed', 'false'); } }
@@ -3644,7 +3653,7 @@ function msNextSetup(bars, A) {
       if (P.rp) return;   // replaying: keep the hidden future hidden (analysis resumes on exit)
       series.setData(P.view(P.bars));
       P.setLog();
-      P.setVol(); P.setEma(); P.setShade();
+      P.setVol(); P.setEma(); P.setShade(); P.setVwap();
       P.analyze();
       if (!keepView || !P.fitted) P.fit();
       P.legend();
@@ -3763,7 +3772,7 @@ function msNextSetup(bars, A) {
       if (!P.rp) series.update(P.viewBar(b));
       if (!lgHover && !P.rp) P.legend();
       const now = Date.now();
-      if (k.closed || !P._t || now - P._t > 2000) { P._t = now; P.analyze(); }
+      if (k.closed || !P._t || now - P._t > 2000) { P._t = now; P.analyze(); if (G.showVwap === true && !P.rp) P.setVwap(); }
     };
     new ResizeObserver(() => { if (!P.fitted && el.clientWidth > 0 && P.bars) requestAnimationFrame(P.fit); }).observe(el);
     return P;
@@ -3888,10 +3897,11 @@ function msNextSetup(bars, A) {
       setTimeout(() => { if (sel.value) run(); }, 3000); setInterval(() => { if (sel.value && !document.hidden) run(); }, 60e3);
     } }
   { const k = document.getElementById('ms-show-shade'); try { G.showShade = localStorage.getItem('ms-shade') !== '0'; } catch (e) {} if (k) { k.checked = G.showShade !== false; k.addEventListener('change', () => { G.showShade = k.checked; try { localStorage.setItem('ms-shade', k.checked ? '1' : '0'); } catch (e) {} Object.values(panes).forEach((P) => P.setShade && P.setShade()); }); } }
+  { const k = document.getElementById('ms-show-vwap'); try { G.showVwap = localStorage.getItem('ms-vwap') === '1'; } catch (e) {} if (k) { k.checked = G.showVwap === true; k.addEventListener('change', () => { G.showVwap = k.checked; try { localStorage.setItem('ms-vwap', k.checked ? '1' : '0'); } catch (e) {} Object.values(panes).forEach((P) => P.setVwap && P.setVwap()); }); } }
   { const k = document.getElementById('ms-show-ema'); try { G.showEma = localStorage.getItem('ms-ema') === '1'; } catch (e) {} if (k) { k.checked = G.showEma === true; k.addEventListener('change', () => { G.showEma = k.checked; try { localStorage.setItem('ms-ema', k.checked ? '1' : '0'); } catch (e) {} Object.values(panes).forEach((P) => P.setEma && P.setEma()); }); } }
   // chart layout presets (7 Nov loop): one tap flips the layer toggles; "Mine" is saved on this device
   { const box = document.getElementById('ms-lay'); if (box) { const all = () => [...document.querySelectorAll('.ms-tog input[type=checkbox][id^="ms-show-"]')];
-    const OFF_CLEAN = ['ms-show-ema', 'ms-show-shade', 'ms-show-vol', 'ms-show-ha', 'ms-show-ct', 'ms-show-detail', 'ms-show-replica', 'ms-show-news', 'ms-show-sess', 'ms-show-next', 'ms-show-plan'];
+    const OFF_CLEAN = ['ms-show-ema', 'ms-show-vwap', 'ms-show-shade', 'ms-show-vol', 'ms-show-ha', 'ms-show-ct', 'ms-show-detail', 'ms-show-replica', 'ms-show-news', 'ms-show-sess', 'ms-show-next', 'ms-show-plan'];
     const NOT_FULL = ['ms-show-ha', 'ms-show-log', 'ms-show-detail'];
     const apply = (m) => all().forEach((c) => { if (!(c.id in m) || c.checked === m[c.id]) return; c.checked = m[c.id]; c.dispatchEvent(new Event('change', { bubbles: true })); });
     const flash = (b, t) => { const o = b.textContent; b.textContent = t; setTimeout(() => { b.textContent = o; }, 1400); };
