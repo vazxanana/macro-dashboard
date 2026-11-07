@@ -19,3 +19,13 @@ test('execution stats: mean, median, worst, per symbol; positions without a fill
   const md = deskSection({ mirror: { state: { status: 'ok', map }, execution: x }, now: 1794200000 });
   assert.match(md, /Execution vs paper:\*\* 3 demo fills; slippage against the council entry \+0\.12R/);
 });
+// review (7 Nov): the ICT desk signals on CME futures (NQ / ES / YM / RTY / GC) and the demo fills the cash index / spot gold CFD,
+// so its paper entry is on another instrument: fill - entry is the futures-cash basis (often several R), not slippage
+test('ICT desk fills: no slippage against a futures entry (basis); the delay is still measured', () => {
+  const ict = { id: 'ict:nq-b-1', side: 'buy', entry: 25150, stop: 25100, opened: 1000 };
+  assert.deepEqual(fillQuality(ict, 24990.5, 1090), { fillPrice: 24990.5, lagSec: 90 });   // was slipR -3.19 (the basis)
+  const map = { a: { symbol: 'XAUUSD', slipR: 0.1, lagSec: 20, openedAt: '2026-11-09T00:00:00Z' }, n: { symbol: 'US100', fillPrice: 24990.5, lagSec: 90, openedAt: '2026-11-09T00:00:00Z' } };
+  const x = executionStats(map); assert.equal(x.n, 1); assert.equal(x.meanSlipR, 0.1); assert.equal(x.bySymbol.US100, undefined); assert.equal(x.medianLagSec, 55);
+  assert.deepEqual(executionStats({ n: map.n }), { n: 0, medianLagSec: 90 });
+  assert.equal(executionStats({ a: { ...map.a, lagSec: null } }).medianLagSec, null);   // a missing delay is not a 0 s delay
+});

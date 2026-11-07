@@ -6,7 +6,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import zlib from 'node:zlib';
-import { MARKETS, P, MIN_GRADE, cnbcBars, agg, signals, letter, isASetup, isAPlus, sizeOf, SHADOW, isDip, VARIANTS, variantRule, loadMeridian } from './tracker.mjs';
+import { MARKETS, P, MIN_GRADE, cnbcBars, agg, signals, letter, isASetup, isAPlus, sizeOf, SHADOW, isDip, VARIANTS, variantRule, variantTags, loadMeridian } from './tracker.mjs';
 
 const DATA = process.argv[2] || 'data/ict';
 const FROM = Date.parse(process.argv[3] || '2025-08-01T00:00:00Z') / 1000;   // owner, 7 Nov: 5 more months (was 1 Jan 2026)
@@ -118,7 +118,10 @@ if (process.argv[1] && process.argv[1].endsWith('replay.mjs')) {
       out.src[key] = { sym: src.sym, h1: src.H.length, m5: src.m5.length, m5from: src.m5from ? new Date(src.m5from * 1000).toISOString().slice(0, 10) : null, d1: src.D.length };
       const sig = signals(src.H, src.D, 1, M.tick).concat(signals(src.H, src.D, -1, M.tick)).filter((g) => g.close >= FROM && g.grade.total >= MIN_GRADE).sort((a, b) => a.close - b.close);
       let busyAll = 0, busyA = 0;   // same rule as the tracker: an A-setup is only blocked by an open A-setup
+      // each A-setup carries the shadow variants' verdicts (vr), for the Coach's ICT filter verdicts; a failure here only loses the tags
+      let vctx = null; try { vctx = { H: src.H, D: src.D, ms: await loadMeridian() }; } catch (e) { (out.shadowErrors = out.shadowErrors || {})[`${key}-vr`] = String(e.message || e); }
       for (const g of sig) { const a = isASetup(g, key); if (g.close < (a ? busyA : busyAll)) continue; const t = simulate(g, M, key, src); if (!t) { out.gaps[key] = (out.gaps[key] || 0) + 1; continue; } t.aset = a; t.aplus = isAPlus(g, key); t.size = a ? sizeOf(g, key) : 1;
+        if (a && vctx) { try { t.vr = variantTags(g, key, vctx); } catch (e) {} }
         if (t.size !== 1 && t.R != null) { t.Rraw = t.R; t.R = +(t.R * t.size).toFixed(2); if (t.R2 != null) t.R2 = +(t.R2 * t.size).toFixed(2); }
         out.trades.push(t);
         const end = t.closed || Infinity; busyAll = Math.max(busyAll, end); if (a) busyA = end; }

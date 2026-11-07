@@ -23,6 +23,7 @@ import { m15Choch, m15cFeat as m15cOf } from './choch.mjs';
 import { cleanBars, LTF_CLEAN } from './clean.mjs';
 import { d1AdxFeat } from './adx.mjs';
 import { spreadOf, costOf } from './fills.mjs';
+import { newsFeat } from './events.mjs';
 
 const DIR = process.argv[2] || 'data', DAYS = +(process.argv[3] || 30);
 const ONLY = process.env.BT_MARKETS ? new Set(process.env.BT_MARKETS.split(',')) : null;   // local tests: BT_MARKETS=xau,eurusd
@@ -467,6 +468,7 @@ for (const [key, M] of Object.entries(MARKETS)) {
         if (!cfT || t - cfT > FRESH * SEC[def.l]) continue;
         const feat = { d1: d1T(src, t) === (st.sell ? -1 : 1) ? 'with' : 'against', struct: st.retr == null ? 'n/a' : st.retr >= 0.5 ? 'main' : 'internal', session: sessionOf(t), ...structFeat(st.sell, def.l, src, t), m15c: m15cOf(src['15m'].bars, st.sell, t), m15c1: m15cOf(src['15m'].bars, st.sell, t, 1) };
         if (st.k === 'swing') { try { Object.assign(feat, d1AdxFeat(src['1d'].bars, t)); } catch (e) {} }   // tag only (paper sleeve swing-adx), as the live Trader
+        try { Object.assign(feat, newsFeat(t)); } catch (e) {}   // news research tag (tier-1 US release within +-120 min), as the live Trader; no rule reads it
         const tr = { m: key, k: st.k, h: def.h, side, entry: st.entry, stop: st.stop, t1: st.t1, t2: st.t2 != null && (st.t2 - st.t1) * (st.sell ? -1 : 1) > 0 ? st.t2 : null, rr: st.rr, opened: t, status: 'pending', feat, mfe: 0 };
         if (st.sell ? price >= st.entry : price <= st.entry) {   // already through the entry: fill at market, like the Trader
           const r = Math.abs(price - st.stop), rw = (st.t1 - price) * (st.sell ? -1 : 1);
@@ -527,8 +529,8 @@ const out = {
   // status (after m15c1; adx / adxBand follow it, so older column indexes hold): 'closed', 'unfilled' (a resting order that never filled, 0R) or 'open'
   // (still running at the end of the window: R columns null; fill 1 once its entry filled, 0 while the order still rests)
   trades: all.concat(twins, unfilled, stillOpen).map((x) => { const op = x.status === 'open' || x.status === 'pending', st = op ? 'open' : x.status === 'closed' ? 'closed' : 'unfilled';
-    return [x.m, x.k, x.side, x.opened, x.filled || null, +x.rr.toFixed(2), x.feat.d1, x.feat.struct, x.feat.session, ...x.v.map((v) => op || v.R == null ? null : +v.R.toFixed(2)), +x.mfe.toFixed(2), +x.cost.toFixed(3), op ? (x.filled ? 1 : 0) : x.status === 'closed' ? 1 : 0, x.feat.cf, x.feat.choch, x.feat.m15c, x.feat.m15c1, st, x.feat.adx ?? null, x.feat.adxBand ?? null]; }),
-  tradeCols: ['market', 'setup', 'side', 'opened', 'filled', 'rr', 'd1', 'struct', 'session', 'R_none', 'R_be1', 'R_be15', 'R_tp2', 'mfe', 'cost', 'fill', 'cf', 'choch', 'm15c', 'm15c1', 'status', 'adx', 'adxBand'],   // adx / adxBand (Swing only: D1 ADX(14) tag, paper sleeve swing-adx) appended last so older indexes hold
+    return [x.m, x.k, x.side, x.opened, x.filled || null, +x.rr.toFixed(2), x.feat.d1, x.feat.struct, x.feat.session, ...x.v.map((v) => op || v.R == null ? null : +v.R.toFixed(2)), +x.mfe.toFixed(2), +x.cost.toFixed(3), op ? (x.filled ? 1 : 0) : x.status === 'closed' ? 1 : 0, x.feat.cf, x.feat.choch, x.feat.m15c, x.feat.m15c1, st, x.feat.adx ?? null, x.feat.adxBand ?? null, x.feat.newsT1 ?? null, x.feat.newsMin ?? null]; }),
+  tradeCols: ['market', 'setup', 'side', 'opened', 'filled', 'rr', 'd1', 'struct', 'session', 'R_none', 'R_be1', 'R_be15', 'R_tp2', 'mfe', 'cost', 'fill', 'cf', 'choch', 'm15c', 'm15c1', 'status', 'adx', 'adxBand', 'newsT1', 'newsMin'],   // adx / adxBand (Swing only: D1 ADX(14) tag, paper sleeve swing-adx), then newsT1 / newsMin (news research tag, council/events.mjs), appended last so older indexes hold
   twins: twins.length, unfilled: unfilled.length, open: stillOpen.length,
   examples: EX.map((x) => ({ id: x.id, market: x.market, side: x.side, entry: x.entry, stop: x.stop, target: x.target, entryFrom: x.entryFrom, entryTo: x.entryTo,
     caught: x.caught, setups: x.setups.map(({ s, ...v }) => v), sweep: x.sweep.map(({ s, ...v }) => v), m15: x.m15.map(({ s, ...v }) => v) })),

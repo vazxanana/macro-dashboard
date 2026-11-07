@@ -55,6 +55,17 @@ test('news shortly before the stop -> news tag; news long before it is reported 
   assert.ok(ev.tags.includes('news')); assert.ok(!/Minor/.test(ev.text));
 });
 
+test('the official calendar (council/events.mjs) is checked too: NFP tags news, jobless claims are only listed', () => {
+  const nfp = Date.UTC(2026, 10, 6, 13, 30) / 1000;   // Fri 6 Nov 2026 08:30 New York
+  const a = postMortem(loss({ opened: nfp - 3600, filled: nfp - 3600, closed: nfp + 1200 }));
+  assert.ok(a.tags.includes('news')); assert.match(a.text, /USD Non-Farm Payrolls/);
+  const claims = Date.UTC(2026, 10, 5, 13, 30) / 1000;   // Thu 5 Nov: Initial Jobless Claims (tier 2)
+  const b = postMortem(loss({ opened: claims - 3600, filled: claims - 3600, closed: claims + 1200 }));
+  assert.ok(!b.tags.includes('news')); assert.match(b.text, /Initial Jobless Claims/); assert.match(b.text, /not tagged news/);
+  const c = postMortem(loss({ opened: nfp - 3600, filled: nfp - 3600, closed: nfp + 1200, pm: { phase: 'done', until: nfp + 9e3, after: { best: 0, worst: 3, hitT1: null }, news: [{ t: nfp, title: 'Non-Farm Employment Change', country: 'USD' }] } }));
+  assert.equal(c.evidence.news.length, 1, 'the recorded item at the same time is the same release');
+});
+
 test('tight stop -> noise; late fill or stale signal -> late', () => {
   assert.ok(postMortem(loss({ ctx: { stopAtr: 0.3, stopSpreads: 12, trend: {} } })).tags.includes('noise'));
   assert.ok(postMortem(loss({ ctx: { stopAtr: 1, stopSpreads: 4, trend: {} } })).tags.includes('noise'));

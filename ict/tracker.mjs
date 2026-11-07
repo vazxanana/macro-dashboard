@@ -145,9 +145,17 @@ export function signals(Hraw, D, side, tick) {
 // hunted: on 2023-26 cash indices every year turned positive and the drawdown halved; confirmed on NQ futures 2023-25)
 export const RISK_FLOOR = 0.3;
 export const RISK_CAP = 0.75; // skill §22: stops wider than 0.75x the daily ATR are not A-setups
-// skill §23: a signal on a jobs-report morning (first Friday of the month, before 10:00 New York) is news, not a liquidity run
-const ET_PARTS = new Intl.DateTimeFormat('en-US', { timeZone: 'America/New_York', weekday: 'short', day: 'numeric', hour: 'numeric', hourCycle: 'h23' });
-export const nfpMorning = (t) => { if (!t) return false; const p = Object.fromEntries(ET_PARTS.formatToParts(new Date(t * 1000)).map((x) => [x.type, x.value])); return p.weekday === 'Fri' && +p.day <= 7 && +p.hour < 10; };
+// skill §23: a signal on a jobs-report morning (before 10:00 New York on the NFP release day) is news, not a liquidity run.
+// The release days come from council/events.mjs (#488): the first-Friday guess was wrong for 6 of the 15 reports in
+// Aug 2025 - Nov 2026 (shutdown delays, holiday moves). Outside the calendar's range, or without it, the first Friday is used.
+const ET_PARTS = new Intl.DateTimeFormat('en-US', { timeZone: 'America/New_York', weekday: 'short', year: 'numeric', month: '2-digit', day: '2-digit', hour: 'numeric', hourCycle: 'h23' });
+let NFP_DAYS = null, NFP_FROM = Infinity, NFP_TO = -Infinity;
+try { const ev = (await import('../council/events.mjs')).EVENTS.filter((e) => e.type === 'NFP');
+  if (ev.length) { NFP_DAYS = new Set(); for (const e of ev) { const p = Object.fromEntries(ET_PARTS.formatToParts(new Date(e.t * 1000)).map((x) => [x.type, x.value])); NFP_DAYS.add(`${p.year}-${p.month}-${p.day}`); NFP_FROM = Math.min(NFP_FROM, e.t - 40 * 86400); NFP_TO = Math.max(NFP_TO, e.t + 40 * 86400); } } } catch (e) {}
+export const nfpMorning = (t) => { if (!t) return false; const p = Object.fromEntries(ET_PARTS.formatToParts(new Date(t * 1000)).map((x) => [x.type, x.value]));
+  if (+p.hour >= 10) return false;
+  if (NFP_DAYS && t >= NFP_FROM && t <= NFP_TO) return NFP_DAYS.has(`${p.year}-${p.month}-${p.day}`);
+  return p.weekday === 'Fri' && +p.day <= 7; };
 // skill §25 (owner: "we had way better results before"): a tight stop (0.15-0.3x the daily ATR) still counts as an A-setup when the
 // signal has A+ quality (inversion body >= 60%, not the NY afternoon), at HALF size; R of such a trade is recorded x0.5 (Rraw = per unit)
 export const RISK_TIGHT = 0.15, TIGHT_SIZE = 0.5;
@@ -200,6 +208,9 @@ export const h1Trend = (g, H, ms) => { const i = H.findLastIndex((b) => b.time +
   return ms(H.slice(Math.max(0, i - SHADOW.h1opp.look + 1), i + 1), SHADOW.h1opp.N).trend; };
 export const isH1Opp = (g, mk, H, ms) => SHADOW.h1opp.markets.includes(mk) && aRecorded(g, mk) && h1Trend(g, H, ms) !== g.side;
 export const variantRule = (v, g, mk, ctx) => (v === 'nofri' ? isNoFri(g, mk) : v === 'h1opp' ? isH1Opp(g, mk, ctx.H, ctx.ms) : v === 'dip' ? isDip(g, mk, ctx.D) : false);
+// each variant's verdict on one signal, stored on the replay's A-setups (vr) so the Coach can tell the trades a filter rejects from the
+// ones its stream only missed while busy (council/proposals.mjs ictVariantVerdicts); a tag, it changes no record
+export const variantTags = (g, mk, ctx) => Object.fromEntries(VARIANTS.map((v) => [v, !!variantRule(v, g, mk, ctx)]));
 export const letter = (g) =>(g >= 10 ? 'A+' : g >= 9 ? 'A' : g >= 8 ? 'A-' : g >= 7 ? 'B+' : g >= 6 ? 'B' : g >= 5 ? 'B-' : g >= 3 ? 'C' : 'F');
 
 // manage one open trade on the closed 5m candles (shared by the live records and the shadow 'dip' records)

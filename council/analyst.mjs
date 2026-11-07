@@ -1,6 +1,7 @@
 // Council · Analyst helper: a short, data-built "Live Scalp rule check" section for analysis/latest.md.
 // Reporting only: it reads snapshot.json, config.json and backtest.json and changes no rule or trade.
 // The Trader refreshes the block on every run, between the markers below, so the Analyst's weekly text stays as written.
+import { eventsBetween } from './events.mjs';
 
 const START = '<!-- live-rule:start -->', END = '<!-- live-rule:end -->';
 const sessionOf = (t) => { const h = new Date(t * 1000).getUTCHours(); return h < 7 ? 'asia' : h < 12 ? 'london' : h < 16 ? 'overlap' : h < 21 ? 'newyork' : 'late'; };
@@ -161,8 +162,17 @@ export function opensNear(t, within = 1800) {
 }
 const relOpen = (o, what) => `${what} ${Math.abs(o.mins)} min ${o.mins >= 0 ? 'after' : 'before'} the ${o.name} (${hm(o.t)} UTC)`;
 
-// One post-mortem. `events` (optional): [{ t, title, impact, country }] from a calendar; by default the news the Trader's
-// review recorded on the trade (pm.news: high-impact releases for its currencies, 30 min before the fill to the stop).
+// News around a trade (30 min before the fill to 5 min after the stop): the official calendar in council/events.mjs (tier 1 =
+// CPI / NFP / FOMC / PCE, cb = ECB / BoJ, tier 2 = ISM / claims) for the market's currencies, plus the ForexFactory high-impact
+// news the Trader's review recorded (pm.news); a recorded item within 15 min of a calendar one is the same release.
+export function newsAround(tr, from, to) {
+  const cur = String(tr.label || '').includes('/') ? String(tr.label).split('/') : ['USD'];
+  const cal = eventsBetween(from, to, { country: cur }).map((e) => ({ t: e.t, title: e.title, country: e.country, tier: e.tier }));
+  const rec = (Array.isArray(tr.pm && tr.pm.news) ? tr.pm.news : []).filter((e) => !cal.some((c) => Math.abs(c.t - e.t) <= 900));
+  return [...cal, ...rec].sort((a, b) => a.t - b.t);
+}
+
+// One post-mortem. `events` (optional): [{ t, title, impact, country, tier? }] to use instead of the calendar + recorded news.
 export function postMortem(tr, { events = null } = {}) {
   const s = tr.side === 'sell' ? -1 : 1, pm = tr.pm || {}, a = pm.phase === 'done' ? pm.after : null, c = tr.ctx || {};
   const fill = tr.filled || tr.opened, closed = tr.closed, mfe = Math.max(0, +tr.mfe || 0), lossR = Math.abs(tr.R != null ? +tr.R : -1);
@@ -195,14 +205,14 @@ export function postMortem(tr, { events = null } = {}) {
   ev.opens = [oE && { at: 'entry', name: oE.name, mins: oE.mins }, oS && { at: 'stop', name: oS.name, mins: oS.mins }].filter(Boolean);
   if (oE || oS) lines.push([oE && relOpen(oE, 'Entry'), oS && relOpen(oS, oE ? 'stopped' : 'Stopped')].filter(Boolean).join('; ') + '.');
   else lines.push('No session open within 30 min of the entry or the stop.');
-  const news = Array.isArray(events) ? events.filter((e) => (!e.impact || e.impact === 'High') && e.t >= fill - 1800 && e.t <= closed + 300) : Array.isArray(pm.news) ? pm.news : null;
+  const news = Array.isArray(events) ? events.filter((e) => (!e.impact || e.impact === 'High') && e.t >= fill - 1800 && e.t <= closed + 300) : newsAround(tr, fill - 1800, closed + 300);
   if (news && news.length) {
     ev.news = news.map((e) => ({ t: e.t, title: `${e.country ? e.country + ' ' : ''}${e.title}` }));
-    const hit = news.filter((e) => e.t >= fill - 1800 && e.t <= closed && closed - e.t <= 7200);   // the stop came within 2 h of the release
+    // tagged only when the stop came within 2 h of a major release (tier 2 calendar items, ISM / jobless claims, are listed only)
+    const hit = news.filter((e) => e.tier !== 2 && e.t >= fill - 1800 && e.t <= closed && closed - e.t <= 7200);
     if (hit.length) { tags.add('news'); finds.push([2, 'News during the trade']); }
-    lines.push(`High-impact news: ${news.map((e) => `${e.country ? e.country + ' ' : ''}${e.title} at ${hm(e.t)} UTC (${e.t <= closed ? `${dur(closed - e.t)} before the stop` : 'after the stop'})`).join('; ')}${hit.length ? '' : '; the stop was not within 2 h of it, so it is not tagged news'}.`);
-  } else if (news) lines.push('No high-impact news for its currencies from 30 min before the fill to the stop.');
-  else lines.push('News was not checked for this trade.');
+    lines.push(`High-impact news: ${news.map((e) => `${e.country ? e.country + ' ' : ''}${e.title} at ${hm(e.t)} UTC (${e.t <= closed ? `${dur(closed - e.t)} before the stop` : 'after the stop'})`).join('; ')}${hit.length ? '' : '; no major release within 2 h before the stop, so it is not tagged news'}.`);
+  } else lines.push('No high-impact news for its currencies from 30 min before the fill to the stop.');
   // 4. stop size and entry timing
   if ((c.stopAtr != null && c.stopAtr < 0.5) || (c.stopSpreads != null && c.stopSpreads < 5)) { tags.add('noise'); finds.push([3, 'Stop inside normal noise']); lines.push(`The stop was ${c.stopAtr}× ATR (${c.stopSpreads} spreads) from the entry: inside one normal candle.`); }
   else if (c.stopAtr != null) lines.push(`The stop was ${c.stopAtr}× ATR from the entry, outside normal candle noise.`);
