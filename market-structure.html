@@ -3830,7 +3830,7 @@ function msNextSetup(bars, A) {
     };
     P.setMode = function (m) {
       if (m === 'ict') { try { series.detachPrimitive(overlay); } catch (e) {} try { series.attachPrimitive(P.ictOv); } catch (e) {}
-        (P.priceLines || []).forEach((pl) => { try { series.removePriceLine(pl); } catch (e) {} }); P.priceLines = []; try { series.setMarkers([]); } catch (e) {} P._mkSig = null; P.ictDraw(); }
+        (P.priceLines || []).forEach((pl) => { try { series.removePriceLine(pl); } catch (e) {} }); P.priceLines = []; try { P.planLinesDraw(); } catch (e) {} try { series.setMarkers([]); } catch (e) {} P._mkSig = null; P.ictDraw(); }
       else { try { series.detachPrimitive(P.ictOv); } catch (e) {} (P._ictPL || []).forEach((l) => { try { series.removePriceLine(l); } catch (e) {} }); P._ictPL = [];
         if (!P.rp) { try { series.attachPrimitive(overlay); } catch (e) {} } P._mkSig = null; P._ctSig = null; if (P.A) P.draw(); }
     };
@@ -3911,7 +3911,7 @@ function msNextSetup(bars, A) {
     P.planLinesDraw = function () {
       P.planLines.forEach((pl) => series.removePriceLine(pl)); P.planLines = [];
       const pl = G.plan;
-      if (!G.show.plan || !pl || tf.id === '4h') return;
+      if (!G.show.plan || !pl || tf.id === '4h' || G.mode === 'ict') return;   // ICT mode: no council plan lines
       const add = (price, color, title, style) => P.planLines.push(series.createPriceLine({ price, color, lineWidth: 1, lineStyle: style, axisLabelVisible: true, title, lineVisible: G.show.detail }));
       add(pl.entry, '#2962ff', 'Entry', LW.LineStyle.Solid);
       add(pl.stop, '#f23645', 'Stop', LW.LineStyle.Solid);
