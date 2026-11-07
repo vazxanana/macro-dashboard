@@ -41,10 +41,56 @@ export function liveRuleSection({ snapshot, config, backtest, now = Math.floor(D
 }
 
 // put the section in the report: replace the old block, else insert it before "## Top 3 to watch", else append
-export function injectSection(md, section) {
+export function injectSection(md, section, start = START, end = END) {
   if (!section) return md;
-  const i = md.indexOf(START), j = md.indexOf(END);
-  if (i >= 0 && j > i) return md.slice(0, i) + section + md.slice(j + END.length);
+  const i = md.indexOf(start), j = md.indexOf(end);
+  if (i >= 0 && j > i) return md.slice(0, i) + section + md.slice(j + end.length);
   const t = md.indexOf('\n## Top 3');
   return t >= 0 ? md.slice(0, t + 1) + section + '\n\n' + md.slice(t + 1) : md.replace(/\s*$/, '\n\n') + section + '\n';
+}
+
+// ---- Coach rule changes (reporting only): how often each Coach-owned rule moved in the last 7 days -------------------
+// Research (research/edge/coach-learning) found the Coach's learning changes rules often and reverses itself without
+// improving results. This block makes that visible to the owner; it changes nothing.
+export const CHURN_START = '<!-- coach-churn:start -->', CHURN_END = '<!-- coach-churn:end -->';
+const SESS = /\b(asia|london|overlap|newyork|late)\b/i;
+export function churnSubject(change) {
+  const c = String(change || '');
+  if (/^minimum stop/i.test(c)) return 'Minimum stop';
+  if (/^break-even/i.test(c)) return 'Break-even';
+  const p = c.match(/^(?:Paused|Resumed) ([\w-]+)/); if (p) return `${p[1]} · pause`;
+  const m = c.match(/^([\w-]+(?:, [\w-]+)*):\s*(.*)$/);
+  if (!m) return c.replace(/\s*\(.*$/, '').slice(0, 60);
+  if (/\bD1\b/.test(m[2])) return `${m[1]} · D1 rule`;
+  const s = m[2].match(SESS); if (s && /session/i.test(m[2])) return `${m[1]} · ${s[1].toLowerCase()} session`;
+  if (/break-even/i.test(m[2])) return `${m[1]} · break-even`;
+  return `${m[1]} · ${m[2].replace(/\s*\(.*$/, '').slice(0, 40)}`;
+}
+export function coachChurnSection({ config, now = Math.floor(Date.now() / 1000), days = 7 }) {
+  const h = ((config && config.history) || []).filter((x) => /^coach/.test(x.by || '') && Date.parse(x.at) / 1000 >= now - days * 86400);
+  const by = new Map();
+  for (const x of h.sort((a, b) => Date.parse(a.at) - Date.parse(b.at))) { const k = churnSubject(x.change); if (!by.has(k)) by.set(k, []); by.get(k).push(x); }
+  const out = [CHURN_START, '## Coach rule changes', '',
+    `Built by the Trader at ${new Date(now * 1000).toISOString().slice(0, 16).replace('T', ' ')} UTC from the rule history. Rules the Coach changed by itself in the last ${days} days (owner rules are not counted).`, ''];
+  if (!h.length) { out.push('No Coach rule changes in this period.', CHURN_END); return out.join('\n'); }
+  out.push('| Rule | Changes | Steps (oldest first) |', '|---|---|---|');
+  const rows = [...by.entries()].sort((a, b) => b[1].length - a[1].length || a[0].localeCompare(b[0]));
+  let flips = 0;
+  let ratchets = 0;
+  for (const [k, xs] of rows) {
+    // a numeric setting (e.g. "Minimum stop 0.6 → 0.7 ATR"): show the path, and say whether it only moved one way
+    const nums = xs.map((x) => (String(x.change).match(/([\d.]+)\s*→\s*([\d.]+)/) || []).slice(1).map(Number));
+    let steps, tag = '';
+    if (nums.every((n) => n.length === 2)) {
+      const path = [nums[0][0], ...nums.map((n) => n[1])], up = nums.every((n) => n[1] > n[0]), down = nums.every((n) => n[1] < n[0]);
+      steps = `${path.join(' → ')} (${xs[0].at.slice(5, 10)} to ${xs[xs.length - 1].at.slice(5, 10)})`;
+      if (xs.length >= 3 && (up || down)) { tag = ` **(${up ? 'up' : 'down'} every time)**`; ratchets++; } else if (xs.length >= 3) { tag = ' **(back and forth)**'; flips++; }
+    } else {
+      steps = xs.map((x) => `${x.at.slice(5, 10)} ${x.change.replace(/^[\w-]+(?:, [\w-]+)*:\s*/, '').replace(/\s*\(.*$/, '').slice(0, 48)}`).join(' → ');
+      if (xs.length >= 3) { tag = ' **(back and forth)**'; flips++; }
+    }
+    out.push(`| ${k}${tag} | ${xs.length} | ${steps.replace(/\|/g, '/')} |`);
+  }
+  out.push('', `${h.length} changes on ${by.size} rules${flips ? `; ${flips} rule${flips > 1 ? 's' : ''} went back and forth 3+ times` : ''}${ratchets ? `; ${ratchets} setting${ratchets > 1 ? 's' : ''} only ever moved one way` : ''}. A rule that keeps moving is reacting to noise: the 150-day study found the Coach's choices do no better than dropping the same number of trades at random (research/edge/coach-learning).`, CHURN_END);
+  return out.join('\n');
 }
