@@ -1409,6 +1409,11 @@ td.st-dim { color: var(--ink-faint); }
   #ict-f-m, #ict-f-s { min-height: 36px; }
   #ms-mk-btn { min-height: 36px; display: inline-flex; align-items: center; }
 }
+
+/* polish 28: text inputs and selects get the same 36px tap height on phones */
+@media (max-width: 600px) {
+  #ms-risk, #ms-tg-token, #ms-tg-chat, .ms-j select, .ms-j input:not([type=checkbox]), #v-users input, #v-users select { min-height: 36px; font-size: 16px; }
+}
 </style>
 </head>
 <body>
