@@ -1,0 +1,3119 @@
+{
+ "at": "2026-11-07T20:32:31.309Z",
+ "bar": {
+  "minN": 30,
+  "oosT": 2,
+  "bonfP": 0.05
+ },
+ "claims": [
+  {
+   "id": "ict-a",
+   "system": "ICT",
+   "status": "live (paper desk + cTrader demo mirror)",
+   "name": "ICT A-setups (desk replay)",
+   "claim": "desk replay since 2025-08-01: +0.296R a trade over 253 (before costs)",
+   "source": "ict/replay.json trades (aset)",
+   "fitFrom": "2023-01-01",
+   "family": "ict",
+   "n": 253,
+   "mean": 0.2754,
+   "sd": 1.7004,
+   "t": 2.5765,
+   "wr": 0.3953,
+   "sum": 69.6872,
+   "skew": 1.9626,
+   "kurt": 7.9416,
+   "maxDD": 13.0301,
+   "from": "2025-08-04",
+   "to": "2026-11-05",
+   "is": {
+    "n": 151,
+    "mean": 0.2705,
+    "sd": 1.7365,
+    "t": 1.914,
+    "wr": 0.404,
+    "sum": 40.8415,
+    "skew": 2.1112,
+    "kurt": 9.1469,
+    "maxDD": 13.0301
+   },
+   "oos": {
+    "n": 102,
+    "mean": 0.2828,
+    "sd": 1.654,
+    "t": 1.7268,
+    "wr": 0.3824,
+    "sum": 28.8457,
+    "skew": 1.7036,
+    "kurt": 5.7207,
+    "maxDD": 12.5288
+   },
+   "boot": {
+    "lo": 0.0715,
+    "hi": 0.4895,
+    "pLE0": 0.0036
+   },
+   "cost": {
+    "x0": {
+     "mean": 0.296,
+     "t": 2.7676,
+     "sum": 74.89
+    },
+    "x1": {
+     "mean": 0.2754,
+     "t": 2.5765,
+     "sum": 69.6872
+    },
+    "x1.5": {
+     "mean": 0.2652,
+     "t": 2.4808,
+     "sum": 67.0858
+    },
+    "x2": {
+     "mean": 0.2549,
+     "t": 2.385,
+     "sum": 64.4844
+    }
+   },
+   "mc": {
+    "dd50": 11.6009,
+    "dd95": 18.5632,
+    "ddActual": 13.0301
+   },
+   "mt": {
+    "N": 363,
+    "bonf": {
+     "p": 0.005,
+     "pAdj": 1,
+     "tReq": 3.6373
+    },
+    "sr": 0.162,
+    "sr0": 0.1861,
+    "dsr": 0.3265
+   },
+   "untouched": {
+    "n": 0,
+    "mean": null,
+    "t": null
+   },
+   "warn": [],
+   "verdict": "fragile",
+   "why": [
+    "out-of-sample t 1.73 < 2",
+    "fails Bonferroni for N=363 (needs t 3.64, has 2.58)",
+    "no untouched sample: the rule was chosen on data from 2023-01-01 on (0 trades before)"
+   ]
+  },
+  {
+   "id": "ict-nofri",
+   "system": "ICT",
+   "status": "shadow (paper variant)",
+   "name": "ICT A-setups, no Friday variant",
+   "claim": "+0.363R a trade over 223 (before costs)",
+   "source": "ict/replay.json shadowByVariant.nofri",
+   "fitFrom": "2023-01-01",
+   "dropped": {
+    "n": 31,
+    "mean": -0.1352,
+    "t": -0.6049
+   },
+   "family": "nofri",
+   "n": 223,
+   "mean": 0.3427,
+   "sd": 1.7515,
+   "t": 2.9215,
+   "wr": 0.4081,
+   "sum": 76.4128,
+   "skew": 1.9269,
+   "kurt": 7.6184,
+   "maxDD": 11.5194,
+   "from": "2025-08-04",
+   "to": "2026-11-05",
+   "is": {
+    "n": 133,
+    "mean": 0.3443,
+    "sd": 1.7841,
+    "t": 2.2257,
+    "wr": 0.406,
+    "sum": 45.7944,
+    "skew": 2.1018,
+    "kurt": 8.8778,
+    "maxDD": 10.8211
+   },
+   "oos": {
+    "n": 90,
+    "mean": 0.3402,
+    "sd": 1.712,
+    "t": 1.8851,
+    "wr": 0.4111,
+    "sum": 30.6183,
+    "skew": 1.629,
+    "kurt": 5.3669,
+    "maxDD": 11.5194
+   },
+   "boot": {
+    "lo": 0.1214,
+    "hi": 0.5744,
+    "pLE0": 0.0006
+   },
+   "cost": {
+    "x0": {
+     "mean": 0.3631,
+     "t": 3.0942,
+     "sum": 80.97
+    },
+    "x1": {
+     "mean": 0.3427,
+     "t": 2.9215,
+     "sum": 76.4128
+    },
+    "x1.5": {
+     "mean": 0.3324,
+     "t": 2.835,
+     "sum": 74.1342
+    },
+    "x2": {
+     "mean": 0.3222,
+     "t": 2.7484,
+     "sum": 71.8556
+    }
+   },
+   "mc": {
+    "dd50": 9.9801,
+    "dd95": 15.9522,
+    "ddActual": 11.5194
+   },
+   "mt": {
+    "N": 64,
+    "bonf": {
+     "p": 0.0017,
+     "pAdj": 0.1115,
+     "tReq": 3.1628
+    },
+    "sr": 0.1956,
+    "sr0": 0.159,
+    "dsr": 0.7449
+   },
+   "untouched": {
+    "n": 0,
+    "mean": null,
+    "t": null
+   },
+   "warn": [],
+   "verdict": "fragile",
+   "why": [
+    "out-of-sample t 1.89 < 2",
+    "fails Bonferroni for N=64 (needs t 3.16, has 2.92)",
+    "no untouched sample: the rule was chosen on data from 2023-01-01 on (0 trades before)"
+   ]
+  },
+  {
+   "id": "ict-h1opp",
+   "system": "ICT",
+   "status": "shadow (paper variant)",
+   "name": "ICT A-setups, H1 structure opposed variant",
+   "claim": "+0.378R a trade over 176 (before costs)",
+   "source": "ict/replay.json shadowByVariant.h1opp",
+   "fitFrom": "2023-01-01",
+   "dropped": {
+    "n": 78,
+    "mean": 0.1088,
+    "t": 0.5677
+   },
+   "family": "h1opp",
+   "n": 176,
+   "mean": 0.3548,
+   "sd": 1.7003,
+   "t": 2.7683,
+   "wr": 0.4318,
+   "sum": 62.4443,
+   "skew": 1.3995,
+   "kurt": 4.8425,
+   "maxDD": 10.5614,
+   "from": "2025-08-07",
+   "to": "2026-11-05",
+   "is": {
+    "n": 105,
+    "mean": 0.2411,
+    "sd": 1.5718,
+    "t": 1.5715,
+    "wr": 0.419,
+    "sum": 25.3114,
+    "skew": 1.3678,
+    "kurt": 5.183,
+    "maxDD": 10.5614
+   },
+   "oos": {
+    "n": 71,
+    "mean": 0.523,
+    "sd": 1.8731,
+    "t": 2.3527,
+    "wr": 0.4507,
+    "sum": 37.133,
+    "skew": 1.3446,
+    "kurt": 4.1886,
+    "maxDD": 9.8952
+   },
+   "boot": {
+    "lo": 0.1113,
+    "hi": 0.6025,
+    "pLE0": 0.0016
+   },
+   "cost": {
+    "x0": {
+     "mean": 0.3777,
+     "t": 2.948,
+     "sum": 66.47
+    },
+    "x1": {
+     "mean": 0.3548,
+     "t": 2.7683,
+     "sum": 62.4443
+    },
+    "x1.5": {
+     "mean": 0.3434,
+     "t": 2.6784,
+     "sum": 60.4315
+    },
+    "x2": {
+     "mean": 0.3319,
+     "t": 2.5885,
+     "sum": 58.4187
+    }
+   },
+   "mc": {
+    "dd50": 9.2229,
+    "dd95": 14.835,
+    "ddActual": 10.5614
+   },
+   "mt": {
+    "N": 102,
+    "bonf": {
+     "p": 0.0028,
+     "pAdj": 0.2874,
+     "tReq": 3.2961
+    },
+    "sr": 0.2087,
+    "sr0": 0.1918,
+    "dsr": 0.6016
+   },
+   "untouched": {
+    "n": 0,
+    "mean": null,
+    "t": null
+   },
+   "warn": [],
+   "verdict": "fragile",
+   "why": [
+    "fails Bonferroni for N=102 (needs t 3.30, has 2.77)",
+    "no untouched sample: the rule was chosen on data from 2023-01-01 on (0 trades before)"
+   ]
+  },
+  {
+   "id": "ict-dip",
+   "system": "ICT",
+   "status": "shadow (paper, NQ/ES)",
+   "name": "ICT dip-buy NQ/ES",
+   "claim": "+0.555R a trade over 62 (before costs)",
+   "source": "ict/replay.json shadow (variant dip)",
+   "fitFrom": "2018-01-01",
+   "family": "dip",
+   "n": 62,
+   "mean": 0.5415,
+   "sd": 1.8,
+   "t": 2.3688,
+   "wr": 0.5,
+   "sum": 33.5745,
+   "skew": 0.7351,
+   "kurt": 2.2182,
+   "maxDD": 11.1657,
+   "from": "2025-08-22",
+   "to": "2026-11-05",
+   "is": {
+    "n": 37,
+    "mean": 0.5064,
+    "sd": 1.7228,
+    "t": 1.788,
+    "wr": 0.5135,
+    "sum": 18.7363,
+    "skew": 0.6736,
+    "kurt": 2.2352,
+    "maxDD": 11.1657
+   },
+   "oos": {
+    "n": 25,
+    "mean": 0.5935,
+    "sd": 1.9439,
+    "t": 1.5267,
+    "wr": 0.48,
+    "sum": 14.8383,
+    "skew": 0.7771,
+    "kurt": 2.1126,
+    "maxDD": 6.0532
+   },
+   "boot": {
+    "lo": 0.1036,
+    "hi": 1.0016,
+    "pLE0": 0.0086
+   },
+   "cost": {
+    "x0": {
+     "mean": 0.5555,
+     "t": 2.4277,
+     "sum": 34.44
+    },
+    "x1": {
+     "mean": 0.5415,
+     "t": 2.3688,
+     "sum": 33.5745
+    },
+    "x1.5": {
+     "mean": 0.5345,
+     "t": 2.3394,
+     "sum": 33.1418
+    },
+    "x2": {
+     "mean": 0.5276,
+     "t": 2.3098,
+     "sum": 32.709
+    }
+   },
+   "mc": {
+    "dd50": 6.0022,
+    "dd95": 9.553,
+    "ddActual": 11.1657
+   },
+   "mt": {
+    "N": 86,
+    "bonf": {
+     "p": 0.0089,
+     "pAdj": 0.7673,
+     "tReq": 3.2479
+    },
+    "sr": 0.3008,
+    "sr0": 0.3172,
+    "dsr": 0.4436
+   },
+   "untouched": {
+    "n": 0,
+    "mean": null,
+    "t": null
+   },
+   "warn": [
+    "the real drawdown (11.2R) is worse than 95% of reshuffles: losses cluster"
+   ],
+   "verdict": "fragile",
+   "why": [
+    "out-of-sample t 1.53 < 2",
+    "fails Bonferroni for N=86 (needs t 3.25, has 2.37)",
+    "no untouched sample: the rule was chosen on data from 2018-01-01 on (0 trades before)"
+   ]
+  },
+  {
+   "id": "ict-all",
+   "system": "ICT",
+   "status": "reference (every graded signal)",
+   "name": "ICT all graded signals",
+   "claim": "reference: what the A filter is selected from",
+   "source": "ict/replay.json trades",
+   "fitFrom": "2023-01-01",
+   "family": "ict",
+   "n": 826,
+   "mean": 0.1287,
+   "sd": 1.6067,
+   "t": 2.3027,
+   "wr": 0.3801,
+   "sum": 106.333,
+   "skew": 2.0817,
+   "kurt": 10.3492,
+   "maxDD": 33.8261,
+   "from": "2025-08-01",
+   "to": "2026-11-06",
+   "is": {
+    "n": 495,
+    "mean": 0.1899,
+    "sd": 1.6775,
+    "t": 2.5186,
+    "wr": 0.4061,
+    "sum": 94.0009,
+    "skew": 2.2308,
+    "kurt": 11.975,
+    "maxDD": 15.4786
+   },
+   "oos": {
+    "n": 331,
+    "mean": 0.0373,
+    "sd": 1.4925,
+    "t": 0.4542,
+    "wr": 0.3414,
+    "sum": 12.3322,
+    "skew": 1.7065,
+    "kurt": 5.7753,
+    "maxDD": 28.4016
+   },
+   "boot": {
+    "lo": 0.0231,
+    "hi": 0.2388,
+    "pLE0": 0.0094
+   },
+   "cost": {
+    "x0": {
+     "mean": 0.1564,
+     "t": 2.7981,
+     "sum": 129.2
+    },
+    "x1": {
+     "mean": 0.1287,
+     "t": 2.3027,
+     "sum": 106.333
+    },
+    "x1.5": {
+     "mean": 0.1149,
+     "t": 2.0547,
+     "sum": 94.8996
+    },
+    "x2": {
+     "mean": 0.101,
+     "t": 1.8068,
+     "sum": 83.4661
+    }
+   },
+   "mc": {
+    "dd50": 24.8288,
+    "dd95": 39.364,
+    "ddActual": 33.8261
+   },
+   "mt": {
+    "N": 363,
+    "bonf": {
+     "p": 0.0106,
+     "pAdj": 1,
+     "tReq": 3.6373
+    },
+    "sr": 0.0801,
+    "sr0": 0.1029,
+    "dsr": 0.2389
+   },
+   "untouched": {
+    "n": 0,
+    "mean": null,
+    "t": null
+   },
+   "warn": [
+    "decay: in-sample +0.190 vs out-of-sample +0.037 a trade"
+   ],
+   "verdict": "fragile",
+   "why": [
+    "out-of-sample t 0.45 < 2",
+    "fails Bonferroni for N=363 (needs t 3.64, has 2.30)",
+    "no untouched sample: the rule was chosen on data from 2023-01-01 on (0 trades before)"
+   ]
+  },
+  {
+   "id": "ict-a-nq-2018",
+   "system": "ICT",
+   "status": "long-history check of the live A rule",
+   "name": "ICT A-setups NQ, 2018-26 rebuild",
+   "claim": "same rule on 8 years of HistData (earlier rebuild audit)",
+   "source": "research/edge/robustness/out/ict.json nq",
+   "fitFrom": "2023-01-01",
+   "family": "ict",
+   "n": 406,
+   "mean": 0.135,
+   "sd": 1.5963,
+   "t": 1.704,
+   "wr": 0.3621,
+   "sum": 54.8076,
+   "skew": 2.408,
+   "kurt": 11.2105,
+   "maxDD": 17.4038,
+   "from": "2018-03-13",
+   "to": "2026-10-29",
+   "is": {
+    "n": 243,
+    "mean": 0.0304,
+    "sd": 1.4596,
+    "t": 0.3248,
+    "wr": 0.321,
+    "sum": 7.3909,
+    "skew": 2.3393,
+    "kurt": 10.8094,
+    "maxDD": 17.4038
+   },
+   "oos": {
+    "n": 163,
+    "mean": 0.2909,
+    "sd": 1.7739,
+    "t": 2.0937,
+    "wr": 0.4233,
+    "sum": 47.4167,
+    "skew": 2.3605,
+    "kurt": 10.5885,
+    "maxDD": 9.9363
+   },
+   "boot": {
+    "lo": -0.0161,
+    "hi": 0.2995,
+    "pLE0": 0.043
+   },
+   "cost": {
+    "x0": {
+     "mean": 0.1474,
+     "t": 1.8604,
+     "sum": 59.83
+    },
+    "x1": {
+     "mean": 0.135,
+     "t": 1.704,
+     "sum": 54.8076
+    },
+    "x1.5": {
+     "mean": 0.1288,
+     "t": 1.6258,
+     "sum": 52.2964
+    },
+    "x2": {
+     "mean": 0.1226,
+     "t": 1.5475,
+     "sum": 49.7852
+    }
+   },
+   "mc": {
+    "dd50": 18.1945,
+    "dd95": 28.5767,
+    "ddActual": 17.4038
+   },
+   "mt": {
+    "N": 363,
+    "bonf": {
+     "p": 0.0442,
+     "pAdj": 1,
+     "tReq": 3.6373
+    },
+    "sr": 0.0846,
+    "sr0": 0.1468,
+    "dsr": 0.0825
+   },
+   "untouched": {
+    "n": 250,
+    "mean": 0.0343,
+    "t": 0.3755
+   },
+   "warn": [],
+   "verdict": "fragile",
+   "why": [
+    "CI includes 0 (−0.016 to +0.299)",
+    "fails Bonferroni for N=363 (needs t 3.64, has 1.70)"
+   ]
+  },
+  {
+   "id": "ict-a-gc-2018",
+   "system": "ICT",
+   "status": "long-history check of the live A rule",
+   "name": "ICT A-setups GC, 2018-26 rebuild",
+   "claim": "same rule on 8 years of HistData (earlier rebuild audit)",
+   "source": "research/edge/robustness/out/ict.json gc",
+   "fitFrom": "2019-01-01",
+   "family": "ict",
+   "n": 529,
+   "mean": 0.2058,
+   "sd": 1.614,
+   "t": 2.9325,
+   "wr": 0.448,
+   "sum": 108.8603,
+   "skew": 1.7196,
+   "kurt": 7.6519,
+   "maxDD": 15.663,
+   "from": "2018-01-29",
+   "to": "2026-10-30",
+   "is": {
+    "n": 317,
+    "mean": 0.1321,
+    "sd": 1.441,
+    "t": 1.6324,
+    "wr": 0.4479,
+    "sum": 41.8805,
+    "skew": 1.2559,
+    "kurt": 4.2561,
+    "maxDD": 15.663
+   },
+   "oos": {
+    "n": 212,
+    "mean": 0.3159,
+    "sd": 1.8409,
+    "t": 2.4989,
+    "wr": 0.4481,
+    "sum": 66.9797,
+    "skew": 1.932,
+    "kurt": 8.6015,
+    "maxDD": 7.071
+   },
+   "boot": {
+    "lo": 0.0715,
+    "hi": 0.3482,
+    "pLE0": 0.0006
+   },
+   "cost": {
+    "x0": {
+     "mean": 0.2371,
+     "t": 3.3787,
+     "sum": 125.41
+    },
+    "x1": {
+     "mean": 0.2058,
+     "t": 2.9325,
+     "sum": 108.8603
+    },
+    "x1.5": {
+     "mean": 0.1901,
+     "t": 2.7093,
+     "sum": 100.5854
+    },
+    "x2": {
+     "mean": 0.1745,
+     "t": 2.486,
+     "sum": 92.3105
+    }
+   },
+   "mc": {
+    "dd50": 16.9333,
+    "dd95": 26.5596,
+    "ddActual": 15.663
+   },
+   "mt": {
+    "N": 363,
+    "bonf": {
+     "p": 0.0017,
+     "pAdj": 0.6104,
+     "tReq": 3.6373
+    },
+    "sr": 0.1275,
+    "sr0": 0.1286,
+    "dsr": 0.4888
+   },
+   "untouched": {
+    "n": 78,
+    "mean": -0.0164,
+    "t": -0.1091
+   },
+   "warn": [],
+   "verdict": "fragile",
+   "why": [
+    "fails Bonferroni for N=363 (needs t 3.64, has 2.93)",
+    "untouched period before 2019-01-01: −0.016 a trade over 78"
+   ]
+  },
+  {
+   "id": "replica",
+   "system": "Meridian",
+   "status": "live (paper)",
+   "name": "Gold replica (council replay)",
+   "claim": "council replay 2022-12-27 to 2026-11-03, costs included",
+   "source": "research/replay-2w.json k=replica",
+   "fitFrom": "2023-01-01",
+   "family": "council",
+   "n": 212,
+   "mean": 0.8771,
+   "sd": 3.3425,
+   "t": 3.8208,
+   "wr": 0.3302,
+   "sum": 185.95,
+   "skew": 1.4173,
+   "kurt": 4.0305,
+   "maxDD": 17.58,
+   "from": "2023-12-14",
+   "to": "2026-04-22",
+   "is": {
+    "n": 127,
+    "mean": 0.9937,
+    "sd": 3.5183,
+    "t": 3.1829,
+    "wr": 0.3386,
+    "sum": 126.2,
+    "skew": 1.4317,
+    "kurt": 4.0884,
+    "maxDD": 10.32
+   },
+   "oos": {
+    "n": 85,
+    "mean": 0.7029,
+    "sd": 3.0732,
+    "t": 2.1088,
+    "wr": 0.3176,
+    "sum": 59.75,
+    "skew": 1.3143,
+    "kurt": 3.4621,
+    "maxDD": 17.58
+   },
+   "boot": {
+    "lo": 0.4396,
+    "hi": 1.3361,
+    "pLE0": 0
+   },
+   "cost": {
+    "x0": {
+     "mean": 0.9094,
+     "t": 3.9585,
+     "sum": 192.7847
+    },
+    "x1": {
+     "mean": 0.8771,
+     "t": 3.8208,
+     "sum": 185.95
+    },
+    "x1.5": {
+     "mean": 0.861,
+     "t": 3.7518,
+     "sum": 182.5327
+    },
+    "x2": {
+     "mean": 0.8449,
+     "t": 3.6827,
+     "sum": 179.1153
+    }
+   },
+   "mc": {
+    "dd50": 15.44,
+    "dd95": 24.2715,
+    "ddActual": 17.58
+   },
+   "mt": {
+    "N": 424,
+    "bonf": {
+     "p": 0.0001,
+     "pAdj": 0.0282,
+     "tReq": 3.6772
+    },
+    "sr": 0.2624,
+    "sr0": 0.2067,
+    "dsr": 0.8367
+   },
+   "untouched": {
+    "n": 0,
+    "mean": null,
+    "t": null
+   },
+   "warn": [],
+   "verdict": "fragile",
+   "why": [
+    "no untouched sample: the rule was chosen on data from 2023-01-01 on (0 trades before)"
+   ]
+  },
+  {
+   "id": "gtrend",
+   "system": "Meridian",
+   "status": "live (paper)",
+   "name": "Gold trend N20 (council replay)",
+   "claim": "council replay 2022-12-27 to 2026-11-03, costs included",
+   "source": "research/replay-2w.json k=gtrend",
+   "fitFrom": "2019-01-01",
+   "family": "council",
+   "n": 22,
+   "mean": 1.6818,
+   "sd": 3.1661,
+   "t": 2.4916,
+   "wr": 0.6818,
+   "sum": 37,
+   "skew": 2.2913,
+   "kurt": 8.5394,
+   "maxDD": 1.4,
+   "from": "2023-01-04",
+   "to": "2026-08-06",
+   "is": {
+    "n": 13,
+    "mean": 1.2908,
+    "sd": 2.1738,
+    "t": 2.1409,
+    "wr": 0.6923,
+    "sum": 16.78,
+    "skew": 1.1503,
+    "kurt": 3.7613,
+    "maxDD": 1.4
+   },
+   "oos": {
+    "n": 9,
+    "mean": 2.2467,
+    "sd": 4.3148,
+    "t": 1.5621,
+    "wr": 0.6667,
+    "sum": 20.22,
+    "skew": 1.9295,
+    "kurt": 5.4783,
+    "maxDD": 0.88
+   },
+   "boot": {
+    "lo": 0.5408,
+    "hi": 3.1023,
+    "pLE0": 0.0004
+   },
+   "cost": {
+    "x0": {
+     "mean": 1.687,
+     "t": 2.499,
+     "sum": 37.1137
+    },
+    "x1": {
+     "mean": 1.6818,
+     "t": 2.4916,
+     "sum": 37
+    },
+    "x1.5": {
+     "mean": 1.6792,
+     "t": 2.4878,
+     "sum": 36.9432
+    },
+    "x2": {
+     "mean": 1.6767,
+     "t": 2.4841,
+     "sum": 36.8863
+    }
+   },
+   "mc": {
+    "dd50": 1.67,
+    "dd95": 2.77,
+    "ddActual": 1.4
+   },
+   "mt": {
+    "N": 424,
+    "bonf": {
+     "p": 0.0064,
+     "pAdj": 1,
+     "tReq": 3.6772
+    },
+    "sr": 0.5312,
+    "sr0": 0.6552,
+    "dsr": 0.1555
+   },
+   "untouched": {
+    "n": 0,
+    "mean": null,
+    "t": null
+   },
+   "warn": [],
+   "verdict": "not proven",
+   "why": [
+    "only 22 trades (needs 30+)"
+   ]
+  },
+  {
+   "id": "gtrend-2018",
+   "system": "Meridian",
+   "status": "live (paper)",
+   "name": "Gold trend N20, 2018-26 rebuild",
+   "claim": "same rule rebuilt on 8 years of HistData (earlier rebuild audit)",
+   "source": "research/edge/robustness/out/gtrend.json",
+   "fitFrom": "2019-01-01",
+   "family": "council",
+   "n": 40,
+   "mean": 1.6396,
+   "sd": 4.0028,
+   "t": 2.5906,
+   "wr": 0.525,
+   "sum": 65.5843,
+   "skew": 2.369,
+   "kurt": 9.5042,
+   "maxDD": 3.6532,
+   "from": "2018-03-22",
+   "to": "2026-08-04",
+   "is": {
+    "n": 24,
+    "mean": 1.2583,
+    "sd": 3.0311,
+    "t": 2.0337,
+    "wr": 0.4583,
+    "sum": 30.1992,
+    "skew": 1.2142,
+    "kurt": 3.2815,
+    "maxDD": 3.6532
+   },
+   "oos": {
+    "n": 16,
+    "mean": 2.2116,
+    "sd": 5.1952,
+    "t": 1.7028,
+    "wr": 0.625,
+    "sum": 35.3851,
+    "skew": 2.276,
+    "kurt": 7.4434,
+    "maxDD": 2.006
+   },
+   "boot": {
+    "lo": 0.5142,
+    "hi": 3.011,
+    "pLE0": 0.0008
+   },
+   "cost": {
+    "x0": {
+     "mean": 1.8278,
+     "t": 2.9398,
+     "sum": 73.1138
+    },
+    "x1": {
+     "mean": 1.6396,
+     "t": 2.5906,
+     "sum": 65.5843
+    },
+    "x1.5": {
+     "mean": 1.5455,
+     "t": 2.415,
+     "sum": 61.8195
+    },
+    "x2": {
+     "mean": 1.4514,
+     "t": 2.24,
+     "sum": 58.0548
+    }
+   },
+   "mc": {
+    "dd50": 4.0356,
+    "dd95": 6.6252,
+    "ddActual": 3.6532
+   },
+   "mt": {
+    "N": 424,
+    "bonf": {
+     "p": 0.0048,
+     "pAdj": 1,
+     "tReq": 3.6772
+    },
+    "sr": 0.4096,
+    "sr0": 0.4808,
+    "dsr": 0.2372
+   },
+   "untouched": {
+    "n": 3,
+    "mean": 1.6664,
+    "t": 0.7209
+   },
+   "warn": [],
+   "verdict": "fragile",
+   "why": [
+    "out-of-sample t 1.70 < 2",
+    "fails Bonferroni for N=424 (needs t 3.68, has 2.59)",
+    "no untouched sample: the rule was chosen on data from 2019-01-01 on (3 trades before)"
+   ]
+  },
+  {
+   "id": "gtrend5",
+   "system": "Meridian",
+   "status": "live (paper)",
+   "name": "Gold trend fast N5 (council replay)",
+   "claim": "council replay 2022-12-27 to 2026-11-03, costs included",
+   "source": "research/replay-2w.json k=gtrend5",
+   "fitFrom": "2019-01-01",
+   "family": "council",
+   "n": 39,
+   "mean": 1.7115,
+   "sd": 4.9862,
+   "t": 2.1436,
+   "wr": 0.3846,
+   "sum": 66.75,
+   "skew": 3.093,
+   "kurt": 13.0927,
+   "maxDD": 2.88,
+   "from": "2023-02-02",
+   "to": "2026-10-11",
+   "is": {
+    "n": 23,
+    "mean": 1.3948,
+    "sd": 3.6903,
+    "t": 1.8126,
+    "wr": 0.3913,
+    "sum": 32.08,
+    "skew": 2.4325,
+    "kurt": 9.0068,
+    "maxDD": 2.42
+   },
+   "oos": {
+    "n": 16,
+    "mean": 2.1669,
+    "sd": 6.5297,
+    "t": 1.3274,
+    "wr": 0.375,
+    "sum": 34.67,
+    "skew": 2.7607,
+    "kurt": 9.6435,
+    "maxDD": 2.88
+   },
+   "boot": {
+    "lo": 0.3561,
+    "hi": 3.4299,
+    "pLE0": 0.002
+   },
+   "cost": {
+    "x0": {
+     "mean": 1.7163,
+     "t": 2.1494,
+     "sum": 66.9353
+    },
+    "x1": {
+     "mean": 1.7115,
+     "t": 2.1436,
+     "sum": 66.75
+    },
+    "x1.5": {
+     "mean": 1.7092,
+     "t": 2.1407,
+     "sum": 66.6574
+    },
+    "x2": {
+     "mean": 1.7068,
+     "t": 2.1378,
+     "sum": 66.5647
+    }
+   },
+   "mc": {
+    "dd50": 4.025,
+    "dd95": 6.5505,
+    "ddActual": 2.88
+   },
+   "mt": {
+    "N": 424,
+    "bonf": {
+     "p": 0.016,
+     "pAdj": 1,
+     "tReq": 3.6772
+    },
+    "sr": 0.3433,
+    "sr0": 0.4871,
+    "dsr": 0.0511
+   },
+   "untouched": {
+    "n": 0,
+    "mean": null,
+    "t": null
+   },
+   "warn": [],
+   "verdict": "fragile",
+   "why": [
+    "out-of-sample t 1.33 < 2",
+    "fails Bonferroni for N=424 (needs t 3.68, has 2.14)",
+    "no untouched sample: the rule was chosen on data from 2019-01-01 on (0 trades before)"
+   ]
+  },
+  {
+   "id": "gtrend5-2018",
+   "system": "Meridian",
+   "status": "live (paper)",
+   "name": "Gold trend fast N5, 2018-26 rebuild",
+   "claim": "same rule rebuilt on 8 years of HistData (earlier rebuild audit)",
+   "source": "research/edge/robustness/out/gtrend.json",
+   "fitFrom": "2019-01-01",
+   "family": "council",
+   "n": 74,
+   "mean": 1.0645,
+   "sd": 3.365,
+   "t": 2.7212,
+   "wr": 0.3514,
+   "sum": 78.7696,
+   "skew": 2.6985,
+   "kurt": 11.2311,
+   "maxDD": 5.3751,
+   "from": "2018-02-13",
+   "to": "2026-07-01",
+   "is": {
+    "n": 44,
+    "mean": 0.7813,
+    "sd": 2.7183,
+    "t": 1.9066,
+    "wr": 0.2955,
+    "sum": 34.3779,
+    "skew": 1.8008,
+    "kurt": 5.0819,
+    "maxDD": 5.3751
+   },
+   "oos": {
+    "n": 30,
+    "mean": 1.4797,
+    "sd": 4.1529,
+    "t": 1.9516,
+    "wr": 0.4333,
+    "sum": 44.3917,
+    "skew": 2.724,
+    "kurt": 10.0578,
+    "maxDD": 3.237
+   },
+   "boot": {
+    "lo": 0.3559,
+    "hi": 1.8641,
+    "pLE0": 0.0008
+   },
+   "cost": {
+    "x0": {
+     "mean": 1.1388,
+     "t": 2.9274,
+     "sum": 84.2698
+    },
+    "x1": {
+     "mean": 1.0645,
+     "t": 2.7212,
+     "sum": 78.7696
+    },
+    "x1.5": {
+     "mean": 1.0273,
+     "t": 2.6148,
+     "sum": 76.0195
+    },
+    "x2": {
+     "mean": 0.9901,
+     "t": 2.5066,
+     "sum": 73.2694
+    }
+   },
+   "mc": {
+    "dd50": 5.7125,
+    "dd95": 9.1439,
+    "ddActual": 5.3751
+   },
+   "mt": {
+    "N": 424,
+    "bonf": {
+     "p": 0.0033,
+     "pAdj": 1,
+     "tReq": 3.6772
+    },
+    "sr": 0.3163,
+    "sr0": 0.3514,
+    "dsr": 0.3182
+   },
+   "untouched": {
+    "n": 8,
+    "mean": 0.1139,
+    "t": 0.1284
+   },
+   "warn": [],
+   "verdict": "fragile",
+   "why": [
+    "out-of-sample t 1.95 < 2",
+    "fails Bonferroni for N=424 (needs t 3.68, has 2.72)",
+    "no untouched sample: the rule was chosen on data from 2019-01-01 on (8 trades before)"
+   ]
+  },
+  {
+   "id": "nq-open",
+   "system": "Meridian",
+   "status": "live (paper)",
+   "name": "NQ New York open run (council replay)",
+   "claim": "council replay 2022-12-27 to 2026-11-03, costs included",
+   "source": "research/replay-2w.json k=nq-open",
+   "fitFrom": "2023-01-01",
+   "family": "council",
+   "n": 299,
+   "mean": 0.3314,
+   "sd": 1.561,
+   "t": 3.6708,
+   "wr": 0.4749,
+   "sum": 99.08,
+   "skew": 0.7597,
+   "kurt": 2.4945,
+   "maxDD": 9.02,
+   "from": "2022-12-28",
+   "to": "2026-10-29",
+   "is": {
+    "n": 179,
+    "mean": 0.2929,
+    "sd": 1.5631,
+    "t": 2.5071,
+    "wr": 0.4581,
+    "sum": 52.43,
+    "skew": 0.7612,
+    "kurt": 2.4414,
+    "maxDD": 9.02
+   },
+   "oos": {
+    "n": 120,
+    "mean": 0.3888,
+    "sd": 1.5626,
+    "t": 2.7253,
+    "wr": 0.5,
+    "sum": 46.65,
+    "skew": 0.7603,
+    "kurt": 2.5725,
+    "maxDD": 7.85
+   },
+   "boot": {
+    "lo": 0.1585,
+    "hi": 0.5081,
+    "pLE0": 0
+   },
+   "cost": {
+    "x0": {
+     "mean": 0.3432,
+     "t": 3.8026,
+     "sum": 102.6166
+    },
+    "x1": {
+     "mean": 0.3314,
+     "t": 3.6708,
+     "sum": 99.08
+    },
+    "x1.5": {
+     "mean": 0.3255,
+     "t": 3.6049,
+     "sum": 97.3117
+    },
+    "x2": {
+     "mean": 0.3195,
+     "t": 3.539,
+     "sum": 95.5434
+    }
+   },
+   "mc": {
+    "dd50": 10.86,
+    "dd95": 17.1105,
+    "ddActual": 9.02
+   },
+   "mt": {
+    "N": 424,
+    "bonf": {
+     "p": 0.0001,
+     "pAdj": 0.0513,
+     "tReq": 3.6772
+    },
+    "sr": 0.2123,
+    "sr0": 0.1739,
+    "dsr": 0.7629
+   },
+   "untouched": {
+    "n": 3,
+    "mean": -0.2133,
+    "t": -0.2661
+   },
+   "warn": [],
+   "verdict": "fragile",
+   "why": [
+    "fails Bonferroni for N=424 (needs t 3.68, has 3.67)",
+    "no untouched sample: the rule was chosen on data from 2023-01-01 on (3 trades before)"
+   ]
+  },
+  {
+   "id": "nq-open-2018",
+   "system": "Meridian",
+   "status": "live (paper)",
+   "name": "NQ New York open run, 2018-26 rebuild",
+   "claim": "same rule rebuilt on 8 years of HistData (earlier rebuild audit)",
+   "source": "research/edge/robustness/out/nq.json",
+   "fitFrom": "2023-01-01",
+   "family": "council",
+   "n": 725,
+   "mean": 0.1461,
+   "sd": 1.5155,
+   "t": 2.5954,
+   "wr": 0.4234,
+   "sum": 105.9065,
+   "skew": 1.1092,
+   "kurt": 3.8116,
+   "maxDD": 19.9808,
+   "from": "2018-01-02",
+   "to": "2026-10-29",
+   "is": {
+    "n": 435,
+    "mean": 0.0275,
+    "sd": 1.4307,
+    "t": 0.4004,
+    "wr": 0.3862,
+    "sum": 11.947,
+    "skew": 1.166,
+    "kurt": 3.8077,
+    "maxDD": 19.9808
+   },
+   "oos": {
+    "n": 290,
+    "mean": 0.324,
+    "sd": 1.6207,
+    "t": 3.4044,
+    "wr": 0.4793,
+    "sum": 93.9594,
+    "skew": 0.9957,
+    "kurt": 3.6437,
+    "maxDD": 8.1488
+   },
+   "boot": {
+    "lo": 0.0383,
+    "hi": 0.2567,
+    "pLE0": 0.0046
+   },
+   "cost": {
+    "x0": {
+     "mean": 0.1819,
+     "t": 3.2365,
+     "sum": 131.9027
+    },
+    "x1": {
+     "mean": 0.1461,
+     "t": 2.5954,
+     "sum": 105.9065
+    },
+    "x1.5": {
+     "mean": 0.1281,
+     "t": 2.2753,
+     "sum": 92.9084
+    },
+    "x2": {
+     "mean": 0.1102,
+     "t": 1.9555,
+     "sum": 79.9102
+    }
+   },
+   "mc": {
+    "dd50": 21.6714,
+    "dd95": 33.8646,
+    "ddActual": 19.9808
+   },
+   "mt": {
+    "N": 424,
+    "bonf": {
+     "p": 0.0047,
+     "pAdj": 1,
+     "tReq": 3.6772
+    },
+    "sr": 0.0964,
+    "sr0": 0.1116,
+    "dsr": 0.3332
+   },
+   "untouched": {
+    "n": 435,
+    "mean": 0.0275,
+    "t": 0.4004
+   },
+   "warn": [],
+   "verdict": "fragile",
+   "why": [
+    "fails Bonferroni for N=424 (needs t 3.68, has 2.60)"
+   ]
+  },
+  {
+   "id": "trend",
+   "system": "Meridian",
+   "status": "live (paper)",
+   "name": "Crypto trend v3 (council replay)",
+   "claim": "council replay 2022-12-27 to 2026-11-03, costs included",
+   "source": "research/replay-2w.json k=trend",
+   "fitFrom": "2022-01-01",
+   "family": "council",
+   "n": 96,
+   "mean": 1.0794,
+   "sd": 3.1425,
+   "t": 3.3653,
+   "wr": 0.4792,
+   "sum": 103.62,
+   "skew": 2.5342,
+   "kurt": 8.6919,
+   "maxDD": 8.27,
+   "from": "2023-01-10",
+   "to": "2026-09-19",
+   "is": {
+    "n": 57,
+    "mean": 1.7868,
+    "sd": 3.7055,
+    "t": 3.6406,
+    "wr": 0.5263,
+    "sum": 101.85,
+    "skew": 1.9424,
+    "kurt": 5.6148,
+    "maxDD": 6.79
+   },
+   "oos": {
+    "n": 39,
+    "mean": 0.0454,
+    "sd": 1.6143,
+    "t": 0.1756,
+    "wr": 0.4103,
+    "sum": 1.77,
+    "skew": 4.0879,
+    "kurt": 22.2394,
+    "maxDD": 8.27
+   },
+   "boot": {
+    "lo": 0.4999,
+    "hi": 1.7113,
+    "pLE0": 0
+   },
+   "cost": {
+    "x0": {
+     "mean": 1.1272,
+     "t": 3.5159,
+     "sum": 108.2146
+    },
+    "x1": {
+     "mean": 1.0794,
+     "t": 3.3653,
+     "sum": 103.62
+    },
+    "x1.5": {
+     "mean": 1.0554,
+     "t": 3.2901,
+     "sum": 101.3227
+    },
+    "x2": {
+     "mean": 1.0315,
+     "t": 3.2148,
+     "sum": 99.0254
+    }
+   },
+   "mc": {
+    "dd50": 4.34,
+    "dd95": 6.96,
+    "ddActual": 8.27
+   },
+   "mt": {
+    "N": 424,
+    "bonf": {
+     "p": 0.0004,
+     "pAdj": 0.1621,
+     "tReq": 3.6772
+    },
+    "sr": 0.3435,
+    "sr0": 0.3081,
+    "dsr": 0.7184
+   },
+   "untouched": {
+    "n": 0,
+    "mean": null,
+    "t": null
+   },
+   "warn": [
+    "decay: in-sample +1.787 vs out-of-sample +0.045 a trade",
+    "the real drawdown (8.3R) is worse than 95% of reshuffles: losses cluster"
+   ],
+   "verdict": "fragile",
+   "why": [
+    "out-of-sample t 0.18 < 2",
+    "fails Bonferroni for N=424 (needs t 3.68, has 3.37)",
+    "no untouched sample: the rule was chosen on data from 2022-01-01 on (0 trades before)"
+   ]
+  },
+  {
+   "id": "trend-2018",
+   "system": "Meridian",
+   "status": "live (paper)",
+   "name": "Crypto trend v3, 2018-26 rebuild",
+   "claim": "same rule rebuilt on 8 years of HistData (earlier rebuild audit)",
+   "source": "research/edge/robustness/out/crypto.json",
+   "fitFrom": "2022-01-01",
+   "family": "council",
+   "n": 125,
+   "mean": 2.8038,
+   "sd": 8.4891,
+   "t": 3.6926,
+   "wr": 0.336,
+   "sum": 350.4719,
+   "skew": 3.2194,
+   "kurt": 13.6114,
+   "maxDD": 13.6811,
+   "from": "2017-11-01",
+   "to": "2026-09-21",
+   "is": {
+    "n": 75,
+    "mean": 3.2554,
+    "sd": 9.7838,
+    "t": 2.8816,
+    "wr": 0.3067,
+    "sum": 244.1535,
+    "skew": 3.0151,
+    "kurt": 11.6017,
+    "maxDD": 12.8793
+   },
+   "oos": {
+    "n": 50,
+    "mean": 2.1264,
+    "sd": 6.0851,
+    "t": 2.4709,
+    "wr": 0.38,
+    "sum": 106.3184,
+    "skew": 2.725,
+    "kurt": 9.5064,
+    "maxDD": 6.6991
+   },
+   "boot": {
+    "lo": 1.421,
+    "hi": 4.3616,
+    "pLE0": 0
+   },
+   "cost": {
+    "x0": {
+     "mean": 3.0503,
+     "t": 4.0423,
+     "sum": 381.2875
+    },
+    "x1": {
+     "mean": 2.8038,
+     "t": 3.6926,
+     "sum": 350.4719
+    },
+    "x1.5": {
+     "mean": 2.6805,
+     "t": 3.517,
+     "sum": 335.064
+    },
+    "x2": {
+     "mean": 2.5572,
+     "t": 3.3411,
+     "sum": 319.6562
+    }
+   },
+   "mc": {
+    "dd50": 7.098,
+    "dd95": 11.3608,
+    "ddActual": 13.6811
+   },
+   "mt": {
+    "N": 424,
+    "bonf": {
+     "p": 0.0001,
+     "pAdj": 0.0471,
+     "tReq": 3.6772
+    },
+    "sr": 0.3303,
+    "sr0": 0.2696,
+    "dsr": 0.8988
+   },
+   "untouched": {
+    "n": 53,
+    "mean": 4.7683,
+    "t": 3.0661
+   },
+   "warn": [
+    "the real drawdown (13.7R) is worse than 95% of reshuffles: losses cluster"
+   ],
+   "verdict": "robust",
+   "why": [
+    "passes every test"
+   ]
+  },
+  {
+   "id": "gtl",
+   "system": "Meridian",
+   "status": "live (paper)",
+   "name": "Gold H4 trendline (council replay)",
+   "claim": "council replay 2022-12-27 to 2026-11-03, costs included",
+   "source": "research/replay-2w.json k=gtl",
+   "fitFrom": "2023-01-01",
+   "family": "council",
+   "n": 24,
+   "mean": 0.1462,
+   "sd": 1.5783,
+   "t": 0.454,
+   "wr": 0.375,
+   "sum": 3.51,
+   "skew": 1.7676,
+   "kurt": 6.0207,
+   "maxDD": 6.64,
+   "from": "2026-01-05",
+   "to": "2026-10-27",
+   "is": {
+    "n": 14,
+    "mean": 0.0407,
+    "sd": 1.3235,
+    "t": 0.1151,
+    "wr": 0.4286,
+    "sum": 0.57,
+    "skew": 1.053,
+    "kurt": 3.2236,
+    "maxDD": 3.63
+   },
+   "oos": {
+    "n": 10,
+    "mean": 0.294,
+    "sd": 1.9479,
+    "t": 0.4773,
+    "wr": 0.3,
+    "sum": 2.94,
+    "skew": 1.8691,
+    "kurt": 5.4994,
+    "maxDD": 3.01
+   },
+   "boot": {
+    "lo": -0.4092,
+    "hi": 0.7926,
+    "pLE0": 0.3392
+   },
+   "cost": {
+    "x0": {
+     "mean": 0.1508,
+     "t": 0.4679,
+     "sum": 3.619
+    },
+    "x1": {
+     "mean": 0.1462,
+     "t": 0.454,
+     "sum": 3.51
+    },
+    "x1.5": {
+     "mean": 0.144,
+     "t": 0.447,
+     "sum": 3.4555
+    },
+    "x2": {
+     "mean": 0.1417,
+     "t": 0.44,
+     "sum": 3.401
+    }
+   },
+   "mc": {
+    "dd50": 5.14,
+    "dd95": 7.89,
+    "ddActual": 6.64
+   },
+   "mt": {
+    "N": 424,
+    "bonf": {
+     "p": 0.3249,
+     "pAdj": 1,
+     "tReq": 3.6772
+    },
+    "sr": 0.0927,
+    "sr0": 0.6261,
+    "dsr": 0.0027
+   },
+   "untouched": {
+    "n": 0,
+    "mean": null,
+    "t": null
+   },
+   "warn": [],
+   "verdict": "not proven",
+   "why": [
+    "only 24 trades (needs 30+)"
+   ]
+  },
+  {
+   "id": "gtl-2018",
+   "system": "Meridian",
+   "status": "live (paper)",
+   "name": "Gold H4 trendline, 2018-26 rebuild",
+   "claim": "same rule rebuilt on 8 years of HistData (earlier rebuild audit)",
+   "source": "research/edge/robustness/out/gtl.json",
+   "fitFrom": "2023-01-01",
+   "family": "council",
+   "n": 302,
+   "mean": 0.1419,
+   "sd": 1.2409,
+   "t": 1.9871,
+   "wr": 0.4834,
+   "sum": 42.8491,
+   "skew": 1.0309,
+   "kurt": 3.9432,
+   "maxDD": 19.2154,
+   "from": "2018-01-19",
+   "to": "2026-10-27",
+   "is": {
+    "n": 181,
+    "mean": -0.0064,
+    "sd": 1.1111,
+    "t": -0.0774,
+    "wr": 0.4586,
+    "sum": -1.1573,
+    "skew": 0.9234,
+    "kurt": 3.1349,
+    "maxDD": 19.2154
+   },
+   "oos": {
+    "n": 121,
+    "mean": 0.3637,
+    "sd": 1.3884,
+    "t": 2.8815,
+    "wr": 0.5207,
+    "sum": 44.0064,
+    "skew": 0.9652,
+    "kurt": 3.8725,
+    "maxDD": 7.0965
+   },
+   "boot": {
+    "lo": 0.0032,
+    "hi": 0.2822,
+    "pLE0": 0.023
+   },
+   "cost": {
+    "x0": {
+     "mean": 0.1615,
+     "t": 2.2655,
+     "sum": 48.7854
+    },
+    "x1": {
+     "mean": 0.1419,
+     "t": 1.9871,
+     "sum": 42.8491
+    },
+    "x1.5": {
+     "mean": 0.1321,
+     "t": 1.8479,
+     "sum": 39.881
+    },
+    "x2": {
+     "mean": 0.1222,
+     "t": 1.7087,
+     "sum": 36.9128
+    }
+   },
+   "mc": {
+    "dd50": 12.2635,
+    "dd95": 19.414,
+    "ddActual": 19.2154
+   },
+   "mt": {
+    "N": 424,
+    "bonf": {
+     "p": 0.0235,
+     "pAdj": 1,
+     "tReq": 3.6772
+    },
+    "sr": 0.1143,
+    "sr0": 0.1731,
+    "dsr": 0.1403
+   },
+   "untouched": {
+    "n": 164,
+    "mean": -0.0134,
+    "t": -0.1564
+   },
+   "warn": [],
+   "verdict": "fragile",
+   "why": [
+    "fails Bonferroni for N=424 (needs t 3.68, has 1.99)",
+    "untouched period before 2023-01-01: −0.013 a trade over 164"
+   ]
+  },
+  {
+   "id": "geg",
+   "system": "Meridian",
+   "status": "live (paper)",
+   "name": "Gold daily engulf (council replay)",
+   "claim": "council replay 2022-12-27 to 2026-11-03, costs included",
+   "source": "research/replay-2w.json k=geg",
+   "fitFrom": "2023-01-01",
+   "family": "council",
+   "n": 18,
+   "mean": 0.2256,
+   "sd": 1.9394,
+   "t": 0.4934,
+   "wr": 0.2778,
+   "sum": 4.06,
+   "skew": 1.1776,
+   "kurt": 2.8274,
+   "maxDD": 5.27,
+   "from": "2026-01-30",
+   "to": "2026-10-19",
+   "is": {
+    "n": 10,
+    "mean": 0.004,
+    "sd": 1.9984,
+    "t": 0.0063,
+    "wr": 0.2,
+    "sum": 0.04,
+    "skew": 1.7265,
+    "kurt": 4.4404,
+    "maxDD": 4.77
+   },
+   "oos": {
+    "n": 8,
+    "mean": 0.5025,
+    "sd": 1.9602,
+    "t": 0.7251,
+    "wr": 0.375,
+    "sum": 4.02,
+    "skew": 0.5224,
+    "kurt": 1.3416,
+    "maxDD": 4.03
+   },
+   "boot": {
+    "lo": -0.5795,
+    "hi": 1.1484,
+    "pLE0": 0.3232
+   },
+   "cost": {
+    "x0": {
+     "mean": 0.2313,
+     "t": 0.5055,
+     "sum": 4.1634
+    },
+    "x1": {
+     "mean": 0.2256,
+     "t": 0.4934,
+     "sum": 4.06
+    },
+    "x1.5": {
+     "mean": 0.2227,
+     "t": 0.4873,
+     "sum": 4.0083
+    },
+    "x2": {
+     "mean": 0.2198,
+     "t": 0.4813,
+     "sum": 3.9566
+    }
+   },
+   "mc": {
+    "dd50": 5.19,
+    "dd95": 8.2905,
+    "ddActual": 5.27
+   },
+   "mt": {
+    "N": 424,
+    "bonf": {
+     "p": 0.3109,
+     "pAdj": 1,
+     "tReq": 3.6772
+    },
+    "sr": 0.1163,
+    "sr0": 0.7282,
+    "dsr": 0.0034
+   },
+   "untouched": {
+    "n": 0,
+    "mean": null,
+    "t": null
+   },
+   "warn": [],
+   "verdict": "not proven",
+   "why": [
+    "only 18 trades (needs 30+)"
+   ]
+  },
+  {
+   "id": "geg-2018",
+   "system": "Meridian",
+   "status": "live (paper)",
+   "name": "Gold daily engulf, 2018-26 rebuild",
+   "claim": "same rule rebuilt on 8 years of HistData (earlier rebuild audit)",
+   "source": "research/edge/robustness/out/geg.json",
+   "fitFrom": "2023-01-01",
+   "family": "council",
+   "n": 217,
+   "mean": 0.1968,
+   "sd": 1.6983,
+   "t": 1.7069,
+   "wr": 0.4101,
+   "sum": 42.702,
+   "skew": 1.8083,
+   "kurt": 7.1478,
+   "maxDD": 14.7791,
+   "from": "2018-02-21",
+   "to": "2026-09-04",
+   "is": {
+    "n": 130,
+    "mean": 0.0845,
+    "sd": 1.668,
+    "t": 0.5778,
+    "wr": 0.3538,
+    "sum": 10.9891,
+    "skew": 1.8914,
+    "kurt": 7.0508,
+    "maxDD": 11.8253
+   },
+   "oos": {
+    "n": 87,
+    "mean": 0.3645,
+    "sd": 1.7386,
+    "t": 1.9556,
+    "wr": 0.4943,
+    "sum": 31.7129,
+    "skew": 1.7148,
+    "kurt": 7.3571,
+    "maxDD": 6.961
+   },
+   "boot": {
+    "lo": -0.0182,
+    "hi": 0.4335,
+    "pLE0": 0.0374
+   },
+   "cost": {
+    "x0": {
+     "mean": 0.2144,
+     "t": 1.8582,
+     "sum": 46.5257
+    },
+    "x1": {
+     "mean": 0.1968,
+     "t": 1.7069,
+     "sum": 42.702
+    },
+    "x1.5": {
+     "mean": 0.188,
+     "t": 1.6312,
+     "sum": 40.7901
+    },
+    "x2": {
+     "mean": 0.1792,
+     "t": 1.5553,
+     "sum": 38.8782
+    }
+   },
+   "mc": {
+    "dd50": 14.0859,
+    "dd95": 22.5094,
+    "ddActual": 14.7791
+   },
+   "mt": {
+    "N": 424,
+    "bonf": {
+     "p": 0.0439,
+     "pAdj": 1,
+     "tReq": 3.6772
+    },
+    "sr": 0.1159,
+    "sr0": 0.2043,
+    "dsr": 0.0745
+   },
+   "untouched": {
+    "n": 123,
+    "mean": 0.0943,
+    "t": 0.6223
+   },
+   "warn": [],
+   "verdict": "fragile",
+   "why": [
+    "out-of-sample t 1.96 < 2",
+    "CI includes 0 (−0.018 to +0.434)",
+    "fails Bonferroni for N=424 (needs t 3.68, has 1.71)"
+   ]
+  },
+  {
+   "id": "gmp",
+   "system": "Meridian",
+   "status": "shadow (test system)",
+   "name": "Gold momentum pullback (council replay)",
+   "claim": "council replay 2022-12-27 to 2026-11-03, costs included",
+   "source": "research/replay-2w.json k=gmp",
+   "fitFrom": "2023-01-01",
+   "family": "council",
+   "n": 74,
+   "mean": -0.0243,
+   "sd": 1.1872,
+   "t": -0.1762,
+   "wr": 0.3784,
+   "sum": -1.8,
+   "skew": 0.9794,
+   "kurt": 2.8596,
+   "maxDD": 7.32,
+   "from": "2026-01-06",
+   "to": "2026-10-22",
+   "is": {
+    "n": 44,
+    "mean": 0.1018,
+    "sd": 1.2929,
+    "t": 0.5224,
+    "wr": 0.4091,
+    "sum": 4.48,
+    "skew": 0.8632,
+    "kurt": 2.5344,
+    "maxDD": 7.32
+   },
+   "oos": {
+    "n": 30,
+    "mean": -0.2093,
+    "sd": 1.0049,
+    "t": -1.141,
+    "wr": 0.3333,
+    "sum": -6.28,
+    "skew": 0.9911,
+    "kurt": 2.791,
+    "maxDD": 7.31
+   },
+   "boot": {
+    "lo": -0.2893,
+    "hi": 0.2439,
+    "pLE0": 0.5876
+   },
+   "cost": {
+    "x0": {
+     "mean": -0.0099,
+     "t": -0.0717,
+     "sum": -0.7326
+    },
+    "x1": {
+     "mean": -0.0243,
+     "t": -0.1762,
+     "sum": -1.8
+    },
+    "x1.5": {
+     "mean": -0.0315,
+     "t": -0.2285,
+     "sum": -2.3337
+    },
+    "x2": {
+     "mean": -0.0387,
+     "t": -0.2808,
+     "sum": -2.8674
+    }
+   },
+   "mc": {
+    "dd50": 10.81,
+    "dd95": 16.27,
+    "ddActual": 7.32
+   },
+   "mt": {
+    "N": 424,
+    "bonf": {
+     "p": 0.57,
+     "pAdj": 1,
+     "tReq": 3.6772
+    },
+    "sr": -0.0205,
+    "sr0": 0.3514,
+    "dsr": 0.0008
+   },
+   "untouched": {
+    "n": 0,
+    "mean": null,
+    "t": null
+   },
+   "warn": [
+    "decay: in-sample +0.102 vs out-of-sample −0.209 a trade"
+   ],
+   "verdict": "not proven",
+   "why": [
+    "out-of-sample −0.209 a trade",
+    "CI includes 0 (−0.289 to +0.244)",
+    "−0.039 a trade at 2x costs",
+    "fails Bonferroni for N=424 (needs t 3.68, has -0.18)",
+    "no untouched sample: the rule was chosen on data from 2023-01-01 on (0 trades before)"
+   ]
+  },
+  {
+   "id": "gmp-2018",
+   "system": "Meridian",
+   "status": "shadow (test system)",
+   "name": "Gold momentum pullback, 2018-26 rebuild",
+   "claim": "same rule rebuilt on 8 years of HistData (earlier rebuild audit)",
+   "source": "research/edge/robustness/out/gmp.json",
+   "fitFrom": "2023-01-01",
+   "family": "council",
+   "n": 1003,
+   "mean": 0.041,
+   "sd": 1.2817,
+   "t": 1.0123,
+   "wr": 0.4287,
+   "sum": 41.0925,
+   "skew": 1.1211,
+   "kurt": 3.892,
+   "maxDD": 40.0127,
+   "from": "2018-02-05",
+   "to": "2026-10-22",
+   "is": {
+    "n": 601,
+    "mean": -0.0447,
+    "sd": 1.2709,
+    "t": -0.8616,
+    "wr": 0.3943,
+    "sum": -26.8454,
+    "skew": 1.2065,
+    "kurt": 4.0296,
+    "maxDD": 40.0127
+   },
+   "oos": {
+    "n": 402,
+    "mean": 0.169,
+    "sd": 1.2888,
+    "t": 2.6291,
+    "wr": 0.4801,
+    "sum": 67.9379,
+    "skew": 1.0173,
+    "kurt": 3.7803,
+    "maxDD": 12.8872
+   },
+   "boot": {
+    "lo": -0.0357,
+    "hi": 0.1204,
+    "pLE0": 0.1436
+   },
+   "cost": {
+    "x0": {
+     "mean": 0.0743,
+     "t": 1.8389,
+     "sum": 74.5622
+    },
+    "x1": {
+     "mean": 0.041,
+     "t": 1.0123,
+     "sum": 41.0925
+    },
+    "x1.5": {
+     "mean": 0.0243,
+     "t": 0.5996,
+     "sum": 24.3577
+    },
+    "x2": {
+     "mean": 0.0076,
+     "t": 0.1875,
+     "sum": 7.6228
+    }
+   },
+   "mc": {
+    "dd50": 31.5485,
+    "dd95": 49.6651,
+    "ddActual": 40.0127
+   },
+   "mt": {
+    "N": 424,
+    "bonf": {
+     "p": 0.1557,
+     "pAdj": 1,
+     "tReq": 3.6772
+    },
+    "sr": 0.032,
+    "sr0": 0.0949,
+    "dsr": 0.0213
+   },
+   "untouched": {
+    "n": 633,
+    "mean": -0.0431,
+    "t": -0.856
+   },
+   "warn": [],
+   "verdict": "fragile",
+   "why": [
+    "CI includes 0 (−0.036 to +0.120)",
+    "fails Bonferroni for N=424 (needs t 3.68, has 1.01)",
+    "untouched period before 2023-01-01: −0.043 a trade over 633"
+   ]
+  },
+  {
+   "id": "mosha-bo-2018",
+   "system": "Meridian",
+   "status": "live (paper)",
+   "name": "Mosha BO, 2018-26 rebuild",
+   "claim": "same rule rebuilt on 8 years of HistData (earlier rebuild audit)",
+   "source": "research/edge/robustness/out/mosha.json",
+   "fitFrom": "2019-01-01",
+   "family": "council",
+   "n": 147,
+   "mean": 0.0092,
+   "sd": 2.0399,
+   "t": 0.0546,
+   "wr": 0.2857,
+   "sum": 1.3511,
+   "skew": 1.8412,
+   "kurt": 6.4039,
+   "maxDD": 39.1673,
+   "from": "2018-07-17",
+   "to": "2026-06-10",
+   "is": {
+    "n": 88,
+    "mean": 0.1771,
+    "sd": 2.0612,
+    "t": 0.806,
+    "wr": 0.3182,
+    "sum": 15.585,
+    "skew": 1.7901,
+    "kurt": 5.8997,
+    "maxDD": 24.9334
+   },
+   "oos": {
+    "n": 59,
+    "mean": -0.2413,
+    "sd": 1.9989,
+    "t": -0.9271,
+    "wr": 0.2373,
+    "sum": -14.2339,
+    "skew": 1.9737,
+    "kurt": 7.4354,
+    "maxDD": 20.7315
+   },
+   "boot": {
+    "lo": -0.3203,
+    "hi": 0.3534,
+    "pLE0": 0.4862
+   },
+   "cost": {
+    "x0": {
+     "mean": 0.1878,
+     "t": 1.1534,
+     "sum": 27.6107
+    },
+    "x1": {
+     "mean": 0.0092,
+     "t": 0.0546,
+     "sum": 1.3511
+    },
+    "x1.5": {
+     "mean": -0.0801,
+     "t": -0.4628,
+     "sum": -11.7787
+    },
+    "x2": {
+     "mean": -0.1694,
+     "t": -0.945,
+     "sum": -24.9085
+    }
+   },
+   "mc": {
+    "dd50": 24.2329,
+    "dd95": 36.6979,
+    "ddActual": 39.1673
+   },
+   "mt": {
+    "N": 424,
+    "bonf": {
+     "p": 0.4782,
+     "pAdj": 1,
+     "tReq": 3.6772
+    },
+    "sr": 0.0045,
+    "sr0": 0.2485,
+    "dsr": 0.0015
+   },
+   "untouched": {
+    "n": 9,
+    "mean": -0.2109,
+    "t": -0.3462
+   },
+   "warn": [
+    "decay: in-sample +0.177 vs out-of-sample −0.241 a trade",
+    "the real drawdown (39.2R) is worse than 95% of reshuffles: losses cluster"
+   ],
+   "verdict": "not proven",
+   "why": [
+    "out-of-sample −0.241 a trade",
+    "CI includes 0 (−0.320 to +0.353)",
+    "−0.169 a trade at 2x costs",
+    "fails Bonferroni for N=424 (needs t 3.68, has 0.05)",
+    "no untouched sample: the rule was chosen on data from 2019-01-01 on (9 trades before)"
+   ]
+  },
+  {
+   "id": "scalp-30d",
+   "system": "Meridian",
+   "status": "shadow (back from live paper 7 Nov)",
+   "name": "Scalp live rule, 30-day replay",
+   "claim": "owner rule 7 Nov: +0.329R a trade over 500 in a 30-day replay (before crypto exchange fees)",
+   "source": "backtest.json (scalp, live filters)",
+   "fitFrom": "2026-10-08",
+   "family": "scalp",
+   "n": 235,
+   "mean": -0.8667,
+   "sd": 2.2336,
+   "t": -5.9484,
+   "wr": 0.2553,
+   "sum": -203.679,
+   "skew": 0.5346,
+   "kurt": 6.036,
+   "maxDD": 208.739,
+   "from": "2026-10-08",
+   "to": "2026-11-06",
+   "is": {
+    "n": 141,
+    "mean": -0.9653,
+    "sd": 2.4203,
+    "t": -4.7358,
+    "wr": 0.2482,
+    "sum": -136.103,
+    "skew": 0.5455,
+    "kurt": 6.0654,
+    "maxDD": 141.163
+   },
+   "oos": {
+    "n": 94,
+    "mean": -0.7189,
+    "sd": 1.9232,
+    "t": -3.6242,
+    "wr": 0.266,
+    "sum": -67.576,
+    "skew": 0.6108,
+    "kurt": 4.9043,
+    "maxDD": 67.576
+   },
+   "boot": {
+    "lo": -1.151,
+    "hi": -0.5817,
+    "pLE0": 1
+   },
+   "cost": {
+    "x0": {
+     "mean": 0.0671,
+     "t": 0.541,
+     "sum": 15.78
+    },
+    "x1": {
+     "mean": -0.8667,
+     "t": -5.9484,
+     "sum": -203.679
+    },
+    "x1.5": {
+     "mean": -1.3337,
+     "t": -7.651,
+     "sum": -313.4085
+    },
+    "x2": {
+     "mean": -1.8006,
+     "t": -8.6133,
+     "sum": -423.138
+    }
+   },
+   "mc": {
+    "dd50": 205.882,
+    "dd95": 215.5057,
+    "ddActual": 208.739
+   },
+   "mt": {
+    "N": 1112,
+    "bonf": {
+     "p": 1,
+     "pAdj": 1,
+     "tReq": 3.9163
+    },
+    "sr": -0.388,
+    "sr0": 0.2148,
+    "dsr": 0
+   },
+   "untouched": {
+    "n": 0,
+    "mean": null,
+    "t": null
+   },
+   "warn": [],
+   "verdict": "not proven",
+   "why": [
+    "out-of-sample −0.719 a trade",
+    "CI entirely below 0 (−1.151 to −0.582)",
+    "−1.801 a trade at 2x costs",
+    "fails Bonferroni for N=1112 (needs t 3.92, has -5.95)",
+    "no untouched sample: the rule was chosen on data from 2026-10-08 on (0 trades before)"
+   ]
+  },
+  {
+   "id": "scalp-30d-fx",
+   "system": "Meridian",
+   "status": "shadow",
+   "name": "Scalp live rule, 30-day replay, gold + forex",
+   "claim": "the same without crypto (Kraken fees cost crypto scalps about 2R a trade)",
+   "source": "backtest.json (scalp, live filters, no crypto)",
+   "fitFrom": "2026-10-08",
+   "family": "scalp",
+   "n": 144,
+   "mean": -0.2208,
+   "sd": 1.4682,
+   "t": -1.8047,
+   "wr": 0.2917,
+   "sum": -31.796,
+   "skew": 1.101,
+   "kurt": 2.5666,
+   "maxDD": 42.817,
+   "from": "2026-10-08",
+   "to": "2026-11-04",
+   "is": {
+    "n": 86,
+    "mean": -0.234,
+    "sd": 1.4484,
+    "t": -1.498,
+    "wr": 0.2907,
+    "sum": -20.121,
+    "skew": 1.0881,
+    "kurt": 2.5061,
+    "maxDD": 25.181
+   },
+   "oos": {
+    "n": 58,
+    "mean": -0.2013,
+    "sd": 1.5097,
+    "t": -1.0154,
+    "wr": 0.2931,
+    "sum": -11.675,
+    "skew": 1.1143,
+    "kurt": 2.6271,
+    "maxDD": 18.4
+   },
+   "boot": {
+    "lo": -0.4543,
+    "hi": 0.0246,
+    "pLE0": 0.9592
+   },
+   "cost": {
+    "x0": {
+     "mean": -0.0908,
+     "t": -0.7456,
+     "sum": -13.07
+    },
+    "x1": {
+     "mean": -0.2208,
+     "t": -1.8047,
+     "sum": -31.796
+    },
+    "x1.5": {
+     "mean": -0.2858,
+     "t": -2.3284,
+     "sum": -41.159
+    },
+    "x2": {
+     "mean": -0.3508,
+     "t": -2.8471,
+     "sum": -50.522
+    }
+   },
+   "mc": {
+    "dd50": 37.9105,
+    "dd95": 47.493,
+    "ddActual": 42.817
+   },
+   "mt": {
+    "N": 1112,
+    "bonf": {
+     "p": 0.9644,
+     "pAdj": 1,
+     "tReq": 3.9163
+    },
+    "sr": -0.1504,
+    "sr0": 0.2747,
+    "dsr": 0
+   },
+   "untouched": {
+    "n": 0,
+    "mean": null,
+    "t": null
+   },
+   "warn": [],
+   "verdict": "not proven",
+   "why": [
+    "out-of-sample −0.201 a trade",
+    "CI includes 0 (−0.454 to +0.025)",
+    "−0.351 a trade at 2x costs",
+    "fails Bonferroni for N=1112 (needs t 3.92, has -1.80)",
+    "no untouched sample: the rule was chosen on data from 2026-10-08 on (0 trades before)"
+   ]
+  },
+  {
+   "id": "swing-adx-fwd",
+   "system": "Meridian",
+   "status": "shadow (paper sleeve)",
+   "name": "Swing D1 ADX band, forward tags",
+   "claim": "tags since #468; adopt only after 50+ forward trades at +0.10R or better",
+   "source": "backtest.json swing rows with adxBand",
+   "family": "swingAdx",
+   "n": 5,
+   "mean": -0.0794,
+   "sd": 1.5119,
+   "t": -0.1174,
+   "wr": 0.4,
+   "sum": -0.397,
+   "skew": 0.3936,
+   "kurt": 1.1755,
+   "maxDD": 3.542,
+   "from": "2026-10-22",
+   "to": "2026-11-04",
+   "is": {
+    "n": 3,
+    "mean": 0.7093,
+    "sd": 1.4953,
+    "t": 0.8217,
+    "wr": 0.6667,
+    "sum": 2.128,
+    "skew": -0.7061,
+    "kurt": 1.5,
+    "maxDD": 1.017
+   },
+   "oos": {
+    "n": 2,
+    "mean": -1.2625,
+    "sd": 0.0742,
+    "t": -24.0476,
+    "wr": 0,
+    "sum": -2.525,
+    "skew": 0,
+    "kurt": 1,
+    "maxDD": 2.525
+   },
+   "boot": {
+    "lo": -1.2134,
+    "hi": 1.0546,
+    "pLE0": 0.6628
+   },
+   "cost": {
+    "x0": {
+     "mean": 0.166,
+     "t": 0.2323,
+     "sum": 0.83
+    },
+    "x1": {
+     "mean": -0.0794,
+     "t": -0.1174,
+     "sum": -0.397
+    },
+    "x1.5": {
+     "mean": -0.2021,
+     "t": -0.3067,
+     "sum": -1.0105
+    },
+    "x2": {
+     "mean": -0.3248,
+     "t": -0.5048,
+     "sum": -1.624
+    }
+   },
+   "mc": {
+    "dd50": 2.332,
+    "dd95": 3.542,
+    "ddActual": 3.542
+   },
+   "mt": {
+    "N": 722,
+    "bonf": {
+     "p": 0.5467,
+     "pAdj": 1,
+     "tReq": 3.8108
+    },
+    "sr": -0.0525,
+    "sr0": 1.5807,
+    "dsr": 0.0006
+   },
+   "warn": [],
+   "verdict": "not proven",
+   "why": [
+    "only 5 trades (needs 30+)"
+   ]
+  },
+  {
+   "id": "scalp-150d",
+   "system": "Meridian",
+   "status": "shadow",
+   "name": "Scalp live rule, 150d replay",
+   "claim": "same rule on the 150-day engine replay",
+   "source": "research/backtest-150d.json (scalp, live filters)",
+   "fitFrom": "2026-10-08",
+   "family": "scalp",
+   "n": 915,
+   "mean": -0.0114,
+   "sd": 2.0409,
+   "t": -0.1683,
+   "wr": 0.2929,
+   "sum": -10.388,
+   "skew": 3.529,
+   "kurt": 28.4551,
+   "maxDD": 103.778,
+   "from": "2026-06-05",
+   "to": "2026-11-02",
+   "is": {
+    "n": 549,
+    "mean": 0.0366,
+    "sd": 2.1388,
+    "t": 0.4013,
+    "wr": 0.3042,
+    "sum": 20.111,
+    "skew": 3.9076,
+    "kurt": 33.4487,
+    "maxDD": 80.05
+   },
+   "oos": {
+    "n": 366,
+    "mean": -0.0833,
+    "sd": 1.8852,
+    "t": -0.8457,
+    "wr": 0.276,
+    "sum": -30.499,
+    "skew": 2.6178,
+    "kurt": 14.2747,
+    "maxDD": 81.756
+   },
+   "boot": {
+    "lo": -0.1417,
+    "hi": 0.1266,
+    "pLE0": 0.569
+   },
+   "cost": {
+    "x0": {
+     "mean": 0.0801,
+     "t": 1.1893,
+     "sum": 73.32
+    },
+    "x1": {
+     "mean": -0.0114,
+     "t": -0.1683,
+     "sum": -10.388
+    },
+    "x1.5": {
+     "mean": -0.0571,
+     "t": -0.8451,
+     "sum": -52.242
+    },
+    "x2": {
+     "mean": -0.1028,
+     "t": -1.5193,
+     "sum": -94.096
+    }
+   },
+   "mc": {
+    "dd50": 68.898,
+    "dd95": 102.614,
+    "ddActual": 103.778
+   },
+   "mt": {
+    "N": 1112,
+    "bonf": {
+     "p": 0.5668,
+     "pAdj": 1,
+     "tReq": 3.9163
+    },
+    "sr": -0.0056,
+    "sr0": 0.1087,
+    "dsr": 0.0003
+   },
+   "untouched": {
+    "n": 743,
+    "mean": -0.0667,
+    "t": -0.9131
+   },
+   "warn": [
+    "decay: in-sample +0.037 vs out-of-sample −0.083 a trade"
+   ],
+   "verdict": "not proven",
+   "why": [
+    "out-of-sample −0.083 a trade",
+    "CI includes 0 (−0.142 to +0.127)",
+    "−0.103 a trade at 2x costs",
+    "fails Bonferroni for N=1112 (needs t 3.92, has -0.17)",
+    "untouched period before 2026-10-08: −0.067 a trade over 743"
+   ]
+  },
+  {
+   "id": "scalp-150d-clean",
+   "system": "Meridian",
+   "status": "shadow",
+   "name": "Scalp live rule, 150d-clean replay",
+   "claim": "same rule on the 150-day engine replay",
+   "source": "research/backtest-150d-clean.json (scalp, live filters)",
+   "fitFrom": "2026-10-08",
+   "family": "scalp",
+   "n": 937,
+   "mean": -0.0273,
+   "sd": 2.0192,
+   "t": -0.414,
+   "wr": 0.2892,
+   "sum": -25.589,
+   "skew": 3.4436,
+   "kurt": 26.6069,
+   "maxDD": 133.871,
+   "from": "2026-06-06",
+   "to": "2026-11-03",
+   "is": {
+    "n": 562,
+    "mean": 0.0213,
+    "sd": 2.1041,
+    "t": 0.2403,
+    "wr": 0.3007,
+    "sum": 11.984,
+    "skew": 3.7566,
+    "kurt": 30.9727,
+    "maxDD": 74.89
+   },
+   "oos": {
+    "n": 375,
+    "mean": -0.1002,
+    "sd": 1.8854,
+    "t": -1.0291,
+    "wr": 0.272,
+    "sum": -37.573,
+    "skew": 2.7316,
+    "kurt": 15.219,
+    "maxDD": 99.882
+   },
+   "boot": {
+    "lo": -0.1512,
+    "hi": 0.1078,
+    "pLE0": 0.6636
+   },
+   "cost": {
+    "x0": {
+     "mean": 0.0649,
+     "t": 0.9847,
+     "sum": 60.81
+    },
+    "x1": {
+     "mean": -0.0273,
+     "t": -0.414,
+     "sum": -25.589
+    },
+    "x1.5": {
+     "mean": -0.0734,
+     "t": -1.1118,
+     "sum": -68.7885
+    },
+    "x2": {
+     "mean": -0.1195,
+     "t": -1.8075,
+     "sum": -111.988
+    }
+   },
+   "mc": {
+    "dd50": 76.6685,
+    "dd95": 110.7091,
+    "ddActual": 133.871
+   },
+   "mt": {
+    "N": 1112,
+    "bonf": {
+     "p": 0.6606,
+     "pAdj": 1,
+     "tReq": 3.9163
+    },
+    "sr": -0.0135,
+    "sr0": 0.1074,
+    "dsr": 0.0002
+   },
+   "untouched": {
+    "n": 757,
+    "mean": -0.1102,
+    "t": -1.5573
+   },
+   "warn": [
+    "decay: in-sample +0.021 vs out-of-sample −0.100 a trade"
+   ],
+   "verdict": "not proven",
+   "why": [
+    "out-of-sample −0.100 a trade",
+    "CI includes 0 (−0.151 to +0.108)",
+    "−0.120 a trade at 2x costs",
+    "fails Bonferroni for N=1112 (needs t 3.92, has -0.41)",
+    "untouched period before 2026-10-08: −0.110 a trade over 757"
+   ]
+  },
+  {
+   "id": "scalp-histdata",
+   "system": "Meridian",
+   "status": "shadow",
+   "name": "Scalp live rule, 2018-26 HistData",
+   "claim": "research/edge/regime baseline (IS 2018-23 / OOS 2024-26 split of that study)",
+   "source": "research/edge/regime/RESULT.md (summary only)",
+   "family": "scalp",
+   "n": 14083,
+   "mean": -0.2005,
+   "sd": 1.6885,
+   "t": -14.0931,
+   "wr": null,
+   "sum": -2823.865,
+   "skew": 0,
+   "kurt": 3,
+   "maxDD": null,
+   "from": null,
+   "to": null,
+   "is": {
+    "n": 9551,
+    "mean": -0.187,
+    "t": -10.9,
+    "sd": 1.6766
+   },
+   "oos": {
+    "n": 4532,
+    "mean": -0.229,
+    "t": -9,
+    "sd": 1.7129
+   },
+   "boot": {
+    "lo": -0.2284,
+    "hi": -0.1726,
+    "pLE0": 1,
+    "approx": true
+   },
+   "cost": {
+    "x0": {
+     "mean": -0.0675,
+     "t": null,
+     "sum": null
+    },
+    "x1": {
+     "mean": -0.2005,
+     "t": -14.0931,
+     "sum": -2823.865
+    },
+    "x1.5": {
+     "mean": -0.267,
+     "t": null,
+     "sum": null
+    },
+    "x2": {
+     "mean": -0.3335,
+     "t": null,
+     "sum": null
+    }
+   },
+   "mc": {
+    "dd50": null,
+    "dd95": null,
+    "ddActual": null
+   },
+   "mt": {
+    "N": 1112,
+    "bonf": {
+     "p": 1,
+     "pAdj": 1,
+     "tReq": 3.9163
+    },
+    "sr": -0.1188,
+    "sr0": 0.0277,
+    "dsr": 0
+   },
+   "summaryOnly": true,
+   "verdict": "not proven",
+   "why": [
+    "out-of-sample −0.229 a trade",
+    "CI entirely below 0 (−0.228 to −0.173)",
+    "−0.334 a trade at 2x costs",
+    "fails Bonferroni for N=1112 (needs t 3.92, has -14.09)"
+   ]
+  },
+  {
+   "id": "swing-adx",
+   "system": "Meridian",
+   "status": "shadow (paper sleeve)",
+   "name": "Swing D1 ADX band 19.4-29.2",
+   "claim": "OOS 2024-26 +0.290R a trade over 67 (t 1.46); +0.277 at 1.5x cost",
+   "source": "research/edge/regime/proposal.md (summary only)",
+   "family": "swingAdx",
+   "n": 278,
+   "mean": 0.1557,
+   "sd": 1.5774,
+   "t": 1.6453,
+   "wr": null,
+   "sum": 43.273,
+   "skew": 0,
+   "kurt": 3,
+   "maxDD": null,
+   "from": null,
+   "to": null,
+   "is": {
+    "n": 211,
+    "mean": 0.113,
+    "t": 1.05,
+    "sd": 1.5633
+   },
+   "oos": {
+    "n": 67,
+    "mean": 0.29,
+    "t": 1.46,
+    "sd": 1.6259
+   },
+   "boot": {
+    "lo": -0.0298,
+    "hi": 0.3411,
+    "pLE0": 0.05,
+    "approx": true
+   },
+   "cost": {
+    "x0": {
+     "mean": 0.1817,
+     "t": null,
+     "sum": null
+    },
+    "x1": {
+     "mean": 0.1557,
+     "t": 1.6453,
+     "sum": 43.273
+    },
+    "x1.5": {
+     "mean": 0.1427,
+     "t": null,
+     "sum": null
+    },
+    "x2": {
+     "mean": 0.1297,
+     "t": null,
+     "sum": null
+    }
+   },
+   "mc": {
+    "dd50": null,
+    "dd95": null,
+    "ddActual": null
+   },
+   "mt": {
+    "N": 722,
+    "bonf": {
+     "p": 0.05,
+     "pAdj": 1,
+     "tReq": 3.8108
+    },
+    "sr": 0.0987,
+    "sr0": 0.1899,
+    "dsr": 0.0648
+   },
+   "summaryOnly": true,
+   "verdict": "fragile",
+   "why": [
+    "out-of-sample t 1.46 < 2",
+    "CI includes 0 (−0.030 to +0.341)",
+    "fails Bonferroni for N=722 (needs t 3.81, has 1.65)"
+   ]
+  },
+  {
+   "id": "coach-promote",
+   "system": "Meridian",
+   "status": "Coach rule (proposals to the owner)",
+   "name": "Coach promotions, forward record",
+   "claim": "promote: n>=100, +0.10R, both halves positive in the 30-day replay",
+   "source": "research/backtest-150d-clean.json, walk-forward 30-day look-back / 7-day hold",
+   "family": "coach",
+   "picks": 9,
+   "selMean": 0.2403,
+   "n": 319,
+   "mean": -0.0223,
+   "sd": 1.6357,
+   "t": -0.2436,
+   "wr": 0.3292,
+   "sum": -7.116,
+   "skew": 1.523,
+   "kurt": 5.2854,
+   "maxDD": 27.375,
+   "from": "2026-07-06",
+   "to": "2026-11-03",
+   "is": {
+    "n": 191,
+    "mean": 0.0318,
+    "sd": 1.6844,
+    "t": 0.2609,
+    "wr": 0.3403,
+    "sum": 6.073,
+    "skew": 1.5395,
+    "kurt": 5.3596,
+    "maxDD": 27.307
+   },
+   "oos": {
+    "n": 128,
+    "mean": -0.103,
+    "sd": 1.5631,
+    "t": -0.7458,
+    "wr": 0.3125,
+    "sum": -13.189,
+    "skew": 1.4686,
+    "kurt": 4.977,
+    "maxDD": 20.645
+   },
+   "boot": {
+    "lo": -0.1984,
+    "hi": 0.1654,
+    "pLE0": 0.5976
+   },
+   "cost": {
+    "x0": {
+     "mean": 0.037,
+     "t": 0.4044,
+     "sum": 11.8
+    },
+    "x1": {
+     "mean": -0.0223,
+     "t": -0.2436,
+     "sum": -7.116
+    },
+    "x1.5": {
+     "mean": -0.052,
+     "t": -0.5667,
+     "sum": -16.574
+    },
+    "x2": {
+     "mean": -0.0816,
+     "t": -0.8888,
+     "sum": -26.032
+    }
+   },
+   "mc": {
+    "dd50": 33.3945,
+    "dd95": 49.3101,
+    "ddActual": 27.375
+   },
+   "mt": {
+    "N": 32,
+    "bonf": {
+     "p": 0.5962,
+     "pAdj": 1,
+     "tReq": 2.9552
+    },
+    "sr": -0.0136,
+    "sr0": 0.1178,
+    "dsr": 0.0102
+   },
+   "warn": [
+    "decay: in-sample +0.032 vs out-of-sample −0.103 a trade"
+   ],
+   "verdict": "not proven",
+   "why": [
+    "out-of-sample −0.103 a trade",
+    "CI includes 0 (−0.198 to +0.165)",
+    "−0.082 a trade at 2x costs",
+    "fails Bonferroni for N=32 (needs t 2.96, has -0.24)"
+   ]
+  },
+  {
+   "id": "coach-toggles",
+   "system": "Meridian",
+   "status": "Coach rule changes (applied automatically)",
+   "name": "Coach-stats session / D1 / stop toggles",
+   "claim": "35 automatic rule changes",
+   "source": "config.json history (coach-stats, coach-backtest)",
+   "family": "coach",
+   "n": 35,
+   "toggles": {
+    "n": 35,
+    "withN": 26,
+    "medianN": 10,
+    "underThirty": 20,
+    "topics": 15,
+    "flipped": 11,
+    "maxFlips": 5
+   },
+   "verdict": "not proven",
+   "why": [
+    "median evidence 10 trades; 20 of 26 cite fewer than 30",
+    "11 topics changed 2+ times (5 at most)"
+   ]
+  }
+ ],
+ "sources": {
+  "ict/replay.json": {
+   "at": "2026-11-07T19:52:15.820Z",
+   "from": "2025-08-01"
+  },
+  "research/replay-2w.json": {
+   "from": "2022-12-27",
+   "to": "2026-11-03"
+  },
+  "backtest.json": {
+   "at": "2026-11-07T20:21:42.476Z",
+   "from": "2026-10-08T19:52:00.000Z",
+   "to": "2026-11-07T19:52:00.000Z",
+   "days": 30
+  },
+  "research/backtest-150d.json": {
+   "at": "2026-11-02T21:57:46.797Z",
+   "from": "2026-06-05T21:54:00.000Z",
+   "to": "2026-11-02T21:54:00.000Z",
+   "days": 150
+  },
+  "research/backtest-150d-clean.json": {
+   "at": "2026-11-03T09:11:36.891Z",
+   "from": "2026-06-06T09:08:00.000Z",
+   "to": "2026-11-03T09:08:00.000Z",
+   "days": 150
+  }
+ },
+ "trials": {
+  "ict": {
+   "N": 363,
+   "how": "ict-filters 64 + ict-exits 96 + ict-universe 60 + ict-index-longonly 26 + confluence 102 + 15 ICT skill rule sections adopted after testing (§14-§32)"
+  },
+  "nofri": {
+   "N": 64,
+   "how": "ict-filters: 31 filters x 2 populations + 2 greedy combinations"
+  },
+  "h1opp": {
+   "N": 102,
+   "how": "confluence: 6 ICT features x 8 Meridian books + 6 Meridian-context features x 8 ICT books + 6"
+  },
+  "dip": {
+   "N": 86,
+   "how": "ict-universe 60 cells (where the gold buy rule on indices was found) + ict-index-longonly 26"
+  },
+  "council": {
+   "N": 424,
+   "how": "research/log.md lines that report an R result (recounted each run when the log is present)"
+  },
+  "scalp": {
+   "N": 1112,
+   "how": "scalp-filters 826 + timing 243 + scalp-exits 23 + costs 20"
+  },
+  "swingAdx": {
+   "N": 722,
+   "how": "regime: 178 gates per system x 3 systems + context run + 12 neighbour checks"
+  },
+  "coach": {
+   "N": 32,
+   "how": "coach-learning: 16 Coach policies x 2 streams (the forward record itself is out-of-sample)"
+  }
+ }
+}
