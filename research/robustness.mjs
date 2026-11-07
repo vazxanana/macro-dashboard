@@ -249,10 +249,11 @@ export function buildClaims(dir, { iters = 5000, seed = 7, repoOut = path.join(H
   // status from the live config, so an owner move to shadow shows here without editing this list (7 Nov: crypto trend)
   const cfgNow = readJSON(dir, 'config.json') || {};
   const cryptoSt = cfgNow.cryptoTrendShadow ? 'shadow (owner, 7 Nov: no edge since Jun 2025, #508)' : 'live (paper)';
+  const gt5St = cfgNow.goldTrendFastShadow ? 'shadow (owner, 7 Nov: one bet with Gold trend N20, #530)' : 'live (paper)';
   const SYS = [
     ['replica', 'Gold replica', 'live (paper)', (x) => true, null],
     ['gtrend', 'Gold trend N20', 'live (paper)', (x) => true, ['gtrend.json', 'trades.gtrend20']],
-    ['gtrend5', 'Gold trend fast N5', 'live (paper)', (x) => true, ['gtrend.json', 'trades.gtrend5']],
+    ['gtrend5', 'Gold trend fast N5', gt5St, (x) => true, ['gtrend.json', 'trades.gtrend5']],
     ['nq-open', 'NQ New York open run', 'live (paper)', (x) => x.session === 'nyflip', ['nq.json', 'trades']],
     ['trend', 'Crypto trend v3', cryptoSt, (x) => true, ['crypto.json', 'trades']],
     ['gtl', 'Gold H4 trendline', 'live (paper)', (x) => true, ['gtl.json', 'trades']],

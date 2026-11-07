@@ -10224,8 +10224,8 @@ html[data-role="public"] #ms-me-ct { display: none; }
   'use strict';
   var DAY = 86400;
   var SYS_K = ['replica', 'mosha-bo', 'trend', 'gtrend', 'gtrend5', 'gtl', 'geg', 'gmp'];   // keep in step with SYS_K in the main script
-  var SYS_ON = { replica: function (c) { return (c.replicaLive || []).length > 0; }, 'mosha-bo': function (c) { return !!c.moshaBo; }, trend: function (c) { return (c.cryptoTrend || []).length > 0; },
-    gtrend: function (c) { return !!c.goldTrend; }, gtrend5: function (c) { return !!c.goldTrendFast; }, gtl: function (c) { return !!c.goldTL; }, geg: function (c) { return !!c.goldEG; }, gmp: function (c) { return !!c.goldMP; } };
+  var SYS_ON = { replica: function (c) { return (c.replicaLive || []).length > 0; }, 'mosha-bo': function (c) { return !!c.moshaBo; }, trend: function (c) { return (c.cryptoTrend || []).length > 0 && !c.cryptoTrendShadow; },
+    gtrend: function (c) { return !!c.goldTrend; }, gtrend5: function (c) { return !!c.goldTrendFast && !c.goldTrendFastShadow; }, gtl: function (c) { return !!c.goldTL; }, geg: function (c) { return !!c.goldEG; }, gmp: function (c) { return !!c.goldMP; } };
   var VARIANT = { nofri: 'ICT A-setups, skip Fridays', h1opp: 'ICT A-setups against or without H1 structure', dip: 'ICT dip-buy (NQ / ES)' };
   var ASK = /^(promote|promoteIf|demote|skipMarket|skipSession|dataSource|ictFilter)$/;
   var num = function (v) { return typeof v === 'number' && isFinite(v); };

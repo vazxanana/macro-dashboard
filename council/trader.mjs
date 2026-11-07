@@ -290,6 +290,11 @@ const USER_RULES = [
   { id: 'crypto-trend-shadow', apply: (c) => { c.cryptoTrendShadow = true; },
     change: 'Crypto trend (BTC, ETH, SOL, XRP) to shadow (owner, 7 Nov): new breakouts are recorded as shadow trades, not live paper; open trades run to their exits',
     why: 'Decay study (#508): 2017-May 2025 strong (+2.8R a trade over 124 incl. the add), Jun 2025-Oct 2026 -0.13R a trade over 20 (t -0.56), Kraken candles from Mar 2025 -0.25R over 24. 2024-26 rests on one XRP run (without the top 5% +0.05R). Fees ~0.07R, not the cause; the BTC 200-day regime explains 2018/2022 but not the recent fade. About a 10% chance it is bad luck. Owner chose shadow.' },
+  // 7 Nov, owner's decision: Gold trend fast (5-day) to shadow; Gold trend (20-day) stays live. 2006-17 out-of-sample test (#530):
+  // the two legs' monthly R correlates 0.92 (one long-gold bet run twice); N20 has the better return per drawdown (6.8 vs 4.5).
+  { id: 'gold-trend-fast-shadow', apply: (c) => { c.goldTrendFastShadow = true; },
+    change: 'Gold trend fast (5-day breakout) to shadow (owner, 7 Nov): new breakouts recorded as shadow trades; Gold trend (20-day) stays live; open trades run to their exits',
+    why: '2006-17 untouched test (#530): both legs regime-bound (N20 +0.49R, N5 +0.37R a position); monthly R correlation 0.92, so running both doubles one long-gold bet; N20 return per drawdown 6.8 vs 4.5. Owner kept N20 live.' },
 ];
 config.userRules = config.userRules || [];
 for (const u of USER_RULES) if (!config.userRules.includes(u.id)) { u.apply(config); config.userRules.push(u.id); config.history.push({ at: nowISO, by: 'user', change: u.change, why: u.why }); }
@@ -698,7 +703,9 @@ for (const [key, M] of Object.entries(MARKETS)) {
         const GT = LEG.cfg, D = src['1d'].bars.slice(0, -1), n = D.length, last = D[n - 1], dp = Math.max(2, (M.dec ?? 2) + 1);
         const tr14 = (i) => Math.max(D[i].high - D[i].low, Math.abs(D[i].high - D[i - 1].close), Math.abs(D[i].low - D[i - 1].close));
         const atr14 = (i) => { let a = 0; for (let j = i - 13; j <= i; j++) a += tr14(j); return a / 14; };
-        const open = trades.find((x) => x.k === LEG.k && x.market === key && !x.shadow && x.status === 'open');
+        // gold-trend-fast-shadow (owner, 7 Nov): the fast leg's new trades are shadow (blockedBy owner-shadow) and still managed here
+        const sh = LEG.k === 'gtrend5' && !!config.goldTrendFastShadow;
+        const open = trades.find((x) => x.k === LEG.k && x.market === key && (!x.shadow || (x.blockedBy || []).includes('owner-shadow')) && x.status === 'open');
         if (n > GT.n + 15) {
           if (open) {
             // one ratchet per newly closed daily candle
@@ -708,7 +715,7 @@ for (const [key, M] of Object.entries(MARKETS)) {
               if (config.goldTrendAdd && !gAdd && !trades.some((x) => x.addOf === open.id) && last.close - open.entry >= config.goldTrendAdd.atR * open.r0) {
                 const ae = +price.toFixed(dp), rA = ae - open.stop;
                 if (rA > 0) trades.push({ id: `${open.id}-add`, market: key, label: M.label, dec: M.dec, k: LEG.k, name: `${LEG.name} add`, pair: open.pair, h: '1d', side: 'buy',
-                  entry: ae, stop: open.stop, t1: +(ae * 100).toFixed(2), rr: 99, trail: [1e6, 0], size: 1, buf: CFG.buf, opened: now, filled: now, checked: now, status: 'open', R: null, r0: rA, noBe: true, entryMode: 'market', addOf: open.id, shadow: false, blockedBy: [],
+                  entry: ae, stop: open.stop, t1: +(ae * 100).toFixed(2), rr: 99, trail: [1e6, 0], size: 1, buf: CFG.buf, opened: now, filled: now, checked: now, status: 'open', R: null, r0: rA, noBe: true, entryMode: 'market', addOf: open.id, shadow: !!open.shadow, blockedBy: open.shadow ? ['owner-shadow'] : [],
                   note: `${LEG.name} add: daily close ${last.close} is +${config.goldTrendAdd.atR}R above the first entry ${open.entry}, so a second unit buys ${ae} with the same stop ${open.stop}; the stop keeps rising with the daily closes; out with the first unit.` });
               } }
           } else {
@@ -717,7 +724,7 @@ for (const [key, M] of Object.entries(MARKETS)) {
               const entry = +price.toFixed(dp), stop = +(entry - GT.k * A).toFixed(dp), r0 = entry - stop;
               if (r0 > 0) trades.push({ id, market: key, label: M.label, dec: M.dec, k: LEG.k, name: LEG.name, pair: `D1 ${GT.n}-day breakout`, h: '1d', side: 'buy',
                 entry, stop, t1: +(entry * 100).toFixed(2), rr: 99, trail: [1e6, 0], buf: CFG.buf, opened: now, filled: now, checked: now, status: 'open', R: null, r0, noBe: true, entryMode: 'market', lastD: last.time, drift: driftR('buy', last.close, entry, stop),
-                feat: { hi: +hi.toFixed(2), atr: +A.toFixed(2) }, shadow: false, blockedBy: [],
+                feat: { hi: +hi.toFixed(2), atr: +A.toFixed(2) }, shadow: sh, blockedBy: sh ? ['owner-shadow'] : [],
                 note: `${LEG.name}: daily close ${last.close} above the ${GT.n}-day high ${hi.toFixed(2)}. Buy at market, stop ${GT.k} x ATR(D1) below (${stop}); the stop rises to (daily close - ${GT.k} ATR) on every closed day; no target.` });
             }
           }
