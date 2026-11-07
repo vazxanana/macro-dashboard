@@ -1399,6 +1399,9 @@ td.st-dim { color: var(--ink-faint); }
 .ms-j-stats > span { display: inline-flex; align-items: baseline; gap: 6px; padding: 6px 12px; border: 1px solid var(--line); border-radius: 999px; background: var(--panel-raised, var(--panel)); color: var(--ink-dim); font-size: 12.5px; }
 .ms-j-stats > span b { color: var(--ink); }
 .ms-j-stats > span b.pos { color: var(--buy); } .ms-j-stats > span b.neg { color: var(--sell); }
+
+/* polish 26: dark theme faint text nudged to pass WCAG AA (4.43:1 -> ~5:1 on panels) */
+:root:not([data-theme="light"]) { --ink-faint: #7f8796; }
 </style>
 </head>
 <body>
