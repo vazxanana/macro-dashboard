@@ -124,9 +124,11 @@ export function parseKraken(j) {
 // ─── series access with publication lags (the no-look-ahead rule) ──────────────────────────────────────────────────────
 function upto(arr, t, key = 't') { let lo = 0, hi = arr.length; while (lo < hi) { const m = (lo + hi) >> 1; if (arr[m][key] <= t) lo = m + 1; else hi = m; } return lo; }   // count of items with key <= t
 // a view of FRED series id as known for target day D
+// a series whose newest usable value is older than this many days counts as no data (e.g. a discontinued FRED series)
+export const MAX_AGE = { DTWEXBGS: 30, WALCL: 21, WTREGEN: 21, SWPT: 21, BSCICP03DEM665S: 120 };
 export function fredView(fred, id, D) {
-  const a = (fred && fred[id]) || [], n = upto(a, D - (LAG[id] || 2) * DAY);
-  return { n, last: n ? a[n - 1] : null, back: (k) => (n - 1 - k >= 0 ? a[n - 1 - k] : null), at: (t) => { const i = upto(a, Math.min(t, D - (LAG[id] || 2) * DAY)); return i ? a[i - 1] : null; } };
+  const a = (fred && fred[id]) || [], n0 = upto(a, D - (LAG[id] || 2) * DAY), n = n0 && a[n0 - 1].t >= D - (MAX_AGE[id] || 15) * DAY ? n0 : 0;
+  return { n, last: n ? a[n - 1] : null, back: (k) => (n - 1 - k >= 0 ? a[n - 1 - k] : null), at: (t) => { if (!n) return null; const i = upto(a, Math.min(t, D - (LAG[id] || 2) * DAY)); return i ? a[i - 1] : null; } };
 }
 // daily bars before D (weekdays only; the forming candle of the day before D counts with its latest price)
 export const weekday = (t) => { const w = new Date(t * 1000).getUTCDay(); return w >= 1 && w <= 5; };
