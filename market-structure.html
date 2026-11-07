@@ -8678,6 +8678,175 @@ html, body, button, input, select, textarea { font-family: Figtree, -apple-syste
 html { font-variant-numeric: tabular-nums; -webkit-font-smoothing: antialiased; }
 h1, h2, h3, .h-head { letter-spacing: -0.02em; }
 code, pre, kbd, .tva-src, .tvw-url, .tv-tk .tk-l { font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace !important; }
+/* ═══ Charts chrome polish (7 Nov): one calm toolbar language for the Charts view. Same height, radius and type for the
+   Indicators button, the Meridian / ICT switch and the view segment; grouped chart tools with dividers; clear active
+   states; inset focus rings that the scrolling toolbars cannot clip; 44px touch targets on phones; a tidier indicator
+   sheet; scanner rows aligned on tabular figures. Local tokens, because --panel-hover / --line-strong are dark-only. ═══ */
+#v-charts, #ms-ind, #ms-lay, #v-scanner .ms-scan {
+  --cx-h: 36px; --cx-r: calc(var(--r-sm, 8px) + 1px);
+  --cx-hover: color-mix(in srgb, var(--ink) 6%, var(--panel));
+  --cx-line: color-mix(in srgb, var(--ink) 13%, var(--panel));
+  --cx-line2: color-mix(in srgb, var(--ink) 24%, var(--panel));
+  --cx-on-bg: color-mix(in srgb, var(--gold, #e3b341) 15%, var(--panel));
+  --cx-on-ring: var(--gold, #e3b341);
+  --cx-focus: var(--accent);
+}
+:root[data-theme="light"] :is(#v-charts, #ms-ind, #ms-lay, #v-scanner .ms-scan) { --cx-on-bg: color-mix(in srgb, #b8860b 11%, #fff); --cx-on-ring: #9a6f08; }
+
+/* — Section header: hint keys read as keys in every theme — */
+#v-charts .kbd-hint kbd { display: inline-grid; place-items: center; min-width: 18px; height: 18px; padding: 0 4px; border: 1px solid var(--cx-line); border-bottom-width: 2px; border-radius: 4px; background: var(--panel); color: var(--ink-dim); font-size: 10.5px; line-height: 1; }
+
+/* — Header controls: Indicators · Meridian | ICT · D1 … M1 | All Split — */
+#v-charts .sec-h > .ind-open, #v-charts .sec-h > .seg { height: var(--cx-h); min-height: var(--cx-h); }
+#v-charts .ind-open { display: inline-flex; align-items: center; gap: 8px; padding: 0 10px 0 11px; border-radius: var(--cx-r); border: 1px solid var(--cx-line); background: var(--panel); color: var(--ink); font: 600 13px var(--sans); transition: background .15s ease-out, border-color .15s ease-out; }
+#v-charts .ind-open::before { content: ""; width: 16px; height: 16px; flex: none; background: currentColor; -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M3 17l5-6 4 4 8-9'/%3E%3Cpath d='M3 21h18'/%3E%3C/svg%3E") center / contain no-repeat; mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M3 17l5-6 4 4 8-9'/%3E%3Cpath d='M3 21h18'/%3E%3C/svg%3E") center / contain no-repeat; }
+#v-charts .ind-open small { margin: 0; min-width: 34px; padding: 1px 6px; border-radius: 999px; background: var(--cx-hover); color: var(--ink-dim); font: 600 11.5px var(--sans); font-variant-numeric: tabular-nums; text-align: center; }
+#v-charts .ind-open:hover { background: var(--cx-hover); border-color: var(--cx-line2); }
+#v-charts .sec-h > .seg { display: inline-flex; align-items: stretch; gap: 2px; padding: 3px; border: 1px solid var(--cx-line); border-radius: var(--cx-r); background: var(--panel); }
+#v-charts .sec-h > .seg button { min-height: 0; height: auto; min-width: 44px; padding: 0 11px; border: 0 !important; border-radius: calc(var(--cx-r) - 3px); background: transparent; color: var(--ink-dim); font: 600 12.5px var(--sans); font-variant-numeric: tabular-nums; box-shadow: none; transition: background .15s ease-out, color .15s ease-out, box-shadow .15s ease-out; }
+#v-charts .sec-h > .seg button:hover:not(.on) { background: var(--cx-hover); color: var(--ink); }
+#v-charts .sec-h > .seg button.on { background: var(--cx-on-bg); color: var(--ink); box-shadow: inset 0 0 0 1px var(--cx-on-ring); }
+#v-charts .sec-h > .seg button:focus-visible, #v-charts .ind-open:focus-visible { outline: 2px solid var(--cx-focus); outline-offset: -2px; }
+#v-charts .ind-open:focus-visible { outline-offset: 2px; }
+#v-charts .mk-mode button { min-width: 64px; }
+html[data-mk="ict"] #v-charts .mk-mode button[data-mk="ict"].on { background: color-mix(in srgb, #9c27b0 14%, var(--panel)); box-shadow: inset 0 0 0 1px #a43cbd; border-color: transparent; }
+/* the view segment: timeframes, then the two layouts after a hairline */
+#v-charts .seg[aria-label="Chart view"] button[data-view="all"] { position: relative; margin-left: 9px; }
+#v-charts .seg[aria-label="Chart view"] button[data-view="all"]::before { content: ""; position: absolute; left: -6px; top: 6px; bottom: 6px; width: 1px; background: var(--cx-line); pointer-events: none; }
+
+/* — Chart pane header + tool strip — */
+#v-charts .ms-ph { min-height: 40px; padding-block: 4px; }
+#v-charts .ms-ph .ms-role { min-width: 0; flex: 0 1 auto; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+#v-charts .ms-ph .ch-tools { gap: 2px; align-items: center; padding-block: 2px; }
+#v-charts .ch-b { position: relative; width: 30px; height: 30px; border-radius: 7px; border: 0; color: var(--ink-faint); transition: background .12s ease-out, color .12s ease-out; }
+#v-charts .ch-b::before { width: 16px; height: 16px; }
+#v-charts .ch-b:hover { color: var(--ink); background: var(--cx-hover); border: 0; }
+#v-charts .ch-b.on, #v-charts .ch-b[aria-pressed="true"] { color: var(--accent); background: color-mix(in srgb, var(--accent) 13%, var(--panel)); box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--accent) 45%, transparent); }
+#v-charts .ch-b:focus-visible { outline: 2px solid var(--cx-focus); outline-offset: -2px; }
+#v-charts .ch-b:active { transform: scale(.94); }
+/* groups: open · draw (lines, trend, position, fib, ruler) · replay / snapshot / alert · fit / full screen */
+#v-charts .ch-tools .ch-hl, #v-charts .ch-tools .ch-rp, #v-charts .ch-tools .ch-fit { margin-left: 9px; }
+#v-charts .ch-tools .ch-hl::after, #v-charts .ch-tools .ch-rp::after, #v-charts .ch-tools .ch-fit::after { content: ""; position: absolute; left: -6px; top: 8px; bottom: 8px; width: 1px; background: var(--cx-line); pointer-events: none; }
+
+/* — Split bar and its sync popover — */
+#v-charts .sp-bar { gap: 8px; color: var(--ink-dim); font: 500 12.5px var(--sans); }
+#v-charts .sp-bar label { gap: 7px; }
+#v-charts .sp-bar select { height: var(--cx-h); min-height: var(--cx-h); padding: 0 28px 0 10px; border: 1px solid var(--cx-line); border-radius: var(--cx-r); background: var(--panel) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23888f9c' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E") right 9px center / 12px no-repeat; color: var(--ink); font: 600 13px var(--sans); appearance: none; -webkit-appearance: none; cursor: pointer; }
+#v-charts .sp-bar select:hover:not(:disabled) { border-color: var(--cx-line2); }
+#v-charts .sp-bar select:disabled { opacity: 1; color: var(--ink-dim); background-color: var(--cx-hover); cursor: not-allowed; }
+#v-charts .sp-bar select:focus-visible { outline: 2px solid var(--cx-focus); outline-offset: 1px; }
+#v-charts .sp-sep { height: 22px; background: var(--cx-line); }
+#v-charts .sp-sync > summary { height: var(--cx-h); min-height: var(--cx-h); gap: 7px; padding: 0 10px; border-color: var(--cx-line); border-radius: var(--cx-r); font: 600 13px var(--sans); transition: background .15s ease-out, border-color .15s ease-out; }
+#v-charts .sp-sync > summary::before { content: ""; width: 15px; height: 15px; background: currentColor; -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M10 13a5 5 0 0 0 7.5.5l3-3a5 5 0 0 0-7-7l-1.7 1.7'/%3E%3Cpath d='M14 11a5 5 0 0 0-7.5-.5l-3 3a5 5 0 0 0 7 7l1.7-1.7'/%3E%3C/svg%3E") center / contain no-repeat; mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M10 13a5 5 0 0 0 7.5.5l3-3a5 5 0 0 0-7-7l-1.7 1.7'/%3E%3Cpath d='M14 11a5 5 0 0 0-7.5-.5l-3 3a5 5 0 0 0 7 7l1.7-1.7'/%3E%3C/svg%3E") center / contain no-repeat; }
+#v-charts .sp-sync > summary::after { content: ""; width: 10px; height: 10px; margin-left: 1px; background: var(--ink-faint); -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E") center / contain no-repeat; mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E") center / contain no-repeat; transition: transform .15s ease-out; }
+#v-charts .sp-sync[open] > summary::after { transform: rotate(180deg); }
+#v-charts .sp-sync > summary:hover { background: var(--cx-hover); border-color: var(--cx-line2); }
+#v-charts .sp-sync[open] > summary { background: var(--cx-on-bg); border-color: var(--cx-on-ring); }
+#v-charts .sp-sync > summary:focus-visible { outline: 2px solid var(--cx-focus); outline-offset: 2px; }
+#v-charts .sp-pop { width: 248px; padding: 8px 6px 6px; border-color: var(--cx-line); border-radius: calc(var(--cx-r) + 3px); box-shadow: 0 12px 32px rgba(0,0,0,.22); }
+#v-charts .sp-pop .sp-h { padding: 2px 8px 4px; font: 600 12px var(--sans); letter-spacing: 0; text-transform: none; color: var(--ink-dim); }
+#v-charts .sp-pop label { min-height: 38px; padding: 0 8px; border-radius: 7px; }
+#v-charts .sp-pop label:hover { background: var(--cx-hover); }
+
+/* — Position chip on the chart — */
+#v-charts .pos-chip { border-color: var(--cx-line); border-radius: var(--cx-r); gap: 6px 8px; }
+#v-charts .pos-chip button { border-color: var(--cx-line); border-radius: 7px; }
+#v-charts .pos-chip button:hover { background: var(--cx-hover); border-color: var(--cx-line2); }
+#v-charts .pos-chip button:focus-visible { outline: 2px solid var(--cx-focus); outline-offset: 1px; }
+
+/* — Layer presets (Settings menu) — */
+#ms-lay { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 6px; }
+#ms-lay button { grid-column: span 2; min-height: 36px; border-color: var(--cx-line); border-radius: var(--cx-r); }
+#ms-lay button.sv { grid-column: span 3; }
+#ms-lay button:hover { background: var(--cx-hover); border-color: var(--cx-line2); }
+#ms-lay button.on { background: var(--cx-on-bg); border-color: var(--cx-on-ring); }
+
+/* — Indicators dialog — */
+#ms-ind { width: min(680px, calc(100vw - 24px)); border-color: var(--cx-line); border-radius: calc(var(--cx-r) + 5px); box-shadow: 0 24px 60px rgba(0,0,0,.3); overscroll-behavior: contain; }
+#ms-ind .ind-h { flex-wrap: wrap; gap: 4px 12px; padding: 14px 14px 12px 18px; border-color: var(--cx-line); z-index: 1; }
+#ms-ind .ind-h h3 { font: 700 16px var(--sans); }
+#ms-ind .ind-h .ms-note { flex: 1 1 200px; min-width: 0; color: var(--ink-dim); font-size: 12.5px; }
+#ms-ind .ind-h .tv-x { order: 3; width: 36px; height: 36px; min-height: 36px; padding: 0; display: grid; place-items: center; border-radius: var(--cx-r); }
+#ms-ind .ind-h .tv-x:focus-visible { outline: 2px solid var(--cx-focus); outline-offset: 1px; }
+#ms-ind .ind-cur { padding: 12px 18px 4px; gap: 6px; }
+#ms-ind .ind-cur li { display: grid; grid-template-columns: auto minmax(0, 1fr) auto auto; gap: 8px 10px; min-height: 44px; padding: 5px 6px 5px 10px; border-color: var(--cx-line); border-radius: var(--cx-r); background: var(--panel); }
+#ms-ind .ind-cur li:has(label + label) { grid-template-columns: auto minmax(0, 1fr) auto auto auto; }
+#ms-ind .ind-cur li:has(label + label + label) { grid-template-columns: auto minmax(0, 1fr) auto auto auto auto; }
+#ms-ind .ind-cur li.empty { display: block; padding: 12px; text-align: center; font-size: 13px; }
+#ms-ind .ind-cur .ind-nm { margin: 0; font: 600 13.5px var(--sans); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+#ms-ind .ind-cur input[type=color] { width: 22px; height: 22px; border-radius: 6px; overflow: hidden; }
+#ms-ind .ind-cur input[type=color]::-webkit-color-swatch-wrapper { padding: 0; } #ms-ind .ind-cur input[type=color]::-webkit-color-swatch { border: 0; border-radius: 6px; }
+#ms-ind .ind-cur label { gap: 6px; color: var(--ink-dim); font: 500 12px var(--sans); }
+#ms-ind .ind-cur input[type=number] { width: 64px; height: 32px; padding: 0 8px; border-color: var(--cx-line); border-radius: 7px; background: var(--panel); font: 600 13px var(--sans); font-variant-numeric: tabular-nums; }
+#ms-ind .ind-cur input:focus-visible, #ms-ind .ind-cur button:focus-visible { outline: 2px solid var(--cx-focus); outline-offset: 1px; }
+#ms-ind .ind-cur button { width: 32px; height: 32px; min-height: 32px; min-width: 32px; display: grid; place-items: center; padding: 0; border-color: transparent; background: transparent; color: var(--ink-dim); font-size: 18px; line-height: 1; }
+#ms-ind .ind-cur button:hover { background: var(--cx-hover); color: var(--sell); }
+#ms-ind .ind-lib { grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 6px; padding: 12px 18px 18px; margin-top: 8px; border-top: 1px solid var(--cx-line); }
+#ms-ind .ind-lib button { display: flex; align-items: center; justify-content: space-between; gap: 10px; min-height: 44px; padding: 8px 10px 8px 12px; border-color: var(--cx-line); border-radius: var(--cx-r); transition: background .12s ease-out, border-color .12s ease-out; }
+#ms-ind .ind-lib button b { font: 600 13px/1.3 var(--sans); }
+#ms-ind .ind-lib small { flex: none; padding: 2px 7px; border-radius: 999px; background: var(--cx-hover); color: var(--ink-dim); font: 500 11px var(--sans); white-space: nowrap; }
+#ms-ind .ind-lib button:hover:not(:disabled) { background: var(--cx-hover); border-color: var(--cx-line2); }
+#ms-ind .ind-lib button:focus-visible { outline: 2px solid var(--cx-focus); outline-offset: -2px; }
+
+/* — Scanner rows: right-aligned figures in fixed columns — */
+#v-scanner .ms-srow { transition: background .12s ease-out, border-color .12s ease-out; }
+#v-scanner .ms-srow:hover { background: var(--cx-hover); border-color: var(--cx-line2); }
+#v-scanner .ms-srow.ready:hover { background: color-mix(in srgb, var(--buy) 10%, var(--panel)); }
+#v-scanner .ms-srow.cur { box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--accent) 50%, transparent); }
+#v-scanner .ms-srow .mk small { color: var(--ink-dim); font-size: 11px; }
+#v-scanner .ms-srow .pr { display: grid; justify-items: end; text-align: right; font-variant-numeric: tabular-nums; }
+#v-scanner .ms-srow .pr small { font-size: 11px; line-height: 1.3; }
+#v-scanner .ms-srow .tr { flex-wrap: nowrap; }
+#v-scanner .ms-srow .tr .ms-al { min-width: 38px; text-align: center; font-variant-numeric: tabular-nums; }
+#v-scanner .ms-srow .lv { display: grid; grid-template-columns: auto auto auto; justify-content: end; justify-items: end; align-items: center; gap: 3px 10px; }
+#v-scanner .ms-srow .lv .lv-d { grid-column: 1 / -1; }
+
+/* — Phones: 44px targets, calmer stacking — */
+@media (max-width: 700px) {
+  #v-charts .sec-h > .ind-open { --cx-h: 46px; margin-left: 0; flex: none; }
+  #v-charts .sec-h > .seg { --cx-h: 46px; padding: 0; gap: 0; }
+  #v-charts .sec-h > .seg button.on { border-radius: calc(var(--cx-r) - 1px); }
+  #v-charts .sec-h > .mk-mode { flex: 1 1 170px; width: auto; }
+  #v-charts .sec-h > .mk-mode button { flex: 1 1 0; }
+  /* all eight views stay visible on common phones: 44px tall cells share the width (about 43px each at 390px) and the
+     strip only scrolls below ~340px of column */
+  #v-charts .sec-h > .seg[aria-label="Chart view"] { flex: 1 1 100%; width: 100%; overflow-x: auto; }
+  #v-charts .sec-h > .seg[aria-label="Chart view"] button { flex: 1 1 0; min-width: 40px; padding: 0 2px; border-radius: 0; }
+  #v-charts .sec-h > .seg[aria-label="Chart view"] button[data-view="all"] { margin-left: 0; box-shadow: inset 1px 0 0 var(--cx-line); }
+  #v-charts .sec-h > .seg[aria-label="Chart view"] button[data-view="all"]::before { display: none; }
+  #v-charts .sec-h > .seg[aria-label="Chart view"] button.on { box-shadow: inset 0 0 0 1px var(--cx-on-ring); border-radius: calc(var(--cx-r) - 1px); }
+  #v-charts .sec-h > .seg[aria-label="Chart view"] button[data-view="all"].on { box-shadow: inset 0 0 0 1px var(--cx-on-ring); }
+  #v-charts .sp-bar select, #v-charts .sp-sync > summary { --cx-h: 44px; }
+  #v-charts .sp-pop label { min-height: 44px; }
+  #v-charts .pos-chip button { min-height: 44px; min-width: 44px; }
+}
+@media (max-width: 520px), (pointer: coarse) and (max-width: 1024px) {
+  #v-charts .ms-ph { min-height: 46px; padding-block: 1px; }
+  #v-charts .ch-b { width: 44px; height: 44px; border-radius: 9px; }
+  #v-charts .ch-b::before { width: 18px; height: 18px; }
+  #v-charts .ch-tools .ch-hl, #v-charts .ch-tools .ch-rp, #v-charts .ch-tools .ch-fit { margin-left: 7px; }
+  #v-charts .ch-tools .ch-hl::after, #v-charts .ch-tools .ch-rp::after, #v-charts .ch-tools .ch-fit::after { left: -5px; top: 12px; bottom: 12px; }
+}
+@media (max-width: 520px) {
+  #ms-ind { width: 100vw; max-width: 100vw; max-height: 88dvh; margin: auto 0 0; border-radius: 16px 16px 0 0; border-bottom: 0; }
+  #ms-ind .ind-h { padding: 12px 10px 10px 16px; }
+  #ms-ind .ind-h .ms-note { order: 4; flex-basis: 100%; }
+  #ms-ind .ind-h .tv-x { width: 44px; height: 44px; margin-left: auto; }
+  #ms-ind .ind-cur { padding: 10px 12px 4px; }
+  #ms-ind .ind-cur li, #ms-ind .ind-cur li:has(label + label), #ms-ind .ind-cur li:has(label + label + label) { grid-template-columns: auto minmax(0, 1fr) auto; }
+  #ms-ind .ind-cur li > label { grid-row: 2; grid-column: 2 / span 1; justify-self: start; }
+  #ms-ind .ind-cur li > label + label { grid-row: 3; }
+  #ms-ind .ind-cur li > label + label + label { grid-row: 4; }
+  #ms-ind .ind-cur li > button { grid-row: 1; grid-column: 3; width: 44px; height: 44px; }
+  #ms-ind .ind-cur input[type=number] { height: 40px; width: 84px; }
+  #ms-ind .ind-cur input[type=color] { width: 28px; height: 28px; }
+  #ms-ind .ind-lib { grid-template-columns: 1fr; padding: 12px 12px 18px; }
+  #ms-ind .ind-lib button { min-height: 48px; }
+  @media (prefers-reduced-motion: no-preference) { #ms-ind[open] { animation: cx-sheet .28s cubic-bezier(.22, 1, .36, 1); } }
+}
+@keyframes cx-sheet { from { transform: translateY(24px); opacity: 0; } to { transform: none; opacity: 1; } }
+@media (prefers-reduced-motion: reduce) { #v-charts .ch-b, #v-charts .sec-h > .seg button, #v-charts .ind-open, #v-charts .sp-sync > summary, #v-charts .sp-sync > summary::after, #ms-ind .ind-lib button, #v-scanner .ms-srow { transition: none; } #v-charts .ch-b:active { transform: none; } }
+@media (forced-colors: active) { #v-charts .sec-h > .seg button.on, #v-charts .ch-b.on { outline: 2px solid Highlight; outline-offset: -2px; } }
 </style>
 <style>
 /* ── Council design pass (Nov 2026): hierarchy, tables, touch targets, contrast. Everything scoped to #v-council. ── */
