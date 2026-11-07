@@ -840,6 +840,10 @@
     .u-t td select { width: 100%; min-height: 44px; font-size: 14px; }
     .u-acts { display: flex; flex-wrap: wrap; gap: 8px; white-space: normal; }
     .u-acts button { margin: 0; min-height: 44px; flex: 1 1 auto; }
+    /* QA 7 Nov: source next to the name, cells sized to content (not the 40px table-row height), actions fill the row */
+    .u-t tbody td { height: auto; }
+    .u-t td:nth-child(3) { grid-column: 2; grid-row: 1; justify-self: end; }
+    .u-t td.u-acts { display: flex; }
   }
 
   /* ═══════════ Design pass 100 (6 Nov) ═══════════
@@ -6354,13 +6358,15 @@ function msNextSetup(bars, A) {
     const ks = cfg.focusSetups || [], stopped = cfg.sleeveStopped || {}; const all = ks.concat(Object.keys(stopped).filter((k) => !ks.includes(k)));
     // Coach promotion / demotion proposals (7 Nov): shadow setups that earned a live slot, live setups that lost their edge.
     // Shown even when nothing trades live; never applied: a setup moves in or out of live only with the owner's OK.
-    const PD = (C.coach && Array.isArray(C.coach.proposals) ? C.coach.proposals : []).filter((p) => p.kind === 'promote' || p.kind === 'promoteIf' || p.kind === 'demote' || p.kind === 'dataSource');
+    const PD = (C.coach && Array.isArray(C.coach.proposals) ? C.coach.proposals : []).filter((p) => p.kind === 'promote' || p.kind === 'promoteIf' || p.kind === 'demote' || p.kind === 'dataSource')
+      // a data-source proposal whose markets the Trader already reads from OANDA (snapshot.feed, since 7 Nov) asks for nothing: hide it
+      .filter((p) => !(p.kind === 'dataSource' && Array.isArray(p.markets) && p.markets.length && C.snap && C.snap.feed && p.markets.every((m) => C.snap.feed[m] === 'OANDA')));
     const pfx = (v) => `<span class="${v >= 0 ? 'pos' : 'neg'}"><b>${v >= 0 ? '+' : '−'}${Math.abs(+v || 0).toFixed(2)}R</b></span>`;
     const pd = !(C.coach && Array.isArray(C.coach.proposals)) ? '' : `<div class="sl-row"><div class="sl-h"><b>Coach suggests (needs your OK)</b><small>promote / demote · from the 30-day replay</small></div>${PD.length ? PD.map((p) => p.kind === 'dataSource' ? `<small class="sl-n" title="${esc(p.why || '')}"><span class="ms-chip ms-chip-sell">Data</span> <b>${esc(p.label)}</b> — closed live trades ${pfx(p.liveR / p.n)} a trade on Kraken candles, ${pfx(p.spotR / p.n)} on OANDA spot (${+p.n} trades)</small>` : `<small class="sl-n" title="${esc(p.why || '')}"><span class="ms-chip ${p.kind === 'demote' ? 'ms-chip-sell' : 'ms-chip-buy'}">${p.kind === 'demote' ? 'Demote' : 'Promote'}</span> <b>${esc(p.label || (p.kind === 'demote' ? 'move ' + p.setup + ' back to shadow' : 'make ' + p.setup + ' live'))}</b> — ${pfx(p.exp)} a trade over ${+p.n} replay trades${p.h1 && p.h2 ? ` · halves ${pfx(p.h1.exp)} / ${pfx(p.h2.exp)}` : ''}${p.all ? ` · all of ${esc(p.setup)} ${pfx(p.all.exp)} over ${+p.all.n}` : ''}</small>`).join('') : '<small class="sl-n">No shadow setup has earned a live slot and no live setup has lost its edge (promote: 100+ replay trades, +0.10R a trade, both halves positive).</small>'}</div>`;
     // cTrader DEMO mirror (council/ctrader-mirror.mjs): status and the last orders, owner/admin view only
     const MS = C.mirror && C.mirror.state, adminView = document.documentElement.dataset.mode === 'admin';
     const tHM = (iso) => { const d = new Date(iso); return isNaN(d) ? '' : d.toLocaleString('en-GB', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' }); };
-    const mr = MS && adminView ? `<div class="sl-row"><div class="sl-h"><span class="ms-chip ${/^ok/.test(MS.status || '') ? 'ms-chip-buy' : 'ms-chip-sell'}">Demo</span><b>cTrader mirror</b><small>${esc(MS.status || '—')}${MS.lastRun ? ` · checked ${esc(tHM(MS.lastRun))}` : ''} · ${Object.values(MS.map || {}).filter((m) => m.status === 'open').length} open</small></div>${((C.mirror.log || []).slice(-5).reverse().map((l) => `<small class="sl-n">${esc(tHM(l.at))} · ${esc(l.msg)}</small>`).join('')) || '<small class="sl-n">No orders yet: it copies new live council trades and ICT A-setups (0.01 lot, demo only).</small>'}</div>` : '';
+    const mr = MS && adminView ? `<div class="sl-row"><div class="sl-h"><span class="ms-chip ${/^ok/.test(MS.status || '') ? 'ms-chip-buy' : 'ms-chip-sell'}">Demo</span><b class="sl-nocap">cTrader mirror</b><small>${esc(MS.status || '—')}${MS.lastRun ? ` · checked ${esc(tHM(MS.lastRun))}` : ''}${/\bopen\b/.test(MS.status || '') ? '' : ` · ${Object.values(MS.map || {}).filter((m) => m.status === 'open').length} open`}</small></div>${((C.mirror.log || []).slice(-5).reverse().map((l) => `<small class="sl-n">${esc(tHM(l.at))} · ${esc(l.msg)}</small>`).join('')) || '<small class="sl-n">No orders yet: it copies new live council trades and ICT A-setups (0.01 lot, demo only).</small>'}</div>` : '';
     if (!all.length) { if (!PD.length && !mr) { el.hidden = true; return; } el.hidden = false; el.innerHTML = `<div class="ms-k"><span>Live setups · paper</span><span class="ms-note">no engine setup trades live yet</span></div>${pd}${mr}`; return; }
     const rows = all.map((k) => { const h = (cfg.history || []).find((x) => x.by === 'user' && /trades live on paper on every market/.test(x.change || '') && new RegExp('^' + k, 'i').test(x.change || '')), since = h ? Date.parse(h.at) / 1000 : 0;
       const L = (Array.isArray(C.trades) ? C.trades : []).filter((x) => x.k === k && !x.shadow && x.opened >= since), done = L.filter((x) => (x.status === 'win' || x.status === 'loss' || x.status === 'be') && isFinite(x.R)), open = L.filter((x) => x.status === 'open' || x.status === 'pending');
@@ -9056,6 +9062,7 @@ html[data-mk="ict"] #v-charts .mk-mode button[data-mk="ict"].on { background: co
 #v-council .c-sleeve .sl-row { gap: 8px; padding: 16px 0; }
 #v-council .c-sleeve .sl-row + .sl-row { border-top: 1px solid var(--line-soft); }
 #v-council .c-sleeve .sl-h b { font-size: 16px; }
+#v-council .c-sleeve .sl-h b.sl-nocap { text-transform: none; }   /* brand names (cTrader) keep their own case */
 #v-council .c-sleeve .sl-h small, #v-council .c-sleeve .sl-n { color: var(--ink-dim); font-size: 12.5px; line-height: 1.55; }
 #v-council .c-sleeve .sl-k { gap: 6px 22px; font-size: 12.5px; }
 #v-council .c-sleeve .sl-k b { font: 600 15px var(--mono); font-variant-numeric: tabular-nums; margin-right: 2px; }
