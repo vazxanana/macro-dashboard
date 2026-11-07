@@ -1424,6 +1424,20 @@ td.st-dim { color: var(--ink-faint); }
 
 /* polish 32: tablet top bar pushes the actions and profile to the right edge */
 @media (min-width: 601px) and (max-width: 1100px) { .top > .top-actions { margin-left: auto; } }
+
+/* new theme: Midnight, deep navy surfaces with Aurum gold as the accent */
+:root[data-theme="midnight"] {
+  --bg: #070d1f; --panel: #0d1630; --panel-raised: #111c3a; --panel-hover: #15224a;
+  --line: rgba(150,175,255,.12); --line-soft: rgba(150,175,255,.07); --line-strong: rgba(150,175,255,.2);
+  --ink: #eef2ff; --ink-dim: #b0bcdc; --ink-faint: #8d9ac0;
+  --accent: #e3b341; --accent-soft: rgba(227,179,65,.14);
+  --buy: #34d6a0; --sell: #ff6b85; --buy-soft: rgba(52,214,160,.13); --sell-soft: rgba(255,107,133,.13);
+  color-scheme: dark;
+}
+:root[data-theme="midnight"] body { background: radial-gradient(1100px 520px at 85% -220px, rgba(227,179,65,.10), transparent 70%), radial-gradient(900px 600px at 0% 0%, rgba(70,110,255,.10), transparent 70%), var(--bg); background-attachment: fixed; }
+:root[data-theme="midnight"] .card, :root[data-theme="midnight"] .tile { box-shadow: 0 1px 0 rgba(255,255,255,.03) inset, 0 10px 30px -18px rgba(0,0,0,.6); }
+:root[data-theme="midnight"] ::selection { background: rgba(227,179,65,.3); }
+:root[data-theme="midnight"] .top { background: color-mix(in srgb, var(--bg) 80%, transparent); }
 </style>
 </head>
 <body>
@@ -2110,6 +2124,7 @@ function msNextSetup(bars, A) {
   const THEMES = {
     light: { bg: '#ffffff', text: '#131722', grid: '#f0f3fa', border: '#e0e3eb' },
     dark:  { bg: '#151a23', text: '#8f98aa', grid: '#19202c', border: '#273042' },
+    midnight: { bg: '#0c1530', text: '#9aa8cb', grid: '#121e3d', border: '#22335c' },
   };
   const UPC = '#089981', DNC = '#f23645';
   const Z = {
@@ -2933,8 +2948,8 @@ function msNextSetup(bars, A) {
       p.chart.applyOptions({ layout: { background: { type: 'solid', color: t.bg }, textColor: t.text }, grid: { vertLines: { visible: false }, horzLines: { color: t.grid } }, rightPriceScale: { borderColor: t.border }, timeScale: { borderColor: t.border } });
       p.overlay.set(p.overlay.items);
     });
-    root.dataset.chart = G.theme; document.documentElement.dataset.theme = G.theme;
-    $('ms-theme').textContent = G.theme === 'light' ? 'Dark charts' : 'Light charts';
+    root.dataset.chart = G.theme === 'light' ? 'light' : 'dark'; document.documentElement.dataset.theme = G.theme;
+    $('ms-theme').textContent = `Theme: ${{ dark: 'Dark', light: 'Light', midnight: 'Midnight' }[G.theme] || 'Dark'}`; $('ms-theme').title = 'Switch theme: Dark, Light, Midnight';
   }
   function applyAlertsBtn() {
     const b = $('ms-alerts'); b.textContent = G.alerts ? 'Alerts on' : 'Alerts off'; b.title = b.textContent; b.setAttribute('aria-pressed', String(G.alerts));
@@ -2944,7 +2959,7 @@ function msNextSetup(bars, A) {
     const pr = JSON.parse(localStorage.getItem('msPrefs') || '{}');
     if (pr.show) Object.assign(G.show, pr.show);
     if (pr.risk > 0) G.risk = +pr.risk;
-    if (pr.theme === 'dark' || pr.theme === 'light') G.theme = pr.theme;
+    if (pr.theme === 'dark' || pr.theme === 'light' || pr.theme === 'midnight') G.theme = pr.theme;
     G.alerts = !!pr.alerts;
   } catch (e) {}
   root.querySelectorAll('[data-show]').forEach((cb) => { cb.checked = G.show[cb.dataset.show] !== false; });
@@ -2955,7 +2970,7 @@ function msNextSetup(bars, A) {
   root.querySelectorAll('[data-show]').forEach((cb) => cb.addEventListener('change', () => {
     G.show[cb.dataset.show] = cb.checked; savePrefs(); Object.values(panes).forEach((p) => p.A && p.draw());
   }));
-  $('ms-theme').addEventListener('click', () => { G.theme = G.theme === 'light' ? 'dark' : 'light'; applyTheme(); savePrefs(); });
+  $('ms-theme').addEventListener('click', () => { const order = ['dark', 'light', 'midnight']; G.theme = order[(order.indexOf(G.theme) + 1) % order.length]; applyTheme(); savePrefs(); });
   $('ms-risk').addEventListener('input', () => { const v = +$('ms-risk').value; if (v > 0) { G.risk = v; savePrefs(); topDown(); } });
   $('ms-alerts').addEventListener('click', async () => {
     G.alerts = !G.alerts; applyAlertsBtn(); savePrefs();
