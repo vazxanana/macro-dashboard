@@ -15,6 +15,7 @@ import { dukaMinutes, dukaHours, dukaDays, dukaReset } from './duka.mjs';
 import { yahooBars } from './yahoo.mjs';
 import { krakenMinutes, krakenOHLC } from './krakenhist.mjs';
 import { m15Choch, m15cFeat as m15cOf } from './choch.mjs';
+import { cleanBars, LTF_CLEAN } from './clean.mjs';
 
 const DIR = process.argv[2] || 'data', DAYS = +(process.argv[3] || 30);
 const FAKE = !!process.env.BT_FAKE;   // offline self-test with a synthetic random walk
@@ -288,6 +289,11 @@ for (const [key, M] of Object.entries(MARKETS)) {
       }
     } else {
       for (const [id, iv, sec] of TFS) data[id] = await klines(M.sym, iv, startT - (WIN + 2) * sec, endT);
+    }
+    // bad prints: the same cleaner, timeframes and options the live Trader applies to its candles (clean.mjs), before any analysis
+    for (const [id] of TFS) {
+      const nBad = data[id] ? cleanBars(data[id], M.group === 'Forex' && LTF_CLEAN.has(id) ? { wickK: 15 } : {}) : 0;
+      if (nBad) { const C = (meta.cleaned = meta.cleaned || {}); (C[key] = C[key] || {})[id] = nBad; }
     }
     const m1 = data['1m'];
     // OANDA D1 trend per day (closed daily candles before that day, last 720), cached; null when OANDA can't be read
