@@ -3632,13 +3632,26 @@ function msNextSetup(bars, A) {
     { const QK = `ms-pos-${instKey}-${tf.id}`; P._pos = []; let E = null;
       const btn = () => el.closest('.ms-pane') && el.closest('.ms-pane').querySelector('.ch-pos');
       const mark = (on) => { const b = btn(); if (b) { b.classList.toggle('on', on); b.setAttribute('aria-pressed', String(on)); } el.classList.toggle('measuring', on || !!P.measureOn || !!P.hlOn || !!P.fibOn); };
-      P.drawPos = function () { P._pos.forEach((l) => { try { series.removePriceLine(l); } catch (e) {} }); P._pos = []; let q = null; try { q = JSON.parse(localStorage.getItem(QK) || 'null'); } catch (e) {} if (!q) return;
+      P.drawPos = function () { P._pos.forEach((l) => { try { series.removePriceLine(l); } catch (e) {} }); P._pos = []; let q = null; try { q = JSON.parse(localStorage.getItem(QK) || 'null'); } catch (e) {} if (!q) { if (P.posChip) P.posChip(null); return; }
         const [en, st] = q, r = Math.abs(en - st), buy = en > st, d = buy ? 1 : -1; let sz = ''; try { sz = sizeText(r, en); } catch (e) {}
         const pct = (v) => `${(Math.abs(v - en) / en * 100).toFixed(2)}%`;
         P._pos.push(series.createPriceLine({ price: en, color: '#2962ff', lineWidth: 2, lineStyle: LW.LineStyle.Solid, axisLabelVisible: true, title: `${buy ? '▲ Long' : '▼ Short'} · ${sz}` }));
         P._pos.push(series.createPriceLine({ price: st, color: '#f23645', lineWidth: 2, lineStyle: LW.LineStyle.Solid, axisLabelVisible: true, title: `Stop −1R · ${fmt(r)} (${pct(st)})` }));
         P._pos.push(series.createPriceLine({ price: en + d * r, color: 'rgba(8,153,129,.6)', lineWidth: 1, lineStyle: LW.LineStyle.Dashed, axisLabelVisible: false, title: '1R' }));
-        P._pos.push(series.createPriceLine({ price: en + d * 2 * r, color: '#089981', lineWidth: 2, lineStyle: LW.LineStyle.Solid, axisLabelVisible: true, title: `Target +2R · ${pct(en + d * 2 * r)}` })); };
+        P._pos.push(series.createPriceLine({ price: en + d * 2 * r, color: '#089981', lineWidth: 2, lineStyle: LW.LineStyle.Solid, axisLabelVisible: true, title: `Target +2R · ${pct(en + d * 2 * r)}` }));
+        P.posChip([en, st, en + d * 2 * r, buy, sz]); };
+      // action chip for the planned position (7 Nov loop): copy it as an MT5 / cTrader order, set a price alert at the entry, or clear it
+      P.posChip = function (q) { let c = el.querySelector('.pos-chip'); if (!q) { if (c) c.remove(); return; }
+        if (!c) { c = document.createElement('div'); c.className = 'pos-chip'; el.appendChild(c); }
+        const [en, st, tp, buy, sz] = q, f = (v) => (+v).toFixed(INST.dec), sym = String(INST.label || instKey).replace(/[^A-Za-z0-9]/g, '').toUpperCase();
+        const last = P.bars && P.bars.length ? P.bars[P.bars.length - 1].close : null, typ = last == null ? '' : (buy ? en < last : en > last) ? ' LIMIT' : ' STOP';
+        const mt5 = `${sym} ${buy ? 'BUY' : 'SELL'}${typ} ${f(en)} SL ${f(st)} TP ${f(tp)}`;
+        const ct = `${buy ? 'Buy' : 'Sell'}${typ ? typ.toLowerCase() + ' order' : ''} ${sym} @ ${f(en)} | Stop loss ${f(st)} | Take profit ${f(tp)}`;
+        c.innerHTML = `<b class="${buy ? 'up' : 'dn'}">${buy ? '▲ Long' : '▼ Short'}${typ}</b><span>${f(en)} · SL ${f(st)} · TP ${f(tp)}${sz ? ` · ${esc(sz)}` : ''}</span><button type="button" data-pc="mt5">Copy MT5</button><button type="button" data-pc="ct">cTrader</button><button type="button" data-pc="al">Alert at entry</button><button type="button" data-pc="x" aria-label="Remove the position plan">×</button>`;
+        c.onclick = async (ev) => { ev.stopPropagation(); const b = ev.target.closest('[data-pc]'); if (!b) return; const k = b.dataset.pc;
+          if (k === 'x') { if (P.posTool) P.posTool(); return; }
+          if (k === 'al') { if (window.msOpenAlerts) window.msOpenAlerts(instKey, +f(en)); return; }
+          const v = k === 'mt5' ? mt5 : ct; try { await navigator.clipboard.writeText(v); } catch (e) { prompt('Copy', v); } const o = b.textContent; b.textContent = 'Copied ✓'; setTimeout(() => { b.textContent = o; }, 1400); window.msTrack && msTrack('Position ticket', { fmt: k }); }; };
       P.posTool = function () { let has = false; try { has = !!localStorage.getItem(QK); } catch (e) {}
         if (P.posOn) { P.posOn = false; E = null; mark(false); return; }
         if (has) { try { localStorage.removeItem(QK); } catch (e) {} P.drawPos(); return; }
@@ -7826,6 +7839,12 @@ function gpStats(T) {
 .rp-bar button { height: 30px; min-width: 34px; padding: 0 10px; border-radius: 7px; border: 1px solid var(--line); background: var(--bg); color: var(--ink); font: inherit; font-size: 12.5px; font-weight: 600; cursor: pointer; }
 .rp-bar button:hover { border-color: var(--accent); }
 .rp-bar .rp-t { padding: 0 8px; font-size: 12px; color: var(--ink-dim); white-space: nowrap; font-variant-numeric: tabular-nums; }
+.pos-chip { position: absolute; left: 8px; bottom: 30px; z-index: 4; display: flex; flex-wrap: wrap; align-items: center; gap: 6px; max-width: calc(100% - 90px); padding: 6px 8px; border-radius: 10px; border: 1px solid var(--line); background: color-mix(in srgb, var(--panel) 92%, transparent); box-shadow: 0 4px 14px rgba(0,0,0,.25); font-size: 12px; font-variant-numeric: tabular-nums; color: var(--ink); }
+.pos-chip b { font-weight: 700; } .pos-chip b.up { color: var(--buy); } .pos-chip b.dn { color: var(--sell); } .pos-chip span { color: var(--ink-dim); }
+.pos-chip button { min-height: 28px; padding: 2px 9px; border-radius: 7px; border: 1px solid var(--line); background: var(--panel); color: var(--ink); font: inherit; font-weight: 600; cursor: pointer; }
+.pos-chip button:hover { border-color: var(--accent); } .pos-chip button:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+.pos-chip [data-pc="x"] { min-width: 28px; padding: 2px 6px; }
+@media (max-width: 520px) { .pos-chip { left: 4px; right: 60px; max-width: none; bottom: 26px; font-size: 11.5px; } .pos-chip span { flex-basis: 100%; order: 1; } }
 .ch-pos { --i: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linejoin='round'%3E%3Crect x='4' y='4' width='16' height='9' rx='1'/%3E%3Crect x='4' y='13' width='16' height='7' rx='1' stroke-dasharray='2 2'/%3E%3C/svg%3E"); }
 .ch-fib { --i: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round'%3E%3Cpath d='M3 5h18M3 10h18M3 14h18M3 19h18' stroke-dasharray='0'/%3E%3Cpath d='M5 19 19 5' stroke-width='1.4'/%3E%3C/svg%3E"); }
 .ch-hl { --i: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round'%3E%3Cpath d='M3 12h18'/%3E%3Ccircle cx='12' cy='12' r='2.2' fill='black'/%3E%3C/svg%3E"); }
