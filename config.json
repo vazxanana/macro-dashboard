@@ -580,6 +580,12 @@
    "by": "user",
    "change": "NQ open run: regime tags (TREND, META) on every trade and a paper shadow stream \"trend-on only\" (|TS| >= 0.295); the live rule is unchanged",
    "why": "Regime study (2004-26, pre-registered): NQ/TREND is the one consistent split: second half ON +0.119R vs OFF -0.200R a trade (t 2.73, nominal; Bonferroni bar 2.83), right sign in every era, but in 2023-26 the skipped trades won (+0.23R over 41). A loss filter for dead regimes, not a regime detector: recorded as tags and a shadow so the forward record decides."
+  },
+  {
+   "at": "2026-11-07T22:58:46.000Z",
+   "by": "repair",
+   "change": "Shadow: 29 m30m1 trades of 4-6 Nov marked duplicate (copies of a Scalp entry, +18.81R gross); no stat counts them",
+   "why": "m30m1 fires on the same M1 entry as the Scalp. The Trader drops the copy since 6 Nov 18:03 UTC (#259); the copies recorded before that still counted the same trade twice in the shadow book and in the m30m1 rules."
   }
  ],
  "btAt": "2026-11-07T21:41:23.838Z",
@@ -636,11 +642,11 @@
  "noPause": true,
  "wouldPause": {
   "rintra": {
-   "at": "2026-11-07T22:56:56.000Z",
+   "at": "2026-11-07T22:58:46.000Z",
    "why": "four losses in a row"
   },
   "scalp": {
-   "at": "2026-11-07T22:56:56.000Z",
+   "at": "2026-11-07T22:58:46.000Z",
    "why": "expectancy -1.00R over 13 trades"
   },
   "xau": {
@@ -676,7 +682,8 @@
   "badprint-2026-11-03-7",
   "void-rounded-replica-2026-11-04",
   "history-crypto-trend-v3",
-  "history-pairs-dormant"
+  "history-pairs-dormant",
+  "void-m30m1-twins-2026-11-06"
  ],
  "takeAll": false,
  "focus": [
