@@ -1146,9 +1146,9 @@ function learnFromBacktest(change) {
     if (!BT.b.tradeCols.includes(c)) continue;   // an older backtest without this condition
     const S = sides(k, c, [v1, v2]), fl = config.filters[k] || {}, other = (v) => v === v1 ? v2 : v1;
     // a filter the backtest set earlier, whose excluded side is no longer worse: drop it
-    if (fl[c] && (fl.src || {})[c] === 'backtest') {
+    if (fl[c] && (fl.src || {})[c] === 'backtest' && !cooling(k, c)) {   // 14-day hold (robustness audit: added and dropped 10 h apart)
       const kept = S[fl[c]], out = S[other(fl[c])];
-      if (kept.n >= 15 && out.n >= 15 && out.e >= kept.e) {
+      if (kept.n >= 15 && out.n >= 15 && out.e >= kept.e) { touched(k, c);
         change(`${k}: "only ${txt(fl[c])}" dropped (backtest)`, `${f2(kept.e)} each over ${kept.n}, the excluded side ${f2(out.e)} over ${out.n}: the filter no longer helps.`);
         delete fl[c]; if (fl.since) delete fl.since[c]; if (fl.src) delete fl.src[c];
       }
@@ -1159,6 +1159,8 @@ function learnFromBacktest(change) {
     const f = config.filters[k] = config.filters[k] || {};
     if (userOwned(f, c)) continue;   // the owner's rule stays until the owner changes it (Coach proposals can still flag it)
     if (f[c] === win && (f.src || {})[c] === 'backtest') continue;
+    if (isLiveSetup(k) || cooling(k, c)) continue;   // live setups: the owner's call; a rule changed in the last 14 days stays
+    touched(k, c);
     const was = f[c];
     f[c] = win; (f.since = f.since || {})[c] = nowISO; (f.src = f.src || {})[c] = 'backtest';
     change(`${k}: only ${txt(win)} (backtest)${was && was !== win ? `, replacing "only ${txt(was)}"` : ''}`, `${S[win].n + S[lose].n} trades over the last ${days} days: ${txt(win)} ${f2(S[win].e)} each, ${txt(lose)} ${f2(S[lose].e)} (gap ${tTxt(gap)}); true in both halves.`);
@@ -1172,7 +1174,7 @@ function learnFromBacktest(change) {
       return { be, d, ok: d.e >= 0.02 && d.t >= 2 && h1.e > 0 && h2.e > 0 };
     });
     const best = cand.filter((c) => c.ok).sort((x, y) => y.d.e - x.d.e)[0], want = best ? best.be : null;
-    if ((config.be || null) !== want) {
+    if ((config.be || null) !== want && knobGate('be', none.n)) {   // 14-day hold, shared with the statistical break-even steps
       change(want ? `Break-even at +${want}R (backtest)` : 'Break-even turned off (backtest)', `${none.n} trades over the last ${days} days: no break-even ${f2(none.e)} each; break-even at +1R changes that by ${f2(cand[0].d.e)} (${tTxt(cand[0].d.t)}), at +1.5R by ${f2(cand[1].d.e)} (${tTxt(cand[1].d.t)}).`);
       config.be = want; if (want) config.beSince = nowISO; else delete config.beSince;
     }
@@ -1231,7 +1233,7 @@ function learnFromBacktest(change) {
 function learnManagement(closedAll, change) {
   if (config.be || config.beSrc === 'backtest') return;
   const losses = closedAll.filter((x) => x.status === 'loss' && now - x.closed < 14 * 86400), gave = losses.filter((x) => (x.mfe || 0) >= 1);
-  if (losses.length >= 6 && gave.length >= 4 && gave.length / losses.length >= 0.25) {
+  if (losses.length >= 6 && gave.length >= 4 && gave.length / losses.length >= 0.25 && knobGate('be', losses.length)) {
     config.be = 1; config.beSince = nowISO;
     change('Break-even at +1R turned on', `${gave.length} of ${losses.length} recent losers (live and shadow) were +1R or more before turning around.`);
   }
@@ -1259,6 +1261,11 @@ function touched(k, f) { (config.coachChanged = config.coachChanged || {})[coolK
 // Coach's own filter rules, and the change ledger (coach.json ledger, analysis/latest.md). Live setups (focusSetups) and owner
 // rules are never changed here: they stay the owner's call.
 const isLiveSetup = (k) => (config.focusSetups || []).includes(k);
+// Coach knobs (stop buffer, minimum stop, reward:risk, break-even, signal age, news guard, dollar cap): the robustness audit
+// (research/robustness.md, 7 Nov) found 35 Coach changes on a median of 10 trades, 11 topics changed back and forth. A knob now
+// moves only on COACH_MIN_N+ trades of evidence and at most once per COACH_COOL (14 days). Use as the LAST test of a change's
+// condition: when it passes, the knob is marked as changed.
+function knobGate(knob, n) { if (!(n >= COACH_MIN_N) || cooling('all', knob)) return false; touched('all', knob); return true; }
 const clear = (a, sign, tau) => solid(a, sign) && shrunkClear(a, sign, tau);   // solid() is the floor, shrinkage the extra bar
 // prior spread for the shrinkage, from every (setup x D1 / structure / session value) group of the sample: empirical Bayes
 function coachTau(closedAll) {
@@ -1393,10 +1400,10 @@ if (coach.date !== today) {
   if (rs.n >= 10) {
     // (7 Nov) the 'win rate under 35%' triggers for a wider minimum stop / buffer are gone: this engine's targets sit 2-4R away,
     // so it normally wins 23-26% of trades and the trigger fired every night (minimum stop 0.6 -> 1.1 ATR in five nights).
-    if (rs.wr > 0.6 && config.buf > LIMITS.buf[0]) { const v = +Math.max(LIMITS.buf[0], config.buf - 0.01).toFixed(2); change(`Stop buffer ${config.buf} → ${v} ATR`, `Win rate ${Math.round(rs.wr * 100)}% over ${rs.n} trades: a tighter stop gives more R.`); config.buf = v; }
+    if (rs.wr > 0.6 && config.buf > LIMITS.buf[0] && knobGate('buf', rs.n)) { const v = +Math.max(LIMITS.buf[0], config.buf - 0.01).toFixed(2); change(`Stop buffer ${config.buf} → ${v} ATR`, `Win rate ${Math.round(rs.wr * 100)}% over ${rs.n} trades: a tighter stop gives more R.`); config.buf = v; }
   }
   const low = recent.filter((x) => x.rr < 1.5), ls = stat(low);
-  if (ls.n >= 6 && ls.exp < 0 && config.minRR < 1.5) { change(`Minimum reward:risk ${config.minRR} → 1.5`, `Trades under 1.5R returned ${ls.exp}R each over ${ls.n} trades.`); config.minRR = 1.5; }
+  if (ls.n >= 6 && ls.exp < 0 && config.minRR < 1.5 && knobGate('minRR', ls.n)) { change(`Minimum reward:risk ${config.minRR} → 1.5`, `Trades under 1.5R returned ${ls.exp}R each over ${ls.n} trades.`); config.minRR = 1.5; }
   learnFilters(closedAll, change);
   learnManagement(closedAll, change);
   // drop a rule only on the same strict evidence that adds one (solid(): 30+ trades, t >= 2, both halves, plus the shrunk
@@ -1426,7 +1433,7 @@ if (coach.date !== today) {
   const recentLoss = closed.filter((x) => x.status === 'loss' && now - x.closed < 14 * 86400);
   if (!config.be && recentLoss.length >= 8) {
     const gaveBack = recentLoss.filter((x) => (x.mfe || 0) >= 1).length;
-    if (gaveBack / recentLoss.length >= 0.4) { config.be = 1; config.beSince = nowISO; change('Break-even at +1R turned on', `${gaveBack} of ${recentLoss.length} recent losers were +1R or more before turning around.`); }
+    if (gaveBack / recentLoss.length >= 0.4 && knobGate('be', recentLoss.length)) { config.be = 1; config.beSince = nowISO; change('Break-even at +1R turned on', `${gaveBack} of ${recentLoss.length} recent losers were +1R or more before turning around.`); }
   } else if (config.be && config.beSince && now - Date.parse(config.beSince) / 1000 > 21 * 86400) {
     const bes = closed.filter((x) => x.status === 'be'), wins = closed.filter((x) => x.status === 'win');
     change('Break-even rule off for a re-test', `${bes.length} trades closed at break-even and ${wins.length} won over the last 30 days; testing without it.`);
@@ -1436,15 +1443,15 @@ if (coach.date !== today) {
   const rl = trades.filter((x) => x.status === 'loss' && ((x.pm && x.pm.phase === 'done') || ownTags(x).length) && now - x.closed < 14 * 86400);
   const cnt = (c) => rl.filter((x) => (x.pm && (x.pm.cause === c || (x.pm.factors || []).includes(c))) || ownTags(x).some((t) => OWNER_CAUSE[t] === c)).length, share = (c) => rl.length ? cnt(c) / rl.length : 0;
   if (rl.length >= 6) {
-    if (cnt('hunt') >= 3 && share('hunt') >= 0.3 && config.buf < LIMITS.buf[1]) { const v = +Math.min(LIMITS.buf[1], config.buf + 0.02).toFixed(2); change(`Stop buffer ${config.buf} → ${v} ATR`, `Reviews: ${cnt('hunt')} of ${rl.length} losses were stopped out and then went to the target (stop hunted).`); config.buf = v; }
-    if (cnt('noise') >= 3 && config.minRisk < LIMITS.minRisk[1]) { const v = +Math.min(LIMITS.minRisk[1], config.minRisk + 0.1).toFixed(2); change(`Minimum stop ${config.minRisk} → ${v} ATR`, `Reviews: ${cnt('noise')} losses had a stop inside one normal candle.`); config.minRisk = v; }
-    if (cnt('late') >= 3 && share('late') >= 0.3 && (config.fresh || FRESH) > 6) { const v = (config.fresh || FRESH) - 2; change(`Fresh signals only: ${config.fresh || FRESH} → ${v} candles`, `Reviews: ${cnt('late')} of ${rl.length} losses were late entries.`); config.fresh = v; }
-    if (cnt('news') >= 3 && !config.newsGuard) { config.newsGuard = true; config.newsSince = nowISO; change('News guard on', `Reviews: ${cnt('news')} losses came from high-impact news; no short-term trades from 15 min before to 45 min after news.`); }
+    if (cnt('hunt') >= 3 && share('hunt') >= 0.3 && config.buf < LIMITS.buf[1] && knobGate('buf', rl.length)) { const v = +Math.min(LIMITS.buf[1], config.buf + 0.02).toFixed(2); change(`Stop buffer ${config.buf} → ${v} ATR`, `Reviews: ${cnt('hunt')} of ${rl.length} losses were stopped out and then went to the target (stop hunted).`); config.buf = v; }
+    if (cnt('noise') >= 3 && config.minRisk < LIMITS.minRisk[1] && knobGate('minRisk', rl.length)) { const v = +Math.min(LIMITS.minRisk[1], config.minRisk + 0.1).toFixed(2); change(`Minimum stop ${config.minRisk} → ${v} ATR`, `Reviews: ${cnt('noise')} losses had a stop inside one normal candle.`); config.minRisk = v; }
+    if (cnt('late') >= 3 && share('late') >= 0.3 && (config.fresh || FRESH) > 6 && knobGate('fresh', rl.length)) { const v = (config.fresh || FRESH) - 2; change(`Fresh signals only: ${config.fresh || FRESH} → ${v} candles`, `Reviews: ${cnt('late')} of ${rl.length} losses were late entries.`); config.fresh = v; }
+    if (cnt('news') >= 3 && !config.newsGuard && knobGate('newsGuard', rl.length)) { config.newsGuard = true; config.newsSince = nowISO; change('News guard on', `Reviews: ${cnt('news')} losses came from high-impact news; no short-term trades from 15 min before to 45 min after news.`); }
   }
   // break-even that keeps costing wins: move it later
   const beR = trades.filter((x) => x.status === 'be' && x.pm && x.pm.phase === 'done' && now - x.closed < 14 * 86400);
   const beCost = beR.filter((x) => x.pm.cause === 'becost').length;
-  if (config.be && config.be < 2 && beCost >= 3 && beCost > beR.length - beCost) { change(`Break-even ${config.be}R → ${config.be + 0.5}R`, `Reviews: ${beCost} of ${beR.length} break-even exits then went on to the target.`); config.be = config.be + 0.5; }
+  if (config.be && config.be < 2 && beCost >= 3 && beCost > beR.length - beCost && knobGate('be', beR.length)) { change(`Break-even ${config.be}R → ${config.be + 0.5}R`, `Reviews: ${beCost} of ${beR.length} break-even exits then went on to the target.`); config.be = config.be + 0.5; }
   // re-test the news guard after 21 days, using its shadow trades
   if (config.newsGuard && config.newsSince && now - Date.parse(config.newsSince) / 1000 > 21 * 86400) {
     const sh = shadows.filter((x) => (x.blockedBy || []).includes('news'));
@@ -1456,8 +1463,8 @@ if (coach.date !== today) {
   {
     const cap = config.maxUsd || MAX_USD, sh = shadows.filter((x) => (x.blockedBy || []).length === 1 && x.blockedBy[0] === 'usd' && now - x.closed < 14 * 86400);
     const fx = closed.filter((x) => ['xau', 'eurusd', 'gbpusd', 'audusd', 'usdcad', 'usdchf'].includes(x.market) && now - x.closed < 14 * 86400);
-    if (sh.length >= 5 && exp(sh) > 0.3 && cap < LIMITS.maxUsd[1]) { config.maxUsd = cap + 1; change(`Dollar cap ${cap} → ${cap + 1} trades`, `Trades blocked only by the dollar cap made +${exp(sh).toFixed(2)}R over ${sh.length}.`); }
-    else if (sh.length >= 5 && exp(sh) < -0.3 && fx.length >= 8 && exp(fx) < -0.3 && cap > LIMITS.maxUsd[0]) { config.maxUsd = cap - 1; change(`Dollar cap ${cap} → ${cap - 1} trades`, `Gold/forex trades lost ${exp(fx).toFixed(2)}R each and the blocked ones would have lost too.`); }
+    if (sh.length >= 5 && exp(sh) > 0.3 && cap < LIMITS.maxUsd[1] && knobGate('maxUsd', sh.length)) { config.maxUsd = cap + 1; change(`Dollar cap ${cap} → ${cap + 1} trades`, `Trades blocked only by the dollar cap made +${exp(sh).toFixed(2)}R over ${sh.length}.`); }
+    else if (sh.length >= 5 && exp(sh) < -0.3 && fx.length >= 8 && exp(fx) < -0.3 && cap > LIMITS.maxUsd[0] && knobGate('maxUsd', sh.length)) { config.maxUsd = cap - 1; change(`Dollar cap ${cap} → ${cap - 1} trades`, `Gold/forex trades lost ${exp(fx).toFixed(2)}R each and the blocked ones would have lost too.`); }
   }
 
   // markets: pause one for 3 days when it loses (6+ trades, worse than -0.3R each); resume early if its shadow trades recover
