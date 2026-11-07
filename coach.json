@@ -197,5 +197,39 @@
   "m30m1: dropped the D1 rule: The trades it blocked made +1.36R over 19.",
   "scalp: skip the overlap session: -0.61R over 10 trades there; +0.32R elsewhere.",
   "m30m1: only with D1: against: -0.62R over 8 trades, too costly to keep taking while with is tested."
- ]
+ ],
+ "proposals": [
+  {
+   "setup": "scalp",
+   "kind": "skipMarket",
+   "value": "eurusd",
+   "label": "skip EUR/USD",
+   "n": 22,
+   "exp": -0.86,
+   "restN": 196,
+   "restExp": 0.33,
+   "why": "scalp under the live rule made −0.86R a trade over 22 replay trades on EUR/USD; the other markets +0.33R over 196.",
+   "at": "2026-11-07T16:58:48.000Z"
+  },
+  {
+   "setup": "scalp",
+   "kind": "stability",
+   "value": "unstable",
+   "n": 218,
+   "exp": 0.21,
+   "h1": {
+    "n": 102,
+    "exp": -0.05
+   },
+   "h2": {
+    "n": 116,
+    "exp": 0.45
+   },
+   "flag": true,
+   "why": "scalp under the live rule: +0.21R a trade over 218 replay trades; first half −0.05R (102), second half +0.45R (116): one half lost money, so the edge is not steady.",
+   "at": "2026-11-07T16:58:48.000Z"
+  }
+ ],
+ "proposalsKey": "2026-11-07T16:49:29.484Z|[[\"scalp\",{\"d1\":\"against\",\"since\":{\"d1\":\"2026-11-02T11:52:07.000Z\",\"session:asia\":\"2026-11-02T21:25:27.000Z\",\"session:overlap\":\"2026-11-07T06:00:50.000Z\"},\"src\":{\"d1\":\"user\",\"noMarket\":\"user\",\"session:asia\":\"user\"},\"noSession\":[\"asia\",\"overlap\"],\"noMarket\":[\"audusd\"]}]]",
+ "proposalsBt": "2026-11-07T16:49:29.484Z"
 }
