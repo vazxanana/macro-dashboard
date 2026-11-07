@@ -4,7 +4,9 @@ name: ICT desk tracker
 # futures (NQ, ES, YM, RTY) and writes council-data ict/ (trades.json, snapshot.json, bars.json), which the
 # ICT desk page reads. Never touches the council's files.
 on:
-  # 7 Nov 2026: the ICT tracker now runs on Vercel (api/run.js at :04/:19/:34/:49); this workflow is kept for a manual run only.
+  # Stays on GitHub until the Vercel runner can write (GH_TOKEN needs Contents: Read and write); then this schedule goes.
+  schedule:
+    - cron: '4,19,34,49 * * * *'
   workflow_dispatch:
 
 permissions:
