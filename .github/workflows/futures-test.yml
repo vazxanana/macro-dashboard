@@ -1,0 +1,31 @@
+name: Futures ticket test
+
+# Sends one sample futures ticket to the council's phone alerts (ntfy / Telegram). Manual only.
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - name: Checkout council data
+        uses: actions/checkout@v4
+        with:
+          ref: council-data
+          path: data
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Send the test ticket
+        env:
+          NTFY_TOPIC: ${{ secrets.NTFY_TOPIC }}
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+          FUT_ACCOUNT: ${{ vars.FUT_ACCOUNT }}
+          FUT_RISK: ${{ vars.FUT_RISK }}
+        run: node council/futures-test.mjs data

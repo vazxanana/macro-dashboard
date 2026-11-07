@@ -7,6 +7,7 @@ import path from 'node:path';
 import { msAnalyze, CFG, PAIRS, RETR, LBL, buildSetup, buildRetrace, setMarket } from './engine.mjs';
 import { entryContext, startReview, watchReview, judge, newsNear, lessons } from './review.mjs';
 import { m15cFeat } from './choch.mjs';
+import { FUT, ticket, closeTicket } from './futures.mjs';
 
 const DIR = process.argv[2] || 'data';
 fs.mkdirSync(DIR, { recursive: true });
@@ -1774,10 +1775,24 @@ if (nqLast) snapshot.nqLast = nqLast;
 // the last 15 min are sent, each once (ntfyO / ntfyC flags), so a restart never floods the phone with old trades.
 { const topic = process.env.NTFY_TOPIC || 'mosha-council-d200fdc484', fmt = (v, d) => (+v).toFixed(d != null ? d : 2), fR = (v) => `${v > 0 ? '+' : ''}${(+v).toFixed(2)}R`;
   const ev = [];
+  // futures tickets (council/futures.mjs): gold → MGC, NQ → MNQ; the alert opens the contract's TradingView chart
+  const futOpt = { account: +process.env.FUT_ACCOUNT || 10000, risk: +process.env.FUT_RISK || 0.25, basis: null };
+  { const gs = rd('ict/snapshot.json', null), gc = gs && gs.markets && gs.markets.gc, xs = snapshot.markets && snapshot.markets.xau;
+    if (gc && xs && gc.price && xs.price && now - Date.parse(gs.at) / 1000 < 3600 && Math.abs(gc.price - xs.price) < 60) futOpt.basis = +(gc.price - xs.price).toFixed(1); }
+  const DASH = 'https://vazxanana.github.io/macro-dashboard/market-structure.html#council';
   for (const x of trades.filter((x) => !x.shadow).concat(research.filter((x) => x.k === 'nq-open'))) {
-    const nm = `${x.label} ${x.k === 'nq-open' ? x.name + ' (paper)' : x.name}`;
-    if (!x.ntfyO && x.status === 'open' && x.filled >= now - 900) { x.ntfyO = 1; ev.push({ title: `${x.side.toUpperCase()} ${nm}`, msg: `Entry ${fmt(x.entry, x.dec)}, stop ${fmt(x.stop, x.dec)}${x.k === 'trend' ? ' (catastrophe stop; exits on a daily close under the channel midpoint), no fixed target' : x.tp1 != null ? `, 2R mark ${fmt(x.tp1, x.dec)}, then trailing` : `, target ${fmt(x.t1, x.dec)}`}${x.size && x.size !== 1 ? ` · ${x.size}× size` : ''}`, tags: x.side === 'sell' ? 'chart_with_downwards_trend' : 'chart_with_upwards_trend' }); }
-    if (!x.ntfyC && x.R != null && x.closed && x.closed >= now - 900 && ['win', 'loss', 'be'].includes(x.status)) { x.ntfyC = 1; ev.push({ title: `${x.status === 'win' ? 'Win' : x.status === 'loss' ? 'Loss' : 'Break-even'} ${fR(x.R)} · ${nm}`, msg: `${x.side.toUpperCase()} from ${fmt(x.entry, x.dec)}${x.exit ? ` · ${x.exit}` : ''}`, tags: x.R > 0 ? 'white_check_mark' : x.R < 0 ? 'x' : 'heavy_minus_sign' }); }
+    const nm = `${x.label} ${x.k === 'nq-open' ? x.name + ' (paper)' : x.name}`, fut = FUT[x.market];
+    // a resting limit order: send the limit ticket when it is placed, and a cancel when it expires unfilled
+    if (fut && !x.ntfyP && x.status === 'pending' && x.opened >= now - 900) { const tk = ticket(x, now, futOpt); x.ntfyP = 1;
+      if (tk) { x.futT = { code: tk.c.code, n: tk.n }; ev.push({ title: `${x.side.toUpperCase()} LIMIT ${nm}`, msg: tk.text, tags: 'hourglass', click: tk.url }); } }
+    if (fut && x.futT && !x.ntfyX && x.status === 'expired' && x.closed >= now - 900) { x.ntfyX = 1; ev.push({ title: `Cancel ${x.futT.code} limit · ${nm}`, msg: `The council's limit order expired unfilled: cancel your ${x.side} limit on ${x.futT.code}.`, tags: 'no_entry_sign', click: `https://www.tradingview.com/chart/?symbol=${encodeURIComponent(fut.ex + ':' + x.futT.code)}` }); }
+    if (!x.ntfyO && x.status === 'open' && x.filled >= now - 900) { x.ntfyO = 1;
+      if (fut) { const tk = x.futT ? null : ticket(x, now, futOpt);
+        if (tk) { x.futT = { code: tk.c.code, n: tk.n }; ev.push({ title: `${x.side.toUpperCase()} ${tk.n} ${tk.c.code} · ${nm}`, msg: tk.text, tags: x.side === 'sell' ? 'chart_with_downwards_trend' : 'chart_with_upwards_trend', click: tk.url }); continue; }
+        if (x.futT) { ev.push({ title: `Limit filled · ${nm}`, msg: `Your ${x.side} limit on ${x.futT.code} should be filled (${x.futT.n} contracts). If it is not, skip it: don't chase.`, tags: 'white_check_mark', click: `https://www.tradingview.com/chart/?symbol=${encodeURIComponent(fut.ex + ':' + x.futT.code)}` }); continue; } }
+      ev.push({ title: `${x.side.toUpperCase()} ${nm}`, msg: `Entry ${fmt(x.entry, x.dec)}, stop ${fmt(x.stop, x.dec)}${x.k === 'trend' ? ' (catastrophe stop; exits on a daily close under the channel midpoint), no fixed target' : x.tp1 != null ? `, 2R mark ${fmt(x.tp1, x.dec)}, then trailing` : `, target ${fmt(x.t1, x.dec)}`}${x.size && x.size !== 1 ? ` · ${x.size}× size` : ''}`, tags: x.side === 'sell' ? 'chart_with_downwards_trend' : 'chart_with_upwards_trend' }); }
+    if (!x.ntfyC && x.R != null && x.closed && x.closed >= now - 900 && ['win', 'loss', 'be'].includes(x.status)) { x.ntfyC = 1; const ct = fut && x.futT ? closeTicket(x, now, x.futT) : null;
+      ev.push({ title: `${x.status === 'win' ? 'Win' : x.status === 'loss' ? 'Loss' : 'Break-even'} ${fR(x.R)} · ${nm}`, msg: `${ct ? ct.text + ' (if your stop / target has not already done it)\n' : ''}${x.side.toUpperCase()} from ${fmt(x.entry, x.dec)}${x.exit ? ` · ${x.exit}` : ''}`, tags: x.R > 0 ? 'white_check_mark' : x.R < 0 ? 'x' : 'heavy_minus_sign', click: ct ? ct.url : null }); }
   }
   // Telegram (4 Nov): the same events to a Telegram chat. Needs the repository secret TELEGRAM_BOT_TOKEN (from @BotFather).
   // TELEGRAM_CHAT_ID is optional: without it the bot uses the first private chat that messaged it (send the bot /start),
@@ -1792,13 +1807,13 @@ if (nqLast) snapshot.nqLast = nqLast;
   }
   if (tgTok && tgChat) for (const e of ev.slice(0, 8)) {
     try { const r = await fetch(tgApi('sendMessage'), { method: 'POST', headers: { 'Content-Type': 'application/json' }, signal: AbortSignal.timeout(8000),
-        body: JSON.stringify({ chat_id: tgChat, text: `${e.title}\n${e.msg}\nhttps://vazxanana.github.io/macro-dashboard/market-structure.html#council`, disable_web_page_preview: true }) });
+        body: JSON.stringify({ chat_id: tgChat, text: `${e.title}\n${e.msg}\n${e.click || DASH}`, disable_web_page_preview: true }) });
       if (!r.ok) snapshot.errors.telegram = `HTTP ${r.status}`; }
     catch (err) { snapshot.errors.telegram = String(err.message || err); }
   }
   for (const e of ev.slice(0, 8)) {
     if (!e.tags) continue;   // the Telegram-only 'connected' note
-    try { await fetch(`https://ntfy.sh/${topic}`, { method: 'POST', body: e.msg, headers: { Title: e.title, Tags: e.tags, Click: 'https://vazxanana.github.io/macro-dashboard/market-structure.html#council' }, signal: AbortSignal.timeout(5000) }); }
+    try { await fetch(`https://ntfy.sh/${topic}`, { method: 'POST', body: e.msg, headers: { Title: e.title, Tags: e.tags, Click: e.click || DASH, ...(e.click ? { Actions: `view, Dashboard, ${DASH}` } : {}) }, signal: AbortSignal.timeout(5000) }); }
     catch (err) { snapshot.errors.ntfy = String(err.message || err); }
   }
   if (ev.length) wr('trades.json', trades);
