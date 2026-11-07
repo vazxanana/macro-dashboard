@@ -3499,6 +3499,87 @@ function msNextSetup(bars, A) {
   }
   let P5pv = [];
 
+  // ICT session liquidity (Asia / London ranges, New York midnight open) and the 50% of yesterday, for a pane or the Split screen chart
+  const etFmt = new Intl.DateTimeFormat('en-US', { timeZone: 'America/New_York', hour: 'numeric', hourCycle: 'h23', year: 'numeric', month: '2-digit', day: '2-digit' });
+  const et = (ts) => { const q = Object.fromEntries(etFmt.formatToParts(new Date(ts * 1000)).map((x) => [x.type, x.value])); return { h: +q.hour, d: `${q.year}-${q.month}-${q.day}` }; };
+  // phones (owner: labels crowd at 390px): shorter titles on the price-axis labels of narrow charts
+  const plT = (t, w) => (w && w < 480 ? { Invalidation: 'Inv.', 'NY midnight open': 'NY open', 'EQ (50% yesterday)': 'EQ 50%' }[t] || t : t);
+  function ictSess(B, R, tf, items, PL, d, off) { const n = B.length;
+    // session liquidity on intraday charts: today's (New York date) Asia 20:00-00:00 and London 02:00-05:00 ranges, the midnight open
+    if (tf.sec <= 3600) {
+      const today = et(R[n - 1].time).d; let asia = null, lon = null, mid = null, ai = -1, li = -1;
+      for (let i = n - 1; i >= 0 && i > n - 1500; i--) { const q = et(R[i].time); const b = B[i];
+        const isAsiaToday = (q.h >= 20 && et(R[i].time + 86400).d === today) || (q.h < 0); const isLon = q.d === today && q.h >= 2 && q.h < 5;
+        if (q.d === today && q.h === 0 && mid == null) mid = { p: b.open, i }; if (q.d === today && q.h === 0) mid = { p: b.open, i };
+        if (isAsiaToday) { asia = asia ? { hi: Math.max(asia.hi, b.high), lo: Math.min(asia.lo, b.low), i } : { hi: b.high, lo: b.low, i }; ai = i; }
+        if (isLon) { lon = lon ? { hi: Math.max(lon.hi, b.high), lo: Math.min(lon.lo, b.low), i } : { hi: b.high, lo: b.low, i }; li = i; }
+        if (q.d < today && q.h < 19) break; }
+      if (asia) { items.lines.push({ l1: asia.i, l2: n + 3, p: asia.hi, color: 'rgba(156,39,176,0.8)', w: 1, dash: true, text: 'Asia high' }, { l1: asia.i, l2: n + 3, p: asia.lo, color: 'rgba(156,39,176,0.8)', w: 1, dash: true, text: 'Asia low', below: true }); }
+      if (lon) { items.lines.push({ l1: lon.i, l2: n + 3, p: lon.hi, color: 'rgba(0,150,136,0.85)', w: 1, dash: true, text: 'London high' }, { l1: lon.i, l2: n + 3, p: lon.lo, color: 'rgba(0,150,136,0.85)', w: 1, dash: true, text: 'London low', below: true }); }
+      if (mid) PL(mid.p, 'NY midnight open', 'rgba(255,152,0,0.85)', true);
+    }
+    // premium / discount: 50% of yesterday's range (from the daily chart)
+    if (d && d.length > 2) { const day = Math.floor(Date.now() / 1000 / 86400) * 86400, pd = d.filter((b) => b.time < day).pop();
+      if (pd) PL((pd.high + pd.low) / 2 + off, 'EQ (50% yesterday)', 'rgba(138,148,168,0.9)', true); }
+  }
+  // Meridian markup (structure breaks, origins, CF, 50% / VR, higher-timeframe origins, plan, next leg): shared by the panes and the
+  // Split screen's free chart; own = the page's market (its plan and higher-timeframe origins apply), f = price formatter
+  function merItems(bars, A, S, tf, items, f, own) { const n = bars.length; const fmt = f;
+    const D = G.show.detail, low = tf.sec <= 900;
+    if (low) items.vlines = markerLines(bars, tf, D);
+    if (tf.sec <= 3600) { items.days = []; for (let i = 1; i < n; i++) { const a = new Date((bars[i - 1].time - TZ) * 1000), b2 = new Date((bars[i].time - TZ) * 1000); if (a.getDate() !== b2.getDate()) items.days.push(i); } }
+    const recent = A.events.slice(D ? -2 : -1), seen = new Set();
+    const evs = A.events.slice(D ? (low ? -8 : -14) : (low ? -3 : -5));
+    evs.forEach((e, k) => {
+      const c = e.dir < 0 ? Z.sell : Z.buy, sell = e.dir < 0;
+      if (G.show.bo) items.lines.push({ bo: true, l1: e.fromIdx, l2: e.breakIdx, p: e.level, color: c.line, text: k >= evs.length - (D ? 5 : 2) ? (e.structure ? 'BO Structure' : (sell ? 'BO Sell' : 'BO Buy')) : '', below: sell });
+      if (!recent.includes(e)) return;
+      const end = e.endIdx !== null ? e.endIdx : n + 26;
+      if (G.show.origin) {
+        items.boxes.push({ kind: 'origin', open: e.endIdx === null, l1: e.start, l2: end, lo: e.bot, hi: e.top, fill: c.fill, stroke: c.stroke });
+        items.labels.push({ l: e.endIdx === null ? n + 1 : e.start + 1, dx: 4, p: sell ? e.bot : e.top, dy: sell ? -6 : 14, text: `Origin ${fmt(e.bot)}–${fmt(e.top)}`, color: c.line });
+      }
+      if (G.show.cf) e.cf.forEach((f) => {
+        if (seen.has(f.i) || (!D && !f.post)) return; seen.add(f.i);
+        items.boxes.push({ kind: 'cf', l1: f.i - 1, l2: f.i + 3, lo: f.lo, hi: f.hi, fill: c.cf, stroke: c.stroke });
+        items.labels.push({ l: f.i + 1, p: sell ? f.hi : f.lo, dy: sell ? -6 : 15, text: f.post ? 'CF ✓' : 'CF', align: 'center', color: c.line });
+      });
+      const vrPt = e.vr ? e.vr : (e === A.last && A.ext ? { i: A.ext.i, p: A.ext.p } : null);
+      if (G.show.vr && vrPt && (sell ? vrPt.p < e.bot : vrPt.p > e.top)) {
+        const mid = ((sell ? e.top : e.bot) + vrPt.p) / 2;
+        items.lines.push({ l1: vrPt.i, l2: end, p: mid, color: '#9aa4b8', w: 1, dash: true, text: `50% ${fmt(mid)} · ${sell ? 'main ↑ internal ↓' : 'internal ↑ main ↓'}`, below: !sell });
+      }
+      if (G.show.vr && e.vrBox) {
+        items.boxes.push({ kind: 'vr', l1: e.vr.i - 2, l2: Math.min(end, e.vr.i + 14), lo: e.vrBox.lo, hi: e.vrBox.hi, fill: Z.vr.fill, stroke: Z.vr.stroke });
+        items.labels.push({ l: e.vr.i, p: sell ? e.vrBox.lo : e.vrBox.hi, dy: sell ? 15 : -6, text: 'VR', align: 'center', color: Z.vr.stroke });
+      }
+    });
+    // Higher-timeframe origins as dashed reference boxes (the barrier this TF trades from)
+    if (own && G.show.htf) {
+      const idx = ACTIVE.findIndex((x) => x.id === tf.id);
+      ACTIVE.slice(0, idx).filter((h) => h.id !== '5m').slice(D ? -2 : -1).forEach((h) => {
+        const hp = panes[h.id];
+        const he = hp && hp.A && hp.A.last;
+        if (!he || he.endIdx !== null) return;
+        const t0 = hp.bars[he.start].time;
+        let l1 = bars.findIndex((b) => b.time >= t0); if (l1 < 0) return;
+        items.boxes.push({ kind: 'htf', open: true, l1, l2: n + 26, lo: he.bot, hi: he.top, stroke: Z.htf, dash: true });
+        items.labels.push({ l: n + 26, dx: -4, align: 'right', p: he.top, dy: 14, text: `${h.label} Origin`, color: Z.htf });
+      });
+    }
+    const pos = own && G.show.plan && G.plan;
+    if (pos) {
+      const pl = G.plan, l1 = n + 3, l2 = n + 20;
+      items.boxes.push({ kind: 'rw', entry: pl.entry, l1, l2, lo: Math.min(pl.entry, pl.t1), hi: Math.max(pl.entry, pl.t1), fill: 'rgba(8,153,129,0.20)', stroke: 'rgba(8,153,129,0.7)' });
+      items.boxes.push({ kind: 'rk', entry: pl.entry, l1, l2, lo: Math.min(pl.entry, pl.stop), hi: Math.max(pl.entry, pl.stop), fill: 'rgba(242,54,69,0.20)', stroke: 'rgba(242,54,69,0.7)' });
+      items.labels.push({ l: l1 + 8, p: pl.t1, text: `${pl.name} ${pl.sell ? 'SELL' : 'BUY'} · ${pl.rr.toFixed(1)}R`, pill: true, bg: pl.sell ? '#f23645' : '#089981', dy: pl.sell ? 16 : -16 });
+    }
+    if (!pos && own && G.show.next && S && S.proj.length && (tf.id === '4h' || tf.id === '1h')) {
+      items.path = S.proj;
+      S.proj.forEach((p) => { if (p.t) items.labels.push({ l: p.l, p: p.p, text: p.t, pill: true, bg: Z.proj, dy: p.t.startsWith('②') ? (S.sell ? -18 : 18) : (S.sell ? 18 : -18) }); });
+    }
+  }
+
   // ─── One chart pane per timeframe ───
   const panes = {};
   function makePane(tf) {
@@ -3788,30 +3869,13 @@ function msNextSetup(bars, A) {
     // ICT markup (7 Nov, owner: "don't mix the council with the ICT" — a header switch picks Meridian or ICT): fair value gaps
     // (last 4 unfilled each way), session liquidity (Asia / London high-low, New York midnight open) and the 50% of yesterday's range
     P.ictOv = new Overlay(); P._ictPL = [];
-    const etFmt = new Intl.DateTimeFormat('en-US', { timeZone: 'America/New_York', hour: 'numeric', hourCycle: 'h23', year: 'numeric', month: '2-digit', day: '2-digit' });
-    const et = (ts) => { const q = Object.fromEntries(etFmt.formatToParts(new Date(ts * 1000)).map((x) => [x.type, x.value])); return { h: +q.hour, d: `${q.year}-${q.month}-${q.day}` }; };
     P.ictDraw = function () {
       const B = P.bars, R = P.raw; if (!B || B.length < 30 || !R) return; const n = B.length, off = G.offset || 0;
       const items = { boxes: [], lines: [], labels: [], path: [], vlines: [], segs: [] };
       fvgItems(B, items);
-      // session liquidity on intraday charts: today's (New York date) Asia 20:00-00:00 and London 02:00-05:00 ranges, the midnight open
       (P._ictPL || []).forEach((l) => { try { series.removePriceLine(l); } catch (e) {} }); P._ictPL = [];
-      const PL = (price, title, color, dash) => P._ictPL.push(series.createPriceLine({ price, color, lineWidth: 1, lineStyle: dash ? LW.LineStyle.Dashed : LW.LineStyle.Solid, axisLabelVisible: true, title }));
-      if (tf.sec <= 3600) {
-        const today = et(R[n - 1].time).d; let asia = null, lon = null, mid = null, ai = -1, li = -1;
-        for (let i = n - 1; i >= 0 && i > n - 1500; i--) { const q = et(R[i].time); const b = B[i];
-          const isAsiaToday = (q.h >= 20 && et(R[i].time + 86400).d === today) || (q.h < 0); const isLon = q.d === today && q.h >= 2 && q.h < 5;
-          if (q.d === today && q.h === 0 && mid == null) mid = { p: b.open, i }; if (q.d === today && q.h === 0) mid = { p: b.open, i };
-          if (isAsiaToday) { asia = asia ? { hi: Math.max(asia.hi, b.high), lo: Math.min(asia.lo, b.low), i } : { hi: b.high, lo: b.low, i }; ai = i; }
-          if (isLon) { lon = lon ? { hi: Math.max(lon.hi, b.high), lo: Math.min(lon.lo, b.low), i } : { hi: b.high, lo: b.low, i }; li = i; }
-          if (q.d < today && q.h < 19) break; }
-        if (asia) { items.lines.push({ l1: asia.i, l2: n + 3, p: asia.hi, color: 'rgba(156,39,176,0.8)', w: 1, dash: true, text: 'Asia high' }, { l1: asia.i, l2: n + 3, p: asia.lo, color: 'rgba(156,39,176,0.8)', w: 1, dash: true, text: 'Asia low', below: true }); }
-        if (lon) { items.lines.push({ l1: lon.i, l2: n + 3, p: lon.hi, color: 'rgba(0,150,136,0.85)', w: 1, dash: true, text: 'London high' }, { l1: lon.i, l2: n + 3, p: lon.lo, color: 'rgba(0,150,136,0.85)', w: 1, dash: true, text: 'London low', below: true }); }
-        if (mid) PL(mid.p, 'NY midnight open', 'rgba(255,152,0,0.85)', true);
-      }
-      // premium / discount: 50% of yesterday's range (from the daily chart)
-      const d = panes['1d'] && panes['1d'].raw; if (d && d.length > 2) { const day = Math.floor(Date.now() / 1000 / 86400) * 86400, pd = d.filter((b) => b.time < day).pop();
-        if (pd) PL((pd.high + pd.low) / 2 + off, 'EQ (50% yesterday)', 'rgba(138,148,168,0.9)', true); }
+      const PL = (price, title, color, dash) => P._ictPL.push(series.createPriceLine({ price, color, lineWidth: 1, lineStyle: dash ? LW.LineStyle.Dashed : LW.LineStyle.Solid, axisLabelVisible: true, title: plT(title, el.clientWidth) }));
+      ictSess(B, R, tf, items, PL, panes['1d'] && panes['1d'].raw, off);
       P.ictOv.set(items);
     };
     P.setMode = function (m) {
@@ -3832,65 +3896,13 @@ function msNextSetup(bars, A) {
     P.draw = function () {
       const bars = P.bars, n = bars.length, A = P.A, S = P.S;
       const items = { boxes: [], lines: [], labels: [], path: [], vlines: [], segs: [] };
-      const D = G.show.detail, low = tf.sec <= 900;
-      if (low) items.vlines = markerLines(bars, tf, D);
-      if (tf.sec <= 3600) { items.days = []; for (let i = 1; i < n; i++) { const a = new Date((bars[i - 1].time - TZ) * 1000), b2 = new Date((bars[i].time - TZ) * 1000); if (a.getDate() !== b2.getDate()) items.days.push(i); } }
-      const recent = A.events.slice(D ? -2 : -1), seen = new Set();
-      const evs = A.events.slice(D ? (low ? -8 : -14) : (low ? -3 : -5));
-      evs.forEach((e, k) => {
-        const c = e.dir < 0 ? Z.sell : Z.buy, sell = e.dir < 0;
-        if (G.show.bo) items.lines.push({ bo: true, l1: e.fromIdx, l2: e.breakIdx, p: e.level, color: c.line, text: k >= evs.length - (D ? 5 : 2) ? (e.structure ? 'BO Structure' : (sell ? 'BO Sell' : 'BO Buy')) : '', below: sell });
-        if (!recent.includes(e)) return;
-        const end = e.endIdx !== null ? e.endIdx : n + 26;
-        if (G.show.origin) {
-          items.boxes.push({ kind: 'origin', open: e.endIdx === null, l1: e.start, l2: end, lo: e.bot, hi: e.top, fill: c.fill, stroke: c.stroke });
-          items.labels.push({ l: e.endIdx === null ? n + 1 : e.start + 1, dx: 4, p: sell ? e.bot : e.top, dy: sell ? -6 : 14, text: `Origin ${fmt(e.bot)}–${fmt(e.top)}`, color: c.line });
-        }
-        if (G.show.cf) e.cf.forEach((f) => {
-          if (seen.has(f.i) || (!D && !f.post)) return; seen.add(f.i);
-          items.boxes.push({ kind: 'cf', l1: f.i - 1, l2: f.i + 3, lo: f.lo, hi: f.hi, fill: c.cf, stroke: c.stroke });
-          items.labels.push({ l: f.i + 1, p: sell ? f.hi : f.lo, dy: sell ? -6 : 15, text: f.post ? 'CF ✓' : 'CF', align: 'center', color: c.line });
-        });
-        const vrPt = e.vr ? e.vr : (e === A.last && A.ext ? { i: A.ext.i, p: A.ext.p } : null);
-        if (G.show.vr && vrPt && (sell ? vrPt.p < e.bot : vrPt.p > e.top)) {
-          const mid = ((sell ? e.top : e.bot) + vrPt.p) / 2;
-          items.lines.push({ l1: vrPt.i, l2: end, p: mid, color: '#9aa4b8', w: 1, dash: true, text: `50% ${fmt(mid)} · ${sell ? 'main ↑ internal ↓' : 'internal ↑ main ↓'}`, below: !sell });
-        }
-        if (G.show.vr && e.vrBox) {
-          items.boxes.push({ kind: 'vr', l1: e.vr.i - 2, l2: Math.min(end, e.vr.i + 14), lo: e.vrBox.lo, hi: e.vrBox.hi, fill: Z.vr.fill, stroke: Z.vr.stroke });
-          items.labels.push({ l: e.vr.i, p: sell ? e.vrBox.lo : e.vrBox.hi, dy: sell ? 15 : -6, text: 'VR', align: 'center', color: Z.vr.stroke });
-        }
-      });
-      // Higher-timeframe origins as dashed reference boxes (the barrier this TF trades from)
-      if (G.show.htf) {
-        const idx = ACTIVE.findIndex((x) => x.id === tf.id);
-        ACTIVE.slice(0, idx).filter((h) => h.id !== '5m').slice(D ? -2 : -1).forEach((h) => {
-          const hp = panes[h.id];
-          const he = hp && hp.A && hp.A.last;
-          if (!he || he.endIdx !== null) return;
-          const t0 = hp.bars[he.start].time;
-          let l1 = bars.findIndex((b) => b.time >= t0); if (l1 < 0) return;
-          items.boxes.push({ kind: 'htf', open: true, l1, l2: n + 26, lo: he.bot, hi: he.top, stroke: Z.htf, dash: true });
-          items.labels.push({ l: n + 26, dx: -4, align: 'right', p: he.top, dy: 14, text: `${h.label} Origin`, color: Z.htf });
-        });
-      }
-      const pos = G.show.plan && G.plan;
-      if (pos) {
-        const pl = G.plan, l1 = n + 3, l2 = n + 20;
-        items.boxes.push({ kind: 'rw', entry: pl.entry, l1, l2, lo: Math.min(pl.entry, pl.t1), hi: Math.max(pl.entry, pl.t1), fill: 'rgba(8,153,129,0.20)', stroke: 'rgba(8,153,129,0.7)' });
-        items.boxes.push({ kind: 'rk', entry: pl.entry, l1, l2, lo: Math.min(pl.entry, pl.stop), hi: Math.max(pl.entry, pl.stop), fill: 'rgba(242,54,69,0.20)', stroke: 'rgba(242,54,69,0.7)' });
-        items.labels.push({ l: l1 + 8, p: pl.t1, text: `${pl.name} ${pl.sell ? 'SELL' : 'BUY'} · ${pl.rr.toFixed(1)}R`, pill: true, bg: pl.sell ? '#f23645' : '#089981', dy: pl.sell ? 16 : -16 });
-      }
-      if (!pos && G.show.next && S && S.proj.length && (tf.id === '4h' || tf.id === '1h')) {
-        items.path = S.proj;
-        S.proj.forEach((p) => { if (p.t) items.labels.push({ l: p.l, p: p.p, text: p.t, pill: true, bg: Z.proj, dy: p.t.startsWith('②') ? (S.sell ? -18 : 18) : (S.sell ? 18 : -18) }); });
-      }
+      merItems(bars, A, S, tf, items, fmt, true);
       P5pv = [];
       if (tf.id === '5m') try { replicaItems(items, bars); } catch (e) { /* the other panes not loaded yet */ }
       P.pv = items.path.map((q) => q.p).concat(tf.id === '5m' ? P5pv : []);
       overlay.set(items);
       P.priceLines.forEach((pl) => series.removePriceLine(pl)); P.priceLines = [];
-      if (S) P.priceLines.push(series.createPriceLine({ price: S.invalid, color: '#787b86', lineWidth: 1, lineStyle: LW.LineStyle.Dashed, axisLabelVisible: true, title: 'Invalidation', lineVisible: G.show.detail }));
+      if (S) P.priceLines.push(series.createPriceLine({ price: S.invalid, color: '#787b86', lineWidth: 1, lineStyle: LW.LineStyle.Dashed, axisLabelVisible: true, title: plT('Invalidation', el.clientWidth), lineVisible: G.show.detail }));
       P.planLinesDraw();
     };
     P.planLines = [];
@@ -4549,7 +4561,7 @@ function msNextSetup(bars, A) {
     const sel = list.find((t) => t.k === G.sel);
     G.plan = sel && !sel.invalid ? { entry: sel.entry, stop: sel.stop, t1: sel.t1, t2: sel.t2, rr: sel.rr, sell: sel.sell, name: sel.name } : null;
     const key = G.plan ? [G.sel, G.plan.entry, G.plan.stop, G.plan.t1].map((v) => typeof v === 'number' ? v.toFixed(1) : v).join('|') : 'none';
-    if (key !== G.planKey) { G.planKey = key; Object.values(panes).forEach((p) => p.A && p.draw()); }
+    if (key !== G.planKey) { G.planKey = key; Object.values(panes).forEach((p) => p.A && p.draw()); if (window.msSplitMarkup) window.msSplitMarkup(); }
     if (G.auto) autoTrade(list, price);
     list.forEach((t) => {
       const was = G.prevStates[t.k];
@@ -4723,7 +4735,7 @@ function msNextSetup(bars, A) {
   applyAlertsBtn();
 
   root.querySelectorAll('[data-show]').forEach((cb) => cb.addEventListener('change', () => {
-    G.show[cb.dataset.show] = cb.checked; savePrefs(); Object.values(panes).forEach((p) => p.A && p.draw());
+    G.show[cb.dataset.show] = cb.checked; savePrefs(); Object.values(panes).forEach((p) => p.A && p.draw()); if (window.msSplitMarkup) window.msSplitMarkup();
   }));
   $('ms-theme').addEventListener('click', () => { const order = ['dark', 'light', 'midnight', 'pro']; G.theme = order[(order.indexOf(G.theme) + 1) % order.length]; applyTheme(); savePrefs(); });
   $('ms-risk').addEventListener('input', () => { const v = +$('ms-risk').value; if (v > 0) { G.risk = v; savePrefs(); topDown(); } });
@@ -4875,30 +4887,41 @@ function msNextSetup(bars, A) {
     lt.value = SP.ltf; rt.value = spTf(); rt.disabled = SP.sync.tf; sy.value = spSym(); sy.disabled = SP.sync.sym; }
   function spTheme() { if (!SP.chart) return; const t = THEMES[G.theme] || THEMES.dark;
     SP.chart.applyOptions({ layout: { background: { type: 'gradient', topColor: t.bgTop || t.bg, bottomColor: t.bg }, textColor: t.text }, rightPriceScale: { borderVisible: false }, timeScale: { borderVisible: false } });
-    if (SP.series) SP.series.applyOptions(candleCols()); }
+    if (SP.series) SP.series.applyOptions(candleCols()); if (SP.ov) SP.ov.set(SP.ov.items); }   // repaint the markups in the new theme's label colours
   window.msSplitTheme = spTheme; window.msSplitMarkup = () => { try { if (SP.on && !spPane()) spMarkup(); } catch (e) {} };
   function spChart() { if (SP.chart) return; const el = document.getElementById('ms-sp-c'); if (!el) return;
-    SP.chart = LW.createChart(el, { autoSize: true, layout: { fontSize: 11, fontFamily: 'Figtree, -apple-system, "Segoe UI", Roboto, sans-serif' }, grid: { vertLines: { visible: false }, horzLines: { visible: false } }, crosshair: { mode: LW.CrosshairMode.Normal }, timeScale: { timeVisible: true, secondsVisible: false, rightOffset: 6 } });
+    SP.chart = LW.createChart(el, { autoSize: true, layout: { fontSize: 11, fontFamily: 'Figtree, -apple-system, "Segoe UI", Roboto, sans-serif' }, grid: { vertLines: { visible: false }, horzLines: { visible: false } }, crosshair: { mode: LW.CrosshairMode.Normal }, timeScale: { timeVisible: true, secondsVisible: false, rightOffset: 6 },
+      localization: { priceFormatter: (p) => fmtI(p, INSTRUMENTS[spSym()] || INST) } });   // thousands separators, like the left chart
     SP.series = SP.chart.addCandlestickSeries({ ...candleCols(), priceLineStyle: LW.LineStyle.Dotted });
     spTheme();
     const lg = document.getElementById('ms-sp-lg');
     SP.chart.subscribeCrosshairMove((pr) => { const b = pr && pr.time != null && SP.bars.find((x) => x.time === pr.time); const I = INSTRUMENTS[spSym()] || INST, d = I.dec ?? 2, f = (v) => (+v).toLocaleString('en-US', { minimumFractionDigits: d, maximumFractionDigits: d });
       const B = b || SP.bars[SP.bars.length - 1]; if (lg && B) lg.innerHTML = `<span class="k">O</span><b>${f(B.open)}</b> <span class="k">H</span><b>${f(B.high)}</b> <span class="k">L</span><b>${f(B.low)}</b> <span class="k">C</span><b class="${B.close >= B.open ? 'up' : 'dn'}">${f(B.close)}</b>`; });
   }
-  // markups on the free chart (another market): Meridian = the last structure breaks, ICT = fair value gaps; indicators in both
-  SP.ind = []; SP.ov = null;
+  // markups on the free chart (another market, or the left chart's own timeframe): the same Meridian / ICT drawing as the panes
+  // (merItems / fvgItems + ictSess) with the price lines they use; the page's plan and higher-timeframe origins only for its own market
+  SP.ind = []; SP.ov = null; SP.pl = []; SP.d = null; SP.dk = '';
   function spMarkup() { if (!SP.chart || !SP.series) return; SP.ind.forEach((s2) => { try { SP.chart.removeSeries(s2); } catch (e) {} }); SP.ind = [];
+    SP.pl.forEach((l) => { try { SP.series.removePriceLine(l); } catch (e) {} }); SP.pl = [];
     if (!SP.ov) { SP.ov = new Overlay(); try { SP.series.attachPrimitive(SP.ov); } catch (e) {} }
-    const B = SP.bars, items = { boxes: [], lines: [], labels: [], path: [], vlines: [], segs: [] };
-    if (B && B.length > 40) { if (G.mode === 'ict') fvgItems(B, items);
-      else { try { const A = msAnalyze(B, 6); (A.events || []).slice(-3).forEach((e, k, arr) => { const c = e.dir < 0 ? '#f23645' : '#089981'; items.lines.push({ bo: true, l1: e.fromIdx, l2: e.breakIdx, p: e.level, color: c, text: k === arr.length - 1 ? (e.structure ? 'BO Structure' : e.dir < 0 ? 'BO Sell' : 'BO Buy') : '' }); }); } catch (e) {} } }
+    const B = SP.bars, k = spSym(), own = k === instKey, I = INSTRUMENTS[k] || INST, tf = TFS.find((t) => t.id === spTf()) || TFS[2], items = { boxes: [], lines: [], labels: [], path: [], vlines: [], segs: [] };
+    const PL = (price, title, color, dash, vis = true) => SP.pl.push(SP.series.createPriceLine({ price, color, lineWidth: 1, lineStyle: dash === 2 ? LW.LineStyle.Dotted : dash ? LW.LineStyle.Dashed : LW.LineStyle.Solid, axisLabelVisible: true, title: plT(title, SP.chart.chartElement().clientWidth), lineVisible: vis }));
+    if (B && B.length > 40) try {
+      if (G.mode === 'ict') { fvgItems(B, items); ictSess(B, B.map((b) => ({ time: b.time - TZ })), tf, items, PL, own ? panes['1d'] && panes['1d'].raw : SP.d, own ? G.offset || 0 : 0); }
+      else { const A = msAnalyze(B, PIVOT), S = A.last ? msNextSetup(B, A) : null; merItems(B, A, S, tf, items, (v) => fmtI(v, I), own);
+        if (S) PL(S.invalid, 'Invalidation', '#787b86', true, G.show.detail);
+        const pl = G.plan; if (own && G.show.plan && pl && tf.id !== '4h') { PL(pl.entry, 'Entry', '#2962ff', false, G.show.detail); PL(pl.stop, 'Stop', '#f23645', false, G.show.detail); PL(pl.t1, 'T1', '#089981', true, G.show.detail); if (tf.id !== '1m') PL(pl.t2, 'T2', '#089981', 2, G.show.detail); } }
+    } catch (e) { /* not enough swings yet */ }
     SP.ov.set(items); indDraw(SP.chart, B, SP.ind); }
   async function spLoad() {
     if (!SP.on) return; spControls(); grid4.dataset.splitR = spPane() ? spTf() : ''; if (spPane()) { setTimeout(() => { const R = spPane(); if (R) R.fit(); if (SP.sync.range || SP.sync.time) spFromLeft(); }, 60); return; } spChart(); const k = spSym(), tf = spTf(), I = INSTRUMENTS[k], key = `${k}|${tf}`; if (!I || !SP.series) return;
     const T = TFS.find((t) => t.id === tf); document.getElementById('ms-sp-t').textContent = `${I.label} · ${T ? T.label : tf}`;
-    if (SP.key !== key) { SP.key = key; SP.series.setData([]); SP.bars = []; }
+    if (SP.key !== key) { SP.key = key; SP.series.setData([]); SP.bars = []; spMarkup(); }   // no old market's markups on an empty chart
+    // another market: its own daily bars, for the ICT 50%-of-yesterday line
+    if (k !== instKey && SP.dk !== k) { SP.dk = k; SP.d = null; fetchBars(TFS.find((t) => t.id === '1d') || TFS[0], I, 10).then((r) => { if (SP.dk === k && r && r.bars) { SP.d = r.bars; if (G.mode === 'ict' && SP.bars.length) spMarkup(); } }).catch(() => {}); }
     try { const r = await fetchBars(TFS.find((t) => t.id === tf) || TFS[2], I, 500); if (SP.key !== key || !r || !r.bars || !r.bars.length) return;
-      SP.bars = r.bars.map((b) => ({ time: b.time + TZ, open: +b.open, high: +b.high, low: +b.low, close: +b.close }));
+      const off = k === instKey ? G.offset || 0 : 0;   // same market: the left chart's price offset, so the plan lines sit on the candles
+      SP.bars = r.bars.map((b) => ({ time: b.time + TZ, open: +b.open + off, high: +b.high + off, low: +b.low + off, close: +b.close + off }));
       SP.series.applyOptions({ priceFormat: { type: 'price', precision: I.dec ?? 2, minMove: Math.pow(10, -(I.dec ?? 2)) } });
       SP.series.setData(SP.bars); document.getElementById('ms-sp-src').textContent = r.src || ''; spMarkup();
       if (SP.sync.range || SP.sync.time) spFromLeft(); else SP.chart.timeScale().fitContent();
@@ -4924,8 +4947,10 @@ function msNextSetup(bars, A) {
   function spApply() { grid4.dataset.splitL = SP.ltf; grid4.dataset.splitR = SP.on && spPane() ? spTf() : ''; if (!SP.on) return; if (!spPane()) spChart(); spControls(); spWire(); spLoad(); }
   window.msSplitView = (on) => { SP.on = on; const bar = document.getElementById('ms-sp-bar'); if (bar) bar.hidden = !on; if (on) { spInit(); spApply(); } };
   setInterval(async () => { if (!SP.on || document.hidden || !SP.series || !SP.bars.length) return; const k = spSym(), tf = spTf(), I = INSTRUMENTS[k], key = SP.key;
-    try { const r = await fetchBars(TFS.find((t) => t.id === tf) || TFS[2], I, 3); if (SP.key !== key || !r || !r.bars) return; r.bars.forEach((b) => { const x = { time: b.time + TZ, open: +b.open, high: +b.high, low: +b.low, close: +b.close }; const last = SP.bars[SP.bars.length - 1];
-      if (x.time === last.time) SP.bars[SP.bars.length - 1] = x; else if (x.time > last.time) SP.bars.push(x); else return; try { SP.series.update(x); } catch (e) {} }); } catch (e) {} }, 15e3);
+    try { const r = await fetchBars(TFS.find((t) => t.id === tf) || TFS[2], I, 3); if (SP.key !== key || !r || !r.bars) return; const off = k === instKey ? G.offset || 0 : 0; let ch = 0;
+      r.bars.forEach((b) => { const x = { time: b.time + TZ, open: +b.open + off, high: +b.high + off, low: +b.low + off, close: +b.close + off }; const last = SP.bars[SP.bars.length - 1];
+      if (x.time === last.time) SP.bars[SP.bars.length - 1] = x; else if (x.time > last.time) SP.bars.push(x); else return; ch = 1; try { SP.series.update(x); } catch (e) {} });
+      if (ch) spMarkup(); } catch (e) {} }, 15e3);   // markups and indicators follow the live candle, as on the panes
   if (root.querySelector('[data-view]')) {
     root.querySelectorAll('[data-view]').forEach((b) => b.addEventListener('click', () => setView(b.dataset.view)));
     let v0 = null; try { v0 = localStorage.getItem('msView'); } catch (e) {}
@@ -5071,7 +5096,7 @@ function msNextSetup(bars, A) {
     try { window.MS_NEWS = NEWS; document.dispatchEvent(new CustomEvent('ms:news')); } catch (e) {}
     newsSrc = live ? 'ForexFactory calendar' : 'built-in NFP and FOMC dates (live calendar unavailable)';
     renderNews();
-    Object.values(panes).forEach((p) => p.A && p.draw());
+    Object.values(panes).forEach((p) => p.A && p.draw()); if (window.msSplitMarkup) window.msSplitMarkup();
   }
   const newsWarned = new Set();
   function renderNews() {
