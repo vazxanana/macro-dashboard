@@ -14,12 +14,12 @@ const row = (m, k, side, opened, R, cost = 0.1, d1 = 'with') => [m, k, side, ope
 let id = 0;
 const live = (market, k, side, opened, R, d1 = 'with') => ({ id: `t${++id}`, market, k, side, opened, status: R > 0 ? 'win' : 'loss', R, rr: 2, feat: { d1, session: 'london', struct: 'main', cf: 'bo', choch: 'no', m15c: 'no' }, shadow: true });
 
-function run(trades, rows, source) {
+function run(trades, rows, source, krakenCoverage) {
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'fid-'));
   try {
     fs.writeFileSync(path.join(dir, 'trades.json'), JSON.stringify(trades));
     fs.writeFileSync(path.join(dir, 'backtest.json'), JSON.stringify({ at: new Date((SWITCH + 7200) * 1000).toISOString(), from: new Date((T0 - 86400) * 1000).toISOString(), to: new Date((SWITCH + 7200) * 1000).toISOString(),
-      markets: { source, errors: {}, d1src: { xau: 'OANDA', btc: 'feed' }, xau: { steps: 1 }, btc: { steps: 1 } }, tradeCols: COLS, trades: rows }));
+      markets: { source, krakenCoverage, errors: {}, d1src: { xau: 'OANDA', btc: 'feed' }, xau: { steps: 1 }, btc: { steps: 1 } }, tradeCols: COLS, trades: rows }));
     const log = execFileSync(process.execPath, [SCRIPT, dir], { encoding: 'utf8' });
     return { log, f: JSON.parse(fs.readFileSync(path.join(dir, 'research', 'fidelity.json'), 'utf8')) };
   } finally { fs.rmSync(dir, { recursive: true, force: true }); }
@@ -59,4 +59,14 @@ test('crypto on Binance in the replay counts as a different feed from live Krake
   const { f } = run([live('btc', 'scalp', 'buy', T0 + 3600, 2)], [row('btc', 'scalp', 'buy', T0 + 3600, 2)], { xau: 'OANDA', btc: 'Binance' });
   assert.equal(f.perMarket.btc.pairs, 1); assert.equal(f.perMarket.btc.sameFeed.pairs, 0);
   assert.equal(f.sameFeed.live, 0); assert.equal(f.sameFeed.feedDiffersPairs, 1);
+});
+
+test('a coin switches to the same-feed numbers once the replay reads it from Kraken; the Kraken cache reach is shown', () => {
+  const trades = [live('btc', 'scalp', 'buy', T0 + 3600, 2)], rows = [row('btc', 'scalp', 'buy', T0 + 3600, 2)];
+  const before = run(trades, rows, { xau: 'OANDA', btc: 'Binance' }, { btc: { from: '2026-11-03', covers: false } });
+  assert.deepEqual(before.f.perMarket.btc.krakenCache, { from: '2026-11-03', covers: false });
+  assert.match(before.log, /btc {5}replay Binance \(Kraken cache from 2026-11-03\)/);
+  const after = run(trades, rows, { xau: 'OANDA', btc: 'Kraken' }, { btc: { from: '2026-10-06', covers: true } });
+  assert.equal(after.f.perMarket.btc.sameFeed.pairs, 1); assert.equal(after.f.sameFeed.feedDiffersPairs, 0);
+  assert.doesNotMatch(after.log, /Kraken cache from/);
 });

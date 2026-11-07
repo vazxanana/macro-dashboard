@@ -1,0 +1,85 @@
+name: Kraken backfill
+
+# Fills the replay's per-day Kraken trade-history cache (council/krakenfill.mjs), so the nightly replay (backtest.yml) reads
+# crypto from Kraken, the feed the live Trader trades on, instead of falling back to Binance. Kraken's public Trades endpoint
+# answers ~1 call a second at 1,000 trades a call: BTC's 30-day window is ~5,600 calls (~2 h), far more than the nightly
+# replay spends. Every 30 min, one runner makes Kraken calls for at most 25 minutes, saves each pair's cursor, and the next
+# run goes on from there. Shares the replay's Actions cache line (duka-*); each save first merges the newest saved copy in.
+# Free (public repo), no secrets, writes no council-data file and changes no trading rule.
+on:
+  schedule:
+    - cron: '11,41 * * * *'
+  workflow_dispatch:
+    inputs:
+      minutes:
+        description: 'Time box: minutes of Kraken calls'
+        default: '25'
+  push:
+    branches: [main]
+    paths:
+      - 'council/krakenhist.mjs'
+      - 'council/krakenfill.mjs'
+      - '.github/workflows/kraken-backfill.yml'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: kraken-backfill
+  cancel-in-progress: false
+
+jobs:
+  backfill:
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          sparse-checkout: council
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Restore history cache
+        uses: actions/cache/restore@v4
+        with:
+          path: .duka-cache
+          key: duka-${{ github.run_id }}-${{ github.run_attempt }}
+          restore-keys: duka-
+
+      - name: Backfill
+        id: fill
+        env:
+          MINUTES: ${{ github.event.inputs.minutes || '25' }}
+        run: |
+          case "$MINUTES" in ''|*[!0-9]*) MINUTES=25 ;; esac
+          [ "$MINUTES" -gt 28 ] && MINUTES=28
+          node council/krakenfill.mjs .duka-cache 30 "$MINUTES"
+
+      # Kept even when the run fails or times out (the cursors are saved as it goes). The replay may have saved a newer copy
+      # meanwhile: restore it beside ours and merge, so neither run's days are lost.
+      - name: Merge with the newest saved cache
+        id: merge
+        if: always() && steps.fill.outputs.save != 'false'
+        run: mv .duka-cache .duka-mine 2>/dev/null || mkdir -p .duka-mine
+
+      - name: Restore the newest saved cache
+        if: always() && steps.merge.outcome == 'success'
+        uses: actions/cache/restore@v4
+        with:
+          path: .duka-cache
+          key: duka-${{ github.run_id }}-${{ github.run_attempt }}
+          restore-keys: duka-
+
+      - name: Merge
+        if: always() && steps.merge.outcome == 'success'
+        run: mkdir -p .duka-cache && node council/krakenfill.mjs --merge .duka-mine .duka-cache && node council/krakenfill.mjs --status .duka-cache 30
+
+      - name: Save history cache
+        if: always() && steps.merge.outcome == 'success'
+        uses: actions/cache/save@v4
+        with:
+          path: .duka-cache
+          key: duka-${{ github.run_id }}-${{ github.run_attempt }}
