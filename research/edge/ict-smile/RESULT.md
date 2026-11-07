@@ -9,7 +9,7 @@ will be replaced by the result, whatever it is.
 - **Hypothesis (one).** A-setups taken when the Dollar Smile (council/macro.mjs, unchanged) is on its **left or right** side
   lose money. The proposed paper filter `nosmilex` drops them.
 - **Bar.** The dropped trades need all three: n ≥ 30, t ≤ −2, and mean R < 0 in both halves.
-- **Pre-registration.** `preregistration.md`, committed (9a113d62) before any out-of-sample trade was generated or classified.
+- **Pre-registration.** `preregistration.md`, committed (9a113d62, pushed to `claude/ict-smile` first) before any out-of-sample trade was generated or classified.
 
 ## Trades
 
