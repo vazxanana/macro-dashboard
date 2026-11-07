@@ -5390,5 +5390,11 @@ function msNextSetup(bars, A) {
 <script>
 (() => { const r = document.documentElement; let on = null; const f = () => { const v = scrollY > 8; if (v !== on) { on = v; r.classList.toggle('scrolled', v); } }; addEventListener('scroll', f, { passive: true }); f(); })();
 </script>
+<script>
+/* Skip link: move focus to the current view's heading without touching the hash (the hash drives view routing) */
+(() => { const a = document.querySelector('a.skip'); if (!a) return;
+  a.addEventListener('click', (ev) => { ev.preventDefault(); const v = document.querySelector('section.view:not([hidden])'); const t = (v && v.querySelector('h1, h2')) || document.getElementById('ms-main-start'); if (!t) return;
+    if (!t.hasAttribute('tabindex')) t.setAttribute('tabindex', '-1'); t.focus({ preventScroll: false }); t.scrollIntoView({ block: 'start' }); }); })();
+</script>
 </body>
 </html>
