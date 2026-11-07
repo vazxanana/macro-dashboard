@@ -116,6 +116,15 @@ written with the owner's GitHub token, `msGhTok`). users.json overrides built-in
 removes one. Sign-in fetches the list; a signed-in non-owner is re-checked after load and signed out if removed or if the
 password changed (`ms-user-rec` keeps an added user's record between visits). Passwords must stay unique per account.
 
+## Gold playbook check (6 Nov 2026, owner's skills)
+
+Admin card `#ms-pb` on the Setup view (`renderPlaybook()`, called from `renderHome()`), from the owner's skill collection
+(gold-msnr-playbook §2-5, Mosha S.CODE, Zlankator, MMXM): context tiles (council Weekly structure `goldW1` vs the setup,
+Daily regime = 20-day efficiency ratio on closed D1 candles, countdown to the 17:00 New York Daily close, NY midnight
+open and price above/below it, session / kill zone), the playbook's pre-trade checklist (auto items + manual ticks kept
+per day in localStorage `msPb-<inst>-<NY date>`), a verdict, and the management rules. Guidance only: the Daily-ER filter
+failed the council's own 2023-26 test (council-data research/log.md, 6 Nov), so it is not a council rule.
+
 ## ICT desk (6 Nov 2026, owner: a separate edge)
 
 ICT is its own edge and approach: never mix it into the council systems, their rules, filters or reports.
@@ -124,7 +133,7 @@ Rules and research live in `.claude/skills/ICT/SKILL.md` (results also in counci
   (`trades.json`, `snapshot.json`, `bars.json`). Markets: NQ, ES, YM, RTY futures from CNBC (Yahoo fallback). Model: H1 iFVG
   reversal (swing swept → body closes through the leg's FVG within 6 H1 candles; stop 2 ticks beyond the sweep;
   no fixed target: from +2R the stop trails 1.5R behind the best price (skill §15; before 6 Nov: 3R target); fixed-2R
-  result recorded as `R2`; 48 h max). Every signal records ICT features (`feat`) and a /10 grade.
+  result recorded as `R2`; out after 36 closed H1 candles, skill §21; 48 h before 7 Nov). Every signal records ICT features (`feat`) and a /10 grade.
 - Page: view `#ict` ("ICT desk", class `ictx`), shown only when `html[data-ict]` is set: the owner, and users
   with `ict: true` (Fred, the main reviewer and trader, lands there after sign-in). The desk user marks signals
   Taken / Skipped / Missed with fill and own R, grades them and writes notes: localStorage `ictDesk`, synced to
@@ -134,6 +143,27 @@ Rules and research live in `.claude/skills/ICT/SKILL.md` (results also in counci
 - Replay: `ict/replay.mjs` (workflow `ict-replay.yml`: on change, on demand with a start date, weekly) runs the same
   `signals()` over CNBC history since 1 Jan 2026 and writes council-data `ict/replay.json` (records carry `replay: true`).
   The desk has a Both / Live / Replay switch (localStorage `ictSrc`) and a P&L calendar of closed signals.
-- A-setup filter (research 6 Nov, skill §14): against the daily bias + grade >= 7 (`isASetup`, records carry `aset`).
+- A-setup filter (skills §14 + §20 + §22 + §23): against the daily bias + grade >= 7 + stop between 0.3x and 0.75x the daily ATR
+  + not a jobs-report morning (first Friday of the month before 10:00 ET, `nfpMorning`)
+  (`feat.atrR`, `RISK_FLOOR`, `RISK_CAP`, `isASetup`; records carry `aset`).
   The desk defaults to A-setups (switch `ictFlt`: A-setups / All signals / One per cluster — the highest-grade index of
   same-side A-setups within 3 h, skill §16, computed on the page); every signal is still tracked.
+- A+ tier (skill §17): A-setup + inversion body >= 60% of range + not NY PM (`isAPlus`, records carry `aplus`); desk
+  filter "A+".
+- Desk extras (6 Nov): New York clock with kill zones (`#ict-clock`), a live forward-test card on futures signals only
+  (`#ict-fwd`, replay excluded; verdict needs ~30 closed A+), an auto checklist per signal (`#ict-tv-ck`), and NY 00:00 /
+  PDH / PDL lines on the signal chart. Skill §19: the edge is not proven on 2023-26 cash data — paper only.
+
+## Main systems first (7 Nov 2026, owner: "our main edge looks horrible")
+The council calendar (`renderCalendar`) defaults to the main systems (`SYS_K` live trades + their replays + NQ paper); the
+admin switch `.cal-src` ("Main systems" / "+ Shadow", localStorage `msCalSrc`) adds the shadow book and its back-filled
+replay (research/shadow-replay.json, about −1,200R Jun–Oct, setups the live rules block). The Home Today strip
+(`renderToday`) headlines `sysClosed()` and floating live R; shadow and retired-engine trades sit on the second line.
+
+## Gold trend fast (7 Nov 2026, owner goal: more profit from the skills)
+Second gold-trend leg `gtrend5` (user rule `gold-trend-fast`, `config.goldTrendFast = { n: 5, k: 2 }`): the gold trend rule on
+the prior 5 daily highs, its own position and add next to the 20-day leg (`gtrend`); the trader runs both from one loop
+(`LEG`). Sizing guide 0.25% (bridges: the shared gold risk). Replay 2023-Oct 2026 in research/replay-2w.json (39 trades).
+Adopted on return per drawdown of the gold book (+39.3% → +45.5% | +68.6% → +79.9%, worst drawdown −2.34 → −2.61% |
+−6.21 → −6.47%), positive every year 2019-26 alone.
+

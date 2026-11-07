@@ -1,12 +1,12 @@
 // ICT desk replay (owner, 6 Nov 2026): the tracker's own H1 iFVG model run over the year so far (from 1 Jan 2026) of CNBC futures
 // candles (5m where CNBC still has them, H1 otherwise), so the desk calendar and stats have history before the live
 // tracker started. Same signal code (signals() in tracker.mjs), entry at the inversion candle's close, stop 2 ticks
-// beyond the sweep, 3R target with the 2R mark recorded, 48 h max, one trade per market at a time. Writes
+// beyond the sweep, 3R target with the 2R mark recorded, 36 trading hours max, one trade per market at a time. Writes
 // council-data ict/replay.json; every record carries replay: true. Never mixed with the council's data.
 import fs from 'node:fs';
 import path from 'node:path';
 import zlib from 'node:zlib';
-import { MARKETS, P, cnbcBars, agg, signals, letter, isASetup } from './tracker.mjs';
+import { MARKETS, P, cnbcBars, agg, signals, letter, isASetup, isAPlus } from './tracker.mjs';
 
 const DATA = process.argv[2] || 'data/ict';
 const FROM = Date.parse(process.argv[3] || '2026-01-01T00:00:00Z') / 1000;
@@ -29,6 +29,7 @@ async function history(M) {
       m5 = m5.concat(got); await sleep(250);
     }
     h1 = dedupe(h1); m5 = dedupe(m5);
+    const cnbc1 = h1.length ? h1[0].time : null;   // signals before this come from the Dukascopy cash-index fill
     // CNBC keeps only ~6 months of intraday candles: fill the earlier part from the research probe's Dukascopy cash-index
     // 5m files (council-data research/candles/idx/), scaled to the futures level by the median ratio over the overlap
     const DUKA = { NQ: 'USATECHIDXUSD', ES: 'USA500IDXUSD', YM: 'USA30IDXUSD' }[M.short];
@@ -57,18 +58,19 @@ async function history(M) {
     // 5m counts as exit data from the first day with a near-full 5m session onwards
     const days = new Map(); for (const b of m5) { const d = Math.floor(b.time / 86400); days.set(d, (days.get(d) || 0) + 1); }
     const full = [...days.entries()].filter(([, n]) => n >= 200).map(([d]) => d).sort((a, b) => a - b);
-    return { sym, m5, H, D, m5from: full.length ? full[0] * 86400 : null, m5days: new Set(full) };
+    return { sym, m5, H, D, m5from: full.length ? full[0] * 86400 : null, m5days: new Set(full), cnbcFrom: cnbc1 };
   }
   throw new Error(`no CNBC history for ${M.short}`);
 }
 
 function simulate(g, M, key, src) {
-  const s = g.side, f = (v) => +(+v).toFixed(M.dec), entry = g.entry, r0 = g.r0, t2 = entry + s * P.mark * r0, end = g.close + P.holdH * 3600;
+  const s = g.side, f = (v) => +(+v).toFixed(M.dec), entry = g.entry, r0 = g.r0, t2 = entry + s * P.mark * r0;
+  const hb = src.H.filter((b) => b.time >= g.close).slice(0, P.holdH), end = hb.length === P.holdH ? hb[hb.length - 1].time + 3600 : g.close + P.holdH * 3600;   // P.holdH closed H1 candles
   const use5 = src.m5days && src.m5days.has(Math.floor(g.close / 86400)) && src.m5days.has(Math.floor((g.close + 86400) / 86400));
   const bars = use5 ? src.m5.filter((b) => b.time >= g.close && b.time < end) : src.H.filter((b) => b.time >= g.close && b.time < end);
   const step = use5 ? 300 : 3600;
   // same exit as the tracker: no fixed target; from +2R the stop trails 1.5R behind the best price (checked before the
-  // candle's own new high moves it, i.e. conservatively); 48 h max
+  // candle's own new high moves it, i.e. conservatively); 36 trading hours max
   let status = 'open', R = null, closed = null, exit = null, exitPx = null, mark2 = null, mfe = 0, stop = g.stop, moved = false;
   for (const b of bars) {
     if (!mark2 && (s > 0 ? b.high >= t2 : b.low <= t2)) mark2 = b.time + step;
@@ -80,7 +82,7 @@ function simulate(g, M, key, src) {
   const R2 = closed ? (mark2 && mark2 <= closed ? 2 : R) : null;
   // research: the next 72 H1 candles after the entry as [best, worst, close] in R (sign-adjusted), to study other exits offline
   const path = src.H.filter((b) => b.time >= g.close && b.time < g.close + 72 * 3600).map((b) => [+(((s > 0 ? b.high : -b.low) - s * entry) / r0).toFixed(2), +(((s > 0 ? b.low : -b.high) - s * entry) / r0).toFixed(2), +((s * (b.close - entry)) / r0).toFixed(2)]);
-  return { id: `${key}-${s > 0 ? 'b' : 's'}-${g.t}-r`, market: key, label: M.label, short: M.short, side: s > 0 ? 'buy' : 'sell', model: 'H1 iFVG reversal', replay: true, res: step === 300 ? '5m' : '1h',
+  return { id: `${key}-${s > 0 ? 'b' : 's'}-${g.t}-r`, market: key, label: M.label, short: M.short, side: s > 0 ? 'buy' : 'sell', model: 'H1 iFVG reversal', replay: true, res: step === 300 ? '5m' : '1h', ...(src.cnbcFrom && g.close < src.cnbcFrom ? { cash: true } : {}),
     signalAt: g.close, signalPx: f(entry), entry: f(entry), stop: f(g.stop), stop0: f(g.stop), r0: +r0.toFixed(M.dec + 1), t1: null, trail: P.trail, t2: f(t2), opened: g.close, status, R, R2, closed, exit, exitPx: exitPx == null ? null : f(exitPx), mfe: +mfe.toFixed(2), path,
     sweep: { t: g.sweepT, level: f(g.swept) }, fvg: g.fvg.map(f), ih: g.ih == null ? null : f(g.ih), dol: g.dol == null ? null : f(g.dol), valid: g.valid, feat: g.feat, grade: { ...g.grade, letter: letter(g.grade.total) } };
 }
@@ -92,7 +94,7 @@ for (const [key, M] of Object.entries(MARKETS)) {
     out.src[key] = { sym: src.sym, h1: src.H.length, m5: src.m5.length, m5from: src.m5from ? new Date(src.m5from * 1000).toISOString().slice(0, 10) : null, d1: src.D.length };
     const sig = signals(src.H, src.D, 1, M.tick).concat(signals(src.H, src.D, -1, M.tick)).filter((g) => g.close >= FROM).sort((a, b) => a.close - b.close);
     let busyAll = 0, busyA = 0;   // same rule as the tracker: an A-setup is only blocked by an open A-setup
-    for (const g of sig) { const a = isASetup(g); if (g.close < (a ? busyA : busyAll)) continue; const t = simulate(g, M, key, src); t.aset = a; out.trades.push(t);
+    for (const g of sig) { const a = isASetup(g); if (g.close < (a ? busyA : busyAll)) continue; const t = simulate(g, M, key, src); t.aset = a; t.aplus = isAPlus(g); out.trades.push(t);
       const end = t.closed || Infinity; busyAll = Math.max(busyAll, end); if (a) busyA = end; }
     console.log(key, JSON.stringify(out.src[key]), 'signals', sig.length, 'trades', out.trades.filter((x) => x.market === key).length);
   } catch (e) { out.errors[key] = String(e.message || e); console.log(key, out.errors[key]); }

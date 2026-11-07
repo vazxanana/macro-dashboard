@@ -6,7 +6,7 @@
 // Model (H1, both sides): a confirmed H1 swing low (3 bars each side, last 96 H1 bars) is swept; within 6 H1
 // candles a candle BODY closes above the most recent bearish FVG of the down-leg (the inversion) → buy at the
 // price when the tracker sees it; stop 2 ticks under the sweep low; target 3R (the 2R mark is recorded as a
-// second variant); out after 48 h. Sells mirror. One open trade per market.
+// second variant); out after 36 trading hours (36 closed H1 candles; skill §21). Sells mirror. One open trade per market.
 import fs from 'node:fs';
 import path from 'node:path';
 
@@ -17,7 +17,7 @@ export const MARKETS = {
   ym:  { sym: 'YM=F',  cnbc: ['@DJ.1', '@YM.1'],  label: 'Dow Jones',    short: 'YM',  tick: 1,    dec: 0 },
   rty: { sym: 'RTY=F', cnbc: ['@TFS.1', '@RTY.1'], label: 'Russell 2000', short: 'RTY', tick: 0.1, dec: 1 },
 };
-export const P = { piv: 3, look: 96, vmax: 6, rr: 3, trail: [2, 1.5], mark: 2, holdH: 48, maxAtr: 8, fresh: 3 * 3600 };
+export const P = { piv: 3, look: 96, vmax: 6, rr: 3, trail: [2, 1.5], mark: 2, holdH: 36, maxAtr: 8, fresh: 3 * 3600 };
 const UA = 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36';
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 const now = Math.floor(Date.now() / 1000);
@@ -100,13 +100,15 @@ export function signals(Hraw, D, side, tick) {
       let bias = null, pd = null, pdSweep = null;
       if (di >= 50) { const sma = Dm.slice(di - 49, di + 1).reduce((a, d) => a + d.close, 0) / 50; bias = Dm[di].close > sma;
         const R = Dm.slice(di - 19, di + 1), hi = Math.max(...R.map((d) => d.high)), lw = Math.min(...R.map((d) => d.low)); pd = +((e - lw) / (hi - lw)).toFixed(3); pdSweep = lo < Dm[di].low; }
+      // stop size vs the daily range: r0 / ATR14 of the closed daily candles (skill §20)
+      const atrD = di >= 14 ? Dm.slice(di - 13, di + 1).reduce((a, d) => a + (d.high - d.low), 0) / 14 : null, atrR = atrD ? +(r0 / atrD).toFixed(3) : null;
       const b = H[c], rg = b.high - b.low || 1e-9, body = Math.abs(b.close - b.open) / rg, cl = (b.close - b.low) / rg;
       const strength = Math.round(4 * Math.min(1, body / 0.7) * (cl >= 0.75 ? 1 : cl >= 0.5 ? 0.6 : 0.3)), speed = c - s <= 2 ? 3 : c - s <= 4 ? 2 : 1;
       const rrRoom = dol != null ? (dol - e) / r0 : null, rrPts = rrRoom == null ? 1 : rrRoom >= 3 ? 3 : rrRoom >= 2 ? 2 : 1;
       out.push({ side, t: Hraw[c].time, close: Hraw[c].time + 3600, sweepT: Hraw[s].time, swept: side * H[swept.at(-1)].low,
         fvg: [side * Math.min(top, bot), side * Math.max(top, bot)].sort((x, y) => x - y), entry: side * e, stop: side * stop, r0,
         ih: ih == null ? null : side * ih, dol: dol == null ? null : side * dol, valid: ih == null || b.high < ih,
-        feat: { bias: bias == null ? null : bias ? 'with' : 'against', pd, zone: pd == null ? null : pd < 0.5 ? (side > 0 ? 'discount' : 'premium') : (side > 0 ? 'premium' : 'discount'),
+        feat: { atrR, bias: bias == null ? null : bias ? 'with' : 'against', pd, zone: pd == null ? null : pd < 0.5 ? (side > 0 ? 'discount' : 'premium') : (side > 0 ? 'premium' : 'discount'),
           pdSweep, speed: c - s, body: +body.toFixed(2), closeLoc: +cl.toFixed(2), session: session(etHour(Hraw[c].time + 3600)), etHour: etHour(Hraw[c].time + 3600) },
         grade: { strength, speed, rr: rrPts, total: strength + speed + rrPts } });
       lastExit = c + 6; break;
@@ -117,7 +119,16 @@ export function signals(Hraw, D, side, tick) {
 // The A-setup filter (6 Nov 2026 research, .claude/skills/ICT/SKILL.md §14): the signal goes AGAINST the daily bias (prior
 // close vs its 50-day average) and its candle-closure grade is at least 7/10 (B+). Every signal is still recorded; A-setups
 // carry aset: true and are never blocked by a weaker open signal on the same market.
-export const isASetup = (g) => !!g.feat && g.feat.bias === 'against' && g.grade && g.grade.total >= 7;
+// A-setup (skills §14 + §20): against the daily bias, grade >= 7, and a stop of at least 0.3x the daily ATR (tight stops on H1 sweeps get
+// hunted: on 2023-26 cash indices every year turned positive and the drawdown halved; confirmed on NQ futures 2023-25)
+export const RISK_FLOOR = 0.3;
+export const RISK_CAP = 0.75; // skill §22: stops wider than 0.75x the daily ATR are not A-setups
+// skill §23: a signal on a jobs-report morning (first Friday of the month, before 10:00 New York) is news, not a liquidity run
+const ET_PARTS = new Intl.DateTimeFormat('en-US', { timeZone: 'America/New_York', weekday: 'short', day: 'numeric', hour: 'numeric', hourCycle: 'h23' });
+export const nfpMorning = (t) => { if (!t) return false; const p = Object.fromEntries(ET_PARTS.formatToParts(new Date(t * 1000)).map((x) => [x.type, x.value])); return p.weekday === 'Fri' && +p.day <= 7 && +p.hour < 10; };
+export const isASetup = (g) => !!g.feat && g.feat.bias === 'against' && g.grade && g.grade.total >= 7 && (g.feat.atrR == null || (g.feat.atrR >= RISK_FLOOR && g.feat.atrR < RISK_CAP)) && !nfpMorning(g.close ?? g.signalAt);
+// A+ tier (skill §17): an A-setup whose inversion candle body is >= 60% of its range and that does not fire in the NY afternoon (12-16 ET)
+export const isAPlus = (g) => isASetup(g) && g.feat.body >= 0.6 && g.feat.session !== 'NY PM';
 export const letter = (g) => (g >= 10 ? 'A+' : g >= 9 ? 'A' : g >= 8 ? 'A-' : g >= 7 ? 'B+' : g >= 6 ? 'B' : g >= 5 ? 'B-' : g >= 3 ? 'C' : 'F');
 
 async function main() {
@@ -140,7 +151,8 @@ async function main() {
           if (tr.trail && tr.mfe >= tr.trail[0]) { const ns = f(tr.entry + s * (tr.mfe - tr.trail[1]) * tr.r0); if ((ns - tr.stop) * s > 0) { tr.stop = ns; tr.trailMoved = true; } }   // trail from +2R, 1.5R behind the best
           tr.checked = b.time + 300;
         }
-        if (tr.status === 'open' && now - tr.opened > P.holdH * 3600) { const R = +((s * (price - tr.entry)) / tr.r0).toFixed(2);
+        // time exit after P.holdH closed H1 candles since the signal (trading hours, not clock hours: weekends don't count)
+        if (tr.status === 'open' && H.filter((b) => b.time >= (tr.signalAt || tr.opened)).length >= P.holdH) { const R = +((s * (price - tr.entry)) / tr.r0).toFixed(2);
           Object.assign(tr, { status: R > 0 ? 'win' : R < 0 ? 'loss' : 'be', R, exitPx: f(price), closed: now, exit: 'time' }); }
         if (tr.closed) tr.R2 = tr.mark2 && (!tr.closed || tr.mark2 <= tr.closed) ? 2 : tr.R;   // the 2R-target variant
       }
@@ -156,7 +168,7 @@ async function main() {
         trades.push({ id, market: key, label: M.label, short: M.short, side: s > 0 ? 'buy' : 'sell', model: 'H1 iFVG reversal', signalAt: g.close, signalPx: f(g.entry),
           entry, stop: f(g.stop), r0: +r0.toFixed(M.dec + 1), t1: null, trail: P.trail, stop0: f(g.stop), t2: f(entry + s * P.mark * r0), opened: now, checked: now, status: 'open', R: null,
           sweep: { t: g.sweepT, level: f(g.swept) }, fvg: g.fvg.map(f), ih: g.ih == null ? null : f(g.ih), dol: g.dol == null ? null : f(g.dol), valid: g.valid,
-          feat: g.feat, grade: { ...g.grade, letter: letter(g.grade.total) }, aset });
+          feat: g.feat, grade: { ...g.grade, letter: letter(g.grade.total) }, aset, aplus: isAPlus(g) });
       }
       // 3. snapshot + candles for the page
       const last = sig.at(-1), dd = D.at(-1);

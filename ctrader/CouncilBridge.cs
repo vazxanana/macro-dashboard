@@ -27,6 +27,7 @@ namespace cAlgo.Robots
         [Parameter("XRP symbol (empty = off)", DefaultValue = "")] public string SymXRP { get; set; }
 
         [Parameter("Risk % gold replica", DefaultValue = 0.25)] public double RiskGold { get; set; }
+        [Parameter("Risk % gold trend", DefaultValue = 0.5)] public double RiskGoldTrend { get; set; }   // 7 Nov: 2x the other gold legs, as the sizing guide; 2023-26 more return at the same drawdown
         [Parameter("Risk % Mosha BO", DefaultValue = 0.25)] public double RiskMosha { get; set; }
         [Parameter("Risk % crypto trend", DefaultValue = 0.25)] public double RiskCrypto { get; set; }
         [Parameter("Risk % NQ open run", DefaultValue = 0.25)] public double RiskNQ { get; set; }
@@ -147,8 +148,8 @@ namespace cAlgo.Robots
 
         // ---------- mirroring ----------
         private string SymFor(string m) { switch (m) { case "xau": return SymGold; case "nq": return SymNQ; case "btc": return SymBTC; case "eth": return SymETH; case "sol": return SymSOL; case "xrp": return SymXRP; } return ""; }
-        private double RiskFor(string k) { switch (k) { case "replica": case "gtrend": case "gtl": case "geg": return RiskGold; case "mosha-bo": return RiskMosha; case "trend": return RiskCrypto; case "nq-open": return RiskNQ; } return 0; }
-        private bool EnabledFor(string k) { switch (k) { case "replica": case "gtrend": case "gtl": case "geg": return MirrorGold; case "mosha-bo": return MirrorMosha; case "trend": return MirrorCrypto; case "nq-open": return MirrorNQ; } return false; }
+        private double RiskFor(string k) { switch (k) { case "gtrend": return RiskGoldTrend; case "replica": case "gtrend5": case "gtl": case "geg": return RiskGold; case "mosha-bo": return RiskMosha; case "trend": return RiskCrypto; case "nq-open": return RiskNQ; } return 0; }
+        private bool EnabledFor(string k) { switch (k) { case "replica": case "gtrend": case "gtrend5": case "gtl": case "geg": return MirrorGold; case "mosha-bo": return MirrorMosha; case "trend": return MirrorCrypto; case "nq-open": return MirrorNQ; } return false; }
         private static bool IsClosed(string st) { return st == "win" || st == "loss" || st == "be" || st == "expired" || st == "missed" || st == "skipped" || st == "cancelled"; }
         private Position PosFor(string id) { foreach (var p in Positions) if (p.Label == LabelPrefix + id) return p; return null; }
         private PendingOrder OrdFor(string id) { foreach (var o in PendingOrders) if (o.Label == LabelPrefix + id) return o; return null; }

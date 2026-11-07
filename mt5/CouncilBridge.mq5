@@ -25,6 +25,7 @@ input string  InpSymSOL     = "";
 input string  InpSymXRP     = "";
 // risk (% of equity per first unit; an add uses the same lots as its first trade)
 input double  InpRiskGold   = 0.25;
+input double  InpRiskGoldTrend = 0.5;  // 7 Nov: gold trend at 2x the other gold legs, as the sizing guide (2023-26: more return, same drawdown)
 input double  InpRiskMosha  = 0.25;
 input double  InpRiskCrypto = 0.25;
 input double  InpRiskNQ     = 0.25;
@@ -62,14 +63,15 @@ string symFor(string market) {
   return "";
 }
 double riskFor(string k) {
-  if (k == "replica" || k == "gtrend" || k == "gtl" || k == "geg") return InpRiskGold;
+  if (k == "gtrend") return InpRiskGoldTrend;
+  if (k == "replica" || k == "gtrend5" || k == "gtl" || k == "geg") return InpRiskGold;
   if (k == "mosha-bo") return InpRiskMosha;
   if (k == "trend") return InpRiskCrypto;
   if (k == "nq-open") return InpRiskNQ;
   return 0;
 }
 bool enabledFor(string k) {
-  if (k == "replica" || k == "gtrend" || k == "gtl" || k == "geg") return InpMirrorGold;
+  if (k == "replica" || k == "gtrend" || k == "gtrend5" || k == "gtl" || k == "geg") return InpMirrorGold;
   if (k == "mosha-bo") return InpMirrorMosha;
   if (k == "trend") return InpMirrorCrypto;
   if (k == "nq-open") return InpMirrorNQ;

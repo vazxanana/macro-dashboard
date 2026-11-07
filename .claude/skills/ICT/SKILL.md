@@ -140,3 +140,97 @@ The indices move together: in the 2026 replay 154 A-setups fell into 120 cluster
 - Tested and rejected the same day: a limit entry on a pullback toward the stop (0.25-0.5R, 3-12 h) — mixed on all signals,
   worse on A-setups; session filters for A-setups — no pattern holds in all four sets (Asia positive but small samples).
 - Desk: "One per cluster" view (A-setups, ★ pick of n); clusters are computed on the page.
+
+## 17. A+ tier: strong displacement, not the NY afternoon (6 Nov 2026)
+Second-filter search inside A-setups (trailing exit, cost included), 20 features, kept only those better in ALL four sets
+(NQ 2023 / 2024 / 2025, every signal independent; 2026 replay of four indices):
+- body of the inversion candle >= 70% of its range: 4/4; not in NY PM (12-16 ET): 4/4; everything else (sweep of the
+  previous day, depth in the range, validity, speed, room, grade >= 8, side, DOL) at most 3/4.
+- Body threshold plateau 0.6-0.7 (0.8 too strict). **A+ = A-setup + body >= 0.6 + not NY PM**: total R
+  NQ23 +17.1 (A +9.5), NQ24 +12.2 (+9.6), NQ25 +3.1 (+0.6), 2026 +66.1 (+67.3, fewer trades); worst drawdown lower in all
+  four (10.4 / 8.0 / 8.6 / 9.5 vs 11.4 / 14.0 / 11.9 / 12.9). R a trade +0.37 / +0.24 / +0.08 / +0.62.
+- Fits ICT: displacement (a strong body) shows intent; the afternoon session is the low-quality part of the NY day.
+- About 20 features were tried, so expect some shrinkage live. Tracker/replay: `isAPlus`, records carry `aplus`;
+  desk filter "A+" (A-setups stay the default until the forward sample confirms).
+
+## 18. Cross-check with the MMXM skill (owner's skill collection, 6 Nov 2026)
+The `mmxm-market-maker-model` skill (ICT Market Maker Model) is the closest relative of this edge. Its rules, tested here on
+the H1 iFVG model (NQ 2023-25, every signal independent, trailing exit):
+- **Kill zones** ("outside the kill zones the probabilities reduce drastically"): agrees with §17 — NY PM signals are the
+  weak ones; the A+ tier already drops them.
+- **Midnight-open filter** (buy below the 00:00 NY open, sell above): does NOT help this model. A-setups on the "wrong"
+  side did better in 2023 (+0.34R vs −0.06R) and 2025 (+0.17R vs −0.31R), equal in 2024; same for all signals. That rule
+  belongs to MMXM's intraday M5/M1 models, not to an H1 reversal; not adopted.
+- Still to test: previous-day high/low as the target (MMXM: the easiest daily target, ~90% of days), the Day-4 model, and
+  the NY 08:00-12:00 window with a 09:00-10:30 reversal sweet spot for an M5 version of the desk.
+
+## 19. Reality check: S&P 500 and Dow 2023-26 (6 Nov 2026) — the edge is NOT proven
+Dukascopy cash-index CFDs (USATECHIDXUSD, USA500IDXUSD, USA30IDXUSD) 1m → 5m → H1, Jan 2023 - Nov 2026, the tracker's
+own signals(), every signal independent, CFD costs NQ 1 / ES 0.5 / YM 2.5 points, R a signal:
+| | 2023 | 2024 | 2025 | 2026 |
+|---|---|---|---|---|
+| NQ A+ trail | +0.51 | +0.27 | −0.04 | 0.00 |
+| ES A+ trail | −0.13 | +0.08 | −0.43 | −0.07 |
+| YM A+ trail | +0.41 | +0.18 | −0.03 | −0.13 |
+| 3 indices A+ trail (sum) | +23.5R | +22.2R | −23.3R | −6.8R |
+| 3 indices A trail (sum) | +2.2R | +27.2R | −23.6R | −2.2R |
+| 3 indices all signals trail | +36.4R | +70.8R | −19.0R | −71.1R |
+- Futures (CNBC 2026, owner's NQ file 2023-25) and cash CFDs give DIFFERENT H1 signals: only ~40% of signal times match
+  in Apr-Nov 2026, and 2026 A-setups were +0.49R (NQ futures) vs +0.09R (NQ cash), +0.14R vs −0.24R (YM). The model is
+  sensitive to the data feed; the tracker trades futures, so futures results matter most, but our futures history is short.
+- Honest summary: positive in 2023-24, flat to negative in 2025, feed-dependent in 2026. The A / A+ filters and the trail
+  were chosen on data that now looks favourable; treat them as hypotheses. **Paper only; forward-test before any risk.**
+  S&P (ES) is the weakest index on cash data in every year but 2024.
+- Replay records from the January-February Dukascopy fill carry `cash: true`.
+
+## 20. Stop floor: stop >= 0.3x the daily ATR (7 Nov 2026) — now part of the A-setup
+Walk-forward on NQ, S&P 500 and Dow cash 2023-26 (chosen on 2023-24, judged on 2025-26), every signal independent,
+trailing exit, CFD costs. New regime features: daily efficiency ratio, volatility percentile, stretch from the 20-day mean,
+weekday, and the stop as a share of the daily ATR (`feat.atrR` = r0 / ATR14 of closed daily candles).
+- Most in-sample winners failed out of sample again (e.g. trend days + Asia: +0.62R → −0.20R).
+- The one theme that held: **tight stops lose**. Hourly sweeps with a stop under ~0.3 daily ATR get hunted by noise.
+- A-setups, 3 indices: all → 2023 −1.0R, 2024 +27.2R, 2025 −23.6R, 2026 −2.2R (worst DD 33 / 46);
+  **with stop >= 0.3 ATR → +20.4R, +25.9R, +1.3R, +16.8R (DD 12 / 16)**; about 45% of A-setups remain (~90 a year).
+  Thresholds 0.2-0.4 all positive in both halves; >= 0.5 loses again (a band, not "the wider the better").
+- NQ futures 2023-25 (independent data): A → +9.5 / +9.6 / +0.6R (DD 11.4 / 14.0 / 11.9); A + floor →
+  +11.1 / +13.8 / +8.3R (DD 7.5 / 6.5 / 9.2): more profit and less drawdown in every year.
+- A+ adds little once the floor is in (cash: +25.6 / +20.3 / −3.8 / +14.1 vs A +20.4 / +25.9 / +1.3 / +16.8); kept as a tier.
+- Code: `feat.atrR`, `RISK_FLOOR = 0.3` and `isASetup()` in ict/tracker.mjs (the replay re-runs on tracker changes).
+
+## 21. Exits and portfolio controls re-checked with the stop floor (7 Nov 2026)
+On A-setups with the stop floor (§20), cash NQ/ES/YM 2023-24 | 2025-26 and NQ futures 2023 / 2024 / 2025:
+- **Time exit 36 trading hours (36 closed H1 candles) instead of 48** — cash +37.0R dd 10.1 | +36.0R dd 11.7 (48 h:
+  +46.3R dd 12.3 | +18.0R dd 16.3); NQ futures +10.9 / +13.9 / +9.8R, dd 4.2 / 5.6 / 6.5 (48 h: +11.1 / +13.8 / +8.3R,
+  dd 7.5 / 6.5 / 9.2). Plateau 30-40 h; 60-72 h collapses in 2025-26. Total profit up, drawdown down in every set; only
+  2023-24 cash profit is lower, so it would NOT pass the council's strict both-halves rule (ICT is a separate edge).
+  The live tracker and the replay now count the hold in closed H1 candles (weekends don't count), as in the research.
+- Fixed 2R / 3R / 4R targets: less profit than the trail in 2023-24 and no better in 2025-26 (4R: dd 31). The trail stays.
+- Portfolio controls did not help: one bet per cluster (2025-26 return/DD 0.4 vs 1.1 for every trade), 1R split across a
+  cluster 0.8, daily loss caps 1-3R no change, half size after 3 losses 0.2. Take every A-setup at the same 1R.
+- External evidence (deep research report "ICT and gold system improvements"): stops placed just beyond swept levels sit
+  in stop-cascade zones (Osler); intraday momentum into the close argues against afternoon reversals; no peer-reviewed
+  test of FVG / iFVG / kill zones exists.
+
+## 22. Stop band: 0.3x to 0.75x the daily ATR (7 Nov 2026) — now part of the A-setup
+- Idea from the deep-research report (volatility-scaled stops): a stop far wider than the day's range is a late, stretched entry.
+- Test, A-setups (against bias + grade >= 7), trail from +2R, 36 H1 hold, costs in:
+  - Cash NQ+ES+YM 2023-24 | 2025-26: floor 0.3 only +37.0R dd 10.1 | +36.0R dd 11.7; band 0.3-0.75 +37.7R dd 7.6 | +48.6R dd 10.8 (more R, less drawdown in both halves). Band 0.3-0.5 has the best R per trade but fewer trades and less total R in 2025-26.
+  - NQ futures 2023 / 2024 / 2025: drawdown 5.0 / 5.4 / 3.0 vs 6.3 / 7.5 / 6.1; R +8.9 / +13.1 / +20.1 vs +9.6 / +9.9 / +13.7.
+- Rejected: widening stops under 0.3 ATR to 0.3 ATR instead of skipping (-1.6R | +4.0R, dd 41): tight-stop signals are bad trades, not just noise-stopped ones.
+- Code: `RISK_CAP = 0.75` in `isASetup()` (ict/tracker.mjs).
+
+## 23. News days (7 Nov 2026): skip jobs-report mornings, keep FOMC days
+- A-setups with the §22 band, 2023-24 | 2025-26 cash NQ+ES+YM: live +37.7R dd 7.6 | +48.6R dd 10.8.
+- Skip signals on the first Friday of the month before 10:00 ET (the 08:30 jobs report): +41.8R dd 6.9 | +51.7R dd 10.8. NQ futures 2023 / 2024 / 2025: +9.9 / +15.2 / +21.1R vs +8.9 / +13.1 / +20.1R; all 4 such futures signals lost. Small sample (about 3 signals a year) but the logic fits: a sweep made by the release candle is news, not a liquidity run. Adopted (`nfpMorning` in `isASetup`).
+- FOMC days are NOT skipped: skipping them costs 20R in 2023-24 (6 signals, +20.4R); skipping only shorts, only before 14:00 ET, or the day before also fails.
+- First Friday of the month is a proxy for the jobs report (it can move to the second Friday); the proxy is what was tested.
+
+## 24. Why the 2026 desk replay looks worse (7 Nov 2026) — rules unchanged
+- 2026 futures replay (CNBC, Jan–Nov): all signals +51.2R (406) but A-setups only +12.8R (93), dd 13.4. Owner: "ICT results only look worse".
+- The gap is the tight-stop slice (stop < 0.3x daily ATR, against bias): +64R on the 2026 futures replay, from about 10 outliers (top 10 = +53R).
+  The same slice loses everywhere else: cash 2023-24 −37.4R, cash 2025-26 −56.5R, NQ futures 2023-25 −8.1R, and cash over the very same 2026 months −18.6R.
+  It is feed- and luck-dependent, so the §20 floor stays.
+- A-setups are the only filter positive in all four datasets (cash 23-24 +37.7 dd 7.6 | cash 25-26 +48.6 dd 10.8 | NQ fut +42.1 dd 5.4 | 2026 replay +11.8 dd 14.0 after costs).
+  A+ is also positive in all four (+37.6 dd 5.7 | +28.8 dd 9.0 | +26.9 dd 7.2 | +20.7 dd 7.7) and is the steadier view for 2026, but it is not better in every set.
+- Exits: 2026 prefers quicker exits (trail from +1.5R by 1R: +18.5R dd 9.5; 24 h: +21.0 dd 7.2). Both lose profit on 2025-26 cash and NQ futures. Unchanged.
+- Read: 2026 is the edge's weakest stretch (≈ +0.1R a signal), not a broken rule. Judge it on the forward A+ count (§19), not on the replay's all-signals line.
