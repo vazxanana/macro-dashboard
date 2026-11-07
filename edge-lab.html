@@ -407,6 +407,12 @@
       '<div class="yr" aria-hidden="true"><span>' + esc(years[0].year) + '</span>' + (n > 1 ? '<span>' + esc(years[n - 1].year) + '</span>' : '') + '</div>';
   }
 
+  function baselines(bl) {
+    if (!bl || typeof bl !== 'object') return [];
+    if (bl.is || bl.oos) return [['', bl]];
+    return Object.keys(bl).filter(function (k) { var v = bl[k]; return v && typeof v === 'object' && (v.is || v.oos); }).map(function (k) { return [k, bl[k]]; });
+  }
+
   function ioCell(st, label) {
     var is = st && st.is, oos = st && st.oos;
     return '<span class="lbl">' + label + '</span><span class="io"><span class="is" title="In sample">' + fmtR(is && is.exp) + '</span><span class="arr" aria-label="to">→</span><span class="oos" title="Out of sample">' + fmtR(oos && oos.exp) + '</span></span>';
@@ -429,7 +435,15 @@
         '<div class="waiting">result.json could not be parsed</div>' +
         '<div class="c-rep"><button class="linkbtn" type="button" data-rep="' + esc(topic) + '">Report</button></div></article>';
     }
-    var d = rec.data, a = analyse(d), b = a.best, base = d.baseline || {};
+    var d = rec.data, a = analyse(d), b = a.best;
+    // baseline is either {is, oos} or several named baselines ({A: {is, oos}, ALL: {is, oos}}): compare with the one the best rule names
+    var baseSet = baselines(d.baseline), base = {}, baseKey = '';
+    if (baseSet.length === 1) { base = baseSet[0][1]; baseKey = baseSet[0][0]; }
+    else if (baseSet.length) {
+      var pick = b && b.rule && baseSet.filter(function (e) { return e[0] && new RegExp('^' + e[0].replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '[-:\\s]', 'i').test(b.rule); })[0];
+      pick = pick || baseSet.filter(function (e) { return /^all$/i.test(e[0]); })[0] || baseSet[0];
+      base = pick[1]; baseKey = pick[0];
+    }
     var sys = d.system ? esc(d.system) : '';
     var tried = num(d.variantsTried);
     var meta = [sys, isFinite(tried) ? fmtN(tried) + ' variants tried' : (a.cands.length ? a.cands.length + ' candidates' : '')].filter(Boolean).join(' · ');
@@ -448,7 +462,7 @@
         '<td><span class="v ' + (vv === 'pass' ? 'up' : vv === 'fail' ? 'down' : '') + '">' + esc(String(c.verdict || '–').toUpperCase()) + '</span></td>' +
         '<td>' + fmtR(is.exp) + '</td><td>' + fmtN(is.n) + '</td><td>' + fmtR(oos.exp) + '</td><td>' + fmtN(oos.n) + '</td><td>' + fmtWR(oos.wr) + '</td><td>' + fmtDD(oos.maxDD) + '</td><td>' + fmtT(oos.t) + '</td></tr>';
     }).join('');
-    var baseRow = '<tr><td><em>Baseline</em></td><td>–</td><td>' + fmtR(base.is && base.is.exp) + '</td><td>' + fmtN(base.is && base.is.n) + '</td><td>' + fmtR(base.oos && base.oos.exp) + '</td><td>' + fmtN(base.oos && base.oos.n) + '</td><td>' + fmtWR(base.oos && base.oos.wr) + '</td><td>' + fmtDD(base.oos && base.oos.maxDD) + '</td><td>' + fmtT(base.oos && base.oos.t) + '</td></tr>';
+    var baseRow = (baseSet.length ? baseSet : [['', {}]]).map(function (e) { var bs = e[1]; return '<tr><td><em>Baseline' + (e[0] ? ' ' + esc(e[0]) : '') + '</em></td><td>–</td><td>' + fmtR(bs.is && bs.is.exp) + '</td><td>' + fmtN(bs.is && bs.is.n) + '</td><td>' + fmtR(bs.oos && bs.oos.exp) + '</td><td>' + fmtN(bs.oos && bs.oos.n) + '</td><td>' + fmtWR(bs.oos && bs.oos.wr) + '</td><td>' + fmtDD(bs.oos && bs.oos.maxDD) + '</td><td>' + fmtT(bs.oos && bs.oos.t) + '</td></tr>'; }).join('');
     var notes = d.notes ? (Array.isArray(d.notes) ? d.notes.join('\n') : typeof d.notes === 'string' ? d.notes : JSON.stringify(d.notes, null, 1)) : '';
     var more = '<details class="more"' + open + '><summary>' + CHEV + (a.cands.length ? 'All ' + a.cands.length + ' candidate' + (a.cands.length === 1 ? '' : 's') : 'Baseline detail') + (notes ? ' and notes' : '') + '</summary>' +
       '<div class="cand-wrap"><table class="cand"><thead><tr><th scope="col">Rule</th><th scope="col">Verdict</th><th scope="col">IS exp</th><th scope="col">IS n</th><th scope="col">OOS exp</th><th scope="col">OOS n</th><th scope="col">OOS WR</th><th scope="col">OOS max DD</th><th scope="col">OOS t</th></tr></thead><tbody>' + baseRow + candRows + '</tbody></table></div>' +
@@ -458,11 +472,11 @@
       '<div class="c-study"><h3>' + esc(name) + '</h3>' + (meta ? '<p class="meta" title="' + esc(meta.replace(/<[^>]+>/g, '')) + '">' + meta + '</p>' : '') +
       (b && b.rule ? '<p class="rule" title="' + esc(b.rule) + '"><em>Best:</em> ' + esc(b.rule) + '</p>' : '') + '</div>' +
       '<div class="c-verdict">' + BADGE[a.verdict] + '</div>' +
-      '<div class="c-base">' + ioCell(base, 'Baseline IS → OOS') + '</div>' +
+      '<div class="c-base">' + ioCell(base, 'Baseline IS → OOS') + (baseSet.length > 1 ? '<span class="sub">Baseline ' + esc(baseKey) + ' of ' + baseSet.length + '</span>' : '') + '</div>' +
       '<div class="c-best">' + (b ? ioCell(b, 'Best candidate IS → OOS') + deltaHTML : '<span class="lbl">Best candidate</span><span class="dash">–</span>' + deltaHTML) + '</div>' +
       '<div class="c-n"><span class="lbl">OOS n</span>' + fmtN(oosB.n) + nSub + '</div>' +
       '<div class="c-dd"><span class="lbl">OOS max DD</span>' + fmtDD(oosB.maxDD) + wrSub + '</div>' +
-      '<div class="c-years"><span class="lbl">OOS exp by year</span>' + sparkline(years) + '</div>' +
+      '<div class="c-years"><span class="lbl">Exp by year</span>' + sparkline(years) + '</div>' +
       '<div class="c-rep">' + (rec.report !== false ? '<button class="linkbtn" type="button" data-rep="' + esc(topic) + '">Report' + CHEV.replace('<svg', '<svg width="11" height="11"') + '</button>' : '<button class="linkbtn" type="button" disabled>No report</button>') + '</div>' +
       more + '</article>';
   }
@@ -495,7 +509,7 @@
       '<div class="seg" role="img" aria-label="' + segs.map(function (s) { return s[1] + ' ' + s[2].toLowerCase(); }).join(', ') + '">' + segs.map(function (s) { return '<i class="' + s[0] + '" style="flex-grow:' + s[1] + '"></i>'; }).join('') + '</div>' +
       '<ul class="legend">' + segs.map(function (s) { return '<li><i class="' + s[0] + '" style="background:var(' + ({ pass: '--buy', fail: '--sell', inc: '--ink-faint', run: '--line-strong' })[s[0]] + ')"></i>' + s[2] + ' <b>' + s[1] + '</b></li>'; }).join('') + '</ul>';
 
-    var cols = '<div class="cols" aria-hidden="true"><span>Study</span><span>Verdict</span><span>Baseline IS → OOS</span><span>Best candidate IS → OOS</span><span>OOS n</span><span>Max DD</span><span>OOS exp by year</span><span></span></div>';
+    var cols = '<div class="cols" aria-hidden="true"><span>Study</span><span>Verdict</span><span>Baseline IS → OOS</span><span>Best candidate IS → OOS</span><span>OOS n</span><span>Max DD</span><span>Exp by year</span><span></span></div>';
     var gi = 0;
     var html = [['meridian', 'Meridian', 'Desk systems, scalps and the gold book'], ['ict', 'ICT', 'The ICT desk: filters, exits and universe']].map(function (g) {
       var list = groups[g[0]]; if (!list.length) return '';

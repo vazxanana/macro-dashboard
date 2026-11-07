@@ -1,0 +1,1679 @@
+{
+ "topic": "portfolio",
+ "system": "MERIDIAN council live sleeve (Scalp against D1, not Asia, no AUD/USD + gold M30->M1 against D1; 150-day engine replay backtest-150d-m30.json, Jun-Nov 2026) and ICT desk A-setups (ict-filters driver on HistData NQ/ES/GC 2018-Oct 2026; CNBC replay Aug 2025-Nov 2026 as a second check)",
+ "baseline": {
+  "rule": "live caps: council 2 trades per market (never both sides), dollar cap 2, Scalp re-entry wait 3 h; ICT one open A-setup per market; fixed 1R per trade",
+  "council": {
+   "is": {
+    "n": 673,
+    "wr": 0.293,
+    "exp": -0.008,
+    "R": -3.5,
+    "maxDD": 53.4,
+    "t": -0.11,
+    "sharpe": -0.12,
+    "rdd": -0.07
+   },
+   "oos": {
+    "n": 339,
+    "wr": 0.319,
+    "exp": 0.094,
+    "R": 31.9,
+    "maxDD": 62.6,
+    "t": 0.81,
+    "sharpe": 1.56,
+    "rdd": 0.51
+   },
+   "split": "2026-09-14T14:09:40.000Z"
+  },
+  "ict": {
+   "is": {
+    "n": 910,
+    "wr": 0.378,
+    "exp": 0.091,
+    "R": 82.8,
+    "maxDD": 34.2,
+    "t": 1.76,
+    "sharpe": 0.67,
+    "rdd": 2.42
+   },
+   "oos": {
+    "n": 411,
+    "wr": 0.404,
+    "exp": 0.125,
+    "R": 51.3,
+    "maxDD": 16,
+    "t": 1.72,
+    "sharpe": 0.93,
+    "rdd": 3.21
+   },
+   "years": {
+    "2018": {
+     "n": 148,
+     "exp": -0.098,
+     "R": -14.4
+    },
+    "2019": {
+     "n": 155,
+     "exp": 0.133,
+     "R": 20.6
+    },
+    "2020": {
+     "n": 158,
+     "exp": 0.182,
+     "R": 28.7
+    },
+    "2021": {
+     "n": 154,
+     "exp": -0.046,
+     "R": -7.1
+    },
+    "2022": {
+     "n": 158,
+     "exp": 0.186,
+     "R": 29.4
+    },
+    "2023": {
+     "n": 137,
+     "exp": 0.187,
+     "R": 25.7
+    },
+    "2024": {
+     "n": 151,
+     "exp": 0.123,
+     "R": 18.6
+    },
+    "2025": {
+     "n": 138,
+     "exp": 0.147,
+     "R": 20.3
+    },
+    "2026": {
+     "n": 122,
+     "exp": 0.102,
+     "R": 12.4
+    }
+   }
+  },
+  "gross": {
+   "councilLiveCaps": {
+    "is": {
+     "n": 673,
+     "wr": 0.293,
+     "exp": 0.067,
+     "R": 45.2,
+     "maxDD": 32.8,
+     "streak": 14,
+     "t": 0.89
+    },
+    "oos": {
+     "n": 339,
+     "wr": 0.319,
+     "exp": 0.168,
+     "R": 56.8,
+     "maxDD": 45.3,
+     "streak": 13,
+     "t": 1.45
+    }
+   },
+   "ictA": {
+    "is": {
+     "n": 910,
+     "wr": 0.379,
+     "exp": 0.115,
+     "R": 104.8,
+     "maxDD": 29.2,
+     "streak": 16,
+     "t": 2.23
+    },
+    "oos": {
+     "n": 411,
+     "wr": 0.404,
+     "exp": 0.138,
+     "R": 56.8,
+     "maxDD": 15.8,
+     "streak": 9,
+     "t": 1.9
+    }
+   }
+  }
+ },
+ "candidates": [
+  {
+   "rule": "council caps chosen in-sample from 80 combinations: {\"pm\":99,\"usd\":1,\"re\":6} (pm = trades per market, usd = dollar cap, re = re-entry hours)",
+   "is": {
+    "n": 513,
+    "wr": 0.31,
+    "exp": 0.052,
+    "R": 29.2,
+    "maxDD": 34.6,
+    "t": 0.59,
+    "sharpe": 1.18,
+    "rdd": 0.85
+   },
+   "oos": {
+    "n": 256,
+    "wr": 0.32,
+    "exp": 0.093,
+    "R": 23.9,
+    "maxDD": 32.8,
+    "t": 0.7,
+    "sharpe": 1.56,
+    "rdd": 0.73
+   },
+   "years": null,
+   "verdict": "FAIL: same OOS daily Sharpe as the live caps (1.56 vs 1.56), less R (+23.9 vs +31.9), lower DD (32.8 vs 62.6). Not a clear improvement; 80 variants on 150 days."
+  },
+  {
+   "rule": "council one knob at a time around live (usd)",
+   "is": null,
+   "oos": null,
+   "grid": [
+    {
+     "cap": {
+      "pm": 2,
+      "usd": 1,
+      "re": 3
+     },
+     "is": {
+      "n": 544,
+      "wr": 0.292,
+      "exp": -0.021,
+      "R": -7.7,
+      "maxDD": 38,
+      "t": -0.25,
+      "sharpe": -0.33,
+      "rdd": -0.2
+     },
+     "oos": {
+      "n": 267,
+      "wr": 0.311,
+      "exp": 0.057,
+      "R": 15.2,
+      "maxDD": 41.8,
+      "t": 0.44,
+      "sharpe": 0.97,
+      "rdd": 0.36
+     }
+    },
+    {
+     "cap": {
+      "pm": 2,
+      "usd": 2,
+      "re": 3
+     },
+     "is": {
+      "n": 673,
+      "wr": 0.293,
+      "exp": -0.008,
+      "R": -3.5,
+      "maxDD": 53.4,
+      "t": -0.11,
+      "sharpe": -0.12,
+      "rdd": -0.07
+     },
+     "oos": {
+      "n": 339,
+      "wr": 0.319,
+      "exp": 0.094,
+      "R": 31.9,
+      "maxDD": 62.6,
+      "t": 0.81,
+      "sharpe": 1.56,
+      "rdd": 0.51
+     }
+    },
+    {
+     "cap": {
+      "pm": 2,
+      "usd": 3,
+      "re": 3
+     },
+     "is": {
+      "n": 706,
+      "wr": 0.289,
+      "exp": -0.017,
+      "R": -7,
+      "maxDD": 49.7,
+      "t": -0.23,
+      "sharpe": -0.24,
+      "rdd": -0.14
+     },
+     "oos": {
+      "n": 364,
+      "wr": 0.313,
+      "exp": 0.074,
+      "R": 27,
+      "maxDD": 62.1,
+      "t": 0.67,
+      "sharpe": 1.29,
+      "rdd": 0.44
+     }
+    },
+    {
+     "cap": {
+      "pm": 2,
+      "usd": 4,
+      "re": 3
+     },
+     "is": {
+      "n": 718,
+      "wr": 0.288,
+      "exp": -0.016,
+      "R": -6.5,
+      "maxDD": 49.6,
+      "t": -0.22,
+      "sharpe": -0.21,
+      "rdd": -0.13
+     },
+     "oos": {
+      "n": 370,
+      "wr": 0.314,
+      "exp": 0.071,
+      "R": 26.1,
+      "maxDD": 63.2,
+      "t": 0.65,
+      "sharpe": 1.26,
+      "rdd": 0.41
+     }
+    },
+    {
+     "cap": {
+      "pm": 2,
+      "usd": 99,
+      "re": 3
+     },
+     "is": {
+      "n": 719,
+      "wr": 0.288,
+      "exp": -0.018,
+      "R": -7.6,
+      "maxDD": 50.7,
+      "t": -0.24,
+      "sharpe": -0.24,
+      "rdd": -0.15
+     },
+     "oos": {
+      "n": 370,
+      "wr": 0.314,
+      "exp": 0.071,
+      "R": 26.2,
+      "maxDD": 63.2,
+      "t": 0.65,
+      "sharpe": 1.26,
+      "rdd": 0.41
+     }
+    }
+   ],
+   "verdict": "live dollar cap 2 is the best setting in-sample AND out-of-sample (keep)"
+  },
+  {
+   "rule": "council one knob at a time around live (pm)",
+   "is": null,
+   "oos": null,
+   "grid": [
+    {
+     "cap": {
+      "pm": 1,
+      "usd": 2,
+      "re": 3
+     },
+     "is": {
+      "n": 517,
+      "wr": 0.277,
+      "exp": -0.049,
+      "R": -22.5,
+      "maxDD": 41,
+      "t": -0.55,
+      "sharpe": -0.93,
+      "rdd": -0.55
+     },
+     "oos": {
+      "n": 272,
+      "wr": 0.294,
+      "exp": 0.049,
+      "R": 13.3,
+      "maxDD": 45.6,
+      "t": 0.37,
+      "sharpe": 0.91,
+      "rdd": 0.29
+     }
+    },
+    {
+     "cap": {
+      "pm": 2,
+      "usd": 2,
+      "re": 3
+     },
+     "is": {
+      "n": 673,
+      "wr": 0.293,
+      "exp": -0.008,
+      "R": -3.5,
+      "maxDD": 53.4,
+      "t": -0.11,
+      "sharpe": -0.12,
+      "rdd": -0.07
+     },
+     "oos": {
+      "n": 339,
+      "wr": 0.319,
+      "exp": 0.094,
+      "R": 31.9,
+      "maxDD": 62.6,
+      "t": 0.81,
+      "sharpe": 1.56,
+      "rdd": 0.51
+     }
+    },
+    {
+     "cap": {
+      "pm": 3,
+      "usd": 2,
+      "re": 3
+     },
+     "is": {
+      "n": 692,
+      "wr": 0.296,
+      "exp": 0.002,
+      "R": 3.6,
+      "maxDD": 53.9,
+      "t": 0.03,
+      "sharpe": 0.12,
+      "rdd": 0.07
+     },
+     "oos": {
+      "n": 349,
+      "wr": 0.318,
+      "exp": 0.09,
+      "R": 31.5,
+      "maxDD": 63.5,
+      "t": 0.8,
+      "sharpe": 1.57,
+      "rdd": 0.5
+     }
+    },
+    {
+     "cap": {
+      "pm": 99,
+      "usd": 2,
+      "re": 3
+     },
+     "is": {
+      "n": 696,
+      "wr": 0.3,
+      "exp": 0.019,
+      "R": 15.5,
+      "maxDD": 45.9,
+      "t": 0.26,
+      "sharpe": 0.51,
+      "rdd": 0.34
+     },
+     "oos": {
+      "n": 353,
+      "wr": 0.32,
+      "exp": 0.096,
+      "R": 33.8,
+      "maxDD": 63.3,
+      "t": 0.85,
+      "sharpe": 1.67,
+      "rdd": 0.53
+     }
+    }
+   ],
+   "verdict": "per-market cap 2 vs 3/unlimited: small gain in both halves (IS Sharpe -0.12 -> 0.51, OOS 1.56 -> 1.67) - within noise; keep 2"
+  },
+  {
+   "rule": "council one knob at a time around live (re)",
+   "is": null,
+   "oos": null,
+   "grid": [
+    {
+     "cap": {
+      "pm": 2,
+      "usd": 2,
+      "re": 0
+     },
+     "is": {
+      "n": 850,
+      "wr": 0.278,
+      "exp": -0.042,
+      "R": -32.1,
+      "maxDD": 82.7,
+      "t": -0.62,
+      "sharpe": -0.89,
+      "rdd": -0.39
+     },
+     "oos": {
+      "n": 420,
+      "wr": 0.312,
+      "exp": 0.073,
+      "R": 30.5,
+      "maxDD": 77.2,
+      "t": 0.7,
+      "sharpe": 1.31,
+      "rdd": 0.4
+     }
+    },
+    {
+     "cap": {
+      "pm": 2,
+      "usd": 2,
+      "re": 3
+     },
+     "is": {
+      "n": 673,
+      "wr": 0.293,
+      "exp": -0.008,
+      "R": -3.5,
+      "maxDD": 53.4,
+      "t": -0.11,
+      "sharpe": -0.12,
+      "rdd": -0.07
+     },
+     "oos": {
+      "n": 339,
+      "wr": 0.319,
+      "exp": 0.094,
+      "R": 31.9,
+      "maxDD": 62.6,
+      "t": 0.81,
+      "sharpe": 1.56,
+      "rdd": 0.51
+     }
+    },
+    {
+     "cap": {
+      "pm": 2,
+      "usd": 2,
+      "re": 6
+     },
+     "is": {
+      "n": 614,
+      "wr": 0.29,
+      "exp": -0.021,
+      "R": -11.7,
+      "maxDD": 67.1,
+      "t": -0.26,
+      "sharpe": -0.42,
+      "rdd": -0.17
+     },
+     "oos": {
+      "n": 313,
+      "wr": 0.316,
+      "exp": 0.113,
+      "R": 35.2,
+      "maxDD": 57.7,
+      "t": 0.91,
+      "sharpe": 1.72,
+      "rdd": 0.61
+     }
+    },
+    {
+     "cap": {
+      "pm": 2,
+      "usd": 2,
+      "re": 12
+     },
+     "is": {
+      "n": 556,
+      "wr": 0.277,
+      "exp": -0.093,
+      "R": -43.7,
+      "maxDD": 67.1,
+      "t": -1.25,
+      "sharpe": -1.87,
+      "rdd": -0.65
+     },
+     "oos": {
+      "n": 287,
+      "wr": 0.328,
+      "exp": 0.126,
+      "R": 36.3,
+      "maxDD": 48.8,
+      "t": 0.98,
+      "sharpe": 1.81,
+      "rdd": 0.74
+     }
+    }
+   ],
+   "verdict": "live 3 h re-entry wait is the in-sample best (keep); 0 h is worse in both halves"
+  },
+  {
+   "rule": "council uncapped (for reference)",
+   "is": {
+    "n": 1117,
+    "wr": 0.286,
+    "exp": -0.047,
+    "R": -49.2,
+    "maxDD": 133.2,
+    "t": -0.83,
+    "sharpe": -1.11,
+    "rdd": -0.37
+   },
+   "oos": {
+    "n": 581,
+    "wr": 0.32,
+    "exp": 0.049,
+    "R": 28.3,
+    "maxDD": 91.7,
+    "t": 0.59,
+    "sharpe": 1.03,
+    "rdd": 0.31
+   },
+   "verdict": "caps are worth keeping: uncapped is worse in both halves (OOS Sharpe 1.03 vs 1.56, DD 91.7 vs 62.6)"
+  },
+  {
+   "rule": "ICT caps chosen in-sample (2018-23): {\"pm\":2,\"idx\":1} (idx = same-direction open trades across the index futures)",
+   "is": {
+    "n": 853,
+    "wr": 0.382,
+    "exp": 0.098,
+    "R": 83.7,
+    "maxDD": 29.8,
+    "t": 1.85,
+    "sharpe": 0.74,
+    "rdd": 2.81
+   },
+   "oos": {
+    "n": 378,
+    "wr": 0.41,
+    "exp": 0.149,
+    "R": 56.5,
+    "maxDD": 12.6,
+    "t": 1.95,
+    "sharpe": 1.12,
+    "rdd": 4.47
+   },
+   "years": {
+    "2018": {
+     "n": 145,
+     "exp": -0.036,
+     "R": -5.2
+    },
+    "2019": {
+     "n": 146,
+     "exp": 0.144,
+     "R": 21
+    },
+    "2020": {
+     "n": 145,
+     "exp": 0.155,
+     "R": 22.4
+    },
+    "2021": {
+     "n": 151,
+     "exp": -0.026,
+     "R": -3.9
+    },
+    "2022": {
+     "n": 138,
+     "exp": 0.192,
+     "R": 26.5
+    },
+    "2023": {
+     "n": 128,
+     "exp": 0.179,
+     "R": 23
+    },
+    "2024": {
+     "n": 135,
+     "exp": 0.102,
+     "R": 13.8
+    },
+    "2025": {
+     "n": 132,
+     "exp": 0.211,
+     "R": 27.9
+    },
+    "2026": {
+     "n": 111,
+     "exp": 0.133,
+     "R": 14.8
+    }
+   },
+   "cnbcCheck": {
+    "pm1_idx99": {
+     "n": 239,
+     "wr": 0.385,
+     "exp": 0.265,
+     "R": 63.3,
+     "maxDD": 16.2,
+     "streak": 9,
+     "t": 2.19,
+     "days": 459,
+     "sharpe": 1.73,
+     "rdd": 3.9,
+     "longestUnderwaterDays": 97
+    },
+    "pm1_idx1": {
+     "n": 198,
+     "wr": 0.374,
+     "exp": 0.168,
+     "R": 33.3,
+     "maxDD": 12.3,
+     "streak": 8,
+     "t": 1.37,
+     "days": 459,
+     "sharpe": 1.14,
+     "rdd": 2.7,
+     "longestUnderwaterDays": 129
+    },
+    "pm1_idx2": {
+     "n": 235,
+     "wr": 0.383,
+     "exp": 0.225,
+     "R": 53,
+     "maxDD": 16.2,
+     "streak": 9,
+     "t": 1.9,
+     "days": 459,
+     "sharpe": 1.57,
+     "rdd": 3.26,
+     "longestUnderwaterDays": 97
+    },
+    "pm1_idx3": {
+     "n": 239,
+     "wr": 0.385,
+     "exp": 0.265,
+     "R": 63.3,
+     "maxDD": 16.2,
+     "streak": 9,
+     "t": 2.19,
+     "days": 459,
+     "sharpe": 1.73,
+     "rdd": 3.9,
+     "longestUnderwaterDays": 97
+    },
+    "pm2_idx1": {
+     "n": 198,
+     "wr": 0.374,
+     "exp": 0.168,
+     "R": 33.3,
+     "maxDD": 12.3,
+     "streak": 8,
+     "t": 1.37,
+     "days": 459,
+     "sharpe": 1.14,
+     "rdd": 2.7,
+     "longestUnderwaterDays": 129
+    }
+   },
+   "verdict": "INCONCLUSIVE: passes on HistData OOS 2024-26 (+0.149 vs +0.125 R/trade, DD 12.6 vs 16.0, 3/3 years positive) but FAILS on the desk CNBC replay with 4 indices (Sharpe 1.73 -> 1.14, R +63 -> +33). Not proposed."
+  },
+  {
+   "rule": "ICT sizing: fixed",
+   "is": {
+    "n": 910,
+    "wr": 0.378,
+    "exp": 0.091,
+    "R": 82.8,
+    "maxDD": 34.2,
+    "t": 1.76,
+    "sharpe": 0.67,
+    "rdd": 2.42
+   },
+   "oos": {
+    "n": 411,
+    "wr": 0.404,
+    "exp": 0.125,
+    "R": 51.3,
+    "maxDD": 16,
+    "t": 1.72,
+    "sharpe": 0.93,
+    "rdd": 3.21
+   },
+   "verdict": "baseline"
+  },
+  {
+   "rule": "ICT sizing: volScaled",
+   "is": {
+    "n": 910,
+    "wr": 0.378,
+    "exp": 0.087,
+    "R": 79.5,
+    "maxDD": 41.9,
+    "t": 1.69,
+    "sharpe": 0.65,
+    "rdd": 1.9
+   },
+   "oos": {
+    "n": 411,
+    "wr": 0.404,
+    "exp": 0.114,
+    "R": 46.9,
+    "maxDD": 16.5,
+    "t": 1.63,
+    "sharpe": 0.88,
+    "rdd": 2.84
+   },
+   "verdict": "no OOS improvement over fixed / sizeOf"
+  },
+  {
+   "rule": "ICT sizing: kellyIS",
+   "is": {
+    "n": 910,
+    "wr": 0.378,
+    "exp": 0.134,
+    "R": 122.1,
+    "maxDD": 37.2,
+    "t": 2.11,
+    "sharpe": 0.86,
+    "rdd": 3.28
+   },
+   "oos": {
+    "n": 411,
+    "wr": 0.404,
+    "exp": 0.138,
+    "R": 56.7,
+    "maxDD": 13.4,
+    "t": 1.6,
+    "sharpe": 0.92,
+    "rdd": 4.24
+   },
+   "verdict": "no OOS improvement over fixed / sizeOf"
+  },
+  {
+   "rule": "ICT sizing: kellyRolling",
+   "is": {
+    "n": 910,
+    "wr": 0.315,
+    "exp": 0.104,
+    "R": 94.5,
+    "maxDD": 33.7,
+    "t": 1.57,
+    "sharpe": 0.63,
+    "rdd": 2.81
+   },
+   "oos": {
+    "n": 411,
+    "wr": 0.404,
+    "exp": 0.123,
+    "R": 50.4,
+    "maxDD": 13.8,
+    "t": 1.53,
+    "sharpe": 0.88,
+    "rdd": 3.64
+   },
+   "verdict": "no OOS improvement over fixed / sizeOf"
+  },
+  {
+   "rule": "ICT sizing: kellyRollingFloor",
+   "is": {
+    "n": 910,
+    "wr": 0.378,
+    "exp": 0.107,
+    "R": 97.6,
+    "maxDD": 32.2,
+    "t": 1.69,
+    "sharpe": 0.68,
+    "rdd": 3.03
+   },
+   "oos": {
+    "n": 411,
+    "wr": 0.404,
+    "exp": 0.121,
+    "R": 49.7,
+    "maxDD": 13.2,
+    "t": 1.58,
+    "sharpe": 0.9,
+    "rdd": 3.77
+   },
+   "verdict": "no OOS improvement over fixed / sizeOf"
+  },
+  {
+   "rule": "ICT sizing: ictSizeOf",
+   "is": {
+    "n": 910,
+    "wr": 0.378,
+    "exp": 0.109,
+    "R": 99.5,
+    "maxDD": 38.5,
+    "t": 1.89,
+    "sharpe": 0.7,
+    "rdd": 2.58
+   },
+   "oos": {
+    "n": 411,
+    "wr": 0.404,
+    "exp": 0.179,
+    "R": 73.8,
+    "maxDD": 17.4,
+    "t": 2.11,
+    "sharpe": 1.16,
+    "rdd": 4.24
+   },
+   "verdict": "live sizeOf is the best scheme without look-ahead in-sample and OOS (keep)"
+  },
+  {
+   "rule": "council sizing: fixed",
+   "is": {
+    "n": 673,
+    "wr": 0.293,
+    "exp": -0.008,
+    "R": -3.5,
+    "maxDD": 53.4,
+    "t": -0.11,
+    "sharpe": -0.12,
+    "rdd": -0.07
+   },
+   "oos": {
+    "n": 339,
+    "wr": 0.319,
+    "exp": 0.094,
+    "R": 31.9,
+    "maxDD": 62.6,
+    "t": 0.81,
+    "sharpe": 1.56,
+    "rdd": 0.51
+   },
+   "verdict": "baseline"
+  },
+  {
+   "rule": "council sizing: volScaled",
+   "is": {
+    "n": 673,
+    "wr": 0.293,
+    "exp": -0.048,
+    "R": -31.7,
+    "maxDD": 62.6,
+    "t": -0.65,
+    "sharpe": -1.15,
+    "rdd": -0.51
+   },
+   "oos": {
+    "n": 339,
+    "wr": 0.319,
+    "exp": 0.081,
+    "R": 27.6,
+    "maxDD": 57.4,
+    "t": 0.76,
+    "sharpe": 1.54,
+    "rdd": 0.48
+   },
+   "verdict": "no improvement"
+  },
+  {
+   "rule": "council sizing: kellyIS",
+   "is": {
+    "n": 673,
+    "wr": 0.293,
+    "exp": -0.008,
+    "R": -3.5,
+    "maxDD": 53.4,
+    "t": -0.11,
+    "sharpe": -0.12,
+    "rdd": -0.07
+   },
+   "oos": {
+    "n": 339,
+    "wr": 0.319,
+    "exp": 0.094,
+    "R": 31.9,
+    "maxDD": 62.6,
+    "t": 0.81,
+    "sharpe": 1.56,
+    "rdd": 0.51
+   },
+   "verdict": "equals fixed: in-sample pooled Kelly <= 0, nothing to tilt"
+  },
+  {
+   "rule": "council sizing: kellyRolling",
+   "is": {
+    "n": 673,
+    "wr": 0.248,
+    "exp": 0.142,
+    "R": 96.7,
+    "maxDD": 27.1,
+    "t": 1.36,
+    "sharpe": 2.45,
+    "rdd": 3.56
+   },
+   "oos": {
+    "n": 339,
+    "wr": 0.286,
+    "exp": 0.157,
+    "R": 53.2,
+    "maxDD": 57.9,
+    "t": 1.39,
+    "sharpe": 2.21,
+    "rdd": 0.92
+   },
+   "verdict": "INCONCLUSIVE: best in-sample and OOS (OOS Sharpe 2.2 vs 1.56, +53 vs +32R) but only 51 OOS days, one year, and it is mostly a market tilt (gold up, FX/crypto down). Paper-track, do not adopt yet."
+  },
+  {
+   "rule": "council sizing: kellyRollingFloor",
+   "is": {
+    "n": 673,
+    "wr": 0.293,
+    "exp": 0.119,
+    "R": 81.1,
+    "maxDD": 29.8,
+    "t": 1.19,
+    "sharpe": 2.17,
+    "rdd": 2.72
+   },
+   "oos": {
+    "n": 339,
+    "wr": 0.319,
+    "exp": 0.148,
+    "R": 50,
+    "maxDD": 55.3,
+    "t": 1.37,
+    "sharpe": 2.16,
+    "rdd": 0.9
+   },
+   "verdict": "INCONCLUSIVE: best in-sample and OOS (OOS Sharpe 2.2 vs 1.56, +53 vs +32R) but only 51 OOS days, one year, and it is mostly a market tilt (gold up, FX/crypto down). Paper-track, do not adopt yet."
+  }
+ ],
+ "monteCarlo": {
+  "method": "10,000 paths, 5-day block bootstrap of calendar days, 365-day horizon; i.i.d. trade bootstrap for contrast",
+  "results": {
+   "ictOOS_fixed": {
+    "block": {
+     "paths": 10000,
+     "horizonDays": 365,
+     "block": 5,
+     "maxDD": {
+      "p50": 13,
+      "p90": 22.5,
+      "p95": 26.3,
+      "p99": 34.2
+     },
+     "pDD20": 0.1545,
+     "recoveryDays": {
+      "p50": 48,
+      "p90": 121,
+      "p95": 153,
+      "notRecoveredInYear": 0.429
+     },
+     "longestUnderwaterDays": {
+      "p50": 145,
+      "p95": 338
+     },
+     "yearR": {
+      "p5": -11.8,
+      "p50": 18,
+      "p95": 48.4
+     },
+     "pLosingYear": 0.157
+    },
+    "iid": {
+     "paths": 10000,
+     "tradesPerYear": 146,
+     "maxDD": {
+      "p50": 12.7,
+      "p95": 25,
+      "p99": 32.5
+     },
+     "pDD20": 0.1378
+    }
+   },
+   "ictAll_fixed": {
+    "block": {
+     "paths": 10000,
+     "horizonDays": 365,
+     "block": 5,
+     "maxDD": {
+      "p50": 14.7,
+      "p90": 25.6,
+      "p95": 29.9,
+      "p99": 38.5
+     },
+     "pDD20": 0.235,
+     "recoveryDays": {
+      "p50": 51,
+      "p90": 128,
+      "p95": 155,
+      "notRecoveredInYear": 0.473
+     },
+     "longestUnderwaterDays": {
+      "p50": 161,
+      "p95": 349
+     },
+     "yearR": {
+      "p5": -16.2,
+      "p50": 15.1,
+      "p95": 49
+     },
+     "pLosingYear": 0.221
+    },
+    "iid": {
+     "paths": 10000,
+     "tradesPerYear": 151,
+     "maxDD": {
+      "p50": 14.2,
+      "p95": 27.9,
+      "p99": 36.1
+     },
+     "pDD20": 0.2031
+    }
+   },
+   "ictOOS_ictSizeOf": {
+    "block": {
+     "paths": 10000,
+     "horizonDays": 365,
+     "block": 5,
+     "maxDD": {
+      "p50": 13.3,
+      "p90": 22.6,
+      "p95": 26.4,
+      "p99": 33.8
+     },
+     "pDD20": 0.1601,
+     "recoveryDays": {
+      "p50": 42,
+      "p90": 110,
+      "p95": 138,
+      "notRecoveredInYear": 0.372
+     },
+     "longestUnderwaterDays": {
+      "p50": 133,
+      "p95": 323
+     },
+     "yearR": {
+      "p5": -9,
+      "p50": 25.3,
+      "p95": 61.6
+     },
+     "pLosingYear": 0.106
+    }
+   },
+   "ictOOS_volScaled": {
+    "block": {
+     "paths": 10000,
+     "horizonDays": 365,
+     "block": 5,
+     "maxDD": {
+      "p50": 12.5,
+      "p90": 21.8,
+      "p95": 25.2,
+      "p99": 32.4
+     },
+     "pDD20": 0.1357,
+     "recoveryDays": {
+      "p50": 48,
+      "p90": 120,
+      "p95": 148,
+      "notRecoveredInYear": 0.435
+     },
+     "longestUnderwaterDays": {
+      "p50": 148,
+      "p95": 340
+     },
+     "yearR": {
+      "p5": -12,
+      "p50": 16.4,
+      "p95": 45.8
+     },
+     "pLosingYear": 0.167
+    }
+   },
+   "ictOOS_kellyRolling": {
+    "block": {
+     "paths": 10000,
+     "horizonDays": 365,
+     "block": 5,
+     "maxDD": {
+      "p50": 14.1,
+      "p90": 24.9,
+      "p95": 28.8,
+      "p99": 38.2
+     },
+     "pDD20": 0.2101,
+     "recoveryDays": {
+      "p50": 51,
+      "p90": 125,
+      "p95": 152,
+      "notRecoveredInYear": 0.454
+     },
+     "longestUnderwaterDays": {
+      "p50": 151,
+      "p95": 342
+     },
+     "yearR": {
+      "p5": -13.7,
+      "p50": 17.9,
+      "p95": 50
+     },
+     "pLosingYear": 0.182
+    }
+   },
+   "ictOOS_kellyRollingFloor": {
+    "block": {
+     "paths": 10000,
+     "horizonDays": 365,
+     "block": 5,
+     "maxDD": {
+      "p50": 13.4,
+      "p90": 23.5,
+      "p95": 27.3,
+      "p99": 36.1
+     },
+     "pDD20": 0.1765,
+     "recoveryDays": {
+      "p50": 51,
+      "p90": 124,
+      "p95": 153,
+      "notRecoveredInYear": 0.447
+     },
+     "longestUnderwaterDays": {
+      "p50": 149,
+      "p95": 341
+     },
+     "yearR": {
+      "p5": -12.5,
+      "p50": 17.6,
+      "p95": 48.4
+     },
+     "pLosingYear": 0.174
+    }
+   },
+   "council_liveCaps": {
+    "block": {
+     "paths": 10000,
+     "horizonDays": 365,
+     "block": 5,
+     "maxDD": {
+      "p50": 102.3,
+      "p90": 175,
+      "p95": 205.5,
+      "p99": 259
+     },
+     "pDD20": 1,
+     "recoveryDays": {
+      "p50": 51,
+      "p90": 131,
+      "p95": 160,
+      "notRecoveredInYear": 0.492
+     },
+     "longestUnderwaterDays": {
+      "p50": 166,
+      "p95": 353
+     },
+     "yearR": {
+      "p5": -116,
+      "p50": 87.6,
+      "p95": 294.9
+     },
+     "pLosingYear": 0.241
+    },
+    "iid": {
+     "paths": 10000,
+     "tradesPerYear": 2465,
+     "maxDD": {
+      "p50": 89.3,
+      "p95": 172.7,
+      "p99": 219.8
+     },
+     "pDD20": 1
+    }
+   },
+   "council_bestCaps": {
+    "block": {
+     "paths": 10000,
+     "horizonDays": 365,
+     "block": 5,
+     "maxDD": {
+      "p50": 66,
+      "p90": 108.5,
+      "p95": 126.1,
+      "p99": 164.3
+     },
+     "pDD20": 1,
+     "recoveryDays": {
+      "p50": 43,
+      "p90": 111,
+      "p95": 137,
+      "notRecoveredInYear": 0.346
+     },
+     "longestUnderwaterDays": {
+      "p50": 128,
+      "p95": 312
+     },
+     "yearR": {
+      "p5": -29.7,
+      "p50": 127.3,
+      "p95": 294.1
+     },
+     "pLosingYear": 0.093
+    }
+   },
+   "council_uncapped": {
+    "block": {
+     "paths": 10000,
+     "horizonDays": 365,
+     "block": 5,
+     "maxDD": {
+      "p50": 206.8,
+      "p90": 356.2,
+      "p95": 408.4,
+      "p99": 512.7
+     },
+     "pDD20": 1,
+     "recoveryDays": {
+      "p50": 69,
+      "p90": 149,
+      "p95": 172,
+      "notRecoveredInYear": 0.724
+     },
+     "longestUnderwaterDays": {
+      "p50": 245,
+      "p95": 365
+     },
+     "yearR": {
+      "p5": -323.3,
+      "p50": -25.3,
+      "p95": 277.4
+     },
+     "pLosingYear": 0.555
+    }
+   },
+   "combined_window": {
+    "days": 147,
+    "block": {
+     "paths": 10000,
+     "horizonDays": 365,
+     "block": 5,
+     "maxDD": {
+      "p50": 107.6,
+      "p90": 181.6,
+      "p95": 210.1,
+      "p99": 268.5
+     },
+     "pDD20": 1,
+     "recoveryDays": {
+      "p50": 53,
+      "p90": 130,
+      "p95": 159,
+      "notRecoveredInYear": 0.508
+     },
+     "longestUnderwaterDays": {
+      "p50": 170,
+      "p95": 355
+     },
+     "yearR": {
+      "p5": -119.9,
+      "p50": 84.7,
+      "p95": 295.9
+     },
+     "pLosingYear": 0.258
+    }
+   },
+   "combined_window_bestCaps": {
+    "days": 147,
+    "block": {
+     "paths": 10000,
+     "horizonDays": 365,
+     "block": 5,
+     "maxDD": {
+      "p50": 66.8,
+      "p90": 109.9,
+      "p95": 127.4,
+      "p99": 165.3
+     },
+     "pDD20": 1,
+     "recoveryDays": {
+      "p50": 41,
+      "p90": 106,
+      "p95": 134,
+      "notRecoveredInYear": 0.33
+     },
+     "longestUnderwaterDays": {
+      "p50": 122,
+      "p95": 302
+     },
+     "yearR": {
+      "p5": -19.2,
+      "p50": 144.5,
+      "p95": 317.9
+     },
+     "pLosingYear": 0.077
+    }
+   },
+   "ictOOS_bestCaps": {
+    "block": {
+     "paths": 10000,
+     "horizonDays": 365,
+     "block": 5,
+     "maxDD": {
+      "p50": 11.4,
+      "p90": 19.5,
+      "p95": 23,
+      "p99": 29.7
+     },
+     "pDD20": 0.09,
+     "recoveryDays": {
+      "p50": 46,
+      "p90": 116,
+      "p95": 146,
+      "notRecoveredInYear": 0.387
+     },
+     "longestUnderwaterDays": {
+      "p50": 136,
+      "p95": 325
+     },
+     "yearR": {
+      "p5": -8.4,
+      "p50": 19.6,
+      "p95": 48.5
+     },
+     "pLosingYear": 0.12
+    }
+   },
+   "ictAll_bestCaps": {
+    "block": {
+     "paths": 10000,
+     "horizonDays": 365,
+     "block": 5,
+     "maxDD": {
+      "p50": 13.1,
+      "p90": 22.9,
+      "p95": 26.6,
+      "p99": 34.7
+     },
+     "pDD20": 0.1637,
+     "recoveryDays": {
+      "p50": 48,
+      "p90": 122,
+      "p95": 148,
+      "notRecoveredInYear": 0.449
+     },
+     "longestUnderwaterDays": {
+      "p50": 152,
+      "p95": 345
+     },
+     "yearR": {
+      "p5": -13.5,
+      "p50": 16.1,
+      "p95": 47.1
+     },
+     "pLosingYear": 0.188
+    }
+   }
+  },
+  "combinedIndependent": [
+   {
+    "wCouncil": 0,
+    "maxDD": {
+     "p50": 11.5,
+     "p95": 22.4,
+     "p99": 29.4
+    },
+    "pDD20": 0.0909,
+    "yearR": {
+     "p5": -7.7,
+     "p50": 19.5
+    },
+    "pLosingYear": 0.121
+   },
+   {
+    "wCouncil": 0.05,
+    "maxDD": {
+     "p50": 12,
+     "p95": 23.3,
+     "p99": 30.1
+    },
+    "pDD20": 0.1034,
+    "yearR": {
+     "p5": -5.2,
+     "p50": 24
+    },
+    "pLosingYear": 0.087
+   },
+   {
+    "wCouncil": 0.1,
+    "maxDD": {
+     "p50": 14.2,
+     "p95": 27.6,
+     "p99": 36
+    },
+    "pDD20": 0.1936,
+    "yearR": {
+     "p5": -5.6,
+     "p50": 28.6
+    },
+    "pLosingYear": 0.085
+   },
+   {
+    "wCouncil": 0.15,
+    "maxDD": {
+     "p50": 17.5,
+     "p95": 33.8,
+     "p99": 43.9
+    },
+    "pDD20": 0.3596,
+    "yearR": {
+     "p5": -7.9,
+     "p50": 32.8
+    },
+    "pLosingYear": 0.096
+   },
+   {
+    "wCouncil": 0.25,
+    "maxDD": {
+     "p50": 25.5,
+     "p95": 49.7,
+     "p99": 63.7
+    },
+    "pDD20": 0.7549,
+    "yearR": {
+     "p5": -16.1,
+     "p50": 41.4
+    },
+    "pLosingYear": 0.12
+   }
+  ],
+  "riskPerTradeFor20pctP95DD": {
+   "ictOOS_fixed": {
+    "p95DD_R": 26.3,
+    "riskPerTradePct": 0.76
+   },
+   "ictAll_fixed": {
+    "p95DD_R": 29.9,
+    "riskPerTradePct": 0.669
+   },
+   "ictOOS_ictSizeOf": {
+    "p95DD_R": 26.4,
+    "riskPerTradePct": 0.758
+   },
+   "ictOOS_volScaled": {
+    "p95DD_R": 25.2,
+    "riskPerTradePct": 0.794
+   },
+   "ictOOS_kellyRolling": {
+    "p95DD_R": 28.8,
+    "riskPerTradePct": 0.694
+   },
+   "ictOOS_kellyRollingFloor": {
+    "p95DD_R": 27.3,
+    "riskPerTradePct": 0.733
+   },
+   "council_liveCaps": {
+    "p95DD_R": 205.5,
+    "riskPerTradePct": 0.097
+   },
+   "council_bestCaps": {
+    "p95DD_R": 126.1,
+    "riskPerTradePct": 0.159
+   },
+   "council_uncapped": {
+    "p95DD_R": 408.4,
+    "riskPerTradePct": 0.049
+   },
+   "combined_window": {
+    "p95DD_R": 210.1,
+    "riskPerTradePct": 0.095
+   },
+   "combined_window_bestCaps": {
+    "p95DD_R": 127.4,
+    "riskPerTradePct": 0.157
+   },
+   "ictOOS_bestCaps": {
+    "p95DD_R": 23,
+    "riskPerTradePct": 0.87
+   },
+   "ictAll_bestCaps": {
+    "p95DD_R": 26.6,
+    "riskPerTradePct": 0.752
+   }
+  },
+  "kellyFraction": {
+   "ictA_IS2018_23": {
+    "mu": 0.091,
+    "var": 2.433,
+    "fullKelly": 0.0374,
+    "quarterKelly": 0.0094
+   },
+   "ictA_OOS2024_26": {
+    "mu": 0.125,
+    "var": 2.175,
+    "fullKelly": 0.0574,
+    "quarterKelly": 0.0144
+   },
+   "councilLiveCaps_all": {
+    "mu": 0.026,
+    "var": 4.074,
+    "fullKelly": 0.0064,
+    "quarterKelly": 0.0016
+   }
+  }
+ },
+ "correlation": {
+  "window": [
+   "2026-06-06",
+   "2026-10-30"
+  ],
+  "systems": {
+   "councilScalpA": {
+    "councilScalpA": 1,
+    "councilGoldM30": 0.25,
+    "councilFX": 0.61,
+    "councilCrypto": 0.73,
+    "councilGoldScalp": 0.38,
+    "ictIndex": -0.08,
+    "ictGold": 0.04
+   },
+   "councilGoldM30": {
+    "councilScalpA": 0.25,
+    "councilGoldM30": 1,
+    "councilFX": 0.01,
+    "councilCrypto": -0.09,
+    "councilGoldScalp": 0.67,
+    "ictIndex": 0.04,
+    "ictGold": -0.2
+   },
+   "councilFX": {
+    "councilScalpA": 0.61,
+    "councilGoldM30": 0.01,
+    "councilFX": 1,
+    "councilCrypto": 0.15,
+    "councilGoldScalp": -0.03,
+    "ictIndex": -0.04,
+    "ictGold": 0.15
+   },
+   "councilCrypto": {
+    "councilScalpA": 0.73,
+    "councilGoldM30": -0.09,
+    "councilFX": 0.15,
+    "councilCrypto": 1,
+    "councilGoldScalp": -0.1,
+    "ictIndex": -0.06,
+    "ictGold": 0.05
+   },
+   "councilGoldScalp": {
+    "councilScalpA": 0.38,
+    "councilGoldM30": 0.67,
+    "councilFX": -0.03,
+    "councilCrypto": -0.1,
+    "councilGoldScalp": 1,
+    "ictIndex": -0.03,
+    "ictGold": -0.14
+   },
+   "ictIndex": {
+    "councilScalpA": -0.08,
+    "councilGoldM30": 0.04,
+    "councilFX": -0.04,
+    "councilCrypto": -0.06,
+    "councilGoldScalp": -0.03,
+    "ictIndex": 1,
+    "ictGold": 0.08
+   },
+   "ictGold": {
+    "councilScalpA": 0.04,
+    "councilGoldM30": -0.2,
+    "councilFX": 0.15,
+    "councilCrypto": 0.05,
+    "councilGoldScalp": -0.14,
+    "ictIndex": 0.08,
+    "ictGold": 1
+   }
+  },
+  "avgPairwise": {
+   "councilFxGold150d": 0,
+   "councilCrypto150d": 0.12,
+   "council30dAll": -0.03,
+   "ictIndexCnbc": 0.02
+  },
+  "ictLongRun": {
+   "nq": {
+    "nq": 1,
+    "es": 0.24,
+    "gc": 0
+   },
+   "es": {
+    "nq": 0.24,
+    "es": 1,
+    "gc": 0.03
+   },
+   "gc": {
+    "nq": 0,
+    "es": 0.03,
+    "gc": 1
+   }
+  },
+  "usdCluster": {
+   "councilSameDollar": {
+    "pairs": 552,
+    "corrR": 0,
+    "bothLose": 0.4,
+    "pLoseGivenOtherLoses": 0.74
+   },
+   "councilOppositeDollar": {
+    "pairs": 754,
+    "corrR": -0.05,
+    "bothLose": 0.34,
+    "pLoseGivenOtherLoses": 0.67
+   },
+   "baseLossRate": 0.7,
+   "openTogetherDepth": {
+    "0": 3,
+    "1": 217,
+    "2": 292,
+    "3": 166,
+    "4": 141,
+    "5": 65,
+    "6": 84
+   },
+   "ictSameDirectionIndex": {
+    "pairs": 166,
+    "corrR": 0.6,
+    "bothLose": 0.51,
+    "pLoseGivenOtherLoses": 0.86
+   },
+   "ictOppositeIndex": {
+    "pairs": 11,
+    "corrR": -0.22,
+    "bothLose": 0.09,
+    "pLoseGivenOtherLoses": 1
+   }
+  }
+ },
+ "variantsTried": 119,
+ "notes": [
+  "No candidate PASSES. Recommended: keep the live caps (dollar cap 2, 2 per market, 3 h re-entry) and ICT sizeOf; set risk per R by system so the 95th-percentile one-year drawdown is ~20% of equity: ICT ~0.75% per 1R, council sleeve ~0.1% per trade (or council R = 0.05 of an ICT R in one book).",
+  "Expected one-year max DD at 95%: ICT A-setups 26.3R (OOS days) / 29.9R (2018-26 days); council sleeve at 1R per trade 205R (it takes ~2,500 trades a year); ICT + council at 0.05x: 23.3R.",
+  "Council stream is 150 days of one regime, forex D1 labels from Kraken (the live trader uses OANDA labels since 7 Nov); the forex Scalp-against sleeve loses in this file in both halves while the 30-day OANDA-labelled backtest.json shows it positive.",
+  "Gold-systems (#merged) published stats only, no trade lists, so the gold replica / Mosha / gold trend books are not in the correlation or Monte Carlo."
+ ]
+}

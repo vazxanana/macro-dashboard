@@ -22,7 +22,7 @@ const REPO = 'vazxanana/macro-dashboard', BR = 'council-data';
 const JOBS = {
   council: { script: 'council/trader.mjs', arg: (d) => d, budget: 225e3, files: ['trades.json', 'state.json', 'config.json', 'coach.json', 'research.json', 'snapshot.json',
     'backtest.json', 'research/replay-2w.json', 'reviews/losses.json', 'ict/snapshot.json', 'mt5/signals.csv', 'analysis/latest.md'], writes: (f) => !f.startsWith('ict/') },
-  ict: { script: 'ict/tracker.mjs', arg: (d) => path.join(d, 'ict'), budget: 270e3, files: ['ict/trades.json', 'ict/bars.json', 'ict/snapshot.json'], writes: (f) => f.startsWith('ict/') },
+  ict: { script: 'ict/tracker.mjs', arg: (d) => path.join(d, 'ict'), budget: 270e3, files: ['ict/trades.json', 'ict/bars.json', 'ict/snapshot.json', 'ict/shadow.json'], writes: (f) => f.startsWith('ict/') },
 };
 const sha1 = (b) => crypto.createHash('sha1').update(b).digest('hex');
 const walk = (d, b = d) => fs.readdirSync(d, { withFileTypes: true }).flatMap((e) => e.isDirectory() ? walk(path.join(d, e.name), b) : [path.relative(b, path.join(d, e.name)).split(path.sep).join('/')]);

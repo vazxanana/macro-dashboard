@@ -6,7 +6,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import zlib from 'node:zlib';
-import { MARKETS, P, MIN_GRADE, cnbcBars, agg, signals, letter, isASetup, isAPlus, sizeOf } from './tracker.mjs';
+import { MARKETS, P, MIN_GRADE, cnbcBars, agg, signals, letter, isASetup, isAPlus, sizeOf, SHADOW, isDip } from './tracker.mjs';
 
 const DATA = process.argv[2] || 'data/ict';
 const FROM = Date.parse(process.argv[3] || '2025-08-01T00:00:00Z') / 1000;   // owner, 7 Nov: 5 more months (was 1 Jan 2026)
@@ -111,7 +111,7 @@ export function simulate(g, M, key, src, at = now) {
 }
 
 if (process.argv[1] && process.argv[1].endsWith('replay.mjs')) {
-  const out = { at: new Date().toISOString(), from: new Date(FROM * 1000).toISOString().slice(0, 10), src: {}, errors: {}, gaps: {}, trades: [] };
+  const out = { at: new Date().toISOString(), from: new Date(FROM * 1000).toISOString().slice(0, 10), src: {}, errors: {}, gaps: {}, trades: [], shadow: [] };
   for (const [key, M] of Object.entries(MARKETS)) {
     try {
       const src = await history(M);
@@ -122,6 +122,11 @@ if (process.argv[1] && process.argv[1].endsWith('replay.mjs')) {
         if (t.size !== 1 && t.R != null) { t.Rraw = t.R; t.R = +(t.R * t.size).toFixed(2); if (t.R2 != null) t.R2 = +(t.R2 * t.size).toFixed(2); }
         out.trades.push(t);
         const end = t.closed || Infinity; busyAll = Math.max(busyAll, end); if (a) busyA = end; }
+      // shadow 'dip' (paper comparison only, research/edge/ict-index-longonly): its own stream with its own one-open-trade rule, size 1,
+      // no break-even (simulate() skips break-even when the market has an aRule), gold exit. Kept in out.shadow, never in out.trades.
+      if (SHADOW.dip.markets.includes(key)) { let busy = 0;
+        for (const g of sig) { if (g.close < busy || !isDip(g, key, src.D)) continue; const t = simulate(g, { ...M, aRule: 'dip' }, key, src); if (!t) continue;
+          Object.assign(t, { id: t.id.replace(/-r$/, '-dip-r'), shadow: true, variant: 'dip', aset: false, size: 1 }); out.shadow.push(t); busy = t.closed || Infinity; } }
       console.log(key, JSON.stringify(out.src[key]), 'signals', sig.length, 'trades', out.trades.filter((x) => x.market === key).length);
     } catch (e) { out.errors[key] = String(e.message || e); console.log(key, out.errors[key]); }
   }
@@ -129,8 +134,10 @@ if (process.argv[1] && process.argv[1].endsWith('replay.mjs')) {
   const C = out.trades.filter((x) => x.closed);
   const CA = C.filter((x) => x.aset);
   out.totalsA = { n: CA.length, wins: CA.filter((x) => x.R > 0).length, R: +CA.reduce((a, x) => a + x.R, 0).toFixed(2) };
+  out.shadow.sort((a, b) => a.opened - b.opened);
+  { const SC = out.shadow.filter((x) => x.closed); out.totalsDip = { n: SC.length, wins: SC.filter((x) => x.R > 0).length, R: +SC.reduce((a, x) => a + x.R, 0).toFixed(2) }; }
   out.totals = { n: C.length, wins: C.filter((x) => x.R > 0).length, R: +C.reduce((a, x) => a + x.R, 0).toFixed(2), R2: +C.reduce((a, x) => a + (x.R2 ?? x.R), 0).toFixed(2) };
   fs.mkdirSync(DATA, { recursive: true });
   fs.writeFileSync(path.join(DATA, 'replay.json'), JSON.stringify(out));
-  console.log('totals', JSON.stringify(out.totals));
+  console.log('totals', JSON.stringify(out.totals), 'dip (shadow)', JSON.stringify(out.totalsDip));
 }

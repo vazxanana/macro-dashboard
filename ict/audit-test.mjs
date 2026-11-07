@@ -50,7 +50,7 @@ globalThis.fetch = async (u) => { const p = String(u).split('/'), i = p.indexOf(
   return { ok: true, status: 200, json: async () => ({ barData: { priceBars: b.map((x) => ({ open: x[1], high: x[2], low: x[3], close: x[4], tradeTimeinMills: x[0] * 1000 })) } }) }; };
 `);
   execFileSync(process.execPath, ['--import', path.join(dir, 'stub.mjs'), path.join(HERE, 'tracker.mjs'), dir], { stdio: 'pipe' });
-  const r = { trades: JSON.parse(fs.readFileSync(path.join(dir, 'trades.json'), 'utf8')), bars: JSON.parse(fs.readFileSync(path.join(dir, 'bars.json'), 'utf8')), snap: JSON.parse(fs.readFileSync(path.join(dir, 'snapshot.json'), 'utf8')) };
+  const r = { trades: JSON.parse(fs.readFileSync(path.join(dir, 'trades.json'), 'utf8')), bars: JSON.parse(fs.readFileSync(path.join(dir, 'bars.json'), 'utf8')), snap: JSON.parse(fs.readFileSync(path.join(dir, 'snapshot.json'), 'utf8')), shadow: JSON.parse(fs.readFileSync(path.join(dir, 'shadow.json'), 'utf8')) };
   fs.rmSync(dir, { recursive: true, force: true });
   return r;
 };
@@ -74,6 +74,19 @@ globalThis.fetch = async (u) => { const p = String(u).split('/'), i = p.indexOf(
   // the real open ES trade (signal Fri 16:00 ET) must still be open on Saturday: 36 trading hours have not passed
   const r2 = runTracker('2026-11-07T10:37:33Z', live, Infinity);
   ok(r2.trades.filter((q) => q.status === 'open').length === live.filter((q) => q.status === 'open').length, 'live open trades stay open over the weekend');
+  // shadow 'dip' (paper comparison): its own file, every record flagged, NQ/ES buys only, size 1, no break-even; trades.json never carries one
+  const sh = r2.shadow.trades;
+  ok(r2.trades.every((q) => !q.shadow && !q.variant) && sh.every((q) => q.shadow === true && q.variant === 'dip' && q.side === 'buy' && ['nq', 'es'].includes(q.market) && q.size === 1 && q.be == null),
+    `shadow records only in shadow.json and all flagged (${sh.length}); live records untouched`);
+}
+{
+  const { isDip, dipGate } = await import('./tracker.mjs');
+  const D = Array.from({ length: 30 }, (_, i) => ({ time: 86400 * i, open: 100, high: 101, low: 99, close: 100 - (i === 28 ? 5 : 0) }));
+  const g = { side: 1, close: 86400 * 29 + 3600, grade: { total: 3 }, feat: { atrR: 0.5 } };   // last closed daily = day 28 (95) vs day 8 (100)
+  ok(dipGate(g, D) === true && isDip(g, 'nq', D) && isDip(g, 'es', D), 'dip: buy after a lower 20-day close qualifies on NQ/ES');
+  ok(!isDip(g, 'ym', D) && !isDip(g, 'gc', D) && !isDip({ ...g, side: -1 }, 'nq', D) && !isDip({ ...g, feat: { atrR: 0.2 } }, 'nq', D) && !isDip({ ...g, feat: { atrR: 0.75 } }, 'nq', D) && !isDip({ ...g, grade: { total: 2 } }, 'nq', D),
+    'dip: not YM/GC, not sells, stop band 0.3-0.75x ATR, grade >= 3');
+  ok(!isDip({ ...g, close: 86400 * 30 + 3600 }, 'nq', D.map((d, i) => (i === 29 ? { ...d, close: 101 } : d))), 'dip: no buy when the last close is above the close 20 days earlier');
 }
 {
   // c. mid-session with the last 5m bar still forming: its hour is not a closed H1 candle yet
