@@ -1,8 +1,8 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "framework": null,
-  "buildCommand": "",
-  "outputDirectory": ".",
+  "buildCommand": "mkdir -p out && cp -r index.html market-structure.html gold-trading.html manifest.json sw.js icon-192.png icon-512.png assets out/",
+  "outputDirectory": "out",
   "rewrites": [
     {
       "source": "/cdata/:path*",
@@ -39,12 +39,22 @@
   ],
   "crons": [
     {
-      "path": "/api/kick?job=ict",
-      "schedule": "4,19,34,49 * * * *"
+      "path": "/api/run?job=council",
+      "schedule": "*/4 * * * *"
     },
     {
-      "path": "/api/kick?job=council",
-      "schedule": "*/10 * * * *"
+      "path": "/api/run?job=ict",
+      "schedule": "4,19,34,49 * * * *"
     }
-  ]
+  ],
+  "installCommand": "",
+  "functions": {
+    "api/run.js": {
+      "maxDuration": 300,
+      "includeFiles": "{council,ict}/**"
+    },
+    "api/data.js": {
+      "maxDuration": 30
+    }
+  }
 }
