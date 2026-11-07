@@ -78,9 +78,13 @@ async function history(M) {
   throw new Error(`no CNBC history for ${M.short}`);
 }
 
-function simulate(g, M, key, src) {
+// audit (7 Nov): a hole in the candle history longer than any exchange holiday (4 days) inside a trade's window means the
+// exit cannot be known (gold before CNBC's continuous history had holes of 1-3 weeks: one trade was "held" 17 days)
+export const MAX_GAP = 4 * 86400;
+export function simulate(g, M, key, src, at = now) {
   const s = g.side, f = (v) => +(+v).toFixed(M.dec), entry = g.entry, r0 = g.r0, t2 = entry + s * P.mark * r0;
   const hb = src.H.filter((b) => b.time >= g.close).slice(0, P.holdH), end = hb.length === P.holdH ? hb[hb.length - 1].time + 3600 : g.close + P.holdH * 3600;   // P.holdH closed H1 candles
+  { let p = g.close; for (const b of hb) { if (b.time - p > MAX_GAP) return null; p = b.time + 3600; } }
   const use5 = src.m5days && src.m5days.has(Math.floor(g.close / 86400)) && src.m5days.has(Math.floor((g.close + 86400) / 86400));
   const bars = use5 ? src.m5.filter((b) => b.time >= g.close && b.time < end) : src.H.filter((b) => b.time >= g.close && b.time < end);
   const step = use5 ? 300 : 3600;
@@ -95,7 +99,9 @@ function simulate(g, M, key, src) {
     if (beAt && !beMoved && mfe >= beAt && (entry - stop) * s > 0) { stop = entry; beMoved = true; }
     if (mfe >= P.trail[0]) { const ns = entry + s * (mfe - P.trail[1]) * r0; if ((ns - stop) * s > 0) { stop = ns; moved = true; } }
   }
-  if (status === 'open' && end <= now && bars.length) { const last = bars.at(-1); R = +((s * (last.close - entry)) / r0).toFixed(2); status = R > 0 ? 'win' : R < 0 ? 'loss' : 'be'; closed = last.time + step; exit = 'time'; exitPx = last.close; }
+  // the time exit needs all P.holdH candles: before, a window cut short by the end of the data (a weekend run) closed at
+  // 36 CLOCK hours, i.e. on Friday's last bar
+  if (status === 'open' && hb.length === P.holdH && end <= at && bars.length) { const last = bars.at(-1); R = +((s * (last.close - entry)) / r0).toFixed(2); status = R > 0 ? 'win' : R < 0 ? 'loss' : 'be'; closed = last.time + step; exit = 'time'; exitPx = last.close; }
   const R2 = closed ? (mark2 && mark2 <= closed ? 2 : R) : null;
   // research: the next 72 H1 candles after the entry as [best, worst, close] in R (sign-adjusted), to study other exits offline
   const path = src.H.filter((b) => b.time >= g.close && b.time < g.close + 72 * 3600).map((b) => [+(((s > 0 ? b.high : -b.low) - s * entry) / r0).toFixed(2), +(((s > 0 ? b.low : -b.high) - s * entry) / r0).toFixed(2), +((s * (b.close - entry)) / r0).toFixed(2)]);
@@ -104,25 +110,27 @@ function simulate(g, M, key, src) {
     sweep: { t: g.sweepT, level: f(g.swept) }, fvg: g.fvg.map(f), ih: g.ih == null ? null : f(g.ih), dol: g.dol == null ? null : f(g.dol), valid: g.valid, feat: g.feat, grade: { ...g.grade, letter: letter(g.grade.total) } };
 }
 
-const out = { at: new Date().toISOString(), from: new Date(FROM * 1000).toISOString().slice(0, 10), src: {}, errors: {}, trades: [] };
-for (const [key, M] of Object.entries(MARKETS)) {
-  try {
-    const src = await history(M);
-    out.src[key] = { sym: src.sym, h1: src.H.length, m5: src.m5.length, m5from: src.m5from ? new Date(src.m5from * 1000).toISOString().slice(0, 10) : null, d1: src.D.length };
-    const sig = signals(src.H, src.D, 1, M.tick).concat(signals(src.H, src.D, -1, M.tick)).filter((g) => g.close >= FROM && g.grade.total >= MIN_GRADE).sort((a, b) => a.close - b.close);
-    let busyAll = 0, busyA = 0;   // same rule as the tracker: an A-setup is only blocked by an open A-setup
-    for (const g of sig) { const a = isASetup(g, key); if (g.close < (a ? busyA : busyAll)) continue; const t = simulate(g, M, key, src); t.aset = a; t.aplus = isAPlus(g, key); t.size = a ? sizeOf(g, key) : 1;
-      if (t.size !== 1 && t.R != null) { t.Rraw = t.R; t.R = +(t.R * t.size).toFixed(2); if (t.R2 != null) t.R2 = +(t.R2 * t.size).toFixed(2); }
-      out.trades.push(t);
-      const end = t.closed || Infinity; busyAll = Math.max(busyAll, end); if (a) busyA = end; }
-    console.log(key, JSON.stringify(out.src[key]), 'signals', sig.length, 'trades', out.trades.filter((x) => x.market === key).length);
-  } catch (e) { out.errors[key] = String(e.message || e); console.log(key, out.errors[key]); }
+if (process.argv[1] && process.argv[1].endsWith('replay.mjs')) {
+  const out = { at: new Date().toISOString(), from: new Date(FROM * 1000).toISOString().slice(0, 10), src: {}, errors: {}, gaps: {}, trades: [] };
+  for (const [key, M] of Object.entries(MARKETS)) {
+    try {
+      const src = await history(M);
+      out.src[key] = { sym: src.sym, h1: src.H.length, m5: src.m5.length, m5from: src.m5from ? new Date(src.m5from * 1000).toISOString().slice(0, 10) : null, d1: src.D.length };
+      const sig = signals(src.H, src.D, 1, M.tick).concat(signals(src.H, src.D, -1, M.tick)).filter((g) => g.close >= FROM && g.grade.total >= MIN_GRADE).sort((a, b) => a.close - b.close);
+      let busyAll = 0, busyA = 0;   // same rule as the tracker: an A-setup is only blocked by an open A-setup
+      for (const g of sig) { const a = isASetup(g, key); if (g.close < (a ? busyA : busyAll)) continue; const t = simulate(g, M, key, src); if (!t) { out.gaps[key] = (out.gaps[key] || 0) + 1; continue; } t.aset = a; t.aplus = isAPlus(g, key); t.size = a ? sizeOf(g, key) : 1;
+        if (t.size !== 1 && t.R != null) { t.Rraw = t.R; t.R = +(t.R * t.size).toFixed(2); if (t.R2 != null) t.R2 = +(t.R2 * t.size).toFixed(2); }
+        out.trades.push(t);
+        const end = t.closed || Infinity; busyAll = Math.max(busyAll, end); if (a) busyA = end; }
+      console.log(key, JSON.stringify(out.src[key]), 'signals', sig.length, 'trades', out.trades.filter((x) => x.market === key).length);
+    } catch (e) { out.errors[key] = String(e.message || e); console.log(key, out.errors[key]); }
+  }
+  out.trades.sort((a, b) => a.opened - b.opened);
+  const C = out.trades.filter((x) => x.closed);
+  const CA = C.filter((x) => x.aset);
+  out.totalsA = { n: CA.length, wins: CA.filter((x) => x.R > 0).length, R: +CA.reduce((a, x) => a + x.R, 0).toFixed(2) };
+  out.totals = { n: C.length, wins: C.filter((x) => x.R > 0).length, R: +C.reduce((a, x) => a + x.R, 0).toFixed(2), R2: +C.reduce((a, x) => a + (x.R2 ?? x.R), 0).toFixed(2) };
+  fs.mkdirSync(DATA, { recursive: true });
+  fs.writeFileSync(path.join(DATA, 'replay.json'), JSON.stringify(out));
+  console.log('totals', JSON.stringify(out.totals));
 }
-out.trades.sort((a, b) => a.opened - b.opened);
-const C = out.trades.filter((x) => x.closed);
-const CA = C.filter((x) => x.aset);
-out.totalsA = { n: CA.length, wins: CA.filter((x) => x.R > 0).length, R: +CA.reduce((a, x) => a + x.R, 0).toFixed(2) };
-out.totals = { n: C.length, wins: C.filter((x) => x.R > 0).length, R: +C.reduce((a, x) => a + x.R, 0).toFixed(2), R2: +C.reduce((a, x) => a + (x.R2 ?? x.R), 0).toFixed(2) };
-fs.mkdirSync(DATA, { recursive: true });
-fs.writeFileSync(path.join(DATA, 'replay.json'), JSON.stringify(out));
-console.log('totals', JSON.stringify(out.totals));
