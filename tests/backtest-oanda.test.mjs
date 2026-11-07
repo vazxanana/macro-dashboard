@@ -53,7 +53,11 @@ test('gold replay: every timeframe from OANDA, no Kraken fallback, no PAXG shift
     // the loader paged 1m/1h/4h/1d by from/to, every call for xau
     for (const tf of ['1m', '1h', '4h', '1d']) assert.ok(calls.some((q) => q.tf === tf && q.from && q.to && q.sym === 'xau'), `paged ${tf}`);
     assert.ok(calls.filter((q) => q.tf === '1m').every((q) => +q.to - +q.from <= 4999 * 60), 'at most 4,999 1m candles a call');
-    assert.deepEqual(bt.tradeCols.slice(-5), ['status', 'adx', 'adxBand', 'newsT1', 'newsMin'], 'news research tag after adx/adxBand');
+    assert.deepEqual(bt.tradeCols.slice(-6), ['status', 'adx', 'adxBand', 'newsT1', 'newsMin', 'R_pt1'], 'news research tag after adx/adxBand, then the paper exit R_pt1');
+    { // R_pt1 (paper exit, half off at +1R): null while open, otherwise between -1 and the 10R cap; the live columns are unaffected by it
+      const pi = bt.tradeCols.indexOf('R_pt1'), si = bt.tradeCols.indexOf('status');
+      for (const r of bt.trades) if (r[si] === 'open') assert.equal(r[pi], null); else if (r[pi] != null) assert.ok(r[pi] >= -1.01 && r[pi] <= 10, `R_pt1 ${r[pi]}`);
+      assert.ok(bt.overall.pt1 && bt.overall.none && bt.overall.none.n >= bt.overall.pt1.n, 'pt1 counts only finished paper exits'); }
     assert.equal(bt.tradeCols.indexOf('adxBand'), 22, 'adx / adxBand indexes hold');
     { const ni = bt.tradeCols.indexOf('newsT1'); for (const r of bt.trades) assert.ok(r[ni] === null || ['CPI', 'NFP', 'FOMC', 'PCE'].includes(r[ni]), 'newsT1 is a tier-1 release or null'); }
     assert.equal(bt.tradeCols.indexOf('status'), 20, 'older column indexes hold');
