@@ -2294,6 +2294,7 @@ html[data-motion="off"][data-gate] .gate-bg path[stroke] { animation: none; stro
             <label><input type="checkbox" id="ms-show-kl" checked><i style="border-top:1.5px dotted #9aa4b2;height:0"></i>Key levels</label>
             <label><input type="checkbox" id="ms-show-ema"><i style="background:linear-gradient(90deg,#2962ff 33%,#e0a526 33% 66%,#9c27b0 66%);height:2px"></i>EMAs 21 / 50 / 200</label>
             <label><input type="checkbox" id="ms-show-shade" checked><i style="background:linear-gradient(90deg,rgba(38,166,154,.4) 33%,rgba(41,98,255,.4) 33% 66%,rgba(156,39,176,.4) 66%)"></i>Session shading</label>
+            <label class="cmp-row">Compare with <select id="ms-cmp" aria-label="Compare with another market"><option value="">none</option></select></label>
             <label><input type="checkbox" id="ms-show-vol" checked><i style="background:linear-gradient(90deg,rgba(8,153,129,.5) 50%,rgba(242,54,69,.5) 50%)"></i>Volume</label>
             <label><input type="checkbox" id="ms-show-next" data-show="next" checked><i style="background:#2962ff;height:2px"></i>Next setup</label>
             <label><input type="checkbox" id="ms-show-plan" data-show="plan" checked><i style="background:#089981;height:2px"></i>Selected trade</label>
@@ -3501,6 +3502,15 @@ function msNextSetup(bars, A) {
     chart.priceScale('vol').applyOptions({ scaleMargins: { top: 0.84, bottom: 0 }, visible: false });
     const vcol = (b) => b.close >= b.open ? 'rgba(8,153,129,.26)' : 'rgba(242,54,69,.26)';
     P.vol = vol;
+    // compare overlay (7 Nov loop): another market rebased onto this chart (same % path from the first visible-history candle)
+    const cmp = chart.addLineSeries({ color: 'rgba(224,165,38,.85)', lineWidth: 1.5, priceLineVisible: false, lastValueVisible: true, crosshairMarkerVisible: false, title: '' });
+    P.setCmp = function (rows, label) {
+      if (!rows || !rows.length || !P.bars || !P.bars.length) { cmp.setData([]); cmp.applyOptions({ title: '' }); return; }
+      const byT = new Map(rows.map((r) => [r.time + TZ, r.close])), first = P.bars.find((b) => byT.has(b.time)); if (!first) { cmp.setData([]); return; }
+      const k = first.close / byT.get(first.time);
+      cmp.setData(P.bars.filter((b) => byT.has(b.time) && b.time >= first.time).map((b) => ({ time: b.time, value: byT.get(b.time) * k })));
+      cmp.applyOptions({ title: label });
+    };
     // session shading (7 Nov loop): faint Asia / London / New York background bands on M15, M5 and M1 (UTC 00-07 / 07-13 / 13-21)
     const shade = ['15m', '5m', '1m'].includes(tf.id) ? chart.addHistogramSeries({ priceScaleId: 'sess', priceLineVisible: false, lastValueVisible: false, base: 0 }) : null;
     if (shade) chart.priceScale('sess').applyOptions({ scaleMargins: { top: 0, bottom: 0 }, visible: false });
@@ -3724,6 +3734,17 @@ function msNextSetup(bars, A) {
   setTimeout(councilLines, 4000); setInterval(councilLines, 15e3);
   { const k = document.getElementById('ms-show-ct'); try { G.showCT = localStorage.getItem('ms-ct') !== '0'; } catch (e) {} if (k) { k.checked = G.showCT !== false; k.addEventListener('change', () => { G.showCT = k.checked; try { localStorage.setItem('ms-ct', k.checked ? '1' : '0'); } catch (e) {} Object.values(panes).forEach((P) => { P._ctSig = null; }); councilLines(); }); } }
   { const k = document.getElementById('ms-show-kl'); try { G.showKL = localStorage.getItem('ms-kl') !== '0'; } catch (e) {} if (k) { k.checked = G.showKL !== false; k.addEventListener('change', () => { G.showKL = k.checked; try { localStorage.setItem('ms-kl', k.checked ? '1' : '0'); } catch (e) {} keyLevels(); }); } }
+  // compare overlay control: pick a market, its candles (OANDA / exchange) are rebased onto every chart and refreshed each minute
+  { const sel = document.getElementById('ms-cmp');
+    if (sel) {
+      Object.keys(INSTRUMENTS).filter((k) => k !== instKey).forEach((k) => { const o = document.createElement('option'); o.value = k; o.textContent = `${INSTRUMENTS[k].label} · ${INSTRUMENTS[k].name}`; sel.appendChild(o); });
+      try { const v = localStorage.getItem('ms-cmp-' + instKey); if (v && INSTRUMENTS[v]) sel.value = v; } catch (e) {}
+      const run = async () => { const k = sel.value, I = INSTRUMENTS[k];
+        await Promise.all(Object.entries(panes).map(async ([id, P]) => { if (!P.setCmp) return; if (!I) { P.setCmp(null); return; }
+          try { const tf = TFS.find((t) => t.id === id), r = await fetchBars(tf, I, 500); P.setCmp(r.bars, I.label); } catch (e) { P.setCmp(null); } })); };
+      sel.addEventListener('change', () => { try { localStorage.setItem('ms-cmp-' + instKey, sel.value); } catch (e) {} run(); window.msTrack && msTrack('Compare', { with: sel.value || 'none' }); });
+      setTimeout(() => { if (sel.value) run(); }, 3000); setInterval(() => { if (sel.value && !document.hidden) run(); }, 60e3);
+    } }
   { const k = document.getElementById('ms-show-shade'); try { G.showShade = localStorage.getItem('ms-shade') !== '0'; } catch (e) {} if (k) { k.checked = G.showShade !== false; k.addEventListener('change', () => { G.showShade = k.checked; try { localStorage.setItem('ms-shade', k.checked ? '1' : '0'); } catch (e) {} Object.values(panes).forEach((P) => P.setShade && P.setShade()); }); } }
   { const k = document.getElementById('ms-show-ema'); try { G.showEma = localStorage.getItem('ms-ema') === '1'; } catch (e) {} if (k) { k.checked = G.showEma === true; k.addEventListener('change', () => { G.showEma = k.checked; try { localStorage.setItem('ms-ema', k.checked ? '1' : '0'); } catch (e) {} Object.values(panes).forEach((P) => P.setEma && P.setEma()); }); } }
   { const v = document.getElementById('ms-show-vol'); try { G.showVol = localStorage.getItem('ms-vol') !== '0'; } catch (e) {} if (v) { v.checked = G.showVol !== false; v.addEventListener('change', () => { G.showVol = v.checked; try { localStorage.setItem('ms-vol', v.checked ? '1' : '0'); } catch (e) {} Object.values(panes).forEach((P) => P.setVol && P.setVol()); }); } }
@@ -7603,6 +7624,7 @@ function gpStats(T) {
 .ch-bell.on { color: #e0a526; }
 .tv-tk { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; margin: 8px 0 0; padding: 10px 12px; border: 1px solid color-mix(in srgb, var(--accent) 30%, var(--line)); border-radius: 10px; background: color-mix(in srgb, var(--accent) 6%, transparent); font-size: 12.5px; }
 .tv-tk[hidden] { display: none; }
+.cmp-row { display: flex !important; align-items: center; gap: 8px; } .cmp-row select { flex: 1; min-width: 0; height: 30px; border-radius: 7px; border: 1px solid var(--line); background: var(--bg); color: var(--ink); font: inherit; font-size: 12.5px; padding: 0 6px; }
 /* trade viewer on phones (7 Nov loop): full-screen sheet, title + close on one row, Before/After/Save on their own row, long notes clamp to 3 lines (tap to expand) */
 @media (max-width: 600px) {
   dialog.tv { width: 100vw; max-width: 100vw; height: 100dvh; max-height: 100dvh; margin: 0; border-radius: 0; border: 0; }
