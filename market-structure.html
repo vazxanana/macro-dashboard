@@ -1579,6 +1579,14 @@ html[data-motion="off"] .stagger-in > * { animation: none; }
 .h-kpi b.flash-up::after, .h-kpi b.flash-dn::after { position: absolute; left: 100%; top: 50%; margin-left: 6px; transform: translateY(-50%); font-size: .55em; animation: glyphOut 1.1s ease-out forwards; }
 .h-kpi b.flash-up::after { content: "▲"; color: var(--buy); } .h-kpi b.flash-dn::after { content: "▼"; color: var(--sell); }
 @keyframes glyphOut { 0%, 60% { opacity: 1; } 100% { opacity: 0; } }
+
+/* Home: month sparkline in the This month card */
+.h-kpi { position: relative; }
+.h-spark { position: absolute; right: 14px; top: 14px; overflow: visible; }
+.h-spark .z { stroke: var(--line-strong, var(--line)); stroke-dasharray: 2 3; stroke-width: 1; }
+.h-spark path { fill: none; stroke-width: 1.6; stroke-linejoin: round; stroke-linecap: round; }
+.h-spark path.up { stroke: var(--buy); } .h-spark path.dn { stroke: var(--sell); }
+@media (max-width: 560px) { .h-spark { width: 56px; right: 10px; top: 10px; } }
 </style>
 <script>try{if(localStorage.getItem('msMotion')==='off')document.documentElement.dataset.motion='off'}catch(e){}</script>
 </head>
@@ -4034,13 +4042,19 @@ function msNextSetup(bars, A) {
     const closed = PUB ? sysClosed() : (COUNCIL.trades || []).filter((x) => ['win', 'loss', 'be'].includes(x.status) && x.closed && x.R != null);
     const sum = (t) => { const a = closed.filter((x) => x.closed >= t), live = a.filter((x) => !x.shadow); return { n: a.length, R: a.reduce((q, x) => q + x.R, 0), lR: live.reduce((q, x) => q + x.R, 0), ln: live.length }; };
     const F = window.FLOAT || null, D = sum(d0), W = sum(w0), M = sum(m0);
-    const cell = (k, v, sub, c) => `<div class="h-kpi"><span class="h-kpi-k">${k}</span><b class="${c}">${v}</b><span class="h-kpi-s">${sub}</span></div>`;
+    const cell = (k, v, sub, c, x) => `<div class="h-kpi"><span class="h-kpi-k">${k}</span><b class="${c}">${v}</b><span class="h-kpi-s">${sub}</span>${x || ''}</div>`;
+    // month sparkline: cumulative R by day, zero line, ends on today
+    const spark = (() => { const n = now.getDate(), ds = Array(n).fill(0); closed.filter((x) => x.closed >= m0).forEach((x) => { const d = new Date(x.closed * 1000).getDate(); if (d <= n) ds[d - 1] += x.R; });
+      let c = 0; const pts = [0].concat(ds.map((v) => (c += v))); if (pts.length < 3) return '';
+      const mn = Math.min(0, ...pts), mx = Math.max(0, ...pts), W = 84, H = 24, y = (v) => (H - 2 - ((v - mn) / ((mx - mn) || 1)) * (H - 4) + 1).toFixed(1);
+      const d = pts.map((v, i) => `${i ? 'L' : 'M'}${(i / (pts.length - 1) * W).toFixed(1)},${y(v)}`).join('');
+      return `<svg class="h-spark" viewBox="0 0 ${W} ${H}" width="${W}" height="${H}" role="img" aria-label="Month so far, cumulative R by day: ${fR(c)}"><line x1="0" x2="${W}" y1="${y(0)}" y2="${y(0)}" class="z"/><path d="${d}" class="${c >= 0 ? 'up' : 'dn'}"/></svg>`; })();
     const sub = (S) => PUB ? `${S.n} closed` : `${S.n} closed${S.ln ? ` · live ${fR(S.lR)}` : ''}`;
     const prev = (window.TODAY_PREV = window.TODAY_PREV || {});
     el.innerHTML = COUNCIL.trades ? [
       PUB ? cell('Floating now', F ? fR(F.liveTot || 0) : '—', F ? `${F.open} open` : 'loading', F ? cls(F.liveTot || 0) : '')
         : cell('Floating now', F ? fR(F.tot) : '—', F ? `${F.open} open${F.sh ? ` + ${F.sh} shadow` : ''}${F.pct ? ` · ${F.pct >= 0 ? '+' : '−'}${Math.abs(F.pct).toFixed(2)}%` : ''}` : 'loading', F ? cls(F.tot) : ''),
-      cell('Today', fR(D.R), sub(D), cls(D.R)), cell('This week', fR(W.R), sub(W), cls(W.R)), cell('This month', fR(M.R), sub(M), cls(M.R)),
+      cell('Today', fR(D.R), sub(D), cls(D.R)), cell('This week', fR(W.R), sub(W), cls(W.R)), cell('This month', fR(M.R), sub(M), cls(M.R), PUB ? '' : spark),
     ].join('') : '';
     // flash a figure that changed since the last render (green up, red down)
     el.querySelectorAll('.h-kpi').forEach((c) => { const k = c.querySelector('.h-kpi-k').textContent, b = c.querySelector('b'), v = parseFloat((b.textContent || '').replace('−', '-'));
