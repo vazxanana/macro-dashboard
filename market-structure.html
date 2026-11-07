@@ -2113,7 +2113,7 @@ html[data-role="viewer"] [data-go="crypto"], html[data-role="viewer"] [data-go="
 .ch-lg { position: absolute; top: 8px; left: 10px; right: 90px; z-index: 3; pointer-events: none; display: flex; flex-wrap: wrap; align-items: baseline; gap: 2px 6px; font: 500 11.5px/1.35 var(--mono); font-variant-numeric: tabular-nums; color: var(--ink-faint); text-shadow: 0 0 6px var(--panel), 0 0 2px var(--panel); }
 .ch-lg .k { color: var(--ink-faint); margin-left: 4px; } .ch-lg .k:first-child { margin-left: 0; }
 .ch-lg b { font-weight: 600; } .ch-lg b.up { color: var(--buy); } .ch-lg b.dn { color: var(--sell); }
-.ch-lg .chg { margin-left: 6px; } .ch-lg .t { margin-left: 8px; color: var(--ink-faint); }
+.ch-lg .chg { margin-left: 6px; } .ch-lg .cur { display: inline-flex; gap: 4px; margin-left: 10px; padding-left: 10px; border-left: 1px solid var(--line); } .ch-lg .t { margin-left: 8px; color: var(--ink-faint); }
 @media (max-width: 700px) { .ch-lg { font-size: 10.5px; right: 64px; gap: 0 4px; } .ch-lg .t { display: none; } }
 .ms-chart { position: relative; }
 .ms-legend { display: none !important; }
@@ -3463,7 +3463,10 @@ function msNextSetup(bars, A) {
       const b = B[i], pv = i > 0 ? B[i - 1].close : b.open, ch = b.close - pv, pc = pv ? ch / pv * 100 : 0, cl = ch >= 0 ? 'up' : 'dn';
       const d = new Date((b.time - TZ) * 1000), when = tf.sec >= 86400 ? d.toLocaleDateString(undefined, { day: 'numeric', month: 'short', year: 'numeric' }) : d.toLocaleString(undefined, { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' });
       const h = `<span class="k">O</span><b class="${cl}">${fmt(b.open)}</b><span class="k">H</span><b class="${cl}">${fmt(b.high)}</b><span class="k">L</span><b class="${cl}">${fmt(b.low)}</b><span class="k">C</span><b class="${cl}">${fmt(b.close)}</b><b class="${cl} chg">${ch >= 0 ? '+' : '−'}${fmt(Math.abs(ch))} (${ch >= 0 ? '+' : '−'}${Math.abs(pc).toFixed(2)}%)</b><span class="t">${when}</span>`;
-      if (h !== lgLast) { lg.innerHTML = h; lgLast = h; }
+      // cursor readout (7 Nov loop): the price under the crosshair and its distance from the last price
+      let hx = h; const L0 = B[B.length - 1];
+      if (lgHover && P._cp != null && isFinite(P._cp) && L0) { const d = P._cp - L0.close, pc2 = d / L0.close * 100; hx += `<span class="cur"><span class="k">⌖</span><b>${fmt(P._cp)}</b><b class="${d >= 0 ? 'up' : 'dn'}">${d >= 0 ? '+' : '−'}${fmt(Math.abs(d))} (${d >= 0 ? '+' : '−'}${Math.abs(pc2).toFixed(2)}%)</b><span class="k">from last</span></span>`; }
+      if (hx !== lgLast) { lg.innerHTML = hx; lgLast = hx; }
     };
     { const pane = el.closest('.ms-pane'), ph = pane && pane.querySelector('.ms-ph');
       if (ph && !ph.querySelector('.ch-tools')) {
@@ -3491,7 +3494,7 @@ function msNextSetup(bars, A) {
         cd.classList.toggle('up', L.close >= L.open);
       };
       setInterval(tickCd, 1000); chart.timeScale().subscribeVisibleLogicalRangeChange(() => requestAnimationFrame(tickCd)); }
-    chart.subscribeCrosshairMove((pr) => { if (!P.bars) return; if (pr && pr.logical != null && pr.point && pr.point.x >= 0) { lgHover = true; P.legend(Math.round(pr.logical)); } else { lgHover = false; P.legend(); } });
+    chart.subscribeCrosshairMove((pr) => { if (!P.bars) return; if (pr && pr.logical != null && pr.point && pr.point.x >= 0) { lgHover = true; P._cp = series.coordinateToPrice(pr.point.y); P.legend(Math.round(pr.logical)); } else { lgHover = false; P.legend(); } });
     setInterval(() => { if (!lgHover && el.offsetParent && !document.hidden) { try { const d = series.data(); if (d && d.length && P.bars && P.bars.length) { const L = d[d.length - 1], b = P.bars[P.bars.length - 1]; if (L.time === b.time) Object.assign(b, { open: L.open, high: L.high, low: L.low, close: L.close }); } } catch (e) {} P.legend(); } }, 1000);
     series.applyOptions({ autoscaleInfoProvider: (orig) => {
       const r = orig();
