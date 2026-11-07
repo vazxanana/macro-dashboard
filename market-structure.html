@@ -5163,5 +5163,17 @@ function msNextSetup(bars, A) {
   });
 })();
 </script>
+<script>
+/* Hero numbers count up once on first render (600 ms ease-out); later updates use the existing flash. Off for reduced motion. */
+(() => { if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  const run = (b) => { const m = /^([+\u2212-]?)([\d,]*\.?\d+)(.*)$/.exec(b.textContent.trim()); if (!m) return;
+    const sign = m[1], raw = m[2].replace(/,/g, ''), tgt = parseFloat(raw), dec = (raw.split('.')[1] || '').length, suf = m[3]; if (!isFinite(tgt) || tgt === 0) return;
+    const t0 = performance.now(), D = 600, ease = (x) => 1 - Math.pow(1 - x, 4);
+    const step = (now) => { if (!b.isConnected) return; const k = Math.min(1, (now - t0) / D); b.textContent = sign + (tgt * ease(k)).toLocaleString('en-US', { minimumFractionDigits: dec, maximumFractionDigits: dec }) + suf; if (k < 1) requestAnimationFrame(step); };
+    requestAnimationFrame(step); };
+  ['h-today', 'g-today'].forEach((id) => { const el = document.getElementById(id); if (!el) return; let done = false;
+    const mo = new MutationObserver(() => { if (done) return; const bs = el.querySelectorAll('.h-kpi b'); if (!bs.length || ![...bs].some((b) => /\d/.test(b.textContent))) return; done = true; mo.disconnect(); bs.forEach(run); });
+    mo.observe(el, { childList: true, subtree: true }); }); })();
+</script>
 </body>
 </html>
