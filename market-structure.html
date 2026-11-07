@@ -2643,7 +2643,7 @@ html[data-motion="off"] #v-ict .ict-cal-d:hover { transform: none !important; }
   <!-- ─── Home: one card per section ─── -->
   <section class="view" id="v-home" aria-label="Home">
     <div class="h-top"><div><div class="h-dl"><div class="h-date" id="h-date"></div><span class="h-clock" id="h-clock" hidden></span></div><h1 class="h-head" id="h-head">Loading live candles…</h1></div></div>
-    <nav class="h-quick" aria-label="Jump to"><a href="#council/calendar">Calendar</a><a href="#council/overview">Active trades</a><a href="#council/trades">All trades</a><a href="#council/review" class="adm">Loss review</a><a href="#council/systems" class="adm">Systems</a><a href="#council/research" class="adm">Research</a><a href="#council/scoreboard" class="adm">Edge scoreboard</a><a href="#council/macro" class="adm">Macro desk</a><a href="#journal">Journal</a></nav>
+    <nav class="h-quick" aria-label="Jump to"><a href="#council/calendar">Calendar</a><a href="#council/overview">Active trades</a><a href="#council/trades">All trades</a><a href="#council/review" class="adm">Loss review</a><a href="#council/systems" class="adm">Systems</a><a href="#council/research" class="adm">Research</a><a href="#council/scoreboard" class="adm">Edge scoreboard</a><a href="#council/macro" class="adm">Macro desk</a><a href="#council/week" class="adm">This week</a><a href="#journal">Journal</a></nav>
     <div class="h-warn" id="h-warn" role="alert" hidden></div>
     <div class="h-today" id="h-today" role="group" aria-label="Results today"></div>
     <section class="h-mk" id="h-mk" aria-labelledby="h-mk-t" aria-busy="true" hidden><div class="h-mk-h"><h2 id="h-mk-t">Markets now</h2><span class="h-mk-k" id="h-mk-k">% vs prior day's close (UTC) · line 24 h</span><span class="h-mk-st" id="h-mk-st" role="status" aria-live="polite"></span></div><div class="h-mk-row" id="h-mk-row"></div></section>
@@ -2797,7 +2797,7 @@ html[data-motion="off"] #v-ict .ict-cal-d:hover { transform: none !important; }
       <div><h1 class="h-head">AI council</h1><p class="ms-note" id="ms-c-status">Loading council data…</p></div>
       <label class="c-auto adm" hidden style="display:none"><input type="checkbox" id="ms-auto" checked> <span><b>Browser Trader</b><small>On by default. Every fresh Ready setup on the market you're viewing is saved to your journal as a paper trade, then tracked to its stop or target.</small></span></label>
     </div>
-    <nav class="c-nav" id="ms-c-nav" role="tablist" aria-label="Council sections"><button type="button" role="tab" class="" id="ms-cn-overview" data-pane="overview" aria-controls="ms-cp-overview" aria-selected="true">Overview<span class="c-nav-n" id="ms-cn-n-overview"></span></button><button type="button" class="c-nav-jump" id="ms-cn-cal" aria-label="Jump to the calendar">Calendar</button><button type="button" role="tab" class="" id="ms-cn-trades" data-pane="trades" aria-controls="ms-cp-trades" aria-selected="false">Trades<span class="c-nav-n" id="ms-cn-n-trades"></span></button><button type="button" role="tab" class="adm" id="ms-cn-systems" data-pane="systems" aria-controls="ms-cp-systems" aria-selected="false">Systems<span class="c-nav-n" id="ms-cn-n-systems"></span></button><button type="button" role="tab" class="adm" id="ms-cn-review" data-pane="review" aria-controls="ms-cp-review" aria-selected="false">Review<span class="c-nav-n" id="ms-cn-n-review"></span></button><button type="button" role="tab" class="adm" id="ms-cn-research" data-pane="research" aria-controls="ms-cp-research" aria-selected="false">Research<span class="c-nav-n" id="ms-cn-n-research"></span></button><button type="button" role="tab" class="adm" id="ms-cn-macro" data-pane="macro" aria-controls="ms-cp-macro" aria-selected="false">Macro<span class="c-nav-n" id="ms-cn-n-macro"></span></button></nav>
+    <nav class="c-nav" id="ms-c-nav" role="tablist" aria-label="Council sections"><button type="button" role="tab" class="" id="ms-cn-overview" data-pane="overview" aria-controls="ms-cp-overview" aria-selected="true">Overview<span class="c-nav-n" id="ms-cn-n-overview"></span></button><button type="button" class="c-nav-jump" id="ms-cn-cal" aria-label="Jump to the calendar">Calendar</button><button type="button" role="tab" class="" id="ms-cn-trades" data-pane="trades" aria-controls="ms-cp-trades" aria-selected="false">Trades<span class="c-nav-n" id="ms-cn-n-trades"></span></button><button type="button" role="tab" class="adm" id="ms-cn-systems" data-pane="systems" aria-controls="ms-cp-systems" aria-selected="false">Systems<span class="c-nav-n" id="ms-cn-n-systems"></span></button><button type="button" role="tab" class="adm" id="ms-cn-review" data-pane="review" aria-controls="ms-cp-review" aria-selected="false">Review<span class="c-nav-n" id="ms-cn-n-review"></span></button><button type="button" role="tab" class="adm" id="ms-cn-research" data-pane="research" aria-controls="ms-cp-research" aria-selected="false">Research<span class="c-nav-n" id="ms-cn-n-research"></span></button><button type="button" role="tab" class="adm" id="ms-cn-macro" data-pane="macro" aria-controls="ms-cp-macro" aria-selected="false">Macro<span class="c-nav-n" id="ms-cn-n-macro"></span></button><button type="button" role="tab" class="adm" id="ms-cn-week" data-pane="week" aria-controls="ms-cp-week" aria-selected="false">This week<span class="c-nav-n" id="ms-cn-n-week"></span></button></nav>
     <div class="c-grid c-pane c-pane-overview" id="ms-cp-overview" role="tabpanel" aria-labelledby="ms-cn-overview" data-pane="overview">
       <div class="card c-active" id="ms-active-card">
         <div class="ms-k"><span>Active trades · placed by the system now</span><span class="c-tog"><span id="ms-active-sum" class="c-act-sum"></span><input type="checkbox" id="ms-act-sh" checked hidden style="display:none"></span></div>
@@ -2987,6 +2987,68 @@ html[data-motion="off"] #v-ict .ict-cal-d:hover { transform: none !important; }
         </details>
         <p class="md-paper">Paper only. The Macro strategist changes no rule and places no trade. Next-day direction is barely forecastable, so its odds stay at each market's base rate; how far a market moves is the part worth reading.</p>
       </div>
+    </div>
+    <!-- This week (8 Nov 2026, owner: one weekly report on the phone): council-data files only, rendered by #ms-wk-js. Paper only. -->
+    <div class="c-grid c-pane c-pane-week adm" id="ms-cp-week" role="tabpanel" aria-labelledby="ms-cn-week" data-pane="week" hidden>
+      <header class="wk-head">
+        <div class="wk-nav">
+          <button type="button" class="wk-arrow" id="ms-wk-prev" aria-label="Previous week"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m15 18-6-6 6-6"/></svg></button>
+          <div class="wk-title" aria-live="polite">
+            <h2 id="ms-wk-title">This week</h2>
+            <p><span id="ms-wk-range">Loading the week…</span><button type="button" class="wk-today" id="ms-wk-today" hidden>Back to this week</button></p>
+          </div>
+          <button type="button" class="wk-arrow" id="ms-wk-next" aria-label="Next week"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg></button>
+        </div>
+        <ul class="wk-pills" id="ms-wk-pills" aria-label="Status"></ul>
+      </header>
+      <div class="wk-tiles" id="ms-wk-tiles" aria-label="The week in numbers"></div>
+      <div class="wk-col">
+        <div class="card wk-pnl">
+          <div class="ms-k"><span>Paper P&amp;L by system · after costs</span></div>
+          <div class="wk-seg" id="ms-wk-seg" role="tablist" aria-label="Which book">
+            <button type="button" role="tab" data-g="live" aria-controls="ms-wk-bars">Live <span class="wk-n" id="ms-wk-n-live"></span></button>
+            <button type="button" role="tab" data-g="shadow" aria-controls="ms-wk-bars">Shadow <span class="wk-n" id="ms-wk-n-shadow"></span></button>
+            <button type="button" role="tab" data-g="research" aria-controls="ms-wk-bars">Research <span class="wk-n" id="ms-wk-n-research"></span></button>
+          </div>
+          <ul class="wk-bars" id="ms-wk-bars" role="tabpanel" aria-label="Net R per system this week"></ul>
+          <p class="wk-tot" id="ms-wk-tot"></p>
+          <p class="wk-foot" id="ms-wk-cost"></p>
+        </div>
+        <div class="card wk-bw">
+          <div class="ms-k"><span>Best and worst trades</span><small class="k-sub" id="ms-wk-bw-for"></small></div>
+          <div id="ms-wk-bw"></div>
+        </div>
+        <div class="card wk-rules">
+          <div class="ms-k"><span>Rule changes this week</span></div>
+          <div class="wk-seg" id="ms-wk-rseg" role="tablist" aria-label="Who changed it">
+            <button type="button" role="tab" data-a="all" aria-controls="ms-wk-rl">All <span class="wk-n" id="ms-wk-rn-all"></span></button>
+            <button type="button" role="tab" data-a="you" aria-controls="ms-wk-rl">You <span class="wk-n" id="ms-wk-rn-you"></span></button>
+            <button type="button" role="tab" data-a="coach" aria-controls="ms-wk-rl">Coach <span class="wk-n" id="ms-wk-rn-coach"></span></button>
+            <button type="button" role="tab" data-a="fix" aria-controls="ms-wk-rl">Fixes <span class="wk-n" id="ms-wk-rn-fix"></span></button>
+          </div>
+          <div id="ms-wk-rl" role="tabpanel"></div>
+        </div>
+      </div>
+      <div class="wk-col">
+        <div class="card wk-dec">
+          <div class="ms-k"><span>Decisions waiting on you</span><span class="wk-now">Now</span></div>
+          <div id="ms-wk-dec"></div>
+        </div>
+        <div class="card wk-open">
+          <div class="ms-k"><span>Open positions</span><span class="wk-now">Now</span></div>
+          <div id="ms-wk-open"></div>
+        </div>
+        <div class="card wk-decay">
+          <div class="ms-k"><span>Edge decay</span><span class="wk-now" id="ms-wk-decay-at">Now</span></div>
+          <div id="ms-wk-decay"></div>
+        </div>
+        <div class="card wk-rob">
+          <div class="ms-k"><span>Robustness verdicts</span><span class="wk-now" id="ms-wk-rob-at">Now</span></div>
+          <div id="ms-wk-rob"></div>
+        </div>
+      </div>
+      <p class="wk-paper">Paper only. This report reads the council's files and changes nothing; every rule change stays your call.</p>
+      <div class="wk-tip" id="ms-wk-tip" role="tooltip" hidden></div>
     </div>
   </section>
 
@@ -7290,8 +7352,8 @@ function msNextSetup(bars, A) {
 
   // ─── Sections: a home page of cards, each section on its own page ───
   const VIEWS = ['home', 'setup', 'charts', 'scanner', 'crypto', 'gold', 'council', 'journal', 'guest', 'users', 'ict'];
-  // Council sections (6 Nov renovation): Overview · Trades · Systems · Review · Research · Macro (7 Nov); deep links #council/<section>
-  const CPANES = ['overview', 'trades', 'systems', 'review', 'research', 'macro'], CPUB = ['overview', 'trades'];
+  // Council sections (6 Nov renovation): Overview · Trades · Systems · Review · Research · Macro (7 Nov) · This week (8 Nov); deep links #council/<section>
+  const CPANES = ['overview', 'trades', 'systems', 'review', 'research', 'macro', 'week'], CPUB = ['overview', 'trades'];
   const CPANE = { cur: 'overview' };
   try { const p0 = localStorage.getItem('msCpane'); if (CPANES.includes(p0)) CPANE.cur = p0; } catch (e) {}
   function setPane(p, push = true) {
@@ -10969,6 +11031,549 @@ html[data-role="public"] #ms-me-ct { display: none; }
   W.MS_DECAY_RENDER = render;
   document.addEventListener('ms:council', render);
   setTimeout(render, 0);
+})(window);
+</script>
+<style id="ms-wk-css">
+/* ── This week (#ms-cp-week, 8 Nov 2026, owner: one phone-first weekly report). Council → This week, admin only.
+   Self-contained: every rule is scoped to #ms-cp-week, the script is #ms-wk-js. Phone first; no horizontal scroll at 375 px. ── */
+#ms-cp-week { --wk-soft: color-mix(in srgb, var(--ink) 4%, transparent); --wk-ls: color-mix(in srgb, var(--ink) 16%, transparent); --wk-warn: var(--c-warn, #f2b33d);
+  /* gain / loss bar fills: validated with the dataviz validator against the panel surface (light ΔE 8.7, dark ΔE 9.1 deutan) */
+  --wk-up: #28aa83; --wk-dn: #cc3552;
+  grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); align-items: start; }
+:root[data-theme="light"] #ms-cp-week { --wk-up: #08876f; --wk-dn: #d92d4b; }
+#ms-cp-week > .wk-head, #ms-cp-week > .wk-tiles, #ms-cp-week > .wk-paper { grid-column: 1 / -1; }
+#ms-cp-week .wk-col { display: grid; gap: inherit; align-content: start; min-width: 0; }
+@media (max-width: 1000px) {
+  #ms-cp-week { grid-template-columns: minmax(0, 1fr); }
+  #ms-cp-week .wk-col { display: contents; }
+  #ms-cp-week .wk-dec { order: 1; } #ms-cp-week .wk-pnl { order: 2; } #ms-cp-week .wk-bw { order: 3; } #ms-cp-week .wk-rules { order: 4; }
+  #ms-cp-week .wk-open { order: 5; } #ms-cp-week .wk-decay { order: 6; } #ms-cp-week .wk-rob { order: 7; } #ms-cp-week > .wk-paper { order: 8; }
+}
+#ms-cp-week .card { min-width: 0; }
+#ms-cp-week .wk-sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+#ms-cp-week .pos { color: var(--buy); } #ms-cp-week .neg { color: var(--sell); }
+#ms-cp-week .wk-n:empty { display: none; }
+#ms-cp-week .wk-n { min-width: 20px; height: 20px; padding: 0 6px; border-radius: 10px; background: var(--wk-soft); color: var(--ink-dim); font: 600 11.5px/20px var(--sans); text-align: center; font-variant-numeric: tabular-nums; }
+#ms-cp-week .wk-now { margin-left: auto; padding: 2px 8px; border-radius: 999px; border: 1px solid var(--line); font: 600 11px var(--sans); color: var(--ink-faint); }
+#ms-cp-week .wk-lede { margin: -4px 0 12px; color: var(--ink-dim); font-size: 13px; line-height: 1.5; max-width: 70ch; }
+#ms-cp-week .wk-foot { margin: 12px 0 0; font-size: 12px; color: var(--ink-faint); line-height: 1.5; }
+#ms-cp-week .wk-foot b { color: var(--ink-dim); font-weight: 600; }
+#ms-cp-week .wk-empty { margin: 0; padding: 14px 4px; color: var(--ink-dim); font-size: 13px; line-height: 1.5; }
+
+/* header: week navigation */
+#ms-cp-week .wk-head { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 10px 16px; align-items: center; padding: 6px 2px 2px; }
+#ms-cp-week .wk-nav { display: grid; grid-template-columns: 44px minmax(0, 1fr) 44px; gap: 8px; align-items: center; min-width: 0; }
+#ms-cp-week .wk-arrow { all: unset; box-sizing: border-box; width: 44px; height: 44px; border-radius: 12px; border: 1px solid var(--line); background: var(--panel); display: grid; place-items: center; color: var(--ink); cursor: pointer; -webkit-tap-highlight-color: transparent; transition: background .15s ease-out, border-color .15s ease-out; touch-action: manipulation; }
+#ms-cp-week .wk-arrow svg { width: 20px; height: 20px; }
+@media (hover: hover) { #ms-cp-week .wk-arrow:not(:disabled):hover { background: var(--wk-soft); border-color: var(--line-strong, var(--line)); } }
+#ms-cp-week .wk-arrow:disabled { opacity: .35; cursor: default; }
+#ms-cp-week .wk-arrow:focus-visible, #ms-cp-week .wk-row:focus-visible, #ms-cp-week .wk-it:focus-visible, #ms-cp-week .wk-more:focus-visible, #ms-cp-week .wk-today:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
+#ms-cp-week .wk-title { min-width: 0; text-align: center; }
+#ms-cp-week .wk-title h2 { margin: 0; font: 700 22px/1.2 var(--sans); letter-spacing: -.3px; color: var(--ink); }
+#ms-cp-week .wk-title p { margin: 3px 0 0; color: var(--ink-dim); font-size: 13px; line-height: 1.4; font-variant-numeric: tabular-nums; }
+#ms-cp-week .wk-today { all: unset; cursor: pointer; color: var(--accent); font: 600 12.5px var(--sans); padding: 2px 6px; border-radius: 6px; margin-left: 4px; }
+#ms-cp-week .wk-today[hidden] { display: none; }
+#ms-cp-week .wk-pills { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 6px; justify-content: flex-end; }
+#ms-cp-week .wk-pill { display: inline-flex; align-items: center; gap: 7px; padding: 5px 11px; border-radius: 999px; font: 600 12.5px var(--sans); border: 1px solid var(--line); color: var(--ink-dim); background: var(--panel); white-space: nowrap; }
+#ms-cp-week .wk-pill i { width: 7px; height: 7px; border-radius: 50%; background: currentColor; flex: none; }
+#ms-cp-week .wk-pill.ok { color: var(--buy); } #ms-cp-week .wk-pill.warn { color: var(--wk-warn); border-color: color-mix(in srgb, var(--wk-warn) 35%, var(--line)); }
+#ms-cp-week .wk-pill.tag { color: var(--ink); font-weight: 500; background: var(--wk-soft); white-space: normal; text-align: left; }
+@media (max-width: 700px) { #ms-cp-week .wk-head { grid-template-columns: minmax(0, 1fr); } #ms-cp-week .wk-pills { justify-content: center; } }
+
+/* stat tiles */
+#ms-cp-week .wk-tiles { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; }
+@media (max-width: 760px) { #ms-cp-week .wk-tiles { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+#ms-cp-week .wk-tile { padding: 14px 14px 12px; border: 1px solid var(--line); border-radius: 14px; background: var(--panel); min-width: 0; display: grid; gap: 4px; align-content: start; }
+#ms-cp-week .wk-tile small { font: 600 12px var(--sans); color: var(--ink-faint); }
+#ms-cp-week .wk-tile b { font: 700 24px/1.15 var(--sans); letter-spacing: -.5px; color: var(--ink); display: flex; align-items: center; gap: 7px; }
+#ms-cp-week .wk-tile b .dir { width: 0; height: 0; border: 6px solid transparent; flex: none; }
+#ms-cp-week .wk-tile b .dir.up { border-bottom: 8px solid var(--wk-up); border-top-width: 0; }
+#ms-cp-week .wk-tile b .dir.dn { border-top: 8px solid var(--wk-dn); border-bottom-width: 0; }
+#ms-cp-week .wk-tile span { font-size: 12px; color: var(--ink-dim); line-height: 1.4; }
+
+/* segmented control (scopes the P&L bars and the best / worst trades) */
+#ms-cp-week .wk-seg { display: flex; gap: 2px; padding: 3px; border: 1px solid var(--line); border-radius: 11px; background: var(--panel-raised); margin: 0 0 12px; }
+#ms-cp-week .wk-seg button { flex: 1 1 0; min-width: 0; min-height: 44px; padding: 6px 6px; white-space: nowrap; border: 0; border-radius: 8px; background: transparent; color: var(--ink-dim); font: 600 13px var(--sans); cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 6px; transition: background .15s ease-out, color .15s ease-out; touch-action: manipulation; }
+@media (hover: hover) { #ms-cp-week .wk-seg button:hover { color: var(--ink); } }
+#ms-cp-week .wk-seg button[aria-selected="true"] { background: var(--panel); color: var(--ink); box-shadow: 0 0 0 1px var(--wk-ls), 0 1px 2px rgba(0,0,0,.12); }
+#ms-cp-week .wk-seg button:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
+
+/* P&L by system: diverging bars from one zero line, gains right, losses left; the value sits outside the bar in ink */
+#ms-cp-week .wk-bars { list-style: none; margin: 0; padding: 0; border-top: 1px solid var(--line-soft); }
+#ms-cp-week .wk-bars > li { border-bottom: 1px solid var(--line-soft); }
+#ms-cp-week .wk-row { all: unset; box-sizing: border-box; width: 100%; cursor: pointer; display: grid; grid-template-columns: minmax(0, 1.5fr) minmax(56px, 1fr) 78px; gap: 4px 10px; align-items: center; padding: 10px 4px; min-height: 52px; border-radius: 10px; -webkit-tap-highlight-color: transparent; transition: background .15s ease-out; }
+@media (hover: hover) { #ms-cp-week .wk-row:hover { background: var(--wk-soft); } }
+#ms-cp-week .wk-nm { min-width: 0; display: grid; gap: 2px; }
+#ms-cp-week .wk-nm b { font: 600 14px/1.3 var(--sans); color: var(--ink); overflow-wrap: anywhere; }
+#ms-cp-week .wk-nm small { font-size: 12px; color: var(--ink-faint); font-variant-numeric: tabular-nums; }
+#ms-cp-week .wk-trk { position: relative; height: 24px; }
+#ms-cp-week .wk-trk::before { content: ''; position: absolute; left: 50%; top: 0; bottom: 0; width: 1px; background: var(--line); }
+#ms-cp-week .wk-trk i { position: absolute; top: 7px; height: 10px; min-width: 2px; background: var(--wk-up); }
+#ms-cp-week .wk-trk i.up { left: 50%; border-radius: 0 4px 4px 0; }
+#ms-cp-week .wk-trk i.dn { right: 50%; background: var(--wk-dn); border-radius: 4px 0 0 4px; }
+@media (hover: hover) { #ms-cp-week .wk-row:hover .wk-trk i { filter: brightness(1.12); } }
+#ms-cp-week .wk-val { text-align: right; font: 700 15px var(--sans); color: var(--ink); font-variant-numeric: tabular-nums; white-space: nowrap; }
+#ms-cp-week .wk-val small { display: block; font: 500 11.5px var(--sans); color: var(--ink-faint); }
+#ms-cp-week .wk-x { padding: 2px 6px 14px; display: grid; gap: 8px; }
+#ms-cp-week .wk-x[hidden] { display: none; }
+#ms-cp-week .wk-x p { margin: 0; font-size: 12.5px; line-height: 1.55; color: var(--ink-dim); max-width: 72ch; overflow-wrap: anywhere; }
+#ms-cp-week .wk-x p b { color: var(--ink); font-weight: 600; }
+@media (prefers-reduced-motion: no-preference) { #ms-cp-week .wk-x:not([hidden]) { animation: wk-in .26s cubic-bezier(.22, 1, .36, 1); } }
+@keyframes wk-in { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: none; } }
+#ms-cp-week .wk-tl { list-style: none; margin: 0; padding: 0; display: grid; gap: 2px; }
+#ms-cp-week .wk-tl li { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 8px; font-size: 12.5px; color: var(--ink-dim); padding: 3px 0; font-variant-numeric: tabular-nums; }
+#ms-cp-week .wk-tl li b { color: var(--ink); font-weight: 600; }
+#ms-cp-week .wk-tot { margin: 12px 0 0; font-size: 13px; color: var(--ink-dim); line-height: 1.5; }
+#ms-cp-week .wk-tot b { color: var(--ink); font-weight: 600; font-variant-numeric: tabular-nums; }
+#ms-cp-week .wk-tip { position: fixed; z-index: 60; pointer-events: none; max-width: 240px; padding: 9px 11px; border-radius: 10px; background: var(--panel); border: 1px solid var(--line-strong, var(--line)); box-shadow: 0 12px 28px -12px rgba(0,0,0,.45); font-size: 12px; line-height: 1.45; color: var(--ink-dim); }
+#ms-cp-week .wk-tip[hidden] { display: none; }
+#ms-cp-week .wk-tip strong { display: block; font: 700 16px var(--sans); color: var(--ink); font-variant-numeric: tabular-nums; }
+
+/* list items that open (trades, rule changes, decay, robustness, decisions) */
+#ms-cp-week .wk-list { list-style: none; margin: 0; padding: 0; border-top: 1px solid var(--line-soft); }
+#ms-cp-week .wk-list > li { border-bottom: 1px solid var(--line-soft); }
+#ms-cp-week .wk-it { all: unset; box-sizing: border-box; width: 100%; cursor: pointer; display: grid; grid-template-columns: minmax(0, 1fr) auto 20px; gap: 3px 10px; align-items: center; padding: 11px 4px; min-height: 48px; border-radius: 10px; -webkit-tap-highlight-color: transparent; transition: background .15s ease-out; }
+@media (hover: hover) { #ms-cp-week .wk-it:hover { background: var(--wk-soft); } }
+#ms-cp-week .wk-it .t { min-width: 0; display: grid; gap: 3px; }
+#ms-cp-week .wk-it .t b { font: 600 13.5px/1.35 var(--sans); color: var(--ink); overflow-wrap: anywhere; }
+#ms-cp-week .wk-it .t small { font-size: 12px; color: var(--ink-faint); line-height: 1.35; font-variant-numeric: tabular-nums; }
+#ms-cp-week .wk-it .v { text-align: right; font: 700 14.5px var(--sans); color: var(--ink); font-variant-numeric: tabular-nums; white-space: nowrap; }
+#ms-cp-week .wk-chev { width: 20px; height: 20px; color: var(--ink-faint); transition: transform .2s cubic-bezier(.22, 1, .36, 1); }
+#ms-cp-week [aria-expanded="true"] .wk-chev { transform: rotate(180deg); color: var(--ink); }
+#ms-cp-week .wk-sub { margin: 14px 0 6px; font: 600 12.5px var(--sans); color: var(--ink-faint); display: flex; align-items: center; gap: 8px; }
+#ms-cp-week .wk-sub:first-child { margin-top: 0; }
+#ms-cp-week .wk-st { display: inline-block; padding: 1px 7px; border-radius: 6px; font: 600 11.5px/1.5 var(--sans); border: 1px solid var(--line); color: var(--ink-dim); white-space: nowrap; }
+#ms-cp-week .wk-st.you { color: var(--accent); border-color: color-mix(in srgb, var(--accent) 40%, transparent); }
+#ms-cp-week .wk-st.good { color: var(--buy); border-color: color-mix(in srgb, var(--buy) 40%, transparent); }
+#ms-cp-week .wk-st.warn { color: var(--gold, #e3b341); border-color: color-mix(in srgb, var(--gold, #e3b341) 45%, transparent); }
+#ms-cp-week .wk-st.bad { color: var(--sell); border-color: color-mix(in srgb, var(--sell) 45%, transparent); background: color-mix(in srgb, var(--sell) 9%, transparent); }
+#ms-cp-week .wk-st.mute { color: var(--ink-faint); border-style: dashed; }
+#ms-cp-week .wk-more { all: unset; box-sizing: border-box; cursor: pointer; display: flex; align-items: center; justify-content: center; width: 100%; min-height: 44px; margin-top: 6px; border-radius: 10px; color: var(--accent); font: 600 13px var(--sans); }
+@media (hover: hover) { #ms-cp-week .wk-more:hover { background: var(--wk-soft); } }
+#ms-cp-week .wk-chips { display: flex; flex-wrap: wrap; gap: 6px; margin: 0 0 12px; }
+#ms-cp-week .wk-chip { display: inline-flex; align-items: center; gap: 6px; padding: 4px 10px; border-radius: 8px; border: 1px solid var(--line); font: 500 12.5px var(--sans); color: var(--ink-dim); font-variant-numeric: tabular-nums; }
+#ms-cp-week .wk-chip b { color: var(--ink); font-weight: 700; }
+
+/* decisions waiting on you */
+#ms-cp-week .wk-dec .wk-it { grid-template-columns: 30px minmax(0, 1fr) 20px; }
+#ms-cp-week .wk-ico { width: 30px; height: 30px; border-radius: 9px; display: grid; place-items: center; background: var(--wk-soft); color: var(--ink-dim); }
+#ms-cp-week .wk-ico svg { width: 17px; height: 17px; }
+#ms-cp-week .wk-ico.bad { color: var(--sell); background: color-mix(in srgb, var(--sell) 11%, transparent); }
+#ms-cp-week .wk-ico.warn { color: var(--gold, #e3b341); background: color-mix(in srgb, var(--gold, #e3b341) 13%, transparent); }
+#ms-cp-week .wk-ico.you { color: var(--accent); background: color-mix(in srgb, var(--accent) 12%, transparent); }
+#ms-cp-week .wk-x a { color: var(--accent); font-weight: 600; text-decoration: none; }
+#ms-cp-week .wk-clear { display: flex; align-items: center; gap: 10px; margin: 0; padding: 12px 4px; color: var(--ink-dim); font-size: 13.5px; }
+#ms-cp-week .wk-clear svg { width: 20px; height: 20px; color: var(--buy); flex: none; }
+
+#ms-cp-week .wk-paper { margin: 2px 0 0; font-size: 12px; color: var(--ink-faint); line-height: 1.5; text-align: center; }
+#ms-cp-week details.wk-all { margin-top: 10px; }
+#ms-cp-week details.wk-all > summary { cursor: pointer; min-height: 44px; display: flex; align-items: center; color: var(--accent); font: 600 13px var(--sans); list-style: none; }
+#ms-cp-week details.wk-all > summary::-webkit-details-marker { display: none; }
+#ms-cp-week.wk-busy .wk-col, #ms-cp-week.wk-busy .wk-tiles { opacity: .55; transition: opacity .2s ease-out; }
+:root[data-theme="light"] #ms-cp-week .wk-st.warn, :root[data-theme="light"] #ms-cp-week .wk-ico.warn { color: #8a5d00; border-color: rgba(138,93,0,.4); }
+@media (prefers-reduced-motion: reduce) { #ms-cp-week .wk-chev, #ms-cp-week .wk-seg button, #ms-cp-week .wk-row, #ms-cp-week .wk-it { transition: none; } }
+@media (forced-colors: active) { #ms-cp-week .wk-trk i { forced-color-adjust: none; } #ms-cp-week .wk-seg button[aria-selected="true"] { outline: 2px solid Highlight; } }
+@media print { #ms-cp-week .wk-arrow { display: none; } }
+</style>
+<script id="ms-wk-js">
+// This week (8 Nov 2026, owner: "a beautiful weekly report on my phone"). Council → This week (#council/week), admin only.
+// Built only from council-data files: trades.json + research.json (Meridian live, shadow and research paper trades), ict/trades.json +
+// ict/replay.json + ict/shadow.json (ICT desk), coach.json (proposals, ledger, decay from council/decay.mjs), config.json history
+// (rule changes, by you or the Coach), research/robustness.json, macro/forecast.json, digest.json (the daily digest's robustness
+// baseline), snapshot.json + ict/snapshot.json (prices for open positions), health.json. It changes nothing.
+// Weeks run Monday 00:00 to Sunday 24:00 UTC, as the council and the digest count days. After costs: Meridian Rnet (council/fills.mjs),
+// ICT less the CME micro round trip (council/digest.mjs ICT_COST_PTS), research trades carry no cost and show gross.
+// Pure functions are on window.MS_WEEK (tests/week-report.test.mjs runs them without a page).
+(function (W) {
+  'use strict';
+  var DAY = 86400, WEEK = 7 * DAY;
+  var num = function (v) { return typeof v === 'number' && isFinite(v); };
+  var arr = function (a) { return Array.isArray(a) ? a : []; };
+  var r2 = function (v) { return Math.round(v * 100) / 100; };
+  var DONE = { win: 1, loss: 1, be: 1 };
+  var ICT_COST_PTS = { nq: 1.37, es: 1.0, ym: 5.5, rty: 0.55, gc: 0.42 };   // council/digest.mjs ICT_COST_PTS (keep in step)
+  var VARIANT = { nofri: 'ICT A-setups, skip Fridays', h1opp: 'ICT A-setups against H1 structure', dip: 'ICT dip-buy (NQ / ES)', silver: 'ICT on silver', strail: 'ICT A-setups, structure trail' };
+  var RES_NAME = { replica: 'Replica on forex and crypto', cycle: 'Crypto cycle', 'gold-nyrun': 'Gold New York run', 'nq-open': 'NQ open run, research sessions' };
+  var ASK = /^(promote|promoteIf|demote|skipMarket|skipSession|dataSource|ictFilter)$/;   // council/alerts.mjs actionable
+
+  // ─── pure ───
+  var closedAt = function (x) { return x.closed || x.exitAt || null; };
+  var isClosed = function (x) { return !!x && !!DONE[x.status] && num(x.R) && !!closedAt(x); };
+  var merNet = function (x) { return num(x.Rnet) ? x.Rnet : num(x.costR) ? x.R - x.costR * (x.size || 1) : x.R; };   // council/digest.mjs merNet
+  var r0Of = function (x) { return +x.r0 || Math.abs(x.entry - (x.stop0 != null ? x.stop0 : x.stop)); };
+  var ictNet = function (x) { if (num(x.Rnet)) return x.Rnet; var r0 = r0Of(x), c = ICT_COST_PTS[x.market] || 0; return r0 > 0 ? x.R - c / r0 * (x.size || 1) : x.R; };
+  // Monday 00:00 UTC of the week holding unix time t
+  function weekOf(t) { var d = Math.floor(t / DAY), wd = (new Date(d * DAY * 1000).getUTCDay() + 6) % 7; return (d - wd) * DAY; }
+  // the Trader's live Meridian list (council/alerts.mjs alertable): live trades.json plus the NQ open run's forward paper in research.json
+  var nqLive = function (x) { return x.k === 'nq-open' && !/-x$/.test(x.session || ''); };
+  function merName(x, names) { if (names[x.k]) return names[x.k]; var n = x.name || x.k, p = x.pair || ''; return p && p.indexOf(n) === 0 ? p : n + (p && !/^(Replica|Gold|Crypto)/.test(n) ? ' ' + p : ''); }
+
+  // every closed paper trade as one record: { key (system), name, grp live | shadow | research, desk, t (close), R gross, net, ck (cost on record) }
+  function records(D) {
+    D = D || {}; var out = [], names = {};
+    arr(D.coach && D.coach.decay && D.coach.decay.systems).forEach(function (s) { if (s && s.id && s.name) names[s.id] = s.name; });
+    var rec = function (x, desk, grp, key, name, net, ck) {
+      var R = +x.R; out.push({ id: x.id, key: key, name: name, grp: grp, desk: desk, t: closedAt(x), o: x.opened, R: r2(R), net: r2(net), cost: ck ? r2(R - net) : null, ck: ck,
+        mk: x.short || x.label || String(x.market || '').toUpperCase(), side: x.side, st: x.status, src: x.replay ? 'replay' : 'forward', x: x });
+    };
+    arr(D.trades).forEach(function (x) { if (!isClosed(x)) return; rec(x, 'Meridian', x.shadow ? 'shadow' : 'live', 'm:' + x.k + (x.shadow ? ':s' : ''), merName(x, names), merNet(x), num(x.Rnet) || num(x.costR)); });
+    arr(D.research).forEach(function (x) {
+      if (!isClosed(x) || x.void) return;
+      if (nqLive(x)) { var ny = x.session === 'nyflip'; rec(x, 'Meridian', 'live', 'm:nq-open' + (ny ? '' : ':old'), ny ? names['nq-open'] || 'NQ New York open run' : 'NQ open, retired sessions', merNet(x), num(x.Rnet) || num(x.costR)); return; }
+      rec(x, 'Meridian', 'research', 'r:' + x.k, RES_NAME[x.k] || x.name || x.k, merNet(x), num(x.Rnet) || num(x.costR));
+    });
+    // ICT desk: the forward record, and the desk replay where the forward record has no copy of the signal
+    var IR = D.ictReplay || {}, IT = arr(D.ictTrades), IS = D.ictShadow || {}, fwd = {};
+    IT.forEach(function (x) { if (x && x.id) fwd[x.id] = 1; });
+    var ict = function (x) { if (!isClosed(x) || x.valid === false) return; var ck = r0Of(x) > 0 && !!ICT_COST_PTS[x.market];
+      rec(x, 'ICT', x.aset ? 'live' : 'shadow', x.aset ? 'i:a' : 'i:all', x.aset ? names['ict-a'] || 'ICT A-setups' : 'ICT other graded signals', ictNet(x), ck); };
+    IT.forEach(ict);
+    arr(IR.trades).forEach(function (x) { if (x && !fwd[String(x.id).replace(/-r$/, '')]) ict(x); });
+    var vt = function (v, L) { arr(L).forEach(function (x) { if (!isClosed(x)) return; rec(x, 'ICT', 'shadow', 'i:v:' + v, (VARIANT[v] || 'ICT variant ' + v) + ' (paper)', ictNet(x), r0Of(x) > 0 && !!ICT_COST_PTS[x.market]); }); };
+    vt(IS.variant || 'dip', IS.trades);
+    Object.keys(IS.variants || {}).forEach(function (v) { vt(v, (IS.variants[v] || {}).trades); });
+    return out;
+  }
+  function tally(L) {
+    var o = { n: 0, w: 0, l: 0, R: 0, net: 0, ck: true, rp: 0 };
+    L.forEach(function (r) { o.n++; if (r.R > 0) o.w++; else if (r.R < 0) o.l++; o.R += r.R; o.net += r.net; if (!r.ck) o.ck = false; if (r.src === 'replay') o.rp++; });
+    o.R = r2(o.R); o.net = r2(o.net); o.cost = r2(o.R - o.net); return o;
+  }
+  // the week starting at wk (Monday 00:00 UTC): rows per system, per book totals, best and worst trades per book
+  function build(D, wk, all) {
+    all = all || records(D); var from = wk, to = wk + WEEK;
+    var inW = all.filter(function (r) { return r.t >= from && r.t < to; }), by = {};
+    inW.forEach(function (r) { (by[r.key] = by[r.key] || { key: r.key, name: r.name, grp: r.grp, desk: r.desk, list: [] }).list.push(r); });
+    var rows = Object.keys(by).map(function (k) { var o = by[k], t = tally(o.list); o.list.sort(function (a, b) { return a.t - b.t; }); return Object.assign(o, t); })
+      .sort(function (a, b) { return b.net - a.net; });
+    var books = {}, best = {}, worst = {};
+    ['live', 'shadow', 'research'].forEach(function (g) {
+      var L = inW.filter(function (r) { return r.grp === g; }); books[g] = tally(L);
+      var S = L.slice().sort(function (a, b) { return b.net - a.net; });
+      best[g] = S.filter(function (r) { return r.net > 0; }).slice(0, 3);
+      worst[g] = S.filter(function (r) { return r.net < 0; }).reverse().slice(0, 3);
+    });
+    var tsOf = function (f) { var T = all.filter(f).map(function (r) { return r.t; }); return T.length ? Math.min.apply(null, T) : null; };
+    return { from: from, to: to, rows: rows, books: books, best: best, worst: worst,
+      merLive: tally(inW.filter(function (r) { return r.grp === 'live' && r.desk === 'Meridian'; })), ictA: tally(inW.filter(function (r) { return r.key === 'i:a'; })),
+      firstMer: tsOf(function (r) { return r.desk === 'Meridian'; }), first: tsOf(function () { return true; }) };
+  }
+  // the weeks there is anything to show: from the first closed trade's week to the current week
+  function weeks(all, now) { var T = all.map(function (r) { return r.t; }).filter(num), last = weekOf(now), first = T.length ? weekOf(Math.min.apply(null, T)) : last; return { first: Math.min(first, last), last: last }; }
+
+  // config.json history in [from, to): who changed what and why; Coach entries carry the ledger's before / 30-day check
+  var actor = function (by) { by = String(by || ''); return by === 'user' ? 'you' : /^coach/.test(by) ? 'coach' : 'fix'; };
+  function rules(config, coach, from, to) {
+    var led = arr(coach && coach.ledger);
+    return arr(config && config.history).map(function (h) {
+      var t = Date.parse(h && h.at) / 1000; if (!num(t) || t < from || t >= to) return null;
+      var l = led.filter(function (x) { return x && x.at === h.at && x.change === h.change; })[0];
+      return { t: t, by: String(h.by || ''), who: actor(h.by), change: String(h.change || ''), why: String(h.why || ''), before: l && l.before || null, due: l && l.d30 && l.d30.due || null };
+    }).filter(Boolean).sort(function (a, b) { return b.t - a.t; });
+  }
+  // robustness verdicts against a baseline map { claim id: verdict } (digest.json robust, written by the daily digest)
+  var robustMap = function (J) { var o = {}; arr(J && J.claims).forEach(function (c) { if (c && c.id && c.verdict) o[c.id] = c.verdict; }); return o; };
+  function robustChanges(J, prev) {
+    if (!prev || typeof prev !== 'object') return [];
+    return arr(J && J.claims).filter(function (c) { return c && c.id && c.verdict && prev[c.id] && prev[c.id] !== c.verdict; })
+      .map(function (c) { return { id: c.id, name: c.name || c.id, was: prev[c.id], to: c.verdict, status: c.status || '', why: arr(c.why) }; });
+  }
+  // open now: live Meridian (trades.json, the NQ open run) and the ICT desk's forward record, floating R from the latest prices
+  function openNow(D) {
+    D = D || {}; var px = function (mk) { var a = D.snap && D.snap.markets && D.snap.markets[mk], b = D.ictSnap && D.ictSnap.markets && D.ictSnap.markets[mk];
+      return a && +a.price > 0 ? +a.price : b && +b.price > 0 ? +b.price : null; };
+    var out = [], sh = 0;
+    var add = function (x, desk) {
+      var p = px(x.market), r0 = r0Of(x), dir = x.side === 'sell' ? -1 : 1, pend = x.status === 'pending';
+      out.push({ desk: desk, x: x, pend: pend, mk: x.short || x.label || String(x.market || '').toUpperCase(), side: x.side, sys: desk === 'ICT' ? (x.aset ? 'ICT A-setup' : 'ICT ' + ((x.grade && x.grade.letter) || 'signal')) : x.name || x.k,
+        px: p, R: !pend && p > 0 && r0 > 0 ? r2(dir * (p - x.entry) / r0 * (x.size || 1)) : null, o: x.opened });
+    };
+    arr(D.trades).forEach(function (x) { if (!x || (x.status !== 'open' && x.status !== 'pending')) return; if (x.shadow) sh++; else add(x, 'Meridian'); });
+    arr(D.research).forEach(function (x) { if (x && x.status === 'open' && nqLive(x)) add(x, 'Meridian'); });
+    arr(D.ictTrades).forEach(function (x) { if (x && x.status === 'open') add(x, 'ICT'); });
+    return { list: out.sort(function (a, b) { return (b.o || 0) - (a.o || 0); }), shadow: sh };
+  }
+  // what waits on the owner now: Coach proposals, live systems the decay monitor calls decaying, flagged ICT filters, robustness
+  // changes on a live system, data-feed trouble, and the pauses the Coach would make (your "No pauses" rule keeps them trading)
+  function decisions(D, now, rc) {
+    D = D || {}; var out = [], co = D.coach || {};
+    arr(co.proposals).filter(function (p) { return p && p.setup && (ASK.test(p.kind) || (p.kind === 'stability' && p.flag)); }).forEach(function (p) {
+      out.push({ k: 'coach', tone: 'you', title: p.label || (p.kind + ' ' + p.setup), detail: [p.n ? p.n + ' replay trades' + (num(p.exp) ? ', ' + fR(p.exp) + ' a trade' : '') : '', p.h1 && p.h2 ? 'halves ' + fR(p.h1.exp) + ' / ' + fR(p.h2.exp) : '', p.why || ''].filter(Boolean).join(' · '), href: '#council/systems', act: 'OK or reject it under Systems' });
+    });
+    arr(co.decay && co.decay.systems).filter(function (s) { return s && s.live && s.status === 'decaying'; }).forEach(function (s) {
+      out.push({ k: 'decay', tone: 'bad', title: s.name + ' is decaying', detail: arr(s.why).join('; '), act: 'Keep it, move it to shadow or retire it: the monitor changes nothing.' });
+    });
+    arr(co.ictWatch).filter(function (w) { return w && w.flag; }).forEach(function (w) { out.push({ k: 'ict', tone: 'you', title: w.label || 'ICT filter ' + w.value, detail: w.why || '', href: '#council/systems', act: 'Adopt the filter or leave the A-rule as it is.' }); });
+    arr(rc).filter(function (c) { return /^live/.test(c.status); }).forEach(function (c) { out.push({ k: 'robust', tone: c.to === 'robust' ? 'you' : 'warn', title: c.name + ': ' + c.was + ' → ' + c.to, detail: c.why.join('; '), act: 'A live system’s evidence changed grade.' }); });
+    var H = D.health; if (H && (H.status === 'bad' || H.status === 'warn')) out.push({ k: 'data', tone: H.status === 'bad' ? 'bad' : 'warn', title: 'Data feeds ' + (H.status === 'bad' ? 'bad' : 'shaky'), detail: H.summary || '', act: 'Check the Data chip on the Overview.' });
+    var wp = (D.config && D.config.wouldPause) || {}, P = Object.keys(wp).filter(function (k) { var t = Date.parse(wp[k] && wp[k].at) / 1000; return num(t) && now - t <= WEEK; });
+    if (P.length && D.config && D.config.noPause) out.push({ k: 'pause', tone: 'warn', title: 'The Coach would pause ' + P.length + ' setup' + (P.length > 1 ? 's or markets' : ' or market'), detail: P.map(function (k) { return k + ': ' + wp[k].why; }).join('; '), act: 'Your “No pauses” rule keeps them trading; nothing to do unless you want a pause.' });
+    return out;
+  }
+  function fR(v, d) { return num(v) ? (v > 0.004 ? '+' : v < -0.004 ? '−' : '') + Math.abs(v).toFixed(d == null ? 2 : d) + 'R' : '—'; }
+  W.MS_WEEK = { DAY: DAY, WEEK: WEEK, ICT_COST_PTS: ICT_COST_PTS, weekOf: weekOf, records: records, tally: tally, build: build, weeks: weeks, rules: rules, robustMap: robustMap, robustChanges: robustChanges, openNow: openNow, decisions: decisions, merNet: merNet, ictNet: ictNet };
+  if (typeof document === 'undefined' || !document.getElementById) return;
+
+  // ─── page ───
+  var R = document.documentElement, pane = document.getElementById('ms-cp-week');
+  if (!pane || R.dataset.mode !== 'admin') return;
+  var $ = function (id) { return document.getElementById(id); };
+  var esc = function (s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); };
+  var trim = function (s, n) { s = String(s || '').replace(/\s+/g, ' ').trim(); return s.length > n ? s.slice(0, n - 1).replace(/\s+\S*$/, '') + '…' : s; };
+  var dU = new Intl.DateTimeFormat('en-GB', { weekday: 'short', day: 'numeric', month: 'short', timeZone: 'UTC' });
+  var dmU = new Intl.DateTimeFormat('en-GB', { day: 'numeric', month: 'short', timeZone: 'UTC' });
+  var yU = new Intl.DateTimeFormat('en-GB', { year: 'numeric', timeZone: 'UTC' });
+  var hmU = new Intl.DateTimeFormat('en-GB', { hour: '2-digit', minute: '2-digit', hourCycle: 'h23', timeZone: 'UTC' });
+  var when = function (t) { return num(t) ? dU.format(new Date(t * 1000)) + ' ' + hmU.format(new Date(t * 1000)) : ''; };
+  var chev = '<svg class="wk-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>';
+  var ICO = { coach: '<path d="M12 3v3m0 12v3M3 12h3m12 0h3M6 6l2 2m8 8 2 2M6 18l2-2m8-8 2-2"/><circle cx="12" cy="12" r="3"/>', decay: '<path d="M3 7l6 6 4-4 8 8"/><path d="M21 11v6h-6"/>',
+    ict: '<path d="M4 6h16M7 12h10M10 18h4"/>', robust: '<path d="M12 3l8 4v5c0 5-3.5 8-8 9-4.5-1-8-4-8-9V7z"/>', data: '<path d="M12 9v4m0 4h.01"/><path d="M10.3 3.9 2 18a2 2 0 0 0 1.7 3h16.6a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/>',
+    pause: '<rect x="6" y="5" width="4" height="14" rx="1"/><rect x="14" y="5" width="4" height="14" rx="1"/>' };
+  var ico = function (k, tone) { return '<span class="wk-ico ' + (tone || '') + '" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">' + (ICO[k] || ICO.coach) + '</svg></span>'; };
+  var pxF = function (v, x) { if (!num(v)) return '—'; var d = x && num(x.dec) ? x.dec : Math.abs(v) >= 1000 ? 2 : Math.abs(v) >= 10 ? 2 : 4; return v.toLocaleString('en-US', { minimumFractionDigits: d, maximumFractionDigits: d }); };
+  var plural = function (n, w) { return n + ' ' + w + (n === 1 ? '' : 's'); };
+  var GL = { live: 'Live', shadow: 'Shadow', research: 'Research' };
+  var VL = { robust: 'good', fragile: 'warn', 'not proven': 'mute' };
+  var DL = { healthy: 'good', watch: 'warn', decaying: 'bad' };
+
+  var st = { wk: null, g: 'live', a: 'all', open: {}, rlAll: false, all: null, extra: null, extraAt: 0, loading: null, lastRender: 0 };
+  try { var s0 = JSON.parse(localStorage.getItem('msWeekRpt') || '{}'); if (s0 && /^(live|shadow|research)$/.test(s0.g)) st.g = s0.g; if (s0 && /^(all|you|coach|fix)$/.test(s0.a)) st.a = s0.a; } catch (e) {}
+  var save = function () { try { localStorage.setItem('msWeekRpt', JSON.stringify({ g: st.g, a: st.a })); } catch (e) {} };
+  // a deep link to one week: #council/week/2026-11-02 (any day of that week)
+  (function () { var m = /^#council\/week\/(\d{4}-\d{2}-\d{2})/.exec(location.hash); if (m) { var t = Date.parse(m[1] + 'T12:00:00Z') / 1000; if (num(t)) st.wk = weekOf(t); } })();
+
+  // per-viewer robustness baseline (only when the daily digest has written none yet): the last verdicts this browser saw
+  function localRobust(map) {
+    var o = null; try { o = JSON.parse(localStorage.getItem('msWeekRobust') || 'null'); } catch (e) {}
+    var same = function (a, b) { return !!a && !!b && JSON.stringify(a) === JSON.stringify(b); };
+    if (!o || !o.map) { o = { at: Date.now(), map: map }; }
+    else if (!same(o.map, map)) { o = { at: Date.now(), map: map, prev: o.map, prevAt: o.at }; }
+    try { localStorage.setItem('msWeekRobust', JSON.stringify(o)); } catch (e) {}
+    return o.prev ? { map: o.prev, at: o.prevAt, src: 'local' } : null;
+  }
+
+  function data() {
+    var C = W.MS_COUNCIL || {}, X = st.extra || {};
+    return { trades: C.trades, research: C.research, config: C.config, coach: C.coach, snap: C.snap, health: C.health,
+      ictReplay: X.ictReplay, ictTrades: X.ictTrades, ictShadow: X.ictShadow, ictSnap: X.ictSnap, robust: X.robust, macro: X.macro, digest: X.digest };
+  }
+
+  // ─── header + tiles ───
+  function renderHead(B, D, rng, now) {
+    var cur = weekOf(now), wk = st.wk;
+    $('ms-wk-title').textContent = wk === cur ? 'This week' : wk === cur - WEEK ? 'Last week' : 'Week of ' + dmU.format(new Date(wk * 1000));
+    var end = new Date((wk + WEEK - DAY) * 1000);
+    $('ms-wk-range').textContent = dU.format(new Date(wk * 1000)) + ' – ' + dU.format(end) + ' ' + yU.format(end) + ' · UTC';
+    $('ms-wk-prev').disabled = wk <= rng.first; $('ms-wk-next').disabled = wk >= rng.last; $('ms-wk-today').hidden = wk === cur;
+    var pills = [];
+    var at = W.MS_COUNCIL && W.MS_COUNCIL.at; if (at) pills.push('<li class="wk-pill ok"><i></i>Council read ' + esc(hmU.format(new Date(at))) + ' UTC</li>');
+    pills.push('<li class="wk-pill">Paper only</li>');
+    var dg = D.digest; if (dg && dg.sent && dg.sent.at) pills.push('<li class="wk-pill">Last digest ' + esc(dU.format(new Date(dg.sent.at))) + '</li>');
+    var f = D.macro; if (wk === cur && f && f.regime && f.regime.label) pills.push('<li class="wk-pill tag" title="Macro strategist regime, ' + esc(when(Date.parse(f.at) / 1000)) + ' UTC">Macro: ' + esc(trim(f.regime.label, 90)) + '</li>');
+    $('ms-wk-pills').innerHTML = pills.join('');
+    var nR = rules(D.config, D.coach, B.from, B.to), cnt = { you: 0, coach: 0, fix: 0 }; nR.forEach(function (r) { cnt[r.who]++; });
+    var tile = function (lbl, v, sub, isR) { var d = isR && num(v) && Math.abs(v) >= 0.005 ? '<i class="dir ' + (v > 0 ? 'up' : 'dn') + '" aria-hidden="true"></i>' : '';
+      return '<div class="wk-tile"><small>' + lbl + '</small><b>' + d + (isR ? fR(v) : esc(v)) + '</b><span>' + sub + '</span></div>'; };
+    var t1 = B.merLive, t2 = B.ictA, t3 = B.books.shadow;
+    $('ms-wk-tiles').innerHTML = tile('Meridian live, net', t1.n ? t1.net : 0, t1.n ? plural(t1.n, 'trade') + ' · ' + t1.w + 'W ' + t1.l + 'L · gross ' + fR(t1.R) : 'no closed trades', true)
+      + tile('ICT desk A-setups, net', t2.n ? t2.net : 0, t2.n ? plural(t2.n, 'trade') + ' · ' + t2.w + 'W ' + t2.l + 'L' + (t2.rp ? ' · ' + (t2.rp === t2.n ? 'desk replay' : t2.rp + ' replay') : '') : 'no closed trades', true)
+      + tile('Shadow book, net', t3.n ? t3.net : 0, t3.n ? plural(t3.n, 'trade') + ' · ' + t3.w + 'W ' + t3.l + 'L' : 'no closed trades', true)
+      + tile('Rule changes', String(nR.length), nR.length ? 'you ' + cnt.you + ' · Coach ' + cnt.coach + (cnt.fix ? ' · fixes ' + cnt.fix : '') : 'none this week', false);
+  }
+
+  // ─── P&L by system ───
+  function renderPnl(B) {
+    ['live', 'shadow', 'research'].forEach(function (g) { $('ms-wk-n-' + g).textContent = B.books[g].n || ''; });
+    pane.querySelectorAll('#ms-wk-seg [data-g]').forEach(function (b) { var on = b.dataset.g === st.g; b.setAttribute('aria-selected', String(on)); b.tabIndex = on ? 0 : -1; });
+    var rows = B.rows.filter(function (r) { return r.grp === st.g; }), bk = B.books[st.g], el = $('ms-wk-bars');
+    if (!rows.length) {
+      var pre = B.firstMer && B.to <= B.firstMer;
+      el.innerHTML = '<li><p class="wk-empty">No closed ' + GL[st.g].toLowerCase() + ' trades this week.' + (pre ? ' Meridian’s trade record starts ' + esc(dU.format(new Date(B.firstMer * 1000))) + '; earlier weeks show the ICT desk’s replay only.' : '') + '</p></li>';
+      $('ms-wk-tot').innerHTML = ''; $('ms-wk-cost').textContent = ''; return;
+    }
+    var mx = Math.max.apply(null, rows.map(function (r) { return Math.abs(r.net); }).concat([0.5]));
+    el.innerHTML = rows.map(function (r) {
+      var w = Math.abs(r.net) / mx * 50, id = 'ms-wk-x-' + r.key.replace(/[^a-z0-9]+/gi, '-'), open = !!st.open[r.key];
+      var sub = plural(r.n, 'trade') + ' · ' + r.w + 'W ' + r.l + 'L' + (r.desk === 'ICT' && r.rp ? (r.rp === r.n ? ' · replay' : ' · ' + r.rp + ' replay') : '');
+      var L = r.list.slice().reverse(), shown = L.slice(0, 12);
+      var x = '<div class="wk-x" id="' + id + '"' + (open ? '' : ' hidden') + '><p>Gross <b>' + fR(r.R) + '</b>' + (r.ck ? ', costs <b>' + fR(-r.cost) + '</b>, net <b>' + fR(r.net) + '</b>' : ' · no cost on record, so net = gross') + '. ' + esc(r.desk) + (r.grp === 'live' ? ' live paper' : r.grp === 'shadow' ? ' shadow book' : ' research paper') + '.</p>'
+        + '<ul class="wk-tl">' + shown.map(function (t) { return '<li><span>' + esc(when(t.t)) + ' · <b>' + esc(t.mk) + '</b> ' + esc(t.side || '') + (t.src === 'replay' ? ' · replay' : '') + '</span><span class="' + (t.net > 0.004 ? 'pos' : t.net < -0.004 ? 'neg' : '') + '">' + fR(t.net) + '</span></li>'; }).join('') + '</ul>'
+        + (L.length > shown.length ? '<p>+' + (L.length - shown.length) + ' earlier trades this week.</p>' : '') + '</div>';
+      return '<li><button type="button" class="wk-row" data-row="' + esc(r.key) + '" aria-expanded="' + open + '" aria-controls="' + id + '" aria-label="' + esc(r.name + ': ' + fR(r.net) + ' net over ' + plural(r.n, 'trade')) + '">'
+        + '<span class="wk-nm"><b>' + esc(r.name) + '</b><small>' + esc(sub) + '</small></span>'
+        + '<span class="wk-trk" aria-hidden="true"><i class="' + (r.net >= 0 ? 'up' : 'dn') + '" style="width:' + w.toFixed(1) + '%"></i></span>'
+        + '<span class="wk-val">' + fR(r.net) + (r.ck ? '' : '<small>gross</small>') + '</span></button>' + x + '</li>';
+    }).join('');
+    $('ms-wk-tot').innerHTML = GL[st.g] + ' total after costs <b class="' + (bk.net > 0.004 ? 'pos' : bk.net < -0.004 ? 'neg' : '') + '">' + fR(bk.net) + '</b> over ' + plural(bk.n, 'trade') + ' (' + bk.w + ' won, ' + bk.l + ' lost; gross ' + fR(bk.R) + ').';
+    $('ms-wk-cost').innerHTML = 'Bars share one scale, gains right of the line, losses left. Costs: Meridian’s recorded spread and slippage per trade' + (st.g !== 'research' ? '; ICT a CME micro round trip (1 tick spread, fees, 1 tick slippage)' : '') + (bk.ck ? '' : '; rows marked <b>gross</b> have no cost on record') + '. Tap a system for its trades.';
+  }
+
+  // ─── best and worst ───
+  function noteOf(r) {
+    var x = r.x || {}, P = [], pm = x.pm || {};
+    if (r.desk === 'ICT') {
+      P.push('<b>' + esc(x.model || 'ICT signal') + '</b>' + (x.grade && x.grade.letter ? ', grade ' + esc(x.grade.letter) : '') + (x.feat && x.feat.session ? ', ' + esc(x.feat.session) + ' session' : '') + (x.feat && x.feat.bias ? ', ' + esc(x.feat.bias) + ' the daily bias' : '') + (x.feat && x.feat.zone ? ', in ' + esc(x.feat.zone) : '') + (r.src === 'replay' ? ' · desk replay' : ' · forward paper') + '.');
+      P.push('Entry ' + pxF(x.entry) + ', stop ' + pxF(x.stop0 != null ? x.stop0 : x.stop) + (x.exit ? ', out on ' + esc(String(x.exit).replace(/-/g, ' ')) : '') + (num(x.exitPx) ? ' at ' + pxF(x.exitPx) : '') + (num(x.size) && x.size !== 1 ? ', size ' + x.size : '') + '.');
+    } else {
+      if (x.note) P.push(esc(trim(x.note, 420)));
+      if (pm.title) P.push('<b>' + esc(pm.title) + '.</b> ' + esc(pm.detail || '') + (pm.lesson ? ' Lesson: ' + esc(pm.lesson) : ''));
+      P.push('Entry ' + pxF(x.entry, x) + ', stop ' + pxF(x.stop0 != null ? x.stop0 : x.stop, x) + (num(x.t1) && !(x.rr >= 99) ? ', target ' + pxF(x.t1, x) : '') + (x.exitKind ? ', out on ' + esc(x.exitKind) : x.exit ? ', out: ' + esc(x.exit) : '') + (num(x.mfe) ? '. Best +' + x.mfe.toFixed(2) + 'R, worst −' + Math.abs(x.mae || 0).toFixed(2) + 'R while open' : '') + '.');
+    }
+    P.push('Opened ' + esc(when(r.o)) + ', closed ' + esc(when(r.t)) + ' UTC. Gross ' + fR(r.R) + (r.ck ? ', costs ' + fR(-r.cost) + ', net ' + fR(r.net) : ', no cost on record') + '.');
+    return P.map(function (p) { return '<p>' + p + '</p>'; }).join('');
+  }
+  function tradeItem(r, i, tag) {
+    var id = 'ms-wk-t-' + tag + i, k = 't:' + r.id, open = !!st.open[k];
+    return '<li><button type="button" class="wk-it" data-open="' + esc(k) + '" aria-expanded="' + open + '" aria-controls="' + id + '"><span class="t"><b>' + esc(r.mk) + ' ' + esc(r.side || '') + ' · ' + esc(r.name) + '</b><small>' + esc(when(r.t)) + ' UTC' + (r.src === 'replay' ? ' · replay' : '') + '</small></span>'
+      + '<span class="v ' + (r.net > 0 ? 'pos' : 'neg') + '">' + fR(r.net) + '</span>' + chev + '</button><div class="wk-x" id="' + id + '"' + (open ? '' : ' hidden') + '>' + noteOf(r) + '</div></li>';
+  }
+  function renderBw(B) {
+    var b = B.best[st.g], w = B.worst[st.g]; $('ms-wk-bw-for').textContent = GL[st.g] + ' book, after costs';
+    if (!b.length && !w.length) { $('ms-wk-bw').innerHTML = '<p class="wk-empty">No closed ' + GL[st.g].toLowerCase() + ' trades this week.</p>'; return; }
+    $('ms-wk-bw').innerHTML = '<div class="wk-sub">Best</div>' + (b.length ? '<ul class="wk-list">' + b.map(function (r, i) { return tradeItem(r, i, 'b'); }).join('') + '</ul>' : '<p class="wk-empty">No winning trade.</p>')
+      + '<div class="wk-sub">Worst</div>' + (w.length ? '<ul class="wk-list">' + w.map(function (r, i) { return tradeItem(r, i, 'w'); }).join('') + '</ul>' : '<p class="wk-empty">No losing trade.</p>');
+  }
+
+  // ─── rule changes ───
+  var WHO = { you: ['You', 'you'], coach: ['Coach', ''], fix: ['Fix', 'mute'] };
+  var BY = { 'coach-stats': 'Coach, live stats', 'coach-backtest': 'Coach, 30-day replay', 'coach-ai': 'Coach, AI review', 'coach-guard': 'Coach, live guard', system: 'System', repair: 'Record repair', user: 'You' };
+  function renderRules(D, B) {
+    var L = rules(D.config, D.coach, B.from, B.to), c = { all: L.length, you: 0, coach: 0, fix: 0 }; L.forEach(function (r) { c[r.who]++; });
+    Object.keys(c).forEach(function (k) { $('ms-wk-rn-' + k).textContent = c[k] || ''; });
+    pane.querySelectorAll('#ms-wk-rseg [data-a]').forEach(function (b) { var on = b.dataset.a === st.a; b.setAttribute('aria-selected', String(on)); b.tabIndex = on ? 0 : -1; });
+    var S = st.a === 'all' ? L : L.filter(function (r) { return r.who === st.a; }), lim = st.rlAll ? S.length : 8;
+    if (!S.length) { $('ms-wk-rl').innerHTML = '<p class="wk-empty">' + (L.length ? 'None by ' + (st.a === 'you' ? 'you' : st.a === 'coach' ? 'the Coach' : 'repairs') + ' this week.' : 'No rule changed this week.') + '</p>'; return; }
+    $('ms-wk-rl').innerHTML = '<ul class="wk-list">' + S.slice(0, lim).map(function (r, i) {
+      var id = 'ms-wk-r-' + i, k = 'r:' + r.t + ':' + r.change.slice(0, 40), open = !!st.open[k], short = trim(r.change, 110), wl = WHO[r.who];
+      return '<li><button type="button" class="wk-it" data-open="' + esc(k) + '" aria-expanded="' + open + '" aria-controls="' + id + '"><span class="t"><b>' + esc(short) + '</b><small><span class="wk-st ' + wl[1] + '">' + wl[0] + '</span> ' + esc(when(r.t)) + ' UTC</small></span><span class="v"></span>' + chev + '</button>'
+        + '<div class="wk-x" id="' + id + '"' + (open ? '' : ' hidden') + '>' + (short !== r.change ? '<p><b>Change.</b> ' + esc(r.change) + '</p>' : '') + '<p><b>Why.</b> ' + esc(r.why || 'No reason recorded.') + '</p>'
+        + '<p>By ' + esc(BY[r.by] || r.by) + (r.before && num(r.before.n) ? '. Before the change: ' + r.before.n + ' trades at ' + fR(r.before.exp) + ' a trade' : '') + (r.due ? '. Its 30-day check is due ' + esc(dU.format(new Date(r.due))) : '') + '.</p></div></li>';
+    }).join('') + '</ul>' + (S.length > lim ? '<button type="button" class="wk-more" data-more="rules">Show all ' + S.length + '</button>' : '');
+  }
+
+  // ─── now: decisions, open positions, edge decay, robustness ───
+  function renderDec(D, rc, now) {
+    var L = decisions(D, now, rc);
+    if (!L.length) { $('ms-wk-dec').innerHTML = '<p class="wk-clear"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12 5 5L20 7"/></svg>Nothing waiting on you.</p>'; return; }
+    $('ms-wk-dec').innerHTML = '<ul class="wk-list">' + L.map(function (d, i) {
+      var id = 'ms-wk-d-' + i, k = 'd:' + d.k + ':' + d.title.slice(0, 40), open = !!st.open[k];
+      return '<li><button type="button" class="wk-it" data-open="' + esc(k) + '" aria-expanded="' + open + '" aria-controls="' + id + '">' + ico(d.k, d.tone) + '<span class="t"><b>' + esc(d.title) + '</b><small>' + esc(d.act || '') + '</small></span>' + chev + '</button>'
+        + '<div class="wk-x" id="' + id + '"' + (open ? '' : ' hidden') + '>' + (d.detail ? '<p>' + esc(d.detail) + '</p>' : '') + (d.href ? '<p><a href="' + esc(d.href) + '">Open it →</a></p>' : '') + '</div></li>';
+    }).join('') + '</ul>';
+  }
+  function renderOpen(D) {
+    var O = openNow(D), L = O.list, el = $('ms-wk-open');
+    var known = L.filter(function (p) { return p.R != null; }), tot = r2(known.reduce(function (s, p) { return s + p.R; }, 0));
+    el.innerHTML = (L.length ? '<div class="wk-chips"><span class="wk-chip"><b>' + L.length + '</b> live</span>' + (known.length ? '<span class="wk-chip">floating <b class="' + (tot > 0 ? 'pos' : tot < 0 ? 'neg' : '') + '">' + fR(tot) + '</b></span>' : '') + '</div><ul class="wk-list">' + L.map(function (p, i) {
+      var id = 'ms-wk-o-' + i, k = 'o:' + (p.x.id || i), open = !!st.open[k], x = p.x;
+      return '<li><button type="button" class="wk-it" data-open="' + esc(k) + '" aria-expanded="' + open + '" aria-controls="' + id + '"><span class="t"><b>' + esc(p.mk) + ' ' + esc(p.side || '') + ' · ' + esc(p.sys) + '</b><small>' + esc(p.desk) + (p.pend ? ' · order waiting' : ' · opened ' + esc(when(p.o))) + '</small></span>'
+        + '<span class="v ' + (p.R > 0 ? 'pos' : p.R < 0 ? 'neg' : '') + '">' + (p.pend ? 'pending' : fR(p.R)) + '</span>' + chev + '</button>'
+        + '<div class="wk-x" id="' + id + '"' + (open ? '' : ' hidden') + '><p>Entry ' + pxF(x.entry, x) + ', stop ' + pxF(x.stop, x) + (num(x.t1) && !(x.rr >= 99) ? ', target ' + pxF(x.t1, x) : '') + (num(p.px) ? '; last price ' + pxF(p.px, x) : '') + '.</p>' + (x.note ? '<p>' + esc(trim(x.note, 360)) + '</p>' : '') + '</div></li>';
+    }).join('') + '</ul>' : '<p class="wk-empty">No live position open.</p>')
+      + '<p class="wk-foot">' + (O.shadow ? '<b>' + O.shadow + '</b> shadow positions are open as well (not counted). ' : '') + 'Floating R uses the last price the council recorded.</p>';
+  }
+  function renderDecay(D) {
+    var Dc = D.coach && D.coach.decay, el = $('ms-wk-decay');
+    if (!Dc || !arr(Dc.systems).length) { el.innerHTML = '<p class="wk-empty">' + (Dc && Dc.error ? 'Edge-decay monitor: ' + esc(Dc.error) : 'No edge-decay reading yet: the Coach writes one every 6 hours.') + '</p>'; return; }
+    if (Dc.at) $('ms-wk-decay-at').textContent = 'Now · ' + dmU.format(new Date(Dc.at)) + ' ' + hmU.format(new Date(Dc.at));
+    var S = arr(Dc.systems).slice().sort(function (a, b) { return (a.live === b.live ? 0 : a.live ? -1 : 1) || ({ decaying: 0, watch: 1, healthy: 2 }[a.status] - { decaying: 0, watch: 1, healthy: 2 }[b.status]); });
+    var c = { healthy: 0, watch: 0, decaying: 0 }; S.forEach(function (s) { if (s.live && c[s.status] != null) c[s.status]++; });
+    el.innerHTML = '<div class="wk-chips"><span class="wk-chip"><b>' + c.healthy + '</b> healthy</span><span class="wk-chip"><b>' + c.watch + '</b> on watch</span><span class="wk-chip"><b class="' + (c.decaying ? 'neg' : '') + '">' + c.decaying + '</b> decaying</span></div><ul class="wk-list">' + S.map(function (s, i) {
+      var id = 'ms-wk-dc-' + i, k = 'dc:' + s.id, open = !!st.open[k], r = s.roll || {}, stt = s.few ? 'mute' : DL[s.status] || '';
+      return '<li><button type="button" class="wk-it" data-open="' + esc(k) + '" aria-expanded="' + open + '" aria-controls="' + id + '"><span class="t"><b>' + esc(s.name) + '</b><small><span class="wk-st ' + stt + '">' + (s.few ? 'Too few' : esc(s.status.charAt(0).toUpperCase() + s.status.slice(1))) + '</span> ' + esc(s.desk || '') + (s.live ? '' : ' · shadow') + '</small></span>'
+        + '<span class="v">' + (r.n ? fR(r.exp) + '<small style="display:block;font:500 11px var(--sans);color:var(--ink-faint)">last ' + r.n + '</small>' : '') + '</span>' + chev + '</button>'
+        + '<div class="wk-x" id="' + id + '"' + (open ? '' : ' hidden') + '><p>' + esc(arr(s.why).join('; ')) + '</p>' + (num(s.ref) ? '<p>Backtest ' + fR(s.ref) + ' a trade' + (s.fwd && s.fwd.n ? '; forward ' + s.fwd.n + ' trades at ' + fR(s.fwd.exp) : '') + '.</p>' : '') + '</div></li>';
+    }).join('') + '</ul><p class="wk-foot">Status only: the monitor never changes a rule. A live system marked decaying lands in “Decisions waiting on you”.</p>';
+  }
+  function renderRob(D, base) {
+    var J = D.robust, el = $('ms-wk-rob');
+    if (!J || !arr(J.claims).length) { el.innerHTML = '<p class="wk-empty">No robustness audit yet (research/robustness.json).</p>'; return []; }
+    if (J.at) $('ms-wk-rob-at').textContent = 'Now · ' + dmU.format(new Date(J.at));
+    var C = arr(J.claims), rc = base ? robustChanges(J, base.map) : [], cnt = {}; C.forEach(function (c) { cnt[c.verdict] = (cnt[c.verdict] || 0) + 1; });
+    var item = function (c, i, tag) { var id = 'ms-wk-rb-' + tag + i, k = 'rb:' + c.id, open = !!st.open[k];
+      return '<li><button type="button" class="wk-it" data-open="' + esc(k) + '" aria-expanded="' + open + '" aria-controls="' + id + '"><span class="t"><b>' + esc(c.name || c.id) + '</b><small>' + (c.was ? '<span class="wk-st ' + (VL[c.was] || '') + '">' + esc(c.was) + '</span> → ' : '') + '<span class="wk-st ' + (VL[c.verdict || c.to] || '') + '">' + esc(c.verdict || c.to) + '</span> ' + esc(c.status || '') + '</small></span><span class="v"></span>' + chev + '</button>'
+        + '<div class="wk-x" id="' + id + '"' + (open ? '' : ' hidden') + '><p>' + esc(arr(c.why).join('; ') || 'No reasons recorded.') + '</p>' + (c.claim ? '<p>Claim: ' + esc(c.claim) + '</p>' : '') + '</div></li>'; };
+    var live = C.filter(function (c) { return /^live/.test(c.status || ''); }), rest = C.filter(function (c) { return !/^live/.test(c.status || ''); });
+    el.innerHTML = '<div class="wk-chips">' + ['robust', 'fragile', 'not proven'].map(function (v) { return '<span class="wk-chip"><b>' + (cnt[v] || 0) + '</b> ' + v + '</span>'; }).join('') + '</div>'
+      + '<div class="wk-sub">Changes' + (base ? ' since ' + esc(base.src === 'digest' ? 'the last digest' : 'you last looked') + (base.at ? ', ' + esc(dU.format(new Date(base.at))) : '') : '') + '</div>'
+      + (rc.length ? '<ul class="wk-list">' + rc.map(function (c, i) { return item(c, i, 'c'); }).join('') + '</ul>' : '<p class="wk-empty">' + (base ? 'No verdict changed.' : 'Verdicts recorded now; changes show from the next audit.') + '</p>')
+      + (live.length ? '<details class="wk-all"><summary>Live systems (' + live.length + ')</summary><ul class="wk-list">' + live.map(function (c, i) { return item(c, i, 'l'); }).join('') + '</ul></details>' : '')
+      + (rest.length ? '<details class="wk-all"><summary>Shadow, research and Coach claims (' + rest.length + ')</summary><ul class="wk-list">' + rest.map(function (c, i) { return item(c, i, 'o'); }).join('') + '</ul></details>' : '')
+      + '<p class="wk-foot">Bar: ' + esc(J.bar ? (J.bar.minN || 30) + '+ trades, out-of-sample t ≥ ' + (J.bar.oosT || 2) + ', survives the multiple-testing count' : 'see research/robustness.md') + '. Every live edge so far is regime-bound.</p>';
+    return rc;
+  }
+
+  // ─── render ───
+  function render() {
+    if (pane.hidden || !W.MS_COUNCIL || !W.MS_COUNCIL.at) return;
+    var D = data(), now = Date.now() / 1000;
+    st.all = records(D);
+    var rng = weeks(st.all, now); if (st.wk == null) st.wk = rng.last; st.wk = Math.max(rng.first, Math.min(rng.last, st.wk));
+    var B = build(D, st.wk, st.all);
+    var base = D.digest && D.digest.robust ? { map: D.digest.robust, at: D.digest.sent && D.digest.sent.at, src: 'digest' } : D.robust ? localRobust(robustMap(D.robust)) : null;
+    pane.classList.toggle('wk-busy', !st.extra);
+    var safe = function (f) { try { return f(); } catch (e) { if (W.console) console.warn('week report', e); } };
+    safe(function () { renderHead(B, D, rng, now); });
+    safe(function () { renderPnl(B); });
+    safe(function () { renderBw(B); });
+    safe(function () { renderRules(D, B); });
+    var rc = safe(function () { return renderRob(D, base); }) || [];
+    safe(function () { renderDec(D, rc, now); });
+    safe(function () { renderOpen(D); });
+    safe(function () { renderDecay(D); });
+    st.lastRender = Date.now();
+  }
+  function go(wk) { st.wk = wk; st.open = {}; st.rlAll = false; render(); }
+
+  // ─── interaction ───
+  pane.addEventListener('click', function (ev) {
+    var t = ev.target;
+    if (t.closest('#ms-wk-prev')) { go(st.wk - WEEK); return; }
+    if (t.closest('#ms-wk-next')) { go(st.wk + WEEK); return; }
+    if (t.closest('#ms-wk-today')) { go(weekOf(Date.now() / 1000)); return; }
+    var g = t.closest('#ms-wk-seg [data-g]'); if (g) { st.g = g.dataset.g; save(); render(); return; }
+    var a = t.closest('#ms-wk-rseg [data-a]'); if (a) { st.a = a.dataset.a; st.rlAll = false; save(); render(); return; }
+    if (t.closest('[data-more="rules"]')) { st.rlAll = true; render(); return; }
+    var b = t.closest('button[aria-controls][data-row], button[aria-controls][data-open]');
+    if (b) { var k = b.dataset.row || b.dataset.open, x = $(b.getAttribute('aria-controls')), open = b.getAttribute('aria-expanded') !== 'true';
+      b.setAttribute('aria-expanded', String(open)); if (x) x.hidden = !open; if (open) st.open[k] = 1; else delete st.open[k]; hideTip(); }
+  });
+  pane.addEventListener('keydown', function (ev) {   // arrow keys move along each segmented control (tab pattern)
+    var g = ev.target.closest('.wk-seg'); if (!g || ['ArrowLeft', 'ArrowRight', 'Home', 'End'].indexOf(ev.key) < 0) return;
+    var bs = Array.prototype.slice.call(g.querySelectorAll('button')), i = bs.indexOf(document.activeElement); if (i < 0) return;
+    var j = ev.key === 'Home' ? 0 : ev.key === 'End' ? bs.length - 1 : (i + (ev.key === 'ArrowRight' ? 1 : -1) + bs.length) % bs.length;
+    ev.preventDefault(); bs[j].click(); var nb = g.querySelectorAll('button')[j]; if (nb) nb.focus();
+  });
+  // hover / focus readout on a P&L bar (the same numbers are in the row and its opened list)
+  var tip = $('ms-wk-tip');
+  function hideTip() { if (tip) tip.hidden = true; }
+  function showTip(row, x, y) {
+    if (!tip || !st.all) return; var r = build(data(), st.wk, st.all).rows.filter(function (q) { return q.key === row.dataset.row; })[0]; if (!r) return hideTip();
+    tip.textContent = ''; var s = document.createElement('strong'); s.textContent = fR(r.net) + (r.ck ? ' net' : ' gross'); tip.appendChild(s);
+    [r.name, plural(r.n, 'trade') + ', ' + r.w + ' won, ' + r.l + ' lost', 'Gross ' + fR(r.R) + (r.ck ? ' · costs ' + fR(-r.cost) : ' · no cost on record')].forEach(function (l) { var d = document.createElement('div'); d.textContent = l; tip.appendChild(d); });
+    tip.hidden = false; var w = tip.offsetWidth, h = tip.offsetHeight, vw = window.innerWidth;
+    tip.style.left = Math.max(8, Math.min(vw - w - 8, x - w / 2)) + 'px'; tip.style.top = Math.max(8, y - h - 14) + 'px';
+  }
+  pane.addEventListener('pointermove', function (ev) { if (ev.pointerType !== 'mouse') return; var row = ev.target.closest('.wk-row'); if (!row) return hideTip(); showTip(row, ev.clientX, ev.clientY); });
+  pane.addEventListener('pointerleave', hideTip);
+  pane.addEventListener('focusin', function (ev) { var row = ev.target.closest && ev.target.closest('.wk-row'); if (!row || !row.matches(':focus-visible')) return hideTip(); var b = row.getBoundingClientRect(); showTip(row, b.left + b.width / 2, b.top); });
+  pane.addEventListener('focusout', hideTip);
+  window.addEventListener('scroll', hideTip, { passive: true });
+
+  // ─── data ───
+  function loadExtra() {
+    if (st.extra && Date.now() - st.extraAt < 5 * 60e3) return Promise.resolve(st.extra);
+    if (st.loading) return st.loading;
+    var base = W.MS_CDATA || '', bust = Math.floor(Date.now() / 120000);
+    var get = function (f) { return fetch(base + f + '?v=' + bust, { cache: 'no-store' }).then(function (r) { return r.ok ? r.json() : null; }).catch(function () { return null; }); };
+    st.loading = Promise.all([get('ict/replay.json'), get('ict/trades.json'), get('ict/shadow.json'), get('ict/snapshot.json'), get('research/robustness.json'), get('macro/forecast.json'), get('digest.json')]).then(function (a) {
+      st.extra = { ictReplay: a[0], ictTrades: a[1], ictShadow: a[2], ictSnap: a[3], robust: a[4], macro: a[5], digest: a[6] }; st.extraAt = Date.now(); st.loading = null; return st.extra; });
+    return st.loading;
+  }
+  function show() { if (pane.hidden) return; render(); loadExtra().then(render); }
+  new MutationObserver(function () { if (!pane.hidden) show(); else hideTip(); }).observe(pane, { attributes: true, attributeFilter: ['hidden'] });
+  document.addEventListener('ms:council', function () { if (!pane.hidden) show(); });
+  setTimeout(show, 0);
 })(window);
 </script>
 </body>
