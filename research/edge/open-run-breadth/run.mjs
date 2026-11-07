@@ -67,7 +67,8 @@ for (const sym of ['nas100', ...NEW]) {
     early: S.early, late: S.late, lateHalves: [stats(R(late.slice(0, h))), stats(R(late.slice(h)))],
     medianStopPts: { early: stops(tr.filter((x) => x.d < LATE)), late: stops(late) },
     pass: { L, E, both: L && E }, byYear: byYear(tr), sensitivity: sens,
-    trades: tr.map((x) => ({ d: x.d, m: x.m, side: x.side, entry: x.entry, r0: +x.r0.toFixed(2), gross: x.gross, R: +x.R.toFixed(3), exit: x.exit })) };
+    tradeCols: ['d', 'm', 'side', 'entry', 'r0', 'gross', 'R', 'exit'],
+    trades: tr.map((x) => [x.d, x.m, x.side, x.entry, +x.r0.toFixed(2), x.gross, +x.R.toFixed(3), x.exit]) };
   console.log(`\n## ${M.name} (${sym}) clean ${clean[0]}-${clean.at(-1)} (${clean.length} yrs), cost ${M.cost} pt, median stop early ${out.results[sym].medianStopPts.early} late ${out.results[sym].medianStopPts.late}`);
   console.log(line('early 2004-22', S.early)); console.log(line('late 2023-26', S.late)); console.log('PASS L', L, 'E', E);
   for (const [k, v] of Object.entries(sens)) console.log(`  ${k.padEnd(18)} early ${v.early.avg} (t ${v.early.t}, n ${v.early.n}) | late ${v.late.avg} (t ${v.late.t}, n ${v.late.n})`);
@@ -94,7 +95,7 @@ for (const s of NEW) {
   for (const [w, f] of [['early', (x) => x.d < LATE], ['late', (x) => x.d >= LATE]]) {
     const tr = primary[s].filter(f), shared = tr.filter((x) => nqMap.has(x.d)), same = shared.filter((x) => nqMap.get(x.d).side === x.side), notNq = tr.filter((x) => !nqMap.has(x.d));
     res[w] = { trades: tr.length, alsoNqDay: shared.length, sameSide: same.length, corrRsameSide: corr(same.map((x) => x.R), same.map((x) => nqMap.get(x.d).R)),
-      onNqDays: stats(R(shared)), notNqDays: stats(R(notNq)) };
+      onNqDays: stats(R(shared)), notNqDays: stats(R(notNq)), sameSideDays: stats(R(same)), nqOnSameSideDays: stats(same.map((x) => nqMap.get(x.d).R)) };
   }
   out.dependence[s] = res;
   console.log(`dependence ${MARKETS[s].name}:`, JSON.stringify(res));
@@ -117,5 +118,6 @@ if (SPXHD && fs.existsSync(SPXHD)) {
   console.log('  byYear', out.histdataES.byYear.map((r) => `${r.year}:${r.avg}(${r.n})`).join(' '));
 }
 
-fs.writeFileSync(path.join(HERE, 'result.json'), JSON.stringify(out, null, 1));
+// pretty, but each trade (an array of plain values) on one line
+fs.writeFileSync(path.join(HERE, 'result.json'), JSON.stringify(out, null, 1).replace(/\[\n\s*("[^"\n]*"|-?[\d.]+)((?:,\n\s*(?:"[^"\n]*"|-?[\d.e-]+))+)\n\s*\]/g, (m) => m.replace(/\n\s*/g, '')));
 console.log('\nwrote result.json');
