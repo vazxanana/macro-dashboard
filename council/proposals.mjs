@@ -102,10 +102,8 @@ export function promoteDemote(rows, config, halves, at, opt = {}) {
 // Data-source proposal (7 Nov): from research/spotcheck.json (council/spotcheck.mjs). The live Trader manages gold/forex
 // trades on Kraken candles; when the same trades re-judged on OANDA spot candles come out clearly worse, Kraken's thin forex
 // books are flattering the paper results. One proposal names the markets; never applied (the candle source is the owner's call).
-// opt.feed = snapshot.feed ({ key: 'OANDA' | 'Kraken' }): markets the live Trader already runs on OANDA candles (PR #449)
-// are dropped, so the proposal names only markets still on Kraken and disappears once all of them are on OANDA.
 export function spotProposals(spot, at = new Date().toISOString(), opt = {}) {
-  const minN = opt.minN || 20, gap = opt.gap != null ? opt.gap : 8, feed = opt.feed || {};
+  const minN = opt.minN || 20, gap = opt.gap != null ? opt.gap : 8;
   if (!spot || !spot.markets) return [];
   const feed = opt.feed || {};   // markets already managed on OANDA candles (snapshot.feed) need no proposal
   const bad = Object.entries(spot.markets).filter(([m, c]) => c && feed[m] !== 'OANDA' && c.n >= minN && c.liveR - c.spotR >= gap).sort((a, b) => (b[1].liveR - b[1].spotR) - (a[1].liveR - a[1].spotR));
