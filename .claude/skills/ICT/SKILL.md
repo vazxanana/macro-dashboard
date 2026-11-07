@@ -224,3 +224,13 @@ On A-setups with the stop floor (§20), cash NQ/ES/YM 2023-24 | 2025-26 and NQ f
 - Skip signals on the first Friday of the month before 10:00 ET (the 08:30 jobs report): +41.8R dd 6.9 | +51.7R dd 10.8. NQ futures 2023 / 2024 / 2025: +9.9 / +15.2 / +21.1R vs +8.9 / +13.1 / +20.1R; all 4 such futures signals lost. Small sample (about 3 signals a year) but the logic fits: a sweep made by the release candle is news, not a liquidity run. Adopted (`nfpMorning` in `isASetup`).
 - FOMC days are NOT skipped: skipping them costs 20R in 2023-24 (6 signals, +20.4R); skipping only shorts, only before 14:00 ET, or the day before also fails.
 - First Friday of the month is a proxy for the jobs report (it can move to the second Friday); the proxy is what was tested.
+
+## 24. Why the 2026 desk replay looks worse (7 Nov 2026) — rules unchanged
+- 2026 futures replay (CNBC, Jan–Nov): all signals +51.2R (406) but A-setups only +12.8R (93), dd 13.4. Owner: "ICT results only look worse".
+- The gap is the tight-stop slice (stop < 0.3x daily ATR, against bias): +64R on the 2026 futures replay, from about 10 outliers (top 10 = +53R).
+  The same slice loses everywhere else: cash 2023-24 −37.4R, cash 2025-26 −56.5R, NQ futures 2023-25 −8.1R, and cash over the very same 2026 months −18.6R.
+  It is feed- and luck-dependent, so the §20 floor stays.
+- A-setups are the only filter positive in all four datasets (cash 23-24 +37.7 dd 7.6 | cash 25-26 +48.6 dd 10.8 | NQ fut +42.1 dd 5.4 | 2026 replay +11.8 dd 14.0 after costs).
+  A+ is also positive in all four (+37.6 dd 5.7 | +28.8 dd 9.0 | +26.9 dd 7.2 | +20.7 dd 7.7) and is the steadier view for 2026, but it is not better in every set.
+- Exits: 2026 prefers quicker exits (trail from +1.5R by 1R: +18.5R dd 9.5; 24 h: +21.0 dd 7.2). Both lose profit on 2025-26 cash and NQ futures. Unchanged.
+- Read: 2026 is the edge's weakest stretch (≈ +0.1R a signal), not a broken rule. Judge it on the forward A+ count (§19), not on the replay's all-signals line.
