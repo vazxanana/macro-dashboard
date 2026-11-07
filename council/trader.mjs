@@ -626,9 +626,10 @@ for (const [key, M] of Object.entries(MARKETS)) {
     // 4. pullback entry: limit at the broken M15 level, stop past the M15 Origin, target 3R (his 1:2 or 1:3), valid 24 h,
     // out after 72 h. Spot gold, engine events causal: 2019-22 104 trades +7.5R (2R +11.5R), 2023-26 114 trades +15.1R
     // (+0.13R a trade), no volatility gate needed. Lower-timeframe chains (H1-M15-M5, M30-M15-M5) lost and are not used.
-    // Crypto trend (5 Nov, user rule pairs-best): daily 55-day breakout, long only. Entry the first run after a daily close above
-    // the prior 55 daily highs (at market, about the close); initial stop 4 x ATR(20) below; each daily close lifts the stop to
-    // 4 ATR under the best close so far; out on a daily close under the prior 27 daily lows (at market). One trade per coin.
+    // Crypto trend (5 Nov, user rule pairs-best; v3 since 5 Nov, shadow since 7 Nov): two slots per coin, the 55- and 100-day
+    // breakouts, long only. Entry the first run after a daily close above the prior N daily highs (at market); catastrophe stop
+    // 5 x ATR(20) below, fixed; out on a daily close under the ratcheting N-day channel midpoint (at market); one add at +1R.
+    // (The v1 rule in the pairs-best history line, 4 ATR trail and the 27-day low, only manages trades opened before v3.)
     // A coin stops opening trend trades once its forward trend total reaches config.cryptoTrendStopR (−8R).
     if ((config.cryptoTrend || []).includes(key)) {
       try {
@@ -827,7 +828,8 @@ for (const [key, M] of Object.entries(MARKETS)) {
         // kept +0.37R / +0.35R a trade (both halves) when it agrees, lost when it is against. The daily candles are spot gold
         // from CNBC (XAU=): PAXG's premium over spot drifts over the months, so its weekly swings break in other places (3 Nov:
         // spot closed the week through the weekly low, PAXG did not). CNBC matched the HistData spot weeks in 95 of 95 weeks
-        // since January 2025. If CNBC fails, the PAXG daily candles stand in (snapshot.goldW1Src says which).
+        // since January 2025. If CNBC fails, the market feed's daily candles stand in: OANDA spot since 7 Nov, else Kraken PAXG
+        // (snapshot.goldW1Src says which: 'cnbc-spot', 'oanda' or 'paxg').
         let dly = src['1d'].bars;
         if (config.moshaBoWeekly) try {
           const ds = (t) => new Date(t * 1000).toISOString().slice(0, 10).replace(/-/g, '') + '000000';
@@ -836,7 +838,7 @@ for (const [key, M] of Object.entries(MARKETS)) {
           const cd = pb.map((b) => ({ time: Math.floor(+b.tradeTimeinMills / 86400000) * 86400, open: +b.open, high: +b.high, low: +b.low, close: +b.close })).filter((b) => [b.time, b.open, b.high, b.low, b.close].every((v) => isFinite(v) && v > 0));
           if (cd.length < 300) throw new Error(`CNBC XAU= daily: ${cd.length} candles (HTTP ${r.status})`);
           dly = cd.sort((a, b) => a.time - b.time); snapshot.goldW1Src = 'cnbc-spot';
-        } catch (e) { snapshot.goldW1Src = 'paxg'; snapshot.errors.goldW1 = String(e.message || e); }
+        } catch (e) { snapshot.goldW1Src = feed === 'OANDA' ? 'oanda' : 'paxg'; snapshot.errors.goldW1 = String(e.message || e); }
         const wk = [];
         for (const b of dly) { const k = Math.floor((b.time - 345600) / 604800) * 604800 + 345600, c = wk.at(-1);
           if (!c || c.time !== k) wk.push({ time: k, open: b.open, high: b.high, low: b.low, close: b.close }); else { c.high = Math.max(c.high, b.high); c.low = Math.min(c.low, b.low); c.close = b.close; } }
@@ -869,11 +871,12 @@ for (const [key, M] of Object.entries(MARKETS)) {
       } catch (e) { snapshot.errors.moshaBo = String(e.message || e); }
     }
     // volatility gate (4 Nov, user rule gold-vol-gate): 20-day average daily range as % of price, from the last 20 closed daily
-    // bars. The replica only trades gold live while this is at least config.goldVolMin (1.5%); below it signals stay research.
+    // bars. Since 5 Nov (gold-top-be) the fixed 1.5% leg (config.goldVolMin) is null and only the percentile gate below
+    // (config.goldVolPct) decides; below the gate the replica's signals stay research (research/edge/param-drift).
     const dvb = src['1d'].bars.slice(-21, -1), volPct = dvb.length >= 15 ? dvb.reduce((a, b) => a + (b.high - b.low) / b.close * 100, 0) / dvb.length : null;
     if (key === 'xau') { snapshot.goldVol = volPct == null ? null : +volPct.toFixed(2); snapshot.goldVolMin = config.goldVolMin || null; }
     // pairs (4 Nov, user rule pairs-live): the gate is relative to each market's own history: today's 20-day range must be in the
-    // top fifth (config.pairVolPct) of the 20-day ranges over its last 365 daily candles. Gold keeps its 1.5% gate.
+    // top fifth (config.pairVolPct) of the 20-day ranges over its last 365 daily candles. Gold has its own percentile gate below.
     // A day's range counts at most 3x the median of the 20 days before it: a lone Kraken bad print (USD/CAD and USD/CHF, 3 Nov,
     // hundreds of pips for a minute) would otherwise inflate the 20-day range and open the gate. Gold keeps its raw ranges.
     let volGate = key === 'xau' ? config.goldVolMin || null : null, pairVol = volPct;
