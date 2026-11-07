@@ -9,9 +9,17 @@ name: Council trader
 # so the Trader runs 24/7. Cron runs are only a watchdog: they never cancel the
 # loop (own concurrency group) and start a new one only if none is running.
 on:
-  # 7 Nov 2026: the council now trades on Vercel (api/run.js, cron every 4 min) so the repo can be private without paying for
-  # 24/7 Actions minutes. This workflow is kept for a manual emergency run only: no schedule, no push trigger, no self-restart.
+  # 7 Nov 2026, 16:3x: the owner chose GitHub Actions as the council runner (repo public, so minutes are free). Self-restart,
+  # watchdog and push trigger are back. The Vercel cron (api/run.js) stands down while this loop has saved in the last 10 min
+  # and takes over on its own if this loop stops.
+  schedule:
+    - cron: '7,22,37,52 * * * *'
   workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'council/**'
+      - '.github/workflows/council.yml'
 
 permissions:
   contents: write
@@ -78,3 +86,8 @@ jobs:
             fi
             if [ "$i" -lt "$ROUNDS" ]; then sleep 240; fi
           done
+
+      - name: Start the next run
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh workflow run council.yml --ref main -R "${{ github.repository }}"
