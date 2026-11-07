@@ -8,7 +8,7 @@ _Snapshot 2026-11-02 05:37 UTC. Paper trading only._
 <!-- live-rule:start -->
 ## Live Scalp rule check
 
-Built by the Trader at 2026-11-07 18:29 UTC from snapshot, config and the 30-day replay. Rule now: Scalp (M15 → M1) against D1 only, not in asia/overlap, skips audusd.
+Built by the Trader at 2026-11-07 18:34 UTC from snapshot, config and the 30-day replay. Rule now: Scalp (M15 → M1) against D1 only, not in asia/overlap, skips audusd.
 
 Session now: **newyork**.
 
@@ -18,7 +18,7 @@ Session now: **newyork**.
 | BTC/USD | up (Kraken) | **sell** only | READY sell | 25 trades, 32% won, +0.45R a trade |
 | ETH/USD | down (Kraken) | **buy** only | READY buy | 23 trades, 39% won, +0.35R a trade |
 | SOL/USD | down (Kraken) | **buy** only | IN ORIGIN sell | 17 trades, 29% won, +0.52R a trade |
-| XRP/USD | up (Kraken) | **sell** only | IN ORIGIN sell | 31 trades, 32% won, +0.07R a trade |
+| XRP/USD | up (Kraken) | **sell** only | READY sell | 31 trades, 32% won, +0.07R a trade |
 | EUR/USD | down (OANDA; Kraken says up) | **buy** only | WAIT RETRACE sell | 21 trades, 14% won, −0.70R a trade |
 | GBP/USD | down (OANDA) | **buy** only | WAIT RETRACE sell | 20 trades, 40% won, +0.39R a trade |
 | AUD/USD | up (OANDA) | no (rule skips AUD/USD) | READY sell | 37 trades, 27% won, −0.24R a trade |
