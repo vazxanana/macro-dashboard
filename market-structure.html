@@ -1452,6 +1452,11 @@ td.st-dim { color: var(--ink-faint); }
 :root[data-theme="midnight"] .gate-card { background: rgba(13,22,48,.9) !important; border-color: rgba(150,175,255,.14); }
 :root[data-theme="midnight"] .gate-card input { background: #0a1330; border-color: rgba(150,175,255,.18); }
 :root[data-theme="midnight"] .gate-guest { border-color: rgba(150,175,255,.18); }
+
+/* polish 37: possible-trade cards, stop note reads as text not a mono badge; cards lift on hover */
+.ms-tr-q .ms-q { font: 500 11.5px/1.45 var(--sans); letter-spacing: 0; white-space: normal; padding: 6px 9px; border-radius: 8px; color: var(--ink-dim); }
+.ms-trade { transition: border-color .15s, transform .15s, box-shadow .15s; }
+@media (hover: hover) { .ms-trade:not(.sel):hover { border-color: var(--line-strong, var(--line)); transform: translateY(-1px); box-shadow: 0 6px 18px -10px rgba(0,0,0,.45); } }
 </style>
 </head>
 <body>
