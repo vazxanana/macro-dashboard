@@ -3471,10 +3471,11 @@ function msNextSetup(bars, A) {
     { const pane = el.closest('.ms-pane'), ph = pane && pane.querySelector('.ms-ph');
       if (ph && !ph.querySelector('.ch-tools')) {
         const tl = document.createElement('span'); tl.className = 'ch-tools';
-        tl.innerHTML = `<a class="ch-b ch-tv" target="_blank" rel="noopener" title="Open this chart on TradingView" aria-label="Open on TradingView"></a><button type="button" class="ch-b ch-ruler" title="Measure: drag on the chart (or hold Shift and drag)" aria-label="Measure price and time on the chart" aria-pressed="false"></button><button type="button" class="ch-b ch-snap" title="Save this chart as an image" aria-label="Save the chart as a PNG image"></button><button type="button" class="ch-b ch-bell" title="Price alert (notifies this device) · tip: right-click the chart to set one at that price" aria-label="Set a price alert"></button><button type="button" class="ch-b ch-fit" title="Fit the chart (double-click the chart)" aria-label="Fit the ${tf.label} chart"></button><button type="button" class="ch-b ch-fs" title="Full screen" aria-label="Show the ${tf.label} chart full screen"></button>`;
+        tl.innerHTML = `<a class="ch-b ch-tv" target="_blank" rel="noopener" title="Open this chart on TradingView" aria-label="Open on TradingView"></a><button type="button" class="ch-b ch-hl" title="Draw a horizontal line: click the chart to place it, click a line again to remove it (saved for this market)" aria-label="Draw horizontal lines" aria-pressed="false"></button><button type="button" class="ch-b ch-ruler" title="Measure: drag on the chart (or hold Shift and drag)" aria-label="Measure price and time on the chart" aria-pressed="false"></button><button type="button" class="ch-b ch-snap" title="Save this chart as an image" aria-label="Save the chart as a PNG image"></button><button type="button" class="ch-b ch-bell" title="Price alert (notifies this device) · tip: right-click the chart to set one at that price" aria-label="Set a price alert"></button><button type="button" class="ch-b ch-fit" title="Fit the chart (double-click the chart)" aria-label="Fit the ${tf.label} chart"></button><button type="button" class="ch-b ch-fs" title="Full screen" aria-label="Show the ${tf.label} chart full screen"></button>`;
         ph.appendChild(tl);
         tl.querySelector('.ch-fit').addEventListener('click', () => P.fit());
         tl.querySelector('.ch-snap').addEventListener('click', () => P.snapshot());
+        tl.querySelector('.ch-hl').addEventListener('click', (e) => { const on = !P.hlOn; P.hlOn = on; e.currentTarget.classList.toggle('on', on); e.currentTarget.setAttribute('aria-pressed', String(on)); el.classList.toggle('measuring', on || !!P.measureOn); });
         { const tv = tl.querySelector('.ch-tv'); tv.href = tvUrl(CUR, tf); tv.addEventListener('click', () => { tv.href = tvUrl(CUR, tf); window.msTrack && msTrack('Open TradingView', { tf: tf.id }); }); }
         tl.querySelector('.ch-ruler').addEventListener('click', (e) => { const on = !P.measureOn; P.measureOn = on; e.currentTarget.classList.toggle('on', on); e.currentTarget.setAttribute('aria-pressed', String(on)); el.classList.toggle('measuring', on); if (!on) P.clearMeasure(); });
         tl.querySelector('.ch-bell').addEventListener('click', () => window.msOpenAlerts && window.msOpenAlerts());
@@ -3581,6 +3582,12 @@ function msNextSetup(bars, A) {
     { const at = (ev) => { const r = el.getBoundingClientRect(), p = series.coordinateToPrice(ev.clientY - r.top); return p != null && isFinite(p) ? p : null; };
       el.addEventListener('contextmenu', (ev) => { if (ev.target.closest && ev.target.closest('.ch-tools')) return; const p = at(ev); if (p == null || !window.msOpenAlerts) return; ev.preventDefault(); window.msOpenAlerts(instKey, p); });
       el.addEventListener('click', (ev) => { if (!ev.altKey || P.measureOn) return; const p = at(ev); if (p != null && window.msOpenAlerts) { ev.preventDefault(); window.msOpenAlerts(instKey, p); } }); }
+    // horizontal line tool (7 Nov loop): click to place, click a line (within 6 px) to remove; shared by all timeframes, saved per market
+    el.addEventListener('click', (ev) => { if (!P.hlOn || ev.altKey) return; if (ev.target.closest && ev.target.closest('.ch-tools')) return;
+      const r = el.getBoundingClientRect(), y = ev.clientY - r.top, pr = series.coordinateToPrice(y); if (pr == null || !isFinite(pr)) return;
+      const L = window.msHLines.get(), hit = L.findIndex((v) => { const c = series.priceToCoordinate(v); return c != null && Math.abs(c - y) <= 6; });
+      if (hit >= 0) L.splice(hit, 1); else L.push(+pr.toFixed(Math.max(0, INST.dec)));
+      window.msHLines.set(L); });
     P.rebuild = function (keepView) {
       const off = G.offset;
       P.bars = P.raw.map((b) => ({ time: b.time + TZ, open: b.open + off, high: b.high + off, low: b.low + off, close: b.close + off }));
@@ -3728,6 +3735,16 @@ function msNextSetup(bars, A) {
       P._kl = L.map(([t, v]) => P.series.createPriceLine({ price: v + off, color: t === 'DO' ? 'rgba(154,164,178,.55)' : /H$/.test(t) ? 'rgba(8,153,129,.55)' : 'rgba(242,54,69,.55)', lineWidth: 1, lineStyle: LW.LineStyle.SparseDotted, axisLabelVisible: true, title: t })); });
   }
   setTimeout(keyLevels, 2500); setInterval(keyLevels, 60e3);
+  // your own horizontal lines (drawn with the line tool), per market in localStorage
+  window.msHLines = {
+    key: () => 'ms-hl-' + instKey,
+    get() { try { return JSON.parse(localStorage.getItem(this.key()) || '[]').filter((v) => isFinite(v)); } catch (e) { return []; } },
+    set(L) { try { localStorage.setItem(this.key(), JSON.stringify(L.slice(-30))); } catch (e) {} drawHLines(); },
+  };
+  function drawHLines() { const L = window.msHLines.get();
+    Object.values(panes).forEach((P) => { if (!P.series) return; (P._hl || []).forEach((l) => { try { P.series.removePriceLine(l); } catch (e) {} });
+      P._hl = L.map((v) => P.series.createPriceLine({ price: v, color: 'rgba(209,212,220,.75)', lineWidth: 1, lineStyle: LW.LineStyle.Solid, axisLabelVisible: true, title: '' })); }); }
+  setTimeout(drawHLines, 2000);
   // range meter (7 Nov loop): today's range against the 14-day average daily range, and where price sits inside today's range
   function rangeMeter() {
     const el = document.getElementById('ms-adr'), d = panes['1d'] && panes['1d'].raw; if (!el) return;
@@ -7668,6 +7685,7 @@ function gpStats(T) {
 /* price alerts (7 Nov) */
 .ch-bell { --i: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 8a6 6 0 1 1 12 0c0 7 3 9 3 9H3s3-2 3-9M10.3 21a1.94 1.94 0 0 0 3.4 0'/%3E%3C/svg%3E"); }
 .ch-bell.on { color: #e0a526; }
+.ch-hl { --i: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round'%3E%3Cpath d='M3 12h18'/%3E%3Ccircle cx='12' cy='12' r='2.2' fill='black'/%3E%3C/svg%3E"); }
 .tv-tk { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; margin: 8px 0 0; padding: 10px 12px; border: 1px solid color-mix(in srgb, var(--accent) 30%, var(--line)); border-radius: 10px; background: color-mix(in srgb, var(--accent) 6%, transparent); font-size: 12.5px; }
 .tv-tk[hidden] { display: none; }
 .adr { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 10px; margin: 6px 0 12px; font-size: 12.5px; color: var(--ink-dim); }
