@@ -1446,6 +1446,12 @@ td.st-dim { color: var(--ink-faint); }
 /* polish 35: the alerts-on bell uses the theme accent (blue in dark/light, gold in Midnight) instead of a hard-coded blue */
 #ms-alerts.is-on { background: #2962ff; color: #fff; border-color: #2962ff; }
 :root[data-theme="midnight"] #ms-alerts.is-on { background: var(--accent); color: #1a1405; border-color: var(--accent); }
+
+/* polish 36: sign-in screen in Midnight uses the navy palette */
+:root[data-theme="midnight"][data-gate] .gate { background: radial-gradient(900px 600px at 85% 15%, rgba(227,179,65,.18), transparent 65%), radial-gradient(800px 600px at 10% 100%, rgba(70,110,255,.16), transparent 70%), linear-gradient(180deg, #0a1228 0%, #050a1a 100%); }
+:root[data-theme="midnight"] .gate-card { background: rgba(13,22,48,.9) !important; border-color: rgba(150,175,255,.14); }
+:root[data-theme="midnight"] .gate-card input { background: #0a1330; border-color: rgba(150,175,255,.18); }
+:root[data-theme="midnight"] .gate-guest { border-color: rgba(150,175,255,.18); }
 </style>
 </head>
 <body>
