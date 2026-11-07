@@ -1,5 +1,5 @@
 {
- "at": "2026-11-07T21:41:41.536Z",
+ "at": "2026-11-07T22:10:54.788Z",
  "bar": {
   "minN": 30,
   "oosT": 2,
@@ -704,6 +704,90 @@
    ]
   },
   {
+   "id": "ict-a-2008",
+   "system": "ICT",
+   "status": "long-history check of the live A rule",
+   "name": "ICT A-setups, 2008-17 untouched (OANDA cash, 4 markets)",
+   "claim": "pre-registered test #526: 2008-17 −0.013R a trade (n 2235, t -0.45) vs 2018-26 +0.093R (n 1786); verdict FAILS",
+   "source": "research/edge/ict-oos-2008/result.json (summary only)",
+   "family": "ict",
+   "n": 4021,
+   "mean": 0.0341,
+   "sd": 1.4387,
+   "t": 1.5022,
+   "wr": null,
+   "sum": 137.043,
+   "skew": 0,
+   "kurt": 3,
+   "maxDD": null,
+   "from": null,
+   "to": null,
+   "is": {
+    "n": 1786,
+    "mean": 0.093,
+    "t": 2.58,
+    "sd": 1.5234
+   },
+   "oos": {
+    "n": 2235,
+    "mean": -0.013,
+    "t": -0.45,
+    "sd": 1.3657
+   },
+   "boot": {
+    "lo": -0.0104,
+    "hi": 0.0786,
+    "pLE0": 0.0665,
+    "approx": true
+   },
+   "cost": {
+    "x0": {
+     "mean": 0.0941,
+     "t": null,
+     "sum": null
+    },
+    "x1": {
+     "mean": 0.0341,
+     "t": 1.5022,
+     "sum": 137.043
+    },
+    "x1.5": {
+     "mean": 0.0041,
+     "t": null,
+     "sum": null
+    },
+    "x2": {
+     "mean": -0.0259,
+     "t": null,
+     "sum": null
+    }
+   },
+   "mc": {
+    "dd50": null,
+    "dd95": null,
+    "ddActual": null
+   },
+   "mt": {
+    "N": 363,
+    "bonf": {
+     "p": 0.0665,
+     "pAdj": 1,
+     "tReq": 3.6373
+    },
+    "sr": 0.0237,
+    "sr0": 0.0466,
+    "dsr": 0.0732
+   },
+   "summaryOnly": true,
+   "verdict": "not proven",
+   "why": [
+    "out-of-sample −0.013 a trade",
+    "CI includes 0 (−0.010 to +0.079)",
+    "−0.026 a trade at 2x costs",
+    "fails Bonferroni for N=363 (needs t 3.64, has 1.50)"
+   ]
+  },
+  {
    "id": "replica",
    "system": "Meridian",
    "status": "live (paper)",
@@ -996,7 +1080,7 @@
   {
    "id": "gtrend5",
    "system": "Meridian",
-   "status": "live (paper)",
+   "status": "shadow (owner, 7 Nov: one bet with Gold trend N20, #530)",
    "name": "Gold trend fast N5 (council replay)",
    "claim": "council replay 2022-12-27 to 2026-11-03, costs included",
    "source": "research/replay-2w.json k=gtrend5",
@@ -1094,7 +1178,7 @@
   {
    "id": "gtrend5-2018",
    "system": "Meridian",
-   "status": "live (paper)",
+   "status": "shadow (owner, 7 Nov: one bet with Gold trend N20, #530)",
    "name": "Gold trend fast N5, 2018-26 rebuild",
    "claim": "same rule rebuilt on 8 years of HistData (earlier rebuild audit)",
    "source": "research/edge/robustness/out/gtrend.json",
@@ -1385,7 +1469,7 @@
   {
    "id": "trend",
    "system": "Meridian",
-   "status": "live (paper)",
+   "status": "shadow (owner, 7 Nov: no edge since Jun 2025, #508)",
    "name": "Crypto trend v3 (council replay)",
    "claim": "council replay 2022-12-27 to 2026-11-03, costs included",
    "source": "research/replay-2w.json k=trend",
@@ -1486,7 +1570,7 @@
   {
    "id": "trend-2018",
    "system": "Meridian",
-   "status": "live (paper)",
+   "status": "shadow (owner, 7 Nov: no edge since Jun 2025, #508)",
    "name": "Crypto trend v3, 2018-26 rebuild",
    "claim": "same rule rebuilt on 8 years of HistData (earlier rebuild audit)",
    "source": "research/edge/robustness/out/crypto.json",
