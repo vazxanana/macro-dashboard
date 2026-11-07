@@ -22,6 +22,7 @@ import { krakenMinutes, krakenOHLC, basisSeries } from './krakenhist.mjs';
 import { m15Choch, m15cFeat as m15cOf } from './choch.mjs';
 import { cleanBars, LTF_CLEAN } from './clean.mjs';
 import { d1AdxFeat } from './adx.mjs';
+import { spreadOf, costOf } from './fills.mjs';
 
 const DIR = process.argv[2] || 'data', DAYS = +(process.argv[3] || 30);
 const ONLY = process.env.BT_MARKETS ? new Set(process.env.BT_MARKETS.split(',')) : null;   // local tests: BT_MARKETS=xau,eurusd
@@ -290,14 +291,7 @@ function structFeat(sell, l, src, at) {
   const choch = ['15m', '5m'].some((id) => { const s = src[id]; return s && s.A && s.A.events.some((e) => e.dir === dir && e.structure && at - s.bars[e.breakIdx].time <= FRESH * SEC[id]); }) ? 'yes' : 'no';
   return { cf, choch };
 }
-// typical spread (same model as the trade reviews): one spread is paid per round trip
-const spreadOf = (M, price) => M.group === 'Forex' ? 0.0001 : M.spot ? 0.3 : price * 0.0002;
-// Cost charged to a replay trade, in price: the spread, plus for crypto Kraken's exchange fees (the council's crypto prices are
-// Kraken spot; research/edge/costs: the spread alone was ~1/40 of the real cost). Kraken Pro's entry tier: 0.25% maker, 0.40% taker.
-// A limit entry pays maker, a market entry (twins, sweeps) taker; the exit is charged taker (stops are market orders). Forex and
-// gold keep the spread only (a raw-spread account's commission is about the spread again: research/edge/costs).
-const FEE = { maker: 0.0025, taker: 0.004 };
-const costOf = (M, price, limitEntry) => spreadOf(M, price) + (M.group === 'Crypto' ? price * ((limitEntry ? FEE.maker : FEE.taker) + FEE.taker) : 0);
+// spread and costs (spreadOf, FEE, costOf) live in council/fills.mjs since 8 Nov, shared with the Trader's paper fills
 const BUILDERS = PAIRS.map((p) => [p, buildSetup]).concat(RETR.map((p) => [p, buildRetrace]));
 const DEFS = PAIRS.concat(RETR);
 const all = [], twins = [], unfilled = [], stillOpen = [], meta = { errors: {} };   // closed trades; their market-entry twins; resting orders that never filled;
