@@ -8,30 +8,30 @@ _Snapshot 2026-11-02 05:37 UTC. Paper trading only._
 <!-- live-rule:start -->
 ## Live Scalp rule check
 
-Built by the Trader at 2026-11-07 21:21 UTC from snapshot, config and the 30-day replay. Rule now: Scalp (M15 → M1) against D1 only, not in asia/overlap, skips audusd. **Scalp is not live right now** (not in focusSetups), so nothing below trades live.
+Built by the Trader at 2026-11-07 21:26 UTC from snapshot, config and the 30-day replay. Rule now: Scalp (M15 → M1) against D1 only, not in asia/overlap, skips audusd. **Scalp is not live right now** (not in focusSetups), so nothing below trades live.
 
 Session now: **late**.
 
 | Market | D1 (source) | Live Scalp would | Scalp now | Replay, live rule |
 |---|---|---|---|---|
-| XAU/USD | down (OANDA) | no (not live, trades the replica instead) | IN ORIGIN sell | 30 trades, 30% won, −0.07R a trade |
-| BTC/USD | up (Kraken) | no (not live) | READY sell | 26 trades, 12% won, −3.09R a trade |
-| ETH/USD | down (Kraken) | no (not live) | IN ORIGIN buy | 21 trades, 29% won, −1.51R a trade |
-| SOL/USD | down (Kraken) | no (not live) | IN ORIGIN sell | 18 trades, 22% won, −0.86R a trade |
-| XRP/USD | up (Kraken) | no (not live) | READY sell | 26 trades, 19% won, −1.70R a trade |
-| EUR/USD | down (OANDA) | no (not live) | IN ORIGIN sell | 25 trades, 20% won, −0.51R a trade |
-| GBP/USD | down (OANDA) | no (not live) | READY sell (blocked: wrong side) | 34 trades, 21% won, −0.49R a trade |
-| AUD/USD | up (OANDA) | no (not live, rule skips AUD/USD) | IN ORIGIN buy | 34 trades, 35% won, +0.03R a trade |
-| USD/CAD | up (OANDA) | no (not live) | IN ORIGIN buy | 26 trades, 54% won, +0.48R a trade |
-| USD/CHF | down (OANDA) | no (not live) | IN ORIGIN buy | 29 trades, 24% won, −0.43R a trade |
+| XAU/USD | down (OANDA) | no (not live, trades the replica instead) | IN ORIGIN sell | 29 trades, 31% won, −0.13R a trade |
+| BTC/USD | up (Kraken) | no (not live) | READY sell | 25 trades, 16% won, −2.79R a trade |
+| ETH/USD | down (Kraken) | no (not live) | IN ORIGIN buy | 23 trades, 30% won, −1.80R a trade |
+| SOL/USD | down (Kraken) | no (not live) | IN ORIGIN sell | 22 trades, 18% won, −1.44R a trade |
+| XRP/USD | up (Kraken) | no (not live) | READY sell | 30 trades, 23% won, −2.50R a trade |
+| EUR/USD | down (OANDA) | no (not live) | IN ORIGIN sell | 24 trades, 25% won, −0.37R a trade |
+| GBP/USD | down (OANDA) | no (not live) | READY sell (blocked: wrong side) | 35 trades, 20% won, −0.57R a trade |
+| AUD/USD | up (OANDA) | no (not live, rule skips AUD/USD) | IN ORIGIN buy | 33 trades, 33% won, −0.13R a trade |
+| USD/CAD | up (OANDA) | no (not live) | IN ORIGIN buy | 25 trades, 48% won, +0.28R a trade |
+| USD/CHF | down (OANDA) | no (not live) | IN ORIGIN buy | 30 trades, 20% won, −0.51R a trade |
 
-Replay total on the markets it trades live: 205 trades, −0.98R a trade (−201.45R), after spread. Each signal still has to clear reward:risk ≥ 1.2, the 2-trades-per-market cap and the 3-hour re-entry rule.
+Replay total on the markets it trades live: 214 trades, −1.19R a trade (−254.96R), after spread. Each signal still has to clear reward:risk ≥ 1.2, the 2-trades-per-market cap and the 3-hour re-entry rule.
 <!-- live-rule:end -->
 
 <!-- coach-churn:start -->
 ## Coach rule changes
 
-Built by the Trader at 2026-11-07 21:21 UTC from the rule history. Rules the Coach changed by itself in the last 7 days (owner rules are not counted).
+Built by the Trader at 2026-11-07 21:26 UTC from the rule history. Rules the Coach changed by itself in the last 7 days (owner rules are not counted).
 
 | Rule | Changes | Steps (oldest first) |
 |---|---|---|
@@ -41,37 +41,37 @@ Built by the Trader at 2026-11-07 21:21 UTC from the rule history. Rules the Coa
 | rscalp · asia session **(back and forth)** | 3 | 11-04 trading the asia session again → 11-04 skip the asia session → 11-06 trading the asia session again |
 | scalp · overlap session **(back and forth)** | 3 | 11-06 skip the overlap session → 11-07 trading the overlap session again → 11-07 skip the overlap session |
 | Break-even | 2 | 11-02 Break-even at +1R turned on → 11-02 Break-even turned off |
+| intraday · D1 rule | 2 | 11-02 only against D1 → 11-07 "only against D1" dropped |
 | rintra · D1 rule | 2 | 11-03 only with D1 → 11-07 dropped the D1 rule |
 | rscalp · D1 rule | 2 | 11-02 only with D1 → 11-02 "only with D1" dropped |
 | rscalp · overlap session | 2 | 11-03 skip the overlap session → 11-06 trading the overlap session again |
 | scalp · D1 rule | 2 | 11-02 only with D1 → 11-02 only against D1 |
 | scalp · pause | 2 | 11-02 Paused scalp for 3 days → 11-02 Resumed scalp early |
 | intraday · asia session | 1 | 11-04 skip the asia session |
-| intraday · D1 rule | 1 | 11-02 only against D1 |
 | News guard on | 1 | 11-04 News guard on |
 | rintra · late session | 1 | 11-03 skip the late session |
 | rscalp · newyork session | 1 | 11-06 skip the newyork session |
 | scalp, rscalp · asia session | 1 | 11-02 skip the asia session |
 
-36 changes on 17 rules; 4 rules went back and forth 3+ times; 1 setting only ever moved one way. A rule that keeps moving is reacting to noise: the 150-day study found the Coach's choices do no better than dropping the same number of trades at random (research/edge/coach-learning).
+37 changes on 17 rules; 4 rules went back and forth 3+ times; 1 setting only ever moved one way. A rule that keeps moving is reacting to noise: the 150-day study found the Coach's choices do no better than dropping the same number of trades at random (research/edge/coach-learning).
 <!-- coach-churn:end -->
 
 <!-- desk-status:start -->
 ## Desk & mirror status
 
-Built by the Trader at 2026-11-07 21:21 UTC. ICT desk: the last 7 days; mirror: the cTrader DEMO account (0.01 lot, demo only).
+Built by the Trader at 2026-11-07 21:26 UTC. ICT desk: the last 7 days; mirror: the cTrader DEMO account (0.01 lot, demo only).
 
 **ICT A-setups:** 0 signals (0 open, 0 closed); 1 other signal tracked, not A-setups.
 
 **Dip-buy candidate (NQ/ES, paper only):** 0 signals in 7 days · recording since 2026-11-07.
 
-**cTrader mirror:** ok · demo Fusion Markets · balance 988.99 · 0 open (checked 2026-11-07 21:16 UTC).
+**cTrader mirror:** ok · demo Fusion Markets · balance 988.99 · 0 open (checked 2026-11-07 21:22 UTC).
 <!-- desk-status:end -->
 
 <!-- coach-ledger:start -->
 ## Coach change ledger
 
-Built by the Trader at 2026-11-07 21:21 UTC. Every rule the Coach changed by itself, the evidence it used and what happened 30 days later. Filter changes run as champion/challenger trials: the old rule keeps running as a shadow and the change stays only if it beats it on the same forward signals (20 where they disagree, shrunk edge ≥ +0.05R a signal; else back to the old rule after 60 days). Owner rules and live setups are not Coach changes.
+Built by the Trader at 2026-11-07 21:26 UTC. Every rule the Coach changed by itself, the evidence it used and what happened 30 days later. Filter changes run as champion/challenger trials: the old rule keeps running as a shadow and the change stays only if it beats it on the same forward signals (20 where they disagree, shrunk edge ≥ +0.05R a signal; else back to the old rule after 60 days). Owner rules and live setups are not Coach changes.
 
 | Date | Change | Evidence | Before → after (the sample it used) | Trial | 30 days later |
 |---|---|---|---|---|---|
@@ -102,7 +102,7 @@ No 30-day results yet.
 <!-- macro:start -->
 ## Macro strategist
 
-Built by the Macro strategist at 2026-11-07 21:16 UTC for 2026-11-09 (paper only, changes no rule or trade; full view in macro/forecast.json). Regime: **Dollar Smile left side (stress) · dollar liquidity draining · VIX curve inverted (stress)**.
+Built by the Macro strategist at 2026-11-07 21:27 UTC for 2026-11-09 (paper only, changes no rule or trade; full view in macro/forecast.json). Regime: **Dollar Smile left side (stress) · dollar liquidity draining · VIX curve inverted (stress)**.
 
 | Market | P(up) | Lean | Exp. move | Main drivers | Replay hit / base | Brier vs coin |
 |---|---|---|---|---|---|---|
@@ -112,7 +112,7 @@ Built by the Macro strategist at 2026-11-07 21:16 UTC for 2026-11-09 (paper only
 | NQ (Nasdaq 100) | 55% | macro tilt down 1 pt | ±1.44% (20-day avg) | real yields down; real-yield 1-week momentum up; credit stress down | 56% / 56% (879 d) | 0.2476 vs 0.25 |
 | ES (S&P 500) | 52% | macro tilt down 2 pts | ±0.81% (20-day avg) | real yields down; credit stress down; vix term structure up | 54% / 54% (877 d) | 0.2483 vs 0.25 |
 
-Macro strategist, Sat 7 Nov 21:16 UTC, for Mon 9 Nov (UTC day, open to close). Regime: Dollar Smile left side (stress) · dollar liquidity draining · VIX curve inverted (stress). Gold: 54% up (base rate 54%; base rate, no macro tilt). Drivers lean up: real-yield 1-week momentum, risk sentiment; against: real yields. Expected move ±1.01% (20-day average). EUR/USD: 49% up (base rate 49%; base rate, no macro tilt, the replay finds no edge in its drivers). Drivers lean down: real yields, usd 5-day momentum; against: real-yield 1-week momentum. Expected move ±0.24% (20-day average). USD/JPY: 55% up (base rate 56%; macro tilt down 1 pt). Drivers lean down: us 10y yield trend, real-yield 1-week momentum; against: real yields. Expected move ±0.27% (20-day average). NQ (Nasdaq 100): 55% up (base rate 56%; macro tilt down 1 pt). Drivers lean down: real yields, credit stress; against: real-yield 1-week momentum. Expected move ±1.44% (20-day average). ES (S&P 500): 52% up (base rate 54%; macro tilt down 2 pts). Drivers lean down: real yields, credit stress; against: vix term structure. Expected move ±0.81% (20-day average). DXY: 51% up (mirror of EUR/USD). No high-impact events in the next 5 days on the calendar we could read (next week's calendar is not published yet; it usually appears over the weekend). Honesty check: on the 880-day walk-forward replay the gold calls hit 53% against a 54% base rate (Brier 0.2491 vs 0.25 for a coin flip, Pesaran-Timmermann 0.16): no proven edge (about the base rate). Treat the direction odds as context, not trade signals. Move size: all five markets keep the naive 20-day average: none of the 4 models tried beat it out of sample on both MAE and QLIKE, on all days and on CPI / NFP / FOMC days. CPI / NFP / FOMC days moved gold 0.972% on average against 0.859% on other days, but no model turned that into a better forecast.
+Macro strategist, Sat 7 Nov 21:27 UTC, for Mon 9 Nov (UTC day, open to close). Regime: Dollar Smile left side (stress) · dollar liquidity draining · VIX curve inverted (stress). Gold: 54% up (base rate 54%; base rate, no macro tilt). Drivers lean up: real-yield 1-week momentum, risk sentiment; against: real yields. Expected move ±1.01% (20-day average). EUR/USD: 49% up (base rate 49%; base rate, no macro tilt, the replay finds no edge in its drivers). Drivers lean down: real yields, usd 5-day momentum; against: real-yield 1-week momentum. Expected move ±0.24% (20-day average). USD/JPY: 55% up (base rate 56%; macro tilt down 1 pt). Drivers lean down: us 10y yield trend, real-yield 1-week momentum; against: real yields. Expected move ±0.27% (20-day average). NQ (Nasdaq 100): 55% up (base rate 56%; macro tilt down 1 pt). Drivers lean down: real yields, credit stress; against: real-yield 1-week momentum. Expected move ±1.44% (20-day average). ES (S&P 500): 52% up (base rate 54%; macro tilt down 2 pts). Drivers lean down: real yields, credit stress; against: vix term structure. Expected move ±0.81% (20-day average). DXY: 51% up (mirror of EUR/USD). No high-impact events in the next 5 days on the calendar we could read (next week's calendar is not published yet; it usually appears over the weekend). Honesty check: on the 880-day walk-forward replay the gold calls hit 53% against a 54% base rate (Brier 0.2491 vs 0.25 for a coin flip, Pesaran-Timmermann 0.16): no proven edge (about the base rate). Treat the direction odds as context, not trade signals. Move size: all five markets keep the naive 20-day average: none of the 4 models tried beat it out of sample on both MAE and QLIKE, on all days and on CPI / NFP / FOMC days. CPI / NFP / FOMC days moved gold 0.972% on average against 0.859% on other days, but no model turned that into a better forecast.
 <!-- macro:end -->
 
 <!-- postmortems:start -->
