@@ -282,6 +282,13 @@ const USER_RULES = [
       c.focusSetups = (c.focusSetups || []).filter((k) => k !== 'swing'); },
     change: 'Swing to shadow (owner, 7 Nov): no live paper Swing trades; signals still recorded as shadow',
     why: '10-year OANDA replay of the live engine (gold + 5 forex, one spread a trade): -0.095R a trade, n2,076, t -3.0, negative in both halves; no filter or exit of 10 tested turns it positive (research/edge/meridian-swing). Owner chose shadow.' },
+  // 7 Nov, owner's decision: crypto trend v3 to shadow. Decay study (research/edge/crypto-trend-decay, #508): +2.8R a trade
+  // 2017-May 2025, but -0.13R over the 20 trades since Jun 2025 (t -0.56; Kraken candles from Mar 2025 -0.25R over 24); 2024-26
+  // rests on one XRP run; fees are not the cause and the BTC 200-day regime does not explain the fade. New signals are recorded as
+  // shadow trades (blockedBy 'owner-shadow'); trades already open run to their own exits. Undo: a new user rule clearing the flag.
+  { id: 'crypto-trend-shadow', apply: (c) => { c.cryptoTrendShadow = true; },
+    change: 'Crypto trend (BTC, ETH, SOL, XRP) to shadow (owner, 7 Nov): new breakouts are recorded as shadow trades, not live paper; open trades run to their exits',
+    why: 'Decay study (#508): 2017-May 2025 strong (+2.8R a trade over 124 incl. the add), Jun 2025-Oct 2026 -0.13R a trade over 20 (t -0.56), Kraken candles from Mar 2025 -0.25R over 24. 2024-26 rests on one XRP run (without the top 5% +0.05R). Fees ~0.07R, not the cause; the BTC 200-day regime explains 2018/2022 but not the recent fade. About a 10% chance it is bad luck. Owner chose shadow.' },
 ];
 config.userRules = config.userRules || [];
 for (const u of USER_RULES) if (!config.userRules.includes(u.id)) { u.apply(config); config.userRules.push(u.id); config.history.push({ at: nowISO, by: 'user', change: u.change, why: u.why }); }
@@ -628,11 +635,13 @@ for (const [key, M] of Object.entries(MARKETS)) {
         // for the 55-day alone; council coins +52.3R over 70 (+0.75R), worst drawdown −7.9R. Older trades keep their own kATR.
         const SYSX = [{ sys: 55, x: 27, k: 5, id: 'trend' }, { sys: 100, x: 50, k: 5, id: 'trend100' }], A = atrAt(n - 1);
         const hiN = (N) => Math.max(...D.slice(n - 1 - N, n - 1).map((b) => b.high)), hi55 = hiN(55), lo27 = Math.min(...D.slice(n - 28, n - 1).map((b) => b.low));
-        const mine = trades.filter((x) => x.k === 'trend' && x.market === key && !x.shadow);
+        const mine = trades.filter((x) => x.k === 'trend' && x.market === key && !x.shadow), sh = !!config.cryptoTrendShadow;
+        // shadow mode (crypto-trend-shadow): live and shadow trend trades are both managed here; one open trade per slot either way
+        const mineAll = trades.filter((x) => x.k === 'trend' && x.market === key && (!x.shadow || (x.blockedBy || []).includes('owner-shadow')));
         const fwdR = mine.filter((x) => x.R != null && x.closed && x.opened >= (config.cryptoTrendAt || 0)).reduce((a, x) => a + x.R, 0);
         const stopped = config.cryptoTrendStopR != null && fwdR <= config.cryptoTrendStopR, dp = Math.max(2, (M.dec ?? 2) + 1);
         for (const S of SYSX) {
-          const open = mine.find((x) => x.status === 'open' && !x.addOf && (x.sys || 55) === S.sys), xN = open ? (open.sys === 100 ? 50 : 27) : S.x;
+          const open = mineAll.find((x) => x.status === 'open' && !x.addOf && (x.sys || 55) === S.sys), xN = open ? (open.sys === 100 ? 50 : 27) : S.x;
           if (open) {
             for (const b of D.filter((b) => b.time > (open.lastD || open.filled - 86400) && b.time >= Math.floor(open.filled / 86400) * 86400)) {
               const i = D.indexOf(b); if (i < xN + 1) continue;
@@ -648,7 +657,7 @@ for (const [key, M] of Object.entries(MARKETS)) {
                 else if (config.cryptoAdd && !open.addDone && i === n - 1 && b.close >= open.entry + config.cryptoAdd.atR * open.r0 && !trades.some((x) => x.id === `${open.id}-add`)) {
                   open.addDone = true; const ae = +price.toFixed(dp), rA = open.r0, st = +(ae - rA).toFixed(dp);
                   if (ae > open.entry && st > 0) trades.push({ id: `${open.id}-add`, market: key, label: M.label, dec: M.dec, k: 'trend', sys: open.sys, kATR: open.kATR, name: 'Crypto trend add', pair: open.pair, h: '1d', side: 'buy',
-                    entry: ae, stop: st, t1: +(ae * 100).toFixed(2), rr: 99, trail: [1e6, 0], size: config.cryptoAdd.size, buf: CFG.buf, opened: now, filled: now, checked: now, status: 'open', R: null, r0: rA, noBe: true, entryMode: 'market', addOf: open.id, shadow: false, blockedBy: [],
+                    entry: ae, stop: st, t1: +(ae * 100).toFixed(2), rr: 99, trail: [1e6, 0], size: config.cryptoAdd.size, buf: CFG.buf, opened: now, filled: now, checked: now, status: 'open', R: null, r0: rA, noBe: true, entryMode: 'market', addOf: open.id, shadow: !!open.shadow, blockedBy: open.shadow ? ['owner-shadow'] : [],
                     note: `Crypto trend add: the trade from ${open.entry} closed the day +${config.cryptoAdd.atR}R (5 ATR) higher, so a second unit buys ${ae} with its own catastrophe stop ${st} (5 ATR at entry); it exits with the first trade on a daily close under the channel midpoint ${open.midStop}.` });
                 }
               } else {
@@ -666,17 +675,17 @@ for (const [key, M] of Object.entries(MARKETS)) {
           // Sharpe 2018-21 1.67 vs 1.50, 2022-26 0.81 vs 0.58; worst drawdown -28% vs -39% and -21% vs -27% (lab/crypto_ens2.py).
           const hi = hiN(S.sys), id = `${key}-${S.id}-${last.time}`;
           const midNow = (hi + Math.min(...D.slice(n - 1 - S.sys, n - 1).map((b) => b.low))) / 2;
-          if (last.close > hi && !stopped && !trades.some((x) => x.id === id) && now - (last.time + 86400) < 86400) {
+          if (last.close > hi && (sh || !stopped) && !trades.some((x) => x.id === id) && now - (last.time + 86400) < 86400) {
             const entry = +price.toFixed(dp), stop = +(entry - S.k * A).toFixed(dp), r0 = entry - stop;
             if (r0 > 0) trades.push({ id, market: key, label: M.label, dec: M.dec, k: 'trend', sys: S.sys, kATR: S.k, name: 'Crypto trend', pair: `D1 ${S.sys}-day breakout`, h: '1d', side: 'buy',
               entry, stop, t1: +(entry * 100).toFixed(2), rr: 99, trail: [1e6, 0], buf: CFG.buf, opened: now, filled: now, checked: now, status: 'open', R: null, r0, noBe: true, entryMode: 'market', lastD: last.time, best: last.close, drift: driftR('buy', last.close, entry, stop), exitRule: 'mid', midStop: +midNow.toFixed(dp),
-              feat: { hi: +hi.toFixed(4), atr: +A.toFixed(4) }, shadow: false, blockedBy: [],
+              feat: { hi: +hi.toFixed(4), atr: +A.toFixed(4) }, shadow: sh, blockedBy: sh ? ['owner-shadow'] : [],
               note: `Crypto trend: daily close ${last.close} above the ${S.sys}-day high ${+hi.toFixed(4)}. Buy at market, catastrophe stop ${S.k} ATR below (${stop}); out on a daily close under the ${S.sys}-day channel midpoint (now ${+midNow.toFixed(dp)}), which only ratchets up.` });
           }
         }
         const openT = trades.filter((x) => x.k === 'trend' && x.market === key && x.status === 'open');
         (snapshot.trend = snapshot.trend || {})[key] = { label: M.label, close: last.close, hi55: +hi55.toFixed(4), hi100: +hiN(100).toFixed(4), lo27: +lo27.toFixed(4), atr: +A.toFixed(4), open: openT.length > 0, nOpen: openT.length,
-          stop: openT.length ? Math.max(...openT.map((x) => x.stop)) : null, midStop: openT.length ? Math.max(...openT.map((x) => x.midStop || 0)) || null : null, toBreakout: +((hi55 / price - 1) * 100).toFixed(2), n: mine.filter((x) => x.R != null).length, R: +fwdR.toFixed(2), stopped };
+          stop: openT.length ? Math.max(...openT.map((x) => x.stop)) : null, midStop: openT.length ? Math.max(...openT.map((x) => x.midStop || 0)) || null : null, toBreakout: +((hi55 / price - 1) * 100).toFixed(2), n: mine.filter((x) => x.R != null).length, R: +fwdR.toFixed(2), stopped, shadow: sh };
       } catch (e) { snapshot.errors.trend = String(e.message || e); }
     }
     // Gold trend (5 Nov, user rule gold-trend): daily close above the prior N daily highs -> long at market on the next run; stop k x ATR(D1,14)
