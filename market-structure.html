@@ -1393,6 +1393,12 @@ td.st-dim { color: var(--ink-faint); }
 .ms-js-t .ex-w { color: var(--buy); background: var(--buy-soft); border-color: color-mix(in srgb, var(--buy) 30%, transparent); }
 .ms-js-t .ex-l { color: var(--sell); background: var(--sell-soft); border-color: color-mix(in srgb, var(--sell) 30%, transparent); }
 .ms-js-t .ex-f { color: var(--ink-dim); }
+
+/* polish 25: journal stats as chips */
+.ms-j-stats { gap: 8px !important; }
+.ms-j-stats > span { display: inline-flex; align-items: baseline; gap: 6px; padding: 6px 12px; border: 1px solid var(--line); border-radius: 999px; background: var(--panel-raised, var(--panel)); color: var(--ink-dim); font-size: 12.5px; }
+.ms-j-stats > span b { color: var(--ink); }
+.ms-j-stats > span b.pos { color: var(--buy); } .ms-j-stats > span b.neg { color: var(--sell); }
 </style>
 </head>
 <body>
