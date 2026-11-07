@@ -95,37 +95,50 @@ export async function suiteRound({ env, req, WS = globalThis.WebSocket, clock = 
       const info = (await one(PT.SYMBOL_BY_ID_REQ, { ctidTraderAccountId: ctid, symbolId: [symbolId] }, PT.SYMBOL_BY_ID_RES)).symbol?.[0] || {};
       if (!(+info.lotSize > 0)) { r.skipped = 'broker gave no lot size'; continue; }
       const volume = volumeFor({ ...info, minVolume: info.minVolume }, 0.0001), d = Number.isFinite(+info.digits) ? +info.digits : 2;   // the broker's minimum
+      if (volume == null) { r.skipped = 'its minimum volume is above 0.1 lot'; continue; }
       r.volume = volume; r.digits = d;
-      // 1. market buy
-      const ev1 = await s.send(PT.NEW_ORDER_REQ, { ctidTraderAccountId: ctid, symbolId, orderType: 1, tradeSide: 1, volume, label: LABEL, comment: `suite ${req.request} ${sym}` }, filledOrRejected);
-      const p1 = lastPayload(ev1), st1 = step('market buy', ev1, { acceptedMs: msOf(ev1, 'ACCEPTED'), filledMs: msOf(ev1, 'FILLED') });
-      const pid = p1.position && p1.position.positionId, fill = (p1.deal && +p1.deal.executionPrice) || (p1.position && +p1.position.price) || null;
-      st1.fillPrice = fill; st1.positionId = pid != null ? String(pid) : null;
-      if (errOf(ev1) || pid == null || !fill) { r.result = `market order not filled (${errOf(ev1) || 'no position/fill'})`; continue; }
-      // 2-3. set, then change SL/TP (absolute prices), each read back from the broker
-      for (const [name, slPct, tpPct] of [['set SL/TP', 0.01, 0.02], ['change SL/TP', 0.015, 0.03]]) {
-        const sl = round(fill * (1 - slPct), d), tp = round(fill * (1 + tpPct), d);
-        const ev = await s.send(PT2.AMEND_POSITION_SLTP_REQ, { ctidTraderAccountId: ctid, positionId: Number(pid), stopLoss: sl, takeProfit: tp }, () => true);
-        const pos = ((await reconcile()).position || []).find((x) => String(x.positionId) === String(pid)) || {};
-        step(name, ev, { asked: { sl, tp }, broker: { sl: pos.stopLoss ?? null, tp: pos.takeProfit ?? null }, match: pos.stopLoss != null && Math.abs(+pos.stopLoss - sl) < 10 ** -d * 1.5 && Math.abs(+pos.takeProfit - tp) < 10 ** -d * 1.5 });
+      // an error inside one symbol's steps (a failed reconcile, a timeout) ends that symbol only: its test position is closed again
+      // (and its limit order cancelled) before the next symbol, so the suite never leaves a demo position or order behind
+      let openPid = null, openOid = null;
+      try {
+        // 1. market buy
+        const ev1 = await s.send(PT.NEW_ORDER_REQ, { ctidTraderAccountId: ctid, symbolId, orderType: 1, tradeSide: 1, volume, label: LABEL, comment: `suite ${req.request} ${sym}` }, filledOrRejected);
+        const p1 = lastPayload(ev1), st1 = step('market buy', ev1, { acceptedMs: msOf(ev1, 'ACCEPTED'), filledMs: msOf(ev1, 'FILLED') });
+        const pid = p1.position && p1.position.positionId, fill = (p1.deal && +p1.deal.executionPrice) || (p1.position && +p1.position.price) || null;
+        st1.fillPrice = fill; st1.positionId = pid != null ? String(pid) : null; if (pid != null) openPid = pid;
+        if (errOf(ev1) || pid == null || !fill) { r.result = `market order not filled (${errOf(ev1) || 'no position/fill'})`; continue; }
+        // 2-3. set, then change SL/TP (absolute prices), each read back from the broker
+        for (const [name, slPct, tpPct] of [['set SL/TP', 0.01, 0.02], ['change SL/TP', 0.015, 0.03]]) {
+          const sl = round(fill * (1 - slPct), d), tp = round(fill * (1 + tpPct), d);
+          const ev = await s.send(PT2.AMEND_POSITION_SLTP_REQ, { ctidTraderAccountId: ctid, positionId: Number(pid), stopLoss: sl, takeProfit: tp }, () => true);
+          const pos = ((await reconcile()).position || []).find((x) => String(x.positionId) === String(pid)) || {};
+          step(name, ev, { asked: { sl, tp }, broker: { sl: pos.stopLoss ?? null, tp: pos.takeProfit ?? null }, match: pos.stopLoss != null && Math.abs(+pos.stopLoss - sl) < 10 ** -d * 1.5 && Math.abs(+pos.takeProfit - tp) < 10 ** -d * 1.5 });
+        }
+        // 4. close
+        const ev4 = await s.send(PT.CLOSE_POSITION_REQ, { ctidTraderAccountId: ctid, positionId: Number(pid), volume }, filledOrRejected);
+        step('close', ev4, { filledMs: msOf(ev4, 'FILLED') });
+        if (!errOf(ev4) && ev4.some((e) => e.event === 'FILLED')) openPid = null;
+        const still = ((await reconcile()).position || []).some((x) => String(x.positionId) === String(pid));
+        openPid = null;   // the close got its answer: a position still open keeps the stop and target it was given (recorded below)
+        if (still) { r.result = 'close not confirmed: the position is still open (it has a stop and target set)'; continue; }
+        // 5-6. limit buy 2% below, then cancel it
+        const lp = round(fill * 0.98, d);
+        const ev5 = await s.send(PT.NEW_ORDER_REQ, { ctidTraderAccountId: ctid, symbolId, orderType: 2, tradeSide: 1, volume, limitPrice: lp, label: LABEL, comment: `suite ${req.request} ${sym} limit` }, (n) => n === 'ACCEPTED' || filledOrRejected(n));
+        const p5 = lastPayload(ev5), oid = p5.order && p5.order.orderId; if (oid != null && !errOf(ev5)) openOid = oid;
+        const pending = ((await reconcile()).order || []).some((o) => String(o.orderId) === String(oid));
+        step('limit buy', ev5, { limitPrice: lp, acceptedMs: msOf(ev5, 'ACCEPTED'), orderId: oid != null ? String(oid) : null, pendingAtBroker: pending });
+        if (oid != null) {
+          const ev6 = await s.send(PT2.CANCEL_ORDER_REQ, { ctidTraderAccountId: ctid, orderId: Number(oid) }, (n) => n === 'CANCELLED' || n === 'CANCEL_REJECTED');
+          if (ev6.some((e) => e.event === 'CANCELLED')) openOid = null;
+          const left = ((await reconcile()).order || []).some((o) => String(o.orderId) === String(oid));
+          step('cancel limit', ev6, { cancelledMs: msOf(ev6, 'CANCELLED'), goneAtBroker: !left });
+        }
+        r.result = 'ok';
+      } catch (e) {
+        r.result = `error: ${scrub(e.message || e)}`;
+        if (openPid != null) { const ev = await s.send(PT.CLOSE_POSITION_REQ, { ctidTraderAccountId: ctid, positionId: Number(openPid), volume }, filledOrRejected); step('cleanup close', ev, { filledMs: msOf(ev, 'FILLED') }); }
+        if (openOid != null) { const ev = await s.send(PT2.CANCEL_ORDER_REQ, { ctidTraderAccountId: ctid, orderId: Number(openOid) }, (n) => n === 'CANCELLED' || n === 'CANCEL_REJECTED'); step('cleanup cancel', ev, { cancelledMs: msOf(ev, 'CANCELLED') }); }
       }
-      // 4. close
-      const ev4 = await s.send(PT.CLOSE_POSITION_REQ, { ctidTraderAccountId: ctid, positionId: Number(pid), volume }, filledOrRejected);
-      step('close', ev4, { filledMs: msOf(ev4, 'FILLED') });
-      const still = ((await reconcile()).position || []).some((x) => String(x.positionId) === String(pid));
-      if (still) { r.result = 'close not confirmed: the position is still open (it has a stop and target set)'; continue; }
-      // 5-6. limit buy 2% below, then cancel it
-      const lp = round(fill * 0.98, d);
-      const ev5 = await s.send(PT.NEW_ORDER_REQ, { ctidTraderAccountId: ctid, symbolId, orderType: 2, tradeSide: 1, volume, limitPrice: lp, label: LABEL, comment: `suite ${req.request} ${sym} limit` }, (n) => n === 'ACCEPTED' || filledOrRejected(n));
-      const p5 = lastPayload(ev5), oid = p5.order && p5.order.orderId;
-      const pending = ((await reconcile()).order || []).some((o) => String(o.orderId) === String(oid));
-      step('limit buy', ev5, { limitPrice: lp, acceptedMs: msOf(ev5, 'ACCEPTED'), orderId: oid != null ? String(oid) : null, pendingAtBroker: pending });
-      if (oid != null) {
-        const ev6 = await s.send(PT2.CANCEL_ORDER_REQ, { ctidTraderAccountId: ctid, orderId: Number(oid) }, (n) => n === 'CANCELLED' || n === 'CANCEL_REJECTED');
-        const left = ((await reconcile()).order || []).some((o) => String(o.orderId) === String(oid));
-        step('cancel limit', ev6, { cancelledMs: msOf(ev6, 'CANCELLED'), goneAtBroker: !left });
-      }
-      r.result = 'ok';
     }
     req.status = 'done';
   } catch (e) { req.status = `error: ${scrub(e.message || e)}`; }

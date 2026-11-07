@@ -18,6 +18,29 @@ test('mixed dropped trades -> watch only, with the numbers', () => {
   assert.equal(v.kind, 'ictWatch'); assert.equal(v.flag, false); assert.match(v.why, /Not proposed/);
   assert.equal(proposalDigest([v], null, 1e9), null, 'a watch note is not sent as a proposal');
 });
+// review (7 Nov): a variant stream keeps its own one-open-trade rule, so an A-setup can be missing from it only because the variant
+// was busy with a trade the A-rule never took. Such a trade passes the filter and must not count as "dropped". The replay tags
+// every A-setup with the variants' verdicts (vr); the Coach uses them when present.
+test('dropped = the A-setups the filter rejects (vr tags), not the ones lost to the variant\'s own one-open rule', () => {
+  const rows = []; for (let i = 0; i < 120; i++) { const fri = i % 4 === 0; rows.push({ ...mk(i, fri ? -1 : 1.2, fri), vr: { nofri: !fri } }); }
+  const r = replay(rows); r.shadowByVariant.nofri = r.shadowByVariant.nofri.filter((t, j) => j % 10);   // ~9 winners missing: variant busy
+  const [v] = ictVariantVerdicts(r);
+  assert.equal(v.n, 30); assert.equal(v.exp, -1); assert.equal(v.keptN, 90); assert.equal(v.keptExp, 1.2);
+});
+test('variantTags: each variant\'s verdict on an A-setup (what the replay stores as vr)', async () => {
+  const { variantTags, loadMeridian } = await import('../ict/tracker.mjs');
+  const g = { side: 1, grade: { total: 8 }, feat: { bias: 'against', atrR: 0.5, body: 0.5, session: 'NY AM' }, close: Date.UTC(2026, 10, 6, 15) / 1000 };   // a NY Friday
+  const ctx = { H: [], D: [], ms: await loadMeridian() };
+  assert.deepEqual(variantTags(g, 'nq', ctx), { nofri: false, h1opp: true });
+  assert.deepEqual(variantTags({ ...g, close: g.close - 86400 }, 'nq', ctx), { nofri: true, h1opp: true });
+});
+test('coach.json: the daily Coach rewrite keeps the proposals and the ICT watch list', async () => {
+  const { coachCarry } = await import('../council/proposals.mjs');
+  const prev = { proposals: [{ kind: 'ictFilter' }], proposalsKey: 'v5|k', proposalsSent: { key: 'a' }, ictWatch: [{ kind: 'ictWatch', value: 'h1opp' }], notes: ['old'] };
+  assert.deepEqual(coachCarry(prev), { proposals: prev.proposals, proposalsKey: 'v5|k', proposalsSent: { key: 'a' }, ictWatch: prev.ictWatch });
+  assert.deepEqual(coachCarry({}), { proposals: [], proposalsKey: '', proposalsSent: undefined, ictWatch: [] });
+});
+
 test('open trades and non-A trades are ignored; bad input gives nothing', () => {
   assert.deepEqual(ictVariantVerdicts(null), []); assert.deepEqual(ictVariantVerdicts({ trades: [] }), []);
   const rows = [mk(1, -1, true), { ...mk(2, -1, true), closed: null }, { ...mk(3, -1, true), aset: false }, mk(4, 1, false)];

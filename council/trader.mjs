@@ -9,7 +9,7 @@ import { entryContext, startReview, watchReview, judge, newsNear, lessons } from
 import { m15cFeat } from './choch.mjs';
 import { alertable, alertEvents, sendAlerts, when, NTFY_DEFAULT, proposalDigest } from './alerts.mjs';
 import { liveRuleSection, injectSection, coachChurnSection, CHURN_START, CHURN_END, deskSection, DESK_START, DESK_END } from './analyst.mjs';
-import { coachProposals, spotProposals, ictVariantVerdicts } from './proposals.mjs';
+import { coachProposals, spotProposals, ictVariantVerdicts, coachCarry } from './proposals.mjs';
 import { shrink, ebTau, shrunkClear, ruleState, sameRule, setRule, descRule, judgeTrial, ledgerStart, syncLedger, ledgerSection, LEDGER_START, LEDGER_END } from './coach.mjs';
 import { cleanBars, LTF_CLEAN } from './clean.mjs';
 import { voidRoundedReplicas, historyCatchUp } from './repairs.mjs';
@@ -1470,8 +1470,8 @@ if (coach.date !== today) {
     const sh = shadows.filter((x) => x.market === m && (x.blockedBy || []).includes('market'));
     if (sh.length >= 4 && exp(sh) > 0.3) { delete config.pausedMarkets[m]; change(`Resumed market ${m} early`, `Shadow trades while paused made +${exp(sh).toFixed(2)}R over ${sh.length}.`); }
   }
-  const prev = rd('coach.json', {});   // keep the owner-facing proposals between the daily runs
-  wr('coach.json', { proposals: prev.proposals || [], proposalsKey: prev.proposalsKey || '', proposalsSent: prev.proposalsSent, ledger: prev.ledger, ledgerSlot: prev.ledgerSlot, ledgerSince: prev.ledgerSince, date: today, at: nowISO, stats, last14: rs, lessons: lessons(trades, now), fslot: nowISO.slice(0, 11) + String(Math.floor(+nowISO.slice(11, 13) / 6) * 6).padStart(2, '0'), notes: notes.length ? notes : ['No change today: not enough evidence to move a rule.'] });
+  const prev = rd('coach.json', {});   // keep the owner-facing proposals, the ICT watch list (coachCarry) and the ledger between the daily runs
+  wr('coach.json', { ...coachCarry(prev), ledger: prev.ledger, ledgerSlot: prev.ledgerSlot, ledgerSince: prev.ledgerSince, date: today, at: nowISO, stats, last14: rs, lessons: lessons(trades, now), fslot: nowISO.slice(0, 11) + String(Math.floor(+nowISO.slice(11, 13) / 6) * 6).padStart(2, '0'), notes: notes.length ? notes : ['No change today: not enough evidence to move a rule.'] });
 }
 // every run: pause a setup as soon as its live record says so
 {

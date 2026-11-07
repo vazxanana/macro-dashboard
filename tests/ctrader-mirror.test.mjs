@@ -303,6 +303,25 @@ test('alerts: a position found again after a lost round is managed but not re-al
   assert.deepEqual(kinds(r), ['close']);
 });
 
+// review (7 Nov): no answer to the order (timeout) is not a rejection: the order may have gone through, and it is found by
+// label/comment next round. Before, the owner got "order rejected · Not retried" and then no open alert for the live position.
+test('alerts: no broker answer is not alerted as a rejection; the position found next round gets its open alert, once', async () => {
+  const b = broker({ fill: 'silent' });
+  let r = await mirrorRound({ env: ENV, trades: [tr()], state: started, WS: b.WS, now: NOW, timeout: 30 });
+  assert.match(r.state.skipped['eurusd-intraday-1'], /timeout/); assert.deepEqual(kinds(r), []);
+  b.o.fill = 'normal';
+  r = await mirrorRound({ env: ENV, trades: [tr()], state: again(r), WS: b.WS, now: NOW + 240 });
+  assert.equal(r.state.map['eurusd-intraday-1'].status, 'open'); assert.deepEqual(kinds(r), ['open']);
+  assert.match(mirrorAlertText(r.alerts[0], NOW).msg, /^Opened · council entry/);
+  r = await mirrorRound({ env: ENV, trades: [tr()], state: again(r), WS: b.WS, now: NOW + 480 }); assert.deepEqual(kinds(r), []);
+  assert.equal(orders(b).length, 1);
+});
+test('ICT desk position: the fill is recorded without a slippage against the futures entry', async () => {
+  const b = broker(), ict = [{ id: 'nq-b-1', market: 'nq', side: 'buy', entry: 25000, stop: 24950, t1: null, status: 'open', opened: NOW - 120, aset: true }];
+  const r = await mirrorRound({ env: ENV, trades: ictCandidates(ict), state: started, WS: b.WS, now: NOW });
+  const m = r.state.map['ict:nq-b-1']; assert.equal(m.status, 'open'); assert.equal(m.fillPrice, 1.10012); assert.equal(m.lagSec, 120); assert.equal(m.slipR, undefined);
+});
+
 test('alerts: sent through ntfy + Telegram (fake fetch); failures are returned scrubbed, never thrown; off with COUNCIL_ALERTS=off', async () => {
   const b = broker(); const r = await mirrorRound({ env: ENV, trades: [tr()], state: started, WS: b.WS, now: NOW });
   let f = fakeFetch(); let a = await sendMirrorAlerts(r.alerts, { env: AENV, now: NOW, fetchFn: f.fn });

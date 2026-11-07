@@ -51,6 +51,8 @@ const normName = (s) => String(s || '').toUpperCase().replace(/[^A-Z0-9.]/g, '')
 // broker answers meaning "not now" (the order was certainly not placed): retried while the trade is still fresh. Timeouts and
 // dropped connections are NOT retried (the order may have gone through); step 0 finds such a position next round.
 const RETRY = /MARKET_CLOSED|SYMBOL_HAS_HOLIDAY|NO_QUOTES|SERVER_IS_UNDER_MAINTENANCE|CH_SERVER_NOT_REACHABLE|REQUEST_FREQUENCY_EXCEEDED|TRADING_DISABLED|not tradable now/;
+// session errors with no broker answer behind them (session() below): the order's outcome is unknown
+const UNSURE = /^timeout waiting|connection closed|session closed/;
 
 // ---- secrets ------------------------------------------------------------------------------------------------------
 // scrub(text) hides the configured secrets; scrub.add(...) also hides tokens learnt later (the stored or rotated pair), so a
@@ -150,7 +152,8 @@ export function relative(dist, digits = 5) {
 // mirrorRound collects short events in out.alerts: { kind: 'open' | 'close' | 'reject' | 'unfilled' | 'closefail', trade, symbol,
 // side, lots, price, digits, ... }. Position events are flagged on the saved position (m.alerted), a rejection comes with its
 // one-time skip note, so each is sent once, also after a restart. A position found again by label/comment (its round never
-// saved) gets no open alert: that round may already have sent it; its close still alerts.
+// saved) gets no open alert: that round may already have sent it; its close still alerts. An order that got no answer at all is
+// not alerted as rejected; if its position turns up next round, that round sends the open alert.
 const px = (v, d) => (v == null || v === '' || !Number.isFinite(+v) ? null : d != null && Number.isFinite(+d) ? (+v).toFixed(+d) : String(+v));
 const sideTxt = (e) => String(e.side || '').toUpperCase(), lotTxt = (e) => (e.lots != null && Number.isFinite(+e.lots) ? ` ${+(+e.lots).toFixed(2)} lot` : '');
 const councilTxt = (e) => (e.setup ? `Council ${e.setup} · ${e.trade}` : String(e.trade || ''));
@@ -194,17 +197,24 @@ export async function sendMirrorAlerts(alerts, { env = {}, now = Math.floor(Date
 const TOKEN_ERR = /ACCESS_TOKEN|INVALID_TOKEN|TOKEN_EXPIRED|CH_ACCESS_TOKEN_INVALID|NOT_AUTHORIZED|UNAUTHORIZED/i;
 // execution quality (7 Nov): how the demo fill compares with the council's paper entry. slipR > 0 means a worse fill than the
 // council assumed, in units of the trade's risk (entry to stop); lagSec is the time from the council's fill to the demo order.
+// The ICT desk's prices are CME futures (NQ / ES / YM / RTY / GC) while the demo fills the cash index / spot gold CFD: fill - entry
+// there is the futures-cash basis (often several R), not slippage, so those fills keep the price and the delay only.
+const otherInstrument = (t) => String(t.id).startsWith('ict:');
 export function fillQuality(t, price, now) {
   const px = +price, risk = Math.abs(t.entry - t.stop);
   if (!(px > 0) || !(risk > 0)) return {};
-  const sign = t.side === 'sell' ? -1 : 1, when = t.filled || t.opened;
-  return { fillPrice: px, slipR: +((sign * (px - t.entry)) / risk).toFixed(3), lagSec: Number.isFinite(+when) ? Math.max(0, Math.round(now - when)) : null };
+  const sign = t.side === 'sell' ? -1 : 1, when = t.filled || t.opened, lagSec = Number.isFinite(+when) ? Math.max(0, Math.round(now - when)) : null;
+  if (otherInstrument(t)) return { fillPrice: px, lagSec };
+  return { fillPrice: px, slipR: +((sign * (px - t.entry)) / risk).toFixed(3), lagSec };
 }
 export function executionStats(map, { since = 0 } = {}) {
-  const F = Object.values(map || {}).filter((m) => Number.isFinite(+m.slipR) && (Date.parse(m.openedAt) / 1000 || 0) >= since);
-  if (!F.length) return { n: 0 };
-  const sl = F.map((m) => +m.slipR).sort((a, b) => a - b), lag = F.map((m) => +m.lagSec).filter(Number.isFinite).sort((a, b) => a - b);
+  const all = Object.values(map || {}).filter((m) => (Date.parse(m.openedAt) / 1000 || 0) >= since);
+  const F = all.filter((m) => m.slipR != null && Number.isFinite(+m.slipR));
+  // the delay of every recorded fill (ICT desk fills too); a missing delay is left out, not counted as 0 s
+  const lag = all.filter((m) => m.lagSec != null && Number.isFinite(+m.lagSec) && (m.fillPrice != null || m.slipR != null)).map((m) => +m.lagSec).sort((a, b) => a - b);
   const med = (a) => (a.length ? (a.length % 2 ? a[a.length >> 1] : (a[a.length / 2 - 1] + a[a.length / 2]) / 2) : null);
+  if (!F.length) return lag.length ? { n: 0, medianLagSec: med(lag) } : { n: 0 };
+  const sl = F.map((m) => +m.slipR).sort((a, b) => a - b);
   const by = {}; for (const m of F) { const k = m.symbol; (by[k] = by[k] || []).push(+m.slipR); }
   return { n: F.length, meanSlipR: +(sl.reduce((a, b) => a + b, 0) / sl.length).toFixed(3), medianSlipR: +med(sl).toFixed(3), worstSlipR: sl[sl.length - 1],
     medianLagSec: lag.length ? med(lag) : null, bySymbol: Object.fromEntries(Object.entries(by).map(([k, a]) => [k, { n: a.length, meanSlipR: +(a.reduce((x, y) => x + y, 0) / a.length).toFixed(3) }])) };
@@ -276,10 +286,14 @@ export async function mirrorRound({ env, trades, state, tokens, WS = globalThis.
       const p = ours.get(commentFor(t)); if (!p) continue;
       const pid = String(p.positionId), m = st.map[t.id];
       if (m && m.status !== 'sent') continue;   // already managed (open or finished): never re-adopted
-      st.map[t.id] = { ...(m || { symbol: t.market.toUpperCase(), side: t.side, setup: t.k, openedAt: iso, councilEntry: t.entry, stop: t.stop, t1: t.t1, adopted: true, alerted: ['open'] }),
+      // a skip note means the round that sent the order saved its state (the order got no answer) and sent no open alert: alert now.
+      // Without one, the round that sent it may have been lost after alerting: no open alert (never twice).
+      const unanswered = !m && !!(st.skipped && st.skipped[t.id]);
+      st.map[t.id] = { ...(m || { symbol: t.market.toUpperCase(), side: t.side, setup: t.k, openedAt: iso, councilEntry: t.entry, stop: t.stop, t1: t.t1, adopted: true, alerted: unanswered ? [] : ['open'] }),
         positionId: pid, volume: +(p.tradeData || {}).volume || (m && m.volume), status: 'open' };
       if (st.skipped) delete st.skipped[t.id]; if (st.wait) delete st.wait[t.id];
       say(`${m ? 'confirmed' : 'found'} ${st.map[t.id].symbol} position ${pid} at the broker`, { trade: t.id });
+      if (unanswered) alert('open', t.id, st.map[t.id], () => ({ filled: true, price: p.price ?? null, entry: t.entry, stop: t.stop, t1: t.t1, noTarget: t.t1 == null || t.rr >= 50 }));
     }
     for (const [id, m] of Object.entries(st.map)) {
       if (m.status !== 'sent') continue;
@@ -340,7 +354,9 @@ export async function mirrorRound({ env, trades, state, tokens, WS = globalThis.
           alert('open', t.id, st.map[t.id], () => ({ filled, price: (ev.deal && ev.deal.executionPrice) ?? (filled && ev.position ? ev.position.price : null) ?? null,
             entry: t.entry, stop: t.stop, t1: t.t1, noTarget: !('relativeTakeProfit' in order) }));
         } catch (e) { if (RETRY.test(`${e.code || ''} ${e.message}`)) later(`order rejected: ${e.message}`); else skip(`order rejected: ${e.message}`);
-          if ((st.skipped || {})[t.id]) alert('reject', t.id, null, () => ({ symbol: name, side: t.side, lots: volume / +info.lotSize, result: st.skipped[t.id] })); }
+          // no answer at all (timeout, dropped connection) is not a rejection: the order may be live and is looked up by label/comment
+          // next round (step 0, which then sends the open alert); only a broker's answer is alerted as a rejection
+          if ((st.skipped || {})[t.id] && !(!e.code && UNSURE.test(e.message))) alert('reject', t.id, null, () => ({ symbol: name, side: t.side, lots: volume / +info.lotSize, result: st.skipped[t.id] })); }
       }
     }
     // housekeeping: skip/retry notes matter only while a trade can still be copied; finished positions are kept LIMITS.keepDays
