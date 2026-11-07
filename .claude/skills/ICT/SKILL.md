@@ -370,3 +370,18 @@ Tested on index A-setups (cash NQ/ES/YM 2023-24 | 2025-26 | NQ futures 2023-25 |
 - Rejected the same day: BE at +1R, half off at 1 / 1.5 / 2R, grade >= 8 (2025-26 flat), weekday or hour skips (skipping 07-09 ET
   helped the three history sets but failed the replay), speed / close-location filters, previous-day sweep only, zone match,
   buys or sells only, max 1-2 A-setups a day.
+
+## 33. A-setup exits on the replay trades (8 Nov 2026, research/edge/ict-exits-replay) — live exit unchanged
+The 253 closed A-trades of the Aug 2025 – Nov 2026 replay, same entries and sizes, exits re-run on OANDA 5m candles (NQ/ES/YM/GC,
+scaled onto each futures entry) and the replay H1 path (RTY), costs in. Live exit re-simulated: 249 trades, +0.231R a trade (net).
+Gate: better than the live exit in both halves (split 24 Jun 2026) and on >= 3 of 5 markets.
+- BE at +1R −0.024R a trade; no BE −0.016; half off at +1R −0.125 (t −2.8); half off at +2R −0.047 (t −2.1); fixed 3R −0.032;
+  out at the 12th H1 close unless +1R −0.082. All fail.
+- **Structure trail** (from +2R the stop goes to the last confirmed H1 swing, 2 candles each side, no 1.5R trail): +0.289R a trade,
+  +0.058 over live (t 1.4), halves +3.6R / +10.9R, better on ES, YM, RTY and GC, worse on NQ → passes the gate.
+- **Not confirmed:** on 2018-26 HistData (NQ/ES/GC cash, 1,411 A-setups) it is −0.008R a trade vs live (worse in 2018-21 and 2022-24,
+  better in 2025-26, worse on all three markets), and 1- or 3-candle swings fail on the replay. Same story as the fixed targets
+  in research/edge/ict-exits: 2025-26 rewards looser exits.
+- So it runs as the paper-only shadow variant `strail` (`SHADOW.strail`, records with `trail: null` + `strail: [2, 2]`, own one-open
+  stream in shadow.json `.variants` / replay.json `.shadowByVariant`), and the Coach does not judge it as a filter. Go live only if
+  the forward stream keeps beating the A-rule over a long stretch AND an older regime agrees.

@@ -7596,10 +7596,11 @@ function msNextSetup(bars, A) {
     return `<table><thead><tr><th>Paper market, closed</th><th class="n">n</th><th class="n">Win</th><th class="n">R / trade</th><th class="n">Total</th></tr></thead><tbody>${rows}</tbody></table>`
       + '<p class="msg"><b>Silver (spot XAG/USD, OANDA)</b>: the unchanged A-rule under gold\'s rule (buys, stop 0.3-0.75x the daily ATR, size 1, no break-even). Market test 1 Aug 2025 - 7 Nov 2026 after costs: +0.41R a trade over 82 (t 2.0), positive in both halves; random silver buys made +0.11R. But it lost in 2018-23, so it may only be the silver rally. Paper only: not live, no alerts, not mirrored. Gross R, no costs.</p>';
   }
-  // A-rule variants 'nofri' (research/edge/ict-filters) and 'h1opp' (research/edge/confluence): shadow.json .variants (live forward) and
-  // replay.json .shadowByVariant, against the current A-rule on all markets over the same period. Same sizing and exits as the A-rule.
+  // A-rule variants 'nofri' (research/edge/ict-filters), 'h1opp' (research/edge/confluence) and the exit variant 'strail'
+  // (research/edge/ict-exits-replay): shadow.json .variants (live forward) and replay.json .shadowByVariant, against the current A-rule
+  // on all markets over the same period. Same sizing as the A-rule; same exits except 'strail'.
   function renderVars(st, row, fromTxt) {
-    const V = S.vars || {}, VR = S.varsReplay || {}, NAMES = [['nofri', 'No Fridays'], ['h1opp', 'H1 structure opposed']];
+    const V = S.vars || {}, VR = S.varsReplay || {}, NAMES = [['nofri', 'No Fridays'], ['h1opp', 'H1 structure opposed'], ['strail', 'Structure trail exit']];
     const since = Math.min(...NAMES.map(([v]) => (V[v] && V[v].since ? Date.parse(V[v].since) / 1000 : Infinity)));
     const sinceTxt = isFinite(since) ? new Date(since * 1000).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }) : null;
     const al = sinceTxt ? st(S.trades.filter((x) => isA(x) && x.signalAt >= since)) : null, ar = S.replayInfo ? st(S.replay.filter(isA)) : null;
@@ -7609,7 +7610,7 @@ function msNextSetup(bars, A) {
     for (const [v, k] of NAMES) rows += row(`${k} · replay`, Array.isArray(VR[v]) ? st(VR[v].filter(KEEP)) : null, fromTxt ? (Array.isArray(VR[v]) ? `since ${fromTxt}` : 'after the next replay run') : '');
     rows += row('Current A-rule · replay', ar, fromTxt ? `since ${fromTxt}` : '');
     return `<table><thead><tr><th>All markets, A-setups, closed</th><th class="n">n</th><th class="n">Win</th><th class="n">R / trade</th><th class="n">Total</th></tr></thead><tbody>${rows}</tbody></table>`
-      + '<p class="msg">Two variants of the current A-setup rule (same sizing, break-even and trail), each with its own one-open-trade-per-market stream. <b>No Fridays</b>: skips A-setups whose signal closes on a New York Friday (8.8 years of history, out of sample 2024-26: +0.156R a trade vs +0.125R, drawdown 11.3R vs 16.0R; a weak pass). <b>H1 structure opposed</b>: takes an A-setup only when the Meridian H1 structure trend is not with the trade (out of sample +0.361R a trade on 61% of the trades vs +0.223R, same total R; an idea to forward-test, not a pass). Shadow records only: not live, no alerts.</p>';
+      + '<p class="msg">Three variants of the current A-setup rule (same sizing and break-even), each with its own one-open-trade-per-market stream. <b>Structure trail exit</b>: the same A-setups, but from +2R the stop follows the last confirmed H1 swing (2 candles each side) instead of trailing 1.5R behind the best price; same 36-candle exit (Aug 2025 - Nov 2026 replay trades: +0.058R a trade over the current exit, better in both halves and on 4 of 5 markets; 2018-26 cash history: no better, −0.008R a trade; an idea to forward-test, not a pass). <b>No Fridays</b>: skips A-setups whose signal closes on a New York Friday (8.8 years of history, out of sample 2024-26: +0.156R a trade vs +0.125R, drawdown 11.3R vs 16.0R; a weak pass). <b>H1 structure opposed</b>: takes an A-setup only when the Meridian H1 structure trend is not with the trade (out of sample +0.361R a trade on 61% of the trades vs +0.223R, same total R; an idea to forward-test, not a pass). Shadow records only: not live, no alerts.</p>';
   }
   // the desk data (~1.9 MB with replay + bars) loads when the ICT view first opens, then every 2 min while it is open (site audit 7 Nov)
   let loadedAt = 0; const fresh = () => { if (Date.now() - loadedAt > 110e3) { loadedAt = Date.now(); load(); } };

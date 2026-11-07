@@ -195,7 +195,14 @@ export const isDip = (g, mk, D) => SHADOW.dip.markets.includes(mk) && g.side > 0
 //    mH1 != 'with'). OOS +0.361R a trade on 61% of the trades vs +0.223R, same total R: a forward-test idea, not a pass.
 SHADOW.nofri = { markets: Object.keys(MARKETS) };
 SHADOW.h1opp = { markets: Object.keys(MARKETS), N: 6, look: 720, min: 60 };
-export const VARIANTS = ['nofri', 'h1opp'];
+// PAPER COMPARISON ONLY (8 Nov 2026, research/edge/ict-exits-replay): 'strail' = every A-setup (same entries, sizing and break-even as
+// the A-rule) with a STRUCTURE trail instead of the 1.5R trail: once the best price has reached +2R, at each H1 close the stop moves to
+// the last confirmed H1 swing low (buys; swing high for sells; 2 candles each side, among the candles since the signal) when that is
+// tighter. Same 36-candle time exit. On the Aug 2025 - Nov 2026 replay trades it beat the live exit in both halves and on 4 of 5
+// markets (+0.058R a trade, t 1.4), but on 2018-26 cash history it is no better (-0.008R a trade, worse in 2018-21 and 2022-24):
+// a forward-test idea, not a rule change.
+SHADOW.strail = { markets: Object.keys(MARKETS), from: 2, piv: 2 };
+export const VARIANTS = ['nofri', 'h1opp', 'strail'], EXIT_VARIANTS = ['strail'];
 const NY_DOW = new Intl.DateTimeFormat('en-US', { timeZone: 'America/New_York', weekday: 'short' });
 export const nyFriday = (t) => NY_DOW.format(new Date(t * 1000)) === 'Fri';
 const aRecorded = (g, mk) => !!g.grade && g.grade.total >= MIN_GRADE && isASetup(g, mk);
@@ -207,6 +214,7 @@ export const loadMeridian = async () => (meridian = meridian || (await import('.
 export const h1Trend = (g, H, ms) => { const i = H.findLastIndex((b) => b.time + 3600 <= g.close); if (i < SHADOW.h1opp.min) return 0;
   return ms(H.slice(Math.max(0, i - SHADOW.h1opp.look + 1), i + 1), SHADOW.h1opp.N).trend; };
 export const isH1Opp = (g, mk, H, ms) => SHADOW.h1opp.markets.includes(mk) && aRecorded(g, mk) && h1Trend(g, H, ms) !== g.side;
+export const isStrail = (g, mk) => SHADOW.strail.markets.includes(mk) && aRecorded(g, mk);   // exit variant: the A-setup entries unchanged
 // PAPER-ONLY MARKETS (research/ict-markets.md, 7 Nov 2026): markets where the UNCHANGED A-rule passed the market-expansion gate (n >= 30,
 // t >= 2, positive in both halves of 1 Aug 2025 - 7 Nov 2026, after costs). They are NOT in MARKETS, so they never reach trades.json,
 // the snapshot, bars.json, alerts or the cTrader mirror: each runs its own shadow variant stream (shadow.json .variants[variant],
@@ -220,11 +228,12 @@ VARIANTS.push('silver');
 export const PAPER_VARIANTS = new Set(Object.values(SHADOW_MARKETS).map((M) => M.variant));
 export const isPaperA = (g, mk) => !!SHADOW_MARKETS[mk] && !!g.grade && g.grade.total >= MIN_GRADE && RULES[SHADOW_MARKETS[mk].aRule](g);
 const paperRule = (v, g, mk) => !!SHADOW_MARKETS[mk] && SHADOW_MARKETS[mk].variant === v && isPaperA(g, mk);
-export const variantRule = (v, g, mk, ctx) => (v === 'nofri' ? isNoFri(g, mk) : v === 'h1opp' ? isH1Opp(g, mk, ctx.H, ctx.ms) : v === 'dip' ? isDip(g, mk, ctx.D) : paperRule(v, g, mk));
+export const variantRule = (v, g, mk, ctx) => (v === 'nofri' ? isNoFri(g, mk) : v === 'h1opp' ? isH1Opp(g, mk, ctx.H, ctx.ms) : v === 'strail' ? isStrail(g, mk) : v === 'dip' ? isDip(g, mk, ctx.D) : paperRule(v, g, mk));
 // each filter variant's verdict on one signal, stored on the replay's A-setups (vr) so the Coach can tell the trades a filter rejects from the
 // ones its stream only missed while busy (council/proposals.mjs ictVariantVerdicts); a tag, it changes no record. Paper-market variants
-// (SHADOW_MARKETS) are other markets, not filters: never tagged, so the live A-setup records stay exactly as they were
-export const variantTags = (g, mk, ctx) => Object.fromEntries(VARIANTS.filter((v) => !PAPER_VARIANTS.has(v)).map((v) => [v, !!variantRule(v, g, mk, ctx)]));
+// (SHADOW_MARKETS) are other markets and exit variants (strail) take every A-setup, so neither is a filter: never tagged, so the live
+// A-setup records stay exactly as they were
+export const variantTags = (g, mk, ctx) => Object.fromEntries(VARIANTS.filter((v) => !PAPER_VARIANTS.has(v) && !EXIT_VARIANTS.includes(v)).map((v) => [v, !!variantRule(v, g, mk, ctx)]));
 // OANDA mid candles for the paper-only markets via the site's market-data proxy (complete candles only, 17:00 New York hour dropped
 // like the futures feed); D1 = the 17:00 New York (FX/metals) day built from those H1 candles, stamped so time + 86400 = its close
 export const MD_BARS = process.env.ICT_MD_BARS || 'https://meridianx.dev/md/bars';
@@ -244,6 +253,11 @@ export function dailyNY(H) {
     else { cur.high = Math.max(cur.high, b.high); cur.low = Math.min(cur.low, b.low); cur.close = b.close; } }
   return out;
 }
+// 'strail' stop level after the first k closed H1 candles since the signal (hc[0] = the first candle after it): the latest swing low
+// (buys) / high (sells) confirmed by `piv` candles each side within those k candles, or null
+export const strailLevel = (hc, k, s, piv) => { for (let j = k - 1 - piv; j >= piv; j--) { let ok = true;
+  for (let q = j - piv; q <= j + piv; q++) if (s > 0 ? hc[q].low < hc[j].low : hc[q].high > hc[j].high) { ok = false; break; }
+  if (ok) return s > 0 ? hc[j].low : hc[j].high; } return null; };
 export const letter = (g) =>(g >= 10 ? 'A+' : g >= 9 ? 'A' : g >= 8 ? 'A-' : g >= 7 ? 'B+' : g >= 6 ? 'B' : g >= 5 ? 'B-' : g >= 3 ? 'C' : 'F');
 
 // manage one open trade on the closed 5m candles (shared by the live records and the shadow 'dip' records)
@@ -253,6 +267,12 @@ function manageTrade(tr, H, m5, f) {
   // the exit is at the close of the 36th candle and nothing after it is managed (it used the price at run time before)
   const hold = H.filter((b) => b.time >= (tr.signalAt || tr.opened)), endT = hold.length >= P.holdH ? hold[P.holdH - 1].time + 3600 : Infinity;
   for (const b of m5.bars.filter((b) => b.time >= tr.checked && b.time < endT)) {
+    // shadow 'strail' only (live records never carry strail): at each H1 close since the signal, once the best price has reached
+    // +strail[0] R, the stop moves to the last confirmed H1 swing (strail[1] candles each side) when tighter; tr.sk = candles seen
+    if (tr.strail) { let k = tr.sk || 0;
+      while (k < hold.length && hold[k].time + 3600 <= b.time) { k++;
+        if (tr.mfe >= tr.strail[0]) { const ns = strailLevel(hold, k, s, tr.strail[1]); if (ns != null && (ns - tr.stop) * s > 0) { tr.stop = f(ns); tr.trailMoved = true; } } }
+      tr.sk = k; }
     if (!tr.mark2 && (s > 0 ? b.high >= tr.t2 : b.low <= tr.t2)) tr.mark2 = b.time + 300;
     tr.mfe = Math.max(tr.mfe || 0, +(((s > 0 ? b.high : -b.low) - s * tr.entry) / tr.r0).toFixed(2));
     if (s > 0 ? b.low <= tr.stop : b.high >= tr.stop) { const Rraw = +((s * (tr.stop - tr.entry)) / tr.r0).toFixed(2), R = +(Rraw * (tr.size || 1)).toFixed(2);
@@ -272,7 +292,7 @@ async function main() {
   fs.mkdirSync(DATA, { recursive: true });
   // shadow 'dip' records (paper comparison, never alerted): a separate file so trades.json and the live stats stay as they were
   const shadow = load('shadow.json', null) || { variant: 'dip', since: new Date(now * 1000).toISOString(), trades: [], errors: {} }; shadow.errors = shadow.errors || {};
-  // 'nofri' / 'h1opp' live under .variants (the top-level fields stay the 'dip' stream, so older readers keep working)
+  // 'nofri' / 'h1opp' / 'strail' live under .variants (the top-level fields stay the 'dip' stream, so older readers keep working)
   shadow.variants = shadow.variants || {};
   for (const v of VARIANTS) { const V = (shadow.variants[v] = shadow.variants[v] || { since: new Date(now * 1000).toISOString(), trades: [], errors: {} }); V.trades = V.trades || []; V.errors = V.errors || {}; }
   const trades = load('trades.json', []), snap = { at: new Date().toISOString(), markets: {}, errors: {}, model: { ...P, name: 'H1 iFVG reversal' } }, bars = {};
@@ -328,7 +348,7 @@ async function main() {
           delete shadow.errors[key];
         } catch (e) { shadow.errors[key] = String(e.message || e); }
       }
-      // 5. shadow 'nofri' / 'h1opp' (paper comparison only): the A-setup rule with one extra condition, each its own stream (own open
+      // 5. shadow 'nofri' / 'h1opp' / 'strail' (paper comparison only): the A-setup rule with one extra condition ('strail': another exit), each its own stream (own open
       // trade per market, own ids, own records in shadow.json .variants); runs last, own try per variant, errors kept there
       for (const v of VARIANTS) {
         const V = shadow.variants[v];
@@ -343,9 +363,10 @@ async function main() {
             const entry = f(price), r0 = Math.abs(entry - g.stop);
             if ((entry - g.stop) * s <= 0 || r0 > 1.6 * g.r0) continue;
             V.trades.push({ id, shadow: true, variant: v, market: key, label: M.label, short: M.short, side: s > 0 ? 'buy' : 'sell', model: 'H1 iFVG reversal', signalAt: g.close, signalPx: f(g.entry),
-              entry, stop: f(g.stop), r0: +r0.toFixed(M.dec + 1), t1: null, trail: P.trail, be: M.aRule ? null : P.be, stop0: f(g.stop), t2: f(entry + s * P.mark * r0), opened: now, checked: frontier, status: 'open', R: null, size: sizeOf(g, key),
+              entry, stop: f(g.stop), r0: +r0.toFixed(M.dec + 1), t1: null, trail: v === 'strail' ? null : P.trail, be: M.aRule ? null : P.be, stop0: f(g.stop), t2: f(entry + s * P.mark * r0), opened: now, checked: frontier, status: 'open', R: null, size: sizeOf(g, key),
               sweep: { t: g.sweepT, level: f(g.swept) }, fvg: g.fvg.map(f), ih: g.ih == null ? null : f(g.ih), dol: g.dol == null ? null : f(g.dol), valid: g.valid,
-              feat: g.feat, grade: { ...g.grade, letter: letter(g.grade.total) }, aset: true, aplus: isAPlus(g, key), ...(v === 'h1opp' ? { mH1: h1Trend(g, H, ctx.ms) } : {}) });
+              feat: g.feat, grade: { ...g.grade, letter: letter(g.grade.total) }, aset: true, aplus: isAPlus(g, key), ...(v === 'h1opp' ? { mH1: h1Trend(g, H, ctx.ms) } : {}),
+              ...(v === 'strail' ? { strail: [SHADOW.strail.from, SHADOW.strail.piv] } : {}) });
           }
           delete V.errors[key];
         } catch (e) { V.errors[key] = String(e.message || e); }
