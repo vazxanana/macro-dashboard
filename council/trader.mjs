@@ -13,6 +13,7 @@ import { coachProposals, spotProposals, ictVariantVerdicts, coachCarry } from '.
 import { shrink, ebTau, shrunkClear, ruleState, sameRule, setRule, descRule, judgeTrial, ledgerStart, syncLedger, ledgerSection, LEDGER_START, LEDGER_END } from './coach.mjs';
 import { buildDecay } from './decay.mjs';
 import { recordVerdicts } from './digest.mjs';   // the shared verdict record (digest.json): decay statuses each 6-hour reading
+import { buildBook } from './book.mjs';
 import { cleanBars, LTF_CLEAN } from './clean.mjs';
 import { voidRoundedReplicas, historyCatchUp, voidM30Twins } from './repairs.mjs';
 import { d1AdxFeat } from './adx.mjs';
@@ -1525,7 +1526,7 @@ if (coach.date !== today) {
     if (sh.length >= 4 && exp(sh) > 0.3) { delete config.pausedMarkets[m]; change(`Resumed market ${m} early`, `Shadow trades while paused made +${exp(sh).toFixed(2)}R over ${sh.length}.`); }
   }
   const prev = rd('coach.json', {});   // keep the owner-facing proposals, the ICT watch list (coachCarry) and the ledger between the daily runs
-  wr('coach.json', { ...coachCarry(prev), decay: prev.decay, ledger: prev.ledger, ledgerSlot: prev.ledgerSlot, ledgerSince: prev.ledgerSince, date: today, at: nowISO, stats, last14: rs, lessons: lessons(trades, now), fslot: nowISO.slice(0, 11) + String(Math.floor(+nowISO.slice(11, 13) / 6) * 6).padStart(2, '0'), notes: notes.length ? notes : ['No change today: not enough evidence to move a rule.'] });
+  wr('coach.json', { ...coachCarry(prev), decay: prev.decay, book: prev.book, ledger: prev.ledger, ledgerSlot: prev.ledgerSlot, ledgerSince: prev.ledgerSince, date: today, at: nowISO, stats, last14: rs, lessons: lessons(trades, now), fslot: nowISO.slice(0, 11) + String(Math.floor(+nowISO.slice(11, 13) / 6) * 6).padStart(2, '0'), notes: notes.length ? notes : ['No change today: not enough evidence to move a rule.'] });
 }
 // every run: pause a setup as soon as its live record says so
 {
@@ -2087,6 +2088,14 @@ try { const cj = rd('coach.json', {});
     if (Object.keys(e).length < tried) { cj.decaySent = dg.mark; wr('coach.json', cj); }
     for (const [c, m] of Object.entries(e)) snapshot.errors[`decay_${c}`] = m; }
 } catch (e) { console.log('decay monitor failed:', e.message); }
+// Book weights, paper comparison (8 Nov, council/book.mjs): the live book as traded against the portfolio-v2 proposal (equal
+// risk per distinct idea, gold family capped at 40%, clean-half sizing) applied to the SAME closed trades -> coach.json book,
+// every 6 hours. Paper comparison only: no live change; nothing here changes a rule, a size, a filter or a trade.
+try { const cj = rd('coach.json', {});
+  if (!cj.book || cj.book.slot !== CC_SLOT) {
+    cj.book = { ...buildBook({ trades, research, ictTrades: rd('ict/trades.json', []), ictReplay: rd('ict/replay.json', null) }, { now }), slot: CC_SLOT };
+    wr('coach.json', cj); }
+} catch (e) { console.log('book comparison failed:', e.message); }
 snapshot.lessons = lessons(trades, now);
 // owner's loss reviews, per setup (30 days): reason counts, rule ideas, and reasons that repeat (3+ and a third of the
 // reviewed losses of that setup) as candidates the twice-daily council check tests on the backtest before any rule changes

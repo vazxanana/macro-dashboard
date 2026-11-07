@@ -2896,6 +2896,15 @@ html[data-motion="off"] #v-ict .ict-cal-d:hover { transform: none !important; }
         <div class="dc-wrap" tabindex="0" role="region" aria-label="Edge decay monitor, scrolls sideways"><table class="dc-t"><thead><tr><th class="dc-l">System</th><th class="dc-l">Status</th><th>Last trades</th><th>CUSUM vs backtest</th><th>vs zero</th><th>Drawdown</th><th>Record</th><th class="dc-l">Why</th></tr></thead><tbody id="ms-decay-b"></tbody></table></div>
         <p class="ms-note dc-foot">Each live system's record after costs (the council replay up to its first forward trade, then the forward paper record) against its own backtest. <b>CUSUM</b> rises while a system runs below about half its backtest edge; its limit is what one year of normal luck stays under 19 times in 20. <b>Decaying</b>: past the limit, or a drawdown beyond the worst the system has had (gold replica: the owner's 40R allowance). <b>Watch</b>: 3/4 of either. Status only: the monitor never changes a rule; you decide. Method: research/edge/decay-monitor.</p>
       </div>
+      <div class="card c-book adm" id="ms-book">
+        <div class="ms-k"><span>Book weights · live vs proposed</span><span class="bk-tag">Paper comparison · no live change</span></div>
+        <p class="bk-sum" id="ms-book-sum">Waiting for the Coach…</p>
+        <div class="bk-legend" aria-hidden="true"><span><i class="bk-sw bk-live"></i>Live book, as traded</span><span><i class="bk-sw bk-prop"></i>Proposed weights, same trades</span></div>
+        <div class="bk-chart" id="ms-book-chart" role="img" aria-label="Running R of the live book and of the proposed weights on the same trades"></div>
+        <p class="bk-hover" id="ms-book-hover" aria-live="polite"></p>
+        <div class="bk-wrap" tabindex="0" role="region" aria-label="Book weights by idea, scrolls sideways"><table class="bk-t"><thead><tr><th class="bk-l">Idea</th><th><span class="bk-long">Trades</span><span class="bk-short" title="trades">n</span></th><th><span class="bk-long">Risk live → proposed</span><span class="bk-short">Risk</span></th><th><span class="bk-long">R live</span><span class="bk-short">Live</span></th><th><span class="bk-long">R proposed</span><span class="bk-short">Proposed</span></th></tr></thead><tbody id="ms-book-b"></tbody></table></div>
+        <p class="ms-note bk-foot" id="ms-book-foot">The portfolio-v2 proposal the owner has not decided on (equal risk per <b>distinct idea</b>, the ICT desk counted once, Gold trend N20 + N5 as one bet, the gold family capped at 40% of the book, sized on the clean-half Sharpe of about 0.3), applied after the fact to the <b>same closed paper trades</b> the live book took: no trade added, removed or re-priced, the same total risk, only spread differently. R after costs. Nothing here changes a rule, a size, a filter or a trade.</p>
+      </div>
       <div class="card c-analyst">
         <div class="ms-k">Analyst · weekly brief</div>
         <div class="c-sub">Ready right now</div>
@@ -11285,6 +11294,127 @@ html[data-role="public"] #ms-me-ct { display: none; }
     }).join('');
   }
   W.MS_DECAY_RENDER = render;
+  document.addEventListener('ms:council', render);
+  setTimeout(render, 0);
+})(window);
+</script>
+<style id="ms-book-css">
+/* Book weights, paper comparison (#ms-book, 8 Nov): coach.json book (council/book.mjs). Research pane, admin only; self-contained.
+   Series colours validated with the dataviz validator per theme (dark on #121722, light on #fff: CVD ΔE ≥ 21). */
+.c-book { --bk-live: #5b8cff; --bk-prop: #b08326; min-width: 0; }
+:root[data-theme="light"] .c-book { --bk-live: #2f6bff; --bk-prop: #a3700a; }
+.c-book .bk-tag { display: inline-block; padding: 2px 8px; border-radius: 999px; border: 1px dashed var(--line); font: 600 11px/1.5 var(--sans); letter-spacing: 0; text-transform: none; color: var(--ink-dim); white-space: nowrap; }
+.c-book .bk-sum { margin: 0 0 10px; font-size: 13.5px; line-height: 1.5; color: var(--ink-dim); } .c-book .bk-sum b { color: var(--ink); font-weight: 600; }
+.c-book .pos { color: var(--buy); font-weight: 600; } .c-book .neg { color: var(--sell); font-weight: 600; }
+.c-book .bk-legend { display: flex; flex-wrap: wrap; gap: 4px 16px; margin: 0 0 6px; font-size: 12px; color: var(--ink-dim); }
+.c-book .bk-legend span { display: inline-flex; align-items: center; gap: 6px; }
+.c-book .bk-sw { width: 14px; height: 3px; border-radius: 2px; background: var(--bk-live); } .c-book .bk-sw.bk-prop { background: var(--bk-prop); }
+.c-book .bk-chart { position: relative; width: 100%; height: 130px; min-width: 0; touch-action: pan-y; }
+.c-book .bk-chart svg { display: block; width: 100%; height: 100%; overflow: visible; }
+.c-book .bk-chart .bk-grid { stroke: var(--line); stroke-width: 1; } .c-book .bk-chart .bk-zero { stroke: var(--ink-faint); stroke-width: 1; stroke-dasharray: 3 3; }
+.c-book .bk-chart .bk-ln { fill: none; stroke-width: 2; stroke-linejoin: round; stroke-linecap: round; } .c-book .bk-chart .bk-ln.live { stroke: var(--bk-live); } .c-book .bk-chart .bk-ln.prop { stroke: var(--bk-prop); }
+.c-book .bk-chart .bk-dot { stroke: var(--panel); stroke-width: 2; } .c-book .bk-chart .bk-dot.live { fill: var(--bk-live); } .c-book .bk-chart .bk-dot.prop { fill: var(--bk-prop); }
+.c-book .bk-chart text { font: 11px var(--sans); fill: var(--ink-dim); } .c-book .bk-chart text.bk-end { font-weight: 600; fill: var(--ink); }
+.c-book .bk-chart .bk-x { stroke: var(--ink-faint); stroke-width: 1; } .c-book .bk-chart .bk-empty { fill: var(--ink-faint); font-size: 12.5px; }
+.c-book .bk-hover { margin: 4px 0 10px; min-height: 18px; font-size: 12px; line-height: 1.5; color: var(--ink-dim); font-variant-numeric: tabular-nums; }
+.c-book .bk-wrap { width: 0; min-width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; border: 1px solid var(--line); border-radius: var(--r-sm, 8px); }
+.c-book .bk-wrap:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.bk-t { width: 100%; border-collapse: collapse; font-size: 13px; font-variant-numeric: tabular-nums; }
+.bk-t th, .bk-t td { padding: 7px 9px; border-bottom: 1px solid var(--line); text-align: right; white-space: nowrap; vertical-align: middle; }
+.bk-t thead th { font-size: 11.5px; font-weight: 600; color: var(--ink-dim); background: var(--panel-raised, var(--panel)); }
+.bk-t .bk-l { text-align: left; white-space: normal; } .bk-t tbody tr:last-child td { border-bottom: 0; }
+.bk-t td.bk-l b { color: var(--ink); font-weight: 600; } .bk-t td.bk-l small { display: block; color: var(--ink-faint); font-size: 11px; }
+.bk-t .bk-gold { display: inline-block; margin-left: 6px; padding: 0 6px; border-radius: 6px; border: 1px solid var(--line); font-size: 10.5px; font-weight: 600; color: var(--ink-dim); vertical-align: 1px; }
+.bk-t tr.bk-none td { color: var(--ink-faint); } .bk-t tr.bk-other td { color: var(--ink-faint); font-style: italic; }
+.bk-t td .bk-m { color: var(--ink-faint); } .bk-t td .bk-m b { color: var(--ink); font-weight: 600; }
+.c-book .bk-foot b { color: var(--ink); font-weight: 600; } .c-book .bk-foot { margin-top: 10px; line-height: 1.5; }
+.bk-t .bk-short { display: none; }
+@media (max-width: 520px) { .bk-t { font-size: 12.5px; } .bk-t th, .bk-t td { padding: 6px 5px; } .bk-t .bk-pc, .bk-t .bk-long { display: none; } .bk-t .bk-short { display: inline; } .c-book .bk-chart { height: 110px; } }
+</style>
+<script id="ms-book-js">
+// Book weights, paper comparison (8 Nov 2026): renders coach.json `book` (council/book.mjs, written by the Trader every 6 hours)
+// into #ms-book: a two-line running-R chart (live book as traded vs the proposed weights on the same trades), a table per
+// idea and a summary. Reads the copy the page already loaded (window.MS_COUNCIL, event ms:council); fetches nothing; changes nothing.
+(function (W) {
+  var $ = function (id) { return document.getElementById(id); };
+  var esc = function (s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); };
+  var num = function (v) { return typeof v === 'number' && isFinite(v); };
+  var fR = function (v, d) { return num(v) ? (v > 0.004 ? '+' : v < -0.004 ? '−' : '') + Math.abs(v).toFixed(d == null ? 2 : d) + 'R' : '—'; };
+  var cR = function (v) { return '<span class="' + (v > 0.005 ? 'pos' : v < -0.005 ? 'neg' : '') + '">' + fR(v) + '</span>'; };
+  var pct = function (v) { return num(v) ? Math.round(v * 100) + '%' : '—'; };
+  var DAYF = new Intl.DateTimeFormat('en-GB', { timeZone: 'UTC', day: 'numeric', month: 'short' });
+  var dayLbl = function (d) { return DAYF.format(new Date(d + 'T12:00:00Z')); };
+  // every UTC calendar day from `from` to the last recorded day, each with the running totals (flat where nothing closed)
+  function series(B) {
+    var days = Array.isArray(B.days) ? B.days : [], out = [], by = {}, i; if (!days.length) return out;
+    for (i = 0; i < days.length; i++) by[days[i].d] = days[i];
+    var t = Date.parse((B.from || days[0].d) + 'T00:00:00Z'), end = Date.parse(days[days.length - 1].d + 'T00:00:00Z'), cl = 0, cp = 0;
+    if (!(t <= end)) t = Date.parse(days[0].d + 'T00:00:00Z');
+    out.push({ d: new Date(t - 86400000).toISOString().slice(0, 10), live: 0, prop: 0, day: null, start: true });   // both books start at zero the day before the window
+    for (; t <= end; t += 86400000) { var d = new Date(t).toISOString().slice(0, 10), r = by[d]; if (r) { cl = r.cumLive; cp = r.cumProp; } out.push({ d: d, live: cl, prop: cp, day: r || null }); }
+    return out;
+  }
+  var CH = { S: [], w: 0, x0: 0, x1: 0, idx: -1 };
+  function drawChart(B) {
+    var box = $('ms-book-chart'); if (!box) return; var S = series(B); CH.S = S;
+    var w = box.clientWidth || 320, h = box.clientHeight || 130, padL = 6, padR = 104, padT = 10, padB = 18;
+    if (!S.length) { box.innerHTML = '<svg viewBox="0 0 ' + w + ' ' + h + '"><text class="bk-empty" x="' + (w / 2) + '" y="' + (h / 2) + '" text-anchor="middle">No closed trade in the window yet.</text></svg>'; return; }
+    var vals = [0]; S.forEach(function (p) { vals.push(p.live, p.prop); });
+    var lo = Math.min.apply(null, vals), hi = Math.max.apply(null, vals); if (hi - lo < 1) { hi += 0.5; lo -= 0.5; }
+    var pad = (hi - lo) * 0.08; lo -= pad; hi += pad;
+    var x0 = padL, x1 = w - padR, n = S.length, X = function (i) { return n > 1 ? x0 + (x1 - x0) * i / (n - 1) : (x0 + x1) / 2; }, Y = function (v) { return padT + (h - padT - padB) * (hi - v) / (hi - lo); };
+    CH.w = w; CH.x0 = x0; CH.x1 = x1;
+    var path = function (k) { var d = ''; for (var i = 0; i < n; i++) d += (i ? ' L' : 'M') + X(i).toFixed(1) + ' ' + Y(S[i][k]).toFixed(1); return d; };   // running total at each day's close
+    var last = S[n - 1], yl = Y(last.live), yp = Y(last.prop), gap = Math.abs(yl - yp) < 14;
+    var lab = function (y, cls, txt) { return '<text class="bk-end" x="' + (x1 + 10) + '" y="' + (y + 4).toFixed(1) + '">' + txt + '</text>'; };
+    var yl2 = yl, yp2 = yp; if (gap) { var mid = (yl + yp) / 2, up = yl <= yp; yl2 = mid + (up ? -8 : 8); yp2 = mid + (up ? 8 : -8); }
+    var svg = '<svg viewBox="0 0 ' + w + ' ' + h + '" preserveAspectRatio="none" aria-hidden="true">'
+      + '<line class="bk-grid" x1="' + x0 + '" x2="' + x1 + '" y1="' + Y(hi - pad).toFixed(1) + '" y2="' + Y(hi - pad).toFixed(1) + '"/><line class="bk-grid" x1="' + x0 + '" x2="' + x1 + '" y1="' + Y(lo + pad).toFixed(1) + '" y2="' + Y(lo + pad).toFixed(1) + '"/>'
+      + (lo < 0 && hi > 0 ? '<line class="bk-zero" x1="' + x0 + '" x2="' + x1 + '" y1="' + Y(0).toFixed(1) + '" y2="' + Y(0).toFixed(1) + '"/>' : '')
+      + '<text x="' + x0 + '" y="' + (h - 4) + '">' + esc(S.length > 1 ? dayLbl(S[1].d) : dayLbl(S[0].d)) + '</text><text x="' + x1 + '" y="' + (h - 4) + '" text-anchor="end">' + esc(dayLbl(last.d)) + '</text>'
+      + '<path class="bk-ln live" d="' + path('live') + '"/><path class="bk-ln prop" d="' + path('prop') + '"/>'
+      + '<circle class="bk-dot live" cx="' + X(n - 1).toFixed(1) + '" cy="' + yl.toFixed(1) + '" r="4"/><circle class="bk-dot prop" cx="' + X(n - 1).toFixed(1) + '" cy="' + yp.toFixed(1) + '" r="4"/>'
+      + lab(yl2, 'live', 'Live ' + esc(fR(last.live, 1))) + lab(yp2, 'prop', 'Proposed ' + esc(fR(last.prop, 1)))
+      + '<line class="bk-x" id="ms-book-x" x1="0" x2="0" y1="' + padT + '" y2="' + (h - padB) + '" visibility="hidden"/></svg>';
+    box.innerHTML = svg;
+  }
+  function hover(ev) {
+    var box = $('ms-book-chart'), out = $('ms-book-hover'), x = $('ms-book-x'); if (!box || !out || !CH.S.length) return;
+    var r = box.getBoundingClientRect(), px = (ev.clientX - r.left) * (CH.w / (r.width || 1)), n = CH.S.length;
+    var i = n > 1 ? Math.round((px - CH.x0) / (CH.x1 - CH.x0) * (n - 1)) : 0; i = Math.max(0, Math.min(n - 1, i));
+    var p = CH.S[i], xx = n > 1 ? CH.x0 + (CH.x1 - CH.x0) * i / (n - 1) : (CH.x0 + CH.x1) / 2;
+    if (x) { x.setAttribute('x1', xx); x.setAttribute('x2', xx); x.setAttribute('visibility', 'visible'); }
+    out.innerHTML = p.start ? '<b>Start</b> · both books at 0R before ' + esc(dayLbl(CH.S.length > 1 ? CH.S[1].d : p.d))
+      : '<b>' + esc(dayLbl(p.d)) + '</b> · ' + (p.day ? p.day.n + ' closed: live ' + cR(p.day.live) + ', proposed ' + cR(p.day.prop) + ' · ' : 'nothing closed · ') + 'running live ' + esc(fR(p.live)) + ', proposed ' + esc(fR(p.prop));
+  }
+  function unhover() { var x = $('ms-book-x'), out = $('ms-book-hover'); if (x) x.setAttribute('visibility', 'hidden'); if (out) out.textContent = CH.S.length ? 'Touch or hover the chart for a day.' : ''; }
+  function render() {
+    var sum = $('ms-book-sum'), body = $('ms-book-b'); if (!sum || !body) return;
+    var C = W.MS_COUNCIL, B = C && C.coach && C.coach.book;
+    if (!B || !B.live || !B.proposed) { sum.textContent = 'No book reading yet: the Coach writes one every 6 hours.'; body.innerHTML = ''; drawChart({ days: [] }); unhover(); return; }
+    var bud = B.budget || {}, gold = (B.byIdea || []).filter(function (r) { return r.gold; }), rest = (B.byIdea || []).filter(function (r) { return !r.gold && r.id !== 'other'; });
+    var at = B.at ? new Date(B.at).toLocaleString('en-GB', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' }) : '';
+    sum.innerHTML = (B.nTrades ? 'Since <b>' + esc(dayLbl(B.from)) + '</b>, ' + B.nTrades + ' closed paper trade' + (B.nTrades === 1 ? '' : 's') + ': live book ' + cR(B.live.R) + ', proposed weights ' + cR(B.proposed.R)
+      + ' (' + cR(B.diff) + ')' + ' · max drawdown ' + esc(num(B.live.dd) ? B.live.dd.toFixed(1) : '—') + ' / ' + esc(num(B.proposed.dd) ? B.proposed.dd.toFixed(1) : '—') + 'R'
+      + (num(B.corr) ? ' · daily correlation ' + B.corr.toFixed(2) : '') + (num(B.live.sharpe) ? ' · Sharpe ' + B.live.sharpe.toFixed(2) + ' / ' + B.proposed.sharpe.toFixed(2) + ' (clean-half expectation ' + esc(B.sizing && B.sizing.sharpe) + ')' : '') + '. '
+      : 'No closed paper trade since ' + esc(dayLbl(B.from)) + ' yet. ')
+      + 'Same trades, same total risk (' + esc(bud.M) + 'R budget, one unit per live stream), spread per idea: ' + (rest.length ? pct(rest[0].w) + ' each to ' + rest.map(function (r) { return esc(r.name); }).join(', ') : '') + (gold.length ? ', ' + pct(gold[0].w) + ' each to the ' + gold.length + ' gold systems' + (bud.capped ? ' (family capped at ' + pct(bud.goldCap) + ')' : '') : '') + '.'
+      + (at ? ' <span class="ms-note">Updated ' + esc(at) + '.</span>' : '');
+    body.innerHTML = (B.byIdea || []).map(function (r) {
+      var cls = r.id === 'other' ? 'bk-other' : r.n ? '' : 'bk-none';
+      return '<tr class="' + cls + '"><td class="bk-l"><b>' + esc(r.name) + '</b>' + (r.gold ? '<span class="bk-gold">gold</span>' : '') + (r.streams > 1 ? '<small>' + r.streams + ' live streams, one idea</small>' : '') + '</td>'
+        + '<td>' + esc(r.n) + '</td><td><span class="bk-m">' + (r.id === 'other' ? 'as live' : esc(r.streams) + '× → <b>' + esc(num(r.m) ? (r.m * r.streams).toFixed(2) : '—') + '×</b>' + (num(r.w) ? '<span class="bk-pc"> (' + pct(r.w) + ')</span>' : '')) + '</span></td>'
+        + '<td>' + (r.n ? cR(r.live) : '—') + '</td><td>' + (r.n ? cR(r.prop) : '—') + '</td></tr>';
+    }).join('');
+    var foot = $('ms-book-foot'); if (foot && B.sizing && B.sizing.note && !/Expect the clean-half/.test(foot.textContent)) foot.innerHTML += ' ' + esc(B.sizing.note);
+    drawChart(B); unhover();
+  }
+  var box = $('ms-book-chart');
+  if (box) { box.addEventListener('pointermove', hover); box.addEventListener('pointerdown', hover); box.addEventListener('pointerleave', unhover); }
+  // the research pane is hidden until opened: redraw when the chart box gets its real width (ResizeObserver; window resize as the fallback)
+  var rz = null, lastW = 0, redraw = function () { clearTimeout(rz); rz = setTimeout(function () { var b = $('ms-book-chart'); if (!b || b.clientWidth === lastW) return; lastW = b.clientWidth; var C = W.MS_COUNCIL; if (C && C.coach && C.coach.book) { drawChart(C.coach.book); unhover(); } }, 80); };
+  if (box && typeof ResizeObserver === 'function') new ResizeObserver(redraw).observe(box); else W.addEventListener('resize', redraw);
+  W.MS_BOOK = { series: series, render: render };
   document.addEventListener('ms:council', render);
   setTimeout(render, 0);
 })(window);
