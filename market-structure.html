@@ -1551,6 +1551,14 @@ html[data-guest] #ms-cmdk-btn { display: none !important; }
 .cal-wk.loss { border-style: solid; border-color: color-mix(in srgb, var(--sell) 40%, transparent); background: var(--sell-soft, rgba(242,87,111,.1)); } .cal-wk.loss .cr { color: var(--sell); }
 .cal-wk .ct { font-size: 10.5px; }
 @media (max-width: 560px) { #ms-cal { grid-template-columns: repeat(7, minmax(0, 1fr)); } #ms-cal .cal-wk, #ms-cal .cal-wkh { display: none; } }
+
+/* Home: session clock beside the date */
+.h-dl { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.h-clock { display: inline-flex; align-items: center; gap: 6px; padding: 2px 9px; border: 1px solid var(--line); border-radius: 999px; font: 500 11.5px var(--sans); color: var(--ink-dim); white-space: nowrap; font-variant-numeric: tabular-nums; }
+.h-clock i { width: 6px; height: 6px; border-radius: 50%; background: var(--buy); flex: none; }
+.h-clock.closed i { background: var(--ink-faint); }
+.h-clock b { color: var(--ink); font-weight: 600; }
+:root[data-theme="pro"] .h-clock { border-radius: 4px; }
 </style>
 </head>
 <body>
@@ -1663,7 +1671,7 @@ html[data-guest] #ms-cmdk-btn { display: none !important; }
   </section>
   <!-- ─── Home: one card per section ─── -->
   <section class="view" id="v-home" aria-label="Home">
-    <div class="h-top"><div><div class="h-date" id="h-date"></div><h1 class="h-head" id="h-head">Loading live candles…</h1></div></div>
+    <div class="h-top"><div><div class="h-dl"><div class="h-date" id="h-date"></div><span class="h-clock" id="h-clock" hidden></span></div><h1 class="h-head" id="h-head">Loading live candles…</h1></div></div>
     <nav class="h-quick" aria-label="Jump to"><a href="#council/overview">Active trades &amp; calendar</a><a href="#council/trades">All trades</a><a href="#council/review" class="adm">Loss review</a><a href="#council/systems" class="adm">Systems</a><a href="#council/research" class="adm">Research</a><a href="#journal">Journal</a></nav>
     <div class="h-warn" id="h-warn" role="alert" hidden></div>
     <div class="h-today" id="h-today" role="group" aria-label="Results today"></div>
@@ -5215,6 +5223,25 @@ function msNextSetup(bars, A) {
     while (j >= 0 && j < days.length && days[j].disabled) j += (k === 'Home' || k === 'End') ? dir : dir;
     if (j < 0 || j >= days.length || days[j].disabled) return; ev.preventDefault(); days[j].focus(); }); };
   wire('ms-cal', 'button.cal-d'); wire('ict-cal', 'button.ict-cal-d'); wire('g-cal', 'button.cal-d'); })();
+</script>
+<script>
+/* Session clock: which FX/gold sessions are open now (UTC, approximate, ignores DST shifts) and when the next one starts */
+(() => { const el = document.getElementById('h-clock'); if (!el) return;
+  const S = [['Asia', 22, 7], ['London', 7, 16], ['New York', 12, 21]];
+  const inS = (h, a, b) => a < b ? h >= a && h < b : h >= a || h < b;
+  const dur = (ms) => { const m = Math.round(ms / 60000), h = Math.floor(m / 60); return h ? `${h}h ${String(m % 60).padStart(2, '0')}m` : `${m}m`; };
+  const closedAt = (d) => { const wd = d.getUTCDay(), h = d.getUTCHours(); return wd === 6 || (wd === 0 && h < 22) || (wd === 5 && h >= 21); };
+  const tick = () => {
+    const now = new Date(), h = now.getUTCHours() + now.getUTCMinutes() / 60;
+    if (closedAt(now)) { const t = new Date(now); while (closedAt(t)) t.setUTCMinutes(t.getUTCMinutes() + 30); t.setUTCMinutes(0, 0, 0);
+      el.className = 'h-clock closed'; el.innerHTML = `<i></i>Forex and gold closed · open in <b>${dur(t - now)}</b>`; el.hidden = false; return; }
+    const open = S.filter(([, a, b]) => inS(h, a, b)).map(([n]) => n);
+    let nxt = null; for (let k = 1; k <= 24 * 60; k++) { const t = new Date(now.getTime() + k * 60000), th = t.getUTCHours() + t.getUTCMinutes() / 60; const st = S.find(([n, a]) => Math.abs(th - a) < 1 / 120 && !open.includes(n)); if (st) { nxt = [st[0], t - now]; break; } }
+    const ends = S.filter(([n]) => open.includes(n)).map(([n, , b]) => { let d = b - h; if (d <= 0) d += 24; return [n, d * 3600000]; }).sort((x, y) => x[1] - y[1]), end = ends[0];
+    const tail = !open.length ? (nxt ? ` · ${nxt[0]} opens in ${dur(nxt[1])}` : '') : nxt && nxt[1] < end[1] ? ` · ${nxt[0]} opens in ${dur(nxt[1])}` : ` · ${open.length > 1 ? end[0] + ' closes' : 'closes'} in ${dur(end[1])}`;
+    el.className = 'h-clock' + (open.length ? '' : ' closed'); el.innerHTML = `<i></i><b>${open.join(' + ') || 'Between sessions'}</b>${open.length > 1 ? ' overlap' : ''}${tail}`;
+    el.title = 'Trading sessions in UTC (approximate): Asia 22:00-07:00, London 07:00-16:00, New York 12:00-21:00'; el.hidden = false; };
+  tick(); setInterval(tick, 30000); })();
 </script>
 </body>
 </html>
