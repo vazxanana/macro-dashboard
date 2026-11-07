@@ -374,6 +374,19 @@ hidden behind a checkbox. The main script hands its data over with `window.MS_CO
   BTC is ~175 Kraken calls a day (~5,600 for 30 days at ~1 call/s). Both workflows save the `duka-*` cache even when cancelled
   and merge the newest saved copy first. Tests: `tests/kraken-backfill.test.mjs` (fake Kraken + Binance).
 
+## Loop watchdog (8 Nov 2026, reliability: the council's own health alert)
+`council/health.mjs` (pure `problems()` + `decide()`, file `main()`) reads council-data snapshot.json / health.json / trades.json /
+ict/snapshot.json and reports: loop stopped (snapshot `at` > 20 min, "expected ≤ 10"), a failed council.yml run, ICT desk stopped (> 45 min,
+not in the futures weekend), open trades on an open market not re-checked for 60 min, the data check missing 90 min, the same
+`snapshot.errors` key on 3 consecutive observed rounds, a feed health.json calls stale 30+ min (datacheck alerts first; this escalates).
+ONE phone alert per state change (new problem / "Council back" / "still n problems"), a reminder every 12 h, marked in council-data
+`watchdog.json` `healthSent` like coach.json decaySent; every channel failing keeps the old mark. Run only by
+`.github/workflows/watchdog.yml` (cron :11/:41, every completed Council trader run except pending-push cancels, manual), never from the
+loop it watches; it trades nothing and restarts nothing (council.yml's cron job does). Watchdog review of 6-8 Nov: 489 saves in 48 h
+(one per 5.9 min), two outages (80 min: 330-min timeout; 262 min: a push cancelled the loop and GitHub fired the cron only twice that
+day), zero data-branch push rejections in the logs read; the loop now aborts a stuck rebase and retries the hand-over dispatch.
+Tests: `tests/health.test.mjs`.
+
 ## Daily owner digest (8 Nov 2026, owner: one message instead of many alerts)
 `council/digest.mjs`, run by council.yml every round (120 s cap, never fails the round); it sends ONE phone message per UTC day through
 `alerts.mjs` `sendAlerts` (ntfy + Telegram, same env as the other alerts): from 21:15 UTC Mon-Fri (not on a CME full-closure holiday,
