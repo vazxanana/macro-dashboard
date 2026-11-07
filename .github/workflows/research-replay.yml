@@ -18,6 +18,11 @@ on:
       budget:
         description: 'Kraken calls per forex pair for days not yet cached'
         default: '2500'
+  # a change to this file starts a run with the defaults (90 days → research/replay-90d.json)
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/research-replay.yml'
 
 permissions:
   contents: write
