@@ -127,6 +127,18 @@ export function spotClosed(t) {
   const p = Object.fromEntries(nyFmt.formatToParts(new Date(t * 1000)).map((x) => [x.type, x.value])), h = +p.hour;
   return p.weekday === 'Sat' || (p.weekday === 'Fri' && h >= 17) || (p.weekday === 'Sun' && h < 17);
 }
+// 7 Nov (owner OK): the daily 17:00 New York rollover. Its first minutes print spiky mid prices on forex (USD/CHF 12 Aug 21:04 UTC);
+// over 90 days 21 live-style stops (12.6R) were taken there (#520). OANDA prints next to nothing 17:00-17:04 and the spread spike
+// sits on the first candles after (USD/CHF 1m range 17:05 median 2.6 / p90 5.7 pips vs ~0.5-0.8 / ~2 the rest of the hour; back to
+// normal by ~17:15). Candles starting 17:00-17:14 New York, Monday to Thursday (Friday 17:00 is the weekend close, Sunday 17:00
+// the real reopen), fill and stop nothing; the next candle still can (a real move shows in its open: stopFill).
+const nyMin = new Intl.DateTimeFormat('en-US', { timeZone: 'America/New_York', weekday: 'short', hour: '2-digit', minute: '2-digit', hourCycle: 'h23' });
+export function spotRollover(t) {
+  const p = Object.fromEntries(nyMin.formatToParts(new Date(t * 1000)).map((x) => [x.type, x.value]));
+  return ['Mon', 'Tue', 'Wed', 'Thu'].includes(p.weekday) && +p.hour % 24 === 17 && +p.minute < 15;
+}
+// a gold / forex candle that must not fill or stop a trade: spot shut, or the rollover minutes
+export const spotSkip = (t) => spotClosed(t) || spotRollover(t);
 
 // ─── the replay's trade step (council/backtest.mjs), on the same rules as the Trader's "Manage open trades" ───
 // The Backtest manages each trade on 1m candles under several exit variants at once (v: none / be1 / be15 / tp2 and the paper

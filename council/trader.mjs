@@ -15,7 +15,7 @@ import { cleanBars, LTF_CLEAN } from './clean.mjs';
 import { voidRoundedReplicas, historyCatchUp } from './repairs.mjs';
 import { d1AdxFeat } from './adx.mjs';
 // paper fills (8 Nov): costs (raw R + cost-adjusted Rnet), the stale-signal shadow stat, gap-aware stops (council/fills.mjs)
-import { costModel, annotateCosts, costSummary, driftR, backfillDrift, staleStats, stopFill, exitR, fillBarAmbiguous, spotClosed } from './fills.mjs';
+import { costModel, annotateCosts, costSummary, driftR, backfillDrift, staleStats, stopFill, exitR, fillBarAmbiguous, spotSkip } from './fills.mjs';
 import { SYMBOLS as BROKER_SYMBOLS } from './ctrader-mirror.mjs';
 import { newsFeat } from './events.mjs';
 
@@ -538,7 +538,7 @@ for (const [key, M] of Object.entries(MARKETS)) {
         if (b.time < tr.checked) continue;
         if (b.time > settle) { next = b.time; break; }
         // gold / forex (8 Nov): a candle while the spot market is shut (Kraken's PAXG fallback trades the weekend) never fills or stops a trade
-        if (M.group !== 'Crypto' && spotClosed(b.time)) continue;
+        if (M.group !== 'Crypto' && spotSkip(b.time)) continue;   // 7 Nov: + the 17:00 New York rollover minutes (owner)
         if (tr.status === 'pending') {
           if (s ? b.high >= tr.entry : b.low <= tr.entry) {
             // 8 Nov: the fill candle also reached the target (not the stop) and did not open through the entry: which came first is

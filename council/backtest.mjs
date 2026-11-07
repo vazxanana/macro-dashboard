@@ -28,7 +28,7 @@ import { krakenData as krakenLoad, krakenGap, basisSeries, aggregate } from './k
 import { m15Choch, m15cFeat as m15cOf } from './choch.mjs';
 import { cleanBars, LTF_CLEAN } from './clean.mjs';
 import { d1AdxFeat } from './adx.mjs';
-import { spreadOf, costOf, spotClosed, replayBar } from './fills.mjs';
+import { spreadOf, costOf, spotClosed, spotSkip, replayBar } from './fills.mjs';
 import { newsFeat } from './events.mjs';
 
 const DIR = process.argv[2] || 'data', DAYS = +(process.argv[3] || 30);
@@ -411,7 +411,7 @@ for (const [key, M] of Object.entries(MARKETS)) {
       const off = offAt ? offAt(t) : 0;   // gold: the spot offset of this step (the live Trader manages on its run's shifted candles)
       while (i1 < m1.length && m1[i1].time < t) {
         const b = off ? shiftBar(m1[i1++], off) : m1[i1++];
-        const shut = M.group !== 'Crypto' && spotClosed(b.time);   // gold / forex: a candle while spot is shut fills and stops nothing, as live
+        const shut = M.group !== 'Crypto' && spotSkip(b.time);   // gold / forex: a candle while spot is shut fills and stops nothing, as live
         for (const tr of open) replayBar(tr, b, { shut, wait: WAIT[tr.h] || 86400 });
         for (let k = open.length - 1; k >= 0; k--) if (open[k].status !== 'pending' && open[k].status !== 'open' && !(open[k].status === 'closed' && open[k].v.some((v) => !v.done))) { const tr = open.splice(k, 1)[0]; if (tr.status === 'closed') (tr.twin ? twins : all).push(tr); else if (!tr.twin) { tr.v.forEach((v) => { v.R = 0; }); tr.cost = 0; unfilled.push(tr); } }
       }
