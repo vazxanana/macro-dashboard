@@ -168,6 +168,14 @@ Rules and research live in `.claude/skills/ICT/SKILL.md` (results also in counci
   (`#ict-fwd`, replay excluded; verdict needs ~30 closed A+), an auto checklist per signal (`#ict-tv-ck`), and NY 00:00 /
   PDH / PDL lines on the signal chart. Skill §19: the edge is not proven on 2023-26 cash data — paper only.
 
+## Coach evolution (7 Nov 2026, owner: members evolve without overfitting)
+`council/coach.mjs`, wired into the statistical Coach in `council/trader.mjs`. Filter changes (D1 / structure / session) need
+`solid()` plus a shrunk expectancy ≥ 0.10R (empirical-Bayes prior around 0R), and each runs as a champion/challenger trial
+(`config.coachTrials`): the old rule is followed as a shadow on the same signals and comes back by itself unless the new one wins
+by ≥ +0.05R shrunk per disagreeing signal over 20 of them (60-day limit). Every Coach change lands in `coach.json` `ledger` with
+its evidence and a 30-day result, shown in analysis/latest.md (`<!-- coach-ledger -->` block). Owner rules (`userOwned`) and
+live setups (`focusSetups`) stay out of the Coach's reach. Tests: `tests/coach-*.test.mjs`.
+
 ## Main systems first (7 Nov 2026, owner: "our main edge looks horrible")
 The council calendar (`renderCalendar`) defaults to the main systems (`SYS_K` live trades + their replays + NQ paper); the
 admin switch `.cal-src` ("Main systems" / "+ Shadow", localStorage `msCalSrc`) adds the shadow book and its back-filled

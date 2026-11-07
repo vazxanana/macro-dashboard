@@ -10,6 +10,7 @@ import { m15cFeat } from './choch.mjs';
 import { alertable, alertEvents, sendAlerts, when, NTFY_DEFAULT, proposalDigest } from './alerts.mjs';
 import { liveRuleSection, injectSection, coachChurnSection, CHURN_START, CHURN_END, deskSection, DESK_START, DESK_END } from './analyst.mjs';
 import { coachProposals, spotProposals, ictVariantVerdicts } from './proposals.mjs';
+import { shrink, ebTau, shrunkClear, ruleState, sameRule, setRule, descRule, judgeTrial, ledgerStart, syncLedger, ledgerSection, LEDGER_START, LEDGER_END } from './coach.mjs';
 import { cleanBars, LTF_CLEAN } from './clean.mjs';
 import { voidRoundedReplicas, historyCatchUp } from './repairs.mjs';
 import { d1AdxFeat } from './adx.mjs';
@@ -1245,27 +1246,74 @@ function solid(a, sign) {   // a: trades with R; sign +1 = clearly positive, -1 
   return [o.slice(0, h), o.slice(h)].every((p) => p.length && sign * (p.reduce((s, x) => s + x.R, 0) / p.length) > 0);
 }
 const coolKey = (k, f) => `${k}:${f}`;
-function cooling(k, f) { const t = (config.coachChanged || {})[coolKey(k, f)]; return !!t && now - Date.parse(t) / 1000 < COACH_COOL; }
+function cooling(k, f) { if ((config.coachTrials || {})[coolKey(k, f)]) return true;   // a champion/challenger trial holds the rule
+  const t = (config.coachChanged || {})[coolKey(k, f)]; return !!t && now - Date.parse(t) / 1000 < COACH_COOL; }
 function touched(k, f) { (config.coachChanged = config.coachChanged || {})[coolKey(k, f)] = nowISO; }
+// ─── Coach evolution (7 Nov, council/coach.mjs): shrunk expectancy on top of solid(), champion/challenger trials for the
+// Coach's own filter rules, and the change ledger (coach.json ledger, analysis/latest.md). Live setups (focusSetups) and owner
+// rules are never changed here: they stay the owner's call.
+const isLiveSetup = (k) => (config.focusSetups || []).includes(k);
+const clear = (a, sign, tau) => solid(a, sign) && shrunkClear(a, sign, tau);   // solid() is the floor, shrinkage the extra bar
+// prior spread for the shrinkage, from every (setup x D1 / structure / session value) group of the sample: empirical Bayes
+function coachTau(closedAll) {
+  const g = {};
+  for (const t of closedAll) if (isFinite(t.R) && t.feat) for (const fe of ['d1', 'struct', 'session']) { const v = t.feat[fe]; if (v && v !== 'n/a') (g[`${t.k}|${fe}|${v}`] = g[`${t.k}|${fe}|${v}`] || []).push(t); }
+  return ebTau(Object.values(g));
+}
+const coachCj0 = rd('coach.json', {}), coachLedger = Array.isArray(coachCj0.ledger) ? coachCj0.ledger : [], coachNotes = [];
+const CC_SLOT = nowISO.slice(0, 11) + String(Math.floor(+nowISO.slice(11, 13) / 6) * 6).padStart(2, '0');
+let ledgerDirty = coachCj0.ledgerSlot !== CC_SLOT;
+// a Coach filter change starts a trial: the challenger (new rule) is in force, the champion (old rule) runs as a shadow
+function startTrial(k, fe, champion, challenger, sample, what, why, group, tau, rest) {
+  const e = ledgerStart({ at: nowISO, k, fe, champion, challenger, what, why, sample, group, tau, rest });
+  (config.coachTrials = config.coachTrials || {})[coolKey(k, fe)] = { id: e.id, k, fe, champion: e.champion, challenger: e.challenger, start: nowISO };
+  coachLedger.push(e); ledgerDirty = true;
+}
+// judge the running trials (every 6 hours): keep the challenger, or put the champion back and log why
+function judgeTrials(closedAll) {
+  const T = config.coachTrials || {}, tau = coachTau(closedAll);
+  for (const [key, tr] of Object.entries(T)) {
+    const fl = config.filters[tr.k] || {}, e = coachLedger.find((x) => x.id === tr.id);
+    let v = judgeTrial(tr, trades, now, tau);
+    if (userOwned(fl, tr.fe)) v = { ...v, status: 'owner', why: 'The owner set this rule during the trial: the owner\'s rule stays.' };
+    else if (isLiveSetup(tr.k)) v = { ...v, status: 'frozen', why: `${tr.k} trades live now: its rules change only with the owner's OK, so the trial ends with the rule as it is.` };
+    else if (!sameRule(fl, tr.fe, tr.challenger)) v = { ...v, status: 'superseded', why: `Another step changed the rule during the trial (now: ${descRule(tr.fe, ruleState(fl, tr.fe))}).` };
+    if (e) e.trial = { ...v, at: nowISO };
+    if (v.status === 'running') continue;
+    delete T[key];
+    if (v.status === 'reverted') {
+      setRule(config.filters[tr.k] = config.filters[tr.k] || {}, tr.fe, tr.champion, nowISO); touched(tr.k, tr.fe);
+      const what = `${tr.k}: back to the champion rule (${descRule(tr.fe, tr.champion)})`;
+      config.history.push({ at: nowISO, by: 'coach-trial', change: what, why: v.why, trial: tr.id });
+      if (emptyFilter(config.filters[tr.k])) delete config.filters[tr.k];
+      coachNotes.push(`${what}: ${v.why}`);
+    } else coachNotes.push(`${tr.k}: trial ${v.status} (${descRule(tr.fe, tr.challenger)}): ${v.why}`);
+  }
+  if (!Object.keys(T).length) delete config.coachTrials;
+}
 function learnFilters(closedAll, change) {
   // ─── Self-evolution: learn filters from the conditions that lose (strict evidence, see solid()) ───
-  const learnBy = {};
+  const learnBy = {}, tau = coachTau(closedAll);
   for (const t of closedAll) if (isFinite(t.R)) (learnBy[t.k] = learnBy[t.k] || []).push(t);
   for (const [k, arr] of Object.entries(learnBy)) {
-    if (arr.length < 2 * COACH_MIN_N) continue;
+    if (arr.length < 2 * COACH_MIN_N || isLiveSetup(k)) continue;   // live setups: the owner's call (Coach proposals)
     const fl = config.filters[k] = config.filters[k] || {};
     for (const fe of ['d1', 'struct']) {
       if (fl[fe] || cooling(k, fe)) continue;
       const g = {}; arr.forEach((x) => { const v = x.feat && x.feat[fe]; if (v && v !== 'n/a') (g[v] = g[v] || []).push(x); });
       const vals = Object.entries(g).map(([v, a]) => ({ v, a, n: a.length, e: exp(a) }));
-      const bad = vals.find((x) => solid(x.a, -1)), good = vals.find((x) => x !== bad && x.n >= COACH_MIN_N && x.e > 0);
-      if (bad && good) { fl[fe] = good.v; (fl.since = fl.since || {})[fe] = nowISO; touched(k, fe); change(`${k}: only ${good.v} ${fe === 'd1' ? 'D1' : 'structure'}`, `${bad.v}: ${bad.e.toFixed(2)}R over ${bad.n} trades (clearly negative, both halves); ${good.v}: +${good.e.toFixed(2)}R over ${good.n}.`); }
+      const bad = vals.find((x) => clear(x.a, -1, tau)), good = vals.find((x) => x !== bad && x.n >= COACH_MIN_N && x.e > 0);
+      if (bad && good) { fl[fe] = good.v; (fl.since = fl.since || {})[fe] = nowISO; touched(k, fe);
+        const what = `${k}: only ${good.v} ${fe === 'd1' ? 'D1' : 'structure'}`, why = `${bad.v}: ${bad.e.toFixed(2)}R over ${bad.n} trades (clearly negative, both halves; shrunk ${shrink(bad.a, tau).post.toFixed(2)}R); ${good.v}: +${good.e.toFixed(2)}R over ${good.n}. Trial: the old rule runs as a shadow.`;
+        change(what, why); startTrial(k, fe, null, good.v, arr, what, why, bad.a, tau, good.a); }
     }
     const gs = {}; arr.forEach((x) => { const v = x.feat && x.feat.session; if (v) (gs[v] = gs[v] || []).push(x); });
     for (const [v, a] of Object.entries(gs)) {
-      if ((fl.noSession || []).includes(v) || cooling(k, 'session:' + v) || !solid(a, -1)) continue;
+      if ((fl.noSession || []).includes(v) || cooling(k, 'session:' + v) || !clear(a, -1, tau)) continue;
       const rest = arr.filter((x) => !(x.feat && x.feat.session === v));
-      if (rest.length >= COACH_MIN_N && exp(rest) > 0) { fl.noSession = (fl.noSession || []).concat(v); (fl.since = fl.since || {})['session:' + v] = nowISO; touched(k, 'session:' + v); change(`${k}: skip the ${v} session`, `${exp(a).toFixed(2)}R over ${a.length} trades there (clearly negative, both halves); +${exp(rest).toFixed(2)}R over ${rest.length} elsewhere.`); }
+      if (rest.length >= COACH_MIN_N && exp(rest) > 0) { fl.noSession = (fl.noSession || []).concat(v); (fl.since = fl.since || {})['session:' + v] = nowISO; touched(k, 'session:' + v);
+        const what = `${k}: skip the ${v} session`, why = `${exp(a).toFixed(2)}R over ${a.length} trades there (clearly negative, both halves; shrunk ${shrink(a, tau).post.toFixed(2)}R); +${exp(rest).toFixed(2)}R over ${rest.length} elsewhere. Trial: the old rule runs as a shadow.`;
+        change(what, why); startTrial(k, 'session:' + v, false, true, arr, what, why, a, tau, rest); }
     }
   }
 }
@@ -1322,6 +1370,7 @@ function learnPauses(sample, change) {
   }
 }
 
+if (ledgerDirty && config.coachTrials) judgeTrials(trades.filter((x) => (x.status === 'win' || x.status === 'loss' || x.status === 'be') && now - x.closed < 30 * 86400));
 const coach = rd('coach.json', { date: '' });
 const today = nowISO.slice(0, 10);
 if (coach.date !== today) {
@@ -1344,20 +1393,26 @@ if (coach.date !== today) {
   if (ls.n >= 6 && ls.exp < 0 && config.minRR < 1.5) { change(`Minimum reward:risk ${config.minRR} → 1.5`, `Trades under 1.5R returned ${ls.exp}R each over ${ls.n} trades.`); config.minRR = 1.5; }
   learnFilters(closedAll, change);
   learnManagement(closedAll, change);
-  // drop a rule only on the same strict evidence that adds one (solid(): 30+ trades, t >= 2, both halves), never on a timer
+  // drop a rule only on the same strict evidence that adds one (solid(): 30+ trades, t >= 2, both halves, plus the shrunk
+  // expectancy), never on a timer; a drop is a challenger too (the rule keeps running as the shadow champion)
+  const dropTau = coachTau(closedAll);
   for (const [k, fl] of Object.entries(config.filters)) {
+    if (isLiveSetup(k)) continue;   // live setups: the owner's call
     for (const fe of ['d1', 'struct']) {
       if (!fl[fe] || (fl.src || {})[fe] === 'backtest' || userOwned(fl, fe)) continue;   // owner rules stay until the owner changes them
       if (cooling(k, fe)) continue;
       // the side the rule keeps out, judged on every closed signal of the setup (live and shadow), as when it was added
       const sh = closedAll.filter((x) => x.k === k && isFinite(x.R) && x.feat && x.feat[fe] && x.feat[fe] !== 'n/a' && x.feat[fe] !== fl[fe]);
-      if (solid(sh, 1)) { touched(k, fe); change(`${k}: dropped the ${fe === 'd1' ? 'D1' : 'structure'} rule`, `The side it kept out made +${exp(sh).toFixed(2)}R over ${sh.length} trades (clearly positive, both halves).`); delete fl[fe]; if (fl.since) delete fl.since[fe]; }
+      if (clear(sh, 1, dropTau)) { touched(k, fe); const was = fl[fe], what = `${k}: dropped the ${fe === 'd1' ? 'D1' : 'structure'} rule`, why = `The side it kept out made +${exp(sh).toFixed(2)}R over ${sh.length} trades (clearly positive, both halves; shrunk +${shrink(sh, dropTau).post.toFixed(2)}R). Trial: the old rule runs as a shadow.`;
+        change(what, why); delete fl[fe]; if (fl.since) delete fl.since[fe]; startTrial(k, fe, was, null, closedAll.filter((x) => x.k === k && isFinite(x.R)), what, why, sh, dropTau); }
     }
     for (const v of (fl.noSession || []).slice()) {
       if (userOwned(fl, 'session:' + v)) continue;
       if (cooling(k, 'session:' + v)) continue;
       const sh = closedAll.filter((x) => x.k === k && isFinite(x.R) && x.feat && x.feat.session === v);
-      if (solid(sh, 1)) { fl.noSession = fl.noSession.filter((x) => x !== v); if (fl.since) delete fl.since['session:' + v]; touched(k, 'session:' + v); change(`${k}: trading the ${v} session again`, `Trades in that session made +${exp(sh).toFixed(2)}R over ${sh.length} (clearly positive, both halves).`); }
+      if (clear(sh, 1, dropTau)) { fl.noSession = fl.noSession.filter((x) => x !== v); if (fl.since) delete fl.since['session:' + v]; touched(k, 'session:' + v);
+        const what = `${k}: trading the ${v} session again`, why = `Trades in that session made +${exp(sh).toFixed(2)}R over ${sh.length} (clearly positive, both halves; shrunk +${shrink(sh, dropTau).post.toFixed(2)}R). Trial: the old rule runs as a shadow.`;
+        change(what, why); startTrial(k, 'session:' + v, true, false, closedAll.filter((x) => x.k === k && isFinite(x.R)), what, why, sh, dropTau); }
     }
     if (emptyFilter(fl)) delete config.filters[k];
   }
@@ -1412,7 +1467,7 @@ if (coach.date !== today) {
     if (sh.length >= 4 && exp(sh) > 0.3) { delete config.pausedMarkets[m]; change(`Resumed market ${m} early`, `Shadow trades while paused made +${exp(sh).toFixed(2)}R over ${sh.length}.`); }
   }
   const prev = rd('coach.json', {});   // keep the owner-facing proposals between the daily runs
-  wr('coach.json', { proposals: prev.proposals || [], proposalsKey: prev.proposalsKey || '', proposalsSent: prev.proposalsSent, date: today, at: nowISO, stats, last14: rs, lessons: lessons(trades, now), fslot: nowISO.slice(0, 11) + String(Math.floor(+nowISO.slice(11, 13) / 6) * 6).padStart(2, '0'), notes: notes.length ? notes : ['No change today: not enough evidence to move a rule.'] });
+  wr('coach.json', { proposals: prev.proposals || [], proposalsKey: prev.proposalsKey || '', proposalsSent: prev.proposalsSent, ledger: prev.ledger, ledgerSlot: prev.ledgerSlot, ledgerSince: prev.ledgerSince, date: today, at: nowISO, stats, last14: rs, lessons: lessons(trades, now), fslot: nowISO.slice(0, 11) + String(Math.floor(+nowISO.slice(11, 13) / 6) * 6).padStart(2, '0'), notes: notes.length ? notes : ['No change today: not enough evidence to move a rule.'] });
 }
 // every run: pause a setup as soon as its live record says so
 {
@@ -1437,6 +1492,17 @@ const fslot = nowISO.slice(0, 11) + String(Math.floor(+nowISO.slice(11, 13) / 6)
     if (added.length) cj.notes = (cj.notes || []).filter((n) => !/^No change today/.test(n)).concat(added);
     wr('coach.json', cj);
   }
+}
+// Coach change ledger (7 Nov): every Coach change from the history, the trials' progress and the 30-day results; every 6 hours
+// or when a trial started or ended. Written to coach.json (ledger) and shown in analysis/latest.md.
+if (ledgerDirty) {
+  try {
+    const cj = rd('coach.json', {}), pool = trades.filter((x) => DEF_KEYS.has(x.k) && (x.status === 'win' || x.status === 'loss' || x.status === 'be') && isFinite(x.R));
+    cj.ledger = syncLedger(coachLedger, config.history, pool, now, { backfillBefore: cj.ledgerSince ? '' : nowISO });
+    cj.ledgerSince = cj.ledgerSince || nowISO; cj.ledgerSlot = CC_SLOT;
+    if (coachNotes.length) cj.notes = (cj.notes || []).filter((n) => !/^No change today/.test(n)).concat(coachNotes);
+    wr('coach.json', cj);
+  } catch (e) { console.log('coach ledger failed:', e.message); }
 }
 // Coach proposals (7 Nov): suggestions for the owner from the replay, for the setups trading live. Never applied here:
 // live rules change only with the owner's OK. Recomputed when backtest.json, the live setups or any setup's rules change.
@@ -1946,7 +2012,8 @@ wr('snapshot.json', snapshot);
 // Analyst report (reporting only): refresh the "Live Scalp rule check" block in analysis/latest.md, if the report is here
 try { const fA = path.join(DIR, 'analysis', 'latest.md');
   if (fs.existsSync(fA)) { const md = fs.readFileSync(fA, 'utf8'), nx = injectSection(injectSection(md, liveRuleSection({ snapshot, config, backtest: rd('backtest.json', null), now })), coachChurnSection({ config, now }), CHURN_START, CHURN_END);
-    const nx2 = injectSection(nx, deskSection({ ict: rd('ict/trades.json', []), shadow: rd('ict/shadow.json', null), mirror: rd('ctrader/mirror.json', null), now }), DESK_START, DESK_END);
+    const nx1 = injectSection(nx, deskSection({ ict: rd('ict/trades.json', []), shadow: rd('ict/shadow.json', null), mirror: rd('ctrader/mirror.json', null), now }), DESK_START, DESK_END);
+    const nx2 = injectSection(nx1, ledgerSection({ ledger: rd('coach.json', {}).ledger || [], trials: config.coachTrials || {}, now }), LEDGER_START, LEDGER_END);
     if (nx2 !== md) fs.writeFileSync(fA, nx2); } } catch (e) { console.log('analyst section:', e.message); }
 const open = trades.filter((x) => x.status === 'open' || x.status === 'pending').length;
 console.log(`Council run ${nowISO}: ${Object.keys(snapshot.markets).length} markets, ${Object.keys(snapshot.errors).length} errors, ${open} open/pending trades, ${trades.length} total.`);
