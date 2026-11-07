@@ -4652,7 +4652,7 @@ function msNextSetup(bars, A) {
       };
       // OANDA answers from the edge cache, so without the tick stream the fast timeframes refresh every few seconds;
       // while ticks stream in, the poll only re-syncs whole candles at the normal pace
-      const iv = () => G.source === 'OANDA' && !G.live ? Math.min(tf.poll, { '1m': 3e3, '5m': 5e3, '15m': 10e3 }[tf.id] || tf.poll) : tf.poll;
+      const iv = () => G.source === 'OANDA' && !G.live && !marketClosedNow() ? Math.min(tf.poll, { '1m': 3e3, '5m': 5e3, '15m': 10e3 }[tf.id] || tf.poll) : tf.poll;
       setTimeout(tick, iv());
     });
   }
@@ -6826,8 +6826,9 @@ function msNextSetup(bars, A) {
   const PB_MANUAL = [['closed', 'Signal candles CLOSED (DRD, BO, CF, EG)', 'Never act on a candle still forming; most of the old "edge" was knowing the close early.'],
     ['origin', 'The zone is the extreme / origin of the leg, not a roadblock in the middle', ''], ['fresh', 'Entry zone fresh (or within its reuse limit)', 'EG zone 2 uses, EF zone 1.'],
     ['sl', 'Stop beyond the structural extreme; size from the stop distance', 'Fixed 20-30 pip stops do not fit today\'s gold.'], ['tgt', 'Target = next barrier / opposing same-TF zone, at least 2R', '']];
+  var pbReady = true;   // renderHome can run (from the scanner) before the constants above exist; the playbook waits for them
   function renderPlaybook() {
-    const box = document.getElementById('ms-pb'); if (!box || PUB) return;
+    const box = document.getElementById('ms-pb'); if (!box || PUB || !pbReady) return;
     const now = Date.now() / 1000, ny = nyParts(now), gold = instKey === 'xau', sn = COUNCIL.snap || {};
     const dir = G.td ? (G.td.word === 'Sell' ? -1 : 1) : 0;
     // weekly structure (council's W1, gold only)
@@ -7111,7 +7112,9 @@ function msNextSetup(bars, A) {
       : AP.m > 0.15 ? 'A+ is holding up live (above +0.15R a signal over 30+). Keep sizing small and watch the drawdown.' : AP.m > 0 ? 'A+ is barely positive live: no real edge yet; keep it on paper.' : 'A+ is losing live after 30+ signals: stop and review the model.';
     $('ict-fwd').innerHTML = `<div class="t">Live forward test</div><div class="row">${t('A+', AP)}${t('A-setups', A)}${t('All signals', ALL)}</div><div class="msg">${verdict}</div>`;
   }
-  window.renderIct = () => { render(); renderClock(); renderFwd(); };
+  // the desk data (~1.9 MB with replay + bars) loads when the ICT view first opens, then every 2 min while it is open (site audit 7 Nov)
+  let loadedAt = 0; const fresh = () => { if (Date.now() - loadedAt > 110e3) { loadedAt = Date.now(); load(); } };
+  window.renderIct = () => { render(); renderClock(); renderFwd(); fresh(); };
   setInterval(() => { if (!$('v-ict').hidden) renderClock(); }, 30e3);
 
   // ─── chart dialog + review ───
@@ -7200,7 +7203,7 @@ function msNextSetup(bars, A) {
     render(); if (t.trim()) push().then(render).catch((e) => alert(`GitHub: ${e.message || e}`));
   });
   $('ict-sync-now').addEventListener('click', () => { $('ict-sync').textContent = 'Syncing…'; Promise.resolve(load()).then(() => push()).then((r) => { $('ict-sync').textContent = r === 'synced' ? 'Synced just now' : 'This browser only'; }).catch((e) => { $('ict-sync').textContent = `GitHub: ${e.message || e}`; }); });
-  if (document.documentElement.dataset.ict) { load(); setInterval(load, 120e3); addEventListener('hashchange', () => { if (location.hash === '#ict') render(); }); }
+  if (document.documentElement.dataset.ict) { if (!$('v-ict').hidden) fresh(); setInterval(() => { if (!document.hidden && !$('v-ict').hidden) fresh(); }, 120e3); addEventListener('hashchange', () => { if (location.hash === '#ict') render(); }); }
 })();
 
 </script>
