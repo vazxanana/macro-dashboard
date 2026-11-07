@@ -252,6 +252,12 @@ function structFeat(sell, l, src, at) {
 }
 // typical spread (same model as the trade reviews): one spread is paid per round trip
 const spreadOf = (M, price) => M.group === 'Forex' ? 0.0001 : M.spot ? 0.3 : price * 0.0002;
+// Cost charged to a replay trade, in price: the spread, plus for crypto Kraken's exchange fees (the council's crypto prices are
+// Kraken spot; research/edge/costs: the spread alone was ~1/40 of the real cost). Kraken Pro's entry tier: 0.25% maker, 0.40% taker.
+// A limit entry pays maker, a market entry (twins, sweeps) taker; the exit is charged taker (stops are market orders). Forex and
+// gold keep the spread only (a raw-spread account's commission is about the spread again: research/edge/costs).
+const FEE = { maker: 0.0025, taker: 0.004 };
+const costOf = (M, price, limitEntry) => spreadOf(M, price) + (M.group === 'Crypto' ? price * ((limitEntry ? FEE.maker : FEE.taker) + FEE.taker) : 0);
 const BUILDERS = PAIRS.map((p) => [p, buildSetup]).concat(RETR.map((p) => [p, buildRetrace]));
 const DEFS = PAIRS.concat(RETR);
 const all = [], twins = [], unfilled = [], stillOpen = [], meta = { errors: {} };   // closed trades; their market-entry twins; resting orders that never filled;
@@ -419,7 +425,7 @@ for (const [key, M] of Object.entries(MARKETS)) {
           if (!(r > 0) || (st.sell ? price >= st.stop : price <= st.stop) || rw <= 0) continue;
           tr.entry = price; tr.rr = rw / r; tr.status = 'open'; tr.filled = t;
         }
-        tr.r0 = Math.abs(tr.entry - tr.stop); tr.cost = tr.r0 > 0 ? spreadOf(M, tr.entry) / tr.r0 : 0;
+        tr.r0 = Math.abs(tr.entry - tr.stop); tr.cost = tr.r0 > 0 ? costOf(M, tr.entry, tr.filled !== t) / tr.r0 : 0;   // filled at the signal = crossed the limit at market
         if (!(tr.r0 > 0)) continue;
         tr.v = VARIANTS.map(([n, be, t2]) => ({ n, be, t2, stop: tr.stop, beMoved: false, done: false, R: null }));
         open.push(tr);
@@ -430,7 +436,7 @@ for (const [key, M] of Object.entries(MARKETS)) {
           if (!(r > 0) || (st.sell ? price >= st.stop : price <= st.stop) || rw <= 0) continue;
           Object.assign(tw, { entry: price, rr: rw / r, status: 'open', filled: t });
         }
-        tw.r0 = Math.abs(tw.entry - tw.stop); tw.cost = tw.r0 > 0 ? spreadOf(M, tw.entry) / tw.r0 : 0;
+        tw.r0 = Math.abs(tw.entry - tw.stop); tw.cost = tw.r0 > 0 ? costOf(M, tw.entry, false) / tw.r0 : 0;
         tw.v = VARIANTS.map(([n, be, t2]) => ({ n, be, t2, stop: tw.stop, beMoved: false, done: false, R: null }));
         open.push(tw);
       }
@@ -440,7 +446,7 @@ for (const [key, M] of Object.entries(MARKETS)) {
         if (open.some((x) => x.k === sw.k && x.side === side)) continue;   // one sweep trade per side at a time
         const tr = { m: key, k: sw.k, h: '1h', side, entry: sw.entry, stop: sw.stop, t1: sw.t1, rr: sw.rr, opened: t, filled: t, status: 'open', mfe: 0,
           feat: { d1: d1T(src, t) === (sw.sell ? -1 : 1) ? 'with' : 'against', struct: 'n/a', session: sessionOf(t), ...structFeat(sw.sell, '1m', src, t), m15c: m15cOf(src['15m'].bars, sw.sell, t), m15c1: m15cOf(src['15m'].bars, sw.sell, t, 1) } };
-        tr.r0 = Math.abs(tr.entry - tr.stop); tr.cost = tr.r0 > 0 ? spreadOf(M, tr.entry) / tr.r0 : 0;
+        tr.r0 = Math.abs(tr.entry - tr.stop); tr.cost = tr.r0 > 0 ? costOf(M, tr.entry, false) / tr.r0 : 0;
         tr.v = VARIANTS.map(([n, be, t2]) => ({ n, be, t2, stop: tr.stop, beMoved: false, done: false, R: null }));
         open.push(tr);
       }
