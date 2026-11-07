@@ -5,6 +5,7 @@ const crypto = require('node:crypto');
 const { handle, _t } = require('../api/ctrader-link.js');
 const ENV = { CTRADER_CLIENT_ID: 'cid-fake', CTRADER_CLIENT_SECRET: 'csecret-fake', CTRADER_LINK_KEY: 'link-key-fake-0123456789', BLOB_READ_WRITE_TOKEN: 'blob-fake' };
 const sha = (s) => crypto.createHash('sha256').update(s).digest('hex');
+const OWNER_HASH = '49c5624f2625ed8b42b6e1bf2819a3a41ddb9743aeca36ea34ea7eb96c252ca8';   // the owner's hash, public in the page
 const USERS = { users: { maria: { name: 'Maria', hash: sha('maria-pw'), role: 'viewer' }, gone: { name: 'Gone', hash: sha('gone-pw'), role: 'viewer', disabled: true } } };
 
 function memStore() { const m = new Map(); return { m, get: async (u) => m.get(u) || null, set: async (u, r) => { m.set(u, JSON.parse(JSON.stringify(r))); }, del: async (u) => { m.delete(u); } }; }
@@ -62,7 +63,7 @@ test('session -> start -> callback stores encrypted tokens for that user only', 
 test('summary: balance, floating P&L, open trades in lots, closed history with net P&L; read messages only', async () => {
   const store = memStore(); await store.set('maria', { accessToken: 'AT-1', refreshToken: 'RT-1', exp: Date.now() + 20 * 86400e3 });
   const ct = fakeCtrader();
-  const sess = _t.sign(ENV, { k: 'sess', u: 'maria', exp: 1794600000000 + 1e6 });
+  const sess = _t.sign(ENV, { k: 'sess', u: 'maria', f: _t.fpOf(ENV, sha('maria-pw')), exp: 1794600000000 + 1e6 });
   const realNow = Date.now; Date.now = () => 1794600000000;
   try {
     const r = await post({ action: 'summary', session: sess }, { env: ENV, WS: ct.WS, deps: { store, blobUsers: async () => USERS } });
@@ -79,7 +80,7 @@ test('summary: balance, floating P&L, open trades in lots, closed history with n
 test('live accounts are read on the live host (view only); a session never sends a trading message', async () => {
   const store = memStore(); await store.set('owner', { accessToken: 'AT-2', exp: Date.now() + 20 * 86400e3 });
   const ct = fakeCtrader({ live: true });
-  const r = await post({ action: 'summary', session: _t.sign(ENV, { k: 'sess', u: 'owner', exp: Date.now() + 1e6 }) }, { env: ENV, WS: ct.WS, deps: { store, blobUsers: async () => USERS } });
+  const r = await post({ action: 'summary', session: _t.sign(ENV, { k: 'sess', u: 'owner', f: _t.fpOf(ENV, OWNER_HASH), exp: Date.now() + 1e6 }) }, { env: ENV, WS: ct.WS, deps: { store, blobUsers: async () => USERS } });
   assert.equal(r.code, 200); assert.equal(r.body.account.live, true);
   assert.ok(ct.sent.some((m) => m.url === _t.HOSTS.live));
   const s = _t.session(ct.WS, _t.HOSTS.demo);
@@ -89,9 +90,9 @@ test('live accounts are read on the live host (view only); a session never sends
 });
 
 test('not linked yet, unlink, missing setup, and secrets never echoed', async () => {
-  const store = memStore(), sess = _t.sign(ENV, { k: 'sess', u: 'maria', exp: Date.now() + 1e6 });
+  const store = memStore(), sess = _t.sign(ENV, { k: 'sess', u: 'maria', f: _t.fpOf(ENV, sha('maria-pw')), exp: Date.now() + 1e6 });
   const r = await post({ action: 'summary', session: sess }, { env: ENV, deps: { store, blobUsers: async () => USERS } }); assert.deepEqual(r.body, { linked: false });
-  await store.set('maria', { accessToken: 'x' }); await post({ action: 'unlink', session: sess }, { env: ENV, deps: { store } }); assert.equal(store.m.size, 0);
+  await store.set('maria', { accessToken: 'x' }); await post({ action: 'unlink', session: sess }, { env: ENV, deps: { store, blobUsers: async () => USERS } }); assert.equal(store.m.size, 0);
   const off = await post({ action: 'session' }, { env: { ...ENV, CTRADER_LINK_KEY: '' } }); assert.equal(off.code, 503);
   const box = _t.seal(ENV, { accessToken: 'AT-secret' }); assert.doesNotMatch(JSON.stringify(box), /AT-secret/); assert.equal(_t.unseal(ENV, box).accessToken, 'AT-secret');
   const err = await post({ action: 'summary', session: sess }, { env: ENV, deps: { store: { get: async () => { throw new Error('boom csecret-fake'); } }, blobUsers: async () => USERS } });

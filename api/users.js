@@ -4,10 +4,13 @@
 //   POST /api/users { ownerPw, users, note } -> saves the whole list; ownerPw must hash to the owner's password hash
 // Each save is a new blob users/<time>-<random>.json (unique URL, so no stale CDN copy); older ones are deleted.
 // First run: if the store is empty, it starts from council-data users.json (if that exists).
-const { put, list, del } = require('@vercel/blob');
+// the Blob SDK loads on first use (the list checks below stay testable without it)
+const blob = () => require('@vercel/blob');
+const put = (...a) => blob().put(...a), list = (...a) => blob().list(...a), del = (...a) => blob().del(...a);
 const crypto = require('node:crypto');
 const OWNER_HASH = '49c5624f2625ed8b42b6e1bf2819a3a41ddb9743aeca36ea34ea7eb96c252ca8';   // same as MS_ADMIN_HASH in the page
 const sha = (s) => crypto.createHash('sha256').update(String(s), 'utf8').digest('hex');
+const isOwner = (pw) => !!pw && String(pw).length <= 200 && crypto.timingSafeEqual(Buffer.from(sha(pw)), Buffer.from(OWNER_HASH));   // constant time
 const tok = () => process.env.BLOB_READ_WRITE_TOKEN;
 
 async function latest() {
@@ -29,7 +32,7 @@ const clean = (users) => {
   if (!users || typeof users !== 'object' || Array.isArray(users)) return null;
   const out = {};
   for (const [k, u] of Object.entries(users)) {
-    if (!/^[a-z0-9-]{1,24}$/.test(k) || !u || typeof u !== 'object') return null;
+    if (!/^[a-z0-9-]{1,24}$/.test(k) || k === 'owner' || !u || typeof u !== 'object') return null;   // "owner" is reserved (the owner's cTrader link)
     if (!/^[0-9a-f]{64}$/.test(String(u.hash || '')) || !['viewer', 'reviewer'].includes(u.role)) return null;
     out[k] = { name: String(u.name || k).slice(0, 24), role: u.role, hash: u.hash, ...(u.ict ? { ict: true } : {}), ...(u.disabled ? { disabled: true } : {}) };
   }
@@ -44,7 +47,7 @@ module.exports = async (req, res) => {
     if (req.method === 'GET') return res.status(200).json(await load(req));
     if (req.method !== 'POST') return res.status(405).json({ error: 'GET or POST' });
     let b; try { b = typeof req.body === 'string' ? (JSON.parse(req.body || '{}') || {}) : (req.body || {}); } catch (e) { return res.status(400).json({ error: 'bad JSON' }); }
-    if (!b.ownerPw || sha(b.ownerPw) !== OWNER_HASH) return res.status(403).json({ error: 'Owner password not accepted' });
+    if (!isOwner(b.ownerPw)) return res.status(403).json({ error: 'Owner password not accepted' });
     const users = clean(b.users); if (!users) return res.status(400).json({ error: 'Bad user list' });
     if (Object.values(users).some((u) => u.hash === OWNER_HASH)) return res.status(400).json({ error: 'That password is the owner\'s' });
     const data = { users, updated: new Date().toISOString(), note: String(b.note || '').slice(0, 120) };
@@ -55,3 +58,4 @@ module.exports = async (req, res) => {
     return res.status(200).json(data);
   } catch (e) { console.error(`[users] ${e.message}`); return res.status(500).json({ error: String(e.message || e) }); }
 };
+module.exports._t = { clean, isOwner };

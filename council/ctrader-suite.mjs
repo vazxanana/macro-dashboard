@@ -71,7 +71,7 @@ export async function suiteRound({ env, req, WS = globalThis.WebSocket, clock = 
     req.done = true; req.status = 'not run: mirror off or not configured for demo'; return req;
   }
   let tok = { accessToken: env.CTRADER_ACCESS_TOKEN };
-  try { const t = req._tokens && unseal(req._tokens, env); if (t && t.accessToken) tok = t; } catch (e) {}
+  try { const t = req._tokens && unseal(req._tokens, env); if (t) scrub.add(t.accessToken, t.refreshToken); if (t && t.accessToken) tok = t; } catch (e) {}
   const s = suiteSession(WS, scrub, DEMO_HOST, clock);
   try {
     const one = async (pt, payload, expect) => { const ev = await s.send(pt, payload); const e = errOf(ev); if (e) throw new Error(e); const p = lastPayload(ev); if (expect && !ev.some((x) => x.reply === expect)) throw new Error(`unexpected reply`); return p; };

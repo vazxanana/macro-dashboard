@@ -2,6 +2,8 @@
 // The browser asks /cdata/<path> (rewritten here); it never sees the token, so the repo can be private.
 //   GH_READ_TOKEN  fine-grained GitHub token for this repo with Contents: read (falls back to GH_DISPATCH_TOKEN if that one can read)
 const REPO = 'vazxanana/macro-dashboard', BRANCH = 'council-data';
+// council-data files the site never needs: the demo mirror's rotated cTrader tokens (AES-GCM sealed, but still a secret at rest)
+const PRIVATE = new Set(['ctrader/tokens.json']);
 
 // an MT5 / cTrader bridge polling the signals file leaves a tiny "last read" marker in Blob (at most every 2 min per instance)
 let lastPing = 0;
@@ -15,7 +17,8 @@ async function bridgePing(req) {
 }
 module.exports = async (req, res) => {
   const p = String((req.query && req.query.p) || '').replace(/^\/+/, '');
-  if (!p || p.length > 200 || !/^[A-Za-z0-9._\/-]+$/.test(p) || p.split('/').some((s) => s === '..' || s.startsWith('.'))) return res.status(400).json({ error: 'bad path' });
+  if (!p || p.length > 200 || !/^[A-Za-z0-9._\/-]+$/.test(p) || p.split('/').some((s) => s === '' || s === '..' || s.startsWith('.'))) return res.status(400).json({ error: 'bad path' });
+  if (PRIVATE.has(p.toLowerCase())) return res.status(404).json({ error: 'not found' });   // sealed secrets stay server-side
   const tok = process.env.GH_READ_TOKEN || process.env.GH_TOKEN || process.env.GH_DISPATCH_TOKEN, enc = p.split('/').map(encodeURIComponent).join('/');
   try {
     // with a token: the GitHub API (works on a private repo); without one: the public raw file (only while the repo is still public)
