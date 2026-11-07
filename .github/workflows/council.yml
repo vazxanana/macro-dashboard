@@ -49,14 +49,20 @@ jobs:
           if [ -z "$last" ]; then echo "No council save found in the last 50 commits: leaving the running loop alone"; exit 0; fi
           age=$(( $(date -u +%s) - $(date -u -d "$last" +%s) ))
           echo "Last council save: $last (${age}s ago)"
-          if [ "$age" -gt 1200 ]; then gh workflow run council.yml --ref main -R "${{ github.repository }}"; echo "Loop is stale: started a new one"; fi
+          if [ "$age" -gt 1200 ]; then
+            # the trade group no longer cancels in progress runs, so cancel the stuck one here before starting a fresh loop
+            for id in $(gh run list -R "${{ github.repository }}" --workflow council.yml --limit 20 --json databaseId,status,event \
+              --jq '.[] | select(.event != "schedule" and .status == "in_progress") | .databaseId'); do gh run cancel "$id" -R "${{ github.repository }}" || true; done
+            gh workflow run council.yml --ref main -R "${{ github.repository }}"; echo "Loop is stale: cancelled it and started a new one"; fi
 
   trade:
     if: github.event_name != 'schedule'
     runs-on: ubuntu-latest
+    # 7 Nov: a push no longer cancels a running round mid-way (five merges in a row cancelled every run, so nothing was saved
+    # for 6+ min). The new run waits; the running loop sees new council code on main at its next check and hands over.
     concurrency:
       group: council
-      cancel-in-progress: true
+      cancel-in-progress: false
     timeout-minutes: 330
     steps:
       - name: Checkout code
@@ -92,10 +98,14 @@ jobs:
           CTRADER_REFRESH_TOKEN: ${{ secrets.CTRADER_REFRESH_TOKEN || vars.CTRADER_REFRESH_TOKEN }}
           CTRADER_ACCOUNT_ID: ${{ secrets.CTRADER_ACCOUNT_ID || vars.CTRADER_ACCOUNT_ID }}
           CTRADER_ENV: ${{ secrets.CTRADER_ENV || vars.CTRADER_ENV }}
+          GH_TOKEN: ${{ github.token }}   # newcode(): compare this run's commit with main (read only)
         run: |
           git -C data config user.name "mosha-council"
           git -C data config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           ROUNDS=60
+          # new council code on main since this run started? (council/, ict/, api/ or this workflow) -> hand over between rounds
+          newcode() { f=$(gh api "repos/${{ github.repository }}/compare/${{ github.sha }}...main" --jq '.files[].filename' 2>/dev/null) || return 1
+            echo "$f" | grep -qE '^(council/|ict/|api/|\.github/workflows/council\.yml)'; }
           for i in $(seq 1 $ROUNDS); do
             # 60 rounds take ~5.6 h (~5.6 min each), longer than the 330-min job timeout, so the job was killed before "Start the
             # next run" (6 Nov 05:44: 79 min with no run until the cron watchdog restarted it). Stop at 300 min so the hand-off runs.
@@ -117,7 +127,10 @@ jobs:
               git -C data commit -q -m "Council run $(date -u +%Y-%m-%dT%H:%MZ)"
               for j in 1 2 3; do git -C data pull -q --rebase origin council-data && git -C data push -q origin HEAD:council-data && break; sleep 5; done
             fi
-            if [ "$i" -lt "$ROUNDS" ]; then sleep 240; fi
+            if newcode; then echo "New council code on main: handing over after round $i"; break; fi
+            if [ "$i" -lt "$ROUNDS" ]; then
+              for k in 1 2 3 4; do sleep 60; if newcode; then echo "New council code on main: handing over after round $i"; break 2; fi; done
+            fi
           done
 
       - name: Start the next run
