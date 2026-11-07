@@ -5372,10 +5372,11 @@ function msNextSetup(bars, A) {
   const RES = { open: 'Open', win: 'Win', loss: 'Loss', be: 'Break-even', skip: 'Skipped' };
   // System trades journal (5 Nov): every closed paper trade the council placed, adds folded into their first trade
   function systemClosed() {
-    const C = COUNCIL, tr = (C.trades || []).filter((x) => SYS_K.includes(x.k) && !x.shadow && x.R != null && x.closed);
+    // closed = win / loss / break-even only: missed and expired orders also carry R 0 and a close time but were never a trade
+    const C = COUNCIL, done = (x) => ['win', 'loss', 'be'].includes(x.status) && x.R != null && x.closed, tr = (C.trades || []).filter((x) => SYS_K.includes(x.k) && !x.shadow && done(x));
     const rows = tr.filter((x) => !x.addOf).map((x) => ({ ...x }));
     for (const a of tr.filter((x) => x.addOf)) { const q = rows.find((x) => x.id === a.addOf); if (q) { q.R = +(q.R + a.R).toFixed(2); q.closed = Math.max(q.closed, a.closed); q.exit = (q.exit ? q.exit + ' + ' : '') + 'add ' + (a.R >= 0 ? '+' : '−') + Math.abs(a.R).toFixed(2) + 'R'; } else rows.push({ ...a }); }
-    for (const r of (C.research || []).filter((x) => x.k === 'nq-open' && x.session === 'nyflip' && x.R != null && x.closed)) rows.push({ ...r, paper: true });
+    for (const r of (C.research || []).filter((x) => x.k === 'nq-open' && x.session === 'nyflip' && done(x))) rows.push({ ...r, paper: true });
     return rows.sort((a, b) => b.closed - a.closed);
   }
   function renderSystemJournal() {
@@ -5739,7 +5740,7 @@ function msNextSetup(bars, A) {
       const [yy, mm, dd] = CAL.sel.split('-').map(Number), tot = sel.reduce((a, x) => a + x.R, 0), w = sel.filter((x) => x.R > 0).length;
       document.getElementById('ms-cal-dayh').innerHTML = `<b>${new Date(yy, mm, dd).toLocaleDateString(undefined, { weekday: 'short', day: 'numeric', month: 'short' })} · <span class="${tot > 0 ? 'pos' : tot < 0 ? 'neg' : ''}">${fR(tot)}</span> · ${sel.length} trade${sel.length > 1 ? 's' : ''}, ${w} won</b><button type="button" id="ms-cal-dayx" aria-label="Close the day">Close</button>`;
     }
-    document.getElementById('ms-cal-day').innerHTML = sel ? sel.slice().sort((a, b) => a.opened - b.opened).map((x) => `<li${x.bt ? '' : ` data-tid="${esc(x.id)}" tabindex="0" title="Show this trade on a chart"`}${x.shadow ? ' class="sh"' : ''}>${x.shadow ? '<span class="tag">shadow</span>' : ''}<span>${ftime(x.opened + TZ)}</span><b>${esc(x.label)}</b><span class="chip ${x.side}">${x.side.toUpperCase()}</span><span>${(PUB ? '' : esc(x.name))}</span><b class="${x.R > 0 ? 'pos' : x.R < 0 ? 'neg' : ''}">${x.status === 'be' ? 'break-even' : fR(x.R)}</b><small>${x.bt ? (x.rr != null ? `Target ${x.rr}R · backtest` : 'Trend · backtest') : `Entry ${fmtI(x.entry, { dec: 2 })} · stop ${fmtI(x.stop, { dec: 2 })} · target ${fmtI(x.t1, { dec: 2 })}`} · closed ${ftime(x.closed + TZ)}${x.exit ? ` (${esc(x.exit)})` : ''}${x.shadow ? ' · shadow' : ''}${x.replay ? ` · replay${x.paper ? ', paper setup' : ''}` : x.forward ? ' · paper, live forward' : ''}</small></li>`).join('') : '';
+    document.getElementById('ms-cal-day').innerHTML = sel ? sel.slice().sort((a, b) => a.opened - b.opened).map((x) => `<li${x.bt ? '' : ` data-tid="${esc(x.id)}" tabindex="0" title="Show this trade on a chart"`}${x.shadow ? ' class="sh"' : ''}>${x.shadow ? '<span class="tag">shadow</span>' : ''}<span>${ftime(x.opened + TZ)}</span><b>${esc(x.label)}</b><span class="chip ${x.side}">${x.side.toUpperCase()}</span><span>${(PUB ? '' : esc(x.name))}</span><b class="${x.R > 0 ? 'pos' : x.R < 0 ? 'neg' : ''}">${x.status === 'be' ? 'break-even' : fR(x.R)}</b><small>${x.bt ? (x.rr != null ? `Target ${x.rr}R · backtest` : 'Trend · backtest') : `Entry ${fmtI(x.entry, { dec: x.dec ?? 2 })} · stop ${fmtI(x.stop, { dec: x.dec ?? 2 })} · target ${x.t1 == null ? 'none (trend exit)' : fmtI(x.t1, { dec: x.dec ?? 2 })}`} · closed ${ftime(x.closed + TZ)}${x.exit ? ` (${esc(x.exit)})` : ''}${x.shadow ? ' · shadow' : ''}${x.replay ? ` · replay${x.paper ? ', paper setup' : ''}` : x.forward ? ' · paper, live forward' : ''}</small></li>`).join('') : '';
   }
   ['ms-cal-prev', 'ms-cal-next'].forEach((id, i) => { const b = document.getElementById(id); if (b) b.addEventListener('click', () => { CAL.m += i ? 1 : -1; if (CAL.m < 0) { CAL.m = 11; CAL.y--; } if (CAL.m > 11) { CAL.m = 0; CAL.y++; } CAL.sel = null; renderCalendar(); }); });
   ['ms-cal-sh', 'ms-cal-rp'].forEach((id) => { const el = document.getElementById(id); if (el) el.addEventListener('change', renderCalendar); });
