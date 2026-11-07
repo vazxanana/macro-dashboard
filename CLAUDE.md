@@ -133,7 +133,7 @@ Rules and research live in `.claude/skills/ICT/SKILL.md` (results also in counci
   (`trades.json`, `snapshot.json`, `bars.json`). Markets: NQ, ES, YM, RTY futures and gold futures (GC) from CNBC (Yahoo fallback); EUR/USD and GBP/USD removed 7 Nov (owner). Grade F signals (total < 3, `MIN_GRADE`) are not recorded and are filtered on the desk (`KEEP`). Model: H1 iFVG
   reversal (swing swept → body closes through the leg's FVG within 6 H1 candles; stop 2 ticks beyond the sweep;
   no fixed target: from +2R the stop trails 1.5R behind the best price (skill §15; before 6 Nov: 3R target); fixed-2R
-  result recorded as `R2`; out after 36 closed H1 candles, skill §21; 48 h before 7 Nov). Every signal records ICT features (`feat`) and a /10 grade.
+  result recorded as `R2`; out after 36 closed H1 candles, skill §21; 48 h before 7 Nov; index futures also move the stop to the entry at +1.5R, `P.be`, skill §32, not gold). Every signal records ICT features (`feat`) and a /10 grade.
 - Page: view `#ict` ("ICT desk", class `ictx`), shown only when `html[data-ict]` is set: the owner, and users
   with `ict: true` (Fred, the main reviewer and trader, lands there after sign-in). The desk user marks signals
   Taken / Skipped / Missed with fill and own R, grades them and writes notes: localStorage `ictDesk`, synced to

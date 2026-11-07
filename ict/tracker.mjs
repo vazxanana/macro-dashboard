@@ -22,7 +22,9 @@ export const MARKETS = {
 };
 // owner (7 Nov): grade F signals (total < 3 of 10) are not recorded at all
 export const MIN_GRADE = 3;
-export const P = { piv: 3, look: 96, vmax: 6, rr: 3, trail: [2, 1.5], mark: 2, holdH: 36, maxAtr: 8, fresh: 3 * 3600 };
+// be (7 Nov, owner "improve the ict stats"): index futures move the stop to the entry once +1.5R is reached (more R in all four test
+// sets, smaller drawdown in two; it hurt gold, so gold keeps the plain trail)
+export const P = { piv: 3, look: 96, vmax: 6, rr: 3, trail: [2, 1.5], mark: 2, holdH: 36, maxAtr: 8, fresh: 3 * 3600, be: 1.5 };
 const UA = 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36';
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 const now = Math.floor(Date.now() / 1000);
@@ -177,8 +179,9 @@ async function main() {
           if (!tr.mark2 && (s > 0 ? b.high >= tr.t2 : b.low <= tr.t2)) tr.mark2 = b.time + 300;
           tr.mfe = Math.max(tr.mfe || 0, +(((s > 0 ? b.high : -b.low) - s * tr.entry) / tr.r0).toFixed(2));
           if (s > 0 ? b.low <= tr.stop : b.high >= tr.stop) { const Rraw = +((s * (tr.stop - tr.entry)) / tr.r0).toFixed(2), R = +(Rraw * (tr.size || 1)).toFixed(2);
-            Object.assign(tr, { status: Rraw > 0.001 ? 'win' : Rraw < -0.001 ? 'loss' : 'be', R, Rraw, exitPx: tr.stop, closed: b.time + 300, exit: tr.trailMoved ? 'trail' : 'stop' }); break; }
+            Object.assign(tr, { status: Rraw > 0.001 ? 'win' : Rraw < -0.001 ? 'loss' : 'be', R, Rraw, exitPx: tr.stop, closed: b.time + 300, exit: tr.trailMoved ? 'trail' : tr.beMoved ? 'breakeven' : 'stop' }); break; }
           if (tr.t1 != null && (s > 0 ? b.high >= tr.t1 : b.low <= tr.t1)) { Object.assign(tr, { status: 'win', R: P.rr, exitPx: tr.t1, closed: b.time + 300, exit: 'target' }); break; }
+          if (tr.be && !tr.beMoved && tr.mfe >= tr.be && (tr.entry - tr.stop) * s > 0) { tr.stop = tr.entry; tr.beMoved = true; }   // break-even from +1.5R (index futures)
           if (tr.trail && tr.mfe >= tr.trail[0]) { const ns = f(tr.entry + s * (tr.mfe - tr.trail[1]) * tr.r0); if ((ns - tr.stop) * s > 0) { tr.stop = ns; tr.trailMoved = true; } }   // trail from +2R, 1.5R behind the best
           tr.checked = b.time + 300;
         }
@@ -197,7 +200,7 @@ async function main() {
         const s = g.side, entry = f(price), r0 = Math.abs(entry - g.stop);
         if ((entry - g.stop) * s <= 0 || r0 > 1.6 * g.r0) continue;   // price already through the stop, or ran far from the signal
         trades.push({ id, market: key, label: M.label, short: M.short, side: s > 0 ? 'buy' : 'sell', model: 'H1 iFVG reversal', signalAt: g.close, signalPx: f(g.entry),
-          entry, stop: f(g.stop), r0: +r0.toFixed(M.dec + 1), t1: null, trail: P.trail, stop0: f(g.stop), t2: f(entry + s * P.mark * r0), opened: now, checked: now, status: 'open', R: null, size: aset ? sizeOf(g, key) : 1,
+          entry, stop: f(g.stop), r0: +r0.toFixed(M.dec + 1), t1: null, trail: P.trail, be: M.aRule ? null : P.be, stop0: f(g.stop), t2: f(entry + s * P.mark * r0), opened: now, checked: now, status: 'open', R: null, size: aset ? sizeOf(g, key) : 1,
           sweep: { t: g.sweepT, level: f(g.swept) }, fvg: g.fvg.map(f), ih: g.ih == null ? null : f(g.ih), dol: g.dol == null ? null : f(g.dol), valid: g.valid,
           feat: g.feat, grade: { ...g.grade, letter: letter(g.grade.total) }, aset, aplus: isAPlus(g, key) });
       }
