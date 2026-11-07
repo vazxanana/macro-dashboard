@@ -2280,6 +2280,7 @@ html[data-motion="off"][data-gate] .gate-bg path[stroke] { animation: none; stro
         <summary class="ms-tbtn">Settings</summary>
         <div class="menu-body">
           <button type="button" class="menu-pa" id="ms-pa-open">Price alerts <small>notify this device at a price</small></button>
+          <button type="button" class="menu-pa menu-br" id="ms-br-open">Broker bridge <small>MT5 / cTrader mirror of the council</small></button>
           <button type="button" class="menu-pa menu-tv" id="ms-tva-open">TradingView add-on <small>council trades on your TradingView chart</small></button>
           <div class="menu-h">Chart layers</div>
           <div class="ms-tog">
@@ -3687,6 +3688,56 @@ function msNextSetup(bars, A) {
   setTimeout(keyLevels, 2500); setInterval(keyLevels, 60e3);
   { const k = document.getElementById('ms-show-kl'); try { G.showKL = localStorage.getItem('ms-kl') !== '0'; } catch (e) {} if (k) { k.checked = G.showKL !== false; k.addEventListener('change', () => { G.showKL = k.checked; try { localStorage.setItem('ms-kl', k.checked ? '1' : '0'); } catch (e) {} keyLevels(); }); } }
   { const v = document.getElementById('ms-show-vol'); try { G.showVol = localStorage.getItem('ms-vol') !== '0'; } catch (e) {} if (v) { v.checked = G.showVol !== false; v.addEventListener('change', () => { G.showVol = v.checked; try { localStorage.setItem('ms-vol', v.checked ? '1' : '0'); } catch (e) {} Object.values(panes).forEach((P) => P.setVol && P.setVol()); }); } }
+  // Broker bridge panel (7 Nov loop): what the MT5 / cTrader CouncilBridge EA sees (mt5/signals.csv), when a bridge last read it, setup + EA downloads
+  { const btn = document.getElementById('ms-br-open'); let dlg;
+    const URL_ = 'https://meridianx.dev/cdata/mt5/signals.csv';
+    const ago = (s) => { const d = Date.now() / 1000 - s; return d < 90 ? 'just now' : d < 5400 ? `${Math.round(d / 60)} min ago` : d < 172800 ? `${Math.round(d / 3600)} h ago` : `${Math.round(d / 86400)} d ago`; };
+    const load = async () => {
+      const st = dlg.querySelector('#br-st'), li = dlg.querySelector('#br-list');
+      st.innerHTML = '<span class="br-k">Checking…</span>'; li.innerHTML = '';
+      let csv = '', last = null;
+      try { csv = await (await fetch(`${window.MS_CDATA}mt5/signals.csv?t=${Date.now()}`, { cache: 'no-store' })).text(); } catch (e) {}
+      try { last = (await (await fetch('/api/bridge', { cache: 'no-store' })).json()).lastRead; } catch (e) {}
+      const lines = csv.split('\n').filter(Boolean), gen = +((lines[0] || '').match(/generated (\d+)/) || [])[1] || 0, cols = (lines[1] || '').split(',');
+      const recs = lines.slice(2).map((l) => { const v = l.split(','), o = {}; cols.forEach((c, i) => { o[c] = v[i]; }); return o; });
+      const live = recs.filter((r) => r.status === 'open' || r.status === 'pending'), fresh = gen && Date.now() / 1000 - gen < 20 * 60;
+      const lr = last && Date.parse(last.at) / 1000, lrOk = lr && Date.now() / 1000 - lr < 15 * 60;
+      st.innerHTML = `<div class="br-c ${fresh ? 'ok' : 'warn'}"><span class="br-k">Council feed</span><b>${gen ? `updated ${ago(gen)}` : 'not found'}</b><small>${fresh ? 'the council is writing signals' : 'no new signals file for a while: the council bot may be paused'}</small></div>
+        <div class="br-c ${lrOk ? 'ok' : lr ? 'warn' : ''}"><span class="br-k">Your bridge</span><b>${lr ? `${last.client === 'mt5' ? 'MT5' : 'cTrader'} read ${ago(lr)}` : 'no reads seen yet'}</b><small>${lrOk ? 'connected and mirroring' : lr ? 'not polling right now (terminal or EA off?)' : 'start the EA below; it shows up here within a couple of minutes'}</small></div>
+        <div class="br-c"><span class="br-k">Live records</span><b>${live.length}</b><small>${recs.length} in the file (closed ones tell the EA to exit)</small></div>`;
+      li.innerHTML = live.length ? live.map((r) => `<li><span class="pa-arr ${r.side === 'buy' ? 'above' : 'below'}">${r.side === 'buy' ? '↑' : '↓'}</span><span class="pa-w"><b>${(INSTRUMENTS[r.market] || {}).label || r.market.toUpperCase()} ${r.side.toUpperCase()} ${r.entryMode === 'limit' ? 'LIMIT' : 'MARKET'} ${r.entry}</b><small>${r.status} · stop ${r.stop}${r.t1 ? ` · target ${r.t1}` : ''} · ${r.k}${r.addOf ? ' · add' : ''}</small></span></li>`).join('') : '<li class="pa-empty">No open or pending council trades for the bridge right now.</li>';
+    };
+    const getFile = async (f) => {
+      let pw = ''; try { pw = sessionStorage.getItem('ms-own-pw') || ''; } catch (e) {}
+      if (!pw) { pw = prompt('Owner password (to download the bridge code)') || ''; if (!pw) return; }
+      const r = await fetch('/api/bridge', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ ownerPw: pw, file: f }) });
+      if (!r.ok) { alert(r.status === 403 ? 'Owner password not accepted.' : `Download failed (${r.status}).`); return; }
+      try { sessionStorage.setItem('ms-own-pw', pw); } catch (e) {}
+      const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([await r.text()], { type: 'text/plain' })); a.download = f === 'mt5' ? 'CouncilBridge.mq5' : 'CouncilBridge.cs'; document.body.appendChild(a); a.click(); a.remove();
+    };
+    const open = () => {
+      if (!dlg) {
+        dlg = document.createElement('dialog'); dlg.className = 'pa-dlg tva-dlg'; dlg.setAttribute('aria-labelledby', 'br-h');
+        dlg.innerHTML = `<div class="pa-top"><h2 id="br-h">Broker bridge</h2><button type="button" class="pa-x" aria-label="Close">×</button></div>
+          <p class="pa-sub">The CouncilBridge Expert Advisor mirrors the council's trades on your MT5 or cTrader account (demo first). It reads the council's signals file every 30 seconds.</p>
+          <div class="br-st" id="br-st"></div>
+          <ul class="pa-list" id="br-list"></ul>
+          <h3 class="br-h3">Set up</h3>
+          <ol class="tva-steps"><li>Download the EA: <button type="button" class="pa-del br-dl" data-f="mt5">MT5 (.mq5)</button> <button type="button" class="pa-del br-dl" data-f="ctrader">cTrader (.cs)</button></li>
+          <li>MT5: Tools → Options → Expert Advisors → tick <b>Allow WebRequest</b> and add <code>https://meridianx.dev</code>. cTrader: the cBot needs <b>Full access</b>.</li>
+          <li>Attach it to any chart; the signals address is already filled in: <code class="br-url">${URL_}</code> <button type="button" class="pa-del" id="br-cp">Copy</button></li>
+          <li>Check the risk inputs (0.25% per trade by default, daily loss and max drawdown guards) before going live.</li></ol>
+          <div class="tva-acts"><button type="button" class="pa-del" id="br-re">Refresh status</button></div>`;
+        document.body.appendChild(dlg);
+        dlg.querySelector('.pa-x').onclick = () => dlg.close(); dlg.addEventListener('click', (e) => { if (e.target === dlg) dlg.close(); });
+        dlg.querySelector('#br-re').onclick = load;
+        dlg.querySelector('#br-cp').onclick = async (e) => { try { await navigator.clipboard.writeText(URL_); e.target.textContent = 'Copied ✓'; } catch (err) { prompt('Copy', URL_); } };
+        dlg.querySelectorAll('.br-dl').forEach((b) => b.onclick = () => getFile(b.dataset.f));
+      }
+      dlg.showModal(); load();
+    };
+    window.msOpenBridge = open;
+    if (btn) btn.addEventListener('click', () => { const m = btn.closest('details'); if (m) m.open = false; open(); }); }
   // TradingView add-on (7 Nov loop): a Pine Script indicator with the council's open trades, generated by /api/pine
   { const btn = document.getElementById('ms-tva-open'); let dlg;
     const load = async () => { const k = dlg.querySelector('#tva-sym').value, sh = dlg.querySelector('#tva-sh').checked, ta = dlg.querySelector('#tva-src'), m = dlg.querySelector('#tva-msg');
@@ -6491,7 +6542,7 @@ function msNextSetup(bars, A) {
     if (sel && document.getElementById('ms-mk-btn') && shown(document.getElementById('ms-mk-btn'))) [...sel.options].forEach((o) => out.push({ g: 'Markets', t: o.textContent.trim(), d: o.selected ? 'current' : (o.parentElement.label || ''), run: () => { if (!o.selected) location.href = '?s=' + o.value + location.hash; } }));
     const tb = document.getElementById('ms-theme');
     if (tb) [['dark', 'Dark'], ['light', 'Light'], ['midnight', 'Midnight'], ['pro', 'Pro']].forEach(([k, t]) => out.push({ g: 'Theme', t: t + ' theme', d: document.documentElement.dataset.theme === k ? 'current' : '', run: () => { for (let i = 0; i < 5 && document.documentElement.dataset.theme !== k; i++) tb.click(); } }));
-    [['ms-pa-open', 'Price alerts: notify me at a price'], ['ms-tva-open', 'TradingView add-on: council trades as a Pine indicator'], ['ms-focus-btn', 'Focus mode: open trades full screen (F)'], ['ms-alerts', 'Turn alerts on / off'], ['ms-fit', 'Reset chart view'], ['ms-j-csv', 'Export journal CSV']].forEach(([id, t]) => { const b = document.getElementById(id); if (b) out.push({ g: 'Actions', t, d: '', run: () => b.click() }); });
+    [['ms-pa-open', 'Price alerts: notify me at a price'], ['ms-tva-open', 'TradingView add-on: council trades as a Pine indicator'], ['ms-br-open', 'Broker bridge: MT5 / cTrader status and setup'], ['ms-focus-btn', 'Focus mode: open trades full screen (F)'], ['ms-alerts', 'Turn alerts on / off'], ['ms-fit', 'Reset chart view'], ['ms-j-csv', 'Export journal CSV']].forEach(([id, t]) => { const b = document.getElementById(id); if (b) out.push({ g: 'Actions', t, d: '', run: () => b.click() }); });
     return out;
   };
   let all = [], cur = [], sel = 0;
@@ -7488,6 +7539,16 @@ function gpStats(T) {
 .ch-ms-l.below { bottom: auto; top: calc(100% + 6px); }
 .ch-snap { --i: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M14.5 4h-5L7 7H4a1 1 0 0 0-1 1v11a1 1 0 0 0 1 1h16a1 1 0 0 0 1-1V8a1 1 0 0 0-1-1h-3z'/%3E%3Ccircle cx='12' cy='13' r='3.5'/%3E%3C/svg%3E"); }
 .menu-pa { display: flex; flex-direction: column; align-items: flex-start; gap: 2px; width: 100%; padding: 10px 12px; margin-bottom: 8px; border-radius: 10px; border: 1px solid color-mix(in srgb, #e0a526 35%, var(--line)); background: color-mix(in srgb, #e0a526 8%, transparent); color: var(--ink); font: inherit; font-weight: 600; text-align: left; cursor: pointer; }
+.menu-br { border-color: color-mix(in srgb, var(--buy) 35%, var(--line)); background: color-mix(in srgb, var(--buy) 7%, transparent); }
+.br-st { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 8px; }
+.br-c { display: flex; flex-direction: column; gap: 3px; padding: 10px 12px; border-radius: 10px; border: 1px solid var(--line); background: var(--bg); }
+.br-c.ok { border-color: color-mix(in srgb, var(--buy) 45%, var(--line)); } .br-c.warn { border-color: color-mix(in srgb, #e0a526 55%, var(--line)); }
+.br-c .br-k { font-size: 11px; text-transform: uppercase; letter-spacing: .05em; color: var(--ink-faint); }
+.br-c b { font-size: 14px; } .br-c small { font-size: 12px; color: var(--ink-dim); line-height: 1.4; }
+.br-c.ok b { color: var(--buy); } .br-c.warn b { color: #e0a526; }
+.br-h3 { margin: 16px 0 4px; font-size: 14px; }
+.tva-steps code { font: 12px var(--mono, ui-monospace, monospace); background: var(--bg); padding: 1px 6px; border-radius: 5px; overflow-wrap: anywhere; }
+.tva-steps .pa-del { height: 28px; margin: 2px 0; }
 .menu-tv { border-color: color-mix(in srgb, var(--accent) 35%, var(--line)); background: color-mix(in srgb, var(--accent) 8%, transparent); }
 .tva-dlg { width: min(640px, calc(100vw - 24px)); }
 .tva-row { display: flex; gap: 14px; align-items: end; flex-wrap: wrap; margin-bottom: 12px; }
