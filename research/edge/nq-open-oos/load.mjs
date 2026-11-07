@@ -1,0 +1,34 @@
+// Day maps for the open-run replay: Map<NY date, [{time, open, high, low, close, vol, m}]> (09:30-11:05 ET candles plus the
+// candles the midnight-open filter reads: m = 0 is the 00:00 ET candle; m = -1 the last candle before midnight (OANDA only)).
+import fs from 'node:fs';
+import path from 'node:path';
+import zlib from 'node:zlib';
+import { nyParts, nyMidnight } from './lib.mjs';
+
+// OANDA NAS100_USD mid candles written by fetch.mjs
+export function loadOanda(dir) {
+  const days = new Map();
+  for (const f of fs.readdirSync(dir).filter((f) => /^nas100-\d{4}\.json$/.test(f)).sort()) {
+    const j = JSON.parse(fs.readFileSync(path.join(dir, f), 'utf8'));
+    for (const [d, rows] of Object.entries(j)) days.set(d, rows.map(([time, open, high, low, close, vol]) => ({ time, open, high, low, close, vol, m: nyParts(time).d === d ? nyParts(time).m : -1 })));
+  }
+  return days;
+}
+
+// HistData NSXUSD M1 (council-data research/candles/nsxusd-histdata/*.csv.gz). Labels are New York wall-clock time incl. DST
+// (council-data research/log.md, 5 Nov "HistData time convention settled").
+export function loadHistData(dir) {
+  const days = new Map();
+  for (const f of fs.readdirSync(dir).filter((f) => f.endsWith('.csv.gz')).sort()) {
+    const txt = zlib.gunzipSync(fs.readFileSync(path.join(dir, f))).toString();
+    for (const line of txt.split('\n')) {
+      if (line.length < 20) continue; const [ts, o, h, l, c] = line.split(';');
+      const d = `${ts.slice(0, 4)}-${ts.slice(4, 6)}-${ts.slice(6, 8)}`, m = +ts.slice(9, 11) * 60 + +ts.slice(11, 13);
+      if (!(m === 0 || (m >= 570 && m <= 665))) continue;
+      let a = days.get(d); if (!a) { a = []; days.set(d, a); }
+      a.push({ time: nyMidnight(d) + m * 60, open: +o, high: +h, low: +l, close: +c, vol: 0, m });
+    }
+  }
+  for (const [d, a] of days) { const p = nyParts(nyMidnight(d) + 12 * 3600); if (p.wd === 'Sat' || p.wd === 'Sun') days.delete(d); else a.sort((x, y) => x.time - y.time); }
+  return new Map([...days].sort((a, b) => (a[0] < b[0] ? -1 : 1)));
+}
