@@ -1840,6 +1840,52 @@ html[data-motion="off"] .odo > span { animation-duration: 1ms; } html[data-motio
 @keyframes vt-out-b { to { opacity: 0; transform: translateX(28px); } }
 @keyframes vt-in-b { from { opacity: 0; transform: translateX(-36px); } }
 @media (prefers-reduced-motion: reduce) { ::view-transition-old(root), ::view-transition-new(root) { animation: none !important; } }
+
+/* ═══ POLISH 3 · professional & smooth (7 Nov) ═══ */
+/* 1 rendering */
+html { -webkit-tap-highlight-color: transparent; scrollbar-gutter: stable; text-size-adjust: 100%; -webkit-text-size-adjust: 100%; }
+body { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; text-rendering: optimizeLegibility; }
+@media (prefers-reduced-motion: no-preference) { html:not([data-motion="off"]) { scroll-behavior: smooth; } }
+/* 2 typography */
+:where(h1, h2, h3, .tile-big, .h-head, .fx-empty b) { text-wrap: balance; }
+:where(p, .ms-note, .tile-sub, .h-ring-n, .fx-empty) { text-wrap: pretty; }
+:where(td, th, .pz-p, .fx-r b, .fx-d, .a-r, .a-d, .h-kpi b, .ms-cd, kbd, code) { font-variant-numeric: tabular-nums; }
+:where(a) { text-underline-offset: 3px; text-decoration-thickness: from-font; }
+:where(kbd) { font-family: var(--mono); }
+/* 3 one motion vocabulary for controls: 160 ms, ease-out */
+:where(button, a, summary, [role="tab"], input, select, textarea, .tile, .pz, .card) { transition-property: color, background-color, border-color, box-shadow, opacity, transform; transition-duration: .16s; transition-timing-function: cubic-bezier(.16, 1, .3, 1); }
+:where(button, a, summary, [role="tab"], label, select) { touch-action: manipulation; }
+:where(button, .ms-tbtn, [role="tab"], .h-quick a, .cal-seg button, .c-tabs button):not(:disabled):active { transform: scale(.97); transition-duration: .06s; }
+:where(button, input, select, textarea):disabled { opacity: .45; cursor: not-allowed; }
+/* 4 hover only where there is a pointer that hovers; touch gets press states instead */
+@media (hover: none) { .pz:hover, a.tile:hover { transform: none; } }
+@media (hover: hover) { a.tile:hover { border-color: var(--line-strong, var(--ink-faint)); } }
+/* 5 tables: row hover and sticky headers inside scrolling tables */
+.t-scroll thead th { position: sticky; top: 0; z-index: 1; background: var(--panel); box-shadow: inset 0 -1px 0 var(--line); }
+@media (hover: hover) { :where(.t-scroll, .card) tbody tr:hover > td { background: color-mix(in srgb, var(--ink) 3.5%, transparent); } }
+/* 6 scanner: skeleton bars while a market waits to be scanned */
+.srow-skel { grid-column: 2 / -1; display: flex; gap: 14px; align-items: center; min-width: 0; }
+.srow-skel i { height: 10px; border-radius: 5px; background: linear-gradient(90deg, var(--panel-hover, var(--line)) 0%, color-mix(in srgb, var(--ink) 9%, transparent) 40%, var(--panel-hover, var(--line)) 80%); background-size: 200% 100%; animation: shimmer 1.6s linear infinite; }
+.srow-skel i:nth-child(1) { flex: 0 0 72px; } .srow-skel i:nth-child(2) { flex: 0 0 120px; animation-delay: .12s; } .srow-skel i:nth-child(3) { flex: 1 1 auto; max-width: 260px; animation-delay: .24s; }
+@media (max-width: 1000px) { .srow-skel { grid-column: 1 / -1; } .srow-skel i:nth-child(3) { display: none; } }
+/* 7 "Loading…" headings breathe instead of sitting still */
+.is-loading { animation: ld-breathe 1.8s ease-in-out infinite; }
+@keyframes ld-breathe { 50% { opacity: .55; } }
+/* 8 theme switch crossfades instead of snapping */
+html.theme-x, html.theme-x *, html.theme-x *::before, html.theme-x *::after { transition: background-color .32s ease, color .32s ease, border-color .32s ease, fill .32s ease, stroke .32s ease !important; }
+/* 9 entrance: Market pulse tiles and Focus cards settle in once, staggered */
+@media (prefers-reduced-motion: no-preference) {
+  html:not([data-motion="off"]) .h-pulse-row.enter .pz { animation: pz-in .38s cubic-bezier(.16, 1, .3, 1) both; animation-delay: calc(var(--i, 0) * 28ms); }
+  html:not([data-motion="off"]) .fx-list.enter .fx-c { animation: pz-in .42s cubic-bezier(.16, 1, .3, 1) both; animation-delay: calc(var(--i, 0) * 32ms); }
+}
+@keyframes pz-in { from { opacity: 0; transform: translateY(6px); } }
+/* 10 anchors land below the sticky top bar */
+:where(section, .card, h2, h3) { scroll-margin-top: calc(var(--top-h, 58px) + 16px); }
+/* 11 top-bar trade pill: figures roll and the pill glows briefly when the float changes */
+#ms-hdr-open.tick { box-shadow: 0 0 0 3px color-mix(in srgb, var(--gold) 22%, transparent); }
+#ms-hdr-open { transition: box-shadow .5s ease-out; }
+@media (prefers-reduced-motion: reduce) { .is-loading, .srow-skel i { animation: none; } html.theme-x * { transition: none !important; } }
+html[data-motion="off"] .is-loading, html[data-motion="off"] .srow-skel i { animation: none; }
 </style>
 <script>try{if(localStorage.getItem('msMotion')==='off')document.documentElement.dataset.motion='off'}catch(e){}</script>
 </head>
@@ -3692,7 +3738,7 @@ function msNextSetup(bars, A) {
     SCAN.el.innerHTML = rows.map(({ k, I, r }) => {
       const href = `?s=${k}`, cur = k === instKey ? ' cur' : '';
       const mk = `<span class="mk"><b>${I.label}</b><small>${I.name}${k === instKey ? ' · on screen' : ''}</small></span>`;
-      if (!r) return `<a class="ms-srow${cur}" href="${href}">${mk}<span class="err">Waiting to scan…</span></a>`;
+      if (!r) return `<a class="ms-srow${cur}" href="${href}">${mk}<span class="srow-skel" role="status" aria-label="Waiting to scan"><i></i><i></i><i></i></span></a>`;
       if (r.err) return `<a class="ms-srow${cur}" href="${href}">${mk}<span class="err">Couldn't load: ${esc(r.err)}</span></a>`;
       const best = r.list[0], ready = r.list.filter((t) => t.state === 'READY');
       const chg = r.chg === null ? '' : ` <small style="color:${r.chg >= 0 ? UPC : DNC};font-weight:600">${r.chg >= 0 ? '+' : ''}${r.chg.toFixed(2)}%</small>`;
@@ -5792,7 +5838,7 @@ function msNextSetup(bars, A) {
   function watch(id, sel, key) {
     var host = document.getElementById(id); if (!host) return;
     new MutationObserver(function () { if (busy) return; busy = true;
-      try { host.querySelectorAll(sel).forEach(function (el, i) { var k = id + '|' + (key ? key(el, i) : i), t = el.textContent.trim(); if (MEM[k] != null && MEM[k] !== t) roll(el, MEM[k], t); MEM[k] = t; }); } finally { busy = false; } })
+      try { host.querySelectorAll(sel).forEach(function (el, i) { if (el.querySelector('.odo')) return; var k = id + '|' + (key ? key(el, i) : i), t = el.textContent.trim(); if (MEM[k] != null && MEM[k] !== t) roll(el, MEM[k], t); MEM[k] = t; }); } finally { busy = false; } })
       .observe(host, { childList: true, subtree: true });
   }
   function rowKey(el, i) { var r = el.closest('[data-tid]'); if (r) return r.getAttribute('data-tid'); var g = el.closest('li,details,div'); var b = g && g.querySelector('b'); return (b ? b.textContent : '') + i; }
@@ -5927,6 +5973,29 @@ function msNextSetup(bars, A) {
     document.getElementById('h-ring').classList.toggle('wk', wk);
   }
   draw(); setInterval(function () { if (!document.hidden) draw(); }, 30000); document.addEventListener('ms:news', draw); document.addEventListener('visibilitychange', function () { if (!document.hidden) draw(); });
+})();
+</script>
+<script>
+// polish 3: theme crossfade, breathing "Loading…" labels, staggered entrances, rolling top-bar pill
+(function () {
+  var R = document.documentElement, still = function () { return R.dataset.motion === 'off' || matchMedia('(prefers-reduced-motion: reduce)').matches; };
+  // theme: add the crossfade class just before any theme change lands, drop it after
+  var tx = null; function fade() { if (still()) return; R.classList.add('theme-x'); clearTimeout(tx); tx = setTimeout(function () { R.classList.remove('theme-x'); }, 420); }
+  document.addEventListener('click', function (e) { if (e.target.closest && e.target.closest('#ms-theme, [data-theme-set], .cmdk-it')) fade(); }, true);
+  // "Loading…" labels breathe until real text replaces them
+  function mark(root) { (root || document).querySelectorAll('.tile-big, .h-head, .tile-sub, .ms-note, h1, h2').forEach(function (el) { el.classList.toggle('is-loading', /^(Loading|Starting up|Scanning soon)/.test(el.textContent.trim())); }); }
+  var mt = null; new MutationObserver(function () { if (mt) return; mt = setTimeout(function () { mt = null; mark(); }, 250); }).observe(document.body, { childList: true, subtree: true, characterData: true });
+  document.addEventListener('DOMContentLoaded', function () { mark(); }); mark();
+  // staggered entrance the first time a list fills
+  function stagger(id, item) { var el = document.getElementById(id); if (!el) return; var done = false;
+    new MutationObserver(function () { if (done) return; var it = el.querySelectorAll(item); if (!it.length) return; done = true; it.forEach(function (c, i) { c.style.setProperty('--i', Math.min(i, 14)); }); el.classList.add('enter'); setTimeout(function () { el.classList.remove('enter'); }, 1200); }).observe(el, { childList: true }); }
+  stagger('h-pulse-row', '.pz');
+  var fl = document.getElementById('fx-list'), fd = document.getElementById('ms-focus');
+  if (fl && fd) new MutationObserver(function () { if (!fd.open) return; setTimeout(function () { fl.querySelectorAll('.fx-c').forEach(function (c, i) { c.style.setProperty('--i', Math.min(i, 14)); }); fl.classList.add('enter'); setTimeout(function () { fl.classList.remove('enter'); }, 1300); }, 0); }).observe(fd, { attributes: true, attributeFilter: ['open'] });
+  // top-bar pill: roll the R figure and glow when the float changes
+  var ho = document.getElementById('ms-hdr-open'), last = null;
+  if (ho) new MutationObserver(function () { var b = ho.querySelector('.pos .ho-l, .neg .ho-l'), t = b ? b.textContent : null;
+    if (t && last && t !== last) { if (window.msRoll) window.msRoll(b, last, t); if (!still()) { ho.classList.add('tick'); setTimeout(function () { ho.classList.remove('tick'); }, 700); } } if (t) last = t; }).observe(ho, { childList: true });
 })();
 </script>
 </body>
