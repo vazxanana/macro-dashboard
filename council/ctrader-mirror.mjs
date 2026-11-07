@@ -15,9 +15,13 @@
 //     position whose round never saved is found again by that label/comment, so a trade is never opened twice.
 //   * Secrets come from the environment, are never written in plain text or logged; a rotated token pair is kept encrypted
 //     (AES-256-GCM, key from the client secret) in ctrader/tokens.json.
+//   * Phone alerts (best-effort, through council/alerts.mjs: ntfy + Telegram, the same NTFY_TOPIC / TELEGRAM_* settings as the
+//     council's alerts) when a mirror order opens, closes, is rejected or is not filled. Sent after mirror.json is saved; a failed
+//     alert never changes or stops the trading. Each is sent once (flags in the saved state), so a restart never re-alerts.
 import fs from 'node:fs';
 import path from 'node:path';
 import crypto from 'node:crypto';
+import { sendAlerts, when, NTFY_DEFAULT } from './alerts.mjs';
 
 export const DEMO_HOST = 'wss://demo.ctraderapi.com:5036';
 export const PT = {
@@ -137,12 +141,65 @@ export function relative(dist, digits = 5) {
   return Math.max(unit, Math.round((Math.abs(dist) * 100000) / unit) * unit);
 }
 
+// ---- phone alerts ---------------------------------------------------------------------------------------------------
+// mirrorRound collects short events in out.alerts: { kind: 'open' | 'close' | 'reject' | 'unfilled' | 'closefail', trade, symbol,
+// side, lots, price, digits, ... }. Position events are flagged on the saved position (m.alerted), a rejection comes with its
+// one-time skip note, so each is sent once, also after a restart. A position found again by label/comment (its round never
+// saved) gets no open alert: that round may already have sent it; its close still alerts.
+const px = (v, d) => (v == null || v === '' || !Number.isFinite(+v) ? null : d != null && Number.isFinite(+d) ? (+v).toFixed(+d) : String(+v));
+const sideTxt = (e) => String(e.side || '').toUpperCase(), lotTxt = (e) => (e.lots != null && Number.isFinite(+e.lots) ? ` ${+(+e.lots).toFixed(2)} lot` : '');
+const councilTxt = (e) => (e.setup ? `Council ${e.setup} · ${e.trade}` : String(e.trade || ''));
+const rTxt = (r) => (r == null || !Number.isFinite(+r) ? '' : ` ${+r > 0 ? '+' : ''}${(+r).toFixed(2)}R`);
+export function mirrorAlertText(e, now) {
+  const head = `${sideTxt(e)} ${e.symbol || ''}`.trim(), at = when(now), up = e.side === 'sell' ? 'chart_with_downwards_trend' : 'chart_with_upwards_trend';
+  if (e.kind === 'open') {
+    const p = px(e.price, e.digits), lv = [px(e.entry, e.digits) && `council entry ${px(e.entry, e.digits)}`, px(e.stop, e.digits) && `stop ${px(e.stop, e.digits)}`,
+      e.noTarget || px(e.t1, e.digits) == null ? 'no fixed target' : `target ${px(e.t1, e.digits)}`].filter(Boolean).join(' · ');
+    return { title: `Demo mirror: ${head}${lotTxt(e)}`, msg: `${e.filled === false ? 'Order accepted, fill not confirmed yet' : `Opened${p ? ` at ${p}` : ''}`} · ${lv}\n${councilTxt(e)}\n${at}`, tags: `robot,${up}` };
+  }
+  if (e.kind === 'close') {
+    const p = px(e.price, e.digits), pl = e.pnl != null && Number.isFinite(+e.pnl) ? `gross P/L ${+e.pnl >= 0 ? '+' : ''}${(+e.pnl).toFixed(2)}` : '';
+    const why = e.by === 'council' ? `The council closed the trade${e.council ? `: ${e.council}${rTxt(e.R)}` : ''}` : 'Closed at the broker (its stop or target)';
+    const good = e.pnl != null ? +e.pnl : e.R != null ? +e.R : NaN, top = [p && `Closed at ${p}`, pl].filter(Boolean).join(' · ');
+    return { title: `Demo mirror: closed ${head}${lotTxt(e)}`, msg: `${top ? top + '\n' : ''}${why}\n${councilTxt(e)}\n${at}`,
+      tags: `robot,${good > 0 ? 'white_check_mark' : good < 0 ? 'x' : 'checkered_flag'}` };
+  }
+  if (e.kind === 'reject') return { title: `Demo mirror: order rejected · ${head}${lotTxt(e)}`, msg: `${e.result || 'rejected'}\nNot retried.\n${councilTxt(e)}\n${at}`, tags: 'robot,no_entry_sign' };
+  if (e.kind === 'unfilled') return { title: `Demo mirror: order not filled · ${head}`, msg: `No position at the broker 10 min after the order was accepted.\n${councilTxt(e)}\n${at}`, tags: 'robot,no_entry_sign' };
+  if (e.kind === 'closefail') return { title: `Demo mirror: close failed · ${head}${lotTxt(e)}`, msg: `${e.result || 'close failed'}\nThe council closed the trade; the demo position is still open (the close is retried each round).\n${councilTxt(e)}\n${at}`, tags: 'robot,warning' };
+  return null;
+}
+// Sends the round's events through the council's alert channel. Never throws; returns { sent, errors } with secrets scrubbed.
+// COUNCIL_ALERTS=off sends nothing (as for the council's own alerts).
+export async function sendMirrorAlerts(alerts, { env = {}, now = Math.floor(Date.now() / 1000), tgChat = null, fetchFn = fetch } = {}) {
+  const errors = {};
+  try {
+    if (!Array.isArray(alerts) || !alerts.length || env.COUNCIL_ALERTS === 'off') return { sent: 0, errors };
+    const ev = [];
+    for (const a of alerts) { try { const x = mirrorAlertText(a, now); if (x) ev.push(x); } catch (e) { errors.format = 'an alert could not be formatted'; } }
+    if (!ev.length) return { sent: 0, errors };
+    const topic = env.NTFY_TOPIC || NTFY_DEFAULT, tgTok = env.TELEGRAM_BOT_TOKEN || null, chat = env.TELEGRAM_CHAT_ID || tgChat || null;
+    const hide = [tgTok, chat, env.NTFY_TOPIC].filter((v) => v && String(v).length >= 4).map(String), scrub = scrubber(env);
+    for (const [k, v] of Object.entries(await sendAlerts(ev, { topic, tgTok, tgChat: chat, fetchFn }))) { let t = scrub(v); for (const h of hide) t = t.split(h).join('***'); errors[k] = t; }
+    return { sent: Math.min(ev.length, 8), errors };
+  } catch (e) { errors.alerts = 'alert send failed'; return { sent: 0, errors }; }
+}
+
 // ---- one mirror round -----------------------------------------------------------------------------------------------
 const TOKEN_ERR = /ACCESS_TOKEN|INVALID_TOKEN|TOKEN_EXPIRED|CH_ACCESS_TOKEN_INVALID|NOT_AUTHORIZED|UNAUTHORIZED/i;
 export async function mirrorRound({ env, trades, state, tokens, WS = globalThis.WebSocket, now = Math.floor(Date.now() / 1000), timeout, onTokens }) {
   const scrub = scrubber(env), log = [], say = (msg, x = {}) => log.push({ at: new Date(now * 1000).toISOString(), msg: scrub(msg), ...x });
   const st = { map: {}, day: null, startedAt: null, ...(state || {}) };
-  const out = { state: st, tokens: tokens || null, log, sent: [] };
+  const out = { state: st, tokens: tokens || null, log, sent: [], alerts: [] };
+  // phone alert events (see mirrorAlertText): collected only, sent by the caller; never allowed to throw into the trading, so the
+  // extra fields come as a function evaluated in here
+  const alert = (kind, id, m, extra) => { try {
+    if (m && Array.isArray(m.alerted) && m.alerted.includes(kind)) return;
+    const x = typeof extra === 'function' ? extra() : extra || {}, t = Array.isArray(trades) ? trades.find((y) => y && y.id === id) : null;
+    out.alerts.push({ kind, trade: id, symbol: m ? m.symbol : null, side: m ? m.side : null, lots: m ? m.lots ?? null : null, digits: m ? m.digits ?? null : null,
+      setup: (m && m.setup) || (t && t.k) || null, ...x });
+    if (m) (Array.isArray(m.alerted) ? m.alerted : (m.alerted = [])).push(kind);
+  } catch (e) {} };
   if (String(env.CTRADER_MIRROR || '').trim().toLowerCase() !== 'on') { st.status = `off (CTRADER_MIRROR is ${env.CTRADER_MIRROR ? `"${String(env.CTRADER_MIRROR).trim().slice(0, 8)}", not "on"` : 'not set'})`; return out; }
   const missing = NEED.filter((k) => !env[k]);
   if (missing.length) { st.status = `not configured: ${missing.join(', ')} missing`; return out; }
@@ -195,7 +252,7 @@ export async function mirrorRound({ env, trades, state, tokens, WS = globalThis.
       const p = ours.get(commentFor(t)); if (!p) continue;
       const pid = String(p.positionId), m = st.map[t.id];
       if (m && m.status !== 'sent') continue;   // already managed (open or finished): never re-adopted
-      st.map[t.id] = { ...(m || { symbol: t.market.toUpperCase(), side: t.side, setup: t.k, openedAt: iso, councilEntry: t.entry, stop: t.stop, t1: t.t1, adopted: true }),
+      st.map[t.id] = { ...(m || { symbol: t.market.toUpperCase(), side: t.side, setup: t.k, openedAt: iso, councilEntry: t.entry, stop: t.stop, t1: t.t1, adopted: true, alerted: ['open'] }),
         positionId: pid, volume: +(p.tradeData || {}).volume || (m && m.volume), status: 'open' };
       if (st.skipped) delete st.skipped[t.id]; if (st.wait) delete st.wait[t.id];
       say(`${m ? 'confirmed' : 'found'} ${st.map[t.id].symbol} position ${pid} at the broker`, { trade: t.id });
@@ -203,11 +260,12 @@ export async function mirrorRound({ env, trades, state, tokens, WS = globalThis.
     for (const [id, m] of Object.entries(st.map)) {
       if (m.status !== 'sent') continue;
       if (m.positionId && positions.has(String(m.positionId))) { m.status = 'open'; continue; }
-      if (now - Date.parse(m.openedAt) / 1000 > 600) { m.status = 'not filled'; m.closedAt = iso; say(`${m.symbol} order for ${id}: no position at the broker`, { trade: id }); }
+      if (now - Date.parse(m.openedAt) / 1000 > 600) { m.status = 'not filled'; m.closedAt = iso; say(`${m.symbol} order for ${id}: no position at the broker`, { trade: id }); alert('unfilled', id, m); }
     }
     // 1) positions gone at the broker (stop/target hit there, or our accepted close filled after its round) -> mark done
     for (const [id, m] of Object.entries(st.map)) if (m.status === 'open' && !positions.has(String(m.positionId))) {
-      m.status = m.closing ? 'closed by council' : 'closed at broker'; m.closedAt = iso; say(`${m.symbol} position ${m.positionId} ${m.closing ? 'close filled' : 'closed at the broker'}`, { trade: id }); }
+      m.status = m.closing ? 'closed by council' : 'closed at broker'; m.closedAt = iso; say(`${m.symbol} position ${m.positionId} ${m.closing ? 'close filled' : 'closed at the broker'}`, { trade: id });
+      const t = byId.get(id); alert('close', id, m, { by: m.closing ? 'council' : 'broker', council: t && isDone(t) ? t.status : null, R: t ? t.R ?? null : null }); }
     // 2) council closed the trade -> close our position (waits for the fill; an accepted-only close is confirmed by step 1 next round)
     for (const [id, m] of Object.entries(st.map)) {
       if (m.status !== 'open') continue;
@@ -216,8 +274,10 @@ export async function mirrorRound({ env, trades, state, tokens, WS = globalThis.
       const vol = (p.tradeData && +p.tradeData.volume) || m.volume;
       try { const ev = await s.send(PT.CLOSE_POSITION_REQ, { ctidTraderAccountId: ctid, positionId: Number(m.positionId), volume: vol }, PT.EXECUTION_EVENT, orderStep);
         if (ev.interim) { m.closing = iso; say(`close ${m.symbol} ${m.positionId} accepted, fill not confirmed yet`, { trade: id }); continue; }
-        m.status = 'closed by council'; m.closedAt = iso; out.sent.push({ type: 'close', trade: id }); say(`closed ${m.symbol} position ${m.positionId} (council: ${t.status})`, { trade: id }); }
-      catch (e) { say(`close ${m.symbol} ${m.positionId} failed: ${e.message}`, { trade: id }); }
+        m.status = 'closed by council'; m.closedAt = iso; out.sent.push({ type: 'close', trade: id }); say(`closed ${m.symbol} position ${m.positionId} (council: ${t.status})`, { trade: id });
+        alert('close', id, m, () => { const dl = ev.deal || {}, cd = dl.closePositionDetail || {}, md = Number.isFinite(+cd.moneyDigits) ? +cd.moneyDigits : digits;
+          return { by: 'council', council: t.status, R: t.R ?? null, price: dl.executionPrice ?? null, pnl: cd.grossProfit != null && Number.isFinite(+cd.grossProfit) ? +cd.grossProfit / 10 ** md : null }; }); }
+      catch (e) { say(`close ${m.symbol} ${m.positionId} failed: ${e.message}`, { trade: id }); alert('closefail', id, m, { result: scrub(e.message) }); }
     }
     // 3) new live council trades -> open
     const dayDown = st.day.startBalance && balance != null ? (st.day.startBalance - balance) / st.day.startBalance : 0;
@@ -248,10 +308,13 @@ export async function mirrorRound({ env, trades, state, tokens, WS = globalThis.
         try {
           const ev = await s.send(PT.NEW_ORDER_REQ, order, PT.EXECUTION_EVENT, orderStep);
           const pid = (ev.position && ev.position.positionId) ?? (ev.order && ev.order.positionId), filled = !ev.interim && pid != null;
-          st.map[t.id] = { positionId: pid != null ? String(pid) : null, symbol: name, side: t.side, volume, setup: t.k, status: filled ? 'open' : 'sent', openedAt: iso, councilEntry: t.entry, stop: t.stop, t1: t.t1 };
+          st.map[t.id] = { positionId: pid != null ? String(pid) : null, symbol: name, side: t.side, volume, lots: volume / +info.lotSize, digits: d, setup: t.k, status: filled ? 'open' : 'sent', openedAt: iso, councilEntry: t.entry, stop: t.stop, t1: t.t1 };
           if (st.wait) delete st.wait[t.id];
           out.sent.push({ type: 'open', trade: t.id }); say(`${filled ? 'opened' : 'sent (fill not confirmed yet)'} ${sell ? 'sell' : 'buy'} ${name} ${volume / +info.lotSize} lot (council ${t.k})`, { trade: t.id });
-        } catch (e) { if (RETRY.test(`${e.code || ''} ${e.message}`)) later(`order rejected: ${e.message}`); else skip(`order rejected: ${e.message}`); }
+          alert('open', t.id, st.map[t.id], () => ({ filled, price: (ev.deal && ev.deal.executionPrice) ?? (filled && ev.position ? ev.position.price : null) ?? null,
+            entry: t.entry, stop: t.stop, t1: t.t1, noTarget: !('relativeTakeProfit' in order) }));
+        } catch (e) { if (RETRY.test(`${e.code || ''} ${e.message}`)) later(`order rejected: ${e.message}`); else skip(`order rejected: ${e.message}`);
+          if ((st.skipped || {})[t.id]) alert('reject', t.id, null, () => ({ symbol: name, side: t.side, lots: volume / +info.lotSize, result: st.skipped[t.id] })); }
       }
     }
     // housekeeping: skip/retry notes matter only while a trade can still be copied; finished positions are kept LIMITS.keepDays
@@ -278,4 +341,11 @@ if (process.argv[1] && process.argv[1].endsWith('ctrader-mirror.mjs')) {
   fs.writeFileSync(path.join(CD, 'mirror.json'), JSON.stringify({ state: r.state, log: (prev.log || []).concat(r.log).slice(-300), limits: LIMITS, symbols: SYMBOLS }, null, 1));
   if (r.tokens && JSON.stringify(r.tokens) !== JSON.stringify(rd('tokens.json', null))) saveTokens(r.tokens);
   console.log(`cTrader mirror: ${r.state.status}${r.sent.length ? ` · ${r.sent.length} sent` : ''}`);
+  // phone alerts, after mirror.json is saved (already flagged there, so a crash here never re-sends them): best-effort only
+  if (r.alerts.length) {
+    let tgChat = null; try { tgChat = JSON.parse(fs.readFileSync(path.join(DIR, 'state.json'), 'utf8')).tgChat || null; } catch (e) {}   // the council's remembered chat
+    const a = await sendMirrorAlerts(r.alerts, { env: process.env, tgChat });
+    const errs = Object.entries(a.errors).map(([k, v]) => `${k} ${v}`).join('; ');
+    console.log(`cTrader mirror alerts: ${a.sent} sent${errs ? ` · errors: ${errs}` : ''}`);
+  }
 }
