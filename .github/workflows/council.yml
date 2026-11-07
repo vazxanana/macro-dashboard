@@ -132,7 +132,15 @@ jobs:
             fi
             if newcode; then echo "New council code on main: handing over after round $i"; break; fi
             if [ "$i" -lt "$ROUNDS" ]; then
-              for k in 1 2 3 4; do sleep 60; if newcode; then echo "New council code on main: handing over after round $i"; break 2; fi; done
+              for k in 1 2 3 4; do sleep 60
+                # the owner's demo account every minute between rounds (owner, 7 Nov: a manual trade showed up late); saved only on a change
+                node council/ctrader-account.mjs data >/dev/null 2>&1 || true
+                if ! git -C data diff --quiet -- ctrader/account.json 2>/dev/null || [ -n "$(git -C data ls-files --others -- ctrader/account.json)" ]; then
+                  git -C data add ctrader/account.json && git -C data commit -q -m "cTrader account $(date -u +%H:%MZ)" && \
+                  for j in 1 2 3; do git -C data pull -q --rebase origin council-data && git -C data push -q origin HEAD:council-data && break; sleep 3; done
+                fi
+                if newcode; then echo "New council code on main: handing over after round $i"; break 2; fi
+              done
             fi
           done
 

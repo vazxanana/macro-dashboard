@@ -34,6 +34,11 @@ if (process.argv[1] && process.argv[1].endsWith('ctrader-account.mjs')) {
     const snap = await accountSnapshot({ env: process.env, tokens });
     if (!snap) process.exit(0);
     fs.mkdirSync(CD, { recursive: true });
+    // write only when something changed (balance, positions, orders, history): the loop checks every minute between rounds and
+    // must not commit a new file just because the timestamp moved
+    let prev = null; try { prev = JSON.parse(fs.readFileSync(path.join(CD, 'account.json'), 'utf8')); } catch (e) {}
+    const sig = (o) => JSON.stringify({ ...(o || {}), at: undefined, open: (o && o.open || []).map((p) => ({ ...p, pnl: p.pnl == null ? null : Math.round(p.pnl) })) });
+    if (prev && sig(prev) === sig(snap)) { console.log('cTrader account: no change'); process.exit(0); }
     fs.writeFileSync(path.join(CD, 'account.json'), JSON.stringify(snap, null, 1));
     console.log(`cTrader account: ${snap.error || `balance ${snap.balance} · ${snap.open.length} open · ${snap.history.length} closed in 30 days`}`);
   } catch (e) { console.log(`cTrader account failed: ${scrub(e.message || e)}`); }
