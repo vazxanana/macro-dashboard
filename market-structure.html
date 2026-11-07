@@ -3480,11 +3480,12 @@ function msNextSetup(bars, A) {
     { const pane = el.closest('.ms-pane'), ph = pane && pane.querySelector('.ms-ph');
       if (ph && !ph.querySelector('.ch-tools')) {
         const tl = document.createElement('span'); tl.className = 'ch-tools';
-        tl.innerHTML = `<a class="ch-b ch-tv" target="_blank" rel="noopener" title="Open this chart on TradingView" aria-label="Open on TradingView"></a><button type="button" class="ch-b ch-hl" title="Draw a horizontal line: click the chart to place it, click a line again to remove it (saved for this market)" aria-label="Draw horizontal lines" aria-pressed="false"></button><button type="button" class="ch-b ch-fib" title="Fibonacci retracement: click the swing start, then the swing end (click again to remove it; saved for this chart)" aria-label="Draw a Fibonacci retracement" aria-pressed="false"></button><button type="button" class="ch-b ch-ruler" title="Measure: drag on the chart (or hold Shift and drag)" aria-label="Measure price and time on the chart" aria-pressed="false"></button><button type="button" class="ch-b ch-rp" title="Replay: hide the future and step through the candles (← → keys)" aria-label="Bar replay" aria-pressed="false"></button><button type="button" class="ch-b ch-snap" title="Save this chart as an image" aria-label="Save the chart as a PNG image"></button><button type="button" class="ch-b ch-bell" title="Price alert (notifies this device) · tip: right-click the chart to set one at that price" aria-label="Set a price alert"></button><button type="button" class="ch-b ch-fit" title="Fit the chart (double-click the chart)" aria-label="Fit the ${tf.label} chart"></button><button type="button" class="ch-b ch-fs" title="Full screen" aria-label="Show the ${tf.label} chart full screen"></button>`;
+        tl.innerHTML = `<a class="ch-b ch-tv" target="_blank" rel="noopener" title="Open this chart on TradingView" aria-label="Open on TradingView"></a><button type="button" class="ch-b ch-hl" title="Draw a horizontal line: click the chart to place it, click a line again to remove it (saved for this market)" aria-label="Draw horizontal lines" aria-pressed="false"></button><button type="button" class="ch-b ch-pos" title="Position tool: click the entry, then the stop; the target is drawn at 2R with the size for your risk (click again to remove)" aria-label="Plan a position (entry, stop, 2R target)" aria-pressed="false"></button><button type="button" class="ch-b ch-fib" title="Fibonacci retracement: click the swing start, then the swing end (click again to remove it; saved for this chart)" aria-label="Draw a Fibonacci retracement" aria-pressed="false"></button><button type="button" class="ch-b ch-ruler" title="Measure: drag on the chart (or hold Shift and drag)" aria-label="Measure price and time on the chart" aria-pressed="false"></button><button type="button" class="ch-b ch-rp" title="Replay: hide the future and step through the candles (← → keys)" aria-label="Bar replay" aria-pressed="false"></button><button type="button" class="ch-b ch-snap" title="Save this chart as an image" aria-label="Save the chart as a PNG image"></button><button type="button" class="ch-b ch-bell" title="Price alert (notifies this device) · tip: right-click the chart to set one at that price" aria-label="Set a price alert"></button><button type="button" class="ch-b ch-fit" title="Fit the chart (double-click the chart)" aria-label="Fit the ${tf.label} chart"></button><button type="button" class="ch-b ch-fs" title="Full screen" aria-label="Show the ${tf.label} chart full screen"></button>`;
         ph.appendChild(tl);
         tl.querySelector('.ch-fit').addEventListener('click', () => P.fit());
         tl.querySelector('.ch-snap').addEventListener('click', () => P.snapshot());
         tl.querySelector('.ch-rp').addEventListener('click', (e) => { P.replay(!P.rp); e.currentTarget.classList.toggle('on', !!P.rp); e.currentTarget.setAttribute('aria-pressed', String(!!P.rp)); });
+        tl.querySelector('.ch-pos').addEventListener('click', () => P.posTool && P.posTool());
         tl.querySelector('.ch-fib').addEventListener('click', () => P.fibTool && P.fibTool());
         tl.querySelector('.ch-hl').addEventListener('click', (e) => { const on = !P.hlOn; P.hlOn = on; e.currentTarget.classList.toggle('on', on); e.currentTarget.setAttribute('aria-pressed', String(on)); el.classList.toggle('measuring', on || !!P.measureOn); });
         { const tv = tl.querySelector('.ch-tv'); tv.href = tvUrl(CUR, tf); tv.addEventListener('click', () => { tv.href = tvUrl(CUR, tf); window.msTrack && msTrack('Open TradingView', { tf: tf.id }); }); }
@@ -3627,6 +3628,29 @@ function msNextSetup(bars, A) {
         A = null; P.fibOn = false; mark(false); P.drawFib(); });
       addEventListener('keydown', (ev) => { if (ev.key === 'Escape' && P.fibOn) { P.fibOn = false; A = null; mark(false); } });
       setTimeout(() => P.drawFib(), 0); }
+    // position tool (7 Nov loop): click entry, then stop; draws entry / stop / 1R / 2R lines with the size for the risk setting
+    { const QK = `ms-pos-${instKey}-${tf.id}`; P._pos = []; let E = null;
+      const btn = () => el.closest('.ms-pane') && el.closest('.ms-pane').querySelector('.ch-pos');
+      const mark = (on) => { const b = btn(); if (b) { b.classList.toggle('on', on); b.setAttribute('aria-pressed', String(on)); } el.classList.toggle('measuring', on || !!P.measureOn || !!P.hlOn || !!P.fibOn); };
+      P.drawPos = function () { P._pos.forEach((l) => { try { series.removePriceLine(l); } catch (e) {} }); P._pos = []; let q = null; try { q = JSON.parse(localStorage.getItem(QK) || 'null'); } catch (e) {} if (!q) return;
+        const [en, st] = q, r = Math.abs(en - st), buy = en > st, d = buy ? 1 : -1; let sz = ''; try { sz = sizeText(r, en); } catch (e) {}
+        const pct = (v) => `${(Math.abs(v - en) / en * 100).toFixed(2)}%`;
+        P._pos.push(series.createPriceLine({ price: en, color: '#2962ff', lineWidth: 2, lineStyle: LW.LineStyle.Solid, axisLabelVisible: true, title: `${buy ? '▲ Long' : '▼ Short'} · ${sz}` }));
+        P._pos.push(series.createPriceLine({ price: st, color: '#f23645', lineWidth: 2, lineStyle: LW.LineStyle.Solid, axisLabelVisible: true, title: `Stop −1R · ${fmt(r)} (${pct(st)})` }));
+        P._pos.push(series.createPriceLine({ price: en + d * r, color: 'rgba(8,153,129,.6)', lineWidth: 1, lineStyle: LW.LineStyle.Dashed, axisLabelVisible: false, title: '1R' }));
+        P._pos.push(series.createPriceLine({ price: en + d * 2 * r, color: '#089981', lineWidth: 2, lineStyle: LW.LineStyle.Solid, axisLabelVisible: true, title: `Target +2R · ${pct(en + d * 2 * r)}` })); };
+      P.posTool = function () { let has = false; try { has = !!localStorage.getItem(QK); } catch (e) {}
+        if (P.posOn) { P.posOn = false; E = null; mark(false); return; }
+        if (has) { try { localStorage.removeItem(QK); } catch (e) {} P.drawPos(); return; }
+        if (P.fibOn && P.fibTool) P.fibTool(); if (P.hlOn) { const h = el.closest('.ms-pane') && el.closest('.ms-pane').querySelector('.ch-hl'); if (h) h.click(); }
+        P.posOn = true; E = null; mark(true); };
+      el.addEventListener('click', (ev) => { if (!P.posOn || ev.altKey) return; if (ev.target.closest && ev.target.closest('.ch-tools')) return;
+        const rc = el.getBoundingClientRect(), pr = series.coordinateToPrice(ev.clientY - rc.top); if (pr == null || !isFinite(pr)) return;
+        if (E == null) { E = pr; return; } if (Math.abs(pr - E) < 1e-9) return;
+        try { localStorage.setItem(QK, JSON.stringify([+E.toFixed(INST.dec + 1), +pr.toFixed(INST.dec + 1)])); } catch (e) {}
+        E = null; P.posOn = false; mark(false); P.drawPos(); });
+      addEventListener('keydown', (ev) => { if (ev.key === 'Escape' && P.posOn) { P.posOn = false; E = null; mark(false); } });
+      setTimeout(() => P.drawPos(), 0); }
     // bar replay (7 Nov loop): hide everything after a chosen candle and step forward one bar at a time (practice reading the chart)
     { const bar = document.createElement('div'); bar.className = 'rp-bar'; bar.hidden = true;
       bar.innerHTML = '<button type="button" data-rp="-1" aria-label="One candle back">◀</button><button type="button" data-rp="play" aria-label="Play">▶</button><button type="button" data-rp="1" aria-label="One candle forward">▶|</button><span class="rp-t"></span><button type="button" data-rp="x" aria-label="Exit replay">Exit</button>';
@@ -7802,6 +7826,7 @@ function gpStats(T) {
 .rp-bar button { height: 30px; min-width: 34px; padding: 0 10px; border-radius: 7px; border: 1px solid var(--line); background: var(--bg); color: var(--ink); font: inherit; font-size: 12.5px; font-weight: 600; cursor: pointer; }
 .rp-bar button:hover { border-color: var(--accent); }
 .rp-bar .rp-t { padding: 0 8px; font-size: 12px; color: var(--ink-dim); white-space: nowrap; font-variant-numeric: tabular-nums; }
+.ch-pos { --i: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linejoin='round'%3E%3Crect x='4' y='4' width='16' height='9' rx='1'/%3E%3Crect x='4' y='13' width='16' height='7' rx='1' stroke-dasharray='2 2'/%3E%3C/svg%3E"); }
 .ch-fib { --i: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round'%3E%3Cpath d='M3 5h18M3 10h18M3 14h18M3 19h18' stroke-dasharray='0'/%3E%3Cpath d='M5 19 19 5' stroke-width='1.4'/%3E%3C/svg%3E"); }
 .ch-hl { --i: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round'%3E%3Cpath d='M3 12h18'/%3E%3Ccircle cx='12' cy='12' r='2.2' fill='black'/%3E%3C/svg%3E"); }
 .tv-tk { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; margin: 8px 0 0; padding: 10px 12px; border: 1px solid color-mix(in srgb, var(--accent) 30%, var(--line)); border-radius: 10px; background: color-mix(in srgb, var(--accent) 6%, transparent); font-size: 12.5px; }
