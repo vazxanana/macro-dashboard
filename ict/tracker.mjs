@@ -50,12 +50,19 @@ async function yahoo(sym, interval, range) {
 // since 4 Nov 2026 (429), so CNBC is first and Yahoo the fallback.
 const nyFmt = new Intl.DateTimeFormat('en-US', { timeZone: 'America/New_York', year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', hourCycle: 'h23' });
 const etStamp = (t) => { const o = {}; for (const p of nyFmt.formatToParts(new Date(t * 1000))) o[p.type] = p.value; return `${o.year}${o.month}${o.day}${o.hour}${o.minute}00`; };
+// CME halt (17:00-18:00 New York) for all five markets; CNBC still prints into it (Friday settlement ticks, and the bar that
+// straddles the 18:00 reopen), which made a fake H1 candle each day
+const etH = new Intl.DateTimeFormat('en-US', { timeZone: 'America/New_York', hour: 'numeric', hourCycle: 'h23' });
+export const inHalt = (t) => +etH.format(new Date(t * 1000)) % 24 === 17;
 export async function cnbcBars(sym, iv, from, to) {
+  // audit (7 Nov): CNBC anchors intraday bars at the request's start minute (a run at hh:37 got 5m bars at :02/:07/...),
+  // so H1 candles built from them were shifted and changed from run to run; start on the hour
+  if (iv !== '1D') from = Math.floor(from / 3600) * 3600;
   const r = await fetch(`https://ts-api.cnbc.com/harmony/app/bars/${encodeURIComponent(sym)}/${iv}/${etStamp(from)}/${etStamp(to)}/adjusted/EST5EDT.json`, { headers: { 'User-Agent': UA, Accept: 'application/json' }, signal: AbortSignal.timeout(30000) });
   const j = await r.json().catch(() => null), pb = j && j.barData && j.barData.priceBars;
   if (!pb || !pb.length) throw new Error(`CNBC ${sym} ${iv}: ${(j && j.statusMessage) || `HTTP ${r.status}`}`);
   const out = [];
-  for (const b of pb) { const o = +b.open, h = +b.high, l = +b.low, c = +b.close, t = Math.round(+b.tradeTimeinMills / 1000); if ([o, h, l, c, t].every((v) => isFinite(v) && v > 0)) out.push({ time: t, open: o, high: Math.max(h, o, c), low: Math.min(l, o, c), close: c }); }
+  for (const b of pb) { const o = +b.open, h = +b.high, l = +b.low, c = +b.close, t = Math.round(+b.tradeTimeinMills / 1000); if ([o, h, l, c, t].every((v) => isFinite(v) && v > 0) && (iv === '1D' || !inHalt(t))) out.push({ time: t, open: o, high: Math.max(h, o, c), low: Math.min(l, o, c), close: c }); }
   return out.sort((a, b) => a.time - b.time);
 }
 export const agg = (bars, sec) => { const m = new Map(); for (const b of bars) { const k = Math.floor(b.time / sec) * sec, c = m.get(k); if (!c) m.set(k, { time: k, open: b.open, high: b.high, low: b.low, close: b.close }); else { c.high = Math.max(c.high, b.high); c.low = Math.min(c.low, b.low); c.close = b.close; } } return [...m.values()].sort((a, b) => a.time - b.time); };
@@ -65,13 +72,13 @@ async function feed(M) {
     try {
       let m5 = [];
       for (let t = now - 24 * 86400; t < now; t += 6 * 86400) { m5 = m5.concat(await cnbcBars(sym, '5M', t, Math.min(now + 300, t + 6 * 86400))); await sleep(400); }
-      const seen = new Set(); m5 = m5.filter((b) => !seen.has(b.time) && seen.add(b.time)).sort((a, b) => a.time - b.time);
+      { const by = new Map(); for (const b of m5) by.set(b.time, b); m5 = [...by.values()].sort((a, b) => a.time - b.time); }   // the later (fuller) copy of a bar wins
       const d1 = await cnbcBars(sym, '1D', now - 400 * 86400, now + 86400);
       if (m5.length > 500 && d1.length > 60) return { src: `cnbc ${sym}`, h1: agg(m5, 3600), d1, m5: m5.filter((b) => b.time >= now - 5 * 86400) };
     } catch (e) { console.log(String(e.message || e)); }
   }
   const [h1, d1, m5] = [await yahoo(M.sym, '60m', '60d'), await yahoo(M.sym, '1d', '1y'), await yahoo(M.sym, '5m', '5d')];
-  return { src: `yahoo ${M.sym}`, h1: h1.bars, d1: d1.bars, m5: m5.bars };
+  return { src: `yahoo ${M.sym}`, h1: h1.bars.filter((b) => !inHalt(b.time)), d1: d1.bars, m5: m5.bars.filter((b) => !inHalt(b.time)) };
 }
 const load = (f, d) => { try { return JSON.parse(fs.readFileSync(path.join(DATA, f), 'utf8')); } catch (e) { return d; } };
 const save = (f, v) => fs.writeFileSync(path.join(DATA, f), JSON.stringify(v, null, f === 'trades.json' ? 0 : 1));
@@ -169,25 +176,33 @@ async function main() {
   const trades = load('trades.json', []), snap = { at: new Date().toISOString(), markets: {}, errors: {}, model: { ...P, name: 'H1 iFVG reversal' } }, bars = {};
   for (const [key, M] of Object.entries(MARKETS)) {
     try {
-      const F = await feed(M), m5 = { bars: F.m5 };
-      const H = F.h1.filter((b) => b.time + 3600 <= now), D = F.d1.filter((b) => b.time + 86400 <= now), price = F.m5.length ? F.m5.at(-1).close : F.h1.at(-1).close;
+      const F = await feed(M), price = F.m5.length ? F.m5.at(-1).close : F.h1.at(-1).close;
+      // audit (7 Nov): CNBC's last bar is still forming (and the feed runs ~10 min behind), so a candle counts as closed only
+      // once the feed has a later bar, or the last bar is 20+ min old (session halt, weekend). Before, an H1 candle could be
+      // "closed" on part of its 5m bars and a forming 5m bar was managed once and then skipped for good.
+      const done = F.m5.filter((b, i, A) => b.time + 300 <= now && (i < A.length - 1 || now - (b.time + 300) >= 1200));
+      const frontier = done.length ? done.at(-1).time + 300 : now, m5 = { bars: done };
+      const H = F.h1.filter((b) => b.time + 3600 <= Math.min(now, frontier)), D = F.d1.filter((b) => b.time + 86400 <= now);
       const f = (v) => +(+v).toFixed(M.dec);
       // 1. manage open trades on 5m candles
       for (const tr of trades.filter((x) => x.market === key && x.status === 'open')) {
         const s = tr.side === 'buy' ? 1 : -1;
-        for (const b of m5.bars.filter((b) => b.time >= tr.checked && b.time + 300 <= now)) {
+        // time exit after P.holdH closed H1 candles since the signal (trading hours, not clock hours: weekends don't count). Audit:
+        // the exit is at the close of the 36th candle and nothing after it is managed (it used the price at run time before)
+        const hold = H.filter((b) => b.time >= (tr.signalAt || tr.opened)), endT = hold.length >= P.holdH ? hold[P.holdH - 1].time + 3600 : Infinity;
+        for (const b of m5.bars.filter((b) => b.time >= tr.checked && b.time < endT)) {
           if (!tr.mark2 && (s > 0 ? b.high >= tr.t2 : b.low <= tr.t2)) tr.mark2 = b.time + 300;
           tr.mfe = Math.max(tr.mfe || 0, +(((s > 0 ? b.high : -b.low) - s * tr.entry) / tr.r0).toFixed(2));
           if (s > 0 ? b.low <= tr.stop : b.high >= tr.stop) { const Rraw = +((s * (tr.stop - tr.entry)) / tr.r0).toFixed(2), R = +(Rraw * (tr.size || 1)).toFixed(2);
             Object.assign(tr, { status: Rraw > 0.001 ? 'win' : Rraw < -0.001 ? 'loss' : 'be', R, Rraw, exitPx: tr.stop, closed: b.time + 300, exit: tr.trailMoved ? 'trail' : tr.beMoved ? 'breakeven' : 'stop' }); break; }
-          if (tr.t1 != null && (s > 0 ? b.high >= tr.t1 : b.low <= tr.t1)) { Object.assign(tr, { status: 'win', R: P.rr, exitPx: tr.t1, closed: b.time + 300, exit: 'target' }); break; }
+          if (tr.t1 != null && (s > 0 ? b.high >= tr.t1 : b.low <= tr.t1)) { const Rraw = +((s * (tr.t1 - tr.entry)) / tr.r0).toFixed(2);   // older records with a fixed target; sized like every other exit
+            Object.assign(tr, { status: 'win', R: +(Rraw * (tr.size || 1)).toFixed(2), Rraw, exitPx: tr.t1, closed: b.time + 300, exit: 'target' }); break; }
           if (tr.be && !tr.beMoved && tr.mfe >= tr.be && (tr.entry - tr.stop) * s > 0) { tr.stop = tr.entry; tr.beMoved = true; }   // break-even from +1.5R (index futures)
           if (tr.trail && tr.mfe >= tr.trail[0]) { const ns = f(tr.entry + s * (tr.mfe - tr.trail[1]) * tr.r0); if ((ns - tr.stop) * s > 0) { tr.stop = ns; tr.trailMoved = true; } }   // trail from +2R, 1.5R behind the best
           tr.checked = b.time + 300;
         }
-        // time exit after P.holdH closed H1 candles since the signal (trading hours, not clock hours: weekends don't count)
-        if (tr.status === 'open' && H.filter((b) => b.time >= (tr.signalAt || tr.opened)).length >= P.holdH) { const Rraw = +((s * (price - tr.entry)) / tr.r0).toFixed(2), R = +(Rraw * (tr.size || 1)).toFixed(2);
-          Object.assign(tr, { status: Rraw > 0 ? 'win' : Rraw < 0 ? 'loss' : 'be', R, Rraw, exitPx: f(price), closed: now, exit: 'time' }); }
+        if (tr.status === 'open' && endT !== Infinity) { const px = hold[P.holdH - 1].close, Rraw = +((s * (px - tr.entry)) / tr.r0).toFixed(2), R = +(Rraw * (tr.size || 1)).toFixed(2);
+          Object.assign(tr, { status: Rraw > 0 ? 'win' : Rraw < 0 ? 'loss' : 'be', R, Rraw, exitPx: f(px), closed: endT, exit: 'time' }); }
         if (tr.closed) tr.R2 = tr.mark2 && (!tr.closed || tr.mark2 <= tr.closed) ? +(2 * (tr.size || 1)).toFixed(2) : tr.R;   // the 2R-target variant
       }
       // 2. new signals: an inversion candle closed in the last 3 h, not yet recorded, no open trade on this market
@@ -200,7 +215,7 @@ async function main() {
         const s = g.side, entry = f(price), r0 = Math.abs(entry - g.stop);
         if ((entry - g.stop) * s <= 0 || r0 > 1.6 * g.r0) continue;   // price already through the stop, or ran far from the signal
         trades.push({ id, market: key, label: M.label, short: M.short, side: s > 0 ? 'buy' : 'sell', model: 'H1 iFVG reversal', signalAt: g.close, signalPx: f(g.entry),
-          entry, stop: f(g.stop), r0: +r0.toFixed(M.dec + 1), t1: null, trail: P.trail, be: M.aRule ? null : P.be, stop0: f(g.stop), t2: f(entry + s * P.mark * r0), opened: now, checked: now, status: 'open', R: null, size: aset ? sizeOf(g, key) : 1,
+          entry, stop: f(g.stop), r0: +r0.toFixed(M.dec + 1), t1: null, trail: P.trail, be: M.aRule ? null : P.be, stop0: f(g.stop), t2: f(entry + s * P.mark * r0), opened: now, checked: frontier, status: 'open', R: null, size: aset ? sizeOf(g, key) : 1,
           sweep: { t: g.sweepT, level: f(g.swept) }, fvg: g.fvg.map(f), ih: g.ih == null ? null : f(g.ih), dol: g.dol == null ? null : f(g.dol), valid: g.valid,
           feat: g.feat, grade: { ...g.grade, letter: letter(g.grade.total) }, aset, aplus: isAPlus(g, key) });
       }

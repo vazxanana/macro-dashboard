@@ -2225,6 +2225,136 @@ html[data-motion="off"][data-gate] .gate-bg path[stroke] { animation: none; stro
 .gate-side { position: relative; isolation: isolate; }
 .gate-side::before { content: ""; position: absolute; inset: -70px -60px -50px -80px; z-index: -1; background: radial-gradient(closest-side, rgba(7,7,10,.82), rgba(7,7,10,.55) 60%, transparent); pointer-events: none; }
 @media (max-width: 900px) { .gate-side::before { display: none; } }
+
+/* ═══ ICT desk design pass (7 Nov): what is open now first, then results by market and session, then history.
+   Scoped to #v-ict. Gold stays the brand accent for on-states; a violet tag (the ICT markup colour on the charts) marks
+   this as its own desk. Light theme gets deeper gold / green / red inks so text clears 4.5:1 on white. */
+#v-ict { --ict-gold-ink: var(--gold); --ict-up: var(--buy); --ict-dn: var(--sell); --ict-line-a: var(--gold);
+  --ict-desk: #b9a4ff; --ict-desk-soft: rgba(167,139,250,.12); --ict-desk-line: rgba(167,139,250,.36); font-variant-numeric: tabular-nums; }
+:root[data-theme="light"] #v-ict { --ict-gold-ink: #835c00; --ict-up: #067a66; --ict-dn: #c42038; --ict-line-a: #a77700;
+  --ict-desk: #6a3fc4; --ict-desk-soft: rgba(106,63,196,.07); --ict-desk-line: rgba(106,63,196,.3); }
+#v-ict .pos { color: var(--ict-up) !important; } #v-ict .neg { color: var(--ict-dn) !important; }
+#v-ict .ms-chip-buy { color: var(--ict-up); } #v-ict .ms-chip-sell { color: var(--ict-dn); }
+#v-ict .ict-h { margin: 0; font: 600 15px/1.3 var(--sans); color: var(--ink); letter-spacing: 0; text-transform: none; }
+#v-ict .ms-k { align-items: baseline; margin-bottom: 12px; }
+/* header: title + desk tag, labelled segmented controls */
+#v-ict .ict-head { align-items: flex-start; gap: 14px 24px; }
+#v-ict .ict-title { flex: 1 1 420px; min-width: 0; }
+#v-ict .ict-tag { display: inline-block; vertical-align: 4px; margin-left: 8px; padding: 2px 9px; border-radius: 999px; font: 600 11.5px/1.4 var(--sans); color: var(--ict-desk); background: var(--ict-desk-soft); border: 1px solid var(--ict-desk-line); white-space: nowrap; }
+#v-ict .ict-hr { display: grid; gap: 8px; justify-items: end; }
+#v-ict .ict-me b { color: var(--ict-gold-ink); }
+#v-ict .ict-ctl { display: flex; align-items: center; gap: 10px; }
+#v-ict .ict-ctl-l { font: 500 12px var(--sans); color: var(--ink-dim); }
+#v-ict .ict-seg.ict-src { gap: 2px; padding: 3px; border: 1px solid var(--line); border-radius: 10px; background: var(--panel); flex-wrap: nowrap; }
+#v-ict .ict-src button { border: 0; background: transparent; min-height: 32px; padding: 4px 12px; border-radius: 7px; color: var(--ink-dim); font: 600 12.5px var(--sans); transition: background-color .15s ease-out, color .15s ease-out; }
+#v-ict .ict-src button:hover { color: var(--ink); background: var(--panel-raised); }
+#v-ict .ict-src button.on { background: var(--gold); color: #17130a; }
+/* session clock: the live kill zone also carries a dot, not only colour */
+#v-ict .ict-clock { gap: 6px 8px; margin-top: -4px; }
+#v-ict .ict-clock .kz.on { color: var(--ict-gold-ink); }
+#v-ict .ict-clock .kz.on::before { content: ""; display: inline-block; width: 6px; height: 6px; border-radius: 50%; background: currentColor; margin-right: 6px; vertical-align: 1px; }
+/* 1 · now: open signals beside the live forward test */
+#v-ict .ict-now { display: grid; grid-template-columns: minmax(0, 1.65fr) minmax(0, 1fr); gap: var(--sp-4, 16px); align-items: stretch; }
+#v-ict .ict-open-c:has(li[data-id]) { border-color: var(--gold-line); }
+#v-ict .ict-open { gap: 10px; }
+#v-ict .ict-open li { padding: 12px 14px; gap: 8px; border-radius: 12px; background: var(--panel-raised); transition: border-color .15s ease-out; }
+#v-ict .ict-open li.empty { background: none; border-style: dashed; padding: 16px; line-height: 1.5; }
+#v-ict .ict-open .r1 { gap: 6px 8px; }
+#v-ict .ict-open .r1 .live { font: 700 18px var(--mono); letter-spacing: -.01em; }
+#v-ict .ict-open .r2 { font: 500 12.5px var(--sans); color: var(--ink-dim); line-height: 1.5; }
+#v-ict .ict-bar { height: 6px; background-color: var(--line); background-image: linear-gradient(90deg, transparent calc(25% - 1px), var(--ink-faint) calc(25% - 1px) 25%, transparent 25% calc(75% - 1px), var(--ink-faint) calc(75% - 1px) 75%, transparent 75%); }   /* ticks at the entry (0R) and +2R */
+#v-ict .ict-bar i { background: var(--gold); opacity: .9; }
+#v-ict .ict-fwd { grid-template-columns: minmax(0, 1fr); align-content: start; gap: 8px; }
+#v-ict .ict-fwd .t { font: 600 15px var(--sans); margin-bottom: 2px; }
+#v-ict .ict-fwd .row { display: grid; gap: 0; }
+#v-ict .ict-fwd .row > span { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; padding: 8px 0; border-bottom: 1px solid var(--line-soft); color: var(--ink-dim); font-size: 13px; }
+#v-ict .ict-fwd .row b { font: 600 13px var(--sans); color: var(--ink); text-align: right; }
+#v-ict .ict-fwd .msg { font-size: 12.5px; line-height: 1.55; color: var(--ink-dim); margin-top: 4px; }
+/* markets: a quiet quote strip */
+#v-ict .ict-mkts { grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 10px; }
+#v-ict .ict-m { padding: 12px 14px; gap: 3px; }
+#v-ict .ict-m .px { font: 600 18px var(--mono); letter-spacing: -.01em; margin: 2px 0; }
+#v-ict .ict-m .sub { font-size: 12px; }
+/* 2 · results: a ledger of the totals next to the equity curve (no hero-number tiles) */
+#v-ict .ict-res-g { display: grid; grid-template-columns: minmax(250px, 330px) minmax(0, 1fr); gap: 16px 32px; align-items: start; }
+#v-ict .ict-kpi { display: grid; grid-template-columns: minmax(0, 1fr); gap: 0; background: none; border: 0; border-radius: 0; overflow: visible; }
+#v-ict .ict-kpi > div { background: none; padding: 9px 0; display: grid; grid-template-columns: minmax(0, 1fr) auto; grid-template-areas: "k v" "s v"; column-gap: 16px; row-gap: 1px; align-items: center; border-bottom: 1px solid var(--line-soft); }
+#v-ict .ict-kpi > div:first-child { padding-top: 0; } #v-ict .ict-kpi > div:last-child { border-bottom: 0; padding-bottom: 0; }
+#v-ict .ict-kpi span { grid-area: k; font: 600 13px var(--sans); color: var(--ink); }
+#v-ict .ict-kpi small { grid-area: s; font: 500 12px var(--sans); color: var(--ink-faint); }
+#v-ict .ict-kpi b { grid-area: v; font: 600 17px var(--mono); text-align: right; color: var(--ink); }
+#v-ict .ict-eq-w { min-width: 0; }
+#v-ict .ict-eq-l { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 4px 14px; font: 500 12px var(--sans); color: var(--ink-faint); margin-bottom: 8px; }
+#v-ict .ict-eq svg { height: 230px; }
+#v-ict .ict-eq path:nth-of-type(1) { stroke-dasharray: 5 4; }          /* fixed 2R: dashed, so the two lines differ by more than colour */
+#v-ict .ict-eq path:nth-of-type(2) { stroke: var(--ict-line-a); }
+#v-ict .ict-sw { width: 14px; margin: 0 6px 0 2px; } #v-ict .ict-sw.a { background: var(--ict-line-a); }
+#v-ict .ict-sw.b { background: repeating-linear-gradient(90deg, #6f8fd6 0 5px, transparent 5px 8px); }
+/* what works: market and session lead */
+#v-ict .ict-break { grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 22px 32px; }
+#v-ict .ict-break table:nth-child(1) { order: -2; } #v-ict .ict-break table:nth-child(4) { order: -1; }
+#v-ict .ict-break caption { font: 600 13px var(--sans); padding-bottom: 8px; }
+#v-ict .ict-break td, #v-ict .ict-break th { padding: 6px; }
+#v-ict .ict-break th { color: var(--ink-faint); font: 500 12px var(--sans); }
+#v-ict .ict-break td.neg .bar { background-image: repeating-linear-gradient(135deg, transparent 0 2px, rgba(0,0,0,.4) 2px 3.5px); }   /* losing rows hatched */
+/* 3 · history: calendar and the signal log */
+#v-ict .ict-cal-nav .ms-tbtn { min-width: 36px; min-height: 36px; font-size: 16px; }
+#v-ict .ict-cal-d[disabled] { opacity: 1; } #v-ict .ict-cal-d[disabled] .d { color: var(--ink-faint); }
+#v-ict .ict-cal-d .d { color: var(--ink-dim); }
+#v-ict .ict-cal-d.up b, #v-ict .ict-cal-d.dn b { color: var(--ink); font-weight: 700; } #v-ict .ict-cal-d.up small, #v-ict .ict-cal-d.dn small { color: var(--ink-dim); }   /* the signed value carries win / loss; the tint backs it up */
+#v-ict .ict-cal-d.today .d { color: var(--ict-gold-ink); }
+:root[data-theme="light"] #v-ict .ict-cal-d.up { background: color-mix(in srgb, #089981 calc(6% + var(--heat) * 20%), var(--panel)); }
+:root[data-theme="light"] #v-ict .ict-cal-d.dn { background: color-mix(in srgb, #f23645 calc(6% + var(--heat) * 18%), var(--panel)); }
+#v-ict .ict-cal-day li { min-height: 44px; transition: border-color .15s ease-out; }
+#v-ict .ict-t td { height: 44px; }
+#v-ict .ict-t tbody tr:not(.empty):focus-visible { outline-offset: -2px; }
+#v-ict .ict-g.ga, #v-ict .ict-tags button.on, #v-ict .ict-cal-d .tk { color: var(--ict-gold-ink); }
+#v-ict .ict-ck li.y { color: var(--ict-up); } #v-ict .ict-ck li.n { color: var(--ict-dn); }
+@media (max-width: 1000px) {
+  #v-ict .ict-now, #v-ict .ict-res-g { grid-template-columns: minmax(0, 1fr); }
+  #v-ict .ict-mkts { grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); }
+}
+@media (max-width: 700px) {
+  #v-ict .ict-hr { justify-items: stretch; width: 100%; }
+  #v-ict .ict-ctl { display: grid; gap: 4px; }
+  #v-ict #ict-src { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  #v-ict #ict-flt { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  #v-ict .ict-tag { vertical-align: 3px; }
+  /* markets: one swipeable row instead of three rows of tiles */
+  #v-ict .ict-mkts { grid-template-columns: none; grid-auto-flow: column; grid-auto-columns: minmax(150px, 44%); overflow-x: auto; scroll-snap-type: x mandatory; padding-bottom: 4px; overscroll-behavior-x: contain; }
+  #v-ict .ict-m { scroll-snap-align: start; }
+  /* the signal log as two-line rows: market · side · grade · result, then time · session · entry */
+  #v-ict .ict-tw { max-height: 70vh; }
+  #v-ict .ict-t, #v-ict .ict-t tbody { display: block; width: 100%; min-width: 0; }
+  #v-ict .ict-eq svg { height: 170px; }
+  #v-ict .ict-cal-d { padding: 4px 3px; } #v-ict .ict-cal-d b { font-size: 10px; letter-spacing: -.02em; overflow: hidden; }
+  #v-ict .ict-open .r1 .live { font-size: 16px; }
+  #v-ict .ict-t thead { display: none; }
+  #v-ict .ict-t tr { display: grid; grid-template-columns: auto auto minmax(0, 1fr) auto; grid-template-areas: "mk sd gr rs" "tm tm se en" "rv rv rv rv"; gap: 4px 8px; align-items: center; padding: 10px 12px; border-bottom: 1px solid var(--line-soft); min-height: 44px; }
+  #v-ict .ict-t td { display: block; height: auto; padding: 0 !important; border: 0 !important; position: static !important; box-shadow: none !important; background: none !important; white-space: nowrap; font-size: 12.5px; min-width: 0; }
+  #v-ict .ict-t td:nth-child(1) { grid-area: tm; color: var(--ink-faint); font-family: var(--sans); }
+  #v-ict .ict-t td:nth-child(2) { grid-area: mk; font-size: 14px; }
+  #v-ict .ict-t td:nth-child(3) { grid-area: sd; }
+  #v-ict .ict-t td:nth-child(4) { grid-area: gr; overflow: hidden; text-overflow: ellipsis; }
+  #v-ict .ict-t td:nth-child(5) { grid-area: se; color: var(--ink-dim); font-family: var(--sans); }
+  #v-ict .ict-t td:nth-child(8) { grid-area: en; text-align: right; color: var(--ink-dim); }
+  #v-ict .ict-t td:nth-child(8)::before { content: "Entry "; font-family: var(--sans); color: var(--ink-faint); }
+  #v-ict .ict-t td:nth-child(11) { grid-area: rs; text-align: right; font-weight: 600; }
+  #v-ict .ict-t td:nth-child(12) { grid-area: rv; }
+  #v-ict .ict-t td:nth-child(12):has(> .ms-note), #v-ict .ict-t td:nth-child(6), #v-ict .ict-t td:nth-child(7), #v-ict .ict-t td:nth-child(9), #v-ict .ict-t td:nth-child(10) { display: none; }
+  #v-ict .ict-t tr.empty { display: block; } #v-ict .ict-t tr.empty td { white-space: normal; padding: 18px 4px !important; }
+  #v-ict .ict-f { width: 100%; } #v-ict .ict-f select { flex: 1; min-width: 0; }
+  #v-ict .ms-k:has(.ict-f) { flex-wrap: wrap; }
+}
+/* touch: 44px targets */
+@media (pointer: coarse), (max-width: 700px) {
+  #v-ict .ict-src button, #v-ict .ict-seg button, #v-ict .ict-tv-tf button, #v-ict .ict-tags button, #v-ict .ms-tbtn, #v-ict select, #v-ict summary, #v-ict .u-btn { min-height: 44px; }
+  #v-ict .ict-cal-nav .ms-tbtn, #v-ict .tv-x { min-width: 44px; min-height: 44px; }
+  #v-ict summary { display: flex; align-items: center; }
+}
+@media (prefers-reduced-motion: reduce) { #v-ict *, #v-ict *::before, #v-ict *::after { transition: none !important; animation: none !important; } #v-ict .ict-cal-d:hover, #v-ict .ict-m:hover { transform: none !important; } }
+html[data-motion="off"] #v-ict *, html[data-motion="off"] #v-ict *::before, html[data-motion="off"] #v-ict *::after { transition: none !important; animation: none !important; }
+html[data-motion="off"] #v-ict .ict-cal-d:hover { transform: none !important; }
 </style>
 <script>try{if(localStorage.getItem('msMotion')==='off')document.documentElement.dataset.motion='off'}catch(e){}</script>
 <!-- Vercel Web Analytics + Speed Insights (cookie-free; only on the Vercel site, not on GitHub Pages or a local copy) -->
@@ -2390,7 +2520,7 @@ html[data-motion="off"][data-gate] .gate-bg path[stroke] { animation: none; stro
     <nav class="h-quick" aria-label="Jump to"><a href="#council/calendar">Calendar</a><a href="#council/overview">Active trades</a><a href="#council/trades">All trades</a><a href="#council/review" class="adm">Loss review</a><a href="#council/systems" class="adm">Systems</a><a href="#council/research" class="adm">Research</a><a href="#journal">Journal</a></nav>
     <div class="h-warn" id="h-warn" role="alert" hidden></div>
     <div class="h-today" id="h-today" role="group" aria-label="Results today"></div>
-    <section class="h-mk" id="h-mk" aria-label="Markets now" hidden><div class="h-mk-h"><h2>Markets now</h2><span class="h-mk-k">last 24 hours · tap to chart</span></div><div class="h-mk-row" id="h-mk-row"></div></section>
+    <section class="h-mk" id="h-mk" aria-label="Markets now" hidden><div class="h-mk-h"><h2>Markets now</h2><span class="h-mk-k">% vs prior day's close (UTC) · line 24 h</span></div><div class="h-mk-row" id="h-mk-row"></div></section>
     <section class="h-pulse adm" id="h-pulse" aria-label="Market pulse" hidden><div class="h-pulse-h"><h2>Market pulse</h2><span class="h-pulse-k">trend on D1 · H4 · H1, strongest first</span></div><div class="h-pulse-row" id="h-pulse-row"></div></section>
     <div class="h-grid">
       <div class="h-main">
@@ -2709,34 +2839,38 @@ html[data-motion="off"][data-gate] .gate-bg path[stroke] { animation: none; stro
   </section>
   <section class="view ictx" id="v-ict" aria-label="ICT desk" hidden>
     <div class="v-head ict-head">
-      <div><h1 class="h-head">ICT desk</h1><p class="ms-note">US index futures · H1 iFVG reversal (sweep → inversion → trail from +2R). A separate edge from the council. <span id="ict-run"></span></p></div>
-      <div class="ict-hr"><div class="ict-me" id="ict-me"></div><div class="ict-seg ict-src" id="ict-src" role="group" aria-label="Which signals"><button type="button" data-s="both" class="on">Both</button><button type="button" data-s="live">Live</button><button type="button" data-s="replay">Replay</button></div><div class="ict-seg ict-src" id="ict-flt" role="group" aria-label="Which setups"><button type="button" data-f="ap" title="A-setups with a strong inversion candle (body at least 60% of its range), not in the NY afternoon">A+</button><button type="button" data-f="a" class="on" title="Against the daily bias and grade B+ or better">A-setups</button><button type="button" data-f="all">All signals</button><button type="button" data-f="pick" title="A-setups, one bet per cluster: when several indices give the same-side setup within 3 hours, only the highest grade">One per cluster</button></div></div>
+      <div class="ict-title"><h1 class="h-head">ICT desk <span class="ict-tag">Paper desk</span></h1><p class="ms-note">US index futures and gold · H1 iFVG reversal (sweep → inversion → trail from +2R). A separate edge from the council. <span id="ict-run"></span></p></div>
+      <div class="ict-hr"><div class="ict-me" id="ict-me"></div>
+        <div class="ict-ctl"><span class="ict-ctl-l" aria-hidden="true">Source</span><div class="ict-seg ict-src" id="ict-src" role="group" aria-label="Which signals"><button type="button" data-s="both" class="on">Both</button><button type="button" data-s="live">Live</button><button type="button" data-s="replay">Replay</button></div></div>
+        <div class="ict-ctl"><span class="ict-ctl-l" aria-hidden="true">Setups</span><div class="ict-seg ict-src" id="ict-flt" role="group" aria-label="Which setups"><button type="button" data-f="ap" title="A-setups with a strong inversion candle (body at least 60% of its range), not in the NY afternoon">A+</button><button type="button" data-f="a" class="on" title="Against the daily bias and grade B+ or better">A-setups</button><button type="button" data-f="all">All signals</button><button type="button" data-f="pick" title="A-setups, one bet per cluster: when several indices give the same-side setup within 3 hours, only the highest grade">One per cluster</button></div></div></div>
     </div>
-    <div class="ict-clock" id="ict-clock" aria-live="polite"></div>
-    <div class="ict-mkts" id="ict-mkts" role="list" aria-label="Markets"></div>
-    <div class="ict-kpi" id="ict-kpi" role="group" aria-label="Results"></div>
-    <div class="card ict-card ict-fwd" id="ict-fwd"></div>
-    <div class="ict-grid">
-      <div class="card ict-card">
-        <div class="ms-k"><span>Open signals</span><small id="ict-open-n"></small></div>
+    <div class="ict-clock" id="ict-clock"></div>
+    <div class="ict-now">
+      <div class="card ict-card ict-open-c">
+        <div class="ms-k"><h2 class="ict-h">Open now</h2><small id="ict-open-n"></small></div>
         <ul class="ict-open" id="ict-open"><li class="empty">Loading…</li></ul>
       </div>
-      <div class="card ict-card">
-        <div class="ms-k"><span>Equity</span><small>R per signal · <i class="ict-sw a"></i> the model (trail) <i class="ict-sw b"></i> fixed 2R</small></div>
-        <div class="ict-eq" id="ict-eq"></div>
+      <div class="card ict-card ict-fwd" id="ict-fwd"></div>
+    </div>
+    <div class="ict-mkts" id="ict-mkts" role="list" aria-label="Markets"></div>
+    <div class="card ict-card ict-res">
+      <div class="ms-k"><h2 class="ict-h">Results</h2><small>closed signals in the current view</small></div>
+      <div class="ict-res-g">
+        <div class="ict-kpi" id="ict-kpi" role="group" aria-label="Results"></div>
+        <div class="ict-eq-w"><div class="ict-eq-l"><span>Equity, R per signal</span><span><i class="ict-sw a"></i>the model (trail) <i class="ict-sw b"></i>fixed 2R</span></div><div class="ict-eq" id="ict-eq"></div></div>
       </div>
     </div>
     <div class="card ict-card">
-      <div class="ms-k"><span>P&amp;L calendar</span><span class="ict-cal-nav"><button type="button" class="ms-tbtn" id="ict-cal-prev" aria-label="Previous month">‹</button><b id="ict-cal-m"></b><button type="button" class="ms-tbtn" id="ict-cal-next" aria-label="Next month">›</button></span></div>
+      <div class="ms-k"><h2 class="ict-h">What works</h2><small>closed signals split by market, session and each ICT feature · the model's exit</small></div>
+      <div class="ict-break" id="ict-break"></div>
+    </div>
+    <div class="card ict-card">
+      <div class="ms-k"><h2 class="ict-h">P&amp;L calendar</h2><span class="ict-cal-nav"><button type="button" class="ms-tbtn" id="ict-cal-prev" aria-label="Previous month">‹</button><b id="ict-cal-m" aria-live="polite"></b><button type="button" class="ms-tbtn" id="ict-cal-next" aria-label="Next month">›</button></span></div>
       <div class="ict-cal" id="ict-cal"></div>
       <ul class="ict-cal-day" id="ict-cal-day"></ul>
     </div>
     <div class="card ict-card">
-      <div class="ms-k"><span>What works</span><small>closed signals split by each ICT feature · the model's exit</small></div>
-      <div class="ict-break" id="ict-break"></div>
-    </div>
-    <div class="card ict-card">
-      <div class="ms-k"><span>Signals</span>
+      <div class="ms-k"><h2 class="ict-h">Signals</h2>
         <span class="ict-f" id="ict-f" role="group" aria-label="Filter signals">
           <select id="ict-f-m" aria-label="Market"><option value="">All markets</option><option value="nq">NQ</option><option value="es">ES</option><option value="ym">YM</option><option value="rty">RTY</option><option value="gc">Gold (GC)</option></select>
           <select id="ict-f-s" aria-label="Status"><option value="">All</option><option value="open">Open</option><option value="closed">Closed</option><option value="todo">Not reviewed</option><option value="taken" class="ict-rw">Taken by me</option></select>
@@ -2745,11 +2879,11 @@ html[data-motion="off"][data-gate] .gate-bg path[stroke] { animation: none; stro
     </div>
     <div class="ict-grid ict-rw">
       <div class="card ict-card">
-        <div class="ms-k"><span>My trading</span><small id="ict-mine-who"></small></div>
+        <div class="ms-k"><h2 class="ict-h">My trading</h2><small id="ict-mine-who"></small></div>
         <div id="ict-mine"></div>
       </div>
       <div class="card ict-card">
-        <div class="ms-k"><span>Saving</span><small id="ict-sync"></small></div>
+        <div class="ms-k"><h2 class="ict-h">Saving</h2><small id="ict-sync"></small></div>
         <p class="ms-note">Your reviews and taken trades are kept in this browser and, once GitHub is connected, saved to the council data (ict/desk.json) so they show on every device and for the owner.</p>
         <p><button type="button" class="ms-tbtn" id="ict-gh">Connect GitHub</button> <button type="button" class="ms-tbtn" id="ict-sync-now">Sync now</button></p>
       </div>
@@ -3998,28 +4132,59 @@ function msNextSetup(bars, A) {
   // watchlist strip (7 Nov loop): OANDA markets with today's change; tap to switch the charts to that market
   async function watchlist() {
     const el = document.getElementById('ms-wl'); if (!el || !MD.base || MD.on === false) return;
-    const keys = Object.keys(INSTRUMENTS).filter((k) => INSTRUMENTS[k].md);
-    const rows = await Promise.all(keys.map(async (k) => { try { const j = await (await fetch(`${location.origin}${MD.base}bars?sym=${k}&tf=1d&n=2`)).json(); const b = j.bars || []; if (b.length < 2) return null; const c = b[b.length - 1].close, o = b[b.length - 2].close; return { k, c, ch: (c - o) / o * 100 }; } catch (e) { return null; } }));
-    const ok = rows.filter(Boolean); if (!ok.length) return;
+    const Q = await mdQuotes();   // same quotes and change basis as Home "Markets now" (defined below; runs after the script has loaded)
+    const ok = Object.keys(INSTRUMENTS).filter((k) => Q[k]).map((k) => Q[k]); if (!ok.length) return;
     el.hidden = false;
-    el.innerHTML = ok.map((r) => { const I = INSTRUMENTS[r.k], d = I.dec ?? 2; return `<a href="?s=${r.k}#charts" class="wl-i${r.k === instKey ? ' cur' : ''}"${r.k === instKey ? ' aria-current="true"' : ''}><b>${I.label}</b><span>${(+r.c).toLocaleString('en-US', { minimumFractionDigits: d, maximumFractionDigits: d })}</span><em class="${r.ch >= 0 ? 'up' : 'dn'}">${r.ch >= 0 ? '+' : '−'}${Math.abs(r.ch).toFixed(2)}%</em></a>`; }).join('');
+    el.innerHTML = ok.map((r) => { const I = INSTRUMENTS[r.k], d = I.dec ?? 2; return `<a href="?s=${r.k}#charts" class="wl-i${r.k === instKey ? ' cur' : ''}"${r.k === instKey ? ' aria-current="true"' : ''} title="${I.label}: change vs the previous day's close (OANDA, UTC days)${r.closed ? ` · closed, last price ${mdWd(r.day)}` : ''}"><b>${I.label}</b><span>${(+r.c).toLocaleString('en-US', { minimumFractionDigits: d, maximumFractionDigits: d })}</span><em class="${r.ch >= 0 ? 'up' : 'dn'}">${r.ch >= 0 ? '+' : '−'}${Math.abs(r.ch).toFixed(2)}%</em></a>`; }).join('');
+  }
+  // Shared OANDA quotes (home-accuracy, 7 Nov): one fetch per market feeds the Home "Markets now" cards and the scanner's % column,
+  // so both show the same price and the same change basis. Change = last price vs the previous trading day's close, on OANDA's
+  // 00:00 UTC daily candles; a short Sunday-evening candle is skipped so Monday (and Sunday night) compare with Friday's close.
+  // closed = the newest daily candle is complete (weekend / holiday); stale = no H1 candle in the last 3 hours while not closed.
+  const MDQ = { at: 0, p: null, q: {} };
+  function mdQuotes() {
+    if (!MD.base || MD.on === false) return Promise.resolve({});
+    if (MDQ.p && Date.now() - MDQ.at < 50e3) return MDQ.p;
+    MDQ.at = Date.now();
+    MDQ.p = (async () => {
+      const keys = Object.keys(INSTRUMENTS).filter((k) => INSTRUMENTS[k].md);
+      await Promise.all(keys.map(async (k) => { try {
+        const [h, d] = await Promise.all([fetch(`${location.origin}${MD.base}bars?sym=${INSTRUMENTS[k].md}&tf=1h&n=24`).then((r) => r.json()), fetch(`${location.origin}${MD.base}bars?sym=${INSTRUMENTS[k].md}&tf=1d&n=4`).then((r) => r.json())]);
+        const hb = (h.bars || []).filter((b) => isFinite(+b.close)), db = (d.bars || []).filter((b) => isFinite(+b.close)); if (hb.length < 2 || db.length < 2) return;
+        const last = db[db.length - 1], prev = db.slice(0, -1).filter((b) => new Date(b.time * 1000).getUTCDay() !== 0).pop() || db[db.length - 2];
+        const c = +hb[hb.length - 1].close, o = +prev.close, lastH = hb[hb.length - 1].time, closed = !last.live, now = Date.now() / 1000;
+        MDQ.q[k] = { k, c, ch: (c - o) / o * 100, pts: hb.map((b) => +b.close), day: last.time, lastH, closed, stale: !closed && now - (lastH + 3600) > 3 * 3600, at: Date.now() };
+      } catch (e) { /* keep the last good quote */ } }));
+      return MDQ.q;
+    })();
+    return MDQ.p;
+  }
+  const mdWd = (t) => new Date(t * 1000).toLocaleDateString('en-GB', { weekday: 'short', timeZone: 'UTC' });
+  const mdHm = (t) => new Date(t * 1000).toLocaleString([], { weekday: 'short', hour: '2-digit', minute: '2-digit' });
+  // the council's D1 for a market when its snapshot is recent (D1 moves slowly; 6 h covers skipped runs), with the feed it came from
+  function councilD1(k) {
+    let s = null; try { s = COUNCIL.snap; } catch (e) { return null; }   // COUNCIL is declared further down the script
+    if (!s || !s.markets || !s.markets[k] || !(Date.now() - Date.parse(s.at) < 6 * 3600e3)) return null;
+    const v = (s.markets[k].trend || {})['1d']; if (v !== 1 && v !== -1) return null;
+    const ds = (s.d1src || {})[k];
+    return { v, src: ds ? ds.src : 'Kraken', at: s.at };
   }
   // Home "Markets now" (7 Nov loop): each OANDA market with price, change on the day and a 24 h sparkline from H1 candles
   async function homeMarkets() {
     const el = document.getElementById('h-mk-row'), box = document.getElementById('h-mk'); if (!el || !box || !MD.base || MD.on === false) return;
-    const keys = Object.keys(INSTRUMENTS).filter((k) => INSTRUMENTS[k].md);
-    const rows = await Promise.all(keys.map(async (k) => { try {
-      const [h, d] = await Promise.all([fetch(`${location.origin}${MD.base}bars?sym=${k}&tf=1h&n=24`).then((r) => r.json()), fetch(`${location.origin}${MD.base}bars?sym=${k}&tf=1d&n=2`).then((r) => r.json())]);
-      const hb = (h.bars || []).map((b) => +b.close).filter(isFinite), db = d.bars || []; if (hb.length < 2 || db.length < 2) return null;
-      const c = +db[db.length - 1].close, o = +db[db.length - 2].close; return { k, c, ch: (c - o) / o * 100, pts: hb };
-    } catch (e) { return null; } }));
-    const ok = rows.filter(Boolean); if (!ok.length) return;
+    const Q = await mdQuotes();
+    const ok = Object.keys(INSTRUMENTS).filter((k) => Q[k]).map((k) => Q[k]); if (!ok.length) return;
     const spark = (pts, up) => { const lo = Math.min(...pts), hi = Math.max(...pts), W = 96, H = 28, sx = W / (pts.length - 1), y = (v) => hi === lo ? H / 2 : 2 + (H - 4) * (1 - (v - lo) / (hi - lo));
       const d = pts.map((v, i) => `${i ? 'L' : 'M'}${(i * sx).toFixed(1)} ${y(v).toFixed(1)}`).join(' ');
       return `<svg class="h-mk-sp ${up ? 'up' : 'dn'}" viewBox="0 0 ${W} ${H}" preserveAspectRatio="none" aria-hidden="true"><path class="a" d="${d} L${W} ${H} L0 ${H}Z"/><path class="l" d="${d}"/><circle cx="${W}" cy="${y(pts[pts.length - 1]).toFixed(1)}" r="2.2"/></svg>`; };
     box.hidden = false;
-    el.innerHTML = ok.map((r) => { const I = INSTRUMENTS[r.k], dd = I.dec ?? 2, up = r.ch >= 0;
-      return `<a class="h-mk-i" href="?s=${r.k}#charts" aria-label="${I.label} ${r.c} ${up ? 'up' : 'down'} ${Math.abs(r.ch).toFixed(2)} percent today"><span class="h-mk-t"><b>${I.label}</b><em class="${up ? 'up' : 'dn'}">${up ? '+' : '−'}${Math.abs(r.ch).toFixed(2)}%</em></span><span class="h-mk-p">${(+r.c).toLocaleString('en-US', { minimumFractionDigits: dd, maximumFractionDigits: dd })}</span>${spark(r.pts, up)}</a>`; }).join('');
+    const kk = box.querySelector('.h-mk-k'); if (kk) kk.textContent = ok.every((r) => r.closed) ? `closed · ${mdWd(ok[0].day)} session vs day before` : '% vs prior day\'s close (UTC) · line 24 h';
+    el.innerHTML = ok.map((r) => { const I = INSTRUMENTS[r.k], dd = I.dec ?? 2, up = r.ch >= 0, d1 = councilD1(r.k), px = (+r.c).toLocaleString('en-US', { minimumFractionDigits: dd, maximumFractionDigits: dd }), pc = `${up ? '+' : '−'}${Math.abs(r.ch).toFixed(2)}%`;
+      const st = r.closed ? `<span class="h-mk-st">Closed · ${mdWd(r.day)}</span>` : r.stale ? `<span class="h-mk-st warn">Delayed · ${esc(mdHm(r.lastH + 3600))}</span>` : '';
+      const d1t = d1 ? `<span class="h-mk-d1 ${d1.v > 0 ? 'up' : 'dn'}">D1 ${d1.v > 0 ? '▲' : '▼'}</span>` : '';
+      const tip = `${I.label} ${px} · ${pc} vs the previous day's close (OANDA, 00:00 UTC days)${r.closed ? ` · market closed, last price from ${mdWd(r.day)}` : r.stale ? ` · no new candle since ${mdHm(r.lastH + 3600)}` : ''}${d1 ? ` · council D1 ${d1.v > 0 ? 'up' : 'down'} (${d1.src} daily candles, what the Trader trades on)` : ''}`;
+      return `<a class="h-mk-i${r.closed ? ' closed' : ''}" href="?s=${r.k}#charts" title="${esc(tip)}" aria-label="${esc(tip)}"><span class="h-mk-t"><b>${I.label}</b><em class="${up ? 'up' : 'dn'}">${pc}</em></span><span class="h-mk-p">${px}</span>${d1t || st ? `<span class="h-mk-m">${d1t}${st}</span>` : ''}${spark(r.pts, up)}</a>`; }).join('');
+    try { if (SCAN.el) renderScan(); } catch (e) {}
   }
   setTimeout(homeMarkets, 2000); setInterval(() => { if (!document.hidden && (location.hash === '' || location.hash === '#home')) homeMarkets(); }, 60e3);
   setTimeout(watchlist, 2500); setInterval(() => { if (!document.hidden && location.hash === '#charts') watchlist(); }, 60e3);
@@ -4658,7 +4823,7 @@ function msNextSetup(bars, A) {
       };
       // OANDA answers from the edge cache, so without the tick stream the fast timeframes refresh every few seconds;
       // while ticks stream in, the poll only re-syncs whole candles at the normal pace
-      const iv = () => G.source === 'OANDA' && !G.live ? Math.min(tf.poll, { '1m': 3e3, '5m': 5e3, '15m': 10e3 }[tf.id] || tf.poll) : tf.poll;
+      const iv = () => G.source === 'OANDA' && !G.live && !marketClosedNow() ? Math.min(tf.poll, { '1m': 3e3, '5m': 5e3, '15m': 10e3 }[tf.id] || tf.poll) : tf.poll;
       setTimeout(tick, iv());
     });
   }
@@ -5180,7 +5345,7 @@ function msNextSetup(bars, A) {
     ACTIVE.forEach((tf) => { const P = panes[tf.id]; if (P.A && P.bars) src[tf.id] = { bars: P.bars, A: P.A }; });
     return src;
   }
-  function evaluate(I, src) {
+  function evaluate(I, src, feed) {
     const m = src['1m'] || src['5m'] || src['15m'] || src['1h'];
     if (!m) return null;
     const price = m.bars[m.bars.length - 1].close;
@@ -5190,12 +5355,12 @@ function msNextSetup(bars, A) {
       list.sort((a, b) => ORDER[a.state] - ORDER[b.state] || b.rr - a.rr);
       const trend = {}; ['1d', '4h', '1h'].forEach((k) => { trend[k] = src[k] && src[k].A ? src[k].A.trend : 0; });
       const h1 = src['1h'] && src['1h'].bars, ref = h1 && h1.length > 24 ? h1[h1.length - 25].close : null;
-      return { price, list, trend, chg: ref ? (price - ref) / ref * 100 : null };
+      return { price, list, trend, chg: ref ? (price - ref) / ref * 100 : null, feed: feed || '' };
     } finally { CUR = c; }
   }
   async function scanInst(key) {
     const I = INSTRUMENTS[key];
-    if (key === instKey) return evaluate(I, srcFromPanes());
+    if (key === instKey) return evaluate(I, srcFromPanes(), G.source);
     const res = await Promise.allSettled(TFS.map((tf) => fetchBars(tf, I, 300)));
     let off = 0;
     if (I.spot) {
@@ -5210,7 +5375,8 @@ function msNextSetup(bars, A) {
       src[TFS[k].id] = { bars, A: msAnalyze(bars, PIVOT) };
     });
     if (!Object.keys(src).length) throw new Error((res.find((r) => r.status === 'rejected') || {}).reason?.message || 'No data');
-    return evaluate(I, src);
+    const d1 = res[TFS.findIndex((t) => t.id === '1d')];
+    return evaluate(I, src, d1 && d1.status === 'fulfilled' ? d1.value.src : '');
   }
   function renderScan() {
     if (!SCAN.el) return;
@@ -5225,10 +5391,15 @@ function msNextSetup(bars, A) {
       if (!r) return `<a class="ms-srow${cur}" href="${href}">${mk}<span class="srow-skel" role="status" aria-label="Waiting to scan"><i></i><i></i><i></i></span></a>`;
       if (r.err) return `<a class="ms-srow${cur}" href="${href}">${mk}<span class="err">Couldn't load: ${esc(r.err)}</span></a>`;
       const best = r.list[0], ready = r.list.filter((t) => t.state === 'READY');
-      const chg = r.chg === null ? '' : ` <small style="color:${r.chg >= 0 ? UPC : DNC};font-weight:600">${r.chg >= 0 ? '+' : ''}${r.chg.toFixed(2)}%</small>`;
+      // price and day change: the same OANDA quote as Home "Markets now" when there is one, else this row's own (24 h rolling)
+      const q = typeof MDQ !== 'undefined' && MDQ.q[k], px = q ? q.c : r.price, ch = q ? q.ch : r.chg;
+      const chg = ch == null ? '' : ` <small class="pr-c" style="color:${ch >= 0 ? UPC : DNC};font-weight:600" title="${q ? `Change vs the previous day's close (OANDA, 00:00 UTC days)${q.closed ? `; market closed, last price ${mdWd(q.day)}` : ''}` : 'Change over the last 24 hours'}">${ch >= 0 ? '+' : ''}${ch.toFixed(2)}%${q ? '' : ' 24h'}</small>${q && q.closed ? ' <small class="pr-x">closed</small>' : q && q.stale ? ' <small class="pr-x warn">delayed</small>' : ''}`;
+      // D1: the council's D1 (OANDA daily for gold and forex) is what the Trader trades on, so it leads; this row's own D1 shows only when it disagrees
+      const cd = councilD1(k), own = r.trend['1d'], d1v = cd ? cd.v : own, ownSrc = r.from === 'council' ? '' : (r.feed || 'chart');
+      const d1 = `<span class="ms-al ${d1v > 0 ? 'ok' : d1v < 0 ? 'against' : ''}" title="${cd ? `D1 ${d1v > 0 ? 'up' : 'down'} · council D1 from ${cd.src} daily candles (what the Trader trades on)` : `D1 from ${ownSrc || 'the council scan'}`}">D1 ${d1v < 0 ? '▼' : d1v > 0 ? '▲' : '–'}</span>${cd && ownSrc && own && own !== cd.v ? `<span class="ms-al ms-al-x" title="${k === instKey ? 'This chart' : 'This scan'}'s own D1 (${esc(ownSrc)} candles) reads ${own > 0 ? 'up' : 'down'}; the council's D1 (${esc(cd.src)}) reads ${cd.v > 0 ? 'up' : 'down'}">${k === instKey ? 'chart' : esc(ownSrc)} ${own > 0 ? '▲' : '▼'}</span>` : ''}`;
       const su = best ? `<span class="su"><span class="ms-chip ${best.sell ? 'ms-chip-sell' : 'ms-chip-buy'}">${best.sell ? 'SELL' : 'BUY'}</span><b>${best.name}</b><small>${best.pair}</small><span class="ms-st ${best.cls}">${best.state}</span>${ready.length > 1 ? `<small>+${ready.length - 1} more ready</small>` : ''}</span>` : '<span class="su">No setup</span>';
-      const lv = best && !best.invalid ? `<span class="lv"><span class="lv-p">Entry ${fmtI(best.entry, I)}</span> <span class="lv-p">Stop ${fmtI(best.stop, I)}</span> <b class="lv-r">${best.rr.toFixed(1)}R</b>${(() => { const risk = Math.abs(best.entry - best.stop); if (!risk || r.price == null) return ''; const away = (best.sell ? best.entry - r.price : r.price - best.entry) / risk; const at = Math.abs(away) < 0.05; return `<span class="lv-d${at ? ' at' : ''}" title="Distance from price to entry, in multiples of the stop distance">${at ? 'at entry' : `${Math.abs(away).toFixed(1)}R to entry`}</span>`; })()}</span>` : '<span class="lv"></span>';
-      return `<a class="ms-srow${cur}${ready.length ? ' ready' : ''}" href="${href}">${mk}<span class="pr">${fmtI(r.price, I)}${chg}</span><span class="tr">${arrow(r.trend['1d'], 'D1')}${arrow(r.trend['4h'], 'H4')}${arrow(r.trend['1h'], 'H1')}</span>${su}${lv}</a>`;
+      const lv = best && !best.invalid ? `<span class="lv"><span class="lv-p">Entry ${fmtI(best.entry, I)}</span> <span class="lv-p">Stop ${fmtI(best.stop, I)}</span> <b class="lv-r">${best.rr.toFixed(1)}R</b>${(() => { const risk = Math.abs(best.entry - best.stop); if (!risk || px == null) return ''; const away = (best.sell ? best.entry - px : px - best.entry) / risk; const at = Math.abs(away) < 0.05; return `<span class="lv-d${at ? ' at' : ''}" title="Distance from price to entry, in multiples of the stop distance">${at ? 'at entry' : `${Math.abs(away).toFixed(1)}R to entry`}</span>`; })()}</span>` : '<span class="lv"></span>';
+      return `<a class="ms-srow${cur}${ready.length ? ' ready' : ''}" href="${href}">${mk}<span class="pr">${fmtI(px, I)}${chg}</span><span class="tr">${d1}${arrow(r.trend['4h'], 'H4')}${arrow(r.trend['1h'], 'H1')}</span>${su}${lv}</a>`;
     }).join('');
     const nReady = rows.filter((x) => x.r && !x.r.err && x.r.list.some((t) => t.state === 'READY')).length;
     const badge = document.getElementById('ms-scan-badge');
@@ -5253,8 +5424,11 @@ function msNextSetup(bars, A) {
       const snap = COUNCIL.snap, age = snap ? Date.now() - Date.parse(snap.at) : Infinity;
       if (snap && age < 25 * 60e3 && Object.keys(snap.markets || {}).length) {
         Object.keys(INSTRUMENTS).forEach((k) => { if (k !== instKey && snap.markets[k]) SCAN.res[k] = fromSnapshot(k, snap.markets[k]); });
-        SCAN.res[instKey] = evaluate(INST, srcFromPanes()) || SCAN.res[instKey];
+        SCAN.res[instKey] = evaluate(INST, srcFromPanes(), G.source) || SCAN.res[instKey];
         SCAN.at = Date.parse(snap.at); SCAN.snapAt = snap.at; renderScan();
+        // markets the council does not trade (silver, indices, USD/JPY) are not in its snapshot: scan them here instead of leaving them "waiting" for good
+        const miss = Object.keys(INSTRUMENTS).filter((k) => k !== instKey && !snap.markets[k] && (!SCAN.res[k] || Date.now() - (SCAN.res[k].at || 0) > 4 * 60e3));
+        await Promise.all(miss.map(async (k) => { try { SCAN.res[k] = Object.assign(await scanInst(k) || { err: 'No data' }, { at: Date.now() }); } catch (e) { SCAN.res[k] = { err: e.message || 'No data', at: Date.now() }; } renderScan(); }));
         return;
       }
     }
@@ -5372,10 +5546,11 @@ function msNextSetup(bars, A) {
   const RES = { open: 'Open', win: 'Win', loss: 'Loss', be: 'Break-even', skip: 'Skipped' };
   // System trades journal (5 Nov): every closed paper trade the council placed, adds folded into their first trade
   function systemClosed() {
-    const C = COUNCIL, tr = (C.trades || []).filter((x) => SYS_K.includes(x.k) && !x.shadow && x.R != null && x.closed);
+    // closed = win / loss / break-even only: missed and expired orders also carry R 0 and a close time but were never a trade
+    const C = COUNCIL, done = (x) => ['win', 'loss', 'be'].includes(x.status) && x.R != null && x.closed, tr = (C.trades || []).filter((x) => SYS_K.includes(x.k) && !x.shadow && done(x));
     const rows = tr.filter((x) => !x.addOf).map((x) => ({ ...x }));
     for (const a of tr.filter((x) => x.addOf)) { const q = rows.find((x) => x.id === a.addOf); if (q) { q.R = +(q.R + a.R).toFixed(2); q.closed = Math.max(q.closed, a.closed); q.exit = (q.exit ? q.exit + ' + ' : '') + 'add ' + (a.R >= 0 ? '+' : '−') + Math.abs(a.R).toFixed(2) + 'R'; } else rows.push({ ...a }); }
-    for (const r of (C.research || []).filter((x) => x.k === 'nq-open' && x.session === 'nyflip' && x.R != null && x.closed)) rows.push({ ...r, paper: true });
+    for (const r of (C.research || []).filter((x) => x.k === 'nq-open' && x.session === 'nyflip' && done(x))) rows.push({ ...r, paper: true });
     return rows.sort((a, b) => b.closed - a.closed);
   }
   function renderSystemJournal() {
@@ -5614,7 +5789,9 @@ function msNextSetup(bars, A) {
   function md(src) {   // small, safe markdown: headings, bullets, bold, paragraphs, simple tables (Analyst's live-rule check)
     const out = []; let list = false, tbl = null;
     const inl = (x) => esc(x).replace(/\*\*(.+?)\*\*/g, '<b>$1</b>').replace(/(^|[\s(])_([^_\s][^_]*?)_(?=[\s.,;:)!?]|$)/g, '$1<i>$2</i>').replace(/`(.+?)`/g, '<code>$1</code>');   // _italic_ (word-bounded, so snake_case stays)
-    const endTbl = () => { if (!tbl) return; out.push(`<div class="c-md-tw"><table><thead><tr>${tbl[0].map((c) => `<th>${inl(c)}</th>`).join('')}</tr></thead><tbody>${tbl.slice(1).map((r) => `<tr>${r.map((c) => `<td>${inl(c)}</td>`).join('')}</tr>`).join('')}</tbody></table></div>`); tbl = null; };
+    // columns whose body cells are all plain numbers (+1.2R, 41%, 3,979.4, —) are right-aligned in tabular figures (layout only)
+    const numC = (i) => tbl.length > 1 && tbl.slice(1).every((r) => /^(?:[+\-−]?\$?[\d,.]+(?:%|R| ?pts?)?|—|-|)$/.test(String(r[i] || '').replace(/\*\*|`/g, '').trim())) && tbl.slice(1).some((r) => /\d/.test(r[i] || ''));
+    const endTbl = () => { if (!tbl) return; const N = tbl[0].map((_, i) => numC(i)); out.push(`<div class="c-md-tw" tabindex="0" role="region" aria-label="Table"><table><thead><tr>${tbl[0].map((c, i) => `<th${N[i] ? ' class="n"' : ''}>${inl(c)}</th>`).join('')}</tr></thead><tbody>${tbl.slice(1).map((r) => `<tr>${r.map((c, i) => `<td${N[i] ? ' class="n"' : ''}>${inl(c)}</td>`).join('')}</tr>`).join('')}</tbody></table></div>`); tbl = null; };
     String(src || '').split(/\r?\n/).forEach((line) => {
       if (/^\s*<!--.*-->\s*$/.test(line)) return;   // markers (e.g. the Trader's live-rule block)
       if (/^\s*\|.*\|\s*$/.test(line)) { if (list) { out.push('</ul>'); list = false; } const cells = line.trim().slice(1, -1).split('|').map((c) => c.trim());
@@ -5739,7 +5916,7 @@ function msNextSetup(bars, A) {
       const [yy, mm, dd] = CAL.sel.split('-').map(Number), tot = sel.reduce((a, x) => a + x.R, 0), w = sel.filter((x) => x.R > 0).length;
       document.getElementById('ms-cal-dayh').innerHTML = `<b>${new Date(yy, mm, dd).toLocaleDateString(undefined, { weekday: 'short', day: 'numeric', month: 'short' })} · <span class="${tot > 0 ? 'pos' : tot < 0 ? 'neg' : ''}">${fR(tot)}</span> · ${sel.length} trade${sel.length > 1 ? 's' : ''}, ${w} won</b><button type="button" id="ms-cal-dayx" aria-label="Close the day">Close</button>`;
     }
-    document.getElementById('ms-cal-day').innerHTML = sel ? sel.slice().sort((a, b) => a.opened - b.opened).map((x) => `<li${x.bt ? '' : ` data-tid="${esc(x.id)}" tabindex="0" title="Show this trade on a chart"`}${x.shadow ? ' class="sh"' : ''}>${x.shadow ? '<span class="tag">shadow</span>' : ''}<span>${ftime(x.opened + TZ)}</span><b>${esc(x.label)}</b><span class="chip ${x.side}">${x.side.toUpperCase()}</span><span>${(PUB ? '' : esc(x.name))}</span><b class="${x.R > 0 ? 'pos' : x.R < 0 ? 'neg' : ''}">${x.status === 'be' ? 'break-even' : fR(x.R)}</b><small>${x.bt ? (x.rr != null ? `Target ${x.rr}R · backtest` : 'Trend · backtest') : `Entry ${fmtI(x.entry, { dec: 2 })} · stop ${fmtI(x.stop, { dec: 2 })} · target ${fmtI(x.t1, { dec: 2 })}`} · closed ${ftime(x.closed + TZ)}${x.exit ? ` (${esc(x.exit)})` : ''}${x.shadow ? ' · shadow' : ''}${x.replay ? ` · replay${x.paper ? ', paper setup' : ''}` : x.forward ? ' · paper, live forward' : ''}</small></li>`).join('') : '';
+    document.getElementById('ms-cal-day').innerHTML = sel ? sel.slice().sort((a, b) => a.opened - b.opened).map((x) => `<li${x.bt ? '' : ` data-tid="${esc(x.id)}" tabindex="0" title="Show this trade on a chart"`}${x.shadow ? ' class="sh"' : ''}>${x.shadow ? '<span class="tag">shadow</span>' : ''}<span>${ftime(x.opened + TZ)}</span><b>${esc(x.label)}</b><span class="chip ${x.side}">${x.side.toUpperCase()}</span><span>${(PUB ? '' : esc(x.name))}</span><b class="${x.R > 0 ? 'pos' : x.R < 0 ? 'neg' : ''}">${x.status === 'be' ? 'break-even' : fR(x.R)}</b><small>${x.bt ? (x.rr != null ? `Target ${x.rr}R · backtest` : 'Trend · backtest') : `Entry ${fmtI(x.entry, { dec: x.dec ?? 2 })} · stop ${fmtI(x.stop, { dec: x.dec ?? 2 })} · target ${x.t1 == null ? 'none (trend exit)' : fmtI(x.t1, { dec: x.dec ?? 2 })}`} · closed ${ftime(x.closed + TZ)}${x.exit ? ` (${esc(x.exit)})` : ''}${x.shadow ? ' · shadow' : ''}${x.replay ? ` · replay${x.paper ? ', paper setup' : ''}` : x.forward ? ' · paper, live forward' : ''}</small></li>`).join('') : '';
   }
   ['ms-cal-prev', 'ms-cal-next'].forEach((id, i) => { const b = document.getElementById(id); if (b) b.addEventListener('click', () => { CAL.m += i ? 1 : -1; if (CAL.m < 0) { CAL.m = 11; CAL.y--; } if (CAL.m > 11) { CAL.m = 0; CAL.y++; } CAL.sel = null; renderCalendar(); }); });
   ['ms-cal-sh', 'ms-cal-rp'].forEach((id) => { const el = document.getElementById(id); if (el) el.addEventListener('change', renderCalendar); });
@@ -6845,8 +7022,9 @@ function msNextSetup(bars, A) {
   const PB_MANUAL = [['closed', 'Signal candles CLOSED (DRD, BO, CF, EG)', 'Never act on a candle still forming; most of the old "edge" was knowing the close early.'],
     ['origin', 'The zone is the extreme / origin of the leg, not a roadblock in the middle', ''], ['fresh', 'Entry zone fresh (or within its reuse limit)', 'EG zone 2 uses, EF zone 1.'],
     ['sl', 'Stop beyond the structural extreme; size from the stop distance', 'Fixed 20-30 pip stops do not fit today\'s gold.'], ['tgt', 'Target = next barrier / opposing same-TF zone, at least 2R', '']];
+  var pbReady = true;   // renderHome can run (from the scanner) before the constants above exist; the playbook waits for them
   function renderPlaybook() {
-    const box = document.getElementById('ms-pb'); if (!box || PUB) return;
+    const box = document.getElementById('ms-pb'); if (!box || PUB || !pbReady) return;
     const now = Date.now() / 1000, ny = nyParts(now), gold = instKey === 'xau', sn = COUNCIL.snap || {};
     const dir = G.td ? (G.td.word === 'Sell' ? -1 : 1) : 0;
     // weekly structure (council's W1, gold only)
@@ -7008,7 +7186,8 @@ function msNextSetup(bars, A) {
     for (const x of A) { const c = cl[cl.length - 1]; if (c && IDX.has(x.market) && IDX.has(c[0].market) && c[0].side === x.side && x.signalAt - c[0].signalAt <= 3 * 3600 && !c.some((y) => y.market === x.market)) c.push(x); else cl.push([x]); }
     for (const c of cl) { const best = c.slice().sort((a, b) => (b.grade.total - a.grade.total) || ((b.feat.body || 0) - (a.feat.body || 0)) || (a.signalAt - b.signalAt))[0]; for (const x of c) PICK.set(x.id, { pick: x === best, n: c.length }); }
   }
-  const all = () => { const L = S.src === 'live' ? S.trades : S.src === 'replay' ? S.replay : S.trades.concat(S.replay); markClusters(L);
+  // audit (7 Nov): in Both, a signal the live tracker took is not counted again from the replay (same market, side and candle)
+  const all = () => { const lv = new Set(S.trades.map((x) => x.id)); const L = S.src === 'live' ? S.trades : S.src === 'replay' ? S.replay : S.trades.concat(S.replay.filter((x) => !lv.has(String(x.id).replace(/-r$/, '')))); markClusters(L);
     return L.filter((x) => S.flt === 'all' || (S.flt === 'ap' ? isAP(x) : isA(x) && (S.flt !== 'pick' || (PICK.get(x.id) || {}).pick))); };
   const clTag = (x) => { const c = PICK.get(x.id); return c && c.n > 1 ? (c.pick ? ` <span class="ict-a" title="Best of ${c.n} same-side setups within 3 h">★ pick of ${c.n}</span>` : ` <span class="ict-pill" title="Another index in this cluster has the higher grade">cluster of ${c.n}</span>`) : ''; };
   try { S.desk = JSON.parse(localStorage.getItem('ictDesk') || 'null') || S.desk; } catch (e) {}
@@ -7042,7 +7221,7 @@ function msNextSetup(bars, A) {
         + `<div class="sub">PDH ${m ? fx(m.pdh, k) : '—'} · PDL ${m ? fx(m.pdl, k) : '—'}</div></div>`; }).join('');
     // KPIs
     const sum = (a, f) => a.reduce((s, x) => s + (f(x) || 0), 0), R3 = sum(C, (x) => x.R), R2 = sum(C, (x) => x.R2 ?? x.R), w = C.filter((x) => x.R > 0).length;
-    const fl = sum(O, liveR), mine = T.filter((x) => (myRev(x) || {}).act === 'taken'), rev = C.filter((x) => myRev(x) && myRev(x).text).length;
+    const fl = sum(O, (x) => liveR(x) * (x.size || 1)), mine = T.filter((x) => (myRev(x) || {}).act === 'taken'), rev = C.filter((x) => myRev(x) && myRev(x).text).length;
     const cell = (k, v, sub, c) => `<div><span>${k}</span><b class="${c || ''}">${v}</b><small>${sub}</small></div>`;
     $('ict-kpi').innerHTML = cell('Signals', T.length, `${O.length} open · ${C.length} closed`) + cell('Win rate', C.length ? Math.round((100 * w) / C.length) + '%' : '—', `${w} of ${C.length}`)
       + cell('Total', fR(R3), C.length ? `${fR(R3 / C.length)} a signal` : 'no closed yet', cls(R3)) + cell('Fixed 2R', fR(R2), C.length ? `${fR(R2 / C.length)} a signal` : '—', cls(R2))
@@ -7130,7 +7309,9 @@ function msNextSetup(bars, A) {
       : AP.m > 0.15 ? 'A+ is holding up live (above +0.15R a signal over 30+). Keep sizing small and watch the drawdown.' : AP.m > 0 ? 'A+ is barely positive live: no real edge yet; keep it on paper.' : 'A+ is losing live after 30+ signals: stop and review the model.';
     $('ict-fwd').innerHTML = `<div class="t">Live forward test</div><div class="row">${t('A+', AP)}${t('A-setups', A)}${t('All signals', ALL)}</div><div class="msg">${verdict}</div>`;
   }
-  window.renderIct = () => { render(); renderClock(); renderFwd(); };
+  // the desk data (~1.9 MB with replay + bars) loads when the ICT view first opens, then every 2 min while it is open (site audit 7 Nov)
+  let loadedAt = 0; const fresh = () => { if (Date.now() - loadedAt > 110e3) { loadedAt = Date.now(); load(); } };
+  window.renderIct = () => { render(); renderClock(); renderFwd(); fresh(); };
   setInterval(() => { if (!$('v-ict').hidden) renderClock(); }, 30e3);
 
   // ─── chart dialog + review ───
@@ -7219,7 +7400,7 @@ function msNextSetup(bars, A) {
     render(); if (t.trim()) push().then(render).catch((e) => alert(`GitHub: ${e.message || e}`));
   });
   $('ict-sync-now').addEventListener('click', () => { $('ict-sync').textContent = 'Syncing…'; Promise.resolve(load()).then(() => push()).then((r) => { $('ict-sync').textContent = r === 'synced' ? 'Synced just now' : 'This browser only'; }).catch((e) => { $('ict-sync').textContent = `GitHub: ${e.message || e}`; }); });
-  if (document.documentElement.dataset.ict) { load(); setInterval(load, 120e3); addEventListener('hashchange', () => { if (location.hash === '#ict') render(); }); }
+  if (document.documentElement.dataset.ict) { if (!$('v-ict').hidden) fresh(); setInterval(() => { if (!document.hidden && !$('v-ict').hidden) fresh(); }, 120e3); addEventListener('hashchange', () => { if (location.hash === '#ict') render(); }); }
 })();
 
 </script>
@@ -7512,6 +7693,9 @@ function msNextSetup(bars, A) {
         + '<span class="pz-l">' + E(o.m.label) + (n ? '<span class="pz-n">' + n + '</span>' : '') + '</span><span class="pz-p">' + fPx(o.m.price, d) + '</span>'
         + '<span class="pz-tf" aria-hidden="true">' + o.v.map(function (x) { return '<i class="' + (x > 0 ? 'u' : x < 0 ? 'd' : '') + '"></i>'; }).join('') + '</span></a>'; }).join('');
     ks.forEach(function (o) { LASTPX[o.k] = o.m.price; });
+    // say whose numbers these are and how old: the council's last scan (D1 from OANDA for gold and forex), flagged when over 45 minutes old
+    var hk = sec.querySelector('.h-pulse-k'), at = Date.parse(L.snap.at);
+    if (hk && isFinite(at)) { var old = Date.now() - at > 45 * 60e3; hk.textContent = 'council trend on D1 · H4 · H1, strongest first · scan ' + new Date(at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) + (old ? ' (old)' : ''); hk.classList.toggle('c-warn', old); }
     sec.hidden = !ks.length; edge(row);
   }
   function edge(el) { var l = el.scrollLeft > 2, r = el.scrollLeft + el.clientWidth < el.scrollWidth - 2, v = (l ? 'l' : '') + (l && r ? ' ' : '') + (r ? 'r' : ''); if (v) el.setAttribute('data-more', v); else el.removeAttribute('data-more'); }
@@ -8301,6 +8485,14 @@ function gpStats(T) {
 .h-mk-i:hover { border-color: var(--accent); transform: translateY(-1px); } .h-mk-i:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 .h-mk-t { display: flex; justify-content: space-between; align-items: baseline; font-size: 12.5px; } .h-mk-t b { font-weight: 700; } .h-mk-t em { font-style: normal; font-weight: 600; } .h-mk-t em.up { color: var(--buy); } .h-mk-t em.dn { color: var(--sell); }
 .h-mk-p { font-size: 17px; font-weight: 700; letter-spacing: -.01em; }
+.h-mk-h h2 { white-space: nowrap; }
+.h-mk-m { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 6px; min-width: 0; font-size: 10.5px; line-height: 1.3; }
+.h-mk-d1 { font-weight: 700; font-family: var(--mono); padding: 0 5px; border-radius: 4px; border: 1px solid var(--line); white-space: nowrap; }
+.h-mk-d1.up { color: var(--buy); border-color: color-mix(in srgb, var(--buy) 40%, transparent); } .h-mk-d1.dn { color: var(--sell); border-color: color-mix(in srgb, var(--sell) 40%, transparent); }
+.h-mk-st { color: var(--ink-dim); white-space: nowrap; } .h-mk-st.warn { color: var(--warn, #b7791f); }
+.h-mk-i.closed .h-mk-sp { opacity: .55; }
+.ms-srow .tr .ms-al-x { border-style: dashed; color: var(--ink-faint); font-weight: 600; }
+.ms-srow .pr-x { font: 600 10px var(--sans); color: var(--ink-faint); text-transform: uppercase; letter-spacing: .03em; } .ms-srow .pr-x.warn { color: var(--warn, #b7791f); }
 .h-mk-sp { width: 100%; height: 28px; display: block; margin-top: 2px; overflow: visible; }
 .h-mk-sp .l { fill: none; stroke-width: 1.6; vector-effect: non-scaling-stroke; } .h-mk-sp .a { stroke: none; opacity: .12; }
 .h-mk-sp.up .l { stroke: var(--buy); } .h-mk-sp.up .a, .h-mk-sp.up circle { fill: var(--buy); } .h-mk-sp.dn .l { stroke: var(--sell); } .h-mk-sp.dn .a, .h-mk-sp.dn circle { fill: var(--sell); }
@@ -8486,6 +8678,137 @@ html, body, button, input, select, textarea { font-family: Figtree, -apple-syste
 html { font-variant-numeric: tabular-nums; -webkit-font-smoothing: antialiased; }
 h1, h2, h3, .h-head { letter-spacing: -0.02em; }
 code, pre, kbd, .tva-src, .tvw-url, .tv-tk .tk-l { font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace !important; }
+</style>
+<style>
+/* ── Council design pass (Nov 2026): hierarchy, tables, touch targets, contrast. Everything scoped to #v-council. ── */
+/* light theme: profit / loss colours dark enough for 4.5:1 on white and on their own tints */
+:root[data-theme="light"] #v-council { --buy: #067562; --sell: #c2203d; --c-warn: #8a5a00; }
+#v-council { --c-warn: #f2b33d; --c-tap: 44px; }
+
+/* 1 · status line: state pill first, the scan details on their own line (no stray leading dot when it wraps) */
+#v-council .c-head p#ms-c-status { gap: 6px 10px; margin-top: 8px; font-size: 13px; }
+#v-council #ms-c-status .c-ok, #v-council #ms-c-status .c-warn, #v-council #ms-c-status .c-bad { display: inline-flex; align-items: center; gap: 6px; padding: 3px 10px 3px 8px; border-radius: 999px; font: 600 12.5px var(--sans); }
+#v-council #ms-c-status .c-ok { color: color-mix(in srgb, var(--buy) 85%, var(--ink)); background: color-mix(in srgb, var(--buy) 11%, transparent); }
+#v-council #ms-c-status .c-warn { color: var(--c-warn); background: color-mix(in srgb, var(--c-warn) 14%, transparent); }
+#v-council #ms-c-status .c-bad { color: var(--sell); background: color-mix(in srgb, var(--sell) 11%, transparent); }
+#v-council #ms-c-status .c-meta { flex-basis: 100%; display: block; margin: 0; color: var(--ink-dim); font-size: 12.5px; }
+#v-council #ms-c-status .c-meta::before { content: none; }
+#v-council .c-warn { color: var(--c-warn); }
+
+/* 2 · section nav and trade tabs: 44px targets, readable count badge */
+#v-council .c-nav button { min-height: var(--c-tap); }
+#v-council .c-nav-n { color: var(--ink); background: color-mix(in srgb, var(--accent) 18%, transparent); font-weight: 700; }
+#v-council #ms-c-tabs button { min-height: var(--c-tap); justify-content: center; padding-inline: 12px; }
+#v-council #ms-c-tabs button small { color: var(--ink-dim); }
+#v-council #ms-c-tabnote { margin: 4px 0 12px; color: var(--ink-dim); }
+#v-council .c-mine { min-height: var(--c-tap); display: inline-flex; align-items: center; gap: 8px; cursor: pointer; }
+#v-council .c-mine input { width: 18px; height: 18px; }
+
+/* 3 · tables: numbers right-aligned in tabular figures, scroll sideways inside the wrapper only */
+#v-council .ms-bt-wrap, #v-council .edge-wrap, #v-council .c-md-tw { max-width: 100%; overflow-x: auto; overscroll-behavior-x: contain; -webkit-overflow-scrolling: touch; }
+#v-council .c-t td.n, #v-council .c-t th.n, #v-council .edge-t td, #v-council .c-md td.n, #v-council .c-md th.n { text-align: right; font-variant-numeric: tabular-nums; }
+#v-council .edge-t td:nth-child(2) { text-align: left; }
+#v-council .c-t tr.sh td { opacity: 1; color: var(--ink-faint); }   /* shadow rows: dimmed by colour, not opacity (keeps 4.5:1 and works with the sticky column) */
+#v-council .c-t tr.sh td b { color: var(--ink-dim); }
+#v-council .c-pm-v.system { color: var(--c-warn); background: color-mix(in srgb, var(--c-warn) 14%, transparent); }
+#v-council .ms-more, #v-council .c-trader button:not([role="tab"]) { min-height: var(--c-tap); }
+@media (max-width: 700px) {
+  /* phones: the first column (time / setup / market / condition) stays put while the numbers scroll */
+  #v-council .c-t :is(th, td):first-child, #v-council .edge-t tr > :first-child, #v-council .c-md-tw :is(th, td):first-child {
+    position: sticky; left: 0; z-index: 1; background-color: var(--panel); box-shadow: inset -1px 0 0 var(--line); }
+  #v-council .c-t thead th:first-child, #v-council .edge-t thead th:first-child, #v-council .c-md-tw thead th:first-child { z-index: 2; }
+  #v-council .t-scroll .c-t thead th:first-child { background-color: var(--panel-raised); }
+  #v-council .c-t td:first-child { white-space: nowrap; }
+}
+@media (max-width: 700px) and (hover: hover) { #v-council tbody tr:hover > td:first-child { background-color: color-mix(in srgb, var(--ink) 3.5%, var(--panel)); } }
+
+/* 4 · Systems → Live setups: the Coach's proposals come first, as the one thing waiting for the owner */
+#v-council .c-sleeve { display: flex; flex-direction: column; }
+#v-council .c-sleeve > .ms-k { order: -2; margin-bottom: 4px; }
+#v-council .c-sleeve .sl-row { gap: 8px; padding: 16px 0; }
+#v-council .c-sleeve .sl-row + .sl-row { border-top: 1px solid var(--line-soft); }
+#v-council .c-sleeve .sl-h b { font-size: 16px; }
+#v-council .c-sleeve .sl-h small, #v-council .c-sleeve .sl-n { color: var(--ink-dim); font-size: 12.5px; line-height: 1.55; }
+#v-council .c-sleeve .sl-k { gap: 6px 22px; font-size: 12.5px; }
+#v-council .c-sleeve .sl-k b { font: 600 15px var(--mono); font-variant-numeric: tabular-nums; margin-right: 2px; }
+#v-council .c-sleeve .sl-g { height: 4px; margin-top: 2px; }
+/* the proposals row: its heading <b> is the first child (a setup row starts with its Live / Stopped chip).
+   With a Promote / Demote waiting it moves to the top of the card as the one thing that needs the owner; with nothing waiting it stays a quiet line at the bottom. */
+#v-council .c-sleeve .sl-row:has(> .sl-h > b:first-child) .sl-h b { text-transform: none; font-size: 15px; }
+#v-council .c-sleeve .sl-row:has(> .sl-h > b:first-child):has(.ms-chip) {
+  order: -1; margin: 6px 0 10px; padding: 14px 16px; border: 1px solid var(--gold-line, color-mix(in srgb, #e3b341 45%, transparent)); border-radius: var(--r, 8px);
+  background: color-mix(in srgb, var(--gold, #e3b341) 7%, var(--panel)); }
+#v-council .c-sleeve .sl-row:has(> .sl-h > b:first-child):has(.ms-chip) + .sl-row { border-top: 0; }
+#v-council .c-sleeve .sl-row:has(> .sl-h > b:first-child):has(.ms-chip) .sl-h b { display: inline-flex; align-items: center; gap: 8px; }
+#v-council .c-sleeve .sl-row:has(> .sl-h > b:first-child):has(.ms-chip) .sl-h b::before { content: "!"; display: inline-grid; place-items: center; width: 20px; height: 20px; border-radius: 50%; background: var(--gold, #e3b341); color: #1a1405; font: 800 12px/1 var(--sans); }
+#v-council .c-sleeve .sl-row:has(> .sl-h > b:first-child) .sl-n:has(.ms-chip) { display: block; color: var(--ink); font-size: 13px; padding: 10px 0 2px; }
+#v-council .c-sleeve .sl-row:has(> .sl-h > b:first-child) .sl-n:has(.ms-chip) + .sl-n { border-top: 1px solid color-mix(in srgb, var(--gold, #e3b341) 25%, transparent); }
+#v-council .c-sleeve .ms-chip-buy::before { content: "▲ "; font-size: .85em; }
+#v-council .c-sleeve .ms-chip-sell::before { content: "▼ "; font-size: .85em; }
+#v-council .c-sleeve .sl-h .ms-chip::before { content: none; }   /* Live / Stopped status chips: no arrow */
+/* a per-setup suggestion (skip a market / session) inside a live setup row: same "waiting for you" treatment */
+#v-council .c-sleeve small.sl-n[title^="From the 30-day replay"] { display: block; padding: 8px 12px; border-radius: var(--r-sm, 6px); color: var(--ink); background: color-mix(in srgb, var(--gold, #e3b341) 9%, transparent); border: 1px solid var(--gold-line, color-mix(in srgb, #e3b341 45%, transparent)); }
+
+/* 5 · Edge finder: 44px group buttons, quieter verdict, readable zebra */
+#v-council .c-edge .edge-by { gap: 8px; margin: 6px 0 14px; }
+#v-council .c-edge .edge-by button, #v-council .c-edge .edge-sc select { min-height: var(--c-tap); padding-inline: 14px; }
+#v-council .c-edge .edge-by button[aria-pressed="true"] { border-color: var(--accent); color: var(--ink); }
+#v-council .edge-t th, #v-council .edge-t td { padding: 10px 10px; }
+#v-council .edge-t tbody th { font-weight: 600; color: var(--ink); text-align: left; }
+#v-council .edge-t tr.edge > *, #v-council .edge-t tr.avoid > * { background-color: transparent; }
+#v-council .edge-t tr.edge { background: color-mix(in srgb, var(--buy) 7%, var(--panel)); }
+#v-council .edge-t tr.avoid { background: color-mix(in srgb, var(--sell) 6%, var(--panel)); }
+#v-council .c-how > summary { min-height: var(--c-tap); display: flex; align-items: center; }
+
+/* 6 · P&L calendar: 44px controls; weekends and future days dimmed by tone, not opacity */
+#v-council .cal-nav button { width: var(--c-tap); height: var(--c-tap); }
+#v-council .cal-seg button { min-height: var(--c-tap); padding-inline: 14px; }
+#v-council #ms-cal > .cal-d.we:not(.win):not(.loss), #v-council .cal > :nth-child(7n+6):not(.cal-h):not(.win):not(.loss), #v-council .cal > :nth-child(7n+7):not(.cal-h):not(.win):not(.loss) { opacity: 1; background: transparent; }
+#v-council .cal .cal-d.fut .cn { opacity: 1; }
+#v-council .cal-d .cn, #v-council .cal-wk .cn { color: var(--ink-dim); }
+#v-council .cal-d.we .cn, #v-council .cal-d.fut .cn { color: var(--ink-faint); }
+#v-council #ms-cal-sum { color: var(--ink-dim); }
+#v-council .cal-dayh button { min-height: 36px; padding-inline: 12px; }
+
+/* active trades: shadow positions dimmed by tone (opacity dropped them below 3:1) and a dashed edge */
+#v-council .c-act li.sh { opacity: 1; border-style: dashed; }
+#v-council .c-act li.sh .a-t, #v-council .c-act li.sh b { color: var(--ink-dim); }
+
+/* 7 · research: Ready list rows are whole-row links; backtest summary reads as a lede */
+#v-council .c-ready li { padding: 0; align-items: center; }
+#v-council .c-ready li > a { flex: 1; min-width: 0; min-height: var(--c-tap); display: flex; flex-wrap: wrap; align-items: center; gap: 2px 6px; padding: 8px 4px 8px 12px; }
+#v-council .c-ready li > span { padding-right: 12px; }
+#v-council #ms-c-bt-sum { color: var(--ink-dim); font-size: 13px; margin: 0 0 10px; }
+#v-council .ms-q.good { color: var(--buy); border-color: color-mix(in srgb, var(--buy) 45%, transparent); background: color-mix(in srgb, var(--buy) 8%, transparent); }
+#v-council .ms-q.weak { color: var(--c-warn); border-color: color-mix(in srgb, var(--c-warn) 45%, transparent); background: color-mix(in srgb, var(--c-warn) 8%, transparent); }
+#v-council .c-few { color: var(--ink-dim); }
+#v-council .c-wide { color: var(--ink-dim); }
+/* Coach rule log: no coloured side stripe; owner changes carry a "you" tag instead */
+#v-council .c-hist li { border: 1px solid var(--line-soft); border-radius: var(--r-sm, 6px); padding: 10px 12px; }
+#v-council .c-hist li span { color: var(--ink-dim); }
+#v-council .c-hist li.by-you { background: color-mix(in srgb, var(--gold, #e3b341) 7%, transparent); border-color: var(--gold-line, color-mix(in srgb, #e3b341 45%, transparent)); }
+#v-council .c-hist li.by-you span { color: var(--ink-dim); font-weight: 600; }
+/* calendar day cells with a result: secondary lines in ink-dim so they hold 4.5:1 on the heat tint */
+#v-council .cal-d:is(.win, .loss) .ct, #v-council .cal-d:is(.win, .loss) .ct-w, #v-council .cal-wk .ct { color: var(--ink-dim); }
+#v-council .cal-d.win .cr, #v-council .cal-wk.win .cr { color: color-mix(in srgb, var(--buy) 82%, var(--ink)); }
+#v-council .cal-d.loss .cr, #v-council .cal-wk.loss .cr { color: color-mix(in srgb, var(--sell) 82%, var(--ink)); }
+
+/* 8 · Analyst / Coach markdown: measure, heading rhythm, framed tables with numeric columns */
+#v-council .c-md { font-size: 13.5px; line-height: 1.65; }
+#v-council .c-md > p, #v-council .c-md > ul { max-width: 75ch; }
+#v-council .c-md li + li { margin-top: 4px; }
+#v-council .c-md h3 { font-size: 17px; margin: 22px 0 8px; padding-top: 16px; border-top: 1px solid var(--line-soft); text-wrap: balance; }
+#v-council .c-md > h3:first-child { margin-top: 4px; padding-top: 0; border-top: 0; }
+#v-council .c-md h4, #v-council .c-md h5 { font-size: 14px; margin: 18px 0 6px; }
+#v-council .c-md .c-md-tw { margin: 6px 0 14px; border: 1px solid var(--line); border-radius: var(--r-sm, 6px); }
+#v-council .c-md table { font-size: 12.5px; }
+#v-council .c-md th { background: var(--panel-raised); font-size: 12px; white-space: nowrap; }
+#v-council .c-md th, #v-council .c-md td { padding: 8px 10px; border-bottom-color: var(--line-soft); }
+#v-council .c-md tbody tr:last-child td { border-bottom: 0; }
+#v-council .c-md td.n { font-family: var(--mono); white-space: nowrap; }
+#v-council .c-md td:first-child { color: var(--ink); font-weight: 600; }
+#v-council .c-md-tw:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+@media (max-width: 700px) { #v-council .c-md td { min-width: 96px; } #v-council .c-md td:first-child { min-width: 84px; } }
 </style>
 </body>
 </html>
