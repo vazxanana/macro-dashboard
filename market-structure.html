@@ -2287,6 +2287,7 @@ html[data-motion="off"][data-gate] .gate-bg path[stroke] { animation: none; stro
             <label><input type="checkbox" id="ms-show-cf" data-show="cf" checked><i style="background:rgba(242,54,69,.5)"></i>CF</label>
             <label><input type="checkbox" id="ms-show-vr" data-show="vr" checked><i style="background:rgba(255,152,0,.4);border:1px solid #e08600"></i>VR</label>
             <label><input type="checkbox" id="ms-show-htf" data-show="htf" checked><i style="border:1.5px dashed #2962ff"></i>HTF Origin</label>
+            <label><input type="checkbox" id="ms-show-vol" checked><i style="background:linear-gradient(90deg,rgba(8,153,129,.5) 50%,rgba(242,54,69,.5) 50%)"></i>Volume</label>
             <label><input type="checkbox" id="ms-show-next" data-show="next" checked><i style="background:#2962ff;height:2px"></i>Next setup</label>
             <label><input type="checkbox" id="ms-show-plan" data-show="plan" checked><i style="background:#089981;height:2px"></i>Selected trade</label>
             <label><input type="checkbox" id="ms-show-replica" data-show="replica" checked><i style="background:#7b61ff;height:2px"></i><span class="adm">Replica (gold M5)</span><span class="pubonly">Signals (gold M5)</span></label>
@@ -3479,10 +3480,17 @@ function msNextSetup(bars, A) {
       return r;
     } });
 
+    // tick-volume histogram along the bottom (OANDA counts price changes per candle; exchange feeds without volume show nothing)
+    const vol = chart.addHistogramSeries({ priceScaleId: 'vol', priceFormat: { type: 'volume' }, lastValueVisible: false, priceLineVisible: false });
+    chart.priceScale('vol').applyOptions({ scaleMargins: { top: 0.84, bottom: 0 }, visible: false });
+    const vcol = (b) => b.close >= b.open ? 'rgba(8,153,129,.26)' : 'rgba(242,54,69,.26)';
+    P.vol = vol;
+    P.setVol = function () { const on = P.raw && P.raw.some((b) => b.volume > 0) && G.showVol !== false; vol.setData(on ? P.raw.map((b) => ({ time: b.time + TZ, value: b.volume || 0, color: vcol(b) })) : []); };
     P.rebuild = function (keepView) {
       const off = G.offset;
       P.bars = P.raw.map((b) => ({ time: b.time + TZ, open: b.open + off, high: b.high + off, low: b.low + off, close: b.close + off }));
       series.setData(P.bars);
+      P.setVol();
       P.analyze();
       if (!keepView || !P.fitted) P.fit();
       P.legend();
@@ -3595,6 +3603,7 @@ function msNextSetup(bars, A) {
       else return;
       const off = G.offset, b = { time: k.time + TZ, open: k.open + off, high: k.high + off, low: k.low + off, close: k.close + off };
       if (P.bars[P.bars.length - 1].time === b.time) P.bars[P.bars.length - 1] = b; else P.bars.push(b);
+      if (G.showVol !== false) { const rk = P.raw[P.raw.length - 1]; if (rk.volume > 0 || P.raw.some((x) => x.volume > 0)) try { vol.update({ time: b.time, value: rk.volume || 0, color: vcol(rk) }); } catch (e) {} }
       if (P.bars.length > P.raw.length) P.bars.shift();
       series.update(b);
       if (!lgHover) P.legend();
@@ -3606,6 +3615,7 @@ function msNextSetup(bars, A) {
   }
 
   TFS.forEach((tf) => { const p = makePane(tf); if (p) panes[tf.id] = p; });
+  { const v = document.getElementById('ms-show-vol'); try { G.showVol = localStorage.getItem('ms-vol') !== '0'; } catch (e) {} if (v) { v.checked = G.showVol !== false; v.addEventListener('change', () => { G.showVol = v.checked; try { localStorage.setItem('ms-vol', v.checked ? '1' : '0'); } catch (e) {} Object.values(panes).forEach((P) => P.setVol && P.setVol()); }); } }
   { const b = document.getElementById('ms-pa-open'); if (b) b.addEventListener('click', () => { const m = b.closest('details'); if (m) m.open = false; window.msOpenAlerts(); }); }
   // ─── Price alerts (7 Nov): set a level, get a phone/desktop notification when it trades, even with the site closed.
   // The list lives on this device (localStorage) and on Vercel (/api/push, private Blob) with its Web Push subscription;
