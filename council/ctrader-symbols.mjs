@@ -171,7 +171,7 @@ export async function symbolSpecs({ env, tokens = null, prev = null, history = n
       markets, missing, symbols: out, errors };
     for (const e of Object.values(out)) e.impliedPrice = impliedPrice(e, file.account.leverage);
     // the sample trade, sized by the mirror's own riskVolume with these specs
-    file.sample = { balance: SAMPLE.balance, riskPct: +(SAMPLE.risk * 100).toFixed(3), riskCash: +(SAMPLE.balance * SAMPLE.risk).toFixed(2), maxLots: LIMITS.maxLots };
+    file.sample = { balance: SAMPLE.balance, riskPct: +(SAMPLE.risk * 100).toFixed(3), riskCash: +(SAMPLE.balance * SAMPLE.risk).toFixed(2), maxLots: LIMITS.maxLots, maxMarginPct: LIMITS.maxMarginShare * 100 };
     for (const [name, e] of Object.entries(out)) {
       const stop = SAMPLE.stops[e.markets[0]], mid = e.bid > 0 && e.ask > 0 ? (e.bid + e.ask) / 2 : null;
       if (!stop) continue;

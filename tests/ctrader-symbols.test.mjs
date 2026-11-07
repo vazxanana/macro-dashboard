@@ -98,7 +98,7 @@ test('dumps the specs of every symbol the mirror uses: lots, assets, mode, sched
   assert.deepEqual(n.observed, { n: 1, perPointPerLot: 1, matches: true });
   assert.equal(f.symbols.US30.tradingMode, 'CLOSE_ONLY_MODE');
   // the sample: 0.20% (1R) of $50k = $100. Gold, 32-point stop: $3,200 a lot -> 0.03 lot; US100, 160 points at $1: 0.625 -> 0.6 lot
-  assert.deepEqual(f.sample, { balance: 50000, riskPct: 0.2, riskCash: 100, maxLots: 5 });
+  assert.deepEqual(f.sample, { balance: 50000, riskPct: 0.2, riskCash: 100, maxLots: 5, maxMarginPct: 20 });
   assert.deepEqual(g.sample, { stop: SAMPLE.stops.xau, lots: 0.03, volume: 300, riskCash: 100, perLot: 3200, risked: 96 });
   assert.deepEqual(n.sample, { stop: 160, lots: 0.6, volume: 60, riskCash: 100, perLot: 160, risked: 96 });
   assert.equal(f.symbols.EURUSD.sample.lots, 0.5);   // 20 pips = $200 a lot
@@ -158,7 +158,12 @@ test('real Fusion specs: the mirror lot for a 0.20% (1R) ICT trade at $50k, and 
   assert.equal(lotFor('NAS100', 26981, 26821).lots, 0.62);    // $100 / (160 pts x $1) = 0.625 -> 0.62
   assert.equal(lotFor('US500', 7379, 7349).lots, 3.33);       // 30 pts: 3.33
   assert.equal(lotFor('US30', 51284, 51084).lots, 0.5);       // 200 pts: 0.50
-  assert.match(lotFor('US2000', 2752, 2734).skip, /5\.55 lot is above the 5-lot cap/);   // 18 pts: 5.55 lots, over LIMITS.maxLots
+  assert.equal(lotFor('US2000', 2752, 2734).lots, 5.55);   // 18 pts: 5.55 lots; margin 5.55 x $27.52 = $153, far under 20% of $50k (owner, 7 Nov: cap by risk)
+  // the margin cap: a 0.05 gold stop would need 20 lots ($16,282 margin at $814/lot) > 20% of $50k -> skipped; 0.1 -> 10 lots ($8,141) allowed
+  assert.match(lotFor('XAUUSD', 4070, 4069.95).skip, /19\.99 lot would use 162\d\d\.\d+ margin, over 20% of the balance/);
+  assert.equal(lotFor('XAUUSD', 4070, 4069.9).lots, 10);
+  // without the broker's margin (no spec) the old 5-lot cap still applies
+  assert.match(riskVolume({ info: REAL.symbols.US2000, t: { id: 'ict:x', entry: 2752, stop: 2734, size: 1 }, balance: 50000, name: 'US2000', spec: null }).skip, /5-lot cap \(the broker's margin is not known\)/);
   assert.equal(lotFor('XAUUSD', 4070, 4038).lots, 0.03);      // $32 x 100 oz = $3,200 a lot -> 0.031 -> 0.03
   assert.equal(lotFor('EURUSD', 1.114, 1.112, 'm1').lots, 0.05);   // Meridian 0.02% = $10, 20 pips = $200 a lot
   assert.equal(lotFor('USDCAD', 1.38, 1.378, 'm2').lots, 0.06);    // USD base: 1 CAD = 1/1.38 USD, 20 pips = $144.9 a lot -> 0.069 -> 0.06
