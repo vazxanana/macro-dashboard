@@ -40,6 +40,13 @@ module.exports = async (req, res) => {
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), `${job}-`)), before = {};
   try {
     if (live && !tok) throw new Error('GH_TOKEN not set');
+    // owner (7 Nov): one runner at a time. While the GitHub Actions council loop is committing (it saved a round in the last
+    // 10 minutes), the Vercel council round stands down: no trading, no alerts, no commit. If Actions stops (e.g. the repo goes
+    // private), Vercel takes over by itself on the next cron.
+    if (job === 'council') { try { const r = await gh(`/commits?sha=${BR}&per_page=1`); const c = (await r.json())[0];
+      const who = c && ((c.author && c.author.login) || (c.commit && c.commit.author && c.commit.author.name) || ''), at = c && Date.parse(c.commit.committer.date);
+      if (/github-actions|mosha-council/.test(who) && Date.now() - at < 10 * 60e3) { const sk = { job, mode: 'skipped', why: `GitHub Actions saved ${Math.round((Date.now() - at) / 60e3)} min ago`, seconds: 0 };
+        console.log(JSON.stringify(sk)); await report(job, sk); return res.status(200).json(sk); } } catch (e) { console.error('actions check', e.message); } }
     STEP = 'download';
     // 1. the files this job reads, at the branch's current commit
     const head = (await (await gh(`/git/ref/heads/${BR}`)).json()).object.sha;
