@@ -235,12 +235,15 @@ export function buildClaims(dir, { iters = 5000, seed = 7, repoOut = path.join(H
 
   // council systems: the council's own replays (claim source) and the 2018-2026 rebuilds
   const rp = readJSON(dir, 'research/replay-2w.json');
+  // status from the live config, so an owner move to shadow shows here without editing this list (7 Nov: crypto trend)
+  const cfgNow = readJSON(dir, 'config.json') || {};
+  const cryptoSt = cfgNow.cryptoTrendShadow ? 'shadow (owner, 7 Nov: no edge since Jun 2025, #508)' : 'live (paper)';
   const SYS = [
     ['replica', 'Gold replica', 'live (paper)', (x) => true, null],
     ['gtrend', 'Gold trend N20', 'live (paper)', (x) => true, ['gtrend.json', 'trades.gtrend20']],
     ['gtrend5', 'Gold trend fast N5', 'live (paper)', (x) => true, ['gtrend.json', 'trades.gtrend5']],
     ['nq-open', 'NQ New York open run', 'live (paper)', (x) => x.session === 'nyflip', ['nq.json', 'trades']],
-    ['trend', 'Crypto trend v3', 'live (paper)', (x) => true, ['crypto.json', 'trades']],
+    ['trend', 'Crypto trend v3', cryptoSt, (x) => true, ['crypto.json', 'trades']],
     ['gtl', 'Gold H4 trendline', 'live (paper)', (x) => true, ['gtl.json', 'trades']],
     ['geg', 'Gold daily engulf', 'live (paper)', (x) => true, ['geg.json', 'trades']],
     ['gmp', 'Gold momentum pullback', 'shadow (test system)', (x) => true, ['gmp.json', 'trades']],
