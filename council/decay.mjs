@@ -113,6 +113,13 @@ export function assess(points, b) {
   const why = [], few = n < DK.minN;
   const sr = b.h > 0 ? S.s / b.h : 0, ddr = b.ddLimit > 0 ? dd.cur / b.ddLimit : 0;
   if (few) { why.push(`only ${n} trade${n === 1 ? '' : 's'} on record: no verdict yet`); return { ...o, few: true, status: 'healthy', why }; }
+  // no council replay of this rule (the record is its research rebuild): the rebuild is shown, not judged. Three rebuilds of the
+  // live Mosha BO rule disagree on 2018-22 and share a minority of trades (research/edge/mosha-oos, 8 Nov), so a flag read on
+  // the last rebuild trades measured the baseline choice, not the rule. The forward record alone counts, once it has minN trades.
+  if (o.nHist && !o.nReplay && live.length < DK.minN) {
+    why.push(`${live.length} forward trade${live.length === 1 ? '' : 's'} of ${DK.minN} needed: no council replay of this rule, and its research rebuilds disagree, so the rebuild record shown here is not judged`);
+    return { ...o, few: true, status: 'healthy', why };
+  }
   let status = 'healthy';
   if (S.s >= b.h) { status = 'decaying'; why.push(`running below half its backtest edge (${fR(b.ref)} a trade): CUSUM ${r2(S.s)} past its limit ${b.h}`); }
   if (dd.cur > b.ddLimit) { status = 'decaying'; why.push(`drawdown ${r2(dd.cur)}R beyond its limit ${b.ddLimit}R`); }
