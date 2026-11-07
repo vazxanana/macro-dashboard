@@ -1367,6 +1367,10 @@ td.st-dim { color: var(--ink-faint); }
 /* polish 19: council status 'stopped' matches running/late (the badge style of .c-bad was leaking in); loss groups get a review progress bar */
 #ms-c-status .c-bad { font: inherit; font-weight: 700; padding: 0; background: none; border-radius: 0; }
 .rv-bar { display: inline-block; width: 44px; height: 4px; margin-left: 8px; vertical-align: 2px; border-radius: 4px; background: linear-gradient(90deg, var(--buy) var(--p), var(--line) var(--p)); }
+
+/* polish 20: coach chips label their source quietly, analyst rows colour the side */
+.ms-q .q-k { font: 600 9.5px var(--sans); letter-spacing: .04em; text-transform: uppercase; color: var(--ink-faint); margin-right: 5px; }
+.c-ready em.sd { font-style: normal; font-weight: 600; } .c-ready em.sd.b { color: var(--buy); } .c-ready em.sd.s { color: var(--sell); }
 </style>
 </head>
 <body>
@@ -3988,15 +3992,15 @@ function msNextSetup(bars, A) {
     renderBacktest(C.backtest, C.config || {});
     // Analyst
     const ready = C.snap ? Object.entries(C.snap.markets || {}).flatMap(([k, m]) => m.setups.filter((t) => t.state === 'READY').map((t) => ({ k, m, t }))) : [];
-    set('ms-c-ready', ready.length ? ready.map(({ k, m, t }) => `<li><a href="?s=${k}#setup"><b>${esc(m.label)}</b> ${t.side === 'sell' ? 'Sell' : 'Buy'} ${esc(t.name)} <small>${esc(t.pair)}</small></a><span>${t.rr}R</span></li>`).join('') : '<li class="empty">No market is Ready at the last Trader run.</li>');
+    set('ms-c-ready', ready.length ? ready.map(({ k, m, t }) => `<li><a href="?s=${k}#setup"><b>${esc(m.label)}</b> <em class="sd ${t.side === 'sell' ? 's' : 'b'}">${t.side === 'sell' ? 'Sell' : 'Buy'}</em> ${esc(t.name)} <small>${esc(t.pair)}</small></a><span>${t.rr}R</span></li>`).join('') : '<li class="empty">No market is Ready at the last Trader run.</li>');
     set('ms-c-analysis', C.analysis ? md(C.analysis) : '<p class="ms-note">The Analyst writes the weekly brief every Monday morning: bias per market, key levels, likely setups and the week\'s news.</p>');
     // Coach
     const cf = C.config || { buf: CFG.buf, minRR: CFG.minRR, paused: {}, history: [] };
     const paused = Object.entries(cf.paused || {});
     set('ms-c-rules', `<span class="ms-q">Stop buffer ${cf.buf} × ATR</span><span class="ms-q">Min stop ${cf.minRisk || 0.6} × ATR</span><span class="ms-q">${cf.be ? `Break-even at +${cf.be}R` : 'No break-even move'}</span><span class="ms-q">Min reward:risk ${cf.minRR}</span><span class="ms-q">Dollar cap ${cf.maxUsd || 3} trades</span>${cf.newsGuard ? '<span class="ms-q">News guard on</span>' : ''}` + (paused.length ? paused.map(([k, u]) => `<span class="ms-q weak">${esc(k)} paused to ${esc(u.slice(0, 10))}</span>`).join('') : '<span class="ms-q good">All setups active</span>') +
       Object.entries(cf.pausedMarkets || {}).map(([m, u]) => `<span class="ms-q weak">${esc((INSTRUMENTS[m] || {}).label || m)} paused to ${esc(String(u).slice(0, 10))}</span>`).join('') +
-      Object.entries(cf.target || {}).filter(([, v]) => v === 't2').map(([k]) => `<span class="ms-q">${(cf.targetBy || {})[k] === 'user' ? 'Your rule' : 'Learned'} · ${esc(k)}: ${/^r/.test(k) ? 'hold to the Origin' : 'hold to the second target'}</span>`).join('') +
-      Object.entries(cf.filters || {}).map(([k, f]) => [f.d1 ? `${k}: only ${f.d1} D1` : '', f.cf ? `${k}: only ${f.cf === 'choch' ? 'CHoCH' : 'continuation BO'} confirmations` : '', f.choch ? `${k}: ${f.choch === 'yes' ? 'needs' : 'skips on'} a fresh M15/M5 CHoCH` : '', f.m15c ? `${k}: ${f.m15c === 'yes' ? 'needs' : 'skips on'} your M15 CHoCH` : '', f.struct ? `${k}: only ${f.struct} structure` : '', (f.noSession || []).length ? `${k}: skip ${f.noSession.join(', ')}` : ''].filter(Boolean).map((t) => `<span class="ms-q">Learned · ${esc(t)}</span>`).join('')).join(''));
+      Object.entries(cf.target || {}).filter(([, v]) => v === 't2').map(([k]) => `<span class="ms-q"><small class="q-k">${(cf.targetBy || {})[k] === 'user' ? 'Your rule' : 'Learned'}</small> ${esc(k)}: ${/^r/.test(k) ? 'hold to the Origin' : 'hold to the second target'}</span>`).join('') +
+      Object.entries(cf.filters || {}).map(([k, f]) => [f.d1 ? `${k}: only ${f.d1} D1` : '', f.cf ? `${k}: only ${f.cf === 'choch' ? 'CHoCH' : 'continuation BO'} confirmations` : '', f.choch ? `${k}: ${f.choch === 'yes' ? 'needs' : 'skips on'} a fresh M15/M5 CHoCH` : '', f.m15c ? `${k}: ${f.m15c === 'yes' ? 'needs' : 'skips on'} your M15 CHoCH` : '', f.struct ? `${k}: only ${f.struct} structure` : '', (f.noSession || []).length ? `${k}: skip ${f.noSession.join(', ')}` : ''].filter(Boolean).map((t) => `<span class="ms-q"><small class="q-k">Learned</small> ${esc(t)}</span>`).join('')).join(''));
     const sh = (C.trades || []).filter((x) => x.shadow && (x.status === 'win' || x.status === 'loss')), shR = sh.reduce((a, x) => a + x.R, 0);
     set('ms-c-shadow-sum', sh.length ? `Shadow trades (blocked by rules) closed: ${sh.length}, ${shR >= 0 ? '+' : ''}${shR.toFixed(1)}R. ${shR > 0 ? 'Blocked trades are winning: the Coach will loosen the rule that blocks them.' : 'The rules are keeping you out of losing trades.'}` : 'Blocked setups are followed as shadow trades so the Coach can check every rule it adds.');
     set('ms-c-notes', C.coach ? (C.coach.notes || []).map((n) => `<li>${esc(n)}</li>`).join('') : '<li>The statistical Coach runs once a day with the Trader.</li>');
