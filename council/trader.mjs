@@ -1359,10 +1359,11 @@ const fslot = nowISO.slice(0, 11) + String(Math.floor(+nowISO.slice(11, 13) / 6)
   }
 }
 // Coach proposals (7 Nov): suggestions for the owner from the replay, for the setups trading live. Never applied here:
-// live rules change only with the owner's OK. Recomputed when backtest.json or the live setups' rules change.
+// live rules change only with the owner's OK. Recomputed when backtest.json, the live setups or any setup's rules change.
 try {
   const b = rd('backtest.json', null), cj = rd('coach.json', {});
-  const key = b && b.at ? b.at + '|' + JSON.stringify((config.focusSetups || []).map((k) => [k, (config.filters || {})[k] || null])) : '';
+  // v2: promotion/demotion proposals read every setup's filters, so any rule change recomputes them
+  const key = b && b.at ? 'v2|' + b.at + '|' + JSON.stringify([config.focusSetups || [], config.filters || {}]) : '';
   if (key && cj.proposalsKey !== key) { cj.proposals = coachProposals(b, config, nowISO); cj.proposalsKey = key; cj.proposalsBt = b.at; wr('coach.json', cj); }
 } catch (e) { console.log('coach proposals failed:', e.message); }
 config.history = config.history.slice(-200);
