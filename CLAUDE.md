@@ -352,7 +352,8 @@ forex): 249 of 9,230 rows changed, R_none −131 → −182R; most gap R is the 
 Shadow audit (8 Nov, `research/edge/shadow-audit`): the shadow book's −300R week was costs, not trading (+92.6R gross; 300R of Kraken fees on
 139 crypto scalps). One repair: `council/repairs.mjs` `voidM30Twins` gives the 29 pre-dedupe m30m1 copies of Scalp entries status
 `duplicate` (`dupOf`, `void`; no tally counts that status). Near-stop market fills (the engine's stop floor is checked on the planned entry,
-not the fill) and the crypto venue are proposals for the owner, not changes.
+not the fill) is a proposal for the owner. Crypto venue, owner's decision 7 Nov: the council trades through cTrader (CFD), so crypto
+paper trades pay the costs study's CFD round trip (0.04% of price, `CFD_CRYPTO` in `council/fills.mjs`) instead of Kraken spot fees.
 
 ## Edge scoreboard (7 Nov 2026, owner: "where is the edge across both systems, at a glance")
 Admin card `#ms-sb` at the top of the Council research pane (deep link `#council/scoreboard`, Home quick link). Script `#ms-sb-js` at the
