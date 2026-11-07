@@ -2121,6 +2121,68 @@ html[data-role="viewer"] [data-go="crypto"], html[data-role="viewer"] [data-go="
   .btab a { font-size: 10px !important; letter-spacing: -0.01em; min-width: 0; overflow: hidden; }
   .btab a { white-space: nowrap; text-overflow: ellipsis; }
 }
+
+/* ═══ LOGIN 2 (7 Nov): two-panel desk intro + refined card, live gold strip, caps-lock hint, shake on a wrong password ═══ */
+.gate-wrap { position: relative; z-index: 1; display: grid; grid-template-columns: minmax(0, 1fr) 400px; gap: clamp(32px, 6vw, 96px); align-items: center; width: min(1080px, 100%); }
+.gate-side { color: #eceef2; font: 15px/1.6 Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; max-width: 520px; }
+.gs-brand { display: flex; align-items: center; gap: 10px; font: 600 15px Inter, sans-serif; color: #e9c46a; letter-spacing: .01em; margin-bottom: 28px; }
+.gs-brand .ms-coin { width: 26px; height: 26px; }
+.gs-h { margin: 0 0 14px; font: 650 clamp(32px, 3.6vw, 46px)/1.08 Inter, -apple-system, sans-serif; letter-spacing: -0.025em; color: #f4f5f8; text-wrap: balance; }
+.gs-h em { font-style: normal; color: #e9c46a; }
+.gs-p { margin: 0 0 26px; color: #a6adbb; max-width: 46ch; text-wrap: pretty; }
+.gs-list { list-style: none; margin: 0 0 30px; padding: 0; display: grid; gap: 14px; }
+.gs-list li { display: grid; grid-template-columns: 34px 1fr; gap: 12px; align-items: start; color: #a6adbb; font-size: 14px; }
+.gs-list b { color: #eceef2; font-weight: 600; }
+.gs-i { width: 34px; height: 34px; border-radius: 10px; background: rgba(227,179,65,.10); border: 1px solid rgba(227,179,65,.28); position: relative; }
+.gs-i::after { content: ""; position: absolute; inset: 8px; background: #e9c46a; -webkit-mask: var(--m) center / contain no-repeat; mask: var(--m) center / contain no-repeat; }
+.gs-i1 { --m: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round'%3E%3Ccircle cx='9' cy='8' r='3'/%3E%3Ccircle cx='17' cy='9' r='2.4'/%3E%3Cpath d='M3 19c0-3 2.7-5 6-5s6 2 6 5M15 14.5c2.8-.3 6 1.2 6 4.5'/%3E%3C/svg%3E"); }
+.gs-i2 { --m: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round'%3E%3Cpath d='M7 4v16M17 4v16'/%3E%3Crect x='5' y='8' width='4' height='7' rx='1'/%3E%3Crect x='15' y='6' width='4' height='9' rx='1'/%3E%3C/svg%3E"); }
+.gs-i3 { --m: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round'%3E%3Cpath d='M4 9V5a1 1 0 0 1 1-1h4M15 4h4a1 1 0 0 1 1 1v4M20 15v4a1 1 0 0 1-1 1h-4M9 20H5a1 1 0 0 1-1-1v-4'/%3E%3Ccircle cx='12' cy='12' r='2.5'/%3E%3C/svg%3E"); }
+.gs-live { display: inline-grid; gap: 6px; padding: 12px 16px; border-radius: 12px; background: rgba(15,17,22,.72); border: 1px solid rgba(255,255,255,.08); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); min-width: 300px; }
+.gs-tk { display: flex; align-items: baseline; gap: 10px; font: 500 13px Inter, sans-serif; color: #a6adbb; }
+.gs-dot { width: 8px; height: 8px; border-radius: 50%; background: #3fbf8f; align-self: center; box-shadow: 0 0 0 0 rgba(63,191,143,.6); animation: gs-pulse 2s ease-out infinite; }
+@keyframes gs-pulse { to { box-shadow: 0 0 0 8px transparent; } }
+.gs-dot.off { background: #7c8496; animation: none; }
+.gs-sym { font-weight: 600; color: #eceef2; }
+.gs-px { font: 650 18px "JetBrains Mono", ui-monospace, monospace; color: #f4f5f8; font-variant-numeric: tabular-nums; }
+.gs-tf { display: inline-flex; gap: 4px; margin-left: auto; }
+.gs-tf i { font: 600 10.5px "JetBrains Mono", monospace; font-style: normal; padding: 1px 5px; border-radius: 4px; border: 1px solid rgba(255,255,255,.14); color: #a6adbb; }
+.gs-tf i.u { color: #3fbf8f; border-color: rgba(63,191,143,.45); } .gs-tf i.d { color: #ff6b81; border-color: rgba(255,107,129,.45); }
+.gs-sess { font: 500 12.5px Inter, sans-serif; color: #8d95a5; }
+.gs-sess b { color: #e9c46a; font-weight: 600; }
+/* card refinements */
+.gate-card { width: 100% !important; border-radius: 18px !important; padding: 30px 30px 20px !important; box-shadow: 0 40px 100px -20px rgba(0,0,0,.7), 0 0 0 1px rgba(255,255,255,.04) inset !important; }
+.gate-card h1 { font-size: 26px !important; letter-spacing: -0.02em; }
+.gate-caps { margin: 6px 0 0; font: 500 12.5px Inter, sans-serif; color: #e9c46a; display: flex; align-items: center; gap: 6px; }
+.gate-caps::before { content: "⇪"; font-size: 13px; }
+.gate-go { position: relative; }
+.gate-go:disabled::after { content: ""; position: absolute; right: 16px; top: 50%; width: 14px; height: 14px; margin-top: -7px; border-radius: 50%; border: 2px solid rgba(23,19,10,.35); border-top-color: #17130a; animation: gate-spin .7s linear infinite; }
+@keyframes gate-spin { to { transform: rotate(360deg); } }
+.gate-card.shake { animation: gate-shake .42s cubic-bezier(.36, .07, .19, .97); }
+@keyframes gate-shake { 15%, 85% { transform: translateX(-2px); } 30%, 70% { transform: translateX(5px); } 45%, 55% { transform: translateX(-7px); } }
+.gate-foot { display: flex; justify-content: space-between; gap: 10px; flex-wrap: wrap; margin: 18px -30px -20px; padding: 12px 30px; border-top: 1px solid rgba(255,255,255,.06); font: 500 11.5px Inter, sans-serif; color: #6f7686; border-radius: 0 0 18px 18px; background: rgba(255,255,255,.015); }
+/* the chart line in the background draws itself once */
+html[data-gate] .gate-bg path[stroke] { stroke-dasharray: 2400; stroke-dashoffset: 2400; animation: gate-draw 2.4s .2s cubic-bezier(.65, 0, .35, 1) forwards; }
+@keyframes gate-draw { to { stroke-dashoffset: 0; } }
+html[data-gate] .gate-side { animation: gate-in .6s .1s cubic-bezier(.16, 1, .3, 1) both; } html[data-gate] .gate-card { animation: gate-in .6s cubic-bezier(.16, 1, .3, 1) both; }
+@keyframes gate-in { from { opacity: 0; transform: translateY(10px); } }
+@media (prefers-reduced-motion: reduce) { html[data-gate] .gate-bg path[stroke] { animation: none; stroke-dasharray: none; } html[data-gate] .gate-side, html[data-gate] .gate-card, .gate-card.shake, .gs-dot { animation: none !important; } }
+html[data-motion="off"][data-gate] .gate-bg path[stroke] { animation: none; stroke-dasharray: none; } html[data-motion="off"] .gate-side, html[data-motion="off"] .gate-card { animation: none !important; }
+/* tablet and phone: the card first, a compact desk strip above it */
+@media (max-width: 900px) {
+  .gate-wrap { grid-template-columns: minmax(0, 420px); justify-content: center; gap: 18px; }
+  .gate-side { order: -1; max-width: none; }
+  .gs-h, .gs-p, .gs-list { display: none; }
+  .gs-brand { margin-bottom: 12px; justify-content: center; }
+  .gs-live { display: grid; width: 100%; min-width: 0; box-sizing: border-box; }
+  .gate-card .gate-brand > span, .gate-card .gate-brand > .ms-coin { display: none; }
+  .gate-card .gate-brand { justify-content: flex-end; min-height: 0; margin: 0; }
+}
+@media (max-width: 420px) { .gate-card { padding: 24px 20px 16px !important; } .gate-foot { margin: 16px -20px -16px; padding: 12px 20px; } }
+.gate-caps[hidden] { display: none !important; }
+.gate-side { position: relative; isolation: isolate; }
+.gate-side::before { content: ""; position: absolute; inset: -70px -60px -50px -80px; z-index: -1; background: radial-gradient(closest-side, rgba(7,7,10,.82), rgba(7,7,10,.55) 60%, transparent); pointer-events: none; }
+@media (max-width: 900px) { .gate-side::before { display: none; } }
 </style>
 <script>try{if(localStorage.getItem('msMotion')==='off')document.documentElement.dataset.motion='off'}catch(e){}</script>
 </head>
@@ -2137,19 +2199,37 @@ html[data-role="viewer"] [data-go="crypto"], html[data-role="viewer"] [data-go="
     <path d="M0 700 L80 660 L150 690 L230 610 L300 640 L380 560 L450 590 L520 500 L600 540 L680 470 L760 500 L840 420 L910 450 L990 360 L1070 400 L1150 320 L1230 350 L1310 270 L1380 290 L1440 230" fill="none" stroke="url(#gbL)" stroke-width="2.5" stroke-linejoin="round"/>
     <g fill="#e3b341" fill-opacity=".10" stroke="#e3b341" stroke-opacity=".22"><rect x="96" y="600" width="14" height="60" rx="2"/><line x1="103" y1="582" x2="103" y2="676"/><rect x="176" y="640" width="14" height="40" rx="2"/><line x1="183" y1="622" x2="183" y2="696"/><rect x="256" y="570" width="14" height="70" rx="2"/><line x1="263" y1="552" x2="263" y2="656"/><rect x="336" y="590" width="14" height="44" rx="2"/><line x1="343" y1="572" x2="343" y2="650"/><rect x="416" y="520" width="14" height="66" rx="2"/><line x1="423" y1="502" x2="423" y2="602"/><rect x="496" y="470" width="14" height="58" rx="2"/><line x1="503" y1="452" x2="503" y2="544"/><rect x="576" y="500" width="14" height="40" rx="2"/><line x1="583" y1="482" x2="583" y2="556"/><rect x="656" y="430" width="14" height="64" rx="2"/><line x1="663" y1="412" x2="663" y2="510"/><rect x="736" y="460" width="14" height="36" rx="2"/><line x1="743" y1="442" x2="743" y2="512"/><rect x="816" y="390" width="14" height="62" rx="2"/><line x1="823" y1="372" x2="823" y2="468"/><rect x="896" y="410" width="14" height="38" rx="2"/><line x1="903" y1="392" x2="903" y2="464"/><rect x="976" y="330" width="14" height="66" rx="2"/><line x1="983" y1="312" x2="983" y2="412"/><rect x="1056" y="360" width="14" height="40" rx="2"/><line x1="1063" y1="342" x2="1063" y2="416"/><rect x="1136" y="290" width="14" height="60" rx="2"/><line x1="1143" y1="272" x2="1143" y2="366"/><rect x="1216" y="310" width="14" height="36" rx="2"/><line x1="1223" y1="292" x2="1223" y2="362"/><rect x="1296" y="240" width="14" height="58" rx="2"/><line x1="1303" y1="222" x2="1303" y2="314"/><rect x="1376" y="250" width="14" height="34" rx="2"/><line x1="1383" y1="232" x2="1383" y2="300"/></g>
   </svg>
+  <div class="gate-wrap">
+  <aside class="gate-side" aria-label="About the desk">
+    <div class="gs-brand"><i class="ms-coin" aria-hidden="true"></i><span>Aurum Desk</span></div>
+    <h2 class="gs-h">Your trading desk, <em>live</em>.</h2>
+    <p class="gs-p">Market structure on every timeframe, an AI council paper-trading every setup, and dedicated desks for gold, crypto scalping and ICT.</p>
+    <ul class="gs-list">
+      <li><i class="gs-i gs-i1" aria-hidden="true"></i><span><b>AI council</b> places, manages and reviews paper trades around the clock</span></li>
+      <li><i class="gs-i gs-i2" aria-hidden="true"></i><span><b>D1 → M1 structure</b> with breakouts, origins and the next setup</span></li>
+      <li><i class="gs-i gs-i3" aria-hidden="true"></i><span><b>Focus mode</b>, market pulse and the session clock in one view</span></li>
+    </ul>
+    <div class="gs-live" id="gs-live" aria-live="off">
+      <div class="gs-tk"><span class="gs-dot" aria-hidden="true"></span><span class="gs-sym">XAU/USD</span><b class="gs-px" id="gs-px">—</b><span class="gs-tf" id="gs-tf"></span></div>
+      <div class="gs-sess" id="gs-sess"></div>
+    </div>
+  </aside>
   <div class="gate-card">
     <div class="gate-brand"><i class="ms-coin" aria-hidden="true"></i><span>Aurum Desk</span><button type="button" class="gate-x" id="ms-gate-x" aria-label="Close sign-in">×</button></div>
     <h1 id="ms-gate-t">Sign in</h1>
     <p class="gate-sub">Welcome back. Sign in to continue.</p>
     <form id="ms-gate-f" novalidate>
       <label for="ms-gate-p">Password</label>
-      <input id="ms-gate-p" name="password" type="password" autocomplete="current-password">
+      <input id="ms-gate-p" name="password" type="password" autocomplete="current-password" aria-describedby="ms-gate-caps ms-gate-err">
+      <p class="gate-caps" id="ms-gate-caps" hidden>Caps Lock is on</p>
       <p class="gate-err" id="ms-gate-err" role="alert"></p>
       <button type="submit" class="gate-go" id="ms-gate-go">Sign in</button>
     </form>
     <div class="gate-or"><span>or</span></div>
     <button type="button" class="gate-guest" id="ms-gate-guest">Continue as guest</button>
     <p class="gate-note">Guests see a live gold H4 chart with one trade setup and the P&amp;L calendar.</p>
+    <p class="gate-foot"><span>Paper trading only · not financial advice</span><span>meridianx.dev</span></p>
+  </div>
   </div>
 </div>
 <a class="skip" href="#ms-main-start">Skip to content</a>
@@ -6962,6 +7042,27 @@ function gpStats(T) {
   // this script runs after the router's first pass: catch a page opened straight on #gold too
   new MutationObserver(function () { if (!view.hidden) window.renderGold(); }).observe(view, { attributes: true, attributeFilter: ['hidden'] });
   if (!view.hidden) window.renderGold();
+})();
+</script>
+<script>
+// Login 2: caps-lock hint, shake on a wrong password, the live gold strip (public snapshot) and the session line
+(function () {
+  var R = document.documentElement; if (!document.getElementById('ms-gate')) return;
+  var inp = document.getElementById('ms-gate-p'), caps = document.getElementById('ms-gate-caps'), err = document.getElementById('ms-gate-err'), card = document.querySelector('.gate-card');
+  function capsCheck(e) { if (caps && e.getModifierState) caps.hidden = !e.getModifierState('CapsLock'); }
+  if (inp) { inp.addEventListener('keydown', capsCheck); inp.addEventListener('keyup', capsCheck); inp.addEventListener('blur', function () { if (caps) caps.hidden = true; }); inp.addEventListener('input', function () { if (err && err.textContent) err.textContent = ''; }); }
+  if (err && card) new MutationObserver(function () { if (/wrong/i.test(err.textContent)) { card.classList.remove('shake'); void card.offsetWidth; card.classList.add('shake'); } }).observe(err, { childList: true, characterData: true, subtree: true });
+  function sess() { var d = new Date(), h = d.getUTCHours() + d.getUTCMinutes() / 60, w = d.getUTCDay(), on = [], el = document.getElementById('gs-sess'); if (!el) return;
+    if (w === 6 || (w === 0 && h < 22) || (w === 5 && h >= 21)) { el.innerHTML = 'Forex and gold <b>closed</b> for the weekend · crypto trades 24/7'; return; }
+    if (h >= 23 || h < 8) on.push('Asia'); if (h >= 7 && h < 16) on.push('London'); if (h >= 12.5 && h < 21) on.push('New York');
+    el.innerHTML = on.length ? '<b>' + on.join(' + ') + '</b> session open · ' + d.toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' }) + ' your time' : 'Between sessions · ' + d.toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' }) + ' your time'; }
+  function px() { if (!R.dataset.gate) return; var u = (window.MS_CDATA || '') + 'snapshot.json?t=' + Math.floor(Date.now() / 60000);
+    fetch(u, { cache: 'no-store' }).then(function (r) { return r.ok ? r.json() : null; }).then(function (j) { var m = j && j.markets && j.markets.xau; var dot = document.querySelector('.gs-dot');
+      if (!m || !m.price) { if (dot) dot.classList.add('off'); return; }
+      document.getElementById('gs-px').textContent = (+m.price).toLocaleString(undefined, { minimumFractionDigits: 1, maximumFractionDigits: 1 });
+      var t = m.trend || {}; document.getElementById('gs-tf').innerHTML = [['D1', t['1d']], ['H4', t['4h']], ['H1', t['1h']]].map(function (z) { return '<i class="' + (z[1] > 0 ? 'u' : z[1] < 0 ? 'd' : '') + '" title="' + z[0] + (z[1] > 0 ? ' up' : z[1] < 0 ? ' down' : ' flat') + '">' + z[0] + (z[1] > 0 ? '▲' : z[1] < 0 ? '▼' : '') + '</i>'; }).join(''); })
+      .catch(function () { var dot = document.querySelector('.gs-dot'); if (dot) dot.classList.add('off'); }); }
+  sess(); px(); setInterval(function () { if (R.dataset.gate) { sess(); } }, 30000); setInterval(px, 120000);
 })();
 </script>
 </body>
