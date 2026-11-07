@@ -8,22 +8,22 @@ _Snapshot 2026-11-02 05:37 UTC. Paper trading only._
 <!-- live-rule:start -->
 ## Live Scalp rule check
 
-Built by the Trader at 2026-11-07 19:00 UTC from snapshot, config and the 30-day replay. Rule now: Scalp (M15 → M1) against D1 only, not in asia/overlap, skips audusd.
+Built by the Trader at 2026-11-07 19:04 UTC from snapshot, config and the 30-day replay. Rule now: Scalp (M15 → M1) against D1 only, not in asia/overlap, skips audusd. **Scalp is not live right now** (not in focusSetups), so nothing below trades live.
 
 Session now: **newyork**.
 
 | Market | D1 (source) | Live Scalp would | Scalp now | Replay, live rule |
 |---|---|---|---|---|
-| XAU/USD | down (OANDA) | no (trades the replica instead) | IN ORIGIN sell | 41 trades, 34% won, −0.10R a trade |
-| BTC/USD | up (Kraken) | **sell** only | READY sell | 25 trades, 32% won, +0.45R a trade |
-| ETH/USD | down (Kraken) | **buy** only | READY buy | 23 trades, 39% won, +0.35R a trade |
-| SOL/USD | down (Kraken) | **buy** only | IN ORIGIN sell | 17 trades, 29% won, +0.52R a trade |
-| XRP/USD | up (Kraken) | **sell** only | READY sell | 31 trades, 32% won, +0.07R a trade |
-| EUR/USD | down (OANDA) | **buy** only | IN ORIGIN sell | 21 trades, 14% won, −0.70R a trade |
-| GBP/USD | down (OANDA) | **buy** only | READY sell (blocked: wrong side) | 20 trades, 40% won, +0.39R a trade |
-| AUD/USD | up (OANDA) | no (rule skips AUD/USD) | IN ORIGIN buy | 37 trades, 27% won, −0.24R a trade |
-| USD/CAD | up (OANDA) | **sell** only | IN ORIGIN buy | 28 trades, 25% won, −0.35R a trade |
-| USD/CHF | down (OANDA) | **buy** only | IN ORIGIN buy | 29 trades, 48% won, +0.38R a trade |
+| XAU/USD | down (OANDA) | no (not live, trades the replica instead) | IN ORIGIN sell | 41 trades, 34% won, −0.10R a trade |
+| BTC/USD | up (Kraken) | no (not live) | READY sell | 25 trades, 32% won, +0.45R a trade |
+| ETH/USD | down (Kraken) | no (not live) | READY buy | 23 trades, 39% won, +0.35R a trade |
+| SOL/USD | down (Kraken) | no (not live) | IN ORIGIN sell | 17 trades, 29% won, +0.52R a trade |
+| XRP/USD | up (Kraken) | no (not live) | READY sell | 31 trades, 32% won, +0.07R a trade |
+| EUR/USD | down (OANDA) | no (not live) | IN ORIGIN sell | 21 trades, 14% won, −0.70R a trade |
+| GBP/USD | down (OANDA) | no (not live) | READY sell (blocked: wrong side) | 20 trades, 40% won, +0.39R a trade |
+| AUD/USD | up (OANDA) | no (not live, rule skips AUD/USD) | IN ORIGIN buy | 37 trades, 27% won, −0.24R a trade |
+| USD/CAD | up (OANDA) | no (not live) | IN ORIGIN buy | 28 trades, 25% won, −0.35R a trade |
+| USD/CHF | down (OANDA) | no (not live) | IN ORIGIN buy | 29 trades, 48% won, +0.38R a trade |
 
 Replay total on the markets it trades live: 194 trades, +0.13R a trade (+24.50R), after spread. Each signal still has to clear reward:risk ≥ 1.2, the 2-trades-per-market cap and the 3-hour re-entry rule.
 <!-- live-rule:end -->
@@ -31,7 +31,7 @@ Replay total on the markets it trades live: 194 trades, +0.13R a trade (+24.50R)
 <!-- coach-churn:start -->
 ## Coach rule changes
 
-Built by the Trader at 2026-11-07 19:00 UTC from the rule history. Rules the Coach changed by itself in the last 7 days (owner rules are not counted).
+Built by the Trader at 2026-11-07 19:04 UTC from the rule history. Rules the Coach changed by itself in the last 7 days (owner rules are not counted).
 
 | Rule | Changes | Steps (oldest first) |
 |---|---|---|

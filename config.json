@@ -545,6 +545,12 @@
    "by": "repair",
    "change": "Pairs replica settings are dormant: pairsLiveAt, pairVolPct (80) and pairStopR (-10) are kept, but no pair is in replicaLive ([\"xau\"]), so no pair trades the replica live. They only label the pairs' research signals (calm, pairStop) and the Pairs card's gate.",
    "why": "history catch-up: since pairs-best (5 Nov) put forex back to research only, nothing said these settings no longer trade."
+  },
+  {
+   "at": "2026-11-07T19:04:10.000Z",
+   "by": "user",
+   "change": "Scalp back to shadow (owner delegated): no new live paper Scalp trades; signals still recorded as shadow",
+   "why": "Live rule on HistData M1 2018-Oct 2026 (gold + 5 forex, live engine, 1 spread a trade): -0.187R a trade 2018-23 (n9,551), -0.229R 2024-26 (n4,532), negative every year and market (research/edge/regime); all 50 regime cells negative; no exit rescues it (research/edge/scalp-exits, best -0.18R); realistic costs -0.24 to -0.30R (research/edge/costs). The 30-day replay is -0.07R net now, and live forex results on spot candles were far worse than on Kraken (research/spotcheck.json)."
   }
  ],
  "btAt": "2026-11-07T17:52:30.624Z",
@@ -585,7 +591,8 @@
   "gold-trend-add",
   "gold-momentum-pullback",
   "gold-trend-fast",
-  "scalp-against-live"
+  "scalp-against-live",
+  "scalp-shadow-research"
  ],
  "target": {},
  "targetBy": {},
@@ -600,7 +607,7 @@
    "why": "four losses in a row"
   },
   "scalp": {
-   "at": "2026-11-07T19:00:47.000Z",
+   "at": "2026-11-07T19:04:10.000Z",
    "why": "expectancy -1.00R over 13 trades"
   },
   "xau": {
@@ -720,7 +727,5 @@
   "n": 5,
   "k": 2
  },
- "focusSetups": [
-  "scalp"
- ]
+ "focusSetups": []
 }
