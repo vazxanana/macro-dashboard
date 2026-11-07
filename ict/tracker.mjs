@@ -16,6 +16,10 @@ export const MARKETS = {
   es:  { sym: 'ES=F',  cnbc: ['@SP.1', '@ES.1'],  label: 'S&P 500',      short: 'ES',  tick: 0.25, dec: 2 },
   ym:  { sym: 'YM=F',  cnbc: ['@DJ.1', '@YM.1'],  label: 'Dow Jones',    short: 'YM',  tick: 1,    dec: 0 },
   rty: { sym: 'RTY=F', cnbc: ['@TFS.1', '@RTY.1'], label: 'Russell 2000', short: 'RTY', tick: 0.1, dec: 1 },
+  // skill §26 (owner, 7 Nov): gold futures and two FX majors, each with its own A-setup rule (aRule) from 2019-26 history
+  gc:  { sym: 'GC=F', cnbc: ['@GC.1'], label: 'Gold', short: 'GC', tick: 0.1, dec: 1, aRule: 'gold' },
+  eurusd: { sym: 'EURUSD=X', cnbc: ['EUR='], label: 'EUR/USD', short: 'EURUSD', tick: 0.00001, dec: 5, aRule: 'london' },
+  gbpusd: { sym: 'GBPUSD=X', cnbc: ['GBP='], label: 'GBP/USD', short: 'GBPUSD', tick: 0.00001, dec: 5, aRule: 'none' },
 };
 export const P = { piv: 3, look: 96, vmax: 6, rr: 3, trail: [2, 1.5], mark: 2, holdH: 36, maxAtr: 8, fresh: 3 * 3600 };
 const UA = 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36';
@@ -131,10 +135,19 @@ export const nfpMorning = (t) => { if (!t) return false; const p = Object.fromEn
 export const RISK_TIGHT = 0.15, TIGHT_SIZE = 0.5;
 const aBase = (g) => !!g.feat && g.feat.bias === 'against' && g.grade && g.grade.total >= 7 && !nfpMorning(g.close ?? g.signalAt);
 const aTight = (g) => aBase(g) && g.feat.atrR != null && g.feat.atrR >= RISK_TIGHT && g.feat.atrR < RISK_FLOOR && g.feat.body >= 0.6 && g.feat.session !== 'NY PM';
-export const isASetup = (g) => (aBase(g) && (g.feat.atrR == null || (g.feat.atrR >= RISK_FLOOR && g.feat.atrR < RISK_CAP))) || aTight(g);
-export const sizeOf = (g) => (aTight(g) ? TIGHT_SIZE : 1);
+const aIndex = (g) => (aBase(g) && (g.feat.atrR == null || (g.feat.atrR >= RISK_FLOOR && g.feat.atrR < RISK_CAP))) || aTight(g);
+// skill §26: the index rule does not carry over. Spot gold 2019-26: A-setups lose in every window, while BUYS with a stop of
+// 0.3-0.75x the daily ATR are positive in every year (2019-22 +56.7R, 2023-24 +36.0R, 2025-26 +32.8R). EUR/USD: London-session
+// signals only (+28.6 | +11.7 | +14.9R, 7 of 8 years positive). GBP/USD: no rule held in every window, so no A-setups (tracked only).
+const RULES = {
+  gold: (g) => !!g.feat && g.side > 0 && g.feat.atrR != null && g.feat.atrR >= RISK_FLOOR && g.feat.atrR < RISK_CAP,
+  london: (g) => !!g.feat && g.feat.session === 'London',
+  none: () => false,
+};
+export const isASetup = (g, mk) => { const r = mk && MARKETS[mk] && MARKETS[mk].aRule; return r ? RULES[r](g) : aIndex(g); };
+export const sizeOf = (g, mk) => (mk && MARKETS[mk] && MARKETS[mk].aRule ? 1 : aTight(g) ? TIGHT_SIZE : 1);
 // A+ tier (skill §17): an A-setup whose inversion candle body is >= 60% of its range and that does not fire in the NY afternoon (12-16 ET)
-export const isAPlus = (g) => isASetup(g) && g.feat.body >= 0.6 && g.feat.session !== 'NY PM';
+export const isAPlus = (g, mk) => !(mk && MARKETS[mk] && MARKETS[mk].aRule) && isASetup(g, mk) && g.feat.body >= 0.6 && g.feat.session !== 'NY PM';   // §26: no A+ tier for gold / FX (strong bodies did worse there)
 export const letter = (g) => (g >= 10 ? 'A+' : g >= 9 ? 'A' : g >= 8 ? 'A-' : g >= 7 ? 'B+' : g >= 6 ? 'B' : g >= 5 ? 'B-' : g >= 3 ? 'C' : 'F');
 
 async function main() {
@@ -167,14 +180,14 @@ async function main() {
       for (const g of sig) {
         const id = `${key}-${g.side > 0 ? 'b' : 's'}-${g.t}`;
         if (trades.some((x) => x.id === id) || now - g.close > P.fresh) continue;
-        const aset = isASetup(g);
+        const aset = isASetup(g, key);
         if (trades.some((x) => x.market === key && x.status === 'open' && (!aset || x.aset))) continue;   // one open per market; an A-setup is only blocked by another A-setup
         const s = g.side, entry = f(price), r0 = Math.abs(entry - g.stop);
         if ((entry - g.stop) * s <= 0 || r0 > 1.6 * g.r0) continue;   // price already through the stop, or ran far from the signal
         trades.push({ id, market: key, label: M.label, short: M.short, side: s > 0 ? 'buy' : 'sell', model: 'H1 iFVG reversal', signalAt: g.close, signalPx: f(g.entry),
-          entry, stop: f(g.stop), r0: +r0.toFixed(M.dec + 1), t1: null, trail: P.trail, stop0: f(g.stop), t2: f(entry + s * P.mark * r0), opened: now, checked: now, status: 'open', R: null, size: aset ? sizeOf(g) : 1,
+          entry, stop: f(g.stop), r0: +r0.toFixed(M.dec + 1), t1: null, trail: P.trail, stop0: f(g.stop), t2: f(entry + s * P.mark * r0), opened: now, checked: now, status: 'open', R: null, size: aset ? sizeOf(g, key) : 1,
           sweep: { t: g.sweepT, level: f(g.swept) }, fvg: g.fvg.map(f), ih: g.ih == null ? null : f(g.ih), dol: g.dol == null ? null : f(g.dol), valid: g.valid,
-          feat: g.feat, grade: { ...g.grade, letter: letter(g.grade.total) }, aset, aplus: isAPlus(g) });
+          feat: g.feat, grade: { ...g.grade, letter: letter(g.grade.total) }, aset, aplus: isAPlus(g, key) });
       }
       // 3. snapshot + candles for the page
       const last = sig.at(-1), dd = D.at(-1);
