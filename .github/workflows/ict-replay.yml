@@ -1,13 +1,13 @@
 name: ICT desk replay
 
-# Replays the ICT tracker's model over the the year so far (from 1 Jan 2026) of CNBC futures candles and writes council-data
+# Replays the ICT tracker's model from 1 Aug 2025 (owner, 7 Nov 2026; before: 1 Jan 2026) of CNBC futures candles and writes council-data
 # ict/replay.json for the ICT desk (calendar, stats). Runs when the replay code changes, on demand, and weekly.
 on:
   workflow_dispatch:
     inputs:
       from:
         description: 'Replay start (UTC date)'
-        default: '2026-01-01'
+        default: '2025-08-01'
   schedule:
     - cron: '41 6 * * 0'
   push:
@@ -40,7 +40,7 @@ jobs:
         with:
           node-version: 22
       - name: Replay
-        run: node ict/replay.mjs data/ict "${{ github.event.inputs.from || '2026-01-01' }}"
+        run: node ict/replay.mjs data/ict "${{ github.event.inputs.from || '2025-08-01' }}"
       - name: Save to council-data
         run: |
           cd data

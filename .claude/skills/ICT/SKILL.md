@@ -329,3 +329,25 @@ Tested on cash NQ+ES+YM (`idxrec5.mjs`), live exit, costs, 2023-24 | 2025-26. A-
 - **Kept as forward-test features, not rules:** every signal now records `feat.htfFvg` ('D1' / 'H4' / null) and `feat.cc` (+1 agrees, −1 against, 0).
   - The desk's "What works" table splits by both; review tag "Stops run into a D1/H4 FVG".
   - Re-judge with ~100 forward A-setups, judging D1 separately.
+
+## 30. M5 entry inside the H1 A-setup (7 Nov 2026) — Fred's manual entry, not automatable
+The course pairs an H1 setup with an M5/M1 entry. Tested on index A-setups (cash NQ/ES/YM 2023-26 and NQ futures 2023-25), simulated on M5 candles, costs in, results at the same money risk.
+- **Rule:** after the H1 A-setup closes, wait up to 6 h for the first M5 iFVG signal (the tracker's own `signals()` on M5) on the same side, with its stop no worse than the H1 stop.
+  - The setup is dead if the H1 stop trades first (24 of 438 cases).
+  - Enter at that M5 close, keep the H1 stop, same trail (+2R / 1.5R) and 36 h hold.
+  - No M5 signal = no trade.
+- **Cash 2023-24 | 2025-26:** H1 entry +33.8R dd 15.7 | +23.1R dd 18.4; **M5 entry + H1 stop +56.5R dd 9.1 | +93.5R dd 6.7**.
+  - By year: 2023 +18.5 vs +16.0, 2024 +38.0 vs +17.8, 2025 +42.0 vs +15.5, 2026 +51.5 vs +7.6.
+  - About 62% of A-setups get an M5 entry.
+- **NQ futures 2023 / 2024 / 2025:** H1 +10.0 / +10.7 / +8.4R (dd 8.8 / 7.2 / 6.7); M5 entry +10.4 / +21.6 / +15.4R (dd 2.0 / 6.8 / 2.3).
+- **M5 entry with the M5 stop** (a third of the H1 stop): +32.8 | +93.6R on cash but −0.9R in NQ futures 2024. Keep the H1 stop.
+- **Latency kills it:**
+  - entering one M5 bar late: cash +26.5 | +32.5R, futures +4.8 / +6.3 / +2.3R;
+  - entering three bars (15 min) late: cash +8.5 | +24.3R.
+  - The edge is in the inversion candle's own close. The tracker (15-min cadence, GitHub cron delays) cannot take it.
+- **Use:** Fred's execution method at the screen. The desk shows it on every index A-setup's checklist. His Taken trades (fill + own R) measure it live.
+- **Also tested 7 Nov:** room-to-DOL sizing (§27) on gold and EUR/USD hurts both (gold +43.6 | +20.7 | +24.2R vs +56.7 | +36.0 | +32.8R; EUR/USD drawdown doubles in 2019-22). They stay at 1x.
+- **RTY:** no history beyond the 2026 replay, too few trades to judge; unchanged.
+- **Replay:** now starts 1 Aug 2025 (5 more months).
+  - NQ/ES/YM back-fill from Dukascopy cash; EUR/USD and GBP/USD back-fill from HistData M1 in council-data.
+  - GC and RTY start where CNBC history begins.

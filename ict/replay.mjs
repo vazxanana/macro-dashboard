@@ -9,7 +9,7 @@ import zlib from 'node:zlib';
 import { MARKETS, P, cnbcBars, agg, signals, letter, isASetup, isAPlus, sizeOf } from './tracker.mjs';
 
 const DATA = process.argv[2] || 'data/ict';
-const FROM = Date.parse(process.argv[3] || '2026-01-01T00:00:00Z') / 1000;
+const FROM = Date.parse(process.argv[3] || '2025-08-01T00:00:00Z') / 1000;   // owner, 7 Nov: 5 more months (was 1 Jan 2026)
 const now = Math.floor(Date.now() / 1000);
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 const dedupe = (a) => { const m = new Map(); for (const b of a) m.set(b.time, b); return [...m.values()].sort((x, y) => x.time - y.time); };
@@ -33,12 +33,20 @@ async function history(M) {
     // CNBC keeps only ~6 months of intraday candles: fill the earlier part from the research probe's Dukascopy cash-index
     // 5m files (council-data research/candles/idx/), scaled to the futures level by the median ratio over the overlap
     const DUKA = { NQ: 'USATECHIDXUSD', ES: 'USA500IDXUSD', YM: 'USA30IDXUSD' }[M.short];
-    if (DUKA && h1.length && h1[0].time > FROM) {
+    // FX: HistData M1 files in council-data research/candles/<PAIR>/ (EST, no DST -> UTC), aggregated to 5m, used the same way
+    const HD = { EURUSD: 'EURUSD', GBPUSD: 'GBPUSD' }[M.short];
+    if ((DUKA || HD) && h1.length && h1[0].time > FROM) {
       let d5 = [];
-      for (const y of [...new Set([warm, now].map((t) => new Date(t * 1000).getUTCFullYear()))]) {
+      const yrs = [...new Set([warm, now].map((t) => new Date(t * 1000).getUTCFullYear()))]; for (let y = yrs[0]; y <= yrs.at(-1); y++) if (!yrs.includes(y)) yrs.push(y);
+      if (DUKA) for (const y of yrs) {
         const f = path.join(DATA, '..', 'research', 'candles', 'idx', `${DUKA}_${y}.json.gz`);
         try { d5 = d5.concat(JSON.parse(zlib.gunzipSync(fs.readFileSync(f))).map((r) => ({ time: r[0], open: r[1], high: r[2], low: r[3], close: r[4] }))); } catch (e) { /* not there yet */ }
       }
+      if (HD) { const dir = path.join(DATA, '..', 'research', 'candles', HD); let m1 = [];
+        let files = []; try { files = fs.readdirSync(dir).filter((f) => f.endsWith('.csv.gz') && yrs.some((y) => f.includes(`_M1_${y}`))); } catch (e) { files = []; }
+        for (const f of files) for (const ln of zlib.gunzipSync(fs.readFileSync(path.join(dir, f))).toString().split('\n')) { if (!ln) continue; const [d, o, h, l, c] = ln.split(';');
+          const t = Date.UTC(+d.slice(0, 4), +d.slice(4, 6) - 1, +d.slice(6, 8), +d.slice(9, 11), +d.slice(11, 13)) / 1000 + 5 * 3600; if (t >= warm) m1.push({ time: t, open: +o, high: +h, low: +l, close: +c }); }
+        d5 = agg(m1.sort((a, b) => a.time - b.time), 300); }
       d5 = dedupe(d5);
       if (d5.length) {
         const dh = agg(d5, 3600), byT = new Map(dh.map((b) => [b.time, b])), first = h1[0].time;
@@ -47,8 +55,8 @@ async function history(M) {
           const k = ratios[Math.floor(ratios.length / 2)], sc = (b) => ({ time: b.time, open: b.open * k, high: b.high * k, low: b.low * k, close: b.close * k });
           const fill = dh.filter((b) => b.time >= warm && b.time < first).map(sc);
           h1 = dedupe(fill.concat(h1)); m5 = dedupe(d5.filter((b) => b.time >= FROM && b.time < first).map(sc).concat(m5));
-          log.push(`duka ${DUKA} fill ${fill.length} H1 before ${new Date(first * 1000).toISOString().slice(0, 10)}, scale ${k.toFixed(4)}`);
-        } else log.push(`duka ${DUKA}: overlap too small (${ratios.length})`);
+          log.push(`${DUKA ? 'duka ' + DUKA : 'histdata ' + HD} fill ${fill.length} H1 before ${new Date(first * 1000).toISOString().slice(0, 10)}, scale ${k.toFixed(4)}`);
+        } else log.push(`${DUKA || HD}: overlap too small (${ratios.length})`);
       }
     }
     console.log(M.short, sym, 'H1', h1.length, 'M5', m5.length, log.join(' '));

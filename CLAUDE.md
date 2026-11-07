@@ -141,7 +141,7 @@ Rules and research live in `.claude/skills/ICT/SKILL.md` (results also in counci
 - Read-only desk: `ict: 'read'` on a user (Orlando) sets `html[data-ict-ro]`, which hides `.ict-rw` (the review form,
   "My trading", GitHub saving); viewers with ICT access may open `#ict`.
 - Replay: `ict/replay.mjs` (workflow `ict-replay.yml`: on change, on demand with a start date, weekly) runs the same
-  `signals()` over CNBC history since 1 Jan 2026 and writes council-data `ict/replay.json` (records carry `replay: true`).
+  `signals()` over CNBC history since 1 Aug 2025 (default; 1 Jan 2026 before 7 Nov; FX back-filled from HistData) and writes council-data `ict/replay.json` (records carry `replay: true`).
   The desk has a Both / Live / Replay switch (localStorage `ictSrc`) and a P&L calendar of closed signals.
 - A-setup filter (skills §14 + §20 + §22 + §23): against the daily bias + grade >= 7 + stop between 0.3x and 0.75x the daily ATR
   + not a jobs-report morning (first Friday of the month before 10:00 ET, `nfpMorning`)
@@ -153,6 +153,8 @@ Rules and research live in `.claude/skills/ICT/SKILL.md` (results also in counci
   applies to nq/es/ym/rty only (`isASetup(g, mk)`); no A+ tier for these three; desk clusters stay index-only.
 - Forward-test features (skill §29): `feat.htfFvg` (sweep into an unfilled D1 / H4 FVG) and `feat.cc` (prior daily
   candle-closure bias vs the signal) are recorded on every signal and split in "What works"; not filters.
+- M5 entry for Fred (skill §30): index A-setups → wait ≤ 6 h for an M5 iFVG, enter on its close with the H1 stop; beats
+  the H1 entry every year but needs execution on the close (not automatable at 15 min); shown in the signal checklist.
 - Size by room (skill §27): index A-setups 1.5x when the DOL is >= 2R away, else 0.5x (`DOL_ROOM`, `ROOM_SIZE`, `sizeOf`),
   times the §25 tight-stop half; R is stored x size; desk pill "<n>× size".
   The desk defaults to A-setups (switch `ictFlt`: A-setups / All signals / One per cluster — the highest-grade index of
