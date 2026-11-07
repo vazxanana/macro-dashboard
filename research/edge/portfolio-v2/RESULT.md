@@ -297,11 +297,11 @@ The other earlier study, `research/edge/portfolio` (2018-26 ICT plus a 150-day c
 - **One fixed set of parameters**, not tuned: a 36-month window, 24-month eligibility, k = 3, an SD floor of 0.25R, and
   12-month overlap for correlations.
 - **Multiple testing.** 8 primary books plus 4 TK sensitivities and x2 runs. The single-stream results were public before
-  this pre-registration (commit 2a6d24a6). The books were not.
+  this pre-registration (pushed as 2a6d24a6 before any result; 318482c8 after the rebase onto main). The books were not.
 
 ## Files
 
-- `preregistration.md`: the design and the bars, committed and pushed before any portfolio number (2a6d24a6).
+- `preregistration.md`: the design and the bars, committed and pushed before any portfolio number (2a6d24a6; 318482c8 after the rebase).
 - `ict-streams.mjs`: the ICT A-setup and shadow streams on OANDA 5m 2007-26, using the desk's code unchanged.
 - `run.mjs`: monthly series, the walk-forward books, correlations, betas, attribution and verdicts. It writes `result.json`.
 - `result.json`:
