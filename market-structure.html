@@ -2390,7 +2390,7 @@ html[data-motion="off"][data-gate] .gate-bg path[stroke] { animation: none; stro
     <nav class="h-quick" aria-label="Jump to"><a href="#council/calendar">Calendar</a><a href="#council/overview">Active trades</a><a href="#council/trades">All trades</a><a href="#council/review" class="adm">Loss review</a><a href="#council/systems" class="adm">Systems</a><a href="#council/research" class="adm">Research</a><a href="#journal">Journal</a></nav>
     <div class="h-warn" id="h-warn" role="alert" hidden></div>
     <div class="h-today" id="h-today" role="group" aria-label="Results today"></div>
-    <section class="h-mk" id="h-mk" aria-label="Markets now" hidden><div class="h-mk-h"><h2>Markets now</h2><span class="h-mk-k">last 24 hours · tap to chart</span></div><div class="h-mk-row" id="h-mk-row"></div></section>
+    <section class="h-mk" id="h-mk" aria-label="Markets now" hidden><div class="h-mk-h"><h2>Markets now</h2><span class="h-mk-k">% vs prior day's close (UTC) · line 24 h</span></div><div class="h-mk-row" id="h-mk-row"></div></section>
     <section class="h-pulse adm" id="h-pulse" aria-label="Market pulse" hidden><div class="h-pulse-h"><h2>Market pulse</h2><span class="h-pulse-k">trend on D1 · H4 · H1, strongest first</span></div><div class="h-pulse-row" id="h-pulse-row"></div></section>
     <div class="h-grid">
       <div class="h-main">
@@ -3998,28 +3998,59 @@ function msNextSetup(bars, A) {
   // watchlist strip (7 Nov loop): OANDA markets with today's change; tap to switch the charts to that market
   async function watchlist() {
     const el = document.getElementById('ms-wl'); if (!el || !MD.base || MD.on === false) return;
-    const keys = Object.keys(INSTRUMENTS).filter((k) => INSTRUMENTS[k].md);
-    const rows = await Promise.all(keys.map(async (k) => { try { const j = await (await fetch(`${location.origin}${MD.base}bars?sym=${k}&tf=1d&n=2`)).json(); const b = j.bars || []; if (b.length < 2) return null; const c = b[b.length - 1].close, o = b[b.length - 2].close; return { k, c, ch: (c - o) / o * 100 }; } catch (e) { return null; } }));
-    const ok = rows.filter(Boolean); if (!ok.length) return;
+    const Q = await mdQuotes();   // same quotes and change basis as Home "Markets now" (defined below; runs after the script has loaded)
+    const ok = Object.keys(INSTRUMENTS).filter((k) => Q[k]).map((k) => Q[k]); if (!ok.length) return;
     el.hidden = false;
-    el.innerHTML = ok.map((r) => { const I = INSTRUMENTS[r.k], d = I.dec ?? 2; return `<a href="?s=${r.k}#charts" class="wl-i${r.k === instKey ? ' cur' : ''}"${r.k === instKey ? ' aria-current="true"' : ''}><b>${I.label}</b><span>${(+r.c).toLocaleString('en-US', { minimumFractionDigits: d, maximumFractionDigits: d })}</span><em class="${r.ch >= 0 ? 'up' : 'dn'}">${r.ch >= 0 ? '+' : '−'}${Math.abs(r.ch).toFixed(2)}%</em></a>`; }).join('');
+    el.innerHTML = ok.map((r) => { const I = INSTRUMENTS[r.k], d = I.dec ?? 2; return `<a href="?s=${r.k}#charts" class="wl-i${r.k === instKey ? ' cur' : ''}"${r.k === instKey ? ' aria-current="true"' : ''} title="${I.label}: change vs the previous day's close (OANDA, UTC days)${r.closed ? ` · closed, last price ${mdWd(r.day)}` : ''}"><b>${I.label}</b><span>${(+r.c).toLocaleString('en-US', { minimumFractionDigits: d, maximumFractionDigits: d })}</span><em class="${r.ch >= 0 ? 'up' : 'dn'}">${r.ch >= 0 ? '+' : '−'}${Math.abs(r.ch).toFixed(2)}%</em></a>`; }).join('');
+  }
+  // Shared OANDA quotes (home-accuracy, 7 Nov): one fetch per market feeds the Home "Markets now" cards and the scanner's % column,
+  // so both show the same price and the same change basis. Change = last price vs the previous trading day's close, on OANDA's
+  // 00:00 UTC daily candles; a short Sunday-evening candle is skipped so Monday (and Sunday night) compare with Friday's close.
+  // closed = the newest daily candle is complete (weekend / holiday); stale = no H1 candle in the last 3 hours while not closed.
+  const MDQ = { at: 0, p: null, q: {} };
+  function mdQuotes() {
+    if (!MD.base || MD.on === false) return Promise.resolve({});
+    if (MDQ.p && Date.now() - MDQ.at < 50e3) return MDQ.p;
+    MDQ.at = Date.now();
+    MDQ.p = (async () => {
+      const keys = Object.keys(INSTRUMENTS).filter((k) => INSTRUMENTS[k].md);
+      await Promise.all(keys.map(async (k) => { try {
+        const [h, d] = await Promise.all([fetch(`${location.origin}${MD.base}bars?sym=${INSTRUMENTS[k].md}&tf=1h&n=24`).then((r) => r.json()), fetch(`${location.origin}${MD.base}bars?sym=${INSTRUMENTS[k].md}&tf=1d&n=4`).then((r) => r.json())]);
+        const hb = (h.bars || []).filter((b) => isFinite(+b.close)), db = (d.bars || []).filter((b) => isFinite(+b.close)); if (hb.length < 2 || db.length < 2) return;
+        const last = db[db.length - 1], prev = db.slice(0, -1).filter((b) => new Date(b.time * 1000).getUTCDay() !== 0).pop() || db[db.length - 2];
+        const c = +hb[hb.length - 1].close, o = +prev.close, lastH = hb[hb.length - 1].time, closed = !last.live, now = Date.now() / 1000;
+        MDQ.q[k] = { k, c, ch: (c - o) / o * 100, pts: hb.map((b) => +b.close), day: last.time, lastH, closed, stale: !closed && now - (lastH + 3600) > 3 * 3600, at: Date.now() };
+      } catch (e) { /* keep the last good quote */ } }));
+      return MDQ.q;
+    })();
+    return MDQ.p;
+  }
+  const mdWd = (t) => new Date(t * 1000).toLocaleDateString('en-GB', { weekday: 'short', timeZone: 'UTC' });
+  const mdHm = (t) => new Date(t * 1000).toLocaleString([], { weekday: 'short', hour: '2-digit', minute: '2-digit' });
+  // the council's D1 for a market when its snapshot is recent (D1 moves slowly; 6 h covers skipped runs), with the feed it came from
+  function councilD1(k) {
+    let s = null; try { s = COUNCIL.snap; } catch (e) { return null; }   // COUNCIL is declared further down the script
+    if (!s || !s.markets || !s.markets[k] || !(Date.now() - Date.parse(s.at) < 6 * 3600e3)) return null;
+    const v = (s.markets[k].trend || {})['1d']; if (v !== 1 && v !== -1) return null;
+    const ds = (s.d1src || {})[k];
+    return { v, src: ds ? ds.src : 'Kraken', at: s.at };
   }
   // Home "Markets now" (7 Nov loop): each OANDA market with price, change on the day and a 24 h sparkline from H1 candles
   async function homeMarkets() {
     const el = document.getElementById('h-mk-row'), box = document.getElementById('h-mk'); if (!el || !box || !MD.base || MD.on === false) return;
-    const keys = Object.keys(INSTRUMENTS).filter((k) => INSTRUMENTS[k].md);
-    const rows = await Promise.all(keys.map(async (k) => { try {
-      const [h, d] = await Promise.all([fetch(`${location.origin}${MD.base}bars?sym=${k}&tf=1h&n=24`).then((r) => r.json()), fetch(`${location.origin}${MD.base}bars?sym=${k}&tf=1d&n=2`).then((r) => r.json())]);
-      const hb = (h.bars || []).map((b) => +b.close).filter(isFinite), db = d.bars || []; if (hb.length < 2 || db.length < 2) return null;
-      const c = +db[db.length - 1].close, o = +db[db.length - 2].close; return { k, c, ch: (c - o) / o * 100, pts: hb };
-    } catch (e) { return null; } }));
-    const ok = rows.filter(Boolean); if (!ok.length) return;
+    const Q = await mdQuotes();
+    const ok = Object.keys(INSTRUMENTS).filter((k) => Q[k]).map((k) => Q[k]); if (!ok.length) return;
     const spark = (pts, up) => { const lo = Math.min(...pts), hi = Math.max(...pts), W = 96, H = 28, sx = W / (pts.length - 1), y = (v) => hi === lo ? H / 2 : 2 + (H - 4) * (1 - (v - lo) / (hi - lo));
       const d = pts.map((v, i) => `${i ? 'L' : 'M'}${(i * sx).toFixed(1)} ${y(v).toFixed(1)}`).join(' ');
       return `<svg class="h-mk-sp ${up ? 'up' : 'dn'}" viewBox="0 0 ${W} ${H}" preserveAspectRatio="none" aria-hidden="true"><path class="a" d="${d} L${W} ${H} L0 ${H}Z"/><path class="l" d="${d}"/><circle cx="${W}" cy="${y(pts[pts.length - 1]).toFixed(1)}" r="2.2"/></svg>`; };
     box.hidden = false;
-    el.innerHTML = ok.map((r) => { const I = INSTRUMENTS[r.k], dd = I.dec ?? 2, up = r.ch >= 0;
-      return `<a class="h-mk-i" href="?s=${r.k}#charts" aria-label="${I.label} ${r.c} ${up ? 'up' : 'down'} ${Math.abs(r.ch).toFixed(2)} percent today"><span class="h-mk-t"><b>${I.label}</b><em class="${up ? 'up' : 'dn'}">${up ? '+' : '−'}${Math.abs(r.ch).toFixed(2)}%</em></span><span class="h-mk-p">${(+r.c).toLocaleString('en-US', { minimumFractionDigits: dd, maximumFractionDigits: dd })}</span>${spark(r.pts, up)}</a>`; }).join('');
+    const kk = box.querySelector('.h-mk-k'); if (kk) kk.textContent = ok.every((r) => r.closed) ? `closed · ${mdWd(ok[0].day)} session vs day before` : '% vs prior day\'s close (UTC) · line 24 h';
+    el.innerHTML = ok.map((r) => { const I = INSTRUMENTS[r.k], dd = I.dec ?? 2, up = r.ch >= 0, d1 = councilD1(r.k), px = (+r.c).toLocaleString('en-US', { minimumFractionDigits: dd, maximumFractionDigits: dd }), pc = `${up ? '+' : '−'}${Math.abs(r.ch).toFixed(2)}%`;
+      const st = r.closed ? `<span class="h-mk-st">Closed · ${mdWd(r.day)}</span>` : r.stale ? `<span class="h-mk-st warn">Delayed · ${esc(mdHm(r.lastH + 3600))}</span>` : '';
+      const d1t = d1 ? `<span class="h-mk-d1 ${d1.v > 0 ? 'up' : 'dn'}">D1 ${d1.v > 0 ? '▲' : '▼'}</span>` : '';
+      const tip = `${I.label} ${px} · ${pc} vs the previous day's close (OANDA, 00:00 UTC days)${r.closed ? ` · market closed, last price from ${mdWd(r.day)}` : r.stale ? ` · no new candle since ${mdHm(r.lastH + 3600)}` : ''}${d1 ? ` · council D1 ${d1.v > 0 ? 'up' : 'down'} (${d1.src} daily candles, what the Trader trades on)` : ''}`;
+      return `<a class="h-mk-i${r.closed ? ' closed' : ''}" href="?s=${r.k}#charts" title="${esc(tip)}" aria-label="${esc(tip)}"><span class="h-mk-t"><b>${I.label}</b><em class="${up ? 'up' : 'dn'}">${pc}</em></span><span class="h-mk-p">${px}</span>${d1t || st ? `<span class="h-mk-m">${d1t}${st}</span>` : ''}${spark(r.pts, up)}</a>`; }).join('');
+    try { if (SCAN.el) renderScan(); } catch (e) {}
   }
   setTimeout(homeMarkets, 2000); setInterval(() => { if (!document.hidden && (location.hash === '' || location.hash === '#home')) homeMarkets(); }, 60e3);
   setTimeout(watchlist, 2500); setInterval(() => { if (!document.hidden && location.hash === '#charts') watchlist(); }, 60e3);
@@ -5180,7 +5211,7 @@ function msNextSetup(bars, A) {
     ACTIVE.forEach((tf) => { const P = panes[tf.id]; if (P.A && P.bars) src[tf.id] = { bars: P.bars, A: P.A }; });
     return src;
   }
-  function evaluate(I, src) {
+  function evaluate(I, src, feed) {
     const m = src['1m'] || src['5m'] || src['15m'] || src['1h'];
     if (!m) return null;
     const price = m.bars[m.bars.length - 1].close;
@@ -5190,12 +5221,12 @@ function msNextSetup(bars, A) {
       list.sort((a, b) => ORDER[a.state] - ORDER[b.state] || b.rr - a.rr);
       const trend = {}; ['1d', '4h', '1h'].forEach((k) => { trend[k] = src[k] && src[k].A ? src[k].A.trend : 0; });
       const h1 = src['1h'] && src['1h'].bars, ref = h1 && h1.length > 24 ? h1[h1.length - 25].close : null;
-      return { price, list, trend, chg: ref ? (price - ref) / ref * 100 : null };
+      return { price, list, trend, chg: ref ? (price - ref) / ref * 100 : null, feed: feed || '' };
     } finally { CUR = c; }
   }
   async function scanInst(key) {
     const I = INSTRUMENTS[key];
-    if (key === instKey) return evaluate(I, srcFromPanes());
+    if (key === instKey) return evaluate(I, srcFromPanes(), G.source);
     const res = await Promise.allSettled(TFS.map((tf) => fetchBars(tf, I, 300)));
     let off = 0;
     if (I.spot) {
@@ -5210,7 +5241,8 @@ function msNextSetup(bars, A) {
       src[TFS[k].id] = { bars, A: msAnalyze(bars, PIVOT) };
     });
     if (!Object.keys(src).length) throw new Error((res.find((r) => r.status === 'rejected') || {}).reason?.message || 'No data');
-    return evaluate(I, src);
+    const d1 = res[TFS.findIndex((t) => t.id === '1d')];
+    return evaluate(I, src, d1 && d1.status === 'fulfilled' ? d1.value.src : '');
   }
   function renderScan() {
     if (!SCAN.el) return;
@@ -5225,10 +5257,15 @@ function msNextSetup(bars, A) {
       if (!r) return `<a class="ms-srow${cur}" href="${href}">${mk}<span class="srow-skel" role="status" aria-label="Waiting to scan"><i></i><i></i><i></i></span></a>`;
       if (r.err) return `<a class="ms-srow${cur}" href="${href}">${mk}<span class="err">Couldn't load: ${esc(r.err)}</span></a>`;
       const best = r.list[0], ready = r.list.filter((t) => t.state === 'READY');
-      const chg = r.chg === null ? '' : ` <small style="color:${r.chg >= 0 ? UPC : DNC};font-weight:600">${r.chg >= 0 ? '+' : ''}${r.chg.toFixed(2)}%</small>`;
+      // price and day change: the same OANDA quote as Home "Markets now" when there is one, else this row's own (24 h rolling)
+      const q = typeof MDQ !== 'undefined' && MDQ.q[k], px = q ? q.c : r.price, ch = q ? q.ch : r.chg;
+      const chg = ch == null ? '' : ` <small class="pr-c" style="color:${ch >= 0 ? UPC : DNC};font-weight:600" title="${q ? `Change vs the previous day's close (OANDA, 00:00 UTC days)${q.closed ? `; market closed, last price ${mdWd(q.day)}` : ''}` : 'Change over the last 24 hours'}">${ch >= 0 ? '+' : ''}${ch.toFixed(2)}%${q ? '' : ' 24h'}</small>${q && q.closed ? ' <small class="pr-x">closed</small>' : q && q.stale ? ' <small class="pr-x warn">delayed</small>' : ''}`;
+      // D1: the council's D1 (OANDA daily for gold and forex) is what the Trader trades on, so it leads; this row's own D1 shows only when it disagrees
+      const cd = councilD1(k), own = r.trend['1d'], d1v = cd ? cd.v : own, ownSrc = r.from === 'council' ? '' : (r.feed || 'chart');
+      const d1 = `<span class="ms-al ${d1v > 0 ? 'ok' : d1v < 0 ? 'against' : ''}" title="${cd ? `D1 ${d1v > 0 ? 'up' : 'down'} · council D1 from ${cd.src} daily candles (what the Trader trades on)` : `D1 from ${ownSrc || 'the council scan'}`}">D1 ${d1v < 0 ? '▼' : d1v > 0 ? '▲' : '–'}</span>${cd && ownSrc && own && own !== cd.v ? `<span class="ms-al ms-al-x" title="${k === instKey ? 'This chart' : 'This scan'}'s own D1 (${esc(ownSrc)} candles) reads ${own > 0 ? 'up' : 'down'}; the council's D1 (${esc(cd.src)}) reads ${cd.v > 0 ? 'up' : 'down'}">${k === instKey ? 'chart' : esc(ownSrc)} ${own > 0 ? '▲' : '▼'}</span>` : ''}`;
       const su = best ? `<span class="su"><span class="ms-chip ${best.sell ? 'ms-chip-sell' : 'ms-chip-buy'}">${best.sell ? 'SELL' : 'BUY'}</span><b>${best.name}</b><small>${best.pair}</small><span class="ms-st ${best.cls}">${best.state}</span>${ready.length > 1 ? `<small>+${ready.length - 1} more ready</small>` : ''}</span>` : '<span class="su">No setup</span>';
-      const lv = best && !best.invalid ? `<span class="lv"><span class="lv-p">Entry ${fmtI(best.entry, I)}</span> <span class="lv-p">Stop ${fmtI(best.stop, I)}</span> <b class="lv-r">${best.rr.toFixed(1)}R</b>${(() => { const risk = Math.abs(best.entry - best.stop); if (!risk || r.price == null) return ''; const away = (best.sell ? best.entry - r.price : r.price - best.entry) / risk; const at = Math.abs(away) < 0.05; return `<span class="lv-d${at ? ' at' : ''}" title="Distance from price to entry, in multiples of the stop distance">${at ? 'at entry' : `${Math.abs(away).toFixed(1)}R to entry`}</span>`; })()}</span>` : '<span class="lv"></span>';
-      return `<a class="ms-srow${cur}${ready.length ? ' ready' : ''}" href="${href}">${mk}<span class="pr">${fmtI(r.price, I)}${chg}</span><span class="tr">${arrow(r.trend['1d'], 'D1')}${arrow(r.trend['4h'], 'H4')}${arrow(r.trend['1h'], 'H1')}</span>${su}${lv}</a>`;
+      const lv = best && !best.invalid ? `<span class="lv"><span class="lv-p">Entry ${fmtI(best.entry, I)}</span> <span class="lv-p">Stop ${fmtI(best.stop, I)}</span> <b class="lv-r">${best.rr.toFixed(1)}R</b>${(() => { const risk = Math.abs(best.entry - best.stop); if (!risk || px == null) return ''; const away = (best.sell ? best.entry - px : px - best.entry) / risk; const at = Math.abs(away) < 0.05; return `<span class="lv-d${at ? ' at' : ''}" title="Distance from price to entry, in multiples of the stop distance">${at ? 'at entry' : `${Math.abs(away).toFixed(1)}R to entry`}</span>`; })()}</span>` : '<span class="lv"></span>';
+      return `<a class="ms-srow${cur}${ready.length ? ' ready' : ''}" href="${href}">${mk}<span class="pr">${fmtI(px, I)}${chg}</span><span class="tr">${d1}${arrow(r.trend['4h'], 'H4')}${arrow(r.trend['1h'], 'H1')}</span>${su}${lv}</a>`;
     }).join('');
     const nReady = rows.filter((x) => x.r && !x.r.err && x.r.list.some((t) => t.state === 'READY')).length;
     const badge = document.getElementById('ms-scan-badge');
@@ -5253,8 +5290,11 @@ function msNextSetup(bars, A) {
       const snap = COUNCIL.snap, age = snap ? Date.now() - Date.parse(snap.at) : Infinity;
       if (snap && age < 25 * 60e3 && Object.keys(snap.markets || {}).length) {
         Object.keys(INSTRUMENTS).forEach((k) => { if (k !== instKey && snap.markets[k]) SCAN.res[k] = fromSnapshot(k, snap.markets[k]); });
-        SCAN.res[instKey] = evaluate(INST, srcFromPanes()) || SCAN.res[instKey];
+        SCAN.res[instKey] = evaluate(INST, srcFromPanes(), G.source) || SCAN.res[instKey];
         SCAN.at = Date.parse(snap.at); SCAN.snapAt = snap.at; renderScan();
+        // markets the council does not trade (silver, indices, USD/JPY) are not in its snapshot: scan them here instead of leaving them "waiting" for good
+        const miss = Object.keys(INSTRUMENTS).filter((k) => k !== instKey && !snap.markets[k] && (!SCAN.res[k] || Date.now() - (SCAN.res[k].at || 0) > 4 * 60e3));
+        await Promise.all(miss.map(async (k) => { try { SCAN.res[k] = Object.assign(await scanInst(k) || { err: 'No data' }, { at: Date.now() }); } catch (e) { SCAN.res[k] = { err: e.message || 'No data', at: Date.now() }; } renderScan(); }));
         return;
       }
     }
@@ -7514,6 +7554,9 @@ function msNextSetup(bars, A) {
         + '<span class="pz-l">' + E(o.m.label) + (n ? '<span class="pz-n">' + n + '</span>' : '') + '</span><span class="pz-p">' + fPx(o.m.price, d) + '</span>'
         + '<span class="pz-tf" aria-hidden="true">' + o.v.map(function (x) { return '<i class="' + (x > 0 ? 'u' : x < 0 ? 'd' : '') + '"></i>'; }).join('') + '</span></a>'; }).join('');
     ks.forEach(function (o) { LASTPX[o.k] = o.m.price; });
+    // say whose numbers these are and how old: the council's last scan (D1 from OANDA for gold and forex), flagged when over 45 minutes old
+    var hk = sec.querySelector('.h-pulse-k'), at = Date.parse(L.snap.at);
+    if (hk && isFinite(at)) { var old = Date.now() - at > 45 * 60e3; hk.textContent = 'council trend on D1 · H4 · H1, strongest first · scan ' + new Date(at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) + (old ? ' (old)' : ''); hk.classList.toggle('c-warn', old); }
     sec.hidden = !ks.length; edge(row);
   }
   function edge(el) { var l = el.scrollLeft > 2, r = el.scrollLeft + el.clientWidth < el.scrollWidth - 2, v = (l ? 'l' : '') + (l && r ? ' ' : '') + (r ? 'r' : ''); if (v) el.setAttribute('data-more', v); else el.removeAttribute('data-more'); }
@@ -8303,6 +8346,14 @@ function gpStats(T) {
 .h-mk-i:hover { border-color: var(--accent); transform: translateY(-1px); } .h-mk-i:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 .h-mk-t { display: flex; justify-content: space-between; align-items: baseline; font-size: 12.5px; } .h-mk-t b { font-weight: 700; } .h-mk-t em { font-style: normal; font-weight: 600; } .h-mk-t em.up { color: var(--buy); } .h-mk-t em.dn { color: var(--sell); }
 .h-mk-p { font-size: 17px; font-weight: 700; letter-spacing: -.01em; }
+.h-mk-h h2 { white-space: nowrap; }
+.h-mk-m { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 6px; min-width: 0; font-size: 10.5px; line-height: 1.3; }
+.h-mk-d1 { font-weight: 700; font-family: var(--mono); padding: 0 5px; border-radius: 4px; border: 1px solid var(--line); white-space: nowrap; }
+.h-mk-d1.up { color: var(--buy); border-color: color-mix(in srgb, var(--buy) 40%, transparent); } .h-mk-d1.dn { color: var(--sell); border-color: color-mix(in srgb, var(--sell) 40%, transparent); }
+.h-mk-st { color: var(--ink-dim); white-space: nowrap; } .h-mk-st.warn { color: var(--warn, #b7791f); }
+.h-mk-i.closed .h-mk-sp { opacity: .55; }
+.ms-srow .tr .ms-al-x { border-style: dashed; color: var(--ink-faint); font-weight: 600; }
+.ms-srow .pr-x { font: 600 10px var(--sans); color: var(--ink-faint); text-transform: uppercase; letter-spacing: .03em; } .ms-srow .pr-x.warn { color: var(--warn, #b7791f); }
 .h-mk-sp { width: 100%; height: 28px; display: block; margin-top: 2px; overflow: visible; }
 .h-mk-sp .l { fill: none; stroke-width: 1.6; vector-effect: non-scaling-stroke; } .h-mk-sp .a { stroke: none; opacity: .12; }
 .h-mk-sp.up .l { stroke: var(--buy); } .h-mk-sp.up .a, .h-mk-sp.up circle { fill: var(--buy); } .h-mk-sp.dn .l { stroke: var(--sell); } .h-mk-sp.dn .a, .h-mk-sp.dn circle { fill: var(--sell); }
