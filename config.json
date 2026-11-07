@@ -586,6 +586,12 @@
    "by": "repair",
    "change": "Shadow: 29 m30m1 trades of 4-6 Nov marked duplicate (copies of a Scalp entry, +18.81R gross); no stat counts them",
    "why": "m30m1 fires on the same M1 entry as the Scalp. The Trader drops the copy since 6 Nov 18:03 UTC (#259); the copies recorded before that still counted the same trade twice in the shadow book and in the m30m1 rules."
+  },
+  {
+   "at": "2026-11-07T23:09:24.000Z",
+   "by": "repair",
+   "change": "Costs: 158 closed crypto paper trades re-costed under the CFD model (0.04% a round trip); they had carried 348.6R of Kraken spot fees in total. Gross R unchanged.",
+   "why": "Owner decision 7 Nov: the council trades through cTrader (CFD), so Kraken spot fees were the wrong venue (research/edge/shadow-audit: 300R of a −288R paper week)."
   }
  ],
  "btAt": "2026-11-07T21:41:23.838Z",
@@ -642,11 +648,11 @@
  "noPause": true,
  "wouldPause": {
   "rintra": {
-   "at": "2026-11-07T23:07:15.000Z",
+   "at": "2026-11-07T23:09:24.000Z",
    "why": "four losses in a row"
   },
   "scalp": {
-   "at": "2026-11-07T23:07:15.000Z",
+   "at": "2026-11-07T23:09:24.000Z",
    "why": "expectancy -1.00R over 13 trades"
   },
   "xau": {
@@ -683,7 +689,8 @@
   "void-rounded-replica-2026-11-04",
   "history-crypto-trend-v3",
   "history-pairs-dormant",
-  "void-m30m1-twins-2026-11-06"
+  "void-m30m1-twins-2026-11-06",
+  "recost-crypto-cfd-2026-11-07"
  ],
  "takeAll": false,
  "focus": [
