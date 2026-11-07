@@ -1,7 +1,7 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "framework": null,
-  "buildCommand": "mkdir -p out/macro && cp -r market-structure.html gold-trading.html manifest.json sw.js icon-192.png icon-512.png robots.txt assets out/ && cp market-structure.html out/index.html && cp index.html out/macro/index.html",
+  "buildCommand": "mkdir -p out/macro && cp -r market-structure.html gold-trading.html manifest.json app.webmanifest sw.js icon-192.png icon-512.png robots.txt assets out/ && cp market-structure.html out/index.html && cp index.html out/macro/index.html",
   "outputDirectory": "out",
   "rewrites": [
     {
@@ -109,6 +109,10 @@
     {
       "path": "/api/run?job=ict",
       "schedule": "4,19,34,49 * * * *"
+    },
+    {
+      "path": "/api/alert-cron",
+      "schedule": "* * * * *"
     }
   ],
   "functions": {
@@ -133,6 +137,12 @@
     },
     "api/og.mjs": {
       "maxDuration": 15
+    },
+    "api/push.js": {
+      "maxDuration": 15
+    },
+    "api/alert-cron.js": {
+      "maxDuration": 60
     }
   }
 }

@@ -4,6 +4,10 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#08090c">
+<link rel="manifest" href="/app.webmanifest">
+<link rel="apple-touch-icon" href="/icon-192.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Meridian X">
 <title>Aurum Desk</title>
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cdefs%3E%3CradialGradient id='g' cx='.35' cy='.3' r='.8'%3E%3Cstop offset='0' stop-color='%23fbe7a6'/%3E%3Cstop offset='.55' stop-color='%23e3b341'/%3E%3Cstop offset='1' stop-color='%238a6312'/%3E%3C/radialGradient%3E%3C/defs%3E%3Ccircle cx='16' cy='16' r='14' fill='url(%23g)'/%3E%3Ccircle cx='16' cy='16' r='10.5' fill='none' stroke='%23fff' stroke-opacity='.35'/%3E%3C/svg%3E">
 <meta name="color-scheme" content="dark">
@@ -2275,6 +2279,7 @@ html[data-motion="off"][data-gate] .gate-bg path[stroke] { animation: none; stro
       <details class="menu">
         <summary class="ms-tbtn">Settings</summary>
         <div class="menu-body">
+          <button type="button" class="menu-pa" id="ms-pa-open">Price alerts <small>notify this device at a price</small></button>
           <div class="menu-h">Chart layers</div>
           <div class="ms-tog">
             <label><input type="checkbox" id="ms-show-bo" data-show="bo" checked><i style="background:#f23645;height:2px"></i>BO lines</label>
@@ -3445,9 +3450,10 @@ function msNextSetup(bars, A) {
     { const pane = el.closest('.ms-pane'), ph = pane && pane.querySelector('.ms-ph');
       if (ph && !ph.querySelector('.ch-tools')) {
         const tl = document.createElement('span'); tl.className = 'ch-tools';
-        tl.innerHTML = `<button type="button" class="ch-b ch-fit" title="Fit the chart (double-click the chart)" aria-label="Fit the ${tf.label} chart"></button><button type="button" class="ch-b ch-fs" title="Full screen" aria-label="Show the ${tf.label} chart full screen"></button>`;
+        tl.innerHTML = `<button type="button" class="ch-b ch-bell" title="Price alert (notifies this device)" aria-label="Set a price alert"></button><button type="button" class="ch-b ch-fit" title="Fit the chart (double-click the chart)" aria-label="Fit the ${tf.label} chart"></button><button type="button" class="ch-b ch-fs" title="Full screen" aria-label="Show the ${tf.label} chart full screen"></button>`;
         ph.appendChild(tl);
         tl.querySelector('.ch-fit').addEventListener('click', () => P.fit());
+        tl.querySelector('.ch-bell').addEventListener('click', () => window.msOpenAlerts && window.msOpenAlerts());
         tl.querySelector('.ch-fs').addEventListener('click', () => { if (document.fullscreenElement) document.exitFullscreen(); else if (pane.requestFullscreen) pane.requestFullscreen().catch(() => {}); });
       }
       el.addEventListener('dblclick', () => P.fit()); }
@@ -3584,7 +3590,97 @@ function msNextSetup(bars, A) {
     new ResizeObserver(() => { if (!P.fitted && el.clientWidth > 0 && P.bars) requestAnimationFrame(P.fit); }).observe(el);
     return P;
   }
+
   TFS.forEach((tf) => { const p = makePane(tf); if (p) panes[tf.id] = p; });
+  { const b = document.getElementById('ms-pa-open'); if (b) b.addEventListener('click', () => { const m = b.closest('details'); if (m) m.open = false; window.msOpenAlerts(); }); }
+  // ─── Price alerts (7 Nov): set a level, get a phone/desktop notification when it trades, even with the site closed.
+  // The list lives on this device (localStorage) and on Vercel (/api/push, private Blob) with its Web Push subscription;
+  // the /api/alert-cron Vercel cron checks OANDA prices every minute and sends the push. Alert levels show as dashed lines.
+  {
+    const PA = { list: [], key: null, sub: null };
+    const MDK = Object.keys(INSTRUMENTS).filter((k) => INSTRUMENTS[k].md);
+    const can = () => 'serviceWorker' in navigator && 'PushManager' in window && 'Notification' in window && !!MD.base;
+    const ios = /iP(hone|ad|od)/.test(navigator.userAgent), standalone = matchMedia('(display-mode: standalone)').matches || navigator.standalone;
+    try { PA.list = JSON.parse(localStorage.getItem('ms-pa') || '[]'); } catch (e) {}
+    const store = () => { try { localStorage.setItem('ms-pa', JSON.stringify(PA.list)); } catch (e) {} };
+    const fx = (k, v) => { const d = (INSTRUMENTS[k] || {}).dec ?? 2; return (+v).toLocaleString('en-US', { minimumFractionDigits: d, maximumFractionDigits: d }); };
+    const nowPx = (k) => { if (k === instKey) { const m = panes['1m'] || panes['5m']; const r = m && m.raw; if (r && r.length) return r[r.length - 1].close; } return PA.px[k] || null; };
+    PA.px = {};
+    async function quote(k) { try { const j = await (await fetch(`${location.origin}${MD.base}bars?sym=${k}&tf=1m&n=1`, { cache: 'no-store' })).json(); const b = j.bars && j.bars[j.bars.length - 1]; if (b) PA.px[k] = b.close; } catch (e) {} return nowPx(k); }
+    function lines() {
+      Object.values(panes).forEach((P) => { (P._pal || []).forEach((l) => { try { P.series.removePriceLine(l); } catch (e) {} }); P._pal = PA.list.filter((a) => a.sym === instKey).map((a) => P.series.createPriceLine({ price: a.price, color: '#e0a526', lineWidth: 1, lineStyle: LW.LineStyle.Dashed, axisLabelVisible: true, title: `🔔 ${a.dir === 'above' ? '↑' : '↓'}` })); });
+      const b = document.querySelectorAll('.ch-bell'); b.forEach((x) => x.classList.toggle('on', PA.list.some((a) => a.sym === instKey)));
+    }
+    async function subscribe() {
+      if (!PA.key) { const j = await (await fetch('/api/push?key=1')).json(); PA.key = j.key; }
+      if (!PA.key) throw new Error('Alerts are not set up on the server yet.');
+      const perm = Notification.permission === 'granted' ? 'granted' : await Notification.requestPermission();
+      if (perm !== 'granted') throw new Error('Notifications are blocked for this site. Allow them in the browser settings, then try again.');
+      const reg = await navigator.serviceWorker.register('/sw.js'); await navigator.serviceWorker.ready;
+      let sub = await reg.pushManager.getSubscription();
+      if (!sub) { const raw = atob(PA.key.replace(/-/g, '+').replace(/_/g, '/') + '='.repeat((4 - PA.key.length % 4) % 4)); sub = await reg.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: Uint8Array.from(raw, (c) => c.charCodeAt(0)) }); }
+      PA.sub = sub.toJSON(); return PA.sub;
+    }
+    async function sync() {
+      const sub = PA.sub || await subscribe();
+      const r = await fetch('/api/push', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ sub, alerts: PA.list }) });
+      const j = await r.json().catch(() => ({})); if (!r.ok) throw new Error(j.error || `Server ${r.status}`);
+    }
+    // on load: drop alerts the server already fired (it removes them after sending)
+    if (can() && PA.list.length && Notification.permission === 'granted') navigator.serviceWorker.getRegistration('/').then(async (reg) => {
+      const sub = reg && await reg.pushManager.getSubscription(); if (!sub) return; PA.sub = sub.toJSON();
+      const j = await (await fetch('/api/push', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ sub: PA.sub, get: true }) })).json();
+      if (Array.isArray(j.alerts)) { const ids = new Set(j.alerts.map((a) => a.id)); PA.list = PA.list.filter((a) => ids.has(a.id)); store(); lines(); render(); }
+    }).catch(() => {});
+    let dlg;
+    function render() {
+      if (!dlg) return; const ul = dlg.querySelector('#pa-list');
+      ul.innerHTML = PA.list.length ? PA.list.map((a) => { const I = INSTRUMENTS[a.sym] || {}, n = nowPx(a.sym), dist = n ? (a.price - n) / n * 100 : null;
+        return `<li><span class="pa-arr ${a.dir}" aria-hidden="true">${a.dir === 'above' ? '↑' : '↓'}</span><span class="pa-w"><b>${I.label || a.sym} ${a.dir === 'above' ? 'rises to' : 'falls to'} ${fx(a.sym, a.price)}</b><small>${dist != null ? `${dist >= 0 ? '+' : '−'}${Math.abs(dist).toFixed(2)}% away` : ''}${a.note ? ` · ${esc(a.note)}` : ''}</small></span><button type="button" class="pa-del" data-id="${a.id}" aria-label="Delete this alert">Delete</button></li>`; }).join('')
+        : '<li class="pa-empty">No alerts yet. Set one above and you get a notification on this device when the price trades there.</li>';
+    }
+    function hint() {
+      const k = dlg.querySelector('#pa-sym').value, v = +dlg.querySelector('#pa-price').value, n = nowPx(k), h = dlg.querySelector('#pa-hint');
+      h.textContent = !n ? '' : !(v > 0) ? `Now ${fx(k, n)}` : `Alerts when ${INSTRUMENTS[k].label} ${v >= n ? 'rises' : 'falls'} to ${fx(k, v)} (now ${fx(k, n)}, ${((v - n) / n * 100).toFixed(2)}% away)`;
+    }
+    function build() {
+      dlg = document.createElement('dialog'); dlg.id = 'ms-pa'; dlg.className = 'pa-dlg'; dlg.setAttribute('aria-labelledby', 'pa-h');
+      dlg.innerHTML = `<div class="pa-top"><h2 id="pa-h">Price alerts</h2><button type="button" class="pa-x" aria-label="Close">×</button></div>
+        <p class="pa-sub">Get a notification on this device when a market trades at your price, even with Meridian X closed. Checked every minute against OANDA prices.</p>
+        <form id="pa-f" class="pa-f" novalidate><label>Market<select id="pa-sym">${MDK.map((k) => `<option value="${k}">${INSTRUMENTS[k].label} · ${INSTRUMENTS[k].name}</option>`).join('')}</select></label>
+        <label>Price<input id="pa-price" type="number" inputmode="decimal" step="any" required></label>
+        <label class="pa-wide"><span>Note <small>(optional)</small></span><input id="pa-note" maxlength="60" placeholder="e.g. H4 origin top"></label>
+        <p id="pa-hint" class="pa-hint" aria-live="polite"></p><button type="submit" class="pa-go">Create alert</button></form>
+        <p id="pa-msg" class="pa-msg" role="status"></p><ul id="pa-list" class="pa-list"></ul>`;
+      document.body.appendChild(dlg);
+      dlg.querySelector('.pa-x').onclick = () => dlg.close();
+      dlg.addEventListener('click', (e) => { if (e.target === dlg) dlg.close(); });
+      dlg.querySelector('#pa-sym').onchange = async (e) => { const k = e.target.value, n = await quote(k); if (n) dlg.querySelector('#pa-price').value = (+n).toFixed(INSTRUMENTS[k].dec); hint(); };
+      dlg.querySelector('#pa-price').oninput = hint;
+      dlg.querySelector('#pa-list').onclick = async (e) => { const b = e.target.closest('.pa-del'); if (!b) return; const old = PA.list; PA.list = PA.list.filter((a) => a.id !== b.dataset.id); store(); lines(); render();
+        try { await sync(); } catch (err) { dlg.querySelector('#pa-msg').textContent = `Deleted here; the server copy will update next time (${err.message}).`; } };
+      dlg.querySelector('#pa-f').onsubmit = async (e) => { e.preventDefault(); const msg = dlg.querySelector('#pa-msg'), btn = dlg.querySelector('.pa-go');
+        const k = dlg.querySelector('#pa-sym').value, v = +dlg.querySelector('#pa-price').value, n = nowPx(k) || await quote(k);
+        if (!(v > 0)) { msg.textContent = 'Type a price.'; return; } if (!n) { msg.textContent = 'No live price for this market right now; try again in a moment.'; return; }
+        if (PA.list.length >= 20) { msg.textContent = 'Up to 20 alerts per device.'; return; }
+        if (!can()) { msg.textContent = ios && !standalone ? 'On iPhone, add Meridian X to the Home Screen first (Share → Add to Home Screen), open it from there and set the alert again.' : 'This browser cannot receive notifications.'; return; }
+        const a = { id: Math.random().toString(36).slice(2, 10), sym: k, price: v, dir: v >= n ? 'above' : 'below', note: dlg.querySelector('#pa-note').value.trim(), label: INSTRUMENTS[k].label, at: Math.floor(Date.now() / 1000) };
+        btn.disabled = true; btn.textContent = 'Saving…'; msg.textContent = '';
+        PA.list = PA.list.concat(a);
+        try { await sync(); store(); msg.textContent = `Alert set: ${a.label} ${a.dir === 'above' ? 'rises' : 'falls'} to ${fx(k, v)}.`; dlg.querySelector('#pa-note').value = ''; window.msTrack && msTrack('Price alert'); }
+        catch (err) { PA.list = PA.list.filter((x) => x.id !== a.id); msg.textContent = err.message || String(err); }
+        finally { btn.disabled = false; btn.textContent = 'Create alert'; lines(); render(); } };
+    }
+    window.msOpenAlerts = async (sym) => {
+      if (!dlg) build();
+      const k = sym && INSTRUMENTS[sym] && INSTRUMENTS[sym].md ? sym : INSTRUMENTS[instKey].md ? instKey : 'xau';
+      dlg.querySelector('#pa-sym').value = k; const n = nowPx(k) || await quote(k);
+      if (n) dlg.querySelector('#pa-price').value = (+n).toFixed(INSTRUMENTS[k].dec);
+      dlg.querySelector('#pa-msg').textContent = can() ? '' : ios && !standalone ? 'On iPhone: Share → Add to Home Screen, then open Meridian X from the Home Screen to use alerts.' : MD.base ? 'This browser cannot receive notifications.' : 'Alerts work on meridianx.dev.';
+      hint(); render(); dlg.showModal(); setTimeout(() => { const i = dlg.querySelector('#pa-price'); i.focus(); i.select(); }, 30);
+    };
+    setTimeout(lines, 1500);
+  }
   const ACTIVE = TFS.filter((tf) => panes[tf.id]);
   // Crosshair sync: hovering a moment on one timeframe marks the same moment on the others (bar containing that time)
   (() => { const list = Object.values(panes); if (list.length < 2 || typeof list[0].chart.setCrosshairPosition !== 'function') return; let busy = false;
@@ -6252,7 +6348,7 @@ function msNextSetup(bars, A) {
     if (sel && document.getElementById('ms-mk-btn') && shown(document.getElementById('ms-mk-btn'))) [...sel.options].forEach((o) => out.push({ g: 'Markets', t: o.textContent.trim(), d: o.selected ? 'current' : (o.parentElement.label || ''), run: () => { if (!o.selected) location.href = '?s=' + o.value + location.hash; } }));
     const tb = document.getElementById('ms-theme');
     if (tb) [['dark', 'Dark'], ['light', 'Light'], ['midnight', 'Midnight'], ['pro', 'Pro']].forEach(([k, t]) => out.push({ g: 'Theme', t: t + ' theme', d: document.documentElement.dataset.theme === k ? 'current' : '', run: () => { for (let i = 0; i < 5 && document.documentElement.dataset.theme !== k; i++) tb.click(); } }));
-    [['ms-focus-btn', 'Focus mode: open trades full screen (F)'], ['ms-alerts', 'Turn alerts on / off'], ['ms-fit', 'Reset chart view'], ['ms-j-csv', 'Export journal CSV']].forEach(([id, t]) => { const b = document.getElementById(id); if (b) out.push({ g: 'Actions', t, d: '', run: () => b.click() }); });
+    [['ms-pa-open', 'Price alerts: notify me at a price'], ['ms-focus-btn', 'Focus mode: open trades full screen (F)'], ['ms-alerts', 'Turn alerts on / off'], ['ms-fit', 'Reset chart view'], ['ms-j-csv', 'Export journal CSV']].forEach(([id, t]) => { const b = document.getElementById(id); if (b) out.push({ g: 'Actions', t, d: '', run: () => b.click() }); });
     return out;
   };
   let all = [], cur = [], sel = 0;
@@ -7224,6 +7320,45 @@ function gpStats(T) {
 .hdr-spr { margin-left: 10px; font: 500 11px var(--mono, ui-monospace, monospace); color: var(--ink-faint); white-space: nowrap; font-variant-numeric: tabular-nums; }
 .hdr-spr[hidden] { display: none; }
 @media (max-width: 900px) { .hdr-spr { display: none; } }
+</style>
+<style>
+/* price alerts (7 Nov) */
+.ch-bell { --i: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 8a6 6 0 1 1 12 0c0 7 3 9 3 9H3s3-2 3-9M10.3 21a1.94 1.94 0 0 0 3.4 0'/%3E%3C/svg%3E"); }
+.ch-bell.on { color: #e0a526; }
+.menu-pa { display: flex; flex-direction: column; align-items: flex-start; gap: 2px; width: 100%; padding: 10px 12px; margin-bottom: 8px; border-radius: 10px; border: 1px solid color-mix(in srgb, #e0a526 35%, var(--line)); background: color-mix(in srgb, #e0a526 8%, transparent); color: var(--ink); font: inherit; font-weight: 600; text-align: left; cursor: pointer; }
+.menu-pa small { font-weight: 400; color: var(--ink-faint); font-size: 12px; }
+.menu-pa:hover { background: color-mix(in srgb, #e0a526 14%, transparent); }
+.pa-dlg { border: 1px solid var(--line); border-radius: 16px; background: var(--panel); color: var(--ink); padding: 22px 22px 18px; width: min(520px, calc(100vw - 24px)); max-height: min(86vh, 720px); box-shadow: 0 30px 80px -24px rgba(0,0,0,.6); }
+.pa-dlg[open] { animation: cmdkIn .18s cubic-bezier(.23,1,.32,1); }
+.pa-dlg::backdrop { background: rgba(5,7,12,.55); backdrop-filter: blur(2px); }
+.pa-top { display: flex; align-items: center; justify-content: space-between; }
+.pa-top h2 { margin: 0; font-size: 18px; letter-spacing: -.01em; }
+.pa-x { width: 36px; height: 36px; border: 0; border-radius: 9px; background: transparent; color: var(--ink-dim); font-size: 22px; cursor: pointer; }
+.pa-x:hover { background: color-mix(in srgb, var(--ink) 8%, transparent); color: var(--ink); }
+.pa-sub { margin: 6px 0 16px; color: var(--ink-dim); font-size: 13px; line-height: 1.5; text-wrap: pretty; }
+.pa-f { display: grid; grid-template-columns: 1.3fr 1fr; gap: 12px; align-items: end; }
+.pa-f label { display: flex; flex-direction: column; gap: 6px; font-size: 12px; font-weight: 600; color: var(--ink-dim); }
+.pa-f label small { font-weight: 400; color: var(--ink-faint); }
+.pa-f .pa-wide, .pa-f .pa-hint, .pa-f .pa-go { grid-column: 1 / -1; }
+.pa-f select, .pa-f input { height: 44px; padding: 0 12px; border-radius: 10px; border: 1px solid var(--line); background: var(--bg); color: var(--ink); font: inherit; font-size: 15px; font-variant-numeric: tabular-nums; min-width: 0; }
+.pa-f select:focus, .pa-f input:focus { outline: 2px solid var(--accent); outline-offset: 1px; }
+.pa-hint { margin: -2px 0 0; min-height: 1.3em; font-size: 12.5px; color: var(--ink-faint); font-variant-numeric: tabular-nums; }
+.pa-go { height: 44px; border: 0; border-radius: 10px; background: #e0a526; color: #1a1300; font: inherit; font-weight: 700; cursor: pointer; }
+.pa-go:hover { filter: brightness(1.06); } .pa-go:disabled { opacity: .6; cursor: progress; }
+.pa-msg { margin: 10px 0 0; min-height: 1.2em; font-size: 13px; color: var(--ink-dim); }
+.pa-list { list-style: none; margin: 10px 0 0; padding: 0; border-top: 1px solid var(--line-soft, var(--line)); max-height: 260px; overflow-y: auto; }
+.pa-list li { display: flex; align-items: center; gap: 12px; padding: 10px 2px; border-bottom: 1px solid var(--line-soft, var(--line)); }
+.pa-list li.pa-empty { color: var(--ink-faint); font-size: 13px; line-height: 1.5; border: 0; }
+.pa-arr { width: 28px; height: 28px; border-radius: 8px; display: grid; place-items: center; font-weight: 700; flex: none; }
+.pa-arr.above { color: var(--buy); background: color-mix(in srgb, var(--buy) 14%, transparent); }
+.pa-arr.below { color: var(--sell); background: color-mix(in srgb, var(--sell) 14%, transparent); }
+.pa-w { display: flex; flex-direction: column; gap: 2px; min-width: 0; flex: 1; }
+.pa-w b { font-size: 14px; font-weight: 600; font-variant-numeric: tabular-nums; }
+.pa-w small { font-size: 12px; color: var(--ink-faint); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.pa-del { height: 32px; padding: 0 12px; border-radius: 8px; border: 1px solid var(--line); background: transparent; color: var(--ink-dim); font: inherit; font-size: 12.5px; cursor: pointer; }
+.pa-del:hover { color: var(--sell); border-color: color-mix(in srgb, var(--sell) 40%, var(--line)); }
+@media (max-width: 480px) { .pa-f { grid-template-columns: 1fr; } }
+@media (prefers-reduced-motion: reduce) { .pa-dlg[open] { animation: none; } }
 </style>
 </body>
 </html>
