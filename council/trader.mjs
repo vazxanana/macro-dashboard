@@ -902,7 +902,7 @@ for (const [key, M] of Object.entries(MARKETS)) {
               ...(config.moshaBeR ? { beAt: config.moshaBeR } : {}), ...(config.moshaAdd ? { addAt: config.moshaAdd.atR, addSize: config.moshaAdd.size } : {}),
               ...(config.moshaRun ? { t1: +(entry + d * 10 * r0).toFixed(2), rr: 10, tp1: +(entry + d * config.moshaRun.atR * r0).toFixed(2), trail: [config.moshaRun.atR, config.moshaRun.trail] } : {}),
               feat: { h4At: e1.t, h1At: e2.t, m15At: e3.t, w1: w1At(e3.t) === d ? 'with' : 'against', m15Flip: !!e3.flip, pull }, shadow: blk.length > 0, blockedBy: blk,
-              feed: FEED, note: `Mosha BO system: ${config.moshaBoWeekly ? `weekly structure ${d < 0 ? 'bearish' : 'bullish'}, ` : ''}H4 BO ${d < 0 ? 'sell' : 'buy'}, then H1 BO ${d < 0 ? 'buy' : 'sell'} (retracement), then M15 BO ${d < 0 ? 'sell' : 'buy'} through ${entry}. Pullback limit at the broken M15 level ${entry}, stop past the M15 Origin ${stop}, target 3R ${(entry + d * 3 * r0).toFixed(2)}; valid 24 h, out after 72 h.` });
+              feed: FEED, note: `Mosha BO system: ${config.moshaBoWeekly ? `weekly structure ${d < 0 ? 'bearish' : 'bullish'}, ` : ''}H4 BO ${d < 0 ? 'sell' : 'buy'}, then H1 BO ${d < 0 ? 'buy' : 'sell'} (retracement), then M15 BO ${d < 0 ? 'sell' : 'buy'} through ${entry}. Pullback limit at the broken M15 level ${entry}, stop past the M15 Origin ${stop}, ${config.moshaRun ? `from +${config.moshaRun.atR}R the stop trails ${config.moshaRun.trail}R behind the best price (cap 10R)` : `target 3R ${(entry + d * 3 * r0).toFixed(2)}`}; valid 24 h, out after 72 h.` });
           }
         }
       } catch (e) { snapshot.errors.moshaBo = String(e.message || e); }
