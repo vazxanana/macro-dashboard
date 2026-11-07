@@ -1266,10 +1266,11 @@ document.addEventListener('DOMContentLoaded', function () {
     try { h = await msSha256(pw); } catch (e) { err.textContent = 'This browser cannot check the password (the page needs https).'; btn.disabled = false; btn.textContent = 'Sign in'; return; }
     var all = h === window.MS_ADMIN_HASH ? window.MS_USERS : window.msMergeUsers(await window.msFetchUsers());
     var un = Object.keys(all).find(function (k) { return all[k].hash === h; }), R = un && all[un];   // password only (6 Nov): each password belongs to one account
+    if (h === window.MS_ADMIN_HASH || (R && h === R.hash)) window.msTrack && msTrack('Sign in', { result: 'ok' });
     if (h === window.MS_ADMIN_HASH) { try { localStorage.setItem('ms-admin', h); localStorage.removeItem('ms-user'); localStorage.removeItem('ms-guest'); } catch (e) {} location.reload(); return; }
     if (R && h === R.hash) { try { localStorage.setItem('ms-admin', h); localStorage.setItem('ms-user', un); localStorage.setItem('ms-user-rec', JSON.stringify({ key: un, name: R.name, role: R.role, hash: h, ict: R.ict || false })); localStorage.removeItem('ms-guest'); } catch (e) {} location.reload(); return; }
-    btn.disabled = false; btn.textContent = 'Sign in'; err.textContent = 'Wrong password.'; document.getElementById('ms-gate-p').select(); });
-  if (gb) gb.addEventListener('click', function () { var was = document.documentElement.dataset.mode === 'public' && localStorage.getItem('ms-guest'); try { localStorage.setItem('ms-guest', '1'); } catch (e) {} if (was) msGate(false); else location.reload(); });
+    window.msTrack && msTrack('Sign in', { result: 'wrong' }); btn.disabled = false; btn.textContent = 'Sign in'; err.textContent = 'Wrong password.'; document.getElementById('ms-gate-p').select(); });
+  if (gb) gb.addEventListener('click', function () { window.msTrack && msTrack('Guest'); var was = document.documentElement.dataset.mode === 'public' && localStorage.getItem('ms-guest'); try { localStorage.setItem('ms-guest', '1'); } catch (e) {} if (was) msGate(false); else location.reload(); });
   if (x) x.addEventListener('click', function () { msGate(false); });
   document.addEventListener('keydown', function (ev) { if (ev.key === 'Escape' && document.documentElement.dataset.gate && localStorage.getItem('ms-guest')) msGate(false); });
 });
@@ -2185,6 +2186,19 @@ html[data-motion="off"][data-gate] .gate-bg path[stroke] { animation: none; stro
 @media (max-width: 900px) { .gate-side::before { display: none; } }
 </style>
 <script>try{if(localStorage.getItem('msMotion')==='off')document.documentElement.dataset.motion='off'}catch(e){}</script>
+<!-- Vercel Web Analytics + Speed Insights (cookie-free; only on the Vercel site, not on GitHub Pages or a local copy) -->
+<script>
+(function () {
+  if (!/^https?:$/.test(location.protocol) || /github\.io$|^localhost$|^127\./.test(location.hostname)) { window.msTrack = function () {}; return; }
+  window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };
+  window.si = window.si || function () { (window.siq = window.siq || []).push(arguments); };
+  // custom events (Pro): which views people open and which tools they use; never names, passwords or prices
+  window.msTrack = function (name, data) { try { window.va('event', { name: name, data: data || {} }); } catch (e) {} };
+  ['/_vercel/insights/script.js', '/_vercel/speed-insights/script.js'].forEach(function (src) { var t = document.createElement('script'); t.defer = true; t.src = src; t.onerror = function () {}; document.head.appendChild(t); });
+  var last = ''; function view() { var v = (location.hash.slice(1).split(/[/?]/)[0] || 'home'); if (v !== last) { last = v; window.msTrack('View', { view: v }); } }
+  addEventListener('hashchange', view); addEventListener('DOMContentLoaded', view);
+})();
+</script>
 </head>
 <body>
 <div class="gate" id="ms-gate" role="dialog" aria-modal="true" aria-labelledby="ms-gate-t">
@@ -2234,6 +2248,7 @@ html[data-motion="off"][data-gate] .gate-bg path[stroke] { animation: none; stro
 </div>
 <a class="skip" href="#ms-main-start">Skip to content</a>
 <div class="ms-live app" id="ms-live" data-chart="dark">
+  <div class="ms-notice" id="ms-notice" role="status" hidden><span class="ms-notice-t" id="ms-notice-t"></span><button type="button" class="ms-notice-x" id="ms-notice-x" aria-label="Hide this notice">×</button></div>
 
   <header class="top">
     <div class="brand"><i class="ms-coin" aria-hidden="true"></i><div><details class="mk" id="ms-mk"><summary class="inst" id="ms-mk-btn" title="Market (click to change)">XAU/USD</summary><div class="mk-pop"><label class="sr" for="ms-mk-q">Search markets</label><input id="ms-mk-q" type="search" placeholder="Search markets…" autocomplete="off"><ul class="mk-list" id="ms-mk-list"></ul></div></details><select id="ms-inst" class="inst" hidden aria-hidden="true" tabindex="-1"><option>XAU/USD · Gold</option></select><span id="ms-inst-name">Gold · Mosha structure</span></div></div>
@@ -2242,6 +2257,7 @@ html[data-motion="off"][data-gate] .gate-bg path[stroke] { animation: none; stro
       <a href="#home" data-go="home">Home</a><a href="#setup" data-go="setup" class="adm">Setup</a><a href="#charts" data-go="charts">Charts</a><a href="#scanner" data-go="scanner" class="adm">Scanner</a><a href="#crypto" data-go="crypto" class="adm">Crypto</a><a href="#gold" data-go="gold" class="adm">Gold playbook</a><a href="#council" data-go="council">Council</a><a href="#journal" data-go="journal">Journal</a><a href="#ict" data-go="ict" class="ictx">ICT desk</a><a href="#users" data-go="users" class="adm own">Users</a>
     </nav>
     <a class="ms-badge" id="ms-scan-badge" href="#scanner" hidden></a>
+    <a class="ms-botwarn" id="ms-botwarn" href="#council" hidden></a>
     <span class="ms-status"><i class="ms-live-dot" id="ms-live-dot"></i><span id="ms-live-txt">Connecting…</span><span class="upd"> · <span id="ms-updated">—</span></span></span>
     <div class="top-actions">
       <a class="hdr-open" id="ms-hdr-open" href="#council" title="Open trades placed by the system. % = floating result in account terms at the sizing guide: 0.25% risk per NQ / gold trade, 0.5% per crypto trend trade">—</a>
@@ -5139,6 +5155,7 @@ function msNextSetup(bars, A) {
     const seen = new Set(); return all.filter((b) => b.time >= p1 && b.time <= p2 && !seen.has(b.time) && seen.add(b.time)).sort((a, b) => a.time - b.time);
   }
   async function openTrade(id, keep) {
+    if (!keep) window.msTrack && msTrack('Trade review');
     const x = (COUNCIL.trades || []).concat(sysTrades()).find((t) => t.id === id), dlg = document.getElementById('ms-tv');
     if (!x || !dlg) return;
     // timeframe and history (6 Nov, owner: more candles back and other timeframes when reviewing a loss)
@@ -7063,6 +7080,44 @@ function gpStats(T) {
       var t = m.trend || {}; document.getElementById('gs-tf').innerHTML = [['D1', t['1d']], ['H4', t['4h']], ['H1', t['1h']]].map(function (z) { return '<i class="' + (z[1] > 0 ? 'u' : z[1] < 0 ? 'd' : '') + '" title="' + z[0] + (z[1] > 0 ? ' up' : z[1] < 0 ? ' down' : ' flat') + '">' + z[0] + (z[1] > 0 ? '▲' : z[1] < 0 ? '▼' : '') + '</i>'; }).join(''); })
       .catch(function () { var dot = document.querySelector('.gs-dot'); if (dot) dot.classList.add('off'); }); }
   sess(); px(); setInterval(function () { if (R.dataset.gate) { sess(); } }, 30000); setInterval(px, 120000);
+})();
+</script>
+<style>
+/* site notice (Edge Config "notice") and bot-stall pill (from /api/status), 7 Nov 2026 */
+.ms-notice { display: flex; align-items: center; gap: 12px; justify-content: center; padding: 8px 44px 8px 16px; position: relative; font-size: 13px; line-height: 1.45; color: var(--ink); background: color-mix(in srgb, var(--accent) 14%, var(--panel)); border-bottom: 1px solid color-mix(in srgb, var(--accent) 30%, var(--line)); text-wrap: pretty; }
+.ms-notice[hidden] { display: none; }
+.ms-notice.warn { background: color-mix(in srgb, #e0a526 16%, var(--panel)); border-bottom-color: color-mix(in srgb, #e0a526 40%, var(--line)); }
+.ms-notice-x { position: absolute; right: 8px; top: 50%; transform: translateY(-50%); width: 32px; height: 32px; border: 0; border-radius: 8px; background: transparent; color: var(--ink-dim); font-size: 18px; cursor: pointer; }
+.ms-notice-x:hover { background: color-mix(in srgb, var(--ink) 8%, transparent); color: var(--ink); }
+.ms-botwarn { display: inline-flex; align-items: center; gap: 6px; padding: 3px 10px; border-radius: 999px; font-size: 12px; font-weight: 600; white-space: nowrap; text-decoration: none; color: #b97a00; background: color-mix(in srgb, #e0a526 14%, transparent); border: 1px solid color-mix(in srgb, #e0a526 35%, transparent); }
+.ms-botwarn::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: #e0a526; }
+:root:not([data-theme="light"]) .ms-botwarn { color: #f0c05a; }
+.ms-botwarn[hidden], html[data-mode="public"] .ms-botwarn, html[data-gate] .ms-notice { display: none !important; }
+@media (max-width: 700px) { .ms-botwarn { font-size: 11px; padding: 2px 8px; } }
+</style>
+<script>
+/* Polls /api/status (Vercel only): shows the owner's site notice and warns when a bot has not saved a round for too long */
+(function () {
+  if (!/^https?:$/.test(location.protocol) || /github\.io$/.test(location.hostname)) return;
+  var n = document.getElementById('ms-notice'), nt = document.getElementById('ms-notice-t'), w = document.getElementById('ms-botwarn'), hid = '';
+  try { hid = localStorage.getItem('ms-notice-hid') || ''; } catch (e) {}
+  document.getElementById('ms-notice-x').addEventListener('click', function () { n.hidden = true; try { localStorage.setItem('ms-notice-hid', nt.textContent); } catch (e) {} hid = nt.textContent; });
+  var NAME = { council: 'Council bot', ict: 'ICT tracker' };
+  function mins(m) { return m < 90 ? m + ' min' : Math.round(m / 60) + ' h'; }
+  function load() {
+    fetch('/api/status', { cache: 'no-store' }).then(function (r) { return r.ok ? r.json() : null; }).then(function (d) {
+      if (!d) return;
+      n.classList.toggle('warn', d.noticeLevel === 'warn'); nt.textContent = d.notice; n.hidden = !d.notice || d.notice === hid;
+      var bad = Object.keys(d.bots || {}).filter(function (k) { return d.bots[k].stale; });
+      if (bad.length) {
+        w.textContent = bad.length > 1 ? 'Bots behind' : NAME[bad[0]] + ' behind';
+        w.title = bad.map(function (k) { return NAME[k] + ': last round ' + mins(d.bots[k].ageMin) + ' ago'; }).join(' · ') + '. Open the Council page for details.';
+        w.href = bad[0] === 'ict' ? '#ict' : '#council'; w.hidden = false;
+      } else w.hidden = true;
+    }).catch(function () {});
+  }
+  load(); setInterval(function () { if (!document.hidden) load(); }, 120e3);
+  document.addEventListener('visibilitychange', function () { if (!document.hidden) load(); });
 })();
 </script>
 </body>
