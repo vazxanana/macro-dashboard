@@ -2459,8 +2459,8 @@ html[data-motion="off"][data-gate] .gate-bg path[stroke] { animation: none; stro
   <section class="view" id="v-charts" aria-label="Charts" hidden>
     <div class="sec-h">
       <h2>Charts <span class="kbd-hint"><kbd>1</kbd>–<kbd>6</kbd> pick a chart · <kbd>0</kbd> all · <kbd>F</kbd> fit</span></h2>
-      <div class="adr" id="ms-adr" aria-live="polite" hidden></div>
-      <div class="mtf" id="ms-mtf" hidden></div>
+      <div class="adr" id="ms-adr" role="status" aria-label="Daily range" hidden></div>
+      <div class="mtf" id="ms-mtf" role="group" aria-label="Timeframe alignment: last structure break per timeframe" hidden></div>
       <div class="seg" role="group" aria-label="Chart view">
         <button type="button" data-view="1d">D1</button><button type="button" data-view="4h">H4</button><button type="button" data-view="1h">H1</button><button type="button" data-view="15m">M15</button><button type="button" data-view="5m">M5</button><button type="button" data-view="1m">M1</button><button type="button" data-view="all">All</button>
       </div>
@@ -7691,6 +7691,10 @@ function gpStats(T) {
 .ch-hl { --i: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round'%3E%3Cpath d='M3 12h18'/%3E%3Ccircle cx='12' cy='12' r='2.2' fill='black'/%3E%3C/svg%3E"); }
 .tv-tk { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; margin: 8px 0 0; padding: 10px 12px; border: 1px solid color-mix(in srgb, var(--accent) 30%, var(--line)); border-radius: 10px; background: color-mix(in srgb, var(--accent) 6%, transparent); font-size: 12.5px; }
 .tv-tk[hidden] { display: none; }
+/* keyboard focus on the new tools and dialogs (7 Nov loop, accessibility) */
+.ch-b:focus-visible, .pa-x:focus-visible, .pa-del:focus-visible, .pa-go:focus-visible, .mtf-c:focus-visible, .menu-pa:focus-visible, .tv-tk .tk-b button:focus-visible, .tv-tk .tk-b a:focus-visible, .ms-notice-x:focus-visible, .own-acts button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.pa-dlg select:focus-visible, .tva-row select:focus-visible, .cmp-row select:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+@media (prefers-reduced-motion: reduce) { .ch-ms, .adr-bar i, .mtf-c { transition: none !important; } }
 .adr { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 10px; margin: 6px 0 12px; font-size: 12.5px; color: var(--ink-dim); }
 .adr[hidden] { display: none; }
 .mtf { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; margin: -4px 0 14px; }
