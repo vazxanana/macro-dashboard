@@ -1568,6 +1568,11 @@ html[data-motion="off"] *, html[data-motion="off"] *::before, html[data-motion="
 .stagger-in > * { animation: rowIn .32s cubic-bezier(.23,1,.32,1) both; animation-delay: calc(var(--i, 0) * 35ms); }
 @media (prefers-reduced-motion: reduce) { .stagger-in > * { animation: none; } }
 html[data-motion="off"] .stagger-in > * { animation: none; }
+
+/* cursor spotlight on Home cards: dark themes, fine pointers only, never on charts */
+@media (hover: hover) and (pointer: fine) {
+  :root:not([data-theme="light"]) #v-home .tile, :root:not([data-theme="light"]) #v-home .h-main > .card { background-image: radial-gradient(260px circle at var(--mx, -999px) var(--my, -999px), color-mix(in srgb, var(--accent) 9%, transparent), transparent 70%); }
+}
 </style>
 <script>try{if(localStorage.getItem('msMotion')==='off')document.documentElement.dataset.motion='off'}catch(e){}</script>
 </head>
@@ -5277,6 +5282,13 @@ function msNextSetup(bars, A) {
     mo.disconnect(); rows.slice(0, 14).forEach((c, i) => c.style.setProperty('--i', i)); el.classList.add('stagger-in');
     setTimeout(() => { el.classList.remove('stagger-in'); rows.forEach((c) => c.style.removeProperty('--i')); }, 1200); });
   mo.observe(el, { childList: true }); }); })();
+</script>
+<script>
+/* spotlight: one pointermove listener on Home writes the pointer position into the hovered card */
+(() => { if (!matchMedia('(hover: hover) and (pointer: fine)').matches) return; const v = document.getElementById('v-home'); if (!v) return; let last = null, raf = 0, ev0 = null;
+  v.addEventListener('pointermove', (ev) => { ev0 = ev; if (raf) return; raf = requestAnimationFrame(() => { raf = 0; const c = ev0.target.closest('#v-home .tile, #v-home .h-main > .card');
+    if (last && last !== c) { last.style.removeProperty('--mx'); last.style.removeProperty('--my'); } last = c; if (!c) return; const r = c.getBoundingClientRect(); c.style.setProperty('--mx', (ev0.clientX - r.left) + 'px'); c.style.setProperty('--my', (ev0.clientY - r.top) + 'px'); }); }, { passive: true });
+  v.addEventListener('pointerleave', () => { if (last) { last.style.removeProperty('--mx'); last.style.removeProperty('--my'); last = null; } }); })();
 </script>
 </body>
 </html>
