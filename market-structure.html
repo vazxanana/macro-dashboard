@@ -2157,12 +2157,6 @@ html[data-role="viewer"] [data-go="crypto"], html[data-role="viewer"] [data-go="
 .ms-pane:fullscreen .ch-fs { --i: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M9 4v5H4M20 9h-5V4M15 20v-5h5M4 15h5v5'/%3E%3C/svg%3E"); }
 @media (max-width: 700px) { .ch-fs { display: none; } }
 
-/* phones: ten tabs no longer fit; Users (owner admin page) leaves the bottom bar (still in Search), labels never run into each other */
-@media (max-width: 440px) {
-  .btab a[data-go="users"] { display: none !important; }
-  .btab a { font-size: 10px !important; letter-spacing: -0.01em; min-width: 0; overflow: hidden; }
-  .btab a { white-space: nowrap; text-overflow: ellipsis; }
-}
 
 /* ═══ LOGIN 2 (7 Nov): two-panel desk intro + refined card, live gold strip, caps-lock hint, shake on a wrong password ═══ */
 .gate-wrap { position: relative; z-index: 1; display: grid; grid-template-columns: minmax(0, 1fr) 400px; gap: clamp(32px, 6vw, 96px); align-items: center; width: min(1080px, 100%); }
@@ -2452,6 +2446,28 @@ html[data-motion="off"] #v-ict .ict-cal-d:hover { transform: none !important; }
   addEventListener('hashchange', view); addEventListener('DOMContentLoaded', view);
 })();
 </script>
+<script>
+/* shell (7 Nov): pick the theme before the first paint. A saved choice wins; otherwise follow the device (light or dark).
+   The phone browser bar (theme-color) and the form controls (color-scheme) follow the page theme from the start. */
+(function () {
+  var R = document.documentElement, t = null, K = ['dark', 'light', 'midnight', 'pro'];
+  try { t = JSON.parse(localStorage.getItem('msPrefs') || '{}').theme; } catch (e) {}
+  if (K.indexOf(t) < 0) { t = window.matchMedia && matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark'; R.dataset.themeAuto = '1'; }
+  R.dataset.theme = t;
+  var cv = null;
+  window.msThemeMeta = function () {
+    var light = R.dataset.theme === 'light', cs = document.querySelector('meta[name="color-scheme"]'), tc = document.querySelector('meta[name="theme-color"]');
+    R.style.colorScheme = light ? 'light' : 'dark';
+    if (cs) cs.setAttribute('content', light ? 'light' : 'dark');
+    if (!tc) return;
+    var bg = 'gate' in R.dataset ? '#08090c' : getComputedStyle(R).getPropertyValue('--bg').trim();   // the sign-in page is always dark
+    if (!bg) return;
+    try { cv = cv || document.createElement('canvas').getContext('2d'); cv.fillStyle = '#000'; cv.fillStyle = bg; cv.fillRect(0, 0, 1, 1); var d = cv.getImageData(0, 0, 1, 1).data; bg = '#' + [d[0], d[1], d[2]].map(function (x) { return x.toString(16).padStart(2, '0'); }).join(''); } catch (e) {}
+    tc.setAttribute('content', bg);
+  };
+  window.msThemeMeta();
+})();
+</script>
 </head>
 <body>
 <div class="gate" id="ms-gate" role="dialog" aria-modal="true" aria-labelledby="ms-gate-t">
@@ -2514,7 +2530,7 @@ html[data-motion="off"] #v-ict .ict-cal-d:hover { transform: none !important; }
     <span class="ms-status"><i class="ms-live-dot" id="ms-live-dot"></i><span id="ms-live-txt">Connecting…</span><span class="upd"> · <span id="ms-updated">—</span></span></span>
     <div class="top-actions">
       <a class="hdr-open" id="ms-hdr-open" href="#council" title="Open trades placed by the system. % = floating result in account terms at the sizing guide: 0.25% risk per NQ / gold trade, 0.5% per crypto trend trade">—</a>
-      <button type="button" class="ms-tbtn" id="ms-focus-btn" title="Focus mode: open trades, full screen (F)" aria-label="Focus mode" aria-keyshortcuts="F Shift+F">Focus</button><button type="button" class="ms-tbtn" id="ms-cmdk-btn" title="Search and jump (Ctrl K)" aria-label="Search and jump" aria-keyshortcuts="Control+K /">Search</button><button type="button" class="ms-tbtn" id="ms-alerts" aria-pressed="false" title="Alerts off">Alerts off</button>
+      <button type="button" class="ms-tbtn" id="ms-focus-btn" title="Focus mode: open trades, full screen (F)" aria-label="Focus mode" aria-keyshortcuts="F Shift+F">Focus</button><button type="button" class="ms-tbtn" id="ms-cmdk-btn" title="Search and jump (Ctrl K)" aria-label="Search and jump" aria-keyshortcuts="Control+K /">Search</button><button type="button" class="ms-tbtn" id="ms-alerts" aria-pressed="false" title="Alerts off">Alerts off</button><button type="button" class="ms-tbtn ms-theme-q" id="ms-theme-q" data-theme-set title="Switch to the light theme">Light theme</button>
       <details class="menu">
         <summary class="ms-tbtn">Settings</summary>
         <div class="menu-body">
@@ -2572,6 +2588,7 @@ html[data-motion="off"] #v-ict .ict-cal-d:hover { transform: none !important; }
           <button type="button" role="menuitem" id="ms-me-photo">Change photo</button>
           <button type="button" role="menuitem" id="ms-me-rmphoto" hidden>Remove photo</button>
           <button type="button" role="menuitem" id="ms-me-rename">Change display name</button>
+          <button type="button" role="menuitem" id="ms-me-theme" data-theme-set>Light theme</button>
           <button type="button" role="menuitem" id="ms-me-out" class="me-out">Log out</button>
           <input type="file" id="ms-me-file" accept="image/*" hidden>
         </div>
@@ -3120,7 +3137,9 @@ html[data-motion="off"] #v-ict .ict-cal-d:hover { transform: none !important; }
     <a href="#journal" data-go="journal"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 3h11a1 1 0 011 1v16a1 1 0 01-1 1H6zM6 3v18M10 8h5M10 12h5"></path></svg>Journal</a>
     <a href="#ict" data-go="ict" class="ictx"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 19h16M6 15l4-5 3 3 5-7"></path><path d="M15 6h3v3"></path></svg>ICT</a>
     <a href="#users" data-go="users" class="adm own"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="9" cy="8" r="3.5"></circle><path d="M2.5 20c.8-3.6 3.4-5.5 6.5-5.5s5.7 1.9 6.5 5.5"></path><path d="M17 8v6M14 11h6"></path></svg><span>Users</span></a>
+    <button type="button" class="btab-more-btn" id="ms-more-btn" popovertarget="ms-more" aria-controls="ms-more" aria-expanded="false" hidden><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><rect x="4" y="4" width="6" height="6" rx="1.5"></rect><rect x="14" y="4" width="6" height="6" rx="1.5"></rect><rect x="4" y="14" width="6" height="6" rx="1.5"></rect><rect x="14" y="14" width="6" height="6" rx="1.5"></rect></svg><span>More</span></button>
   </nav>
+  <div class="btab-more" id="ms-more" popover aria-label="More sections"><p class="btab-more-h">More sections</p><nav class="btab-more-list" id="ms-more-list" aria-label="More sections"></nav></div>
   <dialog class="ind-dlg" id="ms-ind" aria-labelledby="ms-ind-t"><div class="ind-h"><h3 id="ms-ind-t">Indicators</h3><span class="ms-note">Up to 10, on every chart. Saved for your account on this device.</span><button type="button" class="tv-x" id="ms-ind-x" aria-label="Close">×</button></div>
     <ul class="ind-cur" id="ms-ind-cur"></ul><div class="ind-lib" id="ms-ind-lib"></div></dialog>
   <dialog class="tv" id="ms-tv" aria-labelledby="ms-tv-t"><div class="tv-h"><div><h3 id="ms-tv-t">Trade</h3><p id="ms-tv-s"></p></div><div class="tv-ba" role="group" aria-label="Prediction before, result after"><button type="button" data-ba="before">Before</button><button type="button" data-ba="after" class="on">After</button><button type="button" data-ba="save" title="Save the before and after charts as images">Save</button></div><button type="button" class="tv-x" id="ms-tv-x" aria-label="Close chart">×</button></div><div class="tv-tf" id="ms-tv-tf" role="group" aria-label="Chart timeframe"><button type="button" data-tvtf="auto" class="on" aria-pressed="true">Auto</button><button type="button" data-tvtf="1m" aria-pressed="false">M1</button><button type="button" data-tvtf="5m" aria-pressed="false">M5</button><button type="button" data-tvtf="15m" aria-pressed="false">M15</button><button type="button" data-tvtf="1h" aria-pressed="false">H1</button><button type="button" data-tvtf="4h" aria-pressed="false">H4</button><button type="button" data-tvtf="1d" aria-pressed="false">D1</button><span class="tv-tf-sp"></span><button type="button" data-tvmore="1" title="Load more candles before the trade">More history</button><span class="tv-tf-n" id="ms-tv-tfn"></span></div><div class="tv-c" id="ms-tv-c"><div class="tv-msg" id="ms-tv-m">Loading candles…</div></div><div class="tv-k" id="ms-tv-k"></div><div class="tv-tk" id="ms-tv-tk" hidden></div><div class="tv-rv adm" id="ms-tv-rv" hidden><div class="rv-strat" id="ms-rv-strat"></div><div class="rv-tools"><b>Draw</b><button type="button" data-tool="pen">Pen</button><button type="button" data-tool="line">Line</button><button type="button" data-tool="text">Text</button><button type="button" class="rv-c on" data-col="#f23645" style="background:#f23645" aria-label="Colour #f23645"></button><button type="button" class="rv-c" data-col="#089981" style="background:#089981" aria-label="Colour #089981"></button><button type="button" class="rv-c" data-col="#f5a623" style="background:#f5a623" aria-label="Colour #f5a623"></button><button type="button" class="rv-c" data-col="#2962ff" style="background:#2962ff" aria-label="Colour #2962ff"></button><button type="button" class="rv-c" data-col="#ffffff" style="background:#ffffff" aria-label="Colour #ffffff"></button><button type="button" data-act="undo">Undo</button><button type="button" data-act="clear">Clear</button></div><div class="rv-tags" id="ms-rv-tags" aria-label="Why it failed"></div><textarea id="ms-rv-text" rows="3" placeholder="Why did this setup fail? What did the chart show before the entry?"></textarea><textarea id="ms-rv-lesson" rows="2" placeholder="Rule idea for the council (optional), e.g. no scalp sells while H4 makes higher lows"></textarea><div class="rv-save"><button type="button" id="ms-rv-save">Save review</button><span id="ms-rv-msg"></span></div><div class="rv-council" id="ms-rv-council"></div></div></dialog>
@@ -3359,7 +3378,7 @@ function msNextSetup(bars, A) {
     vr:   { fill: 'rgba(255,152,0,0.18)', stroke: 'rgba(224,134,0,0.9)' },
     htf:  'rgba(41,98,255,0.85)', proj: '#2962ff',
   };
-  const G = { theme: root.dataset.chart === 'dark' ? 'dark' : 'light', show: { bo: true, origin: true, cf: true, vr: true, next: true, htf: true, plan: true, detail: false, sess: true, news: true, replica: true }, risk: 100, alerts: false, plan: null, prev: null, sel: null, prevStates: {}, planKey: '',
+  const G = { theme: ['dark', 'light', 'midnight', 'pro'].indexOf(document.documentElement.dataset.theme) >= 0 ? document.documentElement.dataset.theme : 'dark', show: { bo: true, origin: true, cf: true, vr: true, next: true, htf: true, plan: true, detail: false, sess: true, news: true, replica: true }, risk: 100, alerts: false, plan: null, prev: null, sel: null, prevStates: {}, planKey: '',
     offset: 0, spot: null, source: '', live: false, csv: false }; try { G.ha = localStorage.getItem('ms-ha') === '1'; G.log = localStorage.getItem('ms-log') === '1'; G.mode = localStorage.getItem('ms-mode') === 'ict' ? 'ict' : 'meridian'; } catch (e) { G.mode = 'meridian'; }
   const $ = (id) => document.getElementById(id);
   const $o = (id) => document.getElementById(id) || { set textContent(v) {}, set className(v) {}, set innerHTML(v) {}, style: {} };
@@ -4980,7 +4999,7 @@ function msNextSetup(bars, A) {
 
   // ─── Controls ───
   function savePrefs() {
-    try { localStorage.setItem('msPrefs', JSON.stringify({ theme: G.theme, show: G.show, risk: G.risk, alerts: G.alerts })); } catch (e) {}
+    try { localStorage.setItem('msPrefs', JSON.stringify({ theme: document.documentElement.dataset.themeAuto ? undefined : G.theme, show: G.show, risk: G.risk, alerts: G.alerts })); } catch (e) {}
   }
   function applyTheme() {
     const t = THEMES[G.theme];
@@ -5017,6 +5036,8 @@ function msNextSetup(bars, A) {
     G.show[cb.dataset.show] = cb.checked; savePrefs(); Object.values(panes).forEach((p) => p.A && p.draw()); if (window.msSplitMarkup) window.msSplitMarkup();
   }));
   $('ms-theme').addEventListener('click', () => { const order = ['dark', 'light', 'midnight', 'pro']; G.theme = order[(order.indexOf(G.theme) + 1) % order.length]; applyTheme(); savePrefs(); });
+  // shell (7 Nov): the header's light / dark switch and the account menu set a theme directly; save = false keeps following the device
+  window.msSetTheme = (t, save) => { if (!THEMES[t]) return; G.theme = t; applyTheme(); if (save !== false) { delete document.documentElement.dataset.themeAuto; savePrefs(); } };
   $('ms-risk').addEventListener('input', () => { const v = +$('ms-risk').value; if (v > 0) { G.risk = v; savePrefs(); topDown(); } });
   $('ms-alerts').addEventListener('click', async () => {
     G.alerts = !G.alerts; applyAlertsBtn(); savePrefs();
@@ -6968,7 +6989,7 @@ function msNextSetup(bars, A) {
   }
 
   // ─── Design pass 100 (6 Nov): small behaviours ───
-  { const NAMES = { home: 'Home', setup: 'Setup', charts: 'Charts', scanner: 'Scanner', council: 'Council', journal: 'Journal', users: 'Users', guest: 'Gold H4', ict: 'ICT desk' };
+  { const NAMES = { home: 'Home', setup: 'Setup', charts: 'Charts', scanner: 'Scanner', crypto: 'Crypto', gold: 'Gold playbook', council: 'Council', journal: 'Journal', users: 'Users', guest: 'Gold H4', ict: 'ICT desk' };
     const setTitle = () => { const v = document.querySelector('.view:not([hidden])'); const k = v ? v.id.replace('v-', '') : 'home'; document.title = `${NAMES[k] || 'Home'} · Aurum Desk`; };
     addEventListener('hashchange', () => setTimeout(setTitle, 0)); setTimeout(setTitle, 0);
     // card titles "Name · detail": the detail in a quieter tone
@@ -9074,5 +9095,146 @@ html[data-mk="ict"] #v-charts .mk-mode button[data-mk="ict"].on { background: co
 #v-council .c-md-tw:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 @media (max-width: 700px) { #v-council .c-md td { min-width: 96px; } #v-council .c-md td:first-child { min-width: 84px; } }
 </style>
+<style>
+/* ═══ SHELL 2 (7 Nov): header, navigation, theme switch and bot pill. Scoped to the app shell (.top, .btab, the More sheet);
+   the views' content is styled elsewhere. ═══ */
+:root { --tap: 44px; }
+/* header: the bot pill never moves anything. Below 1180 px it sits after the live dot, just left of the right-aligned actions, so
+   when /api/status reports a stalled bot it only fills empty space; on phones it shrinks to a dot so the account button stays on screen */
+@media (max-width: 1179px) { .top > .ms-status { order: 1; } .top > .ms-botwarn { order: 2; } .top > .top-actions { order: 3; } }
+.ms-botwarn { position: relative; flex: none; }
+.ms-botwarn::after, #ms-hdr-open::after { content: ""; position: absolute; inset: -8px -2px; }
+#ms-hdr-open { position: relative; }
+@media (max-width: 700px) {
+  .ms-botwarn { width: 30px; height: 30px; padding: 0 !important; gap: 0; justify-content: center; font-size: 0 !important; }
+  .ms-botwarn::before { width: 9px; height: 9px; box-shadow: 0 0 0 3px color-mix(in srgb, #e0a526 25%, transparent); }
+  .ms-botwarn::after { inset: -7px; }
+  .top > .brand { min-width: 0; }
+}
+/* light / dark switch in the header (the four-theme cycle stays in Settings → Display) */
+#ms-theme-q { --ico: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round'%3E%3Ccircle cx='12' cy='12' r='4'/%3E%3Cpath d='M12 2.5v2M12 19.5v2M4.6 4.6l1.4 1.4M18 18l1.4 1.4M2.5 12h2M19.5 12h2M4.6 19.4L6 18M18 6l1.4-1.4'/%3E%3C/svg%3E"); }
+:root[data-theme="light"] #ms-theme-q { --ico: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M20.5 14.2A8.5 8.5 0 1 1 9.8 3.5a6.6 6.6 0 0 0 10.7 10.7z'/%3E%3C/svg%3E"); }
+html[data-gate] #ms-theme-q { display: none !important; }
+/* touch screens: every header control is at least 44 px */
+@media (pointer: coarse) {
+  .top-actions > .ms-tbtn, .top-actions > details.menu > summary.ms-tbtn { width: var(--tap); height: var(--tap); min-height: var(--tap); }
+  .top .mk > summary.inst { min-height: var(--tap); display: inline-flex; align-items: center; }
+  .top .tabs a { min-height: var(--tap); display: inline-flex; align-items: center; }
+}
+@media (max-width: 700px) {
+  /* phones: quiet icon buttons (no box), 44 px targets, the theme switch moves into the account menu */
+  .top-actions { gap: 0; }
+  .top-actions > .ms-tbtn, .top-actions > details.menu > summary.ms-tbtn { width: var(--tap); height: var(--tap); min-height: var(--tap); border-color: transparent; border-radius: 12px; }
+  .top-actions > .ms-tbtn:not(.is-on), .top-actions > details.menu > summary.ms-tbtn { background: transparent; box-shadow: none; }
+  .top-actions > .ms-tbtn::before, .top-actions > details.menu > summary.ms-tbtn::before { width: 20px; height: 20px; }
+  .top-actions > details[open] > summary.ms-tbtn { background: var(--panel-raised); }
+  #ms-theme-q { display: none !important; }
+}
+@media (min-width: 701px) { #ms-me-theme { display: none; } }
+
+/* bottom bar on phones: at most five tabs, each with its label; the rest open from "More" (a sheet just above the thumb) */
+.btab-more-btn { display: none; }
+@media (max-width: 700px) {
+  .btab { background: color-mix(in srgb, var(--bg) 96%, transparent); padding: 4px max(4px, env(safe-area-inset-left, 0px)) calc(4px + env(safe-area-inset-bottom, 0px)) max(4px, env(safe-area-inset-right, 0px)); }
+  .btab > a.btab-x { display: none !important; }
+  .btab > a, .btab-more-btn { min-height: 56px; gap: 3px; font: 500 11px/1.2 var(--sans); letter-spacing: 0; min-width: 0; white-space: nowrap; }
+  .btab > a[aria-current="page"], .btab-more-btn.on { color: var(--ink); font-weight: 600; }
+  .btab > a[aria-current="page"] svg, .btab-more-btn.on svg { color: var(--accent); }
+  .btab.btab-ovf .btab-more-btn:not([hidden]) { display: flex; flex-direction: column; align-items: center; justify-content: center; border: 0; background: none; color: var(--ink-faint); border-radius: 10px; cursor: pointer; padding: 0; -webkit-tap-highlight-color: transparent; }
+  .btab-more-btn svg { padding: 3px 14px; box-sizing: content-box; border-radius: 999px; transition: background-color .2s cubic-bezier(.23,1,.32,1); }
+  .btab-more-btn.on svg, .btab-more-btn[aria-expanded="true"] svg { background: color-mix(in srgb, var(--accent) 16%, transparent); }
+  .btab-more-btn[aria-expanded="true"] { color: var(--ink); }
+  .btab-more-btn:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
+  :root[data-theme="pro"] .btab-more-btn svg { border-radius: 6px; }
+  .ms-live.app { padding-bottom: calc(80px + env(safe-area-inset-bottom, 0px)); }
+}
+.btab-more { position: fixed; inset: auto max(8px, env(safe-area-inset-right, 0px)) calc(72px + env(safe-area-inset-bottom, 0px)) max(8px, env(safe-area-inset-left, 0px));
+  margin: 0 auto; width: auto; max-width: 480px; padding: 12px; border: 1px solid var(--line-strong, var(--line)); border-radius: 18px;
+  background: var(--panel-raised); color: var(--ink); box-shadow: 0 -16px 48px -16px rgba(0,0,0,.6), 0 2px 8px rgba(0,0,0,.2);
+  opacity: 1; transform: none; transition: opacity .18s ease-out, transform .26s cubic-bezier(.22,1,.36,1), overlay .26s allow-discrete, display .26s allow-discrete; }
+.btab-more:not(:popover-open) { opacity: 0; transform: translateY(10px); }
+@starting-style { .btab-more:popover-open { opacity: 0; transform: translateY(10px); } }
+.btab-more::backdrop { background: rgba(0,0,0,.28); }
+.btab-more-h { margin: 2px 6px 10px; font: 600 12.5px var(--sans); color: var(--ink-dim); }
+.btab-more-list { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px; }
+.btab-more-list a { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; min-height: 72px; padding: 8px 4px; border-radius: 12px;
+  font: 500 12.5px/1.2 var(--sans); color: var(--ink-dim); text-decoration: none; text-align: center; background: color-mix(in srgb, var(--ink) 4%, transparent); -webkit-tap-highlight-color: transparent; }
+.btab-more-list a:active { background: color-mix(in srgb, var(--ink) 9%, transparent); }
+.btab-more-list a[aria-current="page"] { color: var(--ink); font-weight: 600; background: color-mix(in srgb, var(--accent) 14%, transparent); box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--accent) 40%, transparent); }
+.btab-more-list a[aria-current="page"] svg { color: var(--accent); }
+.btab-more-list a:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+:root[data-theme="light"] .btab-more { box-shadow: 0 -12px 36px -12px rgba(16,24,40,.22), 0 2px 6px rgba(16,24,40,.06); }
+:root[data-theme="light"] .btab-more::backdrop { background: rgba(16,24,40,.16); }
+:root[data-theme="pro"] .btab-more { border-radius: 10px; } :root[data-theme="pro"] .btab-more-list a { border-radius: 6px; }
+@media (min-width: 701px) { .btab-more { display: none !important; } }
+@media (prefers-reduced-motion: reduce) { .btab-more, .btab-more:not(:popover-open) { transition: none; transform: none; } }
+html[data-motion="off"] .btab-more { transition: none; transform: none; }
+@media print { .btab-more { display: none !important; } }
+</style>
+<script>
+/* shell 2 (7 Nov): phone bottom bar with at most five tabs + the More sheet, and the light / dark switch */
+(function () {
+  var R = document.documentElement;
+  // ── bottom bar: keep the four most used sections this account can open, the rest go into More ──
+  var nav = document.querySelector('nav.btab'), btn = document.getElementById('ms-more-btn'), sheet = document.getElementById('ms-more'), list = document.getElementById('ms-more-list');
+  if (nav && btn && sheet && list) {
+    var PRI = ['home', 'charts', 'council', 'ict', 'journal', 'setup', 'scanner', 'crypto', 'gold', 'users'];
+    var links = [].slice.call(nav.querySelectorAll(':scope > a[data-go]'));
+    var canPop = typeof sheet.showPopover === 'function';
+    if (!canPop) { sheet.removeAttribute('popover'); sheet.hidden = true; btn.removeAttribute('popovertarget'); }
+    var close = function () { if (canPop) { try { sheet.hidePopover(); } catch (e) {} } else { sheet.hidden = true; btn.setAttribute('aria-expanded', 'false'); } };
+    var mark = function () {
+      var cur = list.querySelector('a[aria-current="page"]');
+      btn.classList.toggle('on', !!cur);
+      btn.setAttribute('aria-label', cur ? 'More sections, now on ' + cur.textContent.trim() : 'More sections');
+    };
+    var fit = function () {
+      links.forEach(function (a) { a.classList.remove('btab-x'); });
+      var vis = links.filter(function (a) { return getComputedStyle(a).display !== 'none'; });
+      var over = [];
+      if (vis.length > 5) {
+        var keep = vis.slice().sort(function (a, b) { return PRI.indexOf(a.dataset.go) - PRI.indexOf(b.dataset.go); }).slice(0, 4);
+        over = vis.filter(function (a) { return keep.indexOf(a) < 0; });
+      }
+      over.forEach(function (a) { a.classList.add('btab-x'); });
+      nav.classList.toggle('btab-ovf', over.length > 0); btn.hidden = !over.length;
+      list.replaceChildren.apply(list, over.map(function (a) { var c = a.cloneNode(true); c.removeAttribute('class'); return c; }));
+      if (!over.length) close();
+      mark();
+    };
+    list.addEventListener('click', function (e) { if (e.target.closest('a')) close(); });
+    if (canPop) sheet.addEventListener('toggle', function (e) { btn.setAttribute('aria-expanded', String(e.newState === 'open')); if (e.newState === 'open') { var f = list.querySelector('a[aria-current="page"]') || list.querySelector('a'); if (f) f.focus({ preventScroll: true }); } });
+    else btn.addEventListener('click', function () { sheet.hidden = !sheet.hidden; btn.setAttribute('aria-expanded', String(!sheet.hidden)); });
+    // the router marks every [data-go] link (the copies in the sheet included) with aria-current after a hash change
+    addEventListener('hashchange', function () { setTimeout(mark, 0); });
+    new MutationObserver(mark).observe(list, { subtree: true, attributes: true, attributeFilter: ['aria-current'] });
+    new MutationObserver(function () { setTimeout(fit, 0); if (window.msThemeMeta) window.msThemeMeta(); }).observe(R, { attributes: true, attributeFilter: ['data-mode', 'data-role', 'data-ict', 'data-ict-ro', 'data-gate', 'data-guest'] });
+    fit(); setTimeout(fit, 0);
+  }
+  // ── light / dark switch (header on wider screens, account menu on phones) ──
+  var qb = document.getElementById('ms-theme-q'), mi = document.getElementById('ms-me-theme');
+  var light = function () { return R.dataset.theme === 'light'; };
+  var sync = function () {
+    var l = light(), t = l ? 'Switch to the dark theme' : 'Switch to the light theme';
+    if (qb) { qb.textContent = l ? 'Dark theme' : 'Light theme'; qb.title = t; qb.setAttribute('aria-label', t); }
+    if (mi) mi.textContent = l ? 'Dark theme' : 'Light theme';
+    if (window.msThemeMeta) window.msThemeMeta();
+  };
+  var flip = function () {
+    var dark = 'dark'; try { dark = localStorage.getItem('msDarkTheme') || 'dark'; } catch (e) {}
+    if (!light()) { dark = R.dataset.theme; try { localStorage.setItem('msDarkTheme', dark); } catch (e) {} }
+    var next = light() ? dark : 'light';
+    if (window.msSetTheme) window.msSetTheme(next);
+    else { R.dataset.theme = next; delete R.dataset.themeAuto; try { var p = JSON.parse(localStorage.getItem('msPrefs') || '{}'); p.theme = next; localStorage.setItem('msPrefs', JSON.stringify(p)); } catch (e) {} }
+  };
+  if (qb) qb.addEventListener('click', flip);
+  if (mi) mi.addEventListener('click', flip);
+  new MutationObserver(sync).observe(R, { attributes: true, attributeFilter: ['data-theme'] });
+  sync();
+  // no saved choice yet: keep following the device when it switches between light and dark
+  if (window.matchMedia) { var mq = matchMedia('(prefers-color-scheme: light)'), on = function () { if (!R.dataset.themeAuto) return; var t = mq.matches ? 'light' : 'dark'; if (window.msSetTheme) window.msSetTheme(t, false); else R.dataset.theme = t; };
+    if (mq.addEventListener) mq.addEventListener('change', on); }
+})();
+</script>
 </body>
 </html>
