@@ -527,6 +527,24 @@
    "by": "user",
    "change": "Scalp against D1, outside Asia, trades live on paper on every market (the market focus no longer blocks Scalp); the other engine setups stay shadow",
    "why": "30-day replay: Scalp against the D1 trend +0.329R a trade over 500 trades, positive in both halves (+0.24 / +0.42); Scalp with D1 -0.29R over 459. Forward shadow trades 1-7 Nov agree: +0.25R over 127. Against D1 in Asia is flat (+0.03R over 562), so Asia stays out."
+  },
+  {
+   "at": "2026-11-07T17:35:48.000Z",
+   "by": "repair",
+   "change": "Research: 25 replica signals of 4 Nov 15:21-23:47 UTC marked void (audusd 5, usdchf 7, gbpusd 4, eurusd 4, usdcad 4, xrp 1); research stats skip void records",
+   "why": "Prices were rounded to 2 decimals on markets quoted with 4-5 decimals (pxr bug, fixed), so entry equalled the stop (or sat one 0.01 tick from it) and R was -1, null or 0 for a \"win\"."
+  },
+  {
+   "at": "2026-11-07T17:35:48.000Z",
+   "by": "repair",
+   "change": "Crypto trend as the code runs it (v2/v3 since 5 Nov): two slots per coin (BTC, ETH, SOL, XRP), long only. A daily close above the prior 55 daily highs, or above the prior 100 daily highs, buys at market on the next run (one open trade per slot). Catastrophe stop 5 x ATR(20) below the entry, fixed. Exit: a daily close under the ratcheting midpoint of that slot's own 55- or 100-day channel (high+low)/2, at market. One add per trade at +1R (cryptoAdd), with its own 5 ATR stop, leaving with the first trade. A coin stops opening trend trades once its forward trend total reaches -8R (cryptoTrendStopR). Trades opened before v3 keep their own rule (kATR trail, out under the 27/50-day low).",
+   "why": "history catch-up: code changed without a history entry (the 5 Nov pairs-best entry still describes v1: 55-day breakout, 4 ATR trail, out under the 27-day low)."
+  },
+  {
+   "at": "2026-11-07T17:35:48.000Z",
+   "by": "repair",
+   "change": "Pairs replica settings are dormant: pairsLiveAt, pairVolPct (80) and pairStopR (-10) are kept, but no pair is in replicaLive ([\"xau\"]), so no pair trades the replica live. They only label the pairs' research signals (calm, pairStop) and the Pairs card's gate.",
+   "why": "history catch-up: since pairs-best (5 Nov) put forex back to research only, nothing said these settings no longer trade."
   }
  ],
  "btAt": "2026-11-07T17:09:47.826Z",
@@ -582,7 +600,7 @@
    "why": "four losses in a row"
   },
   "scalp": {
-   "at": "2026-11-07T17:33:40.000Z",
+   "at": "2026-11-07T17:35:48.000Z",
    "why": "expectancy -1.00R over 13 trades"
   },
   "xau": {
@@ -599,7 +617,10 @@
   }
  },
  "repairs": [
-  "badprint-2026-11-03-7"
+  "badprint-2026-11-03-7",
+  "void-rounded-replica-2026-11-04",
+  "history-crypto-trend-v3",
+  "history-pairs-dormant"
  ],
  "takeAll": false,
  "focus": [
