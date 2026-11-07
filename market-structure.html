@@ -1387,6 +1387,12 @@ td.st-dim { color: var(--ink-faint); }
 /* polish 23: council calendar today = one gold outline (was blue border + gold ring), gold date number like the ICT calendar */
 .cal-d.today { border-color: var(--gold, #e3b341) !important; }
 .cal-d.today .cn { color: var(--gold, #e3b341); font-weight: 700; }
+
+/* polish 24: journal exit reason as a tinted tag */
+.ms-js-t .ex { display: inline-block; padding: 1px 8px; border-radius: 999px; font: 500 11.5px var(--sans); border: 1px solid var(--line); }
+.ms-js-t .ex-w { color: var(--buy); background: var(--buy-soft); border-color: color-mix(in srgb, var(--buy) 30%, transparent); }
+.ms-js-t .ex-l { color: var(--sell); background: var(--sell-soft); border-color: color-mix(in srgb, var(--sell) 30%, transparent); }
+.ms-js-t .ex-f { color: var(--ink-dim); }
 </style>
 </head>
 <body>
@@ -3362,7 +3368,7 @@ function msNextSetup(bars, A) {
     const body = document.getElementById('ms-js-body'), st = document.getElementById('ms-js-stats'); if (!body) return;
     const rows = systemClosed(), fR = (v) => `${v > 0 ? '+' : v < 0 ? '−' : ''}${Math.abs(v).toFixed(2)}R`;
     body.innerHTML = rows.length ? rows.slice(0, 200).map((x) => { const d = { dec: x.dec != null ? x.dec : 2 };
-      return `<tr data-tid="${esc(x.id)}"><td>${ftime(x.closed + TZ)}</td><td><b>${esc(x.label)}</b></td><td>${PUB ? '—' : `${esc(x.name)}${x.paper ? ' <small>paper</small>' : ''}`}</td><td><span class="ms-chip ${x.side === 'sell' ? 'ms-chip-sell' : 'ms-chip-buy'}">${x.side === 'sell' ? 'SELL' : 'BUY'}</span></td><td class="m">${fmtI(x.entry, d)}</td><td class="m">${fmtI(x.stop, d)}</td><td>${esc(x.exit ? x.exit.charAt(0).toUpperCase() + x.exit.slice(1) : (x.status === 'be' ? 'Break-even' : x.R > 0 ? 'Target' : 'Stop'))}</td><td class="m ${x.R > 0 ? 'pos' : x.R < 0 ? 'neg' : ''}">${fR(x.R)}</td></tr>`; }).join('')
+      return `<tr data-tid="${esc(x.id)}"><td>${ftime(x.closed + TZ)}</td><td><b>${esc(x.label)}</b></td><td>${PUB ? '—' : `${esc(x.name)}${x.paper ? ' <small>paper</small>' : ''}`}</td><td><span class="ms-chip ${x.side === 'sell' ? 'ms-chip-sell' : 'ms-chip-buy'}">${x.side === 'sell' ? 'SELL' : 'BUY'}</span></td><td class="m">${fmtI(x.entry, d)}</td><td class="m">${fmtI(x.stop, d)}</td><td><span class="ex ${x.R > 0 ? 'ex-w' : x.R < 0 ? 'ex-l' : 'ex-f'}">${esc(x.exit ? x.exit.charAt(0).toUpperCase() + x.exit.slice(1) : (x.status === 'be' ? 'Break-even' : x.R > 0 ? 'Target' : 'Stop'))}</span></td><td class="m ${x.R > 0 ? 'pos' : x.R < 0 ? 'neg' : ''}">${fR(x.R)}</td></tr>`; }).join('')
       : '<tr class="empty"><td colspan="8">No closed system trade yet.</td></tr>';
     const by = {}; for (const x of rows) { const k = x.name; (by[k] = by[k] || []).push(x.R); }
     const tot = rows.reduce((a, x) => a + x.R, 0);
