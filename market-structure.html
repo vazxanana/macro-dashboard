@@ -2822,6 +2822,7 @@ html[data-motion="off"] #v-ict .ict-cal-d:hover { transform: none !important; }
         <div class="ms-k"><span>Edge finder · where the council makes money</span><span class="ms-note" id="ms-edge-at"></span></div>
         <div class="edge-by" role="group" aria-label="Group by"><button type="button" data-eby="d1" class="on" aria-pressed="true">D1 trend</button><button type="button" data-eby="session" aria-pressed="false">Session</button><button type="button" data-eby="cf" aria-pressed="false">Confirming break</button><button type="button" data-eby="rr" aria-pressed="false">Reward:risk</button><button type="button" data-eby="market" aria-pressed="false">Market</button><button type="button" data-eby="setup" aria-pressed="false">Setup</button><label class="edge-sc">Setup <select id="ms-edge-k" aria-label="Only this setup"><option value="">all</option></select></label></div>
         <div class="edge-wrap"><table class="edge-t"><thead><tr><th scope="col">Condition</th><th scope="col">Verdict</th><th scope="col">Live</th><th scope="col">Shadow</th><th scope="col">30-day replay</th><th scope="col" title="Replay first half / second half">Halves</th></tr></thead><tbody id="ms-edge-b"></tbody></table></div>
+        <p class="edge-adx" id="ms-edge-adx" hidden></p>
         <p class="ms-note">R per trade (number of trades). <b>Edge</b>: replay ≥ +0.2R over 100+ trades, both halves positive and the forward trades (live + shadow, 20+) positive. <b>Avoid</b>: replay ≤ −0.1R over 100+ and forward not positive. Shadow trades are signals the rules blocked; their results are simulated the same way as live paper trades.</p>
       </div>
       <div class="card c-nq adm">
@@ -6350,6 +6351,18 @@ function msNextSetup(bars, A) {
       const edge = B && B.n >= 100 && B.e >= 0.2 && H1 && H2 && H1.e > 0 && H2.e > 0 && F && F.n >= 20 && F.e > 0, avoid = B && B.n >= 100 && B.e <= -0.1 && (!F || F.e <= 0);
       return { k, L, S, B, H1, H2, v: edge ? 'edge' : avoid ? 'avoid' : '', sort: B ? B.e : F ? F.e : -9 }; }).sort((a, b) => b.sort - a.sort);
     tb.innerHTML = rows.length ? rows.map((r) => `<tr class="${r.v}"><th scope="row">${esc(String(r.k))}</th><td>${r.v === 'edge' ? '<span class="ms-chip ms-chip-buy">Edge</span>' : r.v === 'avoid' ? '<span class="ms-chip ms-chip-sell">Avoid</span>' : '<small>unclear</small>'}</td><td>${cell(r.L)}</td><td>${cell(r.S)}</td><td>${cell(r.B)}</td><td>${r.H1 && r.H2 ? `${cell(r.H1)} / ${cell(r.H2)}` : '<small>—</small>'}</td></tr>`).join('') : '<tr><td colspan="6"><small>No closed trades yet.</small></td></tr>';
+    // Swing ADX band (paper tag, research/edge/regime): Swing signals tagged with the D1 ADX(14) of the last closed daily candle;
+    // in-band = 19.4-29.2. Shadow trades only, nothing trades live on it; forward next to the 30-day replay, both under the Swing D1 rule.
+    const ax = document.getElementById('ms-edge-adx'); if (ax) {
+      const fSw = ((C.config && C.config.filters) || {}).swing || {}, d1ok = (v) => !fSw.d1 || v === fSw.d1;
+      const fwS = (Array.isArray(C.trades) ? C.trades : []).filter((t) => t.k === 'swing' && t.shadow && t.feat && typeof t.feat.adxBand === 'boolean' && d1ok(t.feat.d1) && (t.status === 'win' || t.status === 'loss' || t.status === 'be') && isFinite(t.R));
+      const cols = C.backtest && C.backtest.tradeCols, iB = cols ? cols.indexOf('adxBand') : -1;
+      const rpS = iB < 0 ? [] : C.backtest.trades.map((r) => Object.fromEntries(cols.map((c, i) => [c, r[i]]))).filter((t) => t.setup === 'swing' && t.fill && t.status !== 'open' && t.R_none != null && isFinite(t.R_none) && typeof t.adxBand === 'boolean' && d1ok(t.d1)).map((t) => ({ adxBand: t.adxBand, R: t.R_none - (+t.cost || 0) }));
+      const sc = (a) => { if (!a.length) return '<small>no trades</small>'; const e = a.reduce((x, y) => x + y, 0) / a.length; return `<span class="${e > 0.05 ? 'pos' : e < -0.05 ? 'neg' : ''}">${e >= 0 ? '+' : '−'}${Math.abs(e).toFixed(2)}R</span>/t <small>(n${a.length})</small>`; };
+      const pair = (a, R) => `in ${sc(a.filter((t) => t.adxBand === true).map(R))} · out ${sc(a.filter((t) => t.adxBand === false).map(R))}`;
+      ax.hidden = false;
+      ax.innerHTML = `<b>Swing ADX band (paper)</b> <span class="ms-chip">not live</span> D1 ADX(14) 19.4–29.2${fSw.d1 ? `, ${esc(fSw.d1)} D1` : ''} · forward shadow ${pair(fwS, (t) => +t.R)} · 30-day replay ${iB < 0 ? '<small>no ADX column yet (next replay run)</small>' : `${pair(rpS, (t) => t.R)} <small>after spread</small>`}. <small>A tag only: research lead (OOS +0.29R/t, n67, t 1.46, inconclusive); a live rule only after 50+ forward trades at +0.1R/t.</small>`;
+    }
     const at = document.getElementById('ms-edge-at'); if (at) at.textContent = C.backtest && C.backtest.at ? `replay ${new Date(C.backtest.at).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })} · ${fw.length} forward trades` : `${fw.length} forward trades`;
   }
   document.addEventListener('click', (ev) => { const b = ev.target.closest && ev.target.closest('[data-eby]'); if (!b) return; EDGE.by = b.dataset.eby; document.querySelectorAll('[data-eby]').forEach((x) => { x.classList.toggle('on', x === b); x.setAttribute('aria-pressed', String(x === b)); }); renderEdge(); });
@@ -8696,6 +8709,7 @@ function gpStats(T) {
 .edge-t { width: 100%; border-collapse: collapse; font-size: 13px; font-variant-numeric: tabular-nums; }
 .edge-t th, .edge-t td { padding: 7px 8px; border-bottom: 1px solid var(--line); text-align: right; white-space: nowrap; } .edge-t th:first-child, .edge-t td:nth-child(2) { text-align: left; } .edge-t thead th { font-size: 11.5px; color: var(--ink-dim); font-weight: 600; }
 .edge-t td small { color: var(--ink-dim); } .edge-t .pos { color: var(--buy); font-weight: 600; } .edge-t .neg { color: var(--sell); font-weight: 600; }
+.c-edge .edge-adx { margin: 10px 0 0; font-size: 12.5px; color: var(--ink-dim); line-height: 1.5; } .c-edge .edge-adx b { color: var(--ink); } .c-edge .edge-adx .pos { color: var(--buy); font-weight: 600; } .c-edge .edge-adx .neg { color: var(--sell); font-weight: 600; }
 .edge-t tr.edge { background: color-mix(in srgb, var(--buy) 7%, transparent); } .edge-t tr.avoid { background: color-mix(in srgb, var(--sell) 6%, transparent); }
 .seg[aria-label="Chart view"] { max-width: 100%; min-width: 0; overflow-x: auto; scrollbar-width: none; } .seg[aria-label="Chart view"]::-webkit-scrollbar { display: none; } .seg[aria-label="Chart view"] > button { flex: none; }
 @media (max-width: 520px) { .sp-sep { display: none; } .sp-pop { left: auto; right: 0; } }

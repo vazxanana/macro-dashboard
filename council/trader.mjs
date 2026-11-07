@@ -12,6 +12,7 @@ import { liveRuleSection, injectSection, coachChurnSection, CHURN_START, CHURN_E
 import { coachProposals, spotProposals } from './proposals.mjs';
 import { cleanBars, LTF_CLEAN } from './clean.mjs';
 import { voidRoundedReplicas, historyCatchUp } from './repairs.mjs';
+import { d1AdxFeat } from './adx.mjs';
 
 const DIR = process.argv[2] || 'data';
 fs.mkdirSync(DIR, { recursive: true });
@@ -982,6 +983,9 @@ for (const [key, M] of Object.entries(MARKETS)) {
       if (!cfT || now - cfT > (config.fresh || FRESH) * SEC[def.l]) continue;   // an old CF: the move already happened
       // Conditions at the signal: the Coach learns which of them win
       const feat = { d1: src['1d'].A.trend === (t.sell ? -1 : 1) ? 'with' : 'against', struct: t.retr == null ? 'n/a' : t.retr >= 0.5 ? 'main' : 'internal', session: sessionOf(now), ...structFeat(t, def, src, now), m15c: m15cFeat(src['15m'].bars, t.sell, now) };
+      // Swing D1 ADX tag (paper sleeve "swing-adx", research/edge/regime): ADX(14) of the last closed daily candle and whether it sits
+      // in the 19.4-29.2 band. A tag only: no filter, focus or Coach step reads it, so it changes no trade decision.
+      if (t.k === 'swing') { try { Object.assign(feat, d1AdxFeat(src['1d'].bars, now)); } catch (e) {} }
       // Rules from the Coach. A blocked setup is still followed as a SHADOW trade (no score), so the Coach can check the rule was right
       const f = config.filters[t.k] || {}, blockedBy = [];
       if (config.paused[t.k]) blockedBy.push('paused');
