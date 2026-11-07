@@ -1420,11 +1420,9 @@ try {
   const b = rd('backtest.json', null), cj = rd('coach.json', {});
   // v2: promotion/demotion proposals read every setup's filters, so any rule change recomputes them
   // v3: plus the data-source proposal from the nightly spot check (research/spotcheck.json)
-  // markets the live Trader runs on OANDA candles drop out of it (snapshot.feed); the key changes only when that set does
-  const spot = rd('research/spotcheck.json', null), feed = snapshot.feed || {};
-  const spotOff = spot && spot.markets ? Object.keys(spot.markets).filter((m) => feed[m] !== 'OANDA').sort().join(',') : '';
-  const key = b && b.at ? 'v3|' + b.at + '|' + (spot && spot.at || '') + '|' + JSON.stringify([config.focusSetups || [], config.filters || {}]) + '|off:' + spotOff : '';
-  if (key && cj.proposalsKey !== key) { cj.proposals = coachProposals(b, config, nowISO).concat(spotProposals(spot, nowISO, { feed })); cj.proposalsKey = key; cj.proposalsBt = b.at; wr('coach.json', cj); }
+  const spot = rd('research/spotcheck.json', null);
+  const key = b && b.at ? 'v4|' + b.at + '|' + (spot && spot.at || '') + '|' + JSON.stringify(snapshot.feed || {}) + '|' + JSON.stringify([config.focusSetups || [], config.filters || {}]) : '';
+  if (key && cj.proposalsKey !== key) { cj.proposals = coachProposals(b, config, nowISO).concat(spotProposals(spot, nowISO, { feed: snapshot.feed || {} })); cj.proposalsKey = key; cj.proposalsBt = b.at; wr('coach.json', cj); }
 } catch (e) { console.log('coach proposals failed:', e.message); }
 config.history = config.history.slice(-200);
 
