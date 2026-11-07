@@ -1378,6 +1378,11 @@ td.st-dim { color: var(--ink-faint); }
 .c-hist li.by-you span { color: var(--gold, #d4a017); }
 .c-hist li b { font-weight: 600; line-height: 1.5; }
 .c-hist li em { color: var(--ink-faint); }
+
+/* polish 22: light theme shadows tuned (the dark theme's heavy black shadows looked smudgy on light surfaces) */
+:root[data-theme="light"] .c-nav { box-shadow: 0 1px 2px rgba(16,24,40,.05); }
+:root[data-theme="light"] .mk-pop, :root[data-theme="light"] .menu-body, :root[data-theme="light"] .me-pop { box-shadow: 0 18px 40px -12px rgba(16,24,40,.22), 0 2px 6px rgba(16,24,40,.06); }
+:root[data-theme="light"] .c-nav button[aria-selected="true"] { background: #fff; box-shadow: 0 0 0 1px var(--line), 0 1px 3px rgba(16,24,40,.08); color: var(--ink); font-weight: 600; }
 </style>
 </head>
 <body>
