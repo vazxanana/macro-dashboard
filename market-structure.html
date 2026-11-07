@@ -2225,6 +2225,88 @@ html[data-motion="off"][data-gate] .gate-bg path[stroke] { animation: none; stro
 .gate-side { position: relative; isolation: isolate; }
 .gate-side::before { content: ""; position: absolute; inset: -70px -60px -50px -80px; z-index: -1; background: radial-gradient(closest-side, rgba(7,7,10,.82), rgba(7,7,10,.55) 60%, transparent); pointer-events: none; }
 @media (max-width: 900px) { .gate-side::before { display: none; } }
+/* ── Home design pass (7 Nov): everything below is scoped to the Home view ── */
+/* light theme: green/red and the faint ink a step deeper on Home so small text clears 4.5:1 on white and on the tinted chips */
+:root[data-theme="light"] #v-home { --buy: #067a62; --sell: #c42340; --ink-faint: #5d6472; --hmk-amber: #8a5a00; }
+#v-home { --hmk-amber: #e0a63a; }
+#v-home .h-top { padding-bottom: 2px; }
+#v-home .h-head { text-wrap: balance; }
+/* no layout shift while Home fills in: the date/session line and the results strip hold their final height from the start */
+#v-home .h-dl { min-height: 20px; }
+#v-home #h-today:empty { min-height: 92px; }
+@media (max-width: 700px) { #v-home #h-today:empty { min-height: 190px; } }
+@media (max-width: 520px) { #v-home .h-dl { min-height: 44px; align-content: flex-start; } }
+#v-home .ms-al.against { color: var(--sell); }
+/* Markets now */
+#v-home .h-mk { margin: 6px 0 4px; min-width: 0; } #v-home .h-mk[hidden] { display: none; }
+#v-home .h-mk-h { display: flex; align-items: baseline; flex-wrap: wrap; gap: 4px 10px; margin: 0 0 10px; }
+#v-home .h-mk-h h2 { font: 600 15px/1.2 var(--sans); margin: 0; color: var(--ink); letter-spacing: -0.01em; }
+#v-home .h-mk-k { font-size: 12.5px; color: var(--ink-dim); }
+#v-home .h-mk-st { margin-left: auto; display: inline-flex; align-items: center; gap: 6px; font-size: 12px; color: var(--ink-dim); font-variant-numeric: tabular-nums; white-space: nowrap; }
+#v-home .h-mk-st:empty { display: none; }
+#v-home .h-mk-st i { width: 6px; height: 6px; border-radius: 50%; background: var(--buy); flex: none; }
+#v-home .h-mk[data-state="closed"] .h-mk-st i { background: transparent; box-shadow: inset 0 0 0 1.5px var(--ink-faint); }
+#v-home .h-mk[data-state="stale"] .h-mk-st { color: var(--hmk-amber); } #v-home .h-mk[data-state="stale"] .h-mk-st i { background: var(--hmk-amber); }
+#v-home .h-mk-row { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 10px; }
+@media (min-width: 1000px) { #v-home .h-mk-row { grid-template-columns: repeat(5, minmax(0, 1fr)); } }
+#v-home .h-mk-i { position: relative; display: grid; gap: 4px; min-height: 116px; padding: 12px 14px 10px; border-radius: 12px; border: 1px solid var(--line); background: var(--panel); color: var(--ink); text-decoration: none; font-variant-numeric: tabular-nums; transition: border-color .18s cubic-bezier(.25, 1, .5, 1), background-color .18s cubic-bezier(.25, 1, .5, 1), transform .18s cubic-bezier(.25, 1, .5, 1); }
+#v-home a.h-mk-i:hover { border-color: var(--line-strong); background: var(--panel-hover); transform: translateY(-1px); }
+#v-home .h-mk-i.cur { border-color: var(--gold-line, var(--accent)); }
+#v-home .h-mk-i:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+#v-home .h-mk-t { display: flex; justify-content: space-between; align-items: baseline; gap: 6px; font-size: 12px; line-height: 16px; }
+#v-home .h-mk-t b { font-weight: 600; color: var(--ink-dim); letter-spacing: .01em; }
+#v-home .h-mk-t em { font-style: normal; font-weight: 650; } #v-home .h-mk-t em.up { color: var(--buy); } #v-home .h-mk-t em.dn { color: var(--sell); }
+#v-home .h-mk-p { font-size: 19px; line-height: 24px; font-weight: 650; letter-spacing: -.015em; }
+#v-home .h-mk-p b { font-weight: inherit; border-radius: 4px; margin: 0 -3px; padding: 0 3px; }
+#v-home .h-mk-m { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 6px; min-width: 0; min-height: 16px; font-size: 10.5px; line-height: 16px; }
+#v-home .h-mk-d1 { font: 700 10.5px/14px var(--mono); padding: 0 5px; border-radius: 4px; border: 1px solid var(--line); white-space: nowrap; }
+#v-home .h-mk-d1.up { color: var(--buy); border-color: color-mix(in srgb, var(--buy) 40%, transparent); } #v-home .h-mk-d1.dn { color: var(--sell); border-color: color-mix(in srgb, var(--sell) 40%, transparent); }
+#v-home .h-mk-cs { color: var(--ink-dim); white-space: nowrap; } #v-home .h-mk-cs.warn { color: var(--hmk-amber); }
+#v-home .h-mk-i.closed .h-mk-g { opacity: .62; }
+#v-home .h-mk-g { position: relative; display: block; height: 30px; margin-top: 2px; }
+#v-home .h-mk-g .h-mk-sp { position: absolute; inset: 0; width: 100%; height: 100%; display: block; overflow: visible; }
+#v-home .h-mk-sp .l { fill: none; stroke-width: 1.6; vector-effect: non-scaling-stroke; stroke-linejoin: round; } #v-home .h-mk-sp .a { stroke: none; opacity: .13; }
+#v-home .h-mk-sp.up .l { stroke: var(--buy); } #v-home .h-mk-sp.up .a { fill: var(--buy); } #v-home .h-mk-sp.dn .l { stroke: var(--sell); } #v-home .h-mk-sp.dn .a { fill: var(--sell); }
+#v-home .h-mk-dot { position: absolute; right: -3px; width: 6px; height: 6px; margin-top: -3px; border-radius: 50%; background: var(--buy); box-shadow: 0 0 0 2px var(--panel); }
+#v-home .h-mk-dot.dn { background: var(--sell); }
+#v-home .h-mk[data-state="closed"] .h-mk-g, #v-home .h-mk[data-state="stale"] .h-mk-g { opacity: .62; }
+#v-home .h-mk[data-state="closed"] .h-mk-dot { background: var(--panel); box-shadow: inset 0 0 0 1.5px var(--ink-faint); }
+/* skeleton: same box as a real card so the swap does not move anything */
+#v-home .h-mk-sk { pointer-events: none; }
+#v-home .h-mk-sk b, #v-home .h-mk-sk em, #v-home .h-mk-sk .h-mk-g { display: block; border-radius: 4px; background: var(--line); }
+#v-home .h-mk-sk .h-mk-t b { width: 54px; height: 10px; margin-top: 3px; } #v-home .h-mk-sk .h-mk-t em { width: 38px; height: 10px; margin-top: 3px; }
+#v-home .h-mk-sk .h-mk-p b { width: 62%; height: 14px; margin: 5px 0 0; padding: 0; }
+#v-home .h-mk-sk .h-mk-g { opacity: .55; }
+#v-home .h-mk-err { grid-column: 1 / -1; display: flex; align-items: center; min-height: 116px; margin: 0; padding: 0 16px; border: 1px dashed var(--line-strong); border-radius: 12px; color: var(--ink-dim); font-size: 13px; }
+@media (max-width: 520px) {
+  #v-home .h-mk-h:has(.h-mk-st:not(:empty)) .h-mk-k { display: none; }
+  #v-home .h-mk-row { display: flex; width: 0; min-width: 100%; overflow-x: auto; scroll-snap-type: x mandatory; scroll-padding: 0 16px; scrollbar-width: none; margin-right: -16px; padding: 0 16px 2px 0; overscroll-behavior-x: contain; }
+  #v-home .h-mk-row::-webkit-scrollbar { display: none; }
+  #v-home .h-mk-i { flex: 0 0 148px; scroll-snap-align: start; }
+  #v-home .h-mk-err { flex: 1 0 100%; }
+  #v-home .h-mk-row[data-more="r"] { -webkit-mask-image: linear-gradient(90deg, #000 calc(100% - 40px), transparent); mask-image: linear-gradient(90deg, #000 calc(100% - 40px), transparent); }
+  #v-home .h-mk-row[data-more="l"] { -webkit-mask-image: linear-gradient(90deg, transparent, #000 28px); mask-image: linear-gradient(90deg, transparent, #000 28px); }
+  #v-home .h-mk-row[data-more="l r"] { -webkit-mask-image: linear-gradient(90deg, transparent, #000 28px, #000 calc(100% - 40px), transparent); mask-image: linear-gradient(90deg, transparent, #000 28px, #000 calc(100% - 40px), transparent); }
+}
+/* phones: the chip row and the small links in Open positions get 44px tap targets without moving the layout */
+@media (max-width: 700px) { #v-home .h-quick a { min-height: 44px; } }
+#v-home .h-act .c-link, #v-home .h-act-more a { display: inline-flex; align-items: center; min-height: 44px; margin: -14px 0; }
+:root[data-theme="light"] #v-home .h-act .c-link, :root[data-theme="light"] #v-home .h-act-more a { color: #2357d8; }
+#v-home .h-act-more a:hover, #v-home .h-act .c-link:hover { text-decoration: underline; text-underline-offset: 3px; }
+/* motion: sparklines wipe in once, prices tint briefly when they tick, skeletons shimmer; all off for reduced motion */
+@keyframes hmk-wipe { from { clip-path: inset(0 100% 0 0); } to { clip-path: inset(0 0 0 0); } }
+@keyframes hmk-pop { from { opacity: 0; transform: scale(.4); } to { opacity: 1; transform: none; } }
+@keyframes hmk-tu { from { background: color-mix(in srgb, var(--buy) 22%, transparent); } to { background: transparent; } }
+@keyframes hmk-td { from { background: color-mix(in srgb, var(--sell) 22%, transparent); } to { background: transparent; } }
+@keyframes hmk-sh { 50% { opacity: .45; } }
+@media (prefers-reduced-motion: no-preference) {
+  html:not([data-motion="off"]) #v-home .h-mk-row.draw .h-mk-sp { animation: hmk-wipe .9s cubic-bezier(.16, 1, .3, 1) calc(var(--i, 0) * 35ms) both; }
+  html:not([data-motion="off"]) #v-home .h-mk-row.draw .h-mk-dot { animation: hmk-pop .3s cubic-bezier(.16, 1, .3, 1) calc(.7s + var(--i, 0) * 35ms) both; }
+  html:not([data-motion="off"]) #v-home .h-mk-p b.tk-u { animation: hmk-tu 1.2s cubic-bezier(.25, 1, .5, 1); }
+  html:not([data-motion="off"]) #v-home .h-mk-p b.tk-d { animation: hmk-td 1.2s cubic-bezier(.25, 1, .5, 1); }
+  html:not([data-motion="off"]) #v-home .h-mk-sk b, html:not([data-motion="off"]) #v-home .h-mk-sk em, html:not([data-motion="off"]) #v-home .h-mk-sk .h-mk-g { animation: hmk-sh 1.4s ease-in-out infinite; }
+}
+@media (prefers-reduced-motion: reduce) { #v-home .h-mk-i { transition: none; } #v-home a.h-mk-i:hover { transform: none; } }
 
 /* ═══ ICT desk design pass (7 Nov): what is open now first, then results by market and session, then history.
    Scoped to #v-ict. Gold stays the brand accent for on-states; a violet tag (the ICT markup colour on the charts) marks
@@ -2520,8 +2602,7 @@ html[data-motion="off"] #v-ict .ict-cal-d:hover { transform: none !important; }
     <nav class="h-quick" aria-label="Jump to"><a href="#council/calendar">Calendar</a><a href="#council/overview">Active trades</a><a href="#council/trades">All trades</a><a href="#council/review" class="adm">Loss review</a><a href="#council/systems" class="adm">Systems</a><a href="#council/research" class="adm">Research</a><a href="#journal">Journal</a></nav>
     <div class="h-warn" id="h-warn" role="alert" hidden></div>
     <div class="h-today" id="h-today" role="group" aria-label="Results today"></div>
-    <section class="h-mk" id="h-mk" aria-label="Markets now" hidden><div class="h-mk-h"><h2>Markets now</h2><span class="h-mk-k">% vs prior day's close (UTC) · line 24 h</span></div><div class="h-mk-row" id="h-mk-row"></div></section>
-    <section class="h-pulse adm" id="h-pulse" aria-label="Market pulse" hidden><div class="h-pulse-h"><h2>Market pulse</h2><span class="h-pulse-k">trend on D1 · H4 · H1, strongest first</span></div><div class="h-pulse-row" id="h-pulse-row"></div></section>
+    <section class="h-mk" id="h-mk" aria-labelledby="h-mk-t" aria-busy="true" hidden><div class="h-mk-h"><h2 id="h-mk-t">Markets now</h2><span class="h-mk-k" id="h-mk-k">% vs prior day's close (UTC) · line 24 h</span><span class="h-mk-st" id="h-mk-st" role="status" aria-live="polite"></span></div><div class="h-mk-row" id="h-mk-row"></div></section>
     <div class="h-grid">
       <div class="h-main">
       <a class="tile wide adm" href="#setup">
@@ -2577,6 +2658,7 @@ html[data-motion="off"] #v-ict .ict-cal-d:hover { transform: none !important; }
       </nav>
       </div>
     </div>
+    <section class="h-pulse adm" id="h-pulse" aria-label="Market pulse" hidden><div class="h-pulse-h"><h2>Market pulse</h2><span class="h-pulse-k">trend on D1 · H4 · H1, strongest first</span></div><div class="h-pulse-row" id="h-pulse-row"></div></section>
   </section>
 
   <!-- ─── Setup: checklist + possible trades ─── -->
@@ -4169,24 +4251,50 @@ function msNextSetup(bars, A) {
     const ds = (s.d1src || {})[k];
     return { v, src: ds ? ds.src : 'Kraken', at: s.at };
   }
-  // Home "Markets now" (7 Nov loop): each OANDA market with price, change on the day and a 24 h sparkline from H1 candles
+  // Home "Markets now" (7 Nov loop): each OANDA market with price, change on the day and a 24 h sparkline from H1 candles.
+  // States (design pass, 7 Nov): skeleton cards on load (same size as the real ones, so nothing shifts), "markets closed"
+  // over the weekend, "delayed" when a refresh fails after a good one, and a quiet retry note when nothing loads.
+  const HMK = { last: null, px: {}, fails: 0, drawn: false };
+  const hmkClosed = (d = new Date()) => { const wd = d.getUTCDay(), h = d.getUTCHours(); return wd === 6 || (wd === 0 && h < 22) || (wd === 5 && h >= 21); };
+  const hmkTime = (d) => d.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' });
+  function homeMarketsState() {
+    const box = document.getElementById('h-mk'), k = document.getElementById('h-mk-k'), st = document.getElementById('h-mk-st'); if (!box || !k || !st) return;
+    const closed = HMK.last ? HMK.allClosed : hmkClosed(), stale = HMK.last && Date.now() - HMK.last > 3 * 60e3;
+    box.dataset.state = !HMK.last ? (HMK.fails ? 'error' : 'loading') : stale ? 'stale' : closed ? 'closed' : 'live';
+    k.textContent = closed ? `${HMK.day ? mdWd(HMK.day) + ' session' : 'last session'} vs day before · tap to chart` : '% vs prior day\'s close (UTC) · line 24 h';
+    st.innerHTML = !HMK.last ? '' : stale ? `<i></i>Delayed · as of ${hmkTime(new Date(HMK.last))}` : closed ? '<i></i>Markets closed' : `<i></i>Live · ${hmkTime(new Date(HMK.last))}`;
+  }
+  (() => { const el = document.getElementById('h-mk-row'), box = document.getElementById('h-mk'); if (!el || !box || !MD.base || MD.on === false) return;
+    const n = Object.keys(INSTRUMENTS).filter((k) => INSTRUMENTS[k].md).length;
+    el.innerHTML = Array.from({ length: n }, () => '<span class="h-mk-i h-mk-sk" aria-hidden="true"><span class="h-mk-t"><b></b><em></em></span><span class="h-mk-p"><b></b></span><span class="h-mk-m"></span><span class="h-mk-g"></span></span>').join('');
+    box.hidden = false; homeMarketsState();
+    const hd = document.getElementById('h-date'); if (hd && !hd.textContent) hd.textContent = new Date().toLocaleString('en-GB', { weekday: 'long', day: 'numeric', month: 'long', hour: '2-digit', minute: '2-digit' }); })();
   async function homeMarkets() {
-    const el = document.getElementById('h-mk-row'), box = document.getElementById('h-mk'); if (!el || !box || !MD.base || MD.on === false) return;
+    const el = document.getElementById('h-mk-row'), box = document.getElementById('h-mk'); if (!el || !box || !MD.base || MD.on === false) { if (box) box.hidden = true; return; }
     const Q = await mdQuotes();
-    const ok = Object.keys(INSTRUMENTS).filter((k) => Q[k]).map((k) => Q[k]); if (!ok.length) return;
+    const ok = Object.keys(INSTRUMENTS).filter((k) => Q[k]).map((k) => Q[k]);
+    if (!ok.length) { HMK.fails++; if (!HMK.last) { el.innerHTML = '<p class="h-mk-err">Live prices could not load. Retrying every minute.</p>'; box.removeAttribute('aria-busy'); } homeMarketsState(); return; }
+    HMK.fails = 0; HMK.last = Math.max(...ok.map((r) => r.at || 0)); HMK.allClosed = ok.every((r) => r.closed); HMK.day = ok[0].day; HMK.anyStale = ok.some((r) => r.stale);
     const spark = (pts, up) => { const lo = Math.min(...pts), hi = Math.max(...pts), W = 96, H = 28, sx = W / (pts.length - 1), y = (v) => hi === lo ? H / 2 : 2 + (H - 4) * (1 - (v - lo) / (hi - lo));
       const d = pts.map((v, i) => `${i ? 'L' : 'M'}${(i * sx).toFixed(1)} ${y(v).toFixed(1)}`).join(' ');
-      return `<svg class="h-mk-sp ${up ? 'up' : 'dn'}" viewBox="0 0 ${W} ${H}" preserveAspectRatio="none" aria-hidden="true"><path class="a" d="${d} L${W} ${H} L0 ${H}Z"/><path class="l" d="${d}"/><circle cx="${W}" cy="${y(pts[pts.length - 1]).toFixed(1)}" r="2.2"/></svg>`; };
-    box.hidden = false;
-    const kk = box.querySelector('.h-mk-k'); if (kk) kk.textContent = ok.every((r) => r.closed) ? `closed · ${mdWd(ok[0].day)} session vs day before` : '% vs prior day\'s close (UTC) · line 24 h';
-    el.innerHTML = ok.map((r) => { const I = INSTRUMENTS[r.k], dd = I.dec ?? 2, up = r.ch >= 0, d1 = councilD1(r.k), px = (+r.c).toLocaleString('en-US', { minimumFractionDigits: dd, maximumFractionDigits: dd }), pc = `${up ? '+' : '−'}${Math.abs(r.ch).toFixed(2)}%`;
-      const st = r.closed ? `<span class="h-mk-st">Closed · ${mdWd(r.day)}</span>` : r.stale ? `<span class="h-mk-st warn">Delayed · ${esc(mdHm(r.lastH + 3600))}</span>` : '';
+      return `<svg class="h-mk-sp ${up ? 'up' : 'dn'}" viewBox="0 0 ${W} ${H}" preserveAspectRatio="none" aria-hidden="true"><path class="a" d="${d} L${W} ${H} L0 ${H}Z"/><path class="l" d="${d}"/></svg><i class="h-mk-dot ${up ? 'up' : 'dn'}" style="top:${(y(pts[pts.length - 1]) / H * 100).toFixed(1)}%" aria-hidden="true"></i>`; };
+    el.innerHTML = ok.map((r, ix) => { const I = INSTRUMENTS[r.k], dd = I.dec ?? 2, up = r.ch >= 0, d1 = councilD1(r.k), prev = HMK.px[r.k], px = (+r.c).toLocaleString('en-US', { minimumFractionDigits: dd, maximumFractionDigits: dd }), pc = `${up ? '+' : '−'}${Math.abs(r.ch).toFixed(2)}%`;
+      const tk = prev != null && r.c !== prev ? (r.c > prev ? 'tk-u' : 'tk-d') : '';
+      // per-card status only where it differs from the section pill (one market closed or delayed while others trade)
+      const st = r.closed && !HMK.allClosed ? `<span class="h-mk-cs">Closed · ${mdWd(r.day)}</span>` : r.stale ? `<span class="h-mk-cs warn">Delayed · ${esc(mdHm(r.lastH + 3600))}</span>` : '';
       const d1t = d1 ? `<span class="h-mk-d1 ${d1.v > 0 ? 'up' : 'dn'}">D1 ${d1.v > 0 ? '▲' : '▼'}</span>` : '';
-      const tip = `${I.label} ${px} · ${pc} vs the previous day's close (OANDA, 00:00 UTC days)${r.closed ? ` · market closed, last price from ${mdWd(r.day)}` : r.stale ? ` · no new candle since ${mdHm(r.lastH + 3600)}` : ''}${d1 ? ` · council D1 ${d1.v > 0 ? 'up' : 'down'} (${d1.src} daily candles, what the Trader trades on)` : ''}`;
-      return `<a class="h-mk-i${r.closed ? ' closed' : ''}" href="?s=${r.k}#charts" title="${esc(tip)}" aria-label="${esc(tip)}"><span class="h-mk-t"><b>${I.label}</b><em class="${up ? 'up' : 'dn'}">${pc}</em></span><span class="h-mk-p">${px}</span>${d1t || st ? `<span class="h-mk-m">${d1t}${st}</span>` : ''}${spark(r.pts, up)}</a>`; }).join('');
+      const tip = `${I.label} ${px} · ${pc} vs the previous day's close (OANDA, 00:00 UTC days)${r.closed ? ` · market closed, last price from ${mdWd(r.day)}` : r.stale ? ` · no new candle since ${mdHm(r.lastH + 3600)}` : ''}${d1 ? ` · council D1 ${d1.v > 0 ? 'up' : 'down'} (${d1.src} daily candles, what the Trader trades on)` : ''} · open chart`;
+      return `<a class="h-mk-i${r.closed ? ' closed' : ''}${r.k === instKey ? ' cur' : ''}" style="--i:${ix}" href="?s=${r.k}#charts" title="${esc(tip)}" aria-label="${esc(tip)}"><span class="h-mk-t"><b>${I.label}</b><em class="${up ? 'up' : 'dn'}">${pc}</em></span><span class="h-mk-p"><b class="${tk}">${px}</b></span><span class="h-mk-m">${d1t}${st}</span><span class="h-mk-g">${spark(r.pts, up)}</span></a>`; }).join('');
+    ok.forEach((r) => { HMK.px[r.k] = r.c; });
+    if (!HMK.drawn) { HMK.drawn = true; el.classList.add('draw'); setTimeout(() => el.classList.remove('draw'), 1800); }
+    box.hidden = false; box.removeAttribute('aria-busy'); homeMarketsState(); hmkEdge();
     try { if (SCAN.el) renderScan(); } catch (e) {}
   }
   setTimeout(homeMarkets, 2000); setInterval(() => { if (!document.hidden && (location.hash === '' || location.hash === '#home')) homeMarkets(); }, 60e3);
+  setInterval(homeMarketsState, 30e3);
+  // phone scroller: fade the edge that has more cards behind it
+  const hmkEdge = () => { const el = document.getElementById('h-mk-row'); if (!el) return; const l = el.scrollLeft > 2, r = el.scrollLeft + el.clientWidth < el.scrollWidth - 2; const v = [l && 'l', r && 'r'].filter(Boolean).join(' '); if (v) el.dataset.more = v; else delete el.dataset.more; };
+  document.getElementById('h-mk-row')?.addEventListener('scroll', hmkEdge, { passive: true }); window.addEventListener('resize', hmkEdge);
   setTimeout(watchlist, 2500); setInterval(() => { if (!document.hidden && location.hash === '#charts') watchlist(); }, 60e3);
   // timeframe alignment strip (7 Nov loop): the last structure break direction on each timeframe at a glance; tap one to open that chart
   function mtfStrip() {
@@ -7083,7 +7191,9 @@ function msNextSetup(bars, A) {
         const phase = td.beyond ? 'price broke past the H4 Origin, so stand aside' : td.entry ? 'the entry window is open'
           : ['', 'waiting for the H1 VR', 'waiting for the retrace into the Origin', 'waiting for the H1 CF', 'waiting for the entry'][td.now] || 'watching';
         set('h-date', new Date().toLocaleString('en-GB', { weekday: 'long', day: 'numeric', month: 'long', hour: '2-digit', minute: '2-digit' }));
-        set('h-head', `${esc(INST.name)} is in a ${w} setup, ${phase}`);
+        // weekend (design pass, 7 Nov): forex, metals and indices are shut, so an "open" entry window waits for the reopen
+        const shut = INST.group !== 'Crypto' && ((d) => { const wd = d.getUTCDay(), h = d.getUTCHours(); return wd === 6 || (wd === 0 && h < 22) || (wd === 5 && h >= 21); })(new Date());
+        set('h-head', `${esc(INST.name)} is in a ${w} setup, ${shut && td.entry && !td.beyond ? 'the entry window reopens with the market' : phase}`);
         set('h-prog', td.done.map((d, k) => `<i class="${d ? 'd' : k === td.now ? 'n' : ''}"></i>`).join(''));
         set('h-prog-t', td.now < 0 ? 'All 5 steps done' : `Step ${td.now + 1} of 5`);
       }
@@ -8481,26 +8591,8 @@ function gpStats(T) {
 .adr[hidden] { display: none; }
 .mtf { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; margin: -4px 0 14px; }
 .mtf[hidden] { display: none; }
-.h-mk { margin: 0 0 14px; } .h-mk[hidden] { display: none; }
-.h-mk-h { display: flex; align-items: baseline; gap: 10px; margin: 0 0 8px; } .h-mk-h h2 { font-size: 14px; font-weight: 700; margin: 0; } .h-mk-k { font-size: 12px; color: var(--ink-dim); }
-.h-mk-row { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 8px; }
-.h-mk-i { display: grid; gap: 2px; padding: 10px 12px 8px; border-radius: 12px; border: 1px solid var(--line); background: var(--panel); color: var(--ink); text-decoration: none; font-variant-numeric: tabular-nums; transition: border-color .15s, transform .15s; }
-.h-mk-i:hover { border-color: var(--accent); transform: translateY(-1px); } .h-mk-i:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
-.h-mk-t { display: flex; justify-content: space-between; align-items: baseline; font-size: 12.5px; } .h-mk-t b { font-weight: 700; } .h-mk-t em { font-style: normal; font-weight: 600; } .h-mk-t em.up { color: var(--buy); } .h-mk-t em.dn { color: var(--sell); }
-.h-mk-p { font-size: 17px; font-weight: 700; letter-spacing: -.01em; }
-.h-mk-h h2 { white-space: nowrap; }
-.h-mk-m { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 6px; min-width: 0; font-size: 10.5px; line-height: 1.3; }
-.h-mk-d1 { font-weight: 700; font-family: var(--mono); padding: 0 5px; border-radius: 4px; border: 1px solid var(--line); white-space: nowrap; }
-.h-mk-d1.up { color: var(--buy); border-color: color-mix(in srgb, var(--buy) 40%, transparent); } .h-mk-d1.dn { color: var(--sell); border-color: color-mix(in srgb, var(--sell) 40%, transparent); }
-.h-mk-st { color: var(--ink-dim); white-space: nowrap; } .h-mk-st.warn { color: var(--warn, #b7791f); }
-.h-mk-i.closed .h-mk-sp { opacity: .55; }
 .ms-srow .tr .ms-al-x { border-style: dashed; color: var(--ink-faint); font-weight: 600; }
 .ms-srow .pr-x { font: 600 10px var(--sans); color: var(--ink-faint); text-transform: uppercase; letter-spacing: .03em; } .ms-srow .pr-x.warn { color: var(--warn, #b7791f); }
-.h-mk-sp { width: 100%; height: 28px; display: block; margin-top: 2px; overflow: visible; }
-.h-mk-sp .l { fill: none; stroke-width: 1.6; vector-effect: non-scaling-stroke; } .h-mk-sp .a { stroke: none; opacity: .12; }
-.h-mk-sp.up .l { stroke: var(--buy); } .h-mk-sp.up .a, .h-mk-sp.up circle { fill: var(--buy); } .h-mk-sp.dn .l { stroke: var(--sell); } .h-mk-sp.dn .a, .h-mk-sp.dn circle { fill: var(--sell); }
-@media (max-width: 520px) { .h-mk-row { display: flex; width: 0; min-width: 100%; overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: none; padding-bottom: 2px; } .h-mk-row::-webkit-scrollbar { display: none; } .h-mk-i { flex: 0 0 140px; scroll-snap-align: start; } }
-@media (prefers-reduced-motion: reduce) { .h-mk-i { transition: none; } .h-mk-i:hover { transform: none; } }
 .ms-lay { display: flex; flex-wrap: wrap; gap: 6px; margin: 2px 0 8px; }
 .ms-lay button { flex: 1 1 auto; min-height: 32px; padding: 4px 10px; border-radius: 8px; border: 1px solid var(--line); background: var(--panel); color: var(--ink); font: inherit; font-size: 12.5px; font-weight: 600; cursor: pointer; }
 .ms-lay button:hover, .ms-lay button.on { border-color: var(--accent); } .ms-lay button.on { background: color-mix(in srgb, var(--accent) 12%, var(--panel)); }
