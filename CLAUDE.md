@@ -143,7 +143,8 @@ Rules and research live in `.claude/skills/ICT/SKILL.md` (results also in counci
 - Replay: `ict/replay.mjs` (workflow `ict-replay.yml`: on change, on demand with a start date, weekly) runs the same
   `signals()` over CNBC history since 1 Jan 2026 and writes council-data `ict/replay.json` (records carry `replay: true`).
   The desk has a Both / Live / Replay switch (localStorage `ictSrc`) and a P&L calendar of closed signals.
-- A-setup filter (research 6 Nov, skill §14): against the daily bias + grade >= 7 (`isASetup`, records carry `aset`).
+- A-setup filter (skills §14 + §20): against the daily bias + grade >= 7 + stop >= 0.3x the daily ATR (`feat.atrR`,
+  `RISK_FLOOR`, `isASetup`; records carry `aset`).
   The desk defaults to A-setups (switch `ictFlt`: A-setups / All signals / One per cluster — the highest-grade index of
   same-side A-setups within 3 h, skill §16, computed on the page); every signal is still tracked.
 - A+ tier (skill §17): A-setup + inversion body >= 60% of range + not NY PM (`isAPlus`, records carry `aplus`); desk

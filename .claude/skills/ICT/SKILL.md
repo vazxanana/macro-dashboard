@@ -182,3 +182,17 @@ own signals(), every signal independent, CFD costs NQ 1 / ES 0.5 / YM 2.5 points
   were chosen on data that now looks favourable; treat them as hypotheses. **Paper only; forward-test before any risk.**
   S&P (ES) is the weakest index on cash data in every year but 2024.
 - Replay records from the January-February Dukascopy fill carry `cash: true`.
+
+## 20. Stop floor: stop >= 0.3x the daily ATR (7 Nov 2026) — now part of the A-setup
+Walk-forward on NQ, S&P 500 and Dow cash 2023-26 (chosen on 2023-24, judged on 2025-26), every signal independent,
+trailing exit, CFD costs. New regime features: daily efficiency ratio, volatility percentile, stretch from the 20-day mean,
+weekday, and the stop as a share of the daily ATR (`feat.atrR` = r0 / ATR14 of closed daily candles).
+- Most in-sample winners failed out of sample again (e.g. trend days + Asia: +0.62R → −0.20R).
+- The one theme that held: **tight stops lose**. Hourly sweeps with a stop under ~0.3 daily ATR get hunted by noise.
+- A-setups, 3 indices: all → 2023 −1.0R, 2024 +27.2R, 2025 −23.6R, 2026 −2.2R (worst DD 33 / 46);
+  **with stop >= 0.3 ATR → +20.4R, +25.9R, +1.3R, +16.8R (DD 12 / 16)**; about 45% of A-setups remain (~90 a year).
+  Thresholds 0.2-0.4 all positive in both halves; >= 0.5 loses again (a band, not "the wider the better").
+- NQ futures 2023-25 (independent data): A → +9.5 / +9.6 / +0.6R (DD 11.4 / 14.0 / 11.9); A + floor →
+  +11.1 / +13.8 / +8.3R (DD 7.5 / 6.5 / 9.2): more profit and less drawdown in every year.
+- A+ adds little once the floor is in (cash: +25.6 / +20.3 / −3.8 / +14.1 vs A +20.4 / +25.9 / +1.3 / +16.8); kept as a tier.
+- Code: `feat.atrR`, `RISK_FLOOR = 0.3` and `isASetup()` in ict/tracker.mjs (the replay re-runs on tracker changes).
