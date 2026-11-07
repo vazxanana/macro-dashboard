@@ -18,7 +18,7 @@ Supporting scripts:
 
 | Script | Job |
 |---|---|
-| `backtest.mjs` | The daily replay: the last 30 days of real candles through the Trader's engine and rules → `backtest.json`. |
+| `backtest.mjs` | The daily replay: the last 30 days of real candles through the Trader's engine and rules → `backtest.json`. Also records the paper exit `R_pt1` (half off at +1R, the rest trailing 1R) next to the live exit, never traded (`research/meridian-exits.md`); `BT_DUMP=<dir>` writes fills and 1m candles for exit studies. |
 | `fidelity.mjs` | Replay fidelity check: does the replay produce the same signals and outcomes as the live Trader on the same days? → `research/fidelity.json`. |
 | `proposals.mjs` | Builds the Coach's owner-facing proposals from `backtest.json` (never applies them). |
 | `coach.mjs` | The Coach's evolution helpers: shrunk expectancy, champion/challenger trials for its filter rules, the change ledger and its `analysis/latest.md` block. |

@@ -44,8 +44,13 @@ const TFS = [['1d', '1d', 86400], ['4h', '4h', 14400], ['1h', '1h', 3600], ['30m
 const SEC = Object.fromEntries(TFS.map(([id, , s]) => [id, s]));
 const WAIT = { '1d': 5 * 86400, '4h': 2 * 86400, '1h': 12 * 3600, '15m': 3 * 3600 };
 const FRESH = 12, WIN = 720, STEP = 300;
-// trade management variants: [name, break-even level, hold to the second target]
-const VARIANTS = [['none', null, false], ['be1', 1, false], ['be15', 1.5, false], ['tp2', null, true]];
+// trade management variants: [name, break-even level, hold to the second target, partial exit]
+// pt1 (8 Nov, paper comparison only, never traded): half off at +1R, the rest's stop to the entry, then trailing 1R behind the
+// best price with no target (cap 10R). The one exit that beat the live exit (engine target, no break-even) in both halves and on
+// 4 of 6 markets of a 365-day OANDA replay of the Meridian rule-passing signals (research/meridian-exits.md); still negative
+// there, so it is only recorded next to the live exit (column R_pt1) for the owner to judge forward.
+const VARIANTS = [['none', null, false], ['be1', 1, false], ['be15', 1.5, false], ['tp2', null, true], ['pt1', null, false, { at: 1, trail: 1 }]];
+const newVariants = (stop) => VARIANTS.map(([n, be, t2, pt]) => ({ n, be, t2, pt, stop, beMoved: false, done: false, R: null, size: 1, booked: 0, best: 0 }));
 // D1 trend labels from OANDA spot for gold and forex (7 Nov), the same source the live trader and the site charts use, so the
 // replay's "with / against D1" means the same thing as the live trades'. Only the label; the D1 candles stay as loaded.
 const OANDA_D1 = new Set(['xau', 'eurusd', 'gbpusd', 'audusd', 'usdcad', 'usdchf']), MD_BASE = process.env.MD_BASE || 'https://meridianx.dev/md/';
@@ -165,6 +170,15 @@ async function oandaData(key) {
 function manage(v, tr, b) {
   if (v.done) return;
   const s = tr.side === 'sell', r0 = tr.r0;
+  if (v.pt) {   // partial: stop first, then the partial at +pt.at R, then the 10R cap; the stop moves after the candle's checks
+    const sg = s ? -1 : 1, fav = (s ? tr.entry - b.low : b.high - tr.entry) / r0, cap = tr.entry + sg * 10 * r0;
+    if (s ? b.high >= v.stop : b.low <= v.stop) { v.done = true; v.R = v.booked + v.size * (v.stop - tr.entry) * sg / r0; v.closed = b.time; return; }
+    if (v.size === 1 && fav >= v.pt.at) { v.booked = 0.5 * v.pt.at; v.size = 0.5; }
+    if (s ? b.low <= cap : b.high >= cap) { v.done = true; v.R = v.booked + v.size * 10; v.closed = b.time; return; }
+    v.best = Math.max(v.best, fav);
+    if (v.size < 1) { const ns = tr.entry + sg * Math.max(0, v.best - v.pt.trail) * r0; if ((ns - v.stop) * sg > 0) v.stop = ns; }
+    return;
+  }
   if (s ? b.high >= v.stop : b.low <= v.stop) { v.done = true; v.R = v.beMoved ? 0 : -1; v.closed = b.time; return; }
   const tgt = v.t2 && tr.t2 != null ? tr.t2 : tr.t1;
   if (s ? b.low <= tgt : b.high >= tgt) { v.done = true; v.R = tgt === tr.t1 ? tr.rr : Math.abs(tgt - tr.entry) / r0; v.closed = b.time; return; }
@@ -391,6 +405,8 @@ for (const [key, M] of Object.entries(MARKETS)) {
       if (nBad) { const C = (meta.cleaned = meta.cleaned || {}); (C[key] = C[key] || {})[id] = nBad; }
     }
     const m1 = data['1m'];
+    // research (BT_DUMP=<dir>): the 1m candles each trade is managed on, so exit variants can be replayed on the same fills
+    if (process.env.BT_DUMP) fs.writeFileSync(path.join(process.env.BT_DUMP, `${key}-m1.json`), JSON.stringify(m1.map((b) => [b.time, b.open, b.high, b.low, b.close])));
     // gold onto spot (after cleaning, like the live Trader): offAt(t) is the offset the Trader would have used at step t
     let offAt = null;
     if (M.spot && oanda) meta.goldShift = { method: 'none: OANDA gold is spot', base: 'OANDA' };
@@ -420,13 +436,16 @@ for (const [key, M] of Object.entries(MARKETS)) {
             else if (s ? b.low <= tr.t1 : b.high >= tr.t1) { tr.status = 'missed'; continue; }
             else { if (b.time - tr.opened > (WAIT[tr.h] || 86400)) tr.status = 'expired'; continue; }
           }
+          // closed by the replay's own variants while the paper pt1 exit still runs: keep managing pt1 only (status, MFE and the
+          // signal checks below treat the trade as closed, exactly as before pt1 existed)
+          if (tr.status === 'closed') { for (const v of tr.v) manage(v, tr, b); continue; }
           if (tr.status !== 'open') continue;
           const s = tr.side === 'sell';
           tr.mfe = Math.max(tr.mfe, (s ? tr.entry - b.low : b.high - tr.entry) / tr.r0);
           for (const v of tr.v) manage(v, tr, b);
-          if (tr.v.every((v) => v.done)) tr.status = 'closed';
+          if (tr.v.every((v) => v.done || v.pt)) tr.status = 'closed';
         }
-        for (let k = open.length - 1; k >= 0; k--) if (open[k].status !== 'pending' && open[k].status !== 'open') { const tr = open.splice(k, 1)[0]; if (tr.status === 'closed') (tr.twin ? twins : all).push(tr); else if (!tr.twin) { tr.v.forEach((v) => { v.R = 0; }); tr.cost = 0; unfilled.push(tr); } }
+        for (let k = open.length - 1; k >= 0; k--) if (open[k].status !== 'pending' && open[k].status !== 'open' && !(open[k].status === 'closed' && open[k].v.some((v) => !v.done))) { const tr = open.splice(k, 1)[0]; if (tr.status === 'closed') (tr.twin ? twins : all).push(tr); else if (!tr.twin) { tr.v.forEach((v) => { v.R = 0; }); tr.cost = 0; unfilled.push(tr); } }
       }
       if (i1 < WIN) continue;
       // the Trader's view at time t: the last 720 closed candles of every timeframe plus the forming one
@@ -463,7 +482,7 @@ for (const [key, M] of Object.entries(MARKETS)) {
         if (!st || st.state !== 'READY' || seen.has(st.sig)) continue;
         seen.add(st.sig);
         const side = st.sell ? 'sell' : 'buy';
-        if (open.some((x) => x.k === st.k && x.side === side && Math.abs(x.t1 - st.t1) <= Math.abs(st.t1) * 1e-5)) continue;
+        if (open.some((x) => x.status !== 'closed' && x.k === st.k && x.side === side && Math.abs(x.t1 - st.t1) <= Math.abs(st.t1) * 1e-5)) continue;
         const def = DEFS.find((p) => p.k === st.k), cfT = +String(st.sig).split('|')[2];
         if (!cfT || t - cfT > FRESH * SEC[def.l]) continue;
         const feat = { d1: d1T(src, t) === (st.sell ? -1 : 1) ? 'with' : 'against', struct: st.retr == null ? 'n/a' : st.retr >= 0.5 ? 'main' : 'internal', session: sessionOf(t), ...structFeat(st.sell, def.l, src, t), m15c: m15cOf(src['15m'].bars, st.sell, t), m15c1: m15cOf(src['15m'].bars, st.sell, t, 1) };
@@ -477,7 +496,7 @@ for (const [key, M] of Object.entries(MARKETS)) {
         }
         tr.r0 = Math.abs(tr.entry - tr.stop); tr.cost = tr.r0 > 0 ? costOf(M, tr.entry, tr.filled !== t) / tr.r0 : 0;   // filled at the signal = crossed the limit at market
         if (!(tr.r0 > 0)) continue;
-        tr.v = VARIANTS.map(([n, be, t2]) => ({ n, be, t2, stop: tr.stop, beMoved: false, done: false, R: null }));
+        tr.v = newVariants(tr.stop);
         open.push(tr);
         // its twin entered at market at the signal (same stop and targets): the other entry style, for a fair comparison
         const tw = { ...tr, k: st.k + '@mkt', twin: true, mfe: 0 };
@@ -487,17 +506,17 @@ for (const [key, M] of Object.entries(MARKETS)) {
           Object.assign(tw, { entry: price, rr: rw / r, status: 'open', filled: t });
         }
         tw.r0 = Math.abs(tw.entry - tw.stop); tw.cost = tw.r0 > 0 ? costOf(M, tw.entry, false) / tw.r0 : 0;
-        tw.v = VARIANTS.map(([n, be, t2]) => ({ n, be, t2, stop: tw.stop, beMoved: false, done: false, R: null }));
+        tw.v = newVariants(tw.stop);
         open.push(tw);
       }
       for (const sw of sweepSetups(src, price, t, null, spreadOf(M, price)).concat(chochSetups(src, price, t, null, spreadOf(M, price)))) {
         if (seen.has(sw.sig)) continue; seen.add(sw.sig);
         const side = sw.sell ? 'sell' : 'buy';
-        if (open.some((x) => x.k === sw.k && x.side === side)) continue;   // one sweep trade per side at a time
+        if (open.some((x) => x.status !== 'closed' && x.k === sw.k && x.side === side)) continue;   // one sweep trade per side at a time
         const tr = { m: key, k: sw.k, h: '1h', side, entry: sw.entry, stop: sw.stop, t1: sw.t1, rr: sw.rr, opened: t, filled: t, status: 'open', mfe: 0,
           feat: { d1: d1T(src, t) === (sw.sell ? -1 : 1) ? 'with' : 'against', struct: 'n/a', session: sessionOf(t), ...structFeat(sw.sell, '1m', src, t), m15c: m15cOf(src['15m'].bars, sw.sell, t), m15c1: m15cOf(src['15m'].bars, sw.sell, t, 1) } };
         tr.r0 = Math.abs(tr.entry - tr.stop); tr.cost = tr.r0 > 0 ? costOf(M, tr.entry, false) / tr.r0 : 0;
-        tr.v = VARIANTS.map(([n, be, t2]) => ({ n, be, t2, stop: tr.stop, beMoved: false, done: false, R: null }));
+        tr.v = newVariants(tr.stop);
         open.push(tr);
       }
     }
@@ -505,14 +524,15 @@ for (const [key, M] of Object.entries(MARKETS)) {
       for (const tr of all.concat(twins, unfilled, open).filter((v) => v.m === key && v.side === x.side && v.opened >= x.from - 2 * PAD && v.opened <= x.to + 2 * PAD))
         x.caught.push({ setup: tr.k, opened: tr.opened, entry: +tr.entry.toFixed(2), stop: +tr.stop.toFixed(2), target: +tr.t1.toFixed(2), rr: +tr.rr.toFixed(2), filled: !!tr.filled, R: tr.v[0].R == null ? null : +tr.v[0].R.toFixed(2), status: tr.status });
     }
-    stillOpen.push(...open);
-    meta[key] = { steps, trades: all.filter((x) => x.m === key).length, open: open.length };
+    for (const tr of open) if (tr.status === 'closed') (tr.twin ? twins : all).push(tr); else stillOpen.push(tr);   // closed with pt1 still running: R_pt1 null
+    meta[key] = { steps, trades: all.filter((x) => x.m === key).length, open: open.filter((x) => x.status !== 'closed').length };
     console.log(`${key}: ${steps} steps, ${meta[key].trades} closed trades, ${((Date.now() - t0wall) / 1000).toFixed(0)}s`);
   } catch (e) { meta.errors[key] = String(e.message || e); console.log(`${key}: ${e.message || e}`); }
 }
 
 // ─── Stats ───
-const stat = (arr, vi) => { const R = arr.map((x) => x.v[vi].R); const n = R.length, sum = R.reduce((a, b) => a + b, 0), w = R.filter((r) => r > 0).length;
+// R_pt1 is null while that paper exit still runs: skipped
+const stat = (arr, vi) => { const R = arr.map((x) => x.v[vi].R).filter((r) => r != null); const n = R.length, sum = R.reduce((a, b) => a + b, 0), w = R.filter((r) => r > 0).length;
   return { n, wr: n ? +(w / n).toFixed(3) : null, R: +sum.toFixed(2), exp: n ? +(sum / n).toFixed(3) : null }; };
 const byVar = (arr) => Object.fromEntries(VARIANTS.map(([n], vi) => [n, stat(arr, vi)]));
 const group = (arr, keyFn) => { const g = {}; for (const x of arr) { const k = keyFn(x); (g[k] = g[k] || []).push(x); } return Object.fromEntries(Object.entries(g).map(([k, a]) => [k, byVar(a)])); };
@@ -529,13 +549,16 @@ const out = {
   // status (after m15c1; adx / adxBand follow it, so older column indexes hold): 'closed', 'unfilled' (a resting order that never filled, 0R) or 'open'
   // (still running at the end of the window: R columns null; fill 1 once its entry filled, 0 while the order still rests)
   trades: all.concat(twins, unfilled, stillOpen).map((x) => { const op = x.status === 'open' || x.status === 'pending', st = op ? 'open' : x.status === 'closed' ? 'closed' : 'unfilled';
-    return [x.m, x.k, x.side, x.opened, x.filled || null, +x.rr.toFixed(2), x.feat.d1, x.feat.struct, x.feat.session, ...x.v.map((v) => op || v.R == null ? null : +v.R.toFixed(2)), +x.mfe.toFixed(2), +x.cost.toFixed(3), op ? (x.filled ? 1 : 0) : x.status === 'closed' ? 1 : 0, x.feat.cf, x.feat.choch, x.feat.m15c, x.feat.m15c1, st, x.feat.adx ?? null, x.feat.adxBand ?? null, x.feat.newsT1 ?? null, x.feat.newsMin ?? null]; }),
-  tradeCols: ['market', 'setup', 'side', 'opened', 'filled', 'rr', 'd1', 'struct', 'session', 'R_none', 'R_be1', 'R_be15', 'R_tp2', 'mfe', 'cost', 'fill', 'cf', 'choch', 'm15c', 'm15c1', 'status', 'adx', 'adxBand', 'newsT1', 'newsMin'],   // adx / adxBand (Swing only: D1 ADX(14) tag, paper sleeve swing-adx), then newsT1 / newsMin (news research tag, council/events.mjs), appended last so older indexes hold
+    return [x.m, x.k, x.side, x.opened, x.filled || null, +x.rr.toFixed(2), x.feat.d1, x.feat.struct, x.feat.session, ...x.v.filter((v) => !v.pt).map((v) => op || v.R == null ? null : +v.R.toFixed(2)), +x.mfe.toFixed(2), +x.cost.toFixed(3), op ? (x.filled ? 1 : 0) : x.status === 'closed' ? 1 : 0, x.feat.cf, x.feat.choch, x.feat.m15c, x.feat.m15c1, st, x.feat.adx ?? null, x.feat.adxBand ?? null, x.feat.newsT1 ?? null, x.feat.newsMin ?? null, ...x.v.filter((v) => v.pt).map((v) => op || v.R == null ? null : +v.R.toFixed(2))]; }),
+  tradeCols: ['market', 'setup', 'side', 'opened', 'filled', 'rr', 'd1', 'struct', 'session', 'R_none', 'R_be1', 'R_be15', 'R_tp2', 'mfe', 'cost', 'fill', 'cf', 'choch', 'm15c', 'm15c1', 'status', 'adx', 'adxBand', 'newsT1', 'newsMin', 'R_pt1'],   // adx / adxBand (Swing only: D1 ADX(14) tag, paper sleeve swing-adx), then newsT1 / newsMin (news research tag, council/events.mjs), then R_pt1 (paper exit comparison, research/meridian-exits.md), appended last so older indexes hold
   twins: twins.length, unfilled: unfilled.length, open: stillOpen.length,
   examples: EX.map((x) => ({ id: x.id, market: x.market, side: x.side, entry: x.entry, stop: x.stop, target: x.target, entryFrom: x.entryFrom, entryTo: x.entryTo,
     caught: x.caught, setups: x.setups.map(({ s, ...v }) => v), sweep: x.sweep.map(({ s, ...v }) => v), m15: x.m15.map(({ s, ...v }) => v) })),
 };
 fs.writeFileSync(path.join(DIR, 'backtest.json'), JSON.stringify(out));
+// research (BT_DUMP): every filled live-style trade (no market twins) with its levels, cost and the replay's own result, for exit studies
+if (process.env.BT_DUMP) fs.writeFileSync(path.join(process.env.BT_DUMP, 'trades.json'), JSON.stringify({ from: out.from, to: out.to, source: meta.source, trades: all.concat(stillOpen.filter((x) => !x.twin && x.filled)).map((x) => ({
+  m: x.m, k: x.k, side: x.side, entry: x.entry, stop: x.stop, t1: x.t1, t2: x.t2, rr: x.rr, opened: x.opened, filled: x.filled, r0: x.r0, cost: x.cost, feat: x.feat, status: x.status, R: Object.fromEntries(x.v.map((v) => [v.n, v.R])) })) }));
 console.log(`\n${all.length} trades over ${DAYS} days (${((Date.now() - t0wall) / 1000).toFixed(0)}s)`);
 console.log('overall', JSON.stringify(out.overall));
 for (const [k, v] of Object.entries(out.bySetup)) console.log(k.padEnd(9), Object.entries(v).map(([n, s]) => `${n} n${s.n} wr${s.wr} exp${s.exp}`).join(' | '));
