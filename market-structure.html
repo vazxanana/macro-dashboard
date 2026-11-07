@@ -1611,6 +1611,13 @@ html[data-motion="off"] .stagger-in > * { animation: none; }
 .rh-l { top: 0; bottom: auto; } .rh-l b.pos { color: var(--buy); } .rh-l b.neg { color: var(--sell); }
 
 @media (max-width: 560px) { .c-dd-l { position: static; display: block; text-align: right; background: none; padding: 2px 0 0; } .c-rh { padding-top: 0; } .rh-l { margin-bottom: 4px; } }
+
+/* active trade: stop → target meter with entry tick and current price marker */
+.c-act .a-m { grid-column: 1 / -1; position: relative; height: 4px; margin: 6px 0 2px; border-radius: 4px; background: linear-gradient(90deg, color-mix(in srgb, var(--sell) 55%, transparent), color-mix(in srgb, var(--line) 80%, transparent) 45%, color-mix(in srgb, var(--line) 80%, transparent) 55%, color-mix(in srgb, var(--buy) 55%, transparent)); }
+.c-act .a-m i { position: absolute; top: 50%; transform: translate(-50%, -50%); }
+.c-act .a-m-e { width: 2px; height: 10px; background: var(--ink-faint); border-radius: 1px; }
+.c-act .a-m-p { width: 9px; height: 9px; border-radius: 50%; border: 2px solid var(--panel); box-sizing: content-box; }
+.c-act .a-m-p.up { background: var(--buy); } .c-act .a-m-p.dn { background: var(--sell); }
 </style>
 <script>try{if(localStorage.getItem('msMotion')==='off')document.documentElement.dataset.motion='off'}catch(e){}</script>
 </head>
@@ -3978,7 +3985,9 @@ function msNextSetup(bars, A) {
       return { x, fl, lots, usd, html: `<li data-tid="${esc(x.id)}" tabindex="0" title="Show this trade on a chart" class="${x.shadow ? 'sh' : ''}"><span class="chip ${x.side}">${x.side.toUpperCase()}</span>`
         + `<span class="a-t"><b>${esc(x.label)}</b> ${PUB ? '' : esc(x.name)}${x.shadow ? `<span class="tag" title="Blocked by: ${esc((x.blockedBy || []).join(', '))}">shadow${x.blockedBy && x.blockedBy.length ? ' · ' + esc(x.blockedBy.join(', ')) : ''}</span>` : ''}${x.tracker ? '<span class="tag" title="A research tracker (not our system): recorded to judge the idea, not counted">tracker</span>' : x.paper ? '<span class="tag">paper</span>' : ''}${x.addOf ? `<span class="tag" title="${x.k === 'trend' ? 'Second unit added when a daily close was +1R above the first entry; its own 5 ATR stop' : x.k === 'gtrend' ? 'Second unit added when a daily close was +1R above the first entry; same ratcheting stop' : 'Second unit added at the add level, stop at the first entry'}">add</span>` : ''}${!x.paper && !SYS_K.includes(x.k) ? '<span class="tag" title="Opened by the earlier council strategies, still managed to its exit">older strategy</span>' : ''}${size !== 1 ? `<span class="tag">${size}× size</span>` : ''}${x.status === 'pending' ? '<span class="tag">waiting fill</span>' : ''}</span>`
         + `<span class="a-r ${fl == null ? '' : fl >= 0 ? 'pos' : 'neg'}">${fl == null ? '—' : fR(fl)}</span>`
-        + `<span class="a-d">Entry ${fmtI(x.entry, d)} · stop ${fmtI(x.stop, d)} · ${(x.k === 'trend' || x.k === 'gtrend') ? 'no fixed target' : `${x.tp1 != null ? `${Math.round(Math.abs(x.tp1 - x.entry) / (r0 || 1))}R mark` : x.trail ? `trail from +${x.trail[0]}R at` : 'target'} ${fmtI(x.tp1 != null ? x.tp1 : x.trail ? x.entry + s * x.trail[0] * r0 : mark, d)}`}${px != null ? ` · now ${fmtI(px, d)}${x.market === 'nq' ? ' (10 min delayed)' : ''}` : ''} · open ${ageT}${x.mfe ? ` · best +${(+x.mfe).toFixed(2)}R` : ''}${trail && !PUB ? ` · ${trail}` : ''}</span></li>` };
+        + `<span class="a-d">Entry ${fmtI(x.entry, d)} · stop ${fmtI(x.stop, d)} · ${(x.k === 'trend' || x.k === 'gtrend') ? 'no fixed target' : `${x.tp1 != null ? `${Math.round(Math.abs(x.tp1 - x.entry) / (r0 || 1))}R mark` : x.trail ? `trail from +${x.trail[0]}R at` : 'target'} ${fmtI(x.tp1 != null ? x.tp1 : x.trail ? x.entry + s * x.trail[0] * r0 : mark, d)}`}${px != null ? ` · now ${fmtI(px, d)}${x.market === 'nq' ? ' (10 min delayed)' : ''}` : ''} · open ${ageT}${x.mfe ? ` · best +${(+x.mfe).toFixed(2)}R` : ''}${trail && !PUB ? ` · ${trail}` : ''}</span>${(() => { const tgt = x.tp1 != null ? x.tp1 : mark; if (px == null || x.status !== 'open' || tgt == null || x.k === 'trend' || x.k === 'gtrend' || tgt === x.stop) return '';
+          const f = (v) => Math.max(0, Math.min(1, (v - x.stop) / (tgt - x.stop))), pPx = f(px), pEn = f(x.entry);
+          return `<span class="a-m" role="img" aria-label="Price is ${Math.round(pPx * 100)}% of the way from stop to target"><i class="a-m-e" style="left:${(pEn * 100).toFixed(1)}%"></i><i class="a-m-p ${pPx >= pEn ? 'up' : 'dn'}" style="left:${(pPx * 100).toFixed(1)}%"></i></span>`; })()}</li>` };
     }) : [];
     const fmtL = (v) => v >= 10 ? v.toFixed(1) : v >= 1 ? v.toFixed(2) : v.toFixed(3), fUsd = (v) => `${v >= 0 ? '+' : '−'}$${Math.abs(v).toFixed(0)}`;
     const OPEN = (window.ACT_OPEN = window.ACT_OPEN || new Set()), groups = new Map();
