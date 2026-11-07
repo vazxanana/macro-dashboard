@@ -8,24 +8,24 @@ _Snapshot 2026-11-02 05:37 UTC. Paper trading only._
 <!-- live-rule:start -->
 ## Live Scalp rule check
 
-Built by the Trader at 2026-11-07 17:06 UTC from snapshot, config and the 30-day replay. Rule now: Scalp (M15 → M1) against D1 only, not in asia/overlap, skips audusd.
+Built by the Trader at 2026-11-07 17:11 UTC from snapshot, config and the 30-day replay. Rule now: Scalp (M15 → M1) against D1 only, not in asia/overlap, skips audusd.
 
 Session now: **newyork**.
 
 | Market | D1 (source) | Live Scalp would | Scalp now | Replay, live rule |
 |---|---|---|---|---|
-| XAU/USD | down (OANDA; Kraken says up) | no (trades the replica instead) | IN ORIGIN buy | 37 trades, 41% won, +0.16R a trade |
-| BTC/USD | up (Kraken) | **sell** only | READY sell | 25 trades, 32% won, +0.40R a trade |
-| ETH/USD | down (Kraken) | **buy** only | IN ORIGIN buy | 21 trades, 43% won, +0.41R a trade |
-| SOL/USD | down (Kraken) | **buy** only | IN ORIGIN sell | 18 trades, 33% won, +0.65R a trade |
-| XRP/USD | up (Kraken) | **sell** only | IN ORIGIN sell | 30 trades, 30% won, +0.37R a trade |
-| EUR/USD | down (OANDA; Kraken says up) | **buy** only | WAIT RETRACE sell | 22 trades, 9% won, −0.86R a trade |
-| GBP/USD | down (OANDA) | **buy** only | WAIT RETRACE sell | 15 trades, 20% won, −0.30R a trade |
-| AUD/USD | up (OANDA) | no (rule skips AUD/USD) | IN ORIGIN sell | 34 trades, 24% won, −0.36R a trade |
-| USD/CAD | up (OANDA) | **sell** only | IN ORIGIN buy | 21 trades, 19% won, −0.02R a trade |
-| USD/CHF | down (OANDA; Kraken says up) | **buy** only | WAIT RETRACE buy | 29 trades, 48% won, +0.78R a trade |
+| XAU/USD | down (OANDA; Kraken says up) | no (trades the replica instead) | IN ORIGIN buy | 39 trades, 41% won, +0.19R a trade |
+| BTC/USD | up (Kraken) | **sell** only | READY sell | 25 trades, 32% won, +0.45R a trade |
+| ETH/USD | down (Kraken) | **buy** only | IN ORIGIN buy | 21 trades, 43% won, +0.49R a trade |
+| SOL/USD | down (Kraken) | **buy** only | IN ORIGIN sell | 17 trades, 29% won, +0.52R a trade |
+| XRP/USD | up (Kraken) | **sell** only | IN ORIGIN sell | 31 trades, 32% won, +0.07R a trade |
+| EUR/USD | down (OANDA; Kraken says up) | **buy** only | WAIT RETRACE sell | 22 trades, 9% won, −0.87R a trade |
+| GBP/USD | down (OANDA) | **buy** only | WAIT RETRACE sell | 16 trades, 19% won, −0.38R a trade |
+| AUD/USD | up (OANDA) | no (rule skips AUD/USD) | IN ORIGIN sell | 34 trades, 24% won, −0.39R a trade |
+| USD/CAD | up (OANDA) | **sell** only | IN ORIGIN buy | 21 trades, 19% won, +0.44R a trade |
+| USD/CHF | down (OANDA; Kraken says up) | **buy** only | WAIT RETRACE buy | 29 trades, 45% won, +0.40R a trade |
 
-Replay total on the markets it trades live: 181 trades, +0.22R a trade (+40.39R), after spread. Each signal still has to clear reward:risk ≥ 1.2, the 2-trades-per-market cap and the 3-hour re-entry rule.
+Replay total on the markets it trades live: 182 trades, +0.15R a trade (+28.04R), after spread. Each signal still has to clear reward:risk ≥ 1.2, the 2-trades-per-market cap and the 3-hour re-entry rule.
 <!-- live-rule:end -->
 
 ## Top 3 to watch
