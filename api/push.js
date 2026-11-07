@@ -15,12 +15,13 @@ module.exports = async (req, res) => {
   const id = devId(sub.endpoint);
   try {
     const { by, blobs } = await all();
-    if (b.get) { const bl = by.get(id); return res.status(200).json({ alerts: bl ? (await read(bl)).alerts || [] : [] }); }
+    if (b.get) { const bl = by.get(id), d = bl ? await read(bl) : null; return res.status(200).json({ alerts: d ? d.alerts || [] : [], tv: !!(d && d.tv) }); }
     if (!Array.isArray(b.alerts) || b.alerts.length > 20) return res.status(400).json({ error: 'up to 20 alerts' });
     if (!by.has(id) && by.size >= 300) return res.status(429).json({ error: 'too many devices' });
     const alerts = b.alerts.map((a) => ({ id: String(a.id || '').slice(0, 16), sym: String(a.sym), price: +a.price, dir: a.dir === 'below' ? 'below' : 'above', note: String(a.note || '').slice(0, 60), label: String(a.label || '').slice(0, 20), at: Math.floor(+a.at || Date.now() / 1000) }));
     if (alerts.some((a) => !a.id || !SYM[a.sym] || !(a.price > 0))) return res.status(400).json({ error: 'bad alert' });
-    await save(id, alerts.length ? { sub: { endpoint: sub.endpoint, keys: { p256dh: String(sub.keys.p256dh), auth: String(sub.keys.auth) } }, alerts, at: Date.now() } : null, blobs);
+    const tv = b.tv === true;   // also forward TradingView alerts (api/tv-webhook) to this device
+    await save(id, alerts.length || tv ? { sub: { endpoint: sub.endpoint, keys: { p256dh: String(sub.keys.p256dh), auth: String(sub.keys.auth) } }, alerts, tv, at: Date.now() } : null, blobs);
     return res.status(200).json({ alerts });
   } catch (e) { console.error(`[push] ${e.message}`); return res.status(500).json({ error: String(e.message || e) }); }
 };

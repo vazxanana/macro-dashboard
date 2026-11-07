@@ -2281,6 +2281,7 @@ html[data-motion="off"][data-gate] .gate-bg path[stroke] { animation: none; stro
         <div class="menu-body">
           <button type="button" class="menu-pa" id="ms-pa-open">Price alerts <small>notify this device at a price</small></button>
           <button type="button" class="menu-pa menu-br" id="ms-br-open">Broker bridge <small>MT5 / cTrader mirror of the council</small></button>
+          <button type="button" class="menu-pa menu-tv" id="ms-tvw-open">TradingView alerts in <small>log TradingView alerts here, push to your phone</small></button>
           <button type="button" class="menu-pa menu-tv" id="ms-tva-open">TradingView add-on <small>council trades on your TradingView chart</small></button>
           <div class="menu-h">Chart layers</div>
           <div class="ms-tog">
@@ -3688,6 +3689,45 @@ function msNextSetup(bars, A) {
   setTimeout(keyLevels, 2500); setInterval(keyLevels, 60e3);
   { const k = document.getElementById('ms-show-kl'); try { G.showKL = localStorage.getItem('ms-kl') !== '0'; } catch (e) {} if (k) { k.checked = G.showKL !== false; k.addEventListener('change', () => { G.showKL = k.checked; try { localStorage.setItem('ms-kl', k.checked ? '1' : '0'); } catch (e) {} keyLevels(); }); } }
   { const v = document.getElementById('ms-show-vol'); try { G.showVol = localStorage.getItem('ms-vol') !== '0'; } catch (e) {} if (v) { v.checked = G.showVol !== false; v.addEventListener('change', () => { G.showVol = v.checked; try { localStorage.setItem('ms-vol', v.checked ? '1' : '0'); } catch (e) {} Object.values(panes).forEach((P) => P.setVol && P.setVol()); }); } }
+  // TradingView alerts in (7 Nov loop): webhook URL (owner), message template, forward-to-this-device switch, recent alerts
+  { const btn = document.getElementById('ms-tvw-open'); let dlg;
+    const TPL = '{"ticker":"{{ticker}}","price":{{close}},"side":"buy","msg":"{{strategy.order.comment}} {{interval}}"}';
+    const load = async () => {
+      const m = dlg.querySelector('#tvw-msg'), ul = dlg.querySelector('#tvw-list'), u = dlg.querySelector('#tvw-url');
+      let pw = ''; try { pw = sessionStorage.getItem('ms-own-pw') || ''; } catch (e) {}
+      if (!pw) { u.textContent = 'Type your owner password to show the webhook address.'; dlg.querySelector('#tvw-pw').hidden = false; return; }
+      m.textContent = 'Loading…';
+      try { const r = await fetch('/api/tv-webhook', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ ownerPw: pw, list: true }) }); const j = await r.json();
+        if (r.status === 403) { try { sessionStorage.removeItem('ms-own-pw'); } catch (e) {} dlg.querySelector('#tvw-pw').hidden = false; u.textContent = 'Owner password not accepted.'; m.textContent = ''; return; }
+        if (!r.ok) throw new Error(j.error || r.status);
+        dlg.querySelector('#tvw-pw').hidden = true; u.textContent = j.url; dlg.querySelector('#tvw-cpu').disabled = false; m.textContent = '';
+        ul.innerHTML = (j.alerts || []).length ? j.alerts.map((a) => `<li><span class="pa-arr ${/sell|short/i.test(a.side || '') ? 'below' : 'above'}">${/sell|short/i.test(a.side || '') ? '↓' : /buy|long/i.test(a.side || '') ? '↑' : '•'}</span><span class="pa-w"><b>${esc(a.ticker || 'Alert')}${a.price != null ? ` · ${esc(a.price)}` : ''}${a.side ? ` · ${esc(String(a.side).toUpperCase())}` : ''}</b><small>${esc(new Date(a.at).toLocaleString(undefined, { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' }))} · ${esc(String(a.text || '').slice(0, 140))}</small></span></li>`).join('') : '<li class="pa-empty">No TradingView alerts received yet.</li>';
+      } catch (e) { m.textContent = `Could not load (${e.message}).`; }
+    };
+    const open = () => {
+      if (!dlg) {
+        dlg = document.createElement('dialog'); dlg.className = 'pa-dlg tva-dlg'; dlg.setAttribute('aria-labelledby', 'tvw-h');
+        dlg.innerHTML = `<div class="pa-top"><h2 id="tvw-h">TradingView alerts in</h2><button type="button" class="pa-x" aria-label="Close">×</button></div>
+          <p class="pa-sub">Send any TradingView alert (your own indicators or strategies) to Meridian X: it is logged here and pushed to your devices.</p>
+          <form id="tvw-pw" class="pa-f" hidden><label class="pa-wide">Owner password<input type="password" id="tvw-pwi" autocomplete="current-password"></label><button type="submit" class="pa-go">Show the webhook</button></form>
+          <h3 class="br-h3">1 · Webhook URL</h3><p class="tvw-row"><code id="tvw-url" class="tvw-url">…</code><button type="button" class="pa-del" id="tvw-cpu" disabled>Copy</button></p>
+          <h3 class="br-h3">2 · Message (JSON, optional)</h3><p class="tvw-row"><code class="tvw-url">${esc(TPL)}</code><button type="button" class="pa-del" id="tvw-cpt">Copy</button></p>
+          <ol class="tva-steps"><li>In TradingView: create an alert → Notifications → tick <b>Webhook URL</b> and paste the URL.</li><li>Paste the message above into the alert's Message box (plain text works too).</li><li>Keep the URL private: it is the key.</li></ol>
+          <label class="tva-ck tvw-ck"><input type="checkbox" id="tvw-push"> Push TradingView alerts to this device</label>
+          <p id="tvw-msg" class="pa-msg" role="status"></p><h3 class="br-h3">Recent alerts</h3><ul class="pa-list" id="tvw-list"></ul>`;
+        document.body.appendChild(dlg);
+        dlg.querySelector('.pa-x').onclick = () => dlg.close(); dlg.addEventListener('click', (e) => { if (e.target === dlg) dlg.close(); });
+        dlg.querySelector('#tvw-pw').onsubmit = async (e) => { e.preventDefault(); const v = dlg.querySelector('#tvw-pwi').value; if ((await msSha256(v)) !== window.MS_ADMIN_HASH) { dlg.querySelector('#tvw-url').textContent = 'That is not the owner password.'; return; } try { sessionStorage.setItem('ms-own-pw', v); } catch (err) {} load(); };
+        const cp = async (t, b) => { try { await navigator.clipboard.writeText(t); b.textContent = 'Copied ✓'; setTimeout(() => { b.textContent = 'Copy'; }, 1400); } catch (e) { prompt('Copy', t); } };
+        dlg.querySelector('#tvw-cpu').onclick = (e) => cp(dlg.querySelector('#tvw-url').textContent, e.target);
+        dlg.querySelector('#tvw-cpt').onclick = (e) => cp(TPL, e.target);
+        const ck = dlg.querySelector('#tvw-push'); try { ck.checked = localStorage.getItem('ms-tv-push') === '1'; } catch (e) {}
+        ck.onchange = async () => { const m = dlg.querySelector('#tvw-msg'); m.textContent = 'Saving…'; try { await window.msTvPush(ck.checked); m.textContent = ck.checked ? 'This device will get TradingView alerts.' : 'This device will no longer get TradingView alerts.'; } catch (e) { ck.checked = !ck.checked; m.textContent = e.message || String(e); } };
+      }
+      dlg.showModal(); load();
+    };
+    window.msOpenTvAlerts = open;
+    if (btn) btn.addEventListener('click', () => { const m = btn.closest('details'); if (m) m.open = false; open(); }); }
   // Broker bridge panel (7 Nov loop): what the MT5 / cTrader CouncilBridge EA sees (mt5/signals.csv), when a bridge last read it, setup + EA downloads
   { const btn = document.getElementById('ms-br-open'); let dlg;
     const URL_ = 'https://meridianx.dev/cdata/mt5/signals.csv';
@@ -3798,7 +3838,7 @@ function msNextSetup(bars, A) {
     }
     async function sync() {
       const sub = PA.sub || await subscribe();
-      const r = await fetch('/api/push', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ sub, alerts: PA.list }) });
+      const r = await fetch('/api/push', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ sub, alerts: PA.list, tv: PA.tv === true }) });
       const j = await r.json().catch(() => ({})); if (!r.ok) throw new Error(j.error || `Server ${r.status}`);
     }
     // on load: drop alerts the server already fired (it removes them after sending)
@@ -3846,6 +3886,9 @@ function msNextSetup(bars, A) {
         catch (err) { PA.list = PA.list.filter((x) => x.id !== a.id); msg.textContent = err.message || String(err); }
         finally { btn.disabled = false; btn.textContent = 'Create alert'; lines(); render(); } };
     }
+    try { PA.tv = localStorage.getItem('ms-tv-push') === '1'; } catch (e) {}
+    // TradingView alerts to this device (panel in Settings → TradingView alerts)
+    window.msTvPush = async (on) => { PA.tv = !!on; try { localStorage.setItem('ms-tv-push', on ? '1' : '0'); } catch (e) {} if (!can()) throw new Error(ios && !standalone ? 'On iPhone, add Meridian X to the Home Screen first and open it from there.' : 'This browser cannot receive notifications.'); await sync(); };
     window.msOpenAlerts = async (sym) => {
       if (!dlg) build();
       const k = sym && INSTRUMENTS[sym] && INSTRUMENTS[sym].md ? sym : INSTRUMENTS[instKey].md ? instKey : 'xau';
@@ -6542,7 +6585,7 @@ function msNextSetup(bars, A) {
     if (sel && document.getElementById('ms-mk-btn') && shown(document.getElementById('ms-mk-btn'))) [...sel.options].forEach((o) => out.push({ g: 'Markets', t: o.textContent.trim(), d: o.selected ? 'current' : (o.parentElement.label || ''), run: () => { if (!o.selected) location.href = '?s=' + o.value + location.hash; } }));
     const tb = document.getElementById('ms-theme');
     if (tb) [['dark', 'Dark'], ['light', 'Light'], ['midnight', 'Midnight'], ['pro', 'Pro']].forEach(([k, t]) => out.push({ g: 'Theme', t: t + ' theme', d: document.documentElement.dataset.theme === k ? 'current' : '', run: () => { for (let i = 0; i < 5 && document.documentElement.dataset.theme !== k; i++) tb.click(); } }));
-    [['ms-pa-open', 'Price alerts: notify me at a price'], ['ms-tva-open', 'TradingView add-on: council trades as a Pine indicator'], ['ms-br-open', 'Broker bridge: MT5 / cTrader status and setup'], ['ms-focus-btn', 'Focus mode: open trades full screen (F)'], ['ms-alerts', 'Turn alerts on / off'], ['ms-fit', 'Reset chart view'], ['ms-j-csv', 'Export journal CSV']].forEach(([id, t]) => { const b = document.getElementById(id); if (b) out.push({ g: 'Actions', t, d: '', run: () => b.click() }); });
+    [['ms-pa-open', 'Price alerts: notify me at a price'], ['ms-tva-open', 'TradingView add-on: council trades as a Pine indicator'], ['ms-br-open', 'Broker bridge: MT5 / cTrader status and setup'], ['ms-tvw-open', 'TradingView alerts: webhook into Meridian X'], ['ms-focus-btn', 'Focus mode: open trades full screen (F)'], ['ms-alerts', 'Turn alerts on / off'], ['ms-fit', 'Reset chart view'], ['ms-j-csv', 'Export journal CSV']].forEach(([id, t]) => { const b = document.getElementById(id); if (b) out.push({ g: 'Actions', t, d: '', run: () => b.click() }); });
     return out;
   };
   let all = [], cur = [], sel = 0;
@@ -7547,6 +7590,10 @@ function gpStats(T) {
 .br-c b { font-size: 14px; } .br-c small { font-size: 12px; color: var(--ink-dim); line-height: 1.4; }
 .br-c.ok b { color: var(--buy); } .br-c.warn b { color: #e0a526; }
 .br-h3 { margin: 16px 0 4px; font-size: 14px; }
+.tvw-row { display: flex; gap: 8px; align-items: center; margin: 4px 0; }
+.tvw-url { flex: 1; min-width: 0; font: 12px var(--mono, ui-monospace, monospace); background: var(--bg); border: 1px solid var(--line); border-radius: 8px; padding: 8px 10px; overflow-wrap: anywhere; color: var(--ink); }
+.tvw-row .pa-del { flex: none; }
+.tvw-ck { display: flex; align-items: center; gap: 8px; margin-top: 12px; font-size: 13.5px; font-weight: 600; }
 .tva-steps code { font: 12px var(--mono, ui-monospace, monospace); background: var(--bg); padding: 1px 6px; border-radius: 5px; overflow-wrap: anywhere; }
 .tva-steps .pa-del { height: 28px; margin: 2px 0; }
 .menu-tv { border-color: color-mix(in srgb, var(--accent) 35%, var(--line)); background: color-mix(in srgb, var(--accent) 8%, transparent); }

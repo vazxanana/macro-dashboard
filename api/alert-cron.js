@@ -34,7 +34,7 @@ module.exports = async (req, res) => {
         try { await webpush.sendNotification(d.sub, payload, { TTL: 3600, urgency: 'high' }); sent++; }
         catch (e) { if (e.statusCode === 404 || e.statusCode === 410) { dead = true; break; } console.warn(`[alerts] push ${e.statusCode || e.message}`); }
       }
-      if (dead) { gone++; await save(id, null, blobs); } else await save(id, keep.length ? { ...d, alerts: keep, at: Date.now() } : null, blobs);
+      if (dead) { gone++; await save(id, null, blobs); } else await save(id, keep.length || d.tv ? { ...d, alerts: keep, at: Date.now() } : null, blobs);
     }
     console.log(JSON.stringify({ devices: devs.length, sent, gone }));
     return res.status(200).json({ devices: devs.length, sent, gone });
