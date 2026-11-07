@@ -130,10 +130,10 @@ failed the council's own 2023-26 test (council-data research/log.md, 6 Nov), so 
 ICT is its own edge and approach: never mix it into the council systems, their rules, filters or reports.
 Rules and research live in `.claude/skills/ICT/SKILL.md` (results also in council-data `research/ict/`).
 - Tracker: `ict/tracker.mjs`, workflow `.github/workflows/ict.yml` (every 15 min), data in council-data `ict/`
-  (`trades.json`, `snapshot.json`, `bars.json`). Markets: NQ, ES, YM, RTY futures, gold futures (GC), EUR/USD and GBP/USD from CNBC (Yahoo fallback). Model: H1 iFVG
+  (`trades.json`, `snapshot.json`, `bars.json`). Markets: NQ, ES, YM, RTY futures and gold futures (GC) from CNBC (Yahoo fallback); EUR/USD and GBP/USD removed 7 Nov (owner). Grade F signals (total < 3, `MIN_GRADE`) are not recorded and are filtered on the desk (`KEEP`). Model: H1 iFVG
   reversal (swing swept → body closes through the leg's FVG within 6 H1 candles; stop 2 ticks beyond the sweep;
   no fixed target: from +2R the stop trails 1.5R behind the best price (skill §15; before 6 Nov: 3R target); fixed-2R
-  result recorded as `R2`; out after 36 closed H1 candles, skill §21; 48 h before 7 Nov). Every signal records ICT features (`feat`) and a /10 grade.
+  result recorded as `R2`; out after 36 closed H1 candles, skill §21; 48 h before 7 Nov; index futures also move the stop to the entry at +1.5R, `P.be`, skill §32, not gold). Every signal records ICT features (`feat`) and a /10 grade.
 - Page: view `#ict` ("ICT desk", class `ictx`), shown only when `html[data-ict]` is set: the owner, and users
   with `ict: true` (Fred, the main reviewer and trader, lands there after sign-in). The desk user marks signals
   Taken / Skipped / Missed with fill and own R, grades them and writes notes: localStorage `ictDesk`, synced to
@@ -148,9 +148,8 @@ Rules and research live in `.claude/skills/ICT/SKILL.md` (results also in counci
   + (skill §25) a tight stop 0.15-0.3x ATR also counts when it has A+ quality (body >= 0.6, not NY PM), at half size
   (`RISK_TIGHT`, `sizeOf`; records carry `size`, R stored x size, `Rraw` per unit; desk pill "½ size")
   (`feat.atrR`, `RISK_FLOOR`, `RISK_CAP`, `isASetup`; records carry `aset`).
-- Gold futures and FX (skill §26, 7 Nov): MARKETS also has `gc` (@GC.1), `eurusd` (EUR=), `gbpusd` (GBP=), each with its own
-  `aRule`: gold = buys with a 0.3-0.75x ATR stop; EUR/USD = London-session signals; GBP/USD = none (tracked only). The index rule
-  applies to nq/es/ym/rty only (`isASetup(g, mk)`); no A+ tier for these three; desk clusters stay index-only.
+- Gold futures (skill §26, 7 Nov): MARKETS also has `gc` (@GC.1) with its own `aRule`: buys with a 0.3-0.75x ATR stop. The index
+  rule applies to nq/es/ym/rty only (`isASetup(g, mk)`); no A+ tier for gold; desk clusters stay index-only.
 - Forward-test features (skill §29): `feat.htfFvg` (sweep into an unfilled D1 / H4 FVG) and `feat.cc` (prior daily
   candle-closure bias vs the signal) are recorded on every signal and split in "What works"; not filters.
 - M5 entry for Fred (skill §30): index A-setups → wait ≤ 6 h for an M5 iFVG, enter on its close with the H1 stop; beats
@@ -178,3 +177,18 @@ the prior 5 daily highs, its own position and add next to the 20-day leg (`gtren
 Adopted on return per drawdown of the gold book (+39.3% → +45.5% | +68.6% → +79.9%, worst drawdown −2.34 → −2.61% |
 −6.21 → −6.47%), positive every year 2019-26 alone.
 
+
+## Gold playbook view (7 Nov 2026, owner: "make dashboard only for this skill")
+Admin-only view `#gold` (`#v-gold`, nav "Gold playbook"; hidden for viewers and guests) for the owner's gold-master-playbook skill
+(kept locally only, never in this public repo). It shows the skill's tested edge in my own words: Weekly structure bullish (last
+completed W1 body close above the last 2-bar-fractal swing high) + a New York-close Daily candle closing above the prior day's low
+and in the top 30% of its range → buy the next Daily open, stop $0.30 under its low, 3R (2R option), out after 10 days, longs only.
+Self-contained script at the end of the page (`window.renderGold`): Binance PAXG H1 since Nov 2020 grouped into NY 17:00 days
+(`gpDays`, weekend hours dropped; closed days cached in localStorage `msGpDays1`), shifted onto spot via gold-api.com; context
+(Weekly state and the level that flips it, 20-day ER, Daily close, session), backtest (each signal its own trade, $0.35 cost, stop
+first; halves 2021-22 untested | Nov 22-Oct 24 | Nov 24-now), signal list with "Took it" ticks (`msGpTook`), checklist ticks per day
+(`msGpCk-<NY date>`), variant switch (`msGpVar`), size calculator (`msGpSize`). Not a council system; not mixed with ICT.
+Calendar and tweaks (7 Nov): a P&L calendar on the view (`renderCal`: closed trades by NY exit day, open ones on today with
+floating R, month/year totals, "Every signal" / "Ones I took" switch `msGpCalSrc`). Tweaks tested on spot gold 2018-26 (exits,
+targets, caps, regime/trend filters, overlay, candle colour): none gave more profit AND less drawdown in both 2023-24 and 2025-26,
+so the rule stays as the skill wrote it; the table sits on the page (`TW`). 2018-20 also positive (+31.7R, PF 1.43).
