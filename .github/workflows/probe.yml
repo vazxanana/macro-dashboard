@@ -1,5 +1,5 @@
 name: Council data probe
-# RESEARCH ONLY (ICT edge, owner 6 Nov): Nasdaq 100, S&P 500 and Dow 1m history (Dukascopy) saved as 5m candles.
+# RESEARCH ONLY (owner 7 Nov: crypto scalper on more IC Markets coins): Binance spot 5m klines 2022 - Oct 2026.
 on:
   push:
     branches: [council-probe]
@@ -8,20 +8,17 @@ permissions:
 jobs:
   dump:
     runs-on: ubuntu-latest
-    timeout-minutes: 150
+    timeout-minutes: 120
     strategy:
       fail-fast: false
       max-parallel: 6
       matrix:
-        sym: [USATECHIDXUSD, USA500IDXUSD, USA30IDXUSD]
-        year: ['2023', '2024', '2025', '2026']
+        sym: [LTCUSDT, BCHUSDT, ADAUSDT, DOGEUSDT, DOTUSDT, LINKUSDT, XLMUSDT, AVAXUSDT, UNIUSDT, EOSUSDT, DASHUSDT]
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with: { node-version: 22 }
-      - run: node tools/idxdump.mjs ${{ matrix.sym }} ${{ matrix.year }} ${{ matrix.sym }}_${{ matrix.year }}.json.gz
+      - run: mkdir -p out && python3 tools/binance5m.py out ${{ matrix.sym }} 2022
       - uses: actions/upload-artifact@v4
-        with: { name: '${{ matrix.sym }}_${{ matrix.year }}', path: '*.json.gz' }
+        with: { name: '${{ matrix.sym }}', path: 'out/*.json.gz' }
   save:
     needs: dump
     if: always()
@@ -32,7 +29,7 @@ jobs:
       - uses: actions/download-artifact@v4
         with: { path: dl, merge-multiple: true }
       - run: |
-          mkdir -p research/candles/idx && mv dl/*.json.gz research/candles/idx/ && ls -la research/candles/idx
+          mkdir -p research/candles/crypto5m && mv dl/*.json.gz research/candles/crypto5m/ && ls -la research/candles/crypto5m
           git config user.name "mosha-council"; git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add research/candles/idx && git commit -qm "Research (ICT): NQ, S&P 500, Dow 5m candles 2023-2026 (Dukascopy)" || exit 0
+          git add research/candles/crypto5m && git commit -qm "Research: more IC Markets coins, Binance 5m 2022-2026 (crypto scalper)" || exit 0
           for j in 1 2 3 4 5; do git pull -q --rebase origin council-data && git push -q origin HEAD:council-data && break; sleep 5; done
