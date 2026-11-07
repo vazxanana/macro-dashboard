@@ -3466,7 +3466,7 @@ function msNextSetup(bars, A) {
     { const pane = el.closest('.ms-pane'), ph = pane && pane.querySelector('.ms-ph');
       if (ph && !ph.querySelector('.ch-tools')) {
         const tl = document.createElement('span'); tl.className = 'ch-tools';
-        tl.innerHTML = `<a class="ch-b ch-tv" target="_blank" rel="noopener" title="Open this chart on TradingView" aria-label="Open on TradingView"></a><button type="button" class="ch-b ch-ruler" title="Measure: drag on the chart (or hold Shift and drag)" aria-label="Measure price and time on the chart" aria-pressed="false"></button><button type="button" class="ch-b ch-snap" title="Save this chart as an image" aria-label="Save the chart as a PNG image"></button><button type="button" class="ch-b ch-bell" title="Price alert (notifies this device)" aria-label="Set a price alert"></button><button type="button" class="ch-b ch-fit" title="Fit the chart (double-click the chart)" aria-label="Fit the ${tf.label} chart"></button><button type="button" class="ch-b ch-fs" title="Full screen" aria-label="Show the ${tf.label} chart full screen"></button>`;
+        tl.innerHTML = `<a class="ch-b ch-tv" target="_blank" rel="noopener" title="Open this chart on TradingView" aria-label="Open on TradingView"></a><button type="button" class="ch-b ch-ruler" title="Measure: drag on the chart (or hold Shift and drag)" aria-label="Measure price and time on the chart" aria-pressed="false"></button><button type="button" class="ch-b ch-snap" title="Save this chart as an image" aria-label="Save the chart as a PNG image"></button><button type="button" class="ch-b ch-bell" title="Price alert (notifies this device) · tip: right-click the chart to set one at that price" aria-label="Set a price alert"></button><button type="button" class="ch-b ch-fit" title="Fit the chart (double-click the chart)" aria-label="Fit the ${tf.label} chart"></button><button type="button" class="ch-b ch-fs" title="Full screen" aria-label="Show the ${tf.label} chart full screen"></button>`;
         ph.appendChild(tl);
         tl.querySelector('.ch-fit').addEventListener('click', () => P.fit());
         tl.querySelector('.ch-snap').addEventListener('click', () => P.snapshot());
@@ -3572,6 +3572,10 @@ function msNextSetup(bars, A) {
       addEventListener('mousemove', move); el.addEventListener('touchmove', move, { passive: false });
       addEventListener('mouseup', end); el.addEventListener('touchend', end);
       addEventListener('keydown', (ev) => { if (ev.key === 'Escape') P.clearMeasure(); }); }
+    // right-click (or Alt+click) on a chart: price alert at that price (7 Nov loop)
+    { const at = (ev) => { const r = el.getBoundingClientRect(), p = series.coordinateToPrice(ev.clientY - r.top); return p != null && isFinite(p) ? p : null; };
+      el.addEventListener('contextmenu', (ev) => { if (ev.target.closest && ev.target.closest('.ch-tools')) return; const p = at(ev); if (p == null || !window.msOpenAlerts) return; ev.preventDefault(); window.msOpenAlerts(instKey, p); });
+      el.addEventListener('click', (ev) => { if (!ev.altKey || P.measureOn) return; const p = at(ev); if (p != null && window.msOpenAlerts) { ev.preventDefault(); window.msOpenAlerts(instKey, p); } }); }
     P.rebuild = function (keepView) {
       const off = G.offset;
       P.bars = P.raw.map((b) => ({ time: b.time + TZ, open: b.open + off, high: b.high + off, low: b.low + off, close: b.close + off }));
@@ -3948,11 +3952,12 @@ function msNextSetup(bars, A) {
     try { PA.tv = localStorage.getItem('ms-tv-push') === '1'; } catch (e) {}
     // TradingView alerts to this device (panel in Settings → TradingView alerts)
     window.msTvPush = async (on) => { PA.tv = !!on; try { localStorage.setItem('ms-tv-push', on ? '1' : '0'); } catch (e) {} if (!can()) throw new Error(ios && !standalone ? 'On iPhone, add Meridian X to the Home Screen first and open it from there.' : 'This browser cannot receive notifications.'); await sync(); };
-    window.msOpenAlerts = async (sym) => {
+    window.msOpenAlerts = async (sym, atPrice) => {
       if (!dlg) build();
       const k = sym && INSTRUMENTS[sym] && INSTRUMENTS[sym].md ? sym : INSTRUMENTS[instKey].md ? instKey : 'xau';
       dlg.querySelector('#pa-sym').value = k; const n = nowPx(k) || await quote(k);
       if (n) dlg.querySelector('#pa-price').value = (+n).toFixed(INSTRUMENTS[k].dec);
+      if (atPrice > 0) dlg.querySelector('#pa-price').value = (+atPrice).toFixed(INSTRUMENTS[k].dec);
       dlg.querySelector('#pa-msg').textContent = can() ? '' : ios && !standalone ? 'On iPhone: Share → Add to Home Screen, then open Meridian X from the Home Screen to use alerts.' : MD.base ? 'This browser cannot receive notifications.' : 'Alerts work on meridianx.dev.';
       hint(); render(); dlg.showModal(); setTimeout(() => { const i = dlg.querySelector('#pa-price'); i.focus(); i.select(); }, 30);
     };
