@@ -8,30 +8,30 @@ _Snapshot 2026-11-02 05:37 UTC. Paper trading only._
 <!-- live-rule:start -->
 ## Live Scalp rule check
 
-Built by the Trader at 2026-11-07 20:20 UTC from snapshot, config and the 30-day replay. Rule now: Scalp (M15 → M1) against D1 only, not in asia/overlap, skips audusd. **Scalp is not live right now** (not in focusSetups), so nothing below trades live.
+Built by the Trader at 2026-11-07 20:23 UTC from snapshot, config and the 30-day replay. Rule now: Scalp (M15 → M1) against D1 only, not in asia/overlap, skips audusd. **Scalp is not live right now** (not in focusSetups), so nothing below trades live.
 
 Session now: **newyork**.
 
 | Market | D1 (source) | Live Scalp would | Scalp now | Replay, live rule |
 |---|---|---|---|---|
-| XAU/USD | down (OANDA) | no (not live, trades the replica instead) | IN ORIGIN sell | 41 trades, 34% won, −0.13R a trade |
-| BTC/USD | up (Kraken) | no (not live) | READY sell | 24 trades, 13% won, −3.70R a trade |
-| ETH/USD | down (Kraken) | no (not live) | READY buy | 23 trades, 26% won, −1.65R a trade |
-| SOL/USD | down (Kraken) | no (not live) | IN ORIGIN sell | 18 trades, 22% won, −0.88R a trade |
-| XRP/USD | up (Kraken) | no (not live) | READY sell | 28 trades, 18% won, −1.83R a trade |
-| EUR/USD | down (OANDA) | no (not live) | IN ORIGIN sell | 21 trades, 14% won, −0.70R a trade |
-| GBP/USD | down (OANDA) | no (not live) | READY sell (blocked: wrong side) | 19 trades, 42% won, +0.43R a trade |
-| AUD/USD | up (OANDA) | no (not live, rule skips AUD/USD) | IN ORIGIN buy | 38 trades, 26% won, −0.27R a trade |
-| USD/CAD | up (OANDA) | no (not live) | IN ORIGIN buy | 30 trades, 27% won, −0.26R a trade |
-| USD/CHF | down (OANDA) | no (not live) | IN ORIGIN buy | 30 trades, 57% won, +0.73R a trade |
+| XAU/USD | down (OANDA) | no (not live, trades the replica instead) | IN ORIGIN sell | 30 trades, 30% won, −0.07R a trade |
+| BTC/USD | up (Kraken) | no (not live) | READY sell | 26 trades, 12% won, −3.09R a trade |
+| ETH/USD | down (Kraken) | no (not live) | READY buy | 21 trades, 29% won, −1.51R a trade |
+| SOL/USD | down (Kraken) | no (not live) | IN ORIGIN sell | 18 trades, 22% won, −0.86R a trade |
+| XRP/USD | up (Kraken) | no (not live) | READY sell | 26 trades, 19% won, −1.70R a trade |
+| EUR/USD | down (OANDA) | no (not live) | IN ORIGIN sell | 25 trades, 20% won, −0.51R a trade |
+| GBP/USD | down (OANDA) | no (not live) | READY sell (blocked: wrong side) | 34 trades, 21% won, −0.49R a trade |
+| AUD/USD | up (OANDA) | no (not live, rule skips AUD/USD) | IN ORIGIN buy | 34 trades, 35% won, +0.03R a trade |
+| USD/CAD | up (OANDA) | no (not live) | IN ORIGIN buy | 26 trades, 54% won, +0.48R a trade |
+| USD/CHF | down (OANDA) | no (not live) | IN ORIGIN buy | 29 trades, 24% won, −0.43R a trade |
 
-Replay total on the markets it trades live: 193 trades, −0.97R a trade (−186.47R), after spread. Each signal still has to clear reward:risk ≥ 1.2, the 2-trades-per-market cap and the 3-hour re-entry rule.
+Replay total on the markets it trades live: 205 trades, −0.98R a trade (−201.45R), after spread. Each signal still has to clear reward:risk ≥ 1.2, the 2-trades-per-market cap and the 3-hour re-entry rule.
 <!-- live-rule:end -->
 
 <!-- coach-churn:start -->
 ## Coach rule changes
 
-Built by the Trader at 2026-11-07 20:20 UTC from the rule history. Rules the Coach changed by itself in the last 7 days (owner rules are not counted).
+Built by the Trader at 2026-11-07 20:23 UTC from the rule history. Rules the Coach changed by itself in the last 7 days (owner rules are not counted).
 
 | Rule | Changes | Steps (oldest first) |
 |---|---|---|
@@ -59,13 +59,13 @@ Built by the Trader at 2026-11-07 20:20 UTC from the rule history. Rules the Coa
 <!-- desk-status:start -->
 ## Desk & mirror status
 
-Built by the Trader at 2026-11-07 20:20 UTC. ICT desk: the last 7 days; mirror: the cTrader DEMO account (0.01 lot, demo only).
+Built by the Trader at 2026-11-07 20:23 UTC. ICT desk: the last 7 days; mirror: the cTrader DEMO account (0.01 lot, demo only).
 
 **ICT A-setups:** 0 signals (0 open, 0 closed); 1 other signal tracked, not A-setups.
 
 **Dip-buy candidate (NQ/ES, paper only):** 0 signals in 7 days · recording since 2026-11-07.
 
-**cTrader mirror:** ok · demo Fusion Markets · balance 997.73 · 0 open (checked 2026-11-07 20:16 UTC).
+**cTrader mirror:** ok · demo Fusion Markets · balance 997.73 · 0 open (checked 2026-11-07 20:20 UTC).
 <!-- desk-status:end -->
 
 ## Top 3 to watch
