@@ -2806,7 +2806,7 @@ html[data-motion="off"][data-gate] .gate-bg path[stroke] { animation: none; stro
 
 
 
-  <p class="foot">Live candles from Binance and Kraken public feeds; gold is aligned to XAU/USD spot via gold-api.com. Times are in your local zone.<br>Version 6 Nov 2026 · public view<span class="adm"> · <span class="ms-who" id="ms-who">admin</span></span> · <a class="ms-admin-link" id="ms-admin-link"></a></p>
+  <p class="foot">Gold and forex candles from OANDA (spot, mid price); crypto from Binance and Kraken. Without OANDA the page falls back to exchange feeds, with gold aligned to XAU/USD spot via gold-api.com. Times are in your local zone.<br>Version 6 Nov 2026 · public view<span class="adm"> · <span class="ms-who" id="ms-who">admin</span></span> · <a class="ms-admin-link" id="ms-admin-link"></a></p>
   <nav class="btab" aria-label="Main sections">
     <a class="btab-brand" href="#home" aria-label="Aurum Desk, home"><i class="ms-coin" aria-hidden="true"></i><span>Aurum</span></a>
     <a href="#home" data-go="home"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M3 11l9-7 9 7v9a1 1 0 01-1 1h-5v-6H9v6H4a1 1 0 01-1-1z"></path></svg>Home</a>
@@ -3016,16 +3016,16 @@ function msNextSetup(bars, A) {
   ];
   const BARS = 500, PIVOT = 6;
   const INSTRUMENTS = {
-    xau:    { group: 'Metals', label: 'XAU/USD', name: 'Gold',     binance: 'PAXGUSDT', kraken: 'PAXGUSD', dec: 1, spot: true, size: 'gold', color: '#c99400' },
+    xau:    { group: 'Metals', md: 'xau', label: 'XAU/USD', name: 'Gold',     binance: 'PAXGUSDT', kraken: 'PAXGUSD', dec: 1, spot: true, size: 'gold', color: '#c99400' },
     btc:    { group: 'Crypto', label: 'BTC/USD', name: 'Bitcoin',  binance: 'BTCUSDT',  kraken: 'XBTUSD',  dec: 1, size: 'units', unit: 'BTC', color: '#f7931a' },
     eth:    { group: 'Crypto', label: 'ETH/USD', name: 'Ethereum', binance: 'ETHUSDT',  kraken: 'ETHUSD',  dec: 2, size: 'units', unit: 'ETH', color: '#7b8cde' },
     sol:    { group: 'Crypto', label: 'SOL/USD', name: 'Solana',   binance: 'SOLUSDT',  kraken: 'SOLUSD',  dec: 2, size: 'units', unit: 'SOL', color: '#14f195' },
     xrp:    { group: 'Crypto', label: 'XRP/USD', name: 'XRP',      binance: 'XRPUSDT',  kraken: 'XRPUSD',  dec: 4, size: 'units', unit: 'XRP', color: '#8a96a8' },
-    eurusd: { group: 'Forex',  label: 'EUR/USD', name: 'Euro',     binance: null, kraken: 'EURUSD', bitstamp: 'eurusd', dec: 5, size: 'fx',    color: '#2962ff' },
-    gbpusd: { group: 'Forex',  label: 'GBP/USD', name: 'Pound',    binance: null, kraken: 'GBPUSD', bitstamp: 'gbpusd', dec: 5, size: 'fx',    color: '#2962ff' },
-    audusd: { group: 'Forex',  label: 'AUD/USD', name: 'Aussie',   binance: null, kraken: 'AUDUSD', dec: 5, size: 'fx',    color: '#2962ff' },
-    usdcad: { group: 'Forex',  label: 'USD/CAD', name: 'Loonie',   binance: null, kraken: 'USDCAD', dec: 5, size: 'fxquote', color: '#2962ff' },
-    usdchf: { group: 'Forex',  label: 'USD/CHF', name: 'Swissy',   binance: null, kraken: 'USDCHF', dec: 5, size: 'fxquote', color: '#2962ff' },
+    eurusd: { group: 'Forex', md: 'eurusd',  label: 'EUR/USD', name: 'Euro',     binance: null, kraken: 'EURUSD', bitstamp: 'eurusd', dec: 5, size: 'fx',    color: '#2962ff' },
+    gbpusd: { group: 'Forex', md: 'gbpusd',  label: 'GBP/USD', name: 'Pound',    binance: null, kraken: 'GBPUSD', bitstamp: 'gbpusd', dec: 5, size: 'fx',    color: '#2962ff' },
+    audusd: { group: 'Forex', md: 'audusd',  label: 'AUD/USD', name: 'Aussie',   binance: null, kraken: 'AUDUSD', dec: 5, size: 'fx',    color: '#2962ff' },
+    usdcad: { group: 'Forex', md: 'usdcad',  label: 'USD/CAD', name: 'Loonie',   binance: null, kraken: 'USDCAD', dec: 5, size: 'fxquote', color: '#2962ff' },
+    usdchf: { group: 'Forex', md: 'usdchf',  label: 'USD/CHF', name: 'Swissy',   binance: null, kraken: 'USDCHF', dec: 5, size: 'fxquote', color: '#2962ff' },
   };
   let instKey = null;
   try { instKey = new URLSearchParams(location.search).get('s'); } catch (e) {}
@@ -3225,8 +3225,20 @@ function msNextSetup(bars, A) {
     krakenChain = run.catch(() => {}).then(() => new Promise((r) => setTimeout(r, 1100)));
     return run;
   }
+  // OANDA (broker-grade spot gold and forex) through the site's own /md proxy, which holds the token. Only on the Vercel site;
+  // a 503 means no token is set, so the page stops asking and uses the exchange feeds below for the rest of the visit.
+  const MD = { base: /^https?:$/.test(location.protocol) && !/github\.io$/.test(location.hostname) ? '/md/' : null, on: null };
+  async function mdBars(I, tf, q) {
+    if (!I.md || !MD.base || MD.on === false) return null;
+    try {
+      const j = await getJSON(`${location.origin}${MD.base}bars?sym=${I.md}&tf=${tf.id}&${q}`);
+      if (j && Array.isArray(j.bars) && j.bars.length) { MD.on = true; return j.bars; }
+    } catch (e) { if (/ 503$/.test(e.message)) MD.on = false; }
+    return null;
+  }
   async function fetchBars(tf, I = INST, lim = BARS, urgent = false) {
     const errs = [];
+    { const b = await mdBars(I, tf, `n=${lim}`); if (b) return { src: 'OANDA', bars: b }; }
     if (I.binance) try {
       let out = [], end = null;
       while (out.length < lim) {
@@ -3254,6 +3266,7 @@ function msNextSetup(bars, A) {
     throw new Error((errs.length > 1 && errs.every((m) => /failed to fetch|load failed|networkerror/i.test(m)) ? errs.map((m) => m.split(':')[0]).join(', ') + ': no response' : errs.join(' · ')) || 'No data source answered');
   }
   async function refreshSpot() {
+    if (G.source === 'OANDA') { if (G.offset) { G.offset = 0; Object.values(panes).forEach((p) => p.raw && p.rebuild(true)); } return; }   // OANDA is already XAU/USD spot
     try {
       const j = await getJSON('https://api.gold-api.com/price/XAU');
       if (j && isFinite(+j.price)) { G.spot = +j.price; recomputeOffset(); }
@@ -3877,9 +3890,11 @@ function msNextSetup(bars, A) {
       const tick = async () => {
         try { const r = await fetchBars(tf); const P = panes[tf.id]; P.raw = r.bars; P.rebuild(true); $('ms-updated').textContent = new Date().toLocaleTimeString(); }
         catch (e) { /* keep last candles */ }
-        if (!G.csv) setTimeout(tick, tf.poll);
+        if (!G.csv) setTimeout(tick, iv);
       };
-      setTimeout(tick, tf.poll);
+      // OANDA answers from the edge cache, so the fast timeframes can refresh every few seconds
+      const iv = G.source === 'OANDA' ? Math.min(tf.poll, { '1m': 3e3, '5m': 5e3, '15m': 10e3 }[tf.id] || tf.poll) : tf.poll;
+      setTimeout(tick, iv);
     });
   }
   function setStatus() {
@@ -3888,13 +3903,15 @@ function msNextSetup(bars, A) {
     if (G.live) { dot.className = 'ms-live-dot on'; txt.textContent = `Live · ${G.source} stream`; }
     else if (polling) { dot.className = 'ms-live-dot poll'; txt.textContent = `Live · ${G.source} (refreshing)`; }
     else { dot.className = 'ms-live-dot'; txt.textContent = 'Connecting…'; }
-    const srcSym = { Binance: INST.binance, Kraken: INST.kraken, Bitstamp: INST.bitstamp }[G.source] || '';
+    const srcSym = { Binance: INST.binance, Kraken: INST.kraken, Bitstamp: INST.bitstamp, OANDA: INST.label + ' mid' }[G.source] || '';
     const now = new Date(), wd = now.getUTCDay(), hr = now.getUTCHours();
     const fxClosed = INST.group === 'Forex' && marketClosed();
-    $('ms-feed-note').textContent = INST.spot
+    $('ms-feed-note').textContent = INST.spot && G.source === 'OANDA'
+      ? `${marketClosed() ? 'Spot gold is closed for the weekend (Friday 21:00 to Sunday 23:00 UTC), so candles stay flat until it reopens. ' : ''}Gold candles are OANDA XAU/USD spot (mid of bid and ask), the market the Traders' levels are set on. Times in your local zone. COMEX futures (MGC/GC) trade a few dollars above spot.`
+      : INST.spot
       ? `${marketClosed() ? 'Weekend window for spot gold (the Traders stop on Friday at 21:00 UTC and wait until Sunday 23:00 UTC); PAXG keeps trading, so setups now are noise and the Traders skip them. ' : ''}Gold candles from ${G.source} PAXG/USD (1 token = 1 oz of LBMA gold), shifted ${G.offset >= 0 ? '+' : ''}${fmt(G.offset)} onto XAU/USD spot from gold-api.com. Times in your local zone. COMEX futures (MGC/GC) trade a few dollars above spot.`
       : INST.group === 'Forex'
-        ? `${fxClosed ? 'Forex is closed for the weekend, so candles stay flat until it reopens Sunday evening (UTC). ' : ''}${INST.label} candles from ${G.source} (${srcSym}). Exchange forex can differ slightly from your broker's quotes. Times in your local zone.`
+        ? `${fxClosed ? 'Forex is closed for the weekend, so candles stay flat until it reopens Sunday evening (UTC). ' : ''}${INST.label} candles from ${G.source} (${srcSym}). ${G.source === 'OANDA' ? 'Broker interbank prices (mid of bid and ask).' : 'Exchange forex can differ slightly from your broker\'s quotes.'} Times in your local zone.`
         : `${INST.label} candles from ${G.source} (${srcSym}). Times in your local zone.`;
   }
 
@@ -3912,7 +3929,7 @@ function msNextSetup(bars, A) {
     }
     G.source = ok[0].value.src;
     res.forEach((r, k) => { if (r.status === 'fulfilled') { panes[ACTIVE[k].id].raw = r.value.bars; } });
-    if (INST.spot) await refreshSpot();
+    if (INST.spot && G.source !== 'OANDA') await refreshSpot();
     const m1 = panes['1m'].raw;
     if (G.spot && m1) { const off = G.spot - m1[m1.length - 1].close; if (Math.abs(off) < 150) G.offset = off; }
     ACTIVE.forEach((tf) => { const P = panes[tf.id]; if (P.raw) P.rebuild(false); });
@@ -4219,7 +4236,7 @@ function msNextSetup(bars, A) {
     if (I.spot) {
       const m1 = res[TFS.findIndex((t) => t.id === '1m')];
       if (SCAN.spot === null) { try { const j = await getJSON('https://api.gold-api.com/price/XAU'); SCAN.spot = +j.price || 0; } catch (e) { SCAN.spot = 0; } }
-      if (SCAN.spot && m1.status === 'fulfilled') { const o = SCAN.spot - m1.value.bars[m1.value.bars.length - 1].close; if (Math.abs(o) < 150) off = o; }
+      if (SCAN.spot && m1.status === 'fulfilled' && m1.value.src !== 'OANDA') { const o = SCAN.spot - m1.value.bars[m1.value.bars.length - 1].close; if (Math.abs(o) < 150) off = o; }
     }
     const src = {};
     res.forEach((r, k) => {
@@ -4841,8 +4858,8 @@ function msNextSetup(bars, A) {
     GV.busy = true;
     try {
       if (!GV.bars || Date.now() - GV.at > 5 * 60e3) {
-        GV.bars = (await fetchBars(tf, I, 300)).bars; GV.at = Date.now();
-        try { const j = await getJSON('https://api.gold-api.com/price/XAU'), o = +j.price - GV.bars[GV.bars.length - 1].close; GV.off = isFinite(o) && Math.abs(o) < 150 ? o : (G.offset || 0); } catch (e) { GV.off = G.offset || 0; }
+        const gr = await fetchBars(tf, I, 300); GV.bars = gr.bars; GV.at = Date.now();
+        if (gr.src === 'OANDA') GV.off = 0; else try { const j = await getJSON('https://api.gold-api.com/price/XAU'), o = +j.price - GV.bars[GV.bars.length - 1].close; GV.off = isFinite(o) && Math.abs(o) < 150 ? o : (G.offset || 0); } catch (e) { GV.off = G.offset || 0; }
       }
       const th = THEMES[G.theme] || THEMES.dark;
       if (!GV.chart) {
@@ -5119,6 +5136,7 @@ function msNextSetup(bars, A) {
     const tf = TFS.find((t) => t.id === '1h'); return { tf, pad: 40 * tf.sec, start, end };
   }
   async function rangeBars(tf, I, from, to) {
+    { const b = await mdBars(I, tf, `from=${Math.floor(from)}&to=${Math.ceil(to)}`); if (b) { b.src = 'OANDA'; return b; } }
     const map = (k) => ({ time: k[0] / 1000, open: +k[1], high: +k[2], low: +k[3], close: +k[4] });
     if (I.binance) try {
       let out = [], st = Math.floor(from) * 1000; const end = Math.ceil(to) * 1000;
@@ -5135,7 +5153,7 @@ function msNextSetup(bars, A) {
       const rows = j && j.data && j.data.ohlc;
       if (Array.isArray(rows) && rows.length) return rows.map((k) => ({ time: +k.timestamp, open: +k.open, high: +k.high, low: +k.low, close: +k.close })).sort((a, b) => a.time - b.time);
     } catch (e) { /* next source */ }
-    return (await fetchBars(tf, I, 720, true)).bars;
+    const r = await fetchBars(tf, I, 720, true); r.bars.src = r.src; return r.bars;
   }
   async function paxgWindow(W) {   // Binance PAXGUSDT (the replay's own source) for [start - pad, end + pad]
     const a = Math.floor(W.start - W.pad) * 1000, iv = W.tf.binance;
@@ -5204,7 +5222,7 @@ function msNextSetup(bars, A) {
     // gold: the candles are PAXG, the trade's levels are XAU/USD spot (the Trader shifts PAXG by the spot basis), so shift
     // the candles the same way or the entry, stop and target sit a few dollars off the price they were set on
     let off = 0;
-    if (I.spot && bars.length && !rpGold) {
+    if (I.spot && bars.length && !rpGold && bars.src !== 'OANDA') {
       try { const j = await getJSON('https://api.gold-api.com/price/XAU'), o = +j.price - bars[bars.length - 1].close; if (isFinite(o) && Math.abs(o) < 150) off = o; }
       catch (e) { if (INST === I) off = G.offset || 0; }
       if (req !== TV.req) return;
