@@ -16,11 +16,12 @@ export const MARKETS = {
   es:  { sym: 'ES=F',  cnbc: ['@SP.1', '@ES.1'],  label: 'S&P 500',      short: 'ES',  tick: 0.25, dec: 2 },
   ym:  { sym: 'YM=F',  cnbc: ['@DJ.1', '@YM.1'],  label: 'Dow Jones',    short: 'YM',  tick: 1,    dec: 0 },
   rty: { sym: 'RTY=F', cnbc: ['@TFS.1', '@RTY.1'], label: 'Russell 2000', short: 'RTY', tick: 0.1, dec: 1 },
-  // skill §26 (owner, 7 Nov): gold futures and two FX majors, each with its own A-setup rule (aRule) from 2019-26 history
+  // skill §26 (owner, 7 Nov): gold futures with its own A-setup rule (aRule) from 2019-26 history. EUR/USD and GBP/USD were
+  // tracked 7 Nov and removed the same day (owner: "remove gbpusd and eurusd").
   gc:  { sym: 'GC=F', cnbc: ['@GC.1'], label: 'Gold', short: 'GC', tick: 0.1, dec: 1, aRule: 'gold' },
-  eurusd: { sym: 'EURUSD=X', cnbc: ['EUR='], label: 'EUR/USD', short: 'EURUSD', tick: 0.00001, dec: 5, aRule: 'london' },
-  gbpusd: { sym: 'GBPUSD=X', cnbc: ['GBP='], label: 'GBP/USD', short: 'GBPUSD', tick: 0.00001, dec: 5, aRule: 'none' },
 };
+// owner (7 Nov): grade F signals (total < 3 of 10) are not recorded at all
+export const MIN_GRADE = 3;
 export const P = { piv: 3, look: 96, vmax: 6, rr: 3, trail: [2, 1.5], mark: 2, holdH: 36, maxAtr: 8, fresh: 3 * 3600 };
 const UA = 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36';
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
@@ -149,8 +150,6 @@ const aIndex = (g) => (aBase(g) && (g.feat.atrR == null || (g.feat.atrR >= RISK_
 // signals only (+28.6 | +11.7 | +14.9R, 7 of 8 years positive). GBP/USD: no rule held in every window, so no A-setups (tracked only).
 const RULES = {
   gold: (g) => !!g.feat && g.side > 0 && g.feat.atrR != null && g.feat.atrR >= RISK_FLOOR && g.feat.atrR < RISK_CAP,
-  london: (g) => !!g.feat && g.feat.session === 'London',
-  none: () => false,
 };
 export const isASetup = (g, mk) => { const r = mk && MARKETS[mk] && MARKETS[mk].aRule; return r ? RULES[r](g) : aIndex(g); };
 // skill §27: index A-setups are sized by the room to the draw on liquidity (DOL, the next untaken high/low) at the signal:
@@ -192,7 +191,7 @@ async function main() {
       const sig = signals(H, D, 1, M.tick).concat(signals(H, D, -1, M.tick)).sort((a, b) => a.close - b.close);
       for (const g of sig) {
         const id = `${key}-${g.side > 0 ? 'b' : 's'}-${g.t}`;
-        if (trades.some((x) => x.id === id) || now - g.close > P.fresh) continue;
+        if (trades.some((x) => x.id === id) || now - g.close > P.fresh || g.grade.total < MIN_GRADE) continue;
         const aset = isASetup(g, key);
         if (trades.some((x) => x.market === key && x.status === 'open' && (!aset || x.aset))) continue;   // one open per market; an A-setup is only blocked by another A-setup
         const s = g.side, entry = f(price), r0 = Math.abs(entry - g.stop);

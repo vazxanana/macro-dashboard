@@ -355,3 +355,9 @@ The course pairs an H1 setup with an M5/M1 entry. Tested on index A-setups (cash
   - The back-fill only ran before the first bar and calibrated on the 20 days after it, so NQ / ES / RTY / GC started only in April-May ("overlap too small").
   - The replay now keeps CNBC's continuous part (the last run of 10-day chunks with >= 50 bars) and back-fills everything earlier.
   - Gold back-fills from council-data spot gold 1m (xau-jan-jun.json.gz, 20 Dec 2025 → 7 Jun 2026). RTY has no back-fill source.
+
+## 31. Markets and grades trimmed (7 Nov 2026, owner)
+- EUR/USD and GBP/USD removed from the tracker, the replay and the desk (owner: "remove gbpusd and eurusd"). §26's FX results
+  stay above as history only; the gold (GC) rule is unchanged.
+- Grade F signals (total < 3 of 10, `MIN_GRADE`) are no longer recorded by the tracker or the replay, and older F records are
+  filtered on the desk. Cost on the Aug 2025 – Oct 2026 replay: 14 signals, −4.6R in all; one was an A-setup (+2.5R).
