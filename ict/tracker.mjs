@@ -9,6 +9,7 @@
 // second variant); out after 36 trading hours (36 closed H1 candles; skill §21). Sells mirror. One open trade per market.
 import fs from 'node:fs';
 import path from 'node:path';
+import { cmeShut } from './calendar.mjs';
 
 const DATA = process.argv[2] || 'data/ict';
 export const MARKETS = {
@@ -54,23 +55,14 @@ const etStamp = (t) => { const o = {}; for (const p of nyFmt.formatToParts(new D
 // straddles the 18:00 reopen), which made a fake H1 candle each day
 const etH = new Intl.DateTimeFormat('en-US', { timeZone: 'America/New_York', hour: 'numeric', hourCycle: 'h23' });
 export const inHalt = (t) => +etH.format(new Date(t * 1000)) % 24 === 17;
-// 7 Nov (owner OK): CME shut for the weekend (Fri 17:00 - Sun 18:00 New York) or a full-day holiday (New Year, Good Friday,
-// Christmas, until the 18:00 reopen). CNBC prints flat candles (open = high = low = close = Friday's last price) into these
-// hours: 7-10 a market in 3 weeks of H1 on 7 Nov. They cannot sweep, but they add fake bars between real ones.
-const nyDay = new Intl.DateTimeFormat('en-US', { timeZone: 'America/New_York', year: 'numeric', month: '2-digit', day: '2-digit', weekday: 'short', hour: '2-digit', minute: '2-digit', hourCycle: 'h23' });
-const ymd = (y, m, d) => new Date(Date.UTC(y, m, d)).toISOString().slice(0, 10);
-const obs = (y, m, d) => { const w = new Date(Date.UTC(y, m, d)).getUTCDay(); return ymd(y, m, d + (w === 6 ? -1 : w === 0 ? 1 : 0)); };
-function goodFriday(y) { const a = y % 19, b = Math.floor(y / 100), c = y % 100, d = Math.floor(b / 4), e = b % 4, f = Math.floor((b + 8) / 25), g = Math.floor((b - f + 1) / 3),
-  h = (19 * a + b - d - g + 15) % 30, i = Math.floor(c / 4), k = c % 4, l = (32 + 2 * e + 2 * i - h - k) % 7, m = Math.floor((a + 11 * h + 22 * l) / 451), mo = Math.floor((h + l - 7 * m + 114) / 31), da = ((h + l - 7 * m + 114) % 31) + 1;
-  return new Date(Date.UTC(y, mo - 1, da) - 2 * 86400e3).toISOString().slice(0, 10); }
-const SHUT = new Map(), shutDays = (y) => SHUT.get(y) || SHUT.set(y, new Set([obs(y, 0, 1), goodFriday(y), obs(y, 11, 25)])).get(y);
-export function cmeShut(t) {
-  const o = {}; for (const p of nyDay.formatToParts(new Date(t * 1000))) o[p.type] = p.value;
-  const m = (+o.hour % 24) * 60 + +o.minute, wd = o.weekday;
-  if (wd === 'Sat' || (wd === 'Fri' && m >= 1020) || (wd === 'Sun' && m < 1080)) return true;
-  return m < 1080 && shutDays(+o.year).has(`${o.year}-${o.month}-${o.day}`);
-}
-const closedBar = (t) => inHalt(t) || cmeShut(t);
+// 7 Nov (owner OK): CME shut for the weekend (Fri 17:00 - Sun 18:00 New York), a full-day holiday (New Year, Good Friday,
+// Christmas, from the eve's 17:00 until the 18:00 reopen) or a holiday EARLY CLOSE (13:00 New York until the 18:00 reopen:
+// MLK, Presidents', Memorial, Juneteenth, 3-4 July, Labor Day, Thanksgiving and the day after, Christmas Eve). CNBC prints flat
+// candles (open = high = low = close = the last price) into all of these hours: 7-10 a market in 3 weeks of H1 on 7 Nov, four
+// flat H1 candles on the Juneteenth 2026 afternoon. They cannot sweep, but they add fake bars between real ones (shorter real
+// holds, diluted ATR, fake pivots). The calendar is ict/calendar.mjs (derived from the CME rule set, no network).
+export { cmeShut };
+export const closedBar = (t) => inHalt(t) || cmeShut(t);
 export async function cnbcBars(sym, iv, from, to) {
   // audit (7 Nov): CNBC anchors intraday bars at the request's start minute (a run at hh:37 got 5m bars at :02/:07/...),
   // so H1 candles built from them were shifted and changed from run to run; start on the hour
