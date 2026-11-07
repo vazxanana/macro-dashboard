@@ -5204,5 +5204,17 @@ function msNextSetup(bars, A) {
     if (st) { const m = Math.round(age / 60000), t = `Stale: no new price for ${m < 1 ? 'under a minute' : m + ' min'} (the market may be closed or the feed paused)`; setTimeout(() => { if (dot.classList.contains('stale')) { dot.title = t; dot.setAttribute('aria-label', t); } }, 0); } }
   setInterval(check, 15000); window.__msStaleCheck = check; })();
 </script>
+<script>
+/* Calendars: arrow keys move between days (left/right a day, up/down a week), Home/End jump to the first/last day */
+(() => { const wire = (id, sel) => { const g = document.getElementById(id); if (!g) return;
+  g.addEventListener('keydown', (ev) => { const k = ev.key; if (!['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown', 'Home', 'End'].includes(k)) return;
+    const days = [...g.querySelectorAll(sel)], i = days.indexOf(ev.target.closest(sel)); if (i < 0) return;
+    const step = { ArrowLeft: -1, ArrowRight: 1, ArrowUp: -7, ArrowDown: 7 }[k];
+    let j = k === 'Home' ? 0 : k === 'End' ? days.length - 1 : i + step;
+    const dir = k === 'Home' ? 1 : k === 'End' ? -1 : Math.sign(step);
+    while (j >= 0 && j < days.length && days[j].disabled) j += (k === 'Home' || k === 'End') ? dir : dir;
+    if (j < 0 || j >= days.length || days[j].disabled) return; ev.preventDefault(); days[j].focus(); }); };
+  wire('ms-cal', 'button.cal-d'); wire('ict-cal', 'button.ict-cal-d'); wire('g-cal', 'button.cal-d'); })();
+</script>
 </body>
 </html>
