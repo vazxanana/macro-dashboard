@@ -361,3 +361,12 @@ The course pairs an H1 setup with an M5/M1 entry. Tested on index A-setups (cash
   stay above as history only; the gold (GC) rule is unchanged.
 - Grade F signals (total < 3 of 10, `MIN_GRADE`) are no longer recorded by the tracker or the replay, and older F records are
   filtered on the desk. Cost on the Aug 2025 – Oct 2026 replay: 14 signals, −4.6R in all; one was an A-setup (+2.5R).
+
+## 32. Break-even at +1.5R on index futures (7 Nov 2026, owner: "can we improve the ict stats?")
+Tested on index A-setups (cash NQ/ES/YM 2023-24 | 2025-26 | NQ futures 2023-25 | futures replay Aug 2025 – Oct 2026, costs in):
+- Live trail: +37.7 dd 7.6 | +48.6 dd 10.8 | +42.1 dd 5.4 | +19.5 dd 16.2.
+- Stop to entry at +1.5R, then the same trail: +37.8 dd 8.0 | +51.1 dd 9.4 | +44.3 dd 5.4 | +26.6 dd 11.3 → adopted (`P.be`).
+- On gold buys it cost R (2023-24 +35.5 → +29.1, 2025-26 +33.8 → +29.9), so gold keeps the plain trail (`be` null for aRule markets).
+- Rejected the same day: BE at +1R, half off at 1 / 1.5 / 2R, grade >= 8 (2025-26 flat), weekday or hour skips (skipping 07-09 ET
+  helped the three history sets but failed the replay), speed / close-location filters, previous-day sweep only, zone match,
+  buys or sells only, max 1-2 A-setups a day.
