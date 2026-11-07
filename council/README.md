@@ -21,6 +21,7 @@ Supporting scripts:
 | `backtest.mjs` | The daily replay: the last 30 days of real candles through the Trader's engine and rules → `backtest.json`. |
 | `fidelity.mjs` | Replay fidelity check: does the replay produce the same signals and outcomes as the live Trader on the same days? → `research/fidelity.json`. |
 | `proposals.mjs` | Builds the Coach's owner-facing proposals from `backtest.json` (never applies them). |
+| `coach.mjs` | The Coach's evolution helpers: shrunk expectancy, champion/challenger trials for its filter rules, the change ledger and its `analysis/latest.md` block. |
 | `analyst.mjs` | Builds the Live Scalp rule check block. |
 | `clean.mjs` | Bad-print cleaner shared by the Trader and the replay, so both read the same candles. |
 | `review.mjs` | Post-mortem of every closed trade (`pm` on the trade). |
@@ -78,8 +79,19 @@ drops, re-tests or overwrites those (`userOwned` in `trader.mjs`, checked by bot
 | pauses | a setup ≤ 7 days, a market ≤ 3 days |
 
 Pauses are switched off by the owner (`no-pause`): the Coach records what it would have paused in `config.wouldPause` instead.
-Blocked signals are always followed as shadow trades (`shadow: true`, `blockedBy`), so every rule can be judged. A learned filter
-is dropped when its blocked trades make more than +0.2R over 5+, and re-tested after 21 days.
+Blocked signals are always followed as shadow trades (`shadow: true`, `blockedBy`), so every rule can be judged.
+
+**How the Coach learns its filters (`coach.mjs`).** A D1 / structure / session filter is added or dropped only when the group it
+acts on passes `solid()` (30+ trades, |t| ≥ 2, the same sign in both halves) AND its shrunk expectancy is at least 0.10R away
+from 0 (a Normal prior centred on 0R; its spread tau estimated from all setup × condition groups, empirical Bayes, clamped
+0.05–0.5R). Each such change is a **champion/challenger trial** (`config.coachTrials`): the new rule trades, the old one is
+followed as a shadow on the same recorded signals; after 20 forward signals where the two disagree the change stays if its
+shrunk edge is ≥ +0.05R a signal, otherwise (or after 60 days without 20) the old rule comes back by itself (`by: "coach-trial"`,
+reason in `why`). A rule under trial or changed in the last 14 days is not touched again. Setups that trade live
+(`config.focusSetups`) and owner rules are never changed by this learner: proposals only.
+**Change ledger.** Every Coach change in `history` gets an entry in `coach.json` → `ledger` (evidence, before/after numbers on the
+sample it used, trial progress, and 30 days later the result: champion vs challenger for trials, the scope's record before vs
+after for the rest). The Trader shows the last 20 in `analysis/latest.md` ("Coach change ledger").
 
 **Live-sleeve guard (`coach-guard`).** A setup the owner put live on every market (`config.focusSetups`, today `scalp`) goes back
 to shadow by itself once its live trades since that day lose 0.3R or more a trade over 20+ closed trades. It is logged, the date
