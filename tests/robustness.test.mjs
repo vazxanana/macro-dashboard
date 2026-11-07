@@ -158,6 +158,6 @@ test('end to end on a synthetic council-data folder: writes robustness.json and 
   // missing files are skipped, not fatal
   const empty = fs.mkdtempSync(path.join(os.tmpdir(), 'rob-empty-'));
   const e = buildClaims(empty, { iters: 50, repoOut: path.join(empty, 'none') });
-  assert.ok(e.claims.every((c) => c.id === 'scalp-histdata' || c.id === 'swing-adx'));
+  assert.ok(e.claims.every((c) => ['scalp-histdata', 'swing-adx', 'ict-a-2008'].includes(c.id)))   // repo-file summaries only;
   assert.match(toMarkdown({ at: 'x', ...e }), /Swing D1 ADX band/);
 });
