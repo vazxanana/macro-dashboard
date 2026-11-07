@@ -14,7 +14,7 @@ import { shrink, ebTau, shrunkClear, ruleState, sameRule, setRule, descRule, jud
 import { buildDecay } from './decay.mjs';
 import { recordVerdicts } from './digest.mjs';   // the shared verdict record (digest.json): decay statuses each 6-hour reading
 import { cleanBars, LTF_CLEAN } from './clean.mjs';
-import { voidRoundedReplicas, historyCatchUp } from './repairs.mjs';
+import { voidRoundedReplicas, historyCatchUp, voidM30Twins } from './repairs.mjs';
 import { d1AdxFeat } from './adx.mjs';
 // paper fills (8 Nov): costs (raw R + cost-adjusted Rnet), the stale-signal shadow stat, gap-aware stops (council/fills.mjs)
 import { costModel, annotateCosts, costSummary, driftR, backfillDrift, staleStats, stopFill, exitR, fillBarAmbiguous, spotSkip } from './fills.mjs';
@@ -408,8 +408,9 @@ function dailyCycle(src, price, t) {
   return { sell: bear, entry: price, stop, t1: price + (bull ? 3 : -3) * r, closeBy: t + 8 * 3600, day: d, londonHigh: hi, londonLow: lo };
 }
 let research = rd('research.json', []);
-// One-time data repairs (7 Nov, council/repairs.mjs): void the 4 Nov rounded-price replica signals; history catch-up lines
-voidRoundedReplicas(research, config, nowISO); historyCatchUp(config, nowISO);
+// One-time data repairs (7 Nov, council/repairs.mjs): void the 4 Nov rounded-price replica signals; history catch-up lines;
+// 8 Nov: the pre-dedupe m30m1 copies of Scalp entries get status 'duplicate' (research/edge/shadow-audit)
+voidRoundedReplicas(research, config, nowISO); historyCatchUp(config, nowISO); voidM30Twins(trades, config, nowISO);
 // ─── Research setup (paper only): the trader's gold replica (3 Nov) ───
 // Rebuilt from the four marked gold trades of 2-3 Nov: a leg of at least 2 M15 ATRs in the last 3 h or 6 h; M5 (1-candle
 // swings) closes back through the last swing against the leg (the CHoCH) = the signal. Limit entry at the 30% retest from
