@@ -141,9 +141,10 @@ export function ictVariantVerdicts(replay, at = new Date().toISOString(), opt = 
   const A = replay.trades.filter((t) => t.aset && t.closed && Number.isFinite(+t.R));
   if (!A.length) return [];
   const stats = (a) => { const n = a.length, m = n ? a.reduce((s, x) => s + +x.R, 0) / n : 0, sd = n > 1 ? Math.sqrt(a.reduce((s, x) => s + (x.R - m) ** 2, 0) / (n - 1)) : 0; return { n, exp: r2(m), t: sd > 0 ? r2(m / (sd / Math.sqrt(n))) : 0 }; };
-  const out = [];
+  const out = [], paper = new Set(Array.isArray(replay.paperVariants) ? replay.paperVariants : []);
   for (const [v, L] of Object.entries(replay.shadowByVariant)) {
-    if (!Array.isArray(L)) continue;
+    // a paper-only MARKET stream (research/ict-markets.md, e.g. 'silver') trades other markets: it is not a filter of the A-setups
+    if (!Array.isArray(L) || paper.has(v) || (L.length && L.every((t) => t.paperMarket))) continue;
     // dropped = the A-setups the filter rejects. The replay tags each A-setup with every variant's verdict (t.vr, ict/replay.mjs);
     // a replay without the tags falls back to "missing from the variant's stream", which also counts trades the variant only missed
     // because its own one-open-trade rule was busy with a trade the A-rule never took

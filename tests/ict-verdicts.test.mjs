@@ -46,3 +46,11 @@ test('open trades and non-A trades are ignored; bad input gives nothing', () => 
   const rows = [mk(1, -1, true), { ...mk(2, -1, true), closed: null }, { ...mk(3, -1, true), aset: false }, mk(4, 1, false)];
   const [v] = ictVariantVerdicts(replay(rows)); assert.equal(v.n, 1);
 });
+test('a paper-only market stream (research/ict-markets.md) is not judged as a filter of the A-setups', () => {
+  const rows = []; for (let i = 0; i < 60; i++) rows.push(mk(i, i % 2 ? 1 : -1, i % 5 === 0));
+  const silver = [{ id: 'xag-b-1-silver-r', market: 'xag', shadow: true, variant: 'silver', paperMarket: true, aset: true, closed: 5, R: 1 }];
+  const r = { ...replay(rows), paperVariants: ['silver'] }; r.shadowByVariant.silver = silver;
+  assert.deepEqual(ictVariantVerdicts(r).map((v) => v.value), ['nofri']);
+  r.shadowByVariant.silver = []; assert.deepEqual(ictVariantVerdicts(r).map((v) => v.value), ['nofri'], 'empty stream skipped by the listed name');
+  delete r.paperVariants; r.shadowByVariant.silver = silver; assert.deepEqual(ictVariantVerdicts(r).map((v) => v.value), ['nofri'], 'records flagged paperMarket skipped');
+});

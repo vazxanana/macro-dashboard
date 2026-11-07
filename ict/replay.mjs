@@ -6,7 +6,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import zlib from 'node:zlib';
-import { MARKETS, P, MIN_GRADE, cnbcBars, agg, signals, letter, isASetup, isAPlus, sizeOf, SHADOW, isDip, VARIANTS, variantRule, variantTags, loadMeridian } from './tracker.mjs';
+import { MARKETS, P, MIN_GRADE, cnbcBars, agg, signals, letter, isASetup, isAPlus, sizeOf, SHADOW, isDip, VARIANTS, variantRule, variantTags, loadMeridian, SHADOW_MARKETS, mdBars, dailyNY } from './tracker.mjs';
 
 const DATA = process.argv[2] || 'data/ict';
 const FROM = Date.parse(process.argv[3] || '2025-08-01T00:00:00Z') / 1000;   // owner, 7 Nov: 5 more months (was 1 Jan 2026)
@@ -78,6 +78,19 @@ async function history(M) {
   throw new Error(`no CNBC history for ${M.short}`);
 }
 
+// paper-only markets: OANDA mid 1h (signals, D1 at the 17:00 New York rollover) and 5m (exits) through the proxy, in windows of
+// 4999 candles (OANDA's cap); 5m counts as exit data on days with >= 200 candles, as history() does
+async function paperHistory(M) {
+  const get = async (tf, sec, from) => { let a = [];
+    for (let t = from; t < now; t += 4999 * sec) { a = a.concat(await mdBars(M.md, tf, `from=${t}&to=${Math.min(now, t + 4999 * sec)}`)); await sleep(200); }
+    return dedupe(a); };
+  const H = (await get('1h', 3600, FROM - 400 * 86400)).filter((b) => b.time + 3600 <= now), m5 = (await get('5m', 300, FROM - 2 * 86400)).filter((b) => b.time + 300 <= now);
+  const D = dailyNY(H).filter((b) => b.time + 86400 <= now);
+  const days = new Map(); for (const b of m5) { const d = Math.floor(b.time / 86400); days.set(d, (days.get(d) || 0) + 1); }
+  if (H.length < 1000 || D.length < 60) throw new Error(`md ${M.md}: short history (H1 ${H.length}, D1 ${D.length})`);
+  return { H, m5, D, m5days: new Set([...days.entries()].filter(([, n]) => n >= 200).map(([d]) => d)) };
+}
+
 // audit (7 Nov): a hole in the candle history longer than any exchange holiday (4 days) inside a trade's window means the
 // exit cannot be known (gold before CNBC's continuous history had holes of 1-3 weeks: one trade was "held" 17 days)
 export const MAX_GAP = 4 * 86400;
@@ -141,6 +154,22 @@ if (process.argv[1] && process.argv[1].endsWith('replay.mjs')) {
         } catch (e) { (out.shadowErrors = out.shadowErrors || {})[`${key}-${v}`] = String(e.message || e); } }
       console.log(key, JSON.stringify(out.src[key]), 'signals', sig.length, 'trades', out.trades.filter((x) => x.market === key).length);
     } catch (e) { out.errors[key] = String(e.message || e); console.log(key, out.errors[key]); }
+  }
+  // paper-only markets (SHADOW_MARKETS, research/ict-markets.md): OANDA mid history through the site's market-data proxy, the market's
+  // own variant stream in out.shadowByVariant[variant] (gold-rule sizing and exits, one open trade at a time). Never in out.trades.
+  out.paperVariants = Object.values(SHADOW_MARKETS).map((M) => M.variant);   // variants that are other markets, not filters of the A-stream
+  for (const [key, M] of Object.entries(SHADOW_MARKETS)) {
+    const v = M.variant;
+    try {
+      const src = await paperHistory(M);
+      (out.shadowSrc = out.shadowSrc || {})[key] = { sym: `oanda ${M.md}`, h1: src.H.length, m5: src.m5.length, d1: src.D.length };
+      const sig = signals(src.H, src.D, 1, M.tick).concat(signals(src.H, src.D, -1, M.tick)).filter((g) => g.close >= FROM && g.grade.total >= MIN_GRADE).sort((a, b) => a.close - b.close);
+      let busy = 0;
+      for (const g of sig) { if (g.close < busy || !variantRule(v, g, key, src)) continue; const t = simulate(g, M, key, src); if (!t) continue;
+        delete t.path; Object.assign(t, { id: t.id.replace(/-r$/, `-${v}-r`), shadow: true, variant: v, paperMarket: true, aset: true, aplus: false, size: 1 });
+        out.shadowByVariant[v].push(t); busy = t.closed || Infinity; }
+      console.log(key, 'paper', JSON.stringify(out.shadowSrc[key]), 'signals', sig.length, 'trades', out.shadowByVariant[v].length);
+    } catch (e) { (out.shadowErrors = out.shadowErrors || {})[`${key}-${v}`] = String(e.message || e); console.log(key, 'paper', String(e.message || e)); }
   }
   out.trades.sort((a, b) => a.opened - b.opened);
   const C = out.trades.filter((x) => x.closed);

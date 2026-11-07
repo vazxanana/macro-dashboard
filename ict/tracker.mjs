@@ -207,10 +207,43 @@ export const loadMeridian = async () => (meridian = meridian || (await import('.
 export const h1Trend = (g, H, ms) => { const i = H.findLastIndex((b) => b.time + 3600 <= g.close); if (i < SHADOW.h1opp.min) return 0;
   return ms(H.slice(Math.max(0, i - SHADOW.h1opp.look + 1), i + 1), SHADOW.h1opp.N).trend; };
 export const isH1Opp = (g, mk, H, ms) => SHADOW.h1opp.markets.includes(mk) && aRecorded(g, mk) && h1Trend(g, H, ms) !== g.side;
-export const variantRule = (v, g, mk, ctx) => (v === 'nofri' ? isNoFri(g, mk) : v === 'h1opp' ? isH1Opp(g, mk, ctx.H, ctx.ms) : v === 'dip' ? isDip(g, mk, ctx.D) : false);
-// each variant's verdict on one signal, stored on the replay's A-setups (vr) so the Coach can tell the trades a filter rejects from the
-// ones its stream only missed while busy (council/proposals.mjs ictVariantVerdicts); a tag, it changes no record
-export const variantTags = (g, mk, ctx) => Object.fromEntries(VARIANTS.map((v) => [v, !!variantRule(v, g, mk, ctx)]));
+// PAPER-ONLY MARKETS (research/ict-markets.md, 7 Nov 2026): markets where the UNCHANGED A-rule passed the market-expansion gate (n >= 30,
+// t >= 2, positive in both halves of 1 Aug 2025 - 7 Nov 2026, after costs). They are NOT in MARKETS, so they never reach trades.json,
+// the snapshot, bars.json, alerts or the cTrader mirror: each runs its own shadow variant stream (shadow.json .variants[variant],
+// replay.json .shadowByVariant[variant]), records flagged shadow: true + variant. The owner decides on anything live.
+//  'silver' = spot silver XAG/USD, OANDA mid candles through the site's own proxy (api/bars.js, the data the research used), under
+//    GC's gold rule (buys, stop 0.3-0.75x the daily ATR, size 1, no break-even): +0.41R a trade net over 82, t 2.02, halves +28.3R /
+//    +5.4R, random silver buys +0.11R. Caveat: 2018-23 lost (research/edge/ict-universe), so it may be the 2025-26 silver rally.
+export const SHADOW_MARKETS = { xag: { md: 'xag', label: 'Silver (spot)', short: 'XAG', tick: 0.001, dec: 4, aRule: 'gold', variant: 'silver' } };
+SHADOW.silver = { markets: ['xag'] };
+VARIANTS.push('silver');
+export const PAPER_VARIANTS = new Set(Object.values(SHADOW_MARKETS).map((M) => M.variant));
+export const isPaperA = (g, mk) => !!SHADOW_MARKETS[mk] && !!g.grade && g.grade.total >= MIN_GRADE && RULES[SHADOW_MARKETS[mk].aRule](g);
+const paperRule = (v, g, mk) => !!SHADOW_MARKETS[mk] && SHADOW_MARKETS[mk].variant === v && isPaperA(g, mk);
+export const variantRule = (v, g, mk, ctx) => (v === 'nofri' ? isNoFri(g, mk) : v === 'h1opp' ? isH1Opp(g, mk, ctx.H, ctx.ms) : v === 'dip' ? isDip(g, mk, ctx.D) : paperRule(v, g, mk));
+// each filter variant's verdict on one signal, stored on the replay's A-setups (vr) so the Coach can tell the trades a filter rejects from the
+// ones its stream only missed while busy (council/proposals.mjs ictVariantVerdicts); a tag, it changes no record. Paper-market variants
+// (SHADOW_MARKETS) are other markets, not filters: never tagged, so the live A-setup records stay exactly as they were
+export const variantTags = (g, mk, ctx) => Object.fromEntries(VARIANTS.filter((v) => !PAPER_VARIANTS.has(v)).map((v) => [v, !!variantRule(v, g, mk, ctx)]));
+// OANDA mid candles for the paper-only markets via the site's market-data proxy (complete candles only, 17:00 New York hour dropped
+// like the futures feed); D1 = the 17:00 New York (FX/metals) day built from those H1 candles, stamped so time + 86400 = its close
+export const MD_BARS = process.env.ICT_MD_BARS || 'https://meridianx.dev/md/bars';
+export async function mdBars(sym, tf, q) {
+  const r = await fetch(`${MD_BARS}?sym=${encodeURIComponent(sym)}&tf=${tf}&${q}`, { headers: { 'User-Agent': UA, Accept: 'application/json' }, signal: AbortSignal.timeout(30000) });
+  const j = await r.json().catch(() => null);
+  if (!r.ok || !j || !Array.isArray(j.bars)) throw new Error(`md ${sym} ${tf}: ${(j && j.error) || `HTTP ${r.status}`}`);
+  return j.bars.filter((b) => !b.live && [b.open, b.high, b.low, b.close, b.time].every((v) => isFinite(v) && v > 0) && !inHalt(b.time))
+    .map((b) => ({ time: b.time, open: +b.open, high: Math.max(b.high, b.open, b.close), low: Math.min(b.low, b.open, b.close), close: +b.close })).sort((a, b) => a.time - b.time);
+}
+const NY_OFF = new Intl.DateTimeFormat('en-US', { timeZone: 'America/New_York', timeZoneName: 'shortOffset' });
+const nyOff = (t) => (NY_OFF.formatToParts(new Date(t * 1000)).find((x) => x.type === 'timeZoneName').value.includes('-4') ? 4 : 5);
+export function dailyNY(H) {
+  const out = []; let cur = null, key = null;
+  for (const b of H) { const off = nyOff(b.time), day = Math.floor((b.time - off * 3600 + 7 * 3600) / 86400);
+    if (day !== key) { key = day; cur = { time: (day + 1) * 86400 - 7 * 3600 + off * 3600 - 86400, open: b.open, high: b.high, low: b.low, close: b.close }; out.push(cur); }
+    else { cur.high = Math.max(cur.high, b.high); cur.low = Math.min(cur.low, b.low); cur.close = b.close; } }
+  return out;
+}
 export const letter = (g) =>(g >= 10 ? 'A+' : g >= 9 ? 'A' : g >= 8 ? 'A-' : g >= 7 ? 'B+' : g >= 6 ? 'B' : g >= 5 ? 'B-' : g >= 3 ? 'C' : 'F');
 
 // manage one open trade on the closed 5m candles (shared by the live records and the shadow 'dip' records)
@@ -319,6 +352,32 @@ async function main() {
       }
     } catch (e) { snap.errors[key] = String(e.message || e); }
     await sleep(800);
+  }
+  // 6. paper-only markets (SHADOW_MARKETS): after every live market, own feed, own try; they only ever write their own variant
+  // stream in shadow.json .variants (same records as step 5, gold-rule sizing and exits), never trades / snap / bars
+  for (const [key, M] of Object.entries(SHADOW_MARKETS)) {
+    const v = M.variant, V = shadow.variants[v];
+    try {
+      const h1 = await mdBars(M.md, '1h', 'n=2000'), m5all = await mdBars(M.md, '5m', 'n=5000');
+      const done = m5all.filter((b) => b.time + 300 <= now), frontier = done.length ? done.at(-1).time + 300 : now, m5 = { bars: done };
+      const H = h1.filter((b) => b.time + 3600 <= Math.min(now, frontier)), D = dailyNY(h1).filter((b) => b.time + 86400 <= now);
+      if (H.length < 200 || D.length < 60 || !done.length) throw new Error(`md ${M.md}: short history (H1 ${H.length}, D1 ${D.length}, 5m ${done.length})`);
+      const f = (x) => +(+x).toFixed(M.dec), price = done.at(-1).close;
+      for (const tr of V.trades.filter((x) => x.market === key && x.status === 'open')) manageTrade(tr, H, m5, f);
+      const sig = signals(H, D, 1, M.tick).concat(signals(H, D, -1, M.tick)).sort((a, b) => a.close - b.close);
+      for (const g of sig) {
+        const s = g.side, id = `${key}-${s > 0 ? 'b' : 's'}-${g.t}-${v}`;
+        if (V.trades.some((x) => x.id === id) || now - g.close > P.fresh || !variantRule(v, g, key, { H, D })) continue;
+        if (V.trades.some((x) => x.market === key && x.status === 'open')) continue;   // one open trade per market for this variant
+        const entry = f(price), r0 = Math.abs(entry - g.stop);
+        if ((entry - g.stop) * s <= 0 || r0 > 1.6 * g.r0) continue;
+        V.trades.push({ id, shadow: true, variant: v, paperMarket: true, market: key, label: M.label, short: M.short, side: s > 0 ? 'buy' : 'sell', model: 'H1 iFVG reversal', signalAt: g.close, signalPx: f(g.entry),
+          entry, stop: f(g.stop), r0: +r0.toFixed(M.dec + 1), t1: null, trail: P.trail, be: M.aRule ? null : P.be, stop0: f(g.stop), t2: f(entry + s * P.mark * r0), opened: now, checked: frontier, status: 'open', R: null, size: 1,
+          sweep: { t: g.sweepT, level: f(g.swept) }, fvg: g.fvg.map(f), ih: g.ih == null ? null : f(g.ih), dol: g.dol == null ? null : f(g.dol), valid: g.valid,
+          feat: g.feat, grade: { ...g.grade, letter: letter(g.grade.total) }, aset: true, aplus: false });
+      }
+      delete V.errors[key];
+    } catch (e) { V.errors[key] = String(e.message || e); }
   }
   const C = trades.filter((x) => x.closed);
   snap.totals = { n: C.length, wins: C.filter((x) => x.R > 0).length, R: +C.reduce((a, x) => a + x.R, 0).toFixed(2), open: trades.filter((x) => x.status === 'open').length };

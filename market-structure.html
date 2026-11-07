@@ -7584,7 +7584,17 @@ function msNextSetup(bars, A) {
       + row('Candidate · live forward', dl, sinceTxt ? `since ${sinceTxt}` : 'starts with the next tracker run') + row('Current A-rule · live forward', al, sinceTxt ? 'same period' : '')
       + row('Candidate · replay', dr, fromTxt ? (dr ? `since ${fromTxt}` : 'after the next replay run') : '') + row('Current A-rule · replay', ar, fromTxt ? `since ${fromTxt}` : '') + '</tbody></table>'
       + '<p class="msg">Dip-buy NQ/ES: BUY signals only (grade C or better, stop 0.3-0.75x the daily ATR), taken only when the last daily close is below the close 20 trading days earlier; size 1, no break-even, trail from +2R, out after 36 H1 candles. Shadow records only: not live, no alerts, and the current A-rule is unchanged. A-rule R is sized. Compare for at least a month before any switch.</p>'
-      + renderVars(st, row, fromTxt);
+      + renderVars(st, row, fromTxt) + renderPaper(st, row, fromTxt);
+  }
+  // paper-only markets (research/ict-markets.md): the unchanged A-rule on a market the desk does not trade, its own variant stream in
+  // shadow.json .variants / replay.json .shadowByVariant (records flagged paperMarket). Never in the desk's stats, alerts or the mirror.
+  function renderPaper(st, row, fromTxt) {
+    const V = (S.vars || {}).silver, VR = (S.varsReplay || {}).silver, ok = (x) => x && x.market === 'xag' && !(x.grade && x.grade.letter === 'F');
+    const since = V && V.since ? new Date(Date.parse(V.since)).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }) : null;
+    const rows = row('Silver · live forward', V && Array.isArray(V.trades) ? st(V.trades.filter(ok)) : null, since ? `since ${since}` : 'starts with the next tracker run')
+      + row('Silver · replay', Array.isArray(VR) ? st(VR.filter(ok)) : null, fromTxt ? (Array.isArray(VR) ? `since ${fromTxt}` : 'after the next replay run') : '');
+    return `<table><thead><tr><th>Paper market, closed</th><th class="n">n</th><th class="n">Win</th><th class="n">R / trade</th><th class="n">Total</th></tr></thead><tbody>${rows}</tbody></table>`
+      + '<p class="msg"><b>Silver (spot XAG/USD, OANDA)</b>: the unchanged A-rule under gold\'s rule (buys, stop 0.3-0.75x the daily ATR, size 1, no break-even). Market test 1 Aug 2025 - 7 Nov 2026 after costs: +0.41R a trade over 82 (t 2.0), positive in both halves; random silver buys made +0.11R. But it lost in 2018-23, so it may only be the silver rally. Paper only: not live, no alerts, not mirrored. Gross R, no costs.</p>';
   }
   // A-rule variants 'nofri' (research/edge/ict-filters) and 'h1opp' (research/edge/confluence): shadow.json .variants (live forward) and
   // replay.json .shadowByVariant, against the current A-rule on all markets over the same period. Same sizing and exits as the A-rule.
