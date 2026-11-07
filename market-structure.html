@@ -1664,6 +1664,8 @@ html[data-role="viewer"] .j-empty-go { display: none; }
 
 /* light theme: focus ring in a deeper gold so it meets 3:1 against white (was 1.95:1) */
 :root[data-theme="light"] :where(a, button, summary, select, input, textarea, [tabindex]):focus-visible { outline-color: #9a6b00 !important; }
+  /* pass 73: light theme text selection was white text on a pale gold wash (unreadable) */
+  :root[data-theme="light"] ::selection { background: rgba(154,107,0,.24); color: var(--ink); }
 </style>
 <script>try{if(localStorage.getItem('msMotion')==='off')document.documentElement.dataset.motion='off'}catch(e){}</script>
 </head>
