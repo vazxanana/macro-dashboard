@@ -131,7 +131,7 @@ async function check(env, { WS = globalThis.WebSocket, store = null } = {}) {
     // CTRADER_ACCOUNT_ID may hold the Open API account id (ctidTraderAccountId) or the login number shown in cTrader (traderLogin)
     const all = list.ctidTraderAccount || [];
     const acc = all.find((a) => Number(a.ctidTraderAccountId) === accountId) || all.find((a) => Number(a.traderLogin) === accountId);
-    if (!acc) return { ok: false, status: 404, error: 'CTRADER_ACCOUNT_ID matches neither the account id nor the login of any account this token can see', accounts: all.map(listing) };
+    if (!acc) return { ok: false, status: 404, error: 'CTRADER_ACCOUNT_ID matches neither the account id nor the login of any account this token can see', configured: mask(accountId), accounts: all.map(listing) };
     if (acc.isLive !== false) return { ok: false, status: 403, error: 'account is not a demo account (isLive is not false): stopped before connecting to it' };
     const ctid = Number(acc.ctidTraderAccountId), matchedBy = ctid === accountId ? 'accountId' : 'login';
 

@@ -102,7 +102,7 @@ test('CTRADER_ACCOUNT_ID may be the login number; the demo check still applies',
 
 test('unknown account: 404 with a masked list, no full numbers', async () => {
   const r = await check({ ...ENV, CTRADER_ACCOUNT_ID: '123456' }, { WS: fakeWS().WS });
-  assert.equal(r.status, 404); assert.deepEqual(r.accounts, [{ accountId: '…242', login: '…99', demo: true, broker: 'DemoBroker' }]);
+  assert.equal(r.status, 404); assert.equal(r.configured, '…456'); assert.deepEqual(r.accounts, [{ accountId: '…242', login: '…99', demo: true, broker: 'DemoBroker' }]);
   assert.equal(JSON.stringify(r).includes('4242'), false);
 });
 
