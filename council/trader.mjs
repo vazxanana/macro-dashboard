@@ -238,6 +238,14 @@ const USER_RULES = [
 ];
 config.userRules = config.userRules || [];
 for (const u of USER_RULES) if (!config.userRules.includes(u.id)) { u.apply(config); config.userRules.push(u.id); config.history.push({ at: nowISO, by: 'user', change: u.change, why: u.why }); }
+// Owner rules are never undone by the Coach (7 Nov). Normalise the older string form (gold-m30 stored src: 'user',
+// since: '<iso>') into the per-field objects the Coach reads, and mark the owner's "Scalp outside Asia" session rule.
+for (const fl of Object.values(config.filters || {})) {
+  if (typeof fl.src === 'string') fl.src = Object.fromEntries(['d1', 'struct'].filter((c) => fl[c]).map((c) => [c, fl.src]));
+  if (typeof fl.since === 'string') fl.since = Object.fromEntries(['d1', 'struct'].filter((c) => fl[c]).map((c) => [c, fl.since]));
+}
+if (config.userRules.includes('scalp-against-live') && config.filters.scalp && (config.filters.scalp.noSession || []).includes('asia')) (config.filters.scalp.src = config.filters.scalp.src || {})['session:asia'] = 'user';
+const userOwned = (fl, key) => ((fl && fl.src) || {})[key] === 'user';
 const state = Object.assign({ seen: {}, lastRun: 0 }, rd('state.json', {}));
 let trades = rd('trades.json', []);
 // Live-sleeve guard (7 Nov): a setup put live through focusSetups goes back to shadow on its own if its live paper trades since
@@ -1285,12 +1293,13 @@ if (coach.date !== today) {
   // drop a rule when the trades it blocked would have paid (shadow expectancy > +0.2R over 5+), or after 21 days to re-test it
   for (const [k, fl] of Object.entries(config.filters)) {
     for (const fe of ['d1', 'struct']) {
-      if (!fl[fe] || (fl.src || {})[fe] === 'backtest') continue;
+      if (!fl[fe] || (fl.src || {})[fe] === 'backtest' || userOwned(fl, fe)) continue;   // owner rules stay until the owner changes them
       const sh = shadows.filter((x) => x.k === k && (x.blockedBy || []).includes(fe));
       const old = fl.since && fl.since[fe] && now - Date.parse(fl.since[fe]) / 1000 > 21 * 86400;
       if ((sh.length >= 5 && exp(sh) > 0.2) || old) { change(`${k}: dropped the ${fe === 'd1' ? 'D1' : 'structure'} rule`, old ? '21 days old: re-testing without it.' : `The trades it blocked made +${exp(sh).toFixed(2)}R over ${sh.length}.`); delete fl[fe]; if (fl.since) delete fl.since[fe]; }
     }
     for (const v of (fl.noSession || []).slice()) {
+      if (userOwned(fl, 'session:' + v)) continue;
       const sh = shadows.filter((x) => x.k === k && (x.blockedBy || []).includes('session') && x.feat && x.feat.session === v);
       const old = fl.since && fl.since['session:' + v] && now - Date.parse(fl.since['session:' + v]) / 1000 > 21 * 86400;
       if ((sh.length >= 5 && exp(sh) > 0.2) || old) { fl.noSession = fl.noSession.filter((x) => x !== v); if (fl.since) delete fl.since['session:' + v]; change(`${k}: trading the ${v} session again`, old ? '21 days old: re-testing.' : `Blocked trades made +${exp(sh).toFixed(2)}R over ${sh.length}.`); }
