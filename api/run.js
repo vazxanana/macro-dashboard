@@ -33,7 +33,8 @@ module.exports = async (req, res) => {
   const F = await flags(), paused = [].concat(F.paused || []);
   if (paused.includes(job) || paused.includes('all')) { console.log(JSON.stringify({ job, paused: true })); return res.status(200).json({ job, paused: true }); }
   const RM = String(F.runMode || process.env.RUN_MODE || '').split(',').map((x) => x.trim()), live = (RM.includes('live') || RM.includes(job)) && req.query.mode !== 'dry', tok = process.env.GH_TOKEN || process.env.GH_DISPATCH_TOKEN, t0 = Date.now();
-  const gh = async (u, o = {}) => { const r = await fetch(`https://api.github.com/repos/${REPO}${u}`, { ...o, headers: { ...(tok ? { Authorization: `Bearer ${tok}` } : {}), Accept: 'application/vnd.github+json', 'X-GitHub-Api-Version': '2022-11-28', 'User-Agent': 'aurum-desk-runner', ...(o.body ? { 'Content-Type': 'application/json' } : {}), ...(o.headers || {}) } });
+  // network errors (GitHub's HTTP/2 GOAWAY mid-upload, 7 Nov) are retried with backoff; HTTP errors are not
+  const gh = async (u, o = {}) => { let r; for (let a = 0; ; a++) { try { r = await fetch(`https://api.github.com/repos/${REPO}${u}`, { ...o, headers: { ...(tok ? { Authorization: `Bearer ${tok}` } : {}), Accept: 'application/vnd.github+json', 'X-GitHub-Api-Version': '2022-11-28', 'User-Agent': 'aurum-desk-runner', ...(o.body ? { 'Content-Type': 'application/json' } : {}), ...(o.headers || {}) } }); break; } catch (e) { if (a >= 3) throw e; await new Promise((ok) => setTimeout(ok, 800 * (a + 1) ** 2)); } }
     if (!r.ok && !(o.ok || []).includes(r.status)) throw new Error(`GitHub ${r.status} ${u}: ${(await r.text()).slice(0, 200)}`); return r; };
   let STEP = 'start';
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), `${job}-`)), before = {};
@@ -63,7 +64,8 @@ module.exports = async (req, res) => {
     if (!live || !changed.length || failed) { console.log(JSON.stringify(summary)); await report(job, summary); return res.status(200).json(summary); }
     STEP = 'commit';
     // 4. commit the changed files on top of whatever the branch is at now (the other job may have committed meanwhile)
-    const blobs = await Promise.all(changed.map(async (f) => ({ path: f, mode: '100644', type: 'blob', sha: (await (await gh('/git/blobs', { method: 'POST', body: JSON.stringify({ content: fs.readFileSync(path.join(dir, f)).toString('base64'), encoding: 'base64' }) })).json()).sha })));
+    // one file at a time (parallel uploads of the large JSON files made GitHub drop the HTTP/2 connection)
+    const blobs = []; for (const f of changed) blobs.push(({ path: f, mode: '100644', type: 'blob', sha: (await (await gh('/git/blobs', { method: 'POST', body: JSON.stringify({ content: fs.readFileSync(path.join(dir, f)).toString('base64'), encoding: 'base64' }) })).json()).sha }));
     for (let a = 0; a < 4; a++) {
       const cur = (await (await gh(`/git/ref/heads/${BR}`)).json()).object.sha, tree = (await (await gh(`/git/commits/${cur}`)).json()).tree.sha;
       const nt = (await (await gh('/git/trees', { method: 'POST', body: JSON.stringify({ base_tree: tree, tree: blobs }) })).json()).sha;
