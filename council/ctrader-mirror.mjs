@@ -187,6 +187,24 @@ export async function sendMirrorAlerts(alerts, { env = {}, now = Math.floor(Date
 
 // ---- one mirror round -----------------------------------------------------------------------------------------------
 const TOKEN_ERR = /ACCESS_TOKEN|INVALID_TOKEN|TOKEN_EXPIRED|CH_ACCESS_TOKEN_INVALID|NOT_AUTHORIZED|UNAUTHORIZED/i;
+// execution quality (7 Nov): how the demo fill compares with the council's paper entry. slipR > 0 means a worse fill than the
+// council assumed, in units of the trade's risk (entry to stop); lagSec is the time from the council's fill to the demo order.
+export function fillQuality(t, price, now) {
+  const px = +price, risk = Math.abs(t.entry - t.stop);
+  if (!(px > 0) || !(risk > 0)) return {};
+  const sign = t.side === 'sell' ? -1 : 1, when = t.filled || t.opened;
+  return { fillPrice: px, slipR: +((sign * (px - t.entry)) / risk).toFixed(3), lagSec: Number.isFinite(+when) ? Math.max(0, Math.round(now - when)) : null };
+}
+export function executionStats(map, { since = 0 } = {}) {
+  const F = Object.values(map || {}).filter((m) => Number.isFinite(+m.slipR) && (Date.parse(m.openedAt) / 1000 || 0) >= since);
+  if (!F.length) return { n: 0 };
+  const sl = F.map((m) => +m.slipR).sort((a, b) => a - b), lag = F.map((m) => +m.lagSec).filter(Number.isFinite).sort((a, b) => a - b);
+  const med = (a) => (a.length ? (a.length % 2 ? a[a.length >> 1] : (a[a.length / 2 - 1] + a[a.length / 2]) / 2) : null);
+  const by = {}; for (const m of F) { const k = m.symbol; (by[k] = by[k] || []).push(+m.slipR); }
+  return { n: F.length, meanSlipR: +(sl.reduce((a, b) => a + b, 0) / sl.length).toFixed(3), medianSlipR: +med(sl).toFixed(3), worstSlipR: sl[sl.length - 1],
+    medianLagSec: lag.length ? med(lag) : null, bySymbol: Object.fromEntries(Object.entries(by).map(([k, a]) => [k, { n: a.length, meanSlipR: +(a.reduce((x, y) => x + y, 0) / a.length).toFixed(3) }])) };
+}
+
 export async function mirrorRound({ env, trades, state, tokens, WS = globalThis.WebSocket, now = Math.floor(Date.now() / 1000), timeout, onTokens }) {
   const scrub = scrubber(env), log = [], say = (msg, x = {}) => log.push({ at: new Date(now * 1000).toISOString(), msg: scrub(msg), ...x });
   const st = { map: {}, day: null, startedAt: null, ...(state || {}) };
@@ -274,7 +292,8 @@ export async function mirrorRound({ env, trades, state, tokens, WS = globalThis.
       const vol = (p.tradeData && +p.tradeData.volume) || m.volume;
       try { const ev = await s.send(PT.CLOSE_POSITION_REQ, { ctidTraderAccountId: ctid, positionId: Number(m.positionId), volume: vol }, PT.EXECUTION_EVENT, orderStep);
         if (ev.interim) { m.closing = iso; say(`close ${m.symbol} ${m.positionId} accepted, fill not confirmed yet`, { trade: id }); continue; }
-        m.status = 'closed by council'; m.closedAt = iso; out.sent.push({ type: 'close', trade: id }); say(`closed ${m.symbol} position ${m.positionId} (council: ${t.status})`, { trade: id });
+        m.status = 'closed by council'; m.closedAt = iso; out.sent.push({ type: 'close', trade: id });
+        { const px = ev.deal && +ev.deal.executionPrice; if (px > 0) { m.exitPrice = px; m.councilExit = t.exitPx ?? null; m.councilR = t.R ?? null; } } say(`closed ${m.symbol} position ${m.positionId} (council: ${t.status})`, { trade: id });
         alert('close', id, m, () => { const dl = ev.deal || {}, cd = dl.closePositionDetail || {}, md = Number.isFinite(+cd.moneyDigits) ? +cd.moneyDigits : digits;
           return { by: 'council', council: t.status, R: t.R ?? null, price: dl.executionPrice ?? null, pnl: cd.grossProfit != null && Number.isFinite(+cd.grossProfit) ? +cd.grossProfit / 10 ** md : null }; }); }
       catch (e) { say(`close ${m.symbol} ${m.positionId} failed: ${e.message}`, { trade: id }); alert('closefail', id, m, { result: scrub(e.message) }); }
@@ -308,7 +327,8 @@ export async function mirrorRound({ env, trades, state, tokens, WS = globalThis.
         try {
           const ev = await s.send(PT.NEW_ORDER_REQ, order, PT.EXECUTION_EVENT, orderStep);
           const pid = (ev.position && ev.position.positionId) ?? (ev.order && ev.order.positionId), filled = !ev.interim && pid != null;
-          st.map[t.id] = { positionId: pid != null ? String(pid) : null, symbol: name, side: t.side, volume, lots: volume / +info.lotSize, digits: d, setup: t.k, status: filled ? 'open' : 'sent', openedAt: iso, councilEntry: t.entry, stop: t.stop, t1: t.t1 };
+          st.map[t.id] = { positionId: pid != null ? String(pid) : null, symbol: name, side: t.side, volume, lots: volume / +info.lotSize, digits: d, setup: t.k, status: filled ? 'open' : 'sent', openedAt: iso, councilEntry: t.entry, stop: t.stop, t1: t.t1,
+            ...fillQuality(t, (ev.deal && ev.deal.executionPrice) ?? (filled && ev.position ? ev.position.price : null), now) };
           if (st.wait) delete st.wait[t.id];
           out.sent.push({ type: 'open', trade: t.id }); say(`${filled ? 'opened' : 'sent (fill not confirmed yet)'} ${sell ? 'sell' : 'buy'} ${name} ${volume / +info.lotSize} lot (council ${t.k})`, { trade: t.id });
           alert('open', t.id, st.map[t.id], () => ({ filled, price: (ev.deal && ev.deal.executionPrice) ?? (filled && ev.position ? ev.position.price : null) ?? null,
@@ -338,7 +358,7 @@ if (process.argv[1] && process.argv[1].endsWith('ctrader-mirror.mjs')) {
   const saveTokens = (t) => { fs.mkdirSync(CD, { recursive: true }); fs.writeFileSync(path.join(CD, 'tokens.json'), JSON.stringify(t)); };
   const prev = rd('mirror.json', {}), r = await mirrorRound({ env: process.env, trades, state: prev.state, tokens: rd('tokens.json', null), onTokens: saveTokens });
   fs.mkdirSync(CD, { recursive: true });
-  fs.writeFileSync(path.join(CD, 'mirror.json'), JSON.stringify({ state: r.state, log: (prev.log || []).concat(r.log).slice(-300), limits: LIMITS, symbols: SYMBOLS }, null, 1));
+  fs.writeFileSync(path.join(CD, 'mirror.json'), JSON.stringify({ state: r.state, log: (prev.log || []).concat(r.log).slice(-300), limits: LIMITS, symbols: SYMBOLS, execution: executionStats(r.state.map) }, null, 1));
   if (r.tokens && JSON.stringify(r.tokens) !== JSON.stringify(rd('tokens.json', null))) saveTokens(r.tokens);
   console.log(`cTrader mirror: ${r.state.status}${r.sent.length ? ` · ${r.sent.length} sent` : ''}`);
   // phone alerts, after mirror.json is saved (already flagged there, so a crash here never re-sends them): best-effort only
