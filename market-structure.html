@@ -2290,6 +2290,7 @@ html[data-motion="off"][data-gate] .gate-bg path[stroke] { animation: none; stro
             <label><input type="checkbox" id="ms-show-cf" data-show="cf" checked><i style="background:rgba(242,54,69,.5)"></i>CF</label>
             <label><input type="checkbox" id="ms-show-vr" data-show="vr" checked><i style="background:rgba(255,152,0,.4);border:1px solid #e08600"></i>VR</label>
             <label><input type="checkbox" id="ms-show-htf" data-show="htf" checked><i style="border:1.5px dashed #2962ff"></i>HTF Origin</label>
+            <label><input type="checkbox" id="ms-show-ct" checked><i style="background:#2962ff;height:2px"></i>Council trades</label>
             <label><input type="checkbox" id="ms-show-kl" checked><i style="border-top:1.5px dotted #9aa4b2;height:0"></i>Key levels</label>
             <label><input type="checkbox" id="ms-show-vol" checked><i style="background:linear-gradient(90deg,rgba(8,153,129,.5) 50%,rgba(242,54,69,.5) 50%)"></i>Volume</label>
             <label><input type="checkbox" id="ms-show-next" data-show="next" checked><i style="background:#2962ff;height:2px"></i>Next setup</label>
@@ -3687,6 +3688,20 @@ function msNextSetup(bars, A) {
       P._kl = L.map(([t, v]) => P.series.createPriceLine({ price: v + off, color: t === 'DO' ? 'rgba(154,164,178,.55)' : /H$/.test(t) ? 'rgba(8,153,129,.55)' : 'rgba(242,54,69,.55)', lineWidth: 1, lineStyle: LW.LineStyle.SparseDotted, axisLabelVisible: true, title: t })); });
   }
   setTimeout(keyLevels, 2500); setInterval(keyLevels, 60e3);
+  // council trades on the live charts (7 Nov loop): this market's open / pending council trades as entry, stop and target lines
+  function councilLines() {
+    let T = []; try { T = (COUNCIL.trades || []).filter((x) => x.market === instKey && !x.shadow && (x.status === 'open' || x.status === 'pending') && isFinite(x.entry) && isFinite(x.stop)); } catch (e) {}
+    if (G.showCT === false) T = [];
+    const sig = JSON.stringify(T.map((x) => [x.id, x.entry, x.stop, x.t1, x.status]));
+    ['4h', '1h', '15m', '5m', '1m'].forEach((id) => { const P = panes[id]; if (!P || !P.series || P._ctSig === sig) return; P._ctSig = sig;
+      (P._ct || []).forEach((l) => { try { P.series.removePriceLine(l); } catch (e) {} }); P._ct = [];
+      T.forEach((x) => { const nm = `${x.side === 'buy' ? '▲' : '▼'} ${x.name || x.k}${x.status === 'pending' ? ' (limit)' : ''}`;
+        P._ct.push(P.series.createPriceLine({ price: x.entry, color: '#2962ff', lineWidth: 2, lineStyle: x.status === 'pending' ? LW.LineStyle.Dashed : LW.LineStyle.Solid, axisLabelVisible: true, title: nm }));
+        P._ct.push(P.series.createPriceLine({ price: x.stop, color: '#f23645', lineWidth: 1, lineStyle: LW.LineStyle.Dashed, axisLabelVisible: true, title: 'SL' }));
+        if (isFinite(x.t1)) P._ct.push(P.series.createPriceLine({ price: x.t1, color: '#089981', lineWidth: 1, lineStyle: LW.LineStyle.Dashed, axisLabelVisible: true, title: 'TP' })); }); });
+  }
+  setTimeout(councilLines, 4000); setInterval(councilLines, 15e3);
+  { const k = document.getElementById('ms-show-ct'); try { G.showCT = localStorage.getItem('ms-ct') !== '0'; } catch (e) {} if (k) { k.checked = G.showCT !== false; k.addEventListener('change', () => { G.showCT = k.checked; try { localStorage.setItem('ms-ct', k.checked ? '1' : '0'); } catch (e) {} Object.values(panes).forEach((P) => { P._ctSig = null; }); councilLines(); }); } }
   { const k = document.getElementById('ms-show-kl'); try { G.showKL = localStorage.getItem('ms-kl') !== '0'; } catch (e) {} if (k) { k.checked = G.showKL !== false; k.addEventListener('change', () => { G.showKL = k.checked; try { localStorage.setItem('ms-kl', k.checked ? '1' : '0'); } catch (e) {} keyLevels(); }); } }
   { const v = document.getElementById('ms-show-vol'); try { G.showVol = localStorage.getItem('ms-vol') !== '0'; } catch (e) {} if (v) { v.checked = G.showVol !== false; v.addEventListener('change', () => { G.showVol = v.checked; try { localStorage.setItem('ms-vol', v.checked ? '1' : '0'); } catch (e) {} Object.values(panes).forEach((P) => P.setVol && P.setVol()); }); } }
   // TradingView alerts in (7 Nov loop): webhook URL (owner), message template, forward-to-this-device switch, recent alerts
