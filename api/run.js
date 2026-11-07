@@ -36,7 +36,7 @@ module.exports = async (req, res) => {
   // network errors (GitHub's HTTP/2 GOAWAY mid-upload, 7 Nov) are retried with backoff; HTTP errors are not
   const gh = async (u, o = {}) => { let r; for (let a = 0; ; a++) { try { r = await fetch(`https://api.github.com/repos/${REPO}${u}`, { ...o, headers: { ...(tok ? { Authorization: `Bearer ${tok}` } : {}), Accept: 'application/vnd.github+json', 'X-GitHub-Api-Version': '2022-11-28', 'User-Agent': 'aurum-desk-runner', ...(o.body ? { 'Content-Type': 'application/json' } : {}), ...(o.headers || {}) } }); break; } catch (e) { if (a >= 3) throw e; await new Promise((ok) => setTimeout(ok, 800 * (a + 1) ** 2)); } }
     if (!r.ok && !(o.ok || []).includes(r.status)) throw new Error(`GitHub ${r.status} ${u}: ${(await r.text()).slice(0, 200)}`); return r; };
-  let STEP = 'start';
+  let STEP = 'start', SUM = null;
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), `${job}-`)), before = {};
   try {
     if (live && !tok) throw new Error('GH_TOKEN not set');
@@ -61,6 +61,7 @@ module.exports = async (req, res) => {
     const summary = { job, mode: live ? 'live' : 'dry', base: head.slice(0, 7), seconds: Math.round((Date.now() - t0) / 1000), failed, changed: changed.map((f) => `${f} (${fs.statSync(path.join(dir, f)).size} B)`) };
     if (job === 'council' && changed.includes('trades.json')) { try { const a = JSON.parse(fs.readFileSync(path.join(dir, 'trades.json'), 'utf8')); summary.trades = a.length; summary.open = a.filter((x) => x.status === 'open').length; } catch (e) {} }
     if (job === 'council') { try { const sn = JSON.parse(fs.readFileSync(path.join(dir, 'snapshot.json'), 'utf8')); if (sn.d1src) summary.d1src = sn.d1src; if (sn.errors && Object.keys(sn.errors).length) summary.errors = sn.errors; } catch (e) {} }
+    SUM = summary;
     if (!live || !changed.length || failed) { console.log(JSON.stringify(summary)); await report(job, summary); return res.status(200).json(summary); }
     STEP = 'commit';
     // 4. commit the changed files on top of whatever the branch is at now (the other job may have committed meanwhile)
@@ -75,6 +76,6 @@ module.exports = async (req, res) => {
       await new Promise((r) => setTimeout(r, 1500 * (a + 1)));
     }
     throw new Error('branch kept moving; commit not saved');
-  } catch (e) { const cause = e && e.cause ? `${e.cause.code || ''} ${e.cause.message || e.cause}`.trim() : ''; console.error(`[${job}] ${e.message} ${cause}`); await report(job, { job, error: String(e.message || e), cause, stack: String(e.stack || '').split('\n').slice(1, 4).join(' | ').slice(0, 300), step: STEP }); return res.status(500).json({ job, error: String(e.message || e), cause }); }
+  } catch (e) { const cause = e && e.cause ? `${e.cause.code || ''} ${e.cause.message || e.cause}`.trim() : ''; console.error(`[${job}] ${e.message} ${cause}`); await report(job, { ...(SUM || {}), job, error: String(e.message || e), cause, stack: String(e.stack || '').split('\n').slice(1, 4).join(' | ').slice(0, 300), step: STEP }); return res.status(500).json({ job, error: String(e.message || e), cause }); }
   finally { try { fs.rmSync(dir, { recursive: true, force: true }); } catch (e) {} }
 };
