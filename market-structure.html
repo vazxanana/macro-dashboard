@@ -5155,7 +5155,7 @@ function msNextSetup(bars, A) {
   const gcls = (l) => (/^A/.test(l) ? 'ga' : /^B/.test(l) ? 'gb' : 'gc');
   const TAGS = [['sweep', 'Clean sweep'], ['fvg', 'Obvious FVG'], ['dol', 'Clear DOL'], ['bias', 'With HTF bias'], ['pd', 'Right side of P/D'], ['time', 'Good time'], ['against', 'Against bias'], ['chop', 'Consolidation'], ['news', 'News'], ['late', 'Late entry'], ['nodol', 'No target liquidity'],
     // sponsorship-checklist tags (skill §28, 7 Nov): Fred's chart judgement, recorded so it can be tested on real trades
-    ['opens', 'Beyond 00:00 & 08:30 opens'], ['induce', 'Inducement into the level'], ['smt', 'SMT (NQ/ES/YM)'], ['cisd', 'CISD body close'], ['disp', 'Displacement + FVG'], ['reh', 'REH/REL as target'], ['eqwin', '09:00-10:30 window']];
+    ['opens', 'Beyond 00:00 & 08:30 opens'], ['induce', 'Inducement into the level'], ['smt', 'SMT (NQ/ES/YM)'], ['cisd', 'CISD body close'], ['disp', 'Displacement + FVG'], ['reh', 'REH/REL as target'], ['eqwin', '09:00-10:30 window'], ['htffvg', 'Stops run into a D1/H4 FVG']];
   const S = { trades: [], replay: [], replayInfo: null, snap: null, bars: {}, desk: { reviews: {} }, f: { m: '', s: '' }, cur: null, tf: 'h1', src: 'both', cal: null, calDay: null };
   const RO = !!document.documentElement.dataset.ictRo;   // read-only desk (Orlando)
   try { S.src = localStorage.getItem('ictSrc') || 'both'; } catch (e) {}
@@ -5226,7 +5226,7 @@ function msNextSetup(bars, A) {
       : '<p class="ms-note">The curve starts with the first closed signal.</p>';
     // breakdowns
     const groups = [['Market', (x) => x.short], ['Side', (x) => x.side], ['Grade', (x) => x.grade.letter], ['Session', (x) => x.feat.session], ['Daily bias', (x) => x.feat.bias || 'n/a'], ['Premium / discount', (x) => x.feat.zone || 'n/a'],
-      ['Prev-day high/low swept', (x) => (x.feat.pdSweep ? 'yes' : 'no')], ['Valid (internal level untouched)', (x) => (x.valid ? 'yes' : 'no')], ['My review', (x) => (myRev(x) && myRev(x).grade) || 'not graded']];
+      ['Prev-day high/low swept', (x) => (x.feat.pdSweep ? 'yes' : 'no')], ['Sweep into a D1/H4 FVG', (x) => (x.feat.htfFvg === undefined ? 'n/a' : x.feat.htfFvg || 'no')], ['Daily candle closure', (x) => (x.feat.cc === undefined ? 'n/a' : x.feat.cc > 0 ? 'agrees' : x.feat.cc < 0 ? 'against' : 'neutral')], ['Valid (internal level untouched)', (x) => (x.valid ? 'yes' : 'no')], ['My review', (x) => (myRev(x) && myRev(x).grade) || 'not graded']];
     const mx = Math.max(0.5, ...groups.flatMap(([, f]) => { const g = {}; C.forEach((x) => { const k = f(x); (g[k] = g[k] || []).push(x.R); }); return Object.values(g).map((a) => Math.abs(a.reduce((s, v) => s + v, 0) / a.length)); }));
     $('ict-break').innerHTML = C.length ? groups.map(([name, f]) => { const g = {}; C.forEach((x) => { const k = f(x); (g[k] = g[k] || []).push(x.R); });
       return `<table><caption>${esc(name)}</caption><thead><tr><th></th><th class="n">n</th><th class="n">Win</th><th class="n">R / signal</th></tr></thead><tbody>${Object.entries(g).sort((a, b) => b[1].length - a[1].length).map(([k, a]) => { const m = a.reduce((s, v) => s + v, 0) / a.length;
