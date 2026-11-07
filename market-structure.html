@@ -2225,6 +2225,136 @@ html[data-motion="off"][data-gate] .gate-bg path[stroke] { animation: none; stro
 .gate-side { position: relative; isolation: isolate; }
 .gate-side::before { content: ""; position: absolute; inset: -70px -60px -50px -80px; z-index: -1; background: radial-gradient(closest-side, rgba(7,7,10,.82), rgba(7,7,10,.55) 60%, transparent); pointer-events: none; }
 @media (max-width: 900px) { .gate-side::before { display: none; } }
+
+/* ═══ ICT desk design pass (7 Nov): what is open now first, then results by market and session, then history.
+   Scoped to #v-ict. Gold stays the brand accent for on-states; a violet tag (the ICT markup colour on the charts) marks
+   this as its own desk. Light theme gets deeper gold / green / red inks so text clears 4.5:1 on white. */
+#v-ict { --ict-gold-ink: var(--gold); --ict-up: var(--buy); --ict-dn: var(--sell); --ict-line-a: var(--gold);
+  --ict-desk: #b9a4ff; --ict-desk-soft: rgba(167,139,250,.12); --ict-desk-line: rgba(167,139,250,.36); font-variant-numeric: tabular-nums; }
+:root[data-theme="light"] #v-ict { --ict-gold-ink: #835c00; --ict-up: #067a66; --ict-dn: #c42038; --ict-line-a: #a77700;
+  --ict-desk: #6a3fc4; --ict-desk-soft: rgba(106,63,196,.07); --ict-desk-line: rgba(106,63,196,.3); }
+#v-ict .pos { color: var(--ict-up) !important; } #v-ict .neg { color: var(--ict-dn) !important; }
+#v-ict .ms-chip-buy { color: var(--ict-up); } #v-ict .ms-chip-sell { color: var(--ict-dn); }
+#v-ict .ict-h { margin: 0; font: 600 15px/1.3 var(--sans); color: var(--ink); letter-spacing: 0; text-transform: none; }
+#v-ict .ms-k { align-items: baseline; margin-bottom: 12px; }
+/* header: title + desk tag, labelled segmented controls */
+#v-ict .ict-head { align-items: flex-start; gap: 14px 24px; }
+#v-ict .ict-title { flex: 1 1 420px; min-width: 0; }
+#v-ict .ict-tag { display: inline-block; vertical-align: 4px; margin-left: 8px; padding: 2px 9px; border-radius: 999px; font: 600 11.5px/1.4 var(--sans); color: var(--ict-desk); background: var(--ict-desk-soft); border: 1px solid var(--ict-desk-line); white-space: nowrap; }
+#v-ict .ict-hr { display: grid; gap: 8px; justify-items: end; }
+#v-ict .ict-me b { color: var(--ict-gold-ink); }
+#v-ict .ict-ctl { display: flex; align-items: center; gap: 10px; }
+#v-ict .ict-ctl-l { font: 500 12px var(--sans); color: var(--ink-dim); }
+#v-ict .ict-seg.ict-src { gap: 2px; padding: 3px; border: 1px solid var(--line); border-radius: 10px; background: var(--panel); flex-wrap: nowrap; }
+#v-ict .ict-src button { border: 0; background: transparent; min-height: 32px; padding: 4px 12px; border-radius: 7px; color: var(--ink-dim); font: 600 12.5px var(--sans); transition: background-color .15s ease-out, color .15s ease-out; }
+#v-ict .ict-src button:hover { color: var(--ink); background: var(--panel-raised); }
+#v-ict .ict-src button.on { background: var(--gold); color: #17130a; }
+/* session clock: the live kill zone also carries a dot, not only colour */
+#v-ict .ict-clock { gap: 6px 8px; margin-top: -4px; }
+#v-ict .ict-clock .kz.on { color: var(--ict-gold-ink); }
+#v-ict .ict-clock .kz.on::before { content: ""; display: inline-block; width: 6px; height: 6px; border-radius: 50%; background: currentColor; margin-right: 6px; vertical-align: 1px; }
+/* 1 · now: open signals beside the live forward test */
+#v-ict .ict-now { display: grid; grid-template-columns: minmax(0, 1.65fr) minmax(0, 1fr); gap: var(--sp-4, 16px); align-items: stretch; }
+#v-ict .ict-open-c:has(li[data-id]) { border-color: var(--gold-line); }
+#v-ict .ict-open { gap: 10px; }
+#v-ict .ict-open li { padding: 12px 14px; gap: 8px; border-radius: 12px; background: var(--panel-raised); transition: border-color .15s ease-out; }
+#v-ict .ict-open li.empty { background: none; border-style: dashed; padding: 16px; line-height: 1.5; }
+#v-ict .ict-open .r1 { gap: 6px 8px; }
+#v-ict .ict-open .r1 .live { font: 700 18px var(--mono); letter-spacing: -.01em; }
+#v-ict .ict-open .r2 { font: 500 12.5px var(--sans); color: var(--ink-dim); line-height: 1.5; }
+#v-ict .ict-bar { height: 6px; background-color: var(--line); background-image: linear-gradient(90deg, transparent calc(25% - 1px), var(--ink-faint) calc(25% - 1px) 25%, transparent 25% calc(75% - 1px), var(--ink-faint) calc(75% - 1px) 75%, transparent 75%); }   /* ticks at the entry (0R) and +2R */
+#v-ict .ict-bar i { background: var(--gold); opacity: .9; }
+#v-ict .ict-fwd { grid-template-columns: minmax(0, 1fr); align-content: start; gap: 8px; }
+#v-ict .ict-fwd .t { font: 600 15px var(--sans); margin-bottom: 2px; }
+#v-ict .ict-fwd .row { display: grid; gap: 0; }
+#v-ict .ict-fwd .row > span { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; padding: 8px 0; border-bottom: 1px solid var(--line-soft); color: var(--ink-dim); font-size: 13px; }
+#v-ict .ict-fwd .row b { font: 600 13px var(--sans); color: var(--ink); text-align: right; }
+#v-ict .ict-fwd .msg { font-size: 12.5px; line-height: 1.55; color: var(--ink-dim); margin-top: 4px; }
+/* markets: a quiet quote strip */
+#v-ict .ict-mkts { grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 10px; }
+#v-ict .ict-m { padding: 12px 14px; gap: 3px; }
+#v-ict .ict-m .px { font: 600 18px var(--mono); letter-spacing: -.01em; margin: 2px 0; }
+#v-ict .ict-m .sub { font-size: 12px; }
+/* 2 · results: a ledger of the totals next to the equity curve (no hero-number tiles) */
+#v-ict .ict-res-g { display: grid; grid-template-columns: minmax(250px, 330px) minmax(0, 1fr); gap: 16px 32px; align-items: start; }
+#v-ict .ict-kpi { display: grid; grid-template-columns: minmax(0, 1fr); gap: 0; background: none; border: 0; border-radius: 0; overflow: visible; }
+#v-ict .ict-kpi > div { background: none; padding: 9px 0; display: grid; grid-template-columns: minmax(0, 1fr) auto; grid-template-areas: "k v" "s v"; column-gap: 16px; row-gap: 1px; align-items: center; border-bottom: 1px solid var(--line-soft); }
+#v-ict .ict-kpi > div:first-child { padding-top: 0; } #v-ict .ict-kpi > div:last-child { border-bottom: 0; padding-bottom: 0; }
+#v-ict .ict-kpi span { grid-area: k; font: 600 13px var(--sans); color: var(--ink); }
+#v-ict .ict-kpi small { grid-area: s; font: 500 12px var(--sans); color: var(--ink-faint); }
+#v-ict .ict-kpi b { grid-area: v; font: 600 17px var(--mono); text-align: right; color: var(--ink); }
+#v-ict .ict-eq-w { min-width: 0; }
+#v-ict .ict-eq-l { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 4px 14px; font: 500 12px var(--sans); color: var(--ink-faint); margin-bottom: 8px; }
+#v-ict .ict-eq svg { height: 230px; }
+#v-ict .ict-eq path:nth-of-type(1) { stroke-dasharray: 5 4; }          /* fixed 2R: dashed, so the two lines differ by more than colour */
+#v-ict .ict-eq path:nth-of-type(2) { stroke: var(--ict-line-a); }
+#v-ict .ict-sw { width: 14px; margin: 0 6px 0 2px; } #v-ict .ict-sw.a { background: var(--ict-line-a); }
+#v-ict .ict-sw.b { background: repeating-linear-gradient(90deg, #6f8fd6 0 5px, transparent 5px 8px); }
+/* what works: market and session lead */
+#v-ict .ict-break { grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 22px 32px; }
+#v-ict .ict-break table:nth-child(1) { order: -2; } #v-ict .ict-break table:nth-child(4) { order: -1; }
+#v-ict .ict-break caption { font: 600 13px var(--sans); padding-bottom: 8px; }
+#v-ict .ict-break td, #v-ict .ict-break th { padding: 6px; }
+#v-ict .ict-break th { color: var(--ink-faint); font: 500 12px var(--sans); }
+#v-ict .ict-break td.neg .bar { background-image: repeating-linear-gradient(135deg, transparent 0 2px, rgba(0,0,0,.4) 2px 3.5px); }   /* losing rows hatched */
+/* 3 · history: calendar and the signal log */
+#v-ict .ict-cal-nav .ms-tbtn { min-width: 36px; min-height: 36px; font-size: 16px; }
+#v-ict .ict-cal-d[disabled] { opacity: 1; } #v-ict .ict-cal-d[disabled] .d { color: var(--ink-faint); }
+#v-ict .ict-cal-d .d { color: var(--ink-dim); }
+#v-ict .ict-cal-d.up b, #v-ict .ict-cal-d.dn b { color: var(--ink); font-weight: 700; } #v-ict .ict-cal-d.up small, #v-ict .ict-cal-d.dn small { color: var(--ink-dim); }   /* the signed value carries win / loss; the tint backs it up */
+#v-ict .ict-cal-d.today .d { color: var(--ict-gold-ink); }
+:root[data-theme="light"] #v-ict .ict-cal-d.up { background: color-mix(in srgb, #089981 calc(6% + var(--heat) * 20%), var(--panel)); }
+:root[data-theme="light"] #v-ict .ict-cal-d.dn { background: color-mix(in srgb, #f23645 calc(6% + var(--heat) * 18%), var(--panel)); }
+#v-ict .ict-cal-day li { min-height: 44px; transition: border-color .15s ease-out; }
+#v-ict .ict-t td { height: 44px; }
+#v-ict .ict-t tbody tr:not(.empty):focus-visible { outline-offset: -2px; }
+#v-ict .ict-g.ga, #v-ict .ict-tags button.on, #v-ict .ict-cal-d .tk { color: var(--ict-gold-ink); }
+#v-ict .ict-ck li.y { color: var(--ict-up); } #v-ict .ict-ck li.n { color: var(--ict-dn); }
+@media (max-width: 1000px) {
+  #v-ict .ict-now, #v-ict .ict-res-g { grid-template-columns: minmax(0, 1fr); }
+  #v-ict .ict-mkts { grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); }
+}
+@media (max-width: 700px) {
+  #v-ict .ict-hr { justify-items: stretch; width: 100%; }
+  #v-ict .ict-ctl { display: grid; gap: 4px; }
+  #v-ict #ict-src { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  #v-ict #ict-flt { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  #v-ict .ict-tag { vertical-align: 3px; }
+  /* markets: one swipeable row instead of three rows of tiles */
+  #v-ict .ict-mkts { grid-template-columns: none; grid-auto-flow: column; grid-auto-columns: minmax(150px, 44%); overflow-x: auto; scroll-snap-type: x mandatory; padding-bottom: 4px; overscroll-behavior-x: contain; }
+  #v-ict .ict-m { scroll-snap-align: start; }
+  /* the signal log as two-line rows: market · side · grade · result, then time · session · entry */
+  #v-ict .ict-tw { max-height: 70vh; }
+  #v-ict .ict-t, #v-ict .ict-t tbody { display: block; width: 100%; min-width: 0; }
+  #v-ict .ict-eq svg { height: 170px; }
+  #v-ict .ict-cal-d { padding: 4px 3px; } #v-ict .ict-cal-d b { font-size: 10px; letter-spacing: -.02em; overflow: hidden; }
+  #v-ict .ict-open .r1 .live { font-size: 16px; }
+  #v-ict .ict-t thead { display: none; }
+  #v-ict .ict-t tr { display: grid; grid-template-columns: auto auto minmax(0, 1fr) auto; grid-template-areas: "mk sd gr rs" "tm tm se en" "rv rv rv rv"; gap: 4px 8px; align-items: center; padding: 10px 12px; border-bottom: 1px solid var(--line-soft); min-height: 44px; }
+  #v-ict .ict-t td { display: block; height: auto; padding: 0 !important; border: 0 !important; position: static !important; box-shadow: none !important; background: none !important; white-space: nowrap; font-size: 12.5px; min-width: 0; }
+  #v-ict .ict-t td:nth-child(1) { grid-area: tm; color: var(--ink-faint); font-family: var(--sans); }
+  #v-ict .ict-t td:nth-child(2) { grid-area: mk; font-size: 14px; }
+  #v-ict .ict-t td:nth-child(3) { grid-area: sd; }
+  #v-ict .ict-t td:nth-child(4) { grid-area: gr; overflow: hidden; text-overflow: ellipsis; }
+  #v-ict .ict-t td:nth-child(5) { grid-area: se; color: var(--ink-dim); font-family: var(--sans); }
+  #v-ict .ict-t td:nth-child(8) { grid-area: en; text-align: right; color: var(--ink-dim); }
+  #v-ict .ict-t td:nth-child(8)::before { content: "Entry "; font-family: var(--sans); color: var(--ink-faint); }
+  #v-ict .ict-t td:nth-child(11) { grid-area: rs; text-align: right; font-weight: 600; }
+  #v-ict .ict-t td:nth-child(12) { grid-area: rv; }
+  #v-ict .ict-t td:nth-child(12):has(> .ms-note), #v-ict .ict-t td:nth-child(6), #v-ict .ict-t td:nth-child(7), #v-ict .ict-t td:nth-child(9), #v-ict .ict-t td:nth-child(10) { display: none; }
+  #v-ict .ict-t tr.empty { display: block; } #v-ict .ict-t tr.empty td { white-space: normal; padding: 18px 4px !important; }
+  #v-ict .ict-f { width: 100%; } #v-ict .ict-f select { flex: 1; min-width: 0; }
+  #v-ict .ms-k:has(.ict-f) { flex-wrap: wrap; }
+}
+/* touch: 44px targets */
+@media (pointer: coarse), (max-width: 700px) {
+  #v-ict .ict-src button, #v-ict .ict-seg button, #v-ict .ict-tv-tf button, #v-ict .ict-tags button, #v-ict .ms-tbtn, #v-ict select, #v-ict summary, #v-ict .u-btn { min-height: 44px; }
+  #v-ict .ict-cal-nav .ms-tbtn, #v-ict .tv-x { min-width: 44px; min-height: 44px; }
+  #v-ict summary { display: flex; align-items: center; }
+}
+@media (prefers-reduced-motion: reduce) { #v-ict *, #v-ict *::before, #v-ict *::after { transition: none !important; animation: none !important; } #v-ict .ict-cal-d:hover, #v-ict .ict-m:hover { transform: none !important; } }
+html[data-motion="off"] #v-ict *, html[data-motion="off"] #v-ict *::before, html[data-motion="off"] #v-ict *::after { transition: none !important; animation: none !important; }
+html[data-motion="off"] #v-ict .ict-cal-d:hover { transform: none !important; }
 </style>
 <script>try{if(localStorage.getItem('msMotion')==='off')document.documentElement.dataset.motion='off'}catch(e){}</script>
 <!-- Vercel Web Analytics + Speed Insights (cookie-free; only on the Vercel site, not on GitHub Pages or a local copy) -->
@@ -2709,34 +2839,38 @@ html[data-motion="off"][data-gate] .gate-bg path[stroke] { animation: none; stro
   </section>
   <section class="view ictx" id="v-ict" aria-label="ICT desk" hidden>
     <div class="v-head ict-head">
-      <div><h1 class="h-head">ICT desk</h1><p class="ms-note">US index futures · H1 iFVG reversal (sweep → inversion → trail from +2R). A separate edge from the council. <span id="ict-run"></span></p></div>
-      <div class="ict-hr"><div class="ict-me" id="ict-me"></div><div class="ict-seg ict-src" id="ict-src" role="group" aria-label="Which signals"><button type="button" data-s="both" class="on">Both</button><button type="button" data-s="live">Live</button><button type="button" data-s="replay">Replay</button></div><div class="ict-seg ict-src" id="ict-flt" role="group" aria-label="Which setups"><button type="button" data-f="ap" title="A-setups with a strong inversion candle (body at least 60% of its range), not in the NY afternoon">A+</button><button type="button" data-f="a" class="on" title="Against the daily bias and grade B+ or better">A-setups</button><button type="button" data-f="all">All signals</button><button type="button" data-f="pick" title="A-setups, one bet per cluster: when several indices give the same-side setup within 3 hours, only the highest grade">One per cluster</button></div></div>
+      <div class="ict-title"><h1 class="h-head">ICT desk <span class="ict-tag">Paper desk</span></h1><p class="ms-note">US index futures and gold · H1 iFVG reversal (sweep → inversion → trail from +2R). A separate edge from the council. <span id="ict-run"></span></p></div>
+      <div class="ict-hr"><div class="ict-me" id="ict-me"></div>
+        <div class="ict-ctl"><span class="ict-ctl-l" aria-hidden="true">Source</span><div class="ict-seg ict-src" id="ict-src" role="group" aria-label="Which signals"><button type="button" data-s="both" class="on">Both</button><button type="button" data-s="live">Live</button><button type="button" data-s="replay">Replay</button></div></div>
+        <div class="ict-ctl"><span class="ict-ctl-l" aria-hidden="true">Setups</span><div class="ict-seg ict-src" id="ict-flt" role="group" aria-label="Which setups"><button type="button" data-f="ap" title="A-setups with a strong inversion candle (body at least 60% of its range), not in the NY afternoon">A+</button><button type="button" data-f="a" class="on" title="Against the daily bias and grade B+ or better">A-setups</button><button type="button" data-f="all">All signals</button><button type="button" data-f="pick" title="A-setups, one bet per cluster: when several indices give the same-side setup within 3 hours, only the highest grade">One per cluster</button></div></div></div>
     </div>
-    <div class="ict-clock" id="ict-clock" aria-live="polite"></div>
-    <div class="ict-mkts" id="ict-mkts" role="list" aria-label="Markets"></div>
-    <div class="ict-kpi" id="ict-kpi" role="group" aria-label="Results"></div>
-    <div class="card ict-card ict-fwd" id="ict-fwd"></div>
-    <div class="ict-grid">
-      <div class="card ict-card">
-        <div class="ms-k"><span>Open signals</span><small id="ict-open-n"></small></div>
+    <div class="ict-clock" id="ict-clock"></div>
+    <div class="ict-now">
+      <div class="card ict-card ict-open-c">
+        <div class="ms-k"><h2 class="ict-h">Open now</h2><small id="ict-open-n"></small></div>
         <ul class="ict-open" id="ict-open"><li class="empty">Loading…</li></ul>
       </div>
-      <div class="card ict-card">
-        <div class="ms-k"><span>Equity</span><small>R per signal · <i class="ict-sw a"></i> the model (trail) <i class="ict-sw b"></i> fixed 2R</small></div>
-        <div class="ict-eq" id="ict-eq"></div>
+      <div class="card ict-card ict-fwd" id="ict-fwd"></div>
+    </div>
+    <div class="ict-mkts" id="ict-mkts" role="list" aria-label="Markets"></div>
+    <div class="card ict-card ict-res">
+      <div class="ms-k"><h2 class="ict-h">Results</h2><small>closed signals in the current view</small></div>
+      <div class="ict-res-g">
+        <div class="ict-kpi" id="ict-kpi" role="group" aria-label="Results"></div>
+        <div class="ict-eq-w"><div class="ict-eq-l"><span>Equity, R per signal</span><span><i class="ict-sw a"></i>the model (trail) <i class="ict-sw b"></i>fixed 2R</span></div><div class="ict-eq" id="ict-eq"></div></div>
       </div>
     </div>
     <div class="card ict-card">
-      <div class="ms-k"><span>P&amp;L calendar</span><span class="ict-cal-nav"><button type="button" class="ms-tbtn" id="ict-cal-prev" aria-label="Previous month">‹</button><b id="ict-cal-m"></b><button type="button" class="ms-tbtn" id="ict-cal-next" aria-label="Next month">›</button></span></div>
+      <div class="ms-k"><h2 class="ict-h">What works</h2><small>closed signals split by market, session and each ICT feature · the model's exit</small></div>
+      <div class="ict-break" id="ict-break"></div>
+    </div>
+    <div class="card ict-card">
+      <div class="ms-k"><h2 class="ict-h">P&amp;L calendar</h2><span class="ict-cal-nav"><button type="button" class="ms-tbtn" id="ict-cal-prev" aria-label="Previous month">‹</button><b id="ict-cal-m" aria-live="polite"></b><button type="button" class="ms-tbtn" id="ict-cal-next" aria-label="Next month">›</button></span></div>
       <div class="ict-cal" id="ict-cal"></div>
       <ul class="ict-cal-day" id="ict-cal-day"></ul>
     </div>
     <div class="card ict-card">
-      <div class="ms-k"><span>What works</span><small>closed signals split by each ICT feature · the model's exit</small></div>
-      <div class="ict-break" id="ict-break"></div>
-    </div>
-    <div class="card ict-card">
-      <div class="ms-k"><span>Signals</span>
+      <div class="ms-k"><h2 class="ict-h">Signals</h2>
         <span class="ict-f" id="ict-f" role="group" aria-label="Filter signals">
           <select id="ict-f-m" aria-label="Market"><option value="">All markets</option><option value="nq">NQ</option><option value="es">ES</option><option value="ym">YM</option><option value="rty">RTY</option><option value="gc">Gold (GC)</option></select>
           <select id="ict-f-s" aria-label="Status"><option value="">All</option><option value="open">Open</option><option value="closed">Closed</option><option value="todo">Not reviewed</option><option value="taken" class="ict-rw">Taken by me</option></select>
@@ -2745,11 +2879,11 @@ html[data-motion="off"][data-gate] .gate-bg path[stroke] { animation: none; stro
     </div>
     <div class="ict-grid ict-rw">
       <div class="card ict-card">
-        <div class="ms-k"><span>My trading</span><small id="ict-mine-who"></small></div>
+        <div class="ms-k"><h2 class="ict-h">My trading</h2><small id="ict-mine-who"></small></div>
         <div id="ict-mine"></div>
       </div>
       <div class="card ict-card">
-        <div class="ms-k"><span>Saving</span><small id="ict-sync"></small></div>
+        <div class="ms-k"><h2 class="ict-h">Saving</h2><small id="ict-sync"></small></div>
         <p class="ms-note">Your reviews and taken trades are kept in this browser and, once GitHub is connected, saved to the council data (ict/desk.json) so they show on every device and for the owner.</p>
         <p><button type="button" class="ms-tbtn" id="ict-gh">Connect GitHub</button> <button type="button" class="ms-tbtn" id="ict-sync-now">Sync now</button></p>
       </div>
