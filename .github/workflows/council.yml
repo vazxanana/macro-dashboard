@@ -134,7 +134,9 @@ jobs:
             git -C data add -A
             if ! git -C data diff --cached --quiet; then
               git -C data commit -q -m "Council run $(date -u +%Y-%m-%dT%H:%MZ)"
-              for j in 1 2 3; do git -C data pull -q --rebase origin council-data && git -C data push -q origin HEAD:council-data && break; sleep 5; done
+              # a rebase that stops on a conflict (another writer touched the same file) must be aborted, or every later round's
+              # pull / commit fails inside the half-done rebase and nothing is saved until the run ends (8 Nov: watchdog review)
+              for j in 1 2 3; do { git -C data pull -q --rebase origin council-data || git -C data rebase --abort || true; } && git -C data push -q origin HEAD:council-data && break; sleep 5; done
             fi
             if newcode; then echo "New council code on main: handing over after round $i"; break; fi
             if [ "$i" -lt "$ROUNDS" ]; then
@@ -143,7 +145,7 @@ jobs:
                 node council/ctrader-account.mjs data >/dev/null 2>&1 || true
                 if ! git -C data diff --quiet -- ctrader/account.json 2>/dev/null || [ -n "$(git -C data ls-files --others -- ctrader/account.json)" ]; then
                   git -C data add ctrader/account.json && git -C data commit -q -m "cTrader account $(date -u +%H:%MZ)" && \
-                  for j in 1 2 3; do git -C data pull -q --rebase origin council-data && git -C data push -q origin HEAD:council-data && break; sleep 3; done
+                  for j in 1 2 3; do { git -C data pull -q --rebase origin council-data || git -C data rebase --abort || true; } && git -C data push -q origin HEAD:council-data && break; sleep 3; done
                 fi
                 if newcode; then echo "New council code on main: handing over after round $i"; break 2; fi
               done
@@ -151,6 +153,9 @@ jobs:
           done
 
       - name: Start the next run
+        # also after a failed Trade step (never after a cancel: the cron watchdog or a person cancelled it on purpose); one failed
+        # dispatch call used to leave the loop dead until GitHub fired the cron, which it does a few times a day here
+        if: ${{ !cancelled() }}
         env:
           GH_TOKEN: ${{ github.token }}
-        run: gh workflow run council.yml --ref main -R "${{ github.repository }}"
+        run: for a in 1 2 3; do gh workflow run council.yml --ref main -R "${{ github.repository }}" && exit 0; sleep 10; done; echo "::warning::could not dispatch the next run"; exit 1
