@@ -263,6 +263,12 @@ const USER_RULES = [
       f.d1 = 'against'; f.src = { ...(f.src || {}), d1: 'user' }; f.noSession = [...new Set([...(f.noSession || []), 'asia'])]; },
     change: 'Scalp against D1, outside Asia, trades live on paper on every market (the market focus no longer blocks Scalp); the other engine setups stay shadow',
     why: '30-day replay: Scalp against the D1 trend +0.329R a trade over 500 trades, positive in both halves (+0.24 / +0.42); Scalp with D1 -0.29R over 459. Forward shadow trades 1-7 Nov agree: +0.25R over 127. Against D1 in Asia is flat (+0.03R over 562), so Asia stays out.' },
+  // 7 Nov 19:xx UTC: the owner delegated the trading decisions ("you're the hedge fund manager"). The long-history research
+  // overturned the 30-day replay that put Scalp live: it loses after costs in every year, market and regime tested. Scalp goes
+  // back to shadow (its filters stay, its signals keep being recorded); open live Scalp trades run to their own exits.
+  { id: 'scalp-shadow-research', apply: (c) => { c.focusSetups = (c.focusSetups || []).filter((k) => k !== 'scalp'); },
+    change: 'Scalp back to shadow (owner delegated): no new live paper Scalp trades; signals still recorded as shadow',
+    why: 'Live rule on HistData M1 2018-Oct 2026 (gold + 5 forex, live engine, 1 spread a trade): -0.187R a trade 2018-23 (n9,551), -0.229R 2024-26 (n4,532), negative every year and market (research/edge/regime); all 50 regime cells negative; no exit rescues it (research/edge/scalp-exits, best -0.18R); realistic costs -0.24 to -0.30R (research/edge/costs). The 30-day replay is -0.07R net now, and live forex results on spot candles were far worse than on Kraken (research/spotcheck.json).' },
 ];
 config.userRules = config.userRules || [];
 for (const u of USER_RULES) if (!config.userRules.includes(u.id)) { u.apply(config); config.userRules.push(u.id); config.history.push({ at: nowISO, by: 'user', change: u.change, why: u.why }); }
