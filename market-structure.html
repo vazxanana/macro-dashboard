@@ -1363,6 +1363,10 @@ td.st-open::before { background: var(--accent); box-shadow: 0 0 0 3px var(--acce
 td.st-pend::before { background: #e0a526; animation: ms-wait 1.6s ease-in-out infinite; }
 td.st-pend { color: var(--ink); }
 td.st-dim { color: var(--ink-faint); }
+
+/* polish 19: council status 'stopped' matches running/late (the badge style of .c-bad was leaking in); loss groups get a review progress bar */
+#ms-c-status .c-bad { font: inherit; font-weight: 700; padding: 0; background: none; border-radius: 0; }
+.rv-bar { display: inline-block; width: 44px; height: 4px; margin-left: 8px; vertical-align: 2px; border-radius: 4px; background: linear-gradient(90deg, var(--buy) var(--p), var(--line) var(--p)); }
 </style>
 </head>
 <body>
@@ -4249,7 +4253,7 @@ function msNextSetup(bars, A) {
       rv.forEach((x) => (RV.map[x.id].tags || []).forEach((t) => { tc[t] = (tc[t] || 0) + 1; }));
       const top = Object.entries(tc).sort((p, q) => q[1] - p[1]).slice(0, 3).map(([t, n]) => `${esc(rvTagName(t))} ×${n}`).join(' · ');
       const sh = a.filter((x) => x.shadow).length, cand = ((ow.candidates || []).filter((c) => c.k === x0.k));
-      return `<details class="loss-g" data-g="${esc(key)}"${window.LOSS_OPEN.has(key) ? ' open' : ''}><summary><b>${esc(x0.name)}</b> <small>${esc(x0.pair || '')} · ${esc(x0.k)}</small><span class="loss-n">${a.length} loss${a.length > 1 ? 'es' : ''}${sh ? ` (${sh} shadow)` : ''} · <b class="neg">${R.toFixed(1)}R</b> · reviewed ${rv.length}/${a.length}</span>${top ? `<span class="loss-top">Your reasons: ${top}</span>` : ''}${cand.length ? `<span class="loss-top">Council: ${cand.map((c) => `${esc(rvTagName(c.tag))} in ${c.n} of ${c.of} reviewed, queued to test`).join('; ')}</span>` : ''}</summary>
+      return `<details class="loss-g" data-g="${esc(key)}"${window.LOSS_OPEN.has(key) ? ' open' : ''}><summary><b>${esc(x0.name)}</b> <small>${esc(x0.pair || '')} · ${esc(x0.k)}</small><span class="loss-n">${a.length} loss${a.length > 1 ? 'es' : ''}${sh ? ` (${sh} shadow)` : ''} · <b class="neg">${R.toFixed(1)}R</b> · reviewed ${rv.length}/${a.length}<i class="rv-bar" style="--p:${(a.length ? rv.length / a.length * 100 : 0).toFixed(0)}%" aria-hidden="true"></i></span>${top ? `<span class="loss-top">Your reasons: ${top}</span>` : ''}${cand.length ? `<span class="loss-top">Council: ${cand.map((c) => `${esc(rvTagName(c.tag))} in ${c.n} of ${c.of} reviewed, queued to test`).join('; ')}</span>` : ''}</summary>
         <ul class="loss-rows">${a.slice(0, 60).map((x) => { const r = RV.map[x.id], done = r && !r.draft;
           return `<li data-lid="${esc(x.id)}" tabindex="0" title="Open the chart and review this loss"><span>${ftime(x.closed + TZ)}</span><b>${esc(x.label)}</b><span class="chip ${x.side}">${x.side.toUpperCase()}</span><b class="neg">${x.R != null ? x.R : -1}R</b><span class="loss-why">${x.shadow ? `shadow · ${esc((x.blockedBy || []).join(', '))}` : 'live'}${x.pm && x.pm.title ? ` · council: ${esc(x.pm.title)}` : ''}</span><span class="loss-st ${done ? 'ok' : ''}">${done ? `✓ ${esc((r.tags || []).map(rvTagName).join(', ') || 'reviewed')}${r.by && r.by !== 'owner' ? ` · ${esc(r.by)}` : ''}` : r && r.draft ? 'draft' : 'review'}</span></li>`; }).join('')}${a.length > 60 ? `<li class="loss-more">${a.length - 60} older losses not shown; narrow the filter.</li>` : ''}</ul></details>`;
     }).join('') : '<p class="ms-note">No losing trade in this view.</p>';
