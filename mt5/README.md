@@ -13,7 +13,7 @@ so it is off by default). The Expert Advisor polls that file every 30 s and mirr
 | `win` / `loss` / `be` / `expired` / `missed` | position closed or order deleted |
 | add (`addOf` set) | same lots as its first trade (same notional, as in the research) |
 
-**Sizing.** `InpRisk*` is the % of equity lost if the first unit hits its stop (default 0.25% each). Lots are
+**Sizing.** `InpRisk*` is the % of equity lost if the first unit hits its stop (default 0.25% each; gold trend `InpRiskGoldTrend` 0.5%, twice the other gold legs, as the sizing guide: on 2023-26 that adds about +3% / +6% in the two halves at the same drawdown). Lots are
 computed from the symbol's tick value and rounded down to the volume step; a trade whose minimum lot would risk
 more is skipped.
 
