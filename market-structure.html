@@ -4980,5 +4980,11 @@ function msNextSetup(bars, A) {
   addEventListener('hashchange', () => { const v = top(); if (v !== cur) { cur = v; requestAnimationFrame(() => scrollTo({ top: 0, behavior: 'instant' })); } });
 })();
 </script>
+<script>
+/* polish 31: the phone browser bar follows the page theme */
+(() => { const m = document.querySelector('meta[name="theme-color"]'); if (!m) return; const r = document.documentElement;
+  const f = () => { const bg = getComputedStyle(r).getPropertyValue('--bg').trim(); if (bg) m.setAttribute('content', bg); };
+  f(); new MutationObserver(f).observe(r, { attributes: true, attributeFilter: ['data-theme'] }); })();
+</script>
 </body>
 </html>
