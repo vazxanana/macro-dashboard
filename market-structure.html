@@ -2297,6 +2297,7 @@ html[data-motion="off"][data-gate] .gate-bg path[stroke] { animation: none; stro
             <label><input type="checkbox" id="ms-show-ema"><i style="background:linear-gradient(90deg,#2962ff 33%,#e0a526 33% 66%,#9c27b0 66%);height:2px"></i>EMAs 21 / 50 / 200</label>
             <label><input type="checkbox" id="ms-show-shade" checked><i style="background:linear-gradient(90deg,rgba(38,166,154,.4) 33%,rgba(41,98,255,.4) 33% 66%,rgba(156,39,176,.4) 66%)"></i>Session shading</label>
             <label class="cmp-row">Compare with <select id="ms-cmp" aria-label="Compare with another market"><option value="">none</option></select></label>
+            <label><input type="checkbox" id="ms-show-ha"><i style="background:linear-gradient(90deg,rgba(8,153,129,.8) 33%,rgba(8,153,129,.45) 33% 66%,rgba(242,54,69,.8) 66%)"></i>Heikin Ashi candles</label>
             <label><input type="checkbox" id="ms-show-vol" checked><i style="background:linear-gradient(90deg,rgba(8,153,129,.5) 50%,rgba(242,54,69,.5) 50%)"></i>Volume</label>
             <label><input type="checkbox" id="ms-show-next" data-show="next" checked><i style="background:#2962ff;height:2px"></i>Next setup</label>
             <label><input type="checkbox" id="ms-show-plan" data-show="plan" checked><i style="background:#089981;height:2px"></i>Selected trade</label>
@@ -3085,7 +3086,7 @@ function msNextSetup(bars, A) {
     htf:  'rgba(41,98,255,0.85)', proj: '#2962ff',
   };
   const G = { theme: root.dataset.chart === 'dark' ? 'dark' : 'light', show: { bo: true, origin: true, cf: true, vr: true, next: true, htf: true, plan: true, detail: false, sess: true, news: true, replica: true }, risk: 100, alerts: false, plan: null, prev: null, sel: null, prevStates: {}, planKey: '',
-    offset: 0, spot: null, source: '', live: false, csv: false };
+    offset: 0, spot: null, source: '', live: false, csv: false }; try { G.ha = localStorage.getItem('ms-ha') === '1'; } catch (e) {}
   const $ = (id) => document.getElementById(id);
   const $o = (id) => document.getElementById(id) || { set textContent(v) {}, set className(v) {}, set innerHTML(v) {}, style: {} };
   const fmt = (v) => (v == null || !isFinite(v)) ? '—' : v.toLocaleString('en-US', { minimumFractionDigits: CUR.dec, maximumFractionDigits: CUR.dec });
@@ -3598,7 +3599,7 @@ function msNextSetup(bars, A) {
     { const bar = document.createElement('div'); bar.className = 'rp-bar'; bar.hidden = true;
       bar.innerHTML = '<button type="button" data-rp="-1" aria-label="One candle back">◀</button><button type="button" data-rp="play" aria-label="Play">▶</button><button type="button" data-rp="1" aria-label="One candle forward">▶|</button><span class="rp-t"></span><button type="button" data-rp="x" aria-label="Exit replay">Exit</button>';
       el.appendChild(bar); let timer = null;
-      const show = () => { const B = P.bars.slice(0, P.rp.i); series.setData(B); if (lgHover === false) { const lb = B[B.length - 1]; if (lb) lg.innerHTML = `<span class="k">Replay</span><span class="k">O</span><b>${fmt(lb.open)}</b><span class="k">H</span><b>${fmt(lb.high)}</b><span class="k">L</span><b>${fmt(lb.low)}</b><span class="k">C</span><b>${fmt(lb.close)}</b>`; } try { vol.setData([]); } catch (e) {} const b = B[B.length - 1];
+      const show = () => { const B = P.bars.slice(0, P.rp.i); series.setData(P.view(B)); if (lgHover === false) { const lb = B[B.length - 1]; if (lb) lg.innerHTML = `<span class="k">Replay</span><span class="k">O</span><b>${fmt(lb.open)}</b><span class="k">H</span><b>${fmt(lb.high)}</b><span class="k">L</span><b>${fmt(lb.low)}</b><span class="k">C</span><b>${fmt(lb.close)}</b>`; } try { vol.setData([]); } catch (e) {} const b = B[B.length - 1];
         bar.querySelector('.rp-t').textContent = b ? `${new Date((b.time - TZ) * 1000).toLocaleString(undefined, { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })} · ${P.rp.i}/${P.bars.length}` : ''; };
       const step = (d) => { if (!P.rp) return; P.rp.i = Math.max(20, Math.min(P.bars.length, P.rp.i + d)); show(); if (P.rp.i >= P.bars.length) stop(); };
       const stop = () => { clearInterval(timer); timer = null; bar.querySelector('[data-rp="play"]').textContent = '▶'; };
@@ -3609,11 +3610,14 @@ function msNextSetup(bars, A) {
         if (a === 'x') { P.replay(false); const t = el.closest('.ms-pane') && el.closest('.ms-pane').querySelector('.ch-rp'); if (t) { t.classList.remove('on'); t.setAttribute('aria-pressed', 'false'); } }
         else if (a === 'play') { if (timer) stop(); else { b.textContent = '❚❚'; timer = setInterval(() => step(1), 600); } } else step(+a); });
       addEventListener('keydown', (ev) => { if (!P.rp || !el.offsetParent || /INPUT|TEXTAREA|SELECT/.test((ev.target || {}).tagName || '')) return; if (ev.key === 'ArrowRight') { ev.preventDefault(); step(1); } else if (ev.key === 'ArrowLeft') { ev.preventDefault(); step(-1); } }); }
+    // Heikin Ashi display (7 Nov loop): only the drawn candles change; P.bars (analysis, levels, legend) stay the real OHLC
+    P.view = function (B) { if (!G.ha) { P._ha = null; return B; } const H = []; B.forEach((b, i) => { const c = (b.open + b.high + b.low + b.close) / 4, o = i ? (H[i - 1].open + H[i - 1].close) / 2 : (b.open + b.close) / 2; H.push({ time: b.time, open: o, high: Math.max(b.high, o, c), low: Math.min(b.low, o, c), close: c }); }); P._ha = H; return H; };
+    P.viewBar = function (b) { if (!G.ha || !P._ha || !P._ha.length) return b; const H = P._ha; if (H[H.length - 1].time === b.time) H.pop(); const p = H[H.length - 1], c = (b.open + b.high + b.low + b.close) / 4, o = p ? (p.open + p.close) / 2 : (b.open + b.close) / 2, h = { time: b.time, open: o, high: Math.max(b.high, o, c), low: Math.min(b.low, o, c), close: c }; H.push(h); if (H.length > P.bars.length + 5) H.shift(); return h; };
     P.rebuild = function (keepView) {
       const off = G.offset;
       P.bars = P.raw.map((b) => ({ time: b.time + TZ, open: b.open + off, high: b.high + off, low: b.low + off, close: b.close + off }));
       if (P.rp) return;   // replaying: keep the hidden future hidden (analysis resumes on exit)
-      series.setData(P.bars);
+      series.setData(P.view(P.bars));
       P.setVol(); P.setEma(); P.setShade();
       P.analyze();
       if (!keepView || !P.fitted) P.fit();
@@ -3730,7 +3734,7 @@ function msNextSetup(bars, A) {
       P.tickEma(b); P.tickShade(b);
       if (G.showVol !== false) { const rk = P.raw[P.raw.length - 1]; if (rk.volume > 0 || P.raw.some((x) => x.volume > 0)) try { vol.update({ time: b.time, value: rk.volume || 0, color: vcol(rk) }); } catch (e) {} }
       if (P.bars.length > P.raw.length) P.bars.shift();
-      if (!P.rp) series.update(b);
+      if (!P.rp) series.update(P.viewBar(b));
       if (!lgHover && !P.rp) P.legend();
       const now = Date.now();
       if (k.closed || !P._t || now - P._t > 2000) { P._t = now; P.analyze(); }
@@ -3859,6 +3863,7 @@ function msNextSetup(bars, A) {
     } }
   { const k = document.getElementById('ms-show-shade'); try { G.showShade = localStorage.getItem('ms-shade') !== '0'; } catch (e) {} if (k) { k.checked = G.showShade !== false; k.addEventListener('change', () => { G.showShade = k.checked; try { localStorage.setItem('ms-shade', k.checked ? '1' : '0'); } catch (e) {} Object.values(panes).forEach((P) => P.setShade && P.setShade()); }); } }
   { const k = document.getElementById('ms-show-ema'); try { G.showEma = localStorage.getItem('ms-ema') === '1'; } catch (e) {} if (k) { k.checked = G.showEma === true; k.addEventListener('change', () => { G.showEma = k.checked; try { localStorage.setItem('ms-ema', k.checked ? '1' : '0'); } catch (e) {} Object.values(panes).forEach((P) => P.setEma && P.setEma()); }); } }
+  { const v = document.getElementById('ms-show-ha'); try { G.ha = localStorage.getItem('ms-ha') === '1'; } catch (e) {} if (v) { v.checked = !!G.ha; v.addEventListener('change', () => { G.ha = v.checked; try { localStorage.setItem('ms-ha', v.checked ? '1' : '0'); } catch (e) {} Object.values(panes).forEach((P) => { if (P.raw && P.raw.length && P.rebuild) P.rebuild(true); }); }); } }
   { const v = document.getElementById('ms-show-vol'); try { G.showVol = localStorage.getItem('ms-vol') !== '0'; } catch (e) {} if (v) { v.checked = G.showVol !== false; v.addEventListener('change', () => { G.showVol = v.checked; try { localStorage.setItem('ms-vol', v.checked ? '1' : '0'); } catch (e) {} Object.values(panes).forEach((P) => P.setVol && P.setVol()); }); } }
   // TradingView alerts in (7 Nov loop): webhook URL (owner), message template, forward-to-this-device switch, recent alerts
   { const btn = document.getElementById('ms-tvw-open'); let dlg;
