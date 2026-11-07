@@ -1624,6 +1624,11 @@ html[data-motion="off"] .stagger-in > * { animation: none; }
 @media (hover: hover) { #ms-levels b:hover { background: var(--accent-soft, rgba(91,140,255,.12)); } }
 .copy-tip { position: fixed; z-index: 120; pointer-events: none; padding: 4px 8px; border-radius: 6px; background: var(--ink); color: var(--bg); font: 600 11.5px var(--sans); transform: translate(-50%, -130%); animation: tipIn .14s cubic-bezier(.23,1,.32,1); }
 @keyframes tipIn { from { opacity: 0; transform: translate(-50%, -110%); } }
+
+/* scanner: distance to entry in R */
+.ms-srow .lv-d { font: 600 10.5px var(--sans); color: var(--ink-faint); white-space: nowrap; padding: 1px 6px; border-radius: 999px; border: 1px dashed var(--line); }
+.ms-srow .lv-d.at { color: var(--accent); border: 1px solid color-mix(in srgb, var(--accent) 45%, transparent); background: var(--accent-soft, rgba(91,140,255,.12)); }
+:root[data-theme="pro"] .ms-srow .lv-d { border-radius: 3px; }
 </style>
 <script>try{if(localStorage.getItem('msMotion')==='off')document.documentElement.dataset.motion='off'}catch(e){}</script>
 </head>
@@ -3454,7 +3459,7 @@ function msNextSetup(bars, A) {
       const best = r.list[0], ready = r.list.filter((t) => t.state === 'READY');
       const chg = r.chg === null ? '' : ` <small style="color:${r.chg >= 0 ? UPC : DNC};font-weight:600">${r.chg >= 0 ? '+' : ''}${r.chg.toFixed(2)}%</small>`;
       const su = best ? `<span class="su"><span class="ms-chip ${best.sell ? 'ms-chip-sell' : 'ms-chip-buy'}">${best.sell ? 'SELL' : 'BUY'}</span><b>${best.name}</b><small>${best.pair}</small><span class="ms-st ${best.cls}">${best.state}</span>${ready.length > 1 ? `<small>+${ready.length - 1} more ready</small>` : ''}</span>` : '<span class="su">No setup</span>';
-      const lv = best && !best.invalid ? `<span class="lv"><span class="lv-p">Entry ${fmtI(best.entry, I)}</span> <span class="lv-p">Stop ${fmtI(best.stop, I)}</span> <b class="lv-r">${best.rr.toFixed(1)}R</b></span>` : '<span class="lv"></span>';
+      const lv = best && !best.invalid ? `<span class="lv"><span class="lv-p">Entry ${fmtI(best.entry, I)}</span> <span class="lv-p">Stop ${fmtI(best.stop, I)}</span> <b class="lv-r">${best.rr.toFixed(1)}R</b>${(() => { const risk = Math.abs(best.entry - best.stop); if (!risk || r.price == null) return ''; const away = (best.sell ? best.entry - r.price : r.price - best.entry) / risk; const at = Math.abs(away) < 0.05; return `<span class="lv-d${at ? ' at' : ''}" title="Distance from price to entry, in multiples of the stop distance">${at ? 'at entry' : `${Math.abs(away).toFixed(1)}R to entry`}</span>`; })()}</span>` : '<span class="lv"></span>';
       return `<a class="ms-srow${cur}${ready.length ? ' ready' : ''}" href="${href}">${mk}<span class="pr">${fmtI(r.price, I)}${chg}</span><span class="tr">${arrow(r.trend['1d'], 'D1')}${arrow(r.trend['4h'], 'H4')}${arrow(r.trend['1h'], 'H1')}</span>${su}${lv}</a>`;
     }).join('');
     const nReady = rows.filter((x) => x.r && !x.r.err && x.r.list.some((t) => t.state === 'READY')).length;
