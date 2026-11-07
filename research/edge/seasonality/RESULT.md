@@ -4,7 +4,7 @@ Paper research only. No live rule, config or tracker was changed.
 
 **Question.** Every edge the council has found so far is regime-bound: it works from 2018 or 2023 and fails on older data (#511, #512, #526, #508, #530). Is there a simple calendar or clock edge, with a published economic reason, that holds across both 2006–15 and 2016–26 on NQ, ES or gold after costs?
 
-The family, the rules, the costs and the pass bar were pre-registered and pushed before any return was computed (`preregistration.md`, commit 1004897d on main's history; first pushed as 13ac532a before a rebase). There are 6 hypotheses taken from the literature and 10 tests (hypothesis × market). The bar:
+The family, the rules, the costs and the pass bar were pre-registered and pushed before any return was computed (`preregistration.md`, commit 13ac532a, 1004897d after a rebase onto main; both pushed before any result). There are 6 hypotheses taken from the literature and 10 tests (hypothesis × market). The bar:
 - **Half A, 2006–15:** net mean > 0 and one-sided p < 0.005 (Bonferroni over 10 tests).
 - **Half B, 2016–26:** net mean > 0 and p < 0.05 / (number of tests that passed half A).
 - **Double costs:** net mean > 0 in both halves.
