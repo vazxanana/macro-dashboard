@@ -145,7 +145,12 @@ const RULES = {
   none: () => false,
 };
 export const isASetup = (g, mk) => { const r = mk && MARKETS[mk] && MARKETS[mk].aRule; return r ? RULES[r](g) : aIndex(g); };
-export const sizeOf = (g, mk) => (mk && MARKETS[mk] && MARKETS[mk].aRule ? 1 : aTight(g) ? TIGHT_SIZE : 1);
+// skill §27: index A-setups are sized by the room to the draw on liquidity (DOL, the next untaken high/low) at the signal:
+// 1.5x when it is >= 2R away, 0.5x when closer or unknown (more R in all four test sets, smaller drawdown in three)
+export const DOL_ROOM = 2, ROOM_SIZE = [0.5, 1.5];
+const roomR = (g) => (g.dol != null && g.r0 > 0 ? ((g.side > 0 ? 1 : -1) * (g.dol - g.entry)) / g.r0 : null);
+export const sizeOf = (g, mk) => { if (mk && MARKETS[mk] && MARKETS[mk].aRule) return 1;
+  const r = roomR(g); return +((aTight(g) ? TIGHT_SIZE : 1) * (r != null && r >= DOL_ROOM ? ROOM_SIZE[1] : ROOM_SIZE[0])).toFixed(2); };
 // A+ tier (skill §17): an A-setup whose inversion candle body is >= 60% of its range and that does not fire in the NY afternoon (12-16 ET)
 export const isAPlus = (g, mk) => !(mk && MARKETS[mk] && MARKETS[mk].aRule) && isASetup(g, mk) && g.feat.body >= 0.6 && g.feat.session !== 'NY PM';   // §26: no A+ tier for gold / FX (strong bodies did worse there)
 export const letter = (g) => (g >= 10 ? 'A+' : g >= 9 ? 'A' : g >= 8 ? 'A-' : g >= 7 ? 'B+' : g >= 6 ? 'B' : g >= 5 ? 'B-' : g >= 3 ? 'C' : 'F');

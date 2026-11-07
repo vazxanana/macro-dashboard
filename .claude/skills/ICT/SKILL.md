@@ -281,3 +281,24 @@ Windows: 2019-22 | 2023-24 | 2025-26.
   - Desk clusters stay index-only.
   - The replay has CNBC history only for these (no cash fill).
 - **Caveat:** spot gold and HistData FX stand in for the futures/broker feed; the forward sample decides.
+
+## 27. Size by room to the draw on liquidity (7 Nov 2026) — index A-setups
+MMXM / §9.8: the target is the DOL (the next untaken high/low).
+Tested on the core index A-setups (against, grade >= 7, stop 0.3-0.75 ATR, live trail, costs).
+Datasets: cash 23-24 | cash 25-26 | NQ futures 23-25 | 2026 replay.
+- **Exit at the DOL:** worse than the trail everywhere.
+  - All off at the DOL (1-8R): +28.8 | +40.4 | +32.9 | −1.8R.
+  - Half at the DOL: +33.2 | +44.5 | +37.5 | +0.7R.
+  - Live trail: +37.7 | +48.6 | +42.1 | +3.2R.
+- **Room as a filter:** only DOL >= 2R away gives +24.0 dd 4.6 | +26.4 dd 5.3 | +27.5 dd 4.0 | +9.5 dd 5.5. Better per trade and in drawdown, less total.
+- **Room as size: 1.5x when the DOL is >= 2R away, 0.5x otherwise (or unknown).**
+  - With sizing: +42.9 dd 7.5 | +50.7 dd 10.7 | +48.6 dd 6.7 | +11.0 dd 9.1.
+  - Live: +37.7 dd 7.6 | +48.6 dd 10.8 | +42.1 dd 5.4 | +3.2 dd 16.2.
+  - More R in all four, smaller drawdown in three (NQ futures dd +1.3R). Average size about 0.94x, so total risk is about the same.
+  - Other splits: 1/0.5 and 1/0.75 have less total; 1.5/1 has the same ratio with more drawdown.
+- **Gold and FX exits (§26 rules) re-checked:** trails 1-3R, 12-72 h and fixed 1.5-3R targets.
+  - Nothing beats the live trail 2/1.5, 36 h in every window (gold 3/2 trail and 48 h win one window and lose another).
+  - Unchanged; gold and FX stay at 1x (no DOL test on them yet).
+- **Code:** `DOL_ROOM = 2`, `ROOM_SIZE = [0.5, 1.5]`, `sizeOf(g, mk)`.
+  - The size multiplies with the §25 tight-stop half, giving 0.25 / 0.5 / 0.75 / 1.5.
+  - R is stored x size; the desk pill shows "1.5× size" etc.
