@@ -204,39 +204,53 @@
    "kind": "skipMarket",
    "value": "eurusd",
    "label": "skip EUR/USD",
-   "n": 22,
-   "exp": -0.87,
-   "restN": 199,
-   "restExp": 0.27,
-   "why": "scalp under the live rule made −0.87R a trade over 22 replay trades on EUR/USD; the other markets +0.27R over 199.",
-   "at": "2026-11-07T17:21:03.000Z"
+   "n": 21,
+   "exp": -0.7,
+   "restN": 214,
+   "restExp": 0.16,
+   "why": "scalp under the live rule made −0.70R a trade over 21 replay trades on EUR/USD; the other markets +0.16R over 214.",
+   "at": "2026-11-07T17:57:21.000Z"
+  },
+  {
+   "setup": "scalp",
+   "kind": "skipMarket",
+   "value": "usdcad",
+   "label": "skip USD/CAD",
+   "n": 28,
+   "exp": -0.35,
+   "restN": 207,
+   "restExp": 0.15,
+   "why": "scalp under the live rule made −0.35R a trade over 28 replay trades on USD/CAD; the other markets +0.15R over 207.",
+   "at": "2026-11-07T17:57:21.000Z"
   },
   {
    "setup": "scalp",
    "kind": "stability",
-   "value": "stable",
-   "n": 221,
-   "exp": 0.16,
+   "value": "unstable",
+   "n": 235,
+   "exp": 0.09,
    "h1": {
-    "n": 104,
-    "exp": 0.01
+    "n": 123,
+    "exp": -0.02
    },
    "h2": {
-    "n": 117,
-    "exp": 0.3
+    "n": 112,
+    "exp": 0.2
    },
-   "flag": false,
-   "why": "scalp under the live rule: +0.16R a trade over 221 replay trades; first half +0.01R (104), second half +0.30R (117): positive in both halves.",
-   "at": "2026-11-07T17:21:03.000Z"
+   "flag": true,
+   "why": "scalp under the live rule: +0.09R a trade over 235 replay trades; first half −0.02R (123), second half +0.20R (112): one half lost money, so the edge is not steady.",
+   "at": "2026-11-07T17:57:21.000Z"
   }
  ],
- "proposalsKey": "v2|2026-11-07T17:09:47.826Z|[[\"scalp\"],{\"scalp\":{\"d1\":\"against\",\"since\":{\"d1\":\"2026-11-02T11:52:07.000Z\",\"session:asia\":\"2026-11-02T21:25:27.000Z\",\"session:overlap\":\"2026-11-07T06:00:50.000Z\"},\"src\":{\"d1\":\"user\",\"noMarket\":\"user\",\"session:asia\":\"user\"},\"noSession\":[\"asia\",\"overlap\"],\"noMarket\":[\"audusd\"]},\"rscalp\":{\"since\":{\"session:newyork\":\"2026-11-06T12:00:22.000Z\"},\"src\":{\"minRR\":\"user\"},\"noSession\":[\"newyork\"],\"minRR\":3},\"intraday\":{\"d1\":\"against\",\"since\":{\"d1\":\"2026-11-02T11:52:07.000Z\",\"session:asia\":\"2026-11-04T12:04:20.000Z\"},\"src\":{\"d1\":\"backtest\",\"maxRR\":\"user\"},\"maxRR\":10,\"noSession\":[\"asia\"]},\"rintra\":{\"since\":{\"session:late\":\"2026-11-03T06:00:12.000Z\"},\"noSession\":[\"late\"],\"noMarket\":[\"usdchf\"],\"src\":{\"noMarket\":\"user\"}},\"position\":{\"off\":true,\"src\":{\"off\":\"user\"}},\"swing\":{\"d1\":\"against\",\"src\":{\"d1\":\"user\"}},\"m30m1\":{\"d1\":\"with\",\"since\":{\"d1\":\"2026-11-07T06:00:50.000Z\"}}}]",
- "proposalsBt": "2026-11-07T17:09:47.826Z",
+ "proposalsKey": "v2|2026-11-07T17:52:30.624Z|[[\"scalp\"],{\"scalp\":{\"d1\":\"against\",\"since\":{\"d1\":\"2026-11-02T11:52:07.000Z\",\"session:asia\":\"2026-11-02T21:25:27.000Z\",\"session:overlap\":\"2026-11-07T06:00:50.000Z\"},\"src\":{\"d1\":\"user\",\"noMarket\":\"user\",\"session:asia\":\"user\"},\"noSession\":[\"asia\",\"overlap\"],\"noMarket\":[\"audusd\"]},\"rscalp\":{\"since\":{\"session:newyork\":\"2026-11-06T12:00:22.000Z\"},\"src\":{\"minRR\":\"user\"},\"noSession\":[\"newyork\"],\"minRR\":3},\"intraday\":{\"d1\":\"against\",\"since\":{\"d1\":\"2026-11-02T11:52:07.000Z\",\"session:asia\":\"2026-11-04T12:04:20.000Z\"},\"src\":{\"d1\":\"backtest\",\"maxRR\":\"user\"},\"maxRR\":10,\"noSession\":[\"asia\"]},\"rintra\":{\"since\":{\"session:late\":\"2026-11-03T06:00:12.000Z\"},\"noSession\":[\"late\"],\"noMarket\":[\"usdchf\"],\"src\":{\"noMarket\":\"user\"}},\"position\":{\"off\":true,\"src\":{\"off\":\"user\"}},\"swing\":{\"d1\":\"against\",\"src\":{\"d1\":\"user\"}},\"m30m1\":{\"d1\":\"with\",\"since\":{\"d1\":\"2026-11-07T06:00:50.000Z\"}}}]",
+ "proposalsBt": "2026-11-07T17:52:30.624Z",
  "proposalsSent": {
-  "key": "scalp:skipMarket:eurusd",
-  "at": "2026-11-07T17:33:40.000Z",
+  "key": "scalp:skipMarket:eurusd|scalp:skipMarket:usdcad|scalp:stability:unstable",
+  "at": "2026-11-07T17:57:21.000Z",
   "items": [
-   "skip EUR/USD for Scalp — −0.87R over 22 replay trades"
+   "skip EUR/USD for Scalp — −0.70R over 21 replay trades",
+   "skip USD/CAD for Scalp — −0.35R over 28 replay trades",
+   "Scalp edge unstable — halves −0.02R / +0.20R"
   ]
  }
 }
