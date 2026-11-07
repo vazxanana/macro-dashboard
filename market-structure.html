@@ -3249,6 +3249,12 @@ function msNextSetup(bars, A) {
   // OANDA (broker-grade spot gold and forex) through the site's own /md proxy, which holds the token. Only on the Vercel site;
   // a 503 means no token is set, so the page stops asking and uses the exchange feeds below for the rest of the visit.
   const MD = { base: /^https?:$/.test(location.protocol) && !/github\.io$/.test(location.hostname) ? '/md/' : null, on: null };
+  // TradingView symbols for each market (OANDA for spot/CFDs, Binance for crypto) and its interval codes
+  const TV_SYM = { xau: 'OANDA:XAUUSD', xag: 'OANDA:XAGUSD', eurusd: 'OANDA:EURUSD', gbpusd: 'OANDA:GBPUSD', audusd: 'OANDA:AUDUSD', usdcad: 'OANDA:USDCAD', usdchf: 'OANDA:USDCHF', usdjpy: 'OANDA:USDJPY', nas100: 'OANDA:NAS100USD', spx500: 'OANDA:SPX500USD', btc: 'BINANCE:BTCUSDT', eth: 'BINANCE:ETHUSDT', sol: 'BINANCE:SOLUSDT', xrp: 'BINANCE:XRPUSDT' };
+  const TV_INT = { '1d': 'D', '4h': '240', '1h': '60', '15m': '15', '5m': '5', '1m': '1' };
+  const tvSym = (I) => TV_SYM[Object.keys(INSTRUMENTS).find((k) => INSTRUMENTS[k] === I)] || `OANDA:${String(I.label).replace(/\W/g, '')}`;
+  const tvUrl = (I, tf) => `https://www.tradingview.com/chart/?symbol=${encodeURIComponent(tvSym(I))}${tf ? `&interval=${TV_INT[tf.id] || '60'}` : ''}`;
+  window.msTvUrl = (key, tfId) => tvUrl(INSTRUMENTS[key] || INST, TFS.find((t) => t.id === tfId));
   const marketClosedNow = () => { if (CUR.group === 'Crypto') return false; const d = new Date(), wd = d.getUTCDay(), h = d.getUTCHours(); return wd === 6 || (wd === 0 && h < 22) || (wd === 5 && h >= 21); };
   async function mdBars(I, tf, q) {
     if (!I.md || !MD.base || MD.on === false) return null;
@@ -3453,10 +3459,11 @@ function msNextSetup(bars, A) {
     { const pane = el.closest('.ms-pane'), ph = pane && pane.querySelector('.ms-ph');
       if (ph && !ph.querySelector('.ch-tools')) {
         const tl = document.createElement('span'); tl.className = 'ch-tools';
-        tl.innerHTML = `<button type="button" class="ch-b ch-ruler" title="Measure: drag on the chart (or hold Shift and drag)" aria-label="Measure price and time on the chart" aria-pressed="false"></button><button type="button" class="ch-b ch-snap" title="Save this chart as an image" aria-label="Save the chart as a PNG image"></button><button type="button" class="ch-b ch-bell" title="Price alert (notifies this device)" aria-label="Set a price alert"></button><button type="button" class="ch-b ch-fit" title="Fit the chart (double-click the chart)" aria-label="Fit the ${tf.label} chart"></button><button type="button" class="ch-b ch-fs" title="Full screen" aria-label="Show the ${tf.label} chart full screen"></button>`;
+        tl.innerHTML = `<a class="ch-b ch-tv" target="_blank" rel="noopener" title="Open this chart on TradingView" aria-label="Open on TradingView"></a><button type="button" class="ch-b ch-ruler" title="Measure: drag on the chart (or hold Shift and drag)" aria-label="Measure price and time on the chart" aria-pressed="false"></button><button type="button" class="ch-b ch-snap" title="Save this chart as an image" aria-label="Save the chart as a PNG image"></button><button type="button" class="ch-b ch-bell" title="Price alert (notifies this device)" aria-label="Set a price alert"></button><button type="button" class="ch-b ch-fit" title="Fit the chart (double-click the chart)" aria-label="Fit the ${tf.label} chart"></button><button type="button" class="ch-b ch-fs" title="Full screen" aria-label="Show the ${tf.label} chart full screen"></button>`;
         ph.appendChild(tl);
         tl.querySelector('.ch-fit').addEventListener('click', () => P.fit());
         tl.querySelector('.ch-snap').addEventListener('click', () => P.snapshot());
+        { const tv = tl.querySelector('.ch-tv'); tv.href = tvUrl(CUR, tf); tv.addEventListener('click', () => { tv.href = tvUrl(CUR, tf); window.msTrack && msTrack('Open TradingView', { tf: tf.id }); }); }
         tl.querySelector('.ch-ruler').addEventListener('click', (e) => { const on = !P.measureOn; P.measureOn = on; e.currentTarget.classList.toggle('on', on); e.currentTarget.setAttribute('aria-pressed', String(on)); el.classList.toggle('measuring', on); if (!on) P.clearMeasure(); });
         tl.querySelector('.ch-bell').addEventListener('click', () => window.msOpenAlerts && window.msOpenAlerts());
         tl.querySelector('.ch-fs').addEventListener('click', () => { if (document.fullscreenElement) document.exitFullscreen(); else if (pane.requestFullscreen) pane.requestFullscreen().catch(() => {}); });
@@ -7412,6 +7419,7 @@ function gpStats(T) {
 /* price alerts (7 Nov) */
 .ch-bell { --i: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 8a6 6 0 1 1 12 0c0 7 3 9 3 9H3s3-2 3-9M10.3 21a1.94 1.94 0 0 0 3.4 0'/%3E%3C/svg%3E"); }
 .ch-bell.on { color: #e0a526; }
+.ch-tv { --i: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M15 3h6v6M10 14 21 3M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6'/%3E%3C/svg%3E"); text-decoration: none; }
 .ch-ruler { --i: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M21.3 15.3a2.4 2.4 0 0 1 0 3.4l-2.6 2.6a2.4 2.4 0 0 1-3.4 0L2.7 8.7a2.4 2.4 0 0 1 0-3.4l2.6-2.6a2.4 2.4 0 0 1 3.4 0zM14.5 12.5l2-2M11.5 9.5l2-2M8.5 6.5l2-2M17.5 15.5l2-2'/%3E%3C/svg%3E"); }
 .ch-b.on { color: var(--accent); background: color-mix(in srgb, var(--accent) 14%, transparent); }
 .ms-chart.measuring { cursor: crosshair; }
