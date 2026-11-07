@@ -1,0 +1,52 @@
+name: Futures roll data (one-off research dump)
+
+# Research only (research/edge/futures-roll/preregistration.md): dumps raw CNBC continuous-futures candles (front and second month,
+# adjusted and unadjusted) to council-data research/futures-roll/cnbc.json.gz, because CNBC refuses the research sandbox.
+# Changes no rule and no desk file. Runs on demand only (and on pushes of the research branch while the check was run).
+on:
+  workflow_dispatch:
+  push:
+    branches: [claude/futures-roll]
+    paths:
+      - '.github/workflows/futures-roll-data.yml'
+      - 'research/edge/futures-roll/fetch-cnbc.mjs'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: futures-roll-data
+  cancel-in-progress: false
+
+jobs:
+  dump:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            research/edge/futures-roll
+      - uses: actions/checkout@v4
+        with:
+          ref: council-data
+          path: data
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            /research/futures-roll/
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Dump CNBC candles
+        run: |
+          mkdir -p data/research/futures-roll
+          node research/edge/futures-roll/fetch-cnbc.mjs data/research/futures-roll/cnbc.json.gz
+      - name: Save to council-data
+        run: |
+          cd data
+          git config user.name "futures-roll"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add research/futures-roll/cnbc.json.gz
+          git commit -qm "Futures roll research: CNBC candle dump $(date -u +%Y-%m-%dT%H:%MZ)" || exit 0
+          for i in 1 2 3 4 5; do git pull -q --rebase origin council-data && git push -q origin HEAD:council-data && exit 0; sleep $((i * 3)); done
+          exit 1
