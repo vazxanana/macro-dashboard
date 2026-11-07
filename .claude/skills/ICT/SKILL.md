@@ -351,3 +351,7 @@ The course pairs an H1 setup with an M5/M1 entry. Tested on index A-setups (cash
 - **Replay:** now starts 1 Aug 2025 (5 more months).
   - NQ/ES/YM back-fill from Dukascopy cash; EUR/USD and GBP/USD back-fill from HistData M1 in council-data.
   - GC and RTY start where CNBC history begins.
+- **Replay back-fill fix (7 Nov):** CNBC returns a few stray hourly bars months before its continuous history.
+  - The back-fill only ran before the first bar and calibrated on the 20 days after it, so NQ / ES / RTY / GC started only in April-May ("overlap too small").
+  - The replay now keeps CNBC's continuous part (the last run of 10-day chunks with >= 50 bars) and back-fills everything earlier.
+  - Gold back-fills from council-data spot gold 1m (xau-jan-jun.json.gz, 20 Dec 2025 → 7 Jun 2026). RTY has no back-fill source.
