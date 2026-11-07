@@ -568,6 +568,12 @@
    "by": "coach-backtest",
    "change": "intraday: \"only against D1\" dropped (backtest)",
    "why": "-0.46R each over 135, the excluded side -0.37R over 99: the filter no longer helps."
+  },
+  {
+   "at": "2026-11-07T22:04:13.000Z",
+   "by": "user",
+   "change": "Gold trend fast (5-day breakout) to shadow (owner, 7 Nov): new breakouts recorded as shadow trades; Gold trend (20-day) stays live; open trades run to their exits",
+   "why": "2006-17 untouched test (#530): both legs regime-bound (N20 +0.49R, N5 +0.37R a position); monthly R correlation 0.92, so running both doubles one long-gold bet; N20 return per drawdown 6.8 vs 4.5. Owner kept N20 live."
   }
  ],
  "btAt": "2026-11-07T21:41:23.838Z",
@@ -611,7 +617,8 @@
   "scalp-against-live",
   "scalp-shadow-research",
   "swing-shadow-research",
-  "crypto-trend-shadow"
+  "crypto-trend-shadow",
+  "gold-trend-fast-shadow"
  ],
  "target": {},
  "targetBy": {},
@@ -622,11 +629,11 @@
  "noPause": true,
  "wouldPause": {
   "rintra": {
-   "at": "2026-11-07T21:58:42.000Z",
+   "at": "2026-11-07T22:04:13.000Z",
    "why": "four losses in a row"
   },
   "scalp": {
-   "at": "2026-11-07T21:58:42.000Z",
+   "at": "2026-11-07T22:04:13.000Z",
    "why": "expectancy -1.00R over 13 trades"
   },
   "xau": {
@@ -766,5 +773,6 @@
  "cryptoTrendShadow": true,
  "coachChanged": {
   "intraday:d1": "2026-11-07T21:26:49.000Z"
- }
+ },
+ "goldTrendFastShadow": true
 }
