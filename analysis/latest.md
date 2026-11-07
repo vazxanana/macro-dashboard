@@ -8,7 +8,7 @@ _Snapshot 2026-11-02 05:37 UTC. Paper trading only._
 <!-- live-rule:start -->
 ## Live Scalp rule check
 
-Built by the Trader at 2026-11-07 20:29 UTC from snapshot, config and the 30-day replay. Rule now: Scalp (M15 → M1) against D1 only, not in asia/overlap, skips audusd. **Scalp is not live right now** (not in focusSetups), so nothing below trades live.
+Built by the Trader at 2026-11-07 20:36 UTC from snapshot, config and the 30-day replay. Rule now: Scalp (M15 → M1) against D1 only, not in asia/overlap, skips audusd. **Scalp is not live right now** (not in focusSetups), so nothing below trades live.
 
 Session now: **newyork**.
 
@@ -31,7 +31,7 @@ Replay total on the markets it trades live: 205 trades, −0.98R a trade (−201
 <!-- coach-churn:start -->
 ## Coach rule changes
 
-Built by the Trader at 2026-11-07 20:29 UTC from the rule history. Rules the Coach changed by itself in the last 7 days (owner rules are not counted).
+Built by the Trader at 2026-11-07 20:36 UTC from the rule history. Rules the Coach changed by itself in the last 7 days (owner rules are not counted).
 
 | Rule | Changes | Steps (oldest first) |
 |---|---|---|
@@ -59,14 +59,61 @@ Built by the Trader at 2026-11-07 20:29 UTC from the rule history. Rules the Coa
 <!-- desk-status:start -->
 ## Desk & mirror status
 
-Built by the Trader at 2026-11-07 20:29 UTC. ICT desk: the last 7 days; mirror: the cTrader DEMO account (0.01 lot, demo only).
+Built by the Trader at 2026-11-07 20:36 UTC. ICT desk: the last 7 days; mirror: the cTrader DEMO account (0.01 lot, demo only).
 
 **ICT A-setups:** 0 signals (0 open, 0 closed); 1 other signal tracked, not A-setups.
 
 **Dip-buy candidate (NQ/ES, paper only):** 0 signals in 7 days · recording since 2026-11-07.
 
-**cTrader mirror:** ok · demo Fusion Markets · balance 997.73 · 0 open (checked 2026-11-07 20:24 UTC).
+**cTrader mirror:** ok · demo Fusion Markets · balance 997.73 · 0 open (checked 2026-11-07 20:30 UTC).
 <!-- desk-status:end -->
+
+<!-- coach-ledger:start -->
+## Coach change ledger
+
+Built by the Trader at 2026-11-07 20:36 UTC. Every rule the Coach changed by itself, the evidence it used and what happened 30 days later. Filter changes run as champion/challenger trials: the old rule keeps running as a shadow and the change stays only if it beats it on the same forward signals (20 where they disagree, shrunk edge ≥ +0.05R a signal; else back to the old rule after 60 days). Owner rules and live setups are not Coach changes.
+
+| Date | Change | Evidence | Before → after (the sample it used) | Trial | 30 days later |
+|---|---|---|---|---|---|
+| 2026-11-07 | m30m1: only with D1 (from history) | against: -0.62R over 8 trades, too costly to keep taking while with is tested. | 28 at +0.71R in the 30 days before | — | due 2026-12-07 |
+| 2026-11-07 | scalp: skip the overlap session (from history) | -0.61R over 10 trades there; +0.32R elsewhere. | 274 at +0.09R in the 30 days before | — | due 2026-12-07 |
+| 2026-11-07 | m30m1: dropped the D1 rule (from history) | The trades it blocked made +1.36R over 19. | 28 at +0.71R in the 30 days before | — | due 2026-12-07 |
+| 2026-11-07 | rintra: dropped the D1 rule (from history) | The trades it blocked made +1.33R over 10. | 32 at +0.28R in the 30 days before | — | due 2026-12-07 |
+| 2026-11-07 | scalp: trading the overlap session again (from history) | Blocked trades made +0.27R over 12. | 268 at +0.06R in the 30 days before | — | due 2026-12-07 |
+| 2026-11-07 | Minimum stop 1 → 1.1 ATR (from history) | Win rate 17% over 36 trades: stops get hit by normal candle noise. | 531 at +0.10R in the 30 days before | — | due 2026-12-07 |
+| 2026-11-06 | scalp: skip the overlap session (from history) | -1.00R over 9 trades there; +0.04R elsewhere. | 234 at −0.08R in the 30 days before | — | due 2026-12-06 |
+| 2026-11-06 | rscalp: skip the newyork session (from history) | -0.51R over 31 trades there; +0.02R elsewhere. | 140 at +0.11R in the 30 days before | — | due 2026-12-06 |
+| 2026-11-06 | m30m1: only with D1 (from history) | against: -0.62R over 8 trades, too costly to keep taking while with is tested. | 19 at −0.15R in the 30 days before | — | due 2026-12-06 |
+| 2026-11-06 | m30m1: dropped the D1 rule (from history) | The trades it blocked made +0.45R over 9. | 16 at −0.18R in the 30 days before | — | due 2026-12-06 |
+| 2026-11-06 | rscalp: trading the asia session again (from history) | Blocked trades made +0.26R over 11. | 128 at +0.08R in the 30 days before | — | due 2026-12-06 |
+| 2026-11-06 | rscalp: trading the overlap session again (from history) | Blocked trades made +0.77R over 14. | 128 at +0.08R in the 30 days before | — | due 2026-12-06 |
+| 2026-11-06 | Minimum stop 0.9 → 1 ATR (from history) | Win rate 17% over 36 trades: stops get hit by normal candle noise. | 425 at −0.07R in the 30 days before | — | due 2026-12-06 |
+| 2026-11-05 | Minimum stop 0.8 → 0.9 ATR (from history) | Win rate 17% over 36 trades: stops get hit by normal candle noise. | 329 at −0.04R in the 30 days before | — | due 2026-12-05 |
+| 2026-11-04 | intraday: skip the asia session (from history) | -0.38R over 6 trades there; +1.74R elsewhere. | 24 at +0.60R in the 30 days before | — | due 2026-12-04 |
+| 2026-11-04 | rscalp: skip the asia session (from history) | -0.57R over 9 trades there; +0.14R elsewhere. | 62 at +0.28R in the 30 days before | — | due 2026-12-04 |
+| 2026-11-04 | News guard on (from history) | Reviews: 4 losses came from high-impact news; no short-term trades from 15 min before to 45 min after news. | 183 at −0.02R in the 30 days before | — | due 2026-12-04 |
+| 2026-11-04 | rscalp: trading the asia session again (from history) | Blocked trades made +0.29R over 5. | 55 at +0.31R in the 30 days before | — | due 2026-12-04 |
+| 2026-11-04 | Minimum stop 0.7 → 0.8 ATR (from history) | Win rate 10% over 29 trades: stops get hit by normal candle noise. | 183 at −0.02R in the 30 days before | — | due 2026-12-04 |
+| 2026-11-03 | rscalp: skip the overlap session (from history) | -0.51R over 5 trades there; +0.06R elsewhere. | 50 at +0.36R in the 30 days before | — | due 2026-12-03 |
+
+No 30-day results yet.
+<!-- coach-ledger:end -->
+
+<!-- macro:start -->
+## Macro strategist
+
+Built by the Macro strategist at 2026-11-07 20:37 UTC for 2026-11-09 (paper only, changes no rule or trade; full view in macro/forecast.json). Regime: **transitional dollar · liquidity n/a · VIX curve inverted (stress)**.
+
+| Market | P(up) | Lean | Exp. move | Main drivers | Replay hit / base | Brier vs coin |
+|---|---|---|---|---|---|---|
+| Gold | 54% | base rate, no macro tilt | ±0.6% | macro composite up; risk sentiment up; usd 5-day momentum down | 53% / 54% (880 d) | 0.2494 vs 0.25 |
+| EUR/USD | 49% | base rate, no macro tilt | ±0.22% | usd 5-day momentum down; own price trend down; risk sentiment down | 49% / 52% (879 d) | 0.2507 vs 0.25 |
+| USD/JPY | 58% | macro tilt up 2 pts | ±0.18% | usd 5-day momentum up; own price trend up; risk sentiment down | 56% / 57% (879 d) | 0.2459 vs 0.25 |
+| NQ (Nasdaq 100) | 55% | base rate, no macro tilt | ±1.24% | vix term structure up; own price trend down; risk sentiment up | 56% / 56% (879 d) | 0.248 vs 0.25 |
+| ES (S&P 500) | 53% | base rate, no macro tilt | ±0.54% | vix term structure up; own price trend down; risk sentiment up | 54% / 54% (877 d) | 0.2489 vs 0.25 |
+
+Macro strategist, Sat 7 Nov 20:37 UTC, for Mon 9 Nov (UTC day, open to close). Regime: transitional dollar · liquidity n/a · VIX curve inverted (stress). Gold: 54% up (base rate 54%; base rate, no macro tilt, the replay finds no edge in its drivers). Drivers lean up: macro composite, risk sentiment; against: usd 5-day momentum. Typical move ±0.6%. EUR/USD: 49% up (base rate 49%; base rate, no macro tilt, the replay finds no edge in its drivers). Drivers lean down: usd 5-day momentum, own price trend. Typical move ±0.22%. USD/JPY: 58% up (base rate 56%; macro tilt up 2 pts). Drivers lean up: usd 5-day momentum, own price trend; against: risk sentiment. Typical move ±0.18%. NQ (Nasdaq 100): 55% up (base rate 56%; base rate, no macro tilt). Drivers lean up: vix term structure, risk sentiment; against: own price trend. Typical move ±1.24%. ES (S&P 500): 53% up (base rate 54%; base rate, no macro tilt). Drivers lean up: vix term structure, risk sentiment; against: own price trend. Typical move ±0.54%. DXY: 51% up (mirror of EUR/USD). No high-impact events in the next 5 days on the calendar we could read. Honesty check: on the 880-day walk-forward replay the gold calls hit 53% against a 54% base rate (Brier 0.2494 vs 0.25 for a coin flip, Pesaran-Timmermann 0.5): no proven edge (about the base rate). Event days moved gold 1.118% on average against 0.836% on other days: the size of the move is the more reliable forecast. Treat the direction odds as context, not trade signals.
+<!-- macro:end -->
 
 ## Top 3 to watch
 

@@ -79,8 +79,10 @@
   "swing": {
    "d1": "against",
    "src": {
-    "d1": "user"
-   }
+    "d1": "user",
+    "off": "user"
+   },
+   "off": true
   },
   "m30m1": {
    "d1": "with",
@@ -551,6 +553,12 @@
    "by": "user",
    "change": "Scalp back to shadow (owner delegated): no new live paper Scalp trades; signals still recorded as shadow",
    "why": "Live rule on HistData M1 2018-Oct 2026 (gold + 5 forex, live engine, 1 spread a trade): -0.187R a trade 2018-23 (n9,551), -0.229R 2024-26 (n4,532), negative every year and market (research/edge/regime); all 50 regime cells negative; no exit rescues it (research/edge/scalp-exits, best -0.18R); realistic costs -0.24 to -0.30R (research/edge/costs). The 30-day replay is -0.07R net now, and live forex results on spot candles were far worse than on Kraken (research/spotcheck.json)."
+  },
+  {
+   "at": "2026-11-07T20:36:23.000Z",
+   "by": "user",
+   "change": "Swing to shadow (owner, 7 Nov): no live paper Swing trades; signals still recorded as shadow",
+   "why": "10-year OANDA replay of the live engine (gold + 5 forex, one spread a trade): -0.095R a trade, n2,076, t -3.0, negative in both halves; no filter or exit of 10 tested turns it positive (research/edge/meridian-swing). Owner chose shadow."
   }
  ],
  "btAt": "2026-11-07T20:21:42.476Z",
@@ -592,7 +600,8 @@
   "gold-momentum-pullback",
   "gold-trend-fast",
   "scalp-against-live",
-  "scalp-shadow-research"
+  "scalp-shadow-research",
+  "swing-shadow-research"
  ],
  "target": {},
  "targetBy": {},
@@ -603,11 +612,11 @@
  "noPause": true,
  "wouldPause": {
   "rintra": {
-   "at": "2026-11-07T20:29:38.000Z",
+   "at": "2026-11-07T20:36:23.000Z",
    "why": "four losses in a row"
   },
   "scalp": {
-   "at": "2026-11-07T20:29:38.000Z",
+   "at": "2026-11-07T20:36:23.000Z",
    "why": "expectancy -1.00R over 13 trades"
   },
   "xau": {

@@ -199,7 +199,7 @@
   "m30m1: only with D1: against: -0.62R over 8 trades, too costly to keep taking while with is tested."
  ],
  "proposals": [],
- "proposalsKey": "v5|2026-11-07T20:21:42.476Z|2026-11-07T20:21:43.887Z|2026-11-07T19:52:15.820Z|{\"xau\":\"OANDA\",\"btc\":\"Kraken\",\"eth\":\"Kraken\",\"sol\":\"Kraken\",\"xrp\":\"Kraken\",\"eurusd\":\"OANDA\",\"gbpusd\":\"OANDA\",\"audusd\":\"OANDA\",\"usdcad\":\"OANDA\",\"usdchf\":\"OANDA\"}|[[],{\"scalp\":{\"d1\":\"against\",\"since\":{\"d1\":\"2026-11-02T11:52:07.000Z\",\"session:asia\":\"2026-11-02T21:25:27.000Z\",\"session:overlap\":\"2026-11-07T06:00:50.000Z\"},\"src\":{\"d1\":\"user\",\"noMarket\":\"user\",\"session:asia\":\"user\"},\"noSession\":[\"asia\",\"overlap\"],\"noMarket\":[\"audusd\"]},\"rscalp\":{\"since\":{\"session:newyork\":\"2026-11-06T12:00:22.000Z\"},\"src\":{\"minRR\":\"user\"},\"noSession\":[\"newyork\"],\"minRR\":3},\"intraday\":{\"d1\":\"against\",\"since\":{\"d1\":\"2026-11-02T11:52:07.000Z\",\"session:asia\":\"2026-11-04T12:04:20.000Z\"},\"src\":{\"d1\":\"backtest\",\"maxRR\":\"user\"},\"maxRR\":10,\"noSession\":[\"asia\"]},\"rintra\":{\"since\":{\"session:late\":\"2026-11-03T06:00:12.000Z\"},\"noSession\":[\"late\"],\"noMarket\":[\"usdchf\"],\"src\":{\"noMarket\":\"user\"}},\"position\":{\"off\":true,\"src\":{\"off\":\"user\"}},\"swing\":{\"d1\":\"against\",\"src\":{\"d1\":\"user\"}},\"m30m1\":{\"d1\":\"with\",\"since\":{\"d1\":\"2026-11-07T06:00:50.000Z\"}}}]",
+ "proposalsKey": "v5|2026-11-07T20:21:42.476Z|2026-11-07T20:21:43.887Z|2026-11-07T19:52:15.820Z|{\"xau\":\"OANDA\",\"btc\":\"Kraken\",\"eth\":\"Kraken\",\"sol\":\"Kraken\",\"xrp\":\"Kraken\",\"eurusd\":\"OANDA\",\"gbpusd\":\"OANDA\",\"audusd\":\"OANDA\",\"usdcad\":\"OANDA\",\"usdchf\":\"OANDA\"}|[[],{\"scalp\":{\"d1\":\"against\",\"since\":{\"d1\":\"2026-11-02T11:52:07.000Z\",\"session:asia\":\"2026-11-02T21:25:27.000Z\",\"session:overlap\":\"2026-11-07T06:00:50.000Z\"},\"src\":{\"d1\":\"user\",\"noMarket\":\"user\",\"session:asia\":\"user\"},\"noSession\":[\"asia\",\"overlap\"],\"noMarket\":[\"audusd\"]},\"rscalp\":{\"since\":{\"session:newyork\":\"2026-11-06T12:00:22.000Z\"},\"src\":{\"minRR\":\"user\"},\"noSession\":[\"newyork\"],\"minRR\":3},\"intraday\":{\"d1\":\"against\",\"since\":{\"d1\":\"2026-11-02T11:52:07.000Z\",\"session:asia\":\"2026-11-04T12:04:20.000Z\"},\"src\":{\"d1\":\"backtest\",\"maxRR\":\"user\"},\"maxRR\":10,\"noSession\":[\"asia\"]},\"rintra\":{\"since\":{\"session:late\":\"2026-11-03T06:00:12.000Z\"},\"noSession\":[\"late\"],\"noMarket\":[\"usdchf\"],\"src\":{\"noMarket\":\"user\"}},\"position\":{\"off\":true,\"src\":{\"off\":\"user\"}},\"swing\":{\"d1\":\"against\",\"src\":{\"d1\":\"user\",\"off\":\"user\"},\"off\":true},\"m30m1\":{\"d1\":\"with\",\"since\":{\"d1\":\"2026-11-07T06:00:50.000Z\"}}}]",
  "proposalsBt": "2026-11-07T20:21:42.476Z",
  "proposalsSent": {
   "key": "",
@@ -229,7 +229,7 @@
    "keptExp": 0.35,
    "flag": false,
    "why": "ICT A-setups: skip Fridays: the 31 A-setups it drops made −0.11R a trade (t -0.51; halves +0.11R / −0.33R); the 222 it keeps +0.35R. Not proposed: needs 30+ dropped trades losing at t ≤ −2 in both halves.",
-   "at": "2026-11-07T20:23:27.000Z"
+   "at": "2026-11-07T20:36:23.000Z"
   },
   {
    "setup": "ICT A",
@@ -253,7 +253,824 @@
    "keptExp": 0.37,
    "flag": false,
    "why": "ICT A-setups: only trades against or without H1 structure: the 78 A-setups it drops made +0.12R a trade (t 0.65; halves +0.47R / −0.23R); the 175 it keeps +0.37R. Not proposed: needs 30+ dropped trades losing at t ≤ −2 in both halves.",
-   "at": "2026-11-07T20:23:27.000Z"
+   "at": "2026-11-07T20:36:23.000Z"
   }
- ]
+ ],
+ "ledger": [
+  {
+   "id": "ch-1793586399-scalp-only-with-D1",
+   "at": "2026-11-02T02:26:39.000Z",
+   "by": "coach-stats",
+   "change": "scalp: only with D1",
+   "scope": {
+    "setups": [
+     "scalp"
+    ]
+   },
+   "evidence": {
+    "why": "against: -1.00R over 7 trades, too costly to keep taking while with is tested."
+   },
+   "before": {
+    "n": 9,
+    "R": -9,
+    "exp": -1
+   },
+   "backfilled": true,
+   "d30": {
+    "due": "2026-12-02T02:26:39.000Z"
+   }
+  },
+  {
+   "id": "ch-1793599446-Break-even-at-1R-turned-on",
+   "at": "2026-11-02T06:04:06.000Z",
+   "by": "coach-stats",
+   "change": "Break-even at +1R turned on",
+   "scope": {
+    "all": true
+   },
+   "evidence": {
+    "why": "5 of 20 recent losers (live and shadow) were +1R or more before turning around."
+   },
+   "before": {
+    "n": 25,
+    "R": -11.65,
+    "exp": -0.47
+   },
+   "backfilled": true,
+   "d30": {
+    "due": "2026-12-02T06:04:06.000Z"
+   }
+  },
+  {
+   "id": "ch-1793604583-Paused-scalp-for-3-days",
+   "at": "2026-11-02T07:29:43.000Z",
+   "by": "coach-stats",
+   "change": "Paused scalp for 3 days",
+   "scope": {
+    "setups": [
+     "scalp"
+    ]
+   },
+   "evidence": {
+    "why": "Expectancy -0.83R over 6 trades."
+   },
+   "before": {
+    "n": 20,
+    "R": -17,
+    "exp": -0.85
+   },
+   "backfilled": true,
+   "d30": {
+    "due": "2026-12-02T07:29:43.000Z"
+   }
+  },
+  {
+   "id": "ch-1793620327-rscalp-only-with-D1-backtest-",
+   "at": "2026-11-02T11:52:07.000Z",
+   "by": "coach-backtest",
+   "change": "rscalp: only with D1 (backtest)",
+   "scope": {
+    "setups": [
+     "rscalp"
+    ]
+   },
+   "evidence": {
+    "why": "300 trades over the last 30 days: with +0.17R each, against -0.20R; true in both halves."
+   },
+   "before": {
+    "n": 16,
+    "R": -0.99,
+    "exp": -0.06
+   },
+   "backfilled": true,
+   "d30": {
+    "due": "2026-12-02T11:52:07.000Z"
+   }
+  },
+  {
+   "id": "ch-1793620327-scalp-only-against-D1-backtest-replacing",
+   "at": "2026-11-02T11:52:07.000Z",
+   "by": "coach-backtest",
+   "change": "scalp: only against D1 (backtest), replacing \"only with D1\"",
+   "scope": {
+    "setups": [
+     "scalp"
+    ]
+   },
+   "evidence": {
+    "why": "484 trades over the last 30 days: against +0.43R each, with -0.30R; true in both halves."
+   },
+   "before": {
+    "n": 24,
+    "R": -19,
+    "exp": -0.79
+   },
+   "backfilled": true,
+   "d30": {
+    "due": "2026-12-02T11:52:07.000Z"
+   }
+  },
+  {
+   "id": "ch-1793620327-intraday-only-against-D1-backtest-",
+   "at": "2026-11-02T11:52:07.000Z",
+   "by": "coach-backtest",
+   "change": "intraday: only against D1 (backtest)",
+   "scope": {
+    "setups": [
+     "intraday"
+    ]
+   },
+   "evidence": {
+    "why": "122 trades over the last 30 days: against +0.41R each, with -0.80R; true in both halves."
+   },
+   "before": {
+    "n": 2,
+    "R": 1.94,
+    "exp": 0.97
+   },
+   "backfilled": true,
+   "d30": {
+    "due": "2026-12-02T11:52:07.000Z"
+   }
+  },
+  {
+   "id": "ch-1793620327-Break-even-turned-off-backtest-",
+   "at": "2026-11-02T11:52:07.000Z",
+   "by": "coach-backtest",
+   "change": "Break-even turned off (backtest)",
+   "scope": {
+    "all": true
+   },
+   "evidence": {
+    "why": "1013 trades over the last 30 days: no break-even +0.06R each, at +1R -0.04R, at +1.5R -0.01R."
+   },
+   "before": {
+    "n": 49,
+    "R": -13.91,
+    "exp": -0.28
+   },
+   "backfilled": true,
+   "d30": {
+    "due": "2026-12-02T11:52:07.000Z"
+   }
+  },
+  {
+   "id": "ch-1793646452-Paused-rintra-for-3-days",
+   "at": "2026-11-02T19:07:32.000Z",
+   "by": "coach-stats",
+   "change": "Paused rintra for 3 days",
+   "scope": {
+    "setups": [
+     "rintra"
+    ]
+   },
+   "evidence": {
+    "why": "Four losses in a row (3 live, 6 shadow blocked only by exposure or the dollar cap)."
+   },
+   "before": {
+    "n": 12,
+    "R": 1.82,
+    "exp": 0.15
+   },
+   "backfilled": true,
+   "d30": {
+    "due": "2026-12-02T19:07:32.000Z"
+   }
+  },
+  {
+   "id": "ch-1793652880-Resumed-rintra",
+   "at": "2026-11-02T20:54:40.000Z",
+   "by": "coach-stats",
+   "change": "Resumed rintra",
+   "scope": {
+    "setups": [
+     "rintra"
+    ]
+   },
+   "evidence": {
+    "why": "Its last 9 trades made +0.08R each and the backtest +0.16R over 96: a losing streak inside a record that pays is variance."
+   },
+   "before": {
+    "n": 12,
+    "R": 1.82,
+    "exp": 0.15
+   },
+   "backfilled": true,
+   "d30": {
+    "due": "2026-12-02T20:54:40.000Z"
+   }
+  },
+  {
+   "id": "ch-1793654023-Resumed-scalp-early",
+   "at": "2026-11-02T21:13:43.000Z",
+   "by": "coach-stats",
+   "change": "Resumed scalp early",
+   "scope": {
+    "setups": [
+     "scalp"
+    ]
+   },
+   "evidence": {
+    "why": "The 11 trades it would have taken while paused (blocked only by the pause or portfolio limits) made +0.70R each."
+   },
+   "before": {
+    "n": 45,
+    "R": -15.74,
+    "exp": -0.35
+   },
+   "backfilled": true,
+   "d30": {
+    "due": "2026-12-02T21:13:43.000Z"
+   }
+  },
+  {
+   "id": "ch-1793654727-scalp-rscalp-skip-the-asia-session",
+   "at": "2026-11-02T21:25:27.000Z",
+   "by": "coach-ai",
+   "change": "scalp, rscalp: skip the asia session",
+   "scope": {
+    "setups": [
+     "scalp",
+     "rscalp"
+    ]
+   },
+   "evidence": {
+    "why": "2 Nov: Asia lost -15.9R over 29 trades (2 wins, live and shadow) while New York made +12.9R over 13; all 8 live Asia trades lost (-6R). One day only: blocked Asia trades keep running as shadow and the rule drops itself if they make +0.2R over 5."
+   },
+   "before": {
+    "n": 69,
+    "R": -20.04,
+    "exp": -0.29
+   },
+   "backfilled": true,
+   "d30": {
+    "due": "2026-12-02T21:25:27.000Z"
+   }
+  },
+  {
+   "id": "ch-1793656380-rscalp-only-with-D1-dropped-backtest-",
+   "at": "2026-11-02T21:53:00.000Z",
+   "by": "coach-backtest",
+   "change": "rscalp: \"only with D1\" dropped (backtest)",
+   "scope": {
+    "setups": [
+     "rscalp"
+    ]
+   },
+   "evidence": {
+    "why": "-0.16R each over 263, the excluded side -0.12R over 181: the filter no longer helps."
+   },
+   "before": {
+    "n": 24,
+    "R": -4.3,
+    "exp": -0.18
+   },
+   "backfilled": true,
+   "d30": {
+    "due": "2026-12-02T21:53:00.000Z"
+   }
+  },
+  {
+   "id": "ch-1793664304-Minimum-stop-0-6-0-7-ATR",
+   "at": "2026-11-03T00:05:04.000Z",
+   "by": "coach-stats",
+   "change": "Minimum stop 0.6 → 0.7 ATR",
+   "scope": {
+    "all": true
+   },
+   "evidence": {
+    "why": "Win rate 6% over 18 trades: stops get hit by normal candle noise."
+   },
+   "before": {
+    "n": 88,
+    "R": -9.47,
+    "exp": -0.11
+   },
+   "backfilled": true,
+   "d30": {
+    "due": "2026-12-03T00:05:04.000Z"
+   }
+  },
+  {
+   "id": "ch-1793685612-rintra-only-with-D1",
+   "at": "2026-11-03T06:00:12.000Z",
+   "by": "coach-stats",
+   "change": "rintra: only with D1",
+   "scope": {
+    "setups": [
+     "rintra"
+    ]
+   },
+   "evidence": {
+    "why": "against: -0.39R over 5 trades; with: +0.19R over 10."
+   },
+   "before": {
+    "n": 15,
+    "R": -0.01,
+    "exp": 0
+   },
+   "backfilled": true,
+   "d30": {
+    "due": "2026-12-03T06:00:12.000Z"
+   }
+  },
+  {
+   "id": "ch-1793685612-rintra-skip-the-late-session",
+   "at": "2026-11-03T06:00:12.000Z",
+   "by": "coach-stats",
+   "change": "rintra: skip the late session",
+   "scope": {
+    "setups": [
+     "rintra"
+    ]
+   },
+   "evidence": {
+    "why": "-0.23R over 6 trades there; +0.15R elsewhere."
+   },
+   "before": {
+    "n": 15,
+    "R": -0.01,
+    "exp": 0
+   },
+   "backfilled": true,
+   "d30": {
+    "due": "2026-12-03T06:00:12.000Z"
+   }
+  },
+  {
+   "id": "ch-1793685933-Paused-rintra-for-3-days",
+   "at": "2026-11-03T06:05:33.000Z",
+   "by": "coach-stats",
+   "change": "Paused rintra for 3 days",
+   "scope": {
+    "setups": [
+     "rintra"
+    ]
+   },
+   "evidence": {
+    "why": "Four losses in a row (4 live, 6 shadow blocked only by exposure or the dollar cap)."
+   },
+   "before": {
+    "n": 15,
+    "R": -0.01,
+    "exp": 0
+   },
+   "backfilled": true,
+   "d30": {
+    "due": "2026-12-03T06:05:33.000Z"
+   }
+  },
+  {
+   "id": "ch-1793729134-rscalp-skip-the-overlap-session",
+   "at": "2026-11-03T18:05:34.000Z",
+   "by": "coach-stats",
+   "change": "rscalp: skip the overlap session",
+   "scope": {
+    "setups": [
+     "rscalp"
+    ]
+   },
+   "evidence": {
+    "why": "-0.51R over 5 trades there; +0.06R elsewhere."
+   },
+   "before": {
+    "n": 50,
+    "R": 17.79,
+    "exp": 0.36
+   },
+   "backfilled": true,
+   "d30": {
+    "due": "2026-12-03T18:05:34.000Z"
+   }
+  },
+  {
+   "id": "ch-1793750578-Minimum-stop-0-7-0-8-ATR",
+   "at": "2026-11-04T00:02:58.000Z",
+   "by": "coach-stats",
+   "change": "Minimum stop 0.7 → 0.8 ATR",
+   "scope": {
+    "all": true
+   },
+   "evidence": {
+    "why": "Win rate 10% over 29 trades: stops get hit by normal candle noise."
+   },
+   "before": {
+    "n": 183,
+    "R": -2.79,
+    "exp": -0.02
+   },
+   "backfilled": true,
+   "d30": {
+    "due": "2026-12-04T00:02:58.000Z"
+   }
+  },
+  {
+   "id": "ch-1793750578-rscalp-trading-the-asia-session-again",
+   "at": "2026-11-04T00:02:58.000Z",
+   "by": "coach-stats",
+   "change": "rscalp: trading the asia session again",
+   "scope": {
+    "setups": [
+     "rscalp"
+    ]
+   },
+   "evidence": {
+    "why": "Blocked trades made +0.29R over 5."
+   },
+   "before": {
+    "n": 55,
+    "R": 17.12,
+    "exp": 0.31
+   },
+   "backfilled": true,
+   "d30": {
+    "due": "2026-12-04T00:02:58.000Z"
+   }
+  },
+  {
+   "id": "ch-1793750578-News-guard-on",
+   "at": "2026-11-04T00:02:58.000Z",
+   "by": "coach-stats",
+   "change": "News guard on",
+   "scope": {
+    "all": true
+   },
+   "evidence": {
+    "why": "Reviews: 4 losses came from high-impact news; no short-term trades from 15 min before to 45 min after news."
+   },
+   "before": {
+    "n": 183,
+    "R": -2.79,
+    "exp": -0.02
+   },
+   "backfilled": true,
+   "d30": {
+    "due": "2026-12-04T00:02:58.000Z"
+   }
+  },
+  {
+   "id": "ch-1793772046-rscalp-skip-the-asia-session",
+   "at": "2026-11-04T06:00:46.000Z",
+   "by": "coach-stats",
+   "change": "rscalp: skip the asia session",
+   "scope": {
+    "setups": [
+     "rscalp"
+    ]
+   },
+   "evidence": {
+    "why": "-0.57R over 9 trades there; +0.14R elsewhere."
+   },
+   "before": {
+    "n": 62,
+    "R": 17.26,
+    "exp": 0.28
+   },
+   "backfilled": true,
+   "d30": {
+    "due": "2026-12-04T06:00:46.000Z"
+   }
+  },
+  {
+   "id": "ch-1793793860-intraday-skip-the-asia-session",
+   "at": "2026-11-04T12:04:20.000Z",
+   "by": "coach-stats",
+   "change": "intraday: skip the asia session",
+   "scope": {
+    "setups": [
+     "intraday"
+    ]
+   },
+   "evidence": {
+    "why": "-0.38R over 6 trades there; +1.74R elsewhere."
+   },
+   "before": {
+    "n": 24,
+    "R": 14.4,
+    "exp": 0.6
+   },
+   "backfilled": true,
+   "d30": {
+    "due": "2026-12-04T12:04:20.000Z"
+   }
+  },
+  {
+   "id": "ch-1793836951-Minimum-stop-0-8-0-9-ATR",
+   "at": "2026-11-05T00:02:31.000Z",
+   "by": "coach-stats",
+   "change": "Minimum stop 0.8 → 0.9 ATR",
+   "scope": {
+    "all": true
+   },
+   "evidence": {
+    "why": "Win rate 17% over 36 trades: stops get hit by normal candle noise."
+   },
+   "before": {
+    "n": 329,
+    "R": -12.3,
+    "exp": -0.04
+   },
+   "backfilled": true,
+   "d30": {
+    "due": "2026-12-05T00:02:31.000Z"
+   }
+  },
+  {
+   "id": "ch-1793923469-Minimum-stop-0-9-1-ATR",
+   "at": "2026-11-06T00:04:29.000Z",
+   "by": "coach-stats",
+   "change": "Minimum stop 0.9 → 1 ATR",
+   "scope": {
+    "all": true
+   },
+   "evidence": {
+    "why": "Win rate 17% over 36 trades: stops get hit by normal candle noise."
+   },
+   "before": {
+    "n": 425,
+    "R": -29.39,
+    "exp": -0.07
+   },
+   "backfilled": true,
+   "d30": {
+    "due": "2026-12-06T00:04:29.000Z"
+   }
+  },
+  {
+   "id": "ch-1793923469-rscalp-trading-the-overlap-session-again",
+   "at": "2026-11-06T00:04:29.000Z",
+   "by": "coach-stats",
+   "change": "rscalp: trading the overlap session again",
+   "scope": {
+    "setups": [
+     "rscalp"
+    ]
+   },
+   "evidence": {
+    "why": "Blocked trades made +0.77R over 14."
+   },
+   "before": {
+    "n": 128,
+    "R": 10.11,
+    "exp": 0.08
+   },
+   "backfilled": true,
+   "d30": {
+    "due": "2026-12-06T00:04:29.000Z"
+   }
+  },
+  {
+   "id": "ch-1793923469-rscalp-trading-the-asia-session-again",
+   "at": "2026-11-06T00:04:29.000Z",
+   "by": "coach-stats",
+   "change": "rscalp: trading the asia session again",
+   "scope": {
+    "setups": [
+     "rscalp"
+    ]
+   },
+   "evidence": {
+    "why": "Blocked trades made +0.26R over 11."
+   },
+   "before": {
+    "n": 128,
+    "R": 10.11,
+    "exp": 0.08
+   },
+   "backfilled": true,
+   "d30": {
+    "due": "2026-12-06T00:04:29.000Z"
+   }
+  },
+  {
+   "id": "ch-1793923469-m30m1-dropped-the-D1-rule",
+   "at": "2026-11-06T00:04:29.000Z",
+   "by": "coach-stats",
+   "change": "m30m1: dropped the D1 rule",
+   "scope": {
+    "setups": [
+     "m30m1"
+    ]
+   },
+   "evidence": {
+    "why": "The trades it blocked made +0.45R over 9."
+   },
+   "before": {
+    "n": 16,
+    "R": -2.94,
+    "exp": -0.18
+   },
+   "backfilled": true,
+   "d30": {
+    "due": "2026-12-06T00:04:29.000Z"
+   }
+  },
+  {
+   "id": "ch-1793948402-m30m1-only-with-D1",
+   "at": "2026-11-06T07:00:02.000Z",
+   "by": "coach-stats",
+   "change": "m30m1: only with D1",
+   "scope": {
+    "setups": [
+     "m30m1"
+    ]
+   },
+   "evidence": {
+    "why": "against: -0.62R over 8 trades, too costly to keep taking while with is tested."
+   },
+   "before": {
+    "n": 19,
+    "R": -2.91,
+    "exp": -0.15
+   },
+   "backfilled": true,
+   "d30": {
+    "due": "2026-12-06T07:00:02.000Z"
+   }
+  },
+  {
+   "id": "ch-1793966422-rscalp-skip-the-newyork-session",
+   "at": "2026-11-06T12:00:22.000Z",
+   "by": "coach-stats",
+   "change": "rscalp: skip the newyork session",
+   "scope": {
+    "setups": [
+     "rscalp"
+    ]
+   },
+   "evidence": {
+    "why": "-0.51R over 31 trades there; +0.02R elsewhere."
+   },
+   "before": {
+    "n": 140,
+    "R": 15.14,
+    "exp": 0.11
+   },
+   "backfilled": true,
+   "d30": {
+    "due": "2026-12-06T12:00:22.000Z"
+   }
+  },
+  {
+   "id": "ch-1793966422-scalp-skip-the-overlap-session",
+   "at": "2026-11-06T12:00:22.000Z",
+   "by": "coach-stats",
+   "change": "scalp: skip the overlap session",
+   "scope": {
+    "setups": [
+     "scalp"
+    ]
+   },
+   "evidence": {
+    "why": "-1.00R over 9 trades there; +0.04R elsewhere."
+   },
+   "before": {
+    "n": 234,
+    "R": -18.94,
+    "exp": -0.08
+   },
+   "backfilled": true,
+   "d30": {
+    "due": "2026-12-06T12:00:22.000Z"
+   }
+  },
+  {
+   "id": "ch-1794009829-Minimum-stop-1-1-1-ATR",
+   "at": "2026-11-07T00:03:49.000Z",
+   "by": "coach-stats",
+   "change": "Minimum stop 1 → 1.1 ATR",
+   "scope": {
+    "all": true
+   },
+   "evidence": {
+    "why": "Win rate 17% over 36 trades: stops get hit by normal candle noise."
+   },
+   "before": {
+    "n": 531,
+    "R": 55.73,
+    "exp": 0.1
+   },
+   "backfilled": true,
+   "d30": {
+    "due": "2026-12-07T00:03:49.000Z"
+   }
+  },
+  {
+   "id": "ch-1794009829-scalp-trading-the-overlap-session-again",
+   "at": "2026-11-07T00:03:49.000Z",
+   "by": "coach-stats",
+   "change": "scalp: trading the overlap session again",
+   "scope": {
+    "setups": [
+     "scalp"
+    ]
+   },
+   "evidence": {
+    "why": "Blocked trades made +0.27R over 12."
+   },
+   "before": {
+    "n": 268,
+    "R": 16.97,
+    "exp": 0.06
+   },
+   "backfilled": true,
+   "d30": {
+    "due": "2026-12-07T00:03:49.000Z"
+   }
+  },
+  {
+   "id": "ch-1794009829-rintra-dropped-the-D1-rule",
+   "at": "2026-11-07T00:03:49.000Z",
+   "by": "coach-stats",
+   "change": "rintra: dropped the D1 rule",
+   "scope": {
+    "setups": [
+     "rintra"
+    ]
+   },
+   "evidence": {
+    "why": "The trades it blocked made +1.33R over 10."
+   },
+   "before": {
+    "n": 32,
+    "R": 9.01,
+    "exp": 0.28
+   },
+   "backfilled": true,
+   "d30": {
+    "due": "2026-12-07T00:03:49.000Z"
+   }
+  },
+  {
+   "id": "ch-1794009829-m30m1-dropped-the-D1-rule",
+   "at": "2026-11-07T00:03:49.000Z",
+   "by": "coach-stats",
+   "change": "m30m1: dropped the D1 rule",
+   "scope": {
+    "setups": [
+     "m30m1"
+    ]
+   },
+   "evidence": {
+    "why": "The trades it blocked made +1.36R over 19."
+   },
+   "before": {
+    "n": 28,
+    "R": 19.81,
+    "exp": 0.71
+   },
+   "backfilled": true,
+   "d30": {
+    "due": "2026-12-07T00:03:49.000Z"
+   }
+  },
+  {
+   "id": "ch-1794031250-scalp-skip-the-overlap-session",
+   "at": "2026-11-07T06:00:50.000Z",
+   "by": "coach-stats",
+   "change": "scalp: skip the overlap session",
+   "scope": {
+    "setups": [
+     "scalp"
+    ]
+   },
+   "evidence": {
+    "why": "-0.61R over 10 trades there; +0.32R elsewhere."
+   },
+   "before": {
+    "n": 274,
+    "R": 25.97,
+    "exp": 0.09
+   },
+   "backfilled": true,
+   "d30": {
+    "due": "2026-12-07T06:00:50.000Z"
+   }
+  },
+  {
+   "id": "ch-1794031250-m30m1-only-with-D1",
+   "at": "2026-11-07T06:00:50.000Z",
+   "by": "coach-stats",
+   "change": "m30m1: only with D1",
+   "scope": {
+    "setups": [
+     "m30m1"
+    ]
+   },
+   "evidence": {
+    "why": "against: -0.62R over 8 trades, too costly to keep taking while with is tested."
+   },
+   "before": {
+    "n": 28,
+    "R": 19.81,
+    "exp": 0.71
+   },
+   "backfilled": true,
+   "d30": {
+    "due": "2026-12-07T06:00:50.000Z"
+   }
+  }
+ ],
+ "ledgerSince": "2026-11-07T20:36:23.000Z",
+ "ledgerSlot": "2026-11-07T18"
 }
