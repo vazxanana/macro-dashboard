@@ -3093,6 +3093,9 @@ function msNextSetup(bars, A) {
     pro: { bg: '#11110f', bgTop: '#171715', text: '#a3a29c', grid: '#1a1a18', border: '#2b2b28' },
   };
   const UPC = '#089981', DNC = '#f23645';
+  const candleCols = () => G.theme === 'light'
+    ? { upColor: '#c9ccd2', downColor: '#131722', borderUpColor: '#131722', borderDownColor: '#131722', wickUpColor: '#131722', wickDownColor: '#131722' }
+    : { upColor: UPC, downColor: DNC, borderUpColor: UPC, borderDownColor: DNC, wickUpColor: UPC, wickDownColor: DNC };
   const Z = {
     sell: { fill: 'rgba(242,54,69,0.20)', stroke: 'rgba(178,40,51,0.85)', cf: 'rgba(242,54,69,0.30)', line: '#f23645' },
     buy:  { fill: 'rgba(8,153,129,0.16)', stroke: 'rgba(6,122,103,0.85)', cf: 'rgba(8,153,129,0.28)', line: '#089981' },
@@ -3534,7 +3537,7 @@ function msNextSetup(bars, A) {
     // tick-volume histogram along the bottom (OANDA counts price changes per candle; exchange feeds without volume show nothing)
     const vol = chart.addHistogramSeries({ priceScaleId: 'vol', priceFormat: { type: 'volume' }, lastValueVisible: false, priceLineVisible: false });
     chart.priceScale('vol').applyOptions({ scaleMargins: { top: 0.84, bottom: 0 }, visible: false });
-    const vcol = (b) => b.close >= b.open ? 'rgba(8,153,129,.26)' : 'rgba(242,54,69,.26)';
+    const vcol = (b) => G.theme === 'light' ? (b.close >= b.open ? 'rgba(19,23,34,.12)' : 'rgba(19,23,34,.28)') : b.close >= b.open ? 'rgba(8,153,129,.26)' : 'rgba(242,54,69,.26)';
     P.vol = vol;
     // compare overlay (7 Nov loop): another market rebased onto this chart (same % path from the first visible-history candle)
     const cmp = chart.addLineSeries({ color: 'rgba(224,165,38,.85)', lineWidth: 1.5, priceLineVisible: false, lastValueVisible: true, crosshairMarkerVisible: false, title: '' });
@@ -4615,6 +4618,10 @@ function msNextSetup(bars, A) {
       p.overlay.set(p.overlay.items);
     });
     root.dataset.chart = G.theme === 'light' ? 'light' : 'dark'; document.documentElement.dataset.theme = G.theme;
+    // owner (7 Nov): on the white (Light) theme the candles are monochrome, like a printed chart: grey up candles and black
+    // down candles with black borders and wicks; the dark themes keep the green / red candles
+    { const K = candleCols(); Object.values(panes).forEach((p) => { try { p.series.applyOptions(K); if (p.setVol) p.setVol(); } catch (e) {} });
+      try { [GV.series, TV.series].forEach((s2) => { if (s2) s2.applyOptions(K); }); } catch (e) { /* trade viewers not set up yet */ } }
     if (typeof drawHLines === 'function') setTimeout(drawHLines, 0);
     $('ms-theme').textContent = `Theme: ${{ dark: 'Dark', light: 'Light', midnight: 'Midnight', pro: 'Pro' }[G.theme] || 'Dark'}`; $('ms-theme').title = 'Switch theme: Dark, Light, Midnight, Pro';
   }
@@ -5537,7 +5544,7 @@ function msNextSetup(bars, A) {
       const th = THEMES[G.theme] || THEMES.dark;
       if (!GV.chart) {
         GV.chart = LW.createChart(host, { autoSize: true, layout: { background: { type: 'solid', color: th.bg }, textColor: th.text, fontSize: 11 }, grid: { vertLines: { visible: false }, horzLines: { visible: false } }, rightPriceScale: { borderColor: th.border }, timeScale: { borderColor: th.border, timeVisible: true, rightOffset: 18 }, crosshair: { mode: LW.CrosshairMode.Normal }, handleScroll: true, handleScale: true });
-        GV.series = GV.chart.addCandlestickSeries({ upColor: UPC, downColor: DNC, borderUpColor: UPC, borderDownColor: DNC, wickUpColor: UPC, wickDownColor: DNC, priceLineVisible: false, lastValueVisible: true });
+        GV.series = GV.chart.addCandlestickSeries({ ...candleCols(), priceLineVisible: false, lastValueVisible: true });
         GV.ov = new Overlay(); GV.series.attachPrimitive(GV.ov);
       }
       const data = GV.bars.map((b) => ({ time: b.time + TZ, open: b.open + GV.off, high: b.high + GV.off, low: b.low + GV.off, close: b.close + GV.off }));
@@ -5921,7 +5928,7 @@ function msNextSetup(bars, A) {
           const b = D[i]; if (!b || b.open == null) { lg.innerHTML = ''; return; } const pv = i > 0 && D[i - 1].close != null ? D[i - 1].close : b.open, ch = b.close - pv, cl = ch >= 0 ? 'up' : 'dn', f = C.f, dd = new Date((b.time - TZ) * 1000);
           lg.innerHTML = `<span class="k">O</span><b class="${cl}">${f(b.open)}</b><span class="k">H</span><b class="${cl}">${f(b.high)}</b><span class="k">L</span><b class="${cl}">${f(b.low)}</b><span class="k">C</span><b class="${cl}">${f(b.close)}</b><b class="${cl} chg">${ch >= 0 ? '+' : '−'}${f(Math.abs(ch))}</b><span class="t">${dd.toLocaleString(undefined, { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })}</span>`; };
         TV.chart.subscribeCrosshairMove((pr) => TV.legend(pr && pr.point && pr.logical != null ? Math.round(pr.logical) : null)); }
-      TV.series = TV.chart.addCandlestickSeries({ upColor: UPC, downColor: DNC, borderUpColor: UPC, borderDownColor: DNC, wickUpColor: UPC, wickDownColor: DNC, priceLineVisible: false, lastValueVisible: false });
+      TV.series = TV.chart.addCandlestickSeries({ ...candleCols(), priceLineVisible: false, lastValueVisible: false });
       TV.ov = new Overlay(); TV.series.attachPrimitive(TV.ov);
       TV.series.applyOptions({ autoscaleInfoProvider: (orig) => { const r = orig(); if (r && r.priceRange && TV.pv.length) { r.priceRange.minValue = Math.min(r.priceRange.minValue, ...TV.pv); r.priceRange.maxValue = Math.max(r.priceRange.maxValue, ...TV.pv); } return r; } });
     } else TV.chart.applyOptions({ layout: { background: { type: 'gradient', topColor: th.bgTop || th.bg, bottomColor: th.bg }, textColor: th.text }, grid: { vertLines: { visible: false }, horzLines: { visible: false } } });
