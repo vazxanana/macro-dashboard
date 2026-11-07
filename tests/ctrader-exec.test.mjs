@@ -1,0 +1,21 @@
+// node --test tests/ctrader-exec.test.mjs — demo fill vs council paper entry (slippage in R, delay)
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import { fillQuality, executionStats } from '../council/ctrader-mirror.mjs';
+import { deskSection } from '../council/analyst.mjs';
+test('slippage is in R and signed so that positive is worse than paper', () => {
+  assert.deepEqual(fillQuality({ side: 'buy', entry: 100, stop: 98, filled: 1000 }, 100.5, 1030), { fillPrice: 100.5, slipR: 0.25, lagSec: 30 });
+  assert.equal(fillQuality({ side: 'sell', entry: 100, stop: 102 }, 100.5, 0).slipR, -0.25);   // sold higher: better
+  assert.deepEqual(fillQuality({ side: 'buy', entry: 100, stop: 100 }, 101, 0), {});
+  assert.deepEqual(fillQuality({ side: 'buy', entry: 100, stop: 99 }, null, 0), {});
+});
+test('execution stats: mean, median, worst, per symbol; positions without a fill are left out', () => {
+  const map = { a: { symbol: 'XAUUSD', slipR: 0.1, lagSec: 20, openedAt: '2026-11-09T00:00:00Z' }, b: { symbol: 'XAUUSD', slipR: -0.05, lagSec: 40, openedAt: '2026-11-09T00:00:00Z' },
+    c: { symbol: 'EURUSD', slipR: 0.3, lagSec: 30, openedAt: '2026-11-09T00:00:00Z' }, d: { symbol: 'EURUSD', status: 'sent', openedAt: '2026-11-09T00:00:00Z' } };
+  const x = executionStats(map);
+  assert.equal(x.n, 3); assert.equal(x.meanSlipR, 0.117); assert.equal(x.medianSlipR, 0.1); assert.equal(x.worstSlipR, 0.3); assert.equal(x.medianLagSec, 30);
+  assert.deepEqual(x.bySymbol.XAUUSD, { n: 2, meanSlipR: 0.025 });
+  assert.deepEqual(executionStats({}), { n: 0 });
+  const md = deskSection({ mirror: { state: { status: 'ok', map }, execution: x }, now: 1794200000 });
+  assert.match(md, /Execution vs paper:\*\* 3 demo fills; slippage against the council entry \+0\.12R/);
+});

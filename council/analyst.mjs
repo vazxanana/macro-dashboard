@@ -115,7 +115,9 @@ export function deskSection({ ict = [], shadow = null, mirror = null, now = Math
   else {
     const op = Object.entries(st.map || {}).filter(([, m]) => m.status === 'open');
     out.push('', `**cTrader mirror:** ${st.status || '—'}${st.lastRun ? ` (checked ${String(st.lastRun).slice(0, 16).replace('T', ' ')} UTC)` : ''}.`);
-    for (const [id, m] of op) out.push(`- open: ${m.symbol} ${m.side} ${m.setup || ''} (${id})`);
+    for (const [id, m] of op) out.push(`- open: ${m.symbol} ${m.side} ${m.setup || ''} (${id})${Number.isFinite(+m.slipR) ? ` · fill ${m.fillPrice} vs council ${m.councilEntry} (${sgn(m.slipR)}R slippage)` : ''}`);
+    const x = mirror.execution;
+    if (x && x.n) out.push('', `**Execution vs paper:** ${x.n} demo fill${x.n === 1 ? '' : 's'}; slippage against the council entry ${sgn(x.meanSlipR)}R on average (median ${sgn(x.medianSlipR)}R, worst ${sgn(x.worstSlipR)}R; positive = worse than paper)${x.medianLagSec != null ? `, median ${x.medianLagSec}s from council fill to demo order` : ''}.`);
     const L = ((mirror.log || []).slice(-5)).reverse();
     if (L.length) { out.push('', 'Last mirror events:'); for (const l of L) out.push(`- ${String(l.at).slice(5, 16).replace('T', ' ')} ${String(l.msg).replace(/\|/g, '/')}`); }
   }
