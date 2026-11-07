@@ -10,7 +10,8 @@
 //   2. open positions and their floating R (prices from snapshot.json and ict/snapshot.json)
 //   3. the macro regime and the next day's event playbook headline (macro/forecast.json)
 //   4. what waits on the owner: Coach proposals (coach.json), data-feed problems (health.json), robustness verdict changes
-//      (research/robustness.json, against the last digest)
+//      (research/robustness.json, against the last digest), and a live system the edge-decay monitor calls 'decaying'
+//      (coach.json decay, council/decay.mjs; one line, only when there is one)
 //   5. edge scoreboard movers: streams whose verdict changed since the last digest (the scoreboard's own pure functions,
 //      script#ms-sb-js of market-structure.html, run here without a page)
 //
@@ -153,6 +154,15 @@ export function robustChanges(J, prev) {
   return (J && Array.isArray(J.claims) ? J.claims : []).filter((c) => c && c.id && c.verdict && prev[c.id] && prev[c.id] !== c.verdict)
     .map((c) => ({ id: c.id, name: c.name || c.id, from: prev[c.id], to: c.verdict }));
 }
+// Edge-decay monitor (coach.json decay, council/decay.mjs): one line naming the LIVE systems whose status is 'decaying', or null.
+// Shadow systems (crypto trend since 7 Nov) are left out: the owner already moved them off live.
+export function decayLine(decay) {
+  const S = (decay && Array.isArray(decay.systems) ? decay.systems : []).filter((s) => s && s.live && s.status === 'decaying');
+  if (!S.length) return null;
+  const one = (s) => `${s.name} (${[s.roll && s.roll.n ? `last ${s.roll.n} ${fR(s.roll.exp)} a trade` : '', s.cusRef ? `CUSUM ${s.cusRef.s}/${s.cusRef.h}` : '',
+    s.dd ? `DD ${(+s.dd.cur).toFixed(1)}R of ${(+s.dd.limit).toFixed(0)}R` : ''].filter(Boolean).join(', ')})`;
+  return `Edge decay: ${trim(S.slice(0, 2).map(one).join('; '), 150)}${S.length > 2 ? ` +${S.length - 2} more` : ''}. Status only, no rule changed: your call.`;
+}
 export function waiting(D, now, prev) {
   const out = [], P = (D.coach && Array.isArray(D.coach.proposals) ? D.coach.proposals : []).filter(actionable);
   if (P.length) out.push(`Coach: ${P.length} proposal${P.length > 1 ? 's' : ''} to OK: ${trim(P.slice(0, 2).map((p) => p.label || proposalLine(p)).join('; '), 90)}${P.length > 2 ? ` +${P.length - 2} more` : ''}`);
@@ -162,6 +172,8 @@ export function waiting(D, now, prev) {
   else if (!(now - hAt <= CFG.dataStaleH * 3600)) out.push(`Data feeds: last check ${Number.isFinite(hAt) ? `${dayLabel(hAt)} ${HMF.format(new Date(hAt * 1000))} UTC` : 'unknown'}.`);
   const rc = robustChanges(D.robust, prev && prev.robust);
   if (rc.length) out.push(`Robustness: ${trim(rc.slice(0, 2).map((c) => `${c.name} ${c.from} → ${c.to}`).join('; '), 100)}${rc.length > 2 ? ` +${rc.length - 2} more` : ''}`);
+  const dl = decayLine(D.coach && D.coach.decay);
+  if (dl) out.push(dl);
   return out;
 }
 

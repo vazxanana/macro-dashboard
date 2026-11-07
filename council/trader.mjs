@@ -11,6 +11,7 @@ import { alertable, alertEvents, sendAlerts, when, NTFY_DEFAULT, proposalDigest 
 import { liveRuleSection, injectSection, coachChurnSection, CHURN_START, CHURN_END, deskSection, DESK_START, DESK_END, analystReviews, analystSections, fidelitySection, FID_START, FID_END } from './analyst.mjs';
 import { coachProposals, spotProposals, ictVariantVerdicts, coachCarry } from './proposals.mjs';
 import { shrink, ebTau, shrunkClear, ruleState, sameRule, setRule, descRule, judgeTrial, ledgerStart, syncLedger, ledgerSection, LEDGER_START, LEDGER_END } from './coach.mjs';
+import { buildDecay } from './decay.mjs';
 import { cleanBars, LTF_CLEAN } from './clean.mjs';
 import { voidRoundedReplicas, historyCatchUp } from './repairs.mjs';
 import { d1AdxFeat } from './adx.mjs';
@@ -1489,7 +1490,7 @@ if (coach.date !== today) {
     if (sh.length >= 4 && exp(sh) > 0.3) { delete config.pausedMarkets[m]; change(`Resumed market ${m} early`, `Shadow trades while paused made +${exp(sh).toFixed(2)}R over ${sh.length}.`); }
   }
   const prev = rd('coach.json', {});   // keep the owner-facing proposals, the ICT watch list (coachCarry) and the ledger between the daily runs
-  wr('coach.json', { ...coachCarry(prev), ledger: prev.ledger, ledgerSlot: prev.ledgerSlot, ledgerSince: prev.ledgerSince, date: today, at: nowISO, stats, last14: rs, lessons: lessons(trades, now), fslot: nowISO.slice(0, 11) + String(Math.floor(+nowISO.slice(11, 13) / 6) * 6).padStart(2, '0'), notes: notes.length ? notes : ['No change today: not enough evidence to move a rule.'] });
+  wr('coach.json', { ...coachCarry(prev), decay: prev.decay, ledger: prev.ledger, ledgerSlot: prev.ledgerSlot, ledgerSince: prev.ledgerSince, date: today, at: nowISO, stats, last14: rs, lessons: lessons(trades, now), fslot: nowISO.slice(0, 11) + String(Math.floor(+nowISO.slice(11, 13) / 6) * 6).padStart(2, '0'), notes: notes.length ? notes : ['No change today: not enough evidence to move a rule.'] });
 }
 // every run: pause a setup as soon as its live record says so
 {
@@ -2022,6 +2023,14 @@ try { const ev = [], quiet = process.env.COUNCIL_ALERTS === 'off', topic = proce
   } catch (err) { snapshot.errors.digest = String(err.message || err); }
 } catch (err) { snapshot.errors.alerts = String(err.message || err); }
 wr('research.json', research);
+// Edge-decay monitor (8 Nov, council/decay.mjs): every live system's record after costs against its own backtest (rolling
+// expectancy, CUSUM vs the backtest and vs zero, drawdown vs its worst) -> coach.json decay, every 6 hours. Status and alert
+// only: it never changes a rule, a filter, a size or a trade; the owner decides (the daily digest names a decaying system).
+try { const cj = rd('coach.json', {});
+  if (!cj.decay || cj.decay.slot !== CC_SLOT) {
+    cj.decay = { ...buildDecay({ trades, research, ictTrades: rd('ict/trades.json', []), replay: rd('research/replay-2w.json', null), ictReplay: rd('ict/replay.json', null) }, { now }), slot: CC_SLOT };
+    wr('coach.json', cj); }
+} catch (e) { console.log('decay monitor failed:', e.message); }
 snapshot.lessons = lessons(trades, now);
 // owner's loss reviews, per setup (30 days): reason counts, rule ideas, and reasons that repeat (3+ and a third of the
 // reviewed losses of that setup) as candidates the twice-daily council check tests on the backtest before any rule changes
