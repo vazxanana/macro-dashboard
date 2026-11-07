@@ -14,8 +14,12 @@
 <meta property="og:title" content="Meridian X · Trading desk">
 <meta property="og:description" content="Live market structure, the AI council's trades, crypto scalping and the ICT desk.">
 <meta property="og:url" content="https://meridianx.dev/">
-<meta property="og:image" content="https://meridianx.dev/icon-512.png">
-<meta name="twitter:card" content="summary">
+<meta property="og:image" content="https://meridianx.dev/api/og">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Meridian X: live gold price and 2-day chart">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://meridianx.dev/api/og">
 <link rel="canonical" href="https://meridianx.dev/">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -2258,7 +2262,7 @@ html[data-motion="off"][data-gate] .gate-bg path[stroke] { animation: none; stro
 
   <header class="top">
     <div class="brand"><i class="ms-coin" aria-hidden="true"></i><div><details class="mk" id="ms-mk"><summary class="inst" id="ms-mk-btn" title="Market (click to change)">XAU/USD</summary><div class="mk-pop"><label class="sr" for="ms-mk-q">Search markets</label><input id="ms-mk-q" type="search" placeholder="Search markets…" autocomplete="off"><ul class="mk-list" id="ms-mk-list"></ul></div></details><select id="ms-inst" class="inst" hidden aria-hidden="true" tabindex="-1"><option>XAU/USD · Gold</option></select><span id="ms-inst-name">Gold · Mosha structure</span></div></div>
-    <div class="px"><b id="ms-hdr-price">—</b><span id="ms-hdr-chg" class="hdr-chg"></span></div>
+    <div class="px"><b id="ms-hdr-price">—</b><span id="ms-hdr-chg" class="hdr-chg"></span><span id="ms-hdr-spr" class="hdr-spr" hidden></span></div>
     <nav class="tabs" aria-label="Sections">
       <a href="#home" data-go="home">Home</a><a href="#setup" data-go="setup" class="adm">Setup</a><a href="#charts" data-go="charts">Charts</a><a href="#scanner" data-go="scanner" class="adm">Scanner</a><a href="#crypto" data-go="crypto" class="adm">Crypto</a><a href="#gold" data-go="gold" class="adm">Gold playbook</a><a href="#council" data-go="council">Council</a><a href="#journal" data-go="journal">Journal</a><a href="#ict" data-go="ict" class="ictx">ICT desk</a><a href="#users" data-go="users" class="adm own">Users</a>
     </nav>
@@ -3023,6 +3027,9 @@ function msNextSetup(bars, A) {
   const BARS = 500, PIVOT = 6;
   const INSTRUMENTS = {
     xau:    { group: 'Metals', md: 'xau', label: 'XAU/USD', name: 'Gold',     binance: 'PAXGUSDT', kraken: 'PAXGUSD', dec: 1, spot: true, size: 'gold', color: '#c99400' },
+    xag:    { group: 'Metals', md: 'xag', label: 'XAG/USD', name: 'Silver',   binance: null, kraken: null, dec: 3, size: 'units', unit: 'oz', color: '#9aa4b2' },
+    nas100: { group: 'Indices', md: 'nas100', label: 'NAS100', name: 'Nasdaq 100', binance: null, kraken: null, dec: 1, size: 'units', unit: 'units', color: '#7c5cff' },
+    spx500: { group: 'Indices', md: 'spx500', label: 'US500', name: 'S&P 500',  binance: null, kraken: null, dec: 1, size: 'units', unit: 'units', color: '#3d7bff' },
     btc:    { group: 'Crypto', label: 'BTC/USD', name: 'Bitcoin',  binance: 'BTCUSDT',  kraken: 'XBTUSD',  dec: 1, size: 'units', unit: 'BTC', color: '#f7931a' },
     eth:    { group: 'Crypto', label: 'ETH/USD', name: 'Ethereum', binance: 'ETHUSDT',  kraken: 'ETHUSD',  dec: 2, size: 'units', unit: 'ETH', color: '#7b8cde' },
     sol:    { group: 'Crypto', label: 'SOL/USD', name: 'Solana',   binance: 'SOLUSDT',  kraken: 'SOLUSD',  dec: 2, size: 'units', unit: 'SOL', color: '#14f195' },
@@ -3031,6 +3038,7 @@ function msNextSetup(bars, A) {
     gbpusd: { group: 'Forex', md: 'gbpusd',  label: 'GBP/USD', name: 'Pound',    binance: null, kraken: 'GBPUSD', bitstamp: 'gbpusd', dec: 5, size: 'fx',    color: '#2962ff' },
     audusd: { group: 'Forex', md: 'audusd',  label: 'AUD/USD', name: 'Aussie',   binance: null, kraken: 'AUDUSD', dec: 5, size: 'fx',    color: '#2962ff' },
     usdcad: { group: 'Forex', md: 'usdcad',  label: 'USD/CAD', name: 'Loonie',   binance: null, kraken: 'USDCAD', dec: 5, size: 'fxquote', color: '#2962ff' },
+    usdjpy: { group: 'Forex', md: 'usdjpy',  label: 'USD/JPY', name: 'Yen',      binance: null, kraken: null, dec: 3, pip: 0.01, size: 'fxquote', color: '#2962ff' },
     usdchf: { group: 'Forex', md: 'usdchf',  label: 'USD/CHF', name: 'Swissy',   binance: null, kraken: 'USDCHF', dec: 5, size: 'fxquote', color: '#2962ff' },
   };
   let instKey = null;
@@ -3257,7 +3265,7 @@ function msNextSetup(bars, A) {
       }
       if (out.length) return { src: 'Binance', bars: out };
     } catch (e) { errs.push(((m) => m.indexOf('Binance') === 0 ? m : 'Binance: ' + m)(String(e.message || 'blocked'))); }
-    try {
+    if (I.kraken) try {
       const j = await krakenGet(`https://api.kraken.com/0/public/OHLC?pair=${I.kraken}&interval=${tf.kraken}`, urgent);
       const key = j.result && Object.keys(j.result).find((k) => k !== 'last');
       const rows = key ? j.result[key] : null;
@@ -3675,7 +3683,7 @@ function msNextSetup(bars, A) {
     return k ? s / k : 0;
   }
   // Smallest buffer worth placing: about one typical spread for the market
-  const spreadOf = (price) => CUR.group === 'Forex' ? 0.0001 : CUR.spot ? 0.3 : price * 0.0002;
+  const spreadOf = (price) => CUR.group === 'Forex' ? (CUR.pip || 0.0001) : CUR.spot ? 0.3 : price * 0.0002;
   function buildSetup(pr, price, src = panes) {
     const hp = src[pr.h], lp = src[pr.l];
     if (!hp || !lp || !hp.A || !hp.A.last || !lp.A || !lp.bars) return null;
@@ -3905,9 +3913,11 @@ function msNextSetup(bars, A) {
         if (bt === last.time) P.push({ time: bt, open: last.open, high: Math.max(last.high, px), low: Math.min(last.low, px), close: px });
         else if (bt > last.time) P.push({ time: bt, open: px, high: px, low: px, close: px });
       });
-      const now = Date.now(); if (now - upd > 1000) { upd = now; $('ms-updated').textContent = new Date().toLocaleTimeString(); }
+      const now = Date.now(); if (now - upd > 1000) { upd = now; $('ms-updated').textContent = new Date().toLocaleTimeString();
+        const hp = $('ms-hdr-price'); if (hp) { const prev = +hp.dataset.p; if (prev && prev !== px) { hp.classList.remove('tick-up', 'tick-down'); void hp.offsetWidth; hp.classList.add(px > prev ? 'tick-up' : 'tick-down'); } hp.dataset.p = px; hp.textContent = fmt(px); }
+        const sp = $('ms-hdr-spr'); if (sp) { sp.hidden = false; sp.textContent = `Bid ${fmt(d.b)} · Ask ${fmt(d.a)}`; sp.title = `OANDA spread ${fmt(d.a - d.b)}${d.ok === false ? ' (market not tradeable now)' : ''}`; } }
     };
-    es.onerror = () => { if (es.readyState === 2) { G.es = null; if (G.live) { G.live = false; setStatus(); } setTimeout(startTicks, 5000); } };
+    es.onerror = () => { if (es.readyState === 2) { G.es = null; const sp = $('ms-hdr-spr'); if (sp) sp.hidden = true; if (G.live) { G.live = false; setStatus(); } setTimeout(startTicks, 5000); } };
   }
   let polling = false;
   function startPolling() {
@@ -7211,6 +7221,9 @@ function gpStats(T) {
 .own-acts { display: flex; justify-content: flex-end; gap: 8px; }
 .own-acts button { height: 40px; padding: 0 16px; border-radius: 10px; border: 1px solid var(--line); background: transparent; color: var(--ink); font: inherit; font-weight: 600; cursor: pointer; }
 .own-acts button.pri { background: var(--accent); border-color: var(--accent); color: #fff; }
+.hdr-spr { margin-left: 10px; font: 500 11px var(--mono, ui-monospace, monospace); color: var(--ink-faint); white-space: nowrap; font-variant-numeric: tabular-nums; }
+.hdr-spr[hidden] { display: none; }
+@media (max-width: 900px) { .hdr-spr { display: none; } }
 </style>
 </body>
 </html>
