@@ -8,9 +8,11 @@
 //   * OFF unless CTRADER_MIRROR=on. Without the CTRADER_* secrets it does nothing.
 //   * Only these message types can be sent: auth, account list, trader, reconcile, symbols, token refresh, heartbeat, NEW MARKET
 //     ORDER and CLOSE POSITION. No amend, no cancel, no pending orders.
-//   * Small and capped: 0.01 lot (or the symbol's minimum), at most MAX_OPEN mirror positions, no new order once the account is
-//     down DAY_STOP of its balance on the UTC day, only trades opened in the last FRESH seconds (no catch-up of old trades).
-//   * It only ever touches positions it opened (label "council", tracked in ctrader/mirror.json).
+//   * Small and capped: 0.01 lot (or the symbol's minimum, refused above 0.1 lot or without a lot size), at most MAX_OPEN mirror
+//     positions (unconfirmed orders included), no new order once the account is down DAY_STOP of its balance on the UTC day
+//     (closed P/L: balance), only trades opened in the last FRESH seconds (no catch-up of old trades).
+//   * It only ever touches positions it opened (label "council" + comment naming the trade, tracked in ctrader/mirror.json); a
+//     position whose round never saved is found again by that label/comment, so a trade is never opened twice.
 //   * Secrets come from the environment, are never written in plain text or logged; a rotated token pair is kept encrypted
 //     (AES-256-GCM, key from the client secret) in ctrader/tokens.json.
 import fs from 'node:fs';
@@ -36,15 +38,22 @@ export const SYMBOLS = { xau: ['XAUUSD'], eurusd: ['EURUSD'], gbpusd: ['GBPUSD']
 // the ICT desk's trades as mirror candidates: only its A-setups (the part that holds up after costs: research/edge/costs), with
 // their own id space; everything else is treated like a shadow (never sent)
 export const ictCandidates = (ict) => (Array.isArray(ict) ? ict : []).map((t) => ({ ...t, id: 'ict:' + t.id, k: 'ict-' + (t.aplus ? 'A+' : 'A'), shadow: !t.aset, rr: t.t1 == null ? 99 : t.rr }));
-export const LIMITS = { lots: 0.01, maxOpen: 5, dayStop: 0.02, fresh: 15 * 60 };
+export const LIMITS = { lots: 0.01, maxLots: 0.1, maxOpen: 5, dayStop: 0.02, fresh: 15 * 60, retries: 3, keepDays: 30 };
 const LABEL = 'council';
 const OPEN = new Set(['open']), isDone = (t) => !!t.status && t.status !== 'open' && t.status !== 'pending';
+// the order comment is also the key that finds our position at the broker again (ProtoOATradeData.label + comment)
+export const commentFor = (t) => `${String(t.id).startsWith('ict:') ? 'ict' : 'council'} ${t.k} ${t.id}`.slice(0, 100);
+const normName = (s) => String(s || '').toUpperCase().replace(/[^A-Z0-9.]/g, '');   // "EUR/USD" (the proto's own example) == "EURUSD"
+// broker answers meaning "not now" (the order was certainly not placed): retried while the trade is still fresh. Timeouts and
+// dropped connections are NOT retried (the order may have gone through); step 0 finds such a position next round.
+const RETRY = /MARKET_CLOSED|SYMBOL_HAS_HOLIDAY|NO_QUOTES|SERVER_IS_UNDER_MAINTENANCE|CH_SERVER_NOT_REACHABLE|REQUEST_FREQUENCY_EXCEEDED|TRADING_DISABLED|not tradable now/;
 
 // ---- secrets ------------------------------------------------------------------------------------------------------
 export function scrubber(env) {
   const vals = NEED.map((k) => env[k]).filter((v) => v && String(v).length >= 6);
   return (s) => { let t = String(s == null ? '' : s); for (const v of vals) t = t.split(v).join('[redacted]'); return t.slice(0, 300); };
 }
+const baseOf = (env) => crypto.createHash('sha256').update(`${env.CTRADER_REFRESH_TOKEN}|base`).digest('hex').slice(0, 16);   // kept sealed only
 const keyFor = (env) => crypto.createHash('sha256').update(`${env.CTRADER_CLIENT_SECRET}|meridian-ctrader-tokens-v1`).digest();
 export function seal(obj, env) {
   const iv = crypto.randomBytes(12), c = crypto.createCipheriv('aes-256-gcm', keyFor(env), iv);
@@ -57,29 +66,52 @@ export function unseal(o, env) {
 }
 
 // ---- Open API session (JSON over WebSocket) ---------------------------------------------------------------------------
-export function session(WS, scrub, url = DEMO_HOST) {
+// ProtoOAExecutionType (OpenApiModelMessages.proto). The JSON API sends enums as numbers; names are accepted too.
+export const EXEC = { ORDER_ACCEPTED: 2, ORDER_FILLED: 3, ORDER_REPLACED: 4, ORDER_CANCELLED: 5, ORDER_EXPIRED: 6, ORDER_REJECTED: 7, ORDER_CANCEL_REJECTED: 8, ORDER_PARTIAL_FILL: 11 };
+const execType = (v) => (typeof v === 'number' ? v : EXEC[v] != null ? EXEC[v] : Number(v));
+// A NEW_ORDER / CLOSE_POSITION request is answered by SEVERAL execution events carrying its clientMsgId: ORDER_ACCEPTED (validated,
+// not filled yet), then ORDER_FILLED, or ORDER_REJECTED / CANCELLED / EXPIRED, or an ORDER_ERROR_EVENT. Wait past ACCEPTED for the
+// outcome; a rejection inside an execution event is an error, not a success.
+export function orderStep(p) {
+  const x = execType(p.executionType);
+  if (x === EXEC.ORDER_ACCEPTED) return 'wait';
+  if ([EXEC.ORDER_REJECTED, EXEC.ORDER_CANCELLED, EXEC.ORDER_EXPIRED, EXEC.ORDER_CANCEL_REJECTED].includes(x)) {
+    const e = new Error(String(p.errorCode || Object.keys(EXEC).find((k) => EXEC[k] === x))); e.code = p.errorCode || ''; return e;
+  }
+  return 'done';
+}
+export function session(WS, scrub, url = DEMO_HOST, { timeout = 10000 } = {}) {
   if (url !== DEMO_HOST) throw new Error('refusing a non-demo host');
   const ws = new WS(url), waiting = new Map();
   let n = 0, beat, closed = false;
   const opened = new Promise((ok, fail) => { ws.onopen = ok; ws.onerror = () => fail(new Error('could not reach the cTrader demo server')); });
+  // a request that already had an interim answer (ORDER_ACCEPTED) resolves with it, flagged interim, instead of failing on timeout/close
+  const finish = (id, w, why) => { waiting.delete(id); clearTimeout(w.t); if (w.interim) w.ok({ ...w.interim, interim: true }); else w.fail(new Error(why)); };
+  const drop = (id, w) => { waiting.delete(id); clearTimeout(w.t); };
   ws.onmessage = (ev) => {
     let m; try { m = JSON.parse(typeof ev.data === 'string' ? ev.data : String(ev.data)); } catch (e) { return; }
     const w = m.clientMsgId && waiting.get(m.clientMsgId); if (!w) return;   // spontaneous events (heartbeats, other fills) are ignored
-    waiting.delete(m.clientMsgId); clearTimeout(w.t);
     if (m.payloadType === PT.OA_ERROR_RES || m.payloadType === PT.ERROR_RES || m.payloadType === PT.ORDER_ERROR_EVENT) {
+      drop(m.clientMsgId, w);
       const p = m.payload || {}; const e = new Error(scrub(`${p.errorCode || 'ERROR'}: ${p.description || ''}`)); e.code = p.errorCode; w.fail(e);
-    } else if (w.expect && m.payloadType !== w.expect) w.fail(new Error(`unexpected reply ${m.payloadType}`));
-    else w.ok(m.payload || {});
+    } else if (w.expect && m.payloadType !== w.expect) { drop(m.clientMsgId, w); w.fail(new Error(`unexpected reply ${m.payloadType}`)); }
+    else {
+      const p = m.payload || {}, r = w.step ? w.step(p) : 'done';
+      if (r === 'wait') { w.interim = p; return; }   // keep waiting: the fill (or the rejection) follows with the same clientMsgId
+      drop(m.clientMsgId, w);
+      if (r instanceof Error) { const e = new Error(scrub(r.message)); e.code = r.code; w.fail(e); } else w.ok(p);
+    }
   };
-  ws.onclose = () => { clearInterval(beat); for (const w of waiting.values()) { clearTimeout(w.t); w.fail(new Error('connection closed')); } waiting.clear(); };
-  async function send(payloadType, payload, expect) {
+  ws.onclose = () => { clearInterval(beat); for (const [id, w] of [...waiting]) finish(id, w, 'connection closed'); };
+  async function send(payloadType, payload, expect, step) {
     if (!ALLOWED.has(payloadType)) throw new Error(`blocked: message ${payloadType} is not allowed`);
     if (closed) throw new Error('session closed');
     await opened;
     const clientMsgId = `m${++n}`;
     return new Promise((ok, fail) => {
-      const t = setTimeout(() => { waiting.delete(clientMsgId); fail(new Error(`timeout waiting for ${expect}`)); }, 10000);
-      waiting.set(clientMsgId, { ok, fail, t, expect });
+      const w = { ok, fail, expect, step };
+      w.t = setTimeout(() => finish(clientMsgId, w, `timeout waiting for ${expect}`), timeout);
+      waiting.set(clientMsgId, w);
       ws.send(JSON.stringify({ clientMsgId, payloadType, payload }));
     });
   }
@@ -89,12 +121,15 @@ export function session(WS, scrub, url = DEMO_HOST) {
 
 // ---- sizing ---------------------------------------------------------------------------------------------------------
 // cTrader volume is in hundredths of a unit; lotSize is the volume of one lot. 0.01 lot, rounded to the step, at least the minimum.
+// No lotSize (optional in ProtoOASymbol) -> null: guessing the forex lot (10,000,000) would make an index order 1,000 contracts.
+// A minimum above LIMITS.maxLots -> null too: never more than 0.1 lot just because the broker's minimum is large.
 export function volumeFor(sym, lots = LIMITS.lots) {
-  const lot = +sym.lotSize || 10000000, step = +sym.stepVolume || 1, min = +sym.minVolume || step;
+  const lot = +sym.lotSize; if (!(lot > 0)) return null;
+  const step = +sym.stepVolume || 1, min = +sym.minVolume || step;
   let v = Math.round((lot * lots) / step) * step;
   if (v < min) v = min;
   if (sym.maxVolume && v > +sym.maxVolume) v = +sym.maxVolume;
-  return v;
+  return v > lot * LIMITS.maxLots + 1e-9 ? null : v;
 }
 // relative stop/target for a market order: in 1/100000 of the price, a multiple of the symbol's smallest step
 export function relative(dist, digits = 5) {
@@ -104,7 +139,7 @@ export function relative(dist, digits = 5) {
 
 // ---- one mirror round -----------------------------------------------------------------------------------------------
 const TOKEN_ERR = /ACCESS_TOKEN|INVALID_TOKEN|TOKEN_EXPIRED|CH_ACCESS_TOKEN_INVALID|NOT_AUTHORIZED|UNAUTHORIZED/i;
-export async function mirrorRound({ env, trades, state, tokens, WS = globalThis.WebSocket, now = Math.floor(Date.now() / 1000) }) {
+export async function mirrorRound({ env, trades, state, tokens, WS = globalThis.WebSocket, now = Math.floor(Date.now() / 1000), timeout, onTokens }) {
   const scrub = scrubber(env), log = [], say = (msg, x = {}) => log.push({ at: new Date(now * 1000).toISOString(), msg: scrub(msg), ...x });
   const st = { map: {}, day: null, startedAt: null, ...(state || {}) };
   const out = { state: st, tokens: tokens || null, log, sent: [] };
@@ -117,9 +152,10 @@ export async function mirrorRound({ env, trades, state, tokens, WS = globalThis.
   if (!st.startedAt) st.startedAt = new Date(now * 1000).toISOString();   // trades before the mirror existed are never copied
 
   let tok = { accessToken: env.CTRADER_ACCESS_TOKEN, refreshToken: env.CTRADER_REFRESH_TOKEN };
-  if (tokens) { try { const t = unseal(tokens, env); if (t.accessToken && t.refreshToken) tok = t; } catch (e) { say('stored tokens unreadable; using the configured ones'); } }
+  // the stored (rotated) pair wins, unless the owner has since configured a new pair (re-authorised): then the configured one is used
+  if (tokens) { try { const t = unseal(tokens, env); if (t.accessToken && t.refreshToken) { if (t.base && t.base !== baseOf(env)) say('new tokens configured; stored ones ignored'); else tok = t; } } catch (e) { say('stored tokens unreadable; using the configured ones'); } }
 
-  const s = session(WS, scrub);
+  const s = session(WS, scrub, DEMO_HOST, timeout ? { timeout } : {});
   try {
     await s.send(PT.APP_AUTH_REQ, { clientId: env.CTRADER_CLIENT_ID, clientSecret: env.CTRADER_CLIENT_SECRET }, PT.APP_AUTH_RES);
     let list;
@@ -128,8 +164,10 @@ export async function mirrorRound({ env, trades, state, tokens, WS = globalThis.
       if (!TOKEN_ERR.test(String(e.code || e.message))) throw e;
       const r = await s.send(PT.REFRESH_TOKEN_REQ, { refreshToken: tok.refreshToken }, PT.REFRESH_TOKEN_RES);
       if (!r.accessToken || !r.refreshToken) throw new Error('token refresh returned no tokens');
-      tok = { accessToken: r.accessToken, refreshToken: r.refreshToken, rotatedAt: new Date(now * 1000).toISOString() };
+      tok = { accessToken: r.accessToken, refreshToken: r.refreshToken, rotatedAt: new Date(now * 1000).toISOString(), base: baseOf(env) };
       out.tokens = seal(tok, env); say('access token refreshed (stored encrypted)');
+      // the old refresh token is spent now: persist the new pair at once, not only at the end of the round (a cancelled job loses it)
+      if (onTokens) { try { onTokens(out.tokens); } catch (e) { say('could not store the refreshed tokens'); } }
       list = await s.send(PT.ACCOUNTS_BY_TOKEN_REQ, { accessToken: tok.accessToken }, PT.ACCOUNTS_BY_TOKEN_RES);
     }
     const all = list.ctidTraderAccount || [];
@@ -143,50 +181,82 @@ export async function mirrorRound({ env, trades, state, tokens, WS = globalThis.
     const digits = Number.isFinite(+tr.moneyDigits) ? +tr.moneyDigits : 2, balance = tr.balance != null ? Number(tr.balance) / 10 ** digits : null;
     const today = new Date(now * 1000).toISOString().slice(0, 10);
     if (!st.day || st.day.date !== today) st.day = { date: today, startBalance: balance };
+    if (st.day.startBalance == null && balance != null) st.day.startBalance = balance;   // first readable balance of the day
     const rc = await s.send(PT.RECONCILE_REQ, { ctidTraderAccountId: ctid }, PT.RECONCILE_RES);
     const positions = new Map((rc.position || []).map((p) => [String(p.positionId), p]));
+    const iso = new Date(now * 1000).toISOString(), byId = new Map(trades.map((t) => [t.id, t]));
 
-    // 1) positions closed at the broker (stop/target hit there) -> mark done
-    for (const [id, m] of Object.entries(st.map)) if (m.status === 'open' && !positions.has(String(m.positionId))) { m.status = 'closed at broker'; m.closedAt = new Date(now * 1000).toISOString(); say(`${m.symbol} position ${m.positionId} closed at the broker`, { trade: id }); }
-    // 2) council closed the trade -> close our position
-    const byId = new Map(trades.map((t) => [t.id, t]));
+    // 0) find our positions by label + comment: confirms orders whose fill was not seen ("sent"), and adopts positions whose round
+    //    never saved (job cancelled mid-round, timeout), so they are managed and the trade is never opened twice
+    const ours = new Map();
+    for (const p of positions.values()) { const td = p.tradeData || {}; if (td.label === LABEL && td.comment) ours.set(td.comment, p); }
+    for (const t of trades) {
+      if (t.shadow || !SYMBOLS[t.market]) continue;
+      const p = ours.get(commentFor(t)); if (!p) continue;
+      const pid = String(p.positionId), m = st.map[t.id];
+      if (m && m.status !== 'sent') continue;   // already managed (open or finished): never re-adopted
+      st.map[t.id] = { ...(m || { symbol: t.market.toUpperCase(), side: t.side, setup: t.k, openedAt: iso, councilEntry: t.entry, stop: t.stop, t1: t.t1, adopted: true }),
+        positionId: pid, volume: +(p.tradeData || {}).volume || (m && m.volume), status: 'open' };
+      if (st.skipped) delete st.skipped[t.id]; if (st.wait) delete st.wait[t.id];
+      say(`${m ? 'confirmed' : 'found'} ${st.map[t.id].symbol} position ${pid} at the broker`, { trade: t.id });
+    }
+    for (const [id, m] of Object.entries(st.map)) {
+      if (m.status !== 'sent') continue;
+      if (m.positionId && positions.has(String(m.positionId))) { m.status = 'open'; continue; }
+      if (now - Date.parse(m.openedAt) / 1000 > 600) { m.status = 'not filled'; m.closedAt = iso; say(`${m.symbol} order for ${id}: no position at the broker`, { trade: id }); }
+    }
+    // 1) positions gone at the broker (stop/target hit there, or our accepted close filled after its round) -> mark done
+    for (const [id, m] of Object.entries(st.map)) if (m.status === 'open' && !positions.has(String(m.positionId))) {
+      m.status = m.closing ? 'closed by council' : 'closed at broker'; m.closedAt = iso; say(`${m.symbol} position ${m.positionId} ${m.closing ? 'close filled' : 'closed at the broker'}`, { trade: id }); }
+    // 2) council closed the trade -> close our position (waits for the fill; an accepted-only close is confirmed by step 1 next round)
     for (const [id, m] of Object.entries(st.map)) {
       if (m.status !== 'open') continue;
       const t = byId.get(id); if (!t || !isDone(t)) continue;
       const p = positions.get(String(m.positionId)); if (!p) continue;
       const vol = (p.tradeData && +p.tradeData.volume) || m.volume;
-      try { await s.send(PT.CLOSE_POSITION_REQ, { ctidTraderAccountId: ctid, positionId: Number(m.positionId), volume: vol }, PT.EXECUTION_EVENT);
-        m.status = 'closed by council'; m.closedAt = new Date(now * 1000).toISOString(); out.sent.push({ type: 'close', trade: id }); say(`closed ${m.symbol} position ${m.positionId} (council: ${t.status})`, { trade: id }); }
+      try { const ev = await s.send(PT.CLOSE_POSITION_REQ, { ctidTraderAccountId: ctid, positionId: Number(m.positionId), volume: vol }, PT.EXECUTION_EVENT, orderStep);
+        if (ev.interim) { m.closing = iso; say(`close ${m.symbol} ${m.positionId} accepted, fill not confirmed yet`, { trade: id }); continue; }
+        m.status = 'closed by council'; m.closedAt = iso; out.sent.push({ type: 'close', trade: id }); say(`closed ${m.symbol} position ${m.positionId} (council: ${t.status})`, { trade: id }); }
       catch (e) { say(`close ${m.symbol} ${m.positionId} failed: ${e.message}`, { trade: id }); }
     }
     // 3) new live council trades -> open
     const dayDown = st.day.startBalance && balance != null ? (st.day.startBalance - balance) / st.day.startBalance : 0;
-    const openCount = () => Object.values(st.map).filter((m) => m.status === 'open').length;
+    const openCount = () => Object.values(st.map).filter((m) => m.status === 'open' || m.status === 'sent').length;   // unconfirmed orders count too
     const since = Date.parse(st.startedAt) / 1000;
     const fresh = trades.filter((t) => !t.shadow && OPEN.has(t.status) && SYMBOLS[t.market] && !st.map[t.id] && !(st.skipped || {})[t.id]
-      && (t.filled || t.opened) >= since && now - (t.filled || t.opened) <= LIMITS.fresh && t.stop != null && t.entry != null);
+      && (t.side === 'buy' || t.side === 'sell') && (t.filled || t.opened) >= since && now - (t.filled || t.opened) <= LIMITS.fresh
+      && t.stop != null && t.entry != null && Math.abs(t.entry - t.stop) > 0);
     if (fresh.length) {
       const names = await s.send(PT.SYMBOLS_LIST_REQ, { ctidTraderAccountId: ctid }, PT.SYMBOLS_LIST_RES);
-      const idOf = new Map((names.symbol || []).map((x) => [String(x.symbolName).toUpperCase(), x.symbolId]));
+      const idOf = new Map((names.symbol || []).filter((x) => x.enabled !== false).map((x) => [normName(x.symbolName), x.symbolId]));
       for (const t of fresh) {
-        const skip = (why) => { (st.skipped = st.skipped || {})[t.id] = why; say(`not mirrored ${t.id}: ${why}`, { trade: t.id }); };
+        const skip = (why) => { (st.skipped = st.skipped || {})[t.id] = why; if (st.wait) delete st.wait[t.id]; say(`not mirrored ${t.id}: ${why}`, { trade: t.id }); };
+        // "not now" answers: tried again next round while the trade is fresh, at most LIMITS.retries times in all
+        const later = (why) => { const n = (((st.wait || {})[t.id] || {}).n || 0) + 1; (st.wait = st.wait || {})[t.id] = { why, n };
+          if (n >= LIMITS.retries) skip(`${why} (${n} tries)`); else say(`not mirrored yet ${t.id}: ${why} (will retry)`, { trade: t.id }); };
         if (dayDown >= LIMITS.dayStop) { skip(`daily loss stop (${(dayDown * 100).toFixed(1)}% down today)`); continue; }
         if (openCount() >= LIMITS.maxOpen) { skip(`${LIMITS.maxOpen} mirror positions already open`); continue; }
-        const name = SYMBOLS[t.market].find((n) => idOf.has(n.toUpperCase())), symbolId = name && idOf.get(name.toUpperCase());
+        const name = SYMBOLS[t.market].find((n) => idOf.has(normName(n))), symbolId = name && idOf.get(normName(name));
         if (!symbolId) { skip(`none of ${SYMBOLS[t.market].join('/')} found at the broker`); continue; }
         const info = ((await s.send(PT.SYMBOL_BY_ID_REQ, { ctidTraderAccountId: ctid, symbolId: [symbolId] }, PT.SYMBOL_BY_ID_RES)).symbol || [])[0] || {};
         const volume = volumeFor(info), sell = t.side === 'sell', d = Number.isFinite(+info.digits) ? +info.digits : 5;
+        if (volume == null) { skip(`${name}: no lot size, or its minimum volume is above ${LIMITS.maxLots} lot`); continue; }
+        if (info.tradingMode != null && info.tradingMode !== 0 && info.tradingMode !== 'ENABLED') { later(`${name} not tradable now (mode ${info.tradingMode})`); continue; }
         const order = { ctidTraderAccountId: ctid, symbolId, orderType: 1, tradeSide: sell ? 2 : 1, volume, label: LABEL,
-          comment: `${String(t.id).startsWith('ict:') ? 'ict' : 'council'} ${t.k} ${t.id}`.slice(0, 100), clientOrderId: String(t.id).slice(0, 50), relativeStopLoss: relative(t.entry - t.stop, d) };
+          comment: commentFor(t), clientOrderId: String(t.id).slice(0, 50), relativeStopLoss: relative(t.entry - t.stop, d) };
         if (t.t1 != null && !(t.rr >= 50)) order.relativeTakeProfit = relative(t.t1 - t.entry, d);   // trailing systems: no fixed target
         try {
-          const ev = await s.send(PT.NEW_ORDER_REQ, order, PT.EXECUTION_EVENT);
-          const pid = ev.position && ev.position.positionId;
-          st.map[t.id] = { positionId: pid != null ? String(pid) : null, symbol: name, side: t.side, volume, setup: t.k, status: pid != null ? 'open' : 'sent', openedAt: new Date(now * 1000).toISOString(), councilEntry: t.entry, stop: t.stop, t1: t.t1 };
-          out.sent.push({ type: 'open', trade: t.id }); say(`opened ${sell ? 'sell' : 'buy'} ${name} ${volume / (+info.lotSize || 10000000)} lot (council ${t.k})`, { trade: t.id });
-        } catch (e) { skip(`order rejected: ${e.message}`); }
+          const ev = await s.send(PT.NEW_ORDER_REQ, order, PT.EXECUTION_EVENT, orderStep);
+          const pid = (ev.position && ev.position.positionId) ?? (ev.order && ev.order.positionId), filled = !ev.interim && pid != null;
+          st.map[t.id] = { positionId: pid != null ? String(pid) : null, symbol: name, side: t.side, volume, setup: t.k, status: filled ? 'open' : 'sent', openedAt: iso, councilEntry: t.entry, stop: t.stop, t1: t.t1 };
+          if (st.wait) delete st.wait[t.id];
+          out.sent.push({ type: 'open', trade: t.id }); say(`${filled ? 'opened' : 'sent (fill not confirmed yet)'} ${sell ? 'sell' : 'buy'} ${name} ${volume / +info.lotSize} lot (council ${t.k})`, { trade: t.id });
+        } catch (e) { if (RETRY.test(`${e.code || ''} ${e.message}`)) later(`order rejected: ${e.message}`); else skip(`order rejected: ${e.message}`); }
       }
     }
+    // housekeeping: skip/retry notes matter only while a trade can still be copied; finished positions are kept LIMITS.keepDays
+    for (const k of ['skipped', 'wait']) for (const id of Object.keys(st[k] || {})) { const t = byId.get(id); if (!t || now - (t.filled || t.opened) > LIMITS.fresh) delete st[k][id]; }
+    for (const [id, m] of Object.entries(st.map)) if (m.closedAt && now - Date.parse(m.closedAt) / 1000 > LIMITS.keepDays * 86400) delete st.map[id];
     st.status = `ok · demo ${acc.brokerTitleShort || ''} · balance ${balance} · ${openCount()} open`.trim();
     st.balance = balance; st.lastRun = new Date(now * 1000).toISOString();
     return out;
@@ -202,9 +272,10 @@ if (process.argv[1] && process.argv[1].endsWith('ctrader-mirror.mjs')) {
   const raw = JSON.parse(fs.readFileSync(path.join(DIR, 'trades.json'), 'utf8'));
   let ict = []; try { ict = JSON.parse(fs.readFileSync(path.join(DIR, 'ict', 'trades.json'), 'utf8')); } catch (e) {}
   const trades = (Array.isArray(raw) ? raw : raw.trades || []).concat(ictCandidates(ict));
-  const prev = rd('mirror.json', {}), r = await mirrorRound({ env: process.env, trades, state: prev.state, tokens: rd('tokens.json', null) });
+  const saveTokens = (t) => { fs.mkdirSync(CD, { recursive: true }); fs.writeFileSync(path.join(CD, 'tokens.json'), JSON.stringify(t)); };
+  const prev = rd('mirror.json', {}), r = await mirrorRound({ env: process.env, trades, state: prev.state, tokens: rd('tokens.json', null), onTokens: saveTokens });
   fs.mkdirSync(CD, { recursive: true });
   fs.writeFileSync(path.join(CD, 'mirror.json'), JSON.stringify({ state: r.state, log: (prev.log || []).concat(r.log).slice(-300), limits: LIMITS, symbols: SYMBOLS }, null, 1));
-  if (r.tokens && JSON.stringify(r.tokens) !== JSON.stringify(rd('tokens.json', null))) fs.writeFileSync(path.join(CD, 'tokens.json'), JSON.stringify(r.tokens));
+  if (r.tokens && JSON.stringify(r.tokens) !== JSON.stringify(rd('tokens.json', null))) saveTokens(r.tokens);
   console.log(`cTrader mirror: ${r.state.status}${r.sent.length ? ` · ${r.sent.length} sent` : ''}`);
 }
