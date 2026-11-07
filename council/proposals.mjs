@@ -135,6 +135,8 @@ export const coachCarry = (prev = {}) => ({ proposals: prev.proposals || [], pro
 // when the trades it DROPS are clearly losing: 30+ dropped trades, mean R at t <= -2, and negative in both halves by close
 // time (the Coach's usual bar). Otherwise the verdict is 'watch' with the numbers. Never applied: the owner decides.
 const VARIANT = { nofri: 'skip Fridays', h1opp: 'only trades against or without H1 structure' };
+// exit variants ('strail': structure trail) take the same A-setups with another exit: there are no dropped trades to judge
+const ICT_EXIT_VARIANTS = new Set(['strail']);
 export function ictVariantVerdicts(replay, at = new Date().toISOString(), opt = {}) {
   const minN = opt.minN || 30, T = opt.t || 2;
   if (!replay || !Array.isArray(replay.trades) || !replay.shadowByVariant) return [];
@@ -144,7 +146,7 @@ export function ictVariantVerdicts(replay, at = new Date().toISOString(), opt = 
   const out = [], paper = new Set(Array.isArray(replay.paperVariants) ? replay.paperVariants : []);
   for (const [v, L] of Object.entries(replay.shadowByVariant)) {
     // a paper-only MARKET stream (research/ict-markets.md, e.g. 'silver') trades other markets: it is not a filter of the A-setups
-    if (!Array.isArray(L) || paper.has(v) || (L.length && L.every((t) => t.paperMarket))) continue;
+    if (!Array.isArray(L) || ICT_EXIT_VARIANTS.has(v) || paper.has(v) || (L.length && L.every((t) => t.paperMarket))) continue;
     // dropped = the A-setups the filter rejects. The replay tags each A-setup with every variant's verdict (t.vr, ict/replay.mjs);
     // a replay without the tags falls back to "missing from the variant's stream", which also counts trades the variant only missed
     // because its own one-open-trade rule was busy with a trade the A-rule never took

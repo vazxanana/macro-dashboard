@@ -54,3 +54,8 @@ test('a paper-only market stream (research/ict-markets.md) is not judged as a fi
   r.shadowByVariant.silver = []; assert.deepEqual(ictVariantVerdicts(r).map((v) => v.value), ['nofri'], 'empty stream skipped by the listed name');
   delete r.paperVariants; r.shadowByVariant.silver = silver; assert.deepEqual(ictVariantVerdicts(r).map((v) => v.value), ['nofri'], 'records flagged paperMarket skipped');
 });
+test('the exit variant strail (same A-setups, another exit) is not judged as a filter', () => {
+  const rows = []; for (let i = 0; i < 60; i++) rows.push(mk(i, i % 2 ? 1 : -1, false));
+  const r = replay(rows); r.shadowByVariant.strail = rows.slice(0, 20).map((t) => ({ ...t, id: t.id.replace(/-r$/, '-strail-r') }));
+  assert.deepEqual(ictVariantVerdicts(r).map((v) => v.value), []);
+});

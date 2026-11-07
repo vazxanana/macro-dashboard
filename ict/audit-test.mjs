@@ -38,9 +38,10 @@ const etHour = (t) => +NY.format(new Date(t * 1000)) % 24;
 }
 
 // 2. tracker main() on the real candles with a stubbed CNBC (child process: the tracker reads the clock at load)
-const runTracker = (nowIso, trades, cut) => {
+const runTracker = (nowIso, trades, cut, shadow) => {
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'ict-audit-'));
   fs.writeFileSync(path.join(dir, 'trades.json'), JSON.stringify(trades));
+  if (shadow) fs.writeFileSync(path.join(dir, 'shadow.json'), JSON.stringify(shadow));
   const cnbc = {}; const map = { nq: '@ND.1', es: '@SP.1', ym: '@DJ.1', rty: '@TFS.1', gc: '@GC.1' };
   for (const [k, sym] of Object.entries(map)) cnbc[sym] = { '5M': bars[k].m5.filter((b) => b[0] <= cut), '1D': bars[k].d1 };
   fs.writeFileSync(path.join(dir, 'feed.json'), JSON.stringify(cnbc));
@@ -82,11 +83,12 @@ globalThis.fetch = async (u) => { const p = String(u).split('/'), i = p.indexOf(
   const sh = r2.shadow.trades;
   ok(r2.trades.every((q) => !q.shadow && !q.variant) && sh.every((q) => q.shadow === true && q.variant === 'dip' && q.side === 'buy' && ['nq', 'es'].includes(q.market) && q.size === 1 && q.be == null),
     `shadow records only in shadow.json and all flagged (${sh.length}); live records untouched`);
-  // shadow 'nofri' / 'h1opp': under shadow.json .variants, every record flagged with its own variant, A-setups only, one open per market
-  const V = r2.shadow.variants || {};
-  ok(['nofri', 'h1opp'].every((v) => V[v] && Array.isArray(V[v].trades) && V[v].since && V[v].totals && V[v].trades.every((q) => q.shadow === true && q.variant === v && q.aset === true && q.id.endsWith(`-${v}`))
+  // shadow 'nofri' / 'h1opp' / 'strail': under shadow.json .variants, every record flagged with its own variant, A-setups only, one open per market
+  const V = r2.shadow.variants || {}, VN = ['nofri', 'h1opp', 'strail'];
+  ok(VN.every((v) => V[v] && Array.isArray(V[v].trades) && V[v].since && V[v].totals && V[v].trades.every((q) => q.shadow === true && q.variant === v && q.aset === true && q.id.endsWith(`-${v}`))
     && Object.keys(V[v].errors).length === 0 && ['nq', 'es', 'ym', 'rty', 'gc'].every((m) => V[v].trades.filter((q) => q.market === m && q.status === 'open').length <= 1)),
-    `variants nofri/h1opp in shadow.json .variants, flagged, no errors (${['nofri', 'h1opp'].map((v) => (V[v] ? V[v].trades.length : '-')).join('/')} records)`);
+    `variants nofri/h1opp/strail in shadow.json .variants, flagged, no errors (${VN.map((v) => (V[v] ? V[v].trades.length : '-')).join('/')} records)`);
+  ok(V.strail.trades.every((q) => q.trail === null && Array.isArray(q.strail)) && r2.trades.every((q) => q.strail === undefined), "strail records carry the structure trail (no 1.5R trail); live records never do");
   // paper-only market 'silver' (research/ict-markets.md): its feed is down here (no network), which must only show as an error in its
   // own variant stream; the live records, snapshot and bars never carry the paper market
   ok(V.silver && Array.isArray(V.silver.trades) && V.silver.trades.length === 0 && V.silver.errors.xag && Object.keys(r2.snap.errors).length === 0
@@ -106,6 +108,34 @@ globalThis.fetch = async (u) => { const p = String(u).split('/'), i = p.indexOf(
   const D = dailyNY([h('2026-11-09T21:00:00Z'), h('2026-11-09T23:00:00Z'), h('2026-07-06T20:00:00Z')].sort((a, b) => a.time - b.time));
   ok(D.length === 3 && D[0].time + 86400 === Date.parse('2026-07-06T21:00:00Z') / 1000 && D[1].time + 86400 === Date.parse('2026-11-09T22:00:00Z') / 1000 && D[2].time + 86400 === Date.parse('2026-11-10T22:00:00Z') / 1000,
     'dailyNY: days roll at 17:00 New York (EDT and EST)');
+}
+// shadow 'strail': the tracker's 5m management and the replay's simulate() give the same exit on the same candles
+{
+  const { simulate } = await import('./replay.mjs');
+  const { MARKETS, strailLevel, SHADOW } = await import('./tracker.mjs');
+  const hc = [5, 4, 3, 4, 5, 6, 5, 7].map((l) => ({ low: l, high: l + 1 }));
+  ok(strailLevel(hc, 5, 1, 2) === 3 && strailLevel(hc, 4, 1, 2) === null && strailLevel(hc, 8, 1, 2) === 3 && strailLevel(hc, 8, 1, 1) === 5 && strailLevel(hc, 8, -1, 2) === null && strailLevel(hc, 7, -1, 1) === 7,
+    'strail: the latest swing confirmed by 2 candles each side, among the candles closed so far');
+  const m5 = bars.es.m5.map((b) => ({ time: b[0], open: b[1], high: b[2], low: b[3], close: b[4] }));
+  const H = bars.es.h1.map((b) => ({ time: b[0], open: b[1], high: b[2], low: b[3], close: b[4] }));
+  const src = { H, m5, m5days: new Set(m5.map((b) => Math.floor(b.time / 86400)).flatMap((d) => [d, d + 1])) };
+  const opt = { strail: [SHADOW.strail.from, SHADOW.strail.piv] };
+  // find a window on the stored candles where the structure trail closes the trade (buy or sell, a few stop sizes)
+  let pick = null;
+  for (const c of H.filter((q) => q.time >= m5[0].time).slice(0, 12)) for (const side of [1, -1]) for (const k of [0.1, 0.15, 0.2, 0.3]) { if (pick) break;
+    const close = c.time + 3600, e = (m5.filter((b) => b.time < close).at(-1) || {}).close; if (e == null) continue;
+    const r0 = +(e * k / 100).toFixed(2), g = { side, t: c.time, close, entry: e, r0, stop: e - side * r0, sweepT: c.time, swept: e - side * r0, fvg: [e, e], ih: null, dol: null, valid: true, feat: {}, grade: { total: 7 } };
+    const x = simulate(g, MARKETS.es, 'es', src, Infinity, opt);
+    if (x && x.exit === 'trail' && x.R > 0) pick = { g, x }; }
+  if (!pick) ok(false, 'strail: no window on the stored candles where the structure trail closes a trade');
+  else {
+    const { g, x } = pick, s = g.side;
+    const seed = { variant: 'dip', since: '2026-11-01T00:00:00Z', trades: [], errors: {}, variants: { strail: { since: '2026-11-01T00:00:00Z', errors: {}, trades: [{ id: 'es-test-strail', shadow: true, variant: 'strail', market: 'es', label: 'S&P 500', short: 'ES',
+      side: s > 0 ? 'buy' : 'sell', signalAt: g.close, signalPx: g.entry, entry: g.entry, stop: g.stop, stop0: g.stop, r0: g.r0, t1: null, trail: null, strail: opt.strail, be: 1.5, t2: g.entry + s * 2 * g.r0, opened: g.close, checked: g.close,
+      status: 'open', R: null, size: 1, grade: { total: 7, letter: 'B+' }, feat: {}, aset: true }] } } };
+    const r = runTracker('2026-11-07T10:37:33Z', [], Infinity, seed), y = r.shadow.variants.strail.trades.find((q) => q.id === 'es-test-strail');
+    ok(y && y.exit === 'trail' && Math.abs(y.Rraw - x.R) < 0.011 && y.closed === x.closed, `strail: tracker and replay agree (${y && y.exit} ${y && y.Rraw}R vs ${x.exit} ${x.R}R, ${s > 0 ? 'buy' : 'sell'})`);
+  }
 }
 {
   const { isNoFri, nyFriday, isH1Opp, h1Trend, loadMeridian } = await import('./tracker.mjs');

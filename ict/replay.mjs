@@ -6,7 +6,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import zlib from 'node:zlib';
-import { MARKETS, P, MIN_GRADE, cnbcBars, agg, signals, letter, isASetup, isAPlus, sizeOf, SHADOW, isDip, VARIANTS, variantRule, variantTags, loadMeridian, SHADOW_MARKETS, mdBars, dailyNY } from './tracker.mjs';
+import { MARKETS, P, MIN_GRADE, cnbcBars, agg, signals, letter, isASetup, isAPlus, sizeOf, SHADOW, isDip, VARIANTS, variantRule, variantTags, loadMeridian, SHADOW_MARKETS, mdBars, dailyNY, strailLevel } from './tracker.mjs';
 
 const DATA = process.argv[2] || 'data/ict';
 const FROM = Date.parse(process.argv[3] || '2025-08-01T00:00:00Z') / 1000;   // owner, 7 Nov: 5 more months (was 1 Jan 2026)
@@ -94,7 +94,8 @@ async function paperHistory(M) {
 // audit (7 Nov): a hole in the candle history longer than any exchange holiday (4 days) inside a trade's window means the
 // exit cannot be known (gold before CNBC's continuous history had holes of 1-3 weeks: one trade was "held" 17 days)
 export const MAX_GAP = 4 * 86400;
-export function simulate(g, M, key, src, at = now) {
+// opt.strail (shadow 'strail' only): the structure trail [from R, swing candles each side] replaces the 1.5R trail
+export function simulate(g, M, key, src, at = now, opt = {}) {
   const s = g.side, f = (v) => +(+v).toFixed(M.dec), entry = g.entry, r0 = g.r0, t2 = entry + s * P.mark * r0;
   const hb = src.H.filter((b) => b.time >= g.close).slice(0, P.holdH), end = hb.length === P.holdH ? hb[hb.length - 1].time + 3600 : g.close + P.holdH * 3600;   // P.holdH closed H1 candles
   { let p = g.close; for (const b of hb) { if (b.time - p > MAX_GAP) return null; p = b.time + 3600; } }
@@ -105,12 +106,16 @@ export function simulate(g, M, key, src, at = now) {
   // candle's own new high moves it, i.e. conservatively); 36 trading hours max
   let status = 'open', R = null, closed = null, exit = null, exitPx = null, mark2 = null, mfe = 0, stop = g.stop, moved = false, beMoved = false;
   const beAt = M.aRule ? null : P.be;   // break-even from +1.5R on index futures, as the tracker
+  const trail = opt.strail ? null : P.trail; let sk = 0;
   for (const b of bars) {
+    // 'strail': at each H1 close since the signal (hb), from +strail[0] R the stop moves to the last confirmed H1 swing when tighter (as the tracker)
+    if (opt.strail) while (sk < hb.length && hb[sk].time + 3600 <= b.time) { sk++;
+      if (mfe >= opt.strail[0]) { const ns = strailLevel(hb, sk, s, opt.strail[1]); if (ns != null && (ns - stop) * s > 0) { stop = ns; moved = true; } } }
     if (!mark2 && (s > 0 ? b.high >= t2 : b.low <= t2)) mark2 = b.time + step;
     if (s > 0 ? b.low <= stop : b.high >= stop) { R = +((s * (stop - entry)) / r0).toFixed(2); status = R > 0.001 ? 'win' : R < -0.001 ? 'loss' : 'be'; closed = b.time + step; exit = moved ? 'trail' : beMoved ? 'breakeven' : 'stop'; exitPx = stop; break; }
     mfe = Math.max(mfe, ((s > 0 ? b.high : -b.low) - s * entry) / r0);
     if (beAt && !beMoved && mfe >= beAt && (entry - stop) * s > 0) { stop = entry; beMoved = true; }
-    if (mfe >= P.trail[0]) { const ns = entry + s * (mfe - P.trail[1]) * r0; if ((ns - stop) * s > 0) { stop = ns; moved = true; } }
+    if (trail && mfe >= trail[0]) { const ns = entry + s * (mfe - trail[1]) * r0; if ((ns - stop) * s > 0) { stop = ns; moved = true; } }
   }
   // the time exit needs all P.holdH candles: before, a window cut short by the end of the data (a weekend run) closed at
   // 36 CLOCK hours, i.e. on Friday's last bar
@@ -119,7 +124,7 @@ export function simulate(g, M, key, src, at = now) {
   // research: the next 72 H1 candles after the entry as [best, worst, close] in R (sign-adjusted), to study other exits offline
   const path = src.H.filter((b) => b.time >= g.close && b.time < g.close + 72 * 3600).map((b) => [+(((s > 0 ? b.high : -b.low) - s * entry) / r0).toFixed(2), +(((s > 0 ? b.low : -b.high) - s * entry) / r0).toFixed(2), +((s * (b.close - entry)) / r0).toFixed(2)]);
   return { id: `${key}-${s > 0 ? 'b' : 's'}-${g.t}-r`, market: key, label: M.label, short: M.short, side: s > 0 ? 'buy' : 'sell', model: 'H1 iFVG reversal', replay: true, res: step === 300 ? '5m' : '1h', ...(src.cnbcFrom && g.close < src.cnbcFrom ? { cash: true } : {}),
-    signalAt: g.close, signalPx: f(entry), entry: f(entry), stop: f(g.stop), stop0: f(g.stop), r0: +r0.toFixed(M.dec + 1), t1: null, trail: P.trail, be: beAt, t2: f(t2), opened: g.close, status, R, R2, closed, exit, exitPx: exitPx == null ? null : f(exitPx), mfe: +mfe.toFixed(2), path,
+    signalAt: g.close, signalPx: f(entry), entry: f(entry), stop: f(g.stop), stop0: f(g.stop), r0: +r0.toFixed(M.dec + 1), t1: null, trail, ...(opt.strail ? { strail: opt.strail } : {}), be: beAt, t2: f(t2), opened: g.close, status, R, R2, closed, exit, exitPx: exitPx == null ? null : f(exitPx), mfe: +mfe.toFixed(2), path,
     sweep: { t: g.sweepT, level: f(g.swept) }, fvg: g.fvg.map(f), ih: g.ih == null ? null : f(g.ih), dol: g.dol == null ? null : f(g.dol), valid: g.valid, feat: g.feat, grade: { ...g.grade, letter: letter(g.grade.total) } };
 }
 
@@ -143,11 +148,12 @@ if (process.argv[1] && process.argv[1].endsWith('replay.mjs')) {
       if (SHADOW.dip.markets.includes(key)) { let busy = 0;
         for (const g of sig) { if (g.close < busy || !isDip(g, key, src.D)) continue; const t = simulate(g, { ...M, aRule: 'dip' }, key, src); if (!t) continue;
           Object.assign(t, { id: t.id.replace(/-r$/, '-dip-r'), shadow: true, variant: 'dip', aset: false, size: 1 }); out.shadow.push(t); busy = t.closed || Infinity; } }
-      // shadow 'nofri' / 'h1opp' (paper comparison only): the A-setup rule plus one condition, each its own stream with its own one-open
-      // rule, A-setup sizing and exits (break-even on indices), as the live tracker; kept in out.shadowByVariant without the 72-candle path
+      // shadow 'nofri' / 'h1opp' / 'strail' (paper comparison only): the A-setup rule plus one condition ('strail': the structure-trail
+      // exit instead), each its own stream with its own one-open rule, A-setup sizing and break-even on indices, as the live tracker;
+      // kept in out.shadowByVariant without the 72-candle path
       for (const v of VARIANTS) { if (!SHADOW[v].markets.includes(key)) continue;
         try { const ctx = { H: src.H, D: src.D, ms: v === 'h1opp' ? await loadMeridian() : null }; let busy = 0;
-          for (const g of sig) { if (g.close < busy || !variantRule(v, g, key, ctx)) continue; const t = simulate(g, M, key, src); if (!t) continue;
+          for (const g of sig) { if (g.close < busy || !variantRule(v, g, key, ctx)) continue; const t = simulate(g, M, key, src, now, v === 'strail' ? { strail: [SHADOW.strail.from, SHADOW.strail.piv] } : {}); if (!t) continue;
             delete t.path; Object.assign(t, { id: t.id.replace(/-r$/, `-${v}-r`), shadow: true, variant: v, aset: true, aplus: isAPlus(g, key), size: sizeOf(g, key) });
             if (t.size !== 1 && t.R != null) { t.Rraw = t.R; t.R = +(t.R * t.size).toFixed(2); if (t.R2 != null) t.R2 = +(t.R2 * t.size).toFixed(2); }
             out.shadowByVariant[v].push(t); busy = t.closed || Infinity; }
