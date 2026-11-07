@@ -16,6 +16,7 @@ import { d1AdxFeat } from './adx.mjs';
 // paper fills (8 Nov): costs (raw R + cost-adjusted Rnet), the stale-signal shadow stat, gap-aware stops (council/fills.mjs)
 import { costModel, annotateCosts, costSummary, driftR, backfillDrift, staleStats, stopFill, exitR, fillBarAmbiguous, spotClosed } from './fills.mjs';
 import { SYMBOLS as BROKER_SYMBOLS } from './ctrader-mirror.mjs';
+import { newsFeat } from './events.mjs';
 
 const DIR = process.argv[2] || 'data';
 fs.mkdirSync(DIR, { recursive: true });
@@ -1002,6 +1003,9 @@ for (const [key, M] of Object.entries(MARKETS)) {
       // Swing D1 ADX tag (paper sleeve "swing-adx", research/edge/regime): ADX(14) of the last closed daily candle and whether it sits
       // in the 19.4-29.2 band. A tag only: no filter, focus or Coach step reads it, so it changes no trade decision.
       if (t.k === 'swing') { try { Object.assign(feat, d1AdxFeat(src['1d'].bars, now)); } catch (e) {} }
+      // News research tag (research/news-filter.md, paper only): tier-1 US release (CPI/NFP/FOMC/PCE) within +-120 min and the minutes to it.
+      // A tag only: no filter, focus, guard or Coach step reads it, so it changes no trade decision.
+      try { Object.assign(feat, newsFeat(now)); } catch (e) {}
       // Rules from the Coach. A blocked setup is still followed as a SHADOW trade (no score), so the Coach can check the rule was right
       const f = config.filters[t.k] || {}, blockedBy = [];
       if (config.paused[t.k]) blockedBy.push('paused');
