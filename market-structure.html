@@ -5691,6 +5691,7 @@ function msNextSetup(bars, A) {
       else if (b.dataset.tvmore) TV.extra = (TV.extra || 0) + 300;
       openTrade(TV.curId, true);
     });
+    { const sp = document.getElementById('ms-tv-s'); if (sp) sp.addEventListener('click', () => sp.classList.toggle('open')); }
     const ba = document.querySelector('.tv-ba'); if (ba) ba.addEventListener('click', (ev) => { const b = ev.target.closest('[data-ba]'); if (!b) return; if (b.dataset.ba === 'save') tvSaveBoth(); else tvApply(b.dataset.ba); });
     if (dlg) dlg.addEventListener('click', (ev) => { if (ev.target === dlg) dlg.close(); }); }
   // ─── Loss review (owner, 6 Nov): every losing trade stacked by the strategy that took it; draw on its chart and write why
@@ -7564,6 +7565,21 @@ function gpStats(T) {
 .ch-bell.on { color: #e0a526; }
 .tv-tk { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; margin: 8px 0 0; padding: 10px 12px; border: 1px solid color-mix(in srgb, var(--accent) 30%, var(--line)); border-radius: 10px; background: color-mix(in srgb, var(--accent) 6%, transparent); font-size: 12.5px; }
 .tv-tk[hidden] { display: none; }
+/* trade viewer on phones (7 Nov loop): full-screen sheet, title + close on one row, Before/After/Save on their own row, long notes clamp to 3 lines (tap to expand) */
+@media (max-width: 600px) {
+  dialog.tv { width: 100vw; max-width: 100vw; height: 100dvh; max-height: 100dvh; margin: 0; border-radius: 0; border: 0; }
+  .tv-h { flex-wrap: wrap; gap: 8px 10px; padding: 12px 12px 10px; position: sticky; top: 0; z-index: 6; background: var(--panel); }
+  .tv-h > div { flex: 1 1 calc(100% - 56px); order: 1; }
+  .tv-h .tv-x { order: 2; }
+  .tv-h .tv-ba { order: 3; margin: 0; flex: 1 1 100%; }
+  .tv-h .tv-ba button { flex: 1; padding: 8px 10px; }
+  .tv-h h3 { font-size: 15px; line-height: 1.35; }
+  .tv-h p { display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; cursor: pointer; }
+  .tv-h p.open { display: block; }
+  .tv-tf { overflow-x: auto; flex-wrap: nowrap !important; scrollbar-width: none; }
+  .tv-tk { margin: 8px 12px 12px; }
+}
+.tv-tk { box-sizing: border-box; max-width: 100%; }
 .tv-tk .tk-h { font-size: 11px; text-transform: uppercase; letter-spacing: .06em; color: var(--accent); }
 .tv-tk .tk-l { font: 600 12.5px var(--mono, ui-monospace, monospace); color: var(--ink); font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
 .tv-tk .tk-sz { color: var(--ink-dim); }
