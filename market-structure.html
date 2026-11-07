@@ -2287,6 +2287,7 @@ html[data-motion="off"][data-gate] .gate-bg path[stroke] { animation: none; stro
             <label><input type="checkbox" id="ms-show-cf" data-show="cf" checked><i style="background:rgba(242,54,69,.5)"></i>CF</label>
             <label><input type="checkbox" id="ms-show-vr" data-show="vr" checked><i style="background:rgba(255,152,0,.4);border:1px solid #e08600"></i>VR</label>
             <label><input type="checkbox" id="ms-show-htf" data-show="htf" checked><i style="border:1.5px dashed #2962ff"></i>HTF Origin</label>
+            <label><input type="checkbox" id="ms-show-kl" checked><i style="border-top:1.5px dotted #9aa4b2;height:0"></i>Key levels</label>
             <label><input type="checkbox" id="ms-show-vol" checked><i style="background:linear-gradient(90deg,rgba(8,153,129,.5) 50%,rgba(242,54,69,.5) 50%)"></i>Volume</label>
             <label><input type="checkbox" id="ms-show-next" data-show="next" checked><i style="background:#2962ff;height:2px"></i>Next setup</label>
             <label><input type="checkbox" id="ms-show-plan" data-show="plan" checked><i style="background:#089981;height:2px"></i>Selected trade</label>
@@ -3659,6 +3660,24 @@ function msNextSetup(bars, A) {
   }
 
   TFS.forEach((tf) => { const p = makePane(tf); if (p) panes[tf.id] = p; });
+  // key levels (7 Nov loop): previous day / week high and low and today's open, as quiet dotted lines on the intraday charts
+  function keyLevels() {
+    const d = panes['1d'] && panes['1d'].raw; let L = [];
+    if (G.showKL !== false && d && d.length > 8) {
+      const now = Date.now() / 1000, day = Math.floor(now / 86400) * 86400, prev = d.filter((b) => b.time < day), cur = d.find((b) => b.time === day);
+      const pd = prev[prev.length - 1], wk = (t) => Math.floor((t / 86400 + 3) / 7);   // weeks start Monday (UTC)
+      const thisW = wk(day), pw = prev.filter((b) => wk(b.time) === thisW - 1);
+      if (pd) L.push(['PDH', pd.high], ['PDL', pd.low]);
+      if (pw.length) L.push(['PWH', Math.max(...pw.map((b) => b.high))], ['PWL', Math.min(...pw.map((b) => b.low))]);
+      if (cur) L.push(['DO', cur.open]);
+    }
+    const off = G.offset || 0;
+    ['4h', '1h', '15m', '5m', '1m'].forEach((id) => { const P = panes[id]; if (!P || !P.series) return;
+      (P._kl || []).forEach((l) => { try { P.series.removePriceLine(l); } catch (e) {} });
+      P._kl = L.map(([t, v]) => P.series.createPriceLine({ price: v + off, color: t === 'DO' ? 'rgba(154,164,178,.55)' : /H$/.test(t) ? 'rgba(8,153,129,.55)' : 'rgba(242,54,69,.55)', lineWidth: 1, lineStyle: LW.LineStyle.SparseDotted, axisLabelVisible: true, title: t })); });
+  }
+  setTimeout(keyLevels, 2500); setInterval(keyLevels, 60e3);
+  { const k = document.getElementById('ms-show-kl'); try { G.showKL = localStorage.getItem('ms-kl') !== '0'; } catch (e) {} if (k) { k.checked = G.showKL !== false; k.addEventListener('change', () => { G.showKL = k.checked; try { localStorage.setItem('ms-kl', k.checked ? '1' : '0'); } catch (e) {} keyLevels(); }); } }
   { const v = document.getElementById('ms-show-vol'); try { G.showVol = localStorage.getItem('ms-vol') !== '0'; } catch (e) {} if (v) { v.checked = G.showVol !== false; v.addEventListener('change', () => { G.showVol = v.checked; try { localStorage.setItem('ms-vol', v.checked ? '1' : '0'); } catch (e) {} Object.values(panes).forEach((P) => P.setVol && P.setVol()); }); } }
   { const b = document.getElementById('ms-pa-open'); if (b) b.addEventListener('click', () => { const m = b.closest('details'); if (m) m.open = false; window.msOpenAlerts(); }); }
   // ─── Price alerts (7 Nov): set a level, get a phone/desktop notification when it trades, even with the site closed.
