@@ -83,13 +83,14 @@ export async function sendAlerts(ev, { topic, tgTok, tgChat, fetchFn = fetch } =
 // ({ key, at, items }), so a restart never resends. A stability line counts only when it is flagged (a losing half).
 export const SITE = 'https://meridianx.dev/';
 const fRm = (v) => `${v >= 0 ? '+' : '−'}${Math.abs(+v).toFixed(2)}R`, cap = (s) => String(s).charAt(0).toUpperCase() + String(s).slice(1);
-const actionable = (p) => !!p && !!p.setup && (['skipMarket', 'skipSession', 'promote', 'promoteIf', 'demote', 'dataSource'].includes(p.kind) || (p.kind === 'stability' && !!p.flag));
+const actionable = (p) => !!p && !!p.setup && (['skipMarket', 'skipSession', 'promote', 'promoteIf', 'demote', 'dataSource', 'ictFilter'].includes(p.kind) || (p.kind === 'stability' && !!p.flag));
 const halvesTxt = (p) => p.h1 && p.h2 ? `halves ${fRm(p.h1.exp)} / ${fRm(p.h2.exp)}` : '';
 export function proposalLine(p) {
   const S = cap(p.setup), over = `${fRm(p.exp)} over ${p.n} replay trades`;
   if (p.kind === 'stability') return `${S} edge unstable — ${halvesTxt(p)}`;
   if (p.kind === 'dataSource') return `${cap(p.label)} — live ${fRm(p.liveR / p.n)} vs spot ${fRm(p.spotR / p.n)} a trade over ${p.n} trades`;
   if (p.kind === 'skipMarket' || p.kind === 'skipSession') return `${p.label} for ${S} — ${over}`;
+  if (p.kind === 'ictFilter') return `${p.label} — the ${p.n} dropped trades made ${fRm(p.exp)} each (t ${p.t}) · ${halvesTxt(p)}`;
   return `${p.label || p.kind + ' ' + p.setup} — ${over}${p.h1 && p.h2 ? ' · ' + halvesTxt(p) : ''}`;
 }
 export function proposalsKey(proposals) {

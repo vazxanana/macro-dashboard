@@ -114,3 +114,30 @@ export function spotProposals(spot, at = new Date().toISOString(), opt = {}) {
     label: `manage ${bad.map(([m]) => mName(m)).join(', ')} trades on OANDA spot candles`, n, liveR, spotR, exp: r2((liveR - spotR) / n),
     why: `The same closed live trades re-judged on OANDA spot candles: ${liveR >= 0 ? '+' : '−'}${Math.abs(liveR).toFixed(1)}R on Kraken candles vs ${spotR >= 0 ? '+' : '−'}${Math.abs(spotR).toFixed(1)}R on spot over ${n} trades (${per}). Kraken's thin forex books reach levels spot never touched, so the paper results look better than a broker would give.`, spotAt: spot.at, at }];
 }
+
+// ICT filter verdicts (7 Nov): the ICT desk's paper variants (ict/replay.json shadowByVariant: 'nofri' skips Fridays, 'h1opp'
+// keeps only trades against or without H1 structure) each drop some A-setups. A filter is only worth proposing to the owner
+// when the trades it DROPS are clearly losing: 30+ dropped trades, mean R at t <= -2, and negative in both halves by close
+// time (the Coach's usual bar). Otherwise the verdict is 'watch' with the numbers. Never applied: the owner decides.
+const VARIANT = { nofri: 'skip Fridays', h1opp: 'only trades against or without H1 structure' };
+export function ictVariantVerdicts(replay, at = new Date().toISOString(), opt = {}) {
+  const minN = opt.minN || 30, T = opt.t || 2;
+  if (!replay || !Array.isArray(replay.trades) || !replay.shadowByVariant) return [];
+  const A = replay.trades.filter((t) => t.aset && t.closed && Number.isFinite(+t.R));
+  if (!A.length) return [];
+  const stats = (a) => { const n = a.length, m = n ? a.reduce((s, x) => s + +x.R, 0) / n : 0, sd = n > 1 ? Math.sqrt(a.reduce((s, x) => s + (x.R - m) ** 2, 0) / (n - 1)) : 0; return { n, exp: r2(m), t: sd > 0 ? r2(m / (sd / Math.sqrt(n))) : 0 }; };
+  const out = [];
+  for (const [v, L] of Object.entries(replay.shadowByVariant)) {
+    if (!Array.isArray(L)) continue;
+    const keep = new Set(L.map((t) => String(t.id).replace(`-${v}`, '')));
+    const dropped = A.filter((t) => !keep.has(t.id)).sort((x, y) => x.closed - y.closed), kept = A.filter((t) => keep.has(t.id));
+    if (!dropped.length) continue;
+    const d = stats(dropped), k = stats(kept), h = dropped.length >> 1, h1 = stats(dropped.slice(0, h)), h2 = stats(dropped.slice(h));
+    const propose = d.n >= minN && d.t <= -T && h1.exp < 0 && h2.exp < 0;
+    const label = `ICT A-setups: ${VARIANT[v] || v}`;
+    out.push({ setup: 'ICT A', kind: propose ? 'ictFilter' : 'ictWatch', value: v, label, n: d.n, exp: d.exp, t: d.t, h1, h2, keptN: k.n, keptExp: k.exp, flag: propose,
+      why: `${label}: the ${d.n} A-setups it drops made ${fR(d.exp)} a trade (t ${d.t}; halves ${fR(h1.exp)} / ${fR(h2.exp)}); the ${k.n} it keeps ${fR(k.exp)}. `
+        + (propose ? 'The dropped trades lose clearly: proposed to the owner.' : `Not proposed: needs ${minN}+ dropped trades losing at t ≤ −${T} in both halves.`), at });
+  }
+  return out;
+}
