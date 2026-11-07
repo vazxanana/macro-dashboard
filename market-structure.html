@@ -1559,7 +1559,11 @@ html[data-guest] #ms-cmdk-btn { display: none !important; }
 .h-clock.closed i { background: var(--ink-faint); }
 .h-clock b { color: var(--ink); font-weight: 600; }
 :root[data-theme="pro"] .h-clock { border-radius: 4px; }
+
+/* in-app motion switch: same effect as the OS reduced-motion setting */
+html[data-motion="off"] *, html[data-motion="off"] *::before, html[data-motion="off"] *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; scroll-behavior: auto !important; }
 </style>
+<script>try{if(localStorage.getItem('msMotion')==='off')document.documentElement.dataset.motion='off'}catch(e){}</script>
 </head>
 <body>
 <div class="gate" id="ms-gate" role="dialog" aria-modal="true" aria-labelledby="ms-gate-t">
@@ -1623,7 +1627,7 @@ html[data-guest] #ms-cmdk-btn { display: none !important; }
           <div class="menu-h">Display</div>
           <div class="menu-row">
             <button type="button" class="ms-tbtn" id="ms-theme">Light charts</button>
-            <button type="button" class="ms-tbtn" id="ms-fit">Reset view</button>
+            <button type="button" class="ms-tbtn" id="ms-fit">Reset view</button><button type="button" class="ms-tbtn" id="ms-motion" aria-pressed="true">Motion: on</button>
             <label class="ms-tbtn own" for="ms-csv">Load CSV</label>
             <input type="file" id="ms-csv" accept=".csv,text/csv" hidden>
           </div>
@@ -5199,7 +5203,7 @@ function msNextSetup(bars, A) {
 </script>
 <script>
 /* Hero numbers count up once on first render (600 ms ease-out); later updates use the existing flash. Off for reduced motion. */
-(() => { if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+(() => { if (matchMedia('(prefers-reduced-motion: reduce)').matches || document.documentElement.dataset.motion === 'off') return;
   const run = (b) => { const m = /^([+\u2212-]?)([\d,]*\.?\d+)(.*)$/.exec(b.textContent.trim()); if (!m) return;
     const sign = m[1], raw = m[2].replace(/,/g, ''), tgt = parseFloat(raw), dec = (raw.split('.')[1] || '').length, suf = m[3]; if (!isFinite(tgt) || tgt === 0) return;
     const t0 = performance.now(), D = 600, ease = (x) => 1 - Math.pow(1 - x, 4);
@@ -5249,6 +5253,13 @@ function msNextSetup(bars, A) {
     el.className = 'h-clock' + (open.length ? '' : ' closed'); el.innerHTML = `<i></i><b>${open.join(' + ') || 'Between sessions'}</b>${open.length > 1 ? ' overlap' : ''}${tail}`;
     el.title = 'Trading sessions in UTC (approximate): Asia 22:00-07:00, London 07:00-16:00, New York 12:00-21:00'; el.hidden = false; };
   tick(); setInterval(tick, 30000); })();
+</script>
+<script>
+/* Motion switch in Settings → Display */
+(() => { const b = document.getElementById('ms-motion'), r = document.documentElement; if (!b) return;
+  const show = () => { const on = r.dataset.motion !== 'off'; b.textContent = `Motion: ${on ? 'on' : 'off'}`; b.setAttribute('aria-pressed', String(on)); b.title = on ? 'Turn animations off (count-ups, flashes, pulses, transitions)' : 'Turn animations back on'; };
+  b.addEventListener('click', () => { if (r.dataset.motion === 'off') { delete r.dataset.motion; try { localStorage.removeItem('msMotion'); } catch (e) {} } else { r.dataset.motion = 'off'; try { localStorage.setItem('msMotion', 'off'); } catch (e) {} } show(); });
+  show(); })();
 </script>
 </body>
 </html>
