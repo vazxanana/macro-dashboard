@@ -30,7 +30,7 @@ export function coachProposals(b, config, at = new Date().toISOString(), opt = {
   const cols = b.tradeCols, hasCost = cols.includes('cost');
   // filled trades as the Trader takes them (no market-entry twins, no unfilled orders), judged after costs
   const rows = b.trades.map((r) => Object.fromEntries(cols.map((c, i) => [c, r[i]])))
-    .filter((t) => t.fill !== 0 && !String(t.setup).includes('@') && t.R_none != null && isFinite(t.R_none))
+    .filter((t) => t.fill !== 0 && t.status !== 'open' && !String(t.setup).includes('@') && t.R_none != null && isFinite(t.R_none))
     .map((t) => ({ ...t, R: +(t.R_none - (hasCost ? t.cost || 0 : 0)).toFixed(3) }));
   const t0 = Date.parse(b.from) / 1000, t1 = Date.parse(b.to) / 1000;
   const out = [];

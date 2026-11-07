@@ -6008,7 +6008,7 @@ function msNextSetup(bars, A) {
     const rrB = (r) => r == null ? '—' : r < 1 ? '< 1' : r < 1.5 ? '1–1.5' : r < 2 ? '1.5–2' : r < 3 ? '2–3' : r < 5 ? '3–5' : '5+';
     const val = (t, f) => EDGE.by === 'rr' ? rrB(t.rr) : EDGE.by === 'market' ? t.market : EDGE.by === 'setup' ? String(t.k || t.setup || '').replace('@mkt', '') : (f || {})[EDGE.by];
     const fw = (Array.isArray(C.trades) ? C.trades : []).filter((t) => (t.status === 'win' || t.status === 'loss' || t.status === 'be') && isFinite(t.R) && (!EDGE.k || t.k === EDGE.k));
-    const bt = C.backtest && C.backtest.tradeCols ? C.backtest.trades.map((r) => Object.fromEntries(C.backtest.tradeCols.map((c, i) => [c, r[i]]))).filter((t) => t.fill && (!EDGE.k || String(t.setup).replace('@mkt', '') === EDGE.k)) : [];
+    const bt = C.backtest && C.backtest.tradeCols ? C.backtest.trades.map((r) => Object.fromEntries(C.backtest.tradeCols.map((c, i) => [c, r[i]]))).filter((t) => t.fill && t.status !== 'open' && t.R_none != null && (!EDGE.k || String(t.setup).replace('@mkt', '') === EDGE.k)) : [];   // open rows (no result yet) left out
     const sel = document.getElementById('ms-edge-k'); if (sel && sel.options.length < 2) { const ks = [...new Set(fw.map((t) => t.k))].sort(); sel.innerHTML = '<option value="">all</option>' + ks.map((k) => `<option value="${esc(k)}">${esc(k)}</option>`).join(''); }
     const mid = bt.length ? bt.map((t) => t.opened).sort((a, b) => a - b)[bt.length >> 1] : 0, G2 = new Map(), add = (key, slot, R) => { if (key == null) return; if (!G2.has(key)) G2.set(key, { live: [], sh: [], bt: [], h1: [], h2: [] }); G2.get(key)[slot].push(R); };
     fw.forEach((t) => add(val(t, t.feat), t.shadow ? 'sh' : 'live', +t.R));
@@ -6037,9 +6037,9 @@ function msNextSetup(bars, A) {
         <div class="sl-k"><span><b>${done.length}</b> closed</span><span><b>${open.length}</b> open</span><span class="${e == null ? '' : e > 0 ? 'pos' : 'neg'}"><b>${e == null ? '—' : (e >= 0 ? '+' : '−') + Math.abs(e).toFixed(2) + 'R'}</b> a trade</span><span class="${sum > 0 ? 'pos' : sum < 0 ? 'neg' : ''}"><b>${(sum >= 0 ? '+' : '−') + Math.abs(sum).toFixed(1)}R</b> total</span></div>
         ${(() => { const B = C.backtest, cols = B && B.tradeCols; if (!cols || !Array.isArray(B.trades)) return '';
           // Replay rows that pass the same live rule (setup, D1 filter, skipped sessions/markets): what the 30-day replay expects per trade.
-          const ix = (c) => cols.indexOf(c), iS = ix('setup'), iD = ix('d1'), iSe = ix('session'), iM = ix('market'), iR = ix('R_none'), iF = ix('fill'), iC = ix('cost'); if (iS < 0 || iR < 0) return '';
+          const ix = (c) => cols.indexOf(c), iS = ix('setup'), iD = ix('d1'), iSe = ix('session'), iM = ix('market'), iR = ix('R_none'), iF = ix('fill'), iC = ix('cost'), iSt = ix('status'); if (iS < 0 || iR < 0) return '';
           // filled trades only (a resting order that never filled is not a trade), judged after spread, as the Coach counts them
-          const rp = B.trades.filter((r) => r[iS] === k && (iF < 0 || r[iF] !== 0) && (!f.d1 || r[iD] === f.d1) && !(f.noSession || []).includes(r[iSe]) && !(f.noMarket || []).includes(r[iM]) && isFinite(r[iR]));
+          const rp = B.trades.filter((r) => r[iS] === k && (iF < 0 || r[iF] !== 0) && (!f.d1 || r[iD] === f.d1) && !(f.noSession || []).includes(r[iSe]) && !(f.noMarket || []).includes(r[iM]) && r[iR] != null && isFinite(r[iR]) && (iSt < 0 || r[iSt] !== 'open'));   // open rows: no result yet
           const Rn = (r) => r[iR] - (iC >= 0 ? +r[iC] || 0 : 0);
           if (rp.length < 10) return ''; const re = rp.reduce((a, r) => a + Rn(r), 0) / rp.length, fx = (v) => (v >= 0 ? '+' : '−') + Math.abs(v).toFixed(2) + 'R';
           const gap = e == null ? null : e - re, note = e == null || done.length < 5 ? 'too few live trades to compare yet' : Math.abs(gap) < 0.25 ? 'live is tracking the replay' : gap < 0 ? 'live is running below the replay: watch fills, costs and the D1 label' : 'live is running above the replay';
@@ -6718,7 +6718,8 @@ function msNextSetup(bars, A) {
     const sum = document.getElementById('ms-c-bt-sum'); if (!sum) return;
     const set = (id, html) => { const el = document.getElementById(id); if (el) el.innerHTML = html; };
     if (!b || !Array.isArray(b.trades) || !b.trades.length) { sum.textContent = 'No backtest yet: it runs daily and after every engine change.'; ['ms-c-bt', 'ms-c-bt-mkt', 'ms-c-bt-lines'].forEach((id) => set(id, '')); return; }
-    const TA = b.trades.map((r) => Object.fromEntries(b.tradeCols.map((c, i) => [c, r[i]])));
+    // rows still open at the end of the replay window (status 'open', R null) have no result yet: left out of every number here
+    const TA = b.trades.map((r) => Object.fromEntries(b.tradeCols.map((c, i) => [c, r[i]]))).filter((t) => t.status !== 'open');
     const net = b.tradeCols.includes('cost');   // results after a typical spread (one per round trip), as the Coach judges them
     if (net) TA.forEach((t) => ['R_none', 'R_be1', 'R_be15', 'R_tp2'].forEach((k) => { if (t[k] != null) t[k] -= t.cost || 0; }));
     const T = TA.filter((t) => t.fill !== 0 && !String(t.setup).includes('@'));   // the trades as the Trader takes them (no market-entry twins, no unfilled orders)
