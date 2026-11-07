@@ -30,7 +30,10 @@ Each system is judged on its record after costs. One point is one position: a go
 
 There are two exceptions:
 
-- **ICT A-setups:** the desk replay (`ict/replay.json`, `aset`), after the micro-futures round trip.
+- **ICT A-setups:** the 2018–26 rebuild on GC/NQ/ES/YM (#526; the per-position record is `research/edge/sizing/inputs.json`),
+  1,787 positions at +0.09R. The monitor then reads the desk replay (`ict/replay.json`, `aset`, after the micro-futures round
+  trip) and the forward record against it. Until 8 Nov the baseline was the 15-month replay itself (+0.20R): circular, and
+  hotter than the rule's long record, so a return to +0.09R would have read as decay (sizing study, #538).
 - **Mosha BO:** it has no council replay. The last two years of its 2018–26 rebuild stand in front of the forward record.
 
 | Measure | Definition |
@@ -65,7 +68,7 @@ regime still holds.
 | Gold daily engulf | 2018-26 rebuild | 217 | +0.20 | 1.70 | 25 | 7.01 | 22.3R (14.8 / 22.3 / –) |
 | Gold momentum pullback | 2018-26 rebuild | 1003 | +0.04 | 1.28 | 115 | 14.28 | 50.6R (40.0 / 50.6 / –) |
 | NQ New York open run | council replay 2022-12 to 2026-10 (nyflip) | 299 | +0.33 | 1.56 | 78 | 12.73 | 20R (20 / 17.3 / –) |
-| ICT A-setups | desk replay 2025-08 to 2026-11, net | 234 | +0.20 | 1.58 | 186 | 16.22 | 20.0R (11.2 / 20.0 / –) |
+| ICT A-setups | 2018-26 rebuild, GC/NQ/ES/YM (#526) | 1787 | +0.09 | 1.52 | 202 | 16.52 | 53.1R (31.3 / 53.1 / –) |
 | Crypto trend (shadow) | 2017-26 rebuild (positions) | 125 | +2.80 | 8.49 | 14 | 2.73 | 13.7R (13.7 / 11.5 / –) |
 
 Sources for the worst drawdowns:
@@ -182,12 +185,14 @@ Each system gets 1,000 runs per test:
 | Gold daily engulf | 25 | 5.0% | 16.3% | 74% | 37 trades (1.5 yr) |
 | Gold momentum pullback | 115 | 6.8% | 20.7% | 39%¹ | 181 trades (1.6 yr) |
 | NQ New York open run | 78 | 4.4% | 16.3% | 98% | 69 trades (0.9 yr) |
-| ICT A-setups | 186 | 8.4% | 24.3% | 97% | 138 trades (0.7 yr) |
+| ICT A-setups | 202 | 5.0% | 18.7% | 62%³ | 275 trades (1.4 yr) |
 | Crypto trend | 14 | 4.9% | 22.7% | 100% | 10 trades (0.7 yr) |
 
 ¹ Mosha BO (+0.01R) and the momentum pullback (+0.04R) have almost no backtest edge. Removing it changes little, so this
 column does not apply to them. For these two, the monitor only catches a system that is losing.
 ² The limit is set on at least 10 trades. For the slow trend legs, a "year" is about two years of signals.
+³ With the +0.09R baseline, a fall to zero edge is a small step (0.06 SD a trade), so it takes longer to catch than the
++0.20R replay baseline suggested (97% within 3 years). The monitor is quicker on a losing ICT desk: CUSUM vs zero.
 
 ## Calibration choices
 
@@ -211,7 +216,7 @@ column does not apply to them. For these two, the monitor only catches a system 
 | Gold daily engulf | healthy | 18 replay | +0.23R (18) | 2.44 / 7.01 | 4.0R / 22.3R |
 | Gold momentum pullback | healthy | 74 replay | −0.21R (30) | 3.66 / 14.28 | 6.8R / 50.6R |
 | NQ New York open run | healthy | 299 replay | +0.20R (30) | 1.51 / 12.73 | 2.0R / 20R |
-| ICT A-setups | healthy | 234 desk replay | +0.67R (30) | 0.99 / 16.22 | 1.5R / 20.0R |
+| ICT A-setups | healthy | 234 desk replay | +0.67R (30) | 0.97 / 16.52 | 1.5R / 53.1R |
 | Crypto trend (shadow) | decaying | 65 replay positions | +0.15R (14) | 4.54 / 2.73 | 4.8R / 13.7R |
 
 **Mosha BO.** The flag comes from the robustness rebuild of the rule (2018–26: +0.01R a trade, out of sample −0.24R), not from
