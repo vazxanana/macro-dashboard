@@ -122,7 +122,8 @@ export function signals(Hraw, D, side, tick) {
 // A-setup (skills §14 + §20): against the daily bias, grade >= 7, and a stop of at least 0.3x the daily ATR (tight stops on H1 sweeps get
 // hunted: on 2023-26 cash indices every year turned positive and the drawdown halved; confirmed on NQ futures 2023-25)
 export const RISK_FLOOR = 0.3;
-export const isASetup = (g) => !!g.feat && g.feat.bias === 'against' && g.grade && g.grade.total >= 7 && (g.feat.atrR == null || g.feat.atrR >= RISK_FLOOR);
+export const RISK_CAP = 0.75; // skill §22: stops wider than 0.75x the daily ATR are not A-setups
+export const isASetup = (g) => !!g.feat && g.feat.bias === 'against' && g.grade && g.grade.total >= 7 && (g.feat.atrR == null || (g.feat.atrR >= RISK_FLOOR && g.feat.atrR < RISK_CAP));
 // A+ tier (skill §17): an A-setup whose inversion candle body is >= 60% of its range and that does not fire in the NY afternoon (12-16 ET)
 export const isAPlus = (g) => isASetup(g) && g.feat.body >= 0.6 && g.feat.session !== 'NY PM';
 export const letter = (g) => (g >= 10 ? 'A+' : g >= 9 ? 'A' : g >= 8 ? 'A-' : g >= 7 ? 'B+' : g >= 6 ? 'B' : g >= 5 ? 'B-' : g >= 3 ? 'C' : 'F');

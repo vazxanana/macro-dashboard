@@ -210,3 +210,11 @@ On A-setups with the stop floor (§20), cash NQ/ES/YM 2023-24 | 2025-26 and NQ f
 - External evidence (deep research report "ICT and gold system improvements"): stops placed just beyond swept levels sit
   in stop-cascade zones (Osler); intraday momentum into the close argues against afternoon reversals; no peer-reviewed
   test of FVG / iFVG / kill zones exists.
+
+## 22. Stop band: 0.3x to 0.75x the daily ATR (7 Nov 2026) — now part of the A-setup
+- Idea from the deep-research report (volatility-scaled stops): a stop far wider than the day's range is a late, stretched entry.
+- Test, A-setups (against bias + grade >= 7), trail from +2R, 36 H1 hold, costs in:
+  - Cash NQ+ES+YM 2023-24 | 2025-26: floor 0.3 only +37.0R dd 10.1 | +36.0R dd 11.7; band 0.3-0.75 +37.7R dd 7.6 | +48.6R dd 10.8 (more R, less drawdown in both halves). Band 0.3-0.5 has the best R per trade but fewer trades and less total R in 2025-26.
+  - NQ futures 2023 / 2024 / 2025: drawdown 5.0 / 5.4 / 3.0 vs 6.3 / 7.5 / 6.1; R +8.9 / +13.1 / +20.1 vs +9.6 / +9.9 / +13.7.
+- Rejected: widening stops under 0.3 ATR to 0.3 ATR instead of skipping (-1.6R | +4.0R, dd 41): tight-stop signals are bad trades, not just noise-stopped ones.
+- Code: `RISK_CAP = 0.75` in `isASetup()` (ict/tracker.mjs).
