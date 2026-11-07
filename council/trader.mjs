@@ -7,7 +7,7 @@ import path from 'node:path';
 import { msAnalyze, CFG, PAIRS, RETR, LBL, buildSetup, buildRetrace, setMarket } from './engine.mjs';
 import { entryContext, startReview, watchReview, judge, newsNear, lessons } from './review.mjs';
 import { m15cFeat } from './choch.mjs';
-import { alertable, alertEvents, sendAlerts, when, NTFY_DEFAULT } from './alerts.mjs';
+import { alertable, alertEvents, sendAlerts, when, NTFY_DEFAULT, proposalDigest } from './alerts.mjs';
 import { liveRuleSection, injectSection } from './analyst.mjs';
 import { coachProposals } from './proposals.mjs';
 import { cleanBars, LTF_CLEAN } from './clean.mjs';
@@ -1333,7 +1333,7 @@ if (coach.date !== today) {
     if (sh.length >= 4 && exp(sh) > 0.3) { delete config.pausedMarkets[m]; change(`Resumed market ${m} early`, `Shadow trades while paused made +${exp(sh).toFixed(2)}R over ${sh.length}.`); }
   }
   const prev = rd('coach.json', {});   // keep the owner-facing proposals between the daily runs
-  wr('coach.json', { proposals: prev.proposals || [], proposalsKey: prev.proposalsKey || '', date: today, at: nowISO, stats, last14: rs, lessons: lessons(trades, now), fslot: nowISO.slice(0, 11) + String(Math.floor(+nowISO.slice(11, 13) / 6) * 6).padStart(2, '0'), notes: notes.length ? notes : ['No change today: not enough evidence to move a rule.'] });
+  wr('coach.json', { proposals: prev.proposals || [], proposalsKey: prev.proposalsKey || '', proposalsSent: prev.proposalsSent, date: today, at: nowISO, stats, last14: rs, lessons: lessons(trades, now), fslot: nowISO.slice(0, 11) + String(Math.floor(+nowISO.slice(11, 13) / 6) * 6).padStart(2, '0'), notes: notes.length ? notes : ['No change today: not enough evidence to move a rule.'] });
 }
 // every run: pause a setup as soon as its live record says so
 {
@@ -1822,6 +1822,13 @@ try { const ev = [], quiet = process.env.COUNCIL_ALERTS === 'off', topic = proce
   }
   if (!quiet && ev.length) Object.assign(snapshot.errors, await sendAlerts(ev, { topic, tgTok, tgChat }));
   if (ev.length) wr('trades.json', trades);
+  // Coach proposal digest (7 Nov, council/alerts.mjs): one message when the set of proposals changes, else at most a daily
+  // reminder; marked in coach.json proposalsSent once a channel took it, so a restart never resends. Never applies anything.
+  try { const cj = rd('coach.json', {}), dg = quiet ? null : proposalDigest(cj.proposals, cj.proposalsSent, now);
+    if (dg) { const e = await sendAlerts([dg.ev], { topic, tgTok, tgChat }), tried = (topic ? 1 : 0) + (tgTok && tgChat ? 1 : 0);
+      if (Object.keys(e).length < tried) { cj.proposalsSent = dg.mark; wr('coach.json', cj); }
+      for (const [c, m] of Object.entries(e)) snapshot.errors[`digest_${c}`] = m; }
+  } catch (err) { snapshot.errors.digest = String(err.message || err); }
 } catch (err) { snapshot.errors.alerts = String(err.message || err); }
 wr('research.json', research);
 snapshot.lessons = lessons(trades, now);
