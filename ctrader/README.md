@@ -31,7 +31,7 @@ no council bot needed. One instance trades every coin in its list.
 **Setup**
 1. cTrader → Automate → New cBot → replace the template with `CryptoTrend.cs` → Build. It needs no access rights.
 2. Add one instance to any chart (e.g. BTCUSD, D1). Parameters:
-   - symbol list (default `BTCUSD,ETHUSD,SOLUSD,XRPUSD`; use your broker's names, unknown ones are skipped with a log line);
+   - symbol list (default `BTCUSD,ETHUSD,SOLUSD,XRPUSD,ADAUSD,BNBUSD,LNKUSD`; use your broker's names, unknown ones are skipped with a log line);
    - risk % per unit (default 0.25%; the council's sizing guide is 0.5% + 0.5% on the add);
    - which slots to use, the add on/off, and an open-risk cap for all coins (default 3%).
 3. **Start with "Dry run" on**: the Log shows what it would buy or close. Switch it off to trade.
@@ -59,3 +59,8 @@ value gap; the bot enters at market.
 
 **Setup:** Automate → New cBot → paste `CryptoScalper.cs` → Build (no access rights). Add one instance to any chart.
 Default symbols `BTCUSD,ETHUSD`; change them to your broker's names. cTrader Desktop must stay on.
+
+**More coins (7 Nov).** Same rules on Binance daily 2018-26, 0.8% costs, 2018-21 | 2022-26:
+- Added: ADA +90.9 | +22.1R, BNB +115.7 | +31.0R, LINK +13.7 | +10.7R.
+- Left out: DOGE +27.0 | +1.6R, LTC +9.1 | −12.5R, TRX −1.2 | +9.1R.
+- CryptoScalper stays BTC + ETH only. Its rule was tested on 11 more IC Markets coins (LTC, BCH, ADA, DOGE, DOT, LINK, XLM, AVAX, UNI, EOS, DASH), Binance 5m 2022-26: every one loses at a 0.1% round-trip cost (best: DOGE about flat).

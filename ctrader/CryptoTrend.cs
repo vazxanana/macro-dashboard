@@ -13,6 +13,9 @@
 // 1.67 (2018-21) / 0.81 (2022-26); the add raised profit with a small rise in drawdown. Crypto CFDs charge overnight financing:
 // a trend system holds for weeks, so check your broker's swap on long crypto before going live.
 //
+// More coins (7 Nov, Binance daily 2018-26, these rules, 0.8% costs; 2018-21 | 2022-26): ADA +90.9R | +22.1R, BNB +115.7R | +31.0R,
+// LINK +13.7R | +10.7R added; DOGE +27.0 | +1.6 (flat lately), LTC +9.1 | -12.5, TRX -1.2 | +9.1 left out. Names differ by broker
+// (IC Markets e.g. LNKUSD for Chainlink); a name the broker doesn't have is skipped with a log line.
 // State lives in the positions themselves (label CT55 / CT100, adds CT55A / CT100A), so restarting the bot is safe.
 using System;
 using System.Linq;
@@ -25,7 +28,7 @@ namespace cAlgo.Robots
     [Robot(AccessRights = AccessRights.None, AddIndicators = false)]
     public class CryptoTrend : Robot
     {
-        [Parameter("Symbols (comma separated)", DefaultValue = "BTCUSD,ETHUSD,SOLUSD,XRPUSD")] public string SymbolList { get; set; }
+        [Parameter("Symbols (comma separated)", DefaultValue = "BTCUSD,ETHUSD,SOLUSD,XRPUSD,ADAUSD,BNBUSD,LNKUSD")] public string SymbolList { get; set; }
         [Parameter("Risk % per unit", DefaultValue = 0.25, MinValue = 0.01, MaxValue = 5)] public double RiskPct { get; set; }
         [Parameter("Use the 55-day slot", DefaultValue = true)] public bool Use55 { get; set; }
         [Parameter("Use the 100-day slot", DefaultValue = true)] public bool Use100 { get; set; }
