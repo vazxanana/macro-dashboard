@@ -4,11 +4,14 @@ import assert from 'node:assert/strict';
 import { suiteRound, suiteSession, PT2 } from '../council/ctrader-suite.mjs';
 import { PT } from '../council/ctrader-mirror.mjs';
 const ENV = { CTRADER_CLIENT_ID: 'fake-client-id', CTRADER_CLIENT_SECRET: 'fake-client-secret', CTRADER_ACCESS_TOKEN: 'fake-access', CTRADER_ACCOUNT_ID: '4242', CTRADER_ENV: 'demo', CTRADER_MIRROR: 'on' };
-function broker({ isLive = false, closed = [] } = {}) {
+// failReconcile: reconcile answers with an error (a broker hiccup mid-suite); info: symbol field overrides
+function broker({ isLive = false, closed = [], failReconcile = false, info = {} } = {}) {
   const sent = [], pos = new Map(), ord = new Map(); let id = 500;
   class WS { constructor() { setTimeout(() => this.onopen(), 0); }
     send(text) { const m = JSON.parse(text); sent.push(m);
       const r = (t, p, delay = 0) => setTimeout(() => this.onmessage({ data: JSON.stringify({ clientMsgId: m.clientMsgId, payloadType: t, payload: p }) }), delay), p = m.payload;
+      if (failReconcile && m.payloadType === PT.RECONCILE_REQ) return r(PT.OA_ERROR_RES, { errorCode: 'CH_SERVER_NOT_REACHABLE', description: 'try later' });
+      if (m.payloadType === PT.SYMBOL_BY_ID_REQ && info[p.symbolId[0]]) return r(PT.SYMBOL_BY_ID_RES, { symbol: [{ symbolId: p.symbolId[0], digits: 2, ...info[p.symbolId[0]] }] });
       switch (m.payloadType) {
         case PT.APP_AUTH_REQ: return r(PT.APP_AUTH_RES, {});
         case PT.ACCOUNTS_BY_TOKEN_REQ: return r(PT.ACCOUNTS_BY_TOKEN_RES, { ctidTraderAccount: [{ ctidTraderAccountId: 4242, isLive }] });
@@ -51,6 +54,18 @@ test('a closed market is recorded with its error and the next pair still runs', 
   assert.match(req.results[0].result, /MARKET_CLOSED/); assert.equal(req.results[1].result, 'ok'); assert.equal(req.results[2].skipped, 'not offered by the broker');
   assert.match(req.summary[0], /MARKET_CLOSED/);
 });
+// review (7 Nov): an error after the market buy (here: reconcile fails) ended the whole suite with the test position still open
+test('an error mid-symbol closes that symbol\'s test position and the next symbol still runs', async () => {
+  const b = broker({ failReconcile: true }), req = await suiteRound({ env: ENV, req: { request: 's5', symbols: ['BTCUSD', 'EURUSD'] }, WS: b.WS });
+  assert.ok(req.done); assert.equal(b.pos.size, 0, 'no test position left open');
+  assert.match(req.results[0].result, /CH_SERVER_NOT_REACHABLE/); assert.equal(req.results[1].symbol, 'EURUSD');
+  assert.equal(b.sent.filter((m) => m.payloadType === PT.CLOSE_POSITION_REQ).length, 2);
+});
+test('a symbol whose minimum volume is above 0.1 lot is skipped, never sent with no volume', async () => {
+  const b = broker({ info: { 3: { lotSize: 100, minVolume: 50, stepVolume: 1 } } }), req = await suiteRound({ env: ENV, req: { request: 's6', symbols: ['BTCUSD'] }, WS: b.WS });
+  assert.match(req.results[0].skipped, /minimum/); assert.equal(b.sent.some((m) => m.payloadType === PT.NEW_ORDER_REQ), false);
+});
+
 test('refuses a live account, a mirror switched off, and runs a request once', async () => {
   const b = broker({ isLive: true }); let req = await suiteRound({ env: ENV, req: { request: 's3' }, WS: b.WS });
   assert.ok(req.done); assert.match(req.status, /not a demo/); assert.equal(b.sent.some((m) => m.payloadType === PT.NEW_ORDER_REQ), false);

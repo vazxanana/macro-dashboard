@@ -200,6 +200,9 @@ export const h1Trend = (g, H, ms) => { const i = H.findLastIndex((b) => b.time +
   return ms(H.slice(Math.max(0, i - SHADOW.h1opp.look + 1), i + 1), SHADOW.h1opp.N).trend; };
 export const isH1Opp = (g, mk, H, ms) => SHADOW.h1opp.markets.includes(mk) && aRecorded(g, mk) && h1Trend(g, H, ms) !== g.side;
 export const variantRule = (v, g, mk, ctx) => (v === 'nofri' ? isNoFri(g, mk) : v === 'h1opp' ? isH1Opp(g, mk, ctx.H, ctx.ms) : v === 'dip' ? isDip(g, mk, ctx.D) : false);
+// each variant's verdict on one signal, stored on the replay's A-setups (vr) so the Coach can tell the trades a filter rejects from the
+// ones its stream only missed while busy (council/proposals.mjs ictVariantVerdicts); a tag, it changes no record
+export const variantTags = (g, mk, ctx) => Object.fromEntries(VARIANTS.map((v) => [v, !!variantRule(v, g, mk, ctx)]));
 export const letter = (g) =>(g >= 10 ? 'A+' : g >= 9 ? 'A' : g >= 8 ? 'A-' : g >= 7 ? 'B+' : g >= 6 ? 'B' : g >= 5 ? 'B-' : g >= 3 ? 'C' : 'F');
 
 // manage one open trade on the closed 5m candles (shared by the live records and the shadow 'dip' records)

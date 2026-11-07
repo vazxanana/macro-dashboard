@@ -9,7 +9,7 @@
 // allowlist (market NEW ORDER and CLOSE POSITION are the only trading messages), secrets never logged. One request runs once.
 import fs from 'node:fs';
 import path from 'node:path';
-import { PT, session, scrubber, unseal, volumeFor, relative } from './ctrader-mirror.mjs';
+import { PT, session, scrubber, unseal, volumeFor, relative, orderStep } from './ctrader-mirror.mjs';
 
 const NEED = ['CTRADER_CLIENT_ID', 'CTRADER_CLIENT_SECRET', 'CTRADER_ACCESS_TOKEN', 'CTRADER_REFRESH_TOKEN', 'CTRADER_ACCOUNT_ID', 'CTRADER_ENV'];
 const KRAKEN = { BTCUSD: 'XBTUSD', ETHUSD: 'ETHUSD', XAUUSD: 'PAXGUSD' };
@@ -43,7 +43,7 @@ export async function testRound({ env, req, WS = globalThis.WebSocket, now = Mat
       const p = (rc.position || []).find((x) => String(x.positionId) === String(req.positionId));
       if (!p) { req.closedAt = new Date(now * 1000).toISOString(); req.done = true; log(`position ${req.positionId} already closed at the broker (stop/target)`); return req; }
       if (now - Date.parse(req.openedAt) / 1000 < (+req.holdSec || 300)) { log(`holding position ${req.positionId} (${req.symbol}) until the hold ends`); return req; }
-      await s.send(PT.CLOSE_POSITION_REQ, { ctidTraderAccountId: ctid, positionId: Number(req.positionId), volume: (p.tradeData && +p.tradeData.volume) || req.volume }, PT.EXECUTION_EVENT);
+      await s.send(PT.CLOSE_POSITION_REQ, { ctidTraderAccountId: ctid, positionId: Number(req.positionId), volume: (p.tradeData && +p.tradeData.volume) || req.volume }, PT.EXECUTION_EVENT, orderStep);   // waits past ORDER_ACCEPTED; a rejected close throws (retried next round)
       req.closedAt = new Date(now * 1000).toISOString(); req.done = true; log(`closed position ${req.positionId} (${req.symbol}): test complete`); return req;
     }
     if (req.positionId) { req.done = true; return req; }
@@ -58,11 +58,12 @@ export async function testRound({ env, req, WS = globalThis.WebSocket, now = Mat
       const symbolId = idOf.get(name); if (!symbolId) { log(`${name}: not offered by the broker`); continue; }
       const info = ((await s.send(PT.SYMBOL_BY_ID_REQ, { ctidTraderAccountId: ctid, symbolId: [symbolId] }, PT.SYMBOL_BY_ID_RES)).symbol || [])[0] || {};
       const volume = volumeFor(info), d = Number.isFinite(+info.digits) ? +info.digits : 2, side = req.side === 'sell' ? 2 : 1;
+      if (volume == null) { log(`${name}: no lot size, or its minimum volume is above 0.1 lot`); continue; }
       const order = { ctidTraderAccountId: ctid, symbolId, orderType: 1, tradeSide: side, volume, label: 'council-test', comment: `test ${req.request}`.slice(0, 100), clientOrderId: `test-${req.request}`.slice(0, 50) };
       const ref = await price(name); if (ref) { order.relativeStopLoss = relative(ref * 0.01, d); order.relativeTakeProfit = relative(ref * 0.01, d); }
       try {
-        const ev = await s.send(PT.NEW_ORDER_REQ, order, PT.EXECUTION_EVENT);
-        const pid = ev.position && ev.position.positionId;
+        const ev = await s.send(PT.NEW_ORDER_REQ, order, PT.EXECUTION_EVENT, orderStep);   // ACCEPTED, then FILLED or REJECTED (a rejection throws: next symbol)
+        const pid = (ev.position && ev.position.positionId) ?? (ev.order && ev.order.positionId);
         Object.assign(req, { symbol: name, volume, positionId: pid != null ? String(pid) : null, openedAt: new Date(now * 1000).toISOString(), execution: ev.executionType || null, sl_tp: ref ? '~1% from ' + ref : 'none (no reference price)' });
         log(`opened ${side === 1 ? 'buy' : 'sell'} ${name} volume ${volume}${ref ? ` with stop/target ~1% (ref ${ref})` : ''}: ${ev.executionType || 'accepted'}, position ${pid != null ? pid : '?'}`);
         if (pid == null) req.done = true;

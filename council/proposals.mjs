@@ -115,6 +115,10 @@ export function spotProposals(spot, at = new Date().toISOString(), opt = {}) {
     why: `The same closed live trades re-judged on OANDA spot candles: ${liveR >= 0 ? '+' : '−'}${Math.abs(liveR).toFixed(1)}R on Kraken candles vs ${spotR >= 0 ? '+' : '−'}${Math.abs(spotR).toFixed(1)}R on spot over ${n} trades (${per}). Kraken's thin forex books reach levels spot never touched, so the paper results look better than a broker would give.`, spotAt: spot.at, at }];
 }
 
+// The daily Coach run rewrites coach.json: these owner-facing fields are carried over, because the proposals block only recomputes
+// them when its inputs change (proposalsKey), so a field left out here would stay missing until the next replay or rule change.
+export const coachCarry = (prev = {}) => ({ proposals: prev.proposals || [], proposalsKey: prev.proposalsKey || '', proposalsSent: prev.proposalsSent, ictWatch: prev.ictWatch || [] });
+
 // ICT filter verdicts (7 Nov): the ICT desk's paper variants (ict/replay.json shadowByVariant: 'nofri' skips Fridays, 'h1opp'
 // keeps only trades against or without H1 structure) each drop some A-setups. A filter is only worth proposing to the owner
 // when the trades it DROPS are clearly losing: 30+ dropped trades, mean R at t <= -2, and negative in both halves by close
@@ -129,8 +133,12 @@ export function ictVariantVerdicts(replay, at = new Date().toISOString(), opt = 
   const out = [];
   for (const [v, L] of Object.entries(replay.shadowByVariant)) {
     if (!Array.isArray(L)) continue;
+    // dropped = the A-setups the filter rejects. The replay tags each A-setup with every variant's verdict (t.vr, ict/replay.mjs);
+    // a replay without the tags falls back to "missing from the variant's stream", which also counts trades the variant only missed
+    // because its own one-open-trade rule was busy with a trade the A-rule never took
     const keep = new Set(L.map((t) => String(t.id).replace(`-${v}`, '')));
-    const dropped = A.filter((t) => !keep.has(t.id)).sort((x, y) => x.closed - y.closed), kept = A.filter((t) => keep.has(t.id));
+    const tagged = A.every((t) => t.vr && typeof t.vr[v] === 'boolean'), kept0 = (t) => (tagged ? t.vr[v] : keep.has(t.id));
+    const dropped = A.filter((t) => !kept0(t)).sort((x, y) => x.closed - y.closed), kept = A.filter(kept0);
     if (!dropped.length) continue;
     const d = stats(dropped), k = stats(kept), h = dropped.length >> 1, h1 = stats(dropped.slice(0, h)), h2 = stats(dropped.slice(h));
     const propose = d.n >= minN && d.t <= -T && h1.exp < 0 && h2.exp < 0;
