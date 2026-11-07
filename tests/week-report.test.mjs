@@ -12,7 +12,7 @@ import zlib from 'node:zlib';
 import { buildDecay } from '../council/decay.mjs';
 import { annotateCosts } from '../council/fills.mjs';
 import { syncLedger } from '../council/coach.mjs';
-import { main as digestMain, ICT_COST_PTS } from '../council/digest.mjs';
+import { main as digestMain, recordVerdicts, ICT_COST_PTS } from '../council/digest.mjs';
 import { buildClaims } from '../research/robustness.mjs';
 import * as M from '../council/macro.mjs';
 
@@ -36,6 +36,11 @@ test('week report: council tab, pane, section list, quick link and script are wi
   for (const f of ['ict/replay.json', 'ict/trades.json', 'ict/shadow.json', 'ict/snapshot.json', 'research/robustness.json', 'macro/forecast.json', 'digest.json']) assert.ok(js.includes(`get('${f}')`), f);
   for (const k of ['trades', 'research', 'config', 'coach', 'snap', 'health']) assert.ok(js.includes(`${k}: C.${k}`), `reads MS_COUNCIL.${k}`);
   for (const id of ['ms-wk-prev', 'ms-wk-next', 'ms-wk-tiles', 'ms-wk-bars', 'ms-wk-bw', 'ms-wk-rl', 'ms-wk-dec', 'ms-wk-open', 'ms-wk-decay', 'ms-wk-rob']) assert.ok(html.includes(`id="${id}"`), id);
+  // the shared verdict record: both cards read digest.json changes through the pure functions; localStorage only as the fallback
+  assert.match(js, /if \(dg && Array\.isArray\(dg\.changes\)\) rc = robustWeek\(D\.robust, dg, B\.from, B\.to, cur\);/, 'robustness changes come from digest.json when it exists');
+  assert.match(js, /else if \(D\.robust\) \{ local = localRobust\(robustMap\(D\.robust\)\);/, 'localStorage baseline only without the file');
+  assert.match(js, /dc = decayWeek\(Dc, D\.digest, B\.from, B\.to/, 'edge-decay changes come from digest.json');
+  assert.ok(js.includes("changesBlock(dc, D.digest, 'decay')") && js.includes("changesBlock(rc, D.digest, 'robust', local)"), 'both cards show a changes block');
 });
 
 test('week report: costs and the live list match the daily digest', () => {
@@ -101,15 +106,44 @@ test('week report: rule changes, the Coach ledger, decay, robustness, digest and
   const J = { claims }, map = MW.robustMap(J), prev = { ...map, 'ict-a': a.verdict === 'robust' ? 'fragile' : 'robust' };
   const rc = MW.robustChanges(J, prev); assert.equal(rc.length, 1); assert.equal(rc[0].was, prev['ict-a']); assert.equal(rc[0].to, a.verdict);
 
-  // digest.json (council/digest.mjs main): sent.at and the robustness baseline map
+  // digest.json (council/digest.mjs main): sent.at, the shared verdict record (robust, decay, since) and its change log
   const dd2 = fs.mkdtempSync(path.join(os.tmpdir(), 'wk-dg-'));
   fs.mkdirSync(path.join(dd2, 'research'));
   fs.writeFileSync(path.join(dd2, 'research/robustness.json'), JSON.stringify(J));
+  fs.writeFileSync(path.join(dd2, 'coach.json'), JSON.stringify({ decay: dec }));
   const ok = { ok: true, status: 200, text: async () => '', json: async () => ({ ok: true }) };
   await digestMain(dd2, { env: {}, fetchFn: async () => ok, force: true, now: Date.UTC(2026, 10, 6, 22) / 1000, scoreboard: () => [] });
-  const dg = JSON.parse(fs.readFileSync(path.join(dd2, 'digest.json'), 'utf8'));
-  for (const p of ['sent.at', 'robust']) assert.ok(has(dg, p), `digest.json ${p}`);
+  let dg = JSON.parse(fs.readFileSync(path.join(dd2, 'digest.json'), 'utf8'));
+  for (const p of ['sent.at', 'at', 'since', 'robust', 'decay', 'changes']) assert.ok(has(dg, p), `digest.json ${p}`);
   assert.deepEqual(dg.robust, { ...map }, 'digest.json robust is the same { claim id: verdict } map the report diffs against');
+  assert.deepEqual(dg.decay, Object.fromEntries(dec.systems.map((x) => [x.id, x.status])), 'digest.json decay is { system id: status }');
+  // the Trader's 6-hour hook (recordVerdicts) logs a decay change and the digest logs a robustness change: the report finds both in that week
+  const sys0 = dec.systems[0], flipped = { ...dec, systems: [{ ...sys0, status: sys0.status === 'decaying' ? 'healthy' : 'decaying' }, ...dec.systems.slice(1)] };
+  fs.writeFileSync(path.join(dd2, 'coach.json'), JSON.stringify({ decay: flipped }));   // as the Trader: coach.json first, then the record
+  recordVerdicts(dd2, { robust: J, decay: flipped, now: Date.UTC(2026, 10, 7, 6) / 1000 });
+  fs.writeFileSync(path.join(dd2, 'research/robustness.json'), JSON.stringify({ claims: claims.map((c) => c.id === 'ict-a' ? { ...c, verdict: prev['ict-a'] } : c) }));
+  await digestMain(dd2, { env: {}, fetchFn: async () => ok, now: Date.UTC(2026, 10, 7, 12) / 1000, scoreboard: () => [] });   // Saturday noon: no digest, the record is kept
+  dg = JSON.parse(fs.readFileSync(path.join(dd2, 'digest.json'), 'utf8'));
+  assert.equal(dg.sent.day, '2026-11-06'); assert.equal(dg.changes.length, 2);
+  for (const c of dg.changes) for (const p of ['at', 'kind', 'id', 'name', 'from', 'to']) assert.ok(has(c, p), `digest.json changes[] ${p}`);
+  const wk2 = MW.weekOf(Date.UTC(2026, 10, 7) / 1000), J2 = JSON.parse(fs.readFileSync(path.join(dd2, 'research/robustness.json'), 'utf8'));
+  const rw = MW.robustWeek(J2, dg, wk2, wk2 + MW.WEEK, false);
+  assert.equal(rw.length, 1); assert.deepEqual([rw[0].id, rw[0].was, rw[0].to, rw[0].name, rw[0].status], ['ict-a', a.verdict, prev['ict-a'], a.name, a.status]); assert.ok(Array.isArray(rw[0].why));
+  assert.equal(rw[0].t, Date.UTC(2026, 10, 7, 12) / 1000);
+  const dw = MW.decayWeek(flipped, dg, wk2, wk2 + MW.WEEK, false);
+  assert.equal(dw.length, 1); assert.deepEqual([dw[0].id, dw[0].was, dw[0].to, dw[0].name, dw[0].live, dw[0].desk], [sys0.id, sys0.status, flipped.systems[0].status, sys0.name, !!sys0.live, sys0.desk]);
+  assert.deepEqual(MW.changeLog(dg, 'decay', wk2, wk2 + MW.WEEK).map((c) => c.id), [sys0.id]);
+  assert.equal(MW.robustWeek(J2, dg, wk2 - MW.WEEK, wk2, false).length, 0, 'the week before: nothing logged');
+  // current week: what the live file shows against the record's last snapshot counts too, once, until the next round logs it
+  const J3 = { claims: J2.claims.map((c) => c.id === 'gtrend' || c.id === claims[1].id ? { ...c, verdict: c.verdict === 'robust' ? 'fragile' : 'robust' } : c) };
+  const lag = MW.robustWeek(J3, dg, wk2, wk2 + MW.WEEK, true), lagged = lag.filter((c) => c.t === null);
+  assert.ok(lagged.length >= 1 && lagged.every((c) => dg.robust[c.id] === c.was && c.to !== c.was)); assert.equal(lag.length, lagged.length + 1);
+  assert.equal(MW.robustWeek(J3, dg, wk2, wk2 + MW.WEEK, false).length, 1, 'a past week never diffs the live file');
+  const dLag = MW.decayWeek({ ...flipped, systems: flipped.systems.map((x) => x.id === sys0.id ? { ...x, status: 'watch' } : x) }, dg, wk2, wk2 + MW.WEEK, true);
+  assert.equal(dLag.length, 2); assert.equal(dLag[0].t, null); assert.equal(dLag[0].to, 'watch');
+  // decisions: one entry per live claim even when the week logged several changes for it
+  const twice = rw.concat([{ ...rw[0], was: rw[0].to, to: rw[0].was }]).map((c) => ({ ...c, status: 'live (paper)' }));
+  assert.equal(MW.decisions({ coach: {} }, Date.UTC(2026, 10, 7, 12) / 1000, twice).filter((d) => d.k === 'robust').length, 1);
   fs.rmSync(dir, { recursive: true, force: true }); fs.rmSync(dd2, { recursive: true, force: true });
 
   // macro/forecast.json: the regime label and when it was built
