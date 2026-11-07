@@ -8138,7 +8138,16 @@ function gpStats(T) {
       var bad = Object.keys(d.bots || {}).filter(function (k) { return d.bots[k].stale; });
       if (bad.length) {
         w.textContent = bad.length > 1 ? 'Bots behind' : NAME[bad[0]] + ' behind';
-        w.title = bad.map(function (k) { return NAME[k] + ': last round ' + mins(d.bots[k].ageMin) + ' ago'; }).join(' · ') + '. Open the Council page for details.';
+        // why (7 Nov): the runner's last report says whether rounds run dry, fail to save, or don't run at all
+        var why = function (k) { var b = d.bots[k], r = b.lastRun; if (!r) return 'no round reported yet';
+          if (r.error && /Resource not accessible|403/.test(r.error)) return "rounds run but can't save: the GitHub token (GH_TOKEN in Vercel) needs Contents: Read and write";
+          if (r.error) return 'last round failed at ' + (r.step || 'start') + ': ' + String(r.error).slice(0, 90);
+          if (r.mode === 'dry') return 'rounds run dry (Edge Config runMode is not "' + k + '" or "live")';
+          return 'last round ' + mins(Math.round((Date.now() - Date.parse(r.at)) / 60000)) + ' ago'; };
+        var r0 = d.bots[bad[0]].lastRun;
+        if (bad.length === 1 && r0 && r0.error && /Resource not accessible|403/.test(r0.error)) w.textContent = NAME[bad[0]] + ": can't save";
+        else if (bad.length === 1 && r0 && r0.mode === 'dry') w.textContent = NAME[bad[0]] + ' in dry run';
+        w.title = bad.map(function (k) { return NAME[k] + ': last saved round ' + mins(d.bots[k].ageMin) + ' ago — ' + why(k); }).join(' · ') + '.';
         w.href = bad[0] === 'ict' ? '#ict' : '#council'; w.hidden = false;
       } else w.hidden = true;
     }).catch(function () {});
