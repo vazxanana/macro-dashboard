@@ -3,6 +3,7 @@
 // trades that pass its current live filters are split by market and by session; a market or session that loses clearly
 // (20+ trades at -0.30R or worse each) while the rest are positive becomes a "skip" proposal. A stability line reports the
 // expectancy in each half of the replay window and flags a negative half.
+import { shrink, ebTau } from './coach.mjs';
 const MKT = { xau: 'gold', eurusd: 'EUR/USD', gbpusd: 'GBP/USD', audusd: 'AUD/USD', usdcad: 'USD/CAD', usdchf: 'USD/CHF', usdjpy: 'USD/JPY', btc: 'BTC', eth: 'ETH', nq: 'NQ', es: 'ES' };
 const SES = { asia: 'Asia', london: 'London', newyork: 'New York', overlap: 'London/New York overlap', late: 'late New York' };
 const mName = (m) => MKT[m] || String(m).toUpperCase();
@@ -66,12 +67,22 @@ export function coachProposals(b, config, at = new Date().toISOString(), opt = {
 //   promoteIf : the same setup restricted to one condition the Coach already splits on (daily trend with/against, one
 //               session): n>=80, +0.15R or better, both halves positive and at least +0.10R better than the whole.
 //   demote    : a live setup whose replay under the live rule has n>=80 and loses on average, or loses in both halves.
+//   Shrinkage gate (7 Nov, research/robustness.md: the old rule's 9 promotions over the 150-day replay came from 30-day windows
+//   at +0.24R a trade and were followed by -0.02R over 319 trades): a promotion also needs t >= 2 and the SHRUNK expectancy
+//   (empirical-Bayes prior around 0R, tau from every setup / condition group in the window, council/coach.mjs) to clear the
+//   bar, not the raw mean. With ~60 groups tested per window the prior is tight, so a lucky window no longer looks like an edge.
 const COND = [['d1', (v) => `only ${v} the daily trend`], ['session', (v) => `only in the ${sName(v)} session`]];
 export function promoteDemote(rows, config, halves, at, opt = {}) {
-  const P = { n: 100, exp: 0.1, nIf: 80, expIf: 0.15, better: 0.1, nDem: 80, ...(opt.promote || {}) };
+  const P = { n: 100, exp: 0.1, nIf: 80, expIf: 0.15, better: 0.1, nDem: 80, t: 2, shrink: true, ...(opt.promote || {}) };
   const focus = (config && config.focusSetups) || [], F = (config && config.filters) || {};
   const out = [], pos = (h) => h.h1.n > 0 && h.h2.n > 0 && h.h1.exp > 0 && h.h2.exp > 0;
-  const stat = (A) => ({ n: A.length, exp: r2(mean(A)), ...halves(A) });
+  // the prior: every candidate group this run looks at (each setup under its filters, and its D1 / session subsets)
+  const groups = [];
+  for (const k of new Set(rows.map((t) => t.setup))) { const A = rows.filter((t) => t.setup === k && passesLive(t, F[k] || {})); groups.push(A);
+    for (const [field] of COND) for (const v of new Set(A.map((t) => t[field]))) if (v != null && v !== 'n/a') groups.push(A.filter((t) => t[field] === v)); }
+  const tau = P.tau || ebTau(groups);
+  const stat = (A) => { const s = shrink(A, tau); return { n: A.length, exp: r2(mean(A)), t: s.se > 0 && isFinite(s.se) ? r2(s.mean / s.se) : 0, shrunk: r2(s.post), ...halves(A) }; };
+  const clears = (s, bar) => !P.shrink || (s.t >= P.t && s.shrunk >= bar);   // P.shrink false: the raw-mean rule as before
   const line = (s) => `${fR(s.exp)} a trade over ${s.n} replay trades; first half ${fR(s.h1.exp)} (${s.h1.n}), second half ${fR(s.h2.exp)} (${s.h2.n})`;
   for (const k of [...new Set(rows.map((t) => t.setup))].sort()) {
     const f = F[k] || {}, A = rows.filter((t) => t.setup === k && passesLive(t, f));
@@ -84,15 +95,15 @@ export function promoteDemote(rows, config, halves, at, opt = {}) {
     }
     if (f.off || A.length < Math.min(P.n, P.nIf)) continue;
     const whole = stat(A);
-    if (whole.n >= P.n && whole.exp >= P.exp && pos(whole)) out.push({ setup: k, kind: 'promote', value: 'live', label: `make ${k} live`, ...whole,
-      why: `${k} (shadow) under its current filters: ${line(whole)}: profitable in both halves.`, at });
+    if (whole.n >= P.n && whole.exp >= P.exp && pos(whole) && clears(whole, P.exp)) out.push({ setup: k, kind: 'promote', value: 'live', label: `make ${k} live`, ...whole,
+      why: `${k} (shadow) under its current filters: ${line(whole)}: profitable in both halves (t ${whole.t}, shrunk ${fR(whole.shrunk)}).`, at });
     for (const [field, lab] of COND) {
       if (field === 'd1' && f.d1) continue;   // already restricted to one side of the daily trend
       for (const v of [...new Set(A.map((t) => t[field]))].filter((v) => v != null && v !== 'n/a').sort()) {
         const s = stat(A.filter((t) => t[field] === v));
-        if (s.n < P.nIf || s.exp < P.expIf || !pos(s) || s.exp < whole.exp + P.better) continue;
+        if (s.n < P.nIf || s.exp < P.expIf || !pos(s) || s.exp < whole.exp + P.better || !clears(s, P.expIf) || (P.shrink && s.shrunk < whole.shrunk + P.better)) continue;
         out.push({ setup: k, kind: 'promoteIf', value: `${field}:${v}`, label: `make ${k} live, ${lab(v)}`, ...s, all: { n: whole.n, exp: whole.exp },
-          why: `${k} (shadow) ${lab(v).replace('only ', '')}: ${line(s)}; all of ${k} ${fR(whole.exp)} over ${whole.n}.`, at });
+          why: `${k} (shadow) ${lab(v).replace('only ', '')}: ${line(s)} (t ${s.t}, shrunk ${fR(s.shrunk)}); all of ${k} ${fR(whole.exp)} over ${whole.n}.`, at });
       }
     }
   }

@@ -206,3 +206,40 @@ export function ledgerSection({ ledger = [], trials = {}, now = Math.floor(Date.
   out.push('', S.length ? `${S.length} change${S.length > 1 ? 's' : ''} with a 30-day result: ${up} helped, ${S.length - up} did not${S.some((e) => e.fe) ? `; trial changes net ${fR(net)} against keeping the old rule` : ''}. Changes outside the trials (stop buffer, minimum stop, pauses) are a before/after, not a controlled test.` : 'No 30-day results yet.', LEDGER_END);
   return out.join('\n');
 }
+
+// ─── Regression check against the robustness audit (research/robustness.md, 7 Nov): replay past Coach changes through
+// today's gates. Evidence size is read from the change's own `why` text; a statistical filter change also needs t >= 2 and
+// |shrunk| >= CC.effect, with the per-trade spread taken as opt.sd (the audit measured 1.64R on the engine replay); every
+// topic (as the audit groups them) holds for 14 days after a change. Backtest changes keep their own bar (100s of trades).
+export function evidenceN(why) {
+  const w = String(why || '');
+  for (const re of [/over (\d+)/, /(\d+) (?:replay |past |closed |recent )?trades/, /of (\d+)/, /(\d+) losses/]) { const m = w.match(re); if (m) return +m[1]; }
+  return 0;
+}
+export function auditTopic(change) {   // the audit's grouping (research/robustness.mjs coachToggles)
+  const s = String(change || '').toLowerCase(), setup = (s.match(/^([a-z0-9]+):/) || [])[1] || 'all';
+  const what = (s.match(/asia|overlap|london|new ?york|late|d1|stop|reward|break-even|pause|structure/) || ['other'])[0];
+  return `${setup}|${what}`;
+}
+export function gateHistory(history, opt = {}) {
+  const minN = opt.minN || 30, cool = (opt.coolDays || 14) * DAY, sd = opt.sd || 1.64, tau = opt.tau || CC.tau;
+  const H = (history || []).filter((e) => e && (e.by === 'coach-stats' || e.by === 'coach-backtest')).sort((a, b) => Date.parse(a.at) - Date.parse(b.at));
+  const last = {}, kept = [], blocked = [];
+  for (const h of H) {
+    const n = evidenceN(h.why), topic = auditTopic(h.change), at = sec(h.at);
+    const filter = /^[\w-]+(?:, [\w-]+)*: (only|skip|trading|dropped)/.test(h.change || '');
+    let why = null;
+    if (/^(Paused|Resumed)\b/.test(h.change || '') && opt.noPause !== false) why = 'pauses are off (owner rule no-pause): recorded in wouldPause only';
+    else if (h.by === 'coach-stats' && !(n >= minN)) why = `evidence ${n} < ${minN}`;
+    else if (h.by === 'coach-stats' && filter) {
+      const m = String(h.why || '').match(/([+-]?\d+(?:\.\d+)?)R over (\d+)/), e = m ? +m[1] : 0, k = m ? +m[2] : n;
+      const se = sd / Math.sqrt(k), w = tau * tau / (tau * tau + se * se), t = e / se;
+      if (Math.abs(t) < 2) why = `t ${t.toFixed(2)} (sd ${sd})`;
+      else if (Math.abs(w * e) < CC.effect) why = `shrunk ${(w * e).toFixed(2)}R`;
+    }
+    if (!why && last[topic] != null && at - last[topic] < cool) why = 'cool-down (14 days)';
+    if (why) { blocked.push({ ...h, blocked: why }); continue; }
+    kept.push(h); last[topic] = at;
+  }
+  return { kept, blocked };
+}

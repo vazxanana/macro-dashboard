@@ -181,7 +181,9 @@ Rules and research live in `.claude/skills/ICT/SKILL.md` (results also in counci
 (`config.coachTrials`): the old rule is followed as a shadow on the same signals and comes back by itself unless the new one wins
 by ≥ +0.05R shrunk per disagreeing signal over 20 of them (60-day limit). Every Coach change lands in `coach.json` `ledger` with
 its evidence and a 30-day result, shown in analysis/latest.md (`<!-- coach-ledger -->` block). Owner rules (`userOwned`) and
-live setups (`focusSetups`) stay out of the Coach's reach. Tests: `tests/coach-*.test.mjs`.
+live setups (`focusSetups`) stay out of the Coach's reach. Knobs (buffer, min stop, R:R, break-even, news guard, dollar cap)
+need 30+ trades and move once per 14 days (`knobGate`); promotion proposals need t >= 2 and a shrunk expectancy over the bar.
+Regression against the robustness audit: `tests/coach-audit.test.mjs` (fixture `tests/fixtures/coach-audit.json`). Tests: `tests/coach-*.test.mjs`.
 
 ## Main systems first (7 Nov 2026, owner: "our main edge looks horrible")
 The council calendar (`renderCalendar`) defaults to the main systems (`SYS_K` live trades + their replays + NQ paper); the

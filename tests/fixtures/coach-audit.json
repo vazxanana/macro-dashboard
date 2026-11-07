@@ -1,0 +1,400 @@
+{
+ "source": "research/robustness.json (#486) and council-data config.json history / research/backtest-150d-clean.json as of 2026-11-07",
+ "audit": {
+  "promotions": {
+   "picks": 9,
+   "selMean": 0.2403,
+   "n": 319,
+   "mean": -0.0223
+  },
+  "toggles": {
+   "n": 35,
+   "withN": 26,
+   "medianN": 10,
+   "underThirty": 20,
+   "topics": 15,
+   "flipped": 11,
+   "maxFlips": 5
+  }
+ },
+ "newRuleWalk": {
+  "picks": 0,
+  "n": 0
+ },
+ "promotions": [
+  {
+   "at": "2026-07-06",
+   "setup": "m15choch",
+   "kind": "promote",
+   "value": "live",
+   "n": 117,
+   "mean": 0.3302,
+   "sd": 2.1246,
+   "tau": 0.05,
+   "groups": 66,
+   "whole": {
+    "n": 117,
+    "mean": 0.3302,
+    "sd": 2.1246
+   },
+   "fwdN": 30,
+   "fwdExp": -0.1307
+  },
+  {
+   "at": "2026-07-06",
+   "setup": "scalp",
+   "kind": "promote",
+   "value": "live",
+   "n": 143,
+   "mean": 0.2324,
+   "sd": 2.1058,
+   "tau": 0.05,
+   "groups": 66,
+   "whole": {
+    "n": 143,
+    "mean": 0.2324,
+    "sd": 2.1058
+   },
+   "fwdN": 41,
+   "fwdExp": -0.3223
+  },
+  {
+   "at": "2026-07-13",
+   "setup": "m15choch",
+   "kind": "promote",
+   "value": "live",
+   "n": 120,
+   "mean": 0.1432,
+   "sd": 1.8268,
+   "tau": 0.05,
+   "groups": 65,
+   "whole": {
+    "n": 120,
+    "mean": 0.1432,
+    "sd": 1.8268
+   },
+   "fwdN": 50,
+   "fwdExp": 0.1656
+  },
+  {
+   "at": "2026-07-20",
+   "setup": "m15choch",
+   "kind": "promote",
+   "value": "live",
+   "n": 129,
+   "mean": 0.162,
+   "sd": 1.7325,
+   "tau": 0.1514,
+   "groups": 67,
+   "whole": {
+    "n": 129,
+    "mean": 0.162,
+    "sd": 1.7325
+   },
+   "fwdN": 73,
+   "fwdExp": 0.2052
+  },
+  {
+   "at": "2026-07-27",
+   "setup": "m15choch",
+   "kind": "promote",
+   "value": "live",
+   "n": 172,
+   "mean": 0.1896,
+   "sd": 1.7128,
+   "tau": 0.05,
+   "groups": 74,
+   "whole": {
+    "n": 172,
+    "mean": 0.1896,
+    "sd": 1.7128
+   },
+   "fwdN": 75,
+   "fwdExp": -0.2044
+  },
+  {
+   "at": "2026-08-24",
+   "setup": "scalp",
+   "kind": "promoteIf",
+   "value": "session:london",
+   "n": 90,
+   "mean": 0.1783,
+   "sd": 1.6958,
+   "tau": 0.0558,
+   "groups": 81,
+   "whole": {
+    "n": 243,
+    "mean": -0.1118,
+    "sd": 1.613
+   },
+   "fwdN": 23,
+   "fwdExp": -0.133
+  },
+  {
+   "at": "2026-10-26",
+   "setup": "scalp",
+   "kind": "promoteIf",
+   "value": "session:london",
+   "n": 98,
+   "mean": 0.3481,
+   "sd": 2.5906,
+   "tau": 0.2231,
+   "groups": 85,
+   "whole": {
+    "n": 190,
+    "mean": 0.0589,
+    "sd": 2.1309
+   },
+   "fwdN": 18,
+   "fwdExp": 0.0486
+  },
+  {
+   "at": "2026-11-02",
+   "setup": "scalp",
+   "kind": "promote",
+   "value": "live",
+   "n": 195,
+   "mean": 0.2272,
+   "sd": 2.2006,
+   "tau": 0.0913,
+   "groups": 82,
+   "whole": {
+    "n": 195,
+    "mean": 0.2272,
+    "sd": 2.2006
+   },
+   "fwdN": 9,
+   "fwdExp": 0.4748
+  },
+  {
+   "at": "2026-11-02",
+   "setup": "scalp",
+   "kind": "promoteIf",
+   "value": "session:london",
+   "n": 89,
+   "mean": 0.4538,
+   "sd": 2.7172,
+   "tau": 0.0913,
+   "groups": 82,
+   "whole": {
+    "n": 195,
+    "mean": 0.2272,
+    "sd": 2.2006
+   },
+   "fwdN": 1,
+   "fwdExp": -1.143
+  }
+ ],
+ "history": [
+  {
+   "at": "2026-11-02T02:26:39.000Z",
+   "by": "coach-stats",
+   "change": "scalp: only with D1",
+   "why": "against: -1.00R over 7 trades, too costly to keep taking while with is tested."
+  },
+  {
+   "at": "2026-11-02T06:04:06.000Z",
+   "by": "coach-stats",
+   "change": "Break-even at +1R turned on",
+   "why": "5 of 20 recent losers (live and shadow) were +1R or more before turning around."
+  },
+  {
+   "at": "2026-11-02T07:29:43.000Z",
+   "by": "coach-stats",
+   "change": "Paused scalp for 3 days",
+   "why": "Expectancy -0.83R over 6 trades."
+  },
+  {
+   "at": "2026-11-02T11:52:07.000Z",
+   "by": "coach-backtest",
+   "change": "rscalp: only with D1 (backtest)",
+   "why": "300 trades over the last 30 days: with +0.17R each, against -0.20R; true in both halves."
+  },
+  {
+   "at": "2026-11-02T11:52:07.000Z",
+   "by": "coach-backtest",
+   "change": "scalp: only against D1 (backtest), replacing \"only with D1\"",
+   "why": "484 trades over the last 30 days: against +0.43R each, with -0.30R; true in both halves."
+  },
+  {
+   "at": "2026-11-02T11:52:07.000Z",
+   "by": "coach-backtest",
+   "change": "intraday: only against D1 (backtest)",
+   "why": "122 trades over the last 30 days: against +0.41R each, with -0.80R; true in both halves."
+  },
+  {
+   "at": "2026-11-02T11:52:07.000Z",
+   "by": "coach-backtest",
+   "change": "Break-even turned off (backtest)",
+   "why": "1013 trades over the last 30 days: no break-even +0.06R each, at +1R -0.04R, at +1.5R -0.01R."
+  },
+  {
+   "at": "2026-11-02T19:07:32.000Z",
+   "by": "coach-stats",
+   "change": "Paused rintra for 3 days",
+   "why": "Four losses in a row (3 live, 6 shadow blocked only by exposure or the dollar cap)."
+  },
+  {
+   "at": "2026-11-02T20:54:40.000Z",
+   "by": "coach-stats",
+   "change": "Resumed rintra",
+   "why": "Its last 9 trades made +0.08R each and the backtest +0.16R over 96: a losing streak inside a record that pays is variance."
+  },
+  {
+   "at": "2026-11-02T21:13:43.000Z",
+   "by": "coach-stats",
+   "change": "Resumed scalp early",
+   "why": "The 11 trades it would have taken while paused (blocked only by the pause or portfolio limits) made +0.70R each."
+  },
+  {
+   "at": "2026-11-02T21:53:00.000Z",
+   "by": "coach-backtest",
+   "change": "rscalp: \"only with D1\" dropped (backtest)",
+   "why": "-0.16R each over 263, the excluded side -0.12R over 181: the filter no longer helps."
+  },
+  {
+   "at": "2026-11-03T00:05:04.000Z",
+   "by": "coach-stats",
+   "change": "Minimum stop 0.6 → 0.7 ATR",
+   "why": "Win rate 6% over 18 trades: stops get hit by normal candle noise."
+  },
+  {
+   "at": "2026-11-03T06:00:12.000Z",
+   "by": "coach-stats",
+   "change": "rintra: only with D1",
+   "why": "against: -0.39R over 5 trades; with: +0.19R over 10."
+  },
+  {
+   "at": "2026-11-03T06:00:12.000Z",
+   "by": "coach-stats",
+   "change": "rintra: skip the late session",
+   "why": "-0.23R over 6 trades there; +0.15R elsewhere."
+  },
+  {
+   "at": "2026-11-03T06:05:33.000Z",
+   "by": "coach-stats",
+   "change": "Paused rintra for 3 days",
+   "why": "Four losses in a row (4 live, 6 shadow blocked only by exposure or the dollar cap)."
+  },
+  {
+   "at": "2026-11-03T18:05:34.000Z",
+   "by": "coach-stats",
+   "change": "rscalp: skip the overlap session",
+   "why": "-0.51R over 5 trades there; +0.06R elsewhere."
+  },
+  {
+   "at": "2026-11-04T00:02:58.000Z",
+   "by": "coach-stats",
+   "change": "Minimum stop 0.7 → 0.8 ATR",
+   "why": "Win rate 10% over 29 trades: stops get hit by normal candle noise."
+  },
+  {
+   "at": "2026-11-04T00:02:58.000Z",
+   "by": "coach-stats",
+   "change": "rscalp: trading the asia session again",
+   "why": "Blocked trades made +0.29R over 5."
+  },
+  {
+   "at": "2026-11-04T00:02:58.000Z",
+   "by": "coach-stats",
+   "change": "News guard on",
+   "why": "Reviews: 4 losses came from high-impact news; no short-term trades from 15 min before to 45 min after news."
+  },
+  {
+   "at": "2026-11-04T06:00:46.000Z",
+   "by": "coach-stats",
+   "change": "rscalp: skip the asia session",
+   "why": "-0.57R over 9 trades there; +0.14R elsewhere."
+  },
+  {
+   "at": "2026-11-04T12:04:20.000Z",
+   "by": "coach-stats",
+   "change": "intraday: skip the asia session",
+   "why": "-0.38R over 6 trades there; +1.74R elsewhere."
+  },
+  {
+   "at": "2026-11-05T00:02:31.000Z",
+   "by": "coach-stats",
+   "change": "Minimum stop 0.8 → 0.9 ATR",
+   "why": "Win rate 17% over 36 trades: stops get hit by normal candle noise."
+  },
+  {
+   "at": "2026-11-06T00:04:29.000Z",
+   "by": "coach-stats",
+   "change": "Minimum stop 0.9 → 1 ATR",
+   "why": "Win rate 17% over 36 trades: stops get hit by normal candle noise."
+  },
+  {
+   "at": "2026-11-06T00:04:29.000Z",
+   "by": "coach-stats",
+   "change": "rscalp: trading the overlap session again",
+   "why": "Blocked trades made +0.77R over 14."
+  },
+  {
+   "at": "2026-11-06T00:04:29.000Z",
+   "by": "coach-stats",
+   "change": "rscalp: trading the asia session again",
+   "why": "Blocked trades made +0.26R over 11."
+  },
+  {
+   "at": "2026-11-06T00:04:29.000Z",
+   "by": "coach-stats",
+   "change": "m30m1: dropped the D1 rule",
+   "why": "The trades it blocked made +0.45R over 9."
+  },
+  {
+   "at": "2026-11-06T07:00:02.000Z",
+   "by": "coach-stats",
+   "change": "m30m1: only with D1",
+   "why": "against: -0.62R over 8 trades, too costly to keep taking while with is tested."
+  },
+  {
+   "at": "2026-11-06T12:00:22.000Z",
+   "by": "coach-stats",
+   "change": "rscalp: skip the newyork session",
+   "why": "-0.51R over 31 trades there; +0.02R elsewhere."
+  },
+  {
+   "at": "2026-11-06T12:00:22.000Z",
+   "by": "coach-stats",
+   "change": "scalp: skip the overlap session",
+   "why": "-1.00R over 9 trades there; +0.04R elsewhere."
+  },
+  {
+   "at": "2026-11-07T00:03:49.000Z",
+   "by": "coach-stats",
+   "change": "Minimum stop 1 → 1.1 ATR",
+   "why": "Win rate 17% over 36 trades: stops get hit by normal candle noise."
+  },
+  {
+   "at": "2026-11-07T00:03:49.000Z",
+   "by": "coach-stats",
+   "change": "scalp: trading the overlap session again",
+   "why": "Blocked trades made +0.27R over 12."
+  },
+  {
+   "at": "2026-11-07T00:03:49.000Z",
+   "by": "coach-stats",
+   "change": "rintra: dropped the D1 rule",
+   "why": "The trades it blocked made +1.33R over 10."
+  },
+  {
+   "at": "2026-11-07T00:03:49.000Z",
+   "by": "coach-stats",
+   "change": "m30m1: dropped the D1 rule",
+   "why": "The trades it blocked made +1.36R over 19."
+  },
+  {
+   "at": "2026-11-07T06:00:50.000Z",
+   "by": "coach-stats",
+   "change": "scalp: skip the overlap session",
+   "why": "-0.61R over 10 trades there; +0.32R elsewhere."
+  },
+  {
+   "at": "2026-11-07T06:00:50.000Z",
+   "by": "coach-stats",
+   "change": "m30m1: only with D1",
+   "why": "against: -0.62R over 8 trades, too costly to keep taking while with is tested."
+  }
+ ]
+}

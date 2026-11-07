@@ -92,6 +92,12 @@ followed as a shadow on the same recorded signals; after 20 forward signals wher
 shrunk edge is ≥ +0.05R a signal, otherwise (or after 60 days without 20) the old rule comes back by itself (`by: "coach-trial"`,
 reason in `why`). A rule under trial or changed in the last 14 days is not touched again. Setups that trade live
 (`config.focusSetups`) and owner rules are never changed by this learner: proposals only.
+**Knobs and backtest filters (robustness audit, 7 Nov).** Stop buffer, minimum stop, reward:risk, break-even, signal age, news
+guard and dollar cap move only on 30+ trades of evidence and at most once in 14 days (`knobGate`); the backtest learner's
+filters hold 14 days too and leave live setups alone. Promotion proposals (`proposals.mjs`) need t >= 2 and a shrunk expectancy
+over the bar (tau from every setup / condition group in the window). Replayed on the audit's data (`tests/coach-audit.test.mjs`):
+the 9 promotions of the old rule (windows +0.24R, next week −0.02R over 319) all blocked; of the 35 Coach changes, 5 pass
+(4 backtest filters, 1 knob), none on fewer than 30 trades, no topic flips.
 **Change ledger.** Every Coach change in `history` gets an entry in `coach.json` → `ledger` (evidence, before/after numbers on the
 sample it used, trial progress, and 30 days later the result: champion vs challenger for trials, the scope's record before vs
 after for the rest). The Trader shows the last 20 in `analysis/latest.md` ("Coach change ledger").
