@@ -3177,7 +3177,7 @@ html[data-motion="off"] #v-ict .ict-cal-d:hover { transform: none !important; }
       </ol>
     </details>
     <dialog class="tv ict-tv" id="ict-tv" aria-labelledby="ict-tv-t">
-      <div class="tv-h"><div><h3 id="ict-tv-t">Signal</h3><p id="ict-tv-s"></p></div><div class="ict-tv-tf" role="group" aria-label="Timeframe"><button type="button" data-tf="h1" class="on">H1</button><button type="button" data-tf="m5">M5</button></div><button type="button" class="tv-x" id="ict-tv-x" aria-label="Close">×</button></div>
+      <div class="tv-h"><div><h3 id="ict-tv-t">Signal</h3><p id="ict-tv-s"></p></div><div class="ict-tv-tf" role="group" aria-label="Timeframe"><button type="button" data-tf="m5" aria-pressed="false">M5</button><button type="button" data-tf="m15" aria-pressed="false">M15</button><button type="button" data-tf="h1" class="on" aria-pressed="true">H1</button><button type="button" data-tf="h4" aria-pressed="false">H4</button></div><button type="button" class="tv-x" id="ict-tv-x" aria-label="Close">×</button></div>
       <div class="ict-tv-c" id="ict-tv-c"></div>
       <ul class="ict-ck" id="ict-tv-ck" aria-label="Signal checklist"></ul>
       <p class="ms-note" id="ict-tv-n"></p>
@@ -3309,7 +3309,7 @@ html[data-motion="off"] #v-ict .ict-cal-d:hover { transform: none !important; }
   <div class="btab-more" id="ms-more" popover aria-label="More sections"><p class="btab-more-h">More sections</p><nav class="btab-more-list" id="ms-more-list" aria-label="More sections"></nav></div>
   <dialog class="ind-dlg" id="ms-ind" aria-labelledby="ms-ind-t"><div class="ind-h"><h3 id="ms-ind-t">Indicators</h3><span class="ms-note">Up to 10, on every chart. Saved for your account on this device.</span><button type="button" class="tv-x" id="ms-ind-x" aria-label="Close">×</button></div>
     <ul class="ind-cur" id="ms-ind-cur"></ul><div class="ind-lib" id="ms-ind-lib"></div></dialog>
-  <dialog class="tv" id="ms-tv" aria-labelledby="ms-tv-t"><div class="tv-h"><div><h3 id="ms-tv-t">Trade</h3><p id="ms-tv-s"></p></div><div class="tv-ba" role="group" aria-label="Prediction before, result after"><button type="button" data-ba="before">Before</button><button type="button" data-ba="after" class="on">After</button><button type="button" data-ba="save" title="Save the before and after charts as images">Save</button></div><button type="button" class="tv-x" id="ms-tv-x" aria-label="Close chart">×</button></div><div class="tv-tf" id="ms-tv-tf" role="group" aria-label="Chart timeframe"><button type="button" data-tvtf="auto" class="on" aria-pressed="true">Auto</button><button type="button" data-tvtf="1m" aria-pressed="false">M1</button><button type="button" data-tvtf="5m" aria-pressed="false">M5</button><button type="button" data-tvtf="15m" aria-pressed="false">M15</button><button type="button" data-tvtf="1h" aria-pressed="false">H1</button><button type="button" data-tvtf="4h" aria-pressed="false">H4</button><button type="button" data-tvtf="1d" aria-pressed="false">D1</button><span class="tv-tf-sp"></span><button type="button" data-tvmore="1" title="Load more candles before the trade">More history</button><span class="tv-tf-n" id="ms-tv-tfn"></span></div><div class="tv-c" id="ms-tv-c"><div class="tv-msg" id="ms-tv-m">Loading candles…</div></div><div class="tv-k" id="ms-tv-k"></div><div class="tv-tk" id="ms-tv-tk" hidden></div><div class="tv-rv adm" id="ms-tv-rv" hidden><div class="rv-strat" id="ms-rv-strat"></div><div class="rv-tools"><b>Draw</b><button type="button" data-tool="pen">Pen</button><button type="button" data-tool="line">Line</button><button type="button" data-tool="text">Text</button><button type="button" class="rv-c on" data-col="#f23645" style="background:#f23645" aria-label="Colour #f23645"></button><button type="button" class="rv-c" data-col="#089981" style="background:#089981" aria-label="Colour #089981"></button><button type="button" class="rv-c" data-col="#f5a623" style="background:#f5a623" aria-label="Colour #f5a623"></button><button type="button" class="rv-c" data-col="#2962ff" style="background:#2962ff" aria-label="Colour #2962ff"></button><button type="button" class="rv-c" data-col="#ffffff" style="background:#ffffff" aria-label="Colour #ffffff"></button><button type="button" data-act="undo">Undo</button><button type="button" data-act="clear">Clear</button></div><div class="rv-tags" id="ms-rv-tags" aria-label="Why it failed"></div><textarea id="ms-rv-text" rows="3" placeholder="Why did this setup fail? What did the chart show before the entry?"></textarea><textarea id="ms-rv-lesson" rows="2" placeholder="Rule idea for the council (optional), e.g. no scalp sells while H4 makes higher lows"></textarea><div class="rv-save"><button type="button" id="ms-rv-save">Save review</button><span id="ms-rv-msg"></span></div><div class="rv-council" id="ms-rv-council"></div></div></dialog>
+  <dialog class="tv" id="ms-tv" aria-labelledby="ms-tv-t"><div class="tv-h"><div><h3 id="ms-tv-t">Trade</h3><p id="ms-tv-s"></p></div><div class="tv-ba" role="group" aria-label="Prediction before, result after"><button type="button" data-ba="before">Before</button><button type="button" data-ba="after" class="on">After</button><button type="button" data-ba="save" title="Save the before and after charts as images">Save</button></div><button type="button" class="tv-x" id="ms-tv-x" aria-label="Close chart">×</button></div><div class="tv-tf" id="ms-tv-tf" role="group" aria-label="Chart timeframe"><button type="button" data-tvtf="auto" class="on" aria-pressed="true">Auto</button><button type="button" data-tvtf="1m" aria-pressed="false">M1</button><button type="button" data-tvtf="5m" aria-pressed="false">M5</button><button type="button" data-tvtf="15m" aria-pressed="false">M15</button><button type="button" data-tvtf="1h" aria-pressed="false">H1</button><button type="button" data-tvtf="4h" aria-pressed="false">H4</button><button type="button" data-tvtf="1d" aria-pressed="false">D1</button><span class="tv-tf-sp"></span><button type="button" data-tvmore="1" title="Load more candles before the trade">More history</button><span class="tv-tf-n" id="ms-tv-tfn"></span></div><div class="tv-c" id="ms-tv-c"><div class="tv-msg" id="ms-tv-m">Loading candles…</div></div><div class="tv-k" id="ms-tv-k"></div><div class="tv-nb" id="ms-tv-nb" hidden></div><div class="tv-tk" id="ms-tv-tk" hidden></div><div class="tv-rv adm" id="ms-tv-rv" hidden><div class="rv-strat" id="ms-rv-strat"></div><div class="rv-tools"><b>Draw</b><button type="button" data-tool="pen">Pen</button><button type="button" data-tool="line">Line</button><button type="button" data-tool="text">Text</button><button type="button" class="rv-c on" data-col="#f23645" style="background:#f23645" aria-label="Colour #f23645"></button><button type="button" class="rv-c" data-col="#089981" style="background:#089981" aria-label="Colour #089981"></button><button type="button" class="rv-c" data-col="#f5a623" style="background:#f5a623" aria-label="Colour #f5a623"></button><button type="button" class="rv-c" data-col="#2962ff" style="background:#2962ff" aria-label="Colour #2962ff"></button><button type="button" class="rv-c" data-col="#ffffff" style="background:#ffffff" aria-label="Colour #ffffff"></button><button type="button" data-act="undo">Undo</button><button type="button" data-act="clear">Clear</button></div><div class="rv-tags" id="ms-rv-tags" aria-label="Why it failed"></div><textarea id="ms-rv-text" rows="3" placeholder="Why did this setup fail? What did the chart show before the entry?"></textarea><textarea id="ms-rv-lesson" rows="2" placeholder="Rule idea for the council (optional), e.g. no scalp sells while H4 makes higher lows"></textarea><div class="rv-save"><button type="button" id="ms-rv-save">Save review</button><span id="ms-rv-msg"></span></div><div class="rv-council" id="ms-rv-council"></div></div></dialog>
   <button type="button" class="to-top" id="ms-to-top" aria-label="Back to top" hidden><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 19V5M5 12l7-7 7 7"/></svg></button>
   <div class="ms-toasts" id="ms-toasts" role="status" aria-live="polite"></div>
 </div>
@@ -6789,20 +6789,22 @@ function msNextSetup(bars, A) {
     const val = { mt5, ct, txt };
     el.querySelectorAll('[data-tk]').forEach((b) => b.onclick = async () => { try { await navigator.clipboard.writeText(val[b.dataset.tk]); } catch (e) { prompt('Copy', val[b.dataset.tk]); } const o = b.textContent; b.textContent = 'Copied ✓'; setTimeout(() => { b.textContent = o; }, 1400); window.msTrack && msTrack('Trade ticket', { fmt: b.dataset.tk }); });
   }
-  async function openTrade(id, keep) {
+  async function openTrade(id, keep, tf) {
     if (!keep) window.msTrack && msTrack('Trade review');
     const x = (COUNCIL.trades || []).concat(sysTrades()).find((t) => t.id === id), dlg = document.getElementById('ms-tv');
     if (!x || !dlg) return;
-    // timeframe and history (6 Nov, owner: more candles back and other timeframes when reviewing a loss)
-    if (!keep || TV.curId !== id) { TV.tfSel = null; TV.extra = 0; }
+    // timeframe and history (6 Nov, owner: more candles back and other timeframes when reviewing a loss); tf: from a #trade/<id>/<tf> link
+    if (!keep || TV.curId !== id) { TV.tfSel = tf && TFS.some((t) => t.id === tf) ? tf : null; TV.extra = 0; }
     TV.curId = id;
     document.querySelectorAll('#ms-tv-tf [data-tvtf]').forEach((b) => { const on = b.dataset.tvtf === (TV.tfSel || 'auto'); b.classList.toggle('on', on); b.setAttribute('aria-pressed', String(on)); });
     // NQ (paper setups) is not one of the page's markets: chart it from Yahoo NQ=F, or the candles saved on council-data
     const I = INSTRUMENTS[x.market] || (x.market === 'nq' ? { label: 'NQ', name: 'Nasdaq 100 futures', dec: 2, nq: true } : null); if (!I) return;
-    // replay trades: candles around the trade's own dates, raw PAXG (their levels are PAXG, no spot shift)
-    const rpGold = !!x.replay && x.market === 'xau';
+    // replay trades: candles around the trade's own dates, raw PAXG (their levels are PAXG, no spot shift); replays run on spot gold
+    // (src 'spot' / HistData, 7 Nov) read OANDA spot through rangeBars instead, which also works where Binance is blocked
+    const rpGold = !!x.replay && x.market === 'xau' && !/spot|histdata/i.test(x.src || '');
     const s = x.side === 'sell' ? -1 : 1, d = { dec: x.dec != null ? x.dec : I.dec }, f = (v) => fmtI(v, d);
-    const r0 = x.r0 || (x.beMoved ? 0 : Math.abs(x.entry - x.stop)), stop0 = x.beMoved && r0 ? x.entry - s * r0 : x.stop;
+    // the first stop: a trade whose stop moved (break-even or trail) keeps its first risk in r0 (trade viewer, 7 Nov: trailed trades drew the moved stop as the stop)
+    const r0 = x.r0 || (x.beMoved || x.trailMoved ? 0 : Math.abs(x.entry - x.stop)), stop0 = x.stop0 != null && isFinite(x.stop0) ? +x.stop0 : (x.beMoved || x.trailMoved) && r0 ? x.entry - s * r0 : x.stop;
     const res = x.status === 'win' ? `Win +${x.R}R` : x.status === 'loss' ? `Loss ${x.R != null && x.R !== -1 ? `${x.R}R${x.exit ? ` (${x.exit})` : ''}` : '−1R'}` : x.status === 'be' ? 'Break-even 0R' : (ST_NAME[x.status] || x.status);
     document.getElementById('ms-tv-t').textContent = PUB ? `${x.label} ${x.side === 'sell' ? 'sell' : 'buy'}` : `${x.label} · ${x.name} ${x.pair} · ${x.side === 'sell' ? 'Sell' : 'Buy'} · ${res}${x.shadow ? ' (shadow)' : ''}`;
     document.getElementById('ms-tv-s').innerHTML = PUB ? '' : x.pm && x.pm.title ? `<b class="c-pm-v ${x.pm.verdict}" style="margin:0 6px 0 0">${x.pm.verdict === 'system' ? 'System' : 'Market'}</b><b>${esc(x.pm.title)}</b> · ${esc(x.pm.detail)} <br>Lesson: ${esc(x.pm.lesson)}${x.shadow && x.note ? `<br>${esc(x.note)}` : ''}` : esc(x.note || '');
@@ -6812,8 +6814,10 @@ function msNextSetup(bars, A) {
       ft.session && (SESSION_NAME[ft.session] || ft.session), x.entryMode === 'market' && 'Market entry'].filter(Boolean);
     document.getElementById('ms-tv-k').innerHTML = `${cond.length && !PUB ? `<span class="tv-cond">At the signal <b>${cond.map(esc).join(' · ')}</b></span>` : ''}<span><i style="background:#2962ff"></i>Entry <b>${f(x.entry)}</b></span><span><i style="background:${DNC}"></i>Stop <b>${f(stop0)}</b></span>${x.beMoved ? `<span><i style="background:#8a94a8"></i>Stop moved to entry</span>` : ''}${x.t1 == null || !isFinite(x.t1) ? `<span><i style="background:${UPC}"></i>Target <b>none</b> (trend trade: rides until its exit rule)</span>` : `<span><i style="background:${UPC}"></i>Target <b>${f(x.t1)}</b>${x.tp1 != null ? ` (${/^r/.test(x.k) ? 'the Origin' : 'target 2'}; target 1 ${f(x.tp1)})` : ''}</span>`}${x.rr != null && isFinite(x.rr) ? `<span>Reward:risk <b>${x.rr}R</b></span>` : ''}${x.mfe != null ? `<span>Best <b>+${x.mfe}R</b></span>` : ''}<span>${ftime(x.opened + TZ)}${x.closed ? ' → ' + ftime(x.closed + TZ) : ''}</span><a href="?s=${esc(x.market)}#charts">Open ${esc(I.label)} charts</a>`;
     tradeTicket(x, PUB);
+    { const nb = document.getElementById('ms-tv-nb'), T = window.MS_TRV; if (nb) { nb.innerHTML = PUB || !T ? '' : T.nbHtml(x, !!(x.pm && x.pm.title)); nb.hidden = !nb.innerHTML; } }   // note + blockers (#ms-trv-js)
     const msg = document.getElementById('ms-tv-m'); msg.hidden = false; msg.textContent = 'Loading candles…';
     if (!dlg.open) dlg.showModal();
+    if (window.MS_TRV) window.MS_TRV.opened('ms', id, TV.tfSel);   // the #trade/<id> link and the back button (#ms-trv-js)
     if (keep) TV.ctx = null; else rvOpen(x);   // a timeframe switch keeps the review being written
     const host = document.getElementById('ms-tv-c'), th = THEMES[G.theme];
     if (!TV.chart) {
@@ -6827,8 +6831,10 @@ function msNextSetup(bars, A) {
       TV.ov = new Overlay(); TV.series.attachPrimitive(TV.ov);
       TV.series.applyOptions({ autoscaleInfoProvider: (orig) => { const r = orig(); if (r && r.priceRange && TV.pv.length) { r.priceRange.minValue = Math.min(r.priceRange.minValue, ...TV.pv); r.priceRange.maxValue = Math.max(r.priceRange.maxValue, ...TV.pv); } return r; } });
     } else TV.chart.applyOptions({ layout: { background: { type: 'gradient', topColor: th.bgTop || th.bg, bottomColor: th.bg }, textColor: th.text }, grid: { vertLines: { visible: false }, horzLines: { visible: false } } });
-    TV.lines.forEach((l) => TV.series.removePriceLine(l)); TV.lines = []; TV.series.setData([]); TV.series.setMarkers([]);
-    const req = ++TV.req, W0 = (I.nq || rpGold) ? tvPickWin(x) : tvPickTf(x), tfC = TV.tfSel ? TFS.find((t) => t.id === TV.tfSel) : null;
+    // the stop's path (trailing / break-even trades): a dotted step line, from the record or rebuilt from the candles (#ms-trv-js)
+    if (!TV.trail) TV.trail = TV.chart.addLineSeries({ color: DNC, lineWidth: 2, lineStyle: LW.LineStyle.Dotted, lineType: LW.LineType ? LW.LineType.WithSteps : 1, priceLineVisible: false, lastValueVisible: false, crosshairMarkerVisible: false });
+    TV.lines.forEach((l) => TV.series.removePriceLine(l)); TV.lines = []; TV.series.setData([]); TV.series.setMarkers([]); TV.trail.setData([]);
+    const req = ++TV.req, W0 = (I.nq || x.replay) ? tvPickWin(x) : tvPickTf(x), tfC = TV.tfSel ? TFS.find((t) => t.id === TV.tfSel) : null;
     const W = tfC ? { tf: tfC, start: W0.start, end: W0.end, pad: Math.max(W0.pad, 60 * tfC.sec) } : { ...W0 };
     W.pad += (TV.extra || 0) * W.tf.sec;
     W.pad = Math.min(W.pad, 3800 * W.tf.sec);   // at most ~4 pages of candles before the trade
@@ -6856,7 +6862,8 @@ function msNextSetup(bars, A) {
     line(x.entry, '#2962ff', 'Entry'); line(stop0, DNC, 'Stop'); if (x.t1 != null && isFinite(x.t1)) line(x.t1, UPC, x.tp1 != null ? (/^r/.test(x.k) ? 'Target (Origin)' : 'Target 2') : 'Target');
     if (x.tp1 != null) line(x.tp1, UPC, 'Target 1', LW.LineStyle.Dashed);
     if (x.beMoved) line(x.entry, '#8a94a8', 'Stop at entry', LW.LineStyle.Dashed);
-    const snap = (t) => { let best = data[0].time; for (const b of data) { if (b.time <= t + TZ) best = b.time; else break; } return best; };
+    else if (x.trailMoved && (x.status === 'open' || x.status === 'pending') && isFinite(x.stop) && x.stop !== stop0) line(x.stop, '#8a94a8', 'Stop now', LW.LineStyle.Dashed);
+    const snap =(t) => { let best = data[0].time; for (const b of data) { if (b.time <= t + TZ) best = b.time; else break; } return best; };
     const mk = [];
     if (x.filled && x.filled !== x.opened && snap(x.filled) !== snap(x.opened)) mk.push({ time: snap(x.opened), position: s > 0 ? 'belowBar' : 'aboveBar', color: '#8a94a8', shape: 'circle', text: Math.abs(snap(x.filled) - snap(x.opened)) > 4 * W.tf.sec ? 'Signal' : '' });
     mk.push({ time: snap(x.filled || x.opened), position: s > 0 ? 'belowBar' : 'aboveBar', color: '#2962ff', shape: s > 0 ? 'arrowUp' : 'arrowDown', text: x.filled ? `${x.side === 'sell' ? 'Sell' : 'Buy'} ${f(x.entry)}` : 'Order placed' });
@@ -6869,6 +6876,8 @@ function msNextSetup(bars, A) {
     // keep what the before/after views need: the candles, the entry and exit bars, the markers
     const idxOf = (t) => { const tt = snap(t); return data.findIndex((b) => b.time === tt); };
     TV.ctx = { x, data, mk: mk.slice(), iE: idxOf(x.filled || x.opened), iX: x.closed ? idxOf(x.closed) : -1, s, stop0, f, from, to, title: document.getElementById('ms-tv-t').textContent };
+    if (window.MS_TRV) { const C = TV.ctx, sp = window.MS_TRV.stopPath(x, data, C.iE, C.iX, { s, stop0, tz: TZ, be: x.beMoved && !x.noBe ? x.beAt || (COUNCIL.config && COUNCIL.config.be) || null : null });
+      C.trail = sp; window.MS_TRV.keyTrail(document.getElementById('ms-tv-k'), sp, f, DNC); }
     tvApply(TV.mode);
   }
   // Before = the chart as it was when the trade was taken, with the prediction arrow (entry → target); After = what happened
@@ -6879,6 +6888,7 @@ function msNextSetup(bars, A) {
     const { x, data, iE, iX, s, f } = C, before = mode === 'before', n = data.length;
     TV.series.setData(before ? data.map((b, i) => (i <= iE ? b : { time: b.time })) : data);
     TV.series.setMarkers(before ? C.mk.filter((m) => m.time <= data[Math.max(0, iE)].time && !/Target|Stopped|Break-even|Out after/.test(m.text)) : C.mk);
+    if (TV.trail) TV.trail.setData(!before && C.trail ? C.trail.pts : []);
     const tgtIdx = iX > iE ? iX : Math.min(n + 10, iE + 30), sell = s < 0, items = { boxes: [], lines: [], labels: [], path: [], vlines: [], segs: [] };
     // trailing-stop trades (replica since 4 Nov): the arrow aims at the 2R mark, the target line is only the 10R cap
     const noTgt = x.t1 == null || !isFinite(x.t1), trailing = !!x.trail || x.rr >= 10 || noTgt, aim = trailing ? (x.tp1 != null ? x.tp1 : x.entry + s * 2 * Math.abs(x.entry - C.stop0)) : x.t1;
@@ -6942,6 +6952,12 @@ function msNextSetup(bars, A) {
     { const sp = document.getElementById('ms-tv-s'); if (sp) sp.addEventListener('click', () => sp.classList.toggle('open')); }
     const ba = document.querySelector('.tv-ba'); if (ba) ba.addEventListener('click', (ev) => { const b = ev.target.closest('[data-ba]'); if (!b) return; if (b.dataset.ba === 'save') tvSaveBoth(); else tvApply(b.dataset.ba); });
     if (dlg) dlg.addEventListener('click', (ev) => { if (ev.target === dlg) dlg.close(); }); }
+  // for the trade replay router (#ms-trv-js): #trade/<id> links, the scoreboard readout and the ICT desk's chart reuse these
+  window.msFindTrade = (id) => (COUNCIL.trades || []).concat(sysTrades()).find((t) => t.id === id) || null;
+  window.msCouncilLoaded = () => !!COUNCIL.trades;
+  window.msOpenTrade = (id, tf) => openTrade(id, false, tf);
+  window.msTvCur = () => TV.curId;
+  window.msRangeBars = (mkt, tfId, from, to) => { const I = INSTRUMENTS[mkt], tf = TFS.find((t) => t.id === tfId); return I && tf ? rangeBars(tf, I, from, to) : Promise.reject(new Error('no ' + mkt + ' ' + tfId)); };
   // ─── Loss review (owner, 6 Nov): every losing trade stacked by the strategy that took it; draw on its chart and write why
   // the setup failed. Reviews live in this browser (localStorage msLossRev) and, with a GitHub token, in council-data
   // reviews/losses.json, which the trader reads: the reasons that match its own review causes (stop hunt, stop too tight,
@@ -7741,32 +7757,62 @@ function msNextSetup(bars, A) {
   setInterval(() => { if (!$('v-ict').hidden) renderClock(); }, 30e3);
 
   // ─── chart dialog + review ───
-  let CH = null, SER = null, LINES = [];
-  function drawChart() {
+  let CH = null, SER = null, TRL = null, LINES = [], DREQ = 0;
+  // timeframes (trade viewer, 7 Nov: M5 / M15 / H1 / H4). The tracker keeps futures candles (Yahoo, about 400 h of H1 and 600 M5);
+  // M15 and H4 are built from them. Older signals and replays read OANDA cash candles through the page's bar fetcher (msRangeBars),
+  // moved by the gap to the signal's own price (futures, or the replay's cash feed) so the entry, stop and target sit where they were set
+  const TFSEC = { m5: 300, m15: 900, h1: 3600, h4: 14400 }, TFID = { m5: '5m', m15: '15m', h1: '1h', h4: '4h' }, TFL = { m5: 'M5', m15: 'M15', h1: 'H1', h4: 'H4' }, MDK = { nq: 'nas100', es: 'spx500', ym: 'us30', gc: 'xau' }, GAP = new Map();
+  async function sigBars(x, tf) {
+    const T = window.MS_TRV, sec = TFSEC[tf] || 3600, B = S.bars[x.market] || {}, from = tf === 'm15' ? 'm5' : tf === 'h4' ? 'h1' : tf;
+    let raw = (B[from] || []).map((b) => ({ time: b[0], open: b[1], high: b[2], low: b[3], close: b[4] }));
+    if (sec !== TFSEC[from] && T) raw = T.agg(raw, sec);
+    if (!x.replay && raw.length && raw[0].time <= x.signalAt - 12 * sec) return { raw, src: `${TFL[tf]} futures candles from Yahoo (the tracker's, about 10 min delayed)` };
+    const mk = MDK[x.market]; if (!mk || !window.msRangeBars) return { raw, src: raw.length ? `${TFL[tf]} futures candles from Yahoo; this signal is older than the tracker's candles` : 'No candles for this market before the tracker\'s next run.' };
+    const end = Math.min(Date.now() / 1000, (x.closed || x.signalAt + 36 * 3600) + 30 * sec), start = x.signalAt - (tf === 'h4' ? 60 : 110) * sec;
+    let bars = (await window.msRangeBars(mk, TFID[tf], start, end)).filter((b) => b.time >= start - sec && b.time <= end);
+    let off = 0;
+    if (x.signalPx != null) {
+      if (!GAP.has(x.id)) { const m5 = await window.msRangeBars(mk, '5m', x.signalAt - 3600, x.signalAt + 600).catch(() => []), at = m5.filter((b) => b.time < x.signalAt).pop(); GAP.set(x.id, at ? x.signalPx - at.close : 0); }
+      off = GAP.get(x.id) || 0; if (off) bars = bars.map((b) => ({ time: b.time, open: b.open + off, high: b.high + off, low: b.low + off, close: b.close + off }));
+    }
+    return { raw: bars, src: `${TFL[tf]} OANDA cash candles (${mk.toUpperCase()})${off ? `, moved ${off > 0 ? '+' : '−'}${fx(Math.abs(off), x.market)} to the ${x.replay ? 'replay feed' : 'futures'} price at the signal` : ''}` };
+  }
+  async function drawChart() {
     const x = S.cur; if (!x) return;
-    const box = $('ict-tv-c'), LW = window.LightweightCharts; if (!LW) { box.innerHTML = '<p class="ms-note">Charts need the Lightweight Charts library.</p>'; return; }
+    const box = $('ict-tv-c'), LW = window.LightweightCharts, T = window.MS_TRV; if (!LW) { box.innerHTML = '<p class="ms-note">Charts need the Lightweight Charts library.</p>'; return; }
     if (!CH) { CH = LW.createChart(box, { autoSize: true, layout: { background: { color: 'transparent' }, textColor: getComputedStyle(document.documentElement).getPropertyValue('--ink-dim') || '#9aa3b2' },
       grid: { vertLines: { visible: false }, horzLines: { visible: false } }, timeScale: { timeVisible: true, secondsVisible: false }, rightPriceScale: { borderVisible: false } });
-      SER = CH.addCandlestickSeries({ upColor: '#089981', downColor: '#f23645', borderUpColor: '#089981', borderDownColor: '#f23645', wickUpColor: '#089981', wickDownColor: '#f23645', priceLineVisible: false }); }
-    const raw = ((S.bars[x.market] || {})[S.tf] || []).map((b) => ({ time: b[0], open: b[1], high: b[2], low: b[3], close: b[4] }));
+      SER = CH.addCandlestickSeries({ upColor: '#089981', downColor: '#f23645', borderUpColor: '#089981', borderDownColor: '#f23645', wickUpColor: '#089981', wickDownColor: '#f23645', priceLineVisible: false });
+      TRL = CH.addLineSeries({ color: '#f23645', lineWidth: 2, lineStyle: LW.LineStyle.Dotted, lineType: LW.LineType ? LW.LineType.WithSteps : 1, priceLineVisible: false, lastValueVisible: false, crosshairMarkerVisible: false }); }
+    const req = ++DREQ, sec = TFSEC[S.tf] || 3600; $('ict-tv-n').textContent = 'Loading candles…';
+    let got; try { got = await sigBars(x, S.tf); } catch (e) { got = { raw: [], src: `Couldn't load candles: ${e.message || e}` }; }
+    if (req !== DREQ || S.cur !== x) return;
+    const raw = got.raw;
     SER.setData(raw); SER.applyOptions({ priceFormat: { type: 'price', precision: DEC[x.market] ?? 2, minMove: Math.pow(10, -(DEC[x.market] ?? 2)) } });
     LINES.forEach((l) => SER.removePriceLine(l)); LINES = [];
     const add = (price, color, title, style) => { if (price != null) LINES.push(SER.createPriceLine({ price, color, lineWidth: 1, lineStyle: style ?? 0, axisLabelVisible: true, title })); };
     add(x.entry, '#c9a24a', 'Entry'); add(x.stop, '#f23645', 'Stop'); add(x.t1, '#089981', '3R'); add(x.t2, '#089981', '2R', 2); if (x.stop0 != null && x.stop0 !== x.stop) add(x.stop0, '#f23645', 'First stop', 2);
     add(x.sweep && x.sweep.level, '#9aa3b2', 'Swept', 2); if (x.fvg) { add(x.fvg[0], '#6f8fd6', 'FVG', 1); add(x.fvg[1], '#6f8fd6', 'FVG', 1); }
     if (x.dol != null) add(x.dol, '#c9a24a', 'DOL', 3);
+    if (x.closed && x.exitPx != null && x.exitPx !== x.stop) add(x.exitPx, x.R > 0 ? '#089981' : '#f23645', 'Exit', 2);
     // NY midnight open of the signal day and the previous day's high/low (from the stored candles)
     const etd = (t) => new Intl.DateTimeFormat('en-CA', { timeZone: 'America/New_York' }).format(new Date(t * 1000)), eth = (t) => +new Intl.DateTimeFormat('en-US', { timeZone: 'America/New_York', hour: '2-digit', hourCycle: 'h23' }).format(new Date(t * 1000));
     const h1b = (S.bars[x.market] || {}).h1 || [], mob = h1b.find((b) => etd(b[0]) === etd(x.signalAt) && eth(b[0]) === 0);
     if (mob) add(mob[1], '#9aa3b2', 'NY 00:00', 3);
     const d1b = ((S.bars[x.market] || {}).d1 || []).filter((b) => b[0] + 86400 <= x.signalAt); const pd = d1b[d1b.length - 1];
     if (pd) { add(pd[2], '#7d8590', 'PDH', 1); add(pd[3], '#7d8590', 'PDL', 1); }
-    const mk = [{ time: x.signalAt - (S.tf === 'h1' ? 3600 : 300) - ((x.signalAt - (S.tf === 'h1' ? 3600 : 300)) % (S.tf === 'h1' ? 3600 : 300)), position: x.side === 'buy' ? 'belowBar' : 'aboveBar', color: '#c9a24a', shape: x.side === 'buy' ? 'arrowUp' : 'arrowDown', text: 'iFVG' }];
-    if (x.sweep) mk.unshift({ time: x.sweep.t - (x.sweep.t % (S.tf === 'h1' ? 3600 : 300)), position: x.side === 'buy' ? 'belowBar' : 'aboveBar', color: '#9aa3b2', shape: 'circle', text: 'Sweep' });
-    if (x.closed) mk.push({ time: x.closed - (x.closed % (S.tf === 'h1' ? 3600 : 300)), position: 'inBar', color: x.R > 0 ? '#089981' : '#f23645', shape: 'square', text: `${x.exit} ${fR(x.R)}` });
-    const tset = new Set(raw.map((b) => b.time)); SER.setMarkers(mk.filter((m) => tset.has(m.time)).sort((a, b) => a.time - b.time));
-    if (raw.length) { const i = raw.findIndex((b) => b.time >= x.signalAt - 3600 * (S.tf === 'h1' ? 30 : 3)); CH.timeScale().setVisibleLogicalRange({ from: Math.max(0, i), to: Math.min(raw.length + 3, Math.max(0, i) + (S.tf === 'h1' ? 90 : 140)) }); }
-    $('ict-tv-n').textContent = raw.length ? `${S.tf.toUpperCase()} candles from Yahoo (about 10 min delayed). The tracker keeps the last ${S.tf === 'h1' ? '400 hours' : '600 five-minute candles'}; older signals may sit before the first candle.` : 'Candles appear after the tracker\'s next run.';
+    // markers on the candle that holds each moment (the signal candle closes at signalAt; a close is recorded at the end of its candle)
+    const at = (t) => { let k = -1; for (let i = 0; i < raw.length && raw[i].time <= t; i++) k = i; return k; };
+    const iS = at(x.signalAt - 1), iE = at(x.signalAt), iX = x.closed ? at(x.closed - 1) : -1, mk = [];
+    if (iS >= 0 && x.signalAt - raw[iS].time <= sec) mk.push({ time: raw[iS].time, position: x.side === 'buy' ? 'belowBar' : 'aboveBar', color: '#c9a24a', shape: x.side === 'buy' ? 'arrowUp' : 'arrowDown', text: 'iFVG' });
+    if (x.sweep) { const i = at(x.sweep.t); if (i >= 0 && x.sweep.t - raw[i].time < sec) mk.unshift({ time: raw[i].time, position: x.side === 'buy' ? 'belowBar' : 'aboveBar', color: '#9aa3b2', shape: 'circle', text: 'Sweep' }); }
+    if (iX >= 0 && x.closed - raw[iX].time <= sec) mk.push({ time: raw[iX].time, position: 'inBar', color: x.R > 0 ? '#089981' : '#f23645', shape: 'square', text: `${x.exit} ${fR(x.R)}` });
+    const seen = new Set(); SER.setMarkers(mk.sort((a, b) => a.time - b.time).filter((m) => !seen.has(m.time + m.text) && seen.add(m.time + m.text)));
+    // the stop's path: break-even from +1.5R, then the trail from +2R 1.5R behind the best price, rebuilt on these candles (the record keeps the last stop only)
+    const moved = x.trailMoved || x.beMoved || /trail|breakeven/.test(x.exit || ''), sp = T && moved && iE >= 0 ? T.stopPath(x, raw, iE, iX, { s: x.side === 'buy' ? 1 : -1, stop0: x.stop0 ?? x.stop, be: x.be || null }) : null;
+    TRL.setData(sp ? sp.pts : []);
+    if (raw.length) { const i0 = Math.max(0, at(x.sweep ? x.sweep.t : x.signalAt) - (S.tf === 'h4' ? 12 : 25)), i1 = Math.max(iX, iE, i0) + (S.tf === 'h4' ? 10 : 25); CH.timeScale().setVisibleLogicalRange({ from: i0, to: Math.min(raw.length + 3, Math.max(i1, i0 + 40)) }); }
+    $('ict-tv-n').textContent = raw.length ? `${got.src}.${sp ? ` Dotted red line: the stop's path (break-even, then the trail), rebuilt from these candles; it ended at ${fx(sp.last, x.market)}.` : ''}` : got.src;
   }
   function openSig(id) {
     const x = S.trades.concat(S.replay).find((t) => t.id === id); if (!x) return; S.cur = x;
@@ -7780,7 +7826,14 @@ function msNextSetup(bars, A) {
     S.rv = { act: rv.act || '', grade: rv.grade || '', tags: new Set(rv.tags || []) };
     $('ict-rv-fill').value = rv.fill ?? ''; $('ict-rv-r').value = rv.r ?? ''; $('ict-rv-text').value = rv.text || ''; $('ict-rv-msg').textContent = rv.at ? `Saved ${ago(rv.at)}${rv.by ? ` by ${rv.by}` : ''}` : '';
     paintRv(); const d = $('ict-tv'); if (!d.open) d.showModal(); setTimeout(drawChart, 30);
+    if (window.MS_TRV) window.MS_TRV.opened('ict', x.id, TFID[S.tf]);   // the #trade/<id> link and the back button (#ms-trv-js)
   }
+  const paintTf = () => $('ict-tv').querySelectorAll('.ict-tv-tf button').forEach((z) => { const on = z.dataset.tf === S.tf; z.classList.toggle('on', on); z.setAttribute('aria-pressed', String(on)); });
+  // for the trade replay router (#ms-trv-js): open a signal from a #trade/<id> link or the edge scoreboard (loads the desk data first)
+  window.msIctOpen = async (id, tf) => { if (!S.trades.length && !S.replay.length) { loadedAt = Date.now(); await load(); }
+    const x = S.trades.concat(S.replay).find((t) => t.id === id); if (!x) return false;
+    const k = Object.keys(TFID).find((q) => TFID[q] === tf); if (k) S.tf = k; paintTf(); openSig(id); return true; };
+  window.msIctCur = () => (S.cur && $('ict-tv').open ? S.cur.id : null);
   function paintRv() {
     $('ict-rv-act').querySelectorAll('button').forEach((b) => { const on = b.dataset.a === S.rv.act; b.classList.toggle('on', on); b.setAttribute('aria-pressed', String(on)); });
     $('ict-rv-g').querySelectorAll('button').forEach((b) => { const on = b.dataset.g === S.rv.grade; b.classList.toggle('on', on); b.setAttribute('aria-pressed', String(on)); });
@@ -7807,7 +7860,7 @@ function msNextSetup(bars, A) {
   $('ict-f-s').addEventListener('change', (e) => { S.f.s = e.target.value; render(); });
   $('ict-tv-x').addEventListener('click', () => $('ict-tv').close());
   $('ict-tv').addEventListener('click', (ev) => { if (ev.target === $('ict-tv')) $('ict-tv').close(); });
-  $('ict-tv').querySelector('.ict-tv-tf').addEventListener('click', (ev) => { const b = ev.target.closest('button'); if (!b) return; S.tf = b.dataset.tf; b.parentNode.querySelectorAll('button').forEach((z) => z.classList.toggle('on', z === b)); drawChart(); });
+  $('ict-tv').querySelector('.ict-tv-tf').addEventListener('click', (ev) => { const b = ev.target.closest('button'); if (!b) return; S.tf = b.dataset.tf; paintTf(); drawChart(); if (window.MS_TRV && S.cur) window.MS_TRV.opened('ict', S.cur.id, TFID[S.tf]); });
   $('ict-rv-act').addEventListener('click', (ev) => { const b = ev.target.closest('button'); if (!b) return; S.rv.act = S.rv.act === b.dataset.a ? '' : b.dataset.a; paintRv(); });
   $('ict-rv-g').addEventListener('click', (ev) => { const b = ev.target.closest('button'); if (!b) return; S.rv.grade = S.rv.grade === b.dataset.g ? '' : b.dataset.g; paintRv(); });
   $('ict-rv-tags').addEventListener('click', (ev) => { const b = ev.target.closest('button'); if (!b) return; const k = b.dataset.t; S.rv.tags.has(k) ? S.rv.tags.delete(k) : S.rv.tags.add(k); paintRv(); });
@@ -7829,6 +7882,191 @@ function msNextSetup(bars, A) {
   if (document.documentElement.dataset.ict) { if (!$('v-ict').hidden) fresh(); setInterval(() => { if (!document.hidden && !$('v-ict').hidden) fresh(); }, 120e3); addEventListener('hashchange', () => { if (location.hash === '#ict') render(); }); }
 })();
 
+</script>
+<style id="ms-trv-css">
+/* Trade replay (#ms-trv-js, 7 Nov): the trade viewers (#ms-tv council / systems, #ict-tv ICT desk) as phone sheets with a #trade/<id> link */
+.tv-nb { display: grid; gap: 6px; padding: 10px 16px 12px; border-top: 1px solid var(--line-soft); font-size: 12.5px; color: var(--ink-dim); line-height: 1.5; }
+.tv-nb[hidden] { display: none; }
+.tv-nb .nb-k { font-size: 11px; font-weight: 600; letter-spacing: .05em; text-transform: uppercase; color: var(--ink-faint); margin-right: 6px; }
+.tv-nb .nb-row { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; }
+.tv-nb .nb-b { display: inline-flex; align-items: center; min-height: 26px; padding: 2px 9px; border-radius: 999px; border: 1px solid color-mix(in srgb, var(--sell, #f23645) 45%, var(--line)); color: var(--ink); background: color-mix(in srgb, var(--sell, #f23645) 8%, transparent); font-size: 12px; }
+.tv-nb .nb-n { margin: 0; color: var(--ink-dim); overflow-wrap: anywhere; }
+.tv-k .tv-trl i { height: 0 !important; border-top: 2px dotted currentColor; background: none !important; }
+.eq-tip .eq-open { color: var(--accent); font-weight: 600; }
+.trv-sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+@media (max-width: 600px) {
+  dialog.tv { padding-bottom: env(safe-area-inset-bottom, 0px); overscroll-behavior: contain; }
+  dialog.tv .tv-x { width: 44px; height: 44px; font-size: 22px; }
+  .tv-nb { padding: 10px 12px 12px; }
+  .ict-tv .ict-tv-tf { order: 3; flex: 1 1 100%; margin: 0; }
+  .ict-tv .ict-tv-tf button { flex: 1; min-height: 44px; }
+}
+</style>
+<script id="ms-trv-js">
+// ─── Trade replay (7 Nov): tap any paper trade (Meridian trades, Active trades, systems, the ICT desk, the edge scoreboard's
+// equity-curve readout) and its chart opens as a sheet: entry, stop, target, the stop's path, the exit, the R, the note and what
+// blocked it, on M5 / M15 / H1 / H4. Deep link #trade/<id>[/<tf>] (e.g. #trade/xau-rscalp-1793563759/M15); Esc or back closes it.
+// The pure parts (link parsing, the stop's path, candle grouping, blocker names) are tested in tests/trade-viewer.test.mjs.
+(function (W) {
+  var TF = { m1: '1m', '1m': '1m', m5: '5m', '5m': '5m', m15: '15m', '15m': '15m', h1: '1h', '1h': '1h', '60m': '1h', h4: '4h', '4h': '4h', d1: '1d', '1d': '1d' };
+  var TFL = { '1m': 'M1', '5m': 'M5', '15m': 'M15', '1h': 'H1', '4h': 'H4', '1d': 'D1' };
+  var ID = /^[A-Za-z0-9][\w.:-]{0,119}$/;
+  // '#trade/<id>' or '#trade/<id>/<tf>' -> { id, tf } (tf '5m' | '15m' | '1h' | '4h' | '1m' | '1d' or null); anything else -> null
+  function parse(h) {
+    var m = /^#?trade\/([^/?#]+)(?:\/([^/?#]*))?\/?$/.exec(String(h == null ? '' : h).trim()); if (!m) return null;
+    var id; try { id = decodeURIComponent(m[1]); } catch (e) { return null; }
+    if (!ID.test(id)) return null;
+    return { id: id, tf: (m[2] && TF[m[2].toLowerCase()]) || null };
+  }
+  function href(id, tf) { return '#trade/' + encodeURIComponent(id) + (tf && TFL[tf] ? '/' + TFL[tf] : ''); }
+  // ICT desk records: <market>-<b|s>-<signal time>[-r] on the desk's futures (nq, es, ym, rty, gc); everything else is the council's
+  function desk(id) { return /^(nq|es|ym|rty|gc)-[bs]-\d{9,}/.test(String(id)) ? 'ict' : 'council'; }
+  // group candles into longer ones (M5 -> M15, H1 -> H4), buckets on UTC multiples of sec
+  function agg(bars, sec) {
+    var out = [], c = null;
+    (bars || []).forEach(function (b) { var t = Math.floor(b.time / sec) * sec;
+      if (!c || c.time !== t) { c = { time: t, open: b.open, high: b.high, low: b.low, close: b.close }; out.push(c); }
+      else { c.high = Math.max(c.high, b.high); c.low = Math.min(c.low, b.low); c.close = b.close; } });
+    return out;
+  }
+  // the stop through the trade, candle by candle, under the trade's own rule: break-even once +be R is reached, then (trail [a, b])
+  // from +a R the stop follows b R behind the best price; it never loosens. Each point is the stop in force during that candle;
+  // the walk stops on the candle that touches it. Returns { pts: [{ time, value }], last, moved }.
+  function trail(o) {
+    var s = o.side < 0 ? -1 : 1, e = +o.entry, st = +o.stop, r0 = +o.r0 || Math.abs(e - st), tr = o.trail && o.trail.length === 2 && +o.trail[0] < 100 ? o.trail : null, be = +o.be || 0;
+    var pts = [], mfe = 0, B = o.bars || [], first = true;
+    if (!(r0 > 0)) return { pts: pts, last: st, moved: false };
+    for (var i = 0; i < B.length; i++) {
+      var b = B[i]; if (b.high == null || b.low == null) continue;
+      pts.push({ time: b.time, value: st });
+      if (!first && (s > 0 ? b.low <= st : b.high >= st)) break;
+      first = false;
+      mfe = Math.max(mfe, (s > 0 ? b.high - e : e - b.low) / r0);
+      if (be && mfe >= be && (e - st) * s > 0) st = e;
+      if (tr && mfe >= +tr[0]) { var ns = e + s * (mfe - +tr[1]) * r0; if ((ns - st) * s > 0) st = ns; }
+    }
+    return { pts: pts, last: st, moved: st !== +o.stop || pts.some(function (p) { return p.value !== +o.stop; }) };
+  }
+  // the stop's path for a viewer: a recorded path (x.stops = [[time, price], ...]) when the record has one, else rebuilt from the chart's
+  // candles (data[iE .. iX], iX < 0 = to the end) for trades whose stop moved by rule; null when there is nothing to draw
+  function stopPath(x, data, iE, iX, opt) {
+    opt = opt || {}; var tz = opt.tz || 0, D = (data || []).slice(Math.max(0, iE), iX >= 0 ? iX + 1 : undefined);
+    if (!x || !D.length) return null;
+    if (Array.isArray(x.stops) && x.stops.length) {
+      var R = x.stops.map(function (q) { return [+q[0] + tz, +q[1]]; }).sort(function (a, b) { return a[0] - b[0]; }), k = 0, v = R[0][1], pts = [];
+      D.forEach(function (b) { while (k < R.length && R[k][0] <= b.time) { v = R[k][1]; k++; } pts.push({ time: b.time, value: v }); });
+      return { pts: pts, last: pts[pts.length - 1].value, kind: 'recorded' };
+    }
+    var stop0 = opt.stop0 != null ? +opt.stop0 : +x.stop, r0 = opt.r0 || x.r0 || Math.abs(x.entry - stop0), be = opt.be || null;
+    // the systems' runners (10R cap, tp1 = where the trail starts) trail 1R behind the best price (council/trader.mjs: replica, NQ open, Mosha, H4 trendline, engulf, pullback)
+    var tr = x.trail && x.trail.length === 2 && +x.trail[0] < 100 ? x.trail : !x.trail && x.tp1 != null && +x.rr >= 10 && r0 > 0 ? [Math.abs(x.tp1 - x.entry) / r0, 1] : null;
+    if (!tr && !be) return null;
+    var r = trail({ side: opt.s != null ? opt.s : (x.side === 'sell' ? -1 : 1), entry: x.entry, stop: stop0, r0: r0, trail: tr, be: be, bars: D });
+    return r.moved ? { pts: r.pts, last: r.last, kind: 'rebuilt' } : null;
+  }
+  // why a shadow trade was not taken live (council trader's blockedBy codes, council/trader.mjs)
+  var BLK = { paused: 'Setup paused', market: 'Market paused or skipped', minRR: 'Reward:risk under the minimum', news: 'High-impact news within the hour', d1: 'Against the D1 rule',
+    cf: 'Confirmation-break rule', choch: 'M15/M5 CHoCH rule', m15c: 'M15 CHoCH rule', struct: 'Structure rule', session: 'Session rule', off: 'Setup switched off', rrBand: 'Outside its reward:risk band',
+    exposure: 'Already 2 trades or an opposite trade open here', duplicate: 'Same stop and target as an open trade', usd: 'Too many trades on the same dollar bet', focus: 'Not a focus market',
+    replica: 'This market trades the gold replica live', reentry: 'A Scalp the same way lost here in the last 3 h', 'owner-shadow': 'Shadow by the owner’s decision', test: 'Test stream, not live' };
+  function blockName(k) { return BLK[k] || String(k || '').replace(/[-_]+/g, ' ').replace(/^./, function (c) { return c.toUpperCase(); }); }
+  var esc = function (v) { return String(v == null ? '' : v).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); };
+  // the note + blockers strip under the council viewer's levels; withNote: the header shows the review instead of the note
+  function nbHtml(x, withNote) {
+    var b = (x && x.blockedBy) || [], out = '';
+    if (b.length) out += '<div class="nb-row"><span class="nb-k">' + (x.shadow ? 'Shadow: blocked by' : 'Blocked by') + '</span>' + b.map(function (k) { return '<span class="nb-b">' + esc(blockName(k)) + '</span>'; }).join('') + '</div>';
+    if (withNote && x.note) out += '<p class="nb-n"><span class="nb-k">Note</span>' + esc(x.note) + '</p>';
+    return out;
+  }
+  // the stop path's entry in the council viewer's key (el = #ms-tv-k); f formats a price
+  function keyTrail(el, sp, f, color) {
+    if (!el) return; var o = el.querySelector('.tv-trl'); if (o) o.remove(); if (!sp) return;
+    var s = el.ownerDocument.createElement('span'); s.className = 'tv-trl'; s.style.color = color || '';
+    s.innerHTML = '<i></i><span style="color:var(--ink-dim)">Stop path ' + (sp.kind === 'recorded' ? 'as recorded' : 'rebuilt from these candles') + ', last <b>' + esc(f ? f(sp.last) : sp.last) + '</b></span>';
+    var a = el.querySelector('a'); if (a) el.insertBefore(s, a); else el.appendChild(s);
+  }
+  var API = { parse: parse, href: href, desk: desk, agg: agg, trail: trail, stopPath: stopPath, blockName: blockName, nbHtml: nbHtml, keyTrail: keyTrail };
+  W.MS_TRV = API;
+  if (!W.document || !W.history) return;
+
+  // ─── router: the sheet and the address bar agree, so back closes it and a #trade link opens it ───
+  var Rt = { pushed: false, base: null, y: 0, quiet: false, busy: false };
+  var dlg = function (k) { return document.getElementById(k === 'ict' ? 'ict-tv' : 'ms-tv'); };
+  var openDlg = function () { var a = dlg('ms'), b = dlg('ict'); return a && a.open ? a : b && b.open ? b : null; };
+  var openId = function () { var a = dlg('ms'), b = dlg('ict'); return a && a.open && W.msTvCur ? W.msTvCur() : b && b.open && W.msIctCur ? W.msIctCur() : null; };
+  var sleep = function (ms) { return new Promise(function (r) { setTimeout(r, ms); }); };
+  var restore = function () { var y = Rt.y; if (!y) return; [0, 60, 280].forEach(function (t) { setTimeout(function () { if (!openDlg()) W.scrollTo({ top: y, behavior: 'instant' }); }, t); }); };
+  function toast(t, b) {
+    var box = document.getElementById('ms-toasts'); if (!box) return; var el = document.createElement('div'); el.className = 'ms-toast'; el.innerHTML = '<b></b><span></span>';
+    el.querySelector('b').textContent = t; el.querySelector('span').textContent = b; box.appendChild(el); setTimeout(function () { el.remove(); }, 8000);
+  }
+  // a viewer opened (tap, link or timeframe change): the first time, a history entry for the sheet; after that, keep the link current
+  API.opened = function (k, id, tf) {
+    var want = href(id, tf);
+    if (parse(location.hash)) { if (location.hash !== want) history.replaceState(history.state && history.state.trv ? { trv: id } : history.state, '', want); return; }
+    Rt.base = location.hash || '#home'; Rt.y = W.scrollY; history.pushState({ trv: id }, '', want); Rt.pushed = true;
+  };
+  function onClose() {
+    if (Rt.quiet || !parse(location.hash)) return;
+    if (Rt.pushed && history.state && history.state.trv) { Rt.pushed = false; history.back(); restore(); }
+    else { Rt.pushed = false; history.replaceState(null, '', Rt.base && !parse(Rt.base) ? Rt.base : '#council/trades'); }
+  }
+  // show the page that belongs behind a sheet (a cold #trade link lands on Home otherwise): council trades, or the ICT desk
+  async function showBase(hash, push) {
+    var v = hash.slice(1).split('/')[0], el = document.getElementById('v-' + v);
+    if (el && !el.hidden) return;
+    Rt.busy = true;
+    if (push) history.pushState(null, '', hash); else history.replaceState(null, '', hash);
+    W.dispatchEvent(new HashChangeEvent('hashchange'));
+    for (var i = 0; i < 40 && el && el.hidden; i++) await sleep(40);
+    Rt.busy = false;
+  }
+  async function route(p) {
+    if (Rt.routing === p.id) return; Rt.routing = p.id;
+    try { await route1(p); } finally { Rt.routing = null; }
+  }
+  async function route1(p) {
+    var ict = desk(p.id) === 'ict' && !!document.documentElement.dataset.ict, mine = history.state && history.state.trv === p.id;
+    if (!mine) {   // a typed / pasted / shared link: the page behind it, then the sheet's own history entry
+      var base = ict ? '#ict' : '#council/trades';
+      await showBase(base, false); history.pushState({ trv: p.id }, '', href(p.id, p.tf)); Rt.base = base; Rt.y = 0;
+    }
+    Rt.pushed = true;
+    for (var i = 0; i < 80; i++) {
+      if (!parse(location.hash) || parse(location.hash).id !== p.id) return;   // the user moved on
+      if (ict && W.msIctOpen) { if (await W.msIctOpen(p.id, p.tf)) return; ict = false; }
+      if (W.msFindTrade && W.msFindTrade(p.id)) { W.msOpenTrade(p.id, p.tf); return; }
+      if (i > 6 && W.msCouncilLoaded && W.msCouncilLoaded()) break;
+      await sleep(400);
+    }
+    toast('Trade not found', 'No paper trade ' + p.id + ' in the council or ICT desk records this page can read.');
+    Rt.pushed = false; history.replaceState(null, '', Rt.base || '#council/trades'); W.dispatchEvent(new HashChangeEvent('hashchange'));
+  }
+  function onNav() {
+    if (Rt.busy) return;
+    var p = parse(location.hash), d = openDlg();
+    if (!p) { if (d) { Rt.quiet = true; d.close(); Rt.quiet = false; Rt.pushed = false; restore(); } return; }
+    if (d && openId() === p.id) return;
+    route(p);
+  }
+  // open a trade by id from elsewhere on the page (the scoreboard readout): the ICT desk's sheet lives in its own page, so that page
+  // comes up behind it; back returns here
+  API.can = function (id) { return !!((W.msFindTrade && W.msFindTrade(id)) || (desk(id) === 'ict' && document.documentElement.dataset.ict && W.msIctOpen)); };
+  API.open = async function (id, tf) {
+    if (W.msFindTrade && W.msFindTrade(id)) { W.msOpenTrade(id, tf); return; }
+    if (!(desk(id) === 'ict' && W.msIctOpen)) return;
+    var from = location.hash || '#home', y = W.scrollY;
+    await showBase('#ict', true);
+    history.replaceState({ trv: id }, '', href(id, tf)); Rt.base = from; Rt.y = y; Rt.pushed = true;
+    if (!(await W.msIctOpen(id, tf))) { toast('Trade not on the desk', 'The ICT desk does not list ' + id + ' (grade F and retired markets are hidden).'); history.back(); restore(); }
+  };
+  function wire() {
+    ['ms', 'ict'].forEach(function (k) { var d = dlg(k); if (d && !d.dataset.trv) { d.dataset.trv = '1'; d.addEventListener('close', onClose); } });
+    W.addEventListener('popstate', onNav); W.addEventListener('hashchange', onNav);
+    if (parse(location.hash)) setTimeout(onNav, 0);
+  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', wire); else wire();
+})(window);
 </script>
 <script>
 // design polish 5: mark sideways-scrolling rows with which edges hide more (the CSS fades those edges)
@@ -10300,7 +10538,7 @@ html[data-role="public"] #ms-me-ct { display: none; }
   var cap = function (s) { s = String(s || ''); return s.charAt(0).toUpperCase() + s.slice(1); };
   // one closed trade as a curve point: R after costs where recorded (Rnet), plus what the equity-curve tooltip shows (#ms-eq-js)
   var tp = function (x, t) { var o = { t: t, R: num(x.Rnet) ? +x.Rnet : +x.R, g: +x.R, m: x.short || x.label || x.market, sd: x.side, st: x.status, o: x.opened };
-    if (num(x.costR)) o.c = x.costR; if (x.shadow) o.sh = 1; if (x.grade && x.grade.letter) o.gr = x.grade.letter; return o; };
+    if (num(x.costR)) o.c = x.costR; if (x.shadow) o.sh = 1; if (x.grade && x.grade.letter) o.gr = x.grade.letter; if (x.id != null) o.id = String(x.id); return o; };   // id: the readout opens the trade (#ms-trv-js)
 
   // n, win rate, R per trade, total, max drawdown (peak to trough of the cumulative R), t of the mean, halves by time, last 30 days
   function stats(pts, now) {
@@ -10939,15 +11177,22 @@ html[data-role="public"] #ms-me-ct { display: none; }
       h('span', 'eq-tn', res + ' ' + fR(p.R), ln);
       if (num(p.c) && p.c) h('div', null, fR(p.g) + ' before costs, cost ' + Math.abs(p.c).toFixed(2) + 'R', tip);
       var tags = [q.sh ? 'Shadow book' : null, p.gr ? 'grade ' + p.gr : null].filter(Boolean); if (tags.length) h('div', null, tags.join(' · '), tip);
+      if (tid(i)) h('div', 'eq-open', touchAt && Date.now() - touchAt < 1500 ? 'Tap it again to see this trade on a chart' : 'Click or press Enter to see this trade on a chart', tip);
       live(tip, narrow, x, w, M.l);
     };
+    // the trade under the crosshair opens in the trade viewer (#ms-trv-js): click, Enter, or a second tap on the same trade
+    var touchAt = 0, tid = function (i) { var q = P[i], id = q && q.p && q.p.id; return id && W.MS_TRV && W.MS_TRV.can(id) ? id : null; };
+    var openT = function (i) { var id = tid(i); if (id) W.MS_TRV.open(id); };
     var hide = function () { if (pinned) return; cur = null; rest(tip, narrow, ROW_HINT); ch.setAttribute('visibility', 'hidden'); cd.setAttribute('visibility', 'hidden'); };
     var at = function (e) { var rc = svg.getBoundingClientRect(), px = (e.clientX - rc.left) * (w / rc.width); return Math.round((px - M.l) / (w - M.l - M.r) * n); };
     plot.addEventListener('pointermove', function (e) { if (e.pointerType !== 'touch' || pinned) show(at(e)); });
-    plot.addEventListener('pointerdown', function (e) { if (e.pointerType === 'touch') { pinned = true; show(at(e)); } });
+    plot.addEventListener('pointerdown', function (e) { if (e.pointerType === 'touch') { var i = Math.max(1, Math.min(n, at(e))), tol = Math.max(1, Math.round(n * 14 / Math.max(1, w - M.l - M.r)));
+      if (pinned && cur != null && Math.abs(i - cur) <= tol && tid(cur) && Date.now() - touchAt > 250) { touchAt = Date.now(); openT(cur); return; } touchAt = Date.now(); pinned = true; show(i); } });
+    plot.addEventListener('click', function (e) { if (e.pointerType === 'touch' || Date.now() - touchAt < 900 || cur == null) return; openT(cur); });
     plot.addEventListener('pointerleave', function (e) { if (e.pointerType !== 'touch') hide(); });
     plot.addEventListener('keydown', function (e) {
       var k = e.key, i = cur == null ? n : cur;
+      if (k === 'Enter' && cur != null && tid(cur)) { e.preventDefault(); openT(cur); return; }
       var nx = k === 'ArrowRight' ? i + 1 : k === 'ArrowLeft' ? i - 1 : k === 'Home' ? 1 : k === 'End' ? n : k === 'PageUp' ? i + 10 : k === 'PageDown' ? i - 10 : null;
       if (k === 'Escape') { pinned = false; hide(); return; }
       if (nx == null) return; e.preventDefault(); show(nx);
