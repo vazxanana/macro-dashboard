@@ -83,7 +83,7 @@ export async function sendAlerts(ev, { topic, tgTok, tgChat, fetchFn = fetch } =
 // ({ key, at, items }), so a restart never resends. A stability line counts only when it is flagged (a losing half).
 export const SITE = 'https://meridianx.dev/';
 const fRm = (v) => `${v >= 0 ? '+' : '−'}${Math.abs(+v).toFixed(2)}R`, cap = (s) => String(s).charAt(0).toUpperCase() + String(s).slice(1);
-const actionable = (p) => !!p && !!p.setup && (['skipMarket', 'skipSession', 'promote', 'promoteIf', 'demote', 'dataSource', 'ictFilter'].includes(p.kind) || (p.kind === 'stability' && !!p.flag));
+export const actionable = (p) => !!p && !!p.setup && (['skipMarket', 'skipSession', 'promote', 'promoteIf', 'demote', 'dataSource', 'ictFilter'].includes(p.kind) || (p.kind === 'stability' && !!p.flag));
 const halvesTxt = (p) => p.h1 && p.h2 ? `halves ${fRm(p.h1.exp)} / ${fRm(p.h2.exp)}` : '';
 export function proposalLine(p) {
   const S = cap(p.setup), over = `${fRm(p.exp)} over ${p.n} replay trades`;
