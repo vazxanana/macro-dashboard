@@ -106,6 +106,7 @@ jobs:
             if [ $((i % 3)) -eq 1 ]; then node ict/tracker.mjs data/ict || echo "ICT round $i failed"; fi
             node council/ctrader-mirror.mjs data || echo "cTrader mirror round $i failed"
             node council/ctrader-test.mjs data || echo "cTrader test round $i failed"   # one-off demo test order, only when ctrader/test.json asks
+            node council/ctrader-suite.mjs data || echo "cTrader suite round $i failed"   # demo trade test suite (latency, SL/TP, limit, cancel), only when ctrader/suite.json asks
             git -C data add -A
             if ! git -C data diff --cached --quiet; then
               git -C data commit -q -m "Council run $(date -u +%Y-%m-%dT%H:%MZ)"
