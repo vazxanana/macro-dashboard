@@ -6,7 +6,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import zlib from 'node:zlib';
-import { MARKETS, P, MIN_GRADE, cnbcBars, closedBar, agg, signals, letter, isASetup, isAPlus, sizeOf, SHADOW, isDip, VARIANTS, variantRule, variantTags, loadMeridian, SHADOW_MARKETS, mdBars, dailyNY, strailLevel } from './tracker.mjs';
+import { MARKETS, P, MIN_GRADE, cnbcBars, cnbcDaily, closedBar, agg, signals, letter, isASetup, isAPlus, sizeOf, SHADOW, isDip, VARIANTS, variantRule, variantTags, loadMeridian, SHADOW_MARKETS, mdBars, dailyNY, strailLevel } from './tracker.mjs';
 
 const DATA = process.argv[2] || 'data/ict';
 const FROM = Date.parse(process.argv[3] || '2025-08-01T00:00:00Z') / 1000;   // owner, 7 Nov: 5 more months (was 1 Jan 2026)
@@ -14,6 +14,25 @@ const now = Math.floor(Date.now() / 1000);
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 const dedupe = (a) => { const m = new Map(); for (const b of a) m.set(b.time, b); return [...m.values()].sort((x, y) => x.time - y.time); };
 
+// futures-roll (research/edge/futures-roll, 7 Nov 2026): CNBC's intraday '.1' history is the CURRENT contract's own candles, so
+// before CNBC made it the front month (14 Sep 2026 for the indices, 31 Jul for gold) it is a deferred contract: 0.01-3 % of the front
+// month's hourly volume, with 15-100 % one-print (flat) H1 candles in Mar-Aug 2026 for the indices. Its sweeps and gaps are not the
+// market the desk trades (the "4 Jun 2026" NQ/ES glitch). CNBC's intraday candles are used only from the first day of their last
+// stretch with a daily median hourly volume >= LIQ.min x the median hourly volume of the last LIQ.ref trading days (each day's
+// value is the median of it and its neighbours, so one quiet holiday does not cut the series); the hours before go to the back-fill.
+export const LIQ = { min: 0.2, ref: 20 };
+const nyDay = new Intl.DateTimeFormat('en-CA', { timeZone: 'America/New_York', year: 'numeric', month: '2-digit', day: '2-digit' });
+export function liquidFrom(h1) {
+  const med = (a) => { const s = [...a].sort((x, y) => x - y); return s.length ? s[s.length >> 1] : 0; };
+  const days = []; for (const b of h1) { const k = nyDay.format(new Date((b.time + 6 * 3600) * 1000)); if (!days.length || days.at(-1).k !== k) days.push({ k, t: b.time, v: [] }); days.at(-1).v.push(b.volume || 0); }
+  if (days.length < LIQ.ref + 2) return null;
+  const dm = days.map((d) => med(d.v)), ref = med(days.slice(-LIQ.ref).flatMap((d) => d.v));
+  if (!(ref > 0)) return null;
+  const sm = dm.map((v, i) => med(dm.slice(Math.max(0, i - 1), i + 2)));
+  let i = days.length - 1; while (i > 0 && sm[i] < LIQ.min * ref) i--;   // a thin last day (holiday, partial session) is not the start
+  while (i > 0 && sm[i - 1] >= LIQ.min * ref) i--;
+  return days[i].t;
+}
 async function history(M) {
   // Signals need H1 only: CNBC 1H over the whole period (10-day requests). 5m (2-day requests) is used only for exits where
   // CNBC still has it; H1 gaps are filled from 5m. Each request's candle count is logged so coverage can be checked.
@@ -34,6 +53,9 @@ async function history(M) {
     { const ch = new Map(); for (const b of h1) { const c = Math.floor((b.time - FROM) / (10 * 86400)); ch.set(c, (ch.get(c) || 0) + 1); }
       const ks = [...ch.keys()].sort((a, b) => a - b); let c0 = ks.at(-1); while (c0 > 0 && (ch.get(c0 - 1) || 0) >= 50) c0--;
       if (ks.length && c0 > ks[0]) { const t0 = FROM + c0 * 10 * 86400, before = h1.length; h1 = h1.filter((b) => b.time >= t0); log.push(`stray CNBC bars before ${new Date(t0 * 1000).toISOString().slice(0, 10)} dropped (${before - h1.length})`); } }
+    // futures-roll (7 Nov 2026): the earlier hours are a deferred contract's thin prints, not the front month; they go to the back-fill
+    { const t0 = liquidFrom(h1);
+      if (t0 && h1.length && t0 > h1[0].time) { const before = h1.length; h1 = h1.filter((b) => b.time >= t0); m5 = m5.filter((b) => b.time >= t0); log.push(`deferred-contract CNBC bars before ${new Date(t0 * 1000).toISOString().slice(0, 10)} dropped (${before - h1.length})`); } }
     const cnbc1 = h1.length ? h1[0].time : null;   // signals before this come from the Dukascopy cash-index fill
     // CNBC keeps only ~6 months of intraday candles: fill the earlier part from the research probe's Dukascopy cash-index
     // 5m files (council-data research/candles/idx/), scaled to the futures level by the median ratio over the overlap
@@ -54,6 +76,12 @@ async function history(M) {
           const t = Date.UTC(+d.slice(0, 4), +d.slice(4, 6) - 1, +d.slice(6, 8), +d.slice(9, 11), +d.slice(11, 13)) / 1000 + 5 * 3600; if (t >= warm) m1.push({ time: t, open: +o, high: +h, low: +l, close: +c }); }
         d5 = agg(m1.sort((a, b) => a.time - b.time), 300); }
       if (XAU) { try { d5 = agg(JSON.parse(zlib.gunzipSync(fs.readFileSync(XAU))).map((r) => ({ time: r[0], open: r[1], high: r[2], low: r[3], close: r[4] })).filter((b) => b.time >= warm), 300); } catch (e) { d5 = []; } }
+      // futures-roll: the files end before CNBC's front-month candles start (spot gold 7 Jun 2026, Dukascopy 5 Nov 2026, while the next
+      // index roll moves the start to mid-December): OANDA mid 5m (the paper markets' source, site proxy) fills the hole and the 20
+      // days the scale is measured on. RTY has no OANDA symbol and no fill.
+      const MD = { NQ: 'nas100', ES: 'spx500', YM: 'us30', GC: 'xau' }[M.short], end = d5.length ? d5.at(-1).time + 300 : warm, upto = Math.min(now, h1[0].time + 21 * 86400);
+      if (MD && h1[0].time - end > 86400) { let o = []; try { for (let t = end; t < upto; t += 4999 * 300) { o = o.concat(await mdBars(MD, '5m', `from=${t}&to=${Math.min(upto, t + 4999 * 300)}`)); await sleep(200); } } catch (e) { o = []; log.push(`oanda ${MD} gap fill failed: ${e.message || e}`); }
+        if (o.length) { d5 = dedupe(d5.concat(o.filter((b) => b.time >= end))); log.push(`oanda ${MD} gap fill ${o.length} 5m`); } }
       // calendar audit: the cash / spot fills trade through CME half-day afternoons and holiday eves (spot gold on MLK afternoon);
       // the futures did not, so those bars are dropped exactly as cnbcBars() drops the feed's flat candles there
       d5 = dedupe(d5).filter((b) => !closedBar(b.time));
@@ -71,11 +99,12 @@ async function history(M) {
     console.log(M.short, sym, 'H1', h1.length, 'M5', m5.length, log.join(' '));
     if (h1.length + m5.length < 500) continue;
     const have = new Set(h1.map((b) => b.time)), H = dedupe(h1.concat(agg(m5, 3600).filter((b) => !have.has(b.time)))).filter((b) => b.time + 3600 <= now);
-    const D = (await cnbcBars(sym, '1D', FROM - 500 * 86400, now + 86400)).filter((b) => b.time + 86400 <= now);
+    // daily candles back-adjusted across contract rolls (tracker.mjs rollAdjust; research/edge/futures-roll)
+    const daily = await cnbcDaily(M, sym, FROM - 500 * 86400, now + 86400), D = daily.d1.filter((b) => b.time + 86400 <= now);
     // 5m counts as exit data from the first day with a near-full 5m session onwards
     const days = new Map(); for (const b of m5) { const d = Math.floor(b.time / 86400); days.set(d, (days.get(d) || 0) + 1); }
     const full = [...days.entries()].filter(([, n]) => n >= 200).map(([d]) => d).sort((a, b) => a - b);
-    return { sym, m5, H, D, m5from: full.length ? full[0] * 86400 : null, m5days: new Set(full), cnbcFrom: cnbc1 };
+    return { sym, m5, H, D, rolls: daily.rolls, m5from: full.length ? full[0] * 86400 : null, m5days: new Set(full), cnbcFrom: cnbc1 };
   }
   throw new Error(`no CNBC history for ${M.short}`);
 }
@@ -135,7 +164,7 @@ if (process.argv[1] && process.argv[1].endsWith('replay.mjs')) {
   for (const [key, M] of Object.entries(MARKETS)) {
     try {
       const src = await history(M);
-      out.src[key] = { sym: src.sym, h1: src.H.length, m5: src.m5.length, m5from: src.m5from ? new Date(src.m5from * 1000).toISOString().slice(0, 10) : null, d1: src.D.length };
+      out.src[key] = { sym: src.sym, h1: src.H.length, m5: src.m5.length, m5from: src.m5from ? new Date(src.m5from * 1000).toISOString().slice(0, 10) : null, d1: src.D.length, d1Rolls: src.rolls };
       const sig = signals(src.H, src.D, 1, M.tick).concat(signals(src.H, src.D, -1, M.tick)).filter((g) => g.close >= FROM && g.grade.total >= MIN_GRADE).sort((a, b) => a.close - b.close);
       let busyAll = 0, busyA = 0;   // same rule as the tracker: an A-setup is only blocked by an open A-setup
       // each A-setup carries the shadow variants' verdicts (vr), for the Coach's ICT filter verdicts; a failure here only loses the tags

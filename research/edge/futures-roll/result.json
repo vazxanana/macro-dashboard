@@ -1,0 +1,2712 @@
+{
+ "topic": "futures-roll",
+ "question": "Do contract rolls in the ICT desk's CNBC continuous futures fake gaps / FVGs / sweeps or distort stops (replay and live)?",
+ "preregistration": "research/edge/futures-roll/preregistration.md (committed before any candle around a roll was looked at)",
+ "data": {
+  "cnbc": "council-data research/futures-roll/cnbc.json.gz (dumped 2026-11-07T22:11:04.542Z) and probe.json.gz (cash indices, spot gold, single contracts)",
+  "cash": "OANDA mid H1 NAS100/SPX500/US30/XAU via meridianx.dev /md/bars",
+  "replay": "council-data ict/replay.json at 475f6bc3 (7 Nov 2026 21:16 run), reproduced exactly from the dump (251 A-trades, +61.87R, 0 differences)"
+ },
+ "findings": {
+  "intraday": "CNBC 1H/5M of @X.1 are the CURRENT contract's own candles (Dec 2026 for the indices and gold on 7 Nov): no roll step anywhere in them. Evidence: basis to OANDA cash decays smoothly Mar-Nov 2026 (NQ 630 -> 96) with no quarterly jump; adjusted = unadjusted path; NQZ26 1D - @ND.1 1D = 0 from 14 Sep. Before the contract was front its hours are thin (NQ < 18 H1 candles a day until early June 2026, YM until July).",
+  "daily": "CNBC 1D of @X.1 is an UNADJUSTED splice of front months: it steps by the calendar spread on the switch day (indices: Monday of the expiry week, June 2026 on the Monday after; gold: the last business day before the delivery month, Oct skipped).",
+  "h1BasisSteps": "The pre-registered H1 basis scan (rolls.mjs) flagged steps that are not CNBC rolls: thin deferred-contract hours (NQ Apr-May, ES Jan-Apr 2026) and OANDA's own index-CFD reference change on 15 Sep 2026 15-17 UTC (Dec contract minus CNBC cash is flat that day).",
+  "live": "Each live run re-reads 24 days of the current contract, so on the first run after a switch an open trade's stored levels sit one spread away from the candles (sells stopped by the spread, buys given it)."
+ },
+ "dailyRolls2025_26": {
+  "nq": [
+   {
+    "day": "2025-03-17",
+    "spread": 222.73,
+    "pct": 1.11
+   },
+   {
+    "day": "2025-06-16",
+    "spread": 221.55,
+    "pct": 1
+   },
+   {
+    "day": "2025-09-15",
+    "spread": 239.99,
+    "pct": 0.98
+   },
+   {
+    "day": "2025-12-15",
+    "spread": 262.8,
+    "pct": 1.04
+   },
+   {
+    "day": "2026-03-16",
+    "spread": 226.47,
+    "pct": 0.91
+   },
+   {
+    "day": "2026-06-22",
+    "spread": 298.02,
+    "pct": 0.97
+   },
+   {
+    "day": "2026-09-14",
+    "spread": 307.86,
+    "pct": 1.05
+   }
+  ],
+  "es": [
+   {
+    "day": "2025-03-17",
+    "spread": 57.01,
+    "pct": 0.99
+   },
+   {
+    "day": "2025-06-16",
+    "spread": 55.3,
+    "pct": 0.91
+   },
+   {
+    "day": "2025-09-15",
+    "spread": 60.95,
+    "pct": 0.91
+   },
+   {
+    "day": "2025-12-15",
+    "spread": 62.09,
+    "pct": 0.9
+   },
+   {
+    "day": "2026-03-16",
+    "spread": 53.25,
+    "pct": 0.79
+   },
+   {
+    "day": "2026-06-22",
+    "spread": 61.55,
+    "pct": 0.82
+   },
+   {
+    "day": "2026-09-14",
+    "spread": 71.19,
+    "pct": 0.93
+   }
+  ],
+  "ym": [
+   {
+    "day": "2025-03-17",
+    "spread": 366.6,
+    "pct": 0.87
+   },
+   {
+    "day": "2025-06-16",
+    "spread": 344.74,
+    "pct": 0.8
+   },
+   {
+    "day": "2025-09-15",
+    "spread": 363.81,
+    "pct": 0.79
+   },
+   {
+    "day": "2025-12-15",
+    "spread": 410.53,
+    "pct": 0.84
+   },
+   {
+    "day": "2026-03-16",
+    "spread": 314.1,
+    "pct": 0.66
+   },
+   {
+    "day": "2026-06-18",
+    "spread": 375.76,
+    "pct": 0.72
+   },
+   {
+    "day": "2026-09-14",
+    "spread": 433.13,
+    "pct": 0.82
+   }
+  ],
+  "rty": [
+   {
+    "day": "2025-03-17",
+    "spread": 17.83,
+    "pct": 0.86
+   },
+   {
+    "day": "2025-06-16",
+    "spread": 17.15,
+    "pct": 0.8
+   },
+   {
+    "day": "2025-09-15",
+    "spread": 19.9,
+    "pct": 0.82
+   },
+   {
+    "day": "2025-12-15",
+    "spread": 21.66,
+    "pct": 0.85
+   },
+   {
+    "day": "2026-03-17",
+    "spread": 15.37,
+    "pct": 0.61
+   },
+   {
+    "day": "2026-06-22",
+    "spread": 18.62,
+    "pct": 0.62
+   },
+   {
+    "day": "2026-09-14",
+    "spread": 23.68,
+    "pct": 0.81
+   }
+  ],
+  "gc": [
+   {
+    "day": "2025-01-31",
+    "spread": 23.9,
+    "pct": 0.84
+   },
+   {
+    "day": "2025-03-28",
+    "spread": 29.5,
+    "pct": 0.95
+   },
+   {
+    "day": "2025-06-04",
+    "spread": 27.6,
+    "pct": 0.81
+   },
+   {
+    "day": "2025-07-31",
+    "spread": 55.9,
+    "pct": 1.67
+   },
+   {
+    "day": "2025-11-28",
+    "spread": 35.5,
+    "pct": 0.83
+   },
+   {
+    "day": "2026-01-30",
+    "spread": 55.3,
+    "pct": 1.17
+   },
+   {
+    "day": "2026-03-31",
+    "spread": 29.8,
+    "pct": 0.64
+   },
+   {
+    "day": "2026-05-29",
+    "spread": 31.2,
+    "pct": 0.68
+   },
+   {
+    "day": "2026-07-31",
+    "spread": 60.5,
+    "pct": 1.47
+   }
+  ]
+ },
+ "h1GapsNonRoll": {
+  "nq": {
+   "p95": 44.75,
+   "p99": 85
+  },
+  "es": {
+   "p95": 6.75,
+   "p99": 18
+  },
+  "ym": {
+   "p95": 55,
+   "p99": 109
+  },
+  "rty": {
+   "p95": 4.6,
+   "p99": 10
+  },
+  "gc": {
+   "p95": 8.5,
+   "p99": 19.9
+  }
+ },
+ "verdict": "REAL, but not where it was suspected. CNBC intraday candles never jump at a roll (one contract per request), so no H1 gap / FVG / sweep and no replay exit was faked by a roll step. Three data problems are real: (1) the DAILY candles step by the calendar spread at every switch (5-7x the 95th-percentile H1 gap) and flipped the 50-day bias of 8 replay A-signals; (2) live, a trade open across a switch is managed against candles one spread away (1 replay A-trade, gold 29 Jul 2026, +1.07R of fake gain); (3) the replay used the current contract own history from before it was front: thin deferred prints (H1 ranges 0-0.8x the market, up to 100 % one-print candles) behind 91 of the 251 replay A-trades, incl. the 4 Jun 2026 NQ/ES signals.",
+ "fix": "Data layer only. ict/tracker.mjs rollAdjust (daily candles back-adjusted with spreads measured on CNBC cash-index closes; indices) and contractShift/shiftTrade (open trades moved by the measured intraday offset on a contract switch; live tracker); ict/replay.mjs liquidFrom (CNBC intraday only from the contract front-month stretch, earlier hours back-filled as before, OANDA filling where the files end). Signals, A-rule, sizing and exits unchanged.",
+ "replayAChanges": {
+  "old": {
+   "n": 251,
+   "R": 61.87
+  },
+  "new": {
+   "n": 251,
+   "R": 64.47
+  },
+  "changes": [
+   {
+    "change": "A-setup removed",
+    "market": "ym",
+    "side": "sell",
+    "signal": "2025-08-04 12:00",
+    "cash": true,
+    "R": -0.75,
+    "size": 0.75,
+    "why": "50-day bias against -> with (roll step in the daily candles)"
+   },
+   {
+    "change": "A-setup added",
+    "market": "es",
+    "side": "buy",
+    "signal": "2026-07-21 00:00",
+    "cash": false,
+    "R": 1.05,
+    "size": 0.75,
+    "why": "50-day bias with -> against (roll step in the daily candles)"
+   },
+   {
+    "change": "A-setup added",
+    "market": "es",
+    "side": "buy",
+    "signal": "2026-08-03 14:00",
+    "cash": false,
+    "R": 2.33,
+    "size": 0.5,
+    "why": "50-day bias with -> against (roll step in the daily candles)"
+   },
+   {
+    "change": "A-setup added",
+    "market": "ym",
+    "side": "buy",
+    "signal": "2026-10-21 16:00",
+    "cash": false,
+    "R": 0.14,
+    "size": 0.5,
+    "why": "50-day bias with -> against (roll step in the daily candles)"
+   },
+   {
+    "change": "A-setup removed",
+    "market": "ym",
+    "side": "sell",
+    "signal": "2026-10-22 00:00",
+    "cash": false,
+    "R": -0.5,
+    "size": 0.5,
+    "why": "50-day bias against -> with (roll step in the daily candles)"
+   },
+   {
+    "change": "A-setup removed",
+    "market": "ym",
+    "side": "sell",
+    "signal": "2026-10-27 14:00",
+    "cash": false,
+    "R": -0.5,
+    "size": 0.5,
+    "why": "50-day bias against -> with (roll step in the daily candles)"
+   },
+   {
+    "change": "A-setup added",
+    "market": "es",
+    "side": "buy",
+    "signal": "2026-10-30 20:00",
+    "cash": false,
+    "R": 0,
+    "size": 0.5,
+    "why": "50-day bias with -> against (roll step in the daily candles)"
+   },
+   {
+    "change": "A-setup removed",
+    "market": "rty",
+    "side": "sell",
+    "signal": "2026-11-05 13:00",
+    "cash": false,
+    "R": 2.67,
+    "size": 0.25,
+    "why": "50-day bias against -> with (roll step in the daily candles)"
+   }
+  ],
+  "keptA": 249,
+  "keptSameExit": true
+ },
+ "touched": {
+  "signal": [
+   {
+    "market": "ym",
+    "side": "sell",
+    "signal": "2025-09-15 16:00",
+    "closed": "2025-09-17 06:00",
+    "R": 0.2,
+    "exit": "time",
+    "cash": true,
+    "switch": "2025-09-14 22:00"
+   },
+   {
+    "market": "es",
+    "side": "sell",
+    "signal": "2025-09-18 13:00",
+    "closed": "2025-09-18 14:30",
+    "R": -1.5,
+    "exit": "stop",
+    "cash": true,
+    "switch": "2025-09-14 22:00"
+   },
+   {
+    "market": "es",
+    "side": "buy",
+    "signal": "2026-03-15 23:00",
+    "closed": "2026-03-17 12:00",
+    "R": 0.41,
+    "exit": "time",
+    "cash": true,
+    "switch": "2026-03-15 22:00"
+   },
+   {
+    "market": "ym",
+    "side": "buy",
+    "signal": "2026-03-15 23:00",
+    "closed": "2026-03-17 12:00",
+    "R": 0.41,
+    "exit": "time",
+    "cash": true,
+    "switch": "2026-03-15 22:00"
+   },
+   {
+    "market": "nq",
+    "side": "sell",
+    "signal": "2026-06-21 23:00",
+    "closed": "2026-06-22 07:00",
+    "R": -0.25,
+    "exit": "stop",
+    "cash": false,
+    "switch": "2026-06-21 22:00"
+   },
+   {
+    "market": "rty",
+    "side": "sell",
+    "signal": "2026-06-22 00:00",
+    "closed": "2026-06-22 12:00",
+    "R": -0.5,
+    "exit": "stop",
+    "cash": false,
+    "switch": "2026-06-21 22:00"
+   },
+   {
+    "market": "nq",
+    "side": "sell",
+    "signal": "2026-06-22 15:00",
+    "closed": "2026-06-24 05:00",
+    "R": 1.4,
+    "exit": "time",
+    "cash": false,
+    "switch": "2026-06-21 22:00"
+   },
+   {
+    "market": "es",
+    "side": "sell",
+    "signal": "2026-06-22 15:00",
+    "closed": "2026-06-24 05:00",
+    "R": 0.84,
+    "exit": "time",
+    "cash": false,
+    "switch": "2026-06-21 22:00"
+   },
+   {
+    "market": "rty",
+    "side": "sell",
+    "signal": "2026-06-22 20:00",
+    "closed": "2026-06-23 14:00",
+    "R": 1.75,
+    "exit": "trail",
+    "cash": false,
+    "switch": "2026-06-21 22:00"
+   },
+   {
+    "market": "rty",
+    "side": "sell",
+    "signal": "2026-06-23 19:00",
+    "closed": "2026-06-24 15:00",
+    "R": -0.5,
+    "exit": "stop",
+    "cash": false,
+    "switch": "2026-06-21 22:00"
+   },
+   {
+    "market": "rty",
+    "side": "sell",
+    "signal": "2026-06-24 18:00",
+    "closed": "2026-06-25 14:00",
+    "R": -0.5,
+    "exit": "stop",
+    "cash": false,
+    "switch": "2026-06-21 22:00"
+   },
+   {
+    "market": "gc",
+    "side": "buy",
+    "signal": "2026-07-31 18:00",
+    "closed": "2026-08-03 14:00",
+    "R": -1,
+    "exit": "stop",
+    "cash": false,
+    "switch": "2026-07-30 22:00"
+   },
+   {
+    "market": "gc",
+    "side": "buy",
+    "signal": "2026-08-03 19:00",
+    "closed": "2026-08-04 23:25",
+    "R": 0.99,
+    "exit": "trail",
+    "cash": false,
+    "switch": "2026-07-30 22:00"
+   },
+   {
+    "market": "ym",
+    "side": "buy",
+    "signal": "2026-09-14 02:00",
+    "closed": "2026-09-15 04:55",
+    "R": -0.5,
+    "exit": "stop",
+    "cash": false,
+    "switch": "2026-09-13 22:00"
+   },
+   {
+    "market": "rty",
+    "side": "buy",
+    "signal": "2026-09-14 16:00",
+    "closed": "2026-09-15 04:40",
+    "R": -0.5,
+    "exit": "stop",
+    "cash": false,
+    "switch": "2026-09-13 22:00"
+   },
+   {
+    "market": "es",
+    "side": "sell",
+    "signal": "2026-09-14 20:00",
+    "closed": "2026-09-15 12:50",
+    "R": 0,
+    "exit": "breakeven",
+    "cash": false,
+    "switch": "2026-09-13 22:00"
+   },
+   {
+    "market": "rty",
+    "side": "buy",
+    "signal": "2026-09-15 10:00",
+    "closed": "2026-09-15 14:40",
+    "R": -1.5,
+    "exit": "stop",
+    "cash": false,
+    "switch": "2026-09-13 22:00"
+   },
+   {
+    "market": "rty",
+    "side": "buy",
+    "signal": "2026-09-15 17:00",
+    "closed": "2026-09-16 18:55",
+    "R": -0.5,
+    "exit": "stop",
+    "cash": false,
+    "switch": "2026-09-13 22:00"
+   },
+   {
+    "market": "ym",
+    "side": "buy",
+    "signal": "2026-09-16 11:00",
+    "closed": "2026-09-16 13:35",
+    "R": -0.25,
+    "exit": "stop",
+    "cash": false,
+    "switch": "2026-09-13 22:00"
+   }
+  ],
+  "exit": [
+   {
+    "market": "gc",
+    "side": "buy",
+    "signal": "2026-07-29 18:00",
+    "closed": "2026-07-31 08:00",
+    "R": 0.45,
+    "exit": "time",
+    "cash": false,
+    "switch": "2026-07-30 22:00"
+   }
+  ],
+  "d1": {
+   "ym": {
+    "a": 60,
+    "touched": 52
+   },
+   "es": {
+    "a": 61,
+    "touched": 49
+   },
+   "nq": {
+    "a": 46,
+    "touched": 35
+   },
+   "gc": {
+    "a": 60,
+    "touched": 53
+   },
+   "rty": {
+    "a": 26,
+    "touched": 23
+   }
+  }
+ },
+ "shiftsUsedByBench": {
+  "@ND.1": [
+   {
+    "from": 0,
+    "day": null,
+    "offset": null,
+    "n": 0
+   },
+   {
+    "from": 1718316000,
+    "day": "2024-06-14",
+    "offset": null,
+    "n": 0
+   },
+   {
+    "from": 1726178400,
+    "day": "2024-09-13",
+    "offset": null,
+    "n": 0
+   },
+   {
+    "from": 1734303600,
+    "day": "2024-12-16",
+    "offset": null,
+    "n": 0
+   },
+   {
+    "from": 1742162400,
+    "day": "2025-03-17",
+    "offset": null,
+    "n": 0
+   },
+   {
+    "from": 1750024800,
+    "day": "2025-06-16",
+    "offset": null,
+    "n": 0
+   },
+   {
+    "from": 1757887200,
+    "day": "2025-09-15",
+    "offset": null,
+    "n": 0
+   },
+   {
+    "from": 1765753200,
+    "day": "2025-12-15",
+    "offset": null,
+    "n": 2
+   },
+   {
+    "from": 1773612000,
+    "day": "2026-03-16",
+    "offset": 543,
+    "n": 48
+   },
+   {
+    "from": 1782079200,
+    "day": "2026-06-22",
+    "offset": 296.75,
+    "n": 58
+   },
+   {
+    "from": 1789336800,
+    "day": "2026-09-14",
+    "offset": 0,
+    "n": 40
+   }
+  ],
+  "@SP.1": [
+   {
+    "from": 0,
+    "day": null,
+    "offset": null,
+    "n": 0
+   },
+   {
+    "from": 1718316000,
+    "day": "2024-06-14",
+    "offset": null,
+    "n": 0
+   },
+   {
+    "from": 1726178400,
+    "day": "2024-09-13",
+    "offset": null,
+    "n": 0
+   },
+   {
+    "from": 1734303600,
+    "day": "2024-12-16",
+    "offset": null,
+    "n": 0
+   },
+   {
+    "from": 1742162400,
+    "day": "2025-03-17",
+    "offset": null,
+    "n": 0
+   },
+   {
+    "from": 1750024800,
+    "day": "2025-06-16",
+    "offset": null,
+    "n": 0
+   },
+   {
+    "from": 1757887200,
+    "day": "2025-09-15",
+    "offset": null,
+    "n": 0
+   },
+   {
+    "from": 1765753200,
+    "day": "2025-12-15",
+    "offset": 156,
+    "n": 12
+   },
+   {
+    "from": 1773612000,
+    "day": "2026-03-16",
+    "offset": 118.75,
+    "n": 61
+   },
+   {
+    "from": 1782079200,
+    "day": "2026-06-22",
+    "offset": 67,
+    "n": 58
+   },
+   {
+    "from": 1789336800,
+    "day": "2026-09-14",
+    "offset": 0,
+    "n": 40
+   }
+  ],
+  "@DJ.1": [
+   {
+    "from": 0,
+    "day": null,
+    "offset": null,
+    "n": 0
+   },
+   {
+    "from": 1718316000,
+    "day": "2024-06-14",
+    "offset": null,
+    "n": 0
+   },
+   {
+    "from": 1726178400,
+    "day": "2024-09-13",
+    "offset": null,
+    "n": 0
+   },
+   {
+    "from": 1734303600,
+    "day": "2024-12-16",
+    "offset": null,
+    "n": 0
+   },
+   {
+    "from": 1742162400,
+    "day": "2025-03-17",
+    "offset": null,
+    "n": 0
+   },
+   {
+    "from": 1750024800,
+    "day": "2025-06-16",
+    "offset": null,
+    "n": 0
+   },
+   {
+    "from": 1757887200,
+    "day": "2025-09-15",
+    "offset": null,
+    "n": 0
+   },
+   {
+    "from": 1765753200,
+    "day": "2025-12-15",
+    "offset": null,
+    "n": 0
+   },
+   {
+    "from": 1773612000,
+    "day": "2026-03-16",
+    "offset": 761,
+    "n": 14
+   },
+   {
+    "from": 1781733600,
+    "day": "2026-06-18",
+    "offset": 418,
+    "n": 59
+   },
+   {
+    "from": 1789336800,
+    "day": "2026-09-14",
+    "offset": 0,
+    "n": 40
+   }
+  ],
+  "@TFS.1": [
+   {
+    "from": 0,
+    "day": null,
+    "offset": null,
+    "n": 0
+   },
+   {
+    "from": 1718316000,
+    "day": "2024-06-14",
+    "offset": null,
+    "n": 0
+   },
+   {
+    "from": 1726437600,
+    "day": "2024-09-16",
+    "offset": null,
+    "n": 0
+   },
+   {
+    "from": 1734303600,
+    "day": "2024-12-16",
+    "offset": null,
+    "n": 0
+   },
+   {
+    "from": 1742162400,
+    "day": "2025-03-17",
+    "offset": null,
+    "n": 0
+   },
+   {
+    "from": 1750024800,
+    "day": "2025-06-16",
+    "offset": null,
+    "n": 0
+   },
+   {
+    "from": 1757887200,
+    "day": "2025-09-15",
+    "offset": null,
+    "n": 0
+   },
+   {
+    "from": 1765753200,
+    "day": "2025-12-15",
+    "offset": null,
+    "n": 0
+   },
+   {
+    "from": 1773698400,
+    "day": "2026-03-17",
+    "offset": 43.2,
+    "n": 22
+   },
+   {
+    "from": 1782079200,
+    "day": "2026-06-22",
+    "offset": 22.4,
+    "n": 58
+   },
+   {
+    "from": 1789336800,
+    "day": "2026-09-14",
+    "offset": 0,
+    "n": 40
+   }
+  ],
+  "@GC.1": [
+   {
+    "from": 0,
+    "day": null,
+    "offset": null,
+    "n": 0
+   },
+   {
+    "from": 1722463200,
+    "day": "2024-08-01",
+    "offset": null,
+    "n": 0
+   },
+   {
+    "from": 1732834800,
+    "day": "2024-11-29",
+    "offset": null,
+    "n": 0
+   },
+   {
+    "from": 1738278000,
+    "day": "2025-01-31",
+    "offset": null,
+    "n": 0
+   },
+   {
+    "from": 1743112800,
+    "day": "2025-03-28",
+    "offset": null,
+    "n": 0
+   },
+   {
+    "from": 1748988000,
+    "day": "2025-06-04",
+    "offset": null,
+    "n": 1
+   },
+   {
+    "from": 1753912800,
+    "day": "2025-07-31",
+    "offset": 181.4,
+    "n": 13
+   },
+   {
+    "from": 1764284400,
+    "day": "2025-11-28",
+    "offset": 158.8,
+    "n": 9
+   },
+   {
+    "from": 1769727600,
+    "day": "2026-01-30",
+    "offset": 148.7,
+    "n": 25
+   },
+   {
+    "from": 1774908000,
+    "day": "2026-03-31",
+    "offset": 105.2,
+    "n": 41
+   },
+   {
+    "from": 1780005600,
+    "day": "2026-05-29",
+    "offset": 54.3,
+    "n": 43
+   },
+   {
+    "from": 1785448800,
+    "day": "2026-07-31",
+    "offset": 0,
+    "n": 70
+   }
+  ]
+ },
+ "bench": {
+  "runs": 2052,
+  "errors": {
+   "old": 0,
+   "new": 0
+  },
+  "from": "2026-05-20T00:00:00.000Z",
+  "to": "2026-11-06T22:00:00.000Z",
+  "runsDiffering": {
+   "trades": 1652,
+   "snapshotWithoutRollFieldsAndPdhPdl": 1292,
+   "barsH1M5": 0,
+   "barsD1": 2052,
+   "shadow": 1648
+  },
+  "firstDiff": {
+   "trades": "2026-06-22T08:00:00.000Z",
+   "snapCore": "2026-07-22T08:00:00.000Z",
+   "barsH1M5": null
+  },
+  "switches": [
+   {
+    "run": "2026-05-28T22:00:00.000Z",
+    "switched": [
+     [
+      "gc",
+      50.9
+     ]
+    ],
+    "open": [
+     "nq-s-1779886800",
+     "es-b-1779919200"
+    ]
+   },
+   {
+    "run": "2026-06-21T22:00:00.000Z",
+    "switched": [
+     [
+      "nq",
+      246.25
+     ],
+     [
+      "es",
+      51.75
+     ]
+    ],
+    "open": [
+     "gc-s-1781877600"
+    ]
+   },
+   {
+    "run": "2026-07-30T22:00:00.000Z",
+    "switched": [
+     [
+      "gc",
+      54.3
+     ]
+    ],
+    "open": [
+     "gc-b-1785344400"
+    ]
+   },
+   {
+    "run": "2026-09-13T22:00:00.000Z",
+    "switched": [
+     [
+      "nq",
+      296.75
+     ],
+     [
+      "es",
+      67
+     ],
+     [
+      "ym",
+      418
+     ],
+     [
+      "rty",
+      22.4
+     ]
+    ],
+    "open": []
+   }
+  ],
+  "trades": {
+   "old": 359,
+   "new": 359,
+   "differing": 8,
+   "featuresOnly": 106,
+   "rows": [
+    {
+     "id": "es-b-1784588400",
+     "what": "changed",
+     "aset": true,
+     "signal": "2026-07-21 00:00",
+     "d": [
+      "aset false -> true",
+      "size 1 -> 0.75",
+      "R 1.25 -> 0.94"
+     ],
+     "feat": [
+      "feat.bias"
+     ],
+     "rolled": null
+    },
+    {
+     "id": "gc-b-1785344400",
+     "what": "changed",
+     "aset": true,
+     "signal": "2026-07-29 18:00",
+     "d": [
+      "R 1.47 -> 0.4",
+      "entry 4050.3 -> 4104.6",
+      "stop0 3999.4 -> 4053.7"
+     ],
+     "feat": [],
+     "rolled": [
+      {
+       "at": 1785448800,
+       "by": 54.3
+      }
+     ]
+    },
+    {
+     "id": "es-b-1785762000",
+     "what": "new only",
+     "aset": true,
+     "R": 1.31,
+     "signal": "2026-08-03 14:00",
+     "bias": "against",
+     "rolled": null
+    },
+    {
+     "id": "ym-b-1792594800",
+     "what": "new only",
+     "aset": true,
+     "R": -0.1,
+     "signal": "2026-10-21 16:00",
+     "bias": "against",
+     "rolled": null
+    },
+    {
+     "id": "ym-s-1792623600",
+     "what": "old only",
+     "aset": true,
+     "R": 0,
+     "signal": "2026-10-22 00:00",
+     "bias": "against"
+    },
+    {
+     "id": "ym-s-1793106000",
+     "what": "changed",
+     "aset": false,
+     "signal": "2026-10-27 14:00",
+     "d": [
+      "aset true -> false",
+      "size 0.5 -> 1"
+     ],
+     "feat": [
+      "feat.bias"
+     ],
+     "rolled": null
+    },
+    {
+     "id": "es-b-1793386800",
+     "what": "changed",
+     "aset": true,
+     "signal": "2026-10-30 20:00",
+     "d": [
+      "aset false -> true",
+      "size 1 -> 0.5",
+      "R -1 -> -0.5"
+     ],
+     "feat": [
+      "feat.bias"
+     ],
+     "rolled": null
+    },
+    {
+     "id": "rty-s-1793880000",
+     "what": "old only",
+     "aset": true,
+     "R": 1.68,
+     "signal": "2026-11-05 13:00",
+     "bias": "against"
+    }
+   ]
+  },
+  "totals": {
+   "old": {
+    "all": {
+     "n": 356,
+     "R": 87.44
+    },
+    "A": {
+     "n": 121,
+     "R": 28.02
+    }
+   },
+   "new": {
+    "all": {
+     "n": 356,
+     "R": 86.09
+    },
+    "A": {
+     "n": 122,
+     "R": 26.92
+    }
+   }
+  }
+ },
+ "deferredContract": {
+  "rangeRatioVsCashByMonth": {
+   "nq": [
+    {
+     "month": "2026-03",
+     "rangeRatio": 0,
+     "hoursPresent": 3
+    },
+    {
+     "month": "2026-04",
+     "rangeRatio": 0,
+     "hoursPresent": 24
+    },
+    {
+     "month": "2026-05",
+     "rangeRatio": 0,
+     "hoursPresent": 56
+    },
+    {
+     "month": "2026-06",
+     "rangeRatio": 0.61,
+     "hoursPresent": 87
+    },
+    {
+     "month": "2026-07",
+     "rangeRatio": 0.8,
+     "hoursPresent": 99
+    },
+    {
+     "month": "2026-08",
+     "rangeRatio": 0.81,
+     "hoursPresent": 100
+    },
+    {
+     "month": "2026-09",
+     "rangeRatio": 1,
+     "hoursPresent": 100
+    },
+    {
+     "month": "2026-10",
+     "rangeRatio": 1.01,
+     "hoursPresent": 100
+    },
+    {
+     "month": "2026-11",
+     "rangeRatio": 1,
+     "hoursPresent": 100
+    }
+   ],
+   "es": [
+    {
+     "month": "2026-03",
+     "rangeRatio": 0,
+     "hoursPresent": 18
+    },
+    {
+     "month": "2026-04",
+     "rangeRatio": 0,
+     "hoursPresent": 45
+    },
+    {
+     "month": "2026-05",
+     "rangeRatio": 0,
+     "hoursPresent": 65
+    },
+    {
+     "month": "2026-06",
+     "rangeRatio": 0.66,
+     "hoursPresent": 89
+    },
+    {
+     "month": "2026-07",
+     "rangeRatio": 0.77,
+     "hoursPresent": 99
+    },
+    {
+     "month": "2026-08",
+     "rangeRatio": 0.8,
+     "hoursPresent": 99
+    },
+    {
+     "month": "2026-09",
+     "rangeRatio": 1.01,
+     "hoursPresent": 100
+    },
+    {
+     "month": "2026-10",
+     "rangeRatio": 1.01,
+     "hoursPresent": 100
+    },
+    {
+     "month": "2026-11",
+     "rangeRatio": 1.01,
+     "hoursPresent": 100
+    }
+   ],
+   "ym": [
+    {
+     "month": "2026-05",
+     "rangeRatio": 0,
+     "hoursPresent": 5
+    },
+    {
+     "month": "2026-06",
+     "rangeRatio": 0.08,
+     "hoursPresent": 43
+    },
+    {
+     "month": "2026-07",
+     "rangeRatio": 0.45,
+     "hoursPresent": 83
+    },
+    {
+     "month": "2026-08",
+     "rangeRatio": 0.39,
+     "hoursPresent": 82
+    },
+    {
+     "month": "2026-09",
+     "rangeRatio": 0.99,
+     "hoursPresent": 99
+    },
+    {
+     "month": "2026-10",
+     "rangeRatio": 1,
+     "hoursPresent": 100
+    },
+    {
+     "month": "2026-11",
+     "rangeRatio": 1,
+     "hoursPresent": 100
+    }
+   ],
+   "gc": [
+    {
+     "month": "2026-03",
+     "rangeRatio": 0.67,
+     "hoursPresent": 97
+    },
+    {
+     "month": "2026-04",
+     "rangeRatio": 0.66,
+     "hoursPresent": 98
+    },
+    {
+     "month": "2026-05",
+     "rangeRatio": 0.76,
+     "hoursPresent": 98
+    },
+    {
+     "month": "2026-06",
+     "rangeRatio": 0.91,
+     "hoursPresent": 100
+    },
+    {
+     "month": "2026-07",
+     "rangeRatio": 0.96,
+     "hoursPresent": 100
+    },
+    {
+     "month": "2026-08",
+     "rangeRatio": 1.02,
+     "hoursPresent": 100
+    },
+    {
+     "month": "2026-09",
+     "rangeRatio": 1.02,
+     "hoursPresent": 100
+    },
+    {
+     "month": "2026-10",
+     "rangeRatio": 1.02,
+     "hoursPresent": 100
+    },
+    {
+     "month": "2026-11",
+     "rangeRatio": 1.02,
+     "hoursPresent": 100
+    }
+   ]
+  },
+  "weeklyLiquidity": {
+   "@ND.1": [
+    {
+     "week": "2026-03-02",
+     "perDay": 6,
+     "medVol": 3,
+     "volPctOfFront": 0.02,
+     "flat": 100
+    },
+    {
+     "week": "2026-03-09",
+     "perDay": 7,
+     "medVol": 3,
+     "volPctOfFront": 0.02,
+     "flat": 100
+    },
+    {
+     "week": "2026-03-30",
+     "perDay": 16,
+     "medVol": 4,
+     "volPctOfFront": 0.03,
+     "flat": 100
+    },
+    {
+     "week": "2026-04-06",
+     "perDay": 3,
+     "medVol": 3,
+     "volPctOfFront": 0.02,
+     "flat": 100
+    },
+    {
+     "week": "2026-04-13",
+     "perDay": 8,
+     "medVol": 8,
+     "volPctOfFront": 0.06,
+     "flat": 83
+    },
+    {
+     "week": "2026-04-20",
+     "perDay": 8,
+     "medVol": 4,
+     "volPctOfFront": 0.03,
+     "flat": 78
+    },
+    {
+     "week": "2026-04-27",
+     "perDay": 8.5,
+     "medVol": 7,
+     "volPctOfFront": 0.05,
+     "flat": 79
+    },
+    {
+     "week": "2026-05-04",
+     "perDay": 11.2,
+     "medVol": 8,
+     "volPctOfFront": 0.06,
+     "flat": 70
+    },
+    {
+     "week": "2026-05-11",
+     "perDay": 15.6,
+     "medVol": 19,
+     "volPctOfFront": 0.14,
+     "flat": 55
+    },
+    {
+     "week": "2026-05-18",
+     "perDay": 11.4,
+     "medVol": 16,
+     "volPctOfFront": 0.12,
+     "flat": 65
+    },
+    {
+     "week": "2026-05-25",
+     "perDay": 9.5,
+     "medVol": 4,
+     "volPctOfFront": 0.03,
+     "flat": 46
+    },
+    {
+     "week": "2026-06-01",
+     "perDay": 12.5,
+     "medVol": 25,
+     "volPctOfFront": 0.18,
+     "flat": 48
+    },
+    {
+     "week": "2026-06-08",
+     "perDay": 16.3,
+     "medVol": 32,
+     "volPctOfFront": 0.23,
+     "flat": 40
+    },
+    {
+     "week": "2026-06-15",
+     "perDay": 17.7,
+     "medVol": 32,
+     "volPctOfFront": 0.23,
+     "flat": 17
+    },
+    {
+     "week": "2026-06-22",
+     "perDay": 19,
+     "medVol": 83,
+     "volPctOfFront": 0.61,
+     "flat": 2
+    },
+    {
+     "week": "2026-06-29",
+     "perDay": 18.2,
+     "medVol": 50,
+     "volPctOfFront": 0.36,
+     "flat": 3
+    },
+    {
+     "week": "2026-07-06",
+     "perDay": 19.2,
+     "medVol": 44,
+     "volPctOfFront": 0.32,
+     "flat": 2
+    },
+    {
+     "week": "2026-07-13",
+     "perDay": 19,
+     "medVol": 64,
+     "volPctOfFront": 0.47,
+     "flat": 2
+    },
+    {
+     "week": "2026-07-20",
+     "perDay": 19.2,
+     "medVol": 58,
+     "volPctOfFront": 0.42,
+     "flat": 0
+    },
+    {
+     "week": "2026-07-27",
+     "perDay": 19.2,
+     "medVol": 93,
+     "volPctOfFront": 0.68,
+     "flat": 0
+    },
+    {
+     "week": "2026-08-03",
+     "perDay": 19.2,
+     "medVol": 52,
+     "volPctOfFront": 0.38,
+     "flat": 1
+    },
+    {
+     "week": "2026-08-10",
+     "perDay": 19,
+     "medVol": 36,
+     "volPctOfFront": 0.26,
+     "flat": 4
+    },
+    {
+     "week": "2026-08-17",
+     "perDay": 19.2,
+     "medVol": 65,
+     "volPctOfFront": 0.47,
+     "flat": 2
+    },
+    {
+     "week": "2026-08-24",
+     "perDay": 19.2,
+     "medVol": 60,
+     "volPctOfFront": 0.44,
+     "flat": 0
+    },
+    {
+     "week": "2026-08-31",
+     "perDay": 19.2,
+     "medVol": 94,
+     "volPctOfFront": 0.69,
+     "flat": 0
+    },
+    {
+     "week": "2026-09-07",
+     "perDay": 18.5,
+     "medVol": 225,
+     "volPctOfFront": 1.64,
+     "flat": 0
+    },
+    {
+     "week": "2026-09-14",
+     "perDay": 19.2,
+     "medVol": 8554,
+     "volPctOfFront": 62.36,
+     "flat": 0
+    },
+    {
+     "week": "2026-09-21",
+     "perDay": 19.2,
+     "medVol": 9576,
+     "volPctOfFront": 69.81,
+     "flat": 0
+    },
+    {
+     "week": "2026-09-28",
+     "perDay": 19.2,
+     "medVol": 11138,
+     "volPctOfFront": 81.2,
+     "flat": 0
+    },
+    {
+     "week": "2026-10-05",
+     "perDay": 19.2,
+     "medVol": 9734,
+     "volPctOfFront": 70.96,
+     "flat": 0
+    },
+    {
+     "week": "2026-10-12",
+     "perDay": 19.2,
+     "medVol": 12077,
+     "volPctOfFront": 88.04,
+     "flat": 0
+    },
+    {
+     "week": "2026-10-19",
+     "perDay": 19.2,
+     "medVol": 13368,
+     "volPctOfFront": 97.46,
+     "flat": 0
+    },
+    {
+     "week": "2026-10-26",
+     "perDay": 19,
+     "medVol": 14353,
+     "volPctOfFront": 104.64,
+     "flat": 0
+    },
+    {
+     "week": "2026-11-02",
+     "perDay": 22.8,
+     "medVol": 19772,
+     "volPctOfFront": 144.14,
+     "flat": 0
+    }
+   ],
+   "@SP.1": [
+    {
+     "week": "2025-12-15",
+     "perDay": 7,
+     "medVol": 15,
+     "volPctOfFront": 0.06,
+     "flat": 100
+    },
+    {
+     "week": "2026-01-05",
+     "perDay": 5,
+     "medVol": 2,
+     "volPctOfFront": 0.01,
+     "flat": 100
+    },
+    {
+     "week": "2026-01-19",
+     "perDay": 6,
+     "medVol": 4,
+     "volPctOfFront": 0.02,
+     "flat": 100
+    },
+    {
+     "week": "2026-02-02",
+     "perDay": 4,
+     "medVol": 3,
+     "volPctOfFront": 0.01,
+     "flat": 100
+    },
+    {
+     "week": "2026-03-02",
+     "perDay": 4.4,
+     "medVol": 2,
+     "volPctOfFront": 0.01,
+     "flat": 100
+    },
+    {
+     "week": "2026-03-09",
+     "perDay": 4.5,
+     "medVol": 2,
+     "volPctOfFront": 0.01,
+     "flat": 94
+    },
+    {
+     "week": "2026-03-16",
+     "perDay": 3.8,
+     "medVol": 8,
+     "volPctOfFront": 0.03,
+     "flat": 73
+    },
+    {
+     "week": "2026-03-23",
+     "perDay": 4.8,
+     "medVol": 5,
+     "volPctOfFront": 0.02,
+     "flat": 84
+    },
+    {
+     "week": "2026-03-30",
+     "perDay": 5.5,
+     "medVol": 6,
+     "volPctOfFront": 0.02,
+     "flat": 95
+    },
+    {
+     "week": "2026-04-06",
+     "perDay": 10.2,
+     "medVol": 3,
+     "volPctOfFront": 0.01,
+     "flat": 76
+    },
+    {
+     "week": "2026-04-13",
+     "perDay": 13.4,
+     "medVol": 6,
+     "volPctOfFront": 0.02,
+     "flat": 76
+    },
+    {
+     "week": "2026-04-20",
+     "perDay": 10.4,
+     "medVol": 5,
+     "volPctOfFront": 0.02,
+     "flat": 69
+    },
+    {
+     "week": "2026-04-27",
+     "perDay": 9.7,
+     "medVol": 5,
+     "volPctOfFront": 0.02,
+     "flat": 76
+    },
+    {
+     "week": "2026-05-04",
+     "perDay": 14,
+     "medVol": 4,
+     "volPctOfFront": 0.02,
+     "flat": 63
+    },
+    {
+     "week": "2026-05-11",
+     "perDay": 14.5,
+     "medVol": 5,
+     "volPctOfFront": 0.02,
+     "flat": 55
+    },
+    {
+     "week": "2026-05-18",
+     "perDay": 12.7,
+     "medVol": 5,
+     "volPctOfFront": 0.02,
+     "flat": 67
+    },
+    {
+     "week": "2026-05-25",
+     "perDay": 10.5,
+     "medVol": 6,
+     "volPctOfFront": 0.02,
+     "flat": 48
+    },
+    {
+     "week": "2026-06-01",
+     "perDay": 12.7,
+     "medVol": 7,
+     "volPctOfFront": 0.03,
+     "flat": 38
+    },
+    {
+     "week": "2026-06-08",
+     "perDay": 17.2,
+     "medVol": 14,
+     "volPctOfFront": 0.05,
+     "flat": 29
+    },
+    {
+     "week": "2026-06-15",
+     "perDay": 18.5,
+     "medVol": 16,
+     "volPctOfFront": 0.06,
+     "flat": 25
+    },
+    {
+     "week": "2026-06-22",
+     "perDay": 18.8,
+     "medVol": 50,
+     "volPctOfFront": 0.19,
+     "flat": 5
+    },
+    {
+     "week": "2026-06-29",
+     "perDay": 17.5,
+     "medVol": 22,
+     "volPctOfFront": 0.08,
+     "flat": 4
+    },
+    {
+     "week": "2026-07-06",
+     "perDay": 19.2,
+     "medVol": 31,
+     "volPctOfFront": 0.12,
+     "flat": 6
+    },
+    {
+     "week": "2026-07-13",
+     "perDay": 19,
+     "medVol": 44,
+     "volPctOfFront": 0.17,
+     "flat": 4
+    },
+    {
+     "week": "2026-07-20",
+     "perDay": 19.2,
+     "medVol": 34,
+     "volPctOfFront": 0.13,
+     "flat": 3
+    },
+    {
+     "week": "2026-07-27",
+     "perDay": 19.2,
+     "medVol": 48,
+     "volPctOfFront": 0.18,
+     "flat": 3
+    },
+    {
+     "week": "2026-08-03",
+     "perDay": 18.8,
+     "medVol": 22,
+     "volPctOfFront": 0.08,
+     "flat": 6
+    },
+    {
+     "week": "2026-08-10",
+     "perDay": 18.8,
+     "medVol": 18,
+     "volPctOfFront": 0.07,
+     "flat": 14
+    },
+    {
+     "week": "2026-08-17",
+     "perDay": 19.2,
+     "medVol": 43,
+     "volPctOfFront": 0.16,
+     "flat": 3
+    },
+    {
+     "week": "2026-08-24",
+     "perDay": 19.2,
+     "medVol": 58,
+     "volPctOfFront": 0.22,
+     "flat": 3
+    },
+    {
+     "week": "2026-08-31",
+     "perDay": 19.2,
+     "medVol": 112,
+     "volPctOfFront": 0.43,
+     "flat": 1
+    },
+    {
+     "week": "2026-09-07",
+     "perDay": 18.5,
+     "medVol": 689,
+     "volPctOfFront": 2.63,
+     "flat": 0
+    },
+    {
+     "week": "2026-09-14",
+     "perDay": 19.2,
+     "medVol": 17518,
+     "volPctOfFront": 66.99,
+     "flat": 0
+    },
+    {
+     "week": "2026-09-21",
+     "perDay": 19.2,
+     "medVol": 20516,
+     "volPctOfFront": 78.46,
+     "flat": 0
+    },
+    {
+     "week": "2026-09-28",
+     "perDay": 19.2,
+     "medVol": 23379,
+     "volPctOfFront": 89.4,
+     "flat": 0
+    },
+    {
+     "week": "2026-10-05",
+     "perDay": 19.2,
+     "medVol": 19917,
+     "volPctOfFront": 76.16,
+     "flat": 0
+    },
+    {
+     "week": "2026-10-12",
+     "perDay": 19.2,
+     "medVol": 19490,
+     "volPctOfFront": 74.53,
+     "flat": 0
+    },
+    {
+     "week": "2026-10-19",
+     "perDay": 19.2,
+     "medVol": 26150,
+     "volPctOfFront": 100,
+     "flat": 0
+    },
+    {
+     "week": "2026-10-26",
+     "perDay": 19,
+     "medVol": 24894,
+     "volPctOfFront": 95.2,
+     "flat": 0
+    },
+    {
+     "week": "2026-11-02",
+     "perDay": 22.8,
+     "medVol": 36108,
+     "volPctOfFront": 138.08,
+     "flat": 0
+    }
+   ],
+   "@DJ.1": [
+    {
+     "week": "2026-05-04",
+     "perDay": 7,
+     "medVol": 5,
+     "volPctOfFront": 0.21,
+     "flat": 100
+    },
+    {
+     "week": "2026-05-11",
+     "perDay": 1,
+     "medVol": 21,
+     "volPctOfFront": 0.89,
+     "flat": 100
+    },
+    {
+     "week": "2026-05-25",
+     "perDay": 3,
+     "medVol": 2,
+     "volPctOfFront": 0.08,
+     "flat": 100
+    },
+    {
+     "week": "2026-06-01",
+     "perDay": 5,
+     "medVol": 26,
+     "volPctOfFront": 1.1,
+     "flat": 100
+    },
+    {
+     "week": "2026-06-08",
+     "perDay": 8.2,
+     "medVol": 7,
+     "volPctOfFront": 0.3,
+     "flat": 76
+    },
+    {
+     "week": "2026-06-15",
+     "perDay": 8,
+     "medVol": 10,
+     "volPctOfFront": 0.42,
+     "flat": 48
+    },
+    {
+     "week": "2026-06-22",
+     "perDay": 17.6,
+     "medVol": 10,
+     "volPctOfFront": 0.42,
+     "flat": 31
+    },
+    {
+     "week": "2026-06-29",
+     "perDay": 12.8,
+     "medVol": 13,
+     "volPctOfFront": 0.55,
+     "flat": 47
+    },
+    {
+     "week": "2026-07-06",
+     "perDay": 15.2,
+     "medVol": 11,
+     "volPctOfFront": 0.47,
+     "flat": 32
+    },
+    {
+     "week": "2026-07-13",
+     "perDay": 16.7,
+     "medVol": 16,
+     "volPctOfFront": 0.68,
+     "flat": 25
+    },
+    {
+     "week": "2026-07-20",
+     "perDay": 16.2,
+     "medVol": 14,
+     "volPctOfFront": 0.59,
+     "flat": 26
+    },
+    {
+     "week": "2026-07-27",
+     "perDay": 16.8,
+     "medVol": 28,
+     "volPctOfFront": 1.19,
+     "flat": 27
+    },
+    {
+     "week": "2026-08-03",
+     "perDay": 20.2,
+     "medVol": 14,
+     "volPctOfFront": 0.59,
+     "flat": 24
+    },
+    {
+     "week": "2026-08-10",
+     "perDay": 17.4,
+     "medVol": 8,
+     "volPctOfFront": 0.34,
+     "flat": 41
+    },
+    {
+     "week": "2026-08-17",
+     "perDay": 15.5,
+     "medVol": 11,
+     "volPctOfFront": 0.47,
+     "flat": 35
+    },
+    {
+     "week": "2026-08-24",
+     "perDay": 16.3,
+     "medVol": 15,
+     "volPctOfFront": 0.64,
+     "flat": 32
+    },
+    {
+     "week": "2026-08-31",
+     "perDay": 17.3,
+     "medVol": 19,
+     "volPctOfFront": 0.81,
+     "flat": 18
+    },
+    {
+     "week": "2026-09-07",
+     "perDay": 18.3,
+     "medVol": 60,
+     "volPctOfFront": 2.55,
+     "flat": 5
+    },
+    {
+     "week": "2026-09-14",
+     "perDay": 19.2,
+     "medVol": 1362,
+     "volPctOfFront": 57.86,
+     "flat": 0
+    },
+    {
+     "week": "2026-09-21",
+     "perDay": 19.2,
+     "medVol": 1634,
+     "volPctOfFront": 69.41,
+     "flat": 0
+    },
+    {
+     "week": "2026-09-28",
+     "perDay": 19.2,
+     "medVol": 1764,
+     "volPctOfFront": 74.94,
+     "flat": 0
+    },
+    {
+     "week": "2026-10-05",
+     "perDay": 19.2,
+     "medVol": 1932,
+     "volPctOfFront": 82.07,
+     "flat": 0
+    },
+    {
+     "week": "2026-10-12",
+     "perDay": 19.2,
+     "medVol": 1963,
+     "volPctOfFront": 83.39,
+     "flat": 0
+    },
+    {
+     "week": "2026-10-19",
+     "perDay": 19.2,
+     "medVol": 2020,
+     "volPctOfFront": 85.81,
+     "flat": 0
+    },
+    {
+     "week": "2026-10-26",
+     "perDay": 19,
+     "medVol": 2303,
+     "volPctOfFront": 97.83,
+     "flat": 0
+    },
+    {
+     "week": "2026-11-02",
+     "perDay": 22.8,
+     "medVol": 3177,
+     "volPctOfFront": 134.96,
+     "flat": 0
+    }
+   ],
+   "@TFS.1": [
+    {
+     "week": "2026-05-04",
+     "perDay": 6,
+     "medVol": 7,
+     "volPctOfFront": 0.26,
+     "flat": 100
+    },
+    {
+     "week": "2026-05-11",
+     "perDay": 6,
+     "medVol": 8,
+     "volPctOfFront": 0.3,
+     "flat": 100
+    },
+    {
+     "week": "2026-05-18",
+     "perDay": 4.5,
+     "medVol": 3,
+     "volPctOfFront": 0.11,
+     "flat": 100
+    },
+    {
+     "week": "2026-05-25",
+     "perDay": 5,
+     "medVol": 7,
+     "volPctOfFront": 0.26,
+     "flat": 68
+    },
+    {
+     "week": "2026-06-01",
+     "perDay": 5.3,
+     "medVol": 23,
+     "volPctOfFront": 0.86,
+     "flat": 69
+    },
+    {
+     "week": "2026-06-08",
+     "perDay": 7.3,
+     "medVol": 5,
+     "volPctOfFront": 0.19,
+     "flat": 82
+    },
+    {
+     "week": "2026-06-15",
+     "perDay": 9.2,
+     "medVol": 12,
+     "volPctOfFront": 0.45,
+     "flat": 49
+    },
+    {
+     "week": "2026-06-22",
+     "perDay": 16,
+     "medVol": 17,
+     "volPctOfFront": 0.64,
+     "flat": 29
+    },
+    {
+     "week": "2026-06-29",
+     "perDay": 12,
+     "medVol": 18,
+     "volPctOfFront": 0.68,
+     "flat": 38
+    },
+    {
+     "week": "2026-07-06",
+     "perDay": 14.8,
+     "medVol": 15,
+     "volPctOfFront": 0.56,
+     "flat": 30
+    },
+    {
+     "week": "2026-07-13",
+     "perDay": 14.2,
+     "medVol": 11,
+     "volPctOfFront": 0.41,
+     "flat": 16
+    },
+    {
+     "week": "2026-07-20",
+     "perDay": 16.2,
+     "medVol": 18,
+     "volPctOfFront": 0.68,
+     "flat": 26
+    },
+    {
+     "week": "2026-07-27",
+     "perDay": 15,
+     "medVol": 15,
+     "volPctOfFront": 0.56,
+     "flat": 30
+    },
+    {
+     "week": "2026-08-03",
+     "perDay": 15.3,
+     "medVol": 10,
+     "volPctOfFront": 0.38,
+     "flat": 35
+    },
+    {
+     "week": "2026-08-10",
+     "perDay": 14.5,
+     "medVol": 10,
+     "volPctOfFront": 0.38,
+     "flat": 33
+    },
+    {
+     "week": "2026-08-17",
+     "perDay": 16.3,
+     "medVol": 13,
+     "volPctOfFront": 0.49,
+     "flat": 23
+    },
+    {
+     "week": "2026-08-24",
+     "perDay": 14.7,
+     "medVol": 12,
+     "volPctOfFront": 0.45,
+     "flat": 30
+    },
+    {
+     "week": "2026-08-31",
+     "perDay": 15,
+     "medVol": 23,
+     "volPctOfFront": 0.86,
+     "flat": 16
+    },
+    {
+     "week": "2026-09-07",
+     "perDay": 17.8,
+     "medVol": 82,
+     "volPctOfFront": 3.08,
+     "flat": 15
+    },
+    {
+     "week": "2026-09-14",
+     "perDay": 19.2,
+     "medVol": 2099,
+     "volPctOfFront": 78.88,
+     "flat": 0
+    },
+    {
+     "week": "2026-09-21",
+     "perDay": 19.2,
+     "medVol": 2565,
+     "volPctOfFront": 96.39,
+     "flat": 0
+    },
+    {
+     "week": "2026-09-28",
+     "perDay": 19.2,
+     "medVol": 2369,
+     "volPctOfFront": 89.03,
+     "flat": 0
+    },
+    {
+     "week": "2026-10-05",
+     "perDay": 19.2,
+     "medVol": 2872,
+     "volPctOfFront": 107.93,
+     "flat": 0
+    },
+    {
+     "week": "2026-10-12",
+     "perDay": 19.2,
+     "medVol": 2193,
+     "volPctOfFront": 82.41,
+     "flat": 0
+    },
+    {
+     "week": "2026-10-19",
+     "perDay": 19.2,
+     "medVol": 2132,
+     "volPctOfFront": 80.12,
+     "flat": 0
+    },
+    {
+     "week": "2026-10-26",
+     "perDay": 19,
+     "medVol": 2340,
+     "volPctOfFront": 87.94,
+     "flat": 0
+    },
+    {
+     "week": "2026-11-02",
+     "perDay": 22.8,
+     "medVol": 3685,
+     "volPctOfFront": 138.48,
+     "flat": 0
+    }
+   ],
+   "@GC.1": [
+    {
+     "week": "2025-03-17",
+     "perDay": 5,
+     "medVol": 2,
+     "volPctOfFront": 0.04,
+     "flat": 80
+    },
+    {
+     "week": "2025-03-24",
+     "perDay": 1.5,
+     "medVol": 3,
+     "volPctOfFront": 0.06,
+     "flat": 100
+    },
+    {
+     "week": "2025-03-31",
+     "perDay": 9,
+     "medVol": 2,
+     "volPctOfFront": 0.04,
+     "flat": 89
+    },
+    {
+     "week": "2025-06-02",
+     "perDay": 3,
+     "medVol": 1,
+     "volPctOfFront": 0.02,
+     "flat": 89
+    },
+    {
+     "week": "2025-06-09",
+     "perDay": 4,
+     "medVol": 6,
+     "volPctOfFront": 0.12,
+     "flat": 100
+    },
+    {
+     "week": "2025-06-30",
+     "perDay": 4.2,
+     "medVol": 3,
+     "volPctOfFront": 0.06,
+     "flat": 86
+    },
+    {
+     "week": "2025-07-07",
+     "perDay": 3.5,
+     "medVol": 2,
+     "volPctOfFront": 0.04,
+     "flat": 86
+    },
+    {
+     "week": "2025-10-13",
+     "perDay": 2,
+     "medVol": 10,
+     "volPctOfFront": 0.2,
+     "flat": 0
+    },
+    {
+     "week": "2025-10-20",
+     "perDay": 17.3,
+     "medVol": 13,
+     "volPctOfFront": 0.27,
+     "flat": 19
+    },
+    {
+     "week": "2025-10-27",
+     "perDay": 16.5,
+     "medVol": 14,
+     "volPctOfFront": 0.29,
+     "flat": 25
+    },
+    {
+     "week": "2025-11-03",
+     "perDay": 20.3,
+     "medVol": 13,
+     "volPctOfFront": 0.27,
+     "flat": 27
+    },
+    {
+     "week": "2025-12-15",
+     "perDay": 15,
+     "medVol": 10,
+     "volPctOfFront": 0.2,
+     "flat": 25
+    },
+    {
+     "week": "2025-12-22",
+     "perDay": 20.5,
+     "medVol": 19,
+     "volPctOfFront": 0.39,
+     "flat": 18
+    },
+    {
+     "week": "2026-01-26",
+     "perDay": 19.2,
+     "medVol": 79,
+     "volPctOfFront": 1.61,
+     "flat": 0
+    },
+    {
+     "week": "2026-02-02",
+     "perDay": 17.3,
+     "medVol": 66,
+     "volPctOfFront": 1.35,
+     "flat": 0
+    },
+    {
+     "week": "2026-02-23",
+     "perDay": 1,
+     "medVol": 128,
+     "volPctOfFront": 2.61,
+     "flat": 0
+    },
+    {
+     "week": "2026-03-02",
+     "perDay": 19.2,
+     "medVol": 34,
+     "volPctOfFront": 0.69,
+     "flat": 9
+    },
+    {
+     "week": "2026-03-09",
+     "perDay": 18.7,
+     "medVol": 27,
+     "volPctOfFront": 0.55,
+     "flat": 13
+    },
+    {
+     "week": "2026-03-16",
+     "perDay": 17.7,
+     "medVol": 51,
+     "volPctOfFront": 1.04,
+     "flat": 8
+    },
+    {
+     "week": "2026-03-23",
+     "perDay": 19,
+     "medVol": 57,
+     "volPctOfFront": 1.16,
+     "flat": 5
+    },
+    {
+     "week": "2026-03-30",
+     "perDay": 15.3,
+     "medVol": 50,
+     "volPctOfFront": 1.02,
+     "flat": 2
+    },
+    {
+     "week": "2026-04-06",
+     "perDay": 18.8,
+     "medVol": 36,
+     "volPctOfFront": 0.74,
+     "flat": 4
+    },
+    {
+     "week": "2026-04-13",
+     "perDay": 19,
+     "medVol": 32,
+     "volPctOfFront": 0.65,
+     "flat": 11
+    },
+    {
+     "week": "2026-04-20",
+     "perDay": 19,
+     "medVol": 28,
+     "volPctOfFront": 0.57,
+     "flat": 8
+    },
+    {
+     "week": "2026-04-27",
+     "perDay": 17.8,
+     "medVol": 34,
+     "volPctOfFront": 0.69,
+     "flat": 11
+    },
+    {
+     "week": "2026-05-04",
+     "perDay": 18.7,
+     "medVol": 39,
+     "volPctOfFront": 0.8,
+     "flat": 13
+    },
+    {
+     "week": "2026-05-11",
+     "perDay": 19,
+     "medVol": 56,
+     "volPctOfFront": 1.14,
+     "flat": 4
+    },
+    {
+     "week": "2026-05-18",
+     "perDay": 18.7,
+     "medVol": 48,
+     "volPctOfFront": 0.98,
+     "flat": 6
+    },
+    {
+     "week": "2026-05-25",
+     "perDay": 18.8,
+     "medVol": 61,
+     "volPctOfFront": 1.25,
+     "flat": 5
+    },
+    {
+     "week": "2026-06-01",
+     "perDay": 19.2,
+     "medVol": 76,
+     "volPctOfFront": 1.55,
+     "flat": 0
+    },
+    {
+     "week": "2026-06-08",
+     "perDay": 19.2,
+     "medVol": 117,
+     "volPctOfFront": 2.39,
+     "flat": 0
+    },
+    {
+     "week": "2026-06-15",
+     "perDay": 18.5,
+     "medVol": 96,
+     "volPctOfFront": 1.96,
+     "flat": 0
+    },
+    {
+     "week": "2026-06-22",
+     "perDay": 19.2,
+     "medVol": 96,
+     "volPctOfFront": 1.96,
+     "flat": 0
+    },
+    {
+     "week": "2026-06-29",
+     "perDay": 18.5,
+     "medVol": 97,
+     "volPctOfFront": 1.98,
+     "flat": 0
+    },
+    {
+     "week": "2026-07-06",
+     "perDay": 19.2,
+     "medVol": 126,
+     "volPctOfFront": 2.57,
+     "flat": 0
+    },
+    {
+     "week": "2026-07-13",
+     "perDay": 19.2,
+     "medVol": 156,
+     "volPctOfFront": 3.19,
+     "flat": 0
+    },
+    {
+     "week": "2026-07-20",
+     "perDay": 19.2,
+     "medVol": 308,
+     "volPctOfFront": 6.29,
+     "flat": 0
+    },
+    {
+     "week": "2026-07-27",
+     "perDay": 19.2,
+     "medVol": 2502,
+     "volPctOfFront": 51.1,
+     "flat": 0
+    },
+    {
+     "week": "2026-08-03",
+     "perDay": 19.2,
+     "medVol": 4525,
+     "volPctOfFront": 92.42,
+     "flat": 0
+    },
+    {
+     "week": "2026-08-10",
+     "perDay": 19.2,
+     "medVol": 4425,
+     "volPctOfFront": 90.38,
+     "flat": 0
+    },
+    {
+     "week": "2026-08-17",
+     "perDay": 19.2,
+     "medVol": 4566,
+     "volPctOfFront": 93.26,
+     "flat": 0
+    },
+    {
+     "week": "2026-08-24",
+     "perDay": 19.2,
+     "medVol": 5468,
+     "volPctOfFront": 111.68,
+     "flat": 0
+    },
+    {
+     "week": "2026-08-31",
+     "perDay": 19.2,
+     "medVol": 5254,
+     "volPctOfFront": 107.31,
+     "flat": 0
+    },
+    {
+     "week": "2026-09-07",
+     "perDay": 18.8,
+     "medVol": 4876,
+     "volPctOfFront": 99.59,
+     "flat": 0
+    },
+    {
+     "week": "2026-09-14",
+     "perDay": 19.2,
+     "medVol": 5396,
+     "volPctOfFront": 110.21,
+     "flat": 0
+    },
+    {
+     "week": "2026-09-21",
+     "perDay": 19.2,
+     "medVol": 5057,
+     "volPctOfFront": 103.29,
+     "flat": 0
+    },
+    {
+     "week": "2026-09-28",
+     "perDay": 19.2,
+     "medVol": 5111,
+     "volPctOfFront": 104.39,
+     "flat": 0
+    },
+    {
+     "week": "2026-10-05",
+     "perDay": 19.2,
+     "medVol": 4532,
+     "volPctOfFront": 92.57,
+     "flat": 0
+    },
+    {
+     "week": "2026-10-12",
+     "perDay": 19.2,
+     "medVol": 4427,
+     "volPctOfFront": 90.42,
+     "flat": 0
+    },
+    {
+     "week": "2026-10-19",
+     "perDay": 19.2,
+     "medVol": 5050,
+     "volPctOfFront": 103.15,
+     "flat": 0
+    },
+    {
+     "week": "2026-10-26",
+     "perDay": 19,
+     "medVol": 4750,
+     "volPctOfFront": 97.02,
+     "flat": 0
+    },
+    {
+     "week": "2026-11-02",
+     "perDay": 22.8,
+     "medVol": 5756,
+     "volPctOfFront": 117.57,
+     "flat": 0
+    }
+   ]
+  },
+  "replayEffectPerMarket": {
+   "nq": {
+    "window": "2026-05-04 .. 2026-09-22",
+    "before": {
+     "n": 18,
+     "R": 8.22,
+     "perTrade": 0.457
+    },
+    "after": {
+     "n": 19,
+     "R": 3.48,
+     "perTrade": 0.183
+    },
+    "sameSignal": 8,
+    "wholeReplay": {
+     "before": {
+      "n": 45,
+      "R": 10.4,
+      "perTrade": 0.231
+     },
+     "after": {
+      "n": 48,
+      "R": 7.79,
+      "perTrade": 0.162
+     }
+    }
+   },
+   "es": {
+    "window": "2026-05-06 .. 2026-09-14",
+    "before": {
+     "n": 21,
+     "R": 11.18,
+     "perTrade": 0.532
+    },
+    "after": {
+     "n": 11,
+     "R": 3.72,
+     "perTrade": 0.338
+    },
+    "sameSignal": 6,
+    "wholeReplay": {
+     "before": {
+      "n": 64,
+      "R": 28.68,
+      "perTrade": 0.448
+     },
+     "after": {
+      "n": 56,
+      "R": 21.28,
+      "perTrade": 0.38
+     }
+    }
+   },
+   "ym": {
+    "window": "2026-07-01 .. 2026-09-14",
+    "before": {
+     "n": 14,
+     "R": 5.44,
+     "perTrade": 0.389
+    },
+    "after": {
+     "n": 6,
+     "R": 1.51,
+     "perTrade": 0.252
+    },
+    "sameSignal": 3,
+    "wholeReplay": {
+     "before": {
+      "n": 58,
+      "R": 14.47,
+      "perTrade": 0.249
+     },
+     "after": {
+      "n": 53,
+      "R": 10.68,
+      "perTrade": 0.202
+     }
+    }
+   },
+   "rty": {
+    "window": "2026-06-22 .. 2026-09-15",
+    "before": {
+     "n": 14,
+     "R": 7.15,
+     "perTrade": 0.511
+    },
+    "after": {
+     "n": 0,
+     "R": 0,
+     "perTrade": null
+    },
+    "sameSignal": 0,
+    "wholeReplay": {
+     "before": {
+      "n": 25,
+      "R": 8.81,
+      "perTrade": 0.352
+     },
+     "after": {
+      "n": 11,
+      "R": 1.66,
+      "perTrade": 0.151
+     }
+    }
+   },
+   "gc": {
+    "window": "2026-03-02 .. 2026-07-28",
+    "before": {
+     "n": 24,
+     "R": -0.93,
+     "perTrade": -0.039
+    },
+    "after": {
+     "n": 21,
+     "R": 9.39,
+     "perTrade": 0.447
+    },
+    "sameSignal": 12,
+    "wholeReplay": {
+     "before": {
+      "n": 59,
+      "R": 2.11,
+      "perTrade": 0.036
+     },
+     "after": {
+      "n": 57,
+      "R": 11.43,
+      "perTrade": 0.201
+     }
+    }
+   }
+  }
+ },
+ "replayATotals": {
+  "base": {
+   "n": 251,
+   "R": 61.87
+  },
+  "dailyRollFix": {
+   "n": 251,
+   "R": 64.47
+  },
+  "bothFixes": {
+   "n": 225,
+   "R": 52.84
+  }
+ }
+}
