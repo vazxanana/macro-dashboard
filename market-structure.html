@@ -280,6 +280,18 @@
   .ms-grid4[data-view="1d"] .ms-pane:not([data-tf="1d"]), .ms-grid4[data-view="4h"] .ms-pane:not([data-tf="4h"]), .ms-grid4[data-view="1h"] .ms-pane:not([data-tf="1h"]),
   .ms-grid4[data-view="15m"] .ms-pane:not([data-tf="15m"]), .ms-grid4[data-view="5m"] .ms-pane:not([data-tf="5m"]), .ms-grid4[data-view="1m"] .ms-pane:not([data-tf="1m"]) { display: none; }
   .ms-grid4[data-view="all"] .ms-pane:last-child:nth-child(odd) { grid-column: 1 / -1; }
+  .ms-grid4.ms-grid4[data-view="split"] { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .ms-grid4:not([data-view="split"]) .ms-splitc { display: none; }
+  .ms-grid4[data-view="split"] .ms-splitc { order: 2; } .ms-grid4[data-view="split"] .ms-pane:not(.ms-splitc) { order: 1; }
+  .ms-grid4[data-view="split"] .ms-chart { height: min(70vh, 660px); min-height: 380px; }
+  .ms-grid4[data-view="split"][data-split-l="1d"] .ms-pane:not([data-tf="1d"]):not(.ms-splitc) { display: none; }
+  .ms-grid4[data-view="split"][data-split-l="4h"] .ms-pane:not([data-tf="4h"]):not(.ms-splitc) { display: none; }
+  .ms-grid4[data-view="split"][data-split-l="1h"] .ms-pane:not([data-tf="1h"]):not(.ms-splitc) { display: none; }
+  .ms-grid4[data-view="split"][data-split-l="15m"] .ms-pane:not([data-tf="15m"]):not(.ms-splitc) { display: none; }
+  .ms-grid4[data-view="split"][data-split-l="5m"] .ms-pane:not([data-tf="5m"]):not(.ms-splitc) { display: none; }
+  .ms-grid4[data-view="split"][data-split-l="1m"] .ms-pane:not([data-tf="1m"]):not(.ms-splitc) { display: none; }
+  @media (max-width: 900px) { .ms-grid4.ms-grid4[data-view="split"] { grid-template-columns: minmax(0, 1fr); } .ms-grid4[data-view="split"] .ms-chart { height: min(46vh, 420px); min-height: 300px; } }
+
   .ms-grid4:not([data-view="all"]) .ms-chart { height: min(70vh, 660px); min-height: 380px; }
   .ms-pane { border-radius: 8px; }
   .how { color: var(--ink-dim); font-size: 13px; }
@@ -2474,10 +2486,25 @@ html[data-motion="off"][data-gate] .gate-bg path[stroke] { animation: none; stro
       <div class="pa-chips" id="ms-pa-chips" hidden></div>
       <div class="mtf" id="ms-mtf" role="group" aria-label="Timeframe alignment: last structure break per timeframe" hidden></div>
       <div class="seg" role="group" aria-label="Chart view">
-        <button type="button" data-view="1d">D1</button><button type="button" data-view="4h">H4</button><button type="button" data-view="1h">H1</button><button type="button" data-view="15m">M15</button><button type="button" data-view="5m">M5</button><button type="button" data-view="1m">M1</button><button type="button" data-view="all">All</button>
+        <button type="button" data-view="1d">D1</button><button type="button" data-view="4h">H4</button><button type="button" data-view="1h">H1</button><button type="button" data-view="15m">M15</button><button type="button" data-view="5m">M5</button><button type="button" data-view="1m">M1</button><button type="button" data-view="all">All</button><button type="button" data-view="split" title="Two charts side by side, with sync settings">Split</button>
       </div>
     </div>
+    <div class="sp-bar" id="ms-sp-bar" hidden>
+      <label>Left <select id="ms-sp-ltf" aria-label="Left chart timeframe"></select></label>
+      <span class="sp-sep" aria-hidden="true"></span>
+      <label>Right <select id="ms-sp-sym" aria-label="Right chart market"></select></label>
+      <select id="ms-sp-rtf" aria-label="Right chart timeframe"></select>
+      <details class="sp-sync"><summary>Sync</summary><div class="sp-pop" role="group" aria-label="Sync in layout">
+        <div class="sp-h">Sync in layout</div>
+        <label title="The right chart shows the same market as the page"><span>Symbol</span><input type="checkbox" data-sync="sym" checked></label>
+        <label title="The right chart uses the left chart's timeframe"><span>Interval</span><input type="checkbox" data-sync="tf"></label>
+        <label title="The crosshair moves on both charts"><span>Crosshair</span><input type="checkbox" data-sync="cross" checked></label>
+        <label title="Scrolling one chart scrolls the other to the same time"><span>Time</span><input type="checkbox" data-sync="time" checked></label>
+        <label title="Both charts show exactly the same date range (zoom too)"><span>Date range</span><input type="checkbox" data-sync="range" checked></label>
+      </div></details>
+    </div>
     <div class="ms-grid4">
+      <div class="ms-pane ms-splitc" data-tf="split"><div class="ms-ph"><b id="ms-sp-t">—</b><span class="ms-role" id="ms-sp-src"></span></div><div class="ms-legend" id="ms-sp-lg"></div><div class="ms-chart sp-chart" id="ms-sp-c"></div></div>
       <div class="ms-pane" data-tf="1d"><div class="ms-ph"><b>D1</b><span class="ms-role">Bias</span><span class="ms-chip" id="ms-t-1d">—</span><span class="ms-cd" id="ms-cd-1d" title="Time until this candle closes"></span></div><div class="ms-legend" id="ms-l-1d"></div><div class="ms-chart" id="ms-c-1d"></div><div class="ms-ro" id="ms-r-1d"></div></div>
       <div class="ms-pane" data-tf="4h"><div class="ms-ph"><b>H4</b><span class="ms-role">Direction · BO</span><span class="ms-chip" id="ms-t-4h">—</span><span class="ms-cd" id="ms-cd-4h" title="Time until this candle closes"></span></div><div class="ms-legend" id="ms-l-4h"></div><div class="ms-chart" id="ms-c-4h"></div><div class="ms-ro" id="ms-r-4h"></div></div>
       <div class="ms-pane" data-tf="1h"><div class="ms-ph"><b>H1</b><span class="ms-role">VR · CF</span><span class="ms-chip" id="ms-t-1h">—</span><span class="ms-cd" id="ms-cd-1h" title="Time until this candle closes"></span></div><div class="ms-legend" id="ms-l-1h"></div><div class="ms-chart" id="ms-c-1h"></div><div class="ms-ro" id="ms-r-1h"></div></div>
@@ -4623,6 +4650,7 @@ function msNextSetup(bars, A) {
     { const K = candleCols(); Object.values(panes).forEach((p) => { try { p.series.applyOptions(K); if (p.setVol) p.setVol(); } catch (e) {} });
       try { [GV.series, TV.series].forEach((s2) => { if (s2) s2.applyOptions(K); }); } catch (e) { /* trade viewers not set up yet */ } }
     if (typeof drawHLines === 'function') setTimeout(drawHLines, 0);
+    if (window.msSplitTheme) window.msSplitTheme();
     $('ms-theme').textContent = `Theme: ${{ dark: 'Dark', light: 'Light', midnight: 'Midnight', pro: 'Pro' }[G.theme] || 'Dark'}`; $('ms-theme').title = 'Switch theme: Dark, Light, Midnight, Pro';
   }
   function applyAlertsBtn() {
@@ -4666,11 +4694,74 @@ function msNextSetup(bars, A) {
   root.querySelectorAll('.ms-coin').forEach((c) => { c.style.background = `radial-gradient(circle at 35% 35%, #ffffffaa, ${INST.color})`; });
   const grid4 = root.querySelector('.ms-grid4');
   function setView(v) {
-    grid4.dataset.view = v;
+    grid4.dataset.view = v; if (window.msSplitView) setTimeout(() => window.msSplitView(v === 'split'), 0);
     root.querySelectorAll('[data-view]').forEach((b) => { const on = b.dataset.view === v; b.classList.toggle('on', on); b.setAttribute('aria-pressed', String(on)); });
     try { localStorage.setItem('msView', v); } catch (e) {}
     setTimeout(() => Object.values(panes).forEach((p) => p.fit()), 60);
   }
+
+  // split layout (7 Nov, owner: "let people put 2 chart screens side by side" with TradingView-style sync settings)
+  // left = one of the analysed timeframe charts; right = a free chart (any market, any timeframe), synced by the toggles
+  const SP = { on: false, ltf: '1h', rtf: '15m', sym: instKey, sync: { sym: true, tf: false, cross: true, time: true, range: true }, chart: null, series: null, bars: [], key: '', busy: false, unsub: [] };
+  try { Object.assign(SP, JSON.parse(localStorage.getItem('ms-split') || '{}'), { on: false, chart: null, series: null, bars: [], key: '', busy: false, unsub: [] }); SP.sync = Object.assign({ sym: true, tf: false, cross: true, time: true, range: true }, SP.sync || {}); } catch (e) {}
+  const spSave = () => { try { localStorage.setItem('ms-split', JSON.stringify({ ltf: SP.ltf, rtf: SP.rtf, sym: SP.sym, sync: SP.sync })); } catch (e) {} };
+  const spSym = () => (SP.sync.sym ? instKey : SP.sym), spTf = () => (SP.sync.tf ? SP.ltf : SP.rtf);
+  function spInit() {
+    const lt = document.getElementById('ms-sp-ltf'), rt = document.getElementById('ms-sp-rtf'), sy = document.getElementById('ms-sp-sym'); if (!lt || lt.options.length) return;
+    const opts = TFS.map((t) => `<option value="${t.id}">${t.label}</option>`).join(''); lt.innerHTML = opts; rt.innerHTML = opts;
+    const groups = {}; Object.entries(INSTRUMENTS).forEach(([k, v]) => { (groups[v.group] = groups[v.group] || []).push(`<option value="${k}">${v.label}</option>`); });
+    sy.innerHTML = Object.entries(groups).map(([g, o]) => `<optgroup label="${g}">${o.join('')}</optgroup>`).join('');
+    lt.addEventListener('change', () => { SP.ltf = lt.value; spSave(); spApply(); });
+    rt.addEventListener('change', () => { SP.rtf = rt.value; spSave(); spLoad(); });
+    sy.addEventListener('change', () => { SP.sym = sy.value; spSave(); spLoad(); });
+    document.querySelectorAll('[data-sync]').forEach((c) => { c.checked = !!SP.sync[c.dataset.sync]; c.addEventListener('change', () => { SP.sync[c.dataset.sync] = c.checked; spSave(); spApply(); }); });
+    document.addEventListener('click', (ev) => { const d = document.querySelector('.sp-sync[open]'); if (d && !d.contains(ev.target)) d.open = false; });
+  }
+  function spControls() { const lt = document.getElementById('ms-sp-ltf'), rt = document.getElementById('ms-sp-rtf'), sy = document.getElementById('ms-sp-sym');
+    lt.value = SP.ltf; rt.value = spTf(); rt.disabled = SP.sync.tf; sy.value = spSym(); sy.disabled = SP.sync.sym; }
+  function spTheme() { if (!SP.chart) return; const t = THEMES[G.theme] || THEMES.dark;
+    SP.chart.applyOptions({ layout: { background: { type: 'gradient', topColor: t.bgTop || t.bg, bottomColor: t.bg }, textColor: t.text }, rightPriceScale: { borderVisible: false }, timeScale: { borderVisible: false } });
+    if (SP.series) SP.series.applyOptions(candleCols()); }
+  window.msSplitTheme = spTheme;
+  function spChart() { if (SP.chart) return; const el = document.getElementById('ms-sp-c'); if (!el) return;
+    SP.chart = LW.createChart(el, { autoSize: true, layout: { fontSize: 11, fontFamily: 'Figtree, -apple-system, "Segoe UI", Roboto, sans-serif' }, grid: { vertLines: { visible: false }, horzLines: { visible: false } }, crosshair: { mode: LW.CrosshairMode.Normal }, timeScale: { timeVisible: true, secondsVisible: false, rightOffset: 6 } });
+    SP.series = SP.chart.addCandlestickSeries({ ...candleCols(), priceLineStyle: LW.LineStyle.Dotted });
+    spTheme();
+    const lg = document.getElementById('ms-sp-lg');
+    SP.chart.subscribeCrosshairMove((pr) => { const b = pr && pr.time != null && SP.bars.find((x) => x.time === pr.time); const I = INSTRUMENTS[spSym()] || INST, d = I.dec ?? 2, f = (v) => (+v).toLocaleString('en-US', { minimumFractionDigits: d, maximumFractionDigits: d });
+      const B = b || SP.bars[SP.bars.length - 1]; if (lg && B) lg.innerHTML = `<span class="k">O</span><b>${f(B.open)}</b> <span class="k">H</span><b>${f(B.high)}</b> <span class="k">L</span><b>${f(B.low)}</b> <span class="k">C</span><b class="${B.close >= B.open ? 'up' : 'dn'}">${f(B.close)}</b>`; });
+  }
+  async function spLoad() {
+    if (!SP.on) return; spChart(); spControls(); const k = spSym(), tf = spTf(), I = INSTRUMENTS[k], key = `${k}|${tf}`; if (!I || !SP.series) return;
+    const T = TFS.find((t) => t.id === tf); document.getElementById('ms-sp-t').textContent = `${I.label} · ${T ? T.label : tf}`;
+    if (SP.key !== key) { SP.key = key; SP.series.setData([]); SP.bars = []; }
+    try { const r = await fetchBars(TFS.find((t) => t.id === tf) || TFS[2], I, 500); if (SP.key !== key || !r || !r.bars || !r.bars.length) return;
+      SP.bars = r.bars.map((b) => ({ time: b.time + TZ, open: +b.open, high: +b.high, low: +b.low, close: +b.close }));
+      SP.series.applyOptions({ priceFormat: { type: 'price', precision: I.dec ?? 2, minMove: Math.pow(10, -(I.dec ?? 2)) } });
+      SP.series.setData(SP.bars); document.getElementById('ms-sp-src').textContent = r.src || '';
+      if (SP.sync.range || SP.sync.time) spFromLeft(); else SP.chart.timeScale().fitContent();
+    } catch (e) { document.getElementById('ms-sp-src').textContent = 'no data'; }
+  }
+  const leftP = () => panes[SP.ltf];
+  function spFromLeft() { const L = leftP(); if (!L || !SP.chart || SP.busy) return; const vr = L.chart.timeScale().getVisibleRange(); if (!vr) return; SP.busy = true;
+    try { if (SP.sync.range) SP.chart.timeScale().setVisibleRange(vr);
+      else if (SP.sync.time) { const ts = SP.chart.timeScale(), cur = ts.getVisibleRange(); if (cur) { const w = cur.to - cur.from; ts.setVisibleRange({ from: vr.to - w, to: vr.to }); } } } catch (e) {} finally { setTimeout(() => { SP.busy = false; }, 0); } }
+  function spToLeft() { const L = leftP(); if (!L || !SP.chart || SP.busy) return; const vr = SP.chart.timeScale().getVisibleRange(); if (!vr) return; SP.busy = true;
+    try { if (SP.sync.range) L.chart.timeScale().setVisibleRange(vr);
+      else if (SP.sync.time) { const ts = L.chart.timeScale(), cur = ts.getVisibleRange(); if (cur) ts.setVisibleRange({ from: vr.to - (cur.to - cur.from), to: vr.to }); } } catch (e) {} finally { setTimeout(() => { SP.busy = false; }, 0); } }
+  const barAtT = (B, t) => { let lo = 0, hi = B.length - 1, r = null; while (lo <= hi) { const m = (lo + hi) >> 1; if (B[m].time <= t) { r = B[m]; lo = m + 1; } else hi = m - 1; } return r; };
+  function spWire() { SP.unsub.forEach((f) => { try { f(); } catch (e) {} }); SP.unsub = []; const L = leftP(); if (!L || !SP.chart) return;
+    const onL = () => { if (SP.on && (SP.sync.range || SP.sync.time)) spFromLeft(); }, onR = () => { if (SP.on && (SP.sync.range || SP.sync.time)) spToLeft(); };
+    L.chart.timeScale().subscribeVisibleTimeRangeChange(onL); SP.chart.timeScale().subscribeVisibleTimeRangeChange(onR);
+    const cxL = (pr) => { if (!SP.on || !SP.sync.cross || SP.cx) return; SP.cx = 1; try { const b = pr && pr.time != null ? barAtT(SP.bars, pr.time) : null; if (b) SP.chart.setCrosshairPosition(b.close, b.time, SP.series); else SP.chart.clearCrosshairPosition(); } catch (e) {} SP.cx = 0; };
+    const cxR = (pr) => { if (!SP.on || !SP.sync.cross || SP.cx) return; SP.cx = 1; try { const b = pr && pr.time != null && L.bars ? barAtT(L.bars, pr.time) : null; if (b) L.chart.setCrosshairPosition(b.close, b.time, L.series); else L.chart.clearCrosshairPosition(); } catch (e) {} SP.cx = 0; };
+    L.chart.subscribeCrosshairMove(cxL); SP.chart.subscribeCrosshairMove(cxR);
+    SP.unsub.push(() => L.chart.timeScale().unsubscribeVisibleTimeRangeChange(onL), () => SP.chart.timeScale().unsubscribeVisibleTimeRangeChange(onR), () => L.chart.unsubscribeCrosshairMove(cxL), () => SP.chart.unsubscribeCrosshairMove(cxR)); }
+  function spApply() { grid4.dataset.splitL = SP.ltf; if (!SP.on) return; spChart(); spControls(); spWire(); spLoad(); }
+  window.msSplitView = (on) => { SP.on = on; const bar = document.getElementById('ms-sp-bar'); if (bar) bar.hidden = !on; if (on) { spInit(); spApply(); } };
+  setInterval(async () => { if (!SP.on || document.hidden || !SP.series || !SP.bars.length) return; const k = spSym(), tf = spTf(), I = INSTRUMENTS[k], key = SP.key;
+    try { const r = await fetchBars(TFS.find((t) => t.id === tf) || TFS[2], I, 3); if (SP.key !== key || !r || !r.bars) return; r.bars.forEach((b) => { const x = { time: b.time + TZ, open: +b.open, high: +b.high, low: +b.low, close: +b.close }; const last = SP.bars[SP.bars.length - 1];
+      if (x.time === last.time) SP.bars[SP.bars.length - 1] = x; else if (x.time > last.time) SP.bars.push(x); else return; try { SP.series.update(x); } catch (e) {} }); } catch (e) {} }, 15e3);
   if (root.querySelector('[data-view]')) {
     root.querySelectorAll('[data-view]').forEach((b) => b.addEventListener('click', () => setView(b.dataset.view)));
     let v0 = null; try { v0 = localStorage.getItem('msView'); } catch (e) {}
@@ -7967,6 +8058,25 @@ function gpStats(T) {
 .edge-t th, .edge-t td { padding: 7px 8px; border-bottom: 1px solid var(--line); text-align: right; white-space: nowrap; } .edge-t th:first-child, .edge-t td:nth-child(2) { text-align: left; } .edge-t thead th { font-size: 11.5px; color: var(--ink-dim); font-weight: 600; }
 .edge-t td small { color: var(--ink-dim); } .edge-t .pos { color: var(--buy); font-weight: 600; } .edge-t .neg { color: var(--sell); font-weight: 600; }
 .edge-t tr.edge { background: color-mix(in srgb, var(--buy) 7%, transparent); } .edge-t tr.avoid { background: color-mix(in srgb, var(--sell) 6%, transparent); }
+.seg[aria-label="Chart view"] { max-width: 100%; min-width: 0; overflow-x: auto; scrollbar-width: none; } .seg[aria-label="Chart view"]::-webkit-scrollbar { display: none; } .seg[aria-label="Chart view"] > button { flex: none; }
+@media (max-width: 520px) { .sp-sep { display: none; } .sp-pop { left: auto; right: 0; } }
+.ms-grid4[data-view="split"], .sp-bar { min-width: 0; max-width: 100%; } .ms-grid4[data-view="split"] .ms-pane { min-width: 0; overflow: hidden; } .sp-bar select { max-width: 46vw; }
+#v-charts { grid-template-columns: minmax(0, 1fr); } #v-charts > * { min-width: 0; }
+.sp-bar { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 10px; margin: 0 0 10px; font-size: 12.5px; color: var(--ink-dim); }
+.sp-bar[hidden] { display: none; } .sp-bar label { display: inline-flex; align-items: center; gap: 6px; }
+.sp-bar select { font: inherit; color: var(--ink); background: var(--panel); border: 1px solid var(--line); border-radius: 8px; min-height: 32px; padding: 2px 8px; }
+.sp-sep { width: 1px; height: 20px; background: var(--line); }
+.sp-sync { position: relative; } .sp-sync > summary { list-style: none; cursor: pointer; min-height: 32px; display: inline-flex; align-items: center; padding: 2px 12px; border: 1px solid var(--line); border-radius: 8px; color: var(--ink); background: var(--panel); font-weight: 600; }
+.sp-sync > summary::-webkit-details-marker { display: none; } .sp-sync[open] > summary { border-color: var(--accent); }
+.sp-sync:not([open]) .sp-pop { display: none; }
+.sp-pop { position: absolute; z-index: 30; top: calc(100% + 6px); left: 0; width: 230px; padding: 10px 12px; border-radius: 12px; border: 1px solid var(--line); background: var(--panel); box-shadow: 0 10px 30px rgba(0,0,0,.3); }
+.sp-pop .sp-h { font-size: 11px; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; color: var(--ink-dim); margin-bottom: 6px; }
+.sp-pop label { display: flex; justify-content: space-between; align-items: center; padding: 6px 0; color: var(--ink); font-size: 13.5px; cursor: pointer; }
+.sp-pop input { appearance: none; -webkit-appearance: none; width: 34px; height: 20px; border-radius: 10px; background: var(--line); position: relative; cursor: pointer; transition: background .15s; margin: 0; }
+.sp-pop input::after { content: ''; position: absolute; top: 2px; left: 2px; width: 16px; height: 16px; border-radius: 50%; background: #fff; transition: transform .15s; box-shadow: 0 1px 2px rgba(0,0,0,.3); }
+.sp-pop input:checked { background: var(--accent); } .sp-pop input:checked::after { transform: translateX(14px); }
+.sp-pop input:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+@media (prefers-reduced-motion: reduce) { .sp-pop input, .sp-pop input::after { transition: none; } }
 .wl { display: flex; gap: 6px; width: 0; min-width: 100%; box-sizing: border-box; overflow-x: auto; scrollbar-width: none; margin: 4px 0 12px; padding-bottom: 2px; }
 .wl[hidden] { display: none; } .wl::-webkit-scrollbar { display: none; }
 .wl-i { flex: none; display: inline-flex; align-items: baseline; gap: 6px; padding: 6px 10px; border-radius: 9px; border: 1px solid var(--line); background: var(--panel); color: var(--ink); text-decoration: none; font-size: 12.5px; font-variant-numeric: tabular-nums; }
