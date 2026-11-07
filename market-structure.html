@@ -1629,6 +1629,9 @@ html[data-motion="off"] .stagger-in > * { animation: none; }
 .ms-srow .lv-d { font: 600 10.5px var(--sans); color: var(--ink-faint); white-space: nowrap; padding: 1px 6px; border-radius: 999px; border: 1px dashed var(--line); }
 .ms-srow .lv-d.at { color: var(--accent); border: 1px solid color-mix(in srgb, var(--accent) 45%, transparent); background: var(--accent-soft, rgba(91,140,255,.12)); }
 :root[data-theme="pro"] .ms-srow .lv-d { border-radius: 3px; }
+
+.ms-tr-g .tr-d { font: 500 10px var(--sans); font-style: normal; text-transform: none; letter-spacing: 0; color: var(--ink-faint); margin-top: 1px; }
+.ms-tr-g .tr-d.at { color: var(--accent); font-weight: 600; }
 </style>
 <script>try{if(localStorage.getItem('msMotion')==='off')document.documentElement.dataset.motion='off'}catch(e){}</script>
 </head>
@@ -3017,7 +3020,7 @@ function msNextSetup(bars, A) {
       return `<button type="button" class="ms-trade${t.k === G.sel ? ' sel' : ''}${t.invalid ? ' invalid' : ''}" data-k="${t.k}" aria-pressed="${t.k === G.sel}">` +
         `<div class="ms-tr-h"><span class="ms-chip ${t.sell ? 'ms-chip-sell' : 'ms-chip-buy'}">${t.sell ? 'SELL' : 'BUY'}</span><b>${t.name}</b><small>${t.pair}</small>${tag}<span class="ms-st ${t.cls}">${t.state}</span></div>` +
         `<div class="ms-rr" aria-hidden="true"><i style="width:${riskPct.toFixed(0)}%"></i><b></b><em></em></div>` +
-        `<div class="ms-tr-g"><span>Entry<b>${fmt(t.entry)}</b></span><span>Stop<b class="neg">${fmt(t.stop)}</b></span><span>Target 1<b class="pos">${fmt(t.t1)}</b></span>` +
+        `<div class="ms-tr-g"><span>Entry<b>${fmt(t.entry)}</b>${(() => { const rk = Math.abs(t.entry - t.stop); if (t.invalid || !rk || !isFinite(price)) return ''; const a = (t.sell ? t.entry - price : price - t.entry) / rk; return Math.abs(a) < 0.05 ? '<em class="tr-d at">at entry</em>' : `<em class="tr-d">${Math.abs(a).toFixed(1)}R away</em>`; })()}</span><span>Stop<b class="neg">${fmt(t.stop)}</b></span><span>Target 1<b class="pos">${fmt(t.t1)}</b></span>` +
         `<span>Target 2<b class="pos">${fmt(t.t2)}</b></span><span>Reward : risk<b>${t.rr.toFixed(1)} R</b></span><span>Size<b>${size}</b></span></div>` +
         `<div class="ms-tr-q">${t.stopWhy && !t.invalid ? `<span class="ms-q">Stop past ${t.stopWhy} + ${fmt(t.buf)}</span>` : ''}` +
         `${t.retr !== null ? `<span class="ms-q ${t.retr >= 0.5 ? 'good' : 'weak'}">Pullback ${t.retr >= 1 ? '100%+' : Math.round(t.retr * 100) + '%'} · ${t.retr >= 0.5 ? 'main structure' : 'internal structure'}</span>` : ''}</div>` +
