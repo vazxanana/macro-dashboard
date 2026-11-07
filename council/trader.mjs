@@ -29,6 +29,7 @@ const MARKETS = {
 const TFS = [['1d', 1440, 86400], ['4h', 240, 14400], ['1h', 60, 3600], ['15m', 15, 900], ['5m', 5, 300], ['1m', 1, 60]];
 // gold also reads M30: the trader marks M30 structure, and M30 → M1 against D1 is the gold setup that held in the 150-day replay
 const M30_MARKETS = new Set(['xau']);
+const OANDA_D1 = new Set(['xau', 'eurusd', 'gbpusd', 'audusd', 'usdcad', 'usdchf']), MD_BASE = process.env.MD_BASE || 'https://meridianx.dev/md/';   // D1 trend source for spot markets (7 Nov)
 const TFS_M30 = TFS.slice(0, 3).concat([['30m', 30, 1800]], TFS.slice(3));
 LBL['30m'] = 'M30';
 const PAIRS_T = PAIRS.concat([{ k: 'm30m1', name: 'M30', h: '30m', l: '1m', e: 'M1', up: '1h' }]);
@@ -454,6 +455,16 @@ for (const [key, M] of Object.entries(MARKETS)) {
       src[id].bars = src[id].bars.map((b) => ({ time: b.time, open: b.open + off, high: b.high + off, low: b.low + off, close: b.close + off }));
       src[id].A = msAnalyze(src[id].bars, 6);
     }
+    // D1 trend from OANDA spot (owner 7 Nov): Kraken's PAXG daily candles (weekend candles, a different history window) kept gold
+    // "up" since a 27 Jan 2026 break while spot broke down on 30 Oct, so the council's "with / against D1" disagreed with the charts.
+    // Gold and forex now take the D1 trend (only the trend label; the D1 candles the systems trade on stay Kraken) from the same
+    // OANDA feed the site charts use; if it can't be read, the Kraken trend stays. Replay check: against D1 +0.38R (OANDA labels).
+    if (OANDA_D1.has(key)) { const kt = src['1d'].A.trend;
+      try { const r = await fetch(`${MD_BASE}bars?sym=${key}&tf=1d&n=720`, { signal: AbortSignal.timeout(8000) }); const j = r.ok ? await r.json() : null;
+        if (j && j.src === 'OANDA' && Array.isArray(j.bars) && j.bars.length > 200) { const ot = msAnalyze(j.bars.map((b) => ({ time: b.time, open: +b.open, high: +b.high, low: +b.low, close: +b.close })), 6).trend;
+          if (ot === 1 || ot === -1) src['1d'].A.trend = ot; (snapshot.d1src = snapshot.d1src || {})[key] = { src: 'OANDA', trend: src['1d'].A.trend, kraken: kt }; }
+        else (snapshot.d1src = snapshot.d1src || {})[key] = { src: 'Kraken', trend: kt, why: j && j.error ? String(j.error).slice(0, 80) : 'no OANDA bars' };
+      } catch (e) { (snapshot.d1src = snapshot.d1src || {})[key] = { src: 'Kraken', trend: kt, why: String(e.message || e).slice(0, 80) }; } }
     const price = src['1m'].bars.at(-1).close;
     if (key === 'xau') goldM1 = src['1m'].bars;
     setMarket(M);
