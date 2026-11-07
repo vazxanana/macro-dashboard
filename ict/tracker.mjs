@@ -82,6 +82,11 @@ export function signals(Hraw, D, side, tick) {
   const isPL = (j) => j >= n && j + n < N && H.slice(j - n, j + n + 1).every((b) => b.low >= H[j].low);
   const isPH = (j) => j >= n && j + n < N && H.slice(j - n, j + n + 1).every((b) => b.high <= H[j].high);
   let act = [], lastExit = -1;
+  const H4 = agg(H, 14400);   // mirrored H4 (skill §29: v20 'run stops into an imbalance')
+  // unfilled bullish FVG (mirrored space) on B closed before time t whose gap contains the sweep low x, within the last `look` candles
+  const fvgHit = (B, sec, t, x, look) => { const n2 = B.findLastIndex((b) => b.time + sec <= t); for (let i = n2; i >= Math.max(2, n2 - look); i--) {
+    const lo = B[i - 2].high, hi = B[i].low; if (hi <= lo) continue; let filled = false; for (let j = i + 1; j <= n2; j++) if (B[j].low <= lo) { filled = true; break; }
+    if (!filled && x >= lo && x <= hi) return true; } return false; };
   for (let i = n; i < N; i++) {
     const j = i - n; if (j >= 0 && isPL(j)) act.push(j);
     act = act.filter((k) => i - k <= P.look);
@@ -106,6 +111,9 @@ export function signals(Hraw, D, side, tick) {
         const R = Dm.slice(di - 19, di + 1), hi = Math.max(...R.map((d) => d.high)), lw = Math.min(...R.map((d) => d.low)); pd = +((e - lw) / (hi - lw)).toFixed(3); pdSweep = lo < Dm[di].low; }
       // stop size vs the daily range: r0 / ATR14 of the closed daily candles (skill §20)
       const atrD = di >= 14 ? Dm.slice(di - 13, di + 1).reduce((a, d) => a + (d.high - d.low), 0) / 14 : null, atrR = atrD ? +(r0 / atrD).toFixed(3) : null;
+      // skill §29 (forward-test features, not filters): the sweep candle traded into an unfilled D1 / H4 FVG; prior daily candle-closure bias
+      const htfFvg = fvgHit(Dm, 86400, Hraw[s].time, H[s].low, 20) ? 'D1' : fvgHit(H4, 14400, Hraw[s].time, H[s].low, 30) ? 'H4' : null;
+      let cc = 0; if (di >= 1) { const a = Dm[di - 1], d = Dm[di]; cc = (d.low < a.low && d.close > a.low) || d.close > a.high ? 1 : (d.high > a.high && d.close < a.high) || d.close < a.low ? -1 : 0; }
       const b = H[c], rg = b.high - b.low || 1e-9, body = Math.abs(b.close - b.open) / rg, cl = (b.close - b.low) / rg;
       const strength = Math.round(4 * Math.min(1, body / 0.7) * (cl >= 0.75 ? 1 : cl >= 0.5 ? 0.6 : 0.3)), speed = c - s <= 2 ? 3 : c - s <= 4 ? 2 : 1;
       const rrRoom = dol != null ? (dol - e) / r0 : null, rrPts = rrRoom == null ? 1 : rrRoom >= 3 ? 3 : rrRoom >= 2 ? 2 : 1;
@@ -113,7 +121,7 @@ export function signals(Hraw, D, side, tick) {
         fvg: [side * Math.min(top, bot), side * Math.max(top, bot)].sort((x, y) => x - y), entry: side * e, stop: side * stop, r0,
         ih: ih == null ? null : side * ih, dol: dol == null ? null : side * dol, valid: ih == null || b.high < ih,
         feat: { atrR, bias: bias == null ? null : bias ? 'with' : 'against', pd, zone: pd == null ? null : pd < 0.5 ? (side > 0 ? 'discount' : 'premium') : (side > 0 ? 'premium' : 'discount'),
-          pdSweep, speed: c - s, body: +body.toFixed(2), closeLoc: +cl.toFixed(2), session: session(etHour(Hraw[c].time + 3600)), etHour: etHour(Hraw[c].time + 3600) },
+          pdSweep, speed: c - s, body: +body.toFixed(2), closeLoc: +cl.toFixed(2), session: session(etHour(Hraw[c].time + 3600)), etHour: etHour(Hraw[c].time + 3600), htfFvg, cc },
         grade: { strength, speed, rr: rrPts, total: strength + speed + rrPts } });
       lastExit = c + 6; break;
     }
@@ -145,7 +153,12 @@ const RULES = {
   none: () => false,
 };
 export const isASetup = (g, mk) => { const r = mk && MARKETS[mk] && MARKETS[mk].aRule; return r ? RULES[r](g) : aIndex(g); };
-export const sizeOf = (g, mk) => (mk && MARKETS[mk] && MARKETS[mk].aRule ? 1 : aTight(g) ? TIGHT_SIZE : 1);
+// skill §27: index A-setups are sized by the room to the draw on liquidity (DOL, the next untaken high/low) at the signal:
+// 1.5x when it is >= 2R away, 0.5x when closer or unknown (more R in all four test sets, smaller drawdown in three)
+export const DOL_ROOM = 2, ROOM_SIZE = [0.5, 1.5];
+const roomR = (g) => (g.dol != null && g.r0 > 0 ? ((g.side > 0 ? 1 : -1) * (g.dol - g.entry)) / g.r0 : null);
+export const sizeOf = (g, mk) => { if (mk && MARKETS[mk] && MARKETS[mk].aRule) return 1;
+  const r = roomR(g); return +((aTight(g) ? TIGHT_SIZE : 1) * (r != null && r >= DOL_ROOM ? ROOM_SIZE[1] : ROOM_SIZE[0])).toFixed(2); };
 // A+ tier (skill §17): an A-setup whose inversion candle body is >= 60% of its range and that does not fire in the NY afternoon (12-16 ET)
 export const isAPlus = (g, mk) => !(mk && MARKETS[mk] && MARKETS[mk].aRule) && isASetup(g, mk) && g.feat.body >= 0.6 && g.feat.session !== 'NY PM';   // §26: no A+ tier for gold / FX (strong bodies did worse there)
 export const letter = (g) => (g >= 10 ? 'A+' : g >= 9 ? 'A' : g >= 8 ? 'A-' : g >= 7 ? 'B+' : g >= 6 ? 'B' : g >= 5 ? 'B-' : g >= 3 ? 'C' : 'F');

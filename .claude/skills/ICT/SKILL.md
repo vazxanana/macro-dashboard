@@ -281,3 +281,77 @@ Windows: 2019-22 | 2023-24 | 2025-26.
   - Desk clusters stay index-only.
   - The replay has CNBC history only for these (no cash fill).
 - **Caveat:** spot gold and HistData FX stand in for the futures/broker feed; the forward sample decides.
+
+## 27. Size by room to the draw on liquidity (7 Nov 2026) — index A-setups
+MMXM / §9.8: the target is the DOL (the next untaken high/low).
+Tested on the core index A-setups (against, grade >= 7, stop 0.3-0.75 ATR, live trail, costs).
+Datasets: cash 23-24 | cash 25-26 | NQ futures 23-25 | 2026 replay.
+- **Exit at the DOL:** worse than the trail everywhere.
+  - All off at the DOL (1-8R): +28.8 | +40.4 | +32.9 | −1.8R.
+  - Half at the DOL: +33.2 | +44.5 | +37.5 | +0.7R.
+  - Live trail: +37.7 | +48.6 | +42.1 | +3.2R.
+- **Room as a filter:** only DOL >= 2R away gives +24.0 dd 4.6 | +26.4 dd 5.3 | +27.5 dd 4.0 | +9.5 dd 5.5. Better per trade and in drawdown, less total.
+- **Room as size: 1.5x when the DOL is >= 2R away, 0.5x otherwise (or unknown).**
+  - With sizing: +42.9 dd 7.5 | +50.7 dd 10.7 | +48.6 dd 6.7 | +11.0 dd 9.1.
+  - Live: +37.7 dd 7.6 | +48.6 dd 10.8 | +42.1 dd 5.4 | +3.2 dd 16.2.
+  - More R in all four, smaller drawdown in three (NQ futures dd +1.3R). Average size about 0.94x, so total risk is about the same.
+  - Other splits: 1/0.5 and 1/0.75 have less total; 1.5/1 has the same ratio with more drawdown.
+- **Gold and FX exits (§26 rules) re-checked:** trails 1-3R, 12-72 h and fixed 1.5-3R targets.
+  - Nothing beats the live trail 2/1.5, 36 h in every window (gold 3/2 trail and 48 h win one window and lose another).
+  - Unchanged; gold and FX stay at 1x (no DOL test on them yet).
+- **Code:** `DOL_ROOM = 2`, `ROOM_SIZE = [0.5, 1.5]`, `sizeOf(g, mk)`.
+  - The size multiplies with the §25 tight-stop half, giving 0.25 / 0.5 / 0.75 / 1.5.
+  - R is stored x size; the desk pill shows "1.5× size" etc.
+
+## 28. Intraday course rules tested on the H1 iFVG model (7 Nov 2026) — none adopted as filters
+The owner uploaded a second, longer study spec (an NQ-focused intraday course, kept outside this public repo as a local
+skill). Its codable rules were tested on cash NQ+ES+YM, 2023-24 | 2025-26, live exit, costs.
+The tracker's signals were rebuilt with the sweep time, the 00:00 / 08:30 ET opens, an SMT proxy and a relative-equal-high/low scan.
+A-setups base: +39.3R dd 14.6 | +35.0R dd 19.7.
+- **SMT** (at the sweep candle this index took its prior-24h low/high while ES or YM did not): −0.7 | +12.2R. Without SMT: −0.1 | +11.4R. No edge.
+- **Opening prices** (buys below both the 00:00 and 08:30 opens, sells above): +7.3 | −3.9R. The other side did better (+35.2 | +34.3R). Same as the midnight-only test (§18). Rejected.
+- **Equity window** (signal closes 10:00 ET): best per trade (+0.21 | +0.28R, n 28 | 29). As a 1.5x size-up on top of §27 it is better on cash and NQ futures but worse on the 2026 replay (+9.9 vs +11.0R, dd 11.0 vs 9.1). Rejected.
+- **London kill zone only:** +6.1 | 0.0R. **Skip the Asian session:** +30.3 | +24.1R (worse). **Skip Mondays:** mixed.
+- **NQ month seasonality** (no buys in Feb/Sep, no sells in May-Jul/Nov): +50.5 dd 12.6 | +28.0 dd 12.4. Rejected: the course's month map comes from the same years we test on (look-ahead), with no clean later window.
+- **Relative equal highs/lows beyond the entry:** almost every signal has them (+30.2 | +32.6R with vs +9.1 | +2.4R without). Not a filter. At >= 2R away it is close to the §27 room-to-DOL sizing already live.
+- **Read:** the course is a discretionary M5-M1 intraday framework built around a trader reading the higher, intermediate and short timeframes in order. Its codable pieces do not improve this mechanical H1 model.
+  - The pieces that agree are already in it: no NY afternoon (§17), the jobs-report morning (§23), room to the draw on liquidity (§27).
+- **Best use:** its sponsorship checklist as Fred's judgement on the desk. New review tags: beyond 00:00 & 08:30 opens, inducement, SMT, CISD body close, displacement + FVG, REH/REL target, 09:00-10:30 window. With ~50 reviewed trades, test which tags separate winners from losers.
+
+## 29. Course update: H4/H1 reading (owner upload, 7 Nov 2026) — tested, recorded as forward features
+The updated course spec (kept as a local skill) adds the missing H4/H1 chapter.
+On the intermediate timeframe, price heading to the daily draw does one of two things: rebalance an imbalance, or run stops.
+The best version is both: stops run INTO an imbalance. Each day the bias is re-read from the daily candle closure (wick beyond the prior day and close back, or a close beyond it).
+Tested on cash NQ+ES+YM (`idxrec5.mjs`), live exit, costs, 2023-24 | 2025-26. A-setups base +39.3R | +35.0R.
+- **Sweep candle traded into an unfilled D1 FVG:** +2.6R (12) | +29.7R (25). Into an H4 FVG: +1.7R (29) | +9.0R (51). Either: −0.9R | +30.1R. None: +40.2R | +4.9R. Inconsistent and thin (37 D1 cases in four years). Not a filter.
+- **Daily candle-closure bias agrees with the signal:** +18.3R | +4.9R. Against: +16.2R | +27.8R. Flips between halves. Not a filter.
+- All signals: the H4-FVG sweep +44.3R | −22.0R; no stable pattern.
+- **Kept as forward-test features, not rules:** every signal now records `feat.htfFvg` ('D1' / 'H4' / null) and `feat.cc` (+1 agrees, −1 against, 0).
+  - The desk's "What works" table splits by both; review tag "Stops run into a D1/H4 FVG".
+  - Re-judge with ~100 forward A-setups, judging D1 separately.
+
+## 30. M5 entry inside the H1 A-setup (7 Nov 2026) — Fred's manual entry, not automatable
+The course pairs an H1 setup with an M5/M1 entry. Tested on index A-setups (cash NQ/ES/YM 2023-26 and NQ futures 2023-25), simulated on M5 candles, costs in, results at the same money risk.
+- **Rule:** after the H1 A-setup closes, wait up to 6 h for the first M5 iFVG signal (the tracker's own `signals()` on M5) on the same side, with its stop no worse than the H1 stop.
+  - The setup is dead if the H1 stop trades first (24 of 438 cases).
+  - Enter at that M5 close, keep the H1 stop, same trail (+2R / 1.5R) and 36 h hold.
+  - No M5 signal = no trade.
+- **Cash 2023-24 | 2025-26:** H1 entry +33.8R dd 15.7 | +23.1R dd 18.4; **M5 entry + H1 stop +56.5R dd 9.1 | +93.5R dd 6.7**.
+  - By year: 2023 +18.5 vs +16.0, 2024 +38.0 vs +17.8, 2025 +42.0 vs +15.5, 2026 +51.5 vs +7.6.
+  - About 62% of A-setups get an M5 entry.
+- **NQ futures 2023 / 2024 / 2025:** H1 +10.0 / +10.7 / +8.4R (dd 8.8 / 7.2 / 6.7); M5 entry +10.4 / +21.6 / +15.4R (dd 2.0 / 6.8 / 2.3).
+- **M5 entry with the M5 stop** (a third of the H1 stop): +32.8 | +93.6R on cash but −0.9R in NQ futures 2024. Keep the H1 stop.
+- **Latency kills it:**
+  - entering one M5 bar late: cash +26.5 | +32.5R, futures +4.8 / +6.3 / +2.3R;
+  - entering three bars (15 min) late: cash +8.5 | +24.3R.
+  - The edge is in the inversion candle's own close. The tracker (15-min cadence, GitHub cron delays) cannot take it.
+- **Use:** Fred's execution method at the screen. The desk shows it on every index A-setup's checklist. His Taken trades (fill + own R) measure it live.
+- **Also tested 7 Nov:** room-to-DOL sizing (§27) on gold and EUR/USD hurts both (gold +43.6 | +20.7 | +24.2R vs +56.7 | +36.0 | +32.8R; EUR/USD drawdown doubles in 2019-22). They stay at 1x.
+- **RTY:** no history beyond the 2026 replay, too few trades to judge; unchanged.
+- **Replay:** now starts 1 Aug 2025 (5 more months).
+  - NQ/ES/YM back-fill from Dukascopy cash; EUR/USD and GBP/USD back-fill from HistData M1 in council-data.
+  - GC and RTY start where CNBC history begins.
+- **Replay back-fill fix (7 Nov):** CNBC returns a few stray hourly bars months before its continuous history.
+  - The back-fill only ran before the first bar and calibrated on the 20 days after it, so NQ / ES / RTY / GC started only in April-May ("overlap too small").
+  - The replay now keeps CNBC's continuous part (the last run of 10-day chunks with >= 50 bars) and back-fills everything earlier.
+  - Gold back-fills from council-data spot gold 1m (xau-jan-jun.json.gz, 20 Dec 2025 → 7 Jun 2026). RTY has no back-fill source.
