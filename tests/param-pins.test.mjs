@@ -74,7 +74,8 @@ test('gold trend, H4 trendline and daily engulf: the live config is what #530 te
   has(trader, 'const dir = msnrDirection(H, D, TL.n4, 2); state.dir = dir;', 'trendline direction SOP');
   has(trader, "if (r0 > 0 && price > entry) trades.push({ id, market: key, label: M.label, dec: M.dec, k: 'geg'", 'engulf limit only below price');
   has(trader, 'now - (last.time + 86400) < 86400', 'daily signal within 24 h'); has(trader, 'now - (last.time + 14400) < 3600', 'H4 signal within 1 h');
-  has(trader, "last.close - open.entry >= config.goldTrendAdd.atR * open.r0", 'trend add at +1R on a daily close');
+  // (8 Nov, council/feed.mjs) the entry is read in the current feed's frame: + feedBasis, 0 unless the candle feed changed while open
+  has(trader, "last.close - (open.entry + (open.feedBasis || 0)) >= config.goldTrendAdd.atR * open.r0", 'trend add at +1R on a daily close');
   assert.equal((trader.match(/trail: \[2, 1\]/g) || []).length, 2, 'gtl and geg trail 1R behind from +2R');
   const study = read('../research/edge/gold-systems-oos/replay.mjs');
   has(study, 'const CFG = { goldTrend: { n: 20, k: 2 }, goldTrendFast: { n: 5, k: 2 }, goldTrendAdd: { atR: 1 },', '#530 CFG');

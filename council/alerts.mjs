@@ -41,10 +41,12 @@ export function alertEvents(list, now, futOpt = {}) {
       const up = x.side === 'sell' ? 'chart_with_downwards_trend' : 'chart_with_upwards_trend';
       // a resting limit order: send the limit ticket when it is placed, and a cancel when it ends unfilled (expired, or
       // the target was reached first: 'missed')
-      if (fut && !x.ntfyP && x.status === 'pending' && x.opened >= now - 900) { const tk = ticket(x, now, futOpt); x.ntfyP = 1;
-        if (tk) { x.futT = { code: tk.c.code, n: tk.n }; ev.push({ title: `${side} LIMIT ${nm}`, msg: `${tk.text}\n${lv}\n${at}`, tags: 'hourglass', click: tk.url }); } }
-      if (fut && x.futT && !x.ntfyX && (x.status === 'expired' || x.status === 'missed') && x.closed >= now - held) { x.ntfyX = 1;
-        ev.push({ title: `Cancel ${x.futT.code} limit · ${nm}`, msg: `The council's limit order ${x.status === 'missed' ? 'was not filled before the target was reached' : 'expired unfilled'}: cancel your ${x.side} limit on ${x.futT.code}.\n${at}`, tags: 'no_entry_sign', click: tvUrl(fut, x.futT.code) }); }
+      // (8 Nov, council/feed.mjs) a limit re-quoted after a feed change (ntfyP reset, requoted.at) sends a replacement ticket
+      const rq = x.requoted && x.requoted.at >= now - 900;
+      if (fut && !x.ntfyP && x.status === 'pending' && (x.opened >= now - 900 || rq)) { const tk = ticket(x, now, futOpt), had = x.futT; x.ntfyP = 1;
+        if (tk) { x.futT = { code: tk.c.code, n: tk.n }; ev.push({ title: `${rq && had ? 'REPLACE' : side} LIMIT ${nm}`, msg: `${rq && had ? `The candle feed changed and the council re-quoted this order: cancel your ${x.side} limit on ${had.code} and place this one.\n` : ''}${tk.text}\n${lv}\n${at}`, tags: 'hourglass', click: tk.url }); } }
+      if (fut && x.futT && !x.ntfyX && (x.status === 'expired' || x.status === 'missed' || x.status === 'cancelled') && x.closed >= now - held) { x.ntfyX = 1;
+        ev.push({ title: `Cancel ${x.futT.code} limit · ${nm}`, msg: `The council's limit order ${x.status === 'missed' ? 'was not filled before the target was reached' : x.status === 'cancelled' ? `was cancelled (${x.exit || 'feed changed'})` : 'expired unfilled'}: cancel your ${x.side} limit on ${x.futT.code}.\n${at}`, tags: 'no_entry_sign', click: tvUrl(fut, x.futT.code) }); }
       if (!x.ntfyO && x.status === 'open' && x.filled >= now - 900) { x.ntfyO = 1;
         if (fut) { const tk = x.futT ? null : ticket(x, now, futOpt);
           if (tk) { x.futT = { code: tk.c.code, n: tk.n }; ev.push({ title: `${side} ${tk.n} ${tk.c.code} · ${nm}`, msg: `${tk.text}\n${lv}\n${at}`, tags: up, click: tk.url }); continue; }
