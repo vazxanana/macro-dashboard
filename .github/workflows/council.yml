@@ -32,7 +32,7 @@ jobs:
     runs-on: ubuntu-latest
     concurrency:
       group: council-watchdog
-      cancel-in-progress: false
+      cancel-in-progress: true   # one-off kick: replaces the old-code loop, then hands over to main (newcode sees this file differ)
     steps:
       - name: Start the Trader loop if it is not running
         env:
@@ -62,7 +62,7 @@ jobs:
     # for 6+ min). The new run waits; the running loop sees new council code on main at its next check and hands over.
     concurrency:
       group: council
-      cancel-in-progress: false
+      cancel-in-progress: true   # one-off kick: replaces the old-code loop, then hands over to main (newcode sees this file differ)
     timeout-minutes: 330
     steps:
       - name: Checkout code
