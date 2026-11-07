@@ -29,6 +29,7 @@ Supporting scripts:
 | `replay.mjs` | Minute-by-minute replay of one market's morning, printed to the job log (manual). |
 | `choch.mjs`, `futures.mjs`, `futures-test.mjs` | M15 CHoCH helper; futures tickets in alerts; one sample ticket (manual). |
 | `engine.mjs` | Generated from the market-structure page's engine; regenerate it when the page's setup rules change. |
+| `datacheck.mjs` | Candle-feed monitor: the OANDA proxy (`/md/bars`), Kraken and the ICT desk's CNBC futures, 5m candles → `health.json` (stale in market hours, gaps, zero/negative prices, broken candles, jumps > 25x ATR) and one deduplicated phone alert per bad episode (confirmed on 2 checks, 12 h reminder, all-clear). Weekend / daily halt / US holidays are not errors. |
 
 ## When things run
 
@@ -40,6 +41,8 @@ Supporting scripts:
 | Daily replay + fidelity | `.github/workflows/backtest.yml` | 03:17 UTC daily, on pushes to the replay's files, or by hand (choose the number of days). |
 | 90-day research replay | `.github/workflows/research-replay.yml` | By hand only. Writes `research/replay-90d.json` (or a path you choose); never touches `backtest.json`. |
 | Bars snapshot | `.github/workflows/bars.yml` | By hand: saves recent candles to `research/bars/` so a day can be replayed exactly. |
+| Data check | `council.yml`, inside the Trader loop | Every 2nd round (~11 min): `node council/datacheck.mjs data` (150 s cap, never fails the round). |
+| Tests | `.github/workflows/tests.yml` | Every pull request and push to `main`: syntax check, `node --test tests/`, the ICT audit and the alert checks on pinned council-data copies (`tests/fixtures/`). Offline: no secrets, no network. |
 | Morning replay | `.github/workflows/replay.yml` | By hand: prints one market's morning to the log. |
 | ICT desk | `ict.yml`, `ict-replay.yml`, `api/run.js?job=ict` | A separate system with its own files (`ict/`); not part of the council. |
 

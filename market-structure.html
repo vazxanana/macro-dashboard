@@ -6031,12 +6031,12 @@ function msNextSetup(bars, A) {
     const bust = Math.floor(Date.now() / 120000);
     const get = (f, json) => fetch(`${CDATA}${f}?v=${bust}`, { cache: 'no-store' }).then((r) => r.ok ? (json ? r.json() : r.text()) : null).catch(() => null);
     const anP = get('reviews/analyst.json', 1);   // Analyst post-mortems of live losses (shown on the loss review; owner reviews win)
-    let [trades, config, coach, snap, analysis, review, backtest, replay, research, shadowRp, lossRev, mirror] = await Promise.all([get('trades.json', 1), get('config.json', 1), get('coach.json', 1), get('snapshot.json', 1), get('analysis/latest.md'), get('reviews/latest.md'), get('backtest.json', 1), get('research/replay-2w.json', 1), get('research.json', 1), get('research/shadow-replay.json', 1), get('reviews/losses.json', 1), get('ctrader/mirror.json', 1)]);
+    let [trades, config, coach, snap, analysis, review, backtest, replay, research, shadowRp, lossRev, mirror, health] = await Promise.all([get('trades.json', 1), get('config.json', 1), get('coach.json', 1), get('snapshot.json', 1), get('analysis/latest.md'), get('reviews/latest.md'), get('backtest.json', 1), get('research/replay-2w.json', 1), get('research.json', 1), get('research/shadow-replay.json', 1), get('reviews/losses.json', 1), get('ctrader/mirror.json', 1), get('health.json', 1)]);
     // m30m1 (M30 → M1) fires on the same M1 entry as the gold scalp: the same trade recorded twice; count it once (6 Nov)
     if (Array.isArray(trades)) { const seen = new Set(trades.filter((x) => x.k !== 'm30m1').map((x) => `${x.market}|${x.side}|${x.opened}|${x.entry}`)); trades = trades.filter((x) => x.k !== 'm30m1' || !seen.has(`${x.market}|${x.side}|${x.opened}|${x.entry}`)); }
     if (lossRev && lossRev.reviews) rvMerge(lossRev);
     COUNCIL.anRev = ((await anP) || {}).reviews || {};
-    Object.assign(COUNCIL, { trades, config, coach, snap, analysis, review, backtest, replay, research, shadowRp, mirror, shRpRows: null, at: Date.now() });
+    Object.assign(COUNCIL, { trades, config, coach, snap, analysis, review, backtest, replay, research, shadowRp, mirror, health, shRpRows: null, at: Date.now() });
     councilAlerts(trades);
     if (config) {
       CFG.buf = Math.min(0.25, Math.max(0.10, +config.buf || 0.15)); CFG.minRR = +config.minRR || 1.2; CFG.minRisk = Math.min(1.2, Math.max(0.4, +config.minRisk || 0.6)); CFG.paused = config.paused || {};
@@ -6045,6 +6045,9 @@ function msNextSetup(bars, A) {
     renderCouncil();
     try { window.MS_COUNCIL = COUNCIL; document.dispatchEvent(new CustomEvent('ms:council')); } catch (e) {}   // edge scoreboard (#ms-sb) reads the same copy
   }
+  // the Data chip's per-market list (renderCouncil re-draws the status line on every load, so the open state lives in COUNCIL.dhOpen)
+  { const st = document.getElementById('ms-c-status'); if (st) st.addEventListener('click', (e) => { const b = e.target.closest && e.target.closest('[data-dh]'); if (!b) return;
+    COUNCIL.dhOpen = !COUNCIL.dhOpen; b.setAttribute('aria-expanded', String(COUNCIL.dhOpen)); const l = b.nextElementSibling; if (l && l.classList.contains('c-dh-list')) l.hidden = !COUNCIL.dhOpen; }); }
   // Tell the user when the always-on Trader opens or closes a trade (scored trades only, once each)
   function councilAlerts(trades) {
     if (!Array.isArray(trades)) return;
@@ -6508,9 +6511,19 @@ function msNextSetup(bars, A) {
         const fb = ks.filter((k) => d[k].src !== 'OANDA').map((k) => `${lab(k)}${d[k].why ? ': ' + d[k].why : ''}`);
         const tip = ['D1 trend from OANDA spot daily bars.', flips.length ? 'Disagrees with Kraken: ' + flips.join(', ') : '', fb.length ? 'Fell back to Kraken: ' + fb.join('; ') : ''].filter(Boolean).join(' ');
         return ` · <span title="${esc(tip)}">D1 trend: OANDA ${oa.length}/${ks.length}${fb.length ? ` <b style="color:var(--warn,#b45309)">${fb.length} on Kraken fallback</b>` : ''}${flips.length ? ` · ${flips.length} differ${flips.length > 1 ? '' : 's'} from Kraken` : ''}</span>`; };
+      // Data chip (admin, 7 Nov, reliability): the candle-feed monitor council/datacheck.mjs writes health.json every ~11 min (OANDA proxy,
+      // Kraken, the ICT desk's CNBC futures). Tap it for the per-market list (COUNCIL.dhOpen); the D1-source note in the line below stays as it was.
+      const dataChip = (h) => { if (!h || !h.feeds || PUB) return '';
+        const age = (Date.now() - Date.parse(h.at)) / 60000, late = !(age < 45), F = Object.values(h.feeds), ms = F.flatMap((f) => Object.values(f.markets || {}).map((m) => ({ ...m, feed: f.label })));
+        const bad = ms.filter((m) => m.status === 'bad'), warn = ms.filter((m) => m.status === 'warn'), shut = ms.filter((m) => m.status === 'closed').length;
+        const cls = late ? 'c-warn' : bad.length ? 'c-bad' : warn.length ? 'c-warn' : 'c-ok';
+        const txt = late ? 'Data check late' : bad.length ? `Data: ${bad.length} bad` : warn.length ? `Data: ${warn.length} warning${warn.length > 1 ? 's' : ''}` : 'Data OK';
+        const row = (m) => `<span class="c-dh-r"><b>${esc(m.feed)} ${esc(m.label)}</b> ${esc((m.issues || []).map((x) => x.detail).join('; '))}</span>`;
+        const list = `<span class="adm c-dh-list" ${COUNCIL.dhOpen ? '' : 'hidden'}>${bad.concat(warn).map(row).join('') || `<span class="c-dh-r">${ms.length} markets clean${shut ? ` (${shut} closed now)` : ''}: ${esc(F.map((f) => f.label).join(', '))}.</span>`}<span class="c-dh-r c-dh-at">Checked ${ago(Date.parse(h.at) / 1000)}${h.lastAlert ? ` · last phone alert: ${esc(h.lastAlert.title)}, ${ago(Date.parse(h.lastAlert.at) / 1000)}` : ''}</span></span>`;
+        return `<button type="button" class="adm ${cls} c-dh" data-dh aria-expanded="${!!COUNCIL.dhOpen}" title="Candle feeds (OANDA, Kraken, ICT desk CNBC): ${esc(h.summary || '')}">${esc(txt)}</button>${list}`; };
       const age = (Date.now() - Date.parse(C.snap.at)) / 60000, mk = Object.values(C.snap.markets || {}), closed = mk.filter((m) => m.open === false).length, errs = Object.keys(C.snap.errors || {});
       const health = age < 30 ? '<span class="c-ok">● Trader running</span>' : age < 90 ? '<span class="c-warn">● Trader late</span>' : '<span class="c-bad">● Trader stopped</span>';
-      set('ms-c-status', `${health}<span class="c-meta">last scan ${ago(Date.parse(C.snap.at) / 1000)} · ${mk.length} markets watched${closed ? ` (${closed} closed for the weekend)` : ''}${errs.length ? ` · ${errs.length} feed error${errs.length > 1 ? 's' : ''}: ${esc(errs.join(', '))}` : ''}${d1Note(C.snap)}</span>`);
+      set('ms-c-status', `${health}${dataChip(C.health)}<span class="c-meta">last scan ${ago(Date.parse(C.snap.at) / 1000)} · ${mk.length} markets watched${closed ? ` (${closed} closed for the weekend)` : ''}${errs.length ? ` · ${errs.length} feed error${errs.length > 1 ? 's' : ''}: ${esc(errs.join(', '))}` : ''}${d1Note(C.snap)}</span>`);
     } else set('ms-c-status', 'Waiting for the first Trader run.');
     set('ms-c-kpi', `<div><span>Open</span><b>${open.length}</b></div><div><span>Closed</span><b>${closed.length}</b></div><div><span>Win rate</span><b>${closed.length ? Math.round(w / closed.length * 100) + '%' : '—'}</b></div><div><span>Total</span><b class="${R > 0 ? 'pos' : R < 0 ? 'neg' : ''}">${closed.length ? (R > 0 ? '+' : '') + R.toFixed(1) + 'R' : '—'}</b></div>`);
     // equity in R by close time
@@ -9127,6 +9140,13 @@ html[data-mk="ict"] #v-charts .mk-mode button[data-mk="ict"].on { background: co
 #v-council #ms-c-status .c-bad { color: var(--sell); background: color-mix(in srgb, var(--sell) 11%, transparent); }
 #v-council #ms-c-status .c-meta { flex-basis: 100%; display: block; margin: 0; color: var(--ink-dim); font-size: 12.5px; }
 #v-council #ms-c-status .c-meta::before { content: none; }
+#v-council #ms-c-status .c-dh { border: 0; cursor: pointer; min-height: 28px; }
+#v-council #ms-c-status .c-dh::after { content: '▾'; font-size: 10px; opacity: .7; }
+#v-council #ms-c-status .c-dh[aria-expanded="true"]::after { content: '▴'; }
+#v-council #ms-c-status .c-dh-list { flex-basis: 100%; display: flex; flex-direction: column; gap: 2px; margin: 2px 0 0; padding: 8px 10px; border: 1px solid var(--line); border-radius: 10px; font-size: 12.5px; color: var(--ink-dim); }
+#v-council #ms-c-status .c-dh-list[hidden] { display: none; }
+#v-council #ms-c-status .c-dh-r b { color: var(--ink); font-weight: 600; }
+#v-council #ms-c-status .c-dh-at { color: var(--ink-faint); }
 #v-council .c-warn { color: var(--c-warn); }
 
 /* 2 · section nav and trade tabs: 44px targets, readable count badge */
