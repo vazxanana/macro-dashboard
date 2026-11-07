@@ -1799,6 +1799,47 @@ html[data-guest] #ms-focus-btn, html[data-gate] #ms-focus-btn { display: none !i
 }
 @media (prefers-reduced-motion: reduce) { .odo > span { animation-duration: 1ms; } .eq-draw path { animation: none !important; stroke-dasharray: none !important; } #ms-focus[open], .fx-live { animation: none; } .fx-dot { transition: none; } .pz { transition: none; } }
 html[data-motion="off"] .odo > span { animation-duration: 1ms; } html[data-motion="off"] .eq-draw path { animation: none !important; stroke-dasharray: none !important; } html[data-motion="off"] #ms-focus[open], html[data-motion="off"] .fx-live { animation: none; }
+
+/* ═══ OVERDRIVE 3 · session clock ring (Home) ═══ */
+.h-ring { --as: oklch(0.72 0.11 195); --lo: var(--gold); --ny: oklch(0.70 0.14 255); cursor: default; }
+.h-ring-tz { font: 500 11.5px var(--mono); color: var(--ink-faint); margin-left: 6px; }
+.h-ring-b { display: flex; align-items: center; gap: 16px; margin-top: 6px; }
+.h-ring-svg { width: 168px; height: 168px; flex: none; overflow: visible; }
+.h-ring-lg { list-style: none; margin: 0; padding: 0; display: grid; gap: 7px; font-size: 12.5px; color: var(--ink-dim); }
+.h-ring-lg i { display: inline-block; width: 10px; height: 4px; border-radius: 2px; margin-right: 7px; vertical-align: middle; background: var(--c); }
+.h-ring-lg .as { --c: var(--as); } .h-ring-lg .lo { --c: var(--lo); } .h-ring-lg .ny { --c: var(--ny); }
+.h-ring-lg .nw i { width: 7px; height: 7px; border-radius: 1px; transform: rotate(45deg); background: var(--sell); }
+.h-ring-n { margin: 10px 0 0; font-size: 13px; color: var(--ink-dim); line-height: 1.5; }
+.h-ring-n b { color: var(--ink); font-weight: 600; }
+.h-ring-svg .trk { fill: none; stroke: var(--line); stroke-width: 7; }
+.h-ring-svg .arc { fill: none; stroke-width: 7; stroke-linecap: round; opacity: .32; transition: opacity .3s; }
+.h-ring-svg .arc.on { opacity: 1; filter: drop-shadow(0 0 4px color-mix(in srgb, currentColor 55%, transparent)); }
+.h-ring-svg .arc.as { stroke: var(--as); color: var(--as); } .h-ring-svg .arc.lo { stroke: var(--lo); color: var(--lo); } .h-ring-svg .arc.ny { stroke: var(--ny); color: var(--ny); }
+.h-ring-svg .tk { stroke: var(--ink-faint); stroke-width: 1; opacity: .5; } .h-ring-svg .tk.mj { stroke-width: 1.6; opacity: .9; }
+.h-ring-svg .hl { font: 500 9px var(--mono); fill: var(--ink-faint); text-anchor: middle; dominant-baseline: central; }
+.h-ring-svg .hand { stroke: var(--ink); stroke-width: 1.8; stroke-linecap: round; }
+.h-ring-svg .hub { fill: var(--ink); } .h-ring-svg .tip { fill: var(--ink); stroke: var(--panel); stroke-width: 2; }
+.h-ring-svg .nw { fill: var(--sell); stroke: var(--panel); stroke-width: 1.2; }
+.h-ring-svg .ct { font: 650 22px var(--mono); fill: var(--ink); text-anchor: middle; font-variant-numeric: tabular-nums; }
+.h-ring-svg .cs { font: 500 9.5px var(--sans); fill: var(--ink-dim); text-anchor: middle; }
+.h-ring.wk .arc { opacity: .14; filter: none; }
+@media (max-width: 420px) { .h-ring-svg { width: 148px; height: 148px; } .h-ring-b { gap: 12px; } }
+
+/* ═══ OVERDRIVE 4 · cinematic page switches ═══ */
+@supports (view-transition-name: none) {
+  .top { view-transition-name: ms-top; }
+  .top .tabs { view-transition-name: ms-nav; }
+  ::view-transition-group(ms-top), ::view-transition-group(ms-nav), ::view-transition-old(ms-top), ::view-transition-new(ms-top), ::view-transition-old(ms-nav), ::view-transition-new(ms-nav) { animation: none; }
+  ::view-transition-old(root) { animation: vt-out .16s cubic-bezier(.4, 0, 1, 1) both; }
+  ::view-transition-new(root) { animation: vt-in .26s cubic-bezier(.16, 1, .3, 1) both; }
+  html[data-vt="back"]::view-transition-old(root) { animation-name: vt-out-b; }
+  html[data-vt="back"]::view-transition-new(root) { animation-name: vt-in-b; }
+}
+@keyframes vt-out { to { opacity: 0; transform: translateX(-28px); } }
+@keyframes vt-in { from { opacity: 0; transform: translateX(36px); } }
+@keyframes vt-out-b { to { opacity: 0; transform: translateX(28px); } }
+@keyframes vt-in-b { from { opacity: 0; transform: translateX(-36px); } }
+@media (prefers-reduced-motion: reduce) { ::view-transition-old(root), ::view-transition-new(root) { animation: none !important; } }
 </style>
 <script>try{if(localStorage.getItem('msMotion')==='off')document.documentElement.dataset.motion='off'}catch(e){}</script>
 </head>
@@ -1932,6 +1973,12 @@ html[data-motion="off"] .odo > span { animation-duration: 1ms; } html[data-motio
       </div>
       </div>
       <div class="h-side">
+      <section class="tile tile-s h-ring" id="h-ring" aria-labelledby="h-ring-k">
+        <span class="tile-k" id="h-ring-k">Sessions <span class="h-ring-tz" id="h-ring-tz"></span></span>
+        <div class="h-ring-b"><svg class="h-ring-svg" id="h-ring-svg" viewBox="0 0 200 200" role="img" aria-label="24-hour session clock"></svg>
+          <ul class="h-ring-lg" aria-hidden="true"><li class="as"><i></i>Asia</li><li class="lo"><i></i>London</li><li class="ny"><i></i>New York</li><li class="nw"><i></i>High-impact news</li></ul></div>
+        <p class="h-ring-n" id="h-ring-n" aria-live="polite"></p>
+      </section>
       <a class="tile tile-s" href="#council">
         <span class="tile-k">AI council</span>
         <span class="tile-big" id="h-council">Starting up</span>
@@ -3529,6 +3576,7 @@ function msNextSetup(bars, A) {
     } catch (e) { /* calendar feed blocked: built-in dates only */ }
     const cur = instCur();
     NEWS = list.map((x) => Object.assign(x, { rel: cur.includes(x.cur) })).sort((a, b) => a.t - b.t);
+    try { window.MS_NEWS = NEWS; document.dispatchEvent(new CustomEvent('ms:news')); } catch (e) {}
     newsSrc = live ? 'ForexFactory calendar' : 'built-in NFP and FOMC dates (live calendar unavailable)';
     renderNews();
     Object.values(panes).forEach((p) => p.A && p.draw());
@@ -5223,7 +5271,15 @@ function msNextSetup(bars, A) {
   if (document.getElementById('v-home')) {
     const hdr = document.querySelector('.top');
     if (hdr && window.ResizeObserver) new ResizeObserver(() => document.documentElement.style.setProperty('--top-h', hdr.offsetHeight + 'px')).observe(hdr);
-    addEventListener('hashchange', showView); showView();
+    // overdrive 4: page switches slide in the direction of travel (View Transitions); same-page changes and reduced motion switch instantly
+    addEventListener('hashchange', () => {
+      const R = document.documentElement, cur = VIEWS.find((k) => { const el = document.getElementById('v-' + k); return el && !el.hidden; }), nx = location.hash.slice(1).split('/')[0] || 'home';
+      const still = R.dataset.motion === 'off' || matchMedia('(prefers-reduced-motion: reduce)').matches;
+      if (!document.startViewTransition || still || !cur || cur === nx || document.hidden || document.querySelector('dialog[open]')) { showView(); return; }
+      const ORD = ['home', 'setup', 'charts', 'scanner', 'council', 'journal', 'ict', 'users', 'guest'];
+      R.dataset.vt = ORD.indexOf(nx) >= ORD.indexOf(cur) ? 'fwd' : 'back';
+      try { const t = document.startViewTransition(showView); t.finished.finally(() => { delete R.dataset.vt; }); } catch (e) { showView(); }
+    }); showView();
     setInterval(() => { renderSessList(); renderHome(); }, 30e3); renderSessList();
   }
 
@@ -5833,6 +5889,44 @@ function msNextSetup(bars, A) {
 
   document.addEventListener('ms:live', function () { pulse(); render(); });
   window.addEventListener('hashchange', function () { setTimeout(pulse, 30); });
+})();
+</script>
+<script>
+// Home session clock: a 24-hour dial in local time with the Asia / London / New York sessions as arcs, a now hand and high-impact news as diamonds
+(function () {
+  var svg = document.getElementById('h-ring-svg'); if (!svg) return;
+  var C = 100, S = [{ k: 'as', n: 'Asia', a: 23, b: 8, r: 80 }, { k: 'lo', n: 'London', a: 7, b: 16, r: 70 }, { k: 'ny', n: 'New York', a: 12.5, b: 21, r: 60 }];
+  var off = -new Date().getTimezoneOffset() / 60, loc = function (u) { return ((u + off) % 24 + 24) % 24; };
+  var pt = function (h, r) { var a = (h / 24) * 2 * Math.PI - Math.PI / 2; return [C + r * Math.cos(a), C + r * Math.sin(a)]; };
+  var arc = function (h1, h2, r) { var d = ((h2 - h1) % 24 + 24) % 24, p = pt(h1, r), q = pt(h1 + d, r); return 'M' + p[0].toFixed(2) + ' ' + p[1].toFixed(2) + 'A' + r + ' ' + r + ' 0 ' + (d > 12 ? 1 : 0) + ' 1 ' + q[0].toFixed(2) + ' ' + q[1].toFixed(2); };
+  var inS = function (u, s) { return s.a < s.b ? u >= s.a && u < s.b : u >= s.a || u < s.b; };
+  var dur = function (h) { var m = Math.round(h * 60); return m < 60 ? m + 'm' : Math.floor(m / 60) + 'h ' + (m % 60) + 'm'; };
+  var tz = document.getElementById('h-ring-tz'); try { if (tz) tz.textContent = 'your time, UTC' + (off >= 0 ? '+' : '−') + Math.abs(off); } catch (e) {}
+  function closed(d) { var w = d.getUTCDay(), h = d.getUTCHours(); return w === 6 || (w === 0 && h < 22) || (w === 5 && h >= 21); }
+  function draw() {
+    var d = new Date(), u = d.getUTCHours() + d.getUTCMinutes() / 60, l = loc(u), wk = closed(d), h = '';
+    S.forEach(function (s) { h += '<circle class="trk" cx="100" cy="100" r="' + s.r + '"/>'; });
+    for (var k = 0; k < 24; k++) { var mj = k % 6 === 0, a = pt(k, 91), b = pt(k, mj ? 97 : 94.5); h += '<line class="tk' + (mj ? ' mj' : '') + '" x1="' + a[0].toFixed(1) + '" y1="' + a[1].toFixed(1) + '" x2="' + b[0].toFixed(1) + '" y2="' + b[1].toFixed(1) + '"/>';
+      if (mj) { var t = pt(k, 106); h += '<text class="hl" x="' + t[0].toFixed(1) + '" y="' + t[1].toFixed(1) + '">' + String(k).padStart(2, '0') + '</text>'; } }
+    var on = [];
+    S.forEach(function (s) { var a = !wk && inS(u, s); if (a) on.push(s.n); h += '<path class="arc ' + s.k + (a ? ' on' : '') + '" d="' + arc(loc(s.a), loc(s.b), s.r) + '"><title>' + s.n + ' session</title></path>'; });
+    var now = Date.now() / 1000, N = (window.MS_NEWS || []).filter(function (x) { return x.t > now && x.t < now + 86400; }).slice(0, 8);
+    N.forEach(function (x) { var dd = new Date(x.t * 1000), p = pt(dd.getHours() + dd.getMinutes() / 60, 91); h += '<rect class="nw" x="' + (p[0] - 3.6).toFixed(1) + '" y="' + (p[1] - 3.6).toFixed(1) + '" width="7.2" height="7.2" transform="rotate(45 ' + p[0].toFixed(1) + ' ' + p[1].toFixed(1) + ')"><title>' + (x.cur || '') + ' ' + String(x.title).replace(/[<&]/g, '') + ' · ' + dd.toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' }) + '</title></rect>'; });
+    var e = pt(l, 90), o = pt(l, 52); h += '<line class="hand" x1="' + o[0].toFixed(1) + '" y1="' + o[1].toFixed(1) + '" x2="' + e[0].toFixed(1) + '" y2="' + e[1].toFixed(1) + '"/><circle class="tip" cx="' + e[0].toFixed(1) + '" cy="' + e[1].toFixed(1) + '" r="4.5"/>';
+    var tm = d.toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit', hour12: false });
+    h += '<text class="ct" x="100" y="' + (on.length ? 98 : 104) + '">' + tm + '</text>' + (on.length ? '<text class="cs" x="100" y="115">' + on.join(' + ') + '</text>' : '<text class="cs" x="100" y="121">' + (wk ? 'weekend' : 'quiet hours') + '</text>');
+    svg.innerHTML = h;
+    // next change: the soonest session open or close
+    var best = null; S.forEach(function (s) { [['opens', s.a], ['closes', s.b]].forEach(function (z) { var dt = ((z[1] - u) % 24 + 24) % 24 || 24; if (!best || dt < best.dt) best = { dt: dt, t: s.n + ' ' + z[0] }; }); });
+    var nx = N[0], txt;
+    if (wk) { var w = d.getUTCDay(), hrs = (w === 5 ? (24 - u) + 46 : w === 6 ? (24 - u) + 22 : 22 - u); txt = 'Forex and gold are closed for the weekend · they open in <b>' + dur(hrs) + '</b>'; }
+    else txt = '<b>' + best.t + '</b> in ' + dur(best.dt) + (on.length ? '' : ' · between sessions');
+    if (nx) txt += '<br>Next news: <b>' + (nx.cur ? nx.cur + ' ' : '') + String(nx.short || nx.title).replace(/[<&]/g, '') + '</b> in ' + dur((nx.t - now) / 3600);
+    document.getElementById('h-ring-n').innerHTML = txt;
+    svg.setAttribute('aria-label', 'Session clock: ' + tm + (on.length ? ', open now: ' + on.join(' and ') : wk ? ', weekend' : ', between sessions'));
+    document.getElementById('h-ring').classList.toggle('wk', wk);
+  }
+  draw(); setInterval(function () { if (!document.hidden) draw(); }, 30000); document.addEventListener('ms:news', draw); document.addEventListener('visibilitychange', function () { if (!document.hidden) draw(); });
 })();
 </script>
 </body>
