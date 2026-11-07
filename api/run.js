@@ -3,7 +3,7 @@
 //   1. downloads only the files that job reads from the council-data branch (not the 700 MB branch),
 //   2. runs the unchanged script (council/trader.mjs or ict/tracker.mjs) on them in /tmp,
 //   3. commits just the changed files back to council-data through the GitHub API (retrying if the branch moved).
-// RUN_MODE=live commits and lets the alerts out; anything else is a dry run (no commit, no Telegram/ntfy), used to
+// RUN_MODE=live commits and lets the alerts out for both jobs; RUN_MODE=ict (or council) does it for that job only; anything else is a dry run (no commit, no Telegram/ntfy), used to
 // compare with the GitHub loop before switching it off. ?mode=dry forces a dry run.
 // Environment: CRON_SECRET, GH_TOKEN (fine-grained, this repo: Contents read/write), RUN_MODE, and the trader's own
 // NTFY_TOPIC, TELEGRAM_BOT_TOKEN, TELEGRAM_CHAT_ID, FUT_ACCOUNT, FUT_RISK.
@@ -21,7 +21,7 @@ const walk = (d, b = d) => fs.readdirSync(d, { withFileTypes: true }).flatMap((e
 module.exports = async (req, res) => {
   if (!process.env.CRON_SECRET || req.headers.authorization !== `Bearer ${process.env.CRON_SECRET}`) return res.status(401).json({ error: 'unauthorised' });
   const job = String((req.query && req.query.job) || ''), J = JOBS[job]; if (!J) return res.status(400).json({ error: 'unknown job' });
-  const live = process.env.RUN_MODE === 'live' && req.query.mode !== 'dry', tok = process.env.GH_TOKEN || process.env.GH_DISPATCH_TOKEN, t0 = Date.now();
+  const RM = String(process.env.RUN_MODE || '').split(',').map((x) => x.trim()), live = (RM.includes('live') || RM.includes(job)) && req.query.mode !== 'dry', tok = process.env.GH_TOKEN || process.env.GH_DISPATCH_TOKEN, t0 = Date.now();
   const gh = async (u, o = {}) => { const r = await fetch(`https://api.github.com/repos/${REPO}${u}`, { ...o, headers: { ...(tok ? { Authorization: `Bearer ${tok}` } : {}), Accept: 'application/vnd.github+json', 'X-GitHub-Api-Version': '2022-11-28', 'User-Agent': 'aurum-desk-runner', ...(o.body ? { 'Content-Type': 'application/json' } : {}), ...(o.headers || {}) } });
     if (!r.ok && !(o.ok || []).includes(r.status)) throw new Error(`GitHub ${r.status} ${u}: ${(await r.text()).slice(0, 200)}`); return r; };
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), `${job}-`)), before = {};
