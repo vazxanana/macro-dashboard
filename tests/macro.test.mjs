@@ -90,6 +90,9 @@ test('no look-ahead: features ignore FRED values inside the publication lag and 
   const v = M.fredView({ X: [{ t: D - 3 * DAY, v: 1 }, { t: D - 2 * DAY, v: 2 }, { t: D - DAY, v: 3 }] }, 'X', D);
   assert.equal(v.last.v, 2);
   assert.equal(M.fredView({ DTWEXBGS: [{ t: D - 5 * DAY, v: 1 }] }, 'DTWEXBGS', D).last, null);   // the broad dollar index lags 10 days
+  // a stale series (discontinued on FRED) counts as no data instead of voting on an old number
+  assert.equal(M.fredView({ BSCICP03DEM665S: [{ t: D - 700 * DAY, v: 99 }] }, 'BSCICP03DEM665S', D).last, null);
+  assert.equal(M.fredView({ DGS2: [{ t: D - 30 * DAY, v: 4 }] }, 'DGS2', D).at(D), null);
 });
 
 test('no look-ahead: walk-forward replay probabilities never depend on later outcomes', () => {
