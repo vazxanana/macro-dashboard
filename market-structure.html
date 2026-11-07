@@ -1219,7 +1219,13 @@ window.MS_USERS = { fred: { name: 'Fred', hash: '370aed697dc503aecee7d8faad5de77
 window.MS_CDATA = (/^https?:$/.test(location.protocol) && !/github\.io$/.test(location.hostname) ? location.origin + '/cdata/' : 'https://raw.githubusercontent.com/vazxanana/macro-dashboard/council-data/');   // Vercel serves council data from /cdata (private repo); GitHub Pages and local files read GitHub directly
 window.MS_USERS_URL = window.MS_CDATA + 'users.json';
 window.msMergeUsers = function (remote) { var m = {}, k; for (k in window.MS_USERS) m[k] = window.MS_USERS[k]; var r = (remote && remote.users) || {}; for (k in r) m[k] = r[k]; for (k in m) if (m[k] && m[k].disabled) delete m[k]; return m; };
-window.msFetchUsers = function () { return fetch(window.MS_USERS_URL + '?t=' + Date.now(), { cache: 'no-store' }).then(function (r) { return r.ok ? r.json() : null; }).catch(function () { return null; }); };   // viewer: setups, P&L calendar, active trades; read-only
+// on the Vercel site the list lives in a private Blob store behind /api/users (7 Nov); elsewhere (GitHub Pages, a local copy) in council-data users.json
+window.MS_USERS_API = /^https?:$/.test(location.protocol) && !/github\.io$/.test(location.hostname) ? location.origin + '/api/users' : null;
+window.msFetchUsers = function () {
+  var gh = function () { return fetch(window.MS_USERS_URL + '?t=' + Date.now(), { cache: 'no-store' }).then(function (r) { return r.ok ? r.json() : null; }).catch(function () { return null; }); };
+  if (!window.MS_USERS_API) return gh();
+  return fetch(window.MS_USERS_API, { cache: 'no-store' }).then(function (r) { return r.ok ? r.json() : r.status === 503 ? gh() : null; }).catch(function () { return null; });
+};   // viewer: setups, P&L calendar, active trades; read-only
 (function () { var h = null, u = null; try { h = localStorage.getItem('ms-admin'); u = localStorage.getItem('ms-user'); } catch (e) {}
   var rec = null; try { rec = JSON.parse(localStorage.getItem('ms-user-rec') || 'null'); } catch (e) {}
   var R = u && rec && rec.key === u && rec.hash === h ? rec : u && window.MS_USERS[u] && window.MS_USERS[u].hash === h ? window.MS_USERS[u] : null, owner = h === '49c5624f2625ed8b42b6e1bf2819a3a41ddb9743aeca36ea34ea7eb96c252ca8' && !u;
@@ -1267,7 +1273,7 @@ document.addEventListener('DOMContentLoaded', function () {
     var all = h === window.MS_ADMIN_HASH ? window.MS_USERS : window.msMergeUsers(await window.msFetchUsers());
     var un = Object.keys(all).find(function (k) { return all[k].hash === h; }), R = un && all[un];   // password only (6 Nov): each password belongs to one account
     if (h === window.MS_ADMIN_HASH || (R && h === R.hash)) window.msTrack && msTrack('Sign in', { result: 'ok' });
-    if (h === window.MS_ADMIN_HASH) { try { localStorage.setItem('ms-admin', h); localStorage.removeItem('ms-user'); localStorage.removeItem('ms-guest'); } catch (e) {} location.reload(); return; }
+    if (h === window.MS_ADMIN_HASH) { try { sessionStorage.setItem('ms-own-pw', pw); } catch (e) {} try { localStorage.setItem('ms-admin', h); localStorage.removeItem('ms-user'); localStorage.removeItem('ms-guest'); } catch (e) {} location.reload(); return; }
     if (R && h === R.hash) { try { localStorage.setItem('ms-admin', h); localStorage.setItem('ms-user', un); localStorage.setItem('ms-user-rec', JSON.stringify({ key: un, name: R.name, role: R.role, hash: h, ict: R.ict || false })); localStorage.removeItem('ms-guest'); } catch (e) {} location.reload(); return; }
     window.msTrack && msTrack('Sign in', { result: 'wrong' }); btn.disabled = false; btn.textContent = 'Sign in'; err.textContent = 'Wrong password.'; document.getElementById('ms-gate-p').select(); });
   if (gb) gb.addEventListener('click', function () { window.msTrack && msTrack('Guest'); var was = document.documentElement.dataset.mode === 'public' && localStorage.getItem('ms-guest'); try { localStorage.setItem('ms-guest', '1'); } catch (e) {} if (was) msGate(false); else location.reload(); });
@@ -2578,7 +2584,7 @@ html[data-motion="off"][data-gate] .gate-bg path[stroke] { animation: none; stro
 
   <!-- ─── Journal ─── -->
   <section class="view own adm" id="v-users" aria-label="Users" hidden>
-    <div class="v-head"><h1 class="h-head">Users</h1><p class="ms-note">Who can sign in and what they see. Changes are saved to the council data on GitHub and apply on every device.</p></div>
+    <div class="v-head"><h1 class="h-head">Users</h1><p class="ms-note">Who can sign in and what they see. Changes are saved on the server and apply on every device straight away.</p></div>
     <div class="card u-card">
       <div class="ms-k"><span>Accounts</span><small id="ms-u-sync"></small></div>
       <div class="ms-bt-wrap"><table class="ms-bt-t c-t u-t"><thead><tr><th>Name</th><th>Access</th><th>Password</th><th class="n">Actions</th></tr></thead><tbody id="ms-u-body"><tr><td colspan="4" class="empty">Loading…</td></tr></tbody></table></div>
@@ -5519,9 +5525,42 @@ function msNextSetup(bars, A) {
     if (!r.ok) throw new Error(`GitHub ${r.status}${r.status === 401 ? ' (token not accepted)' : ''}`);
     const j = await r.json(); return { sha: j.sha, json: JSON.parse(decodeURIComponent(escape(atob(String(j.content).replace(/\s/g, ''))))) };
   }
+  // the owner's password, asked once per tab (kept in sessionStorage only) and checked against the owner hash before it is sent
+  function ownerPw() {
+    let pw = ''; try { pw = sessionStorage.getItem('ms-own-pw') || ''; } catch (e) {}
+    if (pw) return Promise.resolve(pw);
+    return new Promise((done) => {
+      let d = document.getElementById('ms-own-dlg');
+      if (!d) {
+        d = document.createElement('dialog'); d.id = 'ms-own-dlg'; d.className = 'own-dlg';
+        d.innerHTML = '<form method="dialog"><h3>Confirm it\'s you</h3><p>Type your owner password to save account changes. It is asked once per visit and never stored on the server.</p><label for="ms-own-pw">Owner password</label><input id="ms-own-pw" type="password" autocomplete="current-password" required><p class="own-err" id="ms-own-err" role="alert"></p><div class="own-acts"><button type="button" value="cancel" id="ms-own-cancel">Cancel</button><button type="submit" value="ok" class="pri">Confirm</button></div></form>';
+        document.body.appendChild(d);
+      }
+      const inp = d.querySelector('#ms-own-pw'), err = d.querySelector('#ms-own-err'), f = d.querySelector('form');
+      inp.value = ''; err.textContent = '';
+      const finish = (v) => { f.onsubmit = null; d.querySelector('#ms-own-cancel').onclick = null; d.onclose = null; if (d.open) d.close(); done(v); };
+      f.onsubmit = async (ev) => { ev.preventDefault(); const v = inp.value; if ((await msSha256(v)) !== window.MS_ADMIN_HASH) { err.textContent = 'That is not the owner password.'; inp.select(); return; } try { sessionStorage.setItem('ms-own-pw', v); } catch (e) {} finish(v); };
+      d.querySelector('#ms-own-cancel').onclick = () => finish('');
+      d.onclose = () => finish('');
+      d.showModal(); setTimeout(() => inp.focus(), 30);
+    });
+  }
   async function saveUsers(mutate, note) {
     const msg = document.getElementById('ms-u-msg'); if (US.busy) return; US.busy = true;
     try {
+      if (window.MS_USERS_API) {
+        const pw = await ownerPw(); if (!pw) { if (msg) msg.textContent = 'Not saved: the owner password is needed.'; return false; }
+        if (msg) msg.textContent = 'Saving…';
+        const cur = await window.msFetchUsers(); if (!cur) throw new Error('Could not read the current accounts; check your connection and try again.');
+        const data = { users: { ...(cur.users || {}) } };
+        const err = mutate(data); if (err) throw new Error(err);
+        const r = await fetch(window.MS_USERS_API, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ ownerPw: pw, users: data.users, note }) });
+        const j = await r.json().catch(() => ({}));
+        if (r.status === 403) { try { sessionStorage.removeItem('ms-own-pw'); } catch (e) {} throw new Error('The server did not accept the owner password. Try again.'); }
+        if (r.status === 503) throw new Error('Account storage is not set up on the server yet.');
+        if (!r.ok) throw new Error(`Not saved: ${j.error || 'server error ' + r.status}`);
+        US.remote = j; if (msg) msg.textContent = `Saved: ${note}.`; renderUsers(true); return true;
+      }
       for (let a = 0; a < 3; a++) {
         const f = await ghFile(UPATH), data = f.json || { users: {} }; data.users = data.users || {};
         const err = mutate(data); if (err) throw new Error(err);
@@ -5544,7 +5583,7 @@ function msNextSetup(bars, A) {
   async function renderUsers(skipFetch) {
     const body = document.getElementById('ms-u-body'); if (!body || document.documentElement.dataset.role !== 'owner') return;
     if (!skipFetch) US.remote = await window.msFetchUsers();
-    const sync = document.getElementById('ms-u-sync'); if (sync) sync.textContent = ghTok() ? 'GitHub connected' : 'Connect GitHub on the Loss review card to make changes';
+    const sync = document.getElementById('ms-u-sync'); if (sync) sync.textContent = window.MS_USERS_API ? 'Saved on the server · changes ask for your owner password once per visit' : ghTok() ? 'GitHub connected' : 'Connect GitHub on the Loss review card to make changes';
     const rem = (US.remote && US.remote.users) || {}, keys = [...new Set(Object.keys(window.MS_USERS).concat(Object.keys(rem)))];
     body.innerHTML = keys.map((k) => {
       const u = rem[k] || window.MS_USERS[k], off = !!(rem[k] && rem[k].disabled), src = window.MS_USERS[k] ? (rem[k] ? 'built-in, changed here' : 'built-in') : 'added here';
@@ -7138,5 +7177,19 @@ function gpStats(T) {
   document.addEventListener('visibilitychange', function () { if (!document.hidden) load(); });
 })();
 </script>
+<style>
+/* owner password confirm (Users page saves, 7 Nov) */
+.own-dlg { border: 1px solid var(--line); border-radius: 14px; background: var(--panel); color: var(--ink); padding: 22px; width: min(380px, calc(100vw - 32px)); box-shadow: 0 24px 60px -20px rgba(0,0,0,.5); }
+.own-dlg::backdrop { background: rgba(5,7,12,.55); backdrop-filter: blur(2px); }
+.own-dlg h3 { margin: 0 0 6px; font-size: 17px; }
+.own-dlg p { margin: 0 0 14px; color: var(--ink-dim); font-size: 13px; line-height: 1.5; }
+.own-dlg label { display: block; font-size: 12px; font-weight: 600; color: var(--ink-dim); margin-bottom: 6px; }
+.own-dlg input { width: 100%; box-sizing: border-box; height: 44px; padding: 0 12px; border-radius: 10px; border: 1px solid var(--line); background: var(--bg); color: var(--ink); font: inherit; font-size: 16px; }
+.own-dlg input:focus { outline: 2px solid var(--accent); outline-offset: 1px; }
+.own-dlg .own-err { color: var(--sell); min-height: 1.2em; margin: 8px 0 10px; }
+.own-acts { display: flex; justify-content: flex-end; gap: 8px; }
+.own-acts button { height: 40px; padding: 0 16px; border-radius: 10px; border: 1px solid var(--line); background: transparent; color: var(--ink); font: inherit; font-weight: 600; cursor: pointer; }
+.own-acts button.pri { background: var(--accent); border-color: var(--accent); color: #fff; }
+</style>
 </body>
 </html>
