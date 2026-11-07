@@ -3473,10 +3473,11 @@ function msNextSetup(bars, A) {
     { const pane = el.closest('.ms-pane'), ph = pane && pane.querySelector('.ms-ph');
       if (ph && !ph.querySelector('.ch-tools')) {
         const tl = document.createElement('span'); tl.className = 'ch-tools';
-        tl.innerHTML = `<a class="ch-b ch-tv" target="_blank" rel="noopener" title="Open this chart on TradingView" aria-label="Open on TradingView"></a><button type="button" class="ch-b ch-hl" title="Draw a horizontal line: click the chart to place it, click a line again to remove it (saved for this market)" aria-label="Draw horizontal lines" aria-pressed="false"></button><button type="button" class="ch-b ch-ruler" title="Measure: drag on the chart (or hold Shift and drag)" aria-label="Measure price and time on the chart" aria-pressed="false"></button><button type="button" class="ch-b ch-snap" title="Save this chart as an image" aria-label="Save the chart as a PNG image"></button><button type="button" class="ch-b ch-bell" title="Price alert (notifies this device) · tip: right-click the chart to set one at that price" aria-label="Set a price alert"></button><button type="button" class="ch-b ch-fit" title="Fit the chart (double-click the chart)" aria-label="Fit the ${tf.label} chart"></button><button type="button" class="ch-b ch-fs" title="Full screen" aria-label="Show the ${tf.label} chart full screen"></button>`;
+        tl.innerHTML = `<a class="ch-b ch-tv" target="_blank" rel="noopener" title="Open this chart on TradingView" aria-label="Open on TradingView"></a><button type="button" class="ch-b ch-hl" title="Draw a horizontal line: click the chart to place it, click a line again to remove it (saved for this market)" aria-label="Draw horizontal lines" aria-pressed="false"></button><button type="button" class="ch-b ch-ruler" title="Measure: drag on the chart (or hold Shift and drag)" aria-label="Measure price and time on the chart" aria-pressed="false"></button><button type="button" class="ch-b ch-rp" title="Replay: hide the future and step through the candles (← → keys)" aria-label="Bar replay" aria-pressed="false"></button><button type="button" class="ch-b ch-snap" title="Save this chart as an image" aria-label="Save the chart as a PNG image"></button><button type="button" class="ch-b ch-bell" title="Price alert (notifies this device) · tip: right-click the chart to set one at that price" aria-label="Set a price alert"></button><button type="button" class="ch-b ch-fit" title="Fit the chart (double-click the chart)" aria-label="Fit the ${tf.label} chart"></button><button type="button" class="ch-b ch-fs" title="Full screen" aria-label="Show the ${tf.label} chart full screen"></button>`;
         ph.appendChild(tl);
         tl.querySelector('.ch-fit').addEventListener('click', () => P.fit());
         tl.querySelector('.ch-snap').addEventListener('click', () => P.snapshot());
+        tl.querySelector('.ch-rp').addEventListener('click', (e) => { P.replay(!P.rp); e.currentTarget.classList.toggle('on', !!P.rp); e.currentTarget.setAttribute('aria-pressed', String(!!P.rp)); });
         tl.querySelector('.ch-hl').addEventListener('click', (e) => { const on = !P.hlOn; P.hlOn = on; e.currentTarget.classList.toggle('on', on); e.currentTarget.setAttribute('aria-pressed', String(on)); el.classList.toggle('measuring', on || !!P.measureOn); });
         { const tv = tl.querySelector('.ch-tv'); tv.href = tvUrl(CUR, tf); tv.addEventListener('click', () => { tv.href = tvUrl(CUR, tf); window.msTrack && msTrack('Open TradingView', { tf: tf.id }); }); }
         tl.querySelector('.ch-ruler').addEventListener('click', (e) => { const on = !P.measureOn; P.measureOn = on; e.currentTarget.classList.toggle('on', on); e.currentTarget.setAttribute('aria-pressed', String(on)); el.classList.toggle('measuring', on); if (!on) P.clearMeasure(); });
@@ -3498,7 +3499,7 @@ function msNextSetup(bars, A) {
       };
       setInterval(tickCd, 1000); chart.timeScale().subscribeVisibleLogicalRangeChange(() => requestAnimationFrame(tickCd)); }
     chart.subscribeCrosshairMove((pr) => { if (!P.bars) return; if (pr && pr.logical != null && pr.point && pr.point.x >= 0) { lgHover = true; P._cp = series.coordinateToPrice(pr.point.y); P.legend(Math.round(pr.logical)); } else { lgHover = false; P.legend(); } });
-    setInterval(() => { if (!lgHover && el.offsetParent && !document.hidden) { try { const d = series.data(); if (d && d.length && P.bars && P.bars.length) { const L = d[d.length - 1], b = P.bars[P.bars.length - 1]; if (L.time === b.time) Object.assign(b, { open: L.open, high: L.high, low: L.low, close: L.close }); } } catch (e) {} P.legend(); } }, 1000);
+    setInterval(() => { if (!lgHover && !P.rp && el.offsetParent && !document.hidden) { try { const d = series.data(); if (d && d.length && P.bars && P.bars.length) { const L = d[d.length - 1], b = P.bars[P.bars.length - 1]; if (L.time === b.time) Object.assign(b, { open: L.open, high: L.high, low: L.low, close: L.close }); } } catch (e) {} P.legend(); } }, 1000);
     series.applyOptions({ autoscaleInfoProvider: (orig) => {
       const r = orig();
       if (r && r.priceRange && P.pv.length) { r.priceRange.minValue = Math.min(r.priceRange.minValue, ...P.pv); r.priceRange.maxValue = Math.max(r.priceRange.maxValue, ...P.pv); }
@@ -3590,9 +3591,25 @@ function msNextSetup(bars, A) {
       const L = window.msHLines.get(), hit = L.findIndex((v) => { const c = series.priceToCoordinate(v); return c != null && Math.abs(c - y) <= 6; });
       if (hit >= 0) L.splice(hit, 1); else L.push(+pr.toFixed(Math.max(0, INST.dec)));
       window.msHLines.set(L); });
+    // bar replay (7 Nov loop): hide everything after a chosen candle and step forward one bar at a time (practice reading the chart)
+    { const bar = document.createElement('div'); bar.className = 'rp-bar'; bar.hidden = true;
+      bar.innerHTML = '<button type="button" data-rp="-1" aria-label="One candle back">◀</button><button type="button" data-rp="play" aria-label="Play">▶</button><button type="button" data-rp="1" aria-label="One candle forward">▶|</button><span class="rp-t"></span><button type="button" data-rp="x" aria-label="Exit replay">Exit</button>';
+      el.appendChild(bar); let timer = null;
+      const show = () => { const B = P.bars.slice(0, P.rp.i); series.setData(B); if (lgHover === false) { const lb = B[B.length - 1]; if (lb) lg.innerHTML = `<span class="k">Replay</span><span class="k">O</span><b>${fmt(lb.open)}</b><span class="k">H</span><b>${fmt(lb.high)}</b><span class="k">L</span><b>${fmt(lb.low)}</b><span class="k">C</span><b>${fmt(lb.close)}</b>`; } try { vol.setData([]); } catch (e) {} const b = B[B.length - 1];
+        bar.querySelector('.rp-t').textContent = b ? `${new Date((b.time - TZ) * 1000).toLocaleString(undefined, { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })} · ${P.rp.i}/${P.bars.length}` : ''; };
+      const step = (d) => { if (!P.rp) return; P.rp.i = Math.max(20, Math.min(P.bars.length, P.rp.i + d)); show(); if (P.rp.i >= P.bars.length) stop(); };
+      const stop = () => { clearInterval(timer); timer = null; bar.querySelector('[data-rp="play"]').textContent = '▶'; };
+      // the structure drawings are worked out from all candles, so they are hidden while replaying (they would show the future)
+      P.replay = (on) => { if (on && P.bars && P.bars.length > 40) { P.rp = { i: Math.max(20, P.bars.length - 120) }; bar.hidden = false; try { series.detachPrimitive(overlay); } catch (e) {} try { series.setMarkers([]); } catch (e) {} (P.priceLines || []).concat(P._ct || []).forEach((l) => { try { l.applyOptions({ lineVisible: false, axisLabelVisible: false, title: '' }); } catch (e) {} }); el.classList.add('replaying'); show(); chart.timeScale().scrollToRealTime(); }
+        else { stop(); P.rp = null; bar.hidden = true; el.classList.remove('replaying'); try { series.attachPrimitive(overlay); } catch (e) {} P._mkSig = null; P._ctSig = null; P.rebuild(true); } };
+      bar.addEventListener('click', (ev) => { const b = ev.target.closest('[data-rp]'); if (!b) return; const a = b.dataset.rp;
+        if (a === 'x') { P.replay(false); const t = el.closest('.ms-pane') && el.closest('.ms-pane').querySelector('.ch-rp'); if (t) { t.classList.remove('on'); t.setAttribute('aria-pressed', 'false'); } }
+        else if (a === 'play') { if (timer) stop(); else { b.textContent = '❚❚'; timer = setInterval(() => step(1), 600); } } else step(+a); });
+      addEventListener('keydown', (ev) => { if (!P.rp || !el.offsetParent || /INPUT|TEXTAREA|SELECT/.test((ev.target || {}).tagName || '')) return; if (ev.key === 'ArrowRight') { ev.preventDefault(); step(1); } else if (ev.key === 'ArrowLeft') { ev.preventDefault(); step(-1); } }); }
     P.rebuild = function (keepView) {
       const off = G.offset;
       P.bars = P.raw.map((b) => ({ time: b.time + TZ, open: b.open + off, high: b.high + off, low: b.low + off, close: b.close + off }));
+      if (P.rp) return;   // replaying: keep the hidden future hidden (analysis resumes on exit)
       series.setData(P.bars);
       P.setVol(); P.setEma(); P.setShade();
       P.analyze();
@@ -3710,8 +3727,8 @@ function msNextSetup(bars, A) {
       P.tickEma(b); P.tickShade(b);
       if (G.showVol !== false) { const rk = P.raw[P.raw.length - 1]; if (rk.volume > 0 || P.raw.some((x) => x.volume > 0)) try { vol.update({ time: b.time, value: rk.volume || 0, color: vcol(rk) }); } catch (e) {} }
       if (P.bars.length > P.raw.length) P.bars.shift();
-      series.update(b);
-      if (!lgHover) P.legend();
+      if (!P.rp) series.update(b);
+      if (!lgHover && !P.rp) P.legend();
       const now = Date.now();
       if (k.closed || !P._t || now - P._t > 2000) { P._t = now; P.analyze(); }
     };
@@ -3775,7 +3792,7 @@ function msNextSetup(bars, A) {
     let T = []; try { T = (COUNCIL.trades || []).filter((x) => x.market === instKey && !x.shadow && (x.status === 'open' || x.status === 'pending') && isFinite(x.entry) && isFinite(x.stop)); } catch (e) {}
     if (G.showCT === false) T = [];
     const sig = JSON.stringify(T.map((x) => [x.id, x.entry, x.stop, x.t1, x.status]));
-    ['4h', '1h', '15m', '5m', '1m'].forEach((id) => { const P = panes[id]; if (!P || !P.series || P._ctSig === sig) return; P._ctSig = sig;
+    ['4h', '1h', '15m', '5m', '1m'].forEach((id) => { const P = panes[id]; if (!P || !P.series || P.rp || P._ctSig === sig) return; P._ctSig = sig;
       (P._ct || []).forEach((l) => { try { P.series.removePriceLine(l); } catch (e) {} }); P._ct = [];
       T.forEach((x) => { const nm = `${x.side === 'buy' ? '▲' : '▼'} ${x.name || x.k}${x.status === 'pending' ? ' (limit)' : ''}`;
         P._ct.push(P.series.createPriceLine({ price: x.entry, color: '#2962ff', lineWidth: 2, lineStyle: x.status === 'pending' ? LW.LineStyle.Dashed : LW.LineStyle.Solid, axisLabelVisible: true, title: nm }));
@@ -3786,7 +3803,7 @@ function msNextSetup(bars, A) {
   function councilMarkers() {
     let T = []; try { T = (COUNCIL.trades || []).filter((x) => x.market === instKey && !x.shadow && x.entry && (x.filled || x.opened) && x.status !== 'pending' && x.status !== 'missed' && x.status !== 'expired').sort((a, b) => (b.filled || b.opened) - (a.filled || a.opened)).slice(0, 60); } catch (e) {}
     if (G.showCT === false) T = [];
-    ['4h', '1h', '15m'].forEach((id) => { const P = panes[id]; if (!P || !P.series || !P.bars || !P.bars.length) return;
+    ['4h', '1h', '15m'].forEach((id) => { const P = panes[id]; if (!P || !P.series || P.rp || !P.bars || !P.bars.length) return;
       const tf = TFS.find((t) => t.id === id), have = new Set(P.bars.map((b) => b.time)), bt = (t) => Math.floor(t / tf.sec) * tf.sec + TZ, mk = [];
       T.forEach((x) => { const buy = x.side !== 'sell', te = bt(x.filled || x.opened);
         if (have.has(te)) mk.push({ time: te, position: buy ? 'belowBar' : 'aboveBar', shape: buy ? 'arrowUp' : 'arrowDown', color: '#2962ff', text: id === '15m' ? (x.name || x.k) : '' });
@@ -7688,6 +7705,12 @@ function gpStats(T) {
 /* price alerts (7 Nov) */
 .ch-bell { --i: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 8a6 6 0 1 1 12 0c0 7 3 9 3 9H3s3-2 3-9M10.3 21a1.94 1.94 0 0 0 3.4 0'/%3E%3C/svg%3E"); }
 .ch-bell.on { color: #e0a526; }
+.ch-rp { --i: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M3 12a9 9 0 1 0 3-6.7L3 8'/%3E%3Cpath d='M3 3v5h5M10 9l5 3-5 3z'/%3E%3C/svg%3E"); }
+.rp-bar { position: absolute; left: 50%; bottom: 34px; transform: translateX(-50%); z-index: 6; display: flex; align-items: center; gap: 4px; padding: 5px; border-radius: 10px; background: color-mix(in srgb, var(--panel) 92%, transparent); border: 1px solid var(--line); box-shadow: 0 8px 24px rgba(0,0,0,.3); }
+.rp-bar[hidden] { display: none; }
+.rp-bar button { height: 30px; min-width: 34px; padding: 0 10px; border-radius: 7px; border: 1px solid var(--line); background: var(--bg); color: var(--ink); font: inherit; font-size: 12.5px; font-weight: 600; cursor: pointer; }
+.rp-bar button:hover { border-color: var(--accent); }
+.rp-bar .rp-t { padding: 0 8px; font-size: 12px; color: var(--ink-dim); white-space: nowrap; font-variant-numeric: tabular-nums; }
 .ch-hl { --i: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round'%3E%3Cpath d='M3 12h18'/%3E%3Ccircle cx='12' cy='12' r='2.2' fill='black'/%3E%3C/svg%3E"); }
 .tv-tk { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; margin: 8px 0 0; padding: 10px 12px; border: 1px solid color-mix(in srgb, var(--accent) 30%, var(--line)); border-radius: 10px; background: color-mix(in srgb, var(--accent) 6%, transparent); font-size: 12.5px; }
 .tv-tk[hidden] { display: none; }
