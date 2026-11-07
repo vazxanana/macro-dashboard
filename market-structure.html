@@ -2292,6 +2292,7 @@ html[data-motion="off"][data-gate] .gate-bg path[stroke] { animation: none; stro
             <label><input type="checkbox" id="ms-show-htf" data-show="htf" checked><i style="border:1.5px dashed #2962ff"></i>HTF Origin</label>
             <label><input type="checkbox" id="ms-show-ct" checked><i style="background:#2962ff;height:2px"></i>Council trades</label>
             <label><input type="checkbox" id="ms-show-kl" checked><i style="border-top:1.5px dotted #9aa4b2;height:0"></i>Key levels</label>
+            <label><input type="checkbox" id="ms-show-ema"><i style="background:linear-gradient(90deg,#2962ff 33%,#e0a526 33% 66%,#9c27b0 66%);height:2px"></i>EMAs 21 / 50 / 200</label>
             <label><input type="checkbox" id="ms-show-vol" checked><i style="background:linear-gradient(90deg,rgba(8,153,129,.5) 50%,rgba(242,54,69,.5) 50%)"></i>Volume</label>
             <label><input type="checkbox" id="ms-show-next" data-show="next" checked><i style="background:#2962ff;height:2px"></i>Next setup</label>
             <label><input type="checkbox" id="ms-show-plan" data-show="plan" checked><i style="background:#089981;height:2px"></i>Selected trade</label>
@@ -3499,6 +3500,17 @@ function msNextSetup(bars, A) {
     chart.priceScale('vol').applyOptions({ scaleMargins: { top: 0.84, bottom: 0 }, visible: false });
     const vcol = (b) => b.close >= b.open ? 'rgba(8,153,129,.26)' : 'rgba(242,54,69,.26)';
     P.vol = vol;
+    // EMAs 21 / 50 / 200 (7 Nov loop): thin lines, off by default (Settings → Chart layers → EMAs)
+    const EMA = [[21, 'rgba(41,98,255,.75)'], [50, 'rgba(224,165,38,.75)'], [200, 'rgba(156,39,176,.7)']].map(([n, c]) => ({ n, s: chart.addLineSeries({ color: c, lineWidth: 1, priceLineVisible: false, lastValueVisible: false, crosshairMarkerVisible: false }), last: null }));
+    P.setEma = function () {
+      const on = G.showEma === true && P.bars && P.bars.length;
+      EMA.forEach((e) => { if (!on) { e.s.setData([]); e.last = null; return; } const k = 2 / (e.n + 1); let v = null; const out = [];
+        P.bars.forEach((b, i) => { v = v == null ? b.close : b.close * k + v * (1 - k); if (i >= Math.min(e.n, P.bars.length - 1) - 1) out.push({ time: b.time, value: v }); });
+        e.s.setData(out); e.prev = out.length > 1 ? out[out.length - 2].value : null; e.lastT = out.length ? out[out.length - 1].time : null; });
+    };
+    P.tickEma = function (b) { if (G.showEma !== true) return; EMA.forEach((e) => { if (e.prev == null) return; const k = 2 / (e.n + 1);
+      if (b.time !== e.lastT) { const d = e.s.data(); e.prev = d.length ? d[d.length - 1].value : e.prev; e.lastT = b.time; }
+      try { e.s.update({ time: b.time, value: b.close * k + e.prev * (1 - k) }); } catch (err) {} }); };
     P.setVol = function () { const on = P.raw && P.raw.some((b) => b.volume > 0) && G.showVol !== false; vol.setData(on ? P.raw.map((b) => ({ time: b.time + TZ, value: b.volume || 0, color: vcol(b) })) : []); };
     // chart snapshot (7 Nov loop): the chart as a PNG with a title strip (market, timeframe, price, time) for sharing or a journal
     P.snapshot = async function () {
@@ -3546,7 +3558,7 @@ function msNextSetup(bars, A) {
       const off = G.offset;
       P.bars = P.raw.map((b) => ({ time: b.time + TZ, open: b.open + off, high: b.high + off, low: b.low + off, close: b.close + off }));
       series.setData(P.bars);
-      P.setVol();
+      P.setVol(); P.setEma();
       P.analyze();
       if (!keepView || !P.fitted) P.fit();
       P.legend();
@@ -3659,6 +3671,7 @@ function msNextSetup(bars, A) {
       else return;
       const off = G.offset, b = { time: k.time + TZ, open: k.open + off, high: k.high + off, low: k.low + off, close: k.close + off };
       if (P.bars[P.bars.length - 1].time === b.time) P.bars[P.bars.length - 1] = b; else P.bars.push(b);
+      P.tickEma(b);
       if (G.showVol !== false) { const rk = P.raw[P.raw.length - 1]; if (rk.volume > 0 || P.raw.some((x) => x.volume > 0)) try { vol.update({ time: b.time, value: rk.volume || 0, color: vcol(rk) }); } catch (e) {} }
       if (P.bars.length > P.raw.length) P.bars.shift();
       series.update(b);
@@ -3703,6 +3716,7 @@ function msNextSetup(bars, A) {
   setTimeout(councilLines, 4000); setInterval(councilLines, 15e3);
   { const k = document.getElementById('ms-show-ct'); try { G.showCT = localStorage.getItem('ms-ct') !== '0'; } catch (e) {} if (k) { k.checked = G.showCT !== false; k.addEventListener('change', () => { G.showCT = k.checked; try { localStorage.setItem('ms-ct', k.checked ? '1' : '0'); } catch (e) {} Object.values(panes).forEach((P) => { P._ctSig = null; }); councilLines(); }); } }
   { const k = document.getElementById('ms-show-kl'); try { G.showKL = localStorage.getItem('ms-kl') !== '0'; } catch (e) {} if (k) { k.checked = G.showKL !== false; k.addEventListener('change', () => { G.showKL = k.checked; try { localStorage.setItem('ms-kl', k.checked ? '1' : '0'); } catch (e) {} keyLevels(); }); } }
+  { const k = document.getElementById('ms-show-ema'); try { G.showEma = localStorage.getItem('ms-ema') === '1'; } catch (e) {} if (k) { k.checked = G.showEma === true; k.addEventListener('change', () => { G.showEma = k.checked; try { localStorage.setItem('ms-ema', k.checked ? '1' : '0'); } catch (e) {} Object.values(panes).forEach((P) => P.setEma && P.setEma()); }); } }
   { const v = document.getElementById('ms-show-vol'); try { G.showVol = localStorage.getItem('ms-vol') !== '0'; } catch (e) {} if (v) { v.checked = G.showVol !== false; v.addEventListener('change', () => { G.showVol = v.checked; try { localStorage.setItem('ms-vol', v.checked ? '1' : '0'); } catch (e) {} Object.values(panes).forEach((P) => P.setVol && P.setVol()); }); } }
   // TradingView alerts in (7 Nov loop): webhook URL (owner), message template, forward-to-this-device switch, recent alerts
   { const btn = document.getElementById('ms-tvw-open'); let dlg;
