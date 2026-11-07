@@ -27,15 +27,15 @@
 <link rel="canonical" href="https://meridianx.dev/">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600;700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600&display=swap">
 <script src="https://cdn.jsdelivr.net/npm/lightweight-charts@4.1.3/dist/lightweight-charts.standalone.production.js"></script>
 <style>
   /* Layout: one focused column; top bar → what to do now → possible trades → charts → method notes */
   :root {
     --bg: #0b0e14; --panel: #121722; --panel-raised: #0e131c; --line: #1e2533; --line-soft: #1a2130;
     --ink: #e8ecf2; --ink-dim: #a9b2c3; --ink-faint: #8a94a8; --accent: #3d7bff; --buy: #2bd4a4; --sell: #ff5c7a;
-    --sans: Manrope, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-    --mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    --sans: Figtree, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    --mono: Figtree, "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
     color-scheme: dark;
   }
   :root[data-theme="light"] {
@@ -553,13 +553,13 @@
     .seg { width: 100%; } .seg button { flex: 1; padding: 9px 4px; }
   }
 
-  /* ═══ Design pass (4 Nov): one slim top bar, deeper neutral surfaces, hairline borders, Inter, calmer colour ═══ */
+  /* ═══ Design pass (4 Nov): one slim top bar, deeper neutral surfaces, hairline borders, Figtree, calmer colour ═══ */
   :root, :root[data-theme="dark"] {
     --bg: #08090c; --panel: #0f1116; --panel-raised: #14171e; --panel-hover: #161a22;
     --line: rgba(255,255,255,.07); --line-soft: rgba(255,255,255,.045); --line-strong: rgba(255,255,255,.12);
     --ink: #eceef2; --ink-dim: #a4abb8; --ink-faint: #737b8a; --accent: #5b8cff; --accent-soft: rgba(91,140,255,.12);
     --buy: #2fbf8f; --sell: #f2576f; --buy-soft: rgba(47,191,143,.12); --sell-soft: rgba(242,87,111,.12);
-    --sans: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    --sans: Figtree, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
     --r: 12px; --r-sm: 8px;
   }
   html, body { background: var(--bg); font: 14px/1.5 var(--sans); font-feature-settings: "cv11", "ss01"; -webkit-font-smoothing: antialiased; }
@@ -1345,24 +1345,24 @@ window.MS_ADMIN_HASH = '49c5624f2625ed8b42b6e1bf2819a3a41ddb9743aeca36ea34ea7eb9
     background: radial-gradient(900px 600px at 85% 15%, rgba(227,179,65,.16), transparent 65%), radial-gradient(800px 600px at 10% 100%, rgba(91,140,255,.10), transparent 70%), linear-gradient(180deg, #0b0b10 0%, #07070a 100%); }
   .gate-bg { position: fixed; inset: 0; width: 100%; height: 100%; pointer-events: none; }
   .gate-card { position: relative; backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); background: rgba(15,17,22,.88) !important; }
-  .gate-brand span { font: 700 16px Inter, -apple-system, sans-serif; letter-spacing: .2px; color: #f1d27f; }
+  .gate-brand span { font: 700 16px Figtree, -apple-system, sans-serif; letter-spacing: .2px; color: #f1d27f; }
   html[data-gate] body { overflow: hidden; }
   html[data-gate] #ms-live { visibility: hidden; }
-  .gate-card { width: min(400px, 100%); background: #0f1116; border: 1px solid rgba(255,255,255,.08); border-radius: 16px; padding: 28px 28px 22px; box-shadow: 0 30px 80px rgba(0,0,0,.55); color: #eceef2; font: 14px/1.5 Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+  .gate-card { width: min(400px, 100%); background: #0f1116; border: 1px solid rgba(255,255,255,.08); border-radius: 16px; padding: 28px 28px 22px; box-shadow: 0 30px 80px rgba(0,0,0,.55); color: #eceef2; font: 14px/1.5 Figtree, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
   .gate-brand { display: flex; align-items: center; gap: 10px; font-weight: 600; color: #a4abb8; margin-bottom: 18px; }
   .gate-brand .ms-coin { width: 22px; height: 22px; }
   .gate-x { margin-left: auto; width: 36px; height: 36px; border: 0; border-radius: 8px; background: none; color: #737b8a; font-size: 22px; cursor: pointer; display: none; }
   html[data-gate][data-guest] .gate-x { display: inline-block; }
   .gate-x:hover { background: rgba(255,255,255,.05); color: #eceef2; }
-  .gate h1 { font: 600 24px/1.2 Inter, -apple-system, sans-serif; letter-spacing: -.4px; margin: 0 0 6px; }
+  .gate h1 { font: 600 24px/1.2 Figtree, -apple-system, sans-serif; letter-spacing: -.4px; margin: 0 0 6px; }
   .gate-sub { margin: 0 0 20px; color: #a4abb8; font-size: 13.5px; }
   .gate form { display: grid; gap: 6px; }
-  .gate label { font: 500 13px Inter, -apple-system, sans-serif; color: #c9ced8; margin-top: 6px; }
-  .gate input { min-height: 44px; padding: 10px 12px; border-radius: 10px; border: 1px solid rgba(255,255,255,.12); background: #14171e; color: #eceef2; font: 15px Inter, -apple-system, sans-serif; outline: none; transition: border-color .15s ease-out, box-shadow .15s ease-out; }
+  .gate label { font: 500 13px Figtree, -apple-system, sans-serif; color: #c9ced8; margin-top: 6px; }
+  .gate input { min-height: 44px; padding: 10px 12px; border-radius: 10px; border: 1px solid rgba(255,255,255,.12); background: #14171e; color: #eceef2; font: 15px Figtree, -apple-system, sans-serif; outline: none; transition: border-color .15s ease-out, box-shadow .15s ease-out; }
   .gate input::placeholder { color: #8b93a3; }
   .gate input:focus { border-color: #e3b341; box-shadow: 0 0 0 3px rgba(227,179,65,.22); }
   .gate-err { min-height: 20px; margin: 4px 0 0; color: #ff7d92; font-size: 13px; }
-  .gate-go, .gate-guest { min-height: 44px; border-radius: 10px; font: 600 14px Inter, -apple-system, sans-serif; cursor: pointer; transition: background .15s ease-out, border-color .15s ease-out; touch-action: manipulation; }
+  .gate-go, .gate-guest { min-height: 44px; border-radius: 10px; font: 600 14px Figtree, -apple-system, sans-serif; cursor: pointer; transition: background .15s ease-out, border-color .15s ease-out; touch-action: manipulation; }
   .gate-go { border: 0; background: #e3b341; color: #17130a; margin-top: 4px; }
   .gate-go:hover { background: #efc35a; } .gate-go:disabled { opacity: .6; cursor: progress; }
   .gate-guest { width: 100%; border: 1px solid rgba(255,255,255,.14); background: transparent; color: #eceef2; }
@@ -2139,10 +2139,10 @@ html[data-role="viewer"] [data-go="crypto"], html[data-role="viewer"] [data-go="
 
 /* ═══ LOGIN 2 (7 Nov): two-panel desk intro + refined card, live gold strip, caps-lock hint, shake on a wrong password ═══ */
 .gate-wrap { position: relative; z-index: 1; display: grid; grid-template-columns: minmax(0, 1fr) 400px; gap: clamp(32px, 6vw, 96px); align-items: center; width: min(1080px, 100%); }
-.gate-side { color: #eceef2; font: 15px/1.6 Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; max-width: 520px; }
-.gs-brand { display: flex; align-items: center; gap: 10px; font: 600 15px Inter, sans-serif; color: #e9c46a; letter-spacing: .01em; margin-bottom: 28px; }
+.gate-side { color: #eceef2; font: 15px/1.6 Figtree, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; max-width: 520px; }
+.gs-brand { display: flex; align-items: center; gap: 10px; font: 600 15px Figtree, sans-serif; color: #e9c46a; letter-spacing: .01em; margin-bottom: 28px; }
 .gs-brand .ms-coin { width: 26px; height: 26px; }
-.gs-h { margin: 0 0 14px; font: 650 clamp(32px, 3.6vw, 46px)/1.08 Inter, -apple-system, sans-serif; letter-spacing: -0.025em; color: #f4f5f8; text-wrap: balance; }
+.gs-h { margin: 0 0 14px; font: 650 clamp(32px, 3.6vw, 46px)/1.08 Figtree, -apple-system, sans-serif; letter-spacing: -0.025em; color: #f4f5f8; text-wrap: balance; }
 .gs-h em { font-style: normal; color: #e9c46a; }
 .gs-p { margin: 0 0 26px; color: #a6adbb; max-width: 46ch; text-wrap: pretty; }
 .gs-list { list-style: none; margin: 0 0 30px; padding: 0; display: grid; gap: 14px; }
@@ -2154,7 +2154,7 @@ html[data-role="viewer"] [data-go="crypto"], html[data-role="viewer"] [data-go="
 .gs-i2 { --m: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round'%3E%3Cpath d='M7 4v16M17 4v16'/%3E%3Crect x='5' y='8' width='4' height='7' rx='1'/%3E%3Crect x='15' y='6' width='4' height='9' rx='1'/%3E%3C/svg%3E"); }
 .gs-i3 { --m: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round'%3E%3Cpath d='M4 9V5a1 1 0 0 1 1-1h4M15 4h4a1 1 0 0 1 1 1v4M20 15v4a1 1 0 0 1-1 1h-4M9 20H5a1 1 0 0 1-1-1v-4'/%3E%3Ccircle cx='12' cy='12' r='2.5'/%3E%3C/svg%3E"); }
 .gs-live { display: inline-grid; gap: 6px; padding: 12px 16px; border-radius: 12px; background: rgba(15,17,22,.72); border: 1px solid rgba(255,255,255,.08); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); min-width: 300px; }
-.gs-tk { display: flex; align-items: baseline; gap: 10px; font: 500 13px Inter, sans-serif; color: #a6adbb; }
+.gs-tk { display: flex; align-items: baseline; gap: 10px; font: 500 13px Figtree, sans-serif; color: #a6adbb; }
 .gs-dot { width: 8px; height: 8px; border-radius: 50%; background: #3fbf8f; align-self: center; box-shadow: 0 0 0 0 rgba(63,191,143,.6); animation: gs-pulse 2s ease-out infinite; }
 @keyframes gs-pulse { to { box-shadow: 0 0 0 8px transparent; } }
 .gs-dot.off { background: #7c8496; animation: none; }
@@ -2163,19 +2163,19 @@ html[data-role="viewer"] [data-go="crypto"], html[data-role="viewer"] [data-go="
 .gs-tf { display: inline-flex; gap: 4px; margin-left: auto; }
 .gs-tf i { font: 600 10.5px "JetBrains Mono", monospace; font-style: normal; padding: 1px 5px; border-radius: 4px; border: 1px solid rgba(255,255,255,.14); color: #a6adbb; }
 .gs-tf i.u { color: #3fbf8f; border-color: rgba(63,191,143,.45); } .gs-tf i.d { color: #ff6b81; border-color: rgba(255,107,129,.45); }
-.gs-sess { font: 500 12.5px Inter, sans-serif; color: #8d95a5; }
+.gs-sess { font: 500 12.5px Figtree, sans-serif; color: #8d95a5; }
 .gs-sess b { color: #e9c46a; font-weight: 600; }
 /* card refinements */
 .gate-card { width: 100% !important; border-radius: 18px !important; padding: 30px 30px 20px !important; box-shadow: 0 40px 100px -20px rgba(0,0,0,.7), 0 0 0 1px rgba(255,255,255,.04) inset !important; }
 .gate-card h1 { font-size: 26px !important; letter-spacing: -0.02em; }
-.gate-caps { margin: 6px 0 0; font: 500 12.5px Inter, sans-serif; color: #e9c46a; display: flex; align-items: center; gap: 6px; }
+.gate-caps { margin: 6px 0 0; font: 500 12.5px Figtree, sans-serif; color: #e9c46a; display: flex; align-items: center; gap: 6px; }
 .gate-caps::before { content: "⇪"; font-size: 13px; }
 .gate-go { position: relative; }
 .gate-go:disabled::after { content: ""; position: absolute; right: 16px; top: 50%; width: 14px; height: 14px; margin-top: -7px; border-radius: 50%; border: 2px solid rgba(23,19,10,.35); border-top-color: #17130a; animation: gate-spin .7s linear infinite; }
 @keyframes gate-spin { to { transform: rotate(360deg); } }
 .gate-card.shake { animation: gate-shake .42s cubic-bezier(.36, .07, .19, .97); }
 @keyframes gate-shake { 15%, 85% { transform: translateX(-2px); } 30%, 70% { transform: translateX(5px); } 45%, 55% { transform: translateX(-7px); } }
-.gate-foot { display: flex; justify-content: space-between; gap: 10px; flex-wrap: wrap; margin: 18px -30px -20px; padding: 12px 30px; border-top: 1px solid rgba(255,255,255,.06); font: 500 11.5px Inter, sans-serif; color: #6f7686; border-radius: 0 0 18px 18px; background: rgba(255,255,255,.015); }
+.gate-foot { display: flex; justify-content: space-between; gap: 10px; flex-wrap: wrap; margin: 18px -30px -20px; padding: 12px 30px; border-top: 1px solid rgba(255,255,255,.06); font: 500 11.5px Figtree, sans-serif; color: #6f7686; border-radius: 0 0 18px 18px; background: rgba(255,255,255,.015); }
 /* the chart line in the background draws itself once */
 html[data-gate] .gate-bg path[stroke] { stroke-dasharray: 2400; stroke-dashoffset: 2400; animation: gate-draw 2.4s .2s cubic-bezier(.65, 0, .35, 1) forwards; }
 @keyframes gate-draw { to { stroke-dashoffset: 0; } }
@@ -3439,7 +3439,7 @@ function msNextSetup(bars, A) {
     if (!el) return null;
     const chart = LW.createChart(el, {
       autoSize: true,
-      layout: { background: { type: 'solid', color: THEMES.light.bg }, textColor: THEMES.light.text, fontSize: 11 },
+      layout: { background: { type: 'solid', color: THEMES.light.bg }, textColor: THEMES.light.text, fontSize: 11, fontFamily: 'Figtree, -apple-system, "Segoe UI", Roboto, sans-serif' },
       grid: { vertLines: { visible: false }, horzLines: { visible: false } },
       crosshair: { mode: LW.CrosshairMode.Normal },
       rightPriceScale: { borderColor: THEMES.light.border, scaleMargins: { top: 0.13, bottom: 0.08 } },
@@ -3528,10 +3528,10 @@ function msNextSetup(bars, A) {
         const th = THEMES[G.theme] || THEMES.dark; x.fillStyle = th.bgTop || th.bg; x.fillRect(0, 0, out.width, out.height);
         x.drawImage(c, 0, pad * dpr); x.scale(dpr, dpr);
         const L = P.bars && P.bars[P.bars.length - 1], ink = G.theme === 'light' ? '#131722' : '#eceef2', dim = G.theme === 'light' ? '#6b7280' : '#8a94a8';
-        x.font = '600 15px Inter, system-ui, sans-serif'; x.fillStyle = ink; x.fillText(`${CUR.label} · ${tf.label}`, 14, 27);
+        x.font = '600 15px Figtree, system-ui, sans-serif'; x.fillStyle = ink; x.fillText(`${CUR.label} · ${tf.label}`, 14, 27);
         const w1 = x.measureText(`${CUR.label} · ${tf.label}`).width;
         if (L) { x.font = '600 15px ui-monospace, monospace'; x.fillStyle = L.close >= L.open ? '#2bd4a4' : '#ff5c7a'; x.fillText(fmt(L.close), 26 + w1, 27); }
-        x.font = '12px Inter, system-ui, sans-serif'; x.fillStyle = dim; x.textAlign = 'right';
+        x.font = '12px Figtree, system-ui, sans-serif'; x.fillStyle = dim; x.textAlign = 'right';
         x.fillText(`Meridian X · ${new Date().toLocaleString(undefined, { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })}`, el.clientWidth - 14, 27);
         const blob = await new Promise((r) => out.toBlob(r, 'image/png')), name = `${CUR.label.replace(/\W+/g, '')}-${tf.label}-${new Date().toISOString().slice(0, 16).replace(/[:T]/g, '')}.png`;
         const file = new File([blob], name, { type: 'image/png' });
@@ -7697,6 +7697,11 @@ function gpStats(T) {
 .ch-cd { position: absolute; top: 0; right: 0; z-index: 4; pointer-events: none; height: 16px; display: flex; align-items: center; justify-content: center; font: 600 10.5px var(--mono, ui-monospace, monospace); font-variant-numeric: tabular-nums; color: #fff; background: var(--sell); border-radius: 0 0 3px 3px; opacity: .92; }
 .ch-cd.up { background: var(--buy); color: #04140f; }
 .ms-ph .ms-cd { display: none; }   /* the countdown now sits on the price scale */
+/* TradingView-style type everywhere (7 Nov, owner): Figtree (free, near the TradingView face), tabular figures for prices; code keeps a monospace */
+html, body, button, input, select, textarea { font-family: Figtree, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+html { font-variant-numeric: tabular-nums; -webkit-font-smoothing: antialiased; }
+h1, h2, h3, .h-head { letter-spacing: -0.02em; }
+code, pre, kbd, .tva-src, .tvw-url, .tv-tk .tk-l { font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace !important; }
 </style>
 </body>
 </html>
