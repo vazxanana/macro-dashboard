@@ -2703,6 +2703,13 @@ function msNextSetup(bars, A) {
   }
   TFS.forEach((tf) => { const p = makePane(tf); if (p) panes[tf.id] = p; });
   const ACTIVE = TFS.filter((tf) => panes[tf.id]);
+  // Crosshair sync: hovering a moment on one timeframe marks the same moment on the others (bar containing that time)
+  (() => { const list = Object.values(panes); if (list.length < 2 || typeof list[0].chart.setCrosshairPosition !== 'function') return; let busy = false;
+    const barAt = (P, t) => { const b = P.bars; if (!b || !b.length || t < b[0].time) return null; let lo = 0, hi = b.length - 1; while (lo < hi) { const m = (lo + hi + 1) >> 1; if (b[m].time <= t) lo = m; else hi = m - 1; } return b[lo]; };
+    list.forEach((src) => src.chart.subscribeCrosshairMove((par) => { if (busy) return; busy = true;
+      try { list.forEach((P) => { if (P === src) return;
+        if (!par || par.time == null || !par.point) { P.chart.clearCrosshairPosition(); return; }
+        const b = barAt(P, par.time), vr = P.chart.timeScale().getVisibleRange(); if (b && vr && b.time >= vr.from && b.time <= vr.to) P.chart.setCrosshairPosition(b.close, b.time, P.series); else P.chart.clearCrosshairPosition(); }); } catch (e) {} finally { busy = false; } })); })();
 
   // ─── Top-down checklist (Mosha SOP across timeframes) ───
   function topDown() {
