@@ -1110,6 +1110,10 @@
   .gp-ev td { white-space: normal; } .gp-ev td:first-child { width: 2em; color: var(--ink-faint); }
   .gp-ev tr.best td { background: var(--gold-soft); }
   .gp-more { margin-top: 10px; background: none; border: 1px solid var(--line); color: var(--ink-dim); border-radius: 8px; padding: 6px 12px; font: 600 12px var(--sans); cursor: pointer; min-height: 32px; }
+  .gp-cal-c { margin-top: 16px; } .gp-cal-c .gp-card-h { align-items: center; } .gp-cal-y { margin: 0 0 10px; }
+  .gp-cal-c .ict-cal-d .tk { color: var(--gold); font-weight: 700; }
+  .gp-h3 { margin: 14px 0 6px; font: 600 12px var(--sans); color: var(--ink-dim); }
+  .gp-tw td { white-space: normal; }
   .gp-rules ol { margin: 0 0 10px; padding-left: 20px; display: grid; gap: 6px; font-size: 12.5px; color: var(--ink-dim); line-height: 1.5; }
   .gp-rules b { color: var(--ink); }
   @media (max-width: 1000px) { .gp-top, .gp-grid, .gp-charts { grid-template-columns: minmax(0, 1fr); } .gp-kpi { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
@@ -2604,6 +2608,15 @@ html[data-role="viewer"] [data-go="crypto"], html[data-role="viewer"] [data-go="
       </div>
       <div class="gp-halves" id="gp-halves"></div>
     </div>
+    <div class="card gp-cal-c">
+      <div class="gp-card-h"><h2>P&amp;L calendar</h2>
+        <span class="ict-cal-nav"><button type="button" class="ms-tbtn" id="gp-cal-prev" aria-label="Previous month">‹</button><b id="gp-cal-m"></b><button type="button" class="ms-tbtn" id="gp-cal-next" aria-label="Next month">›</button></span>
+        <div class="gp-seg" role="group" aria-label="Trades shown"><button type="button" data-gpc-src="all" aria-pressed="true" class="on">Every signal</button><button type="button" data-gpc-src="took" aria-pressed="false">Ones I took</button></div>
+      </div>
+      <p class="ms-note gp-cal-y" id="gp-cal-y"></p>
+      <div class="ict-cal" id="gp-cal"></div>
+      <ul class="ict-cal-day" id="gp-cal-day"></ul>
+    </div>
     <div class="gp-grid">
       <div class="card">
         <div class="gp-card-h"><h2>Signals</h2><span class="ms-note" id="gp-took-sum"></span></div>
@@ -2631,6 +2644,9 @@ html[data-role="viewer"] [data-go="crypto"], html[data-role="viewer"] [data-go="
           <li><b>Regime matters.</b> Breakouts pay in trends and lose in ranges; skip a choppy Daily.</li>
           <li><b>Levels alone are not an edge.</b> The edge is selection + direction + trigger + management, proven in a journal.</li>
         </ol>
+        <h3 class="gp-h3">Tweaks tested (7 Nov, spot gold 2018-26)</h3>
+        <div class="t-scroll"><table class="gp-tb gp-tw" id="gp-tw"></table></div>
+        <p class="ms-note">Bar to change the rule: more profit and a smaller drawdown in both 2023-24 and 2025-26. Nothing passed, so the rule stays as the skill wrote it. 2018-20, before the skill's test, also made money (+31.7R, PF 1.43).</p>
         <p class="ms-note">Prop sizing: the worst run was about 14R down, so 0.5% a trade at most (≈7% drawdown) and 0.25% in challenge phases. Three losses in a row = stop for the day. The edge only buys: when the Weekly turns bearish it simply stops firing.</p>
       </div>
     </div>
@@ -6556,6 +6572,7 @@ function gpStats(T) {
   var dLbl = function (d) { return new Date(d + 'T12:00:00Z').toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short', year: '2-digit', timeZone: 'UTC' }); };
   var START = Date.UTC(2020, 10, 2) / 1000, CK = 'msGpDays1', ST = { days: null, off: 0, offOk: false, busy: false, at: 0, v: ls.get('msGpVar', '70-3'), lim: 25 };
   if (!/^(70|80)-(2|3)$/.test(ST.v)) ST.v = '70-3';
+  ST.calSrc = ls.get('msGpCalSrc', 'all') === 'took' ? 'took' : 'all';
 
   // ─── data: H1 PAXG from Binance, grouped into NY days, cached (closed days only) ───
   function getJ(u) { return fetch(u, { cache: 'no-store' }).then(function (r) { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); }); }
@@ -6677,7 +6694,7 @@ function gpStats(T) {
       + '<div><span>Daily close</span><b>' + (A.forming ? 'in ' + dur(close17 - now) : wkEnd() ? 'weekend' : 'closed') + '</b><small>17:00 New York · signals only after it</small></div>'
       + '<div class="' + ses[1] + '"><span>Session now</span><b>' + ses[0] + '</b><small>' + String(nyNow.h).padStart(2, '0') + ':00 New York · London / NY for discretionary entries</small></div>'
       + '<div><span>Edge this year</span><b>' + sR(gpStats(A.T.filter(function (x) { return x.d.slice(0, 4) === t.d.slice(0, 4); })).R) + '</b><small>' + gpStats(A.T.filter(function (x) { return x.d.slice(0, 4) === t.d.slice(0, 4); })).n + ' closed signals in ' + t.d.slice(0, 4) + '</small></div>';
-    renderBt(A); renderList(A); renderCk(A, pend); renderEv();
+    renderBt(A); renderCal(A); renderList(A); renderCk(A, pend); renderEv();
   }
   function wkEnd() { var q = nyp(Date.now() / 1000); return q.wd === 'Sat' || (q.wd === 'Sun' && q.h < 18) || (q.wd === 'Fri' && q.h >= 17); }
   function cell(k, v, s) { return '<div><span>' + k + '</span><b>' + v + '</b><small>' + s + '</small></div>'; }
@@ -6720,6 +6737,41 @@ function gpStats(T) {
       + ks.map(function (k, i) { var v = byY[k], h = Math.max(1, Math.abs(v) * sc), x = 5 + i * bw + bw * 0.2, ww = bw * 0.6, y = v >= 0 ? z - h : z;
         return '<rect class="' + (v >= 0 ? 'p' : 'n') + '" x="' + x + '" y="' + y + '" width="' + ww + '" height="' + h + '" rx="3"><title>' + k + ': ' + sR(v) + '</title></rect><text class="v" x="' + (x + ww / 2) + '" y="' + (v >= 0 ? y - 4 : y + h + 12) + '" text-anchor="middle">' + sR(v) + '</text><text x="' + (x + ww / 2) + '" y="' + (H2 - 4) + '" text-anchor="middle">' + k + '</text>'; }).join('') + '</svg>';
   }
+  // P&L calendar: closed trades by the New York day they closed (open trades on today's date with their floating R)
+  function renderCal(A) {
+    var took = ls.get('msGpTook', {}), src = ST.calSrc, byDay = {}, today = nyp(Date.now() / 1000).d;
+    var T = A.T.filter(function (x) { return !x.pending && (src !== 'took' || took[x.d]); });
+    T.forEach(function (x) { var k = x.open ? today : x.exitD; (byDay[k] = byDay[k] || []).push(x); });
+    if (!ST.cal) { var lk = Object.keys(byDay).sort().pop() || today; ST.cal = { y: +lk.slice(0, 4), m: +lk.slice(5, 7) - 1 }; }
+    var y = ST.cal.y, m = ST.cal.m, mm = y + '-' + String(m + 1).padStart(2, '0'), first = new Date(Date.UTC(y, m, 1)), days = new Date(Date.UTC(y, m + 1, 0)).getUTCDate(), lead = (first.getUTCDay() + 6) % 7;
+    var mon = T.filter(function (x) { return !x.open && x.exitD.slice(0, 7) === mm; }), mR = mon.reduce(function (a, x) { return a + x.R; }, 0);
+    var yr = T.filter(function (x) { return !x.open && x.exitD.slice(0, 4) === String(y); }), yR = yr.reduce(function (a, x) { return a + x.R; }, 0), wins = yr.filter(function (x) { return x.R > 0; }).length;
+    var mlab = first.toLocaleString('en-GB', { month: 'long', year: 'numeric', timeZone: 'UTC' });
+    $('gp-cal-m').innerHTML = esc(mlab) + ' <small class="' + (mR > 0 ? 'pos' : mR < 0 ? 'neg' : '') + '">' + (mon.length ? sR(mR) + ' · ' + mon.length + ' closed' : 'no closed trades') + '</small>';
+    var months = {}; yr.forEach(function (x) { var k = x.exitD.slice(5, 7); months[k] = (months[k] || 0) + x.R; }); var up = Object.keys(months).filter(function (k) { return months[k] > 0; }).length;
+    $('gp-cal-y').textContent = y + ': ' + (yr.length ? sR(yR) + ' from ' + yr.length + ' closed trades, ' + Math.round(wins / yr.length * 100) + '% winners, ' + up + ' of ' + Object.keys(months).length + ' months up' : 'no closed trades') + (src === 'took' ? ' (only the ones you ticked)' : ' (every signal, backtest + live)') + '.';
+    var vals = Object.keys(byDay).filter(function (k) { return k.slice(0, 7) === mm; }).map(function (k) { return Math.abs(byDay[k].reduce(function (s, x) { return s + x.R; }, 0)); }), mx = Math.max.apply(null, [3].concat(vals));
+    var html = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].map(function (d) { return '<div class="ict-cal-h">' + d + '</div>'; }).join('') + new Array(lead + 1).join('<div></div>');
+    for (var d = 1; d <= days; d++) {
+      var k = mm + '-' + String(d).padStart(2, '0'), a = byDay[k] || [], R = a.reduce(function (s, x) { return s + x.R; }, 0), heat = a.length ? Math.min(1, Math.abs(R) / mx) : 0, op = a.filter(function (x) { return x.open; }).length, tk = a.filter(function (x) { return took[x.d]; }).length;
+      html += '<button type="button" class="ict-cal-d' + (a.length ? (R > 0 ? ' up' : R < 0 ? ' dn' : '') : '') + (ST.calDay === k ? ' sel' : '') + (k === today ? ' today' : '') + ((lead + d - 1) % 7 >= 5 ? ' we' : '') + '" data-gk="' + k + '" style="--heat:' + heat.toFixed(2) + '"' + (a.length ? '' : ' disabled')
+        + ' aria-label="' + d + ' ' + esc(mlab) + ': ' + (a.length ? sR(R) + ', ' + a.length + ' trades' : 'no trades') + '"><span class="d">' + d + '</span>' + (a.length ? '<b>' + sR(R) + '</b><small>' + (op ? op + ' open' : a.length + (a.length > 1 ? ' trades' : ' trade')) + (tk && src !== 'took' ? ' · <span class="tk">' + tk + ' taken</span>' : '') + '</small>' : '') + '</button>';
+    }
+    $('gp-cal').innerHTML = html;
+    var sel = ST.calDay && byDay[ST.calDay], off = ST.off;
+    $('gp-cal-day').innerHTML = sel ? sel.map(function (x) { return '<li><span class="ms-chip ms-chip-buy">BUY</span><b>' + esc(dLbl(x.d)) + ' signal</b><span class="m">' + f2(x.e + off) + ' → ' + (x.open ? 'open' : x.how) + '</span><b class="' + (x.R > 0 ? 'pos' : 'neg') + '">' + sR(x.R) + (x.open ? ' floating' : '') + '</b><small>' + (took[x.d] ? 'you took it' : 'not ticked') + ' · held from ' + esc(dLbl(x.entryD)) + '</small></li>'; }).join('') : '';
+  }
+  var TW = [
+    ['Rule as written (top 30%, 3R, 10 days)', '+63.7R / −11.9', '+95.2R / −14.6', 'kept'],
+    ['Target 3.5R', '+65.8R / −13.7', '+111.1R / −12.6', 'deeper drawdown 2023-24'],
+    ['Max 4 trades open at once', '+73.2R / −11.9', '+85.3R / −14.6', 'less profit 2025-26'],
+    ['Signal candle must be green', '+66.9R / −11.9', '+94.3R / −12.5', 'too small to call'],
+    ['Close in the top 25%', '+57.4R / −11.4', '+81.7R / −13.2', 'less profit'],
+    ['Break-even at 1.5R', '+68.5R / −11.9', '+94.6R / −16.6', 'deeper drawdown'],
+    ['Daily trending only (20-day ER ≥ 0.2)', '+25.8R / −11.3', '+71.1R / −10.1', 'cuts winners'],
+    ['Next fresh resistance ≥ 2R away', '+33.3R / −6.4', '+46.7R / −7.7', 'half the profit'],
+    ['One trade at a time', '+31.2R / −5.1', '+29.2R / −7.6', 'half the profit'],
+    ['Trailing stop, no target', '+55.1R / −12.3', '+102.1R / −14.9', 'less 2023-24']];
   function niceStep(x) { var p = Math.pow(10, Math.floor(Math.log10(Math.max(x, 1e-9)))), m = x / p; return (m <= 1 ? 1 : m <= 2 ? 2 : m <= 5 ? 5 : 10) * p; }
   function renderList(A) {
     var took = ls.get('msGpTook', {}), off = ST.off, rows = A.T.slice().reverse(), sh = rows.slice(0, ST.lim);
@@ -6761,6 +6813,7 @@ function gpStats(T) {
     ['9', 'Raw key-level touches', 'same as random prices', 'not an edge']];
   function renderEv() {
     if ($('gp-ev').dataset.done) return; $('gp-ev').dataset.done = '1';
+    $('gp-tw').innerHTML = '<thead><tr><th>Change</th><th class="n">2023-24 R / drawdown</th><th class="n">2025-26 R / drawdown</th><th>Verdict</th></tr></thead><tbody>' + TW.map(function (r, i) { return '<tr' + (i ? '' : ' class="best"') + '><td>' + esc(r[0]) + '</td><td class="n">' + r[1] + '</td><td class="n">' + r[2] + '</td><td>' + esc(r[3]) + '</td></tr>'; }).join('') + '</tbody>';
     $('gp-ev').innerHTML = '<thead><tr><th>#</th><th>Model</th><th>Result</th><th>Verdict</th></tr></thead><tbody>' + EV.map(function (r) { return '<tr' + (r[4] ? ' class="best"' : '') + '><td>' + r[0] + '</td><td>' + esc(r[1]) + '</td><td>' + esc(r[2]) + '</td><td>' + esc(r[3]) + '</td></tr>'; }).join('') + '</tbody>';
   }
 
@@ -6769,6 +6822,10 @@ function gpStats(T) {
     var b = ev.target.closest('[data-gpv]');
     if (b) { ST.v = b.dataset.gpv; ls.set('msGpVar', ST.v); view.querySelectorAll('[data-gpv]').forEach(function (x) { var on = x === b; x.classList.toggle('on', on); x.setAttribute('aria-pressed', String(on)); }); render(); }
     if (ev.target.closest('#gp-more')) { ST.lim += 50; render(); }
+    var cs = ev.target.closest('[data-gpc-src]');
+    if (cs) { ST.calSrc = cs.dataset.gpcSrc; ls.set('msGpCalSrc', ST.calSrc); ST.calDay = null; view.querySelectorAll('[data-gpc-src]').forEach(function (x) { var on = x === cs; x.classList.toggle('on', on); x.setAttribute('aria-pressed', String(on)); }); render(); }
+    var cd = ev.target.closest('[data-gk]'); if (cd) { ST.calDay = ST.calDay === cd.dataset.gk ? null : cd.dataset.gk; render(); }
+    if (ev.target.closest('#gp-cal-prev') || ev.target.closest('#gp-cal-next')) { ST.cal.m += ev.target.closest('#gp-cal-prev') ? -1 : 1; if (ST.cal.m < 0) { ST.cal.m = 11; ST.cal.y--; } if (ST.cal.m > 11) { ST.cal.m = 0; ST.cal.y++; } ST.calDay = null; render(); }
   });
   view.addEventListener('change', function (ev) {
     var t = ev.target;
@@ -6778,6 +6835,7 @@ function gpStats(T) {
   });
   $('gp-acct').addEventListener('input', sizeLine);
   (function () { var s = ls.get('msGpSize', {}); $('gp-acct').value = s.a || 100000; $('gp-risk').value = s.r === '0.25' ? '0.25' : '0.5'; })();
+  view.querySelectorAll('[data-gpc-src]').forEach(function (x) { var on = x.dataset.gpcSrc === ST.calSrc; x.classList.toggle('on', on); x.setAttribute('aria-pressed', String(on)); });
   view.querySelectorAll('[data-gpv]').forEach(function (x) { var on = x.dataset.gpv === ST.v; x.classList.toggle('on', on); x.setAttribute('aria-pressed', String(on)); });
   window.renderGold = function () { if (!ST.days) load(); else { render(); if (Date.now() - ST.at > 10 * 60e3) load(); } };
   setInterval(function () { if (!view.hidden) window.renderGold(); }, 60e3);
