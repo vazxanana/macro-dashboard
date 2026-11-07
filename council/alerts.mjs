@@ -9,8 +9,9 @@ const fmt = (v, d) => (+v).toFixed(d != null ? d : 2), fR = (v) => `${v > 0 ? '+
 
 // the trades that may alert: live trades (never shadows) and the NQ open-run paper trades, except the variants the live
 // rule skips (session '...-x', e.g. 'nyflip-x': recorded only to measure a filter, so they must not send a futures ticket)
+// and the research shadow streams (shadow: true, e.g. 'nyflip-trend', the regime study's trend-on copy: never alerted or ticketed)
 export const alertable = (trades, research) => trades.filter((x) => !x.shadow)
-  .concat(research.filter((x) => x.k === 'nq-open' && !/-x$/.test(x.session || '')));
+  .concat(research.filter((x) => x.k === 'nq-open' && !x.shadow && !/-x$/.test(x.session || '')));
 
 // "Sat 7 Nov 17:23 UTC · London 17:23 · New York 12:23"
 const hm = (tz) => new Intl.DateTimeFormat('en-GB', { timeZone: tz, hour: '2-digit', minute: '2-digit', hourCycle: 'h23' });
