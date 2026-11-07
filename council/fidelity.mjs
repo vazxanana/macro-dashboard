@@ -16,6 +16,9 @@ const DIR = process.argv[2] || 'data';
 const TRADES = process.argv[3] || path.join(DIR, 'trades.json');
 const BT = process.argv[4] || path.join(DIR, 'backtest.json');
 const TOL = 10 * 60, NEAR = 60 * 60;
+// the live trader takes gold/forex D1 labels from OANDA only since #384 (7 Nov 2026 16:01 UTC); before that its labels came from
+// Kraken's candles, while the replay labels every day from OANDA. Comparing those two is comparing two label sources, not a fault.
+const LIVE_OANDA_D1_SINCE = Date.parse('2026-11-07T16:01:37Z') / 1000;
 
 const rd = (f) => JSON.parse(fs.readFileSync(f, 'utf8'));
 const liveAll = (() => { const t = rd(TRADES); return Array.isArray(t) ? t : t.trades || []; })();
@@ -147,7 +150,12 @@ const out = {
     pairs: matched,
     d1: { agree: agree(([x, r]) => (x.feat || {}).d1 === r.d1), rate: pct(agree(([x, r]) => (x.feat || {}).d1 === r.d1), matched), table: crossTab((x) => (x.feat || {}).d1, (r) => r.d1),
       // the replay labels gold/forex D1 from OANDA for every day (bt.markets.d1src); the live trader only since its switch, Kraken before
-      bySource: Object.fromEntries(['OANDA', 'feed'].map((src) => { const p = pairs.filter(([x]) => ((bt.markets || {}).d1src || {})[x.market] === src); return [src, { n: p.length, rate: pct(p.filter(([x, r]) => (x.feat || {}).d1 === r.d1).length, p.length) }]; })) },
+      bySource: Object.fromEntries(['OANDA', 'feed'].map((src) => { const p = pairs.filter(([x]) => ((bt.markets || {}).d1src || {})[x.market] === src); return [src, { n: p.length, rate: pct(p.filter(([x, r]) => (x.feat || {}).d1 === r.d1).length, p.length) }]; })),
+      // like-for-like: both sides used the same label source (crypto on its feed; gold/forex live trades opened after the OANDA switch)
+      likeForLike: (() => { const same = ([x]) => { const s = ((bt.markets || {}).d1src || {})[x.market]; return s !== 'OANDA' || x.opened >= LIVE_OANDA_D1_SINCE; };
+        const p = pairs.filter(same), q = pairs.filter((pr) => !same(pr));
+        return { n: p.length, rate: pct(p.filter(([x, r]) => (x.feat || {}).d1 === r.d1).length, p.length), labelSourceDiffers: q.length,
+          note: `${q.length} gold/forex pairs were opened before ${new Date(LIVE_OANDA_D1_SINCE * 1000).toISOString().slice(0, 16)} UTC, when live D1 still came from Kraken: left out` }; })() },
     session: { agree: agree(([x, r]) => (x.feat || {}).session === r.session), rate: pct(agree(([x, r]) => (x.feat || {}).session === r.session), matched) },
     struct: { rate: pct(agree(([x, r]) => (x.feat || {}).struct === r.struct), matched) },
     cf: { rate: pct(agree(([x, r]) => (x.feat || {}).cf === r.cf), matched) },
@@ -180,6 +188,6 @@ const P = (v) => (v == null ? '-' : `${(v * 100).toFixed(0)}%`), o = out.agreeme
 console.log(`Replay fidelity ${out.window.from.slice(0, 16)} → ${out.window.to.slice(0, 16)}`);
 console.log(`live signals ${L.length} (shadow ${out.counts.liveShadow}), replay rows ${R.length}, matched ${matched}`);
 console.log(`match: live found in replay ${P(out.matchRate.liveInReplay)}, replay found in live ${P(out.matchRate.replayInLive)} | comparable setups/markets only: ${P(out.matchRate.comparable.liveInReplay)} / ${P(out.matchRate.comparable.replayInLive)}`);
-console.log(`agreement: d1 ${P(out.agreement.d1.rate)}, session ${P(out.agreement.session.rate)}, struct ${P(out.agreement.struct.rate)}, cf ${P(out.agreement.cf.rate)}, fill ${P(out.agreement.fill.rate)} (n${fillJudged.length})`);
+console.log(`agreement: d1 ${P(out.agreement.d1.rate)} (like-for-like ${P(out.agreement.d1.likeForLike.rate)} n${out.agreement.d1.likeForLike.n}; ${out.agreement.d1.likeForLike.labelSourceDiffers} pairs left out: live D1 was Kraken then), session ${P(out.agreement.session.rate)}, struct ${P(out.agreement.struct.rate)}, cf ${P(out.agreement.cf.rate)}, fill ${P(out.agreement.fill.rate)} (n${fillJudged.length})`);
 console.log(`outcome (both closed n${both.length}): sign ${P(o.signRate)} (net ${P(o.signRateNet)}), exact R ${o.exactR}, mean live ${o.meanLiveR} vs replay ${o.meanReplayR} (net ${o.meanReplayRNet}), mean diff ${o.meanDiffGross} gross (median ${o.medianDiffGross}) / ${o.meanDiffNet} net; rr differs on ${o.rrDiffer}`);
 for (const s of ['unmatchedLive', 'unmatchedReplay']) { console.log(`${s} ${out[s].n}:`); for (const r of out[s].reasons.slice(0, 6)) console.log(`  ${String(r.n).padStart(4)}  ${r.cls}: ${r.why}  ${Object.entries(r.bySetup).sort((a, b) => b[1] - a[1]).slice(0, 4).map(([k, n]) => `${k}${n}`).join(' ')}`); }
