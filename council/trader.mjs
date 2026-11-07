@@ -239,6 +239,19 @@ config.userRules = config.userRules || [];
 for (const u of USER_RULES) if (!config.userRules.includes(u.id)) { u.apply(config); config.userRules.push(u.id); config.history.push({ at: nowISO, by: 'user', change: u.change, why: u.why }); }
 const state = Object.assign({ seen: {}, lastRun: 0 }, rd('state.json', {}));
 let trades = rd('trades.json', []);
+// Live-sleeve guard (7 Nov): a setup put live through focusSetups goes back to shadow on its own if its live paper trades since
+// it went live lose 0.3R or more a trade over 20+ closed trades (the 1-3 Nov live Scalps lost -0.82R over 11 while the shadows made
+// +0.35R, so the forward live record is the judge, not the replay). The owner can put it back with a new user rule.
+for (const k of [...(config.focusSetups || [])]) {
+  const h = (config.history || []).find((x) => x.by === 'user' && /trades live on paper on every market/.test(x.change || '') && new RegExp('^' + k, 'i').test(x.change || ''));
+  const since = h ? Date.parse(h.at) / 1000 : 0;
+  const L = trades.filter((x) => x.k === k && !x.shadow && x.opened >= since && (x.status === 'win' || x.status === 'loss' || x.status === 'be') && isFinite(x.R));
+  const e = L.length ? L.reduce((a, x) => a + x.R, 0) / L.length : 0;
+  if (L.length >= 20 && e <= -0.3) {
+    config.focusSetups = config.focusSetups.filter((x) => x !== k); (config.sleeveStopped = config.sleeveStopped || {})[k] = nowISO;
+    config.history.push({ at: nowISO, by: 'coach-guard', change: `${k}: back to shadow (live sleeve stopped)`, why: `${L.length} live trades since ${new Date(since * 1000).toISOString().slice(0, 10)} made ${e.toFixed(2)}R a trade (stop at -0.30R over 20+).` });
+  }
+}
 // Owner's loss reviews (6 Nov): written from the page's Loss review card into reviews/losses.json. Reasons that match the
 // trade reviews' own causes count in the lesson rules below; the rest are summarised per setup as rule ideas to test.
 const OWNER_REV = (rd('reviews/losses.json', {}) || {}).reviews || {};
