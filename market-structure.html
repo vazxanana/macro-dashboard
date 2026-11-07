@@ -5185,7 +5185,7 @@ function msNextSetup(bars, A) {
     q.setAttribute('aria-activedescendant', cur.length ? 'cmdk-o' + sel : '');
     const el = document.getElementById('cmdk-o' + sel); if (el) el.scrollIntoView({ block: 'nearest' });
   };
-  const showHelp = (on) => { help.hidden = !on; list.hidden = on; if (on && !help.innerHTML) help.innerHTML = '<h3>Anywhere</h3><span><kbd>Ctrl</kbd> <kbd>K</kbd> or <kbd>/</kbd></span><span>Open this palette</span><span><kbd>?</kbd></span><span>Show these shortcuts</span><span><kbd>Esc</kbd></span><span>Close menus and dialogs</span><h3>Charts page</h3><span><kbd>1</kbd> – <kbd>6</kbd></span><span>Show one timeframe (D1 … M1)</span><span><kbd>0</kbd></span><span>Show all timeframes</span><span><kbd>F</kbd></span><span>Fit the charts to the data</span>'; };
+  const showHelp = (on) => { help.hidden = !on; list.hidden = on; if (on && !help.innerHTML) help.innerHTML = '<h3>Anywhere</h3><span><kbd>Ctrl</kbd> <kbd>K</kbd> or <kbd>/</kbd></span><span>Open this palette</span><span><kbd>?</kbd></span><span>Show these shortcuts</span><span><kbd>Esc</kbd></span><span>Close menus and dialogs</span><span><kbd>Alt</kbd> <kbd>1</kbd> – <kbd>8</kbd></span><span>Go to a page (Home, Setup, Charts… in menu order)</span><h3>Charts page</h3><span><kbd>1</kbd> – <kbd>6</kbd></span><span>Show one timeframe (D1 … M1)</span><span><kbd>0</kbd></span><span>Show all timeframes</span><span><kbd>F</kbd></span><span>Fit the charts to the data</span>'; };
   const open = (helpMode) => { if (document.documentElement.dataset.gate || document.documentElement.dataset.guest) return; all = items(); q.value = ''; sel = 0; showHelp(!!helpMode); render(); if (!dlg.open) dlg.showModal(); q.focus(); };
   const go = (i) => { const it = cur[i]; if (!it) return; dlg.close(); setTimeout(() => it.run(), 0); };
   q.addEventListener('input', () => { sel = 0; showHelp(false); render(); });
@@ -5205,6 +5205,9 @@ function msNextSetup(bars, A) {
     if (dlg.open || typing || ev.ctrlKey || ev.metaKey || ev.altKey) return;
     if (ev.key === '/') { ev.preventDefault(); open(false); } else if (ev.key === '?') { ev.preventDefault(); open(true); }
   });
+  // Alt+1..8: jump to the visible pages in menu order (uses the key code so it works with Option on a Mac)
+  document.addEventListener('keydown', (ev) => { if (!ev.altKey || ev.ctrlKey || ev.metaKey || dlg.open || document.documentElement.dataset.gate || document.documentElement.dataset.guest) return;
+    const m = /^Digit([1-9])$/.exec(ev.code || ''); if (!m) return; const v = views()[+m[1] - 1]; if (!v) return; ev.preventDefault(); location.hash = v.k; });
 })();
 </script>
 <script>
