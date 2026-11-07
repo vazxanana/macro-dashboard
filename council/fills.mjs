@@ -143,6 +143,64 @@ export function spotRollover(t) {
 // a gold / forex candle that must not fill or stop a trade: spot shut, or the rollover minutes
 export const spotSkip = (t) => spotClosed(t) || spotRollover(t);
 
+// ─── the Trader's "Manage open trades" step for ONE candle, as a pure function (gold fidelity, 8 Nov) ───
+// council/trader.mjs manages every paper trade with the loop under "Manage open trades"; replayBar / manageVariant below cover the
+// engine setups (stop, target, break-even) but none of what the gold systems carry: a trailing stop (trail [fromR, behindR]), a
+// per-trade break-even (beAt), a time exit (maxHold) and a pyramid add (addAt / addSize). manageLive is that loop body for one
+// candle, so a research replay of the gold systems (research/edge/gold-fidelity/run.mjs) fills and exits as the live Trader does;
+// tests/fills-live.test.mjs runs the Trader's own loop text against it. The caller skips spotSkip candles for gold / forex, applies
+// the forex settle rule, expires resting orders on its run clock (expireOrder) and sizes R once closed (sizeR).
+// Returns null, 'exit' (closed on this candle: win / loss / be / missed) or { add } (the second unit the Trader would push; the
+// caller keeps one per trade, by id). be = config.be (the Coach's break-even; noBe trades ignore it); feed = the round's feed tag,
+// stamped on the add as the Trader does. The entry is read in the candle feed's frame (E = entry + feedBasis, council/feed.mjs).
+export function manageLive(tr, b, { be = null, feed = undefined } = {}) {
+  const s = tr.side === 'sell', E = tr.entry + (tr.feedBasis || 0);
+  if (tr.status === 'pending') {
+    if (s ? b.high >= tr.entry : b.low <= tr.entry) {
+      if (fillBarAmbiguous(b, s, tr.entry, tr.stop, tr.t1)) { tr.status = 'missed'; tr.closed = b.time; tr.R = 0; tr.exit = 'fill and target in one candle'; return 'exit'; }
+      tr.status = 'open'; tr.filled = b.time; }
+    else if (s ? b.low <= tr.t1 : b.high >= tr.t1) { tr.status = 'missed'; tr.closed = b.time; tr.R = 0; return 'exit'; }
+    else return null;
+  }
+  const r0 = tr.r0 || (tr.r0 = Math.abs(E - tr.stop));
+  if (s ? b.high >= tr.stop : b.low <= tr.stop) {
+    const px = stopFill(b, s, tr.stop, b.time > tr.filled), gapped = px !== tr.stop;
+    if (tr.trail && tr.trailMoved) { tr.R = exitR(s, E, px, r0); tr.status = tr.R > 0 ? 'win' : tr.R < 0 ? 'loss' : 'be'; tr.exit = 'trailing stop'; }
+    else if (tr.beMoved) { tr.R = exitR(s, E, px, r0); tr.status = tr.R < 0 ? 'loss' : 'be'; } else { tr.status = 'loss'; tr.R = gapped ? exitR(s, E, px, r0) : -1; }
+    if (gapped) tr.gapR = +((s ? px - tr.stop : tr.stop - px) / r0).toFixed(2);
+    tr.exitPx = px; tr.exitKind = 'stop'; tr.closed = b.time; return 'exit';
+  }
+  if (s ? b.low <= tr.t1 : b.high >= tr.t1) { tr.status = 'win'; tr.closed = b.time; tr.R = tr.rr; tr.exitPx = tr.t1; tr.exitKind = 'target'; return 'exit'; }
+  if (tr.maxHold && b.time >= tr.filled + tr.maxHold) { const R = +((s ? E - b.close : b.close - E) / r0).toFixed(2); tr.status = R > 0 ? 'win' : R < 0 ? 'loss' : 'be'; tr.R = R; tr.closed = b.time; tr.exit = `${tr.maxHold / 3600} h`; tr.exitPx = b.close; tr.exitKind = 'time'; return 'exit'; }
+  tr.mfe = +Math.max(tr.mfe || 0, ((s ? E - b.low : b.high - E) / r0)).toFixed(2);
+  tr.mae = +Math.max(tr.mae || 0, ((s ? b.high - E : E - b.low) / r0)).toFixed(2);
+  if (tr.trail && tr.mfe >= tr.trail[0]) { const ns = E + (s ? -1 : 1) * (tr.mfe - tr.trail[1]) * r0; if (s ? ns < tr.stop : ns > tr.stop) { tr.stop = +ns.toFixed(Math.max(2, (tr.dec ?? 2) + 1)); tr.trailMoved = true; } }
+  if (be && !tr.noBe && !tr.beMoved && ((s ? E - b.low : b.high - E) / r0) >= be) { tr.stop = E; tr.beMoved = true; }
+  if (tr.beAt && !tr.beMoved && ((s ? E - b.low : b.high - E) / r0) >= tr.beAt) { tr.stop = E; tr.beMoved = true; }
+  if (tr.addAt && !tr.addDone && tr.status === 'open' && tr.mfe >= tr.addAt) { tr.addDone = true; const add = addUnit(tr, b, feed); if (add) return { add }; }
+  return null;
+}
+// the pyramid add the Trader pushes at +addAt R (gold replica gold-add, Mosha mosha-add): a second unit at the +addAt level with the
+// stop at the first entry (in the feed's frame), the parent's target and its trail re-expressed in the add's own R; size = addAt x the
+// parent's size so the add's addAt-R-wide stop counts as that much account risk; a shadow parent's add is a shadow too (its system is
+// not ours), carrying the parent's blockers or 'owner-shadow'
+export function addUnit(tr, b, feed = undefined) {
+  const s = tr.side === 'sell', E = tr.entry + (tr.feedBasis || 0), r0 = tr.r0 || Math.abs(E - tr.stop), dp = Math.max(2, (tr.dec ?? 2) + 1), dir = s ? -1 : 1;
+  const ae = +(E + dir * tr.addAt * r0).toFixed(dp), rA = Math.abs(ae - E);
+  if (!(rA > 0)) return null;
+  return { id: `${tr.id}-add`, market: tr.market, label: tr.label, dec: tr.dec, k: tr.k, name: `${tr.name} add`, pair: tr.pair, h: tr.h, side: tr.side,
+    entry: ae, stop: E, t1: tr.t1, rr: +(Math.abs(tr.t1 - ae) / rA).toFixed(2), trail: tr.trail ? [+((tr.trail[0] - tr.addAt) / tr.addAt).toFixed(3), +(tr.trail[1] / tr.addAt).toFixed(3)] : undefined,
+    size: +(tr.addAt * (tr.size || 1)).toFixed(2), buf: tr.buf, opened: b.time, filled: b.time, checked: b.time, status: 'open', R: null, r0: rA, maxHold: Math.max(300, (tr.filled + (tr.maxHold || 48 * 3600)) - b.time), noBe: true, entryMode: 'market', addOf: tr.id, shadow: !!tr.shadow, blockedBy: tr.shadow ? (Array.isArray(tr.blockedBy) && tr.blockedBy.length ? tr.blockedBy.slice() : ['owner-shadow']) : [],
+    feed };
+}
+// a resting order expires on the Trader's run clock: validFor, else the WAIT of its timeframe, else a day
+export function expireOrder(tr, now, wait = 86400) {
+  if (tr.status === 'pending' && now - tr.opened > (tr.validFor || wait || 86400)) { tr.status = 'expired'; tr.closed = now; tr.R = 0; return true; }
+  return false;
+}
+// half- and double-size trades: the score counts R x size once; rawR keeps the per-unit result
+export function sizeR(tr) { if (tr.size && tr.size !== 1 && tr.R != null && tr.rawR == null) { tr.rawR = tr.R; tr.R = +(tr.R * tr.size).toFixed(2); } return tr; }
+
 // ─── the replay's trade step (council/backtest.mjs), on the same rules as the Trader's "Manage open trades" ───
 // The Backtest manages each trade on 1m candles under several exit variants at once (v: none / be1 / be15 / tp2 and the paper
 // pt1); these two functions are that management, built on the helpers above so a replayed trade fills and exits as a live one:
