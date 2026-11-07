@@ -2299,6 +2299,7 @@ html[data-motion="off"][data-gate] .gate-bg path[stroke] { animation: none; stro
             <label><input type="checkbox" id="ms-show-htf" data-show="htf" checked><i style="border:1.5px dashed #2962ff"></i>HTF Origin</label>
             <label><input type="checkbox" id="ms-show-ct" checked><i style="background:#2962ff;height:2px"></i>Council trades + history</label>
             <label><input type="checkbox" id="ms-show-kl" checked><i style="border-top:1.5px dotted #9aa4b2;height:0"></i>Key levels</label>
+            <label><input type="checkbox" id="ms-show-piv"><i style="border-top:1.5px dashed #9c27b0;height:0"></i>Daily pivots (P, R1–R2, S1–S2)</label>
             <label><input type="checkbox" id="ms-show-vwap"><i style="background:#00bcd4;height:2px"></i>VWAP (daily, intraday charts)</label>
             <label><input type="checkbox" id="ms-show-ema"><i style="background:linear-gradient(90deg,#2962ff 33%,#e0a526 33% 66%,#9c27b0 66%);height:2px"></i>EMAs 21 / 50 / 200</label>
             <label><input type="checkbox" id="ms-show-shade" checked><i style="background:linear-gradient(90deg,rgba(38,166,154,.4) 33%,rgba(41,98,255,.4) 33% 66%,rgba(156,39,176,.4) 66%)"></i>Session shading</label>
@@ -3857,10 +3858,13 @@ function msNextSetup(bars, A) {
       if (pw.length) L.push(['PWH', Math.max(...pw.map((b) => b.high))], ['PWL', Math.min(...pw.map((b) => b.low))]);
       if (cur) L.push(['DO', cur.open]);
     }
+    // daily floor pivots (7 Nov loop): from yesterday's high / low / close
+    if (G.showPiv === true && d && d.length > 2) { const day = Math.floor(Date.now() / 1000 / 86400) * 86400, pd = d.filter((b) => b.time < day).pop();
+      if (pd) { const P0 = (pd.high + pd.low + pd.close) / 3, rg = pd.high - pd.low; L.push(['P', P0, 1], ['R1', 2 * P0 - pd.low, 1], ['S1', 2 * P0 - pd.high, 1], ['R2', P0 + rg, 1], ['S2', P0 - rg, 1]); } }
     const off = G.offset || 0;
     ['4h', '1h', '15m', '5m', '1m'].forEach((id) => { const P = panes[id]; if (!P || !P.series) return;
       (P._kl || []).forEach((l) => { try { P.series.removePriceLine(l); } catch (e) {} });
-      P._kl = L.map(([t, v]) => P.series.createPriceLine({ price: v + off, color: t === 'DO' ? 'rgba(154,164,178,.55)' : /H$/.test(t) ? 'rgba(8,153,129,.55)' : 'rgba(242,54,69,.55)', lineWidth: 1, lineStyle: LW.LineStyle.SparseDotted, axisLabelVisible: true, title: t })); });
+      P._kl = L.map(([t, v, pv]) => pv ? P.series.createPriceLine({ price: v + off, color: t === 'P' ? 'rgba(156,39,176,.8)' : 'rgba(156,39,176,.45)', lineWidth: 1, lineStyle: LW.LineStyle.Dashed, axisLabelVisible: t === 'P', title: t }) : P.series.createPriceLine({ price: v + off, color: t === 'DO' ? 'rgba(154,164,178,.55)' : /H$/.test(t) ? 'rgba(8,153,129,.55)' : 'rgba(242,54,69,.55)', lineWidth: 1, lineStyle: LW.LineStyle.SparseDotted, axisLabelVisible: true, title: t })); });
   }
   setTimeout(keyLevels, 2500); setInterval(keyLevels, 60e3);
   // your own horizontal lines (drawn with the line tool), per market in localStorage
@@ -3964,11 +3968,12 @@ function msNextSetup(bars, A) {
       setTimeout(() => { if (sel.value) run(); }, 3000); setInterval(() => { if (sel.value && !document.hidden) run(); }, 60e3);
     } }
   { const k = document.getElementById('ms-show-shade'); try { G.showShade = localStorage.getItem('ms-shade') !== '0'; } catch (e) {} if (k) { k.checked = G.showShade !== false; k.addEventListener('change', () => { G.showShade = k.checked; try { localStorage.setItem('ms-shade', k.checked ? '1' : '0'); } catch (e) {} Object.values(panes).forEach((P) => P.setShade && P.setShade()); }); } }
+  { const k = document.getElementById('ms-show-piv'); try { G.showPiv = localStorage.getItem('ms-piv') === '1'; } catch (e) {} if (k) { k.checked = G.showPiv === true; k.addEventListener('change', () => { G.showPiv = k.checked; try { localStorage.setItem('ms-piv', k.checked ? '1' : '0'); } catch (e) {} keyLevels(); }); } }
   { const k = document.getElementById('ms-show-vwap'); try { G.showVwap = localStorage.getItem('ms-vwap') === '1'; } catch (e) {} if (k) { k.checked = G.showVwap === true; k.addEventListener('change', () => { G.showVwap = k.checked; try { localStorage.setItem('ms-vwap', k.checked ? '1' : '0'); } catch (e) {} Object.values(panes).forEach((P) => P.setVwap && P.setVwap()); }); } }
   { const k = document.getElementById('ms-show-ema'); try { G.showEma = localStorage.getItem('ms-ema') === '1'; } catch (e) {} if (k) { k.checked = G.showEma === true; k.addEventListener('change', () => { G.showEma = k.checked; try { localStorage.setItem('ms-ema', k.checked ? '1' : '0'); } catch (e) {} Object.values(panes).forEach((P) => P.setEma && P.setEma()); }); } }
   // chart layout presets (7 Nov loop): one tap flips the layer toggles; "Mine" is saved on this device
   { const box = document.getElementById('ms-lay'); if (box) { const all = () => [...document.querySelectorAll('.ms-tog input[type=checkbox][id^="ms-show-"]')];
-    const OFF_CLEAN = ['ms-show-ema', 'ms-show-vwap', 'ms-show-shade', 'ms-show-vol', 'ms-show-ha', 'ms-show-ct', 'ms-show-detail', 'ms-show-replica', 'ms-show-news', 'ms-show-sess', 'ms-show-next', 'ms-show-plan'];
+    const OFF_CLEAN = ['ms-show-ema', 'ms-show-vwap', 'ms-show-piv', 'ms-show-shade', 'ms-show-vol', 'ms-show-ha', 'ms-show-ct', 'ms-show-detail', 'ms-show-replica', 'ms-show-news', 'ms-show-sess', 'ms-show-next', 'ms-show-plan'];
     const NOT_FULL = ['ms-show-ha', 'ms-show-log', 'ms-show-detail'];
     const apply = (m) => all().forEach((c) => { if (!(c.id in m) || c.checked === m[c.id]) return; c.checked = m[c.id]; c.dispatchEvent(new Event('change', { bubbles: true })); });
     const flash = (b, t) => { const o = b.textContent; b.textContent = t; setTimeout(() => { b.textContent = o; }, 1400); };
