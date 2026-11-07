@@ -105,6 +105,7 @@ jobs:
             # round (~17 min), before the mirror copies its A-setups. ict.yml keeps a manual trigger only (one writer of ict/).
             if [ $((i % 3)) -eq 1 ]; then node ict/tracker.mjs data/ict || echo "ICT round $i failed"; fi
             node council/ctrader-mirror.mjs data || echo "cTrader mirror round $i failed"
+            node council/ctrader-test.mjs data || echo "cTrader test round $i failed"   # one-off demo test order, only when ctrader/test.json asks
             git -C data add -A
             if ! git -C data diff --cached --quiet; then
               git -C data commit -q -m "Council run $(date -u +%Y-%m-%dT%H:%MZ)"
