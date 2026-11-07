@@ -1,0 +1,18 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "framework": null,
+  "buildCommand": "",
+  "outputDirectory": ".",
+  "rewrites": [
+    { "source": "/macro-dashboard/:path*", "destination": "/:path*" },
+    { "source": "/gold", "destination": "/gold-trading.html" }
+  ],
+  "headers": [
+    { "source": "/sw.js", "headers": [{ "key": "Cache-Control", "value": "no-cache" }] },
+    { "source": "/(.*)\\.html", "headers": [{ "key": "Cache-Control", "value": "no-cache" }] }
+  ],
+  "crons": [
+    { "path": "/api/kick?job=ict", "schedule": "4,19,34,49 * * * *" },
+    { "path": "/api/kick?job=council", "schedule": "*/10 * * * *" }
+  ]
+}

@@ -201,3 +201,11 @@ repository variables `FUT_ACCOUNT` / `FUT_RISK`, default $10,000 / 0.25%; stop /
 prices = spot + the GC−spot basis from the ICT snapshot) and opens that contract's TradingView chart. Limit systems get a
 LIMIT ticket when placed and a cancel when they expire; closes get a CLOSE ticket. Manual workflow "Futures ticket test"
 (`council/futures-test.mjs`) sends one sample ticket. Later option 2: broker API (TradeStation / Tradovate) with TradingView as the screen.
+
+## Vercel (7 Nov 2026, owner: move to Vercel Pro) — stage 1
+`vercel.json` (no build, static from the repo root, `/macro-dashboard/*` rewritten to the root so index.html's asset paths work,
+`/gold`, no-cache on HTML) and `api/kick.js`: Vercel crons (Pro: per-minute) start the GitHub workflows through the API —
+`job=ict` dispatches ict.yml at :04/:19/:34/:49, `job=council` starts council.yml every 10 min only when no loop runs. Env on
+Vercel: `GH_DISPATCH_TOKEN` (fine-grained, this repo, Actions read/write) and `CRON_SECRET`; never commit either. GitHub Pages
+keeps deploying in parallel until the Vercel site is proven. Later stages: server-side login + private repo (the council and ICT
+loops then have to run off GitHub Actions or on paid minutes), then broker-order functions.
