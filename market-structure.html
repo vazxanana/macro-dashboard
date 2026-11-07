@@ -1402,6 +1402,13 @@ td.st-dim { color: var(--ink-faint); }
 
 /* polish 26: dark theme faint text nudged to pass WCAG AA (4.43:1 -> ~5:1 on panels) */
 :root:not([data-theme="light"]) { --ink-faint: #7f8796; }
+
+/* polish 27: comfortable tap targets on phones (ICT filters, ICT selects, market picker) */
+@media (max-width: 600px) {
+  .ict-seg button { min-height: 36px; padding-left: 14px; padding-right: 14px; }
+  #ict-f-m, #ict-f-s { min-height: 36px; }
+  #ms-mk-btn { min-height: 36px; display: inline-flex; align-items: center; }
+}
 </style>
 </head>
 <body>
