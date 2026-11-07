@@ -196,6 +196,25 @@ test('history: append-only, written from 21:00 UTC before the day, never for a s
   assert.match(bad[0].void, /not made before/, 'a forecast stamped after the open is voided, never scored');
 });
 
+test('FRED unreachable: the US Treasury curves fill the rates, the circuit breaker skips the rest', async () => {
+  const s = synth(), calls = [];
+  const usd = (t) => { const d = new Date(t * 1000); return `${String(d.getUTCMonth() + 1).padStart(2, '0')}/${String(d.getUTCDate()).padStart(2, '0')}/${d.getUTCFullYear()}`; };
+  const csvFor = (type, year) => {
+    const inYear = (o) => new Date(o.t * 1000).getUTCFullYear() === year;
+    if (type === 'daily_treasury_real_yield_curve') return '"Date","5 YR","7 YR","10 YR","20 YR","30 YR"\n' + s.fred.DFII10.filter(inYear).reverse().map((o) => `${usd(o.t)},1.5,1.6,${o.v.toFixed(2)},2.0,2.1`).join('\n');
+    const b10 = new Map(s.fred.DGS10.map((o) => [o.t, o.v]));
+    return 'Date,"1 Mo","2 Mo","3 Mo","6 Mo","1 Yr","2 Yr","5 Yr","10 Yr","30 Yr"\n' + s.fred.DGS2.filter(inYear).reverse().map((o) => `${usd(o.t)},4.1,4.1,4.0,3.9,3.8,${o.v.toFixed(2)},3.9,${(b10.get(o.t) || 4).toFixed(2)},4.6`).join('\n');
+  };
+  const base = fakeFetch(s, { down: ['fred.stlouisfed.org'], calls });
+  const f = async (url, opt) => { const m = url.match(/daily-treasury-rates\.csv\/(\d{4})\/all\?type=(\w+)/); if (m) { calls.push(url); const body = csvFor(m[2], +m[1]); return { ok: true, status: 200, text: async () => body }; } return base(url, opt); };
+  const { data, src } = await M.gather(f, NOW, {});
+  assert.ok(data.fred.DFII10.length > 200 && data.fred.DGS2.length > 200 && data.fred.T10YIE.length > 200 && data.fred.T10Y3M.length > 200);
+  assert.match(src['fred:DFII10'], /Treasury real 10Y ok/); assert.match(src["treasury:nominal"], /ok \(3 years\)/, "the synthetic world covers 3 calendar years");
+  assert.equal(calls.filter((u) => u.includes('fred.stlouisfed.org')).length <= 2 * 7, true, 'stops hammering FRED once it is down');
+  const p = M.parseTreasuryCsv('Date,"3 Mo","2 Yr","10 Yr"\n11/06/2026,3.90,3.55,4.10\n11/05/2026,3.91,,4.12\n');
+  assert.deepEqual(p['2 yr'].map((o) => o.v), [3.55]); assert.equal(p['10 yr'][0].t, Date.UTC(2026, 10, 5) / 1000);
+});
+
 test('a full run on a fake network: files, sources, fallbacks, the analysis section', async () => {
   const s = synth(), dir = fs.mkdtempSync(path.join(os.tmpdir(), 'macro-'));
   fs.mkdirSync(path.join(dir, 'analysis')); fs.writeFileSync(path.join(dir, 'analysis', 'latest.md'), '# Weekly brief\n\nText.\n\n## Top 3 to watch\n\n1. Gold\n');
