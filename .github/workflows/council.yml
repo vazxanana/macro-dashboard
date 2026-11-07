@@ -62,7 +62,7 @@ jobs:
     # for 6+ min). The new run waits; the running loop sees new council code on main at its next check and hands over.
     concurrency:
       group: council
-      cancel-in-progress: true   # TEMPORARY (7 Nov): replaces the old-code loop that has no hand-over check; set back to false next commit
+      cancel-in-progress: false
     timeout-minutes: 330
     steps:
       - name: Checkout code
