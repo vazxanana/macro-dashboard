@@ -6,7 +6,7 @@ const REPO = 'vazxanana/macro-dashboard', BRANCH = 'council-data';
 module.exports = async (req, res) => {
   const p = String((req.query && req.query.p) || '').replace(/^\/+/, '');
   if (!p || p.length > 200 || !/^[A-Za-z0-9._\/-]+$/.test(p) || p.split('/').some((s) => s === '..' || s.startsWith('.'))) return res.status(400).json({ error: 'bad path' });
-  const tok = process.env.GH_READ_TOKEN || process.env.GH_DISPATCH_TOKEN, enc = p.split('/').map(encodeURIComponent).join('/');
+  const tok = process.env.GH_READ_TOKEN || process.env.GH_TOKEN || process.env.GH_DISPATCH_TOKEN, enc = p.split('/').map(encodeURIComponent).join('/');
   try {
     // with a token: the GitHub API (works on a private repo); without one: the public raw file (only while the repo is still public)
     const r = tok ? await fetch(`https://api.github.com/repos/${REPO}/contents/${enc}?ref=${BRANCH}`, {
