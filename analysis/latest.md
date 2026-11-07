@@ -8,7 +8,7 @@ _Snapshot 2026-11-02 05:37 UTC. Paper trading only._
 <!-- live-rule:start -->
 ## Live Scalp rule check
 
-Built by the Trader at 2026-11-07 23:42 UTC from snapshot, config and the 30-day replay. Rule now: Scalp (M15 → M1) against D1 only, not in asia/overlap, skips audusd. **Scalp is not live right now** (not in focusSetups), so nothing below trades live.
+Built by the Trader at 2026-11-07 23:47 UTC from snapshot, config and the 30-day replay. Rule now: Scalp (M15 → M1) against D1 only, not in asia/overlap, skips audusd. **Scalp is not live right now** (not in focusSetups), so nothing below trades live.
 
 Session now: **late**.
 
@@ -18,7 +18,7 @@ Session now: **late**.
 | BTC/USD | up (Kraken) | no (not live) | IN ORIGIN sell | 26 trades, 12% won, −3.60R a trade |
 | ETH/USD | down (Kraken) | no (not live) | IN ORIGIN buy | 23 trades, 26% won, −2.07R a trade |
 | SOL/USD | down (Kraken) | no (not live) | IN ORIGIN sell | 24 trades, 17% won, −1.54R a trade |
-| XRP/USD | up (Kraken) | no (not live) | READY sell | 29 trades, 24% won, −3.08R a trade |
+| XRP/USD | up (Kraken) | no (not live) | IN ORIGIN sell | 29 trades, 24% won, −3.08R a trade |
 | EUR/USD | down (OANDA) | no (not live) | IN ORIGIN sell | 22 trades, 14% won, −0.72R a trade |
 | GBP/USD | down (OANDA) | no (not live) | READY sell (blocked: wrong side) | 33 trades, 21% won, −0.54R a trade |
 | AUD/USD | up (OANDA) | no (not live, rule skips AUD/USD) | IN ORIGIN buy | 32 trades, 38% won, +0.00R a trade |
@@ -31,7 +31,7 @@ Replay total on the markets it trades live: 213 trades, −1.43R a trade (−305
 <!-- coach-churn:start -->
 ## Coach rule changes
 
-Built by the Trader at 2026-11-07 23:42 UTC from the rule history. Rules the Coach changed by itself in the last 7 days (owner rules are not counted).
+Built by the Trader at 2026-11-07 23:47 UTC from the rule history. Rules the Coach changed by itself in the last 7 days (owner rules are not counted).
 
 | Rule | Changes | Steps (oldest first) |
 |---|---|---|
@@ -59,19 +59,19 @@ Built by the Trader at 2026-11-07 23:42 UTC from the rule history. Rules the Coa
 <!-- desk-status:start -->
 ## Desk & mirror status
 
-Built by the Trader at 2026-11-07 23:42 UTC. ICT desk: the last 7 days; mirror: the cTrader DEMO account (0.01 lot, demo only).
+Built by the Trader at 2026-11-07 23:47 UTC. ICT desk: the last 7 days; mirror: the cTrader DEMO account (0.01 lot, demo only).
 
 **ICT A-setups:** 0 signals (0 open, 0 closed); 1 other signal tracked, not A-setups.
 
 **Dip-buy candidate (NQ/ES, paper only):** 0 signals in 7 days · recording since 2026-11-07.
 
-**cTrader mirror:** ok · demo Fusion Markets · balance 988.99 · 0 open (checked 2026-11-07 23:37 UTC).
+**cTrader mirror:** ok · demo Fusion Markets · balance 988.99 · 0 open (checked 2026-11-07 23:43 UTC).
 <!-- desk-status:end -->
 
 <!-- coach-ledger:start -->
 ## Coach change ledger
 
-Built by the Trader at 2026-11-07 23:42 UTC. Every rule the Coach changed by itself, the evidence it used and what happened 30 days later. Filter changes run as champion/challenger trials: the old rule keeps running as a shadow and the change stays only if it beats it on the same forward signals (20 where they disagree, shrunk edge ≥ +0.05R a signal; else back to the old rule after 60 days). Owner rules and live setups are not Coach changes.
+Built by the Trader at 2026-11-07 23:47 UTC. Every rule the Coach changed by itself, the evidence it used and what happened 30 days later. Filter changes run as champion/challenger trials: the old rule keeps running as a shadow and the change stays only if it beats it on the same forward signals (20 where they disagree, shrunk edge ≥ +0.05R a signal; else back to the old rule after 60 days). Owner rules and live setups are not Coach changes.
 
 | Date | Change | Evidence | Before → after (the sample it used) | Trial | 30 days later |
 |---|---|---|---|---|---|
