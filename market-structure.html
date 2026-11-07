@@ -2293,6 +2293,7 @@ html[data-motion="off"][data-gate] .gate-bg path[stroke] { animation: none; stro
             <label><input type="checkbox" id="ms-show-ct" checked><i style="background:#2962ff;height:2px"></i>Council trades</label>
             <label><input type="checkbox" id="ms-show-kl" checked><i style="border-top:1.5px dotted #9aa4b2;height:0"></i>Key levels</label>
             <label><input type="checkbox" id="ms-show-ema"><i style="background:linear-gradient(90deg,#2962ff 33%,#e0a526 33% 66%,#9c27b0 66%);height:2px"></i>EMAs 21 / 50 / 200</label>
+            <label><input type="checkbox" id="ms-show-shade" checked><i style="background:linear-gradient(90deg,rgba(38,166,154,.4) 33%,rgba(41,98,255,.4) 33% 66%,rgba(156,39,176,.4) 66%)"></i>Session shading</label>
             <label><input type="checkbox" id="ms-show-vol" checked><i style="background:linear-gradient(90deg,rgba(8,153,129,.5) 50%,rgba(242,54,69,.5) 50%)"></i>Volume</label>
             <label><input type="checkbox" id="ms-show-next" data-show="next" checked><i style="background:#2962ff;height:2px"></i>Next setup</label>
             <label><input type="checkbox" id="ms-show-plan" data-show="plan" checked><i style="background:#089981;height:2px"></i>Selected trade</label>
@@ -3500,6 +3501,13 @@ function msNextSetup(bars, A) {
     chart.priceScale('vol').applyOptions({ scaleMargins: { top: 0.84, bottom: 0 }, visible: false });
     const vcol = (b) => b.close >= b.open ? 'rgba(8,153,129,.26)' : 'rgba(242,54,69,.26)';
     P.vol = vol;
+    // session shading (7 Nov loop): faint Asia / London / New York background bands on M15, M5 and M1 (UTC 00-07 / 07-13 / 13-21)
+    const shade = ['15m', '5m', '1m'].includes(tf.id) ? chart.addHistogramSeries({ priceScaleId: 'sess', priceLineVisible: false, lastValueVisible: false, base: 0 }) : null;
+    if (shade) chart.priceScale('sess').applyOptions({ scaleMargins: { top: 0, bottom: 0 }, visible: false });
+    const sessCol = (t) => { const h = new Date((t - TZ) * 1000).getUTCHours(); return h < 7 ? 'rgba(38,166,154,.10)' : h < 13 ? 'rgba(41,98,255,.10)' : h < 21 ? 'rgba(156,39,176,.09)' : null; };
+    P.setShade = function () { if (!shade) return; const on = G.showShade !== false && P.bars && P.bars.length && !(CUR.group === 'Crypto');
+      shade.setData(on ? P.bars.map((b) => { const c = sessCol(b.time); return c ? { time: b.time, value: 1, color: c } : { time: b.time }; }) : []); };
+    P.tickShade = function (b) { if (!shade || G.showShade === false || CUR.group === 'Crypto') return; const c = sessCol(b.time); try { shade.update(c ? { time: b.time, value: 1, color: c } : { time: b.time }); } catch (e) {} };
     // EMAs 21 / 50 / 200 (7 Nov loop): thin lines, off by default (Settings → Chart layers → EMAs)
     const EMA = [[21, 'rgba(41,98,255,.75)'], [50, 'rgba(224,165,38,.75)'], [200, 'rgba(156,39,176,.7)']].map(([n, c]) => ({ n, s: chart.addLineSeries({ color: c, lineWidth: 1, priceLineVisible: false, lastValueVisible: false, crosshairMarkerVisible: false }), last: null }));
     P.setEma = function () {
@@ -3558,7 +3566,7 @@ function msNextSetup(bars, A) {
       const off = G.offset;
       P.bars = P.raw.map((b) => ({ time: b.time + TZ, open: b.open + off, high: b.high + off, low: b.low + off, close: b.close + off }));
       series.setData(P.bars);
-      P.setVol(); P.setEma();
+      P.setVol(); P.setEma(); P.setShade();
       P.analyze();
       if (!keepView || !P.fitted) P.fit();
       P.legend();
@@ -3671,7 +3679,7 @@ function msNextSetup(bars, A) {
       else return;
       const off = G.offset, b = { time: k.time + TZ, open: k.open + off, high: k.high + off, low: k.low + off, close: k.close + off };
       if (P.bars[P.bars.length - 1].time === b.time) P.bars[P.bars.length - 1] = b; else P.bars.push(b);
-      P.tickEma(b);
+      P.tickEma(b); P.tickShade(b);
       if (G.showVol !== false) { const rk = P.raw[P.raw.length - 1]; if (rk.volume > 0 || P.raw.some((x) => x.volume > 0)) try { vol.update({ time: b.time, value: rk.volume || 0, color: vcol(rk) }); } catch (e) {} }
       if (P.bars.length > P.raw.length) P.bars.shift();
       series.update(b);
@@ -3716,6 +3724,7 @@ function msNextSetup(bars, A) {
   setTimeout(councilLines, 4000); setInterval(councilLines, 15e3);
   { const k = document.getElementById('ms-show-ct'); try { G.showCT = localStorage.getItem('ms-ct') !== '0'; } catch (e) {} if (k) { k.checked = G.showCT !== false; k.addEventListener('change', () => { G.showCT = k.checked; try { localStorage.setItem('ms-ct', k.checked ? '1' : '0'); } catch (e) {} Object.values(panes).forEach((P) => { P._ctSig = null; }); councilLines(); }); } }
   { const k = document.getElementById('ms-show-kl'); try { G.showKL = localStorage.getItem('ms-kl') !== '0'; } catch (e) {} if (k) { k.checked = G.showKL !== false; k.addEventListener('change', () => { G.showKL = k.checked; try { localStorage.setItem('ms-kl', k.checked ? '1' : '0'); } catch (e) {} keyLevels(); }); } }
+  { const k = document.getElementById('ms-show-shade'); try { G.showShade = localStorage.getItem('ms-shade') !== '0'; } catch (e) {} if (k) { k.checked = G.showShade !== false; k.addEventListener('change', () => { G.showShade = k.checked; try { localStorage.setItem('ms-shade', k.checked ? '1' : '0'); } catch (e) {} Object.values(panes).forEach((P) => P.setShade && P.setShade()); }); } }
   { const k = document.getElementById('ms-show-ema'); try { G.showEma = localStorage.getItem('ms-ema') === '1'; } catch (e) {} if (k) { k.checked = G.showEma === true; k.addEventListener('change', () => { G.showEma = k.checked; try { localStorage.setItem('ms-ema', k.checked ? '1' : '0'); } catch (e) {} Object.values(panes).forEach((P) => P.setEma && P.setEma()); }); } }
   { const v = document.getElementById('ms-show-vol'); try { G.showVol = localStorage.getItem('ms-vol') !== '0'; } catch (e) {} if (v) { v.checked = G.showVol !== false; v.addEventListener('change', () => { G.showVol = v.checked; try { localStorage.setItem('ms-vol', v.checked ? '1' : '0'); } catch (e) {} Object.values(panes).forEach((P) => P.setVol && P.setVol()); }); } }
   // TradingView alerts in (7 Nov loop): webhook URL (owner), message template, forward-to-this-device switch, recent alerts
