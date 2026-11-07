@@ -108,12 +108,12 @@ export async function mirrorRound({ env, trades, state, tokens, WS = globalThis.
   const scrub = scrubber(env), log = [], say = (msg, x = {}) => log.push({ at: new Date(now * 1000).toISOString(), msg: scrub(msg), ...x });
   const st = { map: {}, day: null, startedAt: null, ...(state || {}) };
   const out = { state: st, tokens: tokens || null, log, sent: [] };
-  if (String(env.CTRADER_MIRROR || '').toLowerCase() !== 'on') { st.status = 'off (CTRADER_MIRROR is not "on")'; return out; }
+  if (String(env.CTRADER_MIRROR || '').trim().toLowerCase() !== 'on') { st.status = `off (CTRADER_MIRROR is ${env.CTRADER_MIRROR ? `"${String(env.CTRADER_MIRROR).trim().slice(0, 8)}", not "on"` : 'not set'})`; return out; }
   const missing = NEED.filter((k) => !env[k]);
   if (missing.length) { st.status = `not configured: ${missing.join(', ')} missing`; return out; }
-  if (String(env.CTRADER_ENV).toLowerCase() !== 'demo') { st.status = 'refused: CTRADER_ENV must be "demo"'; return out; }
+  if (String(env.CTRADER_ENV).trim().toLowerCase() !== 'demo') { st.status = 'refused: CTRADER_ENV must be "demo"'; return out; }
   if (!WS) { st.status = 'no WebSocket in this runtime'; return out; }
-  const accountId = Number(env.CTRADER_ACCOUNT_ID);
+  const accountId = Number(String(env.CTRADER_ACCOUNT_ID).trim());
   if (!st.startedAt) st.startedAt = new Date(now * 1000).toISOString();   // trades before the mirror existed are never copied
 
   let tok = { accessToken: env.CTRADER_ACCESS_TOKEN, refreshToken: env.CTRADER_REFRESH_TOKEN };
@@ -197,7 +197,8 @@ export async function mirrorRound({ env, trades, state, tokens, WS = globalThis.
 if (process.argv[1] && process.argv[1].endsWith('ctrader-mirror.mjs')) {
   const DIR = process.argv[2] || 'data', CD = path.join(DIR, 'ctrader');
   const rd = (f, d) => { try { return JSON.parse(fs.readFileSync(path.join(CD, f), 'utf8')); } catch (e) { return d; } };
-  if (String(process.env.CTRADER_MIRROR || '').toLowerCase() !== 'on' && !fs.existsSync(path.join(CD, 'mirror.json'))) process.exit(0);   // never set up: stay silent
+  const anySet = ['CTRADER_MIRROR', 'CTRADER_CLIENT_ID', 'CTRADER_ACCOUNT_ID', 'CTRADER_ENV'].some((k) => process.env[k]);
+  if (!anySet && !fs.existsSync(path.join(CD, 'mirror.json'))) process.exit(0);   // never set up: stay silent; once any cTrader setting exists, always report status
   const raw = JSON.parse(fs.readFileSync(path.join(DIR, 'trades.json'), 'utf8'));
   let ict = []; try { ict = JSON.parse(fs.readFileSync(path.join(DIR, 'ict', 'trades.json'), 'utf8')); } catch (e) {}
   const trades = (Array.isArray(raw) ? raw : raw.trades || []).concat(ictCandidates(ict));

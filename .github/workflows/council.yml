@@ -84,13 +84,13 @@ jobs:
           FUT_ACCOUNT: ${{ vars.FUT_ACCOUNT }}
           FUT_RISK: ${{ vars.FUT_RISK }}
           # cTrader DEMO mirror (council/ctrader-mirror.mjs): inert unless CTRADER_MIRROR is "on"; demo accounts only
-          CTRADER_MIRROR: ${{ secrets.CTRADER_MIRROR }}
-          CTRADER_CLIENT_ID: ${{ secrets.CTRADER_CLIENT_ID }}
-          CTRADER_CLIENT_SECRET: ${{ secrets.CTRADER_CLIENT_SECRET }}
-          CTRADER_ACCESS_TOKEN: ${{ secrets.CTRADER_ACCESS_TOKEN }}
-          CTRADER_REFRESH_TOKEN: ${{ secrets.CTRADER_REFRESH_TOKEN }}
-          CTRADER_ACCOUNT_ID: ${{ secrets.CTRADER_ACCOUNT_ID }}
-          CTRADER_ENV: ${{ secrets.CTRADER_ENV }}
+          CTRADER_MIRROR: ${{ secrets.CTRADER_MIRROR || vars.CTRADER_MIRROR }}
+          CTRADER_CLIENT_ID: ${{ secrets.CTRADER_CLIENT_ID || vars.CTRADER_CLIENT_ID }}
+          CTRADER_CLIENT_SECRET: ${{ secrets.CTRADER_CLIENT_SECRET || vars.CTRADER_CLIENT_SECRET }}
+          CTRADER_ACCESS_TOKEN: ${{ secrets.CTRADER_ACCESS_TOKEN || vars.CTRADER_ACCESS_TOKEN }}
+          CTRADER_REFRESH_TOKEN: ${{ secrets.CTRADER_REFRESH_TOKEN || vars.CTRADER_REFRESH_TOKEN }}
+          CTRADER_ACCOUNT_ID: ${{ secrets.CTRADER_ACCOUNT_ID || vars.CTRADER_ACCOUNT_ID }}
+          CTRADER_ENV: ${{ secrets.CTRADER_ENV || vars.CTRADER_ENV }}
         run: |
           git -C data config user.name "mosha-council"
           git -C data config user.email "41898282+github-actions[bot]@users.noreply.github.com"
