@@ -9,6 +9,13 @@
 // Environment: CRON_SECRET, GH_TOKEN (fine-grained, this repo: Contents read/write), RUN_MODE, and the trader's own
 // NTFY_TOPIC, TELEGRAM_BOT_TOKEN, TELEGRAM_CHAT_ID, FUT_ACCOUNT, FUT_RISK.
 const flags = require('./_flags');
+// every round (dry or live) leaves a small report in Blob (runs/<job>-*.json, newest 3 kept) so /api/status can show what the
+// last round did even when it committed nothing (7 Nov: the council ran dry for hours with no way to see it)
+async function report(job, rec) { const tok = process.env.BLOB_READ_WRITE_TOKEN; if (!tok) return;
+  try { const { put, list, del } = require('@vercel/blob');
+    await put(`runs/${job}-${Date.now()}.json`, JSON.stringify({ ...rec, at: new Date().toISOString() }), { access: 'private', addRandomSuffix: true, contentType: 'application/json', token: tok });
+    const { blobs } = await list({ prefix: `runs/${job}-`, token: tok }); blobs.sort((a, b) => new Date(b.uploadedAt) - new Date(a.uploadedAt));
+    if (blobs.length > 3) await del(blobs.slice(3).map((b) => b.url), { token: tok }); } catch (e) { console.error('report', e.message); } }
 const fs = require('node:fs'), path = require('node:path'), os = require('node:os'), crypto = require('node:crypto');
 const { execFileSync } = require('node:child_process');
 const REPO = 'vazxanana/macro-dashboard', BR = 'council-data';
@@ -49,7 +56,8 @@ module.exports = async (req, res) => {
     const changed = walk(dir).filter((f) => J.writes(f) && sha1(fs.readFileSync(path.join(dir, f))) !== before[f]);
     const summary = { job, mode: live ? 'live' : 'dry', base: head.slice(0, 7), seconds: Math.round((Date.now() - t0) / 1000), failed, changed: changed.map((f) => `${f} (${fs.statSync(path.join(dir, f)).size} B)`) };
     if (job === 'council' && changed.includes('trades.json')) { try { const a = JSON.parse(fs.readFileSync(path.join(dir, 'trades.json'), 'utf8')); summary.trades = a.length; summary.open = a.filter((x) => x.status === 'open').length; } catch (e) {} }
-    if (!live || !changed.length || failed) { console.log(JSON.stringify(summary)); return res.status(200).json(summary); }
+    if (job === 'council') { try { const sn = JSON.parse(fs.readFileSync(path.join(dir, 'snapshot.json'), 'utf8')); if (sn.d1src) summary.d1src = sn.d1src; if (sn.errors && Object.keys(sn.errors).length) summary.errors = sn.errors; } catch (e) {} }
+    if (!live || !changed.length || failed) { console.log(JSON.stringify(summary)); await report(job, summary); return res.status(200).json(summary); }
     // 4. commit the changed files on top of whatever the branch is at now (the other job may have committed meanwhile)
     const blobs = await Promise.all(changed.map(async (f) => ({ path: f, mode: '100644', type: 'blob', sha: (await (await gh('/git/blobs', { method: 'POST', body: JSON.stringify({ content: fs.readFileSync(path.join(dir, f)).toString('base64'), encoding: 'base64' }) })).json()).sha })));
     for (let a = 0; a < 4; a++) {
@@ -57,10 +65,10 @@ module.exports = async (req, res) => {
       const nt = (await (await gh('/git/trees', { method: 'POST', body: JSON.stringify({ base_tree: tree, tree: blobs }) })).json()).sha;
       const c = (await (await gh('/git/commits', { method: 'POST', body: JSON.stringify({ message: `${job === 'ict' ? 'ICT desk' : 'Council run'} ${new Date().toISOString().slice(0, 16)}Z (Vercel)`, tree: nt, parents: [cur] }) })).json()).sha;
       const u = await gh(`/git/refs/heads/${BR}`, { method: 'PATCH', body: JSON.stringify({ sha: c, force: false }), ok: [422] });
-      if (u.ok) { summary.commit = c.slice(0, 7); console.log(JSON.stringify(summary)); return res.status(200).json(summary); }
+      if (u.ok) { summary.commit = c.slice(0, 7); console.log(JSON.stringify(summary)); await report(job, summary); return res.status(200).json(summary); }
       await new Promise((r) => setTimeout(r, 1500 * (a + 1)));
     }
     throw new Error('branch kept moving; commit not saved');
-  } catch (e) { console.error(`[${job}] ${e.message}`); return res.status(500).json({ job, error: String(e.message || e) }); }
+  } catch (e) { console.error(`[${job}] ${e.message}`); await report(job, { job, error: String(e.message || e) }); return res.status(500).json({ job, error: String(e.message || e) }); }
   finally { try { fs.rmSync(dir, { recursive: true, force: true }); } catch (e) {} }
 };
