@@ -2955,7 +2955,11 @@ function msNextSetup(bars, A) {
   }
   // Kraken allows about one public request per second: queue them and retry when it says slow down
   let krakenChain = Promise.resolve();
-  function krakenGet(url) {
+  function krakenGet(url, urgent) {
+    if (urgent) return (async () => {   // the trade viewer: someone is waiting on it, so skip the background queue (still backs off when Kraken says slow down)
+      for (let a = 0; a < 4; a++) { const j = await getJSON(url); if (j && j.error && j.error.length && /too many|rate limit/i.test(j.error[0])) { await new Promise((r) => setTimeout(r, 1200 * (a + 1))); continue; } return j; }
+      throw new Error('Kraken: too many requests');
+    })();
     const run = krakenChain.then(async () => {
       for (let a = 0; a < 4; a++) {
         const j = await getJSON(url);
@@ -2967,7 +2971,7 @@ function msNextSetup(bars, A) {
     krakenChain = run.catch(() => {}).then(() => new Promise((r) => setTimeout(r, 1100)));
     return run;
   }
-  async function fetchBars(tf, I = INST, lim = BARS) {
+  async function fetchBars(tf, I = INST, lim = BARS, urgent = false) {
     const errs = [];
     if (I.binance) try {
       let out = [], end = null;
@@ -2982,7 +2986,7 @@ function msNextSetup(bars, A) {
       if (out.length) return { src: 'Binance', bars: out };
     } catch (e) { errs.push(((m) => m.indexOf('Binance') === 0 ? m : 'Binance: ' + m)(String(e.message || 'blocked'))); }
     try {
-      const j = await krakenGet(`https://api.kraken.com/0/public/OHLC?pair=${I.kraken}&interval=${tf.kraken}`);
+      const j = await krakenGet(`https://api.kraken.com/0/public/OHLC?pair=${I.kraken}&interval=${tf.kraken}`, urgent);
       const key = j.result && Object.keys(j.result).find((k) => k !== 'last');
       const rows = key ? j.result[key] : null;
       if (j.error && j.error.length) throw new Error(`Kraken: ${j.error[0]}`);
@@ -4877,7 +4881,7 @@ function msNextSetup(bars, A) {
       const rows = j && j.data && j.data.ohlc;
       if (Array.isArray(rows) && rows.length) return rows.map((k) => ({ time: +k.timestamp, open: +k.open, high: +k.high, low: +k.low, close: +k.close })).sort((a, b) => a.time - b.time);
     } catch (e) { /* next source */ }
-    return (await fetchBars(tf, I, 720)).bars;
+    return (await fetchBars(tf, I, 720, true)).bars;
   }
   async function paxgWindow(W) {   // Binance PAXGUSDT (the replay's own source) for [start - pad, end + pad]
     const a = Math.floor(W.start - W.pad) * 1000, iv = W.tf.binance;
@@ -4922,11 +4926,16 @@ function msNextSetup(bars, A) {
     if (keep) TV.ctx = null; else rvOpen(x);   // a timeframe switch keeps the review being written
     const host = document.getElementById('ms-tv-c'), th = THEMES[G.theme];
     if (!TV.chart) {
-      TV.chart = LW.createChart(host, { autoSize: true, layout: { background: { type: 'solid', color: th.bg }, textColor: th.text, fontSize: 11 }, grid: { vertLines: { visible: false }, horzLines: { visible: false } }, crosshair: { mode: LW.CrosshairMode.Normal }, rightPriceScale: { borderColor: th.border }, timeScale: { borderColor: th.border, timeVisible: true, secondsVisible: false } });
+      TV.chart = LW.createChart(host, { autoSize: true, layout: { background: { type: 'gradient', topColor: th.bgTop || th.bg, bottomColor: th.bg }, textColor: th.text, fontSize: 11 }, grid: { vertLines: { visible: false }, horzLines: { visible: false } }, crosshair: { mode: LW.CrosshairMode.Normal, vertLine: { color: 'rgba(140, 150, 170, 0.55)', style: LW.LineStyle.Dashed, labelBackgroundColor: '#2b3242' }, horzLine: { color: 'rgba(140, 150, 170, 0.55)', style: LW.LineStyle.Dashed, labelBackgroundColor: '#2b3242' } }, rightPriceScale: { borderVisible: false, scaleMargins: { top: 0.14, bottom: 0.08 } }, timeScale: { borderVisible: false, timeVisible: true, secondsVisible: false } });
+      { const lg = document.createElement('div'); lg.className = 'ch-lg'; lg.setAttribute('aria-hidden', 'true'); host.style.position = 'relative'; host.appendChild(lg); TV.lg = lg;
+        TV.legend = (i) => { const C = TV.ctx; if (!C || !C.data || !C.data.length) { lg.innerHTML = ''; return; } const D = C.data; if (typeof i !== 'number' || i < 0 || i >= D.length || D[i].open == null) { i = D.length - 1; if (TV.mode === 'before' && C.iE >= 0) i = C.iE; }
+          const b = D[i]; if (!b || b.open == null) { lg.innerHTML = ''; return; } const pv = i > 0 && D[i - 1].close != null ? D[i - 1].close : b.open, ch = b.close - pv, cl = ch >= 0 ? 'up' : 'dn', f = C.f, dd = new Date((b.time - TZ) * 1000);
+          lg.innerHTML = `<span class="k">O</span><b class="${cl}">${f(b.open)}</b><span class="k">H</span><b class="${cl}">${f(b.high)}</b><span class="k">L</span><b class="${cl}">${f(b.low)}</b><span class="k">C</span><b class="${cl}">${f(b.close)}</b><b class="${cl} chg">${ch >= 0 ? '+' : '−'}${f(Math.abs(ch))}</b><span class="t">${dd.toLocaleString(undefined, { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })}</span>`; };
+        TV.chart.subscribeCrosshairMove((pr) => TV.legend(pr && pr.point && pr.logical != null ? Math.round(pr.logical) : null)); }
       TV.series = TV.chart.addCandlestickSeries({ upColor: UPC, downColor: DNC, borderUpColor: UPC, borderDownColor: DNC, wickUpColor: UPC, wickDownColor: DNC, priceLineVisible: false, lastValueVisible: false });
       TV.ov = new Overlay(); TV.series.attachPrimitive(TV.ov);
       TV.series.applyOptions({ autoscaleInfoProvider: (orig) => { const r = orig(); if (r && r.priceRange && TV.pv.length) { r.priceRange.minValue = Math.min(r.priceRange.minValue, ...TV.pv); r.priceRange.maxValue = Math.max(r.priceRange.maxValue, ...TV.pv); } return r; } });
-    } else TV.chart.applyOptions({ layout: { background: { type: 'solid', color: th.bg }, textColor: th.text }, grid: { horzLines: { visible: false } }, rightPriceScale: { borderColor: th.border }, timeScale: { borderColor: th.border } });
+    } else TV.chart.applyOptions({ layout: { background: { type: 'gradient', topColor: th.bgTop || th.bg, bottomColor: th.bg }, textColor: th.text }, grid: { vertLines: { visible: false }, horzLines: { visible: false } } });
     TV.lines.forEach((l) => TV.series.removePriceLine(l)); TV.lines = []; TV.series.setData([]); TV.series.setMarkers([]);
     const req = ++TV.req, W0 = (I.nq || rpGold) ? tvPickWin(x) : tvPickTf(x), tfC = TV.tfSel ? TFS.find((t) => t.id === TV.tfSel) : null;
     const W = tfC ? { tf: tfC, start: W0.start, end: W0.end, pad: Math.max(W0.pad, 60 * tfC.sec) } : { ...W0 };
@@ -4950,7 +4959,7 @@ function msNextSetup(bars, A) {
     if (!data.length) { msg.textContent = `The ${W.tf.label} candles for this trade are no longer available from the data feed.`; return; }
     msg.hidden = true;
     TV.series.applyOptions({ priceFormat: { type: 'price', precision: d.dec, minMove: Math.pow(10, -d.dec) } });
-    TV.pv = [x.entry, stop0, x.t1, x.tp1].filter((v) => v != null && isFinite(v));
+    { const r0v = Math.abs(x.entry - stop0) || 1, near = (v) => v != null && isFinite(v) && Math.abs(v - x.entry) <= 4.5 * r0v; TV.pv = [x.entry, stop0, x.tp1, x.t1].filter(near); if (!near(x.t1) && !near(x.tp1)) TV.pv.push(x.entry + (x.side === 'sell' ? -2 : 2) * r0v); }
     TV.series.setData(data);
     const line = (price, color, title, style) => TV.lines.push(TV.series.createPriceLine({ price, color, lineWidth: 2, lineStyle: style || LW.LineStyle.Solid, axisLabelVisible: true, title }));
     line(x.entry, '#2962ff', 'Entry'); line(stop0, DNC, 'Stop'); if (x.t1 != null && isFinite(x.t1)) line(x.t1, UPC, x.tp1 != null ? (/^r/.test(x.k) ? 'Target (Origin)' : 'Target 2') : 'Target');
@@ -4983,8 +4992,18 @@ function msNextSetup(bars, A) {
     // trailing-stop trades (replica since 4 Nov): the arrow aims at the 2R mark, the target line is only the 10R cap
     const noTgt = x.t1 == null || !isFinite(x.t1), trailing = !!x.trail || x.rr >= 10 || noTgt, aim = trailing ? (x.tp1 != null ? x.tp1 : x.entry + s * 2 * Math.abs(x.entry - C.stop0)) : x.t1;
     if (iE >= 0) {
+      // position tool: reward box (entry to target, or to the 2R mark when the target is a far cap / none) and risk box (entry to stop), from entry to exit
+      const r0v = Math.abs(x.entry - C.stop0) || 1, rwP = !noTgt && Math.abs(x.t1 - x.entry) <= 4.5 * r0v ? x.t1 : aim, endI = before ? tgtIdx : (iX > iE ? iX : n - 1 + 2);
+      items.boxes.push({ kind: 'rw', entry: x.entry, l1: iE, l2: endI, lo: Math.min(x.entry, rwP), hi: Math.max(x.entry, rwP), fill: 'rgba(8,153,129,0.20)', stroke: 'rgba(8,153,129,0.7)' });
+      items.boxes.push({ kind: 'rk', entry: x.entry, l1: iE, l2: endI, lo: Math.min(x.entry, C.stop0), hi: Math.max(x.entry, C.stop0), fill: 'rgba(242,54,69,0.20)', stroke: 'rgba(242,54,69,0.7)' });
+      items.labels.push({ l: iE, dx: 6, p: rwP, dy: sell ? 14 : -5, text: `${((rwP - x.entry) * s / r0v).toFixed(1)}R · ${f(rwP)}`, color: '#089981' }, { l: iE, dx: 6, p: C.stop0, dy: sell ? -5 : 14, text: `−1R · ${f(C.stop0)}`, color: '#f23645' });
+      if (!before && x.status === 'open') { const L = (window.MS_LIVE && window.MS_LIVE.items || []).find((i) => i.x.id === x.id); if (L && L.fl != null) items.labels.push({ l: n - 1, p: data[n - 1].close, pill: true, bg: L.fl >= 0 ? '#089981' : '#f23645', dy: (L.fl >= 0) === (s > 0) ? -22 : 22, text: `Now ${L.fl >= 0 ? '+' : ''}${L.fl.toFixed(2)}R` }); }
+    }
+    if (iE >= 0 && before) {
       items.path = [{ l: iE, p: x.entry }, { l: tgtIdx, p: aim }];   // dashed arrow: the predicted move
       items.labels.push({ l: Math.round((iE + tgtIdx) / 2), p: (x.entry + aim) / 2, pill: true, bg: '#2962ff', dy: sell ? 18 : -18, text: noTgt ? `Prediction: ${sell ? 'SELL' : 'BUY'}, 2R at ${f(aim)}, then ride the trend (no fixed target)` : trailing ? `Prediction: ${sell ? 'SELL' : 'BUY'}, 2R at ${f(aim)}, then trail` : `Prediction: ${sell ? 'SELL' : 'BUY'} to ${f(x.t1)} (${x.rr}R)` });
+    }
+    if (iE >= 0) {
       items.vlines.push({ l: iE, color: '#2962ff', text: before ? 'Signal (now)' : 'Signal' });
       if (!before && iX > 0 && ['win', 'loss', 'be'].includes(x.status)) {
         const px = x.status === 'win' && !x.exit && !noTgt ? x.t1 : x.status === 'loss' && !x.exit ? C.stop0 : x.entry + s * (x.R || 0) * Math.abs(x.entry - C.stop0);
@@ -4992,6 +5011,7 @@ function msNextSetup(bars, A) {
       }
     }
     if (TV.ov) TV.ov.set(items);
+    if (TV.legend) TV.legend();
     // Before: show the run-up to the signal and room for the predicted move; After: the whole trade
     if (before && iE >= 0) TV.chart.timeScale().setVisibleLogicalRange({ from: Math.max(0, iE - 70), to: tgtIdx + 12 });
     else TV.chart.timeScale().setVisibleRange({ from: C.from + TZ, to: C.to + TZ });
