@@ -1648,6 +1648,12 @@ html.scrolled .top { box-shadow: 0 6px 20px -10px rgba(0,0,0,.55); }
 .ms-cd { display: inline-flex; align-items: center; gap: 5px; }
 .ms-cd::before { content: ""; width: 11px; height: 11px; flex: none; background: currentColor; opacity: .75; -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2.4' stroke-linecap='round'%3E%3Ccircle cx='12' cy='12' r='9'/%3E%3Cpath d='M12 7v5l3 2'/%3E%3C/svg%3E") center / contain no-repeat; mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2.4' stroke-linecap='round'%3E%3Ccircle cx='12' cy='12' r='9'/%3E%3Cpath d='M12 7v5l3 2'/%3E%3C/svg%3E") center / contain no-repeat; }
 .ms-cd.soon { color: #e0a526; }
+
+.j-empty-go { display: inline-flex; align-items: center; gap: 4px; margin-top: 10px; padding: 7px 14px; border-radius: 8px; border: 1px solid var(--line); color: var(--accent); font: 600 12.5px var(--sans); text-decoration: none; }
+.j-empty-go::after { content: "→"; transition: transform .15s; }
+@media (hover: hover) { .j-empty-go:hover { border-color: color-mix(in srgb, var(--accent) 45%, transparent); background: var(--accent-soft, rgba(91,140,255,.1)); } .j-empty-go:hover::after { transform: translateX(3px); } }
+:root[data-theme="pro"] .j-empty-go { border-radius: 4px; }
+html[data-role="viewer"] .j-empty-go { display: none; }
 </style>
 <script>try{if(localStorage.getItem('msMotion')==='off')document.documentElement.dataset.motion='off'}catch(e){}</script>
 </head>
@@ -3656,7 +3662,7 @@ function msNextSetup(bars, A) {
       `<td><input data-f="R" type="number" step="0.1" inputmode="decimal" aria-label="Result in R" value="${x.R === null || x.R === undefined ? '' : x.R}"></td>` +
       `<td><input data-f="note" type="text" aria-label="Notes" placeholder="Why, what you saw…" value="${esc(x.note)}"></td>` +
       `<td><button type="button" class="del" data-del aria-label="Delete this entry">✕</button></td></tr>`).join('')
-      : `<tr class="empty"><td colspan="11">No trades logged yet. Pick a setup under Possible trades and press <b>Log selected trade</b>.</td></tr>`;
+      : `<tr class="empty"><td colspan="11">No trades logged yet. Pick a setup under Possible trades and press <b>Log selected trade</b>.<br><a class="j-empty-go" href="#setup">Go to Setup</a></td></tr>`;
     const st = document.getElementById('ms-j-stats');
     const done = J.filter((x) => x.res === 'win' || x.res === 'loss' || x.res === 'be');
     const eqEl = document.getElementById('ms-j-eq');
