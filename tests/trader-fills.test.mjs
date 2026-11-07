@@ -19,7 +19,7 @@ test('costOf is the Backtest model: spread, plus Kraken fees on crypto', () => {
 
 test('the Backtest imports costOf from fills.mjs (one cost model)', () => {
   const src = fs.readFileSync(new URL('../council/backtest.mjs', import.meta.url), 'utf8');
-  assert.match(src, /import \{ spreadOf, costOf \} from '\.\/fills\.mjs'/);
+  assert.match(src, /import \{ spreadOf, costOf\b[^}]*\} from '\.\/fills\.mjs'/);
   assert.doesNotMatch(src, /const costOf =/);
 });
 

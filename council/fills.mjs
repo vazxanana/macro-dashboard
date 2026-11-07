@@ -10,6 +10,8 @@
 //      |drift| > STALE_R would be recorded as "missed" by the guard; staleStats() counts those and what they made.
 //   3. Trade-state helpers: a stop hit through a gap fills at the gapped open, a candle that fills a limit and reaches the target
 //      with an unknown order is resolved as missed, and candles while the spot market is shut are ignored for gold / forex.
+//   4. The Backtest's trade step (replayBar / manageVariant): its exit variants managed on those same helpers, so a replayed trade
+//      fills and exits like a live one (tests/backtest-fills.test.mjs).
 
 // typical spread (same model as the trade reviews): one spread is paid per round trip
 export const spreadOf = (M, price) => M.group === 'Forex' ? 0.0001 : M.spot ? 0.3 : price * 0.0002;
@@ -124,4 +126,53 @@ const nyFmt = new Intl.DateTimeFormat('en-US', { timeZone: 'America/New_York', w
 export function spotClosed(t) {
   const p = Object.fromEntries(nyFmt.formatToParts(new Date(t * 1000)).map((x) => [x.type, x.value])), h = +p.hour;
   return p.weekday === 'Sat' || (p.weekday === 'Fri' && h >= 17) || (p.weekday === 'Sun' && h < 17);
+}
+
+// ─── the replay's trade step (council/backtest.mjs), on the same rules as the Trader's "Manage open trades" ───
+// The Backtest manages each trade on 1m candles under several exit variants at once (v: none / be1 / be15 / tp2 and the paper
+// pt1); these two functions are that management, built on the helpers above so a replayed trade fills and exits as a live one:
+// a stop gapped through fills at the candle's open (first, break-even and trailing stops alike), a limit fill + target in one
+// candle with an unknown order is missed (0R), and a candle while spot is shut fills, stops and targets nothing.
+// One exit variant v of trade tr on candle b. A gapped stop records v.gapR (R lost beyond the stop).
+export function manageVariant(v, tr, b) {
+  if (v.done) return;
+  const s = tr.side === 'sell', sg = s ? -1 : 1, r0 = tr.r0, hitStop = s ? b.high >= v.stop : b.low <= v.stop;
+  const stopOut = () => { const px = stopFill(b, s, v.stop, b.time > tr.filled); v.done = true; v.closed = b.time; if (px !== v.stop) v.gapR = +(sg * (v.stop - px) / r0).toFixed(2); return px; };
+  if (v.pt) {   // partial: stop first, then the partial at +pt.at R, then the 10R cap; the stop moves after the candle's checks
+    const fav = (s ? tr.entry - b.low : b.high - tr.entry) / r0, cap = tr.entry + sg * 10 * r0;
+    if (hitStop) { const px = stopOut(); v.R = v.booked + v.size * (px - tr.entry) * sg / r0; return; }
+    if (v.size === 1 && fav >= v.pt.at) { v.booked = 0.5 * v.pt.at; v.size = 0.5; }
+    if (s ? b.low <= cap : b.high >= cap) { v.done = true; v.R = v.booked + v.size * 10; v.closed = b.time; return; }
+    v.best = Math.max(v.best, fav);
+    if (v.size < 1) { const ns = tr.entry + sg * Math.max(0, v.best - v.pt.trail) * r0; if ((ns - v.stop) * sg > 0) v.stop = ns; }
+    return;
+  }
+  // the Trader: the first stop books -1R, a break-even stop 0R, and a stop filled at a gapped open the R at that open
+  if (hitStop) { const px = stopOut(); v.R = px !== v.stop ? exitR(s, tr.entry, px, r0) : v.beMoved ? 0 : -1; return; }
+  const tgt = v.t2 && tr.t2 != null ? tr.t2 : tr.t1;
+  if (s ? b.low <= tgt : b.high >= tgt) { v.done = true; v.R = tgt === tr.t1 ? tr.rr : Math.abs(tgt - tr.entry) / r0; v.closed = b.time; return; }
+  if (v.be && !v.beMoved && ((s ? tr.entry - b.low : b.high - tr.entry) / r0) >= v.be) { v.stop = tr.entry; v.beMoved = true; }
+}
+// One replay trade on candle b. tr: side, entry, stop, t1, rr, r0, opened, status ('pending' | 'open' | 'closed' with the paper
+// pt1 still running), mfe, v (exit variants). shut: spotClosed(b.time) for gold / forex (never for crypto); a resting order still
+// expires once b is more than wait seconds after the signal. Statuses it sets: 'open' (filled, tr.filled), 'missed' (target
+// first, or fill and target in one candle: tr.fillTarget), 'expired', 'closed' (every variant but the paper ones done).
+export function replayBar(tr, b, { shut = false, wait = 86400 } = {}) {
+  const s = tr.side === 'sell';
+  if (tr.status === 'pending') {
+    if (b.time < tr.opened) return;
+    if (!shut && (s ? b.high >= tr.entry : b.low <= tr.entry)) {
+      if (fillBarAmbiguous(b, s, tr.entry, tr.stop, tr.t1)) { tr.status = 'missed'; tr.fillTarget = true; return; }
+      tr.status = 'open'; tr.filled = b.time;
+    } else if (!shut && (s ? b.low <= tr.t1 : b.high >= tr.t1)) { tr.status = 'missed'; return; }
+    else { if (b.time - tr.opened > wait) tr.status = 'expired'; return; }
+  }
+  if (shut) return;
+  // closed by the replay's own variants while the paper pt1 exit still runs: keep managing pt1 only (status, MFE and the
+  // signal checks treat the trade as closed)
+  if (tr.status === 'closed') { for (const v of tr.v) manageVariant(v, tr, b); return; }
+  if (tr.status !== 'open') return;
+  tr.mfe = Math.max(tr.mfe, (s ? tr.entry - b.low : b.high - tr.entry) / tr.r0);
+  for (const v of tr.v) manageVariant(v, tr, b);
+  if (tr.v.every((v) => v.done || v.pt)) tr.status = 'closed';
 }
