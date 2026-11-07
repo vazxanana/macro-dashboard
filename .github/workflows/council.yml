@@ -72,7 +72,7 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: '22'   # 22: built-in WebSocket for the cTrader demo mirror
 
       - name: Trade (loop)
         env:
@@ -81,6 +81,14 @@ jobs:
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
           FUT_ACCOUNT: ${{ vars.FUT_ACCOUNT }}
           FUT_RISK: ${{ vars.FUT_RISK }}
+          # cTrader DEMO mirror (council/ctrader-mirror.mjs): inert unless CTRADER_MIRROR is "on"; demo accounts only
+          CTRADER_MIRROR: ${{ secrets.CTRADER_MIRROR }}
+          CTRADER_CLIENT_ID: ${{ secrets.CTRADER_CLIENT_ID }}
+          CTRADER_CLIENT_SECRET: ${{ secrets.CTRADER_CLIENT_SECRET }}
+          CTRADER_ACCESS_TOKEN: ${{ secrets.CTRADER_ACCESS_TOKEN }}
+          CTRADER_REFRESH_TOKEN: ${{ secrets.CTRADER_REFRESH_TOKEN }}
+          CTRADER_ACCOUNT_ID: ${{ secrets.CTRADER_ACCOUNT_ID }}
+          CTRADER_ENV: ${{ secrets.CTRADER_ENV }}
         run: |
           git -C data config user.name "mosha-council"
           git -C data config user.email "41898282+github-actions[bot]@users.noreply.github.com"
@@ -91,6 +99,7 @@ jobs:
             if [ "$SECONDS" -gt 18000 ]; then echo "Time budget reached after $((i - 1)) rounds"; break; fi
             git -C data pull -q --rebase origin council-data || true
             node council/trader.mjs data || echo "Trader round $i failed"
+            node council/ctrader-mirror.mjs data || echo "cTrader mirror round $i failed"
             git -C data add -A
             if ! git -C data diff --cached --quiet; then
               git -C data commit -q -m "Council run $(date -u +%Y-%m-%dT%H:%MZ)"
