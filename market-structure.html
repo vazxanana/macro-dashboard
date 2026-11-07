@@ -2896,7 +2896,7 @@ html[data-motion="off"] #v-ict .ict-cal-d:hover { transform: none !important; }
           <label class="sb-thin"><input type="checkbox" id="ms-sb-thin"> Thin shadow streams (under 20 trades)</label>
         </div>
         <div class="sb-wrap" tabindex="0" role="region" aria-label="Edge scoreboard, scrolls sideways"><table class="sb-t"><thead id="ms-sb-h"></thead><tbody id="ms-sb-b"><tr><td class="sb-empty">Loading…</td></tr></tbody></table></div>
-        <p class="ms-note sb-foot">Sorted by evidence: the t-statistic of R per trade, strongest edge first and strongest loser last; streams under 20 trades go to the end (thin shadow streams are hidden until you tick the box). Verdict: <b>Edge</b> t ≥ 2 with both halves positive · <b>Promising</b> positive, t ≥ 1 · <b>Losing</b> negative, t ≤ −1 · <b>Unclear</b> in between · <b>Too few</b> under 20 trades. Replay rows are net of spread; forward rows as recorded. Tap a stream for its equity curve.</p>
+        <p class="ms-note sb-foot">Sorted by evidence: the t-statistic of R per trade, strongest edge first and strongest loser last; streams under 20 trades go to the end (thin shadow streams are hidden until you tick the box). Verdict: <b>Edge</b> t ≥ 2 with both halves positive · <b>Promising</b> positive, t ≥ 1 · <b>Losing</b> negative, t ≤ −1 · <b>Unclear</b> in between · <b>Too few</b> under 20 trades. Replay rows are net of spread; forward rows are net of costs where the trade records them (R less its cost in R), else as recorded. Tap a stream for its equity curve.</p>
       </div>
       <div class="card c-analyst">
         <div class="ms-k">Analyst · weekly brief</div>
@@ -9702,6 +9702,9 @@ html[data-role="public"] #ms-me-ct { display: none; }
   var tsec = function (v) { if (num(v)) return v > 1e11 ? v / 1000 : v; var d = Date.parse(v); return isFinite(d) ? d / 1000 : null; };
   var norm = function (s) { return String(s || '').toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim(); };
   var cap = function (s) { s = String(s || ''); return s.charAt(0).toUpperCase() + s.slice(1); };
+  // one closed trade as a curve point: R after costs where recorded (Rnet), plus what the equity-curve tooltip shows (#ms-eq-js)
+  var tp = function (x, t) { var o = { t: t, R: num(x.Rnet) ? +x.Rnet : +x.R, g: +x.R, m: x.short || x.label || x.market, sd: x.side, st: x.status, o: x.opened };
+    if (num(x.costR)) o.c = x.costR; if (x.shadow) o.sh = 1; if (x.grade && x.grade.letter) o.gr = x.grade.letter; return o; };
 
   // n, win rate, R per trade, total, max drawdown (peak to trough of the cumulative R), t of the mean, halves by time, last 30 days
   function stats(pts, now) {
@@ -9715,7 +9718,7 @@ html[data-role="public"] #ms-me-ct { display: none; }
     // t of the mean; when every trade has the same R (no spread) t is undefined: tFlat keeps its sign for the verdict and the sort
     return { n: n, wins: w, wr: w / n, exp: m, R: sum, dd: dd, t: sd > 0 && n > 1 ? m / (sd / Math.sqrt(n)) : null, tFlat: sd === 0 && n > 1 && m !== 0 ? (m > 0 ? 1 : -1) : 0,
       h1: A1.length ? { n: A1.length, exp: mean(A1) } : null, h2: A2.length ? { n: A2.length, exp: mean(A2) } : null,
-      l30: { n: L.length, exp: mean(L), R: L.reduce(function (a, p) { return a + p.R; }, 0) }, from: P[0].t || null, to: P[n - 1].t || null, split: h, curve: curve };
+      l30: { n: L.length, exp: mean(L), R: L.reduce(function (a, p) { return a + p.R; }, 0) }, from: P[0].t || null, to: P[n - 1].t || null, split: h, curve: curve, P: P };
   }
   var tv = function (s) { return num(s.t) ? s.t : s.tFlat ? s.tFlat * 1e6 : 0; };
   function verdict(s) {
@@ -9839,7 +9842,8 @@ html[data-role="public"] #ms-me-ct { display: none; }
     };
     // forward: closed live and shadow trades by setup
     var G = {};
-    T.forEach(function (x) { if (!x || !x.k || !closedSt(x.status) || !num(x.R) || !x.closed) return; var key = x.k + (x.shadow ? '|sh' : '|lv'); (G[key] = G[key] || []).push({ t: x.closed, R: +x.R }); });
+    // R after costs (council/fills.mjs annotateCosts: Rnet = R less costR) where the trade records it; g / c keep the gross R and the cost
+    T.forEach(function (x) { if (!x || !x.k || !closedSt(x.status) || !num(x.R) || !x.closed) return; var key = x.k + (x.shadow ? '|sh' : '|lv'); (G[key] = G[key] || []).push(tp(x, x.closed)); });
     Object.keys(G).forEach(function (key) { var p = key.split('|'); add(p[0], p[1] === 'sh' ? 'forward, shadow book' : 'forward, live book', p[1] === 'sh' ? 'shadow' : 'live', G[key]); });
     // 30-day replay of the engine setups (backtest.json): filled trades under the current rule, after spread
     var B = D.backtest;
@@ -9849,16 +9853,16 @@ html[data-role="public"] #ms-me-ct { display: none; }
       var BG = {}; BR.forEach(function (t) { (BG[t.setup] = BG[t.setup] || []).push(t); });
       Object.keys(BG).forEach(function (k) {
         var f = F[k] || {}, A = f.off ? BG[k] : BG[k].filter(function (t) { return passesLive(t, f); });
-        add(k, (B.days || 30) + '-day replay' + (f.off ? ', no rule (off)' : ', current rule'), 'replay', A.map(function (t) { return { t: t.opened, R: t.R_none - (+t.cost || 0) }; }));
+        add(k, (B.days || 30) + '-day replay' + (f.off ? ', no rule (off)' : ', current rule'), 'replay', A.map(function (t) { return { t: t.opened, R: t.R_none - (+t.cost || 0), g: t.R_none, c: +t.cost || 0, m: t.market, sd: t.side, st: t.R_none > 0 ? 'win' : t.R_none < 0 ? 'loss' : 'be' }; }));
       });
     }
     // system replays (research/replay-2w.json): the main systems over years of history
-    var RG = {}; RP.forEach(function (x) { if (!closedSt(x.status) || !num(x.R) || !x.closed) return; (RG[x.k] = RG[x.k] || []).push({ t: x.closed, R: +x.R }); });
+    var RG = {}; RP.forEach(function (x) { if (!closedSt(x.status) || !num(x.R) || !x.closed) return; (RG[x.k] = RG[x.k] || []).push(tp(x, x.closed)); });
     Object.keys(RG).forEach(function (k) { add(k, 'system replay' + (D.replay.from ? ' since ' + String(D.replay.from).slice(0, 4) : ''), 'sysreplay', RG[k]); });
 
     // ICT desk
     var IR = D.ictReplay || {}, IT = Array.isArray(D.ictTrades) ? D.ictTrades : [], IS = D.ictShadow || {};
-    var pt = function (x) { return x && closedSt(x.status) && num(x.R) && x.closed ? { t: x.closed, R: +x.R } : null; };
+    var pt = function (x) { return x && closedSt(x.status) && num(x.R) && x.closed ? tp(x, x.closed) : null; };
     var ictFrom = IR.from && isFinite(Date.parse(IR.from)) ? 'replay since ' + new Date(Date.parse(IR.from)).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric', timeZone: 'UTC' }) : 'replay';
     var ictProps = props.filter(function (p) { return p.kind === 'ictFilter'; });
     if (Array.isArray(IR.trades) || IT.length || IR.totalsA) {
@@ -9891,7 +9895,7 @@ html[data-role="public"] #ms-me-ct { display: none; }
     var M = D.mirror;
     if (M && (M.execution || M.state)) {
       var X = M.execution || {}, map = (M.state && M.state.map) || {};
-      var mp = Object.keys(map).map(function (id) { return map[id]; }).filter(function (m) { return m && num(m.councilR) && m.closedAt; }).map(function (m) { return { t: tsec(m.closedAt), R: m.councilR - (num(m.slipR) ? m.slipR : 0) }; });
+      var mp = Object.keys(map).map(function (id) { return map[id]; }).filter(function (m) { return m && num(m.councilR) && m.closedAt; }).map(function (m) { return { t: tsec(m.closedAt), R: m.councilR - (num(m.slipR) ? m.slipR : 0), g: m.councilR, c: num(m.slipR) ? m.slipR : null, m: m.market || m.symbol, sd: m.side }; });
       var sg = function (v) { return (v >= 0 ? '+' : '−') + Math.abs(v).toFixed(2) + 'R'; };
       rows.push({ id: 'mirror', sys: 'cTrader', name: 'cTrader demo mirror', code: 'demo', src: 'demo fills, council R less slippage', status: 'paper', statusWhy: (M.state && M.state.status) || 'demo account',
         pts: mp, aliases: ['mirror', 'ctrader', 'ctrader mirror', 'ctrader demo', 'demo mirror'], ask: { text: 'Nothing · demo account only' },
@@ -9973,13 +9977,13 @@ html[data-role="public"] #ms-me-ct { display: none; }
   }
   function detail(r, span) {
     var s = r.s, bits = [];
-    if (s.curve && s.curve.length > 1) bits.push('Cumulative R, trade by trade' + (s.from && s.to ? ', ' + fD(s.from) + ' – ' + fD(s.to) : '') + '. The dotted line splits the two halves; dashes mark zero. Worst drawdown <b>' + fR(s.dd, 1) + '</b>.');
+    if (s.curve && s.curve.length > 1) bits.push('Cumulative R after costs, trade by trade' + (s.from && s.to ? ', ' + fD(s.from) + ' – ' + fD(s.to) : '') + (W.MS_EQ ? '. The shaded area is the worst drawdown, <b>' + fR(s.dd, 1) + '</b>; the thin upright line splits the two halves. Hover, tap or use the arrow keys for each trade.' : '. The dotted line splits the two halves; dashes mark zero. Worst drawdown <b>' + fR(s.dd, 1) + '</b>.'));
     else if (s.agg) bits.push('Totals only: this file has no trade list for the stream, so no curve.');
     else if (!s.n) bits.push('No closed trades yet.');
     bits.push('<b>' + SL[r.status] + '</b>: ' + esc(r.statusWhy || '') + '.');
     if (r.robust) bits.push('<b>' + RL[r.robust] + '</b> (research/robustness.json)' + (r.robustWhy ? ': ' + esc(r.robustWhy) : '.'));
     if (r.note) bits.push(esc(r.note));
-    return '<tr class="sb-x" id="sb-x-' + esc(r.id) + '"><td colspan="' + span + '"><div class="sb-xin">' + spark(r) + bits.map(function (b) { return '<p>' + b + '</p>'; }).join('') + '</div></td></tr>';
+    return '<tr class="sb-x" id="sb-x-' + esc(r.id) + '"><td colspan="' + span + '"><div class="sb-xin">' + (W.MS_EQ ? W.MS_EQ.slot(r) : spark(r)) + bits.map(function (b) { return '<p>' + b + '</p>'; }).join('') + '</div></td></tr>';
   }
   function cell(c, r) {
     var s = r.s;
@@ -10021,6 +10025,7 @@ html[data-role="public"] #ms-me-ct { display: none; }
     var sum = $('ms-sb-sum'); if (sum) sum.innerHTML = '<b>' + SB.rows.length + '</b> streams, ' + big.length + ' with 20+ trades: <b class="' + (ed.length ? 'pos' : '') + '">' + ed.length + ' edge</b>, ' + pr.length + ' promising, <b class="' + (lo.length ? 'neg' : '') + '">' + lo.length + ' losing</b>.'
       + (top ? ' Strongest evidence: <b>' + esc(top.name) + '</b> <small>(' + esc(top.src) + ')</small>, ' + fR(top.s.exp) + ' a trade over ' + top.s.n + ', t ' + top.s.t.toFixed(2) + '.' : '')
       + ' ' + (W8.length ? '<b>' + W8.length + ' Coach proposal' + (W8.length === 1 ? '' : 's') + ' wait' + (W8.length === 1 ? 's' : '') + ' for your OK</b> · <a href="#council/systems" data-sb-go="ms-sleeve">open them →</a>' : 'Nothing waits for your OK.');
+    if (W.MS_EQ) W.MS_EQ.drawn(rows, SB);   // equity curves (#ms-eq-js): the all-streams overlay and the open rows' charts
     var at = $('ms-sb-at'); if (at) at.textContent = SB.at && SB.at.length ? 'replays ' + SB.at.map(function (a) { return new Date(a).toLocaleString('en-GB', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' }); }).join(' · ') : '';
   }
   document.addEventListener('click', function (e) {
@@ -10038,6 +10043,337 @@ html[data-role="public"] #ms-me-ct { display: none; }
   W.addEventListener('hashchange', function () { if (/#council\/scoreboard$/.test(location.href)) setTimeout(goSb, 120); });
   if (location.hash === '#council/scoreboard') setTimeout(goSb, 900);
   setTimeout(refresh, 0);
+})(window);
+</script>
+<style id="ms-eq-css">
+/* Equity curves on the edge scoreboard (#ms-eq-js, 7 Nov, owner: "better visuals of the strategies"). Inline SVG, page tokens only. */
+#ms-eq { margin: 0 0 12px; display: grid; gap: 8px; min-width: 0; }
+#ms-eq[hidden] { display: none; }
+.eq-head { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 6px 12px; }
+.eq-head h3 { margin: 0; font-size: 13px; font-weight: 600; color: var(--ink); } .eq-head h3 small { font-weight: 400; color: var(--ink-dim); font-size: 12px; }
+.eq-xs { display: inline-flex; border: 1px solid var(--line); border-radius: 8px; overflow: hidden; }
+.eq-xs button { min-height: 44px; min-width: 44px; padding: 0 12px; border: 0; background: var(--panel); color: var(--ink-dim); font: inherit; font-size: 12.5px; font-weight: 600; cursor: pointer; }
+.eq-xs button + button { border-left: 1px solid var(--line); }
+.eq-xs button[aria-pressed="true"] { color: var(--ink); background: color-mix(in srgb, var(--accent) 12%, var(--panel)); }
+.eq-key { display: flex; flex-wrap: wrap; gap: 4px 14px; margin: 0; font-size: 11.5px; color: var(--ink-dim); line-height: 1.4; }
+.eq-key span { display: inline-flex; align-items: center; gap: 5px; } .eq-key svg { flex: none; }
+.eq-plot { position: relative; min-width: 0; touch-action: pan-y; -webkit-tap-highlight-color: transparent; border-radius: 6px; }
+.eq-plot:focus-visible, .eq-leg button:focus-visible, .eq-xs button:focus-visible, .eq-more:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.eq-plot svg { display: block; width: 100%; overflow: visible; font-family: inherit; font-variant-numeric: tabular-nums; }
+.eq-grid { stroke: var(--line); stroke-width: 1; shape-rendering: crispEdges; }
+.eq-zero { stroke: var(--line-strong, var(--ink-faint)); stroke-width: 1; shape-rendering: crispEdges; }
+.eq-ax { fill: var(--ink-faint); font-size: 10.5px; }
+.eq-lab { fill: var(--ink); font-size: 11px; font-weight: 600; paint-order: stroke; stroke: var(--eq-surf, var(--panel)); stroke-width: 4px; stroke-linejoin: round; }
+.eq-dim { fill: var(--ink-dim); font-weight: 500; }
+.eq-l, .eq-m, .eq-g { fill: none; stroke-linejoin: round; stroke-linecap: round; }
+.eq-l { stroke-width: 1.5; opacity: .62; transition: opacity .12s ease, stroke-width .12s ease; }
+.eq-l.up, .eq-m.up { stroke: var(--buy); } .eq-l.dn, .eq-m.dn { stroke: var(--sell); }
+.eq-dot { stroke: var(--eq-surf, var(--panel)); stroke-width: 2; } .eq-dot.up { fill: var(--buy); } .eq-dot.dn { fill: var(--sell); }
+.eq-l.sh, .eq-m.sh { stroke-dasharray: 5 4; }
+.eq-svg.has-hi .eq-l { opacity: .14; } .eq-svg.has-hi .eq-l.hi { opacity: 1; stroke-width: 2.5; }
+.eq-m { stroke-width: 2; } .eq-g { stroke: var(--ink-faint); stroke-width: 1.25; opacity: .8; }
+.eq-dd { fill: color-mix(in srgb, var(--sell) 15%, transparent); } .eq-ddl { stroke: color-mix(in srgb, var(--sell) 55%, transparent); stroke-width: 1; }
+.eq-split { stroke: var(--ink-faint); stroke-width: 1; opacity: .7; shape-rendering: crispEdges; }
+.eq-ch { stroke: var(--ink-dim); stroke-width: 1; shape-rendering: crispEdges; }
+.eq-tip { position: absolute; top: 4px; z-index: 4; max-width: min(260px, calc(100% - 8px)); padding: 7px 9px; border-radius: 8px; border: 1px solid var(--line); background: var(--panel-raised, var(--panel));
+  box-shadow: 0 6px 18px -8px rgba(0,0,0,.35); font-size: 12px; line-height: 1.4; color: var(--ink-dim); pointer-events: none; white-space: normal; }
+.eq-tip[hidden] { display: none; } .eq-tip.inflow { position: static; max-width: none; margin-top: 6px; min-height: 7.4em; box-shadow: none; } .eq-tip.idle { display: flex; align-items: center; color: var(--ink-faint); border-style: dashed; } .eq-tip b { display: block; color: var(--ink); font-size: 14px; font-weight: 700; } .eq-tip .eq-tn { color: var(--ink); font-weight: 600; }
+.eq-tip .eq-k { display: inline-block; width: 12px; height: 0; border-top: 2px solid currentColor; vertical-align: middle; margin-right: 5px; }
+.eq-tip .eq-k.up { color: var(--buy); } .eq-tip .eq-k.dn { color: var(--sell); } .eq-tip .eq-k.sh { border-top-style: dashed; }
+.eq-leg { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 4px 8px; }
+.eq-leg button { all: unset; box-sizing: border-box; display: grid; grid-template-columns: 22px 1fr auto; align-items: center; gap: 8px; width: 100%; min-height: 44px; padding: 4px 8px; border-radius: 8px; cursor: pointer; }
+.eq-leg button:hover, .eq-leg button.hi { background: color-mix(in srgb, var(--ink) 6%, transparent); }
+.eq-leg .eq-nm { display: grid; min-width: 0; font-size: 12.5px; line-height: 1.25; color: var(--ink); font-weight: 600; } .eq-leg .eq-nm small { color: var(--ink-faint); font-weight: 400; font-size: 11px; }
+.eq-leg .eq-nm span, .eq-leg .eq-nm small { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.eq-leg .eq-v { font-size: 12.5px; font-weight: 600; color: var(--ink); font-variant-numeric: tabular-nums; }
+.eq-more { all: unset; box-sizing: border-box; min-height: 44px; padding: 0 10px; border-radius: 8px; color: var(--accent); font-size: 12.5px; font-weight: 600; cursor: pointer; justify-self: start; }
+.eq-row { display: grid; gap: 6px; min-width: 0; --eq-surf: var(--panel-raised, var(--panel)); }
+.sb-t .sb-xin { width: min(760px, calc(100vw - 96px)); } .sb-t .sb-xin .eq-row svg { max-width: none; } .sb-t .sb-xin .eq-key svg { width: auto; height: auto; display: inline-block; }
+@media (prefers-reduced-motion: reduce) { .eq-l { transition: none; } }
+@media (forced-colors: active) { .eq-l, .eq-m { stroke: CanvasText; } .eq-dd { fill: GrayText; opacity: .3; } }
+</style>
+<script id="ms-eq-js">
+// Equity curves on the edge scoreboard (7 Nov 2026, owner: better visuals of the strategies). Owner/admin only, inside #ms-sb.
+// The scoreboard script (#ms-sb-js) calls MS_EQ.slot(row) for an open row and MS_EQ.drawn(rows) after every render; nothing here
+// changes a number: the curves are the cumulative R of the same points the table counts (after costs where the trade records them).
+// Overlay: every stream on show (scoreboard filter + thin toggle), by trade number or by date, green ends up / red ends down,
+// solid = live or paper book, dashed = shadow book or a switched-off rule. Row chart: cumulative R with the worst drawdown shaded,
+// the R before costs as a thin grey line when costs are known, a crosshair that snaps to each trade (pointer, touch or arrow keys).
+(function (W) {
+  'use strict';
+  if (typeof document === 'undefined' || !document.getElementById) return;
+  var NS = 'http://www.w3.org/2000/svg';
+  var EQ = { x: 'n', hi: null, pin: null, all: false, rows: [], byId: {}, ov: null };
+  try { EQ.x = localStorage.getItem('msEqX') === 't' ? 't' : 'n'; } catch (e) {}
+  var num = function (v) { return typeof v === 'number' && isFinite(v); };
+  var fR = function (v, d) { return num(v) ? (v > 0 ? '+' : v < 0 ? '−' : '') + Math.abs(v).toFixed(d == null ? 2 : d) + 'R' : '—'; };
+  var fD = function (t) { return t ? new Date(t * 1000).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: '2-digit' }) : ''; };
+  var fDT = function (t) { return t ? new Date(t * 1000).toLocaleString('en-GB', { weekday: 'short', day: 'numeric', month: 'short', year: '2-digit', hour: '2-digit', minute: '2-digit' }) : ''; };
+  var reduced = function () { return W.matchMedia && W.matchMedia('(prefers-reduced-motion: reduce)').matches; };
+  var el = function (tag, attrs, parent) { var n = document.createElementNS(NS, tag); for (var k in attrs) if (attrs[k] != null) n.setAttribute(k, attrs[k]); if (parent) parent.appendChild(n); return n; };
+  var h = function (tag, cls, txt, parent) { var n = document.createElement(tag); if (cls) n.className = cls; if (txt != null) n.textContent = txt; if (parent) parent.appendChild(n); return n; };
+  // clean axis ticks: 1 / 2 / 5 x 10^k
+  function ticks(lo, hi, want) {
+    var span = hi - lo || 1, raw = span / Math.max(1, want), p = Math.pow(10, Math.floor(Math.log10(raw))), m = raw / p, st = (m >= 5 ? 10 : m >= 2 ? 5 : m >= 1 ? 2 : 1) * p, out = [];
+    if (st / p === 2 && raw / p < 1.5) st = p;
+    for (var v = Math.ceil(lo / st) * st; v <= hi + 1e-9; v += st) out.push(Math.abs(v) < 1e-9 ? 0 : +v.toFixed(6));
+    return out;
+  }
+  // axis label: whole R unless the step is under 1R; the zero line says R
+  var axl = function (v, T) { var st = T.length > 1 ? Math.abs(T[1] - T[0]) : 1; return v === 0 ? '0R' : fR(v, st < 1 ? 1 : 0).replace(/R$/, ''); };
+  var short = function (r) {
+    var id = r.id || '';
+    return /-live$/.test(id) ? 'forward, live book' : /-shadow$/.test(id) ? 'forward, shadow book' : /-sysreplay$/.test(id) ? r.src : /-replay$/.test(id) ? String(r.src).replace(/, current rule$/, '') : r.src;
+  };
+  // one stream as a curve: points in time order, cumulative R from 0, which points were in the shadow book, the worst drawdown
+  function series(r) {
+    if (r._eq) return r._eq;
+    var P = r.s && r.s.P; if (!P || P.length < 2) return (r._eq = null);
+    var fwd = r.sys === 'Meridian' && /^forward/.test(r.src || ''), off = r.status === 'shadow' || r.status === 'failed';
+    var pts = [{ i: 0, t: P[0].t, y: 0, g: 0 }], c = 0, g = 0, shN = 0, cost = false;
+    P.forEach(function (p, i) { c += p.R; g += num(p.g) ? p.g : p.R; if (num(p.c) && p.c) cost = true; var sh = !!p.sh || (!fwd && off); if (sh) shN++;
+      pts.push({ i: i + 1, t: p.t, y: c, g: g, sh: sh, p: p }); });
+    // worst drawdown: the peak before it, the trough, and where the curve got back to the peak (or the end)
+    var pk = 0, pkI = 0, dd = 0, a = 0, b = 0;
+    pts.forEach(function (q, i) { if (q.y > pk) { pk = q.y; pkI = i; } if (q.y - pk < dd) { dd = q.y - pk; a = pkI; b = i; } });
+    var rec = pts.length - 1; for (var j = b; j < pts.length; j++) if (pts[j].y >= pts[a].y) { rec = j; break; }
+    return (r._eq = { r: r, pts: pts, n: P.length, end: c, gEnd: g, cost: cost, sh: shN * 2 > P.length, mixed: shN > 0 && shN < P.length, dd: dd < 0 ? { a: a, b: b, rec: rec, v: dd } : null, name: r.name, sub: short(r) });
+  }
+  var dirC = function (v) { return v >= 0 ? 'up' : 'dn'; };
+  // the readout: a floating tooltip on wide screens; on a phone a line under the chart (never over the curve), with a hint at rest
+  var rest = function (T, narrow, hint) { T.className = 'eq-tip' + (narrow ? ' inflow idle' : ''); T.textContent = narrow ? hint : ''; T.hidden = !narrow; T.style.left = ''; };
+  var live = function (T, narrow, x, w, ml) { T.className = 'eq-tip' + (narrow ? ' inflow' : ''); T.hidden = false; if (!narrow) { var tw = Math.min(260, w - 8); T.style.left = (x > w / 2 ? ml + 4 : Math.max(4, w - tw - 4)) + 'px'; } };
+  var OV_HINT = 'Hover or tap a line to see which stream it is; tap it again to open its curve.', ROW_HINT = 'Tap or drag along the curve for each trade.';
+  var lineKey = function (cls, wd) { var s = el('svg', { width: wd || 20, height: 8, viewBox: '0 0 ' + (wd || 20) + ' 8', 'aria-hidden': 'true' }); el('line', { x1: 1, x2: (wd || 20) - 1, y1: 4, y2: 4, 'class': cls, 'stroke-width': cls.indexOf('eq-g') >= 0 ? 1.25 : 2 }, s); return s; };
+
+  // ─── overlay: every stream on show ───
+  function ensureOv() {
+    if (EQ.ov && document.body.contains(EQ.ov.box)) return EQ.ov;
+    var wrap = document.querySelector('#ms-sb .sb-wrap'); if (!wrap) return null;
+    var box = h('section', null, null); box.id = 'ms-eq'; box.setAttribute('aria-label', 'Equity curves of every stream'); box.hidden = true;
+    var hd = h('div', 'eq-head', null, box), tt = h('h3', null, 'Cumulative R, every stream ', hd); h('small', null, 'after costs', tt);
+    var xs = h('div', 'eq-xs', null, hd); xs.setAttribute('role', 'group'); xs.setAttribute('aria-label', 'Horizontal axis');
+    [['n', 'By trade'], ['t', 'By date']].forEach(function (o) { var b = h('button', null, o[1], xs); b.type = 'button'; b.dataset.eqx = o[0]; });
+    var key = h('p', 'eq-key', null, box);
+    [['eq-l up', 'Ends up'], ['eq-l dn', 'Ends down'], ['eq-l dn sh', 'Shadow book or rule off (dashed)']].forEach(function (k) { var s = h('span', null, null, key); s.appendChild(lineKey(k[0])); s.appendChild(document.createTextNode(k[1])); });
+    var plot = h('div', 'eq-plot', null, box), svg = el('svg', { 'class': 'eq-svg', role: 'img' }, plot), tip = h('div', 'eq-tip', null, plot); tip.hidden = true; tip.setAttribute('aria-hidden', 'true');
+    var leg = h('ul', 'eq-leg', null, box), more = h('button', 'eq-more', '', box); more.type = 'button'; more.hidden = true;
+    wrap.parentNode.insertBefore(box, wrap);
+    EQ.ov = { box: box, plot: plot, svg: svg, tip: tip, leg: leg, more: more, xs: xs, S: [] };
+    xs.addEventListener('click', function (e) { var b = e.target.closest('[data-eqx]'); if (!b) return; EQ.x = b.dataset.eqx; try { localStorage.setItem('msEqX', EQ.x); } catch (x) {} drawOv(); });
+    more.addEventListener('click', function () { EQ.all = !EQ.all; drawLeg(); });
+    leg.addEventListener('click', function (e) { var b = e.target.closest('[data-eq-open]'); if (b) openRow(b.dataset.eqOpen); });
+    leg.addEventListener('pointerover', function (e) { var b = e.target.closest('[data-eq-open]'); if (b && e.pointerType === 'mouse') hiOv(b.dataset.eqOpen); });
+    leg.addEventListener('pointerout', function (e) { var b = e.target.closest('[data-eq-open]'); if (b && e.pointerType === 'mouse' && !EQ.pin) hiOv(null); });
+    leg.addEventListener('focusin', function (e) { var b = e.target.closest('[data-eq-open]'); if (b) hiOv(b.dataset.eqOpen); });
+    leg.addEventListener('focusout', function () { if (!EQ.pin) hiOv(null); });
+    plot.addEventListener('pointermove', function (e) { if (e.pointerType === 'mouse' || e.pointerType === 'pen') ovAt(e, false); });
+    plot.addEventListener('pointerleave', function (e) { if (e.pointerType === 'mouse' && !EQ.pin) { hiOv(null); rest(tip, EQ.ov.narrow, OV_HINT); } });
+    plot.addEventListener('pointerdown', function (e) { if (e.pointerType === 'touch') ovAt(e, true); });
+    plot.addEventListener('click', function (e) { if (e.pointerType !== 'touch' && EQ.hi && !EQ.tapped) openRow(EQ.hi); EQ.tapped = false; });
+    document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && (EQ.pin || EQ.hi)) { EQ.pin = null; hiOv(null); rest(tip, EQ.ov.narrow, OV_HINT); } });
+    document.addEventListener('pointerdown', function (e) { if (EQ.pin && !box.contains(e.target)) { EQ.pin = null; hiOv(null); rest(tip, EQ.ov.narrow, OV_HINT); } });
+    return EQ.ov;
+  }
+  function drawOv() {
+    var O = ensureOv(); if (!O) return;
+    var S = EQ.rows.map(series).filter(Boolean);
+    O.box.hidden = !S.length; if (!S.length) return;
+    O.S = S;
+    O.xs.querySelectorAll('[data-eqx]').forEach(function (b) { b.setAttribute('aria-pressed', String(b.dataset.eqx === EQ.x)); });
+    var w = O.plot.clientWidth; if (!w) return;
+    var narrow = w < 520, H = narrow ? 210 : 270, M = { l: 40, r: 10, t: 10, b: 24 }, byT = EQ.x === 't';
+    var lo = 0, hi = 0, x0 = Infinity, x1 = -Infinity;
+    S.forEach(function (s) { s.pts.forEach(function (q) { if (q.y < lo) lo = q.y; if (q.y > hi) hi = q.y; var xv = byT ? q.t : q.i; if (num(xv)) { if (xv < x0) x0 = xv; if (xv > x1) x1 = xv; } }); });
+    if (!(x1 > x0)) x1 = x0 + 1;
+    var pad = (hi - lo || 1) * 0.06; lo -= pad; hi += pad;
+    var X = function (v) { return M.l + (v - x0) / (x1 - x0) * (w - M.l - M.r); }, Y = function (v) { return M.t + (hi - v) / (hi - lo) * (H - M.t - M.b); };
+    O.X = X; O.Y = Y; O.H = H; O.w = w; O.M = M; O.x0 = x0; O.x1 = x1; O.byT = byT; if (O.narrow !== narrow || (!EQ.hi && !EQ.pin)) rest(O.tip, narrow, OV_HINT); O.narrow = narrow;
+    var svg = O.svg; while (svg.firstChild) svg.removeChild(svg.firstChild);
+    svg.setAttribute('viewBox', '0 0 ' + w + ' ' + H); svg.setAttribute('height', H);
+    var best = S.reduce(function (a, s) { return s.end > a.end ? s : a; }, S[0]), worst = S.reduce(function (a, s) { return s.end < a.end ? s : a; }, S[0]);
+    svg.setAttribute('aria-label', 'Cumulative R of ' + S.length + ' streams ' + (byT ? 'by date' : 'by trade number') + '. Best: ' + best.name + ' (' + best.sub + ') ' + fR(best.end, 1) + '; worst: ' + worst.name + ' (' + worst.sub + ') ' + fR(worst.end, 1) + '. The scoreboard table below lists every value.');
+    var g = el('g', {}, svg);
+    var TY = ticks(lo, hi, narrow ? 4 : 5); TY.forEach(function (v) { var y = Y(v).toFixed(1); el('line', { x1: M.l, x2: w - M.r, y1: y, y2: y, 'class': v === 0 ? 'eq-zero' : 'eq-grid' }, g); el('text', { x: M.l - 6, y: +y + 3.5, 'text-anchor': 'end', 'class': 'eq-ax' }, g).textContent = axl(v, TY); });
+    xTicks(byT, x0, x1, narrow).forEach(function (v) { var x = X(v.v); if (x < M.l - 1 || x > w - M.r + 1) return; el('text', { x: x.toFixed(1), y: H - 6, 'text-anchor': 'middle', 'class': 'eq-ax' }, g).textContent = v.l; });
+    if (!byT) el('text', { x: w - M.r, y: H - 6 - 12, 'text-anchor': 'end', 'class': 'eq-ax' }, g).textContent = 'trade #';
+    var lines = el('g', {}, svg);
+    S.forEach(function (s) {
+      var d = '', on = false;
+      s.pts.forEach(function (q) { var xv = byT ? q.t : q.i; if (!num(xv)) return; d += (on ? 'L' : 'M') + X(xv).toFixed(1) + ' ' + Y(q.y).toFixed(1); on = true; });
+      s.path = el('path', { d: d, 'class': 'eq-l ' + dirC(s.end) + (s.sh ? ' sh' : ''), 'data-id': s.r.id }, lines);
+    });
+    O.lab = el('g', {}, svg);
+    var hiS = S.filter(function (s) { return s.r.id === EQ.hi; })[0];
+    if (!hiS) EQ.hi = null;
+    hiOv(EQ.hi, true);
+    drawLeg();
+  }
+  function xTicks(byT, x0, x1, narrow) {
+    if (!byT) return ticks(x0, x1, narrow ? 4 : 6).filter(function (v) { return v === Math.round(v); }).map(function (v) { return { v: v, l: String(v) }; });
+    var a = new Date(x0 * 1000), b = new Date(x1 * 1000), months = (b.getUTCFullYear() - a.getUTCFullYear()) * 12 + b.getUTCMonth() - a.getUTCMonth(), out = [];
+    if (months < 1) { var dstep = Math.max(1, Math.ceil((x1 - x0) / 86400 / (narrow ? 4 : 6))); for (var t = Math.ceil(x0 / 86400) * 86400; t <= x1; t += dstep * 86400) out.push({ v: t, l: new Date(t * 1000).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', timeZone: 'UTC' }) }); return out; }
+    var st = [1, 2, 3, 6, 12, 24].find(function (s) { return months / s <= (narrow ? 4 : 6); }) || 24;
+    var d = new Date(Date.UTC(a.getUTCFullYear(), st >= 12 ? 0 : Math.ceil(a.getUTCMonth() / st) * st, 1));
+    if (d.getTime() / 1000 < x0) d = new Date(Date.UTC(d.getUTCFullYear() + (st >= 12 ? 1 : 0), d.getUTCMonth() + (st >= 12 ? 0 : st), 1));
+    for (; d.getTime() / 1000 <= x1; d = new Date(Date.UTC(d.getUTCFullYear(), d.getUTCMonth() + st, 1)))
+      out.push({ v: d.getTime() / 1000, l: st >= 12 ? String(d.getUTCFullYear()) : d.toLocaleDateString('en-GB', { month: 'short', year: '2-digit', timeZone: 'UTC' }) });
+    return out;
+  }
+  // end labels: the highlighted stream, else the best and the worst (never a number on every line)
+  function labels(O) {
+    var g = O.lab; while (g.firstChild) g.removeChild(g.firstChild);
+    var S = O.S, pick = EQ.hi ? S.filter(function (s) { return s.r.id === EQ.hi; }) : [S.reduce(function (a, s) { return s.end > a.end ? s : a; }, S[0]), S.reduce(function (a, s) { return s.end < a.end ? s : a; }, S[0])];
+    pick.filter(function (s, i, A) { return A.indexOf(s) === i; }).forEach(function (s) {
+      var q = s.pts[s.pts.length - 1], xv = O.byT ? q.t : q.i; if (!num(xv)) return;
+      var x = O.X(xv), y = O.Y(q.y);
+      el('circle', { cx: x.toFixed(1), cy: y.toFixed(1), r: 4, 'class': 'eq-dot ' + dirC(s.end) }, g);
+      var left = x > O.w * 0.55, ty = Math.min(O.H - O.M.b - 4, Math.max(O.M.t + 10, y + (s.end >= 0 ? -8 : 15)));
+      var t = el('text', { x: (left ? x - 7 : x + 7).toFixed(1), y: ty.toFixed(1), 'text-anchor': left ? 'end' : 'start', 'class': 'eq-lab' }, g);
+      t.textContent = s.name + ' '; var v = el('tspan', { 'class': 'eq-dim' }, t); v.textContent = fR(s.end, 1);
+    });
+  }
+  function hiOv(id, quiet) {
+    var O = EQ.ov; if (!O || !O.S.length) return;
+    if (EQ.hi === id && !quiet) return;
+    EQ.hi = id;
+    O.svg.classList.toggle('has-hi', !!id);
+    O.S.forEach(function (s) { if (s.path) s.path.classList.toggle('hi', s.r.id === id); });
+    var hs = O.S.filter(function (s) { return s.r.id === id; })[0]; if (hs && hs.path) hs.path.parentNode.appendChild(hs.path);
+    O.leg.querySelectorAll('[data-eq-open]').forEach(function (b) { b.classList.toggle('hi', b.dataset.eqOpen === id); });
+    labels(O);
+  }
+  // nearest stream to the pointer at that x (a stream that has not started or has ended there does not count)
+  function ovAt(e, touch) {
+    var O = EQ.ov; if (!O || !O.S.length || !O.X) return;
+    var rc = O.svg.getBoundingClientRect(), px = (e.clientX - rc.left) * (O.w / rc.width), py = (e.clientY - rc.top) * (O.H / rc.height);
+    if (px < O.M.l - 4 || px > O.w - O.M.r + 4) return;
+    var xv = O.x0 + (px - O.M.l) / (O.w - O.M.l - O.M.r) * (O.x1 - O.x0), best = null, bd = Infinity;
+    O.S.forEach(function (s) {
+      var q = null, P = s.pts;
+      if (O.byT) { if (xv < P[0].t - 86400 || xv > P[P.length - 1].t + 86400) return; for (var k = P.length - 1; k >= 0; k--) if (P[k].t <= xv) { q = P[k]; break; } if (!q) q = P[0]; }
+      else { var i = Math.round(xv); if (i > s.n + 0.5) return; q = P[Math.max(0, Math.min(s.n, i))]; }
+      var d = Math.abs(O.Y(q.y) - py); if (d < bd) { bd = d; best = { s: s, q: q }; }
+    });
+    if (!best || bd > 40) { if (!EQ.pin && !touch) { hiOv(null); rest(O.tip, O.narrow, OV_HINT); } return; }
+    var again = touch && EQ.pin === best.s.r.id;
+    if (touch) { EQ.tapped = true; if (again) { openRow(best.s.r.id); return; } EQ.pin = best.s.r.id; }
+    hiOv(best.s.r.id);
+    var T = O.tip; T.textContent = '';
+    h('b', null, fR(best.q.y, 1), T);
+    var nm = h('div', null, null, T), k = h('span', 'eq-k ' + dirC(best.s.end) + (best.s.sh ? ' sh' : ''), null, nm); k.setAttribute('aria-hidden', 'true');
+    h('span', 'eq-tn', best.s.name, nm); nm.appendChild(document.createTextNode(' · ' + best.s.sub));
+    h('div', null, 'after trade ' + best.q.i + ' of ' + best.s.n + (best.q.t ? ' · ' + fD(best.q.t) : '') + ' · total ' + fR(best.s.end, 1), T);
+    h('div', null, touch ? 'Tap the line again to open its curve' : 'Click to open its curve', T);
+    live(T, O.narrow, O.byT ? O.X(best.q.t) : O.X(best.q.i), O.w, O.M.l);
+  }
+  function drawLeg() {
+    var O = EQ.ov; if (!O) return;
+    var S = O.S.slice().sort(function (a, b) { return b.end - a.end; }), cap = O.narrow ? 5 : 8, list = EQ.all ? S : S.slice(0, cap);
+    O.leg.textContent = '';
+    list.forEach(function (s) {
+      var li = h('li', null, null, O.leg), b = h('button', null, null, li); b.type = 'button'; b.dataset.eqOpen = s.r.id; if (s.r.id === EQ.hi) b.classList.add('hi');
+      b.setAttribute('aria-label', s.name + ', ' + s.sub + ': ' + fR(s.end, 1) + ' after ' + s.n + ' trades' + (s.sh ? ', shadow book' : '') + '. Open its curve in the table');
+      b.appendChild(lineKey('eq-l ' + dirC(s.end) + (s.sh ? ' sh' : ''), 22));
+      var nm = h('span', 'eq-nm', null, b); h('span', null, s.name, nm); h('small', null, s.sub + ' · ' + s.n + ' trades', nm);
+      h('span', 'eq-v', fR(s.end, 1), b);
+    });
+    O.more.hidden = S.length <= cap; O.more.textContent = EQ.all ? 'Show the top ' + cap + ' only' : 'Show all ' + S.length + ' streams';
+    O.more.setAttribute('aria-expanded', String(EQ.all));
+  }
+  function openRow(id) {
+    var q = '[data-sb-row="' + String(id).replace(/["\\]/g, '') + '"]', b = document.querySelector(q);
+    if (!b) return;
+    if (b.getAttribute('aria-expanded') !== 'true') b.click();
+    setTimeout(function () { var x = document.getElementById('sb-x-' + id), b2 = document.querySelector(q); if (x) x.scrollIntoView({ block: 'nearest', behavior: reduced() ? 'auto' : 'smooth' }); var p = x && x.querySelector('.eq-plot'); if (p) p.focus({ preventScroll: true }); else if (b2) b2.focus({ preventScroll: true }); }, 60);
+  }
+
+  // ─── one stream: its curve, the worst drawdown shaded, each trade on hover / tap / arrow keys ───
+  function slot(r) { return series(r) ? '<div class="eq-row" data-eq-row="' + String(r.id).replace(/[&<>"']/g, '') + '"></div>' : ''; }
+  function drawRow(box, s) {
+    box.textContent = '';
+    var key = h('p', 'eq-key', null, box);
+    var kk = function (cls, txt) { var sp = h('span', null, null, key); sp.appendChild(lineKey(cls)); sp.appendChild(document.createTextNode(txt)); };
+    kk('eq-m ' + dirC(s.end) + (s.sh && !s.mixed ? ' sh' : ''), 'After costs' + (s.sh && !s.mixed ? ' (shadow book, dashed)' : ''));
+    if (s.mixed) kk('eq-m ' + dirC(s.end) + ' sh', 'Shadow-book trades (dashed)');
+    if (s.cost) kk('eq-g', 'Before costs ' + fR(s.gEnd, 1));
+    if (s.dd) { var sp = h('span', null, null, key), sw = el('svg', { width: 14, height: 10, 'aria-hidden': 'true' }, sp); el('rect', { width: 14, height: 10, rx: 2, 'class': 'eq-dd' }, sw); sp.appendChild(document.createTextNode('Worst drawdown ' + fR(s.dd.v, 1))); }
+    var plot = h('div', 'eq-plot', null, box); plot.tabIndex = 0; plot.setAttribute('role', 'group');
+    plot.setAttribute('aria-label', 'Equity curve of ' + s.name + ', ' + s.sub + ': ' + fR(s.end, 1) + ' after ' + s.n + ' trades' + (s.cost ? ' (' + fR(s.gEnd, 1) + ' before costs)' : '') + (s.dd ? ', worst drawdown ' + fR(s.dd.v, 1) : '') + '. Left and right arrow keys step through the trades.');
+    var w = plot.clientWidth || box.clientWidth; if (!w) return;
+    var narrow = w < 520, H = narrow ? 180 : 210, M = { l: 40, r: 50, t: 16, b: 22 }, P = s.pts, n = s.n;
+    var lo = 0, hi = 0; P.forEach(function (q) { lo = Math.min(lo, q.y, s.cost ? q.g : 0); hi = Math.max(hi, q.y, s.cost ? q.g : 0); });
+    var pad = (hi - lo || 1) * 0.08; lo -= pad; hi += pad;
+    var X = function (i) { return M.l + i / n * (w - M.l - M.r); }, Y = function (v) { return M.t + (hi - v) / (hi - lo) * (H - M.t - M.b); };
+    var svg = el('svg', { viewBox: '0 0 ' + w + ' ' + H, height: H, 'class': 'eq-svg', 'aria-hidden': 'true' }, plot), tip = h('div', 'eq-tip', null, plot); rest(tip, narrow, ROW_HINT); tip.setAttribute('aria-live', 'polite');
+    var g = el('g', {}, svg);
+    var TY = ticks(lo, hi, narrow ? 3 : 4); TY.forEach(function (v) { var y = Y(v).toFixed(1); el('line', { x1: M.l, x2: w - M.r, y1: y, y2: y, 'class': v === 0 ? 'eq-zero' : 'eq-grid' }, g); el('text', { x: M.l - 6, y: +y + 3.5, 'text-anchor': 'end', 'class': 'eq-ax' }, g).textContent = axl(v, TY); });
+    ticks(0, n, narrow ? 4 : 6).filter(function (v) { return v === Math.round(v) && v > 0; }).forEach(function (v) { el('text', { x: X(v).toFixed(1), y: H - 6, 'text-anchor': 'middle', 'class': 'eq-ax' }, g).textContent = String(v); });
+    el('text', { x: M.l, y: H - 6, 'text-anchor': 'start', 'class': 'eq-ax' }, g).textContent = 'trade #';
+    // worst drawdown: the area between the peak before it and the curve, until the curve gets back to that peak
+    if (s.dd) {
+      var A = s.dd.a, R = s.dd.rec, pk = P[A].y, d = 'M' + X(A).toFixed(1) + ' ' + Y(pk).toFixed(1);
+      for (var i = A; i <= R; i++) d += 'L' + X(i).toFixed(1) + ' ' + Y(Math.min(P[i].y, pk)).toFixed(1);
+      d += 'L' + X(R).toFixed(1) + ' ' + Y(pk).toFixed(1) + 'Z';
+      el('path', { d: d, 'class': 'eq-dd' }, g);
+      el('line', { x1: X(A).toFixed(1), x2: X(R).toFixed(1), y1: Y(pk).toFixed(1), y2: Y(pk).toFixed(1), 'class': 'eq-ddl' }, g);
+      var yb = Y(P[s.dd.b].y), deep = yb - Y(pk) > 34, tx = deep ? (X(A) + X(R)) / 2 : X(s.dd.b), ty = deep ? Y(pk) + 14 : Math.min(H - M.b - 4, yb + 15), lt = el('text', { x: Math.max(M.l + 2, Math.min(w - M.r - 2, tx)).toFixed(1), y: ty.toFixed(1), 'text-anchor': tx < M.l + 50 ? 'start' : tx > w - M.r - 50 ? 'end' : 'middle', 'class': 'eq-lab eq-dim' }, g);
+      lt.textContent = 'max DD ' + fR(s.dd.v, 1);
+    }
+    var sp2 = s.r.s && s.r.s.split; if (sp2 && sp2 < n) { var sx = X(sp2 + 0.5).toFixed(1); el('line', { x1: sx, x2: sx, y1: M.t - 6, y2: H - M.b, 'class': 'eq-split' }, g); el('text', { x: +sx + 4, y: M.t - 4, 'class': 'eq-ax' }, g).textContent = '2nd half'; }
+    if (s.cost) el('path', { d: P.map(function (q, i) { return (i ? 'L' : 'M') + X(i).toFixed(1) + ' ' + Y(q.g).toFixed(1); }).join(''), 'class': 'eq-g' }, svg);
+    // the curve in runs: live-book trades solid, shadow-book trades dashed
+    var run = null, dd2 = '', flush = function () { if (run !== null) el('path', { d: dd2, 'class': 'eq-m ' + dirC(s.end) + (run ? ' sh' : '') }, svg); };
+    for (var j = 1; j <= n; j++) { var shj = !!P[j].sh; if (shj !== run) { flush(); run = shj; dd2 = 'M' + X(j - 1).toFixed(1) + ' ' + Y(P[j - 1].y).toFixed(1); } dd2 += 'L' + X(j).toFixed(1) + ' ' + Y(P[j].y).toFixed(1); }
+    flush();
+    var ex = X(n), ey = Y(s.end);
+    el('circle', { cx: ex.toFixed(1), cy: ey.toFixed(1), r: 4, 'class': 'eq-dot ' + dirC(s.end) }, svg);
+    el('text', { x: (ex + 7).toFixed(1), y: (ey + 4).toFixed(1), 'class': 'eq-lab' }, svg).textContent = fR(s.end, 1);
+    var ch = el('line', { y1: M.t - 4, y2: H - M.b, 'class': 'eq-ch', visibility: 'hidden' }, svg), cd = el('circle', { r: 4.5, 'class': 'eq-dot ' + dirC(s.end), visibility: 'hidden' }, svg);
+    var cur = null, pinned = false;
+    var show = function (i) {
+      i = Math.max(1, Math.min(n, i)); cur = i; var q = P[i], p = q.p || {}, x = X(i);
+      ch.setAttribute('x1', x.toFixed(1)); ch.setAttribute('x2', x.toFixed(1)); ch.setAttribute('visibility', 'visible');
+      cd.setAttribute('cx', x.toFixed(1)); cd.setAttribute('cy', Y(q.y).toFixed(1)); cd.setAttribute('class', 'eq-dot ' + dirC(p.R)); cd.setAttribute('visibility', 'visible');
+      tip.textContent = '';
+      h('b', null, fR(q.y, 2) + ' after ' + i + ' of ' + n, tip);
+      if (q.t) h('div', null, fDT(q.t), tip);
+      var res = (p.st === 'win' ? 'Win' : p.st === 'loss' ? 'Loss' : p.st === 'be' ? 'Break-even' : 'Closed'), ln = h('div', null, null, tip);
+      if (p.m || p.sd) ln.appendChild(document.createTextNode([String(p.m || '').toUpperCase(), p.sd].filter(Boolean).join(' ') + ' · '));
+      h('span', 'eq-tn', res + ' ' + fR(p.R), ln);
+      if (num(p.c) && p.c) h('div', null, fR(p.g) + ' before costs, cost ' + Math.abs(p.c).toFixed(2) + 'R', tip);
+      var tags = [q.sh ? 'Shadow book' : null, p.gr ? 'grade ' + p.gr : null].filter(Boolean); if (tags.length) h('div', null, tags.join(' · '), tip);
+      live(tip, narrow, x, w, M.l);
+    };
+    var hide = function () { if (pinned) return; cur = null; rest(tip, narrow, ROW_HINT); ch.setAttribute('visibility', 'hidden'); cd.setAttribute('visibility', 'hidden'); };
+    var at = function (e) { var rc = svg.getBoundingClientRect(), px = (e.clientX - rc.left) * (w / rc.width); return Math.round((px - M.l) / (w - M.l - M.r) * n); };
+    plot.addEventListener('pointermove', function (e) { if (e.pointerType !== 'touch' || pinned) show(at(e)); });
+    plot.addEventListener('pointerdown', function (e) { if (e.pointerType === 'touch') { pinned = true; show(at(e)); } });
+    plot.addEventListener('pointerleave', function (e) { if (e.pointerType !== 'touch') hide(); });
+    plot.addEventListener('keydown', function (e) {
+      var k = e.key, i = cur == null ? n : cur;
+      var nx = k === 'ArrowRight' ? i + 1 : k === 'ArrowLeft' ? i - 1 : k === 'Home' ? 1 : k === 'End' ? n : k === 'PageUp' ? i + 10 : k === 'PageDown' ? i - 10 : null;
+      if (k === 'Escape') { pinned = false; hide(); return; }
+      if (nx == null) return; e.preventDefault(); show(nx);
+    });
+    plot.addEventListener('focus', function () { if (plot.matches(':focus-visible')) show(cur == null ? n : cur); });
+    plot.addEventListener('blur', function () { pinned = false; hide(); });
+    box._eqPin = function (on) { if (!on) { pinned = false; hide(); } };
+  }
+  function drawRows() {
+    var B = document.getElementById('ms-sb-b'); if (!B) return;
+    B.querySelectorAll('[data-eq-row]').forEach(function (box) { var r = EQ.byId[box.dataset.eqRow], s = r && series(r); if (s) drawRow(box, s); });
+  }
+  // a tap outside an open row chart lets go of its pinned trade
+  document.addEventListener('pointerdown', function (e) { document.querySelectorAll('#ms-sb-b [data-eq-row]').forEach(function (b) { if (b._eqPin && !b.contains(e.target)) b._eqPin(false); }); });
+  function drawn(rows) {
+    EQ.rows = (rows || []).slice(); EQ.byId = {}; EQ.rows.forEach(function (r) { EQ.byId[r.id] = r; });
+    if (EQ.pin && !EQ.byId[EQ.pin]) EQ.pin = null;
+    drawOv(); drawRows();
+  }
+  var rz = null, lastW = 0;
+  W.addEventListener('resize', function () { clearTimeout(rz); rz = setTimeout(function () { var O = EQ.ov; if (!O || O.box.hidden) return; if (O.plot.clientWidth === lastW) return; lastW = O.plot.clientWidth; drawOv(); drawRows(); }, 150); });
+  W.MS_EQ = { slot: slot, drawn: drawn, series: series };
 })(window);
 </script>
 </body>
