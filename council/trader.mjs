@@ -227,6 +227,13 @@ const USER_RULES = [
   { id: 'mosha-bo-weekly', apply: (c) => { c.moshaBoWeekly = true; },
     change: "Mosha BO system: trades only in the weekly structure's direction (his \"Father\" timeframe); the M15 break no longer has to flip M15 structure",
     why: "From his multi-timeframe slides (father/mother/son). Spot gold 2019-26, H4->H1->M15, limit at the broken level, 3R, with the weekly direction computed the way the trader sees it live (Monday weeks built from the last 720 daily candles, swing size 3): weekly agrees 2019-22 +32.2R (87 trades, +0.37R a trade), 2023-26 +34.2R (99, +0.35R), 7 of 8 years positive, worst drawdown -18.4R; weekly against -28.3R / -15.8R. The previous flip-only rule: +7.5R / +15.1R. Caveat: the weekly filter did not help the other timeframe chains, so it is watched by the kill switch like everything else." },
+  // 7 Nov (owner, 14:5x UTC): "focus on the council, improve the trading system for more results". Live sleeve: Scalp against the D1 trend,
+  // outside Asia, on every market (the market focus no longer blocks it). Evidence: 30-day replay (backtest.json, 7 Nov) scalp + D1 against
+  // +0.329R a trade over 500 (first half +0.24, second +0.42); D1 with -0.29R over 459. Forward shadows 1-7 Nov: scalp against +0.25R over 127.
+  { id: 'scalp-against-live', apply: (c) => { c.focusSetups = ['scalp']; c.filters = c.filters || {}; const f = c.filters.scalp = c.filters.scalp || {};
+      f.d1 = 'against'; f.src = { ...(f.src || {}), d1: 'user' }; f.noSession = [...new Set([...(f.noSession || []), 'asia'])]; },
+    change: 'Scalp against D1, outside Asia, trades live on paper on every market (the market focus no longer blocks Scalp); the other engine setups stay shadow',
+    why: '30-day replay: Scalp against the D1 trend +0.329R a trade over 500 trades, positive in both halves (+0.24 / +0.42); Scalp with D1 -0.29R over 459. Forward shadow trades 1-7 Nov agree: +0.25R over 127. Against D1 in Asia is flat (+0.03R over 562), so Asia stays out.' },
 ];
 config.userRules = config.userRules || [];
 for (const u of USER_RULES) if (!config.userRules.includes(u.id)) { u.apply(config); config.userRules.push(u.id); config.history.push({ at: nowISO, by: 'user', change: u.change, why: u.why }); }
@@ -962,7 +969,7 @@ for (const [key, M] of Object.entries(MARKETS)) {
       if (live.some((x) => Math.abs(x.stop - t.stop) <= tick && Math.abs(x.t1 - t.t1) <= tick)) blockedBy.push('duplicate');
       const ud = usdDir(M, t.sell ? 'sell' : 'buy');
       if (ud && trades.filter((x) => !x.shadow && (x.status === 'open' || x.status === 'pending') && MARKETS[x.market] && usdDir(MARKETS[x.market], x.side) === ud).length >= (config.maxUsd || MAX_USD)) blockedBy.push('usd');
-      if (config.focus && config.focus.length && !config.focus.includes(key)) blockedBy.push('focus');
+      if (config.focus && config.focus.length && !config.focus.includes(key) && !(config.focusSetups || []).includes(t.k)) blockedBy.push('focus');   // focusSetups (7 Nov): setups that trade live on every market
       if ((config.replicaLive || []).includes(key)) blockedBy.push('replica');   // this market trades the replica live
       // re-entry (3 Nov, gold 150-day replay): a Scalp in the same direction within 3 h of a Scalp loss on this market loses
       // in every month (−0.24R a trade on the first 100 days, −0.52R, t −4.1, on the last 50; the other Scalps net +0.6R).
