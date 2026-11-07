@@ -64,14 +64,14 @@ string symFor(string market) {
 }
 double riskFor(string k) {
   if (k == "gtrend") return InpRiskGoldTrend;
-  if (k == "replica" || k == "gtl" || k == "geg") return InpRiskGold;
+  if (k == "replica" || k == "gtrend5" || k == "gtl" || k == "geg") return InpRiskGold;
   if (k == "mosha-bo") return InpRiskMosha;
   if (k == "trend") return InpRiskCrypto;
   if (k == "nq-open") return InpRiskNQ;
   return 0;
 }
 bool enabledFor(string k) {
-  if (k == "replica" || k == "gtrend" || k == "gtl" || k == "geg") return InpMirrorGold;
+  if (k == "replica" || k == "gtrend" || k == "gtrend5" || k == "gtl" || k == "geg") return InpMirrorGold;
   if (k == "mosha-bo") return InpMirrorMosha;
   if (k == "trend") return InpMirrorCrypto;
   if (k == "nq-open") return InpMirrorNQ;
