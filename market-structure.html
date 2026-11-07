@@ -718,6 +718,14 @@
   .c-how { margin: -4px 0 12px; border: 1px solid var(--line); border-radius: var(--r-sm); background: rgba(255,255,255,.012); }
   .c-how > summary { cursor: pointer; padding: 9px 12px; font: 500 12.5px var(--sans); color: var(--ink-dim); list-style: none; display: flex; align-items: center; gap: 8px; min-height: 24px; }
   .c-how > summary::-webkit-details-marker { display: none; }
+  /* Macro strategist card (7 Nov) */
+  .c-macro .mc-up { color: var(--buy); } .c-macro .mc-dn { color: var(--sell); } .c-macro .mc-mx { color: var(--ink-faint); }
+  .c-macro td small { display: block; color: var(--ink-faint); font-size: 11px; line-height: 1.4; }
+  .c-macro .mc-ev { border-top: 1px solid var(--line-soft); padding: 8px 0; display: grid; gap: 4px; min-width: 0; }
+  .c-macro .mc-ev:first-child { border-top: 0; }
+  .c-macro .mc-ev b { font-weight: 600; color: var(--ink); }
+  .c-macro .mc-ev .mc-row { display: flex; flex-wrap: wrap; gap: 6px 14px; font-size: 12px; color: var(--ink-dim); }
+  .c-macro .c-how { margin: 12px 0 0; } .c-macro .c-how > p { padding: 0 12px; }
   .c-how > summary::before { content: ""; width: 6px; height: 6px; border-right: 1.5px solid currentColor; border-bottom: 1.5px solid currentColor; transform: rotate(-45deg); transition: transform .15s ease-out; }
   .c-how[open] > summary::before { transform: rotate(45deg); }
   .c-how > summary:hover { color: var(--ink); }
@@ -2885,6 +2893,18 @@ html[data-motion="off"] #v-ict .ict-cal-d:hover { transform: none !important; }
         <div class="c-sub">Ready right now</div>
         <ul class="c-ready" id="ms-c-ready"></ul>
         <div class="c-md" id="ms-c-analysis"></div>
+      </div>
+      <div class="card c-macro adm c-wide" id="ms-c-macro">
+        <div class="ms-k"><span>Macro strategist · next-day odds and event playbook</span><small id="ms-mc-at"></small></div>
+        <p class="ms-note" id="ms-mc-regime">Loading the macro view…</p>
+        <div class="ms-bt-wrap"><table class="ms-bt-t c-t"><thead><tr><th>Market</th><th class="n">P(up)</th><th class="n">Base rate</th><th class="n">Typical move</th><th>Drivers</th></tr></thead><tbody id="ms-mc-p"></tbody></table></div>
+        <div class="c-sub">Event playbook · next 5 days</div>
+        <div id="ms-mc-ev"></div>
+        <div class="c-sub">Scorecard · is it any good?</div>
+        <div class="ms-bt-wrap"><table class="ms-bt-t c-t"><thead><tr><th>Market</th><th class="n">Replay days</th><th class="n">Hit rate</th><th class="n">Base rate</th><th class="n">Brier <small>(coin 0.25; green beats the base rate)</small></th><th class="n">PT test</th><th class="n">Live log</th></tr></thead><tbody id="ms-mc-sc"></tbody></table></div>
+        <p class="ms-note" id="ms-mc-vol"></p>
+        <details class="c-how"><summary>Brief and method</summary><p class="ms-note" id="ms-mc-brief"></p><p class="ms-note" id="ms-mc-method"></p><p class="ms-note" id="ms-mc-src"></p></details>
+        <p class="ms-note" style="margin:8px 0 0">Paper only: the Macro strategist changes no rule and no trade. Next-day direction is barely forecastable, so the odds stay near each market's base rate; the size of event-day moves is the more reliable part.</p>
       </div>
       <div class="card c-coach">
         <div class="ms-k">Coach · daily review and rules</div>
@@ -9495,6 +9515,59 @@ html[data-role="public"] #ms-me-ct { display: none; }
       if (ct) history.replaceState(null, '', location.pathname + '#ctrader');
     }
   });
+})();
+</script>
+<script>
+/* Macro strategist card (7 Nov 2026, admin): council-data macro/forecast.json from council/macro.mjs (paper only) */
+(function () {
+  var R = document.documentElement, box = document.getElementById('ms-c-macro');
+  if (!box || R.dataset.mode !== 'admin') return;
+  var $ = function (id) { return document.getElementById(id); };
+  var esc = function (s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); };
+  var pct = function (p) { return p == null ? '—' : Math.round(p * 100) + '%'; };
+  var arrow = function (m) { return m === 'up' ? '<span class="mc-up">▲ up</span>' : m === 'down' ? '<span class="mc-dn">▼ down</span>' : '<span class="mc-mx">mixed</span>'; };
+  var NAMES = { gold: 'Gold', eurusd: 'EUR/USD', usdjpy: 'USD/JPY', nq: 'NQ', es: 'ES' };
+  var when = function (iso) { var d = new Date(iso); return d.toLocaleString(undefined, { weekday: 'short', day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' }); };
+  function render(f) {
+    $('ms-mc-at').textContent = 'for ' + f.target + ' · built ' + when(f.at);
+    $('ms-mc-regime').innerHTML = 'Regime: <b>' + esc(f.regime && f.regime.label) + '</b>' + (f.targetEvent ? ' · event day: ' + esc(f.targetEvent) : '') + (f.dxy ? ' · DXY ' + pct(f.dxy.pUp) + ' up (mirror of EUR/USD)' : '');
+    var rows = Object.keys(NAMES).map(function (k) {
+      var a = f.assets[k]; if (!a) return '';
+      var base = a.fit ? a.fit.base : null, tilt = a.pUp != null && base != null ? Math.round((a.pUp - base) * 100) : null;
+      var dr = (a.drivers || []).slice(0, 3).map(function (d) { return (d.dir === 'up' ? '<span class="mc-up">▲</span> ' : '<span class="mc-dn">▼</span> ') + esc(d.name.replace(/\s*\(.*\)$/, '')); }).join(' · ');
+      return '<tr><td>' + esc(a.label) + '</td><td class="n"><b>' + pct(a.pUp) + '</b>' + (tilt ? '<small>' + (tilt > 0 ? '+' : '') + tilt + ' pts vs base</small>' : '<small>no macro tilt</small>') + '</td><td class="n">' + pct(base) + '</td><td class="n">' + (a.expMovePct != null ? '±' + a.expMovePct + '%' : '—') + '</td><td>' + (dr || '<span class="mc-mx">no driver has data</span>') + '</td></tr>';
+    });
+    $('ms-mc-p').innerHTML = rows.join('');
+    var ev = (f.playbook || []).slice(0, 8);
+    $('ms-mc-ev').innerHTML = ev.length ? ev.map(function (e) {
+      var sc = (e.scenarios || []).filter(function (s) { return s.name !== 'in line'; }).map(function (s) {
+        return '<div class="mc-row"><b>' + esc(s.name) + '</b> <span>(' + esc(s.when) + (s.odds != null ? ', ~' + pct(s.odds) : '') + ')</span>' + Object.keys(NAMES).map(function (k) { return '<span>' + NAMES[k] + ' ' + arrow(s.moves[k]) + '</span>'; }).join('') + '</div>';
+      }).join('');
+      var mv = Object.keys(NAMES).map(function (k) { return NAMES[k] + ' ±' + (e.expMovePct ? e.expMovePct[k] : '?') + '%'; }).join(' · ');
+      return '<div class="mc-ev"><div><b>' + esc(e.country) + ' ' + esc(e.title) + '</b> · ' + when(e.at) + (e.consensus ? ' · consensus ' + esc(e.consensus) : '') + (e.previous ? ' · previous ' + esc(e.previous) : '') + (e.outcome ? ' · came in <b>' + esc(e.outcome) + '</b>' : '') + '</div>'
+        + '<div class="mc-row"><span>' + esc(e.rule) + '</span></div><div class="mc-row"><span>Typical move: ' + mv + '</span></div>' + sc + (e.note ? '<div class="mc-row"><span>' + esc(e.note) + '</span></div>' : '') + '</div>';
+    }).join('') : '<p class="ms-note">No high-impact events in the next 5 days on the calendar the strategist could read.</p>';
+    var S = f.scorecard || {}, re = S.replay || {}, lv = S.live || {};
+    $('ms-mc-sc').innerHTML = Object.keys(NAMES).map(function (k) {
+      var r = re[k] || {}, l = lv[k] || {};
+      var good = r.n && r.skillClim > 0 && r.pt != null && r.pt > 1.96;
+      return '<tr><td>' + NAMES[k] + '</td><td class="n">' + (r.n || 0) + '</td><td class="n">' + pct(r.hit) + '</td><td class="n">' + pct(r.base) + '</td><td class="n ' + (r.brier == null ? '' : r.brier < r.brierClim ? 'mc-up' : r.brier > 0.25 ? 'mc-dn' : '') + '">' + (r.brier != null ? r.brier : '—') + '</td><td class="n' + (good ? ' mc-up' : '') + '">' + (r.pt != null ? r.pt : '—') + '</td><td class="n">' + (l.n ? l.n + ' days, ' + pct(l.hit) + ' hit, Brier ' + l.brier : 'logging…') + '</td></tr>';
+    }).join('');
+    var g = (S.vol || {}).gold;
+    $('ms-mc-vol').textContent = (g && g.eventDays ? 'Move size: on the replay, Fed and payrolls days moved gold ' + g.eventAvgAbs + '% on average against ' + g.otherAvgAbs + '% on other days; typical-move error ' + g.maeModel + ' vs ' + g.maeNaive + ' for the naive 20-day average. ' : '')
+      + 'Live log: ' + (S.logged || 0) + ' forecasts, ' + (S.resolved || 0) + ' resolved. A PT test above 1.96 means the direction calls beat chance; a 53% hit rate needs about 1,100 days to tell from luck.';
+    $('ms-mc-brief').textContent = f.brief || '';
+    $('ms-mc-method').textContent = S.method || '';
+    var src = f.sources || {}, okN = Object.keys(src).filter(function (k) { return /^(ok|OANDA ok|FRED failed .*Cboe ok)/.test(src[k]); }).length;
+    $('ms-mc-src').textContent = 'Sources: ' + okN + ' of ' + Object.keys(src).length + ' fetched live. ' + Object.keys(src).filter(function (k) { return !/^(ok|OANDA ok)/.test(src[k]); }).map(function (k) { return k + ' ' + src[k]; }).join(' · ');
+  }
+  function load() {
+    fetch((window.MS_CDATA || '') + 'macro/forecast.json?v=' + Math.floor(Date.now() / 300000), { cache: 'no-store' })
+      .then(function (r) { return r.ok ? r.json() : null; })
+      .then(function (f) { if (f && f.assets) render(f); else $('ms-mc-regime').textContent = 'No macro forecast yet: the strategist writes one every ~25 minutes once the council loop runs it.'; })
+      .catch(function () { $('ms-mc-regime').textContent = 'Could not load the macro forecast.'; });
+  }
+  load(); setInterval(load, 10 * 60e3);
 })();
 </script>
 </body>

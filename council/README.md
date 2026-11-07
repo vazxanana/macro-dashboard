@@ -1,10 +1,10 @@
 # Mosha council
 
-A paper-trading desk with three members: the **Trader** trades, the **Coach** tunes the Trader's rules inside fixed limits,
-and the **Analyst** writes a weekly brief. No real money is involved. All results live on the `council-data` branch (never on
+A paper-trading desk with four members: the **Trader** trades, the **Coach** tunes the Trader's rules inside fixed limits,
+the **Analyst** writes a weekly brief, and the **Macro strategist** forecasts next-day macro odds and event days (paper only). No real money is involved. All results live on the `council-data` branch (never on
 `main`), and the site (meridianx.dev, **AI council** view) reads them from there.
 
-## The three members
+## The members
 
 | Member | What it does | When it runs | Reads | Writes |
 |---|---|---|---|---|
@@ -12,6 +12,7 @@ and the **Analyst** writes a weekly brief. No real money is involved. All result
 | **Coach**, statistical (inside `trader.mjs`) | Learns and drops filters, tunes stop buffer / minimum stop / reward:risk / break-even / dollar cap, reads the daily replay, runs the live-sleeve guard, and writes proposals for the owner. | Once a UTC day on the first Trader round; condition filters and break-even every 6 h; the guard and proposals every round (proposals only recompute when the replay or the rules change). | `trades.json`, `backtest.json`, `config.json` | `config.json` (with every change in `history`), `coach.json` (stats, lessons, notes, `proposals`) |
 | **Coach**, AI review | A scheduled Claude session (set up outside this repo) that reads the day's losses and writes a review; may make at most 2 rule changes a day inside the limits below. | Daily. | everything above | `reviews/latest.md`, `config.json` (logged `by: "coach-ai"`) |
 | **Analyst** | A scheduled Claude session (outside this repo) that writes the weekly brief: bias per market, key levels, likely setups, news. Between the markers `<!-- live-rule:start -->` / `<!-- live-rule:end -->` the Trader rewrites a **Live Scalp rule check** every round (`council/analyst.mjs`): each market's D1 trend and its source, which side the live Scalp may take now, and the replay under that rule. Reporting only. | Weekly (Mondays); the rule-check block every Trader round. | `snapshot.json`, `config.json`, `backtest.json` | `analysis/latest.md` |
+| **Macro strategist** (`council/macro.mjs`) | Paper only. Next-day up/down odds for gold, EUR/USD (DXY), USD/JPY, NQ and ES from the macro driver stack of gold-trading.html, an event playbook for the next 1-5 days (consensus, previous, hot / in-line / cool moves per market, expected move size) and a plain-language brief. Fetches its own free data (FRED, Forex Factory calendar, Fed / ECB / BoJ RSS, CFTC, ECB, Cboe, OANDA via /md/bars). Scores itself on a walk-forward replay and an append-only live log (hit rate vs base rate, Brier, calibration, Pesaran-Timmermann). The Analyst and Coach can read `macro/forecast.json`; it changes no rule or trade. | Every 6th Trader round (~25 min). | its own fetches, `macro/*.json` | `macro/forecast.json`, `macro/history.json`, `macro/events.json`, `macro/cache.json`, the "Macro strategist" block in `analysis/latest.md` |
 
 Supporting scripts:
 
