@@ -23,21 +23,35 @@ async function call(url) {
 
 // every trade in [from, to) as [time (s), price], at most maxCalls calls; the array also carries .calls and .complete
 // (false when the call cap stopped it before `to`)
-export async function krakenTrades(pair, from, to, maxCalls = 900) {
+// `since0` resumes a paged read (Kraken's cursor from an earlier call); the array also carries .since, the cursor to resume from
+export async function krakenTrades(pair, from, to, maxCalls = 900, since0 = null) {
   const out = [];
-  let since = String(BigInt(Math.floor(from)) * 1000000000n), calls = 0, complete = false;
+  let since = since0 || String(BigInt(Math.floor(from)) * 1000000000n), calls = 0, complete = false;
   while (calls < maxCalls) {
     calls++;
     const res = await call(`https://api.kraken.com/0/public/Trades?pair=${pair}&since=${since}&count=1000`);
     const key = Object.keys(res).find((k) => k !== 'last'), rows = res[key] || [];
     for (const t of rows) { const tm = +t[2]; if (tm >= from && tm < to) out.push([tm, +t[0]]); }
     const last = rows.length ? +rows[rows.length - 1][2] : Infinity;
-    if (!rows.length || last >= to || res.last === since) { complete = true; break; }
+    if (!rows.length || last >= to || res.last === since) {
+      complete = true;
+      // resume point for a later read of the same day past `to`: just after the last trade kept (the page's own cursor
+      // would skip the trades between `to` and the page end); a repeated boundary trade changes no candle
+      if (out.length) since = String(BigInt(Math.floor(out[out.length - 1][0] * 1e6)) * 1000n + 1n);
+      break;
+    }
     since = res.last;
-    await sleep(1100);   // Kraken allows about one public call a second
+    await sleep(process.env.KRAKEN_NO_WAIT ? 0 : 1100);   // Kraken allows about one public call a second
   }
-  out.calls = calls; out.complete = complete;
+  out.calls = calls; out.complete = complete; out.since = since;
   return out;
+}
+
+// join candles of the same day read in two parts (b's trades all come after a's): open from a, close from b
+export function mergeCandles(a, b) {
+  const m = new Map(a.map((x) => [x.time, { ...x }]));
+  for (const x of b) { const y = m.get(x.time); if (!y) m.set(x.time, { ...x }); else { y.high = Math.max(y.high, x.high); y.low = Math.min(y.low, x.low); y.close = x.close; } }
+  return [...m.values()].sort((p, q) => p.time - q.time);
 }
 
 // 1m candles from trades (minutes without a trade have no candle, like Kraken's own OHLC)
@@ -65,11 +79,21 @@ export async function krakenMinutes(pair, from, to, { cacheDir = null, budget = 
     if (whole && file && fs.existsSync(file)) { try { bars = JSON.parse(fs.readFileSync(file, 'utf8')); cached++; } catch (e) { bars = null; } }
     if (!bars) {
       if (calls >= budget) break;
-      const tr = await krakenTrades(pair, d, end, budget - calls);
+      // a day an earlier run could not finish (the budget ran out inside it) resumes from Kraken's cursor: crypto prints
+      // so many trades that one day takes more calls than a run's budget, so without this no past day ever completed
+      const part = file && file.replace(/\.json$/, '.part.json');
+      let prev = null; if (part && fs.existsSync(part)) { try { prev = JSON.parse(fs.readFileSync(part, 'utf8')); } catch (e) { prev = null; } }
+      const tr = await krakenTrades(pair, d, end, budget - calls, prev && prev.since);
       calls += tr.calls;
-      if (!tr.complete) break;   // the budget ran out inside this day: it and older days wait for the next run
-      bars = minuteCandles(tr); fetched++;
-      if (whole && file) { try { fs.mkdirSync(cacheDir, { recursive: true }); fs.writeFileSync(file, JSON.stringify(bars)); } catch (e) {} }
+      const got = prev ? mergeCandles(prev.bars, minuteCandles(tr)) : minuteCandles(tr);
+      if (!tr.complete) {   // the budget ran out inside this day: keep what we have and where to go on; older days wait
+        if (part) { try { fs.mkdirSync(cacheDir, { recursive: true }); fs.writeFileSync(part, JSON.stringify({ since: tr.since, bars: got })); } catch (e) {} }
+        break;
+      }
+      bars = got; fetched++;
+      // today (not finished yet): keep it with its cursor, so the next run reads only the trades since
+      if (!whole && part) { try { fs.mkdirSync(cacheDir, { recursive: true }); fs.writeFileSync(part, JSON.stringify({ since: tr.since, bars })); } catch (e) {} }
+      if (whole && file) { try { fs.mkdirSync(cacheDir, { recursive: true }); fs.writeFileSync(file, JSON.stringify(bars)); if (part && fs.existsSync(part)) fs.unlinkSync(part); } catch (e) {} }
     }
     out = bars.concat(out); first = d;
   }
