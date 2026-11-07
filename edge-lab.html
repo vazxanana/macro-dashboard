@@ -138,6 +138,7 @@
   .c-study .meta { margin: 2px 0 0; font-size: 12px; color: var(--ink-faint); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
   .c-study .rule { margin: 6px 0 0; font-size: 12.5px; color: var(--ink-dim); display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; overflow-wrap: anywhere; }
   .c-study .rule em { font-style: normal; color: var(--ink-faint); }
+  .c-study .rule.head { color: var(--ink); }
 
   .badge { display: inline-flex; align-items: center; gap: 5px; height: 24px; padding: 0 9px 0 7px; border-radius: 6px; font: 600 11px var(--sans); letter-spacing: .04em; white-space: nowrap; }
   .badge svg { width: 12px; height: 12px; flex: none; }
@@ -310,6 +311,14 @@
     ['ict-filters', 'ICT filters'], ['ict-exits', 'ICT exits'], ['ict-universe', 'ICT universe']
   ];
   var NAMES = {}; KNOWN.forEach(function (k) { NAMES[k[0]] = k[1]; });
+  // later studies (pre-registered, mostly null results); anything not named here is title-cased from its folder
+  var MORE = { 'ict-oos-2008': 'ICT out of sample 2008–17', 'nq-open-oos': 'NQ open run out of sample', 'replica-oos': 'Gold replica out of sample', 'gold-systems-oos': 'Gold systems out of sample',
+    'seasonality': 'Intraday seasonality', 'regime-switch': 'Regime switch', 'portfolio-v2': 'Portfolio v2', 'open-run-breadth': 'Open run on other indices', 'macro-gold': 'Macro gold (real yields)',
+    'ict-breadth': 'ICT on more markets', 'nq-open-exits': 'NQ open run exits', 'ict-sessions': 'ICT sessions', 'sizing': 'Sizing', 'event-risk': 'Event risk', 'ict-smile': 'ICT dollar smile',
+    'ict-trend-side': 'ICT trend side', 'ict-macro': 'ICT macro regime', 'ict-concepts': 'ICT concepts', 'ict-markets': 'ICT markets', 'ict-index-longonly': 'ICT index long-only',
+    'ict-exits-replay': 'ICT exits on the replay', 'crypto-trend-decay': 'Crypto trend decay', 'decay-monitor': 'Decay monitor', 'gold-weekend': 'Gold weekend', 'meridian-swing': 'Meridian swing',
+    'news-filter': 'News filter', 'macro-vol': 'Macro vol', 'param-drift': 'Parameter drift', 'shadow-audit': 'Shadow audit', 'ict-grades': 'ICT grades', 'mosha-oos': 'Mosha BO out of sample', 'gold-fidelity': 'Gold fidelity' };
+  Object.keys(MORE).forEach(function (k) { NAMES[k] = MORE[k]; });
   var REFRESH_MS = 120000;
 
   var $ = function (id) { return document.getElementById(id); };
@@ -325,9 +334,10 @@
   function titleCase(t) { return t.replace(/[-_]+/g, ' ').replace(/^\w/, function (c) { return c.toUpperCase(); }); }
 
   function verdictOf(v) {
+    if (v && typeof v === 'object') v = v.verdict || v.primary || v.label || v.status || v.decision || '';   // {verdict:'FAILS', P1:false}, {primary:'FAIL'}, {label:'NQ-ONLY'}
     var s = String(v || '').trim().toUpperCase();
     if (s.indexOf('PASS') === 0) return 'pass';
-    if (s.indexOf('FAIL') === 0) return 'fail';
+    if (s.indexOf('FAIL') === 0 || s.indexOf('DECAYED') === 0) return 'fail';
     if (s) return 'inc';
     return '';
   }
@@ -360,7 +370,7 @@
   }
 
   // Pick the candidate a reader should see: a declared best, else the strongest passing OOS, else the strongest OOS.
-  function analyse(data) {
+  function analyse(data, rec) {
     var cands = Array.isArray(data.candidates) ? data.candidates.filter(function (c) { return c && typeof c === 'object'; }) : [];
     var best = null;
     if (data.best != null) {
@@ -375,6 +385,9 @@
       best = pool.slice().sort(function (a, b) { return oosExp(b) - oosExp(a); })[0];
     }
     var v = verdictOf(data.verdict);
+    // the published index carries the class read from the author's RESULT.md verdict line: it outranks one noisy formal pass in a candidates table
+    var ix = rec && /^(pass|fail|inc)$/.test(String(rec.verdict || '')) ? rec.verdict : '';
+    if ((!v || v === 'inc') && ix) v = ix;
     if (!v) {
       var vs = cands.map(function (c) { return verdictOf(c.verdict); });
       v = vs.indexOf('pass') >= 0 ? 'pass' : vs.length && vs.every(function (x) { return x === 'fail'; }) ? 'fail' : 'inc';
@@ -435,7 +448,7 @@
         '<div class="waiting">result.json could not be parsed</div>' +
         '<div class="c-rep"><button class="linkbtn" type="button" data-rep="' + esc(topic) + '">Report</button></div></article>';
     }
-    var d = rec.data, a = analyse(d), b = a.best;
+    var d = rec.data, a = analyse(d, rec), b = a.best;
     // baseline is either {is, oos} or several named baselines ({A: {is, oos}, ALL: {is, oos}}): compare with the one the best rule names
     var baseSet = baselines(d.baseline), base = {}, baseKey = '';
     if (baseSet.length === 1) { base = baseSet[0][1]; baseKey = baseSet[0][0]; }
@@ -446,7 +459,8 @@
     }
     var sys = d.system ? esc(d.system) : '';
     var tried = num(d.variantsTried);
-    var meta = [sys, isFinite(tried) ? fmtN(tried) + ' variants tried' : (a.cands.length ? a.cands.length + ' candidates' : '')].filter(Boolean).join(' · ');
+    var meta = [sys, isFinite(tried) ? fmtN(tried) + ' variants tried' : (a.cands.length ? a.cands.length + ' candidates' : ''), rec.built ? 'built ' + esc(rec.built) : ''].filter(Boolean).join(' · ');
+    var headline = rec.headline ? '<p class="rule head" title="' + esc(rec.headline) + '"><em>Verdict:</em> ' + esc(rec.headline) + '</p>' : '';
     var bestStats = b || { is: base.is, oos: base.oos };
     var oosB = bestStats.oos || {}, baseOos = num(base.oos && base.oos.exp), bestOos = num(oosB.exp);
     var delta = b && isFinite(baseOos) && isFinite(bestOos) ? bestOos - baseOos : NaN;
@@ -470,7 +484,7 @@
 
     return '<article class="row" style="--i:' + i + '" data-topic="' + esc(topic) + '">' +
       '<div class="c-study"><h3>' + esc(name) + '</h3>' + (meta ? '<p class="meta" title="' + esc(meta.replace(/<[^>]+>/g, '')) + '">' + meta + '</p>' : '') +
-      (b && b.rule ? '<p class="rule" title="' + esc(b.rule) + '"><em>Best:</em> ' + esc(b.rule) + '</p>' : '') + '</div>' +
+      headline + (b && b.rule ? '<p class="rule" title="' + esc(b.rule) + '"><em>Best:</em> ' + esc(b.rule) + '</p>' : '') + '</div>' +
       '<div class="c-verdict">' + BADGE[a.verdict] + '</div>' +
       '<div class="c-base">' + ioCell(base, 'Baseline IS → OOS') + (baseSet.length > 1 ? '<span class="sub">Baseline ' + esc(baseKey) + ' of ' + baseSet.length + '</span>' : '') + '</div>' +
       '<div class="c-best">' + (b ? ioCell(b, 'Best candidate IS → OOS') + deltaHTML : '<span class="lbl">Best candidate</span><span class="dash">–</span>' + deltaHTML) + '</div>' +
@@ -492,7 +506,7 @@
       groups[g].push(t);
       if (!rec || rec.status === 'missing') counts.run++;
       else if (rec.status === 'error') counts.err++;
-      else counts[analyse(rec.data).verdict]++;
+      else counts[analyse(rec.data, rec).verdict]++;
     });
 
     // remember which candidate lists are open so a refresh does not collapse them
@@ -548,9 +562,9 @@
         var prev = state.studies[e.topic] || {};
         if (!e.result) { state.studies[e.topic] = { status: 'missing', report: e.report, open: prev.open }; return null; }
         return getJSON(BASE + encodeURIComponent(e.topic) + '/result.json').then(function (data) {
-          state.studies[e.topic] = { status: 'ok', data: data && typeof data === 'object' ? data : {}, report: e.report, open: prev.open };
+          state.studies[e.topic] = { status: 'ok', data: data && typeof data === 'object' ? data : {}, report: e.report, open: prev.open, verdict: e.verdict, headline: e.headline, built: e.built };
         }, function (err) {
-          state.studies[e.topic] = { status: err && err.status === 404 ? 'missing' : (err instanceof SyntaxError ? 'error' : (prev.status || 'missing')), data: prev.data, report: e.report, open: prev.open };
+          state.studies[e.topic] = { status: err && err.status === 404 ? 'missing' : (err instanceof SyntaxError ? 'error' : (prev.status || 'missing')), data: prev.data, report: e.report, open: prev.open, verdict: e.verdict, headline: e.headline, built: e.built };
           if (state.studies[e.topic].status === 'ok' && !prev.data) state.studies[e.topic].status = 'missing';
         });
       }));

@@ -2,6 +2,9 @@
 
 **Verdict.**
 
+**Passes the letter of the pre-registered bars, but is not an edge on untouched data:** in the clean 2009-17 half no book
+has t above 1.2 and 6 of 8 lose at double costs; what survives is long-gold beta. Proposal only, no live change.
+
 - **On the letter of the pre-registered bars, the combined book passes.** All 8 walk-forward books (4 schemes × 2 universes)
   have a monthly t of 3.0 to 4.5 over 2009-26, both halves positive, and a positive x2-cost total (Q2). None is "mostly beta"
   (Q3). Inverse volatility (IV) and minimum correlation (MC) beat equal risk (EQ) in both halves on the All universe (Q1).

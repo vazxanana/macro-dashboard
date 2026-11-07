@@ -16,6 +16,10 @@ cuts) and frozen; everything was judged on the second half. 7 systems x 3 indica
 
 ## Verdict
 
+**FAIL as a tradable regime switch.** Two of 21 cells pass the letter of the bar (META on the NQ open run and the gold
+replica), but neither is dependable (each rests on 3-4 yearly calls, unstable before 2015, never called the turn that
+mattered) and nothing gates a live rule. Proposal only: tag NQ open paper trades with trend strength and META.
+
 **By the pre-registered letter: YES, for two of 21 cells.** META passes and survives the Bonferroni bar (t >= 2.83) for the
 **NQ New York open run** (second-half t 3.08) and the **gold replica** (t 3.01). TREND passes nominally for the same two
 systems (t 2.73 and 2.12). **Nothing works for the ICT A-setups or for any of the four gold daily systems.**
