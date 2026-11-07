@@ -255,3 +255,29 @@ On A-setups with the stop floor (§20), cash NQ/ES/YM 2023-24 | 2025-26 and NQ f
 
 - Adopted: the half-size A+ version. It is the only one positive in all four, best total at a moderate drawdown, and 2026 rises from +9 to +30R.
 - Code: `RISK_TIGHT = 0.15`, `TIGHT_SIZE = 0.5`, `sizeOf()` in ict/tracker.mjs. Records carry `size`; R is stored × size (`Rraw` = per unit), so every desk total counts them at half weight. The desk shows a "½ size" pill.
+
+## 26. Gold futures (GC), EUR/USD and GBP/USD (7 Nov 2026) — each market its own A-setup rule
+Owner: add GC, EURUSD and GBPUSD. The tracker's own signals() run over HistData 1m 2018 → Oct 2026 (FX in EST → UTC; spot gold for GC).
+Every signal independent, live exit (trail 1.5R from +2R, 36 H1 hold). Costs: gold 0.30, EUR/USD 0.6 pip, GBP/USD 0.9 pip.
+Windows: 2019-22 | 2023-24 | 2025-26.
+- **The index A-setup does not carry over.**
+  - Gold A-setups: −5.3 | −3.3 | −9.4R.
+  - EUR/USD: −13.1 | +7.4 | −5.7R.
+  - GBP/USD: −4.0 | +23.2 | −0.5R.
+- **Gold:** signals WITH the daily bias win (+9.2 | +36.4 | +37.8R), like the first gold test (§12).
+  - About 1,000 single filters and filter pairs/triples were scanned; only simple ones that held every year were kept.
+  - **Gold A-setup = buys only, stop 0.3-0.75x the daily ATR**: +56.7R dd 10.8 | +36.0R dd 8.3 | +32.8R dd 8.1.
+  - Positive every year: 2019 +21.9, 2020 +15.8, 2021 +7.2, 2022 +11.8, 2023 +23.1, 2024 +13.0, 2025 +32.7, 2026 +0.1 (44 signals).
+  - The same tight-stop lesson as the indices.
+- **EUR/USD:** London-session signals only: +28.6R | +11.7R | +14.9R, 7 of 8 years positive (2020 −4.6R), about +0.09R a trade.
+  - London + fast inversion looked best in the scan but flips by year; rejected.
+- **GBP/USD:**
+  - London only loses in 4 of 8 years.
+  - Against bias + grade >= 8 + previous-day sweep (turtle soup) is positive in 6 of 8 years (2022 −11.3, 2025 −5.1) and fails on EUR/USD.
+  - No A-setups: GBP/USD is tracked and shows under All signals only.
+- **No A+ tier on gold and FX:** strong-body / grade filters made both worse (gold A + body/not-PM +8.5 | +11.0 | +13.4R; EUR/USD −8.6 | +9.5 | −3.2R).
+- **MMXM fit:** London is the FX kill zone (MMXM: London open model); gold's secular up-drift makes buys the side to trade (IOF bullish, §3).
+- **Code:** MARKETS gc (@GC.1 / GC=F), eurusd (EUR= / EURUSD=X), gbpusd (GBP= / GBPUSD=X), each with `aRule` (gold / london / none); `isASetup(g, mk)`, `isAPlus(g, mk)`, `sizeOf(g, mk)`.
+  - Desk clusters stay index-only.
+  - The replay has CNBC history only for these (no cash fill).
+- **Caveat:** spot gold and HistData FX stand in for the futures/broker feed; the forward sample decides.

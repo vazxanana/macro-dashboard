@@ -947,7 +947,7 @@
   .ict-head { display: flex; justify-content: space-between; align-items: flex-end; gap: 12px; flex-wrap: wrap; }
   .ict-me { font: 500 12.5px var(--sans); color: var(--ink-dim); }
   .ict-me b { color: var(--gold); font-weight: 600; }
-  .ict-mkts { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; }
+  .ict-mkts { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 10px; }
   .ict-m { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 12px 14px; display: grid; gap: 3px; min-width: 0; }
   .ict-m .k { display: flex; justify-content: space-between; align-items: baseline; gap: 6px; font: 600 13px var(--sans); }
   .ict-m .k small { font: 500 11px var(--sans); color: var(--ink-faint); }
@@ -1009,7 +1009,7 @@
   .ict-tags { display: flex; gap: 6px; flex-wrap: wrap; }
   .ict-tags button { font: 500 11.5px var(--sans); padding: 3px 9px; border-radius: 999px; border: 1px solid var(--line); background: none; color: var(--ink-dim); cursor: pointer; }
   .ict-tags button.on { border-color: var(--gold-line); color: var(--gold); background: var(--gold-soft); }
-  @media (max-width: 1000px) { .ict-mkts { grid-template-columns: repeat(2, minmax(0, 1fr)); } .ict-kpi { grid-template-columns: repeat(3, minmax(0, 1fr)); } .ict-grid, .ict-break, .ict-rv { grid-template-columns: minmax(0, 1fr); } }
+  @media (max-width: 1000px) { .ict-mkts { grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); } .ict-kpi { grid-template-columns: repeat(3, minmax(0, 1fr)); } .ict-grid, .ict-break, .ict-rv { grid-template-columns: minmax(0, 1fr); } }
   @media (max-width: 520px) { .ict-kpi { grid-template-columns: repeat(2, minmax(0, 1fr)); } .ict-mine-k { grid-template-columns: repeat(2, minmax(0, 1fr)); } .ict-m .px { font-size: 17px; } }
   .ict-tv > .ict-tv-c, .ict-tv > p, .ict-tv > form { margin: 10px 16px; } .ict-tv > form { margin-bottom: 16px; }
   .ict-clock { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; font: 500 12.5px var(--sans); color: var(--ink-dim); }
@@ -2105,7 +2105,7 @@ html[data-role="viewer"] .j-empty-go { display: none; }
     <div class="card ict-card">
       <div class="ms-k"><span>Signals</span>
         <span class="ict-f" id="ict-f" role="group" aria-label="Filter signals">
-          <select id="ict-f-m" aria-label="Market"><option value="">All markets</option><option value="nq">NQ</option><option value="es">ES</option><option value="ym">YM</option><option value="rty">RTY</option></select>
+          <select id="ict-f-m" aria-label="Market"><option value="">All markets</option><option value="nq">NQ</option><option value="es">ES</option><option value="ym">YM</option><option value="rty">RTY</option><option value="gc">Gold (GC)</option><option value="eurusd">EUR/USD</option><option value="gbpusd">GBP/USD</option></select>
           <select id="ict-f-s" aria-label="Status"><option value="">All</option><option value="open">Open</option><option value="closed">Closed</option><option value="todo">Not reviewed</option><option value="taken" class="ict-rw">Taken by me</option></select>
         </span></div>
       <div class="ms-j-wrap t-scroll ict-tw"><table class="ms-j ict-t"><thead><tr><th>Signal</th><th>Market</th><th>Side</th><th>Grade</th><th>Session</th><th>Bias</th><th>Zone</th><th class="n">Entry</th><th class="n">Stop</th><th class="n">Target</th><th>Result</th><th>Review</th></tr></thead><tbody id="ict-body"><tr class="empty"><td colspan="12">Loading…</td></tr></tbody></table></div>
@@ -2132,6 +2132,7 @@ html[data-role="viewer"] .j-empty-go { display: none; }
         <li><b>Stop floor</b> (7 Nov, part of A-setups): the stop must be at least 0.3x the daily ATR. Tight stops on H1 sweeps get hunted. Over 2023-26 on NQ, S&amp;P and Dow it turned every year positive (+20R, +26R, +1R, +17R) and roughly halved the worst drawdown; on NQ futures 2023-25 more profit and less drawdown in every year.</li>
         <li><b>Stop band</b> (7 Nov): the stop must also be under 0.75x the daily ATR. A stop wider than that is a late, stretched entry. On 2023-26 cash data, more profit and less drawdown in both halves (+37.7R / +48.6R, drawdown 7.6 / 10.8 vs 10.1 / 11.7). NQ futures: lower drawdown in every year.</li>
         <li><b>Jobs-report mornings</b> (7 Nov): signals on the first Friday of the month before 10:00 New York are not A-setups. The 08:30 release candle sweeps on news. More profit and no more drawdown in both halves; FOMC days stay in (they held big winners).</li>
+        <li><b>Gold and FX</b> (7 Nov): gold futures (GC), EUR/USD and GBP/USD are tracked too, each with its own A-setup rule, because the index rule does not carry over. Gold: buys only, stop 0.3-0.75x the daily ATR (spot gold, positive every year 2019-2026). EUR/USD: London-session signals only (7 of 8 years positive). GBP/USD: no rule held, so it shows under All signals only. No A+ tier on these three.</li>
         <li><b>Tight stops at half size</b> (7 Nov): a stop of 0.15-0.3x the daily ATR is still an A-setup when the inversion candle is strong (body 60%+) and it is not the New York afternoon, but at half size (marked ½ size). Positive in all four test sets; brings back most of this year's tight-stop winners the floor had removed.</li>
         <li><b>A+</b>: an A-setup whose inversion candle has a strong body (at least 60% of its range) and that does not fire in the NY afternoon (12-16 ET). Research 6 Nov with the trailing exit: NQ 2023 +17.1R vs +9.5R for all A-setups, 2024 +12.2R vs +9.6R, 2025 +3.1R vs +0.6R, 2026 replay +66.1R vs +67.3R with fewer trades, and a smaller worst drawdown in all four.</li>
         <li><b>One per cluster</b>: the four indices often give the same setup within hours, which is one bet, not four. This view keeps only the highest-grade index of each cluster (★). 2026 replay: 154 A-setups in 120 clusters; one per cluster +53R with a 8.9R worst drawdown vs every trade +67R with 12.9R.</li>
@@ -5144,7 +5145,7 @@ function msNextSetup(bars, A) {
   const $ = (id) => document.getElementById(id);
   const esc = (s) => String(s == null ? '' : s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
   const who = window.MS_WHO === 'owner' ? 'Owner' : window.MS_WHO || 'Guest';
-  const DEC = { nq: 2, es: 2, ym: 0, rty: 1 };
+  const DEC = { nq: 2, es: 2, ym: 0, rty: 1, gc: 1, eurusd: 5, gbpusd: 5 };
   const fx = (v, k) => (v == null || !isFinite(v) ? '—' : (+v).toLocaleString('en-US', { minimumFractionDigits: DEC[k] ?? 2, maximumFractionDigits: DEC[k] ?? 2 }));
   const fR = (r) => (r == null ? '—' : `${r > 0 ? '+' : r < 0 ? '−' : ''}${Math.abs(r).toFixed(2)}R`);
   const cls = (r) => (r > 0 ? 'pos' : r < 0 ? 'neg' : '');
@@ -5163,7 +5164,8 @@ function msNextSetup(bars, A) {
   const PICK = new Map();
   function markClusters(L) {
     PICK.clear(); const A = L.filter(isA).sort((a, b) => a.signalAt - b.signalAt), cl = [];
-    for (const x of A) { const c = cl[cl.length - 1]; if (c && c[0].side === x.side && x.signalAt - c[0].signalAt <= 3 * 3600 && !c.some((y) => y.market === x.market)) c.push(x); else cl.push([x]); }
+    const IDX = new Set(['nq', 'es', 'ym', 'rty']);   // clusters are the four indices only; gold and FX are their own bets (skill §26)
+    for (const x of A) { const c = cl[cl.length - 1]; if (c && IDX.has(x.market) && IDX.has(c[0].market) && c[0].side === x.side && x.signalAt - c[0].signalAt <= 3 * 3600 && !c.some((y) => y.market === x.market)) c.push(x); else cl.push([x]); }
     for (const c of cl) { const best = c.slice().sort((a, b) => (b.grade.total - a.grade.total) || ((b.feat.body || 0) - (a.feat.body || 0)) || (a.signalAt - b.signalAt))[0]; for (const x of c) PICK.set(x.id, { pick: x === best, n: c.length }); }
   }
   const all = () => { const L = S.src === 'live' ? S.trades : S.src === 'replay' ? S.replay : S.trades.concat(S.replay); markClusters(L);
@@ -5194,7 +5196,7 @@ function msNextSetup(bars, A) {
     $('ict-run').textContent = snap ? `Tracker checked ${ago(Date.parse(snap.at) / 1000)}${Object.keys(snap.errors || {}).length ? ` · feed issue: ${Object.keys(snap.errors).join(', ').toUpperCase()}` : ''}.${S.replayInfo ? ` Replay since ${S.replayInfo.from}: ${S.replay.length} signals.` : ''}` : 'Waiting for the first tracker run.';
     // markets
     const mk = snap ? snap.markets : {};
-    $('ict-mkts').innerHTML = ['nq', 'es', 'ym', 'rty'].map((k) => { const m = mk[k], o = O.find((x) => x.market === k);
+    $('ict-mkts').innerHTML = ['nq', 'es', 'ym', 'rty', 'gc', 'eurusd', 'gbpusd'].map((k) => { const m = mk[k], o = O.find((x) => x.market === k);
       return `<div class="ict-m${o ? ' live' : ''}" role="listitem"><div class="k">${m ? esc(m.short) : k.toUpperCase()} <small>${m ? esc(m.label) : ''}</small></div><div class="px">${m ? fx(m.price, k) : '—'}</div>`
         + `<div class="sub">${o ? `<b class="${o.side === 'buy' ? 'pos' : 'neg'}">${o.side.toUpperCase()}</b> open · ${fR(liveR(o))}` : m && m.lastSignal ? `Last ${m.lastSignal.side} ${m.lastSignal.grade} · ${ago(m.lastSignal.at)}` : 'No signal yet'}</div>`
         + `<div class="sub">PDH ${m ? fx(m.pdh, k) : '—'} · PDL ${m ? fx(m.pdl, k) : '—'}</div></div>`; }).join('');

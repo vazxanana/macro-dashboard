@@ -130,7 +130,7 @@ failed the council's own 2023-26 test (council-data research/log.md, 6 Nov), so 
 ICT is its own edge and approach: never mix it into the council systems, their rules, filters or reports.
 Rules and research live in `.claude/skills/ICT/SKILL.md` (results also in council-data `research/ict/`).
 - Tracker: `ict/tracker.mjs`, workflow `.github/workflows/ict.yml` (every 15 min), data in council-data `ict/`
-  (`trades.json`, `snapshot.json`, `bars.json`). Markets: NQ, ES, YM, RTY futures from CNBC (Yahoo fallback). Model: H1 iFVG
+  (`trades.json`, `snapshot.json`, `bars.json`). Markets: NQ, ES, YM, RTY futures, gold futures (GC), EUR/USD and GBP/USD from CNBC (Yahoo fallback). Model: H1 iFVG
   reversal (swing swept → body closes through the leg's FVG within 6 H1 candles; stop 2 ticks beyond the sweep;
   no fixed target: from +2R the stop trails 1.5R behind the best price (skill §15; before 6 Nov: 3R target); fixed-2R
   result recorded as `R2`; out after 36 closed H1 candles, skill §21; 48 h before 7 Nov). Every signal records ICT features (`feat`) and a /10 grade.
@@ -148,6 +148,9 @@ Rules and research live in `.claude/skills/ICT/SKILL.md` (results also in counci
   + (skill §25) a tight stop 0.15-0.3x ATR also counts when it has A+ quality (body >= 0.6, not NY PM), at half size
   (`RISK_TIGHT`, `sizeOf`; records carry `size`, R stored x size, `Rraw` per unit; desk pill "½ size")
   (`feat.atrR`, `RISK_FLOOR`, `RISK_CAP`, `isASetup`; records carry `aset`).
+- Gold futures and FX (skill §26, 7 Nov): MARKETS also has `gc` (@GC.1), `eurusd` (EUR=), `gbpusd` (GBP=), each with its own
+  `aRule`: gold = buys with a 0.3-0.75x ATR stop; EUR/USD = London-session signals; GBP/USD = none (tracked only). The index rule
+  applies to nq/es/ym/rty only (`isASetup(g, mk)`); no A+ tier for these three; desk clusters stay index-only.
   The desk defaults to A-setups (switch `ictFlt`: A-setups / All signals / One per cluster — the highest-grade index of
   same-side A-setups within 3 h, skill §16, computed on the page); every signal is still tracked.
 - A+ tier (skill §17): A-setup + inversion body >= 60% of range + not NY PM (`isAPlus`, records carry `aplus`); desk
