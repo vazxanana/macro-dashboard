@@ -11,6 +11,7 @@ import { alertable, alertEvents, sendAlerts, when, NTFY_DEFAULT, proposalDigest 
 import { liveRuleSection, injectSection } from './analyst.mjs';
 import { coachProposals } from './proposals.mjs';
 import { cleanBars, LTF_CLEAN } from './clean.mjs';
+import { voidRoundedReplicas, historyCatchUp } from './repairs.mjs';
 
 const DIR = process.argv[2] || 'data';
 fs.mkdirSync(DIR, { recursive: true });
@@ -339,6 +340,8 @@ function dailyCycle(src, price, t) {
   return { sell: bear, entry: price, stop, t1: price + (bull ? 3 : -3) * r, closeBy: t + 8 * 3600, day: d, londonHigh: hi, londonLow: lo };
 }
 let research = rd('research.json', []);
+// One-time data repairs (7 Nov, council/repairs.mjs): void the 4 Nov rounded-price replica signals; history catch-up lines
+voidRoundedReplicas(research, config, nowISO); historyCatchUp(config, nowISO);
 // ─── Research setup (paper only): the trader's gold replica (3 Nov) ───
 // Rebuilt from the four marked gold trades of 2-3 Nov: a leg of at least 2 M15 ATRs in the last 3 h or 6 h; M5 (1-candle
 // swings) closes back through the last swing against the leg (the CHoCH) = the signal. Limit entry at the 30% retest from
@@ -522,7 +525,7 @@ for (const [key, M] of Object.entries(MARKETS)) {
     }
 
     // ─── Research (paper only, research.json): manage open Daily Cycle trades, then look for today's signal ───
-    for (const r of research.filter((x) => x.market === key && x.k === 'replica' && (x.status === 'pending' || x.status === 'open'))) {
+    for (const r of research.filter((x) => x.market === key && x.k === 'replica' && !x.void && (x.status === 'pending' || x.status === 'open'))) {
       const bars = (src['1m'].bars[0].time <= r.checked ? src['1m'] : src['5m'].bars[0].time <= r.checked ? src['5m'] : src['15m']).bars;
       const s = r.side === 'sell', r0 = Math.abs(r.entry - r.stop);
       for (const b of bars) {
@@ -1783,9 +1786,9 @@ try {
     }
   }
 } catch (e) { snapshot.errors.goldNyrun = String(e.message || e); }
-{ const done = research.filter((x) => x.k === 'cycle' && (x.status === 'win' || x.status === 'loss' || x.status === 'be')), R = done.reduce((a, x) => a + x.R, 0);
+{ const done = research.filter((x) => x.k === 'cycle' && !x.void && (x.status === 'win' || x.status === 'loss' || x.status === 'be')), R = done.reduce((a, x) => a + x.R, 0);
   snapshot.research = { cycle: { closed: done.length, wins: done.filter((x) => x.status === 'win').length, R: +R.toFixed(2), open: research.filter((x) => x.k === 'cycle' && x.status === 'open').length } };
-  const rp = research.filter((x) => x.k === 'replica'), sum = (a) => { const d = a.filter((x) => x.status === 'win' || x.status === 'loss' || x.status === 'be');
+  const rp = research.filter((x) => x.k === 'replica' && !x.void), sum = (a) => { a = a.filter((x) => !x.void); const d = a.filter((x) => x.status === 'win' || x.status === 'loss' || x.status === 'be');
     return { signals: a.length, closed: d.length, wins: d.filter((x) => x.status === 'win').length, R: +d.reduce((s, x) => s + x.R, 0).toFixed(2), open: a.filter((x) => x.status === 'open').length, pending: a.filter((x) => x.status === 'pending').length }; };
   const rpx = rp.filter((x) => x.market === 'xau');
   snapshot.research.replica = { all: sum(rpx), pass: sum(rpx.filter((x) => x.pass && x.v >= 2)), v5: sum(rpx.filter((x) => x.v5)), star: sum(rpx.filter((x) => x.star)) };
