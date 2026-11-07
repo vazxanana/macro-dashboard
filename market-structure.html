@@ -3842,6 +3842,46 @@ function msNextSetup(bars, A) {
     }
   }
 
+  // chart layers (Settings → Chart layers): tick volume, session shading, EMAs 21 / 50 / 200 and the daily VWAP, shared by the
+  // panes and the Split screen's free chart; src() = { tf, raw (feed candles: UTC times, feed prices), bars (drawn candles:
+  // TZ-shifted times, offset prices), off (that price offset), crypto (no session shading) }
+  function chartLayers(chart, src) {
+    const L = {};
+    // tick-volume histogram along the bottom (OANDA counts price changes per candle; exchange feeds without volume show nothing)
+    const vol = L.vol = chart.addHistogramSeries({ priceScaleId: 'vol', priceFormat: { type: 'volume' }, lastValueVisible: false, priceLineVisible: false });
+    chart.priceScale('vol').applyOptions({ scaleMargins: { top: 0.84, bottom: 0 }, visible: false });
+    const vcol = L.vcol = (b) => G.theme === 'light' ? (b.close >= b.open ? 'rgba(19,23,34,.12)' : 'rgba(19,23,34,.28)') : b.close >= b.open ? 'rgba(8,153,129,.26)' : 'rgba(242,54,69,.26)';
+    L.setVol = function () { const raw = src().raw, on = raw && raw.some((b) => b.volume > 0) && G.showVol !== false; vol.setData(on ? raw.map((b) => ({ time: b.time + TZ, value: b.volume || 0, color: vcol(b) })) : []); };
+    // session shading (7 Nov loop): faint Asia / London / New York background bands on M15, M5 and M1 (UTC 00-07 / 07-13 / 13-21)
+    const sessOn = (s) => ['15m', '5m', '1m'].includes(s.tf.id) && G.showShade !== false && !s.crypto;
+    const sessCol = (t) => { const h = new Date((t - TZ) * 1000).getUTCHours(); return h < 7 ? 'rgba(38,166,154,.10)' : h < 13 ? 'rgba(41,98,255,.10)' : h < 21 ? 'rgba(156,39,176,.09)' : null; };
+    L.setShade = function () { const s = src(); if (!sessOn(s) || !s.bars || !s.bars.length) { if (L.shade) L.shade.setData([]); return; }
+      if (!L.shade) { L.shade = chart.addHistogramSeries({ priceScaleId: 'sess', priceLineVisible: false, lastValueVisible: false, base: 0 }); chart.priceScale('sess').applyOptions({ scaleMargins: { top: 0, bottom: 0 }, visible: false }); }
+      L.shade.setData(s.bars.map((b) => { const c = sessCol(b.time); return c ? { time: b.time, value: 1, color: c } : { time: b.time }; })); };
+    L.tickShade = function (b) { if (!L.shade || !sessOn(src())) return; const c = sessCol(b.time); try { L.shade.update(c ? { time: b.time, value: 1, color: c } : { time: b.time }); } catch (e) {} };
+    // EMAs 21 / 50 / 200 (7 Nov loop): thin lines, off by default (Settings → Chart layers → EMAs)
+    const EMA = [[21, 'rgba(41,98,255,.75)'], [50, 'rgba(224,165,38,.75)'], [200, 'rgba(156,39,176,.7)']].map(([n, c]) => ({ n, s: chart.addLineSeries({ color: c, lineWidth: 1, priceLineVisible: false, lastValueVisible: false, crosshairMarkerVisible: false }), last: null }));
+    L.setEma = function () {
+      const B = src().bars, on = G.showEma === true && B && B.length;
+      EMA.forEach((e) => { if (!on) { e.s.setData([]); e.last = null; return; } const k = 2 / (e.n + 1); let v = null; const out = [];
+        B.forEach((b, i) => { v = v == null ? b.close : b.close * k + v * (1 - k); if (i >= Math.min(e.n, B.length - 1) - 1) out.push({ time: b.time, value: v }); });
+        e.s.setData(out); e.prev = out.length > 1 ? out[out.length - 2].value : null; e.lastT = out.length ? out[out.length - 1].time : null; });
+    };
+    L.tickEma = function (b) { if (G.showEma !== true) return; EMA.forEach((e) => { if (e.prev == null) return; const k = 2 / (e.n + 1);
+      if (b.time !== e.lastT) { const d = e.s.data(); e.prev = d.length ? d[d.length - 1].value : e.prev; e.lastT = b.time; }
+      try { e.s.update({ time: b.time, value: b.close * k + e.prev * (1 - k) }); } catch (err) {} }); };
+    // daily VWAP (7 Nov loop): resets at 00:00 UTC on intraday charts; volume-weighted (tick volume), equal-weight when a feed has none
+    L.setVwap = function () { const s = src(), raw = s.raw; if (G.showVwap !== true || s.tf.sec >= 86400 || !raw || !raw.length) { if (L.vwapS) L.vwapS.setData([]); return; }
+      if (!L.vwapS) L.vwapS = chart.addLineSeries({ color: 'rgba(0,188,212,.9)', lineWidth: 1.5, lineStyle: LW.LineStyle.Solid, priceLineVisible: false, lastValueVisible: true, crosshairMarkerVisible: false, title: 'VWAP' });
+      const off = s.off, hasV = raw.some((b) => b.volume > 0), out = []; let day = null, pv = 0, vv = 0;
+      raw.forEach((b) => { const d = Math.floor(b.time / 86400); let gap = false; if (d !== day) { gap = day !== null; day = d; pv = 0; vv = 0; } const w = hasV ? (b.volume || 0) : 1; pv += (b.high + b.low + b.close) / 3 * w; vv += w;
+        if (gap && out.length) out[out.length - 1].color = 'rgba(0,0,0,0)';   // a transparent segment hides the jump at each daily reset
+        if (vv > 0) out.push({ time: b.time + TZ, value: pv / vv + off }); });
+      try { L.vwapS.setData(out); } catch (e) {} };
+    L.setAll = function () { L.setVol(); L.setEma(); L.setShade(); L.setVwap(); };
+    return L;
+  }
+
   // ─── One chart pane per timeframe ───
   const panes = {};
   function makePane(tf) {
@@ -3918,11 +3958,9 @@ function msNextSetup(bars, A) {
       return r;
     } });
 
-    // tick-volume histogram along the bottom (OANDA counts price changes per candle; exchange feeds without volume show nothing)
-    const vol = chart.addHistogramSeries({ priceScaleId: 'vol', priceFormat: { type: 'volume' }, lastValueVisible: false, priceLineVisible: false });
-    chart.priceScale('vol').applyOptions({ scaleMargins: { top: 0.84, bottom: 0 }, visible: false });
-    const vcol = (b) => G.theme === 'light' ? (b.close >= b.open ? 'rgba(19,23,34,.12)' : 'rgba(19,23,34,.28)') : b.close >= b.open ? 'rgba(8,153,129,.26)' : 'rgba(242,54,69,.26)';
-    P.vol = vol;
+    // volume, session shading, EMAs and VWAP (chartLayers, shared with the Split screen's free chart)
+    const LY = chartLayers(chart, () => ({ tf, raw: P.raw, bars: P.bars, off: G.offset, crypto: CUR.group === 'Crypto' })), vol = LY.vol, vcol = LY.vcol;
+    P.vol = vol; P.setVol = LY.setVol; P.setShade = LY.setShade; P.tickShade = LY.tickShade; P.setEma = LY.setEma; P.tickEma = LY.tickEma; P.setVwap = LY.setVwap;
     // compare overlay (7 Nov loop): another market rebased onto this chart (same % path from the first visible-history candle)
     const cmp = chart.addLineSeries({ color: 'rgba(224,165,38,.85)', lineWidth: 1.5, priceLineVisible: false, lastValueVisible: true, crosshairMarkerVisible: false, title: '' });
     P.setCmp = function (rows, label) {
@@ -3932,37 +3970,10 @@ function msNextSetup(bars, A) {
       cmp.setData(P.bars.filter((b) => byT.has(b.time) && b.time >= first.time).map((b) => ({ time: b.time, value: byT.get(b.time) * k })));
       cmp.applyOptions({ title: label });
     };
-    // session shading (7 Nov loop): faint Asia / London / New York background bands on M15, M5 and M1 (UTC 00-07 / 07-13 / 13-21)
-    const shade = ['15m', '5m', '1m'].includes(tf.id) ? chart.addHistogramSeries({ priceScaleId: 'sess', priceLineVisible: false, lastValueVisible: false, base: 0 }) : null;
-    if (shade) chart.priceScale('sess').applyOptions({ scaleMargins: { top: 0, bottom: 0 }, visible: false });
-    const sessCol = (t) => { const h = new Date((t - TZ) * 1000).getUTCHours(); return h < 7 ? 'rgba(38,166,154,.10)' : h < 13 ? 'rgba(41,98,255,.10)' : h < 21 ? 'rgba(156,39,176,.09)' : null; };
-    P.setShade = function () { if (!shade) return; const on = G.showShade !== false && P.bars && P.bars.length && !(CUR.group === 'Crypto');
-      shade.setData(on ? P.bars.map((b) => { const c = sessCol(b.time); return c ? { time: b.time, value: 1, color: c } : { time: b.time }; }) : []); };
-    P.tickShade = function (b) { if (!shade || G.showShade === false || CUR.group === 'Crypto') return; const c = sessCol(b.time); try { shade.update(c ? { time: b.time, value: 1, color: c } : { time: b.time }); } catch (e) {} };
-    // EMAs 21 / 50 / 200 (7 Nov loop): thin lines, off by default (Settings → Chart layers → EMAs)
-    const EMA = [[21, 'rgba(41,98,255,.75)'], [50, 'rgba(224,165,38,.75)'], [200, 'rgba(156,39,176,.7)']].map(([n, c]) => ({ n, s: chart.addLineSeries({ color: c, lineWidth: 1, priceLineVisible: false, lastValueVisible: false, crosshairMarkerVisible: false }), last: null }));
-    P.setEma = function () {
-      const on = G.showEma === true && P.bars && P.bars.length;
-      EMA.forEach((e) => { if (!on) { e.s.setData([]); e.last = null; return; } const k = 2 / (e.n + 1); let v = null; const out = [];
-        P.bars.forEach((b, i) => { v = v == null ? b.close : b.close * k + v * (1 - k); if (i >= Math.min(e.n, P.bars.length - 1) - 1) out.push({ time: b.time, value: v }); });
-        e.s.setData(out); e.prev = out.length > 1 ? out[out.length - 2].value : null; e.lastT = out.length ? out[out.length - 1].time : null; });
-    };
-    P.tickEma = function (b) { if (G.showEma !== true) return; EMA.forEach((e) => { if (e.prev == null) return; const k = 2 / (e.n + 1);
-      if (b.time !== e.lastT) { const d = e.s.data(); e.prev = d.length ? d[d.length - 1].value : e.prev; e.lastT = b.time; }
-      try { e.s.update({ time: b.time, value: b.close * k + e.prev * (1 - k) }); } catch (err) {} }); };
-    // daily VWAP (7 Nov loop): resets at 00:00 UTC on intraday charts; volume-weighted (tick volume), equal-weight when a feed has none
-    const vwapS = tf.sec < 86400 ? chart.addLineSeries({ color: 'rgba(0,188,212,.9)', lineWidth: 1.5, lineStyle: LW.LineStyle.Solid, priceLineVisible: false, lastValueVisible: true, crosshairMarkerVisible: false, title: 'VWAP' }) : null;
     // indicators (7 Nov, owner: "each user allowed to put up to 10 TradingView indicators"): our own versions of the common
     // TradingView studies, computed on the candles; overlays share the price scale, oscillators get stacked bands under the price
     P._ind = [];
     P.setInd = function () { P._ind.forEach((s2) => { try { chart.removeSeries(s2); } catch (e) {} }); P._ind = []; if (P.rp) { indDraw(chart, null, P._ind); return; } indDraw(chart, P.bars, P._ind); };
-    P.setVwap = function () { if (!vwapS) return; if (G.showVwap !== true || !P.raw || !P.raw.length) { vwapS.setData([]); return; }
-      const off = G.offset, hasV = P.raw.some((b) => b.volume > 0), out = []; let day = null, pv = 0, vv = 0;
-      P.raw.forEach((b) => { const d = Math.floor(b.time / 86400); let gap = false; if (d !== day) { gap = day !== null; day = d; pv = 0; vv = 0; } const w = hasV ? (b.volume || 0) : 1; pv += (b.high + b.low + b.close) / 3 * w; vv += w;
-        if (gap && out.length) out[out.length - 1].color = 'rgba(0,0,0,0)';   // a transparent segment hides the jump at each daily reset
-        if (vv > 0) out.push({ time: b.time + TZ, value: pv / vv + off }); });
-      try { vwapS.setData(out); } catch (e) {} };
-    P.setVol = function () { const on = P.raw && P.raw.some((b) => b.volume > 0) && G.showVol !== false; vol.setData(on ? P.raw.map((b) => ({ time: b.time + TZ, value: b.volume || 0, color: vcol(b) })) : []); };
     // chart snapshot (7 Nov loop): the chart as a PNG with a title strip (market, timeframe, price, time) for sharing or a journal
     P.snapshot = async function () {
       try {
@@ -4101,7 +4112,7 @@ function msNextSetup(bars, A) {
       const step = (d) => { if (!P.rp) return; P.rp.i = Math.max(20, Math.min(P.bars.length, P.rp.i + d)); show(); if (P.rp.i >= P.bars.length) stop(); };
       const stop = () => { clearInterval(timer); timer = null; bar.querySelector('[data-rp="play"]').textContent = '▶'; };
       // the structure drawings are worked out from all candles, so they are hidden while replaying (they would show the future)
-      P.replay = (on) => { if (on && P.bars && P.bars.length > 40) { P.rp = { i: Math.max(20, P.bars.length - 120) }; bar.hidden = false; try { series.detachPrimitive(overlay); } catch (e) {} try { series.setMarkers([]); } catch (e) {} (P.priceLines || []).concat(P._ct || []).forEach((l) => { try { l.applyOptions({ lineVisible: false, axisLabelVisible: false, title: '' }); } catch (e) {} }); try { if (vwapS) vwapS.setData([]); } catch (e) {} if (P.drawTl) P.drawTl(); el.classList.add('replaying'); show(); chart.timeScale().scrollToRealTime(); }
+      P.replay = (on) => { if (on && P.bars && P.bars.length > 40) { P.rp = { i: Math.max(20, P.bars.length - 120) }; bar.hidden = false; try { series.detachPrimitive(overlay); } catch (e) {} try { series.setMarkers([]); } catch (e) {} (P.priceLines || []).concat(P._ct || []).forEach((l) => { try { l.applyOptions({ lineVisible: false, axisLabelVisible: false, title: '' }); } catch (e) {} }); try { if (LY.vwapS) LY.vwapS.setData([]); } catch (e) {} if (P.drawTl) P.drawTl(); el.classList.add('replaying'); show(); chart.timeScale().scrollToRealTime(); }
         else { stop(); P.rp = null; bar.hidden = true; el.classList.remove('replaying'); try { series.attachPrimitive(overlay); } catch (e) {} P._mkSig = null; P._ctSig = null; P.rebuild(true); } };
       bar.addEventListener('click', (ev) => { const b = ev.target.closest('[data-rp]'); if (!b) return; const a = b.dataset.rp;
         if (a === 'x') { P.replay(false); const t = el.closest('.ms-pane') && el.closest('.ms-pane').querySelector('.ch-rp'); if (t) { t.classList.remove('on'); t.setAttribute('aria-pressed', 'false'); } }
@@ -4354,12 +4365,17 @@ function msNextSetup(bars, A) {
   }
   setTimeout(mtfStrip, 3500); setInterval(mtfStrip, 10e3);
   document.addEventListener('click', (ev) => { const b = ev.target.closest && ev.target.closest('[data-tfgo]'); if (!b) return; const v = document.querySelector(`[data-view="${b.dataset.tfgo}"]`); if (v) v.click(); });
+  // the charts that carry this market's council trades: the panes of these timeframes, plus the Split screen's free chart when it
+  // shows this market on one of them
+  const ctTargets = (ids) => ids.map((id) => [id, panes[id]]).concat(window.msSplitCT ? window.msSplitCT(ids) : []);
+  // chart layer toggles (volume, sessions, EMAs, VWAP): every pane and the Split screen's free chart
+  const lyAll = (f) => { Object.values(panes).forEach((P) => P[f] && P[f]()); if (window.msSplitLayers) window.msSplitLayers(); };
   // council trades on the live charts (7 Nov loop): this market's open / pending council trades as entry, stop and target lines
   function councilLines() {
     let T = []; try { T = (COUNCIL.trades || []).filter((x) => x.market === instKey && !x.shadow && (x.status === 'open' || x.status === 'pending') && isFinite(x.entry) && isFinite(x.stop)); } catch (e) {}
     if (G.showCT === false || G.mode === 'ict') T = [];
     const sig = JSON.stringify(T.map((x) => [x.id, x.entry, x.stop, x.t1, x.status]));
-    ['4h', '1h', '15m', '5m', '1m'].forEach((id) => { const P = panes[id]; if (!P || !P.series || P.rp || P._ctSig === sig) return; P._ctSig = sig;
+    ctTargets(['4h', '1h', '15m', '5m', '1m']).forEach(([id, P]) => { if (!P || !P.series || P.rp || P._ctSig === sig) return; P._ctSig = sig;
       (P._ct || []).forEach((l) => { try { P.series.removePriceLine(l); } catch (e) {} }); P._ct = [];
       T.forEach((x) => { const nm = `${x.side === 'buy' ? '▲' : '▼'} ${x.name || x.k}${x.status === 'pending' ? ' (limit)' : ''}`;
         P._ct.push(P.series.createPriceLine({ price: x.entry, color: '#2962ff', lineWidth: 2, lineStyle: x.status === 'pending' ? LW.LineStyle.Dashed : LW.LineStyle.Solid, axisLabelVisible: true, title: nm }));
@@ -4370,7 +4386,7 @@ function msNextSetup(bars, A) {
   function councilMarkers() {
     let T = []; try { T = (COUNCIL.trades || []).filter((x) => x.market === instKey && !x.shadow && x.entry && (x.filled || x.opened) && x.status !== 'pending' && x.status !== 'missed' && x.status !== 'expired').sort((a, b) => (b.filled || b.opened) - (a.filled || a.opened)).slice(0, 60); } catch (e) {}
     if (G.showCT === false || G.mode === 'ict') T = [];
-    ['4h', '1h', '15m'].forEach((id) => { const P = panes[id]; if (!P || !P.series || P.rp || !P.bars || !P.bars.length) return;
+    ctTargets(['4h', '1h', '15m']).forEach(([id, P]) => { if (!P || !P.series || P.rp || !P.bars || !P.bars.length) return;
       const tf = TFS.find((t) => t.id === id), have = new Set(P.bars.map((b) => b.time)), bt = (t) => Math.floor(t / tf.sec) * tf.sec + TZ, mk = [];
       T.forEach((x) => { const buy = x.side !== 'sell', te = bt(x.filled || x.opened);
         if (have.has(te)) mk.push({ time: te, position: buy ? 'belowBar' : 'aboveBar', shape: buy ? 'arrowUp' : 'arrowDown', color: '#2962ff', text: id === '15m' ? (x.name || x.k) : '' });
@@ -4393,10 +4409,10 @@ function msNextSetup(bars, A) {
       sel.addEventListener('change', () => { try { localStorage.setItem('ms-cmp-' + instKey, sel.value); } catch (e) {} run(); window.msTrack && msTrack('Compare', { with: sel.value || 'none' }); });
       setTimeout(() => { if (sel.value) run(); }, 3000); setInterval(() => { if (sel.value && !document.hidden) run(); }, 60e3);
     } }
-  { const k = document.getElementById('ms-show-shade'); try { G.showShade = localStorage.getItem('ms-shade') !== '0'; } catch (e) {} if (k) { k.checked = G.showShade !== false; k.addEventListener('change', () => { G.showShade = k.checked; try { localStorage.setItem('ms-shade', k.checked ? '1' : '0'); } catch (e) {} Object.values(panes).forEach((P) => P.setShade && P.setShade()); }); } }
+  { const k = document.getElementById('ms-show-shade'); try { G.showShade = localStorage.getItem('ms-shade') !== '0'; } catch (e) {} if (k) { k.checked = G.showShade !== false; k.addEventListener('change', () => { G.showShade = k.checked; try { localStorage.setItem('ms-shade', k.checked ? '1' : '0'); } catch (e) {} lyAll('setShade'); }); } }
   { const k = document.getElementById('ms-show-piv'); try { G.showPiv = localStorage.getItem('ms-piv') === '1'; } catch (e) {} if (k) { k.checked = G.showPiv === true; k.addEventListener('change', () => { G.showPiv = k.checked; try { localStorage.setItem('ms-piv', k.checked ? '1' : '0'); } catch (e) {} keyLevels(); }); } }
-  { const k = document.getElementById('ms-show-vwap'); try { G.showVwap = localStorage.getItem('ms-vwap') === '1'; } catch (e) {} if (k) { k.checked = G.showVwap === true; k.addEventListener('change', () => { G.showVwap = k.checked; try { localStorage.setItem('ms-vwap', k.checked ? '1' : '0'); } catch (e) {} Object.values(panes).forEach((P) => P.setVwap && P.setVwap()); }); } }
-  { const k = document.getElementById('ms-show-ema'); try { G.showEma = localStorage.getItem('ms-ema') === '1'; } catch (e) {} if (k) { k.checked = G.showEma === true; k.addEventListener('change', () => { G.showEma = k.checked; try { localStorage.setItem('ms-ema', k.checked ? '1' : '0'); } catch (e) {} Object.values(panes).forEach((P) => P.setEma && P.setEma()); }); } }
+  { const k = document.getElementById('ms-show-vwap'); try { G.showVwap = localStorage.getItem('ms-vwap') === '1'; } catch (e) {} if (k) { k.checked = G.showVwap === true; k.addEventListener('change', () => { G.showVwap = k.checked; try { localStorage.setItem('ms-vwap', k.checked ? '1' : '0'); } catch (e) {} lyAll('setVwap'); }); } }
+  { const k = document.getElementById('ms-show-ema'); try { G.showEma = localStorage.getItem('ms-ema') === '1'; } catch (e) {} if (k) { k.checked = G.showEma === true; k.addEventListener('change', () => { G.showEma = k.checked; try { localStorage.setItem('ms-ema', k.checked ? '1' : '0'); } catch (e) {} lyAll('setEma'); }); } }
   // chart layout presets (7 Nov loop): one tap flips the layer toggles; "Mine" is saved on this device
   { const box = document.getElementById('ms-lay'); if (box) { const all = () => [...document.querySelectorAll('.ms-tog input[type=checkbox][id^="ms-show-"]')];
     const OFF_CLEAN = ['ms-show-ema', 'ms-show-vwap', 'ms-show-piv', 'ms-show-shade', 'ms-show-vol', 'ms-show-ha', 'ms-show-ct', 'ms-show-detail', 'ms-show-replica', 'ms-show-news', 'ms-show-sess', 'ms-show-next', 'ms-show-plan'];
@@ -4414,7 +4430,7 @@ function msNextSetup(bars, A) {
       apply(m); box.querySelectorAll('[data-lay]').forEach((x) => x.classList.toggle('on', x === b)); if (window.msTrack) try { window.msTrack('layout', { k }); } catch (e) {} }); } }
   { const v = document.getElementById('ms-show-log'); if (v) { v.checked = !!G.log; v.addEventListener('change', () => { G.log = v.checked; try { localStorage.setItem('ms-log', v.checked ? '1' : '0'); } catch (e) {} Object.values(panes).forEach((P) => P.setLog && P.setLog()); }); } }
   { const v = document.getElementById('ms-show-ha'); try { G.ha = localStorage.getItem('ms-ha') === '1'; } catch (e) {} if (v) { v.checked = !!G.ha; v.addEventListener('change', () => { G.ha = v.checked; try { localStorage.setItem('ms-ha', v.checked ? '1' : '0'); } catch (e) {} Object.values(panes).forEach((P) => { if (P.raw && P.raw.length && P.rebuild) P.rebuild(true); }); }); } }
-  { const v = document.getElementById('ms-show-vol'); try { G.showVol = localStorage.getItem('ms-vol') !== '0'; } catch (e) {} if (v) { v.checked = G.showVol !== false; v.addEventListener('change', () => { G.showVol = v.checked; try { localStorage.setItem('ms-vol', v.checked ? '1' : '0'); } catch (e) {} Object.values(panes).forEach((P) => P.setVol && P.setVol()); }); } }
+  { const v = document.getElementById('ms-show-vol'); try { G.showVol = localStorage.getItem('ms-vol') !== '0'; } catch (e) {} if (v) { v.checked = G.showVol !== false; v.addEventListener('change', () => { G.showVol = v.checked; try { localStorage.setItem('ms-vol', v.checked ? '1' : '0'); } catch (e) {} lyAll('setVol'); }); } }
   // TradingView alerts in (7 Nov loop): webhook URL (owner), message template, forward-to-this-device switch, recent alerts
   { const btn = document.getElementById('ms-tvw-open'); let dlg;
     const TPL = '{"ticker":"{{ticker}}","price":{{close}},"side":"buy","msg":"{{strategy.order.comment}} {{interval}}"}';
@@ -5214,12 +5230,17 @@ function msNextSetup(bars, A) {
     lt.value = SP.ltf; rt.value = spTf(); rt.disabled = SP.sync.tf; sy.value = spSym(); sy.disabled = SP.sync.sym; }
   function spTheme() { if (!SP.chart) return; const t = THEMES[G.theme] || THEMES.dark;
     SP.chart.applyOptions({ layout: { background: { type: 'gradient', topColor: t.bgTop || t.bg, bottomColor: t.bg }, textColor: t.text }, rightPriceScale: { borderVisible: false }, timeScale: { borderVisible: false } });
-    if (SP.series) SP.series.applyOptions(candleCols()); if (SP.ov) SP.ov.set(SP.ov.items); }   // repaint the markups in the new theme's label colours
+    if (SP.series) SP.series.applyOptions(candleCols()); if (SP.ov) SP.ov.set(SP.ov.items); if (SP.ly) SP.ly.setVol(); }   // repaint the markups (and volume) in the new theme's colours
   window.msSplitTheme = spTheme; window.msSplitMarkup = () => { try { if (SP.on && !spPane()) spMarkup(); } catch (e) {} };
+  window.msSplitLayers = () => { try { if (SP.on && !spPane() && SP.ly) SP.ly.setAll(); } catch (e) {} };
+  // council trade lines / markers (councilLines, councilMarkers) reach the free chart while it shows the page's market
+  window.msSplitCT = (ids) => (SP.on && SP.series && !spPane() && spSym() === instKey && ids.includes(spTf()) ? [[spTf(), SP]] : []);
   function spChart() { if (SP.chart) return; const el = document.getElementById('ms-sp-c'); if (!el) return;
     SP.chart = LW.createChart(el, { autoSize: true, layout: { fontSize: 11, fontFamily: 'Figtree, -apple-system, "Segoe UI", Roboto, sans-serif' }, grid: { vertLines: { visible: false }, horzLines: { visible: false } }, crosshair: { mode: LW.CrosshairMode.Normal }, timeScale: { timeVisible: true, secondsVisible: false, rightOffset: 6 },
       localization: { priceFormatter: (p) => fmtI(p, INSTRUMENTS[spSym()] || INST) } });   // thousands separators, like the left chart
     SP.series = SP.chart.addCandlestickSeries({ ...candleCols(), priceLineStyle: LW.LineStyle.Dotted });
+    // volume, session shading, EMAs and VWAP from Settings → Chart layers, as on the panes
+    SP.ly = chartLayers(SP.chart, () => { const k = spSym(); return { tf: TFS.find((t) => t.id === spTf()) || TFS[2], raw: SP.raw, bars: SP.bars, off: k === instKey ? G.offset || 0 : 0, crypto: (INSTRUMENTS[k] || INST).group === 'Crypto' }; });
     spTheme();
     const lg = document.getElementById('ms-sp-lg');
     SP.chart.subscribeCrosshairMove((pr) => { const b = pr && pr.time != null && SP.bars.find((x) => x.time === pr.time); const I = INSTRUMENTS[spSym()] || INST, d = I.dec ?? 2, f = (v) => (+v).toLocaleString('en-US', { minimumFractionDigits: d, maximumFractionDigits: d });
@@ -5227,7 +5248,10 @@ function msNextSetup(bars, A) {
   }
   // markups on the free chart (another market, or the left chart's own timeframe): the same Meridian / ICT drawing as the panes
   // (merItems / fvgItems + ictSess) with the price lines they use; the page's plan and higher-timeframe origins only for its own market
-  SP.ind = []; SP.ov = null; SP.pl = []; SP.d = null; SP.dk = ''; SP.kl = [];
+  SP.ind = []; SP.ov = null; SP.pl = []; SP.d = null; SP.dk = ''; SP.kl = []; SP.raw = []; SP._ct = []; SP.ctKey = '';
+  // council trades: drop the lines / markers of the previous market or timeframe, then let councilLines / councilMarkers redraw
+  function spCT() { const ck = SP.key; if (SP.ctKey !== ck) { SP.ctKey = ck; SP._ct.forEach((l) => { try { SP.series.removePriceLine(l); } catch (e) {} }); SP._ct = []; SP._ctSig = null; SP._mkSig = null; try { SP.series.setMarkers([]); } catch (e) {} }
+    try { councilLines(); councilMarkers(); } catch (e) {} }
   // key levels on the free chart, from its own market's daily candles; like the panes: intraday only, in both markup modes
   function spKL() { if (!SP.series) return; SP.kl.forEach((l) => { try { SP.series.removePriceLine(l); } catch (e) {} }); SP.kl = [];
     const k = spSym(), own = k === instKey; if (!SP.on || spPane() || spTf() === '1d' || !SP.bars.length) return;
@@ -5246,16 +5270,17 @@ function msNextSetup(bars, A) {
         // the gold M5 replica boxes, as on the M5 pane (they come from the page's own M5 / M15 / H1 panes)
         if (own && tf.id === '5m') { const keep = P5pv; try { replicaItems(items, B); } catch (e) {} P5pv = keep; } }
     } catch (e) { /* not enough swings yet */ }
-    SP.ov.set(items); indDraw(SP.chart, B, SP.ind); spKL(); }
+    SP.ov.set(items); indDraw(SP.chart, B, SP.ind); spKL(); if (SP.ly) SP.ly.setAll(); spCT(); }
   async function spLoad() {
     if (!SP.on) return; spControls(); grid4.dataset.splitR = spPane() ? spTf() : ''; if (spPane()) { setTimeout(() => { const R = spPane(); if (R) R.fit(); if (SP.sync.range || SP.sync.time) spFromLeft(); }, 60); return; } spChart(); const k = spSym(), tf = spTf(), I = INSTRUMENTS[k], key = `${k}|${tf}`; if (!I || !SP.series) return;
     const T = TFS.find((t) => t.id === tf); document.getElementById('ms-sp-t').textContent = `${I.label} · ${T ? T.label : tf}`;
-    if (SP.key !== key) { SP.key = key; SP.series.setData([]); SP.bars = []; spMarkup(); }   // no old market's markups on an empty chart
+    if (SP.key !== key) { SP.key = key; SP.series.setData([]); SP.bars = []; SP.raw = []; spMarkup(); }   // no old market's markups on an empty chart
     // another market: its own daily bars (three weeks), for the key levels and the ICT 50%-of-yesterday line
     if (k !== instKey && SP.dk !== k) { SP.dk = k; SP.d = null; fetchBars(TFS.find((t) => t.id === '1d') || TFS[0], I, 20).then((r) => { if (SP.dk === k && r && r.bars) { SP.d = r.bars; if (SP.bars.length) { if (G.mode === 'ict') spMarkup(); else spKL(); } } }).catch(() => {}); }
     try { const r = await fetchBars(TFS.find((t) => t.id === tf) || TFS[2], I, 500); if (SP.key !== key || !r || !r.bars || !r.bars.length) return;
       const off = k === instKey ? G.offset || 0 : 0;   // same market: the left chart's price offset, so the plan lines sit on the candles
-      SP.bars = r.bars.map((b) => ({ time: b.time + TZ, open: +b.open + off, high: +b.high + off, low: +b.low + off, close: +b.close + off }));
+      SP.raw = r.bars.map((b) => ({ time: b.time, open: +b.open, high: +b.high, low: +b.low, close: +b.close, volume: +b.volume || 0 }));   // feed candles, for volume and VWAP
+      SP.bars = SP.raw.map((b) => ({ time: b.time + TZ, open: b.open + off, high: b.high + off, low: b.low + off, close: b.close + off }));
       SP.series.applyOptions({ priceFormat: { type: 'price', precision: I.dec ?? 2, minMove: Math.pow(10, -(I.dec ?? 2)) } });
       SP.series.setData(SP.bars); document.getElementById('ms-sp-src').textContent = r.src || ''; spMarkup();
       if (SP.sync.range || SP.sync.time) spFromLeft(); else SP.chart.timeScale().fitContent();
@@ -5283,7 +5308,8 @@ function msNextSetup(bars, A) {
   setInterval(async () => { if (!SP.on || document.hidden || !SP.series || !SP.bars.length) return; const k = spSym(), tf = spTf(), I = INSTRUMENTS[k], key = SP.key;
     try { const r = await fetchBars(TFS.find((t) => t.id === tf) || TFS[2], I, 3); if (SP.key !== key || !r || !r.bars) return; const off = k === instKey ? G.offset || 0 : 0; let ch = 0;
       r.bars.forEach((b) => { const x = { time: b.time + TZ, open: +b.open + off, high: +b.high + off, low: +b.low + off, close: +b.close + off }; const last = SP.bars[SP.bars.length - 1];
-      if (x.time === last.time) SP.bars[SP.bars.length - 1] = x; else if (x.time > last.time) SP.bars.push(x); else return; ch = 1; try { SP.series.update(x); } catch (e) {} });
+      if (x.time === last.time) SP.bars[SP.bars.length - 1] = x; else if (x.time > last.time) SP.bars.push(x); else return; ch = 1; try { SP.series.update(x); } catch (e) {}
+      const w = { time: b.time, open: +b.open, high: +b.high, low: +b.low, close: +b.close, volume: +b.volume || 0 }; if (SP.raw.length && SP.raw[SP.raw.length - 1].time === w.time) SP.raw[SP.raw.length - 1] = w; else SP.raw.push(w); });
       if (ch) spMarkup(); } catch (e) {} }, 15e3);   // markups and indicators follow the live candle, as on the panes
   if (root.querySelector('[data-view]')) {
     root.querySelectorAll('[data-view]').forEach((b) => b.addEventListener('click', () => setView(b.dataset.view)));
