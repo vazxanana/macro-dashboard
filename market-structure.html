@@ -1643,6 +1643,11 @@ html.scrolled .top { box-shadow: 0 6px 20px -10px rgba(0,0,0,.55); }
 .btab a[aria-current="page"] svg { background: color-mix(in srgb, var(--accent) 16%, transparent); }
 :root[data-theme="pro"] .btab a svg { border-radius: 6px; }
 #g-cal-m { white-space: nowrap; }
+
+/* chart headers: clock glyph before the candle countdown, amber in the final minute */
+.ms-cd { display: inline-flex; align-items: center; gap: 5px; }
+.ms-cd::before { content: ""; width: 11px; height: 11px; flex: none; background: currentColor; opacity: .75; -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2.4' stroke-linecap='round'%3E%3Ccircle cx='12' cy='12' r='9'/%3E%3Cpath d='M12 7v5l3 2'/%3E%3C/svg%3E") center / contain no-repeat; mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2.4' stroke-linecap='round'%3E%3Ccircle cx='12' cy='12' r='9'/%3E%3Cpath d='M12 7v5l3 2'/%3E%3C/svg%3E") center / contain no-repeat; }
+.ms-cd.soon { color: #e0a526; }
 </style>
 <script>try{if(localStorage.getItem('msMotion')==='off')document.documentElement.dataset.motion='off'}catch(e){}</script>
 </head>
@@ -5401,6 +5406,11 @@ function msNextSetup(bars, A) {
 (() => { const a = document.querySelector('a.skip'); if (!a) return;
   a.addEventListener('click', (ev) => { ev.preventDefault(); const v = document.querySelector('section.view:not([hidden])'); const t = (v && v.querySelector('h1, h2')) || document.getElementById('ms-main-start'); if (!t) return;
     if (!t.hasAttribute('tabindex')) t.setAttribute('tabindex', '-1'); t.focus({ preventScroll: false }); t.scrollIntoView({ block: 'start' }); }); })();
+</script>
+<script>
+/* candle countdowns turn amber in their final minute */
+(() => { const els = document.querySelectorAll('.ms-cd'); if (!els.length) return; const f = (e) => e.classList.toggle('soon', /^0:\d\d$/.test(e.textContent.trim()));
+  els.forEach((e) => { new MutationObserver(() => f(e)).observe(e, { childList: true, characterData: true, subtree: true }); f(e); }); })();
 </script>
 </body>
 </html>
