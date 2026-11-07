@@ -1,0 +1,74 @@
+name: Macro gold rule (out-of-sample test)
+
+# Paper research, run once (research/edge/macro-gold/preregistration.md): can the Macro strategist's real-yield input, known the
+# day before, make a tradable gold rule? Fetches full FRED history (DFII10, DTWEXBGS), which the sandbox cannot reach, and the
+# OANDA daily gold candles, and writes council-data research/macro-gold.json. Free (FRED fredgraph.csv, the site's /md/bars
+# proxy) and failure-tolerant: a failed fetch writes an "incomplete" result and the nightly schedule tries again; once a complete
+# result exists, every later run skips (no re-running a finished test) unless dispatched with force. Changes no rule.
+on:
+  workflow_dispatch:
+    inputs:
+      force:
+        description: 'Run again even if a complete result exists'
+        default: 'false'
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/macro-gold.yml'
+      - 'research/edge/macro-gold/run.mjs'
+  schedule:
+    - cron: '41 4 * * *'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: macro-gold
+  cancel-in-progress: false
+
+jobs:
+  macro-gold:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    continue-on-error: true
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            research/edge/macro-gold
+            research/edge/gold-systems-oos
+
+      - name: Checkout council data (only the result file)
+        uses: actions/checkout@v4
+        with:
+          ref: council-data
+          path: data
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            /research/macro-gold.json
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Skip if the test already ran
+        id: done
+        run: |
+          if [ "${{ github.event.inputs.force }}" != "true" ] && [ -f data/research/macro-gold.json ] \
+             && node -e 'process.exit(require("./data/research/macro-gold.json").status === "ok" ? 0 : 1)'; then
+            echo "skip=true" >> "$GITHUB_OUTPUT"; echo "A complete result exists: not running the test again."
+          fi
+
+      - name: Out-of-sample test
+        if: steps.done.outputs.skip != 'true'
+        run: node research/edge/macro-gold/run.mjs data/research/macro-gold.json
+
+      - name: Save results
+        if: steps.done.outputs.skip != 'true'
+        run: |
+          git -C data config user.name "mosha-council"
+          git -C data config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git -C data add research/macro-gold.json
+          git -C data commit -q -m "Macro gold rule out-of-sample test $(date -u +%Y-%m-%dT%H:%MZ)" || exit 0
+          for j in 1 2 3 4 5; do git -C data pull -q --rebase origin council-data && git -C data push -q origin HEAD:council-data && break; sleep 7; done
