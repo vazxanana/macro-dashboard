@@ -9,7 +9,7 @@ module.exports = async (req, res) => {
   const live = process.env.OANDA_ENV === 'live', api = live ? 'api-fxtrade.oanda.com' : 'api-fxpractice.oanda.com', st = live ? 'stream-fxtrade.oanda.com' : 'stream-fxpractice.oanda.com';
   const H = { Authorization: `Bearer ${tok}`, 'Accept-Datetime-Format': 'UNIX' };
   try {
-    if (!acct) { const r = await fetch(`https://${api}/v3/accounts`, { headers: H }); if (!r.ok) throw new Error(`OANDA accounts ${r.status}`); acct = ((await r.json()).accounts || [])[0]?.id; if (!acct) throw new Error('no OANDA account'); }
+    if (!acct) { const r = await fetch(`https://${api}/v3/accounts`, { headers: H, signal: AbortSignal.timeout(8000) }); if (!r.ok) throw new Error(`OANDA accounts ${r.status}`); acct = ((await r.json()).accounts || [])[0]?.id; if (!acct) throw new Error('no OANDA account'); }
   } catch (e) { return res.status(502).json({ error: String(e.message || e) }); }
   const ac = new AbortController(), stop = setTimeout(() => ac.abort(), 270e3);
   req.on('close', () => ac.abort());

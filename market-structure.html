@@ -6048,7 +6048,7 @@ function msNextSetup(bars, A) {
     const rrB = (r) => r == null ? '—' : r < 1 ? '< 1' : r < 1.5 ? '1–1.5' : r < 2 ? '1.5–2' : r < 3 ? '2–3' : r < 5 ? '3–5' : '5+';
     const val = (t, f) => EDGE.by === 'rr' ? rrB(t.rr) : EDGE.by === 'market' ? t.market : EDGE.by === 'setup' ? String(t.k || t.setup || '').replace('@mkt', '') : (f || {})[EDGE.by];
     const fw = (Array.isArray(C.trades) ? C.trades : []).filter((t) => (t.status === 'win' || t.status === 'loss' || t.status === 'be') && isFinite(t.R) && (!EDGE.k || t.k === EDGE.k));
-    const bt = C.backtest && C.backtest.tradeCols ? C.backtest.trades.map((r) => Object.fromEntries(C.backtest.tradeCols.map((c, i) => [c, r[i]]))).filter((t) => t.fill && (!EDGE.k || String(t.setup).replace('@mkt', '') === EDGE.k)) : [];
+    const bt = C.backtest && C.backtest.tradeCols ? C.backtest.trades.map((r) => Object.fromEntries(C.backtest.tradeCols.map((c, i) => [c, r[i]]))).filter((t) => t.fill && t.status !== 'open' && t.R_none != null && (!EDGE.k || String(t.setup).replace('@mkt', '') === EDGE.k)) : [];   // open rows (no result yet) left out
     const sel = document.getElementById('ms-edge-k'); if (sel && sel.options.length < 2) { const ks = [...new Set(fw.map((t) => t.k))].sort(); sel.innerHTML = '<option value="">all</option>' + ks.map((k) => `<option value="${esc(k)}">${esc(k)}</option>`).join(''); }
     const mid = bt.length ? bt.map((t) => t.opened).sort((a, b) => a - b)[bt.length >> 1] : 0, G2 = new Map(), add = (key, slot, R) => { if (key == null) return; if (!G2.has(key)) G2.set(key, { live: [], sh: [], bt: [], h1: [], h2: [] }); G2.get(key)[slot].push(R); };
     fw.forEach((t) => add(val(t, t.feat), t.shadow ? 'sh' : 'live', +t.R));
@@ -6066,7 +6066,12 @@ function msNextSetup(bars, A) {
   // live setups card (7 Nov): which engine setups trade live outside the market focus, their live record and the stop guard
   function renderSleeve() { const el = document.getElementById('ms-sleeve'), C = COUNCIL, cfg = C.config; if (!el || !cfg) return;
     const ks = cfg.focusSetups || [], stopped = cfg.sleeveStopped || {}; const all = ks.concat(Object.keys(stopped).filter((k) => !ks.includes(k)));
-    if (!all.length) { el.hidden = true; return; }
+    // Coach promotion / demotion proposals (7 Nov): shadow setups that earned a live slot, live setups that lost their edge.
+    // Shown even when nothing trades live; never applied: a setup moves in or out of live only with the owner's OK.
+    const PD = (C.coach && Array.isArray(C.coach.proposals) ? C.coach.proposals : []).filter((p) => p.kind === 'promote' || p.kind === 'promoteIf' || p.kind === 'demote');
+    const pfx = (v) => `<span class="${v >= 0 ? 'pos' : 'neg'}"><b>${v >= 0 ? '+' : '−'}${Math.abs(+v || 0).toFixed(2)}R</b></span>`;
+    const pd = !(C.coach && Array.isArray(C.coach.proposals)) ? '' : `<div class="sl-row"><div class="sl-h"><b>Coach suggests (needs your OK)</b><small>promote / demote · from the 30-day replay</small></div>${PD.length ? PD.map((p) => `<small class="sl-n" title="${esc(p.why || '')}"><span class="ms-chip ${p.kind === 'demote' ? 'ms-chip-sell' : 'ms-chip-buy'}">${p.kind === 'demote' ? 'Demote' : 'Promote'}</span> <b>${esc(p.label || (p.kind === 'demote' ? 'move ' + p.setup + ' back to shadow' : 'make ' + p.setup + ' live'))}</b> — ${pfx(p.exp)} a trade over ${+p.n} replay trades${p.h1 && p.h2 ? ` · halves ${pfx(p.h1.exp)} / ${pfx(p.h2.exp)}` : ''}${p.all ? ` · all of ${esc(p.setup)} ${pfx(p.all.exp)} over ${+p.all.n}` : ''}</small>`).join('') : '<small class="sl-n">No shadow setup has earned a live slot and no live setup has lost its edge (promote: 100+ replay trades, +0.10R a trade, both halves positive).</small>'}</div>`;
+    if (!all.length) { if (!PD.length) { el.hidden = true; return; } el.hidden = false; el.innerHTML = `<div class="ms-k"><span>Live setups · paper</span><span class="ms-note">no engine setup trades live yet</span></div>${pd}`; return; }
     const rows = all.map((k) => { const h = (cfg.history || []).find((x) => x.by === 'user' && /trades live on paper on every market/.test(x.change || '') && new RegExp('^' + k, 'i').test(x.change || '')), since = h ? Date.parse(h.at) / 1000 : 0;
       const L = (Array.isArray(C.trades) ? C.trades : []).filter((x) => x.k === k && !x.shadow && x.opened >= since), done = L.filter((x) => (x.status === 'win' || x.status === 'loss' || x.status === 'be') && isFinite(x.R)), open = L.filter((x) => x.status === 'open' || x.status === 'pending');
       const e = done.length ? done.reduce((a, x) => a + x.R, 0) / done.length : null, sum = done.reduce((a, x) => a + x.R, 0), f = cfg.filters && cfg.filters[k] || {};
@@ -6077,9 +6082,9 @@ function msNextSetup(bars, A) {
         <div class="sl-k"><span><b>${done.length}</b> closed</span><span><b>${open.length}</b> open</span><span class="${e == null ? '' : e > 0 ? 'pos' : 'neg'}"><b>${e == null ? '—' : (e >= 0 ? '+' : '−') + Math.abs(e).toFixed(2) + 'R'}</b> a trade</span><span class="${sum > 0 ? 'pos' : sum < 0 ? 'neg' : ''}"><b>${(sum >= 0 ? '+' : '−') + Math.abs(sum).toFixed(1)}R</b> total</span></div>
         ${(() => { const B = C.backtest, cols = B && B.tradeCols; if (!cols || !Array.isArray(B.trades)) return '';
           // Replay rows that pass the same live rule (setup, D1 filter, skipped sessions/markets): what the 30-day replay expects per trade.
-          const ix = (c) => cols.indexOf(c), iS = ix('setup'), iD = ix('d1'), iSe = ix('session'), iM = ix('market'), iR = ix('R_none'), iF = ix('fill'), iC = ix('cost'); if (iS < 0 || iR < 0) return '';
+          const ix = (c) => cols.indexOf(c), iS = ix('setup'), iD = ix('d1'), iSe = ix('session'), iM = ix('market'), iR = ix('R_none'), iF = ix('fill'), iC = ix('cost'), iSt = ix('status'); if (iS < 0 || iR < 0) return '';
           // filled trades only (a resting order that never filled is not a trade), judged after spread, as the Coach counts them
-          const rp = B.trades.filter((r) => r[iS] === k && (iF < 0 || r[iF] !== 0) && (!f.d1 || r[iD] === f.d1) && !(f.noSession || []).includes(r[iSe]) && !(f.noMarket || []).includes(r[iM]) && isFinite(r[iR]));
+          const rp = B.trades.filter((r) => r[iS] === k && (iF < 0 || r[iF] !== 0) && (!f.d1 || r[iD] === f.d1) && !(f.noSession || []).includes(r[iSe]) && !(f.noMarket || []).includes(r[iM]) && r[iR] != null && isFinite(r[iR]) && (iSt < 0 || r[iSt] !== 'open'));   // open rows: no result yet
           const Rn = (r) => r[iR] - (iC >= 0 ? +r[iC] || 0 : 0);
           if (rp.length < 10) return ''; const re = rp.reduce((a, r) => a + Rn(r), 0) / rp.length, fx = (v) => (v >= 0 ? '+' : '−') + Math.abs(v).toFixed(2) + 'R';
           const gap = e == null ? null : e - re, note = e == null || done.length < 5 ? 'too few live trades to compare yet' : Math.abs(gap) < 0.25 ? 'live is tracking the replay' : gap < 0 ? 'live is running below the replay: watch fills, costs and the D1 label' : 'live is running above the replay';
@@ -6091,7 +6096,7 @@ function msNextSetup(bars, A) {
           const s = P.find((p) => p.kind === 'stability'); if (s && s.h1 && s.h2) sk.push(`<small class="sl-n">Replay halves ${fx(s.h1.exp)} / ${fx(s.h2.exp)}${s.flag ? ' · one half lost money: the edge is not steady' : ' · positive in both halves'}</small>`);
           return sk.join(''); })()}
         <div class="sl-g"><i style="width:${Math.min(100, done.length / 20 * 100).toFixed(0)}%"></i></div><small class="sl-n">Guard: back to shadow at −0.30R a trade over 20+ live trades · ${guard}</small></div>`; }).join('');
-    el.hidden = false; el.innerHTML = `<div class="ms-k"><span>Live setups · paper</span><span class="ms-note">engine setups trading live on every market</span></div>${rows}`; }
+    el.hidden = false; el.innerHTML = `<div class="ms-k"><span>Live setups · paper</span><span class="ms-note">engine setups trading live on every market</span></div>${rows}${pd}`; }
   function renderCouncil() {
     try { renderEdge(); } catch (e) { console.warn('edge', e); }
     try { renderSleeve(); } catch (e) { console.warn('sleeve', e); }
@@ -6758,7 +6763,8 @@ function msNextSetup(bars, A) {
     const sum = document.getElementById('ms-c-bt-sum'); if (!sum) return;
     const set = (id, html) => { const el = document.getElementById(id); if (el) el.innerHTML = html; };
     if (!b || !Array.isArray(b.trades) || !b.trades.length) { sum.textContent = 'No backtest yet: it runs daily and after every engine change.'; ['ms-c-bt', 'ms-c-bt-mkt', 'ms-c-bt-lines'].forEach((id) => set(id, '')); return; }
-    const TA = b.trades.map((r) => Object.fromEntries(b.tradeCols.map((c, i) => [c, r[i]])));
+    // rows still open at the end of the replay window (status 'open', R null) have no result yet: left out of every number here
+    const TA = b.trades.map((r) => Object.fromEntries(b.tradeCols.map((c, i) => [c, r[i]]))).filter((t) => t.status !== 'open');
     const net = b.tradeCols.includes('cost');   // results after a typical spread (one per round trip), as the Coach judges them
     if (net) TA.forEach((t) => ['R_none', 'R_be1', 'R_be15', 'R_tp2'].forEach((k) => { if (t[k] != null) t[k] -= t.cost || 0; }));
     const T = TA.filter((t) => t.fill !== 0 && !String(t.setup).includes('@'));   // the trades as the Trader takes them (no market-entry twins, no unfilled orders)
@@ -7042,7 +7048,8 @@ function msNextSetup(bars, A) {
     for (const x of A) { const c = cl[cl.length - 1]; if (c && IDX.has(x.market) && IDX.has(c[0].market) && c[0].side === x.side && x.signalAt - c[0].signalAt <= 3 * 3600 && !c.some((y) => y.market === x.market)) c.push(x); else cl.push([x]); }
     for (const c of cl) { const best = c.slice().sort((a, b) => (b.grade.total - a.grade.total) || ((b.feat.body || 0) - (a.feat.body || 0)) || (a.signalAt - b.signalAt))[0]; for (const x of c) PICK.set(x.id, { pick: x === best, n: c.length }); }
   }
-  const all = () => { const L = S.src === 'live' ? S.trades : S.src === 'replay' ? S.replay : S.trades.concat(S.replay); markClusters(L);
+  // audit (7 Nov): in Both, a signal the live tracker took is not counted again from the replay (same market, side and candle)
+  const all = () => { const lv = new Set(S.trades.map((x) => x.id)); const L = S.src === 'live' ? S.trades : S.src === 'replay' ? S.replay : S.trades.concat(S.replay.filter((x) => !lv.has(String(x.id).replace(/-r$/, '')))); markClusters(L);
     return L.filter((x) => S.flt === 'all' || (S.flt === 'ap' ? isAP(x) : isA(x) && (S.flt !== 'pick' || (PICK.get(x.id) || {}).pick))); };
   const clTag = (x) => { const c = PICK.get(x.id); return c && c.n > 1 ? (c.pick ? ` <span class="ict-a" title="Best of ${c.n} same-side setups within 3 h">★ pick of ${c.n}</span>` : ` <span class="ict-pill" title="Another index in this cluster has the higher grade">cluster of ${c.n}</span>`) : ''; };
   try { S.desk = JSON.parse(localStorage.getItem('ictDesk') || 'null') || S.desk; } catch (e) {}
@@ -7076,7 +7083,7 @@ function msNextSetup(bars, A) {
         + `<div class="sub">PDH ${m ? fx(m.pdh, k) : '—'} · PDL ${m ? fx(m.pdl, k) : '—'}</div></div>`; }).join('');
     // KPIs
     const sum = (a, f) => a.reduce((s, x) => s + (f(x) || 0), 0), R3 = sum(C, (x) => x.R), R2 = sum(C, (x) => x.R2 ?? x.R), w = C.filter((x) => x.R > 0).length;
-    const fl = sum(O, liveR), mine = T.filter((x) => (myRev(x) || {}).act === 'taken'), rev = C.filter((x) => myRev(x) && myRev(x).text).length;
+    const fl = sum(O, (x) => liveR(x) * (x.size || 1)), mine = T.filter((x) => (myRev(x) || {}).act === 'taken'), rev = C.filter((x) => myRev(x) && myRev(x).text).length;
     const cell = (k, v, sub, c) => `<div><span>${k}</span><b class="${c || ''}">${v}</b><small>${sub}</small></div>`;
     $('ict-kpi').innerHTML = cell('Signals', T.length, `${O.length} open · ${C.length} closed`) + cell('Win rate', C.length ? Math.round((100 * w) / C.length) + '%' : '—', `${w} of ${C.length}`)
       + cell('Total', fR(R3), C.length ? `${fR(R3 / C.length)} a signal` : 'no closed yet', cls(R3)) + cell('Fixed 2R', fR(R2), C.length ? `${fR(R2 / C.length)} a signal` : '—', cls(R2))

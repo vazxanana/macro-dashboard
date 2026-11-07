@@ -3,15 +3,16 @@
 // Environment: OANDA_TOKEN (personal access token), OANDA_ENV "practice" (default, demo account) or "live".
 // Without a token it answers 503 and the page falls back to its exchange feeds.
 const { SYM } = require('./_oanda');
-const TF = { '1m': ['M1', 60, 2], '5m': ['M5', 300, 5], '15m': ['M15', 900, 10], '1h': ['H1', 3600, 20], '4h': ['H4', 14400, 30], '1d': ['D', 86400, 60] };
+const TF = Object.assign(Object.create(null), { '1m': ['M1', 60, 2], '5m': ['M5', 300, 5], '15m': ['M15', 900, 10], '1h': ['H1', 3600, 20], '4h': ['H4', 14400, 30], '1d': ['D', 86400, 60] });
 module.exports = async (req, res) => {
   const q = req.query || {};
   // src=kraken (7 Nov): the exact candles the council trader reads (Kraken OHLC; gold = PAXG), to compare with OANDA
   if (q.src === 'kraken') {
-    const KP = { xau: 'PAXGUSD', btc: 'XBTUSD', eth: 'ETHUSD', sol: 'SOLUSD', xrp: 'XRPUSD', eurusd: 'EURUSD', gbpusd: 'GBPUSD', audusd: 'AUDUSD', usdcad: 'USDCAD', usdchf: 'USDCHF' }, KI = { '1m': 1, '5m': 5, '15m': 15, '1h': 60, '4h': 240, '1d': 1440 };
+    const KP = Object.assign(Object.create(null), { xau: 'PAXGUSD', btc: 'XBTUSD', eth: 'ETHUSD', sol: 'SOLUSD', xrp: 'XRPUSD', eurusd: 'EURUSD', gbpusd: 'GBPUSD', audusd: 'AUDUSD', usdcad: 'USDCAD', usdchf: 'USDCHF' }), KI = Object.assign(Object.create(null), { '1m': 1, '5m': 5, '15m': 15, '1h': 60, '4h': 240, '1d': 1440 });
     const pair = KP[String(q.sym || '')], iv = KI[String(q.tf || '')]; if (!pair || !iv) return res.status(400).json({ error: 'unknown sym or tf for kraken' });
-    try { const r = await fetch(`https://api.kraken.com/0/public/OHLC?pair=${pair}&interval=${iv}`, { signal: AbortSignal.timeout(8000) }); const j = await r.json();
-      if (j.error && j.error.length) return res.status(502).json({ error: j.error[0] });
+    try { const r = await fetch(`https://api.kraken.com/0/public/OHLC?pair=${pair}&interval=${iv}`, { signal: AbortSignal.timeout(8000) }); if (!r.ok) { res.setHeader('Cache-Control', 's-maxage=5'); return res.status(502).json({ error: `Kraken ${r.status}` }); }
+      const j = await r.json();
+      if (j.error && j.error.length) { res.setHeader('Cache-Control', 's-maxage=5'); return res.status(502).json({ error: j.error[0] }); }
       const key = Object.keys(j.result).find((k) => k !== 'last'), bars = j.result[key].map((k) => ({ time: +k[0], open: +k[1], high: +k[2], low: +k[3], close: +k[4], volume: +k[6] }));
       res.setHeader('Cache-Control', `public, max-age=0, s-maxage=${Math.min(60, iv)}`); res.setHeader('Access-Control-Allow-Origin', '*');
       return res.status(200).json({ src: 'Kraken', inst: pair, tf: q.tf, bars });
@@ -28,7 +29,7 @@ module.exports = async (req, res) => {
     if (!(from > 0) || !(to > from)) return res.status(400).json({ error: 'bad range' });
     const fromC = Math.max(from, to - 4999 * tf[1]);   // OANDA's 5000-candle cap: keep the end of the window
     p.set('from', String(fromC)); p.set('to', String(to)); hist = to < now - 2 * tf[1];
-  } else p.set('count', String(Math.max(1, Math.min(5000, Math.floor(+q.n || 500)))));
+  } else p.set('count', String(Math.max(1, Math.min(5000, Math.floor(+q.n) || 500))));
   try {
     const r = await fetch(`https://${host}/v3/instruments/${inst}/candles?${p}`, { headers: { Authorization: `Bearer ${tok}`, 'Accept-Datetime-Format': 'UNIX' }, signal: AbortSignal.timeout(8000) });
     if (!r.ok) { res.setHeader('Cache-Control', 's-maxage=5'); return res.status(502).json({ error: `OANDA ${r.status}: ${(await r.text()).slice(0, 160)}` }); }

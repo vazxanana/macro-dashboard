@@ -58,7 +58,8 @@ module.exports = async (req, res) => {
     STEP = 'script';
     // 2. one round of the unchanged script
     const env = { ...process.env };
-    if (!live) { delete env.NTFY_TOPIC; delete env.TELEGRAM_BOT_TOKEN; delete env.TELEGRAM_CHAT_ID; }
+    // dry run: no alerts. Deleting NTFY_TOPIC alone was not enough: the trader then falls back to its default ntfy topic.
+    if (!live) { delete env.NTFY_TOPIC; delete env.TELEGRAM_BOT_TOKEN; delete env.TELEGRAM_CHAT_ID; env.COUNCIL_ALERTS = 'off'; }
     let out = '', failed = null;
     try { out = execFileSync(process.execPath, [path.join(process.cwd(), J.script), J.arg(dir)], { env, cwd: process.cwd(), timeout: J.budget, maxBuffer: 32 << 20, encoding: 'utf8' }); }
     catch (e) { out = String(e.stdout || '') + String(e.stderr || ''); failed = e.killed ? 'timed out' : `exit ${e.status}`; }

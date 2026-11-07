@@ -7,9 +7,10 @@ import path from 'node:path';
 import { msAnalyze, CFG, PAIRS, RETR, LBL, buildSetup, buildRetrace, setMarket } from './engine.mjs';
 import { entryContext, startReview, watchReview, judge, newsNear, lessons } from './review.mjs';
 import { m15cFeat } from './choch.mjs';
-import { FUT, ticket, closeTicket } from './futures.mjs';
+import { alertable, alertEvents, sendAlerts, when, NTFY_DEFAULT } from './alerts.mjs';
 import { liveRuleSection, injectSection } from './analyst.mjs';
 import { coachProposals } from './proposals.mjs';
+import { cleanBars, LTF_CLEAN } from './clean.mjs';
 
 const DIR = process.argv[2] || 'data';
 fs.mkdirSync(DIR, { recursive: true });
@@ -336,35 +337,6 @@ function dailyCycle(src, price, t) {
   const spr = price * 0.0002, buf = Math.max(3 * spr, 0.05 * leg), stop = bull ? lo - buf : hi + buf, r = Math.abs(price - stop);
   if (!(r > 0)) return null;
   return { sell: bear, entry: price, stop, t1: price + (bull ? 3 : -3) * r, closeBy: t + 8 * 3600, day: d, londonHigh: hi, londonLow: lo };
-}
-// Bad prints: thin feeds (Kraken FX trades, stitched Yahoo/Dukascopy) carry the odd off-market tick that makes a 1,000-pip
-// candle and a fake 160R trade. A wick longer than 50 times the median candle range of the last 100 candles is clipped to the
-// body plus one median range; a candle whose body jumps 50 ranges away and comes straight back is flattened to the prior close.
-// Forex (opts.wickK = 15) also clips a lone wick past 15 ranges that the next 3 candles never trade back into: on
-// 3 Nov 10:12 one Kraken order spiked AUD/USD 35 pips for a minute (Yahoo saw nothing) and hit five stops. News spikes get revisited.
-const LTF_CLEAN = new Set(['1m', '5m', '15m', '30m']);   // the lone-wick rule: the timeframes trades are managed on, not the structure TFs
-function cleanBars(arr, o = {}) {
-  const K = o.k || 50, WK = o.wickK || 0, RV = o.revisit || 3;
-  let fixed = 0; const win = [], log = [];
-  for (let i = 0; i < arr.length; i++) {
-    const b = arr[i];
-    const med = win.length >= 20 ? [...win].sort((x, y) => x - y)[win.length >> 1] : 0;
-    if (med > 0) {
-      const lim = K * med, p = arr[i - 1], n = arr[i + 1];
-      if (p && n && Math.abs(b.close - p.close) > lim && Math.abs(n.open - p.close) < lim / 2) {
-        Object.assign(b, { open: p.close, high: p.close, low: p.close, close: p.close }); fixed++; log.push([b.time, 'body']);
-      }
-      const top = Math.max(b.open, b.close), bot = Math.min(b.open, b.close);
-      // a lone wick: far past the body and never traded near again in the next RV candles (needs those candles to exist)
-      const next = arr.slice(i + 1, i + 1 + RV), lone = WK && next.length === RV;
-      const hiLim = lone && next.every((x) => x.high < top + (b.high - top) / 2) ? WK * med : lim;
-      const loLim = lone && next.every((x) => x.low > bot - (bot - b.low) / 2) ? WK * med : lim;
-      if (b.high - top > hiLim) { log.push([b.time, 'high', +((b.high - top) / med).toFixed(0)]); b.high = top + med; fixed++; }
-      if (bot - b.low > loLim) { log.push([b.time, 'low', +((bot - b.low) / med).toFixed(0)]); b.low = bot - med; fixed++; }
-    }
-    const r = b.high - b.low; if (r > 0) { win.push(r); if (win.length > 100) win.shift(); }
-  }
-  return o.log ? log : fixed;
 }
 let research = rd('research.json', []);
 // ─── Research setup (paper only): the trader's gold replica (3 Nov) ───
@@ -1051,7 +1023,8 @@ const exp = (arr) => arr.length ? arr.reduce((a, x) => a + x.R, 0) / arr.length 
 const BT = (() => {
   const b = rd('backtest.json', null);
   if (!b || b.fake || !Array.isArray(b.trades) || !b.trades.length || now - Date.parse(b.at) / 1000 > 3 * 86400) return null;
-  const T = b.trades.map((r) => Object.fromEntries(b.tradeCols.map((c, i) => [c, r[i]])));
+  // rows still open at the end of the replay window (status 'open', R null) have no result yet: left out of every stat here
+  const T = b.trades.map((r) => Object.fromEntries(b.tradeCols.map((c, i) => [c, r[i]]))).filter((t) => t.status !== 'open');
   // judge every result after costs: each backtest trade carries its spread in R (one spread per round trip)
   if (b.tradeCols.includes('cost')) for (const t of T) for (const k of ['R_none', 'R_be1', 'R_be15', 'R_tp2']) if (t[k] != null) t[k] = +(t[k] - (t.cost || 0)).toFixed(3);
   // TA: every row, incl. market-entry twins ('<k>@mkt') and resting orders that never filled (fill 0, 0R);
@@ -1109,6 +1082,7 @@ function learnFromBacktest(change) {
     const win = S[v1].e > S[v2].e ? v1 : v2, lose = other(win), gap = btGapT(S[win], S[lose]);
     if (!(S[win].e >= 0.1 && S[lose].e <= -0.1 && gap >= 3 && S[win].h[0].e > S[lose].h[0].e && S[win].h[1].e > S[lose].h[1].e)) continue;
     const f = config.filters[k] = config.filters[k] || {};
+    if (userOwned(f, c)) continue;   // the owner's rule stays until the owner changes it (Coach proposals can still flag it)
     if (f[c] === win && (f.src || {})[c] === 'backtest') continue;
     const was = f[c];
     f[c] = win; (f.since = f.since || {})[c] = nowISO; (f.src = f.src || {})[c] = 'backtest';
@@ -1386,10 +1360,11 @@ const fslot = nowISO.slice(0, 11) + String(Math.floor(+nowISO.slice(11, 13) / 6)
   }
 }
 // Coach proposals (7 Nov): suggestions for the owner from the replay, for the setups trading live. Never applied here:
-// live rules change only with the owner's OK. Recomputed when backtest.json or the live setups' rules change.
+// live rules change only with the owner's OK. Recomputed when backtest.json, the live setups or any setup's rules change.
 try {
   const b = rd('backtest.json', null), cj = rd('coach.json', {});
-  const key = b && b.at ? b.at + '|' + JSON.stringify((config.focusSetups || []).map((k) => [k, (config.filters || {})[k] || null])) : '';
+  // v2: promotion/demotion proposals read every setup's filters, so any rule change recomputes them
+  const key = b && b.at ? 'v2|' + b.at + '|' + JSON.stringify([config.focusSetups || [], config.filters || {}]) : '';
   if (key && cj.proposalsKey !== key) { cj.proposals = coachProposals(b, config, nowISO); cj.proposalsKey = key; cj.proposalsBt = b.at; wr('coach.json', cj); }
 } catch (e) { console.log('coach proposals failed:', e.message); }
 config.history = config.history.slice(-200);
@@ -1821,53 +1796,33 @@ try {
   for (const sid of ['ny', 'london', 'swing', 'opens', 'nyflip', 'nyflip-x', 'sd2ifvg', 'sd3mom', '80pct', 'tokyo', 'shanghai']) snapshot.research['nq_' + sid] = sum(research.filter((x) => x.k === 'nq-open' && (x.session || 'ny') === sid)); }
 if (nqLast) snapshot.nqLast = nqLast;
 // ─── Phone alerts (4 Nov): a push via ntfy.sh (free, no account) when a live trade or an NQ paper trade opens or closes.
-// Subscribe in the ntfy app to the topic below (or set the repository secret NTFY_TOPIC to use your own). Only events from
-// the last 15 min are sent, each once (ntfyO / ntfyC flags), so a restart never floods the phone with old trades.
-{ const topic = process.env.NTFY_TOPIC || 'mosha-council-d200fdc484', fmt = (v, d) => (+v).toFixed(d != null ? d : 2), fR = (v) => `${v > 0 ? '+' : ''}${(+v).toFixed(2)}R`;
-  const ev = [];
+// Subscribe in the ntfy app to the topic below (or set the repository secret NTFY_TOPIC to use your own). Which events alert,
+// the text and the sends live in council/alerts.mjs: each event is sent once (ntfyP / ntfyX / ntfyO / ntfyC flags) and only
+// while recent, so a restart never floods the phone with old trades. COUNCIL_ALERTS=off (the Vercel dry run) sends nothing.
+// An alert failure is recorded in snapshot.errors and never stops the round.
+try { const ev = [], quiet = process.env.COUNCIL_ALERTS === 'off', topic = process.env.NTFY_TOPIC || NTFY_DEFAULT;
   // futures tickets (council/futures.mjs): gold → MGC, NQ → MNQ; the alert opens the contract's TradingView chart
   const futOpt = { account: +process.env.FUT_ACCOUNT || 10000, risk: +process.env.FUT_RISK || 0.25, basis: null };
   { const gs = rd('ict/snapshot.json', null), gc = gs && gs.markets && gs.markets.gc, xs = snapshot.markets && snapshot.markets.xau;
     if (gc && xs && gc.price && xs.price && now - Date.parse(gs.at) / 1000 < 3600 && Math.abs(gc.price - xs.price) < 60) futOpt.basis = +(gc.price - xs.price).toFixed(1); }
-  const DASH = 'https://vazxanana.github.io/macro-dashboard/market-structure.html#council';
-  for (const x of trades.filter((x) => !x.shadow).concat(research.filter((x) => x.k === 'nq-open'))) {
-    const nm = `${x.label} ${x.k === 'nq-open' ? x.name + ' (paper)' : x.name}`, fut = FUT[x.market];
-    // a resting limit order: send the limit ticket when it is placed, and a cancel when it expires unfilled
-    if (fut && !x.ntfyP && x.status === 'pending' && x.opened >= now - 900) { const tk = ticket(x, now, futOpt); x.ntfyP = 1;
-      if (tk) { x.futT = { code: tk.c.code, n: tk.n }; ev.push({ title: `${x.side.toUpperCase()} LIMIT ${nm}`, msg: tk.text, tags: 'hourglass', click: tk.url }); } }
-    if (fut && x.futT && !x.ntfyX && x.status === 'expired' && x.closed >= now - 900) { x.ntfyX = 1; ev.push({ title: `Cancel ${x.futT.code} limit · ${nm}`, msg: `The council's limit order expired unfilled: cancel your ${x.side} limit on ${x.futT.code}.`, tags: 'no_entry_sign', click: `https://www.tradingview.com/chart/?symbol=${encodeURIComponent(fut.ex + ':' + x.futT.code)}` }); }
-    if (!x.ntfyO && x.status === 'open' && x.filled >= now - 900) { x.ntfyO = 1;
-      if (fut) { const tk = x.futT ? null : ticket(x, now, futOpt);
-        if (tk) { x.futT = { code: tk.c.code, n: tk.n }; ev.push({ title: `${x.side.toUpperCase()} ${tk.n} ${tk.c.code} · ${nm}`, msg: tk.text, tags: x.side === 'sell' ? 'chart_with_downwards_trend' : 'chart_with_upwards_trend', click: tk.url }); continue; }
-        if (x.futT) { ev.push({ title: `Limit filled · ${nm}`, msg: `Your ${x.side} limit on ${x.futT.code} should be filled (${x.futT.n} contracts). If it is not, skip it: don't chase.`, tags: 'white_check_mark', click: `https://www.tradingview.com/chart/?symbol=${encodeURIComponent(fut.ex + ':' + x.futT.code)}` }); continue; } }
-      ev.push({ title: `${x.side.toUpperCase()} ${nm}`, msg: `Entry ${fmt(x.entry, x.dec)}, stop ${fmt(x.stop, x.dec)}${x.k === 'trend' ? ' (catastrophe stop; exits on a daily close under the channel midpoint), no fixed target' : x.tp1 != null ? `, 2R mark ${fmt(x.tp1, x.dec)}, then trailing` : `, target ${fmt(x.t1, x.dec)}`}${x.size && x.size !== 1 ? ` · ${x.size}× size` : ''}`, tags: x.side === 'sell' ? 'chart_with_downwards_trend' : 'chart_with_upwards_trend' }); }
-    if (!x.ntfyC && x.R != null && x.closed && x.closed >= now - 900 && ['win', 'loss', 'be'].includes(x.status)) { x.ntfyC = 1; const ct = fut && x.futT ? closeTicket(x, now, x.futT) : null;
-      ev.push({ title: `${x.status === 'win' ? 'Win' : x.status === 'loss' ? 'Loss' : 'Break-even'} ${fR(x.R)} · ${nm}`, msg: `${ct ? ct.text + ' (if your stop / target has not already done it)\n' : ''}${x.side.toUpperCase()} from ${fmt(x.entry, x.dec)}${x.exit ? ` · ${x.exit}` : ''}`, tags: x.R > 0 ? 'white_check_mark' : x.R < 0 ? 'x' : 'heavy_minus_sign', click: ct ? ct.url : null }); }
-  }
+  const A = alertEvents(alertable(trades, research), now, futOpt); ev.push(...A.ev);
+  if (A.errors.length) snapshot.errors.alerts = A.errors.slice(0, 3).join('; ');
+  // the live-sleeve guard (above) put a setup back to shadow this round: its live alerts stop, so say so once
+  for (const [k, at] of Object.entries(config.sleeveStopped || {})) if (at === nowISO) ev.push({ title: `Live sleeve stopped: ${k}`, msg: `The guard put ${k} back to shadow trades: no more live ${k} alerts until it is turned on again.\n${when(now)}`, tags: 'warning' });
   // Telegram (4 Nov): the same events to a Telegram chat. Needs the repository secret TELEGRAM_BOT_TOKEN (from @BotFather).
   // TELEGRAM_CHAT_ID is optional: without it the bot uses the first private chat that messaged it (send the bot /start),
   // remembered in state.tgChat, and says once that it is connected.
-  const tgTok = process.env.TELEGRAM_BOT_TOKEN, tgApi = (m) => `https://api.telegram.org/bot${tgTok}/${m}`;
+  const tgTok = quiet ? null : process.env.TELEGRAM_BOT_TOKEN;
   let tgChat = process.env.TELEGRAM_CHAT_ID || state.tgChat || null;
   if (tgTok && !tgChat) {
-    try { const j = await (await fetch(tgApi('getUpdates'), { signal: AbortSignal.timeout(8000) })).json();
+    try { const j = await (await fetch(`https://api.telegram.org/bot${tgTok}/getUpdates`, { signal: AbortSignal.timeout(8000) })).json();
       const m = (j.result || []).map((u) => u.message || u.edited_message).find((m) => m && m.chat && m.chat.type === 'private');
       if (m) { tgChat = state.tgChat = String(m.chat.id); wr('state.json', state); ev.unshift({ title: 'Mosha council connected', msg: 'Paper trade alerts (NQ New York open run, gold replica when gold is volatile) will arrive here.' }); } }
-    catch (err) { snapshot.errors.telegram = String(err.message || err); }
+    catch (err) { snapshot.errors.telegram = 'getUpdates failed'; }
   }
-  if (tgTok && tgChat) for (const e of ev.slice(0, 8)) {
-    try { const r = await fetch(tgApi('sendMessage'), { method: 'POST', headers: { 'Content-Type': 'application/json' }, signal: AbortSignal.timeout(8000),
-        body: JSON.stringify({ chat_id: tgChat, text: `${e.title}\n${e.msg}\n${e.click || DASH}`, disable_web_page_preview: true }) });
-      if (!r.ok) snapshot.errors.telegram = `HTTP ${r.status}`; }
-    catch (err) { snapshot.errors.telegram = String(err.message || err); }
-  }
-  for (const e of ev.slice(0, 8)) {
-    if (!e.tags) continue;   // the Telegram-only 'connected' note
-    try { await fetch(`https://ntfy.sh/${topic}`, { method: 'POST', body: e.msg, headers: { Title: e.title, Tags: e.tags, Click: e.click || DASH, ...(e.click ? { Actions: `view, Dashboard, ${DASH}` } : {}) }, signal: AbortSignal.timeout(5000) }); }
-    catch (err) { snapshot.errors.ntfy = String(err.message || err); }
-  }
+  if (!quiet && ev.length) Object.assign(snapshot.errors, await sendAlerts(ev, { topic, tgTok, tgChat }));
   if (ev.length) wr('trades.json', trades);
-}
+} catch (err) { snapshot.errors.alerts = String(err.message || err); }
 wr('research.json', research);
 snapshot.lessons = lessons(trades, now);
 // owner's loss reviews, per setup (30 days): reason counts, rule ideas, and reasons that repeat (3+ and a third of the

@@ -30,9 +30,11 @@ export function coachProposals(b, config, at = new Date().toISOString(), opt = {
   const cols = b.tradeCols, hasCost = cols.includes('cost');
   // filled trades as the Trader takes them (no market-entry twins, no unfilled orders), judged after costs
   const rows = b.trades.map((r) => Object.fromEntries(cols.map((c, i) => [c, r[i]])))
-    .filter((t) => t.fill !== 0 && !String(t.setup).includes('@') && t.R_none != null && isFinite(t.R_none))
+    .filter((t) => t.fill !== 0 && t.status !== 'open' && !String(t.setup).includes('@') && t.R_none != null && isFinite(t.R_none))
     .map((t) => ({ ...t, R: +(t.R_none - (hasCost ? t.cost || 0 : 0)).toFixed(3) }));
   const t0 = Date.parse(b.from) / 1000, t1 = Date.parse(b.to) / 1000;
+  const midOf = (A) => isFinite(t0) && isFinite(t1) && t1 > t0 ? (t0 + t1) / 2 : A.map((t) => t.opened).sort((x, y) => x - y)[A.length >> 1];
+  const halves = (A) => { const mid = midOf(A), a = A.filter((t) => t.opened < mid), z = A.filter((t) => t.opened >= mid); return { h1: { n: a.length, exp: r2(mean(a)) }, h2: { n: z.length, exp: r2(mean(z)) } }; };
   const out = [];
   for (const k of (config && config.focusSetups) || []) {
     const f = ((config.filters || {})[k]) || {};
@@ -48,11 +50,51 @@ export function coachProposals(b, config, at = new Date().toISOString(), opt = {
       }
     }
     // stability: the two halves of the replay window (by calendar time; by the median trade if the window is missing)
-    const mid = isFinite(t0) && isFinite(t1) && t1 > t0 ? (t0 + t1) / 2 : A.map((t) => t.opened).sort((x, y) => x - y)[A.length >> 1];
+    const mid = midOf(A);
     const h1 = A.filter((t) => t.opened < mid), h2 = A.filter((t) => t.opened >= mid), e1 = mean(h1), e2 = mean(h2), e = mean(A);
     const neg = (h1.length && e1 < 0) || (h2.length && e2 < 0);
     out.push({ setup: k, kind: 'stability', value: neg ? 'unstable' : 'stable', n: A.length, exp: r2(e), h1: { n: h1.length, exp: r2(e1) }, h2: { n: h2.length, exp: r2(e2) }, flag: !!neg,
       why: `${k} under the live rule: ${fR(e)} a trade over ${A.length} replay trades; first half ${fR(e1)} (${h1.length}), second half ${fR(e2)} (${h2.length})${neg ? ': one half lost money, so the edge is not steady.' : ': positive in both halves.'}`, at });
+  }
+  return out.concat(promoteDemote(rows, config, halves, at, opt));
+}
+
+// Promotion / demotion (7 Nov): which shadow setups have earned a live slot, and which live setup has lost its edge.
+// Proposals only: the owner moves a setup in or out of config.focusSetups; nothing here changes the live rules.
+//   promote   : a shadow setup (not off) whose replay under its current filters has n>=100, +0.10R or better a trade and
+//               a profit in both halves of the window -> "make <setup> live".
+//   promoteIf : the same setup restricted to one condition the Coach already splits on (daily trend with/against, one
+//               session): n>=80, +0.15R or better, both halves positive and at least +0.10R better than the whole.
+//   demote    : a live setup whose replay under the live rule has n>=80 and loses on average, or loses in both halves.
+const COND = [['d1', (v) => `only ${v} the daily trend`], ['session', (v) => `only in the ${sName(v)} session`]];
+export function promoteDemote(rows, config, halves, at, opt = {}) {
+  const P = { n: 100, exp: 0.1, nIf: 80, expIf: 0.15, better: 0.1, nDem: 80, ...(opt.promote || {}) };
+  const focus = (config && config.focusSetups) || [], F = (config && config.filters) || {};
+  const out = [], pos = (h) => h.h1.n > 0 && h.h2.n > 0 && h.h1.exp > 0 && h.h2.exp > 0;
+  const stat = (A) => ({ n: A.length, exp: r2(mean(A)), ...halves(A) });
+  const line = (s) => `${fR(s.exp)} a trade over ${s.n} replay trades; first half ${fR(s.h1.exp)} (${s.h1.n}), second half ${fR(s.h2.exp)} (${s.h2.n})`;
+  for (const k of [...new Set(rows.map((t) => t.setup))].sort()) {
+    const f = F[k] || {}, A = rows.filter((t) => t.setup === k && passesLive(t, f));
+    if (focus.includes(k)) {
+      if (A.length < P.nDem) continue;
+      const s = stat(A), bothNeg = s.h1.n > 0 && s.h2.n > 0 && s.h1.exp < 0 && s.h2.exp < 0;
+      if (s.exp < 0 || bothNeg) out.push({ setup: k, kind: 'demote', value: 'shadow', label: `move ${k} back to shadow`, ...s,
+        why: `${k} under the live rule: ${line(s)}${s.exp < 0 ? ': it loses on average' : ''}${bothNeg ? (s.exp < 0 ? ' and' : ':') + ' both halves lost money' : ''}. Keep it in shadow until it earns its slot back.`, at });
+      continue;
+    }
+    if (f.off || A.length < Math.min(P.n, P.nIf)) continue;
+    const whole = stat(A);
+    if (whole.n >= P.n && whole.exp >= P.exp && pos(whole)) out.push({ setup: k, kind: 'promote', value: 'live', label: `make ${k} live`, ...whole,
+      why: `${k} (shadow) under its current filters: ${line(whole)}: profitable in both halves.`, at });
+    for (const [field, lab] of COND) {
+      if (field === 'd1' && f.d1) continue;   // already restricted to one side of the daily trend
+      for (const v of [...new Set(A.map((t) => t[field]))].filter((v) => v != null && v !== 'n/a').sort()) {
+        const s = stat(A.filter((t) => t[field] === v));
+        if (s.n < P.nIf || s.exp < P.expIf || !pos(s) || s.exp < whole.exp + P.better) continue;
+        out.push({ setup: k, kind: 'promoteIf', value: `${field}:${v}`, label: `make ${k} live, ${lab(v)}`, ...s, all: { n: whole.n, exp: whole.exp },
+          why: `${k} (shadow) ${lab(v).replace('only ', '')}: ${line(s)}; all of ${k} ${fR(whole.exp)} over ${whole.n}.`, at });
+      }
+    }
   }
   return out;
 }

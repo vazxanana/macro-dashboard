@@ -10,7 +10,8 @@ module.exports = async (req, res) => {
   if (req.method === 'GET') return res.status(200).json({ key: process.env.VAPID_PUBLIC_KEY || null });
   if (req.method !== 'POST') return res.status(405).json({ error: 'GET or POST' });
   if (!tok() || !process.env.VAPID_PUBLIC_KEY) return res.status(503).json({ error: 'alerts not set up' });
-  const b = typeof req.body === 'string' ? JSON.parse(req.body || '{}') : (req.body || {}), sub = b.sub;
+  let b; try { b = typeof req.body === 'string' ? (JSON.parse(req.body || '{}') || {}) : (req.body || {}); } catch (e) { return res.status(400).json({ error: 'bad JSON' }); }
+  const sub = b && b.sub;
   if (!sub || typeof sub.endpoint !== 'string' || !PUSH_HOSTS.test(sub.endpoint) || !sub.keys || !sub.keys.p256dh || !sub.keys.auth) return res.status(400).json({ error: 'bad subscription' });
   const id = devId(sub.endpoint);
   try {
