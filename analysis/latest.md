@@ -5,6 +5,29 @@
 
 _Snapshot 2026-11-02 05:37 UTC. Paper trading only._
 
+<!-- live-rule:start -->
+## Live Scalp rule check
+
+Built by the Trader at 2026-11-07 17:02 UTC from snapshot, config and the 30-day replay. Rule now: Scalp (M15 → M1) against D1 only, not in asia/overlap, skips audusd.
+
+Session now: **newyork**.
+
+| Market | D1 (source) | Live Scalp would | Scalp now | Replay, live rule |
+|---|---|---|---|---|
+| XAU/USD | down (OANDA; Kraken says up) | no (trades the replica instead) | IN ORIGIN buy | 37 trades, 41% won, +0.16R a trade |
+| BTC/USD | up (Kraken) | **sell** only | READY sell | 25 trades, 32% won, +0.40R a trade |
+| ETH/USD | down (Kraken) | **buy** only | IN ORIGIN buy | 21 trades, 43% won, +0.41R a trade |
+| SOL/USD | down (Kraken) | **buy** only | IN ORIGIN sell | 18 trades, 33% won, +0.65R a trade |
+| XRP/USD | up (Kraken) | **sell** only | IN ORIGIN sell | 30 trades, 30% won, +0.37R a trade |
+| EUR/USD | down (OANDA; Kraken says up) | **buy** only | WAIT RETRACE sell | 22 trades, 9% won, −0.86R a trade |
+| GBP/USD | down (OANDA) | **buy** only | WAIT RETRACE sell | 15 trades, 20% won, −0.30R a trade |
+| AUD/USD | up (OANDA) | no (rule skips AUD/USD) | IN ORIGIN sell | 34 trades, 24% won, −0.36R a trade |
+| USD/CAD | up (OANDA) | **sell** only | IN ORIGIN buy | 21 trades, 19% won, −0.02R a trade |
+| USD/CHF | down (OANDA; Kraken says up) | **buy** only | WAIT RETRACE buy | 29 trades, 48% won, +0.78R a trade |
+
+Replay total on the markets it trades live: 181 trades, +0.22R a trade (+40.39R), after spread. Each signal still has to clear reward:risk ≥ 1.2, the 2-trades-per-market cap and the 3-hour re-entry rule.
+<!-- live-rule:end -->
+
 ## Top 3 to watch
 
 1. **ETH: sell.** Zone: H1 Origin 2,279.80 – 2,376.99. Intraday is READY: sell the pullback to 2,288.24, stop past 2,314.85, target 2,170 (4.44R). A live trade is already open. Swing sits in the H4 Origin; for a second entry, wait for H1 to break down (the CF) first.
