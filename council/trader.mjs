@@ -7,7 +7,7 @@ import path from 'node:path';
 import { msAnalyze, CFG, PAIRS, RETR, LBL, buildSetup, buildRetrace, setMarket } from './engine.mjs';
 import { entryContext, startReview, watchReview, judge, newsNear, lessons } from './review.mjs';
 import { m15cFeat } from './choch.mjs';
-import { alertable, alertEvents, sendAlerts, when, NTFY_DEFAULT, proposalDigest } from './alerts.mjs';
+import { alertable, alertEvents, sendAlerts, when, NTFY_DEFAULT, proposalDigest, decayDigest } from './alerts.mjs';
 import { liveRuleSection, injectSection, coachChurnSection, CHURN_START, CHURN_END, deskSection, DESK_START, DESK_END, analystReviews, analystSections, fidelitySection, FID_START, FID_END } from './analyst.mjs';
 import { coachProposals, spotProposals, ictVariantVerdicts, coachCarry } from './proposals.mjs';
 import { shrink, ebTau, shrunkClear, ruleState, sameRule, setRule, descRule, judgeTrial, ledgerStart, syncLedger, ledgerSection, LEDGER_START, LEDGER_END } from './coach.mjs';
@@ -2037,6 +2037,12 @@ try { const cj = rd('coach.json', {});
   if (!cj.decay || cj.decay.slot !== CC_SLOT) {
     cj.decay = { ...buildDecay({ trades, research, ictTrades: rd('ict/trades.json', []), replay: rd('research/replay-2w.json', null), ictReplay: rd('ict/replay.json', null) }, { now }), slot: CC_SLOT };
     wr('coach.json', cj); }
+  // same-round phone ping when the set of decaying live systems changes (council/alerts.mjs decayDigest); marked once a channel took it
+  const dg = process.env.COUNCIL_ALERTS === 'off' ? null : decayDigest(cj.decay, cj.decaySent, now);
+  if (dg) { const topic = process.env.NTFY_TOPIC || NTFY_DEFAULT, tgTok = process.env.TELEGRAM_BOT_TOKEN || null, tgChat = process.env.TELEGRAM_CHAT_ID || state.tgChat || null;
+    const e = await sendAlerts([dg.ev], { topic, tgTok, tgChat }), tried = (topic ? 1 : 0) + (tgTok && tgChat ? 1 : 0);
+    if (Object.keys(e).length < tried) { cj.decaySent = dg.mark; wr('coach.json', cj); }
+    for (const [c, m] of Object.entries(e)) snapshot.errors[`decay_${c}`] = m; }
 } catch (e) { console.log('decay monitor failed:', e.message); }
 snapshot.lessons = lessons(trades, now);
 // owner's loss reviews, per setup (30 days): reason counts, rule ideas, and reasons that repeat (3+ and a third of the

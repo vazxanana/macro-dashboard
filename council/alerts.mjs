@@ -109,3 +109,22 @@ export function proposalDigest(proposals, sent, now, { remindEvery = 86400 } = {
   return { mark, ev: { title: `Coach suggests (needs your OK on the site)${again ? ' · reminder' : ''}`,
     msg: `${items.map((s) => '• ' + s).join('\n')}\nOpen meridianx.dev → Council → Systems. Nothing changes until you OK it (paper only).\n${when(now)}`, tags: 'bulb', click: SITE } };
 }
+
+// Edge-decay change alert (8 Nov, council/decay.mjs): one message when the set of LIVE systems the monitor marks 'decaying'
+// changes (a system turns decaying, or all of them recover), marked in coach.json decaySent so a restart never resends. The
+// daily digest keeps naming a decaying system; this is the same-round ping. Status only: nothing here changes a rule.
+export function decayKey(decay) {
+  return ((decay && Array.isArray(decay.systems)) ? decay.systems : []).filter((s) => s.live && s.status === 'decaying').map((s) => s.id).sort().join('|');
+}
+export function decayDigest(decay, sent, now) {
+  if (!decay || !Array.isArray(decay.systems)) return null;
+  const key = decayKey(decay), prev = sent && typeof sent === 'object' && typeof sent.key === 'string' ? sent : null;
+  if (prev ? prev.key === key : !key) return null;   // no change (and nothing to say on the first run while all is healthy)
+  const D = decay.systems.filter((s) => s.live && s.status === 'decaying'), W = decay.systems.filter((s) => s.live && s.status === 'watch');
+  const mark = { key, at: new Date(now * 1000).toISOString(), items: D.map((s) => s.name) };
+  const line = (s) => `• ${s.name}: ${(s.why || []).slice(0, 2).join('; ') || 'past its limit'}`;
+  if (!D.length) return { mark, ev: { title: 'Edge decay cleared', msg: `Back to healthy: ${(prev.items || []).join(', ') || prev.key}.\nNothing changed; status only.\n${when(now)}`, tags: 'white_check_mark', click: SITE } };
+  const fresh = D.filter((s) => !(prev && (prev.items || []).includes(s.name)));
+  return { mark, ev: { title: `Edge decay: ${(fresh.length ? fresh : D).map((s) => s.name).join(', ')}`,
+    msg: `${D.map(line).join('\n')}${W.length ? `\nOn watch: ${W.map((s) => s.name).join(', ')}` : ''}\nStatus only: no rule changed, your call (Council → Research on the site).\n${when(now)}`, tags: 'chart_with_downwards_trend', click: SITE } };
+}
