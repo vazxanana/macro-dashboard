@@ -8,7 +8,7 @@ _Snapshot 2026-11-02 05:37 UTC. Paper trading only._
 <!-- live-rule:start -->
 ## Live Scalp rule check
 
-Built by the Trader at 2026-11-07 18:40 UTC from snapshot, config and the 30-day replay. Rule now: Scalp (M15 → M1) against D1 only, not in asia/overlap, skips audusd.
+Built by the Trader at 2026-11-07 18:42 UTC from snapshot, config and the 30-day replay. Rule now: Scalp (M15 → M1) against D1 only, not in asia/overlap, skips audusd.
 
 Session now: **newyork**.
 
@@ -27,6 +27,34 @@ Session now: **newyork**.
 
 Replay total on the markets it trades live: 194 trades, +0.13R a trade (+24.50R), after spread. Each signal still has to clear reward:risk ≥ 1.2, the 2-trades-per-market cap and the 3-hour re-entry rule.
 <!-- live-rule:end -->
+
+<!-- coach-churn:start -->
+## Coach rule changes
+
+Built by the Trader at 2026-11-07 18:42 UTC from the rule history. Rules the Coach changed by itself in the last 7 days (owner rules are not counted).
+
+| Rule | Changes | Steps (oldest first) |
+|---|---|---|
+| Minimum stop **(up every time)** | 5 | 0.6 → 0.7 → 0.8 → 0.9 → 1 → 1.1 (11-03 to 11-07) |
+| m30m1 · D1 rule **(back and forth)** | 4 | 11-06 dropped the D1 rule → 11-06 only with D1 → 11-07 dropped the D1 rule → 11-07 only with D1 |
+| rintra · pause **(back and forth)** | 3 | 11-02 Paused rintra for 3 days → 11-02 Resumed rintra → 11-03 Paused rintra for 3 days |
+| rscalp · asia session **(back and forth)** | 3 | 11-04 trading the asia session again → 11-04 skip the asia session → 11-06 trading the asia session again |
+| scalp · overlap session **(back and forth)** | 3 | 11-06 skip the overlap session → 11-07 trading the overlap session again → 11-07 skip the overlap session |
+| Break-even | 2 | 11-02 Break-even at +1R turned on → 11-02 Break-even turned off |
+| rintra · D1 rule | 2 | 11-03 only with D1 → 11-07 dropped the D1 rule |
+| rscalp · D1 rule | 2 | 11-02 only with D1 → 11-02 "only with D1" dropped |
+| rscalp · overlap session | 2 | 11-03 skip the overlap session → 11-06 trading the overlap session again |
+| scalp · D1 rule | 2 | 11-02 only with D1 → 11-02 only against D1 |
+| scalp · pause | 2 | 11-02 Paused scalp for 3 days → 11-02 Resumed scalp early |
+| intraday · asia session | 1 | 11-04 skip the asia session |
+| intraday · D1 rule | 1 | 11-02 only against D1 |
+| News guard on | 1 | 11-04 News guard on |
+| rintra · late session | 1 | 11-03 skip the late session |
+| rscalp · newyork session | 1 | 11-06 skip the newyork session |
+| scalp, rscalp · asia session | 1 | 11-02 skip the asia session |
+
+36 changes on 17 rules; 4 rules went back and forth 3+ times; 1 setting only ever moved one way. A rule that keeps moving is reacting to noise: the 150-day study found the Coach's choices do no better than dropping the same number of trades at random (research/edge/coach-learning).
+<!-- coach-churn:end -->
 
 ## Top 3 to watch
 
