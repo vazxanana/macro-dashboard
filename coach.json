@@ -1555,5 +1555,188 @@
   "items": [
    "Mosha BO"
   ]
+ },
+ "book": {
+  "at": "2026-11-07T23:00:32.000Z",
+  "v": 1,
+  "label": "paper comparison, no live change",
+  "from": "2026-11-04",
+  "to": "2026-11-05",
+  "rule": "Paper comparison only. The live book is traded as it is; the proposed weights are applied to the same closed trades after the fact. Nothing here changes a rule, a size, a filter or a trade: the owner decides.",
+  "budget": {
+   "M": 9,
+   "N": 8,
+   "goldCap": 0.4,
+   "capped": true,
+   "goldShare": 0.4,
+   "goldIdeas": [
+    "mosha-bo",
+    "gtrend",
+    "gtl",
+    "geg",
+    "gmp"
+   ]
+  },
+  "sizing": {
+   "basis": "clean half 2009-17 (research/edge/portfolio-v2)",
+   "sharpe": 0.3,
+   "ddRange": [
+    81,
+    189
+   ],
+   "note": "Expect the clean-half numbers, not the 2018-26 ones: a Sharpe of about 0.3 a year and drawdowns of about 81-189R at this book's budget of 9R (9-21R per 1R of budget)."
+  },
+  "cost": "after costs: trades.json Rnet; ICT the CME micro round trip (digest.mjs merNet / ictNet)",
+  "nTrades": 18,
+  "nDays": 2,
+  "ictReplay": 7,
+  "ictForward": 0,
+  "live": {
+   "R": 13.84,
+   "dd": 0,
+   "ddCur": 0,
+   "sharpe": null,
+   "worstDay": 2.17,
+   "bestDay": 11.67
+  },
+  "proposed": {
+   "R": 28.14,
+   "dd": 0,
+   "ddCur": 0,
+   "sharpe": null,
+   "worstDay": 7.13,
+   "bestDay": 21.01
+  },
+  "diff": 14.3,
+  "corr": null,
+  "byIdea": [
+   {
+    "id": "replica",
+    "name": "Gold replica",
+    "desk": "Meridian",
+    "gold": false,
+    "streams": 1,
+    "n": 2,
+    "w": 0.2,
+    "m": 1.8,
+    "live": 0.95,
+    "prop": 1.71
+   },
+   {
+    "id": "mosha-bo",
+    "name": "Mosha BO",
+    "desk": "Meridian",
+    "gold": true,
+    "streams": 1,
+    "n": 0,
+    "w": 0.08,
+    "m": 0.72,
+    "live": 0,
+    "prop": 0
+   },
+   {
+    "id": "gtrend",
+    "name": "Gold trend (N20 + N5)",
+    "desk": "Meridian",
+    "gold": true,
+    "streams": 2,
+    "n": 0,
+    "w": 0.08,
+    "m": 0.72,
+    "live": 0,
+    "prop": 0
+   },
+   {
+    "id": "gtl",
+    "name": "Gold H4 trendline",
+    "desk": "Meridian",
+    "gold": true,
+    "streams": 1,
+    "n": 0,
+    "w": 0.08,
+    "m": 0.72,
+    "live": 0,
+    "prop": 0
+   },
+   {
+    "id": "geg",
+    "name": "Gold daily engulf",
+    "desk": "Meridian",
+    "gold": true,
+    "streams": 1,
+    "n": 0,
+    "w": 0.08,
+    "m": 0.72,
+    "live": 0,
+    "prop": 0
+   },
+   {
+    "id": "gmp",
+    "name": "Gold momentum pullback",
+    "desk": "Meridian",
+    "gold": true,
+    "streams": 1,
+    "n": 0,
+    "w": 0.08,
+    "m": 0.72,
+    "live": 0,
+    "prop": 0
+   },
+   {
+    "id": "nq-open",
+    "name": "NQ New York open run",
+    "desk": "Meridian",
+    "gold": false,
+    "streams": 1,
+    "n": 4,
+    "w": 0.2,
+    "m": 1.8,
+    "live": -1,
+    "prop": -1.8
+   },
+   {
+    "id": "ict-a",
+    "name": "ICT A-setups",
+    "desk": "ICT",
+    "gold": false,
+    "streams": 1,
+    "n": 7,
+    "w": 0.2,
+    "m": 1.8,
+    "live": 17.91,
+    "prop": 32.24
+   },
+   {
+    "id": "other",
+    "name": "Other (retired setups closing out)",
+    "desk": "Meridian",
+    "gold": false,
+    "streams": 0,
+    "n": 5,
+    "w": null,
+    "m": 1,
+    "live": -4.02,
+    "prop": -4.02
+   }
+  ],
+  "days": [
+   {
+    "d": "2026-11-04",
+    "n": 13,
+    "live": 2.173,
+    "prop": 7.127,
+    "cumLive": 2.173,
+    "cumProp": 7.127
+   },
+   {
+    "d": "2026-11-05",
+    "n": 5,
+    "live": 11.671,
+    "prop": 21.008,
+    "cumLive": 13.844,
+    "cumProp": 28.135
+   }
+  ],
+  "slot": "2026-11-07T18"
  }
 }
