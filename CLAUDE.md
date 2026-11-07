@@ -178,3 +178,14 @@ the prior 5 daily highs, its own position and add next to the 20-day leg (`gtren
 Adopted on return per drawdown of the gold book (+39.3% → +45.5% | +68.6% → +79.9%, worst drawdown −2.34 → −2.61% |
 −6.21 → −6.47%), positive every year 2019-26 alone.
 
+
+## Gold playbook view (7 Nov 2026, owner: "make dashboard only for this skill")
+Admin-only view `#gold` (`#v-gold`, nav "Gold playbook"; hidden for viewers and guests) for the owner's gold-master-playbook skill
+(kept locally only, never in this public repo). It shows the skill's tested edge in my own words: Weekly structure bullish (last
+completed W1 body close above the last 2-bar-fractal swing high) + a New York-close Daily candle closing above the prior day's low
+and in the top 30% of its range → buy the next Daily open, stop $0.30 under its low, 3R (2R option), out after 10 days, longs only.
+Self-contained script at the end of the page (`window.renderGold`): Binance PAXG H1 since Nov 2020 grouped into NY 17:00 days
+(`gpDays`, weekend hours dropped; closed days cached in localStorage `msGpDays1`), shifted onto spot via gold-api.com; context
+(Weekly state and the level that flips it, 20-day ER, Daily close, session), backtest (each signal its own trade, $0.35 cost, stop
+first; halves 2021-22 untested | Nov 22-Oct 24 | Nov 24-now), signal list with "Took it" ticks (`msGpTook`), checklist ticks per day
+(`msGpCk-<NY date>`), variant switch (`msGpVar`), size calculator (`msGpSize`). Not a council system; not mixed with ICT.

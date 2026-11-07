@@ -1055,6 +1055,65 @@
   .pb-verdict.go { background: color-mix(in srgb, #089981 14%, var(--panel)); border-color: color-mix(in srgb, #089981 45%, var(--line)); }
   .pb-verdict.wait { background: var(--gold-soft); border-color: var(--gold-line); } .pb-verdict.no { background: color-mix(in srgb, #f23645 12%, var(--panel)); border-color: color-mix(in srgb, #f23645 40%, var(--line)); }
   @media (max-width: 1000px) { .pb-ctx { grid-template-columns: repeat(2, minmax(0, 1fr)); } .pb-cols { grid-template-columns: minmax(0, 1fr); } }
+  /* ═══ Gold playbook view (#gold, 7 Nov): the gold master playbook's tested edge, context, backtest and checklist ═══ */
+  .gp-head { display: flex; justify-content: space-between; align-items: flex-end; gap: 16px; flex-wrap: wrap; }
+  .gp-head > div:first-child { max-width: 760px; }
+  .gp-seg { display: inline-flex; border: 1px solid var(--line); border-radius: 10px; padding: 3px; gap: 2px; flex-wrap: wrap; }
+  .gp-seg button { background: none; border: 0; color: var(--ink-dim); font: 600 12px var(--sans); padding: 6px 10px; border-radius: 7px; cursor: pointer; min-height: 32px; }
+  .gp-seg button.on { background: var(--gold-soft); color: var(--ink); box-shadow: inset 0 0 0 1px var(--gold-line); }
+  .gp-seg button:focus-visible, .gp-more:focus-visible, .gp-tb input:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  .gp-top, .gp-grid { display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr); gap: 16px; margin-top: 16px; align-items: start; }
+  .gp-card-h { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; margin-bottom: 12px; flex-wrap: wrap; }
+  .gp-card-h h2 { margin: 0; font: 600 15px var(--sans); color: var(--ink); }
+  .gp-bt, .gp-top + .gp-bt { margin-top: 16px; }
+  .gp-plan { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; margin-top: 12px; }
+  .gp-plan > div { border: 1px solid var(--line-soft); border-radius: 10px; padding: 8px 10px; min-width: 0; }
+  .gp-plan span { display: block; font: 500 11px var(--sans); color: var(--ink-faint); }
+  .gp-plan b { font: 600 15px var(--mono); color: var(--ink); font-variant-numeric: tabular-nums; }
+  .gp-plan small { display: block; font: 500 11px var(--sans); color: var(--ink-faint); }
+  .gp-form { margin-top: 12px; font-size: 12.5px; color: var(--ink-dim); line-height: 1.55; }
+  .gp-form b { color: var(--ink); }
+  .gp-size { display: flex; flex-wrap: wrap; gap: 10px 16px; align-items: center; margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--line-soft); font-size: 12px; color: var(--ink-dim); }
+  .gp-size input, .gp-size select { background: transparent; color: var(--ink); border: 1px solid var(--line); border-radius: 6px; padding: 5px 8px; font: 600 13px var(--mono); min-height: 32px; }
+  .gp-size input { width: 120px; } .gp-size select { font-family: var(--sans); }
+  .gp-lots { font: 600 13px var(--mono); color: var(--ink); }
+  .gp-ctx { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+  .gp-ctx > div { border: 1px solid var(--line); border-radius: 10px; padding: 8px 10px; display: grid; gap: 2px; min-width: 0; }
+  .gp-ctx span { font: 500 11.5px var(--sans); color: var(--ink-dim); } .gp-ctx b { font: 600 14px var(--sans); } .gp-ctx small { font: 500 11px var(--sans); color: var(--ink-faint); }
+  .gp-ctx .ok { border-color: color-mix(in srgb, #089981 45%, var(--line)); } .gp-ctx .bad { border-color: color-mix(in srgb, #f23645 45%, var(--line)); } .gp-ctx .warn { border-color: var(--gold-line); }
+  .gp-kpi { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 8px; }
+  .gp-kpi > div { border: 1px solid var(--line-soft); border-radius: 10px; padding: 8px 10px; min-width: 0; }
+  .gp-kpi span { display: block; font: 500 11px var(--sans); color: var(--ink-faint); } .gp-kpi b { font: 600 18px var(--mono); color: var(--ink); font-variant-numeric: tabular-nums; }
+  .gp-charts { display: grid; grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr); gap: 16px; margin-top: 14px; }
+  .gp-charts h3, .gp-halves h3 { margin: 0 0 6px; font: 600 12px var(--sans); color: var(--ink-dim); }
+  .gp-eq, .gp-yr { position: relative; }
+  .gp-eq svg, .gp-yr svg { display: block; width: 100%; height: auto; overflow: visible; }
+  .gp-eq text, .gp-yr text { font: 10.5px var(--mono); fill: var(--ink-faint); }
+  .gp-eq .grid, .gp-yr .grid { stroke: var(--line-soft); stroke-width: 1; }
+  .gp-eq .zero, .gp-yr .zero { stroke: var(--line-strong); stroke-width: 1; }
+  .gp-eq .ln { fill: none; stroke: var(--gold); stroke-width: 2; stroke-linejoin: round; }
+  .gp-eq .band { fill: var(--gold-soft); opacity: .5; }
+  .gp-eq .xh { stroke: var(--ink-faint); stroke-width: 1; stroke-dasharray: 3 3; }
+  .gp-eq .dot { fill: var(--gold); stroke: var(--panel); stroke-width: 2; }
+  .gp-yr rect.p { fill: var(--buy); } .gp-yr rect.n { fill: var(--sell); }
+  .gp-yr text.v { fill: var(--ink-dim); }
+  .gp-tip { position: absolute; pointer-events: none; background: var(--panel-raised); border: 1px solid var(--line); border-radius: 6px; padding: 5px 8px; font: 11px var(--mono); color: var(--ink); white-space: nowrap; display: none; z-index: 2; }
+  .gp-halves { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; margin-top: 14px; }
+  .gp-halves > div { border: 1px solid var(--line-soft); border-radius: 10px; padding: 8px 10px; font-size: 12px; color: var(--ink-dim); }
+  .gp-halves b { color: var(--ink); font-family: var(--mono); }
+  .gp-tb { width: 100%; border-collapse: collapse; font-size: 12.5px; }
+  .gp-tb th { text-align: left; font: 500 11px var(--sans); color: var(--ink-faint); padding: 6px 8px; border-bottom: 1px solid var(--line); white-space: nowrap; }
+  .gp-tb td { padding: 7px 8px; border-bottom: 1px solid var(--line-soft); font-variant-numeric: tabular-nums; white-space: nowrap; }
+  .gp-tb .n { text-align: right; font-family: var(--mono); }
+  .gp-tb .pos { color: var(--buy); } .gp-tb .neg { color: var(--sell); }
+  .gp-tb input { accent-color: var(--gold); width: 16px; height: 16px; }
+  .gp-ev td { white-space: normal; } .gp-ev td:first-child { width: 2em; color: var(--ink-faint); }
+  .gp-ev tr.best td { background: var(--gold-soft); }
+  .gp-more { margin-top: 10px; background: none; border: 1px solid var(--line); color: var(--ink-dim); border-radius: 8px; padding: 6px 12px; font: 600 12px var(--sans); cursor: pointer; min-height: 32px; }
+  .gp-rules ol { margin: 0 0 10px; padding-left: 20px; display: grid; gap: 6px; font-size: 12.5px; color: var(--ink-dim); line-height: 1.5; }
+  .gp-rules b { color: var(--ink); }
+  @media (max-width: 1000px) { .gp-top, .gp-grid, .gp-charts { grid-template-columns: minmax(0, 1fr); } .gp-kpi { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+  @media (max-width: 600px) { .gp-plan { grid-template-columns: repeat(2, minmax(0, 1fr)); } .gp-kpi { grid-template-columns: repeat(2, minmax(0, 1fr)); } .gp-halves { grid-template-columns: minmax(0, 1fr); } .gp-ctx { grid-template-columns: minmax(0, 1fr); } }
   /* Guest view (6 Nov): only the H4 gold chart with one trade setup */
   html[data-role="public"] .btab, html[data-role="public"] .top .tabs, html[data-role="public"] #ms-hdr-open, html[data-role="public"] #ms-alerts,
   html[data-role="public"] .top details.menu, html[data-role="public"] .top .ms-status, html[data-role="public"] .ms-offline-box { display: none !important; }
@@ -1939,7 +1998,7 @@ html[data-motion="off"] .is-loading, html[data-motion="off"] .srow-skel i { anim
 @media (max-width: 700px) { .a-tap { display: none; } .c-act > li:not(.empty) { padding-left: 4px !important; padding-right: 4px !important; } }
 
 /* ═══ CRYPTO DESK (#crypto) ═══ */
-html[data-role="viewer"] [data-go="crypto"] { display: none !important; }
+html[data-role="viewer"] [data-go="crypto"], html[data-role="viewer"] [data-go="gold"] { display: none !important; }
 .cx-head { display: flex; justify-content: space-between; align-items: flex-end; gap: 16px; flex-wrap: wrap; }
 .cx-head .ms-note { max-width: 70ch; }
 .cx-seg, .cx-tf { display: inline-flex; padding: 3px; gap: 2px; border: 1px solid var(--line); border-radius: 10px; background: var(--panel); }
@@ -2056,7 +2115,7 @@ html[data-role="viewer"] [data-go="crypto"] { display: none !important; }
     <div class="brand"><i class="ms-coin" aria-hidden="true"></i><div><details class="mk" id="ms-mk"><summary class="inst" id="ms-mk-btn" title="Market (click to change)">XAU/USD</summary><div class="mk-pop"><label class="sr" for="ms-mk-q">Search markets</label><input id="ms-mk-q" type="search" placeholder="Search markets…" autocomplete="off"><ul class="mk-list" id="ms-mk-list"></ul></div></details><select id="ms-inst" class="inst" hidden aria-hidden="true" tabindex="-1"><option>XAU/USD · Gold</option></select><span id="ms-inst-name">Gold · Mosha structure</span></div></div>
     <div class="px"><b id="ms-hdr-price">—</b><span id="ms-hdr-chg" class="hdr-chg"></span></div>
     <nav class="tabs" aria-label="Sections">
-      <a href="#home" data-go="home">Home</a><a href="#setup" data-go="setup" class="adm">Setup</a><a href="#charts" data-go="charts">Charts</a><a href="#scanner" data-go="scanner" class="adm">Scanner</a><a href="#crypto" data-go="crypto" class="adm">Crypto</a><a href="#council" data-go="council">Council</a><a href="#journal" data-go="journal">Journal</a><a href="#ict" data-go="ict" class="ictx">ICT desk</a><a href="#users" data-go="users" class="adm own">Users</a>
+      <a href="#home" data-go="home">Home</a><a href="#setup" data-go="setup" class="adm">Setup</a><a href="#charts" data-go="charts">Charts</a><a href="#scanner" data-go="scanner" class="adm">Scanner</a><a href="#crypto" data-go="crypto" class="adm">Crypto</a><a href="#gold" data-go="gold" class="adm">Gold playbook</a><a href="#council" data-go="council">Council</a><a href="#journal" data-go="journal">Journal</a><a href="#ict" data-go="ict" class="ictx">ICT desk</a><a href="#users" data-go="users" class="adm own">Users</a>
     </nav>
     <a class="ms-badge" id="ms-scan-badge" href="#scanner" hidden></a>
     <span class="ms-status"><i class="ms-live-dot" id="ms-live-dot"></i><span id="ms-live-txt">Connecting…</span><span class="upd"> · <span id="ms-updated">—</span></span></span>
@@ -2512,6 +2571,70 @@ html[data-role="viewer"] [data-go="crypto"] { display: none !important; }
       </form>
     </dialog>
   </section>
+  <section class="view adm" id="v-gold" aria-label="Gold playbook" hidden>
+    <div class="v-head gp-head">
+      <div><h1 class="h-head">Gold playbook</h1><p class="ms-note">The gold master playbook on its own page: today's signal for its tested edge (Weekly bullish + a strong Daily close → buy the next Daily open), the context, the backtest on New York-close days and the pre-trade checklist. Separate from the council and the ICT desk. <span id="gp-src"></span></p></div>
+      <div class="gp-seg" role="group" aria-label="Variant">
+        <button type="button" data-gpv="70-3" aria-pressed="true" class="on">Top 30% · 3R</button><button type="button" data-gpv="70-2" aria-pressed="false">Top 30% · 2R</button><button type="button" data-gpv="80-3" aria-pressed="false">Top 20% · 3R</button><button type="button" data-gpv="80-2" aria-pressed="false">Top 20% · 2R</button>
+      </div>
+    </div>
+    <div class="gp-top">
+      <div class="card gp-sig">
+        <div class="gp-card-h"><h2>Today's signal</h2><span class="ms-note" id="gp-sig-at"></span></div>
+        <div class="pb-verdict" id="gp-verdict">Loading gold candles…</div>
+        <div class="gp-plan" id="gp-plan"></div>
+        <div class="gp-form" id="gp-form"></div>
+        <div class="gp-size">
+          <label>Account $ <input id="gp-acct" type="number" min="100" step="100" inputmode="decimal"></label>
+          <label>Risk <select id="gp-risk"><option value="0.25">0.25% (challenge)</option><option value="0.5">0.5% (funded max)</option></select></label>
+          <span id="gp-lots" class="gp-lots"></span>
+        </div>
+      </div>
+      <div class="card gp-ctx-c">
+        <div class="gp-card-h"><h2>Context</h2><span class="ms-note">closed candles only</span></div>
+        <div class="gp-ctx" id="gp-ctx"></div>
+      </div>
+    </div>
+    <div class="card gp-bt">
+      <div class="gp-card-h"><h2>How the edge has done</h2><span class="ms-note" id="gp-bt-note">each signal its own trade · cost $0.35/oz · stop first when both hit in one day</span></div>
+      <div class="gp-kpi" id="gp-kpi"></div>
+      <div class="gp-charts">
+        <div><h3>Cumulative R</h3><div class="gp-eq" id="gp-eq"></div></div>
+        <div><h3>By year</h3><div class="gp-yr" id="gp-yr"></div></div>
+      </div>
+      <div class="gp-halves" id="gp-halves"></div>
+    </div>
+    <div class="gp-grid">
+      <div class="card">
+        <div class="gp-card-h"><h2>Signals</h2><span class="ms-note" id="gp-took-sum"></span></div>
+        <div class="t-scroll"><table class="gp-tb" id="gp-list"></table></div>
+        <button type="button" class="gp-more" id="gp-more" hidden>Show more</button>
+      </div>
+      <div class="card">
+        <div class="gp-card-h"><h2>Pre-trade checklist</h2><span class="ms-note">ticks kept for today</span></div>
+        <ul class="pb-ck" id="gp-ck"></ul>
+      </div>
+    </div>
+    <div class="gp-grid">
+      <div class="card">
+        <div class="gp-card-h"><h2>What the gold tests say</h2><span class="ms-note">honest versions, entries after the candle closes</span></div>
+        <div class="t-scroll"><table class="gp-tb gp-ev" id="gp-ev"></table></div>
+      </div>
+      <div class="card gp-rules">
+        <div class="gp-card-h"><h2>Rules that override everything</h2></div>
+        <ol>
+          <li><b>Closed candles only.</b> A level, break, rejection or engulf exists once its candle has closed.</li>
+          <li><b>Wait for the Daily close.</b> Entering before the Daily rejection had closed lost badly (PF 0.24 on days that did not close as rejections).</li>
+          <li><b>Bodies break, wicks don't.</b> Breaks, failed zones and cuts are body-close events.</li>
+          <li><b>One model at a time.</b> Run it to the end before switching.</li>
+          <li><b>Structural stops.</b> Beyond the rejection or pullback extreme, sized from that distance; fixed 20–30 pip stops don't fit today's gold.</li>
+          <li><b>Regime matters.</b> Breakouts pay in trends and lose in ranges; skip a choppy Daily.</li>
+          <li><b>Levels alone are not an edge.</b> The edge is selection + direction + trigger + management, proven in a journal.</li>
+        </ol>
+        <p class="ms-note">Prop sizing: the worst run was about 14R down, so 0.5% a trade at most (≈7% drawdown) and 0.25% in challenge phases. Three losses in a row = stop for the day. The edge only buys: when the Weekly turns bearish it simply stops firing.</p>
+      </div>
+    </div>
+  </section>
   <section class="view" id="v-journal" aria-label="Journal" hidden>
     <div class="v-head"><h1 class="h-head">Journal</h1><p class="ms-note">Closed trades and their results.</p></div>
     <div class="card adm own" id="ms-j-card">
@@ -2539,6 +2662,7 @@ html[data-role="viewer"] [data-go="crypto"] { display: none !important; }
     <a href="#charts" data-go="charts"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M7 4v16M17 4v16M4 8h6v8H4zM14 6h6v6h-6z"></path></svg>Charts</a>
     <a href="#scanner" data-go="scanner" class="adm"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"></circle><path d="M20 20l-3.5-3.5M11 8v3l2 2"></path></svg><span>Scanner</span></a>
     <a href="#crypto" data-go="crypto" class="adm"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"></circle><path d="M9.5 7.5h4a2.25 2.25 0 010 4.5h-4zM9.5 12h4.5a2.25 2.25 0 010 4.5H9.5zM9.5 7.5v9M11 6v1.5M11 16.5V18"></path></svg>Crypto</a>
+    <a href="#gold" data-go="gold" class="adm"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 18h8l-1.5-5h-5zM13 18h8l-1.5-5h-5zM8 11h8l-1.5-5h-5z"></path></svg><span>Gold</span></a>
     <a href="#council" data-go="council"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="8" cy="9" r="3"></circle><circle cx="16" cy="9" r="3"></circle><path d="M3 20c0-3 2.5-5 5-5s5 2 5 5M11 20c0-3 2.5-5 5-5s5 2 5 5"></path></svg>Council</a>
     <a href="#journal" data-go="journal"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 3h11a1 1 0 011 1v16a1 1 0 01-1 1H6zM6 3v18M10 8h5M10 12h5"></path></svg>Journal</a>
     <a href="#ict" data-go="ict" class="ictx"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 19h16M6 15l4-5 3 3 5-7"></path><path d="M15 6h3v3"></path></svg>ICT</a>
@@ -5327,7 +5451,7 @@ function msNextSetup(bars, A) {
   if (document.getElementById('v-council')) { councilReady = loadCouncil(); setInterval(loadCouncil, 5 * 60e3); }
 
   // ─── Sections: a home page of cards, each section on its own page ───
-  const VIEWS = ['home', 'setup', 'charts', 'scanner', 'crypto', 'council', 'journal', 'guest', 'users', 'ict'];
+  const VIEWS = ['home', 'setup', 'charts', 'scanner', 'crypto', 'gold', 'council', 'journal', 'guest', 'users', 'ict'];
   // Council sections (6 Nov renovation): Overview · Trades · Systems · Review · Research; deep links #council/<section>
   const CPANES = ['overview', 'trades', 'systems', 'review', 'research'], CPUB = ['overview', 'trades'];
   const CPANE = { cur: 'overview' };
@@ -5354,6 +5478,7 @@ function msNextSetup(bars, A) {
   function showView() {
     const [h0, sub] = location.hash.slice(1).split('/'), h = PUB ? 'guest' : h0 === 'guest' ? 'home' : VIEWER && !['home', 'setup', 'council'].concat(document.documentElement.dataset.ict ? ['ict'] : []).includes(h0) ? 'home' : h0 === 'users' && document.documentElement.dataset.role !== 'owner' ? 'home' : h0 === 'ict' && !document.documentElement.dataset.ict ? 'home' : !h0 && document.documentElement.dataset.ict && document.documentElement.dataset.role === 'reviewer' ? 'ict' : h0, v = VIEWS.includes(h) ? h : 'home';
     if (v === 'ict' && window.renderIct) setTimeout(window.renderIct, 0);
+    if (v === 'gold' && window.renderGold) setTimeout(window.renderGold, 0);
     if (v === 'users' && window.renderUsers) window.renderUsers();   // guests only get the H4 chart (owner, 6 Nov)
     if (v === 'council') setPane(sub || CPANE.cur, false);
     VIEWS.forEach((k) => { const el = document.getElementById('v-' + k); if (el) el.hidden = k !== v; });
@@ -6331,6 +6456,334 @@ function msNextSetup(bars, A) {
   document.addEventListener('ms:live', function () { if (shown()) renderAll(); });
   new MutationObserver(function () { if (shown()) start(); else stop(); }).observe(V, { attributes: true, attributeFilter: ['hidden'] });
   if (shown()) start();
+})();
+</script>
+<script>
+// ═══ Gold playbook (#gold, 7 Nov 2026, owner: "make a dashboard only for this skill") ═══
+// The gold master playbook's tested edge: Weekly structure bullish (last completed W1 body close broke the last 2-bar-fractal swing
+// high) + a NY-close Daily candle that closes above the previous day's low and in the top 30% of its range → buy the next Daily open,
+// stop $0.30 under the candle's low, 3R (2R = smaller drawdowns), out after 10 days, longs only. Candles: Binance PAXG/USDT H1 since
+// 2021, grouped into New York 17:00-close days (weekend hours dropped), shifted onto XAU/USD spot (gold-api.com) for the levels.
+(function () {
+  'use strict';
+  var view = document.getElementById('v-gold'); if (!view) return;
+const NYF = new Intl.DateTimeFormat('en-US', { timeZone: 'America/New_York', year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', weekday: 'short', hourCycle: 'h23' });
+function nyp(t) { const o = {}; for (const x of NYF.formatToParts(new Date(t * 1000))) o[x.type] = x.value; return { d: `${o.year}-${o.month}-${o.day}`, h: +o.hour, wd: o.weekday }; }
+const addDay = (d, n) => { const x = new Date(d + 'T12:00:00Z'); x.setUTCDate(x.getUTCDate() + n); return x.toISOString().slice(0, 10); };
+// one NY trading day = the hours from 17:00 New York the day before to 17:00 that day; Sunday evening joins Monday; weekend hours dropped
+function gpDays(h1) {
+  const out = []; let cur = null;
+  for (const b of h1) {
+    const p = nyp(b.time); let d = p.h >= 17 ? addDay(p.d, 1) : p.d;
+    const wd = new Date(d + 'T12:00:00Z').getUTCDay();          // 0 Sun .. 6 Sat (of the trading day)
+    if (wd === 6) continue;                                        // Fri 17:00 → Sat: market shut
+    if (wd === 0) continue;                                        // Sat 17:00 → Sun 17:00: market shut (Sun evening joins Monday)
+    if (!cur || cur.d !== d) { cur = { d, time: b.time, open: b.open, high: b.high, low: b.low, close: b.close, n: 0 }; out.push(cur); }
+    cur.high = Math.max(cur.high, b.high); cur.low = Math.min(cur.low, b.low); cur.close = b.close; cur.n++; cur.end = b.time + 3600;
+  }
+  return out.filter((x) => x.n >= 4);
+}
+// weeks: Monday..Friday NY days
+function gpWeeks(D) {
+  const out = []; let cur = null;
+  for (const b of D) {
+    const dt = new Date(b.d + 'T12:00:00Z'), mon = addDay(b.d, -((dt.getUTCDay() + 6) % 7));
+    if (!cur || cur.wk !== mon) { cur = { wk: mon, open: b.open, high: b.high, low: b.low, close: b.close, lastD: b.d }; out.push(cur); }
+    cur.high = Math.max(cur.high, b.high); cur.low = Math.min(cur.low, b.low); cur.close = b.close; cur.lastD = b.d;
+  }
+  return out;
+}
+// weekly structure after each completed week: a body close above the last confirmed swing high (2-bar fractal each side) = bull,
+// below the last confirmed swing low = bear. A swing is known only two weeks after it prints.
+function gpWeekly(W) {
+  let state = 0, sh = null, sl = null, shAt = null, slAt = null, brk = null; const st = [];
+  for (let i = 0; i < W.length; i++) {
+    const k = i - 2;   // fractal centre confirmed by week i
+    if (k >= 2) {
+      const c = W[k];
+      if (c.high > W[k - 1].high && c.high > W[k - 2].high && c.high > W[k + 1].high && c.high > W[k + 2].high) { sh = c.high; shAt = c.wk; }
+      if (c.low < W[k - 1].low && c.low < W[k - 2].low && c.low < W[k + 1].low && c.low < W[k + 2].low) { sl = c.low; slAt = c.wk; }
+    }
+    const w = W[i];
+    if (sh != null && w.close > sh) { state = 1; brk = { lvl: sh, at: w.wk, from: shAt }; sh = null; }
+    else if (sl != null && w.close < sl) { state = -1; brk = { lvl: sl, at: w.wk, from: slAt }; sl = null; }
+    st.push({ wk: w.wk, lastD: w.lastD, state, brk, sh, sl });
+  }
+  return st;
+}
+// the signal on day i: Weekly bullish (weeks completed by day i's close) + close above the prior day's low + close in the top (1-loc) of its range
+function gpSignals(D, W, WS, loc = 0.7) {
+  const wkIdx = new Map(); WS.forEach((s, j) => wkIdx.set(s.lastD, j));
+  let wj = -1; const out = [];
+  for (let i = 1; i < D.length; i++) {
+    if (wkIdx.has(D[i].d)) wj = wkIdx.get(D[i].d);   // this day closes a week: that week counts
+    const b = D[i], rg = b.high - b.low; if (!(rg > 0)) continue;
+    const cl = (b.close - b.low) / rg, ws = wj >= 0 ? WS[wj].state : 0;
+    if (ws === 1 && b.close > D[i - 1].low && cl >= loc) out.push({ i, d: b.d, cl, low: b.low, high: b.high, close: b.close });
+  }
+  return out;
+}
+// each signal its own trade: buy the next day's open, stop $0.30 under the signal low, target rr x R, SL first if both in one day,
+// out at the 10th day's close; cost $0.35/oz
+function gpTrades(D, sigs, rr = 3, cost = 0.35, maxHold = 10) {
+  const out = [];
+  for (const s of sigs) {
+    const j = s.i + 1; if (j >= D.length) { out.push({ ...s, open: true, pending: true }); continue; }
+    const e = D[j].open, sl = s.low - 0.30, R = e - sl; if (!(R > 0)) continue;
+    const tp = e + rr * R; let res = null;
+    for (let k = j; k < Math.min(D.length, j + maxHold); k++) {
+      if (D[k].low <= sl) { res = { x: Math.min(sl, D[k].open), k, how: 'stop' }; break; }
+      if (D[k].high >= tp) { res = { x: Math.max(tp, k === j ? tp : tp), k, how: 'target' }; break; }
+    }
+    if (!res) { const k = j + maxHold - 1; if (k < D.length) res = { x: D[k].close, k, how: '10 days' }; }
+    const t = { ...s, e, sl, tp, risk: R, entryD: D[j].d };
+    if (!res) { const last = D[D.length - 1]; t.open = true; t.R = (last.close - e) / R; }
+    else { t.R = (res.x - e - cost) / R; t.exitD = D[res.k].d; t.how = res.how; }
+    out.push(t);
+  }
+  return out;
+}
+function gpStats(T) {
+  const c = T.filter((t) => !t.open); let eq = 0, pk = 0, dd = 0, run = 0, worst = 0, gw = 0, gl = 0, w = 0;
+  for (const t of c) { eq += t.R; pk = Math.max(pk, eq); dd = Math.min(dd, eq - pk); if (t.R > 0) { gw += t.R; w++; run = 0; } else { gl -= t.R; run++; worst = Math.max(worst, run); } }
+  return { n: c.length, R: eq, pf: gl ? gw / gl : null, wr: c.length ? w / c.length : null, exp: c.length ? eq / c.length : null, dd, worst };
+}
+  var $ = function (id) { return document.getElementById(id); };
+  var esc = function (s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); };
+  var ls = { get: function (k, d) { try { var v = localStorage.getItem(k); return v == null ? d : JSON.parse(v); } catch (e) { return d; } }, set: function (k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} } };
+  var f2 = function (v) { return v == null || !isFinite(v) ? '—' : v.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }); };
+  var sR = function (v) { return v == null || !isFinite(v) ? '—' : (v >= 0 ? '+' : '−') + Math.abs(v).toFixed(1) + 'R'; };
+  var dLbl = function (d) { return new Date(d + 'T12:00:00Z').toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short', year: '2-digit', timeZone: 'UTC' }); };
+  var START = Date.UTC(2020, 10, 2) / 1000, CK = 'msGpDays1', ST = { days: null, off: 0, offOk: false, busy: false, at: 0, v: ls.get('msGpVar', '70-3'), lim: 25 };
+  if (!/^(70|80)-(2|3)$/.test(ST.v)) ST.v = '70-3';
+
+  // ─── data: H1 PAXG from Binance, grouped into NY days, cached (closed days only) ───
+  function getJ(u) { return fetch(u, { cache: 'no-store' }).then(function (r) { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); }); }
+  function h1Range(from, to, prog) {
+    var starts = []; for (var t = from; t < to; t += 1000 * 3600) starts.push(t);
+    var out = new Array(starts.length), i = 0, done = 0;
+    function worker() {
+      if (i >= starts.length) return Promise.resolve();
+      var k = i++, s = starts[k];
+      var u = 'https://data-api.binance.vision/api/v3/klines?symbol=PAXGUSDT&interval=1h&limit=1000&startTime=' + s * 1000 + '&endTime=' + (Math.min(to, s + 1000 * 3600) * 1000 - 1);
+      return getJ(u).catch(function () { return getJ(u.replace('data-api.binance.vision', 'api.binance.com')); }).then(function (raw) {
+        out[k] = (Array.isArray(raw) ? raw : []).map(function (r) { return { time: r[0] / 1000, open: +r[1], high: +r[2], low: +r[3], close: +r[4] }; });
+        done++; if (prog) prog(done, starts.length); return worker();
+      });
+    }
+    return Promise.all([worker(), worker(), worker(), worker()]).then(function () { return [].concat.apply([], out); });
+  }
+  function load() {
+    if (ST.busy) return; ST.busy = true;
+    var cache = ls.get(CK, null), now = Math.floor(Date.now() / 1000), from = START, keep = [];
+    if (cache && Array.isArray(cache.d) && cache.d.length > 300) {
+      keep = cache.d.slice(0, -2).map(function (r) { return { d: r[0], time: r[1], open: r[2], high: r[3], low: r[4], close: r[5], n: r[6], end: r[7] }; });
+      from = keep[keep.length - 1].end;
+    }
+    var note = $('gp-src');
+    h1Range(from, now + 3600, function (a, b) { if (b > 3 && note) note.textContent = 'Loading gold history ' + Math.round(a / b * 100) + '%…'; }).then(function (h1) {
+      if (!h1.length && !keep.length) throw new Error('no candles');
+      var fresh = gpDays(h1), days = keep.concat(fresh.filter(function (x) { return !keep.length || x.time >= from; }));
+      ST.days = days; ST.at = Date.now(); ST.last = h1.length ? h1[h1.length - 1].close : days[days.length - 1].close;
+      var closed = days.filter(function (x) { return x.end <= now && ny17(x.d) <= now; });
+      ls.set(CK, { at: Date.now(), d: closed.map(function (x) { return [x.d, x.time, x.open, x.high, x.low, x.close, x.n, x.end]; }) });
+      return getJ('https://api.gold-api.com/price/XAU').then(function (j) { var off = +j.price - ST.last; if (isFinite(off) && Math.abs(off) < 150) { ST.off = off; ST.offOk = true; } }).catch(function () {});
+    }).then(function () { ST.busy = false; render(); }).catch(function (e) {
+      ST.busy = false; if ($('gp-verdict')) { $('gp-verdict').className = 'pb-verdict no'; $('gp-verdict').textContent = 'Could not load gold candles (' + (e.message || e) + '). Retrying in a minute.'; }
+      setTimeout(load, 60e3);
+    });
+  }
+  // 17:00 New York on day d, as unix seconds
+  function ny17(d) { var t = Date.parse(d + 'T21:00:00Z') / 1000; return nyp(t).h === 17 ? t : t + 3600; }
+
+  // ─── analysis ───
+  function analyse() {
+    var D = ST.days, now = Date.now() / 1000, loc = ST.v.slice(0, 2) / 100, rr = +ST.v.slice(3);
+    var last = D[D.length - 1], forming = ny17(last.d) > now, Dc = forming ? D.slice(0, -1) : D;
+    var Wall = gpWeeks(Dc), lw = Wall[Wall.length - 1];
+    // a week is complete once its Friday has closed (or a later week has started)
+    var lwDone = lw && new Date(lw.lastD + 'T12:00:00Z').getUTCDay() === 5;
+    var Wc = lwDone ? Wall : Wall.slice(0, -1), WS = gpWeekly(Wc);
+    var sig = gpSignals(Dc, Wc, WS, loc), T = gpTrades(D, sig, rr);   // signals from closed days only; trades run through the forming day
+    var wNow = WS[WS.length - 1] || { state: 0 };
+    // forming-day preview with the current weekly state
+    var prev = Dc[Dc.length - 1], fx = null;
+    if (forming && last.high > last.low) fx = { cl: (last.close - last.low) / (last.high - last.low), aboveLow: last.close > prev.low };
+    var ld = Dc[Dc.length - 1], i = Dc.length - 1, rg = ld.high - ld.low;
+    var today = { d: ld.d, cl: rg > 0 ? (ld.close - ld.low) / rg : 0, aboveLow: ld.close > Dc[i - 1].low, sig: sig.length && sig[sig.length - 1].i === i };
+    return { D: D, Dc: Dc, WS: WS, wNow: wNow, T: T, loc: loc, rr: rr, forming: forming, fx: fx, today: today, last: last };
+  }
+  // nearest fresh Daily resistance (A level: bullish candle then bearish, at the bullish close; a wick touch spends it, a body
+  // through re-freshens it) above a price — the skill's untested overlay: skip when it is under 2R away
+  function freshResistance(Dc, px) {
+    var best = null, st = Math.max(1, Dc.length - 500);
+    for (var i = st; i < Dc.length - 1; i++) {
+      var a = Dc[i], b = Dc[i + 1]; if (!(a.close > a.open && b.close < b.open)) continue;
+      var lv = a.close; if (lv <= px || (best != null && lv >= best)) continue;
+      var fresh = true;
+      for (var k = i + 2; k < Dc.length; k++) { var c = Dc[k], bt = Math.max(c.open, c.close), bb = Math.min(c.open, c.close); if (bb <= lv && bt >= lv) fresh = true; else if (c.high >= lv && c.low <= lv) fresh = false; }
+      if (fresh) best = lv;
+    }
+    return best;
+  }
+  function er20(Dc) { if (Dc.length < 21) return null; var c = Dc.slice(-21).map(function (b) { return b.close; }), p = 0; for (var i = 1; i < 21; i++) p += Math.abs(c[i] - c[i - 1]); return p ? Math.abs(c[20] - c[0]) / p : 0; }
+  function dur(s) { s = Math.max(0, Math.round(s)); var h = Math.floor(s / 3600), m = Math.floor(s % 3600 / 60); return h ? h + 'h ' + String(m).padStart(2, '0') + 'm' : m + 'm'; }
+
+  // ─── render ───
+  function render() {
+    if (!ST.days || view.hidden) return;
+    var A = analyse(), off = ST.off, now = Date.now() / 1000, px = ST.last + off, w = A.wNow, t = A.today;
+    var srcTxt = 'Candles: Binance PAXG/USD H1 (1 token = 1 oz of gold) grouped into New York 17:00-close days' + (ST.offOk ? ', shifted ' + (off >= 0 ? '+' : '−') + f2(Math.abs(off)) + ' onto XAU/USD spot.' : '; spot shift unavailable, prices are PAXG.');
+    $('gp-src').textContent = srcTxt;
+    $('gp-sig-at').textContent = 'last closed Daily: ' + dLbl(t.d);
+    // verdict
+    var v = $('gp-verdict'), pend = A.T.filter(function (x) { return x.pending; })[0], opn = A.T.filter(function (x) { return x.open && !x.pending; });
+    var wTxt = w.state === 1 ? 'bullish' : w.state === -1 ? 'bearish' : 'not set yet';
+    var need = Math.round((1 - A.loc) * 100);
+    var cur = !pend && t.sig ? A.T.filter(function (x) { return x.d === t.d; })[0] : null;
+    if (cur) { v.className = 'pb-verdict go'; v.innerHTML = 'Signal live: bought at today\'s Daily open, ' + f2(cur.e + off) + ' (stop ' + f2(cur.sl + off) + ', 3R ' + f2(cur.e + 3 * cur.risk + off) + '). ' + dLbl(cur.d) + ' closed in the top ' + Math.round((1 - cur.cl) * 100 + 0.5) + '% of its range with the Weekly bullish.'; }
+    else if (pend) { v.className = 'pb-verdict go'; v.innerHTML = 'BUY at the next Daily open (18:00 New York). ' + dLbl(pend.d) + ' closed in the top ' + Math.round((1 - pend.cl) * 100 + 0.5) + '% of its range, above the day before\'s low, with the Weekly bullish.'; }
+    else if (w.state !== 1) { v.className = 'pb-verdict no'; v.innerHTML = 'No trade: the Weekly structure is <b>' + wTxt + '</b>' + (w.brk ? ' since the week of ' + dLbl(w.brk.at) + ' (weekly close ' + (w.state > 0 ? 'above ' : 'below ') + f2(w.brk.lvl + off) + ')' : '') + '. The edge only buys, so it stays off until a weekly close' + (w.sh != null ? ' above <b>' + f2(w.sh + off) + '</b>' : ' above the last weekly swing high') + '.'; }
+    else { v.className = 'pb-verdict wait'; v.innerHTML = 'No signal from ' + dLbl(t.d) + ': it closed at ' + Math.round(t.cl * 100) + '% of its range' + (t.aboveLow ? '' : ' and below the day before\'s low') + ' (needs the top ' + need + '% and a close above the prior low). Weekly is bullish, so the next strong Daily close is a buy.'; }
+    // plan
+    var plan = $('gp-plan'), e, sl, R;
+    if (pend) { e = px; sl = pend.low + off - 0.30; R = e - sl; }
+    if (cur) { e = cur.e + off; sl = cur.sl + off; R = cur.risk; }
+    if ((pend || cur) && R > 0) {
+      var fr = freshResistance(A.Dc.map(function (b) { return b; }), e - off), frR = fr != null ? (fr + off - e) / R : null;
+      plan.innerHTML = cell(cur ? 'Entry (filled)' : 'Entry (now)', f2(e), cur ? 'today\'s Daily open · now ' + f2(px) : 'next Daily open') + cell('Stop', f2(sl), '$0.30 under the low') + cell('Target 2R', f2(e + 2 * R), 'smaller drawdowns') + cell('Target 3R', f2(e + 3 * R), 'risk ' + f2(R) + ' $/oz')
+        + (fr != null ? '<div style="grid-column:1/-1"><span>Next fresh Daily resistance (untested overlay)</span><b>' + f2(fr + off) + '</b><small>' + frR.toFixed(1) + 'R away' + (frR < 2 ? ' · under 2R: the playbook suggests skipping' : '') + '</small></div>' : '');
+      ST.R = R;
+    } else {
+      var lt = A.Dc[A.Dc.length - 1];
+      plan.innerHTML = cell('Last Daily close', f2(lt.close + off), Math.round(t.cl * 100) + '% of the range') + cell('Its low', f2(lt.low + off), 'stop would sit at ' + f2(lt.low + off - 0.30))
+        + cell('Price now', f2(px), 'XAU/USD') + cell('Open trades', String(opn.length), opn.length ? 'from earlier signals' : 'none');
+      ST.R = lt.close - lt.low + 0.30;
+    }
+    // forming candle
+    var fm = $('gp-form'), close17 = ny17(A.last.d);
+    if (A.forming && A.fx) {
+      var would = w.state === 1 && A.fx.aboveLow && A.fx.cl >= A.loc;
+      fm.innerHTML = '<b>Today\'s candle (still forming, closes in ' + dur(close17 - now) + ')</b>: at ' + Math.round(A.fx.cl * 100) + '% of its range' + (A.fx.aboveLow ? ', above yesterday\'s low' : ', below yesterday\'s low') + '. ' + (would ? 'If it closed like this it <b>would be a signal</b>; wait for 17:00 New York, never before.' : 'As it stands it would not be a signal.');
+    } else fm.innerHTML = wkEnd() ? 'Market closed for the weekend; the next Daily candle opens Sunday 18:00 New York.' : 'The Daily candle has closed; the next one opens at 18:00 New York.';
+    sizeLine();
+    // context
+    var er = er20(A.Dc), nyNow = nyp(now), hm = nyNow.h, ses = hm >= 2 && hm < 5 ? ['London', 'ok'] : hm >= 8 && hm < 12 ? ['New York', 'ok'] : hm >= 12 && hm < 17 ? ['NY afternoon', 'warn'] : hm >= 18 ? ['Asia', 'warn'] : ['Between sessions', 'warn'];
+    var wcell = '<div class="' + (w.state === 1 ? 'ok' : w.state === -1 ? 'bad' : '') + '"><span>Weekly structure</span><b>' + (w.state === 1 ? 'Bullish' : w.state === -1 ? 'Bearish' : '—') + '</b><small>' + (w.brk ? 'weekly close ' + (w.state > 0 ? 'above ' : 'below ') + f2(w.brk.lvl + off) + ' · week of ' + dLbl(w.brk.at) : 'last weekly swing break') + '</small></div>';
+    var flip = w.state === 1 ? (w.sl != null ? 'a weekly close below ' + f2(w.sl + off) + ' turns it bearish' : 'no confirmed weekly swing low below yet') : (w.sh != null ? 'a weekly close above ' + f2(w.sh + off) + ' turns it bullish' : 'waiting for a weekly swing high');
+    $('gp-ctx').innerHTML = wcell
+      + '<div><span>What flips it</span><b>' + (w.state === 1 ? 'Weekly low' : 'Weekly high') + '</b><small>' + flip + '</small></div>'
+      + '<div class="' + (er == null ? '' : er >= 0.2 ? 'ok' : 'warn') + '"><span>Daily regime</span><b>' + (er == null ? '—' : er >= 0.35 ? 'Strong trend' : er >= 0.2 ? 'Trending' : 'Ranging') + '</b><small>20-day efficiency ' + (er == null ? '—' : er.toFixed(2)) + ' · ranges hurt breakouts</small></div>'
+      + '<div><span>Daily close</span><b>' + (A.forming ? 'in ' + dur(close17 - now) : wkEnd() ? 'weekend' : 'closed') + '</b><small>17:00 New York · signals only after it</small></div>'
+      + '<div class="' + ses[1] + '"><span>Session now</span><b>' + ses[0] + '</b><small>' + String(nyNow.h).padStart(2, '0') + ':00 New York · London / NY for discretionary entries</small></div>'
+      + '<div><span>Edge this year</span><b>' + sR(gpStats(A.T.filter(function (x) { return x.d.slice(0, 4) === t.d.slice(0, 4); })).R) + '</b><small>' + gpStats(A.T.filter(function (x) { return x.d.slice(0, 4) === t.d.slice(0, 4); })).n + ' closed signals in ' + t.d.slice(0, 4) + '</small></div>';
+    renderBt(A); renderList(A); renderCk(A, pend); renderEv();
+  }
+  function wkEnd() { var q = nyp(Date.now() / 1000); return q.wd === 'Sat' || (q.wd === 'Sun' && q.h < 18) || (q.wd === 'Fri' && q.h >= 17); }
+  function cell(k, v, s) { return '<div><span>' + k + '</span><b>' + v + '</b><small>' + s + '</small></div>'; }
+  function sizeLine() {
+    var a = +$('gp-acct').value, r = +$('gp-risk').value, R = ST.R, el = $('gp-lots');
+    if (!(a > 0) || !(R > 0)) { el.textContent = ''; return; }
+    var usd = a * r / 100, oz = usd / R; el.textContent = '$' + Math.round(usd).toLocaleString('en-US') + ' at risk → ' + oz.toFixed(1) + ' oz = ' + (oz / 100).toFixed(2) + ' lots';
+  }
+  function renderBt(A) {
+    var T = A.T, s = gpStats(T), mid = '2024-11-01', sk = '2022-11-01';
+    var k = function (l, v) { return '<div><span>' + l + '</span><b>' + v + '</b></div>'; };
+    $('gp-kpi').innerHTML = k('Closed trades', s.n) + k('Profit factor', s.pf ? s.pf.toFixed(2) : '—') + k('Win rate', s.wr == null ? '—' : Math.round(s.wr * 100) + '%') + k('Average', s.exp == null ? '—' : (s.exp >= 0 ? '+' : '') + s.exp.toFixed(2) + 'R') + k('Total', sR(s.R)) + k('Worst drawdown', sR(s.dd) + ' · ' + s.worst + ' losses');
+    var hv = function (lbl, sub, xs) { var z = gpStats(xs); return '<div><h3>' + lbl + '</h3>' + sub + '<br><b>' + z.n + '</b> trades · PF <b>' + (z.pf ? z.pf.toFixed(2) : '—') + '</b> · <b>' + sR(z.R) + '</b> · drawdown <b>' + sR(z.dd) + '</b></div>'; };
+    $('gp-halves').innerHTML = hv('Before the skill\'s test', 'Jan 2021 – Oct 2022 (gold went sideways)', T.filter(function (x) { return x.d < sk; }))
+      + hv('Skill test, first half', 'Nov 2022 – Oct 2024', T.filter(function (x) { return x.d >= sk && x.d < mid; }))
+      + hv('Skill test, second half + live', 'Nov 2024 – now', T.filter(function (x) { return x.d >= mid; }));
+    // equity curve
+    var C = T.filter(function (x) { return !x.open; }), eq = 0, pts = C.map(function (x) { eq += x.R; return { d: x.exitD || x.d, v: eq, x: x }; });
+    var W = 640, H = 220, pl = 44, pr = 8, pt = 10, pb = 22, mn = Math.min(0, Math.min.apply(null, pts.map(function (p) { return p.v; }))), mx = Math.max(1, Math.max.apply(null, pts.map(function (p) { return p.v; })));
+    var xs = function (i) { return pl + (pts.length > 1 ? i / (pts.length - 1) : 0) * (W - pl - pr); }, ys = function (v) { return pt + (mx - v) / (mx - mn) * (H - pt - pb); };
+    var step = niceStep((mx - mn) / 4), g = '';
+    for (var y = Math.ceil(mn / step) * step; y <= mx; y += step) g += '<line class="' + (Math.abs(y) < 1e-9 ? 'zero' : 'grid') + '" x1="' + pl + '" x2="' + (W - pr) + '" y1="' + ys(y) + '" y2="' + ys(y) + '"/><text x="' + (pl - 6) + '" y="' + (ys(y) + 3.5) + '" text-anchor="end">' + (y > 0 ? '+' : '') + Math.round(y) + 'R</text>';
+    var yrs = '', py = null, lx = -99; pts.forEach(function (p, i) { var yy = p.x.d.slice(0, 4); if (yy !== py) { py = yy; if (xs(i) - lx > 36) { yrs += '<text x="' + xs(i) + '" y="' + (H - 6) + '">' + yy + '</text>'; lx = xs(i); } } });
+    var i0 = pts.findIndex(function (p) { return p.x.d >= sk; }), band = i0 > 0 ? '<rect class="band" x="' + xs(i0) + '" y="' + pt + '" width="' + (W - pr - xs(i0)) + '" height="' + (H - pt - pb) + '"/>' : '';
+    $('gp-eq').innerHTML = '<svg viewBox="0 0 ' + W + ' ' + H + '" role="img" aria-label="Cumulative R of the playbook edge, ' + sR(s.R) + ' over ' + s.n + ' trades">' + band + g + yrs
+      + '<polyline class="ln" points="' + pts.map(function (p, i) { return xs(i).toFixed(1) + ',' + ys(p.v).toFixed(1); }).join(' ') + '"/><line class="xh" y1="' + pt + '" y2="' + (H - pb) + '" style="display:none"/><circle class="dot" r="4" style="display:none"/></svg><div class="gp-tip"></div>';
+    var svg = $('gp-eq').querySelector('svg'), tip = $('gp-eq').querySelector('.gp-tip'), xh = svg.querySelector('.xh'), dot = svg.querySelector('.dot');
+    svg.onpointermove = function (ev) {
+      var r = svg.getBoundingClientRect(), x = (ev.clientX - r.left) / r.width * W, i = Math.max(0, Math.min(pts.length - 1, Math.round((x - pl) / (W - pl - pr) * (pts.length - 1)))), p = pts[i]; if (!p) return;
+      xh.setAttribute('x1', xs(i)); xh.setAttribute('x2', xs(i)); xh.style.display = ''; dot.setAttribute('cx', xs(i)); dot.setAttribute('cy', ys(p.v)); dot.style.display = '';
+      tip.style.display = 'block'; tip.textContent = dLbl(p.x.d) + ' · ' + sR(p.x.R) + ' · total ' + sR(p.v);
+      var tx = xs(i) / W * r.width; tip.style.left = Math.min(r.width - tip.offsetWidth, Math.max(0, tx - tip.offsetWidth / 2)) + 'px'; tip.style.top = (ys(p.v) / H * r.height - 34) + 'px';
+    };
+    svg.onpointerleave = function () { tip.style.display = 'none'; xh.style.display = 'none'; dot.style.display = 'none'; };
+    // by year
+    var byY = {}; C.forEach(function (x) { var yy = x.d.slice(0, 4); byY[yy] = (byY[yy] || 0) + x.R; });
+    var ks = Object.keys(byY).sort(), W2 = 360, H2 = 220, m2 = Math.max(1, Math.max.apply(null, ks.map(function (k) { return Math.abs(byY[k]); }))), anyNeg = ks.some(function (k) { return byY[k] < 0; });
+    var z = anyNeg ? (H2 - 22) * m2 / (2 * m2) + 10 : H2 - 22, sc = (anyNeg ? (H2 - 32) / 2 : H2 - 32) / m2, bw = (W2 - 10) / ks.length;
+    $('gp-yr').innerHTML = '<svg viewBox="0 0 ' + W2 + ' ' + H2 + '" role="img" aria-label="Result by year">' + '<line class="zero" x1="0" x2="' + W2 + '" y1="' + z + '" y2="' + z + '"/>'
+      + ks.map(function (k, i) { var v = byY[k], h = Math.max(1, Math.abs(v) * sc), x = 5 + i * bw + bw * 0.2, ww = bw * 0.6, y = v >= 0 ? z - h : z;
+        return '<rect class="' + (v >= 0 ? 'p' : 'n') + '" x="' + x + '" y="' + y + '" width="' + ww + '" height="' + h + '" rx="3"><title>' + k + ': ' + sR(v) + '</title></rect><text class="v" x="' + (x + ww / 2) + '" y="' + (v >= 0 ? y - 4 : y + h + 12) + '" text-anchor="middle">' + sR(v) + '</text><text x="' + (x + ww / 2) + '" y="' + (H2 - 4) + '" text-anchor="middle">' + k + '</text>'; }).join('') + '</svg>';
+  }
+  function niceStep(x) { var p = Math.pow(10, Math.floor(Math.log10(Math.max(x, 1e-9)))), m = x / p; return (m <= 1 ? 1 : m <= 2 ? 2 : m <= 5 ? 5 : 10) * p; }
+  function renderList(A) {
+    var took = ls.get('msGpTook', {}), off = ST.off, rows = A.T.slice().reverse(), sh = rows.slice(0, ST.lim);
+    $('gp-list').innerHTML = '<thead><tr><th>Signal day</th><th class="n">Entry</th><th class="n">Stop</th><th class="n">Target</th><th class="n">Result</th><th>How</th><th>Took it</th></tr></thead><tbody>'
+      + sh.map(function (x) { var r = x.pending ? 'next open' : x.open ? sR(x.R) + ' open' : sR(x.R);
+        return '<tr><td>' + dLbl(x.d) + '</td><td class="n">' + (x.e ? f2(x.e + off) : '—') + '</td><td class="n">' + f2((x.sl || x.low - 0.3) + off) + '</td><td class="n">' + (x.tp ? f2(x.tp + off) : '—') + '</td><td class="n ' + (x.pending || x.open ? '' : x.R > 0 ? 'pos' : 'neg') + '">' + r + '</td><td>' + esc(x.how || (x.pending ? 'pending' : 'open')) + '</td><td><input type="checkbox" data-gpt="' + x.d + '" aria-label="I took the ' + esc(dLbl(x.d)) + ' signal"' + (took[x.d] ? ' checked' : '') + '></td></tr>'; }).join('') + '</tbody>';
+    $('gp-more').hidden = rows.length <= ST.lim;
+    var tk = A.T.filter(function (x) { return took[x.d]; }), s = gpStats(tk);
+    $('gp-took-sum').textContent = tk.length ? 'You took ' + tk.length + ': ' + sR(s.R) + (s.n ? ' on ' + s.n + ' closed' : '') : rows.length + ' signals since 2021 · tick the ones you took';
+  }
+  var CK_ITEMS = [
+    ['auto', 'Weekly structure bullish (last completed week)', 'The edge only buys; against the Weekly in a trend tested near PF 0.8.'],
+    ['auto', 'Daily candle CLOSED at 17:00 New York in the top of its range, above the prior low', 'Never pre-empt the close.'],
+    ['auto', 'Daily not ranging (20-day efficiency ≥ 0.2)', 'Guidance: 2021, a sideways year, lost.'],
+    ['m', 'Stop $0.30 under the signal candle\'s low; size from that distance', ''],
+    ['m', 'Risk 0.5% at most (0.25% in a challenge phase)', 'About 14R was the worst run down.'],
+    ['m', 'Not after 3 losses in a row', ''],
+    ['m', 'Overlay (untested, journal it): DRD at a fresh Daily/Weekly level or Daily engulf zone; next fresh resistance ≥ 2R away', ''],
+    ['m', 'No high-impact news at the open; target 3R (2R for smaller swings), break-even optional', '']];
+  function renderCk(A, pend) {
+    var day = nyp(Date.now() / 1000).d, key = 'msGpCk-' + day, man = ls.get(key, {}), er = er20(A.Dc), t = A.today;
+    var auto = [A.wNow.state === 1, !!pend || (t.aboveLow && t.cl >= A.loc), er == null ? null : er >= 0.2];
+    var li = function (txt, st, sub) { return '<li class="' + (st === true ? 'yes' : st === false ? 'no' : '') + '"><span class="st" aria-hidden="true">' + (st === true ? '✓' : st === false ? '✕' : '?') + '</span><span>' + esc(txt) + (sub ? '<small>' + esc(sub) + '</small>' : '') + '</span></li>'; };
+    var j = 0;
+    $('gp-ck').innerHTML = CK_ITEMS.map(function (it, i) { if (it[0] === 'auto') return li(it[1], auto[j++], it[2]);
+      return '<li class="' + (man[i] ? 'yes' : '') + '"><label><input type="checkbox" data-gpc="' + i + '"' + (man[i] ? ' checked' : '') + '> <span>' + esc(it[1]) + (it[2] ? '<small>' + esc(it[2]) + '</small>' : '') + '</span></label></li>'; }).join('');
+    $('gp-ck').dataset.key = key;
+  }
+  var EV = [
+    ['★', 'Weekly-bull Daily rejection, long (this page)', 'PF 2.2 at 3R, both halves above 1.9 (Nov 2022 – Oct 2026)', 'the edge', 1],
+    ['1', 'Mosha BO→VR→CF + Weekly agrees + Daily not ranging', 'PF 1.35–1.42 over 14 years; no lift over buying gold in 2022-26', 'modest'],
+    ['2', 'Mosha Janda (Daily engulf barrier → H1), buys', 'PF 1.33–1.40, few trades', 'buys only'],
+    ['3', 'Zlankator Decision Level after the Daily close', 'PF ~1.2, small sample', 'unproven'],
+    ['4', 'Low-risk Apex (honest version)', 'PF 0.4–1.0', 'no edge'],
+    ['5', 'H4 engulf zones, failed-zone continuation', 'PF ~1.0', 'no edge'],
+    ['6', 'H4 engulf + H1 engulf confirmation', 'PF 0.78–0.90', 'hurts'],
+    ['7', 'Breakouts against the Weekly in a trend', 'PF ~0.8', 'never'],
+    ['8', 'Entering before the Daily close', 'PF 0.24 on non-rejection days', 'never'],
+    ['9', 'Raw key-level touches', 'same as random prices', 'not an edge']];
+  function renderEv() {
+    if ($('gp-ev').dataset.done) return; $('gp-ev').dataset.done = '1';
+    $('gp-ev').innerHTML = '<thead><tr><th>#</th><th>Model</th><th>Result</th><th>Verdict</th></tr></thead><tbody>' + EV.map(function (r) { return '<tr' + (r[4] ? ' class="best"' : '') + '><td>' + r[0] + '</td><td>' + esc(r[1]) + '</td><td>' + esc(r[2]) + '</td><td>' + esc(r[3]) + '</td></tr>'; }).join('') + '</tbody>';
+  }
+
+  // ─── events ───
+  view.addEventListener('click', function (ev) {
+    var b = ev.target.closest('[data-gpv]');
+    if (b) { ST.v = b.dataset.gpv; ls.set('msGpVar', ST.v); view.querySelectorAll('[data-gpv]').forEach(function (x) { var on = x === b; x.classList.toggle('on', on); x.setAttribute('aria-pressed', String(on)); }); render(); }
+    if (ev.target.closest('#gp-more')) { ST.lim += 50; render(); }
+  });
+  view.addEventListener('change', function (ev) {
+    var t = ev.target;
+    if (t.dataset.gpt) { var took = ls.get('msGpTook', {}); if (t.checked) took[t.dataset.gpt] = 1; else delete took[t.dataset.gpt]; ls.set('msGpTook', took); render(); }
+    if (t.dataset.gpc) { var key = $('gp-ck').dataset.key, man = ls.get(key, {}); man[t.dataset.gpc] = t.checked; ls.set(key, man); render(); }
+    if (t.id === 'gp-acct' || t.id === 'gp-risk') { ls.set('msGpSize', { a: +$('gp-acct').value, r: $('gp-risk').value }); sizeLine(); }
+  });
+  $('gp-acct').addEventListener('input', sizeLine);
+  (function () { var s = ls.get('msGpSize', {}); $('gp-acct').value = s.a || 100000; $('gp-risk').value = s.r === '0.25' ? '0.25' : '0.5'; })();
+  view.querySelectorAll('[data-gpv]').forEach(function (x) { var on = x.dataset.gpv === ST.v; x.classList.toggle('on', on); x.setAttribute('aria-pressed', String(on)); });
+  window.renderGold = function () { if (!ST.days) load(); else { render(); if (Date.now() - ST.at > 10 * 60e3) load(); } };
+  setInterval(function () { if (!view.hidden) window.renderGold(); }, 60e3);
+  // this script runs after the router's first pass: catch a page opened straight on #gold too
+  new MutationObserver(function () { if (!view.hidden) window.renderGold(); }).observe(view, { attributes: true, attributeFilter: ['hidden'] });
+  if (!view.hidden) window.renderGold();
 })();
 </script>
 </body>
