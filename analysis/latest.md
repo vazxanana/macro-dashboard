@@ -8,7 +8,7 @@ _Snapshot 2026-11-02 05:37 UTC. Paper trading only._
 <!-- live-rule:start -->
 ## Live Scalp rule check
 
-Built by the Trader at 2026-11-07 17:46 UTC from snapshot, config and the 30-day replay. Rule now: Scalp (M15 → M1) against D1 only, not in asia/overlap, skips audusd.
+Built by the Trader at 2026-11-07 17:51 UTC from snapshot, config and the 30-day replay. Rule now: Scalp (M15 → M1) against D1 only, not in asia/overlap, skips audusd.
 
 Session now: **newyork**.
 
@@ -21,7 +21,7 @@ Session now: **newyork**.
 | XRP/USD | up (Kraken) | **sell** only | IN ORIGIN sell | 31 trades, 32% won, +0.07R a trade |
 | EUR/USD | down (OANDA; Kraken says up) | **buy** only | WAIT RETRACE sell | 22 trades, 9% won, −0.87R a trade |
 | GBP/USD | down (OANDA) | **buy** only | WAIT RETRACE sell | 16 trades, 19% won, −0.38R a trade |
-| AUD/USD | up (OANDA) | no (rule skips AUD/USD) | IN ORIGIN sell | 34 trades, 24% won, −0.39R a trade |
+| AUD/USD | up (OANDA) | no (rule skips AUD/USD) | READY sell | 34 trades, 24% won, −0.39R a trade |
 | USD/CAD | up (OANDA) | **sell** only | IN ORIGIN buy | 21 trades, 19% won, +0.44R a trade |
 | USD/CHF | down (OANDA; Kraken says up) | **buy** only | WAIT RETRACE buy | 29 trades, 45% won, +0.40R a trade |
 
