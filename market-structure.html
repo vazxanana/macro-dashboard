@@ -1632,6 +1632,11 @@ html[data-motion="off"] .stagger-in > * { animation: none; }
 
 .ms-tr-g .tr-d { font: 500 10px var(--sans); font-style: normal; text-transform: none; letter-spacing: 0; color: var(--ink-faint); margin-top: 1px; }
 .ms-tr-g .tr-d.at { color: var(--accent); font-weight: 600; }
+
+/* top bar gains a soft shadow once the page is scrolled */
+.top { transition: box-shadow .2s ease-out; }
+html.scrolled .top { box-shadow: 0 6px 20px -10px rgba(0,0,0,.55); }
+:root[data-theme="light"].scrolled .top { box-shadow: 0 6px 18px -10px rgba(16,24,40,.18); }
 </style>
 <script>try{if(localStorage.getItem('msMotion')==='off')document.documentElement.dataset.motion='off'}catch(e){}</script>
 </head>
@@ -5381,6 +5386,9 @@ function msNextSetup(bars, A) {
     const r = b.getBoundingClientRect(), tip = document.createElement('div'); tip.className = 'copy-tip'; tip.setAttribute('role', 'status'); tip.textContent = ok ? `Copied ${raw}` : 'Copy failed';
     tip.style.left = (r.left + r.width / 2) + 'px'; tip.style.top = r.top + 'px'; document.body.appendChild(tip); setTimeout(() => tip.remove(), 1100); });
   const lab = () => ul.querySelectorAll('b').forEach((b) => { b.title = 'Click to copy'; }); new MutationObserver(lab).observe(ul, { childList: true }); lab(); })();
+</script>
+<script>
+(() => { const r = document.documentElement; let on = null; const f = () => { const v = scrollY > 8; if (v !== on) { on = v; r.classList.toggle('scrolled', v); } }; addEventListener('scroll', f, { passive: true }); f(); })();
 </script>
 </body>
 </html>
