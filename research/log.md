@@ -1359,3 +1359,23 @@ Owner's skill file (ALL_SKILLS_COMBINED: gold-msnr-playbook, Engulfing King, eng
 - **MMXM NY-midnight discount** for the long legs (`ms/mmxm_gold.py`): daily engulf fills below the 00:00 open +26.6 dd −11.9 | +40.8; H4 trendline below +2.2 | +11.4 (the profit is above the open). Rejected.
 - **Sizing across the gold legs** (`ms/alloc.py`, % of account, worst drawdown in each half): the guide (replica, trendline and engulf at 0.25%, gold trend at 0.5%) gives +37.2% dd −2.3% | +60.1% dd −6.2%. No grid allocation (0.25–1% per leg) beats it in both halves. The bridges had gold trend at the shared gold risk (+34.0% | +54.0%, same drawdown); they now carry a separate 0.5% gold-trend risk (PR #300).
 - Together with the earlier rounds (Mosha + Daily ER, Zlankator levels / CE / ECMTF, PITCHOU M15, MSNR scalps, engulf locations, two-target exits, session bands, news gates, vol sizing, slow-trend gate, day caps), every codable rule in the skill file has now been tested. The live stack is the best variant found.
+
+## 2026-11-07 — Gold trend fast adopted (PR #301); follow-up variants and gated shorts: no change
+- **Adopted:** gold trend on the 5-day high as its own leg (`gtrend5`, 0.25%).
+  - Gold book in % of account: +39.3% DD −2.34% | +68.6% DD −6.21% → +45.5% DD −2.61% | +79.9% DD −6.47%. Return per drawdown is better in both halves.
+  - N5 alone is positive every year 2019-26.
+  - Replay of 39 trades (2023 to Oct 2026) added to research/replay-2w.json.
+- **5-day leg variants, on the book** (`ms/gt_more.py`):
+  - trail 1.5 ATR: +43.0 | +76.8;
+  - trail 2.5 ATR: +45.8 dd −2.86 | +77.0;
+  - trail 3 ATR: +47.1 dd −2.32 | +76.0 dd −6.58;
+  - no add: +43.1 | +74.7;
+  - add at +0.5R: +45.7 dd −2.83 | +80.3;
+  - N3: +47.6 | +80.7 dd −6.68.
+  - None better in both halves. N5, 2 ATR, add at +1R stays.
+- **A third leg, N10 at 0.25%:** +49.9% DD −2.82% | +90.1% DD −6.83%. It is the same trend trade a third time, so it adds size on one bet rather than a new edge. Not added.
+- **Gold trend shorts gated by the 3/6/12-month trend** (`ms/gt_short.py`), 2019-22 | 2023-24 | 2025-26:
+  - N5, ≤1 of 3 positive: −5.1R | +2.3 (2 trades) | −2.2;
+  - N20: −3.6 | +0.5 | −1.9;
+  - ungated: −9.5 | −4.4 | −6.1.
+  - Feb–Jun 2026: +2.7R (N5, ungated, 4 trades). No hedge leg; gold stays long-only.
