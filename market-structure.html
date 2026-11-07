@@ -3247,6 +3247,7 @@ function msNextSetup(bars, A) {
   // OANDA (broker-grade spot gold and forex) through the site's own /md proxy, which holds the token. Only on the Vercel site;
   // a 503 means no token is set, so the page stops asking and uses the exchange feeds below for the rest of the visit.
   const MD = { base: /^https?:$/.test(location.protocol) && !/github\.io$/.test(location.hostname) ? '/md/' : null, on: null };
+  const marketClosedNow = () => { if (CUR.group === 'Crypto') return false; const d = new Date(), wd = d.getUTCDay(), h = d.getUTCHours(); return wd === 6 || (wd === 0 && h < 22) || (wd === 5 && h >= 21); };
   async function mdBars(I, tf, q) {
     if (!I.md || !MD.base || MD.on === false) return null;
     try {
@@ -3457,6 +3458,19 @@ function msNextSetup(bars, A) {
         tl.querySelector('.ch-fs').addEventListener('click', () => { if (document.fullscreenElement) document.exitFullscreen(); else if (pane.requestFullscreen) pane.requestFullscreen().catch(() => {}); });
       }
       el.addEventListener('dblclick', () => P.fit()); }
+    // candle-close countdown (7 Nov loop): a small pill under the last-price label on the price scale, mm:ss (or h:mm) to this bar's close
+    { const cd = document.createElement('div'); cd.className = 'ch-cd'; cd.setAttribute('aria-hidden', 'true'); el.appendChild(cd);
+      const tickCd = () => {
+        if (!P.bars || !P.bars.length || !el.offsetParent || document.hidden) return;
+        const L = P.bars[P.bars.length - 1], y = series.priceToCoordinate(L.close), w = chart.priceScale('right').width();
+        const left = Math.ceil(((L.time - TZ) + tf.sec) - Date.now() / 1000);
+        if (y == null || !w || left <= 0 || left > tf.sec || marketClosedNow()) { cd.style.display = 'none'; return; }
+        const h = Math.floor(left / 3600), m = Math.floor(left % 3600 / 60), s2 = left % 60, p2 = (v) => String(v).padStart(2, '0');
+        cd.textContent = h ? `${h}:${p2(m)}:${p2(s2)}` : `${p2(m)}:${p2(s2)}`;
+        cd.style.display = ''; cd.style.width = `${w}px`; cd.style.transform = `translateY(${Math.round(y + 11)}px)`;
+        cd.classList.toggle('up', L.close >= L.open);
+      };
+      setInterval(tickCd, 1000); chart.timeScale().subscribeVisibleLogicalRangeChange(() => requestAnimationFrame(tickCd)); }
     chart.subscribeCrosshairMove((pr) => { if (!P.bars) return; if (pr && pr.logical != null && pr.point && pr.point.x >= 0) { lgHover = true; P.legend(Math.round(pr.logical)); } else { lgHover = false; P.legend(); } });
     setInterval(() => { if (!lgHover && el.offsetParent && !document.hidden) { try { const d = series.data(); if (d && d.length && P.bars && P.bars.length) { const L = d[d.length - 1], b = P.bars[P.bars.length - 1]; if (L.time === b.time) Object.assign(b, { open: L.open, high: L.high, low: L.low, close: L.close }); } } catch (e) {} P.legend(); } }, 1000);
     series.applyOptions({ autoscaleInfoProvider: (orig) => {
@@ -7359,6 +7373,9 @@ function gpStats(T) {
 .pa-del:hover { color: var(--sell); border-color: color-mix(in srgb, var(--sell) 40%, var(--line)); }
 @media (max-width: 480px) { .pa-f { grid-template-columns: 1fr; } }
 @media (prefers-reduced-motion: reduce) { .pa-dlg[open] { animation: none; } }
+.ch-cd { position: absolute; top: 0; right: 0; z-index: 4; pointer-events: none; height: 16px; display: flex; align-items: center; justify-content: center; font: 600 10.5px var(--mono, ui-monospace, monospace); font-variant-numeric: tabular-nums; color: #fff; background: var(--sell); border-radius: 0 0 3px 3px; opacity: .92; }
+.ch-cd.up { background: var(--buy); color: #04140f; }
+.ms-ph .ms-cd { display: none; }   /* the countdown now sits on the price scale */
 </style>
 </body>
 </html>
