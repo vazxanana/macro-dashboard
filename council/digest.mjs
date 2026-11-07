@@ -14,6 +14,7 @@
 //      (coach.json decay, council/decay.mjs; one line, only when there is one)
 //   5. edge scoreboard movers: streams whose verdict changed since the last digest (the scoreboard's own pure functions,
 //      script#ms-sb-js of market-structure.html, run here without a page)
+//   6. Sundays only: one line of the book-weights paper comparison (coach.json book, council/book.mjs): live vs proposed R
 //
 // Sent through alerts.mjs sendAlerts (ntfy + Telegram, the same env as the other alerts). Deduplicated per UTC day in
 // council-data digest.json, so a restart never sends twice; when every channel fails nothing is marked and the next round tries
@@ -220,6 +221,14 @@ export function decayLine(decay) {
     s.dd ? `DD ${(+s.dd.cur).toFixed(1)}R of ${(+s.dd.limit).toFixed(0)}R` : ''].filter(Boolean).join(', ')})`;
   return `Edge decay: ${trim(S.slice(0, 2).map(one).join('; '), 150)}${S.length > 2 ? ` +${S.length - 2} more` : ''}. Status only, no rule changed: your call.`;
 }
+// Book weights paper comparison (coach.json book, council/book.mjs): one line for the Sunday preview, or null without a record.
+// Labelled as a paper comparison with no live change, so it is never read as a result of something that trades.
+export function bookLine(book) {
+  if (!book || !(book.nTrades > 0) || !book.live || !book.proposed) return null;
+  const since = book.from ? DAYF.format(new Date(book.from + 'T12:00:00Z')).replace(/^\w+ /, '') : '';
+  return `Book weights (paper comparison, no live change): live ${fR(book.live.R)} vs proposed ${fR(book.proposed.R)}${since ? ` since ${since}` : ''} (${book.nTrades} trades)`
+    + ` · max DD ${(+book.live.dd || 0).toFixed(1)} / ${(+book.proposed.dd || 0).toFixed(1)}R` + (Number.isFinite(+book.corr) ? ` · corr ${(+book.corr).toFixed(2)}` : '') + '.';
+}
 export function waiting(D, now, prev) {
   const out = [], P = (D.coach && Array.isArray(D.coach.proposals) ? D.coach.proposals : []).filter(actionable);
   if (P.length) out.push(`Coach: ${P.length} proposal${P.length > 1 ? 's' : ''} to OK: ${trim(P.slice(0, 2).map((p) => p.label || proposalLine(p)).join('; '), 90)}${P.length > 2 ? ` +${P.length - 2} more` : ''}`);
@@ -255,6 +264,7 @@ export function buildDigest(D, { now, kind = 'daily', prev = {}, sbRows = null }
       : mv.length ? `Scoreboard movers: ${trim(mv.slice(0, 3).map((m) => `${m.name} ${VERDICT[m.from] || m.from} → ${VERDICT[m.to] || m.to}`).join('; '), 140)}${mv.length > 3 ? ` +${mv.length - 3} more` : ''}`
         : 'Scoreboard: no verdict changes.');
   } else L.push('Scoreboard: could not be built this time.');
+  if (kind === 'preview') { const bl = bookLine(D.coach && D.coach.book); if (bl) L.push(bl); }   // Sundays only: the book-weights paper comparison
   L.push(when(now));
   const lines = L.length > CFG.maxLines ? L.slice(0, CFG.maxLines - 1).concat(L.at(-1)) : L;
   const title = `${kind === 'preview' ? 'Week ahead' : 'Daily digest'} · ${dayLabel(now)}: Meridian ${fR(mer.net)} · ICT ${fR(ictA.net)} net`;
