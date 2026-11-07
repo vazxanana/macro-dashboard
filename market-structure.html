@@ -2121,7 +2121,11 @@ html[data-role="viewer"] [data-go="crypto"], html[data-role="viewer"] [data-go="
 .ms-legend { display: none !important; }
 .ch-lg { top: 10px; }
 
-.ms-ph .ch-tools { display: inline-flex; gap: 4px; margin-left: 8px; }
+.ms-ph .ch-tools { display: inline-flex; gap: 4px; margin-left: 8px; min-width: 0; flex: 0 1 auto; overflow-x: auto; scrollbar-width: none; overscroll-behavior-x: contain; }
+.ms-ph .ch-tools::-webkit-scrollbar { display: none; } .ms-ph .ch-tools > * { flex: none; }
+.ms-ph .ch-tools.ovf { -webkit-mask-image: linear-gradient(90deg, #000 calc(100% - 22px), transparent); mask-image: linear-gradient(90deg, #000 calc(100% - 22px), transparent); }
+.ms-ph .ch-tools.ovf.end { -webkit-mask-image: none; mask-image: none; }
+@media (max-width: 520px) { .ms-ph .ms-role { display: none; } .ms-ph .ch-tools { margin-left: 4px; } }
 .ch-b { width: 28px; height: 28px; border-radius: 7px; border: 1px solid transparent; background: transparent; color: var(--ink-faint); cursor: pointer; display: grid; place-items: center; padding: 0; }
 .ch-b::before { content: ""; width: 15px; height: 15px; background: currentColor; -webkit-mask: var(--i) center / contain no-repeat; mask: var(--i) center / contain no-repeat; }
 .ch-b:hover { color: var(--ink); border-color: var(--line); background: var(--panel-hover, transparent); }
@@ -3480,6 +3484,9 @@ function msNextSetup(bars, A) {
     { const pane = el.closest('.ms-pane'), ph = pane && pane.querySelector('.ms-ph');
       if (ph && !ph.querySelector('.ch-tools')) {
         const tl = document.createElement('span'); tl.className = 'ch-tools';
+        // phones (7 Nov loop): the toolbar scrolls sideways inside the header; a fade shows there is more until the end is reached
+        { const ovf = () => { const o = tl.scrollWidth > tl.clientWidth + 1; tl.classList.toggle('ovf', o); tl.classList.toggle('end', o && tl.scrollLeft + tl.clientWidth >= tl.scrollWidth - 2); };
+          tl.addEventListener('scroll', ovf, { passive: true }); if (window.ResizeObserver) new ResizeObserver(ovf).observe(tl); setTimeout(ovf, 0); }
         tl.innerHTML = `<a class="ch-b ch-tv" target="_blank" rel="noopener" title="Open this chart on TradingView" aria-label="Open on TradingView"></a><button type="button" class="ch-b ch-hl" title="Draw a horizontal line: click the chart to place it, click a line again to remove it (saved for this market)" aria-label="Draw horizontal lines" aria-pressed="false"></button><button type="button" class="ch-b ch-tl" title="Trend line: click two points (extends to the latest candle); click the button twice quickly to remove this chart's trend lines" aria-label="Draw a trend line" aria-pressed="false"></button><button type="button" class="ch-b ch-pos" title="Position tool: click the entry, then the stop; the target is drawn at 2R with the size for your risk (click again to remove)" aria-label="Plan a position (entry, stop, 2R target)" aria-pressed="false"></button><button type="button" class="ch-b ch-fib" title="Fibonacci retracement: click the swing start, then the swing end (click again to remove it; saved for this chart)" aria-label="Draw a Fibonacci retracement" aria-pressed="false"></button><button type="button" class="ch-b ch-ruler" title="Measure: drag on the chart (or hold Shift and drag)" aria-label="Measure price and time on the chart" aria-pressed="false"></button><button type="button" class="ch-b ch-rp" title="Replay: hide the future and step through the candles (← → keys)" aria-label="Bar replay" aria-pressed="false"></button><button type="button" class="ch-b ch-snap" title="Save this chart as an image" aria-label="Save the chart as a PNG image"></button><button type="button" class="ch-b ch-bell" title="Price alert (notifies this device) · tip: right-click the chart to set one at that price" aria-label="Set a price alert"></button><button type="button" class="ch-b ch-fit" title="Fit the chart (double-click the chart)" aria-label="Fit the ${tf.label} chart"></button><button type="button" class="ch-b ch-fs" title="Full screen" aria-label="Show the ${tf.label} chart full screen"></button>`;
         ph.appendChild(tl);
         tl.querySelector('.ch-fit').addEventListener('click', () => P.fit());
