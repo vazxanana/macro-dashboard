@@ -1335,3 +1335,27 @@ Report: `reports/ICT and gold system improvements.md` (owner's skills: gold-msnr
   Calm gold has no replica edge. The gate stays.
 - **Momentum-pullback scalp** (TEST since 6 Nov, shadow): 2023 +6.2, 2024 +18.3, 2025 +38.1, 2026 −6.3R (75 trades, red in 6 of the last 7 months). Stays in test; promotion needs it to recover.
 - **2026 by leg:** replica +59.6R (Feb–Apr), daily engulf +12.9R, H4 trendline +3.5R, gold trend +4.7R. Jun–Oct is flat for every leg (gold trend +1.3, H4 trendline +4.0, daily engulf +4.1); the book waits for volatility.
+
+## 2026-11-07 — Owner goal: "use all the skills to make the council the most profitable" — remaining skill rules tested
+Owner's skill file (ALL_SKILLS_COMBINED: gold-msnr-playbook, Engulfing King, engulfing EG/EF, 411, Zlankator, Mosha S.CODE, MMXM). Windows 2023-24 | 2025-26.
+- **Engulfing King 50% midline entry** on the daily engulf (`ms/eg_mid.py`):
+  - live (zone top): +25.5 dd −9.8 | +47.0 dd −7.3;
+  - at 25% of the zone: +10.1 | +12.7;
+  - at 50%: −1.5 | +0.5;
+  - split ½ top + ½ at 50%: +12.0 | +23.8;
+  - top + full add at 50%: +24.0 dd −17.0 | +47.5 dd −16.0.
+  
+  Rejected: the run usually starts from the zone surface.
+- **411 / Zlankator zone reuse** (second touch after the first trade closed, zone not closed through; `ms/eg_reuse.py`): 2× +30.2 | +36.3 (second touches alone +5.2 | −11.7), 3× +28.0 | +35.3, 2× within 30 days +32.7 | +43.1. Rejected (worse in 2025-26).
+- **Mosha "70–80% off at the first barrier"** on the BO→VR→CF records (H4→H1→M15, `ms/mosha_exit.py`; sim vs sim, not vs the stored R3):
+  - fixed 3R +9.1 | +16.7;
+  - 75% at 1.5R then 3R: +5.0 | +14.7;
+  - 75% at 2R then trail: +4.5 | +9.9;
+  - fixed 2R: +3.9 | +11.7;
+  - BE at 1.5R + 3R: +8.7 | +20.7 (near miss);
+  - trails: worse.
+  
+  3R stays.
+- **MMXM NY-midnight discount** for the long legs (`ms/mmxm_gold.py`): daily engulf fills below the 00:00 open +26.6 dd −11.9 | +40.8; H4 trendline below +2.2 | +11.4 (the profit is above the open). Rejected.
+- **Sizing across the gold legs** (`ms/alloc.py`, % of account, worst drawdown in each half): the guide (replica, trendline and engulf at 0.25%, gold trend at 0.5%) gives +37.2% dd −2.3% | +60.1% dd −6.2%. No grid allocation (0.25–1% per leg) beats it in both halves. The bridges had gold trend at the shared gold risk (+34.0% | +54.0%, same drawdown); they now carry a separate 0.5% gold-trend risk (PR #300).
+- Together with the earlier rounds (Mosha + Daily ER, Zlankator levels / CE / ECMTF, PITCHOU M15, MSNR scalps, engulf locations, two-target exits, session bands, news gates, vol sizing, slow-trend gate, day caps), every codable rule in the skill file has now been tested. The live stack is the best variant found.
