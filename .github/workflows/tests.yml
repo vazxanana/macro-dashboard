@@ -1,0 +1,45 @@
+name: Tests
+
+# Offline checks on every pull request and every push to main (reliability, 7 Nov 2026): no secrets, no network, no live data.
+# The council-data based checks run on pinned copies in tests/fixtures/ (the live files roll on and would make them flaky).
+# No `npm ci`: everything here uses Node built-ins only (api/ctrader-link.js loads @vercel/blob lazily; its test injects a fake store).
+# Left out on purpose: council/futures-test.mjs (sends a real phone ticket), the council/ctrader-test.mjs and ctrader-suite.mjs runners (demo
+# broker orders; their logic is unit-tested in tests/ against a fake broker), council/spotcheck.mjs and the replays (network),
+# research/edge/setups-promote/check.mjs (needs a candle archive).
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: tests-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Syntax check (council, ICT desk, Vercel functions)
+        run: for f in council/*.mjs ict/*.mjs api/*.js api/*.mjs research/edge/*.mjs; do node --check "$f" || exit 1; done
+
+      - name: Unit tests (tests/)
+        run: node --test tests/*.test.mjs tests/*.test.js
+
+      - name: ICT desk audit (pinned council-data ict/ copy)
+        run: node ict/audit-test.mjs
+
+      - name: Phone alerts on real trades (pinned council-data copy)
+        run: node council/alerts-test.mjs > alerts-test.log && tail -1 alerts-test.log || { cat alerts-test.log; exit 1; }
+
+      - name: Coach data-source proposal
+        run: node council/proposals-test.mjs

@@ -153,7 +153,7 @@ Rules and research live in `.claude/skills/ICT/SKILL.md` (results also in counci
 - Audit (7 Nov): CNBC intraday requests start on the hour (bars are anchored at the request's start minute); bars in the
   17:00-18:00 ET halt are dropped; an H1 candle / 5m bar counts only once the feed has a later bar (or it is 20+ min old);
   the time exit is at the close of the 36th H1 candle; replay trades whose window has a > 4-day data hole are dropped
-  (`replay.json` `gaps`); Both does not count a live signal twice. Tests: `node ict/audit-test.mjs <copy of council-data ict/>`.
+  (`replay.json` `gaps`); Both does not count a live signal twice. Tests: `node ict/audit-test.mjs` (pinned copy in tests/fixtures/ict/; or pass a copy of council-data ict/).
 - A-setup filter (skills §14 + §20 + §22 + §23): against the daily bias + grade >= 7 + stop between 0.3x and 0.75x the daily ATR
   + not a jobs-report morning (first Friday of the month before 10:00 ET, `nfpMorning`)
   + (skill §25) a tight stop 0.15-0.3x ATR also counts when it has A+ quality (body >= 0.6, not NY PM), at half size
@@ -291,3 +291,15 @@ hit +1R / miss −1R, t = z against the base rate → a "Macro forecast" row). C
 R/trade, total R, max DD, t, halves, last 30 days, status (live / paper / shadow / watch / failed), verdict (Edge / Promising / Unclear /
 Losing / Too few, text + colour) and the owner approval (Coach proposals, linking to `#ms-sleeve`). Sorted by t; thin shadow streams
 hidden behind a checkbox. The main script hands its data over with `window.MS_COUNCIL` + the `ms:council` event (no second download).
+
+## Reliability: tests and data health (7 Nov 2026)
+- **CI** `.github/workflows/tests.yml` (every PR and push to main, Node 22, no npm install, no secrets, no network): `node --check` on
+  council/ict/api, `node --test tests/*.test.mjs tests/*.test.js` (incl. `tests/page-scripts.test.mjs`: every inline script of the
+  pages must parse), `node ict/audit-test.mjs` and `node council/alerts-test.mjs` on pinned council-data copies in `tests/fixtures/`
+  (refresh them only on purpose: the checks name real trades of that week), `node council/proposals-test.mjs`. Keep new tests offline.
+- **Data health** `council/datacheck.mjs` (council loop, every 2nd round): 5m candles from the OANDA proxy, Kraken (crypto) and the ICT
+  desk's CNBC futures → council-data `health.json` (per market: stale in open-market minutes, gaps, zero/negative prices, broken candles,
+  jumps > `CFG.jumpAtr` 25x the 50-candle ATR). Weekend, the 17:00-18:00 New York halt and CME US holidays are closed, never errors. One
+  phone alert per bad episode through `alerts.mjs` `sendAlerts` (bad on 2 checks in a row; new markets at most every 30 min; 12 h
+  reminder; one all-clear); state in `health.json` `alert`. Shown as the admin **Data chip** in the Council status line (`dataChip`,
+  `.c-dh`, tap for the per-market list). Tests: `tests/datacheck.test.mjs` (fake fetch).

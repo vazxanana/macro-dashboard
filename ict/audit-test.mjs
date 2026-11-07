@@ -1,17 +1,21 @@
-// ICT desk audit tests (7 Nov 2026). Run against a COPY of the real council-data ict/ files (never writes there):
-//   node ict/audit-test.mjs <dir with bars.json, trades.json, replay.json>
-// No network: CNBC is stubbed with the real candles from bars.json.
+// ICT desk audit tests (7 Nov 2026). No network: CNBC is stubbed with the real candles from bars.json.
+//   node ict/audit-test.mjs                 the pinned copy in tests/fixtures/ict/ (council-data ict/ at 530dcacf, 7 Nov 20:2x UTC; used by CI)
+//   node ict/audit-test.mjs <dir>           another copy of council-data ict/ (bars.json, trades.json, replay.json, or .json.gz); never writes there
+// The checks name real signals and dates of that week (the 6 Nov 21:05 run, replay trade es-s-1793995200-r), so they hold for the
+// pinned copy; the live files roll on (bars.json keeps ~5 days) and will stop matching them within days.
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
+import zlib from 'node:zlib';
 import { execFileSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 
-const SRC = path.resolve(process.argv[2] || 'data/ict');
 const HERE = path.dirname(fileURLToPath(import.meta.url));
-const bars = JSON.parse(fs.readFileSync(path.join(SRC, 'bars.json'), 'utf8'));
-const replay = JSON.parse(fs.readFileSync(path.join(SRC, 'replay.json'), 'utf8'));
-const live = JSON.parse(fs.readFileSync(path.join(SRC, 'trades.json'), 'utf8'));
+const SRC = path.resolve(process.argv[2] || path.join(HERE, '..', 'tests', 'fixtures', 'ict'));
+const readJSON = (f) => { const p = path.join(SRC, f); return JSON.parse(fs.existsSync(p) ? fs.readFileSync(p, 'utf8') : zlib.gunzipSync(fs.readFileSync(p + '.gz')).toString('utf8')); };
+const bars = readJSON('bars.json');
+const replay = readJSON('replay.json');
+const live = readJSON('trades.json');
 let fails = 0;
 const ok = (c, msg) => { console.log(`${c ? 'ok  ' : 'FAIL'} ${msg}`); if (!c) fails++; };
 const NY = new Intl.DateTimeFormat('en-US', { timeZone: 'America/New_York', hour: 'numeric', hourCycle: 'h23' });

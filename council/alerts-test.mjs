@@ -1,4 +1,7 @@
 // Checks the phone-alert path (council/alerts.mjs) on real trades, with the network stubbed: nothing is sent.
+//   node council/alerts-test.mjs     the pinned copy in tests/fixtures/council/ (council-data at 530dcacf, 7 Nov: live trades, the last
+//                                    50 filled shadow trades, NQ open-run research and coach.json; what CI runs)
+//   today's trades instead:
 //   git fetch origin council-data && mkdir -p /tmp/cd && git show origin/council-data:trades.json > /tmp/cd/trades.json \
 //     && git show origin/council-data:research.json > /tmp/cd/research.json \
 //     && git show origin/council-data:coach.json > /tmp/cd/coach.json && node council/alerts-test.mjs /tmp/cd
@@ -6,8 +9,9 @@
 import fs from 'node:fs';
 import os from 'node:os';
 import assert from 'node:assert/strict';
+import { fileURLToPath } from 'node:url';
 import { alertable, alertEvents, sendAlerts, proposalDigest } from './alerts.mjs';
-const DIR = process.argv[2] || 'data', rd = (f) => JSON.parse(fs.readFileSync(`${DIR}/${f}`, 'utf8'));
+const DIR = process.argv[2] || fileURLToPath(new URL('../tests/fixtures/council', import.meta.url)), rd = (f) => JSON.parse(fs.readFileSync(`${DIR}/${f}`, 'utf8'));
 const trades = rd('trades.json'), research = fs.existsSync(`${DIR}/research.json`) ? rd('research.json') : [];
 const FLAGS = ['ntfyP', 'ntfyX', 'ntfyO', 'ntfyC', 'futT'], clean = (x) => { const y = structuredClone(x); FLAGS.forEach((f) => delete y[f]); return y; };
 const show = (h, ev) => { console.log(`\n=== ${h}`); for (const e of ev) console.log(`[${e.tags}] ${e.title}\n${e.msg}${e.click ? `\n→ ${e.click}` : ''}\n`); };
