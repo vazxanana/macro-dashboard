@@ -83,6 +83,30 @@ async function kraken(pair, interval) {
   }
 }
 
+// Gold and forex candles from OANDA spot (owner delegated, 7 Nov): the same feed the site's charts and the D1 labels use,
+// through the site's own /md/bars proxy. Kraken's forex books are thin: re-judged on spot candles, the live forex trades of
+// 31 Oct - 7 Nov were -45.7R where Kraken's candles said +11.6R (research/spotcheck.json). 30m is built from 15m. The fast
+// timeframes skip the CDN cache (it may serve a minute candle up to 3 min old); the slow ones may use it. null on any failure.
+const OANDA_TF = { '1m': ['1m', 720, true], '5m': ['5m', 720, true], '15m': ['15m', 720, false], '1h': ['1h', 720, false], '4h': ['4h', 720, false], '1d': ['1d', 720, false] };
+function agg30(b15) {
+  const out = []; let cur = null;
+  for (const b of b15) { const t = Math.floor(b.time / 1800) * 1800;
+    if (!cur || cur.time !== t) { cur = { time: t, open: b.open, high: b.high, low: b.low, close: b.close }; out.push(cur); }
+    else { cur.high = Math.max(cur.high, b.high); cur.low = Math.min(cur.low, b.low); cur.close = b.close; } }
+  return out;
+}
+async function oandaBars(key, id) {
+  const [tf, n, fresh] = id === '30m' ? ['15m', 1440, false] : OANDA_TF[id] || [];
+  if (!tf) return null;
+  try {
+    const r = await fetch(`${MD_BASE}bars?sym=${key}&tf=${tf}&n=${n}${fresh ? `&r=${Math.floor(Date.now() / 60000)}` : ''}`, { signal: AbortSignal.timeout(10000) });
+    const j = r.ok ? await r.json() : null;
+    if (!j || j.src !== 'OANDA' || !Array.isArray(j.bars) || j.bars.length < 100) return null;
+    const bars = j.bars.map((b) => ({ time: +b.time, open: +b.open, high: +b.high, low: +b.low, close: +b.close }));
+    return id === '30m' ? agg30(bars).slice(-720) : bars;
+  } catch (e) { return null; }
+}
+
 // ─── Config: the Coach's knobs, with their allowed ranges ───
 const LIMITS = { buf: [0.10, 0.25], minRR: [1.2, 2.5], minRisk: [0.4, 1.2], maxUsd: [2, 4] };
 const config = Object.assign({ buf: 0.15, minRR: 1.2, minRisk: 0.6, be: null, fresh: FRESH, newsGuard: false, maxUsd: MAX_USD, paused: {}, pausedMarkets: {}, filters: {}, history: [] }, rd('config.json', {}));
@@ -427,15 +451,22 @@ function replicaSignals(src) {
 let goldM1 = null;   // gold's 1-minute candles (spot-shifted), for the gold New York open run check after the NQ section
 for (const [key, M] of Object.entries(MARKETS)) {
   try {
-    const src = {};
-    for (const [id, iv] of (M30_MARKETS.has(key) ? TFS_M30 : TFS)) {
+    const src = {}, tfs = M30_MARKETS.has(key) ? TFS_M30 : TFS;
+    // gold/forex: every timeframe from OANDA spot, or (any one missing) every timeframe from Kraken, never a mix
+    let feed = 'Kraken';
+    if (OANDA_D1.has(key)) {
+      const got = {}; for (const [id] of tfs) { got[id] = await oandaBars(key, id); if (!got[id]) break; }
+      if (tfs.every(([id]) => got[id])) { feed = 'OANDA'; for (const [id] of tfs) src[id] = { bars: got[id] }; }
+    }
+    (snapshot.feed = snapshot.feed || {})[key] = feed;
+    if (feed === 'Kraken') for (const [id, iv] of tfs) {
       const bars = await kraken(M.kraken, iv);
       await sleep(1100);
       const nBad = cleanBars(bars, M.group === 'Forex' && LTF_CLEAN.has(id) ? { wickK: 15 } : {});
       if (nBad) { snapshot.cleaned = snapshot.cleaned || {}; (snapshot.cleaned[key] = snapshot.cleaned[key] || {})[id] = nBad; }
       src[id] = { bars };
     }
-    const off = M.spot ? basisFor(key, src['1m'].bars) : 0;
+    const off = M.spot && feed === 'Kraken' ? basisFor(key, src['1m'].bars) : 0;   // OANDA gold is spot already
     for (const id of Object.keys(src)) {
       src[id].bars = src[id].bars.map((b) => ({ time: b.time, open: b.open + off, high: b.high + off, low: b.low + off, close: b.close + off }));
       src[id].A = msAnalyze(src[id].bars, 6);
