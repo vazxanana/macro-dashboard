@@ -3061,6 +3061,10 @@ html[data-motion="off"] #v-ict .ict-cal-d:hover { transform: none !important; }
           <div class="ms-k"><span>Robustness verdicts</span><span class="wk-now" id="ms-wk-rob-at">Now</span></div>
           <div id="ms-wk-rob"></div>
         </div>
+        <div class="card wk-studies">
+          <div class="ms-k"><span>Studies</span><small class="k-sub" id="ms-wk-st-for"></small></div>
+          <div id="ms-wk-studies"></div>
+        </div>
       </div>
       <p class="wk-paper">Paper only. This report reads the council's files and changes nothing; every rule change stays your call.</p>
       <div class="wk-tip" id="ms-wk-tip" role="tooltip" hidden></div>
@@ -11552,8 +11556,13 @@ html[data-role="public"] #ms-me-ct { display: none; }
   #ms-cp-week { grid-template-columns: minmax(0, 1fr); }
   #ms-cp-week .wk-col { display: contents; }
   #ms-cp-week .wk-dec { order: 1; } #ms-cp-week .wk-pnl { order: 2; } #ms-cp-week .wk-bw { order: 3; } #ms-cp-week .wk-rules { order: 4; }
-  #ms-cp-week .wk-open { order: 5; } #ms-cp-week .wk-decay { order: 6; } #ms-cp-week .wk-rob { order: 7; } #ms-cp-week > .wk-paper { order: 8; }
+  #ms-cp-week .wk-open { order: 5; } #ms-cp-week .wk-decay { order: 6; } #ms-cp-week .wk-rob { order: 7; } #ms-cp-week .wk-studies { order: 8; } #ms-cp-week > .wk-paper { order: 9; }
 }
+/* Studies (research ledger): each row is a link to its study in the Edge lab */
+#ms-cp-week a.wk-it { color: inherit; text-decoration: none; }
+#ms-cp-week .wk-study .t small + small { color: var(--ink-faint); }
+#ms-cp-week .wk-study .t .wk-hl { font: 400 12.5px/1.45 var(--sans); color: var(--ink-dim); overflow-wrap: anywhere; }
+#ms-cp-week .wk-study .wk-go { color: var(--accent); font-weight: 600; }
 #ms-cp-week .card { min-width: 0; }
 #ms-cp-week .wk-sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
 #ms-cp-week .pos { color: var(--buy); } #ms-cp-week .neg { color: var(--sell); }
@@ -11685,7 +11694,8 @@ html[data-role="public"] #ms-me-ct { display: none; }
 // Built only from council-data files: trades.json + research.json (Meridian live, shadow and research paper trades), ict/trades.json +
 // ict/replay.json + ict/shadow.json (ICT desk), coach.json (proposals, ledger, decay from council/decay.mjs), config.json history
 // (rule changes, by you or the Coach), research/robustness.json, macro/forecast.json, digest.json (the shared verdict record:
-// robustness and edge-decay changes, council/digest.mjs recordVerdicts), snapshot.json + ict/snapshot.json (prices for open positions), health.json. It changes nothing.
+// robustness and edge-decay changes, council/digest.mjs recordVerdicts), snapshot.json + ict/snapshot.json (prices for open positions), health.json,
+// research/ledger.json (the research ledger: the studies that landed this week, council/research-ledger.mjs). It changes nothing.
 // Weeks run Monday 00:00 to Sunday 24:00 UTC, as the council and the digest count days. After costs: Meridian Rnet (council/fills.mjs),
 // ICT less the CME micro round trip (council/digest.mjs ICT_COST_PTS), research trades carry no cost and show gross.
 // Pure functions are on window.MS_WEEK (tests/week-report.test.mjs runs them without a page).
@@ -11838,8 +11848,14 @@ html[data-role="public"] #ms-me-ct { display: none; }
     if (P.length && D.config && D.config.noPause) out.push({ k: 'pause', tone: 'warn', title: 'The Coach would pause ' + P.length + ' setup' + (P.length > 1 ? 's or markets' : ' or market'), detail: P.map(function (k) { return k + ': ' + wp[k].why; }).join('; '), act: 'Your “No pauses” rule keeps them trading; nothing to do unless you want a pause.' });
     return out;
   }
+  // the studies that landed in [from, to) by the research ledger (council-data research/ledger.json, council/research-ledger.mjs:
+  // `first` = when it landed on main, else its built date), newest first
+  function studies(ledger, from, to) {
+    return arr(ledger && ledger.rows).map(function (r) { var t = Date.parse(r && (r.first || (r.built ? r.built + 'T00:00:00Z' : ''))) / 1000; return num(t) && r.topic ? { r: r, t: t } : null; })
+      .filter(function (x) { return x && x.t >= from && x.t < to; }).sort(function (a, b) { return b.t - a.t; }).map(function (x) { return x.r; });
+  }
   function fR(v, d) { return num(v) ? (v > 0.004 ? '+' : v < -0.004 ? '−' : '') + Math.abs(v).toFixed(d == null ? 2 : d) + 'R' : '—'; }
-  W.MS_WEEK = { DAY: DAY, WEEK: WEEK, ICT_COST_PTS: ICT_COST_PTS, weekOf: weekOf, records: records, tally: tally, build: build, weeks: weeks, rules: rules, robustMap: robustMap, robustChanges: robustChanges, changeLog: changeLog, robustWeek: robustWeek, decayWeek: decayWeek, openNow: openNow, decisions: decisions, merNet: merNet, ictNet: ictNet };
+  W.MS_WEEK = { DAY: DAY, WEEK: WEEK, ICT_COST_PTS: ICT_COST_PTS, weekOf: weekOf, records: records, tally: tally, build: build, weeks: weeks, rules: rules, robustMap: robustMap, robustChanges: robustChanges, changeLog: changeLog, robustWeek: robustWeek, decayWeek: decayWeek, openNow: openNow, decisions: decisions, studies: studies, merNet: merNet, ictNet: ictNet };
   if (typeof document === 'undefined' || !document.getElementById) return;
 
   // ─── page ───
@@ -11864,7 +11880,7 @@ html[data-role="public"] #ms-me-ct { display: none; }
   var VL = { robust: 'good', fragile: 'warn', 'not proven': 'mute' };
   var DL = { healthy: 'good', watch: 'warn', decaying: 'bad' };
 
-  var st = { wk: null, g: 'live', a: 'all', open: {}, rlAll: false, all: null, extra: null, extraAt: 0, loading: null, lastRender: 0 };
+  var st = { wk: null, g: 'live', a: 'all', open: {}, rlAll: false, stAll: false, all: null, extra: null, extraAt: 0, loading: null, lastRender: 0 };
   try { var s0 = JSON.parse(localStorage.getItem('msWeekRpt') || '{}'); if (s0 && /^(live|shadow|research)$/.test(s0.g)) st.g = s0.g; if (s0 && /^(all|you|coach|fix)$/.test(s0.a)) st.a = s0.a; } catch (e) {}
   var save = function () { try { localStorage.setItem('msWeekRpt', JSON.stringify({ g: st.g, a: st.a })); } catch (e) {} };
   // a deep link to one week: #council/week/2026-11-02 (any day of that week)
@@ -11883,7 +11899,7 @@ html[data-role="public"] #ms-me-ct { display: none; }
   function data() {
     var C = W.MS_COUNCIL || {}, X = st.extra || {};
     return { trades: C.trades, research: C.research, config: C.config, coach: C.coach, snap: C.snap, health: C.health,
-      ictReplay: X.ictReplay, ictTrades: X.ictTrades, ictShadow: X.ictShadow, ictSnap: X.ictSnap, robust: X.robust, macro: X.macro, digest: X.digest };
+      ictReplay: X.ictReplay, ictTrades: X.ictTrades, ictShadow: X.ictShadow, ictSnap: X.ictSnap, robust: X.robust, macro: X.macro, digest: X.digest, ledger: X.ledger };
   }
 
   // ─── header + tiles ───
@@ -12041,6 +12057,23 @@ html[data-role="public"] #ms-me-ct { display: none; }
       + (rest.length ? '<details class="wk-all"><summary>Shadow, research and Coach claims (' + rest.length + ')</summary><ul class="wk-list">' + rest.map(function (c, i) { return item(c, i, 'o'); }).join('') + '</ul></details>' : '')
       + '<p class="wk-foot">Bar: ' + esc(J.bar ? (J.bar.minN || 30) + '+ trades, out-of-sample t ≥ ' + (J.bar.oosT || 2) + ', survives the multiple-testing count' : 'see research/robustness.md') + '. Every live edge so far is regime-bound.</p>';
   }
+  // ─── studies: the research ledger's rows for this week, each a link to its Edge lab row ───
+  var SV = { pass: 'good', inc: 'warn', fail: '' }, SL = { pass: 'Pass', inc: 'Inconclusive', fail: 'Fail' };   // the Edge lab's classes (research/edge/verdict.mjs)
+  function renderStudies(D, B) {
+    var Lg = D.ledger, el = $('ms-wk-studies'), sub = $('ms-wk-st-for');
+    if (!Lg || !arr(Lg.rows).length) { sub.textContent = ''; el.innerHTML = '<p class="wk-empty">No research ledger yet: the council loop writes research/ledger.json from the studies in research/edge.</p>'; return; }
+    var S = studies(Lg, B.from, B.to), c = {}; S.forEach(function (r) { c[r.verdict] = (c[r.verdict] || 0) + 1; });
+    sub.textContent = S.length + (S.length === 1 ? ' study' : ' studies') + ' this week';
+    if (!S.length) { el.innerHTML = '<p class="wk-empty">No study landed this week.</p><p class="wk-foot">All ' + Lg.rows.length + ' studies, with their numbers, are in the <a href="edge-lab.html">Edge lab</a>.</p>'; return; }
+    var lim = st.stAll ? S.length : 8;
+    el.innerHTML = '<div class="wk-chips">' + ['pass', 'inc', 'fail'].filter(function (k) { return c[k]; }).map(function (k) { return '<span class="wk-chip"><b>' + c[k] + '</b> ' + SL[k].toLowerCase() + '</span>'; }).join('') + '</div><ul class="wk-list">'
+      + S.slice(0, lim).map(function (r) {
+        var t = Date.parse(r.first || r.built + 'T00:00:00Z') / 1000, v = SL[r.verdict] ? r.verdict : 'inc';
+        return '<li><a class="wk-it wk-study" href="edge-lab.html#' + encodeURIComponent(r.topic) + '" aria-label="' + esc(r.name + ': ' + SL[v] + '. Open it in the Edge lab') + '"><span class="t"><b>' + esc(r.name) + '</b><small class="wk-hl">' + esc(trim(r.headline || '', 150)) + '</small>'
+          + '<small><span class="wk-st ' + SV[v] + '">' + SL[v] + '</span> ' + esc(arr(r.systems).join(', ')) + (num(t) ? ' · ' + esc(dU.format(new Date(t * 1000))) : '') + (r.pr ? ' · #' + esc(r.pr) : '') + '</small></span><span class="v wk-go" aria-hidden="true">→</span></a></li>';
+      }).join('') + '</ul>' + (S.length > lim ? '<button type="button" class="wk-more" data-more="studies">Show all ' + S.length + '</button>' : '')
+      + '<p class="wk-foot">Paper research, each verdict in the study’s own words (its RESULT.md). Tap one for its numbers in the Edge lab. A pass becomes at most a paper shadow stream or a proposal: your call.</p>';
+  }
 
   // ─── render ───
   function render() {
@@ -12064,9 +12097,10 @@ html[data-role="public"] #ms-me-ct { display: none; }
     safe(function () { renderDec(D, rc, now); });
     safe(function () { renderOpen(D); });
     safe(function () { renderDecay(D, B); });
+    safe(function () { renderStudies(D, B); });
     st.lastRender = Date.now();
   }
-  function go(wk) { st.wk = wk; st.open = {}; st.rlAll = false; render(); }
+  function go(wk) { st.wk = wk; st.open = {}; st.rlAll = false; st.stAll = false; render(); }
 
   // ─── interaction ───
   pane.addEventListener('click', function (ev) {
@@ -12077,6 +12111,7 @@ html[data-role="public"] #ms-me-ct { display: none; }
     var g = t.closest('#ms-wk-seg [data-g]'); if (g) { st.g = g.dataset.g; save(); render(); return; }
     var a = t.closest('#ms-wk-rseg [data-a]'); if (a) { st.a = a.dataset.a; st.rlAll = false; save(); render(); return; }
     if (t.closest('[data-more="rules"]')) { st.rlAll = true; render(); return; }
+    if (t.closest('[data-more="studies"]')) { st.stAll = true; render(); return; }
     var b = t.closest('button[aria-controls][data-row], button[aria-controls][data-open]');
     if (b) { var k = b.dataset.row || b.dataset.open, x = $(b.getAttribute('aria-controls')), open = b.getAttribute('aria-expanded') !== 'true';
       b.setAttribute('aria-expanded', String(open)); if (x) x.hidden = !open; if (open) st.open[k] = 1; else delete st.open[k]; hideTip(); }
@@ -12109,8 +12144,8 @@ html[data-role="public"] #ms-me-ct { display: none; }
     if (st.loading) return st.loading;
     var base = W.MS_CDATA || '', bust = Math.floor(Date.now() / 120000);
     var get = function (f) { return fetch(base + f + '?v=' + bust, { cache: 'no-store' }).then(function (r) { return r.ok ? r.json() : null; }).catch(function () { return null; }); };
-    st.loading = Promise.all([get('ict/replay.json'), get('ict/trades.json'), get('ict/shadow.json'), get('ict/snapshot.json'), get('research/robustness.json'), get('macro/forecast.json'), get('digest.json')]).then(function (a) {
-      st.extra = { ictReplay: a[0], ictTrades: a[1], ictShadow: a[2], ictSnap: a[3], robust: a[4], macro: a[5], digest: a[6] }; st.extraAt = Date.now(); st.loading = null; return st.extra; });
+    st.loading = Promise.all([get('ict/replay.json'), get('ict/trades.json'), get('ict/shadow.json'), get('ict/snapshot.json'), get('research/robustness.json'), get('macro/forecast.json'), get('digest.json'), get('research/ledger.json')]).then(function (a) {
+      st.extra = { ictReplay: a[0], ictTrades: a[1], ictShadow: a[2], ictSnap: a[3], robust: a[4], macro: a[5], digest: a[6], ledger: a[7] }; st.extraAt = Date.now(); st.loading = null; return st.extra; });
     return st.loading;
   }
   function show() { if (pane.hidden) return; render(); loadExtra().then(render); }
