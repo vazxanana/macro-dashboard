@@ -1886,6 +1886,14 @@ html.theme-x, html.theme-x *, html.theme-x *::before, html.theme-x *::after { tr
 #ms-hdr-open { transition: box-shadow .5s ease-out; }
 @media (prefers-reduced-motion: reduce) { .is-loading, .srow-skel i { animation: none; } html.theme-x * { transition: none !important; } }
 html[data-motion="off"] .is-loading, html[data-motion="off"] .srow-skel i { animation: none; }
+
+/* polish 4: tighter page headers (title sits closer to the top bar), calmer rhythm */
+@media (min-width: 701px) { .v-head { padding-top: 6px; } }
+.v-head .ms-note { max-width: 72ch; }
+
+/* polish 4: future calendar days recede (the month reads past → today → ahead) */
+.cal .cal-d.fut { background: transparent; border-style: dashed; border-color: color-mix(in srgb, var(--line) 70%, transparent); }
+.cal .cal-d.fut .cn { opacity: .55; }
 </style>
 <script>try{if(localStorage.getItem('msMotion')==='off')document.documentElement.dataset.motion='off'}catch(e){}</script>
 </head>
@@ -1930,7 +1938,7 @@ html[data-motion="off"] .is-loading, html[data-motion="off"] .srow-skel i { anim
     <span class="ms-status"><i class="ms-live-dot" id="ms-live-dot"></i><span id="ms-live-txt">Connecting…</span><span class="upd"> · <span id="ms-updated">—</span></span></span>
     <div class="top-actions">
       <a class="hdr-open" id="ms-hdr-open" href="#council" title="Open trades placed by the system. % = floating result in account terms at the sizing guide: 0.25% risk per NQ / gold trade, 0.5% per crypto trend trade">—</a>
-      <button type="button" class="ms-tbtn" id="ms-focus-btn" title="Focus mode: open trades, full screen (F)" aria-label="Focus mode" aria-keyshortcuts="F">Focus</button><button type="button" class="ms-tbtn" id="ms-cmdk-btn" title="Search and jump (Ctrl K)" aria-label="Search and jump" aria-keyshortcuts="Control+K /">Search</button><button type="button" class="ms-tbtn" id="ms-alerts" aria-pressed="false" title="Alerts off">Alerts off</button>
+      <button type="button" class="ms-tbtn" id="ms-focus-btn" title="Focus mode: open trades, full screen (F)" aria-label="Focus mode" aria-keyshortcuts="F Shift+F">Focus</button><button type="button" class="ms-tbtn" id="ms-cmdk-btn" title="Search and jump (Ctrl K)" aria-label="Search and jump" aria-keyshortcuts="Control+K /">Search</button><button type="button" class="ms-tbtn" id="ms-alerts" aria-pressed="false" title="Alerts off">Alerts off</button>
       <details class="menu">
         <summary class="ms-tbtn">Settings</summary>
         <div class="menu-body">
@@ -4112,7 +4120,7 @@ function msNextSetup(bars, A) {
     if (ev.metaKey || ev.ctrlKey || ev.altKey || /INPUT|TEXTAREA|SELECT/.test((ev.target || {}).tagName || '')) return;
     const tfKeys = { 1: '1d', 2: '4h', 3: '1h', 4: '15m', 5: '5m', 6: '1m', 0: 'all' };
     if (location.hash === '#charts' && tfKeys[ev.key] && document.querySelector(`[data-view="${tfKeys[ev.key]}"]`)) { document.querySelector(`[data-view="${tfKeys[ev.key]}"]`).click(); }
-    else if ((ev.key === 'f' || ev.key === 'F') && location.hash === '#charts') Object.values(panes).forEach((p) => p.fit());
+    else if ((ev.key === 'f' || ev.key === 'F') && !ev.shiftKey && location.hash === '#charts') Object.values(panes).forEach((p) => p.fit());
   });
 
   // ─── Council: Analyst, Trader and Coach (always-on data from the council-data branch) ───
@@ -4188,9 +4196,9 @@ function msNextSetup(bars, A) {
     let html = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].map((d) => `<div class="cal-h">${d}</div>`).join('') + '<div class="cal-d out"></div>'.repeat(lead), mR = 0, up = 0, dn = 0;
     const gMax = Math.max(1, ...Array.from({ length: days }, (_, i) => Math.abs(byDay.get(`${GCAL.y}-${GCAL.m}-${i + 1}`) || 0)));
     for (let d = 1; d <= days; d++) {
-      const k = `${GCAL.y}-${GCAL.m}-${d}`, has = byDay.has(k), R = byDay.get(k) || 0, isT = now.getFullYear() === GCAL.y && now.getMonth() === GCAL.m && now.getDate() === d;
+      const k = `${GCAL.y}-${GCAL.m}-${d}`, has = byDay.has(k), R = byDay.get(k) || 0, isT = now.getFullYear() === GCAL.y && now.getMonth() === GCAL.m && now.getDate() === d; const isF = new Date(GCAL.y, GCAL.m, d) > now;
       if (has) { mR += R; if (R > 0) up++; else if (R < 0) dn++; }
-      html += `<div style="--heat:${has ? Math.min(1, Math.abs(R) / gMax).toFixed(2) : 0}" class="cal-d ${has ? (R > 0 ? 'win' : R < 0 ? 'loss' : '') : ''}${isT ? ' today' : ''}" aria-label="${d}: ${has ? fR(R) : 'no trades'}"><span class="cn">${d}</span>${has ? `<span class="cr">${fR(R)}</span>` : ''}</div>`;
+      html += `<div style="--heat:${has ? Math.min(1, Math.abs(R) / gMax).toFixed(2) : 0}" class="cal-d ${has ? (R > 0 ? 'win' : R < 0 ? 'loss' : '') : ''}${isT ? ' today' : ''}${isF ? ' fut' : ''}" aria-label="${d}: ${has ? fR(R) : 'no trades'}"><span class="cn">${d}</span>${has ? `<span class="cr">${fR(R)}</span>` : ''}</div>`;
     }
     el.innerHTML = html;
     document.getElementById('g-cal-m').innerHTML = `${first.toLocaleDateString(undefined, { month: 'long', year: 'numeric' })}${up + dn ? ` <small class="cal-mt ${mR > 0 ? 'pos' : mR < 0 ? 'neg' : ''}">${fR(mR)}</small>` : ''}`;
@@ -4223,9 +4231,9 @@ function msNextSetup(bars, A) {
     for (let d = 1; d <= days; d++) {
       const k = `${CAL.y}-${CAL.m}-${d}`, arr = byDay.get(k) || [], R0 = arr.reduce((a, x) => a + x.R, 0), heat = arr.length ? Math.min(1, Math.abs(R0) / (window.CAL_MAX || 1)) : 0, R = arr.reduce((a, x) => a + x.R, 0);
       if (arr.length) { mR += R; mN += arr.length; if (R > 0) up++; else if (R < 0) dn++; if (!best || R > best.R) best = { d, R }; if (!worst || R < worst.R) worst = { d, R }; }
-      const cls = arr.length ? (R > 0 ? 'win' : R < 0 ? 'loss' : '') : '', isT = now.getFullYear() === CAL.y && now.getMonth() === CAL.m && now.getDate() === d;
+      const cls = arr.length ? (R > 0 ? 'win' : R < 0 ? 'loss' : '') : '', isT = now.getFullYear() === CAL.y && now.getMonth() === CAL.m && now.getDate() === d; const isF = new Date(CAL.y, CAL.m, d) > now;
       const col = (lead + d - 1) % 7; wkR += R; wkN += arr.length;
-      html += `<button type="button" style="--heat:${heat.toFixed(2)}" class="cal-d ${cls}${isT ? ' today' : ''}${col >= 5 ? ' we' : ''}${CAL.sel === k ? ' sel' : ''}" data-day="${k}" aria-label="${d}: ${arr.length ? `${fR(R)}, ${arr.length} trades` : 'no trades'}"><span class="cn">${d}</span>${arr.length ? `<span class="cr">${fR(R)}</span>${(() => { const q = arr.filter((x) => x.market === 'nq'); if (!q.length || mkSel === 'nq') return ''; const v = q.reduce((a, x) => a + x.R, 0); return `<span class="cq">NQ <b class="${v > 0 ? 'pos' : v < 0 ? 'neg' : ''}">${fR(v)}</b></span>`; })()}${(() => { const q = arr.filter((x) => x.shadow); if (!q.length || q.length === arr.length) return q.length ? '<span class="cq">all shadow</span>' : ''; const v = q.reduce((a, x) => a + x.R, 0); return `<span class="cq">shadow <b class="${v > 0 ? 'pos' : v < 0 ? 'neg' : ''}">${fR(v)}</b></span>`; })()}<span class="ct"><span class="nw">${arr.length} trade${arr.length > 1 ? 's' : ''}</span> <span class="nw ct-w">${arr.filter((x) => x.status === 'win').length} won</span></span>` : ''}</button>`;
+      html += `<button type="button" style="--heat:${heat.toFixed(2)}" class="cal-d ${cls}${isT ? ' today' : ''}${isF ? ' fut' : ''}${col >= 5 ? ' we' : ''}${CAL.sel === k ? ' sel' : ''}" data-day="${k}" aria-label="${d}: ${arr.length ? `${fR(R)}, ${arr.length} trades` : 'no trades'}"><span class="cn">${d}</span>${arr.length ? `<span class="cr">${fR(R)}</span>${(() => { const q = arr.filter((x) => x.market === 'nq'); if (!q.length || mkSel === 'nq') return ''; const v = q.reduce((a, x) => a + x.R, 0); return `<span class="cq">NQ <b class="${v > 0 ? 'pos' : v < 0 ? 'neg' : ''}">${fR(v)}</b></span>`; })()}${(() => { const q = arr.filter((x) => x.shadow); if (!q.length || q.length === arr.length) return q.length ? '<span class="cq">all shadow</span>' : ''; const v = q.reduce((a, x) => a + x.R, 0); return `<span class="cq">shadow <b class="${v > 0 ? 'pos' : v < 0 ? 'neg' : ''}">${fR(v)}</b></span>`; })()}<span class="ct"><span class="nw">${arr.length} trade${arr.length > 1 ? 's' : ''}</span> <span class="nw ct-w">${arr.filter((x) => x.status === 'win').length} won</span></span>` : ''}</button>`;
       if (col === 6 || d === days) { if (col < 6) html += '<div class="cal-d out"></div>'.repeat(6 - col); wkI++;
         html += `<div class="cal-wk ${wkN ? (wkR > 0 ? 'win' : wkR < 0 ? 'loss' : '') : 'none'}" aria-label="Week ${wkI}: ${wkN ? `${fR(wkR)}, ${wkN} trades` : 'no trades'}"><span class="cn">W${wkI}</span>${wkN ? `<span class="cr">${fR(wkR)}</span><span class="ct">${wkN} trade${wkN > 1 ? 's' : ''}</span>` : '<span class="ct">—</span>'}</div>`; wkR = 0; wkN = 0; }
     }
@@ -5655,7 +5663,7 @@ function msNextSetup(bars, A) {
     q.setAttribute('aria-activedescendant', cur.length ? 'cmdk-o' + sel : '');
     const el = document.getElementById('cmdk-o' + sel); if (el) el.scrollIntoView({ block: 'nearest' });
   };
-  const showHelp = (on) => { help.hidden = !on; list.hidden = on; if (on && !help.innerHTML) help.innerHTML = '<h3>Anywhere</h3><span><kbd>Ctrl</kbd> <kbd>K</kbd> or <kbd>/</kbd></span><span>Open this palette</span><span><kbd>?</kbd></span><span>Show these shortcuts</span><span><kbd>F</kbd></span><span>Focus mode: open trades full screen</span><span><kbd>Esc</kbd></span><span>Close menus and dialogs</span><span><kbd>Alt</kbd> <kbd>1</kbd> – <kbd>8</kbd></span><span>Go to a page (Home, Setup, Charts… in menu order)</span><h3>Charts page</h3><span><kbd>1</kbd> – <kbd>6</kbd></span><span>Show one timeframe (D1 … M1)</span><span><kbd>0</kbd></span><span>Show all timeframes</span><span><kbd>F</kbd></span><span>Fit the charts to the data</span>'; };
+  const showHelp = (on) => { help.hidden = !on; list.hidden = on; if (on && !help.innerHTML) help.innerHTML = '<h3>Anywhere</h3><span><kbd>Ctrl</kbd> <kbd>K</kbd> or <kbd>/</kbd></span><span>Open this palette</span><span><kbd>?</kbd></span><span>Show these shortcuts</span><span><kbd>F</kbd></span><span>Focus mode: open trades full screen (<kbd>Shift</kbd> <kbd>F</kbd> on Charts, where F fits the charts)</span><span><kbd>Esc</kbd></span><span>Close menus and dialogs</span><span><kbd>Alt</kbd> <kbd>1</kbd> – <kbd>8</kbd></span><span>Go to a page (Home, Setup, Charts… in menu order)</span><h3>Charts page</h3><span><kbd>1</kbd> – <kbd>6</kbd></span><span>Show one timeframe (D1 … M1)</span><span><kbd>0</kbd></span><span>Show all timeframes</span><span><kbd>F</kbd></span><span>Fit the charts to the data</span>'; };
   const open = (helpMode) => { if (document.documentElement.dataset.gate || document.documentElement.dataset.guest) return; all = items(); q.value = ''; sel = 0; showHelp(!!helpMode); render(); if (!dlg.open) dlg.showModal(); q.focus(); };
   const go = (i) => { const it = cur[i]; if (!it) return; dlg.close(); setTimeout(() => it.run(), 0); };
   q.addEventListener('input', () => { sel = 0; showHelp(false); render(); });
@@ -5931,6 +5939,7 @@ function msNextSetup(bars, A) {
     if (e.key !== 'f' && e.key !== 'F' || e.ctrlKey || e.metaKey || e.altKey) return;
     var t = e.target; if (t && (t.closest('input,textarea,select,[contenteditable="true"]'))) return;
     if (D && D.open) { e.preventDefault(); closeF(); return; }
+    if (location.hash.split('/')[0] === '#charts' && !e.shiftKey) return;   // on Charts, F fits the charts; Shift+F opens focus
     if (document.querySelector('dialog[open]')) return; e.preventDefault(); openF(); });
 
   document.addEventListener('ms:live', function () { pulse(); render(); });
