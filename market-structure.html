@@ -5996,6 +5996,12 @@ function msNextSetup(bars, A) {
           if (rp.length < 10) return ''; const re = rp.reduce((a, r) => a + r[iR], 0) / rp.length, fx = (v) => (v >= 0 ? '+' : '−') + Math.abs(v).toFixed(2) + 'R';
           const gap = e == null ? null : e - re, note = e == null || done.length < 5 ? 'too few live trades to compare yet' : Math.abs(gap) < 0.25 ? 'live is tracking the replay' : gap < 0 ? 'live is running below the replay: watch fills, costs and the D1 label' : 'live is running above the replay';
           return `<small class="sl-n" title="Replay ${esc(B.from ? B.from.slice(0, 10) : '')} – ${esc(B.to ? B.to.slice(0, 10) : '')}, no break-even, rows filtered by this setup's live rule">Replay expects <b class="${re >= 0 ? 'pos' : 'neg'}">${fx(re)}</b> a trade over ${rp.length} trades${gap == null ? '' : ` · live ${fx(e)} (gap ${fx(gap)})`} · ${note}</small>`; })()}
+        ${(() => { const P = (C.coach && Array.isArray(C.coach.proposals) ? C.coach.proposals : []).filter((p) => p.setup === k); if (!P.length) return '';
+          // Coach proposals (7 Nov): suggestions from the replay for this live setup; never applied without the owner's OK
+          const fx = (v) => `<span class="${v >= 0 ? 'pos' : 'neg'}"><b>${v >= 0 ? '+' : '−'}${Math.abs(+v || 0).toFixed(2)}R</b></span>`;
+          const sk = P.filter((p) => p.kind === 'skipMarket' || p.kind === 'skipSession').map((p) => `<small class="sl-n" title="From the 30-day replay: filled trades under this setup's live rule, after spread costs. Not applied: the live rule changes only if you approve.">Coach suggests (needs your OK): <b>${esc(p.label || ('skip ' + p.value))}</b> — ${fx(p.exp)} a trade over ${+p.n} replay trades; the other ${p.kind === 'skipMarket' ? 'markets' : 'sessions'} ${fx(p.restExp)} over ${+p.restN}.</small>`);
+          const s = P.find((p) => p.kind === 'stability'); if (s && s.h1 && s.h2) sk.push(`<small class="sl-n">Replay halves ${fx(s.h1.exp)} / ${fx(s.h2.exp)}${s.flag ? ' · one half lost money: the edge is not steady' : ' · positive in both halves'}</small>`);
+          return sk.join(''); })()}
         <div class="sl-g"><i style="width:${Math.min(100, done.length / 20 * 100).toFixed(0)}%"></i></div><small class="sl-n">Guard: back to shadow at −0.30R a trade over 20+ live trades · ${guard}</small></div>`; }).join('');
     el.hidden = false; el.innerHTML = `<div class="ms-k"><span>Live setups · paper</span><span class="ms-note">engine setups trading live on every market</span></div>${rows}`; }
   function renderCouncil() {
