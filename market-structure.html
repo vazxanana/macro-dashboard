@@ -1414,6 +1414,13 @@ td.st-dim { color: var(--ink-faint); }
 @media (max-width: 600px) {
   #ms-risk, #ms-tg-token, #ms-tg-chat, .ms-j select, .ms-j input:not([type=checkbox]), #v-users input, #v-users select { min-height: 36px; font-size: 16px; }
 }
+
+/* polish 29: thin themed scrollbars (tables, lists, menus) */
+* { scrollbar-width: thin; scrollbar-color: color-mix(in srgb, var(--ink) 22%, transparent) transparent; }
+::-webkit-scrollbar { width: 10px; height: 10px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: color-mix(in srgb, var(--ink) 20%, transparent); border-radius: 10px; border: 3px solid transparent; background-clip: padding-box; }
+::-webkit-scrollbar-thumb:hover { background-color: color-mix(in srgb, var(--ink) 35%, transparent); }
 </style>
 </head>
 <body>
