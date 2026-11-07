@@ -2800,11 +2800,11 @@ html[data-motion="off"] #v-ict .ict-cal-d:hover { transform: none !important; }
     <nav class="c-nav" id="ms-c-nav" role="tablist" aria-label="Council sections"><button type="button" role="tab" class="" id="ms-cn-overview" data-pane="overview" aria-controls="ms-cp-overview" aria-selected="true">Overview<span class="c-nav-n" id="ms-cn-n-overview"></span></button><button type="button" class="c-nav-jump" id="ms-cn-cal" aria-label="Jump to the calendar">Calendar</button><button type="button" role="tab" class="" id="ms-cn-trades" data-pane="trades" aria-controls="ms-cp-trades" aria-selected="false">Trades<span class="c-nav-n" id="ms-cn-n-trades"></span></button><button type="button" role="tab" class="adm" id="ms-cn-systems" data-pane="systems" aria-controls="ms-cp-systems" aria-selected="false">Systems<span class="c-nav-n" id="ms-cn-n-systems"></span></button><button type="button" role="tab" class="adm" id="ms-cn-review" data-pane="review" aria-controls="ms-cp-review" aria-selected="false">Review<span class="c-nav-n" id="ms-cn-n-review"></span></button><button type="button" role="tab" class="adm" id="ms-cn-research" data-pane="research" aria-controls="ms-cp-research" aria-selected="false">Research<span class="c-nav-n" id="ms-cn-n-research"></span></button><button type="button" role="tab" class="adm" id="ms-cn-macro" data-pane="macro" aria-controls="ms-cp-macro" aria-selected="false">Macro<span class="c-nav-n" id="ms-cn-n-macro"></span></button><button type="button" role="tab" class="adm" id="ms-cn-week" data-pane="week" aria-controls="ms-cp-week" aria-selected="false">This week<span class="c-nav-n" id="ms-cn-n-week"></span></button></nav>
     <div class="c-grid c-pane c-pane-overview" id="ms-cp-overview" role="tabpanel" aria-labelledby="ms-cn-overview" data-pane="overview">
       <div class="card c-active" id="ms-active-card">
-        <div class="ms-k"><span>Active trades · placed by the system now</span><span class="c-tog"><span id="ms-active-sum" class="c-act-sum"></span><input type="checkbox" id="ms-act-sh" checked hidden style="display:none"></span></div>
+        <div class="ms-k"><span role="heading" aria-level="2">Active trades · placed by the system now</span><span class="c-tog"><span id="ms-active-sum" class="c-act-sum"></span><input type="checkbox" id="ms-act-sh" checked hidden style="display:none"></span></div>
         <ul class="c-act" id="ms-active"></ul>
       </div>
       <div class="card c-cal">
-        <div class="ms-k"><span>Calendar · result by day (R, trades closed that day)</span><span class="c-tog"><span class="cal-nav"><button type="button" id="ms-cal-prev" aria-label="Previous month">‹</button><b id="ms-cal-m"></b><button type="button" id="ms-cal-next" aria-label="Next month">›</button></span><input type="checkbox" id="ms-cal-sh" checked hidden style="display:none"><input type="checkbox" id="ms-cal-rp" checked hidden style="display:none"></span></div>
+        <div class="ms-k"><span role="heading" aria-level="2">Calendar · result by day (R, trades closed that day)</span><span class="c-tog"><span class="cal-nav"><button type="button" id="ms-cal-prev" aria-label="Previous month">‹</button><b id="ms-cal-m"></b><button type="button" id="ms-cal-next" aria-label="Next month">›</button></span><input type="checkbox" id="ms-cal-sh" checked hidden style="display:none"><input type="checkbox" id="ms-cal-rp" checked hidden style="display:none"></span></div>
         <div class="cal-seg" role="group" aria-label="Markets in the calendar"><button type="button" data-mk="all" class="on" aria-pressed="true">All</button><button type="button" data-mk="xau" aria-pressed="false">Gold</button><button type="button" data-mk="nq" aria-pressed="false">NQ</button><button type="button" data-mk="pairs" aria-pressed="false">Pairs</button></div>
         <div class="cal-seg cal-src adm" role="group" aria-label="Trades in the calendar"><button type="button" data-src="sys" class="on" aria-pressed="true">Main systems</button><button type="button" data-src="all" aria-pressed="false">+ Shadow</button></div>
         <div class="cal" id="ms-cal"></div>
@@ -2814,7 +2814,7 @@ html[data-motion="off"] #v-ict .ict-cal-d:hover { transform: none !important; }
     </div>
     <div class="c-grid c-pane c-pane-trades" id="ms-cp-trades" role="tabpanel" aria-labelledby="ms-cn-trades" data-pane="trades" hidden>
       <div class="card c-trader">
-        <div class="ms-k"><span>Trader · paper trades, all markets, every 4 min</span><span class="c-tog"><label class="c-mine"><input type="checkbox" id="ms-c-mine"> This market only</label><input type="checkbox" id="ms-c-sys" checked hidden aria-hidden="true"></span></div>
+        <div class="ms-k"><span role="heading" aria-level="2">Trader · paper trades, all markets, every 4 min</span><span class="c-tog"><label class="c-mine"><input type="checkbox" id="ms-c-mine"> This market only</label><input type="checkbox" id="ms-c-sys" checked hidden aria-hidden="true"></span></div>
         <div class="c-tabs" id="ms-c-tabs" role="tablist" aria-label="Which trades to show"><button type="button" role="tab" data-ct="live" aria-selected="true">Live <small>our system</small></button><button type="button" role="tab" data-ct="shadow" class="adm">Shadow <small>blocked by a rule</small></button><button type="button" role="tab" data-ct="journal">Journal <small>closed, as in the Journal tab</small></button><button type="button" role="tab" data-ct="all" class="adm">Everything <small>incl. older strategies</small></button></div>
         <p class="ms-note" id="ms-c-tabnote"></p>
         <div class="c-kpi" id="ms-c-kpi"></div>
@@ -2825,14 +2825,14 @@ html[data-motion="off"] #v-ict .ict-cal-d:hover { transform: none !important; }
     <div class="c-grid c-pane c-pane-systems adm" id="ms-cp-systems" role="tabpanel" aria-labelledby="ms-cn-systems" data-pane="systems" hidden>
       <div class="card c-sleeve adm" id="ms-sleeve" hidden></div>
       <div class="card c-edge adm" id="ms-edge">
-        <div class="ms-k"><span>Edge finder · where the council makes money</span><span class="ms-note" id="ms-edge-at"></span></div>
+        <div class="ms-k"><span role="heading" aria-level="2">Edge finder · where the council makes money</span><span class="ms-note" id="ms-edge-at"></span></div>
         <div class="edge-by" role="group" aria-label="Group by"><button type="button" data-eby="d1" class="on" aria-pressed="true">D1 trend</button><button type="button" data-eby="session" aria-pressed="false">Session</button><button type="button" data-eby="cf" aria-pressed="false">Confirming break</button><button type="button" data-eby="rr" aria-pressed="false">Reward:risk</button><button type="button" data-eby="market" aria-pressed="false">Market</button><button type="button" data-eby="setup" aria-pressed="false">Setup</button><label class="edge-sc">Setup <select id="ms-edge-k" aria-label="Only this setup"><option value="">all</option></select></label></div>
-        <div class="edge-wrap"><table class="edge-t"><thead><tr><th scope="col">Condition</th><th scope="col">Verdict</th><th scope="col">Live</th><th scope="col">Shadow</th><th scope="col">30-day replay</th><th scope="col" title="Replay first half / second half">Halves</th></tr></thead><tbody id="ms-edge-b"></tbody></table></div>
+        <div class="edge-wrap" tabindex="0" role="region" aria-label="Edge finder table, scrolls sideways"><table class="edge-t"><thead><tr><th scope="col">Condition</th><th scope="col">Verdict</th><th scope="col">Live</th><th scope="col">Shadow</th><th scope="col">30-day replay</th><th scope="col" title="Replay first half / second half">Halves</th></tr></thead><tbody id="ms-edge-b"></tbody></table></div>
         <p class="edge-adx" id="ms-edge-adx" hidden></p>
         <p class="ms-note">R per trade (number of trades). <b>Edge</b>: replay ≥ +0.2R over 100+ trades, both halves positive and the forward trades (live + shadow, 20+) positive. <b>Avoid</b>: replay ≤ −0.1R over 100+ and forward not positive. Shadow trades are signals the rules blocked; their results are simulated the same way as live paper trades.</p>
       </div>
       <div class="card c-nq adm">
-        <div class="ms-k"><span>NQ New York open run · our system (paper)</span></div>
+        <div class="ms-k"><span role="heading" aria-level="2">NQ New York open run · our system (paper)</span></div>
         <details class="c-how"><summary>How it works</summary>
           <p class="ms-note">NQ runs at least 0.08% of the 09:30 ET opening price (≈20 points; was a fixed 15 until 5 Nov) through it and closes back across it within 15 min; trade <b>with</b> the sweep (the reclaim tends to fail at the New York open), only when the midnight (00:00 ET) open lies ahead of the trade. Stop the same distance on the other side; since 5 Nov evening, after +2R the stop trails 1R behind the best price (cap 10R) instead of a fixed 2R exit (8-year test: +21.1R vs +7.4R in 2018–22, +93.7R vs +76.9R in 2023–26, drawdown not worse); out at 11:00 ET.</p>
           <p class="ms-note"><b>Checked 4 Nov:</b> on 8 years of Nasdaq cash (2018–2026) the same rule made +0.12R a trade over 704 trades, but 2018–2022 was about flat, so expect +0.1–0.2R a trade rather than the replay's +0.30R. Tested and not adopted: later exits, trailing stops, half off at 1R, a 10:00 ET window, volatility-scaled depth, a news-day filter, and the same rule on the S&amp;P 500 (no edge).</p>
@@ -2842,7 +2842,7 @@ html[data-motion="off"] #v-ict .ict-cal-d:hover { transform: none !important; }
         <ul class="cal-day" id="ms-nq-list"></ul>
       </div>
       <div class="card c-rep adm">
-        <div class="ms-k"><span>Gold replica · trades only when gold is volatile</span></div>
+        <div class="ms-k"><span role="heading" aria-level="2">Gold replica · trades only when gold is volatile</span></div>
         <details class="c-how"><summary>How it works</summary>
           <p class="ms-note"><b>Volatility gate since 4 Nov.</b> On 8 years of spot gold (HistData 2019–2026) the replica loses in calm gold every year and only pays when gold moves a lot. Since 5 Nov it trades live only while gold's 20-day average daily range is in the top fifth of gold's own last year (judged on 2023 onwards: trades between 1.5% and that level made +0.02R a trade over 168, top-fifth trades +0.40R in both halves). Below that, every signal is still recorded here as research. It takes trades only in the daily trend direction (a pullback against the 4-hour trend); the engulfing-barrier exception was turned off on 5 Nov because it lost in every year 2023–26 (−15R over 82 trades). Replay 2023–Oct 2026 with the top-fifth gate, breakeven, the add at +2R and the runner: 212 positions, +185.9R (2024 +76.0R, 2025 +52.4R, 2026 +59.6R), worst drawdown −17.6R, best position +14.6R; the fixed-4R rules it replaces made +93.7R with a −11.7R drawdown (return per unit of drawdown 10.6 vs 7.9). Tighter stops, partial exits, session filters and stop buffers were tested on 5 Nov and rejected. Exit and scaling (judged on 2023 onwards): at +1.5R a second unit is added with its stop at the first entry (since 6 Nov; the 5 Nov replay quoted above added at +2R; it shows as a separate “Replica add” trade, counted as 2R of risk); at +2R the stop moves to breakeven; after +4R both units trail 1R behind the best price (cap 10R); out after 48 h. NQ stays the main system.</p>
           <p class="ms-note"><b>Second gold system (paper, since 4 Nov): Mosha BO system.</b> Weekly structure (his “Father”) sets the side; then H4 BO that way, H1 BO the other way (the retracement), M15 BO back in the H4 direction; pullback limit at the broken M15 level, stop past the M15 Origin, target 3R, valid 24 h. On 8 years of spot gold, with the weekly read the way the Trader reads it live: 2019–22 +32.2R over 87 trades, 2023–26 +34.2R over 99 (about +0.35R a trade, 7 of 8 years positive); the same setups against the weekly lost 44R. <b>Out of sample it failed:</b> the identical rule lost on silver, EUR/USD, GBP/USD, USD/JPY, Nasdaq and the S&amp;P (about −220R over ~1,430 trades, 2019–26), so the gold result is probably luck in one cell of a large grid. It stays on paper as a forward test, not as a proven edge. Its trades show in Active trades and the calendar as “Mosha BO system”. Judged on 2023 onwards (5 Nov): +0.27R a trade over 101; buys against a bearish weekly when the daily trend or M15 structure agreed were tested and lost, so it stays weekly-only.</p>
@@ -2857,31 +2857,31 @@ html[data-motion="off"] #v-ict .ict-cal-d:hover { transform: none !important; }
         <ul class="cal-day" id="ms-rep-list"></ul>
       </div>
       <div class="card c-pairs adm">
-        <div class="ms-k"><span>Pairs · crypto trend (live paper) · forex research only</span><span id="ms-pairs-sum" class="c-act-sum"></span></div>
+        <div class="ms-k"><span role="heading" aria-level="2">Pairs · crypto trend (live paper) · forex research only</span><span id="ms-pairs-sum" class="c-act-sum"></span></div>
         <details class="c-how"><summary>How it works</summary>
           <p class="ms-note"><b>Crypto (BTC, ETH, SOL, XRP), since 5 Nov: daily trend, two slots per coin.</b> Buy when a daily candle closes above the 55-day high, and separately above the 100-day high. Since 5 Nov (v3) a trade exits on a daily close under the midpoint of its own 55- or 100-day channel, a level that only moves up; the 5 ATR(20) stop stays as a catastrophe stop (Sharpe 2018–21 1.67 vs 1.50, 2022–26 0.81 vs 0.58; worst drawdown −28% vs −39%). Replay 2023–Oct 2026: 65 trades, +61.7R. Long only. Picked on 2018–21 Binance history, checked on 2022–26 with 0.8% round-trip costs: +0.52R a trade over 10 coins (186 trades); on these four +52.3R over 70 trades (+0.75R), worst drawdown −7.9R. A coin stops at −8R forward.</p>
           <p class="ms-note"><b>Forex: research only.</b> Nothing tested on the five pairs held out of sample: the replica (about 11,000 settings each), Mosha BO, Asia-range breakouts and fades, open sweeps and daily trend-following all lost in 2023–26 after spread. Their replica signals keep being recorded.</p>
         </details>
-        <div class="ms-bt-wrap"><table class="ms-bt-t c-t"><thead><tr><th>Coin</th><th class="n">Close</th><th class="n">55-day high</th><th class="n">To breakout</th><th>Now</th><th class="n">Forward</th><th class="n">Replay 2023–26</th></tr></thead><tbody id="ms-pairs"></tbody></table></div>
+        <div class="ms-bt-wrap" tabindex="0" role="region" aria-label="Pairs table, scrolls sideways"><table class="ms-bt-t c-t"><thead><tr><th>Coin</th><th class="n">Close</th><th class="n">55-day high</th><th class="n">To breakout</th><th>Now</th><th class="n">Forward</th><th class="n">Replay 2023–26</th></tr></thead><tbody id="ms-pairs"></tbody></table></div>
       </div>
     </div>
     <div class="c-grid c-pane c-pane-review adm" id="ms-cp-review" role="tabpanel" aria-labelledby="ms-cn-review" data-pane="review" hidden>
       <div class="card adm c-loss" id="ms-loss">
-        <div class="ms-k"><span>Loss review · why the setup failed</span></div>
+        <div class="ms-k"><span role="heading" aria-level="2">Loss review · why the setup failed</span></div>
         <p class="ms-note">Every losing trade, stacked by the strategy that took it (worst first). Open one, draw on its chart, tick the reasons and write why it failed. The council counts your reasons with its own trade reviews (stop hunt, stop too tight, late entry and news change its rules directly) and tests the rule ideas you write.</p>
         <div class="loss-f" id="ms-loss-f"><span class="seg"><button type="button" data-src="all" class="on" aria-pressed="true">All</button><button type="button" data-src="live" aria-pressed="false">Live</button><button type="button" data-src="shadow" aria-pressed="false">Shadow</button></span><span class="seg"><button type="button" data-days="7" aria-pressed="false">7 days</button><button type="button" data-days="30" class="on" aria-pressed="true">30 days</button></span><span class="seg"><button type="button" data-todo="0" class="on" aria-pressed="true">Everything</button><button type="button" data-todo="1" aria-pressed="false">To review</button></span></div>
         <div id="ms-loss-list" class="loss-list"></div>
         <div class="loss-sync"><span id="ms-loss-sync"></span><button type="button" id="ms-loss-gh">Connect GitHub</button><button type="button" id="ms-loss-copy">Copy reviews</button></div>
       </div>
       <div class="card c-pmc adm">
-        <div class="ms-k">Trade reviews · was it our system or the market?</div>
+        <div class="ms-k" role="heading" aria-level="2">Trade reviews · was it our system or the market?</div>
         <div id="ms-c-pm-sum"></div>
         <ul class="c-pm" id="ms-c-pm"></ul>
       </div>
     </div>
     <div class="c-grid c-pane c-pane-research adm" id="ms-cp-research" role="tabpanel" aria-labelledby="ms-cn-research" data-pane="research" hidden>
       <div class="card c-sb adm" id="ms-sb">
-        <div class="ms-k"><span>Edge scoreboard · every strategy stream</span><span class="ms-note" id="ms-sb-at"></span></div>
+        <div class="ms-k"><span role="heading" aria-level="2">Edge scoreboard · every strategy stream</span><span class="ms-note" id="ms-sb-at"></span></div>
         <p class="sb-sum" id="ms-sb-sum">Loading the scoreboard…</p>
         <div class="sb-bar">
           <div class="sb-seg" role="group" aria-label="Show streams from"><button type="button" data-sbf="all" class="on" aria-pressed="true">All</button><button type="button" data-sbf="Meridian" aria-pressed="false">Meridian</button><button type="button" data-sbf="ICT" aria-pressed="false">ICT</button><button type="button" data-sbf="other" aria-pressed="false">Demo and macro</button></div>
@@ -2891,19 +2891,19 @@ html[data-motion="off"] #v-ict .ict-cal-d:hover { transform: none !important; }
         <p class="ms-note sb-foot">Sorted by evidence: the t-statistic of R per trade, strongest edge first and strongest loser last; streams under 20 trades go to the end (thin shadow streams are hidden until you tick the box). Verdict: <b>Edge</b> t ≥ 2 with both halves positive · <b>Promising</b> positive, t ≥ 1 · <b>Losing</b> negative, t ≤ −1 · <b>Unclear</b> in between · <b>Too few</b> under 20 trades. Replay rows are net of spread; forward rows are net of costs where the trade records them (R less its cost in R), else as recorded. Tap a stream for its equity curve.</p>
       </div>
       <div class="card c-decay adm" id="ms-decay">
-        <div class="ms-k"><span>Edge decay · early warning</span><span class="ms-note" id="ms-decay-at"></span></div>
+        <div class="ms-k"><span role="heading" aria-level="2">Edge decay · early warning</span><span class="ms-note" id="ms-decay-at"></span></div>
         <p class="dc-sum" id="ms-decay-sum">Waiting for the Coach…</p>
         <div class="dc-wrap" tabindex="0" role="region" aria-label="Edge decay monitor, scrolls sideways"><table class="dc-t"><thead><tr><th class="dc-l">System</th><th class="dc-l">Status</th><th>Last trades</th><th>CUSUM vs backtest</th><th>vs zero</th><th>Drawdown</th><th>Record</th><th class="dc-l">Why</th></tr></thead><tbody id="ms-decay-b"></tbody></table></div>
         <p class="ms-note dc-foot">Each live system's record after costs (the council replay up to its first forward trade, then the forward paper record) against its own backtest. <b>CUSUM</b> rises while a system runs below about half its backtest edge; its limit is what one year of normal luck stays under 19 times in 20. <b>Decaying</b>: past the limit, or a drawdown beyond the worst the system has had (gold replica: the owner's 40R allowance). <b>Watch</b>: 3/4 of either. Status only: the monitor never changes a rule; you decide. Method: research/edge/decay-monitor.</p>
       </div>
       <div class="card c-analyst">
-        <div class="ms-k">Analyst · weekly brief</div>
+        <div class="ms-k" role="heading" aria-level="2">Analyst · weekly brief</div>
         <div class="c-sub">Ready right now</div>
         <ul class="c-ready" id="ms-c-ready"></ul>
         <div class="c-md" id="ms-c-analysis"></div>
       </div>
       <div class="card c-coach">
-        <div class="ms-k">Coach · daily review and rules</div>
+        <div class="ms-k" role="heading" aria-level="2">Coach · daily review and rules</div>
         <div class="c-rules" id="ms-c-rules"></div>
         <p class="ms-note" id="ms-c-shadow-sum" style="margin:8px 0 0"></p>
         <div class="c-sub">Today's statistics check</div>
@@ -2914,18 +2914,18 @@ html[data-motion="off"] #v-ict .ict-cal-d:hover { transform: none !important; }
         <div class="c-md" id="ms-c-review"></div>
       </div>
       <div class="card c-score adm">
-        <div class="ms-k">Scorecard · which setups and markets pay</div>
+        <div class="ms-k" role="heading" aria-level="2">Scorecard · which setups and markets pay</div>
         <div class="c-sc">
-          <div class="ms-bt-wrap"><table class="ms-bt-t c-t"><thead><tr><th>Setup</th><th class="n">Trades</th><th class="n">Win rate</th><th class="n">Avg</th><th class="n">Total</th><th>Verdict</th></tr></thead><tbody id="ms-c-sc-setup"></tbody></table></div>
-          <div class="ms-bt-wrap"><table class="ms-bt-t c-t"><thead><tr><th>Market</th><th class="n">Trades</th><th class="n">Win rate</th><th class="n">Avg</th><th class="n">Total</th><th>Verdict</th></tr></thead><tbody id="ms-c-sc-mkt"></tbody></table></div>
+          <div class="ms-bt-wrap" tabindex="0" role="region" aria-label="Scorecard by setup, scrolls sideways"><table class="ms-bt-t c-t"><thead><tr><th>Setup</th><th class="n">Trades</th><th class="n">Win rate</th><th class="n">Avg</th><th class="n">Total</th><th>Verdict</th></tr></thead><tbody id="ms-c-sc-setup"></tbody></table></div>
+          <div class="ms-bt-wrap" tabindex="0" role="region" aria-label="Scorecard by market, scrolls sideways"><table class="ms-bt-t c-t"><thead><tr><th>Market</th><th class="n">Trades</th><th class="n">Win rate</th><th class="n">Avg</th><th class="n">Total</th><th>Verdict</th></tr></thead><tbody id="ms-c-sc-mkt"></tbody></table></div>
         </div>
         <p class="ms-note" style="margin:10px 0 0">From the council's closed paper trades. A verdict needs at least 5 trades: "trust" averages more than +0.2R a trade, "avoid" loses more than 0.2R.</p>
       </div>
       <div class="card c-btc adm">
-        <div class="ms-k">Backtest · the Trader's rules replayed on the last 30 days</div>
+        <div class="ms-k" role="heading" aria-level="2">Backtest · the Trader's rules replayed on the last 30 days</div>
         <p class="ms-note" id="ms-c-bt-sum">Loading the backtest…</p>
         <div class="c-bt-meta" id="ms-c-bt-mkt"></div>
-        <div class="ms-bt-wrap"><table class="ms-bt-t c-t"><thead><tr><th>Setup</th><th class="n">Trades</th><th class="n bt-w">Win rate</th><th class="n">R per trade <small>(95% range)</small></th><th class="n bt-d">With D1</th><th class="n bt-d">Against D1</th><th>Now</th></tr></thead><tbody id="ms-c-bt"></tbody></table></div>
+        <div class="ms-bt-wrap" tabindex="0" role="region" aria-label="Backtest table, scrolls sideways"><table class="ms-bt-t c-t"><thead><tr><th>Setup</th><th class="n">Trades</th><th class="n bt-w">Win rate</th><th class="n">R per trade <small>(95% range)</small></th><th class="n bt-d">With D1</th><th class="n bt-d">Against D1</th><th>Now</th></tr></thead><tbody id="ms-c-bt"></tbody></table></div>
         <ul class="c-bt-lines" id="ms-c-bt-lines"></ul>
         <p class="ms-note" style="margin:10px 0 0">Every setup the Trader would have taken, managed candle by candle on real prices. The range is clustered by market and day (one move often fires several setups), so it is honest about how sure we are: green when the whole range is above zero, red when it is below. The Coach turns only clear findings into rules.</p>
       </div>
@@ -2943,14 +2943,14 @@ html[data-motion="off"] #v-ict .ict-cal-d:hover { transform: none !important; }
       </header>
       <div class="md-col">
         <div class="card md-next">
-          <div class="ms-k"><span>Next day · expected move per market</span><small id="ms-md-next-for"></small></div>
+          <div class="ms-k"><span role="heading" aria-level="3">Next day · expected move per market</span><small id="ms-md-next-for"></small></div>
           <p class="md-lede" id="ms-md-next-lede"></p>
           <div class="md-evday" id="ms-md-evday" hidden></div>
           <ul class="md-mv" id="ms-md-mv" aria-label="Expected move per market"></ul>
           <p class="md-foot" id="ms-md-dxy"></p>
         </div>
         <div class="card md-ev">
-          <div class="ms-k"><span>Calendar · high-impact releases</span></div>
+          <div class="ms-k"><span role="heading" aria-level="3">Calendar · high-impact releases</span></div>
           <div class="md-seg" id="ms-md-ev-seg" role="tablist" aria-label="Calendar view">
             <button type="button" role="tab" data-v="next" id="ms-md-ev-t-next" aria-controls="ms-md-ev-list">Coming up <span class="md-n" id="ms-md-ev-n-next"></span></button>
             <button type="button" role="tab" data-v="past" id="ms-md-ev-t-past" aria-controls="ms-md-ev-list">Recent <span class="md-n" id="ms-md-ev-n-past"></span></button>
@@ -2961,7 +2961,7 @@ html[data-motion="off"] #v-ict .ict-cal-d:hover { transform: none !important; }
       </div>
       <div class="md-col">
         <div class="card md-reg">
-          <div class="ms-k"><span>Regime · where the dollar sits</span></div>
+          <div class="ms-k"><span role="heading" aria-level="3">Regime · where the dollar sits</span></div>
           <figure class="md-smile">
             <svg id="ms-md-smile" viewBox="0 0 320 156" role="img" aria-labelledby="ms-md-smile-t"><title id="ms-md-smile-t">Dollar Smile</title></svg>
             <figcaption class="md-sr" id="ms-md-smile-cap"></figcaption>
@@ -2971,7 +2971,7 @@ html[data-motion="off"] #v-ict .ict-cal-d:hover { transform: none !important; }
           <dl class="md-gauges" id="ms-md-gauges"></dl>
         </div>
         <div class="card md-rec">
-          <div class="ms-k"><span>Track record · is it any good?</span></div>
+          <div class="ms-k"><span role="heading" aria-level="3">Track record · is it any good?</span></div>
           <p class="md-verdict" id="ms-md-verdict"></p>
           <div class="md-seg" id="ms-md-rec-seg" role="tablist" aria-label="Track record view">
             <button type="button" role="tab" data-v="dir" aria-controls="ms-md-rec-body">Direction</button>
@@ -3004,7 +3004,7 @@ html[data-motion="off"] #v-ict .ict-cal-d:hover { transform: none !important; }
       <div class="wk-tiles" id="ms-wk-tiles" aria-label="The week in numbers"></div>
       <div class="wk-col">
         <div class="card wk-pnl">
-          <div class="ms-k"><span>Paper P&amp;L by system · after costs</span></div>
+          <div class="ms-k"><span role="heading" aria-level="3">Paper P&amp;L by system · after costs</span></div>
           <div class="wk-seg" id="ms-wk-seg" role="tablist" aria-label="Which book">
             <button type="button" role="tab" data-g="live" aria-controls="ms-wk-bars">Live <span class="wk-n" id="ms-wk-n-live"></span></button>
             <button type="button" role="tab" data-g="shadow" aria-controls="ms-wk-bars">Shadow <span class="wk-n" id="ms-wk-n-shadow"></span></button>
@@ -3015,11 +3015,11 @@ html[data-motion="off"] #v-ict .ict-cal-d:hover { transform: none !important; }
           <p class="wk-foot" id="ms-wk-cost"></p>
         </div>
         <div class="card wk-bw">
-          <div class="ms-k"><span>Best and worst trades</span><small class="k-sub" id="ms-wk-bw-for"></small></div>
+          <div class="ms-k"><span role="heading" aria-level="3">Best and worst trades</span><small class="k-sub" id="ms-wk-bw-for"></small></div>
           <div id="ms-wk-bw"></div>
         </div>
         <div class="card wk-rules">
-          <div class="ms-k"><span>Rule changes this week</span></div>
+          <div class="ms-k"><span role="heading" aria-level="3">Rule changes this week</span></div>
           <div class="wk-seg" id="ms-wk-rseg" role="tablist" aria-label="Who changed it">
             <button type="button" role="tab" data-a="all" aria-controls="ms-wk-rl">All <span class="wk-n" id="ms-wk-rn-all"></span></button>
             <button type="button" role="tab" data-a="you" aria-controls="ms-wk-rl">You <span class="wk-n" id="ms-wk-rn-you"></span></button>
@@ -3031,11 +3031,11 @@ html[data-motion="off"] #v-ict .ict-cal-d:hover { transform: none !important; }
       </div>
       <div class="wk-col">
         <div class="card wk-dec">
-          <div class="ms-k"><span>Decisions waiting on you</span><span class="wk-now">Now</span></div>
+          <div class="ms-k"><span role="heading" aria-level="3">Decisions waiting on you</span><span class="wk-now">Now</span></div>
           <div id="ms-wk-dec"></div>
         </div>
         <div class="card wk-open">
-          <div class="ms-k"><span>Open positions</span><span class="wk-now">Now</span></div>
+          <div class="ms-k"><span role="heading" aria-level="3">Open positions</span><span class="wk-now">Now</span></div>
           <div id="ms-wk-open"></div>
         </div>
         <div class="card wk-decay">
@@ -6576,7 +6576,7 @@ function msNextSetup(bars, A) {
           + `<td class="n">${nf(e.minLots, 4)} / ${nf(e.stepLots, 4)} / ${nf(e.maxLots, 0)}</td><td class="n">${nf(e.digits, 0)} / ${nf(e.pipPosition, 0)}</td><td class="n">${e.valuePerPoint == null ? '—' : `${ccy} ${nf(e.valuePerPoint, 4)}`}${ob && ob.matches === false ? ' <span class="neg" title="the demo\'s own deals disagree">≠ deals</span>' : ''}</td>`
           + `<td class="n">${e.spread == null ? '—' : nf(e.spread, 6)}</td><td class="n" title="the broker's margin for one lot, read back as leverage (live quote) or as the price it implies (market shut): a wrong lot size would be 10x off">${e.impliedLeverage != null ? '1:' + nf(e.impliedLeverage, 0) : e.impliedPrice != null ? '@ ' + nf(e.impliedPrice, 2) : '—'}</td><td class="n">${nf(sm.stop, 4)}</td><td class="n">${lot}</td></tr>`; }).join('');
       return `<details class="c-how"><summary>Broker specs · ${esc(SP.broker || 'cTrader')} · ${ccy} account · ${esc(tHM(SP.at))} · sample lot for ${nf(S.riskPct, 2)}% (1R) of ${ccy} ${nf(S.balance, 0)} = ${ccy} ${nf(S.riskCash, 0)}</summary>`
-        + `<div class="ms-bt-wrap t-scroll"><table class="ms-bt-t"><thead><tr><th>Symbol</th><th>Base/quote</th><th class="n">Units a lot</th><th class="n">Min / step / max lot</th><th class="n">Digits / pip</th><th class="n">Per point a lot</th><th class="n">Spread</th><th class="n">Margin implies</th><th class="n">Sample stop</th><th class="n">Lot · risk</th></tr></thead><tbody>${rows}</tbody></table></div>`
+        + `<div class="ms-bt-wrap t-scroll" tabindex="0" role="region" aria-label="Broker specs table, scrolls sideways"><table class="ms-bt-t"><thead><tr><th>Symbol</th><th>Base/quote</th><th class="n">Units a lot</th><th class="n">Min / step / max lot</th><th class="n">Digits / pip</th><th class="n">Per point a lot</th><th class="n">Spread</th><th class="n">Margin implies</th><th class="n">Sample stop</th><th class="n">Lot · risk</th></tr></thead><tbody>${rows}</tbody></table></div>`
         + `<small class="sl-n">A lot moves units × price change in the quote currency, converted to the account currency at the broker's own quotes. The lot is floored to the broker's step; one trade may use at most ${nf(S.maxMarginPct ?? 20, 0)}% of the balance as margin (${nf(S.maxLots, 0)} lots when the broker's margin is unknown); a trade below the minimum is skipped, never rounded up.${miss.length ? ` Not offered by the broker: ${esc(miss.join(', '))}.` : ''}</small></details>`; };
     const mr = MS && adminView ? `<div class="sl-row"><div class="sl-h"><span class="ms-chip ${/^ok/.test(MS.status || '') ? 'ms-chip-buy' : 'ms-chip-sell'}">Demo</span><b class="sl-nocap">cTrader mirror</b><small>${esc(MS.status || '—')}${MS.lastRun ? ` · checked ${esc(tHM(MS.lastRun))}` : ''}${/\bopen\b/.test(MS.status || '') ? '' : ` · ${Object.values(MS.map || {}).filter((m) => m.status === 'open').length} open`}</small></div>${((C.mirror.log || []).slice(-5).reverse().map((l) => `<small class="sl-n">${esc(tHM(l.at))} · ${esc(l.msg)}</small>`).join('')) || '<small class="sl-n">No orders yet: it copies new live council trades and ICT A-setups (risk-based lots, demo only).</small>'}${mirrorSpecs(C.specs)}</div>` : '';
     if (!all.length) { if (!PD.length && !mr && !iw) { el.hidden = true; return; } el.hidden = false; el.innerHTML = `<div class="ms-k"><span>Live setups · paper</span><span class="ms-note">no engine setup trades live yet</span></div>${pd}${iw}${mr}`; return; }
@@ -7402,6 +7402,13 @@ function msNextSetup(bars, A) {
         ev.preventDefault(); bs[j].focus(); setPane(bs[j].dataset.pane);
       });
     } }
+  { const tabs = document.getElementById('ms-c-tabs');   // Trades tabs (Live / Shadow / Journal / Everything): arrow keys, Home and End, as on the section bar
+    if (tabs) tabs.addEventListener('keydown', (ev) => {
+      if (!['ArrowLeft', 'ArrowRight', 'Home', 'End'].includes(ev.key)) return;
+      const bs = [...tabs.querySelectorAll('[data-ct]')].filter((b) => b.offsetParent !== null), i = bs.indexOf(document.activeElement); if (i < 0) return;
+      const j = ev.key === 'Home' ? 0 : ev.key === 'End' ? bs.length - 1 : (i + (ev.key === 'ArrowRight' ? 1 : -1) + bs.length) % bs.length;
+      ev.preventDefault(); bs[j].focus(); bs[j].click();
+    }); }
   function showView() {
     const [h0, sub] = location.hash.slice(1).split('/'), h = PUB ? 'guest' : h0 === 'guest' ? 'home' : VIEWER && !['home', 'setup', 'council'].concat(document.documentElement.dataset.ict ? ['ict'] : []).includes(h0) ? 'home' : h0 === 'users' && document.documentElement.dataset.role !== 'owner' ? 'home' : h0 === 'ict' && !document.documentElement.dataset.ict ? 'home' : !h0 && document.documentElement.dataset.ict && document.documentElement.dataset.role === 'reviewer' ? 'ict' : h0, v = VIEWS.includes(h) ? h : 'home';
     if (v === 'ict' && window.renderIct) setTimeout(window.renderIct, 0);
@@ -9644,6 +9651,22 @@ html[data-mk="ict"] #v-charts .mk-mode button[data-mk="ict"].on { background: co
 #v-council .c-md td:first-child { color: var(--ink); font-weight: 600; }
 #v-council .c-md-tw:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 @media (max-width: 700px) { #v-council .c-md td { min-width: 96px; } #v-council .c-md td:first-child { min-width: 84px; } }
+
+/* 9 · a11y audit (8 Nov 2026, Playwright at 375 / 1280 px, light and dark): contrast, 44 px targets, tabular figures, no side stripes */
+:root[data-theme="light"] #v-council { --accent: #2b5fe8; --ink-faint: #626a78; }   /* accent text (review / You / See →) and faint notes were 4.50 and 4.47:1 on white and the page tint; now 5.4 / 5.0 */
+#v-council .loss-st.ok { color: var(--buy); }   /* "stop swept" tag: was --up on its green tint, 3.2:1 in light / 4.4:1 in dark; --buy gives 5.1 / 8.4 */
+#v-council b, #v-council .cal-d .cn, #v-council .cal-mt, #v-council .c-kpi, #v-council .loss-n, #v-council #ms-cp-week .wk-tile b { font-variant-numeric: tabular-nums; }   /* R values and day numbers in Figtree line up (the week tiles set `font:`, which resets it) */
+#v-council .c-pm-i { border-left-width: 1px; border-left-color: var(--line); }   /* trade reviews: the category lives in the tag, not a side stripe */
+#v-council .c-pm-i.system { border-color: color-mix(in srgb, var(--c-warn) 35%, var(--line)); background: color-mix(in srgb, var(--c-warn) 5%, transparent); }
+#v-council .loss-f .seg button, #v-council .loss-sync button, #v-council .c-sb .sb-seg button, #v-council .c-sb .sb-thin { min-height: var(--c-tap); }   /* were 40 / 31 / 32 px */
+#v-council .c-sb .sb-thin input { width: 18px; height: 18px; }
+#v-council .c-sb .sb-seg button { padding-inline: 14px; }
+#v-council .sb-t thead th button { min-height: 28px; min-width: 28px; justify-content: inherit; }   /* sort buttons were 18 px tall and as narrow as "n" */
+@media (max-width: 700px) {
+  #v-council .sb-t thead th button, #v-council .dc-t thead th button { min-height: var(--c-tap); }
+  #v-council .c-t tbody tr[data-tid] > td { height: var(--c-tap); }   /* tappable trade rows: 40 → 44 px (the shared td rule fixes height, not padding) */
+  #v-council .cal { gap: 3px; }
+}
 </style>
 <style>
 /* ═══ SHELL 2 (7 Nov): header, navigation, theme switch and bot pill. Scoped to the app shell (.top, .btab, the More sheet);
