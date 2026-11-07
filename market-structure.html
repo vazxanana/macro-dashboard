@@ -2459,6 +2459,7 @@ html[data-motion="off"][data-gate] .gate-bg path[stroke] { animation: none; stro
   <section class="view" id="v-charts" aria-label="Charts" hidden>
     <div class="sec-h">
       <h2>Charts <span class="kbd-hint"><kbd>1</kbd>–<kbd>6</kbd> pick a chart · <kbd>0</kbd> all · <kbd>F</kbd> fit</span></h2>
+      <nav class="wl" id="ms-wl" aria-label="Watchlist: switch market" hidden></nav>
       <div class="adr" id="ms-adr" role="status" aria-label="Daily range" hidden></div>
       <div class="pa-chips" id="ms-pa-chips" hidden></div>
       <div class="mtf" id="ms-mtf" role="group" aria-label="Timeframe alignment: last structure break per timeframe" hidden></div>
@@ -3776,6 +3777,16 @@ function msNextSetup(bars, A) {
     el.innerHTML = `<span class="adr-k">Range today</span><b>${fmt(rng)}</b><span class="adr-k">of ADR ${fmt(adr)}</span><span class="adr-bar" title="${pct.toFixed(0)}% of the 14-day average daily range used"><i style="width:${Math.min(100, pct).toFixed(1)}%"></i></span><b class="adr-p">${pct.toFixed(0)}%</b><span class="adr-sep"></span><span class="adr-k">In today's range</span><span class="adr-pos" title="0% = today's low, 100% = today's high"><i style="left:${pos.toFixed(1)}%"></i></span><b>${pos.toFixed(0)}%</b>`;
   }
   setTimeout(rangeMeter, 3000); setInterval(rangeMeter, 15e3);
+  // watchlist strip (7 Nov loop): OANDA markets with today's change; tap to switch the charts to that market
+  async function watchlist() {
+    const el = document.getElementById('ms-wl'); if (!el || !MD.base || MD.on === false) return;
+    const keys = Object.keys(INSTRUMENTS).filter((k) => INSTRUMENTS[k].md);
+    const rows = await Promise.all(keys.map(async (k) => { try { const j = await (await fetch(`${location.origin}${MD.base}bars?sym=${k}&tf=1d&n=2`)).json(); const b = j.bars || []; if (b.length < 2) return null; const c = b[b.length - 1].close, o = b[b.length - 2].close; return { k, c, ch: (c - o) / o * 100 }; } catch (e) { return null; } }));
+    const ok = rows.filter(Boolean); if (!ok.length) return;
+    el.hidden = false;
+    el.innerHTML = ok.map((r) => { const I = INSTRUMENTS[r.k], d = I.dec ?? 2; return `<a href="?s=${r.k}#charts" class="wl-i${r.k === instKey ? ' cur' : ''}"${r.k === instKey ? ' aria-current="true"' : ''}><b>${I.label}</b><span>${(+r.c).toLocaleString('en-US', { minimumFractionDigits: d, maximumFractionDigits: d })}</span><em class="${r.ch >= 0 ? 'up' : 'dn'}">${r.ch >= 0 ? '+' : '−'}${Math.abs(r.ch).toFixed(2)}%</em></a>`; }).join('');
+  }
+  setTimeout(watchlist, 2500); setInterval(() => { if (!document.hidden && location.hash === '#charts') watchlist(); }, 60e3);
   // timeframe alignment strip (7 Nov loop): the last structure break direction on each timeframe at a glance; tap one to open that chart
   function mtfStrip() {
     const el = document.getElementById('ms-mtf'); if (!el) return;
@@ -7729,6 +7740,12 @@ function gpStats(T) {
 .adr[hidden] { display: none; }
 .mtf { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; margin: -4px 0 14px; }
 .mtf[hidden] { display: none; }
+.wl { display: flex; gap: 6px; width: 0; min-width: 100%; box-sizing: border-box; overflow-x: auto; scrollbar-width: none; margin: 4px 0 12px; padding-bottom: 2px; }
+.wl[hidden] { display: none; } .wl::-webkit-scrollbar { display: none; }
+.wl-i { flex: none; display: inline-flex; align-items: baseline; gap: 6px; padding: 6px 10px; border-radius: 9px; border: 1px solid var(--line); background: var(--panel); color: var(--ink); text-decoration: none; font-size: 12.5px; font-variant-numeric: tabular-nums; }
+.wl-i b { font-weight: 700; } .wl-i span { color: var(--ink-dim); } .wl-i em { font-style: normal; font-weight: 600; } .wl-i em.up { color: var(--buy); } .wl-i em.dn { color: var(--sell); }
+.wl-i:hover { border-color: var(--accent); } .wl-i.cur { border-color: var(--accent); background: color-mix(in srgb, var(--accent) 10%, var(--panel)); }
+.wl-i:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 .pa-chips { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; margin: -4px 0 12px; }
 .pa-chips[hidden] { display: none; }
 .pa-chips-k { font-size: 12px; color: var(--ink-faint); margin-right: 2px; }
