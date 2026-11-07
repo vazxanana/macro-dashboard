@@ -494,6 +494,12 @@
    "by": "coach-stats",
    "change": "m30m1: dropped the D1 rule",
    "why": "The trades it blocked made +1.36R over 19."
+  },
+  {
+   "at": "2026-11-07T01:14:22.000Z",
+   "by": "user",
+   "change": "Gold trend fast (new paper leg): the gold trend rule on the prior 5 daily highs instead of 20 (a daily close above them buys at market on the next run; stop 2 x ATR(D1,14), lifted to daily close - 2 ATR each closed day; one add at +1R); its own position next to the 20-day leg; sizing guide 0.25%",
+   "why": "Owner goal: use all the skills to make the council more profitable with higher returns. Every skill rule was tested and none beat the live stack (research log 7 Nov); the gold book trades too rarely. Spot gold 1m, 0.30 cost, add at +1R: N5 alone +35.2R (2019-22, n43, DD -4.5) | +24.9R (2023-24, n22, DD -2.4) | +45.2R (2025-26, n18, DD -2.9), positive every year 2019-2026 (2022 +7.2, 2026 +9.7; Feb-Jun 2026 -2.3R over 4). Gold book in % of account (replica, trendline, engulf 0.25%, gold trend 0.5%): +39.3% DD -2.34% | +68.6% DD -6.21%; with N5 at 0.25%: +45.5% DD -2.61% | +79.9% DD -6.47% (return per drawdown 17.4 vs 16.8 | 12.3 vs 11.0). Judged on return per drawdown as a new leg, not as a rule change."
   }
  ],
  "btAt": "2026-11-06T11:18:45.097Z",
@@ -532,7 +538,8 @@
   "mosha-slow",
   "gold-add-1.5",
   "gold-trend-add",
-  "gold-momentum-pullback"
+  "gold-momentum-pullback",
+  "gold-trend-fast"
  ],
  "target": {},
  "targetBy": {},
@@ -547,7 +554,7 @@
    "why": "four losses in a row"
   },
   "scalp": {
-   "at": "2026-11-07T01:12:11.000Z",
+   "at": "2026-11-07T01:14:22.000Z",
    "why": "expectancy -1.00R over 13 trades"
   },
   "xau": {
@@ -658,6 +665,10 @@
   "z1": 0.382,
   "z2": 0.618,
   "wait": 6,
+  "k": 2
+ },
+ "goldTrendFast": {
+  "n": 5,
   "k": 2
  }
 }
