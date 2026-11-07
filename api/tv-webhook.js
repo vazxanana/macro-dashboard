@@ -24,8 +24,8 @@ module.exports = async (req, res) => {
   if (!(req.query && req.query.k)) {
     let b = {}; try { b = typeof req.body === 'string' ? JSON.parse(req.body) : (req.body || {}); } catch (e) {}
     if (!b.ownerPw || crypto.createHash('sha256').update(String(b.ownerPw)).digest('hex') !== OWNER_HASH) return res.status(403).json({ error: 'Owner password not accepted' });
-    const blobs = (await recent()).slice(0, 30);
-    const alerts = await Promise.all(blobs.map(async (bl) => { try { const r = await fetch(bl.url, { headers: { Authorization: `Bearer ${tok()}` } }); return r.ok ? r.json() : null; } catch (e) { return null; } }));
+    let blobs; try { blobs = (await recent()).slice(0, 30); } catch (e) { console.error(`[tv] list ${e.message}`); return res.status(502).json({ error: 'alert log unavailable' }); }
+    const alerts = await Promise.all(blobs.map(async (bl) => { try { const r = await fetch(bl.url, { headers: { Authorization: `Bearer ${tok()}` }, signal: AbortSignal.timeout(8000) }); return r.ok ? r.json() : null; } catch (e) { return null; } }));
     return res.status(200).json({ url: `https://${req.headers.host}/api/tv-webhook?k=${KEY}`, alerts: alerts.filter(Boolean) });
   }
   // TradingView: store + forward
