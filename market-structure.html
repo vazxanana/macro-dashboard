@@ -2340,7 +2340,7 @@ html[data-motion="off"][data-gate] .gate-bg path[stroke] { animation: none; stro
 
   <span id="ms-main-start" tabindex="-1"></span>
   <div class="ms-offline-box" role="alert">
-    <b>Live prices couldn't load.</b> The page couldn't reach the price feeds (Binance and Kraken). Check your connection; some networks and countries block these exchanges. You can still use <b>Settings → Load CSV</b> with a TradingView export.
+    <b>Live prices couldn't load.</b> The page couldn't reach the price feeds (OANDA through meridianx.dev, then Binance and Kraken as backups). Check your connection; some networks block the exchange backups. You can still use <b>Settings → Load CSV</b> with a TradingView export.
     <div class="ms-note" id="ms-offline-why"></div>
   </div>
 
@@ -3745,7 +3745,7 @@ function msNextSetup(bars, A) {
   };
   function drawHLines() { const L = window.msHLines.get();
     Object.values(panes).forEach((P) => { if (!P.series) return; (P._hl || []).forEach((l) => { try { P.series.removePriceLine(l); } catch (e) {} });
-      P._hl = L.map((v) => P.series.createPriceLine({ price: v, color: 'rgba(209,212,220,.75)', lineWidth: 1, lineStyle: LW.LineStyle.Solid, axisLabelVisible: true, title: '' })); }); }
+      P._hl = L.map((v) => P.series.createPriceLine({ price: v, color: G.theme === 'light' ? 'rgba(42,46,57,.7)' : 'rgba(209,212,220,.75)', lineWidth: 1, lineStyle: LW.LineStyle.Solid, axisLabelVisible: true, title: '' })); }); }
   setTimeout(drawHLines, 2000);
   // range meter (7 Nov loop): today's range against the 14-day average daily range, and where price sits inside today's range
   function rangeMeter() {
@@ -4426,6 +4426,7 @@ function msNextSetup(bars, A) {
       p.overlay.set(p.overlay.items);
     });
     root.dataset.chart = G.theme === 'light' ? 'light' : 'dark'; document.documentElement.dataset.theme = G.theme;
+    if (typeof drawHLines === 'function') setTimeout(drawHLines, 0);
     $('ms-theme').textContent = `Theme: ${{ dark: 'Dark', light: 'Light', midnight: 'Midnight', pro: 'Pro' }[G.theme] || 'Dark'}`; $('ms-theme').title = 'Switch theme: Dark, Light, Midnight, Pro';
   }
   function applyAlertsBtn() {
