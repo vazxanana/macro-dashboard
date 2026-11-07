@@ -1379,3 +1379,22 @@ Owner's skill file (ALL_SKILLS_COMBINED: gold-msnr-playbook, Engulfing King, eng
   - N20: −3.6 | +0.5 | −1.9;
   - ungated: −9.5 | −4.4 | −6.1.
   - Feb–Jun 2026: +2.7R (N5, ungated, 4 trades). No hedge leg; gold stays long-only.
+
+## 2026-11-07 — Owner: can the ICT edge improve the council's NQ and pairs? Tested: no change
+ICT A-setups from the ICT research records (cash NQ/ES/YM 2023-26) set against the council's own trades, 2023-24 | 2025-26.
+- **NQ New York open run** (council paper system, 442 replay trades 2023-26; base +51.1R dd 8.2 | +54.7R dd 8.1):
+  - ICT daily bias "against": +48.1 | +31.7R. Discount buys / premium sells: +35.1 | +35.2R. Both less profit; rejected.
+  - **Skip after an opposite NQ ICT A-setup:**
+    - 24 h: +52.9 dd 7.8 | +60.4 dd 8.1;
+    - 12 h: +52.1 | +60.6;
+    - 48 h: +50.8 | +51.8;
+    - opposite NQ/ES/YM setups in 24 h: +47.7 | +53.9, dd 10.8.
+  - The 24 h gain (+7.5R from 22 skipped trades) comes mostly from 2026 (+5.9R; other years −0.2 to +1.0R) and turns negative at 48 h. Noise, not adopted.
+- **Pairs:** the council has no live FX system (removed after the walk-forward failed), so there is nothing to filter.
+- **The ICT gold rule as an extra council gold leg** (H1 iFVG buys, stop 0.3-0.75 daily ATR, trail 2/1.5, 36 h; daily P&L correlation with the book −0.003):
+  - book (incl. gold trend fast): +45.5% dd −2.61% | +79.9% dd −6.47%;
+  - + ICT gold at 0.10%: +49.2 dd −3.24 | +83.0 dd −6.67;
+  - at 0.25%: +54.8 dd −4.20 | +87.8 dd −7.17;
+  - at 0.5%: +64.0 dd −5.80 | +95.7 dd −8.19.
+  - Return per drawdown is worse in 2023-24 at every size. Not added; it stays on the ICT desk (gc).
+- ICT EUR/USD (London, about +0.09R a trade, drawdown about 15R) is weaker than the gold leg; not added either.
