@@ -87,6 +87,25 @@ globalThis.fetch = async (u) => { const p = String(u).split('/'), i = p.indexOf(
   ok(['nofri', 'h1opp'].every((v) => V[v] && Array.isArray(V[v].trades) && V[v].since && V[v].totals && V[v].trades.every((q) => q.shadow === true && q.variant === v && q.aset === true && q.id.endsWith(`-${v}`))
     && Object.keys(V[v].errors).length === 0 && ['nq', 'es', 'ym', 'rty', 'gc'].every((m) => V[v].trades.filter((q) => q.market === m && q.status === 'open').length <= 1)),
     `variants nofri/h1opp in shadow.json .variants, flagged, no errors (${['nofri', 'h1opp'].map((v) => (V[v] ? V[v].trades.length : '-')).join('/')} records)`);
+  // paper-only market 'silver' (research/ict-markets.md): its feed is down here (no network), which must only show as an error in its
+  // own variant stream; the live records, snapshot and bars never carry the paper market
+  ok(V.silver && Array.isArray(V.silver.trades) && V.silver.trades.length === 0 && V.silver.errors.xag && Object.keys(r2.snap.errors).length === 0
+    && !('xag' in r2.snap.markets) && !('xag' in r2.bars) && r2.trades.every((q) => q.market !== 'xag' && !q.paperMarket), 'paper market silver: a feed error stays in its own stream; live files untouched');
+}
+{
+  const { isPaperA, variantRule, SHADOW_MARKETS, MARKETS, dailyNY, isASetup } = await import('./tracker.mjs');
+  const g = { side: 1, grade: { total: 3 }, feat: { atrR: 0.5, bias: 'with', body: 0.3, session: 'NY PM' } };
+  ok(!('xag' in MARKETS) && SHADOW_MARKETS.xag.variant === 'silver', 'silver is a paper-only market, not in MARKETS');
+  ok(isPaperA(g, 'xag') && variantRule('silver', g, 'xag', {}) && !variantRule('silver', g, 'gc', {}) && !variantRule('nofri', g, 'xag', {}) && !isPaperA(g, 'gc'),
+    'silver: the gold rule on xag only');
+  ok(!isPaperA({ ...g, side: -1 }, 'xag') && !isPaperA({ ...g, feat: { atrR: 0.2 } }, 'xag') && !isPaperA({ ...g, feat: { atrR: 0.75 } }, 'xag') && !isPaperA({ ...g, grade: { total: 2 } }, 'xag'),
+    'silver: buys only, stop 0.3-0.75x ATR, grade >= 3');
+  ok(isASetup(g, 'gc') === isPaperA(g, 'xag'), 'silver uses the same rule as GC');
+  // 17:00 New York day: Mon 16:00 ET belongs to Monday, Mon 18:00 ET to Tuesday; time + 86400 = the 17:00 ET close (EST and EDT)
+  const h = (iso) => ({ time: Date.parse(iso) / 1000, open: 1, high: 2, low: 0.5, close: 1.5 });
+  const D = dailyNY([h('2026-11-09T21:00:00Z'), h('2026-11-09T23:00:00Z'), h('2026-07-06T20:00:00Z')].sort((a, b) => a.time - b.time));
+  ok(D.length === 3 && D[0].time + 86400 === Date.parse('2026-07-06T21:00:00Z') / 1000 && D[1].time + 86400 === Date.parse('2026-11-09T22:00:00Z') / 1000 && D[2].time + 86400 === Date.parse('2026-11-10T22:00:00Z') / 1000,
+    'dailyNY: days roll at 17:00 New York (EDT and EST)');
 }
 {
   const { isNoFri, nyFriday, isH1Opp, h1Trend, loadMeridian } = await import('./tracker.mjs');
