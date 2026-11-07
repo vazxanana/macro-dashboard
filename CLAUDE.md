@@ -207,5 +207,15 @@ LIMIT ticket when placed and a cancel when they expire; closes get a CLOSE ticke
 `/gold`, no-cache on HTML) and `api/kick.js`: Vercel crons (Pro: per-minute) start the GitHub workflows through the API —
 `job=ict` dispatches ict.yml at :04/:19/:34/:49, `job=council` starts council.yml every 10 min only when no loop runs. Env on
 Vercel: `GH_DISPATCH_TOKEN` (fine-grained, this repo, Actions read/write) and `CRON_SECRET`; never commit either. GitHub Pages
-keeps deploying in parallel until the Vercel site is proven. Later stages: server-side login + private repo (the council and ICT
+keeps deploying in parallel until the Vercel site is proven.
+Status 7 Nov: Vercel project `macro-dashboard` (prj_4krxNideb9D2LfdcXkAWtAwzPLST) in team `xau` (team_40SuZQP47lNHxjlzDc8PeRH5),
+production https://macro-dashboard-five-mu.vercel.app. Protection: previews only (production public). The build copies only the pages,
+assets and icons to out/; council/ and ict/ ship inside the api/run.js bundle and are never served. Owner wants the repo PRIVATE:
+- api/data.js serves council-data files at /cdata/* with GH_TOKEN/GH_READ_TOKEN (falls back to the public raw file while none is set);
+  the site uses /cdata on Vercel (window.MS_CDATA) and raw.githubusercontent elsewhere; MT5/cTrader bridges default to /cdata/mt5/signals.csv.
+- api/run.js runs one council round (cron every 4 min, ~75 s) or ICT round (:04/:19/:34/:49, ~35 s): downloads only the files the job
+  reads, runs the unchanged script in /tmp, commits the changed files to council-data via the Git Data API. RUN_MODE=live commits and
+  sends alerts; otherwise dry run (no commit, alerts off). Cut-over: set GH_TOKEN (Contents read/write) and the trader's NTFY/Telegram/FUT
+  env on Vercel, set RUN_MODE=live and remove the GitHub council/ICT schedules and loop in the same step, then make the repo private.
+Not yet linked to GitHub (the owner's Vercel login needs a GitHub connection); until then deploys are file uploads through the Vercel API. Later stages: server-side login + private repo (the council and ICT
 loops then have to run off GitHub Actions or on paid minutes), then broker-order functions.

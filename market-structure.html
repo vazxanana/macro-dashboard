@@ -1206,7 +1206,8 @@ window.MS_USERS = { fred: { name: 'Fred', hash: '370aed697dc503aecee7d8faad5de77
   luxus: { name: 'Luxus', hash: 'dccc5d01dabcd1c0b9fa89c91e7f4bde603121ee0172b4ff394e6bb30d295e41', role: 'viewer' },
   carlos: { name: 'Carlos', hash: '511d45febaa8559a9071091951613e559f0b8b12b3995e6c13c94c81fbee59f0', role: 'viewer' } };
 // users added or changed on the Users page live in council-data users.json ({ users: { key: { name, hash, role, disabled? } } }); they override the built-ins
-window.MS_USERS_URL = 'https://raw.githubusercontent.com/vazxanana/macro-dashboard/council-data/users.json';
+window.MS_CDATA = (/^https?:$/.test(location.protocol) && !/github\.io$/.test(location.hostname) ? location.origin + '/cdata/' : 'https://raw.githubusercontent.com/vazxanana/macro-dashboard/council-data/');   // Vercel serves council data from /cdata (private repo); GitHub Pages and local files read GitHub directly
+window.MS_USERS_URL = window.MS_CDATA + 'users.json';
 window.msMergeUsers = function (remote) { var m = {}, k; for (k in window.MS_USERS) m[k] = window.MS_USERS[k]; var r = (remote && remote.users) || {}; for (k in r) m[k] = r[k]; for (k in m) if (m[k] && m[k].disabled) delete m[k]; return m; };
 window.msFetchUsers = function () { return fetch(window.MS_USERS_URL + '?t=' + Date.now(), { cache: 'no-store' }).then(function (r) { return r.ok ? r.json() : null; }).catch(function () { return null; }); };   // viewer: setups, P&L calendar, active trades; read-only
 (function () { var h = null, u = null; try { h = localStorage.getItem('ms-admin'); u = localStorage.getItem('ms-user'); } catch (e) {}
@@ -4511,7 +4512,7 @@ function msNextSetup(bars, A) {
   });
 
   // ─── Council: Analyst, Trader and Coach (always-on data from the council-data branch) ───
-  const CDATA = 'https://raw.githubusercontent.com/vazxanana/macro-dashboard/council-data/';
+  const CDATA = window.MS_CDATA;
   var councilReady;
   const COUNCIL = { at: 0 };
   function md(src) {   // small, safe markdown: headings, bullets, bold, paragraphs
@@ -5750,7 +5751,7 @@ function msNextSetup(bars, A) {
 // GitHub with the msGhTok token). Fred is the main reviewer and trader; the owner sees the same desk.
 (function () {
   if (!document.getElementById('v-ict')) return;
-  const ROOT = 'https://raw.githubusercontent.com/vazxanana/macro-dashboard/council-data/ict/';
+  const ROOT = window.MS_CDATA + 'ict/';
   const GH = { repo: 'vazxanana/macro-dashboard', path: 'ict/desk.json', branch: 'council-data' };
   const $ = (id) => document.getElementById(id);
   const esc = (s) => String(s == null ? '' : s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
