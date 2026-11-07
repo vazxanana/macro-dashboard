@@ -868,7 +868,11 @@ for (const [key, M] of Object.entries(MARKETS)) {
           dly = cd.sort((a, b) => a.time - b.time); snapshot.goldW1Src = 'cnbc-spot';
         } catch (e) { snapshot.goldW1Src = feed === 'OANDA' ? 'oanda' : 'paxg'; snapshot.errors.goldW1 = String(e.message || e); }
         const wk = [];
-        for (const b of dly) { const k = Math.floor((b.time - 345600) / 604800) * 604800 + 345600, c = wk.at(-1);
+        // Weeks run Monday 00:00 UTC. A feed's Sunday-dated candle (OANDA's 22:00 UTC Sunday open, Kraken's 24/7 day) is the
+        // NEXT week's first session, not the previous week's last: folded backwards it moved the weekly close/low and flipped
+        // the filter's fallback reading (gold-fidelity, 8 Nov: OANDA read bullish, CNBC spot bearish). CNBC has no Sunday bars.
+        const weekOf = (t) => Math.floor((t + (new Date(t * 1000).getUTCDay() === 0 ? 86400 : 0) - 345600) / 604800) * 604800 + 345600;
+        for (const b of dly) { const k = weekOf(b.time), c = wk.at(-1);
           if (!c || c.time !== k) wk.push({ time: k, open: b.open, high: b.high, low: b.low, close: b.close }); else { c.high = Math.max(c.high, b.high); c.low = Math.min(c.low, b.low); c.close = b.close; } }
         const wEv = msAnalyze(wk, 3).events.map((e) => ({ t: wk[e.breakIdx].time + 604800, dir: e.dir })).filter((e) => e.t <= now);
         const w1At = (t) => (before(wEv, t) || { dir: 0 }).dir;
