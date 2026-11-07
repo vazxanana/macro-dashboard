@@ -4974,5 +4974,11 @@ function msNextSetup(bars, A) {
   const f = () => { const on = !m.hidden && /^Loading/.test(m.textContent.trim()); if (on) m.dataset.loading = '1'; else delete m.dataset.loading; };
   f(); new MutationObserver(f).observe(m, { childList: true, characterData: true, subtree: true, attributes: true, attributeFilter: ['hidden'] }); }); })();
 </script>
+<script>
+/* polish 30: switching to a different view starts at the top (sub-tabs inside a view keep their scroll) */
+(() => { const top = () => (location.hash.slice(1).split('/')[0] || 'home'); let cur = top();
+  addEventListener('hashchange', () => { const v = top(); if (v !== cur) { cur = v; requestAnimationFrame(() => scrollTo({ top: 0, behavior: 'instant' })); } });
+})();
+</script>
 </body>
 </html>
