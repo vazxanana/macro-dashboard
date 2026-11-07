@@ -1,0 +1,7398 @@
+{
+ "built": "2026-11-07",
+ "preregistration": "research/edge/regime-switch/preregistration.md (commit 75458a96)",
+ "tests": 21,
+ "bonferroniT": 2.83,
+ "data": {
+  "gc": {
+   "days": 5364,
+   "from": "2006-03-20",
+   "to": "2026-11-06"
+  },
+  "nq": {
+   "days": 6124,
+   "from": "2003-03-24",
+   "to": "2026-11-06"
+  },
+  "es": {
+   "days": 6124,
+   "from": "2003-03-24",
+   "to": "2026-11-06"
+  },
+  "ym": {
+   "days": 6101,
+   "from": "2003-03-24",
+   "to": "2026-11-06"
+  }
+ },
+ "systems": {
+  "ict": {
+   "name": "ICT A-setups (GC/NQ/ES/YM pooled)",
+   "history": [
+    "2008-01-01",
+    "2026-11-01"
+   ],
+   "split": "2017-06-01",
+   "trendUsed": "|TS| (two-sided system)",
+   "trades": {
+    "declared": 4021,
+    "study": 4021,
+    "warmupExcluded": 0,
+    "firstHalf": 2111,
+    "secondHalf": 1910,
+    "studyFrom": "2008-01-02"
+   },
+   "alwaysOn": {
+    "firstHalf": {
+     "n": 2111,
+     "R": -29.7,
+     "exp": -0.014,
+     "t": -0.48,
+     "maxDD": 82.8,
+     "win": 0.35
+    },
+    "secondHalf": {
+     "n": 1910,
+     "R": 166.1,
+     "exp": 0.087,
+     "t": 2.49,
+     "maxDD": 31.3,
+     "win": 0.38
+    },
+    "secondHalfX2": {
+     "n": 1910,
+     "R": 72.5,
+     "exp": 0.038,
+     "t": 1.09,
+     "maxDD": 43.5,
+     "win": 0.38
+    },
+    "full": {
+     "n": 4021,
+     "R": 136.4,
+     "exp": 0.034,
+     "t": 1.5,
+     "maxDD": 82.8,
+     "win": 0.37
+    }
+   },
+   "indicators": {
+    "VOL": {
+     "rule": {
+      "cut": 80.147,
+      "dir": "<",
+      "pctOfFirstHalf": 0.8,
+      "fitted": true,
+      "firstHalfT": 2.17,
+      "candidates": [
+       {
+        "p": 0.2,
+        "cut": 21.364,
+        "dir": ">=",
+        "onShare": 0.8,
+        "t": -0.28,
+        "diff": -0.021
+       },
+       {
+        "p": 0.2,
+        "cut": 21.364,
+        "dir": "<",
+        "onShare": 0.2,
+        "t": 0.28,
+        "diff": 0.021
+       },
+       {
+        "p": 0.3,
+        "cut": 32.499,
+        "dir": ">=",
+        "onShare": 0.7,
+        "t": -0.8,
+        "diff": -0.052
+       },
+       {
+        "p": 0.3,
+        "cut": 32.499,
+        "dir": "<",
+        "onShare": 0.3,
+        "t": 0.8,
+        "diff": 0.052
+       },
+       {
+        "p": 0.4,
+        "cut": 42.634,
+        "dir": ">=",
+        "onShare": 0.6,
+        "t": -0.12,
+        "diff": -0.007
+       },
+       {
+        "p": 0.4,
+        "cut": 42.634,
+        "dir": "<",
+        "onShare": 0.4,
+        "t": 0.12,
+        "diff": 0.007
+       },
+       {
+        "p": 0.5,
+        "cut": 52.811,
+        "dir": ">=",
+        "onShare": 0.5,
+        "t": -0.87,
+        "diff": -0.052
+       },
+       {
+        "p": 0.5,
+        "cut": 52.811,
+        "dir": "<",
+        "onShare": 0.5,
+        "t": 0.87,
+        "diff": 0.052
+       },
+       {
+        "p": 0.6,
+        "cut": 62.249,
+        "dir": ">=",
+        "onShare": 0.4,
+        "t": -1.45,
+        "diff": -0.086
+       },
+       {
+        "p": 0.6,
+        "cut": 62.249,
+        "dir": "<",
+        "onShare": 0.6,
+        "t": 1.45,
+        "diff": 0.086
+       },
+       {
+        "p": 0.7,
+        "cut": 71.276,
+        "dir": ">=",
+        "onShare": 0.3,
+        "t": -1.22,
+        "diff": -0.077
+       },
+       {
+        "p": 0.7,
+        "cut": 71.276,
+        "dir": "<",
+        "onShare": 0.7,
+        "t": 1.22,
+        "diff": 0.077
+       },
+       {
+        "p": 0.8,
+        "cut": 80.147,
+        "dir": ">=",
+        "onShare": 0.2,
+        "t": -2.17,
+        "diff": -0.146
+       },
+       {
+        "p": 0.8,
+        "cut": 80.147,
+        "dir": "<",
+        "onShare": 0.8,
+        "t": 2.17,
+        "diff": 0.146
+       }
+      ]
+     },
+     "firstHalf": {
+      "on": {
+       "n": 1688,
+       "R": 25.8,
+       "exp": 0.015,
+       "t": 0.45,
+       "maxDD": 54.1,
+       "win": 0.36
+      },
+      "off": {
+       "n": 423,
+       "R": -55.5,
+       "exp": -0.131,
+       "t": -2.25,
+       "maxDD": 64.5,
+       "win": 0.32
+      },
+      "welchT": 2.17
+     },
+     "secondHalf": {
+      "on": {
+       "n": 1628,
+       "R": 160.5,
+       "exp": 0.099,
+       "t": 2.59,
+       "maxDD": 27.4,
+       "win": 0.38
+      },
+      "off": {
+       "n": 282,
+       "R": 5.6,
+       "exp": 0.02,
+       "t": 0.23,
+       "maxDD": 19.5,
+       "win": 0.38
+      },
+      "welchT": 0.83,
+      "onShare": 0.85,
+      "x2": {
+       "on": {
+        "n": 1628,
+        "R": 75.3,
+        "exp": 0.046,
+        "t": 1.21,
+        "maxDD": 45,
+        "win": 0.38
+       },
+       "off": {
+        "n": 282,
+        "R": -2.8,
+        "exp": -0.01,
+        "t": -0.12,
+        "maxDD": 27.5,
+        "win": 0.38
+       },
+       "welchT": 0.59
+      },
+      "switched": {
+       "n": 1628,
+       "R": 160.5,
+       "exp": 0.099,
+       "t": 2.59,
+       "maxDD": 27.4,
+       "win": 0.38,
+       "years": {
+        "years": 10,
+        "switched": {
+         "pos": 9,
+         "flat": 0,
+         "neg": 1
+        },
+        "alwaysOn": {
+         "pos": 9,
+         "flat": 0,
+         "neg": 1
+        },
+        "byYear": {
+         "2017": {
+          "switched": 0.8,
+          "alwaysOn": 0.8
+         },
+         "2018": {
+          "switched": 11,
+          "alwaysOn": 11
+         },
+         "2019": {
+          "switched": -4,
+          "alwaysOn": -4
+         },
+         "2020": {
+          "switched": 26.7,
+          "alwaysOn": 36.4
+         },
+         "2021": {
+          "switched": 5.2,
+          "alwaysOn": 2
+         },
+         "2022": {
+          "switched": 28.8,
+          "alwaysOn": 34.5
+         },
+         "2023": {
+          "switched": 19.9,
+          "alwaysOn": 13
+         },
+         "2024": {
+          "switched": 13.8,
+          "alwaysOn": 13.8
+         },
+         "2025": {
+          "switched": 30.9,
+          "alwaysOn": 37.9
+         },
+         "2026": {
+          "switched": 27.3,
+          "alwaysOn": 20.6
+         }
+        }
+       }
+      },
+      "alwaysOn": {
+       "n": 1910,
+       "R": 166.1,
+       "exp": 0.087,
+       "t": 2.49,
+       "maxDD": 31.3,
+       "win": 0.38,
+       "years": {
+        "pos": 9,
+        "flat": 0,
+        "neg": 1
+       }
+      }
+     },
+     "fullHistoryReference": {
+      "note": "in-sample contaminated (first half chose the cut)",
+      "on": {
+       "n": 3316,
+       "R": 186.3,
+       "exp": 0.056,
+       "t": 2.21,
+       "maxDD": 54.1,
+       "win": 0.37
+      },
+      "off": {
+       "n": 705,
+       "R": -49.9,
+       "exp": -0.071,
+       "t": -1.44,
+       "maxDD": 64.5,
+       "win": 0.34
+      },
+      "welchT": 2.29,
+      "switchedYears": {
+       "pos": 15,
+       "flat": 0,
+       "neg": 4
+      },
+      "alwaysOnYears": {
+       "pos": 13,
+       "flat": 0,
+       "neg": 6
+      }
+     },
+     "robustness": {
+      "months": 113,
+      "monthsAllOff": 0,
+      "monthsMixed": 48,
+      "offSpells": 149,
+      "monthBlockP": 0.191
+     },
+     "byEraDescriptive": {
+      "2008-2017": {
+       "on": {
+        "n": 1812,
+        "R": 26.6,
+        "exp": 0.015,
+        "t": 0.45,
+        "maxDD": 54.1,
+        "win": 0.36
+       },
+       "off": {
+        "n": 423,
+        "R": -55.5,
+        "exp": -0.131,
+        "t": -2.25,
+        "maxDD": 64.5,
+        "win": 0.32
+       },
+       "welchT": 2.18
+      },
+      "2018-2026": {
+       "on": {
+        "n": 1504,
+        "R": 159.7,
+        "exp": 0.106,
+        "t": 2.69,
+        "maxDD": 27.4,
+        "win": 0.39
+       },
+       "off": {
+        "n": 282,
+        "R": 5.6,
+        "exp": 0.02,
+        "t": 0.23,
+        "maxDD": 19.5,
+        "win": 0.38
+       },
+       "welchT": 0.91
+      }
+     },
+     "tests": {
+      "S1": false,
+      "S2": true,
+      "S3": true,
+      "pass": false,
+      "survivesMultipleTesting": false
+     },
+     "perMarketSecondHalf": {
+      "gc": {
+       "on": {
+        "n": 527,
+        "R": 73.9,
+        "exp": 0.14,
+        "t": 2.07,
+        "maxDD": 23.5,
+        "win": 0.43
+       },
+       "off": {
+        "n": 40,
+        "R": 0.2,
+        "exp": 0.004,
+        "t": 0.02,
+        "maxDD": 8.4,
+        "win": 0.35
+       },
+       "welchT": 0.52
+      },
+      "nq": {
+       "on": {
+        "n": 295,
+        "R": 54.9,
+        "exp": 0.186,
+        "t": 1.87,
+        "maxDD": 17.2,
+        "win": 0.36
+       },
+       "off": {
+        "n": 157,
+        "R": -3.1,
+        "exp": -0.02,
+        "t": -0.18,
+        "maxDD": 15.5,
+        "win": 0.37
+       },
+       "welchT": 1.36
+      },
+      "es": {
+       "on": {
+        "n": 415,
+        "R": 26.5,
+        "exp": 0.064,
+        "t": 0.84,
+        "maxDD": 20.6,
+        "win": 0.36
+       },
+       "off": {
+        "n": 38,
+        "R": -5.2,
+        "exp": -0.137,
+        "t": -0.7,
+        "maxDD": 9.4,
+        "win": 0.32
+       },
+       "welchT": 0.96
+      },
+      "ym": {
+       "on": {
+        "n": 391,
+        "R": 5.2,
+        "exp": 0.013,
+        "t": 0.19,
+        "maxDD": 17.6,
+        "win": 0.35
+       },
+       "off": {
+        "n": 47,
+        "R": 13.8,
+        "exp": 0.294,
+        "t": 1.27,
+        "maxDD": 5.4,
+        "win": 0.47
+       },
+       "welchT": -1.16
+      }
+     }
+    },
+    "TREND": {
+     "rule": {
+      "cut": 1.076,
+      "dir": "<",
+      "pctOfFirstHalf": 0.7,
+      "fitted": true,
+      "firstHalfT": 1.61,
+      "candidates": [
+       {
+        "p": 0.2,
+        "cut": 0.277,
+        "dir": ">=",
+        "onShare": 0.8,
+        "t": -0.18,
+        "diff": -0.013
+       },
+       {
+        "p": 0.2,
+        "cut": 0.277,
+        "dir": "<",
+        "onShare": 0.2,
+        "t": 0.18,
+        "diff": 0.013
+       },
+       {
+        "p": 0.3,
+        "cut": 0.448,
+        "dir": ">=",
+        "onShare": 0.7,
+        "t": 0.66,
+        "diff": 0.041
+       },
+       {
+        "p": 0.3,
+        "cut": 0.448,
+        "dir": "<",
+        "onShare": 0.3,
+        "t": -0.66,
+        "diff": -0.041
+       },
+       {
+        "p": 0.4,
+        "cut": 0.597,
+        "dir": ">=",
+        "onShare": 0.6,
+        "t": -0.11,
+        "diff": -0.007
+       },
+       {
+        "p": 0.4,
+        "cut": 0.597,
+        "dir": "<",
+        "onShare": 0.4,
+        "t": 0.11,
+        "diff": 0.007
+       },
+       {
+        "p": 0.5,
+        "cut": 0.741,
+        "dir": ">=",
+        "onShare": 0.5,
+        "t": -1.44,
+        "diff": -0.084
+       },
+       {
+        "p": 0.5,
+        "cut": 0.741,
+        "dir": "<",
+        "onShare": 0.5,
+        "t": 1.44,
+        "diff": 0.084
+       },
+       {
+        "p": 0.6,
+        "cut": 0.897,
+        "dir": ">=",
+        "onShare": 0.4,
+        "t": -1.37,
+        "diff": -0.081
+       },
+       {
+        "p": 0.6,
+        "cut": 0.897,
+        "dir": "<",
+        "onShare": 0.6,
+        "t": 1.37,
+        "diff": 0.081
+       },
+       {
+        "p": 0.7,
+        "cut": 1.076,
+        "dir": ">=",
+        "onShare": 0.3,
+        "t": -1.61,
+        "diff": -0.097
+       },
+       {
+        "p": 0.7,
+        "cut": 1.076,
+        "dir": "<",
+        "onShare": 0.7,
+        "t": 1.61,
+        "diff": 0.097
+       },
+       {
+        "p": 0.8,
+        "cut": 1.311,
+        "dir": ">=",
+        "onShare": 0.2,
+        "t": -0.27,
+        "diff": -0.019
+       },
+       {
+        "p": 0.8,
+        "cut": 1.311,
+        "dir": "<",
+        "onShare": 0.8,
+        "t": 0.27,
+        "diff": 0.019
+       }
+      ]
+     },
+     "firstHalf": {
+      "on": {
+       "n": 1477,
+       "R": 22.4,
+       "exp": 0.015,
+       "t": 0.42,
+       "maxDD": 48.2,
+       "win": 0.36
+      },
+      "off": {
+       "n": 634,
+       "R": -52.1,
+       "exp": -0.082,
+       "t": -1.7,
+       "maxDD": 60.6,
+       "win": 0.33
+      },
+      "welchT": 1.61
+     },
+     "secondHalf": {
+      "on": {
+       "n": 1205,
+       "R": 80.5,
+       "exp": 0.067,
+       "t": 1.54,
+       "maxDD": 39.7,
+       "win": 0.37
+      },
+      "off": {
+       "n": 705,
+       "R": 85.6,
+       "exp": 0.121,
+       "t": 2.07,
+       "maxDD": 19.2,
+       "win": 0.39
+      },
+      "welchT": -0.75,
+      "onShare": 0.63,
+      "x2": {
+       "on": {
+        "n": 1205,
+        "R": 25.5,
+        "exp": 0.021,
+        "t": 0.49,
+        "maxDD": 47.7,
+        "win": 0.37
+       },
+       "off": {
+        "n": 705,
+        "R": 47,
+        "exp": 0.067,
+        "t": 1.13,
+        "maxDD": 22.8,
+        "win": 0.39
+       },
+       "welchT": -0.62
+      },
+      "switched": {
+       "n": 1205,
+       "R": 80.5,
+       "exp": 0.067,
+       "t": 1.54,
+       "maxDD": 39.7,
+       "win": 0.37,
+       "years": {
+        "years": 10,
+        "switched": {
+         "pos": 7,
+         "flat": 0,
+         "neg": 3
+        },
+        "alwaysOn": {
+         "pos": 9,
+         "flat": 0,
+         "neg": 1
+        },
+        "byYear": {
+         "2017": {
+          "switched": 5.8,
+          "alwaysOn": 0.8
+         },
+         "2018": {
+          "switched": -1.9,
+          "alwaysOn": 11
+         },
+         "2019": {
+          "switched": -3.2,
+          "alwaysOn": -4
+         },
+         "2020": {
+          "switched": 31.4,
+          "alwaysOn": 36.4
+         },
+         "2021": {
+          "switched": 2.5,
+          "alwaysOn": 2
+         },
+         "2022": {
+          "switched": 8.8,
+          "alwaysOn": 34.5
+         },
+         "2023": {
+          "switched": 13.4,
+          "alwaysOn": 13
+         },
+         "2024": {
+          "switched": 13.6,
+          "alwaysOn": 13.8
+         },
+         "2025": {
+          "switched": -11,
+          "alwaysOn": 37.9
+         },
+         "2026": {
+          "switched": 21.1,
+          "alwaysOn": 20.6
+         }
+        }
+       }
+      },
+      "alwaysOn": {
+       "n": 1910,
+       "R": 166.1,
+       "exp": 0.087,
+       "t": 2.49,
+       "maxDD": 31.3,
+       "win": 0.38,
+       "years": {
+        "pos": 9,
+        "flat": 0,
+        "neg": 1
+       }
+      }
+     },
+     "fullHistoryReference": {
+      "note": "in-sample contaminated (first half chose the cut)",
+      "on": {
+       "n": 2682,
+       "R": 102.9,
+       "exp": 0.038,
+       "t": 1.37,
+       "maxDD": 48.2,
+       "win": 0.37
+      },
+      "off": {
+       "n": 1339,
+       "R": 33.5,
+       "exp": 0.025,
+       "t": 0.65,
+       "maxDD": 74.8,
+       "win": 0.36
+      },
+      "welchT": 0.28,
+      "switchedYears": {
+       "pos": 12,
+       "flat": 0,
+       "neg": 7
+      },
+      "alwaysOnYears": {
+       "pos": 13,
+       "flat": 0,
+       "neg": 6
+      }
+     },
+     "robustness": {
+      "months": 113,
+      "monthsAllOff": 4,
+      "monthsMixed": 93,
+      "offSpells": 293,
+      "monthBlockP": 0.751
+     },
+     "byEraDescriptive": {
+      "2008-2017": {
+       "on": {
+        "n": 1520,
+        "R": 28.2,
+        "exp": 0.019,
+        "t": 0.51,
+        "maxDD": 48.2,
+        "win": 0.36
+       },
+       "off": {
+        "n": 715,
+        "R": -57.1,
+        "exp": -0.08,
+        "t": -1.68,
+        "maxDD": 74.8,
+        "win": 0.32
+       },
+       "welchT": 1.65
+      },
+      "2018-2026": {
+       "on": {
+        "n": 1162,
+        "R": 74.7,
+        "exp": 0.064,
+        "t": 1.46,
+        "maxDD": 39.7,
+        "win": 0.37
+       },
+       "off": {
+        "n": 624,
+        "R": 90.6,
+        "exp": 0.145,
+        "t": 2.34,
+        "maxDD": 19.2,
+        "win": 0.41
+       },
+       "welchT": -1.06
+      }
+     },
+     "tests": {
+      "S1": false,
+      "S2": false,
+      "S3": false,
+      "pass": false,
+      "survivesMultipleTesting": false
+     },
+     "perMarketSecondHalf": {
+      "gc": {
+       "on": {
+        "n": 335,
+        "R": 46.3,
+        "exp": 0.138,
+        "t": 1.6,
+        "maxDD": 15.6,
+        "win": 0.42
+       },
+       "off": {
+        "n": 232,
+        "R": 27.7,
+        "exp": 0.119,
+        "t": 1.19,
+        "maxDD": 10.9,
+        "win": 0.43
+       },
+       "welchT": 0.14
+      },
+      "nq": {
+       "on": {
+        "n": 283,
+        "R": 17.6,
+        "exp": 0.062,
+        "t": 0.67,
+        "maxDD": 16.6,
+        "win": 0.35
+       },
+       "off": {
+        "n": 169,
+        "R": 34.2,
+        "exp": 0.202,
+        "t": 1.54,
+        "maxDD": 10.9,
+        "win": 0.38
+       },
+       "welchT": -0.87
+      },
+      "es": {
+       "on": {
+        "n": 270,
+        "R": 15.9,
+        "exp": 0.059,
+        "t": 0.64,
+        "maxDD": 18.4,
+        "win": 0.36
+       },
+       "off": {
+        "n": 183,
+        "R": 5.4,
+        "exp": 0.03,
+        "t": 0.26,
+        "maxDD": 11.5,
+        "win": 0.34
+       },
+       "welchT": 0.2
+      },
+      "ym": {
+       "on": {
+        "n": 317,
+        "R": 0.7,
+        "exp": 0.002,
+        "t": 0.03,
+        "maxDD": 20.2,
+        "win": 0.35
+       },
+       "off": {
+        "n": 121,
+        "R": 18.3,
+        "exp": 0.151,
+        "t": 1.14,
+        "maxDD": 9.4,
+        "win": 0.39
+       },
+       "welchT": -0.98
+      }
+     }
+    },
+    "META": {
+     "rule": {
+      "cut": 0,
+      "dir": ">=",
+      "fitted": false,
+      "note": "fixed a priori: ON unless the trailing 12-month sum is negative"
+     },
+     "firstHalf": {
+      "on": {
+       "n": 980,
+       "R": -3.5,
+       "exp": -0.004,
+       "t": -0.09,
+       "maxDD": 55.6,
+       "win": 0.38
+      },
+      "off": {
+       "n": 1131,
+       "R": -26.2,
+       "exp": -0.023,
+       "t": -0.56,
+       "maxDD": 52.4,
+       "win": 0.33
+      },
+      "welchT": 0.33
+     },
+     "secondHalf": {
+      "on": {
+       "n": 1243,
+       "R": 81.4,
+       "exp": 0.065,
+       "t": 1.51,
+       "maxDD": 34.8,
+       "win": 0.37
+      },
+      "off": {
+       "n": 667,
+       "R": 84.7,
+       "exp": 0.127,
+       "t": 2.16,
+       "maxDD": 23.5,
+       "win": 0.39
+      },
+      "welchT": -0.84,
+      "onShare": 0.65,
+      "x2": {
+       "on": {
+        "n": 1243,
+        "R": 28.4,
+        "exp": 0.023,
+        "t": 0.53,
+        "maxDD": 40.4,
+        "win": 0.37
+       },
+       "off": {
+        "n": 667,
+        "R": 44,
+        "exp": 0.066,
+        "t": 1.12,
+        "maxDD": 37,
+        "win": 0.39
+       },
+       "welchT": -0.59
+      },
+      "switched": {
+       "n": 1243,
+       "R": 81.4,
+       "exp": 0.065,
+       "t": 1.51,
+       "maxDD": 34.8,
+       "win": 0.37,
+       "years": {
+        "years": 10,
+        "switched": {
+         "pos": 7,
+         "flat": 0,
+         "neg": 3
+        },
+        "alwaysOn": {
+         "pos": 9,
+         "flat": 0,
+         "neg": 1
+        },
+        "byYear": {
+         "2017": {
+          "switched": 2.5,
+          "alwaysOn": 0.8
+         },
+         "2018": {
+          "switched": -0.8,
+          "alwaysOn": 11
+         },
+         "2019": {
+          "switched": 10.7,
+          "alwaysOn": -4
+         },
+         "2020": {
+          "switched": 16.3,
+          "alwaysOn": 36.4
+         },
+         "2021": {
+          "switched": 1.7,
+          "alwaysOn": 2
+         },
+         "2022": {
+          "switched": 19.6,
+          "alwaysOn": 34.5
+         },
+         "2023": {
+          "switched": -13.5,
+          "alwaysOn": 13
+         },
+         "2024": {
+          "switched": -0.7,
+          "alwaysOn": 13.8
+         },
+         "2025": {
+          "switched": 26.2,
+          "alwaysOn": 37.9
+         },
+         "2026": {
+          "switched": 19.4,
+          "alwaysOn": 20.6
+         }
+        }
+       }
+      },
+      "alwaysOn": {
+       "n": 1910,
+       "R": 166.1,
+       "exp": 0.087,
+       "t": 2.49,
+       "maxDD": 31.3,
+       "win": 0.38,
+       "years": {
+        "pos": 9,
+        "flat": 0,
+        "neg": 1
+       }
+      }
+     },
+     "fullHistoryReference": {
+      "note": "META is not fitted: the full history is out of sample for it",
+      "on": {
+       "n": 2223,
+       "R": 77.9,
+       "exp": 0.035,
+       "t": 1.15,
+       "maxDD": 55.6,
+       "win": 0.38
+      },
+      "off": {
+       "n": 1798,
+       "R": 58.5,
+       "exp": 0.033,
+       "t": 0.95,
+       "maxDD": 52.4,
+       "win": 0.35
+      },
+      "welchT": 0.05,
+      "switchedYears": {
+       "pos": 12,
+       "flat": 0,
+       "neg": 7
+      },
+      "alwaysOnYears": {
+       "pos": 13,
+       "flat": 0,
+       "neg": 6
+      }
+     },
+     "robustness": {
+      "months": 113,
+      "monthsAllOff": 0,
+      "monthsMixed": 97,
+      "offSpells": 364,
+      "monthBlockP": 0.73
+     },
+     "byEraDescriptive": {
+      "2008-2017": {
+       "on": {
+        "n": 1037,
+        "R": -1,
+        "exp": -0.001,
+        "t": -0.02,
+        "maxDD": 55.6,
+        "win": 0.38
+       },
+       "off": {
+        "n": 1198,
+        "R": -27.9,
+        "exp": -0.023,
+        "t": -0.57,
+        "maxDD": 52.4,
+        "win": 0.33
+       },
+       "welchT": 0.39
+      },
+      "2018-2026": {
+       "on": {
+        "n": 1186,
+        "R": 78.9,
+        "exp": 0.067,
+        "t": 1.5,
+        "maxDD": 34.8,
+        "win": 0.38
+       },
+       "off": {
+        "n": 600,
+        "R": 86.4,
+        "exp": 0.144,
+        "t": 2.36,
+        "maxDD": 23.5,
+        "win": 0.41
+       },
+       "welchT": -1.03
+      }
+     },
+     "tests": {
+      "S1": false,
+      "S2": false,
+      "S3": false,
+      "pass": false,
+      "survivesMultipleTesting": false
+     },
+     "perMarketSecondHalf": {
+      "gc": {
+       "on": {
+        "n": 399,
+        "R": 59.4,
+        "exp": 0.149,
+        "t": 1.86,
+        "maxDD": 16.5,
+        "win": 0.43
+       },
+       "off": {
+        "n": 168,
+        "R": 14.6,
+        "exp": 0.087,
+        "t": 0.78,
+        "maxDD": 21.3,
+        "win": 0.43
+       },
+       "welchT": 0.45
+      },
+      "nq": {
+       "on": {
+        "n": 323,
+        "R": 25.2,
+        "exp": 0.078,
+        "t": 0.88,
+        "maxDD": 11.5,
+        "win": 0.36
+       },
+       "off": {
+        "n": 129,
+        "R": 26.6,
+        "exp": 0.206,
+        "t": 1.38,
+        "maxDD": 11.4,
+        "win": 0.37
+       },
+       "welchT": -0.74
+      },
+      "es": {
+       "on": {
+        "n": 273,
+        "R": -6.5,
+        "exp": -0.024,
+        "t": -0.27,
+        "maxDD": 31.2,
+        "win": 0.33
+       },
+       "off": {
+        "n": 180,
+        "R": 27.9,
+        "exp": 0.155,
+        "t": 1.27,
+        "maxDD": 18.4,
+        "win": 0.39
+       },
+       "welchT": -1.19
+      },
+      "ym": {
+       "on": {
+        "n": 248,
+        "R": 3.3,
+        "exp": 0.013,
+        "t": 0.15,
+        "maxDD": 22.7,
+        "win": 0.35
+       },
+       "off": {
+        "n": 190,
+        "R": 15.7,
+        "exp": 0.083,
+        "t": 0.86,
+        "maxDD": 13.1,
+        "win": 0.38
+       },
+       "welchT": -0.53
+      }
+     }
+    }
+   },
+   "yearlyR": [
+    -21.2,
+    -23,
+    7.8,
+    18.3,
+    -14.6,
+    -44.4,
+    25.6,
+    13.4,
+    11.5,
+    -2.2,
+    11,
+    -4,
+    36.4,
+    2,
+    34.5,
+    13,
+    13.8,
+    37.9,
+    20.6
+   ],
+   "yearlyLag1Corr": 0.13,
+   "now": {
+    "gc": {
+     "asOf": "2026-10-30",
+     "VOL": {
+      "value": 90.73,
+      "on": false
+     },
+     "TREND": {
+      "value": 1.13,
+      "on": false
+     },
+     "META": {
+      "value": 0.42,
+      "on": true
+     }
+    },
+    "es": {
+     "asOf": "2026-10-30",
+     "VOL": {
+      "value": 28.85,
+      "on": true
+     },
+     "TREND": {
+      "value": 0.39,
+      "on": true
+     },
+     "META": {
+      "value": 14.62,
+      "on": true
+     }
+    },
+    "ym": {
+     "asOf": "2026-10-30",
+     "VOL": {
+      "value": 35.62,
+      "on": true
+     },
+     "TREND": {
+      "value": 0.52,
+      "on": true
+     },
+     "META": {
+      "value": 9.19,
+      "on": true
+     }
+    },
+    "nq": {
+     "asOf": "2026-10-30",
+     "VOL": {
+      "value": 67.67,
+      "on": true
+     },
+     "TREND": {
+      "value": 0.04,
+      "on": true
+     },
+     "META": {
+      "value": 7.43,
+      "on": true
+     }
+    }
+   }
+  },
+  "nqopen": {
+   "name": "NQ New York open run",
+   "history": [
+    "2004-01-01",
+    "2026-11-04"
+   ],
+   "split": "2015-06-01",
+   "trendUsed": "|TS| (two-sided system)",
+   "trades": {
+    "declared": 1869,
+    "study": 1846,
+    "warmupExcluded": 23,
+    "firstHalf": 894,
+    "secondHalf": 952,
+    "studyFrom": "2004-03-30"
+   },
+   "alwaysOn": {
+    "firstHalf": {
+     "n": 894,
+     "R": 3.6,
+     "exp": 0.004,
+     "t": 0.09,
+     "maxDD": 31.4,
+     "win": 0.44
+    },
+    "secondHalf": {
+     "n": 952,
+     "R": 65.5,
+     "exp": 0.069,
+     "t": 1.46,
+     "maxDD": 49.1,
+     "win": 0.41
+    },
+    "secondHalfX2": {
+     "n": 952,
+     "R": 20.2,
+     "exp": 0.021,
+     "t": 0.45,
+     "maxDD": 82.7,
+     "win": 0.41
+    },
+    "full": {
+     "n": 1846,
+     "R": 69.2,
+     "exp": 0.037,
+     "t": 1.16,
+     "maxDD": 60.7,
+     "win": 0.43
+    }
+   },
+   "indicators": {
+    "VOL": {
+     "rule": {
+      "cut": 71.473,
+      "dir": "<",
+      "pctOfFirstHalf": 0.7,
+      "fitted": true,
+      "firstHalfT": 1.39,
+      "candidates": [
+       {
+        "p": 0.2,
+        "cut": 21.076,
+        "dir": ">=",
+        "onShare": 0.8,
+        "t": -0.49,
+        "diff": -0.055
+       },
+       {
+        "p": 0.2,
+        "cut": 21.076,
+        "dir": "<",
+        "onShare": 0.2,
+        "t": 0.49,
+        "diff": 0.055
+       },
+       {
+        "p": 0.3,
+        "cut": 32.184,
+        "dir": ">=",
+        "onShare": 0.7,
+        "t": -0.12,
+        "diff": -0.011
+       },
+       {
+        "p": 0.3,
+        "cut": 32.184,
+        "dir": "<",
+        "onShare": 0.3,
+        "t": 0.12,
+        "diff": 0.011
+       },
+       {
+        "p": 0.4,
+        "cut": 41.359,
+        "dir": ">=",
+        "onShare": 0.6,
+        "t": -0.93,
+        "diff": -0.083
+       },
+       {
+        "p": 0.4,
+        "cut": 41.359,
+        "dir": "<",
+        "onShare": 0.4,
+        "t": 0.93,
+        "diff": 0.083
+       },
+       {
+        "p": 0.5,
+        "cut": 51.914,
+        "dir": ">=",
+        "onShare": 0.5,
+        "t": -1.36,
+        "diff": -0.12
+       },
+       {
+        "p": 0.5,
+        "cut": 51.914,
+        "dir": "<",
+        "onShare": 0.5,
+        "t": 1.36,
+        "diff": 0.12
+       },
+       {
+        "p": 0.6,
+        "cut": 62.228,
+        "dir": ">=",
+        "onShare": 0.4,
+        "t": -0.94,
+        "diff": -0.083
+       },
+       {
+        "p": 0.6,
+        "cut": 62.228,
+        "dir": "<",
+        "onShare": 0.6,
+        "t": 0.94,
+        "diff": 0.083
+       },
+       {
+        "p": 0.7,
+        "cut": 71.473,
+        "dir": ">=",
+        "onShare": 0.3,
+        "t": -1.39,
+        "diff": -0.132
+       },
+       {
+        "p": 0.7,
+        "cut": 71.473,
+        "dir": "<",
+        "onShare": 0.7,
+        "t": 1.39,
+        "diff": 0.132
+       },
+       {
+        "p": 0.8,
+        "cut": 81.925,
+        "dir": ">=",
+        "onShare": 0.2,
+        "t": -1.02,
+        "diff": -0.112
+       },
+       {
+        "p": 0.8,
+        "cut": 81.925,
+        "dir": "<",
+        "onShare": 0.8,
+        "t": 1.02,
+        "diff": 0.112
+       }
+      ]
+     },
+     "firstHalf": {
+      "on": {
+       "n": 626,
+       "R": 28.2,
+       "exp": 0.045,
+       "t": 0.85,
+       "maxDD": 20.8,
+       "win": 0.46
+      },
+      "off": {
+       "n": 268,
+       "R": -24.5,
+       "exp": -0.092,
+       "t": -1.17,
+       "maxDD": 31.3,
+       "win": 0.4
+      },
+      "welchT": 1.45
+     },
+     "secondHalf": {
+      "on": {
+       "n": 563,
+       "R": 41.7,
+       "exp": 0.074,
+       "t": 1.22,
+       "maxDD": 42.9,
+       "win": 0.42
+      },
+      "off": {
+       "n": 389,
+       "R": 23.9,
+       "exp": 0.061,
+       "t": 0.81,
+       "maxDD": 32.6,
+       "win": 0.4
+      },
+      "welchT": 0.13,
+      "onShare": 0.59,
+      "x2": {
+       "on": {
+        "n": 563,
+        "R": 9.1,
+        "exp": 0.016,
+        "t": 0.27,
+        "maxDD": 58.3,
+        "win": 0.42
+       },
+       "off": {
+        "n": 389,
+        "R": 11.1,
+        "exp": 0.029,
+        "t": 0.38,
+        "maxDD": 39.6,
+        "win": 0.4
+       },
+       "welchT": -0.13
+      },
+      "switched": {
+       "n": 563,
+       "R": 41.7,
+       "exp": 0.074,
+       "t": 1.22,
+       "maxDD": 42.9,
+       "win": 0.42,
+       "years": {
+        "years": 12,
+        "switched": {
+         "pos": 7,
+         "flat": 0,
+         "neg": 5
+        },
+        "alwaysOn": {
+         "pos": 7,
+         "flat": 0,
+         "neg": 5
+        },
+        "byYear": {
+         "2015": {
+          "switched": -19.7,
+          "alwaysOn": -19.7
+         },
+         "2016": {
+          "switched": -11.6,
+          "alwaysOn": -11.6
+         },
+         "2017": {
+          "switched": 2.8,
+          "alwaysOn": 2.8
+         },
+         "2018": {
+          "switched": 17.2,
+          "alwaysOn": 13.9
+         },
+         "2019": {
+          "switched": -2.9,
+          "alwaysOn": -11.6
+         },
+         "2020": {
+          "switched": -2.3,
+          "alwaysOn": -6.8
+         },
+         "2021": {
+          "switched": 5.2,
+          "alwaysOn": -4.3
+         },
+         "2022": {
+          "switched": -1.2,
+          "alwaysOn": 4.7
+         },
+         "2023": {
+          "switched": 6,
+          "alwaysOn": 29.6
+         },
+         "2024": {
+          "switched": 24.1,
+          "alwaysOn": 24.1
+         },
+         "2025": {
+          "switched": 11.2,
+          "alwaysOn": 16.3
+         },
+         "2026": {
+          "switched": 12.9,
+          "alwaysOn": 28.2
+         }
+        }
+       }
+      },
+      "alwaysOn": {
+       "n": 952,
+       "R": 65.5,
+       "exp": 0.069,
+       "t": 1.46,
+       "maxDD": 49.1,
+       "win": 0.41,
+       "years": {
+        "pos": 7,
+        "flat": 0,
+        "neg": 5
+       }
+      }
+     },
+     "fullHistoryReference": {
+      "note": "in-sample contaminated (first half chose the cut)",
+      "on": {
+       "n": 1189,
+       "R": 69.8,
+       "exp": 0.059,
+       "t": 1.47,
+       "maxDD": 51.6,
+       "win": 0.44
+      },
+      "off": {
+       "n": 657,
+       "R": -0.7,
+       "exp": -0.001,
+       "t": -0.02,
+       "maxDD": 63.3,
+       "win": 0.4
+      },
+      "welchT": 0.88,
+      "switchedYears": {
+       "pos": 12,
+       "flat": 1,
+       "neg": 10
+      },
+      "alwaysOnYears": {
+       "pos": 10,
+       "flat": 0,
+       "neg": 13
+      }
+     },
+     "robustness": {
+      "months": 138,
+      "monthsAllOff": 52,
+      "monthsMixed": 8,
+      "offSpells": 7,
+      "monthBlockP": 0.467
+     },
+     "byEraDescriptive": {
+      "2004-2013": {
+       "on": {
+        "n": 515,
+        "R": 31.3,
+        "exp": 0.061,
+        "t": 1.04,
+        "maxDD": 16.8,
+        "win": 0.47
+       },
+       "off": {
+        "n": 268,
+        "R": -24.5,
+        "exp": -0.092,
+        "t": -1.17,
+        "maxDD": 31.3,
+        "win": 0.4
+       },
+       "welchT": 1.57
+      },
+      "2014-2022": {
+       "on": {
+        "n": 500,
+        "R": -15.6,
+        "exp": -0.031,
+        "t": -0.52,
+        "maxDD": 51.6,
+        "win": 0.4
+       },
+       "off": {
+        "n": 254,
+        "R": -20.2,
+        "exp": -0.079,
+        "t": -0.92,
+        "maxDD": 32.6,
+        "win": 0.36
+       },
+       "welchT": 0.46
+      },
+      "2023-2026": {
+       "on": {
+        "n": 174,
+        "R": 54.2,
+        "exp": 0.311,
+        "t": 2.57,
+        "maxDD": 9.7,
+        "win": 0.47
+       },
+       "off": {
+        "n": 135,
+        "R": 44,
+        "exp": 0.326,
+        "t": 2.29,
+        "maxDD": 5.7,
+        "win": 0.47
+       },
+       "welchT": -0.08
+      }
+     },
+     "tests": {
+      "S1": false,
+      "S2": true,
+      "S3": false,
+      "pass": false,
+      "survivesMultipleTesting": false
+     }
+    },
+    "TREND": {
+     "rule": {
+      "cut": 0.295,
+      "dir": ">=",
+      "pctOfFirstHalf": 0.2,
+      "fitted": true,
+      "firstHalfT": 2.87,
+      "candidates": [
+       {
+        "p": 0.2,
+        "cut": 0.295,
+        "dir": ">=",
+        "onShare": 0.8,
+        "t": 2.87,
+        "diff": 0.299
+       },
+       {
+        "p": 0.2,
+        "cut": 0.295,
+        "dir": "<",
+        "onShare": 0.2,
+        "t": -2.87,
+        "diff": -0.299
+       },
+       {
+        "p": 0.3,
+        "cut": 0.467,
+        "dir": ">=",
+        "onShare": 0.7,
+        "t": 1.15,
+        "diff": 0.11
+       },
+       {
+        "p": 0.3,
+        "cut": 0.467,
+        "dir": "<",
+        "onShare": 0.3,
+        "t": -1.15,
+        "diff": -0.11
+       },
+       {
+        "p": 0.4,
+        "cut": 0.596,
+        "dir": ">=",
+        "onShare": 0.6,
+        "t": 0.54,
+        "diff": 0.048
+       },
+       {
+        "p": 0.4,
+        "cut": 0.596,
+        "dir": "<",
+        "onShare": 0.4,
+        "t": -0.54,
+        "diff": -0.048
+       },
+       {
+        "p": 0.5,
+        "cut": 0.73,
+        "dir": ">=",
+        "onShare": 0.5,
+        "t": 1.23,
+        "diff": 0.108
+       },
+       {
+        "p": 0.5,
+        "cut": 0.73,
+        "dir": "<",
+        "onShare": 0.5,
+        "t": -1.23,
+        "diff": -0.108
+       },
+       {
+        "p": 0.6,
+        "cut": 0.928,
+        "dir": ">=",
+        "onShare": 0.4,
+        "t": 1.59,
+        "diff": 0.143
+       },
+       {
+        "p": 0.6,
+        "cut": 0.928,
+        "dir": "<",
+        "onShare": 0.6,
+        "t": -1.59,
+        "diff": -0.143
+       },
+       {
+        "p": 0.7,
+        "cut": 1.102,
+        "dir": ">=",
+        "onShare": 0.3,
+        "t": 2.03,
+        "diff": 0.196
+       },
+       {
+        "p": 0.7,
+        "cut": 1.102,
+        "dir": "<",
+        "onShare": 0.7,
+        "t": -2.03,
+        "diff": -0.196
+       },
+       {
+        "p": 0.8,
+        "cut": 1.334,
+        "dir": ">=",
+        "onShare": 0.2,
+        "t": 0.72,
+        "diff": 0.076
+       },
+       {
+        "p": 0.8,
+        "cut": 1.334,
+        "dir": "<",
+        "onShare": 0.8,
+        "t": -0.72,
+        "diff": -0.076
+       }
+      ]
+     },
+     "firstHalf": {
+      "on": {
+       "n": 715,
+       "R": 45.7,
+       "exp": 0.064,
+       "t": 1.29,
+       "maxDD": 20.8,
+       "win": 0.46
+      },
+      "off": {
+       "n": 179,
+       "R": -42,
+       "exp": -0.235,
+       "t": -2.57,
+       "maxDD": 42.1,
+       "win": 0.37
+      },
+      "welchT": 2.87
+     },
+     "secondHalf": {
+      "on": {
+       "n": 802,
+       "R": 95.5,
+       "exp": 0.119,
+       "t": 2.27,
+       "maxDD": 30.6,
+       "win": 0.42
+      },
+      "off": {
+       "n": 150,
+       "R": -30,
+       "exp": -0.2,
+       "t": -1.91,
+       "maxDD": 40.5,
+       "win": 0.33
+      },
+      "welchT": 2.73,
+      "onShare": 0.84,
+      "x2": {
+       "on": {
+        "n": 802,
+        "R": 57.6,
+        "exp": 0.072,
+        "t": 1.37,
+        "maxDD": 44.3,
+        "win": 0.42
+       },
+       "off": {
+        "n": 150,
+        "R": -37.4,
+        "exp": -0.25,
+        "t": -2.37,
+        "maxDD": 46.9,
+        "win": 0.33
+       },
+       "welchT": 2.73
+      },
+      "switched": {
+       "n": 802,
+       "R": 95.5,
+       "exp": 0.119,
+       "t": 2.27,
+       "maxDD": 30.6,
+       "win": 0.42,
+       "years": {
+        "years": 12,
+        "switched": {
+         "pos": 7,
+         "flat": 0,
+         "neg": 5
+        },
+        "alwaysOn": {
+         "pos": 7,
+         "flat": 0,
+         "neg": 5
+        },
+        "byYear": {
+         "2015": {
+          "switched": -7,
+          "alwaysOn": -19.7
+         },
+         "2016": {
+          "switched": -8.1,
+          "alwaysOn": -11.6
+         },
+         "2017": {
+          "switched": 2.8,
+          "alwaysOn": 2.8
+         },
+         "2018": {
+          "switched": 22.9,
+          "alwaysOn": 13.9
+         },
+         "2019": {
+          "switched": -10.9,
+          "alwaysOn": -11.6
+         },
+         "2020": {
+          "switched": -1.4,
+          "alwaysOn": -6.8
+         },
+         "2021": {
+          "switched": -3.3,
+          "alwaysOn": -4.3
+         },
+         "2022": {
+          "switched": 11.6,
+          "alwaysOn": 4.7
+         },
+         "2023": {
+          "switched": 27.6,
+          "alwaysOn": 29.6
+         },
+         "2024": {
+          "switched": 24.1,
+          "alwaysOn": 24.1
+         },
+         "2025": {
+          "switched": 12.2,
+          "alwaysOn": 16.3
+         },
+         "2026": {
+          "switched": 25.2,
+          "alwaysOn": 28.2
+         }
+        }
+       }
+      },
+      "alwaysOn": {
+       "n": 952,
+       "R": 65.5,
+       "exp": 0.069,
+       "t": 1.46,
+       "maxDD": 49.1,
+       "win": 0.41,
+       "years": {
+        "pos": 7,
+        "flat": 0,
+        "neg": 5
+       }
+      }
+     },
+     "fullHistoryReference": {
+      "note": "in-sample contaminated (first half chose the cut)",
+      "on": {
+       "n": 1517,
+       "R": 141.2,
+       "exp": 0.093,
+       "t": 2.56,
+       "maxDD": 34.4,
+       "win": 0.44
+      },
+      "off": {
+       "n": 329,
+       "R": -72,
+       "exp": -0.219,
+       "t": -3.18,
+       "maxDD": 82.6,
+       "win": 0.35
+      },
+      "welchT": 4.01,
+      "switchedYears": {
+       "pos": 14,
+       "flat": 0,
+       "neg": 9
+      },
+      "alwaysOnYears": {
+       "pos": 10,
+       "flat": 0,
+       "neg": 13
+      }
+     },
+     "robustness": {
+      "months": 138,
+      "monthsAllOff": 4,
+      "monthsMixed": 39,
+      "offSpells": 44,
+      "monthBlockP": 0.002
+     },
+     "byEraDescriptive": {
+      "2004-2013": {
+       "on": {
+        "n": 605,
+        "R": 47.7,
+        "exp": 0.079,
+        "t": 1.47,
+        "maxDD": 19,
+        "win": 0.47
+       },
+       "off": {
+        "n": 178,
+        "R": -41,
+        "exp": -0.23,
+        "t": -2.51,
+        "maxDD": 41.3,
+        "win": 0.37
+       },
+       "welchT": 2.9
+      },
+      "2014-2022": {
+       "on": {
+        "n": 644,
+        "R": 4.5,
+        "exp": 0.007,
+        "t": 0.13,
+        "maxDD": 34.4,
+        "win": 0.41
+       },
+       "off": {
+        "n": 110,
+        "R": -40.3,
+        "exp": -0.366,
+        "t": -3.56,
+        "maxDD": 41.6,
+        "win": 0.29
+       },
+       "welchT": 3.2
+      },
+      "2023-2026": {
+       "on": {
+        "n": 268,
+        "R": 89,
+        "exp": 0.332,
+        "t": 3.36,
+        "maxDD": 9.7,
+        "win": 0.47
+       },
+       "off": {
+        "n": 41,
+        "R": 9.2,
+        "exp": 0.225,
+        "t": 0.88,
+        "maxDD": 4.1,
+        "win": 0.44
+       },
+       "welchT": 0.39
+      }
+     },
+     "tests": {
+      "S1": true,
+      "S2": true,
+      "S3": true,
+      "pass": true,
+      "survivesMultipleTesting": false
+     }
+    },
+    "META": {
+     "rule": {
+      "cut": 0,
+      "dir": ">=",
+      "fitted": false,
+      "note": "fixed a priori: ON unless the trailing 12-month sum is negative"
+     },
+     "firstHalf": {
+      "on": {
+       "n": 375,
+       "R": -36.1,
+       "exp": -0.096,
+       "t": -1.49,
+       "maxDD": 48,
+       "win": 0.42
+      },
+      "off": {
+       "n": 519,
+       "R": 39.7,
+       "exp": 0.077,
+       "t": 1.29,
+       "maxDD": 22.4,
+       "win": 0.46
+      },
+      "welchT": -1.97
+     },
+     "secondHalf": {
+      "on": {
+       "n": 532,
+       "R": 104.1,
+       "exp": 0.196,
+       "t": 2.96,
+       "maxDD": 24.5,
+       "win": 0.44
+      },
+      "off": {
+       "n": 420,
+       "R": -38.6,
+       "exp": -0.092,
+       "t": -1.39,
+       "maxDD": 51,
+       "win": 0.37
+      },
+      "welchT": 3.08,
+      "onShare": 0.56,
+      "x2": {
+       "on": {
+        "n": 532,
+        "R": 85.3,
+        "exp": 0.16,
+        "t": 2.42,
+        "maxDD": 27.6,
+        "win": 0.44
+       },
+       "off": {
+        "n": 420,
+        "R": -65.1,
+        "exp": -0.155,
+        "t": -2.34,
+        "maxDD": 75.4,
+        "win": 0.37
+       },
+       "welchT": 3.36
+      },
+      "switched": {
+       "n": 532,
+       "R": 104.1,
+       "exp": 0.196,
+       "t": 2.96,
+       "maxDD": 24.5,
+       "win": 0.44,
+       "years": {
+        "years": 12,
+        "switched": {
+         "pos": 6,
+         "flat": 3,
+         "neg": 3
+        },
+        "alwaysOn": {
+         "pos": 7,
+         "flat": 0,
+         "neg": 5
+        },
+        "byYear": {
+         "2015": {
+          "switched": 0,
+          "alwaysOn": -19.7
+         },
+         "2016": {
+          "switched": 0,
+          "alwaysOn": -11.6
+         },
+         "2017": {
+          "switched": -0.2,
+          "alwaysOn": 2.8
+         },
+         "2018": {
+          "switched": 13.9,
+          "alwaysOn": 13.9
+         },
+         "2019": {
+          "switched": -9.3,
+          "alwaysOn": -11.6
+         },
+         "2020": {
+          "switched": -2.4,
+          "alwaysOn": -6.8
+         },
+         "2021": {
+          "switched": 0,
+          "alwaysOn": -4.3
+         },
+         "2022": {
+          "switched": 3.9,
+          "alwaysOn": 4.7
+         },
+         "2023": {
+          "switched": 29.6,
+          "alwaysOn": 29.6
+         },
+         "2024": {
+          "switched": 24.1,
+          "alwaysOn": 24.1
+         },
+         "2025": {
+          "switched": 16.3,
+          "alwaysOn": 16.3
+         },
+         "2026": {
+          "switched": 28.2,
+          "alwaysOn": 28.2
+         }
+        }
+       }
+      },
+      "alwaysOn": {
+       "n": 952,
+       "R": 65.5,
+       "exp": 0.069,
+       "t": 1.46,
+       "maxDD": 49.1,
+       "win": 0.41,
+       "years": {
+        "pos": 7,
+        "flat": 0,
+        "neg": 5
+       }
+      }
+     },
+     "fullHistoryReference": {
+      "note": "META is not fitted: the full history is out of sample for it",
+      "on": {
+       "n": 907,
+       "R": 68,
+       "exp": 0.075,
+       "t": 1.58,
+       "maxDD": 50.5,
+       "win": 0.43
+      },
+      "off": {
+       "n": 939,
+       "R": 1.1,
+       "exp": 0.001,
+       "t": 0.03,
+       "maxDD": 55.5,
+       "win": 0.42
+      },
+      "welchT": 1.14,
+      "switchedYears": {
+       "pos": 8,
+       "flat": 2,
+       "neg": 13
+      },
+      "alwaysOnYears": {
+       "pos": 10,
+       "flat": 0,
+       "neg": 13
+      }
+     },
+     "robustness": {
+      "months": 138,
+      "monthsAllOff": 58,
+      "monthsMixed": 5,
+      "offSpells": 4,
+      "monthBlockP": 0
+     },
+     "byEraDescriptive": {
+      "2004-2013": {
+       "on": {
+        "n": 313,
+        "R": -26.2,
+        "exp": -0.084,
+        "t": -1.19,
+        "maxDD": 48,
+        "win": 0.42
+       },
+       "off": {
+        "n": 470,
+        "R": 32.9,
+        "exp": 0.07,
+        "t": 1.12,
+        "maxDD": 22.4,
+        "win": 0.46
+       },
+       "welchT": -1.64
+      },
+      "2014-2022": {
+       "on": {
+        "n": 285,
+        "R": -4,
+        "exp": -0.014,
+        "t": -0.18,
+        "maxDD": 24.5,
+        "win": 0.4
+       },
+       "off": {
+        "n": 469,
+        "R": -31.8,
+        "exp": -0.068,
+        "t": -1.08,
+        "maxDD": 55.5,
+        "win": 0.38
+       },
+       "welchT": 0.52
+      },
+      "2023-2026": {
+       "on": {
+        "n": 309,
+        "R": 98.2,
+        "exp": 0.318,
+        "t": 3.45,
+        "maxDD": 9.7,
+        "win": 0.47
+       },
+       "off": {
+        "n": 0,
+        "R": 0,
+        "exp": null,
+        "t": null,
+        "maxDD": 0,
+        "win": null
+       },
+       "welchT": null
+      }
+     },
+     "tests": {
+      "S1": true,
+      "S2": true,
+      "S3": true,
+      "pass": true,
+      "survivesMultipleTesting": true
+     }
+    }
+   },
+   "yearlyR": [
+    -9.3,
+    21.2,
+    -5.4,
+    -1.8,
+    -4.4,
+    -6.7,
+    6.3,
+    -3.6,
+    -2.8,
+    14.9,
+    -8.2,
+    -14.7,
+    -11.6,
+    2.8,
+    13.9,
+    -11.6,
+    -6.8,
+    -4.3,
+    4.7,
+    29.6,
+    24.1,
+    16.3,
+    28.2
+   ],
+   "yearlyLag1Corr": 0.35,
+   "now": {
+    "nq": {
+     "asOf": "2026-11-03",
+     "VOL": {
+      "value": 70.27,
+      "on": true
+     },
+     "TREND": {
+      "value": 0.25,
+      "on": false
+     },
+     "META": {
+      "value": 30.32,
+      "on": true
+     }
+    }
+   }
+  },
+  "gtrend": {
+   "name": "Gold trend (N20 + add)",
+   "history": [
+    "2006-07-01",
+    "2026-11-07"
+   ],
+   "split": "2016-09-01",
+   "trendUsed": "signed TS (long-only system)",
+   "trades": {
+    "declared": 134,
+    "study": 127,
+    "warmupExcluded": 7,
+    "firstHalf": 60,
+    "secondHalf": 67,
+    "studyFrom": "2007-04-05"
+   },
+   "alwaysOn": {
+    "firstHalf": {
+     "n": 60,
+     "R": 35.9,
+     "exp": 0.599,
+     "t": 1.8,
+     "maxDD": 5.4,
+     "win": 0.35
+    },
+    "secondHalf": {
+     "n": 67,
+     "R": 81.4,
+     "exp": 1.216,
+     "t": 2.53,
+     "maxDD": 3.8,
+     "win": 0.4
+    },
+    "secondHalfX2": {
+     "n": 67,
+     "R": 80.6,
+     "exp": 1.204,
+     "t": 2.51,
+     "maxDD": 3.9,
+     "win": 0.4
+    },
+    "full": {
+     "n": 127,
+     "R": 117.4,
+     "exp": 0.924,
+     "t": 3.1,
+     "maxDD": 5.4,
+     "win": 0.38
+    }
+   },
+   "indicators": {
+    "VOL": {
+     "rule": {
+      "cut": 25.122,
+      "dir": "<",
+      "pctOfFirstHalf": 0.2,
+      "fitted": true,
+      "firstHalfT": 1.23,
+      "candidates": [
+       {
+        "p": 0.2,
+        "cut": 25.122,
+        "dir": ">=",
+        "onShare": 0.8,
+        "t": -1.23,
+        "diff": -1.326
+       },
+       {
+        "p": 0.2,
+        "cut": 25.122,
+        "dir": "<",
+        "onShare": 0.2,
+        "t": 1.23,
+        "diff": 1.326
+       },
+       {
+        "p": 0.3,
+        "cut": 30.348,
+        "dir": ">=",
+        "onShare": 0.7,
+        "t": -0.55,
+        "diff": -0.45
+       },
+       {
+        "p": 0.3,
+        "cut": 30.348,
+        "dir": "<",
+        "onShare": 0.3,
+        "t": 0.55,
+        "diff": 0.45
+       },
+       {
+        "p": 0.4,
+        "cut": 41.896,
+        "dir": ">=",
+        "onShare": 0.6,
+        "t": -0.56,
+        "diff": -0.402
+       },
+       {
+        "p": 0.4,
+        "cut": 41.896,
+        "dir": "<",
+        "onShare": 0.4,
+        "t": 0.56,
+        "diff": 0.402
+       },
+       {
+        "p": 0.5,
+        "cut": 48.784,
+        "dir": ">=",
+        "onShare": 0.5,
+        "t": -0.82,
+        "diff": -0.547
+       },
+       {
+        "p": 0.5,
+        "cut": 48.784,
+        "dir": "<",
+        "onShare": 0.5,
+        "t": 0.82,
+        "diff": 0.547
+       },
+       {
+        "p": 0.6,
+        "cut": 59.441,
+        "dir": ">=",
+        "onShare": 0.42,
+        "t": -0.8,
+        "diff": -0.495
+       },
+       {
+        "p": 0.6,
+        "cut": 59.441,
+        "dir": "<",
+        "onShare": 0.58,
+        "t": 0.8,
+        "diff": 0.495
+       },
+       {
+        "p": 0.7,
+        "cut": 67.22,
+        "dir": ">=",
+        "onShare": 0.32,
+        "t": -0.96,
+        "diff": -0.537
+       },
+       {
+        "p": 0.7,
+        "cut": 67.22,
+        "dir": "<",
+        "onShare": 0.68,
+        "t": 0.96,
+        "diff": 0.537
+       },
+       {
+        "p": 0.8,
+        "cut": 79.903,
+        "dir": ">=",
+        "onShare": 0.22,
+        "t": -0.58,
+        "diff": -0.339
+       },
+       {
+        "p": 0.8,
+        "cut": 79.903,
+        "dir": "<",
+        "onShare": 0.78,
+        "t": 0.58,
+        "diff": 0.339
+       }
+      ]
+     },
+     "firstHalf": {
+      "on": {
+       "n": 13,
+       "R": 19,
+       "exp": 1.461,
+       "t": 1.51,
+       "maxDD": 1.8,
+       "win": 0.46
+      },
+      "off": {
+       "n": 47,
+       "R": 16.9,
+       "exp": 0.36,
+       "t": 1.1,
+       "maxDD": 5.4,
+       "win": 0.32
+      },
+      "welchT": 1.08
+     },
+     "secondHalf": {
+      "on": {
+       "n": 40,
+       "R": 32.7,
+       "exp": 0.818,
+       "t": 1.83,
+       "maxDD": 4.2,
+       "win": 0.35
+      },
+      "off": {
+       "n": 27,
+       "R": 48.7,
+       "exp": 1.804,
+       "t": 1.82,
+       "maxDD": 2.1,
+       "win": 0.48
+      },
+      "welchT": -0.91,
+      "onShare": 0.6,
+      "x2": {
+       "on": {
+        "n": 40,
+        "R": 32.2,
+        "exp": 0.804,
+        "t": 1.81,
+        "maxDD": 4.2,
+        "win": 0.35
+       },
+       "off": {
+        "n": 27,
+        "R": 48.5,
+        "exp": 1.796,
+        "t": 1.81,
+        "maxDD": 2.1,
+        "win": 0.48
+       },
+       "welchT": -0.91
+      },
+      "switched": {
+       "n": 40,
+       "R": 32.7,
+       "exp": 0.818,
+       "t": 1.83,
+       "maxDD": 4.2,
+       "win": 0.35,
+       "years": {
+        "years": 11,
+        "switched": {
+         "pos": 6,
+         "flat": 3,
+         "neg": 2
+        },
+        "alwaysOn": {
+         "pos": 10,
+         "flat": 0,
+         "neg": 1
+        },
+        "byYear": {
+         "2016": {
+          "switched": 0,
+          "alwaysOn": -0.4
+         },
+         "2017": {
+          "switched": 2.9,
+          "alwaysOn": 3
+         },
+         "2018": {
+          "switched": 5.9,
+          "alwaysOn": 5.9
+         },
+         "2019": {
+          "switched": 13.6,
+          "alwaysOn": 13.6
+         },
+         "2020": {
+          "switched": -1.2,
+          "alwaysOn": 6.9
+         },
+         "2021": {
+          "switched": -1.3,
+          "alwaysOn": 1.1
+         },
+         "2022": {
+          "switched": 0.6,
+          "alwaysOn": 0.6
+         },
+         "2023": {
+          "switched": 3.5,
+          "alwaysOn": 4.2
+         },
+         "2024": {
+          "switched": 9,
+          "alwaysOn": 9
+         },
+         "2025": {
+          "switched": 0,
+          "alwaysOn": 30.4
+         },
+         "2026": {
+          "switched": 0,
+          "alwaysOn": 7.3
+         }
+        }
+       }
+      },
+      "alwaysOn": {
+       "n": 67,
+       "R": 81.4,
+       "exp": 1.216,
+       "t": 2.53,
+       "maxDD": 3.8,
+       "win": 0.4,
+       "years": {
+        "pos": 10,
+        "flat": 0,
+        "neg": 1
+       }
+      }
+     },
+     "fullHistoryReference": {
+      "note": "in-sample contaminated (first half chose the cut)",
+      "on": {
+       "n": 53,
+       "R": 51.7,
+       "exp": 0.976,
+       "t": 2.39,
+       "maxDD": 4.2,
+       "win": 0.38
+      },
+      "off": {
+       "n": 74,
+       "R": 65.6,
+       "exp": 0.887,
+       "t": 2.1,
+       "maxDD": 5.4,
+       "win": 0.38
+      },
+      "welchT": 0.15,
+      "switchedYears": {
+       "pos": 9,
+       "flat": 9,
+       "neg": 3
+      },
+      "alwaysOnYears": {
+       "pos": 17,
+       "flat": 1,
+       "neg": 3
+      }
+     },
+     "robustness": {
+      "months": 62,
+      "monthsAllOff": 25,
+      "monthsMixed": 0,
+      "offSpells": 5,
+      "monthBlockP": 0.831
+     },
+     "byEraDescriptive": {
+      "2006-2017": {
+       "on": {
+        "n": 19,
+        "R": 21.9,
+        "exp": 1.151,
+        "t": 1.64,
+        "maxDD": 1.8,
+        "win": 0.42
+       },
+       "off": {
+        "n": 49,
+        "R": 16.7,
+        "exp": 0.34,
+        "t": 1.08,
+        "maxDD": 5.4,
+        "win": 0.33
+       },
+       "welchT": 1.05
+      },
+      "2018-2026": {
+       "on": {
+        "n": 34,
+        "R": 29.9,
+        "exp": 0.878,
+        "t": 1.72,
+        "maxDD": 4.2,
+        "win": 0.35
+       },
+       "off": {
+        "n": 25,
+        "R": 49,
+        "exp": 1.959,
+        "t": 1.84,
+        "maxDD": 2.1,
+        "win": 0.48
+       },
+       "welchT": -0.91
+      }
+     },
+     "tests": {
+      "S1": false,
+      "S2": false,
+      "S3": false,
+      "pass": false,
+      "survivesMultipleTesting": false
+     }
+    },
+    "TREND": {
+     "rule": {
+      "cut": 0.173,
+      "dir": ">=",
+      "pctOfFirstHalf": 0.3,
+      "fitted": true,
+      "firstHalfT": 1.01,
+      "candidates": [
+       {
+        "p": 0.2,
+        "cut": -0.328,
+        "dir": ">=",
+        "onShare": 0.8,
+        "t": 0.27,
+        "diff": 0.201
+       },
+       {
+        "p": 0.2,
+        "cut": -0.328,
+        "dir": "<",
+        "onShare": 0.2,
+        "t": -0.27,
+        "diff": -0.201
+       },
+       {
+        "p": 0.3,
+        "cut": 0.173,
+        "dir": ">=",
+        "onShare": 0.7,
+        "t": 1.01,
+        "diff": 0.625
+       },
+       {
+        "p": 0.3,
+        "cut": 0.173,
+        "dir": "<",
+        "onShare": 0.3,
+        "t": -1.01,
+        "diff": -0.625
+       },
+       {
+        "p": 0.4,
+        "cut": 0.543,
+        "dir": ">=",
+        "onShare": 0.6,
+        "t": -0.02,
+        "diff": -0.012
+       },
+       {
+        "p": 0.4,
+        "cut": 0.543,
+        "dir": "<",
+        "onShare": 0.4,
+        "t": 0.02,
+        "diff": 0.012
+       },
+       {
+        "p": 0.5,
+        "cut": 0.689,
+        "dir": ">=",
+        "onShare": 0.5,
+        "t": 0.81,
+        "diff": 0.541
+       },
+       {
+        "p": 0.5,
+        "cut": 0.689,
+        "dir": "<",
+        "onShare": 0.5,
+        "t": -0.81,
+        "diff": -0.541
+       },
+       {
+        "p": 0.6,
+        "cut": 0.894,
+        "dir": ">=",
+        "onShare": 0.42,
+        "t": 0.24,
+        "diff": 0.166
+       },
+       {
+        "p": 0.6,
+        "cut": 0.894,
+        "dir": "<",
+        "onShare": 0.58,
+        "t": -0.24,
+        "diff": -0.166
+       },
+       {
+        "p": 0.7,
+        "cut": 1.092,
+        "dir": ">=",
+        "onShare": 0.32,
+        "t": 0.57,
+        "diff": 0.436
+       },
+       {
+        "p": 0.7,
+        "cut": 1.092,
+        "dir": "<",
+        "onShare": 0.68,
+        "t": -0.57,
+        "diff": -0.436
+       },
+       {
+        "p": 0.8,
+        "cut": 1.405,
+        "dir": ">=",
+        "onShare": 0.22,
+        "t": 0.69,
+        "diff": 0.711
+       },
+       {
+        "p": 0.8,
+        "cut": 1.405,
+        "dir": "<",
+        "onShare": 0.78,
+        "t": -0.69,
+        "diff": -0.711
+       }
+      ]
+     },
+     "firstHalf": {
+      "on": {
+       "n": 41,
+       "R": 31.3,
+       "exp": 0.764,
+       "t": 1.71,
+       "maxDD": 5.4,
+       "win": 0.39
+      },
+      "off": {
+       "n": 19,
+       "R": 4.6,
+       "exp": 0.242,
+       "t": 0.58,
+       "maxDD": 2.7,
+       "win": 0.26
+      },
+      "welchT": 0.85
+     },
+     "secondHalf": {
+      "on": {
+       "n": 55,
+       "R": 71,
+       "exp": 1.291,
+       "t": 2.28,
+       "maxDD": 3.3,
+       "win": 0.38
+      },
+      "off": {
+       "n": 12,
+       "R": 10.5,
+       "exp": 0.871,
+       "t": 1.24,
+       "maxDD": 2.4,
+       "win": 0.5
+      },
+      "welchT": 0.46,
+      "onShare": 0.82,
+      "x2": {
+       "on": {
+        "n": 55,
+        "R": 70.4,
+        "exp": 1.279,
+        "t": 2.26,
+        "maxDD": 3.4,
+        "win": 0.38
+       },
+       "off": {
+        "n": 12,
+        "R": 10.3,
+        "exp": 0.857,
+        "t": 1.22,
+        "maxDD": 2.5,
+        "win": 0.5
+       },
+       "welchT": 0.47
+      },
+      "switched": {
+       "n": 55,
+       "R": 71,
+       "exp": 1.291,
+       "t": 2.28,
+       "maxDD": 3.3,
+       "win": 0.38,
+       "years": {
+        "years": 11,
+        "switched": {
+         "pos": 7,
+         "flat": 0,
+         "neg": 4
+        },
+        "alwaysOn": {
+         "pos": 10,
+         "flat": 0,
+         "neg": 1
+        },
+        "byYear": {
+         "2016": {
+          "switched": -0.4,
+          "alwaysOn": -0.4
+         },
+         "2017": {
+          "switched": 2.9,
+          "alwaysOn": 3
+         },
+         "2018": {
+          "switched": -1,
+          "alwaysOn": 5.9
+         },
+         "2019": {
+          "switched": 13.6,
+          "alwaysOn": 13.6
+         },
+         "2020": {
+          "switched": 6.9,
+          "alwaysOn": 6.9
+         },
+         "2021": {
+          "switched": -0.8,
+          "alwaysOn": 1.1
+         },
+         "2022": {
+          "switched": -0.4,
+          "alwaysOn": 0.6
+         },
+         "2023": {
+          "switched": 5.1,
+          "alwaysOn": 4.2
+         },
+         "2024": {
+          "switched": 9,
+          "alwaysOn": 9
+         },
+         "2025": {
+          "switched": 30.4,
+          "alwaysOn": 30.4
+         },
+         "2026": {
+          "switched": 5.8,
+          "alwaysOn": 7.3
+         }
+        }
+       }
+      },
+      "alwaysOn": {
+       "n": 67,
+       "R": 81.4,
+       "exp": 1.216,
+       "t": 2.53,
+       "maxDD": 3.8,
+       "win": 0.4,
+       "years": {
+        "pos": 10,
+        "flat": 0,
+        "neg": 1
+       }
+      }
+     },
+     "fullHistoryReference": {
+      "note": "in-sample contaminated (first half chose the cut)",
+      "on": {
+       "n": 96,
+       "R": 102.3,
+       "exp": 1.066,
+       "t": 2.84,
+       "maxDD": 5.4,
+       "win": 0.39
+      },
+      "off": {
+       "n": 31,
+       "R": 15.1,
+       "exp": 0.486,
+       "t": 1.3,
+       "maxDD": 2.8,
+       "win": 0.35
+      },
+      "welchT": 1.1,
+      "switchedYears": {
+       "pos": 13,
+       "flat": 3,
+       "neg": 5
+      },
+      "alwaysOnYears": {
+       "pos": 17,
+       "flat": 1,
+       "neg": 3
+      }
+     },
+     "robustness": {
+      "months": 62,
+      "monthsAllOff": 12,
+      "monthsMixed": 0,
+      "offSpells": 6,
+      "monthBlockP": 0.304
+     },
+     "byEraDescriptive": {
+      "2006-2017": {
+       "on": {
+        "n": 47,
+        "R": 33.8,
+        "exp": 0.718,
+        "t": 1.79,
+        "maxDD": 5.4,
+        "win": 0.36
+       },
+       "off": {
+        "n": 21,
+        "R": 4.8,
+        "exp": 0.228,
+        "t": 0.6,
+        "maxDD": 2.7,
+        "win": 0.33
+       },
+       "welchT": 0.89
+      },
+      "2018-2026": {
+       "on": {
+        "n": 49,
+        "R": 68.6,
+        "exp": 1.399,
+        "t": 2.23,
+        "maxDD": 3.3,
+        "win": 0.41
+       },
+       "off": {
+        "n": 10,
+        "R": 10.3,
+        "exp": 1.026,
+        "t": 1.22,
+        "maxDD": 2.4,
+        "win": 0.4
+       },
+       "welchT": 0.36
+      }
+     },
+     "tests": {
+      "S1": false,
+      "S2": true,
+      "S3": true,
+      "pass": false,
+      "survivesMultipleTesting": false
+     }
+    },
+    "META": {
+     "rule": {
+      "cut": 0,
+      "dir": ">=",
+      "fitted": false,
+      "note": "fixed a priori: ON unless the trailing 12-month sum is negative"
+     },
+     "firstHalf": {
+      "on": {
+       "n": 38,
+       "R": 14.8,
+       "exp": 0.39,
+       "t": 1.01,
+       "maxDD": 7.4,
+       "win": 0.34
+      },
+      "off": {
+       "n": 22,
+       "R": 21.1,
+       "exp": 0.959,
+       "t": 1.55,
+       "maxDD": 3.1,
+       "win": 0.36
+      },
+      "welchT": -0.78
+     },
+     "secondHalf": {
+      "on": {
+       "n": 58,
+       "R": 74.4,
+       "exp": 1.283,
+       "t": 2.36,
+       "maxDD": 3.8,
+       "win": 0.41
+      },
+      "off": {
+       "n": 9,
+       "R": 7,
+       "exp": 0.779,
+       "t": 1.12,
+       "maxDD": 1.5,
+       "win": 0.33
+      },
+      "welchT": 0.57,
+      "onShare": 0.87,
+      "x2": {
+       "on": {
+        "n": 58,
+        "R": 73.8,
+        "exp": 1.272,
+        "t": 2.34,
+        "maxDD": 3.9,
+        "win": 0.41
+       },
+       "off": {
+        "n": 9,
+        "R": 6.9,
+        "exp": 0.761,
+        "t": 1.1,
+        "maxDD": 1.6,
+        "win": 0.33
+       },
+       "welchT": 0.58
+      },
+      "switched": {
+       "n": 58,
+       "R": 74.4,
+       "exp": 1.283,
+       "t": 2.36,
+       "maxDD": 3.8,
+       "win": 0.41,
+       "years": {
+        "years": 11,
+        "switched": {
+         "pos": 9,
+         "flat": 1,
+         "neg": 1
+        },
+        "alwaysOn": {
+         "pos": 10,
+         "flat": 0,
+         "neg": 1
+        },
+        "byYear": {
+         "2016": {
+          "switched": -0.4,
+          "alwaysOn": -0.4
+         },
+         "2017": {
+          "switched": 0.2,
+          "alwaysOn": 3
+         },
+         "2018": {
+          "switched": 5.9,
+          "alwaysOn": 5.9
+         },
+         "2019": {
+          "switched": 13.6,
+          "alwaysOn": 13.6
+         },
+         "2020": {
+          "switched": 6.9,
+          "alwaysOn": 6.9
+         },
+         "2021": {
+          "switched": 1.1,
+          "alwaysOn": 1.1
+         },
+         "2022": {
+          "switched": 0.6,
+          "alwaysOn": 0.6
+         },
+         "2023": {
+          "switched": 0,
+          "alwaysOn": 4.2
+         },
+         "2024": {
+          "switched": 9,
+          "alwaysOn": 9
+         },
+         "2025": {
+          "switched": 30.4,
+          "alwaysOn": 30.4
+         },
+         "2026": {
+          "switched": 7.3,
+          "alwaysOn": 7.3
+         }
+        }
+       }
+      },
+      "alwaysOn": {
+       "n": 67,
+       "R": 81.4,
+       "exp": 1.216,
+       "t": 2.53,
+       "maxDD": 3.8,
+       "win": 0.4,
+       "years": {
+        "pos": 10,
+        "flat": 0,
+        "neg": 1
+       }
+      }
+     },
+     "fullHistoryReference": {
+      "note": "META is not fitted: the full history is out of sample for it",
+      "on": {
+       "n": 96,
+       "R": 89.3,
+       "exp": 0.93,
+       "t": 2.55,
+       "maxDD": 7.4,
+       "win": 0.39
+      },
+      "off": {
+       "n": 31,
+       "R": 28.1,
+       "exp": 0.907,
+       "t": 1.9,
+       "maxDD": 3.1,
+       "win": 0.35
+      },
+      "welchT": 0.04,
+      "switchedYears": {
+       "pos": 13,
+       "flat": 2,
+       "neg": 6
+      },
+      "alwaysOnYears": {
+       "pos": 17,
+       "flat": 1,
+       "neg": 3
+      }
+     },
+     "robustness": {
+      "months": 62,
+      "monthsAllOff": 8,
+      "monthsMixed": 1,
+      "offSpells": 3,
+      "monthBlockP": 0.299
+     },
+     "byEraDescriptive": {
+      "2006-2017": {
+       "on": {
+        "n": 41,
+        "R": 14.6,
+        "exp": 0.356,
+        "t": 0.99,
+        "maxDD": 7.4,
+        "win": 0.37
+       },
+       "off": {
+        "n": 27,
+        "R": 24,
+        "exp": 0.887,
+        "t": 1.68,
+        "maxDD": 3.1,
+        "win": 0.33
+       },
+       "welchT": -0.83
+      },
+      "2018-2026": {
+       "on": {
+        "n": 55,
+        "R": 74.7,
+        "exp": 1.358,
+        "t": 2.37,
+        "maxDD": 3.8,
+        "win": 0.4
+       },
+       "off": {
+        "n": 4,
+        "R": 4.2,
+        "exp": 1.039,
+        "t": 0.91,
+        "maxDD": 1.2,
+        "win": 0.5
+       },
+       "welchT": 0.25
+      }
+     },
+     "tests": {
+      "S1": false,
+      "S2": true,
+      "S3": true,
+      "pass": false,
+      "survivesMultipleTesting": false
+     }
+    }
+   },
+   "yearlyR": [
+    -2.3,
+    10.5,
+    -2.1,
+    3.5,
+    2.9,
+    13.9,
+    6.4,
+    -1.9,
+    1.5,
+    -1.7,
+    2.8,
+    3,
+    5.9,
+    13.6,
+    6.9,
+    1.1,
+    0.6,
+    4.2,
+    9,
+    30.4,
+    7.3
+   ],
+   "yearlyLag1Corr": 0.16,
+   "now": {
+    "gc": {
+     "asOf": "2026-11-06",
+     "VOL": {
+      "value": 90.8,
+      "on": false
+     },
+     "TREND": {
+      "value": -0.76,
+      "on": false
+     },
+     "META": {
+      "value": 8.23,
+      "on": true
+     }
+    }
+   }
+  },
+  "gtrend5": {
+   "name": "Gold trend fast (N5 + add)",
+   "history": [
+    "2006-07-01",
+    "2026-11-07"
+   ],
+   "split": "2016-09-01",
+   "trendUsed": "signed TS (long-only system)",
+   "trades": {
+    "declared": 227,
+    "study": 216,
+    "warmupExcluded": 11,
+    "firstHalf": 107,
+    "secondHalf": 109,
+    "studyFrom": "2007-03-21"
+   },
+   "alwaysOn": {
+    "firstHalf": {
+     "n": 107,
+     "R": 38.5,
+     "exp": 0.36,
+     "t": 1.62,
+     "maxDD": 10.7,
+     "win": 0.33
+    },
+    "secondHalf": {
+     "n": 109,
+     "R": 109.4,
+     "exp": 1.003,
+     "t": 2.91,
+     "maxDD": 7.5,
+     "win": 0.37
+    },
+    "secondHalfX2": {
+     "n": 109,
+     "R": 108.1,
+     "exp": 0.992,
+     "t": 2.88,
+     "maxDD": 7.6,
+     "win": 0.37
+    },
+    "full": {
+     "n": 216,
+     "R": 147.9,
+     "exp": 0.685,
+     "t": 3.32,
+     "maxDD": 10.7,
+     "win": 0.35
+    }
+   },
+   "indicators": {
+    "VOL": {
+     "rule": {
+      "cut": 52.269,
+      "dir": "<",
+      "pctOfFirstHalf": 0.5,
+      "fitted": true,
+      "firstHalfT": 0.81,
+      "candidates": [
+       {
+        "p": 0.2,
+        "cut": 21.191,
+        "dir": ">=",
+        "onShare": 0.8,
+        "t": -0.74,
+        "diff": -0.567
+       },
+       {
+        "p": 0.2,
+        "cut": 21.191,
+        "dir": "<",
+        "onShare": 0.2,
+        "t": 0.74,
+        "diff": 0.567
+       },
+       {
+        "p": 0.3,
+        "cut": 32.415,
+        "dir": ">=",
+        "onShare": 0.7,
+        "t": -0.49,
+        "diff": -0.269
+       },
+       {
+        "p": 0.3,
+        "cut": 32.415,
+        "dir": "<",
+        "onShare": 0.3,
+        "t": 0.49,
+        "diff": 0.269
+       },
+       {
+        "p": 0.4,
+        "cut": 42.707,
+        "dir": ">=",
+        "onShare": 0.61,
+        "t": -0.34,
+        "diff": -0.164
+       },
+       {
+        "p": 0.4,
+        "cut": 42.707,
+        "dir": "<",
+        "onShare": 0.39,
+        "t": 0.34,
+        "diff": 0.164
+       },
+       {
+        "p": 0.5,
+        "cut": 52.269,
+        "dir": ">=",
+        "onShare": 0.5,
+        "t": -0.81,
+        "diff": -0.362
+       },
+       {
+        "p": 0.5,
+        "cut": 52.269,
+        "dir": "<",
+        "onShare": 0.5,
+        "t": 0.81,
+        "diff": 0.362
+       },
+       {
+        "p": 0.6,
+        "cut": 61.467,
+        "dir": ">=",
+        "onShare": 0.4,
+        "t": -0.29,
+        "diff": -0.122
+       },
+       {
+        "p": 0.6,
+        "cut": 61.467,
+        "dir": "<",
+        "onShare": 0.6,
+        "t": 0.29,
+        "diff": 0.122
+       },
+       {
+        "p": 0.7,
+        "cut": 68.314,
+        "dir": ">=",
+        "onShare": 0.31,
+        "t": -0.38,
+        "diff": -0.154
+       },
+       {
+        "p": 0.7,
+        "cut": 68.314,
+        "dir": "<",
+        "onShare": 0.69,
+        "t": 0.38,
+        "diff": 0.154
+       },
+       {
+        "p": 0.8,
+        "cut": 78.768,
+        "dir": ">=",
+        "onShare": 0.21,
+        "t": 0.03,
+        "diff": 0.012
+       },
+       {
+        "p": 0.8,
+        "cut": 78.768,
+        "dir": "<",
+        "onShare": 0.79,
+        "t": -0.03,
+        "diff": -0.012
+       }
+      ]
+     },
+     "firstHalf": {
+      "on": {
+       "n": 53,
+       "R": 28.8,
+       "exp": 0.543,
+       "t": 1.39,
+       "maxDD": 11.3,
+       "win": 0.32
+      },
+      "off": {
+       "n": 54,
+       "R": 9.8,
+       "exp": 0.181,
+       "t": 0.83,
+       "maxDD": 3.3,
+       "win": 0.33
+      },
+      "welchT": 0.81
+     },
+     "secondHalf": {
+      "on": {
+       "n": 87,
+       "R": 93.9,
+       "exp": 1.079,
+       "t": 2.68,
+       "maxDD": 7.5,
+       "win": 0.38
+      },
+      "off": {
+       "n": 22,
+       "R": 15.4,
+       "exp": 0.702,
+       "t": 1.13,
+       "maxDD": 5.4,
+       "win": 0.32
+      },
+      "welchT": 0.51,
+      "onShare": 0.8,
+      "x2": {
+       "on": {
+        "n": 87,
+        "R": 92.8,
+        "exp": 1.067,
+        "t": 2.65,
+        "maxDD": 7.6,
+        "win": 0.38
+       },
+       "off": {
+        "n": 22,
+        "R": 15.3,
+        "exp": 0.696,
+        "t": 1.12,
+        "maxDD": 5.5,
+        "win": 0.32
+       },
+       "welchT": 0.5
+      },
+      "switched": {
+       "n": 87,
+       "R": 93.9,
+       "exp": 1.079,
+       "t": 2.68,
+       "maxDD": 7.5,
+       "win": 0.38,
+       "years": {
+        "years": 11,
+        "switched": {
+         "pos": 8,
+         "flat": 1,
+         "neg": 2
+        },
+        "alwaysOn": {
+         "pos": 9,
+         "flat": 0,
+         "neg": 2
+        },
+        "byYear": {
+         "2016": {
+          "switched": -0.3,
+          "alwaysOn": -0.3
+         },
+         "2017": {
+          "switched": 11.8,
+          "alwaysOn": 11.8
+         },
+         "2018": {
+          "switched": -0.3,
+          "alwaysOn": -0.3
+         },
+         "2019": {
+          "switched": 16.5,
+          "alwaysOn": 16.5
+         },
+         "2020": {
+          "switched": 4.1,
+          "alwaysOn": 9.5
+         },
+         "2021": {
+          "switched": 4.2,
+          "alwaysOn": 1
+         },
+         "2022": {
+          "switched": 7.2,
+          "alwaysOn": 7.2
+         },
+         "2023": {
+          "switched": 5.4,
+          "alwaysOn": 5.4
+         },
+         "2024": {
+          "switched": 13.4,
+          "alwaysOn": 13.4
+         },
+         "2025": {
+          "switched": 32,
+          "alwaysOn": 34.2
+         },
+         "2026": {
+          "switched": 0,
+          "alwaysOn": 10.9
+         }
+        }
+       }
+      },
+      "alwaysOn": {
+       "n": 109,
+       "R": 109.4,
+       "exp": 1.003,
+       "t": 2.91,
+       "maxDD": 7.5,
+       "win": 0.37,
+       "years": {
+        "pos": 9,
+        "flat": 0,
+        "neg": 2
+       }
+      }
+     },
+     "fullHistoryReference": {
+      "note": "in-sample contaminated (first half chose the cut)",
+      "on": {
+       "n": 140,
+       "R": 122.7,
+       "exp": 0.876,
+       "t": 3.01,
+       "maxDD": 11.3,
+       "win": 0.36
+      },
+      "off": {
+       "n": 76,
+       "R": 25.2,
+       "exp": 0.332,
+       "t": 1.4,
+       "maxDD": 5.4,
+       "win": 0.33
+      },
+      "welchT": 1.45,
+      "switchedYears": {
+       "pos": 12,
+       "flat": 4,
+       "neg": 5
+      },
+      "alwaysOnYears": {
+       "pos": 16,
+       "flat": 1,
+       "neg": 4
+      }
+     },
+     "robustness": {
+      "months": 85,
+      "monthsAllOff": 14,
+      "monthsMixed": 2,
+      "offSpells": 5,
+      "monthBlockP": 0.245
+     },
+     "byEraDescriptive": {
+      "2006-2017": {
+       "on": {
+        "n": 64,
+        "R": 40.3,
+        "exp": 0.63,
+        "t": 1.85,
+        "maxDD": 11.3,
+        "win": 0.38
+       },
+       "off": {
+        "n": 54,
+        "R": 9.8,
+        "exp": 0.181,
+        "t": 0.83,
+        "maxDD": 3.3,
+        "win": 0.33
+       },
+       "welchT": 1.11
+      },
+      "2018-2026": {
+       "on": {
+        "n": 76,
+        "R": 82.4,
+        "exp": 1.084,
+        "t": 2.39,
+        "maxDD": 7.5,
+        "win": 0.34
+       },
+       "off": {
+        "n": 22,
+        "R": 15.4,
+        "exp": 0.702,
+        "t": 1.13,
+        "maxDD": 5.4,
+        "win": 0.32
+       },
+       "welchT": 0.5
+      }
+     },
+     "tests": {
+      "S1": false,
+      "S2": true,
+      "S3": true,
+      "pass": false,
+      "survivesMultipleTesting": false
+     }
+    },
+    "TREND": {
+     "rule": {
+      "cut": 0.959,
+      "dir": ">=",
+      "pctOfFirstHalf": 0.7,
+      "fitted": true,
+      "firstHalfT": 1.4,
+      "candidates": [
+       {
+        "p": 0.2,
+        "cut": -0.38,
+        "dir": ">=",
+        "onShare": 0.8,
+        "t": 0.35,
+        "diff": 0.16
+       },
+       {
+        "p": 0.2,
+        "cut": -0.38,
+        "dir": "<",
+        "onShare": 0.2,
+        "t": -0.35,
+        "diff": -0.16
+       },
+       {
+        "p": 0.3,
+        "cut": -0.097,
+        "dir": ">=",
+        "onShare": 0.7,
+        "t": 0.74,
+        "diff": 0.298
+       },
+       {
+        "p": 0.3,
+        "cut": -0.097,
+        "dir": "<",
+        "onShare": 0.3,
+        "t": -0.74,
+        "diff": -0.298
+       },
+       {
+        "p": 0.4,
+        "cut": 0.206,
+        "dir": ">=",
+        "onShare": 0.61,
+        "t": 0.58,
+        "diff": 0.244
+       },
+       {
+        "p": 0.4,
+        "cut": 0.206,
+        "dir": "<",
+        "onShare": 0.39,
+        "t": -0.58,
+        "diff": -0.244
+       },
+       {
+        "p": 0.5,
+        "cut": 0.584,
+        "dir": ">=",
+        "onShare": 0.5,
+        "t": 0.65,
+        "diff": 0.29
+       },
+       {
+        "p": 0.5,
+        "cut": 0.584,
+        "dir": "<",
+        "onShare": 0.5,
+        "t": -0.65,
+        "diff": -0.29
+       },
+       {
+        "p": 0.6,
+        "cut": 0.743,
+        "dir": ">=",
+        "onShare": 0.4,
+        "t": 1.28,
+        "diff": 0.634
+       },
+       {
+        "p": 0.6,
+        "cut": 0.743,
+        "dir": "<",
+        "onShare": 0.6,
+        "t": -1.28,
+        "diff": -0.634
+       },
+       {
+        "p": 0.7,
+        "cut": 0.959,
+        "dir": ">=",
+        "onShare": 0.31,
+        "t": 1.4,
+        "diff": 0.84
+       },
+       {
+        "p": 0.7,
+        "cut": 0.959,
+        "dir": "<",
+        "onShare": 0.69,
+        "t": -1.4,
+        "diff": -0.84
+       },
+       {
+        "p": 0.8,
+        "cut": 1.164,
+        "dir": ">=",
+        "onShare": 0.21,
+        "t": 0.12,
+        "diff": 0.054
+       },
+       {
+        "p": 0.8,
+        "cut": 1.164,
+        "dir": "<",
+        "onShare": 0.79,
+        "t": -0.12,
+        "diff": -0.054
+       }
+      ]
+     },
+     "firstHalf": {
+      "on": {
+       "n": 33,
+       "R": 31,
+       "exp": 0.941,
+       "t": 1.65,
+       "maxDD": 3.6,
+       "win": 0.45
+      },
+      "off": {
+       "n": 74,
+       "R": 7.5,
+       "exp": 0.101,
+       "t": 0.53,
+       "maxDD": 10.7,
+       "win": 0.27
+      },
+      "welchT": 1.4
+     },
+     "secondHalf": {
+      "on": {
+       "n": 47,
+       "R": 55.7,
+       "exp": 1.185,
+       "t": 1.9,
+       "maxDD": 3.5,
+       "win": 0.36
+      },
+      "off": {
+       "n": 62,
+       "R": 53.6,
+       "exp": 0.865,
+       "t": 2.26,
+       "maxDD": 7.5,
+       "win": 0.37
+      },
+      "welchT": 0.44,
+      "onShare": 0.43,
+      "x2": {
+       "on": {
+        "n": 47,
+        "R": 55.3,
+        "exp": 1.177,
+        "t": 1.88,
+        "maxDD": 3.5,
+        "win": 0.36
+       },
+       "off": {
+        "n": 62,
+        "R": 52.8,
+        "exp": 0.852,
+        "t": 2.23,
+        "maxDD": 7.6,
+        "win": 0.37
+       },
+       "welchT": 0.44
+      },
+      "switched": {
+       "n": 47,
+       "R": 55.7,
+       "exp": 1.185,
+       "t": 1.9,
+       "maxDD": 3.5,
+       "win": 0.36,
+       "years": {
+        "years": 11,
+        "switched": {
+         "pos": 5,
+         "flat": 4,
+         "neg": 2
+        },
+        "alwaysOn": {
+         "pos": 9,
+         "flat": 0,
+         "neg": 2
+        },
+        "byYear": {
+         "2016": {
+          "switched": 0,
+          "alwaysOn": -0.3
+         },
+         "2017": {
+          "switched": 0,
+          "alwaysOn": 11.8
+         },
+         "2018": {
+          "switched": 0,
+          "alwaysOn": -0.3
+         },
+         "2019": {
+          "switched": 4.8,
+          "alwaysOn": 16.5
+         },
+         "2020": {
+          "switched": 6.2,
+          "alwaysOn": 9.5
+         },
+         "2021": {
+          "switched": 0,
+          "alwaysOn": 1
+         },
+         "2022": {
+          "switched": -0.8,
+          "alwaysOn": 7.2
+         },
+         "2023": {
+          "switched": 3.1,
+          "alwaysOn": 5.4
+         },
+         "2024": {
+          "switched": -0.7,
+          "alwaysOn": 13.4
+         },
+         "2025": {
+          "switched": 34.2,
+          "alwaysOn": 34.2
+         },
+         "2026": {
+          "switched": 8.8,
+          "alwaysOn": 10.9
+         }
+        }
+       }
+      },
+      "alwaysOn": {
+       "n": 109,
+       "R": 109.4,
+       "exp": 1.003,
+       "t": 2.91,
+       "maxDD": 7.5,
+       "win": 0.37,
+       "years": {
+        "pos": 9,
+        "flat": 0,
+        "neg": 2
+       }
+      }
+     },
+     "fullHistoryReference": {
+      "note": "in-sample contaminated (first half chose the cut)",
+      "on": {
+       "n": 80,
+       "R": 86.8,
+       "exp": 1.084,
+       "t": 2.5,
+       "maxDD": 6,
+       "win": 0.4
+      },
+      "off": {
+       "n": 136,
+       "R": 61.1,
+       "exp": 0.45,
+       "t": 2.19,
+       "maxDD": 10.7,
+       "win": 0.32
+      },
+      "welchT": 1.32,
+      "switchedYears": {
+       "pos": 10,
+       "flat": 7,
+       "neg": 4
+      },
+      "alwaysOnYears": {
+       "pos": 16,
+       "flat": 1,
+       "neg": 4
+      }
+     },
+     "robustness": {
+      "months": 85,
+      "monthsAllOff": 49,
+      "monthsMixed": 3,
+      "offSpells": 8,
+      "monthBlockP": 0.336
+     },
+     "byEraDescriptive": {
+      "2006-2017": {
+       "on": {
+        "n": 33,
+        "R": 31,
+        "exp": 0.941,
+        "t": 1.65,
+        "maxDD": 3.6,
+        "win": 0.45
+       },
+       "off": {
+        "n": 85,
+        "R": 19,
+        "exp": 0.224,
+        "t": 1.19,
+        "maxDD": 10.7,
+        "win": 0.32
+       },
+       "welchT": 1.19
+      },
+      "2018-2026": {
+       "on": {
+        "n": 47,
+        "R": 55.7,
+        "exp": 1.185,
+        "t": 1.9,
+        "maxDD": 3.5,
+        "win": 0.36
+       },
+       "off": {
+        "n": 51,
+        "R": 42.1,
+        "exp": 0.826,
+        "t": 1.85,
+        "maxDD": 7.5,
+        "win": 0.31
+       },
+       "welchT": 0.47
+      }
+     },
+     "tests": {
+      "S1": false,
+      "S2": true,
+      "S3": true,
+      "pass": false,
+      "survivesMultipleTesting": false
+     }
+    },
+    "META": {
+     "rule": {
+      "cut": 0,
+      "dir": ">=",
+      "fitted": false,
+      "note": "fixed a priori: ON unless the trailing 12-month sum is negative"
+     },
+     "firstHalf": {
+      "on": {
+       "n": 71,
+       "R": 18.3,
+       "exp": 0.258,
+       "t": 0.99,
+       "maxDD": 9.3,
+       "win": 0.31
+      },
+      "off": {
+       "n": 36,
+       "R": 20.3,
+       "exp": 0.563,
+       "t": 1.36,
+       "maxDD": 6.7,
+       "win": 0.36
+      },
+      "welchT": -0.62
+     },
+     "secondHalf": {
+      "on": {
+       "n": 102,
+       "R": 95.4,
+       "exp": 0.936,
+       "t": 2.59,
+       "maxDD": 8.4,
+       "win": 0.35
+      },
+      "off": {
+       "n": 7,
+       "R": 13.9,
+       "exp": 1.989,
+       "t": 1.78,
+       "maxDD": 0.6,
+       "win": 0.57
+      },
+      "welchT": -0.9,
+      "onShare": 0.94,
+      "x2": {
+       "on": {
+        "n": 102,
+        "R": 94.3,
+        "exp": 0.925,
+        "t": 2.57,
+        "maxDD": 8.6,
+        "win": 0.35
+       },
+       "off": {
+        "n": 7,
+        "R": 13.8,
+        "exp": 1.972,
+        "t": 1.77,
+        "maxDD": 0.7,
+        "win": 0.57
+       },
+       "welchT": -0.89
+      },
+      "switched": {
+       "n": 102,
+       "R": 95.4,
+       "exp": 0.936,
+       "t": 2.59,
+       "maxDD": 8.4,
+       "win": 0.35,
+       "years": {
+        "years": 11,
+        "switched": {
+         "pos": 9,
+         "flat": 0,
+         "neg": 2
+        },
+        "alwaysOn": {
+         "pos": 9,
+         "flat": 0,
+         "neg": 2
+        },
+        "byYear": {
+         "2016": {
+          "switched": -0.3,
+          "alwaysOn": -0.3
+         },
+         "2017": {
+          "switched": 8.5,
+          "alwaysOn": 11.8
+         },
+         "2018": {
+          "switched": -6.9,
+          "alwaysOn": -0.3
+         },
+         "2019": {
+          "switched": 16.7,
+          "alwaysOn": 16.5
+         },
+         "2020": {
+          "switched": 9.5,
+          "alwaysOn": 9.5
+         },
+         "2021": {
+          "switched": 0.8,
+          "alwaysOn": 1
+         },
+         "2022": {
+          "switched": 7.2,
+          "alwaysOn": 7.2
+         },
+         "2023": {
+          "switched": 1.3,
+          "alwaysOn": 5.4
+         },
+         "2024": {
+          "switched": 13.4,
+          "alwaysOn": 13.4
+         },
+         "2025": {
+          "switched": 34.2,
+          "alwaysOn": 34.2
+         },
+         "2026": {
+          "switched": 10.9,
+          "alwaysOn": 10.9
+         }
+        }
+       }
+      },
+      "alwaysOn": {
+       "n": 109,
+       "R": 109.4,
+       "exp": 1.003,
+       "t": 2.91,
+       "maxDD": 7.5,
+       "win": 0.37,
+       "years": {
+        "pos": 9,
+        "flat": 0,
+        "neg": 2
+       }
+      }
+     },
+     "fullHistoryReference": {
+      "note": "META is not fitted: the full history is out of sample for it",
+      "on": {
+       "n": 173,
+       "R": 113.7,
+       "exp": 0.657,
+       "t": 2.75,
+       "maxDD": 11.2,
+       "win": 0.34
+      },
+      "off": {
+       "n": 43,
+       "R": 34.2,
+       "exp": 0.795,
+       "t": 2.02,
+       "maxDD": 6.7,
+       "win": 0.4
+      },
+      "welchT": -0.3,
+      "switchedYears": {
+       "pos": 12,
+       "flat": 3,
+       "neg": 6
+      },
+      "alwaysOnYears": {
+       "pos": 16,
+       "flat": 1,
+       "neg": 4
+      }
+     },
+     "robustness": {
+      "months": 85,
+      "monthsAllOff": 5,
+      "monthsMixed": 2,
+      "offSpells": 5,
+      "monthBlockP": 0.87
+     },
+     "byEraDescriptive": {
+      "2006-2017": {
+       "on": {
+        "n": 81,
+        "R": 26.5,
+        "exp": 0.328,
+        "t": 1.35,
+        "maxDD": 11.2,
+        "win": 0.35
+       },
+       "off": {
+        "n": 37,
+        "R": 23.5,
+        "exp": 0.636,
+        "t": 1.55,
+        "maxDD": 6.7,
+        "win": 0.38
+       },
+       "welchT": -0.65
+      },
+      "2018-2026": {
+       "on": {
+        "n": 92,
+        "R": 87.2,
+        "exp": 0.947,
+        "t": 2.4,
+        "maxDD": 8.4,
+        "win": 0.33
+       },
+       "off": {
+        "n": 6,
+        "R": 10.7,
+        "exp": 1.777,
+        "t": 1.37,
+        "maxDD": 0.6,
+        "win": 0.5
+       },
+       "welchT": -0.61
+      }
+     },
+     "tests": {
+      "S1": false,
+      "S2": false,
+      "S3": false,
+      "pass": false,
+      "survivesMultipleTesting": false
+     }
+    }
+   },
+   "yearlyR": [
+    -3.6,
+    14.2,
+    -0.7,
+    6.6,
+    3.9,
+    16,
+    5.4,
+    -6.6,
+    0.5,
+    -2.9,
+    3.3,
+    11.8,
+    -0.3,
+    16.5,
+    9.5,
+    1,
+    7.2,
+    5.4,
+    13.4,
+    34.2,
+    10.9
+   ],
+   "yearlyLag1Corr": 0.12,
+   "now": {
+    "gc": {
+     "asOf": "2026-11-06",
+     "VOL": {
+      "value": 90.8,
+      "on": false
+     },
+     "TREND": {
+      "value": -0.76,
+      "on": false
+     },
+     "META": {
+      "value": 13.15,
+      "on": true
+     }
+    }
+   }
+  },
+  "gtl": {
+   "name": "Gold H4 trendline",
+   "history": [
+    "2006-07-01",
+    "2026-11-07"
+   ],
+   "split": "2016-09-01",
+   "trendUsed": "signed TS (long-only system)",
+   "trades": {
+    "declared": 720,
+    "study": 696,
+    "warmupExcluded": 24,
+    "firstHalf": 338,
+    "secondHalf": 358,
+    "studyFrom": "2007-03-16"
+   },
+   "alwaysOn": {
+    "firstHalf": {
+     "n": 338,
+     "R": -2.8,
+     "exp": -0.008,
+     "t": -0.14,
+     "maxDD": 26.3,
+     "win": 0.46
+    },
+    "secondHalf": {
+     "n": 358,
+     "R": 65.9,
+     "exp": 0.184,
+     "t": 2.73,
+     "maxDD": 12.4,
+     "win": 0.5
+    },
+    "secondHalfX2": {
+     "n": 358,
+     "R": 57.9,
+     "exp": 0.162,
+     "t": 2.39,
+     "maxDD": 13.3,
+     "win": 0.5
+    },
+    "full": {
+     "n": 696,
+     "R": 63.1,
+     "exp": 0.091,
+     "t": 2,
+     "maxDD": 26.3,
+     "win": 0.48
+    }
+   },
+   "indicators": {
+    "VOL": {
+     "rule": {
+      "cut": 52.998,
+      "dir": "<",
+      "pctOfFirstHalf": 0.5,
+      "fitted": true,
+      "firstHalfT": 1.39,
+      "candidates": [
+       {
+        "p": 0.2,
+        "cut": 23.217,
+        "dir": ">=",
+        "onShare": 0.8,
+        "t": -0.71,
+        "diff": -0.112
+       },
+       {
+        "p": 0.2,
+        "cut": 23.217,
+        "dir": "<",
+        "onShare": 0.2,
+        "t": 0.71,
+        "diff": 0.112
+       },
+       {
+        "p": 0.3,
+        "cut": 30.592,
+        "dir": ">=",
+        "onShare": 0.7,
+        "t": -0.73,
+        "diff": -0.099
+       },
+       {
+        "p": 0.3,
+        "cut": 30.592,
+        "dir": "<",
+        "onShare": 0.3,
+        "t": 0.73,
+        "diff": 0.099
+       },
+       {
+        "p": 0.4,
+        "cut": 42.504,
+        "dir": ">=",
+        "onShare": 0.6,
+        "t": -0.68,
+        "diff": -0.085
+       },
+       {
+        "p": 0.4,
+        "cut": 42.504,
+        "dir": "<",
+        "onShare": 0.4,
+        "t": 0.68,
+        "diff": 0.085
+       },
+       {
+        "p": 0.5,
+        "cut": 52.998,
+        "dir": ">=",
+        "onShare": 0.5,
+        "t": -1.39,
+        "diff": -0.167
+       },
+       {
+        "p": 0.5,
+        "cut": 52.998,
+        "dir": "<",
+        "onShare": 0.5,
+        "t": 1.39,
+        "diff": 0.167
+       },
+       {
+        "p": 0.6,
+        "cut": 63.128,
+        "dir": ">=",
+        "onShare": 0.4,
+        "t": -0.06,
+        "diff": -0.008
+       },
+       {
+        "p": 0.6,
+        "cut": 63.128,
+        "dir": "<",
+        "onShare": 0.6,
+        "t": 0.06,
+        "diff": 0.008
+       },
+       {
+        "p": 0.7,
+        "cut": 73.46,
+        "dir": ">=",
+        "onShare": 0.3,
+        "t": -0.34,
+        "diff": -0.044
+       },
+       {
+        "p": 0.7,
+        "cut": 73.46,
+        "dir": "<",
+        "onShare": 0.7,
+        "t": 0.34,
+        "diff": 0.044
+       },
+       {
+        "p": 0.8,
+        "cut": 82.374,
+        "dir": ">=",
+        "onShare": 0.2,
+        "t": 0.43,
+        "diff": 0.062
+       },
+       {
+        "p": 0.8,
+        "cut": 82.374,
+        "dir": "<",
+        "onShare": 0.8,
+        "t": -0.43,
+        "diff": -0.062
+       }
+      ]
+     },
+     "firstHalf": {
+      "on": {
+       "n": 169,
+       "R": 12.7,
+       "exp": 0.075,
+       "t": 0.81,
+       "maxDD": 17.6,
+       "win": 0.46
+      },
+      "off": {
+       "n": 169,
+       "R": -15.5,
+       "exp": -0.092,
+       "t": -1.2,
+       "maxDD": 17.2,
+       "win": 0.45
+      },
+      "welchT": 1.39
+     },
+     "secondHalf": {
+      "on": {
+       "n": 301,
+       "R": 69,
+       "exp": 0.229,
+       "t": 3.04,
+       "maxDD": 12.4,
+       "win": 0.52
+      },
+      "off": {
+       "n": 57,
+       "R": -3.1,
+       "exp": -0.054,
+       "t": -0.38,
+       "maxDD": 9.3,
+       "win": 0.4
+      },
+      "welchT": 1.75,
+      "onShare": 0.84,
+      "x2": {
+       "on": {
+        "n": 301,
+        "R": 61.5,
+        "exp": 0.204,
+        "t": 2.7,
+        "maxDD": 13.3,
+        "win": 0.52
+       },
+       "off": {
+        "n": 57,
+        "R": -3.5,
+        "exp": -0.062,
+        "t": -0.43,
+        "maxDD": 9.4,
+        "win": 0.4
+       },
+       "welchT": 1.65
+      },
+      "switched": {
+       "n": 301,
+       "R": 69,
+       "exp": 0.229,
+       "t": 3.04,
+       "maxDD": 12.4,
+       "win": 0.52,
+       "years": {
+        "years": 11,
+        "switched": {
+         "pos": 9,
+         "flat": 1,
+         "neg": 1
+        },
+        "alwaysOn": {
+         "pos": 9,
+         "flat": 0,
+         "neg": 2
+        },
+        "byYear": {
+         "2016": {
+          "switched": 9.5,
+          "alwaysOn": 9.5
+         },
+         "2017": {
+          "switched": 0.7,
+          "alwaysOn": 0.7
+         },
+         "2018": {
+          "switched": 1.7,
+          "alwaysOn": 1.7
+         },
+         "2019": {
+          "switched": 1,
+          "alwaysOn": 1
+         },
+         "2020": {
+          "switched": 9.5,
+          "alwaysOn": 8.2
+         },
+         "2021": {
+          "switched": 3.2,
+          "alwaysOn": 0.8
+         },
+         "2022": {
+          "switched": -3.9,
+          "alwaysOn": -3.9
+         },
+         "2023": {
+          "switched": 3.4,
+          "alwaysOn": 3.4
+         },
+         "2024": {
+          "switched": 16,
+          "alwaysOn": 16
+         },
+         "2025": {
+          "switched": 27.9,
+          "alwaysOn": 28.9
+         },
+         "2026": {
+          "switched": 0,
+          "alwaysOn": -0.4
+         }
+        }
+       }
+      },
+      "alwaysOn": {
+       "n": 358,
+       "R": 65.9,
+       "exp": 0.184,
+       "t": 2.73,
+       "maxDD": 12.4,
+       "win": 0.5,
+       "years": {
+        "pos": 9,
+        "flat": 0,
+        "neg": 2
+       }
+      }
+     },
+     "fullHistoryReference": {
+      "note": "in-sample contaminated (first half chose the cut)",
+      "on": {
+       "n": 470,
+       "R": 81.7,
+       "exp": 0.174,
+       "t": 2.96,
+       "maxDD": 17.6,
+       "win": 0.5
+      },
+      "off": {
+       "n": 226,
+       "R": -18.5,
+       "exp": -0.082,
+       "t": -1.22,
+       "maxDD": 22.6,
+       "win": 0.44
+      },
+      "welchT": 2.87,
+      "switchedYears": {
+       "pos": 12,
+       "flat": 3,
+       "neg": 6
+      },
+      "alwaysOnYears": {
+       "pos": 11,
+       "flat": 1,
+       "neg": 9
+      }
+     },
+     "robustness": {
+      "months": 120,
+      "monthsAllOff": 19,
+      "monthsMixed": 2,
+      "offSpells": 3,
+      "monthBlockP": 0.044
+     },
+     "byEraDescriptive": {
+      "2006-2017": {
+       "on": {
+        "n": 209,
+        "R": 22.9,
+        "exp": 0.11,
+        "t": 1.25,
+        "maxDD": 17.6,
+        "win": 0.47
+       },
+       "off": {
+        "n": 169,
+        "R": -15.5,
+        "exp": -0.092,
+        "t": -1.2,
+        "maxDD": 17.2,
+        "win": 0.45
+       },
+       "welchT": 1.73
+      },
+      "2018-2026": {
+       "on": {
+        "n": 261,
+        "R": 58.8,
+        "exp": 0.225,
+        "t": 2.86,
+        "maxDD": 12.4,
+        "win": 0.52
+       },
+       "off": {
+        "n": 57,
+        "R": -3.1,
+        "exp": -0.054,
+        "t": -0.38,
+        "maxDD": 9.3,
+        "win": 0.4
+       },
+       "welchT": 1.71
+      }
+     },
+     "tests": {
+      "S1": false,
+      "S2": true,
+      "S3": true,
+      "pass": false,
+      "survivesMultipleTesting": false
+     }
+    },
+    "TREND": {
+     "rule": {
+      "cut": 0.14,
+      "dir": ">=",
+      "pctOfFirstHalf": 0.4,
+      "fitted": true,
+      "firstHalfT": 1.79,
+      "candidates": [
+       {
+        "p": 0.2,
+        "cut": -0.492,
+        "dir": ">=",
+        "onShare": 0.8,
+        "t": 0.3,
+        "diff": 0.042
+       },
+       {
+        "p": 0.2,
+        "cut": -0.492,
+        "dir": "<",
+        "onShare": 0.2,
+        "t": -0.3,
+        "diff": -0.042
+       },
+       {
+        "p": 0.3,
+        "cut": -0.219,
+        "dir": ">=",
+        "onShare": 0.7,
+        "t": 1.11,
+        "diff": 0.138
+       },
+       {
+        "p": 0.3,
+        "cut": -0.219,
+        "dir": "<",
+        "onShare": 0.3,
+        "t": -1.11,
+        "diff": -0.138
+       },
+       {
+        "p": 0.4,
+        "cut": 0.14,
+        "dir": ">=",
+        "onShare": 0.6,
+        "t": 1.79,
+        "diff": 0.21
+       },
+       {
+        "p": 0.4,
+        "cut": 0.14,
+        "dir": "<",
+        "onShare": 0.4,
+        "t": -1.79,
+        "diff": -0.21
+       },
+       {
+        "p": 0.5,
+        "cut": 0.392,
+        "dir": ">=",
+        "onShare": 0.5,
+        "t": 0.78,
+        "diff": 0.094
+       },
+       {
+        "p": 0.5,
+        "cut": 0.392,
+        "dir": "<",
+        "onShare": 0.5,
+        "t": -0.78,
+        "diff": -0.094
+       },
+       {
+        "p": 0.6,
+        "cut": 0.611,
+        "dir": ">=",
+        "onShare": 0.4,
+        "t": 1.43,
+        "diff": 0.181
+       },
+       {
+        "p": 0.6,
+        "cut": 0.611,
+        "dir": "<",
+        "onShare": 0.6,
+        "t": -1.43,
+        "diff": -0.181
+       },
+       {
+        "p": 0.7,
+        "cut": 0.813,
+        "dir": ">=",
+        "onShare": 0.3,
+        "t": 0.49,
+        "diff": 0.066
+       },
+       {
+        "p": 0.7,
+        "cut": 0.813,
+        "dir": "<",
+        "onShare": 0.7,
+        "t": -0.49,
+        "diff": -0.066
+       },
+       {
+        "p": 0.8,
+        "cut": 1.067,
+        "dir": ">=",
+        "onShare": 0.2,
+        "t": -0.33,
+        "diff": -0.047
+       },
+       {
+        "p": 0.8,
+        "cut": 1.067,
+        "dir": "<",
+        "onShare": 0.8,
+        "t": 0.33,
+        "diff": 0.047
+       }
+      ]
+     },
+     "firstHalf": {
+      "on": {
+       "n": 203,
+       "R": 15.3,
+       "exp": 0.076,
+       "t": 0.91,
+       "maxDD": 14.9,
+       "win": 0.48
+      },
+      "off": {
+       "n": 135,
+       "R": -18.1,
+       "exp": -0.134,
+       "t": -1.62,
+       "maxDD": 25.6,
+       "win": 0.41
+      },
+      "welchT": 1.79
+     },
+     "secondHalf": {
+      "on": {
+       "n": 253,
+       "R": 55.5,
+       "exp": 0.219,
+       "t": 2.59,
+       "maxDD": 13.9,
+       "win": 0.5
+      },
+      "off": {
+       "n": 105,
+       "R": 10.4,
+       "exp": 0.1,
+       "t": 0.93,
+       "maxDD": 9.2,
+       "win": 0.5
+      },
+      "welchT": 0.87,
+      "onShare": 0.71,
+      "x2": {
+       "on": {
+        "n": 253,
+        "R": 49.6,
+        "exp": 0.196,
+        "t": 2.31,
+        "maxDD": 14.6,
+        "win": 0.5
+       },
+       "off": {
+        "n": 105,
+        "R": 8.3,
+        "exp": 0.079,
+        "t": 0.74,
+        "maxDD": 9.7,
+        "win": 0.5
+       },
+       "welchT": 0.86
+      },
+      "switched": {
+       "n": 253,
+       "R": 55.5,
+       "exp": 0.219,
+       "t": 2.59,
+       "maxDD": 13.9,
+       "win": 0.5,
+       "years": {
+        "years": 11,
+        "switched": {
+         "pos": 8,
+         "flat": 0,
+         "neg": 3
+        },
+        "alwaysOn": {
+         "pos": 9,
+         "flat": 0,
+         "neg": 2
+        },
+        "byYear": {
+         "2016": {
+          "switched": 7.1,
+          "alwaysOn": 9.5
+         },
+         "2017": {
+          "switched": 0.4,
+          "alwaysOn": 0.7
+         },
+         "2018": {
+          "switched": -0.1,
+          "alwaysOn": 1.7
+         },
+         "2019": {
+          "switched": 1,
+          "alwaysOn": 1
+         },
+         "2020": {
+          "switched": 7.2,
+          "alwaysOn": 8.2
+         },
+         "2021": {
+          "switched": -5.9,
+          "alwaysOn": 0.8
+         },
+         "2022": {
+          "switched": -0.5,
+          "alwaysOn": -3.9
+         },
+         "2023": {
+          "switched": 1.3,
+          "alwaysOn": 3.4
+         },
+         "2024": {
+          "switched": 16,
+          "alwaysOn": 16
+         },
+         "2025": {
+          "switched": 28.9,
+          "alwaysOn": 28.9
+         },
+         "2026": {
+          "switched": 0.1,
+          "alwaysOn": -0.4
+         }
+        }
+       }
+      },
+      "alwaysOn": {
+       "n": 358,
+       "R": 65.9,
+       "exp": 0.184,
+       "t": 2.73,
+       "maxDD": 12.4,
+       "win": 0.5,
+       "years": {
+        "pos": 9,
+        "flat": 0,
+        "neg": 2
+       }
+      }
+     },
+     "fullHistoryReference": {
+      "note": "in-sample contaminated (first half chose the cut)",
+      "on": {
+       "n": 456,
+       "R": 70.8,
+       "exp": 0.155,
+       "t": 2.6,
+       "maxDD": 14.9,
+       "win": 0.49
+      },
+      "off": {
+       "n": 240,
+       "R": -7.7,
+       "exp": -0.032,
+       "t": -0.48,
+       "maxDD": 25.6,
+       "win": 0.45
+      },
+      "welchT": 2.1,
+      "switchedYears": {
+       "pos": 12,
+       "flat": 1,
+       "neg": 8
+      },
+      "alwaysOnYears": {
+       "pos": 11,
+       "flat": 1,
+       "neg": 9
+      }
+     },
+     "robustness": {
+      "months": 120,
+      "monthsAllOff": 35,
+      "monthsMixed": 12,
+      "offSpells": 18,
+      "monthBlockP": 0.314
+     },
+     "byEraDescriptive": {
+      "2006-2017": {
+       "on": {
+        "n": 227,
+        "R": 22.8,
+        "exp": 0.1,
+        "t": 1.21,
+        "maxDD": 14.9,
+        "win": 0.49
+       },
+       "off": {
+        "n": 151,
+        "R": -15.4,
+        "exp": -0.102,
+        "t": -1.25,
+        "maxDD": 25.6,
+        "win": 0.42
+       },
+       "welchT": 1.75
+      },
+      "2018-2026": {
+       "on": {
+        "n": 229,
+        "R": 48,
+        "exp": 0.21,
+        "t": 2.43,
+        "maxDD": 13.9,
+        "win": 0.5
+       },
+       "off": {
+        "n": 89,
+        "R": 7.7,
+        "exp": 0.086,
+        "t": 0.76,
+        "maxDD": 7.2,
+        "win": 0.49
+       },
+       "welchT": 0.86
+      }
+     },
+     "tests": {
+      "S1": false,
+      "S2": false,
+      "S3": true,
+      "pass": false,
+      "survivesMultipleTesting": false
+     }
+    },
+    "META": {
+     "rule": {
+      "cut": 0,
+      "dir": ">=",
+      "fitted": false,
+      "note": "fixed a priori: ON unless the trailing 12-month sum is negative"
+     },
+     "firstHalf": {
+      "on": {
+       "n": 129,
+       "R": -1.4,
+       "exp": -0.011,
+       "t": -0.11,
+       "maxDD": 13.9,
+       "win": 0.48
+      },
+      "off": {
+       "n": 209,
+       "R": -1.4,
+       "exp": -0.007,
+       "t": -0.09,
+       "maxDD": 21.1,
+       "win": 0.44
+      },
+      "welchT": -0.03
+     },
+     "secondHalf": {
+      "on": {
+       "n": 279,
+       "R": 55.3,
+       "exp": 0.198,
+       "t": 2.57,
+       "maxDD": 15.5,
+       "win": 0.51
+      },
+      "off": {
+       "n": 79,
+       "R": 10.6,
+       "exp": 0.134,
+       "t": 0.95,
+       "maxDD": 10.2,
+       "win": 0.48
+      },
+      "welchT": 0.4,
+      "onShare": 0.78,
+      "x2": {
+       "on": {
+        "n": 279,
+        "R": 49.5,
+        "exp": 0.177,
+        "t": 2.3,
+        "maxDD": 18.3,
+        "win": 0.51
+       },
+       "off": {
+        "n": 79,
+        "R": 8.5,
+        "exp": 0.107,
+        "t": 0.76,
+        "maxDD": 10.6,
+        "win": 0.48
+       },
+       "welchT": 0.43
+      },
+      "switched": {
+       "n": 279,
+       "R": 55.3,
+       "exp": 0.198,
+       "t": 2.57,
+       "maxDD": 15.5,
+       "win": 0.51,
+       "years": {
+        "years": 11,
+        "switched": {
+         "pos": 7,
+         "flat": 0,
+         "neg": 4
+        },
+        "alwaysOn": {
+         "pos": 9,
+         "flat": 0,
+         "neg": 2
+        },
+        "byYear": {
+         "2016": {
+          "switched": 9.5,
+          "alwaysOn": 9.5
+         },
+         "2017": {
+          "switched": 0.7,
+          "alwaysOn": 0.7
+         },
+         "2018": {
+          "switched": -5.4,
+          "alwaysOn": 1.7
+         },
+         "2019": {
+          "switched": -6,
+          "alwaysOn": 1
+         },
+         "2020": {
+          "switched": 8.8,
+          "alwaysOn": 8.2
+         },
+         "2021": {
+          "switched": 0.8,
+          "alwaysOn": 0.8
+         },
+         "2022": {
+          "switched": -0.3,
+          "alwaysOn": -3.9
+         },
+         "2023": {
+          "switched": 2.8,
+          "alwaysOn": 3.4
+         },
+         "2024": {
+          "switched": 16,
+          "alwaysOn": 16
+         },
+         "2025": {
+          "switched": 28.9,
+          "alwaysOn": 28.9
+         },
+         "2026": {
+          "switched": -0.4,
+          "alwaysOn": -0.4
+         }
+        }
+       }
+      },
+      "alwaysOn": {
+       "n": 358,
+       "R": 65.9,
+       "exp": 0.184,
+       "t": 2.73,
+       "maxDD": 12.4,
+       "win": 0.5,
+       "years": {
+        "pos": 9,
+        "flat": 0,
+        "neg": 2
+       }
+      }
+     },
+     "fullHistoryReference": {
+      "note": "META is not fitted: the full history is out of sample for it",
+      "on": {
+       "n": 408,
+       "R": 53.9,
+       "exp": 0.132,
+       "t": 2.15,
+       "maxDD": 15.5,
+       "win": 0.5
+      },
+      "off": {
+       "n": 288,
+       "R": 9.2,
+       "exp": 0.032,
+       "t": 0.48,
+       "maxDD": 21.1,
+       "win": 0.45
+      },
+      "welchT": 1.11,
+      "switchedYears": {
+       "pos": 9,
+       "flat": 3,
+       "neg": 9
+      },
+      "alwaysOnYears": {
+       "pos": 11,
+       "flat": 1,
+       "neg": 9
+      }
+     },
+     "robustness": {
+      "months": 120,
+      "monthsAllOff": 24,
+      "monthsMixed": 10,
+      "offSpells": 11,
+      "monthBlockP": 0.444
+     },
+     "byEraDescriptive": {
+      "2006-2017": {
+       "on": {
+        "n": 169,
+        "R": 8.8,
+        "exp": 0.052,
+        "t": 0.55,
+        "maxDD": 13.9,
+        "win": 0.49
+       },
+       "off": {
+        "n": 209,
+        "R": -1.4,
+        "exp": -0.007,
+        "t": -0.09,
+        "maxDD": 21.1,
+        "win": 0.44
+       },
+       "welchT": 0.48
+      },
+      "2018-2026": {
+       "on": {
+        "n": 239,
+        "R": 45.1,
+        "exp": 0.189,
+        "t": 2.35,
+        "maxDD": 13.7,
+        "win": 0.5
+       },
+       "off": {
+        "n": 79,
+        "R": 10.6,
+        "exp": 0.134,
+        "t": 0.95,
+        "maxDD": 10.2,
+        "win": 0.48
+       },
+       "welchT": 0.34
+      }
+     },
+     "tests": {
+      "S1": false,
+      "S2": false,
+      "S3": true,
+      "pass": false,
+      "survivesMultipleTesting": false
+     }
+    }
+   },
+   "yearlyR": [
+    6.3,
+    12.2,
+    -3,
+    -0.1,
+    -7.8,
+    10.1,
+    -4.8,
+    -4.8,
+    -5.8,
+    -8.4,
+    24.8,
+    0.7,
+    1.7,
+    1,
+    8.2,
+    0.8,
+    -3.9,
+    3.4,
+    16,
+    28.9,
+    -0.4
+   ],
+   "yearlyLag1Corr": 0.03,
+   "now": {
+    "gc": {
+     "asOf": "2026-11-06",
+     "VOL": {
+      "value": 90.8,
+      "on": false
+     },
+     "TREND": {
+      "value": -0.76,
+      "on": false
+     },
+     "META": {
+      "value": 1.89,
+      "on": true
+     }
+    }
+   }
+  },
+  "geg": {
+   "name": "Gold daily engulf",
+   "history": [
+    "2006-07-01",
+    "2026-11-07"
+   ],
+   "split": "2016-09-01",
+   "trendUsed": "signed TS (long-only system)",
+   "trades": {
+    "declared": 451,
+    "study": 428,
+    "warmupExcluded": 23,
+    "firstHalf": 209,
+    "secondHalf": 219,
+    "studyFrom": "2007-03-28"
+   },
+   "alwaysOn": {
+    "firstHalf": {
+     "n": 209,
+     "R": 42.5,
+     "exp": 0.203,
+     "t": 1.83,
+     "maxDD": 15.2,
+     "win": 0.42
+    },
+    "secondHalf": {
+     "n": 219,
+     "R": 53.6,
+     "exp": 0.245,
+     "t": 2.12,
+     "maxDD": 13.6,
+     "win": 0.42
+    },
+    "secondHalfX2": {
+     "n": 219,
+     "R": 46.3,
+     "exp": 0.211,
+     "t": 1.83,
+     "maxDD": 15.4,
+     "win": 0.42
+    },
+    "full": {
+     "n": 428,
+     "R": 96,
+     "exp": 0.224,
+     "t": 2.8,
+     "maxDD": 15.2,
+     "win": 0.42
+    }
+   },
+   "indicators": {
+    "VOL": {
+     "rule": {
+      "cut": 48.663,
+      "dir": "<",
+      "pctOfFirstHalf": 0.5,
+      "fitted": true,
+      "firstHalfT": 1.46,
+      "candidates": [
+       {
+        "p": 0.2,
+        "cut": 21.191,
+        "dir": ">=",
+        "onShare": 0.8,
+        "t": 0.16,
+        "diff": 0.041
+       },
+       {
+        "p": 0.2,
+        "cut": 21.191,
+        "dir": "<",
+        "onShare": 0.2,
+        "t": -0.16,
+        "diff": -0.041
+       },
+       {
+        "p": 0.3,
+        "cut": 31.564,
+        "dir": ">=",
+        "onShare": 0.7,
+        "t": -0.2,
+        "diff": -0.048
+       },
+       {
+        "p": 0.3,
+        "cut": 31.564,
+        "dir": "<",
+        "onShare": 0.3,
+        "t": 0.2,
+        "diff": 0.048
+       },
+       {
+        "p": 0.4,
+        "cut": 40.478,
+        "dir": ">=",
+        "onShare": 0.6,
+        "t": -1.35,
+        "diff": -0.312
+       },
+       {
+        "p": 0.4,
+        "cut": 40.478,
+        "dir": "<",
+        "onShare": 0.4,
+        "t": 1.35,
+        "diff": 0.312
+       },
+       {
+        "p": 0.5,
+        "cut": 48.663,
+        "dir": ">=",
+        "onShare": 0.5,
+        "t": -1.46,
+        "diff": -0.322
+       },
+       {
+        "p": 0.5,
+        "cut": 48.663,
+        "dir": "<",
+        "onShare": 0.5,
+        "t": 1.46,
+        "diff": 0.322
+       },
+       {
+        "p": 0.6,
+        "cut": 58.468,
+        "dir": ">=",
+        "onShare": 0.4,
+        "t": -1.16,
+        "diff": -0.263
+       },
+       {
+        "p": 0.6,
+        "cut": 58.468,
+        "dir": "<",
+        "onShare": 0.6,
+        "t": 1.16,
+        "diff": 0.263
+       },
+       {
+        "p": 0.7,
+        "cut": 67.95,
+        "dir": ">=",
+        "onShare": 0.3,
+        "t": -0.88,
+        "diff": -0.212
+       },
+       {
+        "p": 0.7,
+        "cut": 67.95,
+        "dir": "<",
+        "onShare": 0.7,
+        "t": 0.88,
+        "diff": 0.212
+       },
+       {
+        "p": 0.8,
+        "cut": 81.24,
+        "dir": ">=",
+        "onShare": 0.21,
+        "t": 0.98,
+        "diff": 0.281
+       },
+       {
+        "p": 0.8,
+        "cut": 81.24,
+        "dir": "<",
+        "onShare": 0.79,
+        "t": -0.98,
+        "diff": -0.281
+       }
+      ]
+     },
+     "firstHalf": {
+      "on": {
+       "n": 105,
+       "R": 37.7,
+       "exp": 0.359,
+       "t": 2.22,
+       "maxDD": 12.8,
+       "win": 0.46
+      },
+      "off": {
+       "n": 104,
+       "R": 4.7,
+       "exp": 0.046,
+       "t": 0.3,
+       "maxDD": 14.8,
+       "win": 0.38
+      },
+      "welchT": 1.42
+     },
+     "secondHalf": {
+      "on": {
+       "n": 169,
+       "R": 46.8,
+       "exp": 0.277,
+       "t": 2.04,
+       "maxDD": 13.6,
+       "win": 0.43
+      },
+      "off": {
+       "n": 50,
+       "R": 6.8,
+       "exp": 0.136,
+       "t": 0.64,
+       "maxDD": 4.4,
+       "win": 0.4
+      },
+      "welchT": 0.56,
+      "onShare": 0.77,
+      "x2": {
+       "on": {
+        "n": 169,
+        "R": 40.4,
+        "exp": 0.239,
+        "t": 1.76,
+        "maxDD": 15.4,
+        "win": 0.43
+       },
+       "off": {
+        "n": 50,
+        "R": 5.9,
+        "exp": 0.118,
+        "t": 0.55,
+        "maxDD": 4.5,
+        "win": 0.4
+       },
+       "welchT": 0.48
+      },
+      "switched": {
+       "n": 169,
+       "R": 46.8,
+       "exp": 0.277,
+       "t": 2.04,
+       "maxDD": 13.6,
+       "win": 0.43,
+       "years": {
+        "years": 11,
+        "switched": {
+         "pos": 7,
+         "flat": 1,
+         "neg": 3
+        },
+        "alwaysOn": {
+         "pos": 7,
+         "flat": 0,
+         "neg": 4
+        },
+        "byYear": {
+         "2016": {
+          "switched": 1.3,
+          "alwaysOn": 1.3
+         },
+         "2017": {
+          "switched": -1.8,
+          "alwaysOn": -1.8
+         },
+         "2018": {
+          "switched": -6,
+          "alwaysOn": -6
+         },
+         "2019": {
+          "switched": 9.8,
+          "alwaysOn": 9.8
+         },
+         "2020": {
+          "switched": 10.4,
+          "alwaysOn": 11.5
+         },
+         "2021": {
+          "switched": 6.5,
+          "alwaysOn": 12
+         },
+         "2022": {
+          "switched": -2.4,
+          "alwaysOn": -2.4
+         },
+         "2023": {
+          "switched": 9.9,
+          "alwaysOn": 9.9
+         },
+         "2024": {
+          "switched": 10.8,
+          "alwaysOn": 10.8
+         },
+         "2025": {
+          "switched": 8.1,
+          "alwaysOn": 11.5
+         },
+         "2026": {
+          "switched": 0,
+          "alwaysOn": -3.2
+         }
+        }
+       }
+      },
+      "alwaysOn": {
+       "n": 219,
+       "R": 53.6,
+       "exp": 0.245,
+       "t": 2.12,
+       "maxDD": 13.6,
+       "win": 0.42,
+       "years": {
+        "pos": 7,
+        "flat": 0,
+        "neg": 4
+       }
+      }
+     },
+     "fullHistoryReference": {
+      "note": "in-sample contaminated (first half chose the cut)",
+      "on": {
+       "n": 274,
+       "R": 84.5,
+       "exp": 0.308,
+       "t": 2.96,
+       "maxDD": 13.6,
+       "win": 0.44
+      },
+      "off": {
+       "n": 154,
+       "R": 11.5,
+       "exp": 0.075,
+       "t": 0.61,
+       "maxDD": 14.8,
+       "win": 0.38
+      },
+      "welchT": 1.45,
+      "switchedYears": {
+       "pos": 11,
+       "flat": 4,
+       "neg": 6
+      },
+      "alwaysOnYears": {
+       "pos": 13,
+       "flat": 1,
+       "neg": 7
+      }
+     },
+     "robustness": {
+      "months": 106,
+      "monthsAllOff": 23,
+      "monthsMixed": 4,
+      "offSpells": 3,
+      "monthBlockP": 0.28
+     },
+     "byEraDescriptive": {
+      "2006-2017": {
+       "on": {
+        "n": 129,
+        "R": 37.3,
+        "exp": 0.289,
+        "t": 2.05,
+        "maxDD": 12.8,
+        "win": 0.44
+       },
+       "off": {
+        "n": 104,
+        "R": 4.7,
+        "exp": 0.046,
+        "t": 0.3,
+        "maxDD": 14.8,
+        "win": 0.38
+       },
+       "welchT": 1.18
+      },
+      "2018-2026": {
+       "on": {
+        "n": 145,
+        "R": 47.2,
+        "exp": 0.325,
+        "t": 2.15,
+        "maxDD": 9.1,
+        "win": 0.44
+       },
+       "off": {
+        "n": 50,
+        "R": 6.8,
+        "exp": 0.136,
+        "t": 0.64,
+        "maxDD": 4.4,
+        "win": 0.4
+       },
+       "welchT": 0.72
+      }
+     },
+     "tests": {
+      "S1": false,
+      "S2": true,
+      "S3": true,
+      "pass": false,
+      "survivesMultipleTesting": false
+     }
+    },
+    "TREND": {
+     "rule": {
+      "cut": 0.275,
+      "dir": ">=",
+      "pctOfFirstHalf": 0.4,
+      "fitted": true,
+      "firstHalfT": 2.41,
+      "candidates": [
+       {
+        "p": 0.2,
+        "cut": -0.27,
+        "dir": ">=",
+        "onShare": 0.8,
+        "t": 0.66,
+        "diff": 0.179
+       },
+       {
+        "p": 0.2,
+        "cut": -0.27,
+        "dir": "<",
+        "onShare": 0.2,
+        "t": -0.66,
+        "diff": -0.179
+       },
+       {
+        "p": 0.3,
+        "cut": -0.031,
+        "dir": ">=",
+        "onShare": 0.7,
+        "t": 1.18,
+        "diff": 0.279
+       },
+       {
+        "p": 0.3,
+        "cut": -0.031,
+        "dir": "<",
+        "onShare": 0.3,
+        "t": -1.18,
+        "diff": -0.279
+       },
+       {
+        "p": 0.4,
+        "cut": 0.275,
+        "dir": ">=",
+        "onShare": 0.6,
+        "t": 2.41,
+        "diff": 0.521
+       },
+       {
+        "p": 0.4,
+        "cut": 0.275,
+        "dir": "<",
+        "onShare": 0.4,
+        "t": -2.41,
+        "diff": -0.521
+       },
+       {
+        "p": 0.5,
+        "cut": 0.604,
+        "dir": ">=",
+        "onShare": 0.5,
+        "t": 1.21,
+        "diff": 0.269
+       },
+       {
+        "p": 0.5,
+        "cut": 0.604,
+        "dir": "<",
+        "onShare": 0.5,
+        "t": -1.21,
+        "diff": -0.269
+       },
+       {
+        "p": 0.6,
+        "cut": 0.792,
+        "dir": ">=",
+        "onShare": 0.4,
+        "t": 1.21,
+        "diff": 0.28
+       },
+       {
+        "p": 0.6,
+        "cut": 0.792,
+        "dir": "<",
+        "onShare": 0.6,
+        "t": -1.21,
+        "diff": -0.28
+       },
+       {
+        "p": 0.7,
+        "cut": 1.04,
+        "dir": ">=",
+        "onShare": 0.3,
+        "t": 0.96,
+        "diff": 0.247
+       },
+       {
+        "p": 0.7,
+        "cut": 1.04,
+        "dir": "<",
+        "onShare": 0.7,
+        "t": -0.96,
+        "diff": -0.247
+       },
+       {
+        "p": 0.8,
+        "cut": 1.225,
+        "dir": ">=",
+        "onShare": 0.21,
+        "t": -0.02,
+        "diff": -0.005
+       },
+       {
+        "p": 0.8,
+        "cut": 1.225,
+        "dir": "<",
+        "onShare": 0.79,
+        "t": 0.02,
+        "diff": 0.005
+       }
+      ]
+     },
+     "firstHalf": {
+      "on": {
+       "n": 126,
+       "R": 51.7,
+       "exp": 0.41,
+       "t": 2.72,
+       "maxDD": 11.1,
+       "win": 0.47
+      },
+      "off": {
+       "n": 83,
+       "R": -9.2,
+       "exp": -0.111,
+       "t": -0.72,
+       "maxDD": 15.5,
+       "win": 0.34
+      },
+      "welchT": 2.41
+     },
+     "secondHalf": {
+      "on": {
+       "n": 157,
+       "R": 52.6,
+       "exp": 0.335,
+       "t": 2.3,
+       "maxDD": 9.6,
+       "win": 0.43
+      },
+      "off": {
+       "n": 62,
+       "R": 1,
+       "exp": 0.015,
+       "t": 0.09,
+       "maxDD": 10.2,
+       "win": 0.4
+      },
+      "welchT": 1.43,
+      "onShare": 0.72,
+      "x2": {
+       "on": {
+        "n": 157,
+        "R": 48,
+        "exp": 0.305,
+        "t": 2.09,
+        "maxDD": 10.5,
+        "win": 0.43
+       },
+       "off": {
+        "n": 62,
+        "R": -1.7,
+        "exp": -0.027,
+        "t": -0.16,
+        "maxDD": 11.5,
+        "win": 0.4
+       },
+       "welchT": 1.48
+      },
+      "switched": {
+       "n": 157,
+       "R": 52.6,
+       "exp": 0.335,
+       "t": 2.3,
+       "maxDD": 9.6,
+       "win": 0.43,
+       "years": {
+        "years": 11,
+        "switched": {
+         "pos": 8,
+         "flat": 0,
+         "neg": 3
+        },
+        "alwaysOn": {
+         "pos": 7,
+         "flat": 0,
+         "neg": 4
+        },
+        "byYear": {
+         "2016": {
+          "switched": -2.1,
+          "alwaysOn": 1.3
+         },
+         "2017": {
+          "switched": 0.8,
+          "alwaysOn": -1.8
+         },
+         "2018": {
+          "switched": -4.2,
+          "alwaysOn": -6
+         },
+         "2019": {
+          "switched": 9.8,
+          "alwaysOn": 9.8
+         },
+         "2020": {
+          "switched": 11.5,
+          "alwaysOn": 11.5
+         },
+         "2021": {
+          "switched": 4.2,
+          "alwaysOn": 12
+         },
+         "2022": {
+          "switched": 2.1,
+          "alwaysOn": -2.4
+         },
+         "2023": {
+          "switched": 9.9,
+          "alwaysOn": 9.9
+         },
+         "2024": {
+          "switched": 10.8,
+          "alwaysOn": 10.8
+         },
+         "2025": {
+          "switched": 11.5,
+          "alwaysOn": 11.5
+         },
+         "2026": {
+          "switched": -1.9,
+          "alwaysOn": -3.2
+         }
+        }
+       }
+      },
+      "alwaysOn": {
+       "n": 219,
+       "R": 53.6,
+       "exp": 0.245,
+       "t": 2.12,
+       "maxDD": 13.6,
+       "win": 0.42,
+       "years": {
+        "pos": 7,
+        "flat": 0,
+        "neg": 4
+       }
+      }
+     },
+     "fullHistoryReference": {
+      "note": "in-sample contaminated (first half chose the cut)",
+      "on": {
+       "n": 283,
+       "R": 104.3,
+       "exp": 0.369,
+       "t": 3.51,
+       "maxDD": 11.1,
+       "win": 0.45
+      },
+      "off": {
+       "n": 145,
+       "R": -8.3,
+       "exp": -0.057,
+       "t": -0.5,
+       "maxDD": 15.5,
+       "win": 0.37
+      },
+      "welchT": 2.74,
+      "switchedYears": {
+       "pos": 15,
+       "flat": 1,
+       "neg": 5
+      },
+      "alwaysOnYears": {
+       "pos": 13,
+       "flat": 1,
+       "neg": 7
+      }
+     },
+     "robustness": {
+      "months": 106,
+      "monthsAllOff": 28,
+      "monthsMixed": 6,
+      "offSpells": 14,
+      "monthBlockP": 0.098
+     },
+     "byEraDescriptive": {
+      "2006-2017": {
+       "on": {
+        "n": 138,
+        "R": 50.4,
+        "exp": 0.365,
+        "t": 2.58,
+        "maxDD": 11.1,
+        "win": 0.46
+       },
+       "off": {
+        "n": 95,
+        "R": -8.4,
+        "exp": -0.088,
+        "t": -0.61,
+        "maxDD": 15.5,
+        "win": 0.35
+       },
+       "welchT": 2.24
+      },
+      "2018-2026": {
+       "on": {
+        "n": 145,
+        "R": 53.9,
+        "exp": 0.372,
+        "t": 2.4,
+        "maxDD": 9.1,
+        "win": 0.44
+       },
+       "off": {
+        "n": 50,
+        "R": 0.1,
+        "exp": 0.002,
+        "t": 0.01,
+        "maxDD": 6.4,
+        "win": 0.4
+       },
+       "welchT": 1.52
+      }
+     },
+     "tests": {
+      "S1": false,
+      "S2": true,
+      "S3": true,
+      "pass": false,
+      "survivesMultipleTesting": false
+     }
+    },
+    "META": {
+     "rule": {
+      "cut": 0,
+      "dir": ">=",
+      "fitted": false,
+      "note": "fixed a priori: ON unless the trailing 12-month sum is negative"
+     },
+     "firstHalf": {
+      "on": {
+       "n": 138,
+       "R": 30.6,
+       "exp": 0.222,
+       "t": 1.62,
+       "maxDD": 17.8,
+       "win": 0.43
+      },
+      "off": {
+       "n": 71,
+       "R": 11.8,
+       "exp": 0.167,
+       "t": 0.87,
+       "maxDD": 6.9,
+       "win": 0.39
+      },
+      "welchT": 0.23
+     },
+     "secondHalf": {
+      "on": {
+       "n": 180,
+       "R": 48.2,
+       "exp": 0.268,
+       "t": 2.09,
+       "maxDD": 9.1,
+       "win": 0.42
+      },
+      "off": {
+       "n": 39,
+       "R": 5.4,
+       "exp": 0.137,
+       "t": 0.51,
+       "maxDD": 9,
+       "win": 0.44
+      },
+      "welchT": 0.44,
+      "onShare": 0.82,
+      "x2": {
+       "on": {
+        "n": 180,
+        "R": 43.3,
+        "exp": 0.24,
+        "t": 1.88,
+        "maxDD": 9.6,
+        "win": 0.42
+       },
+       "off": {
+        "n": 39,
+        "R": 3,
+        "exp": 0.076,
+        "t": 0.28,
+        "maxDD": 10.2,
+        "win": 0.44
+       },
+       "welchT": 0.55
+      },
+      "switched": {
+       "n": 180,
+       "R": 48.2,
+       "exp": 0.268,
+       "t": 2.09,
+       "maxDD": 9.1,
+       "win": 0.42,
+       "years": {
+        "years": 11,
+        "switched": {
+         "pos": 7,
+         "flat": 1,
+         "neg": 3
+        },
+        "alwaysOn": {
+         "pos": 7,
+         "flat": 0,
+         "neg": 4
+        },
+        "byYear": {
+         "2016": {
+          "switched": 1.3,
+          "alwaysOn": 1.3
+         },
+         "2017": {
+          "switched": -0.6,
+          "alwaysOn": -1.8
+         },
+         "2018": {
+          "switched": 0,
+          "alwaysOn": -6
+         },
+         "2019": {
+          "switched": 2.7,
+          "alwaysOn": 9.8
+         },
+         "2020": {
+          "switched": 11.5,
+          "alwaysOn": 11.5
+         },
+         "2021": {
+          "switched": 12,
+          "alwaysOn": 12
+         },
+         "2022": {
+          "switched": -5.9,
+          "alwaysOn": -2.4
+         },
+         "2023": {
+          "switched": 9.7,
+          "alwaysOn": 9.9
+         },
+         "2024": {
+          "switched": 10.8,
+          "alwaysOn": 10.8
+         },
+         "2025": {
+          "switched": 11.5,
+          "alwaysOn": 11.5
+         },
+         "2026": {
+          "switched": -4.9,
+          "alwaysOn": -3.2
+         }
+        }
+       }
+      },
+      "alwaysOn": {
+       "n": 219,
+       "R": 53.6,
+       "exp": 0.245,
+       "t": 2.12,
+       "maxDD": 13.6,
+       "win": 0.42,
+       "years": {
+        "pos": 7,
+        "flat": 0,
+        "neg": 4
+       }
+      }
+     },
+     "fullHistoryReference": {
+      "note": "META is not fitted: the full history is out of sample for it",
+      "on": {
+       "n": 318,
+       "R": 78.8,
+       "exp": 0.248,
+       "t": 2.65,
+       "maxDD": 17.8,
+       "win": 0.42
+      },
+      "off": {
+       "n": 110,
+       "R": 17.2,
+       "exp": 0.156,
+       "t": 1,
+       "maxDD": 10.9,
+       "win": 0.41
+      },
+      "welchT": 0.5,
+      "switchedYears": {
+       "pos": 11,
+       "flat": 3,
+       "neg": 7
+      },
+      "alwaysOnYears": {
+       "pos": 13,
+       "flat": 1,
+       "neg": 7
+      }
+     },
+     "robustness": {
+      "months": 106,
+      "monthsAllOff": 19,
+      "monthsMixed": 1,
+      "offSpells": 4,
+      "monthBlockP": 0.267
+     },
+     "byEraDescriptive": {
+      "2006-2017": {
+       "on": {
+        "n": 161,
+        "R": 31.3,
+        "exp": 0.194,
+        "t": 1.57,
+        "maxDD": 17.8,
+        "win": 0.42
+       },
+       "off": {
+        "n": 72,
+        "R": 10.7,
+        "exp": 0.149,
+        "t": 0.78,
+        "maxDD": 6.9,
+        "win": 0.39
+       },
+       "welchT": 0.2
+      },
+      "2018-2026": {
+       "on": {
+        "n": 157,
+        "R": 47.5,
+        "exp": 0.303,
+        "t": 2.15,
+        "maxDD": 9.1,
+        "win": 0.43
+       },
+       "off": {
+        "n": 38,
+        "R": 6.5,
+        "exp": 0.17,
+        "t": 0.62,
+        "maxDD": 9,
+        "win": 0.45
+       },
+       "welchT": 0.43
+      }
+     },
+     "tests": {
+      "S1": false,
+      "S2": true,
+      "S3": true,
+      "pass": false,
+      "survivesMultipleTesting": false
+     }
+    }
+   },
+   "yearlyR": [
+    0.2,
+    9.2,
+    -5.1,
+    5.5,
+    23.2,
+    6.9,
+    5,
+    -4.9,
+    -3.1,
+    1.9,
+    10.4,
+    -1.8,
+    -6,
+    9.8,
+    11.5,
+    12,
+    -2.4,
+    9.9,
+    10.8,
+    11.5,
+    -3.2
+   ],
+   "yearlyLag1Corr": 0.04,
+   "now": {
+    "gc": {
+     "asOf": "2026-11-06",
+     "VOL": {
+      "value": 90.8,
+      "on": false
+     },
+     "TREND": {
+      "value": -0.76,
+      "on": false
+     },
+     "META": {
+      "value": -0.75,
+      "on": false
+     }
+    }
+   }
+  },
+  "replica": {
+   "name": "Gold replica",
+   "history": [
+    "2017-01-01",
+    "2026-11-07"
+   ],
+   "split": "2022-01-01",
+   "trendUsed": "|TS| (two-sided system)",
+   "trades": {
+    "declared": 341,
+    "study": 341,
+    "warmupExcluded": 0,
+    "firstHalf": 65,
+    "secondHalf": 276,
+    "studyFrom": "2018-02-08"
+   },
+   "alwaysOn": {
+    "firstHalf": {
+     "n": 65,
+     "R": 7,
+     "exp": 0.108,
+     "t": 0.21,
+     "maxDD": 16.3,
+     "win": 0.18
+    },
+    "secondHalf": {
+     "n": 276,
+     "R": 117.9,
+     "exp": 0.427,
+     "t": 2.3,
+     "maxDD": 27.6,
+     "win": 0.27
+    },
+    "secondHalfX2": {
+     "n": 276,
+     "R": 104.1,
+     "exp": 0.377,
+     "t": 2.04,
+     "maxDD": 33.5,
+     "win": 0.26
+    },
+    "full": {
+     "n": 341,
+     "R": 124.9,
+     "exp": 0.366,
+     "t": 2.05,
+     "maxDD": 36.7,
+     "win": 0.25
+    }
+   },
+   "indicators": {
+    "VOL": {
+     "rule": {
+      "cut": 89.9,
+      "dir": "<",
+      "pctOfFirstHalf": 0.7,
+      "fitted": true,
+      "firstHalfT": 1.9,
+      "candidates": [
+       {
+        "p": 0.2,
+        "cut": 77.795,
+        "dir": ">=",
+        "onShare": 0.8,
+        "t": 1.53,
+        "diff": 1.075
+       },
+       {
+        "p": 0.2,
+        "cut": 77.795,
+        "dir": "<",
+        "onShare": 0.2,
+        "t": -1.53,
+        "diff": -1.075
+       },
+       {
+        "p": 0.3,
+        "cut": 88.435,
+        "dir": ">=",
+        "onShare": 0.71,
+        "t": -0.77,
+        "diff": -1.196
+       },
+       {
+        "p": 0.3,
+        "cut": 88.435,
+        "dir": "<",
+        "onShare": 0.29,
+        "t": 0.77,
+        "diff": 1.196
+       },
+       {
+        "p": 0.4,
+        "cut": 88.666,
+        "dir": ">=",
+        "onShare": 0.6,
+        "t": -0.7,
+        "diff": -0.832
+       },
+       {
+        "p": 0.4,
+        "cut": 88.666,
+        "dir": "<",
+        "onShare": 0.4,
+        "t": 0.7,
+        "diff": 0.832
+       },
+       {
+        "p": 0.5,
+        "cut": 89.129,
+        "dir": ">=",
+        "onShare": 0.52,
+        "t": -0.39,
+        "diff": -0.413
+       },
+       {
+        "p": 0.5,
+        "cut": 89.129,
+        "dir": "<",
+        "onShare": 0.48,
+        "t": 0.39,
+        "diff": 0.413
+       },
+       {
+        "p": 0.6,
+        "cut": 89.591,
+        "dir": ">=",
+        "onShare": 0.46,
+        "t": -1.1,
+        "diff": -1.069
+       },
+       {
+        "p": 0.6,
+        "cut": 89.591,
+        "dir": "<",
+        "onShare": 0.54,
+        "t": 1.1,
+        "diff": 1.069
+       },
+       {
+        "p": 0.7,
+        "cut": 89.9,
+        "dir": ">=",
+        "onShare": 0.31,
+        "t": -1.9,
+        "diff": -1.458
+       },
+       {
+        "p": 0.7,
+        "cut": 89.9,
+        "dir": "<",
+        "onShare": 0.69,
+        "t": 1.9,
+        "diff": 1.458
+       },
+       {
+        "p": 0.8,
+        "cut": 90.131,
+        "dir": ">=",
+        "onShare": 0.26,
+        "t": -1.18,
+        "diff": -0.83
+       },
+       {
+        "p": 0.8,
+        "cut": 90.131,
+        "dir": "<",
+        "onShare": 0.74,
+        "t": 1.18,
+        "diff": 0.83
+       }
+      ]
+     },
+     "firstHalf": {
+      "on": {
+       "n": 47,
+       "R": 19.7,
+       "exp": 0.419,
+       "t": 0.6,
+       "maxDD": 16.3,
+       "win": 0.21
+      },
+      "off": {
+       "n": 18,
+       "R": -12.7,
+       "exp": -0.704,
+       "t": -2.76,
+       "maxDD": 13.1,
+       "win": 0.11
+      },
+      "welchT": 1.52
+     },
+     "secondHalf": {
+      "on": {
+       "n": 175,
+       "R": 60.3,
+       "exp": 0.345,
+       "t": 1.52,
+       "maxDD": 27.6,
+       "win": 0.27
+      },
+      "off": {
+       "n": 101,
+       "R": 57.6,
+       "exp": 0.57,
+       "t": 1.77,
+       "maxDD": 15.7,
+       "win": 0.27
+      },
+      "welchT": -0.57,
+      "onShare": 0.63,
+      "x2": {
+       "on": {
+        "n": 175,
+        "R": 48.2,
+        "exp": 0.275,
+        "t": 1.22,
+        "maxDD": 33.5,
+        "win": 0.26
+       },
+       "off": {
+        "n": 101,
+        "R": 55.9,
+        "exp": 0.553,
+        "t": 1.72,
+        "maxDD": 15.9,
+        "win": 0.27
+       },
+       "welchT": -0.71
+      },
+      "switched": {
+       "n": 175,
+       "R": 60.3,
+       "exp": 0.345,
+       "t": 1.52,
+       "maxDD": 27.6,
+       "win": 0.27,
+       "years": {
+        "years": 5,
+        "switched": {
+         "pos": 2,
+         "flat": 1,
+         "neg": 2
+        },
+        "alwaysOn": {
+         "pos": 3,
+         "flat": 0,
+         "neg": 2
+        },
+        "byYear": {
+         "2022": {
+          "switched": -13,
+          "alwaysOn": -13
+         },
+         "2023": {
+          "switched": -9.7,
+          "alwaysOn": -9.7
+         },
+         "2024": {
+          "switched": 48.2,
+          "alwaysOn": 48.2
+         },
+         "2025": {
+          "switched": 34.8,
+          "alwaysOn": 50.7
+         },
+         "2026": {
+          "switched": 0,
+          "alwaysOn": 41.7
+         }
+        }
+       }
+      },
+      "alwaysOn": {
+       "n": 276,
+       "R": 117.9,
+       "exp": 0.427,
+       "t": 2.3,
+       "maxDD": 27.6,
+       "win": 0.27,
+       "years": {
+        "pos": 3,
+        "flat": 0,
+        "neg": 2
+       }
+      }
+     },
+     "fullHistoryReference": {
+      "note": "in-sample contaminated (first half chose the cut)",
+      "on": {
+       "n": 222,
+       "R": 80,
+       "exp": 0.36,
+       "t": 1.57,
+       "maxDD": 29.7,
+       "win": 0.26
+      },
+      "off": {
+       "n": 119,
+       "R": 44.9,
+       "exp": 0.377,
+       "t": 1.35,
+       "maxDD": 16.5,
+       "win": 0.24
+      },
+      "welchT": -0.05,
+      "switchedYears": {
+       "pos": 3,
+       "flat": 3,
+       "neg": 4
+      },
+      "alwaysOnYears": {
+       "pos": 4,
+       "flat": 2,
+       "neg": 4
+      }
+     },
+     "robustness": {
+      "months": 21,
+      "monthsAllOff": 5,
+      "monthsMixed": 0,
+      "offSpells": 1,
+      "monthBlockP": 0.611
+     },
+     "byEraDescriptive": {
+      "2017-2022": {
+       "on": {
+        "n": 97,
+        "R": 6.7,
+        "exp": 0.069,
+        "t": 0.19,
+        "maxDD": 22.3,
+        "win": 0.19
+       },
+       "off": {
+        "n": 18,
+        "R": -12.7,
+        "exp": -0.704,
+        "t": -2.76,
+        "maxDD": 13.1,
+        "win": 0.11
+       },
+       "welchT": 1.76
+      },
+      "2023-2026": {
+       "on": {
+        "n": 125,
+        "R": 73.3,
+        "exp": 0.586,
+        "t": 1.95,
+        "maxDD": 20,
+        "win": 0.31
+       },
+       "off": {
+        "n": 101,
+        "R": 57.6,
+        "exp": 0.57,
+        "t": 1.77,
+        "maxDD": 15.7,
+        "win": 0.27
+       },
+       "welchT": 0.04
+      }
+     },
+     "tests": {
+      "S1": false,
+      "S2": false,
+      "S3": false,
+      "pass": false,
+      "survivesMultipleTesting": false
+     }
+    },
+    "TREND": {
+     "rule": {
+      "cut": 0.963,
+      "dir": ">=",
+      "pctOfFirstHalf": 0.3,
+      "fitted": true,
+      "firstHalfT": 1.97,
+      "candidates": [
+       {
+        "p": 0.2,
+        "cut": 0.92,
+        "dir": ">=",
+        "onShare": 0.82,
+        "t": 1.37,
+        "diff": 0.962
+       },
+       {
+        "p": 0.2,
+        "cut": 0.92,
+        "dir": "<",
+        "onShare": 0.18,
+        "t": -1.37,
+        "diff": -0.962
+       },
+       {
+        "p": 0.3,
+        "cut": 0.963,
+        "dir": ">=",
+        "onShare": 0.71,
+        "t": 1.97,
+        "diff": 1.519
+       },
+       {
+        "p": 0.3,
+        "cut": 0.963,
+        "dir": "<",
+        "onShare": 0.29,
+        "t": -1.97,
+        "diff": -1.519
+       },
+       {
+        "p": 0.4,
+        "cut": 1.011,
+        "dir": ">=",
+        "onShare": 0.6,
+        "t": 0.04,
+        "diff": 0.043
+       },
+       {
+        "p": 0.4,
+        "cut": 1.011,
+        "dir": "<",
+        "onShare": 0.4,
+        "t": -0.04,
+        "diff": -0.043
+       },
+       {
+        "p": 0.5,
+        "cut": 1.028,
+        "dir": ">=",
+        "onShare": 0.52,
+        "t": 0.27,
+        "diff": 0.271
+       },
+       {
+        "p": 0.5,
+        "cut": 1.028,
+        "dir": "<",
+        "onShare": 0.48,
+        "t": -0.27,
+        "diff": -0.271
+       },
+       {
+        "p": 0.6,
+        "cut": 1.174,
+        "dir": ">=",
+        "onShare": 0.42,
+        "t": 0.7,
+        "diff": 0.806
+       },
+       {
+        "p": 0.6,
+        "cut": 1.174,
+        "dir": "<",
+        "onShare": 0.58,
+        "t": -0.7,
+        "diff": -0.806
+       },
+       {
+        "p": 0.7,
+        "cut": 1.233,
+        "dir": ">=",
+        "onShare": 0.32,
+        "t": -1.32,
+        "diff": -1.02
+       },
+       {
+        "p": 0.7,
+        "cut": 1.233,
+        "dir": "<",
+        "onShare": 0.68,
+        "t": 1.32,
+        "diff": 1.02
+       },
+       {
+        "p": 0.8,
+        "cut": 1.254,
+        "dir": ">=",
+        "onShare": 0.22,
+        "t": -1.8,
+        "diff": -1.227
+       },
+       {
+        "p": 0.8,
+        "cut": 1.254,
+        "dir": "<",
+        "onShare": 0.78,
+        "t": 1.8,
+        "diff": 1.227
+       }
+      ]
+     },
+     "firstHalf": {
+      "on": {
+       "n": 45,
+       "R": 25.9,
+       "exp": 0.576,
+       "t": 0.81,
+       "maxDD": 12.1,
+       "win": 0.22
+      },
+      "off": {
+       "n": 20,
+       "R": -18.9,
+       "exp": -0.946,
+       "t": -3.04,
+       "maxDD": 19.1,
+       "win": 0.1
+      },
+      "welchT": 1.96
+     },
+     "secondHalf": {
+      "on": {
+       "n": 208,
+       "R": 127.2,
+       "exp": 0.611,
+       "t": 2.67,
+       "maxDD": 20,
+       "win": 0.3
+      },
+      "off": {
+       "n": 68,
+       "R": -9.3,
+       "exp": -0.136,
+       "t": -0.51,
+       "maxDD": 16.1,
+       "win": 0.18
+      },
+      "welchT": 2.12,
+      "onShare": 0.75,
+      "x2": {
+       "on": {
+        "n": 208,
+        "R": 116.4,
+        "exp": 0.56,
+        "t": 2.45,
+        "maxDD": 20.9,
+        "win": 0.29
+       },
+       "off": {
+        "n": 68,
+        "R": -12.3,
+        "exp": -0.181,
+        "t": -0.68,
+        "maxDD": 18.7,
+        "win": 0.18
+       },
+       "welchT": 2.11
+      },
+      "switched": {
+       "n": 208,
+       "R": 127.2,
+       "exp": 0.611,
+       "t": 2.67,
+       "maxDD": 20,
+       "win": 0.3,
+       "years": {
+        "years": 5,
+        "switched": {
+         "pos": 3,
+         "flat": 0,
+         "neg": 2
+        },
+        "alwaysOn": {
+         "pos": 3,
+         "flat": 0,
+         "neg": 2
+        },
+        "byYear": {
+         "2022": {
+          "switched": -5.1,
+          "alwaysOn": -13
+         },
+         "2023": {
+          "switched": -10.7,
+          "alwaysOn": -9.7
+         },
+         "2024": {
+          "switched": 48.2,
+          "alwaysOn": 48.2
+         },
+         "2025": {
+          "switched": 50.7,
+          "alwaysOn": 50.7
+         },
+         "2026": {
+          "switched": 44.1,
+          "alwaysOn": 41.7
+         }
+        }
+       }
+      },
+      "alwaysOn": {
+       "n": 276,
+       "R": 117.9,
+       "exp": 0.427,
+       "t": 2.3,
+       "maxDD": 27.6,
+       "win": 0.27,
+       "years": {
+        "pos": 3,
+        "flat": 0,
+        "neg": 2
+       }
+      }
+     },
+     "fullHistoryReference": {
+      "note": "in-sample contaminated (first half chose the cut)",
+      "on": {
+       "n": 253,
+       "R": 153.1,
+       "exp": 0.605,
+       "t": 2.68,
+       "maxDD": 28.3,
+       "win": 0.28
+      },
+      "off": {
+       "n": 88,
+       "R": -28.2,
+       "exp": -0.32,
+       "t": -1.45,
+       "maxDD": 31.1,
+       "win": 0.16
+      },
+      "welchT": 2.93,
+      "switchedYears": {
+       "pos": 4,
+       "flat": 3,
+       "neg": 3
+      },
+      "alwaysOnYears": {
+       "pos": 4,
+       "flat": 2,
+       "neg": 4
+      }
+     },
+     "robustness": {
+      "months": 21,
+      "monthsAllOff": 3,
+      "monthsMixed": 2,
+      "offSpells": 4,
+      "monthBlockP": 0.078
+     },
+     "byEraDescriptive": {
+      "2017-2022": {
+       "on": {
+        "n": 65,
+        "R": 20.8,
+        "exp": 0.321,
+        "t": 0.64,
+        "maxDD": 18.4,
+        "win": 0.2
+       },
+       "off": {
+        "n": 50,
+        "R": -26.8,
+        "exp": -0.536,
+        "t": -2.25,
+        "maxDD": 30.1,
+        "win": 0.14
+       },
+       "welchT": 1.54
+      },
+      "2023-2026": {
+       "on": {
+        "n": 188,
+        "R": 132.2,
+        "exp": 0.703,
+        "t": 2.81,
+        "maxDD": 20,
+        "win": 0.31
+       },
+       "off": {
+        "n": 38,
+        "R": -1.4,
+        "exp": -0.037,
+        "t": -0.09,
+        "maxDD": 15.7,
+        "win": 0.18
+       },
+       "welchT": 1.56
+      }
+     },
+     "tests": {
+      "S1": true,
+      "S2": true,
+      "S3": true,
+      "pass": true,
+      "survivesMultipleTesting": false
+     }
+    },
+    "META": {
+     "rule": {
+      "cut": 0,
+      "dir": ">=",
+      "fitted": false,
+      "note": "fixed a priori: ON unless the trailing 12-month sum is negative"
+     },
+     "firstHalf": {
+      "on": {
+       "n": 47,
+       "R": -8.8,
+       "exp": -0.187,
+       "t": -0.51,
+       "maxDD": 13.4,
+       "win": 0.19
+      },
+      "off": {
+       "n": 18,
+       "R": 15.8,
+       "exp": 0.878,
+       "t": 0.55,
+       "maxDD": 13.4,
+       "win": 0.17
+      },
+      "welchT": -0.65
+     },
+     "secondHalf": {
+      "on": {
+       "n": 199,
+       "R": 137.3,
+       "exp": 0.69,
+       "t": 2.83,
+       "maxDD": 20,
+       "win": 0.31
+      },
+      "off": {
+       "n": 77,
+       "R": -19.4,
+       "exp": -0.252,
+       "t": -1.28,
+       "maxDD": 22.5,
+       "win": 0.17
+      },
+      "welchT": 3.01,
+      "onShare": 0.72,
+      "x2": {
+       "on": {
+        "n": 199,
+        "R": 129,
+        "exp": 0.648,
+        "t": 2.67,
+        "maxDD": 20.9,
+        "win": 0.3
+       },
+       "off": {
+        "n": 77,
+        "R": -24.9,
+        "exp": -0.323,
+        "t": -1.65,
+        "maxDD": 27.3,
+        "win": 0.17
+       },
+       "welchT": 3.11
+      },
+      "switched": {
+       "n": 199,
+       "R": 137.3,
+       "exp": 0.69,
+       "t": 2.83,
+       "maxDD": 20,
+       "win": 0.31,
+       "years": {
+        "years": 5,
+        "switched": {
+         "pos": 3,
+         "flat": 1,
+         "neg": 1
+        },
+        "alwaysOn": {
+         "pos": 3,
+         "flat": 0,
+         "neg": 2
+        },
+        "byYear": {
+         "2022": {
+          "switched": -3.3,
+          "alwaysOn": -13
+         },
+         "2023": {
+          "switched": 0,
+          "alwaysOn": -9.7
+         },
+         "2024": {
+          "switched": 48.2,
+          "alwaysOn": 48.2
+         },
+         "2025": {
+          "switched": 50.7,
+          "alwaysOn": 50.7
+         },
+         "2026": {
+          "switched": 41.7,
+          "alwaysOn": 41.7
+         }
+        }
+       }
+      },
+      "alwaysOn": {
+       "n": 276,
+       "R": 117.9,
+       "exp": 0.427,
+       "t": 2.3,
+       "maxDD": 27.6,
+       "win": 0.27,
+       "years": {
+        "pos": 3,
+        "flat": 0,
+        "neg": 2
+       }
+      }
+     },
+     "fullHistoryReference": {
+      "note": "META is not fitted: the full history is out of sample for it",
+      "on": {
+       "n": 246,
+       "R": 128.5,
+       "exp": 0.522,
+       "t": 2.49,
+       "maxDD": 20,
+       "win": 0.28
+      },
+      "off": {
+       "n": 95,
+       "R": -3.6,
+       "exp": -0.038,
+       "t": -0.11,
+       "maxDD": 22.5,
+       "win": 0.17
+      },
+      "welchT": 1.41,
+      "switchedYears": {
+       "pos": 3,
+       "flat": 3,
+       "neg": 4
+      },
+      "alwaysOnYears": {
+       "pos": 4,
+       "flat": 2,
+       "neg": 4
+      }
+     },
+     "robustness": {
+      "months": 21,
+      "monthsAllOff": 4,
+      "monthsMixed": 2,
+      "offSpells": 3,
+      "monthBlockP": 0.003
+     },
+     "byEraDescriptive": {
+      "2017-2022": {
+       "on": {
+        "n": 56,
+        "R": -12.1,
+        "exp": -0.216,
+        "t": -0.68,
+        "maxDD": 16.3,
+        "win": 0.2
+       },
+       "off": {
+        "n": 59,
+        "R": 6.1,
+        "exp": 0.104,
+        "t": 0.2,
+        "maxDD": 15.1,
+        "win": 0.15
+       },
+       "welchT": -0.53
+      },
+      "2023-2026": {
+       "on": {
+        "n": 190,
+        "R": 140.6,
+        "exp": 0.74,
+        "t": 2.92,
+        "maxDD": 20,
+        "win": 0.31
+       },
+       "off": {
+        "n": 36,
+        "R": -9.7,
+        "exp": -0.27,
+        "t": -0.87,
+        "maxDD": 11.8,
+        "win": 0.19
+       },
+       "welchT": 2.53
+      }
+     },
+     "tests": {
+      "S1": true,
+      "S2": true,
+      "S3": true,
+      "pass": true,
+      "survivesMultipleTesting": true
+     }
+    }
+   },
+   "yearlyR": [
+    0,
+    -8.1,
+    -1.7,
+    16.8,
+    0,
+    -13,
+    -9.7,
+    48.2,
+    50.7,
+    41.7
+   ],
+   "yearlyLag1Corr": 0.6,
+   "now": {
+    "gc": {
+     "asOf": "2026-11-06",
+     "VOL": {
+      "value": 100,
+      "on": false
+     },
+     "TREND": {
+      "value": 0.76,
+      "on": false
+     },
+     "META": {
+      "value": 44.78,
+      "on": true
+     }
+    }
+   }
+  }
+ },
+ "verdict": {
+  "answer": "yes",
+  "nominalPasses": [
+   "nqopen/TREND",
+   "nqopen/META",
+   "replica/TREND",
+   "replica/META"
+  ],
+  "survivors": [
+   "nqopen/META",
+   "replica/META"
+  ],
+  "systemsWithUsableSwitch": [
+   "nqopen",
+   "replica"
+  ]
+ }
+}
