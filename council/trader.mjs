@@ -8,7 +8,7 @@ import { msAnalyze, CFG, PAIRS, RETR, LBL, buildSetup, buildRetrace, setMarket }
 import { entryContext, startReview, watchReview, judge, newsNear, lessons } from './review.mjs';
 import { m15cFeat } from './choch.mjs';
 import { alertable, alertEvents, sendAlerts, when, NTFY_DEFAULT, proposalDigest } from './alerts.mjs';
-import { liveRuleSection, injectSection, coachChurnSection, CHURN_START, CHURN_END, deskSection, DESK_START, DESK_END, analystReviews, analystSections } from './analyst.mjs';
+import { liveRuleSection, injectSection, coachChurnSection, CHURN_START, CHURN_END, deskSection, DESK_START, DESK_END, analystReviews, analystSections, fidelitySection, FID_START, FID_END } from './analyst.mjs';
 import { coachProposals, spotProposals, ictVariantVerdicts, coachCarry } from './proposals.mjs';
 import { shrink, ebTau, shrunkClear, ruleState, sameRule, setRule, descRule, judgeTrial, ledgerStart, syncLedger, ledgerSection, LEDGER_START, LEDGER_END } from './coach.mjs';
 import { cleanBars, LTF_CLEAN } from './clean.mjs';
@@ -2036,7 +2036,7 @@ wr('snapshot.json', snapshot);
 // Analyst report (reporting only): refresh the "Live Scalp rule check" block in analysis/latest.md, if the report is here
 try { const fA = path.join(DIR, 'analysis', 'latest.md');
   if (fs.existsSync(fA)) { const md = fs.readFileSync(fA, 'utf8'), nx = injectSection(injectSection(md, liveRuleSection({ snapshot, config, backtest: rd('backtest.json', null), now })), coachChurnSection({ config, now }), CHURN_START, CHURN_END);
-    const nx1 = injectSection(nx, deskSection({ ict: rd('ict/trades.json', []), shadow: rd('ict/shadow.json', null), mirror: rd('ctrader/mirror.json', null), now }), DESK_START, DESK_END);
+    const nx1 = injectSection(injectSection(nx, fidelitySection({ fid: rd('research/fidelity.json', null), now }), FID_START, FID_END), deskSection({ ict: rd('ict/trades.json', []), shadow: rd('ict/shadow.json', null), mirror: rd('ctrader/mirror.json', null), now }), DESK_START, DESK_END);
     const nx2 = injectSection(nx1, ledgerSection({ ledger: rd('coach.json', {}).ledger || [], trials: config.coachTrials || {}, now }), LEDGER_START, LEDGER_END);
     if (nx2 !== md) fs.writeFileSync(fA, nx2); } } catch (e) { console.log('analyst section:', e.message); }
 // Analyst post-mortems of live losses + the daily "What changed" block (reporting and review tags only)

@@ -126,6 +126,30 @@ export function deskSection({ ict = [], shadow = null, mirror = null, now = Math
   return out.join('\n');
 }
 
+// ---- Replay fidelity (Analyst, 7 Nov) ------------------------------------------------------------------------------------
+// research/fidelity.json (council/fidelity.mjs, written after each replay) was read by nobody. The Analyst reports it: how often
+// the replay finds the live signals, on the same price feed and overall (with the main reasons for misses), whether the results
+// agree, which feed each market's replay used, and gaps in the live loop. Reporting only.
+export const FID_START = '<!-- fidelity:start -->', FID_END = '<!-- fidelity:end -->';
+const pct = (x) => (Number.isFinite(+x) ? `${Math.round(100 * x)}%` : 'n/a');
+export function fidelitySection({ fid = null, now = Math.floor(Date.now() / 1000) }) {
+  const out = [FID_START, '## Replay fidelity'];
+  if (!fid || !fid.counts) { out.push('', 'No fidelity check yet (research/fidelity.json is written after each nightly replay).', FID_END); return out.join('\n'); }
+  const w = fid.window || {}, c = fid.counts, m = fid.matchRate || {}, sf = fid.sameFeed || {}, o = (fid.agreement || {}).outcome || {};
+  const age = fid.at ? Math.round((now - Date.parse(fid.at) / 1000) / 3600) : null;
+  out.push('', `Checked ${String(fid.at || '').slice(0, 16).replace('T', ' ')} UTC${age != null && age >= 30 ? ` (**${age} h old**: the replay has not refreshed it)` : ''}; live signals ${String(w.from || '').slice(0, 10)} to ${String(w.to || '').slice(0, 10)}.`, '');
+  if (sf.live) out.push(`- **Same price feed** (the fair test): the replay found ${pct(sf.liveInReplay)} of ${sf.live} live signals; on ${sf.bothClosed || 0} closed pairs the result had the same sign ${pct(sf.signRate)} of the time (live ${sgn(sf.meanLiveR)}R vs replay ${sgn(sf.meanReplayR)}R a trade before costs).`);
+  out.push(`- **All markets:** ${pct((m.comparable || {}).liveInReplay ?? m.liveInReplay)} of comparable live signals found (${c.matched} matched of ${c.comparableLive ?? c.live}); outcome sign agrees ${pct(o.signRate)} on ${o.bothClosed || 0} closed pairs.`);
+  const rs = ((fid.unmatchedLive || {}).reasons || []).slice(0, 3);
+  if (rs.length) out.push(`- **Why live signals were missed:** ${rs.map((r) => `${r.cls} ${r.n}`).join(', ')} (of ${(fid.unmatchedLive || {}).n}).`);
+  const feeds = Object.entries(fid.perMarket || {}).map(([k, v]) => `${k} ${v.replayFeed || '?'}${v.liveFeeds ? ` / live ${Object.keys(v.liveFeeds).join('+')}` : ''}`);
+  if (feeds.length) out.push(`- **Feeds (replay / live):** ${feeds.join(' · ')}.`);
+  const gaps = (fid.liveRunGaps || []).filter((g) => Date.parse(g.to) / 1000 >= now - 2 * 86400);
+  out.push(gaps.length ? `- **Live loop gaps (48 h):** ${gaps.map((g) => `${String(g.from).slice(5, 16).replace('T', ' ')} for ${g.hours} h`).join(', ')}: no live signals were possible then.` : '- **Live loop gaps (48 h):** none.');
+  out.push(FID_END);
+  return out.join('\n');
+}
+
 // ---- Loss post-mortems (Analyst, 7 Nov) -------------------------------------------------------------------------------
 // Every closed losing LIVE paper trade gets a short post-mortem built only from recorded facts: what price did after the
 // entry (MFE / MAE in R, time to the stop), what it did after the stop (did it come back to the target: stop too tight?),
