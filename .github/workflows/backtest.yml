@@ -60,10 +60,15 @@ jobs:
           DUKA_CACHE: .duka-cache
         run: node council/backtest.mjs data "${{ github.event.inputs.days || '30' }}"
 
+      # Replay fidelity: the replay's signals and outcomes against the live Trader's on the same days (no network)
+      - name: Replay fidelity
+        run: node council/fidelity.mjs data || true
+
       - name: Save results
         run: |
           git -C data config user.name "mosha-council"
           git -C data config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git -C data add backtest.json
+          git -C data add research/fidelity.json || true
           git -C data commit -q -m "Council backtest $(date -u +%Y-%m-%dT%H:%MZ)" || exit 0
           for j in 1 2 3 4 5; do git -C data pull -q --rebase origin council-data && git -C data push -q origin HEAD:council-data && break; sleep 7; done
