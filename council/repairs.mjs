@@ -46,3 +46,30 @@ export function historyCatchUp(config, nowISO) {
   }
   return n;
 }
+
+// 4-6 Nov: the gold M30 → M1 setup (m30m1) fires on the same M1 entry as the Scalp, so the same trade was recorded twice (once as
+// scalp, once as m30m1). The Trader has dropped the m30m1 copy since 6 Nov 18:03 UTC (#259: same market, side, minute and
+// entry), but the 29 copies recorded before that stayed in trades.json and counted in every shadow stat (the shadow book,
+// the m30m1 Coach rules, the scoreboard): 26 of the 28 m30m1 trades closed in the week of 2-8 Nov were Scalp copies
+// (research/edge/shadow-audit). The copies are kept for the record with status 'duplicate' (no tally counts that status),
+// `dupOf` naming the trade they copy and `void`; their R is left as it was. The Scalp record is untouched.
+export const M30_DEDUPE_AT = Date.parse('2026-11-06T18:03:24Z') / 1000;
+export const m30Twin = (x, trades) => (x && x.k === 'm30m1' && trades.find((y) => y !== x && y.market === x.market && y.k !== 'm30m1' && y.side === x.side && y.opened === x.opened && y.entry === x.entry)) || null;
+
+export function voidM30Twins(trades, config, nowISO) {
+  const key = 'void-m30m1-twins-2026-11-06';
+  config.repairs = config.repairs || []; config.history = config.history || [];
+  if (config.repairs.includes(key)) return 0;
+  let n = 0, R = 0;
+  for (const x of trades) {
+    if (x.k !== 'm30m1' || !(x.opened < M30_DEDUPE_AT) || x.dupOf) continue;
+    const tw = m30Twin(x, trades); if (!tw) continue;
+    x.dupOf = tw.id; x.void = true; x.voidWhy = `m30m1 copy of the Scalp ${tw.id} (same market, side, minute and entry), recorded before the 6 Nov dedupe`;
+    if (['win', 'loss', 'be'].includes(x.status)) R += +x.R || 0;
+    x.status = 'duplicate'; n++;
+  }
+  config.repairs.push(key);
+  config.history.push({ at: nowISO, by: 'repair', change: `Shadow: ${n} m30m1 trades of 4-6 Nov marked duplicate (copies of a Scalp entry, ${R >= 0 ? '+' : '−'}${Math.abs(R).toFixed(2)}R gross); no stat counts them`,
+    why: 'm30m1 fires on the same M1 entry as the Scalp. The Trader drops the copy since 6 Nov 18:03 UTC (#259); the copies recorded before that still counted the same trade twice in the shadow book and in the m30m1 rules.' });
+  return n;
+}
