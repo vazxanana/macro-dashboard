@@ -518,10 +518,11 @@ Trader reads candles from a local proxy (api/bars.js behind node:http, `serveHan
 code 3 = new council code on main: the wrapper pulls and restarts. Tests: `tests/live.test.mjs`.
 
 ## Council quick pass (8 Nov 2026)
-council.yml: halfway through the 4-minute wait between rounds (k = 2) the Trader runs again and the mirror copies what it recorded
-("Council quick pass" commit on council-data), so a setup reaches cTrader within about two minutes; the heavy members (Analyst,
+council.yml: every minute of the 4-minute wait between rounds the Trader runs again and the mirror copies what it recorded
+("Council quick pass" commit on council-data), so a setup reaches cTrader within about a minute (owner, 8 Nov: 2 minutes, then
+every minute; a VPS live runner is the next step); the heavy members (Analyst,
 Coach, Macro, veteran, data check, digest, ledger) keep the 5-minute round. Owner: "ok build it, start at 2 minutes". If the
-data-health monitor shows the OANDA proxy or Kraken throttling, drop the pass (delete the `k -eq 2` block) before shortening anything else.
+data-health monitor shows the OANDA proxy or Kraken throttling, drop the pass (delete the quick-pass block) before shortening anything else.
 
 ## cTrader demo mirror: same-time copies (8 Nov 2026)
 `council/ctrader-mirror.mjs` runs straight after the Trader and the ICT desk in each council round (council.yml). A council trade
