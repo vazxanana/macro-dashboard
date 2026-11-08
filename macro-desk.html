@@ -97,8 +97,22 @@
 
 
   /* ─── Macro desk (8 Nov 2026, owner: "a macro area where i can see both reports ... key insights and near to insider information") ─── */
-  .head { padding: 36px 0 20px; }
-  .head p.lede { max-width: 70ch; }
+  .wrap { max-width: 1760px; }
+  main.wrap { padding-top: 14px; }
+  .head { display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px 18px; padding: 10px 0 12px; }
+  .head h1 { font-size: 20px; margin: 0; } .head p.lede { font-size: 12.5px; margin: 0; max-width: none; color: var(--ink-faint); }
+  .top3 { display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(0, 1.25fr) minmax(0, .9fr); gap: 12px; }
+  @media (max-width: 1100px) { .top3 { grid-template-columns: 1fr 1fr; } .top3 > :last-child { grid-column: 1 / -1; } }
+  @media (max-width: 720px) { .top3 { grid-template-columns: 1fr; } }
+  .tabs { display: flex; flex-wrap: wrap; gap: 6px; margin: 14px 0 0; }
+  .tabs button { min-height: 32px; padding: 5px 12px; border-radius: 999px; border: 1px solid var(--line); background: var(--neutral-soft); color: var(--ink-dim); font: 500 12.5px var(--sans); cursor: pointer; }
+  .tabs button[aria-selected="true"] { border-color: var(--accent); color: var(--ink); background: var(--accent-soft); }
+  .tabp[hidden] { display: none; }
+  .card { padding: 14px 16px; } .card h2 { font-size: 15px; } .card h3 { margin: 12px 0 4px; font-size: 12px; } .card p { font-size: 12.5px; margin: 4px 0; line-height: 1.45; }
+  .big { font-size: 20px; } .ch { font-size: 12px; } .ch th, .ch td { padding: 5px 6px 5px 0; } .ch .cannot { display: none; } .card.limits .ch .cannot { display: block; }
+  .insights { font-size: 12.5px; line-height: 1.5; } .debate li { font-size: 12.5px; padding-top: 9px; } .strip { margin-bottom: 12px; } .pill { padding: 4px 10px; font-size: 12px; }
+  section.block { margin-top: 12px; } .mk { font-size: 12.5px; } .bar { margin-top: 4px; height: 5px; }
+  .lim { font: 500 11.5px var(--sans); color: var(--accent); background: none; border: 0; padding: 0; cursor: pointer; margin-left: 8px; }
   .strip { display: flex; flex-wrap: wrap; gap: 8px 10px; align-items: center; margin: 0 0 22px; }
   .pill { display: inline-flex; align-items: center; gap: 6px; padding: 5px 11px; border-radius: 999px; border: 1px solid var(--line); background: var(--neutral-soft); font-size: 12.5px; color: var(--ink-dim); }
   .pill b { color: var(--ink); font-weight: 600; } .pill.buy b { color: var(--buy); } .pill.warn { border-color: color-mix(in srgb, var(--sell) 45%, var(--line)); }
@@ -118,8 +132,8 @@
   .ch .cannot { color: var(--ink-faint); font-size: 12px; } .stale { color: var(--sell); font-size: 11px; margin-left: 6px; }
   .spark { display: inline-flex; gap: 3px; align-items: flex-end; height: 26px; vertical-align: middle; margin-left: 8px; } .spark i { display: block; width: 7px; border-radius: 2px; background: var(--ink-faint); min-height: 2px; } .spark i.p { background: var(--buy); } .spark i.n { background: var(--sell); }
   .debate { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; }
-  .debate li { display: grid; grid-template-columns: 84px minmax(0, 1fr); gap: 12px; padding: 12px 0 0; border-top: 1px solid var(--line-soft); font-size: 13px; }
-  .st { justify-self: start; padding: 2px 9px; border-radius: 999px; border: 1px solid var(--line); font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: .02em; color: var(--ink-dim); margin-top: 2px; }
+  .debate li { display: grid; grid-template-columns: 84px minmax(0, 1fr); gap: 12px; padding: 12px 0 0; border-top: 1px solid var(--line-soft); font-size: 13px; align-items: start; }
+  .st { justify-self: start; align-self: start; line-height: 1.4; padding: 2px 9px; border-radius: 999px; border: 1px solid var(--line); font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: .02em; color: var(--ink-dim); margin-top: 2px; }
   .st.agree { color: var(--buy); border-color: color-mix(in srgb, var(--buy) 50%, var(--line)); } .st.disagree { color: var(--sell); border-color: color-mix(in srgb, var(--sell) 50%, var(--line)); }
   .side { margin-top: 3px; color: var(--ink-dim); } .side small { display: inline-block; min-width: 72px; color: var(--ink-faint); font-size: 11px; text-transform: uppercase; letter-spacing: .02em; } .why { margin-top: 4px; color: var(--ink-faint); font-style: italic; font-size: 12.5px; }
   .insights { margin: 0; padding: 0 0 0 18px; color: var(--ink-dim); font-size: 13.5px; line-height: 1.6; } .insights li { margin: 4px 0; } .insights b { color: var(--ink); font-weight: 600; }
@@ -147,23 +161,26 @@
 </header>
 <main class="wrap">
   <div class="head">
-    <div>
-      <h1>Macro desk: strategist and veteran</h1>
-      <p class="lede">Two macro members, one page. The <b>Macro strategist</b> fetches the data and runs the tested Gold Macro Score; the <b>Macro veteran</b> reads the same data with the professionals' frameworks and argues each topic. Below them: the key insights of the day, and the public data the market's insiders actually read, with its lags and limits. Paper only; nothing here trades on its own.</p>
-    </div>
+    <h1>Macro desk</h1>
+    <p class="lede">The <b>strategist</b> fetches the data and runs the tested Gold Macro Score; the <b>veteran</b> reads the same data with the professionals' frameworks and argues each topic. Paper only.</p>
   </div>
   <div class="strip" id="strip" aria-label="Consensus"></div>
 
-  <div class="grid2">
+  <div class="top3">
     <article class="card" id="c-strat"><h2>Macro strategist <small id="strat-at"></small></h2><div id="strat"></div></article>
     <article class="card" id="c-vet"><h2>Macro veteran <small id="vet-at"></small></h2><div id="vet"></div></article>
+    <article class="card"><h2>Key insights today</h2><ul class="insights" id="insights"></ul></article>
   </div>
 
-  <section class="block card"><h2>The discussion <small id="deb-sum"></small></h2><ul class="debate" id="debate"></ul><p class="note" id="deb-foot"></p></section>
+  <div class="tabs" role="tablist" aria-label="Sections">
+    <button type="button" role="tab" data-t="debate" aria-selected="true">The discussion <span id="deb-n"></span></button>
+    <button type="button" role="tab" data-t="source">Close to the source</button>
+    <button type="button" role="tab" data-t="ledger">Ledger and scoreboard</button>
+  </div>
 
-  <section class="block card"><h2>Key insights today</h2><ul class="insights" id="insights"></ul></section>
+  <section class="block card tabp" id="tab-debate" role="tabpanel"><h2>The discussion <small id="deb-sum"></small></h2><ul class="debate" id="debate"></ul><p class="note" id="deb-foot"></p></section>
 
-  <section class="block card">
+  <section class="block card tabp" id="tab-source" role="tabpanel" hidden>
     <h2>Close to the source <small>positioning, flows, officials, funding</small></h2>
     <p>There is no insider information here, and none anywhere that is legal to trade on. What the professionals have is earlier and more careful reading of public data that most traders never open. These are those feeds, as the council sees them and as the veteran's source registry lists them.</p>
     <div class="grid2" style="margin-top:12px">
@@ -176,7 +193,7 @@
     <div class="src" id="src"></div>
   </section>
 
-  <section class="block card"><h2>Forecast ledger and scoreboard <small>who is right, kept honest</small></h2><div id="ledger"></div></section>
+  <section class="block card tabp" id="tab-ledger" role="tabpanel" hidden><h2>Forecast ledger and scoreboard <small>who is right, kept honest</small></h2><div id="ledger"></div></section>
   <p class="note" id="foot"></p>
 </main>
 <script>
@@ -237,14 +254,15 @@
     $('vet-at').textContent = 'built ' + ago(v.at);
     var vd = v.verdict, h = '<p><span class="big ' + (vd.bias === 'BUY' ? 'buy' : '') + '">' + esc(vd.bias) + (vd.conviction ? ' ' + esc(vd.conviction) : '') + '</span></p><p>' + esc(vd.note) + '</p>';
     h += '<h3>Shock fingerprint</h3><p><b>' + esc(v.shock.shock) + '</b> (' + esc(v.shock.confidence) + ' confidence) · ' + esc(v.shock.clues.join(' · ')) + '</p><p>' + esc(v.shock.goldTest) + '</p><p><span style="color:var(--ink-faint)">Strongest competing explanation:</span> ' + esc(v.shock.competing) + '</p>';
-    h += '<h3>Gold driver channels</h3><table class="ch"><tr><th>Channel</th><th>Observation</th><th>Lean</th></tr>' + v.channels.map(function (c) { return '<tr><td>' + esc(c.name) + (c.stale ? '<span class="stale">stale</span>' : '') + '</td><td>' + esc(c.obs) + (c.asOf ? ' <span style="color:var(--ink-faint)">(' + esc(c.asOf) + ')</span>' : '') + '<div class="cannot">' + esc(c.cannot) + '</div></td><td class="lean ' + (c.lean > 0 ? 'up' : c.lean < 0 ? 'dn' : 'z') + '">' + (c.lean == null ? 'n/a' : c.lean > 0 ? '+1' : c.lean < 0 ? '−1' : '0') + '</td></tr>'; }).join('') + '</table>';
+    h += '<h3>Gold driver channels <button type="button" class="lim" id="lim-btn" aria-pressed="false">show what each cannot tell you</button></h3><table class="ch"><tr><th>Channel</th><th>Observation</th><th>Lean</th></tr>' + v.channels.map(function (c) { return '<tr><td>' + esc(c.name) + (c.stale ? '<span class="stale">stale</span>' : '') + '</td><td>' + esc(c.obs) + (c.asOf ? ' <span style="color:var(--ink-faint)">(' + esc(c.asOf) + ')</span>' : '') + '<div class="cannot">' + esc(c.cannot) + '</div></td><td class="lean ' + (c.lean > 0 ? 'up' : c.lean < 0 ? 'dn' : 'z') + '">' + (c.lean == null ? 'n/a' : c.lean > 0 ? '+1' : c.lean < 0 ? '−1' : '0') + '</td></tr>'; }).join('') + '</table>';
     if (vd.invalidation && vd.invalidation.length) h += '<h3>Fails if</h3><p>' + vd.invalidation.map(esc).join('<br>') + '</p>';
     if (v.card) h += '<details><summary>Hypothesis card</summary><dl class="kv">' + Object.keys(v.card).map(function (k) { return v.card[k] == null ? '' : '<dt>' + esc(k) + '</dt><dd>' + esc(v.card[k]) + '</dd>'; }).join('') + '</dl></details>';
     el.innerHTML = h;
+    var lb = document.getElementById('lim-btn'); if (lb) lb.addEventListener('click', function () { var c = document.getElementById('c-vet'), on = c.classList.toggle('limits'); lb.setAttribute('aria-pressed', String(on)); lb.textContent = on ? 'hide the limits' : 'show what each cannot tell you'; });
   }
   function renderDebate(v) {
     var el = $('debate'); if (!v || !v.debate) { el.innerHTML = ''; $('deb-foot').textContent = ''; return; }
-    $('deb-sum').textContent = v.verdict.agree + ' agree · ' + v.verdict.qualify + ' qualify · ' + v.verdict.disagree + ' disagree';
+    $('deb-sum').textContent = v.verdict.agree + ' agree · ' + v.verdict.qualify + ' qualify · ' + v.verdict.disagree + ' disagree'; $('deb-n').textContent = v.verdict.disagree ? '· ' + v.verdict.disagree + ' open' : '';
     el.innerHTML = v.debate.map(function (t) { return '<li><span class="st ' + esc(t.stance) + '">' + esc(t.stance) + '</span><div><b>' + esc(t.topic) + '</b><div class="side"><small>Strategist</small>' + esc(t.macro) + '</div><div class="side"><small>Veteran</small>' + esc(t.veteran) + '</div>' + (t.why ? '<div class="why">' + esc(t.why) + '</div>' : '') + '</div></li>'; }).join('');
     var sb = v.scoreboard, tl = v.teaching;
     $('deb-foot').innerHTML = (sb ? (sb.weeks ? 'Scoreboard over ' + sb.weeks + ' resolved week' + (sb.weeks === 1 ? '' : 's') + ': <b>veteran ' + pct(sb.veteran.hit) + '</b> vs <b>strategist ' + pct(sb.strategist.hit) + '</b> right on direction per topic' : 'Scoreboard: no resolved week yet') + (sb.pending ? ', ' + sb.pending + ' pending' : '') + '. ' : '') + (tl && tl.line ? esc(tl.line) : '');
@@ -286,6 +304,9 @@
       $('foot').textContent = 'Paper only. The strategist and the veteran change no rule, size or trade; the owner decides. Data: council-data macro/forecast.json, macro/veteran.json, macro/cache.json, macro/veteran-ledger.json.';
     });
   }
+  // tabs (the owner: "i dont like to scroll down all the time"): one lower section at a time, remembered per browser
+  var tabs = document.querySelectorAll('.tabs [data-t]'); function showTab(t) { tabs.forEach(function (b) { b.setAttribute('aria-selected', String(b.dataset.t === t)); }); ['debate', 'source', 'ledger'].forEach(function (k) { $('tab-' + k).hidden = k !== t; }); try { localStorage.setItem('mdTab', t); } catch (e) {} }
+  tabs.forEach(function (b) { b.addEventListener('click', function () { showTab(b.dataset.t); }); }); try { var t0 = localStorage.getItem('mdTab'); if (t0 && $('tab-' + t0)) showTab(t0); } catch (e) {}
   load(); setInterval(load, 5 * 60e3);
 })();
 </script>
