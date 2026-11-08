@@ -682,6 +682,12 @@ FundingPips 2-step, Topstep 50K / 100K, Lucid 50K, custom; all editable in the p
 (eod trails end-of-day balance highs and locks at the start balance; intraday trails equity), time limit, target on closed
 balance, minimum trading days, consistency (best day share), phases (next phase resets the account), funded. Page: OANDA candles
 through `/md/bars` in 4999-bar windows (300 bars of context before the start, N days after), bar-by-bar replay (→ / Space /
-speed / skip day), click-to-set entry / stop / target, risk-% sizing, open positions (BE, close, edit SL / TP), journal with
+speed / skip day); trading (owner 8 Nov: "order, SL and TP placement user friendly, charts as well"): Buy / Sell (B / S) puts a DRAFT
+on the chart (`D`: entry = last close, stop = 1 ATR, target = 2R) with draggable entry / stop / target price lines (`DL`, mouse and
+touch; the chart's pan pauses while dragging), red / green risk-reward zones on a canvas overlay (`drawOverlay`), the order type
+decided from the entry's side of the price (`typeOf`: market / limit / stop), quick stop presets (1 / 1.5 ATR, last swing, this bar)
+and target presets (1 / 1.5 / 2 / 3 R), risk-% or unit sizing, Enter / Esc; open positions' and pending orders' lines drag too
+(`fixPos` / `fixOrd` keep them on the right side). Chart layers (`LAY`, localStorage `btLab:layers`): EMA 20 / 50, session bands
+(London 07-12, NY 12-21 UTC), PDH / PDL; OHLC legend. Risk-% sizing, open positions (BE, close, edit SL / TP), journal with
 editable tags / notes, statistics, calendar, challenge log, sessions in localStorage `btLab:sessions` (+ JSON / CSV export,
 import). Tests: `tests/backtest.test.mjs`. Paper only; nothing reaches the council or the mirror.
