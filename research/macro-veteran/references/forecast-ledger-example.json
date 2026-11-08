@@ -1,0 +1,55 @@
+{
+  "record_id": "synthetic-forecast-001",
+  "forecast_id": "synthetic-die-event",
+  "record_type": "issued",
+  "recorded_at_utc": "2030-01-01T00:00:00Z",
+  "previous_record_id": null,
+  "forecast": {
+    "issued_at_utc": "2030-01-01T00:00:00Z",
+    "information_cutoff_utc": "2030-01-01T00:00:00Z",
+    "target": {
+      "variable": "Synthetic die outcome",
+      "instrument_or_population": "Example only; no financial instrument",
+      "unit": "boolean",
+      "outcome_description": "A fair six-sided die roll is 5 or 6",
+      "observation_start_utc": "2030-01-01T00:00:00Z",
+      "deadline_utc": "2030-01-01T00:01:00Z",
+      "timezone_note": "Synthetic demonstration only"
+    },
+    "horizon": "One synthetic die roll, resolving by the stated deadline",
+    "resolution_rule": {
+      "publisher": "Synthetic example",
+      "dataset_or_instrument": "Illustrative fair six-sided die outcome",
+      "direct_url": null,
+      "field_or_price_convention": "Recorded integer roll from 1 to 6",
+      "rule": "Resolve true if the recorded result is 5 or 6; otherwise false",
+      "revision_policy": "not_applicable",
+      "specified_vintage": null,
+      "missing_or_holiday_policy": "If no roll is recorded, leave unresolved; do not infer an outcome"
+    },
+    "distribution": {
+      "kind": "binary_event",
+      "event_probability": 0.3333333333
+    },
+    "comparator": {
+      "type": "none",
+      "description": "No empirical or market comparator; this is a schema illustration only",
+      "probability_or_value": null,
+      "sample_size": null,
+      "captured_at_utc": null,
+      "source_url": null,
+      "limitations": "Do not treat this example as a financial forecast"
+    },
+    "evidence": {
+      "supporting_record_ids": [],
+      "counterevidence_record_ids": [],
+      "source_ids": [],
+      "dependence_groups": []
+    },
+    "rationale": "In a fair six-sided die model, two of six equally likely outcomes satisfy the event definition. This toy example demonstrates a binary probability record; it is not market analysis.",
+    "disconfirming_evidence": "A resolved roll of 1, 2, 3, or 4 is a non-event; repeated fair rolls would be needed to evaluate calibration.",
+    "method_version": "synthetic-example-1",
+    "author_or_model": "Synthetic fixture only",
+    "tags": ["synthetic", "not-a-market-forecast"]
+  }
+}

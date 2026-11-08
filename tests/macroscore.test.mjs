@@ -64,5 +64,5 @@ test('wiring: the Macro member computes it, writes it in forecast.json, the brie
   assert.match(m, /sources: src, goldScore \};/); assert.match(m, /if \(fc\.goldScore\) L\.push\(scoreLine\(fc\.goldScore\)\);/); assert.match(m, /scoreLine\(fc\.goldScore\)\.replace/);
   assert.match(m, /nc\.score = /);
   const h = fs.readFileSync(new URL('../market-structure.html', import.meta.url), 'utf8');
-  assert.match(h, /id="ms-md-score"/); assert.match(h, /function renderScore\(f\)/); assert.match(h, /renderNext, renderScore, renderSmile/);
+  assert.match(h, /id="ms-md-score"/); assert.match(h, /function renderScore\(f\)/); assert.match(h, /renderNext, renderScore, renderVet, renderSmile/);
 });
