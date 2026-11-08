@@ -272,7 +272,7 @@
     "lots": 0.04,
     "digits": 2,
     "setup": "scalp",
-    "status": "open",
+    "status": "closed at broker",
     "openedAt": "2026-11-08T09:14:33.000Z",
     "councilEntry": 2233.03,
     "stop": 2229.003394,
@@ -284,8 +284,10 @@
     "slipR": 0.44,
     "lagSec": 6994,
     "alerted": [
-     "open"
-    ]
+     "open",
+     "close"
+    ],
+    "closedAt": "2026-11-08T09:19:57.000Z"
    }
   },
   "day": {
@@ -293,9 +295,9 @@
    "startBalance": 988.99
   },
   "startedAt": "2026-11-07T19:38:16.000Z",
-  "status": "ok · demo Fusion Markets · balance 988.99 · 12 open",
-  "balance": 988.99,
-  "lastRun": "2026-11-08T09:14:33.000Z",
+  "status": "ok · demo Fusion Markets · balance 988.81 · 11 open",
+  "balance": 988.81,
+  "lastRun": "2026-11-08T09:19:57.000Z",
   "catchUpAt": "2026-11-08T09:14:33.000Z",
   "wait": {},
   "skipped": {}
@@ -489,6 +491,11 @@
    "at": "2026-11-08T09:14:33.000Z",
    "msg": "not mirrored yet ict:es-s-1793995200: order rejected: MARKET_CLOSED: Trading is not available: Market is closed. (will retry)",
    "trade": "ict:es-s-1793995200"
+  },
+  {
+   "at": "2026-11-08T09:19:57.000Z",
+   "msg": "ETHUSD position 47356893 closed at the broker",
+   "trade": "eth-scalp-1794122279"
   }
  ],
  "limits": {
