@@ -672,7 +672,7 @@ keys are `<name>.<HMAC>` for any member; `granted(name)` is checked on every cal
 revokes; an MCP_KEYS entry is a grant; Fred built in). Tests: `tests/users-perms.test.mjs`, `tests/mcp.test.mjs`.
 
 ## Backtest lab (8 Nov 2026, owner: "build a manual backtesting like TradeZella … and he can simulate prop-firm challenges")
-`backtest.html` at `/backtest` (vercel rewrite; build copies it; sidebar entry `.bt-nav` for signed-in members; the page itself
+`backtest.html` ("ChronosTrade", owner's name, 8 Nov: third segment of the header switch Desk | Macro | ChronosTrade on all three pages, `.hdr-ct`, green when lit) at `/backtest` (vercel rewrite; build copies it; sidebar entry `.bt-nav` for signed-in members; the page itself
 needs `ms-admin` in localStorage). Engine `assets/backtest-engine.js` (`window.BT`, also `module.exports` for tests): accounts,
 `place` (market / limit / stop; a stop is required; sides checked), `onBar` (fills when touched or gapped through, stop / target
 with the worst case when both sit in one bar, gap exits at the open, MFE / MAE in R), `stats` (win rate, PF, expectancy, max DD,
