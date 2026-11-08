@@ -754,3 +754,12 @@ frequency for that horizon plus the council tilt (veteran ledger probability −
 Score; half for the week), clamped 5–95%. `digest` turns the observed channels into a plain read with limits and lists what is
 not observed. Macro desk: "The veteran's calls" card and "What the pros' data says right now" in Close to the source.
 Tests: `tests/outlook.test.mjs`.
+
+## COT positioning desk (8 Nov 2026, owner: COT per pair, week-to-week change, a small fundamental edge)
+`council/cot.mjs` (council.yml, every macro round; CFTC fetch cached 12 h in `macro/cot-raw.json`) → `macro/cot.json`: per market
+(gold, silver, EUR, GBP, JPY, AUD, NZD, CAD, CHF, NQ, ES) speculators' net (TFF leveraged funds; Disaggregated managed money for
+metals), week and 4-week change, trader counts long/short and their change, open interest, 3-year percentile. Two pre-specified
+signals are tested on council daily prices since 2020 from the first close after the Friday release: `extreme` (contrarian at
+90th/10th pct) and `flow` (follow a 1.5-sd weekly change), 5 and 20 days. Edge = n≥15, hit ≥ base+8 pts, t≥2; otherwise the page
+says "no tested edge yet". Fields are matched by pattern (sandbox cannot reach CFTC; `src` logs the keys if parsing fails).
+Macro desk tab "COT positioning". Tests: `tests/cot.test.mjs`. Paper only.

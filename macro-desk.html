@@ -160,6 +160,11 @@
   .pcall b { font: 650 15px var(--mono, ui-monospace, monospace); font-variant-numeric: tabular-nums; text-align: right; }
   .pcall i { grid-column: 2; display: block; height: 4px; border-radius: 3px; background: var(--line-soft); overflow: hidden; } .pcall i s { display: block; height: 100%; background: var(--accent, #e3b341); }
   .dig { list-style: none; margin: 6px 0 14px; padding: 0; display: grid; gap: 8px; } .dig li { font-size: 13px; } .dig small { display: block; color: var(--ink-faint); }
+  .cotw { overflow-x: auto; } .cott { width: 100%; border-collapse: collapse; font-size: 13px; min-width: 760px; }
+  .cott th { text-align: left; font-weight: 600; color: var(--ink-faint); font-size: 11.5px; padding: 6px 8px; border-bottom: 1px solid var(--line-soft); }
+  .cott td { padding: 9px 8px; border-bottom: 1px solid var(--line-soft); vertical-align: top; font-variant-numeric: tabular-nums; } .cott td small { display: block; color: var(--ink-faint); font-size: 11.5px; }
+  .cott .up { color: var(--buy, #22a06b); } .cott .dn { color: var(--sell, #e5484d); }
+  .rng { position: relative; width: 120px; height: 6px; border-radius: 3px; background: var(--line-soft); margin-top: 6px; } .rng s { position: absolute; top: -3px; width: 4px; height: 12px; border-radius: 2px; background: var(--ink); }
   .src { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 12px 20px; margin-top: 8px; }
   .src article { padding: 10px 0 0; border-top: 1px solid var(--line-soft); font-size: 12.5px; } .src h4 { margin: 0 0 3px; font: 600 13px var(--sans); } .src p { margin: 3px 0; font-size: 12.5px; } .src .lag { color: var(--ink-faint); font-size: 11.5px; }
   .ev { list-style: none; margin: 6px 0 0; padding: 0; font-size: 13px; } .ev li { display: grid; grid-template-columns: 112px 1fr; gap: 10px; padding: 7px 0; border-top: 1px solid var(--line-soft); } .ev time { color: var(--ink-faint); font: 500 12px var(--mono); } .ev .pol { color: var(--accent); font-weight: 600; }
@@ -215,6 +220,7 @@
   <div class="tabs" role="tablist" aria-label="Sections">
     <button type="button" role="tab" data-t="debate" aria-selected="true">The discussion <span id="deb-n"></span></button>
     <button type="button" role="tab" data-t="source">Close to the source</button>
+    <button type="button" role="tab" data-t="cot">COT positioning</button>
     <button type="button" role="tab" data-t="ledger">Ledger and scoreboard</button>
     <button type="button" role="tab" data-t="library">Veteran library <span class="vlib-v" id="lib-v"></span></button>
   </div>
@@ -236,6 +242,9 @@
     <div class="src" id="src"></div>
   </section>
 
+  <section class="block card tabp" id="tab-cot" role="tabpanel" hidden><h2>COT positioning <small id="cot-sub">what the big speculators hold, week by week</small></h2>
+    <div class="cotw"><table class="cott"><thead><tr><th>Market</th><th>Net</th><th>Week</th><th>4 weeks</th><th>Traders long / short</th><th>3-year range</th><th>Signal now</th></tr></thead><tbody id="cot-b"></tbody></table></div>
+    <p class="note" id="cot-note"></p></section>
   <section class="block card tabp" id="tab-ledger" role="tabpanel" hidden><h2>Forecast ledger and scoreboard <small>who is right, kept honest</small></h2><div id="ledger"></div></section>
   <section class="block card tabp" id="tab-library" role="tabpanel" hidden>
     <h2>Veteran library <small id="lib-sub">gptmacro_v.1 · the owner's research batch, as delivered</small></h2>
@@ -279,6 +288,24 @@
     $('calls-mo').textContent = 'This month · to ' + o.month.by; $('calls-m').innerHTML = o.month.list.map(li).join('');
     $('calls-note').textContent = o.method + (o.tilt ? ' Council tilt now ' + (o.tilt > 0 ? '+' : '') + Math.round(o.tilt * 100) + ' points.' : ' Council tilt now zero: the strategist sees no tested edge, so these are the honest base rates.') + ' Paper only, not advice.';
     var d = o.digest || { list: [] }; $('dig').innerHTML = d.list.map(function (r) { return '<li><b>' + esc(r.src) + ':</b> ' + esc(r.read) + ' → <b>' + esc(r.says) + '</b><small>' + esc(r.limit || '') + '</small></li>'; }).join('') + (d.missing && d.missing.length ? '<li><small>Not observed by the council yet: ' + esc(d.missing.join(', ')) + '. The veteran does not guess them.</small></li>' : '');
+  }
+  // COT positioning desk (council/cot.mjs)
+  function renderCot(c) {
+    var b = $('cot-b'); if (!c || !c.markets) { b.innerHTML = '<tr><td colspan="7" class="empty">No COT data yet: the council fetches it on its next macro round.</td></tr>'; return; }
+    var k = function (x) { return x == null ? '—' : (Math.abs(x) >= 1000 ? (x / 1000).toFixed(1) + 'k' : String(x)); }, sgn = function (x) { return x == null ? '—' : '<span class="' + (x > 0 ? 'up' : x < 0 ? 'dn' : '') + '">' + (x > 0 ? '+' : '') + k(x) + '</span>'; };
+    var ed = function (t) { return !t ? '' : t.edge ? ' · <b>tested edge</b> (' + t.n + ' cases, ' + Math.round(t.win * 100) + '% right)' : ' · no tested edge yet (' + t.n + ' cases' + (t.win != null ? ', ' + Math.round(t.win * 100) + '% right' : '') + ')'; };
+    b.innerHTML = c.markets.map(function (m) {
+      if (m.missing) return '<tr><td>' + esc(m.name) + '</td><td colspan="6" class="empty">no data this week</td></tr>';
+      var sig = m.signals && m.signals.length ? m.signals.map(function (s) { return esc(s.text) + ed(s.tested); }).join('<br>') : '<small>Nothing unusual</small>';
+      var best = m.tests ? Object.keys(m.tests).filter(function (x) { return m.tests[x].edge; }) : [];
+      return '<tr><td><b>' + esc(m.name) + '</b><small>' + esc(m.who) + ' · ' + esc(m.asOf) + '</small>' + (m.quote ? '<small>' + esc(m.quote) + '</small>' : '') + '</td>'
+        + '<td>' + sgn(m.net) + '<small>' + (m.longShare != null ? m.longShare + '% of positions long' : '') + '</small></td><td>' + sgn(m.chg1) + (m.z != null ? '<small>' + (m.z > 0 ? '+' : '') + m.z + ' sd</small>' : '') + '</td><td>' + sgn(m.chg4) + '</td>'
+        + '<td>' + (m.tL != null ? m.tL + ' / ' + m.tS + '<small>' + (m.tLchg != null ? (m.tLchg >= 0 ? '+' : '') + m.tLchg + ' / ' + (m.tSchg >= 0 ? '+' : '') + m.tSchg + ' on the week' : '') + '</small>' : '—') + '</td>'
+        + '<td>' + (m.pct != null ? m.pct + ([11, 12, 13].indexOf(m.pct % 100) < 0 && ['th', 'st', 'nd', 'rd'][m.pct % 10] || 'th') + ' percentile<div class="rng"><s style="left:calc(' + m.pct + '% - 2px)"></s></div>' : '—') + '</td>'
+        + '<td>' + sig + (best.length ? '<small>Edge found historically: ' + best.join(', ') + '</small>' : '') + '</td></tr>';
+    }).join('');
+    $('cot-sub').textContent = 'positions as of ' + ((c.markets.find(function (m) { return m.asOf; }) || {}).asOf || '—') + ' · updated ' + ago(c.at);
+    $('cot-note').textContent = c.method + ' Paper only, not advice.';
   }
   function renderStrip(fc, v) {
     var out = [], vd = v && v.verdict, gs = fc && fc.goldScore;
@@ -356,7 +383,7 @@
     Promise.all([get('macro/forecast.json'), get('macro/veteran.json'), get('macro/cache.json'), get('macro/veteran-ledger.json')]).then(function (x) {
       var fc = x[0], v = x[1], cache = x[2], L = x[3];
       $('when').textContent = fc && fc.at ? 'strategist ' + ago(fc.at) + (v && v.at ? ' · veteran ' + ago(v.at) : '') : 'No macro data yet';
-      renderStrip(fc, v); renderStrat(fc); renderVet(v); renderDebate(v); renderInsights(fc, v, cache); renderSource(fc, cache); renderLedger(v, L); renderCalls(v);
+      renderStrip(fc, v); renderStrat(fc); renderVet(v); renderDebate(v); renderInsights(fc, v, cache); renderSource(fc, cache); renderLedger(v, L); renderCalls(v); get('macro/cot.json').then(renderCot);
       $('foot').textContent = 'Paper only. The strategist and the veteran change no rule, size or trade; the owner decides. Data: council-data macro/forecast.json, macro/veteran.json, macro/cache.json, macro/veteran-ledger.json.';
     });
   }
@@ -395,7 +422,7 @@
       var first = null; try { first = localStorage.getItem('mdLibDoc'); } catch (e) {} libOpen(first && I.docs.some(function (d) { return d.path === first; }) ? first : 'references/latest-research-batch-status-2026-11-08.md');
     }).catch(function (e) { libBusy = false; $('vlib-doc').innerHTML = '<p class="note">The library is not published yet (' + esc(e.message) + ').</p>'; }); }
   // tabs (the owner: "i dont like to scroll down all the time"): one lower section at a time, remembered per browser
-  var tabs = document.querySelectorAll('.tabs [data-t]'); function showTab(t) { tabs.forEach(function (b) { b.setAttribute('aria-selected', String(b.dataset.t === t)); }); ['debate', 'source', 'ledger', 'library'].forEach(function (k) { $('tab-' + k).hidden = k !== t; }); if (t === 'library') loadLib(); try { localStorage.setItem('mdTab', t); } catch (e) {} }
+  var tabs = document.querySelectorAll('.tabs [data-t]'); function showTab(t) { tabs.forEach(function (b) { b.setAttribute('aria-selected', String(b.dataset.t === t)); }); ['debate', 'source', 'cot', 'ledger', 'library'].forEach(function (k) { $('tab-' + k).hidden = k !== t; }); if (t === 'library') loadLib(); try { localStorage.setItem('mdTab', t); } catch (e) {} }
   tabs.forEach(function (b) { b.addEventListener('click', function () { showTab(b.dataset.t); }); }); try { var t0 = localStorage.getItem('mdTab'); if (t0 && $('tab-' + t0)) showTab(t0); } catch (e) {}
   load(); setInterval(load, 5 * 60e3);
 })();

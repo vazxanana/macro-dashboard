@@ -131,6 +131,8 @@ jobs:
             # Macro veteran (8 Nov, owner's gptmacro_v.1 skill as a council member, paper only): discusses the strategist's view from its
             # data (no fetches), keeps a weekly forecast ledger → data/macro/veteran*.json; runs right after the strategist
             if [ $((i % 6)) -eq 1 ]; then timeout 60 node council/veteran.mjs data || echo "Veteran round $i failed"; fi
+            # COT positioning desk (8 Nov): CFTC speculators per market + tested signals → data/macro/cot.json (fetch cached 12 h)
+            if [ $((i % 6)) -eq 1 ]; then timeout 90 node council/cot.mjs data || echo "COT round $i failed"; fi
             # Data-quality monitor (7 Nov): the OANDA proxy, Kraken and the ICT desk's CNBC feed, every 2nd round (~11 min) → health.json
             # and one deduplicated phone alert when a feed goes bad. Read-only for the bots; never fails the round.
             if [ $((i % 2)) -eq 1 ]; then timeout 150 node council/datacheck.mjs data || echo "Data check round $i failed"; fi
