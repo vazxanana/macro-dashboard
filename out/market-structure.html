@@ -2678,11 +2678,9 @@ html[data-motion="off"] #v-ict .ict-cal-d:hover { transform: none !important; }
 
   <!-- ─── Guest: one H4 gold chart with one trade setup ─── -->
   <section class="view" id="v-guest" aria-label="Gold H4 chart" hidden>
-    <div class="g-head"><div><h1 class="h-head">The desk's gold trade <small class="g-live"><i aria-hidden="true"></i>live</small></h1><p class="ms-note g-lede">The council's current gold trade on H4 candles, then its results and the P&amp;L calendar. Paper trading, one system, nothing hidden.</p></div></div>
-    <!-- the trade the chart shows, in words (8 Nov, owner: "improve this") -->
+    <div class="g-head"><div><h1 class="h-head">The desk's gold trade <small class="g-live"><i aria-hidden="true"></i>live</small></h1><p class="ms-note g-lede">The council's current gold trade: its levels are drawn on every gold chart above, its results and the P&amp;L calendar are here. Paper trading, one system, nothing hidden.</p></div></div>
+    <!-- the trade in words (8 Nov, owner: "improve this"; the chart itself is the charts grid above) -->
     <div class="card g-setup" id="g-setup" hidden></div>
-    <div class="card g-card"><div class="g-chart" id="g-chart"><div class="g-msg" id="g-msg">Loading the chart…</div></div></div>
-    <div class="g-key" aria-hidden="true"><span><i class="k-e"></i>Entry</span><span><i class="k-s"></i>Stop zone</span><span><i class="k-t"></i>Target zone</span></div>
     <h2 class="g-h2">Results <small>main systems, live trades only</small></h2>
     <div class="h-today" id="g-today" role="group" aria-label="Results"></div>
     <!-- the invitation (8 Nov): what members get, with a sign-in that opens the gate -->
@@ -4438,7 +4436,10 @@ function msNextSetup(bars, A) {
     P.planLines = [];
     P.planLinesDraw = function () {
       P.planLines.forEach((pl) => series.removePriceLine(pl)); P.planLines = [];
-      if (PUB) return;   // guests: candles only (8 Nov)
+      if (PUB) {   // guests (8 Nov, owner: "show the trade setup levels on the other timeframes"): the desk's gold trade, on gold, every timeframe
+        const g = G.gplan; if (!g || instKey !== 'xau') return;
+        const add = (price, color, title, style) => { if (price == null || !isFinite(price)) return; P.planLines.push(series.createPriceLine({ price, color, lineWidth: 1, lineStyle: style, axisLabelVisible: true, title, lineVisible: true })); };
+        add(g.entry, '#7aa2ff', 'Entry', LW.LineStyle.Solid); add(g.stop, '#f2576f', 'Stop', LW.LineStyle.Solid); add(g.t1, '#2fbf8f', 'Target', LW.LineStyle.Dashed); return; }
       const pl = G.plan;
       if (!G.show.plan || !pl || tf.id === '4h' || G.mode === 'ict') return;   // ICT mode: no council plan lines
       const add = (price, color, title, style) => P.planLines.push(series.createPriceLine({ price, color, lineWidth: 1, lineStyle: style, axisLabelVisible: true, title, lineVisible: G.show.detail }));
@@ -6457,12 +6458,31 @@ function msNextSetup(bars, A) {
   const GV = { chart: null, series: null, ov: null, bars: null, at: 0, off: 0, busy: false };
   // guests see one page (8 Nov, owner): the charts first, the gold trade, results, calendar and invitation under them
   if (PUB) { const g = document.getElementById('v-guest'), c = document.getElementById('v-charts'); if (g && c && !document.getElementById('g-merged')) { const box = document.createElement('div'); box.id = 'g-merged'; box.className = 'g-merged'; while (g.firstChild) box.appendChild(g.firstChild); c.appendChild(box); } }
+  function guestCard(x, last) {
+      const card = document.getElementById('g-setup');
+      if (!card) return;
+      if (!x) { card.hidden = true; return; }
+      const tgt = x.tp1 != null ? x.tp1 : x.t1, f = (v) => (+v).toLocaleString(undefined, { minimumFractionDigits: 1, maximumFractionDigits: 1 }), R = Math.abs(x.entry - x.stop), rr = tgt != null && R ? Math.abs(tgt - x.entry) / R : null;
+      const fl = last != null && x.status === 'open' && R ? ((x.side === 'buy' ? 1 : -1) * (last - x.entry)) / R : null;
+      const st = x.status === 'pending' ? 'Waiting for the entry' : x.status === 'open' ? 'Open now' : x.status === 'win' ? 'Closed · won' : x.status === 'loss' ? 'Closed · lost' : x.status === 'be' ? 'Closed · break-even' : 'Closed';
+      const when = new Date(((x.filled || x.opened) || 0) * 1000), ago = when.getTime() ? when.toLocaleString(undefined, { weekday: 'short', day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' }) : '';
+      card.hidden = false;
+      card.innerHTML = `<div class="g-s-h"><span class="chip ${x.side}">${x.side === 'sell' ? 'SELL' : 'BUY'}</span><b>${esc(x.name || x.k || 'System trade')}</b><span class="g-s-st ${x.status}">${st}</span>${fl != null ? `<span class="g-s-fl ${fl > 0 ? 'pos' : fl < 0 ? 'neg' : ''}">${fl > 0 ? '+' : fl < 0 ? '−' : ''}${Math.abs(fl).toFixed(2)}R floating</span>` : ''}</div>
+        <div class="g-s-grid"><div><span>Entry</span><b>${f(x.entry)}</b></div><div><span>Stop</span><b class="neg">${f(x.stop)}</b></div><div><span>Target</span><b class="pos">${tgt != null ? f(tgt) : 'trails'}</b></div><div><span>Reward : risk</span><b>${rr != null ? rr.toFixed(1) + ' : 1' : '—'}</b></div></div>
+        <p class="g-s-note">${esc(x.pair ? `${x.pair} · ` : '')}${ago ? `placed ${esc(ago)} · ` : ''}paper trade, risk one unit (R) from entry to stop · the entry, stop and target are drawn on every gold chart above.</p>`;
+  }
   async function renderGuest() {
-    if (!PUB) return; const host = document.getElementById('g-chart'), msg = document.getElementById('g-msg'); if (!host || GV.busy) return;
+    if (!PUB || GV.busy) return; const host = document.getElementById('g-chart'), msg = document.getElementById('g-msg');
     const I = INSTRUMENTS.xau, tf = TFS.find((t) => t.id === '4h'), SYSG = ['replica', 'mosha-bo', 'gtrend', 'gtrend5', 'gtl', 'geg'];
     const pool = (COUNCIL.trades || []).concat(typeof sysTrades === 'function' ? sysTrades() : []).filter((x) => x.market === 'xau' && !x.shadow && !x.replay && SYSG.includes(x.k) && x.entry && x.stop && !x.addOf);
     const live = pool.filter((x) => x.status === 'open' || x.status === 'pending').sort((a, b) => b.opened - a.opened);
     const x = live[0] || pool.filter((t) => t.closed).sort((a, b) => b.closed - a.closed)[0] || null;
+    // the levels on the chart panes (guests see the desk's gold trade on every timeframe) and the card in words
+    { const tgt = x ? (x.tp1 != null ? x.tp1 : x.t1) : null, live1 = x && (x.status === 'open' || x.status === 'pending');
+      const next = live1 ? { entry: +x.entry, stop: +x.stop, t1: tgt != null ? +tgt : null, side: x.side, id: x.id } : null;
+      if (JSON.stringify(next) !== JSON.stringify(G.gplan || null)) { G.gplan = next; try { Object.values(panes).forEach((P) => P.planLinesDraw && P.planLinesDraw()); } catch (e) {} } }
+    guestCard(x, GV.bars && GV.bars.length ? GV.bars[GV.bars.length - 1].close + GV.off : (window.MDQ && MDQ.q && MDQ.q.xau && MDQ.q.xau.price) || null);
+    if (!host) return;
     GV.busy = true;
     try {
       if (!GV.bars || Date.now() - GV.at > 5 * 60e3) {
@@ -6498,19 +6518,6 @@ function msNextSetup(bars, A) {
       } else GV.chart.timeScale().fitContent();
       GV.ov.set(items);
       if (msg) { msg.hidden = !!x; msg.textContent = x ? '' : 'No trade setup on the chart right now.'; }
-      // the trade in words
-      const card = document.getElementById('g-setup');
-      if (card) {
-        if (!x) card.hidden = true;
-        else { const tgt = x.tp1 != null ? x.tp1 : x.t1, f = (v) => (+v).toLocaleString(undefined, { minimumFractionDigits: 1, maximumFractionDigits: 1 }), R = Math.abs(x.entry - x.stop), rr = tgt != null && R ? Math.abs(tgt - x.entry) / R : null;
-          const last = data.length ? data[data.length - 1].close : null, fl = last != null && x.status === 'open' && R ? ((x.side === 'buy' ? 1 : -1) * (last - x.entry)) / R : null;
-          const st = x.status === 'pending' ? 'Waiting for the entry' : x.status === 'open' ? 'Open now' : x.status === 'win' ? 'Closed · won' : x.status === 'loss' ? 'Closed · lost' : x.status === 'be' ? 'Closed · break-even' : 'Closed';
-          const when = new Date(((x.filled || x.opened) || 0) * 1000), ago = when.getTime() ? when.toLocaleString(undefined, { weekday: 'short', day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' }) : '';
-          card.hidden = false;
-          card.innerHTML = `<div class="g-s-h"><span class="chip ${x.side}">${x.side === 'sell' ? 'SELL' : 'BUY'}</span><b>${esc(x.name || x.k || 'System trade')}</b><span class="g-s-st ${x.status}">${st}</span>${fl != null ? `<span class="g-s-fl ${fl > 0 ? 'pos' : fl < 0 ? 'neg' : ''}">${fl > 0 ? '+' : fl < 0 ? '−' : ''}${Math.abs(fl).toFixed(2)}R floating</span>` : ''}</div>
-            <div class="g-s-grid"><div><span>Entry</span><b>${f(x.entry)}</b></div><div><span>Stop</span><b class="neg">${f(x.stop)}</b></div><div><span>Target</span><b class="pos">${tgt != null ? f(tgt) : 'trails'}</b></div><div><span>Reward : risk</span><b>${rr != null ? rr.toFixed(1) + ' : 1' : '—'}</b></div></div>
-            <p class="g-s-note">${esc(x.pair ? `${x.pair} · ` : '')}${ago ? `placed ${esc(ago)} · ` : ''}paper trade, risk one unit (R) from entry to stop.</p>`; }
-      }
     } catch (e) { if (msg) { msg.hidden = false; msg.textContent = "The chart couldn't load right now."; } }
     finally { GV.busy = false; }
   }
