@@ -1,7 +1,8 @@
 // Council → cTrader DEMO mirror (owner, 7 Nov: "mirror to the cTrader demo, that's the goal of all this").
 //   node council/ctrader-mirror.mjs <dataDir>      (runs after each Trader round in council.yml)
 //
-// Copies the council's LIVE paper trades (never shadows) on gold and forex, and the ICT desk's A-setups (NQ/ES/YM/RTY/GC), into the cTrader DEMO account as market orders with
+// Copies the council's paper trades on gold, forex and crypto, LIVE and SHADOW (owner, 8 Nov: "everything the council does, mirror to cTrader,
+// even the ones active now"; before that live only), and the ICT desk's A-setups (NQ/ES/YM/RTY/GC), into the cTrader DEMO account as market orders with
 // the same stop and target, and closes the position when the council closes the trade. Safety, enforced here in code:
 //   * DEMO ONLY: the host is the cTrader demo endpoint, CTRADER_ENV must be "demo", and the account must report isLive:false
 //     before account auth is sent. A live account is refused (the owner decides on live separately, with demo results).
@@ -10,9 +11,13 @@
 //     ORDER and CLOSE POSITION. No amend, no cancel, no pending orders.
 //   * Small and capped: risk-based lots (see sizing below, valued with the broker's own specs from ctrader/symbols.json, written
 //     each round by council/ctrader-symbols.mjs), one trade's margin at most LIMITS.maxMarginShare of the balance (LIMITS.maxLots
-//     when the broker's margin is unknown) and never above the broker's own maximum, at most MAX_OPEN mirror
-//     positions (unconfirmed orders included), no new order once the account is down DAY_STOP of its balance on the UTC day
-//     (closed P/L: balance), only trades opened in the last FRESH seconds (no catch-up of old trades).
+//     when the broker's margin is unknown), all open positions' margin at most LIMITS.maxTotalMarginShare, never above the broker's
+//     own maximum, at most LIMITS.maxOpen mirror positions (unconfirmed orders included), no new order once the account is down
+//     LIMITS.dayStop of its balance on the UTC day (closed P/L: balance), only trades opened in the last LIMITS.fresh seconds, except
+//     ONE catch-up round (8 Nov, owner: "even the ones active now") that copies every open trade once (state.catchUpAt marks it done).
+//   * Minimum lot (8 Nov): on a small demo the risk-based lot is below the broker's minimum for most trades; the order then goes at
+//     the minimum lot (its real risk counted against maxOpenRisk) instead of being skipped. config.json mirrorShadow: false turns the
+//     shadow copying off again (the CLI reads it; mirrorRound takes `shadows`).
 //   * It only ever touches positions it opened (label "council" + comment naming the trade, tracked in ctrader/mirror.json); a
 //     position whose round never saved is found again by that label/comment, so a trade is never opened twice.
 //   * Secrets come from the environment, are never written in plain text or logged; a rotated token pair is kept encrypted
@@ -40,6 +45,7 @@ const NEED = ['CTRADER_CLIENT_ID', 'CTRADER_CLIENT_SECRET', 'CTRADER_ACCESS_TOKE
 // CME futures (NQ, ES, YM, RTY, GC); the demo trades the matching cash index / spot gold CFD: only the stop distance is copied,
 // so the futures-cash basis does not matter.
 export const SYMBOLS = { xau: ['XAUUSD'], eurusd: ['EURUSD'], gbpusd: ['GBPUSD'], audusd: ['AUDUSD'], usdcad: ['USDCAD'], usdchf: ['USDCHF'],
+  btc: ['BTCUSD'], eth: ['ETHUSD'], sol: ['SOLUSD'], xrp: ['XRPUSD'],   // 8 Nov: the council's crypto paper trades too (CFDs at the broker)
   nq: ['US100', 'NAS100', 'USTEC'], es: ['US500', 'SPX500', 'US500.cash'], ym: ['US30', 'DJ30', 'US30.cash'], rty: ['US2000', 'RUSSELL2000'], gc: ['XAUUSD'] };
 // the ICT desk's trades as mirror candidates: only its A-setups (the part that holds up after costs: research/edge/costs), with
 // their own id space; everything else is treated like a shadow (never sent)
@@ -51,8 +57,10 @@ export const ictCandidates = (ict) => (Array.isArray(ict) ? ict : []).map((t) =>
 // = 100 oz), so a flat lot cap skipped normal-risk Russell trades on a $50k demo (18-point stop: 5.55 lots for $100). The risk caps
 // above do the real limiting; a trade's margin (broker's marginPerLot from ctrader/symbols.json) may use at most maxMarginShare of the
 // balance; maxLots stays only as the cap when that margin is unknown.
-export const LIMITS = { lots: 0.01, maxLots: 5, maxMarginShare: 0.2, maxOpen: 5, dayStop: 0.02, fresh: 15 * 60, retries: 3, keepDays: 30,
-  risk: { ict: 0.002, council: 0.0002 }, maxOpenRisk: 0.01 };
+// 8 Nov (owner: mirror everything): maxOpen 5 -> 40, maxOpenRisk 1% -> 50% (minimum-lot orders on a ~$1,000 demo risk about 1% each),
+// minLot fallback on, total margin of all open mirror positions at most 80% of the balance.
+export const LIMITS = { lots: 0.01, maxLots: 5, maxMarginShare: 0.2, maxTotalMarginShare: 0.8, maxOpen: 40, dayStop: 0.02, fresh: 15 * 60, retries: 3, keepDays: 30,
+  risk: { ict: 0.002, council: 0.0002 }, maxOpenRisk: 0.5, minLot: true };
 const LABEL = 'council';
 const OPEN = new Set(['open']), isDone = (t) => !!t.status && t.status !== 'open' && t.status !== 'pending';
 // the order comment is also the key that finds our position at the broker again (ProtoOATradeData.label + comment)
@@ -180,24 +188,28 @@ export function specFor(file, name) {
 }
 // risk-based volume: one lot moves lotSize/100 units x the stop distance (quote currency), converted to the account currency by
 // quoteRate(). Returns { volume, riskCash, lots, perLot } (perLot: account currency lost at the stop per lot) or { skip: reason }.
-export function riskVolume({ info, t, balance, name, openRisk = 0, spec = null, now }) {
+export function riskVolume({ info, t, balance, name, openRisk = 0, openMargin = 0, spec = null, now, minLot = LIMITS.minLot }) {
   const lot = +info.lotSize, dist = Math.abs(+t.entry - +t.stop), px = Math.abs(+t.entry);
   if (!(lot > 0)) return { skip: `${name}: no lot size` };
   if (!(dist > 0) || !(balance > 0)) return { skip: `${name}: no stop distance or balance` };
   const qr = quoteRate({ name, px, spec, now }), toAcc = qr && qr.rate;
   if (!toAcc) return { skip: `${name}: cannot value its quote currency${spec && spec.quote ? ` (${spec.quote})` : ''} in the account currency${spec && spec.deposit ? ` (${spec.deposit})` : ''}` };
   const isIct = String(t.id).startsWith('ict:'), size = isIct && Number.isFinite(+t.size) && +t.size > 0 ? +t.size : 1;
-  const riskCash = balance * (isIct ? LIMITS.risk.ict : LIMITS.risk.council) * size;
-  if (openRisk + riskCash > balance * LIMITS.maxOpenRisk + 1e-9) return { skip: `open risk would pass ${LIMITS.maxOpenRisk * 100}% of the balance` };
+  let riskCash = balance * (isIct ? LIMITS.risk.ict : LIMITS.risk.council) * size;
   const perLot = (lot / 100) * dist * toAcc, lots = riskCash / perLot;
   const step = +info.stepVolume || 1, min = +info.minVolume || step;
-  const v = Math.floor((lots * lot) / step + 1e-9) * step;   // epsilon: 0.01 lot must not floor to 0 on float noise
-  if (v < min) return { skip: `${name}: ${lots.toFixed(4)} lot needed for ${(riskCash).toFixed(2)} risk is below the broker minimum (${min / lot} lot); a bigger demo balance fixes this` };
+  let v = Math.floor((lots * lot) / step + 1e-9) * step, atMin = false;   // epsilon: 0.01 lot must not floor to 0 on float noise
+  if (v < min) {
+    if (!minLot) return { skip: `${name}: ${lots.toFixed(4)} lot needed for ${(riskCash).toFixed(2)} risk is below the broker minimum (${min / lot} lot); a bigger demo balance fixes this` };
+    v = min; atMin = true; riskCash = perLot * (min / lot);   // the minimum lot: its real risk is what counts against the open-risk cap
+  }
+  if (openRisk + riskCash > balance * LIMITS.maxOpenRisk + 1e-9) return { skip: `open risk would pass ${LIMITS.maxOpenRisk * 100}% of the balance${atMin ? ` (${name} at the minimum lot risks ${riskCash.toFixed(2)})` : ''}` };
   if (info.maxVolume && v > +info.maxVolume) return { skip: `${name}: ${(v / lot).toFixed(2)} lot is above the broker maximum (${+info.maxVolume / lot} lot)` };
   const mpl = spec && +spec.marginPerLot > 0 ? +spec.marginPerLot : null, margin = mpl ? (v / lot) * mpl : null;
+  if (mpl && openMargin + margin > balance * LIMITS.maxTotalMarginShare + 1e-9) return { skip: `${name}: ${margin.toFixed(2)} margin would take all open mirror positions over ${LIMITS.maxTotalMarginShare * 100}% of the balance` };
   if (mpl && margin > balance * LIMITS.maxMarginShare + 1e-9) return { skip: `${name}: ${(v / lot).toFixed(2)} lot would use ${margin.toFixed(2)} margin, over ${LIMITS.maxMarginShare * 100}% of the balance` };
   if (!mpl && v > lot * LIMITS.maxLots + 1e-9) return { skip: `${name}: ${(v / lot).toFixed(2)} lot is above the ${LIMITS.maxLots}-lot cap (the broker's margin is not known)` };
-  return { volume: v, riskCash: +riskCash.toFixed(2), lots: +(v / lot).toFixed(4), perLot: +perLot.toFixed(4), ...(margin != null ? { margin: +margin.toFixed(2) } : {}) };
+  return { volume: v, riskCash: +riskCash.toFixed(2), lots: +(v / lot).toFixed(4), perLot: +perLot.toFixed(4), ...(atMin ? { minLot: true } : {}), ...(margin != null ? { margin: +margin.toFixed(2) } : {}) };
 }
 // relative stop/target for a market order: in 1/100000 of the price, a multiple of the symbol's smallest step
 export function relative(dist, digits = 5) {
@@ -231,6 +243,7 @@ export function mirrorAlertText(e, now) {
   }
   if (e.kind === 'reject') return { title: `Demo mirror: order rejected · ${head}${lotTxt(e)}`, msg: `${e.result || 'rejected'}\nNot retried.\n${councilTxt(e)}\n${at}`, tags: 'robot,no_entry_sign' };
   if (e.kind === 'unfilled') return { title: `Demo mirror: order not filled · ${head}`, msg: `No position at the broker 10 min after the order was accepted.\n${councilTxt(e)}\n${at}`, tags: 'robot,no_entry_sign' };
+  if (e.kind === 'summary') return { title: `Demo mirror: ${e.n} orders this round`, msg: `${e.opens} opened, ${e.closes} closed, ${e.other} other events${e.catchUp ? ' (catch-up of the council\'s open trades, shadows included)' : ''}. Details in Council → Desk & mirror.\n${when(now)}`, tags: 'robot,package' };
   if (e.kind === 'closefail') return { title: `Demo mirror: close failed · ${head}${lotTxt(e)}`, msg: `${e.result || 'close failed'}\nThe council closed the trade; the demo position is still open (the close is retried each round).\n${councilTxt(e)}\n${at}`, tags: 'robot,warning' };
   return null;
 }
@@ -277,7 +290,7 @@ export function executionStats(map, { since = 0 } = {}) {
     medianLagSec: lag.length ? med(lag) : null, bySymbol: Object.fromEntries(Object.entries(by).map(([k, a]) => [k, { n: a.length, meanSlipR: +(a.reduce((x, y) => x + y, 0) / a.length).toFixed(3) }])) };
 }
 
-export async function mirrorRound({ env, trades, state, tokens, specs = null, WS = globalThis.WebSocket, now = Math.floor(Date.now() / 1000), timeout, onTokens }) {
+export async function mirrorRound({ env, trades, state, tokens, specs = null, WS = globalThis.WebSocket, now = Math.floor(Date.now() / 1000), timeout, onTokens, shadows = true }) {
   const scrub = scrubber(env), log = [], say = (msg, x = {}) => log.push({ at: new Date(now * 1000).toISOString(), msg: scrub(msg), ...x });
   const st = { map: {}, day: null, startedAt: null, ...(state || {}) };
   const out = { state: st, tokens: tokens || null, log, sent: [], alerts: [] };
@@ -339,7 +352,7 @@ export async function mirrorRound({ env, trades, state, tokens, specs = null, WS
     const ours = new Map();
     for (const p of positions.values()) { const td = p.tradeData || {}; if (td.label === LABEL && td.comment) ours.set(td.comment, p); }
     for (const t of trades) {
-      if (t.shadow || !SYMBOLS[t.market]) continue;
+      if ((t.shadow && !shadows) || !SYMBOLS[t.market]) continue;
       const p = ours.get(commentFor(t)); if (!p) continue;
       const pid = String(p.positionId), m = st.map[t.id];
       if (m && m.status !== 'sent') continue;   // already managed (open or finished): never re-adopted
@@ -379,9 +392,12 @@ export async function mirrorRound({ env, trades, state, tokens, specs = null, WS
     const dayDown = st.day.startBalance && balance != null ? (st.day.startBalance - balance) / st.day.startBalance : 0;
     const openCount = () => Object.values(st.map).filter((m) => m.status === 'open' || m.status === 'sent').length;   // unconfirmed orders count too
     const since = Date.parse(st.startedAt) / 1000;
-    const fresh = trades.filter((t) => !t.shadow && OPEN.has(t.status) && SYMBOLS[t.market] && !st.map[t.id] && !(st.skipped || {})[t.id]
-      && (t.side === 'buy' || t.side === 'sell') && (t.filled || t.opened) >= since && now - (t.filled || t.opened) <= LIMITS.fresh
+    // catch-up (8 Nov, owner: "even the ones active now"): the first round with shadows on copies every open trade whatever its age, once
+    const catchUp = shadows && !st.catchUpAt;
+    const fresh = trades.filter((t) => (!t.shadow || shadows) && OPEN.has(t.status) && SYMBOLS[t.market] && !st.map[t.id] && !(st.skipped || {})[t.id]
+      && (t.side === 'buy' || t.side === 'sell') && (catchUp || ((t.filled || t.opened) >= since && now - (t.filled || t.opened) <= LIMITS.fresh))
       && t.stop != null && t.entry != null && Math.abs(t.entry - t.stop) > 0);
+    if (catchUp) { st.catchUpAt = iso; say(`catch-up round: ${fresh.length} open council trade${fresh.length === 1 ? '' : 's'} (shadows included) considered`); }
     if (fresh.length) {
       const names = await s.send(PT.SYMBOLS_LIST_REQ, { ctidTraderAccountId: ctid }, PT.SYMBOLS_LIST_RES);
       const idOf = new Map((names.symbol || []).filter((x) => x.enabled !== false).map((x) => [normName(x.symbolName), x.symbolId]));
@@ -395,8 +411,9 @@ export async function mirrorRound({ env, trades, state, tokens, specs = null, WS
         const name = SYMBOLS[t.market].find((n) => idOf.has(normName(n))), symbolId = name && idOf.get(normName(name));
         if (!symbolId) { skip(`none of ${SYMBOLS[t.market].join('/')} found at the broker`); continue; }
         const info = ((await s.send(PT.SYMBOL_BY_ID_REQ, { ctidTraderAccountId: ctid, symbolId: [symbolId] }, PT.SYMBOL_BY_ID_RES)).symbol || [])[0] || {};
-        const openRisk = Object.values(st.map).filter((m) => m.status === 'open' || m.status === 'sent').reduce((a, m) => a + (+m.riskCash || 0), 0);
-        const rv = riskVolume({ info, t, balance, name, openRisk, spec: specFor(specs, name), now });
+        const live = Object.values(st.map).filter((m) => m.status === 'open' || m.status === 'sent');
+        const openRisk = live.reduce((a, m) => a + (+m.riskCash || 0), 0), openMargin = live.reduce((a, m) => a + (+m.margin || 0), 0);
+        const rv = riskVolume({ info, t, balance, name, openRisk, openMargin, spec: specFor(specs, name), now });
         if (rv.skip) { skip(rv.skip); continue; }
         const volume = rv.volume, sell = t.side === 'sell', d = Number.isFinite(+info.digits) ? +info.digits : 5;
         if (info.tradingMode != null && info.tradingMode !== 0 && info.tradingMode !== 'ENABLED') { later(`${name} not tradable now (mode ${info.tradingMode})`); continue; }
@@ -406,7 +423,7 @@ export async function mirrorRound({ env, trades, state, tokens, specs = null, WS
         try {
           const ev = await s.send(PT.NEW_ORDER_REQ, order, PT.EXECUTION_EVENT, orderStep);
           const pid = (ev.position && ev.position.positionId) ?? (ev.order && ev.order.positionId), filled = !ev.interim && pid != null;
-          st.map[t.id] = { positionId: pid != null ? String(pid) : null, symbol: name, side: t.side, volume, lots: volume / +info.lotSize, digits: d, setup: t.k, status: filled ? 'open' : 'sent', openedAt: iso, councilEntry: t.entry, stop: t.stop, t1: t.t1, riskCash: rv.riskCash,
+          st.map[t.id] = { positionId: pid != null ? String(pid) : null, symbol: name, side: t.side, volume, lots: volume / +info.lotSize, digits: d, setup: t.k, status: filled ? 'open' : 'sent', openedAt: iso, councilEntry: t.entry, stop: t.stop, t1: t.t1, riskCash: rv.riskCash, ...(rv.margin != null ? { margin: rv.margin } : {}), ...(rv.minLot ? { minLot: true } : {}), ...(t.shadow ? { shadow: true } : {}),
             ...fillQuality(t, (ev.deal && ev.deal.executionPrice) ?? (filled && ev.position ? ev.position.price : null), now) };
           if (st.wait) delete st.wait[t.id];
           out.sent.push({ type: 'open', trade: t.id }); say(`${filled ? 'opened' : 'sent (fill not confirmed yet)'} ${sell ? 'sell' : 'buy'} ${name} ${volume / +info.lotSize} lot (council ${t.k})`, { trade: t.id });
@@ -437,12 +454,17 @@ if (process.argv[1] && process.argv[1].endsWith('ctrader-mirror.mjs')) {
   let ict = []; try { ict = JSON.parse(fs.readFileSync(path.join(DIR, 'ict', 'trades.json'), 'utf8')); } catch (e) {}
   const trades = (Array.isArray(raw) ? raw : raw.trades || []).concat(ictCandidates(ict));
   const saveTokens = (t) => { fs.mkdirSync(CD, { recursive: true }); fs.writeFileSync(path.join(CD, 'tokens.json'), JSON.stringify(t)); };
-  const prev = rd('mirror.json', {}), r = await mirrorRound({ env: process.env, trades, state: prev.state, tokens: rd('tokens.json', null), specs: rd('symbols.json', null), onTokens: saveTokens });
+  let cfg = {}; try { cfg = JSON.parse(fs.readFileSync(path.join(DIR, 'config.json'), 'utf8')) || {}; } catch (e) {}
+  const shadows = cfg.mirrorShadow !== false;   // 8 Nov, owner: shadows mirrored too; config.json mirrorShadow: false turns it off
+  const prev = rd('mirror.json', {}), r = await mirrorRound({ env: process.env, trades, state: prev.state, tokens: rd('tokens.json', null), specs: rd('symbols.json', null), onTokens: saveTokens, shadows });
   fs.mkdirSync(CD, { recursive: true });
   fs.writeFileSync(path.join(CD, 'mirror.json'), JSON.stringify({ state: r.state, log: (prev.log || []).concat(r.log).slice(-300), limits: LIMITS, symbols: SYMBOLS, execution: executionStats(r.state.map) }, null, 1));
   if (r.tokens && JSON.stringify(r.tokens) !== JSON.stringify(rd('tokens.json', null))) saveTokens(r.tokens);
   console.log(`cTrader mirror: ${r.state.status}${r.sent.length ? ` · ${r.sent.length} sent` : ''}`);
   // phone alerts, after mirror.json is saved (already flagged there, so a crash here never re-sends them): best-effort only
+  // a burst (the catch-up round, or many closes at once) goes as one summary instead of a phone message per position
+  if (r.alerts.length > 6) { const n = r.alerts.length, opens = r.alerts.filter((a) => a.kind === 'open').length, closes = r.alerts.filter((a) => a.kind === 'close').length;
+    r.alerts = [{ kind: 'summary', n, opens, closes, other: n - opens - closes, catchUp: !(prev.state && prev.state.catchUpAt) && !!r.state.catchUpAt }]; }
   if (r.alerts.length) {
     let tgChat = null; try { tgChat = JSON.parse(fs.readFileSync(path.join(DIR, 'state.json'), 'utf8')).tgChat || null; } catch (e) {}   // the council's remembered chat
     const a = await sendMirrorAlerts(r.alerts, { env: process.env, tgChat });

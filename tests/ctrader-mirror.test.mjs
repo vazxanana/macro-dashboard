@@ -85,11 +85,28 @@ test('opens a market order for a fresh live trade, with relative stop/target and
   assert.equal(r.state.map['eurusd-intraday-1'].status, 'open'); assert.equal(b.positions.size, 1);
 });
 
-test('never copies shadows, old trades, trades from before the mirror started, pending orders or unknown markets', async () => {
+test('with shadows off: never copies shadows, old trades, trades from before the mirror started, pending orders or unknown markets', async () => {
   const b = broker();
   const trades = [tr({ id: 'a', shadow: true }), tr({ id: 'b', opened: NOW - 3 * 3600, filled: NOW - 3 * 3600 }), tr({ id: 'c', opened: NOW - 20 * 60, filled: NOW - 20 * 60 }), tr({ id: 'd', market: 'btc' }), tr({ id: 'e', status: 'pending' })];
-  const r = await mirrorRound({ env: ENV, trades, state: { startedAt: new Date((NOW - 600) * 1000).toISOString() }, WS: b.WS, now: NOW });
+  const r = await mirrorRound({ env: ENV, trades, state: { startedAt: new Date((NOW - 600) * 1000).toISOString(), catchUpAt: 'done' }, WS: b.WS, now: NOW, shadows: false });
   assert.equal(types(b).includes(PT.NEW_ORDER_REQ), false); assert.deepEqual(r.sent, []);
+});
+
+test('8 Nov (owner: mirror everything): shadows are copied by default, marked shadow at the broker-side record, and the first round catches up every open trade once', async () => {
+  const b = broker();
+  // an old shadow trade (3 h, before the mirror started) and a fresh one: the catch-up round copies both
+  const trades = [tr({ id: 'old-shadow', shadow: true, opened: NOW - 3 * 3600, filled: NOW - 3 * 3600 }), tr({ id: 'fresh-shadow', shadow: true })];
+  let r = await mirrorRound({ env: ENV, trades, state: { startedAt: new Date((NOW - 600) * 1000).toISOString() }, WS: b.WS, now: NOW });
+  assert.equal(b.positions.size, 2); assert.ok(r.state.catchUpAt); assert.equal(r.state.map['old-shadow'].shadow, true); assert.equal(r.state.map['old-shadow'].status, 'open');
+  assert.ok(r.log.some((l) => /catch-up round: 2 open council trades/.test(l.msg)));
+  // after the catch-up, an old trade is no longer copied (the fresh rule is back), a fresh one is
+  r = await mirrorRound({ env: ENV, trades: trades.concat([tr({ id: 'old2', shadow: true, opened: NOW - 3 * 3600, filled: NOW - 3 * 3600 }), tr({ id: 'new2', shadow: true, opened: NOW + 200, filled: NOW + 200 })]), state: r.state, WS: b.WS, now: NOW + 300 });
+  assert.equal(b.positions.size, 3); assert.equal(r.state.map.old2, undefined); assert.equal(r.state.map.new2.status, 'open');
+  // the shadow trade closing at the council closes the demo position
+  r = await mirrorRound({ env: ENV, trades: [tr({ id: 'old-shadow', shadow: true, status: 'loss' }), trades[1], tr({ id: 'new2', shadow: true })], state: r.state, WS: b.WS, now: NOW + 600 });
+  assert.equal(r.state.map['old-shadow'].status, 'closed by council'); assert.equal(b.positions.size, 2);
+  // crypto markets are in the symbol map now
+  const { SYMBOLS } = await import('../council/ctrader-mirror.mjs'); assert.deepEqual(SYMBOLS.btc, ['BTCUSD']); assert.deepEqual(SYMBOLS.xrp, ['XRPUSD']);
 });
 
 test('closes the position when the council closes the trade; marks broker-side closes', async () => {
@@ -101,8 +118,8 @@ test('closes the position when the council closes the trade; marks broker-side c
   assert.equal(b.positions.size, 0); assert.equal(r.state.map['eurusd-intraday-1'].status, 'closed by council'); assert.equal(r.state.map.x2.status, 'closed at broker');
 });
 
-test('caps: at most 5 open, and no new order after a 2% daily loss', async () => {
-  const b = broker(); const trades = Array.from({ length: 7 }, (_, i) => tr({ id: 't' + i }));
+test('caps: at most LIMITS.maxOpen open, and no new order after a 2% daily loss', async () => {
+  const b = broker(); const trades = Array.from({ length: LIMITS.maxOpen + 2 }, (_, i) => tr({ id: 't' + i }));
   let r = await mirrorRound({ env: ENV, trades, state: started, WS: b.WS, now: NOW });
   assert.equal(b.positions.size, LIMITS.maxOpen); assert.equal(Object.keys(r.state.skipped).length, 2);
   const b2 = broker({ balance: 100000 }); r = await mirrorRound({ env: ENV, trades: [], state: started, WS: b2.WS, now: NOW });
@@ -158,10 +175,10 @@ test('market order: waits past ORDER_ACCEPTED for ORDER_FILLED; a rejection afte
 });
 
 test('ORDER_ACCEPTED but no fill seen: kept as "sent" (counts toward the cap), confirmed open by the next reconcile', async () => {
-  const b = broker({ fill: 'accepted-only' }), six = () => Array.from({ length: 6 }, (_, i) => tr({ id: 's' + i }));
+  const b = broker({ fill: 'accepted-only' }), six = () => Array.from({ length: LIMITS.maxOpen + 1 }, (_, i) => tr({ id: 's' + i }));
   let r = await mirrorRound({ env: ENV, trades: six(), state: started, WS: b.WS, now: NOW, timeout: 30 });
   const sent = Object.values(r.state.map); assert.equal(sent.length, LIMITS.maxOpen); assert.ok(sent.every((m) => m.status === 'sent' && m.positionId));
-  assert.match(r.state.skipped.s5, /already open/);
+  assert.match(r.state.skipped['s' + LIMITS.maxOpen], /already open/);
   r = await mirrorRound({ env: ENV, trades: six(), state: r.state, WS: b.WS, now: NOW + 240 });
   assert.ok(Object.values(r.state.map).every((m) => m.status === 'open')); assert.equal(orders(b).length, LIMITS.maxOpen);
 });
@@ -354,7 +371,10 @@ test('alerts never change the trading: same orders, alert flags kept in the save
 test('risk sizing: ICT 0.20% x size, Meridian 0.02% per 1R; USD-base pairs converted; open-risk cap; below the minimum is skipped', () => {
   const fx = { lotSize: 10000000, minVolume: 100000, stepVolume: 100000 }, gold = { lotSize: 10000, minVolume: 100, stepVolume: 100 }, idx = { lotSize: 100, minVolume: 10, stepVolume: 10 };
   // $50k, Meridian EURUSD with a 200-pip stop: $10 risk / ($2,000 a lot) = 0.005 lot -> below 0.01 -> skipped, never rounded up
-  assert.match(riskVolume({ info: fx, t: { id: 'm1', entry: 1.1, stop: 1.08 }, balance: 50000, name: 'EURUSD' }).skip, /below the broker minimum/);
+  assert.match(riskVolume({ info: fx, t: { id: 'm1', entry: 1.1, stop: 1.08 }, balance: 50000, name: 'EURUSD', minLot: false }).skip, /below the broker minimum/);
+  // 8 Nov: by default the order goes at the broker minimum instead, with its real risk counted (0.01 lot x 200 pips = 20)
+  const atMin = riskVolume({ info: fx, t: { id: 'm1', entry: 1.1, stop: 1.08 }, balance: 50000, name: 'EURUSD' });
+  assert.equal(atMin.volume, 100000); assert.equal(atMin.minLot, true); assert.equal(atMin.lots, 0.01); assert.equal(atMin.riskCash, 20);
   // $50k, Meridian EURUSD with a 20-pip stop: $10 / $200 = 0.05 lot
   assert.deepEqual(riskVolume({ info: fx, t: { id: 'm1', entry: 1.1, stop: 1.098 }, balance: 50000, name: 'EURUSD' }), { volume: 500000, riskCash: 10, lots: 0.05, perLot: 200 });
   // USDJPY 20-pip stop at 150: a lot moves 100,000 x 0.20 / 150 = $133.3; $50k Meridian $10 -> 0.0750 lot -> floor 0.07
@@ -365,11 +385,14 @@ test('risk sizing: ICT 0.20% x size, Meridian 0.02% per 1R; USD-base pairs conve
   // ICT NQ on a $1-a-point CFD, 90-point stop: $100 / $90 = 1.11 lot -> 1.1
   assert.equal(riskVolume({ info: idx, t: { id: 'ict:nq-1', entry: 25000, stop: 24910 }, balance: 50000, name: 'US100' }).lots, 1.1);
   // open risk: $450 already at risk + a $100 ICT trade passes 1% of $50k? no (550 > 500)
-  assert.match(riskVolume({ info: gold, t: { id: 'ict:gc-3', entry: 4000, stop: 3980 }, balance: 50000, name: 'XAUUSD', openRisk: 450 }).skip, /open risk/);
+  assert.match(riskVolume({ info: gold, t: { id: 'ict:gc-3', entry: 4000, stop: 3980 }, balance: 50000, name: 'XAUUSD', openRisk: 50000 * LIMITS.maxOpenRisk - 50 }).skip, /open risk/);
+  assert.equal(LIMITS.maxOpen, 40); assert.equal(LIMITS.maxOpenRisk, 0.5); assert.equal(LIMITS.minLot, true);
   // a cross pair with no USD side is not guessed
   assert.match(riskVolume({ info: fx, t: { id: 'm3', entry: 0.85, stop: 0.849 }, balance: 50000, name: 'EURGBP' }).skip, /quote currency/);
-  // on the old $1,000 demo an ICT gold trade is skipped instead of risking 4%
-  assert.match(riskVolume({ info: gold, t: { id: 'ict:gc-4', entry: 4000, stop: 3980 }, balance: 1000, name: 'XAUUSD' }).skip, /bigger demo balance/);
+  // on a $1,000 demo an ICT gold trade goes at the minimum lot (8 Nov), its real 2% risk counted; with the fallback off it is skipped as before
+  const small = riskVolume({ info: gold, t: { id: 'ict:gc-4', entry: 4000, stop: 3980 }, balance: 1000, name: 'XAUUSD' });
+  assert.equal(small.minLot, true); assert.equal(small.lots, 0.01); assert.equal(small.riskCash, 20);
+  assert.match(riskVolume({ info: gold, t: { id: 'ict:gc-4', entry: 4000, stop: 3980 }, balance: 1000, name: 'XAUUSD', minLot: false }).skip, /bigger demo balance/);
 });
 
 // ---- broker specs (ctrader/symbols.json, council/ctrader-symbols.mjs) ---------------------------------------------------------
