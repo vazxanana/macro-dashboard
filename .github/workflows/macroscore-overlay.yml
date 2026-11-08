@@ -1,0 +1,84 @@
+name: Gold Macro Score overlay (out-of-sample test)
+
+# Paper research, run once (research/edge/macroscore-overlay/preregistration.md): does the macro-agent-demo skill's sizing rule
+# ("half risk normally, full risk when the Gold Macro Score is above +0.25") help the council's long-only gold systems on gold
+# they never saw? Fetches the FRED history (DFII10, DGS2, DGS10), which the sandbox cannot reach, reads the council's own daily
+# candle cache (DXY pairs, gold) and the committed per-position records, and writes council-data research/macroscore-overlay.json.
+# Free and failure-tolerant: a failed fetch writes an "incomplete" result and the nightly schedule tries again; once a complete
+# result exists, every later run skips (no re-running a finished test) unless dispatched with force. No candles are refetched.
+# Changes no rule.
+on:
+  workflow_dispatch:
+    inputs:
+      force:
+        description: 'Run again even if a complete result exists'
+        default: 'false'
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/macroscore-overlay.yml'
+      - 'research/edge/macroscore-overlay/run.mjs'
+  schedule:
+    - cron: '53 4 * * *'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: macroscore-overlay
+  cancel-in-progress: false
+
+jobs:
+  macroscore-overlay:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    continue-on-error: true
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            council
+            research/edge/macroscore-overlay
+            research/edge/gold-systems-oos
+            research/edge/mosha-oos
+
+      - name: Checkout council data (the result file and the daily cache the score needs)
+        uses: actions/checkout@v4
+        with:
+          ref: council-data
+          path: data
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            /research/macroscore-overlay.json
+            /research/daily/eurusd.json
+            /research/daily/usdjpy.json
+            /research/daily/gbpusd.json
+            /research/daily/usdcad.json
+            /research/daily/usdchf.json
+            /research/daily/xau.json
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Skip if the test already ran
+        id: done
+        run: |
+          if [ "${{ github.event.inputs.force }}" != "true" ] && [ -f data/research/macroscore-overlay.json ] \
+             && node -e 'process.exit(require("./data/research/macroscore-overlay.json").status === "ok" ? 0 : 1)'; then
+            echo "skip=true" >> "$GITHUB_OUTPUT"; echo "A complete result exists: not running the test again."
+          fi
+
+      - name: Out-of-sample test
+        if: steps.done.outputs.skip != 'true'
+        run: node research/edge/macroscore-overlay/run.mjs data/research/macroscore-overlay.json
+
+      - name: Save results
+        if: steps.done.outputs.skip != 'true'
+        run: |
+          git -C data config user.name "mosha-council"
+          git -C data config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git -C data add research/macroscore-overlay.json
+          git -C data commit -q -m "Gold Macro Score overlay out-of-sample test $(date -u +%Y-%m-%dT%H:%MZ)" || exit 0
+          for j in 1 2 3 4 5; do git -C data pull -q --rebase origin council-data && git -C data push -q origin HEAD:council-data && break; sleep 7; done
