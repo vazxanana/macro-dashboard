@@ -152,6 +152,19 @@ jobs:
             if newcode; then echo "New council code on main: handing over after round $i"; break; fi
             if [ "$i" -lt "$ROUNDS" ]; then
               for k in 1 2 3 4; do sleep 60
+                # Quick pass (8 Nov, owner: "build it, start at 2 minutes"): halfway through the wait the Trader looks at the markets
+                # again and the mirror copies what it recorded, so a setup reaches cTrader within about two minutes instead of a
+                # round. The heavy members keep the 5-minute round. Saved as its own commit; a failure never stops the loop.
+                if [ "$k" -eq 2 ]; then
+                  git -C data pull -q --rebase origin council-data || true
+                  node council/trader.mjs data || echo "Trader quick pass $i failed"
+                  node council/ctrader-mirror.mjs data || echo "cTrader mirror quick pass $i failed"
+                  git -C data add -A
+                  if ! git -C data diff --cached --quiet; then
+                    git -C data commit -q -m "Council quick pass $(date -u +%Y-%m-%dT%H:%MZ)"
+                    for j in 1 2 3; do { git -C data pull -q --rebase origin council-data || git -C data rebase --abort || true; } && git -C data push -q origin HEAD:council-data && break; sleep 5; done
+                  fi
+                fi
                 # the owner's demo account every minute between rounds (owner, 7 Nov: a manual trade showed up late); saved only on a change
                 node council/ctrader-account.mjs data >/dev/null 2>&1 || true
                 if ! git -C data diff --quiet -- ctrader/account.json 2>/dev/null || [ -n "$(git -C data ls-files --others -- ctrader/account.json)" ]; then
