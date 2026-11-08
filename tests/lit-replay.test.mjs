@@ -18,6 +18,9 @@ test('replay: the window, the funnel, every setup with a reason or an order, the
   for (const s of out.setups) { assert.ok(s.t >= NOW - 63 * 86400); assert.ok(s.levelPx > 0 && s.accLow > 0 && s.accHigh >= s.accLow); assert.ok(s.why || s.order); if (s.order) { assert.ok(s.order.entry > 0 && s.order.stop > 0 && s.order.target > 0); if (s.side === 'sell') assert.ok(s.order.stop > s.order.entry && s.order.target < s.order.entry); else assert.ok(s.order.stop < s.order.entry && s.order.target > s.order.entry); } }
   for (const x of out.trades) { assert.ok(x.entry > 0 && x.exit > 0 && x.stop > 0 && typeof x.Rnet === 'number'); }
   assert.match(out.note, /Paper research/);
+  // the study sets: labelled, with fills and gated trades, prices positive, stop on the right side
+  assert.deepEqual(Object.keys(out.study), ['loose-limit', 'market-break']);
+  for (const S of Object.values(out.study)) { assert.ok(S.label && S.desc && S.build && S.fills && S.gated); for (const x of S.fills.trades) { assert.ok(x.entry > 0 && x.stop > 0 && x.target > 0 && x.tExit >= x.t); if (x.side === 'sell') assert.ok(x.stop > x.entry); else assert.ok(x.stop < x.entry); } assert.ok(S.gated.n <= S.fills.n); }
 });
 test('fetchBars: windows are stitched, deduplicated, the forming candle dropped', async () => {
   const calls = [];
