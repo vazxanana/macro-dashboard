@@ -592,6 +592,12 @@
    "by": "repair",
    "change": "Costs: 158 closed crypto paper trades re-costed under the CFD model (0.04% a round trip); they had carried 348.6R of Kraken spot fees in total. Gross R unchanged.",
    "why": "Owner decision 7 Nov: the council trades through cTrader (CFD), so Kraken spot fees were the wrong venue (research/edge/shadow-audit: 300R of a −288R paper week)."
+  },
+  {
+   "at": "2026-11-08T09:21:35.000Z",
+   "by": "user",
+   "change": "LIT (M15 FBOS → M5 RBOS → limit at the order block) runs on gold as a paper shadow stream \"LIT (paper shadow)\"; no live rule changes",
+   "why": "LIT study (#597): INCONCLUSIVE, too few trades at the skill's defaults (27 gold fills in 19 years) and what fills loses; the owner keeps it as a paper shadow to build a forward record, not as a system."
   }
  ],
  "btAt": "2026-11-07T21:41:23.838Z",
@@ -637,7 +643,8 @@
   "swing-shadow-research",
   "crypto-trend-shadow",
   "gold-trend-fast-shadow",
-  "nq-regime-shadow"
+  "nq-regime-shadow",
+  "lit-shadow"
  ],
  "target": {},
  "targetBy": {},
@@ -648,11 +655,11 @@
  "noPause": true,
  "wouldPause": {
   "rintra": {
-   "at": "2026-11-08T09:19:06.000Z",
+   "at": "2026-11-08T09:21:35.000Z",
    "why": "four losses in a row"
   },
   "scalp": {
-   "at": "2026-11-08T09:19:06.000Z",
+   "at": "2026-11-08T09:21:35.000Z",
    "why": "expectancy -1.00R over 13 trades"
   },
   "xau": {
@@ -798,5 +805,6 @@
  "goldTrendFastShadow": true,
  "nqRegimeShadow": {
   "trendMin": 0.295
- }
+ },
+ "litShadow": true
 }
