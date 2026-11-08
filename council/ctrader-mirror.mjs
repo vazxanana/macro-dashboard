@@ -13,11 +13,21 @@
 //     each round by council/ctrader-symbols.mjs), one trade's margin at most LIMITS.maxMarginShare of the balance (LIMITS.maxLots
 //     when the broker's margin is unknown), all open positions' margin at most LIMITS.maxTotalMarginShare, never above the broker's
 //     own maximum, at most LIMITS.maxOpen mirror positions (unconfirmed orders included), no new order once the account is down
-//     LIMITS.dayStop of its balance on the UTC day (closed P/L: balance), only trades opened in the last LIMITS.fresh seconds, except
-//     ONE catch-up round (8 Nov, owner: "even the ones active now") that copies every open trade once (state.catchUpAt marks it done).
+//     LIMITS.dayStop of its balance on the UTC day (closed P/L: balance).
+//   * Everything the council has open (8 Nov, owner: "even the ones active now"): an open council trade stays eligible for as long
+//     as it is open, whatever its age; a closed market, a holiday or a capacity cap (open count, open risk, margin, daily stop) only
+//     waits (state.wait, the symbol paused LIMITS.pause seconds after a closed-market answer), a broker rejection or an unusable
+//     price skips the trade for good (state.skipped). Both notes live as long as the trade is open.
+//   * Levels (8 Nov audit): a market order carries RELATIVE stop/target distances from its fill. Measured from the council's entry
+//     they land at the wrong prices for a trade copied late, so for council trades they are measured from the council's latest
+//     price of the market (`marks`, the Trader's snapshot.json), and the demo stop/target then equal the council's levels within the
+//     quote gap; the lot is sized on that real distance too. A trade whose price has already passed the council stop or target, or
+//     has run more than LIMITS.maxDriftR of its risk from the entry, is a different trade now and is skipped. ICT trades keep the
+//     entry-relative distances (futures levels on a cash CFD: only the distance carries over).
 //   * Minimum lot (8 Nov): on a small demo the risk-based lot is below the broker's minimum for most trades; the order then goes at
-//     the minimum lot (its real risk counted against maxOpenRisk) instead of being skipped. config.json mirrorShadow: false turns the
-//     shadow copying off again (the CLI reads it; mirrorRound takes `shadows`).
+//     the minimum lot (its real risk counted against maxOpenRisk) instead of being skipped, unless even that risks more than
+//     LIMITS.maxMinLotRisk of the balance (then it waits for a bigger balance). config.json mirrorShadow: false turns the shadow
+//     copying off again (the CLI reads it; mirrorRound takes `shadows`).
 //   * It only ever touches positions it opened (label "council" + comment naming the trade, tracked in ctrader/mirror.json); a
 //     position whose round never saved is found again by that label/comment, so a trade is never opened twice.
 //   * Secrets come from the environment, are never written in plain text or logged; a rotated token pair is kept encrypted
@@ -59,8 +69,8 @@ export const ictCandidates = (ict) => (Array.isArray(ict) ? ict : []).map((t) =>
 // balance; maxLots stays only as the cap when that margin is unknown.
 // 8 Nov (owner: mirror everything): maxOpen 5 -> 40, maxOpenRisk 1% -> 50% (minimum-lot orders on a ~$1,000 demo risk about 1% each),
 // minLot fallback on, total margin of all open mirror positions at most 80% of the balance.
-export const LIMITS = { lots: 0.01, maxLots: 5, maxMarginShare: 0.2, maxTotalMarginShare: 0.8, maxOpen: 40, dayStop: 0.02, fresh: 15 * 60, retries: 3, keepDays: 30,
-  risk: { ict: 0.002, council: 0.0002 }, maxOpenRisk: 0.5, minLot: true };
+export const LIMITS = { lots: 0.01, maxLots: 5, maxMarginShare: 0.2, maxTotalMarginShare: 0.8, maxOpen: 40, dayStop: 0.02, retries: 3, keepDays: 30,
+  risk: { ict: 0.002, council: 0.0002 }, maxOpenRisk: 0.5, minLot: true, maxMinLotRisk: 0.02, maxDriftR: 1, markMaxAge: 30 * 60, pause: 10 * 60 };
 const LABEL = 'council';
 const OPEN = new Set(['open']), isDone = (t) => !!t.status && t.status !== 'open' && t.status !== 'pending';
 // the order comment is also the key that finds our position at the broker again (ProtoOATradeData.label + comment)
@@ -71,6 +81,15 @@ export const normName = (s) => String(s || '').toUpperCase().replace(/[^A-Z0-9.]
 const RETRY = /MARKET_CLOSED|SYMBOL_HAS_HOLIDAY|NO_QUOTES|SERVER_IS_UNDER_MAINTENANCE|CH_SERVER_NOT_REACHABLE|REQUEST_FREQUENCY_EXCEEDED|TRADING_DISABLED|not tradable now/;
 // session errors with no broker answer behind them (session() below): the order's outcome is unknown
 const UNSURE = /^timeout waiting|connection closed|session closed/;
+// "not now" answers that are nobody's fault and never count as a try: the symbol is paused LIMITS.pause seconds, the trade waits
+const PAUSE = /MARKET_CLOSED|SYMBOL_HAS_HOLIDAY|NO_QUOTES|not tradable now/;
+// the council's latest price of a market (marks: { market: price | { price, at } }), null when unknown or older than LIMITS.markMaxAge
+export function markOf(marks, market, now) {
+  const m = marks && marks[market], px = m != null && typeof m === 'object' ? +m.price : +m, at = m != null && typeof m === 'object' ? m.at : null;
+  if (!(px > 0)) return null;
+  const t = at == null ? null : typeof at === 'number' ? (at > 1e11 ? at / 1000 : at) : Date.parse(at) / 1000;
+  return t != null && Number.isFinite(t) && now - t > LIMITS.markMaxAge ? null : px;
+}
 
 // ---- secrets ------------------------------------------------------------------------------------------------------
 // scrub(text) hides the configured secrets; scrub.add(...) also hides tokens learnt later (the stored or rotated pair), so a
@@ -202,11 +221,13 @@ export function riskVolume({ info, t, balance, name, openRisk = 0, openMargin = 
   if (v < min) {
     if (!minLot) return { skip: `${name}: ${lots.toFixed(4)} lot needed for ${(riskCash).toFixed(2)} risk is below the broker minimum (${min / lot} lot); a bigger demo balance fixes this` };
     v = min; atMin = true; riskCash = perLot * (min / lot);   // the minimum lot: its real risk is what counts against the open-risk cap
+    if (riskCash > balance * LIMITS.maxMinLotRisk + 1e-9) return { skip: `${name}: even the minimum lot (${min / lot}) risks ${riskCash.toFixed(2)}, ${(riskCash / balance * 100).toFixed(1)}% of the balance (cap ${LIMITS.maxMinLotRisk * 100}%); a bigger demo balance fixes this`, retry: true };
   }
-  if (openRisk + riskCash > balance * LIMITS.maxOpenRisk + 1e-9) return { skip: `open risk would pass ${LIMITS.maxOpenRisk * 100}% of the balance${atMin ? ` (${name} at the minimum lot risks ${riskCash.toFixed(2)})` : ''}` };
+  // capacity answers (retry: true) are tried again next round: the account or the open book may have changed
+  if (openRisk + riskCash > balance * LIMITS.maxOpenRisk + 1e-9) return { skip: `open risk would pass ${LIMITS.maxOpenRisk * 100}% of the balance${atMin ? ` (${name} at the minimum lot risks ${riskCash.toFixed(2)})` : ''}`, retry: true };
   if (info.maxVolume && v > +info.maxVolume) return { skip: `${name}: ${(v / lot).toFixed(2)} lot is above the broker maximum (${+info.maxVolume / lot} lot)` };
   const mpl = spec && +spec.marginPerLot > 0 ? +spec.marginPerLot : null, margin = mpl ? (v / lot) * mpl : null;
-  if (mpl && openMargin + margin > balance * LIMITS.maxTotalMarginShare + 1e-9) return { skip: `${name}: ${margin.toFixed(2)} margin would take all open mirror positions over ${LIMITS.maxTotalMarginShare * 100}% of the balance` };
+  if (mpl && openMargin + margin > balance * LIMITS.maxTotalMarginShare + 1e-9) return { skip: `${name}: ${margin.toFixed(2)} margin would take all open mirror positions over ${LIMITS.maxTotalMarginShare * 100}% of the balance`, retry: true };
   if (mpl && margin > balance * LIMITS.maxMarginShare + 1e-9) return { skip: `${name}: ${(v / lot).toFixed(2)} lot would use ${margin.toFixed(2)} margin, over ${LIMITS.maxMarginShare * 100}% of the balance` };
   if (!mpl && v > lot * LIMITS.maxLots + 1e-9) return { skip: `${name}: ${(v / lot).toFixed(2)} lot is above the ${LIMITS.maxLots}-lot cap (the broker's margin is not known)` };
   return { volume: v, riskCash: +riskCash.toFixed(2), lots: +(v / lot).toFixed(4), perLot: +perLot.toFixed(4), ...(atMin ? { minLot: true } : {}), ...(margin != null ? { margin: +margin.toFixed(2) } : {}) };
@@ -290,7 +311,7 @@ export function executionStats(map, { since = 0 } = {}) {
     medianLagSec: lag.length ? med(lag) : null, bySymbol: Object.fromEntries(Object.entries(by).map(([k, a]) => [k, { n: a.length, meanSlipR: +(a.reduce((x, y) => x + y, 0) / a.length).toFixed(3) }])) };
 }
 
-export async function mirrorRound({ env, trades, state, tokens, specs = null, WS = globalThis.WebSocket, now = Math.floor(Date.now() / 1000), timeout, onTokens, shadows = true }) {
+export async function mirrorRound({ env, trades, state, tokens, specs = null, WS = globalThis.WebSocket, now = Math.floor(Date.now() / 1000), timeout, onTokens, shadows = true, marks = null }) {
   const scrub = scrubber(env), log = [], say = (msg, x = {}) => log.push({ at: new Date(now * 1000).toISOString(), msg: scrub(msg), ...x });
   const st = { map: {}, day: null, startedAt: null, ...(state || {}) };
   const out = { state: st, tokens: tokens || null, log, sent: [], alerts: [] };
@@ -391,52 +412,64 @@ export async function mirrorRound({ env, trades, state, tokens, specs = null, WS
     // 3) new live council trades -> open
     const dayDown = st.day.startBalance && balance != null ? (st.day.startBalance - balance) / st.day.startBalance : 0;
     const openCount = () => Object.values(st.map).filter((m) => m.status === 'open' || m.status === 'sent').length;   // unconfirmed orders count too
-    const since = Date.parse(st.startedAt) / 1000;
-    // catch-up (8 Nov, owner: "even the ones active now"): the first round with shadows on copies every open trade whatever its age, once
-    const catchUp = shadows && !st.catchUpAt;
+    // every open council trade not yet copied or skipped is eligible, whatever its age (8 Nov, owner: "even the ones active now")
     const fresh = trades.filter((t) => (!t.shadow || shadows) && OPEN.has(t.status) && SYMBOLS[t.market] && !st.map[t.id] && !(st.skipped || {})[t.id]
-      && (t.side === 'buy' || t.side === 'sell') && (catchUp || ((t.filled || t.opened) >= since && now - (t.filled || t.opened) <= LIMITS.fresh))
-      && t.stop != null && t.entry != null && Math.abs(t.entry - t.stop) > 0);
-    if (catchUp) { st.catchUpAt = iso; say(`catch-up round: ${fresh.length} open council trade${fresh.length === 1 ? '' : 's'} (shadows included) considered`); }
+      && (t.side === 'buy' || t.side === 'sell') && t.stop != null && t.entry != null && Math.abs(t.entry - t.stop) > 0);
+    if (shadows && !st.catchUpAt) { st.catchUpAt = iso; say(`catch-up round: ${fresh.length} open council trade${fresh.length === 1 ? '' : 's'} (shadows included) considered`); }
+    st.paused = Object.fromEntries(Object.entries(st.paused || {}).filter(([, until]) => Date.parse(until) / 1000 > now));   // closed-market pauses still running
     if (fresh.length) {
       const names = await s.send(PT.SYMBOLS_LIST_REQ, { ctidTraderAccountId: ctid }, PT.SYMBOLS_LIST_RES);
       const idOf = new Map((names.symbol || []).filter((x) => x.enabled !== false).map((x) => [normName(x.symbolName), x.symbolId]));
       for (const t of fresh) {
         const skip = (why) => { (st.skipped = st.skipped || {})[t.id] = why; if (st.wait) delete st.wait[t.id]; say(`not mirrored ${t.id}: ${why}`, { trade: t.id }); };
-        // "not now" answers: tried again next round while the trade is fresh, at most LIMITS.retries times in all
-        const later = (why) => { const n = (((st.wait || {})[t.id] || {}).n || 0) + 1; (st.wait = st.wait || {})[t.id] = { why, n };
-          if (n >= LIMITS.retries) skip(`${why} (${n} tries)`); else say(`not mirrored yet ${t.id}: ${why} (will retry)`, { trade: t.id }); };
-        if (dayDown >= LIMITS.dayStop) { skip(`daily loss stop (${(dayDown * 100).toFixed(1)}% down today)`); continue; }
-        if (openCount() >= LIMITS.maxOpen) { skip(`${LIMITS.maxOpen} mirror positions already open`); continue; }
+        // "not now" answers: tried again next round for as long as the trade is open. Only a counted answer (count: a broker
+        // rejection that is not a closed market) can run out of tries, LIMITS.retries in all; a repeat of the same reason is not logged again
+        const later = (why, count = false) => { const w = (st.wait || {})[t.id] || { n: 0 }, n = w.n + (count ? 1 : 0); (st.wait = st.wait || {})[t.id] = { why, n, at: iso };
+          if (count && n >= LIMITS.retries) skip(`${why} (${n} tries)`); else if (w.why !== why) say(`not mirrored yet ${t.id}: ${why} (will retry)`, { trade: t.id }); };
+        if (dayDown >= LIMITS.dayStop) { later(`daily loss stop (${(dayDown * 100).toFixed(1)}% down today)`); continue; }
+        if (openCount() >= LIMITS.maxOpen) { later(`${LIMITS.maxOpen} mirror positions already open`); continue; }
         const name = SYMBOLS[t.market].find((n) => idOf.has(normName(n))), symbolId = name && idOf.get(normName(name));
         if (!symbolId) { skip(`none of ${SYMBOLS[t.market].join('/')} found at the broker`); continue; }
+        if (st.paused[name]) { later(`${name} market closed (paused until ${st.paused[name].slice(11, 16)} UTC)`); continue; }
+        const sell = t.side === 'sell', sgn = sell ? -1 : 1, isIct = String(t.id).startsWith('ict:');
+        // council trades: distances measured from the council's latest price, so the demo stop/target sit at the council's levels
+        const mark = isIct ? null : markOf(marks, t.market, now); let from = t.entry;
+        if (mark) {
+          const R = Math.abs(t.entry - t.stop), ran = (sgn * (mark - t.entry)) / R;
+          if (sgn * (mark - t.stop) <= 0) { skip(`price ${mark} is already past the council stop ${t.stop}`); continue; }
+          if (t.t1 != null && !(t.rr >= 50) && sgn * (t.t1 - mark) <= 0) { skip(`price ${mark} is already past the council target ${t.t1}`); continue; }
+          if (ran > LIMITS.maxDriftR) { skip(`price ${mark} has run ${ran.toFixed(2)}R from the council entry ${t.entry}: a different trade now`); continue; }
+          from = mark;
+        }
         const info = ((await s.send(PT.SYMBOL_BY_ID_REQ, { ctidTraderAccountId: ctid, symbolId: [symbolId] }, PT.SYMBOL_BY_ID_RES)).symbol || [])[0] || {};
         const live = Object.values(st.map).filter((m) => m.status === 'open' || m.status === 'sent');
         const openRisk = live.reduce((a, m) => a + (+m.riskCash || 0), 0), openMargin = live.reduce((a, m) => a + (+m.margin || 0), 0);
-        const rv = riskVolume({ info, t, balance, name, openRisk, openMargin, spec: specFor(specs, name), now });
-        if (rv.skip) { skip(rv.skip); continue; }
-        const volume = rv.volume, sell = t.side === 'sell', d = Number.isFinite(+info.digits) ? +info.digits : 5;
+        const rv = riskVolume({ info, t: { ...t, entry: from }, balance, name, openRisk, openMargin, spec: specFor(specs, name), now });
+        if (rv.skip) { (rv.retry ? later : skip)(rv.skip); continue; }
+        const volume = rv.volume, d = Number.isFinite(+info.digits) ? +info.digits : 5;
         if (info.tradingMode != null && info.tradingMode !== 0 && info.tradingMode !== 'ENABLED') { later(`${name} not tradable now (mode ${info.tradingMode})`); continue; }
         const order = { ctidTraderAccountId: ctid, symbolId, orderType: 1, tradeSide: sell ? 2 : 1, volume, label: LABEL,
-          comment: commentFor(t), clientOrderId: String(t.id).slice(0, 50), relativeStopLoss: relative(t.entry - t.stop, d) };
-        if (t.t1 != null && !(t.rr >= 50)) order.relativeTakeProfit = relative(t.t1 - t.entry, d);   // trailing systems: no fixed target
+          comment: commentFor(t), clientOrderId: String(t.id).slice(0, 50), relativeStopLoss: relative(from - t.stop, d) };
+        if (t.t1 != null && !(t.rr >= 50)) order.relativeTakeProfit = relative(t.t1 - from, d);   // trailing systems: no fixed target
         try {
           const ev = await s.send(PT.NEW_ORDER_REQ, order, PT.EXECUTION_EVENT, orderStep);
           const pid = (ev.position && ev.position.positionId) ?? (ev.order && ev.order.positionId), filled = !ev.interim && pid != null;
-          st.map[t.id] = { positionId: pid != null ? String(pid) : null, symbol: name, side: t.side, volume, lots: volume / +info.lotSize, digits: d, setup: t.k, status: filled ? 'open' : 'sent', openedAt: iso, councilEntry: t.entry, stop: t.stop, t1: t.t1, riskCash: rv.riskCash, ...(rv.margin != null ? { margin: rv.margin } : {}), ...(rv.minLot ? { minLot: true } : {}), ...(t.shadow ? { shadow: true } : {}),
+          st.map[t.id] = { positionId: pid != null ? String(pid) : null, symbol: name, side: t.side, volume, lots: volume / +info.lotSize, digits: d, setup: t.k, status: filled ? 'open' : 'sent', openedAt: iso, councilEntry: t.entry, stop: t.stop, t1: t.t1, riskCash: rv.riskCash, ...(rv.margin != null ? { margin: rv.margin } : {}), ...(rv.minLot ? { minLot: true } : {}), ...(t.shadow ? { shadow: true } : {}), ...(mark ? { mark, levelsFrom: 'mark' } : {}),
             ...fillQuality(t, (ev.deal && ev.deal.executionPrice) ?? (filled && ev.position ? ev.position.price : null), now) };
           if (st.wait) delete st.wait[t.id];
           out.sent.push({ type: 'open', trade: t.id }); say(`${filled ? 'opened' : 'sent (fill not confirmed yet)'} ${sell ? 'sell' : 'buy'} ${name} ${volume / +info.lotSize} lot (council ${t.k})`, { trade: t.id });
           alert('open', t.id, st.map[t.id], () => ({ filled, price: (ev.deal && ev.deal.executionPrice) ?? (filled && ev.position ? ev.position.price : null) ?? null,
             entry: t.entry, stop: t.stop, t1: t.t1, noTarget: !('relativeTakeProfit' in order) }));
-        } catch (e) { if (RETRY.test(`${e.code || ''} ${e.message}`)) later(`order rejected: ${e.message}`); else skip(`order rejected: ${e.message}`);
+        } catch (e) { const txt = `${e.code || ''} ${e.message}`;
+          if (PAUSE.test(txt)) { st.paused[name] = new Date((now + LIMITS.pause) * 1000).toISOString(); later(`${name} market closed: ${e.message}`); }
+          else if (RETRY.test(txt)) later(`order rejected: ${e.message}`, true); else skip(`order rejected: ${e.message}`);
           // no answer at all (timeout, dropped connection) is not a rejection: the order may be live and is looked up by label/comment
           // next round (step 0, which then sends the open alert); only a broker's answer is alerted as a rejection
           if ((st.skipped || {})[t.id] && !(!e.code && UNSURE.test(e.message))) alert('reject', t.id, null, () => ({ symbol: name, side: t.side, lots: volume / +info.lotSize, result: st.skipped[t.id] })); }
       }
     }
-    // housekeeping: skip/retry notes matter only while a trade can still be copied; finished positions are kept LIMITS.keepDays
-    for (const k of ['skipped', 'wait']) for (const id of Object.keys(st[k] || {})) { const t = byId.get(id); if (!t || now - (t.filled || t.opened) > LIMITS.fresh) delete st[k][id]; }
+    // housekeeping: skip/retry notes matter only while the council trade is open; finished positions are kept LIMITS.keepDays
+    for (const k of ['skipped', 'wait']) for (const id of Object.keys(st[k] || {})) { const t = byId.get(id); if (!t || !OPEN.has(t.status)) delete st[k][id]; }
     for (const [id, m] of Object.entries(st.map)) if (m.closedAt && now - Date.parse(m.closedAt) / 1000 > LIMITS.keepDays * 86400) delete st.map[id];
     st.status = `ok · demo ${acc.brokerTitleShort || ''} · balance ${balance} · ${openCount()} open`.trim();
     st.balance = balance; st.lastRun = new Date(now * 1000).toISOString();
@@ -456,7 +489,10 @@ if (process.argv[1] && process.argv[1].endsWith('ctrader-mirror.mjs')) {
   const saveTokens = (t) => { fs.mkdirSync(CD, { recursive: true }); fs.writeFileSync(path.join(CD, 'tokens.json'), JSON.stringify(t)); };
   let cfg = {}; try { cfg = JSON.parse(fs.readFileSync(path.join(DIR, 'config.json'), 'utf8')) || {}; } catch (e) {}
   const shadows = cfg.mirrorShadow !== false;   // 8 Nov, owner: shadows mirrored too; config.json mirrorShadow: false turns it off
-  const prev = rd('mirror.json', {}), r = await mirrorRound({ env: process.env, trades, state: prev.state, tokens: rd('tokens.json', null), specs: rd('symbols.json', null), onTokens: saveTokens, shadows });
+  // the council's latest prices (Trader snapshot): stop/target distances of a council trade are measured from them, see the header
+  let marks = null; try { const sn = JSON.parse(fs.readFileSync(path.join(DIR, 'snapshot.json'), 'utf8'));
+    marks = Object.fromEntries(Object.entries(sn.markets || {}).filter(([, m]) => m && +m.price > 0).map(([k, m]) => [k, { price: +m.price, at: sn.at }])); } catch (e) {}
+  const prev = rd('mirror.json', {}), r = await mirrorRound({ env: process.env, trades, state: prev.state, tokens: rd('tokens.json', null), specs: rd('symbols.json', null), onTokens: saveTokens, shadows, marks });
   fs.mkdirSync(CD, { recursive: true });
   fs.writeFileSync(path.join(CD, 'mirror.json'), JSON.stringify({ state: r.state, log: (prev.log || []).concat(r.log).slice(-300), limits: LIMITS, symbols: SYMBOLS, execution: executionStats(r.state.map) }, null, 1));
   if (r.tokens && JSON.stringify(r.tokens) !== JSON.stringify(rd('tokens.json', null))) saveTokens(r.tokens);
