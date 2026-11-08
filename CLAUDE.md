@@ -557,6 +557,15 @@ moves the forming candle on every pane like the OANDA ticks (`G.tickSrc 'rest'`,
 the stream's 8 s connect timer fires or when the source is not Binance, stops itself once a stream is live, and the fallback poll is
 fast for every source while nothing ticks.
 
+## LIT replay, last two months (8 Nov 2026)
+`council/lit-replay.mjs` (owner: "fill trades from the last 2 months so I can study them"): the pre-registered rule (council/lit.mjs
+detector + the study's simulateOrder / selectTrades from research/edge/lit/run.mjs) over ~63 days of OANDA 5m gold read through
+`MD_BASE` bars?from&to in 15-day windows (+9 days warm-up) → council-data `lit/replay.json`: funnel, build counts, every setup with
+its drop reason or order and outcome, the taken trades with Rnet / Rnet2, the other variants. Runs in the council loop (the ICT round),
+skipped while the file is < 20 h old (`--force` overrides; `--days N`). Paper research, not the stream's records; the LIT desk shows it
+under "Last two months, replayed". First run on 8 Nov: 73 setups, 2 orders, 0 fills, as the study's rate predicts. Tests:
+`tests/lit-replay.test.mjs`.
+
 ## LIT and NQ SDV desks (8 Nov 2026)
 The desk switch is ICT | Gold | Crypto | LIT | NQ SDV (soon). `#lit` (v-lit, `renderLit`, re-run when council-data lands) shows the paper
 shadow stream: record from trades with `k 'lit'` / ids `xau-lit-*`, the detector funnel and dropped-candidate counts from `snapshot.lit`,

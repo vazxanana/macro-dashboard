@@ -6541,8 +6541,31 @@ function msNextSetup(bars, A) {
         ${build.length ? `<p class="ms-note" style="margin:10px 0 0">Candidates dropped: ${build.map(([k, v]) => `${k} ${v}`).join(' · ')}.</p>` : ''}
         ${L ? `<p class="ms-note" style="margin:6px 0 0">Gates: one order at a time, at most one London and one New York morning fill a day, stop after a win or −1.5R. Held now: ${L.held || 0}, break-evens: ${L.be || 0}.</p>` : ''}</div>
       <div class="card lit-wide"><div class="ms-k"><span>Open and resting</span></div>${table(open.concat(pend), 'No LIT order open or resting right now.')}</div>
-      <div class="card lit-wide"><div class="ms-k"><span>Closed</span><small>${done.length} trades</small></div>${table(done.slice(0, 60), 'No closed LIT trade yet.')}</div>`;
+      <div class="card lit-wide"><div class="ms-k"><span>Closed</span><small>${done.length} trades</small></div>${table(done.slice(0, 60), 'No closed LIT trade yet.')}</div>
+      <div class="card lit-wide" id="lit-replay"><div class="ms-k"><span>Last two months, replayed</span><small>loading…</small></div></div>`;
+    litReplay();
   };
+  // the replay of the rule over the last two months (council/lit-replay.mjs -> lit/replay.json): every setup the detector saw, what
+  // became of it, the orders and the fills, so the owner can study the edge on recent candles (8 Nov)
+  async function litReplay() {
+    const box = document.getElementById('lit-replay'); if (!box) return;
+    let R = null; try { const r = await fetch(window.MS_CDATA + 'lit/replay.json?t=' + Math.floor(Date.now() / 600000), { cache: 'no-store' }); R = r.ok ? await r.json() : null; } catch (e) {}
+    if (!R) { box.innerHTML = '<div class="ms-k"><span>Last two months, replayed</span></div><div class="ct-empty">The replay has not run yet. It runs once a day in the council loop and lands here.</div>'; return; }
+    const when = (t) => new Date(t * 1000).toLocaleString(undefined, { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' }), fR = (v) => `${v > 0 ? '+' : v < 0 ? '−' : ''}${Math.abs(v).toFixed(2)}R`;
+    const LV = { acc: 'accumulation extreme', pd: 'previous day', pw: 'previous week', eqh: 'equal highs / lows', ASIA: 'Asia session', LONDON: 'London session', NY_AM: 'NY morning' };
+    const st = R.stats || {}, setups = R.setups || [], trades = R.trades || [];
+    const tr = trades.map((x) => `<tr><td>${when(x.t)}</td><td><span class="chip ${x.side}">${x.side.toUpperCase()}</span></td><td>${x.sess}</td><td>${LV[x.level] || x.level}</td><td class="n">${x.entry}</td><td class="n">${x.stop}</td><td class="n">${x.target}</td><td class="n">${x.rr ?? '—'}</td><td>${x.kind} <b class="${x.Rnet > 0 ? 'pos' : x.Rnet < 0 ? 'neg' : ''}">${fR(x.Rnet)}</b></td></tr>`).join('');
+    const su = setups.slice().reverse().map((x) => `<tr><td>${when(x.t)}</td><td><span class="chip ${x.side}">${x.side.toUpperCase()}</span></td><td>${x.sess}</td><td>${LV[x.level] || x.level} <span class="lit-px">${x.levelPx}</span></td><td class="n">${x.accLow} – ${x.accHigh} <small>${x.accBars} M15</small></td><td>${x.order ? `<b>order</b> ${x.order.entry} · stop ${x.order.stop} · target ${x.order.target} · ${x.order.rr}:1 · <i>${x.order.outcome}</i>${x.order.capOK ? '' : ' · stop over the cap, not placed'}` : `<span class="lit-why">${x.why}</span>`}</td></tr>`).join('');
+    const vs = Object.entries(R.variants || {}).map(([k, v]) => `<li><span>${k}</span><b>${v.orders} orders · ${v.taken} taken${v.stats && v.stats.n ? ` · ${fR(v.stats.total)}` : ''}</b></li>`).join('');
+    box.innerHTML = `<div class="ms-k"><span>Last two months, replayed</span><small>${R.from} → ${R.to} · ${R.bars.toLocaleString()} M5 candles · run ${new Date(R.at).toLocaleString(undefined, { weekday: 'short', hour: '2-digit', minute: '2-digit' })}</small></div>
+      <div class="ct-stats"><div><span>Setups seen</span><b>${setups.length}</b></div><div><span>Orders built</span><b>${R.orders}</b></div><div><span>Filled</span><b>${R.filled}</b></div><div><span>Taken by the gates</span><b>${trades.length}</b></div><div><span>Net</span><b class="${(st.total || 0) > 0 ? 'ct-pos' : (st.total || 0) < 0 ? 'ct-neg' : ''}">${st.n ? fR(st.total) : '—'}</b></div></div>
+      <p class="ms-note" style="margin:10px 0 0">${esc(R.note)}</p>
+      <h4 class="lit-h4">Trades the rule would have taken <small>${trades.length}</small></h4>
+      ${trades.length ? `<div class="ct-tw"><table class="ct-t"><thead><tr><th>Filled</th><th>Side</th><th>Session</th><th>Level</th><th class="n">Entry</th><th class="n">Stop</th><th class="n">Target</th><th class="n">R:R</th><th>Exit</th></tr></thead><tbody>${tr}</tbody></table></div>` : '<div class="ct-empty">No fill in this window: every order expired, saw its target first, or was skipped by a gate. The setups below show where the rule looked and why it passed.</div>'}
+      <h4 class="lit-h4">Every setup the detector saw <small>${setups.length} · newest first</small></h4>
+      <div class="ct-tw"><table class="ct-t lit-setups"><thead><tr><th>Sweep</th><th>Side</th><th>Session</th><th>Level swept</th><th class="n">Accumulation</th><th>What became of it</th></tr></thead><tbody>${su || '<tr><td colspan="6" class="ct-empty">No setup in this window.</td></tr>'}</tbody></table></div>
+      ${vs ? `<h4 class="lit-h4">The study's other variants <small>comparison only</small></h4><ul class="lit-funnel">${vs}</ul>` : ''}`;
+  }
   function guestCard(x, last) {
       const card = document.getElementById('g-setup');
       if (!card) return;
@@ -10363,6 +10386,9 @@ html[data-role="public"] .hdr-sw { display: none; }
 #v-lit .lit-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; } #v-lit .lit-wide { grid-column: 1 / -1; }
 #v-lit .lit-funnel { list-style: none; margin: 0; padding: 0; display: grid; gap: 4px; } #v-lit .lit-funnel li { display: flex; justify-content: space-between; gap: 12px; padding: 6px 0; border-bottom: 1px solid var(--line-soft, var(--line)); font-size: 13px; }
 #v-lit .lit-funnel li:last-child { border-bottom: 0; } #v-lit .lit-funnel b { font-variant-numeric: tabular-nums; }
+#v-lit .lit-h4 { margin: 16px 0 8px; font-size: 14px; } #v-lit .lit-h4 small { color: var(--ink-faint); font-weight: 500; margin-left: 6px; }
+#v-lit .lit-setups td { white-space: normal; } #v-lit .lit-px { font-variant-numeric: tabular-nums; color: var(--ink-faint); margin-left: 4px; } #v-lit .lit-why { color: var(--ink-faint); } #v-lit .lit-setups i { color: var(--ink-dim); font-style: normal; font-weight: 600; }
+#v-lit .lit-setups small { color: var(--ink-faint); margin-left: 4px; }
 #v-lit .ms-k small, #v-lit .ms-k > small { color: var(--ink-faint); font-weight: 500; margin-left: 8px; }
 #v-lit .ct-stats b.ct-pos { color: var(--buy); } #v-lit .ct-stats b.ct-neg { color: var(--sell); } #v-lit td.n, #v-lit th.n { text-align: right; } #v-lit b.pos { color: var(--buy); } #v-lit b.neg { color: var(--sell); }
 #v-sdv .sdv-card { max-width: 760px; } #v-sdv .sdv-card h2 { margin: 0 0 10px; font-size: 17px; } #v-sdv .sdv-card ol { margin: 0 0 12px; padding-left: 20px; display: grid; gap: 8px; line-height: 1.5; }
