@@ -1,3 +1,5 @@
+8 Nov: the owner keeps LIT as a paper shadow stream (council/lit.mjs, k 'lit') to build a forward record; this study's verdict stands.
+
 # LIT (Liquidity Inducement Theory) on gold and NAS100, 2008-2026 (8 Nov 2026)
 
 **Verdict: INCONCLUSIVE — under the skill's own defaults the rule produces too few trades to judge (XAUUSD 27 and NAS100 35 fills in 19 years, one order in five fills), and everything that can be measured is negative: the thicker uncapped set loses 0.70R a trade on gold 2018-26 (n 39, t −2.7) and 0.25R on NAS100 (n 42), no set beats random entry with the same stops and targets, and none survives doubled costs. Not a candidate for a paper shadow stream.**
