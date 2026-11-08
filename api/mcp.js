@@ -5,7 +5,8 @@
 //   URL for the friend:  https://meridianx.dev/api/mcp/<key>  (vercel.json rewrites it to /api/mcp?key=<key>; under /api because the
 //                        firewall rule "Only reads outside the API" denies every POST elsewhere)
 //   Env (Vercel, server only):
-//     MCP_KEYS        "fred:<long random>,orlando:<long random>"  one key per person; the name goes on their notes and PRs.
+//     (no key env needed for Fred: his key is derived from CTRADER_LINK_KEY / CRON_SECRET, see whoIs)
+//     MCP_KEYS        optional "name:<long random>,…" for more people or to override a derived key; the name goes on notes and PRs.
 //                     Make a key with: node -e "console.log(require('crypto').randomBytes(24).toString('base64url'))"
 //     GH_READ_TOKEN   reads council-data and main (falls back to GH_TOKEN / GH_DISPATCH_TOKEN, as api/data.js does)
 //     GH_MCP_TOKEN    writes: branch + commit (Contents read/write) and the PR (Pull requests write). Falls back to GH_TOKEN;
@@ -30,14 +31,24 @@ const writeTok = () => process.env.GH_MCP_TOKEN || process.env.GH_TOKEN;
 const iso = (t) => (t ? new Date(t * 1000).toISOString().slice(0, 16).replace('T', ' ') : null);
 const scrubErr = (e) => String(e && e.message || e).replace(/gh[pousr]_[A-Za-z0-9_]+|github_pat_[A-Za-z0-9_]+/g, '***');
 
-// ---- who is calling: MCP_KEYS "name:key,name:key", compared in constant time ----
+// ---- who is calling ----
+// Keys come from two places: MCP_KEYS "name:key,name:key" (optional, for anyone), and for the profile users a key DERIVED from a
+// secret already on the server (owner, 8 Nov: "for Fred the key should be there already without him adding"): HMAC of the name
+// with CTRADER_LINK_KEY (else CRON_SECRET), so Fred's URL exists from the first deploy. Compared in constant time.
+const same = (a, b) => typeof a === 'string' && typeof b === 'string' && a.length === b.length && crypto.timingSafeEqual(Buffer.from(a), Buffer.from(b));
+function derivedKey(name, env = process.env) { const sec = env.CTRADER_LINK_KEY || env.CRON_SECRET; return sec && PROFILE_USERS.includes(name) ? crypto.createHmac('sha256', sec).update(`mcp:${name}`).digest('base64url').slice(0, 32) : null; }
+function keyFor(name, env = process.env) {
+  const ent = String(env.MCP_KEYS || '').split(',').map((x) => x.trim()).find((x) => x.toLowerCase().startsWith(name + ':'));
+  const k = ent ? ent.slice(name.length + 1) : null; return k && k.length >= 16 ? k : derivedKey(name, env);
+}
 function whoIs(key) {
   if (!key || typeof key !== 'string' || key.length > 200) return null;
   for (const ent of String(process.env.MCP_KEYS || '').split(',')) {
     const i = ent.indexOf(':'); if (i < 1) continue;
     const name = ent.slice(0, i).trim().toLowerCase(), k = ent.slice(i + 1).trim();
-    if (k.length >= 16 && k.length === key.length && crypto.timingSafeEqual(Buffer.from(k), Buffer.from(key)) && /^[a-z0-9-]{1,24}$/.test(name)) return name;
+    if (k.length >= 16 && same(k, key) && /^[a-z0-9-]{1,24}$/.test(name)) return name;
   }
+  for (const name of PROFILE_USERS) { const k = derivedKey(name); if (k && same(k, key)) return name; }
   return null;
 }
 
@@ -201,10 +212,9 @@ module.exports = async (req, res) => {
     try {
       const ct = require('./ctrader-link.js')._t, who = await ct.identify({ blobUsers: () => ct.blobUsers(process.env, req.headers.host) }, want, b.pw);
       if (!who || who.u !== want) return res.status(403).json({ error: 'Password not accepted' });
-      const ent = String(process.env.MCP_KEYS || '').split(',').map((x) => x.trim()).find((x) => x.toLowerCase().startsWith(want + ':'));
-      if (!ent || ent.slice(want.length + 1).length < 16) return res.status(404).json({ error: 'No key has been made for you yet; ask the owner' });
+      const k = keyFor(want); if (!k) return res.status(503).json({ error: 'The server has no key secret yet; ask the owner' });
       console.log(`[mcp] key shown to ${want}`);
-      return res.status(200).json({ user: want, url: `https://${req.headers.host}/api/mcp/${ent.slice(want.length + 1)}` });
+      return res.status(200).json({ user: want, url: `https://${req.headers.host}/api/mcp/${k}` });
     } catch (e) { return res.status(e.status || 500).json({ error: scrubErr(e) }); }
   }
   const who = whoIs((req.query && req.query.key) || (String(req.headers.authorization || '').match(/^Bearer (.+)$/) || [])[1]);
@@ -219,4 +229,4 @@ module.exports = async (req, res) => {
   res.setHeader('Content-Type', 'application/json'); res.setHeader('Mcp-Protocol-Version', '2025-06-18');
   return res.status(200).json(Array.isArray(body) ? out : out[0]);
 };
-module.exports.lib = { PROFILE_USERS, whoIs, okPath, scrub, stats, brief, outcome, filterTrades, sections, rpc, TOOLS, call };
+module.exports.lib = { PROFILE_USERS, derivedKey, keyFor, whoIs, okPath, scrub, stats, brief, outcome, filterTrades, sections, rpc, TOOLS, call };
