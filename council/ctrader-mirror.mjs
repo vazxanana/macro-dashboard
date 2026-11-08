@@ -520,7 +520,12 @@ export async function mirrorRound({ env, trades, state, tokens, specs = null, WS
     const ensureStop = async (id, m, t, p) => {
       const d = Number.isFinite(+m.digits) ? +m.digits : 5, at = (v) => +(+v).toFixed(d);
       const isIct = String(id).startsWith('ict:'), fill = Number.isFinite(+p.price) && +p.price > 0 ? +p.price : null;
-      const want = isIct ? (fill != null ? at(fill + (+t.stop - +t.entry)) : null) : at(t.stop);
+      const num = (v) => v != null && v !== '' && Number.isFinite(+v);
+      let want = !num(t.stop) ? null : isIct ? (fill != null && num(t.entry) ? at(fill + (+t.stop - +t.entry)) : null) : at(t.stop);
+      // a stop must sit on the losing side of the fill and above zero (9 Nov audit: a missing level once read as 0)
+      // (a trailed stop may sit past the entry, so the side is checked against the current price, when known; else the broker judges)
+      { const side = m.side || t.side, nowPx = t.market ? markOf(marks, t.market, now) : null;
+        if (want != null && (!(want > 0) || (nowPx != null && ((side === 'buy' && want >= nowPx) || (side === 'sell' && want <= nowPx))))) want = null; }
       const wantT1 = t.t1 != null && !(t.rr >= 50) ? (isIct ? (fill != null ? at(fill + (+t.t1 - +t.entry)) : null) : at(t.t1)) : null;
       const vol = (p.tradeData && +p.tradeData.volume) || m.volume, mk = markOf(marks, t.market, now);
       const closeNow = async (why) => {
@@ -532,7 +537,7 @@ export async function mirrorRound({ env, trades, state, tokens, specs = null, WS
           alert('close', id, m, { by: 'mirror', council: t.status, R: null, why: `no stop at the broker: ${why}` }); }
         catch (e2) { m.noStopTries = (m.noStopTries || 0) + 1; say(`close of unprotected ${m.symbol} ${m.positionId} failed: ${e2.message} (again next round)`, { trade: id }); alert('nostop', id, m, { result: scrub(e2.message), stop: want }); }
       };
-      if (want == null) { await closeNow('no fill price to measure the stop from'); return; }
+      if (want == null) { await closeNow('no valid stop level (missing, zero, or on the wrong side of the fill)'); return; }
       const req = { ctidTraderAccountId: ctid, positionId: Number(m.positionId), stopLoss: want, ...(wantT1 != null ? { takeProfit: wantT1 } : p.takeProfit != null ? { takeProfit: +p.takeProfit } : {}) };
       try {
         await s.send(PT.AMEND_POSITION_SLTP_REQ, req, PT.EXECUTION_EVENT, amendStep);
@@ -546,10 +551,23 @@ export async function mirrorRound({ env, trades, state, tokens, specs = null, WS
     };
     for (const [id, m] of Object.entries(st.map)) {
       if (m.status !== 'open' || m.closing) continue;
-      const t = byId.get(id); if (!t || !OPEN.has(t.status) || t.stop == null) continue;
       const p = positions.get(String(m.positionId)); if (!p || p.stopLoss != null) continue;
+      // (9 Nov audit) the council's trade may have left its list or lost its levels: the stop saved at the open still protects it
+      const t0 = byId.get(id), t = t0 && t0.stop != null && !isDone(t0) ? t0 : m.stop != null ? { id, market: null, side: m.side, stop: m.stop, entry: m.councilEntry ?? m.stop, t1: m.t1 ?? null, rr: m.rr, status: 'open' } : null;
+      if (!t) { await ensureStop(id, m, { id, stop: null, entry: null, t1: null, status: 'open' }, p); continue; }   // no level anywhere: ensureStop closes it
       await ensureStop(id, m, t, p);
     }
+    // 2d) RULE: a position with our label that the mirror does not manage (state lost, or another run's) and has no stop is closed
+    //     at once; one with a stop is reported once and left to its stop (9 Nov audit)
+    { const known = new Set(Object.values(st.map).map((m) => String(m.positionId)));
+      for (const p of positions.values()) { const td = p.tradeData || {}; if (td.label !== LABEL || known.has(String(p.positionId))) continue;
+        const key = String(p.positionId); st.orphans = st.orphans || {};
+        if (p.stopLoss == null) {
+          try { await s.send(PT.CLOSE_POSITION_REQ, { ctidTraderAccountId: ctid, positionId: Number(p.positionId), volume: +td.volume }, PT.EXECUTION_EVENT, orderStep);
+            say(`closed unmanaged position ${key} (${td.comment || 'no comment'}): it had no stop`); alert('close', `orphan:${key}`, { symbol: td.comment || 'position', positionId: key }, { by: 'mirror', why: 'unmanaged position without a stop' }); }
+          catch (e) { say(`close of unmanaged position ${key} without a stop failed: ${e.message} (again next round)`); alert('nostop', `orphan:${key}`, { symbol: td.comment || 'position', positionId: key }, { result: scrub(e.message) }); }
+        } else if (!st.orphans[key]) { st.orphans[key] = iso; say(`unmanaged position ${key} (${td.comment || 'no comment'}) found at the broker with a stop at ${p.stopLoss}: left to its stop`); }
+      } }
     // 2c) the council moved a stop or target on an open trade (break-even, trailing, a re-planned target) -> the demo position's
     //     protection follows (8 Nov, owner). Council trades take the council's absolute levels; an ICT trade (futures levels on a
     //     cash CFD) moves its broker stop by the same distance the council moved its own. A move the broker rejects is retried

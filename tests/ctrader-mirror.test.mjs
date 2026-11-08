@@ -729,3 +729,23 @@ test('stop check reads the position back: a stop attached just after the fill ev
   r = await mirrorRound({ env: ENV, trades: [tr()], state: started, WS: b2.WS, now: NOW, slWaitMs: 0 });
   assert.equal(b2.amends.length, 1); assert.ok(b2.amends[0].stopLoss > 0); assert.ok(r.log.some((l) => /missing stop/.test(l.msg)));
 });
+
+test('audit 9 Nov: no position is ever left without a stop, and a stop is never set at 0', async () => {
+  // the council trade leaves the list: the stop saved at the open still protects the position
+  const b = broker(); let r = await mirrorRound({ env: ENV, trades: [tr()], state: started, WS: b.WS, now: NOW, slWaitMs: 0 });
+  const pid = r.state.map['eurusd-intraday-1'].positionId; delete b.positions.get(pid).stopLoss;
+  r = await mirrorRound({ env: ENV, trades: [], state: r.state, WS: b.WS, now: NOW + 60, slWaitMs: 0 });
+  assert.equal(b.amends.at(-1).stopLoss, 1.098, 'saved stop used'); assert.ok(b.amends.every((a) => a.stopLoss == null || a.stopLoss > 0));
+  // no level anywhere: closed, never amended to 0
+  const b2 = broker(); r = await mirrorRound({ env: ENV, trades: [tr()], state: started, WS: b2.WS, now: NOW, slWaitMs: 0 });
+  const id2 = r.state.map['eurusd-intraday-1'].positionId; delete b2.positions.get(id2).stopLoss; r.state.map['eurusd-intraday-1'].stop = null;
+  const before = b2.amends.length; r = await mirrorRound({ env: ENV, trades: [tr({ stop: null })], state: r.state, WS: b2.WS, now: NOW + 60, slWaitMs: 0 });
+  assert.equal(b2.amends.length, before, 'no amend'); assert.equal(b2.o.closes, 1); assert.match(r.state.map['eurusd-intraday-1'].status, /closed by mirror/);
+  // an unmanaged position with our label and no stop is closed; one with a stop is reported once and left
+  const b3 = broker(); b3.positions.set('900', { positionId: 900, positionStatus: 1, price: 1.1, tradeData: { symbolId: 1, volume: 1000, tradeSide: 1, label: 'council', comment: 'lost' } });
+  b3.positions.set('901', { positionId: 901, positionStatus: 1, price: 1.1, stopLoss: 1.09, tradeData: { symbolId: 1, volume: 1000, tradeSide: 1, label: 'council', comment: 'kept' } });
+  r = await mirrorRound({ env: ENV, trades: [], state: started, WS: b3.WS, now: NOW, slWaitMs: 0 });
+  assert.equal(b3.o.closes, 1); assert.equal(b3.positions.has('900'), false); assert.equal(b3.positions.has('901'), true); assert.ok(r.state.orphans['901']);
+  r = await mirrorRound({ env: ENV, trades: [], state: r.state, WS: b3.WS, now: NOW + 60, slWaitMs: 0 });
+  assert.equal(r.log.filter((l) => /unmanaged position 901/.test(l.msg)).length, 0, 'reported once');
+});
