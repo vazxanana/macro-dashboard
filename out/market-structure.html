@@ -3392,6 +3392,10 @@ html[data-motion="off"] #v-ict .ict-cal-d:hover { transform: none !important; }
         <div class="pf-ct-h"><div><h2 id="ms-pf-t">Demo accounts</h2><div class="ct-sub" id="ms-pf-sub"></div></div></div>
         <div class="ct-b pf-ct-b" id="ms-pf-b" aria-live="polite"></div>
       </section>
+      <section class="card pf-ct pf-mcp" id="ms-pf-mcp" aria-labelledby="ms-pf-mcp-t" hidden>
+        <div class="pf-ct-h"><div><h2 id="ms-pf-mcp-t">ChatGPT connector</h2><div class="ct-sub">Work on the ICT edge from ChatGPT: read the rules and every signal, save notes, propose changes</div></div></div>
+        <div class="ct-b pf-ct-b" id="ms-pf-mcp-b"></div>
+      </section>
     </div>
   </section>
   <section class="view" id="v-journal" aria-label="Journal" hidden>
@@ -10320,8 +10324,29 @@ html[data-role="public"] .hdr-sw { display: none; }
     ['photo', 'rename'].forEach((k) => { const b = $('ms-pf-' + k); if (b) b.hidden = !$('ms-me-' + k); });
     if ($('ms-pf-theme') && $('ms-me-theme')) $('ms-pf-theme').textContent = $('ms-me-theme').textContent;
     load(true);
+    mcpCard();
     clearInterval(state.timer); state.timer = setInterval(() => { if (!document.hidden && active()) load(false); else if (!active()) clearInterval(state.timer); }, 15000);
   };
+  // Fred's ChatGPT connector (owner, 8 Nov: only Fred). The URL carries his key, so it is shown after his password, never stored.
+  const MCP_API = API ? location.origin + '/api/mcp' : null;
+  function mcpCard() {
+    const c = $('ms-pf-mcp'); if (!c) return;
+    const me = ls('ms-user'); if (me !== 'fred' || !MCP_API) { c.hidden = true; return; }
+    c.hidden = false; const b = $('ms-pf-mcp-b'); if (b.dataset.ready) return; b.dataset.ready = '1';
+    const steps = `<ol><li>In ChatGPT: Settings → Connectors → Advanced → Developer mode on → Create.</li><li>Paste the URL above as the MCP server URL; Authentication: <b>None</b>.</li><li>Enable it in a chat and ask, for example, "show me the A-setup losses on NQ this month" or "read ict/tracker.mjs and propose a change".</li></ol><p class="ms-note" style="margin:10px 0 0">The URL is your key: keep it to yourself. Changes you propose become a draft pull request for the owner; nothing changes live until the owner merges. Paper trading only.</p>`;
+    b.innerHTML = `<label>Your Aurum Desk password (to show your connector URL)<input type="password" id="ms-mcp-pw" autocomplete="current-password"></label><div style="margin-top:10px"><button type="button" class="ct-btn" id="ms-mcp-go">Show my connector URL</button></div><div class="ct-msg" id="ms-mcp-msg" role="status"></div>`;
+    const go = $('ms-mcp-go'), pw = $('ms-mcp-pw');
+    pw.addEventListener('keydown', (e) => { if (e.key === 'Enter') go.click(); });
+    go.addEventListener('click', async () => {
+      go.disabled = true; $('ms-mcp-msg').textContent = 'Checking…';
+      try {
+        const r = await fetch(MCP_API, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action: 'mykey', user: me, pw: pw.value }), cache: 'no-store' });
+        const j = await r.json().catch(() => ({})); if (!r.ok) throw new Error(j.error || ('Error ' + r.status));
+        b.innerHTML = `<div class="mcp-url"><code id="ms-mcp-url">${esc(j.url)}</code><button type="button" class="ms-tbtn" id="ms-mcp-copy">Copy</button></div>${steps}`;
+        $('ms-mcp-copy').addEventListener('click', async () => { try { await navigator.clipboard.writeText(j.url); $('ms-mcp-copy').textContent = 'Copied'; } catch (e) { $('ms-mcp-copy').textContent = 'Select and copy'; } });
+      } catch (e) { go.disabled = false; $('ms-mcp-msg').textContent = e.message; }
+    });
+  }
   function open(msg) {
     if (document.documentElement.dataset.role === 'public' || !userKey()) return;
     MODE = 'dlg';
@@ -10360,6 +10385,8 @@ html[data-role="public"] .hdr-sw { display: none; }
 #v-profile .pf-ct { padding: 0; overflow: hidden; }
 #v-profile .pf-ct-h { display: flex; align-items: center; gap: 12px; padding: 14px 16px; border-bottom: 1px solid var(--line); } #v-profile .pf-ct-h h2 { margin: 0; font-size: 16px; } #v-profile .pf-ct-h .ct-sub { color: var(--ink-faint); font-size: 12px; }
 #v-profile .pf-ct-b { padding: 16px; font-variant-numeric: tabular-nums; }
+#v-profile .pf-mcp { grid-column: 2; } #v-profile .pf-mcp ol { margin: 10px 0 0; padding-left: 20px; font-size: 13px; line-height: 1.6; } #v-profile .pf-mcp .mcp-url { display: flex; gap: 8px; align-items: center; margin: 10px 0; } #v-profile .pf-mcp .mcp-url code { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; padding: 8px 10px; border: 1px solid var(--line); border-radius: 8px; font-size: 12px; background: var(--panel-hover, rgba(127,127,127,.08)); } #v-profile .pf-mcp label { display: grid; gap: 6px; font-size: 13px; max-width: 360px; } #v-profile .pf-mcp input { min-height: 38px; }
+@media (max-width: 900px) { #v-profile .pf-mcp { grid-column: 1; } }
 .me-pop .me-link { display: flex; align-items: center; min-height: 38px; padding: 8px 10px; text-decoration: none; color: var(--ink); font: 600 13px var(--sans); border-radius: 8px; } .me-pop .me-link:hover, .me-pop .me-link:focus-visible { background: var(--panel-hover); outline: none; }
 @media (max-width: 900px) { #v-profile .pf-grid { grid-template-columns: 1fr; } #v-profile .pf-card { position: static; } }
 </style>
