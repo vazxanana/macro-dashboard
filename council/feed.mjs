@@ -97,3 +97,16 @@ export function feedChangeText(c) {
   if (c.kept) parts.push(`${c.kept} open kept (no basis)`);
   return `feed changed ${c.from} → ${c.to}${parts.length ? ': ' + parts.join(', ') : ' (no live trades)'}`;
 }
+
+// Feed hysteresis (8 Nov): one missed OANDA read (a proxy timeout) used to flip a market to Kraken for a round and back the
+// next, re-quoting its orders twice on the way (gold 07:00 and 07:05 UTC: the engulf order re-derived on PAXG, then on spot
+// again). A market that was on OANDA now needs FEED_MISSES consecutive misses before it falls to Kraken; until then the
+// round skips the market (its records are not touched by candles they were not priced on, and nothing is re-quoted). A
+// market that was not on OANDA (first round, or already on Kraken) falls through at once, as before.
+export const FEED_MISSES = 2;
+export function feedDecision({ oandaOk, oandaMarket, prevFeed = null, misses = 0 }) {
+  if (!oandaMarket) return { feed: 'Kraken', misses: 0 };
+  if (oandaOk) return { feed: 'OANDA', misses: 0 };
+  const m = (misses | 0) + 1;
+  return prevFeed === 'oanda' && m < FEED_MISSES ? { feed: 'skip', misses: m } : { feed: 'Kraken', misses: m };
+}
