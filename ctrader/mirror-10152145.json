@@ -619,6 +619,60 @@
     ],
     "stopSetAt": "2026-11-08T22:03:09.000Z",
     "stopSetBy": "guard"
+   },
+   "usdcad-rintra-1794179194": {
+    "symbol": "USDCAD",
+    "side": "sell",
+    "setup": "rintra",
+    "openedAt": "2026-11-08T23:09:16.000Z",
+    "councilEntry": 1.4122,
+    "stop": 1.41296,
+    "t1": 1.40337,
+    "adopted": false,
+    "alerted": [
+     "open"
+    ],
+    "viaLimit": true,
+    "limitPrice": 1.4122,
+    "digits": 5,
+    "lots": 0.03,
+    "riskCash": 2,
+    "margin": 6,
+    "shadow": true,
+    "fillPrice": 1.41222,
+    "slipR": -0.026,
+    "lagSec": 162,
+    "positionId": "47376642",
+    "volume": 300000,
+    "status": "open"
+   },
+   "audusd-scalp-1794179316": {
+    "positionId": "47377210",
+    "symbol": "AUDUSD",
+    "side": "buy",
+    "volume": 100000,
+    "lots": 0.01,
+    "digits": 5,
+    "setup": "scalp",
+    "status": "open",
+    "openedAt": "2026-11-08T23:09:16.000Z",
+    "councilEntry": 0.687,
+    "stop": 0.68554,
+    "t1": 0.68934,
+    "riskCash": 2,
+    "margin": 1.37,
+    "shadow": true,
+    "mark": 0.687,
+    "levelsFrom": "mark",
+    "fillPrice": 0.687,
+    "slipR": 0,
+    "lagSec": 40,
+    "alerted": [
+     "open",
+     "amend"
+    ],
+    "stopSetAt": "2026-11-08T23:09:16.000Z",
+    "stopSetBy": "guard"
    }
   },
   "day": {
@@ -626,7 +680,7 @@
    "startBalance": 10000
   },
   "startedAt": "2026-11-08T11:42:25.000Z",
-  "status": "ok · demo Fusion Markets · balance 9987.78 · 14 open · 3 resting",
+  "status": "ok · demo Fusion Markets · balance 9987.78 · 16 open · 2 resting",
   "skipped": {
    "audusd-position-1793601653": "price 0.68666 has run 1.27R from the council entry 0.70162: a different trade now",
    "xrp-rswing-1793942619": "none of XRPUSD found at the broker",
@@ -639,12 +693,7 @@
    "xau-position-1793783465": {
     "why": "XAUUSD market closed (paused until 23:09 UTC)",
     "n": 0,
-    "at": "2026-11-08T23:07:16.000Z"
-   },
-   "xau-scalp-1794179194": {
-    "why": "XAUUSD market closed (paused until 23:09 UTC)",
-    "n": 0,
-    "at": "2026-11-08T23:07:16.000Z"
+    "at": "2026-11-08T23:09:16.000Z"
    }
   },
   "paused": {
@@ -694,48 +743,13 @@
     "alerted": [
      "pending"
     ]
-   },
-   "usdcad-rintra-1794179194": {
-    "orderId": "33764588",
-    "symbol": "USDCAD",
-    "side": "sell",
-    "volume": 300000,
-    "lots": 0.03,
-    "digits": 5,
-    "setup": "rintra",
-    "limitPrice": 1.4122,
-    "stop": 1.41296,
-    "t1": 1.40337,
-    "placedAt": "2026-11-08T23:07:16.000Z",
-    "expires": "2026-11-09T11:06:34.000Z",
-    "riskCash": 2,
-    "margin": 6,
-    "shadow": true,
-    "alerted": [
-     "pending"
-    ]
    }
   },
   "catchUpAt": "2026-11-08T12:04:40.000Z",
   "balance": 9987.78,
-  "lastRun": "2026-11-08T23:07:16.000Z"
+  "lastRun": "2026-11-08T23:09:16.000Z"
  },
  "log": [
-  {
-   "at": "2026-11-08T20:16:08.000Z",
-   "msg": "not mirrored yet usdcad-position-1793949081: USDCAD market closed (paused until 20:26 UTC) (will retry)",
-   "trade": "usdcad-position-1793949081"
-  },
-  {
-   "at": "2026-11-08T20:16:08.000Z",
-   "msg": "not mirrored yet usdcad-swing-1793949081: USDCAD market closed (paused until 20:26 UTC) (will retry)",
-   "trade": "usdcad-swing-1793949081"
-  },
-  {
-   "at": "2026-11-08T20:16:08.000Z",
-   "msg": "not mirrored yet audusd-scalp-1793949425: AUDUSD market closed: MARKET_CLOSED: Trading is not available: Market is closed. (will retry)",
-   "trade": "audusd-scalp-1793949425"
-  },
   {
    "at": "2026-11-08T20:16:08.000Z",
    "msg": "not mirrored yet audusd-intraday-1793949765: AUDUSD market closed (paused until 20:26 UTC) (will retry)",
@@ -2220,6 +2234,21 @@
    "at": "2026-11-08T23:07:16.000Z",
    "msg": "placed sell limit USDCAD 0.03 lot at 1.4122 (council rintra, valid to 2026-11-09T11:06Z)",
    "trade": "usdcad-rintra-1794179194"
+  },
+  {
+   "at": "2026-11-08T23:09:16.000Z",
+   "msg": "limit filled: USDCAD position 47376642 at the broker",
+   "trade": "usdcad-rintra-1794179194"
+  },
+  {
+   "at": "2026-11-08T23:09:16.000Z",
+   "msg": "opened buy AUDUSD 0.01 lot (council scalp)",
+   "trade": "audusd-scalp-1794179316"
+  },
+  {
+   "at": "2026-11-08T23:09:16.000Z",
+   "msg": "set the missing stop on AUDUSD 47377210 at 0.68554 (the broker had opened it without one)",
+   "trade": "audusd-scalp-1794179316"
   }
  ],
  "limits": {
@@ -2297,11 +2326,11 @@
   ]
  },
  "execution": {
-  "n": 21,
-  "meanSlipR": 0.003,
-  "medianSlipR": 0.01,
+  "n": 23,
+  "meanSlipR": 0.001,
+  "medianSlipR": 0,
   "worstSlipR": 1.168,
-  "medianLagSec": 219369,
+  "medianLagSec": 196509,
   "bySymbol": {
    "SOLUSD": {
     "n": 4,
@@ -2324,16 +2353,16 @@
     "meanSlipR": -0.54
    },
    "USDCAD": {
-    "n": 3,
-    "meanSlipR": 0.062
+    "n": 4,
+    "meanSlipR": 0.04
    },
    "USDCHF": {
     "n": 4,
     "meanSlipR": 0.582
    },
    "AUDUSD": {
-    "n": 4,
-    "meanSlipR": 0.133
+    "n": 5,
+    "meanSlipR": 0.106
    }
   }
  }
