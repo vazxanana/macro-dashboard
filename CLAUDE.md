@@ -554,7 +554,7 @@ whose stop distance is within 1.25× the broker spread (ctrader/symbols.json). T
 Guests always land on `#charts`; at load the `#v-guest` children move into `#v-charts > #g-merged` (the gold trade card, results, the
 P&L calendar, the invitation), so guest styles are scoped `:is(#v-guest, .g-merged)`. The desk's gold trade (`G.gplan`, set by
 renderGuest) is drawn as Entry / Stop / Target price lines on every pane while the market is gold (`planLinesDraw`, PUB branch); the
-separate guest H4 chart is gone, `guestCard()` writes the card. The "↓ Gold trade and
+separate guest H4 chart is gone, `guestCard()` writes the card (neutral wording, no system name). Each pane keeps a guest overlay (`P.gOv`) with the stop zone red and target zone green from the placing bar rightwards, like the main system. The "↓ Gold trade and
 results" link in the charts toolbar jumps to that section.
 
 ## Guests on the charts, wide-screen density (8 Nov 2026)

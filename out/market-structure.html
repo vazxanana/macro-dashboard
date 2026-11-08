@@ -4436,10 +4436,17 @@ function msNextSetup(bars, A) {
     P.planLines = [];
     P.planLinesDraw = function () {
       P.planLines.forEach((pl) => series.removePriceLine(pl)); P.planLines = [];
-      if (PUB) {   // guests (8 Nov, owner: "show the trade setup levels on the other timeframes"): the desk's gold trade, on gold, every timeframe
-        const g = G.gplan; if (!g || instKey !== 'xau') return;
-        const add = (price, color, title, style) => { if (price == null || !isFinite(price)) return; P.planLines.push(series.createPriceLine({ price, color, lineWidth: 1, lineStyle: style, axisLabelVisible: true, title, lineVisible: true })); };
-        add(g.entry, '#7aa2ff', 'Entry', LW.LineStyle.Solid); add(g.stop, '#f2576f', 'Stop', LW.LineStyle.Solid); add(g.t1, '#2fbf8f', 'Target', LW.LineStyle.Dashed); return; }
+      if (PUB) {   // guests (8 Nov, owner): the desk's gold trade on every timeframe, drawn like the main system: entry line, stop zone red, target zone green
+        const g = G.gplan, ok = g && instKey === 'xau' && P.bars && P.bars.length;
+        if (!P.gOv) { P.gOv = new Overlay(); attach(P.gOv); }
+        if (!ok) { P.gOv.set({ boxes: [], lines: [], labels: [], path: [], vlines: [], segs: [] }); return; }
+        const add = (price, color, title, style) => { if (price == null || !isFinite(price)) return; P.planLines.push(series.createPriceLine({ price, color, lineWidth: 1, lineStyle: style, axisLabelVisible: true, title, lineVisible: false })); };
+        add(g.entry, '#7aa2ff', 'Entry', LW.LineStyle.Solid); add(g.stop, '#f2576f', 'Stop', LW.LineStyle.Solid); add(g.t1, '#2fbf8f', 'Target', LW.LineStyle.Dashed);
+        const n = P.bars.length; let i0 = P.bars.findIndex((b) => b.time + tf.sec > (g.t0 || 0)); if (i0 < 0) i0 = Math.max(0, n - 12);   // from the bar the trade was placed in, out to the right like the main system
+        const i1 = n + 14, boxes = [{ l1: i0, l2: i1, hi: Math.max(g.entry, g.stop), lo: Math.min(g.entry, g.stop), fill: 'rgba(242,87,111,.16)', stroke: 'rgba(242,87,111,.55)' }];
+        if (g.t1 != null) boxes.push({ l1: i0, l2: i1, hi: Math.max(g.entry, g.t1), lo: Math.min(g.entry, g.t1), fill: 'rgba(47,191,143,.15)', stroke: 'rgba(47,191,143,.55)' });
+        boxes.push({ l1: i0, l2: i1, hi: g.entry, lo: g.entry, fill: null, stroke: '#7aa2ff', dash: true });
+        P.gOv.set({ boxes, lines: [], labels: [], path: [], vlines: [], segs: [] }); return; }
       const pl = G.plan;
       if (!G.show.plan || !pl || tf.id === '4h' || G.mode === 'ict') return;   // ICT mode: no council plan lines
       const add = (price, color, title, style) => P.planLines.push(series.createPriceLine({ price, color, lineWidth: 1, lineStyle: style, axisLabelVisible: true, title, lineVisible: G.show.detail }));
@@ -6467,9 +6474,9 @@ function msNextSetup(bars, A) {
       const st = x.status === 'pending' ? 'Waiting for the entry' : x.status === 'open' ? 'Open now' : x.status === 'win' ? 'Closed · won' : x.status === 'loss' ? 'Closed · lost' : x.status === 'be' ? 'Closed · break-even' : 'Closed';
       const when = new Date(((x.filled || x.opened) || 0) * 1000), ago = when.getTime() ? when.toLocaleString(undefined, { weekday: 'short', day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' }) : '';
       card.hidden = false;
-      card.innerHTML = `<div class="g-s-h"><span class="chip ${x.side}">${x.side === 'sell' ? 'SELL' : 'BUY'}</span><b>${esc(x.name || x.k || 'System trade')}</b><span class="g-s-st ${x.status}">${st}</span>${fl != null ? `<span class="g-s-fl ${fl > 0 ? 'pos' : fl < 0 ? 'neg' : ''}">${fl > 0 ? '+' : fl < 0 ? '−' : ''}${Math.abs(fl).toFixed(2)}R floating</span>` : ''}</div>
+      card.innerHTML = `<div class="g-s-h"><span class="chip ${x.side}">${x.side === 'sell' ? 'SELL' : 'BUY'}</span><b>Gold · the desk's trade</b><span class="g-s-st ${x.status}">${st}</span>${fl != null ? `<span class="g-s-fl ${fl > 0 ? 'pos' : fl < 0 ? 'neg' : ''}">${fl > 0 ? '+' : fl < 0 ? '−' : ''}${Math.abs(fl).toFixed(2)}R floating</span>` : ''}</div>
         <div class="g-s-grid"><div><span>Entry</span><b>${f(x.entry)}</b></div><div><span>Stop</span><b class="neg">${f(x.stop)}</b></div><div><span>Target</span><b class="pos">${tgt != null ? f(tgt) : 'trails'}</b></div><div><span>Reward : risk</span><b>${rr != null ? rr.toFixed(1) + ' : 1' : '—'}</b></div></div>
-        <p class="g-s-note">${esc(x.pair ? `${x.pair} · ` : '')}${ago ? `placed ${esc(ago)} · ` : ''}paper trade, risk one unit (R) from entry to stop · the entry, stop and target are drawn on every gold chart above.</p>`;
+        <p class="g-s-note">${ago ? `placed ${esc(ago)} · ` : ''}paper trade, risk one unit (R) from entry to stop · green zone entry to target, red zone entry to stop, on every gold chart above.</p>`;
   }
   async function renderGuest() {
     if (!PUB || GV.busy) return; const host = document.getElementById('g-chart'), msg = document.getElementById('g-msg');
@@ -6479,7 +6486,7 @@ function msNextSetup(bars, A) {
     const x = live[0] || pool.filter((t) => t.closed).sort((a, b) => b.closed - a.closed)[0] || null;
     // the levels on the chart panes (guests see the desk's gold trade on every timeframe) and the card in words
     { const tgt = x ? (x.tp1 != null ? x.tp1 : x.t1) : null, live1 = x && (x.status === 'open' || x.status === 'pending');
-      const next = live1 ? { entry: +x.entry, stop: +x.stop, t1: tgt != null ? +tgt : null, side: x.side, id: x.id } : null;
+      const next = live1 ? { entry: +x.entry, stop: +x.stop, t1: tgt != null ? +tgt : null, side: x.side, id: x.id, t0: +(x.filled || x.opened) || 0 } : null;
       if (JSON.stringify(next) !== JSON.stringify(G.gplan || null)) { G.gplan = next; try { Object.values(panes).forEach((P) => P.planLinesDraw && P.planLinesDraw()); } catch (e) {} } }
     guestCard(x, GV.bars && GV.bars.length ? GV.bars[GV.bars.length - 1].close + GV.off : (window.MDQ && MDQ.q && MDQ.q.xau && MDQ.q.xau.price) || null);
     if (!host) return;
