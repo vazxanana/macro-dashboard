@@ -10280,6 +10280,14 @@ html[data-role="public"] .hdr-sw { display: none; }
 }
 @media (min-width: 1800px) { .ms-live.app { max-width: 2000px; } #v-home .h-grid { grid-template-columns: minmax(0, 2.2fr) minmax(0, 1fr); } }
 </style>
+<style id="ms-guest5-css">
+/* guests: two screens only, Daily and H1 (8 Nov 2026, owner). The view segment goes; the two panes share the row; both stay tall. */
+html[data-role="public"] #v-charts .ms-pane:not([data-tf="1d"]):not([data-tf="1h"]) { display: none !important; }
+html[data-role="public"] #v-charts .ms-grid4 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+html[data-role="public"] #v-charts .ms-pane[data-tf="1d"] .ms-chart, html[data-role="public"] #v-charts .ms-pane[data-tf="1h"] .ms-chart { height: min(62vh, 560px); }
+html[data-role="public"] #v-charts .sec-h > .seg[aria-label="Chart view"], html[data-role="public"] #v-charts .kbd-hint { display: none !important; }
+@media (max-width: 900px) { html[data-role="public"] #v-charts .ms-grid4 { grid-template-columns: minmax(0, 1fr); } html[data-role="public"] #v-charts .ms-pane .ms-chart { height: 360px; } }
+</style>
 <style id="ms-guest4-css">
 /* guests: one page (8 Nov 2026). The charts, then the gold trade and the rest, separated by a rule. */
 #v-charts .g-merged { display: grid; gap: 14px; margin-top: 26px; padding-top: 22px; border-top: 1px solid var(--line); scroll-margin-top: 80px; }
