@@ -626,7 +626,7 @@
    "startBalance": 10000
   },
   "startedAt": "2026-11-08T11:42:25.000Z",
-  "status": "ok · demo Fusion Markets · balance 9987.78 · 14 open · 2 resting",
+  "status": "ok · demo Fusion Markets · balance 9987.78 · 14 open · 3 resting",
   "skipped": {
    "audusd-position-1793601653": "price 0.68666 has run 1.27R from the council entry 0.70162: a different trade now",
    "xrp-rswing-1793942619": "none of XRPUSD found at the broker",
@@ -639,7 +639,12 @@
    "xau-position-1793783465": {
     "why": "XAUUSD market closed (paused until 23:09 UTC)",
     "n": 0,
-    "at": "2026-11-08T23:04:45.000Z"
+    "at": "2026-11-08T23:07:16.000Z"
+   },
+   "xau-scalp-1794179194": {
+    "why": "XAUUSD market closed (paused until 23:09 UTC)",
+    "n": 0,
+    "at": "2026-11-08T23:07:16.000Z"
    }
   },
   "paused": {
@@ -689,23 +694,33 @@
     "alerted": [
      "pending"
     ]
+   },
+   "usdcad-rintra-1794179194": {
+    "orderId": "33764588",
+    "symbol": "USDCAD",
+    "side": "sell",
+    "volume": 300000,
+    "lots": 0.03,
+    "digits": 5,
+    "setup": "rintra",
+    "limitPrice": 1.4122,
+    "stop": 1.41296,
+    "t1": 1.40337,
+    "placedAt": "2026-11-08T23:07:16.000Z",
+    "expires": "2026-11-09T11:06:34.000Z",
+    "riskCash": 2,
+    "margin": 6,
+    "shadow": true,
+    "alerted": [
+     "pending"
+    ]
    }
   },
   "catchUpAt": "2026-11-08T12:04:40.000Z",
   "balance": 9987.78,
-  "lastRun": "2026-11-08T23:04:45.000Z"
+  "lastRun": "2026-11-08T23:07:16.000Z"
  },
  "log": [
-  {
-   "at": "2026-11-08T20:16:08.000Z",
-   "msg": "not mirrored yet eurusd-intraday-1793890935: EURUSD market closed (paused until 20:26 UTC) (will retry)",
-   "trade": "eurusd-intraday-1793890935"
-  },
-  {
-   "at": "2026-11-08T20:16:08.000Z",
-   "msg": "not mirrored yet gbpusd-scalp-1793916690: GBPUSD market closed (paused until 20:26 UTC) (will retry)",
-   "trade": "gbpusd-scalp-1793916690"
-  },
   {
    "at": "2026-11-08T20:16:08.000Z",
    "msg": "not mirrored yet usdcad-position-1793949081: USDCAD market closed (paused until 20:26 UTC) (will retry)",
@@ -2195,6 +2210,16 @@
    "at": "2026-11-08T23:00:07.000Z",
    "msg": "not mirrored yet xau-position-1793783465: XAUUSD market closed (paused until 23:09 UTC) (will retry)",
    "trade": "xau-position-1793783465"
+  },
+  {
+   "at": "2026-11-08T23:07:16.000Z",
+   "msg": "not mirrored yet xau-scalp-1794179194: XAUUSD market closed (paused until 23:09 UTC) (will retry)",
+   "trade": "xau-scalp-1794179194"
+  },
+  {
+   "at": "2026-11-08T23:07:16.000Z",
+   "msg": "placed sell limit USDCAD 0.03 lot at 1.4122 (council rintra, valid to 2026-11-09T11:06Z)",
+   "trade": "usdcad-rintra-1794179194"
   }
  ],
  "limits": {
