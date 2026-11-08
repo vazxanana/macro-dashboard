@@ -122,6 +122,9 @@ jobs:
             # Macro strategist (7 Nov, paper only): next-day odds, event playbook and scorecard → data/macro/; every 6th round
             # (~25 min), capped at 3 min; a failure never stops the loop.
             if [ $((i % 6)) -eq 1 ]; then timeout 180 node council/macro.mjs data || echo "Macro round $i failed"; fi
+            # Macro veteran (8 Nov, owner's gptmacro_v.1 skill as a council member, paper only): discusses the strategist's view from its
+            # data (no fetches), keeps a weekly forecast ledger → data/macro/veteran*.json; runs right after the strategist
+            if [ $((i % 6)) -eq 1 ]; then timeout 60 node council/veteran.mjs data || echo "Veteran round $i failed"; fi
             # Data-quality monitor (7 Nov): the OANDA proxy, Kraken and the ICT desk's CNBC feed, every 2nd round (~11 min) → health.json
             # and one deduplicated phone alert when a feed goes bad. Read-only for the bots; never fails the round.
             if [ $((i % 2)) -eq 1 ]; then timeout 150 node council/datacheck.mjs data || echo "Data check round $i failed"; fi

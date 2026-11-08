@@ -1,0 +1,211 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://meridianx.example/schemas/forecast-ledger.schema.json",
+  "title": "Append-only Research Forecast Ledger Record",
+  "description": "One immutable event in an analyst forecast ledger. Issue and update events preserve the complete forecast snapshot; resolution is a separate event linked to its predecessor.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["record_id", "forecast_id", "record_type", "recorded_at_utc", "previous_record_id"],
+  "properties": {
+    "record_id": { "type": "string", "minLength": 1 },
+    "forecast_id": { "type": "string", "minLength": 1 },
+    "record_type": { "enum": ["issued", "updated", "resolved"] },
+    "recorded_at_utc": { "type": "string", "format": "date-time" },
+    "previous_record_id": { "type": ["string", "null"], "description": "Null for the initial issuance; otherwise the immediately preceding immutable event for this forecast." },
+    "forecast": { "$ref": "#/$defs/forecast" },
+    "resolution": { "$ref": "#/$defs/resolution" }
+  },
+  "allOf": [
+    {
+      "if": { "properties": { "record_type": { "const": "issued" } }, "required": ["record_type"] },
+      "then": {
+        "required": ["forecast"],
+        "properties": { "previous_record_id": { "type": "null" } },
+        "not": { "required": ["resolution"] }
+      }
+    },
+    {
+      "if": { "properties": { "record_type": { "const": "updated" } }, "required": ["record_type"] },
+      "then": {
+        "required": ["forecast"],
+        "properties": { "previous_record_id": { "type": "string", "minLength": 1 } },
+        "not": { "required": ["resolution"] }
+      }
+    },
+    {
+      "if": { "properties": { "record_type": { "const": "resolved" } }, "required": ["record_type"] },
+      "then": {
+        "required": ["resolution"],
+        "properties": { "previous_record_id": { "type": "string", "minLength": 1 } },
+        "not": { "required": ["forecast"] }
+      }
+    }
+  ],
+  "$defs": {
+    "forecast": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["issued_at_utc", "information_cutoff_utc", "target", "horizon", "resolution_rule", "distribution", "comparator", "evidence", "rationale", "disconfirming_evidence"],
+      "properties": {
+        "issued_at_utc": { "type": "string", "format": "date-time" },
+        "information_cutoff_utc": { "type": "string", "format": "date-time", "description": "Latest time for evidence used in this forecast version. Must not postdate issuance." },
+        "target": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["variable", "instrument_or_population", "unit", "outcome_description", "observation_start_utc", "deadline_utc"],
+          "properties": {
+            "variable": { "type": "string", "minLength": 1 },
+            "instrument_or_population": { "type": "string", "minLength": 1 },
+            "unit": { "type": "string", "minLength": 1 },
+            "outcome_description": { "type": "string", "minLength": 1 },
+            "observation_start_utc": { "type": "string", "format": "date-time" },
+            "deadline_utc": { "type": "string", "format": "date-time" },
+            "timezone_note": { "type": "string" }
+          }
+        },
+        "horizon": { "type": "string", "minLength": 1 },
+        "resolution_rule": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["publisher", "dataset_or_instrument", "field_or_price_convention", "rule", "revision_policy"],
+          "properties": {
+            "publisher": { "type": "string", "minLength": 1 },
+            "dataset_or_instrument": { "type": "string", "minLength": 1 },
+            "direct_url": { "type": ["string", "null"], "format": "uri" },
+            "field_or_price_convention": { "type": "string", "minLength": 1 },
+            "rule": { "type": "string", "minLength": 1 },
+            "revision_policy": { "enum": ["first_release", "latest_as_of_deadline", "final", "specified_vintage", "not_applicable"] },
+            "specified_vintage": { "type": ["string", "null"] },
+            "missing_or_holiday_policy": { "type": "string" }
+          }
+        },
+        "distribution": {
+          "oneOf": [
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["kind", "event_probability"],
+              "properties": {
+                "kind": { "const": "binary_event" },
+                "event_probability": { "type": "number", "minimum": 0, "maximum": 1 }
+              }
+            },
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["kind", "point_estimate"],
+              "properties": {
+                "kind": { "const": "point" },
+                "point_estimate": { "type": "number" },
+                "unit": { "type": "string" }
+              }
+            },
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["kind", "quantiles"],
+              "properties": {
+                "kind": { "const": "quantiles" },
+                "quantiles": {
+                  "type": "array",
+                  "minItems": 2,
+                  "items": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": ["probability", "value"],
+                    "properties": {
+                      "probability": { "type": "number", "exclusiveMinimum": 0, "exclusiveMaximum": 1 },
+                      "value": { "type": "number" }
+                    }
+                  }
+                },
+                "unit": { "type": "string" },
+                "distribution_method": { "type": "string" }
+              }
+            }
+          ]
+        },
+        "comparator": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["type", "description"],
+          "properties": {
+            "type": { "enum": ["base_rate", "timestamped_consensus", "market_implied", "naive_model", "none"] },
+            "description": { "type": "string", "minLength": 1 },
+            "probability_or_value": { "type": ["number", "null"] },
+            "sample_size": { "type": ["integer", "null"], "minimum": 0 },
+            "captured_at_utc": { "type": ["string", "null"], "format": "date-time" },
+            "source_url": { "type": ["string", "null"], "format": "uri" },
+            "limitations": { "type": "string" }
+          }
+        },
+        "evidence": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["supporting_record_ids", "counterevidence_record_ids"],
+          "properties": {
+            "supporting_record_ids": { "type": "array", "items": { "type": "string" }, "uniqueItems": true },
+            "counterevidence_record_ids": { "type": "array", "items": { "type": "string" }, "uniqueItems": true },
+            "source_ids": { "type": "array", "items": { "type": "string" }, "uniqueItems": true },
+            "dependence_groups": { "type": "array", "items": { "type": "string" }, "uniqueItems": true }
+          }
+        },
+        "rationale": { "type": "string", "minLength": 1 },
+        "disconfirming_evidence": { "type": "string", "minLength": 1 },
+        "method_version": { "type": "string" },
+        "author_or_model": { "type": "string" },
+        "tags": { "type": "array", "items": { "type": "string" }, "uniqueItems": true }
+      }
+    },
+    "resolution": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["resolved_at_utc", "outcome", "source_snapshot", "scores"],
+      "properties": {
+        "resolved_at_utc": { "type": "string", "format": "date-time" },
+        "outcome": { "type": ["boolean", "number", "string", "null"] },
+        "source_snapshot": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["publisher", "dataset_or_instrument", "observed_at_utc", "retrieved_at_utc"],
+          "properties": {
+            "publisher": { "type": "string", "minLength": 1 },
+            "dataset_or_instrument": { "type": "string", "minLength": 1 },
+            "direct_url": { "type": ["string", "null"], "format": "uri" },
+            "observed_at_utc": { "type": "string", "format": "date-time" },
+            "retrieved_at_utc": { "type": "string", "format": "date-time" },
+            "vintage_id": { "type": ["string", "null"] },
+            "content_hash_sha256": { "type": ["string", "null"], "pattern": "^[A-Fa-f0-9]{64}$" }
+          }
+        },
+        "scores": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["name", "value", "baseline", "method_version", "optimization_direction"],
+            "properties": {
+              "name": { "enum": ["brier", "log_score", "crps", "pinball", "interval_score", "absolute_error", "squared_error", "other"], "description": "For log_score, use negative log likelihood (log loss); lower values are better. interval_score is an individual forecast's interval loss. Interval coverage is an aggregate calibration diagnostic, not a per-forecast loss." },
+              "value": { "type": "number" },
+              "baseline": { "type": "string", "minLength": 1 },
+              "baseline_score": { "type": ["number", "null"] },
+              "optimization_direction": { "enum": ["lower_is_better", "higher_is_better", "target_value"], "description": "Declare whether the score is minimized, maximized, or evaluated against an explicit target." },
+              "target_value": { "type": "number", "description": "Required when optimization_direction is target_value; record the numeric nominal target, in the score's stated scale." },
+              "target_tolerance": { "type": "number", "minimum": 0, "description": "Optional acceptable absolute deviation from target_value, in the score's stated scale." },
+              "target_deviation_rule": { "type": "string", "minLength": 1, "description": "Required when optimization_direction is target_value; define how deviations from target_value are assessed." },
+              "method_version": { "type": "string", "minLength": 1 },
+              "sample_size_context": { "type": "string" }
+            },
+            "allOf": [
+              {
+                "if": { "properties": { "optimization_direction": { "const": "target_value" } }, "required": ["optimization_direction"] },
+                "then": { "required": ["target_value", "target_deviation_rule"] }
+              }
+            ]
+          }
+        },
+        "review_note": { "type": "string" }
+      }
+    }
+  }
+}

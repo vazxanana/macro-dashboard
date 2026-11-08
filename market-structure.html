@@ -2966,6 +2966,13 @@ html[data-motion="off"] #v-ict .ict-cal-d:hover { transform: none !important; }
           <ul class="md-mv" id="ms-md-mv" aria-label="Expected move per market"></ul>
           <p class="md-foot" id="ms-md-dxy"></p>
           <p class="md-foot md-score" id="ms-md-score"></p>
+          <!-- Macro veteran (8 Nov 2026, owner): council/veteran.mjs discusses the strategist's view topic by topic; macro/veteran.json -->
+          <section class="md-vet" id="ms-md-vet" aria-labelledby="ms-md-vet-t" hidden>
+            <h3 id="ms-md-vet-t">Macro veteran · the discussion <small id="ms-md-vet-at"></small></h3>
+            <p class="md-vet-verdict" id="ms-md-vet-verdict"></p>
+            <ul class="md-vet-list" id="ms-md-vet-list"></ul>
+            <p class="md-vet-foot" id="ms-md-vet-foot"></p>
+          </section>
         </div>
         <div class="card md-ev">
           <div class="ms-k"><span role="heading" aria-level="3">Calendar · high-impact releases</span></div>
@@ -10056,6 +10063,20 @@ html[data-role="public"] #ms-me-ct { display: none; }
 
 #ms-cp-macro .md-lede { margin: -4px 0 12px; color: var(--ink-dim); font-size: 13px; line-height: 1.5; max-width: 70ch; }
 #ms-cp-macro .md-foot { margin: 12px 0 0; font-size: 12.5px; color: var(--ink-faint); line-height: 1.5; }
+/* Macro veteran: the discussion with the strategist (8 Nov 2026) */
+#ms-cp-macro .md-vet { margin: 14px 0 0; padding: 12px 14px; border: 1px solid var(--line); border-radius: var(--r-sm, 8px); background: var(--panel); }
+#ms-cp-macro .md-vet h3 { margin: 0 0 6px; font-size: 14px; font-weight: 600; color: var(--ink); } #ms-cp-macro .md-vet h3 small { font-weight: 400; color: var(--ink-faint); font-size: 12px; margin-left: 6px; }
+#ms-cp-macro .md-vet-verdict { margin: 0 0 10px; font-size: 13px; line-height: 1.5; color: var(--ink-dim); } #ms-cp-macro .md-vet-verdict b { color: var(--ink); } #ms-cp-macro .md-vet-verdict b.pos { color: var(--up, #1a9c5b); }
+#ms-cp-macro .md-vet-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+#ms-cp-macro .md-vet-row { display: grid; grid-template-columns: 74px minmax(0, 1fr); gap: 10px; align-items: start; padding: 8px 0; border-top: 1px solid var(--line); font-size: 12.5px; line-height: 1.45; color: var(--ink-dim); }
+#ms-cp-macro .md-vet-row > div { min-width: 0; } #ms-cp-macro .md-vet-row b { color: var(--ink); }
+#ms-cp-macro .md-vet-st { display: inline-block; padding: 2px 8px; border-radius: 999px; font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.02em; border: 1px solid var(--line); color: var(--ink-dim); justify-self: start; margin-top: 2px; }
+#ms-cp-macro .md-vet-row.agree .md-vet-st { border-color: color-mix(in srgb, var(--up, #1a9c5b) 50%, var(--line)); color: var(--up, #1a9c5b); }
+#ms-cp-macro .md-vet-row.disagree .md-vet-st { border-color: color-mix(in srgb, var(--down, #c23b3b) 50%, var(--line)); color: var(--down, #c23b3b); }
+#ms-cp-macro .md-vet-side { margin-top: 3px; } #ms-cp-macro .md-vet-side small { display: inline-block; min-width: 68px; color: var(--ink-faint); font-size: 11px; text-transform: uppercase; letter-spacing: 0.02em; }
+#ms-cp-macro .md-vet-why { margin-top: 4px; font-size: 12px; color: var(--ink-faint); font-style: italic; }
+#ms-cp-macro .md-vet-foot { margin: 10px 0 0; font-size: 12.5px; color: var(--ink-faint); line-height: 1.5; }
+@media (max-width: 480px) { #ms-cp-macro .md-vet-row { grid-template-columns: 1fr; gap: 4px; } }
 #ms-cp-macro .md-evday { margin: 0 0 12px; padding: 10px 12px; border-radius: var(--r-sm, 8px); border: 1px solid color-mix(in srgb, var(--md-warn) 35%, transparent); background: color-mix(in srgb, var(--md-warn) 9%, transparent); font-size: 13px; color: var(--ink); }
 
 /* next day: one row per market, tap to open the model, drivers and why */
@@ -10315,6 +10336,26 @@ html[data-role="public"] #ms-me-ct { display: none; }
       + '. <span title="Four pre-specified drivers, weekly, expanding z-scores (2007-26 test: IC +0.15, score > +0.25 → +2.2% next 4 weeks, up 69%; a negative score predicts nothing, so it is never a sell). Paper reading: nothing trades or sizes on it.">Direction only, never a sell; paper reading.</span>';
   }
 
+  // ─── Macro veteran (8 Nov, council/veteran.mjs: a code port of the owner's gptmacro_v.1 skill; discusses the strategist) ───
+  function renderVet() {
+    var el = $('ms-md-vet'), v = D.vet; if (!el) return;
+    if (!v || !v.debate) { el.hidden = true; return; }
+    el.hidden = false;
+    var vd = v.verdict || {}, cls = vd.bias === 'BUY' ? 'pos' : '';
+    $('ms-md-vet-at').textContent = v.at ? 'built ' + new Date(v.at).toLocaleString([], { weekday: 'short', hour: '2-digit', minute: '2-digit' }) : '';
+    $('ms-md-vet-verdict').innerHTML = 'Consensus <b class="' + cls + '">' + esc(vd.bias || 'n/a') + (vd.conviction ? ' ' + esc(vd.conviction) : '') + '</b> · ' + (vd.agree || 0) + ' agree, ' + (vd.qualify || 0) + ' qualify, ' + (vd.disagree || 0) + ' disagree'
+      + ' · shock: <b>' + esc((v.shock || {}).shock || 'n/a') + '</b>' + ((v.shock || {}).confidence ? ' <small>(' + esc(v.shock.confidence) + ' confidence)</small>' : '') + '<br>' + esc(vd.note || '');
+    $('ms-md-vet-list').innerHTML = (v.debate || []).map(function (t) {
+      return '<li class="md-vet-row ' + esc(t.stance) + '"><span class="md-vet-st">' + esc(t.stance) + '</span><div><b>' + esc(t.topic) + '</b>'
+        + '<div class="md-vet-side"><small>Strategist</small>' + esc(t.macro) + '</div><div class="md-vet-side"><small>Veteran</small>' + esc(t.veteran) + '</div>'
+        + (t.why ? '<div class="md-vet-why">' + esc(t.why) + '</div>' : '') + '</div></li>';
+    }).join('');
+    var lg = v.ledger || {}, inv = (vd.invalidation || []).length ? 'Fails if ' + esc(vd.invalidation.join('; ')) + '. ' : '';
+    $('ms-md-vet-foot').innerHTML = inv + (lg.lastProbability != null ? 'Ledger: P(gold up over ' + (v.base && v.base.horizon || 20) + ' trading days) <b>' + Math.round(lg.lastProbability * 100) + '%</b>' + (v.base ? ' vs base ' + Math.round(v.base.upRate * 100) + '%' : '')
+      + ' · ' + (lg.issued || 0) + ' issued, ' + (lg.resolved || 0) + ' resolved' + (lg.brier != null ? ', Brier ' + lg.brier + (lg.brierBase != null ? ' vs base ' + lg.brierBase : '') : '') + '. ' : '')
+      + '<span title="Paper only. The veteran reads the strategist\'s data; it can lower conviction, never flip the tested score\'s direction, and never calls a macro sell.">Paper reading; nothing trades on it.</span>';
+  }
+
   // ─── next day ───
   function modelRows(k, f) {
     var v = ((f.scorecard || {}).vol || {})[k]; if (!v) return '';
@@ -10540,7 +10581,7 @@ html[data-role="public"] #ms-me-ct { display: none; }
   }
   function render() {
     var f = D.f; if (!f || !f.assets) return;
-    var parts = [renderHead, renderNext, renderScore, renderSmile, renderGauges, renderEvents, renderRecord, renderMore];
+    var parts = [renderHead, renderNext, renderScore, renderVet, renderSmile, renderGauges, renderEvents, renderRecord, renderMore];
     parts.forEach(function (fn) { try { fn(f); } catch (e) { if (window.console) console.warn('macro desk: ' + (fn.name || 'part') + ' failed', e); } });
   }
 
@@ -10566,9 +10607,9 @@ html[data-role="public"] #ms-me-ct { display: none; }
   // ─── data ───
   var get = function (p) { return fetch((window.MS_CDATA || '') + p + '?v=' + Math.floor(Date.now() / 300000), { cache: 'no-store' }).then(function (r) { return r.ok ? r.json() : null; }).catch(function () { return null; }); };
   function load() {
-    Promise.all([get('macro/forecast.json'), get('macro/events.json'), get('macro/history.json')]).then(function (x) {
+    Promise.all([get('macro/forecast.json'), get('macro/events.json'), get('macro/history.json'), get('macro/veteran.json')]).then(function (x) {
       if (!x[0] || !x[0].assets) { if (!D.f) $('ms-md-at').textContent = x[0] === null ? 'Could not load the Macro strategist\'s forecast. It is written about every 25 minutes once the council loop runs it.' : 'No macro forecast yet.'; return; }
-      D.f = x[0]; D.ev = Array.isArray(x[1]) ? x[1] : []; D.hist = Array.isArray(x[2]) ? x[2] : [];
+      D.f = x[0]; D.ev = Array.isArray(x[1]) ? x[1] : []; D.hist = Array.isArray(x[2]) ? x[2] : []; D.vet = x[3] && x[3].debate ? x[3] : null;
       renderSoon();
     });
   }
