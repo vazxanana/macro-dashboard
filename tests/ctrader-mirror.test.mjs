@@ -3,7 +3,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
-import { mirrorRound, PT, ALLOWED, session, volumeFor, relative, seal, unseal, LIMITS, ictCandidates, orderStep, commentFor, mirrorAlertText, sendMirrorAlerts, riskVolume, quoteRate, specFor, markOf, applyReset, validUntil, WAIT, pendingStep, cancelStep } from '../council/ctrader-mirror.mjs';
+import { mirrorRound, PT, ALLOWED, session, volumeFor, relative, seal, unseal, LIMITS, ictCandidates, orderStep, commentFor, mirrorAlertText, sendMirrorAlerts, riskVolume, quoteRate, specFor, markOf, applyReset, validUntil, WAIT, pendingStep, cancelStep, bookOf, accountsFor, BOOKS } from '../council/ctrader-mirror.mjs';
 
 const ENV = { CTRADER_CLIENT_ID: 'fake-client-id', CTRADER_CLIENT_SECRET: 'fake-client-secret', CTRADER_ACCESS_TOKEN: 'fake-access-old',
   CTRADER_REFRESH_TOKEN: 'fake-refresh-old', CTRADER_ACCOUNT_ID: '4242', CTRADER_ENV: 'demo', CTRADER_MIRROR: 'on' };
@@ -653,4 +653,17 @@ test('amend: a council stop / target move on an open trade is sent to the broker
   // a closed council trade is not amended, it is closed
   const b4 = broker(); r = await mirrorRound({ env: ENV, trades: [tr()], state: started, WS: b4.WS, now: NOW });
   r = await mirrorRound({ env: ENV, trades: [tr({ stop: 1.1, status: 'win', R: 2 })], state: r.state, WS: b4.WS, now: NOW + 240 }); assert.equal(b4.amends.length, 0); assert.equal(r.state.map['eurusd-intraday-1'].status, 'closed by council');
+});
+
+// ---- 8 Nov (owner): one demo account per book ---------------------------------------------------------------------------------
+test('books and accounts: every trade has one book; accounts come from config.json or CTRADER_ACCOUNTS, the base account takes the rest', () => {
+  assert.deepEqual(BOOKS, ['council', 'ict', 'shadow', 'lit']);
+  assert.equal(bookOf({ id: 'ict:nq-b-1' }), 'ict'); assert.equal(bookOf({ id: 'xau-lit-s-1', k: 'lit', shadow: true }), 'lit'); assert.equal(bookOf({ id: 'eurusd-scalp-1', shadow: true }), 'shadow'); assert.equal(bookOf({ id: 'eurusd-scalp-1', k: 'scalp' }), 'council');
+  let a = accountsFor({ CTRADER_ACCOUNT_ID: '4242' }, {}); assert.deepEqual(a.byBook, { council: '4242', ict: '4242', shadow: '4242', lit: '4242' }); assert.equal(a.groups.length, 1); assert.deepEqual(a.groups[0].books, BOOKS);
+  a = accountsFor({ CTRADER_ACCOUNT_ID: '4242' }, { mirrorAccounts: { shadow: '5000', lit: '6000' } });
+  assert.deepEqual(a.byBook, { council: '4242', ict: '4242', shadow: '5000', lit: '6000' }); assert.deepEqual(a.groups.map((g) => [g.account, g.books]), [['4242', ['council', 'ict']], ['5000', ['shadow']], ['6000', ['lit']]]);
+  a = accountsFor({ CTRADER_ACCOUNT_ID: '4242', CTRADER_ACCOUNTS: 'ict:7000, lit:8000,bogus:1' }, { mirrorAccounts: { lit: '6000' } });
+  assert.deepEqual(a.byBook, { council: '4242', ict: '7000', shadow: '4242', lit: '8000' }, 'the env wins over config.json; unknown books ignored');
+  assert.match(mirrorAlertText({ kind: 'reject', symbol: 'XAUUSD', side: 'buy', book: 'shadow', result: 'no' }, 0).title, /^Demo mirror \[shadow\]: order rejected/);
+  assert.match(mirrorAlertText({ kind: 'reject', symbol: 'XAUUSD', side: 'buy', result: 'no' }, 0).title, /^Demo mirror: order rejected/);
 });

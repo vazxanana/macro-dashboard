@@ -276,6 +276,21 @@ export function applyReset(state, reset, now = Math.floor(Date.now() / 1000)) {
   const dropped = Object.keys(state.map || {}).length;
   return { applied: true, dropped, state: { ...state, map: {}, skipped: {}, wait: {}, paused: {}, day: null, resetAt: at, resetDoneAt: new Date(now * 1000).toISOString() } };
 }
+// ---- books and accounts (8 Nov, owner: "4 extra accounts, one for the shadow trades, the other LIT") -----------------------------
+// Every trade belongs to one book; each book can have its own demo account (same cTrader ID, same token). Account numbers are
+// not secrets: council-data config.json { mirrorAccounts: { council, ict, shadow, lit } }, or the env CTRADER_ACCOUNTS
+// "council:123,ict:456,shadow:789,lit:321" (wins). A book without its own number trades on CTRADER_ACCOUNT_ID.
+export const BOOKS = ['council', 'ict', 'shadow', 'lit'];
+export const bookOf = (t) => (String(t.id).startsWith('ict:') ? 'ict' : t.k === 'lit' ? 'lit' : t.shadow ? 'shadow' : 'council');
+export function accountsFor(env, cfg) {
+  const out = {}, base = String(env.CTRADER_ACCOUNT_ID || '').trim();
+  const c = (cfg && cfg.mirrorAccounts) || {}; for (const b of BOOKS) if (c[b] != null && String(c[b]).trim()) out[b] = String(c[b]).trim();
+  for (const part of String(env.CTRADER_ACCOUNTS || '').split(',')) { const [b, id] = part.split(':').map((x) => (x || '').trim()); if (BOOKS.includes(b) && id) out[b] = id; }
+  for (const b of BOOKS) if (!out[b]) out[b] = base;
+  // group the books by account: one session and one state per account
+  const groups = new Map(); for (const b of BOOKS) { if (!out[b]) continue; const g = groups.get(out[b]) || { account: out[b], books: [] }; g.books.push(b); groups.set(out[b], g); }
+  return { byBook: out, groups: [...groups.values()] };
+}
 // relative stop/target for a market order: in 1/100000 of the price, a multiple of the symbol's smallest step
 export function relative(dist, digits = 5) {
   const unit = 10 ** Math.max(0, 5 - digits);
@@ -293,6 +308,9 @@ const sideTxt = (e) => String(e.side || '').toUpperCase(), lotTxt = (e) => (e.lo
 const councilTxt = (e) => (e.setup ? `Council ${e.setup} · ${e.trade}` : String(e.trade || ''));
 const rTxt = (r) => (r == null || !Number.isFinite(+r) ? '' : ` ${+r > 0 ? '+' : ''}${(+r).toFixed(2)}R`);
 export function mirrorAlertText(e, now) {
+  const t = mirrorAlertText0(e, now); if (t && e && e.book) t.title = t.title.replace(/^Demo mirror/, `Demo mirror [${e.book}]`); return t;
+}
+function mirrorAlertText0(e, now) {
   const head = `${sideTxt(e)} ${e.symbol || ''}`.trim(), at = when(now), up = e.side === 'sell' ? 'chart_with_downwards_trend' : 'chart_with_upwards_trend';
   if (e.kind === 'open') {
     const p = px(e.price, e.digits), lv = [px(e.entry, e.digits) && `council entry ${px(e.entry, e.digits)}`, px(e.stop, e.digits) && `stop ${px(e.stop, e.digits)}`,
@@ -628,19 +646,34 @@ if (process.argv[1] && process.argv[1].endsWith('ctrader-mirror.mjs')) {
   // the council's latest prices (Trader snapshot): stop/target distances of a council trade are measured from them, see the header
   let marks = null; try { const sn = JSON.parse(fs.readFileSync(path.join(DIR, 'snapshot.json'), 'utf8'));
     marks = Object.fromEntries(Object.entries(sn.markets || {}).filter(([, m]) => m && +m.price > 0).map(([k, m]) => [k, { price: +m.price, at: sn.at }])); } catch (e) {}
-  const prev = rd('mirror.json', {});
   let resetFile = null; try { resetFile = JSON.parse(fs.readFileSync(new URL('./ctrader-reset.json', import.meta.url), 'utf8')); } catch (e) {}
-  const reset = applyReset(prev.state, resetFile);
-  if (reset.applied) prev.log = (prev.log || []).concat({ at: new Date().toISOString(), msg: `owner reset ${resetFile.at}: ${reset.dropped} copied-trade records, the skip/wait notes and the day's start balance dropped; the open book is copied afresh` });
-  const r = await mirrorRound({ env: process.env, trades, state: reset.state, tokens: rd('tokens.json', null), specs: rd('symbols.json', null), onTokens: saveTokens, shadows, marks });
   fs.mkdirSync(CD, { recursive: true });
-  fs.writeFileSync(path.join(CD, 'mirror.json'), JSON.stringify({ state: r.state, log: (prev.log || []).concat(r.log).slice(-300), limits: LIMITS, symbols: SYMBOLS, execution: executionStats(r.state.map) }, null, 1));
-  if (r.tokens && JSON.stringify(r.tokens) !== JSON.stringify(rd('tokens.json', null))) saveTokens(r.tokens);
-  console.log(`cTrader mirror: ${r.state.status}${r.sent.length ? ` · ${r.sent.length} sent` : ''}`);
-  // phone alerts, after mirror.json is saved (already flagged there, so a crash here never re-sends them): best-effort only
-  // a burst (the catch-up round, or many closes at once) goes as one summary instead of a phone message per position
-  if (r.alerts.length > 6) { const n = r.alerts.length, opens = r.alerts.filter((a) => a.kind === 'open').length, closes = r.alerts.filter((a) => a.kind === 'close').length;
-    r.alerts = [{ kind: 'summary', n, opens, closes, other: n - opens - closes, catchUp: !(prev.state && prev.state.catchUpAt) && !!r.state.catchUpAt }]; }
+  // one round per demo account (books routed by bookOf): the base account keeps mirror.json; another account's file is
+  // mirror-<account>.json. The token pair is shared (one cTrader ID), so a refresh in one round is handed to the next.
+  // account numbers: council/ctrader-accounts.json on main (owner gives the numbers in chat, a PR records them; no secrets), then
+  // council-data config.json mirrorAccounts, then the env CTRADER_ACCOUNTS
+  let accFile = {}; try { accFile = JSON.parse(fs.readFileSync(new URL('./ctrader-accounts.json', import.meta.url), 'utf8')); } catch (e) {}
+  const { groups } = accountsFor(process.env, { mirrorAccounts: { ...(accFile.mirrorAccounts || {}), ...(cfg.mirrorAccounts || {}) } }), allAlerts = [], base = String(process.env.CTRADER_ACCOUNT_ID || '').trim();
+  let tokens = rd('tokens.json', null), summaryLines = [];
+  for (const g of groups) {
+    const file = g.account === base ? 'mirror.json' : `mirror-${g.account}.json`, prev = rd(file, {});
+    const reset = applyReset(prev.state, resetFile);
+    if (reset.applied) prev.log = (prev.log || []).concat({ at: new Date().toISOString(), msg: `owner reset ${resetFile.at}: ${reset.dropped} copied-trade records, the skip/wait notes and the day's start balance dropped; the open book is copied afresh` });
+    const mine = trades.filter((t) => g.books.includes(bookOf(t)));
+    const r = await mirrorRound({ env: { ...process.env, CTRADER_ACCOUNT_ID: g.account }, trades: mine, state: reset.state, tokens, specs: rd('symbols.json', null), onTokens: saveTokens, shadows, marks });
+    if (r.tokens) tokens = r.tokens;
+    fs.writeFileSync(path.join(CD, file), JSON.stringify({ account: g.account, books: g.books, state: r.state, log: (prev.log || []).concat(r.log).slice(-300), limits: LIMITS, symbols: SYMBOLS, execution: executionStats(r.state.map) }, null, 1));
+    summaryLines.push(`${g.books.join('+')} (${g.account}): ${r.state.status}${r.sent.length ? ` · ${r.sent.length} sent` : ''}`);
+    // a burst (the catch-up round, or many closes at once) goes as one summary instead of a phone message per position
+    if (r.alerts.length > 6) { const n = r.alerts.length, opens = r.alerts.filter((a) => a.kind === 'open').length, closes = r.alerts.filter((a) => a.kind === 'close').length;
+      r.alerts = [{ kind: 'summary', n, opens, closes, other: n - opens - closes, catchUp: !(prev.state && prev.state.catchUpAt) && !!r.state.catchUpAt }]; }
+    for (const a of r.alerts) allAlerts.push(groups.length > 1 ? { ...a, book: g.books.join('+') } : a);
+  }
+  fs.writeFileSync(path.join(CD, 'mirror-accounts.json'), JSON.stringify({ at: new Date().toISOString(), groups: groups.map((g) => ({ account: g.account, books: g.books, file: g.account === base ? 'mirror.json' : `mirror-${g.account}.json` })) }, null, 1));
+  if (tokens && JSON.stringify(tokens) !== JSON.stringify(rd('tokens.json', null))) saveTokens(tokens);
+  console.log(`cTrader mirror: ${summaryLines.join(' | ')}`);
+  const r = { alerts: allAlerts };
+  // phone alerts, after the files are saved (already flagged there, so a crash here never re-sends them): best-effort only
   if (r.alerts.length) {
     let tgChat = null; try { tgChat = JSON.parse(fs.readFileSync(path.join(DIR, 'state.json'), 'utf8')).tgChat || null; } catch (e) {}   // the council's remembered chat
     const a = await sendMirrorAlerts(r.alerts, { env: process.env, tgChat });
