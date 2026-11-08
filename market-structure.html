@@ -3568,9 +3568,12 @@ function msNextSetup(bars, A) {
     offset: 0, spot: null, source: '', live: false, csv: false }; try { G.ha = localStorage.getItem('ms-ha') === '1'; G.log = localStorage.getItem('ms-log') === '1'; G.mode = localStorage.getItem('ms-mode') === 'ict' ? 'ict' : 'meridian'; } catch (e) { G.mode = 'meridian'; }
   const $ = (id) => document.getElementById(id);
   const $o = (id) => document.getElementById(id) || { set textContent(v) {}, set className(v) {}, set innerHTML(v) {}, style: {} };
-  const fmt = (v) => (v == null || !isFinite(v)) ? '—' : v.toLocaleString('en-US', { minimumFractionDigits: CUR.dec, maximumFractionDigits: CUR.dec });
+  // perf (8 Nov): toLocaleString builds a formatter on every call; one Intl formatter per decimals count gives the same text far cheaper
+  const NF = {};
+  const fmt = (v) => (v == null || !isFinite(v)) ? '—' : (NF[CUR.dec] || (NF[CUR.dec] = new Intl.NumberFormat('en-US', { minimumFractionDigits: CUR.dec, maximumFractionDigits: CUR.dec }))).format(v);
   const fmtI = (v, I) => { const c = CUR; CUR = I; try { return fmt(v); } finally { CUR = c; } };
-  const ftime = (t) => new Date((t - TZ) * 1000).toLocaleString('en-GB', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' });
+  const FTIME = new Intl.DateTimeFormat('en-GB', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' });
+  const ftime = (t) => FTIME.format(new Date((t - TZ) * 1000));
 
   // ─── Drawing overlay (series primitive) ───
   class Overlay {
@@ -4043,6 +4046,7 @@ function msNextSetup(bars, A) {
 
   // ─── One chart pane per timeframe ───
   const panes = {};
+  const VCH = document.getElementById('v-charts');   // perf (8 Nov): the chart panes sit in the Charts view; while it is hidden their per-second timers skip the layout read (offsetParent is null there anyway)
   function makePane(tf) {
     const el = document.getElementById(`ms-c-${tf.id}`);
     if (!el) return null;
@@ -4099,7 +4103,7 @@ function msNextSetup(bars, A) {
     // candle-close countdown (7 Nov loop): a small pill under the last-price label on the price scale, mm:ss (or h:mm) to this bar's close
     { const cd = document.createElement('div'); cd.className = 'ch-cd'; cd.setAttribute('aria-hidden', 'true'); el.appendChild(cd);
       const tickCd = () => {
-        if (!P.bars || !P.bars.length || !el.offsetParent || document.hidden) return;
+        if (!P.bars || !P.bars.length || (VCH && VCH.hidden) || !el.offsetParent || document.hidden) return;
         const L = P.bars[P.bars.length - 1], y = series.priceToCoordinate(L.close), w = chart.priceScale('right').width();
         const left = Math.ceil(((L.time - TZ) + tf.sec) - Date.now() / 1000);
         if (y == null || !w || left <= 0 || left > tf.sec || marketClosedNow()) { cd.style.display = 'none'; return; }
@@ -4110,7 +4114,7 @@ function msNextSetup(bars, A) {
       };
       setInterval(tickCd, 1000); chart.timeScale().subscribeVisibleLogicalRangeChange(() => requestAnimationFrame(tickCd)); }
     chart.subscribeCrosshairMove((pr) => { if (!P.bars) return; if (pr && pr.logical != null && pr.point && pr.point.x >= 0) { lgHover = true; P._cp = series.coordinateToPrice(pr.point.y); P.legend(Math.round(pr.logical)); } else { lgHover = false; P.legend(); } });
-    setInterval(() => { if (!lgHover && !P.rp && el.offsetParent && !document.hidden) { try { const d = series.data(); if (d && d.length && P.bars && P.bars.length) { const L = d[d.length - 1], b = P.bars[P.bars.length - 1]; if (L.time === b.time) Object.assign(b, { open: L.open, high: L.high, low: L.low, close: L.close }); } } catch (e) {} P.legend(); } }, 1000);
+    setInterval(() => { if (!lgHover && !P.rp && !(VCH && VCH.hidden) && el.offsetParent && !document.hidden) { try { const d = series.data(); if (d && d.length && P.bars && P.bars.length) { const L = d[d.length - 1], b = P.bars[P.bars.length - 1]; if (L.time === b.time) Object.assign(b, { open: L.open, high: L.high, low: L.low, close: L.close }); } } catch (e) {} P.legend(); } }, 1000);
     series.applyOptions({ autoscaleInfoProvider: (orig) => {
       const r = orig();
       if (r && r.priceRange && P.pv.length) { r.priceRange.minValue = Math.min(r.priceRange.minValue, ...P.pv); r.priceRange.maxValue = Math.max(r.priceRange.maxValue, ...P.pv); }
@@ -6624,28 +6628,33 @@ function msNextSetup(bars, A) {
           return sk.join(''); })()}
         <div class="sl-g"><i style="width:${Math.min(100, done.length / 20 * 100).toFixed(0)}%"></i></div><small class="sl-n">Guard: back to shadow at −0.30R a trade over 20+ live trades · ${guard}</small></div>`; }).join('');
     el.hidden = false; el.innerHTML = `<div class="ms-k"><span>Live setups · paper</span><span class="ms-note">engine setups trading live on every market</span></div>${rows}${pd}${iw}${mr}`; }
+  // perf (8 Nov): a council pane is drawn only while it can be seen (Council view open, that pane selected); a hidden pane is marked
+  // and drawn when it opens (setPane / showView). Same markup, nothing built for panes nobody is looking at. What other views read
+  // (renderActive: Home open positions, floating R, header pill; the Review tab badge; the status line) still runs every time.
+  const CDIRTY = {};
+  const paneOn = (k) => { if (k === 'journal') { const j = document.getElementById('v-journal'); return !!(j && !j.hidden); } const v = document.getElementById('v-council'), p = document.getElementById('ms-cp-' + k); return !!(v && !v.hidden && p && !p.hidden); };
+  const paneDo = (k, f) => { if (paneOn(k)) { CDIRTY[k] = false; f(); } else CDIRTY[k] = true; };
   function renderCouncil() {
-    try { renderEdge(); } catch (e) { console.warn('edge', e); }
-    try { renderSleeve(); } catch (e) { console.warn('sleeve', e); }
+    paneDo('systems', () => { try { renderEdge(); } catch (e) { console.warn('edge', e); } try { renderSleeve(); } catch (e) { console.warn('sleeve', e); } });
     const root = document.getElementById('v-council'); if (!root) return;
     const set = (id, html) => { const el = document.getElementById(id); if (el) el.innerHTML = html; };
     const tab = (window.CTAB = window.CTAB || 'live'), withSh = tab === 'shadow' || tab === 'all';
     const sysBox = document.getElementById('ms-c-sys'); if (sysBox) sysBox.checked = tab !== 'all';
     const C = COUNCIL, SYS = sysOn(), TA = (SYS ? sysTrades().sort((a, b) => a.opened - b.opened) : (C.trades || [])).slice().reverse(), T = TA.filter((x) => !x.shadow);
-    renderCalendar();
-    renderLoss();
-    renderNQ();
-    renderReplica();
-    renderPairs();
-    renderActive();
-    try { renderSystemJournal(); } catch (e) {}
+    paneDo('overview', renderCalendar);
+    paneDo('review', renderLoss); if (CDIRTY.review) renderLossBadge();   // the Review tab badge shows on every pane
+    paneDo('systems', () => { renderNQ(); renderReplica(); renderPairs(); });
+    renderActive();   // also feeds Home (open positions, floating R) and the header pill
+    paneDo('journal', () => { try { renderSystemJournal(); } catch (e) {} });
     const mine = document.getElementById('ms-c-mine'), only = mine && mine.checked;
     const mk = (arr) => only ? arr.filter((x) => x.market === instKey) : arr;
     const SH = (C.trades || []).filter((x) => x.shadow).slice().sort((a, b) => b.opened - a.opened);
     const list = tab === 'shadow' ? mk(SH) : tab === 'journal' ? mk(systemClosed()) : tab === 'all' ? mk((C.trades || []).slice().sort((a, b) => b.opened - a.opened)) : mk(T.concat((C.trades || []).filter((x) => !x.shadow && !SYS_K.includes(x.k) && (x.status === 'open' || x.status === 'pending'))));   // live: our system, plus any open trade still managed from the older strategies
+    paneDo('trades', () => {
     document.querySelectorAll('#ms-c-tabs [data-ct]').forEach((b) => b.setAttribute('aria-selected', String(b.dataset.ct === tab)));
     set('ms-c-tabnote', { live: 'Paper trades our system placed: open and waiting ones first, then closed. Tap a row to see it on a chart.', shadow: `Setups a rule blocked, followed on paper so the rule can be judged (${SH.filter((x) => x.status === 'open' || x.status === 'pending').length} open now). Their result is not counted in the system total.`,
       journal: 'Closed system trades, one row per signal (adds folded into their first trade), the same list the Journal tab keeps and exports.', all: 'Every record the Trader has: our system, shadow trades and the older council strategies.' }[tab] || '');
+    });
     const closed = list.filter((x) => x.status === 'win' || x.status === 'loss' || x.status === 'be');
     const w = closed.filter((x) => x.status === 'win').length, R = closed.reduce((a, x) => a + x.R, 0);
     const open = list.filter((x) => x.status === 'open' || x.status === 'pending');
@@ -6675,6 +6684,7 @@ function msNextSetup(bars, A) {
         return ` · <span class="c-warn">feed switched</span> ${esc(c.label || c.market)} ${esc(c.from)} → ${esc(c.to)} ${ago(Date.parse(c.at) / 1000)}${c.rederived || c.cancelled || c.rebased || c.kept ? ` (${c.rederived || 0} re-quoted, ${c.cancelled || 0} cancelled, ${c.rebased || 0} re-based${c.basis != null ? ` by ${c.basis > 0 ? '+' : ''}${c.basis}` : ''}, ${c.kept || 0} kept)` : ''}${L.length > 1 ? ` · ${L.length - 1} more in 7 days` : ''}`; };
       set('ms-c-status', `${health}${dataChip(C.health)}<span class="c-meta">last scan ${ago(Date.parse(C.snap.at) / 1000)} · ${mk.length} markets watched${closed ? ` (${closed} closed for the weekend)` : ''}${errs.length ? ` · ${errs.length} feed error${errs.length > 1 ? 's' : ''}: ${esc(errs.join(', '))}` : ''}${d1Note(C.snap)}${feedNote(C.snap)}</span>`);
     } else set('ms-c-status', 'Waiting for the first Trader run.');
+    paneDo('trades', () => {   // KPIs, equity curve and the trade table: the Trades pane
     set('ms-c-kpi', `<div><span>Open</span><b>${open.length}</b></div><div><span>Closed</span><b>${closed.length}</b></div><div><span>Win rate</span><b>${closed.length ? Math.round(w / closed.length * 100) + '%' : '—'}</b></div><div><span>Total</span><b class="${R > 0 ? 'pos' : R < 0 ? 'neg' : ''}">${closed.length ? (R > 0 ? '+' : '') + R.toFixed(1) + 'R' : '—'}</b></div>`);
     // equity in R by close time
     const ch = closed.slice().sort((a, b) => a.closed - b.closed); let eq = 0; const pts = [0].concat(ch.map((x) => (eq += x.R)));
@@ -6701,7 +6711,9 @@ function msNextSetup(bars, A) {
     set('ms-c-trades', tableList.length ? tableList.slice(0, LIM).map((x) => `<tr class="${x.shadow ? 'sh' : ''}" data-tid="${esc(x.id)}" tabindex="0" title="Show this trade on a chart"><td>${ftime(x.opened + TZ)}</td><td><b>${esc(x.label)}</b></td><td>${PUB ? '—' : `${esc(x.name)} <small>${esc(x.pair)}</small>`}</td><td><span class="ms-chip ${x.side === 'sell' ? 'ms-chip-sell' : 'ms-chip-buy'}">${x.side.toUpperCase()}</span></td><td class="n">${fmtI(x.entry, dI(x))}</td><td class="n">${fmtI(x.stop, dI(x))}</td><td class="n">${fmtI(x.t1, dI(x))}</td><td class="${(ST[x.status] || ['', ''])[0]}" title="${PUB ? '' : esc(x.note || '')}">${x.shadow ? 'Shadow · ' : ''}${x.replay ? 'Replay · ' : ''}${x.paper && !x.replay ? 'Paper · ' : ''}${(ST[x.status] || ['', x.status])[1]}${x.R != null && (x.status === 'win' || x.status === 'loss' || x.status === 'be') ? ` ${x.R > 0 ? '+' : ''}${x.R}R` : ''}${liveR(x)}${pmChip(x)}${x.shadow && x.blockedBy && x.blockedBy.length ? ` <small>${esc(x.blockedBy.join(', '))}</small>` : ''}${tab === 'journal' && x.exit ? ` <small>${esc(x.exit)}</small>` : ''}</td></tr>`).join('')
         + (tableList.length > LIM ? `<tr class="more"><td colspan="8"><button type="button" class="ms-tbtn c-more" id="ms-c-more">Show more (${tableList.length - LIM} left of ${tableList.length})</button></td></tr>` : '')
       : `<tr><td colspan="8" class="empty">${tab === 'shadow' ? 'No shadow trade yet.' : tab === 'journal' ? 'No closed system trade yet.' : `No council trades yet${only ? ' on this market' : ''}. The Trader takes every Ready setup it sees.`}</td></tr>`);
+    });
     // Trade reviews: every loss studied — our system's error, or just the market?
+    paneDo('review', () => {
     const rv = (C.trades || []).filter((x) => x.pm && x.pm.cause && (withSh || !x.shadow) && (!only || x.market === instKey) && (!SYS || SYS_K.includes(x.k))).sort((a, b) => b.closed - a.closed);
     const rvL = rv.filter((x) => x.status === 'loss'), sysL = rvL.filter((x) => x.pm.verdict === 'system').length;
     const L = C.snap && C.snap.lessons;
@@ -6709,7 +6721,9 @@ function msNextSetup(bars, A) {
       (L && L.top && L.top.length ? `<div class="c-sub">What to fix</div><ul class="c-notes">${L.top.map((t) => `<li>${esc(t)}</li>`).join('')}</ul>` : '')
       : '<p class="ms-note">Each closed trade is studied: what price did before, during and after it. Losses get a verdict: a system error to fix, or just the market.</p>');
     set('ms-c-pm', rv.slice(0, 12).map((x) => `<li class="c-pm-i ${x.pm.verdict}" data-tid="${esc(x.id)}" tabindex="0" title="Show this trade on a chart"><div class="c-pm-h"><span class="c-pm-v ${x.pm.verdict}">${x.pm.verdict === 'system' ? 'System' : 'Market'}</span><b>${esc(x.pm.title)}</b><small>${esc(x.label)} · ${esc(x.name)} ${esc(x.pair)} · ${x.side} · ${x.status === 'loss' ? 'loss' : x.status === 'win' ? `win +${x.R}R` : 'break-even'}${x.shadow ? ' · shadow' : ''} · ${ago(x.closed)}${x.pm.phase === 'watch' ? ' · still watching' : ''}</small></div><p>${esc(x.pm.detail)}</p><p class="c-pm-l">Lesson: ${esc(x.pm.lesson)}</p>${(x.pm.factors || []).length ? `<p class="c-pm-f">Also: ${x.pm.factors.map((f) => esc(PM_NAME[f] || f)).join(', ')}</p>` : ''}</li>`).join('') || '');
+    });
     // Scorecard: closed council trades grouped by setup and by market
+    paneDo('research', () => {   // scorecard, backtest, analyst and coach cards: the Research pane
     const allClosed = (SYS ? sysTrades() : (C.trades || [])).filter((x) => !x.shadow && (x.status === 'win' || x.status === 'loss' || x.status === 'be'));
     const group = (keyFn, labelFn) => {
       const g = {}; allClosed.forEach((x) => { const k = keyFn(x); (g[k] = g[k] || { label: labelFn(x), arr: [] }).arr.push(x); });
@@ -6737,6 +6751,7 @@ function msNextSetup(bars, A) {
     set('ms-c-notes', C.coach ? (C.coach.notes || []).map((n) => `<li>${esc(n)}</li>`).join('') : '<li>The statistical Coach runs once a day with the Trader.</li>');
     set('ms-c-hist', (cf.history || []).slice(-8).reverse().map((h) => `<li class="${/^user|owner/i.test(String(h.by)) ? 'by-you' : 'by-coach'}"><span>${esc(String(h.at).slice(0, 10))} · ${/^user|owner/i.test(String(h.by)) ? 'you' : esc(h.by)}</span><b>${esc(h.change)}</b><em>${esc(h.why)}</em></li>`).join('') || '<li class="empty">No rule changes yet.</li>');
     set('ms-c-review', C.review ? md(C.review) : '<p class="ms-note">The AI Coach writes a review after each trading day: what worked, what didn\'t, and any rule it changed.</p>');
+    });
     renderHome();
     const m1p = panes['1m']; councilHere(m1p && m1p.bars ? m1p.bars[m1p.bars.length - 1].close : null);
   }
@@ -7046,12 +7061,17 @@ function msNextSetup(bars, A) {
         <ul class="loss-rows">${a.slice(0, 60).map((x) => { const r = RV.map[x.id], done = r && !r.draft, an = (COUNCIL.anRev || {})[x.id];
           return `<li data-lid="${esc(x.id)}" tabindex="0" title="Open the chart and review this loss"><span>${ftime(x.closed + TZ)}</span><b>${esc(x.label)}</b><span class="chip ${x.side}">${x.side.toUpperCase()}</span><b class="neg">${x.R != null ? x.R : -1}R</b><span class="loss-why">${x.shadow ? `shadow · ${esc((x.blockedBy || []).join(', '))}` : 'live'}${an ? ` · analyst: ${esc(an.title)}${(an.tags || []).length ? ` (${esc(an.tags.map(rvTagName).join(', '))})` : ''}` : x.pm && x.pm.title ? ` · council: ${esc(x.pm.title)}` : ''}</span><span class="loss-st ${done ? 'ok' : ''}">${done ? `✓ ${esc((r.tags || []).map(rvTagName).join(', ') || 'reviewed')}${r.by && r.by !== 'owner' ? ` · ${esc(r.by)}` : ''}` : r && r.draft ? 'draft' : 'review'}</span></li>`; }).join('')}${a.length > 60 ? `<li class="loss-more">${a.length - 60} older losses not shown; narrow the filter.</li>` : ''}</ul></details>`;
     }).join('') : '<p class="ms-note">No losing trade in this view.</p>';
-    { const nb = document.getElementById('ms-cn-n-review'), now = Date.now() / 1000, seen = new Set();
-      const todo = (COUNCIL.trades || []).concat(sysTrades().filter((x) => !x.replay)).filter((x) => x.status === 'loss' && x.closed && now - x.closed < 86400 && !seen.has(x.id) && seen.add(x.id) && !(RV.map[x.id] && !RV.map[x.id].draft)).length;
-      if (nb) { nb.textContent = todo ? String(todo > 99 ? '99+' : todo) : ''; nb.title = todo ? `${todo} losses from the last 24 hours not reviewed yet` : ''; nb.setAttribute('aria-label', nb.title); } }
+    renderLossBadge();
     const n = Object.values(RV.map).filter((r) => !r.draft).length, s = document.getElementById('ms-loss-sync');
     if (s) s.textContent = `${n} review${n === 1 ? '' : 's'} saved${ghTok() ? ' · syncing to the council (GitHub connected)' : ' in this browser only · connect GitHub so the council can read them'}.`;
     const gb = document.getElementById('ms-loss-gh'); if (gb) gb.textContent = ghTok() ? 'GitHub connected' : 'Connect GitHub';
+  }
+  // the Review tab badge: losses of the last 24 h not reviewed yet (kept up to date even while the Review pane waits to be opened)
+  function renderLossBadge() {
+    if (PUB || !document.getElementById('ms-loss-list')) return;
+    const nb = document.getElementById('ms-cn-n-review'), now = Date.now() / 1000, seen = new Set();
+    const todo = (COUNCIL.trades || []).concat(sysTrades().filter((x) => !x.replay)).filter((x) => x.status === 'loss' && x.closed && now - x.closed < 86400 && !seen.has(x.id) && seen.add(x.id) && !(RV.map[x.id] && !RV.map[x.id].draft)).length;
+    if (nb) { nb.textContent = todo ? String(todo > 99 ? '99+' : todo) : ''; nb.title = todo ? `${todo} losses from the last 24 hours not reviewed yet` : ''; nb.setAttribute('aria-label', nb.title); }
   }
   // drawing layer over the trade chart: points kept as [time (UTC s), price] so they stay on the candles when zoomed
   function rvStep() { const d = TV.ctx && TV.ctx.data; return d && d.length > 1 ? d[1].time - d[0].time : 60; }
@@ -7294,14 +7314,17 @@ function msNextSetup(bars, A) {
     if (tt) { addEventListener('scroll', () => { tt.hidden = scrollY < 900; }, { passive: true }); tt.addEventListener('click', () => { scrollTo({ top: 0, behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' }); const m = document.getElementById('ms-main-start'); if (m) m.focus({ preventScroll: true }); }); }
     // what each Today figure means
     const tip = { 'Floating now': 'Result of the open trades right now, in R (1R = the risk of one trade)', Today: 'Closed today, in R', 'This week': 'Closed since Monday, in R', 'This month': 'Closed since the 1st, in R' };
-    new MutationObserver(() => document.querySelectorAll('.h-kpi').forEach((c) => { const k = c.querySelector('.h-kpi-k'); if (k && tip[k.textContent] && !c.title) c.title = tip[k.textContent]; })).observe(document.body, { childList: true, subtree: true });
+    // perf (8 Nov): one pass per frame however many DOM changes arrive (the observer used to run on every mutation batch)
+    let kq = false; const kpiTips = () => document.querySelectorAll('.h-kpi').forEach((c) => { const k = c.querySelector('.h-kpi-k'); if (k && tip[k.textContent] && !c.title) c.title = tip[k.textContent]; });
+    new MutationObserver(() => { if (kq) return; kq = true; requestAnimationFrame(() => { kq = false; kpiTips(); }); }).observe(document.body, { childList: true, subtree: true }); kpiTips();
   }
 
   // ─── Design round 2 (6 Nov): scroll boxes fade only while more rows are below; the status dot gets a name ───
   { const upd = (el) => { const more = el.scrollHeight - el.clientHeight - el.scrollTop > 4; el.classList.toggle('has-more', more); };
     const boxes = () => document.querySelectorAll('.t-scroll, #ms-cal-day, #ms-nq-list, #ms-rep-list, .loss-rows, #ms-c-pm, .c-pane-overview > .c-active .c-act');
     const wire = () => boxes().forEach((el) => { if (!el.dataset.fadeWired) { el.dataset.fadeWired = '1'; el.addEventListener('scroll', () => upd(el), { passive: true }); } upd(el); });
-    new MutationObserver(() => requestAnimationFrame(wire)).observe(document.body, { childList: true, subtree: true }); addEventListener('resize', wire); wire();
+    // perf (8 Nov): every mutation batch used to queue its own frame callback, each reading scrollHeight (a layout) on every box; now one pass per frame
+    let wq = false; new MutationObserver(() => { if (wq) return; wq = true; requestAnimationFrame(() => { wq = false; wire(); }); }).observe(document.body, { childList: true, subtree: true }); addEventListener('resize', wire); wire();
     const dot = document.getElementById('ms-live-dot'), txt = document.getElementById('ms-live-txt');
     if (dot && txt) { const name = () => { const t = txt.textContent.trim() || (dot.classList.contains('on') ? 'Live' : dot.classList.contains('poll') ? 'Updating every few seconds' : 'Connecting'); dot.title = t; dot.setAttribute('role', 'img'); dot.setAttribute('aria-label', `Price feed: ${t}`); };
       new MutationObserver(name).observe(txt, { childList: true, characterData: true, subtree: true }); new MutationObserver(name).observe(dot, { attributes: true, attributeFilter: ['class'] }); name(); }
@@ -7409,7 +7432,7 @@ function msNextSetup(bars, A) {
     CPANES.forEach((k) => { const el = document.getElementById('ms-cp-' + k), b = document.getElementById('ms-cn-' + k); if (el) el.hidden = k !== p; if (b) { b.setAttribute('aria-selected', String(k === p)); b.tabIndex = k === p ? 0 : -1; } });
     if (push && location.hash !== '#council/' + p) history.replaceState(null, '', '#council/' + p);
     { const b = document.getElementById('ms-cn-' + p); if (b && b.scrollIntoView && b.offsetParent) b.scrollIntoView({ block: 'nearest', inline: 'nearest' }); }
-    if (changed && COUNCIL.trades && typeof renderCouncil === 'function') requestAnimationFrame(() => renderCouncil());
+    if ((changed || CDIRTY[p]) && COUNCIL.trades && typeof renderCouncil === 'function') requestAnimationFrame(() => renderCouncil());   // a pane skipped while hidden is drawn now
   }
   { const nav = document.getElementById('ms-c-nav');
     if (nav) {
@@ -7435,6 +7458,7 @@ function msNextSetup(bars, A) {
     if (v === 'users' && window.renderUsers) window.renderUsers();   // guests only get the H4 chart (owner, 6 Nov)
     if (v === 'council') setPane(sub || CPANE.cur, false);
     VIEWS.forEach((k) => { const el = document.getElementById('v-' + k); if (el) el.hidden = k !== v; });
+    if (v === 'journal' && CDIRTY.journal) paneDo('journal', () => { try { renderSystemJournal(); } catch (e) {} });   // the system journal skipped while its view was hidden
     document.querySelectorAll('[data-go]').forEach((a) => { if (a.dataset.go === v) a.setAttribute('aria-current', 'page'); else a.removeAttribute('aria-current'); });
     if (v === 'charts') setTimeout(() => Object.values(panes).forEach((p) => p.fit()), 60);
     window.scrollTo(0, 0);
@@ -7445,7 +7469,9 @@ function msNextSetup(bars, A) {
   // Context the page can read itself (weekly structure from the council, the Daily regime, the Daily close, the NY midnight
   // open, the session) plus the playbook's pre-trade checklist; manual items are ticked by hand and kept for the day.
   const NYP = new Intl.DateTimeFormat('en-US', { timeZone: 'America/New_York', year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', weekday: 'short', hourCycle: 'h23' });
-  const nyParts = (t) => { const o = {}; for (const x of NYP.formatToParts(new Date(t * 1000))) o[x.type] = x.value; return { d: `${o.year}-${o.month}-${o.day}`, h: +o.hour, m: +o.minute, wd: o.weekday }; };
+  // perf (8 Nov): formatToParts is slow and the playbook asks it for every M15 bar on each render; a bar's New York parts never change, so they are kept (bounded)
+  const NYM = new Map();
+  const nyParts = (t) => { let r = NYM.get(t); if (r) return r; const o = {}; for (const x of NYP.formatToParts(new Date(t * 1000))) o[x.type] = x.value; r = { d: `${o.year}-${o.month}-${o.day}`, h: +o.hour, m: +o.minute, wd: o.weekday }; if (NYM.size > 5000) NYM.clear(); NYM.set(t, r); return r; };
   const PB_MANUAL = [['closed', 'Signal candles CLOSED (DRD, BO, CF, EG)', 'Never act on a candle still forming; most of the old "edge" was knowing the close early.'],
     ['origin', 'The zone is the extreme / origin of the leg, not a roadblock in the middle', ''], ['fresh', 'Entry zone fresh (or within its reuse limit)', 'EG zone 2 uses, EF zone 1.'],
     ['sl', 'Stop beyond the structural extreme; size from the stop distance', 'Fixed 20-30 pip stops do not fit today\'s gold.'], ['tgt', 'Target = next barrier / opposing same-TF zone, at least 2R', '']];
@@ -7473,12 +7499,14 @@ function msNextSetup(bars, A) {
     const news = (typeof NEWS !== 'undefined' ? NEWS : []).filter((x) => x.rel).find((x) => x.t - now < 30 * 60 && now - x.t < 15 * 60);
     const mondayOpen = ny.wd === 'Mon' && ny.h < 3;
     const cell = (k, v, sub, c) => `<div class="${c || ''}"><span>${k}</span><b>${v}</b><small>${sub}</small></div>`;
-    document.getElementById('ms-pb-ctx').innerHTML =
+    // perf (8 Nov): the context tiles and the verdict are rewritten only when their markup changed (the checklist keeps its own ticks, so it is always drawn)
+    const pbSet = (id, html) => { const el = document.getElementById(id); if (el && el._msHtml !== html) { el._msHtml = html; el.innerHTML = html; } };
+    pbSet('ms-pb-ctx',
       cell('Weekly structure', !gold ? 'gold only' : w1 ? (w1 > 0 ? 'Bullish' : 'Bearish') : 'waiting', !gold || !dir || !w1 ? 'last W1 break' : wOk ? `agrees with the ${G.td.word.toLowerCase()} setup` : `against the ${G.td.word.toLowerCase()} setup`, wOk == null ? '' : wOk ? 'ok' : 'bad')
       + cell('Daily regime', regime, er == null ? 'needs 21 daily candles' : `20-day efficiency ${er.toFixed(2)} · ${er >= 0.2 ? 'BO→VR→CF style' : 'barrier style or no trade'}`, er == null ? '' : er >= 0.2 ? 'ok' : 'warn')
       + cell('Daily close', weekend ? 'weekend' : `in ${dur(toClose)}`, '17:00 New York · act only on closed candles', weekend ? 'warn' : '')
       + cell('NY midnight open', mo ? fmt(mo.open) : '—', moSide ? `price ${moSide} it · MMXM: buy below, sell above` : 'MMXM day profile', moSide && dir ? ((dir > 0) === (moSide === 'below') ? 'ok' : 'warn') : '')
-      + cell('Session', ses[0], `${String(ny.h).padStart(2, '0')}:${String(ny.m).padStart(2, '0')} New York`, ses[1]);
+      + cell('Session', ses[0], `${String(ny.h).padStart(2, '0')}:${String(ny.m).padStart(2, '0')} New York`, ses[1]));
     // checklist: auto items + manual items (kept per day and instrument)
     const key = `msPb-${instKey}-${ny.d}`; let man = {}; try { man = JSON.parse(localStorage.getItem(key) || '{}'); } catch (e) {}
     const autoItems = [
@@ -7490,9 +7518,9 @@ function msNextSetup(bars, A) {
       + PB_MANUAL.map(([k, t, sub]) => `<li class="${man[k] ? 'yes' : ''}"><label><input type="checkbox" data-pb="${k}"${man[k] ? ' checked' : ''}> <span>${esc(t)}${sub ? `<small>${esc(sub)}</small>` : ''}</span></label></li>`).join('');
     const autoOk = autoItems.every(([, st]) => st !== false), allMan = PB_MANUAL.every(([k]) => man[k]);
     const v = !autoOk ? ['no', 'Not a playbook trade right now: see the red items.'] : allMan ? ['go', 'All checks pass. Size from the structural stop; 3 losses in a row = stop for the day.'] : ['wait', 'Context is fine; tick the manual checks on the chart before entering.'];
-    document.getElementById('ms-pb-side').innerHTML = `<div class="pb-verdict ${v[0]}">${v[1]}</div>`
+    pbSet('ms-pb-side', `<div class="pb-verdict ${v[0]}">${v[1]}</div>`
       + `<div><b>Management</b> (playbook §5): cut only on a candle CLOSE through the zone; break-even only after ≥ 1.5R (early BE on gold gets hunted); 70-80% off at the first barrier; a failed zone flips — trade its pullback the other way.</div>`
-      + `<div><b>What 14 years of gold say</b>: wait for the Daily close; structural stops; trend regime matters for breakouts; Mosha BO + Weekly agreeing is the best honest edge (PF ~1.35). Engulf mechanics and raw key levels alone have no edge.</div>`;
+      + `<div><b>What 14 years of gold say</b>: wait for the Daily close; structural stops; trend regime matters for breakouts; Mosha BO + Weekly agreeing is the best honest edge (PF ~1.35). Engulf mechanics and raw key levels alone have no edge.</div>`);
     box.dataset.key = key;
   }
   { const ck = document.getElementById('ms-pb-ck');
@@ -7500,7 +7528,8 @@ function msNextSetup(bars, A) {
   function renderHome() {
     try { renderPlaybook(); } catch (e) { console.warn('playbook', e); }
     if (!document.getElementById('v-home')) return;
-    const set = (id, html) => { const el = document.getElementById(id); if (el) el.innerHTML = html; };
+    // perf (8 Nov): renderHome runs after every chart analysis; markup that did not change is not written again (same DOM, no churn)
+    const set = (id, html) => { const el = document.getElementById(id); if (el && el._msHtml !== html) { el._msHtml = html; el.innerHTML = html; } };
     try {
       const bias = document.getElementById('ms-td-bias'), hb = document.getElementById('h-bias');
       if (bias && hb) { hb.textContent = bias.textContent; hb.className = bias.className; }
@@ -10512,9 +10541,13 @@ html[data-role="public"] #ms-me-ct { display: none; }
     Promise.all([get('macro/forecast.json'), get('macro/events.json'), get('macro/history.json')]).then(function (x) {
       if (!x[0] || !x[0].assets) { if (!D.f) $('ms-md-at').textContent = x[0] === null ? 'Could not load the Macro strategist\'s forecast. It is written about every 25 minutes once the council loop runs it.' : 'No macro forecast yet.'; return; }
       D.f = x[0]; D.ev = Array.isArray(x[1]) ? x[1] : []; D.hist = Array.isArray(x[2]) ? x[2] : [];
-      render();
+      renderSoon();
     });
   }
+  // perf (8 Nov): while the pane is hidden the desk is drawn in idle time (off the first paint); opening the pane draws it at once
+  var pend = false, idle = window.requestIdleCallback ? function (f) { window.requestIdleCallback(f, { timeout: 2000 }); } : function (f) { setTimeout(f, 50); };
+  function renderSoon() { if (!pane.hidden) { pend = false; render(); return; } if (pend) return; pend = true; idle(function () { if (pend) { pend = false; render(); } }); }
+  new MutationObserver(function () { if (!pane.hidden && pend) renderSoon(); }).observe(pane, { attributes: true, attributeFilter: ['hidden'] });
   load(); setInterval(load, 10 * 60e3);
   setInterval(function () { if (D.f && !pane.hidden) { try { renderHead(D.f); } catch (e) {} } }, 60e3);   // keep "updated … ago" honest
 })();
