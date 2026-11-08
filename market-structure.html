@@ -5237,7 +5237,7 @@ function msNextSetup(bars, A) {
     if (G.csv) return;
     try {
       ws = new WebSocket('wss://stream.binance.com:9443/stream?streams=' + ACTIVE.map((t) => `${INST.binance.toLowerCase()}@kline_${t.binance}`).join('/'));
-      const kill = setTimeout(() => { if (!G.live) { try { ws.close(); } catch (e) {} startPolling(); } }, 8000);
+      const kill = setTimeout(() => { if (!G.live) { try { ws.close(); } catch (e) {} startPolling(); startRestTicks(); } }, 8000);
       ws.onmessage = (m) => {
         const d = JSON.parse(m.data).data, k = d && d.k; if (!k) return;
         if (!G.live) { G.live = true; clearTimeout(kill); setStatus(); }
@@ -5247,7 +5247,7 @@ function msNextSetup(bars, A) {
       };
       ws.onclose = () => { if (G.live) { G.live = false; setStatus(); setTimeout(startStream, 3000); } };
       ws.onerror = () => {};
-    } catch (e) { startPolling(); }
+    } catch (e) { startPolling(); startRestTicks(); }
   }
   // OANDA ticks (Server-Sent Events from the /md/stream Vercel function): every price change moves the forming candle on all timeframes
   function startTicks() {
@@ -5271,6 +5271,37 @@ function msNextSetup(bars, A) {
     };
     es.onerror = () => { if (es.readyState === 2) { G.es = null; const sp = $('ms-hdr-spr'); if (sp) sp.hidden = true; if (G.live) { G.live = false; setStatus(); } setTimeout(startTicks, 5000); } };
   }
+  // Exchange price ticks (8 Nov, owner: "the charts should be moving like real data; bitcoin is static"): when the Binance stream
+  // is not connected (blocked network, region, or a Kraken / Bitstamp source), the last price is read every 2.5 s from Binance,
+  // else Kraken, and moves the forming candle on every pane the way the OANDA ticks do. Stops by itself once a stream is live.
+  let restTicking = false;
+  function startRestTicks() {
+    if (restTicking || G.csv || G.source === 'OANDA' || !(INST.binance || INST.kraken)) return; restTicking = true;
+    let bnOff = false, fails = 0;
+    const read = async () => {
+      if (!bnOff && INST.binance) { try { const j = await getJSON(`https://api.binance.com/api/v3/ticker/price?symbol=${INST.binance}`); const p = +j.price; if (isFinite(p) && p > 0) return { px: p, src: 'Binance' }; } catch (e) { bnOff = true; } }
+      if (INST.kraken) { const j = await getJSON(`https://api.kraken.com/0/public/Ticker?pair=${INST.kraken}`); const r = j && j.result && Object.values(j.result)[0], p = r && r.c ? +r.c[0] : NaN; if (isFinite(p) && p > 0) return { px: p, src: 'Kraken' }; }
+      throw new Error('no price');
+    };
+    const loop = async () => {
+      if (G.csv) { restTicking = false; return; }
+      if (G.live && G.tickSrc !== 'rest') { restTicking = false; G.tickSrc = null; return; }   // a stream took over
+      try {
+        const { px, src } = await read(); fails = 0; const t = Date.now() / 1000;
+        ACTIVE.forEach((tf) => {
+          const P = panes[tf.id]; if (!P || !P.raw || !P.raw.length) return;
+          const bt = Math.floor(t / tf.sec) * tf.sec, last = P.raw[P.raw.length - 1];
+          if (bt === last.time) P.push({ time: bt, open: last.open, high: Math.max(last.high, px), low: Math.min(last.low, px), close: px });
+          else if (bt > last.time) P.push({ time: bt, open: px, high: px, low: px, close: px });
+        });
+        if (!G.live || G.tickSrc !== 'rest') { G.live = true; G.tickSrc = 'rest'; G.tickName = src; setStatus(); }
+        $('ms-updated').textContent = new Date().toLocaleTimeString();
+        const hp = $('ms-hdr-price'); if (hp) { const prev = +hp.dataset.p; if (prev && prev !== px) { hp.classList.remove('tick-up', 'tick-down'); void hp.offsetWidth; hp.classList.add(px > prev ? 'tick-up' : 'tick-down'); } hp.dataset.p = px; hp.textContent = fmt(px); }
+      } catch (e) { if (++fails >= 4 && G.tickSrc === 'rest') { G.live = false; G.tickSrc = null; setStatus(); } }
+      setTimeout(loop, fails ? 8000 : 2500);
+    };
+    loop();
+  }
   let polling = false;
   function startPolling() {
     if (polling || G.csv) return; polling = true; setStatus();
@@ -5282,14 +5313,14 @@ function msNextSetup(bars, A) {
       };
       // OANDA answers from the edge cache, so without the tick stream the fast timeframes refresh every few seconds;
       // while ticks stream in, the poll only re-syncs whole candles at the normal pace
-      const iv = () => G.source === 'OANDA' && !G.live && !marketClosedNow() ? Math.min(tf.poll, { '1m': 3e3, '5m': 5e3, '15m': 10e3 }[tf.id] || tf.poll) : tf.poll;
+      const iv = () => !G.live && !marketClosedNow() ? Math.min(tf.poll, { '1m': 3e3, '5m': 5e3, '15m': 10e3 }[tf.id] || tf.poll) : tf.poll;
       setTimeout(tick, iv());
     });
   }
   function setStatus() {
     const dot = $('ms-live-dot'), txt = $('ms-live-txt');
     if (G.csv) { dot.className = 'ms-live-dot'; txt.textContent = 'From your CSV'; return; }
-    if (G.live) { dot.className = 'ms-live-dot on'; txt.textContent = G.source === 'OANDA' ? 'Live · OANDA ticks' : `Live · ${G.source} stream`; }
+    if (G.live) { dot.className = 'ms-live-dot on'; txt.textContent = G.source === 'OANDA' ? 'Live · OANDA ticks' : G.tickSrc === 'rest' ? `Live · ${G.tickName || G.source} price ticks` : `Live · ${G.source} stream`; }
     else if (polling) { dot.className = 'ms-live-dot poll'; txt.textContent = `Live · ${G.source} (refreshing)`; }
     else { dot.className = 'ms-live-dot'; txt.textContent = 'Connecting…'; }
     const srcSym = { Binance: INST.binance, Kraken: INST.kraken, Bitstamp: INST.bitstamp, OANDA: INST.label + ' mid' }[G.source] || '';
@@ -5325,7 +5356,7 @@ function msNextSetup(bars, A) {
     topDown(); setStatus();
     $('ms-updated').textContent = new Date().toLocaleTimeString();
     if (INST.spot) setInterval(refreshSpot, 60e3);
-    if (G.source === 'Binance' && INST.binance) startStream(); else { startPolling(); if (G.source === 'OANDA') startTicks(); }
+    if (G.source === 'Binance' && INST.binance) startStream(); else { startPolling(); if (G.source === 'OANDA') startTicks(); else startRestTicks(); }
     if (SCAN.el) { setTimeout(scanAll, 2500); setInterval(scanAll, 5 * 60e3); }
   }
 
