@@ -4440,8 +4440,9 @@ function msNextSetup(bars, A) {
         const g = G.gplan, ok = g && instKey === 'xau' && P.bars && P.bars.length;
         if (!P.gOv) { P.gOv = new Overlay(); attach(P.gOv); }
         if (!ok) { P.gOv.set({ boxes: [], lines: [], labels: [], path: [], vlines: [], segs: [] }); return; }
-        const add = (price, color, title, style) => { if (price == null || !isFinite(price)) return; P.planLines.push(series.createPriceLine({ price, color, lineWidth: 1, lineStyle: style, axisLabelVisible: true, title, lineVisible: false })); };
-        add(g.entry, '#7aa2ff', 'Entry', LW.LineStyle.Solid); add(g.stop, '#f2576f', 'Stop', LW.LineStyle.Solid); add(g.t1, '#2fbf8f', 'Target', LW.LineStyle.Dashed);
+        // as the earlier guest H4 chart drew it: dashed level lines across the pane plus the two zones
+        const add = (price, color, title) => { if (price == null || !isFinite(price)) return; P.planLines.push(series.createPriceLine({ price, color, lineWidth: 1, lineStyle: LW.LineStyle.Dashed, axisLabelVisible: true, title, lineVisible: true })); };
+        add(g.entry, '#7aa2ff', 'Entry'); add(g.stop, '#f2576f', 'Stop'); add(g.t1, '#2fbf8f', 'Target');
         const n = P.bars.length; let i0 = P.bars.findIndex((b) => b.time + tf.sec > (g.t0 || 0)); if (i0 < 0) i0 = Math.max(0, n - 12);   // from the bar the trade was placed in, out to the right like the main system
         const i1 = n + 14, boxes = [{ l1: i0, l2: i1, hi: Math.max(g.entry, g.stop), lo: Math.min(g.entry, g.stop), fill: 'rgba(242,87,111,.16)', stroke: 'rgba(242,87,111,.55)' }];
         if (g.t1 != null) boxes.push({ l1: i0, l2: i1, hi: Math.max(g.entry, g.t1), lo: Math.min(g.entry, g.t1), fill: 'rgba(47,191,143,.15)', stroke: 'rgba(47,191,143,.55)' });
