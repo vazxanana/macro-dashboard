@@ -1011,6 +1011,7 @@
   .ict-m .px { font: 600 20px var(--mono); font-variant-numeric: tabular-nums; }
   .ict-m .sub { font: 500 11.5px var(--sans); color: var(--ink-faint); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .ict-m.live { border-color: var(--gold-line); box-shadow: inset 0 0 0 1px var(--gold-soft); }
+  .ict-m .sub.roll { color: var(--ink-dim); }
   .ict-kpi { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 1px; background: var(--line); border: 1px solid var(--line); border-radius: 12px; overflow: hidden; }
   .ict-kpi > div { background: var(--panel); padding: 12px 14px; display: grid; gap: 2px; }
   .ict-kpi span { font: 500 12px var(--sans); color: var(--ink-dim); }
@@ -7681,13 +7682,19 @@ function msNextSetup(bars, A) {
     $('ict-src').querySelectorAll('button').forEach((b) => { const on = b.dataset.s === S.src; b.classList.toggle('on', on); b.setAttribute('aria-pressed', String(on)); });
     $('ict-flt').querySelectorAll('button').forEach((b) => { const on = b.dataset.f === S.flt; b.classList.toggle('on', on); b.setAttribute('aria-pressed', String(on)); });
     renderCal(T);
-    $('ict-run').textContent = snap ? `Tracker checked ${ago(Date.parse(snap.at) / 1000)}${Object.keys(snap.errors || {}).length ? ` · feed issue: ${Object.keys(snap.errors).join(', ').toUpperCase()}` : ''}.${S.replayInfo ? ` Replay since ${S.replayInfo.from}: ${S.replay.length} signals.` : ''}` : 'Waiting for the first tracker run.';
+    const switched = snap ? Object.entries(snap.markets || {}).filter(([, m]) => m && m.switched).map(([k]) => k.toUpperCase()) : [];
+    $('ict-run').textContent = snap ? `Tracker checked ${ago(Date.parse(snap.at) / 1000)}${Object.keys(snap.errors || {}).length ? ` · feed issue: ${Object.keys(snap.errors).join(', ').toUpperCase()}` : ''}${switched.length ? ` · contract switch on ${switched.join(', ')}: open trades' levels moved by the spread` : ''}.${S.replayInfo ? ` Replay since ${S.replayInfo.from}: ${S.replay.length} signals.` : ''}` : 'Waiting for the first tracker run.';
     // markets
     const mk = snap ? snap.markets : {};
     $('ict-mkts').innerHTML = ['nq', 'es', 'ym', 'rty', 'gc'].map((k) => { const m = mk[k], o = O.find((x) => x.market === k);
       return `<div class="ict-m${o ? ' live' : ''}" role="listitem"><div class="k">${m ? esc(m.short) : k.toUpperCase()} <small>${m ? esc(m.label) : ''}</small></div><div class="px">${m ? fx(m.price, k) : '—'}</div>`
         + `<div class="sub">${o ? `<b class="${o.side === 'buy' ? 'pos' : 'neg'}">${o.side.toUpperCase()}</b> open · ${fR(liveR(o))}` : m && m.lastSignal ? `Last ${m.lastSignal.side} ${m.lastSignal.grade} · ${ago(m.lastSignal.at)}` : 'No signal yet'}</div>`
-        + `<div class="sub">PDH ${m ? fx(m.pdh, k) : '—'} · PDL ${m ? fx(m.pdl, k) : '—'}</div></div>`; }).join('');
+        + `<div class="sub">PDH ${m ? fx(m.pdh, k) : '—'} · PDL ${m ? fx(m.pdl, k) : '—'}</div>`
+        // futures rolls (#578, ict/tracker.mjs rollAdjust / contractShift): the daily candles behind the 50-day bias are back-adjusted
+        // for contract switches when the cash index answers; a switch seen this run moved every open trade's levels by the spread
+        + (m && m.switched ? `<div class="sub roll" title="The CNBC feed moved to the next contract this run; open trades' levels were moved by the calendar spread so the new contract's candles are judged on their own scale">Contract switch: levels moved ${m.switched.by > 0 ? '+' : ''}${fx(m.switched.by, k)}</div>`
+          : m && m.d1Roll ? `<div class="sub roll" title="The daily candles behind the 50-day bias are back-adjusted for the futures roll (the calendar spread at the last contract switch)">Daily roll-adjusted · last switch ${esc(String(m.d1Roll.day || '').slice(5))} (${m.d1Roll.spread > 0 ? '+' : ''}${fx(m.d1Roll.spread, k)})</div>` : '')
+        + `</div>`; }).join('');
     // KPIs
     const sum = (a, f) => a.reduce((s, x) => s + (f(x) || 0), 0), R3 = sum(C, (x) => x.R), R2 = sum(C, (x) => x.R2 ?? x.R), w = C.filter((x) => x.R > 0).length;
     const fl = sum(O, (x) => liveR(x) * (x.size || 1)), mine = T.filter((x) => (myRev(x) || {}).act === 'taken'), rev = C.filter((x) => myRev(x) && myRev(x).text).length;
