@@ -740,3 +740,9 @@ Blob store (`profiles/<key>.json`): GET `?u=<key|owner>` with header `X-MS-Auth:
 the hash is checked against the sign-in list (built-ins + Blob list, removed users refused, owner hash for the owner; fails closed);
 photo must be a JPEG / PNG data URL under 160 KB. The account area (`pullProfile` on load, `pushProfile` on change / remove /
 rename) keeps localStorage as the cache and uploads a browser-only photo once. Tests: `tests/profile.test.mjs`.
+
+## Styled dialogs (8 Nov 2026, owner: native prompt boxes "very ugly")
+`assets/ms-dialog.js` replaces the browser's prompt / confirm / alert on market-structure and ChronosTrade with a `<dialog class="msd">`
+themed from page tokens: `await msAsk(label, value, {title, ok, type, max})` (null on cancel), `await msConfirm(msg, {title, ok, danger})`,
+`msAlert`, `msCopy` (clipboard fallback). `window.alert` routes to it. Don't add native `prompt(`/`confirm(` calls; the audit clicks
+`dialog.msd button.pri`.

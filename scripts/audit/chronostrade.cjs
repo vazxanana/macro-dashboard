@@ -64,13 +64,13 @@ async function load(p, q = 'xau,15m') { await p.click(`#quick [data-q^="${q}"]`)
   const nd = await p.evaluate(() => Object.values(JSON.parse(localStorage.getItem('btLab:sessions')))[0].draw.length); check('drawings placed and saved', nd === 2, nd);
   await p.click('#drawdd summary'); await p.click('[data-dx=last]'); check('remove last drawing', (await p.evaluate(() => Object.values(JSON.parse(localStorage.getItem('btLab:sessions')))[0].draw.length)) === 1);
   // 11. prop firm challenge: fail fast with 6% risk on FTMO
-  await p.selectOption('#firm', 'ftmo2'); p.once('dialog', (d) => d.accept()); await p.click('#pf-start'); await p.waitForTimeout(200);
+  await p.selectOption('#firm', 'ftmo2'); await p.click('#pf-start'); await p.click('dialog.msd button.pri').catch(() => {}); await p.waitForTimeout(200);
   check('challenge starts at the firm size', /100,000/.test(await txt(p, '#bal')) && /live/.test(await txt(p, '#pf-status')), await txt(p, '#pf-status'));
   let failed = false; for (let k = 0; k < 6 && !failed; k++) { await p.keyboard.press('b'); await p.fill('#o-risk', '6'); await p.dispatchEvent('#o-risk', 'input'); await p.click('[data-sl="bar"]'); await p.click('[data-tp="3"]'); await p.click('#place'); for (let i = 0; i < 80; i++) { await p.keyboard.press('ArrowRight'); if (!(await p.$('.pos-card'))) break; } failed = /failed/.test(await txt(p, '#pf-status')); }
   check('daily loss / max loss trips the challenge', failed, await txt(p, '#pf'));
   check('a breach flattens the account', (await p.$$('.pos-card')).length === 0, await txt(p, '#open'));
   check('challenge log lists the days', (await p.$$('#pflog tr')).length > 1);
-  await p.fill('#o-risk', '1'); p.once('dialog', (d) => d.accept()); await p.click('#pf-stop').catch(() => {});
+  await p.fill('#o-risk', '1'); await p.click('#pf-stop').catch(() => {}); await p.click('dialog.msd button.pri').catch(() => {});
   // 12. tabs: stats, calendar, export
   await p.click('.tabs [data-t=stats]'); check('statistics render', (await p.$$('#stats div')).length >= 16 && !/NaN|undefined/.test(await txt(p, '#stats')), (await txt(p, '#stats')).slice(0, 80));
   check('session table renders', (await p.$$('#bysess tr')).length >= 2);

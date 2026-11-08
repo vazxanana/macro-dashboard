@@ -30,6 +30,7 @@
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600&display=swap">
 <!-- charting library served from this site (same connection, cached for a year); the public CDN is the fallback -->
 <script src="/assets/lightweight-charts-4.1.3.js"></script>
+<script src="/assets/ms-dialog.js"></script>
 <script>window.LightweightCharts || document.write('<script src="https://cdn.jsdelivr.net/npm/lightweight-charts@4.1.3/dist/lightweight-charts.standalone.production.js"><\/script>');</script>
 <style>
   /* Layout: one focused column; top bar → what to do now → possible trades → charts → method notes */
@@ -1383,6 +1384,19 @@ document.addEventListener('DOMContentLoaded', function () {
   function esc1(c) { return c.replace(/[&<>"']/g, ''); }
   const greet = () => { const h = new Date().getHours(); return h < 5 ? 'Good night' : h < 12 ? 'Good morning' : h < 17 ? 'Good afternoon' : h < 22 ? 'Good evening' : 'Good night'; };
   const $ = (id) => document.getElementById(id);
+  // the photo and name also live on the server (/api/profile, 8 Nov: they reset because localStorage is per browser: Safari and
+  // the home-screen app keep separate copies, and Safari wipes it after a week). Local storage stays as the fast cache.
+  const API = /^https?:$/.test(location.protocol) && !/github\.io$/.test(location.hostname) ? location.origin + '/api/profile' : null;
+  const acct = () => { try { const h = localStorage.getItem('ms-admin'), u = localStorage.getItem('ms-user'); return who === 'guest' || !h ? null : { u: u || 'owner', h }; } catch (e) { return null; } };
+  function pushProfile(fields) { const a = acct(); if (!API || !a) return; fetch(API, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ u: a.u, h: a.h, ...fields }) }).catch(() => {}); }
+  function pullProfile() { const a = acct(); if (!API || !a) return;
+    fetch(API + '?u=' + encodeURIComponent(a.u), { headers: { 'X-MS-Auth': a.h }, cache: 'no-store' }).then((r) => (r.ok ? r.json() : null)).then((srv) => { if (!srv) return;
+      let changed = false; const lp = get('photo'), ln = get('name');
+      if (srv.photo && srv.photo !== lp) { try { localStorage.setItem(key('photo'), srv.photo); } catch (e) {} changed = true; }
+      if (srv.name && srv.name !== ln) { try { localStorage.setItem(key('name'), srv.name); } catch (e) {} changed = true; }
+      // first visit after the change: a photo or name that only this browser had goes up to the server once
+      const up = {}; if (!srv.photo && lp) up.photo = lp; if (!srv.name && ln) up.name = ln; if (Object.keys(up).length) pushProfile(up);
+      if (changed) { paint(); if ($('v-profile') && !$('v-profile').hidden && window.msProfile) window.msProfile(); } }).catch(() => {}); }
   function paint() {
     const photo = get('photo'), name = get('name') || defName;
     ['ms-me-av', 'ms-me-av2'].forEach((id, n) => { const el = $(id); if (el) el.innerHTML = photo ? `<img src="${photo}" alt="">` : svg(n); });
@@ -1395,7 +1409,7 @@ document.addEventListener('DOMContentLoaded', function () {
     const sm = document.querySelector('#ms-me > summary'); if (sm) sm.setAttribute('aria-label', `${greet()}, ${name}. Account menu`);
   }
   document.addEventListener('DOMContentLoaded', () => {
-    paint(); setInterval(paint, 60e3);
+    paint(); setInterval(paint, 60e3); pullProfile();
     const me = $('ms-me'); if (!me) return;
     me.addEventListener('toggle', () => { if (!me.open) return; const t = $('h-today') && $('h-today').innerText.trim() ? $('h-today') : $('g-today'); const fl = window.FLOAT;
       const pub = who === 'guest', tv = fl ? (pub ? fl.liveTot || 0 : fl.tot) : 0;
@@ -1410,12 +1424,12 @@ document.addEventListener('DOMContentLoaded', function () {
       const img = new Image(), url = URL.createObjectURL(f);
       img.onload = () => { const W = 160, H = 184, c = document.createElement('canvas'); c.width = W; c.height = H; const g = c.getContext('2d');
         const sc = Math.max(W / img.width, H / img.height), w = img.width * sc, h = img.height * sc; g.drawImage(img, (W - w) / 2, (H - h) / 2, w, h);
-        put('photo', c.toDataURL('image/jpeg', 0.86)); URL.revokeObjectURL(url); $('ms-me-file').value = ''; paint(); };
+        const du = c.toDataURL('image/jpeg', 0.86); put('photo', du); pushProfile({ photo: du }); URL.revokeObjectURL(url); $('ms-me-file').value = ''; paint(); };
       img.onerror = () => { alert("That file isn't an image this browser can read."); URL.revokeObjectURL(url); };
       img.src = url;
     });
-    $('ms-me-rmphoto').addEventListener('click', () => { put('photo', null); paint(); });
-    $('ms-me-rename').addEventListener('click', () => { const n = prompt('Display name', get('name') || defName); if (n === null) return; put('name', n.trim().slice(0, 24) || null); paint(); });
+    $('ms-me-rmphoto').addEventListener('click', () => { put('photo', null); pushProfile({ photo: null }); paint(); });
+    $('ms-me-rename').addEventListener('click', async () => { const n = await msAsk('Display name', get('name') || defName, { title: 'Your display name', ok: 'Save', max: 24, placeholder: 'How the desk greets you' }); if (n === null) return; const v = n.trim().slice(0, 24) || null; put('name', v); pushProfile({ name: v }); paint(); });
     $('ms-me-out').addEventListener('click', () => { me.open = false; const a = $('ms-admin-link'); if (a) a.click(); });
   });
 })();
@@ -4392,7 +4406,7 @@ function msNextSetup(bars, A) {
         c.onclick = async (ev) => { ev.stopPropagation(); const b = ev.target.closest('[data-pc]'); if (!b) return; const k = b.dataset.pc;
           if (k === 'x') { if (P.posTool) P.posTool(); return; }
           if (k === 'al') { if (window.msOpenAlerts) window.msOpenAlerts(instKey, +f(en)); return; }
-          const v = k === 'mt5' ? mt5 : ct; try { await navigator.clipboard.writeText(v); } catch (e) { prompt('Copy', v); } const o = b.textContent; b.textContent = 'Copied ✓'; setTimeout(() => { b.textContent = o; }, 1400); window.msTrack && msTrack('Position ticket', { fmt: k }); }; };
+          const v = k === 'mt5' ? mt5 : ct; try { await navigator.clipboard.writeText(v); } catch (e) { msCopy(v); } const o = b.textContent; b.textContent = 'Copied ✓'; setTimeout(() => { b.textContent = o; }, 1400); window.msTrack && msTrack('Position ticket', { fmt: k }); }; };
       P.posTool = function () { let has = false; try { has = !!localStorage.getItem(QK); } catch (e) {}
         if (P.posOn) { P.posOn = false; E = null; mark(false); return; }
         if (has) { try { localStorage.removeItem(QK); } catch (e) {} P.drawPos(); return; }
@@ -4742,8 +4756,8 @@ function msNextSetup(bars, A) {
     const NOT_FULL = ['ms-show-ha', 'ms-show-log', 'ms-show-detail'];
     const apply = (m) => all().forEach((c) => { if (!(c.id in m) || c.checked === m[c.id]) return; c.checked = m[c.id]; c.dispatchEvent(new Event('change', { bubbles: true })); });
     const flash = (b, t) => { const o = b.textContent; b.textContent = t; setTimeout(() => { b.textContent = o; }, 1400); };
-    box.addEventListener('click', (ev) => { const b = ev.target.closest('[data-lay]'); if (!b) return; const k = b.dataset.lay;
-      if (k === 'wipe') { if (!confirm('Remove all your drawings (lines, trend lines, Fibonacci, position plans) on this market?')) return;
+    box.addEventListener('click', async (ev) => { const b = ev.target.closest('[data-lay]'); if (!b) return; const k = b.dataset.lay;
+      if (k === 'wipe') { if (!(await msConfirm('Remove all your drawings (lines, trend lines, Fibonacci, position plans) on this market?', { title: 'Clear drawings', ok: 'Remove all', danger: true }))) return;
         try { Object.keys(localStorage).filter((x) => x === 'ms-hl-' + instKey || ['ms-tl-', 'ms-fib-', 'ms-pos-'].some((p2) => x.startsWith(p2 + instKey + '-'))).forEach((x) => localStorage.removeItem(x)); } catch (e) {}
         try { window.msHLines.set([]); } catch (e) {} Object.values(panes).forEach((P) => { P.drawTl && P.drawTl(); P.drawFib && P.drawFib(); P.drawPos && P.drawPos(); }); flash(b, 'Cleared ✓'); return; }
       if (k === 'save') { const m = {}; all().forEach((c) => { m[c.id] = c.checked; }); try { localStorage.setItem('ms-lay-mine', JSON.stringify(m)); } catch (e) {} flash(b, 'Saved ✓'); return; }
@@ -4783,7 +4797,7 @@ function msNextSetup(bars, A) {
         document.body.appendChild(dlg);
         dlg.querySelector('.pa-x').onclick = () => dlg.close(); dlg.addEventListener('click', (e) => { if (e.target === dlg) dlg.close(); });
         dlg.querySelector('#tvw-pw').onsubmit = async (e) => { e.preventDefault(); const v = dlg.querySelector('#tvw-pwi').value; if ((await msSha256(v)) !== window.MS_ADMIN_HASH) { dlg.querySelector('#tvw-url').textContent = 'That is not the owner password.'; return; } try { sessionStorage.setItem('ms-own-pw', v); } catch (err) {} load(); };
-        const cp = async (t, b) => { try { await navigator.clipboard.writeText(t); b.textContent = 'Copied ✓'; setTimeout(() => { b.textContent = 'Copy'; }, 1400); } catch (e) { prompt('Copy', t); } };
+        const cp = async (t, b) => { try { await navigator.clipboard.writeText(t); b.textContent = 'Copied ✓'; setTimeout(() => { b.textContent = 'Copy'; }, 1400); } catch (e) { msCopy(t); } };
         dlg.querySelector('#tvw-cpu').onclick = (e) => cp(dlg.querySelector('#tvw-url').textContent, e.target);
         dlg.querySelector('#tvw-cpt').onclick = (e) => cp(TPL, e.target);
         const ck = dlg.querySelector('#tvw-push'); try { ck.checked = localStorage.getItem('ms-tv-push') === '1'; } catch (e) {}
@@ -4814,7 +4828,7 @@ function msNextSetup(bars, A) {
     };
     const getFile = async (f) => {
       let pw = ''; try { pw = sessionStorage.getItem('ms-own-pw') || ''; } catch (e) {}
-      if (!pw) { pw = prompt('Owner password (to download the bridge code)') || ''; if (!pw) return; }
+      if (!pw) { pw = (await msAsk('Owner password', '', { title: 'Download the bridge code', type: 'password', ok: 'Continue' })) || ''; if (!pw) return; }
       const r = await fetch('/api/bridge', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ ownerPw: pw, file: f }) });
       if (!r.ok) { alert(r.status === 403 ? 'Owner password not accepted.' : `Download failed (${r.status}).`); return; }
       try { sessionStorage.setItem('ms-own-pw', pw); } catch (e) {}
@@ -4836,7 +4850,7 @@ function msNextSetup(bars, A) {
         document.body.appendChild(dlg);
         dlg.querySelector('.pa-x').onclick = () => dlg.close(); dlg.addEventListener('click', (e) => { if (e.target === dlg) dlg.close(); });
         dlg.querySelector('#br-re').onclick = load;
-        dlg.querySelector('#br-cp').onclick = async (e) => { try { await navigator.clipboard.writeText(URL_); e.target.textContent = 'Copied ✓'; } catch (err) { prompt('Copy', URL_); } };
+        dlg.querySelector('#br-cp').onclick = async (e) => { try { await navigator.clipboard.writeText(URL_); e.target.textContent = 'Copied ✓'; } catch (err) { msCopy(URL_); } };
         dlg.querySelectorAll('.br-dl').forEach((b) => b.onclick = () => getFile(b.dataset.f));
       }
       dlg.showModal(); load();
@@ -7114,7 +7128,7 @@ function msNextSetup(bars, A) {
     el.hidden = false;
     el.innerHTML = `<b class="tk-h">Ticket</b><code class="tk-l" title="MT5 order">${esc(mt5)}</code>${size ? `<span class="tk-sz">Size ${esc(size)}</span>` : ''}<span class="tk-b"><button type="button" data-tk="mt5">Copy MT5</button><button type="button" data-tk="ct">Copy cTrader</button><button type="button" data-tk="txt">Copy text</button><a href="${window.msTvUrl ? window.msTvUrl(x.market, '15m') : '#'}" target="_blank" rel="noopener">TradingView</a></span>`;
     const val = { mt5, ct, txt };
-    el.querySelectorAll('[data-tk]').forEach((b) => b.onclick = async () => { try { await navigator.clipboard.writeText(val[b.dataset.tk]); } catch (e) { prompt('Copy', val[b.dataset.tk]); } const o = b.textContent; b.textContent = 'Copied ✓'; setTimeout(() => { b.textContent = o; }, 1400); window.msTrack && msTrack('Trade ticket', { fmt: b.dataset.tk }); });
+    el.querySelectorAll('[data-tk]').forEach((b) => b.onclick = async () => { try { await navigator.clipboard.writeText(val[b.dataset.tk]); } catch (e) { msCopy(val[b.dataset.tk]); } const o = b.textContent; b.textContent = 'Copied ✓'; setTimeout(() => { b.textContent = o; }, 1400); window.msTrack && msTrack('Trade ticket', { fmt: b.dataset.tk }); });
   }
   async function openTrade(id, keep, tf) {
     if (!keep) window.msTrack && msTrack('Trade review');
@@ -7397,9 +7411,9 @@ function msNextSetup(bars, A) {
     let cv = document.getElementById('ms-rv-cv'); if (cv) return cv;
     cv = document.createElement('canvas'); cv.id = 'ms-rv-cv'; cv.className = 'rv-cv'; document.getElementById('ms-tv-c').appendChild(cv);
     const pos = (ev) => { const b = cv.getBoundingClientRect(); return [ev.clientX - b.left, ev.clientY - b.top]; };
-    cv.addEventListener('pointerdown', (ev) => {
+    cv.addEventListener('pointerdown', async (ev) => {
       if (!RV.tool) return; ev.preventDefault(); const tp = rvToTP(...pos(ev)); if (!tp) { document.getElementById('ms-rv-msg').textContent = 'Wait for the candles to load, then draw.'; return; }
-      if (RV.tool === 'text') { const t = prompt('Text on the chart'); if (t) { RV.strokes.push({ tool: 'text', c: RV.color, pts: [tp], text: t.slice(0, 200) }); rvKeepDraft(); } return; }
+      if (RV.tool === 'text') { const t = await msAsk('Text on the chart', '', { title: 'Add text', ok: 'Add', max: 200 }); if (t) { RV.strokes.push({ tool: 'text', c: RV.color, pts: [tp], text: t.slice(0, 200) }); rvKeepDraft(); } return; }
       cv.setPointerCapture(ev.pointerId); RV.cur = { tool: RV.tool, c: RV.color, w: 2, pts: RV.tool === 'line' ? [tp, tp] : [tp] };
     });
     cv.addEventListener('pointermove', (ev) => { if (!RV.cur) return; const tp = rvToTP(...pos(ev)); if (!tp) return; if (RV.cur.tool === 'line') RV.cur.pts[1] = tp; else RV.cur.pts.push(tp); });
@@ -7440,12 +7454,12 @@ function msNextSetup(bars, A) {
   }
   {
     const p = document.getElementById('ms-tv-rv');
-    if (p) p.addEventListener('click', (ev) => {
+    if (p) p.addEventListener('click', async (ev) => {
       const b = ev.target.closest('button'); if (!b) return;
       if (b.dataset.tool) rvSetTool(b.dataset.tool);
       else if (b.dataset.col) { RV.color = b.dataset.col; p.querySelectorAll('[data-col]').forEach((z) => z.classList.toggle('on', z === b)); }
       else if (b.dataset.act === 'undo') { RV.strokes.pop(); rvKeepDraft(); }
-      else if (b.dataset.act === 'clear') { if (RV.strokes.length && confirm('Remove every drawing on this chart?')) { RV.strokes = []; rvKeepDraft(); } }
+      else if (b.dataset.act === 'clear') { if (RV.strokes.length && await msConfirm('Remove every drawing on this chart?', { title: 'Clear the chart', ok: 'Remove all', danger: true })) { RV.strokes = []; rvKeepDraft(); } }
       else if (b.dataset.tag) { const t = b.dataset.tag; RV.tags.has(t) ? RV.tags.delete(t) : RV.tags.add(t); b.classList.toggle('on', RV.tags.has(t)); b.setAttribute('aria-pressed', String(RV.tags.has(t))); }
       else if (b.id === 'ms-rv-save') rvSave();
     });
@@ -7464,14 +7478,14 @@ function msNextSetup(bars, A) {
       renderLoss();
     });
     const gh = document.getElementById('ms-loss-gh');
-    if (gh) gh.addEventListener('click', () => {
-      const cur = ghTok(), t = prompt(cur ? 'GitHub connected. Paste a new token, or leave empty to disconnect.' : 'Paste a GitHub fine-grained token with Contents: read and write on vazxanana/macro-dashboard only. It stays in this browser and is used only to save your loss reviews to the council-data branch.', '');
+    if (gh) gh.addEventListener('click', async () => {
+      const cur = ghTok(), t = await msAsk(cur ? 'GitHub connected. Paste a new token, or leave empty to disconnect.' : 'Paste a GitHub fine-grained token with Contents: read and write on vazxanana/macro-dashboard only. It stays in this browser and is used only to save your loss reviews to the council-data branch.', '');
       if (t === null) return;
       try { if (t.trim()) localStorage.setItem('msGhTok', t.trim()); else localStorage.removeItem('msGhTok'); } catch (e) {}
       renderLoss(); if (t.trim()) rvPush().then(() => renderLoss()).catch((e) => alert(`GitHub: ${e.message || e}`));
     });
     const cp = document.getElementById('ms-loss-copy');
-    if (cp) cp.addEventListener('click', async () => { const s = JSON.stringify({ updated: new Date().toISOString(), reviews: RV.map }); try { await navigator.clipboard.writeText(s); cp.textContent = 'Copied'; } catch (e) { prompt('Copy the reviews', s); } setTimeout(() => { cp.textContent = 'Copy reviews'; }, 1500); });
+    if (cp) cp.addEventListener('click', async () => { const s = JSON.stringify({ updated: new Date().toISOString(), reviews: RV.map }); try { await navigator.clipboard.writeText(s); cp.textContent = 'Copied'; } catch (e) { msCopy(s, { title: 'Copy the reviews' }); } setTimeout(() => { cp.textContent = 'Copy reviews'; }, 1500); });
     const dlg = document.getElementById('ms-tv'); if (dlg) dlg.addEventListener('close', () => { rvKeepDraft(); RV.tool = null; const cv = document.getElementById('ms-rv-cv'); if (cv) cv.classList.remove('on'); renderLoss(); });
   }
 
@@ -7578,11 +7592,11 @@ function msNextSetup(bars, A) {
         const b = ev.target.closest('button[data-act]'); if (!b) return; const k = b.closest('tr').dataset.u, cur = window.msMergeUsers(US.remote)[k] || (US.remote && US.remote.users[k]) || window.MS_USERS[k];
         if (b.dataset.act === 'perms') { permDialog(k, cur); return; }
         if (b.dataset.act === 'pw') {
-          const pw = prompt(`New password for ${cur.name}`); if (!pw) return; const h = await msSha256(pw.trim());
+          const pw = await msAsk(`New password for ${cur.name}`, '', { title: 'New password', ok: 'Save' }); if (!pw) return; const h = await msSha256(pw.trim());
           if (await hashTaken(h, k)) { alert('That password is already used by another account. Pick another one.'); return; }
           saveUsers((d) => { d.users[k] = { ...(d.users[k] || window.MS_USERS[k] || {}), name: cur.name, role: cur.role, hash: h }; delete d.users[k].disabled; }, `new password for ${cur.name}`);
         } else if (b.dataset.act === 'del') {
-          if (!confirm(`Remove ${cur.name}? They will be signed out on their next visit.`)) return;
+          if (!(await msConfirm(`Remove ${cur.name}? They will be signed out on their next visit.`, { title: 'Remove member', ok: 'Remove', danger: true }))) return;
           saveUsers((d) => { if (window.MS_USERS[k]) d.users[k] = { ...(d.users[k] || window.MS_USERS[k]), disabled: true }; else delete d.users[k]; }, `removed ${cur.name}`);
         } else if (b.dataset.act === 'restore') {
           saveUsers((d) => { if (d.users[k]) delete d.users[k].disabled; if (window.MS_USERS[k] && d.users[k] && d.users[k].hash === window.MS_USERS[k].hash && d.users[k].role === window.MS_USERS[k].role) delete d.users[k]; }, `restored ${k}`);
@@ -8260,8 +8274,8 @@ function msNextSetup(bars, A) {
     try { const r = await push(); msg.textContent = r === 'synced' ? 'Saved and synced to GitHub.' : 'Saved in this browser. Connect GitHub on the desk to share it.'; }
     catch (e) { msg.textContent = `Saved in this browser; GitHub: ${e.message || e}`; }
   });
-  $('ict-gh').addEventListener('click', () => {
-    const cur = tok(), t = prompt(cur ? 'GitHub connected. Paste a new token, or leave empty to disconnect.' : 'Paste a GitHub fine-grained token with Contents: read and write on vazxanana/macro-dashboard only. It stays in this browser and is used only to save desk reviews to the council data.', '');
+  $('ict-gh').addEventListener('click', async () => {
+    const cur = tok(), t = await msAsk(cur ? 'GitHub connected. Paste a new token, or leave empty to disconnect.' : 'Paste a GitHub fine-grained token with Contents: read and write on vazxanana/macro-dashboard only. It stays in this browser and is used only to save desk reviews to the council data.', '');
     if (t === null) return;
     try { if (t.trim()) localStorage.setItem('msGhTok', t.trim()); else localStorage.removeItem('msGhTok'); } catch (e) {}
     render(); if (t.trim()) push().then(render).catch((e) => alert(`GitHub: ${e.message || e}`));
@@ -10338,7 +10352,7 @@ html[data-role="public"] .hdr-sw { display: none; }
     body().querySelectorAll('.ct-books tbody tr[data-book]').forEach((tr) => tr.addEventListener('click', () => { state.book = tr.dataset.book; ls('ms-ct-book', state.book); const x = (state.all || []).find((a) => (a.books || [])[0] === state.book); if (x) render(x); }));
     body().querySelectorAll('[data-days]').forEach((b) => b.addEventListener('click', () => { state.days = +b.dataset.days; load(true); }));
     if ($('ms-ct-relink')) $('ms-ct-relink').addEventListener('click', () => linkForm());
-    if ($('ms-ct-un')) $('ms-ct-un').addEventListener('click', async () => { if (!confirm('Remove the cTrader link from your profile? You can link it again later.')) return; try { await call({ action: 'unlink', session: ls(sessKey()) }); state.data = null; linkForm('Link removed.', true); } catch (e) { alert(e.message); } });
+    if ($('ms-ct-un')) $('ms-ct-un').addEventListener('click', async () => { if (!(await msConfirm('Remove the cTrader link from your profile? You can link it again later.', { title: 'Unlink cTrader', ok: 'Unlink', danger: true }))) return; try { await call({ action: 'unlink', session: ls(sessKey()) }); state.data = null; linkForm('Link removed.', true); } catch (e) { alert(e.message); } });
   }
 
   async function load(showBusy) {
