@@ -58,24 +58,25 @@ test('handler: refuses without a key, answers with one, reads trades through a f
     assert.equal(n.code, 202);
   } finally { globalThis.fetch = realFetch; }
 });
-test('profile key: only Fred, only with his password', async () => {
+test('profile key: a member proves the password; the owner reserved name and unknown actions are refused', async () => {
   process.env.MCP_KEYS = 'fred:abcdefghijklmnopqrstuvwx';
   assert.deepEqual(L.PROFILE_USERS, ['fred']);
   const mk = (body) => { const out = { code: 0, body: null }; const res = { setHeader() {}, status: (c) => { out.code = c; return res; }, json: (b) => { out.body = b; return out; }, end: () => out };
     return handler({ method: 'POST', query: {}, headers: { host: 'meridianx.dev' }, body }, res).then(() => out); };
-  assert.equal((await mk({ action: 'mykey', user: 'orlando', pw: 'x' })).code, 403);
   assert.equal((await mk({ action: 'mykey', user: 'owner', pw: 'x' })).code, 403);
+  assert.equal((await mk({ action: 'mykey', user: 'Bad Name!', pw: 'x' })).code, 403);
   assert.equal((await mk({ action: 'other' })).code, 400);
   const r = await mk({ action: 'mykey', user: 'fred', pw: 'wrong' });   // the user list fails closed here (no Blob): never a URL
   assert.notEqual(r.code, 200); assert.ok(!JSON.stringify(r.body).includes('abcdefghijklmnopqrstuvwx'));
 });
-
-test('Fred\'s key is derived from a server secret, stable, and MCP_KEYS overrides it', () => {
+test('derived keys: name.hmac, stable, any granted member, MCP_KEYS overrides; a grant is checked on every call', async () => {
   const env = { CTRADER_LINK_KEY: 'link-secret' };
-  const k = L.derivedKey('fred', env); assert.equal(k.length, 32); assert.equal(k, L.derivedKey('fred', env)); assert.notEqual(k, L.derivedKey('fred', { CTRADER_LINK_KEY: 'other' }));
-  assert.equal(L.derivedKey('orlando', env), null, 'profile users only'); assert.equal(L.derivedKey('fred', {}), null);
+  const k = L.derivedKey('fred', env); assert.match(k, /^fred\.[A-Za-z0-9_-]{32}$/); assert.equal(k, L.derivedKey('fred', env)); assert.notEqual(k, L.derivedKey('fred', { CTRADER_LINK_KEY: 'other' }));
+  assert.equal(L.derivedKey('owner', env), null); assert.equal(L.derivedKey('fred', {}), null); assert.match(L.derivedKey('carlos', env), /^carlos\./);
   assert.equal(L.keyFor('fred', env), k); assert.equal(L.keyFor('fred', { ...env, MCP_KEYS: 'fred:overrideoverrideoverride' }), 'overrideoverrideoverride');
-  delete process.env.MCP_KEYS; process.env.CTRADER_LINK_KEY = 'link-secret';
-  assert.equal(L.whoIs(k), 'fred'); assert.equal(L.whoIs(k.slice(0, 31) + (k[31] === 'A' ? 'B' : 'A')), null);
-  delete process.env.CTRADER_LINK_KEY;
+  assert.equal(L.whoIs(k, env), 'fred'); assert.equal(L.whoIs(L.derivedKey('carlos', env), env), 'carlos'); assert.equal(L.whoIs(k.slice(0, -1) + (k.endsWith('A') ? 'B' : 'A'), env), null); assert.equal(L.whoIs('fred.short', env), null);
+  L.GRANT.users = { carlos: { perms: { mcp: true } }, orlando: { mcp: true }, fred: { perms: { mcp: false } }, luxus: {} }; L.GRANT.at = Date.now();
+  assert.equal(await L.granted('carlos', 'h', env), true); assert.equal(await L.granted('orlando', 'h', env), true); assert.equal(await L.granted('luxus', 'h', env), false); assert.equal(await L.granted('fred', 'h', env), false);
+  assert.equal(await L.granted('luxus', 'h', { ...env, MCP_KEYS: 'luxus:abcdefghijklmnopqrstuvwx' }), true);
+  L.GRANT.users = { fred: {} }; assert.equal(await L.granted('fred', 'h', env), true); L.GRANT.users = null;
 });

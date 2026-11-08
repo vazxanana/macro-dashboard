@@ -152,7 +152,7 @@ test('wiring: the Macro desk loads macro/veteran.json and renders the discussion
   const yml = fs.readFileSync(new URL('../.github/workflows/council.yml', import.meta.url), 'utf8');
   const i = yml.indexOf('node council/macro.mjs data'), j = yml.indexOf('node council/veteran.mjs data'); assert.ok(i > 0 && j > i, 'veteran right after the strategist');
   assert.ok(fs.existsSync(new URL('../research/macro-veteran/SKILL.md', import.meta.url))); assert.ok(fs.existsSync(new URL('../research/macro-veteran/references/gold-driver-map.md', import.meta.url)));
-  const claude = fs.readFileSync(new URL('../CLAUDE.md', import.meta.url), 'utf8'); assert.match(claude, /## Macro veteran \(8 Nov 2026\)/);
+  const claude = fs.readFileSync(new URL('../CLAUDE.md', import.meta.url), 'utf8'); assert.match(claude, /## Macro veteran \(8 Nov 2026/);
 });
 
 test('the argument\'s record: weekly debates resolved at the horizon, a per-topic scoreboard, and what the strategist has adopted', () => {

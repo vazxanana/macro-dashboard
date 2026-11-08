@@ -657,3 +657,16 @@ research/edge/ict-*/*), `ict_note` (append to council-data `ict/mcp-notes.json`,
 (branch `mcp/<name>/…` + DRAFT PR to main; the owner merges; nothing reaches the tracker before that), and `search` /
 `fetch` for ChatGPT deep research. Fred's key needs no env: `derivedKey` = HMAC(CTRADER_LINK_KEY or CRON_SECRET, "mcp:fred"), 32 chars; `MCP_KEYS` is optional (more people, or an override). Profile card (Fred only, `PROFILE_USERS`): POST `/api/mcp` `{action:"mykey", user, pw}` checks the password with ctrader-link's `identify` and returns his connector URL; the page shows `#ms-pf-mcp` only when `ms-user` is fred. Never: council files, api/, workflows, users, tokens, cTrader orders. Tests
 `tests/mcp.test.mjs`. Rule: a helper's PR is reviewed like any rule change (tests, 2020-now evidence) before merging.
+
+## Per-member permissions (8 Nov 2026, owner: "select on members what they can and can't do or see")
+Keys `MS_PERM_KEYS`: charts, scanner, journal, desks (Gold / Crypto / LIT / NQ SDV), council (every tab; off = overview only),
+macro (Macro desk switch), ct (demo accounts' results, labels only), mcp (ChatGPT connector on the profile), ict (false | 'read' |
+'write'). `MS_PERM_DEFAULTS` per role (viewer: macro only; reviewer: all but ct / mcp / ict), then the record's flags (ict, ct, mcp)
+and its `perms` override key by key (`msPerms(R, owner)`; the owner has everything). Bootstrap sets `html[data-deny="…"]` /
+`data-allow`, and the ict / ictRo / ct / mcp flags follow; CSS gates use `html[data-deny~="key"]` (the old viewer-role rules for
+charts / scanner / journal / desks / council were converted); the router sends a denied view home (`VIEW_PERM`, `msDenied`).
+Users page: a "Permissions…" button per member opens `permDialog` (checkboxes + ICT radio, "Back to role defaults"); saved on the
+record as `perms` plus ict / ct / mcp for the older checks. `api/users.js` `cleanPerms` whitelists keys and values (a bad perms
+object rejects the save). Login records (`ms-user-rec`) carry perms; the post-load check reloads when they changed. MCP: derived
+keys are `<name>.<HMAC>` for any member; `granted(name)` is checked on every call (record's mcp / perms.mcp; perms.mcp false
+revokes; an MCP_KEYS entry is a grant; Fred built in). Tests: `tests/users-perms.test.mjs`, `tests/mcp.test.mjs`.
