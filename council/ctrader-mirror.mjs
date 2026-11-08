@@ -279,9 +279,9 @@ export function applyReset(state, reset, now = Math.floor(Date.now() / 1000)) {
 // ---- books and accounts (8 Nov, owner: "4 extra accounts, one for the shadow trades, the other LIT") -----------------------------
 // Every trade belongs to one book; each book can have its own demo account (same cTrader ID, same token). Account numbers are
 // not secrets: council-data config.json { mirrorAccounts: { council, ict, shadow, lit } }, or the env CTRADER_ACCOUNTS
-// "council:123,ict:456,shadow:789,lit:321" (wins). A book without its own number trades on CTRADER_ACCOUNT_ID.
-export const BOOKS = ['council', 'ict', 'shadow', 'lit'];
-export const bookOf = (t) => (String(t.id).startsWith('ict:') ? 'ict' : t.k === 'lit' ? 'lit' : t.shadow ? 'shadow' : 'council');
+// "council:123,ict:456,shadow:789,lit:321,replica:654" (wins). A book without its own number trades on CTRADER_ACCOUNT_ID.
+export const BOOKS = ['council', 'ict', 'shadow', 'lit', 'replica'];
+export const bookOf = (t) => (String(t.id).startsWith('ict:') ? 'ict' : t.k === 'lit' ? 'lit' : t.k === 'replica' ? 'replica' : t.shadow ? 'shadow' : 'council');
 export function accountsFor(env, cfg) {
   const out = {}, base = String(env.CTRADER_ACCOUNT_ID || '').trim();
   const c = (cfg && cfg.mirrorAccounts) || {}; for (const b of BOOKS) if (c[b] != null && String(c[b]).trim()) out[b] = String(c[b]).trim();

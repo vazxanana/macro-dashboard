@@ -537,7 +537,7 @@ council trades are copied as market orders with relative distances measured from
 so the demo stop/target equal the council's; a price already past the stop/target or more than `LIMITS.maxDriftR` (1R) into the trade
 is skipped. Minimum-lot orders risking over `LIMITS.maxMinLotRisk` (2%) wait for a bigger balance. Closed market, holidays and the
 capacity caps are waits (symbol paused `LIMITS.pause`), broker rejections skips; notes live while the council trade is open or pending.
-One demo account per book (8 Nov, owner): `bookOf` (ict / lit / shadow / council), `accountsFor(env, cfg)` from council-data
+One demo account per book (8 Nov, owner): `bookOf` (ict / lit / replica / shadow / council), `accountsFor(env, cfg)` from council-data
 config.json `mirrorAccounts` or env `CTRADER_ACCOUNTS` ("council:1,ict:2,shadow:3,lit:4"; wins), books without a number trade on
 CTRADER_ACCOUNT_ID; the CLI runs one round per account (the token pair is shared and handed on), writes mirror.json for the base
 account and mirror-<account>.json for the others, plus mirror-accounts.json (the map); alerts carry [book]. When the council moves an open trade's stop or target (break-even, trailing, a re-planned target) the demo position's protection follows
