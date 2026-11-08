@@ -1,5 +1,5 @@
-// Council · spot check (reporting only): re-judges the live Trader's closed gold/forex paper trades on OANDA spot candles.
-// The live Trader manages gold and forex trades on Kraken candles; Kraken's forex books are thin, so a lone print can reach
+// Council · spot check (reporting only): re-judges the live Trader's closed Kraken-era gold/forex paper trades on OANDA spot candles.
+// Until 7 Nov 16:01 UTC the live Trader managed gold and forex trades on Kraken candles; Kraken's forex books are thin, so a lone print can reach
 // a target (or a stop) that spot never touched. For each closed trade the same entry, stop and target are walked through
 // OANDA 5-minute candles (meridianx.dev/md, the feed the site's charts use): stop first inside a candle, as the Trader does.
 // Writes research/spotcheck.json. Changes no rule or trade.
@@ -22,15 +22,20 @@ export function judge(t, bars) {
   }
   return 'open';
 }
-// trades a fixed stop/target walk can judge: plain closed win/loss, not trailing systems or add-on units
+// trades a fixed stop/target walk can judge: plain closed win/loss, not trailing systems or add-on units.
+// Feed (8 Nov): the live Trader has managed gold and forex on OANDA candles since 7 Nov 16:01 UTC, and every record since then
+// carries feed 'oanda'; a trade managed on OANDA walked through OANDA candles again is the same feed judging itself, so only
+// the Kraken-era trades (feed 'kraken', or no feed tag: written before the tag existed) are judged. The rest are counted.
+export const krakenEra = (t) => !t.feed || t.feed === 'kraken';
 export const judgeable = (t) => (t.status === 'win' || t.status === 'loss') && t.filled && !t.addOf && !(t.rr >= 50) && t.t1 != null && t.stop != null;
 
 export function summarize(trades, barsBy) {
   const out = {};
   for (const m of Object.keys(barsBy)) {
     const bars = barsBy[m]; if (!bars || !bars.length) continue;
-    const from = bars[0].time + 600, T = trades.filter((t) => t.market === m && judgeable(t) && t.filled >= from && t.closed <= bars.at(-1).time + 300);
-    const c = { n: 0, same: 0, liveWinSpotLoss: 0, liveWinSpotNever: 0, liveLossSpotWin: 0, liveLossSpotNever: 0, liveR: 0, spotR: 0, liveOnly: { n: 0, liveR: 0, spotR: 0 }, examples: [] };
+    const from = bars[0].time + 600, inWin = trades.filter((t) => t.market === m && judgeable(t) && t.filled >= from && t.closed <= bars.at(-1).time + 300);
+    const T = inWin.filter(krakenEra);
+    const c = { n: 0, sameFeed: inWin.length - T.length, same: 0, liveWinSpotLoss: 0, liveWinSpotNever: 0, liveLossSpotWin: 0, liveLossSpotNever: 0, liveR: 0, spotR: 0, liveOnly: { n: 0, liveR: 0, spotR: 0 }, examples: [] };
     for (const t of T) {
       const o = judge(t, bars), sR = o === 'win' ? t.rr : o === 'loss' ? -1 : 0, lR = t.status === 'win' ? t.rr : -1;
       c.n++; c.liveR += lR; c.spotR += sR;
@@ -56,7 +61,7 @@ if (process.argv[1] && process.argv[1].endsWith('spotcheck.mjs')) {
     catch (e) { errors[m] = String(e.message || e).slice(0, 120); }
   }
   const markets = summarize(trades, barsBy), fx = Object.entries(markets).filter(([m]) => m !== 'xau').map(([, c]) => c);
-  const out = { at: new Date().toISOString(), source: 'OANDA spot 5m (meridianx.dev/md) vs the live Trader (Kraken candles)',
+  const out = { at: new Date().toISOString(), source: 'OANDA spot 5m (meridianx.dev/md) vs the live Trader\'s Kraken-era trades (feed kraken or untagged; trades managed on OANDA since 7 Nov 16:01 UTC are counted as sameFeed, not judged)',
     note: 'Same entry/stop/target walked through spot candles, stop first inside a candle; break-even moves ignored. 5m candles cannot order a stop and target inside one candle.',
     markets, forex: { n: fx.reduce((a, c) => a + c.n, 0), liveR: +fx.reduce((a, c) => a + c.liveR, 0).toFixed(2), spotR: +fx.reduce((a, c) => a + c.spotR, 0).toFixed(2) }, errors };
   fs.mkdirSync(path.join(DIR, 'research'), { recursive: true });
