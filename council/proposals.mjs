@@ -128,7 +128,9 @@ export function spotProposals(spot, at = new Date().toISOString(), opt = {}) {
 
 // The daily Coach run rewrites coach.json: these owner-facing fields are carried over, because the proposals block only recomputes
 // them when its inputs change (proposalsKey), so a field left out here would stay missing until the next replay or rule change.
-export const coachCarry = (prev = {}) => ({ proposals: prev.proposals || [], proposalsKey: prev.proposalsKey || '', proposalsSent: prev.proposalsSent, ictWatch: prev.ictWatch || [] });
+// decaySent too (8 Nov): the daily rewrite dropped the edge-decay alert mark, so after a system recovered the "Edge decay
+// cleared" ping never went out (the monitor saw no earlier alert) and the next decay would have pinged as if it were the first.
+export const coachCarry = (prev = {}) => ({ proposals: prev.proposals || [], proposalsKey: prev.proposalsKey || '', proposalsSent: prev.proposalsSent, ictWatch: prev.ictWatch || [], decaySent: prev.decaySent });
 
 // ICT filter verdicts (7 Nov): the ICT desk's paper variants (ict/replay.json shadowByVariant: 'nofri' skips Fridays, 'h1opp'
 // keeps only trades against or without H1 structure) each drop some A-setups. A filter is only worth proposing to the owner
