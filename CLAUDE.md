@@ -724,5 +724,11 @@ localStorage `btLab:fsDock`); leaving puts both back. Audit fixes (8 Nov): draft
 never leave it in a hidden field (keyboard shortcuts kept working), Skip day lands on the first bar of the next trading day, a
 challenge breach closes every position at that bar's close and cancels pending orders (reason "challenge breach"). Phones hide
 the jump field and time readout in the toolbar. End-to-end audit: `scripts/audit/chronostrade.cjs` (Playwright against a local
-build and the live /md/bars, 46 checks; not in node --test). Tests: `tests/backtest.test.mjs`. Paper only; nothing reaches the
+build and the live /md/bars, 46 checks; not in node --test).
+Pass 8 (owner: "improve more"): Monte Carlo pass probability in Statistics (`BT.monteCarlo(Rs, {risk, target, maxLoss, dailyLoss, dd,
+perDay, minDays, n, seed})`: the closed trades' R resampled 2,000 times against a firm's rules, all phase targets added; pass /
+fail / unfinished, why it failed, typical trades and days to pass, drawdown 50th / 95th percentile; `BT.bestRisk` scans 0.25-3 %
+and suggests a risk; seeded RNG for repeatable answers), stats by trading session (Asia 22-07, London 07-12, New York 12-21 UTC,
+`bySession`) and by mistake (`byMistake`), and a journal Review column (`td.mist`, dialog `#mistd`: FOMO, revenge, moved stop,
+early exit, late entry, oversized, against plan, hesitated, chased, ignored news, or "followed plan"; `t.mistakes`, `t.reviewed`). Tests: `tests/backtest.test.mjs`. Paper only; nothing reaches the
 council or the mirror.

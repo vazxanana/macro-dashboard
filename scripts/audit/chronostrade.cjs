@@ -73,6 +73,11 @@ async function load(p, q = 'xau,15m') { await p.click(`#quick [data-q^="${q}"]`)
   await p.fill('#o-risk', '1'); p.once('dialog', (d) => d.accept()); await p.click('#pf-stop').catch(() => {});
   // 12. tabs: stats, calendar, export
   await p.click('.tabs [data-t=stats]'); check('statistics render', (await p.$$('#stats div')).length >= 16 && !/NaN|undefined/.test(await txt(p, '#stats')), (await txt(p, '#stats')).slice(0, 80));
+  check('session table renders', (await p.$$('#bysess tr')).length >= 2);
+  await p.click('.tabs [data-t=journal]'); await p.click('#jbody td.mist >> nth=0'); await p.check('#mist-grid input[value="FOMO"]'); await p.click('#mist-save'); await p.waitForTimeout(100);
+  check('a trade can be reviewed with a mistake tag', /FOMO/.test(await txt(p, '#jbody td.mist')));
+  await p.click('.tabs [data-t=stats]'); check('mistake breakdown renders', /FOMO/.test(await txt(p, '#bymist')));
+  if (!(await p.$eval('#mc-run', (e) => e.disabled))) { await p.click('#mc-run'); await p.waitForTimeout(200); check('pass probability runs', /pass|fail/.test(await txt(p, '#mc-out'))); } else check('pass probability waits for 5 trades', /needs at least 5/.test(await txt(p, '#mc-note')));
   await p.click('.tabs [data-t=cal]'); const t1 = await txt(p, '#cal-title'); await p.click('#cal-prev'); check('calendar navigates', (await txt(p, '#cal-title')) !== t1); await p.click('#cal-next');
   await p.click('.tabs [data-t=data]'); const [dl] = await Promise.all([p.waitForEvent('download'), p.click('#exp-csv')]); const csv = fs.readFileSync(await dl.path(), 'utf8'); check('CSV export has the trades', csv.trim().split('\n').length >= 2 && /entry/.test(csv.split('\n')[0]), csv.split('\n')[0]);
   const [dj] = await Promise.all([p.waitForEvent('download'), p.click('#exp-json')]); const js = JSON.parse(fs.readFileSync(await dj.path(), 'utf8')); check('JSON export is a session', js.acct && js.sym === 'xau');
