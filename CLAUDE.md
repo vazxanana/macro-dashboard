@@ -698,4 +698,8 @@ row to frame that trade on the chart, stats Avg hold and R spread (`holdAvg`, `r
 (`renderStrip`, replayed %, now, equity, trades, challenge), quick starts (`#quick`, a market / TF / days back), a first-visit
 welcome (`#welcome`), toasts for loads, fills, stops, targets and challenge events (`toast()`), a keyboard guide (`#hk`), chart
 watermark, loading progress, equity sparkline (`drawSpark`), journal side badges and R chips, phone layout (sticky controls,
-compact header). Tests: `tests/backtest.test.mjs`. Paper only; nothing reaches the council or the mirror.
+compact header). Pass 4 (owner: "layout, chart, buttons, UI"): icon toolbar (`.tbg` groups: undo / next / play-pause /
+skip, speed pills, jump, Layers and Context dropdowns as `details.dd` + `.ddp`), chart height from the viewport, volume
+histogram layer (`vol`), candle colours from the theme tokens, positions and pending orders as cards (`.pos-card`), journal
+summary bar (`#jsum`), zebra rows, empty states, focus rings. Tests: `tests/backtest.test.mjs`. Paper only; nothing reaches the
+council or the mirror.
