@@ -1,6 +1,6 @@
 {
- "at": "2026-11-08T21:50:30.000Z",
- "status": "ok",
+ "at": "2026-11-08T22:10:05.000Z",
+ "status": "bad",
  "feeds": {
   "oanda": {
    "label": "OANDA spot (md/bars)",
@@ -22,7 +22,7 @@
      "sym": "eurusd",
      "status": "closed",
      "n": 300,
-     "last": "2026-11-06T21:55:00.000Z",
+     "last": "2026-11-08T22:10:00.000Z",
      "staleMin": 0,
      "maxJump": 1.93,
      "clipped": 0,
@@ -33,7 +33,7 @@
      "sym": "gbpusd",
      "status": "closed",
      "n": 300,
-     "last": "2026-11-06T21:55:00.000Z",
+     "last": "2026-11-08T22:10:00.000Z",
      "staleMin": 0,
      "maxJump": 2.4,
      "clipped": 0,
@@ -44,7 +44,7 @@
      "sym": "audusd",
      "status": "closed",
      "n": 300,
-     "last": "2026-11-06T21:55:00.000Z",
+     "last": "2026-11-08T22:10:00.000Z",
      "staleMin": 0,
      "maxJump": 2.58,
      "clipped": 0,
@@ -55,7 +55,7 @@
      "sym": "usdcad",
      "status": "closed",
      "n": 300,
-     "last": "2026-11-06T21:55:00.000Z",
+     "last": "2026-11-08T22:05:00.000Z",
      "staleMin": 0,
      "maxJump": 3.57,
      "clipped": 0,
@@ -66,7 +66,7 @@
      "sym": "usdchf",
      "status": "closed",
      "n": 300,
-     "last": "2026-11-06T21:55:00.000Z",
+     "last": "2026-11-08T22:10:00.000Z",
      "staleMin": 0,
      "maxJump": 2.17,
      "clipped": 0,
@@ -76,38 +76,45 @@
   },
   "kraken": {
    "label": "Kraken",
-   "status": "ok",
+   "status": "bad",
    "markets": {
     "btc": {
      "label": "BTC/USD",
      "sym": "XBTUSD",
      "status": "ok",
      "n": 721,
-     "last": "2026-11-08T21:50:00.000Z",
+     "last": "2026-11-08T22:10:00.000Z",
      "staleMin": 0,
-     "maxJump": 6.95,
+     "maxJump": 24,
      "clipped": 0,
      "issues": []
     },
     "eth": {
      "label": "ETH/USD",
      "sym": "ETHUSD",
-     "status": "ok",
+     "status": "bad",
      "n": 721,
-     "last": "2026-11-08T21:50:00.000Z",
+     "last": "2026-11-08T22:10:00.000Z",
      "staleMin": 0,
-     "maxJump": 6.98,
+     "maxJump": 28.88,
      "clipped": 0,
-     "issues": []
+     "issues": [
+      {
+       "kind": "jump",
+       "sev": "bad",
+       "detail": "candle 28.88x the average range (2162.09 → 2159.73/2169.94/2071/2125)",
+       "at": "2026-11-08 21:55Z"
+      }
+     ]
     },
     "sol": {
      "label": "SOL/USD",
      "sym": "SOLUSD",
      "status": "ok",
      "n": 721,
-     "last": "2026-11-08T21:50:00.000Z",
+     "last": "2026-11-08T22:10:00.000Z",
      "staleMin": 0,
-     "maxJump": 7.32,
+     "maxJump": 9.47,
      "clipped": 0,
      "issues": []
     },
@@ -116,9 +123,9 @@
      "sym": "XRPUSD",
      "status": "ok",
      "n": 721,
-     "last": "2026-11-08T21:50:00.000Z",
+     "last": "2026-11-08T22:10:00.000Z",
      "staleMin": 0,
-     "maxJump": 6.19,
+     "maxJump": 11.59,
      "clipped": 0,
      "issues": []
     }
@@ -126,69 +133,86 @@
   },
   "cnbc": {
    "label": "CNBC futures (ICT desk)",
-   "status": "closed",
+   "status": "bad",
    "markets": {
     "nq": {
      "label": "NQ",
      "sym": "@ND.1",
-     "status": "closed",
-     "n": 566,
-     "last": "2026-11-07T20:15:00.000Z",
-     "staleMin": 0,
-     "maxJump": 2.29,
-     "clipped": 0,
-     "issues": []
+     "status": "bad",
+     "n": 0,
+     "issues": [
+      {
+       "kind": "error",
+       "sev": "bad",
+       "detail": "unreachable: HTTP 401"
+      }
+     ]
     },
     "es": {
      "label": "ES",
      "sym": "@SP.1",
-     "status": "closed",
-     "n": 566,
-     "last": "2026-11-07T20:15:00.000Z",
-     "staleMin": 0,
-     "maxJump": 2.44,
-     "clipped": 0,
-     "issues": []
+     "status": "bad",
+     "n": 0,
+     "issues": [
+      {
+       "kind": "error",
+       "sev": "bad",
+       "detail": "unreachable: HTTP 401"
+      }
+     ]
     },
     "ym": {
      "label": "YM",
      "sym": "@DJ.1",
-     "status": "closed",
-     "n": 565,
-     "last": "2026-11-07T20:15:00.000Z",
-     "staleMin": 0,
-     "maxJump": 2.14,
-     "clipped": 0,
-     "issues": []
+     "status": "bad",
+     "n": 0,
+     "issues": [
+      {
+       "kind": "error",
+       "sev": "bad",
+       "detail": "unreachable: HTTP 401"
+      }
+     ]
     },
     "rty": {
      "label": "RTY",
      "sym": "@TFS.1",
-     "status": "closed",
-     "n": 566,
-     "last": "2026-11-07T20:15:00.000Z",
-     "staleMin": 0,
-     "maxJump": 1.87,
-     "clipped": 0,
-     "issues": []
+     "status": "bad",
+     "n": 0,
+     "issues": [
+      {
+       "kind": "error",
+       "sev": "bad",
+       "detail": "unreachable: HTTP 401"
+      }
+     ]
     },
     "gc": {
      "label": "GC",
      "sym": "@GC.1",
-     "status": "closed",
-     "n": 566,
-     "last": "2026-11-07T20:20:00.000Z",
-     "staleMin": 0,
-     "maxJump": 1.54,
-     "clipped": 0,
-     "issues": []
+     "status": "bad",
+     "n": 0,
+     "issues": [
+      {
+       "kind": "error",
+       "sev": "bad",
+       "detail": "unreachable: HTTP 401"
+      }
+     ]
     }
    }
   }
  },
- "summary": "All feeds clean",
+ "summary": "Kraken: ETH/USD jump · CNBC futures (ICT desk): NQ error, ES error, YM error, RTY error, GC error",
  "alert": {
-  "streak": {},
+  "streak": {
+   "kraken:eth": 1,
+   "cnbc:nq": 1,
+   "cnbc:es": 1,
+   "cnbc:ym": 1,
+   "cnbc:rty": 1,
+   "cnbc:gc": 1
+  },
   "sent": {
    "key": "",
    "at": null
