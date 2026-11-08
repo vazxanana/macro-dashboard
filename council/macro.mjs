@@ -158,6 +158,17 @@ export function dxySeries(bars) {
 // Each driver votes +1 / −1 / 0 from gold's point of view (as in computeDailyBias), or null when it has no data. W turns the
 // vote into each asset's direction: e.g. falling real yields lift gold, EUR/USD and the Nasdaq and pull USD/JPY down.
 // Drivers with a `map` give each asset its own vote (Dollar Smile phases, each asset's own trend, the pre-FOMC drift).
+// The Macro veteran's challengers (8 Nov, owner: "the veteran will argue with him to fortify his understanding and prediction"):
+// the strategist's own drivers read over the veteran's 4-week window instead of the level or the 5-day move. They ride the
+// replay like every driver (hit rate, t-stat) but carry no weight until a lesson adopts them: a challenger proven on the replay
+// (t >= 3) that beats its incumbent's hit rate takes the incumbent's weights and the incumbent keeps half (lessons()). A
+// challenger that stops being proven hands them back. Every adoption and reversal is an append-only record in macro/lessons.json.
+export const CHALLENGERS = {
+  v_ry4w: { vs: 'ry', weights: { gold: 3, eurusd: 1, usdjpy: -1.5, nq: 1.5, es: 1 } },
+  v_d2_4w: { vs: 'dgs2', weights: { gold: 1, eurusd: 1, usdjpy: -1, nq: 0.5, es: 0.5 } },
+  v_dxy4w: { vs: 'dxymom', weights: { gold: 1, eurusd: 1, usdjpy: -1, nq: 0.5, es: 0.5 } },
+};
+export const LESSON = { minN: 30, provenT: 3, keepT: 2, margin: 0.02 };
 export const W = {
   ry:       { gold: 3, eurusd: 1, usdjpy: -1.5, nq: 1.5, es: 1 },
   macro:    { gold: 2 },
@@ -225,7 +236,10 @@ export function features(data, D, opt = {}) {
   for (const k of AK) { const b = bars[k]; if (b.length >= 21) { const c = b[b.length - 1].close, sma = b.slice(-20).reduce((s, x) => s + x.close, 0) / 20; trend[k] = c > sma ? 1 : c < sma ? -1 : 0; last[k] = c; }
     const rets = b.slice(-21).map((x, i, a) => (i ? Math.log(x.close / a[i - 1].close) : null)).slice(1); vol[k] = rets.length >= 10 ? Math.sqrt(rets.reduce((s, x) => s + x * x, 0) / rets.length) * 100 : null; }
   const v3 = F('VXVCLS').last, e2 = F('ECB2Y');
+  // the Macro veteran's windows (8 Nov): the same series over the 4 weeks the Gold Macro Score was tested on
+  const ry4w = chgOf(F('DFII10'), 20), d2_4w = chgOf(d2V, 20), dxy4w = dxy.length > 20 ? +((dxyNow / dxy[dxy.length - 21].close - 1) * 100).toFixed(3) : null;
   return {
+    ry4w: ry4w == null ? null : +ry4w.toFixed(4), d2_4w: d2_4w == null ? null : +d2_4w.toFixed(4), dxy4w,
     eu2y: e2.last ? { level: e2.last.v, chg: chgOf(e2, 5) } : null,
     D, ry, vix: vixV, vixTs: vixV != null && v3 && v3.v > 0 && Math.abs(F('VIXCLS').last.t - v3.t) <= 3 * DAY ? +(vixV / v3.v).toFixed(3) : null, hy: hyV.last ? { level: hyV.last.v, chg: chgOf(hyV, 5) } : null, d2: d2V.last ? { level: d2V.last.v, chg: chgOf(d2V, 5) } : null,
     d10: d10V.last ? { level: d10V.last.v, chg: chgOf(d10V, 5) } : null, be: beV.last ? { level: beV.last.v, chg: chgOf(beV, 5) } : null,
@@ -272,14 +286,20 @@ export function drivers(f) {
   const tr = f.trend, hasT = AK.some((k) => tr[k] != null);
   add('trend', 'Own price trend (close vs 20-day mean)', 'positioning', hasT ? 0 : null, hasT ? AK.map((k) => `${ASSETS[k].label.split(' ')[0]} ${tr[k] > 0 ? 'above' : tr[k] < 0 ? 'below' : 'n/a'}`).join(', ') : 'no data', hasT ? Object.fromEntries(AK.map((k) => [k, tr[k] || 0])) : null);
   add('fomc', 'Fed decision day (context: the pre-FOMC drift faded after 2015)', 'event', 0, f.fomcDay ? 'Fed decision on the target day' : 'no Fed decision on the target day');
+  // the veteran's challengers: 4-week changes (see CHALLENGERS); a falling real yield / 2Y / dollar over 4 weeks leans up for gold
+  add('v_ry4w', 'Veteran: real yield, 4-week change', 'rates', f.ry4w == null ? null : f.ry4w <= -0.1 ? 1 : f.ry4w >= 0.1 ? -1 : 0, f.ry4w == null ? 'no data' : `10Y TIPS ${sg(f.ry4w * 100, 0)} bp in 4 weeks`);
+  add('v_d2_4w', 'Veteran: Fed path (2Y), 4-week change', 'rates', f.d2_4w == null ? null : f.d2_4w <= -0.15 ? 1 : f.d2_4w >= 0.15 ? -1 : 0, f.d2_4w == null ? 'no data' : `2Y ${sg(f.d2_4w * 100, 0)} bp in 4 weeks`);
+  add('v_dxy4w', 'Veteran: dollar (DXY), 4-week change', 'dollar', f.dxy4w == null ? null : f.dxy4w <= -1 ? 1 : f.dxy4w >= 1 ? -1 : 0, f.dxy4w == null ? 'no data' : `DXY ${sg(f.dxy4w, 2)}% in 4 weeks`);
   return { list: out, smile: sm, carry };
 }
 
 // score in [-1, 1] for one asset: weighted mean of the votes of the drivers that have data
-export function assetScore(list, a) {
+// weights in force: W, except where a lesson has adopted a challenger (adopted: { driverKey: weights }, from lessons())
+export const weightsOf = (k, adopted = null) => (adopted && adopted[k]) || W[k] || {};
+export function assetScore(list, a, adopted = null) {
   let num = 0, den = 0; const used = [];
   for (const d of list) {
-    const w = (W[d.k] || {})[a]; if (!w || d.v === null) continue;
+    const w = weightsOf(d.k, adopted)[a]; if (!w || d.v === null) continue;
     const vote = d.map ? (d.map[a] || 0) * Math.abs(w) : d.v * w;
     num += vote; den += Math.abs(w); if (vote) used.push({ k: d.k, name: d.name, dir: vote > 0 ? 'up' : 'down', w: Math.abs(w), detail: d.detail });
   }
@@ -473,7 +493,7 @@ export function replay(data, { days = 1000, minTrain = 120, refit = 20, upto: la
       if (!fits[k] || i % refit === 0) fits[k] = past.length >= minTrain ? fitPlatt(past.map((r) => ({ s: r.s, y: r.y }))) : null;
       const p = fits[k] ? probOf(sc.s, fits[k]) : null;
       past.push({ D, s: sc.s, y, p });
-      for (const d of list) { const w = (W[d.k] || {})[k]; if (!w || d.v === null) continue; const v = d.map ? d.map[k] || 0 : Math.sign(d.v * w); if (!v) continue;
+      for (const d of list) { const w = (W[d.k] || {})[k] || (CHALLENGERS[d.k] ? CHALLENGERS[d.k].weights[k] : 0); if (!w || d.v === null) continue; const v = d.map ? d.map[k] || 0 : Math.sign(d.v * w); if (!v) continue;
         const t = drv[k][d.k] || (drv[k][d.k] = { n: 0, hit: 0 }); t.n++; if ((v > 0 ? 1 : 0) === y) t.hit++; }
     }
     i++;
@@ -782,19 +802,46 @@ export function macroSection(fc) {
   for (const a of AK) { const f = fc.assets[a], sc = fc.scorecard.replay[a] || {};
     out.push(`| ${ASSETS[a].label} | ${f && f.pUp != null ? pct(f.pUp) : '—'} | ${f && f.pUp != null ? leanWord(f.pUp, f.fit ? f.fit.base : 0.5) : '—'} | ${f && f.expMovePct != null ? `±${f.expMovePct}% (${f.volModel === 'naive' || !f.volModel ? '20-day avg' : f.volModel})` : '—'} | ${f ? f.drivers.slice(0, 3).map((d) => `${short(d.name)} ${d.dir}`).join('; ').replace(/\|/g, '/') : '—'} | ${sc.n ? `${pct(sc.hit)} / ${pct(sc.base)} (${sc.n} d)` : '—'} | ${sc.n ? `${sc.brier} vs 0.25` : '—'} |`); }
   if (fc.playbook.length) { out.push('', 'Next high-impact events:'); for (const e of fc.playbook.slice(0, 6)) out.push(`- ${e.at.slice(0, 16).replace('T', ' ')} UTC ${e.country} ${e.title}${e.consensus ? ` (cons. ${e.consensus}, prev. ${e.previous || '—'})` : ''}: ${e.rule}; ${e.scenarios[0].name} → gold ${e.scenarios[0].moves.gold}, EUR/USD ${e.scenarios[0].moves.eurusd}, USD/JPY ${e.scenarios[0].moves.usdjpy}, NQ ${e.scenarios[0].moves.nq}.`); }
+  if (fc.learned) { const a = fc.learned.active || []; out.push('', `Lessons from the Macro veteran: ${a.length ? `${a.length} challenger${a.length === 1 ? '' : 's'} adopted (${a.join(', ')})` : 'no challenger has beaten its incumbent on the replay yet'}; ${Object.entries(fc.learned.challengers || {}).map(([c, x]) => `${c} ${x.challenger ? `hit ${x.challenger.hit} t ${x.challenger.t}` : 'no record'} vs ${x.vs} ${x.incumbent ? `hit ${x.incumbent.hit} t ${x.incumbent.t}` : 'no record'}`).join('; ')}.`); }
   out.push('', fc.brief.replace(/\|/g, '/'), MACRO_END);
   return out.join('\n');
 }
 
 // ─── one run ───────────────────────────────────────────────────────────────────────────────────────────────────────────
-export function buildForecast(data, now, { src = {}, history = [], eventLog = [], goldScore = null } = {}) {
+// ─── lessons: what the strategist adopts from the veteran's challengers (append-only records) ───────────────────────────
+// stats: the replay's driver hit rates for gold ({ k: { n, hit, t, proven } }). A challenger is adopted when it is proven (t >=
+// LESSON.provenT, n >= minN) and its incumbent is not, or it beats the incumbent's hit rate by LESSON.margin; it is reverted when
+// its t falls under LESSON.keepT or the incumbent is proven and ahead by the margin. The decision uses the replay to today, so it
+// is recorded with its date and the live log judges the adopted strategist from there on.
+export function lessons(prev, stats, now) {
+  const L = Array.isArray(prev) ? prev.slice() : [], at = new Date(now * 1000).toISOString();
+  const state = {}; for (const r of L) state[r.challenger] = r.action === 'adopt';
+  for (const [c, def] of Object.entries(CHALLENGERS)) {
+    const cs = stats[c], is = stats[def.vs], on = !!state[c];
+    const cProven = cs && cs.n >= LESSON.minN && cs.t >= LESSON.provenT, iProven = is && is.n >= LESSON.minN && is.t >= LESSON.provenT;
+    if (!on && cProven && (!iProven || cs.hit >= is.hit + LESSON.margin)) {
+      L.push({ at, challenger: c, incumbent: def.vs, action: 'adopt', stats: { challenger: cs, incumbent: is || null }, why: `${c} proven on the replay (hit ${cs.hit}, t ${cs.t}, n ${cs.n})${iProven ? ` and ahead of ${def.vs} (hit ${is.hit})` : `; ${def.vs} not proven${is ? ` (hit ${is.hit}, t ${is.t})` : ''}`}` }); state[c] = true;
+    } else if (on && (!cs || cs.t < LESSON.keepT || (iProven && is.hit >= cs.hit + LESSON.margin))) {
+      L.push({ at, challenger: c, incumbent: def.vs, action: 'revert', stats: { challenger: cs || null, incumbent: is || null }, why: !cs ? `${c} has no replay record` : cs.t < LESSON.keepT ? `${c} no longer proven (t ${cs.t})` : `${def.vs} is ahead again (hit ${is.hit} vs ${cs.hit})` }); state[c] = false;
+    }
+  }
+  const adopted = {};
+  for (const [c, def] of Object.entries(CHALLENGERS)) if (state[c]) { adopted[c] = { ...def.weights }; adopted[def.vs] = Object.fromEntries(Object.entries(W[def.vs] || {}).map(([a, w]) => [a, +(w / 2).toFixed(2)])); }
+  return { records: L, adopted, active: Object.keys(state).filter((c) => state[c]) };
+}
+
+export function buildForecast(data, now, { src = {}, history = [], eventLog = [], goldScore = null, lessons: prevLessons = [] } = {}) {
   const D = targetDay(now), Dn = iso(D), cal = data.cal || [];
   const dk = dayKind(D, cal);
   const f = features(data, D, { fomcDay: dk.type === 'FOMC' }), { list, smile, carry } = drivers(f);
   const rp = replay(data, { upto: D });
   const assets = {}, scRe = {}, drvRe = {}, vs = {}, volUse = {};
+  // a driver counts as proven only with a t-stat of 3 or more on the replay (research: after counting every variant tried)
+  for (const a of AK) drvRe[a] = Object.fromEntries(Object.entries(rp.drv[a]).filter(([, t]) => t.n >= 30).map(([k, t]) => { const h = t.hit / t.n, tt = (h - 0.5) / Math.sqrt(0.25 / t.n); return [k, { n: t.n, hit: r2(h, 3), t: r2(tt, 2), proven: tt >= 3 }]; }));
+  // the veteran's lessons: challengers proven on the replay take their incumbent's weights (see lessons())
+  const learned = lessons(prevLessons, drvRe.gold || {}, now), adopted = Object.keys(learned.adopted).length ? learned.adopted : null;
   for (const a of AK) {
-    const rows = rp.rows[a], fit = fitPlatt(rows.map((r) => ({ s: r.s, y: r.y }))), sc = assetScore(list, a), have = f.last[a] > 0;
+    const rows = rp.rows[a], fit = fitPlatt(rows.map((r) => ({ s: r.s, y: r.y }))), sc = assetScore(list, a, adopted), have = f.last[a] > 0;
     // move size: the selection protocol on this asset's walk-forward rows decides the model; naive unless one passes both halves
     const sel = volSelect(rp.vol[a], a), vixAt = VIX_ASSETS.includes(a) ? vixOf(data) : null;
     volUse[a] = { engine: rp.eng[a], model: sel.used, vixAt };
@@ -803,8 +850,6 @@ export function buildForecast(data, now, { src = {}, history = [], eventLog = []
       expMovePct: vf ? r2(vf.exp, 2) : null, naiveMovePct: vf ? r2(vf.naive, 2) : null, volModel: vf ? vf.model : null, volRatio: vf ? vf.ratio : null, expBasis: vf ? vf.basis : null,
       fit, drivers: sc.used.map((d) => ({ k: d.k, name: d.name, dir: d.dir, w: d.w, detail: d.detail })) };
     scRe[a] = scorecard(rows.filter((r) => r.p != null));
-    // a driver counts as proven only with a t-stat of 3 or more on the replay (research: after counting every variant tried)
-    drvRe[a] = Object.fromEntries(Object.entries(rp.drv[a]).filter(([, t]) => t.n >= 30).map(([k, t]) => { const h = t.hit / t.n, tt = (h - 0.5) / Math.sqrt(0.25 / t.n); return [k, { n: t.n, hit: r2(h, 3), t: r2(tt, 2), proven: tt >= 3 }]; }));
     vs[a] = sel;
   }
   // the live log: the move forecast that was used vs the naive one, MAE and QLIKE
@@ -824,7 +869,10 @@ export function buildForecast(data, now, { src = {}, history = [], eventLog = []
     .map((n) => ({ src: n.src, title: n.title, link: n.link, at: n.at ? new Date(n.at * 1000).toISOString() : null, policy: /FOMC statement|monetary policy decision|policy rate|interest rate|minutes/i.test(n.title) }));
   const fc = { v: 1, at: new Date(now * 1000).toISOString(), target: Dn, targetEvent: dk.title, paperOnly: true, regime, assets,
     dxy: assets.eurusd.pUp != null ? { pUp: r2(1 - assets.eurusd.pUp, 3), note: 'mirror of EUR/USD (EUR is 57.6% of the DXY)' } : null,
-    drivers: list.map((d) => ({ k: d.k, name: d.name, cluster: d.cluster, vote: d.v, detail: d.detail, weights: W[d.k] || {}, ...(d.map ? { perAsset: d.map } : {}) })),
+    drivers: list.map((d) => ({ k: d.k, name: d.name, cluster: d.cluster, vote: d.v, detail: d.detail, weights: weightsOf(d.k, adopted), ...(CHALLENGERS[d.k] ? { challenger: true, vs: CHALLENGERS[d.k].vs, candidateWeights: CHALLENGERS[d.k].weights } : {}), ...(d.map ? { perAsset: d.map } : {}) })),
+    // what the strategist has learned from the veteran: adopted challengers, the full record, and every challenger's replay standing
+    learned: { active: learned.active, adopted: learned.adopted, records: learned.records, recent: learned.records.slice(-10),
+      challengers: Object.fromEntries(Object.entries(CHALLENGERS).map(([c, def]) => [c, { vs: def.vs, challenger: (drvRe.gold || {})[c] || null, incumbent: (drvRe.gold || {})[def.vs] || null, adopted: learned.active.includes(c) }])) },
     playbook, news, scorecard: { replay: scRe, live, vol: vs, volMethod: VOL_METHOD, replayDays: rp.Ds.length, driverHit: drvRe, logged: history.length, resolved: history.filter((h) => h.y != null).length,
       method: 'Walk-forward: each replay day uses only data published before it (FRED with publication lags, candles before the day); the score-to-probability map (anchored on the base up-rate, strongly shrunk, capped 35-65%) is refitted every 20 days on earlier days only (needs 120). Target: the next UTC weekday candle, up if close > open. Base rate = the share of the more common direction; coin flip (random walk) = 50% every day, Brier 0.25. Pesaran-Timmermann above 1.96 = direction calls better than chance. A 53% hit rate needs about 1,100 forecasts to tell from luck. The live log is append-only, written from 21:00 UTC before each day opens.' },
     sources: src, goldScore };
@@ -840,10 +888,10 @@ export async function run({ dir = 'data', fetchImpl = globalThis.fetch, now = Ma
   const eventLog = logEvents(rd('events.json', []), data.cal || []);
   let history = resolveHistory(rd('history.json', []), data.bars);
   const S = await scoreSeries(fetchImpl, now, { dir, data, cache, src }), goldScore = goldMacroScore(S, { asOf: now });
-  const fc = buildForecast(data, now, { src, history, eventLog, goldScore });
+  const fc = buildForecast(data, now, { src, history, eventLog, goldScore, lessons: rd('lessons.json', []) });
   history = updateHistory(history, fc, now).slice(-3000);
   const w = (f, v, pretty = true) => { const s = pretty ? JSON.stringify(v, null, 1) : JSON.stringify(v); const p = path.join(M, f); let old = null; try { old = fs.readFileSync(p, 'utf8'); } catch (e) {} if (old !== s) fs.writeFileSync(p, s); };
-  w('forecast.json', fc); w('history.json', history); w('events.json', eventLog);
+  w('forecast.json', fc); w('history.json', history); w('events.json', eventLog); w('lessons.json', fc.learned.records);
   // last good copies, so one failed fetch does not blank the drivers (no timestamps: the file only changes with new data)
   const nc = { fred: {}, cal: data.cal && data.cal.length ? data.cal : cache.cal || [], cot: data.cot && data.cot.length ? data.cot : cache.cot || [] };
   for (const id of [...FRED, 'ECB2Y']) if (data.fred[id] && data.fred[id].length) nc.fred[id] = data.fred[id].slice(-300).map((o) => [iso(o.t), o.v]); else if (cache.fred && cache.fred[id]) nc.fred[id] = cache.fred[id];

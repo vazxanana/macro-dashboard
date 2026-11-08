@@ -154,3 +154,26 @@ test('wiring: the Macro desk loads macro/veteran.json and renders the discussion
   assert.ok(fs.existsSync(new URL('../research/macro-veteran/SKILL.md', import.meta.url))); assert.ok(fs.existsSync(new URL('../research/macro-veteran/references/gold-driver-map.md', import.meta.url)));
   const claude = fs.readFileSync(new URL('../CLAUDE.md', import.meta.url), 'utf8'); assert.match(claude, /## Macro veteran \(8 Nov 2026\)/);
 });
+
+test('the argument\'s record: weekly debates resolved at the horizon, a per-topic scoreboard, and what the strategist has adopted', () => {
+  const topics = [{ topic: 'Direction for gold', stance: 'agree', m: 1, v: 1 }, { topic: 'Real yields', stance: 'disagree', m: -1, v: 1 }, { topic: 'Positioning', stance: 'agree', m: 0, v: null }];
+  let { hist, issued } = V.debatesIssue([], { now: NOW, gold, topics });
+  assert.ok(issued); assert.equal(hist.length, 1); assert.equal(issued.week, '2026-11-07'); assert.deepEqual(issued.topics[1], { topic: 'Real yields', stance: 'disagree', m: -1, v: 1 }); assert.equal(issued.resolved, null);
+  assert.equal(V.debatesIssue(hist, { now: NOW + DAY, gold, topics }).issued, null, 'one record a week');
+  const more = Array.from({ length: 25 }, (_, i) => ({ t: gold[gold.length - 1].t + (i + 1) * DAY, v: 4200 + i }));
+  hist = V.debatesResolve(hist, gold.concat(more)); assert.equal(hist[0].resolved.dir, 1); assert.ok(hist[0].resolved.returnPct > 0);
+  const sb = V.scoreboard(hist);
+  assert.equal(sb.weeks, 1); assert.equal(sb.pending, 0); assert.deepEqual(sb.byTopic['Real yields'], { strategist: { n: 1, hit: 0 }, veteran: { n: 1, hit: 1 } });
+  assert.deepEqual(sb.byTopic['Positioning'], { strategist: { n: 0, hit: null }, veteran: { n: 0, hit: null } }, 'abstentions are not scored');
+  assert.equal(sb.veteran.hit, 1); assert.equal(sb.strategist.hit, 0.5); assert.equal(sb.strategist.n, 2);
+  assert.equal(V.scoreboard([]).weeks, 0);
+  // teaching: from the strategist's learned block
+  const t0 = V.teaching({}); assert.deepEqual(t0.adopted, []); assert.match(t0.line, /does not run/);
+  const t1 = V.teaching({ learned: { active: ['v_ry4w'], recent: [{ action: 'adopt' }], challengers: { v_ry4w: { vs: 'ry', challenger: { hit: 0.58, t: 3.2 }, incumbent: { hit: 0.51, t: 0.6 }, adopted: true }, v_dxy4w: { vs: 'dxymom', challenger: null, incumbent: { hit: 0.5, t: 0.1 }, adopted: false } } } });
+  assert.deepEqual(t1.adopted, ['v_ry4w']); assert.equal(t1.pending.length, 1); assert.match(t1.line, /adopted v_ry4w/); assert.match(t1.line, /v_dxy4w no record yet vs dxymom hit 50%, t 0.1/);
+  // debate topics carry the numeric leans the scoreboard needs
+  const C = cache(), s = {}; for (const [k, v] of Object.entries(C.fred)) s[k] = V.fromCache(v); s.gold = gold; s.dxy = dxy; s.avg10w = 3950;
+  const ch = V.channels(s, NOW), d = V.debate(forecast(), ch, V.fingerprint(ch.changes), { now: NOW, base: null });
+  const ry = d.topics.find((t) => t.topic === 'Real yields'); assert.equal(ry.m, -1); assert.equal(ry.v, 1);
+  assert.equal(d.topics.find((t) => t.topic === 'Regime').m, null);
+});

@@ -259,3 +259,30 @@ test('a full run on a fake network: files, sources, fallbacks, the analysis sect
   assert.ok(hist2.every((h) => Date.parse(h.at) / 1000 === sun));
   assert.ok(fc.brief && fc2.brief);
 });
+
+// ─── the Macro veteran's challengers and lessons (8 Nov: the argument teaches the strategist) ───
+test('veteran challengers: 4-week readings ride the replay with no weight; lessons adopt a proven one and hand it back', () => {
+  const C = M.CHALLENGERS; assert.deepEqual(Object.keys(C), ['v_ry4w', 'v_d2_4w', 'v_dxy4w']); assert.equal(C.v_ry4w.vs, 'ry'); assert.deepEqual(C.v_ry4w.weights, M.W.ry);
+  for (const k of Object.keys(C)) assert.equal(M.W[k], undefined, `${k} carries no weight of its own`);
+  // drivers: the challengers vote from 4-week changes
+  const list = M.drivers({ ry4w: -0.2, d2_4w: 0.3, dxy4w: -1.5, ry: null, vix: null, trend: {}, vol: {}, last: {}, D: 0 }).list;
+  const by = Object.fromEntries(list.map((d) => [d.k, d])); assert.equal(by.v_ry4w.v, 1); assert.equal(by.v_d2_4w.v, -1); assert.equal(by.v_dxy4w.v, 1); assert.match(by.v_ry4w.detail, /−20 bp in 4 weeks/);
+  assert.equal(M.drivers({ ry4w: null, d2_4w: null, dxy4w: null, ry: null, vix: null, trend: {}, vol: {}, last: {}, D: 0 }).list.find((d) => d.k === 'v_ry4w').v, null);
+  // assetScore: a challenger counts only through adopted weights
+  const L = [{ k: 'v_ry4w', v: 1 }, { k: 'ry', v: -1 }];
+  assert.equal(M.assetScore(L, 'gold').s, -1, 'without a lesson only the incumbent votes');
+  const adopted = { v_ry4w: { gold: 3 }, ry: { gold: 1.5 } };
+  assert.equal(+M.assetScore(L, 'gold', adopted).s.toFixed(3), +((3 - 1.5) / 4.5).toFixed(3)); assert.deepEqual(M.weightsOf('v_ry4w', adopted), { gold: 3 }); assert.deepEqual(M.weightsOf('ry'), M.W.ry);
+  // lessons: adopt when proven and ahead, revert when no longer proven; append-only
+  const proven = { n: 400, hit: 0.58, t: 3.2, proven: true }, weak = { n: 400, hit: 0.52, t: 0.8, proven: false };
+  let r = M.lessons([], { v_ry4w: proven, ry: weak }, 1794000000);
+  assert.deepEqual(r.active, ['v_ry4w']); assert.equal(r.records.length, 1); assert.equal(r.records[0].action, 'adopt'); assert.match(r.records[0].why, /not proven/);
+  assert.deepEqual(r.adopted.v_ry4w, M.W.ry); assert.equal(r.adopted.ry.gold, 1.5);
+  r = M.lessons(r.records, { v_ry4w: proven, ry: weak }, 1794000600); assert.equal(r.records.length, 1, 'nothing new while the standing holds');
+  r = M.lessons(r.records, { v_ry4w: { n: 420, hit: 0.53, t: 1.2, proven: false }, ry: weak }, 1794001200);
+  assert.equal(r.records.length, 2); assert.equal(r.records[1].action, 'revert'); assert.deepEqual(r.active, []); assert.deepEqual(r.adopted, {});
+  // not adopted: proven but not ahead of a proven incumbent; too few observations
+  assert.deepEqual(M.lessons([], { v_ry4w: proven, ry: { n: 400, hit: 0.6, t: 4, proven: true } }, 0).active, []);
+  assert.deepEqual(M.lessons([], { v_ry4w: { n: 20, hit: 0.9, t: 3.6, proven: true } }, 0).active, []);
+  assert.equal(M.LESSON.provenT, 3);
+});
