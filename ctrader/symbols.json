@@ -1,5 +1,5 @@
 {
- "at": "2026-11-08T09:12:43.460Z",
+ "at": "2026-11-08T09:14:18.055Z",
  "source": "council/ctrader-symbols.mjs",
  "broker": "Fusion Markets",
  "account": {
@@ -13,13 +13,21 @@
   "audusd": "AUDUSD",
   "usdcad": "USDCAD",
   "usdchf": "USDCHF",
+  "btc": "BTCUSD",
+  "eth": "ETHUSD",
+  "sol": "SOLUSD",
+  "xrp": null,
   "nq": "NAS100",
   "es": "US500",
   "ym": "US30",
   "rty": "US2000",
   "gc": "XAUUSD"
  },
- "missing": {},
+ "missing": {
+  "xrp": [
+   "XRPUSD"
+  ]
+ },
  "symbols": {
   "XAUUSD": {
    "markets": [
@@ -122,7 +130,7 @@
    "spread": null,
    "spreadAt": null,
    "quoteToDeposit": 1,
-   "rateAt": "2026-11-08T09:12:43.460Z",
+   "rateAt": "2026-11-08T09:14:18.055Z",
    "marginPerLot": 814.08,
    "valuePerPoint": 100,
    "pipValue": 10,
@@ -225,7 +233,7 @@
    "spread": null,
    "spreadAt": null,
    "quoteToDeposit": 1,
-   "rateAt": "2026-11-08T09:12:43.460Z",
+   "rateAt": "2026-11-08T09:14:18.055Z",
    "marginPerLot": 222.8,
    "valuePerPoint": 100000,
    "pipValue": 10,
@@ -328,7 +336,7 @@
    "spread": null,
    "spreadAt": null,
    "quoteToDeposit": 1,
-   "rateAt": "2026-11-08T09:12:43.460Z",
+   "rateAt": "2026-11-08T09:14:18.055Z",
    "marginPerLot": 267.06,
    "valuePerPoint": 100000,
    "pipValue": 10,
@@ -431,7 +439,7 @@
    "spread": null,
    "spreadAt": null,
    "quoteToDeposit": 1,
-   "rateAt": "2026-11-08T09:12:43.460Z",
+   "rateAt": "2026-11-08T09:14:18.055Z",
    "marginPerLot": 137.34,
    "valuePerPoint": 100000,
    "pipValue": 10,
@@ -646,6 +654,331 @@
     "skip": "USDCHF: no broker quote yet"
    }
   },
+  "BTCUSD": {
+   "markets": [
+    "btc"
+   ],
+   "symbolId": 101,
+   "description": "Bitcoin vs US Dollar",
+   "base": "BTC",
+   "quote": "USD",
+   "lotSize": 100,
+   "unitsPerLot": 1,
+   "minVolume": 1,
+   "stepVolume": 1,
+   "maxVolume": 10000,
+   "minLots": 0.01,
+   "stepLots": 0.01,
+   "maxLots": 100,
+   "digits": 2,
+   "pipPosition": 1,
+   "measurementUnits": "BTC",
+   "tradingMode": "ENABLED",
+   "scheduleTimeZone": "America/New_York",
+   "schedule": [
+    [
+     0,
+     61140
+    ],
+    [
+     61320,
+     147540
+    ],
+    [
+     147720,
+     233940
+    ],
+    [
+     234120,
+     320340
+    ],
+    [
+     320520,
+     406740
+    ],
+    [
+     406920,
+     493140
+    ],
+    [
+     493320,
+     579540
+    ],
+    [
+     579720,
+     604799
+    ]
+   ],
+   "scheduleText": "Sun 00:00–Sun 16:59, Sun 17:02–Mon 16:59, Mon 17:02–Tue 16:59, Tue 17:02–Wed 16:59, Wed 17:02–Thu 16:59, Thu 17:02–Fri 16:59, Fri 17:02–Sat 16:59, Sat 17:02–Sat 23:59",
+   "holidays": [
+    {
+     "name": "US Daylight Savings",
+     "date": "2026-11-01",
+     "recurring": false,
+     "start": 0,
+     "end": 0
+    }
+   ],
+   "leverageId": 1001,
+   "leverageTiers": [
+    {
+     "volume": 10000000000000,
+     "leverage": 1000
+    }
+   ],
+   "commission": {
+    "type": 1,
+    "preciseRate": 0,
+    "preciseMin": 0,
+    "minType": 1,
+    "minAsset": "USD"
+   },
+   "swap": {
+    "long": -15,
+    "short": -7.5,
+    "type": 1,
+    "rollover3Days": 5
+   },
+   "distances": {
+    "sl": 0,
+    "tp": 0,
+    "setIn": 1
+   },
+   "pnlConversionFeeRate": 0,
+   "enableShortSelling": true,
+   "bid": 75795.11,
+   "ask": 75812.79,
+   "quoteAt": "2026-11-08T09:14:17.899Z",
+   "spread": 17.68,
+   "spreadAt": "2026-11-08T09:14:17.899Z",
+   "quoteToDeposit": 1,
+   "rateAt": "2026-11-08T09:14:18.055Z",
+   "marginPerLot": 7580.89,
+   "valuePerPoint": 1,
+   "pipValue": 0.1,
+   "notionalPerLot": 75803.95,
+   "impliedLeverage": 10,
+   "observed": null,
+   "impliedPrice": 75808.9
+  },
+  "ETHUSD": {
+   "markets": [
+    "eth"
+   ],
+   "symbolId": 102,
+   "description": "Ethereum vs US Dollar",
+   "base": "ETH",
+   "quote": "USD",
+   "lotSize": 100,
+   "unitsPerLot": 1,
+   "minVolume": 1,
+   "stepVolume": 1,
+   "maxVolume": 10000,
+   "minLots": 0.01,
+   "stepLots": 0.01,
+   "maxLots": 100,
+   "digits": 2,
+   "pipPosition": 1,
+   "measurementUnits": "ETH",
+   "tradingMode": "ENABLED",
+   "scheduleTimeZone": "America/New_York",
+   "schedule": [
+    [
+     0,
+     61140
+    ],
+    [
+     61320,
+     147540
+    ],
+    [
+     147720,
+     233940
+    ],
+    [
+     234120,
+     320340
+    ],
+    [
+     320520,
+     406740
+    ],
+    [
+     406920,
+     493140
+    ],
+    [
+     493320,
+     579540
+    ],
+    [
+     579720,
+     604799
+    ]
+   ],
+   "scheduleText": "Sun 00:00–Sun 16:59, Sun 17:02–Mon 16:59, Mon 17:02–Tue 16:59, Tue 17:02–Wed 16:59, Wed 17:02–Thu 16:59, Thu 17:02–Fri 16:59, Fri 17:02–Sat 16:59, Sat 17:02–Sat 23:59",
+   "holidays": [
+    {
+     "name": "US Daylight Savings",
+     "date": "2026-11-01",
+     "recurring": false,
+     "start": 0,
+     "end": 0
+    }
+   ],
+   "leverageId": 1001,
+   "leverageTiers": [
+    {
+     "volume": 10000000000000,
+     "leverage": 1000
+    }
+   ],
+   "commission": {
+    "type": 1,
+    "preciseRate": 0,
+    "preciseMin": 0,
+    "minType": 1,
+    "minAsset": "USD"
+   },
+   "swap": {
+    "long": -15,
+    "short": -10,
+    "type": 1,
+    "rollover3Days": 5
+   },
+   "distances": {
+    "sl": 0,
+    "tp": 0,
+    "setIn": 1
+   },
+   "pnlConversionFeeRate": 0,
+   "enableShortSelling": true,
+   "bid": 2231.9,
+   "ask": 2234.9,
+   "quoteAt": "2026-11-08T09:14:13.426Z",
+   "spread": 3,
+   "spreadAt": "2026-11-08T09:14:13.426Z",
+   "quoteToDeposit": 1,
+   "rateAt": "2026-11-08T09:14:18.055Z",
+   "marginPerLot": 223.48,
+   "valuePerPoint": 1,
+   "pipValue": 0.1,
+   "notionalPerLot": 2233.4,
+   "impliedLeverage": 10,
+   "observed": null,
+   "impliedPrice": 2234.8
+  },
+  "SOLUSD": {
+   "markets": [
+    "sol"
+   ],
+   "symbolId": 137,
+   "description": "Solana vs US Dollar",
+   "base": "SOL",
+   "quote": "USD",
+   "lotSize": 100000,
+   "unitsPerLot": 1000,
+   "minVolume": 1000,
+   "stepVolume": 1000,
+   "maxVolume": 10000000,
+   "minLots": 0.01,
+   "stepLots": 0.01,
+   "maxLots": 100,
+   "digits": 3,
+   "pipPosition": 2,
+   "measurementUnits": "SOL",
+   "tradingMode": "ENABLED",
+   "scheduleTimeZone": "America/New_York",
+   "schedule": [
+    [
+     0,
+     61140
+    ],
+    [
+     61320,
+     147540
+    ],
+    [
+     147720,
+     233940
+    ],
+    [
+     234120,
+     320340
+    ],
+    [
+     320520,
+     406740
+    ],
+    [
+     406920,
+     493140
+    ],
+    [
+     493320,
+     579540
+    ],
+    [
+     579720,
+     604799
+    ]
+   ],
+   "scheduleText": "Sun 00:00–Sun 16:59, Sun 17:02–Mon 16:59, Mon 17:02–Tue 16:59, Tue 17:02–Wed 16:59, Wed 17:02–Thu 16:59, Thu 17:02–Fri 16:59, Fri 17:02–Sat 16:59, Sat 17:02–Sat 23:59",
+   "holidays": [
+    {
+     "name": "US Daylight Savings",
+     "date": "2026-11-01",
+     "recurring": false,
+     "start": 0,
+     "end": 0
+    }
+   ],
+   "leverageId": 1001,
+   "leverageTiers": [
+    {
+     "volume": 10000000000000,
+     "leverage": 1000
+    }
+   ],
+   "commission": {
+    "type": 1,
+    "preciseRate": 0,
+    "preciseMin": 0,
+    "minType": 1,
+    "minAsset": "USD"
+   },
+   "swap": {
+    "long": -15,
+    "short": -15,
+    "type": 1,
+    "rollover3Days": 5
+   },
+   "distances": {
+    "sl": 0,
+    "tp": 0,
+    "setIn": 1
+   },
+   "pnlConversionFeeRate": 0,
+   "enableShortSelling": true,
+   "bid": 88.941,
+   "ask": 89.129,
+   "quoteAt": "2026-11-08T09:14:13.053Z",
+   "spread": 0.188,
+   "spreadAt": "2026-11-08T09:14:13.053Z",
+   "quoteToDeposit": 1,
+   "rateAt": "2026-11-08T09:14:18.055Z",
+   "marginPerLot": 8913.9,
+   "valuePerPoint": 1000,
+   "pipValue": 10,
+   "notionalPerLot": 89035,
+   "impliedLeverage": 10,
+   "observed": {
+    "n": 4,
+    "perPointPerLot": 1000,
+    "matches": true
+   },
+   "impliedPrice": 89.139
+  },
   "NAS100": {
    "markets": [
     "nq"
@@ -746,7 +1079,7 @@
    "spread": null,
    "spreadAt": null,
    "quoteToDeposit": 1,
-   "rateAt": "2026-11-08T09:12:43.460Z",
+   "rateAt": "2026-11-08T09:14:18.055Z",
    "marginPerLot": 269.81,
    "valuePerPoint": 1,
    "pipValue": 0.1,
@@ -863,7 +1196,7 @@
    "spread": null,
    "spreadAt": null,
    "quoteToDeposit": 1,
-   "rateAt": "2026-11-08T09:12:43.460Z",
+   "rateAt": "2026-11-08T09:14:18.055Z",
    "marginPerLot": 73.79,
    "valuePerPoint": 1,
    "pipValue": 0.1,
@@ -980,7 +1313,7 @@
    "spread": null,
    "spreadAt": null,
    "quoteToDeposit": 1,
-   "rateAt": "2026-11-08T09:12:43.460Z",
+   "rateAt": "2026-11-08T09:14:18.055Z",
    "marginPerLot": 512.84,
    "valuePerPoint": 1,
    "pipValue": 0.1,
@@ -1097,7 +1430,7 @@
    "spread": null,
    "spreadAt": null,
    "quoteToDeposit": 1,
-   "rateAt": "2026-11-08T09:12:43.460Z",
+   "rateAt": "2026-11-08T09:14:18.055Z",
    "marginPerLot": 27.52,
    "valuePerPoint": 1,
    "pipValue": 0.1,
