@@ -673,6 +673,35 @@
     ],
     "stopSetAt": "2026-11-08T23:09:16.000Z",
     "stopSetBy": "guard"
+   },
+   "xau-position-1793783465": {
+    "positionId": "47377771",
+    "symbol": "XAUUSD",
+    "side": "buy",
+    "volume": 100,
+    "lots": 0.01,
+    "digits": 2,
+    "setup": "position",
+    "status": "open",
+    "openedAt": "2026-11-08T23:11:19.000Z",
+    "councilEntry": 4041.66,
+    "stop": 3887.690642857143,
+    "t1": 5636.88,
+    "riskCash": 181.32,
+    "margin": 8.12,
+    "minLot": true,
+    "shadow": true,
+    "mark": 4069.015,
+    "levelsFrom": "mark",
+    "fillPrice": 4069.61,
+    "slipR": 0.182,
+    "lagSec": 390439,
+    "alerted": [
+     "open",
+     "amend"
+    ],
+    "stopSetAt": "2026-11-08T23:11:19.000Z",
+    "stopSetBy": "guard"
    }
   },
   "day": {
@@ -680,7 +709,7 @@
    "startBalance": 10000
   },
   "startedAt": "2026-11-08T11:42:25.000Z",
-  "status": "ok · demo Fusion Markets · balance 9987.78 · 16 open · 2 resting",
+  "status": "ok · demo Fusion Markets · balance 9987.78 · 17 open · 2 resting",
   "skipped": {
    "audusd-position-1793601653": "price 0.68666 has run 1.27R from the council entry 0.70162: a different trade now",
    "xrp-rswing-1793942619": "none of XRPUSD found at the broker",
@@ -689,16 +718,8 @@
    "gbpusd-scalp-1793916690": "price 1.33526 has run 2.33R from the council entry 1.34482: a different trade now",
    "usdchf-scalp-1793971016": "price 0.82058 has run 1.02R from the council entry 0.81941: a different trade now"
   },
-  "wait": {
-   "xau-position-1793783465": {
-    "why": "XAUUSD market closed (paused until 23:09 UTC)",
-    "n": 0,
-    "at": "2026-11-08T23:09:16.000Z"
-   }
-  },
-  "paused": {
-   "XAUUSD": "2026-11-08T23:09:40.000Z"
-  },
+  "wait": {},
+  "paused": {},
   "resetAt": "2026-11-08T09:45Z",
   "resetDoneAt": "2026-11-08T11:42:47.000Z",
   "orders": {
@@ -747,19 +768,9 @@
   },
   "catchUpAt": "2026-11-08T12:04:40.000Z",
   "balance": 9987.78,
-  "lastRun": "2026-11-08T23:09:16.000Z"
+  "lastRun": "2026-11-08T23:11:19.000Z"
  },
  "log": [
-  {
-   "at": "2026-11-08T20:16:08.000Z",
-   "msg": "not mirrored yet audusd-intraday-1793949765: AUDUSD market closed (paused until 20:26 UTC) (will retry)",
-   "trade": "audusd-intraday-1793949765"
-  },
-  {
-   "at": "2026-11-08T20:16:08.000Z",
-   "msg": "not mirrored yet usdchf-scalp-1793955902: USDCHF market closed (paused until 20:26 UTC) (will retry)",
-   "trade": "usdchf-scalp-1793955902"
-  },
   {
    "at": "2026-11-08T20:16:08.000Z",
    "msg": "not mirrored yet usdchf-scalp-1793971016: USDCHF market closed (paused until 20:26 UTC) (will retry)",
@@ -2249,6 +2260,16 @@
    "at": "2026-11-08T23:09:16.000Z",
    "msg": "set the missing stop on AUDUSD 47377210 at 0.68554 (the broker had opened it without one)",
    "trade": "audusd-scalp-1794179316"
+  },
+  {
+   "at": "2026-11-08T23:11:19.000Z",
+   "msg": "opened buy XAUUSD 0.01 lot (council position)",
+   "trade": "xau-position-1793783465"
+  },
+  {
+   "at": "2026-11-08T23:11:19.000Z",
+   "msg": "set the missing stop on XAUUSD 47377771 at 3887.69 (the broker had opened it without one)",
+   "trade": "xau-position-1793783465"
   }
  ],
  "limits": {
@@ -2326,11 +2347,11 @@
   ]
  },
  "execution": {
-  "n": 23,
-  "meanSlipR": 0.001,
-  "medianSlipR": 0,
+  "n": 24,
+  "meanSlipR": 0.009,
+  "medianSlipR": 0.005,
   "worstSlipR": 1.168,
-  "medianLagSec": 196509,
+  "medianLagSec": 207939,
   "bySymbol": {
    "SOLUSD": {
     "n": 4,
@@ -2363,6 +2384,10 @@
    "AUDUSD": {
     "n": 5,
     "meanSlipR": 0.106
+   },
+   "XAUUSD": {
+    "n": 1,
+    "meanSlipR": 0.182
    }
   }
  }

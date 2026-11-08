@@ -4,30 +4,48 @@
   "ict"
  ],
  "state": {
-  "map": {},
+  "map": {
+   "ict:es-s-1793995200": {
+    "positionId": "47377764",
+    "symbol": "US500",
+    "side": "sell",
+    "volume": 61,
+    "lots": 0.61,
+    "digits": 2,
+    "setup": "ict-A",
+    "status": "open",
+    "openedAt": "2026-11-08T23:11:17.000Z",
+    "councilEntry": 7405,
+    "stop": 7437.75,
+    "t1": 7306.75,
+    "riskCash": 20,
+    "margin": 44.99,
+    "shadow": true,
+    "fillPrice": 7393.06,
+    "lagSec": 177129,
+    "alerted": [
+     "open",
+     "amend"
+    ],
+    "stopSetAt": "2026-11-08T23:11:17.000Z",
+    "stopSetBy": "guard"
+   }
+  },
   "day": {
    "date": "2026-11-08",
    "startBalance": 10000
   },
   "startedAt": "2026-11-08T11:42:25.000Z",
-  "status": "ok · demo Fusion Markets · balance 10000 · 0 open",
+  "status": "ok · demo Fusion Markets · balance 10000 · 1 open",
   "skipped": {},
-  "wait": {
-   "ict:es-s-1793995200": {
-    "why": "US500 market closed (paused until 23:09 UTC)",
-    "n": 0,
-    "at": "2026-11-08T23:09:14.000Z"
-   }
-  },
-  "paused": {
-   "US500": "2026-11-08T23:09:38.000Z"
-  },
+  "wait": {},
+  "paused": {},
   "resetAt": "2026-11-08T09:45Z",
   "resetDoneAt": "2026-11-08T11:42:46.000Z",
   "orders": {},
   "catchUpAt": "2026-11-08T12:04:38.000Z",
   "balance": 10000,
-  "lastRun": "2026-11-08T23:09:14.000Z"
+  "lastRun": "2026-11-08T23:11:17.000Z"
  },
  "log": [
   {
@@ -637,6 +655,16 @@
    "at": "2026-11-08T23:00:06.000Z",
    "msg": "not mirrored yet ict:es-s-1793995200: US500 market closed (paused until 23:09 UTC) (will retry)",
    "trade": "ict:es-s-1793995200"
+  },
+  {
+   "at": "2026-11-08T23:11:17.000Z",
+   "msg": "opened sell US500 0.61 lot (council ict-A)",
+   "trade": "ict:es-s-1793995200"
+  },
+  {
+   "at": "2026-11-08T23:11:17.000Z",
+   "msg": "set the missing stop on US500 47377764 at 7425.81 (the broker had opened it without one)",
+   "trade": "ict:es-s-1793995200"
   }
  ],
  "limits": {
@@ -714,6 +742,7 @@
   ]
  },
  "execution": {
-  "n": 0
+  "n": 0,
+  "medianLagSec": 177129
  }
 }
