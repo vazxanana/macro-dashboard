@@ -151,10 +151,11 @@ function block(T, cfg, from, to, half, gated) {
 function printBlock(name, o) {
   console.log(`\n=== ${name}\n n | wr | exp | R | DD | streak | t\npooled x1 | ${f(o.net)}\npooled x2 | ${f(o.net2)}\ngross     | ${f(o.gross)}\nmonthly ${JSON.stringify(o.monthly)}`);
   console.log(`halves (${o.split}): ${f(o.first)} || ${f(o.second)}   x2: ${sg(o.halves2.first.exp)} || ${sg(o.halves2.second.exp)}`);
-  console.log(`drift: control ${f(o.drift.control)} | adjusted ${f(o.drift.adjusted)} | CI ${o.drift.ci ? `${o.drift.ci.lo}..${o.drift.ci.hi} P(>0) ${o.drift.ci.pPos} (${o.drift.ci.months} months)` : '-'}`);
-  for (const [m, x] of Object.entries(o.markets)) console.log(`${m} | ${f(x.net)} || x2 ${sg(x.net2.exp)} | gross ${sg(x.gross.exp)} | 1st ${sg(x.first.exp)} (${x.first.n}, t ${x.first.t}) | 2nd ${sg(x.second.exp)} (${x.second.n}, t ${x.second.t}) | monthly t ${x.monthly.t} | drift adj ${sg(x.drift.adjusted.exp)} (t ${x.drift.adjusted.t}) CI ${x.drift.ci ? `${x.drift.ci.lo}..${x.drift.ci.hi}` : '-'}`);
+  // the index baseline trades both sides, so it carries no buys-only drift block (full() removes it): print guards only
+  if (o.drift) console.log(`drift: control ${f(o.drift.control)} | adjusted ${f(o.drift.adjusted)} | CI ${o.drift.ci ? `${o.drift.ci.lo}..${o.drift.ci.hi} P(>0) ${o.drift.ci.pPos} (${o.drift.ci.months} months)` : '-'}`);
+  for (const [m, x] of Object.entries(o.markets)) console.log(`${m} | ${f(x.net)} || x2 ${sg(x.net2.exp)} | gross ${sg(x.gross.exp)} | 1st ${sg(x.first.exp)} (${x.first.n}, t ${x.first.t}) | 2nd ${sg(x.second.exp)} (${x.second.n}, t ${x.second.t}) | monthly t ${x.monthly.t}${x.drift ? ` | drift adj ${sg(x.drift.adjusted.exp)} (t ${x.drift.adjusted.t}) CI ${x.drift.ci ? `${x.drift.ci.lo}..${x.drift.ci.hi}` : '-'}` : ''}`);
   console.log('year | n | wr | exp | R | t | x2 | ctrl | adj');
-  for (const [y, s] of Object.entries(o.years)) console.log(`${y} | ${s.n} | ${s.wr == null ? '-' : (100 * s.wr).toFixed(0) + '%'} | ${sg(s.exp)} | ${s.R} | ${s.t} | ${sg(s.x2)} | ${sg(s.ctrl)} | ${sg(s.adj)}`);
+  for (const [y, s] of Object.entries(o.years)) console.log(`${y} | ${s.n} | ${s.wr == null ? '-' : (100 * s.wr).toFixed(0) + '%'} | ${sg(s.exp)} | ${s.R} | ${s.t} | ${sg(s.x2)} | ${s.ctrl == null ? '-' : sg(s.ctrl)} | ${s.adj == null ? '-' : sg(s.adj)}`);
 }
 // the pre-registered bar (preregistration.md): PASS = pooled net > 0 with t >= 2, both halves > 0, drift-adjusted margin's CI > 0;
 // FAIL = pooled <= 0, or a half <= 0, or the margin over random gated longs <= 0; otherwise INCONCLUSIVE (positive, not significant)
