@@ -712,5 +712,9 @@ double-click; `timeToX` / `xToTime` map time across weekend gaps and past the la
 rules checklist in the draft (`RL`, localStorage `btLab:rules`, editable, optional strict mode that refuses a trade until every
 rule is ticked; the trade keeps `rules {ok, of, miss}`; journal chip; stats "All rules followed" vs "Rules broken"), and a chart
 snapshot per closed trade (`snapTrade`: chart + overlay, 520 px JPEG, `S.shots` keyed by `shotKey`, last 40 kept, kept outside the
-account so Undo stays light; journal thumbnail opens `#shotd`). Tests: `tests/backtest.test.mjs`. Paper only; nothing reaches the
+account so Undo stays light; journal thumbnail opens `#shotd`).
+Toolbar position (owner: "the play buttons should be at the top or movable"): `#tb` docks at the top of the chart (default), floats
+over the chart (drag the dotted grip `#tb-grip`, compact single row, time and jump hidden) or sits under the chart; the dock button
+`#tb-dock` cycles top / float / bottom (`tbPlace`, `tbMove` clamps inside the card); localStorage `btLab:tbDock` and `btLab:tbPos`;
+the overlay canvas and legend follow the chart's offset. Phones keep it sticky at the bottom unless floating. Tests: `tests/backtest.test.mjs`. Paper only; nothing reaches the
 council or the mirror.
