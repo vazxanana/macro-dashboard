@@ -542,7 +542,12 @@ config.json `mirrorAccounts` or env `CTRADER_ACCOUNTS` ("council:1,ict:2,shadow:
 CTRADER_ACCOUNT_ID; the CLI runs one round per account (the token pair is shared and handed on), writes mirror.json for the base
 account and mirror-<account>.json for the others, plus mirror-accounts.json (the map); alerts carry [book]. When the council moves an open trade's stop or target (break-even, trailing, a re-planned target) the demo position's protection follows
 (`AMEND_POSITION_SLTP_REQ`, own positions only; council trades take the absolute levels, ICT trades move the broker stop by the
-council's distance; `AMEND_TRIES` rejections then left alone; 8 Nov, owner approved). `council/ctrader-reset.json { at }` drops the copied-trade records once per `at` (owner closed everything by hand). Tests:
+council's distance; `AMEND_TRIES` rejections then left alone; 8 Nov, owner approved). `council/ctrader-reset.json { at }` drops the copied-trade records once per `at` (owner closed everything by hand). **RULE (owner, 8 Nov):
+a mirrored position never sits without a stop.** A market order's relative stop is measured from the fill, so a stop distance inside
+the spread is dropped by the broker and the position stays unprotected; `ensureStop` sets the council's absolute stop (ICT: the
+council's distance from the fill) by amend right at the fill and on every round for any held position without one, and CLOSES the
+position at once when the broker refuses the stop (only no answer at all waits a round, with a `nostop` alert); step 3 skips a trade
+whose stop distance is within 1.25× the broker spread (ctrader/symbols.json). Tests:
 `tests/ctrader-mirror.test.mjs` (fake broker with resting orders, `fillOrder`, cancel / cancel-rejected paths).
 
 ## cTrader demo accounts on the profile (8 Nov 2026)
