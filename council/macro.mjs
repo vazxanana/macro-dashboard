@@ -51,6 +51,10 @@ const FX_EXTRA = { gbpusd: { sym: 'gbpusd', kraken: 'GBPUSD' }, usdcad: { sym: '
 // the broad dollar index weekly on Monday for the week before; the OECD confidence index about six weeks after its month.
 export const LAG = { DFII10: 2, DGS2: 2, DGS10: 2, T10YIE: 2, T10Y3M: 2, BAMLH0A0HYM2: 2, VIXCLS: 2, VXVCLS: 2, DTWEXBGS: 10, WALCL: 2, RRPONTSYD: 2, WTREGEN: 2, SOFR: 2, EFFR: 2, SWPT: 2, BSCICP03DEM665S: 45 };
 export const FRED = Object.keys(LAG);
+// "GOLD" matches more than one contract (COMEX 100 oz and the micro): one row per report date, the largest book (8 Nov: the micro's
+// ~−1k net was read as gold, 0th percentile). Old cached rows without gross keep the row with the largest |net|.
+export function cotMain(rows) { const by = new Map(); for (const r of rows || []) { const k = r.t, sz = r.gross != null ? r.gross : Math.abs(r.net), o = by.get(k); if (!o || sz > (o.gross != null ? o.gross : Math.abs(o.net))) by.set(k, r); }
+  return [...by.values()].sort((a, b) => a.t - b.t); }
 const COT_LAG = 4;   // CFTC: Tuesday positions, released Friday
 
 export const iso = (t) => new Date(t * 1000).toISOString().slice(0, 10);
@@ -228,7 +232,7 @@ export function features(data, D, opt = {}) {
   // global dollar liquidity: Fed balance sheet − reverse repo − Treasury General Account, $bn, 4-week change
   const netAt = (t) => { const w = F('WALCL').at(t), r = F('RRPONTSYD').at(t), g = F('WTREGEN').at(t); return w && r && g ? w.v / 1000 - r.v - g.v / 1000 : null; };
   const cut = D - 2 * DAY, liqNow = netAt(cut), liq4 = netAt(cut - 28 * DAY);
-  const cotRows = (data.cot || []).filter((r) => r.t <= D - COT_LAG * DAY);
+  const cotRows = cotMain(data.cot || []).filter((r) => r.t <= D - COT_LAG * DAY);
   let cot = null;
   if (cotRows.length >= 5) { const w = cotRows.slice(-60), now = w[w.length - 1], m4 = w[Math.max(0, w.length - 5)], s = w.map((r) => r.net).sort((a, b) => a - b);
     cot = { net: now.net, chg4w: now.net - m4.net, pct: Math.round(Math.max(0, s.findIndex((v) => v >= now.net)) / Math.max(1, s.length - 1) * 100), asOf: iso(now.t) }; }
@@ -690,9 +694,9 @@ export async function gather(fetchImpl, now, cache = {}) {
   const q = 'https://publicreporting.cftc.gov/resource/72hh-3qpy.json?$select=report_date_as_yyyy_mm_dd,m_money_positions_long_all,m_money_positions_short_all'
     + '&$where=' + encodeURIComponent("commodity_name='GOLD'") + '&$order=' + encodeURIComponent('report_date_as_yyyy_mm_dd DESC') + '&$limit=200';
   const c = await get(fetchImpl, q, 'json', 15000);
-  if (Array.isArray(c.body) && c.body.length) { data.cot = c.body.map((r) => ({ t: Date.parse(String(r.report_date_as_yyyy_mm_dd).slice(0, 10) + 'T00:00:00Z') / 1000, net: (+r.m_money_positions_long_all || 0) - (+r.m_money_positions_short_all || 0) }))
-    .filter((r) => isFinite(r.t)).sort((a, b) => a.t - b.t); src.cot = `ok (${data.cot.length} weeks)`; }
-  else if (Array.isArray(cache.cot) && cache.cot.length) { data.cot = cache.cot; src.cot = `failed (${c.err || 'empty'}), using cache`; }
+  if (Array.isArray(c.body) && c.body.length) { data.cot = c.body.map((r) => ({ t: Date.parse(String(r.report_date_as_yyyy_mm_dd).slice(0, 10) + 'T00:00:00Z') / 1000, net: (+r.m_money_positions_long_all || 0) - (+r.m_money_positions_short_all || 0), gross: (+r.m_money_positions_long_all || 0) + (+r.m_money_positions_short_all || 0) }))
+    .filter((r) => isFinite(r.t)); data.cot = cotMain(data.cot); src.cot = `ok (${data.cot.length} weeks)`; }
+  else if (Array.isArray(cache.cot) && cache.cot.length) { data.cot = cotMain(cache.cot); src.cot = `failed (${c.err || 'empty'}), using cache`; }
   else src.cot = `failed (${c.err || 'empty'})`;
   return { data, src };
 }

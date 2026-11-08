@@ -23,6 +23,7 @@ import path from 'node:path';
 import { injectSection } from './analyst.mjs';
 import { dailyRows, dxyDaily, isoDay } from './macroscore.mjs';
 import { outlook } from './outlook.mjs';
+import { cotMain } from './macro.mjs';
 
 const DAY = 86400;
 // the batch revision this port follows (research/macro-veteran/SKILL.md); 1.2 = the owner's 8 Nov evening upload
@@ -326,7 +327,7 @@ export function build({ fc, cache, daily, ledger = [], debates = [], now }) {
   const gold = (daily && daily.gold) || [];
   S.gold = gold; S.dxy = daily && daily.dxy ? daily.dxy : [];
   if (gold.length >= 50) { const w = gold.filter((o) => o.t <= now).slice(-50); S.avg10w = w.reduce((a, o) => a + o.v, 0) / w.length; }
-  const cotRows = (cache && cache.cot || []).filter((r) => r.t <= now - 4 * DAY);
+  const cotRows = cotMain(cache && cache.cot || []).filter((r) => r.t <= now - 4 * DAY);
   if (cotRows.length >= 5) { const w = cotRows.slice(-60), cur = w[w.length - 1], m4 = w[Math.max(0, w.length - 5)], s = w.map((r) => r.net).sort((a, b) => a - b);
     S.cot = { net: cur.net, chg4w: cur.net - m4.net, pct: Math.round(Math.max(0, s.findIndex((v) => v >= cur.net)) / Math.max(1, s.length - 1) * 100), asOf: isoDay(cur.t) }; }
   const ch = channels(S, now), fp = fingerprint(ch.changes), base = baseRates(gold, { now });

@@ -18,3 +18,8 @@ test('sessions skip weekends; too little history gives no calls', () => {
   const o = outlook({ gold, dxy: [], now, tilt20: 0.08, ch: { list: [] }, fc: { goldScore: { score: 0.6 } } });
   assert.equal(o.week.list.length, 7); assert.equal(o.digest.list[0].says, 'a tested long edge');
 });
+test('COT keeps the main gold contract when the micro shares the report date', async () => {
+  const { cotMain } = await import('../council/macro.mjs');
+  const r = cotMain([{ t: 2, net: -118 }, { t: 1, net: 104206 }, { t: 1, net: -1 }, { t: 2, net: 105562, gross: 200000 }]);
+  assert.deepEqual(r.map((x) => x.net), [104206, 105562]);
+});
