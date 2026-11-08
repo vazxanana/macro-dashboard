@@ -2850,6 +2850,7 @@ html[data-motion="off"] #v-ict .ict-cal-d:hover { transform: none !important; }
         </details>
         <p class="ms-note" id="ms-rep-vol"></p>
         <p class="ms-note" id="ms-rep-w1"></p>
+        <p class="ms-note" id="ms-rep-mosha"></p>
         <div class="c-kpi" id="ms-rep-kpi"></div>
         <div class="rep-track" id="ms-rep-track" aria-label="Live replica results against the replay expectation"></div>
         <p class="ms-note" id="ms-rep-track-txt"></p>
@@ -6483,6 +6484,14 @@ function msNextSetup(bars, A) {
       set('ms-rep-vol', v == null ? 'Gold volatility: waiting for the Trader.' : `Gold volatility now: <b>${v.toFixed(2)}%</b> average daily range${mn == null ? '' : ` (gate ${mn.toFixed(2)}%${sn.goldVolMin ? '' : ', the top fifth of gold’s own last year'}) · <b class="${v >= mn ? 'pos' : 'neg'}">${v >= mn ? 'trading live' : 'calm: research only'}</b>`}`);
       const w = sn.goldW1;
       set('ms-rep-w1', !w ? 'Weekly structure: waiting for the Trader.' : `Weekly structure now: <b class="${w > 0 ? 'pos' : 'neg'}">${w > 0 ? 'bullish' : 'bearish'}</b> · the Mosha BO system takes only <b>${w > 0 ? 'buys' : 'sells'}</b>${sn.goldW1Src && sn.goldW1Src !== 'cnbc-spot' ? ` (read from ${sn.goldW1Src === 'paxg' ? 'PAXG' : 'OANDA daily'} candles: the CNBC spot feed failed this run)` : ''}`); }
+      // Mosha BO chain (8 Nov, snapshot.moshaBo.state): where the H4 -> H1 -> M15 walk stands between trades, same words as council/mosha.mjs
+      { const m = sn.moshaBo && sn.moshaBo.state, side = (d) => (d < 0 ? 'sell' : 'buy'), when = (t) => new Date(t * 1000).toISOString().slice(5, 16).replace('T', ' ') + ' UTC';
+        const wk = !m || m.w1 == null || m.stage === 'h4' ? '' : m.w1 === m.dir ? ' Weekly structure agrees.' : ' Weekly structure is against it: the trade would be recorded as a shadow.';
+        const pos = m && (m.open || m.pending) ? ` ${m.open ? `${m.open} open` : ''}${m.open && m.pending ? ', ' : ''}${m.pending ? `${m.pending} pending` : ''} live.` : '';
+        set('ms-rep-mosha', !m ? 'Mosha BO chain: waiting for the Trader.' : m.stage === 'h4' ? 'Mosha BO chain: waiting for an H4 BO.' + pos
+          : m.stage === 'h1' ? `Mosha BO chain: H4 BO <b>${side(m.dir)}</b> at ${m.h4.level} (${when(m.h4.t)}); waiting for the H1 BO the other way (the retracement).${wk}${pos}`
+          : m.stage === 'm15' ? `Mosha BO chain: H4 BO <b>${side(m.dir)}</b> (${when(m.h4.t)}), H1 retracement BO (${when(m.h1.t)}); waiting for the M15 BO back <b>${side(m.dir)}</b>.${wk}${pos}`
+          : `Mosha BO chain complete: M15 BO <b>${side(m.dir)}</b> at ${m.m15.level} (${when(m.m15.t)}) after the H4 BO (${when(m.h4.t)}) and H1 retracement (${when(m.h1.t)}); the trade is in the record, or blocked (weekly, cap, price or momentum) as a shadow.${wk}${pos}`); }
     set('ms-rep-kpi', `<div><span>Live trades</span><b>${L.length}${L.length - done.length ? ` <small>(${L.length - done.length} open)</small>` : ''}</b></div><div><span>Win rate</span><b>${done.length ? Math.round(w / done.length * 100) + '%' : '—'}</b></div><div><span>Total</span><b class="${R > 0 ? 'pos' : R < 0 ? 'neg' : ''}">${done.length ? fR(R) : '—'}</b></div><div><span>Per trade</span><b>${done.length ? fR(R / done.length) : '—'}</b></div>`);
     renderTrack();
     const rp = C.snap && C.snap.research && C.snap.research.replica;
