@@ -45,6 +45,15 @@
     const c = { ...p, exit: px, closedAt: t, reason, gross: r2(gross), net: r2(net), R: p.r0 ? r2((px - p.entry) * (p.side === 'buy' ? 1 : -1) / p.r0, 2) : null, holdBars: p.holdBars || 0 };
     a.closed.push(c); a.positions = a.positions.filter((x) => x.id !== p.id); return c;
   }
+  // close part of a position: the closed part becomes its own journal record (same entry, R on the full stop distance)
+  function closePartial(a, p, px, t, fraction, reason = 'partial') {
+    const f = Math.min(0.999, Math.max(0.001, fraction || 0.5)), part = { ...p, units: p.units * f, id: p.id, partial: true };
+    const gross = pnl(part, px), net = gross - a.commission; a.balance = r2(a.balance + net);
+    const c = { ...part, exit: px, closedAt: t, reason, gross: r2(gross), net: r2(net), R: p.r0 ? r2((px - p.entry) * (p.side === 'buy' ? 1 : -1) / p.r0, 2) : null, holdBars: p.holdBars || 0, note: `${p.note || ''} (${Math.round(f * 100)}% closed)`.trim() };
+    a.closed.push(c); p.units = p.units * (1 - f); p.scaled = (p.scaled || 0) + f; return c;
+  }
+  // trailing stop: p.trail = price distance; after each bar the stop follows the best price at that distance, never backwards
+  function trail(p, b) { if (!(p.trail > 0)) return; const dir = p.side === 'buy' ? 1 : -1, cand = dir === 1 ? b.high - p.trail : b.low + p.trail; if ((cand - p.stop) * dir > 0) p.stop = cand; }
   // one new bar: fill resting orders that the bar's range touches, then stops / targets on open positions (worst case when both)
   function onBar(a, b) {
     const out = [];
@@ -60,6 +69,7 @@
       if (hitS && hitT) { const sl = a.slFirst; out.push({ kind: 'close', trade: close(a, p, sl ? p.stop : p.target, b.time, sl ? 'stop (both in one bar)' : 'target (both in one bar)') }); }
       else if (hitS) { const px = dir === 1 ? Math.min(p.stop, b.open) : Math.max(p.stop, b.open); out.push({ kind: 'close', trade: close(a, p, px, b.time, px === p.stop ? 'stop' : 'stop (gap)') }); }
       else if (hitT) out.push({ kind: 'close', trade: close(a, p, p.target, b.time, 'target') });
+      else trail(p, b);
     }
     return out;
   }
@@ -75,7 +85,8 @@
     const Rs = closed.map((t) => t.R).filter((x) => x != null), netR = r2(Rs.reduce((s, x) => s + x, 0));
     const by = (f) => { const o = {}; for (const t of closed) { const k = f(t); if (k == null) continue; o[k] = o[k] || { n: 0, net: 0, wins: 0, R: 0 }; o[k].n++; o[k].net = r2(o[k].net + t.net); o[k].R = r2(o[k].R + (t.R || 0)); if (t.net > 0) o[k].wins++; } return o; };
     const hourOf = (t) => new Date(t.openedAt * 1000).getUTCHours(), dayOf = (t) => new Date(t.openedAt * 1000).getUTCDay();
-    return { n, wins: wins.length, losses: losses.length, winRate: n ? r2(wins.length / n, 3) : null, net, netR, avgR: Rs.length ? r2(netR / Rs.length, 2) : null,
+    const holdAvg = n ? r2(closed.reduce((s, t) => s + (t.holdBars || 0), 0) / n, 1) : null, rDist = {}; for (const x of Rs) { const k = x <= -1 ? '≤-1R' : x < 0 ? '-1..0' : x < 1 ? '0..1R' : x < 2 ? '1..2R' : x < 3 ? '2..3R' : '≥3R'; rDist[k] = (rDist[k] || 0) + 1; }
+    return { n, holdAvg, rDist, wins: wins.length, losses: losses.length, winRate: n ? r2(wins.length / n, 3) : null, net, netR, avgR: Rs.length ? r2(netR / Rs.length, 2) : null,
       profitFactor: gl > 0 ? r2(gw / gl) : gw > 0 ? Infinity : null, expectancy: n ? r2(net / n) : null, avgWin: wins.length ? r2(gw / wins.length) : null, avgLoss: losses.length ? r2(gl / losses.length) : null,
       best: n ? Math.max(...closed.map((t) => t.net)) : null, worst: n ? Math.min(...closed.map((t) => t.net)) : null, maxDD: r2(dd), maxDDPct: start ? r2(dd / start * 100, 2) : null, bestStreak, worstStreak: -worstStreak,
       avgMfe: n ? r2(closed.reduce((s, t) => s + (t.mfe || 0), 0) / n, 2) : null, avgMae: n ? r2(closed.reduce((s, t) => s + (t.mae || 0), 0) / n, 2) : null, curve,
@@ -116,6 +127,6 @@
   }
   function consistencyOf(ch, a) { const days = Object.values(ch.days).map((d) => d.net).filter((x) => x > 0), tot = Object.values(ch.days).reduce((s, d) => s + d.net, 0); return tot > 0 && days.length ? r2(Math.max(...days) / tot, 3) : 0; }
 
-  const BT = { FIRMS, newAccount, units, place, cancel, close, onBar, equity, pnl, stats, byDay, dayKey, newChallenge, evaluate, r2 };
+  const BT = { FIRMS, newAccount, units, place, cancel, close, closePartial, trail, onBar, equity, pnl, stats, byDay, dayKey, newChallenge, evaluate, r2 };
   if (typeof module !== 'undefined' && module.exports) module.exports = BT; else root.BT = BT;
 })(typeof globalThis !== 'undefined' ? globalThis : this);

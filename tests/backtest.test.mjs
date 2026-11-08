@@ -76,3 +76,12 @@ test('Topstep rules: trailing EOD drawdown locks at the start balance; consisten
   day(0, 2900); day(1, 150); assert.equal(ch.status, 'live'); assert.match(ch.progress.waiting, /best day/);
   for (let d = 2; d < 6; d++) day(d, 800); assert.equal(ch.status, 'funded');
 });
+
+test('partial close books its own record and leaves the rest running; a trailing stop follows the highs and never retreats', () => {
+  const a = BT.newAccount(10000); const p = BT.place(a, { side: 'buy', type: 'market', price: 100, stop: 99, target: 104, units: 100 }, T0);
+  const c = BT.closePartial(a, p, 101, T0 + H, 0.5); assert.equal(c.net, 50); assert.equal(c.R, 1); assert.equal(p.units, 50); assert.equal(a.balance, 10050); assert.equal(a.positions.length, 1); assert.match(c.note, /50% closed/);
+  p.trail = 1.5; BT.onBar(a, bar(T0 + 2 * H, 101, 102.5, 100.8, 102)); assert.equal(p.stop, 101, 'stop trails to high - 1.5');
+  BT.onBar(a, bar(T0 + 3 * H, 102, 102.2, 101.5, 101.8)); assert.equal(p.stop, 101, 'never backwards');
+  const ev = BT.onBar(a, bar(T0 + 4 * H, 101.8, 101.9, 100.5, 100.7)); assert.equal(ev[0].trade.reason, 'stop'); assert.equal(ev[0].trade.exit, 101); assert.equal(ev[0].trade.net, 50);
+  const s = BT.stats(a.closed, 10000); assert.equal(s.n, 2); assert.equal(s.holdAvg, 1.5); assert.deepEqual(s.rDist, { '1..2R': 2 });
+});
