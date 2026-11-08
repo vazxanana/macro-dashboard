@@ -667,3 +667,14 @@ test('books and accounts: every trade has one book; accounts come from config.js
   assert.match(mirrorAlertText({ kind: 'reject', symbol: 'XAUUSD', side: 'buy', book: 'shadow', result: 'no' }, 0).title, /^Demo mirror \[shadow\]: order rejected/);
   assert.match(mirrorAlertText({ kind: 'reject', symbol: 'XAUUSD', side: 'buy', result: 'no' }, 0).title, /^Demo mirror: order rejected/);
 });
+
+test('accounts hand-over: a trade held on one account is managed there and never opened on another; openBooks limits new opens', async () => {
+  // the base account holds a shadow trade from before the split; the shadow account must not open it again
+  const b = broker(); let r = await mirrorRound({ env: ENV, trades: [tr({ id: 'sh1', shadow: true })], state: started, WS: b.WS, now: NOW });
+  assert.equal(r.state.map.sh1.status, 'open');
+  const b2 = broker(); const r2 = await mirrorRound({ env: ENV, trades: [tr({ id: 'sh1', shadow: true }), tr({ id: 'sh2', shadow: true }), tr({ id: 'live1' })], state: started, WS: b2.WS, now: NOW, openBooks: ['shadow'], exclude: new Set(['sh1']) });
+  assert.deepEqual(Object.keys(r2.state.map), ['sh2'], 'only the unheld shadow trade opens on the shadow account; the live trade is not its book');
+  // the base account, now opening only council trades, still manages the shadow trade it holds: the council closes it, the demo closes
+  r = await mirrorRound({ env: ENV, trades: [tr({ id: 'sh1', shadow: true, status: 'loss' }), tr({ id: 'sh3', shadow: true })], state: r.state, WS: b.WS, now: NOW + 240, openBooks: ['council'] });
+  assert.equal(r.state.map.sh1.status, 'closed by council'); assert.equal(r.state.map.sh3, undefined, 'no new shadow opens on the base account'); assert.equal(b.positions.size, 0);
+});
