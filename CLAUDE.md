@@ -690,4 +690,9 @@ and target presets (1 / 1.5 / 2 / 3 R), risk-% or unit sizing, Enter / Esc; open
 (`fixPos` / `fixOrd` keep them on the right side). Chart layers (`LAY`, localStorage `btLab:layers`): EMA 20 / 50, session bands
 (London 07-12, NY 12-21 UTC), PDH / PDL; OHLC legend. Risk-% sizing, open positions (BE, close, edit SL / TP), journal with
 editable tags / notes, statistics, calendar, challenge log, sessions in localStorage `btLab:sessions` (+ JSON / CSV export,
-import). Tests: `tests/backtest.test.mjs`. Paper only; nothing reaches the council or the mirror.
+import). Pass 2 (owner: "more improvements"): Undo (←, `UNDO` snapshots of account + challenge before each bar, 60 deep), Jump to a
+moment (`step(quiet)` without drawing; Skip day uses it too), a higher-timeframe context chart (`HTF`, H1 / H4 / D1 fetched for
+the same window, the current candle built from the replay bars so it is still forming; localStorage `btLab:htf`), per-position
+½ close (`closePartial`, its own journal record) and Trail (`p.trail` = 1 ATR, engine `trail()` after each bar), click a journal
+row to frame that trade on the chart, stats Avg hold and R spread (`holdAvg`, `rDist`). Tests: `tests/backtest.test.mjs`. Paper
+only; nothing reaches the council or the mirror.
