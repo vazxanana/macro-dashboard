@@ -1383,6 +1383,19 @@ document.addEventListener('DOMContentLoaded', function () {
   function esc1(c) { return c.replace(/[&<>"']/g, ''); }
   const greet = () => { const h = new Date().getHours(); return h < 5 ? 'Good night' : h < 12 ? 'Good morning' : h < 17 ? 'Good afternoon' : h < 22 ? 'Good evening' : 'Good night'; };
   const $ = (id) => document.getElementById(id);
+  // the photo and name also live on the server (/api/profile, 8 Nov: they reset because localStorage is per browser: Safari and
+  // the home-screen app keep separate copies, and Safari wipes it after a week). Local storage stays as the fast cache.
+  const API = /^https?:$/.test(location.protocol) && !/github\.io$/.test(location.hostname) ? location.origin + '/api/profile' : null;
+  const acct = () => { try { const h = localStorage.getItem('ms-admin'), u = localStorage.getItem('ms-user'); return who === 'guest' || !h ? null : { u: u || 'owner', h }; } catch (e) { return null; } };
+  function pushProfile(fields) { const a = acct(); if (!API || !a) return; fetch(API, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ u: a.u, h: a.h, ...fields }) }).catch(() => {}); }
+  function pullProfile() { const a = acct(); if (!API || !a) return;
+    fetch(API + '?u=' + encodeURIComponent(a.u), { headers: { 'X-MS-Auth': a.h }, cache: 'no-store' }).then((r) => (r.ok ? r.json() : null)).then((srv) => { if (!srv) return;
+      let changed = false; const lp = get('photo'), ln = get('name');
+      if (srv.photo && srv.photo !== lp) { try { localStorage.setItem(key('photo'), srv.photo); } catch (e) {} changed = true; }
+      if (srv.name && srv.name !== ln) { try { localStorage.setItem(key('name'), srv.name); } catch (e) {} changed = true; }
+      // first visit after the change: a photo or name that only this browser had goes up to the server once
+      const up = {}; if (!srv.photo && lp) up.photo = lp; if (!srv.name && ln) up.name = ln; if (Object.keys(up).length) pushProfile(up);
+      if (changed) { paint(); if ($('v-profile') && !$('v-profile').hidden && window.msProfile) window.msProfile(); } }).catch(() => {}); }
   function paint() {
     const photo = get('photo'), name = get('name') || defName;
     ['ms-me-av', 'ms-me-av2'].forEach((id, n) => { const el = $(id); if (el) el.innerHTML = photo ? `<img src="${photo}" alt="">` : svg(n); });
@@ -1395,7 +1408,7 @@ document.addEventListener('DOMContentLoaded', function () {
     const sm = document.querySelector('#ms-me > summary'); if (sm) sm.setAttribute('aria-label', `${greet()}, ${name}. Account menu`);
   }
   document.addEventListener('DOMContentLoaded', () => {
-    paint(); setInterval(paint, 60e3);
+    paint(); setInterval(paint, 60e3); pullProfile();
     const me = $('ms-me'); if (!me) return;
     me.addEventListener('toggle', () => { if (!me.open) return; const t = $('h-today') && $('h-today').innerText.trim() ? $('h-today') : $('g-today'); const fl = window.FLOAT;
       const pub = who === 'guest', tv = fl ? (pub ? fl.liveTot || 0 : fl.tot) : 0;
@@ -1410,12 +1423,12 @@ document.addEventListener('DOMContentLoaded', function () {
       const img = new Image(), url = URL.createObjectURL(f);
       img.onload = () => { const W = 160, H = 184, c = document.createElement('canvas'); c.width = W; c.height = H; const g = c.getContext('2d');
         const sc = Math.max(W / img.width, H / img.height), w = img.width * sc, h = img.height * sc; g.drawImage(img, (W - w) / 2, (H - h) / 2, w, h);
-        put('photo', c.toDataURL('image/jpeg', 0.86)); URL.revokeObjectURL(url); $('ms-me-file').value = ''; paint(); };
+        const du = c.toDataURL('image/jpeg', 0.86); put('photo', du); pushProfile({ photo: du }); URL.revokeObjectURL(url); $('ms-me-file').value = ''; paint(); };
       img.onerror = () => { alert("That file isn't an image this browser can read."); URL.revokeObjectURL(url); };
       img.src = url;
     });
-    $('ms-me-rmphoto').addEventListener('click', () => { put('photo', null); paint(); });
-    $('ms-me-rename').addEventListener('click', () => { const n = prompt('Display name', get('name') || defName); if (n === null) return; put('name', n.trim().slice(0, 24) || null); paint(); });
+    $('ms-me-rmphoto').addEventListener('click', () => { put('photo', null); pushProfile({ photo: null }); paint(); });
+    $('ms-me-rename').addEventListener('click', () => { const n = prompt('Display name', get('name') || defName); if (n === null) return; const v = n.trim().slice(0, 24) || null; put('name', v); pushProfile({ name: v }); paint(); });
     $('ms-me-out').addEventListener('click', () => { me.open = false; const a = $('ms-admin-link'); if (a) a.click(); });
   });
 })();
