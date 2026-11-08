@@ -746,3 +746,11 @@ rename) keeps localStorage as the cache and uploads a browser-only photo once. T
 themed from page tokens: `await msAsk(label, value, {title, ok, type, max})` (null on cancel), `await msConfirm(msg, {title, ok, danger})`,
 `msAlert`, `msCopy` (clipboard fallback). `window.alert` routes to it. Don't add native `prompt(`/`confirm(` calls; the audit clicks
 `dialog.msd button.pri`.
+
+## Veteran's calls (8 Nov 2026, owner: week and month predictions with a % chance, plus a summary of the registry data)
+`council/outlook.mjs` (called from `council/veteran.mjs` build → `veteran.json.outlook`): dated gold calls for 5 and 20 trading days
+(close above today, near / stretch touch levels, middle-60% range, big move, DXY direction). Each p is gold's 10-year empirical
+frequency for that horizon plus the council tilt (veteran ledger probability − base rate, carrying the strategist's Gold Macro
+Score; half for the week), clamped 5–95%. `digest` turns the observed channels into a plain read with limits and lists what is
+not observed. Macro desk: "The veteran's calls" card and "What the pros' data says right now" in Close to the source.
+Tests: `tests/outlook.test.mjs`.

@@ -22,6 +22,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { injectSection } from './analyst.mjs';
 import { dailyRows, dxyDaily, isoDay } from './macroscore.mjs';
+import { outlook } from './outlook.mjs';
 
 const DAY = 86400;
 // the batch revision this port follows (research/macro-veteran/SKILL.md); 1.2 = the owner's 8 Nov evening upload
@@ -338,6 +339,7 @@ export function build({ fc, cache, daily, ledger = [], debates = [], now }) {
     scoreboard: board, teaching: teach,
     cpiPilot: cpiPilot(), skillVersion: SKILL_VERSION,
     source: `council/veteran.mjs: a code port of the owner's gptmacro_v.1 skill, revision ${SKILL_VERSION} (research/macro-veteran/); reads the strategist's data only, fetches nothing` };
+  { const pr = probability(verdict, base, fc && fc.goldScore); v.outlook = outlook({ gold, dxy: S.dxy, now, tilt20: base ? pr - base.upRate : 0, ch, fc }); }
   v.brief = briefOf(v);
   return { v, ledger: L, debates: Dh };
 }

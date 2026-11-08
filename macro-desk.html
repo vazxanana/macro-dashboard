@@ -154,6 +154,12 @@
   .st.agree { color: var(--buy); border-color: color-mix(in srgb, var(--buy) 50%, var(--line)); } .st.disagree { color: var(--sell); border-color: color-mix(in srgb, var(--sell) 50%, var(--line)); }
   .side { margin-top: 3px; color: var(--ink-dim); } .side small { display: inline-block; min-width: 72px; color: var(--ink-faint); font-size: 11px; text-transform: uppercase; letter-spacing: .02em; } .why { margin-top: 4px; color: var(--ink-faint); font-style: italic; font-size: 12.5px; }
   .insights { margin: 0; padding: 0 0 0 18px; color: var(--ink-dim); font-size: 13.5px; line-height: 1.6; } .insights li { margin: 4px 0; } .insights b { color: var(--ink); font-weight: 600; }
+  .calls { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 8px 28px; }
+  .pcall { list-style: none; margin: 6px 0 0; padding: 0; display: grid; gap: 9px; }
+  .pcall li { display: grid; grid-template-columns: 46px 1fr; gap: 4px 12px; align-items: center; font-size: 13.5px; }
+  .pcall b { font: 650 15px var(--mono, ui-monospace, monospace); font-variant-numeric: tabular-nums; text-align: right; }
+  .pcall i { grid-column: 2; display: block; height: 4px; border-radius: 3px; background: var(--line-soft); overflow: hidden; } .pcall i s { display: block; height: 100%; background: var(--accent, #e3b341); }
+  .dig { list-style: none; margin: 6px 0 14px; padding: 0; display: grid; gap: 8px; } .dig li { font-size: 13px; } .dig small { display: block; color: var(--ink-faint); }
   .src { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 12px 20px; margin-top: 8px; }
   .src article { padding: 10px 0 0; border-top: 1px solid var(--line-soft); font-size: 12.5px; } .src h4 { margin: 0 0 3px; font: 600 13px var(--sans); } .src p { margin: 3px 0; font-size: 12.5px; } .src .lag { color: var(--ink-faint); font-size: 11.5px; }
   .ev { list-style: none; margin: 6px 0 0; padding: 0; font-size: 13px; } .ev li { display: grid; grid-template-columns: 112px 1fr; gap: 10px; padding: 7px 0; border-top: 1px solid var(--line-soft); } .ev time { color: var(--ink-faint); font: 500 12px var(--mono); } .ev .pol { color: var(--accent); font-weight: 600; }
@@ -202,6 +208,10 @@
     <article class="card"><h2>Key insights today</h2><ul class="insights" id="insights"></ul></article>
   </div>
 
+  <section class="block card" id="c-calls" aria-labelledby="calls-h"><h2 id="calls-h">The veteran's calls <small id="calls-sub">specific, dated, with the chance of each happening</small></h2>
+    <div class="calls"><div><h3 id="calls-wk">This week</h3><ul class="pcall" id="calls-w"></ul></div><div><h3 id="calls-mo">This month</h3><ul class="pcall" id="calls-m"></ul></div></div>
+    <p class="note" id="calls-note"></p></section>
+
   <div class="tabs" role="tablist" aria-label="Sections">
     <button type="button" role="tab" data-t="debate" aria-selected="true">The discussion <span id="deb-n"></span></button>
     <button type="button" role="tab" data-t="source">Close to the source</button>
@@ -220,6 +230,8 @@
       <div><h3>Central-bank communications</h3><ul class="ev" id="news"></ul></div>
       <div><h3>Red-folder calendar</h3><ul class="ev" id="events"></ul></div>
     </div>
+    <h3>What the pros' data says right now (the veteran's summary)</h3>
+    <ul class="dig" id="dig"></ul>
     <h3>Hard-to-get public data the pros read (from the veteran's registry)</h3>
     <div class="src" id="src"></div>
   </section>
@@ -259,6 +271,15 @@
     ['CME FedWatch / OIS pricing', 'Live. The policy path the market has priced.', 'A priced cut is not a dovish surprise; the reaction to a decision is the signal, not the decision.', 'https://www.cmegroup.com/markets/interest-rates/cme-fedwatch-tool.html'],
   ];
 
+  // the veteran's dated calls and his summary of the registry data (council/outlook.mjs)
+  function renderCalls(v) {
+    var o = v && v.outlook, sec = $('c-calls'); if (!o || !o.week) { sec.hidden = true; return; } sec.hidden = false;
+    var li = function (c) { var p = Math.round(c.p * 100); return '<li><b>' + p + '%</b><span>' + esc(c.claim) + '</span><i><s style="width:' + p + '%"></s></i></li>'; };
+    $('calls-wk').textContent = 'This week · to ' + o.week.by; $('calls-w').innerHTML = o.week.list.map(li).join('');
+    $('calls-mo').textContent = 'This month · to ' + o.month.by; $('calls-m').innerHTML = o.month.list.map(li).join('');
+    $('calls-note').textContent = o.method + (o.tilt ? ' Council tilt now ' + (o.tilt > 0 ? '+' : '') + Math.round(o.tilt * 100) + ' points.' : ' Council tilt now zero: the strategist sees no tested edge, so these are the honest base rates.') + ' Paper only, not advice.';
+    var d = o.digest || { list: [] }; $('dig').innerHTML = d.list.map(function (r) { return '<li><b>' + esc(r.src) + ':</b> ' + esc(r.read) + ' → <b>' + esc(r.says) + '</b><small>' + esc(r.limit || '') + '</small></li>'; }).join('') + (d.missing && d.missing.length ? '<li><small>Not observed by the council yet: ' + esc(d.missing.join(', ')) + '. The veteran does not guess them.</small></li>' : '');
+  }
   function renderStrip(fc, v) {
     var out = [], vd = v && v.verdict, gs = fc && fc.goldScore;
     if (vd) out.push('<span class="pill ' + (vd.bias === 'BUY' ? 'buy' : '') + '">Consensus <b>' + esc(vd.bias) + (vd.conviction ? ' ' + esc(vd.conviction) : '') + '</b><small>' + vd.agree + ' agree · ' + vd.qualify + ' qualify · ' + vd.disagree + ' disagree</small></span>');
@@ -335,7 +356,7 @@
     Promise.all([get('macro/forecast.json'), get('macro/veteran.json'), get('macro/cache.json'), get('macro/veteran-ledger.json')]).then(function (x) {
       var fc = x[0], v = x[1], cache = x[2], L = x[3];
       $('when').textContent = fc && fc.at ? 'strategist ' + ago(fc.at) + (v && v.at ? ' · veteran ' + ago(v.at) : '') : 'No macro data yet';
-      renderStrip(fc, v); renderStrat(fc); renderVet(v); renderDebate(v); renderInsights(fc, v, cache); renderSource(fc, cache); renderLedger(v, L);
+      renderStrip(fc, v); renderStrat(fc); renderVet(v); renderDebate(v); renderInsights(fc, v, cache); renderSource(fc, cache); renderLedger(v, L); renderCalls(v);
       $('foot').textContent = 'Paper only. The strategist and the veteran change no rule, size or trade; the owner decides. Data: council-data macro/forecast.json, macro/veteran.json, macro/cache.json, macro/veteran-ledger.json.';
     });
   }
