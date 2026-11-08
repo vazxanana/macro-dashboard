@@ -379,7 +379,10 @@ export function executionStats(map, { since = 0 } = {}) {
     medianLagSec: lag.length ? med(lag) : null, bySymbol: Object.fromEntries(Object.entries(by).map(([k, a]) => [k, { n: a.length, meanSlipR: +(a.reduce((x, y) => x + y, 0) / a.length).toFixed(3) }])) };
 }
 
-export async function mirrorRound({ env, trades, state, tokens, specs = null, WS = globalThis.WebSocket, now = Math.floor(Date.now() / 1000), timeout, onTokens, shadows = true, marks = null }) {
+// openBooks: only trades of these books are opened here (every trade is still managed: closes, stop moves, cancels for what this
+// account already holds, so a book moved to another account hands over without orphans); exclude: ids another account holds
+// (never opened twice across accounts)
+export async function mirrorRound({ env, trades, state, tokens, specs = null, WS = globalThis.WebSocket, now = Math.floor(Date.now() / 1000), timeout, onTokens, shadows = true, marks = null, openBooks = null, exclude = null }) {
   const scrub = scrubber(env), log = [], say = (msg, x = {}) => log.push({ at: new Date(now * 1000).toISOString(), msg: scrub(msg), ...x });
   const st = { map: {}, day: null, startedAt: null, ...(state || {}) };
   const out = { state: st, tokens: tokens || null, log, sent: [], alerts: [] };
@@ -540,6 +543,7 @@ export async function mirrorRound({ env, trades, state, tokens, specs = null, WS
     // every open council trade not yet copied or skipped is eligible, whatever its age (8 Nov, owner: "even the ones active now");
     // a pending council trade (not ICT) is eligible for a resting LIMIT order at its entry
     const fresh = trades.filter((t) => (!t.shadow || shadows) && (OPEN.has(t.status) || (t.status === 'pending' && !String(t.id).startsWith('ict:'))) && SYMBOLS[t.market]
+      && (!openBooks || openBooks.includes(bookOf(t))) && !(exclude && exclude.has(t.id))
       && !st.map[t.id] && !st.orders[t.id] && !(st.skipped || {})[t.id]
       && (t.side === 'buy' || t.side === 'sell') && t.stop != null && t.entry != null && Math.abs(t.entry - t.stop) > 0);
     if (shadows && !st.catchUpAt) { st.catchUpAt = iso; say(`catch-up round: ${fresh.length} open council trade${fresh.length === 1 ? '' : 's'} (shadows included) considered`); }
@@ -655,12 +659,16 @@ if (process.argv[1] && process.argv[1].endsWith('ctrader-mirror.mjs')) {
   let accFile = {}; try { accFile = JSON.parse(fs.readFileSync(new URL('./ctrader-accounts.json', import.meta.url), 'utf8')); } catch (e) {}
   const { groups } = accountsFor(process.env, { mirrorAccounts: { ...(accFile.mirrorAccounts || {}), ...(cfg.mirrorAccounts || {}) } }), allAlerts = [], base = String(process.env.CTRADER_ACCOUNT_ID || '').trim();
   let tokens = rd('tokens.json', null), summaryLines = [];
+  // what each account already holds (open / sent positions, resting orders): another account never opens the same trade
+  const fileOf = (acc) => (acc === base ? 'mirror.json' : `mirror-${acc}.json`), held = new Map();
+  for (const g of groups) { const st = (rd(fileOf(g.account), {}).state) || {}; held.set(g.account, new Set([...Object.entries(st.map || {}).filter(([, m]) => m.status === 'open' || m.status === 'sent').map(([id]) => id), ...Object.keys(st.orders || {})])); }
   for (const g of groups) {
-    const file = g.account === base ? 'mirror.json' : `mirror-${g.account}.json`, prev = rd(file, {});
+    const file = fileOf(g.account), prev = rd(file, {});
+    const exclude = new Set(); for (const [acc, ids] of held) if (acc !== g.account) for (const id of ids) exclude.add(id);
     const reset = applyReset(prev.state, resetFile);
     if (reset.applied) prev.log = (prev.log || []).concat({ at: new Date().toISOString(), msg: `owner reset ${resetFile.at}: ${reset.dropped} copied-trade records, the skip/wait notes and the day's start balance dropped; the open book is copied afresh` });
-    const mine = trades.filter((t) => g.books.includes(bookOf(t)));
-    const r = await mirrorRound({ env: { ...process.env, CTRADER_ACCOUNT_ID: g.account }, trades: mine, state: reset.state, tokens, specs: rd('symbols.json', null), onTokens: saveTokens, shadows, marks });
+    // every trade is passed (this account keeps managing what it already holds); only its books are opened here
+    const r = await mirrorRound({ env: { ...process.env, CTRADER_ACCOUNT_ID: g.account }, trades, state: reset.state, tokens, specs: rd('symbols.json', null), onTokens: saveTokens, shadows, marks, openBooks: g.books, exclude });
     if (r.tokens) tokens = r.tokens;
     fs.writeFileSync(path.join(CD, file), JSON.stringify({ account: g.account, books: g.books, state: r.state, log: (prev.log || []).concat(r.log).slice(-300), limits: LIMITS, symbols: SYMBOLS, execution: executionStats(r.state.map) }, null, 1));
     summaryLines.push(`${g.books.join('+')} (${g.account}): ${r.state.status}${r.sent.length ? ` · ${r.sent.length} sent` : ''}`);
