@@ -14,6 +14,9 @@
 // Entry styles: every signal also gets a twin entered at market (setup '<k>@mkt'), and resting orders that never fill
 // are kept as 0R rows (fill = 0), so the Coach can compare the two entry styles signal by signal.
 // Costs: every trade carries its spread in R (one spread per round trip: bid/ask), so results can be judged net.
+// Fills and exits (8 Nov): the Trader's rules, shared from council/fills.mjs (replayBar): a stop the candle opened beyond fills at
+// the open (first, break-even and trailing stops), a limit fill + target in one candle is missed, candles while spot gold / forex
+// is shut (Fri 17:00 - Sun 17:00 New York) are ignored.
 // Writes <dataDir>/backtest.json: expectancy by setup, by condition, by reward:risk, by market, for three
 // trade-management variants (no break-even, break-even at +1R, at +1.5R).
 import fs from 'node:fs';
@@ -25,7 +28,7 @@ import { krakenData as krakenLoad, krakenGap, basisSeries, aggregate } from './k
 import { m15Choch, m15cFeat as m15cOf } from './choch.mjs';
 import { cleanBars, LTF_CLEAN } from './clean.mjs';
 import { d1AdxFeat } from './adx.mjs';
-import { spreadOf, costOf } from './fills.mjs';
+import { spreadOf, costOf, spotClosed, spotSkip, replayBar } from './fills.mjs';
 import { newsFeat } from './events.mjs';
 
 const DIR = process.argv[2] || 'data', DAYS = +(process.argv[3] || 30);
@@ -160,24 +163,9 @@ async function oandaData(key) {
   return { calls: m1.calls + h1.calls + h4.calls + d1.calls, data: { '1m': m1, '5m': aggregate(m1, 300), '15m': aggregate(m1, 900), '30m': aggregate(m1, 1800), '1h': h1, '4h': h4, '1d': d1 } };
 }
 
-// One trade, managed on 1m candles, under one break-even variant
-function manage(v, tr, b) {
-  if (v.done) return;
-  const s = tr.side === 'sell', r0 = tr.r0;
-  if (v.pt) {   // partial: stop first, then the partial at +pt.at R, then the 10R cap; the stop moves after the candle's checks
-    const sg = s ? -1 : 1, fav = (s ? tr.entry - b.low : b.high - tr.entry) / r0, cap = tr.entry + sg * 10 * r0;
-    if (s ? b.high >= v.stop : b.low <= v.stop) { v.done = true; v.R = v.booked + v.size * (v.stop - tr.entry) * sg / r0; v.closed = b.time; return; }
-    if (v.size === 1 && fav >= v.pt.at) { v.booked = 0.5 * v.pt.at; v.size = 0.5; }
-    if (s ? b.low <= cap : b.high >= cap) { v.done = true; v.R = v.booked + v.size * 10; v.closed = b.time; return; }
-    v.best = Math.max(v.best, fav);
-    if (v.size < 1) { const ns = tr.entry + sg * Math.max(0, v.best - v.pt.trail) * r0; if ((ns - v.stop) * sg > 0) v.stop = ns; }
-    return;
-  }
-  if (s ? b.high >= v.stop : b.low <= v.stop) { v.done = true; v.R = v.beMoved ? 0 : -1; v.closed = b.time; return; }
-  const tgt = v.t2 && tr.t2 != null ? tr.t2 : tr.t1;
-  if (s ? b.low <= tgt : b.high >= tgt) { v.done = true; v.R = tgt === tr.t1 ? tr.rr : Math.abs(tgt - tr.entry) / r0; v.closed = b.time; return; }
-  if (v.be && !v.beMoved && ((s ? tr.entry - b.low : b.high - tr.entry) / r0) >= v.be) { v.stop = tr.entry; v.beMoved = true; }
-}
+// Trade management (pending fills, stops, targets, break-even and the paper pt1 exit) is replayBar / manageVariant in
+// council/fills.mjs since 8 Nov: the Trader's own fill and exit rules (gapped stops fill at the open, a limit fill + target in one
+// candle is missed, candles while spot gold / forex is shut are ignored), shared, not copied.
 
 // ─── Research setup: liquidity sweep → VR → BO (the user's marked gold trade, 2 Nov) ───
 // M30 wicks beyond a recent M30 swing high (low) and closes back inside it = the sweep; then M5 breaks structure the
@@ -423,23 +411,8 @@ for (const [key, M] of Object.entries(MARKETS)) {
       const off = offAt ? offAt(t) : 0;   // gold: the spot offset of this step (the live Trader manages on its run's shifted candles)
       while (i1 < m1.length && m1[i1].time < t) {
         const b = off ? shiftBar(m1[i1++], off) : m1[i1++];
-        for (const tr of open) {
-          if (tr.status === 'pending') {
-            if (b.time < tr.opened) continue;
-            const s = tr.side === 'sell';
-            if (s ? b.high >= tr.entry : b.low <= tr.entry) { tr.status = 'open'; tr.filled = b.time; }
-            else if (s ? b.low <= tr.t1 : b.high >= tr.t1) { tr.status = 'missed'; continue; }
-            else { if (b.time - tr.opened > (WAIT[tr.h] || 86400)) tr.status = 'expired'; continue; }
-          }
-          // closed by the replay's own variants while the paper pt1 exit still runs: keep managing pt1 only (status, MFE and the
-          // signal checks below treat the trade as closed, exactly as before pt1 existed)
-          if (tr.status === 'closed') { for (const v of tr.v) manage(v, tr, b); continue; }
-          if (tr.status !== 'open') continue;
-          const s = tr.side === 'sell';
-          tr.mfe = Math.max(tr.mfe, (s ? tr.entry - b.low : b.high - tr.entry) / tr.r0);
-          for (const v of tr.v) manage(v, tr, b);
-          if (tr.v.every((v) => v.done || v.pt)) tr.status = 'closed';
-        }
+        const shut = M.group !== 'Crypto' && spotSkip(b.time);   // gold / forex: a candle while spot is shut fills and stops nothing, as live
+        for (const tr of open) replayBar(tr, b, { shut, wait: WAIT[tr.h] || 86400 });
         for (let k = open.length - 1; k >= 0; k--) if (open[k].status !== 'pending' && open[k].status !== 'open' && !(open[k].status === 'closed' && open[k].v.some((v) => !v.done))) { const tr = open.splice(k, 1)[0]; if (tr.status === 'closed') (tr.twin ? twins : all).push(tr); else if (!tr.twin) { tr.v.forEach((v) => { v.R = 0; }); tr.cost = 0; unfilled.push(tr); } }
       }
       if (i1 < WIN) continue;
@@ -520,8 +493,12 @@ for (const [key, M] of Object.entries(MARKETS)) {
         x.caught.push({ setup: tr.k, opened: tr.opened, entry: +tr.entry.toFixed(2), stop: +tr.stop.toFixed(2), target: +tr.t1.toFixed(2), rr: +tr.rr.toFixed(2), filled: !!tr.filled, R: tr.v[0].R == null ? null : +tr.v[0].R.toFixed(2), status: tr.status });
     }
     for (const tr of open) if (tr.status === 'closed') (tr.twin ? twins : all).push(tr); else stillOpen.push(tr);   // closed with pt1 still running: R_pt1 null
-    meta[key] = { steps, trades: all.filter((x) => x.m === key).length, open: open.filter((x) => x.status !== 'closed').length };
-    console.log(`${key}: ${steps} steps, ${meta[key].trades} closed trades, ${((Date.now() - t0wall) / 1000).toFixed(0)}s`);
+    // fill checks (8 Nov, the Trader's snapshot.fillChecks): R_none stops filled at a gapped open and the R lost beyond them, and limit
+    // orders missed because the fill candle also reached the target (live-style trades, twins left out)
+    const mine = all.filter((x) => x.m === key), gs = mine.filter((x) => x.v[0].gapR);
+    meta[key] = { steps, trades: mine.length, open: open.filter((x) => x.status !== 'closed').length,
+      gapStops: gs.length, gapR: +gs.reduce((a, x) => a + x.v[0].gapR, 0).toFixed(2), fillTarget: unfilled.filter((x) => x.m === key && x.fillTarget).length };
+    console.log(`${key}: ${steps} steps, ${meta[key].trades} closed trades (${meta[key].gapStops} gapped stops, ${meta[key].gapR}R past the stop; ${meta[key].fillTarget} fill+target misses), ${((Date.now() - t0wall) / 1000).toFixed(0)}s`);
   } catch (e) { meta.errors[key] = String(e.message || e); console.log(`${key}: ${e.message || e}`); }
 }
 
@@ -553,7 +530,7 @@ const out = {
 fs.writeFileSync(path.join(DIR, 'backtest.json'), JSON.stringify(out));
 // research (BT_DUMP): every filled live-style trade (no market twins) with its levels, cost and the replay's own result, for exit studies
 if (process.env.BT_DUMP) fs.writeFileSync(path.join(process.env.BT_DUMP, 'trades.json'), JSON.stringify({ from: out.from, to: out.to, source: meta.source, trades: all.concat(stillOpen.filter((x) => !x.twin && x.filled)).map((x) => ({
-  m: x.m, k: x.k, side: x.side, entry: x.entry, stop: x.stop, t1: x.t1, t2: x.t2, rr: x.rr, opened: x.opened, filled: x.filled, r0: x.r0, cost: x.cost, feat: x.feat, status: x.status, R: Object.fromEntries(x.v.map((v) => [v.n, v.R])) })) }));
+  m: x.m, k: x.k, side: x.side, entry: x.entry, stop: x.stop, t1: x.t1, t2: x.t2, rr: x.rr, opened: x.opened, filled: x.filled, r0: x.r0, cost: x.cost, feat: x.feat, status: x.status, R: Object.fromEntries(x.v.map((v) => [v.n, v.R])), gapR: Object.fromEntries(x.v.filter((v) => v.gapR).map((v) => [v.n, v.gapR])) })) }));
 console.log(`\n${all.length} trades over ${DAYS} days (${((Date.now() - t0wall) / 1000).toFixed(0)}s)`);
 console.log('overall', JSON.stringify(out.overall));
 for (const [k, v] of Object.entries(out.bySetup)) console.log(k.padEnd(9), Object.entries(v).map(([n, s]) => `${n} n${s.n} wr${s.wr} exp${s.exp}`).join(' | '));

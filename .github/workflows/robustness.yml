@@ -1,0 +1,64 @@
+name: Robustness audit
+
+# Re-runs only the robustness audit (research/robustness.mjs, ~1 min) when the audit or a research result it reads changes on
+# main, so a new study reaches research/robustness.json (scoreboard, owner digest) the same hour instead of after the nightly
+# replay (backtest.yml runs the same audit after every replay). Report only: it changes no rule. Free (public repo).
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'research/robustness.mjs'
+      - 'research/edge/**/result.json'
+      - '.github/workflows/robustness.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: robustness-audit
+  cancel-in-progress: false
+
+jobs:
+  robustness:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            research
+            council
+
+      - name: Checkout council data (only the files the audit reads)
+        uses: actions/checkout@v4
+        with:
+          ref: council-data
+          path: data
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            /backtest.json
+            /config.json
+            /ict/replay.json
+            /research/replay-2w.json
+            /research/backtest-150d.json
+            /research/backtest-150d-clean.json
+            /research/log.md
+            /research/robustness.json
+            /research/robustness.md
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Robustness audit
+        run: node research/robustness.mjs data --out data/research
+
+      - name: Save results
+        run: |
+          git -C data config user.name "mosha-council"
+          git -C data config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git -C data add research/robustness.json research/robustness.md
+          git -C data commit -q -m "Robustness audit (research change) $(date -u +%Y-%m-%dT%H:%MZ)" || exit 0
+          for j in 1 2 3 4 5; do git -C data pull -q --rebase origin council-data && git -C data push -q origin HEAD:council-data && break; sleep 7; done

@@ -61,6 +61,15 @@ export function observedValue(history, name) {
     .map((h) => +h.gross / ((h.side === 'sell' ? -1 : 1) * (+h.exit - +h.entry) * +h.lots)).filter((x) => x > 0).sort((a, b) => a - b);
   return v.length ? { n: v.length, perPointPerLot: +v[v.length >> 1].toPrecision(6) } : null;
 }
+// The contract-size check that works with the market shut: margin for one lot = units x price x quoteToDeposit / leverage, where the
+// leverage is the lower of the account's and the symbol's tier (tiers come in hundredths: 50000 = 1:500). Solved for the price, a
+// wrong unitsPerLot shows as a price 10x or 100x off the market. Needs marginPerLot, unitsPerLot, quoteToDeposit and the tiers.
+export function impliedPrice(e, accountLeverage) {
+  const tier = e && Array.isArray(e.leverageTiers) && e.leverageTiers.length ? +e.leverageTiers[0].leverage / 100 : null;
+  const lev = [tier, +accountLeverage].filter((x) => x > 0), L = lev.length ? Math.min(...lev) : null;
+  if (!e || !(e.marginPerLot > 0) || !(e.unitsPerLot > 0) || !(e.quoteToDeposit > 0) || !L) return null;
+  return +((e.marginPerLot * L) / (e.unitsPerLot * e.quoteToDeposit)).toPrecision(6);
+}
 const num = (v) => (v == null || v === '' || !Number.isFinite(+v) ? null : +v);
 const lotsOf = (v, lot) => (num(v) == null || !(lot > 0) ? null : +(+v / lot).toFixed(6));
 
@@ -160,8 +169,9 @@ export async function symbolSpecs({ env, tokens = null, prev = null, history = n
     }
     const file = { at, source: 'council/ctrader-symbols.mjs', broker: acc.broker || null, account: { currency: deposit, leverage: trader.leverageInCents ? trader.leverageInCents / 100 : null },
       markets, missing, symbols: out, errors };
+    for (const e of Object.values(out)) e.impliedPrice = impliedPrice(e, file.account.leverage);
     // the sample trade, sized by the mirror's own riskVolume with these specs
-    file.sample = { balance: SAMPLE.balance, riskPct: +(SAMPLE.risk * 100).toFixed(3), riskCash: +(SAMPLE.balance * SAMPLE.risk).toFixed(2), maxLots: LIMITS.maxLots };
+    file.sample = { balance: SAMPLE.balance, riskPct: +(SAMPLE.risk * 100).toFixed(3), riskCash: +(SAMPLE.balance * SAMPLE.risk).toFixed(2), maxLots: LIMITS.maxLots, maxMarginPct: LIMITS.maxMarginShare * 100 };
     for (const [name, e] of Object.entries(out)) {
       const stop = SAMPLE.stops[e.markets[0]], mid = e.bid > 0 && e.ask > 0 ? (e.bid + e.ask) / 2 : null;
       if (!stop) continue;

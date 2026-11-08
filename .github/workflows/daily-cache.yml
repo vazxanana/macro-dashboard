@@ -1,0 +1,65 @@
+name: Daily candle cache (research)
+
+# Weekly, free: keeps council-data research/daily/<sym>.json (OANDA D1 mid candles, full history, compact rows) for every market
+# in api/_oanda.js through the site's keyless /md/bars proxy (scripts/daily-cache.mjs), plus research/daily/_index.json with the
+# coverage and status per symbol. Studies read /cdata/research/daily/<sym>.json instead of calling OANDA. Failure-tolerant: a
+# market the proxy or OANDA rejects is listed as "error" in the index and the rest is saved. Changes no rule, trades nothing.
+on:
+  workflow_dispatch:
+    inputs:
+      symbols:
+        description: 'Only these page keys, space separated (empty = every mapped symbol)'
+        default: ''
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/daily-cache.yml'
+      - 'scripts/daily-cache.mjs'
+  schedule:
+    - cron: '17 3 * * 6'   # Saturday 03:17 UTC, after the Friday close
+# run marker (touching this file starts a run; the dispatch API is closed to the session token): 2026-11-07T22:55Z
+
+permissions:
+  contents: write
+
+concurrency:
+  group: daily-cache
+  cancel-in-progress: false
+
+jobs:
+  daily-cache:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            scripts
+            api
+
+      - name: Checkout council data (only the daily cache)
+        uses: actions/checkout@v4
+        with:
+          ref: council-data
+          path: data
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            /research/daily/*
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Refresh the daily candles
+        env:
+          SYMS: ${{ github.event.inputs.symbols }}
+        run: node scripts/daily-cache.mjs data $SYMS
+
+      - name: Save
+        run: |
+          git -C data config user.name "mosha-council"
+          git -C data config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git -C data add research/daily
+          git -C data commit -q -m "Daily candle cache $(date -u +%Y-%m-%dT%H:%MZ)" || exit 0
+          for j in 1 2 3 4 5; do git -C data pull -q --rebase origin council-data && git -C data push -q origin HEAD:council-data && break; sleep 7; done

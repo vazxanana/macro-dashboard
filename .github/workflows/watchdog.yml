@@ -1,0 +1,66 @@
+name: Council watchdog
+
+# Is the paper trader still running? (reliability, 8 Nov 2026) Reads the council-data branch only (snapshot.json, health.json,
+# trades.json, ict/snapshot.json) through council/health.mjs and sends ONE phone alert per state change ("Council stopped: last run
+# 47 min ago", "Council back", "Feed stale: gold 35 min"), deduplicated in council-data watchdog.json. It lives in its own small
+# workflow so it still fires when council.yml itself is broken or stuck; one short node step (~40 s), free minutes on a public repo.
+# Triggers: a 30-minute cron (GitHub fires this repo's crons a few times a day at best, so the other two matter), every completed
+# Council trader run except the routine pending-push cancellations (an immediate check after a hand-over, a failed run or the
+# cron watchdog), and a manual run. It restarts nothing: council.yml's own cron job does that; the message says how to by hand.
+on:
+  schedule:
+    - cron: '11,41 * * * *'
+  workflow_dispatch:
+  workflow_run:
+    workflows: [Council trader]
+    types: [completed]
+
+permissions:
+  contents: write   # the watchdog.json mark on council-data (never main)
+
+concurrency:
+  group: council-health
+  cancel-in-progress: false
+
+jobs:
+  check:
+    if: github.event_name != 'workflow_run' || github.event.workflow_run.conclusion != 'cancelled'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: council
+      - name: Checkout council data
+        uses: actions/checkout@v4
+        with:
+          ref: council-data
+          path: data
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Council health check
+        env:
+          NTFY_TOPIC: ${{ secrets.NTFY_TOPIC }}
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+          # the Council trader run that just completed (workflow_run trigger only): a failed / timed-out run is a problem of its own
+          LOOP_RUN_ID: ${{ github.event.workflow_run.id }}
+          LOOP_RUN_CONCLUSION: ${{ github.event.workflow_run.conclusion }}
+          LOOP_RUN_URL: ${{ github.event.workflow_run.html_url }}
+        run: node council/health.mjs data
+      - name: Save the mark
+        run: |
+          cd data
+          git config user.name "mosha-council"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add watchdog.json
+          if git diff --cached --quiet; then echo "watchdog.json unchanged"; exit 0; fi
+          git commit -q -m "Council watchdog $(date -u +%Y-%m-%dT%H:%MZ)"
+          # the loop pushes to council-data every few minutes: rebase onto it, abort a stuck rebase, try three times
+          for j in 1 2 3; do
+            git pull -q --rebase origin council-data || git rebase --abort || true
+            git push -q origin HEAD:council-data && exit 0
+            sleep 5
+          done
+          echo "could not push watchdog.json (the next check decides again)"

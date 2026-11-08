@@ -3,9 +3,10 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { createRequire } from 'node:module';
-import { symbolSpecs, lastTick, chainRate, observedValue, scheduleText, modeName, SAMPLE } from '../council/ctrader-symbols.mjs';
+import fs from 'node:fs';
+import { symbolSpecs, lastTick, chainRate, observedValue, scheduleText, modeName, impliedPrice, SAMPLE } from '../council/ctrader-symbols.mjs';
 import { costModel } from '../council/fills.mjs';
-import { SYMBOLS } from '../council/ctrader-mirror.mjs';
+import { SYMBOLS, riskVolume, specFor } from '../council/ctrader-mirror.mjs';
 const require = createRequire(import.meta.url);
 const { _t } = require('../api/ctrader-link.js');
 
@@ -97,7 +98,7 @@ test('dumps the specs of every symbol the mirror uses: lots, assets, mode, sched
   assert.deepEqual(n.observed, { n: 1, perPointPerLot: 1, matches: true });
   assert.equal(f.symbols.US30.tradingMode, 'CLOSE_ONLY_MODE');
   // the sample: 0.20% (1R) of $50k = $100. Gold, 32-point stop: $3,200 a lot -> 0.03 lot; US100, 160 points at $1: 0.625 -> 0.6 lot
-  assert.deepEqual(f.sample, { balance: 50000, riskPct: 0.2, riskCash: 100, maxLots: 5 });
+  assert.deepEqual(f.sample, { balance: 50000, riskPct: 0.2, riskCash: 100, maxLots: 5, maxMarginPct: 20 });
   assert.deepEqual(g.sample, { stop: SAMPLE.stops.xau, lots: 0.03, volume: 300, riskCash: 100, perLot: 3200, risked: 96 });
   assert.deepEqual(n.sample, { stop: 160, lots: 0.6, volume: 60, riskCash: 100, perLot: 160, risked: 96 });
   assert.equal(f.symbols.EURUSD.sample.lots, 0.5);   // 20 pips = $200 a lot
@@ -129,4 +130,45 @@ test('demo only: a live account is refused, and nothing runs when the mirror is 
   const s = _t.session(fakeBroker().WS, _t.HOSTS.demo);
   for (const pt of [2106, 2108, 2109, 2110, 2111]) await assert.rejects(s.send(pt, {}), /not a read/);
   s.close();
+});
+
+// ---- the real specs: Fusion Markets cTrader demo, first ctrader/symbols.json (7 Nov 2026 21:05 UTC, market shut: no quotes) ------
+const REAL = JSON.parse(fs.readFileSync(new URL('./fixtures/ctrader/symbols.json', import.meta.url), 'utf8'));
+
+test('real Fusion specs: a lot is lotSize/100 units; index CFDs are 1 unit ($1 a point a lot), gold 100 oz, forex 100,000', () => {
+  assert.equal(REAL.broker, 'Fusion Markets'); assert.deepEqual(REAL.account, { currency: 'USD', leverage: 500 }); assert.deepEqual(REAL.missing, {});
+  assert.equal(REAL.markets.nq, 'NAS100');   // Fusion lists NAS100, not US100
+  const want = { XAUUSD: [10000, 100, 'XAU', 'USD', 100], NAS100: [100, 1, 'NAS100', 'USD', 1], US500: [100, 1, 'US500', 'USD', 1], US30: [100, 1, 'US30', 'USD', 1],
+    US2000: [100, 1, 'US2000', 'USD', 1], EURUSD: [10000000, 100000, 'EUR', 'USD', 100000], USDCAD: [10000000, 100000, 'USD', 'CAD', null] };
+  for (const [n, [lot, units, base, quote, vpp]] of Object.entries(want)) {
+    const e = REAL.symbols[n];
+    assert.deepEqual([e.lotSize, e.unitsPerLot, e.base, e.quote, e.valuePerPoint], [lot, units, base, quote, vpp], n);
+    assert.deepEqual([e.minLots, e.stepLots, e.maxLots, e.tradingMode], [0.01, 0.01, 100, 'ENABLED'], n);
+  }
+  // the broker's own margin for one lot, solved for the price (1:500 gold / forex, 1:100 indices): the market's price level, so
+  // unitsPerLot is right (a 10-unit index lot would imply a tenth of the price)
+  const px = (n) => impliedPrice(REAL.symbols[n], REAL.account.leverage);
+  assert.equal(px('XAUUSD'), 4070.4); assert.equal(px('NAS100'), 26981); assert.equal(px('US500'), 7379); assert.equal(px('US30'), 51284); assert.equal(px('US2000'), 2752);
+  assert.equal(px('EURUSD'), 1.114); assert.equal(px('USDCAD'), null);   // CAD-quoted: no broker quote yet to convert with (weekend)
+});
+
+test('real Fusion specs: the mirror lot for a 0.20% (1R) ICT trade at $50k, and Meridian forex at 0.02%', () => {
+  const lotFor = (n, entry, stop, id = 'ict:x') => { const e = REAL.symbols[n];
+    return riskVolume({ info: e, t: { id, entry, stop, size: 1 }, balance: 50000, name: n, spec: specFor(REAL, n), now: Date.parse(REAL.at) / 1000 }); };
+  assert.equal(lotFor('NAS100', 26981, 26821).lots, 0.62);    // $100 / (160 pts x $1) = 0.625 -> 0.62
+  assert.equal(lotFor('US500', 7379, 7349).lots, 3.33);       // 30 pts: 3.33
+  assert.equal(lotFor('US30', 51284, 51084).lots, 0.5);       // 200 pts: 0.50
+  assert.equal(lotFor('US2000', 2752, 2734).lots, 5.55);   // 18 pts: 5.55 lots; margin 5.55 x $27.52 = $153, far under 20% of $50k (owner, 7 Nov: cap by risk)
+  // the margin cap: a 0.05 gold stop would need 20 lots ($16,282 margin at $814/lot) > 20% of $50k -> skipped; 0.1 -> 10 lots ($8,141) allowed
+  assert.match(lotFor('XAUUSD', 4070, 4069.95).skip, /19\.99 lot would use 162\d\d\.\d+ margin, over 20% of the balance/);
+  assert.equal(lotFor('XAUUSD', 4070, 4069.9).lots, 10);
+  // without the broker's margin (no spec) the old 5-lot cap still applies
+  assert.match(riskVolume({ info: REAL.symbols.US2000, t: { id: 'ict:x', entry: 2752, stop: 2734, size: 1 }, balance: 50000, name: 'US2000', spec: null }).skip, /5-lot cap \(the broker's margin is not known\)/);
+  assert.equal(lotFor('XAUUSD', 4070, 4038).lots, 0.03);      // $32 x 100 oz = $3,200 a lot -> 0.031 -> 0.03
+  assert.equal(lotFor('EURUSD', 1.114, 1.112, 'm1').lots, 0.05);   // Meridian 0.02% = $10, 20 pips = $200 a lot
+  assert.equal(lotFor('USDCAD', 1.38, 1.378, 'm2').lots, 0.06);    // USD base: 1 CAD = 1/1.38 USD, 20 pips = $144.9 a lot -> 0.069 -> 0.06
+  // the sample lots written in the file never risk more than the sample's 1R
+  for (const [n, e] of Object.entries(REAL.symbols)) if (e.sample && e.sample.lots != null) assert.ok(e.sample.risked <= REAL.sample.riskCash + 1e-9, n);
+  // no spread while the market is shut: the Trader keeps its default cost
+  assert.equal(costModel({ xau: { group: 'Metals', spot: true } }, { symbols: SYMBOLS, brokerInfo: REAL }).xau.src, 'default');
 });

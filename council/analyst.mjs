@@ -2,6 +2,7 @@
 // Reporting only: it reads snapshot.json, config.json and backtest.json and changes no rule or trade.
 // The Trader refreshes the block on every run, between the markers below, so the Analyst's weekly text stays as written.
 import { eventsBetween } from './events.mjs';
+import { moshaChainText } from './mosha.mjs';
 
 const START = '<!-- live-rule:start -->', END = '<!-- live-rule:end -->';
 const sessionOf = (t) => { const h = new Date(t * 1000).getUTCHours(); return h < 7 ? 'asia' : h < 12 ? 'london' : h < 16 ? 'overlap' : h < 21 ? 'newyork' : 'late'; };
@@ -123,6 +124,30 @@ export function deskSection({ ict = [], shadow = null, mirror = null, now = Math
     if (L.length) { out.push('', 'Last mirror events:'); for (const l of L) out.push(`- ${String(l.at).slice(5, 16).replace('T', ' ')} ${String(l.msg).replace(/\|/g, '/')}`); }
   }
   out.push(DESK_END);
+  return out.join('\n');
+}
+
+// ---- Replay fidelity (Analyst, 7 Nov) ------------------------------------------------------------------------------------
+// research/fidelity.json (council/fidelity.mjs, written after each replay) was read by nobody. The Analyst reports it: how often
+// the replay finds the live signals, on the same price feed and overall (with the main reasons for misses), whether the results
+// agree, which feed each market's replay used, and gaps in the live loop. Reporting only.
+export const FID_START = '<!-- fidelity:start -->', FID_END = '<!-- fidelity:end -->';
+const pct = (x) => (Number.isFinite(+x) ? `${Math.round(100 * x)}%` : 'n/a');
+export function fidelitySection({ fid = null, now = Math.floor(Date.now() / 1000) }) {
+  const out = [FID_START, '## Replay fidelity'];
+  if (!fid || !fid.counts) { out.push('', 'No fidelity check yet (research/fidelity.json is written after each nightly replay).', FID_END); return out.join('\n'); }
+  const w = fid.window || {}, c = fid.counts, m = fid.matchRate || {}, sf = fid.sameFeed || {}, o = (fid.agreement || {}).outcome || {};
+  const age = fid.at ? Math.round((now - Date.parse(fid.at) / 1000) / 3600) : null;
+  out.push('', `Checked ${String(fid.at || '').slice(0, 16).replace('T', ' ')} UTC${age != null && age >= 30 ? ` (**${age} h old**: the replay has not refreshed it)` : ''}; live signals ${String(w.from || '').slice(0, 10)} to ${String(w.to || '').slice(0, 10)}.`, '');
+  if (sf.live) out.push(`- **Same price feed** (the fair test): the replay found ${pct(sf.liveInReplay)} of ${sf.live} live signals; on ${sf.bothClosed || 0} closed pairs the result had the same sign ${pct(sf.signRate)} of the time (live ${sgn(sf.meanLiveR)}R vs replay ${sgn(sf.meanReplayR)}R a trade before costs).`);
+  out.push(`- **All markets:** ${pct((m.comparable || {}).liveInReplay ?? m.liveInReplay)} of comparable live signals found (${c.matched} matched of ${c.comparableLive ?? c.live}); outcome sign agrees ${pct(o.signRate)} on ${o.bothClosed || 0} closed pairs.`);
+  const rs = ((fid.unmatchedLive || {}).reasons || []).slice(0, 3);
+  if (rs.length) out.push(`- **Why live signals were missed:** ${rs.map((r) => `${r.cls} ${r.n}`).join(', ')} (of ${(fid.unmatchedLive || {}).n}).`);
+  const feeds = Object.entries(fid.perMarket || {}).map(([k, v]) => `${k} ${v.replayFeed || '?'}${v.liveFeeds ? ` / live ${Object.keys(v.liveFeeds).join('+')}` : ''}`);
+  if (feeds.length) out.push(`- **Feeds (replay / live):** ${feeds.join(' · ')}.`);
+  const gaps = (fid.liveRunGaps || []).filter((g) => Date.parse(g.to) / 1000 >= now - 2 * 86400);
+  out.push(gaps.length ? `- **Live loop gaps (48 h):** ${gaps.map((g) => `${String(g.from).slice(5, 16).replace('T', ' ')} for ${g.hours} h`).join(', ')}: no live signals were possible then.` : '- **Live loop gaps (48 h):** none.');
+  out.push(FID_END);
   return out.join('\n');
 }
 
@@ -364,4 +389,53 @@ export function analystSections(md, { trades = [], reviews = {}, owner = {}, now
   let nx = injectSection(md, postMortemSection({ reviews, owner, now }), PM_START, PM_END);
   if (!(i >= 0 && j > i && md.slice(i, j).includes(`for ${day} (UTC)`))) nx = injectSection(nx, whatChangedSection({ trades, now }), WC_START, WC_END);
   return nx;
+}
+
+// ---- Live gold systems now (Analyst, 8 Nov) ------------------------------------------------------------------------------
+// The "Live Scalp rule check" block describes a system the owner moved to shadow on 7 Nov, and nothing in the report said
+// where the systems that ARE live stand. One data-built row per Meridian system from the Trader's own snapshot blocks
+// (goldVol / goldW1, moshaBo, goldTrend, goldTrendFast, goldTL, goldEG, goldMP) and the live record: whether it is live, what it
+// is waiting for right now, and what it has on. Reporting only: nothing here changes a rule or a trade.
+export const GOLD_START = '<!-- gold-systems:start -->', GOLD_END = '<!-- gold-systems:end -->';
+const px2 = (v) => (Number.isFinite(+v) ? (+v).toFixed(2) : '—');
+export function goldSystemsSection({ snapshot, config, trades = [], research = [], now = Math.floor(Date.now() / 1000) }) {
+  if (!snapshot || !config) return '';
+  const sn = snapshot, T = Array.isArray(trades) ? trades : [], when = new Date(now * 1000).toISOString().slice(0, 16).replace('T', ' ');
+  const on = (k) => { const L = T.filter((x) => x.k === k && x.market === 'xau' && !x.shadow); const o = L.filter((x) => x.status === 'open').length, p = L.filter((x) => x.status === 'pending').length;
+    return !o && !p ? 'nothing on' : [o ? `${o} open` : '', p ? `${p} pending` : ''].filter(Boolean).join(', '); };
+  const st = (k) => (sn[k] && sn[k].state) || null, blocked = (x) => (x && x.blocked ? ` (blocked: ${x.blocked})` : '');
+  const rows = [];
+  // Gold replica: the volatility gate (the fixed leg goldVolMin when set, else the top-fifth percentile goldVolP; the lower opens it)
+  { const live = (config.replicaLive || []).includes('xau'), legs = [sn.goldVolMin, sn.goldVolP].filter((v) => v != null), gate = legs.length ? Math.min(...legs) : null;
+    const v = sn.goldVol, what = v == null ? 'volatility not read yet' : gate == null ? `20-day average daily range ${v.toFixed(2)}%` : v >= gate ? `gate open: ${v.toFixed(2)}% average daily range, gate ${gate.toFixed(2)}%` : `gate closed: ${v.toFixed(2)}% average daily range under the ${gate.toFixed(2)}% gate, so no new replica trade`;
+    rows.push(['Gold replica', live ? 'live' : 'off', what, on('replica')]); }
+  // Mosha BO: the H4 -> H1 -> M15 chain (snapshot.moshaBo.state, council/mosha.mjs) and the weekly direction
+  { const m = st('moshaBo'), w = sn.goldW1;
+    const what = !config.moshaBo ? '—' : m ? moshaChainText(m, w).replace(/^Mosha BO chain(?: complete)?: /, '') : w == null ? 'waiting for the Trader' : `weekly structure ${w > 0 ? 'bullish: buys only' : 'bearish: sells only'}`;
+    rows.push(['Mosha BO', config.moshaBo ? 'live' : 'off', what, on('mosha-bo')]); }
+  // Gold trend (N-day breakout, long only): a daily close above the N-day high enters; the state has the high and the last close
+  for (const [name, key, cfgKey, k, sh] of [['Gold trend', 'goldTrend', 'goldTrend', 'gtrend', false], ['Gold trend fast', 'goldTrendFast', 'goldTrendFast', 'gtrend5', !!config.goldTrendFastShadow]]) {
+    const c = config[cfgKey], x = st(key); if (!c) { rows.push([name, 'off', '—', '—']); continue; }
+    const what = !x ? 'waiting for the Trader' : x.open ? `in a trade, stop ${px2(x.stop)}` : x.hi20 == null ? 'not enough daily candles yet' : `waiting for a daily close above the ${c.n}-day high ${px2(x.hi20)} (last close ${px2(x.lastClose)})`;
+    rows.push([name, sh ? 'shadow' : 'live', what, sh ? 'paper only' : on(k)]); }
+  // Gold H4 trendline: a falling line through two H4 pivot highs; an H4 close above it (H4 direction up) buys
+  { const x = st('goldTL'), what = !config.goldTL ? '—' : !x ? 'waiting for the Trader' : x.open ? `in a trade, stop ${px2(x.stop)}` : x.line ? `falling H4 line at ${px2(x.line)}; waiting for an H4 close above it${blocked(x)}` : `no falling H4 trendline through two pivot highs right now${blocked(x)}`;
+    rows.push(['Gold H4 trendline', config.goldTL ? 'live' : 'off', what, on('gtl')]); }
+  // Gold daily engulf: a daily close above the last red candle's high, above the moving average; a resting buy at the zone's top
+  { const x = st('goldEG'), c = config.goldEG || {}, n = c.sma || 20;
+    const what = !config.goldEG ? '—' : !x ? 'waiting for the Trader' : `daily close ${px2(x.lastClose)} ${x.up ? 'above' : 'below'} the ${n}-day average ${px2(x.sma)}${x.zone ? `; zone ${px2(x.zone[0])}-${px2(x.zone[1])}` : ''}${x.pending && x.pending.length ? `; resting buy at ${x.pending.map(px2).join(', ')}` : x.up ? '; waiting for the next engulfing close' : ''}${blocked(x)}`;
+    rows.push(['Gold daily engulf', config.goldEG ? 'live' : 'off', what, on('geg')]); }
+  // Gold momentum pullback: D1 direction, pullback zones watched
+  { const x = st('goldMP'), w = x && Array.isArray(x.watching) ? x.watching : [];
+    const what = !config.goldMP ? '—' : !x ? 'waiting for the Trader' : `D1 ${x.d1 > 0 ? 'up' : x.d1 < 0 ? 'down' : 'flat'}; ${w.length ? `${w.length} pullback zone${w.length === 1 ? '' : 's'} watched (${w.map((z) => `${z.side} ${px2(z.zone[0])}-${px2(z.zone[1])}`).join('; ')})` : 'no pullback zone watched'}${x.test ? ' · paper test' : ''}`;
+    rows.push(['Gold momentum pullback', config.goldMP ? 'live' : 'off', what, on('gmp')]); }
+  // NQ New York open run: one paper row a session (research.json, k nq-open, session nyflip)
+  { const R = (Array.isArray(research) ? research : []).filter((x) => x.k === 'nq-open' && x.session === 'nyflip').sort((a, b) => (b.opened || 0) - (a.opened || 0)), last = R[0];
+    const today = new Date(now * 1000).toISOString().slice(0, 10), what = !last ? 'no session recorded yet' : last.day === today ? `today: ${last.side} ${px2(last.entry)}, ${last.status === 'open' ? 'open' : `${last.status}${Number.isFinite(last.R) ? ` ${sgn(last.R)}R` : ''}`}` : `last session ${last.day}: ${last.side} ${last.status}${Number.isFinite(last.R) ? ` ${sgn(last.R)}R` : ''}; next at the 09:30 New York open`;
+    rows.push(['NQ New York open run', 'live (paper, research.json)', what, '—']); }
+  const out = [GOLD_START, '## Live gold systems now', '', `Built by the Trader at ${when} UTC from its own snapshot and the live record. Status only: what each live Meridian system is waiting for right now; the Scalp block below describes a shadow system.`, '',
+    '| System | Book | Now | On |', '|---|---|---|---|'];
+  for (const r of rows) out.push(`| ${r.join(' | ').replace(/\n/g, ' ')} |`);
+  out.push(GOLD_END);
+  return out.join('\n');
 }

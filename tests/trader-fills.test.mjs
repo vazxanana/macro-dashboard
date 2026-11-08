@@ -3,7 +3,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
-import { spreadOf, costOf, FEE, SLIP_SPREADS, STALE_R, costModel, tradeCost, annotateCosts, costSummary, targetExit, limitEntry,
+import { spreadOf, costOf, FEE, CFD_CRYPTO, SLIP_SPREADS, STALE_R, costModel, tradeCost, annotateCosts, costSummary, targetExit, limitEntry,
   driftR, backfillDrift, staleStats } from '../council/fills.mjs';
 
 const MK = { xau: { group: 'Metals', spot: true }, eurusd: { group: 'Forex' }, btc: { group: 'Crypto' } };
@@ -13,13 +13,14 @@ const near = (a, b, eps = 1e-9) => assert.ok(Math.abs(a - b) <= eps, `${a} vs ${
 test('costOf is the Backtest model: spread, plus Kraken fees on crypto', () => {
   near(costOf(MK.xau, 4000, false), 0.3);
   near(costOf(MK.eurusd, 1.1, true), 0.0001);
-  near(costOf(MK.btc, 100000, false), 100000 * 0.0002 + 100000 * (FEE.taker + FEE.taker));
-  near(costOf(MK.btc, 100000, true), 100000 * 0.0002 + 100000 * (FEE.maker + FEE.taker));
+  // crypto pays the CFD round trip (0.04% of price: owner decision 7 Nov, the Kraken spot fees FEE are no longer charged)
+  near(costOf(MK.btc, 100000, false), 100000 * CFD_CRYPTO); near(costOf(MK.btc, 100000, true), 100000 * CFD_CRYPTO);
+  assert.ok(costOf(MK.btc, 100000, false) < 100000 * FEE.taker, 'well below one Kraken taker fee');
 });
 
 test('the Backtest imports costOf from fills.mjs (one cost model)', () => {
   const src = fs.readFileSync(new URL('../council/backtest.mjs', import.meta.url), 'utf8');
-  assert.match(src, /import \{ spreadOf, costOf \} from '\.\/fills\.mjs'/);
+  assert.match(src, /import \{ spreadOf, costOf\b[^}]*\} from '\.\/fills\.mjs'/);
   assert.doesNotMatch(src, /const costOf =/);
 });
 
@@ -69,10 +70,11 @@ test('annotateCosts keeps raw R, adds costR and Rnet (x size), and clears them w
   assert.equal(s.live.all.n, 1); assert.equal(s.shadow.all.n, 1); assert.ok(s.live.byGroup.Metals.Rnet < s.live.byGroup.Metals.R);
 });
 
-test('crypto fees dominate a tight crypto stop', () => {
+test('a tight crypto stop pays the CFD round trip, not Kraken fees', () => {
   const t = { market: 'btc', entry: 100000, stop: 99500, side: 'buy', status: 'loss', R: -1, rr: 2, opened: 1, filled: 1, entryMode: 'market' };
   annotateCosts([t], MK, {});
-  assert.ok(t.costR > 1.5, `costR ${t.costR}`);   // 0.8% taker round trip + spread on a 0.5% stop
+  // 0.04% round trip + half a spread of slippage on a 0.5% stop = 0.10R (the Kraken model charged this trade 1.6R+)
+  assert.ok(t.costR > 0.08 && t.costR < 0.15, `costR ${t.costR}`);
 });
 
 test('driftR: + when price ran on (chasing), - when it came back toward the stop', () => {

@@ -83,3 +83,16 @@ test('optional files: robustness verdicts attach to the matching stream; macro f
   assert.equal(m.id, 'macro'); assert.equal(m.s.n, 400); assert.equal(m.s.wins, 220); assert.ok(Math.abs(m.s.exp - 0.1) < 1e-9); assert.equal(m.s.t, 1.2); assert.equal(m.v, 'promising');
   assert.match(m.src, /replay/); assert.match(m.note, /55% against a 52% base rate/);
 });
+
+test('forward trades count after costs (Rnet) where recorded, and keep what the equity-curve tooltip shows', () => {
+  const trades = [
+    { k: 'scalp', name: 'Scalp', shadow: true, status: 'loss', R: -1, Rnet: -1.4, costR: 0.4, market: 'xau', label: 'XAU/USD', side: 'buy', opened: NOW - 200, closed: NOW - 100 },
+    { k: 'scalp', name: 'Scalp', shadow: true, status: 'win', R: 2, Rnet: 1.6, costR: 0.4, market: 'xau', label: 'XAU/USD', side: 'sell', opened: NOW - 90, closed: NOW - 50 },
+    { k: 'scalp', name: 'Scalp', shadow: true, status: 'win', R: 1, closed: NOW - 10 }];   // no cost recorded: as recorded
+  const r = SB.build({ trades, now: NOW }).find((x) => x.id === 'mer-scalp-shadow');
+  assert.ok(Math.abs(r.s.R - 1.2) < 1e-9, 'net total: -1.4 + 1.6 + 1');
+  assert.deepEqual([...r.s.curve].map((v) => +v.toFixed(2)), [-1.4, 0.2, 1.2]);
+  const p = r.s.P[0];
+  assert.equal(p.g, -1); assert.equal(p.c, 0.4); assert.equal(p.sh, 1); assert.equal(p.m, 'XAU/USD'); assert.equal(p.sd, 'buy'); assert.equal(p.st, 'loss');
+  assert.equal(r.s.P[2].c, undefined);
+});

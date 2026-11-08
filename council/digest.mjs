@@ -10,13 +10,25 @@
 //   2. open positions and their floating R (prices from snapshot.json and ict/snapshot.json)
 //   3. the macro regime and the next day's event playbook headline (macro/forecast.json)
 //   4. what waits on the owner: Coach proposals (coach.json), data-feed problems (health.json), robustness verdict changes
-//      (research/robustness.json, against the last digest)
+//      (research/robustness.json, against the last digest), and a live system the edge-decay monitor calls 'decaying'
+//      (coach.json decay, council/decay.mjs; one line, only when there is one), and a live system whose forward record left
+//      the band the untouched-data study gives it (coach.json expect, council/expect.mjs; one line, only when there is one)
 //   5. edge scoreboard movers: streams whose verdict changed since the last digest (the scoreboard's own pure functions,
 //      script#ms-sb-js of market-structure.html, run here without a page)
+//   6. Sundays only: one line of the book-weights paper comparison (coach.json book, council/book.mjs): live vs proposed R
+//   7. research: on the day a study lands (council-data research/ledger.json, council/research-ledger.mjs) one line
+//      "New study: <name> — <headline>"; the Sunday preview carries a "Research this week" block (count by verdict, up to three)
 //
 // Sent through alerts.mjs sendAlerts (ntfy + Telegram, the same env as the other alerts). Deduplicated per UTC day in
-// council-data digest.json ({ sent: { day, at, kind, title }, sb, robust, last }), so a restart never sends twice; when every
-// channel fails nothing is marked and the next round tries again. COUNCIL_ALERTS=off sends nothing and writes nothing.
+// council-data digest.json, so a restart never sends twice; when every channel fails nothing is marked and the next round tries
+// again. COUNCIL_ALERTS=off sends nothing and marks nothing.
+//
+// digest.json is also the council's SHARED VERDICT RECORD (8 Nov, the week report compared verdicts with whatever that browser
+// had last seen): every round, in or out of the window, recordVerdicts() writes the robustness verdicts (research/robustness.json
+// claims, `robust`) and the edge-decay statuses (coach.json decay, `decay`) it sees now and logs every change in `changes`
+// ({ at, kind: 'robust' | 'decay', id, name, from, to }, the last 200), so the page's "This week" pane shows the changes of any
+// week from one record. The Trader calls the same function when it rebuilds the decay monitor (every 6 hours), so a reading
+// never waits on the digest. File: { at, since, sent: { day, at, kind, title }, sb, robust, decay, changes, last, error? }.
 //
 //   node council/digest.mjs <council-data dir> [--dry] [--force]
 //     --dry    print the digest that would go out now; send nothing, write nothing
@@ -26,11 +38,14 @@ import path from 'node:path';
 import vm from 'node:vm';
 import { sendAlerts, when, NTFY_DEFAULT, SITE, alertable, actionable, proposalLine } from './alerts.mjs';
 import { usHolidays } from './datacheck.mjs';
+import { expectLine } from './expect.mjs';
+import { researchLines } from './research-ledger.mjs';
 
 export const COUNCIL_URL = SITE + 'market-structure.html#council';
 export const CFG = {
   at: 21 * 60 + 15,   // UTC minute of the day from which the digest may go out (about an hour after the 16:00 New York close)
   maxLines: 15,       // body lines at most
+  maxLinesPreview: 18,   // the Sunday preview may carry the "Research this week" block
   macroStaleH: 12,    // a forecast older than this is labelled with its date
   dataStaleH: 3,      // a data check older than this counts as a problem
   acctStaleH: 2,      // a cTrader account file older than this shows its time
@@ -153,6 +168,73 @@ export function robustChanges(J, prev) {
   return (J && Array.isArray(J.claims) ? J.claims : []).filter((c) => c && c.id && c.verdict && prev[c.id] && prev[c.id] !== c.verdict)
     .map((c) => ({ id: c.id, name: c.name || c.id, from: prev[c.id], to: c.verdict }));
 }
+
+// ─── the shared verdict record (digest.json robust / decay / changes) ───
+export const MAX_CHANGES = 200;
+// coach.json decay (council/decay.mjs) → { system id: 'healthy' | 'watch' | 'decaying' } (a system with too few trades reads healthy)
+export const decayMap = (decay) => Object.fromEntries((decay && Array.isArray(decay.systems) ? decay.systems : []).filter((s) => s && s.id && s.status).map((s) => [s.id, s.status]));
+// the names behind the ids, per kind (a claim and a system can share an id), for the change log: a claim or system that is
+// later dropped keeps its name
+const nameMap = (L) => Object.fromEntries((Array.isArray(L) ? L : []).filter((x) => x && x.id && x.name).map((x) => [x.id, x.name]));
+export const verdictNames = (J, decay) => ({ robust: nameMap(J && J.claims), decay: nameMap(decay && decay.systems) });
+// verdicts that differ between two { id: verdict } maps (an id that is new or gone is not a change)
+export function diffMap(prev, next) {
+  if (!prev || !next || typeof prev !== 'object' || typeof next !== 'object') return [];
+  return Object.keys(next).filter((id) => prev[id] && next[id] && prev[id] !== next[id]).map((id) => ({ id, from: prev[id], to: next[id] }));
+}
+// prev (digest.json as read) + the verdicts seen now → { state (the file to write), changes (logged now), dirty (anything new) }.
+// A missing file (map null) keeps the old baseline; the first record of a kind logs nothing (nothing to compare with).
+// names: { robust: { id: name }, decay: { id: name } } (verdictNames)
+export function snapshot(prev, { robust = null, decay = null, now, names = {} } = {}) {
+  const P = prev && typeof prev === 'object' ? prev : {}, at = new Date(now * 1000).toISOString();
+  const state = { ...P }, log = Array.isArray(P.changes) ? P.changes.slice() : [], changes = [];
+  let dirty = !Array.isArray(P.changes) || !P.since;
+  for (const [kind, map] of [['robust', robust], ['decay', decay]]) {
+    if (!map || typeof map !== 'object') continue;
+    for (const c of diffMap(P[kind], map)) changes.push({ at, kind, id: c.id, name: (names[kind] || {})[c.id] || c.id, from: c.from, to: c.to });
+    if (JSON.stringify(P[kind] || null) !== JSON.stringify(map)) { state[kind] = map; dirty = true; }
+  }
+  if (changes.length) log.push(...changes);
+  state.changes = log.length > MAX_CHANGES ? log.slice(-MAX_CHANGES) : log;
+  if (!state.since) state.since = at;
+  if (dirty) state.at = at;
+  return { state, changes, dirty };
+}
+// changes of one kind logged after `since` (default: the last digest went out), one entry per id: first from → last to;
+// a verdict that went away and came back in between is not a change
+export function changesSince(prev, kind, since) {
+  const at = since || (prev && prev.sent && prev.sent.at) || '', by = new Map();
+  for (const c of (prev && Array.isArray(prev.changes) ? prev.changes : []).filter((c) => c && c.kind === kind && c.id && (!at || c.at > at))) {
+    const q = by.get(c.id); if (q) q.to = c.to; else by.set(c.id, { id: c.id, name: c.name || c.id, from: c.from, to: c.to });
+  }
+  return [...by.values()].filter((c) => c.from !== c.to);
+}
+// Record what the files say now into <dir>/digest.json: robust = research/robustness.json, decay = coach.json `decay` (either may
+// be null: nothing read, baseline kept). Writes only when something is new. Returns snapshot()'s result; never throws.
+export function recordVerdicts(dir, { robust = null, decay = null, now = Math.floor(Date.now() / 1000), prev } = {}) {
+  const file = path.join(dir, 'digest.json');
+  if (prev === undefined) { try { prev = JSON.parse(fs.readFileSync(file, 'utf8')) || {}; } catch (e) { prev = {}; } }
+  const S = snapshot(prev, { robust: robust ? robustMap(robust) : null, decay: decay ? decayMap(decay) : null, now, names: verdictNames(robust, decay) });
+  if (S.dirty) { try { fs.mkdirSync(dir, { recursive: true }); fs.writeFileSync(file, JSON.stringify(S.state, null, 1) + '\n'); } catch (e) { S.error = String((e && e.message) || e); } }
+  return S;
+}
+// Edge-decay monitor (coach.json decay, council/decay.mjs): one line naming the LIVE systems whose status is 'decaying', or null.
+// Shadow systems (crypto trend since 7 Nov) are left out: the owner already moved them off live.
+export function decayLine(decay) {
+  const S = (decay && Array.isArray(decay.systems) ? decay.systems : []).filter((s) => s && s.live && s.status === 'decaying');
+  if (!S.length) return null;
+  const one = (s) => `${s.name} (${[s.roll && s.roll.n ? `last ${s.roll.n} ${fR(s.roll.exp)} a trade` : '', s.cusRef ? `CUSUM ${s.cusRef.s}/${s.cusRef.h}` : '',
+    s.dd ? `DD ${(+s.dd.cur).toFixed(1)}R of ${(+s.dd.limit).toFixed(0)}R` : ''].filter(Boolean).join(', ')})`;
+  return `Edge decay: ${trim(S.slice(0, 2).map(one).join('; '), 150)}${S.length > 2 ? ` +${S.length - 2} more` : ''}. Status only, no rule changed: your call.`;
+}
+// Book weights paper comparison (coach.json book, council/book.mjs): one line for the Sunday preview, or null without a record.
+// Labelled as a paper comparison with no live change, so it is never read as a result of something that trades.
+export function bookLine(book) {
+  if (!book || !(book.nTrades > 0) || !book.live || !book.proposed) return null;
+  const since = book.from ? DAYF.format(new Date(book.from + 'T12:00:00Z')).replace(/^\w+ /, '') : '';
+  return `Book weights (paper comparison, no live change): live ${fR(book.live.R)} vs proposed ${fR(book.proposed.R)}${since ? ` since ${since}` : ''} (${book.nTrades} trades)`
+    + ` · max DD ${(+book.live.dd || 0).toFixed(1)} / ${(+book.proposed.dd || 0).toFixed(1)}R` + (Number.isFinite(+book.corr) ? ` · corr ${(+book.corr).toFixed(2)}` : '') + '.';
+}
 export function waiting(D, now, prev) {
   const out = [], P = (D.coach && Array.isArray(D.coach.proposals) ? D.coach.proposals : []).filter(actionable);
   if (P.length) out.push(`Coach: ${P.length} proposal${P.length > 1 ? 's' : ''} to OK: ${trim(P.slice(0, 2).map((p) => p.label || proposalLine(p)).join('; '), 90)}${P.length > 2 ? ` +${P.length - 2} more` : ''}`);
@@ -160,8 +242,14 @@ export function waiting(D, now, prev) {
   if (!H) out.push('Data feeds: no data check yet.');
   else if (H.status === 'bad' || H.status === 'warn') out.push(`Data feeds ${H.status === 'bad' ? 'bad' : 'shaky'}: ${trim(H.summary, 90)}`);
   else if (!(now - hAt <= CFG.dataStaleH * 3600)) out.push(`Data feeds: last check ${Number.isFinite(hAt) ? `${dayLabel(hAt)} ${HMF.format(new Date(hAt * 1000))} UTC` : 'unknown'}.`);
-  const rc = robustChanges(D.robust, prev && prev.robust);
+  // verdict changes since the last digest: from the shared record's log (prev.changes); a record without one (older file) is diffed
+  const rc = prev && Array.isArray(prev.changes) ? changesSince(prev, 'robust') : robustChanges(D.robust, prev && prev.robust);
   if (rc.length) out.push(`Robustness: ${trim(rc.slice(0, 2).map((c) => `${c.name} ${c.from} → ${c.to}`).join('; '), 100)}${rc.length > 2 ? ` +${rc.length - 2} more` : ''}`);
+  const dl = decayLine(D.coach && D.coach.decay);
+  if (dl) out.push(dl);
+  // What to expect (coach.json expect, council/expect.mjs): a live system whose forward record left the band the untouched-data study gives it
+  const el = expectLine(D.coach && D.coach.expect);
+  if (el) out.push(el);
   return out;
 }
 
@@ -185,8 +273,11 @@ export function buildDigest(D, { now, kind = 'daily', prev = {}, sbRows = null }
       : mv.length ? `Scoreboard movers: ${trim(mv.slice(0, 3).map((m) => `${m.name} ${VERDICT[m.from] || m.from} → ${VERDICT[m.to] || m.to}`).join('; '), 140)}${mv.length > 3 ? ` +${mv.length - 3} more` : ''}`
         : 'Scoreboard: no verdict changes.');
   } else L.push('Scoreboard: could not be built this time.');
+  if (kind === 'preview') { const bl = bookLine(D.coach && D.coach.book); if (bl) L.push(bl); }   // Sundays only: the book-weights paper comparison
+  L.push(...researchLines(D.ledger, now, kind));   // nothing on a day without a new study
   L.push(when(now));
-  const lines = L.length > CFG.maxLines ? L.slice(0, CFG.maxLines - 1).concat(L.at(-1)) : L;
+  const max = kind === 'preview' ? CFG.maxLinesPreview : CFG.maxLines;
+  const lines = L.length > max ? L.slice(0, max - 1).concat(L.at(-1)) : L;
   const title = `${kind === 'preview' ? 'Week ahead' : 'Daily digest'} · ${dayLabel(now)}: Meridian ${fR(mer.net)} · ICT ${fR(ictA.net)} net`;
   return { title, msg: lines.join('\n'), lines, state: { sb: sbRows ? verdictMap(sbRows) : (prev && prev.sb) || null, robust: D.robust ? robustMap(D.robust) : (prev && prev.robust) || null } };
 }
@@ -196,7 +287,7 @@ export function readData(dir) {
   const rd = (f) => { try { return JSON.parse(fs.readFileSync(path.join(dir, f), 'utf8')); } catch (e) { return null; } };
   return { rd, trades: rd('trades.json'), research: rd('research.json'), ictTrades: rd('ict/trades.json'), snapshot: rd('snapshot.json'), ictSnap: rd('ict/snapshot.json'),
     account: rd('ctrader/account.json'), mirror: rd('ctrader/mirror.json'), forecast: rd('macro/forecast.json'), coach: rd('coach.json'), health: rd('health.json'),
-    robust: rd('research/robustness.json'), state: rd('state.json') };
+    robust: rd('research/robustness.json'), ledger: rd('research/ledger.json'), state: rd('state.json') };
 }
 // The edge scoreboard's own pure functions (market-structure.html, script#ms-sb-js), as the scoreboard test runs them
 export function loadScoreboard(file = new URL('../market-structure.html', import.meta.url)) {
@@ -210,35 +301,39 @@ export function scoreboardRows(D, now, SB = loadScoreboard()) {
     ictReplay: rd('ict/replay.json'), ictTrades: D.ictTrades, ictShadow: rd('ict/shadow.json'), robust: D.robust, macro: D.forecast, now });
 }
 
-// One round: { skipped } or { sent | dry, title, msg, errors }. `scoreboard(D, now)` returns the rows (injectable for tests).
+// One round: { skipped, recorded } or { sent | dry, title, msg, errors }. `scoreboard(D, now)` returns the rows (injectable for tests).
+// Every round first records the verdicts it sees (recordVerdicts, the shared record; not on --dry), then sends when in the window.
 export async function main(dir, { env = process.env, fetchFn = fetch, now = Math.floor(Date.now() / 1000), dry = false, force = false, scoreboard = scoreboardRows } = {}) {
-  const file = path.join(dir, 'digest.json');
-  let prev = {}; try { prev = JSON.parse(fs.readFileSync(file, 'utf8')) || {}; } catch (e) { prev = {}; }
+  const file = path.join(dir, 'digest.json'), rdj = (f) => { try { return JSON.parse(fs.readFileSync(path.join(dir, f), 'utf8')); } catch (e) { return null; } };
+  let prev = rdj('digest.json') || {}, recorded = 0;
+  if (!dry) { const S = recordVerdicts(dir, { robust: rdj('research/robustness.json'), decay: (rdj('coach.json') || {}).decay, now, prev }); prev = S.state; recorded = S.changes.length; }
   const s = force ? { day: isoDay(now), kind: new Date(now * 1000).getUTCDay() === 0 ? 'preview' : 'daily' } : slot(now);
-  if (!s) return { skipped: 'outside the digest window' };
-  if (!force && prev.sent && prev.sent.day === s.day) return { skipped: `already sent for ${s.day}` };
-  if (!dry && env.COUNCIL_ALERTS === 'off') return { skipped: 'COUNCIL_ALERTS=off' };
+  if (!s) return { skipped: 'outside the digest window', recorded };
+  if (!force && prev.sent && prev.sent.day === s.day) return { skipped: `already sent for ${s.day}`, recorded };
+  if (!dry && env.COUNCIL_ALERTS === 'off') return { skipped: 'COUNCIL_ALERTS=off', recorded };
   const D = readData(dir);
   let rows = null, sbError = null;
   try { rows = scoreboard(D, now); if (!Array.isArray(rows)) rows = null; } catch (e) { sbError = String((e && e.message) || e); }
   const d = buildDigest(D, { now, kind: s.kind, prev, sbRows: rows });
-  if (dry) return { dry: true, title: d.title, msg: d.msg, lines: d.lines.length, sbError };
+  if (dry) return { dry: true, title: d.title, msg: d.msg, lines: d.lines.length, sbError, recorded };
   const topic = env.NTFY_TOPIC || NTFY_DEFAULT, tgTok = env.TELEGRAM_BOT_TOKEN || null, tgChat = env.TELEGRAM_CHAT_ID || (D.state || {}).tgChat || null;
   const tried = 1 + (tgTok && tgChat ? 1 : 0);
   const errors = await sendAlerts([{ title: d.title, msg: d.msg, tags: 'clipboard', click: COUNCIL_URL }], { topic, tgTok, tgChat, fetchFn });
   const failed = Object.keys(errors).length >= tried, at = new Date(now * 1000).toISOString();
-  // every channel failed: keep the old mark (and the old verdict baselines) so the next round tries again
+  // every channel failed: keep the old mark (and the old verdict baselines) so the next round tries again; the shared record
+  // (robust, decay, changes, since) stays in the file either way
   const out = failed ? { ...prev, error: { at, ...errors } }
-    : { sent: { day: s.day, at, kind: s.kind, title: d.title }, sb: d.state.sb, robust: d.state.robust, last: { title: d.title, msg: d.msg }, ...(Object.keys(errors).length ? { error: { at, ...errors } } : {}) };
+    : { ...prev, at, sent: { day: s.day, at, kind: s.kind, title: d.title }, sb: d.state.sb, robust: d.state.robust, last: { title: d.title, msg: d.msg }, error: Object.keys(errors).length ? { at, ...errors } : undefined };
+  if (out.error === undefined) delete out.error;
   fs.mkdirSync(dir, { recursive: true });
   fs.writeFileSync(file, JSON.stringify(out, null, 1) + '\n');
-  return { sent: !failed, title: d.title, msg: d.msg, errors, sbError };
+  return { sent: !failed, title: d.title, msg: d.msg, errors, sbError, recorded };
 }
 
 if (process.argv[1] && process.argv[1].endsWith('digest.mjs')) {
   const args = process.argv.slice(2), dir = args.find((a) => !a.startsWith('--')) || 'data';
   main(dir, { dry: args.includes('--dry'), force: args.includes('--force') }).then((r) => {
-    if (r.skipped) { console.log(`Digest: ${r.skipped}`); return; }
+    if (r.skipped) { console.log(`Digest: ${r.skipped}${r.recorded ? ` (${r.recorded} verdict change${r.recorded > 1 ? 's' : ''} recorded)` : ''}`); return; }
     console.log(`Digest ${r.dry ? '(dry run)' : r.sent ? 'sent' : 'NOT sent'}: ${r.title}\n${r.msg}`);
     if (r.errors && Object.keys(r.errors).length) console.log('  send errors:', JSON.stringify(r.errors));
     if (r.sbError) console.log('  scoreboard:', r.sbError);

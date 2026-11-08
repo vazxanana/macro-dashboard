@@ -60,7 +60,7 @@ Paper research only. No live rule, config or tracker was changed.
    - A gap fills at the open.
    - Like the live loop, the first minute after the fill is not checked. Checking it ("strict") changes nothing: +0.039R vs +0.038R.
 
-Note for the owner (resolved 8 Nov: the owner kept 2 points and the unused `buf` parameter was removed):
+Note for the owner (resolved: the owner kept 2 points and the unused `buf` parameter was removed from trader.mjs in #521):
 - `nqOpenSweep` computed `buf` (0.011% of the open) but never used it. The live stop buffer is a fixed 2 points.
 - The council's replay used the 0.011% buffer.
 - On 2023-26 the two are almost equal: +0.312R vs +0.318R.

@@ -232,15 +232,30 @@ export function buildClaims(dir, { iters = 5000, seed = 7, repoOut = path.join(H
     const L = ((ib[m] || {}).trades || []).filter((x) => x.a);
     if (L.length) add({ id: `ict-a-${m}-2018`, system: 'ICT', status: 'long-history check of the live A rule', name: `ICT A-setups ${nm}, 2018-26 rebuild`, claim: 'same rule on 8 years of HistData (earlier rebuild audit)', source: `research/edge/robustness/out/ict.json ${m}`, fitFrom: FIT['ict-' + m] }, rebuildTrades(L), 'ict');
   }
+  // ICT 2008-17 untouched test (#526, pre-registered): the unchanged A rule on OANDA 5m cash/spot GC, NQ, ES, YM (no free RTY).
+  // Summary only (repo file research/edge/ict-oos-2008/result.json): 2018-26 on the same data as the fitted period, 2008-17 as the
+  // untouched sample; costs per trade from its x1 vs x2 columns.
+  const io = readJSON(HERE, 'edge/ict-oos-2008/result.json');
+  if (io && io.test && io.ref && io.test.pooled && io.ref.pooled) {
+    const T = io.test.pooled, Rf = io.ref.pooled, st = (p) => ({ n: p.n, mean: p.exp, t: p.t });
+    addSummary({ id: 'ict-a-2008', system: 'ICT', status: 'long-history check of the live A rule', name: 'ICT A-setups, 2008-17 untouched (OANDA cash, 4 markets)',
+      claim: `pre-registered test #526: 2008-17 ${fR(T.net.exp)}R a trade (n ${T.net.n}, t ${fx(T.net.t, 2)}) vs 2018-26 ${fR(Rf.net.exp)}R (n ${Rf.net.n}); verdict ${io.verdict && io.verdict.verdict}`,
+      source: 'research/edge/ict-oos-2008/result.json (summary only)' },
+    { is: st(Rf.net), oos: st(T.net), costPerTrade: +(T.net.exp - T.net2.exp).toFixed(3) }, 'ict');
+  }
 
   // council systems: the council's own replays (claim source) and the 2018-2026 rebuilds
   const rp = readJSON(dir, 'research/replay-2w.json');
+  // status from the live config, so an owner move to shadow shows here without editing this list (7 Nov: crypto trend)
+  const cfgNow = readJSON(dir, 'config.json') || {};
+  const cryptoSt = cfgNow.cryptoTrendShadow ? 'shadow (owner, 7 Nov: no edge since Jun 2025, #508)' : 'live (paper)';
+  const gt5St = cfgNow.goldTrendFastShadow ? 'shadow (owner, 7 Nov: one bet with Gold trend N20, #530)' : 'live (paper)';
   const SYS = [
     ['replica', 'Gold replica', 'live (paper)', (x) => true, null],
     ['gtrend', 'Gold trend N20', 'live (paper)', (x) => true, ['gtrend.json', 'trades.gtrend20']],
-    ['gtrend5', 'Gold trend fast N5', 'live (paper)', (x) => true, ['gtrend.json', 'trades.gtrend5']],
+    ['gtrend5', 'Gold trend fast N5', gt5St, (x) => true, ['gtrend.json', 'trades.gtrend5']],
     ['nq-open', 'NQ New York open run', 'live (paper)', (x) => x.session === 'nyflip', ['nq.json', 'trades']],
-    ['trend', 'Crypto trend v3', 'live (paper)', (x) => true, ['crypto.json', 'trades']],
+    ['trend', 'Crypto trend v3', cryptoSt, (x) => true, ['crypto.json', 'trades']],
     ['gtl', 'Gold H4 trendline', 'live (paper)', (x) => true, ['gtl.json', 'trades']],
     ['geg', 'Gold daily engulf', 'live (paper)', (x) => true, ['geg.json', 'trades']],
     ['gmp', 'Gold momentum pullback', 'shadow (test system)', (x) => true, ['gmp.json', 'trades']],
@@ -346,7 +361,10 @@ export function toMarkdown({ at, claims, sources, trials }) {
   const counts = claims.reduce((o, c) => (o[c.verdict] = (o[c.verdict] || 0) + 1, o), {});
   L.push('## Short answer', '');
   L.push(`- ${claims.length} claims audited: ${counts.robust || 0} robust, ${counts.fragile || 0} fragile, ${counts['not proven'] || 0} not proven.`);
-  if (live.length) { L.push('- **LIVE rules that are not robust. Flagged for the owner; nothing was changed:**'); for (const c of live) L.push(`  - ${c.name}: **${c.verdict}**, ${fR(c.mean)}R a trade over ${c.n}. ${c.why.join('; ')}.`); }
+  // a live rule's untouched long-history check, when one exists (7 Nov: ICT 2008-17, #526), is named next to it
+  const longOf = { 'ict-a': 'ict-a-2008' };
+  const longNote = (c) => { const x = longOf[c.id] && claims.find((y) => y.id === longOf[c.id]); return x && x.oos ? ` Long-history check (${x.name.replace(/^.*?, /, '')}): ${fR(x.oos.mean)}R a trade (t ${fx(x.oos.t, 2)}, n ${x.oos.n}), **${x.verdict}**.` : ''; };
+  if (live.length) { L.push('- **LIVE rules that are not robust. Flagged for the owner; nothing was changed:**'); for (const c of live) L.push(`  - ${c.name}: **${c.verdict}**, ${fR(c.mean)}R a trade over ${c.n}. ${c.why.join('; ')}.${longNote(c)}`); }
   for (const c of claims.filter((c) => c.verdict === 'robust')) {
     const sib = /-2018$/.test(c.id) ? claims.find((x) => x.id === c.id.replace(/-2018$/, '')) : null;
     const sibNote = sib && sib.oos && sib.oos.n ? ` The council's own replay of the same rule (${sib.from} to ${sib.to}) is **${sib.verdict}**: out-of-sample ${fR(sib.oos.mean)} a trade (t ${fx(sib.oos.t, 2)}, n ${sib.oos.n}), so check whether the edge still holds now.` : '';

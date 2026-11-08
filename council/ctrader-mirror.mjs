@@ -9,7 +9,8 @@
 //   * Only these message types can be sent: auth, account list, trader, reconcile, symbols, token refresh, heartbeat, NEW MARKET
 //     ORDER and CLOSE POSITION. No amend, no cancel, no pending orders.
 //   * Small and capped: risk-based lots (see sizing below, valued with the broker's own specs from ctrader/symbols.json, written
-//     each round by council/ctrader-symbols.mjs), never above LIMITS.maxLots, at most MAX_OPEN mirror
+//     each round by council/ctrader-symbols.mjs), one trade's margin at most LIMITS.maxMarginShare of the balance (LIMITS.maxLots
+//     when the broker's margin is unknown) and never above the broker's own maximum, at most MAX_OPEN mirror
 //     positions (unconfirmed orders included), no new order once the account is down DAY_STOP of its balance on the UTC day
 //     (closed P/L: balance), only trades opened in the last FRESH seconds (no catch-up of old trades).
 //   * It only ever touches positions it opened (label "council" + comment naming the trade, tracked in ctrader/mirror.json); a
@@ -46,7 +47,11 @@ export const ictCandidates = (ict) => (Array.isArray(ict) ? ict : []).map((t) =>
 // sizing (owner, 7 Nov: "risk-based lots, bigger demo", from research/portfolio.md): each order risks a share of the balance per 1R:
 // ICT A-setups 0.20% x the desk's size field (A+ half-size trades 0.10%), Meridian 0.02%; total open risk at most 1%.
 // The lot follows from the stop distance; below the broker's minimum lot the trade is skipped (never rounded up to more risk).
-export const LIMITS = { lots: 0.01, maxLots: 5, maxOpen: 5, dayStop: 0.02, fresh: 15 * 60, retries: 3, keepDays: 30,
+// Lot cap (owner, 7 Nov: "cap by risk, not lots"): a lot means very different things per symbol (1 US2000 lot = $1 a point, 1 gold lot
+// = 100 oz), so a flat lot cap skipped normal-risk Russell trades on a $50k demo (18-point stop: 5.55 lots for $100). The risk caps
+// above do the real limiting; a trade's margin (broker's marginPerLot from ctrader/symbols.json) may use at most maxMarginShare of the
+// balance; maxLots stays only as the cap when that margin is unknown.
+export const LIMITS = { lots: 0.01, maxLots: 5, maxMarginShare: 0.2, maxOpen: 5, dayStop: 0.02, fresh: 15 * 60, retries: 3, keepDays: 30,
   risk: { ict: 0.002, council: 0.0002 }, maxOpenRisk: 0.01 };
 const LABEL = 'council';
 const OPEN = new Set(['open']), isDone = (t) => !!t.status && t.status !== 'open' && t.status !== 'pending';
@@ -188,8 +193,11 @@ export function riskVolume({ info, t, balance, name, openRisk = 0, spec = null, 
   const step = +info.stepVolume || 1, min = +info.minVolume || step;
   const v = Math.floor((lots * lot) / step + 1e-9) * step;   // epsilon: 0.01 lot must not floor to 0 on float noise
   if (v < min) return { skip: `${name}: ${lots.toFixed(4)} lot needed for ${(riskCash).toFixed(2)} risk is below the broker minimum (${min / lot} lot); a bigger demo balance fixes this` };
-  if (v > lot * LIMITS.maxLots + 1e-9 || (info.maxVolume && v > +info.maxVolume)) return { skip: `${name}: ${(v / lot).toFixed(2)} lot is above the ${LIMITS.maxLots}-lot cap` };
-  return { volume: v, riskCash: +riskCash.toFixed(2), lots: +(v / lot).toFixed(4), perLot: +perLot.toFixed(4) };
+  if (info.maxVolume && v > +info.maxVolume) return { skip: `${name}: ${(v / lot).toFixed(2)} lot is above the broker maximum (${+info.maxVolume / lot} lot)` };
+  const mpl = spec && +spec.marginPerLot > 0 ? +spec.marginPerLot : null, margin = mpl ? (v / lot) * mpl : null;
+  if (mpl && margin > balance * LIMITS.maxMarginShare + 1e-9) return { skip: `${name}: ${(v / lot).toFixed(2)} lot would use ${margin.toFixed(2)} margin, over ${LIMITS.maxMarginShare * 100}% of the balance` };
+  if (!mpl && v > lot * LIMITS.maxLots + 1e-9) return { skip: `${name}: ${(v / lot).toFixed(2)} lot is above the ${LIMITS.maxLots}-lot cap (the broker's margin is not known)` };
+  return { volume: v, riskCash: +riskCash.toFixed(2), lots: +(v / lot).toFixed(4), perLot: +perLot.toFixed(4), ...(margin != null ? { margin: +margin.toFixed(2) } : {}) };
 }
 // relative stop/target for a market order: in 1/100000 of the price, a multiple of the symbol's smallest step
 export function relative(dist, digits = 5) {

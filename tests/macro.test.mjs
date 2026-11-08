@@ -232,6 +232,12 @@ test('a full run on a fake network: files, sources, fallbacks, the analysis sect
   assert.match(out.sources.cot, /failed/); assert.match(out.sources['fred:SWPT'], /failed/); assert.match(out.sources['rss:Fed'], /ok/);
   assert.ok(out.scorecard.replay.gold.n > 100 && out.scorecard.replay.gold.brier > 0);
   assert.ok(out.brief.length > 100 && /Honesty check/.test(out.brief));
+  // move size: the selection protocol's verdict and the model's own record per market, said in the brief
+  for (const a of M.AK) { const v = out.scorecard.vol[a];
+    assert.ok(['naive', ...M.VOL_TRIED].includes(v.used) && v.used === out.assets[a].volModel && v.tried === (M.VIX_ASSETS.includes(a) ? 4 : 3));
+    assert.ok(v.full.n > 100 && v.full.models.ewma.all.mae > 0 && v.full.models.ewma.all.maeNaive > 0 && v.full.models.har.event.qlike != null);
+    if (v.used === 'naive') assert.equal(out.assets[a].expMovePct, out.assets[a].naiveMovePct); }
+  assert.match(out.scorecard.volMethod, /QLIKE/); assert.match(out.brief, /Move size: /);
   assert.ok(calls.every((u) => !/api_key|apikey|token=/i.test(u)), 'keyless sources only');
   const hist = JSON.parse(fs.readFileSync(path.join(dir, 'macro', 'history.json'), 'utf8'));
   assert.equal(hist.length, 0, 'Friday evening is not yet the logging window for Monday (Sunday from 21:00 UTC)');

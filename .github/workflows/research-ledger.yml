@@ -1,0 +1,59 @@
+name: Research ledger
+
+# Research ledger (8 Nov 2026): one row per study in research/edge/<topic>/ (verdict, headline, systems, PR), written to
+# council-data research/ledger.json by council/research-ledger.mjs. The council loop refreshes it every 3rd round from its own
+# checkout; this run writes it the moment a study lands on main, so the daily digest's "New study" line and the week pane's
+# "Studies" list are the same day. Read only: it changes no rule, trade or study.
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'research/edge/**'
+      - 'council/research-ledger.mjs'
+      - '.github/workflows/research-ledger.yml'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: research-ledger
+  cancel-in-progress: false
+
+jobs:
+  ledger:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            research/edge
+            council
+
+      - name: Checkout council data (only the ledger)
+        uses: actions/checkout@v4
+        with:
+          ref: council-data
+          path: data
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            /research/ledger.json
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Build the ledger
+        env:
+          GH_TOKEN: ${{ github.token }}   # landing time and PR number of a new study from the commits API (read only)
+        run: node council/research-ledger.mjs data
+
+      - name: Save it
+        run: |
+          git -C data config user.name "mosha-council"
+          git -C data config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git -C data add research/ledger.json
+          git -C data commit -q -m "Research ledger $(date -u +%Y-%m-%dT%H:%MZ)" || exit 0
+          for j in 1 2 3 4 5; do git -C data pull -q --rebase origin council-data && git -C data push -q origin HEAD:council-data && break; sleep 7; done

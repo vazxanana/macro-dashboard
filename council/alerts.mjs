@@ -9,8 +9,9 @@ const fmt = (v, d) => (+v).toFixed(d != null ? d : 2), fR = (v) => `${v > 0 ? '+
 
 // the trades that may alert: live trades (never shadows) and the NQ open-run paper trades, except the variants the live
 // rule skips (session '...-x', e.g. 'nyflip-x': recorded only to measure a filter, so they must not send a futures ticket)
+// and the research shadow streams (shadow: true, e.g. 'nyflip-trend', the regime study's trend-on copy: never alerted or ticketed)
 export const alertable = (trades, research) => trades.filter((x) => !x.shadow)
-  .concat(research.filter((x) => x.k === 'nq-open' && !/-x$/.test(x.session || '')));
+  .concat(research.filter((x) => x.k === 'nq-open' && !x.shadow && !/-x$/.test(x.session || '')));
 
 // "Sat 7 Nov 17:23 UTC · London 17:23 · New York 12:23"
 const hm = (tz) => new Intl.DateTimeFormat('en-GB', { timeZone: tz, hour: '2-digit', minute: '2-digit', hourCycle: 'h23' });
@@ -40,10 +41,12 @@ export function alertEvents(list, now, futOpt = {}) {
       const up = x.side === 'sell' ? 'chart_with_downwards_trend' : 'chart_with_upwards_trend';
       // a resting limit order: send the limit ticket when it is placed, and a cancel when it ends unfilled (expired, or
       // the target was reached first: 'missed')
-      if (fut && !x.ntfyP && x.status === 'pending' && x.opened >= now - 900) { const tk = ticket(x, now, futOpt); x.ntfyP = 1;
-        if (tk) { x.futT = { code: tk.c.code, n: tk.n }; ev.push({ title: `${side} LIMIT ${nm}`, msg: `${tk.text}\n${lv}\n${at}`, tags: 'hourglass', click: tk.url }); } }
-      if (fut && x.futT && !x.ntfyX && (x.status === 'expired' || x.status === 'missed') && x.closed >= now - held) { x.ntfyX = 1;
-        ev.push({ title: `Cancel ${x.futT.code} limit · ${nm}`, msg: `The council's limit order ${x.status === 'missed' ? 'was not filled before the target was reached' : 'expired unfilled'}: cancel your ${x.side} limit on ${x.futT.code}.\n${at}`, tags: 'no_entry_sign', click: tvUrl(fut, x.futT.code) }); }
+      // (8 Nov, council/feed.mjs) a limit re-quoted after a feed change (ntfyP reset, requoted.at) sends a replacement ticket
+      const rq = x.requoted && x.requoted.at >= now - 900;
+      if (fut && !x.ntfyP && x.status === 'pending' && (x.opened >= now - 900 || rq)) { const tk = ticket(x, now, futOpt), had = x.futT; x.ntfyP = 1;
+        if (tk) { x.futT = { code: tk.c.code, n: tk.n }; ev.push({ title: `${rq && had ? 'REPLACE' : side} LIMIT ${nm}`, msg: `${rq && had ? `The candle feed changed and the council re-quoted this order: cancel your ${x.side} limit on ${had.code} and place this one.\n` : ''}${tk.text}\n${lv}\n${at}`, tags: 'hourglass', click: tk.url }); } }
+      if (fut && x.futT && !x.ntfyX && (x.status === 'expired' || x.status === 'missed' || x.status === 'cancelled') && x.closed >= now - held) { x.ntfyX = 1;
+        ev.push({ title: `Cancel ${x.futT.code} limit · ${nm}`, msg: `The council's limit order ${x.status === 'missed' ? 'was not filled before the target was reached' : x.status === 'cancelled' ? `was cancelled (${x.exit || 'feed changed'})` : 'expired unfilled'}: cancel your ${x.side} limit on ${x.futT.code}.\n${at}`, tags: 'no_entry_sign', click: tvUrl(fut, x.futT.code) }); }
       if (!x.ntfyO && x.status === 'open' && x.filled >= now - 900) { x.ntfyO = 1;
         if (fut) { const tk = x.futT ? null : ticket(x, now, futOpt);
           if (tk) { x.futT = { code: tk.c.code, n: tk.n }; ev.push({ title: `${side} ${tk.n} ${tk.c.code} · ${nm}`, msg: `${tk.text}\n${lv}\n${at}`, tags: up, click: tk.url }); continue; }
@@ -108,4 +111,37 @@ export function proposalDigest(proposals, sent, now, { remindEvery = 86400 } = {
   const again = !!prev && prev.key === key;
   return { mark, ev: { title: `Coach suggests (needs your OK on the site)${again ? ' · reminder' : ''}`,
     msg: `${items.map((s) => '• ' + s).join('\n')}\nOpen meridianx.dev → Council → Systems. Nothing changes until you OK it (paper only).\n${when(now)}`, tags: 'bulb', click: SITE } };
+}
+
+// Edge-decay change alert (8 Nov, council/decay.mjs): one message when the set of LIVE systems the monitor marks 'decaying'
+// changes (a system turns decaying, or all of them recover), marked in coach.json decaySent so a restart never resends. The
+// daily digest keeps naming a decaying system; this is the same-round ping. Status only: nothing here changes a rule.
+export function decayKey(decay) {
+  return ((decay && Array.isArray(decay.systems)) ? decay.systems : []).filter((s) => s.live && s.status === 'decaying').map((s) => s.id).sort().join('|');
+}
+export function decayDigest(decay, sent, now) {
+  if (!decay || !Array.isArray(decay.systems)) return null;
+  const key = decayKey(decay), prev = sent && typeof sent === 'object' && typeof sent.key === 'string' ? sent : null;
+  if (prev ? prev.key === key : !key) return null;   // no change (and nothing to say on the first run while all is healthy)
+  const D = decay.systems.filter((s) => s.live && s.status === 'decaying'), W = decay.systems.filter((s) => s.live && s.status === 'watch');
+  const mark = { key, at: new Date(now * 1000).toISOString(), items: D.map((s) => s.name) };
+  const line = (s) => `• ${s.name}: ${(s.why || []).slice(0, 2).join('; ') || 'past its limit'}`;
+  if (!D.length) return { mark, ev: { title: 'Edge decay cleared', msg: `Back to healthy: ${(prev.items || []).join(', ') || prev.key}.\nNothing changed; status only.\n${when(now)}`, tags: 'white_check_mark', click: SITE } };
+  const fresh = D.filter((s) => !(prev && (prev.items || []).includes(s.name)));
+  return { mark, ev: { title: `Edge decay: ${(fresh.length ? fresh : D).map((s) => s.name).join(', ')}`,
+    msg: `${D.map(line).join('\n')}${W.length ? `\nOn watch: ${W.map((s) => s.name).join(', ')}` : ''}\nStatus only: no rule changed, your call (Council → Research on the site).\n${when(now)}`, tags: 'chart_with_downwards_trend', click: SITE } };
+}
+
+// Mosha BO heads-up (8 Nov, snapshot.moshaBo.state from council/mosha.mjs): the owner places trades by hand, and the Mosha BO
+// trade exists only once the M15 BO completes the chain, so there was no warning that the setup is one break away. One
+// message when the H4 BO and the H1 retracement BO are both in place (stage 'm15'), keyed on that pair of events so a
+// restart never resends it; silent again once the chain completes or a new H4 BO restarts it. Status only: no rule changes.
+export function moshaArmedKey(st) { return st && st.stage === 'm15' && st.h4 && st.h1 ? `${st.h4.t}|${st.h1.t}` : ''; }
+export function moshaArmed(st, sent, now) {
+  const key = moshaArmedKey(st);
+  if (!key || (sent && sent.key === key)) return null;
+  const side = st.dir < 0 ? 'sell' : 'buy', w = st.w1 == null ? '' : st.w1 === st.dir ? 'Weekly structure agrees: a live paper trade.' : 'Weekly structure is against it: the trade would be recorded as a shadow.';
+  const hm = (t) => new Date(t * 1000).toISOString().slice(5, 16).replace('T', ' ') + ' UTC';
+  return { mark: { key, at: new Date(now * 1000).toISOString() }, ev: { title: `Mosha BO armed: watch for an M15 ${side} BO on gold`,
+    msg: `H4 BO ${side} at ${st.h4.level} (${hm(st.h4.t)}), H1 retracement BO at ${st.h1.level} (${hm(st.h1.t)}). An M15 BO back ${side} completes the chain and the Trader records the trade.\n${w}\nHeads-up only; nothing is placed.\n${when(now)}`, tags: 'eyes', click: SITE } };
 }

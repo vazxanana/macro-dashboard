@@ -9,13 +9,14 @@
 // second variant); out after 36 trading hours (36 closed H1 candles; skill §21). Sells mirror. One open trade per market.
 import fs from 'node:fs';
 import path from 'node:path';
+import { cmeShut } from './calendar.mjs';
 
 const DATA = process.argv[2] || 'data/ict';
 export const MARKETS = {
-  nq:  { sym: 'NQ=F',  cnbc: ['@ND.1'],           label: 'Nasdaq 100',   short: 'NQ',  tick: 0.25, dec: 2 },
-  es:  { sym: 'ES=F',  cnbc: ['@SP.1', '@ES.1'],  label: 'S&P 500',      short: 'ES',  tick: 0.25, dec: 2 },
-  ym:  { sym: 'YM=F',  cnbc: ['@DJ.1', '@YM.1'],  label: 'Dow Jones',    short: 'YM',  tick: 1,    dec: 0 },
-  rty: { sym: 'RTY=F', cnbc: ['@TFS.1', '@RTY.1'], label: 'Russell 2000', short: 'RTY', tick: 0.1, dec: 1 },
+  nq:  { sym: 'NQ=F',  cnbc: ['@ND.1'], cash: '.NDX', label: 'Nasdaq 100',   short: 'NQ',  tick: 0.25, dec: 2 },
+  es:  { sym: 'ES=F',  cnbc: ['@SP.1', '@ES.1'], cash: '.SPX', label: 'S&P 500',      short: 'ES',  tick: 0.25, dec: 2 },
+  ym:  { sym: 'YM=F',  cnbc: ['@DJ.1', '@YM.1'], cash: '.DJI', label: 'Dow Jones',    short: 'YM',  tick: 1,    dec: 0 },
+  rty: { sym: 'RTY=F', cnbc: ['@TFS.1', '@RTY.1'], cash: '.RUT', label: 'Russell 2000', short: 'RTY', tick: 0.1, dec: 1 },
   // skill §26 (owner, 7 Nov): gold futures with its own A-setup rule (aRule) from 2019-26 history. EUR/USD and GBP/USD were
   // tracked 7 Nov and removed the same day (owner: "remove gbpusd and eurusd").
   gc:  { sym: 'GC=F', cnbc: ['@GC.1'], label: 'Gold', short: 'GC', tick: 0.1, dec: 1, aRule: 'gold' },
@@ -54,6 +55,14 @@ const etStamp = (t) => { const o = {}; for (const p of nyFmt.formatToParts(new D
 // straddles the 18:00 reopen), which made a fake H1 candle each day
 const etH = new Intl.DateTimeFormat('en-US', { timeZone: 'America/New_York', hour: 'numeric', hourCycle: 'h23' });
 export const inHalt = (t) => +etH.format(new Date(t * 1000)) % 24 === 17;
+// 7 Nov (owner OK): CME shut for the weekend (Fri 17:00 - Sun 18:00 New York), a full-day holiday (New Year, Good Friday,
+// Christmas, from the eve's 17:00 until the 18:00 reopen) or a holiday EARLY CLOSE (13:00 New York until the 18:00 reopen:
+// MLK, Presidents', Memorial, Juneteenth, 3-4 July, Labor Day, Thanksgiving and the day after, Christmas Eve). CNBC prints flat
+// candles (open = high = low = close = the last price) into all of these hours: 7-10 a market in 3 weeks of H1 on 7 Nov, four
+// flat H1 candles on the Juneteenth 2026 afternoon. They cannot sweep, but they add fake bars between real ones (shorter real
+// holds, diluted ATR, fake pivots). The calendar is ict/calendar.mjs (derived from the CME rule set, no network).
+export { cmeShut };
+export const closedBar = (t) => inHalt(t) || cmeShut(t);
 export async function cnbcBars(sym, iv, from, to) {
   // audit (7 Nov): CNBC anchors intraday bars at the request's start minute (a run at hh:37 got 5m bars at :02/:07/...),
   // so H1 candles built from them were shifted and changed from run to run; start on the hour
@@ -62,10 +71,75 @@ export async function cnbcBars(sym, iv, from, to) {
   const j = await r.json().catch(() => null), pb = j && j.barData && j.barData.priceBars;
   if (!pb || !pb.length) throw new Error(`CNBC ${sym} ${iv}: ${(j && j.statusMessage) || `HTTP ${r.status}`}`);
   const out = [];
-  for (const b of pb) { const o = +b.open, h = +b.high, l = +b.low, c = +b.close, t = Math.round(+b.tradeTimeinMills / 1000); if ([o, h, l, c, t].every((v) => isFinite(v) && v > 0) && (iv === '1D' || !inHalt(t))) out.push({ time: t, open: o, high: Math.max(h, o, c), low: Math.min(l, o, c), close: c }); }
+  for (const b of pb) { const o = +b.open, h = +b.high, l = +b.low, c = +b.close, t = Math.round(+b.tradeTimeinMills / 1000); if ([o, h, l, c, t].every((v) => isFinite(v) && v > 0) && (iv === '1D' || !closedBar(t))) out.push({ time: t, open: o, high: Math.max(h, o, c), low: Math.min(l, o, c), close: c, volume: +b.volume || 0 }); }
   return out.sort((a, b) => a.time - b.time);
 }
 export const agg = (bars, sec) => { const m = new Map(); for (const b of bars) { const k = Math.floor(b.time / sec) * sec, c = m.get(k); if (!c) m.set(k, { time: k, open: b.open, high: b.high, low: b.low, close: b.close }); else { c.high = Math.max(c.high, b.high); c.low = Math.min(c.low, b.low); c.close = b.close; } } return [...m.values()].sort((a, b) => a.time - b.time); };
+// Futures rolls (research/edge/futures-roll, 7 Nov 2026). CNBC's INTRADAY candles (1H, 5M) of '@ND.1' are the current contract's own
+// prices, so they never step at a roll, but its DAILY candles are a plain splice of front months: on the day CNBC moves to the next
+// contract (around the index expiry week of Mar/Jun/Sep/Dec) the daily series steps by the calendar spread (NQ +200-320, ES +45-75,
+// YM +310-520, RTY +17-29 points, 0.7-1.0 %). That step moved the 50-day bias (and the 20-day range, D1 FVGs, the 'dip' gate) for up
+// to 50 trading days after every roll, and left the daily candles one or more spreads below the H1 candles. rollAdjust back-adjusts the
+// daily candles (Panama: every candle before a switch moves by that switch's spread, summed over later switches), so they are one
+// continuous series in the current contract's prices, like the H1 candles. Each switch and its spread come from CNBC's own cash-index
+// daily closes: the futures-minus-cash basis changes by >= ROLL.minPct of the price and >= ROLL.k x its median daily change, within
+// ROLL.win days of a quarterly expiry (3rd Friday of Mar/Jun/Sep/Dec); steps up to ROLL.merge days apart count as one, and the switch
+// must be upward (contango: a lone downward step, like the expiring contract's settlement-day candle on 18 Jun 2026, is not one). On CNBC's
+// 2024-26 daily candles this finds exactly one switch per quarter for each index and nothing else. Highs minus lows are unchanged, so
+// the daily ATR is too. Gold has no cash series here: its daily candles stay as CNBC prints them (the gold A-rule reads only the
+// daily ATR, which a roll does not move).
+export const ROLL = { minPct: 0.004, k: 8, win: 10, merge: 5 };
+const nyDateFmt = new Intl.DateTimeFormat('en-CA', { timeZone: 'America/New_York', year: 'numeric', month: '2-digit', day: '2-digit' });
+const dayKey = (t) => nyDateFmt.format(new Date((t + 12 * 3600) * 1000));   // CNBC stamps a daily candle at 00:00 New York of its date
+const median = (a) => { const s = [...a].sort((x, y) => x - y); return s.length ? s[s.length >> 1] : null; };
+const nearExpiry = (key) => { const y = +key.slice(0, 4), m = +key.slice(5, 7) - 1, d = +key.slice(8, 10); if (m % 3 !== 2) return false;
+  const fri = 1 + ((5 - new Date(Date.UTC(y, m, 1)).getUTCDay() + 7) % 7) + 14; return Math.abs(d - fri) <= ROLL.win; };
+export function rollAdjust(d1, cash) {
+  const C = new Map(cash.map((b) => [dayKey(b.time), b.close]));
+  const days = d1.map((b, i) => ({ i, key: dayKey(b.time), basis: C.has(dayKey(b.time)) ? b.close - C.get(dayKey(b.time)) : null })).filter((x) => x.basis != null);
+  const ch = days.slice(1).map((x, j) => ({ i: x.i, key: x.key, c: x.basis - days[j].basis }));
+  if (ch.length < 20) return { d1, rolls: [] };
+  const mad = median(ch.map((x) => Math.abs(x.c))), drift = median(ch.map((x) => x.c));
+  const big = (x, c) => Math.abs(c) >= Math.max(ROLL.minPct * d1[x.i].close, ROLL.k * mad);
+  // steps a few days apart are one switch (June 2026: CNBC kept the expiring contract's thin settlement-day candle, then switched):
+  // they are summed and applied at the later day
+  const cand = ch.filter((x) => nearExpiry(x.key) && big(x, x.c)).map((x) => ({ i: x.i, key: x.key, c: x.c - drift }));
+  const merged = []; for (const x of cand) { const L = merged.at(-1);
+    if (L && Date.parse(x.key) - Date.parse(L.key) <= ROLL.merge * 86400e3) { L.i = x.i; L.key = x.key; L.c += x.c; } else merged.push({ ...x }); }
+  const rolls = merged.filter((x) => x.c > 0 && big(x, x.c)).map((x) => ({ i: x.i, day: x.key, spread: +x.c.toFixed(4) }));
+  if (!rolls.length) return { d1, rolls: [] };
+  const out = d1.map((b, i) => { const s = rolls.reduce((a, r) => a + (i < r.i ? r.spread : 0), 0);
+    return s ? { time: b.time, open: b.open + s, high: b.high + s, low: b.low + s, close: b.close + s } : b; });
+  return { d1: out, rolls: rolls.map(({ day, spread }) => ({ day, spread })) };
+}
+// the market's daily candles, back-adjusted when its cash index answers (rolls: the switches applied; null: not adjusted)
+export async function cnbcDaily(M, sym, from, to) {
+  const d1 = await cnbcBars(sym, '1D', from, to);
+  if (!M.cash) return { d1, rolls: null };
+  try { return rollAdjust(d1, await cnbcBars(M.cash, '1D', from, to)); } catch (e) { console.log(`${M.short} daily roll adjust skipped: ${e.message || e}`); return { d1, rolls: null }; }
+}
+// The live tracker re-reads 24 days of intraday candles every run, so on the run after CNBC moves '.1' to the next contract the whole
+// window comes back in the new contract's prices, while an open trade's entry and stop are the old contract's: a sell would be stopped by
+// the spread alone, a buy would gain it (break-even and trail would move). contractShift compares this run's H1 candles with the last
+// run's (bars.json, same CNBC symbol): a switch is a near-constant offset of >= SHIFT.minPct of the price on >= 80 % of the last 48
+// shared closed candles (no switch: they are equal). shiftTrade moves an open trade's price levels by that offset (R is unchanged).
+export const SHIFT = { minPct: 0.002, tol: 0.001, n: 48, min: 24, share: 0.8 };
+export function contractShift(prevH1, H) {
+  if (!Array.isArray(prevH1) || !H.length) return 0;
+  const P = new Map(prevH1.map((b) => [b[0], b[4]]));
+  const d = H.filter((b) => P.has(b.time)).slice(-SHIFT.n).map((b) => b.close - P.get(b.time));
+  if (d.length < SHIFT.min) return 0;
+  const m = median(d), px = H.at(-1).close;
+  if (Math.abs(m) < SHIFT.minPct * px) return 0;
+  return d.filter((x) => Math.abs(x - m) <= SHIFT.tol * px).length >= SHIFT.share * d.length ? m : 0;
+}
+export function shiftTrade(tr, by, f, at) {
+  for (const k of ['entry', 'stop', 'stop0', 't1', 't2', 'signalPx', 'ih', 'dol']) if (tr[k] != null) tr[k] = f(tr[k] + by);
+  if (tr.sweep && tr.sweep.level != null) tr.sweep = { ...tr.sweep, level: f(tr.sweep.level + by) };
+  if (Array.isArray(tr.fvg)) tr.fvg = tr.fvg.map((v) => f(v + by));
+  tr.rolled = (tr.rolled || []).concat([{ at, by: f(by) }]);
+  return tr;
+}
 // H1 (built from 5m, ~24 days), D1 (~1 year) and 5m (5 days) for one market
 async function feed(M) {
   for (const sym of M.cnbc) {
@@ -73,12 +147,12 @@ async function feed(M) {
       let m5 = [];
       for (let t = now - 24 * 86400; t < now; t += 6 * 86400) { m5 = m5.concat(await cnbcBars(sym, '5M', t, Math.min(now + 300, t + 6 * 86400))); await sleep(400); }
       { const by = new Map(); for (const b of m5) by.set(b.time, b); m5 = [...by.values()].sort((a, b) => a.time - b.time); }   // the later (fuller) copy of a bar wins
-      const d1 = await cnbcBars(sym, '1D', now - 400 * 86400, now + 86400);
-      if (m5.length > 500 && d1.length > 60) return { src: `cnbc ${sym}`, h1: agg(m5, 3600), d1, m5: m5.filter((b) => b.time >= now - 5 * 86400) };
+      const { d1, rolls } = await cnbcDaily(M, sym, now - 400 * 86400, now + 86400);
+      if (m5.length > 500 && d1.length > 60) return { src: `cnbc ${sym}`, h1: agg(m5, 3600), d1, rolls, m5: m5.filter((b) => b.time >= now - 5 * 86400) };
     } catch (e) { console.log(String(e.message || e)); }
   }
   const [h1, d1, m5] = [await yahoo(M.sym, '60m', '60d'), await yahoo(M.sym, '1d', '1y'), await yahoo(M.sym, '5m', '5d')];
-  return { src: `yahoo ${M.sym}`, h1: h1.bars.filter((b) => !inHalt(b.time)), d1: d1.bars, m5: m5.bars.filter((b) => !inHalt(b.time)) };
+  return { src: `yahoo ${M.sym}`, h1: h1.bars.filter((b) => !closedBar(b.time)), d1: d1.bars, m5: m5.bars.filter((b) => !closedBar(b.time)) };
 }
 const load = (f, d) => { try { return JSON.parse(fs.readFileSync(path.join(DATA, f), 'utf8')); } catch (e) { return d; } };
 const save = (f, v) => fs.writeFileSync(path.join(DATA, f), JSON.stringify(v, null, f === 'trades.json' ? 0 : 1));
@@ -296,6 +370,7 @@ async function main() {
   shadow.variants = shadow.variants || {};
   for (const v of VARIANTS) { const V = (shadow.variants[v] = shadow.variants[v] || { since: new Date(now * 1000).toISOString(), trades: [], errors: {} }); V.trades = V.trades || []; V.errors = V.errors || {}; }
   const trades = load('trades.json', []), snap = { at: new Date().toISOString(), markets: {}, errors: {}, model: { ...P, name: 'H1 iFVG reversal' } }, bars = {};
+  const prevBars = load('bars.json', {}) || {}, prevSnap = load('snapshot.json', {}) || {};   // last run's candles, for contractShift
   for (const [key, M] of Object.entries(MARKETS)) {
     try {
       const F = await feed(M), price = F.m5.length ? F.m5.at(-1).close : F.h1.at(-1).close;
@@ -306,6 +381,11 @@ async function main() {
       const frontier = done.length ? done.at(-1).time + 300 : now, m5 = { bars: done };
       const H = F.h1.filter((b) => b.time + 3600 <= Math.min(now, frontier)), D = F.d1.filter((b) => b.time + 86400 <= now);
       const f = (v) => +(+v).toFixed(M.dec);
+      // 0. contract switch since the last run (same CNBC symbol): open trades (live and shadow) move to the new contract's prices
+      const shift = prevSnap.markets && prevSnap.markets[key] && prevSnap.markets[key].src === F.src && F.src.startsWith('cnbc') && prevBars[key] ? contractShift(prevBars[key].h1, H) : 0;
+      if (shift) { const open = [trades, shadow.trades, ...VARIANTS.map((v) => shadow.variants[v].trades)].flatMap((a) => a.filter((x) => x.market === key && x.status === 'open'));
+        for (const tr of open) shiftTrade(tr, shift, f, now);
+        console.log(`${M.short}: contract switch, H1 moved ${f(shift)}; ${open.length} open trade(s) shifted`); }
       // 1. manage open trades on 5m candles
       for (const tr of trades.filter((x) => x.market === key && x.status === 'open')) manageTrade(tr, H, m5, f);
       // 2. new signals: an inversion candle closed in the last 3 h, not yet recorded, no open trade on this market
@@ -326,7 +406,8 @@ async function main() {
       const last = sig.at(-1), dd = D.at(-1);
       snap.markets[key] = { label: M.label, short: M.short, src: F.src, price: f(price), at: m5.bars.length ? m5.bars.at(-1).time + 300 : now,
         lastSignal: last ? { side: last.side > 0 ? 'buy' : 'sell', at: last.close, entry: f(last.entry), grade: letter(last.grade.total) } : null,
-        pdh: dd ? f(dd.high) : null, pdl: dd ? f(dd.low) : null, open: trades.filter((x) => x.market === key && x.status === 'open').length };
+        pdh: dd ? f(dd.high) : null, pdl: dd ? f(dd.low) : null, open: trades.filter((x) => x.market === key && x.status === 'open').length,
+        d1Roll: F.rolls && F.rolls.length ? F.rolls.at(-1) : null, ...(shift ? { switched: { at: now, by: f(shift) } } : {}) };   // last daily roll adjusted; a contract switch this run
       bars[key] = { h1: H.slice(-400).map((b) => [b.time, f(b.open), f(b.high), f(b.low), f(b.close)]), m5: m5.bars.slice(-600).map((b) => [b.time, f(b.open), f(b.high), f(b.low), f(b.close)]),
         d1: D.slice(-120).map((b) => [b.time, f(b.open), f(b.high), f(b.low), f(b.close)]) };
       // 4. shadow 'dip' (paper comparison only): its own open trade per market, own entries, own file; runs after everything

@@ -110,7 +110,7 @@ test('the Trader wires the helpers into every stop check it makes', () => {
   assert.match(src, /import \{[^}]*stopFill[^}]*\} from '\.\/fills\.mjs'/);
   assert.equal((src.match(/stopFill\(b, s, (tr|r)\.stop/g) || []).length, 4, 'main loop, replica research, other research, NQ');
   assert.match(src, /fillBarAmbiguous\(b, s, tr\.entry, tr\.stop, tr\.t1\)/);
-  assert.match(src, /spotClosed\(b\.time\)/);
+  assert.match(src, /spotSkip\(b\.time\)/);   // spot shut or the 17:00 rollover minutes (7 Nov)
   assert.match(src, /annotateCosts\(trades, MARKETS, model\)/);
   // no stop check left that books a flat -1R without looking at the candle's open
   assert.doesNotMatch(src, /b\.low <= r\.stop\) \{ r\.status = 'loss'; r\.R = -1;/);

@@ -36,9 +36,9 @@ test('variantTags: each variant\'s verdict on an A-setup (what the replay stores
 });
 test('coach.json: the daily Coach rewrite keeps the proposals and the ICT watch list', async () => {
   const { coachCarry } = await import('../council/proposals.mjs');
-  const prev = { proposals: [{ kind: 'ictFilter' }], proposalsKey: 'v5|k', proposalsSent: { key: 'a' }, ictWatch: [{ kind: 'ictWatch', value: 'h1opp' }], notes: ['old'] };
-  assert.deepEqual(coachCarry(prev), { proposals: prev.proposals, proposalsKey: 'v5|k', proposalsSent: { key: 'a' }, ictWatch: prev.ictWatch });
-  assert.deepEqual(coachCarry({}), { proposals: [], proposalsKey: '', proposalsSent: undefined, ictWatch: [] });
+  const prev = { proposals: [{ kind: 'ictFilter' }], proposalsKey: 'v5|k', proposalsSent: { key: 'a' }, ictWatch: [{ kind: 'ictWatch', value: 'h1opp' }], decaySent: { key: 'mosha-bo', items: ['Mosha BO'] }, notes: ['old'] };
+  assert.deepEqual(coachCarry(prev), { proposals: prev.proposals, proposalsKey: 'v5|k', proposalsSent: { key: 'a' }, ictWatch: prev.ictWatch, decaySent: prev.decaySent });
+  assert.deepEqual(coachCarry({}), { proposals: [], proposalsKey: '', proposalsSent: undefined, ictWatch: [], decaySent: undefined });
 });
 
 test('open trades and non-A trades are ignored; bad input gives nothing', () => {
