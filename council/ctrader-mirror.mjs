@@ -7,8 +7,16 @@
 //   * DEMO ONLY: the host is the cTrader demo endpoint, CTRADER_ENV must be "demo", and the account must report isLive:false
 //     before account auth is sent. A live account is refused (the owner decides on live separately, with demo results).
 //   * OFF unless CTRADER_MIRROR=on. Without the CTRADER_* secrets it does nothing.
-//   * Only these message types can be sent: auth, account list, trader, reconcile, symbols, token refresh, heartbeat, NEW MARKET
-//     ORDER and CLOSE POSITION. No amend, no cancel, no pending orders.
+//   * Only these message types can be sent: auth, account list, trader, reconcile, symbols, token refresh, heartbeat, NEW ORDER
+//     (market, or a LIMIT order for a council trade that is still pending), CANCEL ORDER (only the mirror's own pending orders, by
+//     label + comment) and CLOSE POSITION. No amend.
+//   * Same time as the council (8 Nov, owner): the council records a trade as `pending` at its entry level and fills it when a
+//     later candle touches that level. The mirror now places the same LIMIT order at the broker (price = the council entry, absolute
+//     stop and target = the council levels, valid until the council's own expiry), so the demo fills on the same touch at the same
+//     price. When the council marks the trade filled while the broker's limit is still resting (a feed saw the touch first) the
+//     limit is cancelled and a market order follows; when the broker fills first, the position is adopted by label + comment; when
+//     the council expires, misses or drops the trade, the limit is cancelled. A pending entry on the wrong side of the current
+//     price (a buy above it) is left to the council's next candle (it fills there) and then copied as a market order.
 //   * Small and capped: risk-based lots (see sizing below, valued with the broker's own specs from ctrader/symbols.json, written
 //     each round by council/ctrader-symbols.mjs), one trade's margin at most LIMITS.maxMarginShare of the balance (LIMITS.maxLots
 //     when the broker's margin is unknown), all open positions' margin at most LIMITS.maxTotalMarginShare, never above the broker's
@@ -43,13 +51,16 @@ import { sendAlerts, when, NTFY_DEFAULT } from './alerts.mjs';
 export const DEMO_HOST = 'wss://demo.ctraderapi.com:5036';
 export const PT = {
   APP_AUTH_REQ: 2100, APP_AUTH_RES: 2101, ACCOUNT_AUTH_REQ: 2102, ACCOUNT_AUTH_RES: 2103,
-  NEW_ORDER_REQ: 2106, CLOSE_POSITION_REQ: 2111, SYMBOLS_LIST_REQ: 2114, SYMBOLS_LIST_RES: 2115,
+  NEW_ORDER_REQ: 2106, CANCEL_ORDER_REQ: 2108, CLOSE_POSITION_REQ: 2111, SYMBOLS_LIST_REQ: 2114, SYMBOLS_LIST_RES: 2115,
   SYMBOL_BY_ID_REQ: 2116, SYMBOL_BY_ID_RES: 2117, TRADER_REQ: 2121, TRADER_RES: 2122, RECONCILE_REQ: 2124, RECONCILE_RES: 2125,
   EXECUTION_EVENT: 2126, ORDER_ERROR_EVENT: 2132, OA_ERROR_RES: 2142, ACCOUNTS_BY_TOKEN_REQ: 2149, ACCOUNTS_BY_TOKEN_RES: 2150,
   REFRESH_TOKEN_REQ: 2173, REFRESH_TOKEN_RES: 2174, ERROR_RES: 50, HEARTBEAT: 51,
 };
 export const ALLOWED = new Set([PT.APP_AUTH_REQ, PT.ACCOUNTS_BY_TOKEN_REQ, PT.ACCOUNT_AUTH_REQ, PT.TRADER_REQ, PT.RECONCILE_REQ,
-  PT.SYMBOLS_LIST_REQ, PT.SYMBOL_BY_ID_REQ, PT.REFRESH_TOKEN_REQ, PT.HEARTBEAT, PT.NEW_ORDER_REQ, PT.CLOSE_POSITION_REQ]);
+  PT.SYMBOLS_LIST_REQ, PT.SYMBOL_BY_ID_REQ, PT.REFRESH_TOKEN_REQ, PT.HEARTBEAT, PT.NEW_ORDER_REQ, PT.CANCEL_ORDER_REQ, PT.CLOSE_POSITION_REQ]);
+// the council's pending-order validity when a trade carries no validFor (council/trader.mjs WAIT, kept in step)
+export const WAIT = { '1d': 5 * 86400, '4h': 2 * 86400, '1h': 12 * 3600, '30m': 6 * 3600, '15m': 3 * 3600 };
+export const validUntil = (t) => (+t.opened || 0) + (+t.validFor || WAIT[t.h] || 86400);
 const NEED = ['CTRADER_CLIENT_ID', 'CTRADER_CLIENT_SECRET', 'CTRADER_ACCESS_TOKEN', 'CTRADER_REFRESH_TOKEN', 'CTRADER_ACCOUNT_ID', 'CTRADER_ENV'];
 // council / ICT desk market -> broker symbol names to try, in order (Fusion Markets cTrader names first). The ICT desk signals on
 // CME futures (NQ, ES, YM, RTY, GC); the demo trades the matching cash index / spot gold CFD: only the stop distance is copied,
@@ -127,6 +138,21 @@ export function orderStep(p) {
     const e = new Error(String(p.errorCode || Object.keys(EXEC).find((k) => EXEC[k] === x))); e.code = p.errorCode || ''; return e;
   }
   return 'done';
+}
+// a LIMIT order is done once ACCEPTED (it rests; a fill, if the price is already there, shows up as a position next round)
+export function pendingStep(p) {
+  const x = execType(p.executionType);
+  if ([EXEC.ORDER_REJECTED, EXEC.ORDER_CANCELLED, EXEC.ORDER_EXPIRED, EXEC.ORDER_CANCEL_REJECTED].includes(x)) {
+    const e = new Error(String(p.errorCode || Object.keys(EXEC).find((k) => EXEC[k] === x))); e.code = p.errorCode || ''; return e;
+  }
+  return 'done';
+}
+// a CANCEL is done at ORDER_CANCELLED; CANCEL_REJECTED (the order filled or is gone meanwhile) is an error; anything else: keep waiting
+export function cancelStep(p) {
+  const x = execType(p.executionType);
+  if (x === EXEC.ORDER_CANCELLED) return 'done';
+  if ([EXEC.ORDER_CANCEL_REJECTED, EXEC.ORDER_REJECTED].includes(x)) { const e = new Error(String(p.errorCode || 'ORDER_CANCEL_REJECTED')); e.code = p.errorCode || 'ORDER_CANCEL_REJECTED'; return e; }
+  return 'wait';
 }
 export function session(WS, scrub, url = DEMO_HOST, { timeout = 10000 } = {}) {
   if (url !== DEMO_HOST) throw new Error('refusing a non-demo host');
@@ -261,7 +287,7 @@ export function mirrorAlertText(e, now) {
   if (e.kind === 'open') {
     const p = px(e.price, e.digits), lv = [px(e.entry, e.digits) && `council entry ${px(e.entry, e.digits)}`, px(e.stop, e.digits) && `stop ${px(e.stop, e.digits)}`,
       e.noTarget || px(e.t1, e.digits) == null ? 'no fixed target' : `target ${px(e.t1, e.digits)}`].filter(Boolean).join(' · ');
-    return { title: `Demo mirror: ${head}${lotTxt(e)}`, msg: `${e.filled === false ? 'Order accepted, fill not confirmed yet' : `Opened${p ? ` at ${p}` : ''}`} · ${lv}\n${councilTxt(e)}\n${at}`, tags: `robot,${up}` };
+    return { title: `Demo mirror: ${head}${lotTxt(e)}`, msg: `${e.filled === false ? 'Order accepted, fill not confirmed yet' : `${e.viaLimit ? 'Limit filled' : 'Opened'}${p ? ` at ${p}` : ''}`} · ${lv}\n${councilTxt(e)}\n${at}`, tags: `robot,${up}` };
   }
   if (e.kind === 'close') {
     const p = px(e.price, e.digits), pl = e.pnl != null && Number.isFinite(+e.pnl) ? `gross P/L ${+e.pnl >= 0 ? '+' : ''}${(+e.pnl).toFixed(2)}` : '';
@@ -270,6 +296,11 @@ export function mirrorAlertText(e, now) {
     return { title: `Demo mirror: closed ${head}${lotTxt(e)}`, msg: `${top ? top + '\n' : ''}${why}\n${councilTxt(e)}\n${at}`,
       tags: `robot,${good > 0 ? 'white_check_mark' : good < 0 ? 'x' : 'checkered_flag'}` };
   }
+  if (e.kind === 'pending') {
+    const lv = [px(e.stop, e.digits) && `stop ${px(e.stop, e.digits)}`, e.noTarget || px(e.t1, e.digits) == null ? 'no fixed target' : `target ${px(e.t1, e.digits)}`].filter(Boolean).join(' · ');
+    return { title: `Demo mirror: limit placed · ${head}${lotTxt(e)}`, msg: `Resting at ${px(e.price, e.digits)} · ${lv}${e.expires ? ` · valid to ${String(e.expires).slice(0, 16)}Z` : ''}\nFills on the same touch as the council.\n${councilTxt(e)}\n${at}`, tags: `robot,hourglass_flowing_sand` };
+  }
+  if (e.kind === 'cancel') return { title: `Demo mirror: limit cancelled · ${head}${lotTxt(e)}`, msg: `${e.reason || 'cancelled'}${e.council === 'open' ? ' (a market order follows)' : ''}\n${councilTxt(e)}\n${at}`, tags: 'robot,wastebasket' };
   if (e.kind === 'reject') return { title: `Demo mirror: order rejected · ${head}${lotTxt(e)}`, msg: `${e.result || 'rejected'}\nNot retried.\n${councilTxt(e)}\n${at}`, tags: 'robot,no_entry_sign' };
   if (e.kind === 'unfilled') return { title: `Demo mirror: order not filled · ${head}`, msg: `No position at the broker 10 min after the order was accepted.\n${councilTxt(e)}\n${at}`, tags: 'robot,no_entry_sign' };
   if (e.kind === 'summary') return { title: `Demo mirror: ${e.n} orders this round`, msg: `${e.opens} opened, ${e.closes} closed, ${e.other} other events${e.catchUp ? ' (catch-up of the council\'s open trades, shadows included)' : ''}. Details in Council → Desk & mirror.\n${when(now)}`, tags: 'robot,package' };
@@ -374,7 +405,15 @@ export async function mirrorRound({ env, trades, state, tokens, specs = null, WS
     if (st.day.startBalance == null && balance != null) st.day.startBalance = balance;   // first readable balance of the day
     const rc = await s.send(PT.RECONCILE_REQ, { ctidTraderAccountId: ctid }, PT.RECONCILE_RES);
     const positions = new Map((rc.position || []).map((p) => [String(p.positionId), p]));
+    const bOrders = new Map((rc.order || []).map((o) => [String(o.orderId), o]));   // pending orders resting at the broker
     const iso = new Date(now * 1000).toISOString(), byId = new Map(trades.map((t) => [t.id, t]));
+    st.orders = st.orders || {};   // the mirror's own resting LIMIT orders, by council trade id
+    const PAUSE_KEY = (name, pending) => (pending ? `${name}:pending` : name);
+    const skipT = (t, why) => { (st.skipped = st.skipped || {})[t.id] = why; if (st.wait) delete st.wait[t.id]; say(`not mirrored ${t.id}: ${why}`, { trade: t.id }); };
+    // "not now" answers: tried again next round for as long as the trade is open or pending. Only a counted answer (count: a broker
+    // rejection that is not a closed market) can run out of tries, LIMITS.retries in all; a repeat of the same reason is not logged again
+    const laterT = (t, why, count = false) => { const w = (st.wait || {})[t.id] || { n: 0 }, n = w.n + (count ? 1 : 0); (st.wait = st.wait || {})[t.id] = { why, n, at: iso };
+      if (count && n >= LIMITS.retries) skipT(t, `${why} (${n} tries)`); else if (w.why !== why) say(`not mirrored yet ${t.id}: ${why} (will retry)`, { trade: t.id }); };
 
     // 0) find our positions by label + comment: confirms orders whose fill was not seen ("sent"), and adopts positions whose round
     //    never saved (job cancelled mid-round, timeout), so they are managed and the trade is never opened twice
@@ -388,16 +427,40 @@ export async function mirrorRound({ env, trades, state, tokens, specs = null, WS
       // a skip note means the round that sent the order saved its state (the order got no answer) and sent no open alert: alert now.
       // Without one, the round that sent it may have been lost after alerting: no open alert (never twice).
       const unanswered = !m && !!(st.skipped && st.skipped[t.id]);
-      st.map[t.id] = { ...(m || { symbol: t.market.toUpperCase(), side: t.side, setup: t.k, openedAt: iso, councilEntry: t.entry, stop: t.stop, t1: t.t1, adopted: true, alerted: unanswered ? [] : ['open'] }),
-        positionId: pid, volume: +(p.tradeData || {}).volume || (m && m.volume), status: 'open' };
+      // the mirror's own LIMIT order filled at the broker (same touch as the council's): the position is ours from now on
+      const o = st.orders[t.id] || null;
+      st.map[t.id] = { ...(m || { symbol: o ? o.symbol : t.market.toUpperCase(), side: t.side, setup: t.k, openedAt: iso, councilEntry: t.entry, stop: t.stop, t1: t.t1, adopted: !o, alerted: unanswered || o ? [] : ['open'],
+          ...(o ? { viaLimit: true, limitPrice: o.limitPrice, digits: o.digits, lots: o.lots, riskCash: o.riskCash, ...(o.margin != null ? { margin: o.margin } : {}), ...(o.minLot ? { minLot: true } : {}), ...(o.shadow ? { shadow: true } : {}),
+            ...fillQuality(t, p.price ?? o.limitPrice, now) } : {}) }),
+        positionId: pid, volume: +(p.tradeData || {}).volume || (m && m.volume) || (o && o.volume), status: 'open' };
+      if (o) delete st.orders[t.id];
       if (st.skipped) delete st.skipped[t.id]; if (st.wait) delete st.wait[t.id];
-      say(`${m ? 'confirmed' : 'found'} ${st.map[t.id].symbol} position ${pid} at the broker`, { trade: t.id });
-      if (unanswered) alert('open', t.id, st.map[t.id], () => ({ filled: true, price: p.price ?? null, entry: t.entry, stop: t.stop, t1: t.t1, noTarget: t.t1 == null || t.rr >= 50 }));
+      say(`${o ? 'limit filled:' : m ? 'confirmed' : 'found'} ${st.map[t.id].symbol} position ${pid} at the broker`, { trade: t.id });
+      if (unanswered || o) alert('open', t.id, st.map[t.id], () => ({ filled: true, viaLimit: !!o, price: p.price ?? (o ? o.limitPrice : null), entry: t.entry, stop: t.stop, t1: t.t1, noTarget: t.t1 == null || t.rr >= 50 }));
     }
     for (const [id, m] of Object.entries(st.map)) {
       if (m.status !== 'sent') continue;
       if (m.positionId && positions.has(String(m.positionId))) { m.status = 'open'; continue; }
       if (now - Date.parse(m.openedAt) / 1000 > 600) { m.status = 'not filled'; m.closedAt = iso; say(`${m.symbol} order for ${id}: no position at the broker`, { trade: id }); alert('unfilled', id, m); }
+    }
+    // 0b) our resting LIMIT orders: gone at the broker without a position (expired there, or cancelled by hand) -> the trade may be
+    //     placed again while the council still has it pending (counted, so a broker that keeps dropping it stops after LIMITS.retries)
+    for (const [id, o] of Object.entries(st.orders)) {
+      if (bOrders.has(String(o.orderId))) continue;
+      delete st.orders[id]; const t = byId.get(id);
+      say(`${o.symbol} limit order ${o.orderId} for ${id} is gone at the broker (expired or cancelled there)`, { trade: id });
+      if (t && t.status === 'pending') laterT(t, `${o.symbol} limit order gone at the broker`, true);
+    }
+    // 0c) cancel our LIMIT order when the council no longer has the trade pending: filled on the council's feed first (a market
+    //     order follows in step 3 this round), expired / missed / dropped (nothing follows). A cancel the broker rejects means the
+    //     order filled meanwhile: the position is adopted next round (step 0), nothing is sent now.
+    for (const [id, o] of Object.entries(st.orders)) {
+      const t = byId.get(id), reason = !t ? 'the council dropped the trade' : t.status === 'pending' ? null : t.status === 'open' ? 'the council filled it on its feed first' : `the council ended it: ${t.status}`;
+      if (!reason) continue;
+      try { await s.send(PT.CANCEL_ORDER_REQ, { ctidTraderAccountId: ctid, orderId: Number(o.orderId) }, PT.EXECUTION_EVENT, cancelStep);
+        delete st.orders[id]; out.sent.push({ type: 'cancel', trade: id }); say(`cancelled ${o.symbol} limit order ${o.orderId} for ${id}: ${reason}`, { trade: id });
+        alert('cancel', id, o, { reason, council: t ? t.status : null }); }
+      catch (e) { say(`cancel of ${o.symbol} limit order ${o.orderId} for ${id} failed: ${e.message} (checked again next round)`, { trade: id }); }
     }
     // 1) positions gone at the broker (stop/target hit there, or our accepted close filled after its round) -> mark done
     for (const [id, m] of Object.entries(st.map)) if (m.status === 'open' && !positions.has(String(m.positionId))) {
@@ -419,9 +482,11 @@ export async function mirrorRound({ env, trades, state, tokens, specs = null, WS
     }
     // 3) new live council trades -> open
     const dayDown = st.day.startBalance && balance != null ? (st.day.startBalance - balance) / st.day.startBalance : 0;
-    const openCount = () => Object.values(st.map).filter((m) => m.status === 'open' || m.status === 'sent').length;   // unconfirmed orders count too
-    // every open council trade not yet copied or skipped is eligible, whatever its age (8 Nov, owner: "even the ones active now")
-    const fresh = trades.filter((t) => (!t.shadow || shadows) && OPEN.has(t.status) && SYMBOLS[t.market] && !st.map[t.id] && !(st.skipped || {})[t.id]
+    const openCount = () => Object.values(st.map).filter((m) => m.status === 'open' || m.status === 'sent').length + Object.keys(st.orders).length;   // unconfirmed and resting orders count too
+    // every open council trade not yet copied or skipped is eligible, whatever its age (8 Nov, owner: "even the ones active now");
+    // a pending council trade (not ICT) is eligible for a resting LIMIT order at its entry
+    const fresh = trades.filter((t) => (!t.shadow || shadows) && (OPEN.has(t.status) || (t.status === 'pending' && !String(t.id).startsWith('ict:'))) && SYMBOLS[t.market]
+      && !st.map[t.id] && !st.orders[t.id] && !(st.skipped || {})[t.id]
       && (t.side === 'buy' || t.side === 'sell') && t.stop != null && t.entry != null && Math.abs(t.entry - t.stop) > 0);
     if (shadows && !st.catchUpAt) { st.catchUpAt = iso; say(`catch-up round: ${fresh.length} open council trade${fresh.length === 1 ? '' : 's'} (shadows included) considered`); }
     st.paused = Object.fromEntries(Object.entries(st.paused || {}).filter(([, until]) => Date.parse(until) / 1000 > now));   // closed-market pauses still running
@@ -429,19 +494,46 @@ export async function mirrorRound({ env, trades, state, tokens, specs = null, WS
       const names = await s.send(PT.SYMBOLS_LIST_REQ, { ctidTraderAccountId: ctid }, PT.SYMBOLS_LIST_RES);
       const idOf = new Map((names.symbol || []).filter((x) => x.enabled !== false).map((x) => [normName(x.symbolName), x.symbolId]));
       for (const t of fresh) {
-        const skip = (why) => { (st.skipped = st.skipped || {})[t.id] = why; if (st.wait) delete st.wait[t.id]; say(`not mirrored ${t.id}: ${why}`, { trade: t.id }); };
-        // "not now" answers: tried again next round for as long as the trade is open. Only a counted answer (count: a broker
-        // rejection that is not a closed market) can run out of tries, LIMITS.retries in all; a repeat of the same reason is not logged again
-        const later = (why, count = false) => { const w = (st.wait || {})[t.id] || { n: 0 }, n = w.n + (count ? 1 : 0); (st.wait = st.wait || {})[t.id] = { why, n, at: iso };
-          if (count && n >= LIMITS.retries) skip(`${why} (${n} tries)`); else if (w.why !== why) say(`not mirrored yet ${t.id}: ${why} (will retry)`, { trade: t.id }); };
+        const skip = (why) => skipT(t, why), later = (why, count = false) => laterT(t, why, count);
+        const pending = t.status === 'pending';
         if (dayDown >= LIMITS.dayStop) { later(`daily loss stop (${(dayDown * 100).toFixed(1)}% down today)`); continue; }
         if (openCount() >= LIMITS.maxOpen) { later(`${LIMITS.maxOpen} mirror positions already open`); continue; }
         const name = SYMBOLS[t.market].find((n) => idOf.has(normName(n))), symbolId = name && idOf.get(normName(name));
         if (!symbolId) { skip(`none of ${SYMBOLS[t.market].join('/')} found at the broker`); continue; }
-        if (st.paused[name]) { later(`${name} market closed (paused until ${st.paused[name].slice(11, 16)} UTC)`); continue; }
+        if (st.paused[PAUSE_KEY(name, pending)]) { later(`${name} market closed (paused until ${st.paused[PAUSE_KEY(name, pending)].slice(11, 16)} UTC)`); continue; }
         const sell = t.side === 'sell', sgn = sell ? -1 : 1, isIct = String(t.id).startsWith('ict:');
-        // council trades: distances measured from the council's latest price, so the demo stop/target sit at the council's levels
         const mark = isIct ? null : markOf(marks, t.market, now); let from = t.entry;
+        if (pending) {
+          // a resting LIMIT order at the council's entry: the broker fills it on the same touch the council fills on
+          const exp = validUntil(t);
+          if (exp - now < 60) { later('the council order expires within a minute'); continue; }
+          if (!mark) { later('no current council price to place the limit against'); continue; }
+          if (sgn * (mark - t.entry) <= 0) { later(`entry ${t.entry} is ${sell ? 'below' : 'above'} the price ${mark}: the council fills it on its next candle, copied then`); continue; }
+          const info = ((await s.send(PT.SYMBOL_BY_ID_REQ, { ctidTraderAccountId: ctid, symbolId: [symbolId] }, PT.SYMBOL_BY_ID_RES)).symbol || [])[0] || {};
+          const live = Object.values(st.map).filter((m) => m.status === 'open' || m.status === 'sent').concat(Object.values(st.orders));
+          const openRisk = live.reduce((a, m) => a + (+m.riskCash || 0), 0), openMargin = live.reduce((a, m) => a + (+m.margin || 0), 0);
+          const rv = riskVolume({ info, t, balance, name, openRisk, openMargin, spec: specFor(specs, name), now });
+          if (rv.skip) { (rv.retry ? later : skip)(rv.skip); continue; }
+          const d = Number.isFinite(+info.digits) ? +info.digits : 5, at = (v) => +(+v).toFixed(d);
+          if (info.tradingMode != null && info.tradingMode !== 0 && info.tradingMode !== 'ENABLED') { later(`${name} not tradable now (mode ${info.tradingMode})`); continue; }
+          const order = { ctidTraderAccountId: ctid, symbolId, orderType: 2, tradeSide: sell ? 2 : 1, volume: rv.volume, limitPrice: at(t.entry), stopLoss: at(t.stop), label: LABEL,
+            comment: commentFor(t), clientOrderId: String(t.id).slice(0, 50), timeInForce: 1, expirationTimestamp: exp * 1000 };   // 1: GOOD_TILL_DATE
+          if (t.t1 != null && !(t.rr >= 50)) order.takeProfit = at(t.t1);
+          try {
+            const ev = await s.send(PT.NEW_ORDER_REQ, order, PT.EXECUTION_EVENT, pendingStep);
+            const oid = ev.order && ev.order.orderId; if (oid == null) throw Object.assign(new Error('order accepted without an order id'), { code: 'NO_ORDER_ID' });
+            st.orders[t.id] = { orderId: String(oid), symbol: name, side: t.side, volume: rv.volume, lots: rv.lots, digits: d, setup: t.k, limitPrice: order.limitPrice, stop: t.stop, t1: t.t1, placedAt: iso,
+              expires: new Date(exp * 1000).toISOString(), riskCash: rv.riskCash, ...(rv.margin != null ? { margin: rv.margin } : {}), ...(rv.minLot ? { minLot: true } : {}), ...(t.shadow ? { shadow: true } : {}) };
+            if (st.wait) delete st.wait[t.id];
+            out.sent.push({ type: 'limit', trade: t.id }); say(`placed ${sell ? 'sell' : 'buy'} limit ${name} ${rv.lots} lot at ${order.limitPrice} (council ${t.k}, valid to ${st.orders[t.id].expires.slice(0, 16)}Z)`, { trade: t.id });
+            alert('pending', t.id, st.orders[t.id], () => ({ price: order.limitPrice, stop: t.stop, t1: t.t1, noTarget: !('takeProfit' in order), expires: st.orders[t.id].expires }));
+          } catch (e) { const txt = `${e.code || ''} ${e.message}`;
+            if (PAUSE.test(txt)) { st.paused[PAUSE_KEY(name, true)] = new Date((now + LIMITS.pause) * 1000).toISOString(); later(`${name} market closed: ${e.message}`); }
+            else if (RETRY.test(txt)) later(`limit rejected: ${e.message}`, true); else skip(`limit rejected: ${e.message}`);
+            if ((st.skipped || {})[t.id] && !(!e.code && UNSURE.test(e.message))) alert('reject', t.id, null, () => ({ symbol: name, side: t.side, lots: rv.lots, result: st.skipped[t.id] })); }
+          continue;
+        }
+        // council trades: distances measured from the council's latest price, so the demo stop/target sit at the council's levels
         if (mark) {
           const R = Math.abs(t.entry - t.stop), ran = (sgn * (mark - t.entry)) / R;
           if (sgn * (mark - t.stop) <= 0) { skip(`price ${mark} is already past the council stop ${t.stop}`); continue; }
@@ -450,7 +542,7 @@ export async function mirrorRound({ env, trades, state, tokens, specs = null, WS
           from = mark;
         }
         const info = ((await s.send(PT.SYMBOL_BY_ID_REQ, { ctidTraderAccountId: ctid, symbolId: [symbolId] }, PT.SYMBOL_BY_ID_RES)).symbol || [])[0] || {};
-        const live = Object.values(st.map).filter((m) => m.status === 'open' || m.status === 'sent');
+        const live = Object.values(st.map).filter((m) => m.status === 'open' || m.status === 'sent').concat(Object.values(st.orders));
         const openRisk = live.reduce((a, m) => a + (+m.riskCash || 0), 0), openMargin = live.reduce((a, m) => a + (+m.margin || 0), 0);
         const rv = riskVolume({ info, t: { ...t, entry: from }, balance, name, openRisk, openMargin, spec: specFor(specs, name), now });
         if (rv.skip) { (rv.retry ? later : skip)(rv.skip); continue; }
@@ -477,9 +569,9 @@ export async function mirrorRound({ env, trades, state, tokens, specs = null, WS
       }
     }
     // housekeeping: skip/retry notes matter only while the council trade is open; finished positions are kept LIMITS.keepDays
-    for (const k of ['skipped', 'wait']) for (const id of Object.keys(st[k] || {})) { const t = byId.get(id); if (!t || !OPEN.has(t.status)) delete st[k][id]; }
+    for (const k of ['skipped', 'wait']) for (const id of Object.keys(st[k] || {})) { const t = byId.get(id); if (!t || !(OPEN.has(t.status) || t.status === 'pending')) delete st[k][id]; }
     for (const [id, m] of Object.entries(st.map)) if (m.closedAt && now - Date.parse(m.closedAt) / 1000 > LIMITS.keepDays * 86400) delete st.map[id];
-    st.status = `ok · demo ${acc.brokerTitleShort || ''} · balance ${balance} · ${openCount()} open`.trim();
+    st.status = `ok · demo ${acc.brokerTitleShort || ''} · balance ${balance} · ${openCount() - Object.keys(st.orders).length} open${Object.keys(st.orders).length ? ` · ${Object.keys(st.orders).length} resting` : ''}`.trim();
     st.balance = balance; st.lastRun = new Date(now * 1000).toISOString();
     return out;
   } catch (e) { st.status = `error: ${scrub(e.message || e)}`; say(st.status); return out; }
