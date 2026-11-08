@@ -777,3 +777,7 @@ Monday open: every market order logged "set the missing stop". Two changes in `c
 2. `LIMITS.settle` (20 min): market orders on a symbol wait that long after its last "market closed" answer (`state.closedSeen`),
    so copies never go out in the widest-spread minutes after a reopen (where a stop inside the spread is dropped). Limit orders
    (absolute stops) are not held. Tests: `tests/ctrader-mirror.test.mjs` (stop read-back, settle).
+Audit (9 Nov, owner: "keep finding bugs, this can't have errors"): the stop guard no longer skips a position whose council trade
+left the list (uses the stop saved at the open, `m.stop`); `ensureStop` never sets a stop from a missing level (it read as 0) and
+rejects one on the wrong side of the current mark (closes instead); step 2d closes any position with our label the mirror does
+not manage that has no stop (one with a stop is reported once, `state.orphans`).
