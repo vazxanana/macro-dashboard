@@ -147,6 +147,18 @@
   .empty { color: var(--ink-faint); font-size: 13px; }
   section.block { margin-top: 24px; }
   @media (max-width: 600px) { .wrap { padding: 0 16px 48px; } .top .check { min-width: 0; } .top .when { white-space: normal; font-size: 11px; max-width: 150px; line-height: 1.25; } .debate li { grid-template-columns: 1fr; gap: 4px; } .mk { grid-template-columns: 1fr auto; } .mk > span:nth-child(n+3) { display: none; } }
+  /* Desk | Macro switch (8 Nov): the same control as the main header, this half lit; Desk goes back */
+  .hdr-sw { --hm-a: #e0a526; --hm-b: #7b61ff; position: relative; display: inline-flex; gap: 2px; padding: 3px; border-radius: 999px; flex: none; isolation: isolate; background: var(--panel, #14161c); }
+  .hdr-sw::before { content: ""; position: absolute; inset: -1.5px; border-radius: inherit; z-index: -2; background: conic-gradient(from var(--hm-r, 0turn), var(--hm-a), var(--hm-b), var(--hm-a)); }
+  .hdr-sw::after { content: ""; position: absolute; inset: 0; border-radius: inherit; z-index: -1; background: var(--panel, #14161c); }
+  .hdr-sw a { display: inline-flex; align-items: center; gap: 7px; height: 28px; padding: 0 12px; border-radius: 999px; text-decoration: none; color: var(--ink-dim, #a6adbb); font: 700 12.5px/1 inherit; white-space: nowrap; transition: background .18s ease-out, color .18s ease-out; }
+  .hdr-sw a i { width: 7px; height: 7px; border-radius: 50%; background: currentColor; opacity: .55; }
+  .hdr-sw a.on { color: var(--ink, #f4f5f8); background: color-mix(in srgb, var(--hm-a) 16%, var(--panel, #14161c)); box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--hm-a) 40%, transparent); }
+  .hdr-sw a.on i { background: var(--hm-a); opacity: 1; box-shadow: 0 0 0 3px color-mix(in srgb, var(--hm-a) 25%, transparent); }
+  .hdr-sw a:not(.on):hover { color: var(--ink, #f4f5f8); background: color-mix(in srgb, var(--hm-b) 12%, var(--panel, #14161c)); } .hdr-sw a:not(.on):hover i { background: var(--hm-b); opacity: 1; }
+  @property --hm-r { syntax: '<angle>'; inherits: false; initial-value: 0turn; }
+  @media (prefers-reduced-motion: no-preference) { .hdr-sw::before { animation: hm-spin 7s linear infinite; } @keyframes hm-spin { to { --hm-r: 1turn; } } }
+  .check { display: flex; align-items: center; gap: 12px; }
   @media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
 </style>
 </head>
@@ -156,7 +168,8 @@
     <a class="brand" href="/"><span class="coin" aria-hidden="true"></span>Meridian X</a>
     <span class="crumb" aria-hidden="true">/</span>
     <span class="brand" style="font-weight:500">Macro desk</span>
-    <div class="check"><span class="when" id="when" aria-live="polite">Loading…</span><a class="btn" href="/#council/macro">Council view</a></div>
+    <div class="check"><span class="when" id="when" aria-live="polite">Loading…</span>
+      <nav class="hdr-sw" aria-label="Desk or macro"><a href="/#home" title="Back to the main desk"><i aria-hidden="true"></i><span>Desk</span></a><a class="on" href="/macro-desk" aria-current="page"><i aria-hidden="true"></i><span>Macro</span></a></nav></div>
   </div>
 </header>
 <main class="wrap">
