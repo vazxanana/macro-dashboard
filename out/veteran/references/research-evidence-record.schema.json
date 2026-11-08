@@ -1,0 +1,245 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "research-evidence-record.schema.json",
+  "title": "MeridianX research evidence record collection",
+  "description": "An array of point-in-time, source-linked records for reported observations, market quotes, or reproducible calculations.",
+  "type": "array",
+  "items": {
+    "type": "object",
+    "additionalProperties": false,
+    "required": [
+    "schema_version",
+    "record_id",
+    "record_type",
+    "source",
+    "time",
+    "measurement",
+    "vintage",
+    "quality"
+  ],
+    "properties": {
+    "schema_version": { "const": "1.0.0" },
+    "record_id": { "type": "string", "minLength": 1 },
+    "record_type": {
+      "enum": ["reported_observation", "market_quote", "calculated_observation"]
+    },
+    "source": { "$ref": "#/items/$defs/source" },
+    "time": { "$ref": "#/items/$defs/time" },
+    "measurement": { "$ref": "#/items/$defs/measurement" },
+    "vintage": { "$ref": "#/items/$defs/vintage" },
+    "quality": { "$ref": "#/items/$defs/quality" },
+    "market": { "$ref": "#/items/$defs/market" },
+    "raw_artifact": { "$ref": "#/items/$defs/rawArtifact" },
+    "notes": { "type": "array", "items": { "type": "string" } }
+    },
+    "allOf": [
+      {
+        "if": { "properties": { "record_type": { "const": "market_quote" } }, "required": ["record_type"] },
+        "then": { "required": ["market"] }
+      },
+      {
+        "if": { "properties": { "record_type": { "const": "calculated_observation" } }, "required": ["record_type"] },
+        "then": { "properties": { "measurement": { "required": ["derivation"] } } }
+      }
+    ],
+    "$defs": {
+    "source": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["source_id", "publisher", "dataset", "direct_url", "independence_group_id"],
+      "properties": {
+        "source_id": { "type": "string", "minLength": 1 },
+        "publisher": { "type": "string", "minLength": 1 },
+        "dataset": { "type": "string", "minLength": 1 },
+        "direct_url": { "type": "string", "format": "uri" },
+        "upstream_source_ids": { "type": "array", "items": { "type": "string" }, "uniqueItems": true, "description": "Dataset/source identifiers only. Link observation record IDs through measurement.derivation.input_record_ids." },
+        "independence_group_id": { "type": "string", "minLength": 1 },
+        "access_class": { "enum": ["public", "login", "api_token", "licensed", "restricted", "user_provided", "unknown"] }
+      }
+    },
+    "time": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["reference_date_or_period", "published_date", "published_at_utc", "available_at_utc", "retrieved_at_utc"],
+      "properties": {
+        "reference_date_or_period": { "type": "string", "minLength": 1 },
+        "published_date": { "type": ["string", "null"], "format": "date", "description": "Publication of this observation or calculation; a reconstructed calculation must not inherit its inputs' publication date." },
+        "published_at_utc": { "type": ["string", "null"], "format": "date-time" },
+        "available_at_utc": { "type": ["string", "null"], "format": "date-time" },
+        "retrieved_at_utc": { "type": "string", "format": "date-time" },
+        "source_timezone": { "type": ["string", "null"] }
+      }
+    },
+    "measurement": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name", "value", "unit", "native_label"],
+      "properties": {
+        "name": { "type": "string", "minLength": 1 },
+        "value": { "type": ["number", "integer", "string", "null"] },
+        "unit": { "type": "string", "minLength": 1 },
+        "currency": { "type": ["string", "null"] },
+        "native_label": { "type": "string", "minLength": 1 },
+        "seasonal_adjustment": { "type": ["string", "null"] },
+        "derivation": { "$ref": "#/items/$defs/derivation" }
+      }
+    },
+    "derivation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["formula", "input_record_ids", "method_version"],
+      "properties": {
+        "formula": { "type": "string", "minLength": 1 },
+        "input_record_ids": { "type": "array", "minItems": 1, "items": { "type": "string" }, "uniqueItems": true },
+        "method_version": { "type": "string", "minLength": 1 }
+      }
+    },
+    "vintage": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["vintage_id", "revision_status", "revision_of"],
+      "properties": {
+        "vintage_id": { "type": "string", "minLength": 1 },
+        "revision_status": { "enum": ["initial", "revised", "final", "preliminary", "not_applicable", "unknown"], "description": "Revision state of the reported source, separate from derivation. Deterministic calculated observations normally use not_applicable; derivation belongs in record_type and quality.status." },
+        "revision_of": { "type": ["string", "null"] }
+      }
+    },
+    "quality": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status", "flags", "note"],
+      "properties": {
+        "status": { "enum": ["source_verified", "provisional", "estimated", "derived", "stale", "incomplete", "unverified"] },
+        "flags": { "type": "array", "items": { "type": "string" }, "uniqueItems": true },
+        "note": { "type": "string" }
+      }
+    },
+    "market": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "instrument_id": { "type": "string" },
+        "venue_or_broker": { "type": "string" },
+        "account_environment": { "enum": ["demo", "live", "unknown", null] },
+        "account_reference": { "type": "string", "description": "Pseudonymous account identifier; never store credentials or tokens here." },
+        "trading_server": { "type": "string" },
+        "broker_symbol_id": { "type": "string" },
+        "symbol_terms_version_id": { "type": "string" },
+        "symbol_terms_observed_at_utc": { "type": ["string", "null"], "format": "date-time" },
+        "broker_symbol_terms": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "swap_long": { "type": ["number", "null"] },
+            "swap_short": { "type": ["number", "null"] },
+            "swap_calculation_type": { "enum": ["PIPS", "PERCENTAGE", "POINTS", "unknown", null] },
+            "swap_rollover_3days": { "type": ["string", "null"] },
+            "swap_period_hours": { "type": ["integer", "null"], "minimum": 0 },
+            "swap_time_utc_minutes": { "type": ["integer", "null"], "minimum": 0, "maximum": 1439 },
+            "charge_swap_at_weekends": { "type": ["boolean", "null"] },
+            "commission_type": { "type": ["string", "null"] },
+            "precise_trading_commission_rate_raw": { "type": ["integer", "null"] },
+            "precise_min_commission_raw": { "type": ["integer", "null"] },
+            "min_commission_type": { "type": ["string", "null"] },
+            "min_commission_asset": { "type": ["string", "null"] },
+            "pnl_conversion_fee_rate_raw": { "type": ["integer", "null"] },
+            "minimum_volume_raw": { "type": ["integer", "null"], "minimum": 0 },
+            "maximum_volume_raw": { "type": ["integer", "null"], "minimum": 0 },
+            "volume_step_raw": { "type": ["integer", "null"], "minimum": 0 },
+            "maximum_exposure_raw": { "type": ["integer", "null"], "minimum": 0 },
+            "trading_schedule_timezone": { "type": ["string", "null"] },
+            "trading_intervals": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": ["start_second", "end_second"],
+                "properties": {
+                  "start_second": { "type": "integer", "minimum": 0 },
+                  "end_second": { "type": "integer", "minimum": 0 }
+                }
+              }
+            },
+            "holiday_calendar_version_id": { "type": ["string", "null"] },
+            "leverage_id": { "type": ["string", "null"] },
+            "minimum_stop_distance_raw": { "type": ["integer", "null"], "minimum": 0 },
+            "stop_distance_unit": { "enum": ["POINTS", "PERCENTAGE", "unknown", null] },
+            "guaranteed_stop_charge_raw": { "type": ["integer", "null"], "minimum": 0 },
+            "raw_terms_artifact_sha256": { "type": ["string", "null"], "pattern": "^[a-fA-F0-9]{64}$" }
+          }
+        },
+        "symbol_or_contract_version": { "type": "string" },
+        "benchmark_or_product_id": { "type": "string" },
+        "contract_month": { "type": "string" },
+        "settlement_type": { "type": "string" },
+        "continuous_series_method": { "type": "string" },
+        "roll_rule": { "type": "string" },
+        "price_adjustment_method": { "enum": ["none", "additive", "ratio", "vendor_defined", null] },
+        "back_adjusted": { "type": ["boolean", "null"] },
+        "bid": { "type": ["number", "null"] },
+        "ask": { "type": ["number", "null"] },
+        "mid": { "type": ["number", "null"] },
+        "spread": { "type": ["number", "null"] },
+        "source_event_timestamp_utc": { "type": ["string", "null"], "format": "date-time" },
+        "client_received_timestamp_utc": { "type": ["string", "null"], "format": "date-time" },
+        "timestamp_requested": { "type": ["boolean", "null"] },
+        "clock_sync_status": { "enum": ["synchronized", "degraded", "unknown", null] },
+        "session": { "type": ["string", "null"] },
+        "quote_age_ms": { "type": ["integer", "null"], "minimum": 0 },
+        "feed_latency_ms": { "type": ["integer", "null"] },
+        "bid_ask_complete": { "type": ["boolean", "null"] },
+        "depth_source_timestamp_utc": { "type": ["string", "null"], "format": "date-time" },
+        "depth_client_received_timestamp_utc": { "type": ["string", "null"], "format": "date-time" },
+        "depth_book_complete": { "type": ["boolean", "null"] },
+        "depth_subscription_version_id": { "type": "string" },
+        "depth_levels": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["event_action", "side", "quote_id", "raw_price", "raw_size", "price", "size_units"],
+            "properties": {
+              "event_action": { "enum": ["NEW", "DELETE", "SNAPSHOT"] },
+              "side": { "enum": ["BID", "ASK"] },
+              "quote_id": { "type": "integer", "minimum": 0 },
+              "raw_price": { "type": "integer", "minimum": 0 },
+              "raw_size": { "type": "integer", "minimum": 0 },
+              "price": { "type": "number" },
+              "size_units": { "type": "number", "minimum": 0 }
+            }
+          }
+        },
+        "depth_price_divisor": { "type": "integer", "const": 100000 },
+        "depth_size_divisor": { "type": "integer", "const": 100 },
+        "conversion_chain_id": { "type": "string" },
+        "conversion_chain_quotes": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["symbol_id", "base_asset", "quote_asset", "bid", "ask", "source_event_timestamp_utc", "client_received_timestamp_utc"],
+            "properties": {
+              "symbol_id": { "type": "string" },
+              "base_asset": { "type": "string" },
+              "quote_asset": { "type": "string" },
+              "bid": { "type": ["number", "null"] },
+              "ask": { "type": ["number", "null"] },
+              "source_event_timestamp_utc": { "type": ["string", "null"], "format": "date-time" },
+              "client_received_timestamp_utc": { "type": ["string", "null"], "format": "date-time" }
+            }
+          }
+        }
+      }
+    },
+    "rawArtifact": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "content_hash_sha256": { "type": ["string", "null"], "pattern": "^[a-fA-F0-9]{64}$" },
+        "artifact_url": { "type": ["string", "null"], "format": "uri" }
+      }
+    }
+    }
+  }
+}
+

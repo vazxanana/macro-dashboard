@@ -1,0 +1,72 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://meridianx.example/schemas/forecast-evaluation-plan.schema.json",
+  "title": "Frozen forecast evaluation plan",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "plan_id", "evaluation_mode", "created_at_utc", "selection", "cohort", "cases", "scoring", "baseline_policy", "missing_outcome_policy", "evidence_policy", "resolution_policy", "probability_bin_edges"],
+  "properties": {
+    "schema_version": {"const": "1.0.0"},
+    "plan_id": {"type": "string", "minLength": 1},
+    "evaluation_mode": {"enum": ["synthetic_demonstration", "retrospective_research", "prospective_research"]},
+    "created_at_utc": {"type": "string", "format": "date-time"},
+    "selection": {"enum": ["initial", "latest_before_cutoff"]},
+    "cohort": {
+      "type": "object", "additionalProperties": false,
+      "required": ["variable", "instrument_or_population", "unit", "horizon", "method_version", "required_tags", "resolution_contract"],
+      "properties": {
+        "variable": {"type": "string", "minLength": 1},
+        "instrument_or_population": {"type": "string", "minLength": 1},
+        "unit": {"type": "string", "minLength": 1},
+        "horizon": {"type": "string", "minLength": 1},
+        "method_version": {"type": "string", "minLength": 1},
+        "required_tags": {"type": "array", "items": {"type": "string", "minLength": 1}, "uniqueItems": true},
+        "resolution_contract": {
+          "type": "object", "additionalProperties": false,
+          "required": ["publisher", "dataset_or_instrument", "field_or_price_convention", "rule", "revision_policy", "specified_vintage", "missing_or_holiday_policy"],
+          "properties": {
+            "publisher": {"type": "string", "minLength": 1},
+            "dataset_or_instrument": {"type": "string", "minLength": 1},
+            "field_or_price_convention": {"type": "string", "minLength": 1},
+            "rule": {"type": "string", "minLength": 1},
+            "revision_policy": {"enum": ["first_release", "latest_as_of_deadline", "final", "specified_vintage", "not_applicable"]},
+            "specified_vintage": {"type": ["string", "null"]},
+            "missing_or_holiday_policy": {"type": "string"}
+          }
+        }
+      }
+    },
+    "cases": {
+      "type": "array", "minItems": 1,
+      "items": {
+        "type": "object", "additionalProperties": false,
+        "required": ["forecast_id", "eligibility_cutoff_utc"],
+        "properties": {
+          "forecast_id": {"type": "string", "minLength": 1},
+          "eligibility_cutoff_utc": {"type": "string", "format": "date-time"}
+        }
+      }
+    },
+    "scoring": {
+      "type": "object", "additionalProperties": false,
+      "required": ["distribution_kind", "metrics", "log_loss_policy"],
+      "properties": {
+        "distribution_kind": {"enum": ["binary_event", "point", "quantiles"]},
+        "metrics": {"type": "array", "minItems": 1, "items": {"enum": ["brier", "log_score", "absolute_error", "squared_error", "pinball", "interval_score"]}, "uniqueItems": true},
+        "log_loss_policy": {"const": "exact"},
+        "point_functional": {"enum": ["mean", "median"]},
+        "quantile_probabilities": {"type": "array", "minItems": 2, "items": {"type": "number", "exclusiveMinimum": 0, "exclusiveMaximum": 1}, "uniqueItems": true},
+        "interval_alphas": {"type": "array", "items": {"type": "number", "exclusiveMinimum": 0, "exclusiveMaximum": 1}, "uniqueItems": true}
+      },
+      "allOf": [
+        {"if": {"properties": {"distribution_kind": {"const": "point"}}}, "then": {"required": ["point_functional"]}},
+        {"if": {"properties": {"distribution_kind": {"const": "quantiles"}}}, "then": {"required": ["quantile_probabilities", "interval_alphas"]}}
+      ]
+    },
+    "baseline_policy": {"const": "selected_snapshot_numeric"},
+    "missing_outcome_policy": {"const": "remain_unresolved"},
+    "evidence_policy": {"enum": ["strict_known_availability", "report_unknown"]},
+    "resolution_policy": {"enum": ["require_publication_and_unit", "report_unverified"]},
+    "probability_bin_edges": {"type": "array", "minItems": 2, "items": {"type": "number", "minimum": 0, "maximum": 1}, "uniqueItems": true}
+  }
+}

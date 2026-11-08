@@ -1,0 +1,126 @@
+{
+  "method_version": "meridianx-forecast-evaluator-1.0.0",
+  "plan_id": "us-core-cpi-pilot-2026-10-initial-v1",
+  "evaluation_mode": "prospective_research",
+  "as_of_utc": "2026-11-08T14:12:31.252Z",
+  "selection": "initial",
+  "cohort": {
+    "variable": "First-release core CPI-U seasonally adjusted monthly percent change",
+    "instrument_or_population": "U.S. city average, all urban consumers",
+    "unit": "percent, nonannualized monthly change",
+    "horizon": "Issue 24 to 72 hours before the captured scheduled release; retain measured lead separately",
+    "method_version": "core-cpi-equal-blend-1.0.0",
+    "required_tags": [
+      "core-cpi-pilot",
+      "locally-registered",
+      "unvalidated"
+    ],
+    "resolution_contract": {
+      "publisher": "U.S. Bureau of Labor Statistics",
+      "dataset_or_instrument": "CPI news release Table A: U.S. city average CPI-U, all items less food and energy",
+      "field_or_price_convention": "Seasonally adjusted percent change from preceding month, exact one-decimal displayed first-release value",
+      "rule": "Resolve to the exact one-decimal core CPI-U monthly percent change in the first official release for the target reference month. Establish the initial vintage from preserved release evidence. Do not replace it with an annual seasonal revision or later correction; show corrections separately. If the initial vintage cannot be established or the release arrives after the declared deadline, leave the primary case unresolved or unverified.",
+      "revision_policy": "first_release",
+      "specified_vintage": null,
+      "missing_or_holiday_policy": "Retain unissued and missing cases. Do not impute an outcome. Keep the original calendar cutoff and deadline after a delay; report the changed lead and any deadline breach. Never substitute a scheduled release time for actual publication evidence."
+    }
+  },
+  "validation_scope": "Standalone runtime checks; full JSON Schema validation must also be performed separately.",
+  "counts": {
+    "registered": 1,
+    "unresolved": 1
+  },
+  "cases": [
+    {
+      "forecast_id": "us-core-cpi-sa-mom-2026-10-blend-pilot-v1",
+      "status": "unresolved",
+      "selected_forecast_record_id": "us-core-cpi-sa-mom-2026-10-blend-pilot-v1-issued",
+      "registered_cutoff_utc": "2026-11-09T13:30:00Z",
+      "visible_versions": 1,
+      "pending_resolution_attempts": 0,
+      "stored_scores_used": false,
+      "cutoff_publication_record_ids": [],
+      "effective_cutoff_utc": "2026-11-09T13:30:00.000Z",
+      "versions_excluded_by_cutoff": 0,
+      "evidence_issues": [],
+      "point_in_time_availability_supplied": true
+    }
+  ],
+  "aggregate_scores": [],
+  "reliability": [],
+  "limits": [
+    "Input timestamps, units, source truth, prose event resolution and plan precommitment require external review; current files/hashes do not prove historical append-only storage.",
+    "Resolution publication times are supplied assertions, not independently authenticated receipt logs.",
+    "Only the declared cohort and paired baseline cases are aggregated. Sparse quantiles are not converted into CRPS.",
+    "Synthetic or retrospective scores do not establish a prospective forecasting or trading track record."
+  ],
+  "pilot_wrapper_method": "meridianx-cpi-pilot-evaluator-1.0.0",
+  "pilot_checks": {
+    "protocol_id": "core-cpi-six-reference-month-pilot-v1",
+    "scope": "Frozen v1 structured policy checks on all supplied registered-case records, including records after the evaluation as-of; the generic result retains its as-of view.",
+    "schedule_policy": "Captured scheduled release is derived as case eligibility cutoff plus 24 hours; required deadline is that schedule plus seven days. This is the frozen v1 convention, not a live calendar lookup.",
+    "issuance_window_and_cutoff_policy": "The arithmetic lead window includes 24 and 72 hours. The frozen generic selection additionally requires BOTH issuance and recording strictly before the eligibility cutoff (T−24h). An issuance exactly at T−24h remains visible but is not eligible; this wrapper does not make that cutoff inclusive.",
+    "case_checks": [
+      {
+        "forecast_id": "us-core-cpi-sa-mom-2026-10-blend-pilot-v1",
+        "schedule_derived_from_v1_cutoff_policy_utc": "2026-11-10T13:30:00.000Z",
+        "required_resolution_deadline_utc": "2026-11-17T13:30:00.000Z",
+        "initial_issuance_present": true,
+        "initial_issuance_lead_hours": 47.29132555555555,
+        "resolution_records_checked": 0,
+        "publication_times_authenticated": false,
+        "first_release_vintage_authenticated": false
+      }
+    ],
+    "source_truth_authenticated": false,
+    "limits": "Full JSON Schema validation is separate. Supplied publication times, source rows, original first-release vintage and historical precommitment require independent evidence. No prose contract is parsed or authenticated."
+  },
+  "cohort_accounting": {
+    "intended_protocol_cases": 6,
+    "registered_plan_cases": 1,
+    "intended_cases_not_in_this_input_plan": 5,
+    "status_counts": {
+      "unresolved": 1
+    },
+    "visible_issued_cases": 1,
+    "scored": 0,
+    "unresolved": 1,
+    "resolution_unverified": 0,
+    "not_issued_as_of": 0,
+    "note": "Counts are local to the supplied plan. Other intended cases may have separate plans; absence here does not prove global absence. Keep the intended six-case denominator distinct from this plan and its issuance statuses."
+  },
+  "secondary_persistence": {
+    "comparator": "Predeclared latest-archived-BLS-print persistence check; separate from primary Cleveland comparator",
+    "metric": "squared_error",
+    "optimization_direction": "lower_is_better",
+    "unit": "percent, nonannualized monthly change squared",
+    "n": 0,
+    "mean_squared_error": {
+      "status": "unavailable",
+      "value": null
+    },
+    "paired_model_mean_squared_error": {
+      "status": "unavailable",
+      "value": null
+    },
+    "cases": [
+      {
+        "forecast_id": "us-core-cpi-sa-mom-2026-10-blend-pilot-v1",
+        "status": "not_scored",
+        "unavailable_reason": "primary_case_unresolved",
+        "evidence_record_id": null,
+        "source_id": null,
+        "value": null,
+        "loss": null,
+        "paired_model_loss": null
+      }
+    ],
+    "limits": "Candidate selection checks one supporting reported BLS record, its matching units and known availability. Correct source row, latest-archive status and reference month still need source review. Ambiguity or absence does not remove a primary score."
+  },
+  "input_sha256": {
+    "ledger": "3341d6397ad0715f490f80c3484a5824ee5323d5ac536ad953385f45e90ce1b1",
+    "evaluation_plan": "4bbbed01b776c3f54459d11208ec21c6fc067b082acc48018750410b9f672538",
+    "protocol": "fb6fb6593672450c00af3bfa1406f3c7c1aa88403e51d30fb9ebcb71ce381157",
+    "evidence": "5bdb730452865e37719c30e9dc5872635273e7c8b8be02f1ac9f09f3c27fcb52"
+  }
+}

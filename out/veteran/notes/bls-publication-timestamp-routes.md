@@ -1,0 +1,47 @@
+# BLS publication-time routes: metadata is not first-public availability
+
+Reviewed 8 November 2026, approximately 14:22–14:25 UTC. This bounded review used official BLS documentation, five successful direct public responses and the relevant IETF standards. No forecast, registered pilot artifact, master output or frozen V1 file was edited. Raw responses, HTTP headers, receipt clocks and hashes are retained under `work/bls-publication-route-captures/`.
+
+**Finding:** BLS offers useful machine-readable notification and data routes, but none inspected here establishes the exact actual first-publication instant of a CPI release. In particular, an official feed's `published` timestamp can precede the embargo, and a latest-number feed timestamp can change while the CPI observations remain from the previous release. Do not copy these fields into the pilot's strict actual-publication field without an independent semantic basis.
+
+## What is available and what it proves
+
+| Route | Current observation | Appropriate use and limit |
+|---|---|---|
+| [CPI news feed](https://www.bls.gov/feed/cpi.rss), linked from the [BLS feed directory](https://www.bls.gov/feed/) | Although named `.rss` and served as `application/rss+xml`, the payload is Atom. Its September entry has `published` and `updated` = `2026-10-14T07:50:31.2-04:00`; link points to the September archive. | Detect release entries, IDs, links and content changes. Preserve the exact fields as publisher metadata. The time is about 39m29s before the September release's 08:30 Eastern embargo, so it cannot automatically be equated to public availability. This is **not proof of an early public leak**; today's file does not show when it became accessible then. |
+| [CPI latest-number feed](https://www.bls.gov/feed/cpi_latest.rss) | RSS `pubDate` = `Fri, 6 Nov 2026 08:31:36 -0500`; content still includes September core SA m/m `+0.3%`. | A compact current-data cross-check and change signal. **Inference from this mismatch:** its later timestamp describes a later feed snapshot/update, not the original September CPI publication. Verify reference month and series, not just the feed timestamp. |
+| [All-indicator latest feed](https://www.bls.gov/feed/bls_latest.rss) | `pubDate` = 6 November 2026, 08:31:35 −0500. | Broad update detection. A timestamp for an aggregate feed cannot identify the first publication of each constituent observation. |
+| [Public Data API v2 signatures](https://www.bls.gov/developers/api_signature_v2.htm) and [actual latest-core-index request](https://api.bls.gov/publicAPI/v2/timeseries/data/CUSR0000SA0L1E?latest=true) | Current JSON reports September 2026 (`M09`), index value `338.896`, plus status, numeric `responseTime`, series ID, period, value and footnotes. No observation publication timestamp appears. | Retrieve current series observations and metadata. The documented response is not a vintage/first-publication log. A reference month, `latest:true`, `responseTime`, or the HTTP response's current date does not establish release time. An index value also does not replace the pilot's exact displayed first-release monthly percent change. |
+| [CPI release archive](https://www.bls.gov/bls/news-release/cpi.htm) | Lists historical releases and warns that their data may be revised in subsequent releases. | Find dated source artifacts and compare versions. A downloaded archive now does not itself authenticate its original release-day bytes or first delivery time. Save initial observations prospectively and preserve later corrections separately. |
+| [CPI-specific calendar](https://www.bls.gov/schedule/news_release/cpi.htm) and [BLS calendar ICS](https://www.bls.gov/schedule/news_release/bls.ics) | Published future schedule, updated as needed. | Establish the planned event clock and calendar changes. Scheduled publication is not observed actual publication. |
+
+The [BLS RSS help page](https://www.bls.gov/help/hlp_rss.htm) explains XML syndication, subscription and regular headline updates. It supplies no guarantee found here that a feed timestamp equals exact actual public release. API documentation likewise describes access to published observations, without an observation-level first-publication clock in the inspected interface. These are limits of this review, not a claim that BLS has no internal release logs or other undiscovered services.
+
+## HTTP and Atom fields: documented semantics
+
+HTTP `Date` describes message origination, while `Last-Modified` is the origin server's estimate of when the selected representation changed. Neither is a first-publication certificate. ETags identify representation versions rather than publication instants. These distinctions follow from [RFC 9110, Date](https://www.rfc-editor.org/rfc/rfc9110.html#section-6.6.1), [Last-Modified](https://www.rfc-editor.org/rfc/rfc9110.html#section-8.8.2), and [ETag](https://www.rfc-editor.org/rfc/rfc9110.html#section-8.8.3).
+
+The captured CPI Atom response illustrates the problem: HTTP `Last-Modified` was `Wed, 14 Oct 2026 11:50:32 GMT`, also before the 12:30 UTC embargo. Its HTTP `Date` was the current retrieval day, 8 November. A server can prepare a representation before exposing it; these fields do not tell this research process when access actually began.
+
+Atom `published` denotes an early lifecycle event, commonly creation or first availability; `updated` denotes a publisher-significant modification. The standard does not require an independently authenticated public-access timestamp. See [RFC 4287 §4.2.9](https://www.rfc-editor.org/rfc/rfc4287.html#section-4.2.9) and [§4.2.15](https://www.rfc-editor.org/rfc/rfc4287.html#section-4.2.15). Keep the payload's own field name and semantics instead of relabeling them as observed release times.
+
+## Viable prospective capture procedure
+
+1. Save the currently scheduled date/time and a pre-release snapshot of the current CPI release, its news feed and latest-number feed. Record which reference month is actually present. Use the official current-release link or archive directory rather than assuming a guessed future filename is authoritative.
+2. For each retrieval, retain request-start and completed-receipt UTC clocks, local clock/synchronization status, final URL, HTTP status and relevant cache/version headers, raw response bytes and SHA-256. Keep the publisher's timestamps separately from those local clocks. Do not retroactively assign a receipt to the source's update label.
+3. At and after the planned release, check for the new reference month and exact Table A field. Use a modest policy-compliant retrieval cadence; a feed refresh alone is insufficient. Preserve the first version this process observes, including a successful response whose content still has the old month. Retain later changes and correction notices as new artifacts.
+4. Report `first_seen_at_utc` as the completed receipt of the first relevant new version, with collection latency and cache limitations. A last-old/first-new pair can bracket **this endpoint observation** under stated assumptions. It cannot prove the exact first availability across all servers, users or dissemination channels, and a stale cached old response cannot prove global absence.
+5. Authenticate the intended first-release vintage, monthly value/precision, units and publication-deadline compliance separately. A nonempty `vintage_id` and a current archive link are not enough. If actual publication remains unknown, preserve null and the pilot's `resolution_unverified` status. Do not fill it with the schedule, `Date`, `Last-Modified`, Atom metadata or receipt merely to make strict scoring pass. Any future design supporting availability intervals would need an explicit prospective specification; it must not silently reinterpret the existing contract.
+
+This procedure produces a defensible receipt record and first-observed version. It does not promise an exact publication clock, a guaranteed original first print, or an externally authenticated precommitment. No event polling process or automation was started by this review.
+
+## Additional usable calendar finding
+
+The CPI-specific official page currently provides all six intended pilot reference months' schedules: October 2026 → 10 November 2026; November → 10 December; December → 13 January 2027; January → 11 February; February → 10 March; March → 13 April. All display 08:30 Eastern. Capture this page as a **new** dated calendar artifact before making future absolute plans, and preserve later revisions. Convert each date using `America/New_York`; the April release is in daylight saving time, unlike November–March dates. This does not change the original registration's honest statement that future dates had not yet been captured then. [Official CPI schedule](https://www.bls.gov/schedule/news_release/cpi.htm)
+
+## Reproducible evidence from this review
+
+- Capture script: `work/capture_bls_publication_routes.mjs`.
+- Successful five-response manifest: `work/bls-publication-route-captures/manifest-1794147791576.json`; the preceding manifest records failed restricted-network requests and is not the success record.
+- Independently recomputed metadata/hash checks: `work/summarize_bls_publication_routes.mjs` and `work/bls-publication-route-captures/publication-route-observations.json`.
+- All five files' byte counts and SHA-256 agree with the successful manifest. The API request remains at September; no future CPI outcome was retrieved, invented or appended.

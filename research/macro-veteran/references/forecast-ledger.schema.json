@@ -130,7 +130,7 @@
           "additionalProperties": false,
           "required": ["type", "description"],
           "properties": {
-            "type": { "enum": ["base_rate", "timestamped_consensus", "market_implied", "naive_model", "none"] },
+            "type": { "enum": ["base_rate", "timestamped_consensus", "market_implied", "naive_model", "published_model", "none"] },
             "description": { "type": "string", "minLength": 1 },
             "probability_or_value": { "type": ["number", "null"] },
             "sample_size": { "type": ["integer", "null"], "minimum": 0 },
@@ -174,6 +174,8 @@
             "direct_url": { "type": ["string", "null"], "format": "uri" },
             "observed_at_utc": { "type": "string", "format": "date-time" },
             "retrieved_at_utc": { "type": "string", "format": "date-time" },
+            "published_at_utc": { "type": ["string", "null"], "format": "date-time", "description": "Actual source publication time when established; not its reference period or scheduled release time. Null if unknown." },
+            "outcome_unit": { "type": "string", "minLength": 1, "description": "Unit of the resolved outcome, matching the forecast target; binary event outcomes normally use boolean." },
             "vintage_id": { "type": ["string", "null"] },
             "content_hash_sha256": { "type": ["string", "null"], "pattern": "^[A-Fa-f0-9]{64}$" }
           }

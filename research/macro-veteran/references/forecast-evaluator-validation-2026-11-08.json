@@ -1,0 +1,226 @@
+{
+  "checked_at_utc": "2026-11-08T13:57:43.211Z",
+  "scope": "Offline evaluator, synthetic fixtures, plan/ledger schemas and documented runtime constraints; not predictive performance.",
+  "runtime": "v24.16.0",
+  "schema_validator": {
+    "name": "Ajv 2020-12",
+    "version": "8.20.0",
+    "formats_version": "3.0.1",
+    "date_uri_formats_asserted": true
+  },
+  "schema_checks": [
+    {
+      "file": "outputs/forecast-ledger-example.json",
+      "schema": "outputs/forecast-ledger.schema.json",
+      "records_checked": 1,
+      "result": "passed"
+    },
+    {
+      "file": "outputs/forecast-evaluator-demo-ledger.json",
+      "schema": "outputs/forecast-ledger.schema.json",
+      "records_checked": 15,
+      "result": "passed"
+    },
+    {
+      "file": "outputs/forecast-evaluator-demo-binary-plan.json",
+      "schema": "outputs/forecast-evaluation-plan.schema.json",
+      "records_checked": 1,
+      "result": "passed"
+    },
+    {
+      "file": "outputs/forecast-evaluator-demo-quantile-plan.json",
+      "schema": "outputs/forecast-evaluation-plan.schema.json",
+      "records_checked": 1,
+      "result": "passed"
+    },
+    {
+      "file": "outputs/forecast-evaluator-demo-point-plan.json",
+      "schema": "outputs/forecast-evaluation-plan.schema.json",
+      "records_checked": 1,
+      "result": "passed"
+    }
+  ],
+  "schema_cli_checks": [
+    {
+      "case": "valid_binary_inputs_with_evidence",
+      "expected": "pass",
+      "result": "passed"
+    },
+    {
+      "case": "valid_quantile_inputs",
+      "expected": "pass",
+      "result": "passed"
+    },
+    {
+      "case": "valid_point_inputs",
+      "expected": "pass",
+      "result": "passed"
+    },
+    {
+      "case": "valid_jsonl",
+      "expected": "pass",
+      "result": "passed"
+    },
+    {
+      "case": "invalid_date",
+      "expected": "reject",
+      "result": "rejected_as_expected"
+    },
+    {
+      "case": "unknown_record_field",
+      "expected": "reject",
+      "result": "rejected_as_expected"
+    },
+    {
+      "case": "invalid_uri",
+      "expected": "reject",
+      "result": "rejected_as_expected"
+    },
+    {
+      "case": "missing_point_functional",
+      "expected": "reject",
+      "result": "rejected_as_expected"
+    }
+  ],
+  "schema_negative_controls": {
+    "count": 4,
+    "result": "rejected_as_expected",
+    "cases": [
+      "invalid date",
+      "unknown ledger field",
+      "missing point functional",
+      "unknown plan field"
+    ]
+  },
+  "runtime_tests": {
+    "tests": 35,
+    "pass": 35,
+    "fail": 0,
+    "skipped": 0,
+    "cancelled": 0,
+    "result": "passed",
+    "captured_output_sha256": "238d8df59b700d452c8fd91b5643972663edffd4633970a93e764834f991ae49"
+  },
+  "demo_cli_reports": [
+    {
+      "file": "outputs/forecast-evaluator-demo-binary-report.json",
+      "counts": {
+        "registered": 6,
+        "scored": 4,
+        "unresolved": 1,
+        "not_issued_as_of": 1
+      },
+      "input_hashes_match": true
+    },
+    {
+      "file": "outputs/forecast-evaluator-demo-quantile-report.json",
+      "counts": {
+        "registered": 1,
+        "scored": 1
+      },
+      "input_hashes_match": true
+    },
+    {
+      "file": "outputs/forecast-evaluator-demo-point-report.json",
+      "counts": {
+        "registered": 1,
+        "scored": 1
+      },
+      "input_hashes_match": true
+    }
+  ],
+  "demo_ledger_unchanged": true,
+  "independent_reviews": {
+    "mathematical_and_design_findings_fixed": [
+      "ambiguous near-identical central quantile endpoints",
+      "Brier skill arithmetic overflow status",
+      "pending null outcome append completion",
+      "retrospective plan timing",
+      "observation/publication chronology",
+      "mixed resolution contracts"
+    ],
+    "current_adversarial_review": "Reproduced pending-completion publication cutoff regression; fix retained earliest known publication across visible history. Reviewer reran original reproduction and full 35-test suite successfully.",
+    "recipient_forward_test": "Fresh recipient ran binary/quantile commands and independently checked scores, all 35 runtime tests and input preservation. After its usability findings were corrected, it independently ran two valid schema commands with evidence and rejected malformed URI/date-time evidence. Preservation paths, quantile expected values and empty-evidence guidance matched behavior. 39 original inputs/frozen files retained their hashes. Network installation was not exercised.",
+    "boundary": "Earlier review follow-up was interrupted by usage limit; the fresh bounded review above independently verified its own finding. Reviews are not exhaustive proof."
+  },
+  "frozen_v1": {
+    "sha256": "69c97e348d08ca12f140d617c28ee8e1fa5d8f83b5c76fd1da0b30c6ecf5ba1f",
+    "unchanged": true
+  },
+  "artifact_hashes": [
+    {
+      "file": "outputs/forecast-ledger.schema.json",
+      "sha256": "98df45ccd58c036d27b701c7d565921b7de08c9195a5ab6c716b934654b4512f"
+    },
+    {
+      "file": "outputs/forecast-evaluation-plan.schema.json",
+      "sha256": "f4f46e0fc7a29e8640ffa3819fb815fb2039b5befd6e3a03adef5315ad92c1b7"
+    },
+    {
+      "file": "outputs/scripts/forecast-evaluator.mjs",
+      "sha256": "239bdf8fc202398395a883b335b9582abf6dd3373345a714d160c03ed61b78b6"
+    },
+    {
+      "file": "outputs/scripts/forecast-evaluator.test.mjs",
+      "sha256": "dbd7f1081bf1ce5ac11a2eb07cd9171bb7f64491008a39f722331334bd94003d"
+    },
+    {
+      "file": "outputs/scripts/validate-forecast-inputs.mjs",
+      "sha256": "7c81920381e6a4a14c6a6bd2ce630a6abcd7d791d75d96a113254851cbb03ece"
+    },
+    {
+      "file": "outputs/forecast-ledger-evaluation-guide.md",
+      "sha256": "5542935e8c10449e7373142abe3afd6cd3b753bbc54b4389e6e0ca7933b317df"
+    },
+    {
+      "file": "outputs/forecast-evaluator-demo-ledger.json",
+      "sha256": "b85dc5134cec6592478e033811515911c4e4f3bf685e3aa9bb24e1831152a117"
+    },
+    {
+      "file": "outputs/forecast-evaluator-demo-binary-plan.json",
+      "sha256": "3f53b8e8cc3f4c46569e759553711b827f4f8b3b2d0ed2a2da86f3ac039aa0ca"
+    },
+    {
+      "file": "outputs/forecast-evaluator-demo-binary-report.json",
+      "sha256": "433dacc227943ff3ffae8d7b8bc7cca63bb1f45bf4cc0a23171c0d0223c8d697"
+    },
+    {
+      "file": "outputs/forecast-evaluator-demo-quantile-plan.json",
+      "sha256": "0d8cfddd7b76ecd97e9856b415ae19f8ff13d575f4561db98e919f3b3920c485"
+    },
+    {
+      "file": "outputs/forecast-evaluator-demo-quantile-report.json",
+      "sha256": "8abd1cbb96afda2dcba86f1b525ceb8ea3869141b158b27961515f4da6d8fdc1"
+    },
+    {
+      "file": "outputs/forecast-evaluator-demo-point-plan.json",
+      "sha256": "629eb13a7db53d3d2ce5cfa84c142495626ad2b415504140beedbce3e0a4565b"
+    },
+    {
+      "file": "outputs/forecast-evaluator-demo-point-report.json",
+      "sha256": "5a7c1d6027ad90828e8d465780f7c0dc3f6c629d6d2991f7f0bed84a5bd316e4"
+    },
+    {
+      "file": "outputs/probability-forecast-calibration-playbook.md",
+      "sha256": "2865b137637963ec41eefcbe3d592794c7943f5de24b3e84b8d29fb80a8ac5d3"
+    },
+    {
+      "file": "outputs/research-pack-index.md",
+      "sha256": "6801a1054af2f525b5519c43642c08e96e20b640585efe8d803e6f4be060584b"
+    },
+    {
+      "file": "outputs/meridianx-research-system-blueprint.md",
+      "sha256": "4d0bbcac76edbd6d0672a5f3a98f89d2a92071e5665367e022b396fc2ac1341c"
+    },
+    {
+      "file": "outputs/us-october-2026-cpi-pre-release-plan.md",
+      "sha256": "0ead1845c5eba5cd00daf91cea10275c194b7ddf273102c60c3f87d609937f95"
+    }
+  ],
+  "limits": [
+    "Full schema checks are separate from standalone CLI runtime checks.",
+    "Supplied source facts, publication/availability timestamps and resolution prose still require primary-source review.",
+    "File hashes establish current bytes, not historical precommitment or immutable storage.",
+    "All included scored examples are synthetic; there is no prospective track record or trading-performance claim."
+  ]
+}

@@ -1,0 +1,170 @@
+{
+  "checked_at_utc": "2026-11-08T19:09:42.167Z",
+  "workbook_sha256": "fc109d047bf7c222c2ff98544515a9302d98e1f82aee8466cb8fde4713b579ff",
+  "engine": "Bundled @oai/artifact-tool; native Excel desktop was not opened",
+  "scope": "Q3 2026 equivalent consolidated cash-flow sensitivity; not a Q4 forecast or equity valuation",
+  "checks": [
+    {
+      "check": "Historical Q3 and YTD bridges reconcile",
+      "result": "passed"
+    },
+    {
+      "check": "Reported replay matches company FCF",
+      "result": "passed"
+    },
+    {
+      "check": "Native data table base, downside and upside agree independently",
+      "result": "passed"
+    },
+    {
+      "check": "Other cash change zero retains reclamation",
+      "result": "passed"
+    },
+    {
+      "check": "Stress case uses same calculation and updates data table",
+      "result": "passed"
+    },
+    {
+      "check": "Positive price change pays assumed cash tax",
+      "result": "passed"
+    },
+    {
+      "check": "Zero tax is preserved as a valid input",
+      "result": "passed"
+    },
+    {
+      "check": "Computed cash break-even returns zero FCF",
+      "result": "passed"
+    },
+    {
+      "check": "Blank unselected case does not block replay",
+      "result": "passed"
+    },
+    {
+      "check": "Blank selected driver makes current FCF unavailable",
+      "result": "passed"
+    },
+    {
+      "check": "Zero cash capex is not treated as missing",
+      "result": "passed"
+    },
+    {
+      "check": "Negative cash capex input is visibly invalid",
+      "result": "passed"
+    },
+    {
+      "check": "Missing source reclamation cannot become a zero cash use",
+      "result": "passed"
+    },
+    {
+      "check": "Raw actuals unchanged after scenario tests",
+      "result": "passed"
+    },
+    {
+      "check": "Final saved case restored to replay",
+      "result": "passed"
+    },
+    {
+      "check": "Exported workbook preserves replay and native data table",
+      "result": "passed"
+    },
+    {
+      "check": "Reopened workbook recalculates selected case and table",
+      "result": "passed"
+    }
+  ],
+  "scenario_results": {
+    "reported_replay_fcf": 1912,
+    "other_cash_change_zero_fcf": 2221,
+    "stress_fcf": 767.5730599999997,
+    "cash_break_even_gold_price": 2611.3612277526927,
+    "plus_100_gold_after_tax_cash_change": 79.68379999999999
+  },
+  "native_data_table": {
+    "range": "'Cash Flow'!J15:O20",
+    "row_input": "F14",
+    "column_input": "F15",
+    "base_and_nonbase_verified": true,
+    "export_import_and_recalculation_verified": true
+  },
+  "source_file_hashes": [
+    {
+      "id": "S1",
+      "sha256": "755b5e8d4fb7d71475954ec9b3288e27ba4700fc7d43a23c6c15f58b0933707f"
+    },
+    {
+      "id": "S2",
+      "sha256": "e2c409951966b91b2fa297cd9355f5067b1a37af16d430500add24d5af7c67cc"
+    }
+  ],
+  "visual_review": {
+    "status": "passed",
+    "sheets": [
+      "Cash Flow",
+      "Assumptions",
+      "Actuals"
+    ],
+    "scope": "All sheets rendered and inspected; labels, source references, inputs, native sensitivity values and status text legible. A source-link rendering defect was corrected before this final export."
+  },
+  "limits": [
+    "Static Q3-equivalent sensitivity, not a Q4 forecast, DCF or equity target.",
+    "Within-quarter cash pass-through, price-linked charge transfer and marginal cash-tax response are assumptions.",
+    "The 256m reclamation use is retained; no claim it is a sustainable future run rate."
+  ],
+  "final_reviewed_at_utc": "2026-11-08T19:17:13.666Z",
+  "export_structure": {
+    "native_data_table": {
+      "t": "dataTable",
+      "ref": "K16:O20",
+      "dt2D": "1",
+      "r1": "F14",
+      "r2": "F15"
+    },
+    "case_selector_validation": [
+      {
+        "type": "whole",
+        "operator": "between",
+        "sqref": "F4"
+      }
+    ],
+    "source_notes": [
+      {
+        "cell": "F8",
+        "contains_sec_url": true
+      },
+      {
+        "cell": "G8",
+        "contains_sec_url": true
+      },
+      {
+        "cell": "G14",
+        "contains_sec_url": true
+      },
+      {
+        "cell": "F29",
+        "contains_sec_url": true
+      },
+      {
+        "cell": "G29",
+        "contains_sec_url": true
+      },
+      {
+        "cell": "F39",
+        "contains_sec_url": true
+      }
+    ],
+    "actual_values_match_input_records": 56,
+    "cached_error_cells": 0,
+    "gridlines_hidden_all_sheets": true,
+    "calculation_properties": null,
+    "workbook_sha256": "fc109d047bf7c222c2ff98544515a9302d98e1f82aee8466cb8fde4713b579ff"
+  },
+  "input_json_sha256": "4547b299bcda343a91a16c42bc6116519149c539bf2e51cec0d9052408af23e1",
+  "independent_review": {
+    "result": "No financial arithmetic blocker found in bounded review",
+    "workbook_sha256": "fc109d047bf7c222c2ff98544515a9302d98e1f82aee8466cb8fde4713b579ff",
+    "scope": "Separate agent imported/recalculated replay, positive/negative price shocks, other cash change zero and stress, verified source hashes and serialized source Notes.",
+    "limits": "Desktop Excel itself and predictive validity were not verified."
+  },
+  "frozen_v1_zip_unchanged": true
+}

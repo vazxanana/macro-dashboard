@@ -42,6 +42,8 @@ For a price or macro variable, forecast a distribution or quantiles instead of o
 
 For example, store a median return and fixed 10th/50th/90th percentiles, or a full predictive distribution. Do not add or remove quantiles after seeing the outcome. Use CRPS for a full continuous distribution, or a pinball/quantile score for a predeclared quantile; proper scoring rules encourage honest probability distributions in expectation. [Gneiting and Raftery (2007)](https://doi.org/10.1198/016214506000001437)
 
+For a point forecast, declare whether the estimate targets the mean or median before observing the result: squared error evaluates a mean, while absolute error evaluates a median. Comparing both losses without fixing that directive can reverse method rankings because they reward different targets. [Gneiting (2011), Making and Evaluating Point Forecasts](https://www.bundesbank.de/resource/blob/635562/7d3de0f3fc003e5b4864828143f268cf/mL/2012-06-01-eltville-11-gneiting-paper-data.pdf)
+
 ## 2. Start with base rates, then update with evidence
 
 ### Choose a defensible reference class
@@ -109,7 +111,7 @@ For forecast probability `p` and outcome `y`, logarithmic loss is:
 Log loss = -[y × ln(p) + (1-y) × ln(1-p)]
 ```
 
-Use a documented numerical floor only if the production system requires one; disclose it because it caps the penalty for a confident miss. Log loss is highly sensitive to assigning near-zero or near-one probabilities when wrong, which makes it useful as a discipline but noisy in small samples.
+Compute the outcome-specific branch, `-ln(p)` for an event or `-ln(1-p)` for a non-event, to avoid the undefined floating-point product `0 × Infinity`. A wrong probability of exactly zero or one incurs infinite loss; a correct certainty has zero loss. The supplied evaluator uses exact, unclipped log loss and writes an explicit `infinite_loss` status with numeric `null` in its separate report. It keeps the case in the aggregate count. The ledger's existing stored-score field accepts finite numbers only: leave `scores` empty when necessary and retain the evaluator report rather than inventing a finite score. Numerical overflow has a separate status. Any alternative clipped-loss experiment needs a separately declared specification because it changes the penalty.
 
 ### Proper scores for distributions
 
@@ -175,6 +177,12 @@ Never upgrade a research forecast to a trade claim just because a simulated acco
 4. Update aggregate score, calibration table, sharpness/resolution diagnostics and uncertainty interval.
 5. Examine misses: bad base rate, double-counted evidence, mistimed information, regime shift, poor probability translation, resolution ambiguity or noise.
 6. Write one falsifiable method change, if warranted. Version it and evaluate it prospectively; do not retroactively rewrite past forecasts.
+
+## 8. Run the offline evaluator
+
+Use the [evaluation guide](forecast-ledger-evaluation-guide.md), [plan schema](forecast-evaluation-plan.schema.json) and [script](scripts/forecast-evaluator.mjs) to make those choices executable. The plan fixes the cohort, resolution contract, loss, registered cases, cutoff, version-selection rule and probability bins. Prospective plans require known evidence availability and explicit publication/unit metadata. Retrospective plans retain their true creation date and remain labeled retrospective. The tool recomputes scores, keeps unresolved/unissued cases visible and reports model-only versus paired baseline sample counts. Its sparse quantile forecasts are scored at their issued levels; they do not imply a full CDF or CRPS.
+
+Run full schema validation separately from the script's runtime checks. Source truth, source receipt logs, genuine historical storage and precommitment still need evidence outside the current files. The [synthetic reports and verification results](forecast-evaluator-validation-2026-11-08.json) demonstrate software behavior, not a forecasting track record.
 
 ## Research anchors
 

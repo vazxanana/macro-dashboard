@@ -1,0 +1,72 @@
+{
+  "schema_version": "1.0.0",
+  "plan_id": "synthetic-binary-evaluation-v1",
+  "evaluation_mode": "synthetic_demonstration",
+  "created_at_utc": "2029-12-31T00:00:00Z",
+  "selection": "latest_before_cutoff",
+  "cohort": {
+    "variable": "Synthetic boolean event",
+    "instrument_or_population": "Explicitly synthetic fixture",
+    "unit": "boolean",
+    "horizon": "one-minute synthetic event",
+    "method_version": "synthetic-evaluation-v1",
+    "required_tags": [
+      "synthetic"
+    ],
+    "resolution_contract": {
+      "publisher": "Synthetic fixture",
+      "dataset_or_instrument": "Illustrative deterministic outcome",
+      "field_or_price_convention": "Synthetic boolean outcome",
+      "rule": "Use the explicitly labelled synthetic outcome in the resolution fixture; no real market outcome is implied.",
+      "revision_policy": "not_applicable",
+      "specified_vintage": null,
+      "missing_or_holiday_policy": "Leave missing outcomes unresolved; append a completion resolution if the value later becomes available."
+    }
+  },
+  "cases": [
+    {
+      "forecast_id": "demo-binary-1",
+      "eligibility_cutoff_utc": "2030-01-01T00:00:45Z"
+    },
+    {
+      "forecast_id": "demo-binary-2",
+      "eligibility_cutoff_utc": "2030-01-01T00:00:45Z"
+    },
+    {
+      "forecast_id": "demo-binary-certainty",
+      "eligibility_cutoff_utc": "2030-01-01T00:00:45Z"
+    },
+    {
+      "forecast_id": "demo-binary-unresolved",
+      "eligibility_cutoff_utc": "2030-01-01T00:00:45Z"
+    },
+    {
+      "forecast_id": "demo-binary-no-baseline",
+      "eligibility_cutoff_utc": "2030-01-01T00:00:45Z"
+    },
+    {
+      "forecast_id": "demo-binary-never-issued",
+      "eligibility_cutoff_utc": "2030-01-01T00:00:45Z"
+    }
+  ],
+  "scoring": {
+    "distribution_kind": "binary_event",
+    "metrics": [
+      "brier",
+      "log_score"
+    ],
+    "log_loss_policy": "exact"
+  },
+  "baseline_policy": "selected_snapshot_numeric",
+  "missing_outcome_policy": "remain_unresolved",
+  "evidence_policy": "report_unknown",
+  "resolution_policy": "require_publication_and_unit",
+  "probability_bin_edges": [
+    0,
+    0.2,
+    0.4,
+    0.6,
+    0.8,
+    1
+  ]
+}

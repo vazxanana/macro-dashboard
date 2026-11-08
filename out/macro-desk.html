@@ -108,6 +108,22 @@
   .tabs button { min-height: 32px; padding: 5px 12px; border-radius: 999px; border: 1px solid var(--line); background: var(--neutral-soft); color: var(--ink-dim); font: 500 12.5px var(--sans); cursor: pointer; }
   .tabs button[aria-selected="true"] { border-color: var(--accent); color: var(--ink); background: var(--accent-soft); }
   .tabp[hidden] { display: none; }
+  .vlib-v { font-size: 10.5px; color: var(--ink-faint); margin-left: 4px; }
+  .vlib { display: grid; grid-template-columns: minmax(240px, 300px) minmax(0, 1fr); gap: 18px; margin-top: 10px; }
+  @media (max-width: 900px) { .vlib { grid-template-columns: 1fr; } }
+  .vlib-cpi { border: 1px solid var(--line); border-radius: 10px; padding: 10px 12px; margin-bottom: 12px; font-size: 12.5px; background: var(--neutral-soft); }
+  .vlib-cpi b { font-size: 18px; display: block; margin: 2px 0; } .vlib-cpi .st { display: inline-block; padding: 1px 8px; border-radius: 999px; border: 1px solid var(--line); font-size: 11px; color: var(--ink-dim); }
+  .vlib-nav h4 { margin: 10px 0 4px; font: 600 11.5px var(--sans); color: var(--ink-faint); text-transform: uppercase; letter-spacing: .04em; }
+  .vlib-nav button { display: block; width: 100%; text-align: left; background: none; border: 0; padding: 4px 6px; border-radius: 6px; font: 500 12.5px var(--sans); color: var(--ink-dim); cursor: pointer; line-height: 1.35; }
+  .vlib-nav button:hover { background: var(--panel-hover, rgba(127,127,127,.08)); color: var(--ink); } .vlib-nav button[aria-current="true"] { background: var(--accent-soft); color: var(--ink); }
+  .vlib-nav button small { color: var(--ink-faint); font-weight: 400; }
+  .vlib-doc { min-width: 0; font-size: 13.5px; line-height: 1.55; color: var(--ink-dim); max-height: 72vh; overflow: auto; padding-right: 6px; }
+  .vlib-doc h1 { font-size: 20px; margin: 0 0 8px; color: var(--ink); } .vlib-doc h2 { font-size: 16px; margin: 18px 0 6px; color: var(--ink); display: block; } .vlib-doc h3 { font-size: 14px; margin: 14px 0 4px; color: var(--ink); } .vlib-doc h4 { font-size: 13px; margin: 12px 0 4px; color: var(--ink); }
+  .vlib-doc p { margin: 6px 0; } .vlib-doc ul, .vlib-doc ol { padding-left: 22px; margin: 6px 0; } .vlib-doc li { margin: 3px 0; }
+  .vlib-doc table { border-collapse: collapse; font-size: 12.5px; margin: 8px 0; width: 100%; } .vlib-doc th, .vlib-doc td { border: 1px solid var(--line); padding: 5px 7px; vertical-align: top; text-align: left; } .vlib-doc th { background: var(--neutral-soft); color: var(--ink); }
+  .vlib-doc code { font: 12px ui-monospace, SFMono-Regular, Menlo, monospace; background: var(--neutral-soft); padding: 1px 4px; border-radius: 4px; } .vlib-doc pre { background: var(--neutral-soft); border: 1px solid var(--line); border-radius: 8px; padding: 10px 12px; overflow: auto; } .vlib-doc pre code { background: none; padding: 0; }
+  .vlib-doc blockquote { margin: 8px 0; padding: 4px 12px; border-left: 3px solid var(--line); color: var(--ink-faint); } .vlib-doc a { color: var(--accent); } .vlib-doc hr { border: 0; border-top: 1px solid var(--line); margin: 14px 0; }
+  .vlib-doc .meta { font-size: 11.5px; color: var(--ink-faint); margin: 0 0 10px; }
   .card { padding: 14px 16px; } .card h2 { font-size: 15px; } .card h3 { margin: 12px 0 4px; font-size: 12px; } .card p { font-size: 12.5px; margin: 4px 0; line-height: 1.45; }
   .big { font-size: 20px; } .ch { font-size: 12px; } .ch th, .ch td { padding: 5px 6px 5px 0; } .ch .cannot { display: none; } .card.limits .ch .cannot { display: block; }
   .insights { font-size: 12.5px; line-height: 1.5; } .debate li { font-size: 12.5px; padding-top: 9px; } .strip { margin-bottom: 12px; } .pill { padding: 4px 10px; font-size: 12px; }
@@ -189,6 +205,7 @@
     <button type="button" role="tab" data-t="debate" aria-selected="true">The discussion <span id="deb-n"></span></button>
     <button type="button" role="tab" data-t="source">Close to the source</button>
     <button type="button" role="tab" data-t="ledger">Ledger and scoreboard</button>
+    <button type="button" role="tab" data-t="library">Veteran library <span class="vlib-v" id="lib-v"></span></button>
   </div>
 
   <section class="block card tabp" id="tab-debate" role="tabpanel"><h2>The discussion <small id="deb-sum"></small></h2><ul class="debate" id="debate"></ul><p class="note" id="deb-foot"></p></section>
@@ -207,6 +224,10 @@
   </section>
 
   <section class="block card tabp" id="tab-ledger" role="tabpanel" hidden><h2>Forecast ledger and scoreboard <small>who is right, kept honest</small></h2><div id="ledger"></div></section>
+  <section class="block card tabp" id="tab-library" role="tabpanel" hidden>
+    <h2>Veteran library <small id="lib-sub">gptmacro_v.1 · the owner's research batch, as delivered</small></h2>
+    <div class="vlib" id="vlib"><div class="vlib-side"><div class="vlib-cpi" id="vlib-cpi"></div><nav class="vlib-nav" id="vlib-nav" aria-label="Documents"></nav></div><article class="vlib-doc" id="vlib-doc"><p class="note">Pick a document. Dated briefs and cases are historical examples: refresh their sources before using a figure today.</p></article></div>
+  </section>
   <p class="note" id="foot"></p>
 </main>
 <script>
@@ -317,8 +338,42 @@
       $('foot').textContent = 'Paper only. The strategist and the veteran change no rule, size or trade; the owner decides. Data: council-data macro/forecast.json, macro/veteran.json, macro/cache.json, macro/veteran-ledger.json.';
     });
   }
+  // ---- Veteran library (owner, 8 Nov: "this is our updated veteran macro, insert on the system and deploy it on the website") ----
+  // The batch is published at /veteran/ by scripts/veteran-index.mjs; the index lists every document with a title and group.
+  var LIB = (/^https?:$/.test(location.protocol) && !/github\.io$/.test(location.hostname) ? '/veteran/' : 'https://raw.githubusercontent.com/vazxanana/macro-dashboard/main/research/macro-veteran/'), LIBI = null, libBusy = false;
+  function mdInline(t) { return t.replace(/`([^`]+)`/g, function (m, c) { return '<code>' + c + '</code>'; }).replace(/\*\*([^*]+)\*\*/g, '<b>$1</b>').replace(/(^|[^*])\*([^*\n]+)\*/g, '$1<i>$2</i>').replace(/\[([^\]]+)\]\(([^)\s]+)\)/g, function (m, txt, href) { if (/^https?:/.test(href)) return '<a href="' + href + '" target="_blank" rel="noopener">' + txt + '</a>'; return '<a href="#" data-doc="' + href.replace(/^\.\//, '') + '">' + txt + '</a>'; }); }
+  // a small Markdown renderer: headings, lists, tables, quotes, fenced code, paragraphs; the text is escaped first
+  function md(src, base) { var lines = esc(src).split('\n'), out = [], i = 0, para = [];
+    function flush() { if (para.length) { out.push('<p>' + mdInline(para.join(' ')) + '</p>'); para = []; } }
+    while (i < lines.length) { var l = lines[i];
+      if (/^```/.test(l)) { flush(); var code = []; i++; while (i < lines.length && !/^```/.test(lines[i])) code.push(lines[i++]); i++; out.push('<pre><code>' + code.join('\n') + '</code></pre>'); continue; }
+      var h = /^(#{1,4})\s+(.*)$/.exec(l); if (h) { flush(); out.push('<h' + h[1].length + '>' + mdInline(h[2]) + '</h' + h[1].length + '>'); i++; continue; }
+      if (/^\s*(-{3,}|\*{3,})\s*$/.test(l)) { flush(); out.push('<hr>'); i++; continue; }
+      if (/^\|/.test(l) && i + 1 < lines.length && /^\|?\s*:?-{2,}/.test(lines[i + 1])) { flush(); var head = l.split('|').slice(1, -1), rows = []; i += 2; while (i < lines.length && /^\|/.test(lines[i])) rows.push(lines[i++].split('|').slice(1, -1));
+        out.push('<table><thead><tr>' + head.map(function (c) { return '<th>' + mdInline(c.trim()) + '</th>'; }).join('') + '</tr></thead><tbody>' + rows.map(function (r) { return '<tr>' + r.map(function (c) { return '<td>' + mdInline(c.trim()) + '</td>'; }).join('') + '</tr>'; }).join('') + '</tbody></table>'); continue; }
+      var li = /^\s*([-*]|\d+\.)\s+(.*)$/.exec(l); if (li) { flush(); var ol = /\d/.test(li[1]), items = []; while (i < lines.length && (li = /^\s*([-*]|\d+\.)\s+(.*)$/.exec(lines[i]))) { var it = li[2]; i++; while (i < lines.length && /^\s{2,}\S/.test(lines[i]) && !/^\s*([-*]|\d+\.)\s+/.test(lines[i])) it += ' ' + lines[i++].trim(); items.push('<li>' + mdInline(it) + '</li>'); } out.push((ol ? '<ol>' : '<ul>') + items.join('') + (ol ? '</ol>' : '</ul>')); continue; }
+      if (/^>\s?/.test(l)) { flush(); var q = []; while (i < lines.length && /^>\s?/.test(lines[i])) q.push(lines[i++].replace(/^>\s?/, '')); out.push('<blockquote>' + mdInline(q.join(' ')) + '</blockquote>'); continue; }
+      if (!l.trim()) { flush(); i++; continue; }
+      para.push(l.trim()); i++; }
+    flush(); return out.join('\n'); }
+  function libCpi(c) { if (!c || !c.length) { $('vlib-cpi').hidden = true; return; } var p = c[0], rel = new Date(p.releaseUtc);
+    $('vlib-cpi').innerHTML = '<div style="color:var(--ink-faint)">Real forecast on the record · core CPI m/m, ' + esc(p.reference) + '</div><b>' + (p.point == null ? 'n/a' : (+p.point).toFixed(3) + '%') + '</b><div>Issued ' + esc(String(p.issuedAt).slice(0, 16).replace('T', ' ')) + ' UTC · BLS first print ' + rel.toLocaleDateString(undefined, { month: 'short', day: 'numeric' }) + ' ' + rel.toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' }) + '</div><div style="margin-top:4px"><span class="st">' + esc(p.status) + (p.outcome != null ? ' · actual ' + esc(String(p.outcome)) : '') + '</span></div><div style="margin-top:6px;color:var(--ink-faint)">Scored against the exact one-decimal first-release value; never a revision. One case, so no skill claim.</div>'; }
+  function libOpen(pth) { var d = LIBI && LIBI.docs.filter(function (x) { return x.path === pth || x.path === 'references/' + pth || x.path === 'notes/' + pth; })[0]; if (!d) { $('vlib-doc').innerHTML = '<p class="note">Not in the library: ' + esc(pth) + '</p>'; return; }
+    document.querySelectorAll('#vlib-nav button').forEach(function (b) { b.setAttribute('aria-current', String(b.dataset.p === d.path)); }); try { localStorage.setItem('mdLibDoc', d.path); } catch (e) {}
+    if (d.kind !== 'doc') { $('vlib-doc').innerHTML = '<h1>' + esc(d.title) + '</h1><p class="meta">' + esc(d.kind) + ' · ' + Math.round(d.bytes / 1024) + ' KB</p><p><a href="' + LIB + d.path + '" target="_blank" rel="noopener">Open the file</a>' + (d.kind === 'script' ? ' · a Node tool from the batch; run it from a checkout, never from the browser.' : '') + '</p>'; return; }
+    $('vlib-doc').innerHTML = '<p class="note">Loading…</p>';
+    fetch(LIB + d.path, { cache: 'no-store' }).then(function (r) { return r.ok ? r.text() : Promise.reject(new Error('HTTP ' + r.status)); }).then(function (t) { $('vlib-doc').innerHTML = '<p class="meta">' + esc(d.path) + (d.date ? ' · ' + esc(d.date) : '') + ' · ' + Math.round(d.bytes / 1024) + ' KB</p>' + md(t); $('vlib-doc').scrollTop = 0;
+      $('vlib-doc').querySelectorAll('a[data-doc]').forEach(function (a) { a.addEventListener('click', function (e) { e.preventDefault(); libOpen(a.dataset.doc.split('#')[0]); }); }); }).catch(function (e) { $('vlib-doc').innerHTML = '<p class="note">Could not load: ' + esc(e.message) + '</p>'; }); }
+  function loadLib() { if (LIBI || libBusy) return; libBusy = true;
+    fetch(LIB + 'index.json', { cache: 'no-store' }).then(function (r) { return r.json(); }).then(function (I) { LIBI = I; libBusy = false;
+      $('lib-v').textContent = I.version ? 'v' + I.version : ''; $('lib-sub').textContent = 'gptmacro_v.1 revision ' + (I.version || '?') + ' · prepared ' + (I.prepared || '') + ' · ' + I.docs.length + ' files' + (I.validation && I.validation.tests ? ' · evaluator tests ' + I.validation.tests.passed + '/' + I.validation.tests.tests : '');
+      libCpi(I.cpiPilot);
+      $('vlib-nav').innerHTML = I.groups.map(function (g) { return '<h4>' + esc(g) + '</h4>' + I.docs.filter(function (d) { return d.group === g; }).map(function (d) { return '<button type="button" data-p="' + esc(d.path) + '">' + esc(d.title) + (d.kind !== 'doc' ? ' <small>' + esc(d.kind) + '</small>' : '') + '</button>'; }).join(''); }).join('');
+      $('vlib-nav').querySelectorAll('button').forEach(function (b) { b.addEventListener('click', function () { libOpen(b.dataset.p); }); });
+      var first = null; try { first = localStorage.getItem('mdLibDoc'); } catch (e) {} libOpen(first && I.docs.some(function (d) { return d.path === first; }) ? first : 'references/latest-research-batch-status-2026-11-08.md');
+    }).catch(function (e) { libBusy = false; $('vlib-doc').innerHTML = '<p class="note">The library is not published yet (' + esc(e.message) + ').</p>'; }); }
   // tabs (the owner: "i dont like to scroll down all the time"): one lower section at a time, remembered per browser
-  var tabs = document.querySelectorAll('.tabs [data-t]'); function showTab(t) { tabs.forEach(function (b) { b.setAttribute('aria-selected', String(b.dataset.t === t)); }); ['debate', 'source', 'ledger'].forEach(function (k) { $('tab-' + k).hidden = k !== t; }); try { localStorage.setItem('mdTab', t); } catch (e) {} }
+  var tabs = document.querySelectorAll('.tabs [data-t]'); function showTab(t) { tabs.forEach(function (b) { b.setAttribute('aria-selected', String(b.dataset.t === t)); }); ['debate', 'source', 'ledger', 'library'].forEach(function (k) { $('tab-' + k).hidden = k !== t; }); if (t === 'library') loadLib(); try { localStorage.setItem('mdTab', t); } catch (e) {} }
   tabs.forEach(function (b) { b.addEventListener('click', function () { showTab(b.dataset.t); }); }); try { var t0 = localStorage.getItem('mdTab'); if (t0 && $('tab-' + t0)) showTab(t0); } catch (e) {}
   load(); setInterval(load, 5 * 60e3);
 })();

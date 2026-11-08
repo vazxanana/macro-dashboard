@@ -1,0 +1,300 @@
+[
+  {
+    "schema_version": "1.0.0",
+    "record_id": "cpi-pilot-bls-september-core-2026-11-08",
+    "record_type": "reported_observation",
+    "source": {
+      "source_id": "bls-september-cpi-release",
+      "publisher": "U.S. Bureau of Labor Statistics",
+      "dataset": "Archived September 2026 CPI release, Table A, captured 8 November",
+      "direct_url": "https://www.bls.gov/news.release/archives/cpi_10142026.htm",
+      "upstream_source_ids": [],
+      "independence_group_id": "lagged-bls-core-cpi",
+      "access_class": "public"
+    },
+    "time": {
+      "reference_date_or_period": "2026-09",
+      "published_date": "2026-10-14",
+      "published_at_utc": null,
+      "available_at_utc": "2026-11-08T14:05:32.788Z",
+      "retrieved_at_utc": "2026-11-08T14:05:32.788Z",
+      "source_timezone": "America/New_York"
+    },
+    "measurement": {
+      "name": "September 2026 all items less food and energy monthly change",
+      "value": 0.3,
+      "unit": "percent, nonannualized monthly change",
+      "currency": null,
+      "native_label": "September 2026 all items less food and energy monthly change",
+      "seasonal_adjustment": "seasonally adjusted"
+    },
+    "vintage": {
+      "vintage_id": "bls-september-cpi-release-captured-2026-11-08T14:05:32.788Z",
+      "revision_status": "unknown",
+      "revision_of": null
+    },
+    "quality": {
+      "status": "source_verified",
+      "flags": [
+        "current-receipt-established",
+        "original-publication-time-unknown",
+        "archived-value-as-captured",
+        "original-release-day-bytes-unconfirmed"
+      ],
+      "note": "Source Table A final monthly column is September 0.3; its following 2.6 is NSA year-over-year. This is the archived value received now, not proof of original release-day delivery or unchanged bytes."
+    },
+    "raw_artifact": {
+      "content_hash_sha256": "b9f981390c08f4a530d839495fce582124015b979bac0398bfcc35ffde0544e4",
+      "artifact_url": null
+    }
+  },
+  {
+    "schema_version": "1.0.0",
+    "record_id": "cpi-pilot-cleveland-october-core-2026-11-08",
+    "record_type": "reported_observation",
+    "source": {
+      "source_id": "cleveland-nowcast",
+      "publisher": "Federal Reserve Bank of Cleveland",
+      "dataset": "Inflation Nowcasting current monthly table",
+      "direct_url": "https://www.clevelandfed.org/indicators-and-data/inflation-nowcasting",
+      "upstream_source_ids": [],
+      "independence_group_id": "lagged-bls-core-cpi",
+      "access_class": "public"
+    },
+    "time": {
+      "reference_date_or_period": "2026-10; source updated label 11/06",
+      "published_date": null,
+      "published_at_utc": null,
+      "available_at_utc": "2026-11-08T14:05:33.380Z",
+      "retrieved_at_utc": "2026-11-08T14:05:33.380Z",
+      "source_timezone": "America/New_York"
+    },
+    "measurement": {
+      "name": "October 2026 core CPI monthly nowcast",
+      "value": 0.21,
+      "unit": "percent, nonannualized monthly change",
+      "currency": null,
+      "native_label": "October 2026 core CPI monthly nowcast",
+      "seasonal_adjustment": "seasonally adjusted"
+    },
+    "vintage": {
+      "vintage_id": "cleveland-nowcast-captured-2026-11-08T14:05:33.380Z",
+      "revision_status": "unknown",
+      "revision_of": null
+    },
+    "quality": {
+      "status": "estimated",
+      "flags": [
+        "current-receipt-established",
+        "original-publication-time-unknown",
+        "model-nowcast-not-consensus",
+        "overlapping-lagged-core-inputs",
+        "missing-2025-input-substitution"
+      ],
+      "note": "Monthly table shows core0.21, source update11/06. Actual captured receipt is 8 November. Current source display is not an archived 6 November receipt and is not survey consensus. The core model depends on lagged core CPI, with special missing-input treatment."
+    },
+    "raw_artifact": {
+      "content_hash_sha256": "ed636b6f7807744cfdc39d13a4fc54ad4c3b20b732c231923c1e48ad06e7d956",
+      "artifact_url": null
+    }
+  },
+  {
+    "schema_version": "1.0.0",
+    "record_id": "cpi-pilot-release-calendar-2026-11-08",
+    "record_type": "reported_observation",
+    "source": {
+      "source_id": "bls-release-calendar",
+      "publisher": "U.S. Bureau of Labor Statistics",
+      "dataset": "November 2026 release calendar",
+      "direct_url": "https://www.bls.gov/schedule/2026/11_sched_list.htm",
+      "upstream_source_ids": [],
+      "independence_group_id": "bls-release-calendar",
+      "access_class": "public"
+    },
+    "time": {
+      "reference_date_or_period": "October 2026 CPI release schedule",
+      "published_date": null,
+      "published_at_utc": null,
+      "available_at_utc": "2026-11-08T14:05:32.579Z",
+      "retrieved_at_utc": "2026-11-08T14:05:32.579Z",
+      "source_timezone": "America/New_York"
+    },
+    "measurement": {
+      "name": "Scheduled release of October 2026 CPI",
+      "value": "2026-11-10T13:30:00Z",
+      "unit": "UTC timestamp of schedule; not actual publication",
+      "currency": null,
+      "native_label": "Scheduled release of October 2026 CPI",
+      "seasonal_adjustment": null
+    },
+    "vintage": {
+      "vintage_id": "bls-release-calendar-captured-2026-11-08T14:05:32.579Z",
+      "revision_status": "unknown",
+      "revision_of": null
+    },
+    "quality": {
+      "status": "source_verified",
+      "flags": [
+        "current-receipt-established",
+        "original-publication-time-unknown",
+        "schedule-can-change"
+      ],
+      "note": "Calendar lists November10 at08:30 Eastern, converted to13:30UTC. Actual publication has not occurred in the captured calendar state and is not established by this schedule."
+    },
+    "raw_artifact": {
+      "content_hash_sha256": "db4cb05e91e67b434f16f01d37540258e780cad0bffa001607f08fc2ef87e071",
+      "artifact_url": null
+    }
+  },
+  {
+    "schema_version": "1.0.0",
+    "record_id": "cpi-pilot-cleveland-core-window-2026-11-08",
+    "record_type": "reported_observation",
+    "source": {
+      "source_id": "cleveland-core-method",
+      "publisher": "Federal Reserve Bank of Cleveland",
+      "dataset": "Inflation Nowcasting technical FAQ",
+      "direct_url": "https://www.clevelandfed.org/-/media/project/clevelandfedtenant/clevelandfedsite/indicators-and-data/inflation-nowcasting/nowcasting_faqs.pdf",
+      "upstream_source_ids": [],
+      "independence_group_id": "lagged-bls-core-cpi",
+      "access_class": "public"
+    },
+    "time": {
+      "reference_date_or_period": "Published model specification, captured 8 November",
+      "published_date": null,
+      "published_at_utc": null,
+      "available_at_utc": "2026-11-08T14:05:33.843Z",
+      "retrieved_at_utc": "2026-11-08T14:05:33.843Z",
+      "source_timezone": "America/New_York"
+    },
+    "measurement": {
+      "name": "Published core CPI recursive moving-average window",
+      "value": 12,
+      "unit": "months",
+      "currency": null,
+      "native_label": "Published core CPI recursive moving-average window",
+      "seasonal_adjustment": null
+    },
+    "vintage": {
+      "vintage_id": "cleveland-core-method-captured-2026-11-08T14:05:33.843Z",
+      "revision_status": "unknown",
+      "revision_of": null
+    },
+    "quality": {
+      "status": "source_verified",
+      "flags": [
+        "current-receipt-established",
+        "original-publication-time-unknown"
+      ],
+      "note": "Published specification uses J=12 lagged monthly core observations. This is counterevidence to treating the blend terms as independent measurements or calling the core nowcast a daily energy-driven signal."
+    },
+    "raw_artifact": {
+      "content_hash_sha256": "a6d4f544a0eaf643b8688bc726088cebc5f51fa0c800e1289082dcea98c8a308",
+      "artifact_url": null
+    }
+  },
+  {
+    "schema_version": "1.0.0",
+    "record_id": "cpi-pilot-cleveland-substituted-inputs-2026-11-08",
+    "record_type": "reported_observation",
+    "source": {
+      "source_id": "cleveland-missing-input-method",
+      "publisher": "Federal Reserve Bank of Cleveland",
+      "dataset": "Methodological approach to missing October and November 2025 CPI data",
+      "direct_url": "https://www.clevelandfed.org/-/media/project/clevelandfedtenant/clevelandfedsite/indicators-and-data/inflation-nowcasting/inflation-nowcasting-model-methodological-approach-to-missing-october-and-november-2025-cpi-data.pdf",
+      "upstream_source_ids": [],
+      "independence_group_id": "lagged-bls-core-cpi",
+      "access_class": "public"
+    },
+    "time": {
+      "reference_date_or_period": "October-November 2025 model inputs; document captured 8 November",
+      "published_date": null,
+      "published_at_utc": null,
+      "available_at_utc": "2026-11-08T14:05:34.082Z",
+      "retrieved_at_utc": "2026-11-08T14:05:34.082Z",
+      "source_timezone": "America/New_York"
+    },
+    "measurement": {
+      "name": "Historical monthly inputs requiring model-dependent treatment",
+      "value": "October 2025 estimates and implied November 2025 monthly changes",
+      "unit": "methodological qualification",
+      "currency": null,
+      "native_label": "Historical monthly inputs requiring model-dependent treatment",
+      "seasonal_adjustment": null
+    },
+    "vintage": {
+      "vintage_id": "cleveland-missing-input-method-captured-2026-11-08T14:05:34.082Z",
+      "revision_status": "unknown",
+      "revision_of": null
+    },
+    "quality": {
+      "status": "source_verified",
+      "flags": [
+        "current-receipt-established",
+        "original-publication-time-unknown",
+        "inferred-relevance-to-october-2026-window"
+      ],
+      "note": "Notice describes estimated October price levels and published November levels producing model-dependent monthly inputs. Under the published 12-month rule, the October2026 core window includes these months; this latter relevance is an analyst inference, not a claim of exact current replication."
+    },
+    "raw_artifact": {
+      "content_hash_sha256": "9afe541247403bdaf89d9676ce66443d443c6828254c1928775cc1c69cbac564",
+      "artifact_url": null
+    }
+  },
+  {
+    "schema_version": "1.0.0",
+    "record_id": "cpi-pilot-equal-blend-calculated-2026-11-08",
+    "record_type": "calculated_observation",
+    "source": {
+      "source_id": "meridianx-core-cpi-equal-blend",
+      "publisher": "MeridianX research",
+      "dataset": "Locally calculated fixed-weight point forecast",
+      "direct_url": "urn:meridianx:research:core-cpi-equal-blend:1",
+      "upstream_source_ids": [
+        "bls-september-cpi-release",
+        "cleveland-nowcast"
+      ],
+      "independence_group_id": "lagged-bls-core-cpi",
+      "access_class": "public"
+    },
+    "time": {
+      "reference_date_or_period": "2026-10 target forecast calculated now",
+      "published_date": null,
+      "published_at_utc": null,
+      "available_at_utc": "2026-11-08T14:12:31.196Z",
+      "retrieved_at_utc": "2026-11-08T14:12:31.196Z",
+      "source_timezone": "UTC"
+    },
+    "measurement": {
+      "name": "Fixed equal-weight core CPI research forecast",
+      "value": 0.255,
+      "unit": "percent, nonannualized monthly change",
+      "currency": null,
+      "native_label": "0.5 *0.21 +0.5 *0.30",
+      "seasonal_adjustment": "seasonally adjusted",
+      "derivation": {
+        "formula": "0.5 * captured Cleveland core CPI nowcast +0.5 * captured latest archived BLS core CPI print",
+        "input_record_ids": [
+          "cpi-pilot-cleveland-october-core-2026-11-08",
+          "cpi-pilot-bls-september-core-2026-11-08"
+        ],
+        "method_version": "core-cpi-equal-blend-1.0.0"
+      }
+    },
+    "vintage": {
+      "vintage_id": "core-cpi-blend-calculated-2026-11-08T14:12:31.196Z",
+      "revision_status": "not_applicable",
+      "revision_of": null
+    },
+    "quality": {
+      "status": "derived",
+      "flags": [
+        "unvalidated-forecast",
+        "fixed-weights-not-fitted",
+        "overlapping-inputs",
+        "future-outcome-unobserved"
+      ],
+      "note": "Current calculation creation time is known; no historical publication is inherited. The point estimate targets the mean of the declared published outcome. Three stored decimals reflect arithmetic, not demonstrated economic precision."
+    }
+  }
+]
