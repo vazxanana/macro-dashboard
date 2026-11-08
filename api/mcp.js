@@ -21,6 +21,7 @@
 const crypto = require('node:crypto');
 const REPO = 'vazxanana/macro-dashboard', DATA = 'council-data', MAIN = 'main', VERSION = '1.0.0';
 const NOTES = 'ict/mcp-notes.json';
+const PROFILE_USERS = ['fred'];   // who may read their own connector URL from the profile page
 // files a proposal may touch (the ICT edge and nothing else)
 const ALLOW = [/^ict\/[^/]+\.mjs$/, /^\.claude\/skills\/ICT\/[^/]+\.md$/, /^tests\/ict-[^/]+\.test\.mjs$/, /^tests\/fixtures\/ict\/[^/]+$/, /^research\/ict\/[^/]+\.(md|json|csv)$/, /^research\/edge\/ict-[^/]+\/[^/]+$/];
 const okPath = (p) => typeof p === 'string' && p.length <= 160 && !p.split('/').some((s) => s === '' || s === '.' || s === '..') && ALLOW.some((re) => re.test(p));
@@ -191,6 +192,21 @@ module.exports = async (req, res) => {
   res.setHeader('Cache-Control', 'no-store'); res.setHeader('Access-Control-Allow-Origin', '*'); res.setHeader('Access-Control-Allow-Methods', 'POST, GET, DELETE, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Accept, Authorization, Mcp-Session-Id, Mcp-Protocol-Version'); res.setHeader('Access-Control-Expose-Headers', 'Mcp-Session-Id, Mcp-Protocol-Version');
   if (req.method === 'OPTIONS') return res.status(204).end();
+    // the profile page (owner, 8 Nov: "make it available in Fred's profile, only Fred"): Fred proves his desk password and gets his
+  // connector URL; no other user is answered, whatever MCP_KEYS holds. The password check is ctrader-link's (same user list).
+  if (req.method === 'POST' && !(req.query && req.query.key) && req.body && (typeof req.body === 'object' ? req.body.action : /"action"\s*:\s*"mykey"/.test(req.body)) ) {
+    let b; try { b = typeof req.body === 'string' ? JSON.parse(req.body) : req.body; } catch (e) { return res.status(400).json({ error: 'bad JSON' }); }
+    if (b.action !== 'mykey') return res.status(400).json({ error: 'unknown action' });
+    const want = String(b.user || '').toLowerCase(); if (!PROFILE_USERS.includes(want)) return res.status(403).json({ error: 'Not available for this account' });
+    try {
+      const ct = require('./ctrader-link.js')._t, who = await ct.identify({ blobUsers: () => ct.blobUsers(process.env, req.headers.host) }, want, b.pw);
+      if (!who || who.u !== want) return res.status(403).json({ error: 'Password not accepted' });
+      const ent = String(process.env.MCP_KEYS || '').split(',').map((x) => x.trim()).find((x) => x.toLowerCase().startsWith(want + ':'));
+      if (!ent || ent.slice(want.length + 1).length < 16) return res.status(404).json({ error: 'No key has been made for you yet; ask the owner' });
+      console.log(`[mcp] key shown to ${want}`);
+      return res.status(200).json({ user: want, url: `https://${req.headers.host}/api/mcp/${ent.slice(want.length + 1)}` });
+    } catch (e) { return res.status(e.status || 500).json({ error: scrubErr(e) }); }
+  }
   const who = whoIs((req.query && req.query.key) || (String(req.headers.authorization || '').match(/^Bearer (.+)$/) || [])[1]);
   if (!who) { console.log('[mcp] refused'); return res.status(401).json({ error: 'unauthorised' }); }
   if (req.method === 'GET') return res.status(405).json({ error: 'this server has no event stream; POST JSON-RPC here' });   // allowed by the spec
@@ -203,4 +219,4 @@ module.exports = async (req, res) => {
   res.setHeader('Content-Type', 'application/json'); res.setHeader('Mcp-Protocol-Version', '2025-06-18');
   return res.status(200).json(Array.isArray(body) ? out : out[0]);
 };
-module.exports.lib = { whoIs, okPath, scrub, stats, brief, outcome, filterTrades, sections, rpc, TOOLS, call };
+module.exports.lib = { PROFILE_USERS, whoIs, okPath, scrub, stats, brief, outcome, filterTrades, sections, rpc, TOOLS, call };

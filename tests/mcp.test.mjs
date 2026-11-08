@@ -58,3 +58,14 @@ test('handler: refuses without a key, answers with one, reads trades through a f
     assert.equal(n.code, 202);
   } finally { globalThis.fetch = realFetch; }
 });
+test('profile key: only Fred, only with his password', async () => {
+  process.env.MCP_KEYS = 'fred:abcdefghijklmnopqrstuvwx';
+  assert.deepEqual(L.PROFILE_USERS, ['fred']);
+  const mk = (body) => { const out = { code: 0, body: null }; const res = { setHeader() {}, status: (c) => { out.code = c; return res; }, json: (b) => { out.body = b; return out; }, end: () => out };
+    return handler({ method: 'POST', query: {}, headers: { host: 'meridianx.dev' }, body }, res).then(() => out); };
+  assert.equal((await mk({ action: 'mykey', user: 'orlando', pw: 'x' })).code, 403);
+  assert.equal((await mk({ action: 'mykey', user: 'owner', pw: 'x' })).code, 403);
+  assert.equal((await mk({ action: 'other' })).code, 400);
+  const r = await mk({ action: 'mykey', user: 'fred', pw: 'wrong' });   // the user list fails closed here (no Blob): never a URL
+  assert.notEqual(r.code, 200); assert.ok(!JSON.stringify(r.body).includes('abcdefghijklmnopqrstuvwx'));
+});
