@@ -1,0 +1,75 @@
+{
+  "protocol_id": "core-cpi-six-reference-month-pilot-v1",
+  "created_at_utc": "2026-11-08T14:12:31.143Z",
+  "evaluation_mode": "prospective_research",
+  "status": "Locally registered unvalidated experiment; no externally authenticated precommitment",
+  "method_version": "core-cpi-equal-blend-1.0.0",
+  "model": {
+    "formula": "0.5 * captured Cleveland core CPI monthly nowcast + 0.5 * latest available archived BLS core CPI monthly print",
+    "cleveland_weight": 0.5,
+    "latest_bls_weight": 0.5,
+    "point_functional": "mean",
+    "estimation": "Fixed weights chosen before this outcome; no fitted weights, uncertainty distribution or predictive-skill claim",
+    "dependency": "Both terms depend on lagged BLS core inflation; no independent-measurement claim"
+  },
+  "target": {
+    "variable": "First-release core CPI-U seasonally adjusted monthly percent change",
+    "population": "U.S. city average, all urban consumers",
+    "unit": "percent, nonannualized monthly change",
+    "precision": "Exact one-decimal first-release printed outcome; keep model estimate unrounded",
+    "resolution_contract": {
+      "publisher": "U.S. Bureau of Labor Statistics",
+      "dataset_or_instrument": "CPI news release Table A: U.S. city average CPI-U, all items less food and energy",
+      "field_or_price_convention": "Seasonally adjusted percent change from preceding month, exact one-decimal displayed first-release value",
+      "rule": "Resolve to the exact one-decimal core CPI-U monthly percent change in the first official release for the target reference month. Establish the initial vintage from preserved release evidence. Do not replace it with an annual seasonal revision or later correction; show corrections separately. If the initial vintage cannot be established or the release arrives after the declared deadline, leave the primary case unresolved or unverified.",
+      "revision_policy": "first_release",
+      "specified_vintage": null,
+      "missing_or_holiday_policy": "Retain unissued and missing cases. Do not impute an outcome. Keep the original calendar cutoff and deadline after a delay; report the changed lead and any deadline breach. Never substitute a scheduled release time for actual publication evidence."
+    }
+  },
+  "issuance_window_hours_before_scheduled_release": {
+    "minimum": 24,
+    "maximum": 72
+  },
+  "selection": "initial",
+  "primary_loss": "squared_error",
+  "primary_comparator": "Cleveland current displayed core CPI monthly nowcast captured at the same information set",
+  "secondary_comparator": "Latest available archived BLS core CPI monthly print; report its squared error for every resolved case, separately from the evaluator primary-comparator aggregates",
+  "case_set": [
+    {
+      "reference_month": "2026-10",
+      "forecast_id": "us-core-cpi-sa-mom-2026-10-blend-pilot-v1",
+      "initial_state": "First case registered now"
+    },
+    {
+      "reference_month": "2026-11",
+      "forecast_id": "us-core-cpi-sa-mom-2026-11-blend-pilot-v1",
+      "initial_state": "Intended future case; release calendar and absolute plan cutoff not yet captured"
+    },
+    {
+      "reference_month": "2026-12",
+      "forecast_id": "us-core-cpi-sa-mom-2026-12-blend-pilot-v1",
+      "initial_state": "Intended future case; release calendar and absolute plan cutoff not yet captured"
+    },
+    {
+      "reference_month": "2027-01",
+      "forecast_id": "us-core-cpi-sa-mom-2027-01-blend-pilot-v1",
+      "initial_state": "Intended future case; release calendar and absolute plan cutoff not yet captured"
+    },
+    {
+      "reference_month": "2027-02",
+      "forecast_id": "us-core-cpi-sa-mom-2027-02-blend-pilot-v1",
+      "initial_state": "Intended future case; release calendar and absolute plan cutoff not yet captured"
+    },
+    {
+      "reference_month": "2027-03",
+      "forecast_id": "us-core-cpi-sa-mom-2027-03-blend-pilot-v1",
+      "initial_state": "Intended future case; release calendar and absolute plan cutoff not yet captured"
+    }
+  ],
+  "case_set_policy": "Six consecutive reference months, retained even if no forecast is issued. This protocol registers the intended case set, not unknown future release dates. Create each absolute case plan before its forecast after capturing its official calendar; preserve omissions. Report the six-case denominator alongside scored and missing counts. No aggregate skill conclusion from the first case.",
+  "update_policy": "Initial snapshots are primary. Later views or different weights require separately labeled exploratory records and cannot replace primary forecasts.",
+  "calendar_policy": "Freeze the scheduled release from the source capture. Eligibility cutoff is 24 hours before that release and resolution deadline seven days after. Report actual issuance lead; do not call this an exact 48-hour cohort.",
+  "source_availability_policy": "Use conservative completed local receipt times for known current inputs; unknown original publication remains null. Current hashes/timestamps do not prove externally authenticated historical immutability.",
+  "resolution_metadata_policy": "Strict evaluator requires actual publication and outcome units. If publication timing cannot be established, retain resolution_unverified and report that limitation; do not fill the schedule or retrieval time into published_at_utc."
+}

@@ -177,3 +177,9 @@ test('the argument\'s record: weekly debates resolved at the horizon, a per-topi
   const ry = d.topics.find((t) => t.topic === 'Real yields'); assert.equal(ry.m, -1); assert.equal(ry.v, 1);
   assert.equal(d.topics.find((t) => t.topic === 'Regime').m, null);
 });
+
+test('revision 1.2: the port names its skill version and reads the batch\'s real CPI pilot', () => {
+  assert.equal(V.SKILL_VERSION, '1.2');
+  const c = V.cpiPilot(); assert.equal(c.point, 0.255); assert.equal(c.status, 'unresolved'); assert.equal(c.releaseUtc, '2026-11-10T13:30:00Z');
+  assert.equal(V.cpiPilot('/nonexistent/ledger.jsonl'), null, 'the Vercel bundle has no research/: null, never a throw');
+});

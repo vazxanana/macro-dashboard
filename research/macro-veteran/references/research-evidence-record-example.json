@@ -1,0 +1,144 @@
+[
+  {
+    "schema_version": "1.0.0",
+    "record_id": "cftc-bpr-gold-bank-gross-long-2026-11-03",
+    "record_type": "reported_observation",
+    "source": {
+      "source_id": "cftc-bank-participation-report",
+      "publisher": "U.S. Commodity Futures Trading Commission",
+      "dataset": "November 2026 Bank Participation Report, futures",
+      "direct_url": "https://www.cftc.gov/MarketReports/BankParticipation/deanov26f",
+      "upstream_source_ids": [],
+      "independence_group_id": "cftc-large-trader-reporting-system",
+      "access_class": "public"
+    },
+    "time": {
+      "reference_date_or_period": "2026-11-03 position snapshot",
+      "published_date": "2026-11-06",
+      "published_at_utc": null,
+      "available_at_utc": null,
+      "retrieved_at_utc": "2026-11-07T22:03:27Z",
+      "source_timezone": "America/New_York"
+    },
+    "measurement": {
+      "name": "aggregate_bank_gross_long",
+      "value": 20680,
+      "unit": "COMEX gold futures contracts",
+      "currency": null,
+      "native_label": "CMX GOLD combined U.S. and NON U.S. LONG FUTURES",
+      "seasonal_adjustment": null
+    },
+    "vintage": {
+      "vintage_id": "cftc-bpr-2026-11-03-published-2026-11-06",
+      "revision_status": "unknown",
+      "revision_of": null
+    },
+    "quality": {
+      "status": "source_verified",
+      "flags": [
+        "aggregate",
+        "monthly",
+        "overlaps-cot-reporting-system",
+        "initial-vintage-unconfirmed"
+      ],
+      "note": "CFTC table reports U.S. bank gross longs of 11,548 and non-U.S. bank gross longs of 9,132; the combined row reports 20,680. Bank identities and OTC hedges are not disclosed. Exact publication time was not captured, so this item should not be used for intraday availability claims. Original-release bytes were not captured, so an unrevised initial vintage is not independently established."
+    }
+  },
+  {
+    "schema_version": "1.0.0",
+    "record_id": "cftc-bpr-gold-bank-gross-short-2026-11-03",
+    "record_type": "reported_observation",
+    "source": {
+      "source_id": "cftc-bank-participation-report",
+      "publisher": "U.S. Commodity Futures Trading Commission",
+      "dataset": "November 2026 Bank Participation Report, futures",
+      "direct_url": "https://www.cftc.gov/MarketReports/BankParticipation/deanov26f",
+      "upstream_source_ids": [],
+      "independence_group_id": "cftc-large-trader-reporting-system",
+      "access_class": "public"
+    },
+    "time": {
+      "reference_date_or_period": "2026-11-03 position snapshot",
+      "published_date": "2026-11-06",
+      "published_at_utc": null,
+      "available_at_utc": null,
+      "retrieved_at_utc": "2026-11-07T22:03:27Z",
+      "source_timezone": "America/New_York"
+    },
+    "measurement": {
+      "name": "aggregate_bank_gross_short",
+      "value": 193298,
+      "unit": "COMEX gold futures contracts",
+      "currency": null,
+      "native_label": "CMX GOLD combined U.S. and NON U.S. SHORT FUTURES",
+      "seasonal_adjustment": null
+    },
+    "vintage": {
+      "vintage_id": "cftc-bpr-2026-11-03-published-2026-11-06",
+      "revision_status": "unknown",
+      "revision_of": null
+    },
+    "quality": {
+      "status": "source_verified",
+      "flags": [
+        "aggregate",
+        "monthly",
+        "overlaps-cot-reporting-system",
+        "initial-vintage-unconfirmed"
+      ],
+      "note": "CFTC table reports U.S. bank gross shorts of 95,459 and non-U.S. bank gross shorts of 97,839; the combined row reports 193,298. Bank identities and OTC hedges are not disclosed. Exact publication time was not captured, so this item should not be used for intraday availability claims. Original-release bytes were not captured, so an unrevised initial vintage is not independently established."
+    }
+  },
+  {
+    "schema_version": "1.0.0",
+    "record_id": "cftc-bpr-gold-bank-net-derived-2026-11-03",
+    "record_type": "calculated_observation",
+    "source": {
+      "source_id": "cftc-bank-participation-report",
+      "publisher": "U.S. Commodity Futures Trading Commission",
+      "dataset": "November 2026 Bank Participation Report, futures",
+      "direct_url": "https://www.cftc.gov/MarketReports/BankParticipation/deanov26f",
+      "upstream_source_ids": [],
+      "independence_group_id": "cftc-large-trader-reporting-system",
+      "access_class": "public"
+    },
+    "time": {
+      "reference_date_or_period": "2026-11-03 position snapshot",
+      "published_date": null,
+      "published_at_utc": null,
+      "available_at_utc": null,
+      "retrieved_at_utc": "2026-11-08T11:10:23.442Z",
+      "source_timezone": "America/New_York"
+    },
+    "measurement": {
+      "name": "aggregate_bank_net_futures_position",
+      "value": -172618,
+      "unit": "COMEX gold futures contracts; net = long minus short",
+      "currency": null,
+      "native_label": "Calculated from combined BPR gross long and gross short",
+      "seasonal_adjustment": null,
+      "derivation": {
+        "formula": "20,680 gross long - 193,298 gross short",
+        "input_record_ids": [
+          "cftc-bpr-gold-bank-gross-long-2026-11-03",
+          "cftc-bpr-gold-bank-gross-short-2026-11-03"
+        ],
+        "method_version": "basic-net-position-v1"
+      }
+    },
+    "vintage": {
+      "vintage_id": "derived-from-cftc-bpr-2026-11-03",
+      "revision_status": "not_applicable",
+      "revision_of": null
+    },
+    "quality": {
+      "status": "derived",
+      "flags": [
+        "aggregate",
+        "monthly",
+        "not-independent-of-cot"
+      ],
+      "note": "Arithmetic is reproducible from the linked reported gross-position records. Net position is descriptive only; do not infer unhedged direction or trading intent. Reconstructed during the audit; the input release date is not the publication date of this calculation, and its original historical calculation time was not established."
+    }
+  }
+]

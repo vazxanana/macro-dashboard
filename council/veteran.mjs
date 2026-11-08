@@ -24,6 +24,18 @@ import { injectSection } from './analyst.mjs';
 import { dailyRows, dxyDaily, isoDay } from './macroscore.mjs';
 
 const DAY = 86400;
+// the batch revision this port follows (research/macro-veteran/SKILL.md); 1.2 = the owner's 8 Nov evening upload
+export const SKILL_VERSION = '1.2';
+// the batch's own real forecast: October 2026 core CPI m/m, issued 8 Nov 2026 14:12 UTC, resolved by the BLS first print of 10 Nov.
+// Read from the repository copy of the ledger when it is there (the Vercel bundle has no research/; then null).
+export function cpiPilot(file = new URL('../research/macro-veteran/references/cpi-pilot-forecast-ledger.jsonl', import.meta.url)) {
+  try {
+    const recs = fs.readFileSync(file, 'utf8').split(/\r?\n/).filter((l) => l.trim()).map((l) => JSON.parse(l));
+    const iss = recs.find((r) => r.record_type === 'issued'); if (!iss) return null;
+    const res = recs.find((r) => (r.record_type === 'resolved' || r.record_type === 'resolution') && r.forecast_id === iss.forecast_id), f = iss.forecast || {};
+    return { forecastId: iss.forecast_id, issuedAt: f.issued_at_utc, point: f.distribution && f.distribution.point_estimate, unit: 'percent m/m', reference: 'October 2026', releaseUtc: '2026-11-10T13:30:00Z', status: res ? 'resolved' : 'unresolved', outcome: res ? (res.resolution && res.resolution.outcome) ?? null : null };
+  } catch (e) { return null; }
+}
 export const VET_START = '<!-- veteran:start -->', VET_END = '<!-- veteran:end -->';
 export const HORIZON_DAYS = 20;   // trading days: the 4-week horizon the Gold Macro Score was tested on
 export const P_BOUNDS = [0.4, 0.7];   // a weekly directional call never leaves this band (calibration humility)
@@ -324,7 +336,8 @@ export function build({ fc, cache, daily, ledger = [], debates = [], now }) {
   const v = { v: 1, at: new Date(now * 1000).toISOString(), paperOnly: true, strategistAt: fc && fc.at || null, shock: fp, channels: ch.list, tally: { sum: ch.tally, observed: ch.have, lean: ch.lean },
     debate: topics, verdict, card, base, ledger: { ...ledgerSummary(L), issuedNow: issued ? issued.forecast_id : null, lastProbability: issued ? issued.forecast.distribution.event_probability : (L.filter((r) => r.record_type === 'issued').at(-1) || {}).forecast?.distribution?.event_probability ?? null },
     scoreboard: board, teaching: teach,
-    source: 'council/veteran.mjs: a code port of the owner\'s gptmacro_v.1 skill (research/macro-veteran/); reads the strategist\'s data only, fetches nothing' };
+    cpiPilot: cpiPilot(), skillVersion: SKILL_VERSION,
+    source: `council/veteran.mjs: a code port of the owner's gptmacro_v.1 skill, revision ${SKILL_VERSION} (research/macro-veteran/); reads the strategist's data only, fetches nothing` };
   v.brief = briefOf(v);
   return { v, ledger: L, debates: Dh };
 }

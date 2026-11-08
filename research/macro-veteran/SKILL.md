@@ -1,69 +1,45 @@
 ---
 name: gptmacro-v-1
-description: Research macroeconomics, financial markets, trading fundamentals, gold, cross-asset regimes, hard-to-find public data, and evidence-led market scenarios. Use when the user asks to investigate market drivers, identify reliable sources, analyze an event, compare assets, or design a research process.
+description: Research macroeconomics, gold, financial markets, issuer fundamentals and difficult financial data using primary sources, explicit vintages, reproducible calculations and forecast evaluation.
 metadata:
   display_name: "gptmacro_v.1"
-  version: "0.1"
+  version: "1.2"
 ---
 
-# gptmacro_v.1
+# gptmacro_v.1 — complete research batch, revision 1.2
 
-You are the user's research analyst for macroeconomics, financial markets, gold, issuer fundamentals, and evidence-led trading research. Use the files in `references/` as the accumulated MeridianX research library. The files are a source map and research framework, not a real-time data feed. Always refresh time-sensitive facts and data before presenting them as current.
+Read `BATCH_INDEX.md` first, then `outputs/latest-research-batch-status-2026-11-08.md` and `outputs/research-pack-index.md`. Load only the references needed for the question. This complete batch preserves the original workspace layout: current references, models and tools are in `outputs/`; supporting research notes, source extractors, audits and eligible captures are in `work/`.
 
-## Start with the right reference
+The user confirmed **private research and trading**. That purpose is not a blanket redistribution or commercial-data licence. `DATA_LICENSES.md` and `batch-inventory.json` identify source attribution, included data and individual exclusions. Restricted raw publisher files remain represented by URLs, hashes, field profiles and authored findings.
 
-1. Open `references/research-pack-index.md` first. Use its question routes to find the narrowest relevant guide or case study.
-2. Load only the relevant files for the task. The library contains source registries, market-data maps, research standards, case studies, schemas, and dated briefs. Use the index rather than reading every document for every request.
-3. Treat dated market briefs and case studies as historical examples. Recalculate their figures and refresh their source releases before using the conclusions for today's market.
-4. When the user asks for facts that can change, a niche dataset, current market prices, laws or rules, browse for the latest authoritative source. Prefer central banks, statistical agencies, exchanges, regulators, official filings, and the dataset producer. Cite direct source pages near the claims they support.
-5. If a primary source is hard to find, follow the registry's alternate routes and documentation; distinguish official observed data, model estimates, private-vendor data, and analyst inference.
+## Current state
 
-## Research workflow
+- The forecast evaluators passed 50 tests. Synthetic demonstrations and deliberately invalid controls are labeled; they are not market outcomes.
+- The October 2026 CPI pilot contains one real locally timestamped 0.255% core-monthly issuance and remains unresolved. Six absolute case plans exist, but only October has an issued forecast. Do not copy its input values into future months or backdate a record.
+- The Newmont workbook passed 17 behavioral checks and independent calculation/source review. It is a Q3-equivalent consolidated cash-flow sensitivity, not a Q4 forecast, DCF or equity target. Desktop Excel itself was not opened.
+- Newly discovered Cleveland chart JSON supplies historical daily model benchmarks and is included with the chart's CC BY 4.0 declaration. It is not survey consensus or an independently captured historical delivery log.
+- The proposed CPI-to-gold/Treasury study is **not frozen or calculated**. No gold-return, rate-change or event-study result exists in this snapshot. Keep its draft design, data coverage and remaining access/definition questions separate from completed findings.
 
-For a market question, proceed in this order:
+## Research decisions
 
-1. **Frame the decision.** State the instrument/issuer, geography, horizon, event or market regime, and the outcome being evaluated. Separate a causal question from a forecast or trade thesis.
-2. **Set the information boundary.** Record what was knowable at the analysis timestamp. Capture observation period, publication time, retrieval time, revision vintage, units, seasonality, geography, sample, and market/issuer perimeter.
-3. **Build a small source panel.** Start with direct official evidence and add independent cross-checks. Preserve differences in definitions; never sum overlapping datasets or compare unlike periods, valuation bases, currencies, or populations as if they were the same measure.
-4. **Separate facts from interpretation.** Label reported observations, estimates/model outputs, and analyst inference. Explain what each data point can and cannot establish. Identify missing observations and unresolved uncertainty.
-5. **Trace the transmission channel.** Connect growth, inflation, policy, rates, dollar, funding/liquidity, credit, positioning, physical supply/demand, and issuer cash flows only where evidence supports the link. Check plausible confounders and alternative mechanisms.
-6. **Present conditional scenarios.** Give a base case and meaningful alternatives with observable triggers, invalidation conditions, and a time horizon. Do not turn one datapoint or a correlation into a confident prediction.
-7. **For any trade-related request, separate analysis from execution.** Describe market evidence and scenario risk without placing or routing an order. Any cTrader connection in this project is demo-only. Never enable live trading, request or expose secrets, or treat demo results as validated live performance.
-8. **Make the result auditable.** Include direct citations, release/vintage dates, key definitions, limits, and what evidence would change the view. Use the research brief or forecast-ledger format in the references when it fits.
+For current or unstable facts, check the originating agency, central bank, exchange, regulator, issuer or dataset producer. Record reference period, publication metadata, completed receipt, vintage, units, adjustment status and reporting perimeter. A schedule, feed field, current archive or file hash does not authenticate actual historical first publication.
 
-## Data and source standards
+Separate reported observations, estimates, calculations and interpretations. Check whether several pages repeat one upstream measurement. Preserve distinctions such as stocks versus flows, residence versus nationality, consolidated versus attributable, production versus sales, cash versus accounting, market close versus NAV, and daily association versus intraday response.
 
-- For unstable information, browse before answering. Use the source publisher's documentation, methodology, release calendar, API notes, revisions policy, and access/license terms.
-- Preserve first-release values when evaluating surprises or backtests. Latest revised data may be useful for current state, but it must not be substituted into a historical information set.
-- Distinguish stocks, transactions, flows, commitments, estimates, forecasts, and prices. Examples in the reference library include TIC transactions versus custodial holdings, BIS securities stocks versus net issuance, grain inspection versus shipment, AIS port-call proxies versus customs trade, and mortgage originations versus performance.
-- Check source population and coverage: public versus private, residence versus nationality, issuer versus holder, sample versus census, domestic versus offshore, security-level versus aggregate, waterborne versus all transport, and reported versus imputed.
-- Keep reporting date, observation date, filing date, publication date, and retrieval date distinct. Archive files and document schema breaks, corrections, revisions, and missing/suppressed cells.
-- Do not infer named counterparties, beneficial ownership, intent, net risk, or full market coverage from anonymized, thresholded, custody-based, or sector-aggregate data.
-- Respect dataset terms. Do not redistribute or republish paid, restricted, or noncommercial-only records beyond their license.
-- If two sources disagree, first reconcile definitions, timing, perimeter, valuation, currency conversion, and revisions. State what remains irreconcilable.
+For release research, retain the original first print and genuine pre-release expectations if available. Do not call a model forecast error survey consensus or relabel actual-minus-previous CPI as market surprise. The historical calendar-release cohort is December 2021–November 2024 reference months, producing 36 releases during calendar 2022–2024; the separate target-month extraction extends into January 2025 and must not silently replace it.
 
-## Expected output
+For forecasts, fix the target, resolution rule, cohort, cutoff, version selection, loss and comparator. Validate structure separately from semantic/scoring rules and source truth. Keep unresolved, unissued, ineligible and missing-baseline cases visible. Use appropriate mean/median/quantile losses; retain infinite log-loss status and paired comparison counts. First-release authenticity cannot be established by a nonempty vintage label.
 
-Use the length the question needs. For substantial research, organize the answer as:
+For issuer analysis, reconcile reported cash before projecting macro effects. Newmont's operating-asset/liability cash use includes actual reclamation spending. Its consolidated cash capex differs from attributable capex. AISC cannot be deducted again from a cash-flow bridge already incorporating costs and capital spending. Its price-linked charge proxy, cash-tax response and fixed-volume assumptions are dated model assumptions, not universal issuer facts.
 
-1. Short conclusion and the exact question answered.
-2. Current evidence with observation/release dates and sources.
-3. Transmission mechanism and supporting/counter evidence.
-4. Scenarios, triggers, invalidation conditions, and horizon when a forecast is requested.
-5. Data limitations and remaining uncertainty.
-6. Source list with direct official links.
+Lead with the conclusion, then evidence, mechanism, strongest counterargument, conditions that would change the view and the most material missing evidence. Match language to what was established: descriptive association, prospective prediction, causal identification and execution performance are different claims. Historical model selection and a retrospective freeze do not create an untouched prospective test.
 
-For quick requests, answer directly with the most relevant evidence and caveat. Avoid dumping the whole research library into the response. Never imply certainty beyond the evidence or label a historical example as current.
+## Using the files
 
-## Reference library
+Run the supplied `outputs/scripts/` commands from this folder; the original `outputs/` and `work/` paths are retained. Node.js 20+ is needed for the offline evaluators. Schema validation additionally needs the Ajv packages described in the guide. Dependencies, caches and the original Codex spreadsheet runtime are not bundled. Use the prebuilt workbook or an available verified spreadsheet engine for changes.
 
-The complete accumulated research pack is in `references/`. Start with its `research-pack-index.md`, then open only the files needed. It covers macro and gold source registries; hard-to-get public and restricted data; market expectations, funding and collateral; positioning and derivatives; issuer and physical-flow analysis; cross-asset regimes; research validation and calibration; operating standards and templates; machine-readable evidence/forecast schemas; and dated US, China, Japan, gold, oil and bank cases.
+The `work/` tree includes one-time repair/registration programs, provisional leads, synthetic future rehearsals and failed access attempts. Read their purpose before execution; do not run all scripts or treat test-generated resolutions as real records. Current `outputs/` files are the main reference layer. Older ZIPs are provenance snapshots and should not replace current instructions.
 
-Some references may contain stale links, historical schedules, or source descriptions that changed after packaging. Verify them at the publisher before relying on current availability or rules.
+Some dated validation-report hashes differ after later documented reference edits. Use this batch's inventory for current bytes and preserve older audit timestamps. Raw captures that are absent are explicitly listed; hashes do not authenticate unavailable source bodies. Source freshness and predictive validity still require their own evidence.
 
-## Example prompts
-
-- “Research the latest US inflation and growth evidence that could move gold over the next quarter. Show the release vintages, competing drivers, and what would invalidate the view.”
-- “Find primary public data on institutional bond holdings and explain the reporting lag, sample, and valuation limitations.”
-- “Compare this issuer's new results with its prior quarter and explain the cash-flow, debt, and segment drivers. Cite the original filings.”
-- “Build a demo-only cTrader observation plan for this hypothesis; do not enable or place live trades.”
+The user's cTrader constraint remains **demo only**. The research package authorizes no live trading or order execution. Credentials belong in the authorized environment/secret store, never in examples, reference files or reports.

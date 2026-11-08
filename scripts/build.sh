@@ -7,3 +7,4 @@ cp market-structure.html out/index.html
 cp index.html out/macro/index.html
 cp edge-lab.html macro-desk.html out/
 node research/edge/build.mjs out
+node scripts/veteran-index.mjs out

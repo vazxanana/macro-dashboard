@@ -1,0 +1,60 @@
+{
+  "checked_at_utc": "2026-11-08T13:58:24.023Z",
+  "validator": {
+    "name": "Ajv 2020-12",
+    "version": "8.20.0",
+    "formats_version": "3.0.1"
+  },
+  "reports": [
+    {
+      "file": "outputs/research-evidence-record-example.json",
+      "schema": "outputs/research-evidence-record.schema.json",
+      "schema_validation": "passed",
+      "format_assertions": true
+    },
+    {
+      "file": "outputs/gdp-vintage-evidence-2023-q3.json",
+      "schema": "outputs/research-evidence-record.schema.json",
+      "schema_validation": "passed",
+      "format_assertions": true
+    },
+    {
+      "file": "outputs/forecast-ledger-example.json",
+      "schema": "outputs/forecast-ledger.schema.json",
+      "schema_validation": "passed",
+      "format_assertions": true
+    }
+  ],
+  "evidence_records": 45,
+  "evidence_semantic_checks": "unique IDs; source/observation lineage; revision chronology; acyclic links; reconstructed publication/availability; missing advance GDI; calculation arithmetic; raw-file hashes",
+  "known_defect_controls": 3,
+  "master_result": "passed",
+  "markdown_checks": {
+    "scope": "top-level Markdown files; table column counts, local file links and unexpected control characters",
+    "issues": 0
+  },
+  "frozen_v1": {
+    "sha256": "69c97e348d08ca12f140d617c28ee8e1fa5d8f83b5c76fd1da0b30c6ecf5ba1f",
+    "unchanged": true,
+    "example_schema_result": "known failure; corrected master replacement provided",
+    "errors": [
+      {
+        "instancePath": "/2/vintage/revision_status",
+        "schemaPath": "#/items/$defs/vintage/properties/revision_status/enum",
+        "keyword": "enum",
+        "params": {
+          "allowedValues": [
+            "initial",
+            "revised",
+            "final",
+            "preliminary",
+            "not_applicable",
+            "unknown"
+          ]
+        },
+        "message": "must be equal to one of the allowed values"
+      }
+    ]
+  },
+  "limits": "Checks establish structure and stated internal invariants; official-source fact review is separate and no predictive performance is established."
+}

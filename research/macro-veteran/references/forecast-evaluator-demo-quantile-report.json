@@ -1,0 +1,215 @@
+{
+  "method_version": "meridianx-forecast-evaluator-1.0.0",
+  "plan_id": "synthetic-quantile-evaluation-v1",
+  "evaluation_mode": "synthetic_demonstration",
+  "as_of_utc": "2030-01-01T00:02:00.000Z",
+  "selection": "latest_before_cutoff",
+  "cohort": {
+    "variable": "Synthetic numeric outcome",
+    "instrument_or_population": "Explicitly synthetic fixture",
+    "unit": "synthetic units",
+    "horizon": "one-minute synthetic event",
+    "method_version": "synthetic-evaluation-v1",
+    "required_tags": [
+      "synthetic"
+    ],
+    "resolution_contract": {
+      "publisher": "Synthetic fixture",
+      "dataset_or_instrument": "Illustrative deterministic outcome",
+      "field_or_price_convention": "Synthetic numeric outcome",
+      "rule": "Use the explicitly labelled synthetic outcome in the resolution fixture; no real market outcome is implied.",
+      "revision_policy": "not_applicable",
+      "specified_vintage": null,
+      "missing_or_holiday_policy": "Leave missing outcomes unresolved; append a completion resolution if the value later becomes available."
+    }
+  },
+  "validation_scope": "Standalone runtime checks; full JSON Schema validation must also be performed separately.",
+  "counts": {
+    "registered": 1,
+    "scored": 1
+  },
+  "cases": [
+    {
+      "forecast_id": "demo-quantile",
+      "status": "scored",
+      "selected_forecast_record_id": "demo-quantile-issued",
+      "registered_cutoff_utc": "2030-01-01T00:00:45Z",
+      "visible_versions": 1,
+      "pending_resolution_attempts": 0,
+      "stored_scores_used": false,
+      "cutoff_publication_record_ids": [],
+      "effective_cutoff_utc": "2030-01-01T00:00:45.000Z",
+      "versions_excluded_by_cutoff": 0,
+      "evidence_issues": [],
+      "point_in_time_availability_supplied": false,
+      "resolution_record_id": "demo-quantile-resolution",
+      "outcome": 25,
+      "source_publication_supplied": true,
+      "outcome_unit_supplied": true,
+      "selected_distribution": {
+        "kind": "quantiles",
+        "quantiles": [
+          {
+            "probability": 0.1,
+            "value": 10
+          },
+          {
+            "probability": 0.5,
+            "value": 15
+          },
+          {
+            "probability": 0.9,
+            "value": 20
+          }
+        ],
+        "unit": "synthetic units"
+      },
+      "comparator": {
+        "type": "naive_model",
+        "description": "Synthetic fixed comparator, not a financial estimate",
+        "probability_or_value": 11,
+        "captured_at_utc": "2029-12-31T23:59:50Z",
+        "source_url": null,
+        "sample_size": null,
+        "limitations": "A deliberately specified synthetic fixture; unit matching is asserted by the example."
+      },
+      "baseline_unavailable_reason": "numeric_point_is_not_quantile_distribution",
+      "scores": [
+        {
+          "metric": "pinball@0.1",
+          "loss": {
+            "status": "finite",
+            "value": 1.5
+          },
+          "baseline_loss": null,
+          "optimization_direction": "lower_is_better",
+          "unit": "synthetic units"
+        },
+        {
+          "metric": "pinball@0.5",
+          "loss": {
+            "status": "finite",
+            "value": 5
+          },
+          "baseline_loss": null,
+          "optimization_direction": "lower_is_better",
+          "unit": "synthetic units"
+        },
+        {
+          "metric": "pinball@0.9",
+          "loss": {
+            "status": "finite",
+            "value": 4.5
+          },
+          "baseline_loss": null,
+          "optimization_direction": "lower_is_better",
+          "unit": "synthetic units"
+        },
+        {
+          "metric": "interval_score@0.2",
+          "loss": {
+            "status": "finite",
+            "value": 60
+          },
+          "baseline_loss": null,
+          "optimization_direction": "lower_is_better",
+          "unit": "synthetic units",
+          "nominal_coverage": 0.8,
+          "covered": false
+        }
+      ],
+      "stored_score_count_ignored": 0
+    }
+  ],
+  "aggregate_scores": [
+    {
+      "metric": "pinball@0.1",
+      "unit": "synthetic units",
+      "n": 1,
+      "model_mean": {
+        "status": "finite",
+        "value": 1.5
+      },
+      "paired_n": 0,
+      "paired_model_mean": {
+        "status": "unavailable",
+        "value": null
+      },
+      "paired_baseline_mean": {
+        "status": "unavailable",
+        "value": null
+      }
+    },
+    {
+      "metric": "pinball@0.5",
+      "unit": "synthetic units",
+      "n": 1,
+      "model_mean": {
+        "status": "finite",
+        "value": 5
+      },
+      "paired_n": 0,
+      "paired_model_mean": {
+        "status": "unavailable",
+        "value": null
+      },
+      "paired_baseline_mean": {
+        "status": "unavailable",
+        "value": null
+      }
+    },
+    {
+      "metric": "pinball@0.9",
+      "unit": "synthetic units",
+      "n": 1,
+      "model_mean": {
+        "status": "finite",
+        "value": 4.5
+      },
+      "paired_n": 0,
+      "paired_model_mean": {
+        "status": "unavailable",
+        "value": null
+      },
+      "paired_baseline_mean": {
+        "status": "unavailable",
+        "value": null
+      }
+    },
+    {
+      "metric": "interval_score@0.2",
+      "unit": "synthetic units",
+      "n": 1,
+      "model_mean": {
+        "status": "finite",
+        "value": 60
+      },
+      "paired_n": 0,
+      "paired_model_mean": {
+        "status": "unavailable",
+        "value": null
+      },
+      "paired_baseline_mean": {
+        "status": "unavailable",
+        "value": null
+      },
+      "coverage": {
+        "nominal": 0.8,
+        "observed": 0,
+        "n": 1
+      }
+    }
+  ],
+  "reliability": [],
+  "limits": [
+    "Input timestamps, units, source truth, prose event resolution and plan precommitment require external review; current files/hashes do not prove historical append-only storage.",
+    "Resolution publication times are supplied assertions, not independently authenticated receipt logs.",
+    "Only the declared cohort and paired baseline cases are aggregated. Sparse quantiles are not converted into CRPS.",
+    "Synthetic or retrospective scores do not establish a prospective forecasting or trading track record."
+  ],
+  "input_sha256": {
+    "ledger": "b85dc5134cec6592478e033811515911c4e4f3bf685e3aa9bb24e1831152a117",
+    "evaluation_plan": "0d8cfddd7b76ecd97e9856b415ae19f8ff13d575f4561db98e919f3b3920c485",
+    "evidence": null
+  }
+}
