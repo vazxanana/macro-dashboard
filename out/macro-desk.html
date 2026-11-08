@@ -301,7 +301,7 @@
       return '<tr><td><b>' + esc(m.name) + '</b><small>' + esc(m.who) + ' · ' + esc(m.asOf) + '</small>' + (m.quote ? '<small>' + esc(m.quote) + '</small>' : '') + '</td>'
         + '<td>' + sgn(m.net) + '<small>' + (m.longShare != null ? m.longShare + '% of positions long' : '') + '</small></td><td>' + sgn(m.chg1) + (m.z != null ? '<small>' + (m.z > 0 ? '+' : '') + m.z + ' sd</small>' : '') + '</td><td>' + sgn(m.chg4) + '</td>'
         + '<td>' + (m.tL != null ? m.tL + ' / ' + m.tS + '<small>' + (m.tLchg != null ? (m.tLchg >= 0 ? '+' : '') + m.tLchg + ' / ' + (m.tSchg >= 0 ? '+' : '') + m.tSchg + ' on the week' : '') + '</small>' : '—') + '</td>'
-        + '<td>' + (m.pct != null ? m.pct + 'th percentile<div class="rng"><s style="left:calc(' + m.pct + '% - 2px)"></s></div>' : '—') + '</td>'
+        + '<td>' + (m.pct != null ? m.pct + ([11, 12, 13].indexOf(m.pct % 100) < 0 && ['th', 'st', 'nd', 'rd'][m.pct % 10] || 'th') + ' percentile<div class="rng"><s style="left:calc(' + m.pct + '% - 2px)"></s></div>' : '—') + '</td>'
         + '<td>' + sig + (best.length ? '<small>Edge found historically: ' + best.join(', ') + '</small>' : '') + '</td></tr>';
     }).join('');
     $('cot-sub').textContent = 'positions as of ' + ((c.markets.find(function (m) { return m.asOf; }) || {}).asOf || '—') + ' · updated ' + ago(c.at);
