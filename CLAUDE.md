@@ -550,6 +550,15 @@ position at once when the broker refuses the stop (only no answer at all waits a
 whose stop distance is within 1.25× the broker spread (ctrader/symbols.json). Tests:
 `tests/ctrader-mirror.test.mjs` (fake broker with resting orders, `fillOrder`, cancel / cancel-rejected paths).
 
+## Profile page and guest view (8 Nov 2026)
+`#profile` (v-profile, in VIEWS and the viewer allow-list) holds the identity card (copied from the account menu) and the council's
+demo accounts rendered by the cTrader module in page mode (`MODE = 'page'` → `#ms-pf-b`; the dialog stays for the cTrader link
+return). The account menu's first item is "Profile and demo accounts"; the old "My cTrader account" item is hidden. The saved user
+record (`ms-user-rec`) carries `ct` so the right survives the reload that stores it. Light theme defines `--panel-hover`,
+`--line-strong`, `--accent-soft`, `--buy-soft`, `--sell-soft` (hovers used to fall back to the dark values). Guest view: the trade in
+words (`#g-setup`), named price lines, a chart that follows the page theme with coloured candles, the header pinned to XAU/USD, and an
+invitation (`.g-join`) whose Sign in opens the gate.
+
 ## Accounts, desks, header switch, gate (8 Nov 2026)
 Users (market-structure.html `MS_USERS`): Fred reviewer + ICT (reviews), Orlando reviewer (sees everything) + ICT read-only, Carlos
 viewer; `ct: true` (all three) shows the council's demo accounts on "My cTrader account" with edge labels only, never account numbers
