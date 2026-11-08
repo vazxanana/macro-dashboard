@@ -1,0 +1,14 @@
+# MeridianX council live runner (Linux VPS). Copy to ~/.config/systemd/user/meridianx-live.service, then:
+#   systemctl --user daemon-reload && systemctl --user enable --now meridianx-live && loginctl enable-linger $USER
+# Secrets: ~/meridianx/.env (never in the repo). Exit code 3 = new council code on main: the unit pulls and restarts.
+[Unit]
+Description=MeridianX council live runner (Trader + cTrader demo mirror)
+After=network-online.target
+[Service]
+WorkingDirectory=%h/macro-dashboard
+ExecStartPre=/usr/bin/git pull -q --ff-only origin main
+ExecStart=/usr/bin/node council/live.mjs
+Restart=always
+RestartSec=20
+[Install]
+WantedBy=default.target

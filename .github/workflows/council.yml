@@ -107,19 +107,24 @@ jobs:
           # new council code on main since this run started? (council/, ict/, api/ or this workflow) -> hand over between rounds
           newcode() { f=$(gh api "repos/${{ github.repository }}/compare/${{ github.sha }}...main" --jq '.files[].filename' 2>/dev/null) || return 1
             echo "$f" | grep -qE '^(council/|ict/|api/|\.github/workflows/council\.yml)'; }
+          # live runner (8 Nov, council/live.mjs on the owner's VPS): while its heartbeat (data/live.json) is under 3 minutes old it owns
+          # the Trader and the mirror; this loop then skips them (one writer of trades.json) and keeps the heavy members
+          livefresh() { node -e 'try{const h=JSON.parse(require("fs").readFileSync("data/live.json","utf8"));process.exit(Date.now()-Date.parse(h.at)<=180000?0:1)}catch(e){process.exit(1)}'; }
           for i in $(seq 1 $ROUNDS); do
             # 60 rounds take ~5.6 h (~5.6 min each), longer than the 330-min job timeout, so the job was killed before "Start the
             # next run" (6 Nov 05:44: 79 min with no run until the cron watchdog restarted it). Stop at 300 min so the hand-off runs.
             if [ "$SECONDS" -gt 18000 ]; then echo "Time budget reached after $((i - 1)) rounds"; break; fi
             git -C data pull -q --rebase origin council-data || true
+            if livefresh; then echo "live runner alive: Trader + mirror left to it this round"; else
             node council/trader.mjs data || echo "Trader round $i failed"
             # cTrader DEMO mirror (8 Nov, owner: "when he places a trade it must go instantly on ctrader"): the very next step after
             # the Trader, so a council fill or pending order reaches the demo within seconds of being recorded; nothing runs in between
             node council/ctrader-mirror.mjs data || echo "cTrader mirror round $i failed"
+            fi
             # ICT desk (7 Nov): GitHub fired ict.yml's 15-min schedule only 3 times in 22 h, so the desk runs here, every 3rd
             # round (~17 min). ict.yml keeps a manual trigger only (one writer of ict/). Its A-setups get their own mirror pass
             # right after it, so they too reach the demo within seconds (the mirror is idempotent: a second pass sends nothing new).
-            if [ $((i % 3)) -eq 1 ]; then node ict/tracker.mjs data/ict || echo "ICT round $i failed"; node council/ctrader-mirror.mjs data || echo "cTrader mirror (ICT) round $i failed"; fi
+            if [ $((i % 3)) -eq 1 ]; then node ict/tracker.mjs data/ict || echo "ICT round $i failed"; livefresh || node council/ctrader-mirror.mjs data || echo "cTrader mirror (ICT) round $i failed"; fi
             # Macro strategist (7 Nov, paper only): next-day odds, event playbook and scorecard → data/macro/; every 6th round
             # (~25 min), capped at 3 min; a failure never stops the loop.
             if [ $((i % 6)) -eq 1 ]; then timeout 180 node council/macro.mjs data || echo "Macro round $i failed"; fi
@@ -155,7 +160,7 @@ jobs:
                 # Quick pass (8 Nov, owner: "build it, start at 2 minutes"): halfway through the wait the Trader looks at the markets
                 # again and the mirror copies what it recorded, so a setup reaches cTrader within about two minutes instead of a
                 # round. The heavy members keep the 5-minute round. Saved as its own commit; a failure never stops the loop.
-                if [ "$k" -eq 2 ]; then
+                if [ "$k" -eq 2 ] && ! livefresh; then
                   git -C data pull -q --rebase origin council-data || true
                   node council/trader.mjs data || echo "Trader quick pass $i failed"
                   node council/ctrader-mirror.mjs data || echo "cTrader mirror quick pass $i failed"

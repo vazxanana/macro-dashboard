@@ -507,6 +507,16 @@ macro/lessons.json, exposed as `fc.learned`. The veteran keeps the argument's re
 `scoreboard` (per topic, who was right on gold's direction 20 trading days on; macro/veteran-debates.json) and `teaching(fc)`
 (what the strategist has adopted, what is pending). Both show on the desk under the discussion.
 
+## Council live runner (8 Nov 2026)
+`council/live.mjs`: one always-on process (owner's VPS; `scripts/live/install-vps.sh`, `meridianx-live.service`; Windows files too)
+that runs the Trader and the cTrader mirror every `LIVE_EVERY` s (30) against its own clone of council-data, pushes when a trading
+file changes (`PUSH_FILES`) or every `LIVE_PUSH_EVERY` s, and writes the heartbeat `live.json`. council.yml `livefresh()` skips its
+Trader, mirror and quick pass while the heartbeat is under `FRESH_SEC` (180 s) old, so there is one writer of trades.json; a stale
+heartbeat hands the Trader back to the workflow. Secrets only in `~/meridianx/.env` (`scripts/live/env.example`, names only); the
+GitHub token travels in a per-command header, never `.git/config`; child output is scrubbed (`scrubber`). With `OANDA_TOKEN` the
+Trader reads candles from a local proxy (api/bars.js behind node:http, `serveHandler`) so the cadence costs no Vercel calls. Exit
+code 3 = new council code on main: the wrapper pulls and restarts. Tests: `tests/live.test.mjs`.
+
 ## Council quick pass (8 Nov 2026)
 council.yml: halfway through the 4-minute wait between rounds (k = 2) the Trader runs again and the mirror copies what it recorded
 ("Council quick pass" commit on council-data), so a setup reaches cTrader within about two minutes; the heavy members (Analyst,
