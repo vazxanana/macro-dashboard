@@ -5,19 +5,48 @@
  ],
  "state": {
   "map": {},
-  "day": null,
+  "day": {
+   "date": "2026-11-08",
+   "startBalance": 10000
+  },
   "startedAt": "2026-11-08T11:42:25.000Z",
-  "status": "refused: CTRADER_ACCOUNT_ID not found for this token",
+  "status": "ok · demo Fusion Markets · balance 10000 · 0 open",
   "skipped": {},
-  "wait": {},
-  "paused": {},
+  "wait": {
+   "ict:es-s-1793995200": {
+    "why": "US500 market closed (paused until 12:14 UTC)",
+    "n": 0,
+    "at": "2026-11-08T12:05:05.000Z"
+   }
+  },
+  "paused": {
+   "US500": "2026-11-08T12:14:38.000Z"
+  },
   "resetAt": "2026-11-08T09:45Z",
-  "resetDoneAt": "2026-11-08T11:42:46.000Z"
+  "resetDoneAt": "2026-11-08T11:42:46.000Z",
+  "orders": {},
+  "catchUpAt": "2026-11-08T12:04:38.000Z",
+  "balance": 10000,
+  "lastRun": "2026-11-08T12:05:05.000Z"
  },
  "log": [
   {
    "at": "2026-11-08T11:42:46.447Z",
    "msg": "owner reset 2026-11-08T09:45Z: 0 copied-trade records, the skip/wait notes and the day's start balance dropped; the open book is copied afresh"
+  },
+  {
+   "at": "2026-11-08T12:04:38.000Z",
+   "msg": "catch-up round: 1 open council trade (shadows included) considered"
+  },
+  {
+   "at": "2026-11-08T12:04:38.000Z",
+   "msg": "not mirrored yet ict:es-s-1793995200: US500 market closed: MARKET_CLOSED: Trading is not available: Market is closed. (will retry)",
+   "trade": "ict:es-s-1793995200"
+  },
+  {
+   "at": "2026-11-08T12:05:05.000Z",
+   "msg": "not mirrored yet ict:es-s-1793995200: US500 market closed (paused until 12:14 UTC) (will retry)",
+   "trade": "ict:es-s-1793995200"
   }
  ],
  "limits": {
