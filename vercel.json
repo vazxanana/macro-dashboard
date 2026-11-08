@@ -6,6 +6,10 @@
   "outputDirectory": "out",
   "rewrites": [
     {
+      "source": "/mcp/:key",
+      "destination": "/api/mcp?key=:key"
+    },
+    {
       "source": "/cdata/:path*",
       "destination": "/api/data?p=:path*"
     },
