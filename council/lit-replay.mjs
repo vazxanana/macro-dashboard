@@ -8,10 +8,71 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { cleanBars, agg15, series, fbosCandidates, buildOrder, VARIANT, SESS_TRADE, XAU, funnel, buildCounts } from './lit.mjs';
-import { simulateOrder, selectTrades, stats, MARKETS, VARIANTS } from '../research/edge/lit/run.mjs';
+import { simulateOrder, managePosition, selectTrades, stats, MARKETS, VARIANTS } from '../research/edge/lit/run.mjs';
+import { P } from './lit.mjs';
+
+// ─── study sets (8 Nov, owner: "I need trades, find a way"): the same M15 manipulation, then looser execution, each labelled.
+// They are for studying the idea on recent candles; none is the pre-registered rule and none trades. ───
+export const STUDY_SETS = [
+  { id: 'loose-limit', label: 'Loose limit', desc: 'M5 break may come after MX is re-tested (MX re-anchors), no speed / overlap / flip filters, R:R over 1.5, no stop cap, limit at the order block open, fills on a touch, lives 48 M5 bars.',
+    mxReanchor: true, quality: false, minRR: 1.5, cap: false, entry: 'limit', touch: true, expiryBars: 48 },
+  { id: 'market-break', label: 'Market on the break', desc: 'Same manipulation; entry at market on the close of the bar after the M5 break, stop beyond MX, target the accumulation extreme, R:R over 1.5, no stop cap, no quality filters: every setup with a break becomes a trade.',
+    mxReanchor: true, quality: false, minRR: 1.5, cap: false, entry: 'market' },
+];
+const lowerBound = (arr, v) => { let lo = 0, hi = arr.length; while (lo < hi) { const m = (lo + hi) >> 1; if (arr[m] < v) lo = m + 1; else hi = m; } return lo; };
+// a study-mode order from an M15 candidate on the (sign-normalised, short-side) M5 series; mirrors council/lit.mjs buildOrder with switches
+export function buildStudy(S5, cd, M, set, fun) {
+  const { h, l, c, o, t, vec, pivL, atr, body, n } = S5;
+  const j0 = lowerBound(t, cd.confEnd), sIdx = lowerBound(t, cd.t), rEnd = lowerBound(t, cd.rEnd);
+  if (j0 >= n || sIdx >= rEnd) return null;
+  let mxIdx = sIdx; for (let k = sIdx; k < rEnd; k++) if (h[k] > h[mxIdx]) mxIdx = k;
+  let MX = h[mxIdx];
+  const swingBefore = (upto) => { for (let k = upto - 1; k >= Math.max(0, upto - 288); k--) if (pivL[k] && k + P.pivot < j0) return k; return -1; };
+  let p = swingBefore(mxIdx); if (p < 0) { fun.noSwing++; return null; }
+  let level = l[p], b = -1;
+  for (let k = mxIdx + 1; k <= Math.min(n - 2, mxIdx + P.rbosWait); k++) {
+    if (h[k] > MX) { if (!set.mxReanchor) { fun.mxBroken++; return null; } MX = h[k]; mxIdx = k; const p2 = swingBefore(k); if (p2 >= 0) level = l[p2]; continue; }
+    if (l[k] <= level) { b = k; break; }
+  }
+  if (b < 0) { fun.noRbos++; return null; }
+  if (set.quality) {
+    if (!(vec[b] || b - mxIdx <= P.rbosFast)) { fun.rbosSlow++; return null; }
+    let ov = 0, cnt = 0; for (let k = mxIdx + 1; k <= b; k++) { cnt++; const rng = h[k] - l[k], inter = Math.min(h[k], h[k - 1]) - Math.max(l[k], l[k - 1]); if (rng > 0 && inter / rng > P.overlapRatio) ov++; }
+    if (cnt && ov / cnt > P.overlapShare) { fun.rbosOverlap++; return null; }
+    if (c[b + 1] > level) { fun.rbosFlip++; return null; }
+  }
+  let d = b; for (let k = mxIdx; k <= b; k++) if (vec[k] && c[k] < o[k]) { d = k; break; }
+  let ob = -1; for (let k = d - 1; k >= mxIdx; k--) if (c[k] > o[k]) { ob = k; break; }
+  if (ob < 0) for (let k = Math.max(mxIdx, d - 3); k <= d - 1; k++) if (ob < 0 || body[k] < body[ob]) ob = k;
+  if (ob < 0) { fun.noOb++; return null; }
+  const jA = Math.max(j0, b + 2); if (jA >= n) return null;
+  const entry = set.entry === 'market' ? c[Math.min(n - 1, b + 1)] : o[ob];
+  const stop = MX + M.stopExtra(atr[jA - 1]), risk = stop - entry; if (!(risk > 0)) { fun.badGeom++; return null; }
+  const target = cd.accLow, rr = (entry - target) / risk; if (!(rr > set.minRR)) { fun.lowRR++; return null; }
+  const capOK = set.cap ? risk <= P.capFrac * Math.abs(entry) : true; if (!capOK) { fun.capped++; return null; }
+  fun.orders++;
+  return { jA, entry, stop, target, risk, rr, MX, capOK, level: cd.kind, sess: cd.sess, tSig: cd.t, tJA: t[jA], b, ob, market: set.entry === 'market' };
+}
+// fills as the study did, with a touch option and a longer life; a market order fills at once on its bar
+export function simulateStudy(S5, M, ord, set) {
+  const { h, l, o, ny, n } = S5, { entry, stop, target } = ord;
+  if (ord.market) { const k = Math.min(n - 1, ord.b + 1); if (ny[k].hm === 930) return { filled: false, end: k, kind: 'open930' }; return managePosition(S5, M, ord, entry, k); }
+  const life = set.expiryBars || P.expiryBars;
+  for (let k = ord.jA; k < Math.min(n, ord.jA + life); k++) {
+    if (ny[k].hm !== 930 && h[k] >= entry + (set.touch ? 0 : S5.tick)) {
+      const fp = Math.max(entry, o[k]);
+      if (h[k] >= stop) return managePosition(S5, M, { ...ord, stop }, fp, k);   // managePosition closes it at the stop on the next bar check; the fill bar itself is kept simple
+      if (l[k] <= target) return { filled: false, end: k, kind: 'ambiguous' };
+      return managePosition(S5, M, ord, fp, k);
+    }
+    if (h[k] > ord.MX) return { filled: false, end: k, kind: 'mxBreak' };
+    if (l[k] <= target) return { filled: false, end: k, kind: 'targetFirst' };
+  }
+  return { filled: false, end: Math.min(n - 1, ord.jA + life - 1), kind: 'expired' };
+}
 
 const MD_BASE = process.env.MD_BASE || 'https://meridianx.dev/md/';
-const DAYS = 63, WINDOW = 15 * 86400, FRESH = 20 * 3600;
+const DAYS = 90, WINDOW = 15 * 86400, FRESH = 20 * 3600, VERSION = 2;   // VERSION: a new shape or set re-runs the replay at once
 
 export async function fetchBars(days = DAYS, fetchFn = fetch, now = Math.floor(Date.now() / 1000)) {
   // the week before the window warms the levels (previous week, accumulation) so the first days are judged like the rest
@@ -34,8 +95,9 @@ export function replay(bars, { days = DAYS, now = Math.floor(Date.now() / 1000),
   // the short series is the plain one, the long series is mirrored (negated), so prices come back with these signs
   const sgn = (dir) => (dir === 'short' ? 1 : -1), px = (dir, v) => +(sgn(dir) * v).toFixed(2);
   const WHY = { noSwing: 'no M5 swing before MX', mxBroken: 'MX broken before the break', noRbos: 'no M5 real break', rbosSlow: 'break too slow', rbosOverlap: 'break overlaps', rbosFlip: 'break flipped back', noOb: 'no order block', badGeom: 'bad geometry', lowRR: 'R:R under 3', capped: 'stop over 0.08% of price' };
+  const candsByDir = {};
   for (const dir of ['short', 'long']) {
-    const cands = fbosCandidates(S15[dir], fun);
+    const cands = fbosCandidates(S15[dir], fun); candsByDir[dir] = cands;
     for (const cd of cands) { cd.confEnd = S15[dir].t[cd.conf] + 900; cd.rEnd = S15[dir].t[cd.r] + 900; cd.dir = dir;
       // the primary variant, with the reason a setup produced no order (a fresh counter per candidate tells which gate dropped it)
       const one = buildCounts(), od = buildOrder(S5[dir], cd, M, VARIANT, one);
@@ -63,10 +125,20 @@ export function replay(bars, { days = DAYS, now = Math.floor(Date.now() / 1000),
   const bySess = {}, byLevel = {}, byKind = {};
   for (const x of trades) { (bySess[x.sess] = bySess[x.sess] || []).push(x); (byLevel[x.level] = byLevel[x.level] || []).push(x); byKind[x.kind] = (byKind[x.kind] || 0) + 1; }
   const sub = (m) => Object.fromEntries(Object.entries(m).map(([k, v]) => [k, { n: v.length, net: +v.reduce((a, x) => a + x.Rnet, 0).toFixed(2), win: +(v.filter((x) => x.R > 0).length / v.length).toFixed(2) }]));
+  // the study sets: every candidate, looser execution; gated trades (one at a time, one per session, day stop) and every fill
+  const study = {};
+  for (const set of STUDY_SETS) {
+    const cnt = buildCounts(), ods = [];
+    for (const dir of ['short', 'long']) for (const cd of candsByDir[dir]) { const od = buildStudy(S5[dir], cd, M, set, cnt); if (od) { od.dir = dir; od.sim = simulateStudy(S5[dir], M, od, set); ods.push(od); } }
+    const fills = ods.filter((od) => od.sim.filled && od.sim.t >= since).map(row).sort((a, b) => a.t - b.t);
+    const gated = selectTrades(ods.map((od) => ({ ...od })), ny).filter((od) => od.sim.t >= since).map(row).sort((a, b) => a.t - b.t);
+    const unf = {}; for (const od of ods) if (!od.sim.filled) unf[od.sim.kind] = (unf[od.sim.kind] || 0) + 1;
+    study[set.id] = { label: set.label, desc: set.desc, build: cnt, orders: ods.filter((od) => S5[od.dir].t[od.jA] >= since).length, unfilled: unf, fills: { n: fills.length, stats: stats(fills), trades: fills }, gated: { n: gated.length, stats: stats(gated), trades: gated } };
+  }
   const variants = {}; for (const [id, ods] of Object.entries(byVariant)) { const tk = selectTrades(ods.map((od) => ({ ...od })), ny).filter((od) => od.sim.t >= since).map(row); variants[id] = { orders: ods.filter((od) => S5[od.dir].t[od.jA] >= since).length, taken: tk.length, stats: stats(tk), trades: tk }; }
-  return { at: new Date(now * 1000).toISOString(), from: new Date(since * 1000).toISOString().slice(0, 10), to: new Date(now * 1000).toISOString().slice(0, 10), days,
+  return { version: VERSION, at: new Date(now * 1000).toISOString(), from: new Date(since * 1000).toISOString().slice(0, 10), to: new Date(now * 1000).toISOString().slice(0, 10), days,
     bars: bars.length, m15: m15.length, funnel: fun, build: bc, orders: orders.length, filled: orders.filter((od) => od.sim.filled).length, unfilled, notTaken,
-    stats: st, bySession: sub(bySess), byLevel: sub(byLevel), byExit: byKind, trades, setups: setups.filter((x) => x.t >= since).sort((a, b) => a.t - b.t), variants,
+    stats: st, bySession: sub(bySess), byLevel: sub(byLevel), byExit: byKind, trades, setups: setups.filter((x) => x.t >= since).sort((a, b) => a.t - b.t), variants, study,
     note: 'What the pre-registered LIT rule would have done on OANDA 5m gold over this window, simulated as the study did (costs $0.30 spread + $0.15 slippage on market exits in Rnet; Rnet2 doubles them). Paper research, not the live shadow stream\'s records. The study\'s verdict (inconclusive, 2008-2026) stands.' };
 }
 
@@ -75,11 +147,11 @@ if (process.argv[1] && process.argv[1].endsWith('lit-replay.mjs')) {
   const DIR = argv.find((a) => !a.startsWith('--') && !/^\d+$/.test(a)) || 'data', OUT = path.join(DIR, 'lit', 'replay.json'), days = +flags.days || DAYS;
   try {
     let prev = null; try { prev = JSON.parse(fs.readFileSync(OUT, 'utf8')); } catch (e) {}
-    if (prev && !flags.force && Date.now() - Date.parse(prev.at) < FRESH * 1000) { console.log(`LIT replay: fresh (${prev.trades.length} trades, ${prev.at})`); process.exit(0); }
+    if (prev && !flags.force && prev.version === VERSION && Date.now() - Date.parse(prev.at) < FRESH * 1000) { console.log(`LIT replay: fresh (${prev.trades.length} trades, ${prev.at})`); process.exit(0); }
     const bars = await fetchBars(days);
     if (bars.length < 2000) throw new Error(`only ${bars.length} candles`);
     const out = replay(bars, { days });
     fs.mkdirSync(path.dirname(OUT), { recursive: true }); fs.writeFileSync(OUT, JSON.stringify(out, null, 1));
-    console.log(`LIT replay: ${out.from} → ${out.to}, ${out.bars} candles, ${out.setups.length} setups, ${out.orders} orders, ${out.filled} filled, ${out.trades.length} taken, net ${out.stats.total ?? 0}R; variants ${Object.entries(out.variants).map(([k, v]) => `${k} ${v.taken}`).join(', ')}`);
+    console.log(`LIT replay: ${out.from} → ${out.to}, ${out.bars} candles, ${out.setups.length} setups, ${out.orders} orders, ${out.filled} filled, ${out.trades.length} taken, net ${out.stats.total ?? 0}R; variants ${Object.entries(out.variants).map(([k, v]) => `${k} ${v.taken}`).join(', ')}; study ${Object.entries(out.study).map(([k, v]) => `${k} fills ${v.fills.n} (${v.fills.stats.total ?? 0}R) gated ${v.gated.n} (${v.gated.stats.total ?? 0}R)`).join(', ')}`);
   } catch (e) { console.log(`LIT replay failed: ${e.message}`); }
 }
