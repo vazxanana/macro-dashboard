@@ -5391,6 +5391,7 @@ function msNextSetup(bars, A) {
   root.querySelectorAll('.ms-coin').forEach((c) => { c.style.background = `radial-gradient(circle at 35% 35%, #ffffffaa, ${INST.color})`; });
   const grid4 = root.querySelector('.ms-grid4');
   function setView(v) {
+    if (PUB) v = 'all';   // guests: always the two screens (Daily and H1), whatever was saved or however narrow the window (8 Nov)
     grid4.dataset.view = v; if (window.msSplitView) setTimeout(() => window.msSplitView(v === 'split'), 0);
     root.querySelectorAll('[data-view]').forEach((b) => { const on = b.dataset.view === v; b.classList.toggle('on', on); b.setAttribute('aria-pressed', String(on)); });
     try { localStorage.setItem('msView', v); } catch (e) {}
@@ -5606,7 +5607,7 @@ function msNextSetup(bars, A) {
   if (root.querySelector('[data-view]')) {
     root.querySelectorAll('[data-view]').forEach((b) => b.addEventListener('click', () => setView(b.dataset.view)));
     let v0 = null; try { v0 = localStorage.getItem('msView'); } catch (e) {}
-    setView(v0 || (innerWidth < 1000 ? '1h' : 'all'));
+    setView(PUB ? 'all' : v0 || (innerWidth < 1000 ? '1h' : 'all'));
   }
   root.querySelectorAll('[data-expand]').forEach((b) => b.addEventListener('click', () => {
     const card = b.closest('.ms-pane'), on = !card.classList.contains('full');
@@ -10342,10 +10343,10 @@ html[data-role="public"] .hdr-sw { display: none; }
 <style id="ms-guest5-css">
 /* guests: two screens only, Daily and H1 (8 Nov 2026, owner). The view segment goes; the two panes share the row; both stay tall. */
 html[data-role="public"] #v-charts .ms-pane:not([data-tf="1d"]):not([data-tf="1h"]) { display: none !important; }
-html[data-role="public"] #v-charts .ms-grid4 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+html[data-role="public"] #v-charts .ms-grid4, html[data-role="public"] #v-charts .ms-grid4[data-view] { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; }
 html[data-role="public"] #v-charts .ms-pane[data-tf="1d"] .ms-chart, html[data-role="public"] #v-charts .ms-pane[data-tf="1h"] .ms-chart { height: min(62vh, 560px); }
 html[data-role="public"] #v-charts .sec-h > .seg[aria-label="Chart view"], html[data-role="public"] #v-charts .kbd-hint { display: none !important; }
-@media (max-width: 900px) { html[data-role="public"] #v-charts .ms-grid4 { grid-template-columns: minmax(0, 1fr); } html[data-role="public"] #v-charts .ms-pane .ms-chart { height: 360px; } }
+@media (max-width: 760px) { html[data-role="public"] #v-charts .ms-grid4, html[data-role="public"] #v-charts .ms-grid4[data-view] { grid-template-columns: minmax(0, 1fr) !important; } html[data-role="public"] #v-charts .ms-pane .ms-chart { height: 360px; } }
 </style>
 <style id="ms-guest4-css">
 /* guests: one page (8 Nov 2026). The charts, then the gold trade and the rest, separated by a rule. */
