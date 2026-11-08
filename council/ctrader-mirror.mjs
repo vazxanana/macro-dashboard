@@ -512,6 +512,44 @@ export async function mirrorRound({ env, trades, state, tokens, specs = null, WS
           return { by: 'council', council: t.status, R: t.R ?? null, price: dl.executionPrice ?? null, pnl: cd.grossProfit != null && Number.isFinite(+cd.grossProfit) ? +cd.grossProfit / 10 ** md : null }; }); }
       catch (e) { say(`close ${m.symbol} ${m.positionId} failed: ${e.message}`, { trade: id }); alert('closefail', id, m, { result: scrub(e.message) }); }
     }
+    // 2b) RULE (owner, 8 Nov): a mirrored position never sits without a stop. A market order's relative stop is measured from the
+    //     fill, and when the stop distance is inside the spread the broker drops the stop and keeps the position. ensureStop sets
+    //     the council's absolute stop (an ICT trade: the council's distance from the fill) by amend, right at the fill and again on
+    //     every round for any held position without one; a stop the broker refuses means the position is closed at once (the
+    //     council would be out too). Only no answer at all (timeout) is left for the next round, with a nostop alert.
+    const ensureStop = async (id, m, t, p) => {
+      const d = Number.isFinite(+m.digits) ? +m.digits : 5, at = (v) => +(+v).toFixed(d);
+      const isIct = String(id).startsWith('ict:'), fill = Number.isFinite(+p.price) && +p.price > 0 ? +p.price : null;
+      const want = isIct ? (fill != null ? at(fill + (+t.stop - +t.entry)) : null) : at(t.stop);
+      const wantT1 = t.t1 != null && !(t.rr >= 50) ? (isIct ? (fill != null ? at(fill + (+t.t1 - +t.entry)) : null) : at(t.t1)) : null;
+      const vol = (p.tradeData && +p.tradeData.volume) || m.volume, mk = markOf(marks, t.market, now);
+      const closeNow = async (why) => {
+        try { const ev = await s.send(PT.CLOSE_POSITION_REQ, { ctidTraderAccountId: ctid, positionId: Number(m.positionId), volume: vol }, PT.EXECUTION_EVENT, orderStep);
+          if (ev.interim) { m.closing = iso; say(`no stop on ${m.symbol} ${m.positionId}: close accepted, fill not confirmed yet (${why})`, { trade: id }); return; }
+          m.status = 'closed by mirror'; m.closedAt = iso; m.closedWhy = `no stop at the broker: ${why}`; out.sent.push({ type: 'close', trade: id });
+          { const px = ev.deal && +ev.deal.executionPrice; if (px > 0) m.exitPrice = px; }
+          say(`closed ${m.symbol} position ${m.positionId}: the broker held it without a stop and refused one (${why})`, { trade: id });
+          alert('close', id, m, { by: 'mirror', council: t.status, R: null, why: `no stop at the broker: ${why}` }); }
+        catch (e2) { m.noStopTries = (m.noStopTries || 0) + 1; say(`close of unprotected ${m.symbol} ${m.positionId} failed: ${e2.message} (again next round)`, { trade: id }); alert('nostop', id, m, { result: scrub(e2.message), stop: want }); }
+      };
+      if (want == null) { await closeNow('no fill price to measure the stop from'); return; }
+      const req = { ctidTraderAccountId: ctid, positionId: Number(m.positionId), stopLoss: want, ...(wantT1 != null ? { takeProfit: wantT1 } : p.takeProfit != null ? { takeProfit: +p.takeProfit } : {}) };
+      try {
+        await s.send(PT.AMEND_POSITION_SLTP_REQ, req, PT.EXECUTION_EVENT, amendStep);
+        m.stop = t.stop; m.stopSetAt = iso; m.stopSetBy = 'guard'; delete m.noStopTries; out.sent.push({ type: 'amend', trade: id });
+        say(`set the missing stop on ${m.symbol} ${m.positionId} at ${want} (the broker had opened it without one)`, { trade: id });
+        alert('amend', id, m, () => ({ stopFrom: null, stop: t.stop, t1From: m.t1 ?? null, t1: wantT1, brokerStop: want, brokerT1: req.takeProfit ?? null, why: 'the broker opened the position without a stop (the stop distance was inside the spread)' }));
+      } catch (e) {
+        if (!e.code && UNSURE.test(e.message)) { m.noStopTries = (m.noStopTries || 0) + 1; say(`stop for ${id} on ${m.symbol} ${m.positionId}: no answer (${e.message}); checked again next round`, { trade: id }); alert('nostop', id, m, { result: scrub(e.message), stop: want }); return; }
+        await closeNow(`${e.message}${mk != null ? `, price ${mk} vs stop ${want}` : ''}`);
+      }
+    };
+    for (const [id, m] of Object.entries(st.map)) {
+      if (m.status !== 'open' || m.closing) continue;
+      const t = byId.get(id); if (!t || !OPEN.has(t.status) || t.stop == null) continue;
+      const p = positions.get(String(m.positionId)); if (!p || p.stopLoss != null) continue;
+      await ensureStop(id, m, t, p);
+    }
     // 2c) the council moved a stop or target on an open trade (break-even, trailing, a re-planned target) -> the demo position's
     //     protection follows (8 Nov, owner). Council trades take the council's absolute levels; an ICT trade (futures levels on a
     //     cash CFD) moves its broker stop by the same distance the council moved its own. A move the broker rejects is retried
@@ -599,6 +637,10 @@ export async function mirrorRound({ env, trades, state, tokens, specs = null, WS
           if (ran > LIMITS.maxDriftR) { skip(`price ${mark} has run ${ran.toFixed(2)}R from the council entry ${t.entry}: a different trade now`); continue; }
           from = mark;
         }
+        // a stop closer than the spread cannot be set at the broker (a sell fills at the bid, its stop triggers on the ask): the
+        // broker would open the position and drop the stop. Such a trade is not mirrored (8 Nov).
+        { const sp = specFor(specs, name), spr = sp && Number.isFinite(+sp.spread) ? +sp.spread : 0, dist = Math.abs(from - t.stop);
+          if (spr > 0 && dist <= spr * 1.25) { skip(`stop distance ${+dist.toFixed(6)} sits inside the broker spread ${spr} on ${name}: no stop could be set`); continue; } }
         const info = ((await s.send(PT.SYMBOL_BY_ID_REQ, { ctidTraderAccountId: ctid, symbolId: [symbolId] }, PT.SYMBOL_BY_ID_RES)).symbol || [])[0] || {};
         const live = Object.values(st.map).filter((m) => m.status === 'open' || m.status === 'sent').concat(Object.values(st.orders));
         const openRisk = live.reduce((a, m) => a + (+m.riskCash || 0), 0), openMargin = live.reduce((a, m) => a + (+m.margin || 0), 0);
@@ -618,6 +660,11 @@ export async function mirrorRound({ env, trades, state, tokens, specs = null, WS
           out.sent.push({ type: 'open', trade: t.id }); say(`${filled ? 'opened' : 'sent (fill not confirmed yet)'} ${sell ? 'sell' : 'buy'} ${name} ${volume / +info.lotSize} lot (council ${t.k})`, { trade: t.id });
           alert('open', t.id, st.map[t.id], () => ({ filled, price: (ev.deal && ev.deal.executionPrice) ?? (filled && ev.position ? ev.position.price : null) ?? null,
             entry: t.entry, stop: t.stop, t1: t.t1, noTarget: !('relativeTakeProfit' in order) }));
+          // RULE: never a position without a stop. The fill event carries the position's levels; a missing stop is set now, or the position closed
+          if (filled && ev.position && ev.position.stopLoss == null) {
+            const pf = { ...ev.position, price: ev.position.price ?? (ev.deal && ev.deal.executionPrice) ?? null, tradeData: ev.position.tradeData || { volume } };
+            await ensureStop(t.id, st.map[t.id], t, pf);
+          }
         } catch (e) { const txt = `${e.code || ''} ${e.message}`;
           if (PAUSE.test(txt)) { st.paused[name] = new Date((now + LIMITS.pause) * 1000).toISOString(); later(`${name} market closed: ${e.message}`); }
           else if (RETRY.test(txt)) later(`order rejected: ${e.message}`, true); else skip(`order rejected: ${e.message}`);

@@ -15,7 +15,7 @@ const INFO = { 7: { symbolId: 7, digits: 2, lotSize: 100, minVolume: 1, stepVolu
 // (no fill event: the position opens/closes later) or 'silent' (order placed, no answer at all), info (symbol overrides).
 function broker({ isLive = false, balance = 1000000, expireFirst = false, reject = null, execReject = false, fill = 'normal', closeFill = 'normal', info = {}, names = SYMS } = {}) {
   const sent = [], positions = new Map(), orders = new Map(), amends = []; let pid = 900, expired = expireFirst;
-  const o = { reject, fill, closeFill, rejectPending: null, cancelReject: false, amendReject: null };
+  const o = { reject, fill, closeFill, rejectPending: null, cancelReject: false, amendReject: null, amendSilent: false, noSL: false, closes: 0 };
   class WS {
     constructor(url) { this.url = url; setTimeout(() => this.onopen && this.onopen(), 0); }
     send(text) {
@@ -32,6 +32,7 @@ function broker({ isLive = false, balance = 1000000, expireFirst = false, reject
         case PT.RECONCILE_REQ: return r(PT.RECONCILE_RES, { position: [...positions.values()], order: [...orders.values()] });
         case PT.AMEND_POSITION_SLTP_REQ: {
           const ps = positions.get(String(p.positionId));
+          if (o.amendSilent) return;
           if (!ps || o.amendReject) return r(PT.EXECUTION_EVENT, { executionType: 7, errorCode: o.amendReject || 'POSITION_NOT_FOUND' });
           if (p.stopLoss != null) ps.stopLoss = p.stopLoss; if (p.takeProfit != null) ps.takeProfit = p.takeProfit; amends.push(p);
           return r(PT.EXECUTION_EVENT, { executionType: 4, position: { ...ps } });
@@ -51,7 +52,10 @@ function broker({ isLive = false, balance = 1000000, expireFirst = false, reject
             orders.set(String(id), od); return r(PT.EXECUTION_EVENT, { executionType: 2, order: od });
           }
           if (o.reject) return r(PT.ORDER_ERROR_EVENT, { errorCode: o.reject, description: 'no' });
-          const id = ++pid, pos = { positionId: id, positionStatus: 1, tradeData: { symbolId: p.symbolId, volume: p.volume, tradeSide: p.tradeSide, label: p.label, comment: p.comment } };
+          const px = 1.10012, dg = (INFO[p.symbolId] || {}).digits ?? 5, rel = (v) => v / 100000;   // the relative levels become absolute ones at the fill, as at a real broker
+          const id = ++pid, pos = { positionId: id, positionStatus: 1, price: px, tradeData: { symbolId: p.symbolId, volume: p.volume, tradeSide: p.tradeSide, label: p.label, comment: p.comment },
+            ...(!o.noSL && p.relativeStopLoss != null ? { stopLoss: +(px + (p.tradeSide === 1 ? -1 : 1) * rel(p.relativeStopLoss)).toFixed(dg) } : {}),
+            ...(p.relativeTakeProfit != null ? { takeProfit: +(px + (p.tradeSide === 1 ? 1 : -1) * rel(p.relativeTakeProfit)).toFixed(dg) } : {}) };
           if (execReject) { r(PT.EXECUTION_EVENT, { executionType: 2, order: { orderId: 5 } }); return r(PT.EXECUTION_EVENT, { executionType: 7, errorCode: 'TRADING_BAD_VOLUME' }, 5); }
           positions.set(String(id), pos);
           if (o.fill === 'silent') return;
@@ -60,7 +64,7 @@ function broker({ isLive = false, balance = 1000000, expireFirst = false, reject
           return r(PT.EXECUTION_EVENT, { executionType: 3, position: { ...pos }, order: { orderId: 5, positionId: id }, deal: { executionPrice: 1.10012 } }, 5);
         }
         case PT.CLOSE_POSITION_REQ: {
-          r(PT.EXECUTION_EVENT, { executionType: 2, position: { positionId: p.positionId } });
+          o.closes++; r(PT.EXECUTION_EVENT, { executionType: 2, position: { positionId: p.positionId } });
           if (o.closeFill === 'accepted-only') return;
           positions.delete(String(p.positionId)); return r(PT.EXECUTION_EVENT, { executionType: 3, position: { positionId: p.positionId, positionStatus: 2 }, deal: { executionPrice: 1.10431, closePositionDetail: { grossProfit: 419, moneyDigits: 2 } } }, 5);
         }
@@ -70,7 +74,7 @@ function broker({ isLive = false, balance = 1000000, expireFirst = false, reject
     close() {}
   }
   const fillOrder = (orderId, price) => { const od = orders.get(String(orderId)); if (!od) throw new Error('no such order'); orders.delete(String(orderId));
-    const id = ++pid; positions.set(String(id), { positionId: id, positionStatus: 1, price, tradeData: { ...od.tradeData } }); return id; };
+    const id = ++pid; positions.set(String(id), { positionId: id, positionStatus: 1, price, tradeData: { ...od.tradeData }, ...(od.stopLoss != null ? { stopLoss: od.stopLoss } : {}), ...(od.takeProfit != null ? { takeProfit: od.takeProfit } : {}) }); return id; };
   return { WS, sent, positions, orders, amends, o, fillOrder, setBalance: (b) => { balance = b; } };
 }
 const NOW = 1794000000;
@@ -368,7 +372,7 @@ test('alerts: no broker answer is not alerted as a rejection; the position found
   b.o.fill = 'normal';
   r = await mirrorRound({ env: ENV, trades: [tr()], state: again(r), WS: b.WS, now: NOW + 240 });
   assert.equal(r.state.map['eurusd-intraday-1'].status, 'open'); assert.deepEqual(kinds(r), ['open']);
-  assert.match(mirrorAlertText(r.alerts[0], NOW).msg, /^Opened · council entry/);
+  assert.match(mirrorAlertText(r.alerts[0], NOW).msg, /^Opened at 1\.10012 · council entry/);   // the fake broker reports the fill price on the adopted position
   r = await mirrorRound({ env: ENV, trades: [tr()], state: again(r), WS: b.WS, now: NOW + 480 }); assert.deepEqual(kinds(r), []);
   assert.equal(orders(b).length, 1);
 });
@@ -677,4 +681,39 @@ test('accounts hand-over: a trade held on one account is managed there and never
   // the base account, now opening only council trades, still manages the shadow trade it holds: the council closes it, the demo closes
   r = await mirrorRound({ env: ENV, trades: [tr({ id: 'sh1', shadow: true, status: 'loss' }), tr({ id: 'sh3', shadow: true })], state: r.state, WS: b.WS, now: NOW + 240, openBooks: ['council'] });
   assert.equal(r.state.map.sh1.status, 'closed by council'); assert.equal(r.state.map.sh3, undefined, 'no new shadow opens on the base account'); assert.equal(b.positions.size, 0);
+});
+
+// ---- the stop guard (8 Nov, owner: "u didnt place sl" / "it is forbidden to have a trade with no sl") -----------------------
+test('stop guard: a fill the broker reports without a stop gets the council stop at once; a refused stop closes the position; a stop inside the spread is not mirrored', async () => {
+  const b = broker(); b.o.noSL = true;
+  const t = tr({ id: 'eurusd-intraday-9' });
+  const r = await mirrorRound({ env: ENV, trades: [t], state: {}, tokens: null, WS: b.WS, now: NOW, timeout: 2000, marks: { eurusd: { price: 1.1, at: NOW } } });
+  const pid = r.state.map['eurusd-intraday-9'].positionId;
+  assert.equal(b.amends.length, 1); assert.equal(b.amends[0].stopLoss, 1.098); assert.equal(b.amends[0].takeProfit, 1.105); assert.equal(b.positions.get(pid).stopLoss, 1.098);   // set in the same round as the fill
+  assert.equal(r.state.map['eurusd-intraday-9'].stopSetBy, 'guard'); assert.ok(r.log.some((l) => /set the missing stop/.test(l.msg)));
+  assert.deepEqual(kinds(r), ['open', 'amend']);
+  // once set, nothing more is sent
+  await mirrorRound({ env: ENV, trades: [t], state: r.state, tokens: null, WS: b.WS, now: NOW + 60, timeout: 2000, marks: { eurusd: { price: 1.1, at: NOW + 60 } } });
+  assert.equal(b.amends.length, 1);
+  // a held position found without a stop on a later round (someone removed it at the broker) is protected again
+  b.positions.get(pid).stopLoss = undefined;
+  const r3 = await mirrorRound({ env: ENV, trades: [t], state: r.state, tokens: null, WS: b.WS, now: NOW + 120, timeout: 2000, marks: { eurusd: { price: 1.1, at: NOW + 120 } } });
+  assert.equal(b.amends.length, 2); assert.equal(b.positions.get(pid).stopLoss, 1.098); assert.equal(r3.state.map['eurusd-intraday-9'].status, 'open');
+  // the broker refuses the stop -> the position is closed at once, whatever the price; the record and the alert say why
+  const b2 = broker(); b2.o.noSL = true; b2.o.amendReject = 'INVALID_REQUEST';
+  const s1 = await mirrorRound({ env: ENV, trades: [t], state: {}, tokens: null, WS: b2.WS, now: NOW, timeout: 2000, marks: { eurusd: { price: 1.1, at: NOW } } });
+  assert.equal(s1.state.map['eurusd-intraday-9'].status, 'closed by mirror'); assert.equal(b2.o.closes, 1); assert.equal(b2.positions.size, 0);
+  assert.match(s1.state.map['eurusd-intraday-9'].closedWhy, /no stop at the broker/); assert.ok(s1.alerts.some((a) => a.kind === 'close' && /no stop/.test(a.why)));
+  // the amend gets no answer at all -> not closed on a guess; alerted, checked again next round
+  const b3 = broker(); b3.o.noSL = true;
+  const s3a = await mirrorRound({ env: ENV, trades: [t], state: {}, tokens: null, WS: b3.WS, now: NOW, timeout: 2000, marks: { eurusd: { price: 1.1, at: NOW } } });
+  const pid3 = s3a.state.map['eurusd-intraday-9'].positionId; b3.positions.get(pid3).stopLoss = undefined; b3.o.amendSilent = true;
+  const s3 = await mirrorRound({ env: ENV, trades: [t], state: s3a.state, tokens: null, WS: b3.WS, now: NOW + 60, timeout: 30, marks: { eurusd: { price: 1.1, at: NOW + 60 } } });
+  assert.equal(s3.state.map['eurusd-intraday-9'].status, 'open'); assert.equal(s3.state.map['eurusd-intraday-9'].noStopTries, 1); assert.ok(s3.alerts.some((a) => a.kind === 'nostop')); assert.equal(b3.o.closes, 0);
+  // the spread guard: a stop 0.0002 away with a 0.0002 spread is not mirrored at all
+  const b4 = broker();
+  const tight = { ...t, id: 'eurusd-scalp-9', stop: 1.0998, t1: 1.1004 };
+  const r4 = await mirrorRound({ env: ENV, trades: [tight], state: {}, tokens: null, WS: b4.WS, now: NOW, timeout: 2000, marks: { eurusd: { price: 1.1, at: NOW } },
+    specs: { account: { currency: 'USD' }, symbols: { EURUSD: { base: 'EUR', quote: 'USD', spread: 0.0002 } } } });
+  assert.equal(b4.positions.size, 0); assert.match(r4.state.skipped['eurusd-scalp-9'], /inside the broker spread/);
 });
