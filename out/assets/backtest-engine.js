@@ -85,12 +85,13 @@
     const Rs = closed.map((t) => t.R).filter((x) => x != null), netR = r2(Rs.reduce((s, x) => s + x, 0));
     const by = (f) => { const o = {}; for (const t of closed) { const k = f(t); if (k == null) continue; o[k] = o[k] || { n: 0, net: 0, wins: 0, R: 0 }; o[k].n++; o[k].net = r2(o[k].net + t.net); o[k].R = r2(o[k].R + (t.R || 0)); if (t.net > 0) o[k].wins++; } return o; };
     const hourOf = (t) => new Date(t.openedAt * 1000).getUTCHours(), dayOf = (t) => new Date(t.openedAt * 1000).getUTCDay();
+    const sessOf = (t) => { const h = hourOf(t); return h >= 7 && h < 12 ? 'London' : h >= 12 && h < 21 ? 'New York' : 'Asia'; };
     const holdAvg = n ? r2(closed.reduce((s, t) => s + (t.holdBars || 0), 0) / n, 1) : null, rDist = {}; for (const x of Rs) { const k = x <= -1 ? '≤-1R' : x < 0 ? '-1..0' : x < 1 ? '0..1R' : x < 2 ? '1..2R' : x < 3 ? '2..3R' : '≥3R'; rDist[k] = (rDist[k] || 0) + 1; }
     return { n, holdAvg, rDist, wins: wins.length, losses: losses.length, winRate: n ? r2(wins.length / n, 3) : null, net, netR, avgR: Rs.length ? r2(netR / Rs.length, 2) : null,
       profitFactor: gl > 0 ? r2(gw / gl) : gw > 0 ? Infinity : null, expectancy: n ? r2(net / n) : null, avgWin: wins.length ? r2(gw / wins.length) : null, avgLoss: losses.length ? r2(gl / losses.length) : null,
       best: n ? Math.max(...closed.map((t) => t.net)) : null, worst: n ? Math.min(...closed.map((t) => t.net)) : null, maxDD: r2(dd), maxDDPct: start ? r2(dd / start * 100, 2) : null, bestStreak, worstStreak: -worstStreak,
       avgMfe: n ? r2(closed.reduce((s, t) => s + (t.mfe || 0), 0) / n, 2) : null, avgMae: n ? r2(closed.reduce((s, t) => s + (t.mae || 0), 0) / n, 2) : null, curve,
-      byWeekday: by(dayOf), byHour: by(hourOf), bySide: by((t) => t.side), byTag: by((t) => (t.tags && t.tags[0]) || null), byExit: by((t) => t.reason), returnPct: start ? r2(net / start * 100, 2) : null };
+      byWeekday: by(dayOf), byHour: by(hourOf), bySide: by((t) => t.side), byTag: by((t) => (t.tags && t.tags[0]) || null), byExit: by((t) => t.reason), bySession: by(sessOf), byMistake: (() => { const o = {}; for (const t of closed) for (const m of (t.mistakes && t.mistakes.length ? t.mistakes : ['none'])) { o[m] = o[m] || { n: 0, net: 0, wins: 0, R: 0 }; o[m].n++; o[m].net = r2(o[m].net + t.net); o[m].R = r2(o[m].R + (t.R || 0)); if (t.net > 0) o[m].wins++; } return o; })(), returnPct: start ? r2(net / start * 100, 2) : null };
   }
   // calendar: net per UTC day of close
   function byDay(closed, dayStartUtc = 0) { const o = {}; for (const t of closed) { const k = dayKey(t.closedAt, dayStartUtc); o[k] = r2((o[k] || 0) + t.net); } return o; }
@@ -127,6 +128,41 @@
   }
   function consistencyOf(ch, a) { const days = Object.values(ch.days).map((d) => d.net).filter((x) => x > 0), tot = Object.values(ch.days).reduce((s, d) => s + d.net, 0); return tot > 0 && days.length ? r2(Math.max(...days) / tot, 3) : 0; }
 
-  const BT = { FIRMS, newAccount, units, place, cancel, close, closePartial, trail, onBar, equity, pnl, stats, byDay, dayKey, newChallenge, evaluate, r2 };
+  // ---- Monte Carlo: how often would these results pass a firm's rules? ----------------------------------------------------
+  // Resamples the trader's own R multiples (with replacement) into many sequences and plays each against the rules:
+  // risk = fraction of the START balance risked per trade (fixed, as most firms are sized), target / maxLoss / dailyLoss as
+  // fractions of the start, dd 'static' or trailing on closed-balance highs (capped at the start, like an EOD trail),
+  // perDay = trades per trading day (for the daily loss rule and the minimum days), minDays, maxTrades = give-up length.
+  // Returns pass / fail / unfinished shares, why it failed, median trades and days to pass, drawdown percentiles.
+  function rng(seed) { let a = seed >>> 0 || 1; return () => { a |= 0; a = (a + 0x6D2B79F5) | 0; let t = Math.imul(a ^ (a >>> 15), 1 | a); t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t; return ((t ^ (t >>> 14)) >>> 0) / 4294967296; }; }
+  function monteCarlo(Rs, o = {}) {
+    const R = (Rs || []).filter((x) => Number.isFinite(x)); if (R.length < 5) return null;
+    const n = o.n || 2000, risk = o.risk ?? 0.01, target = o.target ?? 0.10, maxLoss = o.maxLoss ?? 0.10, dailyLoss = o.dailyLoss || 0, perDay = Math.max(1, Math.round(o.perDay || 2)),
+      minDays = o.minDays || 0, maxTrades = o.maxTrades || 400, trailDD = o.dd === 'eod' || o.dd === 'intraday', rand = rng(o.seed || 7);
+    let pass = 0, fail = 0, open = 0, why = { daily: 0, max: 0 }; const tradesToPass = [], daysToPass = [], dds = [];
+    for (let k = 0; k < n; k++) {
+      let bal = 1, peak = 1, worst = 0, day = 0, dayStart = 1, done = false;
+      for (let i = 0; i < maxTrades; i++) {
+        if (i % perDay === 0) { day++; dayStart = bal; }
+        bal += risk * R[Math.floor(rand() * R.length)];
+        worst = Math.max(worst, peak - bal);
+        if (dailyLoss > 0 && dayStart - bal >= dailyLoss - 1e-12) { fail++; why.daily++; done = true; break; }
+        const floor = trailDD ? Math.min(1, peak - maxLoss) : 1 - maxLoss;
+        if (bal <= floor + 1e-12) { fail++; why.max++; done = true; break; }
+        peak = Math.max(peak, bal);
+        if (bal >= 1 + target - 1e-12 && day >= minDays) { pass++; tradesToPass.push(i + 1); daysToPass.push(day); done = true; break; }
+      }
+      if (!done) open++;
+      dds.push(worst);
+    }
+    const q = (a, p) => { if (!a.length) return null; const b = a.slice().sort((x, y) => x - y); return b[Math.min(b.length - 1, Math.floor(p * b.length))]; };
+    const avgR = R.reduce((x, y) => x + y, 0) / R.length;
+    return { n, trades: R.length, avgR: r2(avgR, 3), pass: r2(pass / n, 3), fail: r2(fail / n, 3), unfinished: r2(open / n, 3), failDaily: r2(why.daily / n, 3), failMax: r2(why.max / n, 3),
+      medianTrades: q(tradesToPass, 0.5), medianDays: q(daysToPass, 0.5), dd50: r2((q(dds, 0.5) || 0) * 100, 2), dd95: r2((q(dds, 0.95) || 0) * 100, 2) };
+  }
+  // the best risk per trade for a firm: the highest pass rate over a grid of risks (0.25% .. 3%)
+  function bestRisk(Rs, o = {}) { let best = null; for (const r of [0.0025, 0.005, 0.0075, 0.01, 0.0125, 0.015, 0.02, 0.025, 0.03]) { const m = monteCarlo(Rs, { ...o, risk: r, n: o.n || 1000 }); if (m && (!best || m.pass > best.pass)) best = { risk: r, ...m }; } return best; }
+
+  const BT = { FIRMS, newAccount, units, place, cancel, close, closePartial, trail, onBar, equity, pnl, stats, byDay, dayKey, newChallenge, evaluate, monteCarlo, bestRisk, r2 };
   if (typeof module !== 'undefined' && module.exports) module.exports = BT; else root.BT = BT;
 })(typeof globalThis !== 'undefined' ? globalThis : this);

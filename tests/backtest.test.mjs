@@ -85,3 +85,25 @@ test('partial close books its own record and leaves the rest running; a trailing
   const ev = BT.onBar(a, bar(T0 + 4 * H, 101.8, 101.9, 100.5, 100.7)); assert.equal(ev[0].trade.reason, 'stop'); assert.equal(ev[0].trade.exit, 101); assert.equal(ev[0].trade.net, 50);
   const s = BT.stats(a.closed, 10000); assert.equal(s.n, 2); assert.equal(s.holdAvg, 1.5); assert.deepEqual(s.rDist, { '1..2R': 2 });
 });
+
+test('Monte Carlo: a winning edge passes often, a losing one fails; daily loss and trailing rules bite; seeded and stable', () => {
+  const good = [2, -1, 2, -1, 2, -1, -1, 3, -1, 2], bad = [1, -1, -1, -1, 1, -1, -1, 2, -1, -1];
+  const g = BT.monteCarlo(good, { risk: 0.01, target: 0.10, maxLoss: 0.10, dailyLoss: 0.05, perDay: 2, n: 1500, seed: 3 });
+  const b = BT.monteCarlo(bad, { risk: 0.01, target: 0.10, maxLoss: 0.10, dailyLoss: 0.05, perDay: 2, n: 1500, seed: 3 });
+  assert.ok(g.pass > 0.8, `good passes ${g.pass}`); assert.ok(b.fail > 0.8, `bad fails ${b.fail}`); assert.equal(g.pass + g.fail + g.unfinished, 1);
+  assert.deepEqual(BT.monteCarlo(good, { seed: 3, n: 500 }), BT.monteCarlo(good, { seed: 3, n: 500 }), 'same seed, same answer');
+  const big = BT.monteCarlo(good, { risk: 0.03, target: 0.10, maxLoss: 0.10, dailyLoss: 0.05, perDay: 3, n: 1500, seed: 3 });
+  assert.ok(big.failDaily > 0, 'three 3% losers in a day breach a 5% daily limit');
+  const trail = BT.monteCarlo(good, { risk: 0.01, target: 0.06, maxLoss: 0.03, dd: 'eod', perDay: 2, n: 1500, seed: 3 }), stat = BT.monteCarlo(good, { risk: 0.01, target: 0.06, maxLoss: 0.03, dd: 'static', perDay: 2, n: 1500, seed: 3 });
+  assert.ok(trail.fail >= stat.fail, 'a trailing floor never fails less than a static one');
+  assert.equal(BT.monteCarlo([1, 2], {}), null, 'too few trades');
+  const br = BT.bestRisk(good, { target: 0.10, maxLoss: 0.10, dailyLoss: 0.05, perDay: 2, seed: 3 }); assert.ok(br.risk > 0 && br.pass >= g.pass - 0.05);
+});
+test('stats split by trading session and by mistake tag', () => {
+  const H = 3600, d = Date.UTC(2026, 0, 6) / 1000;
+  const closed = [{ net: 100, R: 1, openedAt: d + 8 * H, closedAt: d + 9 * H, side: 'buy', mistakes: [] }, { net: -100, R: -1, openedAt: d + 14 * H, closedAt: d + 15 * H, side: 'sell', mistakes: ['FOMO'] },
+    { net: -50, R: -0.5, openedAt: d + 2 * H, closedAt: d + 3 * H, side: 'buy', mistakes: ['FOMO', 'Moved stop'] }];
+  const s = BT.stats(closed, 10000);
+  assert.equal(s.bySession.London.n, 1); assert.equal(s.bySession['New York'].net, -100); assert.equal(s.bySession.Asia.n, 1);
+  assert.equal(s.byMistake.FOMO.n, 2); assert.equal(s.byMistake.FOMO.R, -1.5); assert.equal(s.byMistake.none.n, 1); assert.equal(s.byMistake['Moved stop'].n, 1);
+});
