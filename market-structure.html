@@ -3155,7 +3155,7 @@ html[data-motion="off"] #v-ict .ict-cal-d:hover { transform: none !important; }
     </div>
   </section>
   <section class="view adm" id="v-crypto" aria-label="Crypto desk" hidden>
-    <nav class="desk-sw" aria-label="Desk"><a href="#ict" data-dsw="ict" class="ictx">ICT</a><a href="#gold" data-dsw="gold" class="adm">Gold</a><a href="#crypto" data-dsw="crypto" class="adm">Crypto</a></nav>
+    <nav class="desk-sw" aria-label="Desk"><a href="#ict" data-dsw="ict" class="ictx">ICT</a><a href="#gold" data-dsw="gold" class="adm">Gold</a><a href="#crypto" data-dsw="crypto" class="adm">Crypto</a><a href="#lit" data-dsw="lit" class="adm">LIT</a><a href="#sdv" data-dsw="sdv" class="adm">NQ SDV <small>soon</small></a></nav>
     <div class="v-head cx-head">
       <div><h1 class="h-head">Crypto desk</h1><p class="ms-note">Bitcoin, Ether, Solana and XRP for scalping: M15 → M1 and H1 → M5 setups, open trades and how the scalps have done. Crypto trades around the clock. <span id="cx-src"></span></p></div>
       <div class="cx-seg" role="group" aria-label="Trades counted"><button type="button" data-cx="all" class="on" aria-pressed="true">All incl. shadow</button><button type="button" data-cx="live" aria-pressed="false">Live only</button></div>
@@ -3183,7 +3183,7 @@ html[data-motion="off"] #v-ict .ict-cal-d:hover { transform: none !important; }
     <div class="card"><div class="cx-card-h"><h2>Latest closed scalps</h2><span class="ms-note">newest first</span></div><div class="t-scroll cx-last-w"><table class="cx-tb cx-last" id="cx-last"></table></div></div>
   </section>
   <section class="view ictx" id="v-ict" aria-label="ICT desk" hidden>
-    <nav class="desk-sw" aria-label="Desk"><a href="#ict" data-dsw="ict" class="ictx">ICT</a><a href="#gold" data-dsw="gold" class="adm">Gold</a><a href="#crypto" data-dsw="crypto" class="adm">Crypto</a></nav>
+    <nav class="desk-sw" aria-label="Desk"><a href="#ict" data-dsw="ict" class="ictx">ICT</a><a href="#gold" data-dsw="gold" class="adm">Gold</a><a href="#crypto" data-dsw="crypto" class="adm">Crypto</a><a href="#lit" data-dsw="lit" class="adm">LIT</a><a href="#sdv" data-dsw="sdv" class="adm">NQ SDV <small>soon</small></a></nav>
     <div class="v-head ict-head">
       <div class="ict-title"><h1 class="h-head">ICT desk <span class="ict-tag">Paper desk</span></h1><p class="ms-note">US index futures and gold · H1 iFVG reversal (sweep → inversion → trail from +2R). A separate edge from the council. <span id="ict-run"></span></p></div>
       <div class="ict-hr"><div class="ict-me" id="ict-me"></div>
@@ -3280,8 +3280,29 @@ html[data-motion="off"] #v-ict .ict-cal-d:hover { transform: none !important; }
       </form>
     </dialog>
   </section>
+  <!-- LIT desk (8 Nov, owner: "on the desk should show LIT"): the paper shadow stream from council/lit.mjs, its funnel and its orders -->
+  <section class="view adm" id="v-lit" aria-label="LIT desk" hidden>
+    <nav class="desk-sw" aria-label="Desk"><a href="#ict" data-dsw="ict" class="ictx">ICT</a><a href="#gold" data-dsw="gold" class="adm">Gold</a><a href="#crypto" data-dsw="crypto" class="adm">Crypto</a><a href="#lit" data-dsw="lit" class="adm">LIT</a><a href="#sdv" data-dsw="sdv" class="adm">NQ SDV <small>soon</small></a></nav>
+    <div class="v-head cx-head">
+      <div><h1 class="h-head">LIT desk <span class="ict-tag">Paper shadow</span></h1><p class="ms-note">Liquidity Inducement Theory on gold: an M15 false break of a session, previous-day, previous-week or equal-highs level in London or the New York morning, an M5 real break by wick, a limit at the order block, R:R above 3. Pre-registered study: inconclusive at the skill's defaults, so it runs as a paper shadow until the live record says otherwise. <span id="lit-at"></span></p></div>
+    </div>
+    <div class="lit-grid" id="lit-grid"><div class="card"><div class="ms-k"><span>Loading the LIT stream…</span></div></div></div>
+  </section>
+  <!-- NQ SDV (8 Nov, owner: "the next coming edge"): a placeholder desk until the study is pre-registered and run -->
+  <section class="view adm" id="v-sdv" aria-label="NQ SDV desk" hidden>
+    <nav class="desk-sw" aria-label="Desk"><a href="#ict" data-dsw="ict" class="ictx">ICT</a><a href="#gold" data-dsw="gold" class="adm">Gold</a><a href="#crypto" data-dsw="crypto" class="adm">Crypto</a><a href="#lit" data-dsw="lit" class="adm">LIT</a><a href="#sdv" data-dsw="sdv" class="adm">NQ SDV <small>soon</small></a></nav>
+    <div class="v-head cx-head">
+      <div><h1 class="h-head">NQ SDV <span class="ict-tag">Coming</span></h1><p class="ms-note">The next edge in the queue, on Nasdaq futures. The desk opens once the rule is pre-registered, the backtest (2020 to now) is run and the verdict is recorded, the same way every other edge here earned its place.</p></div>
+    </div>
+    <div class="card sdv-card"><h2>What happens before this desk opens</h2>
+      <ol><li><b>Pre-registration</b>: the rule, the markets, the session windows, the stop and target logic, written down before any test.</li>
+        <li><b>Backtest 2020 → now</b> on the futures data, with costs, then an out-of-sample check.</li>
+        <li><b>Verdict</b>: edge, inconclusive or no edge, recorded in the research folder. Only an edge goes live; an inconclusive one may run as a paper shadow, like LIT.</li>
+        <li><b>Paper first</b>: the council trades it on the demo account before anything else.</li></ol>
+      <p class="ms-note">Nothing here is a signal yet.</p></div>
+  </section>
   <section class="view adm" id="v-gold" aria-label="Gold playbook" hidden>
-    <nav class="desk-sw" aria-label="Desk"><a href="#ict" data-dsw="ict" class="ictx">ICT</a><a href="#gold" data-dsw="gold" class="adm">Gold</a><a href="#crypto" data-dsw="crypto" class="adm">Crypto</a></nav>
+    <nav class="desk-sw" aria-label="Desk"><a href="#ict" data-dsw="ict" class="ictx">ICT</a><a href="#gold" data-dsw="gold" class="adm">Gold</a><a href="#crypto" data-dsw="crypto" class="adm">Crypto</a><a href="#lit" data-dsw="lit" class="adm">LIT</a><a href="#sdv" data-dsw="sdv" class="adm">NQ SDV <small>soon</small></a></nav>
     <div class="v-head gp-head">
       <div><h1 class="h-head">Gold playbook</h1><p class="ms-note">The gold master playbook on its own page: today's signal for its tested edge (Weekly bullish + a strong Daily close → buy the next Daily open), the context, the backtest on New York-close days and the pre-trade checklist. Separate from the council and the ICT desk. <span id="gp-src"></span></p></div>
       <div class="gp-seg" role="group" aria-label="Variant">
@@ -6273,6 +6294,7 @@ function msNextSetup(bars, A) {
     if (lossRev && lossRev.reviews) rvMerge(lossRev);
     COUNCIL.anRev = ((await anP) || {}).reviews || {};
     Object.assign(COUNCIL, { trades, config, coach, snap, analysis, review, backtest, replay, research, shadowRp, mirror, health, specs, shRpRows: null, at: Date.now() });
+    if (window.renderLit && document.getElementById('v-lit') && !document.getElementById('v-lit').hidden) try { renderLit(); } catch (e) {}   // the LIT desk re-reads the fresh snapshot and trades
     councilAlerts(trades);
     if (config) {
       CFG.buf = Math.min(0.25, Math.max(0.10, +config.buf || 0.15)); CFG.minRR = +config.minRR || 1.2; CFG.minRisk = Math.min(1.2, Math.max(0.4, +config.minRisk || 0.6)); CFG.paused = config.paused || {};
@@ -6466,6 +6488,29 @@ function msNextSetup(bars, A) {
   const GV = { chart: null, series: null, ov: null, bars: null, at: 0, off: 0, busy: false };
   // guests see one page (8 Nov, owner): the charts first, the gold trade, results, calendar and invitation under them
   if (PUB) { const g = document.getElementById('v-guest'), c = document.getElementById('v-charts'); if (g && c && !document.getElementById('g-merged')) { const box = document.createElement('div'); box.id = 'g-merged'; box.className = 'g-merged'; while (g.firstChild) box.appendChild(g.firstChild); c.appendChild(box); } }
+  // LIT desk (8 Nov): the shadow stream's state from snapshot.lit and its paper orders from trades.json (k 'lit')
+  window.renderLit = function () {
+    const box = document.getElementById('lit-grid'); if (!box) return;
+    const L = COUNCIL.snap && COUNCIL.snap.lit, T = (COUNCIL.trades || []).filter((x) => x.k === 'lit' || /^xau-lit-/.test(String(x.id)));
+    const at = document.getElementById('lit-at'); if (at) at.textContent = L && L.at ? `Last pass ${new Date(L.at).toLocaleString(undefined, { weekday: 'short', hour: '2-digit', minute: '2-digit' })} · ${L.bars || 0} M5 candles read.` : 'No pass recorded yet.';
+    const fR = (v) => `${v > 0 ? '+' : v < 0 ? '−' : ''}${Math.abs(v).toFixed(2)}R`, when = (t) => (t ? new Date(t * 1000).toLocaleString(undefined, { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' }) : '—');
+    const open = T.filter((x) => x.status === 'open'), pend = T.filter((x) => x.status === 'pending'), done = T.filter((x) => ['win', 'loss', 'be'].includes(x.status)).sort((a, b) => (b.closed || 0) - (a.closed || 0));
+    const R = done.reduce((a, x) => a + (x.R || 0), 0), wins = done.filter((x) => x.R > 0).length;
+    const F = (L && L.funnel) || {}, B = (L && L.build) || {};
+    const funnel = [['Sweeps seen', F.sweeps], ['Equal highs / lows', F.eqh], ['In London / NY morning', F.inSession], ['With accumulation', F.withAcc], ['Premium / discount side', F.premium], ['M15 false breaks (FBOS)', F.fbos], ['Orders built', B.orders]];
+    const build = [['MX already broken', B.mxBroken], ['No M5 real break', B.noRbos], ['Break too slow', B.rbosSlow], ['Break overlaps', B.rbosOverlap], ['Break flipped', B.rbosFlip], ['No order block', B.noOb], ['Bad geometry', B.badGeom], ['R:R under 3', B.lowRR], ['Stop capped', B.capped]].filter(([, v]) => v);
+    const row = (x) => `<tr><td>${when(x.filled || x.opened)}</td><td><span class="chip ${x.side}">${x.side.toUpperCase()}</span></td><td>${esc(x.label || 'XAU/USD')}</td><td class="n">${x.entry}</td><td class="n">${x.stop}</td><td class="n">${x.t1 ?? '—'}</td><td class="n">${x.rr != null ? (+x.rr).toFixed(1) : '—'}</td><td>${esc(x.status)}${x.R != null ? ` <b class="${x.R > 0 ? 'pos' : x.R < 0 ? 'neg' : ''}">${fR(x.R)}</b>` : ''}</td></tr>`;
+    const table = (rows, empty) => rows.length ? `<div class="ct-tw"><table class="ct-t"><thead><tr><th>When</th><th>Side</th><th>Market</th><th class="n">Entry</th><th class="n">Stop</th><th class="n">Target</th><th class="n">R:R</th><th>Status</th></tr></thead><tbody>${rows.map(row).join('')}</tbody></table></div>` : `<div class="ct-empty">${empty}</div>`;
+    box.innerHTML = `
+      <div class="card"><div class="ms-k"><span>Record</span><small>paper, since 8 Nov</small></div>
+        <div class="ct-stats"><div><span>Closed</span><b>${done.length}</b></div><div><span>Net</span><b class="${R > 0 ? 'ct-pos' : R < 0 ? 'ct-neg' : ''}">${fR(R)}</b></div><div><span>Winners</span><b>${done.length ? Math.round((wins / done.length) * 100) + '%' : '—'}</b></div><div><span>Open · resting</span><b>${open.length} · ${pend.length}</b></div></div></div>
+      <div class="card"><div class="ms-k"><span>Today's funnel</span><small>the detector's path, last pass</small></div>
+        <ul class="lit-funnel">${funnel.map(([k, v]) => `<li><span>${k}</span><b>${v ?? '—'}</b></li>`).join('')}</ul>
+        ${build.length ? `<p class="ms-note" style="margin:10px 0 0">Candidates dropped: ${build.map(([k, v]) => `${k} ${v}`).join(' · ')}.</p>` : ''}
+        ${L ? `<p class="ms-note" style="margin:6px 0 0">Gates: one order at a time, at most one London and one New York morning fill a day, stop after a win or −1.5R. Held now: ${L.held || 0}, break-evens: ${L.be || 0}.</p>` : ''}</div>
+      <div class="card lit-wide"><div class="ms-k"><span>Open and resting</span></div>${table(open.concat(pend), 'No LIT order open or resting right now.')}</div>
+      <div class="card lit-wide"><div class="ms-k"><span>Closed</span><small>${done.length} trades</small></div>${table(done.slice(0, 60), 'No closed LIT trade yet.')}</div>`;
+  };
   function guestCard(x, last) {
       const card = document.getElementById('g-setup');
       if (!card) return;
@@ -7565,7 +7610,7 @@ function msNextSetup(bars, A) {
   if (document.getElementById('v-council')) { councilReady = loadCouncil(); setInterval(loadCouncil, 5 * 60e3); }
 
   // ─── Sections: a home page of cards, each section on its own page ───
-  const VIEWS = ['home', 'setup', 'charts', 'scanner', 'crypto', 'gold', 'council', 'journal', 'guest', 'users', 'ict', 'profile'];
+  const VIEWS = ['home', 'setup', 'charts', 'scanner', 'crypto', 'gold', 'council', 'journal', 'guest', 'users', 'ict', 'profile', 'lit', 'sdv'];
   // Council sections (6 Nov renovation): Overview · Trades · Systems · Review · Research · Macro (7 Nov) · This week (8 Nov); deep links #council/<section>
   const CPANES = ['overview', 'trades', 'systems', 'review', 'research', 'macro', 'week'], CPUB = ['overview', 'trades'];
   const CPANE = { cur: 'overview' };
@@ -7600,6 +7645,7 @@ function msNextSetup(bars, A) {
     const [h0, sub] = location.hash.slice(1).split('/'), h = PUB ? 'charts' : h0 === 'guest' ? 'home' : VIEWER && !['home', 'setup', 'council', 'profile'].concat(document.documentElement.dataset.ict ? ['ict'] : []).includes(h0) ? 'home' : h0 === 'users' && document.documentElement.dataset.role !== 'owner' ? 'home' : h0 === 'ict' && !document.documentElement.dataset.ict ? 'home' : !h0 && document.documentElement.dataset.ict && document.documentElement.dataset.role === 'reviewer' ? 'ict' : h0, v = VIEWS.includes(h) ? h : 'home';
     if (v === 'ict' && window.renderIct) setTimeout(window.renderIct, 0);
     if (v === 'profile' && window.msProfile) setTimeout(window.msProfile, 0);
+    if (v === 'lit' && window.renderLit) setTimeout(window.renderLit, 0);
     if (v === 'gold' && window.renderGold) setTimeout(window.renderGold, 0);
     if (v === 'users' && window.renderUsers) window.renderUsers();   // guests only get the H4 chart (owner, 6 Nov)
     if (v === 'council') setPane(sub || CPANE.cur, false);
@@ -7610,7 +7656,7 @@ function msNextSetup(bars, A) {
     document.querySelectorAll('[data-go]').forEach((a) => { if (a.dataset.go === v) a.setAttribute('aria-current', 'page'); else a.removeAttribute('aria-current'); });
     // ICT, Gold and Crypto share one entry (8 Nov, owner: "all in the same page, just a switch"): it lights for any of them and
     // opens the desk used last; the switch at the top of each desk marks the current one
-    { const DESKS = ['ict', 'gold', 'crypto'], on = DESKS.includes(v); if (on) try { localStorage.setItem('ms-desk', v); } catch (e) {}
+    { const DESKS = ['ict', 'gold', 'crypto', 'lit', 'sdv'], on = DESKS.includes(v); if (on) try { localStorage.setItem('ms-desk', v); } catch (e) {}
       let last = 'ict'; try { last = localStorage.getItem('ms-desk') || 'ict'; } catch (e) {}
       const allowed = (k) => (k === 'ict' ? !!document.documentElement.dataset.ict : !PUB && !VIEWER), pick = allowed(last) ? last : DESKS.find(allowed) || 'ict';
       document.querySelectorAll('[data-desks]').forEach((a) => { a.setAttribute('href', '#' + pick); if (on) a.setAttribute('aria-current', 'page'); else a.removeAttribute('aria-current'); });
@@ -10279,6 +10325,19 @@ html[data-role="public"] .hdr-sw { display: none; }
   .ct-stats > div { padding: 10px 12px; } .ct-stats b { font-size: 18px; }
 }
 @media (min-width: 1800px) { .ms-live.app { max-width: 2000px; } #v-home .h-grid { grid-template-columns: minmax(0, 2.2fr) minmax(0, 1fr); } }
+</style>
+<style id="ms-lit-css">
+/* LIT and NQ SDV desks (8 Nov 2026) */
+#v-lit .lit-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; } #v-lit .lit-wide { grid-column: 1 / -1; }
+#v-lit .lit-funnel { list-style: none; margin: 0; padding: 0; display: grid; gap: 4px; } #v-lit .lit-funnel li { display: flex; justify-content: space-between; gap: 12px; padding: 6px 0; border-bottom: 1px solid var(--line-soft, var(--line)); font-size: 13px; }
+#v-lit .lit-funnel li:last-child { border-bottom: 0; } #v-lit .lit-funnel b { font-variant-numeric: tabular-nums; }
+#v-lit .ms-k small, #v-lit .ms-k > small { color: var(--ink-faint); font-weight: 500; margin-left: 8px; }
+#v-lit .ct-stats b.ct-pos { color: var(--buy); } #v-lit .ct-stats b.ct-neg { color: var(--sell); } #v-lit td.n, #v-lit th.n { text-align: right; } #v-lit b.pos { color: var(--buy); } #v-lit b.neg { color: var(--sell); }
+#v-sdv .sdv-card { max-width: 760px; } #v-sdv .sdv-card h2 { margin: 0 0 10px; font-size: 17px; } #v-sdv .sdv-card ol { margin: 0 0 12px; padding-left: 20px; display: grid; gap: 8px; line-height: 1.5; }
+.desk-sw a small { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .04em; margin-left: 6px; padding: 1px 6px; border-radius: 999px; background: color-mix(in srgb, #e0a526 18%, transparent); color: #b97a00; }
+#v-lit .desk-sw a[aria-current="page"] { background: color-mix(in srgb, #00bcd4 14%, var(--panel)); box-shadow: inset 0 0 0 1px #00a3b8; }
+#v-sdv .desk-sw a[aria-current="page"] { background: color-mix(in srgb, var(--ink) 8%, var(--panel)); box-shadow: inset 0 0 0 1px var(--ink-dim); }
+@media (max-width: 900px) { #v-lit .lit-grid { grid-template-columns: 1fr; } }
 </style>
 <style id="ms-guest5-css">
 /* guests: two screens only, Daily and H1 (8 Nov 2026, owner). The view segment goes; the two panes share the row; both stay tall. */
