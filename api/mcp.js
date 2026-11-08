@@ -2,7 +2,8 @@
 // to work on the ICT edge, do changes and read the trades").
 //
 // Transport: MCP Streamable HTTP, stateless JSON-RPC over POST (ChatGPT connectors, Claude, Cursor all speak it).
-//   URL for the friend:  https://meridianx.dev/mcp/<key>      (vercel.json rewrites it to /api/mcp?key=<key>)
+//   URL for the friend:  https://meridianx.dev/api/mcp/<key>  (vercel.json rewrites it to /api/mcp?key=<key>; under /api because the
+//                        firewall rule "Only reads outside the API" denies every POST elsewhere)
 //   Env (Vercel, server only):
 //     MCP_KEYS        "fred:<long random>,orlando:<long random>"  one key per person; the name goes on their notes and PRs.
 //                     Make a key with: node -e "console.log(require('crypto').randomBytes(24).toString('base64url'))"

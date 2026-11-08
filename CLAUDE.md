@@ -636,7 +636,7 @@ unit a lot ($1 a point, 1:100), forex 100,000; all min / step 0.01 lot, max 100.
 the lot size with the market shut.
 
 ## ICT MCP server for outside helpers (8 Nov 2026, owner: "make an MCP for ChatGPT, my friend will use it")
-`api/mcp.js`, served at `https://meridianx.dev/mcp/<key>` (vercel.json rewrite → `/api/mcp?key=`). MCP Streamable HTTP,
+`api/mcp.js`, served at `https://meridianx.dev/api/mcp/<key>` (vercel.json rewrite → `/api/mcp?key=`; must stay under /api: the firewall denies POST elsewhere). MCP Streamable HTTP,
 stateless JSON-RPC over POST (ChatGPT connectors / Claude / Cursor). One key per person in Vercel env `MCP_KEYS`
 (`"fred:<24+ random chars>,orlando:<…>"`); the name goes on their notes and PRs. Reads use `GH_READ_TOKEN` (fallback
 `GH_TOKEN`), writes `GH_MCP_TOKEN` (fallback `GH_TOKEN`; needs Contents write for the branch and Pull requests write for the
