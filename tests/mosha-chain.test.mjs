@@ -32,3 +32,17 @@ test('the Trader publishes it as snapshot.moshaBo.state (wiring pin)', () => {
   const html = fs.readFileSync(new URL('../market-structure.html', import.meta.url), 'utf8');
   assert.match(html, /id="ms-rep-mosha"/); assert.match(html, /sn\.moshaBo && sn\.moshaBo\.state/);
 });
+
+test('heads-up alert: once per H4+H1 pair when the chain is one M15 BO from a trade; silent otherwise (council/alerts.mjs)', async () => {
+  const { moshaArmed, moshaArmedKey } = await import('../council/alerts.mjs');
+  const now = 1794000000, st = { stage: 'm15', dir: -1, h4: { t: 1793851200, dir: -1, level: 4082.82 }, h1: { t: 1793860000, dir: 1, level: 4095.1 }, m15: null, w1: -1 };
+  const a = moshaArmed(st, undefined, now);
+  assert.equal(a.ev.title, 'Mosha BO armed: watch for an M15 sell BO on gold'); assert.match(a.ev.msg, /H4 BO sell at 4082.82 .*H1 retracement BO at 4095.1/); assert.match(a.ev.msg, /Weekly structure agrees/);
+  assert.equal(a.mark.key, '1793851200|1793860000');
+  assert.equal(moshaArmed(st, a.mark, now + 600), null, 'same pair: no resend');
+  assert.match(moshaArmed({ ...st, w1: 1 }, undefined, now).ev.msg, /against it: the trade would be recorded as a shadow/);
+  assert.equal(moshaArmed({ ...st, stage: 'h1', h1: null }, undefined, now), null); assert.equal(moshaArmed({ ...st, stage: 'done' }, undefined, now), null); assert.equal(moshaArmed(null, undefined, now), null);
+  assert.equal(moshaArmedKey({ ...st, h1: { t: 1793870000 } }), '1793851200|1793870000', 'a new H1 BO re-arms');
+  const src = fs.readFileSync(new URL('../council/trader.mjs', import.meta.url), 'utf8');
+  assert.match(src, /moshaArmed\(snapshot\.moshaBo\.state, state\.moshaArmedSent, now\)/); assert.match(src, /state\.moshaArmedSent = ma\.mark/);
+});
