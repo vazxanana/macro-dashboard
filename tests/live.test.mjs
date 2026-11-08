@@ -36,7 +36,7 @@ test('serveHandler: the Vercel-style handler answers on node:http with status, h
 
 test('wiring: the workflow steps aside while the heartbeat is fresh; the install files exist and point at the runner', () => {
   const yml = fs.readFileSync(new URL('../.github/workflows/council.yml', import.meta.url), 'utf8');
-  assert.match(yml, /livefresh\(\)/); assert.match(yml, /if livefresh; then echo "live runner alive/); assert.match(yml, /\[ "\$k" -eq 2 \] && ! livefresh/); assert.match(yml, /livefresh \|\| node council\/ctrader-mirror\.mjs data/);
+  assert.match(yml, /livefresh\(\)/); assert.match(yml, /if livefresh; then echo "live runner alive/); assert.match(yml, /Quick pass[\s\S]*if ! livefresh; then/); assert.match(yml, /livefresh \|\| node council\/ctrader-mirror\.mjs data/);
   for (const f of ['install-vps.sh', 'meridianx-live.service', 'run-live.cmd', 'install-task.cmd', 'env.example', 'README.md']) assert.ok(fs.existsSync(new URL(`../scripts/live/${f}`, import.meta.url)), f);
   const ex = fs.readFileSync(new URL('../scripts/live/env.example', import.meta.url), 'utf8'); assert.doesNotMatch(ex, /=[^\s#]{12,}/, 'the template holds names only');
   assert.match(fs.readFileSync(new URL('../scripts/live/meridianx-live.service', import.meta.url), 'utf8'), /node council\/live\.mjs/);

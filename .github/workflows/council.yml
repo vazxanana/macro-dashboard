@@ -157,10 +157,11 @@ jobs:
             if newcode; then echo "New council code on main: handing over after round $i"; break; fi
             if [ "$i" -lt "$ROUNDS" ]; then
               for k in 1 2 3 4; do sleep 60
-                # Quick pass (8 Nov, owner: "build it, start at 2 minutes"): halfway through the wait the Trader looks at the markets
-                # again and the mirror copies what it recorded, so a setup reaches cTrader within about two minutes instead of a
-                # round. The heavy members keep the 5-minute round. Saved as its own commit; a failure never stops the loop.
-                if [ "$k" -eq 2 ] && ! livefresh; then
+                # Quick pass (8 Nov, owner: "start at 2 minutes", then "every minute"): every minute of the wait the Trader looks at the
+                # markets again and the mirror copies what it recorded, so a setup reaches cTrader within about a minute. The heavy
+                # members keep the 5-minute round. Saved as its own commit; a failure never stops the loop. This is the ceiling of the
+                # free setup; the next step is the live runner on a VPS (council/live.mjs), which then takes these passes over.
+                if ! livefresh; then
                   git -C data pull -q --rebase origin council-data || true
                   node council/trader.mjs data || echo "Trader quick pass $i failed"
                   node council/ctrader-mirror.mjs data || echo "cTrader mirror quick pass $i failed"
