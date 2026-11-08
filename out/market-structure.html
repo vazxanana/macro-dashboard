@@ -1266,11 +1266,11 @@
 // shadow trades, scorecards, reviews) opens with the admin password. The password is never stored: only its SHA-256 is compared.
 // Accounts (6 Nov): the owner (admin, everything) and reviewers (user name + password): reviewers see the whole admin view
 // read-only and can write loss reviews only. Reviewer tokens are the SHA-256 of their password, matched with the user name.
-window.MS_USERS = { fred: { name: 'Fred', hash: '370aed697dc503aecee7d8faad5de775f4f7019c86e672e8d93f3df590527058', role: 'reviewer', ict: true },   // ict: the ICT desk (main reviewer and trader, owner 6 Nov)
+window.MS_USERS = { fred: { name: 'Fred', hash: '370aed697dc503aecee7d8faad5de775f4f7019c86e672e8d93f3df590527058', role: 'reviewer', ict: true, ct: true },   // ict: the ICT desk (main reviewer and trader, owner 6 Nov); ct: sees the demo accounts' results (8 Nov), labels only
  
-  orlando: { name: 'Orlando', hash: '037617a451df6fb39614002d57502a5f7bc240221b1715ed48280534cc478a06', role: 'viewer', ict: 'read' },   // ICT desk read-only (owner 6 Nov)
+  orlando: { name: 'Orlando', hash: '037617a451df6fb39614002d57502a5f7bc240221b1715ed48280534cc478a06', role: 'reviewer', ict: 'read', ct: true },   // sees everything incl. the profile accounts (owner 8 Nov); ICT desk read-only (6 Nov)
   luxus: { name: 'Luxus', hash: 'dccc5d01dabcd1c0b9fa89c91e7f4bde603121ee0172b4ff394e6bb30d295e41', role: 'viewer' },
-  carlos: { name: 'Carlos', hash: '511d45febaa8559a9071091951613e559f0b8b12b3995e6c13c94c81fbee59f0', role: 'viewer' } };
+  carlos: { name: 'Carlos', hash: '511d45febaa8559a9071091951613e559f0b8b12b3995e6c13c94c81fbee59f0', role: 'viewer', ct: true } };   // ct: the demo accounts' P&L (owner 8 Nov)
 // users added or changed on the Users page live in council-data users.json ({ users: { key: { name, hash, role, disabled? } } }); they override the built-ins
 window.MS_CDATA = (/^https?:$/.test(location.protocol) && !/github\.io$/.test(location.hostname) ? location.origin + '/cdata/' : 'https://raw.githubusercontent.com/vazxanana/macro-dashboard/council-data/');   // Vercel serves council data from /cdata (private repo); GitHub Pages and local files read GitHub directly
 window.MS_USERS_URL = window.MS_CDATA + 'users.json';
@@ -1290,6 +1290,7 @@ window.msFetchUsers = function () {
   window.MS_WHO = owner ? 'owner' : R ? R.name : null;
   if (owner || (R && R.ict)) document.documentElement.dataset.ict = '1';   // ICT desk access (a separate edge, owner 6 Nov)
   if (!owner && R && R.ict === 'read') document.documentElement.dataset.ictRo = '1';   // read-only desk (Orlando)
+  if (owner || (R && R.ct)) document.documentElement.dataset.ct = owner ? 'owner' : '1';   // the demo accounts' results on the profile; non-owners see edge labels, never account numbers (8 Nov)
   var guest = null; try { guest = localStorage.getItem('ms-guest'); } catch (e) {}
   if (!owner && !R && !guest) document.documentElement.dataset.gate = '1'; if (guest && !owner && !R) document.documentElement.dataset.guest = '1'; })();
 // signing out forgets the cTrader view-only session (and account choice) kept in this browser, so the next person on a shared
@@ -2082,6 +2083,15 @@ html[data-motion="off"] .is-loading, html[data-motion="off"] .srow-skel i { anim
 
 /* ═══ CRYPTO DESK (#crypto) ═══ */
 html[data-role="viewer"] [data-go="crypto"], html[data-role="viewer"] [data-go="gold"] { display: none !important; }
+/* the Desks entry shows when at least one desk is open to this account */
+html:not([data-mode="admin"]):not([data-ict]) .dsk, html[data-role="viewer"]:not([data-ict]) .dsk { display: none !important; }
+.desk-sw { display: inline-flex; width: max-content; max-width: 100%; gap: 2px; padding: 3px; margin: 0 0 14px; border-radius: 999px; border: 1px solid var(--line); background: var(--panel); }
+.desk-sw a { display: inline-flex; align-items: center; min-height: 32px; padding: 0 16px; border-radius: 999px; text-decoration: none; color: var(--ink-dim); font: 600 13px var(--sans); }
+.desk-sw a:hover { color: var(--ink); } .desk-sw a[aria-current="page"] { background: color-mix(in srgb, var(--accent) 14%, var(--panel)); color: var(--ink); box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--accent) 45%, transparent); }
+#v-ict .desk-sw a[aria-current="page"] { background: color-mix(in srgb, #9c27b0 14%, var(--panel)); box-shadow: inset 0 0 0 1px #a43cbd; }
+#v-gold .desk-sw a[aria-current="page"] { background: color-mix(in srgb, #e0a526 16%, var(--panel)); box-shadow: inset 0 0 0 1px #c98f12; }
+#v-crypto .desk-sw a[aria-current="page"] { background: color-mix(in srgb, #ff9800 14%, var(--panel)); box-shadow: inset 0 0 0 1px #e08600; }
+.desk-sw a:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 .cx-head { display: flex; justify-content: space-between; align-items: flex-end; gap: 16px; flex-wrap: wrap; }
 .cx-head .ms-note { max-width: 70ch; }
 .cx-seg, .cx-tf { display: inline-flex; padding: 3px; gap: 2px; border: 1px solid var(--line); border-radius: 10px; background: var(--panel); }
@@ -2216,6 +2226,19 @@ html[data-role="viewer"] [data-go="crypto"], html[data-role="viewer"] [data-go="
 .gs-tf i.u { color: #3fbf8f; border-color: rgba(63,191,143,.45); } .gs-tf i.d { color: #ff6b81; border-color: rgba(255,107,129,.45); }
 .gs-sess { font: 500 12.5px Figtree, sans-serif; color: #8d95a5; }
 .gs-sess b { color: #e9c46a; font-weight: 600; }
+.gs-proof { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; margin-top: 14px; max-width: 560px; }
+.gs-proof[hidden] { display: none; }
+.gs-pk { display: grid; gap: 2px; padding: 10px 12px; border-radius: 12px; background: rgba(15,17,22,.62); border: 1px solid rgba(255,255,255,.08); min-width: 0; }
+.gs-pk span { font: 600 11px Figtree, sans-serif; letter-spacing: .02em; color: #8d95a5; }
+.gs-pk b { font: 650 20px "JetBrains Mono", ui-monospace, monospace; color: #f4f5f8; font-variant-numeric: tabular-nums; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.gs-pk b.pos { color: #3fbf8f; } .gs-pk b.neg { color: #ff6b81; }
+.gs-pk small { font: 500 11.5px Figtree, sans-serif; color: #8d95a5; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.gs-tape { margin-top: 12px; max-width: 560px; overflow: hidden; border-radius: 10px; border: 1px solid rgba(255,255,255,.07); background: rgba(15,17,22,.5); mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent); -webkit-mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent); }
+.gs-tape[hidden] { display: none; }
+.gs-tape-in { display: inline-flex; gap: 26px; padding: 8px 14px; white-space: nowrap; font: 600 12px "JetBrains Mono", ui-monospace, monospace; color: #a6adbb; width: max-content; }
+.gs-tape-in i { font-style: normal; color: #f4f5f8; } .gs-tape-in .u { color: #3fbf8f; } .gs-tape-in .d { color: #ff6b81; }
+@media (prefers-reduced-motion: no-preference) { .gs-tape-in { animation: gs-tape 40s linear infinite; } @keyframes gs-tape { to { transform: translateX(-50%); } } }
+@media (max-width: 560px) { .gs-proof { grid-template-columns: 1fr 1fr; } .gs-proof .gs-pk:last-child { grid-column: 1 / -1; } }
 /* card refinements */
 .gate-card { width: 100% !important; border-radius: 18px !important; padding: 30px 30px 20px !important; box-shadow: 0 40px 100px -20px rgba(0,0,0,.7), 0 0 0 1px rgba(255,255,255,.04) inset !important; }
 .gate-card h1 { font-size: 26px !important; letter-spacing: -0.02em; }
@@ -2531,6 +2554,13 @@ html[data-motion="off"] #v-ict .ict-cal-d:hover { transform: none !important; }
       <div class="gs-tk"><span class="gs-dot" aria-hidden="true"></span><span class="gs-sym">XAU/USD</span><b class="gs-px" id="gs-px">—</b><span class="gs-tf" id="gs-tf"></span></div>
       <div class="gs-sess" id="gs-sess"></div>
     </div>
+    <!-- what the desk is doing right now, from public council-data (8 Nov, owner: make guests want to join) -->
+    <div class="gs-proof" id="gs-proof" hidden>
+      <div class="gs-pk"><span>Open now</span><b id="gs-p-open">—</b><small>paper trades the council manages</small></div>
+      <div class="gs-pk"><span>ICT replay</span><b id="gs-p-ict">—</b><small id="gs-p-ict-s">H1 iFVG, 2020 → now</small></div>
+      <div class="gs-pk"><span>Last signal</span><b id="gs-p-last">—</b><small id="gs-p-last-s"></small></div>
+    </div>
+    <div class="gs-tape" id="gs-tape" aria-hidden="true" hidden><div class="gs-tape-in" id="gs-tape-in"></div></div>
   </aside>
   <div class="gate-card">
     <div class="gate-brand"><i class="ms-coin" aria-hidden="true"></i><span>Aurum Desk</span><button type="button" class="gate-x" id="ms-gate-x" aria-label="Close sign-in">×</button></div>
@@ -2545,7 +2575,7 @@ html[data-motion="off"] #v-ict .ict-cal-d:hover { transform: none !important; }
     </form>
     <div class="gate-or"><span>or</span></div>
     <button type="button" class="gate-guest" id="ms-gate-guest">Continue as guest</button>
-    <p class="gate-note">Guests see a live gold H4 chart with one trade setup and the P&amp;L calendar.</p>
+    <p class="gate-note">Guests see a live gold H4 chart with one trade setup and the P&amp;L calendar. <b>Want a seat at the desk?</b> Members get every chart, the council's trades and the ICT, gold and crypto desks. Ask the owner for a password.</p>
     <p class="gate-foot"><span>Paper trading only · not financial advice</span><span>meridianx.dev</span></p>
   </div>
   </div>
@@ -2558,9 +2588,9 @@ html[data-motion="off"] #v-ict .ict-cal-d:hover { transform: none !important; }
     <div class="brand"><i class="ms-coin" aria-hidden="true"></i><div><details class="mk" id="ms-mk"><summary class="inst" id="ms-mk-btn" title="Market (click to change)">XAU/USD</summary><div class="mk-pop"><label class="sr" for="ms-mk-q">Search markets</label><input id="ms-mk-q" type="search" placeholder="Search markets…" autocomplete="off"><ul class="mk-list" id="ms-mk-list"></ul></div></details><select id="ms-inst" class="inst" hidden aria-hidden="true" tabindex="-1"><option>XAU/USD · Gold</option></select><span id="ms-inst-name">Gold · Mosha structure</span></div></div>
     <div class="px"><b id="ms-hdr-price">—</b><span id="ms-hdr-chg" class="hdr-chg"></span><span id="ms-hdr-spr" class="hdr-spr" hidden></span></div>
     <nav class="tabs" aria-label="Sections">
-      <a href="#home" data-go="home">Home</a><a href="#setup" data-go="setup" class="adm">Setup</a><a href="#charts" data-go="charts">Charts</a><a href="#scanner" data-go="scanner" class="adm">Scanner</a><a href="#crypto" data-go="crypto" class="adm">Crypto</a><a href="#gold" data-go="gold" class="adm">Gold playbook</a><a href="#council" data-go="council">Council</a><a href="#journal" data-go="journal">Journal</a><a href="#ict" data-go="ict" class="ictx">ICT desk</a><a href="#users" data-go="users" class="adm own">Users</a>
+      <a href="#home" data-go="home">Home</a><a href="#setup" data-go="setup" class="adm">Setup</a><a href="#charts" data-go="charts">Charts</a><a href="#scanner" data-go="scanner" class="adm">Scanner</a><a href="#ict" class="dsk" data-desks>Desks</a><a href="#council" data-go="council">Council</a><a href="#journal" data-go="journal">Journal</a><a href="#users" data-go="users" class="adm own">Users</a>
     </nav>
-    <a class="hdr-macro" id="ms-macro-btn" href="/macro-desk" title="Macro desk: the strategist and the veteran, their debate, the key insights and the source data"><i aria-hidden="true"></i><span>Macro desk</span></a>
+    <nav class="hdr-sw" aria-label="Desk or macro"><a class="on" href="#home" aria-current="page"><i aria-hidden="true"></i><span>Desk</span></a><a id="ms-macro-btn" href="/macro-desk" title="Macro desk: the strategist and the veteran, their debate, the key insights and the source data"><i aria-hidden="true"></i><span>Macro</span></a></nav>
     <a class="ms-badge" id="ms-scan-badge" href="#scanner" hidden></a>
     <a class="ms-botwarn" id="ms-botwarn" href="#council" hidden></a>
     <span class="ms-status"><i class="ms-live-dot" id="ms-live-dot"></i><span id="ms-live-txt">Connecting…</span><span class="upd"> · <span id="ms-updated">—</span></span></span>
@@ -3116,6 +3146,7 @@ html[data-motion="off"] #v-ict .ict-cal-d:hover { transform: none !important; }
     </div>
   </section>
   <section class="view adm" id="v-crypto" aria-label="Crypto desk" hidden>
+    <nav class="desk-sw" aria-label="Desk"><a href="#ict" data-dsw="ict" class="ictx">ICT</a><a href="#gold" data-dsw="gold" class="adm">Gold</a><a href="#crypto" data-dsw="crypto" class="adm">Crypto</a></nav>
     <div class="v-head cx-head">
       <div><h1 class="h-head">Crypto desk</h1><p class="ms-note">Bitcoin, Ether, Solana and XRP for scalping: M15 → M1 and H1 → M5 setups, open trades and how the scalps have done. Crypto trades around the clock. <span id="cx-src"></span></p></div>
       <div class="cx-seg" role="group" aria-label="Trades counted"><button type="button" data-cx="all" class="on" aria-pressed="true">All incl. shadow</button><button type="button" data-cx="live" aria-pressed="false">Live only</button></div>
@@ -3143,6 +3174,7 @@ html[data-motion="off"] #v-ict .ict-cal-d:hover { transform: none !important; }
     <div class="card"><div class="cx-card-h"><h2>Latest closed scalps</h2><span class="ms-note">newest first</span></div><div class="t-scroll cx-last-w"><table class="cx-tb cx-last" id="cx-last"></table></div></div>
   </section>
   <section class="view ictx" id="v-ict" aria-label="ICT desk" hidden>
+    <nav class="desk-sw" aria-label="Desk"><a href="#ict" data-dsw="ict" class="ictx">ICT</a><a href="#gold" data-dsw="gold" class="adm">Gold</a><a href="#crypto" data-dsw="crypto" class="adm">Crypto</a></nav>
     <div class="v-head ict-head">
       <div class="ict-title"><h1 class="h-head">ICT desk <span class="ict-tag">Paper desk</span></h1><p class="ms-note">US index futures and gold · H1 iFVG reversal (sweep → inversion → trail from +2R). A separate edge from the council. <span id="ict-run"></span></p></div>
       <div class="ict-hr"><div class="ict-me" id="ict-me"></div>
@@ -3240,6 +3272,7 @@ html[data-motion="off"] #v-ict .ict-cal-d:hover { transform: none !important; }
     </dialog>
   </section>
   <section class="view adm" id="v-gold" aria-label="Gold playbook" hidden>
+    <nav class="desk-sw" aria-label="Desk"><a href="#ict" data-dsw="ict" class="ictx">ICT</a><a href="#gold" data-dsw="gold" class="adm">Gold</a><a href="#crypto" data-dsw="crypto" class="adm">Crypto</a></nav>
     <div class="v-head gp-head">
       <div><h1 class="h-head">Gold playbook</h1><p class="ms-note">The gold master playbook on its own page: today's signal for its tested edge (Weekly bullish + a strong Daily close → buy the next Daily open), the context, the backtest on New York-close days and the pre-trade checklist. Separate from the council and the ICT desk. <span id="gp-src"></span></p></div>
       <div class="gp-seg" role="group" aria-label="Variant">
@@ -3341,11 +3374,9 @@ html[data-motion="off"] #v-ict .ict-cal-d:hover { transform: none !important; }
     <a href="#setup" data-go="setup" class="adm"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 6h16M4 12h10M4 18h6"></path></svg>Setup</a>
     <a href="#charts" data-go="charts"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M7 4v16M17 4v16M4 8h6v8H4zM14 6h6v6h-6z"></path></svg>Charts</a>
     <a href="#scanner" data-go="scanner" class="adm"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"></circle><path d="M20 20l-3.5-3.5M11 8v3l2 2"></path></svg><span>Scanner</span></a>
-    <a href="#crypto" data-go="crypto" class="adm"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"></circle><path d="M9.5 7.5h4a2.25 2.25 0 010 4.5h-4zM9.5 12h4.5a2.25 2.25 0 010 4.5H9.5zM9.5 7.5v9M11 6v1.5M11 16.5V18"></path></svg>Crypto</a>
-    <a href="#gold" data-go="gold" class="adm"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 18h8l-1.5-5h-5zM13 18h8l-1.5-5h-5zM8 11h8l-1.5-5h-5z"></path></svg><span>Gold</span></a>
+    <a href="#ict" id="ms-nav-desks" class="dsk" data-desks><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 19h16M6 15l4-5 3 3 5-7"></path><path d="M15 6h3v3"></path></svg>Desks</a>
     <a href="#council" data-go="council"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="8" cy="9" r="3"></circle><circle cx="16" cy="9" r="3"></circle><path d="M3 20c0-3 2.5-5 5-5s5 2 5 5M11 20c0-3 2.5-5 5-5s5 2 5 5"></path></svg>Council</a>
     <a href="#journal" data-go="journal"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 3h11a1 1 0 011 1v16a1 1 0 01-1 1H6zM6 3v18M10 8h5M10 12h5"></path></svg>Journal</a>
-    <a href="#ict" data-go="ict" class="ictx"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 19h16M6 15l4-5 3 3 5-7"></path><path d="M15 6h3v3"></path></svg>ICT</a>
     <a href="#users" data-go="users" class="adm own"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="9" cy="8" r="3.5"></circle><path d="M2.5 20c.8-3.6 3.4-5.5 6.5-5.5s5.7 1.9 6.5 5.5"></path><path d="M17 8v6M14 11h6"></path></svg><span>Users</span></a>
     <button type="button" class="btab-more-btn" id="ms-more-btn" popovertarget="ms-more" aria-controls="ms-more" aria-expanded="false" hidden><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><rect x="4" y="4" width="6" height="6" rx="1.5"></rect><rect x="14" y="4" width="6" height="6" rx="1.5"></rect><rect x="4" y="14" width="6" height="6" rx="1.5"></rect><rect x="14" y="14" width="6" height="6" rx="1.5"></rect></svg><span>More</span></button>
   </nav>
@@ -7499,6 +7530,13 @@ function msNextSetup(bars, A) {
     VIEWS.forEach((k) => { const el = document.getElementById('v-' + k); if (el) el.hidden = k !== v; });
     if (v === 'journal' && CDIRTY.journal) paneDo('journal', () => { try { renderSystemJournal(); } catch (e) {} });   // the system journal skipped while its view was hidden
     document.querySelectorAll('[data-go]').forEach((a) => { if (a.dataset.go === v) a.setAttribute('aria-current', 'page'); else a.removeAttribute('aria-current'); });
+    // ICT, Gold and Crypto share one entry (8 Nov, owner: "all in the same page, just a switch"): it lights for any of them and
+    // opens the desk used last; the switch at the top of each desk marks the current one
+    { const DESKS = ['ict', 'gold', 'crypto'], on = DESKS.includes(v); if (on) try { localStorage.setItem('ms-desk', v); } catch (e) {}
+      let last = 'ict'; try { last = localStorage.getItem('ms-desk') || 'ict'; } catch (e) {}
+      const allowed = (k) => (k === 'ict' ? !!document.documentElement.dataset.ict : !PUB && !VIEWER), pick = allowed(last) ? last : DESKS.find(allowed) || 'ict';
+      document.querySelectorAll('[data-desks]').forEach((a) => { a.setAttribute('href', '#' + pick); if (on) a.setAttribute('aria-current', 'page'); else a.removeAttribute('aria-current'); });
+      document.querySelectorAll('[data-dsw]').forEach((a) => { if (a.dataset.dsw === v) a.setAttribute('aria-current', 'page'); else a.removeAttribute('aria-current'); }); }
     if (v === 'charts') setTimeout(() => Object.values(panes).forEach((p) => p.fit()), 60);
     window.scrollTo(0, 0);
     renderHome();
@@ -9156,7 +9194,21 @@ function gpStats(T) {
       document.getElementById('gs-px').textContent = (+m.price).toLocaleString(undefined, { minimumFractionDigits: 1, maximumFractionDigits: 1 });
       var t = m.trend || {}; document.getElementById('gs-tf').innerHTML = [['D1', t['1d']], ['H4', t['4h']], ['H1', t['1h']]].map(function (z) { return '<i class="' + (z[1] > 0 ? 'u' : z[1] < 0 ? 'd' : '') + '" title="' + z[0] + (z[1] > 0 ? ' up' : z[1] < 0 ? ' down' : ' flat') + '">' + z[0] + (z[1] > 0 ? '▲' : z[1] < 0 ? '▼' : '') + '</i>'; }).join(''); })
       .catch(function () { var dot = document.querySelector('.gs-dot'); if (dot) dot.classList.add('off'); }); }
-  sess(); px(); setInterval(function () { if (R.dataset.gate) { sess(); } }, 30000); setInterval(px, 120000);
+  // live proof for guests: open paper trades, the ICT replay record, the latest signal, and a market tape (public council-data)
+  function proof() { if (!R.dataset.gate) return; var q = '?t=' + Math.floor(Date.now() / 300000), base = window.MS_CDATA || '';
+    var get = function (f) { return fetch(base + f + q, { cache: 'no-store' }).then(function (r) { return r.ok ? r.json() : null; }).catch(function () { return null; }); };
+    Promise.all([get('trades.json'), get('ict/replay.json'), get('snapshot.json')]).then(function (a) {
+      var T = Array.isArray(a[0]) ? a[0] : (a[0] && a[0].trades) || [], I = a[1] || null, S = a[2] || null, box = document.getElementById('gs-proof'); if (!box) return;
+      var open = T.filter(function (t) { return t.status === 'open'; }), set = function (id, v, cls) { var el = document.getElementById(id); if (el) { el.textContent = v; if (cls != null) el.className = cls; } };
+      set('gs-p-open', String(open.length));
+      var tot = I && I.totals; if (tot && tot.n) { set('gs-p-ict', (tot.R > 0 ? '+' : '') + Math.round(tot.R) + 'R', tot.R > 0 ? 'pos' : tot.R < 0 ? 'neg' : ''); set('gs-p-ict-s', tot.n + ' trades · ' + Math.round(100 * tot.wins / tot.n) + '% winners · 2020 → now'); }
+      var last = T.filter(function (t) { return t.opened; }).sort(function (x, y) { return y.opened - x.opened; })[0];
+      if (last) { set('gs-p-last', (last.side === 'sell' ? '▼ ' : '▲ ') + (last.label || String(last.market || '').toUpperCase())); var ago = Math.max(1, Math.round((Date.now() / 1000 - last.opened) / 60)); set('gs-p-last-s', (last.name || last.k || 'setup') + ' · ' + (ago < 60 ? ago + ' min ago' : ago < 1440 ? Math.round(ago / 60) + ' h ago' : Math.round(ago / 1440) + ' d ago')); }
+      box.hidden = false;
+      var M = S && S.markets, tape = document.getElementById('gs-tape-in'); if (M && tape) { var rows = Object.keys(M).map(function (k) { var m = M[k]; if (!m || !m.price) return ''; var ch = m.chg != null ? m.chg : m.change != null ? m.change : null; return '<i>' + (m.label || k.toUpperCase()) + '</i> ' + (+m.price).toLocaleString(undefined, { maximumFractionDigits: m.price > 100 ? 1 : 5 }) + (ch != null ? ' <span class="' + (ch > 0 ? 'u' : ch < 0 ? 'd' : '') + '">' + (ch > 0 ? '+' : '') + (+ch).toFixed(2) + '%</span>' : ''); }).filter(Boolean);
+        if (rows.length) { tape.innerHTML = rows.join('<span>·</span>') + '<span>·</span>' + rows.join('<span>·</span>') + '<span>·</span>'; document.getElementById('gs-tape').hidden = false; } }
+    }); }
+  sess(); px(); proof(); setInterval(function () { if (R.dataset.gate) { sess(); } }, 30000); setInterval(px, 120000); setInterval(proof, 300000);
 })();
 </script>
 <style>
@@ -9910,18 +9962,22 @@ html[data-motion="off"] .btab-more { transition: none; transform: none; }
      only keeps a 30-day session token (localStorage ms-ct-sess-<user>); cTrader tokens stay encrypted on the server. -->
 <style>
 html[data-role="public"] #ms-me-ct { display: none; }
-/* Macro desk button, top centre (8 Nov, owner: "a switch cool looking button on center top header like a boss") */
-.hdr-macro { --hm-a: #e0a526; --hm-b: #7b61ff; position: relative; margin-left: auto; display: inline-flex; align-items: center; gap: 8px; height: 32px; padding: 0 14px 0 12px; border-radius: 999px; text-decoration: none; color: var(--ink); font: 700 12.5px/1 var(--sans); letter-spacing: .01em; white-space: nowrap; flex: none;
-  background: var(--panel); isolation: isolate; }
-.hdr-macro::before { content: ""; position: absolute; inset: -1.5px; border-radius: inherit; z-index: -1; background: conic-gradient(from var(--hm-r, 0turn), var(--hm-a), var(--hm-b), var(--hm-a)); }
-.hdr-macro::after { content: ""; position: absolute; inset: 0; border-radius: inherit; z-index: -1; background: var(--panel); }
-.hdr-macro i { width: 8px; height: 8px; border-radius: 50%; background: var(--hm-a); box-shadow: 0 0 0 3px color-mix(in srgb, var(--hm-a) 25%, transparent); }
-.hdr-macro:hover { color: var(--ink); transform: translateY(-1px); } .hdr-macro:hover::before { filter: brightness(1.15); }
-.hdr-macro:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+/* Desk | Macro switch, top centre (8 Nov, owner: "a switch cool looking button on center top header like a boss"; the macro
+   desk page carries the same switch the other way round, so one click comes back). One conic gold/violet ring around a pill
+   pair; the active half is raised. */
+.hdr-sw { --hm-a: #e0a526; --hm-b: #7b61ff; position: relative; display: inline-flex; gap: 2px; padding: 3px; border-radius: 999px; margin-left: auto; flex: none; isolation: isolate; background: var(--panel); }
+.hdr-sw::before { content: ""; position: absolute; inset: -1.5px; border-radius: inherit; z-index: -2; background: conic-gradient(from var(--hm-r, 0turn), var(--hm-a), var(--hm-b), var(--hm-a)); }
+.hdr-sw::after { content: ""; position: absolute; inset: 0; border-radius: inherit; z-index: -1; background: var(--panel); }
+.hdr-sw a { display: inline-flex; align-items: center; gap: 7px; height: 28px; padding: 0 12px; border-radius: 999px; text-decoration: none; color: var(--ink-dim); font: 700 12.5px/1 var(--sans); letter-spacing: .01em; white-space: nowrap; transition: background .18s ease-out, color .18s ease-out; }
+.hdr-sw a i { width: 7px; height: 7px; border-radius: 50%; background: currentColor; opacity: .55; }
+.hdr-sw a.on, .hdr-sw a[aria-current="page"] { color: var(--ink); background: color-mix(in srgb, var(--hm-a) 16%, var(--panel)); box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--hm-a) 40%, transparent); }
+.hdr-sw a.on i, .hdr-sw a[aria-current="page"] i { background: var(--hm-a); opacity: 1; box-shadow: 0 0 0 3px color-mix(in srgb, var(--hm-a) 25%, transparent); }
+.hdr-sw a:not(.on):hover { color: var(--ink); background: color-mix(in srgb, var(--hm-b) 12%, var(--panel)); } .hdr-sw a:not(.on):hover i { background: var(--hm-b); opacity: 1; }
+.hdr-sw a:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
 @property --hm-r { syntax: '<angle>'; inherits: false; initial-value: 0turn; }
-@media (prefers-reduced-motion: no-preference) { .hdr-macro::before { animation: hm-spin 6s linear infinite; } @keyframes hm-spin { to { --hm-r: 1turn; } } }
-html[data-role="public"] .hdr-macro { display: none; }
-@media (max-width: 760px) { .hdr-macro span { display: none; } .hdr-macro { padding: 0 10px; } }
+@media (prefers-reduced-motion: no-preference) { .hdr-sw::before { animation: hm-spin 7s linear infinite; } @keyframes hm-spin { to { --hm-r: 1turn; } } }
+html[data-role="public"] .hdr-sw { display: none; }
+@media (max-width: 760px) { .hdr-sw a span { display: none; } .hdr-sw a { padding: 0 9px; } }
 .ct-dlg { width: min(860px, calc(100vw - 16px)); max-height: min(90vh, 900px); padding: 0; border-radius: 14px; border: 1px solid var(--line); background: var(--panel); color: var(--ink); font-variant-numeric: tabular-nums; }
 .ct-dlg::backdrop { background: rgba(0,0,0,.5); }
 .ct-h { display: flex; align-items: center; gap: 12px; padding: 14px 16px; border-bottom: 1px solid var(--line); position: sticky; top: 0; background: var(--panel); z-index: 2; }
@@ -10007,13 +10063,15 @@ html[data-role="public"] .hdr-macro { display: none; }
   function render(d) {
     const ccy = d.account && d.account.currency, open = d.open || [], hist = d.history || [], orders = d.orders || [];
     const net = hist.reduce((a, h) => a + (h.net || 0), 0), wins = hist.filter((h) => h.net > 0).length;
-    $('ms-ct-sub').innerHTML = `${d.label ? `<b>${esc(d.label)}</b> · ` : ''}${esc((d.account && d.account.broker) || 'cTrader')} · ${esc((d.account && (d.account.login || d.account.id)) || '')} · <span class="ct-tag${d.account && d.account.live ? ' live' : ''}">${d.account && d.account.live ? 'Live' : 'Demo'}</span> · view only`;
+    const OWN = document.documentElement.dataset.ct === 'owner' || d.source !== 'council';   // others (Fred, Orlando, Carlos) get the edge label only, never an account number
+    $('ms-ct-sub').innerHTML = `${d.label ? `<b>${esc(d.label)}</b> · ` : ''}${esc((d.account && d.account.broker) || 'cTrader')}${OWN ? ` · ${esc((d.account && (d.account.login || d.account.id)) || '')}` : ''} · <span class="ct-tag${d.account && d.account.live ? ' live' : ''}">${d.account && d.account.live ? 'Live' : 'Demo'}</span> · view only`;
+    if (!OWN) $('ms-ct-t').textContent = 'Demo accounts';
     // the owner's demo accounts, one per book (council / ICT / shadows / LIT / replica): the overview is the switcher
     const all = state.all || [], tot = (k) => all.reduce((a, x) => a + (x[k] || 0), 0), closed = (x) => (x.history || []).reduce((a, h) => a + (h.net || 0), 0);
-    const books = all.length > 1 ? `<section class="ct-sec"><h4>Accounts <small>${all.length} demo · one per book</small></h4><div class="ct-tw"><table class="ct-t ct-books"><thead><tr><th>Book</th><th class="hide-s">Account</th><th class="n">Balance</th><th class="n hide-s">Equity</th><th class="n">Floating</th><th class="n">Closed · 30 d</th><th class="n hide-s">Open</th></tr></thead><tbody>${all.map((x) => x.error
-        ? `<tr data-book="${esc((x.books || [])[0] || '')}"${x === d ? ' aria-selected="true"' : ''}><td class="ct-book">${esc(x.label)}</td><td colspan="6" class="ct-err">${esc(x.error)}</td></tr>`
-        : `<tr data-book="${esc((x.books || [])[0] || '')}"${x === d ? ' aria-selected="true"' : ''}><td class="ct-book">${esc(x.label)}</td><td class="hide-s">${esc(x.account.login || x.account.id || '')}</td><td class="n">${money(x.balance, x.account.currency)}</td><td class="n hide-s">${money(x.equity, x.account.currency)}</td><td class="n ${cls(x.floating)}">${money(x.floating, x.account.currency, true)}</td><td class="n ${cls(closed(x))}">${money(closed(x), x.account.currency, true)}</td><td class="n hide-s">${(x.open || []).length}${(x.orders || []).length ? ` <small style="color:var(--ink-faint)">+${x.orders.length} resting</small>` : ''}</td></tr>`).join('')}</tbody>
-      ${all.filter((x) => !x.error).length > 1 ? `<tfoot><tr><th>All</th><th class="hide-s"></th><th class="n">${money(tot('balance'), ccy)}</th><th class="n hide-s">${money(tot('equity'), ccy)}</th><th class="n ${cls(tot('floating'))}">${money(tot('floating'), ccy, true)}</th><th class="n ${cls(all.reduce((a, x) => a + closed(x), 0))}">${money(all.reduce((a, x) => a + closed(x), 0), ccy, true)}</th><th class="n hide-s">${all.reduce((a, x) => a + (x.open || []).length, 0)}</th></tr></tfoot>` : ''}</table></div></section>` : '';
+    const books = all.length > 1 ? `<section class="ct-sec"><h4>Accounts <small>${all.length} demo · one per book</small></h4><div class="ct-tw"><table class="ct-t ct-books"><thead><tr><th>Book</th>${OWN ? '<th class="hide-s">Account</th>' : ''}<th class="n">Balance</th><th class="n hide-s">Equity</th><th class="n">Floating</th><th class="n">Closed · 30 d</th><th class="n hide-s">Open</th></tr></thead><tbody>${all.map((x) => x.error
+        ? `<tr data-book="${esc((x.books || [])[0] || '')}"${x === d ? ' aria-selected="true"' : ''}><td class="ct-book">${esc(x.label)}</td><td colspan="${OWN ? 6 : 5}" class="ct-err">${esc(x.error)}</td></tr>`
+        : `<tr data-book="${esc((x.books || [])[0] || '')}"${x === d ? ' aria-selected="true"' : ''}><td class="ct-book">${esc(x.label)}</td>${OWN ? `<td class="hide-s">${esc(x.account.login || x.account.id || '')}</td>` : ''}<td class="n">${money(x.balance, x.account.currency)}</td><td class="n hide-s">${money(x.equity, x.account.currency)}</td><td class="n ${cls(x.floating)}">${money(x.floating, x.account.currency, true)}</td><td class="n ${cls(closed(x))}">${money(closed(x), x.account.currency, true)}</td><td class="n hide-s">${(x.open || []).length}${(x.orders || []).length ? ` <small style="color:var(--ink-faint)">+${x.orders.length} resting</small>` : ''}</td></tr>`).join('')}</tbody>
+      ${all.filter((x) => !x.error).length > 1 ? `<tfoot><tr><th>All</th>${OWN ? '<th class="hide-s"></th>' : ''}<th class="n">${money(tot('balance'), ccy)}</th><th class="n hide-s">${money(tot('equity'), ccy)}</th><th class="n ${cls(tot('floating'))}">${money(tot('floating'), ccy, true)}</th><th class="n ${cls(all.reduce((a, x) => a + closed(x), 0))}">${money(all.reduce((a, x) => a + closed(x), 0), ccy, true)}</th><th class="n hide-s">${all.reduce((a, x) => a + (x.open || []).length, 0)}</th></tr></tfoot>` : ''}</table></div></section>` : '';
     const accSel = (d.accounts || []).length > 1 ? `<div class="ct-acc"><label for="ms-ct-acc" style="font-size:13px;color:var(--ink-dim)">Account</label><select id="ms-ct-acc">${d.accounts.map((a) => `<option value="${esc(a.id)}"${a.id === d.account.id ? ' selected' : ''}>${esc(a.broker || 'cTrader')} · ${esc(a.login || a.id)} · ${a.live ? 'Live' : 'Demo'}</option>`).join('')}</select></div>` : '';
     const openRows = open.map((p) => `<tr><td>${esc(p.symbol)}</td><td><span class="ct-side ${p.side}">${p.side}</span></td><td class="n">${p.lots ?? '—'}</td><td class="n">${px(p.entry)}</td><td class="n hide-s">${px(p.sl)}</td><td class="n hide-s">${px(p.tp)}</td><td class="hide-s">${when(p.openedAt)}</td><td class="n ${cls(p.pnl)}"><b>${money(p.pnl, ccy, true)}</b></td></tr>`).join('');
     const ordRows = orders.map((o) => `<tr><td>${esc(o.symbol)}</td><td><span class="ct-side ${o.side}">${o.side}</span></td><td>${o.type === 2 ? 'Limit' : o.type === 3 ? 'Stop' : 'Order'}</td><td class="n">${o.lots ?? '—'}</td><td class="n">${px(o.price)}</td><td class="n hide-s">${px(o.sl)}</td><td class="n hide-s">${px(o.tp)}</td></tr>`).join('');
@@ -10028,11 +10086,11 @@ html[data-role="public"] .hdr-macro { display: none; }
       ${orders.length ? `<section class="ct-sec"><h4>Pending orders <small>${orders.length}</small></h4><div class="ct-tw"><table class="ct-t"><thead><tr><th>Symbol</th><th>Side</th><th>Type</th><th class="n">Lots</th><th class="n">Price</th><th class="n hide-s">Stop</th><th class="n hide-s">Target</th></tr></thead><tbody>${ordRows}</tbody></table></div></section>` : ''}
       <section class="ct-sec"><h4>History <small>${hist.length} closed · ${hist.length ? Math.round((wins / hist.length) * 100) + '% winners' : '—'}</small><span class="ct-chips" role="group" aria-label="History period"${d.source === 'council' ? ' hidden' : ''}>${[7, 30, 90].map((n) => `<button type="button" data-days="${n}" aria-pressed="${state.days === n}">${n} days</button>`).join('')}</span></h4>
         ${hist.length ? `<div class="ct-tw"><table class="ct-t"><thead><tr><th>Closed</th><th>Symbol</th><th>Side</th><th class="n">Lots</th><th class="n hide-s">Entry</th><th class="n hide-s">Exit</th><th class="n hide-s">Fees + swap</th><th class="n">Net P&amp;L</th></tr></thead><tbody>${histRows}</tbody></table></div>` : `<div class="ct-empty">No closed trades in the last ${d.days} days.</div>`}</section>
-      <div class="ct-f"><span>${d.source === 'council' ? `From the council's own connection to your demo account · updated ${new Date(d.at).toLocaleTimeString()} (every few minutes)` : `Updated ${new Date(d.at).toLocaleTimeString()} · refreshes every 15 s while open`}</span><span class="sp"></span><button type="button" class="ct-btn ghost" id="ms-ct-relink">Link other accounts</button>${d.source === 'council' ? '' : '<button type="button" class="ct-btn ghost" id="ms-ct-un">Remove link</button>'}</div>`;
+      <div class="ct-f"><span>${d.source === 'council' ? `${OWN ? "From the council's own connection to your demo account" : "The council's demo accounts, one per edge · paper money"} · updated ${new Date(d.at).toLocaleTimeString()} (every few minutes)` : `Updated ${new Date(d.at).toLocaleTimeString()} · refreshes every 15 s while open`}</span><span class="sp"></span>${OWN ? '<button type="button" class="ct-btn ghost" id="ms-ct-relink">Link other accounts</button>' : ''}${d.source === 'council' ? '' : '<button type="button" class="ct-btn ghost" id="ms-ct-un">Remove link</button>'}</div>`;
     const sel = $('ms-ct-acc'); if (sel) sel.addEventListener('change', () => { state.account = sel.value; ls('ms-ct-acc-' + (userKey() || 'x'), sel.value); load(true); });
     body().querySelectorAll('.ct-books tbody tr[data-book]').forEach((tr) => tr.addEventListener('click', () => { state.book = tr.dataset.book; ls('ms-ct-book', state.book); const x = (state.all || []).find((a) => (a.books || [])[0] === state.book); if (x) render(x); }));
     body().querySelectorAll('[data-days]').forEach((b) => b.addEventListener('click', () => { state.days = +b.dataset.days; load(true); }));
-    $('ms-ct-relink').addEventListener('click', () => linkForm());
+    if ($('ms-ct-relink')) $('ms-ct-relink').addEventListener('click', () => linkForm());
     if ($('ms-ct-un')) $('ms-ct-un').addEventListener('click', async () => { if (!confirm('Remove the cTrader link from your profile? You can link it again later.')) return; try { await call({ action: 'unlink', session: ls(sessKey()) }); state.data = null; linkForm('Link removed.', true); } catch (e) { alert(e.message); } });
   }
 
@@ -10040,7 +10098,7 @@ html[data-role="public"] .hdr-macro { display: none; }
     if (state.busy || !dlg().open) return;
     if (!API) { body().innerHTML = '<div class="ct-empty">Open the site on meridianx.dev to link cTrader.</div>'; return; }
     // the owner's demo account needs no link: the council loop publishes it (council/ctrader-account.mjs -> ctrader/account.json)
-    if (userKey() === 'owner' && !ls(sessKey())) {
+    if (document.documentElement.dataset.ct && !ls(sessKey())) {
       try {
         const r2 = await fetch((window.MS_CDATA || '/cdata/') + 'ctrader/accounts.json?t=' + Date.now(), { cache: 'no-store' }); const all = r2.ok ? (await r2.json()).accounts : null;
         if (Array.isArray(all) && all.some((a) => a.account && !a.error)) {
@@ -10085,6 +10143,42 @@ html[data-role="public"] .hdr-macro { display: none; }
   });
 })();
 </script>
+<style id="ms-home2-css">
+/* ── Home refresh (8 Nov 2026, owner: "a strong change in the design and theme of the dashboard, more noticeable").
+   Scoped to #v-home and the shell; token-based so both themes follow. A warm gold wash behind the headline, the day's
+   numbers in a raised band with a gold rule, market cards that lift, section tiles with coloured icon badges. ── */
+#v-home { position: relative; isolation: isolate; }
+#v-home::before { content: ""; position: absolute; inset: -24px -24px auto -24px; height: 320px; z-index: -1; pointer-events: none; border-radius: 0 0 48px 48px;
+  background:
+    radial-gradient(60% 120% at 12% 0%, color-mix(in srgb, #e0a526 20%, transparent), transparent 70%),
+    radial-gradient(45% 100% at 88% 10%, color-mix(in srgb, #7b61ff 12%, transparent), transparent 70%);
+  mask-image: linear-gradient(#000 55%, transparent); -webkit-mask-image: linear-gradient(#000 55%, transparent); }
+#v-home .h-top { padding-top: 6px; }
+#v-home .h-head { font-size: clamp(26px, 2.6vw, 38px); letter-spacing: -0.022em; line-height: 1.12; text-wrap: balance; }
+#v-home .h-date { font-weight: 600; color: var(--ink-dim); }
+#v-home .h-quick a { border-radius: 999px; font-weight: 600; transition: transform .15s ease-out, background .15s ease-out, border-color .15s ease-out; }
+#v-home .h-quick a:hover { transform: translateY(-1px); border-color: color-mix(in srgb, var(--accent) 45%, var(--line)); }
+#v-home .h-today { position: relative; border-radius: 16px; overflow: hidden; box-shadow: 0 14px 34px -22px rgba(0,0,0,.45); }
+#v-home .h-today::before { content: ""; position: absolute; inset: 0 0 auto 0; height: 3px; background: linear-gradient(90deg, #e0a526, #f5d27a 40%, #7b61ff); opacity: .9; }
+#v-home .h-kpi b { font-size: clamp(24px, 2.2vw, 30px); letter-spacing: -0.02em; }
+#v-home .h-kpi .h-kpi-k { font-weight: 600; letter-spacing: .01em; }
+#v-home .h-mk-h h2 { font-size: 17px; letter-spacing: -0.01em; }
+#v-home .h-mk-h h2::before { content: ""; display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: #e0a526; margin-right: 8px; vertical-align: 2px; box-shadow: 0 0 0 3px color-mix(in srgb, #e0a526 22%, transparent); }
+#v-home .h-mk a, #v-home .h-mk [data-mk-card] { transition: transform .18s ease-out, box-shadow .18s ease-out, border-color .18s ease-out; }
+#v-home .h-mk a:hover, #v-home .h-mk [data-mk-card]:hover { transform: translateY(-2px); box-shadow: 0 16px 30px -18px rgba(0,0,0,.5); border-color: color-mix(in srgb, var(--accent) 40%, var(--line)); }
+#v-home .tile, #v-home .card { border-radius: 16px; transition: transform .18s ease-out, box-shadow .18s ease-out, border-color .18s ease-out; }
+#v-home a.tile:hover { transform: translateY(-2px); box-shadow: 0 18px 36px -22px rgba(0,0,0,.55); border-color: color-mix(in srgb, var(--accent) 40%, var(--line)); }
+#v-home .tile.wide { background: linear-gradient(135deg, color-mix(in srgb, #e0a526 9%, var(--panel)), var(--panel) 60%); }
+#v-home .tile-k { font-weight: 700; letter-spacing: .005em; }
+#v-home .h-go .h-go-ico { width: 34px; height: 34px; border-radius: 10px; display: grid; place-items: center; margin-bottom: 8px; background: color-mix(in srgb, var(--accent) 14%, transparent); }
+#v-home .h-go-council .h-go-ico { background: color-mix(in srgb, #7b61ff 16%, transparent); } #v-home .h-go-scanner .h-go-ico { background: color-mix(in srgb, #00bcd4 16%, transparent); }
+#v-home .h-go-charts .h-go-ico { background: color-mix(in srgb, #e0a526 18%, transparent); } #v-home .h-go-journal .h-go-ico { background: color-mix(in srgb, #089981 16%, transparent); }
+#v-home .h-act .ms-k > span { font-weight: 700; }
+#v-home .h-pulse { border-radius: 16px; }
+html[data-theme="dark"] #v-home::before, html:not([data-theme="light"]) #v-home::before { opacity: .9; }
+@media (prefers-reduced-motion: reduce) { #v-home .tile, #v-home .card, #v-home .h-quick a, #v-home .h-mk a { transition: none; } }
+@media (max-width: 760px) { #v-home::before { height: 220px; } }
+</style>
 <style id="ms-md-css">
 /* ── Macro desk (#ms-cp-macro, 7 Nov 2026, owner: make the Macro strategist visible and enjoyable). Council → Macro, admin only.
    Self-contained: every rule is scoped to #ms-cp-macro, the script is #ms-md-js. Phone first; no horizontal scroll at 375 px. ── */

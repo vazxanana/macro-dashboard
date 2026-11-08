@@ -550,6 +550,15 @@ position at once when the broker refuses the stop (only no answer at all waits a
 whose stop distance is within 1.25× the broker spread (ctrader/symbols.json). Tests:
 `tests/ctrader-mirror.test.mjs` (fake broker with resting orders, `fillOrder`, cancel / cancel-rejected paths).
 
+## Accounts, desks, header switch, gate (8 Nov 2026)
+Users (market-structure.html `MS_USERS`): Fred reviewer + ICT (reviews), Orlando reviewer (sees everything) + ICT read-only, Carlos
+viewer; `ct: true` (all three) shows the council's demo accounts on "My cTrader account" with edge labels only, never account numbers
+(`html[data-ct]`, "owner" for the owner who also sees the logins). ICT, Gold and Crypto share one sidebar / header entry "Desks"
+(`[data-desks]`, opens the desk used last, localStorage `ms-desk`) and each desk carries the `.desk-sw` switch. The header's
+Desk | Macro control (`.hdr-sw`, conic ring) also sits on /macro-desk the other way round (Desk goes back). Home refresh: scoped
+`#ms-home2-css` (gold wash, raised today band, lifting cards). The gate shows live proof for guests (`#gs-proof`: open paper trades,
+the ICT replay record, the last signal; `#gs-tape` market tape) and an invitation line.
+
 ## Charts: markup switch and settings groups (8 Nov 2026)
 The chart-header switch is Meridian | ICT | Clean (`setMode`, `html[data-mk]`, localStorage `ms-mode`): one markup at a time, never
 stacked; Clean detaches both overlays, their price lines and markers (indicators, drawings and position plans stay). Settings → Chart
