@@ -716,5 +716,13 @@ account so Undo stays light; journal thumbnail opens `#shotd`).
 Toolbar position (owner: "the play buttons should be at the top or movable"): `#tb` docks at the top of the chart (default), floats
 over the chart (drag the dotted grip `#tb-grip`, compact single row, time and jump hidden) or sits under the chart; the dock button
 `#tb-dock` cycles top / float / bottom (`tbPlace`, `tbMove` clamps inside the card); localStorage `btLab:tbDock` and `btLab:tbPos`;
-the overlay canvas and legend follow the chart's offset. Phones keep it sticky at the bottom unless floating. Tests: `tests/backtest.test.mjs`. Paper only; nothing reaches the
+the overlay canvas and legend follow the chart's offset. Phones keep it sticky at the bottom unless floating.
+Full screen (owner: "full screen option with the buy sell buttons and floating docks"): the expand button `#fs-btn` or F (`setFs`)
+fixes the chart card over the page (browser Fullscreen API when allowed), floats the replay bar, and moves the Trade card
+(`#tradecard`: Buy / Sell, draft, open positions, equity in its header `#fs-eq`) into a draggable dock (`#tc-grip`, `dockMove`,
+localStorage `btLab:fsDock`); leaving puts both back. Audit fixes (8 Nov): drafts no longer move focus into the stop field and
+never leave it in a hidden field (keyboard shortcuts kept working), Skip day lands on the first bar of the next trading day, a
+challenge breach closes every position at that bar's close and cancels pending orders (reason "challenge breach"). Phones hide
+the jump field and time readout in the toolbar. End-to-end audit: `scripts/audit/chronostrade.cjs` (Playwright against a local
+build and the live /md/bars, 46 checks; not in node --test). Tests: `tests/backtest.test.mjs`. Paper only; nothing reaches the
 council or the mirror.
