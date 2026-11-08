@@ -15,7 +15,7 @@ const INFO = { 7: { symbolId: 7, digits: 2, lotSize: 100, minVolume: 1, stepVolu
 // (no fill event: the position opens/closes later) or 'silent' (order placed, no answer at all), info (symbol overrides).
 function broker({ isLive = false, balance = 1000000, expireFirst = false, reject = null, execReject = false, fill = 'normal', closeFill = 'normal', info = {}, names = SYMS } = {}) {
   const sent = [], positions = new Map(), orders = new Map(), amends = []; let pid = 900, expired = expireFirst;
-  const o = { reject, fill, closeFill, rejectPending: null, cancelReject: false, amendReject: null, amendSilent: false, noSL: false, closes: 0 };
+  const o = { reject, fill, closeFill, rejectPending: null, cancelReject: false, amendReject: null, amendSilent: false, noSL: false, slLate: false, closes: 0 };
   class WS {
     constructor(url) { this.url = url; setTimeout(() => this.onopen && this.onopen(), 0); }
     send(text) {
@@ -61,7 +61,7 @@ function broker({ isLive = false, balance = 1000000, expireFirst = false, reject
           if (o.fill === 'silent') return;
           r(PT.EXECUTION_EVENT, { executionType: 2, position: { positionId: id, positionStatus: 3 }, order: { orderId: 5, positionId: id } });
           if (o.fill === 'accepted-only') return;
-          return r(PT.EXECUTION_EVENT, { executionType: 3, position: { ...pos }, order: { orderId: 5, positionId: id }, deal: { executionPrice: 1.10012 } }, 5);
+          return r(PT.EXECUTION_EVENT, { executionType: 3, position: o.slLate ? (({ stopLoss, takeProfit, ...x }) => x)(pos) : { ...pos }, order: { orderId: 5, positionId: id }, deal: { executionPrice: 1.10012 } }, 5);
         }
         case PT.CLOSE_POSITION_REQ: {
           o.closes++; r(PT.EXECUTION_EVENT, { executionType: 2, position: { positionId: p.positionId } });
@@ -238,11 +238,13 @@ test('market closed: the trade waits for as long as it is open (no try counted),
   let r = await mirrorRound({ env: ENV, trades: [tr()], state: started, WS: b.WS, now: NOW });
   assert.equal(r.state.wait['eurusd-intraday-1'].n, 0); assert.equal((r.state.skipped || {})['eurusd-intraday-1'], undefined); assert.ok(r.state.paused.EURUSD);
   b.o.reject = null; r = await mirrorRound({ env: ENV, trades: [tr()], state: r.state, WS: b.WS, now: NOW + LIMITS.pause + 60 });
+  assert.equal(r.state.map['eurusd-intraday-1'], undefined, 'just reopened: spreads settle first'); assert.match(r.state.wait['eurusd-intraday-1'].why, /just reopened/);
+  r = await mirrorRound({ env: ENV, trades: [tr()], state: r.state, WS: b.WS, now: NOW + LIMITS.settle + 60 });
   assert.equal(r.state.map['eurusd-intraday-1'].status, 'open'); assert.equal(r.state.wait['eurusd-intraday-1'], undefined);
   // a whole weekend of closed-market rounds: one order per symbol per pause, never a skip; a second trade on the symbol sends nothing while paused
   const b2 = broker({ reject: 'MARKET_CLOSED' }); r = { state: started };
   for (let i = 0; i < 30; i++) r = await mirrorRound({ env: ENV, trades: [tr({ opened: NOW + 100, filled: NOW + 100 }), tr({ id: 'two', opened: NOW + 100, filled: NOW + 100 })], state: r.state, WS: b2.WS, now: NOW + 100 + i * 240 });
-  assert.ok(orders(b2).length >= 8 && orders(b2).length <= 12, `orders ${orders(b2).length}`);   // 30 rounds x 4 min, one probe per 10-min pause
+  assert.ok(orders(b2).length >= 4 && orders(b2).length <= 8, `orders ${orders(b2).length}`);   // 30 rounds x 4 min: one probe per pause + settle window
   assert.equal((r.state.skipped || {})['eurusd-intraday-1'], undefined); assert.match(r.state.wait.two.why, /market closed/);
   assert.equal(r.log.filter((l) => /not mirrored yet two/.test(l.msg)).length <= 1, true);   // a repeat of the same reason is not logged again
   // a counted "not now" (maintenance) still runs out after LIMITS.retries
@@ -716,4 +718,14 @@ test('stop guard: a fill the broker reports without a stop gets the council stop
   const r4 = await mirrorRound({ env: ENV, trades: [tight], state: {}, tokens: null, WS: b4.WS, now: NOW, timeout: 2000, marks: { eurusd: { price: 1.1, at: NOW } },
     specs: { account: { currency: 'USD' }, symbols: { EURUSD: { base: 'EUR', quote: 'USD', spread: 0.0002 } } } });
   assert.equal(b4.positions.size, 0); assert.match(r4.state.skipped['eurusd-scalp-9'], /inside the broker spread/);
+});
+
+test('stop check reads the position back: a stop attached just after the fill event is not "missing"; a really missing one is set', async () => {
+  const b = broker(); b.o.slLate = true;
+  let r = await mirrorRound({ env: ENV, trades: [tr()], state: started, WS: b.WS, now: NOW, slWaitMs: 0 });
+  assert.equal(r.state.map['eurusd-intraday-1'].status, 'open'); assert.equal(b.amends.length, 0, 'no needless amend');
+  assert.ok(r.state.map['eurusd-intraday-1'].brokerStop > 0); assert.equal(r.log.some((l) => /missing stop/.test(l.msg)), false);
+  const b2 = broker(); b2.o.noSL = true;
+  r = await mirrorRound({ env: ENV, trades: [tr()], state: started, WS: b2.WS, now: NOW, slWaitMs: 0 });
+  assert.equal(b2.amends.length, 1); assert.ok(b2.amends[0].stopLoss > 0); assert.ok(r.log.some((l) => /missing stop/.test(l.msg)));
 });

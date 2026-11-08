@@ -84,7 +84,7 @@ export const ictCandidates = (ict) => (Array.isArray(ict) ? ict : []).map((t) =>
 // 8 Nov (owner: mirror everything): maxOpen 5 -> 40, maxOpenRisk 1% -> 50% (minimum-lot orders on a ~$1,000 demo risk about 1% each),
 // minLot fallback on, total margin of all open mirror positions at most 80% of the balance.
 export const LIMITS = { lots: 0.01, maxLots: 5, maxMarginShare: 0.2, maxTotalMarginShare: 0.8, maxOpen: 40, dayStop: 0.02, retries: 3, keepDays: 30,
-  risk: { ict: 0.002, council: 0.0002 }, maxOpenRisk: 0.5, minLot: true, maxMinLotRisk: 0.02, maxDriftR: 1, markMaxAge: 30 * 60, pause: 10 * 60 };
+  risk: { ict: 0.002, council: 0.0002 }, maxOpenRisk: 0.5, minLot: true, maxMinLotRisk: 0.02, maxDriftR: 1, markMaxAge: 30 * 60, pause: 10 * 60, settle: 20 * 60 };   // settle: market orders wait this long after the last "market closed" answer (>= ~10 min after the real open)
 const LABEL = 'council';
 const OPEN = new Set(['open']), isDone = (t) => !!t.status && t.status !== 'open' && t.status !== 'pending';
 // the order comment is also the key that finds our position at the broker again (ProtoOATradeData.label + comment)
@@ -382,7 +382,7 @@ export function executionStats(map, { since = 0 } = {}) {
 // openBooks: only trades of these books are opened here (every trade is still managed: closes, stop moves, cancels for what this
 // account already holds, so a book moved to another account hands over without orphans); exclude: ids another account holds
 // (never opened twice across accounts)
-export async function mirrorRound({ env, trades, state, tokens, specs = null, WS = globalThis.WebSocket, now = Math.floor(Date.now() / 1000), timeout, onTokens, shadows = true, marks = null, openBooks = null, exclude = null }) {
+export async function mirrorRound({ env, trades, state, tokens, specs = null, WS = globalThis.WebSocket, now = Math.floor(Date.now() / 1000), timeout, onTokens, slWaitMs = 1500, shadows = true, marks = null, openBooks = null, exclude = null }) {
   const scrub = scrubber(env), log = [], say = (msg, x = {}) => log.push({ at: new Date(now * 1000).toISOString(), msg: scrub(msg), ...x });
   const st = { map: {}, day: null, startedAt: null, ...(state || {}) };
   const out = { state: st, tokens: tokens || null, log, sent: [], alerts: [] };
@@ -585,7 +585,8 @@ export async function mirrorRound({ env, trades, state, tokens, specs = null, WS
       && !st.map[t.id] && !st.orders[t.id] && !(st.skipped || {})[t.id]
       && (t.side === 'buy' || t.side === 'sell') && t.stop != null && t.entry != null && Math.abs(t.entry - t.stop) > 0);
     if (shadows && !st.catchUpAt) { st.catchUpAt = iso; say(`catch-up round: ${fresh.length} open council trade${fresh.length === 1 ? '' : 's'} (shadows included) considered`); }
-    st.paused = Object.fromEntries(Object.entries(st.paused || {}).filter(([, until]) => Date.parse(until) / 1000 > now));   // closed-market pauses still running
+    st.paused = Object.fromEntries(Object.entries(st.paused || {}).filter(([, until]) => Date.parse(until) / 1000 > now));
+    if (st.closedSeen) st.closedSeen = Object.fromEntries(Object.entries(st.closedSeen).filter(([, at]) => now - Date.parse(at) / 1000 < 86400));   // closed-market pauses still running
     if (fresh.length) {
       const names = await s.send(PT.SYMBOLS_LIST_REQ, { ctidTraderAccountId: ctid }, PT.SYMBOLS_LIST_RES);
       const idOf = new Map((names.symbol || []).filter((x) => x.enabled !== false).map((x) => [normName(x.symbolName), x.symbolId]));
@@ -597,6 +598,9 @@ export async function mirrorRound({ env, trades, state, tokens, specs = null, WS
         const name = SYMBOLS[t.market].find((n) => idOf.has(normName(n))), symbolId = name && idOf.get(normName(name));
         if (!symbolId) { skip(`none of ${SYMBOLS[t.market].join('/')} found at the broker`); continue; }
         if (st.paused[PAUSE_KEY(name, pending)]) { later(`${name} market closed (paused until ${st.paused[PAUSE_KEY(name, pending)].slice(11, 16)} UTC)`); continue; }
+        // a market that just reopened has its widest spreads, where a stop inside the spread is dropped by the broker: market orders
+        // wait LIMITS.settle seconds after the last "market closed" answer (9 Nov, every reopen copy needed the stop guard)
+        { const seen = st.closedSeen && st.closedSeen[name]; if (!pending && seen && now - Date.parse(seen) / 1000 < LIMITS.settle) { later(`${name} market closed or just reopened: next try after ${new Date(Date.parse(seen) + LIMITS.settle * 1000).toISOString().slice(11, 16)} UTC, once spreads settle`); continue; } }
         const sell = t.side === 'sell', sgn = sell ? -1 : 1, isIct = String(t.id).startsWith('ict:');
         const mark = isIct ? null : markOf(marks, t.market, now); let from = t.entry;
         if (pending) {
@@ -624,7 +628,7 @@ export async function mirrorRound({ env, trades, state, tokens, specs = null, WS
             out.sent.push({ type: 'limit', trade: t.id }); say(`placed ${sell ? 'sell' : 'buy'} limit ${name} ${rv.lots} lot at ${order.limitPrice} (council ${t.k}, valid to ${st.orders[t.id].expires.slice(0, 16)}Z)`, { trade: t.id });
             alert('pending', t.id, st.orders[t.id], () => ({ price: order.limitPrice, stop: t.stop, t1: t.t1, noTarget: !('takeProfit' in order), expires: st.orders[t.id].expires }));
           } catch (e) { const txt = `${e.code || ''} ${e.message}`;
-            if (PAUSE.test(txt)) { st.paused[PAUSE_KEY(name, true)] = new Date((now + LIMITS.pause) * 1000).toISOString(); later(`${name} market closed: ${e.message}`); }
+            if (PAUSE.test(txt)) { st.paused[PAUSE_KEY(name, true)] = new Date((now + LIMITS.pause) * 1000).toISOString(); (st.closedSeen = st.closedSeen || {})[name] = iso; later(`${name} market closed: ${e.message}`); }
             else if (RETRY.test(txt)) later(`limit rejected: ${e.message}`, true); else skip(`limit rejected: ${e.message}`);
             if ((st.skipped || {})[t.id] && !(!e.code && UNSURE.test(e.message))) alert('reject', t.id, null, () => ({ symbol: name, side: t.side, lots: rv.lots, result: st.skipped[t.id] })); }
           continue;
@@ -661,12 +665,17 @@ export async function mirrorRound({ env, trades, state, tokens, specs = null, WS
           alert('open', t.id, st.map[t.id], () => ({ filled, price: (ev.deal && ev.deal.executionPrice) ?? (filled && ev.position ? ev.position.price : null) ?? null,
             entry: t.entry, stop: t.stop, t1: t.t1, noTarget: !('relativeTakeProfit' in order) }));
           // RULE: never a position without a stop. The fill event carries the position's levels; a missing stop is set now, or the position closed
+          // (9 Nov, owner: "the most important part"): the fill event can arrive before the broker attaches the relative stop, so the
+          // position is read back from the broker first; only a stop that is really missing is set (or the position closed)
           if (filled && ev.position && ev.position.stopLoss == null) {
-            const pf = { ...ev.position, price: ev.position.price ?? (ev.deal && ev.deal.executionPrice) ?? null, tradeData: ev.position.tradeData || { volume } };
-            await ensureStop(t.id, st.map[t.id], t, pf);
+            let pr = null;
+            try { if (slWaitMs > 0) await new Promise((r) => setTimeout(r, slWaitMs)); const rc2 = await s.send(PT.RECONCILE_REQ, { ctidTraderAccountId: ctid }, PT.RECONCILE_RES); pr = (rc2.position || []).find((x) => String(x.positionId) === String(pid)) || null; } catch (e) { pr = null; }
+            if (pr && pr.stopLoss != null) { st.map[t.id].stopCheckedAt = iso; st.map[t.id].brokerStop = +pr.stopLoss; }
+            else { const base = pr || ev.position, pf = { ...base, price: base.price ?? ev.position.price ?? (ev.deal && ev.deal.executionPrice) ?? null, tradeData: base.tradeData || ev.position.tradeData || { volume } };
+              await ensureStop(t.id, st.map[t.id], t, pf); }
           }
         } catch (e) { const txt = `${e.code || ''} ${e.message}`;
-          if (PAUSE.test(txt)) { st.paused[name] = new Date((now + LIMITS.pause) * 1000).toISOString(); later(`${name} market closed: ${e.message}`); }
+          if (PAUSE.test(txt)) { st.paused[name] = new Date((now + LIMITS.pause) * 1000).toISOString(); (st.closedSeen = st.closedSeen || {})[name] = iso; later(`${name} market closed: ${e.message}`); }
           else if (RETRY.test(txt)) later(`order rejected: ${e.message}`, true); else skip(`order rejected: ${e.message}`);
           // no answer at all (timeout, dropped connection) is not a rejection: the order may be live and is looked up by label/comment
           // next round (step 0, which then sends the open alert); only a broker's answer is alerted as a rejection
