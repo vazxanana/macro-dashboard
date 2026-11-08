@@ -26,3 +26,11 @@ test('the Trader sends it after building the decay block and marks coach.json de
   const src = fs.readFileSync(new URL('../council/trader.mjs', import.meta.url), 'utf8');
   assert.match(src, /decayDigest\(cj\.decay, cj\.decaySent, now\)/); assert.match(src, /cj\.decaySent = dg\.mark/);
 });
+test('the daily Coach rewrite keeps decaySent, so a recovery after an alert still says cleared (live miss, 8 Nov 00:03)', async () => {
+  const { coachCarry } = await import('../council/proposals.mjs');
+  const prev = { key: 'mosha-bo', at: '2026-11-07T22:20:53Z', items: ['Mosha BO'] };
+  const kept = coachCarry({ decaySent: prev, notes: ['x'] }).decaySent;
+  assert.deepEqual(kept, prev);
+  assert.equal(decayDigest(D(sys('mosha-bo', 'Mosha BO', 'healthy')), kept, now).ev.title, 'Edge decay cleared');
+  assert.equal(decayDigest(D(sys('mosha-bo', 'Mosha BO', 'healthy')), undefined, now), null, 'without the mark the recovery is silent');
+});
