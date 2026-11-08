@@ -634,3 +634,17 @@ mirror row. Tests: `tests/ctrader-symbols.test.mjs`, `tests/ctrader-mirror.test.
 `tests/fixtures/ctrader/symbols.json`): USD account 1:500; XAUUSD 100 oz a lot ($100 a $1 move), NAS100 / US500 / US30 / US2000 1
 unit a lot ($1 a point, 1:100), forex 100,000; all min / step 0.01 lot, max 100. `impliedPrice` (margin × leverage ÷ units) checks
 the lot size with the market shut.
+
+## ICT MCP server for outside helpers (8 Nov 2026, owner: "make an MCP for ChatGPT, my friend will use it")
+`api/mcp.js`, served at `https://meridianx.dev/mcp/<key>` (vercel.json rewrite → `/api/mcp?key=`). MCP Streamable HTTP,
+stateless JSON-RPC over POST (ChatGPT connectors / Claude / Cursor). One key per person in Vercel env `MCP_KEYS`
+(`"fred:<24+ random chars>,orlando:<…>"`); the name goes on their notes and PRs. Reads use `GH_READ_TOKEN` (fallback
+`GH_TOKEN`), writes `GH_MCP_TOKEN` (fallback `GH_TOKEN`; needs Contents write for the branch and Pull requests write for the
+PR, else the tool returns the compare link). Tools: `ict_rules` (skill sections + live `P`/`MARKETS`), `ict_trades` (live +
+replay with stats and filters; Both never counts a live signal twice), `ict_trade`, `ict_status`, `ctrader_results` (labels
+only: `scrub` drops every id / login / account key and 7+ digit numbers), `ict_file_list` / `ict_file_read` (allowlist
+`okPath`: ict/*.mjs, .claude/skills/ICT/*.md, tests/ict-*.test.mjs, tests/fixtures/ict/*, research/ict/*,
+research/edge/ict-*/*), `ict_note` (append to council-data `ict/mcp-notes.json`, shown in `ict_status`), `ict_propose_change`
+(branch `mcp/<name>/…` + DRAFT PR to main; the owner merges; nothing reaches the tracker before that), and `search` /
+`fetch` for ChatGPT deep research. Never: council files, api/, workflows, users, tokens, cTrader orders. Tests
+`tests/mcp.test.mjs`. Rule: a helper's PR is reviewed like any rule change (tests, 2020-now evidence) before merging.
