@@ -828,6 +828,14 @@
   .u-t select { min-height: 34px; max-width: 100%; padding: 4px 8px; border-radius: 8px; border: 1px solid var(--line); background: var(--panel-raised); color: var(--ink); font: 500 12.5px var(--sans); }
   .u-acts { white-space: nowrap; } .u-acts button, .u-btn { min-height: 34px; padding: 6px 12px; margin-left: 6px; border-radius: 8px; border: 1px solid var(--line); background: none; color: var(--ink); font: 500 12.5px var(--sans); cursor: pointer; }
   .u-acts button:hover { border-color: var(--line-strong); background: var(--panel-hover); }
+  .u-perm-row { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; margin-top: 6px; } .u-chips { display: flex; flex-wrap: wrap; gap: 4px; }
+  .u-chip { font-size: 11px; padding: 2px 8px; border-radius: 999px; border: 1px solid var(--line); color: var(--ink-dim); background: var(--neutral-soft); } .u-chip-off { color: var(--ink-faint); }
+  .u-perm-btn { min-height: 28px; padding: 3px 10px; border-radius: 8px; border: 1px solid var(--line); background: none; color: var(--ink-dim); font: 500 12px var(--sans); cursor: pointer; } .u-perm-btn:hover { border-color: var(--line-strong); color: var(--ink); }
+  .perm-dlg { max-width: 560px; } .perm-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px 14px; margin: 12px 0; } .perm-l { display: flex; gap: 8px; align-items: flex-start; font-size: 13px; line-height: 1.35; } .perm-l input { margin-top: 2px; }
+  .perm-ict { border: 1px solid var(--line); border-radius: 10px; padding: 8px 12px 10px; margin: 0 0 12px; display: grid; gap: 6px; font-size: 13px; } .perm-ict legend { font-weight: 600; font-size: 12.5px; padding: 0 4px; } .perm-ict label { display: flex; gap: 8px; align-items: center; }
+  .perm-dlg input[type="checkbox"], .perm-dlg input[type="radio"] { appearance: auto; -webkit-appearance: auto; width: 18px; height: 18px; min-height: 0; min-width: 0; margin: 1px 0 0; padding: 0; flex: none; accent-color: var(--accent); border: 0; background: none; box-shadow: none; }
+  .perm-l { align-items: flex-start; } .perm-ict label { align-items: center; }
+  @media (max-width: 600px) { .perm-grid { grid-template-columns: 1fr; } }
   .u-acts .u-del { color: var(--sell); }
   .u-off td { opacity: .55; }
   .u-form { display: grid; grid-template-columns: max-content minmax(0, 420px); gap: 10px 14px; align-items: center; }
@@ -1266,7 +1274,7 @@
 // shadow trades, scorecards, reviews) opens with the admin password. The password is never stored: only its SHA-256 is compared.
 // Accounts (6 Nov): the owner (admin, everything) and reviewers (user name + password): reviewers see the whole admin view
 // read-only and can write loss reviews only. Reviewer tokens are the SHA-256 of their password, matched with the user name.
-window.MS_USERS = { fred: { name: 'Fred', hash: '370aed697dc503aecee7d8faad5de775f4f7019c86e672e8d93f3df590527058', role: 'reviewer', ict: true, ct: true },   // ict: the ICT desk (main reviewer and trader, owner 6 Nov); ct: sees the demo accounts' results (8 Nov), labels only
+window.MS_USERS = { fred: { name: 'Fred', hash: '370aed697dc503aecee7d8faad5de775f4f7019c86e672e8d93f3df590527058', role: 'reviewer', ict: true, ct: true, mcp: true },   // mcp: ChatGPT connector on his profile (8 Nov); ict: the ICT desk (main reviewer and trader, owner 6 Nov); ct: sees the demo accounts' results (8 Nov), labels only
  
   orlando: { name: 'Orlando', hash: '037617a451df6fb39614002d57502a5f7bc240221b1715ed48280534cc478a06', role: 'reviewer', ict: 'read', ct: true },   // sees everything incl. the profile accounts (owner 8 Nov); ICT desk read-only (6 Nov)
   luxus: { name: 'Luxus', hash: 'dccc5d01dabcd1c0b9fa89c91e7f4bde603121ee0172b4ff394e6bb30d295e41', role: 'viewer' },
@@ -1274,6 +1282,19 @@ window.MS_USERS = { fred: { name: 'Fred', hash: '370aed697dc503aecee7d8faad5de77
 // users added or changed on the Users page live in council-data users.json ({ users: { key: { name, hash, role, disabled? } } }); they override the built-ins
 window.MS_CDATA = (/^https?:$/.test(location.protocol) && !/github\.io$/.test(location.hostname) ? location.origin + '/cdata/' : 'https://raw.githubusercontent.com/vazxanana/macro-dashboard/council-data/');   // Vercel serves council data from /cdata (private repo); GitHub Pages and local files read GitHub directly
 window.MS_USERS_URL = window.MS_CDATA + 'users.json';
+// permission keys: what a member can see or do. Role defaults below; `perms` on a user record overrides key by key.
+//   charts, scanner, journal, desks (Gold / Crypto / LIT / NQ SDV), council (every council tab; off = overview only), macro (the
+//   Macro desk switch), ct (demo accounts' results, labels only), mcp (ChatGPT connector on the profile), ict: false | 'read' | 'write'
+window.MS_PERM_KEYS = ['charts', 'scanner', 'journal', 'desks', 'council', 'macro', 'ct', 'mcp', 'ict'];
+window.MS_PERM_DEFAULTS = { viewer: { charts: false, scanner: false, journal: false, desks: false, council: false, macro: true, ct: false, mcp: false, ict: false },
+  reviewer: { charts: true, scanner: true, journal: true, desks: true, council: true, macro: true, ct: false, mcp: false, ict: false } };
+window.msPerms = function (R, owner) {
+  var E = {}, k, d = window.MS_PERM_DEFAULTS[R && R.role] || window.MS_PERM_DEFAULTS.viewer;
+  for (k in d) E[k] = owner ? (k === 'ict' ? 'write' : true) : d[k];
+  if (!owner && R) { if (R.ict) E.ict = R.ict === 'read' ? 'read' : 'write'; if (R.ct) E.ct = true; if (R.mcp) E.mcp = true;
+    var P = R.perms || {}; for (k in P) if (window.MS_PERM_KEYS.indexOf(k) >= 0) E[k] = k === 'ict' ? (P[k] === 'read' || P[k] === 'write' ? P[k] : P[k] === true ? 'write' : false) : !!P[k]; }
+  return E;
+};
 window.msMergeUsers = function (remote) { var m = {}, k; for (k in window.MS_USERS) m[k] = window.MS_USERS[k]; var r = (remote && remote.users) || {}; for (k in r) m[k] = r[k]; for (k in m) if (m[k] && m[k].disabled) delete m[k]; return m; };
 // on the Vercel site the list lives in a private Blob store behind /api/users (7 Nov); elsewhere (GitHub Pages, a local copy) in council-data users.json
 window.MS_USERS_API = /^https?:$/.test(location.protocol) && !/github\.io$/.test(location.hostname) ? location.origin + '/api/users' : null;
@@ -1288,9 +1309,15 @@ window.msFetchUsers = function () {
   document.documentElement.dataset.mode = owner || R ? 'admin' : 'public';
   document.documentElement.dataset.role = owner ? 'owner' : R ? R.role : 'public';
   window.MS_WHO = owner ? 'owner' : R ? R.name : null;
-  if (owner || (R && R.ict)) document.documentElement.dataset.ict = '1';   // ICT desk access (a separate edge, owner 6 Nov)
-  if (!owner && R && R.ict === 'read') document.documentElement.dataset.ictRo = '1';   // read-only desk (Orlando)
-  if (owner || (R && R.ct)) document.documentElement.dataset.ct = owner ? 'owner' : '1';   // the demo accounts' results on the profile; non-owners see edge labels, never account numbers (8 Nov)
+  // Per-member permissions (owner, 8 Nov: "select on members what they can and can't do or see"): role defaults, then the
+  // member's own `perms` from the user list. The page gates on html[data-deny~="key"]; existing ict / ct flags follow.
+  var E = window.msPerms(R, owner); window.MS_PERMS = E;
+  document.documentElement.dataset.deny = window.MS_PERM_KEYS.filter(function (k) { return !E[k]; }).join(' ');
+  document.documentElement.dataset.allow = window.MS_PERM_KEYS.filter(function (k) { return E[k]; }).join(' ');
+  if (E.ict) document.documentElement.dataset.ict = '1';   // ICT desk access (a separate edge, owner 6 Nov)
+  if (!owner && E.ict === 'read') document.documentElement.dataset.ictRo = '1';   // read-only desk (Orlando)
+  if (E.ct) document.documentElement.dataset.ct = owner ? 'owner' : '1';   // the demo accounts' results on the profile; non-owners see edge labels, never account numbers (8 Nov)
+  if (E.mcp) document.documentElement.dataset.mcp = '1';
   var guest = null; try { guest = localStorage.getItem('ms-guest'); } catch (e) {}
   if (!owner && !R && !guest) document.documentElement.dataset.gate = '1'; if (guest && !owner && !R) document.documentElement.dataset.guest = '1'; })();
 // signing out forgets the cTrader view-only session (and account choice) kept in this browser, so the next person on a shared
@@ -1315,7 +1342,8 @@ document.addEventListener('DOMContentLoaded', function () {
     var all = window.msMergeUsers(remote), R = all[u];
     if (!R || R.hash !== h) { try { localStorage.removeItem('ms-admin'); localStorage.removeItem('ms-user'); localStorage.removeItem('ms-user-rec'); } catch (e) {} window.msForgetCt(); location.reload(); return; }
     var rec = null; try { rec = JSON.parse(localStorage.getItem('ms-user-rec') || 'null'); } catch (e) {}
-    if (!rec || rec.role !== R.role || rec.name !== R.name || (rec.ict || false) !== (R.ict || false) || (rec.ct || false) !== (R.ct || false)) { try { localStorage.setItem('ms-user-rec', JSON.stringify({ key: u, name: R.name, role: R.role, hash: h, ict: R.ict || false, ct: R.ct || false })); } catch (e) {} if (!rec || rec.role !== R.role || (rec.ict || false) !== (R.ict || false) || (rec.ct || false) !== (R.ct || false)) location.reload(); }
+    var sig = function (x) { return JSON.stringify([x.role, x.name, x.ict || false, x.ct || false, x.mcp || false, x.perms || null]); };
+    if (!rec || sig(rec) !== sig(R)) { try { localStorage.setItem('ms-user-rec', JSON.stringify({ key: u, name: R.name, role: R.role, hash: h, ict: R.ict || false, ct: R.ct || false, mcp: R.mcp || false, perms: R.perms || null })); } catch (e) {} if (!rec || sig(rec) !== sig(Rlse) !== (R.ct || false)) location.reload(); }
   });
 });
 // Sign-in card (6 Nov): first screen for anyone not signed in; "Continue as guest" opens the public view and is remembered
@@ -1336,7 +1364,7 @@ document.addEventListener('DOMContentLoaded', function () {
     var un = Object.keys(all).find(function (k) { return all[k].hash === h; }), R = un && all[un];   // password only (6 Nov): each password belongs to one account
     if (h === window.MS_ADMIN_HASH || (R && h === R.hash)) window.msTrack && msTrack('Sign in', { result: 'ok' });
     if (h === window.MS_ADMIN_HASH) { try { sessionStorage.setItem('ms-own-pw', pw); } catch (e) {} try { localStorage.setItem('ms-admin', h); localStorage.removeItem('ms-user'); localStorage.removeItem('ms-guest'); } catch (e) {} location.reload(); return; }
-    if (R && h === R.hash) { try { localStorage.setItem('ms-admin', h); localStorage.setItem('ms-user', un); localStorage.setItem('ms-user-rec', JSON.stringify({ key: un, name: R.name, role: R.role, hash: h, ict: R.ict || false })); localStorage.removeItem('ms-guest'); } catch (e) {} location.reload(); return; }
+    if (R && h === R.hash) { try { localStorage.setItem('ms-admin', h); localStorage.setItem('ms-user', un); localStorage.setItem('ms-user-rec', JSON.stringify({ key: un, name: R.name, role: R.role, hash: h, ict: R.ict || false, ct: R.ct || false, mcp: R.mcp || false, perms: R.perms || null })); localStorage.removeItem('ms-guest'); } catch (e) {} location.reload(); return; }
     window.msTrack && msTrack('Sign in', { result: 'wrong' }); btn.disabled = false; btn.textContent = 'Sign in'; err.textContent = 'Wrong password.'; document.getElementById('ms-gate-p').select(); });
   if (gb) gb.addEventListener('click', function () { window.msTrack && msTrack('Guest'); var was = document.documentElement.dataset.mode === 'public' && localStorage.getItem('ms-guest'); try { localStorage.setItem('ms-guest', '1'); } catch (e) {} if (was) msGate(false); else location.reload(); });
   if (x) x.addEventListener('click', function () { msGate(false); });
@@ -1428,10 +1456,11 @@ window.MS_ADMIN_HASH = '49c5624f2625ed8b42b6e1bf2819a3a41ddb9743aeca36ea34ea7eb9
   @media (prefers-reduced-motion: reduce) { .gate input, .gate-go, .gate-guest { transition: none; } }
 </style>
 <style>html[data-role="viewer"] .own, html[data-role="viewer"] .adm-x,
-  html[data-role="viewer"] [data-go="charts"], html[data-role="viewer"] [data-go="scanner"], html[data-role="viewer"] [data-go="journal"],
+  html[data-deny~="charts"] [data-go="charts"], html[data-deny~="scanner"] [data-go="scanner"], html[data-deny~="journal"] [data-go="journal"],
   html[data-role="viewer"] .h-side, html[data-role="viewer"] .h-quick a:not([href="#council/overview"]),
-  html[data-role="viewer"] #ms-cn-trades, html[data-role="viewer"] #ms-cn-systems, html[data-role="viewer"] #ms-cn-review, html[data-role="viewer"] #ms-cn-research,
-  html[data-role="viewer"] #ms-cp-trades, html[data-role="viewer"] #ms-cp-systems, html[data-role="viewer"] #ms-cp-review, html[data-role="viewer"] #ms-cp-research,
+  html[data-deny~="council"] #ms-cn-trades, html[data-deny~="council"] #ms-cn-systems, html[data-deny~="council"] #ms-cn-review, html[data-deny~="council"] #ms-cn-research,
+  html[data-deny~="council"] #ms-cp-trades, html[data-deny~="council"] #ms-cp-systems, html[data-deny~="council"] #ms-cp-review, html[data-deny~="council"] #ms-cp-research,
+  html[data-deny~="macro"] .hdr-sw, html[data-deny~="macro"] .hdr-macro,
   html[data-role="viewer"] #ms-alerts, html[data-role="viewer"] .top details.menu, html[data-role="viewer"] #ms-tv-rv, html[data-role="viewer"] #ms-c-here-card,
   html[data-role="viewer"] .tv-ba [data-ba="save"] { display: none !important; }
   html[data-role="viewer"] .h-grid { grid-template-columns: minmax(0, 1fr); }
@@ -1824,7 +1853,7 @@ html.scrolled .top { box-shadow: 0 6px 20px -10px rgba(0,0,0,.55); }
 .j-empty-go::after { content: "→"; transition: transform .15s; }
 @media (hover: hover) { .j-empty-go:hover { border-color: color-mix(in srgb, var(--accent) 45%, transparent); background: var(--accent-soft, rgba(91,140,255,.1)); } .j-empty-go:hover::after { transform: translateX(3px); } }
 :root[data-theme="pro"] .j-empty-go { border-radius: 4px; }
-html[data-role="viewer"] .j-empty-go { display: none; }
+html[data-deny~="journal"] .j-empty-go { display: none; }
 
 /* show/hide toggle for password fields */
 .pw-wrap { position: relative; display: block; min-width: 0; flex: 1; }
@@ -2082,9 +2111,9 @@ html[data-motion="off"] .is-loading, html[data-motion="off"] .srow-skel i { anim
 @media (max-width: 700px) { .a-tap { display: none; } .c-act > li:not(.empty) { padding-left: 4px !important; padding-right: 4px !important; } }
 
 /* ═══ CRYPTO DESK (#crypto) ═══ */
-html[data-role="viewer"] [data-go="crypto"], html[data-role="viewer"] [data-go="gold"] { display: none !important; }
+html[data-deny~="desks"] [data-go="crypto"], html[data-deny~="desks"] [data-go="gold"], html[data-deny~="desks"] .desk-sw a:not(.ictx) { display: none !important; }
 /* the Desks entry shows when at least one desk is open to this account */
-html:not([data-mode="admin"]):not([data-ict]) .dsk, html[data-role="viewer"]:not([data-ict]) .dsk { display: none !important; }
+html:not([data-mode="admin"]):not([data-ict]) .dsk, html[data-deny~="desks"]:not([data-ict]) .dsk { display: none !important; }
 .desk-sw { display: inline-flex; width: max-content; max-width: 100%; gap: 2px; padding: 3px; margin: 0 0 14px; border-radius: 999px; border: 1px solid var(--line); background: var(--panel); }
 .desk-sw a { display: inline-flex; align-items: center; min-height: 32px; padding: 0 16px; border-radius: 999px; text-decoration: none; color: var(--ink-dim); font: 600 13px var(--sans); }
 .desk-sw a:hover { color: var(--ink); } .desk-sw a[aria-current="page"] { background: color-mix(in srgb, var(--accent) 14%, var(--panel)); color: var(--ink); box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--accent) 45%, transparent); }
@@ -7507,6 +7536,25 @@ function msNextSetup(bars, A) {
   }
   window.renderUsers = (...a) => renderUsers(...a);
   const uKey = (n) => n.trim().toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 24);
+  // per-member permissions (owner, 8 Nov): what each member can see and do, saved on the user record as `perms`
+  const PERM_LABEL = { charts: 'Charts (every market)', scanner: 'Scanner', journal: 'Journal', desks: 'Desks: Gold, Crypto, LIT, NQ SDV', council: 'Council: every tab (off = overview only)', macro: 'Macro desk', ct: 'Demo accounts\' results (labels only)', mcp: 'ChatGPT connector on the profile' };
+  const permChips = (u) => { const E = window.msPerms(u, false); const on = Object.keys(PERM_LABEL).filter((k) => E[k]).map((k) => PERM_LABEL[k].split(' ')[0].replace(/[:']/g, ''));
+    if (E.ict) on.push(E.ict === 'read' ? 'ICT read' : 'ICT desk'); return on.length ? on.map((t) => `<span class="u-chip">${esc(t)}</span>`).join('') : '<span class="u-chip u-chip-off">setups and calendar only</span>'; };
+  function permDialog(k, cur) {
+    let d = document.getElementById('ms-perm-dlg');
+    if (!d) { d = document.createElement('dialog'); d.id = 'ms-perm-dlg'; d.className = 'own-dlg perm-dlg'; document.body.appendChild(d); }
+    const E = window.msPerms(cur, false);
+    d.innerHTML = `<form method="dialog"><h3>What ${esc(cur.name || k)} can see and do</h3><p class="ms-note">Starts from the ${esc(cur.role)} defaults. Changes apply on their next page load.</p>
+      <div class="perm-grid">${Object.keys(PERM_LABEL).map((p) => `<label class="perm-l"><input type="checkbox" name="${p}"${E[p] ? ' checked' : ''}> ${esc(PERM_LABEL[p])}</label>`).join('')}</div>
+      <fieldset class="perm-ict"><legend>ICT desk</legend><label><input type="radio" name="ict" value=""${!E.ict ? ' checked' : ''}> No access</label><label><input type="radio" name="ict" value="read"${E.ict === 'read' ? ' checked' : ''}> Read only</label><label><input type="radio" name="ict" value="write"${E.ict === 'write' ? ' checked' : ''}> Review and trade (marks, grades, notes)</label></fieldset>
+      <div class="own-acts"><button type="button" value="reset" id="ms-perm-reset">Back to role defaults</button><button type="button" value="cancel" id="ms-perm-cancel">Cancel</button><button type="submit" value="ok" class="pri">Save</button></div></form>`;
+    const f = d.querySelector('form');
+    f.onsubmit = (ev) => { ev.preventDefault(); const perms = {}; Object.keys(PERM_LABEL).forEach((p) => { perms[p] = f.elements[p].checked; }); const ict = f.elements.ict.value; perms.ict = ict || false;
+      d.close(); saveUsers((dd) => { const base = dd.users[k] || window.MS_USERS[k] || cur; dd.users[k] = { ...base, name: cur.name, role: cur.role, hash: cur.hash, perms, ict: perms.ict, ct: perms.ct, mcp: perms.mcp }; delete dd.users[k].disabled; }, `permissions for ${cur.name}`); };
+    d.querySelector('#ms-perm-reset').onclick = () => { d.close(); saveUsers((dd) => { const base = dd.users[k] || window.MS_USERS[k] || cur; dd.users[k] = { ...base, name: cur.name, role: cur.role, hash: cur.hash }; delete dd.users[k].perms; delete dd.users[k].ict; delete dd.users[k].ct; delete dd.users[k].mcp; if (window.MS_USERS[k]) { const b = window.MS_USERS[k]; if (b.ict) dd.users[k].ict = b.ict; if (b.ct) dd.users[k].ct = b.ct; if (b.mcp) dd.users[k].mcp = b.mcp; } }, `${cur.name} back to ${cur.role} defaults`); };
+    d.querySelector('#ms-perm-cancel').onclick = () => d.close();
+    d.showModal();
+  }
   async function hashTaken(h, exceptKey) {
     if (h === window.MS_ADMIN_HASH) return true;
     const all = window.msMergeUsers(US.remote); return Object.keys(all).some((k) => k !== exceptKey && all[k].hash === h);
@@ -7518,7 +7566,7 @@ function msNextSetup(bars, A) {
     const rem = (US.remote && US.remote.users) || {}, keys = [...new Set(Object.keys(window.MS_USERS).concat(Object.keys(rem)))];
     body.innerHTML = keys.map((k) => {
       const u = rem[k] || window.MS_USERS[k], off = !!(rem[k] && rem[k].disabled), src = window.MS_USERS[k] ? (rem[k] ? 'built-in, changed here' : 'built-in') : 'added here';
-      return `<tr class="${off ? 'u-off' : ''}" data-u="${esc(k)}"><td><span class="u-who"><span class="u-av" aria-hidden="true">${esc(String(u.name || k).trim().charAt(0).toUpperCase())}</span><b>${esc(u.name || k)}</b></span>${off ? ' <small>removed</small>' : ''}</td><td>${off ? '—' : `<select data-act="role" aria-label="Access for ${esc(u.name || k)}">${Object.entries(ROLE_NAME).map(([r, l]) => `<option value="${r}"${u.role === r ? ' selected' : ''}>${l}</option>`).join('')}</select>`}</td><td><small>${esc(src)}</small></td>`
+      return `<tr class="${off ? 'u-off' : ''}" data-u="${esc(k)}"><td><span class="u-who"><span class="u-av" aria-hidden="true">${esc(String(u.name || k).trim().charAt(0).toUpperCase())}</span><b>${esc(u.name || k)}</b></span>${off ? ' <small>removed</small>' : ''}</td><td>${off ? '—' : `<select data-act="role" aria-label="Access for ${esc(u.name || k)}">${Object.entries(ROLE_NAME).map(([r, l]) => `<option value="${r}"${u.role === r ? ' selected' : ''}>${l}</option>`).join('')}</select><div class="u-perm-row"><span class="u-chips">${permChips(u)}</span><button type="button" data-act="perms" class="u-perm-btn">Permissions…</button></div>`}</td><td><small>${esc(src)}</small></td>`
         + `<td class="n u-acts">${off ? '<button type="button" data-act="restore">Restore</button>' : '<button type="button" data-act="pw">New password</button><button type="button" data-act="del" class="u-del">Remove</button>'}</td></tr>`;
     }).join('') || '<tr><td colspan="4" class="empty">No users yet.</td></tr>';
   }
@@ -7527,6 +7575,7 @@ function msNextSetup(bars, A) {
     if (tb) {
       tb.addEventListener('click', async (ev) => {
         const b = ev.target.closest('button[data-act]'); if (!b) return; const k = b.closest('tr').dataset.u, cur = window.msMergeUsers(US.remote)[k] || (US.remote && US.remote.users[k]) || window.MS_USERS[k];
+        if (b.dataset.act === 'perms') { permDialog(k, cur); return; }
         if (b.dataset.act === 'pw') {
           const pw = prompt(`New password for ${cur.name}`); if (!pw) return; const h = await msSha256(pw.trim());
           if (await hashTaken(h, k)) { alert('That password is already used by another account. Pick another one.'); return; }
@@ -7706,8 +7755,11 @@ function msNextSetup(bars, A) {
       const j = ev.key === 'Home' ? 0 : ev.key === 'End' ? bs.length - 1 : (i + (ev.key === 'ArrowRight' ? 1 : -1) + bs.length) % bs.length;
       ev.preventDefault(); bs[j].focus(); bs[j].click();
     }); }
+  // which permission key a view needs (owner 8 Nov: per-member permissions); the owner is never denied
+  const VIEW_PERM = { charts: 'charts', scanner: 'scanner', journal: 'journal', crypto: 'desks', gold: 'desks', lit: 'desks', sdv: 'desks', ict: 'ict' };
+  function msDenied(view) { const k = VIEW_PERM[view]; if (!k || document.documentElement.dataset.role === 'owner') return false; const E = window.MS_PERMS || {}; return !E[k]; }
   function showView() {
-    const [h0, sub] = location.hash.slice(1).split('/'), h = PUB ? 'charts' : h0 === 'guest' ? 'home' : VIEWER && !['home', 'setup', 'council', 'profile'].concat(document.documentElement.dataset.ict ? ['ict'] : []).includes(h0) ? 'home' : h0 === 'users' && document.documentElement.dataset.role !== 'owner' ? 'home' : h0 === 'ict' && !document.documentElement.dataset.ict ? 'home' : !h0 && document.documentElement.dataset.ict && document.documentElement.dataset.role === 'reviewer' ? 'ict' : h0, v = VIEWS.includes(h) ? h : 'home';
+    const [h0, sub] = location.hash.slice(1).split('/'), h = PUB ? 'charts' : h0 === 'guest' ? 'home' : msDenied(h0) ? 'home' : h0 === 'users' && document.documentElement.dataset.role !== 'owner' ? 'home' : h0 === 'ict' && !document.documentElement.dataset.ict ? 'home' : !h0 && document.documentElement.dataset.ict && document.documentElement.dataset.role === 'reviewer' ? 'ict' : h0, v = VIEWS.includes(h) ? h : 'home';
     if (v === 'ict' && window.renderIct) setTimeout(window.renderIct, 0);
     if (v === 'profile' && window.msProfile) setTimeout(window.msProfile, 0);
     if (v === 'lit' && window.renderLit) setTimeout(window.renderLit, 0);
@@ -10331,7 +10383,7 @@ html[data-role="public"] .hdr-sw { display: none; }
   const MCP_API = API ? location.origin + '/api/mcp' : null;
   function mcpCard() {
     const c = $('ms-pf-mcp'); if (!c) return;
-    const me = ls('ms-user'); if (me !== 'fred' || !MCP_API) { c.hidden = true; return; }
+    const me = ls('ms-user'); if (!me || !document.documentElement.dataset.mcp || !MCP_API) { c.hidden = true; return; }
     c.hidden = false; const b = $('ms-pf-mcp-b'); if (b.dataset.ready) return; b.dataset.ready = '1';
     const steps = `<ol><li>In ChatGPT: Settings → Connectors → Advanced → Developer mode on → Create.</li><li>Paste the URL above as the MCP server URL; Authentication: <b>None</b>.</li><li>Enable it in a chat and ask, for example, "show me the A-setup losses on NQ this month" or "read ict/tracker.mjs and propose a change".</li></ol><p class="ms-note" style="margin:10px 0 0">The URL is your key: keep it to yourself. Changes you propose become a draft pull request for the owner; nothing changes live until the owner merges. Paper trading only.</p>`;
     b.innerHTML = `<label>Your Aurum Desk password (to show your connector URL)<input type="password" id="ms-mcp-pw" autocomplete="current-password"></label><div style="margin-top:10px"><button type="button" class="ct-btn" id="ms-mcp-go">Show my connector URL</button></div><div class="ct-msg" id="ms-mcp-msg" role="status"></div>`;

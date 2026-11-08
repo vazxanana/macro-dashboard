@@ -32,24 +32,38 @@ const iso = (t) => (t ? new Date(t * 1000).toISOString().slice(0, 16).replace('T
 const scrubErr = (e) => String(e && e.message || e).replace(/gh[pousr]_[A-Za-z0-9_]+|github_pat_[A-Za-z0-9_]+/g, '***');
 
 // ---- who is calling ----
-// Keys come from two places: MCP_KEYS "name:key,name:key" (optional, for anyone), and for the profile users a key DERIVED from a
-// secret already on the server (owner, 8 Nov: "for Fred the key should be there already without him adding"): HMAC of the name
-// with CTRADER_LINK_KEY (else CRON_SECRET), so Fred's URL exists from the first deploy. Compared in constant time.
+// Keys come from two places: MCP_KEYS "name:key,name:key" (optional, for anyone), and a key DERIVED from a secret already on the
+// server (owner, 8 Nov: "for Fred the key should be there already without him adding"): "<name>.<HMAC(secret, name)>", so a
+// member's URL exists from the first deploy. A derived key also needs the owner's grant on the member's record (Users page:
+// mcp flag or perms.mcp; Fred has it built in), checked on every call and cached a minute. Compared in constant time.
 const same = (a, b) => typeof a === 'string' && typeof b === 'string' && a.length === b.length && crypto.timingSafeEqual(Buffer.from(a), Buffer.from(b));
-function derivedKey(name, env = process.env) { const sec = env.CTRADER_LINK_KEY || env.CRON_SECRET; return sec && PROFILE_USERS.includes(name) ? crypto.createHmac('sha256', sec).update(`mcp:${name}`).digest('base64url').slice(0, 32) : null; }
+const NAME_RE = /^[a-z0-9-]{1,24}$/;
+function derivedKey(name, env = process.env) { const sec = env.CTRADER_LINK_KEY || env.CRON_SECRET; return sec && NAME_RE.test(name) && name !== 'owner' ? `${name}.${crypto.createHmac('sha256', sec).update(`mcp:${name}`).digest('base64url').slice(0, 32)}` : null; }
 function keyFor(name, env = process.env) {
   const ent = String(env.MCP_KEYS || '').split(',').map((x) => x.trim()).find((x) => x.toLowerCase().startsWith(name + ':'));
   const k = ent ? ent.slice(name.length + 1) : null; return k && k.length >= 16 ? k : derivedKey(name, env);
 }
-function whoIs(key) {
+// the name an MCP_KEYS entry or a derived key stands for, or null
+function whoIs(key, env = process.env) {
   if (!key || typeof key !== 'string' || key.length > 200) return null;
-  for (const ent of String(process.env.MCP_KEYS || '').split(',')) {
+  for (const ent of String(env.MCP_KEYS || '').split(',')) {
     const i = ent.indexOf(':'); if (i < 1) continue;
     const name = ent.slice(0, i).trim().toLowerCase(), k = ent.slice(i + 1).trim();
-    if (k.length >= 16 && same(k, key) && /^[a-z0-9-]{1,24}$/.test(name)) return name;
+    if (k.length >= 16 && same(k, key) && NAME_RE.test(name)) return name;
   }
-  for (const name of PROFILE_USERS) { const k = derivedKey(name); if (k && same(k, key)) return name; }
+  const dot = key.indexOf('.'); if (dot > 0) { const name = key.slice(0, dot), k = derivedKey(name, env); if (k && same(k, key)) return name; }
   return null;
+}
+// is the member granted the connector? the record's mcp flag or perms.mcp (an explicit perms.mcp === false revokes a built-in)
+const GRANT = { at: 0, users: null };
+async function granted(name, host, env = process.env) {
+  if (String(env.MCP_KEYS || '').split(',').some((e) => e.trim().toLowerCase().startsWith(name + ':'))) return true;   // an explicit key is the owner's grant
+  let users = GRANT.users;
+  if (!users || Date.now() - GRANT.at > 60e3) { try { const ct = require('./ctrader-link.js')._t; const r = await ct.blobUsers(env, host); users = (r && r.users) || {}; GRANT.users = users; GRANT.at = Date.now(); } catch (e) { users = GRANT.users || {}; } }
+  const u = users[name]; if (u && u.disabled) return false;
+  if (u && (u.mcp || (u.perms && u.perms.mcp))) return true;
+  if (u && u.perms && u.perms.mcp === false) return false;
+  return PROFILE_USERS.includes(name);
 }
 
 // ---- GitHub ----
@@ -208,16 +222,19 @@ module.exports = async (req, res) => {
   if (req.method === 'POST' && !(req.query && req.query.key) && req.body && (typeof req.body === 'object' ? req.body.action : /"action"\s*:\s*"mykey"/.test(req.body)) ) {
     let b; try { b = typeof req.body === 'string' ? JSON.parse(req.body) : req.body; } catch (e) { return res.status(400).json({ error: 'bad JSON' }); }
     if (b.action !== 'mykey') return res.status(400).json({ error: 'unknown action' });
-    const want = String(b.user || '').toLowerCase(); if (!PROFILE_USERS.includes(want)) return res.status(403).json({ error: 'Not available for this account' });
+    const want = String(b.user || '').toLowerCase(); if (!/^[a-z0-9-]{1,24}$/.test(want) || want === 'owner') return res.status(403).json({ error: 'Not available for this account' });
     try {
-      const ct = require('./ctrader-link.js')._t, who = await ct.identify({ blobUsers: () => ct.blobUsers(process.env, req.headers.host) }, want, b.pw);
+      const ct = require('./ctrader-link.js')._t, blobUsers = () => ct.blobUsers(process.env, req.headers.host), who = await ct.identify({ blobUsers }, want, b.pw);
       if (!who || who.u !== want) return res.status(403).json({ error: 'Password not accepted' });
+      // the owner grants the connector per member (Users page, 8 Nov): the record's mcp flag or perms.mcp; Fred has it built in
+      if (!(await granted(want, req.headers.host))) return res.status(403).json({ error: 'The owner has not switched the connector on for you' });
       const k = keyFor(want); if (!k) return res.status(503).json({ error: 'The server has no key secret yet; ask the owner' });
       console.log(`[mcp] key shown to ${want}`);
       return res.status(200).json({ user: want, url: `https://${req.headers.host}/api/mcp/${k}` });
     } catch (e) { return res.status(e.status || 500).json({ error: scrubErr(e) }); }
   }
   const who = whoIs((req.query && req.query.key) || (String(req.headers.authorization || '').match(/^Bearer (.+)$/) || [])[1]);
+  if (who && !(await granted(who, req.headers.host))) { console.log(`[mcp] ${who} not granted`); return res.status(403).json({ error: 'The owner has not switched the connector on for this account' }); }
   if (!who) { console.log('[mcp] refused'); return res.status(401).json({ error: 'unauthorised' }); }
   if (req.method === 'GET') return res.status(405).json({ error: 'this server has no event stream; POST JSON-RPC here' });   // allowed by the spec
   if (req.method === 'DELETE') return res.status(200).end();
@@ -229,4 +246,4 @@ module.exports = async (req, res) => {
   res.setHeader('Content-Type', 'application/json'); res.setHeader('Mcp-Protocol-Version', '2025-06-18');
   return res.status(200).json(Array.isArray(body) ? out : out[0]);
 };
-module.exports.lib = { PROFILE_USERS, derivedKey, keyFor, whoIs, okPath, scrub, stats, brief, outcome, filterTrades, sections, rpc, TOOLS, call };
+module.exports.lib = { PROFILE_USERS, derivedKey, keyFor, whoIs, granted, GRANT, okPath, scrub, stats, brief, outcome, filterTrades, sections, rpc, TOOLS, call };

@@ -28,13 +28,19 @@ async function load(req) {
   try { const r = await fetch(`https://${req.headers.host}/cdata/users.json`, { signal: AbortSignal.timeout(8000) }); if (r.ok) { const j = await r.json(); if (j && j.users) return j; } } catch (e) {}
   return { users: {} };
 }
+const PERM_KEYS = ['charts', 'scanner', 'journal', 'desks', 'council', 'macro', 'ct', 'mcp', 'ict'];
+const cleanPerms = (p) => { if (p == null) return null; if (typeof p !== 'object' || Array.isArray(p)) return null; const out = {};
+  for (const [k, v] of Object.entries(p)) { if (!PERM_KEYS.includes(k)) return null; if (k === 'ict') { if (![false, true, 'read', 'write'].includes(v)) return null; out.ict = v === true ? 'write' : v; } else { if (typeof v !== 'boolean') return null; out[k] = v; } }
+  return out; };
 const clean = (users) => {
   if (!users || typeof users !== 'object' || Array.isArray(users)) return null;
   const out = {};
   for (const [k, u] of Object.entries(users)) {
     if (!/^[a-z0-9-]{1,24}$/.test(k) || k === 'owner' || !u || typeof u !== 'object') return null;   // "owner" is reserved (the owner's cTrader link)
     if (!/^[0-9a-f]{64}$/.test(String(u.hash || '')) || !['viewer', 'reviewer'].includes(u.role)) return null;
-    out[k] = { name: String(u.name || k).slice(0, 24), role: u.role, hash: u.hash, ...(u.ict ? { ict: true } : {}), ...(u.disabled ? { disabled: true } : {}) };
+    // flags and per-member permissions (owner, 8 Nov): ict false | 'read' | 'write' (true = write), ct, mcp, and perms { key: bool | ict value }
+    const ict = u.ict === 'read' ? 'read' : u.ict ? true : null, perms = cleanPerms(u.perms); if (u.perms && !perms) return null;
+    out[k] = { name: String(u.name || k).slice(0, 24), role: u.role, hash: u.hash, ...(ict ? { ict } : {}), ...(u.ct ? { ct: true } : {}), ...(u.mcp ? { mcp: true } : {}), ...(perms ? { perms } : {}), ...(u.disabled ? { disabled: true } : {}) };
   }
   if (Object.keys(out).length > 200) return null;
   return out;
@@ -59,3 +65,5 @@ module.exports = async (req, res) => {
   } catch (e) { console.error(`[users] ${e.message}`); return res.status(500).json({ error: String(e.message || e) }); }
 };
 module.exports._t = { clean, isOwner };
+
+module.exports.clean = clean; module.exports.cleanPerms = cleanPerms;
