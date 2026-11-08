@@ -195,7 +195,7 @@
     "lots": 0.13,
     "digits": 2,
     "setup": "scalp",
-    "status": "open",
+    "status": "closed at broker",
     "openedAt": "2026-11-08T09:39:48.000Z",
     "councilEntry": 2236.01,
     "stop": 2219.5627980000004,
@@ -209,8 +209,10 @@
     "slipR": 0.042,
     "lagSec": 35222,
     "alerted": [
-     "open"
-    ]
+     "open",
+     "close"
+    ],
+    "closedAt": "2026-11-08T16:54:49.000Z"
    },
    "sol-scalp-1794102041": {
     "positionId": "47357962",
@@ -303,9 +305,9 @@
    "startBalance": 10000
   },
   "startedAt": "2026-11-07T19:38:16.000Z",
-  "status": "ok · demo Fusion Markets · balance 9978.79 · 7 open · 1 resting",
-  "balance": 9978.79,
-  "lastRun": "2026-11-08T16:52:40.000Z",
+  "status": "ok · demo Fusion Markets · balance 9976.79 · 6 open · 1 resting",
+  "balance": 9976.79,
+  "lastRun": "2026-11-08T16:54:49.000Z",
   "catchUpAt": "2026-11-08T09:14:33.000Z",
   "wait": {
    "eurusd-rswing-1793610380": {
@@ -443,11 +445,6 @@
   }
  },
  "log": [
-  {
-   "at": "2026-11-08T09:39:48.000Z",
-   "msg": "not mirrored yet audusd-intraday-1793949765: AUDUSD market closed (paused until 09:49 UTC) (will retry)",
-   "trade": "audusd-intraday-1793949765"
-  },
   {
    "at": "2026-11-08T09:39:48.000Z",
    "msg": "not mirrored yet usdchf-scalp-1793955902: USDCHF market closed (paused until 09:49 UTC) (will retry)",
@@ -1942,6 +1939,11 @@
    "at": "2026-11-08T11:41:12.000Z",
    "msg": "not mirrored yet ict:es-s-1793995200: US500 market closed (paused until 11:49 UTC) (will retry)",
    "trade": "ict:es-s-1793995200"
+  },
+  {
+   "at": "2026-11-08T16:54:49.000Z",
+   "msg": "ETHUSD position 47357961 closed at the broker",
+   "trade": "eth-scalp-1794095566"
   }
  ],
  "limits": {
