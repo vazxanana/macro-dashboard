@@ -41,8 +41,8 @@
     color-scheme: dark;
   }
   :root[data-theme="light"] {
-    --bg: #f4f6f9; --panel: #ffffff; --panel-raised: #f7f8fb; --line: #dfe3ea; --line-soft: #eceff4;
-    --ink: #131722; --ink-dim: #4a5160; --ink-faint: #6b7280; --accent: #2f6bff; --buy: #08876f; --sell: #d92d4b; color-scheme: light;
+    --bg: #f4f6f9; --panel: #ffffff; --panel-raised: #f7f8fb; --panel-hover: #f2f4f8; --line: #dfe3ea; --line-soft: #eceff4; --line-strong: #c9d0db;
+    --ink: #131722; --ink-dim: #4a5160; --ink-faint: #6b7280; --accent: #2f6bff; --accent-soft: rgba(47,107,255,.10); --buy: #08876f; --sell: #d92d4b; --buy-soft: rgba(8,135,111,.12); --sell-soft: rgba(217,45,75,.12); color-scheme: light;
   }
   * { box-sizing: border-box; }
   html, body { margin: 0; background: var(--bg); color: var(--ink); font: 14px/1.5 var(--sans); -webkit-text-size-adjust: 100%; }
@@ -1315,7 +1315,7 @@ document.addEventListener('DOMContentLoaded', function () {
     var all = window.msMergeUsers(remote), R = all[u];
     if (!R || R.hash !== h) { try { localStorage.removeItem('ms-admin'); localStorage.removeItem('ms-user'); localStorage.removeItem('ms-user-rec'); } catch (e) {} window.msForgetCt(); location.reload(); return; }
     var rec = null; try { rec = JSON.parse(localStorage.getItem('ms-user-rec') || 'null'); } catch (e) {}
-    if (!rec || rec.role !== R.role || rec.name !== R.name || (rec.ict || false) !== (R.ict || false)) { try { localStorage.setItem('ms-user-rec', JSON.stringify({ key: u, name: R.name, role: R.role, hash: h, ict: R.ict || false })); } catch (e) {} if (!rec || rec.role !== R.role || (rec.ict || false) !== (R.ict || false)) location.reload(); }
+    if (!rec || rec.role !== R.role || rec.name !== R.name || (rec.ict || false) !== (R.ict || false) || (rec.ct || false) !== (R.ct || false)) { try { localStorage.setItem('ms-user-rec', JSON.stringify({ key: u, name: R.name, role: R.role, hash: h, ict: R.ict || false, ct: R.ct || false })); } catch (e) {} if (!rec || rec.role !== R.role || (rec.ict || false) !== (R.ict || false) || (rec.ct || false) !== (R.ct || false)) location.reload(); }
   });
 });
 // Sign-in card (6 Nov): first screen for anyone not signed in; "Continue as guest" opens the public view and is remembered
@@ -2656,10 +2656,11 @@ html[data-motion="off"] #v-ict .ict-cal-d:hover { transform: none !important; }
         <div class="me-pop" role="menu">
           <div class="me-card"><span class="me-av me-av-lg" id="ms-me-av2" aria-hidden="true"></span><div><b id="ms-me-name2">Guest</b><small id="ms-me-role">Guest</small></div></div>
           <div class="me-today" id="ms-me-today"></div>
+          <a role="menuitem" class="me-link" id="ms-me-profile" href="#profile">Profile and demo accounts</a>
           <button type="button" role="menuitem" id="ms-me-photo">Change photo</button>
           <button type="button" role="menuitem" id="ms-me-rmphoto" hidden>Remove photo</button>
           <button type="button" role="menuitem" id="ms-me-rename">Change display name</button>
-          <button type="button" role="menuitem" id="ms-me-ct">My cTrader account</button>
+          <button type="button" role="menuitem" id="ms-me-ct" hidden>My cTrader account</button>
           <button type="button" role="menuitem" id="ms-me-theme" data-theme-set>Light theme</button>
           <button type="button" role="menuitem" id="ms-me-out" class="me-out">Log out</button>
           <input type="file" id="ms-me-file" accept="image/*" hidden>
@@ -2677,11 +2678,21 @@ html[data-motion="off"] #v-ict .ict-cal-d:hover { transform: none !important; }
 
   <!-- ─── Guest: one H4 gold chart with one trade setup ─── -->
   <section class="view" id="v-guest" aria-label="Gold H4 chart" hidden>
-    <div class="g-head"><h1 class="h-head">Gold · H4</h1></div>
+    <div class="g-head"><div><h1 class="h-head">Gold · H4 <small class="g-live"><i aria-hidden="true"></i>live</small></h1><p class="ms-note g-lede">The desk's current gold trade on live candles. Paper trading, one system, nothing hidden.</p></div></div>
+    <!-- the trade the chart shows, in words (8 Nov, owner: "improve this") -->
+    <div class="card g-setup" id="g-setup" hidden></div>
     <div class="card g-card"><div class="g-chart" id="g-chart"><div class="g-msg" id="g-msg">Loading the chart…</div></div></div>
     <div class="g-key" aria-hidden="true"><span><i class="k-e"></i>Entry</span><span><i class="k-s"></i>Stop zone</span><span><i class="k-t"></i>Target zone</span></div>
-    <h2 class="g-h2">Results</h2>
+    <h2 class="g-h2">Results <small>main systems, live trades only</small></h2>
     <div class="h-today" id="g-today" role="group" aria-label="Results"></div>
+    <!-- the invitation (8 Nov): what members get, with a sign-in that opens the gate -->
+    <section class="g-join" aria-labelledby="g-join-t">
+      <div class="g-join-txt"><h2 id="g-join-t">This is the guest view. Members get the whole desk.</h2>
+        <ul><li><b>Every chart</b>: D1 to M1 with structure, origins, the next setup and your own indicators and drawings.</li>
+          <li><b>The AI council</b>: every paper trade it places, manages and reviews, with the loss reviews and the systems behind them.</li>
+          <li><b>Three desks</b>: ICT on index futures and gold, the gold playbook, crypto scalps, plus the macro desk with the strategist and the veteran.</li></ul></div>
+      <div class="g-join-act"><button type="button" class="gate-go g-join-btn" id="g-join-btn">Sign in</button><p>Have no password yet? Ask the owner for a seat.</p></div>
+    </section>
     <div class="card g-cal-card"><div class="ms-k"><span>P&amp;L calendar</span><span class="cal-nav"><button type="button" id="g-cal-prev" aria-label="Previous month">‹</button><b id="g-cal-m"></b><button type="button" id="g-cal-next" aria-label="Next month">›</button></span></div>
       <div class="cal" id="g-cal"></div><p class="ms-note" id="g-cal-sum"></p></div>
   </section>
@@ -3346,6 +3357,22 @@ html[data-motion="off"] #v-ict .ict-cal-d:hover { transform: none !important; }
         <p class="ms-note">Bar to change the rule: more profit and a smaller drawdown in both 2023-24 and 2025-26. Nothing passed, so the rule stays as the skill wrote it. 2018-20, before the skill's test, also made money (+31.7R, PF 1.43).</p>
         <p class="ms-note">Prop sizing: the worst run was about 14R down, so 0.5% a trade at most (≈7% drawdown) and 0.25% in challenge phases. Three losses in a row = stop for the day. The edge only buys: when the Weekly turns bearish it simply stops firing.</p>
       </div>
+    </div>
+  </section>
+  <!-- Profile (8 Nov, owner: "make the cTrader accounts a page inside the profile so it is more organised") -->
+  <section class="view" id="v-profile" aria-label="Profile" hidden>
+    <div class="v-head pf-head"><div><h1 class="h-head">Profile</h1><p class="ms-note">Your seat on the desk, and the council's demo accounts.</p></div></div>
+    <div class="pf-grid">
+      <aside class="card pf-card">
+        <div class="pf-id"><span class="me-av me-av-lg" id="ms-pf-av" aria-hidden="true"></span><div><b id="ms-pf-name">—</b><small id="ms-pf-role"></small></div></div>
+        <div class="me-today pf-today" id="ms-pf-today"></div>
+        <div class="pf-act"><button type="button" class="ms-tbtn" id="ms-pf-photo">Change photo</button><button type="button" class="ms-tbtn" id="ms-pf-rename">Change display name</button><button type="button" class="ms-tbtn" id="ms-pf-theme" data-theme-set>Light theme</button></div>
+        <p class="ms-note pf-note">Paper trading only. The demo accounts belong to the council: one per edge, so each book's results stay apart.</p>
+      </aside>
+      <section class="card pf-ct" aria-labelledby="ms-pf-t">
+        <div class="pf-ct-h"><div><h2 id="ms-pf-t">Demo accounts</h2><div class="ct-sub" id="ms-pf-sub"></div></div></div>
+        <div class="ct-b pf-ct-b" id="ms-pf-b" aria-live="polite"></div>
+      </section>
     </div>
   </section>
   <section class="view" id="v-journal" aria-label="Journal" hidden>
@@ -6170,7 +6197,7 @@ function msNextSetup(bars, A) {
     mkList.innerHTML = html || '<li class="mk-g">No market matches</li>';
   }
   if (mkList) {
-    const btn = document.getElementById('ms-mk-btn'); if (btn) { btn.textContent = INST.label; btn.title = `Market: ${INST.label} · ${INST.name} (click to change)`; }
+    const btn = document.getElementById('ms-mk-btn'); if (btn) { btn.textContent = PUB ? 'XAU/USD' : INST.label; btn.title = PUB ? 'Gold' : `Market: ${INST.label} · ${INST.name} (click to change)`; }
     mkQ.addEventListener('input', renderMk);
     mkQ.addEventListener('keydown', (ev) => { if (ev.key === 'Enter') { const a = mkList.querySelector('a'); if (a) location.href = a.href; } if (ev.key === 'Escape') mkBox.open = false; });
     mkBox.addEventListener('toggle', () => { if (mkBox.open) { renderMk(); setTimeout(() => mkQ.focus(), 0); } });
@@ -6435,12 +6462,17 @@ function msNextSetup(bars, A) {
         const gr = await fetchBars(tf, I, 300); GV.bars = gr.bars; GV.at = Date.now();
         if (gr.src === 'OANDA') GV.off = 0; else try { const j = await getJSON('https://api.gold-api.com/price/XAU'), o = +j.price - GV.bars[GV.bars.length - 1].close; GV.off = isFinite(o) && Math.abs(o) < 150 ? o : (G.offset || 0); } catch (e) { GV.off = G.offset || 0; }
       }
-      const th = THEMES[G.theme] || THEMES.dark;
+      // the guest chart follows the page theme (not the member's chart palette) and always colours its candles
+      const pageLight = document.documentElement.dataset.theme === 'light' || (!document.documentElement.dataset.theme && matchMedia('(prefers-color-scheme: light)').matches);
+      const th = pageLight ? THEMES.light : THEMES.dark;
+      if (GV.chart && GV.light !== pageLight) { GV.chart.applyOptions({ layout: { background: { type: 'solid', color: th.bg }, textColor: th.text }, rightPriceScale: { borderColor: th.border }, timeScale: { borderColor: th.border } }); }
+      GV.light = pageLight;
       if (!GV.chart) {
         GV.chart = LW.createChart(host, { autoSize: true, layout: { background: { type: 'solid', color: th.bg }, textColor: th.text, fontSize: 11 }, grid: { vertLines: { visible: false }, horzLines: { visible: false } }, rightPriceScale: { borderColor: th.border }, timeScale: { borderColor: th.border, timeVisible: true, rightOffset: 18 }, crosshair: { mode: LW.CrosshairMode.Normal }, handleScroll: true, handleScale: true });
-        GV.series = GV.chart.addCandlestickSeries({ ...candleCols(), priceLineVisible: false, lastValueVisible: true });
-        GV.ov = new Overlay(); GV.series.attachPrimitive(GV.ov);
+        GV.series = GV.chart.addCandlestickSeries({ upColor: UPC, downColor: DNC, borderUpColor: UPC, borderDownColor: DNC, wickUpColor: UPC, wickDownColor: DNC, priceLineVisible: false, lastValueVisible: true });
+        GV.ov = new Overlay(); GV.series.attachPrimitive(GV.ov); GV.pl = [];
       }
+      (GV.pl || []).forEach((l) => { try { GV.series.removePriceLine(l); } catch (e) {} }); GV.pl = [];
       const data = GV.bars.map((b) => ({ time: b.time + TZ, open: b.open + GV.off, high: b.high + GV.off, low: b.low + GV.off, close: b.close + GV.off }));
       GV.series.setData(data);
       const items = { boxes: [], lines: [], labels: [], path: [], vlines: [], segs: [] };
@@ -6451,11 +6483,27 @@ function msNextSetup(bars, A) {
         items.boxes.push({ l1: i0, l2: i1, hi: Math.max(x.entry, x.stop), lo: Math.min(x.entry, x.stop), fill: 'rgba(242,87,111,.16)', stroke: 'rgba(242,87,111,.55)' });
         if (tgt != null) items.boxes.push({ l1: i0, l2: i1, hi: Math.max(x.entry, tgt), lo: Math.min(x.entry, tgt), fill: 'rgba(47,191,143,.15)', stroke: 'rgba(47,191,143,.55)' });
         items.boxes.push({ l1: i0, l2: i1, hi: x.entry, lo: x.entry, fill: null, stroke: '#7aa2ff', dash: true });
+        // the levels named on the price axis
+        const pl = (price, title, color) => { try { GV.pl.push(GV.series.createPriceLine({ price, color, lineWidth: 1, lineStyle: LW.LineStyle.Dashed, axisLabelVisible: true, title })); } catch (e) {} };
+        pl(x.entry, 'Entry', '#7aa2ff'); pl(x.stop, 'Stop', '#f2576f'); if (tgt != null) pl(tgt, 'Target', '#2fbf8f');
         GV.series.applyOptions({ autoscaleInfoProvider: (orig) => { const r = orig(); if (r && r.priceRange) { const v = [x.entry, x.stop, tgt].filter(isFinite); r.priceRange.minValue = Math.min(r.priceRange.minValue, ...v); r.priceRange.maxValue = Math.max(r.priceRange.maxValue, ...v); } return r; } });
         GV.chart.timeScale().setVisibleLogicalRange({ from: Math.max(0, i0 - 90), to: i1 + 4 });
       } else GV.chart.timeScale().fitContent();
       GV.ov.set(items);
       if (msg) { msg.hidden = !!x; msg.textContent = x ? '' : 'No trade setup on the chart right now.'; }
+      // the trade in words
+      const card = document.getElementById('g-setup');
+      if (card) {
+        if (!x) card.hidden = true;
+        else { const tgt = x.tp1 != null ? x.tp1 : x.t1, f = (v) => (+v).toLocaleString(undefined, { minimumFractionDigits: 1, maximumFractionDigits: 1 }), R = Math.abs(x.entry - x.stop), rr = tgt != null && R ? Math.abs(tgt - x.entry) / R : null;
+          const last = data.length ? data[data.length - 1].close : null, fl = last != null && x.status === 'open' && R ? ((x.side === 'buy' ? 1 : -1) * (last - x.entry)) / R : null;
+          const st = x.status === 'pending' ? 'Waiting for the entry' : x.status === 'open' ? 'Open now' : x.status === 'win' ? 'Closed · won' : x.status === 'loss' ? 'Closed · lost' : x.status === 'be' ? 'Closed · break-even' : 'Closed';
+          const when = new Date(((x.filled || x.opened) || 0) * 1000), ago = when.getTime() ? when.toLocaleString(undefined, { weekday: 'short', day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' }) : '';
+          card.hidden = false;
+          card.innerHTML = `<div class="g-s-h"><span class="chip ${x.side}">${x.side === 'sell' ? 'SELL' : 'BUY'}</span><b>${esc(x.name || x.k || 'System trade')}</b><span class="g-s-st ${x.status}">${st}</span>${fl != null ? `<span class="g-s-fl ${fl > 0 ? 'pos' : fl < 0 ? 'neg' : ''}">${fl > 0 ? '+' : fl < 0 ? '−' : ''}${Math.abs(fl).toFixed(2)}R floating</span>` : ''}</div>
+            <div class="g-s-grid"><div><span>Entry</span><b>${f(x.entry)}</b></div><div><span>Stop</span><b class="neg">${f(x.stop)}</b></div><div><span>Target</span><b class="pos">${tgt != null ? f(tgt) : 'trails'}</b></div><div><span>Reward : risk</span><b>${rr != null ? rr.toFixed(1) + ' : 1' : '—'}</b></div></div>
+            <p class="g-s-note">${esc(x.pair ? `${x.pair} · ` : '')}${ago ? `placed ${esc(ago)} · ` : ''}paper trade, risk one unit (R) from entry to stop.</p>`; }
+      }
     } catch (e) { if (msg) { msg.hidden = false; msg.textContent = "The chart couldn't load right now."; } }
     finally { GV.busy = false; }
   }
@@ -7495,7 +7543,7 @@ function msNextSetup(bars, A) {
   if (document.getElementById('v-council')) { councilReady = loadCouncil(); setInterval(loadCouncil, 5 * 60e3); }
 
   // ─── Sections: a home page of cards, each section on its own page ───
-  const VIEWS = ['home', 'setup', 'charts', 'scanner', 'crypto', 'gold', 'council', 'journal', 'guest', 'users', 'ict'];
+  const VIEWS = ['home', 'setup', 'charts', 'scanner', 'crypto', 'gold', 'council', 'journal', 'guest', 'users', 'ict', 'profile'];
   // Council sections (6 Nov renovation): Overview · Trades · Systems · Review · Research · Macro (7 Nov) · This week (8 Nov); deep links #council/<section>
   const CPANES = ['overview', 'trades', 'systems', 'review', 'research', 'macro', 'week'], CPUB = ['overview', 'trades'];
   const CPANE = { cur: 'overview' };
@@ -7527,8 +7575,9 @@ function msNextSetup(bars, A) {
       ev.preventDefault(); bs[j].focus(); bs[j].click();
     }); }
   function showView() {
-    const [h0, sub] = location.hash.slice(1).split('/'), h = PUB ? 'guest' : h0 === 'guest' ? 'home' : VIEWER && !['home', 'setup', 'council'].concat(document.documentElement.dataset.ict ? ['ict'] : []).includes(h0) ? 'home' : h0 === 'users' && document.documentElement.dataset.role !== 'owner' ? 'home' : h0 === 'ict' && !document.documentElement.dataset.ict ? 'home' : !h0 && document.documentElement.dataset.ict && document.documentElement.dataset.role === 'reviewer' ? 'ict' : h0, v = VIEWS.includes(h) ? h : 'home';
+    const [h0, sub] = location.hash.slice(1).split('/'), h = PUB ? 'guest' : h0 === 'guest' ? 'home' : VIEWER && !['home', 'setup', 'council', 'profile'].concat(document.documentElement.dataset.ict ? ['ict'] : []).includes(h0) ? 'home' : h0 === 'users' && document.documentElement.dataset.role !== 'owner' ? 'home' : h0 === 'ict' && !document.documentElement.dataset.ict ? 'home' : !h0 && document.documentElement.dataset.ict && document.documentElement.dataset.role === 'reviewer' ? 'ict' : h0, v = VIEWS.includes(h) ? h : 'home';
     if (v === 'ict' && window.renderIct) setTimeout(window.renderIct, 0);
+    if (v === 'profile' && window.msProfile) setTimeout(window.msProfile, 0);
     if (v === 'gold' && window.renderGold) setTimeout(window.renderGold, 0);
     if (v === 'users' && window.renderUsers) window.renderUsers();   // guests only get the H4 chart (owner, 6 Nov)
     if (v === 'council') setPane(sub || CPANE.cur, false);
@@ -9214,6 +9263,7 @@ function gpStats(T) {
         if (rows.length) { tape.innerHTML = rows.join('<span>·</span>') + '<span>·</span>' + rows.join('<span>·</span>') + '<span>·</span>'; document.getElementById('gs-tape').hidden = false; } }
     }); }
   sess(); px(); proof(); setInterval(function () { if (R.dataset.gate) { sess(); } }, 30000); setInterval(px, 120000); setInterval(proof, 300000);
+  var jb = document.getElementById('g-join-btn'); if (jb) jb.addEventListener('click', function () { msGate(true); proof(); });
 })();
 </script>
 <style>
@@ -10040,7 +10090,10 @@ html[data-role="public"] .hdr-sw { display: none; }
   const sessKey = () => 'ms-ct-sess-' + (userKey() || 'x');
   const esc = (x) => String(x == null ? '' : x).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
   let state = { data: null, all: null, book: ls('ms-ct-book') || '', days: 30, account: ls('ms-ct-acc-' + (userKey() || 'x')) || '', timer: 0, busy: false };
-  const dlg = () => $('ms-ct'), body = () => $('ms-ct-b');
+  // where the accounts render: the profile page (8 Nov, owner) or the dialog (the cTrader link flow's return)
+  let MODE = 'page';
+  const dlg = () => $('ms-ct'), body = () => $(MODE === 'page' ? 'ms-pf-b' : 'ms-ct-b'), subEl = () => $(MODE === 'page' ? 'ms-pf-sub' : 'ms-ct-sub'), titleEl = () => $(MODE === 'page' ? 'ms-pf-t' : 'ms-ct-t');
+  const active = () => (MODE === 'page' ? !!($('v-profile') && !$('v-profile').hidden) : !!(dlg() && dlg().open));
   const money = (v, ccy, sign) => { if (v == null || !isFinite(v)) return '—'; let s; try { s = new Intl.NumberFormat(undefined, ccy ? { style: 'currency', currency: ccy, minimumFractionDigits: 2, maximumFractionDigits: 2 } : { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(Math.abs(v)); } catch (e) { s = Math.abs(v).toFixed(2); } return (v < 0 ? '−' : sign && v > 0 ? '+' : '') + s; };
   const cls = (v) => (v > 0 ? 'ct-pos' : v < 0 ? 'ct-neg' : '');
   const px = (v) => (v == null ? '—' : String(+v));
@@ -10069,8 +10122,8 @@ html[data-role="public"] .hdr-sw { display: none; }
     const ccy = d.account && d.account.currency, open = d.open || [], hist = d.history || [], orders = d.orders || [];
     const net = hist.reduce((a, h) => a + (h.net || 0), 0), wins = hist.filter((h) => h.net > 0).length;
     const OWN = document.documentElement.dataset.ct === 'owner' || d.source !== 'council';   // others (Fred, Orlando, Carlos) get the edge label only, never an account number
-    $('ms-ct-sub').innerHTML = `${d.label ? `<b>${esc(d.label)}</b> · ` : ''}${esc((d.account && d.account.broker) || 'cTrader')}${OWN ? ` · ${esc((d.account && (d.account.login || d.account.id)) || '')}` : ''} · <span class="ct-tag${d.account && d.account.live ? ' live' : ''}">${d.account && d.account.live ? 'Live' : 'Demo'}</span> · view only`;
-    if (!OWN) $('ms-ct-t').textContent = 'Demo accounts';
+    subEl().innerHTML = `${d.label ? `<b>${esc(d.label)}</b> · ` : ''}${esc((d.account && d.account.broker) || 'cTrader')}${OWN ? ` · ${esc((d.account && (d.account.login || d.account.id)) || '')}` : ''} · <span class="ct-tag${d.account && d.account.live ? ' live' : ''}">${d.account && d.account.live ? 'Live' : 'Demo'}</span> · view only`;
+    titleEl().textContent = OWN && d.source !== 'council' ? 'My cTrader account' : 'Demo accounts';
     // the owner's demo accounts, one per book (council / ICT / shadows / LIT / replica): the overview is the switcher
     const all = state.all || [], tot = (k) => all.reduce((a, x) => a + (x[k] || 0), 0), closed = (x) => (x.history || []).reduce((a, h) => a + (h.net || 0), 0);
     const books = all.length > 1 ? `<section class="ct-sec"><h4>Accounts <small>${all.length} demo · one per book</small></h4><div class="ct-tw"><table class="ct-t ct-books"><thead><tr><th>Book</th>${OWN ? '<th class="hide-s">Account</th>' : ''}<th class="n">Balance</th><th class="n hide-s">Equity</th><th class="n">Floating</th><th class="n">Closed · 30 d</th><th class="n hide-s">Open</th></tr></thead><tbody>${all.map((x) => x.error
@@ -10100,7 +10153,7 @@ html[data-role="public"] .hdr-sw { display: none; }
   }
 
   async function load(showBusy) {
-    if (state.busy || !dlg().open) return;
+    if (state.busy || !active()) return;
     if (!API) { body().innerHTML = '<div class="ct-empty">Open the site on meridianx.dev to link cTrader.</div>'; return; }
     // the owner's demo account needs no link: the council loop publishes it (council/ctrader-account.mjs -> ctrader/account.json)
     if (document.documentElement.dataset.ct && !ls(sessKey())) {
@@ -10127,15 +10180,32 @@ html[data-role="public"] .hdr-sw { display: none; }
       else body().innerHTML = `<div class="ct-empty">${esc(e.message)}</div><div><button type="button" class="ct-btn ghost" id="ms-ct-retry">Try again</button></div>`, $('ms-ct-retry') && $('ms-ct-retry').addEventListener('click', () => load(true));
     } finally { state.busy = false; }
   }
+  // the profile page: identity from the account menu, the day's numbers, and the accounts below
+  window.msProfile = function () {
+    if (document.documentElement.dataset.role === 'public' || !userKey()) return;
+    MODE = 'page';
+    const cp = (a, b2) => { const x = $(a), y = $(b2); if (x && y) y.innerHTML = x.innerHTML; };
+    cp('ms-me-av2', 'ms-pf-av'); cp('ms-me-name2', 'ms-pf-name'); cp('ms-me-role', 'ms-pf-role'); cp('ms-me-today', 'ms-pf-today');
+    ['photo', 'rename'].forEach((k) => { const b = $('ms-pf-' + k); if (b) b.hidden = !$('ms-me-' + k); });
+    if ($('ms-pf-theme') && $('ms-me-theme')) $('ms-pf-theme').textContent = $('ms-me-theme').textContent;
+    load(true);
+    clearInterval(state.timer); state.timer = setInterval(() => { if (!document.hidden && active()) load(false); else if (!active()) clearInterval(state.timer); }, 15000);
+  };
   function open(msg) {
     if (document.documentElement.dataset.role === 'public' || !userKey()) return;
+    MODE = 'dlg';
     const d = dlg(); if (!d.open) d.showModal();
     if (msg) linkForm(msg.text, msg.ok);
     if (!msg || msg.ok) load(true);
     clearInterval(state.timer); state.timer = setInterval(() => { if (!document.hidden) load(false); }, 15000);
   }
   document.addEventListener('DOMContentLoaded', () => {
-    const b = $('ms-me-ct'); if (b) b.addEventListener('click', () => { const me = $('ms-me'); if (me) me.open = false; open(); });
+    const b = $('ms-me-ct'); if (b) b.addEventListener('click', () => { const me = $('ms-me'); if (me) me.open = false; location.hash = '#profile'; });
+    const pl = $('ms-me-profile'); if (pl) pl.addEventListener('click', () => { const me = $('ms-me'); if (me) me.open = false; });
+    ['photo', 'rename'].forEach((k) => { const b2 = $('ms-pf-' + k); if (b2) b2.addEventListener('click', () => { const src = $('ms-me-' + k); if (src) src.click(); setTimeout(() => window.msProfile && msProfile(), 400); }); });
+    const pt = $('ms-pf-theme'); if (pt && $('ms-me-theme')) pt.addEventListener('click', () => { $('ms-me-theme').click(); setTimeout(() => { pt.textContent = $('ms-me-theme').textContent; }, 50); });
+    // the router may have shown the profile before this module was ready (a direct #profile load): render it now
+    if ($('v-profile') && !$('v-profile').hidden) setTimeout(() => window.msProfile && msProfile(), 0);
     $('ms-ct-x').addEventListener('click', () => dlg().close());
     dlg().addEventListener('close', () => { clearInterval(state.timer); if (location.hash === '#ctrader') history.replaceState(null, '', location.pathname + location.search.replace(/([?&])ct=[a-z]+&?/, '$1').replace(/[?&]$/, '')); });
     // back from cTrader's grant page: /market-structure.html?ct=linked#ctrader
@@ -10148,6 +10218,50 @@ html[data-role="public"] .hdr-sw { display: none; }
   });
 })();
 </script>
+<style id="ms-profile-css">
+/* ── Profile page (8 Nov 2026): identity on the left, the council's demo accounts on the right ── */
+#v-profile .pf-grid { display: grid; grid-template-columns: minmax(260px, 320px) minmax(0, 1fr); gap: 18px; align-items: start; }
+#v-profile .pf-card { display: grid; gap: 16px; padding: 20px; position: sticky; top: 72px; }
+#v-profile .pf-id { display: flex; align-items: center; gap: 14px; } #v-profile .pf-id b { display: block; font-size: 18px; letter-spacing: -0.01em; } #v-profile .pf-id small { color: var(--ink-faint); font-size: 12.5px; }
+#v-profile .pf-today:empty { display: none; }
+#v-profile .pf-act { display: grid; gap: 8px; } #v-profile .pf-act .ms-tbtn { width: 100%; min-height: 38px; justify-content: center; }
+#v-profile .pf-note { margin: 0; font-size: 12.5px; }
+#v-profile .pf-ct { padding: 0; overflow: hidden; }
+#v-profile .pf-ct-h { display: flex; align-items: center; gap: 12px; padding: 14px 16px; border-bottom: 1px solid var(--line); } #v-profile .pf-ct-h h2 { margin: 0; font-size: 16px; } #v-profile .pf-ct-h .ct-sub { color: var(--ink-faint); font-size: 12px; }
+#v-profile .pf-ct-b { padding: 16px; font-variant-numeric: tabular-nums; }
+.me-pop .me-link { display: flex; align-items: center; min-height: 38px; padding: 8px 10px; text-decoration: none; color: var(--ink); font: 600 13px var(--sans); border-radius: 8px; } .me-pop .me-link:hover, .me-pop .me-link:focus-visible { background: var(--panel-hover); outline: none; }
+@media (max-width: 900px) { #v-profile .pf-grid { grid-template-columns: 1fr; } #v-profile .pf-card { position: static; } }
+</style>
+<style id="ms-guest2-css">
+/* ── Guest view refresh (8 Nov 2026, owner: "improve this"): the trade in words above the chart, named levels on the axis, the
+   chart follows the page theme with coloured candles, and an invitation below the results. ── */
+#v-guest .g-head { display: flex; align-items: flex-end; justify-content: space-between; gap: 16px; flex-wrap: wrap; margin-bottom: 12px; }
+#v-guest .g-head .h-head { display: flex; align-items: center; gap: 10px; margin: 0 0 4px; }
+#v-guest .g-live { display: inline-flex; align-items: center; gap: 6px; font: 600 12px var(--sans); color: var(--buy); text-transform: uppercase; letter-spacing: .04em; }
+#v-guest .g-live i { width: 8px; height: 8px; border-radius: 50%; background: var(--buy); box-shadow: 0 0 0 3px color-mix(in srgb, var(--buy) 25%, transparent); }
+@media (prefers-reduced-motion: no-preference) { #v-guest .g-live i { animation: g-pulse 2s ease-out infinite; } @keyframes g-pulse { 0% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--buy) 45%, transparent); } 70% { box-shadow: 0 0 0 7px transparent; } 100% { box-shadow: 0 0 0 0 transparent; } } }
+#v-guest .g-lede { margin: 0; max-width: 70ch; }
+#v-guest .g-setup { padding: 14px 16px; margin-bottom: 12px; border-radius: 14px; display: grid; gap: 10px; }
+#v-guest .g-s-h { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; } #v-guest .g-s-h > b { font-size: 16px; }
+#v-guest .g-s-st { font-size: 12.5px; font-weight: 600; color: var(--ink-dim); padding: 2px 9px; border-radius: 999px; border: 1px solid var(--line); }
+#v-guest .g-s-st.open { color: var(--buy); border-color: color-mix(in srgb, var(--buy) 45%, transparent); } #v-guest .g-s-st.pending { color: #b97a00; border-color: color-mix(in srgb, #e0a526 45%, transparent); }
+#v-guest .g-s-fl { margin-left: auto; font: 650 14px var(--sans); font-variant-numeric: tabular-nums; } #v-guest .g-s-fl.pos { color: var(--buy); } #v-guest .g-s-fl.neg { color: var(--sell); }
+#v-guest .g-s-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 1px; background: var(--line); border: 1px solid var(--line); border-radius: 10px; overflow: hidden; }
+#v-guest .g-s-grid > div { background: var(--panel-raised, var(--panel)); padding: 9px 12px; display: grid; gap: 2px; }
+#v-guest .g-s-grid span { font-size: 12px; color: var(--ink-faint); } #v-guest .g-s-grid b { font-size: 17px; font-variant-numeric: tabular-nums; } #v-guest .g-s-grid b.pos { color: var(--buy); } #v-guest .g-s-grid b.neg { color: var(--sell); }
+#v-guest .g-s-note { margin: 0; font-size: 12.5px; color: var(--ink-faint); }
+#v-guest .g-card { border-radius: 14px; overflow: hidden; }
+#v-guest .g-h2 { display: flex; align-items: baseline; gap: 10px; } #v-guest .g-h2 small { font-size: 12.5px; font-weight: 500; color: var(--ink-faint); }
+#v-guest .g-join { margin: 22px 0 18px; padding: 22px 24px; border-radius: 16px; display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 20px 32px; align-items: center; color: var(--ink);
+  background: linear-gradient(135deg, color-mix(in srgb, #e0a526 14%, var(--panel)), color-mix(in srgb, #7b61ff 10%, var(--panel))); border: 1px solid color-mix(in srgb, #e0a526 35%, var(--line)); }
+#v-guest .g-join h2 { margin: 0 0 10px; font-size: 20px; letter-spacing: -0.015em; text-wrap: balance; }
+#v-guest .g-join ul { margin: 0; padding: 0 0 0 18px; display: grid; gap: 6px; color: var(--ink-dim); font-size: 14px; line-height: 1.5; } #v-guest .g-join li b { color: var(--ink); }
+#v-guest .g-join-act { display: grid; gap: 8px; justify-items: center; min-width: 200px; }
+#v-guest .g-join-btn { width: 100%; min-height: 44px; border-radius: 12px; font-weight: 700; font-size: 15px; cursor: pointer; border: 0; background: #e3b341; color: #1b1300; }
+#v-guest .g-join-btn:hover { filter: brightness(1.06); } #v-guest .g-join-btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+#v-guest .g-join-act p { margin: 0; font-size: 12.5px; color: var(--ink-faint); text-align: center; }
+@media (max-width: 720px) { #v-guest .g-join { grid-template-columns: 1fr; padding: 18px; } #v-guest .g-join-act { min-width: 0; width: 100%; } }
+</style>
 <style id="ms-home2-css">
 /* ── Home refresh (8 Nov 2026, owner: "a strong change in the design and theme of the dashboard, more noticeable").
    Scoped to #v-home and the shell; token-based so both themes follow. A warm gold wash behind the headline, the day's
