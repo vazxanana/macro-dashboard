@@ -27,6 +27,7 @@ import { SYMBOLS as BROKER_SYMBOLS } from './ctrader-mirror.mjs';
 import { feedTag, requoteMarket, feedChangeText, feedDecision } from './feed.mjs';
 import { newsFeat } from './events.mjs';
 import { fetchDaily as regimeDaily, regimeOf, regimeShadow } from './regime.mjs';
+import { litStep, cleanBars as litClean, LOOKBACK_BARS as LIT_BARS, K as LIT_K } from './lit.mjs';
 
 const DIR = process.argv[2] || 'data';
 fs.mkdirSync(DIR, { recursive: true });
@@ -110,8 +111,8 @@ function agg30(b15) {
     else { cur.high = Math.max(cur.high, b.high); cur.low = Math.min(cur.low, b.low); cur.close = b.close; } }
   return out;
 }
-async function oandaBars(key, id) {
-  const [tf, n, fresh] = id === '30m' ? ['15m', 1440, false] : OANDA_TF[id] || [];
+async function oandaBars(key, id, count = 0) {   // count: a longer read for one caller (LIT's lookback); the feeds keep their own n
+  const [tf, n0, fresh] = id === '30m' ? ['15m', 1440, false] : OANDA_TF[id] || [], n = count || n0;
   if (!tf) return null;
   try {
     const r = await fetch(`${MD_BASE}bars?sym=${key}&tf=${tf}&n=${n}${fresh ? `&r=${Math.floor(Date.now() / 60000)}` : ''}`, { signal: AbortSignal.timeout(10000) });
@@ -309,6 +310,12 @@ const USER_RULES = [
   { id: 'nq-regime-shadow', apply: (c) => { c.nqRegimeShadow = { trendMin: 0.295 }; },
     change: 'NQ open run: regime tags (TREND, META) on every trade and a paper shadow stream "trend-on only" (|TS| >= 0.295); the live rule is unchanged',
     why: 'Regime study (2004-26, pre-registered): NQ/TREND is the one consistent split: second half ON +0.119R vs OFF -0.200R a trade (t 2.73, nominal; Bonferroni bar 2.83), right sign in every era, but in 2023-26 the skipped trades won (+0.23R over 41). A loss filter for dead regimes, not a regime detector: recorded as tags and a shadow so the forward record decides.' },
+  // 8 Nov, owner ("leave it as paper shadow or just LIT"): the LIT edge study's pre-registered primary (research/edge/lit, #596 / #597:
+  // INCONCLUSIVE, not an edge at the skill's defaults) runs forward on gold as a paper shadow stream, k 'lit' (council/lit.mjs), to
+  // build a forward record. Every record is shadow (blockedBy 'owner-shadow'): never live, never alerted. Undo: a user rule clearing the flag.
+  { id: 'lit-shadow', apply: (c) => { c.litShadow = true; },
+    change: 'LIT (M15 FBOS → M5 RBOS → limit at the order block) runs on gold as a paper shadow stream "LIT (paper shadow)"; no live rule changes',
+    why: 'LIT study (#597): INCONCLUSIVE, too few trades at the skill\'s defaults (27 gold fills in 19 years) and what fills loses; the owner keeps it as a paper shadow to build a forward record, not as a system.' },
 ];
 config.userRules = config.userRules || [];
 for (const u of USER_RULES) if (!config.userRules.includes(u.id)) { u.apply(config); config.userRules.push(u.id); config.history.push({ at: nowISO, by: 'user', change: u.change, why: u.why }); }
@@ -773,6 +780,25 @@ for (const [key, M] of Object.entries(MARKETS)) {
         }
         (snapshot[LEG.snap] = snapshot[LEG.snap] || {}).state = { hi20: n > GT.n ? +Math.max(...D.slice(n - 1 - GT.n, n - 1).map((b) => b.high)).toFixed(2) : null, lastClose: last && last.close, open: !!open, stop: open ? open.stop : null };
       } catch (e) { snapshot.errors[LEG.snap] = String(e.message || e); }
+    }
+    // LIT paper shadow stream (owner, 8 Nov; user rule lit-shadow): the pre-registered primary of research/edge/lit, forward on gold.
+    // council/lit.mjs is the detector (a parity-tested port of the study's harness) and the gates (one order at a time, <= 1 London +
+    // 1 NY_AM fill a day, stop after a win or -1.5R). The records are pending limits at the order block's open with the study's stop
+    // and target, managed by the loop above (validFor 24 M5 bars, maxHold to 17:00 New York, re-stamped from the fill); the swing
+    // break-even moves the stop here, like the gold trend ratchet. Lookback: the stream needs the whole previous trading week (the
+    // previous-week level, the weekly range), so it reads ~4,000 closed 5m candles from the OANDA proxy once a round, only here.
+    // Every record is shadow: true, blockedBy ['owner-shadow'] (never live, never alerted, not in the futures bridge or the Systems card).
+    if (key === 'xau' && config.litShadow && feed === 'OANDA') {
+      try {
+        const raw = await oandaBars(key, '5m', LIT_BARS);
+        if (!raw) throw new Error('LIT: OANDA 5m lookback not read this round');
+        const bars = litClean(raw.filter((b) => !b.live && b.time + 300 <= now));
+        const recs = trades.filter((x) => x.k === LIT_K && x.market === key);
+        const st = litStep({ bars, recs, now, key, label: M.label, dec: M.dec, feed: FEED });
+        for (const rec of st.push) if (rec.shadow === true && (rec.blockedBy || []).includes('owner-shadow')) trades.push(rec);
+        snapshot.lit = { at: nowISO, bars: st.m5, m15: st.m15, last: st.last, orders: st.orders, placed: st.push.map((x) => x.id), skipped: st.skipped, held: st.held, be: st.be, funnel: st.funnel, build: st.build,
+          open: recs.filter((x) => x.status === 'open').length, pending: recs.filter((x) => x.status === 'pending').length + st.push.length };
+      } catch (e) { snapshot.errors.lit = String(e.message || e); }
     }
     if (key === 'xau' && config.goldTL) {
       try {
