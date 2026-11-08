@@ -53,8 +53,11 @@ async function history(M) {
     { const ch = new Map(); for (const b of h1) { const c = Math.floor((b.time - FROM) / (10 * 86400)); ch.set(c, (ch.get(c) || 0) + 1); }
       const ks = [...ch.keys()].sort((a, b) => a - b); let c0 = ks.at(-1); while (c0 > 0 && (ch.get(c0 - 1) || 0) >= 50) c0--;
       if (ks.length && c0 > ks[0]) { const t0 = FROM + c0 * 10 * 86400, before = h1.length; h1 = h1.filter((b) => b.time >= t0); log.push(`stray CNBC bars before ${new Date(t0 * 1000).toISOString().slice(0, 10)} dropped (${before - h1.length})`); } }
-    // futures-roll (7 Nov 2026): the earlier hours are a deferred contract's thin prints, not the front month; they go to the back-fill
-    { const t0 = liquidFrom(h1);
+    // futures-roll (7 Nov 2026): the earlier hours are a deferred contract's thin prints, not the front month; they go to the back-fill.
+    // 8 Nov, owner: OFF by default ("keep the 812 / +123.7R record"); the cut was not pre-registered and swapped a third of the replay's
+    // signals for cash-proxy ones. ICT_REPLAY_LIQUID=on turns it back on for research runs. The daily roll adjustment and the live
+    // open-trade shift (stage 1) stay.
+    { const t0 = process.env.ICT_REPLAY_LIQUID === 'on' ? liquidFrom(h1) : null;
       if (t0 && h1.length && t0 > h1[0].time) { const before = h1.length; h1 = h1.filter((b) => b.time >= t0); m5 = m5.filter((b) => b.time >= t0); log.push(`deferred-contract CNBC bars before ${new Date(t0 * 1000).toISOString().slice(0, 10)} dropped (${before - h1.length})`); } }
     const cnbc1 = h1.length ? h1[0].time : null;   // signals before this come from the Dukascopy cash-index fill
     // CNBC keeps only ~6 months of intraday candles: fill the earlier part from the research probe's Dukascopy cash-index

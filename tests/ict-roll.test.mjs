@@ -92,8 +92,10 @@ test('shiftTrade moves every price level of an open trade and keeps its R geomet
   assert.ok(25300 + 50 < tr.stop);
 });
 
-test('replay liquidFrom: CNBC intraday is kept only from the stretch where the contract trades like the front month', async () => {
+test('replay liquidFrom: CNBC intraday is kept only from the stretch where the contract trades like the front month (opt-in: ICT_REPLAY_LIQUID=on; off by default, owner 8 Nov)', async () => {
   const { liquidFrom, LIQ } = await import('../ict/replay.mjs');
+  const src = fs.readFileSync(new URL('../ict/replay.mjs', import.meta.url), 'utf8');
+  assert.match(src, /process\.env\.ICT_REPLAY_LIQUID === 'on' \? liquidFrom\(h1\) : null/, 'the deferred-contract cut is opt-in');
   // 60 deferred days at ~1 % of the front's hourly volume, then 30 front-month days; one quiet holiday inside the front stretch
   const h1 = []; const t0 = Date.parse('2026-07-01T00:00:00Z') / 1000;
   for (let d = 0; d < 90; d++) for (let h = 0; h < 20; h++) h1.push({ time: t0 + d * 86400 + h * 3600, open: 1, high: 1, low: 1, close: 1, volume: d < 60 ? 100 : d === 75 ? 500 : 10000 });
