@@ -732,3 +732,11 @@ and suggests a risk; seeded RNG for repeatable answers), stats by trading sessio
 `bySession`) and by mistake (`byMistake`), and a journal Review column (`td.mist`, dialog `#mistd`: FOMO, revenge, moved stop,
 early exit, late entry, oversized, against plan, hesitated, chased, ignored news, or "followed plan"; `t.mistakes`, `t.reviewed`). Tests: `tests/backtest.test.mjs`. Paper only; nothing reaches the
 council or the mirror.
+
+## Profile photo and name on the server (8 Nov 2026, owner: "the profile photo gets back to default")
+They lived only in localStorage (`ms-photo-<name>`, `ms-name-<name>`), which Safari and the home-screen app keep separately, other
+devices never see, and Safari wipes after about a week without a visit. `api/profile.js` stores them per account in the private
+Blob store (`profiles/<key>.json`): GET `?u=<key|owner>` with header `X-MS-Auth: <ms-admin hash>`, POST `{u, h, photo?, name?}`;
+the hash is checked against the sign-in list (built-ins + Blob list, removed users refused, owner hash for the owner; fails closed);
+photo must be a JPEG / PNG data URL under 160 KB. The account area (`pullProfile` on load, `pushProfile` on change / remove /
+rename) keeps localStorage as the cache and uploads a browser-only photo once. Tests: `tests/profile.test.mjs`.
