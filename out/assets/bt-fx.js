@@ -46,25 +46,36 @@
       g.gain.setValueAtTime(0.0001, t + i * 0.09); g.gain.exponentialRampToValueAtTime(0.9, t + i * 0.09 + 0.02); g.gain.exponentialRampToValueAtTime(0.0001, t + i * 0.09 + 0.7);
       o.connect(g).connect(out); o.start(t + i * 0.09); o.stop(t + i * 0.09 + 0.75); });
   }
-  // "faaaaaah": a breathy f (filtered noise), then a falling voiced "aah" (sawtooth with vibrato through three vowel formants)
+  // "Faaaaaaaaah": a breathy F, then a long, loud falling shout (two detuned saw voices with vibrato through "a" formants,
+  // lightly driven for grit), the pitch sliding down like a groan
   function faah() {
-    const a = ctx(); if (!a) return; const t = a.currentTime, out = a.createGain(); out.gain.value = 0.5; out.connect(a.destination);
-    const n = a.createBuffer(1, a.sampleRate * 0.4, a.sampleRate), d = n.getChannelData(0); for (let i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1;
-    const ns = a.createBufferSource(), hp = a.createBiquadFilter(), ng = a.createGain(); ns.buffer = n; hp.type = 'highpass'; hp.frequency.value = 2200;
-    ng.gain.setValueAtTime(0.0001, t); ng.gain.exponentialRampToValueAtTime(0.35, t + 0.08); ng.gain.exponentialRampToValueAtTime(0.0001, t + 0.34);
-    ns.connect(hp).connect(ng).connect(out); ns.start(t); ns.stop(t + 0.4);
-    const v = t + 0.2, dur = 1.6, o = a.createOscillator(), vib = a.createOscillator(), vg = a.createGain(), vo = a.createGain();
-    o.type = 'sawtooth'; o.frequency.setValueAtTime(260, v); o.frequency.linearRampToValueAtTime(235, v + 0.35); o.frequency.exponentialRampToValueAtTime(120, v + dur);
-    vib.frequency.value = 5.5; vg.gain.value = 5; vib.connect(vg).connect(o.frequency);
-    vo.gain.setValueAtTime(0.0001, v); vo.gain.exponentialRampToValueAtTime(0.8, v + 0.12); vo.gain.setValueAtTime(0.8, v + dur * 0.55); vo.gain.exponentialRampToValueAtTime(0.0001, v + dur);
-    o.connect(vo);
-    for (const [f, q, g] of [[800, 8, 1], [1150, 9, 0.6], [2900, 12, 0.25]]) { const bp = a.createBiquadFilter(), bg = a.createGain(); bp.type = 'bandpass'; bp.frequency.value = f; bp.Q.value = q; bg.gain.value = g; vo.connect(bp).connect(bg).connect(out); }
-    o.start(v); vib.start(v); o.stop(v + dur + 0.05); vib.stop(v + dur + 0.05);
+    const a = ctx(); if (!a) return; const t = a.currentTime, out = a.createGain(), drive = a.createWaveShaper(), k = new Float32Array(1024);
+    for (let i = 0; i < 1024; i++) { const x = i / 512 - 1; k[i] = Math.tanh(2.2 * x); } drive.curve = k; out.gain.value = 0.7; drive.connect(out).connect(a.destination);
+    const n = a.createBuffer(1, a.sampleRate * 0.5, a.sampleRate), d = n.getChannelData(0); for (let i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1;
+    const ns = a.createBufferSource(), hp = a.createBiquadFilter(), ng = a.createGain(); ns.buffer = n; hp.type = 'highpass'; hp.frequency.value = 1800;
+    ng.gain.setValueAtTime(0.0001, t); ng.gain.exponentialRampToValueAtTime(0.5, t + 0.1); ng.gain.exponentialRampToValueAtTime(0.0001, t + 0.42);
+    ns.connect(hp).connect(ng).connect(out); ns.start(t); ns.stop(t + 0.5);
+    const v = t + 0.26, dur = 2.6, vo = a.createGain(), vib = a.createOscillator(), vg = a.createGain();
+    vib.frequency.setValueAtTime(4.5, v); vib.frequency.linearRampToValueAtTime(7, v + dur); vg.gain.value = 7;
+    vo.gain.setValueAtTime(0.0001, v); vo.gain.exponentialRampToValueAtTime(1, v + 0.1); vo.gain.setValueAtTime(1, v + dur * 0.5); vo.gain.exponentialRampToValueAtTime(0.0001, v + dur);
+    for (const det of [0, 7]) { const o = a.createOscillator(); o.type = 'sawtooth'; o.detune.value = det;
+      o.frequency.setValueAtTime(330, v); o.frequency.linearRampToValueAtTime(300, v + 0.5); o.frequency.exponentialRampToValueAtTime(95, v + dur);
+      vib.connect(vg).connect(o.frequency); o.connect(vo); o.start(v); o.stop(v + dur + 0.05); }
+    for (const [f, q, g] of [[750, 6, 1], [1200, 8, 0.7], [2600, 10, 0.3]]) { const bp = a.createBiquadFilter(), bg = a.createGain(); bp.type = 'bandpass'; bp.frequency.setValueAtTime(f, v); bp.frequency.linearRampToValueAtTime(f * 0.85, v + dur); bp.Q.value = q; bg.gain.value = g; vo.connect(bp).connect(bg).connect(drive); }
+    vib.start(v); vib.stop(v + dur + 0.05);
   }
+  // the owner's own clip, if one is saved in this browser (localStorage btLab:lossSound, a data URL under 1.5 MB)
+  let custom = null, customName = null; try { custom = localStorage.getItem('btLab:lossSound'); customName = localStorage.getItem('btLab:lossSoundName'); } catch (e) {}
+  function playLoss() { if (custom) { try { const el = new Audio(custom); el.volume = 1; el.play().catch(() => faah()); return; } catch (e) {} } faah(); }
   const fmtR = (r) => (r == null || !isFinite(r) ? '' : (r > 0 ? '+' : '') + (+r).toFixed(2).replace(/\.?0+$/, '') + 'R');
   window.BTFX = {
     win(R, sub, title) { const d = layer('win', title || 'Target hit', [fmtR(R), sub].filter(Boolean).join(' · ')); confetti(d); if (on) chime(); },
-    loss(R, sub, title) { layer('loss', title || 'Stopped out', [fmtR(R), sub].filter(Boolean).join(' · ')); if (!RM()) { document.body.classList.remove('btfx-shake'); void document.body.offsetWidth; document.body.classList.add('btfx-shake'); setTimeout(() => document.body.classList.remove('btfx-shake'), 600); } if (on) faah(); },
+    loss(R, sub, title) { layer('loss', title || 'Stopped out', [fmtR(R), sub].filter(Boolean).join(' · ')); if (!RM()) { document.body.classList.remove('btfx-shake'); void document.body.offsetWidth; document.body.classList.add('btfx-shake'); setTimeout(() => document.body.classList.remove('btfx-shake'), 600); } if (on) playLoss(); },
+    playLoss() { ctx(); playLoss(); },
+    get customName() { return custom ? customName || 'your sound' : null; },
+    setCustom(file) { if (!file) { custom = customName = null; try { localStorage.removeItem('btLab:lossSound'); localStorage.removeItem('btLab:lossSoundName'); } catch (e) {} return Promise.resolve(true); }
+      if (!/^audio\//.test(file.type)) return Promise.resolve('That is not an audio file'); if (file.size > 1.5e6) return Promise.resolve('Too big: keep the clip under 1.5 MB (a few seconds)');
+      return new Promise((res) => { const r = new FileReader(); r.onload = () => { try { localStorage.setItem('btLab:lossSound', r.result); localStorage.setItem('btLab:lossSoundName', file.name); custom = r.result; customName = file.name; res(true); } catch (e) { res('This browser has no room to keep the sound'); } }; r.onerror = () => res('Could not read the file'); r.readAsDataURL(file); }); },
     get sound() { return on; },
     set sound(v) { on = !!v; try { localStorage.setItem('btLab:sound', on ? '1' : '0'); } catch (e) {} if (on) ctx(); },
     unlock: ctx,
