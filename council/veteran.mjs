@@ -146,31 +146,31 @@ const leanWord = (v) => (v == null ? 'no reading' : v > 0 ? 'supportive for gold
 export function debate(fc, ch, fp, { now, base } = {}) {
   const topics = [], gs = fc && fc.goldScore, dr = (k) => ((fc && fc.drivers) || []).find((d) => d.k === k), gold = fc && fc.assets && fc.assets.gold;
   const C = Object.fromEntries(ch.list.map((r) => [r.k, r]));
-  const push = (topic, macro, veteran, stance, why) => topics.push({ topic, macro, veteran, stance, why });
+  const push = (topic, macro, veteran, stance, why, m = null, v = null) => topics.push({ topic, macro, veteran, stance, why, m: m == null ? null : Math.sign(m), v: v == null ? null : Math.sign(v) });
   // direction
   const mDir = gs && gs.ok ? (gs.bias === 'BUY' ? 1 : 0) : gold && gold.pUp != null ? (gold.pUp - (gold.fit ? gold.fit.base : 0.5) > 0.03 ? 1 : gold.pUp - (gold.fit ? gold.fit.base : 0.5) < -0.03 ? -1 : 0) : null;
   const vDir = ch.lean;
   push('Direction for gold', gs && gs.ok ? `Gold Macro Score ${sg(gs.score)} → ${gs.label}${gold && gold.pUp != null ? `; next-day P(up) ${Math.round(gold.pUp * 100)}%` : ''}` : gold && gold.pUp != null ? `next-day P(up) ${Math.round(gold.pUp * 100)}% (base ${Math.round((gold.fit ? gold.fit.base : 0.5) * 100)}%)` : 'no reading',
     `${ch.have} of ${ch.list.length} channels observed; tally ${sg(ch.tally, 0)} → ${leanWord(vDir)}`, stanceOf(mDir, vDir),
-    gs && gs.ok ? 'The score is the only directional engine that passed a 20-year test (IC +0.15, > +0.25 up 69%); the channel tally is a narrative check that can lower conviction, not flip the call. A negative tally is not a sell.' : 'Without the tested score the veteran treats direction as an auction unless the channels agree strongly.');
+    gs && gs.ok ? 'The score is the only directional engine that passed a 20-year test (IC +0.15, > +0.25 up 69%); the channel tally is a narrative check that can lower conviction, not flip the call. A negative tally is not a sell.' : 'Without the tested score the veteran treats direction as an auction unless the channels agree strongly.', mDir, vDir);
   // real yields: level vs change
   const mry = dr('ry'), ryz = gs && gs.ok && gs.z ? gs.z.ry4w : null, cr = C.real;
   push('Real yields', mry ? `${mry.detail} (vote ${mry.vote > 0 ? 'up' : mry.vote < 0 ? 'down' : 'flat'})${ryz != null ? `; score z (4-week fall) ${sg(ryz)}` : ''}` : 'no reading', cr.obs + (cr.stale ? ' (stale)' : ''),
     mry && mry.vote != null && cr.lean != null ? (mry.vote === cr.lean ? 'agree' : mry.vote === 0 || cr.lean === 0 ? 'qualify' : 'disagree') : 'qualify',
     mry && cr.lean != null && mry.vote < 0 && cr.lean >= 0 ? 'The strategist reads the level (a high TIPS yield is bearish); the driver map says short-horizon direction comes from changes, and the 4-week change is not rising. Both are true: a high level caps the upside, a falling change sets the near-term lean.'
-      : 'Both read the same TIPS series; the question is level versus change, and the Chicago Fed daily model explains little of daily variation either way.');
+      : 'Both read the same TIPS series; the question is level versus change, and the Chicago Fed daily model explains little of daily variation either way.', mry && mry.vote, cr.lean);
   // dollar
   const mdx = dr('dxymom'), dz = gs && gs.ok && gs.z ? gs.z.dxy4w : null, cu = C.usd;
   push('US dollar', mdx ? `${mdx.detail} (vote ${mdx.vote > 0 ? 'up' : mdx.vote < 0 ? 'down' : 'flat'})${dz != null ? `; score z (4-week fall) ${sg(dz)}` : ''}` : 'no reading', cu.obs,
     mdx && mdx.vote != null && cu.lean != null ? stanceOf(mdx.vote, cu.lean) : 'qualify',
-    'A 5-day momentum vote and a 4-week change can disagree without either being wrong; the veteran weights the 4-week window the score was tested on and notes that local-currency gold is not checked.');
+    'A 5-day momentum vote and a 4-week change can disagree without either being wrong; the veteran weights the 4-week window the score was tested on and notes that local-currency gold is not checked.', mdx && mdx.vote, cu.lean);
   // inflation and the next event
   const mbe = dr('be'), ci = C.infl, ev = (fc && fc.playbook || []).find((e) => now == null || Date.parse(e.at) / 1000 >= now);
   const evIn72 = ev && now != null && Date.parse(ev.at) / 1000 - now <= 72 * 3600;
   push('Inflation and the next release', mbe ? `${mbe.detail} (vote ${mbe.vote > 0 ? 'up' : mbe.vote < 0 ? 'down' : 'flat'})${ev ? `; playbook: ${ev.title} ${ev.at.slice(0, 16).replace('T', ' ')} UTC` : ''}` : 'no reading',
     `${ci.obs}. ${evIn72 ? `A red-folder event lands within 72 hours (${ev.title}): the view is conditional and the plan is to read real yields and the dollar after the print, not before.` : 'No red-folder event within 72 hours.'}`,
     mbe && mbe.vote != null && ci.lean != null ? stanceOf(mbe.vote, ci.lean) : 'qualify',
-    'A hot print has two opposing paths (inflation-protection demand versus a stronger policy response lifting real yields and the dollar); the observed move shows which won, not which wins next.');
+    'A hot print has two opposing paths (inflation-protection demand versus a stronger policy response lifting real yields and the dollar); the observed move shows which won, not which wins next.', mbe && mbe.vote, ci.lean);
   // positioning
   const mct = dr('cot'), cp = C.pos;
   push('Positioning', mct ? `${mct.detail} (vote ${mct.vote > 0 ? 'up' : mct.vote < 0 ? 'down' : 'flat'})` : 'no reading', cp.obs + (cp.stale ? ' (lagged more than 12 days)' : ''), mct && mct.vote ? 'qualify' : 'agree',
@@ -271,7 +271,44 @@ export function ledgerSummary(ledger) {
 }
 
 // ---- build / render ----------------------------------------------------------------------------------------------------
-export function build({ fc, cache, daily, ledger = [], now }) {
+// ---- the argument's record: weekly debates, resolved at the horizon, who was right per topic -------------------------------
+// Each side's lean per topic (+1 / −1; 0 or null abstains) is scored against gold's direction over HORIZON_DAYS. The scoreboard
+// is the owner's view of the strategist catching up: as the strategist adopts the veteran's challengers (macro/lessons.json),
+// its per-topic hits should converge on the veteran's.
+export function debatesIssue(hist, { now, gold, topics }) {
+  const H = Array.isArray(hist) ? hist : [], wk = weekKey(now);
+  if (H.some((r) => r.week === wk)) return { hist: H, issued: null };
+  const closes = (gold || []).filter((o) => o.t <= now); if (!closes.length) return { hist: H, issued: null };
+  const at = closes[closes.length - 1];
+  const rec = { week: wk, at: new Date(now * 1000).toISOString(), anchor: { t: at.t, close: at.v }, topics: topics.map((t) => ({ topic: t.topic, stance: t.stance, m: t.m ?? null, v: t.v ?? null })), resolved: null };
+  return { hist: H.concat([rec]), issued: rec };
+}
+export function debatesResolve(hist, gold) {
+  const H = Array.isArray(hist) ? hist.map((r) => ({ ...r })) : [], closes = gold || [], idx = new Map(closes.map((o, i) => [o.t, i]));
+  for (const r of H) { if (r.resolved) continue; const i = idx.get(r.anchor.t); if (i == null || i + HORIZON_DAYS >= closes.length) continue;
+    const end = closes[i + HORIZON_DAYS], dir = end.v > r.anchor.close ? 1 : -1;
+    r.resolved = { at: new Date(end.t * 1000).toISOString(), close: end.v, dir, returnPct: +((end.v / r.anchor.close - 1) * 100).toFixed(2) }; }
+  return H;
+}
+export function scoreboard(hist) {
+  const by = {}, tot = { strategist: { n: 0, hit: 0 }, veteran: { n: 0, hit: 0 } };
+  for (const r of (Array.isArray(hist) ? hist : []).filter((x) => x.resolved)) for (const t of r.topics) {
+    const b = by[t.topic] || (by[t.topic] = { strategist: { n: 0, hit: 0 }, veteran: { n: 0, hit: 0 } });
+    for (const [side, lean] of [['strategist', t.m], ['veteran', t.v]]) if (lean) { b[side].n++; tot[side].n++; if (lean === r.resolved.dir) { b[side].hit++; tot[side].hit++; } }
+  }
+  const rate = (x) => ({ n: x.n, hit: x.n ? +(x.hit / x.n).toFixed(3) : null });
+  return { weeks: (hist || []).filter((x) => x.resolved).length, pending: (hist || []).filter((x) => !x.resolved).length, byTopic: Object.fromEntries(Object.entries(by).map(([k, b]) => [k, { strategist: rate(b.strategist), veteran: rate(b.veteran) }])), strategist: rate(tot.strategist), veteran: rate(tot.veteran) };
+}
+// what the strategist has taken from the veteran so far (macro/forecast.json learned, written by council/macro.mjs lessons())
+export function teaching(fc) {
+  const L = fc && fc.learned; if (!L) return { adopted: [], pending: [], recent: [], line: 'The strategist does not run the veteran\'s challengers yet.' };
+  const ch = L.challengers || {}, adopted = (L.active || []), pending = Object.entries(ch).filter(([c]) => !adopted.includes(c)).map(([c, x]) => ({ k: c, vs: x.vs, challenger: x.challenger, incumbent: x.incumbent }));
+  const fmt = (x) => (x ? `hit ${Math.round(x.hit * 100)}%, t ${x.t}` : 'no record yet');
+  const line = `${adopted.length ? `The strategist adopted ${adopted.join(', ')} (the veteran's 4-week readings now carry their incumbents' weight, the incumbents keep half).` : 'The strategist has adopted none of the veteran\'s challengers yet.'} ${pending.map((x) => `${x.k} ${fmt(x.challenger)} vs ${x.vs} ${fmt(x.incumbent)}`).join('; ')}${pending.length ? '.' : ''} A challenger is adopted when it is proven on the replay (t ≥ 3, n ≥ 30) and beats its incumbent; it is handed back when it stops being proven.`;
+  return { adopted, pending, recent: L.recent || [], line };
+}
+
+export function build({ fc, cache, daily, ledger = [], debates = [], now }) {
   const S = {}; for (const id of ['DFII10', 'T10YIE', 'DGS2', 'DGS10', 'T10Y3M', 'BAMLH0A0HYM2', 'VIXCLS', 'VXVCLS', 'DTWEXBGS', 'SOFR', 'EFFR']) S[id] = fromCache(cache && cache.fred && cache.fred[id]);
   const gold = (daily && daily.gold) || [];
   S.gold = gold; S.dxy = daily && daily.dxy ? daily.dxy : [];
@@ -282,15 +319,19 @@ export function build({ fc, cache, daily, ledger = [], now }) {
   const ch = channels(S, now), fp = fingerprint(ch.changes), base = baseRates(gold, { now });
   const { topics, verdict, card } = debate(fc, ch, fp, { now, base });
   let L = ledgerResolve(ledger, gold); const { ledger: L2, issued } = ledgerIssue(L, { now, gold, verdict, base, gs: fc && fc.goldScore, card }); L = L2;
+  let Dh = debatesResolve(debates, gold); Dh = debatesIssue(Dh, { now, gold, topics }).hist;
+  const board = scoreboard(Dh), teach = teaching(fc);
   const v = { v: 1, at: new Date(now * 1000).toISOString(), paperOnly: true, strategistAt: fc && fc.at || null, shock: fp, channels: ch.list, tally: { sum: ch.tally, observed: ch.have, lean: ch.lean },
     debate: topics, verdict, card, base, ledger: { ...ledgerSummary(L), issuedNow: issued ? issued.forecast_id : null, lastProbability: issued ? issued.forecast.distribution.event_probability : (L.filter((r) => r.record_type === 'issued').at(-1) || {}).forecast?.distribution?.event_probability ?? null },
+    scoreboard: board, teaching: teach,
     source: 'council/veteran.mjs: a code port of the owner\'s gptmacro_v.1 skill (research/macro-veteran/); reads the strategist\'s data only, fetches nothing' };
   v.brief = briefOf(v);
-  return { v, ledger: L };
+  return { v, ledger: L, debates: Dh };
 }
 export function briefOf(v) {
   const d = v.verdict, dis = v.debate.filter((t) => t.stance === 'disagree').map((t) => t.topic), q = v.debate.filter((t) => t.stance === 'qualify').map((t) => t.topic);
-  return `Macro veteran, ${v.at.slice(0, 16).replace('T', ' ')} UTC. Shock: ${v.shock.shock} (${v.shock.confidence}). Consensus with the strategist: ${d.bias}${d.conviction ? ` ${d.conviction}` : ''} · ${d.agree} agree, ${d.qualify} qualify, ${d.disagree} disagree${dis.length ? ` (${dis.join(', ')})` : ''}${q.length ? `; qualified: ${q.join(', ')}` : ''}. ${d.note} Fails if ${d.invalidation.length ? d.invalidation.join('; ') : 'n/a'}.${v.ledger.lastProbability != null ? ` Ledger: P(gold up over ${HORIZON_DAYS} days) ${Math.round(v.ledger.lastProbability * 100)}%${v.base ? ` vs base ${Math.round(v.base.upRate * 100)}%` : ''}, ${v.ledger.resolved} resolved${v.ledger.brier != null ? `, Brier ${v.ledger.brier}${v.ledger.brierBase != null ? ` vs base ${v.ledger.brierBase}` : ''}` : ''}.` : ''}`;
+  const sb = v.scoreboard, sbTxt = sb && sb.weeks ? ` Scoreboard over ${sb.weeks} resolved week${sb.weeks === 1 ? '' : 's'}: veteran ${sb.veteran.hit == null ? 'n/a' : Math.round(sb.veteran.hit * 100) + '%'} vs strategist ${sb.strategist.hit == null ? 'n/a' : Math.round(sb.strategist.hit * 100) + '%'} right on direction per topic.` : '';
+  return `Macro veteran, ${v.at.slice(0, 16).replace('T', ' ')} UTC. Shock: ${v.shock.shock} (${v.shock.confidence}). Consensus with the strategist: ${d.bias}${d.conviction ? ` ${d.conviction}` : ''} · ${d.agree} agree, ${d.qualify} qualify, ${d.disagree} disagree${dis.length ? ` (${dis.join(', ')})` : ''}${q.length ? `; qualified: ${q.join(', ')}` : ''}. ${d.note} Fails if ${d.invalidation.length ? d.invalidation.join('; ') : 'n/a'}.${v.ledger.lastProbability != null ? ` Ledger: P(gold up over ${HORIZON_DAYS} days) ${Math.round(v.ledger.lastProbability * 100)}%${v.base ? ` vs base ${Math.round(v.base.upRate * 100)}%` : ''}, ${v.ledger.resolved} resolved${v.ledger.brier != null ? `, Brier ${v.ledger.brier}${v.ledger.brierBase != null ? ` vs base ${v.ledger.brierBase}` : ''}` : ''}.` : ''}${sbTxt}${v.teaching ? ` Teaching: ${v.teaching.line}` : ''}`;
 }
 export function veteranSection(v) {
   if (!v || !v.debate) return '';
@@ -299,6 +340,8 @@ export function veteranSection(v) {
   for (const t of v.debate) out.push(`| ${t.topic} | ${t.macro.replace(/\|/g, '/')} | ${t.veteran.replace(/\|/g, '/')} | ${t.stance} |`);
   out.push('', v.verdict.note.replace(/\|/g, '/'), '', `Fails if: ${v.verdict.invalidation.join('; ') || 'n/a'}.`, '', `Channels: ${v.channels.map((c) => `${c.name} ${c.lean == null ? 'n/a' : c.lean > 0 ? '+' : c.lean < 0 ? '−' : '0'}${c.stale ? ' (stale)' : ''}`).join(' · ')}.`);
   if (v.ledger) out.push('', `Forecast ledger: ${v.ledger.issued} issued, ${v.ledger.resolved} resolved${v.ledger.brier != null ? `, Brier ${v.ledger.brier} (base ${v.ledger.brierBase ?? 'n/a'}, score rule ${v.ledger.brierScore ?? 'n/a'})` : ''}. ${v.ledger.note}`);
+  if (v.scoreboard) out.push('', `Scoreboard (who was right on gold's direction per topic, ${HORIZON_DAYS} trading days on): ${v.scoreboard.weeks} resolved week${v.scoreboard.weeks === 1 ? '' : 's'}, ${v.scoreboard.pending} pending${v.scoreboard.weeks ? ` · veteran ${v.scoreboard.veteran.hit == null ? 'n/a' : Math.round(v.scoreboard.veteran.hit * 100) + '%'} (${v.scoreboard.veteran.n}) vs strategist ${v.scoreboard.strategist.hit == null ? 'n/a' : Math.round(v.scoreboard.strategist.hit * 100) + '%'} (${v.scoreboard.strategist.n})` : ''}.`);
+  if (v.teaching) out.push('', `Teaching: ${v.teaching.line.replace(/\|/g, '/')}`);
   out.push(VET_END);
   return out.join('\n');
 }
@@ -306,13 +349,13 @@ export function veteranSection(v) {
 export function run({ dir = 'data', now = Math.floor(Date.now() / 1000), log = console.log } = {}) {
   const M = path.join(dir, 'macro'); fs.mkdirSync(M, { recursive: true });
   const rd = (f, d) => { try { return JSON.parse(fs.readFileSync(f, 'utf8')); } catch (e) { return d; } };
-  const fc = rd(path.join(M, 'forecast.json'), null), cache = rd(path.join(M, 'cache.json'), {}), ledger = rd(path.join(M, 'veteran-ledger.json'), []);
+  const fc = rd(path.join(M, 'forecast.json'), null), cache = rd(path.join(M, 'cache.json'), {}), ledger = rd(path.join(M, 'veteran-ledger.json'), []), debates = rd(path.join(M, 'veteran-debates.json'), []);
   if (!fc || !fc.assets) { log('Macro veteran: no strategist forecast yet (macro/forecast.json); nothing to discuss.'); return null; }
   const daily = {}; for (const k of ['eurusd', 'usdjpy', 'gbpusd', 'usdcad', 'usdchf']) daily[k] = dailyRows(rd(path.join(dir, 'research', 'daily', `${k}.json`), null));
   const dx = dxyDaily(daily), gold = dailyRows(rd(path.join(dir, 'research', 'daily', 'xau.json'), null));
-  const { v, ledger: L } = build({ fc, cache, daily: { gold, dxy: dx }, ledger, now });
+  const { v, ledger: L, debates: Dh } = build({ fc, cache, daily: { gold, dxy: dx }, ledger, debates, now });
   const w = (f, val) => { const s = JSON.stringify(val, null, 1), p = path.join(M, f); let old = null; try { old = fs.readFileSync(p, 'utf8'); } catch (e) {} if (old !== s) fs.writeFileSync(p, s); };
-  w('veteran.json', v); w('veteran-ledger.json', L);
+  w('veteran.json', v); w('veteran-ledger.json', L); w('veteran-debates.json', Dh);
   try { const fA = path.join(dir, 'analysis', 'latest.md');
     if (fs.existsSync(fA)) { const md = fs.readFileSync(fA, 'utf8'), nx = injectSection(md, veteranSection(v), VET_START, VET_END); if (nx !== md) fs.writeFileSync(fA, nx); } } catch (e) { log('veteran: analysis section skipped:', e.message); }
   log(v.brief);

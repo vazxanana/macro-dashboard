@@ -10076,6 +10076,7 @@ html[data-role="public"] #ms-me-ct { display: none; }
 #ms-cp-macro .md-vet-side { margin-top: 3px; } #ms-cp-macro .md-vet-side small { display: inline-block; min-width: 68px; color: var(--ink-faint); font-size: 11px; text-transform: uppercase; letter-spacing: 0.02em; }
 #ms-cp-macro .md-vet-why { margin-top: 4px; font-size: 12px; color: var(--ink-faint); font-style: italic; }
 #ms-cp-macro .md-vet-foot { margin: 10px 0 0; font-size: 12.5px; color: var(--ink-faint); line-height: 1.5; }
+#ms-cp-macro .md-vet-teach { display: block; margin: 6px 0; color: var(--ink-dim); }
 @media (max-width: 480px) { #ms-cp-macro .md-vet-row { grid-template-columns: 1fr; gap: 4px; } }
 #ms-cp-macro .md-evday { margin: 0 0 12px; padding: 10px 12px; border-radius: var(--r-sm, 8px); border: 1px solid color-mix(in srgb, var(--md-warn) 35%, transparent); background: color-mix(in srgb, var(--md-warn) 9%, transparent); font-size: 13px; color: var(--ink); }
 
@@ -10353,6 +10354,9 @@ html[data-role="public"] #ms-me-ct { display: none; }
     var lg = v.ledger || {}, inv = (vd.invalidation || []).length ? 'Fails if ' + esc(vd.invalidation.join('; ')) + '. ' : '';
     $('ms-md-vet-foot').innerHTML = inv + (lg.lastProbability != null ? 'Ledger: P(gold up over ' + (v.base && v.base.horizon || 20) + ' trading days) <b>' + Math.round(lg.lastProbability * 100) + '%</b>' + (v.base ? ' vs base ' + Math.round(v.base.upRate * 100) + '%' : '')
       + ' · ' + (lg.issued || 0) + ' issued, ' + (lg.resolved || 0) + ' resolved' + (lg.brier != null ? ', Brier ' + lg.brier + (lg.brierBase != null ? ' vs base ' + lg.brierBase : '') : '') + '. ' : '')
+      + (function () { var sb = v.scoreboard; if (!sb) return ''; var pc = function (x) { return x && x.hit != null ? Math.round(x.hit * 100) + '%' : 'n/a'; };
+        return 'Scoreboard: ' + (sb.weeks ? '<b>veteran ' + pc(sb.veteran) + '</b> vs <b>strategist ' + pc(sb.strategist) + '</b> right on direction per topic over ' + sb.weeks + ' resolved week' + (sb.weeks === 1 ? '' : 's') : 'no resolved week yet') + (sb.pending ? ', ' + sb.pending + ' pending' : '') + '. '; })()
+      + (v.teaching && v.teaching.line ? '<span class="md-vet-teach">' + esc(v.teaching.line) + '</span> ' : '')
       + '<span title="Paper only. The veteran reads the strategist\'s data; it can lower conviction, never flip the tested score\'s direction, and never calls a macro sell.">Paper reading; nothing trades on it.</span>';
   }
 
