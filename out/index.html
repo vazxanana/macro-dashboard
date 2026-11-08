@@ -1350,7 +1350,7 @@ document.addEventListener('DOMContentLoaded', function () {
 // Sign-in card (6 Nov): first screen for anyone not signed in; "Continue as guest" opens the public view and is remembered
 function msGate(show) {
   var g = document.getElementById('ms-gate'); if (!g) return;
-  if (show) { document.documentElement.dataset.gate = '1'; setTimeout(function () { var u = document.getElementById('ms-gate-p'); if (u) u.focus(); }, 30); }
+  if (show) { document.documentElement.dataset.gate = '1'; if (window.msGateRefresh) window.msGateRefresh(); setTimeout(function () { var u = document.getElementById('ms-gate-p'); if (u) u.focus(); }, 30); }
   else delete document.documentElement.dataset.gate;
 }
 document.addEventListener('DOMContentLoaded', function () {
@@ -9465,6 +9465,7 @@ function gpStats(T) {
         if (rows.length) { tape.innerHTML = rows.join('<span>·</span>') + '<span>·</span>' + rows.join('<span>·</span>') + '<span>·</span>'; document.getElementById('gs-tape').hidden = false; } }
     }); }
   sess(); px(); proof(); setInterval(function () { if (R.dataset.gate) { sess(); } }, 30000); setInterval(px, 120000); setInterval(proof, 300000);
+  window.msGateRefresh = function () { sess(); px(); proof(); };   // every Log in button shows the full card (8 Nov: from Charts it looked like the old one)
   var jb = document.getElementById('g-join-btn'); if (jb) jb.addEventListener('click', function () { msGate(true); proof(); });
 })();
 </script>
