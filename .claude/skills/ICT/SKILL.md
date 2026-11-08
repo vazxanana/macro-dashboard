@@ -385,3 +385,14 @@ Gate: better than the live exit in both halves (split 24 Jun 2026) and on >= 3 o
 - So it runs as the paper-only shadow variant `strail` (`SHADOW.strail`, records with `trail: null` + `strail: [2, 2]`, own one-open
   stream in shadow.json `.variants` / replay.json `.shadowByVariant`), and the Coach does not judge it as a filter. Go live only if
   the forward stream keeps beating the A-rule over a long stretch AND an older regime agrees.
+
+## 34. Futures rolls in the CNBC candles (7 Nov 2026, research/edge/futures-roll) — data fix, rules unchanged
+- CNBC's intraday `.1` candles are the current contract's own (no roll jump, so no fake H1 gap / FVG / sweep), but its DAILY candles
+  splice front months and step +0.6-1.7 % at every switch (indices: Monday of the expiry week; gold: last business day before the
+  delivery month). The step tilted the 50-day bias towards sells for ~50 days after each roll (8 replay A-signals flipped).
+- Fix (data layer): index daily candles back-adjusted with spreads measured on CNBC's cash-index closes (`rollAdjust`); a live trade
+  open across a switch has its levels moved by the measured offset (`contractShift`, one replay case: gold 29 Jul 2026, +1.47R fake
+  → +0.40R); the replay no longer reads the current contract's thin back-month hours (`liquidFrom`: 0.01-3 % of front volume, H1
+  ranges 0-0.8x the market, the "4 Jun 2026" NQ/ES signals) and back-fills them from cash instead.
+- Replay A-setups 249 / +63.6R → 222 / +51.6R (RTY now starts 13 Sep 2026: no fill source). The deferred-contract months had made
+  index A-setups look better (+0.39-0.53R a trade) than the liquid data shows (+0.18-0.34R). Full list: research/edge/futures-roll/replay-a-changes.txt.
