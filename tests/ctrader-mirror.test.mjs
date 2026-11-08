@@ -2,7 +2,8 @@
 //   node --test tests/ctrader-mirror.test.mjs
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { mirrorRound, PT, ALLOWED, session, volumeFor, relative, seal, unseal, LIMITS, ictCandidates, orderStep, commentFor, mirrorAlertText, sendMirrorAlerts, riskVolume, quoteRate, specFor, markOf } from '../council/ctrader-mirror.mjs';
+import fs from 'node:fs';
+import { mirrorRound, PT, ALLOWED, session, volumeFor, relative, seal, unseal, LIMITS, ictCandidates, orderStep, commentFor, mirrorAlertText, sendMirrorAlerts, riskVolume, quoteRate, specFor, markOf, applyReset } from '../council/ctrader-mirror.mjs';
 
 const ENV = { CTRADER_CLIENT_ID: 'fake-client-id', CTRADER_CLIENT_SECRET: 'fake-client-secret', CTRADER_ACCESS_TOKEN: 'fake-access-old',
   CTRADER_REFRESH_TOKEN: 'fake-refresh-old', CTRADER_ACCOUNT_ID: '4242', CTRADER_ENV: 'demo', CTRADER_MIRROR: 'on' };
@@ -493,4 +494,17 @@ test('min-lot risk cap: a wide-stop trade whose minimum lot risks more than LIMI
   assert.equal(orders(b).length, 0); assert.match(r.state.wait.x.why, /even the minimum lot/);
   b.setBalance(1000000); r = await mirrorRound({ env: ENV, trades: [tr({ id: 'x', market: 'xau', entry: 4000, stop: 3916, t1: 4200 })], state: r.state, WS: b.WS, now: NOW + 240 });
   assert.equal(orders(b).length, 1); assert.equal(r.state.map.x.status, 'open'); assert.equal(r.state.wait.x, undefined);
+});
+
+test('owner reset: drops the copied-trade records, notes, pauses and day once per `at`; the same trades are then copied again', async () => {
+  const b = broker(); let r = await mirrorRound({ env: ENV, trades: [tr()], state: started, WS: b.WS, now: NOW });
+  assert.equal(orders(b).length, 1); b.positions.clear();   // the owner closed it by hand
+  const none = applyReset(r.state, null); assert.equal(none.applied, false); assert.equal(none.state, r.state);
+  const first = applyReset(r.state, { at: '2026-11-08T09:45Z' }, NOW + 60);
+  assert.equal(first.applied, true); assert.equal(first.dropped, 1); assert.deepEqual(first.state.map, {}); assert.equal(first.state.day, null); assert.equal(first.state.resetAt, '2026-11-08T09:45Z');
+  assert.equal(first.state.startedAt, started.startedAt); assert.equal(first.state.catchUpAt, r.state.catchUpAt);
+  assert.equal(applyReset(first.state, { at: '2026-11-08T09:45Z' }).applied, false);   // once
+  r = await mirrorRound({ env: ENV, trades: [tr()], state: first.state, WS: b.WS, now: NOW + 240 });
+  assert.equal(orders(b).length, 2); assert.equal(r.state.map['eurusd-intraday-1'].status, 'open'); assert.equal(r.state.day.startBalance, 10000);
+  const file = JSON.parse(fs.readFileSync(new URL('../council/ctrader-reset.json', import.meta.url), 'utf8')); assert.match(file.at, /^\d{4}-\d{2}-\d{2}T/);
 });

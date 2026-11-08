@@ -232,6 +232,14 @@ export function riskVolume({ info, t, balance, name, openRisk = 0, openMargin = 
   if (!mpl && v > lot * LIMITS.maxLots + 1e-9) return { skip: `${name}: ${(v / lot).toFixed(2)} lot is above the ${LIMITS.maxLots}-lot cap (the broker's margin is not known)` };
   return { volume: v, riskCash: +riskCash.toFixed(2), lots: +(v / lot).toFixed(4), perLot: +perLot.toFixed(4), ...(atMin ? { minLot: true } : {}), ...(margin != null ? { margin: +margin.toFixed(2) } : {}) };
 }
+// owner reset (council/ctrader-reset.json { at }): the owner closed every demo position by hand and wants the book copied afresh, so
+// the saved record of the copied trades, the skip/wait notes, the pauses and the day's start balance are dropped once per `at`.
+// Positions still open at the broker under the mirror's label are adopted again by the next round (never opened twice).
+export function applyReset(state, reset, now = Math.floor(Date.now() / 1000)) {
+  const at = reset && reset.at; if (!at || !state || state.resetAt === at) return { state, applied: false };
+  const dropped = Object.keys(state.map || {}).length;
+  return { applied: true, dropped, state: { ...state, map: {}, skipped: {}, wait: {}, paused: {}, day: null, resetAt: at, resetDoneAt: new Date(now * 1000).toISOString() } };
+}
 // relative stop/target for a market order: in 1/100000 of the price, a multiple of the symbol's smallest step
 export function relative(dist, digits = 5) {
   const unit = 10 ** Math.max(0, 5 - digits);
@@ -492,7 +500,11 @@ if (process.argv[1] && process.argv[1].endsWith('ctrader-mirror.mjs')) {
   // the council's latest prices (Trader snapshot): stop/target distances of a council trade are measured from them, see the header
   let marks = null; try { const sn = JSON.parse(fs.readFileSync(path.join(DIR, 'snapshot.json'), 'utf8'));
     marks = Object.fromEntries(Object.entries(sn.markets || {}).filter(([, m]) => m && +m.price > 0).map(([k, m]) => [k, { price: +m.price, at: sn.at }])); } catch (e) {}
-  const prev = rd('mirror.json', {}), r = await mirrorRound({ env: process.env, trades, state: prev.state, tokens: rd('tokens.json', null), specs: rd('symbols.json', null), onTokens: saveTokens, shadows, marks });
+  const prev = rd('mirror.json', {});
+  let resetFile = null; try { resetFile = JSON.parse(fs.readFileSync(new URL('./ctrader-reset.json', import.meta.url), 'utf8')); } catch (e) {}
+  const reset = applyReset(prev.state, resetFile);
+  if (reset.applied) prev.log = (prev.log || []).concat({ at: new Date().toISOString(), msg: `owner reset ${resetFile.at}: ${reset.dropped} copied-trade records, the skip/wait notes and the day's start balance dropped; the open book is copied afresh` });
+  const r = await mirrorRound({ env: process.env, trades, state: reset.state, tokens: rd('tokens.json', null), specs: rd('symbols.json', null), onTokens: saveTokens, shadows, marks });
   fs.mkdirSync(CD, { recursive: true });
   fs.writeFileSync(path.join(CD, 'mirror.json'), JSON.stringify({ state: r.state, log: (prev.log || []).concat(r.log).slice(-300), limits: LIMITS, symbols: SYMBOLS, execution: executionStats(r.state.map) }, null, 1));
   if (r.tokens && JSON.stringify(r.tokens) !== JSON.stringify(rd('tokens.json', null))) saveTokens(r.tokens);
