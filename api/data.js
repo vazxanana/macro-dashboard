@@ -28,7 +28,7 @@ module.exports = async (req, res) => {
     if (!r.ok) { res.setHeader('Cache-Control', 's-maxage=15'); return res.status(r.status === 404 ? 404 : 502).json({ error: `GitHub ${r.status}` }); }
     const buf = Buffer.from(await r.arrayBuffer()), ext = (p.split('.').pop() || '').toLowerCase();
     res.setHeader('Content-Type', { json: 'application/json; charset=utf-8', md: 'text/markdown; charset=utf-8', csv: 'text/csv; charset=utf-8', js: 'application/javascript; charset=utf-8' }[ext] || 'text/plain; charset=utf-8');
-    res.setHeader('Cache-Control', p === 'ctrader/account.json' ? 'public, max-age=0, s-maxage=5' : 'public, max-age=0, s-maxage=20, stale-while-revalidate=60');   // the owner's account view: near-live   // the edge serves everyone from one copy for 20 s
+    res.setHeader('Cache-Control', (p === 'ctrader/account.json' || p === 'ctrader/accounts.json') ? 'public, max-age=0, s-maxage=5' : 'public, max-age=0, s-maxage=20, stale-while-revalidate=60');   // the owner's account view: near-live   // the edge serves everyone from one copy for 20 s
     res.setHeader('Access-Control-Allow-Origin', '*');
     if (p === 'mt5/signals.csv') await bridgePing(req).catch(() => {});   // awaited: a frozen function would drop it
     return res.status(200).send(buf);

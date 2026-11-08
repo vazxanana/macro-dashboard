@@ -1,0 +1,1590 @@
+{
+ "topic": "ict-exits-replay",
+ "system": "ICT desk A-setups (ict/tracker.mjs isASetup + sizeOf), exits only; entries unchanged",
+ "data": {
+  "replay": "council-data ict/replay.json (1 Aug 2025 - 7 Nov 2026, 253 closed A-trades). Exits re-run on OANDA 5m (NAS100/SPX500/US30/XAU via meridianx.dev /md/bars, scaled onto each futures entry) and on the replay H1 path for RTY; 4 RTY trades dropped (path ends before the exit)",
+  "history": "HistData M1 2018 - Oct 2026 (NSXUSD as NQ, SPXUSD as ES, XAUUSD as GC), every A-setup its own trade (research/edge/ict-exits setup)",
+  "costs": "round turn: NQ 1.0, ES 0.5, YM 4, RTY 0.3, GC 0.3 points; R sized as the A-rule (x size)"
+ },
+ "variants": {
+  "live": "BE +1.5R (index), trail 1.5R from +2R, 36 H1",
+  "be1": "BE +1R (index)",
+  "nobe": "no BE",
+  "half1": "half off at +1R, BE on the rest, live trail",
+  "half2": "half off at +2R, BE, live trail",
+  "tgt3": "fixed 3R target (live BE)",
+  "tstop12": "out at the 12th H1 close unless +1R was reached",
+  "struct": "structure trail: from +2R, stop to the last confirmed H1 swing (2 each side), no 1.5R trail"
+ },
+ "gate": "beats the live exit in both halves of the replay AND on >= 3 of 5 markets; at most one candidate",
+ "replay": {
+  "from": "2025-08-01",
+  "replayAt": "2026-11-07T19:52:15.820Z",
+  "trades": 253,
+  "compared": 249,
+  "dropped": 4,
+  "src": {
+   "oanda": 225,
+   "path": 28
+  },
+  "halvesSplit": "2026-06-24",
+  "recordedLive": {
+   "gross": {
+    "n": 253,
+    "win": 40.3,
+    "exp": 0.296,
+    "R": 74.9,
+    "dd": 12.2,
+    "t": 2.77
+   },
+   "net": {
+    "n": 249,
+    "win": 40.6,
+    "exp": 0.291,
+    "R": 72.4,
+    "dd": 11.7,
+    "t": 2.69
+   }
+  },
+  "liveResimWithin015R": "221/249",
+  "variants": {
+   "live": {
+    "all": {
+     "n": 249,
+     "win": 39.4,
+     "exp": 0.231,
+     "R": 57.4,
+     "dd": 14.5,
+     "t": 2.32
+    },
+    "h1": {
+     "n": 124,
+     "win": 40.3,
+     "exp": 0.202,
+     "R": 25.1,
+     "dd": 14.5,
+     "t": 1.43
+    },
+    "h2": {
+     "n": 125,
+     "win": 38.4,
+     "exp": 0.259,
+     "R": 32.4,
+     "dd": 12.1,
+     "t": 1.84
+    },
+    "vsLive": {
+     "perTrade": 0,
+     "t": 0,
+     "h1": 0,
+     "h2": 0
+    },
+    "markets": {
+     "nq": {
+      "n": 43,
+      "R": 9.6,
+      "vsLive": 0
+     },
+     "es": {
+      "n": 62,
+      "R": 16,
+      "vsLive": 0
+     },
+     "ym": {
+      "n": 60,
+      "R": 12.5,
+      "vsLive": 0
+     },
+     "rty": {
+      "n": 24,
+      "R": 14.4,
+      "vsLive": 0
+     },
+     "gc": {
+      "n": 60,
+      "R": 4.9,
+      "vsLive": 0
+     }
+    },
+    "marketsBetter": 0
+   },
+   "be1": {
+    "all": {
+     "n": 249,
+     "win": 34.9,
+     "exp": 0.207,
+     "R": 51.5,
+     "dd": 14.7,
+     "t": 2.19
+    },
+    "h1": {
+     "n": 124,
+     "win": 33.9,
+     "exp": 0.124,
+     "R": 15.4,
+     "dd": 14.7,
+     "t": 0.96
+    },
+    "h2": {
+     "n": 125,
+     "win": 36,
+     "exp": 0.289,
+     "R": 36.1,
+     "dd": 8.9,
+     "t": 2.09
+    },
+    "vsLive": {
+     "perTrade": -0.024,
+     "t": -0.75,
+     "h1": -9.7,
+     "h2": 3.8
+    },
+    "markets": {
+     "nq": {
+      "n": 43,
+      "R": 10.6,
+      "vsLive": 1
+     },
+     "es": {
+      "n": 62,
+      "R": 10.1,
+      "vsLive": -5.9
+     },
+     "ym": {
+      "n": 60,
+      "R": 10,
+      "vsLive": -2.5
+     },
+     "rty": {
+      "n": 24,
+      "R": 15.9,
+      "vsLive": 1.5
+     },
+     "gc": {
+      "n": 60,
+      "R": 4.9,
+      "vsLive": 0
+     }
+    },
+    "marketsBetter": 2
+   },
+   "nobe": {
+    "all": {
+     "n": 249,
+     "win": 41.4,
+     "exp": 0.215,
+     "R": 53.6,
+     "dd": 14.5,
+     "t": 2.13
+    },
+    "h1": {
+     "n": 124,
+     "win": 41.9,
+     "exp": 0.181,
+     "R": 22.5,
+     "dd": 14.5,
+     "t": 1.27
+    },
+    "h2": {
+     "n": 125,
+     "win": 40.8,
+     "exp": 0.249,
+     "R": 31.1,
+     "dd": 13,
+     "t": 1.74
+    },
+    "vsLive": {
+     "perTrade": -0.016,
+     "t": -1.01,
+     "h1": -2.6,
+     "h2": -1.3
+    },
+    "markets": {
+     "nq": {
+      "n": 43,
+      "R": 10.7,
+      "vsLive": 1.1
+     },
+     "es": {
+      "n": 62,
+      "R": 12.6,
+      "vsLive": -3.4
+     },
+     "ym": {
+      "n": 60,
+      "R": 10.5,
+      "vsLive": -2
+     },
+     "rty": {
+      "n": 24,
+      "R": 14.9,
+      "vsLive": 0.5
+     },
+     "gc": {
+      "n": 60,
+      "R": 4.9,
+      "vsLive": 0
+     }
+    },
+    "marketsBetter": 2
+   },
+   "half1": {
+    "all": {
+     "n": 249,
+     "win": 51.8,
+     "exp": 0.106,
+     "R": 26.4,
+     "dd": 16.7,
+     "t": 1.5
+    },
+    "h1": {
+     "n": 124,
+     "win": 48.4,
+     "exp": 0.04,
+     "R": 5,
+     "dd": 16.7,
+     "t": 0.41
+    },
+    "h2": {
+     "n": 125,
+     "win": 55.2,
+     "exp": 0.171,
+     "R": 21.4,
+     "dd": 6.1,
+     "t": 1.7
+    },
+    "vsLive": {
+     "perTrade": -0.125,
+     "t": -2.76,
+     "h1": -20.1,
+     "h2": -11
+    },
+    "markets": {
+     "nq": {
+      "n": 43,
+      "R": 6,
+      "vsLive": -3.6
+     },
+     "es": {
+      "n": 62,
+      "R": 10.1,
+      "vsLive": -5.9
+     },
+     "ym": {
+      "n": 60,
+      "R": 6,
+      "vsLive": -6.6
+     },
+     "rty": {
+      "n": 24,
+      "R": 12.2,
+      "vsLive": -2.3
+     },
+     "gc": {
+      "n": 60,
+      "R": -7.9,
+      "vsLive": -12.7
+     }
+    },
+    "marketsBetter": 0
+   },
+   "half2": {
+    "all": {
+     "n": 249,
+     "win": 39.4,
+     "exp": 0.183,
+     "R": 45.7,
+     "dd": 13.7,
+     "t": 2.09
+    },
+    "h1": {
+     "n": 124,
+     "win": 40.3,
+     "exp": 0.157,
+     "R": 19.5,
+     "dd": 13.7,
+     "t": 1.25
+    },
+    "h2": {
+     "n": 125,
+     "win": 38.4,
+     "exp": 0.209,
+     "R": 26.2,
+     "dd": 11.7,
+     "t": 1.7
+    },
+    "vsLive": {
+     "perTrade": -0.047,
+     "t": -2.13,
+     "h1": -5.6,
+     "h2": -6.2
+    },
+    "markets": {
+     "nq": {
+      "n": 43,
+      "R": 6,
+      "vsLive": -3.7
+     },
+     "es": {
+      "n": 62,
+      "R": 15.8,
+      "vsLive": -0.2
+     },
+     "ym": {
+      "n": 60,
+      "R": 10,
+      "vsLive": -2.5
+     },
+     "rty": {
+      "n": 24,
+      "R": 11.3,
+      "vsLive": -3.1
+     },
+     "gc": {
+      "n": 60,
+      "R": 2.6,
+      "vsLive": -2.2
+     }
+    },
+    "marketsBetter": 0
+   },
+   "tgt3": {
+    "all": {
+     "n": 249,
+     "win": 39.4,
+     "exp": 0.199,
+     "R": 49.5,
+     "dd": 16.1,
+     "t": 2.15
+    },
+    "h1": {
+     "n": 124,
+     "win": 40.3,
+     "exp": 0.195,
+     "R": 24.2,
+     "dd": 16.1,
+     "t": 1.44
+    },
+    "h2": {
+     "n": 125,
+     "win": 38.4,
+     "exp": 0.202,
+     "R": 25.2,
+     "dd": 12.1,
+     "t": 1.6
+    },
+    "vsLive": {
+     "perTrade": -0.032,
+     "t": -1.16,
+     "h1": -0.9,
+     "h2": -7.1
+    },
+    "markets": {
+     "nq": {
+      "n": 43,
+      "R": 6.4,
+      "vsLive": -3.2
+     },
+     "es": {
+      "n": 62,
+      "R": 19.3,
+      "vsLive": 3.3
+     },
+     "ym": {
+      "n": 60,
+      "R": 12.5,
+      "vsLive": 0
+     },
+     "rty": {
+      "n": 24,
+      "R": 8.5,
+      "vsLive": -5.9
+     },
+     "gc": {
+      "n": 60,
+      "R": 2.6,
+      "vsLive": -2.2
+     }
+    },
+    "marketsBetter": 1
+   },
+   "tstop12": {
+    "all": {
+     "n": 249,
+     "win": 39.8,
+     "exp": 0.149,
+     "R": 37.1,
+     "dd": 12,
+     "t": 1.69
+    },
+    "h1": {
+     "n": 124,
+     "win": 39.5,
+     "exp": 0.053,
+     "R": 6.6,
+     "dd": 12,
+     "t": 0.46
+    },
+    "h2": {
+     "n": 125,
+     "win": 40,
+     "exp": 0.244,
+     "R": 30.5,
+     "dd": 6.9,
+     "t": 1.85
+    },
+    "vsLive": {
+     "perTrade": -0.082,
+     "t": -1.63,
+     "h1": -18.5,
+     "h2": -1.8
+    },
+    "markets": {
+     "nq": {
+      "n": 43,
+      "R": 6.5,
+      "vsLive": -3.1
+     },
+     "es": {
+      "n": 62,
+      "R": 4.7,
+      "vsLive": -11.3
+     },
+     "ym": {
+      "n": 60,
+      "R": 10,
+      "vsLive": -2.5
+     },
+     "rty": {
+      "n": 24,
+      "R": 16.1,
+      "vsLive": 1.7
+     },
+     "gc": {
+      "n": 60,
+      "R": -0.2,
+      "vsLive": -5.1
+     }
+    },
+    "marketsBetter": 1
+   },
+   "struct": {
+    "all": {
+     "n": 249,
+     "win": 39,
+     "exp": 0.289,
+     "R": 71.9,
+     "dd": 13.2,
+     "t": 2.66
+    },
+    "h1": {
+     "n": 124,
+     "win": 40.3,
+     "exp": 0.231,
+     "R": 28.7,
+     "dd": 13.2,
+     "t": 1.54
+    },
+    "h2": {
+     "n": 125,
+     "win": 37.6,
+     "exp": 0.346,
+     "R": 43.3,
+     "dd": 12.4,
+     "t": 2.2
+    },
+    "vsLive": {
+     "perTrade": 0.058,
+     "t": 1.44,
+     "h1": 3.6,
+     "h2": 10.9
+    },
+    "markets": {
+     "nq": {
+      "n": 43,
+      "R": 6.8,
+      "vsLive": -2.9
+     },
+     "es": {
+      "n": 62,
+      "R": 25,
+      "vsLive": 9
+     },
+     "ym": {
+      "n": 60,
+      "R": 14.1,
+      "vsLive": 1.6
+     },
+     "rty": {
+      "n": 24,
+      "R": 16.7,
+      "vsLive": 2.3
+     },
+     "gc": {
+      "n": 60,
+      "R": 9.3,
+      "vsLive": 4.4
+     }
+    },
+    "marketsBetter": 4
+   }
+  }
+ },
+ "history": {
+  "live": {
+   "all": {
+    "n": 1411,
+    "win": 39.1,
+    "exp": 0.111,
+    "R": 156.6,
+    "dd": 37.3,
+    "t": 2.81
+   },
+   "vsLive": {
+    "perTrade": 0,
+    "total": 0,
+    "t": 0
+   },
+   "periods": {
+    "2018-21": {
+     "n": 660,
+     "win": 37.7,
+     "exp": 0.03,
+     "R": 19.9,
+     "dd": 37.3,
+     "t": 0.57,
+     "vsLive": 0
+    },
+    "2022-24": {
+     "n": 473,
+     "win": 40.6,
+     "exp": 0.193,
+     "R": 91.2,
+     "dd": 21.6,
+     "t": 2.59,
+     "vsLive": 0
+    },
+    "2025-26": {
+     "n": 278,
+     "win": 39.9,
+     "exp": 0.164,
+     "R": 45.5,
+     "dd": 16,
+     "t": 1.8,
+     "vsLive": 0
+    }
+   },
+   "marketsVsLive": {
+    "nq": 0,
+    "es": 0,
+    "gc": 0
+   }
+  },
+  "be1": {
+   "all": {
+    "n": 1411,
+    "win": 35.4,
+    "exp": 0.083,
+    "R": 116.4,
+    "dd": 37.5,
+    "t": 2.25
+   },
+   "vsLive": {
+    "perTrade": -0.028,
+    "total": -40.1,
+    "t": -1.9
+   },
+   "periods": {
+    "2018-21": {
+     "n": 660,
+     "win": 33.9,
+     "exp": 0.019,
+     "R": 12.5,
+     "dd": 37.5,
+     "t": 0.39,
+     "vsLive": -7.4
+    },
+    "2022-24": {
+     "n": 473,
+     "win": 37.2,
+     "exp": 0.159,
+     "R": 75.1,
+     "dd": 22.2,
+     "t": 2.27,
+     "vsLive": -16
+    },
+    "2025-26": {
+     "n": 278,
+     "win": 36,
+     "exp": 0.104,
+     "R": 28.8,
+     "dd": 16,
+     "t": 1.23,
+     "vsLive": -16.7
+    }
+   },
+   "marketsVsLive": {
+    "nq": -24.5,
+    "es": -15.6,
+    "gc": 0
+   }
+  },
+  "nobe": {
+   "all": {
+    "n": 1411,
+    "win": 40.5,
+    "exp": 0.106,
+    "R": 149,
+    "dd": 39.6,
+    "t": 2.64
+   },
+   "vsLive": {
+    "perTrade": -0.005,
+    "total": -7.5,
+    "t": -0.84
+   },
+   "periods": {
+    "2018-21": {
+     "n": 660,
+     "win": 39.1,
+     "exp": 0.031,
+     "R": 20.6,
+     "dd": 39.6,
+     "t": 0.57,
+     "vsLive": 0.7
+    },
+    "2022-24": {
+     "n": 473,
+     "win": 42.1,
+     "exp": 0.182,
+     "R": 86.2,
+     "dd": 22.6,
+     "t": 2.43,
+     "vsLive": -5
+    },
+    "2025-26": {
+     "n": 278,
+     "win": 41,
+     "exp": 0.152,
+     "R": 42.3,
+     "dd": 14.9,
+     "t": 1.66,
+     "vsLive": -3.3
+    }
+   },
+   "marketsVsLive": {
+    "nq": 2.7,
+    "es": -10.2,
+    "gc": 0
+   }
+  },
+  "half1": {
+   "all": {
+    "n": 1411,
+    "win": 53.2,
+    "exp": 0.054,
+    "R": 76.1,
+    "dd": 24.5,
+    "t": 1.95
+   },
+   "vsLive": {
+    "perTrade": -0.057,
+    "total": -80.4,
+    "t": -2.65
+   },
+   "periods": {
+    "2018-21": {
+     "n": 660,
+     "win": 53.5,
+     "exp": 0.031,
+     "R": 20.3,
+     "dd": 24.5,
+     "t": 0.8,
+     "vsLive": 0.4
+    },
+    "2022-24": {
+     "n": 473,
+     "win": 54.3,
+     "exp": 0.098,
+     "R": 46.2,
+     "dd": 18.2,
+     "t": 1.96,
+     "vsLive": -45
+    },
+    "2025-26": {
+     "n": 278,
+     "win": 50.4,
+     "exp": 0.035,
+     "R": 9.7,
+     "dd": 15.5,
+     "t": 0.53,
+     "vsLive": -35.8
+    }
+   },
+   "marketsVsLive": {
+    "nq": -32.3,
+    "es": -10.1,
+    "gc": -38
+   }
+  },
+  "half2": {
+   "all": {
+    "n": 1411,
+    "win": 39.1,
+    "exp": 0.092,
+    "R": 130,
+    "dd": 34.6,
+    "t": 2.62
+   },
+   "vsLive": {
+    "perTrade": -0.019,
+    "total": -26.6,
+    "t": -2.03
+   },
+   "periods": {
+    "2018-21": {
+     "n": 660,
+     "win": 37.7,
+     "exp": 0.029,
+     "R": 18.9,
+     "dd": 34.6,
+     "t": 0.6,
+     "vsLive": -1
+    },
+    "2022-24": {
+     "n": 473,
+     "win": 40.6,
+     "exp": 0.153,
+     "R": 72.2,
+     "dd": 22,
+     "t": 2.38,
+     "vsLive": -18.9
+    },
+    "2025-26": {
+     "n": 278,
+     "win": 39.9,
+     "exp": 0.139,
+     "R": 38.8,
+     "dd": 15.9,
+     "t": 1.7,
+     "vsLive": -6.7
+    }
+   },
+   "marketsVsLive": {
+    "nq": -12.7,
+    "es": 0.2,
+    "gc": -14.1
+   }
+  },
+  "tgt3": {
+   "all": {
+    "n": 1411,
+    "win": 39.1,
+    "exp": 0.083,
+    "R": 117.2,
+    "dd": 36.3,
+    "t": 2.31
+   },
+   "vsLive": {
+    "perTrade": -0.028,
+    "total": -39.4,
+    "t": -2.36
+   },
+   "periods": {
+    "2018-21": {
+     "n": 660,
+     "win": 37.7,
+     "exp": 0.004,
+     "R": 2.8,
+     "dd": 36.3,
+     "t": 0.09,
+     "vsLive": -17.1
+    },
+    "2022-24": {
+     "n": 473,
+     "win": 40.6,
+     "exp": 0.14,
+     "R": 66.1,
+     "dd": 20.2,
+     "t": 2.18,
+     "vsLive": -25.1
+    },
+    "2025-26": {
+     "n": 278,
+     "win": 39.9,
+     "exp": 0.174,
+     "R": 48.3,
+     "dd": 15.2,
+     "t": 1.98,
+     "vsLive": 2.8
+    }
+   },
+   "marketsVsLive": {
+    "nq": -15.5,
+    "es": -7.1,
+    "gc": -16.8
+   }
+  },
+  "tstop12": {
+   "all": {
+    "n": 1411,
+    "win": 39.9,
+    "exp": 0.047,
+    "R": 66,
+    "dd": 44,
+    "t": 1.37
+   },
+   "vsLive": {
+    "perTrade": -0.064,
+    "total": -90.6,
+    "t": -3.25
+   },
+   "periods": {
+    "2018-21": {
+     "n": 660,
+     "win": 37.9,
+     "exp": -0.019,
+     "R": -12.6,
+     "dd": 44,
+     "t": -0.41,
+     "vsLive": -32.5
+    },
+    "2022-24": {
+     "n": 473,
+     "win": 41.9,
+     "exp": 0.101,
+     "R": 47.8,
+     "dd": 16.5,
+     "t": 1.64,
+     "vsLive": -43.3
+    },
+    "2025-26": {
+     "n": 278,
+     "win": 41.4,
+     "exp": 0.111,
+     "R": 30.7,
+     "dd": 15.1,
+     "t": 1.37,
+     "vsLive": -14.8
+    }
+   },
+   "marketsVsLive": {
+    "nq": -31.4,
+    "es": -14.7,
+    "gc": -44.5
+   }
+  },
+  "struct": {
+   "all": {
+    "n": 1411,
+    "win": 36.5,
+    "exp": 0.103,
+    "R": 145.1,
+    "dd": 37.2,
+    "t": 2.57
+   },
+   "vsLive": {
+    "perTrade": -0.008,
+    "total": -11.5,
+    "t": -0.47
+   },
+   "periods": {
+    "2018-21": {
+     "n": 660,
+     "win": 34.5,
+     "exp": -0.003,
+     "R": -2.2,
+     "dd": 37.2,
+     "t": -0.06,
+     "vsLive": -22.1
+    },
+    "2022-24": {
+     "n": 473,
+     "win": 38.3,
+     "exp": 0.182,
+     "R": 86.2,
+     "dd": 18.1,
+     "t": 2.46,
+     "vsLive": -4.9
+    },
+    "2025-26": {
+     "n": 278,
+     "win": 38.1,
+     "exp": 0.219,
+     "R": 61,
+     "dd": 14.1,
+     "t": 2.12,
+     "vsLive": 15.5
+    }
+   },
+   "marketsVsLive": {
+    "nq": -1.7,
+    "es": -1.9,
+    "gc": -7.8
+   }
+  },
+  "st_f1.5_p1": {
+   "all": {
+    "n": 1411,
+    "win": 40.5,
+    "exp": 0.102,
+    "R": 143.3,
+    "dd": 36.1,
+    "t": 2.65
+   },
+   "vsLive": {
+    "perTrade": -0.009,
+    "total": -13.2,
+    "t": -0.5
+   },
+   "periods": {
+    "2018-21": {
+     "n": 660,
+     "win": 38.5,
+     "exp": 0.015,
+     "R": 10,
+     "dd": 36.1,
+     "t": 0.3,
+     "vsLive": -9.9
+    },
+    "2022-24": {
+     "n": 473,
+     "win": 42.5,
+     "exp": 0.178,
+     "R": 84.1,
+     "dd": 17.7,
+     "t": 2.56,
+     "vsLive": -7.1
+    },
+    "2025-26": {
+     "n": 278,
+     "win": 41.7,
+     "exp": 0.177,
+     "R": 49.2,
+     "dd": 13.8,
+     "t": 1.82,
+     "vsLive": 3.7
+    }
+   },
+   "marketsVsLive": {
+    "nq": 3.6,
+    "es": -3.6,
+    "gc": -13.2
+   }
+  },
+  "st_f1.5_p2": {
+   "all": {
+    "n": 1411,
+    "win": 38.7,
+    "exp": 0.11,
+    "R": 155.4,
+    "dd": 36.8,
+    "t": 2.77
+   },
+   "vsLive": {
+    "perTrade": -0.001,
+    "total": -1.2,
+    "t": -0.05
+   },
+   "periods": {
+    "2018-21": {
+     "n": 660,
+     "win": 37,
+     "exp": 0.006,
+     "R": 3.8,
+     "dd": 36.8,
+     "t": 0.11,
+     "vsLive": -16.1
+    },
+    "2022-24": {
+     "n": 473,
+     "win": 40.4,
+     "exp": 0.187,
+     "R": 88.2,
+     "dd": 15.4,
+     "t": 2.55,
+     "vsLive": -2.9
+    },
+    "2025-26": {
+     "n": 278,
+     "win": 39.9,
+     "exp": 0.228,
+     "R": 63.4,
+     "dd": 14.2,
+     "t": 2.21,
+     "vsLive": 17.9
+    }
+   },
+   "marketsVsLive": {
+    "nq": 0.4,
+    "es": 5.4,
+    "gc": -7
+   }
+  },
+  "st_f1.5_p3": {
+   "all": {
+    "n": 1411,
+    "win": 37.1,
+    "exp": 0.109,
+    "R": 153.1,
+    "dd": 35,
+    "t": 2.68
+   },
+   "vsLive": {
+    "perTrade": -0.002,
+    "total": -3.4,
+    "t": -0.13
+   },
+   "periods": {
+    "2018-21": {
+     "n": 660,
+     "win": 35.2,
+     "exp": 0.013,
+     "R": 8.4,
+     "dd": 35,
+     "t": 0.24,
+     "vsLive": -11.5
+    },
+    "2022-24": {
+     "n": 473,
+     "win": 38.9,
+     "exp": 0.189,
+     "R": 89.2,
+     "dd": 16.5,
+     "t": 2.52,
+     "vsLive": -2
+    },
+    "2025-26": {
+     "n": 278,
+     "win": 38.5,
+     "exp": 0.2,
+     "R": 55.5,
+     "dd": 14.4,
+     "t": 1.95,
+     "vsLive": 10
+    }
+   },
+   "marketsVsLive": {
+    "nq": 5.3,
+    "es": -2.4,
+    "gc": -6.3
+   }
+  },
+  "st_f2_p1": {
+   "all": {
+    "n": 1411,
+    "win": 37.3,
+    "exp": 0.093,
+    "R": 131.7,
+    "dd": 38,
+    "t": 2.4
+   },
+   "vsLive": {
+    "perTrade": -0.018,
+    "total": -24.8,
+    "t": -1.03
+   },
+   "periods": {
+    "2018-21": {
+     "n": 660,
+     "win": 35.3,
+     "exp": 0.001,
+     "R": 0.7,
+     "dd": 38,
+     "t": 0.02,
+     "vsLive": -19.2
+    },
+    "2022-24": {
+     "n": 473,
+     "win": 39.3,
+     "exp": 0.171,
+     "R": 81.1,
+     "dd": 20.7,
+     "t": 2.43,
+     "vsLive": -10.1
+    },
+    "2025-26": {
+     "n": 278,
+     "win": 38.8,
+     "exp": 0.18,
+     "R": 50,
+     "dd": 13.9,
+     "t": 1.83,
+     "vsLive": 4.5
+    }
+   },
+   "marketsVsLive": {
+    "nq": -3.3,
+    "es": -8.9,
+    "gc": -12.7
+   }
+  },
+  "st_f2_p2": {
+   "all": {
+    "n": 1411,
+    "win": 36.5,
+    "exp": 0.103,
+    "R": 145.1,
+    "dd": 37.2,
+    "t": 2.57
+   },
+   "vsLive": {
+    "perTrade": -0.008,
+    "total": -11.5,
+    "t": -0.47
+   },
+   "periods": {
+    "2018-21": {
+     "n": 660,
+     "win": 34.5,
+     "exp": -0.003,
+     "R": -2.2,
+     "dd": 37.2,
+     "t": -0.06,
+     "vsLive": -22.1
+    },
+    "2022-24": {
+     "n": 473,
+     "win": 38.3,
+     "exp": 0.182,
+     "R": 86.2,
+     "dd": 18.1,
+     "t": 2.46,
+     "vsLive": -4.9
+    },
+    "2025-26": {
+     "n": 278,
+     "win": 38.1,
+     "exp": 0.219,
+     "R": 61,
+     "dd": 14.1,
+     "t": 2.12,
+     "vsLive": 15.5
+    }
+   },
+   "marketsVsLive": {
+    "nq": -1.7,
+    "es": -1.9,
+    "gc": -7.8
+   }
+  },
+  "st_f2_p3": {
+   "all": {
+    "n": 1411,
+    "win": 35.7,
+    "exp": 0.105,
+    "R": 148.4,
+    "dd": 34.1,
+    "t": 2.58
+   },
+   "vsLive": {
+    "perTrade": -0.006,
+    "total": -8.1,
+    "t": -0.32
+   },
+   "periods": {
+    "2018-21": {
+     "n": 660,
+     "win": 33.8,
+     "exp": 0.005,
+     "R": 3.5,
+     "dd": 34.1,
+     "t": 0.1,
+     "vsLive": -16.4
+    },
+    "2022-24": {
+     "n": 473,
+     "win": 37.4,
+     "exp": 0.186,
+     "R": 88.1,
+     "dd": 17,
+     "t": 2.47,
+     "vsLive": -3.1
+    },
+    "2025-26": {
+     "n": 278,
+     "win": 37.4,
+     "exp": 0.205,
+     "R": 56.9,
+     "dd": 14.3,
+     "t": 1.99,
+     "vsLive": 11.4
+    }
+   },
+   "marketsVsLive": {
+    "nq": 4.3,
+    "es": -6.8,
+    "gc": -5.6
+   }
+  },
+  "st_f2.5_p1": {
+   "all": {
+    "n": 1411,
+    "win": 34.9,
+    "exp": 0.099,
+    "R": 139.7,
+    "dd": 36,
+    "t": 2.47
+   },
+   "vsLive": {
+    "perTrade": -0.012,
+    "total": -16.9,
+    "t": -0.72
+   },
+   "periods": {
+    "2018-21": {
+     "n": 660,
+     "win": 32.1,
+     "exp": -0.002,
+     "R": -1.6,
+     "dd": 36,
+     "t": -0.05,
+     "vsLive": -21.5
+    },
+    "2022-24": {
+     "n": 473,
+     "win": 37.2,
+     "exp": 0.189,
+     "R": 89.4,
+     "dd": 20.3,
+     "t": 2.55,
+     "vsLive": -1.7
+    },
+    "2025-26": {
+     "n": 278,
+     "win": 37.8,
+     "exp": 0.187,
+     "R": 51.9,
+     "dd": 14.2,
+     "t": 1.88,
+     "vsLive": 6.4
+    }
+   },
+   "marketsVsLive": {
+    "nq": 5.7,
+    "es": -4.8,
+    "gc": -17.8
+   }
+  },
+  "st_f2.5_p2": {
+   "all": {
+    "n": 1411,
+    "win": 34.7,
+    "exp": 0.104,
+    "R": 147.3,
+    "dd": 37.1,
+    "t": 2.56
+   },
+   "vsLive": {
+    "perTrade": -0.007,
+    "total": -9.2,
+    "t": -0.37
+   },
+   "periods": {
+    "2018-21": {
+     "n": 660,
+     "win": 31.8,
+     "exp": -0.011,
+     "R": -7.1,
+     "dd": 37.1,
+     "t": -0.21,
+     "vsLive": -27
+    },
+    "2022-24": {
+     "n": 473,
+     "win": 37,
+     "exp": 0.198,
+     "R": 93.7,
+     "dd": 17.9,
+     "t": 2.61,
+     "vsLive": 2.5
+    },
+    "2025-26": {
+     "n": 278,
+     "win": 37.4,
+     "exp": 0.219,
+     "R": 60.8,
+     "dd": 14.3,
+     "t": 2.11,
+     "vsLive": 15.3
+    }
+   },
+   "marketsVsLive": {
+    "nq": 4.5,
+    "es": -3,
+    "gc": -10.7
+   }
+  },
+  "st_f2.5_p3": {
+   "all": {
+    "n": 1411,
+    "win": 34.3,
+    "exp": 0.104,
+    "R": 147.4,
+    "dd": 35.2,
+    "t": 2.54
+   },
+   "vsLive": {
+    "perTrade": -0.006,
+    "total": -9.1,
+    "t": -0.35
+   },
+   "periods": {
+    "2018-21": {
+     "n": 660,
+     "win": 31.5,
+     "exp": -0.008,
+     "R": -5.4,
+     "dd": 35.2,
+     "t": -0.15,
+     "vsLive": -25.3
+    },
+    "2022-24": {
+     "n": 473,
+     "win": 36.6,
+     "exp": 0.198,
+     "R": 93.6,
+     "dd": 16.8,
+     "t": 2.6,
+     "vsLive": 2.4
+    },
+    "2025-26": {
+     "n": 278,
+     "win": 37.1,
+     "exp": 0.213,
+     "R": 59.2,
+     "dd": 14.3,
+     "t": 2.06,
+     "vsLive": 13.7
+    }
+   },
+   "marketsVsLive": {
+    "nq": 3.6,
+    "es": -4.3,
+    "gc": -8.4
+   }
+  },
+  "st_f3_p1": {
+   "all": {
+    "n": 1411,
+    "win": 34.1,
+    "exp": 0.104,
+    "R": 146.8,
+    "dd": 31.5,
+    "t": 2.56
+   },
+   "vsLive": {
+    "perTrade": -0.007,
+    "total": -9.8,
+    "t": -0.4
+   },
+   "periods": {
+    "2018-21": {
+     "n": 660,
+     "win": 31.2,
+     "exp": 0.004,
+     "R": 2.5,
+     "dd": 31.5,
+     "t": 0.07,
+     "vsLive": -17.4
+    },
+    "2022-24": {
+     "n": 473,
+     "win": 36.2,
+     "exp": 0.185,
+     "R": 87.5,
+     "dd": 20.1,
+     "t": 2.48,
+     "vsLive": -3.7
+    },
+    "2025-26": {
+     "n": 278,
+     "win": 37.4,
+     "exp": 0.204,
+     "R": 56.8,
+     "dd": 14.2,
+     "t": 2.02,
+     "vsLive": 11.3
+    }
+   },
+   "marketsVsLive": {
+    "nq": 12.3,
+    "es": -5.3,
+    "gc": -16.8
+   }
+  },
+  "st_f3_p2": {
+   "all": {
+    "n": 1411,
+    "win": 33.9,
+    "exp": 0.109,
+    "R": 153.9,
+    "dd": 32.7,
+    "t": 2.64
+   },
+   "vsLive": {
+    "perTrade": -0.002,
+    "total": -2.7,
+    "t": -0.1
+   },
+   "periods": {
+    "2018-21": {
+     "n": 660,
+     "win": 31.1,
+     "exp": -0.004,
+     "R": -2.9,
+     "dd": 32.7,
+     "t": -0.08,
+     "vsLive": -22.8
+    },
+    "2022-24": {
+     "n": 473,
+     "win": 35.9,
+     "exp": 0.195,
+     "R": 92.1,
+     "dd": 17.7,
+     "t": 2.56,
+     "vsLive": 1
+    },
+    "2025-26": {
+     "n": 278,
+     "win": 37.1,
+     "exp": 0.233,
+     "R": 64.7,
+     "dd": 14.3,
+     "t": 2.21,
+     "vsLive": 19.1
+    }
+   },
+   "marketsVsLive": {
+    "nq": 10,
+    "es": -2.5,
+    "gc": -10.2
+   }
+  },
+  "st_f3_p3": {
+   "all": {
+    "n": 1411,
+    "win": 33.6,
+    "exp": 0.112,
+    "R": 158.2,
+    "dd": 29.7,
+    "t": 2.7
+   },
+   "vsLive": {
+    "perTrade": 0.001,
+    "total": 1.6,
+    "t": 0.06
+   },
+   "periods": {
+    "2018-21": {
+     "n": 660,
+     "win": 30.8,
+     "exp": 0,
+     "R": 0.1,
+     "dd": 29.7,
+     "t": 0,
+     "vsLive": -19.8
+    },
+    "2022-24": {
+     "n": 473,
+     "win": 35.7,
+     "exp": 0.198,
+     "R": 93.8,
+     "dd": 17.7,
+     "t": 2.6,
+     "vsLive": 2.7
+    },
+    "2025-26": {
+     "n": 278,
+     "win": 36.7,
+     "exp": 0.231,
+     "R": 64.3,
+     "dd": 14.3,
+     "t": 2.2,
+     "vsLive": 18.7
+    }
+   },
+   "marketsVsLive": {
+    "nq": 11.4,
+    "es": -2.4,
+    "gc": -7.4
+   }
+  },
+  "st_f2_p2_keeptrail": {
+   "all": {
+    "n": 1411,
+    "win": 39.1,
+    "exp": 0.106,
+    "R": 149.6,
+    "dd": 36.7,
+    "t": 2.73
+   },
+   "vsLive": {
+    "perTrade": -0.005,
+    "total": -6.9,
+    "t": -0.86
+   },
+   "periods": {
+    "2018-21": {
+     "n": 660,
+     "win": 37.7,
+     "exp": 0.029,
+     "R": 19.1,
+     "dd": 36.7,
+     "t": 0.55,
+     "vsLive": -0.8
+    },
+    "2022-24": {
+     "n": 473,
+     "win": 40.6,
+     "exp": 0.179,
+     "R": 84.8,
+     "dd": 21.6,
+     "t": 2.47,
+     "vsLive": -6.3
+    },
+    "2025-26": {
+     "n": 278,
+     "win": 39.9,
+     "exp": 0.164,
+     "R": 45.7,
+     "dd": 15.8,
+     "t": 1.84,
+     "vsLive": 0.2
+    }
+   },
+   "marketsVsLive": {
+    "nq": -4.3,
+    "es": 3.5,
+    "gc": -6.2
+   }
+  }
+ },
+ "verdict": "struct passes the gate on the replay (+0.058R a trade, t 1.44; halves +3.6R / +10.9R; better on ES, YM, RTY, GC, worse on NQ). It is NOT confirmed on 2018-26 history (-0.008R a trade, t -0.47; worse in 2018-21 and 2022-24, better in 2025-26; worse on all three markets), and its pivot neighbours (1 or 3 candles) fail on the replay: a 2025-26 regime effect as the earlier fixed-target result. Added as the paper-only shadow variant strail to forward-test; the live A-rule exit is unchanged.",
+ "proof": {
+  "tracker": {
+   "how": "708 chained tracker runs (every 2 h, 1 Feb - 31 Mar 2026) of the old (origin/main) and new ict/tracker.mjs on a stubbed CNBC feed (OANDA 5m for NQ/ES/YM/GC), trades.json + shadow.json carried run to run; per run a hash of trades.json, snapshot.json (minus its clock) and bars.json, and of shadow.json without the strail stream",
+   "liveDiffs": 0,
+   "otherShadowDiffs": 0,
+   "liveTrades": 106,
+   "strailTrades": 28,
+   "strailClosedByStructure": 5
+  },
+  "replay": {
+   "how": "old (origin/main) and new ict/replay.mjs with CNBC stubbed by OANDA candles (NQ/ES/YM/GC; RTY has no OANDA symbol), from 1 Aug 2025; hash of replay.json (trades incl. vr tags, shadow, other variants, totals) without the strail stream",
+   "identical": true,
+   "fromAug2025GrossOwnStream": {
+    "A": {
+     "n": 245,
+     "R": 82.75
+    },
+    "strail": {
+     "n": 245,
+     "R": 92.92
+    }
+   }
+  },
+  "equivalence": "replay simulate() live and strail == research engine on 225 OANDA-mapped A-trades (0 mismatches); tracker manageTrade == simulate() on a stored-candle window (audit-test)"
+ }
+}

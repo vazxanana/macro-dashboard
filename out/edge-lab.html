@@ -1,0 +1,653 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<meta name="color-scheme" content="dark light">
+<meta name="theme-color" content="#08090c" media="(prefers-color-scheme: dark)">
+<meta name="theme-color" content="#f4f6f9" media="(prefers-color-scheme: light)">
+<title>Edge Lab · Meridian X</title>
+<meta name="description" content="Edge Lab: in-sample versus out-of-sample results of the Meridian and ICT edge studies.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cdefs%3E%3CradialGradient id='g' cx='.35' cy='.3' r='.8'%3E%3Cstop offset='0' stop-color='%23fbe7a6'/%3E%3Cstop offset='.55' stop-color='%23e3b341'/%3E%3Cstop offset='1' stop-color='%238a6312'/%3E%3C/radialGradient%3E%3C/defs%3E%3Ccircle cx='16' cy='16' r='14' fill='url(%23g)'/%3E%3Ccircle cx='16' cy='16' r='10.5' fill='none' stroke='%23fff' stroke-opacity='.35'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600&display=swap">
+<script>
+  // Same theme key as the desk (localStorage msPrefs.theme): light stays light, every other desk theme is dark.
+  // With no saved preference the page follows the system setting.
+  (function () {
+    try {
+      var p = JSON.parse(localStorage.getItem('msPrefs') || 'null');
+      if (p && p.theme) document.documentElement.dataset.theme = p.theme === 'light' ? 'light' : p.theme === 'midnight' ? 'midnight' : 'dark';
+    } catch (e) {}
+  })();
+</script>
+<style>
+  /* Tokens copied from market-structure.html (4 Nov design pass) so the lab reads as part of the desk */
+  :root {
+    --bg: #08090c; --panel: #0f1116; --panel-raised: #14171e; --panel-hover: #161a22;
+    --line: rgba(255,255,255,.07); --line-soft: rgba(255,255,255,.045); --line-strong: rgba(255,255,255,.12);
+    --ink: #eceef2; --ink-dim: #a4abb8; --ink-faint: #8a92a1; --accent: #5b8cff; --accent-soft: rgba(91,140,255,.12);
+    --buy: #2fbf8f; --sell: #f2576f; --buy-soft: rgba(47,191,143,.12); --sell-soft: rgba(242,87,111,.12);
+    --neutral-soft: rgba(255,255,255,.06); --zero: rgba(255,255,255,.22);
+    --shadow-pop: 0 24px 48px rgba(0,0,0,.55);
+    --sans: Figtree, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    --mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    --r: 12px; --r-sm: 8px;
+    --z-sticky: 10; --z-tip: 40;
+    --ease: cubic-bezier(.22, 1, .36, 1);
+    color-scheme: dark;
+  }
+  @media (prefers-color-scheme: light) {
+    :root:not([data-theme="dark"]):not([data-theme="midnight"]) {
+      --bg: #f4f6f9; --panel: #ffffff; --panel-raised: #f7f8fb; --panel-hover: #f9fafc;
+      --line: #dfe3ea; --line-soft: #eceff4; --line-strong: #cdd3dd;
+      --ink: #131722; --ink-dim: #4a5160; --ink-faint: #5f6675; --accent: #2f6bff; --accent-soft: rgba(47,107,255,.09);
+      --buy: #08876f; --sell: #d92d4b; --buy-soft: rgba(8,135,111,.09); --sell-soft: rgba(217,45,75,.08);
+      --neutral-soft: rgba(19,23,34,.05); --zero: rgba(19,23,34,.28);
+      --shadow-pop: 0 18px 40px -12px rgba(16,24,40,.22), 0 2px 6px rgba(16,24,40,.06);
+      color-scheme: light;
+    }
+  }
+  :root[data-theme="light"] {
+    --bg: #f4f6f9; --panel: #ffffff; --panel-raised: #f7f8fb; --panel-hover: #f9fafc;
+    --line: #dfe3ea; --line-soft: #eceff4; --line-strong: #cdd3dd;
+    --ink: #131722; --ink-dim: #4a5160; --ink-faint: #5f6675; --accent: #2f6bff; --accent-soft: rgba(47,107,255,.09);
+    --buy: #08876f; --sell: #d92d4b; --buy-soft: rgba(8,135,111,.09); --sell-soft: rgba(217,45,75,.08);
+    --neutral-soft: rgba(19,23,34,.05); --zero: rgba(19,23,34,.28);
+    --shadow-pop: 0 18px 40px -12px rgba(16,24,40,.22), 0 2px 6px rgba(16,24,40,.06);
+    color-scheme: light;
+  }
+  :root[data-theme="midnight"] {
+    --bg: #070d1f; --panel: #0d1630; --panel-raised: #111c3a; --panel-hover: #15224a;
+    --line: rgba(150,175,255,.12); --line-soft: rgba(150,175,255,.07); --line-strong: rgba(150,175,255,.2);
+    --ink: #eef2ff; --ink-dim: #b0bcdc; --ink-faint: #8d9ac0; --accent: #e3b341; --accent-soft: rgba(227,179,65,.14);
+    --buy: #34d6a0; --sell: #ff6b85; --buy-soft: rgba(52,214,160,.13); --sell-soft: rgba(255,107,133,.13);
+  }
+
+  * { box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; }
+  html, body { margin: 0; background: var(--bg); color: var(--ink); font: 14px/1.5 var(--sans); font-feature-settings: "cv11", "ss01"; -webkit-font-smoothing: antialiased; }
+  body { padding: env(safe-area-inset-top, 0px) 0 env(safe-area-inset-bottom, 0px); min-height: 100vh; }
+  a { color: var(--accent); text-decoration: none; }
+  a:hover { text-decoration: underline; text-underline-offset: 3px; }
+  button { font: inherit; color: inherit; }
+  :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 4px; }
+  ::selection { background: rgba(91,140,255,.3); }
+  .num { font-family: var(--mono); font-variant-numeric: tabular-nums; letter-spacing: -.02em; }
+  .sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+
+  .wrap { max-width: 1240px; margin: 0 auto; padding: 0 24px 64px; }
+
+  /* top bar */
+  .top { position: sticky; top: 0; z-index: var(--z-sticky); display: flex; align-items: center; gap: 12px; height: 56px;
+    background: color-mix(in srgb, var(--bg) 86%, transparent); backdrop-filter: saturate(140%) blur(14px); -webkit-backdrop-filter: saturate(140%) blur(14px); border-bottom: 1px solid var(--line); }
+  .top .wrap { display: flex; align-items: center; gap: 12px; width: 100%; padding-bottom: 0; }
+  .brand { display: inline-flex; align-items: center; gap: 9px; color: var(--ink); font: 600 14px var(--sans); letter-spacing: -.1px; }
+  .brand:hover { text-decoration: none; }
+  .coin { width: 20px; height: 20px; border-radius: 50%; background: radial-gradient(circle at 35% 35%, #ffd768, #c99400); box-shadow: inset 0 -2px 4px rgba(0,0,0,.25); flex: none; }
+  .crumb { color: var(--ink-faint); font-weight: 500; }
+  .top .check { margin-left: auto; display: inline-flex; align-items: center; gap: 8px; font-size: 12px; color: var(--ink-faint); white-space: nowrap; }
+  .btn { display: inline-flex; align-items: center; gap: 6px; min-height: 32px; padding: 6px 12px; border-radius: var(--r-sm); border: 1px solid var(--line); background: var(--neutral-soft); font: 500 12.5px var(--sans); color: var(--ink-dim); cursor: pointer; transition: background .15s, color .15s, border-color .15s; }
+  .btn:hover { color: var(--ink); border-color: var(--line-strong); }
+  .btn svg { width: 14px; height: 14px; }
+  .btn[aria-busy="true"] svg { animation: spin .8s linear infinite; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* heading */
+  .head { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 420px); gap: 16px 48px; align-items: end; padding: 40px 0 28px; }
+  h1 { font: 600 clamp(26px, 3vw, 34px)/1.15 var(--sans); letter-spacing: -.6px; margin: 0 0 10px; text-wrap: balance; }
+  .lede { margin: 0; color: var(--ink-dim); max-width: 62ch; font-size: 14.5px; text-wrap: pretty; }
+  .lede b { color: var(--ink); font-weight: 600; }
+
+  /* progress: tall segmented bar of study states */
+  .prog { min-width: 0; }
+  .prog-h { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; margin-bottom: 8px; }
+  .prog-h strong { font: 600 20px var(--mono); letter-spacing: -.5px; }
+  .prog-h strong span { color: var(--ink-faint); font: 500 14px var(--sans); letter-spacing: 0; }
+  .prog-h small { color: var(--ink-faint); font-size: 12px; }
+  .seg { display: flex; gap: 2px; height: 10px; border-radius: 5px; overflow: hidden; }
+  .seg i { display: block; height: 100%; min-width: 0; transition: flex-grow .6s var(--ease); }
+  .seg .pass { background: var(--buy); } .seg .fail { background: var(--sell); }
+  .seg .inc { background: var(--ink-faint); } .seg .run { background: var(--line-strong); }
+  .legend { display: flex; flex-wrap: wrap; gap: 4px 16px; margin: 10px 0 0; padding: 0; list-style: none; font-size: 12px; color: var(--ink-dim); }
+  .legend li { display: inline-flex; align-items: center; gap: 6px; }
+  .legend i { width: 8px; height: 8px; border-radius: 2px; }
+  .legend b { font: 600 12px var(--mono); color: var(--ink); }
+
+  /* study groups */
+  .group { margin-top: 28px; }
+  .group-h { display: flex; align-items: baseline; gap: 12px; margin: 0 0 10px; padding: 0 2px; }
+  .group-h h2 { margin: 0; font: 600 17px var(--sans); letter-spacing: -.2px; }
+  .group-h p { margin: 0; color: var(--ink-faint); font-size: 12.5px; }
+
+  .table { background: var(--panel); border: 1px solid var(--line); border-radius: var(--r); box-shadow: inset 0 1px 0 rgba(255,255,255,.025); }
+  .cols, .row { display: grid; grid-template-columns: minmax(0, 1.55fr) 118px minmax(0, 1fr) minmax(0, 1.1fr) 64px 76px 150px 84px; column-gap: 16px; align-items: center; padding: 0 18px; }
+  .cols { min-height: 38px; border-bottom: 1px solid var(--line); font: 500 11.5px var(--sans); color: var(--ink-faint); }
+  .cols span:nth-child(n+5):nth-child(-n+6), .row .c-n, .row .c-dd { text-align: right; }
+  .row { padding-top: 14px; padding-bottom: 14px; border-top: 1px solid var(--line-soft); animation: in .5s var(--ease) backwards; animation-delay: calc(var(--i, 0) * 35ms); }
+  .row:first-of-type { border-top: 0; }
+  .row:hover { background: color-mix(in srgb, var(--ink) 2.5%, transparent); }
+  /* deep link #<topic> (the week pane's Studies list and the daily digest point here): the row is opened, scrolled under the sticky bar and marked */
+  .row { scroll-margin-top: 72px; }
+  .row.hit, .row.hit:hover { background: var(--accent-soft); box-shadow: inset 3px 0 0 var(--accent); }
+  .row.hit:focus { outline: none; }
+  .table > .row:last-child { border-radius: 0 0 var(--r) var(--r); }
+  @keyframes in { from { opacity: 0; transform: translateY(4px); } }
+  .lbl { display: none; }
+
+  .c-study { min-width: 0; }
+  .c-study h3 { margin: 0; font: 600 14.5px/1.3 var(--sans); letter-spacing: -.1px; }
+  .c-study .meta { margin: 2px 0 0; font-size: 12px; color: var(--ink-faint); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .c-study .rule { margin: 6px 0 0; font-size: 12.5px; color: var(--ink-dim); display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; overflow-wrap: anywhere; }
+  .c-study .rule em { font-style: normal; color: var(--ink-faint); }
+  .c-study .rule.head { color: var(--ink); }
+
+  .badge { display: inline-flex; align-items: center; gap: 5px; height: 24px; padding: 0 9px 0 7px; border-radius: 6px; font: 600 11px var(--sans); letter-spacing: .04em; white-space: nowrap; }
+  .badge svg { width: 12px; height: 12px; flex: none; }
+  .badge.pass { background: var(--buy-soft); color: var(--buy); }
+  .badge.fail { background: var(--sell-soft); color: var(--sell); }
+  .badge.inc { background: var(--neutral-soft); color: var(--ink-dim); }
+  .badge.run { background: transparent; color: var(--ink-faint); border: 1px dashed var(--line-strong); font-weight: 500; letter-spacing: .02em; }
+  .badge.run .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--accent); animation: pulse 1.6s ease-in-out infinite; margin: 0 2px 0 1px; }
+  .badge.err { background: var(--sell-soft); color: var(--sell); font-weight: 500; }
+  @keyframes pulse { 50% { opacity: .25; transform: scale(.7); } }
+
+  .io { display: flex; align-items: baseline; flex-wrap: wrap; gap: 0 6px; font: 500 13px var(--mono); font-variant-numeric: tabular-nums; letter-spacing: -.02em; }
+  .io .is { color: var(--ink-faint); }
+  .io .arr { color: var(--ink-faint); font-family: var(--sans); }
+  .io .oos { color: var(--ink); font-weight: 600; font-size: 14px; }
+  .sub { display: block; margin-top: 2px; font-size: 11.5px; color: var(--ink-faint); }
+  .sub .num { font-size: 11px; }
+  .up { color: var(--buy); } .down { color: var(--sell); }
+  .dash { color: var(--ink-faint); }
+  .c-n, .c-dd { font: 500 13px var(--mono); font-variant-numeric: tabular-nums; }
+
+  .c-years { min-width: 0; }
+  .spark { display: block; width: 100%; height: 34px; overflow: visible; }
+  .spark .zero { stroke: var(--zero); stroke-width: 1; shape-rendering: crispEdges; }
+  .spark .b-up { fill: var(--buy); } .spark .b-dn { fill: var(--sell); }
+  .spark .hit { fill: transparent; cursor: default; }
+  .spark g:hover .b-up, .spark g:hover .b-dn, .spark g.on .b-up, .spark g.on .b-dn { opacity: 1; }
+  .spark:hover rect.bar { opacity: .45; }
+  .spark:hover g:hover rect.bar { opacity: 1; }
+  .yr { display: flex; justify-content: space-between; font: 500 10.5px var(--mono); color: var(--ink-faint); margin-top: 2px; }
+
+  .c-rep { text-align: right; }
+  .linkbtn { background: none; border: 0; padding: 6px 0; color: var(--accent); font: 500 12.5px var(--sans); cursor: pointer; display: inline-flex; align-items: center; gap: 4px; }
+  .linkbtn:hover { text-decoration: underline; text-underline-offset: 3px; }
+  .linkbtn[disabled] { color: var(--ink-faint); cursor: default; text-decoration: none; }
+
+  /* candidate list */
+  .more { grid-column: 1 / -1; margin-top: 10px; }
+  .more summary { display: inline-flex; align-items: center; gap: 6px; cursor: pointer; list-style: none; font-size: 12px; color: var(--ink-dim); padding: 2px 0; }
+  .more summary::-webkit-details-marker { display: none; }
+  .more summary svg { width: 12px; height: 12px; transition: transform .2s var(--ease); }
+  .more[open] summary svg { transform: rotate(90deg); }
+  .more summary:hover { color: var(--ink); }
+  .cand-wrap { overflow-x: auto; margin-top: 8px; border: 1px solid var(--line-soft); border-radius: var(--r-sm); }
+  .cand { width: 100%; border-collapse: collapse; font-size: 12.5px; }
+  .cand th, .cand td { padding: 7px 10px; text-align: right; white-space: nowrap; border-top: 1px solid var(--line-soft); }
+  .cand thead th { border-top: 0; font: 500 11px var(--sans); color: var(--ink-faint); background: var(--panel-raised); }
+  .cand th:first-child, .cand td:first-child { text-align: left; white-space: normal; min-width: 220px; }
+  .cand td { font-family: var(--mono); font-variant-numeric: tabular-nums; letter-spacing: -.02em; }
+  .cand td:first-child { font-family: var(--sans); letter-spacing: 0; color: var(--ink-dim); }
+  .cand tr.best td:first-child { color: var(--ink); font-weight: 600; }
+  .cand .v { font: 600 10.5px var(--sans); letter-spacing: .04em; }
+  .notes { margin: 10px 0 0; font-size: 12.5px; color: var(--ink-dim); max-width: 90ch; white-space: pre-wrap; text-wrap: pretty; }
+
+  .row.running .c-study h3 { color: var(--ink-dim); }
+  .row .waiting { grid-column: 3 / 8; font-size: 12.5px; color: var(--ink-faint); }
+
+  .foot { margin-top: 36px; color: var(--ink-faint); font-size: 12px; max-width: 80ch; }
+  .foot p { margin: 0 0 6px; }
+  .banner { margin: 0 0 12px; padding: 10px 14px; border-radius: var(--r-sm); background: var(--sell-soft); color: var(--ink); font-size: 13px; }
+
+  /* tooltip */
+  .tip { position: fixed; z-index: var(--z-tip); pointer-events: none; background: var(--panel-raised); border: 1px solid var(--line-strong); border-radius: 6px; padding: 6px 9px; font: 500 11.5px var(--mono); color: var(--ink); white-space: nowrap; box-shadow: var(--shadow-pop); opacity: 0; transition: opacity .12s; }
+  .tip.on { opacity: 1; }
+  .tip b { font-family: var(--sans); font-weight: 600; margin-right: 6px; }
+  .tip span { color: var(--ink-faint); }
+
+  /* report dialog */
+  dialog.rep { width: min(820px, calc(100vw - 32px)); max-height: min(84vh, 900px); padding: 0; border: 1px solid var(--line-strong); border-radius: var(--r); background: var(--panel); color: var(--ink); box-shadow: var(--shadow-pop); overflow: hidden; }
+  dialog.rep[open] { display: flex; flex-direction: column; animation: pop .22s var(--ease); }
+  dialog.rep::backdrop { background: rgba(4,6,10,.55); backdrop-filter: blur(2px); }
+  @keyframes pop { from { opacity: 0; transform: translateY(8px) scale(.985); } }
+  .rep-h { display: flex; align-items: center; gap: 12px; padding: 14px 18px; border-bottom: 1px solid var(--line); }
+  .rep-h h2 { margin: 0; font: 600 15px var(--sans); flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .rep-h a { font-size: 12.5px; white-space: nowrap; }
+  .x { width: 32px; height: 32px; display: grid; place-items: center; border-radius: var(--r-sm); border: 1px solid var(--line); background: none; cursor: pointer; color: var(--ink-dim); }
+  .x:hover { color: var(--ink); border-color: var(--line-strong); }
+  .rep pre { margin: 0; padding: 18px 20px 24px; overflow: auto; white-space: pre-wrap; overflow-wrap: anywhere; font: 12.5px/1.65 var(--mono); color: var(--ink-dim); }
+
+  @media (max-width: 1100px) {
+    .cols, .row { grid-template-columns: minmax(0, 1.4fr) 112px minmax(0, 1fr) minmax(0, 1.1fr) 56px 68px 120px 70px; column-gap: 12px; padding-left: 14px; padding-right: 14px; }
+  }
+  @media (max-width: 900px) {
+    .wrap { padding: 0 16px 48px; }
+    .head { grid-template-columns: minmax(0, 1fr); padding: 28px 0 20px; align-items: start; }
+    .cols { display: none; }
+    .row { grid-template-columns: repeat(4, minmax(0, 1fr)); row-gap: 12px; column-gap: 12px; padding: 16px; }
+    .c-study { grid-column: 1 / 4; }
+    .c-verdict { grid-column: 4; justify-self: end; align-self: start; }
+    .c-base { grid-column: 1 / 3; } .c-best { grid-column: 3 / 5; }
+    .c-n, .c-dd { text-align: left !important; }
+    .c-years { grid-column: 3 / 5; }
+    .c-rep { grid-column: 1 / -1; text-align: left; order: 10; }
+    .more { order: 11; margin-top: 0; }
+    .lbl { display: block; font: 500 11px var(--sans); color: var(--ink-faint); margin-bottom: 3px; letter-spacing: 0; }
+    .row { align-items: start; }
+    .row .waiting { grid-column: 1 / -1; }
+    .c-rep:has(.linkbtn[disabled]), .c-rep:empty { display: none; }
+    .row.running .c-rep { display: none; }
+  }
+  @media (max-width: 520px) {
+    .c-base, .c-best { grid-column: 1 / -1; }
+    .c-n { grid-column: 1; } .c-dd { grid-column: 2; } .c-years { grid-column: 3 / 5; }
+    .c-study { grid-column: 1 / 4; }
+    .top .check .when { display: none; }
+    .group-h { flex-direction: column; gap: 2px; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
+    .badge.run .dot { opacity: .7; }
+  }
+</style>
+</head>
+<body>
+<header class="top">
+  <div class="wrap">
+    <a class="brand" href="/"><span class="coin" aria-hidden="true"></span>Meridian X</a>
+    <span class="crumb" aria-hidden="true">/</span>
+    <span class="brand" style="font-weight:500">Edge Lab</span>
+    <div class="check">
+      <span class="when" id="when" aria-live="polite">Checking…</span>
+      <button class="btn" id="refresh" type="button" aria-label="Check for new results">
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true"><path d="M13.5 8a5.5 5.5 0 1 1-1.6-3.9"/><path d="M13.5 2.5v3h-3"/></svg>
+        <span>Refresh</span>
+      </button>
+    </div>
+  </div>
+</header>
+
+<main class="wrap">
+  <section class="head">
+    <div>
+      <h1>Edge Lab</h1>
+      <p class="lede">Each study tests rule changes against the current system. Expectancy is in <b>R per trade</b>, fitted in sample (IS) and then checked out of sample (OOS). Only the OOS number counts: a candidate passes when its edge survives data it never saw.</p>
+    </div>
+    <div class="prog" id="prog" aria-live="polite"></div>
+  </section>
+
+  <div id="banner"></div>
+  <div id="groups"></div>
+
+  <footer class="foot">
+    <p>Results come from <span class="num">research/edge/&lt;study&gt;/result.json</span>. Studies land as they finish; this page checks again every two minutes. Year bars use each row's own scale; hover or tap a bar for its value.</p>
+    <p><a href="/">Back to the desk</a></p>
+  </footer>
+</main>
+
+<div class="tip" id="tip" role="tooltip"></div>
+
+<dialog class="rep" id="rep" aria-labelledby="rep-title">
+  <div class="rep-h">
+    <h2 id="rep-title">Report</h2>
+    <a id="rep-raw" href="#" target="_blank" rel="noopener">Open raw</a>
+    <button class="x" type="button" id="rep-x" aria-label="Close report">
+      <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true"><path d="M3 3l8 8M11 3l-8 8"/></svg>
+    </button>
+  </div>
+  <pre id="rep-body">Loading…</pre>
+</dialog>
+
+<script>
+(function () {
+  'use strict';
+  var BASE = './research/edge/';
+  // The fourteen commissioned studies, in reading order. Anything else found in the index is appended.
+  var KNOWN = [
+    ['scalp-filters', 'Scalp filters'], ['scalp-exits', 'Scalp exits'], ['setups-promote', 'Setup promotion'],
+    ['regime', 'Regime'], ['gold-systems', 'Gold systems'], ['costs', 'Costs'], ['portfolio', 'Portfolio'],
+    ['timing', 'Timing'], ['confluence', 'Confluence'], ['robustness', 'Robustness'], ['coach-learning', 'Coach learning'],
+    ['ict-filters', 'ICT filters'], ['ict-exits', 'ICT exits'], ['ict-universe', 'ICT universe']
+  ];
+  var NAMES = {}; KNOWN.forEach(function (k) { NAMES[k[0]] = k[1]; });
+  // later studies (pre-registered, mostly null results); anything not named here is title-cased from its folder
+  var MORE = { 'ict-oos-2008': 'ICT out of sample 2008–17', 'nq-open-oos': 'NQ open run out of sample', 'replica-oos': 'Gold replica out of sample', 'gold-systems-oos': 'Gold systems out of sample',
+    'seasonality': 'Intraday seasonality', 'regime-switch': 'Regime switch', 'portfolio-v2': 'Portfolio v2', 'open-run-breadth': 'Open run on other indices', 'macro-gold': 'Macro gold (real yields)',
+    'ict-breadth': 'ICT on more markets', 'nq-open-exits': 'NQ open run exits', 'ict-sessions': 'ICT sessions', 'sizing': 'Sizing', 'event-risk': 'Event risk', 'ict-smile': 'ICT dollar smile',
+    'ict-trend-side': 'ICT trend side', 'ict-macro': 'ICT macro regime', 'ict-concepts': 'ICT concepts', 'ict-markets': 'ICT markets', 'ict-index-longonly': 'ICT index long-only',
+    'ict-exits-replay': 'ICT exits on the replay', 'crypto-trend-decay': 'Crypto trend decay', 'decay-monitor': 'Decay monitor', 'gold-weekend': 'Gold weekend', 'meridian-swing': 'Meridian swing',
+    'news-filter': 'News filter', 'macro-vol': 'Macro vol', 'param-drift': 'Parameter drift', 'shadow-audit': 'Shadow audit', 'ict-grades': 'ICT grades', 'mosha-oos': 'Mosha BO out of sample', 'gold-fidelity': 'Gold fidelity' };
+  Object.keys(MORE).forEach(function (k) { NAMES[k] = MORE[k]; });
+  var REFRESH_MS = 120000;
+
+  var $ = function (id) { return document.getElementById(id); };
+  var state = { studies: {}, index: null, sig: '' };
+
+  function esc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); }
+  function num(v) { if (v == null || v === '') return NaN; var n = typeof v === 'number' ? v : parseFloat(v); return isFinite(n) ? n : NaN; }
+  function fmtR(v, d) { v = num(v); if (!isFinite(v)) return '<span class="dash">–</span>'; var s = Math.abs(v).toFixed(d == null ? 2 : d); return (v > 0 ? '+' : v < 0 ? '−' : '') + s + 'R'; }
+  function fmtN(v) { v = num(v); return isFinite(v) ? Math.round(v).toLocaleString('en-US') : '<span class="dash">–</span>'; }
+  function fmtDD(v) { v = num(v); return isFinite(v) ? Math.abs(v).toFixed(1) + 'R' : '<span class="dash">–</span>'; }
+  function fmtWR(v) { v = num(v); if (!isFinite(v)) return '–'; if (v <= 1) v *= 100; return v.toFixed(0) + '%'; }
+  function fmtT(v) { v = num(v); return isFinite(v) ? v.toFixed(2) : '–'; }
+  function titleCase(t) { return t.replace(/[-_]+/g, ' ').replace(/^\w/, function (c) { return c.toUpperCase(); }); }
+
+  function verdictOf(v) {
+    if (v && typeof v === 'object') v = v.verdict || v.primary || v.label || v.status || v.decision || '';   // {verdict:'FAILS', P1:false}, {primary:'FAIL'}, {label:'NQ-ONLY'}
+    var s = String(v || '').trim().toUpperCase();
+    if (s.indexOf('PASS') === 0) return 'pass';
+    if (s.indexOf('FAIL') === 0 || s.indexOf('DECAYED') === 0) return 'fail';
+    if (s) return 'inc';
+    return '';
+  }
+  var BADGE = {
+    pass: '<span class="badge pass"><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2.5 6.3l2.3 2.2 4.7-5"/></svg>PASS</span>',
+    fail: '<span class="badge fail"><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M3 3l6 6M9 3l-6 6"/></svg>FAIL</span>',
+    inc: '<span class="badge inc"><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M2.5 6h7"/></svg>INCONCLUSIVE</span>',
+    run: '<span class="badge run"><span class="dot" aria-hidden="true"></span>Running</span>',
+    err: '<span class="badge err">Unreadable</span>'
+  };
+  var CHEV = '<svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4.5 2.5L8 6l-3.5 3.5"/></svg>';
+
+  function groupOf(topic, data) {
+    var sys = String((data && data.system) || '');
+    if (/^ict-/.test(topic)) return 'ict';
+    if (/\bict\b/i.test(sys) && !/meridian/i.test(sys)) return 'ict';
+    return 'meridian';
+  }
+
+  function parseYears(y) {
+    if (!y || typeof y !== 'object') return [];
+    var arr = Array.isArray(y)
+      ? y.map(function (o) { return o && typeof o === 'object' ? { year: o.year != null ? o.year : o.y, s: o } : null; }).filter(Boolean)
+      : Object.keys(y).map(function (k) { return { year: k, s: y[k] }; });
+    return arr.map(function (d) {
+      var s = d.s, isNum = typeof s === 'number' || typeof s === 'string';
+      var exp = isNum ? num(s) : num(s && (s.exp != null ? s.exp : s.R));
+      return { year: String(d.year), exp: exp, n: isNum ? NaN : num(s && s.n), wr: isNum ? NaN : num(s && s.wr), total: !isNum && s && s.exp == null && s.R != null };
+    }).filter(function (d) { return d.year && isFinite(d.exp); }).sort(function (a, b) { return a.year < b.year ? -1 : a.year > b.year ? 1 : 0; });
+  }
+
+  // Pick the candidate a reader should see: a declared best, else the strongest passing OOS, else the strongest OOS.
+  function analyse(data, rec) {
+    var cands = Array.isArray(data.candidates) ? data.candidates.filter(function (c) { return c && typeof c === 'object'; }) : [];
+    var best = null;
+    if (data.best != null) {
+      if (typeof data.best === 'number') best = cands[data.best] || null;
+      else if (typeof data.best === 'string') best = cands.filter(function (c) { return c.rule === data.best; })[0] || null;
+      else if (typeof data.best === 'object') best = data.best;
+    }
+    var oosExp = function (c) { var v = num(c.oos && c.oos.exp); return isFinite(v) ? v : -Infinity; };
+    if (!best && cands.length) {
+      var passing = cands.filter(function (c) { return verdictOf(c.verdict) === 'pass'; });
+      var pool = passing.length ? passing : cands;
+      best = pool.slice().sort(function (a, b) { return oosExp(b) - oosExp(a); })[0];
+    }
+    var v = verdictOf(data.verdict);
+    // the published index carries the class read from the author's RESULT.md verdict line: it outranks one noisy formal pass in a candidates table
+    var ix = rec && /^(pass|fail|inc)$/.test(String(rec.verdict || '')) ? rec.verdict : '';
+    if ((!v || v === 'inc') && ix) v = ix;
+    if (!v) {
+      var vs = cands.map(function (c) { return verdictOf(c.verdict); });
+      v = vs.indexOf('pass') >= 0 ? 'pass' : vs.length && vs.every(function (x) { return x === 'fail'; }) ? 'fail' : 'inc';
+    }
+    return { cands: cands, best: best, verdict: v };
+  }
+
+  function sparkline(years) {
+    if (!years.length) return '<span class="dash">No yearly split</span>';
+    var W = 150, H = 34, pad = 1, n = years.length;
+    var max = Math.max.apply(null, years.map(function (d) { return Math.abs(d.exp); })) || 1;
+    var hasNeg = years.some(function (d) { return d.exp < 0; }), hasPos = years.some(function (d) { return d.exp > 0; });
+    var zero = hasNeg && hasPos ? H / 2 : hasNeg ? 2 : H - 2;
+    var span = hasNeg && hasPos ? H / 2 - pad : H - 2 - pad;
+    var slot = W / n, gap = Math.min(4, slot * 0.28), bw = Math.max(2, slot - gap);
+    var out = '';
+    years.forEach(function (d, i) {
+      var h = Math.max(1.5, Math.abs(d.exp) / max * span), x = i * slot + gap / 2;
+      var y = d.exp >= 0 ? zero - h : zero;
+      var r = Math.min(2, bw / 2, h / 2);
+      // flat end on the zero line, rounded data end
+      var path = d.exp >= 0
+        ? 'M' + x + ',' + zero + 'V' + (y + r) + 'Q' + x + ',' + y + ' ' + (x + r) + ',' + y + 'H' + (x + bw - r) + 'Q' + (x + bw) + ',' + y + ' ' + (x + bw) + ',' + (y + r) + 'V' + zero + 'Z'
+        : 'M' + x + ',' + zero + 'V' + (zero + h - r) + 'Q' + x + ',' + (zero + h) + ' ' + (x + r) + ',' + (zero + h) + 'H' + (x + bw - r) + 'Q' + (x + bw) + ',' + (zero + h) + ' ' + (x + bw) + ',' + (zero + h - r) + 'V' + zero + 'Z';
+      out += '<g data-i="' + i + '"><path class="bar ' + (d.exp >= 0 ? 'b-up' : 'b-dn') + '" d="' + path + '"/><rect class="hit" x="' + (i * slot) + '" y="0" width="' + slot + '" height="' + H + '"/></g>';
+    });
+    var label = 'Expectancy by year: ' + years.map(function (d) { return d.year + ' ' + (d.exp >= 0 ? '+' : '−') + Math.abs(d.exp).toFixed(2) + 'R' + (isFinite(d.n) ? ' (' + d.n + ' trades)' : ''); }).join(', ');
+    return '<svg class="spark" viewBox="0 0 ' + W + ' ' + H + '" preserveAspectRatio="none" role="img" aria-label="' + esc(label) + '" data-years="' + esc(JSON.stringify(years)) + '">' +
+      '<line class="zero" x1="0" x2="' + W + '" y1="' + zero + '" y2="' + zero + '"/>' + out + '</svg>' +
+      '<div class="yr" aria-hidden="true"><span>' + esc(years[0].year) + '</span>' + (n > 1 ? '<span>' + esc(years[n - 1].year) + '</span>' : '') + '</div>';
+  }
+
+  function baselines(bl) {
+    if (!bl || typeof bl !== 'object') return [];
+    if (bl.is || bl.oos) return [['', bl]];
+    return Object.keys(bl).filter(function (k) { var v = bl[k]; return v && typeof v === 'object' && (v.is || v.oos); }).map(function (k) { return [k, bl[k]]; });
+  }
+
+  function ioCell(st, label) {
+    var is = st && st.is, oos = st && st.oos;
+    return '<span class="lbl">' + label + '</span><span class="io"><span class="is" title="In sample">' + fmtR(is && is.exp) + '</span><span class="arr" aria-label="to">→</span><span class="oos" title="Out of sample">' + fmtR(oos && oos.exp) + '</span></span>';
+  }
+
+  function rowHTML(topic, rec, i) {
+    var name = NAMES[topic] || titleCase(topic);
+    var open = (rec && rec.open) ? ' open' : '';
+    if (!rec || rec.status === 'missing') {
+      return '<article class="row running" style="--i:' + i + '" data-topic="' + esc(topic) + '">' +
+        '<div class="c-study"><h3>' + esc(name) + '</h3><p class="meta">' + esc(topic) + '</p></div>' +
+        '<div class="c-verdict">' + BADGE.run + '</div>' +
+        '<div class="waiting">Waiting for result.json</div>' +
+        '<div class="c-rep">' + (rec && rec.report ? '<button class="linkbtn" type="button" data-rep="' + esc(topic) + '">Report</button>' : '') + '</div></article>';
+    }
+    if (rec.status === 'error') {
+      return '<article class="row" style="--i:' + i + '" data-topic="' + esc(topic) + '">' +
+        '<div class="c-study"><h3>' + esc(name) + '</h3><p class="meta">' + esc(topic) + '</p></div>' +
+        '<div class="c-verdict">' + BADGE.err + '</div>' +
+        '<div class="waiting">result.json could not be parsed</div>' +
+        '<div class="c-rep"><button class="linkbtn" type="button" data-rep="' + esc(topic) + '">Report</button></div></article>';
+    }
+    var d = rec.data, a = analyse(d, rec), b = a.best;
+    // baseline is either {is, oos} or several named baselines ({A: {is, oos}, ALL: {is, oos}}): compare with the one the best rule names
+    var baseSet = baselines(d.baseline), base = {}, baseKey = '';
+    if (baseSet.length === 1) { base = baseSet[0][1]; baseKey = baseSet[0][0]; }
+    else if (baseSet.length) {
+      var pick = b && b.rule && baseSet.filter(function (e) { return e[0] && new RegExp('^' + e[0].replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '[-:\\s]', 'i').test(b.rule); })[0];
+      pick = pick || baseSet.filter(function (e) { return /^all$/i.test(e[0]); })[0] || baseSet[0];
+      base = pick[1]; baseKey = pick[0];
+    }
+    var sys = d.system ? esc(d.system) : '';
+    var tried = num(d.variantsTried);
+    var meta = [sys, isFinite(tried) ? fmtN(tried) + ' variants tried' : (a.cands.length ? a.cands.length + ' candidates' : ''), rec.built ? 'built ' + esc(rec.built) : ''].filter(Boolean).join(' · ');
+    var headline = rec.headline ? '<p class="rule head" title="' + esc(rec.headline) + '"><em>Verdict:</em> ' + esc(rec.headline) + '</p>' : '';
+    var bestStats = b || { is: base.is, oos: base.oos };
+    var oosB = bestStats.oos || {}, baseOos = num(base.oos && base.oos.exp), bestOos = num(oosB.exp);
+    var delta = b && isFinite(baseOos) && isFinite(bestOos) ? bestOos - baseOos : NaN;
+    var deltaHTML = isFinite(delta) ? '<span class="sub"><span class="num ' + (delta > 0 ? 'up' : delta < 0 ? 'down' : '') + '">' + fmtR(delta) + '</span> vs baseline OOS</span>' : (b ? '' : '<span class="sub">No candidates</span>');
+    var years = parseYears((b && b.years) || d.years || (base && base.years));
+    var oosT = num(oosB.t);
+    var nSub = isFinite(oosT) ? '<span class="sub">t <span class="num">' + fmtT(oosT) + '</span></span>' : '';
+    var wrSub = isFinite(num(oosB.wr)) ? '<span class="sub">WR <span class="num">' + fmtWR(oosB.wr) + '</span></span>' : '';
+
+    var candRows = a.cands.map(function (c) {
+      var vv = verdictOf(c.verdict), is = c.is || {}, oos = c.oos || {};
+      return '<tr' + (c === b ? ' class="best"' : '') + '><td>' + esc(c.rule || '(unnamed)') + '</td>' +
+        '<td><span class="v ' + (vv === 'pass' ? 'up' : vv === 'fail' ? 'down' : '') + '">' + esc(String(c.verdict || '–').toUpperCase()) + '</span></td>' +
+        '<td>' + fmtR(is.exp) + '</td><td>' + fmtN(is.n) + '</td><td>' + fmtR(oos.exp) + '</td><td>' + fmtN(oos.n) + '</td><td>' + fmtWR(oos.wr) + '</td><td>' + fmtDD(oos.maxDD) + '</td><td>' + fmtT(oos.t) + '</td></tr>';
+    }).join('');
+    var baseRow = (baseSet.length ? baseSet : [['', {}]]).map(function (e) { var bs = e[1]; return '<tr><td><em>Baseline' + (e[0] ? ' ' + esc(e[0]) : '') + '</em></td><td>–</td><td>' + fmtR(bs.is && bs.is.exp) + '</td><td>' + fmtN(bs.is && bs.is.n) + '</td><td>' + fmtR(bs.oos && bs.oos.exp) + '</td><td>' + fmtN(bs.oos && bs.oos.n) + '</td><td>' + fmtWR(bs.oos && bs.oos.wr) + '</td><td>' + fmtDD(bs.oos && bs.oos.maxDD) + '</td><td>' + fmtT(bs.oos && bs.oos.t) + '</td></tr>'; }).join('');
+    var notes = d.notes ? (Array.isArray(d.notes) ? d.notes.join('\n') : typeof d.notes === 'string' ? d.notes : JSON.stringify(d.notes, null, 1)) : '';
+    var more = '<details class="more"' + open + '><summary>' + CHEV + (a.cands.length ? 'All ' + a.cands.length + ' candidate' + (a.cands.length === 1 ? '' : 's') : 'Baseline detail') + (notes ? ' and notes' : '') + '</summary>' +
+      '<div class="cand-wrap"><table class="cand"><thead><tr><th scope="col">Rule</th><th scope="col">Verdict</th><th scope="col">IS exp</th><th scope="col">IS n</th><th scope="col">OOS exp</th><th scope="col">OOS n</th><th scope="col">OOS WR</th><th scope="col">OOS max DD</th><th scope="col">OOS t</th></tr></thead><tbody>' + baseRow + candRows + '</tbody></table></div>' +
+      (notes ? '<p class="notes">' + esc(notes) + '</p>' : '') + '</details>';
+
+    return '<article class="row" style="--i:' + i + '" data-topic="' + esc(topic) + '">' +
+      '<div class="c-study"><h3>' + esc(name) + '</h3>' + (meta ? '<p class="meta" title="' + esc(meta.replace(/<[^>]+>/g, '')) + '">' + meta + '</p>' : '') +
+      headline + (b && b.rule ? '<p class="rule" title="' + esc(b.rule) + '"><em>Best:</em> ' + esc(b.rule) + '</p>' : '') + '</div>' +
+      '<div class="c-verdict">' + BADGE[a.verdict] + '</div>' +
+      '<div class="c-base">' + ioCell(base, 'Baseline IS → OOS') + (baseSet.length > 1 ? '<span class="sub">Baseline ' + esc(baseKey) + ' of ' + baseSet.length + '</span>' : '') + '</div>' +
+      '<div class="c-best">' + (b ? ioCell(b, 'Best candidate IS → OOS') + deltaHTML : '<span class="lbl">Best candidate</span><span class="dash">–</span>' + deltaHTML) + '</div>' +
+      '<div class="c-n"><span class="lbl">OOS n</span>' + fmtN(oosB.n) + nSub + '</div>' +
+      '<div class="c-dd"><span class="lbl">OOS max DD</span>' + fmtDD(oosB.maxDD) + wrSub + '</div>' +
+      '<div class="c-years"><span class="lbl">Exp by year</span>' + sparkline(years) + '</div>' +
+      '<div class="c-rep">' + (rec.report !== false ? '<button class="linkbtn" type="button" data-rep="' + esc(topic) + '">Report' + CHEV.replace('<svg', '<svg width="11" height="11"') + '</button>' : '<button class="linkbtn" type="button" disabled>No report</button>') + '</div>' +
+      more + '</article>';
+  }
+
+  function render() {
+    var topics = KNOWN.map(function (k) { return k[0]; });
+    Object.keys(state.studies).sort().forEach(function (t) { if (topics.indexOf(t) < 0) topics.push(t); });
+    var groups = { meridian: [], ict: [] };
+    var counts = { pass: 0, fail: 0, inc: 0, run: 0, err: 0 };
+    topics.forEach(function (t) {
+      var rec = state.studies[t];
+      var g = groupOf(t, rec && rec.data);
+      groups[g].push(t);
+      if (!rec || rec.status === 'missing') counts.run++;
+      else if (rec.status === 'error') counts.err++;
+      else counts[analyse(rec.data, rec).verdict]++;
+    });
+
+    // remember which candidate lists are open so a refresh does not collapse them
+    document.querySelectorAll('.row[data-topic] details[open]').forEach(function (el) {
+      var t = el.closest('.row').dataset.topic; if (state.studies[t]) state.studies[t].open = true;
+    });
+    document.querySelectorAll('.row[data-topic] details:not([open])').forEach(function (el) {
+      var t = el.closest('.row').dataset.topic; if (state.studies[t]) state.studies[t].open = false;
+    });
+
+    var total = topics.length, done = total - counts.run;
+    var segs = [['pass', counts.pass, 'Pass'], ['fail', counts.fail, 'Fail'], ['inc', counts.inc + counts.err, 'Inconclusive'], ['run', counts.run, 'Running']];
+    $('prog').innerHTML = '<div class="prog-h"><strong>' + done + '<span> of ' + total + ' studies in</span></strong><small>' + (state.index && state.index.generated ? 'Published ' + esc(new Date(state.index.generated).toLocaleString([], { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })) : '') + '</small></div>' +
+      '<div class="seg" role="img" aria-label="' + segs.map(function (s) { return s[1] + ' ' + s[2].toLowerCase(); }).join(', ') + '">' + segs.map(function (s) { return '<i class="' + s[0] + '" style="flex-grow:' + s[1] + '"></i>'; }).join('') + '</div>' +
+      '<ul class="legend">' + segs.map(function (s) { return '<li><i class="' + s[0] + '" style="background:var(' + ({ pass: '--buy', fail: '--sell', inc: '--ink-faint', run: '--line-strong' })[s[0]] + ')"></i>' + s[2] + ' <b>' + s[1] + '</b></li>'; }).join('') + '</ul>';
+
+    var cols = '<div class="cols" aria-hidden="true"><span>Study</span><span>Verdict</span><span>Baseline IS → OOS</span><span>Best candidate IS → OOS</span><span>OOS n</span><span>Max DD</span><span>Exp by year</span><span></span></div>';
+    var gi = 0;
+    var html = [['meridian', 'Meridian', 'Desk systems, scalps and the gold book'], ['ict', 'ICT', 'The ICT desk: filters, exits and universe']].map(function (g) {
+      var list = groups[g[0]]; if (!list.length) return '';
+      var landed = list.filter(function (t) { var r = state.studies[t]; return r && r.status !== 'missing'; }).length;
+      return '<section class="group" aria-labelledby="g-' + g[0] + '"><div class="group-h"><h2 id="g-' + g[0] + '">' + g[1] + '</h2><p>' + g[2] + ' · ' + landed + ' of ' + list.length + ' in</p></div>' +
+        '<div class="table">' + cols + list.map(function (t) { return rowHTML(t, state.studies[t], gi++); }).join('') + '</div></section>';
+    }).join('');
+    $('groups').innerHTML = html;
+    if (state.rendered) document.querySelectorAll('.row').forEach(function (r) { r.style.animation = 'none'; });
+    state.rendered = true;
+    deepLink();
+  }
+
+  // #<topic> opens that study's row: its candidate list unfolds, the row scrolls under the sticky bar and is marked. Runs after
+  // every render (the rows are rebuilt on each refresh) and on hashchange; the scroll happens once per hash.
+  var linked = { topic: null, scrolled: false };
+  function deepLink() {
+    var t = decodeURIComponent((location.hash || '').slice(1).split('/')[0]);
+    if (!t || !/^[a-z0-9][a-z0-9_-]*$/i.test(t)) return;
+    if (linked.topic !== t) linked = { topic: t, scrolled: false };
+    var row = document.querySelector('.row[data-topic="' + t + '"]'); if (!row) return;
+    document.querySelectorAll('.row.hit').forEach(function (r) { if (r !== row) r.classList.remove('hit'); });
+    row.classList.add('hit');
+    var d = row.querySelector('details.more'); if (d && !d.open) { d.open = true; if (state.studies[t]) state.studies[t].open = true; }
+    if (linked.scrolled) return;
+    linked.scrolled = true;
+    row.setAttribute('tabindex', '-1'); row.style.animation = 'none';
+    row.scrollIntoView({ block: 'start' });
+    try { row.focus({ preventScroll: true }); } catch (e) {}
+  }
+  window.addEventListener('hashchange', function () { linked = { topic: null, scrolled: false }; deepLink(); });
+
+  function getJSON(url) {
+    return fetch(url, { cache: 'no-store' }).then(function (r) {
+      if (!r.ok) { var e = new Error('HTTP ' + r.status); e.status = r.status; throw e; }
+      return r.text();
+    }).then(function (t) { return JSON.parse(t); });
+  }
+
+  var busy = false;
+  function load() {
+    if (busy) return; busy = true;
+    $('refresh').setAttribute('aria-busy', 'true');
+    getJSON(BASE + 'index.json').then(function (ix) { return ix; }, function () { return null; }).then(function (ix) {
+      state.index = ix;
+      var entries;
+      if (ix && Array.isArray(ix.topics)) {
+        entries = ix.topics.map(function (t) { return typeof t === 'string' ? { topic: t, result: true, report: true } : t; }).filter(function (t) { return t && t.topic; });
+        // studies with no entry in the index are still running
+        KNOWN.forEach(function (k) { if (!entries.some(function (e) { return e.topic === k[0]; })) state.studies[k[0]] = { status: 'missing' }; });
+      } else {
+        // no index (e.g. a plain static server): probe every known study directly
+        entries = KNOWN.map(function (k) { return { topic: k[0], result: true, report: null }; });
+      }
+      return Promise.all(entries.map(function (e) {
+        var prev = state.studies[e.topic] || {};
+        if (!e.result) { state.studies[e.topic] = { status: 'missing', report: e.report, open: prev.open }; return null; }
+        return getJSON(BASE + encodeURIComponent(e.topic) + '/result.json').then(function (data) {
+          state.studies[e.topic] = { status: 'ok', data: data && typeof data === 'object' ? data : {}, report: e.report, open: prev.open, verdict: e.verdict, headline: e.headline, built: e.built };
+        }, function (err) {
+          state.studies[e.topic] = { status: err && err.status === 404 ? 'missing' : (err instanceof SyntaxError ? 'error' : (prev.status || 'missing')), data: prev.data, report: e.report, open: prev.open, verdict: e.verdict, headline: e.headline, built: e.built };
+          if (state.studies[e.topic].status === 'ok' && !prev.data) state.studies[e.topic].status = 'missing';
+        });
+      }));
+    }).then(function () {
+      var sig = JSON.stringify(Object.keys(state.studies).sort().map(function (k) { var s = state.studies[k]; return [k, s.status, s.data, s.report]; }));
+      if (sig !== state.sig) { state.sig = sig; render(); }
+      $('banner').innerHTML = '';
+      $('when').textContent = 'Checked ' + new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    }).catch(function (e) {
+      $('banner').innerHTML = '<p class="banner">Could not load results: ' + esc(e && e.message) + '</p>';
+      if (!state.rendered) render();
+    }).then(function () { busy = false; $('refresh').removeAttribute('aria-busy'); });
+  }
+
+  // tooltip for the year bars
+  var tip = $('tip'), tipOn = null;
+  function showTip(g, x, y) {
+    var svg = g.ownerSVGElement, years; try { years = JSON.parse(svg.getAttribute('data-years')); } catch (e) { return; }
+    var d = years[+g.dataset.i]; if (!d) return;
+    if (tipOn && tipOn !== g) tipOn.classList.remove('on');
+    tipOn = g; g.classList.add('on');
+    tip.innerHTML = '<b>' + esc(d.year) + '</b>' + (d.exp >= 0 ? '+' : '−') + Math.abs(d.exp).toFixed(2) + 'R' + (d.total ? ' <span>total</span>' : ' <span>per trade</span>') + (Number.isFinite(d.n) ? ' <span>· ' + d.n + ' trades</span>' : '') + (Number.isFinite(d.wr) ? ' <span>· WR ' + fmtWR(d.wr) + '</span>' : '');
+    tip.classList.add('on');
+    var w = tip.offsetWidth, h = tip.offsetHeight, vw = document.documentElement.clientWidth;
+    var left = Math.max(8, Math.min(vw - w - 8, x - w / 2)), top = y - h - 12;
+    if (top < 64) top = y + 16;
+    tip.style.left = left + 'px'; tip.style.top = top + 'px';
+  }
+  function hideTip() { tip.classList.remove('on'); if (tipOn) tipOn.classList.remove('on'); tipOn = null; }
+  document.addEventListener('pointermove', function (e) {
+    var g = e.target.closest && e.target.closest('.spark g[data-i]');
+    if (g) showTip(g, e.clientX, e.clientY); else if (tipOn && e.pointerType === 'mouse') hideTip();
+  });
+  document.addEventListener('pointerdown', function (e) {
+    var g = e.target.closest && e.target.closest('.spark g[data-i]');
+    if (g) showTip(g, e.clientX, e.clientY); else hideTip();
+  });
+  window.addEventListener('scroll', hideTip, { passive: true });
+
+  // report dialog
+  var dlg = $('rep');
+  document.addEventListener('click', function (e) {
+    var b = e.target.closest && e.target.closest('[data-rep]'); if (!b) return;
+    var t = b.getAttribute('data-rep'), url = BASE + encodeURIComponent(t) + '/RESULT.md';
+    $('rep-title').textContent = (NAMES[t] || titleCase(t)) + ' · RESULT.md';
+    $('rep-raw').href = url;
+    $('rep-body').textContent = 'Loading…';
+    if (dlg.showModal) dlg.showModal(); else dlg.setAttribute('open', '');
+    fetch(url, { cache: 'no-store' }).then(function (r) { if (!r.ok) throw new Error(r.status === 404 ? 'This study has no RESULT.md yet.' : 'HTTP ' + r.status); return r.text(); })
+      .then(function (txt) { $('rep-body').textContent = txt; $('rep-body').scrollTop = 0; }, function (err) { $('rep-body').textContent = err.message; });
+  });
+  $('rep-x').addEventListener('click', function () { dlg.close ? dlg.close() : dlg.removeAttribute('open'); });
+  dlg.addEventListener('click', function (e) { if (e.target === dlg) dlg.close(); });
+
+  $('refresh').addEventListener('click', load);
+  document.addEventListener('visibilitychange', function () { if (!document.hidden) load(); });
+  setInterval(function () { if (!document.hidden) load(); }, REFRESH_MS);
+  load();
+})();
+</script>
+</body>
+</html>
