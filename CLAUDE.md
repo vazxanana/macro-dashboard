@@ -551,8 +551,10 @@ whose stop distance is within 1.25× the broker spread (ctrader/symbols.json). T
 `tests/ctrader-mirror.test.mjs` (fake broker with resting orders, `fillOrder`, cancel / cancel-rejected paths).
 
 ## Guests: one page (8 Nov 2026)
-Guests always land on `#charts`; at load the `#v-guest` children move into `#v-charts > #g-merged` (the gold trade card, the H4 trade
-chart, results, the P&L calendar, the invitation), so guest styles are scoped `:is(#v-guest, .g-merged)`. The "↓ Gold trade and
+Guests always land on `#charts`; at load the `#v-guest` children move into `#v-charts > #g-merged` (the gold trade card, results, the
+P&L calendar, the invitation), so guest styles are scoped `:is(#v-guest, .g-merged)`. The desk's gold trade (`G.gplan`, set by
+renderGuest) is drawn as Entry / Stop / Target price lines on every pane while the market is gold (`planLinesDraw`, PUB branch); the
+separate guest H4 chart is gone, `guestCard()` writes the card. The "↓ Gold trade and
 results" link in the charts toolbar jumps to that section.
 
 ## Guests on the charts, wide-screen density (8 Nov 2026)
