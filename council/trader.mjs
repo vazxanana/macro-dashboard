@@ -20,6 +20,8 @@ import { voidRoundedReplicas, historyCatchUp, voidM30Twins, recostCrypto } from 
 import { d1AdxFeat } from './adx.mjs';
 // paper fills (8 Nov): costs (raw R + cost-adjusted Rnet), the stale-signal shadow stat, gap-aware stops (council/fills.mjs)
 import { costModel, annotateCosts, costSummary, driftR, backfillDrift, staleStats, stopFill, exitR, fillBarAmbiguous, spotSkip } from './fills.mjs';
+// Mosha BO chain state between trades (8 Nov): snapshot.moshaBo.state, a pure walk of the BO events below (council/mosha.mjs)
+import { moshaChain } from './mosha.mjs';
 import { SYMBOLS as BROKER_SYMBOLS } from './ctrader-mirror.mjs';
 // feed source on every record + re-quote / cancel / re-base when a market's candle feed changes source (8 Nov, council/feed.mjs)
 import { feedTag, requoteMarket, feedChangeText } from './feed.mjs';
@@ -883,6 +885,9 @@ for (const [key, M] of Object.entries(MARKETS)) {
         const w1At = (t) => (before(wEv, t) || { dir: 0 }).dir;
         snapshot.goldW1 = w1At(now) || null;
         const okW = (e) => config.moshaBoWeekly ? w1At(e.t) === e.dir : e.flip;
+        // where the chain stands now (status only, for the site): the last H4 BO, the H1 BO the other way after it, the M15 BO back
+        snapshot.moshaBo = { state: { ...moshaChain(E1, E2, E3), w1: snapshot.goldW1, w1Src: snapshot.goldW1Src || null,
+          open: trades.filter((x) => x.k === 'mosha-bo' && !x.shadow && x.status === 'open').length, pending: trades.filter((x) => x.k === 'mosha-bo' && !x.shadow && x.status === 'pending').length } };
         // 5 Nov (owner: record everything): a chain that fails the weekly filter, the 2-open cap or the price check is kept as a
         // shadow trade (managed the same way, not our system), so each filter's cost shows forward
         if (e3 && now - e3.t <= 3600) {
