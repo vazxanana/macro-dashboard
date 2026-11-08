@@ -550,6 +550,12 @@ position at once when the broker refuses the stop (only no answer at all waits a
 whose stop distance is within 1.25× the broker spread (ctrader/symbols.json). Tests:
 `tests/ctrader-mirror.test.mjs` (fake broker with resting orders, `fillOrder`, cancel / cancel-rejected paths).
 
+## LIT and NQ SDV desks (8 Nov 2026)
+The desk switch is ICT | Gold | Crypto | LIT | NQ SDV (soon). `#lit` (v-lit, `renderLit`, re-run when council-data lands) shows the paper
+shadow stream: record from trades with `k 'lit'` / ids `xau-lit-*`, the detector funnel and dropped-candidate counts from `snapshot.lit`,
+open / resting and closed tables. `#sdv` (v-sdv) is a placeholder that states the steps before a desk opens (pre-registration, 2020→now
+backtest, verdict, paper first); nothing there is a signal.
+
 ## Guests: one page (8 Nov 2026)
 Guests always land on `#charts`; at load the `#v-guest` children move into `#v-charts > #g-merged` (the gold trade card, results, the
 P&L calendar, the invitation), so guest styles are scoped `:is(#v-guest, .g-merged)`. The desk's gold trade (`G.gplan`, set by
