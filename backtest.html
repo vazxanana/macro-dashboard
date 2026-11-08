@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<meta name="color-scheme" content="dark light">
+<title>Backtest lab · Meridian X</title>
+<meta name="description" content="Manual backtesting on real candles: bar-by-bar replay, your own orders, a trading journal with statistics, and prop-firm challenge simulation (FTMO, FundingPips, Topstep, Lucid).">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='16' r='14' fill='%23e0a526'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600&display=swap">
+<script>(function () { try { var p = JSON.parse(localStorage.getItem('msPrefs') || 'null'); if (p && p.theme) document.documentElement.dataset.theme = p.theme === 'light' ? 'light' : 'dark'; } catch (e) {} })();</script>
+<script src="/assets/lightweight-charts-4.1.3.js"></script>
+<script>window.LightweightCharts || document.write('<script src="https://cdn.jsdelivr.net/npm/lightweight-charts@4.1.3/dist/lightweight-charts.standalone.production.js"><\/script>');</script>
+<script src="/assets/backtest-engine.js"></script>
+<style>
+  :root { --bg: #08090c; --panel: #0f1116; --panel-raised: #14171e; --panel-hover: #161a22; --line: rgba(255,255,255,.07); --line-soft: rgba(255,255,255,.045); --line-strong: rgba(255,255,255,.12);
+    --ink: #eceef2; --ink-dim: #a4abb8; --ink-faint: #8a92a1; --accent: #5b8cff; --accent-soft: rgba(91,140,255,.12); --gold: #e0a526;
+    --buy: #2fbf8f; --sell: #f2576f; --buy-soft: rgba(47,191,143,.12); --sell-soft: rgba(242,87,111,.12); --neutral-soft: rgba(255,255,255,.06);
+    --sans: Figtree, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; --mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; --r: 12px; --r-sm: 8px; color-scheme: dark; }
+  @media (prefers-color-scheme: light) { :root:not([data-theme="dark"]) { --bg: #f4f6f9; --panel: #fff; --panel-raised: #f7f8fb; --panel-hover: #f9fafc; --line: #dfe3ea; --line-soft: #eceff4; --line-strong: #cdd3dd; --ink: #131722; --ink-dim: #4a5160; --ink-faint: #5f6675; --accent: #2f6bff; --accent-soft: rgba(47,107,255,.09); --buy: #08876f; --sell: #d92d4b; --buy-soft: rgba(8,135,111,.09); --sell-soft: rgba(217,45,75,.08); --neutral-soft: rgba(19,23,34,.05); color-scheme: light; } }
+  :root[data-theme="light"] { --bg: #f4f6f9; --panel: #fff; --panel-raised: #f7f8fb; --panel-hover: #f9fafc; --line: #dfe3ea; --line-soft: #eceff4; --line-strong: #cdd3dd; --ink: #131722; --ink-dim: #4a5160; --ink-faint: #5f6675; --accent: #2f6bff; --accent-soft: rgba(47,107,255,.09); --buy: #08876f; --sell: #d92d4b; --buy-soft: rgba(8,135,111,.09); --sell-soft: rgba(217,45,75,.08); --neutral-soft: rgba(19,23,34,.05); color-scheme: light; }
+  * { box-sizing: border-box; } html, body { margin: 0; background: var(--bg); color: var(--ink); font: 14px/1.5 var(--sans); }
+  button, input, select, textarea { font: inherit; color: inherit; } button { cursor: pointer; }
+  .top { position: sticky; top: 0; z-index: 10; display: flex; align-items: center; gap: 14px; padding: 8px 18px; background: color-mix(in srgb, var(--panel) 88%, transparent); backdrop-filter: blur(10px); border-bottom: 1px solid var(--line); }
+  .brand { display: inline-flex; align-items: center; gap: 9px; font-weight: 700; text-decoration: none; color: var(--ink); } .brand i { width: 16px; height: 16px; border-radius: 50%; background: radial-gradient(circle at 35% 30%, #fbe7a6, #e0a526 55%, #9a6a0c); }
+  .brand small { color: var(--ink-faint); font-weight: 500; } .top .sp { flex: 1; } .top a.back { color: var(--ink-dim); text-decoration: none; font-size: 13px; padding: 6px 12px; border: 1px solid var(--line); border-radius: 999px; } .top a.back:hover { color: var(--ink); border-color: var(--line-strong); }
+  .wrap { max-width: 1900px; margin: 0 auto; padding: 12px 18px 60px; }
+  .card { background: var(--panel); border: 1px solid var(--line); border-radius: var(--r); padding: 12px 14px; min-width: 0; } .card h2 { margin: 0 0 8px; font-size: 14px; display: flex; align-items: baseline; justify-content: space-between; gap: 10px; } .card h2 small { color: var(--ink-faint); font-weight: 500; font-size: 12px; }
+  .setup { display: flex; flex-wrap: wrap; gap: 8px 10px; align-items: end; } .setup label { display: grid; gap: 3px; font-size: 11.5px; color: var(--ink-faint); } .setup label > * { min-height: 34px; }
+  input, select, textarea { background: var(--panel-raised); border: 1px solid var(--line); border-radius: var(--r-sm); padding: 6px 9px; min-height: 34px; color: var(--ink); } input:focus, select:focus, textarea:focus { outline: 2px solid var(--accent-soft); border-color: var(--accent); }
+  input[type="number"] { font-family: var(--mono); font-size: 13px; } textarea { min-height: 56px; resize: vertical; }
+  .btn { min-height: 34px; padding: 6px 13px; border-radius: var(--r-sm); border: 1px solid var(--line); background: var(--panel-raised); color: var(--ink); font-weight: 600; } .btn:hover { border-color: var(--line-strong); background: var(--panel-hover); }
+  .btn.pri { background: var(--accent); border-color: var(--accent); color: #fff; } .btn.buy { background: var(--buy); border-color: var(--buy); color: #fff; } .btn.sell { background: var(--sell); border-color: var(--sell); color: #fff; } .btn.sm { min-height: 28px; padding: 3px 9px; font-size: 12px; font-weight: 500; } .btn:disabled { opacity: .45; cursor: default; }
+  .grid { display: grid; grid-template-columns: minmax(0, 1fr) 340px; gap: 12px; margin-top: 12px; } @media (max-width: 1100px) { .grid { grid-template-columns: 1fr; } }
+  .chartc { position: relative; } #chart { height: min(62vh, 640px); min-height: 360px; } .ctl { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-top: 10px; } .ctl .now { font: 600 12.5px var(--mono); color: var(--ink-dim); margin-left: auto; }
+  .ctl .mode { display: inline-flex; border: 1px solid var(--line); border-radius: 999px; overflow: hidden; } .ctl .mode button { border: 0; background: none; padding: 5px 11px; font-size: 12px; color: var(--ink-dim); } .ctl .mode button[aria-pressed="true"] { background: var(--accent-soft); color: var(--ink); }
+  .side { display: grid; gap: 12px; align-content: start; min-width: 0; } .side .card { overflow: hidden; } .tk input, .tk select, .tk textarea, .pf-rules input, .pf-rules select { width: 100%; min-width: 0; } .seg button { min-width: 0; padding: 0 4px; } .kv b { font-size: 13.5px; word-break: break-all; } #pf-status .pill { white-space: normal; }
+  .kv { display: grid; grid-template-columns: repeat(auto-fit, minmax(96px, 1fr)); gap: 8px; } .kv div { padding: 8px 10px; border: 1px solid var(--line-soft); border-radius: var(--r-sm); } .kv small { display: block; color: var(--ink-faint); font-size: 11px; } .kv b { font: 600 15px var(--mono); } .pos { color: var(--buy); } .neg { color: var(--sell); }
+  .tk { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; } .tk label { display: grid; gap: 3px; font-size: 11.5px; color: var(--ink-faint); } .tk .full { grid-column: 1 / -1; } .seg { display: grid; grid-template-columns: 1fr 1fr; gap: 0; border: 1px solid var(--line); border-radius: var(--r-sm); overflow: hidden; } .seg button { border: 0; background: none; min-height: 34px; color: var(--ink-dim); font-weight: 600; } .seg button[aria-pressed="true"].b { background: var(--buy-soft); color: var(--buy); } .seg button[aria-pressed="true"].s { background: var(--sell-soft); color: var(--sell); } .seg button[aria-pressed="true"] { background: var(--accent-soft); color: var(--ink); }
+  .seg3 { grid-template-columns: 1fr 1fr 1fr; } .calc { grid-column: 1 / -1; font: 500 12px var(--mono); color: var(--ink-dim); display: flex; flex-wrap: wrap; gap: 6px 14px; } .err { color: var(--sell); font-size: 12px; min-height: 16px; }
+  table { width: 100%; border-collapse: collapse; font-size: 12.5px; } th, td { padding: 6px 7px; text-align: left; border-bottom: 1px solid var(--line-soft); vertical-align: top; } th { color: var(--ink-faint); font-weight: 600; font-size: 11px; text-transform: uppercase; letter-spacing: .03em; } td.n, th.n { text-align: right; font-family: var(--mono); } .tw { overflow: auto; max-height: 420px; }
+  .pill { display: inline-block; padding: 1px 8px; border-radius: 999px; border: 1px solid var(--line); font-size: 11px; color: var(--ink-dim); } .pill.live { color: var(--accent); border-color: color-mix(in srgb, var(--accent) 50%, var(--line)); } .pill.ok { color: var(--buy); border-color: color-mix(in srgb, var(--buy) 50%, var(--line)); } .pill.bad { color: var(--sell); border-color: color-mix(in srgb, var(--sell) 50%, var(--line)); }
+  .bar { height: 7px; border-radius: 999px; background: var(--neutral-soft); overflow: hidden; margin: 4px 0 2px; } .bar i { display: block; height: 100%; background: var(--accent); border-radius: 999px; } .bar i.warn { background: var(--sell); } .bar i.good { background: var(--buy); }
+  .rule { font-size: 12px; color: var(--ink-dim); margin: 6px 0 2px; display: flex; justify-content: space-between; gap: 8px; } .rule b { font-family: var(--mono); font-weight: 600; color: var(--ink); }
+  .tabs { display: flex; flex-wrap: wrap; gap: 6px; margin: 14px 0 0; } .tabs button { min-height: 32px; padding: 5px 12px; border-radius: 999px; border: 1px solid var(--line); background: var(--neutral-soft); color: var(--ink-dim); font: 500 12.5px var(--sans); } .tabs button[aria-selected="true"] { border-color: var(--accent); color: var(--ink); background: var(--accent-soft); }
+  .tabp { margin-top: 10px; } .tabp[hidden] { display: none; }
+  .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 8px; } .stats div { padding: 8px 10px; border: 1px solid var(--line-soft); border-radius: var(--r-sm); } .stats small { display: block; color: var(--ink-faint); font-size: 11px; } .stats b { font: 600 16px var(--mono); }
+  .two { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 12px; margin-top: 12px; } canvas { width: 100%; height: 180px; display: block; }
+  .cal { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; } .cal div { min-height: 54px; padding: 5px 6px; border: 1px solid var(--line-soft); border-radius: 6px; font-size: 11px; color: var(--ink-faint); } .cal div b { display: block; font: 600 12.5px var(--mono); margin-top: 4px; } .cal .h { min-height: 0; border: 0; text-align: center; } .cal .w { background: var(--buy-soft); } .cal .l { background: var(--sell-soft); } .cal .mo { display: flex; gap: 8px; align-items: center; margin-bottom: 8px; }
+  .note { color: var(--ink-faint); font-size: 12px; margin: 8px 0 0; } .hint { font-size: 12px; color: var(--ink-faint); }
+  .gate { max-width: 520px; margin: 60px auto; text-align: center; } .gate h1 { font-size: 22px; margin: 0 0 8px; } .gate a { color: var(--accent); }
+  .tag { display: inline-block; padding: 0 7px; border-radius: 999px; background: var(--neutral-soft); font-size: 11px; margin-right: 3px; }
+  td input, td select { min-height: 26px; padding: 2px 6px; font-size: 12px; } .hb { display: flex; gap: 2px; align-items: flex-end; height: 70px; margin-top: 6px; } .hb i { flex: 1; display: block; border-radius: 2px 2px 0 0; min-height: 1px; background: var(--buy); } .hb i.l { background: var(--sell); align-self: flex-start; border-radius: 0 0 2px 2px; } .hbl { display: flex; font-size: 10px; color: var(--ink-faint); } .hbl span { flex: 1; text-align: center; }
+  .pf-head { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; } .pf-rules { display: grid; grid-template-columns: 1fr 1fr; gap: 6px 8px; margin-top: 8px; } .pf-rules label { display: grid; gap: 2px; font-size: 11px; color: var(--ink-faint); } .pf-rules input, .pf-rules select { min-height: 30px; padding: 3px 7px; font-size: 12.5px; }
+  details summary { cursor: pointer; font-size: 12.5px; color: var(--accent); margin-top: 6px; }
+  kbd { font: 500 11px var(--mono); padding: 1px 5px; border: 1px solid var(--line-strong); border-bottom-width: 2px; border-radius: 4px; color: var(--ink-dim); }
+  @media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
+</style>
+</head>
+<body>
+<header class="top"><a class="brand" href="/#home"><i></i>Meridian X <small>/ Backtest lab</small></a><span class="hint" id="who"></span><span class="sp"></span><span class="hint">Paper only · <kbd>→</kbd> next bar · <kbd>Space</kbd> play</span><a class="back" href="/#home">Back to the desk</a></header>
+<main class="wrap" id="app" hidden>
+  <section class="card">
+    <div class="setup">
+      <label>Market<select id="sym"></select></label>
+      <label>Timeframe<select id="tf"><option value="1m">1 minute</option><option value="5m">5 minutes</option><option value="15m" selected>15 minutes</option><option value="1h">1 hour</option><option value="4h">4 hours</option></select></label>
+      <label>Start (UTC)<input type="datetime-local" id="start"></label>
+      <label>Days to load<input type="number" id="days" value="20" min="1" max="120" style="width:90px"></label>
+      <label>Session name<input id="sname" placeholder="e.g. Gold NY opens, Oct" style="width:200px"></label>
+      <button class="btn pri" id="load">Load candles</button>
+      <span class="hint" id="loadmsg"></span>
+      <span class="sp" style="flex:1"></span>
+      <label>Saved sessions<select id="sessions"></select></label><button class="btn" id="resume">Resume</button><button class="btn" id="newsess">New</button>
+    </div>
+  </section>
+  <div class="grid">
+    <section class="card chartc">
+      <div id="chart"></div>
+      <div class="ctl">
+        <button class="btn" id="step">Next bar <kbd>→</kbd></button><button class="btn" id="play">Play</button>
+        <select id="speed"><option value="1000">1 bar/s</option><option value="500" selected>2 bars/s</option><option value="200">5 bars/s</option><option value="80">12 bars/s</option></select>
+        <button class="btn" id="skipday">Skip to next day</button>
+        <span class="mode" role="group" aria-label="Click on the chart sets"><button aria-pressed="true" data-m="entry">Click sets entry</button><button data-m="stop">stop</button><button data-m="target">target</button></span>
+        <span class="now" id="now">—</span>
+      </div>
+      <p class="note">Candles are OANDA mid prices. The future is hidden; orders fill on the next bars (limit and stop at their price, or at the open when the bar gaps through). When a stop and a target sit inside one bar, the worst case (stop) is assumed unless you switch it off in Account.</p>
+    </section>
+    <aside class="side">
+      <section class="card"><h2>Account <small id="acc-sub"></small></h2>
+        <div class="kv"><div><small>Balance</small><b id="bal">—</b></div><div><small>Equity</small><b id="eq">—</b></div><div><small>Floating</small><b id="flt">—</b></div><div><small>Today</small><b id="today">—</b></div></div>
+        <details><summary>Settings</summary><div class="tk" style="margin-top:8px"><label>Start balance<input type="number" id="startbal" value="100000" step="1000"></label><label>Commission / trade ($)<input type="number" id="comm" value="0" step="0.5"></label><label>Spread (price)<input type="number" id="spread" value="0" step="0.01"></label><label>Both in one bar<select id="slfirst"><option value="1">Stop first (worst case)</option><option value="0">Target first</option></select></label></div><p class="hint">Sizes assume the account currency is the quote currency (USD pairs, gold, indices in USD). JPY and cross pairs are approximate.</p></details>
+      </section>
+      <section class="card"><h2>Order ticket <small id="px-now"></small></h2>
+        <div class="tk">
+          <div class="seg full"><button class="b" data-side="buy" aria-pressed="true">Buy</button><button class="s" data-side="sell">Sell</button></div>
+          <div class="seg seg3 full" id="otype"><button data-t="market" aria-pressed="true">Market</button><button data-t="limit">Limit</button><button data-t="stop">Stop</button></div>
+          <label>Entry<input type="number" id="o-price" step="any" disabled></label><label>Stop loss<input type="number" id="o-stop" step="any"></label>
+          <label>Take profit<input type="number" id="o-target" step="any" placeholder="optional"></label><label>Risk % of balance<input type="number" id="o-risk" value="1" step="0.25" min="0.05"></label>
+          <label class="full">Tags <small>(comma separated)</small><input id="o-tags" placeholder="london sweep, A setup"></label>
+          <label class="full">Note<textarea id="o-note" placeholder="Why this trade?"></textarea></label>
+          <div class="calc" id="calc"></div>
+          <button class="btn buy full" id="place">Place buy</button><div class="err full" id="o-err"></div>
+        </div>
+        <div id="open"></div>
+      </section>
+      <section class="card"><h2>Prop-firm challenge <small id="pf-status"></small></h2>
+        <div class="pf-head"><select id="firm"></select><button class="btn sm pri" id="pf-start">Start challenge</button><button class="btn sm" id="pf-stop" hidden>Stop</button></div>
+        <div id="pf"></div>
+        <details><summary>Rules (editable before you start)</summary><div class="pf-rules" id="pf-rules"></div><p class="hint" id="pf-note"></p></details>
+      </section>
+    </aside>
+  </div>
+  <div class="tabs" role="tablist"><button role="tab" data-t="journal" aria-selected="true">Journal <span id="jn"></span></button><button role="tab" data-t="stats">Statistics</button><button role="tab" data-t="cal">Calendar</button><button role="tab" data-t="log">Challenge log</button><button role="tab" data-t="data">Export</button></div>
+  <section class="card tabp" id="tab-journal"><div class="tw"><table><thead><tr><th>#</th><th>Opened</th><th>Closed</th><th>Side</th><th class="n">Entry</th><th class="n">Stop</th><th class="n">Target</th><th class="n">Exit</th><th>Exit by</th><th class="n">R</th><th class="n">Net $</th><th class="n">MFE / MAE</th><th>Tags</th><th>Note</th></tr></thead><tbody id="jbody"><tr><td colspan="14" class="hint">No closed trades yet.</td></tr></tbody></table></div></section>
+  <section class="card tabp" id="tab-stats" hidden><div class="stats" id="stats"></div><div class="two"><div><h2>Equity curve</h2><canvas id="eqc"></canvas></div><div><h2>Net by weekday (UTC)</h2><div class="hb" id="hbw"></div><div class="hbl"><span>Sun</span><span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span><span>Fri</span><span>Sat</span></div></div><div><h2>Net by hour opened (UTC)</h2><div class="hb" id="hbh"></div><div class="hbl"><span>0</span><span>6</span><span>12</span><span>18</span><span>23</span></div></div><div><h2>By tag</h2><div id="bytag" class="hint"></div></div></div></section>
+  <section class="card tabp" id="tab-cal" hidden><div class="mo"><button class="btn sm" id="cal-prev">‹</button><b id="cal-title"></b><button class="btn sm" id="cal-next">›</button><span class="hint" id="cal-sum"></span></div><div class="cal" id="cal"></div></section>
+  <section class="card tabp" id="tab-log" hidden><div id="pflog" class="hint">Start a challenge to see its log.</div></section>
+  <section class="card tabp" id="tab-data" hidden><div class="ctl" style="margin:0"><button class="btn" id="exp-json">Export session (JSON)</button><button class="btn" id="exp-csv">Export trades (CSV)</button><label class="btn" style="display:inline-flex;align-items:center">Import JSON<input type="file" id="imp" accept="application/json" hidden></label><button class="btn" id="del-sess">Delete this session</button></div><p class="note">Sessions are saved in this browser as you go. Export to keep them or move them to another device.</p></section>
+</main>
+<section class="gate card" id="gate" hidden><h1>Backtest lab</h1><p>Sign in on the desk first, then come back here.</p><p><a href="/#home">Open the desk</a></p></section>
+<script>
+(function () {
+  'use strict';
+  const $ = (id) => document.getElementById(id), esc = (x) => String(x == null ? '' : x).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+  let signed = false; try { signed = !!localStorage.getItem('ms-admin'); } catch (e) {}
+  if (!signed) { $('gate').hidden = false; return; } $('app').hidden = false;
+  try { const rec = JSON.parse(localStorage.getItem('ms-user-rec') || 'null'); $('who').textContent = rec ? rec.name : 'owner'; } catch (e) {}
+  const MARKETS = [['xau', 'Gold XAU/USD', 2], ['xag', 'Silver XAG/USD', 3], ['nas100', 'Nasdaq 100', 1], ['spx500', 'S&P 500', 1], ['us30', 'Dow 30', 1], ['de40', 'DAX 40', 1], ['eurusd', 'EUR/USD', 5], ['gbpusd', 'GBP/USD', 5], ['usdjpy', 'USD/JPY', 3], ['audusd', 'AUD/USD', 5], ['usdcad', 'USD/CAD', 5], ['usdchf', 'USD/CHF', 5], ['nzdusd', 'NZD/USD', 5], ['gbpjpy', 'GBP/JPY', 3], ['bco', 'Brent oil', 2], ['wtico', 'WTI oil', 2]];
+  const TFS = { '1m': 60, '5m': 300, '15m': 900, '1h': 3600, '4h': 14400 };
+  $('sym').innerHTML = MARKETS.map((m) => `<option value="${m[0]}">${m[1]}</option>`).join('');
+  const d0 = new Date(Date.now() - 45 * 86400e3); d0.setUTCHours(7, 0, 0, 0); $('start').value = d0.toISOString().slice(0, 16);
+  const BASE = location.origin + '/md/bars';
+  const S = { id: null, name: '', sym: 'xau', tf: '15m', dec: 2, bars: [], idx: 0, acct: BT.newAccount(100000), ch: null, from: 0, to: 0, side: 'buy', type: 'market', mode: 'entry', timer: 0, calMonth: null };
+  const fmt = (v, d) => v == null || !isFinite(v) ? '—' : (+v).toFixed(d == null ? S.dec : d), money = (v) => v == null ? '—' : (v < 0 ? '−' : '') + '$' + Math.abs(v).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  const when = (t) => t ? new Date(t * 1000).toISOString().slice(0, 16).replace('T', ' ') : '—', cls = (v) => v > 0 ? 'pos' : v < 0 ? 'neg' : '';
+  const cur = () => S.bars[S.idx - 1], px = () => cur() ? cur().close : null;
+
+  // ---- chart ----
+  const chart = LightweightCharts.createChart($('chart'), { layout: { background: { color: 'transparent' }, textColor: getComputedStyle(document.documentElement).getPropertyValue('--ink-dim').trim() || '#a4abb8', fontFamily: 'Figtree, sans-serif' }, grid: { vertLines: { color: 'rgba(127,127,127,.08)' }, horzLines: { color: 'rgba(127,127,127,.08)' } }, timeScale: { timeVisible: true, secondsVisible: false, rightOffset: 6, borderColor: 'rgba(127,127,127,.2)' }, rightPriceScale: { borderColor: 'rgba(127,127,127,.2)' }, crosshair: { mode: 0 }, autoSize: true });
+  const series = chart.addCandlestickSeries({ upColor: '#2fbf8f', downColor: '#f2576f', borderVisible: false, wickUpColor: '#2fbf8f', wickDownColor: '#f2576f', priceFormat: { type: 'price', precision: 2, minMove: 0.01 } });
+  let lines = [];
+  chart.subscribeClick((p) => { if (!p.point) return; const v = series.coordinateToPrice(p.point.y); if (v == null) return; const el = $(S.mode === 'entry' ? 'o-price' : S.mode === 'stop' ? 'o-stop' : 'o-target'); if (el.disabled) return; el.value = (+v).toFixed(S.dec); calc(); });
+  function drawLines() { lines.forEach((l) => series.removePriceLine(l)); lines = []; const a = S.acct;
+    const add = (price, color, title, style) => lines.push(series.createPriceLine({ price, color, lineWidth: 1, lineStyle: style == null ? 2 : style, axisLabelVisible: true, title }));
+    for (const p of a.positions) { add(p.entry, '#5b8cff', `${p.side} ${p.id}`, 0); add(p.stop, '#f2576f', 'SL'); if (p.target != null) add(p.target, '#2fbf8f', 'TP'); }
+    for (const o of a.orders) { add(o.price, '#e0a526', `${o.type} ${o.side}`); add(o.stop, 'rgba(242,87,111,.6)', 'SL'); if (o.target != null) add(o.target, 'rgba(47,191,143,.6)', 'TP'); }
+    const mk = []; for (const t of a.closed) { mk.push({ time: t.openedAt, position: t.side === 'buy' ? 'belowBar' : 'aboveBar', color: t.side === 'buy' ? '#2fbf8f' : '#f2576f', shape: t.side === 'buy' ? 'arrowUp' : 'arrowDown', text: `${t.side} ${fmt(t.entry)}` }); mk.push({ time: t.closedAt, position: 'inBar', color: t.net >= 0 ? '#2fbf8f' : '#f2576f', shape: 'circle', text: `${t.net >= 0 ? '+' : ''}${t.R}R` }); }
+    for (const p of a.positions) mk.push({ time: p.openedAt, position: p.side === 'buy' ? 'belowBar' : 'aboveBar', color: '#5b8cff', shape: p.side === 'buy' ? 'arrowUp' : 'arrowDown', text: `${p.side} ${fmt(p.entry)}` });
+    mk.sort((x, y) => x.time - y.time); series.setMarkers(mk); }
+  function render() { series.setData(S.bars.slice(0, S.idx)); series.applyOptions({ priceFormat: { type: 'price', precision: S.dec, minMove: Math.pow(10, -S.dec) } }); drawLines(); renderAccount(); renderOpen(); renderPF(); calc(); $('now').textContent = cur() ? `${when(cur().time)} UTC · bar ${S.idx} / ${S.bars.length}` : '—'; $('px-now').textContent = px() != null ? fmt(px()) : ''; if (S.type === 'market' && px() != null) $('o-price').value = fmt(px()); }
+
+  // ---- data ----
+  async function fetchBars(sym, tf, from, to) { const sec = TFS[tf], out = []; for (let a = from; a < to; a += 4999 * sec) { const b = Math.min(to, a + 4999 * sec); const r = await fetch(`${BASE}?sym=${sym}&tf=${tf}&from=${a}&to=${b}`); if (!r.ok) throw new Error((await r.json().catch(() => ({}))).error || `HTTP ${r.status}`); const j = await r.json(); for (const x of j.bars || []) if (!x.live && (!out.length || x.time > out[out.length - 1].time)) out.push(x); } return out; }
+  $('load').addEventListener('click', async () => {
+    const sym = $('sym').value, tf = $('tf').value, st = Math.floor(new Date($('start').value + 'Z').getTime() / 1000), days = Math.min(120, Math.max(1, +$('days').value || 20));
+    if (!st) { $('loadmsg').textContent = 'Pick a start.'; return; }
+    if (S.acct.closed.length || S.acct.positions.length) { if (!confirm('Start a new session? The current one stays saved.')) return; }
+    $('loadmsg').textContent = 'Loading…'; $('load').disabled = true;
+    try { const from = st - 300 * TFS[tf], to = Math.min(Math.floor(Date.now() / 1000), st + days * 86400); const bars = await fetchBars(sym, tf, from, to); if (bars.length < 50) throw new Error('too few candles in that window');
+      S.id = 's' + Date.now().toString(36); S.name = $('sname').value.trim() || `${sym.toUpperCase()} ${tf} from ${$('start').value.slice(0, 10)}`; S.sym = sym; S.tf = tf; S.dec = MARKETS.find((m) => m[0] === sym)[2]; S.bars = bars; S.from = from; S.to = to; S.startAt = st;
+      S.idx = Math.max(10, bars.findIndex((b) => b.time >= st)); if (S.idx < 10) S.idx = 10; S.acct = BT.newAccount(+$('startbal').value || 100000, acctOpts()); S.ch = null; S.calMonth = null;
+      $('loadmsg').textContent = `${bars.length} candles · ${when(bars[0].time)} → ${when(bars[bars.length - 1].time)}`; render(); renderJournal(); save(); chart.timeScale().scrollToPosition(4, false);
+    } catch (e) { $('loadmsg').textContent = 'Could not load: ' + e.message; } finally { $('load').disabled = false; }
+  });
+  const acctOpts = () => ({ commission: +$('comm').value || 0, spread: +$('spread').value || 0, slFirst: $('slfirst').value === '1' });
+  ['comm', 'spread', 'slfirst'].forEach((id) => $(id).addEventListener('change', () => { Object.assign(S.acct, acctOpts()); save(); }));
+  $('startbal').addEventListener('change', () => { if (!S.acct.closed.length && !S.acct.positions.length) { S.acct.start = S.acct.balance = +$('startbal').value || 100000; render(); save(); } });
+
+  // ---- replay ----
+  function step() { if (S.idx >= S.bars.length) { stop(); $('loadmsg').textContent = 'End of the loaded candles. Load more days to continue.'; return false; }
+    const b = S.bars[S.idx]; S.idx++; const ev = BT.onBar(S.acct, b); if (S.ch) BT.evaluate(S.ch, S.acct, b.close, b.time);
+    if (ev.length) renderJournal(); render(); if (S.idx % 10 === 0 || ev.length) save(); if (S.ch && S.ch.status !== 'live') stop(); return true; }
+  function stop() { clearInterval(S.timer); S.timer = 0; $('play').textContent = 'Play'; }
+  $('step').addEventListener('click', step); $('play').addEventListener('click', () => { if (S.timer) return stop(); $('play').textContent = 'Pause'; S.timer = setInterval(() => { if (!step()) stop(); }, +$('speed').value); });
+  $('speed').addEventListener('change', () => { if (S.timer) { stop(); $('play').click(); } });
+  $('skipday').addEventListener('click', () => { const d = cur() && BT.dayKey(cur().time); let n = 0; while (S.idx < S.bars.length && BT.dayKey(S.bars[S.idx].time) === d && n++ < 2000) if (!step()) break; });
+  document.addEventListener('keydown', (e) => { if (/INPUT|TEXTAREA|SELECT/.test(e.target.tagName)) return; if (e.key === 'ArrowRight') { e.preventDefault(); step(); } if (e.key === ' ') { e.preventDefault(); $('play').click(); } });
+  document.querySelectorAll('.mode button').forEach((b) => b.addEventListener('click', () => { S.mode = b.dataset.m; document.querySelectorAll('.mode button').forEach((x) => x.setAttribute('aria-pressed', String(x === b))); }));
+
+  // ---- ticket ----
+  document.querySelectorAll('.seg [data-side]').forEach((b) => b.addEventListener('click', () => { S.side = b.dataset.side; document.querySelectorAll('.seg [data-side]').forEach((x) => x.setAttribute('aria-pressed', String(x === b))); $('place').className = `btn full ${S.side}`; $('place').textContent = `Place ${S.side}`; calc(); }));
+  document.querySelectorAll('#otype button').forEach((b) => b.addEventListener('click', () => { S.type = b.dataset.t; document.querySelectorAll('#otype button').forEach((x) => x.setAttribute('aria-pressed', String(x === b))); $('o-price').disabled = S.type === 'market'; if (S.type === 'market' && px() != null) $('o-price').value = fmt(px()); calc(); }));
+  ['o-price', 'o-stop', 'o-target', 'o-risk'].forEach((id) => $(id).addEventListener('input', calc));
+  function calc() { const e = +$('o-price').value, s = +$('o-stop').value, t = +$('o-target').value, risk = (+$('o-risk').value || 0) / 100 * S.acct.balance; const u = e && s ? BT.units(risk, e, s) : 0, rr = u && t ? Math.abs(t - e) / Math.abs(e - s) : null;
+    $('calc').innerHTML = u ? `<span>risk ${money(risk)}</span><span>size ${u >= 100 ? Math.round(u).toLocaleString() : u.toFixed(2)} units</span><span>stop ${fmt(Math.abs(e - s))}</span>${rr ? `<span>R:R 1 : ${rr.toFixed(2)}</span>` : ''}` : '<span>Set entry and stop to size the trade</span>'; }
+  $('place').addEventListener('click', () => { $('o-err').textContent = ''; try { if (!cur()) throw new Error('Load candles first'); const e = S.type === 'market' ? px() : +$('o-price').value, s = +$('o-stop').value, t = $('o-target').value ? +$('o-target').value : null, risk = (+$('o-risk').value || 0) / 100 * S.acct.balance;
+      if (!e) throw new Error('Entry price is needed'); const u = BT.units(risk, e, s); if (!(u > 0)) throw new Error('Stop loss is needed to size the trade');
+      if (S.type === 'limit' && ((S.side === 'buy' && e >= px()) || (S.side === 'sell' && e <= px()))) throw new Error('A limit sits on the better side of the price; use Stop for a breakout');
+      if (S.type === 'stop' && ((S.side === 'buy' && e <= px()) || (S.side === 'sell' && e >= px()))) throw new Error('A stop order sits beyond the price; use Limit for a pullback');
+      BT.place(S.acct, { side: S.side, type: S.type, price: e, stop: s, target: t, units: u, note: $('o-note').value.trim(), tags: $('o-tags').value.split(',').map((x) => x.trim()).filter(Boolean) }, cur().time);
+      $('o-note').value = ''; $('o-stop').value = ''; $('o-target').value = ''; render(); save(); } catch (er) { $('o-err').textContent = er.message; } });
+  function renderOpen() { const a = S.acct, p0 = px(); let h = '';
+    if (a.positions.length) h += `<table style="margin-top:10px"><thead><tr><th>Open</th><th class="n">Entry</th><th class="n">SL</th><th class="n">TP</th><th class="n">P&amp;L</th><th></th></tr></thead><tbody>${a.positions.map((p) => { const v = BT.pnl(p, p0); return `<tr data-id="${p.id}"><td>${p.side} <small>${esc((p.tags || []).join(', '))}</small></td><td class="n">${fmt(p.entry)}</td><td class="n"><input type="number" step="any" value="${fmt(p.stop)}" data-f="stop" style="width:86px"></td><td class="n"><input type="number" step="any" value="${p.target == null ? '' : fmt(p.target)}" data-f="target" style="width:86px"></td><td class="n ${cls(v)}">${money(v)}<br><small>${((v / (p.r0 * p.units)) || 0).toFixed(2)}R</small></td><td><button class="btn sm" data-act="be" title="Stop to entry">BE</button> <button class="btn sm" data-act="close">Close</button></td></tr>`; }).join('')}</tbody></table>`;
+    if (a.orders.length) h += `<table style="margin-top:8px"><thead><tr><th>Pending</th><th class="n">Price</th><th class="n">SL</th><th class="n">TP</th><th></th></tr></thead><tbody>${a.orders.map((o) => `<tr data-id="${o.id}"><td>${o.type} ${o.side}</td><td class="n">${fmt(o.price)}</td><td class="n">${fmt(o.stop)}</td><td class="n">${o.target == null ? '—' : fmt(o.target)}</td><td><button class="btn sm" data-act="cancel">Cancel</button></td></tr>`).join('')}</tbody></table>`;
+    $('open').innerHTML = h; }
+  $('open').addEventListener('click', (e) => { const b = e.target.closest('button[data-act]'); if (!b) return; const id = +b.closest('tr').dataset.id, a = S.acct, p = a.positions.find((x) => x.id === id);
+    if (b.dataset.act === 'close' && p) { BT.close(a, p, px(), cur().time, 'manual'); if (S.ch) BT.evaluate(S.ch, a, px(), cur().time); renderJournal(); }
+    if (b.dataset.act === 'be' && p) p.stop = p.entry; if (b.dataset.act === 'cancel') BT.cancel(a, id); render(); save(); });
+  $('open').addEventListener('change', (e) => { const i = e.target.closest('input[data-f]'); if (!i) return; const p = S.acct.positions.find((x) => x.id === +i.closest('tr').dataset.id); if (!p) return; const v = i.value === '' ? null : +i.value; const dir = p.side === 'buy' ? 1 : -1;
+    if (i.dataset.f === 'stop') { if (v == null || (v - px()) * dir >= 0) { $('o-err').textContent = 'The stop must stay on the losing side of the price'; i.value = fmt(p.stop); return; } p.stop = v; } else { if (v != null && (v - px()) * dir <= 0) { $('o-err').textContent = 'The target must be on the winning side'; i.value = p.target == null ? '' : fmt(p.target); return; } p.target = v; } $('o-err').textContent = ''; render(); save(); });
+  function renderAccount() { const a = S.acct, p0 = px(), eq = p0 != null ? BT.equity(a, p0) : a.balance, fl = eq - a.balance, dk = cur() ? BT.dayKey(cur().time) : null, today = a.closed.filter((t) => BT.dayKey(t.closedAt) === dk).reduce((s, t) => s + t.net, 0) + fl;
+    $('bal').textContent = money(a.balance); $('eq').textContent = money(eq); $('flt').textContent = money(fl); $('flt').className = cls(fl); $('today').textContent = money(today); $('today').className = cls(today); $('acc-sub').textContent = `${a.closed.length} closed · ${a.positions.length} open · ${a.orders.length} pending`; }
+
+  // ---- prop firm ----
+  $('firm').innerHTML = BT.FIRMS.map((f) => `<option value="${f.id}">${f.name}</option>`).join('');
+  let RULES = JSON.parse(JSON.stringify(BT.FIRMS[0]));
+  function rulesForm() { const F = RULES; $('pf-rules').innerHTML = `<label>Account size<input type="number" data-r="size" value="${F.size}" step="1000"></label><label>Phases<input type="text" data-r="phases" value="${F.phases.map((p) => Math.round(p.target * 1000) / 10).join(', ')}" title="targets in %, one per phase"></label><label>Daily loss %<input type="number" data-r="dailyLoss" value="${Math.round(F.dailyLoss * 1000) / 10}" step="0.5"></label><label>Max loss %<input type="number" data-r="maxLoss" value="${Math.round(F.maxLoss * 1000) / 10}" step="0.5"></label><label>Drawdown type<select data-r="dd"><option value="static"${F.dd === 'static' ? ' selected' : ''}>Static (from start)</option><option value="eod"${F.dd === 'eod' ? ' selected' : ''}>Trailing, end of day</option><option value="intraday"${F.dd === 'intraday' ? ' selected' : ''}>Trailing, intraday</option></select></label><label>Min trading days<input type="number" data-r="minDays" value="${F.minDays}"></label><label>Max days (0 = none)<input type="number" data-r="maxDays" value="${F.maxDays}"></label><label>Consistency % (0 = none)<input type="number" data-r="consistency" value="${Math.round(F.consistency * 100)}"></label><label>Day starts (UTC hour)<input type="number" data-r="dayStartUtc" value="${F.dayStartUtc}" min="0" max="23"></label>`; $('pf-note').textContent = F.note + ' Presets are a starting point: firms change their rules, check the current ones before relying on this.'; }
+  $('firm').addEventListener('change', () => { RULES = JSON.parse(JSON.stringify(BT.FIRMS.find((f) => f.id === $('firm').value))); rulesForm(); });
+  $('pf-rules').addEventListener('change', (e) => { const i = e.target.closest('[data-r]'); if (!i) return; const k = i.dataset.r, v = i.value; if (k === 'phases') RULES.phases = v.split(',').map((x, n) => ({ name: `Phase ${n + 1}`, target: (+x || 0) / 100 })).filter((p) => p.target > 0); else if (['dailyLoss', 'maxLoss', 'consistency'].includes(k)) RULES[k] = (+v || 0) / 100; else if (k === 'dd') RULES.dd = v; else RULES[k] = +v || 0; });
+  $('pf-start').addEventListener('click', () => { if (!cur()) { $('o-err').textContent = 'Load candles first'; return; } if (S.acct.closed.length || S.acct.positions.length) { if (!confirm('Starting a challenge resets the account to the firm\'s size and clears trades. Continue?')) return; }
+    S.acct = BT.newAccount(RULES.size, acctOpts()); $('startbal').value = RULES.size; S.ch = BT.newChallenge(RULES); S.ch.startedAt = cur().time; BT.evaluate(S.ch, S.acct, px(), cur().time); render(); renderJournal(); save(); });
+  $('pf-stop').addEventListener('click', () => { if (confirm('Stop the challenge? Trades stay in the journal.')) { S.ch = null; render(); save(); } });
+  function renderPF() { const ch = S.ch; $('pf-start').hidden = !!ch; $('pf-stop').hidden = !ch; $('firm').disabled = !!ch; $('pf-rules').querySelectorAll('input,select').forEach((i) => { i.disabled = !!ch; });
+    if (!ch) { $('pf').innerHTML = '<p class="hint">Pick a firm, check the rules, then Start. The account resets to the firm\'s size and every bar is checked against the daily loss, drawdown, target, minimum days and consistency rules.</p>'; $('pf-status').textContent = ''; $('pflog').innerHTML = 'Start a challenge to see its log.'; return; }
+    const P = ch.progress || {}, F = ch.firm, ph = F.phases[ch.phase], st = ch.status; $('pf-status').innerHTML = `<span class="pill ${st === 'live' ? 'live' : st === 'failed' ? 'bad' : 'ok'}">${esc(F.name)} · ${esc(ph.name)} · ${st}</span>`;
+    const pct = Math.max(0, Math.min(100, P.pct || 0)), dayPct = P.dayLimit ? Math.max(0, Math.min(100, (P.dayLoss || 0) / P.dayLimit * 100)) : null, room = P.floor != null ? (P.equity - P.floor) : null, roomPct = room != null ? Math.max(0, Math.min(100, 100 - room / (F.maxLoss * ch.start) * 100)) : null;
+    $('pf').innerHTML = `<div class="rule"><span>Profit target</span><b>${money(P.balance)} / ${money(P.target)}</b></div><div class="bar"><i class="${pct >= 100 ? 'good' : ''}" style="width:${pct}%"></i></div>
+      ${dayPct != null ? `<div class="rule"><span>Daily loss used</span><b>${money(P.dayLoss)} / ${money(P.dayLimit)}</b></div><div class="bar"><i class="${dayPct > 70 ? 'warn' : ''}" style="width:${dayPct}%"></i></div>` : '<div class="rule"><span>Daily loss</span><b>none</b></div>'}
+      <div class="rule"><span>${F.dd === 'static' ? 'Max loss floor' : 'Trailing floor'}</span><b>${money(P.floor)} · room ${money(room)}</b></div><div class="bar"><i class="${roomPct > 70 ? 'warn' : ''}" style="width:${roomPct || 0}%"></i></div>
+      <div class="rule"><span>Trading days</span><b>${P.tradingDays || 0}${F.minDays ? ` / ${F.minDays} min` : ''}${F.maxDays ? ` · max ${F.maxDays}` : ''}</b></div>
+      ${F.consistency ? `<div class="rule"><span>Best day share</span><b>${Math.round((P.consistency || 0) * 100)}% · max ${Math.round(F.consistency * 100)}%</b></div>` : ''}
+      ${P.waiting ? `<p class="hint" style="color:var(--gold)">${esc(P.waiting)}</p>` : ''}${st === 'failed' ? `<p class="hint" style="color:var(--sell)"><b>Failed:</b> ${esc(ch.reason)}</p>` : ''}${st === 'funded' ? '<p class="hint" style="color:var(--buy)"><b>Passed every phase.</b> In a real firm this is where the funded account begins; keep the same rules.</p>' : ''}`;
+    const days = Object.entries(ch.days); $('pflog').innerHTML = `<p><b>${esc(F.name)}</b> · started ${when(ch.startedAt)} · ${esc(st)}${ch.reason ? ' · ' + esc(ch.reason) : ''}</p>${ch.history.map((h) => `<p>${when(h.t)} · ${esc(h.event)}${h.phase ? ' ' + esc(h.phase) : ''}${h.why ? ': ' + esc(h.why) : ''}</p>`).join('')}<table><thead><tr><th>Day</th><th class="n">Start eq.</th><th class="n">Low</th><th class="n">High</th><th class="n">End balance</th><th class="n">Trades</th><th class="n">Net</th></tr></thead><tbody>${days.map(([k, d]) => `<tr><td>${k}</td><td class="n">${money(d.startEq)}</td><td class="n">${money(d.low)}</td><td class="n">${money(d.high)}</td><td class="n">${money(d.endBalance)}</td><td class="n">${d.trades}</td><td class="n ${cls(d.net)}">${money(d.net)}</td></tr>`).join('') || '<tr><td colspan="7" class="hint">No bars yet.</td></tr>'}</tbody></table>`; }
+
+  // ---- journal, stats, calendar ----
+  function renderJournal() { const a = S.acct, rows = a.closed.slice().reverse(); $('jn').textContent = a.closed.length ? `(${a.closed.length})` : '';
+    $('jbody').innerHTML = rows.length ? rows.map((t) => `<tr data-id="${t.id}"><td>${t.id}</td><td>${when(t.openedAt)}</td><td>${when(t.closedAt)}</td><td>${t.side}</td><td class="n">${fmt(t.entry)}</td><td class="n">${fmt(t.stop)}</td><td class="n">${t.target == null ? '—' : fmt(t.target)}</td><td class="n">${fmt(t.exit)}</td><td>${esc(t.reason)}</td><td class="n ${cls(t.R)}">${t.R == null ? '—' : (t.R > 0 ? '+' : '') + t.R}</td><td class="n ${cls(t.net)}">${money(t.net)}</td><td class="n">${(t.mfe || 0).toFixed(1)} / ${(t.mae || 0).toFixed(1)}</td><td><input value="${esc((t.tags || []).join(', '))}" data-f="tags" style="width:120px"></td><td><input value="${esc(t.note)}" data-f="note" style="width:220px"></td></tr>`).join('') : '<tr><td colspan="14" class="hint">No closed trades yet.</td></tr>';
+    renderStats(); renderCal(); }
+  $('jbody').addEventListener('change', (e) => { const i = e.target.closest('input[data-f]'); if (!i) return; const t = S.acct.closed.find((x) => x.id === +i.closest('tr').dataset.id); if (!t) return; if (i.dataset.f === 'tags') t.tags = i.value.split(',').map((x) => x.trim()).filter(Boolean); else t.note = i.value; save(); renderStats(); });
+  function renderStats() { const s = BT.stats(S.acct.closed, S.acct.start), pf = s.profitFactor === Infinity ? '∞' : s.profitFactor;
+    $('stats').innerHTML = [['Trades', s.n], ['Win rate', s.winRate == null ? '—' : Math.round(s.winRate * 100) + '%'], ['Net', money(s.net), cls(s.net)], ['Return', s.returnPct == null ? '—' : s.returnPct + '%', cls(s.returnPct)], ['Net R', s.netR, cls(s.netR)], ['Avg R', s.avgR ?? '—'], ['Profit factor', pf ?? '—'], ['Expectancy / trade', money(s.expectancy)], ['Avg win', money(s.avgWin)], ['Avg loss', money(s.avgLoss)], ['Max drawdown', money(s.maxDD) + (s.maxDDPct != null ? ` (${s.maxDDPct}%)` : '')], ['Best / worst', `${money(s.best)} / ${money(s.worst)}`], ['Streaks (W / L)', `${s.bestStreak} / ${s.worstStreak}`], ['Avg MFE / MAE (R)', `${s.avgMfe ?? '—'} / ${s.avgMae ?? '—'}`]].map(([k, v, c]) => `<div><small>${k}</small><b class="${c || ''}">${v}</b></div>`).join('');
+    drawCurve(s.curve); bars($('hbw'), [0, 1, 2, 3, 4, 5, 6].map((d) => (s.byWeekday[d] || {}).net || 0)); bars($('hbh'), Array.from({ length: 24 }, (_, h) => (s.byHour[h] || {}).net || 0));
+    const tags = Object.entries(s.byTag); $('bytag').innerHTML = tags.length ? `<table><thead><tr><th>Tag</th><th class="n">Trades</th><th class="n">Win %</th><th class="n">Net R</th><th class="n">Net $</th></tr></thead><tbody>${tags.sort((a, b) => b[1].net - a[1].net).map(([k, v]) => `<tr><td>${esc(k)}</td><td class="n">${v.n}</td><td class="n">${Math.round(v.wins / v.n * 100)}%</td><td class="n ${cls(v.R)}">${v.R}</td><td class="n ${cls(v.net)}">${money(v.net)}</td></tr>`).join('')}</tbody></table>` : 'Tag your trades in the ticket or the journal to compare setups.'; }
+  function bars(el, vals) { const m = Math.max(1e-9, ...vals.map(Math.abs)); el.innerHTML = vals.map((v) => `<i class="${v < 0 ? 'l' : ''}" style="height:${Math.round(Math.abs(v) / m * 100)}%" title="${money(v)}"></i>`).join(''); }
+  function drawCurve(c) { const cv = $('eqc'), r = cv.getBoundingClientRect(); cv.width = Math.max(300, r.width * devicePixelRatio); cv.height = 180 * devicePixelRatio; const x = cv.getContext('2d'), W = cv.width, H = cv.height; x.clearRect(0, 0, W, H); if (c.length < 2) { x.fillStyle = '#8a92a1'; x.font = `${12 * devicePixelRatio}px Figtree`; x.fillText('Close a few trades to see the curve', 12 * devicePixelRatio, H / 2); return; }
+    const ys = c.map((p) => p.eq), lo = Math.min(...ys), hi = Math.max(...ys), pad = 14 * devicePixelRatio, sx = (i) => pad + i / (c.length - 1) * (W - 2 * pad), sy = (v) => H - pad - (hi === lo ? 0.5 : (v - lo) / (hi - lo)) * (H - 2 * pad);
+    x.strokeStyle = 'rgba(127,127,127,.3)'; x.lineWidth = devicePixelRatio; x.beginPath(); x.moveTo(pad, sy(c[0].eq)); x.lineTo(W - pad, sy(c[0].eq)); x.stroke();
+    x.strokeStyle = ys[ys.length - 1] >= ys[0] ? '#2fbf8f' : '#f2576f'; x.lineWidth = 2 * devicePixelRatio; x.beginPath(); c.forEach((p, i) => { i ? x.lineTo(sx(i), sy(p.eq)) : x.moveTo(sx(i), sy(p.eq)); }); x.stroke(); }
+  function renderCal() { const d = BT.byDay(S.acct.closed), keys = Object.keys(d).sort(); if (!S.calMonth) S.calMonth = (keys[keys.length - 1] || (cur() ? BT.dayKey(cur().time) : new Date().toISOString().slice(0, 10))).slice(0, 7);
+    const [y, m] = S.calMonth.split('-').map(Number), first = new Date(Date.UTC(y, m - 1, 1)), n = new Date(Date.UTC(y, m, 0)).getUTCDate(), off = first.getUTCDay(); $('cal-title').textContent = first.toLocaleDateString(undefined, { month: 'long', year: 'numeric', timeZone: 'UTC' });
+    let h = ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'].map((w) => `<div class="h">${w}</div>`).join(''); for (let i = 0; i < off; i++) h += '<div style="border:0"></div>'; let sum = 0, days = 0;
+    for (let day = 1; day <= n; day++) { const k = `${S.calMonth}-${String(day).padStart(2, '0')}`, v = d[k]; if (v != null) { sum += v; days++; } h += `<div class="${v > 0 ? 'w' : v < 0 ? 'l' : ''}">${day}${v != null ? `<b class="${cls(v)}">${money(v)}</b>` : ''}</div>`; }
+    $('cal').innerHTML = h; $('cal-sum').textContent = days ? `${days} trading day${days === 1 ? '' : 's'} · ${money(sum)}` : 'no closed trades this month'; }
+  const shiftMonth = (k) => { const [y, m] = S.calMonth.split('-').map(Number), d = new Date(Date.UTC(y, m - 1 + k, 1)); S.calMonth = d.toISOString().slice(0, 7); renderCal(); };
+  $('cal-prev').addEventListener('click', () => shiftMonth(-1)); $('cal-next').addEventListener('click', () => shiftMonth(1));
+  const tabs = document.querySelectorAll('.tabs [data-t]'); tabs.forEach((b) => b.addEventListener('click', () => { tabs.forEach((x) => x.setAttribute('aria-selected', String(x === b))); ['journal', 'stats', 'cal', 'log', 'data'].forEach((k) => { $('tab-' + k).hidden = k !== b.dataset.t; }); if (b.dataset.t === 'stats') renderStats(); }));
+
+  // ---- sessions ----
+  const KEY = 'btLab:sessions'; const all = () => { try { return JSON.parse(localStorage.getItem(KEY) || '{}'); } catch (e) { return {}; } };
+  function save() { if (!S.id) return; const A = all(); A[S.id] = { id: S.id, name: S.name, sym: S.sym, tf: S.tf, dec: S.dec, from: S.from, to: S.to, startAt: S.startAt, idx: S.idx, acct: S.acct, ch: S.ch, savedAt: Date.now() }; try { localStorage.setItem(KEY, JSON.stringify(A)); } catch (e) { $('loadmsg').textContent = 'Could not save (storage full?)'; } listSessions(); }
+  function listSessions() { const A = Object.values(all()).sort((a, b) => b.savedAt - a.savedAt); $('sessions').innerHTML = A.map((s) => `<option value="${s.id}"${s.id === S.id ? ' selected' : ''}>${esc(s.name)} · ${s.acct.closed.length} trades${s.ch ? ' · ' + esc(s.ch.firm.name) + ' ' + s.ch.status : ''}</option>`).join('') || '<option value="">none yet</option>'; }
+  async function resume(id) { const s = all()[id]; if (!s) return; $('loadmsg').textContent = 'Loading candles…'; try { const bars = await fetchBars(s.sym, s.tf, s.from, s.to); Object.assign(S, { id: s.id, name: s.name, sym: s.sym, tf: s.tf, dec: s.dec, from: s.from, to: s.to, startAt: s.startAt, idx: Math.min(s.idx, bars.length), acct: s.acct, ch: s.ch, bars, calMonth: null }); $('sym').value = s.sym; $('tf').value = s.tf; $('sname').value = s.name; $('startbal').value = S.acct.start; if (S.ch) { $('firm').value = S.ch.firm.id; RULES = JSON.parse(JSON.stringify(S.ch.firm)); rulesForm(); } $('loadmsg').textContent = `Resumed ${s.name}`; render(); renderJournal(); listSessions(); } catch (e) { $('loadmsg').textContent = 'Could not load: ' + e.message; } }
+  $('resume').addEventListener('click', () => { if ($('sessions').value) resume($('sessions').value); }); $('newsess').addEventListener('click', () => { S.id = null; S.bars = []; S.idx = 0; S.acct = BT.newAccount(+$('startbal').value || 100000, acctOpts()); S.ch = null; render(); renderJournal(); listSessions(); $('loadmsg').textContent = 'Pick a market and a start, then Load candles.'; });
+  $('del-sess').addEventListener('click', () => { if (!S.id || !confirm('Delete this session?')) return; const A = all(); delete A[S.id]; localStorage.setItem(KEY, JSON.stringify(A)); $('newsess').click(); });
+  const dl = (name, text, type) => { const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([text], { type })); a.download = name; a.click(); setTimeout(() => URL.revokeObjectURL(a.href), 5000); };
+  $('exp-json').addEventListener('click', () => { if (!S.id) return; dl(`${S.name.replace(/[^a-z0-9]+/gi, '-')}.json`, JSON.stringify(all()[S.id], null, 1), 'application/json'); });
+  $('exp-csv').addEventListener('click', () => { const H = ['id', 'side', 'openedAt', 'closedAt', 'entry', 'stop', 'target', 'exit', 'reason', 'units', 'R', 'net', 'mfe', 'mae', 'tags', 'note']; dl('trades.csv', [H.join(',')].concat(S.acct.closed.map((t) => H.map((k) => { let v = t[k]; if (k === 'openedAt' || k === 'closedAt') v = new Date(v * 1000).toISOString(); if (k === 'tags') v = (v || []).join(';'); return /[",\n]/.test(String(v ?? '')) ? `"${String(v).replace(/"/g, '""')}"` : (v ?? ''); }).join(','))).join('\n'), 'text/csv'); });
+  $('imp').addEventListener('change', async (e) => { const f = e.target.files[0]; if (!f) return; try { const s = JSON.parse(await f.text()); if (!s.acct || !s.sym) throw new Error('not a session file'); const A = all(); s.id = s.id || 's' + Date.now().toString(36); A[s.id] = s; localStorage.setItem(KEY, JSON.stringify(A)); listSessions(); resume(s.id); } catch (er) { $('loadmsg').textContent = 'Import failed: ' + er.message; } e.target.value = ''; });
+
+  rulesForm(); listSessions(); render(); renderJournal();
+  const last = Object.values(all()).sort((a, b) => b.savedAt - a.savedAt)[0]; if (last) resume(last.id); else $('loadmsg').textContent = 'Pick a market and a start, then Load candles.';
+})();
+</script>
+</body>
+</html>

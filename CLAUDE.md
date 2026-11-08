@@ -670,3 +670,18 @@ record as `perms` plus ict / ct / mcp for the older checks. `api/users.js` `clea
 object rejects the save). Login records (`ms-user-rec`) carry perms; the post-load check reloads when they changed. MCP: derived
 keys are `<name>.<HMAC>` for any member; `granted(name)` is checked on every call (record's mcp / perms.mcp; perms.mcp false
 revokes; an MCP_KEYS entry is a grant; Fred built in). Tests: `tests/users-perms.test.mjs`, `tests/mcp.test.mjs`.
+
+## Backtest lab (8 Nov 2026, owner: "build a manual backtesting like TradeZella … and he can simulate prop-firm challenges")
+`backtest.html` at `/backtest` (vercel rewrite; build copies it; sidebar entry `.bt-nav` for signed-in members; the page itself
+needs `ms-admin` in localStorage). Engine `assets/backtest-engine.js` (`window.BT`, also `module.exports` for tests): accounts,
+`place` (market / limit / stop; a stop is required; sides checked), `onBar` (fills when touched or gapped through, stop / target
+with the worst case when both sit in one bar, gap exits at the open, MFE / MAE in R), `stats` (win rate, PF, expectancy, max DD,
+streaks, by weekday / hour / tag / side / exit, equity curve), `byDay`, and the prop-firm model: `FIRMS` presets (FTMO 2-step,
+FundingPips 2-step, Topstep 50K / 100K, Lucid 50K, custom; all editable in the page, each with a "check the firm" note),
+`newChallenge`, `evaluate(ch, acct, px, t)` per bar: daily loss against the day's starting equity, static or trailing floor
+(eod trails end-of-day balance highs and locks at the start balance; intraday trails equity), time limit, target on closed
+balance, minimum trading days, consistency (best day share), phases (next phase resets the account), funded. Page: OANDA candles
+through `/md/bars` in 4999-bar windows (300 bars of context before the start, N days after), bar-by-bar replay (→ / Space /
+speed / skip day), click-to-set entry / stop / target, risk-% sizing, open positions (BE, close, edit SL / TP), journal with
+editable tags / notes, statistics, calendar, challenge log, sessions in localStorage `btLab:sessions` (+ JSON / CSV export,
+import). Tests: `tests/backtest.test.mjs`. Paper only; nothing reaches the council or the mirror.
