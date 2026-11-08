@@ -694,5 +694,8 @@ import). Pass 2 (owner: "more improvements"): Undo (←, `UNDO` snapshots of acc
 moment (`step(quiet)` without drawing; Skip day uses it too), a higher-timeframe context chart (`HTF`, H1 / H4 / D1 fetched for
 the same window, the current candle built from the replay bars so it is still forming; localStorage `btLab:htf`), per-position
 ½ close (`closePartial`, its own journal record) and Trail (`p.trail` = 1 ATR, engine `trail()` after each bar), click a journal
-row to frame that trade on the chart, stats Avg hold and R spread (`holdAvg`, `rDist`). Tests: `tests/backtest.test.mjs`. Paper
-only; nothing reaches the council or the mirror.
+row to frame that trade on the chart, stats Avg hold and R spread (`holdAvg`, `rDist`). Pass 3 (owner: "better aesthetic, more user friendly"): session card collapses to a summary with a progress strip
+(`renderStrip`, replayed %, now, equity, trades, challenge), quick starts (`#quick`, a market / TF / days back), a first-visit
+welcome (`#welcome`), toasts for loads, fills, stops, targets and challenge events (`toast()`), a keyboard guide (`#hk`), chart
+watermark, loading progress, equity sparkline (`drawSpark`), journal side badges and R chips, phone layout (sticky controls,
+compact header). Tests: `tests/backtest.test.mjs`. Paper only; nothing reaches the council or the mirror.
