@@ -65,7 +65,7 @@ Built by the Trader at 2026-11-08 11:58 UTC. ICT desk: the last 7 days; mirror: 
 
 **Dip-buy candidate (NQ/ES, paper only):** 0 signals in 7 days · recording since 2026-11-07.
 
-**cTrader mirror:** ok · demo Fusion Markets · balance 9978.79 · 7 open · 1 resting (checked 2026-11-08 11:56 UTC).
+**cTrader mirror:** ok · demo Fusion Markets · balance 9978.79 · 7 open · 1 resting (checked 2026-11-08 11:58 UTC).
 - open: SOLUSD sell position (sol-position-1793893928) · fill 89.121 vs council 89.77 (+0.08R slippage)
 - open: SOLUSD sell position (sol-position-1793899009) · fill 89.121 vs council 89.77 (+0.08R slippage)
 - open: ETHUSD sell scalp (eth-scalp-1793913249) · fill 2233.7 vs council 2237.27 (+0.12R slippage)
