@@ -7,7 +7,7 @@ import path from 'node:path';
 import { msAnalyze, CFG, PAIRS, RETR, LBL, buildSetup, buildRetrace, setMarket } from './engine.mjs';
 import { entryContext, startReview, watchReview, judge, newsNear, lessons } from './review.mjs';
 import { m15cFeat } from './choch.mjs';
-import { alertable, alertEvents, sendAlerts, when, NTFY_DEFAULT, proposalDigest, decayDigest } from './alerts.mjs';
+import { alertable, alertEvents, sendAlerts, when, NTFY_DEFAULT, proposalDigest, decayDigest, moshaArmed } from './alerts.mjs';
 import { liveRuleSection, injectSection, coachChurnSection, CHURN_START, CHURN_END, deskSection, DESK_START, DESK_END, analystReviews, analystSections, fidelitySection, FID_START, FID_END, goldSystemsSection, GOLD_START, GOLD_END } from './analyst.mjs';
 import { coachProposals, spotProposals, ictVariantVerdicts, coachCarry } from './proposals.mjs';
 import { shrink, ebTau, shrunkClear, ruleState, sameRule, setRule, descRule, judgeTrial, ledgerStart, syncLedger, ledgerSection, LEDGER_START, LEDGER_END } from './coach.mjs';
@@ -2080,6 +2080,12 @@ try { const ev = [], quiet = process.env.COUNCIL_ALERTS === 'off', topic = proce
   }
   if (!quiet && ev.length) Object.assign(snapshot.errors, await sendAlerts(ev, { topic, tgTok, tgChat }));
   if (ev.length) wr('trades.json', trades);
+  // Mosha BO heads-up (8 Nov, council/alerts.mjs moshaArmed): H4 BO + H1 retracement in place, one M15 BO from a trade; marked in state.moshaArmedSent once a channel took it
+  try { const ma = quiet || !snapshot.moshaBo ? null : moshaArmed(snapshot.moshaBo.state, state.moshaArmedSent, now);
+    if (ma) { const e = await sendAlerts([ma.ev], { topic, tgTok, tgChat }), tried = (topic ? 1 : 0) + (tgTok && tgChat ? 1 : 0);
+      if (Object.keys(e).length < tried) { state.moshaArmedSent = ma.mark; wr('state.json', state); }
+      for (const [c, m] of Object.entries(e)) snapshot.errors[`moshaArmed_${c}`] = m; }
+  } catch (err) { snapshot.errors.moshaArmed = String(err.message || err); }
   // Coach proposal digest (7 Nov, council/alerts.mjs): one message when the set of proposals changes, else at most a daily
   // reminder; marked in coach.json proposalsSent once a channel took it, so a restart never resends. Never applies anything.
   try { const cj = rd('coach.json', {}), dg = quiet ? null : proposalDigest(cj.proposals, cj.proposalsSent, now);

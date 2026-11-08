@@ -131,3 +131,17 @@ export function decayDigest(decay, sent, now) {
   return { mark, ev: { title: `Edge decay: ${(fresh.length ? fresh : D).map((s) => s.name).join(', ')}`,
     msg: `${D.map(line).join('\n')}${W.length ? `\nOn watch: ${W.map((s) => s.name).join(', ')}` : ''}\nStatus only: no rule changed, your call (Council → Research on the site).\n${when(now)}`, tags: 'chart_with_downwards_trend', click: SITE } };
 }
+
+// Mosha BO heads-up (8 Nov, snapshot.moshaBo.state from council/mosha.mjs): the owner places trades by hand, and the Mosha BO
+// trade exists only once the M15 BO completes the chain, so there was no warning that the setup is one break away. One
+// message when the H4 BO and the H1 retracement BO are both in place (stage 'm15'), keyed on that pair of events so a
+// restart never resends it; silent again once the chain completes or a new H4 BO restarts it. Status only: no rule changes.
+export function moshaArmedKey(st) { return st && st.stage === 'm15' && st.h4 && st.h1 ? `${st.h4.t}|${st.h1.t}` : ''; }
+export function moshaArmed(st, sent, now) {
+  const key = moshaArmedKey(st);
+  if (!key || (sent && sent.key === key)) return null;
+  const side = st.dir < 0 ? 'sell' : 'buy', w = st.w1 == null ? '' : st.w1 === st.dir ? 'Weekly structure agrees: a live paper trade.' : 'Weekly structure is against it: the trade would be recorded as a shadow.';
+  const hm = (t) => new Date(t * 1000).toISOString().slice(5, 16).replace('T', ' ') + ' UTC';
+  return { mark: { key, at: new Date(now * 1000).toISOString() }, ev: { title: `Mosha BO armed: watch for an M15 ${side} BO on gold`,
+    msg: `H4 BO ${side} at ${st.h4.level} (${hm(st.h4.t)}), H1 retracement BO at ${st.h1.level} (${hm(st.h1.t)}). An M15 BO back ${side} completes the chain and the Trader records the trade.\n${w}\nHeads-up only; nothing is placed.\n${when(now)}`, tags: 'eyes', click: SITE } };
+}
