@@ -1,5 +1,7 @@
 # Futures rolls in the ICT desk's CNBC candles (data integrity, 7 Nov 2026)
 
+> **8 Nov 2026, owner's decision:** stage 2 (the deferred-contract cut, `liquidFrom`) is **off** in the live replay. The owner saw the desk's record fall (all signals 812 / +123.7R → 729 / +48.6R, A-setups 253 / +73.0R → 222 / +51.6R) and chose to keep the earlier record; the cut was not pre-registered and swaps a third of the signals for cash-proxy ones. Stage 1 (daily roll adjustment) and the live open-trade shift stay. `ICT_REPLAY_LIQUID=on` reproduces the stage-2 numbers for research.
+
 **Verdict: real, but not where #505 suspected it.** The H1 / 5m candles the desk uses never jump at a roll, so no roll step
 faked a gap, an FVG or a sweep, and no replay exit crossed a step. Three related data problems are real, and all three are fixed in
 the data layer:
