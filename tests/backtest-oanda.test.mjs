@@ -31,7 +31,10 @@ function proxy(calls) {
   });
 }
 const run = (dir, env) => new Promise((resolve, reject) => {
-  const p = spawn(process.execPath, [SCRIPT, dir, '2'], { env: { ...process.env, ...env } });
+  // the replay's window is "the last 2 days from now": pin the child's clock (tests/fixtures/pin-now.mjs) so the synthetic
+  // price always shows the same window, one with setups (8 Nov 2026: unpinned, the test failed at some hours of the day)
+  const PIN = { PIN_NOW: '1794000000', NODE_OPTIONS: `${process.env.NODE_OPTIONS || ''} --import ${new URL('./fixtures/pin-now.mjs', import.meta.url).pathname}`.trim() };
+  const p = spawn(process.execPath, [SCRIPT, dir, '2'], { env: { ...process.env, ...PIN, ...env } });
   let log = ''; p.stdout.on('data', (d) => { log += d; }); p.stderr.on('data', (d) => { log += d; });
   p.on('close', (code) => (code === 0 ? resolve(log) : reject(new Error(`exit ${code}\n${log}`))));
 });
