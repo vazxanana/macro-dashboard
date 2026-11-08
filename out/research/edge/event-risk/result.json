@@ -1,0 +1,2631 @@
+{
+ "topic": "event-risk",
+ "at": "2026-11-07T21:35:47.259Z",
+ "prereg": "research/edge/event-risk/preregistration.md",
+ "events": {
+  "types": [
+   "CPI",
+   "NFP",
+   "FOMC"
+  ],
+  "window": [
+   -30,
+   60
+  ],
+  "flattenMin": 5,
+  "releases": 154
+ },
+ "samples": {
+  "ICT": {
+   "n": 770,
+   "span": [
+    "2022-01-03",
+    "2026-11-05"
+   ],
+   "parts": {
+    "histdata": 519,
+    "replay": 251
+   }
+  },
+  "MSYS": {
+   "n": 856,
+   "span": [
+    "2022-12-28",
+    "2026-11-04"
+   ],
+   "systems": {
+    "geg": 18,
+    "gtl": 24,
+    "gtrend": 22,
+    "gtrend5": 39,
+    "nq-open": 445,
+    "replica": 212,
+    "trend": 96
+   }
+  },
+  "MSET": {
+   "n": 7853,
+   "span": [
+    "2026-08-09",
+    "2026-11-07"
+   ]
+  }
+ },
+ "tests": {
+  "H1-ICT": {
+   "in": {
+    "n": 5,
+    "exp": -0.32,
+    "R": -1.6,
+    "wr": 0.4,
+    "t": -0.77
+   },
+   "inGross": {
+    "n": 5,
+    "exp": -0.295,
+    "R": -1.5,
+    "wr": 0.4,
+    "t": -0.72
+   },
+   "kept": {
+    "n": 765,
+    "exp": 0.181,
+    "R": 138.6,
+    "wr": 0.392,
+    "t": 3.07
+   },
+   "welch": -1.19,
+   "h1": {
+    "n": 2,
+    "exp": -0.483,
+    "R": -1,
+    "wr": 0.5,
+    "t": -0.46
+   },
+   "h2": {
+    "n": 3,
+    "exp": -0.212,
+    "R": -0.6,
+    "wr": 0.333,
+    "t": -0.48
+   },
+   "releases": 4,
+   "clusterT": -0.87,
+   "all": {
+    "n": 770,
+    "exp": 0.178,
+    "R": 137,
+    "wr": 0.392,
+    "t": 3.04
+   },
+   "filtered": {
+    "n": 765,
+    "exp": 0.181,
+    "R": 138.6,
+    "wr": 0.392,
+    "t": 3.07
+   },
+   "pass": {
+    "n": false,
+    "tOwn": false,
+    "tWelch": false,
+    "halves": true,
+    "netPositive": true,
+    "releases": false
+   },
+   "verdict": "FAIL"
+  },
+  "H2-ICT": {
+   "n": 62,
+   "held": {
+    "n": 62,
+    "exp": 0.788,
+    "R": 48.9,
+    "wr": 0.516,
+    "t": 2.81
+   },
+   "flat": {
+    "n": 62,
+    "exp": 0.383,
+    "R": 23.7,
+    "wr": 0.613,
+    "t": 3.27
+   },
+   "d": {
+    "n": 62,
+    "exp": 0.405,
+    "R": 25.1,
+    "wr": 0.468,
+    "t": 1.91
+   },
+   "welch": 1.33,
+   "h1": {
+    "n": 31,
+    "exp": 0.531,
+    "R": 16.5,
+    "wr": 0.516,
+    "t": 1.65
+   },
+   "h2": {
+    "n": 31,
+    "exp": 0.28,
+    "R": 8.7,
+    "wr": 0.419,
+    "t": 1
+   },
+   "releases": 49,
+   "clusterT": 1.78,
+   "gainFromFlatten": -25.14,
+   "missing": 12,
+   "pass": {
+    "n": true,
+    "tPaired": false,
+    "halves": false,
+    "netPositive": false,
+    "releases": true
+   },
+   "verdict": "FAIL"
+  },
+  "H1-MSYS": {
+   "in": {
+    "n": 1,
+    "exp": -1.01,
+    "R": -1,
+    "wr": 0,
+    "t": null
+   },
+   "inGross": {
+    "n": 1,
+    "exp": -1.01,
+    "R": -1,
+    "wr": 0,
+    "t": null
+   },
+   "kept": {
+    "n": 855,
+    "exp": 0.593,
+    "R": 507.1,
+    "wr": 0.421,
+    "t": 6.69
+   },
+   "welch": null,
+   "h1": {
+    "n": 0
+   },
+   "h2": {
+    "n": 1,
+    "exp": -1.01,
+    "R": -1,
+    "wr": 0,
+    "t": null
+   },
+   "releases": 1,
+   "clusterT": null,
+   "all": {
+    "n": 856,
+    "exp": 0.591,
+    "R": 506.1,
+    "wr": 0.421,
+    "t": 6.68
+   },
+   "filtered": {
+    "n": 855,
+    "exp": 0.593,
+    "R": 507.1,
+    "wr": 0.421,
+    "t": 6.69
+   },
+   "pass": {
+    "n": false,
+    "tOwn": false,
+    "tWelch": false,
+    "halves": false,
+    "netPositive": true,
+    "releases": false
+   },
+   "verdict": "FAIL"
+  },
+  "H2-MSYS": {
+   "n": 9,
+   "held": {
+    "n": 9,
+    "exp": 1.014,
+    "R": 9.1,
+    "wr": 0.444,
+    "t": 0.96
+   },
+   "flat": {
+    "n": 9,
+    "exp": 0.451,
+    "R": 4.1,
+    "wr": 0.667,
+    "t": 2.09
+   },
+   "d": {
+    "n": 9,
+    "exp": 0.564,
+    "R": 5.1,
+    "wr": 0.444,
+    "t": 0.5
+   },
+   "welch": 0.52,
+   "h1": {
+    "n": 4,
+    "exp": 1.822,
+    "R": 7.3,
+    "wr": 0.5,
+    "t": 0.85
+   },
+   "h2": {
+    "n": 5,
+    "exp": -0.443,
+    "R": -2.2,
+    "wr": 0.4,
+    "t": -0.39
+   },
+   "releases": 7,
+   "clusterT": 0.2,
+   "gainFromFlatten": -5.07,
+   "missing": 0,
+   "pass": {
+    "n": false,
+    "tPaired": false,
+    "halves": false,
+    "netPositive": false,
+    "releases": false
+   },
+   "verdict": "FAIL"
+  },
+  "H1-MSET": {
+   "in": {
+    "n": 117,
+    "exp": -0.346,
+    "R": -40.5,
+    "wr": 0.291,
+    "t": -3.18
+   },
+   "inGross": {
+    "n": 117,
+    "exp": -0.295,
+    "R": -34.6,
+    "wr": 0.291,
+    "t": -2.74
+   },
+   "kept": {
+    "n": 7736,
+    "exp": -0.153,
+    "R": -1182.3,
+    "wr": 0.307,
+    "t": -7.44
+   },
+   "welch": -1.75,
+   "h1": {
+    "n": 58,
+    "exp": -0.313,
+    "R": -18.1,
+    "wr": 0.31,
+    "t": -2.01
+   },
+   "h2": {
+    "n": 59,
+    "exp": -0.378,
+    "R": -22.3,
+    "wr": 0.271,
+    "t": -2.48
+   },
+   "releases": 8,
+   "clusterT": -2.69,
+   "all": {
+    "n": 7853,
+    "exp": -0.156,
+    "R": -1222.7,
+    "wr": 0.307,
+    "t": -7.66
+   },
+   "filtered": {
+    "n": 7736,
+    "exp": -0.153,
+    "R": -1182.3,
+    "wr": 0.307,
+    "t": -7.44
+   },
+   "pass": {
+    "n": true,
+    "tOwn": true,
+    "tWelch": false,
+    "halves": true,
+    "netPositive": true,
+    "releases": false
+   },
+   "verdict": "FAIL"
+  }
+ },
+ "reported": {
+  "H1-ICT by market": {
+   "es": {
+    "in": {
+     "n": 1,
+     "exp": 0.563,
+     "R": 0.6,
+     "wr": 1,
+     "t": null
+    },
+    "inGross": {
+     "n": 1,
+     "exp": 0.575,
+     "R": 0.6,
+     "wr": 1,
+     "t": null
+    },
+    "kept": {
+     "n": 228,
+     "exp": 0.178,
+     "R": 40.6,
+     "wr": 0.39,
+     "t": 1.68
+    },
+    "welch": null,
+    "h1": {
+     "n": 0
+    },
+    "h2": {
+     "n": 1,
+     "exp": 0.563,
+     "R": 0.6,
+     "wr": 1,
+     "t": null
+    },
+    "releases": 1,
+    "clusterT": null,
+    "all": {
+     "n": 229,
+     "exp": 0.18,
+     "R": 41.2,
+     "wr": 0.393,
+     "t": 1.71
+    },
+    "filtered": {
+     "n": 228,
+     "exp": 0.178,
+     "R": 40.6,
+     "wr": 0.39,
+     "t": 1.68
+    },
+    "pass": {
+     "n": false,
+     "tOwn": false,
+     "tWelch": false,
+     "halves": false,
+     "netPositive": false,
+     "releases": false
+    },
+    "verdict": "FAIL"
+   },
+   "gc": {
+    "in": {
+     "n": 2,
+     "exp": -0.312,
+     "R": -0.6,
+     "wr": 0.5,
+     "t": -0.41
+    },
+    "inGross": {
+     "n": 2,
+     "exp": -0.275,
+     "R": -0.6,
+     "wr": 0.5,
+     "t": -0.38
+    },
+    "kept": {
+     "n": 264,
+     "exp": 0.161,
+     "R": 42.4,
+     "wr": 0.428,
+     "t": 1.58
+    },
+    "welch": -0.62,
+    "h1": {
+     "n": 1,
+     "exp": -1.065,
+     "R": -1.1,
+     "wr": 0,
+     "t": null
+    },
+    "h2": {
+     "n": 1,
+     "exp": 0.441,
+     "R": 0.4,
+     "wr": 1,
+     "t": null
+    },
+    "releases": 2,
+    "clusterT": -0.41,
+    "all": {
+     "n": 266,
+     "exp": 0.157,
+     "R": 41.8,
+     "wr": 0.429,
+     "t": 1.55
+    },
+    "filtered": {
+     "n": 264,
+     "exp": 0.161,
+     "R": 42.4,
+     "wr": 0.428,
+     "t": 1.58
+    },
+    "pass": {
+     "n": false,
+     "tOwn": false,
+     "tWelch": false,
+     "halves": false,
+     "netPositive": true,
+     "releases": false
+    },
+    "verdict": "FAIL"
+   },
+   "nq": {
+    "in": {
+     "n": 1,
+     "exp": -1.528,
+     "R": -1.5,
+     "wr": 0,
+     "t": null
+    },
+    "inGross": {
+     "n": 1,
+     "exp": -1.5,
+     "R": -1.5,
+     "wr": 0,
+     "t": null
+    },
+    "kept": {
+     "n": 188,
+     "exp": 0.178,
+     "R": 33.4,
+     "wr": 0.367,
+     "t": 1.42
+    },
+    "welch": null,
+    "h1": {
+     "n": 0
+    },
+    "h2": {
+     "n": 1,
+     "exp": -1.528,
+     "R": -1.5,
+     "wr": 0,
+     "t": null
+    },
+    "releases": 1,
+    "clusterT": null,
+    "all": {
+     "n": 189,
+     "exp": 0.169,
+     "R": 31.9,
+     "wr": 0.365,
+     "t": 1.35
+    },
+    "filtered": {
+     "n": 188,
+     "exp": 0.178,
+     "R": 33.4,
+     "wr": 0.367,
+     "t": 1.42
+    },
+    "pass": {
+     "n": false,
+     "tOwn": false,
+     "tWelch": false,
+     "halves": false,
+     "netPositive": true,
+     "releases": false
+    },
+    "verdict": "FAIL"
+   },
+   "rty": {
+    "in": {
+     "n": 0
+    },
+    "inGross": {
+     "n": 0
+    },
+    "kept": {
+     "n": 26,
+     "exp": 0.414,
+     "R": 10.8,
+     "wr": 0.269,
+     "t": 1.25
+    },
+    "welch": null,
+    "h1": {
+     "n": 0
+    },
+    "h2": {
+     "n": 0
+    },
+    "releases": 0,
+    "clusterT": null,
+    "all": {
+     "n": 26,
+     "exp": 0.414,
+     "R": 10.8,
+     "wr": 0.269,
+     "t": 1.25
+    },
+    "filtered": {
+     "n": 26,
+     "exp": 0.414,
+     "R": 10.8,
+     "wr": 0.269,
+     "t": 1.25
+    },
+    "pass": {
+     "n": false,
+     "tOwn": false,
+     "tWelch": false,
+     "halves": false,
+     "netPositive": false,
+     "releases": false
+    },
+    "verdict": "FAIL"
+   },
+   "ym": {
+    "in": {
+     "n": 1,
+     "exp": -0.012,
+     "R": 0,
+     "wr": 0,
+     "t": null
+    },
+    "inGross": {
+     "n": 1,
+     "exp": 0,
+     "R": 0,
+     "wr": 0,
+     "t": null
+    },
+    "kept": {
+     "n": 59,
+     "exp": 0.191,
+     "R": 11.3,
+     "wr": 0.373,
+     "t": 1.09
+    },
+    "welch": null,
+    "h1": {
+     "n": 0
+    },
+    "h2": {
+     "n": 1,
+     "exp": -0.012,
+     "R": 0,
+     "wr": 0,
+     "t": null
+    },
+    "releases": 1,
+    "clusterT": null,
+    "all": {
+     "n": 60,
+     "exp": 0.188,
+     "R": 11.3,
+     "wr": 0.367,
+     "t": 1.09
+    },
+    "filtered": {
+     "n": 59,
+     "exp": 0.191,
+     "R": 11.3,
+     "wr": 0.373,
+     "t": 1.09
+    },
+    "pass": {
+     "n": false,
+     "tOwn": false,
+     "tWelch": false,
+     "halves": false,
+     "netPositive": false,
+     "releases": false
+    },
+    "verdict": "FAIL"
+   }
+  },
+  "H1-ICT by part": {
+   "histdata": {
+    "in": {
+     "n": 3,
+     "exp": -0.677,
+     "R": -2,
+     "wr": 0.333,
+     "t": -1.07
+    },
+    "inGross": {
+     "n": 3,
+     "exp": -0.642,
+     "R": -1.9,
+     "wr": 0.333,
+     "t": -1.03
+    },
+    "kept": {
+     "n": 516,
+     "exp": 0.159,
+     "R": 82.1,
+     "wr": 0.395,
+     "t": 2.19
+    },
+    "welch": -1.31,
+    "h1": {
+     "n": 1,
+     "exp": -1.528,
+     "R": -1.5,
+     "wr": 0,
+     "t": null
+    },
+    "h2": {
+     "n": 2,
+     "exp": -0.251,
+     "R": -0.5,
+     "wr": 0.5,
+     "t": -0.31
+    },
+    "releases": 2,
+    "clusterT": -2.66,
+    "all": {
+     "n": 519,
+     "exp": 0.154,
+     "R": 80.1,
+     "wr": 0.395,
+     "t": 2.13
+    },
+    "filtered": {
+     "n": 516,
+     "exp": 0.159,
+     "R": 82.1,
+     "wr": 0.395,
+     "t": 2.19
+    },
+    "pass": {
+     "n": false,
+     "tOwn": false,
+     "tWelch": false,
+     "halves": true,
+     "netPositive": true,
+     "releases": false
+    },
+    "verdict": "FAIL"
+   },
+   "replay": {
+    "in": {
+     "n": 2,
+     "exp": 0.215,
+     "R": 0.4,
+     "wr": 0.5,
+     "t": 0.95
+    },
+    "inGross": {
+     "n": 2,
+     "exp": 0.225,
+     "R": 0.5,
+     "wr": 0.5,
+     "t": 1
+    },
+    "kept": {
+     "n": 249,
+     "exp": 0.227,
+     "R": 56.4,
+     "wr": 0.386,
+     "t": 2.26
+    },
+    "welch": -0.05,
+    "h1": {
+     "n": 1,
+     "exp": -0.012,
+     "R": 0,
+     "wr": 0,
+     "t": null
+    },
+    "h2": {
+     "n": 1,
+     "exp": 0.441,
+     "R": 0.4,
+     "wr": 1,
+     "t": null
+    },
+    "releases": 2,
+    "clusterT": 0.95,
+    "all": {
+     "n": 251,
+     "exp": 0.227,
+     "R": 56.9,
+     "wr": 0.386,
+     "t": 2.28
+    },
+    "filtered": {
+     "n": 249,
+     "exp": 0.227,
+     "R": 56.4,
+     "wr": 0.386,
+     "t": 2.26
+    },
+    "pass": {
+     "n": false,
+     "tOwn": false,
+     "tWelch": false,
+     "halves": false,
+     "netPositive": false,
+     "releases": false
+    },
+    "verdict": "FAIL"
+   }
+  },
+  "H1-ICT by type": {
+   "CPI": {
+    "n": 1,
+    "exp": -1.065,
+    "R": -1.1,
+    "wr": 0,
+    "t": null
+   },
+   "FOMC": {
+    "n": 4,
+    "exp": -0.134,
+    "R": -0.5,
+    "wr": 0.5,
+    "t": -0.28
+   }
+  },
+  "H1-ICT by side": {
+   "after": {
+    "n": 4,
+    "exp": -0.134,
+    "R": -0.5,
+    "wr": 0.5,
+    "t": -0.28
+   },
+   "before": {
+    "n": 1,
+    "exp": -1.065,
+    "R": -1.1,
+    "wr": 0,
+    "t": null
+   }
+  },
+  "H2-ICT by market": {
+   "es": {
+    "n": 19,
+    "held": {
+     "n": 19,
+     "exp": 0.962,
+     "R": 18.3,
+     "wr": 0.526,
+     "t": 1.69
+    },
+    "flat": {
+     "n": 19,
+     "exp": 0.203,
+     "R": 3.8,
+     "wr": 0.526,
+     "t": 1.09
+    },
+    "d": {
+     "n": 19,
+     "exp": 0.759,
+     "R": 14.4,
+     "wr": 0.526,
+     "t": 1.79
+    },
+    "welch": 1.27,
+    "h1": {
+     "n": 9,
+     "exp": 1.186,
+     "R": 10.7,
+     "wr": 0.667,
+     "t": 2.21
+    },
+    "h2": {
+     "n": 10,
+     "exp": 0.375,
+     "R": 3.7,
+     "wr": 0.4,
+     "t": 0.58
+    },
+    "releases": 19,
+    "clusterT": 1.79,
+    "gainFromFlatten": -14.42,
+    "missing": 0,
+    "pass": {
+     "n": false,
+     "tPaired": false,
+     "halves": false,
+     "netPositive": false,
+     "releases": true
+    },
+    "verdict": "FAIL"
+   },
+   "gc": {
+    "n": 27,
+    "held": {
+     "n": 27,
+     "exp": 0.817,
+     "R": 22.1,
+     "wr": 0.593,
+     "t": 2.09
+    },
+    "flat": {
+     "n": 27,
+     "exp": 0.494,
+     "R": 13.3,
+     "wr": 0.741,
+     "t": 3.07
+    },
+    "d": {
+     "n": 27,
+     "exp": 0.323,
+     "R": 8.7,
+     "wr": 0.519,
+     "t": 1.08
+    },
+    "welch": 0.76,
+    "h1": {
+     "n": 13,
+     "exp": 0.675,
+     "R": 8.8,
+     "wr": 0.538,
+     "t": 1.26
+    },
+    "h2": {
+     "n": 14,
+     "exp": -0.003,
+     "R": 0,
+     "wr": 0.5,
+     "t": -0.01
+    },
+    "releases": 27,
+    "clusterT": 1.08,
+    "gainFromFlatten": -8.72,
+    "missing": 0,
+    "pass": {
+     "n": false,
+     "tPaired": false,
+     "halves": false,
+     "netPositive": false,
+     "releases": true
+    },
+    "verdict": "FAIL"
+   },
+   "nq": {
+    "n": 16,
+    "held": {
+     "n": 16,
+     "exp": 0.533,
+     "R": 8.5,
+     "wr": 0.375,
+     "t": 0.93
+    },
+    "flat": {
+     "n": 16,
+     "exp": 0.409,
+     "R": 6.5,
+     "wr": 0.5,
+     "t": 1.39
+    },
+    "d": {
+     "n": 16,
+     "exp": 0.124,
+     "R": 2,
+     "wr": 0.313,
+     "t": 0.3
+    },
+    "welch": 0.19,
+    "h1": {
+     "n": 8,
+     "exp": -0.263,
+     "R": -2.1,
+     "wr": 0.25,
+     "t": -0.46
+    },
+    "h2": {
+     "n": 8,
+     "exp": 0.512,
+     "R": 4.1,
+     "wr": 0.375,
+     "t": 0.83
+    },
+    "releases": 16,
+    "clusterT": 0.3,
+    "gainFromFlatten": -1.99,
+    "missing": 0,
+    "pass": {
+     "n": false,
+     "tPaired": false,
+     "halves": false,
+     "netPositive": false,
+     "releases": true
+    },
+    "verdict": "FAIL"
+   }
+  },
+  "H2-ICT by part": {
+   "histdata": {
+    "n": 49,
+    "held": {
+     "n": 49,
+     "exp": 0.632,
+     "R": 31,
+     "wr": 0.49,
+     "t": 2.06
+    },
+    "flat": {
+     "n": 49,
+     "exp": 0.293,
+     "R": 14.4,
+     "wr": 0.571,
+     "t": 2.27
+    },
+    "d": {
+     "n": 49,
+     "exp": 0.338,
+     "R": 16.6,
+     "wr": 0.449,
+     "t": 1.49
+    },
+    "welch": 1.02,
+    "h1": {
+     "n": 24,
+     "exp": 0.647,
+     "R": 15.5,
+     "wr": 0.542,
+     "t": 1.76
+    },
+    "h2": {
+     "n": 25,
+     "exp": 0.042,
+     "R": 1.1,
+     "wr": 0.36,
+     "t": 0.16
+    },
+    "releases": 40,
+    "clusterT": 1.52,
+    "gainFromFlatten": -16.58,
+    "missing": 0,
+    "pass": {
+     "n": true,
+     "tPaired": false,
+     "halves": false,
+     "netPositive": false,
+     "releases": true
+    },
+    "verdict": "FAIL"
+   },
+   "replay": {
+    "n": 13,
+    "held": {
+     "n": 13,
+     "exp": 1.378,
+     "R": 17.9,
+     "wr": 0.615,
+     "t": 2.05
+    },
+    "flat": {
+     "n": 13,
+     "exp": 0.72,
+     "R": 9.4,
+     "wr": 0.769,
+     "t": 2.76
+    },
+    "d": {
+     "n": 13,
+     "exp": 0.658,
+     "R": 8.6,
+     "wr": 0.538,
+     "t": 1.19
+    },
+    "welch": 0.91,
+    "h1": {
+     "n": 6,
+     "exp": 0.681,
+     "R": 4.1,
+     "wr": 0.5,
+     "t": 0.98
+    },
+    "h2": {
+     "n": 7,
+     "exp": 0.639,
+     "R": 4.5,
+     "wr": 0.571,
+     "t": 0.71
+    },
+    "releases": 9,
+    "clusterT": 0.89,
+    "gainFromFlatten": -8.56,
+    "missing": 0,
+    "pass": {
+     "n": false,
+     "tPaired": false,
+     "halves": false,
+     "netPositive": false,
+     "releases": false
+    },
+    "verdict": "FAIL"
+   }
+  },
+  "H2-ICT by type": {
+   "CPI": {
+    "n": 15,
+    "held": {
+     "n": 15,
+     "exp": 0.395,
+     "R": 5.9,
+     "wr": 0.333,
+     "t": 0.63
+    },
+    "flat": {
+     "n": 15,
+     "exp": 0.298,
+     "R": 4.5,
+     "wr": 0.533,
+     "t": 1.22
+    },
+    "d": {
+     "n": 15,
+     "exp": 0.097,
+     "R": 1.5,
+     "wr": 0.267,
+     "t": 0.21
+    },
+    "welch": 0.14,
+    "h1": {
+     "n": 7,
+     "exp": 0.075,
+     "R": 0.5,
+     "wr": 0.286,
+     "t": 0.1
+    },
+    "h2": {
+     "n": 8,
+     "exp": 0.116,
+     "R": 0.9,
+     "wr": 0.25,
+     "t": 0.2
+    },
+    "releases": 13,
+    "clusterT": 0.31,
+    "gainFromFlatten": -1.45,
+    "missing": 0,
+    "pass": {
+     "n": false,
+     "tPaired": false,
+     "halves": false,
+     "netPositive": false,
+     "releases": true
+    },
+    "verdict": "FAIL"
+   },
+   "FOMC": {
+    "n": 18,
+    "held": {
+     "n": 18,
+     "exp": 1.788,
+     "R": 32.2,
+     "wr": 0.778,
+     "t": 3.31
+    },
+    "flat": {
+     "n": 18,
+     "exp": 0.775,
+     "R": 14,
+     "wr": 0.722,
+     "t": 2.64
+    },
+    "d": {
+     "n": 18,
+     "exp": 1.013,
+     "R": 18.2,
+     "wr": 0.667,
+     "t": 2.7
+    },
+    "welch": 1.65,
+    "h1": {
+     "n": 9,
+     "exp": 1.443,
+     "R": 13,
+     "wr": 0.667,
+     "t": 2.54
+    },
+    "h2": {
+     "n": 9,
+     "exp": 0.583,
+     "R": 5.2,
+     "wr": 0.667,
+     "t": 1.21
+    },
+    "releases": 14,
+    "clusterT": 2.64,
+    "gainFromFlatten": -18.23,
+    "missing": 0,
+    "pass": {
+     "n": false,
+     "tPaired": false,
+     "halves": false,
+     "netPositive": false,
+     "releases": true
+    },
+    "verdict": "FAIL"
+   },
+   "NFP": {
+    "n": 29,
+    "held": {
+     "n": 29,
+     "exp": 0.371,
+     "R": 10.8,
+     "wr": 0.448,
+     "t": 1.04
+    },
+    "flat": {
+     "n": 29,
+     "exp": 0.183,
+     "R": 5.3,
+     "wr": 0.586,
+     "t": 1.75
+    },
+    "d": {
+     "n": 29,
+     "exp": 0.188,
+     "R": 5.5,
+     "wr": 0.448,
+     "t": 0.62
+    },
+    "welch": 0.51,
+    "h1": {
+     "n": 14,
+     "exp": -0.045,
+     "R": -0.6,
+     "wr": 0.5,
+     "t": -0.13
+    },
+    "h2": {
+     "n": 15,
+     "exp": 0.405,
+     "R": 6.1,
+     "wr": 0.4,
+     "t": 0.83
+    },
+    "releases": 22,
+    "clusterT": 0.39,
+    "gainFromFlatten": -5.45,
+    "missing": 0,
+    "pass": {
+     "n": false,
+     "tPaired": false,
+     "halves": false,
+     "netPositive": false,
+     "releases": true
+    },
+    "verdict": "FAIL"
+   }
+  },
+  "H1-MSYS by system": {
+   "geg": {
+    "in": {
+     "n": 0
+    },
+    "inGross": {
+     "n": 0
+    },
+    "kept": {
+     "n": 18,
+     "exp": 0.226,
+     "R": 4.1,
+     "wr": 0.278,
+     "t": 0.49
+    },
+    "welch": null,
+    "h1": {
+     "n": 0
+    },
+    "h2": {
+     "n": 0
+    },
+    "releases": 0,
+    "clusterT": null,
+    "all": {
+     "n": 18,
+     "exp": 0.226,
+     "R": 4.1,
+     "wr": 0.278,
+     "t": 0.49
+    },
+    "filtered": {
+     "n": 18,
+     "exp": 0.226,
+     "R": 4.1,
+     "wr": 0.278,
+     "t": 0.49
+    },
+    "pass": {
+     "n": false,
+     "tOwn": false,
+     "tWelch": false,
+     "halves": false,
+     "netPositive": false,
+     "releases": false
+    },
+    "verdict": "FAIL"
+   },
+   "gtl": {
+    "in": {
+     "n": 0
+    },
+    "inGross": {
+     "n": 0
+    },
+    "kept": {
+     "n": 24,
+     "exp": 0.146,
+     "R": 3.5,
+     "wr": 0.375,
+     "t": 0.45
+    },
+    "welch": null,
+    "h1": {
+     "n": 0
+    },
+    "h2": {
+     "n": 0
+    },
+    "releases": 0,
+    "clusterT": null,
+    "all": {
+     "n": 24,
+     "exp": 0.146,
+     "R": 3.5,
+     "wr": 0.375,
+     "t": 0.45
+    },
+    "filtered": {
+     "n": 24,
+     "exp": 0.146,
+     "R": 3.5,
+     "wr": 0.375,
+     "t": 0.45
+    },
+    "pass": {
+     "n": false,
+     "tOwn": false,
+     "tWelch": false,
+     "halves": false,
+     "netPositive": false,
+     "releases": false
+    },
+    "verdict": "FAIL"
+   },
+   "gtrend": {
+    "in": {
+     "n": 0
+    },
+    "inGross": {
+     "n": 0
+    },
+    "kept": {
+     "n": 22,
+     "exp": 1.682,
+     "R": 37,
+     "wr": 0.682,
+     "t": 2.49
+    },
+    "welch": null,
+    "h1": {
+     "n": 0
+    },
+    "h2": {
+     "n": 0
+    },
+    "releases": 0,
+    "clusterT": null,
+    "all": {
+     "n": 22,
+     "exp": 1.682,
+     "R": 37,
+     "wr": 0.682,
+     "t": 2.49
+    },
+    "filtered": {
+     "n": 22,
+     "exp": 1.682,
+     "R": 37,
+     "wr": 0.682,
+     "t": 2.49
+    },
+    "pass": {
+     "n": false,
+     "tOwn": false,
+     "tWelch": false,
+     "halves": false,
+     "netPositive": false,
+     "releases": false
+    },
+    "verdict": "FAIL"
+   },
+   "gtrend5": {
+    "in": {
+     "n": 0
+    },
+    "inGross": {
+     "n": 0
+    },
+    "kept": {
+     "n": 39,
+     "exp": 1.712,
+     "R": 66.8,
+     "wr": 0.385,
+     "t": 2.14
+    },
+    "welch": null,
+    "h1": {
+     "n": 0
+    },
+    "h2": {
+     "n": 0
+    },
+    "releases": 0,
+    "clusterT": null,
+    "all": {
+     "n": 39,
+     "exp": 1.712,
+     "R": 66.8,
+     "wr": 0.385,
+     "t": 2.14
+    },
+    "filtered": {
+     "n": 39,
+     "exp": 1.712,
+     "R": 66.8,
+     "wr": 0.385,
+     "t": 2.14
+    },
+    "pass": {
+     "n": false,
+     "tOwn": false,
+     "tWelch": false,
+     "halves": false,
+     "netPositive": false,
+     "releases": false
+    },
+    "verdict": "FAIL"
+   },
+   "nq-open": {
+    "in": {
+     "n": 1,
+     "exp": -1.01,
+     "R": -1,
+     "wr": 0,
+     "t": null
+    },
+    "inGross": {
+     "n": 1,
+     "exp": -1.01,
+     "R": -1,
+     "wr": 0,
+     "t": null
+    },
+    "kept": {
+     "n": 444,
+     "exp": 0.239,
+     "R": 106.2,
+     "wr": 0.45,
+     "t": 3.37
+    },
+    "welch": null,
+    "h1": {
+     "n": 0
+    },
+    "h2": {
+     "n": 1,
+     "exp": -1.01,
+     "R": -1,
+     "wr": 0,
+     "t": null
+    },
+    "releases": 1,
+    "clusterT": null,
+    "all": {
+     "n": 445,
+     "exp": 0.236,
+     "R": 105.2,
+     "wr": 0.449,
+     "t": 3.34
+    },
+    "filtered": {
+     "n": 444,
+     "exp": 0.239,
+     "R": 106.2,
+     "wr": 0.45,
+     "t": 3.37
+    },
+    "pass": {
+     "n": false,
+     "tOwn": false,
+     "tWelch": false,
+     "halves": false,
+     "netPositive": true,
+     "releases": false
+    },
+    "verdict": "FAIL"
+   },
+   "replica": {
+    "in": {
+     "n": 0
+    },
+    "inGross": {
+     "n": 0
+    },
+    "kept": {
+     "n": 212,
+     "exp": 0.877,
+     "R": 186,
+     "wr": 0.33,
+     "t": 3.82
+    },
+    "welch": null,
+    "h1": {
+     "n": 0
+    },
+    "h2": {
+     "n": 0
+    },
+    "releases": 0,
+    "clusterT": null,
+    "all": {
+     "n": 212,
+     "exp": 0.877,
+     "R": 186,
+     "wr": 0.33,
+     "t": 3.82
+    },
+    "filtered": {
+     "n": 212,
+     "exp": 0.877,
+     "R": 186,
+     "wr": 0.33,
+     "t": 3.82
+    },
+    "pass": {
+     "n": false,
+     "tOwn": false,
+     "tWelch": false,
+     "halves": false,
+     "netPositive": false,
+     "releases": false
+    },
+    "verdict": "FAIL"
+   },
+   "trend": {
+    "in": {
+     "n": 0
+    },
+    "inGross": {
+     "n": 0
+    },
+    "kept": {
+     "n": 96,
+     "exp": 1.079,
+     "R": 103.6,
+     "wr": 0.479,
+     "t": 3.37
+    },
+    "welch": null,
+    "h1": {
+     "n": 0
+    },
+    "h2": {
+     "n": 0
+    },
+    "releases": 0,
+    "clusterT": null,
+    "all": {
+     "n": 96,
+     "exp": 1.079,
+     "R": 103.6,
+     "wr": 0.479,
+     "t": 3.37
+    },
+    "filtered": {
+     "n": 96,
+     "exp": 1.079,
+     "R": 103.6,
+     "wr": 0.479,
+     "t": 3.37
+    },
+    "pass": {
+     "n": false,
+     "tOwn": false,
+     "tWelch": false,
+     "halves": false,
+     "netPositive": false,
+     "releases": false
+    },
+    "verdict": "FAIL"
+   }
+  },
+  "H1-MSYS by part": {
+   "before Aug 2025": {
+    "in": {
+     "n": 0
+    },
+    "inGross": {
+     "n": 0
+    },
+    "kept": {
+     "n": 431,
+     "exp": 0.753,
+     "R": 324.3,
+     "wr": 0.445,
+     "t": 5.75
+    },
+    "welch": null,
+    "h1": {
+     "n": 0
+    },
+    "h2": {
+     "n": 0
+    },
+    "releases": 0,
+    "clusterT": null,
+    "all": {
+     "n": 431,
+     "exp": 0.753,
+     "R": 324.3,
+     "wr": 0.445,
+     "t": 5.75
+    },
+    "filtered": {
+     "n": 431,
+     "exp": 0.753,
+     "R": 324.3,
+     "wr": 0.445,
+     "t": 5.75
+    },
+    "pass": {
+     "n": false,
+     "tOwn": false,
+     "tWelch": false,
+     "halves": false,
+     "netPositive": false,
+     "releases": false
+    },
+    "verdict": "FAIL"
+   },
+   "from Aug 2025": {
+    "in": {
+     "n": 1,
+     "exp": -1.01,
+     "R": -1,
+     "wr": 0,
+     "t": null
+    },
+    "inGross": {
+     "n": 1,
+     "exp": -1.01,
+     "R": -1,
+     "wr": 0,
+     "t": null
+    },
+    "kept": {
+     "n": 424,
+     "exp": 0.431,
+     "R": 182.7,
+     "wr": 0.396,
+     "t": 3.62
+    },
+    "welch": null,
+    "h1": {
+     "n": 0
+    },
+    "h2": {
+     "n": 1,
+     "exp": -1.01,
+     "R": -1,
+     "wr": 0,
+     "t": null
+    },
+    "releases": 1,
+    "clusterT": null,
+    "all": {
+     "n": 425,
+     "exp": 0.428,
+     "R": 181.7,
+     "wr": 0.395,
+     "t": 3.6
+    },
+    "filtered": {
+     "n": 424,
+     "exp": 0.431,
+     "R": 182.7,
+     "wr": 0.396,
+     "t": 3.62
+    },
+    "pass": {
+     "n": false,
+     "tOwn": false,
+     "tWelch": false,
+     "halves": false,
+     "netPositive": true,
+     "releases": false
+    },
+    "verdict": "FAIL"
+   }
+  },
+  "H1-MSYS by type": {
+   "NFP": {
+    "n": 1,
+    "exp": -1.01,
+    "R": -1,
+    "wr": 0,
+    "t": null
+   }
+  },
+  "H2-MSYS by system": {
+   "replica": {
+    "n": 9,
+    "held": {
+     "n": 9,
+     "exp": 1.014,
+     "R": 9.1,
+     "wr": 0.444,
+     "t": 0.96
+    },
+    "flat": {
+     "n": 9,
+     "exp": 0.451,
+     "R": 4.1,
+     "wr": 0.667,
+     "t": 2.09
+    },
+    "d": {
+     "n": 9,
+     "exp": 0.564,
+     "R": 5.1,
+     "wr": 0.444,
+     "t": 0.5
+    },
+    "welch": 0.52,
+    "h1": {
+     "n": 4,
+     "exp": 1.822,
+     "R": 7.3,
+     "wr": 0.5,
+     "t": 0.85
+    },
+    "h2": {
+     "n": 5,
+     "exp": -0.443,
+     "R": -2.2,
+     "wr": 0.4,
+     "t": -0.39
+    },
+    "releases": 7,
+    "clusterT": 0.2,
+    "gainFromFlatten": -5.07,
+    "missing": 0,
+    "pass": {
+     "n": false,
+     "tPaired": false,
+     "halves": false,
+     "netPositive": false,
+     "releases": false
+    },
+    "verdict": "FAIL"
+   }
+  },
+  "H2-MSYS by part": {
+   "before Aug 2025": {
+    "n": 6,
+    "held": {
+     "n": 6,
+     "exp": 0.713,
+     "R": 4.3,
+     "wr": 0.333,
+     "t": 0.49
+    },
+    "flat": {
+     "n": 6,
+     "exp": 0.203,
+     "R": 1.2,
+     "wr": 0.5,
+     "t": 0.77
+    },
+    "d": {
+     "n": 6,
+     "exp": 0.51,
+     "R": 3.1,
+     "wr": 0.333,
+     "t": 0.32
+    },
+    "welch": 0.35,
+    "h1": {
+     "n": 3,
+     "exp": 2.86,
+     "R": 8.6,
+     "wr": 0.667,
+     "t": 1.08
+    },
+    "h2": {
+     "n": 3,
+     "exp": -1.839,
+     "R": -5.5,
+     "wr": 0,
+     "t": -5.23
+    },
+    "releases": 4,
+    "clusterT": -0.04,
+    "gainFromFlatten": -3.06,
+    "missing": 0,
+    "pass": {
+     "n": false,
+     "tPaired": false,
+     "halves": false,
+     "netPositive": false,
+     "releases": false
+    },
+    "verdict": "FAIL"
+   },
+   "from Aug 2025": {
+    "n": 3,
+    "held": {
+     "n": 3,
+     "exp": 1.617,
+     "R": 4.9,
+     "wr": 0.667,
+     "t": 1.02
+    },
+    "flat": {
+     "n": 3,
+     "exp": 0.946,
+     "R": 2.8,
+     "wr": 1,
+     "t": 6.44
+    },
+    "d": {
+     "n": 3,
+     "exp": 0.67,
+     "R": 2,
+     "wr": 0.667,
+     "t": 0.4
+    },
+    "welch": 0.42,
+    "h1": {
+     "n": 1,
+     "exp": 0.175,
+     "R": 0.2,
+     "wr": 1,
+     "t": null
+    },
+    "h2": {
+     "n": 2,
+     "exp": 0.918,
+     "R": 1.8,
+     "wr": 0.5,
+     "t": 0.32
+    },
+    "releases": 3,
+    "clusterT": 0.4,
+    "gainFromFlatten": -2.01,
+    "missing": 0,
+    "pass": {
+     "n": false,
+     "tPaired": false,
+     "halves": false,
+     "netPositive": false,
+     "releases": false
+    },
+    "verdict": "FAIL"
+   }
+  },
+  "H1-MSET by market": {
+   "audusd": {
+    "in": {
+     "n": 8,
+     "exp": -0.615,
+     "R": -4.9,
+     "wr": 0.25,
+     "t": -1.84
+    },
+    "inGross": {
+     "n": 8,
+     "exp": -0.526,
+     "R": -4.2,
+     "wr": 0.25,
+     "t": -1.6
+    },
+    "kept": {
+     "n": 729,
+     "exp": -0.369,
+     "R": -269.1,
+     "wr": 0.262,
+     "t": -7.12
+    },
+    "welch": -0.73,
+    "h1": {
+     "n": 4,
+     "exp": -0.757,
+     "R": -3,
+     "wr": 0.25,
+     "t": -2.42
+    },
+    "h2": {
+     "n": 4,
+     "exp": -0.472,
+     "R": -1.9,
+     "wr": 0.25,
+     "t": -0.74
+    },
+    "releases": 5,
+    "clusterT": -2.55,
+    "all": {
+     "n": 737,
+     "exp": -0.372,
+     "R": -274,
+     "wr": 0.262,
+     "t": -7.23
+    },
+    "filtered": {
+     "n": 729,
+     "exp": -0.369,
+     "R": -269.1,
+     "wr": 0.262,
+     "t": -7.12
+    },
+    "pass": {
+     "n": false,
+     "tOwn": false,
+     "tWelch": false,
+     "halves": true,
+     "netPositive": true,
+     "releases": false
+    },
+    "verdict": "FAIL"
+   },
+   "btc": {
+    "in": {
+     "n": 16,
+     "exp": -0.902,
+     "R": -14.4,
+     "wr": 0.063,
+     "t": -7.52
+    },
+    "inGross": {
+     "n": 16,
+     "exp": -0.879,
+     "R": -14.1,
+     "wr": 0.063,
+     "t": -7.25
+    },
+    "kept": {
+     "n": 801,
+     "exp": -0.216,
+     "R": -172.9,
+     "wr": 0.275,
+     "t": -3.71
+    },
+    "welch": -5.15,
+    "h1": {
+     "n": 8,
+     "exp": -1.02,
+     "R": -8.2,
+     "wr": 0,
+     "t": -188.25
+    },
+    "h2": {
+     "n": 8,
+     "exp": -0.785,
+     "R": -6.3,
+     "wr": 0.125,
+     "t": -3.27
+    },
+    "releases": 7,
+    "clusterT": -6.47,
+    "all": {
+     "n": 817,
+     "exp": -0.229,
+     "R": -187.4,
+     "wr": 0.271,
+     "t": -4.01
+    },
+    "filtered": {
+     "n": 801,
+     "exp": -0.216,
+     "R": -172.9,
+     "wr": 0.275,
+     "t": -3.71
+    },
+    "pass": {
+     "n": false,
+     "tOwn": true,
+     "tWelch": true,
+     "halves": true,
+     "netPositive": true,
+     "releases": false
+    },
+    "verdict": "FAIL"
+   },
+   "eth": {
+    "in": {
+     "n": 5,
+     "exp": 0.561,
+     "R": 2.8,
+     "wr": 0.6,
+     "t": 0.87
+    },
+    "inGross": {
+     "n": 5,
+     "exp": 0.578,
+     "R": 2.9,
+     "wr": 0.6,
+     "t": 0.89
+    },
+    "kept": {
+     "n": 583,
+     "exp": -0.035,
+     "R": -20.3,
+     "wr": 0.31,
+     "t": -0.38
+    },
+    "welch": 0.91,
+    "h1": {
+     "n": 2,
+     "exp": 0.247,
+     "R": 0.5,
+     "wr": 0.5,
+     "t": 0.19
+    },
+    "h2": {
+     "n": 3,
+     "exp": 0.771,
+     "R": 2.3,
+     "wr": 0.667,
+     "t": 0.86
+    },
+    "releases": 3,
+    "clusterT": 0.4,
+    "all": {
+     "n": 588,
+     "exp": -0.03,
+     "R": -17.5,
+     "wr": 0.313,
+     "t": -0.33
+    },
+    "filtered": {
+     "n": 583,
+     "exp": -0.035,
+     "R": -20.3,
+     "wr": 0.31,
+     "t": -0.38
+    },
+    "pass": {
+     "n": false,
+     "tOwn": false,
+     "tWelch": false,
+     "halves": false,
+     "netPositive": false,
+     "releases": false
+    },
+    "verdict": "FAIL"
+   },
+   "eurusd": {
+    "in": {
+     "n": 10,
+     "exp": -0.785,
+     "R": -7.8,
+     "wr": 0.2,
+     "t": -3.43
+    },
+    "inGross": {
+     "n": 10,
+     "exp": -0.684,
+     "R": -6.8,
+     "wr": 0.2,
+     "t": -3.07
+    },
+    "kept": {
+     "n": 445,
+     "exp": -0.146,
+     "R": -64.8,
+     "wr": 0.326,
+     "t": -1.75
+    },
+    "welch": -2.62,
+    "h1": {
+     "n": 5,
+     "exp": -1.143,
+     "R": -5.7,
+     "wr": 0,
+     "t": -40.21
+    },
+    "h2": {
+     "n": 5,
+     "exp": -0.427,
+     "R": -2.1,
+     "wr": 0.4,
+     "t": -1.03
+    },
+    "releases": 4,
+    "clusterT": -2.83,
+    "all": {
+     "n": 455,
+     "exp": -0.16,
+     "R": -72.7,
+     "wr": 0.323,
+     "t": -1.96
+    },
+    "filtered": {
+     "n": 445,
+     "exp": -0.146,
+     "R": -64.8,
+     "wr": 0.326,
+     "t": -1.75
+    },
+    "pass": {
+     "n": false,
+     "tOwn": true,
+     "tWelch": true,
+     "halves": true,
+     "netPositive": true,
+     "releases": false
+    },
+    "verdict": "FAIL"
+   },
+   "gbpusd": {
+    "in": {
+     "n": 18,
+     "exp": -0.794,
+     "R": -14.3,
+     "wr": 0.111,
+     "t": -4.14
+    },
+    "inGross": {
+     "n": 18,
+     "exp": -0.725,
+     "R": -13.1,
+     "wr": 0.111,
+     "t": -3.75
+    },
+    "kept": {
+     "n": 684,
+     "exp": -0.222,
+     "R": -152.2,
+     "wr": 0.306,
+     "t": -3.68
+    },
+    "welch": -2.85,
+    "h1": {
+     "n": 9,
+     "exp": -0.523,
+     "R": -4.7,
+     "wr": 0.222,
+     "t": -1.41
+    },
+    "h2": {
+     "n": 9,
+     "exp": -1.066,
+     "R": -9.6,
+     "wr": 0,
+     "t": -73.63
+    },
+    "releases": 8,
+    "clusterT": -2.33,
+    "all": {
+     "n": 702,
+     "exp": -0.237,
+     "R": -166.5,
+     "wr": 0.301,
+     "t": -4
+    },
+    "filtered": {
+     "n": 684,
+     "exp": -0.222,
+     "R": -152.2,
+     "wr": 0.306,
+     "t": -3.68
+    },
+    "pass": {
+     "n": false,
+     "tOwn": true,
+     "tWelch": true,
+     "halves": true,
+     "netPositive": true,
+     "releases": false
+    },
+    "verdict": "FAIL"
+   },
+   "sol": {
+    "in": {
+     "n": 9,
+     "exp": -0.478,
+     "R": -4.3,
+     "wr": 0.333,
+     "t": -1.55
+    },
+    "inGross": {
+     "n": 9,
+     "exp": -0.45,
+     "R": -4,
+     "wr": 0.333,
+     "t": -1.45
+    },
+    "kept": {
+     "n": 865,
+     "exp": -0.085,
+     "R": -73.8,
+     "wr": 0.333,
+     "t": -1.51
+    },
+    "welch": -1.25,
+    "h1": {
+     "n": 4,
+     "exp": 0.2,
+     "R": 0.8,
+     "wr": 0.75,
+     "t": 0.37
+    },
+    "h2": {
+     "n": 5,
+     "exp": -1.02,
+     "R": -5.1,
+     "wr": 0,
+     "t": -229.55
+    },
+    "releases": 6,
+    "clusterT": -2.76,
+    "all": {
+     "n": 874,
+     "exp": -0.089,
+     "R": -78.1,
+     "wr": 0.333,
+     "t": -1.6
+    },
+    "filtered": {
+     "n": 865,
+     "exp": -0.085,
+     "R": -73.8,
+     "wr": 0.333,
+     "t": -1.51
+    },
+    "pass": {
+     "n": false,
+     "tOwn": false,
+     "tWelch": false,
+     "halves": false,
+     "netPositive": true,
+     "releases": false
+    },
+    "verdict": "FAIL"
+   },
+   "usdcad": {
+    "in": {
+     "n": 9,
+     "exp": -0.355,
+     "R": -3.2,
+     "wr": 0.333,
+     "t": -0.9
+    },
+    "inGross": {
+     "n": 9,
+     "exp": -0.247,
+     "R": -2.2,
+     "wr": 0.333,
+     "t": -0.62
+    },
+    "kept": {
+     "n": 880,
+     "exp": -0.119,
+     "R": -104.3,
+     "wr": 0.324,
+     "t": -1.99
+    },
+    "welch": -0.6,
+    "h1": {
+     "n": 4,
+     "exp": 0.203,
+     "R": 0.8,
+     "wr": 0.5,
+     "t": 0.27
+    },
+    "h2": {
+     "n": 5,
+     "exp": -0.802,
+     "R": -4,
+     "wr": 0.2,
+     "t": -2.39
+    },
+    "releases": 5,
+    "clusterT": -0.82,
+    "all": {
+     "n": 889,
+     "exp": -0.121,
+     "R": -107.5,
+     "wr": 0.324,
+     "t": -2.04
+    },
+    "filtered": {
+     "n": 880,
+     "exp": -0.119,
+     "R": -104.3,
+     "wr": 0.324,
+     "t": -1.99
+    },
+    "pass": {
+     "n": false,
+     "tOwn": false,
+     "tWelch": false,
+     "halves": false,
+     "netPositive": true,
+     "releases": false
+    },
+    "verdict": "FAIL"
+   },
+   "usdchf": {
+    "in": {
+     "n": 5,
+     "exp": -0.021,
+     "R": -0.1,
+     "wr": 0.4,
+     "t": -0.03
+    },
+    "inGross": {
+     "n": 5,
+     "exp": 0.056,
+     "R": 0.3,
+     "wr": 0.4,
+     "t": 0.09
+    },
+    "kept": {
+     "n": 779,
+     "exp": -0.136,
+     "R": -106.2,
+     "wr": 0.354,
+     "t": -2.47
+    },
+    "welch": 0.17,
+    "h1": {
+     "n": 2,
+     "exp": -1.069,
+     "R": -2.1,
+     "wr": 0,
+     "t": -194.27
+    },
+    "h2": {
+     "n": 3,
+     "exp": 0.678,
+     "R": 2,
+     "wr": 0.667,
+     "t": 0.72
+    },
+    "releases": 5,
+    "clusterT": -0.03,
+    "all": {
+     "n": 784,
+     "exp": -0.136,
+     "R": -106.3,
+     "wr": 0.355,
+     "t": -2.47
+    },
+    "filtered": {
+     "n": 779,
+     "exp": -0.136,
+     "R": -106.2,
+     "wr": 0.354,
+     "t": -2.47
+    },
+    "pass": {
+     "n": false,
+     "tOwn": false,
+     "tWelch": false,
+     "halves": false,
+     "netPositive": true,
+     "releases": false
+    },
+    "verdict": "FAIL"
+   },
+   "xau": {
+    "in": {
+     "n": 19,
+     "exp": -0.302,
+     "R": -5.7,
+     "wr": 0.263,
+     "t": -1.06
+    },
+    "inGross": {
+     "n": 19,
+     "exp": -0.282,
+     "R": -5.4,
+     "wr": 0.263,
+     "t": -1
+    },
+    "kept": {
+     "n": 1213,
+     "exp": -0.106,
+     "R": -128,
+     "wr": 0.293,
+     "t": -1.9
+    },
+    "welch": -0.68,
+    "h1": {
+     "n": 9,
+     "exp": -0.718,
+     "R": -6.5,
+     "wr": 0.111,
+     "t": -2.44
+    },
+    "h2": {
+     "n": 10,
+     "exp": 0.072,
+     "R": 0.7,
+     "wr": 0.4,
+     "t": 0.16
+    },
+    "releases": 8,
+    "clusterT": -0.75,
+    "all": {
+     "n": 1232,
+     "exp": -0.109,
+     "R": -133.8,
+     "wr": 0.292,
+     "t": -1.98
+    },
+    "filtered": {
+     "n": 1213,
+     "exp": -0.106,
+     "R": -128,
+     "wr": 0.293,
+     "t": -1.9
+    },
+    "pass": {
+     "n": false,
+     "tOwn": false,
+     "tWelch": false,
+     "halves": false,
+     "netPositive": true,
+     "releases": false
+    },
+    "verdict": "FAIL"
+   },
+   "xrp": {
+    "in": {
+     "n": 18,
+     "exp": 0.643,
+     "R": 11.6,
+     "wr": 0.611,
+     "t": 1.83
+    },
+    "inGross": {
+     "n": 18,
+     "exp": 0.669,
+     "R": 12,
+     "wr": 0.611,
+     "t": 1.9
+    },
+    "kept": {
+     "n": 757,
+     "exp": -0.12,
+     "R": -90.6,
+     "wr": 0.301,
+     "t": -1.4
+    },
+    "welch": 2.11,
+    "h1": {
+     "n": 9,
+     "exp": 0.204,
+     "R": 1.8,
+     "wr": 0.444,
+     "t": 0.4
+    },
+    "h2": {
+     "n": 9,
+     "exp": 1.083,
+     "R": 9.7,
+     "wr": 0.778,
+     "t": 2.31
+    },
+    "releases": 8,
+    "clusterT": 2.12,
+    "all": {
+     "n": 775,
+     "exp": -0.102,
+     "R": -79.1,
+     "wr": 0.308,
+     "t": -1.21
+    },
+    "filtered": {
+     "n": 757,
+     "exp": -0.12,
+     "R": -90.6,
+     "wr": 0.301,
+     "t": -1.4
+    },
+    "pass": {
+     "n": false,
+     "tOwn": false,
+     "tWelch": false,
+     "halves": false,
+     "netPositive": false,
+     "releases": false
+    },
+    "verdict": "FAIL"
+   }
+  },
+  "H1 backtest 30d": {
+   "in": {
+    "n": 50,
+    "exp": -0.643,
+    "R": -32.1,
+    "wr": 0.3,
+    "t": -4.13
+   },
+   "inGross": {
+    "n": 50,
+    "exp": -0.111,
+    "R": -5.6,
+    "wr": 0.38,
+    "t": -0.65
+   },
+   "kept": {
+    "n": 2557,
+    "exp": -0.9,
+    "R": -2302.4,
+    "wr": 0.283,
+    "t": -18.51
+   },
+   "welch": 1.58,
+   "h1": {
+    "n": 25,
+    "exp": -0.669,
+    "R": -16.7,
+    "wr": 0.32,
+    "t": -2.99
+   },
+   "h2": {
+    "n": 25,
+    "exp": -0.616,
+    "R": -15.4,
+    "wr": 0.28,
+    "t": -2.8
+   },
+   "releases": 3,
+   "clusterT": -11.59,
+   "all": {
+    "n": 2607,
+    "exp": -0.896,
+    "R": -2334.6,
+    "wr": 0.283,
+    "t": -18.73
+   },
+   "filtered": {
+    "n": 2557,
+    "exp": -0.9,
+    "R": -2302.4,
+    "wr": 0.283,
+    "t": -18.51
+   },
+   "pass": {
+    "n": true,
+    "tOwn": true,
+    "tWelch": false,
+    "halves": true,
+    "netPositive": true,
+    "releases": false
+   },
+   "verdict": "FAIL"
+  },
+  "H1 live": {
+   "in": {
+    "n": 0
+   },
+   "inGross": {
+    "n": 0
+   },
+   "kept": {
+    "n": 36,
+    "exp": -0.427,
+    "R": -15.4,
+    "wr": 0.167,
+    "t": -2.39
+   },
+   "welch": null,
+   "h1": {
+    "n": 0
+   },
+   "h2": {
+    "n": 0
+   },
+   "releases": 0,
+   "clusterT": null,
+   "all": {
+    "n": 36,
+    "exp": -0.427,
+    "R": -15.4,
+    "wr": 0.167,
+    "t": -2.39
+   },
+   "filtered": {
+    "n": 36,
+    "exp": -0.427,
+    "R": -15.4,
+    "wr": 0.167,
+    "t": -2.39
+   },
+   "pass": {
+    "n": false,
+    "tOwn": false,
+    "tWelch": false,
+    "halves": false,
+    "netPositive": false,
+    "releases": false
+   },
+   "verdict": "FAIL"
+  },
+  "H1 live shadow": {
+   "in": {
+    "n": 13,
+    "exp": 0.396,
+    "R": 5.1,
+    "wr": 0.385,
+    "t": 0.76
+   },
+   "inGross": {
+    "n": 13,
+    "exp": 0.396,
+    "R": 5.1,
+    "wr": 0.385,
+    "t": 0.76
+   },
+   "kept": {
+    "n": 504,
+    "exp": 0.172,
+    "R": 86.5,
+    "wr": 0.345,
+    "t": 1.73
+   },
+   "welch": 0.42,
+   "h1": {
+    "n": 6,
+    "exp": 0.7,
+    "R": 4.2,
+    "wr": 0.5,
+    "t": 0.89
+   },
+   "h2": {
+    "n": 7,
+    "exp": 0.136,
+    "R": 0.9,
+    "wr": 0.286,
+    "t": 0.18
+   },
+   "releases": 1,
+   "clusterT": null,
+   "all": {
+    "n": 517,
+    "exp": 0.177,
+    "R": 91.6,
+    "wr": 0.346,
+    "t": 1.82
+   },
+   "filtered": {
+    "n": 504,
+    "exp": 0.172,
+    "R": 86.5,
+    "wr": 0.345,
+    "t": 1.73
+   },
+   "pass": {
+    "n": false,
+    "tOwn": false,
+    "tWelch": false,
+    "halves": false,
+    "netPositive": false,
+    "releases": false
+   },
+   "verdict": "FAIL"
+  }
+ },
+ "verdict": "FAIL"
+}

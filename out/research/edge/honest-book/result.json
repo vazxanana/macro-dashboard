@@ -1,0 +1,3076 @@
+{
+ "at": "2026-11-08T03:44:54.083Z",
+ "prereg": "research/edge/honest-book/preregistration.md",
+ "rule": "paper research only: a proposal for the owner; no live rule, size, filter, tracker, replay or site code changes",
+ "sizing": "fixed 1R a position as each source study recorded it (adds and live sizes inside the position); no weighting between systems",
+ "books": {
+  "A": {
+   "name": "A, the live book",
+   "systems": [
+    "replica",
+    "mosha-bo",
+    "gtrend",
+    "gtl",
+    "geg",
+    "gmp",
+    "nq-open",
+    "ict-a"
+   ]
+  },
+  "B": {
+   "name": "B, honest-positive",
+   "systems": [
+    "gtrend",
+    "geg",
+    "mosha-bo",
+    "gtl"
+   ]
+  },
+  "C": {
+   "name": "C, B + Gold trend fast N5",
+   "systems": [
+    "gtrend",
+    "geg",
+    "mosha-bo",
+    "gtl",
+    "gtrend5"
+   ]
+  }
+ },
+ "sources": {
+  "gtrend": "research/edge/gold-systems-oos/result.json positions (close day, n / n2)",
+  "gtrend5": "research/edge/gold-systems-oos/result.json positions (close day, n / n2)",
+  "gtl": "research/edge/gold-systems-oos/result.json positions (close day, n / n2)",
+  "geg": "research/edge/gold-systems-oos/result.json positions (close day, n / n2)",
+  "mosha-bo": "research/edge/mosha-oos/result.json positions (close day, n / n2)",
+  "replica": "research/edge/sizing/inputs.json systems.replica (#512 replay positions, close day, net1 / net2)",
+  "ict-a": "research/edge/sizing/inputs.json systems.ict-a (#526 run, close day, net1 / net2, live sizeOf)",
+  "gmp": "research/edge/robustness/out/gmp.json trades (entry day; R at 0.15, x2 = gross − 2 × cost)",
+  "nq-open": "research/edge/nq-open-oos/result.json trades (trade day; R net of 1 pt, x2 = 2R − gross)"
+ },
+ "coverage": {
+  "gtrend": {
+   "name": "Gold trend N20",
+   "n": 134,
+   "from": "2006-07-17",
+   "to": "2026-08-28"
+  },
+  "gtrend5": {
+   "name": "Gold trend fast N5",
+   "n": 228,
+   "from": "2006-07-17",
+   "to": "2026-11-06"
+  },
+  "geg": {
+   "name": "Gold daily engulf",
+   "n": 451,
+   "from": "2006-07-17",
+   "to": "2026-10-22"
+  },
+  "gtl": {
+   "name": "Gold H4 trendline",
+   "n": 720,
+   "from": "2006-07-17",
+   "to": "2026-10-30"
+  },
+  "mosha-bo": {
+   "name": "Mosha BO",
+   "n": 108,
+   "from": "2006-10-17",
+   "to": "2026-08-20"
+  },
+  "replica": {
+   "name": "Gold replica",
+   "n": 341,
+   "from": "2018-02-08",
+   "to": "2026-04-23"
+  },
+  "ict-a": {
+   "name": "ICT A-setups",
+   "n": 4021,
+   "from": "2008-01-02",
+   "to": "2026-10-29"
+  },
+  "gmp": {
+   "name": "Gold momentum pullback",
+   "n": 1003,
+   "from": "2018-02-05",
+   "to": "2026-10-22"
+  },
+  "nq-open": {
+   "name": "NQ NY open run",
+   "n": 1869,
+   "from": "2004-01-06",
+   "to": "2026-11-03"
+  }
+ },
+ "windows": {
+  "W1": {
+   "label": "W1 untouched 2006-07 .. 2017-12",
+   "from": "2006-07-01",
+   "to": "2017-12-31",
+   "halves": [
+    [
+     "2006-07-01",
+     "2011-12-31"
+    ],
+    [
+     "2012-01-01",
+     "2017-12-31"
+    ]
+   ],
+   "present": {
+    "A": [
+     "mosha-bo",
+     "gtrend",
+     "gtl",
+     "geg",
+     "nq-open",
+     "ict-a"
+    ],
+    "B": [
+     "gtrend",
+     "geg",
+     "mosha-bo",
+     "gtl"
+    ],
+    "C": [
+     "gtrend",
+     "geg",
+     "mosha-bo",
+     "gtl",
+     "gtrend5"
+    ]
+   },
+   "missing": {
+    "A": [
+     "replica",
+     "gmp"
+    ],
+    "B": [],
+    "C": []
+   },
+   "systems": {
+    "gtrend": {
+     "name": "Gold trend N20",
+     "n": 74,
+     "x1": {
+      "total": 32.3,
+      "perTrade": 0.436,
+      "maxDD": 5.4,
+      "retDD": 6,
+      "t": 1.58,
+      "sharpe": 0.46
+     },
+     "x2": {
+      "total": 31,
+      "perTrade": 0.419,
+      "maxDD": 5.5,
+      "retDD": 5.68
+     },
+     "byYear": {
+      "2006": -2.3,
+      "2007": 7.2,
+      "2008": 1.8,
+      "2009": 2.9,
+      "2010": 2.9,
+      "2011": 13.9,
+      "2012": 6.4,
+      "2013": -1.9,
+      "2014": 1.5,
+      "2015": -1.7,
+      "2016": 2.8,
+      "2017": -1.3
+     }
+    },
+    "gtrend5": {
+     "name": "Gold trend fast N5",
+     "n": 128,
+     "x1": {
+      "total": 41.9,
+      "perTrade": 0.327,
+      "maxDD": 10.7,
+      "retDD": 3.9,
+      "t": 1.71,
+      "sharpe": 0.5
+     },
+     "x2": {
+      "total": 40,
+      "perTrade": 0.313,
+      "maxDD": 11.2,
+      "retDD": 3.58
+     },
+     "byYear": {
+      "2006": -2.8,
+      "2007": 9.4,
+      "2008": 2.3,
+      "2009": 7.7,
+      "2010": 4.3,
+      "2011": 15.6,
+      "2012": 5.4,
+      "2013": -6.6,
+      "2014": -1.3,
+      "2015": -1,
+      "2016": 1.6,
+      "2017": 7.3
+     }
+    },
+    "geg": {
+     "name": "Gold daily engulf",
+     "n": 256,
+     "x1": {
+      "total": 47.6,
+      "perTrade": 0.186,
+      "maxDD": 15.2,
+      "retDD": 3.14,
+      "t": 1.86,
+      "sharpe": 0.54
+     },
+     "x2": {
+      "total": 38.2,
+      "perTrade": 0.149,
+      "maxDD": 16.5,
+      "retDD": 2.32
+     },
+     "byYear": {
+      "2006": 0.2,
+      "2007": 9.2,
+      "2008": -5.1,
+      "2009": 5.5,
+      "2010": 23.2,
+      "2011": 6.9,
+      "2012": 5,
+      "2013": -4.9,
+      "2014": -2.1,
+      "2015": 0.9,
+      "2016": 10.4,
+      "2017": -1.8
+     }
+    },
+    "gtl": {
+     "name": "Gold H4 trendline",
+     "n": 402,
+     "x1": {
+      "total": 19.3,
+      "perTrade": 0.048,
+      "maxDD": 26.3,
+      "retDD": 0.73,
+      "t": 0.83,
+      "sharpe": 0.24
+     },
+     "x2": {
+      "total": 9.1,
+      "perTrade": 0.023,
+      "maxDD": 32.5,
+      "retDD": 0.28
+     },
+     "byYear": {
+      "2006": 3.9,
+      "2007": 14.6,
+      "2008": -3,
+      "2009": -0.1,
+      "2010": -7.8,
+      "2011": 9.5,
+      "2012": -4.2,
+      "2013": -4.8,
+      "2014": -4.8,
+      "2015": -9.4,
+      "2016": 24.8,
+      "2017": 0.7
+     }
+    },
+    "mosha-bo": {
+     "name": "Mosha BO",
+     "n": 62,
+     "x1": {
+      "total": 8.5,
+      "perTrade": 0.137,
+      "maxDD": 15.1,
+      "retDD": 0.56,
+      "t": 0.57,
+      "sharpe": 0.17
+     },
+     "x2": {
+      "total": 3.9,
+      "perTrade": 0.063,
+      "maxDD": 16.6,
+      "retDD": 0.24
+     },
+     "byYear": {
+      "2006": -2.1,
+      "2007": 0,
+      "2008": 6,
+      "2009": 7.6,
+      "2010": -14,
+      "2011": 0.8,
+      "2012": 2.3,
+      "2013": -2,
+      "2014": 0,
+      "2015": 5.2,
+      "2016": 6.9,
+      "2017": -2.1
+     }
+    },
+    "ict-a": {
+     "name": "ICT A-setups",
+     "n": 2234,
+     "x1": {
+      "total": -29.8,
+      "perTrade": -0.013,
+      "maxDD": 82.8,
+      "retDD": -0.36,
+      "t": -0.39,
+      "sharpe": -0.11
+     },
+     "x2": {
+      "total": -163.8,
+      "perTrade": -0.073,
+      "maxDD": 168.2,
+      "retDD": -0.97
+     },
+     "byYear": {
+      "2006": 0,
+      "2007": 0,
+      "2008": -20.1,
+      "2009": -24.1,
+      "2010": 7.8,
+      "2011": 18.3,
+      "2012": -17.4,
+      "2013": -41.7,
+      "2014": 24.6,
+      "2015": 14.4,
+      "2016": 11.5,
+      "2017": -3.1
+     }
+    },
+    "nq-open": {
+     "name": "NQ NY open run",
+     "n": 929,
+     "x1": {
+      "total": -28.4,
+      "perTrade": -0.031,
+      "maxDD": 51.6,
+      "retDD": -0.55,
+      "t": -0.71,
+      "sharpe": -0.21
+     },
+     "x2": {
+      "total": -157.3,
+      "perTrade": -0.169,
+      "maxDD": 168,
+      "retDD": -0.94
+     },
+     "byYear": {
+      "2006": 1.5,
+      "2007": -1.8,
+      "2008": -4.4,
+      "2009": -6.7,
+      "2010": 6.3,
+      "2011": -3.6,
+      "2012": -2.8,
+      "2013": 14.9,
+      "2014": -8.2,
+      "2015": -14.7,
+      "2016": -11.6,
+      "2017": 2.8
+     }
+    }
+   },
+   "x1": {
+    "A": {
+     "total": 49.4,
+     "perYear": 4.3,
+     "maxDD": 83.2,
+     "retDD": 0.59,
+     "t": 0.5,
+     "sharpe": 0.15,
+     "days": 3000,
+     "months": 138,
+     "posMonths": 0.49,
+     "activeMonths": 138,
+     "posActiveMonths": 0.49,
+     "years": 12,
+     "posYears": "6/12",
+     "worstMonth": -23.3,
+     "n": 3957
+    },
+    "B": {
+     "total": 107.6,
+     "perYear": 9.4,
+     "maxDD": 29.2,
+     "retDD": 3.69,
+     "t": 2.37,
+     "sharpe": 0.69,
+     "days": 3000,
+     "months": 138,
+     "posMonths": 0.46,
+     "activeMonths": 134,
+     "posActiveMonths": 0.48,
+     "years": 12,
+     "posYears": "6/12",
+     "worstMonth": -9.8,
+     "n": 794
+    },
+    "C": {
+     "total": 149.5,
+     "perYear": 13,
+     "maxDD": 38.3,
+     "retDD": 3.9,
+     "t": 2.51,
+     "sharpe": 0.73,
+     "days": 3000,
+     "months": 138,
+     "posMonths": 0.44,
+     "activeMonths": 134,
+     "posActiveMonths": 0.46,
+     "years": 12,
+     "posYears": "8/12",
+     "worstMonth": -10.6,
+     "n": 922
+    }
+   },
+   "x2": {
+    "A": {
+     "total": -238.9,
+     "perYear": -20.8,
+     "maxDD": 259.3,
+     "retDD": -0.92,
+     "t": -2.43,
+     "sharpe": -0.7,
+     "days": 3000,
+     "months": 138,
+     "posMonths": 0.39,
+     "activeMonths": 138,
+     "posActiveMonths": 0.39,
+     "years": 12,
+     "posYears": "3/12",
+     "worstMonth": -25.3,
+     "n": 3957
+    },
+    "B": {
+     "total": 82.2,
+     "perYear": 7.1,
+     "maxDD": 34.6,
+     "retDD": 2.38,
+     "t": 1.82,
+     "sharpe": 0.53,
+     "days": 3000,
+     "months": 138,
+     "posMonths": 0.45,
+     "activeMonths": 134,
+     "posActiveMonths": 0.46,
+     "years": 12,
+     "posYears": "6/12",
+     "worstMonth": -10.3,
+     "n": 794
+    },
+    "C": {
+     "total": 122.2,
+     "perYear": 10.6,
+     "maxDD": 44.1,
+     "retDD": 2.77,
+     "t": 2.06,
+     "sharpe": 0.6,
+     "days": 3000,
+     "months": 138,
+     "posMonths": 0.43,
+     "activeMonths": 134,
+     "posActiveMonths": 0.44,
+     "years": 12,
+     "posYears": "8/12",
+     "worstMonth": -11.2,
+     "n": 922
+    }
+   },
+   "h1": {
+    "A": {
+     "x1": {
+      "total": 54.8,
+      "perYear": 10,
+      "maxDD": 83.2,
+      "retDD": 0.66,
+      "t": 0.81,
+      "sharpe": 0.34,
+      "days": 1435,
+      "months": 66,
+      "posMonths": 0.52,
+      "activeMonths": 66,
+      "posActiveMonths": 0.52,
+      "years": 6,
+      "posYears": "4/6",
+      "worstMonth": -15.1
+     },
+     "x2": {
+      "total": -81.8,
+      "perYear": -14.9,
+      "maxDD": 143.4,
+      "retDD": -0.57,
+      "t": -1.2,
+      "sharpe": -0.5,
+      "days": 1435,
+      "months": 66,
+      "posMonths": 0.42,
+      "activeMonths": 66,
+      "posActiveMonths": 0.42,
+      "years": 6,
+      "posYears": "2/6",
+      "worstMonth": -17.6
+     }
+    },
+    "B": {
+     "x1": {
+      "total": 81.8,
+      "perYear": 14.9,
+      "maxDD": 23.6,
+      "retDD": 3.47,
+      "t": 2.34,
+      "sharpe": 0.98,
+      "days": 1435,
+      "months": 66,
+      "posMonths": 0.55,
+      "activeMonths": 65,
+      "posActiveMonths": 0.55,
+      "years": 6,
+      "posYears": "4/6",
+      "worstMonth": -9.8
+     },
+     "x2": {
+      "total": 68,
+      "perYear": 12.4,
+      "maxDD": 25.9,
+      "retDD": 2.62,
+      "t": 1.95,
+      "sharpe": 0.82,
+      "days": 1435,
+      "months": 66,
+      "posMonths": 0.53,
+      "activeMonths": 65,
+      "posActiveMonths": 0.54,
+      "years": 6,
+      "posYears": "4/6",
+      "worstMonth": -10.3
+     }
+    },
+    "C": {
+     "x1": {
+      "total": 118.2,
+      "perYear": 21.5,
+      "maxDD": 28.8,
+      "retDD": 4.1,
+      "t": 2.42,
+      "sharpe": 1.01,
+      "days": 1435,
+      "months": 66,
+      "posMonths": 0.52,
+      "activeMonths": 65,
+      "posActiveMonths": 0.52,
+      "years": 6,
+      "posYears": "5/6",
+      "worstMonth": -10.6
+     },
+     "x2": {
+      "total": 103.3,
+      "perYear": 18.8,
+      "maxDD": 31.3,
+      "retDD": 3.3,
+      "t": 2.12,
+      "sharpe": 0.89,
+      "days": 1435,
+      "months": 66,
+      "posMonths": 0.5,
+      "activeMonths": 65,
+      "posActiveMonths": 0.51,
+      "years": 6,
+      "posYears": "5/6",
+      "worstMonth": -11.2
+     }
+    }
+   },
+   "h2": {
+    "A": {
+     "x1": {
+      "total": -5.4,
+      "perYear": -0.9,
+      "maxDD": 66.3,
+      "retDD": -0.08,
+      "t": -0.08,
+      "sharpe": -0.03,
+      "days": 1565,
+      "months": 72,
+      "posMonths": 0.47,
+      "activeMonths": 72,
+      "posActiveMonths": 0.47,
+      "years": 6,
+      "posYears": "2/6",
+      "worstMonth": -23.3
+     },
+     "x2": {
+      "total": -157.1,
+      "perYear": -26.2,
+      "maxDD": 165.7,
+      "retDD": -0.95,
+      "t": -2.21,
+      "sharpe": -0.89,
+      "days": 1565,
+      "months": 72,
+      "posMonths": 0.36,
+      "activeMonths": 72,
+      "posActiveMonths": 0.36,
+      "years": 6,
+      "posYears": "1/6",
+      "worstMonth": -25.3
+     }
+    },
+    "B": {
+     "x1": {
+      "total": 25.9,
+      "perYear": 4.3,
+      "maxDD": 29.2,
+      "retDD": 0.89,
+      "t": 0.89,
+      "sharpe": 0.36,
+      "days": 1565,
+      "months": 72,
+      "posMonths": 0.39,
+      "activeMonths": 69,
+      "posActiveMonths": 0.41,
+      "years": 6,
+      "posYears": "2/6",
+      "worstMonth": -6
+     },
+     "x2": {
+      "total": 14.3,
+      "perYear": 2.4,
+      "maxDD": 34.6,
+      "retDD": 0.41,
+      "t": 0.49,
+      "sharpe": 0.2,
+      "days": 1565,
+      "months": 72,
+      "posMonths": 0.38,
+      "activeMonths": 69,
+      "posActiveMonths": 0.39,
+      "years": 6,
+      "posYears": "2/6",
+      "worstMonth": -6.1
+     }
+    },
+    "C": {
+     "x1": {
+      "total": 31.3,
+      "perYear": 5.2,
+      "maxDD": 38.3,
+      "retDD": 0.82,
+      "t": 0.92,
+      "sharpe": 0.37,
+      "days": 1565,
+      "months": 72,
+      "posMonths": 0.38,
+      "activeMonths": 69,
+      "posActiveMonths": 0.39,
+      "years": 6,
+      "posYears": "3/6",
+      "worstMonth": -7.1
+     },
+     "x2": {
+      "total": 18.9,
+      "perYear": 3.2,
+      "maxDD": 44.1,
+      "retDD": 0.43,
+      "t": 0.56,
+      "sharpe": 0.22,
+      "days": 1565,
+      "months": 72,
+      "posMonths": 0.36,
+      "activeMonths": 69,
+      "posActiveMonths": 0.38,
+      "years": 6,
+      "posYears": "3/6",
+      "worstMonth": -7.4
+     }
+    }
+   },
+   "corrGold": {
+    "gtrend~gtrend5": 0.92,
+    "gtrend~gtl": 0.01,
+    "gtrend~geg": 0,
+    "gtrend~mosha-bo": -0.03,
+    "gtrend5~gtl": -0.01,
+    "gtrend5~geg": 0,
+    "gtrend5~mosha-bo": -0.03,
+    "gtl~geg": 0.16,
+    "gtl~mosha-bo": 0.03,
+    "geg~mosha-bo": 0.02
+   },
+   "beta": {
+    "A": {
+     "days": 2991,
+     "beta": 0.171,
+     "betaT": 6.05,
+     "alpha": 0.011,
+     "alphaT": 0.34,
+     "R2": 0.012,
+     "corr": 0.11,
+     "goldSumPct": 94.9,
+     "betaR": 16.2,
+     "betaShare": 0.33
+    },
+    "B": {
+     "days": 2991,
+     "beta": 0.088,
+     "betaT": 6.7,
+     "alpha": 0.033,
+     "alphaT": 2.21,
+     "R2": 0.015,
+     "corr": 0.12,
+     "goldSumPct": 94.9,
+     "betaR": 8.3,
+     "betaShare": 0.08
+    },
+    "C": {
+     "days": 2991,
+     "beta": 0.067,
+     "betaT": 3.88,
+     "alpha": 0.048,
+     "alphaT": 2.41,
+     "R2": 0.005,
+     "corr": 0.07,
+     "goldSumPct": 94.9,
+     "betaR": 6.4,
+     "betaShare": 0.04
+    }
+   },
+   "perMarket": {
+    "A": {
+     "gold": 128.7,
+     "Nasdaq": -69,
+     "Dow": 25.8,
+     "S&P": -36.1
+    },
+    "B": {
+     "gold": 107.6
+    },
+    "C": {
+     "gold": 149.5
+    }
+   },
+   "byYear": {
+    "A": {
+     "2006": 1.1,
+     "2007": 29.2,
+     "2008": -24.8,
+     "2009": -15,
+     "2010": 18.5,
+     "2011": 45.8,
+     "2012": -10.7,
+     "2013": -40.5,
+     "2014": 11,
+     "2015": -5.3,
+     "2016": 44.8,
+     "2017": -4.8
+    },
+    "B": {
+     "2006": -0.3,
+     "2007": 31,
+     "2008": -0.3,
+     "2009": 15.9,
+     "2010": 4.4,
+     "2011": 31.1,
+     "2012": 9.5,
+     "2013": -13.7,
+     "2014": -5.3,
+     "2015": -5.1,
+     "2016": 44.9,
+     "2017": -4.5
+    },
+    "C": {
+     "2006": -3.1,
+     "2007": 40.4,
+     "2008": 1.9,
+     "2009": 23.6,
+     "2010": 8.8,
+     "2011": 46.7,
+     "2012": 14.9,
+     "2013": -20.2,
+     "2014": -6.7,
+     "2015": -6.1,
+     "2016": 46.6,
+     "2017": 2.8
+    }
+   },
+   "bootstrap": {
+    "draws": 2000,
+    "months": 138,
+    "pairs": {
+     "B-A": {
+      "retDD": {
+       "pGt0": 0.957,
+       "lo90": 0.08,
+       "hi90": 8.55
+      },
+      "t": {
+       "pGt0": 0.964,
+       "lo90": 0.12,
+       "hi90": 3.49
+      }
+     },
+     "C-A": {
+      "retDD": {
+       "pGt0": 0.967,
+       "lo90": 0.36,
+       "hi90": 10.41
+      },
+      "t": {
+       "pGt0": 0.975,
+       "lo90": 0.26,
+       "hi90": 3.51
+      }
+     },
+     "C-B": {
+      "retDD": {
+       "pGt0": 0.785,
+       "lo90": -0.73,
+       "hi90": 3.15
+      },
+      "t": {
+       "pGt0": 0.672,
+       "lo90": -0.31,
+       "hi90": 0.58
+      }
+     }
+    }
+   }
+  },
+  "W1o": {
+   "label": "W1-overlap 2008-01 .. 2017-12 (sensitivity)",
+   "from": "2008-01-01",
+   "to": "2017-12-31",
+   "halves": [
+    [
+     "2008-01-01",
+     "2012-12-31"
+    ],
+    [
+     "2013-01-01",
+     "2017-12-31"
+    ]
+   ],
+   "present": {
+    "A": [
+     "mosha-bo",
+     "gtrend",
+     "gtl",
+     "geg",
+     "nq-open",
+     "ict-a"
+    ],
+    "B": [
+     "gtrend",
+     "geg",
+     "mosha-bo",
+     "gtl"
+    ],
+    "C": [
+     "gtrend",
+     "geg",
+     "mosha-bo",
+     "gtl",
+     "gtrend5"
+    ]
+   },
+   "missing": {
+    "A": [
+     "replica",
+     "gmp"
+    ],
+    "B": [],
+    "C": []
+   },
+   "systems": {
+    "gtrend": {
+     "name": "Gold trend N20",
+     "n": 62,
+     "x1": {
+      "total": 27.4,
+      "perTrade": 0.442,
+      "maxDD": 5.4,
+      "retDD": 5.09,
+      "t": 1.42,
+      "sharpe": 0.44
+     },
+     "x2": {
+      "total": 26.5,
+      "perTrade": 0.427,
+      "maxDD": 5.5,
+      "retDD": 4.85
+     },
+     "byYear": {
+      "2008": 1.8,
+      "2009": 2.9,
+      "2010": 2.9,
+      "2011": 13.9,
+      "2012": 6.4,
+      "2013": -1.9,
+      "2014": 1.5,
+      "2015": -1.7,
+      "2016": 2.8,
+      "2017": -1.3
+     }
+    },
+    "gtrend5": {
+     "name": "Gold trend fast N5",
+     "n": 110,
+     "x1": {
+      "total": 35.3,
+      "perTrade": 0.321,
+      "maxDD": 10.7,
+      "retDD": 3.28,
+      "t": 1.51,
+      "sharpe": 0.47
+     },
+     "x2": {
+      "total": 33.9,
+      "perTrade": 0.308,
+      "maxDD": 11.2,
+      "retDD": 3.04
+     },
+     "byYear": {
+      "2008": 2.3,
+      "2009": 7.7,
+      "2010": 4.3,
+      "2011": 15.6,
+      "2012": 5.4,
+      "2013": -6.6,
+      "2014": -1.3,
+      "2015": -1,
+      "2016": 1.6,
+      "2017": 7.3
+     }
+    },
+    "geg": {
+     "name": "Gold daily engulf",
+     "n": 215,
+     "x1": {
+      "total": 38.2,
+      "perTrade": 0.178,
+      "maxDD": 15.2,
+      "retDD": 2.52,
+      "t": 1.64,
+      "sharpe": 0.51
+     },
+     "x2": {
+      "total": 30.8,
+      "perTrade": 0.143,
+      "maxDD": 16.5,
+      "retDD": 1.87
+     },
+     "byYear": {
+      "2008": -5.1,
+      "2009": 5.5,
+      "2010": 23.2,
+      "2011": 6.9,
+      "2012": 5,
+      "2013": -4.9,
+      "2014": -2.1,
+      "2015": 0.9,
+      "2016": 10.4,
+      "2017": -1.8
+     }
+    },
+    "gtl": {
+     "name": "Gold H4 trendline",
+     "n": 349,
+     "x1": {
+      "total": 0.8,
+      "perTrade": 0.002,
+      "maxDD": 26.3,
+      "retDD": 0.03,
+      "t": 0.04,
+      "sharpe": 0.01
+     },
+     "x2": {
+      "total": -7.4,
+      "perTrade": -0.021,
+      "maxDD": 32.5,
+      "retDD": -0.23
+     },
+     "byYear": {
+      "2008": -3,
+      "2009": -0.1,
+      "2010": -7.8,
+      "2011": 9.5,
+      "2012": -4.2,
+      "2013": -4.8,
+      "2014": -4.8,
+      "2015": -9.4,
+      "2016": 24.8,
+      "2017": 0.7
+     }
+    },
+    "mosha-bo": {
+     "name": "Mosha BO",
+     "n": 57,
+     "x1": {
+      "total": 10.6,
+      "perTrade": 0.186,
+      "maxDD": 15.1,
+      "retDD": 0.7,
+      "t": 0.73,
+      "sharpe": 0.23
+     },
+     "x2": {
+      "total": 6.7,
+      "perTrade": 0.118,
+      "maxDD": 16.6,
+      "retDD": 0.4
+     },
+     "byYear": {
+      "2008": 6,
+      "2009": 7.6,
+      "2010": -14,
+      "2011": 0.8,
+      "2012": 2.3,
+      "2013": -2,
+      "2014": 0,
+      "2015": 5.2,
+      "2016": 6.9,
+      "2017": -2.1
+     }
+    },
+    "ict-a": {
+     "name": "ICT A-setups",
+     "n": 2234,
+     "x1": {
+      "total": -29.8,
+      "perTrade": -0.013,
+      "maxDD": 82.8,
+      "retDD": -0.36,
+      "t": -0.39,
+      "sharpe": -0.12
+     },
+     "x2": {
+      "total": -163.8,
+      "perTrade": -0.073,
+      "maxDD": 168.2,
+      "retDD": -0.97
+     },
+     "byYear": {
+      "2008": -20.1,
+      "2009": -24.1,
+      "2010": 7.8,
+      "2011": 18.3,
+      "2012": -17.4,
+      "2013": -41.7,
+      "2014": 24.6,
+      "2015": 14.4,
+      "2016": 11.5,
+      "2017": -3.1
+     }
+    },
+    "nq-open": {
+     "name": "NQ NY open run",
+     "n": 802,
+     "x1": {
+      "total": -28.1,
+      "perTrade": -0.035,
+      "maxDD": 51.6,
+      "retDD": -0.54,
+      "t": -0.75,
+      "sharpe": -0.23
+     },
+     "x2": {
+      "total": -133.9,
+      "perTrade": -0.167,
+      "maxDD": 149.9,
+      "retDD": -0.89
+     },
+     "byYear": {
+      "2008": -4.4,
+      "2009": -6.7,
+      "2010": 6.3,
+      "2011": -3.6,
+      "2012": -2.8,
+      "2013": 14.9,
+      "2014": -8.2,
+      "2015": -14.7,
+      "2016": -11.6,
+      "2017": 2.8
+     }
+    }
+   },
+   "x1": {
+    "A": {
+     "total": 19.1,
+     "perYear": 1.9,
+     "maxDD": 83.2,
+     "retDD": 0.23,
+     "t": 0.2,
+     "sharpe": 0.06,
+     "days": 2609,
+     "months": 120,
+     "posMonths": 0.47,
+     "activeMonths": 120,
+     "posActiveMonths": 0.47,
+     "years": 10,
+     "posYears": "4/10",
+     "worstMonth": -23.3,
+     "n": 3719
+    },
+    "B": {
+     "total": 77,
+     "perYear": 7.7,
+     "maxDD": 29.2,
+     "retDD": 2.64,
+     "t": 1.86,
+     "sharpe": 0.58,
+     "days": 2609,
+     "months": 120,
+     "posMonths": 0.43,
+     "activeMonths": 116,
+     "posActiveMonths": 0.45,
+     "years": 10,
+     "posYears": "5/10",
+     "worstMonth": -9.8,
+     "n": 683
+    },
+    "C": {
+     "total": 112.3,
+     "perYear": 11.2,
+     "maxDD": 38.3,
+     "retDD": 2.93,
+     "t": 2.03,
+     "sharpe": 0.63,
+     "days": 2609,
+     "months": 120,
+     "posMonths": 0.42,
+     "activeMonths": 116,
+     "posActiveMonths": 0.43,
+     "years": 10,
+     "posYears": "7/10",
+     "worstMonth": -10.6,
+     "n": 793
+    }
+   },
+   "x2": {
+    "A": {
+     "total": -241.2,
+     "perYear": -24.1,
+     "maxDD": 253.7,
+     "retDD": -0.95,
+     "t": -2.52,
+     "sharpe": -0.78,
+     "days": 2609,
+     "months": 120,
+     "posMonths": 0.38,
+     "activeMonths": 120,
+     "posActiveMonths": 0.38,
+     "years": 10,
+     "posYears": "2/10",
+     "worstMonth": -25.3,
+     "n": 3719
+    },
+    "B": {
+     "total": 56.6,
+     "perYear": 5.7,
+     "maxDD": 34.6,
+     "retDD": 1.63,
+     "t": 1.37,
+     "sharpe": 0.43,
+     "days": 2609,
+     "months": 120,
+     "posMonths": 0.42,
+     "activeMonths": 116,
+     "posActiveMonths": 0.44,
+     "years": 10,
+     "posYears": "5/10",
+     "worstMonth": -10.3,
+     "n": 683
+    },
+    "C": {
+     "total": 90.5,
+     "perYear": 9,
+     "maxDD": 44.1,
+     "retDD": 2.05,
+     "t": 1.64,
+     "sharpe": 0.51,
+     "days": 2609,
+     "months": 120,
+     "posMonths": 0.41,
+     "activeMonths": 116,
+     "posActiveMonths": 0.42,
+     "years": 10,
+     "posYears": "7/10",
+     "worstMonth": -11.2,
+     "n": 793
+    }
+   },
+   "h1": {
+    "A": {
+     "x1": {
+      "total": 13.8,
+      "perYear": 2.8,
+      "maxDD": 83.2,
+      "retDD": 0.17,
+      "t": 0.2,
+      "sharpe": 0.09,
+      "days": 1305,
+      "months": 60,
+      "posMonths": 0.52,
+      "activeMonths": 60,
+      "posActiveMonths": 0.52,
+      "years": 5,
+      "posYears": "2/5",
+      "worstMonth": -23.3
+     },
+     "x2": {
+      "total": -120.7,
+      "perYear": -24.1,
+      "maxDD": 137.8,
+      "retDD": -0.88,
+      "t": -1.73,
+      "sharpe": -0.76,
+      "days": 1305,
+      "months": 60,
+      "posMonths": 0.4,
+      "activeMonths": 60,
+      "posActiveMonths": 0.4,
+      "years": 5,
+      "posYears": "1/5",
+      "worstMonth": -25.3
+     }
+    },
+    "B": {
+     "x1": {
+      "total": 60.6,
+      "perYear": 12.1,
+      "maxDD": 23.6,
+      "retDD": 2.57,
+      "t": 1.86,
+      "sharpe": 0.82,
+      "days": 1305,
+      "months": 60,
+      "posMonths": 0.52,
+      "activeMonths": 59,
+      "posActiveMonths": 0.53,
+      "years": 5,
+      "posYears": "4/5",
+      "worstMonth": -9.8
+     },
+     "x2": {
+      "total": 50.2,
+      "perYear": 10,
+      "maxDD": 25.9,
+      "retDD": 1.94,
+      "t": 1.55,
+      "sharpe": 0.68,
+      "days": 1305,
+      "months": 60,
+      "posMonths": 0.5,
+      "activeMonths": 59,
+      "posActiveMonths": 0.51,
+      "years": 5,
+      "posYears": "4/5",
+      "worstMonth": -10.3
+     }
+    },
+    "C": {
+     "x1": {
+      "total": 95.9,
+      "perYear": 19.2,
+      "maxDD": 28.8,
+      "retDD": 3.33,
+      "t": 2.03,
+      "sharpe": 0.89,
+      "days": 1305,
+      "months": 60,
+      "posMonths": 0.47,
+      "activeMonths": 59,
+      "posActiveMonths": 0.47,
+      "years": 5,
+      "posYears": "5/5",
+      "worstMonth": -10.6
+     },
+     "x2": {
+      "total": 84.7,
+      "perYear": 16.9,
+      "maxDD": 31.3,
+      "retDD": 2.71,
+      "t": 1.8,
+      "sharpe": 0.79,
+      "days": 1305,
+      "months": 60,
+      "posMonths": 0.47,
+      "activeMonths": 59,
+      "posActiveMonths": 0.47,
+      "years": 5,
+      "posYears": "5/5",
+      "worstMonth": -11.2
+     }
+    }
+   },
+   "h2": {
+    "A": {
+     "x1": {
+      "total": 5.3,
+      "perYear": 1.1,
+      "maxDD": 58.2,
+      "retDD": 0.09,
+      "t": 0.08,
+      "sharpe": 0.04,
+      "days": 1304,
+      "months": 60,
+      "posMonths": 0.43,
+      "activeMonths": 60,
+      "posActiveMonths": 0.43,
+      "years": 5,
+      "posYears": "2/5",
+      "worstMonth": -19
+     },
+     "x2": {
+      "total": -120.4,
+      "perYear": -24.1,
+      "maxDD": 131.2,
+      "retDD": -0.92,
+      "t": -1.85,
+      "sharpe": -0.81,
+      "days": 1304,
+      "months": 60,
+      "posMonths": 0.37,
+      "activeMonths": 60,
+      "posActiveMonths": 0.37,
+      "years": 5,
+      "posYears": "1/5",
+      "worstMonth": -21.7
+     }
+    },
+    "B": {
+     "x1": {
+      "total": 16.4,
+      "perYear": 3.3,
+      "maxDD": 27.3,
+      "retDD": 0.6,
+      "t": 0.64,
+      "sharpe": 0.28,
+      "days": 1304,
+      "months": 60,
+      "posMonths": 0.35,
+      "activeMonths": 57,
+      "posActiveMonths": 0.37,
+      "years": 5,
+      "posYears": "1/5",
+      "worstMonth": -6
+     },
+     "x2": {
+      "total": 6.4,
+      "perYear": 1.3,
+      "maxDD": 32.2,
+      "retDD": 0.2,
+      "t": 0.25,
+      "sharpe": 0.11,
+      "days": 1304,
+      "months": 60,
+      "posMonths": 0.35,
+      "activeMonths": 57,
+      "posActiveMonths": 0.37,
+      "years": 5,
+      "posYears": "1/5",
+      "worstMonth": -6.1
+     }
+    },
+    "C": {
+     "x1": {
+      "total": 16.4,
+      "perYear": 3.3,
+      "maxDD": 35.1,
+      "retDD": 0.47,
+      "t": 0.57,
+      "sharpe": 0.25,
+      "days": 1304,
+      "months": 60,
+      "posMonths": 0.37,
+      "activeMonths": 57,
+      "posActiveMonths": 0.39,
+      "years": 5,
+      "posYears": "2/5",
+      "worstMonth": -7.1
+     },
+     "x2": {
+      "total": 5.8,
+      "perYear": 1.2,
+      "maxDD": 40.8,
+      "retDD": 0.14,
+      "t": 0.2,
+      "sharpe": 0.09,
+      "days": 1304,
+      "months": 60,
+      "posMonths": 0.35,
+      "activeMonths": 57,
+      "posActiveMonths": 0.37,
+      "years": 5,
+      "posYears": "2/5",
+      "worstMonth": -7.4
+     }
+    }
+   },
+   "corrGold": {
+    "gtrend~gtrend5": 0.92,
+    "gtrend~gtl": 0.01,
+    "gtrend~geg": -0.01,
+    "gtrend~mosha-bo": -0.04,
+    "gtrend5~gtl": -0.01,
+    "gtrend5~geg": 0,
+    "gtrend5~mosha-bo": -0.03,
+    "gtl~geg": 0.11,
+    "gtl~mosha-bo": 0.02,
+    "geg~mosha-bo": 0.02
+   },
+   "beta": {
+    "A": {
+     "days": 2600,
+     "beta": 0.191,
+     "betaT": 6.07,
+     "alpha": 0.003,
+     "alphaT": 0.08,
+     "R2": 0.014,
+     "corr": 0.12,
+     "goldSumPct": 62.1,
+     "betaR": 11.9,
+     "betaShare": 0.62
+    },
+    "B": {
+     "days": 2600,
+     "beta": 0.097,
+     "betaT": 7.15,
+     "alpha": 0.027,
+     "alphaT": 1.73,
+     "R2": 0.019,
+     "corr": 0.14,
+     "goldSumPct": 62.1,
+     "betaR": 6.1,
+     "betaShare": 0.08
+    },
+    "C": {
+     "days": 2600,
+     "beta": 0.08,
+     "betaT": 4.33,
+     "alpha": 0.041,
+     "alphaT": 1.95,
+     "R2": 0.007,
+     "corr": 0.08,
+     "goldSumPct": 62.1,
+     "betaR": 4.9,
+     "betaShare": 0.04
+    }
+   },
+   "perMarket": {
+    "A": {
+     "gold": 98.1,
+     "Nasdaq": -68.6,
+     "Dow": 25.8,
+     "S&P": -36.1
+    },
+    "B": {
+     "gold": 77
+    },
+    "C": {
+     "gold": 112.3
+    }
+   },
+   "byYear": {
+    "A": {
+     "2008": -24.8,
+     "2009": -15,
+     "2010": 18.5,
+     "2011": 45.8,
+     "2012": -10.7,
+     "2013": -40.5,
+     "2014": 11,
+     "2015": -5.3,
+     "2016": 44.8,
+     "2017": -4.8
+    },
+    "B": {
+     "2008": -0.3,
+     "2009": 15.9,
+     "2010": 4.4,
+     "2011": 31.1,
+     "2012": 9.5,
+     "2013": -13.7,
+     "2014": -5.3,
+     "2015": -5.1,
+     "2016": 44.9,
+     "2017": -4.5
+    },
+    "C": {
+     "2008": 1.9,
+     "2009": 23.6,
+     "2010": 8.8,
+     "2011": 46.7,
+     "2012": 14.9,
+     "2013": -20.2,
+     "2014": -6.7,
+     "2015": -6.1,
+     "2016": 46.6,
+     "2017": 2.8
+    }
+   },
+   "bootstrap": {
+    "draws": 2000,
+    "months": 120,
+    "pairs": {
+     "B-A": {
+      "retDD": {
+       "pGt0": 0.917,
+       "lo90": -0.36,
+       "hi90": 6.98
+      },
+      "t": {
+       "pGt0": 0.929,
+       "lo90": -0.21,
+       "hi90": 3.37
+      }
+     },
+     "C-A": {
+      "retDD": {
+       "pGt0": 0.948,
+       "lo90": -0.04,
+       "hi90": 8.67
+      },
+      "t": {
+       "pGt0": 0.954,
+       "lo90": 0.05,
+       "hi90": 3.42
+      }
+     },
+     "C-B": {
+      "retDD": {
+       "pGt0": 0.815,
+       "lo90": -0.5,
+       "hi90": 2.89
+      },
+      "t": {
+       "pGt0": 0.675,
+       "lo90": -0.33,
+       "hi90": 0.6
+      }
+     }
+    }
+   }
+  },
+  "W2": {
+   "label": "W2 built-on 2018-01 .. 2026-10",
+   "from": "2018-01-01",
+   "to": "2026-10-31",
+   "halves": [
+    [
+     "2018-01-01",
+     "2022-12-31"
+    ],
+    [
+     "2023-01-01",
+     "2026-10-31"
+    ]
+   ],
+   "present": {
+    "A": [
+     "replica",
+     "mosha-bo",
+     "gtrend",
+     "gtl",
+     "geg",
+     "gmp",
+     "nq-open",
+     "ict-a"
+    ],
+    "B": [
+     "gtrend",
+     "geg",
+     "mosha-bo",
+     "gtl"
+    ],
+    "C": [
+     "gtrend",
+     "geg",
+     "mosha-bo",
+     "gtl",
+     "gtrend5"
+    ]
+   },
+   "missing": {
+    "A": [],
+    "B": [],
+    "C": []
+   },
+   "systems": {
+    "gtrend": {
+     "name": "Gold trend N20",
+     "n": 60,
+     "x1": {
+      "total": 83.2,
+      "perTrade": 1.387,
+      "maxDD": 3.8,
+      "retDD": 21.84,
+      "t": 2.5,
+      "sharpe": 0.83
+     },
+     "x2": {
+      "total": 82.6,
+      "perTrade": 1.377,
+      "maxDD": 3.9,
+      "retDD": 21.38
+     },
+     "byYear": {
+      "2018": 3.1,
+      "2019": 14.2,
+      "2020": 13.7,
+      "2021": 0.9,
+      "2022": 0.6,
+      "2023": 4.2,
+      "2024": 9,
+      "2025": 30.4,
+      "2026": 7.3
+     }
+    },
+    "gtrend5": {
+     "name": "Gold trend fast N5",
+     "n": 99,
+     "x1": {
+      "total": 104,
+      "perTrade": 1.051,
+      "maxDD": 7.5,
+      "retDD": 13.85,
+      "t": 2.7,
+      "sharpe": 0.89
+     },
+     "x2": {
+      "total": 103,
+      "perTrade": 1.04,
+      "maxDD": 7.6,
+      "retDD": 13.48
+     },
+     "byYear": {
+      "2018": -1.4,
+      "2019": 17.5,
+      "2020": 14.8,
+      "2021": 1.9,
+      "2022": 3.6,
+      "2023": 9.1,
+      "2024": 13.3,
+      "2025": 34.2,
+      "2026": 10.9
+     }
+    },
+    "geg": {
+     "name": "Gold daily engulf",
+     "n": 195,
+     "x1": {
+      "total": 54,
+      "perTrade": 0.277,
+      "maxDD": 9.1,
+      "retDD": 5.93,
+      "t": 2.18,
+      "sharpe": 0.72
+     },
+     "x2": {
+      "total": 47.6,
+      "perTrade": 0.244,
+      "maxDD": 10.2,
+      "retDD": 4.66
+     },
+     "byYear": {
+      "2018": -6,
+      "2019": 9.8,
+      "2020": 9.6,
+      "2021": 12,
+      "2022": -2.3,
+      "2023": 11.7,
+      "2024": 10.8,
+      "2025": 11.5,
+      "2026": -3.2
+     }
+    },
+    "gtl": {
+     "name": "Gold H4 trendline",
+     "n": 318,
+     "x1": {
+      "total": 55.7,
+      "perTrade": 0.175,
+      "maxDD": 12.4,
+      "retDD": 4.5,
+      "t": 2.5,
+      "sharpe": 0.83
+     },
+     "x2": {
+      "total": 49,
+      "perTrade": 0.154,
+      "maxDD": 13.3,
+      "retDD": 3.69
+     },
+     "byYear": {
+      "2018": 1.7,
+      "2019": 1,
+      "2020": 5.9,
+      "2021": 3.1,
+      "2022": -3.9,
+      "2023": 3.5,
+      "2024": 16,
+      "2025": 28.9,
+      "2026": -0.4
+     }
+    },
+    "mosha-bo": {
+     "name": "Mosha BO",
+     "n": 46,
+     "x1": {
+      "total": 11.6,
+      "perTrade": 0.252,
+      "maxDD": 11.4,
+      "retDD": 1.02,
+      "t": 0.82,
+      "sharpe": 0.27
+     },
+     "x2": {
+      "total": 9.7,
+      "perTrade": 0.211,
+      "maxDD": 12,
+      "retDD": 0.81
+     },
+     "byYear": {
+      "2018": -4.3,
+      "2019": 6.5,
+      "2020": -2.9,
+      "2021": 0,
+      "2022": -6.4,
+      "2023": 6,
+      "2024": 10.9,
+      "2025": -0.2,
+      "2026": 1.9
+     }
+    },
+    "replica": {
+     "name": "Gold replica",
+     "n": 341,
+     "x1": {
+      "total": 124.9,
+      "perTrade": 0.366,
+      "maxDD": 35.1,
+      "retDD": 3.56,
+      "t": 1.81,
+      "sharpe": 0.6
+     },
+     "x2": {
+      "total": 106.5,
+      "perTrade": 0.312,
+      "maxDD": 42.4,
+      "retDD": 2.51
+     },
+     "byYear": {
+      "2018": -8.1,
+      "2019": -1.7,
+      "2020": 16.8,
+      "2021": 0,
+      "2022": -13,
+      "2023": -9.7,
+      "2024": 48.2,
+      "2025": 50.7,
+      "2026": 41.7
+     }
+    },
+    "ict-a": {
+     "name": "ICT A-setups",
+     "n": 1787,
+     "x1": {
+      "total": 166.3,
+      "perTrade": 0.093,
+      "maxDD": 30.2,
+      "retDD": 5.51,
+      "t": 2.24,
+      "sharpe": 0.74
+     },
+     "x2": {
+      "total": 84.6,
+      "perTrade": 0.047,
+      "maxDD": 40.1,
+      "retDD": 2.11
+     },
+     "byYear": {
+      "2018": 12.3,
+      "2019": -4.4,
+      "2020": 33.4,
+      "2021": 5.9,
+      "2022": 34.2,
+      "2023": 12.5,
+      "2024": 13.7,
+      "2025": 36.8,
+      "2026": 21.8
+     }
+    },
+    "gmp": {
+     "name": "Gold momentum pullback",
+     "n": 1003,
+     "x1": {
+      "total": 41.1,
+      "perTrade": 0.041,
+      "maxDD": 40,
+      "retDD": 1.03,
+      "t": 1.01,
+      "sharpe": 0.33
+     },
+     "x2": {
+      "total": 7.6,
+      "perTrade": 0.008,
+      "maxDD": 58.3,
+      "retDD": 0.13
+     },
+     "byYear": {
+      "2018": -9.4,
+      "2019": -19.8,
+      "2020": -2.9,
+      "2021": 8.9,
+      "2022": -4.2,
+      "2023": 12,
+      "2024": 22.2,
+      "2025": 30.6,
+      "2026": 3.6
+     }
+    },
+    "nq-open": {
+     "name": "NQ NY open run",
+     "n": 752,
+     "x1": {
+      "total": 95.1,
+      "perTrade": 0.126,
+      "maxDD": 44.1,
+      "retDD": 2.15,
+      "t": 2.3,
+      "sharpe": 0.76
+     },
+     "x2": {
+      "total": 69,
+      "perTrade": 0.092,
+      "maxDD": 54.1,
+      "retDD": 1.27
+     },
+     "byYear": {
+      "2018": 13.9,
+      "2019": -11.6,
+      "2020": -6.8,
+      "2021": -4.3,
+      "2022": 4.7,
+      "2023": 29.6,
+      "2024": 24.1,
+      "2025": 16.3,
+      "2026": 29.2
+     }
+    }
+   },
+   "x1": {
+    "A": {
+     "total": 631.8,
+     "perYear": 71.5,
+     "maxDD": 59.6,
+     "retDD": 10.6,
+     "t": 4.8,
+     "sharpe": 1.59,
+     "days": 2305,
+     "months": 106,
+     "posMonths": 0.66,
+     "activeMonths": 106,
+     "posActiveMonths": 0.66,
+     "years": 9,
+     "posYears": "8/9",
+     "worstMonth": -26.2,
+     "n": 4502
+    },
+    "B": {
+     "total": 204.5,
+     "perYear": 23.2,
+     "maxDD": 20.7,
+     "retDD": 9.87,
+     "t": 3.91,
+     "sharpe": 1.29,
+     "days": 2305,
+     "months": 106,
+     "posMonths": 0.57,
+     "activeMonths": 104,
+     "posActiveMonths": 0.58,
+     "years": 9,
+     "posYears": "7/9",
+     "worstMonth": -6,
+     "n": 619
+    },
+    "C": {
+     "total": 308.5,
+     "perYear": 34.9,
+     "maxDD": 27.8,
+     "retDD": 11.1,
+     "t": 3.75,
+     "sharpe": 1.24,
+     "days": 2305,
+     "months": 106,
+     "posMonths": 0.57,
+     "activeMonths": 105,
+     "posActiveMonths": 0.57,
+     "years": 9,
+     "posYears": "7/9",
+     "worstMonth": -6.9,
+     "n": 718
+    }
+   },
+   "x2": {
+    "A": {
+     "total": 456.6,
+     "perYear": 51.7,
+     "maxDD": 96.9,
+     "retDD": 4.71,
+     "t": 3.47,
+     "sharpe": 1.15,
+     "days": 2305,
+     "months": 106,
+     "posMonths": 0.59,
+     "activeMonths": 106,
+     "posActiveMonths": 0.59,
+     "years": 9,
+     "posYears": "6/9",
+     "worstMonth": -28.8,
+     "n": 4502
+    },
+    "B": {
+     "total": 188.9,
+     "perYear": 21.4,
+     "maxDD": 22.5,
+     "retDD": 8.4,
+     "t": 3.62,
+     "sharpe": 1.2,
+     "days": 2305,
+     "months": 106,
+     "posMonths": 0.56,
+     "activeMonths": 104,
+     "posActiveMonths": 0.57,
+     "years": 9,
+     "posYears": "7/9",
+     "worstMonth": -6.4,
+     "n": 619
+    },
+    "C": {
+     "total": 291.9,
+     "perYear": 33.1,
+     "maxDD": 29.7,
+     "retDD": 9.81,
+     "t": 3.56,
+     "sharpe": 1.18,
+     "days": 2305,
+     "months": 106,
+     "posMonths": 0.55,
+     "activeMonths": 105,
+     "posActiveMonths": 0.55,
+     "years": 9,
+     "posYears": "7/9",
+     "worstMonth": -7.3,
+     "n": 718
+    }
+   },
+   "h1": {
+    "A": {
+     "x1": {
+      "total": 100.4,
+      "perYear": 20.1,
+      "maxDD": 59.6,
+      "retDD": 1.68,
+      "t": 1.14,
+      "sharpe": 0.5,
+      "days": 1305,
+      "months": 60,
+      "posMonths": 0.53,
+      "activeMonths": 60,
+      "posActiveMonths": 0.53,
+      "years": 5,
+      "posYears": "4/5",
+      "worstMonth": -26.2
+     },
+     "x2": {
+      "total": -14,
+      "perYear": -2.8,
+      "maxDD": 96.9,
+      "retDD": -0.14,
+      "t": -0.16,
+      "sharpe": -0.07,
+      "days": 1305,
+      "months": 60,
+      "posMonths": 0.43,
+      "activeMonths": 60,
+      "posActiveMonths": 0.43,
+      "years": 5,
+      "posYears": "2/5",
+      "worstMonth": -28.8
+     }
+    },
+    "B": {
+     "x1": {
+      "total": 56.3,
+      "perYear": 11.3,
+      "maxDD": 20.7,
+      "retDD": 2.72,
+      "t": 1.73,
+      "sharpe": 0.76,
+      "days": 1305,
+      "months": 60,
+      "posMonths": 0.5,
+      "activeMonths": 58,
+      "posActiveMonths": 0.52,
+      "years": 5,
+      "posYears": "3/5",
+      "worstMonth": -6
+     },
+     "x2": {
+      "total": 44.8,
+      "perYear": 9,
+      "maxDD": 22.5,
+      "retDD": 1.99,
+      "t": 1.38,
+      "sharpe": 0.61,
+      "days": 1305,
+      "months": 60,
+      "posMonths": 0.48,
+      "activeMonths": 58,
+      "posActiveMonths": 0.5,
+      "years": 5,
+      "posYears": "3/5",
+      "worstMonth": -6.4
+     }
+    },
+    "C": {
+     "x1": {
+      "total": 92.7,
+      "perYear": 18.5,
+      "maxDD": 27.8,
+      "retDD": 3.34,
+      "t": 1.96,
+      "sharpe": 0.86,
+      "days": 1305,
+      "months": 60,
+      "posMonths": 0.5,
+      "activeMonths": 59,
+      "posActiveMonths": 0.51,
+      "years": 5,
+      "posYears": "3/5",
+      "worstMonth": -6.9
+     },
+     "x2": {
+      "total": 80.5,
+      "perYear": 16.1,
+      "maxDD": 29.7,
+      "retDD": 2.71,
+      "t": 1.7,
+      "sharpe": 0.75,
+      "days": 1305,
+      "months": 60,
+      "posMonths": 0.47,
+      "activeMonths": 59,
+      "posActiveMonths": 0.47,
+      "years": 5,
+      "posYears": "3/5",
+      "worstMonth": -7.3
+     }
+    }
+   },
+   "h2": {
+    "A": {
+     "x1": {
+      "total": 531.5,
+      "perYear": 138.7,
+      "maxDD": 30.5,
+      "retDD": 17.45,
+      "t": 5.46,
+      "sharpe": 2.74,
+      "days": 1000,
+      "months": 46,
+      "posMonths": 0.83,
+      "activeMonths": 46,
+      "posActiveMonths": 0.83,
+      "years": 4,
+      "posYears": "4/4",
+      "worstMonth": -11.8
+     },
+     "x2": {
+      "total": 470.6,
+      "perYear": 122.8,
+      "maxDD": 31.2,
+      "retDD": 15.09,
+      "t": 4.86,
+      "sharpe": 2.44,
+      "days": 1000,
+      "months": 46,
+      "posMonths": 0.8,
+      "activeMonths": 46,
+      "posActiveMonths": 0.8,
+      "years": 4,
+      "posYears": "4/4",
+      "worstMonth": -12.8
+     }
+    },
+    "B": {
+     "x1": {
+      "total": 148.2,
+      "perYear": 38.7,
+      "maxDD": 11,
+      "retDD": 13.46,
+      "t": 3.62,
+      "sharpe": 1.81,
+      "days": 1000,
+      "months": 46,
+      "posMonths": 0.65,
+      "activeMonths": 46,
+      "posActiveMonths": 0.65,
+      "years": 4,
+      "posYears": "4/4",
+      "worstMonth": -5.1
+     },
+     "x2": {
+      "total": 144.2,
+      "perYear": 37.6,
+      "maxDD": 11.1,
+      "retDD": 13,
+      "t": 3.52,
+      "sharpe": 1.77,
+      "days": 1000,
+      "months": 46,
+      "posMonths": 0.65,
+      "activeMonths": 46,
+      "posActiveMonths": 0.65,
+      "years": 4,
+      "posYears": "4/4",
+      "worstMonth": -5.2
+     }
+    },
+    "C": {
+     "x1": {
+      "total": 215.8,
+      "perYear": 56.3,
+      "maxDD": 12.5,
+      "retDD": 17.22,
+      "t": 3.22,
+      "sharpe": 1.62,
+      "days": 1000,
+      "months": 46,
+      "posMonths": 0.65,
+      "activeMonths": 46,
+      "posActiveMonths": 0.65,
+      "years": 4,
+      "posYears": "4/4",
+      "worstMonth": -6.1
+     },
+     "x2": {
+      "total": 211.4,
+      "perYear": 55.2,
+      "maxDD": 12.6,
+      "retDD": 16.75,
+      "t": 3.16,
+      "sharpe": 1.58,
+      "days": 1000,
+      "months": 46,
+      "posMonths": 0.65,
+      "activeMonths": 46,
+      "posActiveMonths": 0.65,
+      "years": 4,
+      "posYears": "4/4",
+      "worstMonth": -6.2
+     }
+    }
+   },
+   "corrGold": {
+    "gtrend~gtrend5": 0.96,
+    "gtrend~gtl": 0.06,
+    "gtrend~geg": -0.02,
+    "gtrend~mosha-bo": 0,
+    "gtrend~replica": -0.01,
+    "gtrend~gmp": 0.01,
+    "gtrend5~gtl": 0.05,
+    "gtrend5~geg": -0.01,
+    "gtrend5~mosha-bo": 0,
+    "gtrend5~replica": -0.01,
+    "gtrend5~gmp": 0,
+    "gtl~geg": 0.19,
+    "gtl~mosha-bo": 0.05,
+    "gtl~replica": 0.04,
+    "gtl~gmp": 0.05,
+    "geg~mosha-bo": 0.03,
+    "geg~replica": 0.01,
+    "geg~gmp": 0.03,
+    "mosha-bo~replica": -0.01,
+    "mosha-bo~gmp": 0.01,
+    "replica~gmp": 0.01
+   },
+   "beta": {
+    "A": {
+     "days": 2293,
+     "beta": 0.358,
+     "betaT": 6.69,
+     "alpha": 0.257,
+     "alphaT": 4.5,
+     "R2": 0.019,
+     "corr": 0.14,
+     "goldSumPct": 122,
+     "betaR": 43.6,
+     "betaShare": 0.07
+    },
+    "B": {
+     "days": 2293,
+     "beta": 0.069,
+     "betaT": 3.24,
+     "alpha": 0.086,
+     "alphaT": 3.75,
+     "R2": 0.005,
+     "corr": 0.07,
+     "goldSumPct": 122,
+     "betaR": 8.5,
+     "betaShare": 0.04
+    },
+    "C": {
+     "days": 2293,
+     "beta": 0.016,
+     "betaT": 0.46,
+     "alpha": 0.134,
+     "alphaT": 3.73,
+     "R2": 0,
+     "corr": 0.01,
+     "goldSumPct": 122,
+     "betaR": 1.9,
+     "betaShare": 0.01
+    }
+   },
+   "perMarket": {
+    "A": {
+     "gold": 450.2,
+     "Nasdaq": 139.6,
+     "Dow": 25,
+     "S&P": 17.1
+    },
+    "B": {
+     "gold": 204.5
+    },
+    "C": {
+     "gold": 308.5
+    }
+   },
+   "byYear": {
+    "A": {
+     "2018": 3.2,
+     "2019": -5.9,
+     "2020": 66.7,
+     "2021": 26.6,
+     "2022": 9.7,
+     "2023": 69.9,
+     "2024": 154.8,
+     "2025": 205,
+     "2026": 101.8
+    },
+    "B": {
+     "2018": -5.5,
+     "2019": 31.5,
+     "2020": 26.3,
+     "2021": 16,
+     "2022": -12,
+     "2023": 25.4,
+     "2024": 46.7,
+     "2025": 70.6,
+     "2026": 5.5
+    },
+    "C": {
+     "2018": -6.8,
+     "2019": 49,
+     "2020": 41.1,
+     "2021": 17.9,
+     "2022": -8.4,
+     "2023": 34.5,
+     "2024": 60,
+     "2025": 104.8,
+     "2026": 16.5
+    }
+   },
+   "bootstrap": {
+    "draws": 2000,
+    "months": 106,
+    "pairs": {
+     "B-A": {
+      "retDD": {
+       "pGt0": 0.462,
+       "lo90": -9.52,
+       "hi90": 9.7
+      },
+      "t": {
+       "pGt0": 0.163,
+       "lo90": -2.2,
+       "hi90": 0.57
+      }
+     },
+     "C-A": {
+      "retDD": {
+       "pGt0": 0.654,
+       "lo90": -7.2,
+       "hi90": 15.3
+      },
+      "t": {
+       "pGt0": 0.147,
+       "lo90": -2.29,
+       "hi90": 0.51
+      }
+     },
+     "C-B": {
+      "retDD": {
+       "pGt0": 0.952,
+       "lo90": 0.02,
+       "hi90": 8.19
+      },
+      "t": {
+       "pGt0": 0.355,
+       "lo90": -0.5,
+       "hi90": 0.33
+      }
+     }
+    }
+   }
+  },
+  "W3": {
+   "label": "W3 recent 2023-01 .. 2026-10",
+   "from": "2023-01-01",
+   "to": "2026-10-31",
+   "halves": [
+    [
+     "2023-01-01",
+     "2024-11-30"
+    ],
+    [
+     "2024-12-01",
+     "2026-10-31"
+    ]
+   ],
+   "present": {
+    "A": [
+     "replica",
+     "mosha-bo",
+     "gtrend",
+     "gtl",
+     "geg",
+     "gmp",
+     "nq-open",
+     "ict-a"
+    ],
+    "B": [
+     "gtrend",
+     "geg",
+     "mosha-bo",
+     "gtl"
+    ],
+    "C": [
+     "gtrend",
+     "geg",
+     "mosha-bo",
+     "gtl",
+     "gtrend5"
+    ]
+   },
+   "missing": {
+    "A": [],
+    "B": [],
+    "C": []
+   },
+   "systems": {
+    "gtrend": {
+     "name": "Gold trend N20",
+     "n": 27,
+     "x1": {
+      "total": 50.8,
+      "perTrade": 1.881,
+      "maxDD": 2.4,
+      "retDD": 21.27,
+      "t": 1.8,
+      "sharpe": 0.9
+     },
+     "x2": {
+      "total": 50.6,
+      "perTrade": 1.874,
+      "maxDD": 2.4,
+      "retDD": 20.96
+     },
+     "byYear": {
+      "2023": 4.2,
+      "2024": 9,
+      "2025": 30.4,
+      "2026": 7.3
+     }
+    },
+    "gtrend5": {
+     "name": "Gold trend fast N5",
+     "n": 43,
+     "x1": {
+      "total": 67.6,
+      "perTrade": 1.572,
+      "maxDD": 2.6,
+      "retDD": 25.99,
+      "t": 2.11,
+      "sharpe": 1.06
+     },
+     "x2": {
+      "total": 67.3,
+      "perTrade": 1.565,
+      "maxDD": 2.6,
+      "retDD": 25.67
+     },
+     "byYear": {
+      "2023": 9.1,
+      "2024": 13.3,
+      "2025": 34.2,
+      "2026": 10.9
+     }
+    },
+    "geg": {
+     "name": "Gold daily engulf",
+     "n": 85,
+     "x1": {
+      "total": 30.9,
+      "perTrade": 0.364,
+      "maxDD": 5.1,
+      "retDD": 6.1,
+      "t": 1.75,
+      "sharpe": 0.88
+     },
+     "x2": {
+      "total": 29.1,
+      "perTrade": 0.342,
+      "maxDD": 5.1,
+      "retDD": 5.69
+     },
+     "byYear": {
+      "2023": 11.7,
+      "2024": 10.8,
+      "2025": 11.5,
+      "2026": -3.2
+     }
+    },
+    "gtl": {
+     "name": "Gold H4 trendline",
+     "n": 139,
+     "x1": {
+      "total": 47.9,
+      "perTrade": 0.345,
+      "maxDD": 9.3,
+      "retDD": 5.13,
+      "t": 3.04,
+      "sharpe": 1.53
+     },
+     "x2": {
+      "total": 46.2,
+      "perTrade": 0.332,
+      "maxDD": 9.4,
+      "retDD": 4.93
+     },
+     "byYear": {
+      "2023": 3.5,
+      "2024": 16,
+      "2025": 28.9,
+      "2026": -0.4
+     }
+    },
+    "mosha-bo": {
+     "name": "Mosha BO",
+     "n": 18,
+     "x1": {
+      "total": 18.7,
+      "perTrade": 1.039,
+      "maxDD": 4,
+      "retDD": 4.62,
+      "t": 1.57,
+      "sharpe": 0.79
+     },
+     "x2": {
+      "total": 18.2,
+      "perTrade": 1.011,
+      "maxDD": 4.1,
+      "retDD": 4.47
+     },
+     "byYear": {
+      "2023": 6,
+      "2024": 10.9,
+      "2025": -0.2,
+      "2026": 1.9
+     }
+    },
+    "replica": {
+     "name": "Gold replica",
+     "n": 226,
+     "x1": {
+      "total": 130.8,
+      "perTrade": 0.579,
+      "maxDD": 15.7,
+      "retDD": 8.35,
+      "t": 2.22,
+      "sharpe": 1.11
+     },
+     "x2": {
+      "total": 120.3,
+      "perTrade": 0.532,
+      "maxDD": 15.9,
+      "retDD": 7.54
+     },
+     "byYear": {
+      "2023": -9.7,
+      "2024": 48.2,
+      "2025": 50.7,
+      "2026": 41.7
+     }
+    },
+    "ict-a": {
+     "name": "ICT A-setups",
+     "n": 762,
+     "x1": {
+      "total": 84.8,
+      "perTrade": 0.111,
+      "maxDD": 21.1,
+      "retDD": 4.03,
+      "t": 1.8,
+      "sharpe": 0.9
+     },
+     "x2": {
+      "total": 53.9,
+      "perTrade": 0.071,
+      "maxDD": 25.2,
+      "retDD": 2.14
+     },
+     "byYear": {
+      "2023": 12.5,
+      "2024": 13.7,
+      "2025": 36.8,
+      "2026": 21.8
+     }
+    },
+    "gmp": {
+     "name": "Gold momentum pullback",
+     "n": 370,
+     "x1": {
+      "total": 68.4,
+      "perTrade": 0.185,
+      "maxDD": 9.9,
+      "retDD": 6.88,
+      "t": 2.7,
+      "sharpe": 1.36
+     },
+     "x2": {
+      "total": 60.7,
+      "perTrade": 0.164,
+      "maxDD": 10.8,
+      "retDD": 5.64
+     },
+     "byYear": {
+      "2023": 12,
+      "2024": 22.2,
+      "2025": 30.6,
+      "2026": 3.6
+     }
+    },
+    "nq-open": {
+     "name": "NQ NY open run",
+     "n": 308,
+     "x1": {
+      "total": 99.3,
+      "perTrade": 0.322,
+      "maxDD": 9.7,
+      "retDD": 10.26,
+      "t": 3.45,
+      "sharpe": 1.73
+     },
+     "x2": {
+      "total": 91.5,
+      "perTrade": 0.297,
+      "maxDD": 10.2,
+      "retDD": 8.99
+     },
+     "byYear": {
+      "2023": 29.6,
+      "2024": 24.1,
+      "2025": 16.3,
+      "2026": 29.2
+     }
+    }
+   },
+   "x1": {
+    "A": {
+     "total": 531.5,
+     "perYear": 138.7,
+     "maxDD": 30.5,
+     "retDD": 17.45,
+     "t": 5.46,
+     "sharpe": 2.74,
+     "days": 1000,
+     "months": 46,
+     "posMonths": 0.83,
+     "activeMonths": 46,
+     "posActiveMonths": 0.83,
+     "years": 4,
+     "posYears": "4/4",
+     "worstMonth": -11.8,
+     "n": 1935
+    },
+    "B": {
+     "total": 148.2,
+     "perYear": 38.7,
+     "maxDD": 11,
+     "retDD": 13.46,
+     "t": 3.62,
+     "sharpe": 1.81,
+     "days": 1000,
+     "months": 46,
+     "posMonths": 0.65,
+     "activeMonths": 46,
+     "posActiveMonths": 0.65,
+     "years": 4,
+     "posYears": "4/4",
+     "worstMonth": -5.1,
+     "n": 269
+    },
+    "C": {
+     "total": 215.8,
+     "perYear": 56.3,
+     "maxDD": 12.5,
+     "retDD": 17.22,
+     "t": 3.22,
+     "sharpe": 1.62,
+     "days": 1000,
+     "months": 46,
+     "posMonths": 0.65,
+     "activeMonths": 46,
+     "posActiveMonths": 0.65,
+     "years": 4,
+     "posYears": "4/4",
+     "worstMonth": -6.1,
+     "n": 312
+    }
+   },
+   "x2": {
+    "A": {
+     "total": 470.6,
+     "perYear": 122.8,
+     "maxDD": 31.2,
+     "retDD": 15.09,
+     "t": 4.86,
+     "sharpe": 2.44,
+     "days": 1000,
+     "months": 46,
+     "posMonths": 0.8,
+     "activeMonths": 46,
+     "posActiveMonths": 0.8,
+     "years": 4,
+     "posYears": "4/4",
+     "worstMonth": -12.8,
+     "n": 1935
+    },
+    "B": {
+     "total": 144.2,
+     "perYear": 37.6,
+     "maxDD": 11.1,
+     "retDD": 13,
+     "t": 3.52,
+     "sharpe": 1.77,
+     "days": 1000,
+     "months": 46,
+     "posMonths": 0.65,
+     "activeMonths": 46,
+     "posActiveMonths": 0.65,
+     "years": 4,
+     "posYears": "4/4",
+     "worstMonth": -5.2,
+     "n": 269
+    },
+    "C": {
+     "total": 211.4,
+     "perYear": 55.2,
+     "maxDD": 12.6,
+     "retDD": 16.75,
+     "t": 3.16,
+     "sharpe": 1.58,
+     "days": 1000,
+     "months": 46,
+     "posMonths": 0.65,
+     "activeMonths": 46,
+     "posActiveMonths": 0.65,
+     "years": 4,
+     "posYears": "4/4",
+     "worstMonth": -6.2,
+     "n": 312
+    }
+   },
+   "h1": {
+    "A": {
+     "x1": {
+      "total": 206.8,
+      "perYear": 107.9,
+      "maxDD": 21.7,
+      "retDD": 9.51,
+      "t": 3.54,
+      "sharpe": 2.51,
+      "days": 500,
+      "months": 23,
+      "posMonths": 0.78,
+      "activeMonths": 23,
+      "posActiveMonths": 0.78,
+      "years": 2,
+      "posYears": "2/2",
+      "worstMonth": -11.8
+     },
+     "x2": {
+      "total": 169.6,
+      "perYear": 88.5,
+      "maxDD": 23.6,
+      "retDD": 7.17,
+      "t": 2.93,
+      "sharpe": 2.08,
+      "days": 500,
+      "months": 23,
+      "posMonths": 0.78,
+      "activeMonths": 23,
+      "posActiveMonths": 0.78,
+      "years": 2,
+      "posYears": "2/2",
+      "worstMonth": -12.8
+     }
+    },
+    "B": {
+     "x1": {
+      "total": 61.6,
+      "perYear": 32.1,
+      "maxDD": 8.1,
+      "retDD": 7.58,
+      "t": 2.8,
+      "sharpe": 1.99,
+      "days": 500,
+      "months": 23,
+      "posMonths": 0.7,
+      "activeMonths": 23,
+      "posActiveMonths": 0.7,
+      "years": 2,
+      "posYears": "2/2",
+      "worstMonth": -5.1
+     },
+     "x2": {
+      "total": 58.9,
+      "perYear": 30.7,
+      "maxDD": 8.3,
+      "retDD": 7.07,
+      "t": 2.69,
+      "sharpe": 1.91,
+      "days": 500,
+      "months": 23,
+      "posMonths": 0.7,
+      "activeMonths": 23,
+      "posActiveMonths": 0.7,
+      "years": 2,
+      "posYears": "2/2",
+      "worstMonth": -5.2
+     }
+    },
+    "C": {
+     "x1": {
+      "total": 84.7,
+      "perYear": 44.2,
+      "maxDD": 10.5,
+      "retDD": 8.07,
+      "t": 2.63,
+      "sharpe": 1.87,
+      "days": 500,
+      "months": 23,
+      "posMonths": 0.65,
+      "activeMonths": 23,
+      "posActiveMonths": 0.65,
+      "years": 2,
+      "posYears": "2/2",
+      "worstMonth": -6.1
+     },
+     "x2": {
+      "total": 81.8,
+      "perYear": 42.7,
+      "maxDD": 10.7,
+      "retDD": 7.63,
+      "t": 2.55,
+      "sharpe": 1.81,
+      "days": 500,
+      "months": 23,
+      "posMonths": 0.65,
+      "activeMonths": 23,
+      "posActiveMonths": 0.65,
+      "years": 2,
+      "posYears": "2/2",
+      "worstMonth": -6.2
+     }
+    }
+   },
+   "h2": {
+    "A": {
+     "x1": {
+      "total": 324.7,
+      "perYear": 169.4,
+      "maxDD": 30.5,
+      "retDD": 10.66,
+      "t": 4.17,
+      "sharpe": 2.96,
+      "days": 500,
+      "months": 23,
+      "posMonths": 0.87,
+      "activeMonths": 23,
+      "posActiveMonths": 0.87,
+      "years": 3,
+      "posYears": "3/3",
+      "worstMonth": -1.5
+     },
+     "x2": {
+      "total": 301,
+      "perYear": 157.1,
+      "maxDD": 31.2,
+      "retDD": 9.65,
+      "t": 3.88,
+      "sharpe": 2.75,
+      "days": 500,
+      "months": 23,
+      "posMonths": 0.83,
+      "activeMonths": 23,
+      "posActiveMonths": 0.83,
+      "years": 3,
+      "posYears": "3/3",
+      "worstMonth": -2.4
+     }
+    },
+    "B": {
+     "x1": {
+      "total": 86.6,
+      "perYear": 45.2,
+      "maxDD": 11,
+      "retDD": 7.87,
+      "t": 2.5,
+      "sharpe": 1.78,
+      "days": 500,
+      "months": 23,
+      "posMonths": 0.61,
+      "activeMonths": 23,
+      "posActiveMonths": 0.61,
+      "years": 3,
+      "posYears": "3/3",
+      "worstMonth": -4.6
+     },
+     "x2": {
+      "total": 85.3,
+      "perYear": 44.5,
+      "maxDD": 11.1,
+      "retDD": 7.69,
+      "t": 2.47,
+      "sharpe": 1.75,
+      "days": 500,
+      "months": 23,
+      "posMonths": 0.61,
+      "activeMonths": 23,
+      "posActiveMonths": 0.61,
+      "years": 3,
+      "posYears": "3/3",
+      "worstMonth": -4.6
+     }
+    },
+    "C": {
+     "x1": {
+      "total": 131,
+      "perYear": 68.4,
+      "maxDD": 12.5,
+      "retDD": 10.46,
+      "t": 2.23,
+      "sharpe": 1.58,
+      "days": 500,
+      "months": 23,
+      "posMonths": 0.65,
+      "activeMonths": 23,
+      "posActiveMonths": 0.65,
+      "years": 3,
+      "posYears": "3/3",
+      "worstMonth": -5.2
+     },
+     "x2": {
+      "total": 129.6,
+      "perYear": 67.6,
+      "maxDD": 12.6,
+      "retDD": 10.27,
+      "t": 2.2,
+      "sharpe": 1.57,
+      "days": 500,
+      "months": 23,
+      "posMonths": 0.65,
+      "activeMonths": 23,
+      "posActiveMonths": 0.65,
+      "years": 3,
+      "posYears": "3/3",
+      "worstMonth": -5.2
+     }
+    }
+   },
+   "corrGold": {
+    "gtrend~gtrend5": 0.96,
+    "gtrend~gtl": 0.09,
+    "gtrend~geg": -0.02,
+    "gtrend~mosha-bo": 0,
+    "gtrend~replica": -0.01,
+    "gtrend~gmp": -0.01,
+    "gtrend5~gtl": 0.08,
+    "gtrend5~geg": -0.03,
+    "gtrend5~mosha-bo": 0,
+    "gtrend5~replica": -0.01,
+    "gtrend5~gmp": -0.01,
+    "gtl~geg": 0.19,
+    "gtl~mosha-bo": 0.05,
+    "gtl~replica": 0.03,
+    "gtl~gmp": 0.08,
+    "geg~mosha-bo": 0.01,
+    "geg~replica": 0.01,
+    "geg~gmp": 0.02,
+    "mosha-bo~replica": -0.01,
+    "mosha-bo~gmp": -0.01,
+    "replica~gmp": 0
+   },
+   "beta": {
+    "A": {
+     "days": 996,
+     "beta": 0.313,
+     "betaT": 4.05,
+     "alpha": 0.507,
+     "alphaT": 5.22,
+     "R2": 0.016,
+     "corr": 0.13,
+     "goldSumPct": 83.3,
+     "betaR": 26.1,
+     "betaShare": 0.05
+    },
+    "B": {
+     "days": 996,
+     "beta": 0.05,
+     "betaT": 1.51,
+     "alpha": 0.145,
+     "alphaT": 3.51,
+     "R2": 0.002,
+     "corr": 0.05,
+     "goldSumPct": 83.3,
+     "betaR": 4.1,
+     "betaShare": 0.03
+    },
+    "C": {
+     "days": 996,
+     "beta": -0.013,
+     "betaT": -0.25,
+     "alpha": 0.218,
+     "alphaT": 3.23,
+     "R2": 0,
+     "corr": -0.01,
+     "goldSumPct": 83.3,
+     "betaR": -1.1,
+     "betaShare": -0.01
+    }
+   },
+   "perMarket": {
+    "A": {
+     "gold": 392.9,
+     "Nasdaq": 126.4,
+     "S&P": 15.3,
+     "Dow": -3.1
+    },
+    "B": {
+     "gold": 148.2
+    },
+    "C": {
+     "gold": 215.8
+    }
+   },
+   "byYear": {
+    "A": {
+     "2023": 69.9,
+     "2024": 154.8,
+     "2025": 205,
+     "2026": 101.8
+    },
+    "B": {
+     "2023": 25.4,
+     "2024": 46.7,
+     "2025": 70.6,
+     "2026": 5.5
+    },
+    "C": {
+     "2023": 34.5,
+     "2024": 60,
+     "2025": 104.8,
+     "2026": 16.5
+    }
+   },
+   "bootstrap": {
+    "draws": 2000,
+    "months": 46,
+    "pairs": {
+     "B-A": {
+      "retDD": {
+       "pGt0": 0.192,
+       "lo90": -23.53,
+       "hi90": 6.62
+      },
+      "t": {
+       "pGt0": 0.006,
+       "lo90": -2.93,
+       "hi90": -0.61
+      }
+     },
+     "C-A": {
+      "retDD": {
+       "pGt0": 0.356,
+       "lo90": -20.37,
+       "hi90": 14.25
+      },
+      "t": {
+       "pGt0": 0.003,
+       "lo90": -3.24,
+       "hi90": -0.84
+      }
+     },
+     "C-B": {
+      "retDD": {
+       "pGt0": 0.92,
+       "lo90": -0.46,
+       "hi90": 11.47
+      },
+      "t": {
+       "pGt0": 0.154,
+       "lo90": -0.72,
+       "hi90": 0.19
+      }
+     }
+    }
+   }
+  }
+ },
+ "verdict": {
+  "window": "W1 untouched 2006-07 .. 2017-12, x1 costs, return / drawdown",
+  "ranking": [
+   {
+    "book": "C",
+    "retDD": 3.9
+   },
+   {
+    "book": "B",
+    "retDD": 3.69
+   },
+   {
+    "book": "A",
+    "retDD": 0.59
+   }
+  ],
+  "best": "C",
+  "runnerUp": "B",
+  "moreThanNoise": false,
+  "tests": {
+   "bootstrapP": 0.785,
+   "bootstrapPass": false,
+   "halvesPass": false,
+   "x2Pass": true
+  },
+  "text": "C, B + Gold trend fast N5 is the best book by return/drawdown on the untouched window (3.9 against 3.69 for B, honest-positive, 0.59 for A, the live book); the difference is within noise on the pre-registered rule (bootstrap P 0.785, both halves no, x2 yes)."
+ }
+}

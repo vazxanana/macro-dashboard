@@ -9912,6 +9912,10 @@ html[data-role="public"] #ms-me-ct { display: none; }
 .ct-empty { color: var(--ink-faint); font-size: 13px; padding: 12px; }
 .ct-chips[hidden] { display: none; } .ct-chips { display: inline-flex; gap: 4px; margin-left: auto; } .ct-chips button { min-height: 30px; padding: 0 10px; border-radius: 999px; border: 1px solid var(--line); background: transparent; color: var(--ink-dim); font: inherit; font-size: 12px; cursor: pointer; }
 .ct-chips button[aria-pressed="true"] { background: var(--accent-soft, rgba(91,140,255,.14)); color: var(--ink); border-color: var(--accent); }
+/* all the owner's demo accounts, one per book (8 Nov): a clickable overview above the selected account's detail */
+.ct-books tbody tr { cursor: pointer; } .ct-books tbody tr:hover td { background: color-mix(in srgb, var(--ink) 4%, transparent); }
+.ct-books tbody tr[aria-selected="true"] td { background: var(--accent-soft, rgba(91,140,255,.14)); } .ct-books tbody tr[aria-selected="true"] td:first-child { box-shadow: inset 2px 0 0 var(--accent); }
+.ct-books .ct-book { font-weight: 650; } .ct-books .ct-err { color: var(--ink-faint); font-size: 12px; white-space: normal; }
 .ct-f { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; color: var(--ink-faint); font-size: 12px; }
 .ct-f .sp { flex: 1; }
 .ct-btn { min-height: 40px; padding: 0 16px; border-radius: 10px; border: 1px solid var(--accent); background: var(--accent); color: #fff; font: inherit; font-weight: 600; cursor: pointer; }
@@ -9939,7 +9943,7 @@ html[data-role="public"] #ms-me-ct { display: none; }
   const userKey = () => ls('ms-user') || (ls('ms-admin') ? 'owner' : null);
   const sessKey = () => 'ms-ct-sess-' + (userKey() || 'x');
   const esc = (x) => String(x == null ? '' : x).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
-  let state = { data: null, days: 30, account: ls('ms-ct-acc-' + (userKey() || 'x')) || '', timer: 0, busy: false };
+  let state = { data: null, all: null, book: ls('ms-ct-book') || '', days: 30, account: ls('ms-ct-acc-' + (userKey() || 'x')) || '', timer: 0, busy: false };
   const dlg = () => $('ms-ct'), body = () => $('ms-ct-b');
   const money = (v, ccy, sign) => { if (v == null || !isFinite(v)) return '—'; let s; try { s = new Intl.NumberFormat(undefined, ccy ? { style: 'currency', currency: ccy, minimumFractionDigits: 2, maximumFractionDigits: 2 } : { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(Math.abs(v)); } catch (e) { s = Math.abs(v).toFixed(2); } return (v < 0 ? '−' : sign && v > 0 ? '+' : '') + s; };
   const cls = (v) => (v > 0 ? 'ct-pos' : v < 0 ? 'ct-neg' : '');
@@ -9968,12 +9972,20 @@ html[data-role="public"] #ms-me-ct { display: none; }
   function render(d) {
     const ccy = d.account && d.account.currency, open = d.open || [], hist = d.history || [], orders = d.orders || [];
     const net = hist.reduce((a, h) => a + (h.net || 0), 0), wins = hist.filter((h) => h.net > 0).length;
-    $('ms-ct-sub').innerHTML = `${esc((d.account && d.account.broker) || 'cTrader')} · ${esc((d.account && (d.account.login || d.account.id)) || '')} · <span class="ct-tag${d.account && d.account.live ? ' live' : ''}">${d.account && d.account.live ? 'Live' : 'Demo'}</span> · view only`;
+    $('ms-ct-sub').innerHTML = `${d.label ? `<b>${esc(d.label)}</b> · ` : ''}${esc((d.account && d.account.broker) || 'cTrader')} · ${esc((d.account && (d.account.login || d.account.id)) || '')} · <span class="ct-tag${d.account && d.account.live ? ' live' : ''}">${d.account && d.account.live ? 'Live' : 'Demo'}</span> · view only`;
+    // the owner's demo accounts, one per book (council / ICT / shadows / LIT / replica): the overview is the switcher
+    const all = state.all || [], tot = (k) => all.reduce((a, x) => a + (x[k] || 0), 0), closed = (x) => (x.history || []).reduce((a, h) => a + (h.net || 0), 0);
+    const books = all.length > 1 ? `<section class="ct-sec"><h4>Accounts <small>${all.length} demo · one per book</small></h4><div class="ct-tw"><table class="ct-t ct-books"><thead><tr><th>Book</th><th class="hide-s">Account</th><th class="n">Balance</th><th class="n hide-s">Equity</th><th class="n">Floating</th><th class="n">Closed · 30 d</th><th class="n hide-s">Open</th></tr></thead><tbody>${all.map((x) => x.error
+        ? `<tr data-book="${esc((x.books || [])[0] || '')}"${x === d ? ' aria-selected="true"' : ''}><td class="ct-book">${esc(x.label)}</td><td colspan="6" class="ct-err">${esc(x.error)}</td></tr>`
+        : `<tr data-book="${esc((x.books || [])[0] || '')}"${x === d ? ' aria-selected="true"' : ''}><td class="ct-book">${esc(x.label)}</td><td class="hide-s">${esc(x.account.login || x.account.id || '')}</td><td class="n">${money(x.balance, x.account.currency)}</td><td class="n hide-s">${money(x.equity, x.account.currency)}</td><td class="n ${cls(x.floating)}">${money(x.floating, x.account.currency, true)}</td><td class="n ${cls(closed(x))}">${money(closed(x), x.account.currency, true)}</td><td class="n hide-s">${(x.open || []).length}${(x.orders || []).length ? ` <small style="color:var(--ink-faint)">+${x.orders.length} resting</small>` : ''}</td></tr>`).join('')}</tbody>
+      ${all.filter((x) => !x.error).length > 1 ? `<tfoot><tr><th>All</th><th class="hide-s"></th><th class="n">${money(tot('balance'), ccy)}</th><th class="n hide-s">${money(tot('equity'), ccy)}</th><th class="n ${cls(tot('floating'))}">${money(tot('floating'), ccy, true)}</th><th class="n ${cls(all.reduce((a, x) => a + closed(x), 0))}">${money(all.reduce((a, x) => a + closed(x), 0), ccy, true)}</th><th class="n hide-s">${all.reduce((a, x) => a + (x.open || []).length, 0)}</th></tr></tfoot>` : ''}</table></div></section>` : '';
     const accSel = (d.accounts || []).length > 1 ? `<div class="ct-acc"><label for="ms-ct-acc" style="font-size:13px;color:var(--ink-dim)">Account</label><select id="ms-ct-acc">${d.accounts.map((a) => `<option value="${esc(a.id)}"${a.id === d.account.id ? ' selected' : ''}>${esc(a.broker || 'cTrader')} · ${esc(a.login || a.id)} · ${a.live ? 'Live' : 'Demo'}</option>`).join('')}</select></div>` : '';
     const openRows = open.map((p) => `<tr><td>${esc(p.symbol)}</td><td><span class="ct-side ${p.side}">${p.side}</span></td><td class="n">${p.lots ?? '—'}</td><td class="n">${px(p.entry)}</td><td class="n hide-s">${px(p.sl)}</td><td class="n hide-s">${px(p.tp)}</td><td class="hide-s">${when(p.openedAt)}</td><td class="n ${cls(p.pnl)}"><b>${money(p.pnl, ccy, true)}</b></td></tr>`).join('');
     const ordRows = orders.map((o) => `<tr><td>${esc(o.symbol)}</td><td><span class="ct-side ${o.side}">${o.side}</span></td><td>${o.type === 2 ? 'Limit' : o.type === 3 ? 'Stop' : 'Order'}</td><td class="n">${o.lots ?? '—'}</td><td class="n">${px(o.price)}</td><td class="n hide-s">${px(o.sl)}</td><td class="n hide-s">${px(o.tp)}</td></tr>`).join('');
     const histRows = hist.slice(0, 200).map((h) => `<tr><td>${when(h.closedAt)}</td><td>${esc(h.symbol)}</td><td><span class="ct-side ${h.side}">${h.side}</span></td><td class="n">${h.lots ?? '—'}</td><td class="n hide-s">${px(h.entry)}</td><td class="n hide-s">${px(h.exit)}</td><td class="n hide-s">${money((h.swap || 0) + (h.commission || 0), ccy)}</td><td class="n ${cls(h.net)}"><b>${money(h.net, ccy, true)}</b></td></tr>`).join('');
-    body().innerHTML = `${accSel}
+    body().innerHTML = `${books}${accSel}
+      ${books ? `<h4 style="margin:0 0 -8px;font-size:14px">${esc(d.label)} account <small style="color:var(--ink-faint);font-weight:500">${esc((d.books || []).map((b) => ({ council: 'the council\'s own trades', ict: 'the ICT desk', shadow: 'shadow variants under test', lit: 'the LIT stream', replica: 'the replica stream' })[b] || b).join(', '))}</small></h4>` : ''}
+      ${d.error ? `<div class="ct-empty">${esc(d.label || '')}: ${esc(d.error)}</div>` : ''}
       <div class="ct-stats"><div><span>Balance</span><b>${money(d.balance, ccy)}</b></div><div><span>Equity</span><b>${money(d.equity, ccy)}</b></div>
         <div><span><i class="ct-live-dot" aria-hidden="true"></i> Floating P&amp;L</span><b class="${cls(d.floating)}">${money(d.floating, ccy, true)}</b></div>
         <div><span>Closed P&amp;L · ${d.days} days</span><b class="${cls(net)}">${money(net, ccy, true)}</b></div></div>
@@ -9983,6 +9995,7 @@ html[data-role="public"] #ms-me-ct { display: none; }
         ${hist.length ? `<div class="ct-tw"><table class="ct-t"><thead><tr><th>Closed</th><th>Symbol</th><th>Side</th><th class="n">Lots</th><th class="n hide-s">Entry</th><th class="n hide-s">Exit</th><th class="n hide-s">Fees + swap</th><th class="n">Net P&amp;L</th></tr></thead><tbody>${histRows}</tbody></table></div>` : `<div class="ct-empty">No closed trades in the last ${d.days} days.</div>`}</section>
       <div class="ct-f"><span>${d.source === 'council' ? `From the council's own connection to your demo account · updated ${new Date(d.at).toLocaleTimeString()} (every few minutes)` : `Updated ${new Date(d.at).toLocaleTimeString()} · refreshes every 15 s while open`}</span><span class="sp"></span><button type="button" class="ct-btn ghost" id="ms-ct-relink">Link other accounts</button>${d.source === 'council' ? '' : '<button type="button" class="ct-btn ghost" id="ms-ct-un">Remove link</button>'}</div>`;
     const sel = $('ms-ct-acc'); if (sel) sel.addEventListener('change', () => { state.account = sel.value; ls('ms-ct-acc-' + (userKey() || 'x'), sel.value); load(true); });
+    body().querySelectorAll('.ct-books tbody tr[data-book]').forEach((tr) => tr.addEventListener('click', () => { state.book = tr.dataset.book; ls('ms-ct-book', state.book); const x = (state.all || []).find((a) => (a.books || [])[0] === state.book); if (x) render(x); }));
     body().querySelectorAll('[data-days]').forEach((b) => b.addEventListener('click', () => { state.days = +b.dataset.days; load(true); }));
     $('ms-ct-relink').addEventListener('click', () => linkForm());
     if ($('ms-ct-un')) $('ms-ct-un').addEventListener('click', async () => { if (!confirm('Remove the cTrader link from your profile? You can link it again later.')) return; try { await call({ action: 'unlink', session: ls(sessKey()) }); state.data = null; linkForm('Link removed.', true); } catch (e) { alert(e.message); } });
@@ -9993,8 +10006,14 @@ html[data-role="public"] #ms-me-ct { display: none; }
     if (!API) { body().innerHTML = '<div class="ct-empty">Open the site on meridianx.dev to link cTrader.</div>'; return; }
     // the owner's demo account needs no link: the council loop publishes it (council/ctrader-account.mjs -> ctrader/account.json)
     if (userKey() === 'owner' && !ls(sessKey())) {
-      try { const r = await fetch((window.MS_CDATA || '/cdata/') + 'ctrader/account.json?t=' + Date.now(), { cache: 'no-store' }); const d = r.ok ? await r.json() : null;
-        if (d && d.account && !d.error) { state.data = d; render(d); return; } } catch (e) {}
+      try {
+        const r2 = await fetch((window.MS_CDATA || '/cdata/') + 'ctrader/accounts.json?t=' + Date.now(), { cache: 'no-store' }); const all = r2.ok ? (await r2.json()).accounts : null;
+        if (Array.isArray(all) && all.some((a) => a.account && !a.error)) {
+          state.all = all; const pick = all.find((a) => (a.books || [])[0] === state.book) || all.find((a) => a.base && !a.error) || all.find((a) => !a.error);
+          state.data = pick; render(pick); return;
+        }
+        const r = await fetch((window.MS_CDATA || '/cdata/') + 'ctrader/account.json?t=' + Date.now(), { cache: 'no-store' }); const d = r.ok ? await r.json() : null;
+        if (d && d.account && !d.error) { state.all = null; state.data = d; render(d); return; } } catch (e) {}
       linkForm(); return;
     }
     if (!ls(sessKey())) { linkForm(); return; }
