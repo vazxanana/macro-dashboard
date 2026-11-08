@@ -486,6 +486,22 @@ bar, `.row.hit`; `hashchange` re-targets). Paper only; it reads the studies' wor
 `tests/research-ledger.test.mjs` (a row for every committed study, the statement parser, digest lines, the ledger file, wiring).
 `node council/research-ledger.mjs <dir> --dry` prints the rows.
 
+## cTrader demo mirror: same-time copies (8 Nov 2026)
+`council/ctrader-mirror.mjs` runs straight after the Trader and the ICT desk in each council round (council.yml). A council trade
+that is still `pending` gets a resting LIMIT order at the broker: price = the council entry, absolute `stopLoss` / `takeProfit` = the
+council levels, GOOD_TILL_DATE at the council's own expiry (`validUntil`: `validFor`, else `WAIT[h]`, else a day; keep `WAIT` in step
+with trader.mjs). State: `state.orders` by trade id (orderId, limitPrice, lots, riskCash); counts toward `maxOpen` and the open risk.
+The broker filling first → the position is adopted by label + comment (`viaLimit`, one open alert); the council filling first → the
+limit is cancelled (`CANCEL_ORDER_REQ`, the only cancel the mirror may send, own orders only) and the usual market order follows the
+same round; the council expiring / missing / dropping the trade → cancelled; a rejected cancel (filled meanwhile) → adopted next round.
+A buy whose entry is above the current price (or a sell below) is left to the council's next candle and copied as a market order. Open
+council trades are copied as market orders with relative distances measured from the council's latest price (snapshot.json `marks`),
+so the demo stop/target equal the council's; a price already past the stop/target or more than `LIMITS.maxDriftR` (1R) into the trade
+is skipped. Minimum-lot orders risking over `LIMITS.maxMinLotRisk` (2%) wait for a bigger balance. Closed market, holidays and the
+capacity caps are waits (symbol paused `LIMITS.pause`), broker rejections skips; notes live while the council trade is open or pending.
+`council/ctrader-reset.json { at }` drops the copied-trade records once per `at` (owner closed everything by hand). Tests:
+`tests/ctrader-mirror.test.mjs` (fake broker with resting orders, `fillOrder`, cancel / cancel-rejected paths).
+
 ## cTrader symbol specs (7 Nov 2026)
 `council/ctrader-symbols.mjs` (each council round, before the mirror; read only through `api/ctrader-link.js`'s `READ_ONLY` session,
 demo only) → council-data `ctrader/symbols.json`: for the broker symbol the mirror picks per market (`markets`, `missing`): lotSize /

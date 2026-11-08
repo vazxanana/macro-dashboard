@@ -3,7 +3,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
-import { mirrorRound, PT, ALLOWED, session, volumeFor, relative, seal, unseal, LIMITS, ictCandidates, orderStep, commentFor, mirrorAlertText, sendMirrorAlerts, riskVolume, quoteRate, specFor, markOf, applyReset } from '../council/ctrader-mirror.mjs';
+import { mirrorRound, PT, ALLOWED, session, volumeFor, relative, seal, unseal, LIMITS, ictCandidates, orderStep, commentFor, mirrorAlertText, sendMirrorAlerts, riskVolume, quoteRate, specFor, markOf, applyReset, validUntil, WAIT, pendingStep, cancelStep } from '../council/ctrader-mirror.mjs';
 
 const ENV = { CTRADER_CLIENT_ID: 'fake-client-id', CTRADER_CLIENT_SECRET: 'fake-client-secret', CTRADER_ACCESS_TOKEN: 'fake-access-old',
   CTRADER_REFRESH_TOKEN: 'fake-refresh-old', CTRADER_ACCOUNT_ID: '4242', CTRADER_ENV: 'demo', CTRADER_MIRROR: 'on' };
@@ -14,8 +14,8 @@ const INFO = { 7: { symbolId: 7, digits: 2, lotSize: 100, minVolume: 1, stepVolu
 // enums as numbers. Options: reject (ORDER_ERROR_EVENT code), execReject (ORDER_REJECTED inside an execution event), fill: 'accepted-only'
 // (no fill event: the position opens/closes later) or 'silent' (order placed, no answer at all), info (symbol overrides).
 function broker({ isLive = false, balance = 1000000, expireFirst = false, reject = null, execReject = false, fill = 'normal', closeFill = 'normal', info = {}, names = SYMS } = {}) {
-  const sent = [], positions = new Map(); let pid = 900, expired = expireFirst;
-  const o = { reject, fill, closeFill };
+  const sent = [], positions = new Map(), orders = new Map(); let pid = 900, expired = expireFirst;
+  const o = { reject, fill, closeFill, rejectPending: null, cancelReject: false };
   class WS {
     constructor(url) { this.url = url; setTimeout(() => this.onopen && this.onopen(), 0); }
     send(text) {
@@ -29,10 +29,21 @@ function broker({ isLive = false, balance = 1000000, expireFirst = false, reject
         case PT.REFRESH_TOKEN_REQ: expired = false; return r(PT.REFRESH_TOKEN_RES, { accessToken: 'fake-access-new', refreshToken: 'fake-refresh-new' });
         case PT.ACCOUNT_AUTH_REQ: return r(PT.ACCOUNT_AUTH_RES, {});
         case PT.TRADER_REQ: return r(PT.TRADER_RES, { trader: { balance, moneyDigits: 2 } });
-        case PT.RECONCILE_REQ: return r(PT.RECONCILE_RES, { position: [...positions.values()] });
+        case PT.RECONCILE_REQ: return r(PT.RECONCILE_RES, { position: [...positions.values()], order: [...orders.values()] });
+        case PT.CANCEL_ORDER_REQ: {
+          const od = orders.get(String(p.orderId));
+          if (!od || o.cancelReject) return r(PT.EXECUTION_EVENT, { executionType: 8, errorCode: 'ORDER_CANCEL_REJECTED', order: { orderId: p.orderId } });
+          orders.delete(String(p.orderId)); return r(PT.EXECUTION_EVENT, { executionType: 5, order: { ...od, orderStatus: 3 } });
+        }
         case PT.SYMBOLS_LIST_REQ: return r(PT.SYMBOLS_LIST_RES, { symbol: names });
         case PT.SYMBOL_BY_ID_REQ: return r(PT.SYMBOL_BY_ID_RES, { symbol: p.symbolId.map((i) => ({ ...INFO[i], ...(info[i] || {}) })) });
         case PT.NEW_ORDER_REQ: {
+          if (p.orderType === 2) {   // LIMIT: rests until the test fills it (fillOrder) or the mirror cancels it
+            if (o.rejectPending) return r(PT.ORDER_ERROR_EVENT, { errorCode: o.rejectPending, description: 'no' });
+            const id = ++pid, od = { orderId: id, orderStatus: 1, orderType: 2, limitPrice: p.limitPrice, stopLoss: p.stopLoss, takeProfit: p.takeProfit, timeInForce: p.timeInForce, expirationTimestamp: p.expirationTimestamp,
+              tradeData: { symbolId: p.symbolId, volume: p.volume, tradeSide: p.tradeSide, label: p.label, comment: p.comment } };
+            orders.set(String(id), od); return r(PT.EXECUTION_EVENT, { executionType: 2, order: od });
+          }
           if (o.reject) return r(PT.ORDER_ERROR_EVENT, { errorCode: o.reject, description: 'no' });
           const id = ++pid, pos = { positionId: id, positionStatus: 1, tradeData: { symbolId: p.symbolId, volume: p.volume, tradeSide: p.tradeSide, label: p.label, comment: p.comment } };
           if (execReject) { r(PT.EXECUTION_EVENT, { executionType: 2, order: { orderId: 5 } }); return r(PT.EXECUTION_EVENT, { executionType: 7, errorCode: 'TRADING_BAD_VOLUME' }, 5); }
@@ -52,7 +63,9 @@ function broker({ isLive = false, balance = 1000000, expireFirst = false, reject
     }
     close() {}
   }
-  return { WS, sent, positions, o, setBalance: (b) => { balance = b; } };
+  const fillOrder = (orderId, price) => { const od = orders.get(String(orderId)); if (!od) throw new Error('no such order'); orders.delete(String(orderId));
+    const id = ++pid; positions.set(String(id), { positionId: id, positionStatus: 1, price, tradeData: { ...od.tradeData } }); return id; };
+  return { WS, sent, positions, orders, o, fillOrder, setBalance: (b) => { balance = b; } };
 }
 const NOW = 1794000000;
 const tr = (o = {}) => ({ id: 'eurusd-intraday-1', market: 'eurusd', k: 'intraday', side: 'buy', entry: 1.1, stop: 1.098, t1: 1.105, rr: 2.5, status: 'open', opened: NOW - 60, filled: NOW - 60, shadow: false, ...o });
@@ -60,7 +73,8 @@ const started = { startedAt: new Date((NOW - 3600) * 1000).toISOString() };
 const types = (b) => b.sent.map((m) => m.payloadType);
 
 test('only allowed message types: amend/cancel/modify are blocked before sending; non-demo host refused', async () => {
-  for (const t of [2107, 2108, 2109, 2110]) assert.equal(ALLOWED.has(t), false);
+  for (const t of [2107, 2109, 2110]) assert.equal(ALLOWED.has(t), false);   // amend order / amend position SL-TP / close-all stay blocked
+  assert.equal(ALLOWED.has(PT.CANCEL_ORDER_REQ), true);   // 8 Nov: the mirror cancels its own resting limit orders
   const b = broker(), s = session(b.WS, (x) => x);
   await assert.rejects(s.send(2110, {}), /not allowed/); s.close(); assert.equal(b.sent.length, 0);
   assert.throws(() => session(b.WS, (x) => x, 'wss://live.ctraderapi.com:5036'), /non-demo/);
@@ -382,7 +396,7 @@ test('alerts never change the trading: same orders, alert flags kept in the save
   r = await mirrorRound({ env: ENV, trades: [tr({ status: 'win', R: 2 })], state: r.state, WS: b.WS, now: NOW + 240 });
   assert.deepEqual(types(b).filter((t) => t === PT.NEW_ORDER_REQ || t === PT.CLOSE_POSITION_REQ), [PT.NEW_ORDER_REQ, PT.CLOSE_POSITION_REQ]);
   assert.equal(r.state.map['eurusd-intraday-1'].status, 'closed by council'); assert.deepEqual(r.state.map['eurusd-intraday-1'].alerted, ['open', 'close']);
-  assert.equal(ALLOWED.size, 11);
+  assert.equal(ALLOWED.size, 12);
 });
 
 // ---- risk-based sizing (owner, 7 Nov: "risk-based lots, bigger demo") -----------------------------------------------------
@@ -507,4 +521,97 @@ test('owner reset: drops the copied-trade records, notes, pauses and day once pe
   r = await mirrorRound({ env: ENV, trades: [tr()], state: first.state, WS: b.WS, now: NOW + 240 });
   assert.equal(orders(b).length, 2); assert.equal(r.state.map['eurusd-intraday-1'].status, 'open'); assert.equal(r.state.day.startBalance, 10000);
   const file = JSON.parse(fs.readFileSync(new URL('../council/ctrader-reset.json', import.meta.url), 'utf8')); assert.match(file.at, /^\d{4}-\d{2}-\d{2}T/);
+});
+
+// ---- 8 Nov (owner: "open at the same time"): resting LIMIT orders for the council's pending trades ----------------------------
+const pend = (o = {}) => tr({ id: 'eurusd-scalp-9', k: 'scalp', status: 'pending', filled: undefined, opened: NOW - 120, h: '15m', entry: 1.1, stop: 1.098, t1: 1.105, ...o });
+const limits = (b) => b.sent.filter((m) => m.payloadType === PT.NEW_ORDER_REQ && m.payload.orderType === 2).map((m) => m.payload);
+const markets = (b) => b.sent.filter((m) => m.payloadType === PT.NEW_ORDER_REQ && m.payload.orderType === 1).map((m) => m.payload);
+const cancels = (b) => b.sent.filter((m) => m.payloadType === PT.CANCEL_ORDER_REQ).map((m) => m.payload);
+const MK = { eurusd: 1.102 };   // price above the buy entry: a limit buy rests below
+
+test('pending council trade -> one resting LIMIT at the council entry with absolute stop/target, valid to the council expiry; never twice', async () => {
+  const b = broker(); let r = await mirrorRound({ env: ENV, trades: [pend()], state: started, WS: b.WS, now: NOW, marks: MK });
+  const o = limits(b)[0]; assert.equal(limits(b).length, 1); assert.equal(markets(b).length, 0);
+  assert.equal(o.orderType, 2); assert.equal(o.tradeSide, 1); assert.equal(o.limitPrice, 1.1); assert.equal(o.stopLoss, 1.098); assert.equal(o.takeProfit, 1.105); assert.equal(o.volume, 100000);
+  assert.equal(o.timeInForce, 1); assert.equal(o.expirationTimestamp, (NOW - 120 + WAIT['15m']) * 1000); assert.equal(o.label, 'council'); assert.match(o.comment, /eurusd-scalp-9/);
+  assert.equal(validUntil(pend()), NOW - 120 + 3 * 3600); assert.equal(validUntil(pend({ validFor: 600 })), NOW - 120 + 600); assert.equal(validUntil(pend({ h: 'zz' })), NOW - 120 + 86400);
+  const rec = r.state.orders['eurusd-scalp-9']; assert.equal(rec.orderId, '901'); assert.equal(rec.limitPrice, 1.1); assert.equal(rec.riskCash, 2); assert.equal(rec.lots, 0.01);
+  assert.deepEqual(r.alerts.map((a) => a.kind), ['pending']); const txt = mirrorAlertText(r.alerts[0], NOW); assert.match(txt.title, /limit placed · BUY EURUSD 0.01 lot/); assert.match(txt.msg, /Resting at 1.10000 · stop 1.09800 · target 1.10500/);
+  assert.match(r.state.status, /0 open · 1 resting/);
+  r = await mirrorRound({ env: ENV, trades: [pend()], state: r.state, WS: b.WS, now: NOW + 240, marks: MK });
+  assert.equal(limits(b).length, 1); assert.equal(r.sent.length, 0); assert.equal(b.orders.size, 1);
+  // a trailing system (rr >= 50): no take profit on the limit either
+  const b2 = broker(); await mirrorRound({ env: ENV, trades: [pend({ rr: 99, t1: 2 })], state: started, WS: b2.WS, now: NOW, marks: MK });
+  assert.equal('takeProfit' in limits(b2)[0], false); assert.equal(limits(b2)[0].stopLoss, 1.098);
+});
+
+test('the broker fills the limit first -> the position is adopted (limit filled), the order record goes, one open alert', async () => {
+  const b = broker(); let r = await mirrorRound({ env: ENV, trades: [pend()], state: started, WS: b.WS, now: NOW, marks: MK });
+  const pid = b.fillOrder(r.state.orders['eurusd-scalp-9'].orderId, 1.1);
+  r = await mirrorRound({ env: ENV, trades: [pend()], state: r.state, WS: b.WS, now: NOW + 240, marks: MK });   // the council still says pending
+  const m = r.state.map['eurusd-scalp-9']; assert.equal(m.status, 'open'); assert.equal(m.positionId, String(pid)); assert.equal(m.viaLimit, true); assert.equal(m.limitPrice, 1.1); assert.equal(m.fillPrice, 1.1); assert.equal(m.slipR, 0);
+  assert.equal(m.riskCash, 2); assert.equal(m.lots, 0.01); assert.equal(r.state.orders['eurusd-scalp-9'], undefined); assert.equal(markets(b).length, 0);
+  assert.deepEqual(r.alerts.map((a) => a.kind), ['open']); assert.match(mirrorAlertText(r.alerts[0], NOW).msg, /^Limit filled at 1.10000/);
+  // the council then fills too: nothing more is sent; the council closing it closes the position
+  r = await mirrorRound({ env: ENV, trades: [pend({ status: 'open', filled: NOW + 200 })], state: r.state, WS: b.WS, now: NOW + 480, marks: MK }); assert.equal(r.sent.length, 0);
+  r = await mirrorRound({ env: ENV, trades: [pend({ status: 'win', R: 2.5 })], state: r.state, WS: b.WS, now: NOW + 720, marks: MK });
+  assert.equal(r.state.map['eurusd-scalp-9'].status, 'closed by council'); assert.equal(b.positions.size, 0);
+  // the council marks it missed while the broker had filled: the demo position is closed (council book wins)
+  const b3 = broker(); r = await mirrorRound({ env: ENV, trades: [pend()], state: started, WS: b3.WS, now: NOW, marks: MK }); b3.fillOrder(r.state.orders['eurusd-scalp-9'].orderId, 1.1);
+  r = await mirrorRound({ env: ENV, trades: [pend({ status: 'missed' })], state: r.state, WS: b3.WS, now: NOW + 240, marks: MK });
+  assert.equal(r.state.map['eurusd-scalp-9'].status, 'closed by council'); assert.equal(b3.positions.size, 0);
+});
+
+test('the council ends or drops a pending trade -> the resting limit is cancelled; filled on the council feed first -> cancel then market order', async () => {
+  let b = broker(); let r = await mirrorRound({ env: ENV, trades: [pend()], state: started, WS: b.WS, now: NOW, marks: MK });
+  r = await mirrorRound({ env: ENV, trades: [pend({ status: 'expired' })], state: r.state, WS: b.WS, now: NOW + 240, marks: MK });
+  assert.equal(cancels(b).length, 1); assert.equal(cancels(b)[0].orderId, 901); assert.equal(b.orders.size, 0); assert.equal(r.state.orders['eurusd-scalp-9'], undefined);
+  assert.deepEqual(r.alerts.map((a) => a.kind), ['cancel']); assert.match(mirrorAlertText(r.alerts[0], NOW).msg, /the council ended it: expired/); assert.deepEqual(r.sent, [{ type: 'cancel', trade: 'eurusd-scalp-9' }]);
+  // dropped from the council's list altogether
+  b = broker(); r = await mirrorRound({ env: ENV, trades: [pend()], state: started, WS: b.WS, now: NOW, marks: MK });
+  r = await mirrorRound({ env: ENV, trades: [], state: r.state, WS: b.WS, now: NOW + 240, marks: MK }); assert.equal(b.orders.size, 0); assert.match(r.log.at(-1).msg, /dropped the trade/);
+  // the council's feed saw the touch first: cancel, then the usual market order the same round (levels from the mark)
+  b = broker(); r = await mirrorRound({ env: ENV, trades: [pend()], state: started, WS: b.WS, now: NOW, marks: MK });
+  r = await mirrorRound({ env: ENV, trades: [pend({ status: 'open', filled: NOW + 200 })], state: r.state, WS: b.WS, now: NOW + 240, marks: { eurusd: 1.1002 } });
+  assert.equal(cancels(b).length, 1); assert.equal(markets(b).length, 1); assert.equal(r.state.map['eurusd-scalp-9'].status, 'open'); assert.equal(r.state.orders['eurusd-scalp-9'], undefined);
+  assert.deepEqual(r.alerts.map((a) => a.kind), ['cancel', 'open']); assert.match(mirrorAlertText(r.alerts[0], NOW).msg, /a market order follows/);
+  // the cancel is rejected (the broker filled it meanwhile): no market order; the position is adopted next round
+  b = broker(); r = await mirrorRound({ env: ENV, trades: [pend()], state: started, WS: b.WS, now: NOW, marks: MK });
+  b.o.cancelReject = true; r = await mirrorRound({ env: ENV, trades: [pend({ status: 'open', filled: NOW + 200 })], state: r.state, WS: b.WS, now: NOW + 240, marks: { eurusd: 1.1002 } });
+  assert.equal(markets(b).length, 0); assert.ok(r.state.orders['eurusd-scalp-9']); assert.match(r.log.at(-1).msg, /cancel .* failed/);
+  b.o.cancelReject = false; b.fillOrder('901', 1.1);
+  r = await mirrorRound({ env: ENV, trades: [pend({ status: 'open', filled: NOW + 200 })], state: r.state, WS: b.WS, now: NOW + 480, marks: { eurusd: 1.1002 } });
+  assert.equal(markets(b).length, 0); assert.equal(r.state.map['eurusd-scalp-9'].status, 'open'); assert.equal(r.state.map['eurusd-scalp-9'].viaLimit, true);
+});
+
+test('pending: waits without a price, when the entry is on the wrong side of it, near the council expiry, or on a paused symbol; shadows off skips shadows', async () => {
+  let b = broker(); let r = await mirrorRound({ env: ENV, trades: [pend()], state: started, WS: b.WS, now: NOW });
+  assert.equal(limits(b).length, 0); assert.match(r.state.wait['eurusd-scalp-9'].why, /no current council price/);
+  b = broker(); r = await mirrorRound({ env: ENV, trades: [pend()], state: started, WS: b.WS, now: NOW, marks: { eurusd: 1.099 } });   // buy entry above the price
+  assert.equal(limits(b).length, 0); assert.match(r.state.wait['eurusd-scalp-9'].why, /entry 1.1 is above the price 1.099/);
+  b = broker(); r = await mirrorRound({ env: ENV, trades: [pend({ side: 'sell', entry: 1.1, stop: 1.102, t1: 1.095 })], state: started, WS: b.WS, now: NOW, marks: { eurusd: 1.099 } });   // sell limit above the price: fine
+  assert.equal(limits(b).length, 1); assert.equal(limits(b)[0].tradeSide, 2); assert.equal(limits(b)[0].stopLoss, 1.102); assert.equal(limits(b)[0].takeProfit, 1.095);
+  b = broker(); r = await mirrorRound({ env: ENV, trades: [pend({ validFor: 150 })], state: started, WS: b.WS, now: NOW, marks: MK });   // expires in 30 s
+  assert.equal(limits(b).length, 0); assert.match(r.state.wait['eurusd-scalp-9'].why, /expires within a minute/);
+  b = broker({}); b.o.rejectPending = 'MARKET_CLOSED'; r = await mirrorRound({ env: ENV, trades: [pend(), pend({ id: 'eurusd-scalp-10' })], state: started, WS: b.WS, now: NOW, marks: MK });
+  assert.equal(limits(b).length, 1); assert.ok(r.state.paused['EURUSD:pending']); assert.equal(r.state.paused.EURUSD, undefined); assert.match(r.state.wait['eurusd-scalp-10'].why, /paused until/);
+  b.o.rejectPending = null; r = await mirrorRound({ env: ENV, trades: [pend(), pend({ id: 'eurusd-scalp-10' })], state: r.state, WS: b.WS, now: NOW + LIMITS.pause + 60, marks: MK });
+  assert.equal(limits(b).length, 3); assert.equal(Object.keys(r.state.orders).length, 2);
+  b = broker(); r = await mirrorRound({ env: ENV, trades: [pend({ shadow: true })], state: started, WS: b.WS, now: NOW, marks: MK, shadows: false }); assert.equal(limits(b).length, 0);
+  // ICT trades are never placed as limits (the desk reports fills only)
+  const ict = [{ id: 'nq-b-2', market: 'nq', side: 'buy', entry: 20000, stop: 19950, t1: null, status: 'pending', opened: NOW - 60, grade: 'A', setup: 'ict-A' }];
+  b = broker(); r = await mirrorRound({ env: ENV, trades: ictCandidates(ict), state: started, WS: b.WS, now: NOW, marks: { nq: 20100 } }); assert.equal(limits(b).length, 0);
+});
+
+test('pending: a resting order counts toward the open cap and the open risk; gone at the broker -> counted wait, placed again', async () => {
+  const b = broker(); const many = Array.from({ length: LIMITS.maxOpen }, (_, i) => pend({ id: 'p' + i }));
+  let r = await mirrorRound({ env: ENV, trades: many.concat([pend({ id: 'extra' })]), state: started, WS: b.WS, now: NOW, marks: MK });
+  assert.equal(limits(b).length, LIMITS.maxOpen); assert.match(r.state.wait.extra.why, /already open/); assert.match(r.state.status, /0 open · 40 resting/);
+  const b2 = broker(); r = await mirrorRound({ env: ENV, trades: [pend()], state: started, WS: b2.WS, now: NOW, marks: MK });
+  b2.orders.clear();   // expired at the broker, no position
+  r = await mirrorRound({ env: ENV, trades: [pend()], state: r.state, WS: b2.WS, now: NOW + 240, marks: MK });
+  assert.equal(limits(b2).length, 2); assert.equal(Object.keys(r.state.orders).length, 1); assert.ok(r.log.some((l) => /gone at the broker/.test(l.msg)));
+  assert.equal(pendingStep({ executionType: 2 }), 'done'); assert.ok(pendingStep({ executionType: 7, errorCode: 'X' }) instanceof Error);
+  assert.equal(cancelStep({ executionType: 5 }), 'done'); assert.equal(cancelStep({ executionType: 2 }), 'wait'); assert.ok(cancelStep({ executionType: 8 }) instanceof Error);
 });
