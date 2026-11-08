@@ -31,6 +31,8 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { injectSection } from './analyst.mjs';
 import { EVENTS, HISTORY } from './events.mjs';
+// Gold Macro Score (8 Nov, owner: the macro-agent-demo skill's directional engine): council/macroscore.mjs, a paper reading
+import { goldMacroScore, scoreLine, dxyDaily, dailyRows, weeklyFrame, isoDay as isoW } from './macroscore.mjs';
 
 const DAY = 86400;
 export const MD_BASE = process.env.MD_BASE || 'https://meridianx.dev/md/';
@@ -616,12 +618,12 @@ async function treasuryFallback(fetchImpl, now, data, src) {
     if (r10) { data.fred.DFII10 = r10; note('DFII10', 'Treasury real 10Y ok'); } }
   if (need('T10YIE') && y10 && data.fred.DFII10) { const b = by(data.fred.DFII10); data.fred.T10YIE = y10.filter((o) => b.has(o.t)).map((o) => ({ t: o.t, v: +(o.v - b.get(o.t)).toFixed(3) })); note('T10YIE', 'Treasury 10Y − real 10Y ok'); }
 }
+const FRED_TRY = [[{ 'User-Agent': 'macro-dashboard-council/1.0 (+https://meridianx.dev)', Accept: 'text/csv,*/*' }, 20000], [UA, 10000]];
 export async function gather(fetchImpl, now, cache = {}) {
   const src = {}, data = { fred: {}, bars: {}, cot: [], cal: [], rss: [] };
   const cosd = iso(now - 5 * 365 * DAY);
   // FRED: four at a time; a plain client first, then once more with a browser user agent. After 4 series in a row fail,
   // FRED counts as unreachable for this run and the rest go straight to the fallbacks (the run has a 3-minute budget).
-  const FRED_TRY = [[{ 'User-Agent': 'macro-dashboard-council/1.0 (+https://meridianx.dev)', Accept: 'text/csv,*/*' }, 20000], [UA, 10000]];
   let fredFails = 0;
   await pool(FRED, 4, async (id) => {
     let r = { err: 'skipped: FRED unreachable this run' }, obs = [];
@@ -675,6 +677,38 @@ export async function gather(fetchImpl, now, cache = {}) {
   return { data, src };
 }
 
+// ─── Gold Macro Score inputs (8 Nov) ───────────────────────────────────────────────────────────
+// Twenty years of DFII10 / DGS2 / DGS10 from FRED (the expanding z-scores need the history; gather() stops at 5 years), the
+// ICE DXY from the council's own daily candle cache (council-data research/daily/*.json, since 2002) and gold's daily closes
+// for the 10-week tiebreaker. A failed FRED read falls back to the weekly values kept in macro/cache.json plus this run's
+// 5-year daily data, so one bad fetch does not blank the score.
+export const SCORE_FRED = ['DFII10', 'DGS2', 'DGS10'];
+export async function scoreSeries(fetchImpl, now, { dir = 'data', data = { fred: {}, bars: {} }, cache = {}, src = {} } = {}) {
+  const out = {}, C = (cache.score && cache.score.fred) || {};
+  for (const id of SCORE_FRED) {
+    let obs = [], err = '';
+    for (const [h, ms] of FRED_TRY) { const r = await get(fetchImpl, `https://fred.stlouisfed.org/graph/fredgraph.csv?id=${id}&cosd=2006-01-01`, 'text', ms, h); err = r.err || err; obs = r.body ? parseFredCsv(r.body) : []; if (obs.length) break; }
+    if (obs.length) { out[id] = obs; src[`score:${id}`] = `ok, ${obs.length} days to ${iso(obs[obs.length - 1].t)}`; continue; }
+    const wk = (C[id] || []).map(([d, v]) => ({ t: Date.parse(d + 'T00:00:00Z') / 1000, v })), recent = (data.fred && data.fred[id]) || [];
+    const lastW = wk.length ? wk[wk.length - 1].t : -Infinity;
+    out[id] = wk.concat(recent.filter((o) => o.t > lastW));
+    src[`score:${id}`] = out[id].length ? `FRED long history failed (${err || 'empty'}): ${wk.length} cached weeks + ${recent.length} recent days` : `failed (${err || 'empty'})`;
+  }
+  const rd = (k) => { try { return dailyRows(JSON.parse(fs.readFileSync(path.join(dir, 'research', 'daily', `${k}.json`), 'utf8'))); } catch (e) { return null; } };
+  const fromBars = (k) => ((data.bars && data.bars[k]) || []).map((b) => ({ t: Math.floor(b.time / DAY) * DAY, v: b.close }));
+  const daily = {}; let cached = 0;
+  for (const k of ['eurusd', 'usdjpy', 'gbpusd', 'usdcad', 'usdchf']) { const d = rd(k); if (d && d.length) { daily[k] = d; cached++; } else daily[k] = fromBars(k); }
+  const dxy = dxyDaily(daily), goldD = rd('xau'), gold = goldD && goldD.length ? goldD : fromBars('gold');
+  src['score:dxy'] = dxy.length ? `${dxy.length} days (${cached === 5 ? 'daily cache since ' + iso(dxy[0].t) : `${cached} of 5 pairs cached, rest from this run's bars`})` : 'no DXY (pairs missing)';
+  return { ry: out.DFII10 || [], y2: out.DGS2 || [], y10: out.DGS10 || [], dxy, gold };
+}
+// weekly [date, value] per series for macro/cache.json (small, and enough to rebuild the score when FRED is down)
+export function scoreCache(S) {
+  const fred = {};
+  for (const [id, key] of [['DFII10', 'ry'], ['DGS2', 'y2'], ['DGS10', 'y10']]) { const F = weeklyFrame({ v: S[key] || [] }, '2006-01-01'); fred[id] = F.weeks.map((t, i) => [isoW(t), F.cols.v[i]]).filter(([, v]) => v != null); }
+  return { fred };
+}
+
 // ─── history: an append-only log, one forecast per asset per target day ───────────────────────────────────────────────
 // The entry is written once, at the first run from LOG_FROM hours before the day opens (21:00 UTC ≈ the 17:00 New York
 // roll) and before it opens; it is never rewritten. It is resolved on the day's close (up = close > open).
@@ -718,6 +752,7 @@ export function makeBrief(fc) {
     const up = f.score >= 0 ? 'up' : 'down', pro = f.drivers.filter((d) => d.dir === up).slice(0, 2).map((d) => short(d.name)), con = f.drivers.filter((d) => d.dir !== up).slice(0, 1).map((d) => short(d.name));
     L.push(`${ASSETS[a].label}: ${pct(f.pUp)} up (base rate ${f.fit ? pct(f.fit.base) : '?'}; ${leanWord(f.pUp, f.fit ? f.fit.base : 0.5)}${f.fit && f.fit.b === 0 ? ', the replay finds no edge in its drivers' : ''}).${pro.length ? ` Drivers lean ${up}: ${pro.join(', ')}${con.length ? `; against: ${con[0]}` : ''}.` : ''} Expected move ±${f.expMovePct ?? '?'}%${f.volModel && f.volModel !== 'naive' ? ` (${VOL_NAMES[f.volModel]})` : ' (20-day average)'}.`); }
   if (fc.dxy) L.push(`DXY: ${pct(fc.dxy.pUp)} up (mirror of EUR/USD).`);
+  if (fc.goldScore) L.push(scoreLine(fc.goldScore));
   const ev = fc.playbook.slice(0, 4);
   if (ev.length) L.push('Coming up: ' + ev.map((e) => `${e.country} ${e.title} ${WD.format(new Date(e.at))} ${HM.format(new Date(e.at))} UTC${e.consensus ? ` (consensus ${e.consensus}, previous ${e.previous || '—'})` : ''}${e.outcome ? `, came in ${e.outcome}` : `: if ${e.scenarios[0].name}, gold ${e.scenarios[0].moves.gold}, USD ${usdOf(e.scenarios[0].moves.eurusd)}, NQ ${e.scenarios[0].moves.nq}; gold usually moves ±${e.expMovePct.gold}%`}`).join('; ') + '.');
   else L.push(`No high-impact events in the next 5 days on the calendar we could read${fc.sources && /failed/.test(fc.sources['calendar:nextweek'] || '') ? " (next week's calendar is not published yet; it usually appears over the weekend)" : ''}.`);
@@ -742,6 +777,7 @@ export const MACRO_START = '<!-- macro:start -->', MACRO_END = '<!-- macro:end -
 export function macroSection(fc) {
   if (!fc || !fc.assets) return '';
   const out = [MACRO_START, '## Macro strategist', '', `Built by the Macro strategist at ${fc.at.slice(0, 16).replace('T', ' ')} UTC for ${fc.target} (paper only, changes no rule or trade; full view in macro/forecast.json). Regime: **${fc.regime.label}**.`, '',
+    ...(fc.goldScore ? [scoreLine(fc.goldScore).replace(/\|/g, '/'), ''] : []),
     '| Market | P(up) | Lean | Exp. move | Main drivers | Replay hit / base | Brier vs coin |', '|---|---|---|---|---|---|---|'];
   for (const a of AK) { const f = fc.assets[a], sc = fc.scorecard.replay[a] || {};
     out.push(`| ${ASSETS[a].label} | ${f && f.pUp != null ? pct(f.pUp) : '—'} | ${f && f.pUp != null ? leanWord(f.pUp, f.fit ? f.fit.base : 0.5) : '—'} | ${f && f.expMovePct != null ? `±${f.expMovePct}% (${f.volModel === 'naive' || !f.volModel ? '20-day avg' : f.volModel})` : '—'} | ${f ? f.drivers.slice(0, 3).map((d) => `${short(d.name)} ${d.dir}`).join('; ').replace(/\|/g, '/') : '—'} | ${sc.n ? `${pct(sc.hit)} / ${pct(sc.base)} (${sc.n} d)` : '—'} | ${sc.n ? `${sc.brier} vs 0.25` : '—'} |`); }
@@ -751,7 +787,7 @@ export function macroSection(fc) {
 }
 
 // ─── one run ───────────────────────────────────────────────────────────────────────────────────────────────────────────
-export function buildForecast(data, now, { src = {}, history = [], eventLog = [] } = {}) {
+export function buildForecast(data, now, { src = {}, history = [], eventLog = [], goldScore = null } = {}) {
   const D = targetDay(now), Dn = iso(D), cal = data.cal || [];
   const dk = dayKind(D, cal);
   const f = features(data, D, { fomcDay: dk.type === 'FOMC' }), { list, smile, carry } = drivers(f);
@@ -791,7 +827,7 @@ export function buildForecast(data, now, { src = {}, history = [], eventLog = []
     drivers: list.map((d) => ({ k: d.k, name: d.name, cluster: d.cluster, vote: d.v, detail: d.detail, weights: W[d.k] || {}, ...(d.map ? { perAsset: d.map } : {}) })),
     playbook, news, scorecard: { replay: scRe, live, vol: vs, volMethod: VOL_METHOD, replayDays: rp.Ds.length, driverHit: drvRe, logged: history.length, resolved: history.filter((h) => h.y != null).length,
       method: 'Walk-forward: each replay day uses only data published before it (FRED with publication lags, candles before the day); the score-to-probability map (anchored on the base up-rate, strongly shrunk, capped 35-65%) is refitted every 20 days on earlier days only (needs 120). Target: the next UTC weekday candle, up if close > open. Base rate = the share of the more common direction; coin flip (random walk) = 50% every day, Brier 0.25. Pesaran-Timmermann above 1.96 = direction calls better than chance. A 53% hit rate needs about 1,100 forecasts to tell from luck. The live log is append-only, written from 21:00 UTC before each day opens.' },
-    sources: src };
+    sources: src, goldScore };
   fc.brief = makeBrief(fc);
   return fc;
 }
@@ -803,13 +839,15 @@ export async function run({ dir = 'data', fetchImpl = globalThis.fetch, now = Ma
   const { data, src } = await gather(fetchImpl, now, cache);
   const eventLog = logEvents(rd('events.json', []), data.cal || []);
   let history = resolveHistory(rd('history.json', []), data.bars);
-  const fc = buildForecast(data, now, { src, history, eventLog });
+  const S = await scoreSeries(fetchImpl, now, { dir, data, cache, src }), goldScore = goldMacroScore(S, { asOf: now });
+  const fc = buildForecast(data, now, { src, history, eventLog, goldScore });
   history = updateHistory(history, fc, now).slice(-3000);
   const w = (f, v, pretty = true) => { const s = pretty ? JSON.stringify(v, null, 1) : JSON.stringify(v); const p = path.join(M, f); let old = null; try { old = fs.readFileSync(p, 'utf8'); } catch (e) {} if (old !== s) fs.writeFileSync(p, s); };
   w('forecast.json', fc); w('history.json', history); w('events.json', eventLog);
   // last good copies, so one failed fetch does not blank the drivers (no timestamps: the file only changes with new data)
   const nc = { fred: {}, cal: data.cal && data.cal.length ? data.cal : cache.cal || [], cot: data.cot && data.cot.length ? data.cot : cache.cot || [] };
   for (const id of [...FRED, 'ECB2Y']) if (data.fred[id] && data.fred[id].length) nc.fred[id] = data.fred[id].slice(-300).map((o) => [iso(o.t), o.v]); else if (cache.fred && cache.fred[id]) nc.fred[id] = cache.fred[id];
+  nc.score = S.ry.length && S.y2.length && S.y10.length ? scoreCache(S) : cache.score || null;
   w('cache.json', nc, false);
   try { const fA = path.join(dir, 'analysis', 'latest.md');
     if (fs.existsSync(fA)) { const md = fs.readFileSync(fA, 'utf8'), nx = injectSection(md, macroSection(fc), MACRO_START, MACRO_END); if (nx !== md) fs.writeFileSync(fA, nx); } } catch (e) { log('macro: analysis section skipped:', e.message); }

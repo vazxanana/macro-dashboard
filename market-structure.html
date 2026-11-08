@@ -2965,6 +2965,7 @@ html[data-motion="off"] #v-ict .ict-cal-d:hover { transform: none !important; }
           <div class="md-evday" id="ms-md-evday" hidden></div>
           <ul class="md-mv" id="ms-md-mv" aria-label="Expected move per market"></ul>
           <p class="md-foot" id="ms-md-dxy"></p>
+          <p class="md-foot md-score" id="ms-md-score"></p>
         </div>
         <div class="card md-ev">
           <div class="ms-k"><span role="heading" aria-level="3">Calendar · high-impact releases</span></div>
@@ -10303,6 +10304,17 @@ html[data-role="public"] #ms-me-ct { display: none; }
     }).join('');
   }
 
+  // ─── Gold Macro Score (8 Nov, council/macroscore.mjs: the macro-agent-demo skill's directional engine; paper reading) ───
+  function renderScore(f) {
+    var el = $('ms-md-score'), s = f.goldScore; if (!el) return;
+    if (!s || !s.ok) { el.innerHTML = 'Gold Macro Score: <b>n/a</b>' + (s && s.why ? ' (' + esc(s.why) + ')' : '') + '.'; return; }
+    var sg = function (v) { return v == null ? '—' : (v > 0 ? '+' : '') + Number(v).toFixed(2); };
+    var cls = s.bias === 'BUY' ? 'pos' : '';
+    el.innerHTML = 'Gold Macro Score <b class="' + cls + '">' + sg(s.score) + '</b> → <b class="' + cls + '">' + esc(s.label) + '</b> · real yield 4w z ' + sg(s.z.ry4w) + ', DXY 4w z ' + sg(s.z.dxy4w) + ', 2Y 13w z ' + sg(s.z.y2_13w) + ', curve 13w z ' + sg(s.z.curve13w)
+      + ' · 6-week path ' + esc(s.path.map(sg).join(' → ')) + ' · week to ' + esc(s.asOf) + (s.partial ? ' (not closed)' : '') + (s.trend ? ' · gold ' + (s.trend.above10w ? 'above' : 'below') + ' its 10-week average' : '')
+      + '. <span title="Four pre-specified drivers, weekly, expanding z-scores (2007-26 test: IC +0.15, score > +0.25 → +2.2% next 4 weeks, up 69%; a negative score predicts nothing, so it is never a sell). Paper reading: nothing trades or sizes on it.">Direction only, never a sell; paper reading.</span>';
+  }
+
   // ─── next day ───
   function modelRows(k, f) {
     var v = ((f.scorecard || {}).vol || {})[k]; if (!v) return '';
@@ -10528,7 +10540,7 @@ html[data-role="public"] #ms-me-ct { display: none; }
   }
   function render() {
     var f = D.f; if (!f || !f.assets) return;
-    var parts = [renderHead, renderNext, renderSmile, renderGauges, renderEvents, renderRecord, renderMore];
+    var parts = [renderHead, renderNext, renderScore, renderSmile, renderGauges, renderEvents, renderRecord, renderMore];
     parts.forEach(function (fn) { try { fn(f); } catch (e) { if (window.console) console.warn('macro desk: ' + (fn.name || 'part') + ' failed', e); } });
   }
 
