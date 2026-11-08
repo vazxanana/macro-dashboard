@@ -107,3 +107,9 @@ test('replay liquidFrom: CNBC intraday is kept only from the stretch where the c
   assert.equal(liquidFrom(tail), t0 + 60 * 86400);
   assert.ok(LIQ.min > 0.06 && LIQ.min < 0.5, 'between the deferred (<= 6 %) and front (>= 50 %) weekly volume shares, the cut moves by days only (liqsens.mjs)');
 });
+
+test('the ICT desk shows the roll state the tracker publishes (snapshot markets[k].d1Roll / switched)', () => {
+  const html = fs.readFileSync(new URL('../market-structure.html', import.meta.url), 'utf8');
+  assert.match(html, /m && m\.switched \? `<div class="sub roll"/); assert.match(html, /m && m\.d1Roll \? `<div class="sub roll"/);
+  assert.match(html, /contract switch on \$\{switched\.join\(', '\)\}/);
+});
