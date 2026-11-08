@@ -69,3 +69,13 @@ test('profile key: only Fred, only with his password', async () => {
   const r = await mk({ action: 'mykey', user: 'fred', pw: 'wrong' });   // the user list fails closed here (no Blob): never a URL
   assert.notEqual(r.code, 200); assert.ok(!JSON.stringify(r.body).includes('abcdefghijklmnopqrstuvwx'));
 });
+
+test('Fred\'s key is derived from a server secret, stable, and MCP_KEYS overrides it', () => {
+  const env = { CTRADER_LINK_KEY: 'link-secret' };
+  const k = L.derivedKey('fred', env); assert.equal(k.length, 32); assert.equal(k, L.derivedKey('fred', env)); assert.notEqual(k, L.derivedKey('fred', { CTRADER_LINK_KEY: 'other' }));
+  assert.equal(L.derivedKey('orlando', env), null, 'profile users only'); assert.equal(L.derivedKey('fred', {}), null);
+  assert.equal(L.keyFor('fred', env), k); assert.equal(L.keyFor('fred', { ...env, MCP_KEYS: 'fred:overrideoverrideoverride' }), 'overrideoverrideoverride');
+  delete process.env.MCP_KEYS; process.env.CTRADER_LINK_KEY = 'link-secret';
+  assert.equal(L.whoIs(k), 'fred'); assert.equal(L.whoIs(k.slice(0, 31) + (k[31] === 'A' ? 'B' : 'A')), null);
+  delete process.env.CTRADER_LINK_KEY;
+});
