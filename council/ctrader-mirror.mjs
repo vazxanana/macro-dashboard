@@ -9,7 +9,9 @@
 //   * OFF unless CTRADER_MIRROR=on. Without the CTRADER_* secrets it does nothing.
 //   * Only these message types can be sent: auth, account list, trader, reconcile, symbols, token refresh, heartbeat, NEW ORDER
 //     (market, or a LIMIT order for a council trade that is still pending), CANCEL ORDER (only the mirror's own pending orders, by
-//     label + comment) and CLOSE POSITION. No amend.
+//     label + comment), AMEND POSITION SL/TP (only the mirror's own positions, when the council moves a stop or target: break-even,
+//     trailing; 8 Nov, owner: "yes, mirror the stop moves to ctrader, i approve the amend") and CLOSE POSITION. No amend of orders,
+//     no close-all.
 //   * Same time as the council (8 Nov, owner): the council records a trade as `pending` at its entry level and fills it when a
 //     later candle touches that level. The mirror now places the same LIMIT order at the broker (price = the council entry, absolute
 //     stop and target = the council levels, valid until the council's own expiry), so the demo fills on the same touch at the same
@@ -51,13 +53,14 @@ import { sendAlerts, when, NTFY_DEFAULT } from './alerts.mjs';
 export const DEMO_HOST = 'wss://demo.ctraderapi.com:5036';
 export const PT = {
   APP_AUTH_REQ: 2100, APP_AUTH_RES: 2101, ACCOUNT_AUTH_REQ: 2102, ACCOUNT_AUTH_RES: 2103,
-  NEW_ORDER_REQ: 2106, CANCEL_ORDER_REQ: 2108, CLOSE_POSITION_REQ: 2111, SYMBOLS_LIST_REQ: 2114, SYMBOLS_LIST_RES: 2115,
+  NEW_ORDER_REQ: 2106, CANCEL_ORDER_REQ: 2108, AMEND_POSITION_SLTP_REQ: 2110, CLOSE_POSITION_REQ: 2111, SYMBOLS_LIST_REQ: 2114, SYMBOLS_LIST_RES: 2115,
   SYMBOL_BY_ID_REQ: 2116, SYMBOL_BY_ID_RES: 2117, TRADER_REQ: 2121, TRADER_RES: 2122, RECONCILE_REQ: 2124, RECONCILE_RES: 2125,
   EXECUTION_EVENT: 2126, ORDER_ERROR_EVENT: 2132, OA_ERROR_RES: 2142, ACCOUNTS_BY_TOKEN_REQ: 2149, ACCOUNTS_BY_TOKEN_RES: 2150,
   REFRESH_TOKEN_REQ: 2173, REFRESH_TOKEN_RES: 2174, ERROR_RES: 50, HEARTBEAT: 51,
 };
 export const ALLOWED = new Set([PT.APP_AUTH_REQ, PT.ACCOUNTS_BY_TOKEN_REQ, PT.ACCOUNT_AUTH_REQ, PT.TRADER_REQ, PT.RECONCILE_REQ,
-  PT.SYMBOLS_LIST_REQ, PT.SYMBOL_BY_ID_REQ, PT.REFRESH_TOKEN_REQ, PT.HEARTBEAT, PT.NEW_ORDER_REQ, PT.CANCEL_ORDER_REQ, PT.CLOSE_POSITION_REQ]);
+  PT.SYMBOLS_LIST_REQ, PT.SYMBOL_BY_ID_REQ, PT.REFRESH_TOKEN_REQ, PT.HEARTBEAT, PT.NEW_ORDER_REQ, PT.CANCEL_ORDER_REQ, PT.AMEND_POSITION_SLTP_REQ, PT.CLOSE_POSITION_REQ]);
+export const AMEND_TRIES = 3;   // a stop move the broker keeps rejecting is given up after this many rounds (logged once)
 // the council's pending-order validity when a trade carries no validFor (council/trader.mjs WAIT, kept in step)
 export const WAIT = { '1d': 5 * 86400, '4h': 2 * 86400, '1h': 12 * 3600, '30m': 6 * 3600, '15m': 3 * 3600 };
 export const validUntil = (t) => (+t.opened || 0) + (+t.validFor || WAIT[t.h] || 86400);
@@ -153,6 +156,13 @@ export function cancelStep(p) {
   if (x === EXEC.ORDER_CANCELLED) return 'done';
   if ([EXEC.ORDER_CANCEL_REJECTED, EXEC.ORDER_REJECTED].includes(x)) { const e = new Error(String(p.errorCode || 'ORDER_CANCEL_REJECTED')); e.code = p.errorCode || 'ORDER_CANCEL_REJECTED'; return e; }
   return 'wait';
+}
+// an SL/TP amendment is done on any non-error execution event (the broker answers ORDER_REPLACED or ORDER_ACCEPTED for the
+// protective orders); REJECTED / CANCEL_REJECTED is an error
+export function amendStep(p) {
+  const x = execType(p.executionType);
+  if ([EXEC.ORDER_REJECTED, EXEC.ORDER_CANCEL_REJECTED].includes(x)) { const e = new Error(String(p.errorCode || 'ORDER_REJECTED')); e.code = p.errorCode || ''; return e; }
+  return 'done';
 }
 export function session(WS, scrub, url = DEMO_HOST, { timeout = 10000 } = {}) {
   if (url !== DEMO_HOST) throw new Error('refusing a non-demo host');
@@ -300,6 +310,7 @@ export function mirrorAlertText(e, now) {
     const lv = [px(e.stop, e.digits) && `stop ${px(e.stop, e.digits)}`, e.noTarget || px(e.t1, e.digits) == null ? 'no fixed target' : `target ${px(e.t1, e.digits)}`].filter(Boolean).join(' · ');
     return { title: `Demo mirror: limit placed · ${head}${lotTxt(e)}`, msg: `Resting at ${px(e.price, e.digits)} · ${lv}${e.expires ? ` · valid to ${String(e.expires).slice(0, 16)}Z` : ''}\nFills on the same touch as the council.\n${councilTxt(e)}\n${at}`, tags: `robot,hourglass_flowing_sand` };
   }
+  if (e.kind === 'amend') return { title: `Demo mirror: stop moved · ${head}${lotTxt(e)}`, msg: `Stop ${px(e.stopFrom, e.digits) ?? '—'} → ${px(e.stop, e.digits)}${e.t1 != null ? ` · target ${px(e.t1From, e.digits) ?? '—'} → ${px(e.t1, e.digits)}` : ''}${e.brokerStop != null && px(e.brokerStop, e.digits) !== px(e.stop, e.digits) ? ` (broker stop ${px(e.brokerStop, e.digits)})` : ''}\n${e.why || 'the council moved its levels'}\n${councilTxt(e)}\n${at}`, tags: 'robot,shield' };
   if (e.kind === 'cancel') return { title: `Demo mirror: limit cancelled · ${head}${lotTxt(e)}`, msg: `${e.reason || 'cancelled'}${e.council === 'open' ? ' (a market order follows)' : ''}\n${councilTxt(e)}\n${at}`, tags: 'robot,wastebasket' };
   if (e.kind === 'reject') return { title: `Demo mirror: order rejected · ${head}${lotTxt(e)}`, msg: `${e.result || 'rejected'}\nNot retried.\n${councilTxt(e)}\n${at}`, tags: 'robot,no_entry_sign' };
   if (e.kind === 'unfilled') return { title: `Demo mirror: order not filled · ${head}`, msg: `No position at the broker 10 min after the order was accepted.\n${councilTxt(e)}\n${at}`, tags: 'robot,no_entry_sign' };
@@ -479,6 +490,31 @@ export async function mirrorRound({ env, trades, state, tokens, specs = null, WS
         alert('close', id, m, () => { const dl = ev.deal || {}, cd = dl.closePositionDetail || {}, md = Number.isFinite(+cd.moneyDigits) ? +cd.moneyDigits : digits;
           return { by: 'council', council: t.status, R: t.R ?? null, price: dl.executionPrice ?? null, pnl: cd.grossProfit != null && Number.isFinite(+cd.grossProfit) ? +cd.grossProfit / 10 ** md : null }; }); }
       catch (e) { say(`close ${m.symbol} ${m.positionId} failed: ${e.message}`, { trade: id }); alert('closefail', id, m, { result: scrub(e.message) }); }
+    }
+    // 2c) the council moved a stop or target on an open trade (break-even, trailing, a re-planned target) -> the demo position's
+    //     protection follows (8 Nov, owner). Council trades take the council's absolute levels; an ICT trade (futures levels on a
+    //     cash CFD) moves its broker stop by the same distance the council moved its own. A move the broker rejects is retried
+    //     next round, AMEND_TRIES times in all.
+    for (const [id, m] of Object.entries(st.map)) {
+      if (m.status !== 'open') continue;
+      const t = byId.get(id); if (!t || !OPEN.has(t.status)) continue;
+      const p = positions.get(String(m.positionId)); if (!p) continue;
+      const d = Number.isFinite(+m.digits) ? +m.digits : 5, at = (v) => +(+v).toFixed(d), tick = 0.5 * 10 ** -d;
+      const wantT1 = t.t1 != null && !(t.rr >= 50) ? +t.t1 : null, hadT1 = m.t1 != null && !(m.rr >= 50) ? +m.t1 : null;
+      const stopMoved = t.stop != null && m.stop != null && Math.abs(+t.stop - +m.stop) >= tick, t1Moved = (wantT1 == null) !== (hadT1 == null) || (wantT1 != null && hadT1 != null && Math.abs(wantT1 - hadT1) >= tick);
+      if (!stopMoved && !t1Moved) continue;
+      if ((m.amendFails || 0) >= AMEND_TRIES) continue;
+      const isIct = String(id).startsWith('ict:'), bSL = p.stopLoss != null ? +p.stopLoss : null, bTP = p.takeProfit != null ? +p.takeProfit : null;
+      const req = { ctidTraderAccountId: ctid, positionId: Number(m.positionId) };
+      if (isIct) { if (stopMoved) { if (bSL == null) { say(`stop move for ${id} skipped: the broker reports no stop on ${m.symbol} ${m.positionId}`, { trade: id }); m.amendFails = (m.amendFails || 0) + 1; continue; } req.stopLoss = at(bSL + (+t.stop - +m.stop)); } else if (bSL != null) req.stopLoss = at(bSL);
+        if (wantT1 != null) req.takeProfit = at(bTP != null && hadT1 != null ? bTP + (wantT1 - hadT1) : wantT1); }
+      else { req.stopLoss = at(t.stop); if (wantT1 != null) req.takeProfit = at(wantT1); }
+      try {
+        await s.send(PT.AMEND_POSITION_SLTP_REQ, req, PT.EXECUTION_EVENT, amendStep);
+        const from = { stop: m.stop, t1: m.t1 }; m.stop = t.stop; m.t1 = t.t1; m.rr = t.rr; m.amended = (m.amended || 0) + 1; m.amendedAt = iso; delete m.amendFails;
+        out.sent.push({ type: 'amend', trade: id }); say(`moved ${m.symbol} ${m.positionId} protection: stop ${from.stop} -> ${t.stop}${t1Moved ? `, target ${from.t1} -> ${wantT1 == null ? 'none' : t.t1}` : ''} (council ${t.k || 'ict'})`, { trade: id });
+        alert('amend', id, m, () => ({ stopFrom: from.stop, stop: t.stop, t1From: from.t1, t1: wantT1, brokerStop: req.stopLoss, brokerT1: req.takeProfit ?? null, why: t.beAt || t.be ? 'break-even / trail' : 'the council moved its levels' }));
+      } catch (e) { m.amendFails = (m.amendFails || 0) + 1; say(`stop move for ${id} on ${m.symbol} ${m.positionId} failed: ${e.message}${m.amendFails >= AMEND_TRIES ? ` (${m.amendFails} tries, giving up)` : ' (retried next round)'}`, { trade: id }); }
     }
     // 3) new live council trades -> open
     const dayDown = st.day.startBalance && balance != null ? (st.day.startBalance - balance) / st.day.startBalance : 0;

@@ -520,7 +520,9 @@ council trades are copied as market orders with relative distances measured from
 so the demo stop/target equal the council's; a price already past the stop/target or more than `LIMITS.maxDriftR` (1R) into the trade
 is skipped. Minimum-lot orders risking over `LIMITS.maxMinLotRisk` (2%) wait for a bigger balance. Closed market, holidays and the
 capacity caps are waits (symbol paused `LIMITS.pause`), broker rejections skips; notes live while the council trade is open or pending.
-`council/ctrader-reset.json { at }` drops the copied-trade records once per `at` (owner closed everything by hand). Tests:
+When the council moves an open trade's stop or target (break-even, trailing, a re-planned target) the demo position's protection follows
+(`AMEND_POSITION_SLTP_REQ`, own positions only; council trades take the absolute levels, ICT trades move the broker stop by the
+council's distance; `AMEND_TRIES` rejections then left alone; 8 Nov, owner approved). `council/ctrader-reset.json { at }` drops the copied-trade records once per `at` (owner closed everything by hand). Tests:
 `tests/ctrader-mirror.test.mjs` (fake broker with resting orders, `fillOrder`, cancel / cancel-rejected paths).
 
 ## cTrader symbol specs (7 Nov 2026)
