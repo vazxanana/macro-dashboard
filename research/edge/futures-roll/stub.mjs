@@ -1,5 +1,6 @@
 // --import stub for ict/replay.mjs / ict/tracker.mjs: CNBC answered from the raw dump (council-data research/futures-roll/cnbc.json.gz),
 // OANDA paper markets refused, sleeps skipped, the clock fixed. Env: ROLL_DUMP (dump path), ROLL_NOW (ISO clock),
+// ROLL_NOVOL=1: bars without volume (the replay's liquidFrom then cuts nothing: the daily-roll fix alone); ROLL_XAU5: see below.
 // ROLL_D1 (optional JSON file {"@ND.1": [[t,o,h,l,c],...]} that replaces the 1D series: the back-adjusted daily candles).
 import fs from 'node:fs';
 import zlib from 'node:zlib';
@@ -24,5 +25,5 @@ globalThis.fetch = async (u) => {
   const p = u.split('/'), i = p.indexOf('bars'), sym = decodeURIComponent(p[i + 1]), iv = p[i + 2], from = et(p[i + 3]), to = et(p[i + 4]);
   const src = iv === '1D' && D1[sym] ? D1[sym] : dump.series[`${sym}|${iv}|adjusted`] || PROBE[`${sym}|${iv}`] || [];
   const rows = src.filter((b) => b[0] >= from && b[0] <= to && b[0] < T / 1000);
-  return { ok: true, status: 200, json: async () => (rows.length ? { barData: { priceBars: rows.map((b) => ({ open: b[1], high: b[2], low: b[3], close: b[4], volume: b[5] || 0, tradeTimeinMills: b[0] * 1000 })) } } : { statusMessage: 'stub: no bars' }) };
+  return { ok: true, status: 200, json: async () => (rows.length ? { barData: { priceBars: rows.map((b) => ({ open: b[1], high: b[2], low: b[3], close: b[4], volume: process.env.ROLL_NOVOL ? 0 : b[5] || 0, tradeTimeinMills: b[0] * 1000 })) } } : { statusMessage: 'stub: no bars' }) };
 };

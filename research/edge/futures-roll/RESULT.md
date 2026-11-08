@@ -17,7 +17,7 @@ the data layer:
    - H1 ranges were 0–0.8× the market's;
    - up to 100 % of H1 candles were one-print (flat), and NQ hours were missing on 4 Jun.
 
-   **91 of the replay's 251 A-trades** were built on these candles.
+   **90 of the replay's 249 A-trades** were built on these candles.
 
 Pre-registered in `preregistration.md` (pushed before any candle around a roll was looked at). Part 3 was **not** pre-registered. It
 was added after the dump showed what CNBC's intraday history is (see "Stage 2" below).
@@ -71,7 +71,7 @@ Non-roll H1 close-to-next-open gaps, 95th / 99th percentile: NQ 44.8 / 85, ES 6.
 **Exit touched: 1 A-setup.** The switch fell between signal and close: gc buy 29 Jul 2026 18:00, switch 30 Jul 22:00 UTC, +54.3
 points. Live, the old tracker books it +1.47R. The fixed tracker and the replay book it +0.40R / +0.45R.
 
-**Daily bias touched: 212 of 253 A-setups.** A switch day sits inside the 50 daily candles the bias reads. 8 of these change
+**Daily bias touched: 210 of 251 A-setups.** A switch day sits inside the 50 daily candles the bias reads. 8 of these change
 status (stage 1 below).
 
 ## The fix (data layer only: signals, the A-rule, sizing and exits are unchanged)
@@ -106,7 +106,7 @@ status (stage 1 below).
 
 ## Proof: the live A stream changes only where a roll did it
 
-**Chained tracker runs.** 2,052 runs, every 2 h from 20 May to 6 Nov 2026. Old = origin/main 632370d4, new = this branch. The
+**Chained tracker runs.** 2,052 runs, every 2 h from 20 May to 6 Nov 2026. Old = origin/main a8b703a4, new = this branch rebased on it. The
 stubbed CNBC feed (`stub-live.mjs`) serves what a live run at that clock would have read:
 - intraday: the dumped contract shifted to the then-front contract (`mkshifts.mjs`);
 - daily: the front-month splice up to the clock;
@@ -134,25 +134,25 @@ There were 0 errors.
 | es buy 30 Oct 20:00 | non-A, −1R | A-setup ×0.5, −0.5R | bias flip |
 | rty sell 5 Nov 13:00 | A-setup, +1.68R | – | bias against → with |
 
-- **Totals.** A: 121 trades +28.02R → 122 trades +26.92R. All: +87.44R → +86.09R.
+- **Totals.** A: 121 trades +27.44R → 122 trades +26.34R. All: +86.86R → +85.51R.
 - **Switches detected live.** gc 28 May (+50.9), nq/es 21 Jun (+246.25 / +51.75), gc 30 Jul (+54.3), nq/es/ym/rty 13 Sep (+296.75 /
   +67 / +418 / +22.4). Each matches the stubbed spread exactly.
-- **Final code.** The run of the final code (with the replay-only cut and the bar volume field) is `result.json` `benchFinalCode`
-  and must equal the new run above.
 - **Unadjusted fallback.** New code without any cash data is identical to the old replay: all 814 trades, 0 differences.
 
 ### Replay: every historical A-setup that changes (`replay-a-changes.txt`)
 
-Base: council-data `ict/replay.json` at 475f6bc3 (7 Nov 21:16), reproduced exactly from the dump (251 A-trades, +61.87R, 0 diffs).
+Base: origin/main a8b703a4 (after the CME calendar change #561) replayed on the dump with the council-data replay's clock: 249 A-trades,
++63.56R. Before #561, main reproduced council-data `ict/replay.json` at 475f6bc3 exactly from the dump (251 A-trades, +61.87R, 0
+differences), so the dump is the data the live replay read.
 
-**Stage 1, daily roll adjustment.** 251 A-trades, +61.87R → 251, +64.47R. All 8 changes are 50-day-bias flips:
+**Stage 1, daily roll adjustment.** 249 A-trades, +63.56R → 249, +66.16R. All 8 changes are 50-day-bias flips:
 - **Removed:** ym sell 4 Aug 2025 (cash, −0.75), ym sell 22 Oct 2026 (−0.5), ym sell 27 Oct (−0.5), rty sell 5 Nov (+2.67).
 - **Added:** es buy 21 Jul 2026 (+1.05), es buy 3 Aug (+2.33), ym buy 21 Oct (+0.14), es buy 30 Oct (0).
 
 The step tilted the bias "with" for buys and "against" for sells for about 50 days after every roll. So unadjusted candles
 favoured sells.
 
-**Stage 2, deferred-contract cut.** 251 A-trades, +64.47R → **225, +52.84R**. 124 rows are listed in the file. The others keep their R
+**Stage 2, deferred-contract cut.** 249 A-trades, +66.16R → **222, +51.63R**. 122 rows are listed in the file. The others keep their R
 and only move their prices by the new fill scale (NQ ×1.0084 instead of ×1.0221). In the re-sourced window:
 
 | Market | Window | Before (deferred contract) | After (liquid back-fill) | Same signal (±1 h) |
@@ -161,19 +161,19 @@ and only move their prices by the new fill scale (NQ ×1.0084 instead of ×1.022
 | ES | 6 May – 14 Sep | 21, +11.18R (+0.532) | 11, +3.72R (+0.338) | 6 |
 | YM | 1 Jul – 14 Sep | 14, +5.44R (+0.389) | 6, +1.51R (+0.252) | 3 |
 | RTY | 22 Jun – 15 Sep | 14, +7.15R (+0.511) | 0 (no fill source) | 0 |
-| GC | 2 Mar – 28 Jul | 24, −0.93R (−0.039) | 21, +9.39R (+0.447) | 12 |
+| GC | 27 Mar – 28 Jul | 23, −0.48R (−0.021) | 17, +7.40R (+0.435) | 11 |
 
 The deferred-contract candles made the index A-setups look better than the liquid market shows, and gold worse. Whole replay
-afterwards: NQ +7.79R (48), ES +21.28 (56), YM +10.68 (53), RTY +1.66 (11), GC +11.43 (57).
+afterwards: NQ +7.79R (48), ES +21.28 (56), YM +10.68 (53), RTY +1.66 (11), GC +10.22 (54).
 
 Paper shadow streams in the replay, closed n and R, before → after stage 1:
 
 | Stream | Before | After stage 1 | Cause |
 |---|---|---|---|
 | dip | 62, +37.6R | 68, +31.6R | the 20-day gate also reads daily closes |
-| nofri | 219, +66.4R | 218, +69.0R | |
-| h1opp | 176, +62.9R | 174, +59.5R | |
-| strail | 253, +66.9R | 253, +69.7R | |
+| nofri | 217, +68.6R | 216, +71.2R | |
+| h1opp | 177, +60.8R | 175, +57.3R | |
+| strail | 251, +68.6R | 251, +71.4R | |
 
 ## Caveats
 
@@ -201,7 +201,7 @@ Paper shadow streams in the replay, closed n and R, before → after stage 1:
   - `d1frame.mjs`, `check-adjust.mjs`, `liquidity.mjs`, `liqsens.mjs`, `ranges.mjs`, `touch.mjs`
 - Proof:
   - `stub.mjs`, `stub-live.mjs`, `mkshifts.mjs`
-  - `bench.mjs` + `benchdiff.mjs` (chained tracker runs)
+  - `bench.mjs` + `benchdiff.mjs` (chained tracker runs), `replays.sh` (the three replays)
   - `cmp.mjs`, `why.mjs`, `deferred.mjs`, `shadowdiff.mjs`, `changes.mjs`
 - Results: `summary.mjs` → `result.json`, and `replay-a-changes.txt`.
 - Tests: `tests/ict-roll.test.mjs`, with real CNBC NQ/NDX/NQZ26 daily candles of Aug–Oct 2026 in `tests/fixtures/`.

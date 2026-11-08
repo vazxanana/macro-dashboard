@@ -5,7 +5,7 @@
  "data": {
   "cnbc": "council-data research/futures-roll/cnbc.json.gz (dumped 2026-11-07T22:11:04.542Z) and probe.json.gz (cash indices, spot gold, single contracts)",
   "cash": "OANDA mid H1 NAS100/SPX500/US30/XAU via meridianx.dev /md/bars",
-  "replay": "council-data ict/replay.json at 475f6bc3 (7 Nov 2026 21:16 run), reproduced exactly from the dump (251 A-trades, +61.87R, 0 differences)"
+  "replay": "replays.sh on the dump with the clock of council-data ict/replay.json at 475f6bc3 (7 Nov 2026 21:16), which pre-#561 main reproduced exactly (251 A-trades, +61.87R, 0 differences); base = origin/main a8b703a4: 249 A-trades, +63.56R"
  },
  "findings": {
   "intraday": "CNBC 1H/5M of @X.1 are the CURRENT contract's own candles (Dec 2026 for the indices and gold on 7 Nov): no roll step anywhere in them. Evidence: basis to OANDA cash decays smoothly Mar-Nov 2026 (NQ 630 -> 96) with no quarterly jump; adjusted = unadjusted path; NQZ26 1D - @ND.1 1D = 0 from 14 Sep. Before the contract was front its hours are thin (NQ < 18 H1 candles a day until early June 2026, YM until July).",
@@ -232,16 +232,16 @@
    "p99": 19.9
   }
  },
- "verdict": "REAL, but not where it was suspected. CNBC intraday candles never jump at a roll (one contract per request), so no H1 gap / FVG / sweep and no replay exit was faked by a roll step. Three data problems are real: (1) the DAILY candles step by the calendar spread at every switch (5-7x the 95th-percentile H1 gap) and flipped the 50-day bias of 8 replay A-signals; (2) live, a trade open across a switch is managed against candles one spread away (1 replay A-trade, gold 29 Jul 2026, +1.07R of fake gain); (3) the replay used the current contract own history from before it was front: thin deferred prints (H1 ranges 0-0.8x the market, up to 100 % one-print candles) behind 91 of the 251 replay A-trades, incl. the 4 Jun 2026 NQ/ES signals.",
+ "verdict": "REAL, but not where it was suspected. CNBC intraday candles never jump at a roll (one contract per request), so no H1 gap / FVG / sweep and no replay exit was faked by a roll step. Three data problems are real: (1) the DAILY candles step by the calendar spread at every switch (5-7x the 95th-percentile H1 gap) and flipped the 50-day bias of 8 replay A-signals; (2) live, a trade open across a switch is managed against candles one spread away (1 replay A-trade, gold 29 Jul 2026, +1.07R of fake gain); (3) the replay used the current contract own history from before it was front: thin deferred prints (H1 ranges 0-0.8x the market, up to 100 % one-print candles) behind 90 of the 249 replay A-trades, incl. the 4 Jun 2026 NQ/ES signals.",
  "fix": "Data layer only. ict/tracker.mjs rollAdjust (daily candles back-adjusted with spreads measured on CNBC cash-index closes; indices) and contractShift/shiftTrade (open trades moved by the measured intraday offset on a contract switch; live tracker); ict/replay.mjs liquidFrom (CNBC intraday only from the contract front-month stretch, earlier hours back-filled as before, OANDA filling where the files end). Signals, A-rule, sizing and exits unchanged.",
  "replayAChanges": {
   "old": {
-   "n": 251,
-   "R": 61.87
+   "n": 249,
+   "R": 63.56
   },
   "new": {
-   "n": 251,
-   "R": 64.47
+   "n": 249,
+   "R": 66.16
   },
   "changes": [
    {
@@ -325,7 +325,7 @@
     "why": "50-day bias against -> with (roll step in the daily candles)"
    }
   ],
-  "keptA": 249,
+  "keptA": 247,
   "keptSameExit": true
  },
  "touched": {
@@ -547,8 +547,8 @@
     "touched": 35
    },
    "gc": {
-    "a": 60,
-    "touched": 53
+    "a": 58,
+    "touched": 51
    },
    "rty": {
     "a": 26,
@@ -1097,21 +1097,21 @@
    "old": {
     "all": {
      "n": 356,
-     "R": 87.44
+     "R": 86.86
     },
     "A": {
      "n": 121,
-     "R": 28.02
+     "R": 27.44
     }
    },
    "new": {
     "all": {
      "n": 356,
-     "R": 86.09
+     "R": 85.51
     },
     "A": {
      "n": 122,
-     "R": 26.92
+     "R": 26.34
     }
    }
   }
@@ -2668,28 +2668,28 @@
     }
    },
    "gc": {
-    "window": "2026-03-02 .. 2026-07-28",
+    "window": "2026-03-27 .. 2026-07-28",
     "before": {
-     "n": 24,
-     "R": -0.93,
-     "perTrade": -0.039
+     "n": 23,
+     "R": -0.48,
+     "perTrade": -0.021
     },
     "after": {
-     "n": 21,
-     "R": 9.39,
-     "perTrade": 0.447
+     "n": 17,
+     "R": 7.4,
+     "perTrade": 0.435
     },
-    "sameSignal": 12,
+    "sameSignal": 11,
     "wholeReplay": {
      "before": {
-      "n": 59,
-      "R": 2.11,
-      "perTrade": 0.036
+      "n": 57,
+      "R": 3.8,
+      "perTrade": 0.067
      },
      "after": {
-      "n": 57,
-      "R": 11.43,
-      "perTrade": 0.201
+      "n": 54,
+      "R": 10.22,
+      "perTrade": 0.189
      }
     }
    }
@@ -2697,16 +2697,16 @@
  },
  "replayATotals": {
   "base": {
-   "n": 251,
-   "R": 61.87
+   "n": 249,
+   "R": 63.56
   },
   "dailyRollFix": {
-   "n": 251,
-   "R": 64.47
+   "n": 249,
+   "R": 66.16
   },
   "bothFixes": {
-   "n": 225,
-   "R": 52.84
+   "n": 222,
+   "R": 51.63
   }
  }
 }

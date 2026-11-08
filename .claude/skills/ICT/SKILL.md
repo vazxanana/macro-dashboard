@@ -394,5 +394,5 @@ Gate: better than the live exit in both halves (split 24 Jun 2026) and on >= 3 o
   open across a switch has its levels moved by the measured offset (`contractShift`, one replay case: gold 29 Jul 2026, +1.47R fake
   → +0.40R); the replay no longer reads the current contract's thin back-month hours (`liquidFrom`: 0.01-3 % of front volume, H1
   ranges 0-0.8x the market, the "4 Jun 2026" NQ/ES signals) and back-fills them from cash instead.
-- Replay A-setups 251 / +61.9R → 225 / +52.8R (RTY now starts 13 Sep 2026: no fill source). The deferred-contract months had made
+- Replay A-setups 249 / +63.6R → 222 / +51.6R (RTY now starts 13 Sep 2026: no fill source). The deferred-contract months had made
   index A-setups look better (+0.39-0.53R a trade) than the liquid data shows (+0.18-0.34R). Full list: research/edge/futures-roll/replay-a-changes.txt.
