@@ -78,7 +78,7 @@
     .ms-live-dot.poll { background: #f0a500; }
     @keyframes msPulse { 50% { box-shadow: 0 0 0 6px rgba(8,153,129,0); } }
     @media (prefers-reduced-motion: reduce) { .ms-live-dot.on { animation: none; } }
-    .ms-status { display: inline-flex; align-items: center; gap: 6px; color: var(--ms-mute); }
+    .ms-status { display: inline-flex; align-items: center; gap: 6px; color: var(--ms-mute); margin-left: auto; }
     .ms-tog { display: flex; flex-wrap: wrap; gap: 4px 12px; }
     .ms-tog label { display: inline-flex; align-items: center; gap: 5px; cursor: pointer; color: var(--ms-mute); }
     .ms-tog i { width: 12px; height: 9px; border-radius: 2px; display: inline-block; }
@@ -263,9 +263,17 @@
   .menu { position: relative; }
   .menu summary { list-style: none; display: inline-flex; align-items: center; }
   .menu summary::-webkit-details-marker { display: none; }
-  .menu-body { position: absolute; right: 0; top: calc(100% + 8px); width: min(320px, calc(100vw - 32px)); background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 14px; box-shadow: 0 12px 32px rgba(0,0,0,.35); display: grid; gap: 12px; }
+  .menu-body { position: absolute; right: 0; top: calc(100% + 8px); width: min(380px, calc(100vw - 32px)); background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 14px; box-shadow: 0 12px 32px rgba(0,0,0,.35); display: grid; gap: 12px; }
   .menu-h { font-size: 10px; letter-spacing: 1.2px; text-transform: uppercase; color: var(--ink-faint); }
   .menu .ms-tog { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  /* 8 Nov (owner: "organise it even more"): the layers in four named groups, two per row; Telegram folded away */
+  .menu .ms-tog.ms-tog-g { grid-template-columns: 1fr 1fr; gap: 10px 14px; align-items: start; }
+  .menu .tog-g { display: grid; gap: 5px; min-width: 0; }
+  .menu .tog-h { font-size: 11px; font-weight: 700; letter-spacing: .02em; color: var(--ink-faint); padding-bottom: 3px; border-bottom: 1px solid var(--line); margin-bottom: 2px; }
+  .menu .tog-g label { white-space: normal; line-height: 1.25; } .menu .tog-g .cmp-row select { max-width: 110px; }
+  .menu .tg-more > summary { cursor: pointer; list-style: none; } .menu .tg-more > summary::-webkit-details-marker { display: none; }
+  .menu .tg-more > summary::after { content: " ▸"; color: var(--ink-faint); } .menu .tg-more[open] > summary::after { content: " ▾"; }
+  @media (max-width: 420px) { .menu .ms-tog.ms-tog-g { grid-template-columns: 1fr; } }
   .menu-row { display: flex; gap: 8px; flex-wrap: wrap; }
   .ms-tbtn { min-height: 34px; padding: 6px 12px; }
   .sec-h { display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap; margin: 6px 2px -4px; }
@@ -2552,6 +2560,7 @@ html[data-motion="off"] #v-ict .ict-cal-d:hover { transform: none !important; }
     <nav class="tabs" aria-label="Sections">
       <a href="#home" data-go="home">Home</a><a href="#setup" data-go="setup" class="adm">Setup</a><a href="#charts" data-go="charts">Charts</a><a href="#scanner" data-go="scanner" class="adm">Scanner</a><a href="#crypto" data-go="crypto" class="adm">Crypto</a><a href="#gold" data-go="gold" class="adm">Gold playbook</a><a href="#council" data-go="council">Council</a><a href="#journal" data-go="journal">Journal</a><a href="#ict" data-go="ict" class="ictx">ICT desk</a><a href="#users" data-go="users" class="adm own">Users</a>
     </nav>
+    <a class="hdr-macro" id="ms-macro-btn" href="/macro-desk" title="Macro desk: the strategist and the veteran, their debate, the key insights and the source data"><i aria-hidden="true"></i><span>Macro desk</span></a>
     <a class="ms-badge" id="ms-scan-badge" href="#scanner" hidden></a>
     <a class="ms-botwarn" id="ms-botwarn" href="#council" hidden></a>
     <span class="ms-status"><i class="ms-live-dot" id="ms-live-dot"></i><span id="ms-live-txt">Connecting…</span><span class="upd"> · <span id="ms-updated">—</span></span></span>
@@ -2567,28 +2576,32 @@ html[data-motion="off"] #v-ict .ict-cal-d:hover { transform: none !important; }
           <button type="button" class="menu-pa menu-tv" id="ms-tva-open">TradingView add-on <small>council trades on your TradingView chart</small></button>
           <div class="menu-h">Chart layers</div>
           <div class="ms-lay" id="ms-lay" role="group" aria-label="Chart layout presets"><button type="button" data-lay="clean" title="Candles, structure lines and key levels only">Clean</button><button type="button" data-lay="full" title="Every layer on">Full</button><button type="button" data-lay="mine" title="Your saved layout">Mine</button><button type="button" data-lay="save" class="sv" title="Save the current layers as Mine">Save as Mine</button><button type="button" data-lay="wipe" class="sv" title="Remove your lines, trend lines, Fibonacci and position plans on this market">Clear drawings</button></div>
-          <div class="ms-tog">
+          <div class="ms-tog ms-tog-g">
+            <div class="tog-g"><div class="tog-h">Meridian markup</div>
             <label><input type="checkbox" id="ms-show-bo" data-show="bo" checked><i style="background:#f23645;height:2px"></i>BO lines</label>
             <label><input type="checkbox" id="ms-show-origin" data-show="origin" checked><i style="background:rgba(242,54,69,.35);border:1px solid #b22833"></i>Origin</label>
             <label><input type="checkbox" id="ms-show-cf" data-show="cf" checked><i style="background:rgba(242,54,69,.5)"></i>CF</label>
             <label><input type="checkbox" id="ms-show-vr" data-show="vr" checked><i style="background:rgba(255,152,0,.4);border:1px solid #e08600"></i>VR</label>
             <label><input type="checkbox" id="ms-show-htf" data-show="htf" checked><i style="border:1.5px dashed #2962ff"></i>HTF Origin</label>
-            <label><input type="checkbox" id="ms-show-ct" checked><i style="background:#2962ff;height:2px"></i>Council trades + history</label>
-            <label><input type="checkbox" id="ms-show-kl" checked><i style="border-top:1.5px dotted #9aa4b2;height:0"></i>Key levels</label>
-            <label><input type="checkbox" id="ms-show-piv"><i style="border-top:1.5px dashed #9c27b0;height:0"></i>Daily pivots (P, R1–R2, S1–S2)</label>
-            <label><input type="checkbox" id="ms-show-vwap"><i style="background:#00bcd4;height:2px"></i>VWAP (daily, intraday charts)</label>
-            <label><input type="checkbox" id="ms-show-ema"><i style="background:linear-gradient(90deg,#2962ff 33%,#e0a526 33% 66%,#9c27b0 66%);height:2px"></i>EMAs 21 / 50 / 200</label>
-            <label><input type="checkbox" id="ms-show-shade" checked><i style="background:linear-gradient(90deg,rgba(38,166,154,.4) 33%,rgba(41,98,255,.4) 33% 66%,rgba(156,39,176,.4) 66%)"></i>Session shading</label>
-            <label class="cmp-row">Compare with <select id="ms-cmp" aria-label="Compare with another market"><option value="">none</option></select></label>
-            <label><input type="checkbox" id="ms-show-log"><i style="background:none;border-bottom:2px solid #8a94a8;border-radius:0 0 0 10px;height:8px"></i>Log price scale</label>
-            <label><input type="checkbox" id="ms-show-ha"><i style="background:linear-gradient(90deg,rgba(8,153,129,.8) 33%,rgba(8,153,129,.45) 33% 66%,rgba(242,54,69,.8) 66%)"></i>Heikin Ashi candles</label>
-            <label><input type="checkbox" id="ms-show-vol" checked><i style="background:linear-gradient(90deg,rgba(8,153,129,.5) 50%,rgba(242,54,69,.5) 50%)"></i>Volume</label>
+            <label><input type="checkbox" id="ms-show-detail" data-show="detail"><i style="background:var(--ink-faint);height:6px"></i>Detailed labels</label></div>
+            <div class="tog-g"><div class="tog-h">Council</div>
+            <label><input type="checkbox" id="ms-show-ct" checked><i style="background:#2962ff;height:2px"></i>Trades + history</label>
             <label><input type="checkbox" id="ms-show-next" data-show="next" checked><i style="background:#2962ff;height:2px"></i>Next setup</label>
             <label><input type="checkbox" id="ms-show-plan" data-show="plan" checked><i style="background:#089981;height:2px"></i>Selected trade</label>
-            <label><input type="checkbox" id="ms-show-replica" data-show="replica" checked><i style="background:#7b61ff;height:2px"></i><span class="adm">Replica (gold M5)</span><span class="pubonly">Signals (gold M5)</span></label>
-            <label><input type="checkbox" id="ms-show-sess" data-show="sess" checked><i style="border-left:1.5px dashed #2962ff;width:2px;height:12px;border-radius:0"></i>Sessions</label>
-            <label><input type="checkbox" id="ms-show-news" data-show="news" checked><i style="border-left:1.5px dotted #f0a500;width:2px;height:12px;border-radius:0"></i>News</label>
-            <label><input type="checkbox" id="ms-show-detail" data-show="detail"><i style="background:var(--ink-faint);height:6px"></i>Detailed view</label>
+            <label><input type="checkbox" id="ms-show-replica" data-show="replica" checked><i style="background:#7b61ff;height:2px"></i><span class="adm">Replica M5</span><span class="pubonly">Signals M5</span></label></div>
+            <div class="tog-g"><div class="tog-h">Levels and time</div>
+            <label><input type="checkbox" id="ms-show-kl" checked><i style="border-top:1.5px dotted #9aa4b2;height:0"></i>Key levels</label>
+            <label><input type="checkbox" id="ms-show-piv"><i style="border-top:1.5px dashed #9c27b0;height:0"></i>Daily pivots</label>
+            <label><input type="checkbox" id="ms-show-vwap"><i style="background:#00bcd4;height:2px"></i>VWAP (intraday)</label>
+            <label><input type="checkbox" id="ms-show-ema"><i style="background:linear-gradient(90deg,#2962ff 33%,#e0a526 33% 66%,#9c27b0 66%);height:2px"></i>EMAs 21/50/200</label>
+            <label><input type="checkbox" id="ms-show-sess" data-show="sess" checked><i style="border-left:1.5px dashed #2962ff;width:2px;height:12px;border-radius:0"></i>Session lines</label>
+            <label><input type="checkbox" id="ms-show-shade" checked><i style="background:linear-gradient(90deg,rgba(38,166,154,.4) 33%,rgba(41,98,255,.4) 33% 66%,rgba(156,39,176,.4) 66%)"></i>Session shading</label>
+            <label><input type="checkbox" id="ms-show-news" data-show="news" checked><i style="border-left:1.5px dotted #f0a500;width:2px;height:12px;border-radius:0"></i>News</label></div>
+            <div class="tog-g"><div class="tog-h">Chart</div>
+            <label><input type="checkbox" id="ms-show-vol" checked><i style="background:linear-gradient(90deg,rgba(8,153,129,.5) 50%,rgba(242,54,69,.5) 50%)"></i>Volume</label>
+            <label><input type="checkbox" id="ms-show-ha"><i style="background:linear-gradient(90deg,rgba(8,153,129,.8) 33%,rgba(8,153,129,.45) 33% 66%,rgba(242,54,69,.8) 66%)"></i>Heikin Ashi</label>
+            <label><input type="checkbox" id="ms-show-log"><i style="background:none;border-bottom:2px solid #8a94a8;border-radius:0 0 0 10px;height:8px"></i>Log scale</label>
+            <label class="cmp-row">Compare with <select id="ms-cmp" aria-label="Compare with another market"><option value="">none</option></select></label></div>
           </div>
           <div class="menu-h">Display</div>
           <div class="menu-row">
@@ -2598,13 +2611,14 @@ html[data-motion="off"] #v-ict .ict-cal-d:hover { transform: none !important; }
             <input type="file" id="ms-csv" accept=".csv,text/csv" hidden>
           </div>
           <span class="ms-err" id="ms-csv-err" role="status"></span>
-          <div class="menu-h own">Telegram alerts</div>
+          <details class="own tg-more"><summary class="menu-h own">Telegram alerts</summary>
           <div class="ms-tg own">
             <label for="ms-tg-token">Bot token</label><input id="ms-tg-token" type="password" autocomplete="off" spellcheck="false" placeholder="123456789:AA…">
             <label for="ms-tg-chat">Chat ID</label><input id="ms-tg-chat" autocomplete="off" inputmode="numeric" placeholder="123456789">
           </div>
           <div class="menu-row own"><button type="button" class="ms-tbtn" id="ms-tg-test">Send test</button><span class="ms-err" id="ms-tg-msg" role="status"></span></div>
           <p class="ms-note own" style="margin:0">In Telegram, message <b>@BotFather</b>, send /newbot and paste the token here. Send your new bot any message, then get your chat ID from <b>@userinfobot</b>. Both stay in this browser only. Alerts go out while this page is open and Alerts are on.</p>
+          </details>
         </div>
       </details>
       <details class="me" id="ms-me">
@@ -2751,7 +2765,7 @@ html[data-motion="off"] #v-ict .ict-cal-d:hover { transform: none !important; }
       <div class="adr" id="ms-adr" role="status" aria-label="Daily range" hidden></div>
       <div class="pa-chips" id="ms-pa-chips" hidden></div>
       <div class="mtf" id="ms-mtf" role="group" aria-label="Timeframe alignment: last structure break per timeframe" hidden></div>
-      <button type="button" class="ind-open" id="ms-ind-open" title="Add up to 10 indicators (saved for your account on this device)">Indicators <small id="ms-ind-n">0/10</small></button><div class="mk-mode seg" role="group" aria-label="Chart markup"><button type="button" data-mk="meridian" class="on" aria-pressed="true" title="Meridian: the council's Mosha structure, setups and trades">Meridian</button><button type="button" data-mk="ict" aria-pressed="false" title="ICT: fair value gaps, session liquidity, premium / discount and the ICT desk's signals">ICT</button></div>
+      <button type="button" class="ind-open" id="ms-ind-open" title="Add up to 10 indicators (saved for your account on this device)">Indicators <small id="ms-ind-n">0/10</small></button><div class="mk-mode seg" role="group" aria-label="Chart markup"><button type="button" data-mk="meridian" class="on" aria-pressed="true" title="Meridian: the council's Mosha structure, setups and trades">Meridian</button><button type="button" data-mk="ict" aria-pressed="false" title="ICT: fair value gaps, session liquidity, premium / discount and the ICT desk's signals">ICT</button><button type="button" data-mk="clean" aria-pressed="false" title="Clean: candles only, no markup (your indicators and drawings stay)">Clean</button></div>
       <div class="seg" role="group" aria-label="Chart view">
         <button type="button" data-view="1d">D1</button><button type="button" data-view="4h">H4</button><button type="button" data-view="1h">H1</button><button type="button" data-view="15m">M15</button><button type="button" data-view="5m">M5</button><button type="button" data-view="1m">M1</button><button type="button" data-view="all">All</button><button type="button" data-view="split" title="Two charts side by side, with sync settings">Split</button>
       </div>
@@ -3575,7 +3589,7 @@ function msNextSetup(bars, A) {
     htf:  'rgba(41,98,255,0.85)', proj: '#2962ff',
   };
   const G = { theme: ['dark', 'light', 'midnight', 'pro'].indexOf(document.documentElement.dataset.theme) >= 0 ? document.documentElement.dataset.theme : 'dark', show: { bo: true, origin: true, cf: true, vr: true, next: true, htf: true, plan: true, detail: false, sess: true, news: true, replica: true }, risk: 100, alerts: false, plan: null, prev: null, sel: null, prevStates: {}, planKey: '',
-    offset: 0, spot: null, source: '', live: false, csv: false }; try { G.ha = localStorage.getItem('ms-ha') === '1'; G.log = localStorage.getItem('ms-log') === '1'; G.mode = localStorage.getItem('ms-mode') === 'ict' ? 'ict' : 'meridian'; } catch (e) { G.mode = 'meridian'; }
+    offset: 0, spot: null, source: '', live: false, csv: false }; try { G.ha = localStorage.getItem('ms-ha') === '1'; G.log = localStorage.getItem('ms-log') === '1'; G.mode = ['ict', 'clean'].includes(localStorage.getItem('ms-mode')) ? localStorage.getItem('ms-mode') : 'meridian'; } catch (e) { G.mode = 'meridian'; }
   const $ = (id) => document.getElementById(id);
   const $o = (id) => document.getElementById(id) || { set textContent(v) {}, set className(v) {}, set innerHTML(v) {}, style: {} };
   // perf (8 Nov): toLocaleString builds a formatter on every call; one Intl formatter per decimals count gives the same text far cheaper
@@ -4325,6 +4339,11 @@ function msNextSetup(bars, A) {
       P.ictOv.set(items);
     };
     P.setMode = function (m) {
+      if (m === 'clean') {   // candles only: both markups off, their price lines and markers gone; indicators, drawings and plans stay
+        try { series.detachPrimitive(overlay); } catch (e) {} try { series.detachPrimitive(P.ictOv); } catch (e) {}
+        (P.priceLines || []).forEach((pl) => { try { series.removePriceLine(pl); } catch (e) {} }); P.priceLines = [];
+        (P._ictPL || []).forEach((l) => { try { series.removePriceLine(l); } catch (e) {} }); P._ictPL = [];
+        try { series.setMarkers([]); } catch (e) {} P._mkSig = null; P._ctSig = null; try { P.planLinesDraw(); } catch (e) {} return; }
       if (m === 'ict') { try { series.detachPrimitive(overlay); } catch (e) {} try { series.attachPrimitive(P.ictOv); } catch (e) {}
         (P.priceLines || []).forEach((pl) => { try { series.removePriceLine(pl); } catch (e) {} }); P.priceLines = []; try { P.planLinesDraw(); } catch (e) {} try { series.setMarkers([]); } catch (e) {} P._mkSig = null; P.ictDraw(); }
       else { try { series.detachPrimitive(P.ictOv); } catch (e) {} (P._ictPL || []).forEach((l) => { try { series.removePriceLine(l); } catch (e) {} }); P._ictPL = [];
@@ -4335,11 +4354,12 @@ function msNextSetup(bars, A) {
       if (n < 40) return;
       P.A = msAnalyze(bars, PIVOT);
       P.S = P.A.last ? msNextSetup(bars, P.A) : null;
-      if (G.mode === 'ict') P.ictDraw(); else P.draw();
+      if (G.mode === 'ict') P.ictDraw(); else if (G.mode !== 'clean') P.draw();
       P.readout();
       topDown();
     };
     P.draw = function () {
+      if (G.mode === 'clean') { P.priceLines.forEach((pl) => { try { series.removePriceLine(pl); } catch (e) {} }); P.priceLines = []; P.planLinesDraw(); return; }
       const bars = P.bars, n = bars.length, A = P.A, S = P.S;
       const items = { boxes: [], lines: [], labels: [], path: [], vlines: [], segs: [] };
       merItems(bars, A, S, tf, items, fmt, true);
@@ -4546,7 +4566,7 @@ function msNextSetup(bars, A) {
   // council trades on the live charts (7 Nov loop): this market's open / pending council trades as entry, stop and target lines
   function councilLines() {
     let T = []; try { T = (COUNCIL.trades || []).filter((x) => x.market === instKey && !x.shadow && (x.status === 'open' || x.status === 'pending') && isFinite(x.entry) && isFinite(x.stop)); } catch (e) {}
-    if (G.showCT === false || G.mode === 'ict') T = [];
+    if (G.showCT === false || G.mode !== 'meridian') T = [];
     const sig = JSON.stringify(T.map((x) => [x.id, x.entry, x.stop, x.t1, x.status]));
     ctTargets(['4h', '1h', '15m', '5m', '1m']).forEach(([id, P]) => { if (!P || !P.series || P.rp || P._ctSig === sig) return; P._ctSig = sig;
       (P._ct || []).forEach((l) => { try { P.series.removePriceLine(l); } catch (e) {} }); P._ct = [];
@@ -4558,7 +4578,7 @@ function msNextSetup(bars, A) {
   // council trade history as chart markers (7 Nov loop): entries (arrows) and exits (dots with the R result) on H4 / H1 / M15
   function councilMarkers() {
     let T = []; try { T = (COUNCIL.trades || []).filter((x) => x.market === instKey && !x.shadow && x.entry && (x.filled || x.opened) && x.status !== 'pending' && x.status !== 'missed' && x.status !== 'expired').sort((a, b) => (b.filled || b.opened) - (a.filled || a.opened)).slice(0, 60); } catch (e) {}
-    if (G.showCT === false || G.mode === 'ict') T = [];
+    if (G.showCT === false || G.mode !== 'meridian') T = [];
     ctTargets(['4h', '1h', '15m']).forEach(([id, P]) => { if (!P || !P.series || P.rp || !P.bars || !P.bars.length) return;
       const tf = TFS.find((t) => t.id === id), have = new Set(P.bars.map((b) => b.time)), bt = (t) => Math.floor(t / tf.sec) * tf.sec + TZ, mk = [];
       T.forEach((x) => { const buy = x.side !== 'sell', te = bt(x.filled || x.opened);
@@ -5371,14 +5391,15 @@ function msNextSetup(bars, A) {
     const live = (Array.isArray(T) ? T : []).filter((x) => x && (x.status === 'open' || x.status === 'pending') && !(x.grade && x.grade.letter === 'F')).slice(-4);
     el.hidden = false;
     el.innerHTML = `<b>ICT desk</b>` + (live.length ? live.map((x) => `<a href="#ict" class="ict-sg ${x.side === 'sell' ? 'dn' : 'up'}">${x.side === 'sell' ? '▼' : '▲'} ${String(x.short || x.market || '').toUpperCase()} ${x.side} · ${x.model || 'signal'}${x.grade ? ` · ${x.grade.letter}` : ''} · ${x.status}</a>`).join('') : '<span>No open signals right now.</span>') + `<span class="ict-k">Boxes: fair value gaps · purple: Asia range · teal: London range · orange: NY midnight open · grey: 50% of yesterday</span>`; }
-  function setMode(m) { G.mode = m === 'ict' ? 'ict' : 'meridian'; try { localStorage.setItem('ms-mode', G.mode); } catch (e) {}
+  // 8 Nov (owner: "the more u click ict or meridian he just loads more"): one markup at a time, and Clean = candles only
+  function setMode(m) { G.mode = m === 'ict' || m === 'clean' ? m : 'meridian'; try { localStorage.setItem('ms-mode', G.mode); } catch (e) {}
     document.documentElement.dataset.mk = G.mode;
     document.querySelectorAll('[data-mk]').forEach((b) => { if (b.tagName !== 'BUTTON') return; const on = b.dataset.mk === G.mode; b.classList.toggle('on', on); b.setAttribute('aria-pressed', String(on)); });
     Object.values(panes).forEach((P) => { if (P.setMode && P.bars) P.setMode(G.mode); });
     try { councilLines(); councilMarkers(); } catch (e) {} ictStrip(); if (window.msSplitMarkup) window.msSplitMarkup(); window.msTrack && msTrack('Chart markup', { mode: G.mode }); }
   document.addEventListener('click', (ev) => { const b = ev.target.closest && ev.target.closest('button[data-mk]'); if (b) setMode(b.dataset.mk); });
   document.documentElement.dataset.mk = G.mode;
-  setTimeout(() => { if (G.mode === 'ict') setMode('ict'); else document.querySelectorAll('button[data-mk]').forEach((b) => { const on = b.dataset.mk === G.mode; b.classList.toggle('on', on); b.setAttribute('aria-pressed', String(on)); }); }, 3200);
+  setTimeout(() => { if (G.mode !== 'meridian') setMode(G.mode); else document.querySelectorAll('button[data-mk]').forEach((b) => { const on = b.dataset.mk === G.mode; b.classList.toggle('on', on); b.setAttribute('aria-pressed', String(on)); }); }, 3200);
   setInterval(() => { if (G.mode === 'ict' && !document.hidden) ictStrip(); }, 120e3);
   // split layout (7 Nov, owner: "let people put 2 chart screens side by side" with TradingView-style sync settings)
   // left = one of the analysed timeframe charts; right = a free chart (any market, any timeframe), synced by the toggles
@@ -9257,6 +9278,8 @@ function gpStats(T) {
 #v-charts { grid-template-columns: minmax(0, 1fr); } #v-charts > * { min-width: 0; }
 .mk-mode { margin-left: auto; } .mk-mode + .seg { margin-left: 0; } .ict-strip { margin: 0 0 10px; } .mk-mode button { font-weight: 700; }
 html[data-mk="ict"] .mk-mode button[data-mk="ict"].on { background: color-mix(in srgb, #9c27b0 18%, var(--panel)); border-color: #9c27b0; }
+html[data-mk="clean"] .mk-mode button[data-mk="clean"].on { background: color-mix(in srgb, var(--ink) 10%, var(--panel)); border-color: var(--ink-dim); color: var(--ink); }
+html[data-mk="clean"] .ict-strip { display: none; }
 .ict-strip { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 10px; padding: 8px 12px; border-radius: 10px; border: 1px solid color-mix(in srgb, #9c27b0 40%, var(--line)); background: color-mix(in srgb, #9c27b0 7%, var(--panel)); font-size: 12.5px; color: var(--ink-dim); }
 .ict-strip[hidden] { display: none; } .ict-strip b { color: var(--ink); } .ict-strip .ict-k { flex-basis: 100%; font-size: 11.5px; }
 .ict-sg { color: var(--ink); text-decoration: none; padding: 2px 8px; border-radius: 999px; border: 1px solid var(--line); background: var(--panel); font-weight: 600; } .ict-sg.up { color: var(--buy); } .ict-sg.dn { color: var(--sell); }
@@ -9887,6 +9910,18 @@ html[data-motion="off"] .btab-more { transition: none; transform: none; }
      only keeps a 30-day session token (localStorage ms-ct-sess-<user>); cTrader tokens stay encrypted on the server. -->
 <style>
 html[data-role="public"] #ms-me-ct { display: none; }
+/* Macro desk button, top centre (8 Nov, owner: "a switch cool looking button on center top header like a boss") */
+.hdr-macro { --hm-a: #e0a526; --hm-b: #7b61ff; position: relative; margin-left: auto; display: inline-flex; align-items: center; gap: 8px; height: 32px; padding: 0 14px 0 12px; border-radius: 999px; text-decoration: none; color: var(--ink); font: 700 12.5px/1 var(--sans); letter-spacing: .01em; white-space: nowrap; flex: none;
+  background: var(--panel); isolation: isolate; }
+.hdr-macro::before { content: ""; position: absolute; inset: -1.5px; border-radius: inherit; z-index: -1; background: conic-gradient(from var(--hm-r, 0turn), var(--hm-a), var(--hm-b), var(--hm-a)); }
+.hdr-macro::after { content: ""; position: absolute; inset: 0; border-radius: inherit; z-index: -1; background: var(--panel); }
+.hdr-macro i { width: 8px; height: 8px; border-radius: 50%; background: var(--hm-a); box-shadow: 0 0 0 3px color-mix(in srgb, var(--hm-a) 25%, transparent); }
+.hdr-macro:hover { color: var(--ink); transform: translateY(-1px); } .hdr-macro:hover::before { filter: brightness(1.15); }
+.hdr-macro:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+@property --hm-r { syntax: '<angle>'; inherits: false; initial-value: 0turn; }
+@media (prefers-reduced-motion: no-preference) { .hdr-macro::before { animation: hm-spin 6s linear infinite; } @keyframes hm-spin { to { --hm-r: 1turn; } } }
+html[data-role="public"] .hdr-macro { display: none; }
+@media (max-width: 760px) { .hdr-macro span { display: none; } .hdr-macro { padding: 0 10px; } }
 .ct-dlg { width: min(860px, calc(100vw - 16px)); max-height: min(90vh, 900px); padding: 0; border-radius: 14px; border: 1px solid var(--line); background: var(--panel); color: var(--ink); font-variant-numeric: tabular-nums; }
 .ct-dlg::backdrop { background: rgba(0,0,0,.5); }
 .ct-h { display: flex; align-items: center; gap: 12px; padding: 14px 16px; border-bottom: 1px solid var(--line); position: sticky; top: 0; background: var(--panel); z-index: 2; }
