@@ -4116,6 +4116,9 @@ function msNextSetup(bars, A) {
     });
     const series = chart.addCandlestickSeries({ upColor: UPC, downColor: DNC, borderUpColor: UPC, borderDownColor: DNC, wickUpColor: UPC, wickDownColor: DNC, priceLineStyle: LW.LineStyle.Dotted, priceFormat: { type: 'price', precision: INST.dec, minMove: Math.pow(10, -INST.dec) } });
     const overlay = new Overlay(); series.attachPrimitive(overlay);
+    const ON = new Set([overlay]);   // primitives attached right now: attach and detach happen once, whatever the click count
+    const attach = (pr) => { if (!pr || ON.has(pr)) return; try { series.attachPrimitive(pr); ON.add(pr); } catch (e) {} };
+    const detach = (pr) => { if (!pr || !ON.has(pr)) return; try { series.detachPrimitive(pr); } catch (e) {} ON.delete(pr); };
     const P = { tf, el, chart, series, overlay, raw: null, bars: null, A: null, S: null, fitted: false, priceLines: [], pv: [] };
     // charts upgrade (7 Nov): faint symbol watermark, quiet dashed crosshair, OHLC readout that follows the cursor
     chart.applyOptions({ watermark: { visible: true, text: `${INST.label} · ${tf.label}`, color: 'rgba(128, 138, 160, 0.05)', fontSize: 38, fontStyle: '600', horzAlign: 'center', vertAlign: 'center' },
@@ -4330,8 +4333,8 @@ function msNextSetup(bars, A) {
       const step = (d) => { if (!P.rp) return; P.rp.i = Math.max(20, Math.min(P.bars.length, P.rp.i + d)); show(); if (P.rp.i >= P.bars.length) stop(); };
       const stop = () => { clearInterval(timer); timer = null; bar.querySelector('[data-rp="play"]').textContent = '▶'; };
       // the structure drawings are worked out from all candles, so they are hidden while replaying (they would show the future)
-      P.replay = (on) => { if (on && P.bars && P.bars.length > 40) { P.rp = { i: Math.max(20, P.bars.length - 120) }; bar.hidden = false; try { series.detachPrimitive(overlay); } catch (e) {} try { series.setMarkers([]); } catch (e) {} (P.priceLines || []).concat(P._ct || []).forEach((l) => { try { l.applyOptions({ lineVisible: false, axisLabelVisible: false, title: '' }); } catch (e) {} }); try { if (LY.vwapS) LY.vwapS.setData([]); } catch (e) {} if (P.drawTl) P.drawTl(); el.classList.add('replaying'); show(); chart.timeScale().scrollToRealTime(); }
-        else { stop(); P.rp = null; bar.hidden = true; el.classList.remove('replaying'); try { series.attachPrimitive(overlay); } catch (e) {} P._mkSig = null; P._ctSig = null; P.rebuild(true); } };
+      P.replay = (on) => { if (on && P.bars && P.bars.length > 40) { P.rp = { i: Math.max(20, P.bars.length - 120) }; bar.hidden = false; detach(overlay); try { series.setMarkers([]); } catch (e) {} (P.priceLines || []).concat(P._ct || []).forEach((l) => { try { l.applyOptions({ lineVisible: false, axisLabelVisible: false, title: '' }); } catch (e) {} }); try { if (LY.vwapS) LY.vwapS.setData([]); } catch (e) {} if (P.drawTl) P.drawTl(); el.classList.add('replaying'); show(); chart.timeScale().scrollToRealTime(); }
+        else { stop(); P.rp = null; bar.hidden = true; el.classList.remove('replaying'); if (G.mode === 'meridian') attach(overlay); P._mkSig = null; P._ctSig = null; P.rebuild(true); } };
       bar.addEventListener('click', (ev) => { const b = ev.target.closest('[data-rp]'); if (!b) return; const a = b.dataset.rp;
         if (a === 'x') { P.replay(false); const t = el.closest('.ms-pane') && el.closest('.ms-pane').querySelector('.ch-rp'); if (t) { t.classList.remove('on'); t.setAttribute('aria-pressed', 'false'); } }
         else if (a === 'play') { if (timer) stop(); else { b.textContent = '❚❚'; timer = setInterval(() => step(1), 600); } } else step(+a); });
@@ -4370,15 +4373,17 @@ function msNextSetup(bars, A) {
       P.ictOv.set(items);
     };
     P.setMode = function (m) {
+      if (P._mode === m && m !== 'meridian') return;   // same mode again: nothing to redo
+      P._mode = m;
       if (m === 'clean') {   // candles only: both markups off, their price lines and markers gone; indicators, drawings and plans stay
-        try { series.detachPrimitive(overlay); } catch (e) {} try { series.detachPrimitive(P.ictOv); } catch (e) {}
+        detach(overlay); detach(P.ictOv);
         (P.priceLines || []).forEach((pl) => { try { series.removePriceLine(pl); } catch (e) {} }); P.priceLines = [];
         (P._ictPL || []).forEach((l) => { try { series.removePriceLine(l); } catch (e) {} }); P._ictPL = [];
         try { series.setMarkers([]); } catch (e) {} P._mkSig = null; P._ctSig = null; try { P.planLinesDraw(); } catch (e) {} return; }
-      if (m === 'ict') { try { series.detachPrimitive(overlay); } catch (e) {} try { series.attachPrimitive(P.ictOv); } catch (e) {}
+      if (m === 'ict') { detach(overlay); attach(P.ictOv);
         (P.priceLines || []).forEach((pl) => { try { series.removePriceLine(pl); } catch (e) {} }); P.priceLines = []; try { P.planLinesDraw(); } catch (e) {} try { series.setMarkers([]); } catch (e) {} P._mkSig = null; P.ictDraw(); }
-      else { try { series.detachPrimitive(P.ictOv); } catch (e) {} (P._ictPL || []).forEach((l) => { try { series.removePriceLine(l); } catch (e) {} }); P._ictPL = [];
-        if (!P.rp) { try { series.attachPrimitive(overlay); } catch (e) {} } P._mkSig = null; P._ctSig = null; if (P.A) P.draw(); }
+      else { detach(P.ictOv); (P._ictPL || []).forEach((l) => { try { series.removePriceLine(l); } catch (e) {} }); P._ictPL = [];
+        if (!P.rp) attach(overlay); P._mkSig = null; P._ctSig = null; if (P.A) P.draw(); }
     };
     P.analyze = function () {
       const bars = P.bars, n = bars.length;
