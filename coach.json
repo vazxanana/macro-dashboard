@@ -1,6 +1,6 @@
 {
  "proposals": [],
- "proposalsKey": "v5|2026-11-08T10:39:43.680Z|2026-11-08T10:39:49.091Z|2026-11-08T10:27:57.313Z|{\"xau\":\"OANDA\",\"btc\":\"Kraken\",\"eth\":\"Kraken\",\"sol\":\"Kraken\",\"xrp\":\"Kraken\",\"eurusd\":\"OANDA\",\"gbpusd\":\"OANDA\",\"audusd\":\"OANDA\",\"usdcad\":\"OANDA\",\"usdchf\":\"OANDA\"}|[[],{\"scalp\":{\"d1\":\"against\",\"since\":{\"d1\":\"2026-11-02T11:52:07.000Z\",\"session:asia\":\"2026-11-02T21:25:27.000Z\",\"session:overlap\":\"2026-11-07T06:00:50.000Z\"},\"src\":{\"d1\":\"user\",\"noMarket\":\"user\",\"session:asia\":\"user\"},\"noSession\":[\"asia\",\"overlap\"],\"noMarket\":[\"audusd\"]},\"rscalp\":{\"since\":{\"session:newyork\":\"2026-11-06T12:00:22.000Z\"},\"src\":{\"minRR\":\"user\"},\"noSession\":[\"newyork\"],\"minRR\":3},\"intraday\":{\"since\":{\"session:asia\":\"2026-11-04T12:04:20.000Z\"},\"src\":{\"maxRR\":\"user\"},\"maxRR\":10,\"noSession\":[\"asia\"]},\"rintra\":{\"since\":{\"session:late\":\"2026-11-03T06:00:12.000Z\"},\"noSession\":[\"late\"],\"noMarket\":[\"usdchf\"],\"src\":{\"noMarket\":\"user\"}},\"position\":{\"off\":true,\"src\":{\"off\":\"user\"}},\"swing\":{\"d1\":\"against\",\"src\":{\"d1\":\"user\",\"off\":\"user\"},\"off\":true},\"m30m1\":{\"d1\":\"with\",\"since\":{\"d1\":\"2026-11-07T06:00:50.000Z\"}}}]",
+ "proposalsKey": "v5|2026-11-08T10:39:43.680Z|2026-11-08T10:39:49.091Z|2026-11-08T13:49:48.826Z|{\"xau\":\"OANDA\",\"btc\":\"Kraken\",\"eth\":\"Kraken\",\"sol\":\"Kraken\",\"xrp\":\"Kraken\",\"eurusd\":\"OANDA\",\"gbpusd\":\"OANDA\",\"audusd\":\"OANDA\",\"usdcad\":\"OANDA\",\"usdchf\":\"OANDA\"}|[[],{\"scalp\":{\"d1\":\"against\",\"since\":{\"d1\":\"2026-11-02T11:52:07.000Z\",\"session:asia\":\"2026-11-02T21:25:27.000Z\",\"session:overlap\":\"2026-11-07T06:00:50.000Z\"},\"src\":{\"d1\":\"user\",\"noMarket\":\"user\",\"session:asia\":\"user\"},\"noSession\":[\"asia\",\"overlap\"],\"noMarket\":[\"audusd\"]},\"rscalp\":{\"since\":{\"session:newyork\":\"2026-11-06T12:00:22.000Z\"},\"src\":{\"minRR\":\"user\"},\"noSession\":[\"newyork\"],\"minRR\":3},\"intraday\":{\"since\":{\"session:asia\":\"2026-11-04T12:04:20.000Z\"},\"src\":{\"maxRR\":\"user\"},\"maxRR\":10,\"noSession\":[\"asia\"]},\"rintra\":{\"since\":{\"session:late\":\"2026-11-03T06:00:12.000Z\"},\"noSession\":[\"late\"],\"noMarket\":[\"usdchf\"],\"src\":{\"noMarket\":\"user\"}},\"position\":{\"off\":true,\"src\":{\"off\":\"user\"}},\"swing\":{\"d1\":\"against\",\"src\":{\"d1\":\"user\",\"off\":\"user\"},\"off\":true},\"m30m1\":{\"d1\":\"with\",\"since\":{\"d1\":\"2026-11-07T06:00:50.000Z\"}}}]",
  "proposalsSent": {
   "key": "",
   "at": "2026-11-07T19:56:11.000Z",
@@ -12,48 +12,48 @@
    "kind": "ictWatch",
    "value": "nofri",
    "label": "ICT A-setups: skip Fridays",
-   "n": 33,
-   "exp": -0.15,
-   "t": -0.75,
+   "n": 34,
+   "exp": -0.18,
+   "t": -0.89,
    "h1": {
-    "n": 16,
-    "exp": 0.05,
-    "t": 0.17
+    "n": 17,
+    "exp": -0.01,
+    "t": -0.03
    },
    "h2": {
     "n": 17,
     "exp": -0.35,
     "t": -1.31
    },
-   "keptN": 218,
+   "keptN": 220,
    "keptExp": 0.33,
    "flag": false,
-   "why": "ICT A-setups: skip Fridays: the 33 A-setups it drops made −0.15R a trade (t -0.75; halves +0.05R / −0.35R); the 218 it keeps +0.33R. Not proposed: needs 30+ dropped trades losing at t ≤ −2 in both halves.",
-   "at": "2026-11-08T10:46:04.000Z"
+   "why": "ICT A-setups: skip Fridays: the 34 A-setups it drops made −0.18R a trade (t -0.89; halves −0.01R / −0.35R); the 220 it keeps +0.33R. Not proposed: needs 30+ dropped trades losing at t ≤ −2 in both halves.",
+   "at": "2026-11-08T14:03:32.000Z"
   },
   {
    "setup": "ICT A",
    "kind": "ictWatch",
    "value": "h1opp",
    "label": "ICT A-setups: only trades against or without H1 structure",
-   "n": 75,
-   "exp": 0.13,
-   "t": 0.77,
+   "n": 78,
+   "exp": 0.17,
+   "t": 0.98,
    "h1": {
-    "n": 37,
-    "exp": 0.33,
-    "t": 1.15
+    "n": 39,
+    "exp": 0.41,
+    "t": 1.32
    },
    "h2": {
-    "n": 38,
+    "n": 39,
     "exp": -0.08,
     "t": -0.53
    },
    "keptN": 176,
-   "keptExp": 0.33,
+   "keptExp": 0.31,
    "flag": false,
-   "why": "ICT A-setups: only trades against or without H1 structure: the 75 A-setups it drops made +0.13R a trade (t 0.77; halves +0.33R / −0.08R); the 176 it keeps +0.33R. Not proposed: needs 30+ dropped trades losing at t ≤ −2 in both halves.",
-   "at": "2026-11-08T10:46:04.000Z"
+   "why": "ICT A-setups: only trades against or without H1 structure: the 78 A-setups it drops made +0.17R a trade (t 0.98; halves +0.41R / −0.08R); the 176 it keeps +0.31R. Not proposed: needs 30+ dropped trades losing at t ≤ −2 in both halves.",
+   "at": "2026-11-08T14:03:32.000Z"
   }
  ],
  "decay": {
