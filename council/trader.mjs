@@ -24,7 +24,7 @@ import { costModel, annotateCosts, costSummary, driftR, backfillDrift, staleStat
 import { moshaChain } from './mosha.mjs';
 import { SYMBOLS as BROKER_SYMBOLS } from './ctrader-mirror.mjs';
 // feed source on every record + re-quote / cancel / re-base when a market's candle feed changes source (8 Nov, council/feed.mjs)
-import { feedTag, requoteMarket, feedChangeText } from './feed.mjs';
+import { feedTag, requoteMarket, feedChangeText, feedDecision } from './feed.mjs';
 import { newsFeat } from './events.mjs';
 import { fetchDaily as regimeDaily, regimeOf, regimeShadow } from './regime.mjs';
 
@@ -507,7 +507,13 @@ for (const [key, M] of Object.entries(MARKETS)) {
     let feed = 'Kraken';
     if (OANDA_D1.has(key)) {
       const got = {}; for (const [id] of tfs) { got[id] = await oandaBars(key, id); if (!got[id]) break; }
-      if (tfs.every(([id]) => got[id])) { feed = 'OANDA'; for (const [id] of tfs) src[id] = { bars: got[id] }; }
+      const ok = tfs.every(([id]) => got[id]);
+      // hysteresis (8 Nov, council/feed.mjs feedDecision): a market on OANDA skips the round on one missed read instead of flipping
+      // to Kraken and back (two re-quotes); it falls to Kraken only on the second miss in a row. state.feedMiss counts the misses.
+      const FM = (state.feedMiss = state.feedMiss || {}), d = feedDecision({ oandaOk: ok, oandaMarket: true, prevFeed: ((state.feedLast || {})[key] || {}).feed || null, misses: FM[key] || 0 });
+      FM[key] = d.misses;
+      if (d.feed === 'skip') { (snapshot.feed = snapshot.feed || {})[key] = 'OANDA'; snapshot.errors['feed:' + key] = `OANDA not read this round (${d.misses} miss): ${M.label} skipped, feed kept, nothing re-quoted`; continue; }
+      if (ok) { feed = 'OANDA'; for (const [id] of tfs) src[id] = { bars: got[id] }; }
     }
     (snapshot.feed = snapshot.feed || {})[key] = feed;
     const FEED = feedTag(feed);   // 'oanda' | 'kraken': written on every record this round creates

@@ -139,7 +139,7 @@ test('futures tickets follow: a cancelled limit sends a cancel, a re-quoted limi
 
 test('the Trader is wired: feed tag on every record, re-quote before the manage loop, entry read in the feed frame, switches on the snapshot', () => {
   const src = read('../council/trader.mjs');
-  assert.match(src, /import \{ feedTag, requoteMarket, feedChangeText \} from '\.\/feed\.mjs'/);
+  assert.match(src, /import \{ feedTag, requoteMarket, feedChangeText, feedDecision \} from '\.\/feed\.mjs'/);
   assert.match(src, /const FEED = feedTag\(feed\);/);
   // every trade / research record literal carries the tag: 10 trades.push({ … }) literals, the engine's tr, the add, 2 research pushes
   assert.equal((src.match(/trades\.push\(\{/g) || []).length, 10, 'trades.push literals');
