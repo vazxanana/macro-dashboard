@@ -1,8 +1,8 @@
 {
  "v": 1,
- "at": "2026-11-08T22:30:32.000Z",
+ "at": "2026-11-08T22:55:46.000Z",
  "paperOnly": true,
- "strategistAt": "2026-11-08T22:30:23.000Z",
+ "strategistAt": "2026-11-08T22:55:35.000Z",
  "shock": {
   "shock": "Risk-off / de-risking, funding still calm",
   "clues": [
@@ -274,5 +274,144 @@
  "cpiPilot": null,
  "skillVersion": "1.2",
  "source": "council/veteran.mjs: a code port of the owner's gptmacro_v.1 skill, revision 1.2 (research/macro-veteran/); reads the strategist's data only, fetches nothing",
- "brief": "Macro veteran, 2026-11-08 22:30 UTC. Shock: Risk-off / de-risking, funding still calm (medium). Consensus with the strategist: AUCTION · 4 agree, 1 qualify, 1 disagree (Real yields); qualified: US dollar. No macro edge from either member: auction. Direction comes from the technical systems; the macro layer sets event risk and size only. Event within 72 hours (Core CPI m/m): the bias is conditional until the print. Fails if 10Y TIPS real yield above 2.75% (+15 bp from 2.60%) ends the real-rate support; DXY above 103.9 (+1.5%) says the dollar channel has turned; a weekly close below the 10-week average 4160 removes the trend tiebreaker. Ledger: P(gold up over 20 days) 57% vs base 57%, 0 resolved. Teaching: The strategist has adopted none of the veteran's challengers yet. v_ry4w hit 51%, t 0.59 vs ry hit 52%, t 0.88; v_d2_4w hit 52%, t 1.02 vs dgs2 hit 54%, t 2.12; v_dxy4w hit 50%, t -0.04 vs dxymom hit 49%, t -0.58. A challenger is adopted when it is proven on the replay (t ≥ 3, n ≥ 30) and beats its incumbent; it is handed back when it stops being proven."
+ "outlook": {
+  "week": {
+   "horizon": 5,
+   "by": "2026-11-13",
+   "from": "$4,071",
+   "n": 3099,
+   "list": [
+    {
+     "claim": "Gold closes 2026-11-13 above $4,071 (today's close)",
+     "p": 0.55
+    },
+    {
+     "claim": "Gold closes at or above $4,100 on some day by 2026-11-13",
+     "p": 0.52
+    },
+    {
+     "claim": "Gold closes at or above $4,170 on some day by 2026-11-13 (stretch)",
+     "p": 0.14
+    },
+    {
+     "claim": "Gold closes at or below $4,050 on some day by 2026-11-13",
+     "p": 0.5
+    },
+    {
+     "claim": "Gold closes at or below $3,990 on some day by 2026-11-13 (stretch)",
+     "p": 0.15
+    },
+    {
+     "claim": "Gold's 2026-11-13 close lands between $4,022 and $4,137",
+     "p": 0.6
+    },
+    {
+     "claim": "Gold moves 2.5% or more either way by 2026-11-13",
+     "p": 0.17
+    },
+    {
+     "claim": "DXY closes 2026-11-13 above 102.36 (today's close)",
+     "p": 0.52
+    }
+   ]
+  },
+  "month": {
+   "horizon": 20,
+   "by": "2026-12-04",
+   "from": "$4,071",
+   "n": 3084,
+   "list": [
+    {
+     "claim": "Gold closes 2026-12-04 above $4,071 (today's close)",
+     "p": 0.57
+    },
+    {
+     "claim": "Gold closes at or above $4,170 on some day by 2026-12-04",
+     "p": 0.48
+    },
+    {
+     "claim": "Gold closes at or above $4,320 on some day by 2026-12-04 (stretch)",
+     "p": 0.14
+    },
+    {
+     "claim": "Gold closes at or below $4,010 on some day by 2026-12-04",
+     "p": 0.48
+    },
+    {
+     "claim": "Gold closes at or below $3,900 on some day by 2026-12-04 (stretch)",
+     "p": 0.14
+    },
+    {
+     "claim": "Gold's 2026-12-04 close lands between $3,982 and $4,229",
+     "p": 0.6
+    },
+    {
+     "claim": "Gold moves 5.9% or more either way by 2026-12-04",
+     "p": 0.13
+    },
+    {
+     "claim": "DXY closes 2026-12-04 above 102.36 (today's close)",
+     "p": 0.52
+    }
+   ]
+  },
+  "tilt": 0,
+  "digest": {
+   "list": [
+    {
+     "src": "CFTC Commitments of Traders",
+     "read": "COT managed money -1k net, −1k over 4 weeks, 0th percentile (positions as of 2026-11-03)",
+     "says": "neutral for gold. Light positioning: room for buyers to return",
+     "limit": "COT is a Tuesday snapshot of reportable futures, published Friday: crowding and fragility context, not direction. ETF tonnage and options dealer positioning are not observed by the council."
+    },
+    {
+     "src": "Fed H.4.1 / funding (SOFR, VIX curve, HY spreads)",
+     "read": "VIX 28.2 (VIX/VIX3M 1.10) · HY OAS 3.48%, +22 bp on the week · SOFR−EFFR 4 bp (as of 2026-11-05)",
+     "says": "neutral for gold. Stress first sells gold for cash, then buys it",
+     "limit": "Safe-haven behaviour is conditional: in a liquidity squeeze gold is sold for cash first (BIS WP 1380: the effect depends on financial conditions). An inverted VIX curve is stress, not a direction."
+    },
+    {
+     "src": "CME FedWatch / 2Y (policy path)",
+     "read": "2Y 4.46%, −15 bp on the week, −31 bp over 4 weeks · 10Y−3M 0.67% (as of 2026-11-05)",
+     "says": "supportive for gold. The direction of repricing is the signal, not the level",
+     "limit": "The 2Y mixes expected policy and term premium; a cut that was priced is not a dovish surprise, and the reaction to a decision is the signal, not the decision."
+    },
+    {
+     "src": "TIPS real yield (opportunity cost)",
+     "read": "10Y TIPS 2.60%, −3 bp on the week, −32 bp over 4 weeks (as of 2026-11-05)",
+     "says": "supportive for gold",
+     "limit": "The level alone does not forecast daily returns; the regime-dependent sensitivity is read from changes, and a nominal yield move is not a real-yield move."
+    },
+    {
+     "src": "Dollar (DXY, broad USD)",
+     "read": "DXY 102.36, +0.27% on the week, +0.13% over 4 weeks · broad USD −0.10% over 4 weeks (as of 2026-11-06)",
+     "says": "neutral for gold",
+     "limit": "USD and gold can rise together under stress or fall together when cash is wanted; gold in EUR, JPY, INR and CNY terms is not checked here, so the USD quote may hide a different local story."
+    },
+    {
+     "src": "Breakevens (inflation expectations)",
+     "read": "10Y breakeven 2.23%, −11 bp on the week (as of 2026-11-06)",
+     "says": "against gold",
+     "limit": "Breakevens carry inflation-risk and TIPS-liquidity premia; a hot print is not mechanically bullish for gold if real yields and the dollar reprice higher."
+    },
+    {
+     "src": "Council strategist: Gold Macro Score",
+     "read": "score 0.13 (tested 2007-26, 4-week horizon)",
+     "says": "no tested edge (auction)",
+     "limit": "Never a sell signal: a negative score did not predict falls."
+    }
+   ],
+   "missing": [
+    "LBMA vaults",
+    "COMEX warehouse stocks",
+    "Shanghai withdrawals and SHFE warrants",
+    "Swiss customs flows",
+    "WGC reserves and ETF flows",
+    "Treasury TIC",
+    "NY Fed ACM term premium"
+   ]
+  },
+  "method": "Each probability is gold's own frequency for the same horizon over the last 10 years, moved by the council's tilt (the veteran's calibrated probability minus its base rate, carrying the strategist's Gold Macro Score); half the tilt for the week. The range call is the middle 60% of past outcomes. DXY calls carry no tilt."
+ },
+ "brief": "Macro veteran, 2026-11-08 22:55 UTC. Shock: Risk-off / de-risking, funding still calm (medium). Consensus with the strategist: AUCTION · 4 agree, 1 qualify, 1 disagree (Real yields); qualified: US dollar. No macro edge from either member: auction. Direction comes from the technical systems; the macro layer sets event risk and size only. Event within 72 hours (Core CPI m/m): the bias is conditional until the print. Fails if 10Y TIPS real yield above 2.75% (+15 bp from 2.60%) ends the real-rate support; DXY above 103.9 (+1.5%) says the dollar channel has turned; a weekly close below the 10-week average 4160 removes the trend tiebreaker. Ledger: P(gold up over 20 days) 57% vs base 57%, 0 resolved. Teaching: The strategist has adopted none of the veteran's challengers yet. v_ry4w hit 51%, t 0.59 vs ry hit 52%, t 0.88; v_d2_4w hit 52%, t 1.02 vs dgs2 hit 54%, t 2.12; v_dxy4w hit 50%, t -0.04 vs dxymom hit 49%, t -0.58. A challenger is adopted when it is proven on the replay (t ≥ 3, n ≥ 30) and beats its incumbent; it is handed back when it stops being proven."
 }
