@@ -2,7 +2,7 @@
 //   node --test tests/ctrader-mirror.test.mjs
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { mirrorRound, PT, ALLOWED, session, volumeFor, relative, seal, unseal, LIMITS, ictCandidates, orderStep, commentFor, mirrorAlertText, sendMirrorAlerts, riskVolume, quoteRate, specFor } from '../council/ctrader-mirror.mjs';
+import { mirrorRound, PT, ALLOWED, session, volumeFor, relative, seal, unseal, LIMITS, ictCandidates, orderStep, commentFor, mirrorAlertText, sendMirrorAlerts, riskVolume, quoteRate, specFor, markOf } from '../council/ctrader-mirror.mjs';
 
 const ENV = { CTRADER_CLIENT_ID: 'fake-client-id', CTRADER_CLIENT_SECRET: 'fake-client-secret', CTRADER_ACCESS_TOKEN: 'fake-access-old',
   CTRADER_REFRESH_TOKEN: 'fake-refresh-old', CTRADER_ACCOUNT_ID: '4242', CTRADER_ENV: 'demo', CTRADER_MIRROR: 'on' };
@@ -85,11 +85,11 @@ test('opens a market order for a fresh live trade, with relative stop/target and
   assert.equal(r.state.map['eurusd-intraday-1'].status, 'open'); assert.equal(b.positions.size, 1);
 });
 
-test('with shadows off: never copies shadows, old trades, trades from before the mirror started, pending orders or unknown markets', async () => {
+test('with shadows off: never copies shadows, pending orders or unknown markets; old live trades are copied (8 Nov: everything the council has open)', async () => {
   const b = broker();
   const trades = [tr({ id: 'a', shadow: true }), tr({ id: 'b', opened: NOW - 3 * 3600, filled: NOW - 3 * 3600 }), tr({ id: 'c', opened: NOW - 20 * 60, filled: NOW - 20 * 60 }), tr({ id: 'd', market: 'btc' }), tr({ id: 'e', status: 'pending' })];
   const r = await mirrorRound({ env: ENV, trades, state: { startedAt: new Date((NOW - 600) * 1000).toISOString(), catchUpAt: 'done' }, WS: b.WS, now: NOW, shadows: false });
-  assert.equal(types(b).includes(PT.NEW_ORDER_REQ), false); assert.deepEqual(r.sent, []);
+  assert.deepEqual(r.sent.map((x) => x.trade).sort(), ['b', 'c']); assert.equal(r.state.map.a, undefined); assert.equal(r.state.map.d, undefined); assert.equal(r.state.map.e, undefined);
 });
 
 test('8 Nov (owner: mirror everything): shadows are copied by default, marked shadow at the broker-side record, and the first round catches up every open trade once', async () => {
@@ -99,12 +99,12 @@ test('8 Nov (owner: mirror everything): shadows are copied by default, marked sh
   let r = await mirrorRound({ env: ENV, trades, state: { startedAt: new Date((NOW - 600) * 1000).toISOString() }, WS: b.WS, now: NOW });
   assert.equal(b.positions.size, 2); assert.ok(r.state.catchUpAt); assert.equal(r.state.map['old-shadow'].shadow, true); assert.equal(r.state.map['old-shadow'].status, 'open');
   assert.ok(r.log.some((l) => /catch-up round: 2 open council trades/.test(l.msg)));
-  // after the catch-up, an old trade is no longer copied (the fresh rule is back), a fresh one is
+  // later rounds keep copying whatever is open and not yet copied, old or new (no freshness window any more)
   r = await mirrorRound({ env: ENV, trades: trades.concat([tr({ id: 'old2', shadow: true, opened: NOW - 3 * 3600, filled: NOW - 3 * 3600 }), tr({ id: 'new2', shadow: true, opened: NOW + 200, filled: NOW + 200 })]), state: r.state, WS: b.WS, now: NOW + 300 });
-  assert.equal(b.positions.size, 3); assert.equal(r.state.map.old2, undefined); assert.equal(r.state.map.new2.status, 'open');
+  assert.equal(b.positions.size, 4); assert.equal(r.state.map.old2.status, 'open'); assert.equal(r.state.map.new2.status, 'open');
   // the shadow trade closing at the council closes the demo position
-  r = await mirrorRound({ env: ENV, trades: [tr({ id: 'old-shadow', shadow: true, status: 'loss' }), trades[1], tr({ id: 'new2', shadow: true })], state: r.state, WS: b.WS, now: NOW + 600 });
-  assert.equal(r.state.map['old-shadow'].status, 'closed by council'); assert.equal(b.positions.size, 2);
+  r = await mirrorRound({ env: ENV, trades: [tr({ id: 'old-shadow', shadow: true, status: 'loss' }), trades[1], tr({ id: 'new2', shadow: true }), tr({ id: 'old2', shadow: true })], state: r.state, WS: b.WS, now: NOW + 600 });
+  assert.equal(r.state.map['old-shadow'].status, 'closed by council'); assert.equal(b.positions.size, 3);
   // crypto markets are in the symbol map now
   const { SYMBOLS } = await import('../council/ctrader-mirror.mjs'); assert.deepEqual(SYMBOLS.btc, ['BTCUSD']); assert.deepEqual(SYMBOLS.xrp, ['XRPUSD']);
 });
@@ -118,13 +118,17 @@ test('closes the position when the council closes the trade; marks broker-side c
   assert.equal(b.positions.size, 0); assert.equal(r.state.map['eurusd-intraday-1'].status, 'closed by council'); assert.equal(r.state.map.x2.status, 'closed at broker');
 });
 
-test('caps: at most LIMITS.maxOpen open, and no new order after a 2% daily loss', async () => {
+test('caps: at most LIMITS.maxOpen open, and no new order after a 2% daily loss; both are waits (tried again), not skips', async () => {
   const b = broker(); const trades = Array.from({ length: LIMITS.maxOpen + 2 }, (_, i) => tr({ id: 't' + i }));
   let r = await mirrorRound({ env: ENV, trades, state: started, WS: b.WS, now: NOW });
-  assert.equal(b.positions.size, LIMITS.maxOpen); assert.equal(Object.keys(r.state.skipped).length, 2);
+  assert.equal(b.positions.size, LIMITS.maxOpen); assert.equal(Object.keys(r.state.skipped || {}).length, 0); assert.equal(Object.keys(r.state.wait).length, 2);
+  assert.match(r.state.wait['t' + LIMITS.maxOpen].why, /already open/); assert.equal(r.state.wait['t' + LIMITS.maxOpen].n, 0);
+  // one position closes at the council: a waiting trade takes its place next round
+  r = await mirrorRound({ env: ENV, trades: trades.map((t) => (t.id === 't0' ? { ...t, status: 'win' } : t)), state: r.state, WS: b.WS, now: NOW + 240 });
+  assert.equal(b.positions.size, LIMITS.maxOpen); assert.equal(Object.keys(r.state.wait).length, 1);
   const b2 = broker({ balance: 100000 }); r = await mirrorRound({ env: ENV, trades: [], state: started, WS: b2.WS, now: NOW });
   b2.setBalance(97900); r = await mirrorRound({ env: ENV, trades: [tr({ id: 'late' })], state: r.state, WS: b2.WS, now: NOW + 60 });
-  assert.equal(b2.positions.size, 0); assert.match(r.state.skipped.late, /daily loss stop/);
+  assert.equal(b2.positions.size, 0); assert.match(r.state.wait.late.why, /daily loss stop/);
 });
 
 test('a rejected order is logged and not retried', async () => {
@@ -178,7 +182,7 @@ test('ORDER_ACCEPTED but no fill seen: kept as "sent" (counts toward the cap), c
   const b = broker({ fill: 'accepted-only' }), six = () => Array.from({ length: LIMITS.maxOpen + 1 }, (_, i) => tr({ id: 's' + i }));
   let r = await mirrorRound({ env: ENV, trades: six(), state: started, WS: b.WS, now: NOW, timeout: 30 });
   const sent = Object.values(r.state.map); assert.equal(sent.length, LIMITS.maxOpen); assert.ok(sent.every((m) => m.status === 'sent' && m.positionId));
-  assert.match(r.state.skipped['s' + LIMITS.maxOpen], /already open/);
+  assert.match(r.state.wait['s' + LIMITS.maxOpen].why, /already open/);
   r = await mirrorRound({ env: ENV, trades: six(), state: r.state, WS: b.WS, now: NOW + 240 });
   assert.ok(Object.values(r.state.map).every((m) => m.status === 'open')); assert.equal(orders(b).length, LIMITS.maxOpen);
 });
@@ -203,15 +207,22 @@ test('a round whose state was lost (job cancelled after the order): the position
   assert.equal(r.state.map.other.positionId, '902');   // the manual position is never adopted: "other" got its own mirror order
 });
 
-test('market closed: retried next round while fresh, at most LIMITS.retries times; a symbol not tradable now waits too', async () => {
+test('market closed: the trade waits for as long as it is open (no try counted), the symbol is paused LIMITS.pause; other "not now" answers count', async () => {
   const b = broker({ reject: 'MARKET_CLOSED' });
   let r = await mirrorRound({ env: ENV, trades: [tr()], state: started, WS: b.WS, now: NOW });
-  assert.equal(r.state.wait['eurusd-intraday-1'].n, 1); assert.equal((r.state.skipped || {})['eurusd-intraday-1'], undefined);
-  b.o.reject = null; r = await mirrorRound({ env: ENV, trades: [tr()], state: r.state, WS: b.WS, now: NOW + 240 });
+  assert.equal(r.state.wait['eurusd-intraday-1'].n, 0); assert.equal((r.state.skipped || {})['eurusd-intraday-1'], undefined); assert.ok(r.state.paused.EURUSD);
+  b.o.reject = null; r = await mirrorRound({ env: ENV, trades: [tr()], state: r.state, WS: b.WS, now: NOW + LIMITS.pause + 60 });
   assert.equal(r.state.map['eurusd-intraday-1'].status, 'open'); assert.equal(r.state.wait['eurusd-intraday-1'], undefined);
+  // a whole weekend of closed-market rounds: one order per symbol per pause, never a skip; a second trade on the symbol sends nothing while paused
   const b2 = broker({ reject: 'MARKET_CLOSED' }); r = { state: started };
-  for (let i = 0; i < 5; i++) r = await mirrorRound({ env: ENV, trades: [tr({ opened: NOW + 100, filled: NOW + 100 })], state: r.state, WS: b2.WS, now: NOW + 100 + i * 60 });
-  assert.equal(orders(b2).length, LIMITS.retries); assert.match(r.state.skipped['eurusd-intraday-1'], /3 tries/);
+  for (let i = 0; i < 30; i++) r = await mirrorRound({ env: ENV, trades: [tr({ opened: NOW + 100, filled: NOW + 100 }), tr({ id: 'two', opened: NOW + 100, filled: NOW + 100 })], state: r.state, WS: b2.WS, now: NOW + 100 + i * 240 });
+  assert.ok(orders(b2).length >= 8 && orders(b2).length <= 12, `orders ${orders(b2).length}`);   // 30 rounds x 4 min, one probe per 10-min pause
+  assert.equal((r.state.skipped || {})['eurusd-intraday-1'], undefined); assert.match(r.state.wait.two.why, /market closed/);
+  assert.equal(r.log.filter((l) => /not mirrored yet two/.test(l.msg)).length <= 1, true);   // a repeat of the same reason is not logged again
+  // a counted "not now" (maintenance) still runs out after LIMITS.retries
+  const b4 = broker({ reject: 'SERVER_IS_UNDER_MAINTENANCE' }); r = { state: started };
+  for (let i = 0; i < 5; i++) r = await mirrorRound({ env: ENV, trades: [tr()], state: r.state, WS: b4.WS, now: NOW + i * 60 });
+  assert.equal(orders(b4).length, LIMITS.retries); assert.match(r.state.skipped['eurusd-intraday-1'], /3 tries/);
   const b3 = broker({ info: { 1: { tradingMode: 1 } } }); r = await mirrorRound({ env: ENV, trades: [tr()], state: started, WS: b3.WS, now: NOW });
   assert.equal(orders(b3).length, 0); assert.match(r.state.wait['eurusd-intraday-1'].why, /not tradable/);
 });
@@ -250,19 +261,21 @@ test('tokens: a refreshed pair is handed to onTokens at once; a newly configured
   assert.equal(b3.sent.find((m) => m.payloadType === PT.ACCOUNTS_BY_TOKEN_REQ).payload.accessToken, 'fake-access-new');
 });
 
-test('housekeeping: skip notes dropped once the trade can no longer be copied; finished positions dropped after keepDays', async () => {
+test('housekeeping: skip notes live as long as the council trade is open (never re-sent), dropped once it closes; finished positions dropped after keepDays', async () => {
   const b = broker({ reject: 'NOT_ENOUGH_MONEY' }); let r = await mirrorRound({ env: ENV, trades: [tr()], state: started, WS: b.WS, now: NOW });
   assert.ok(r.state.skipped['eurusd-intraday-1']);
   r.state.map.old = { status: 'closed at broker', closedAt: new Date((NOW - 40 * 86400) * 1000).toISOString(), positionId: '1' };
-  r = await mirrorRound({ env: ENV, trades: [tr()], state: r.state, WS: b.WS, now: NOW + LIMITS.fresh + 60 });
-  assert.equal(r.state.skipped['eurusd-intraday-1'], undefined); assert.equal(r.state.map.old, undefined); assert.equal(orders(b).length, 1);
+  r = await mirrorRound({ env: ENV, trades: [tr()], state: r.state, WS: b.WS, now: NOW + 3 * 3600 });   // three hours on, still open: still skipped, no new order
+  assert.ok(r.state.skipped['eurusd-intraday-1']); assert.equal(r.state.map.old, undefined); assert.equal(orders(b).length, 1);
+  r = await mirrorRound({ env: ENV, trades: [tr({ status: 'loss' })], state: r.state, WS: b.WS, now: NOW + 4 * 3600 });
+  assert.equal(r.state.skipped['eurusd-intraday-1'], undefined); assert.equal(orders(b).length, 1);
 });
 
 test('daily stop: a day that started without a readable balance takes the first one it gets', async () => {
   const b = broker(); const st = { ...started, day: { date: new Date(NOW * 1000).toISOString().slice(0, 10), startBalance: null } };
   let r = await mirrorRound({ env: ENV, trades: [], state: st, WS: b.WS, now: NOW }); assert.equal(r.state.day.startBalance, 10000);
   b.setBalance(970000); r = await mirrorRound({ env: ENV, trades: [tr({ opened: NOW + 30, filled: NOW + 30 })], state: r.state, WS: b.WS, now: NOW + 60 });
-  assert.equal(orders(b).length, 0); assert.match(r.state.skipped['eurusd-intraday-1'], /daily loss stop/);
+  assert.equal(orders(b).length, 0); assert.match(r.state.wait['eurusd-intraday-1'].why, /daily loss stop/);
 });
 
 // ---- phone alerts (mirror opens / closes / rejects) -----------------------------------------------------------------------
@@ -307,9 +320,13 @@ test('alerts: a rejected order alerts once (with the reason); "not now" answers 
   assert.deepEqual(kinds(r), ['reject']); const t = mirrorAlertText(r.alerts[0], NOW);
   assert.equal(t.title, 'Demo mirror: order rejected · SELL EURUSD 0.01 lot'); assert.match(t.msg, /NOT_ENOUGH_MONEY/);
   r = await mirrorRound({ env: ENV, trades: [tr({ side: 'sell' })], state: again(r), WS: b.WS, now: NOW + 60 }); assert.deepEqual(kinds(r), []);
-  const b2 = broker({ reject: 'MARKET_CLOSED' }); r = { state: started }; const seen = [];
+  const b2 = broker({ reject: 'SERVER_IS_UNDER_MAINTENANCE' }); r = { state: started }; const seen = [];
   for (let i = 0; i < 4; i++) { r = await mirrorRound({ env: ENV, trades: [tr({ opened: NOW + 100, filled: NOW + 100 })], state: again(r), WS: b2.WS, now: NOW + 100 + i * 60 }); seen.push(...kinds(r)); }
   assert.deepEqual(seen, ['reject']);
+  // a closed market never alerts: it waits for the open
+  const b3 = broker({ reject: 'MARKET_CLOSED' }); r = { state: started }; const seen3 = [];
+  for (let i = 0; i < 4; i++) { r = await mirrorRound({ env: ENV, trades: [tr()], state: again(r), WS: b3.WS, now: NOW + i * 900 }); seen3.push(...kinds(r)); }
+  assert.deepEqual(seen3, []);
 });
 
 test('alerts: a position found again after a lost round is managed but not re-alerted as opened', async () => {
@@ -423,4 +440,57 @@ test('quoteRate: quote = account currency 1, base = account currency 1/price, el
   assert.equal(quoteRate({ name: 'EURGBP', px: 0.85 }), null);
   assert.deepEqual(specFor({ account: { currency: 'USD' }, symbols: { XAUUSD: { quote: 'USD' } } }, 'XAUUSD'), { quote: 'USD', deposit: 'USD' });
   assert.equal(specFor({ symbols: { XAUUSD: { quote: 'USD' } } }, 'XAUUSD'), null); assert.equal(specFor(null, 'XAUUSD'), null);
+});
+
+// ---- 8 Nov audit: levels from the council's latest price, min-lot risk cap --------------------------------------------------
+test('levels: a council trade copied late measures its stop/target distances from the council\'s latest price, so the demo levels equal the council\'s', async () => {
+  // buy 1.1000 / stop 1.0980 / target 1.1050, price now 1.1010 (0.5R into the trade): stop 210 pips-ish below, target 400 above
+  const b = broker(); const r = await mirrorRound({ env: ENV, trades: [tr()], state: started, WS: b.WS, now: NOW, marks: { eurusd: { price: 1.101, at: NOW - 60 } } });
+  const o = orders(b)[0].payload; assert.equal(o.relativeStopLoss, 300); assert.equal(o.relativeTakeProfit, 400);
+  const m = r.state.map['eurusd-intraday-1']; assert.equal(m.mark, 1.101); assert.equal(m.levelsFrom, 'mark'); assert.equal(m.stop, 1.098); assert.equal(m.t1, 1.105);
+  assert.equal(m.riskCash, 3);   // sized on the real distance: 0.01 lot (the minimum) x 30 pips = $3, not the council's 20 pips
+});
+test('levels: price past the council stop or target, or more than LIMITS.maxDriftR into the trade, is skipped as a different trade', async () => {
+  let b = broker(); let r = await mirrorRound({ env: ENV, trades: [tr()], state: started, WS: b.WS, now: NOW, marks: { eurusd: 1.0975 } });
+  assert.equal(orders(b).length, 0); assert.match(r.state.skipped['eurusd-intraday-1'], /past the council stop/);
+  b = broker(); r = await mirrorRound({ env: ENV, trades: [tr()], state: started, WS: b.WS, now: NOW, marks: { eurusd: 1.1051 } });
+  assert.equal(orders(b).length, 0); assert.match(r.state.skipped['eurusd-intraday-1'], /past the council target/);
+  b = broker(); r = await mirrorRound({ env: ENV, trades: [tr()], state: started, WS: b.WS, now: NOW, marks: { eurusd: 1.1025 } });   // 1.25R run
+  assert.equal(orders(b).length, 0); assert.match(r.state.skipped['eurusd-intraday-1'], /run 1\.25R/);
+  // a sell: the same checks the other way round
+  b = broker(); r = await mirrorRound({ env: ENV, trades: [tr({ side: 'sell', entry: 1.1, stop: 1.102, t1: 1.095 })], state: started, WS: b.WS, now: NOW, marks: { eurusd: 1.1021 } });
+  assert.match(r.state.skipped['eurusd-intraday-1'], /past the council stop/);
+  b = broker(); r = await mirrorRound({ env: ENV, trades: [tr({ side: 'sell', entry: 1.1, stop: 1.102, t1: 1.095 })], state: started, WS: b.WS, now: NOW, marks: { eurusd: 1.099 } });
+  assert.equal(orders(b)[0].payload.relativeStopLoss, 300); assert.equal(orders(b)[0].payload.relativeTakeProfit, 400); assert.equal(r.state.map['eurusd-intraday-1'].status, 'open');
+  // a trailing system (rr >= 50, no target) is never skipped for the target
+  b = broker(); r = await mirrorRound({ env: ENV, trades: [tr({ rr: 99, t1: 1.1001 })], state: started, WS: b.WS, now: NOW, marks: { eurusd: 1.1005 } });
+  assert.equal(r.state.map['eurusd-intraday-1'].status, 'open'); assert.equal('relativeTakeProfit' in orders(b)[0], false);
+});
+test('levels: no mark, a stale mark or an ICT trade fall back to the council entry; markOf', async () => {
+  let b = broker(); await mirrorRound({ env: ENV, trades: [tr()], state: started, WS: b.WS, now: NOW, marks: { eurusd: { price: 1.101, at: NOW - LIMITS.markMaxAge - 1 } } });
+  assert.equal(orders(b)[0].payload.relativeStopLoss, 200); assert.equal(orders(b)[0].payload.relativeTakeProfit, 500);
+  b = broker(); let r = await mirrorRound({ env: ENV, trades: [tr()], state: started, WS: b.WS, now: NOW, marks: { xau: 4000 } });
+  assert.equal(orders(b)[0].payload.relativeStopLoss, 200); assert.equal(r.state.map['eurusd-intraday-1'].mark, undefined);
+  assert.equal(markOf({ eurusd: 1.1 }, 'eurusd', NOW), 1.1); assert.equal(markOf({ eurusd: { price: 1.1, at: new Date((NOW - 60) * 1000).toISOString() } }, 'eurusd', NOW), 1.1);
+  assert.equal(markOf({ eurusd: { price: 1.1, at: (NOW - 3600) * 1000 } }, 'eurusd', NOW), null); assert.equal(markOf({ eurusd: 0 }, 'eurusd', NOW), null); assert.equal(markOf(null, 'eurusd', NOW), null);
+  // ICT: futures levels on a cash CFD, distance from the entry regardless of the mark
+  const ict = [{ id: 'nq-b-1', market: 'nq', side: 'buy', entry: 20000, stop: 19950, t1: null, status: 'open', opened: NOW - 60, filled: NOW - 60, grade: 'A', setup: 'ict-A' }];
+  b = broker(); await mirrorRound({ env: ENV, trades: ictCandidates(ict), state: started, WS: b.WS, now: NOW, marks: { nq: 20100 } });
+  assert.equal(orders(b)[0].payload.relativeStopLoss, 5000000);
+});
+test('min-lot risk cap: a wide-stop trade whose minimum lot risks more than LIMITS.maxMinLotRisk of the balance waits for a bigger balance', async () => {
+  const gold = { symbolId: 41, digits: 2, lotSize: 10000, minVolume: 100, stepVolume: 100 };   // 0.01 lot = 1 oz
+  // $1,000 demo, SOL-like stop of $8.4 on 1 lot-equivalent... use gold: 0.01 lot x $84 stop = $84 risk = 8.4% > 2%
+  const wide = riskVolume({ info: gold, t: { id: 'xau-position-1', entry: 4000, stop: 3916 }, balance: 1000, name: 'XAUUSD' });
+  assert.match(wide.skip, /even the minimum lot .* risks 84\.00, 8\.4% of the balance/); assert.equal(wide.retry, true);
+  const ok = riskVolume({ info: gold, t: { id: 'xau-scalp-1', entry: 4000, stop: 3985 }, balance: 1000, name: 'XAUUSD' });   // $15 = 1.5%
+  assert.equal(ok.volume, 100); assert.equal(ok.minLot, true); assert.equal(ok.riskCash, 15);
+  const big = riskVolume({ info: gold, t: { id: 'xau-position-1', entry: 4000, stop: 3916 }, balance: 10000, name: 'XAUUSD' });   // $10k: 0.84%, fine
+  assert.equal(big.volume, 100); assert.equal(big.riskCash, 84);
+  assert.equal(LIMITS.maxMinLotRisk, 0.02); assert.equal(LIMITS.maxDriftR, 1);
+  // in a round it is a wait, not a skip: the owner's bigger balance lets it through next round
+  const b = broker({ balance: 100000 }); let r = await mirrorRound({ env: ENV, trades: [tr({ id: 'x', market: 'xau', entry: 4000, stop: 3916, t1: 4200 })], state: started, WS: b.WS, now: NOW });
+  assert.equal(orders(b).length, 0); assert.match(r.state.wait.x.why, /even the minimum lot/);
+  b.setBalance(1000000); r = await mirrorRound({ env: ENV, trades: [tr({ id: 'x', market: 'xau', entry: 4000, stop: 3916, t1: 4200 })], state: r.state, WS: b.WS, now: NOW + 240 });
+  assert.equal(orders(b).length, 1); assert.equal(r.state.map.x.status, 'open'); assert.equal(r.state.wait.x, undefined);
 });
