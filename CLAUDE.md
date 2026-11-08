@@ -550,6 +550,11 @@ position at once when the broker refuses the stop (only no answer at all waits a
 whose stop distance is within 1.25× the broker spread (ctrader/symbols.json). Tests:
 `tests/ctrader-mirror.test.mjs` (fake broker with resting orders, `fillOrder`, cancel / cancel-rejected paths).
 
+## Guests: one page (8 Nov 2026)
+Guests always land on `#charts`; at load the `#v-guest` children move into `#v-charts > #g-merged` (the gold trade card, the H4 trade
+chart, results, the P&L calendar, the invitation), so guest styles are scoped `:is(#v-guest, .g-merged)`. The "↓ Gold trade and
+results" link in the charts toolbar jumps to that section.
+
 ## Guests on the charts, wide-screen density (8 Nov 2026)
 Guests (`PUB`) may open `#charts` on any market (watchlist chips `?s=<market>#charts`, header picker live only on the charts view;
 `html[data-view]` set by showView). Their markup is Clean only: `setMode` forces clean, Meridian / ICT buttons show a lock and open

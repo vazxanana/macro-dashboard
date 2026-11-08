@@ -2678,8 +2678,7 @@ html[data-motion="off"] #v-ict .ict-cal-d:hover { transform: none !important; }
 
   <!-- ─── Guest: one H4 gold chart with one trade setup ─── -->
   <section class="view" id="v-guest" aria-label="Gold H4 chart" hidden>
-    <div class="g-head"><div><h1 class="h-head">Gold · H4 <small class="g-live"><i aria-hidden="true"></i>live</small></h1><p class="ms-note g-lede">The desk's current gold trade on live candles. Paper trading, one system, nothing hidden.</p></div>
-      <a class="g-charts-btn" href="#charts"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M7 4v16M17 4v16M4 8h6v8H4zM14 6h6v6h-6z"></path></svg>Open the charts <small>any market · D1 to M1</small></a></div>
+    <div class="g-head"><div><h1 class="h-head">The desk's gold trade <small class="g-live"><i aria-hidden="true"></i>live</small></h1><p class="ms-note g-lede">The council's current gold trade on H4 candles, then its results and the P&amp;L calendar. Paper trading, one system, nothing hidden.</p></div></div>
     <!-- the trade the chart shows, in words (8 Nov, owner: "improve this") -->
     <div class="card g-setup" id="g-setup" hidden></div>
     <div class="card g-card"><div class="g-chart" id="g-chart"><div class="g-msg" id="g-msg">Loading the chart…</div></div></div>
@@ -2807,7 +2806,7 @@ html[data-motion="off"] #v-ict .ict-cal-d:hover { transform: none !important; }
       <div class="adr" id="ms-adr" role="status" aria-label="Daily range" hidden></div>
       <div class="pa-chips" id="ms-pa-chips" hidden></div>
       <div class="mtf" id="ms-mtf" role="group" aria-label="Timeframe alignment: last structure break per timeframe" hidden></div>
-      <button type="button" class="ind-open" id="ms-ind-open" title="Add up to 10 indicators (saved for your account on this device)">Indicators <small id="ms-ind-n">0/10</small></button><div class="mk-mode seg" role="group" aria-label="Chart markup"><button type="button" data-mk="meridian" class="on" aria-pressed="true" title="Meridian: the council's Mosha structure, setups and trades">Meridian</button><button type="button" data-mk="ict" aria-pressed="false" title="ICT: fair value gaps, session liquidity, premium / discount and the ICT desk's signals">ICT</button><button type="button" data-mk="clean" aria-pressed="false" title="Clean: candles only, no markup (your indicators and drawings stay)">Clean</button></div><a class="pubonly g-back" href="#guest">← Gold overview</a>
+      <button type="button" class="ind-open" id="ms-ind-open" title="Add up to 10 indicators (saved for your account on this device)">Indicators <small id="ms-ind-n">0/10</small></button><div class="mk-mode seg" role="group" aria-label="Chart markup"><button type="button" data-mk="meridian" class="on" aria-pressed="true" title="Meridian: the council's Mosha structure, setups and trades">Meridian</button><button type="button" data-mk="ict" aria-pressed="false" title="ICT: fair value gaps, session liquidity, premium / discount and the ICT desk's signals">ICT</button><button type="button" data-mk="clean" aria-pressed="false" title="Clean: candles only, no markup (your indicators and drawings stay)">Clean</button></div><a class="pubonly g-back" href="#g-setup">↓ Gold trade and results</a>
       <div class="seg" role="group" aria-label="Chart view">
         <button type="button" data-view="1d">D1</button><button type="button" data-view="4h">H4</button><button type="button" data-view="1h">H1</button><button type="button" data-view="15m">M15</button><button type="button" data-view="5m">M5</button><button type="button" data-view="1m">M1</button><button type="button" data-view="all">All</button><button type="button" data-view="split" title="Two charts side by side, with sync settings">Split</button>
       </div>
@@ -6456,6 +6455,8 @@ function msNextSetup(bars, A) {
   { let raf = 0; addEventListener('scroll', () => { if (raf) return; raf = requestAnimationFrame(() => { raf = 0; document.documentElement.classList.toggle('is-scrolled', scrollY > 4); }); }, { passive: true }); }
   // Guest chart (6 Nov, owner): H4 gold candles with one system trade drawn as an entry line, a stop zone and a target zone
   const GV = { chart: null, series: null, ov: null, bars: null, at: 0, off: 0, busy: false };
+  // guests see one page (8 Nov, owner): the charts first, the gold trade, results, calendar and invitation under them
+  if (PUB) { const g = document.getElementById('v-guest'), c = document.getElementById('v-charts'); if (g && c && !document.getElementById('g-merged')) { const box = document.createElement('div'); box.id = 'g-merged'; box.className = 'g-merged'; while (g.firstChild) box.appendChild(g.firstChild); c.appendChild(box); } }
   async function renderGuest() {
     if (!PUB) return; const host = document.getElementById('g-chart'), msg = document.getElementById('g-msg'); if (!host || GV.busy) return;
     const I = INSTRUMENTS.xau, tf = TFS.find((t) => t.id === '4h'), SYSG = ['replica', 'mosha-bo', 'gtrend', 'gtrend5', 'gtl', 'geg'];
@@ -7581,7 +7582,7 @@ function msNextSetup(bars, A) {
       ev.preventDefault(); bs[j].focus(); bs[j].click();
     }); }
   function showView() {
-    const [h0, sub] = location.hash.slice(1).split('/'), h = PUB ? (h0 === 'charts' ? 'charts' : 'guest') : h0 === 'guest' ? 'home' : VIEWER && !['home', 'setup', 'council', 'profile'].concat(document.documentElement.dataset.ict ? ['ict'] : []).includes(h0) ? 'home' : h0 === 'users' && document.documentElement.dataset.role !== 'owner' ? 'home' : h0 === 'ict' && !document.documentElement.dataset.ict ? 'home' : !h0 && document.documentElement.dataset.ict && document.documentElement.dataset.role === 'reviewer' ? 'ict' : h0, v = VIEWS.includes(h) ? h : 'home';
+    const [h0, sub] = location.hash.slice(1).split('/'), h = PUB ? 'charts' : h0 === 'guest' ? 'home' : VIEWER && !['home', 'setup', 'council', 'profile'].concat(document.documentElement.dataset.ict ? ['ict'] : []).includes(h0) ? 'home' : h0 === 'users' && document.documentElement.dataset.role !== 'owner' ? 'home' : h0 === 'ict' && !document.documentElement.dataset.ict ? 'home' : !h0 && document.documentElement.dataset.ict && document.documentElement.dataset.role === 'reviewer' ? 'ict' : h0, v = VIEWS.includes(h) ? h : 'home';
     if (v === 'ict' && window.renderIct) setTimeout(window.renderIct, 0);
     if (v === 'profile' && window.msProfile) setTimeout(window.msProfile, 0);
     if (v === 'gold' && window.renderGold) setTimeout(window.renderGold, 0);
@@ -10264,6 +10265,12 @@ html[data-role="public"] .hdr-sw { display: none; }
 }
 @media (min-width: 1800px) { .ms-live.app { max-width: 2000px; } #v-home .h-grid { grid-template-columns: minmax(0, 2.2fr) minmax(0, 1fr); } }
 </style>
+<style id="ms-guest4-css">
+/* guests: one page (8 Nov 2026). The charts, then the gold trade and the rest, separated by a rule. */
+#v-charts .g-merged { display: grid; gap: 14px; margin-top: 26px; padding-top: 22px; border-top: 1px solid var(--line); scroll-margin-top: 80px; }
+#v-charts .g-merged .g-head .h-head { font-size: 24px; }
+html[data-role="public"] .g-back { scroll-behavior: smooth; }
+</style>
 <style id="ms-guest3-css">
 /* guests on the charts (8 Nov 2026, owner: "give the guest access to the charts, any currency; Meridian and ICT locked") */
 html[data-role="public"] #v-charts .sec-h .mk-mode button[data-mk="meridian"], html[data-role="public"] #v-charts .sec-h .mk-mode button[data-mk="ict"], html[data-role="public"] .mk-mode button[data-mk="meridian"], html[data-role="public"] .mk-mode button[data-mk="ict"] { position: relative; padding-right: 28px !important; color: var(--ink-faint); }
@@ -10284,32 +10291,32 @@ html[data-role="public"] #v-charts::before { content: "Guest view: candles, your
 <style id="ms-guest2-css">
 /* ── Guest view refresh (8 Nov 2026, owner: "improve this"): the trade in words above the chart, named levels on the axis, the
    chart follows the page theme with coloured candles, and an invitation below the results. ── */
-#v-guest .g-head { display: flex; align-items: flex-end; justify-content: space-between; gap: 16px; flex-wrap: wrap; margin-bottom: 12px; }
-#v-guest .g-head .h-head { display: flex; align-items: center; gap: 10px; margin: 0 0 4px; }
-#v-guest .g-live { display: inline-flex; align-items: center; gap: 6px; font: 600 12px var(--sans); color: var(--buy); text-transform: uppercase; letter-spacing: .04em; }
-#v-guest .g-live i { width: 8px; height: 8px; border-radius: 50%; background: var(--buy); box-shadow: 0 0 0 3px color-mix(in srgb, var(--buy) 25%, transparent); }
-@media (prefers-reduced-motion: no-preference) { #v-guest .g-live i { animation: g-pulse 2s ease-out infinite; } @keyframes g-pulse { 0% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--buy) 45%, transparent); } 70% { box-shadow: 0 0 0 7px transparent; } 100% { box-shadow: 0 0 0 0 transparent; } } }
-#v-guest .g-lede { margin: 0; max-width: 70ch; }
-#v-guest .g-setup { padding: 14px 16px; margin-bottom: 12px; border-radius: 14px; display: grid; gap: 10px; }
-#v-guest .g-s-h { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; } #v-guest .g-s-h > b { font-size: 16px; }
-#v-guest .g-s-st { font-size: 12.5px; font-weight: 600; color: var(--ink-dim); padding: 2px 9px; border-radius: 999px; border: 1px solid var(--line); }
-#v-guest .g-s-st.open { color: var(--buy); border-color: color-mix(in srgb, var(--buy) 45%, transparent); } #v-guest .g-s-st.pending { color: #b97a00; border-color: color-mix(in srgb, #e0a526 45%, transparent); }
-#v-guest .g-s-fl { margin-left: auto; font: 650 14px var(--sans); font-variant-numeric: tabular-nums; } #v-guest .g-s-fl.pos { color: var(--buy); } #v-guest .g-s-fl.neg { color: var(--sell); }
-#v-guest .g-s-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 1px; background: var(--line); border: 1px solid var(--line); border-radius: 10px; overflow: hidden; }
-#v-guest .g-s-grid > div { background: var(--panel-raised, var(--panel)); padding: 9px 12px; display: grid; gap: 2px; }
-#v-guest .g-s-grid span { font-size: 12px; color: var(--ink-faint); } #v-guest .g-s-grid b { font-size: 17px; font-variant-numeric: tabular-nums; } #v-guest .g-s-grid b.pos { color: var(--buy); } #v-guest .g-s-grid b.neg { color: var(--sell); }
-#v-guest .g-s-note { margin: 0; font-size: 12.5px; color: var(--ink-faint); }
-#v-guest .g-card { border-radius: 14px; overflow: hidden; }
-#v-guest .g-h2 { display: flex; align-items: baseline; gap: 10px; } #v-guest .g-h2 small { font-size: 12.5px; font-weight: 500; color: var(--ink-faint); }
-#v-guest .g-join { margin: 22px 0 18px; padding: 22px 24px; border-radius: 16px; display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 20px 32px; align-items: center; color: var(--ink);
+:is(#v-guest, .g-merged) .g-head { display: flex; align-items: flex-end; justify-content: space-between; gap: 16px; flex-wrap: wrap; margin-bottom: 12px; }
+:is(#v-guest, .g-merged) .g-head .h-head { display: flex; align-items: center; gap: 10px; margin: 0 0 4px; }
+:is(#v-guest, .g-merged) .g-live { display: inline-flex; align-items: center; gap: 6px; font: 600 12px var(--sans); color: var(--buy); text-transform: uppercase; letter-spacing: .04em; }
+:is(#v-guest, .g-merged) .g-live i { width: 8px; height: 8px; border-radius: 50%; background: var(--buy); box-shadow: 0 0 0 3px color-mix(in srgb, var(--buy) 25%, transparent); }
+@media (prefers-reduced-motion: no-preference) { :is(#v-guest, .g-merged) .g-live i { animation: g-pulse 2s ease-out infinite; } @keyframes g-pulse { 0% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--buy) 45%, transparent); } 70% { box-shadow: 0 0 0 7px transparent; } 100% { box-shadow: 0 0 0 0 transparent; } } }
+:is(#v-guest, .g-merged) .g-lede { margin: 0; max-width: 70ch; }
+:is(#v-guest, .g-merged) .g-setup { padding: 14px 16px; margin-bottom: 12px; border-radius: 14px; display: grid; gap: 10px; }
+:is(#v-guest, .g-merged) .g-s-h { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; } :is(#v-guest, .g-merged) .g-s-h > b { font-size: 16px; }
+:is(#v-guest, .g-merged) .g-s-st { font-size: 12.5px; font-weight: 600; color: var(--ink-dim); padding: 2px 9px; border-radius: 999px; border: 1px solid var(--line); }
+:is(#v-guest, .g-merged) .g-s-st.open { color: var(--buy); border-color: color-mix(in srgb, var(--buy) 45%, transparent); } :is(#v-guest, .g-merged) .g-s-st.pending { color: #b97a00; border-color: color-mix(in srgb, #e0a526 45%, transparent); }
+:is(#v-guest, .g-merged) .g-s-fl { margin-left: auto; font: 650 14px var(--sans); font-variant-numeric: tabular-nums; } :is(#v-guest, .g-merged) .g-s-fl.pos { color: var(--buy); } :is(#v-guest, .g-merged) .g-s-fl.neg { color: var(--sell); }
+:is(#v-guest, .g-merged) .g-s-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 1px; background: var(--line); border: 1px solid var(--line); border-radius: 10px; overflow: hidden; }
+:is(#v-guest, .g-merged) .g-s-grid > div { background: var(--panel-raised, var(--panel)); padding: 9px 12px; display: grid; gap: 2px; }
+:is(#v-guest, .g-merged) .g-s-grid span { font-size: 12px; color: var(--ink-faint); } :is(#v-guest, .g-merged) .g-s-grid b { font-size: 17px; font-variant-numeric: tabular-nums; } :is(#v-guest, .g-merged) .g-s-grid b.pos { color: var(--buy); } :is(#v-guest, .g-merged) .g-s-grid b.neg { color: var(--sell); }
+:is(#v-guest, .g-merged) .g-s-note { margin: 0; font-size: 12.5px; color: var(--ink-faint); }
+:is(#v-guest, .g-merged) .g-card { border-radius: 14px; overflow: hidden; }
+:is(#v-guest, .g-merged) .g-h2 { display: flex; align-items: baseline; gap: 10px; } :is(#v-guest, .g-merged) .g-h2 small { font-size: 12.5px; font-weight: 500; color: var(--ink-faint); }
+:is(#v-guest, .g-merged) .g-join { margin: 22px 0 18px; padding: 22px 24px; border-radius: 16px; display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 20px 32px; align-items: center; color: var(--ink);
   background: linear-gradient(135deg, color-mix(in srgb, #e0a526 14%, var(--panel)), color-mix(in srgb, #7b61ff 10%, var(--panel))); border: 1px solid color-mix(in srgb, #e0a526 35%, var(--line)); }
-#v-guest .g-join h2 { margin: 0 0 10px; font-size: 20px; letter-spacing: -0.015em; text-wrap: balance; }
-#v-guest .g-join ul { margin: 0; padding: 0 0 0 18px; display: grid; gap: 6px; color: var(--ink-dim); font-size: 14px; line-height: 1.5; } #v-guest .g-join li b { color: var(--ink); }
-#v-guest .g-join-act { display: grid; gap: 8px; justify-items: center; min-width: 200px; }
-#v-guest .g-join-btn { width: 100%; min-height: 44px; border-radius: 12px; font-weight: 700; font-size: 15px; cursor: pointer; border: 0; background: #e3b341; color: #1b1300; }
-#v-guest .g-join-btn:hover { filter: brightness(1.06); } #v-guest .g-join-btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
-#v-guest .g-join-act p { margin: 0; font-size: 12.5px; color: var(--ink-faint); text-align: center; }
-@media (max-width: 720px) { #v-guest .g-join { grid-template-columns: 1fr; padding: 18px; } #v-guest .g-join-act { min-width: 0; width: 100%; } }
+:is(#v-guest, .g-merged) .g-join h2 { margin: 0 0 10px; font-size: 20px; letter-spacing: -0.015em; text-wrap: balance; }
+:is(#v-guest, .g-merged) .g-join ul { margin: 0; padding: 0 0 0 18px; display: grid; gap: 6px; color: var(--ink-dim); font-size: 14px; line-height: 1.5; } :is(#v-guest, .g-merged) .g-join li b { color: var(--ink); }
+:is(#v-guest, .g-merged) .g-join-act { display: grid; gap: 8px; justify-items: center; min-width: 200px; }
+:is(#v-guest, .g-merged) .g-join-btn { width: 100%; min-height: 44px; border-radius: 12px; font-weight: 700; font-size: 15px; cursor: pointer; border: 0; background: #e3b341; color: #1b1300; }
+:is(#v-guest, .g-merged) .g-join-btn:hover { filter: brightness(1.06); } :is(#v-guest, .g-merged) .g-join-btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+:is(#v-guest, .g-merged) .g-join-act p { margin: 0; font-size: 12.5px; color: var(--ink-faint); text-align: center; }
+@media (max-width: 720px) { :is(#v-guest, .g-merged) .g-join { grid-template-columns: 1fr; padding: 18px; } :is(#v-guest, .g-merged) .g-join-act { min-width: 0; width: 100%; } }
 </style>
 <style id="ms-home2-css">
 /* ── Home refresh (8 Nov 2026, owner: "a strong change in the design and theme of the dashboard, more noticeable").
