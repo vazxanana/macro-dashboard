@@ -768,3 +768,12 @@ Macro desk tab "COT positioning". Tests: `tests/cot.test.mjs`. Paper only.
 `assets/bt-fx.js` (`BTFX.win/loss(R, sub, title)`), called from the close events in backtest.html: confetti + green glow + chime on a
 profitable close; red vignette + shake + a WebAudio-synthesized falling "faaaah" voice on a losing one. No audio files. Speaker
 button `#snd-btn` toggles sound (`btLab:sound`). Reduced motion: no confetti or shake. Chart: dotted crosshair, kinetic scroll.
+
+## Mirror stop safety (9 Nov 2026, owner: "fix that, the most important part of this project")
+Monday open: every market order logged "set the missing stop". Two changes in `council/ctrader-mirror.mjs`:
+1. After a market fill whose fill event shows no stop, the mirror waits `slWaitMs` (1.5 s) and reads the position back
+   (RECONCILE); only a stop that is really missing goes to `ensureStop` (amend to the council stop, or close at once if refused).
+   A stop found records `brokerStop` / `stopCheckedAt` on the map entry.
+2. `LIMITS.settle` (20 min): market orders on a symbol wait that long after its last "market closed" answer (`state.closedSeen`),
+   so copies never go out in the widest-spread minutes after a reopen (where a stop inside the spread is dropped). Limit orders
+   (absolute stops) are not held. Tests: `tests/ctrader-mirror.test.mjs` (stop read-back, settle).
