@@ -507,6 +507,12 @@ macro/lessons.json, exposed as `fc.learned`. The veteran keeps the argument's re
 `scoreboard` (per topic, who was right on gold's direction 20 trading days on; macro/veteran-debates.json) and `teaching(fc)`
 (what the strategist has adopted, what is pending). Both show on the desk under the discussion.
 
+## Council quick pass (8 Nov 2026)
+council.yml: halfway through the 4-minute wait between rounds (k = 2) the Trader runs again and the mirror copies what it recorded
+("Council quick pass" commit on council-data), so a setup reaches cTrader within about two minutes; the heavy members (Analyst,
+Coach, Macro, veteran, data check, digest, ledger) keep the 5-minute round. Owner: "ok build it, start at 2 minutes". If the
+data-health monitor shows the OANDA proxy or Kraken throttling, drop the pass (delete the `k -eq 2` block) before shortening anything else.
+
 ## cTrader demo mirror: same-time copies (8 Nov 2026)
 `council/ctrader-mirror.mjs` runs straight after the Trader and the ICT desk in each council round (council.yml). A council trade
 that is still `pending` gets a resting LIMIT order at the broker: price = the council entry, absolute `stopLoss` / `takeProfit` = the
