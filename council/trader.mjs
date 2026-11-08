@@ -1780,8 +1780,10 @@ function nq80Signal(bars, today) {
   }
   return null;
 }
-// minPen / buf below 1 are fractions of the opening price (5 Nov: the 8-year backtest used 0.08% and 0.011%, which is ~20 and
-// ~2.8 points at NQ 25,000; the fixed 15 points had drifted to 0.06%, the weaker end: +0.106R vs +0.119R, 2018-22 +0.005 vs +0.017R)
+// minPen below 1 is a fraction of the opening price (5 Nov: the 8-year backtest used 0.08%, ~20 points at NQ 25,000; the fixed
+// 15 points had drifted to 0.06%, the weaker end: +0.106R vs +0.119R, 2018-22 +0.005 vs +0.017R). The stop sits a fixed 2 points
+// beyond the run extreme (owner, 8 Nov: kept over 0.011% of the open; net of 1 point +0.318R vs +0.312R on 2023-26 and −0.018R vs
+// −0.060R on 2004-22, research/edge/nq-open-oos/RESULT.md). The gold run sets its own buffer from ext.
 // Malaysian SnR direction SOP (owner's L3 session 2; research 5 Nov, ms/msnr_dir.py): working TF H4 with A/V pivot levels (half-width 5),
 // BO buy = close above the last A-level, BO sell = close below the last V-level; Daily key levels = pivots (+-0.1 ATR), engulfing and
 // DOM zones alive 90 days; a breakout switches the direction only when it is external (the broken level formed before the first tap
@@ -1814,11 +1816,11 @@ function msnrDirection(H4, D, n4 = 5, nD = 2) {
   }
   return d;
 }
-function nqOpenSweep(bars, today, o, tFree, minPen = 15, buf = 2) {
+function nqOpenSweep(bars, today, o, tFree, minPen = 15) {
   const D = bars.map((b) => ({ ...b, ...nyParts(b.time) })).filter((b) => b.d === today);
   const first = D.find((b) => b.m === o); if (!first) return null;
   const O = first.open, live = new Map();
-  if (minPen < 1) minPen *= O; if (buf < 1) buf *= O;
+  if (minPen < 1) minPen *= O;
   for (const b of D.filter((b) => b.m > o && b.m < o + 90 && b.time >= tFree)) {
     if (!live.has('L') && b.low < O) live.set('L', { t: b.time, ext: b.low });
     if (!live.has('H') && b.high > O) live.set('H', { t: b.time, ext: b.high });
@@ -1890,7 +1892,7 @@ try {
     // side, 2R, out at 11:00 ET. 1-minute history: 27 trades +19.8R, +0.73R a trade (t 2.8), 67% wins, September +4.9R,
     // October +14.9R; every depth (0–30 points) and reclaim window (5–30 min) positive (+0.46 to +1.19R). Paper.
     if (NQ_ON.nyflip && !['Sat', 'Sun'].includes(ny.wd) && ny.m > 571 && ny.m < 660 && !research.some((x) => x.id === `nq-nyflip-${ny.d}`)) {
-      const g = nqOpenSweep(bars, ny.d, 570, 0, 0.0008, 0.00011);
+      const g = nqOpenSweep(bars, ny.d, 570, 0, 0.0008);
       // midnight-open filter (4 Nov, from the trader's NQ research report: "the New Day Open should be the next target"): only when
       // the 00:00 ET opening price lies ahead of the trade. 3-year futures file: ahead +0.22R a trade over 237 (every year positive),
       // behind +0.05R over 210 (2024 negative); outside the file (Dec–Mar cash index + Sep–Nov 2026): ahead +0.68R over 29, behind +0.19R over 32.
