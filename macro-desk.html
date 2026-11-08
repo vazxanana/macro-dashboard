@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<meta name="color-scheme" content="dark light">
+<meta name="theme-color" content="#08090c" media="(prefers-color-scheme: dark)">
+<meta name="theme-color" content="#f4f6f9" media="(prefers-color-scheme: light)">
+<title>Macro desk · Meridian X</title>
+<meta name="description" content="Macro desk: the Macro strategist and the Macro veteran side by side, their discussion, key insights and the public data the professionals read.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cdefs%3E%3CradialGradient id='g' cx='.35' cy='.3' r='.8'%3E%3Cstop offset='0' stop-color='%23fbe7a6'/%3E%3Cstop offset='.55' stop-color='%23e3b341'/%3E%3Cstop offset='1' stop-color='%238a6312'/%3E%3C/radialGradient%3E%3C/defs%3E%3Ccircle cx='16' cy='16' r='14' fill='url(%23g)'/%3E%3Ccircle cx='16' cy='16' r='10.5' fill='none' stroke='%23fff' stroke-opacity='.35'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600&display=swap">
+<script>
+  // Same theme key as the desk (localStorage msPrefs.theme): light stays light, every other desk theme is dark.
+  // With no saved preference the page follows the system setting.
+  (function () {
+    try {
+      var p = JSON.parse(localStorage.getItem('msPrefs') || 'null');
+      if (p && p.theme) document.documentElement.dataset.theme = p.theme === 'light' ? 'light' : p.theme === 'midnight' ? 'midnight' : 'dark';
+    } catch (e) {}
+  })();
+</script>
+<style>
+  /* Tokens copied from market-structure.html (4 Nov design pass) so the lab reads as part of the desk */
+  :root {
+    --bg: #08090c; --panel: #0f1116; --panel-raised: #14171e; --panel-hover: #161a22;
+    --line: rgba(255,255,255,.07); --line-soft: rgba(255,255,255,.045); --line-strong: rgba(255,255,255,.12);
+    --ink: #eceef2; --ink-dim: #a4abb8; --ink-faint: #8a92a1; --accent: #5b8cff; --accent-soft: rgba(91,140,255,.12);
+    --buy: #2fbf8f; --sell: #f2576f; --buy-soft: rgba(47,191,143,.12); --sell-soft: rgba(242,87,111,.12);
+    --neutral-soft: rgba(255,255,255,.06); --zero: rgba(255,255,255,.22);
+    --shadow-pop: 0 24px 48px rgba(0,0,0,.55);
+    --sans: Figtree, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    --mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    --r: 12px; --r-sm: 8px;
+    --z-sticky: 10; --z-tip: 40;
+    --ease: cubic-bezier(.22, 1, .36, 1);
+    color-scheme: dark;
+  }
+  @media (prefers-color-scheme: light) {
+    :root:not([data-theme="dark"]):not([data-theme="midnight"]) {
+      --bg: #f4f6f9; --panel: #ffffff; --panel-raised: #f7f8fb; --panel-hover: #f9fafc;
+      --line: #dfe3ea; --line-soft: #eceff4; --line-strong: #cdd3dd;
+      --ink: #131722; --ink-dim: #4a5160; --ink-faint: #5f6675; --accent: #2f6bff; --accent-soft: rgba(47,107,255,.09);
+      --buy: #08876f; --sell: #d92d4b; --buy-soft: rgba(8,135,111,.09); --sell-soft: rgba(217,45,75,.08);
+      --neutral-soft: rgba(19,23,34,.05); --zero: rgba(19,23,34,.28);
+      --shadow-pop: 0 18px 40px -12px rgba(16,24,40,.22), 0 2px 6px rgba(16,24,40,.06);
+      color-scheme: light;
+    }
+  }
+  :root[data-theme="light"] {
+    --bg: #f4f6f9; --panel: #ffffff; --panel-raised: #f7f8fb; --panel-hover: #f9fafc;
+    --line: #dfe3ea; --line-soft: #eceff4; --line-strong: #cdd3dd;
+    --ink: #131722; --ink-dim: #4a5160; --ink-faint: #5f6675; --accent: #2f6bff; --accent-soft: rgba(47,107,255,.09);
+    --buy: #08876f; --sell: #d92d4b; --buy-soft: rgba(8,135,111,.09); --sell-soft: rgba(217,45,75,.08);
+    --neutral-soft: rgba(19,23,34,.05); --zero: rgba(19,23,34,.28);
+    --shadow-pop: 0 18px 40px -12px rgba(16,24,40,.22), 0 2px 6px rgba(16,24,40,.06);
+    color-scheme: light;
+  }
+  :root[data-theme="midnight"] {
+    --bg: #070d1f; --panel: #0d1630; --panel-raised: #111c3a; --panel-hover: #15224a;
+    --line: rgba(150,175,255,.12); --line-soft: rgba(150,175,255,.07); --line-strong: rgba(150,175,255,.2);
+    --ink: #eef2ff; --ink-dim: #b0bcdc; --ink-faint: #8d9ac0; --accent: #e3b341; --accent-soft: rgba(227,179,65,.14);
+    --buy: #34d6a0; --sell: #ff6b85; --buy-soft: rgba(52,214,160,.13); --sell-soft: rgba(255,107,133,.13);
+  }
+
+  * { box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; }
+  html, body { margin: 0; background: var(--bg); color: var(--ink); font: 14px/1.5 var(--sans); font-feature-settings: "cv11", "ss01"; -webkit-font-smoothing: antialiased; }
+  body { padding: env(safe-area-inset-top, 0px) 0 env(safe-area-inset-bottom, 0px); min-height: 100vh; }
+  a { color: var(--accent); text-decoration: none; }
+  a:hover { text-decoration: underline; text-underline-offset: 3px; }
+  button { font: inherit; color: inherit; }
+  :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 4px; }
+  ::selection { background: rgba(91,140,255,.3); }
+  .num { font-family: var(--mono); font-variant-numeric: tabular-nums; letter-spacing: -.02em; }
+  .sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+
+  .wrap { max-width: 1240px; margin: 0 auto; padding: 0 24px 64px; }
+
+  /* top bar */
+  .top { position: sticky; top: 0; z-index: var(--z-sticky); display: flex; align-items: center; gap: 12px; height: 56px;
+    background: color-mix(in srgb, var(--bg) 86%, transparent); backdrop-filter: saturate(140%) blur(14px); -webkit-backdrop-filter: saturate(140%) blur(14px); border-bottom: 1px solid var(--line); }
+  .top .wrap { display: flex; align-items: center; gap: 12px; width: 100%; padding-bottom: 0; }
+  .brand { display: inline-flex; align-items: center; gap: 9px; color: var(--ink); font: 600 14px var(--sans); letter-spacing: -.1px; }
+  .brand:hover { text-decoration: none; }
+  .coin { width: 20px; height: 20px; border-radius: 50%; background: radial-gradient(circle at 35% 35%, #ffd768, #c99400); box-shadow: inset 0 -2px 4px rgba(0,0,0,.25); flex: none; }
+  .crumb { color: var(--ink-faint); font-weight: 500; }
+  .top .check { margin-left: auto; display: inline-flex; align-items: center; gap: 8px; font-size: 12px; color: var(--ink-faint); white-space: nowrap; }
+  .btn { display: inline-flex; align-items: center; gap: 6px; min-height: 32px; padding: 6px 12px; border-radius: var(--r-sm); border: 1px solid var(--line); background: var(--neutral-soft); font: 500 12.5px var(--sans); color: var(--ink-dim); cursor: pointer; transition: background .15s, color .15s, border-color .15s; }
+  .btn:hover { color: var(--ink); border-color: var(--line-strong); }
+  .btn svg { width: 14px; height: 14px; }
+  .btn[aria-busy="true"] svg { animation: spin .8s linear infinite; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+
+  /* ─── Macro desk (8 Nov 2026, owner: "a macro area where i can see both reports ... key insights and near to insider information") ─── */
+  .head { padding: 36px 0 20px; }
+  .head p.lede { max-width: 70ch; }
+  .strip { display: flex; flex-wrap: wrap; gap: 8px 10px; align-items: center; margin: 0 0 22px; }
+  .pill { display: inline-flex; align-items: center; gap: 6px; padding: 5px 11px; border-radius: 999px; border: 1px solid var(--line); background: var(--neutral-soft); font-size: 12.5px; color: var(--ink-dim); }
+  .pill b { color: var(--ink); font-weight: 600; } .pill.buy b { color: var(--buy); } .pill.warn { border-color: color-mix(in srgb, var(--sell) 45%, var(--line)); }
+  .pill small { color: var(--ink-faint); }
+  .grid2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); gap: 16px; }
+  .card { background: var(--panel); border: 1px solid var(--line); border-radius: var(--r); padding: 18px 20px; min-width: 0; }
+  .card h2 { margin: 0 0 4px; font: 600 17px var(--sans); letter-spacing: -.2px; display: flex; align-items: baseline; justify-content: space-between; gap: 12px; }
+  .card h2 small { font: 500 12px var(--sans); color: var(--ink-faint); }
+  .card h3 { margin: 16px 0 6px; font: 600 13px var(--sans); color: var(--ink-dim); text-transform: none; }
+  .card p { margin: 6px 0; color: var(--ink-dim); font-size: 13.5px; line-height: 1.55; } .card p b { color: var(--ink); font-weight: 600; }
+  .big { font: 600 22px var(--mono); letter-spacing: -.5px; color: var(--ink); } .big.buy { color: var(--buy); }
+  .kv { display: grid; grid-template-columns: max-content 1fr; gap: 4px 14px; margin: 8px 0 0; font-size: 13px; } .kv dt { color: var(--ink-faint); } .kv dd { margin: 0; color: var(--ink); }
+  .mk { display: grid; grid-template-columns: 1fr auto auto auto; gap: 6px 14px; align-items: baseline; font-size: 13px; margin: 8px 0 0; } .mk > span { color: var(--ink-faint); font-size: 11.5px; } .mk b { font: 600 13px var(--mono); }
+  .bar { height: 6px; border-radius: 3px; background: var(--neutral-soft); position: relative; overflow: hidden; margin-top: 6px; } .bar i { position: absolute; top: 0; bottom: 0; left: 50%; background: var(--buy); } .bar i.dn { background: var(--sell); }
+  .ch { width: 100%; border-collapse: collapse; font-size: 12.5px; margin-top: 6px; } .ch th, .ch td { text-align: left; padding: 7px 8px 7px 0; border-top: 1px solid var(--line-soft); vertical-align: top; } .ch th { color: var(--ink-faint); font-weight: 500; border-top: 0; }
+  .ch td:first-child { color: var(--ink); font-weight: 600; white-space: nowrap; } .ch .lean { font: 600 13px var(--mono); } .lean.up { color: var(--buy); } .lean.dn { color: var(--sell); } .lean.z { color: var(--ink-faint); }
+  .ch .cannot { color: var(--ink-faint); font-size: 12px; } .stale { color: var(--sell); font-size: 11px; margin-left: 6px; }
+  .spark { display: inline-flex; gap: 3px; align-items: flex-end; height: 26px; vertical-align: middle; margin-left: 8px; } .spark i { display: block; width: 7px; border-radius: 2px; background: var(--ink-faint); min-height: 2px; } .spark i.p { background: var(--buy); } .spark i.n { background: var(--sell); }
+  .debate { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; }
+  .debate li { display: grid; grid-template-columns: 84px minmax(0, 1fr); gap: 12px; padding: 12px 0 0; border-top: 1px solid var(--line-soft); font-size: 13px; }
+  .st { justify-self: start; padding: 2px 9px; border-radius: 999px; border: 1px solid var(--line); font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: .02em; color: var(--ink-dim); margin-top: 2px; }
+  .st.agree { color: var(--buy); border-color: color-mix(in srgb, var(--buy) 50%, var(--line)); } .st.disagree { color: var(--sell); border-color: color-mix(in srgb, var(--sell) 50%, var(--line)); }
+  .side { margin-top: 3px; color: var(--ink-dim); } .side small { display: inline-block; min-width: 72px; color: var(--ink-faint); font-size: 11px; text-transform: uppercase; letter-spacing: .02em; } .why { margin-top: 4px; color: var(--ink-faint); font-style: italic; font-size: 12.5px; }
+  .insights { margin: 0; padding: 0 0 0 18px; color: var(--ink-dim); font-size: 13.5px; line-height: 1.6; } .insights li { margin: 4px 0; } .insights b { color: var(--ink); font-weight: 600; }
+  .src { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 12px 20px; margin-top: 8px; }
+  .src article { padding: 10px 0 0; border-top: 1px solid var(--line-soft); font-size: 12.5px; } .src h4 { margin: 0 0 3px; font: 600 13px var(--sans); } .src p { margin: 3px 0; font-size: 12.5px; } .src .lag { color: var(--ink-faint); font-size: 11.5px; }
+  .ev { list-style: none; margin: 6px 0 0; padding: 0; font-size: 13px; } .ev li { display: grid; grid-template-columns: 112px 1fr; gap: 10px; padding: 7px 0; border-top: 1px solid var(--line-soft); } .ev time { color: var(--ink-faint); font: 500 12px var(--mono); } .ev .pol { color: var(--accent); font-weight: 600; }
+  .cot { display: flex; gap: 2px; align-items: flex-end; height: 56px; margin-top: 8px; } .cot i { flex: 1; display: block; background: var(--ink-faint); border-radius: 1px; min-height: 1px; } .cot i.last { background: var(--accent); }
+  .note { color: var(--ink-faint); font-size: 12px; margin-top: 10px; }
+  .gauge { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 8px; margin-top: 8px; } .gauge div { padding: 8px 10px; border: 1px solid var(--line-soft); border-radius: var(--r-sm); } .gauge small { display: block; color: var(--ink-faint); font-size: 11px; } .gauge b { font: 600 15px var(--mono); }
+  details summary { cursor: pointer; color: var(--accent); font-size: 13px; margin-top: 10px; } details dl { margin: 8px 0 0; }
+  .empty { color: var(--ink-faint); font-size: 13px; }
+  section.block { margin-top: 24px; }
+  @media (max-width: 600px) { .wrap { padding: 0 16px 48px; } .top .check { min-width: 0; } .top .when { white-space: normal; font-size: 11px; max-width: 150px; line-height: 1.25; } .debate li { grid-template-columns: 1fr; gap: 4px; } .mk { grid-template-columns: 1fr auto; } .mk > span:nth-child(n+3) { display: none; } }
+  @media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
+</style>
+</head>
+<body>
+<header class="top">
+  <div class="wrap">
+    <a class="brand" href="/"><span class="coin" aria-hidden="true"></span>Meridian X</a>
+    <span class="crumb" aria-hidden="true">/</span>
+    <span class="brand" style="font-weight:500">Macro desk</span>
+    <div class="check"><span class="when" id="when" aria-live="polite">Loading…</span><a class="btn" href="/#council/macro">Council view</a></div>
+  </div>
+</header>
+<main class="wrap">
+  <div class="head">
+    <div>
+      <h1>Macro desk: strategist and veteran</h1>
+      <p class="lede">Two macro members, one page. The <b>Macro strategist</b> fetches the data and runs the tested Gold Macro Score; the <b>Macro veteran</b> reads the same data with the professionals' frameworks and argues each topic. Below them: the key insights of the day, and the public data the market's insiders actually read, with its lags and limits. Paper only; nothing here trades on its own.</p>
+    </div>
+  </div>
+  <div class="strip" id="strip" aria-label="Consensus"></div>
+
+  <div class="grid2">
+    <article class="card" id="c-strat"><h2>Macro strategist <small id="strat-at"></small></h2><div id="strat"></div></article>
+    <article class="card" id="c-vet"><h2>Macro veteran <small id="vet-at"></small></h2><div id="vet"></div></article>
+  </div>
+
+  <section class="block card"><h2>The discussion <small id="deb-sum"></small></h2><ul class="debate" id="debate"></ul><p class="note" id="deb-foot"></p></section>
+
+  <section class="block card"><h2>Key insights today</h2><ul class="insights" id="insights"></ul></section>
+
+  <section class="block card">
+    <h2>Close to the source <small>positioning, flows, officials, funding</small></h2>
+    <p>There is no insider information here, and none anywhere that is legal to trade on. What the professionals have is earlier and more careful reading of public data that most traders never open. These are those feeds, as the council sees them and as the veteran's source registry lists them.</p>
+    <div class="grid2" style="margin-top:12px">
+      <div><h3>Futures positioning (CFTC COT, managed money gold)</h3><div id="cot"></div></div>
+      <div><h3>Funding and stress gauges</h3><div class="gauge" id="gauges"></div></div>
+      <div><h3>Central-bank communications</h3><ul class="ev" id="news"></ul></div>
+      <div><h3>Red-folder calendar</h3><ul class="ev" id="events"></ul></div>
+    </div>
+    <h3>Hard-to-get public data the pros read (from the veteran's registry)</h3>
+    <div class="src" id="src"></div>
+  </section>
+
+  <section class="block card"><h2>Forecast ledger and scoreboard <small>who is right, kept honest</small></h2><div id="ledger"></div></section>
+  <p class="note" id="foot"></p>
+</main>
+<script>
+(function () {
+  var BASE = (/^https?:$/.test(location.protocol) && !/github\.io$/.test(location.hostname) ? location.origin + '/cdata/' : 'https://raw.githubusercontent.com/vazxanana/macro-dashboard/council-data/');
+  var $ = function (id) { return document.getElementById(id); };
+  var esc = function (s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); };
+  var num = function (v) { return v != null && isFinite(+v); };
+  var sg = function (v, d) { return !num(v) ? '—' : (v > 0 ? '+' : v < 0 ? '−' : '') + Math.abs(+v).toFixed(d == null ? 2 : d); };
+  var pct = function (v) { return num(v) ? Math.round(v * 100) + '%' : '—'; };
+  var ago = function (iso) { if (!iso) return ''; var m = Math.round((Date.now() - Date.parse(iso)) / 60000); return m < 1 ? 'just now' : m < 60 ? m + ' min ago' : m < 1440 ? Math.round(m / 60) + ' h ago' : Math.round(m / 1440) + ' d ago'; };
+  var when = function (iso) { return iso ? new Date(iso).toLocaleString([], { weekday: 'short', day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' }) : ''; };
+  function get(p) { return fetch(BASE + p + '?v=' + Math.floor(Date.now() / 300000), { cache: 'no-store' }).then(function (r) { return r.ok ? r.json() : null; }).catch(function () { return null; }); }
+
+  // the veteran's source registry, condensed: cadence, lag, what it cannot establish (research/macro-veteran/references)
+  var SOURCES = [
+    ['CFTC Commitments of Traders', 'Weekly, Friday, for Tuesday positions (3-day lag). Reportable futures by trader class: managed money, swap dealers, producers.', 'Crowding and fragility context, never direction. Not the physical market, not who or why.', 'https://www.cftc.gov/MarketReports/CommitmentsofTraders/index.htm'],
+    ['CFTC Bank Participation Report', 'Monthly, first Tuesday. Gross long and short futures of US and non-US banks in gold.', 'Shows the banks’ futures book, not whether it hedges OTC, client or inventory exposure.', 'https://www.cftc.gov/MarketReports/BankParticipationReports/index.htm'],
+    ['LBMA London vault holdings', 'Monthly, one month in arrears. Tonnes of gold in London-area vaults including the Bank of England.', 'Custody stock, not free float or investor-owned metal; ETF bars sit inside it.', 'https://www.lbma.org.uk/prices-and-data/london-vault-data'],
+    ['COMEX warehouse stocks and deliveries', 'Daily. Registered and eligible inventories, delivery notices.', 'Not global inventory; eligible metal is not necessarily deliverable.', 'https://www.cmegroup.com/clearing/operations-and-deliveries/registrar-reports.html'],
+    ['Shanghai Gold Exchange delivery and withdrawal', 'Monthly highlights. Delivery, withdrawal and delivery ratio in kilograms, as separate measures.', 'Not Chinese consumption: delivery is not withdrawal, withdrawal is not use.', 'https://en.sge.com.cn/'],
+    ['SHFE gold warrants', 'Weekly. Registered warehouse warrants in kg; futures volume and open interest.', 'Exchange-registered stock only; not all Chinese gold or end-user demand.', 'https://www.shfe.com.cn/eng/reports/'],
+    ['Swiss customs gold flows (FOCBS)', 'Monthly, about three weeks after month end. Imports and exports of unwrought gold by partner country; refined vs mined since 2021.', 'Border movement, not ownership or net demand; doré gross weight is not fine gold.', 'https://www.bazg.admin.ch/en/swiss-foreign-trade-statistics-gold-silver-and-coins'],
+    ['World Gold Council reserves and ETF data', 'Reserves monthly, about two months in arrears; ETF holdings and flows monthly.', 'Reported reserve values rise with the price; value growth is not purchases. Quarterly demand is partly estimated.', 'https://www.gold.org/goldhub/data/gold-reserves-by-country'],
+    ['US Treasury TIC', 'Monthly, about six weeks lag. Foreign holdings and transactions in US securities by custody country.', 'Custody attribution, not beneficial owner; the 2023 series break matters for comparisons.', 'https://home.treasury.gov/data/treasury-international-capital-tic-system'],
+    ['NY Fed ACM term premium', 'Daily model estimate of the term premium in Treasury yields.', 'A model, not a traded price: decomposes a yield move into expectations and premium.', 'https://www.newyorkfed.org/research/data-indicators/term-premia-tabs'],
+    ['Fed H.4.1, RRP and TGA (dollar liquidity)', 'Weekly balance sheet, daily reverse repo and Treasury account.', 'Net liquidity is an accounting identity; the market impact depends on who holds the reserves.', 'https://www.federalreserve.gov/releases/h41/'],
+    ['CME FedWatch / OIS pricing', 'Live. The policy path the market has priced.', 'A priced cut is not a dovish surprise; the reaction to a decision is the signal, not the decision.', 'https://www.cmegroup.com/markets/interest-rates/cme-fedwatch-tool.html'],
+  ];
+
+  function renderStrip(fc, v) {
+    var out = [], vd = v && v.verdict, gs = fc && fc.goldScore;
+    if (vd) out.push('<span class="pill ' + (vd.bias === 'BUY' ? 'buy' : '') + '">Consensus <b>' + esc(vd.bias) + (vd.conviction ? ' ' + esc(vd.conviction) : '') + '</b><small>' + vd.agree + ' agree · ' + vd.qualify + ' qualify · ' + vd.disagree + ' disagree</small></span>');
+    if (gs && gs.ok) out.push('<span class="pill ' + (gs.bias === 'BUY' ? 'buy' : '') + '">Gold Macro Score <b>' + esc(sg(gs.score)) + '</b><small>' + esc(gs.label) + '</small></span>');
+    if (v && v.shock) out.push('<span class="pill">Shock <b>' + esc(v.shock.shock) + '</b><small>' + esc(v.shock.confidence) + ' confidence</small></span>');
+    if (fc && fc.regime && fc.regime.label) String(fc.regime.label).split(' · ').forEach(function (t) { out.push('<span class="pill' + (/stress|draining|inverted|carry|high/i.test(t) ? ' warn' : '') + '">' + esc(t) + '</span>'); });
+    if (vd && vd.eventWithin72h) out.push('<span class="pill warn">Event within 72 h <b>' + esc(vd.eventWithin72h.title) + '</b><small>' + esc(when(vd.eventWithin72h.at)) + '</small></span>');
+    $('strip').innerHTML = out.join('') || '<span class="empty">No macro data yet.</span>';
+  }
+  function spark(path) { if (!path || !path.length) return ''; var m = Math.max.apply(null, path.map(function (x) { return Math.abs(x); })) || 1; return '<span class="spark" aria-hidden="true">' + path.map(function (x) { return '<i class="' + (x > 0.25 ? 'p' : x < -0.25 ? 'n' : '') + '" style="height:' + Math.max(8, Math.round(Math.abs(x) / m * 26)) + 'px"></i>'; }).join('') + '</span>'; }
+  function renderStrat(fc) {
+    var el = $('strat'); if (!fc || !fc.assets) { el.innerHTML = '<p class="empty">The strategist has not written a forecast yet (it runs every 25 minutes).</p>'; return; }
+    $('strat-at').textContent = 'built ' + ago(fc.at) + ' · for ' + (fc.target || '');
+    var gs = fc.goldScore, h = '';
+    if (gs && gs.ok) h += '<p><span class="big ' + (gs.bias === 'BUY' ? 'buy' : '') + '">' + esc(sg(gs.score)) + '</span> ' + spark(gs.path) + '<br><b>' + esc(gs.label) + '</b> · real yield 4w z ' + sg(gs.z.ry4w) + ', DXY 4w z ' + sg(gs.z.dxy4w) + ', 2Y 13w z ' + sg(gs.z.y2_13w) + ', curve 13w z ' + sg(gs.z.curve13w) + ' · week to ' + esc(gs.asOf) + (gs.trend ? ' · gold ' + (gs.trend.above10w ? 'above' : 'below') + ' its 10-week average' : '') + '</p>';
+    else h += '<p>Gold Macro Score: <b>n/a</b>' + (gs && gs.why ? ' (' + esc(gs.why) + ')' : '') + '</p>';
+    h += '<h3>Next day, per market</h3><div class="mk"><span>Market</span><span>P(up)</span><span>Base</span><span>Exp. move</span>';
+    Object.keys(fc.assets).forEach(function (k) { var a = fc.assets[k]; if (!a) return; var base = a.fit ? a.fit.base : 0.5, t = num(a.pUp) ? a.pUp - base : 0;
+      h += '<div><b style="font-weight:500">' + esc(a.label || k) + '</b><div class="bar"><i class="' + (t < 0 ? 'dn' : '') + '" style="' + (t < 0 ? 'right:50%;left:auto;' : '') + 'width:' + Math.min(50, Math.abs(t) * 400) + '%"></i></div></div><b>' + pct(a.pUp) + '</b><span>' + pct(base) + '</span><b>' + (num(a.expMovePct) ? '±' + a.expMovePct + '%' : '—') + '</b>'; });
+    h += '</div>';
+    var g = fc.assets.gold; if (g && g.drivers && g.drivers.length) { h += '<h3>Gold drivers today</h3><p>' + g.drivers.slice(0, 6).map(function (d) { return '<b>' + (d.dir === 'up' ? '▲' : '▼') + '</b> ' + esc(d.name.replace(/\s*\(.*\)$/, '')) + ' <span style="color:var(--ink-faint)">' + esc(d.detail) + '</span>'; }).join('<br>') + '</p>'; }
+    if (fc.learned) { var a = fc.learned.active || []; h += '<p class="note">Lessons from the veteran: ' + (a.length ? '<b>' + a.join(', ') + '</b> adopted' : 'no challenger has beaten its incumbent on the replay yet') + '.</p>'; }
+    h += '<details><summary>The strategist’s brief</summary><p>' + esc(fc.brief || '') + '</p></details>';
+    el.innerHTML = h;
+  }
+  function renderVet(v) {
+    var el = $('vet'); if (!v || !v.debate) { el.innerHTML = '<p class="empty">The veteran has not spoken yet (it runs right after the strategist).</p>'; return; }
+    $('vet-at').textContent = 'built ' + ago(v.at);
+    var vd = v.verdict, h = '<p><span class="big ' + (vd.bias === 'BUY' ? 'buy' : '') + '">' + esc(vd.bias) + (vd.conviction ? ' ' + esc(vd.conviction) : '') + '</span></p><p>' + esc(vd.note) + '</p>';
+    h += '<h3>Shock fingerprint</h3><p><b>' + esc(v.shock.shock) + '</b> (' + esc(v.shock.confidence) + ' confidence) · ' + esc(v.shock.clues.join(' · ')) + '</p><p>' + esc(v.shock.goldTest) + '</p><p><span style="color:var(--ink-faint)">Strongest competing explanation:</span> ' + esc(v.shock.competing) + '</p>';
+    h += '<h3>Gold driver channels</h3><table class="ch"><tr><th>Channel</th><th>Observation</th><th>Lean</th></tr>' + v.channels.map(function (c) { return '<tr><td>' + esc(c.name) + (c.stale ? '<span class="stale">stale</span>' : '') + '</td><td>' + esc(c.obs) + (c.asOf ? ' <span style="color:var(--ink-faint)">(' + esc(c.asOf) + ')</span>' : '') + '<div class="cannot">' + esc(c.cannot) + '</div></td><td class="lean ' + (c.lean > 0 ? 'up' : c.lean < 0 ? 'dn' : 'z') + '">' + (c.lean == null ? 'n/a' : c.lean > 0 ? '+1' : c.lean < 0 ? '−1' : '0') + '</td></tr>'; }).join('') + '</table>';
+    if (vd.invalidation && vd.invalidation.length) h += '<h3>Fails if</h3><p>' + vd.invalidation.map(esc).join('<br>') + '</p>';
+    if (v.card) h += '<details><summary>Hypothesis card</summary><dl class="kv">' + Object.keys(v.card).map(function (k) { return v.card[k] == null ? '' : '<dt>' + esc(k) + '</dt><dd>' + esc(v.card[k]) + '</dd>'; }).join('') + '</dl></details>';
+    el.innerHTML = h;
+  }
+  function renderDebate(v) {
+    var el = $('debate'); if (!v || !v.debate) { el.innerHTML = ''; $('deb-foot').textContent = ''; return; }
+    $('deb-sum').textContent = v.verdict.agree + ' agree · ' + v.verdict.qualify + ' qualify · ' + v.verdict.disagree + ' disagree';
+    el.innerHTML = v.debate.map(function (t) { return '<li><span class="st ' + esc(t.stance) + '">' + esc(t.stance) + '</span><div><b>' + esc(t.topic) + '</b><div class="side"><small>Strategist</small>' + esc(t.macro) + '</div><div class="side"><small>Veteran</small>' + esc(t.veteran) + '</div>' + (t.why ? '<div class="why">' + esc(t.why) + '</div>' : '') + '</div></li>'; }).join('');
+    var sb = v.scoreboard, tl = v.teaching;
+    $('deb-foot').innerHTML = (sb ? (sb.weeks ? 'Scoreboard over ' + sb.weeks + ' resolved week' + (sb.weeks === 1 ? '' : 's') + ': <b>veteran ' + pct(sb.veteran.hit) + '</b> vs <b>strategist ' + pct(sb.strategist.hit) + '</b> right on direction per topic' : 'Scoreboard: no resolved week yet') + (sb.pending ? ', ' + sb.pending + ' pending' : '') + '. ' : '') + (tl && tl.line ? esc(tl.line) : '');
+  }
+  function renderInsights(fc, v, cache) {
+    var L = [], gs = fc && fc.goldScore, vd = v && v.verdict;
+    if (gs && gs.ok && gs.path && gs.path.length >= 2) { var d = gs.path[gs.path.length - 1] - gs.path[gs.path.length - 2]; L.push('<b>Score path:</b> ' + gs.path.map(function (x) { return sg(x); }).join(' → ') + (Math.abs(d) >= 0.2 ? (d > 0 ? ', rising' : ', falling') + ' fast' : ', steady') + (gs.score > 0.25 ? '. Above +0.25 the tested rule has gold up 69% of the time over 4 weeks.' : '. Under +0.25 the macro layer has no direction edge: the technical systems lead.')); }
+    if (v && v.shock) L.push('<b>The week’s shock:</b> ' + esc(v.shock.shock) + '. ' + esc(v.shock.goldTest));
+    if (v && v.debate) { var dis = v.debate.filter(function (t) { return t.stance === 'disagree'; }); if (dis.length) L.push('<b>Where the two disagree:</b> ' + dis.map(function (t) { return esc(t.topic) + ' (' + esc(t.why) + ')'; }).join('; ')); else L.push('<b>No open disagreement</b> between the strategist and the veteran this round.'); }
+    if (vd && vd.eventWithin72h) L.push('<b>Event risk:</b> ' + esc(vd.eventWithin72h.title) + ' at ' + esc(when(vd.eventWithin72h.at)) + '. The bias is conditional until the print; read real yields and the dollar after it, not the headline.');
+    if (fc && fc.regime) { var r = fc.regime; if (num(r.sofrEffrBps) && r.sofrEffrBps >= 15) L.push('<b>Funding stress:</b> SOFR−EFFR ' + r.sofrEffrBps + ' bp. Gold can be sold for cash first in a squeeze.'); if (num(r.vixTermRatio) && r.vixTermRatio > 1) L.push('<b>VIX curve inverted</b> (' + r.vixTermRatio + '): stress, not a direction; stocks tend to bounce the next day.'); if (r.liquidity && num(r.liquidity.chg)) L.push('<b>Dollar liquidity</b> ' + (r.liquidity.chg >= 0 ? 'up' : 'down') + ' $' + Math.abs(r.liquidity.chg) + 'bn over 4 weeks (Fed balance sheet − RRP − TGA).'); }
+    if (cache && cache.cot && cache.cot.length > 5) { var c = cache.cot, last = c[c.length - 1], m4 = c[Math.max(0, c.length - 5)], s = c.slice(-60).map(function (r) { return r.net; }).sort(function (a, b) { return a - b; }), pctl = Math.round(Math.max(0, s.findIndex(function (x) { return x >= last.net; })) / Math.max(1, s.length - 1) * 100); L.push('<b>Positioning:</b> managed money ' + Math.round(last.net / 1000) + 'k contracts net, ' + sg((last.net - m4.net) / 1000, 0) + 'k over 4 weeks, ' + pctl + 'th percentile of the last 60 weeks (positions as of ' + new Date(last.t * 1000).toISOString().slice(0, 10) + '). Crowding context only; it never directs.'); }
+    if (v && v.ledger && v.ledger.lastProbability != null) L.push('<b>Ledger:</b> P(gold higher in 20 trading days) ' + pct(v.ledger.lastProbability) + (v.base ? ' against a base rate of ' + pct(v.base.upRate) : '') + '. ' + v.ledger.resolved + ' forecasts resolved' + (v.ledger.brier != null ? ', Brier ' + v.ledger.brier + ' vs base ' + v.ledger.brierBase : '') + '.');
+    if (fc && fc.learned && fc.learned.active && fc.learned.active.length) L.push('<b>The strategist learned:</b> ' + fc.learned.active.join(', ') + ' adopted from the veteran’s challengers.');
+    $('insights').innerHTML = L.length ? L.map(function (x) { return '<li>' + x + '</li>'; }).join('') : '<li class="empty">Nothing yet.</li>';
+  }
+  function renderSource(fc, cache) {
+    var cot = cache && cache.cot && cache.cot.length ? cache.cot.slice(-60) : [];
+    if (cot.length) { var mx = Math.max.apply(null, cot.map(function (r) { return Math.abs(r.net); })) || 1; $('cot').innerHTML = '<div class="cot" aria-label="Net managed-money position, last 60 weeks">' + cot.map(function (r, i) { return '<i class="' + (i === cot.length - 1 ? 'last' : '') + '" style="height:' + Math.max(1, Math.round(Math.abs(r.net) / mx * 56)) + 'px;opacity:' + (r.net < 0 ? .5 : 1) + '" title="' + new Date(r.t * 1000).toISOString().slice(0, 10) + ': ' + Math.round(r.net / 1000) + 'k"></i>'; }).join('') + '</div><p class="note">Net long contracts, weekly, last 60 weeks (CFTC, Tuesday positions published Friday). Faded bars are net short.</p>'; }
+    else $('cot').innerHTML = '<p class="empty">No positioning data in the cache.</p>';
+    var r = fc && fc.regime || {}, g = [['SOFR − EFFR', num(r.sofrEffrBps) ? r.sofrEffrBps + ' bp' : '—', 'repo vs policy rate: funding scarcity when it widens'], ['VIX / VIX3M', num(r.vixTermRatio) ? r.vixTermRatio.toFixed(2) : '—', 'above 1 = inverted, stress'], ['VIX', num(r.vix) ? r.vix.toFixed(1) : '—', 'below 20 risk-on, 20–39 fear, 40+ panic'], ['10Y TIPS real', r.realYield ? r.realYield.level.toFixed(2) + '%' : '—', 'gold’s opportunity cost'], ['10Y − 3M curve', num(r.curve10y3m) ? r.curve10y3m.toFixed(2) + '%' : '—', 'inverted = recession watch'], ['Net liquidity 4w', r.liquidity && num(r.liquidity.chg) ? sg(r.liquidity.chg, 0) + 'bn' : '—', 'Fed balance sheet − RRP − TGA'], ['US − EU 2Y', num(r.usEu2ySpread) ? r.usEu2ySpread.toFixed(2) + '%' : '—', 'rate gap behind EUR/USD'], ['DXY', num(r.dxyProxy) ? r.dxyProxy.toFixed(2) : '—', num(r.dxy5d) ? sg(r.dxy5d) + ' pts in 5 sessions' : '']];
+    $('gauges').innerHTML = g.map(function (x) { return '<div><small>' + esc(x[0]) + '</small><b>' + esc(x[1]) + '</b><small>' + esc(x[2]) + '</small></div>'; }).join('');
+    var news = fc && fc.news || []; $('news').innerHTML = news.length ? news.slice(0, 8).map(function (n) { return '<li><time>' + esc(n.at ? when(n.at) : '') + '</time><span>' + (n.policy ? '<span class="pol">policy</span> ' : '') + esc(n.src) + ': ' + (n.link ? '<a href="' + esc(n.link) + '" rel="noopener" target="_blank">' + esc(n.title) + '</a>' : esc(n.title)) + '</span></li>'; }).join('') : '<li class="empty">No central-bank items in the last week.</li>';
+    var ev = fc && fc.playbook || []; $('events').innerHTML = ev.length ? ev.slice(0, 8).map(function (e) { return '<li><time>' + esc(when(e.at)) + '</time><span><b>' + esc(e.country) + ' ' + esc(e.title) + '</b>' + (e.consensus ? ' · consensus ' + esc(e.consensus) : '') + (e.previous ? ', previous ' + esc(e.previous) : '') + (e.expMovePct && num(e.expMovePct.gold) ? ' · gold typically ±' + e.expMovePct.gold + '%' : '') + '</span></li>'; }).join('') : '<li class="empty">No high-impact release in the calendar window.</li>';
+    $('src').innerHTML = SOURCES.map(function (s) { return '<article><h4><a href="' + esc(s[3]) + '" rel="noopener" target="_blank">' + esc(s[0]) + '</a></h4><p>' + esc(s[1]) + '</p><p class="lag">Cannot tell you: ' + esc(s[2]) + '</p></article>'; }).join('');
+  }
+  function renderLedger(v, L) {
+    var el = $('ledger'); if (!v || !v.ledger) { el.innerHTML = '<p class="empty">No ledger yet.</p>'; return; }
+    var lg = v.ledger, rows = (L || []).filter(function (r) { return r.record_type === 'issued'; }).slice(-8).reverse(), res = {}; (L || []).forEach(function (r) { if (r.record_type === 'resolved') res[r.forecast_id] = r; });
+    var h = '<p>' + lg.issued + ' issued, ' + lg.resolved + ' resolved' + (lg.brier != null ? ' · Brier <b>' + lg.brier + '</b> vs base ' + lg.brierBase + (lg.brierScore != null ? ', score rule ' + lg.brierScore : '') : '') + '. ' + esc(lg.note) + '</p>';
+    if (rows.length) h += '<table class="ch"><tr><th>Week</th><th>Forecast</th><th>P</th><th>Base</th><th>Outcome</th></tr>' + rows.map(function (r) { var o = res[r.forecast_id]; return '<tr><td>' + esc(r.week) + '</td><td style="color:var(--ink-dim)">' + esc(r.forecast.target.outcome_description) + '</td><td class="lean">' + pct(r.forecast.distribution.event_probability) + '</td><td>' + (r.forecast.base_rate ? pct(r.forecast.base_rate.probability) : '—') + '</td><td>' + (o ? (o.resolution.outcome ? '<span class="lean up">up</span>' : '<span class="lean dn">down</span>') + ' ' + sg(o.resolution.return_pct) + '% · Brier ' + o.resolution.scores.brier : '<span style="color:var(--ink-faint)">open</span>') + '</td></tr>'; }).join('') + '</table>';
+    el.innerHTML = h;
+  }
+  function load() {
+    Promise.all([get('macro/forecast.json'), get('macro/veteran.json'), get('macro/cache.json'), get('macro/veteran-ledger.json')]).then(function (x) {
+      var fc = x[0], v = x[1], cache = x[2], L = x[3];
+      $('when').textContent = fc && fc.at ? 'strategist ' + ago(fc.at) + (v && v.at ? ' · veteran ' + ago(v.at) : '') : 'No macro data yet';
+      renderStrip(fc, v); renderStrat(fc); renderVet(v); renderDebate(v); renderInsights(fc, v, cache); renderSource(fc, cache); renderLedger(v, L);
+      $('foot').textContent = 'Paper only. The strategist and the veteran change no rule, size or trade; the owner decides. Data: council-data macro/forecast.json, macro/veteran.json, macro/cache.json, macro/veteran-ledger.json.';
+    });
+  }
+  load(); setInterval(load, 5 * 60e3);
+})();
+</script>
+</body>
+</html>
