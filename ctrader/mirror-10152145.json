@@ -1293,13 +1293,14 @@
    "startBalance": 9987.78
   },
   "startedAt": "2026-11-08T11:42:25.000Z",
-  "status": "ok · demo Fusion Markets · balance 10018.74 · 18 open · 3 resting",
+  "status": "ok · demo Fusion Markets · balance 10018.74 · 18 open · 2 resting",
   "skipped": {
    "audusd-position-1793601653": "price 0.68666 has run 1.27R from the council entry 0.70162: a different trade now",
    "xrp-rswing-1793942619": "none of XRPUSD found at the broker",
    "gbpusd-intraday-1793805393": "price 1.33526 has run 3.46R from the council entry 1.3469: a different trade now",
    "eurusd-intraday-1793890935": "price 1.11407 has run 1.32R from the council entry 1.12124: a different trade now",
-   "gbpusd-scalp-1793916690": "price 1.33526 has run 2.33R from the council entry 1.34482: a different trade now"
+   "gbpusd-scalp-1793916690": "price 1.33526 has run 2.33R from the council entry 1.34482: a different trade now",
+   "xrp-rscalp-1794212999": "none of XRPUSD found at the broker"
   },
   "wait": {},
   "paused": {},
@@ -1346,44 +1347,13 @@
     "alerted": [
      "pending"
     ]
-   },
-   "eurusd-rintra-1794212708": {
-    "orderId": "33790482",
-    "symbol": "EURUSD",
-    "side": "buy",
-    "volume": 100000,
-    "lots": 0.01,
-    "digits": 5,
-    "setup": "rintra",
-    "limitPrice": 1.118,
-    "stop": 1.11301,
-    "t1": 1.118765,
-    "placedAt": "2026-11-09T08:26:12.000Z",
-    "expires": "2026-11-09T20:25:08.000Z",
-    "riskCash": 4.99,
-    "margin": 2.24,
-    "minLot": true,
-    "shadow": true,
-    "alerted": [
-     "pending"
-    ]
    }
   },
   "catchUpAt": "2026-11-08T12:04:40.000Z",
   "balance": 10018.74,
-  "lastRun": "2026-11-09T08:28:38.000Z"
+  "lastRun": "2026-11-09T08:31:07.000Z"
  },
  "log": [
-  {
-   "at": "2026-11-08T20:48:06.000Z",
-   "msg": "not mirrored yet gbpusd-scalp-1793626672: GBPUSD market closed: MARKET_CLOSED: Trading is not available: Market is closed. (will retry)",
-   "trade": "gbpusd-scalp-1793626672"
-  },
-  {
-   "at": "2026-11-08T20:48:06.000Z",
-   "msg": "not mirrored yet usdcad-scalp-1793689919: USDCAD market closed: MARKET_CLOSED: Trading is not available: Market is closed. (will retry)",
-   "trade": "usdcad-scalp-1793689919"
-  },
   {
    "at": "2026-11-08T20:48:06.000Z",
    "msg": "not mirrored yet eurusd-rswing-1793754423: EURUSD market closed (paused until 20:58 UTC) (will retry)",
@@ -2873,6 +2843,16 @@
    "at": "2026-11-09T08:26:12.000Z",
    "msg": "placed buy limit EURUSD 0.01 lot at 1.118 (council rintra, valid to 2026-11-09T20:25Z)",
    "trade": "eurusd-rintra-1794212708"
+  },
+  {
+   "at": "2026-11-09T08:31:07.000Z",
+   "msg": "cancelled EURUSD limit order 33790482 for eurusd-rintra-1794212708: the council ended it: missed",
+   "trade": "eurusd-rintra-1794212708"
+  },
+  {
+   "at": "2026-11-09T08:31:07.000Z",
+   "msg": "not mirrored xrp-rscalp-1794212999: none of XRPUSD found at the broker",
+   "trade": "xrp-rscalp-1794212999"
   }
  ],
  "limits": {
