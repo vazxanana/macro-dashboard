@@ -188,6 +188,10 @@
   @property --hm-r { syntax: '<angle>'; inherits: false; initial-value: 0turn; }
   @media (prefers-reduced-motion: no-preference) { .hdr-sw::before { animation: hm-spin 7s linear infinite; } @keyframes hm-spin { to { --hm-r: 1turn; } } }
   .check { display: flex; align-items: center; gap: 12px; }
+  /* phones (9 Nov audit): the three labelled pills ran 125px past a 390px screen; dots only, as on the main desk */
+  @media (max-width: 760px) { .hdr-sw a span { display: none; } .hdr-sw a { padding: 0 9px; } }
+  /* the channel table's no-wrap first column pushed it 8px past a 390px screen */
+  @media (max-width: 600px) { .ch td:first-child { white-space: normal; } .ch td, .ch th { overflow-wrap: anywhere; } }
   @media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
 </style>
 </head>
