@@ -8,3 +8,4 @@ cp index.html out/macro/index.html
 cp edge-lab.html backtest.html macro-desk.html out/
 node research/edge/build.mjs out
 node scripts/veteran-index.mjs out
+node scripts/stamp-assets.mjs out
