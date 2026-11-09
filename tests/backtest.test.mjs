@@ -99,6 +99,18 @@ test('Monte Carlo: a winning edge passes often, a losing one fails; daily loss a
   assert.equal(BT.monteCarlo([1, 2], {}), null, 'too few trades');
   const br = BT.bestRisk(good, { target: 0.10, maxLoss: 0.10, dailyLoss: 0.05, perDay: 2, seed: 3 }); assert.ok(br.risk > 0 && br.pass >= g.pass - 0.05);
 });
+test('Monte Carlo fan and risk curve are recording only: same answer with or without them', () => {
+  const R = [2, -1, -1, 1.5, -1, 2, -1, 0.5, -1, 3], o = { risk: 0.01, target: 0.10, maxLoss: 0.10, dailyLoss: 0.05, perDay: 2, n: 1200, seed: 11 };
+  const plain = BT.monteCarlo(R, o), { fan, ...rest } = BT.monteCarlo(R, { ...o, fan: 60 });
+  assert.deepEqual(rest, plain, 'the fan does not change the simulation');
+  assert.equal(fan.steps, 60); for (const p of [5, 25, 50, 75, 95]) assert.equal(fan.p[p].length, 60);
+  for (let i = 0; i < 60; i++) { assert.ok(fan.p[5][i] <= fan.p[25][i] && fan.p[25][i] <= fan.p[50][i] && fan.p[50][i] <= fan.p[75][i] && fan.p[75][i] <= fan.p[95][i], 'percentiles ordered'); if (i) assert.ok(fan.done[i] >= fan.done[i - 1], 'finished share only grows'); }
+  assert.ok(fan.p[5][59] >= -10.5 - 3 && fan.p[95][59] <= 10 + 3, 'paths stop at the floor / target (plus one trade)');
+  assert.ok([-1, 0.5].includes(fan.p[50][0]), 'after one trade the median is one draw at 1% risk');
+  const br = BT.bestRisk(R, { ...o, n: 600 }); assert.equal(br.curve.length, 9);
+  assert.equal(br.pass, Math.max(...br.curve.map((c) => c.pass)), 'the best risk is the top of the curve');
+  assert.equal(br.fan, undefined, 'no fan in the scan');
+});
 test('stats split by trading session and by mistake tag', () => {
   const H = 3600, d = Date.UTC(2026, 0, 6) / 1000;
   const closed = [{ net: 100, R: 1, openedAt: d + 8 * H, closedAt: d + 9 * H, side: 'buy', mistakes: [] }, { net: -100, R: -1, openedAt: d + 14 * H, closedAt: d + 15 * H, side: 'sell', mistakes: ['FOMO'] },

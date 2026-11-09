@@ -15,7 +15,7 @@
   // ---- shared tooltip ----
   let tipEl = null, tipAt = 0;
   function tip(e) { const t = e.target.closest && e.target.closest('[data-tip]'); if (!tipEl) { tipEl = document.createElement('div'); tipEl.className = 'bv-tip'; tipEl.setAttribute('role', 'tooltip'); document.body.appendChild(tipEl); }
-    if (!t || !t.closest('.bv')) { if (!tipEl.hidden) tipEl.hidden = true; return; } tipEl.innerHTML = t.getAttribute('data-tip'); tipEl.hidden = false; tipAt = performance.now();
+    if (!t || !t.closest('.bv, .pfv, .jt')) { if (!tipEl.hidden) tipEl.hidden = true; return; } tipEl.innerHTML = t.getAttribute('data-tip'); tipEl.hidden = false; tipAt = performance.now();
     let x, y; if (e.type === 'focusin') { const r = t.getBoundingClientRect(); x = r.left + r.width / 2; y = r.top; } else { x = e.clientX; y = e.clientY; }
     const r = tipEl.getBoundingClientRect(); tipEl.style.left = Math.max(6, Math.min(innerWidth - r.width - 6, x - r.width / 2)) + 'px'; tipEl.style.top = Math.max(6, y - r.height - 12) + 'px'; }
   ['pointermove', 'pointerdown', 'focusin'].forEach((k) => document.addEventListener(k, tip, { passive: true }));
@@ -84,6 +84,86 @@
     el.innerHTML = svg(w, h, b, o.label || 'Comparison') + (o.legend ? `<div class="bv-leg">${o.legend}</div>` : '');
   }
 
+  // ---- vertical bars (weekdays): rows [{k, v (net R), n, w (wins), net}]; the value is written on every bar with its sign ----
+  function cols(el, rows, o = {}) {
+    if (!rows || !rows.length) return empty(el, o.empty || 'No trades yet.');
+    const w = W(el), h = 200, L = 8, Rr = 8, T = 22, B = 40, m = Math.max(0.1, ...rows.map((r) => Math.abs(r.v))), anyNeg = rows.some((r) => r.v < 0), anyPos = rows.some((r) => r.v > 0);
+    const top = anyPos ? m : 0, bot = anyNeg ? -m : 0, sy = (v) => T + (top - v) / ((top - bot) || 1) * (h - T - B - (anyNeg ? 16 : 0)), cw = (w - L - Rr) / rows.length, bw = Math.min(56, cw * 0.62);
+    let b = `<line class="bv-zero" x1="${L}" x2="${w - Rr}" y1="${sy(0).toFixed(1)}" y2="${sy(0).toFixed(1)}"/>`;
+    rows.forEach((r, i) => { const cx = L + cw * i + cw / 2, y0 = sy(0), y1 = sy(r.v), up = r.v >= 0, hh = Math.max(1.5, Math.abs(y1 - y0)), wr = r.n ? Math.round(r.w / r.n * 100) : 0;
+      b += `<rect class="bv-bar ${up ? 'up' : 'dn'}" x="${(cx - bw / 2).toFixed(1)}" y="${(up ? y0 - hh : y0).toFixed(1)}" width="${bw.toFixed(1)}" height="${hh.toFixed(1)}" rx="3" tabindex="0" data-tip="<b>${esc(r.full || r.k)}</b><br>${r.n} trade${r.n === 1 ? '' : 's'} · ${wr}% won<br>${esc(sR(r.v))} · ${esc(money(r.net))}"/>`;
+      b += `<text class="bv-val" x="${cx.toFixed(1)}" y="${(up ? y0 - hh - 6 : y0 + hh + 15).toFixed(1)}" text-anchor="middle">${esc(sR(r.v))}</text>`;
+      b += `<text class="bv-lab" x="${cx.toFixed(1)}" y="${h - 22}" text-anchor="middle">${esc(r.k)}</text><text class="bv-ax" x="${cx.toFixed(1)}" y="${h - 6}" text-anchor="middle">${r.n} · ${wr}%</text>`; });
+    el.innerHTML = svg(w, h, b, o.label || 'Net R by group') + `<div class="bv-leg"><span><i class="sw up"></i>Net R won (+)</span><span><i class="sw dn"></i>Net R lost (−)</span><span>under each bar: trades · % won</span></div>`;
+  }
+
+  // ---- Monte Carlo fan: percentiles of the account (% of the start) after each trade, target and floor drawn ----
+  function fan(el, f, o = {}) {
+    if (!f || !f.steps) return empty(el, 'Run the simulation to see the spread of outcomes.');
+    let L0 = f.done.findIndex((d) => d >= 0.95); L0 = L0 < 0 ? f.steps : Math.min(f.steps, Math.max(20, Math.ceil((L0 + 1) * 1.1)));
+    const P = [5, 25, 50, 75, 95], S = (p) => f.p[p].slice(0, L0), tg = o.target, fl = o.floor;
+    const w = W(el), h = 240, L = 50, Rr = 100, T = 12, B = 26, all = P.flatMap(S).concat([0, tg ?? 0, fl ?? 0]);
+    const lo = Math.min(...all), hi = Math.max(...all), pad = (hi - lo) * 0.06 || 1, y0 = lo - pad, y1 = hi + pad;
+    const sx = (i) => L + (i + 1) / L0 * (w - L - Rr), sy = (v) => T + (1 - (v - y0) / (y1 - y0)) * (h - T - B), pc = (v) => (v > 0 ? '+' : v < 0 ? '−' : '') + Math.abs(v).toFixed(1) + '%';
+    const line = (a) => a.map((v, i) => `${sx(i).toFixed(1)},${sy(v).toFixed(1)}`), band = (a, z) => [`${sx(-1).toFixed(1)},${sy(0).toFixed(1)}`].concat(line(a)).concat(line(z).reverse()).join(' ');
+    let b = ticks(y0, y1, 4).map((v) => `<line class="bv-grid" x1="${L}" x2="${w - Rr}" y1="${sy(v).toFixed(1)}" y2="${sy(v).toFixed(1)}"/><text class="bv-ax" x="${L - 6}" y="${(sy(v) + 4).toFixed(1)}" text-anchor="end">${esc(pc(v))}</text>`).join('');
+    b += `<line class="bv-base" x1="${L}" x2="${w - Rr}" y1="${sy(0).toFixed(1)}" y2="${sy(0).toFixed(1)}"/>`;
+    b += `<polygon class="bv-fan1" points="${band(S(95), S(5))}"/><polygon class="bv-fan2" points="${band(S(75), S(25))}"/>`;
+    b += `<polyline class="bv-fanm" points="${sx(-1).toFixed(1)},${sy(0).toFixed(1)} ${line(S(50)).join(' ')}"/>`;
+    if (tg != null) b += `<line class="bv-tgt" x1="${L}" x2="${w - Rr}" y1="${sy(tg).toFixed(1)}" y2="${sy(tg).toFixed(1)}"/><text class="bv-tgtt" x="${L + 4}" y="${(sy(tg) - 5).toFixed(1)}">✓ Target ${esc(pc(tg))}</text>`;
+    if (fl != null) b += `<line class="bv-flr" x1="${L}" x2="${w - Rr}" y1="${sy(fl).toFixed(1)}" y2="${sy(fl).toFixed(1)}"/><text class="bv-flrt" x="${L + 4}" y="${(sy(fl) + 15).toFixed(1)}">✕ Max loss ${esc(pc(fl))}${o.trailing ? ' (trailing: can sit higher)' : ''}</text>`;
+    // right-hand labels, pushed apart so they never overlap
+    const lab = P.map((p) => ({ p, v: f.p[p][L0 - 1], y: sy(f.p[p][L0 - 1]) })).sort((a, z) => a.y - z.y); for (let i = 1; i < lab.length; i++) lab[i].y = Math.max(lab[i].y, lab[i - 1].y + 14);
+    const over = lab[lab.length - 1].y - (h - B); if (over > 0) lab.forEach((x) => { x.y -= over; }); for (let i = lab.length - 2; i >= 0; i--) lab[i].y = Math.min(lab[i].y, lab[i + 1].y - 14);
+    b += lab.map((x) => `<text class="${x.p === 50 ? 'bv-val' : 'bv-ax'}" x="${(w - Rr + 6).toFixed(1)}" y="${(x.y + 4).toFixed(1)}">${x.p === 50 ? 'median' : x.p + 'th'} ${esc(pc(x.v))}</text>`).join('');
+    const st = (w - L - Rr) / L0; b += S(50).map((_, i) => `<rect class="bv-hit" x="${(sx(i) - st / 2).toFixed(1)}" y="${T}" width="${Math.max(2, st).toFixed(1)}" height="${h - T - B}" data-tip="<b>After ${i + 1} trade${i ? 's' : ''}</b><br>95th ${esc(pc(f.p[95][i]))} · 75th ${esc(pc(f.p[75][i]))}<br>median ${esc(pc(f.p[50][i]))}<br>25th ${esc(pc(f.p[25][i]))} · 5th ${esc(pc(f.p[5][i]))}<br>${Math.round(f.done[i] * 100)}% of runs already passed or failed"/>`).join('');
+    b += ticks(1, L0, 5).filter((v) => v >= 1 && Number.isInteger(v)).map((v) => `<text class="bv-ax" x="${sx(v - 1).toFixed(1)}" y="${h - 6}" text-anchor="middle">${v}</text>`).join('') + `<text class="bv-ax" x="${(w - Rr + 6).toFixed(1)}" y="${h - 6}">trades</text>`;
+    el.innerHTML = svg(w, h, b, `Spread of the simulated accounts over ${L0} trades: median ${pc(f.p[50][L0 - 1])}, 5th percentile ${pc(f.p[5][L0 - 1])}, 95th ${pc(f.p[95][L0 - 1])}`) +
+      `<div class="bv-leg"><span><i class="sw fan1"></i>9 runs in 10 (5th–95th)</span><span><i class="sw fan2"></i>Middle half (25th–75th)</span><span><i class="sw fanm"></i>Median run</span><span><i class="sw tgt"></i>Target</span><span><i class="sw flr"></i>Max loss</span></div>`;
+  }
+
+  // ---- pass rate by risk per trade (BT.bestRisk curve), the best and the chosen risk marked ----
+  function riskCurve(el, curve, o = {}) {
+    if (!curve || curve.length < 2) return empty(el, 'Not enough trades to compare risk sizes.');
+    const w = W(el), h = 224, L = 44, Rr = 14, T = 52, B = 30, xm = Math.max(3, ...curve.map((c) => c.risk * 100)) * 1.04;
+    const sx = (r) => L + r * 100 / xm * (w - L - Rr), sy = (v) => T + (1 - v) * (h - T - B), pc = (v) => Math.round(v * 100) + '%', rk = (r) => (r * 100).toFixed(2) + '%';
+    let b = [0, 0.25, 0.5, 0.75, 1].map((v) => `<line class="bv-grid" x1="${L}" x2="${w - Rr}" y1="${sy(v).toFixed(1)}" y2="${sy(v).toFixed(1)}"/><text class="bv-ax" x="${L - 6}" y="${(sy(v) + 4).toFixed(1)}" text-anchor="end">${pc(v)}</text>`).join('');
+    b += [0.5, 1, 1.5, 2, 2.5, 3].map((r) => `<text class="bv-ax" x="${sx(r / 100).toFixed(1)}" y="${h - 10}" text-anchor="middle">${r}%</text>`).join('');
+    b += `<polyline class="bv-rc" points="${curve.map((c) => `${sx(c.risk).toFixed(1)},${sy(c.pass).toFixed(1)}`).join(' ')}"/>`;
+    b += curve.map((c) => `<circle class="bv-rcp" cx="${sx(c.risk).toFixed(1)}" cy="${sy(c.pass).toFixed(1)}" r="4" tabindex="0" data-tip="<b>${rk(c.risk)} risk per trade</b><br>passes ${pc(c.pass)} · fails ${pc(c.fail)}${c.unfinished ? ` · unfinished ${pc(c.unfinished)}` : ''}"/>`).join('');
+    // markers on the curve; their words sit in two lines above the plot (never on top of each other, whatever the width)
+    const same = o.best && o.chosen && Math.abs(o.best.risk - o.chosen.risk) < 1e-9, line = [];
+    if (o.best && !same) { b += `<circle class="bv-rcb" cx="${sx(o.best.risk).toFixed(1)}" cy="${sy(o.best.pass).toFixed(1)}" r="8"/>`; line.push(['rcb', `Best: ${rk(o.best.risk)} per trade passes ${pc(o.best.pass)}`]); }
+    if (o.chosen) { const x = sx(o.chosen.risk), y = sy(o.chosen.pass); b += (same ? `<circle class="bv-rcb" cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="8"/>` : '') + `<path class="bv-rcy" d="M${x.toFixed(1)} ${(y - 7).toFixed(1)}l7 7-7 7-7-7z"/>`; line.unshift(['rcy', `Yours: ${rk(o.chosen.risk)} per trade passes ${pc(o.chosen.pass)}${same ? ' (also the best)' : ''}`]); }
+    b += line.map(([k, t], i) => (k === 'rcb' ? `<circle class="bv-rcb" cx="${L + 6}" cy="${12 + i * 18}" r="5"/>` : `<path class="bv-rcy" d="M${L + 6} ${6 + i * 18}l6 6-6 6-6-6z"/>`) + `<text class="bv-val" x="${L + 18}" y="${16 + i * 18}">${esc(t)}</text>`).join('');
+    el.innerHTML = svg(w, h, b, `Pass rate by risk per trade${o.best ? `; best ${rk(o.best.risk)} at ${pc(o.best.pass)}` : ''}${o.chosen ? `; yours ${rk(o.chosen.risk)} at ${pc(o.chosen.pass)}` : ''}`) +
+      `<div class="bv-leg"><span><i class="sw rc"></i>Pass rate</span><span><i class="sw rcb"></i>Best risk</span><span><i class="sw rcy"></i>Your risk</span><span>risk per trade, % of the start</span></div>`;
+  }
+
+  // ---- semicircle gauge (prop-firm buffers): o = {left, of, label, note, breached}; returns HTML; words say the state ----
+  function gauge(o) {
+    const f = o.of > 0 ? Math.max(0, Math.min(1, o.left / o.of)) : 0, st = o.breached ? ['bad', 'Breached'] : f > 0.5 ? ['ok', 'Plenty of room'] : f > 0.25 ? ['mid', 'Getting close'] : ['bad', 'Nearly out'];
+    const r = 54, cx = 70, cy = 66, a = Math.PI * (1 - f), ex = cx + r * Math.cos(a), ey = cy - r * Math.sin(a);
+    const arc = f > 0.001 ? `<path class="g-fill ${st[0]}" d="M${cx - r} ${cy} A${r} ${r} 0 0 1 ${ex.toFixed(1)} ${ey.toFixed(1)}"/>` : '';
+    return `<div class="pfg ${st[0]}" tabindex="0" data-tip="<b>${esc(o.label)}</b><br>${esc(money(o.left))} left of ${esc(money(o.of))} (${Math.round(f * 100)}%)${o.note ? '<br>' + esc(o.note) : ''}"><svg viewBox="0 0 140 78" width="140" height="78" role="img" aria-label="${esc(o.label)}: ${esc(money(o.left))} left of ${esc(money(o.of))}, ${st[1]}">` +
+      `<path class="g-bg" d="M${cx - r} ${cy} A${r} ${r} 0 0 1 ${cx + r} ${cy}"/>${arc}<text class="g-v" x="${cx}" y="${cy - 10}" text-anchor="middle">${Math.round(f * 100)}%</text><text class="g-s" x="${cx}" y="${cy + 9}" text-anchor="middle">left</text></svg>` +
+      `<b>${esc(o.label)}</b><span>${esc(money(o.left))} of ${esc(money(o.of))}</span><em>${o.breached ? '✕' : f > 0.5 ? '✓' : '!'} ${st[1]}</em></div>`;
+  }
+
+  // ---- journal thumbnail: closes around the trade, entry / stop / target lines, entry and exit dots (SVG string, 96 × 36) ----
+  function mini(bars, t, last) {
+    if (!bars || !bars.length || !t) return '';
+    const bs = (x) => { let lo = 0, hi = bars.length - 1; while (lo < hi) { const m = (lo + hi) >> 1; if (bars[m].time < x) lo = m + 1; else hi = m; } return lo; };
+    const i0 = bs(t.openedAt), i1 = Math.max(i0, bs(t.closedAt)), a = Math.max(0, i0 - 6), z = Math.max(i1, Math.min(last == null ? bars.length - 1 : last, bars.length - 1, i1 + 3)), stp = Math.max(1, Math.ceil((z - a + 1) / 60));
+    const pts = []; for (let i = a; i <= z; i += stp) pts.push([i, bars[i].close]); if (pts[pts.length - 1][0] !== z) pts.push([z, bars[z].close]);
+    const lv = [t.entry, t.stop, t.exit].concat(t.target != null ? [t.target] : []).filter(Number.isFinite), ps = pts.map((p) => p[1]).concat(lv), lo = Math.min(...ps), hi = Math.max(...ps), W0 = 96, H0 = 36, pd = 3;
+    const sx = (i) => pd + (i - a) / Math.max(1, z - a) * (W0 - 2 * pd), sy = (v) => pd + (1 - (v - lo) / ((hi - lo) || 1)) * (H0 - 2 * pd), win = t.net > 0;
+    const hl = (v, c) => `<line class="${c}" x1="${sx(i0).toFixed(1)}" x2="${Math.max(sx(i1), sx(i0) + 4).toFixed(1)}" y1="${sy(v).toFixed(1)}" y2="${sy(v).toFixed(1)}"/>`;
+    return `<svg viewBox="0 0 ${W0} ${H0}" width="${W0}" height="${H0}" aria-hidden="true"><rect class="m-span" x="${sx(i0).toFixed(1)}" y="0" width="${Math.max(3, sx(i1) - sx(i0)).toFixed(1)}" height="${H0}"/>` +
+      hl(t.stop, 'm-sl') + (t.target != null ? hl(t.target, 'm-tp') : '') + hl(t.entry, 'm-en') + `<polyline class="m-px" points="${pts.map((p) => `${sx(p[0]).toFixed(1)},${sy(p[1]).toFixed(1)}`).join(' ')}"/>` +
+      `<circle class="m-in" cx="${sx(i0).toFixed(1)}" cy="${sy(t.entry).toFixed(1)}" r="2.6"/><circle class="m-out ${win ? 'w' : 'l'}" cx="${sx(i1).toFixed(1)}" cy="${sy(t.exit).toFixed(1)}" r="3"/></svg>`;
+  }
+
   // ---- session report as an image (1200 × 675 canvas) ----
   function reportPNG(d) {
     const cs = getComputedStyle(document.documentElement), v = (k, f) => (cs.getPropertyValue(k) || '').trim() || f;
@@ -109,5 +189,5 @@
     return c.toDataURL('image/png');
   }
 
-  window.BTR = { equity, hist, heat, hbars, reportPNG, sR, money };
+  window.BTR = { equity, hist, heat, hbars, cols, fan, riskCurve, gauge, mini, reportPNG, sR, money };
 })();
