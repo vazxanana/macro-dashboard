@@ -1,6 +1,6 @@
 {
  "v": 1,
- "at": "2026-11-09T14:02:13.000Z",
+ "at": "2026-11-09T15:16:51.000Z",
  "target": "2026-11-10",
  "targetEvent": "CPI, 13:30 UTC",
  "paperOnly": true,
@@ -20,8 +20,8 @@
    "chg": -0.03,
    "bias": "bear"
   },
-  "dxyProxy": 101.9,
-  "dxy5d": 0.04,
+  "dxyProxy": 101.97,
+  "dxy5d": 0.1,
   "broadUsd20dPct": -0.1,
   "sofrEffrBps": 1,
   "curve10y3m": 0.67,
@@ -32,9 +32,9 @@
  "assets": {
   "gold": {
    "label": "Gold",
-   "pUp": 0.539,
-   "score": 0.063,
-   "last": 4123.45,
+   "pUp": 0.536,
+   "score": 0,
+   "last": 4117.93,
    "expMovePct": 1.01,
    "naiveMovePct": 1.01,
    "volModel": "naive",
@@ -42,7 +42,7 @@
    "expBasis": "naive: mean absolute move of the last 20 days",
    "fit": {
     "a": 0.1423,
-    "b": 0.2042,
+    "b": 0.2045,
     "n": 1000,
     "base": 0.536
    },
@@ -90,26 +90,19 @@
      "detail": "104k net, −7k in 4 weeks, 34th pct, week of 2026-11-03"
     },
     {
-     "k": "hy",
-     "name": "Credit stress (HY spreads)",
-     "dir": "up",
-     "w": 1,
-     "detail": "3.48%, +22 bp a week"
-    },
-    {
      "k": "trend",
      "name": "Own price trend (close vs 20-day mean)",
      "dir": "up",
      "w": 1,
-     "detail": "Gold above, EUR/USD above, USD/JPY above, NQ below, ES n/a"
+     "detail": "Gold above, EUR/USD below, USD/JPY above, NQ below, ES below"
     }
    ]
   },
   "eurusd": {
    "label": "EUR/USD",
    "pUp": 0.488,
-   "score": 0,
-   "last": 1.11971,
+   "score": -0.214,
+   "last": 1.11962,
    "expMovePct": 0.24,
    "naiveMovePct": 0.24,
    "volModel": "naive",
@@ -153,9 +146,9 @@
     {
      "k": "trend",
      "name": "Own price trend (close vs 20-day mean)",
-     "dir": "up",
+     "dir": "down",
      "w": 1,
-     "detail": "Gold above, EUR/USD above, USD/JPY above, NQ below, ES n/a"
+     "detail": "Gold above, EUR/USD below, USD/JPY above, NQ below, ES below"
     },
     {
      "k": "vix",
@@ -163,29 +156,22 @@
      "dir": "down",
      "w": 0.5,
      "detail": "VIX 28.2, elevated fear"
-    },
-    {
-     "k": "hy",
-     "name": "Credit stress (HY spreads)",
-     "dir": "down",
-     "w": 0.5,
-     "detail": "3.48%, +22 bp a week"
     }
    ]
   },
   "usdjpy": {
    "label": "USD/JPY",
-   "pUp": 0.549,
-   "score": -0.368,
-   "last": 157.918,
+   "pUp": 0.552,
+   "score": -0.263,
+   "last": 158.156,
    "expMovePct": 0.27,
    "naiveMovePct": 0.27,
    "volModel": "naive",
    "volRatio": 0.78,
    "expBasis": "naive: mean absolute move of the last 20 days",
    "fit": {
-    "a": 0.2461,
-    "b": 0.1338,
+    "a": 0.2459,
+    "b": 0.1352,
     "n": 999,
     "base": 0.565
    },
@@ -219,13 +205,6 @@
      "detail": "4.46%, −15 bp a week"
     },
     {
-     "k": "hy",
-     "name": "Credit stress (HY spreads)",
-     "dir": "down",
-     "w": 1,
-     "detail": "3.48%, +22 bp a week"
-    },
-    {
      "k": "smile",
      "name": "Dollar Smile regime (USD cycle)",
      "dir": "down",
@@ -237,7 +216,7 @@
      "name": "Own price trend (close vs 20-day mean)",
      "dir": "up",
      "w": 1,
-     "detail": "Gold above, EUR/USD above, USD/JPY above, NQ below, ES n/a"
+     "detail": "Gold above, EUR/USD below, USD/JPY above, NQ below, ES below"
     },
     {
      "k": "vix",
@@ -250,9 +229,9 @@
   },
   "nq": {
    "label": "NQ (Nasdaq 100)",
-   "pUp": 0.552,
-   "score": -0.133,
-   "last": 27221.4,
+   "pUp": 0.56,
+   "score": 0,
+   "last": 27713,
    "expMovePct": 1.44,
    "naiveMovePct": 1.44,
    "volModel": "naive",
@@ -260,7 +239,7 @@
    "expBasis": "naive: mean absolute move of the last 20 days",
    "fit": {
     "a": 0.2404,
-    "b": 0.2303,
+    "b": 0.2314,
     "n": 999,
     "base": 0.56
    },
@@ -280,13 +259,6 @@
      "detail": "−3 bp a week"
     },
     {
-     "k": "hy",
-     "name": "Credit stress (HY spreads)",
-     "dir": "down",
-     "w": 1,
-     "detail": "3.48%, +22 bp a week"
-    },
-    {
      "k": "vixts",
      "name": "VIX term structure (VIX / VIX3M)",
      "dir": "up",
@@ -298,7 +270,7 @@
      "name": "Own price trend (close vs 20-day mean)",
      "dir": "down",
      "w": 1,
-     "detail": "Gold above, EUR/USD above, USD/JPY above, NQ below, ES n/a"
+     "detail": "Gold above, EUR/USD below, USD/JPY above, NQ below, ES below"
     },
     {
      "k": "vix",
@@ -325,19 +297,19 @@
   },
   "es": {
    "label": "ES (S&P 500)",
-   "pUp": null,
+   "pUp": 0.537,
    "score": 0,
-   "last": null,
-   "expMovePct": null,
-   "naiveMovePct": null,
-   "volModel": null,
-   "volRatio": null,
-   "expBasis": null,
+   "last": 7513.9,
+   "expMovePct": 0.81,
+   "naiveMovePct": 0.81,
+   "volModel": "naive",
+   "volRatio": 1.55,
+   "expBasis": "naive: mean absolute move of the last 20 days",
    "fit": {
-    "a": 0,
-    "b": 0.25,
-    "n": 0,
-    "base": 0.5
+    "a": 0.149,
+    "b": 0.3008,
+    "n": 997,
+    "base": 0.539
    },
    "drivers": [
     {
@@ -348,18 +320,18 @@
      "detail": "10Y TIPS 2.60%, falling"
     },
     {
-     "k": "hy",
-     "name": "Credit stress (HY spreads)",
-     "dir": "down",
-     "w": 1,
-     "detail": "3.48%, +22 bp a week"
-    },
-    {
      "k": "vixts",
      "name": "VIX term structure (VIX / VIX3M)",
      "dir": "up",
      "w": 1,
      "detail": "1.10: inverted (stress), stocks tend to bounce next day"
+    },
+    {
+     "k": "trend",
+     "name": "Own price trend (close vs 20-day mean)",
+     "dir": "down",
+     "w": 1,
+     "detail": "Gold above, EUR/USD below, USD/JPY above, NQ below, ES below"
     },
     {
      "k": "vix",
@@ -416,7 +388,7 @@
    "name": "Macro composite (TIPS, DXY, seasonal, CB buying, VIX)",
    "cluster": "dollar",
    "vote": 0,
-   "detail": "73% gold-supportive, DXY ≈ 101.9",
+   "detail": "73% gold-supportive, DXY ≈ 102.0",
    "weights": {
     "gold": 2
    }
@@ -488,7 +460,7 @@
    "name": "USD 5-day momentum (ICE DXY on OANDA)",
    "cluster": "dollar",
    "vote": 0,
-   "detail": "+0.04 pts in 5 sessions",
+   "detail": "+0.10 pts in 5 sessions",
    "weights": {
     "gold": 1,
     "eurusd": 1,
@@ -521,8 +493,8 @@
    "k": "hy",
    "name": "Credit stress (HY spreads)",
    "cluster": "risk",
-   "vote": 1,
-   "detail": "3.48%, +22 bp a week",
+   "vote": 0,
+   "detail": "3.42%, −2 bp a week",
    "weights": {
     "gold": 1,
     "eurusd": -0.5,
@@ -568,7 +540,7 @@
    "name": "Yen carry-unwind risk (BoJ / VIX)",
    "cluster": "risk",
    "vote": null,
-   "detail": "USD/JPY −0.0% in 5 days: calm",
+   "detail": "USD/JPY +0.1% in 5 days: calm",
    "weights": {}
   },
   {
@@ -595,7 +567,7 @@
    "name": "Own price trend (close vs 20-day mean)",
    "cluster": "positioning",
    "vote": 0,
-   "detail": "Gold above, EUR/USD above, USD/JPY above, NQ below, ES n/a",
+   "detail": "Gold above, EUR/USD below, USD/JPY above, NQ below, ES below",
    "weights": {
     "gold": 1,
     "eurusd": 1,
@@ -605,10 +577,10 @@
    },
    "perAsset": {
     "gold": 1,
-    "eurusd": 1,
+    "eurusd": -1,
     "usdjpy": 1,
     "nq": -1,
-    "es": 0
+    "es": -1
    }
   },
   {
@@ -658,7 +630,7 @@
    "name": "Veteran: dollar (DXY), 4-week change",
    "cluster": "dollar",
    "vote": 0,
-   "detail": "DXY −0.62% in 4 weeks",
+   "detail": "DXY −0.56% in 4 weeks",
    "weights": {},
    "challenger": true,
    "vs": "dxymom",
@@ -743,14 +715,14 @@
     "eurusd": 0.24,
     "usdjpy": 0.27,
     "nq": 1.44,
-    "es": 1
+    "es": 0.81
    },
    "expBasis": {
     "gold": "naive: mean absolute move of the last 20 days",
     "eurusd": "naive: mean absolute move of the last 20 days",
     "usdjpy": "naive: mean absolute move of the last 20 days",
     "nq": "naive: mean absolute move of the last 20 days",
-    "es": "event prior (no price history)"
+    "es": "naive: mean absolute move of the last 20 days"
    },
    "scenarios": [
     {
@@ -808,14 +780,14 @@
     "eurusd": 0.24,
     "usdjpy": 0.27,
     "nq": 1.44,
-    "es": 1
+    "es": 0.81
    },
    "expBasis": {
     "gold": "naive: mean absolute move of the last 20 days",
     "eurusd": "naive: mean absolute move of the last 20 days",
     "usdjpy": "naive: mean absolute move of the last 20 days",
     "nq": "naive: mean absolute move of the last 20 days",
-    "es": "event prior (no price history)"
+    "es": "naive: mean absolute move of the last 20 days"
    },
    "scenarios": [
     {
@@ -873,14 +845,14 @@
     "eurusd": 0.24,
     "usdjpy": 0.27,
     "nq": 1.44,
-    "es": 0.2
+    "es": 0.81
    },
    "expBasis": {
     "gold": "naive: mean absolute move of the last 20 days",
     "eurusd": "naive: mean absolute move of the last 20 days",
     "usdjpy": "naive: mean absolute move of the last 20 days",
     "nq": "naive: mean absolute move of the last 20 days",
-    "es": "event prior (no price history)"
+    "es": "naive: mean absolute move of the last 20 days"
    },
    "scenarios": [
     {
@@ -938,14 +910,14 @@
     "eurusd": 0.24,
     "usdjpy": 0.27,
     "nq": 1.44,
-    "es": 1
+    "es": 0.81
    },
    "expBasis": {
     "gold": "naive: mean absolute move of the last 20 days",
     "eurusd": "naive: mean absolute move of the last 20 days",
     "usdjpy": "naive: mean absolute move of the last 20 days",
     "nq": "naive: mean absolute move of the last 20 days",
-    "es": "event prior (no price history)"
+    "es": "naive: mean absolute move of the last 20 days"
    },
    "scenarios": [
     {
@@ -1003,14 +975,14 @@
     "eurusd": 0.24,
     "usdjpy": 0.27,
     "nq": 1.44,
-    "es": 1
+    "es": 0.81
    },
    "expBasis": {
     "gold": "naive: mean absolute move of the last 20 days",
     "eurusd": "naive: mean absolute move of the last 20 days",
     "usdjpy": "naive: mean absolute move of the last 20 days",
     "nq": "naive: mean absolute move of the last 20 days",
-    "es": "event prior (no price history)"
+    "es": "naive: mean absolute move of the last 20 days"
    },
    "scenarios": [
     {
@@ -1126,9 +1098,9 @@
     "brierRW": 0.25,
     "brierClim": 0.2486,
     "skillRW": 0.0041,
-    "skillClim": -0.0016,
+    "skillClim": -0.0015,
     "logLoss": 0.6911,
-    "ece": 0.03,
+    "ece": 0.031,
     "calib": [
      {
       "bin": "0-40%",
@@ -1163,7 +1135,7 @@
      {
       "bin": "52-55%",
       "n": 325,
-      "p": 0.534,
+      "p": 0.533,
       "obs": 0.554
      },
      {
@@ -1259,8 +1231,8 @@
     "brierClim": 0.2454,
     "skillRW": 0.0152,
     "skillClim": -0.0032,
-    "logLoss": 0.6856,
-    "ece": 0.009,
+    "logLoss": 0.6855,
+    "ece": 0.01,
     "calib": [
      {
       "bin": "0-40%",
@@ -1294,21 +1266,21 @@
      },
      {
       "bin": "52-55%",
-      "n": 190,
-      "p": 0.539,
-      "obs": 0.558
+      "n": 191,
+      "p": 0.538,
+      "obs": 0.56
      },
      {
       "bin": "55-60%",
-      "n": 680,
+      "n": 677,
       "p": 0.57,
       "obs": 0.569
      },
      {
       "bin": "60-100%",
-      "n": 4,
+      "n": 6,
       "p": 0.602,
-      "obs": 0.25
+      "obs": 0.333
      }
     ]
    },
@@ -1323,10 +1295,10 @@
     "brier": 0.2476,
     "brierRW": 0.25,
     "brierClim": 0.247,
-    "skillRW": 0.0096,
-    "skillClim": -0.0026,
-    "logLoss": 0.6884,
-    "ece": 0.04,
+    "skillRW": 0.0097,
+    "skillClim": -0.0025,
+    "logLoss": 0.6883,
+    "ece": 0.043,
     "calib": [
      {
       "bin": "0-40%",
@@ -1361,25 +1333,88 @@
      {
       "bin": "52-55%",
       "n": 174,
-      "p": 0.538,
+      "p": 0.537,
       "obs": 0.592
      },
      {
       "bin": "55-60%",
-      "n": 576,
+      "n": 574,
       "p": 0.572,
-      "obs": 0.533
+      "obs": 0.531
      },
      {
       "bin": "60-100%",
-      "n": 104,
-      "p": 0.612,
-      "obs": 0.615
+      "n": 106,
+      "p": 0.611,
+      "obs": 0.623
      }
     ]
    },
    "es": {
-    "n": 0
+    "n": 877,
+    "upRate": 0.54,
+    "hit": 0.54,
+    "base": 0.54,
+    "edge": 0,
+    "z": 0,
+    "pt": 0.81,
+    "brier": 0.2483,
+    "brierRW": 0.25,
+    "brierClim": 0.2484,
+    "skillRW": 0.0068,
+    "skillClim": 0.0003,
+    "logLoss": 0.6897,
+    "ece": 0.023,
+    "calib": [
+     {
+      "bin": "0-40%",
+      "n": 0,
+      "p": null,
+      "obs": null
+     },
+     {
+      "bin": "40-45%",
+      "n": 0,
+      "p": null,
+      "obs": null
+     },
+     {
+      "bin": "45-48%",
+      "n": 23,
+      "p": 0.472,
+      "obs": 0.478
+     },
+     {
+      "bin": "48-50%",
+      "n": 67,
+      "p": 0.493,
+      "obs": 0.507
+     },
+     {
+      "bin": "50-52%",
+      "n": 141,
+      "p": 0.51,
+      "obs": 0.574
+     },
+     {
+      "bin": "52-55%",
+      "n": 356,
+      "p": 0.535,
+      "obs": 0.511
+     },
+     {
+      "bin": "55-60%",
+      "n": 286,
+      "p": 0.568,
+      "obs": 0.573
+     },
+     {
+      "bin": "60-100%",
+      "n": 4,
+      "p": 0.603,
+      "obs": 0.5
+     }
+    ]
    }
   },
   "live": {
@@ -2570,36 +2605,337 @@
    },
    "es": {
     "used": "naive",
-    "picked": null,
+    "picked": "ewma",
     "tried": 4,
-    "reason": "only 0 days with every forecast",
+    "split": "2025-02-17",
+    "reason": "ewma won the first half but did not beat naive on the second half (from 2025-02-17)",
     "full": {
-     "n": 0,
-     "eventDays": 0,
-     "eventAvgAbs": null,
-     "otherAvgAbs": null,
-     "from": null,
-     "to": null,
+     "n": 895,
+     "eventDays": 107,
+     "eventAvgAbs": 0.857,
+     "otherAvgAbs": 0.596,
+     "from": "2023-05-31",
+     "to": "2026-11-06",
      "models": {
       "cur": {
-       "all": null,
-       "event": null
+       "all": {
+        "n": 895,
+        "mae": 0.429,
+        "maeNaive": 0.448,
+        "qlike": 1.081,
+        "qlikeNaive": 0.767,
+        "dmMae": 2.88,
+        "dmQlike": -3.19
+       },
+       "event": {
+        "n": 107,
+        "mae": 0.562,
+        "maeNaive": 0.558,
+        "qlike": 1.124,
+        "qlikeNaive": 1.817,
+        "dmMae": -0.13,
+        "dmQlike": 1.71
+       }
       },
       "evt": {
-       "all": null,
-       "event": null
+       "all": {
+        "n": 895,
+        "mae": 0.45,
+        "maeNaive": 0.448,
+        "qlike": 0.737,
+        "qlikeNaive": 0.767,
+        "dmMae": -0.49,
+        "dmQlike": 0.71
+       },
+       "event": {
+        "n": 107,
+        "mae": 0.571,
+        "maeNaive": 0.558,
+        "qlike": 1.565,
+        "qlikeNaive": 1.817,
+        "dmMae": -0.49,
+        "dmQlike": 0.71
+       }
       },
       "ewma": {
-       "all": null,
-       "event": null
+       "all": {
+        "n": 895,
+        "mae": 0.441,
+        "maeNaive": 0.448,
+        "qlike": 0.772,
+        "qlikeNaive": 0.767,
+        "dmMae": 1.27,
+        "dmQlike": -0.08
+       },
+       "event": {
+        "n": 107,
+        "mae": 0.6,
+        "maeNaive": 0.558,
+        "qlike": 1.237,
+        "qlikeNaive": 1.817,
+        "dmMae": -1.48,
+        "dmQlike": 1.52
+       }
       },
       "har": {
-       "all": null,
-       "event": null
+       "all": {
+        "n": 895,
+        "mae": 0.441,
+        "maeNaive": 0.448,
+        "qlike": 0.644,
+        "qlikeNaive": 0.767,
+        "dmMae": 1.2,
+        "dmQlike": 1.85
+       },
+       "event": {
+        "n": 107,
+        "mae": 0.598,
+        "maeNaive": 0.558,
+        "qlike": 1.245,
+        "qlikeNaive": 1.817,
+        "dmMae": -1.1,
+        "dmQlike": 1.35
+       }
       },
       "vix": {
-       "all": null,
-       "event": null
+       "all": {
+        "n": 895,
+        "mae": 0.419,
+        "maeNaive": 0.448,
+        "qlike": 0.563,
+        "qlikeNaive": 0.767,
+        "dmMae": 4.17,
+        "dmQlike": 2.66
+       },
+       "event": {
+        "n": 107,
+        "mae": 0.541,
+        "maeNaive": 0.558,
+        "qlike": 1.536,
+        "qlikeNaive": 1.817,
+        "dmMae": 1.06,
+        "dmQlike": 0.83
+       }
+      }
+     }
+    },
+    "selection": {
+     "n": 447,
+     "eventDays": 55,
+     "eventAvgAbs": 0.823,
+     "otherAvgAbs": 0.527,
+     "from": "2023-05-31",
+     "to": "2025-02-14",
+     "models": {
+      "cur": {
+       "all": {
+        "n": 447,
+        "mae": 0.37,
+        "maeNaive": 0.388,
+        "qlike": 0.704,
+        "qlikeNaive": 0.497,
+        "dmMae": 2.34,
+        "dmQlike": -1.56
+       },
+       "event": {
+        "n": 55,
+        "mae": 0.515,
+        "maeNaive": 0.535,
+        "qlike": 1.128,
+        "qlikeNaive": 1.989,
+        "dmMae": 0.43,
+        "dmQlike": 1.19
+       }
+      },
+      "evt": {
+       "all": {
+        "n": 447,
+        "mae": 0.385,
+        "maeNaive": 0.388,
+        "qlike": 0.392,
+        "qlikeNaive": 0.497,
+        "dmMae": 0.65,
+        "dmQlike": 1.29
+       },
+       "event": {
+        "n": 55,
+        "mae": 0.506,
+        "maeNaive": 0.535,
+        "qlike": 1.138,
+        "qlikeNaive": 1.989,
+        "dmMae": 0.65,
+        "dmQlike": 1.31
+       }
+      },
+      "ewma": {
+       "all": {
+        "n": 447,
+        "mae": 0.382,
+        "maeNaive": 0.388,
+        "qlike": 0.379,
+        "qlikeNaive": 0.497,
+        "dmMae": 1.21,
+        "dmQlike": 1.35
+       },
+       "event": {
+        "n": 55,
+        "mae": 0.513,
+        "maeNaive": 0.535,
+        "qlike": 1.078,
+        "qlikeNaive": 1.989,
+        "dmMae": 0.61,
+        "dmQlike": 1.32
+       }
+      },
+      "har": {
+       "all": {
+        "n": 447,
+        "mae": 0.385,
+        "maeNaive": 0.388,
+        "qlike": 0.384,
+        "qlikeNaive": 0.497,
+        "dmMae": 0.37,
+        "dmQlike": 1.16
+       },
+       "event": {
+        "n": 55,
+        "mae": 0.553,
+        "maeNaive": 0.535,
+        "qlike": 1.157,
+        "qlikeNaive": 1.989,
+        "dmMae": -0.32,
+        "dmQlike": 1.07
+       }
+      },
+      "vix": {
+       "all": {
+        "n": 447,
+        "mae": 0.374,
+        "maeNaive": 0.388,
+        "qlike": 0.335,
+        "qlikeNaive": 0.497,
+        "dmMae": 2.32,
+        "dmQlike": 2.08
+       },
+       "event": {
+        "n": 55,
+        "mae": 0.527,
+        "maeNaive": 0.535,
+        "qlike": 1.385,
+        "qlikeNaive": 1.989,
+        "dmMae": 0.41,
+        "dmQlike": 1.04
+       }
+      }
+     }
+    },
+    "confirmation": {
+     "n": 448,
+     "eventDays": 52,
+     "eventAvgAbs": 0.893,
+     "otherAvgAbs": 0.664,
+     "from": "2025-02-17",
+     "to": "2026-11-06",
+     "models": {
+      "cur": {
+       "all": {
+        "n": 448,
+        "mae": 0.487,
+        "maeNaive": 0.508,
+        "qlike": 1.457,
+        "qlikeNaive": 1.037,
+        "dmMae": 1.86,
+        "dmQlike": -2.9
+       },
+       "event": {
+        "n": 52,
+        "mae": 0.611,
+        "maeNaive": 0.583,
+        "qlike": 1.12,
+        "qlikeNaive": 1.636,
+        "dmMae": -0.81,
+        "dmQlike": 1.6
+       }
+      },
+      "evt": {
+       "all": {
+        "n": 448,
+        "mae": 0.515,
+        "maeNaive": 0.508,
+        "qlike": 1.081,
+        "qlikeNaive": 1.037,
+        "dmMae": -1.98,
+        "dmQlike": -1.86
+       },
+       "event": {
+        "n": 52,
+        "mae": 0.64,
+        "maeNaive": 0.583,
+        "qlike": 2.016,
+        "qlikeNaive": 1.636,
+        "dmMae": -2.05,
+        "dmQlike": -1.92
+       }
+      },
+      "ewma": {
+       "all": {
+        "n": 448,
+        "mae": 0.5,
+        "maeNaive": 0.508,
+        "qlike": 1.165,
+        "qlikeNaive": 1.037,
+        "dmMae": 0.79,
+        "dmQlike": -1.38
+       },
+       "event": {
+        "n": 52,
+        "mae": 0.691,
+        "maeNaive": 0.583,
+        "qlike": 1.405,
+        "qlikeNaive": 1.636,
+        "dmMae": -2.51,
+        "dmQlike": 0.83
+       }
+      },
+      "har": {
+       "all": {
+        "n": 448,
+        "mae": 0.496,
+        "maeNaive": 0.508,
+        "qlike": 0.903,
+        "qlikeNaive": 1.037,
+        "dmMae": 1.21,
+        "dmQlike": 1.47
+       },
+       "event": {
+        "n": 52,
+        "mae": 0.646,
+        "maeNaive": 0.583,
+        "qlike": 1.338,
+        "qlikeNaive": 1.636,
+        "dmMae": -1.42,
+        "dmQlike": 1.02
+       }
+      },
+      "vix": {
+       "all": {
+        "n": 448,
+        "mae": 0.463,
+        "maeNaive": 0.508,
+        "qlike": 0.79,
+        "qlikeNaive": 1.037,
+        "dmMae": 3.52,
+        "dmQlike": 1.86
+       },
+       "event": {
+        "n": 52,
+        "mae": 0.557,
+        "maeNaive": 0.583,
+        "qlike": 1.695,
+        "qlikeNaive": 1.636,
+        "dmMae": 1.02,
+        "dmQlike": -0.18
+       }
       }
      }
     }
@@ -2694,9 +3030,9 @@
      "proven": false
     },
     "hy": {
-     "n": 410,
+     "n": 408,
      "hit": 0.532,
-     "t": 1.28,
+     "t": 1.29,
      "proven": false
     },
     "cot": {
@@ -2774,9 +3110,9 @@
      "proven": false
     },
     "hy": {
-     "n": 409,
-     "hit": 0.487,
-     "t": -0.54,
+     "n": 407,
+     "hit": 0.486,
+     "t": -0.55,
      "proven": false
     }
    },
@@ -2848,9 +3184,9 @@
      "proven": true
     },
     "hy": {
-     "n": 410,
-     "hit": 0.517,
-     "t": 0.69,
+     "n": 408,
+     "hit": 0.52,
+     "t": 0.79,
      "proven": false
     }
    },
@@ -2916,7 +3252,7 @@
      "proven": false
     },
     "hy": {
-     "n": 410,
+     "n": 408,
      "hit": 0.505,
      "t": 0.2,
      "proven": false
@@ -2928,38 +3264,111 @@
      "proven": false
     }
    },
-   "es": {}
+   "es": {
+    "ry": {
+     "n": 750,
+     "hit": 0.516,
+     "t": 0.88,
+     "proven": false
+    },
+    "rymom": {
+     "n": 861,
+     "hit": 0.533,
+     "t": 1.94,
+     "proven": false
+    },
+    "dgs2": {
+     "n": 801,
+     "hit": 0.512,
+     "t": 0.67,
+     "proven": false
+    },
+    "dxymom": {
+     "n": 758,
+     "hit": 0.515,
+     "t": 0.8,
+     "proven": false
+    },
+    "smile": {
+     "n": 416,
+     "hit": 0.538,
+     "t": 1.57,
+     "proven": false
+    },
+    "trend": {
+     "n": 997,
+     "hit": 0.519,
+     "t": 1.17,
+     "proven": false
+    },
+    "v_ry4w": {
+     "n": 643,
+     "hit": 0.518,
+     "t": 0.91,
+     "proven": false
+    },
+    "v_d2_4w": {
+     "n": 513,
+     "hit": 0.534,
+     "t": 1.55,
+     "proven": false
+    },
+    "v_dxy4w": {
+     "n": 620,
+     "hit": 0.526,
+     "t": 1.29,
+     "proven": false
+    },
+    "vix": {
+     "n": 387,
+     "hit": 0.504,
+     "t": 0.15,
+     "proven": false
+    },
+    "hy": {
+     "n": 407,
+     "hit": 0.526,
+     "t": 1.04,
+     "proven": false
+    },
+    "vixts": {
+     "n": 44,
+     "hit": 0.523,
+     "t": 0.3,
+     "proven": false
+    }
+   }
   },
   "logged": 5,
   "resolved": 0,
   "method": "Walk-forward: each replay day uses only data published before it (FRED with publication lags, candles before the day); the score-to-probability map (anchored on the base up-rate, strongly shrunk, capped 35-65%) is refitted every 20 days on earlier days only (needs 120). Target: the next UTC weekday candle, up if close > open. Base rate = the share of the more common direction; coin flip (random walk) = 50% every day, Brier 0.25. Pesaran-Timmermann above 1.96 = direction calls better than chance. A 53% hit rate needs about 1,100 forecasts to tell from luck. The live log is append-only, written from 21:00 UTC before each day opens."
  },
  "sources": {
-  "fred:DGS10": "ok, last 2026-11-05",
-  "fred:DFII10": "ok, last 2026-11-05",
   "fred:DGS2": "ok, last 2026-11-05",
-  "fred:T10Y3M": "ok, last 2026-11-06",
   "fred:T10YIE": "ok, last 2026-11-06",
-  "fred:VXVCLS": "ok, last 2026-11-05",
-  "fred:BAMLH0A0HYM2": "ok, last 2026-11-05",
+  "fred:DFII10": "ok, last 2026-11-05",
+  "fred:DGS10": "ok, last 2026-11-05",
+  "fred:T10Y3M": "ok, last 2026-11-06",
   "fred:VIXCLS": "ok, last 2026-11-05",
+  "fred:VXVCLS": "ok, last 2026-11-05",
   "fred:DTWEXBGS": "ok, last 2026-10-30",
-  "fred:WTREGEN": "ok, last 2026-11-04",
+  "fred:BAMLH0A0HYM2": "ok, last 2026-11-06",
   "fred:WALCL": "ok, last 2026-11-04",
   "fred:RRPONTSYD": "ok, last 2026-11-06",
-  "fred:SWPT": "ok, last 2026-11-04",
-  "fred:BSCICP03DEM665S": "ok, last 2024-01-01",
+  "fred:WTREGEN": "ok, last 2026-11-04",
   "fred:SOFR": "ok, last 2026-11-06",
   "fred:EFFR": "ok, last 2026-11-06",
+  "fred:SWPT": "ok, last 2026-11-04",
+  "fred:BSCICP03DEM665S": "ok, last 2024-01-01",
   "ecb:2y": "ok, last 2026-11-06",
-  "bars:nq": "OANDA ok (1400 days)",
-  "bars:gbpusd": "OANDA ok (1400 days)",
-  "bars:usdchf": "OANDA ok (1400 days)",
   "bars:usdjpy": "OANDA ok (1400 days)",
-  "bars:gold": "OANDA ok (1400 days)",
-  "bars:usdcad": "OANDA ok (1400 days)",
   "bars:eurusd": "OANDA ok (1400 days)",
-  "bars:es": "failed (HTTP 502)",
+  "bars:gbpusd": "OANDA ok (1400 days)",
+  "bars:usdcad": "OANDA ok (1400 days)",
+  "bars:nq": "OANDA ok (1400 days)",
+  "bars:usdchf": "OANDA ok (1400 days)",
+  "bars:gold": "OANDA ok (1400 days)",
+  "bars:es": "OANDA ok (1400 days)",
   "calendar:thisweek": "ok (101 events)",
   "calendar:nextweek": "failed (HTTP 404)",
   "rss:Fed": "ok (20 items)",
@@ -3114,5 +3523,5 @@
   "label": "AUCTION (no macro edge)",
   "rule": "direction only, long-or-flat: > +0.5 BUY High, +0.25..+0.5 BUY Medium, else AUCTION; a negative score is not a sell (skill test 2007-26: no short edge). Paper reading; nothing trades on it."
  },
- "brief": "Macro strategist, Mon 9 Nov 14:02 UTC, for Tue 10 Nov (UTC day, open to close). Regime: Dollar Smile left side (stress) · dollar liquidity draining · VIX curve inverted (stress). Tue 10 Nov is an event day (CPI, 13:30 UTC): expect bigger moves. Gold: 54% up (base rate 54%; base rate, no macro tilt). Drivers lean up: real-yield 1-week momentum, risk sentiment; against: real yields. Expected move ±1.01% (20-day average). EUR/USD: 49% up (base rate 49%; base rate, no macro tilt, the replay finds no edge in its drivers). Drivers lean up: real-yield 1-week momentum, fed expectations; against: real yields. Expected move ±0.24% (20-day average). USD/JPY: 55% up (base rate 56%; macro tilt down 2 pts). Drivers lean down: us 10y yield trend, real-yield 1-week momentum; against: real yields. Expected move ±0.27% (20-day average). NQ (Nasdaq 100): 55% up (base rate 56%; base rate, no macro tilt). Drivers lean down: real yields, credit stress; against: real-yield 1-week momentum. Expected move ±1.44% (20-day average). ES (S&P 500): no forecast (no price data). DXY: 51% up (mirror of EUR/USD). Gold Macro Score -0.16 → AUCTION (no macro edge) (real yield 4w z +0.64, DXY 4w z -0.20, 2Y 13w z -0.63, curve 13w z -0.44; 6-week path -0.98 → -0.58 → -0.13 → +0.13 → +0.13 → -0.16; week to 2026-11-13, not closed; gold below its 10-week average). Direction only, never a sell; paper reading. Coming up: USD Core CPI m/m Tue 10 Nov 13:30 UTC (consensus 0.2%, previous 0.3%): if hot, gold down, USD up, NQ down; gold usually moves ±1.01%; USD CPI m/m Tue 10 Nov 13:30 UTC (consensus 0.3%, previous 0.6%): if hot, gold down, USD up, NQ down; gold usually moves ±1.01%; GBP GDP m/m Thu 12 Nov 07:00 UTC (consensus 0.0%, previous 0.1%): if hot, gold mixed, USD mixed, NQ mixed; gold usually moves ±1.01%; USD Core PPI m/m Fri 13 Nov 13:30 UTC (consensus 0.3%, previous 0.7%): if hot, gold down, USD up, NQ down; gold usually moves ±1.01%. Honesty check: on the 880-day walk-forward replay the gold calls hit 53% against a 54% base rate (Brier 0.249 vs 0.25 for a coin flip, Pesaran-Timmermann 0.18): no proven edge (about the base rate). Treat the direction odds as context, not trade signals. Move size: all five markets keep the naive 20-day average: none of the 4 models tried beat it out of sample on both MAE and QLIKE, on all days and on CPI / NFP / FOMC days. CPI / NFP / FOMC days moved gold 0.972% on average against 0.861% on other days, but no model turned that into a better forecast."
+ "brief": "Macro strategist, Mon 9 Nov 15:16 UTC, for Tue 10 Nov (UTC day, open to close). Regime: Dollar Smile left side (stress) · dollar liquidity draining · VIX curve inverted (stress). Tue 10 Nov is an event day (CPI, 13:30 UTC): expect bigger moves. Gold: 54% up (base rate 54%; base rate, no macro tilt). Drivers lean up: real-yield 1-week momentum, risk sentiment; against: real yields. Expected move ±1.01% (20-day average). EUR/USD: 49% up (base rate 49%; base rate, no macro tilt, the replay finds no edge in its drivers). Drivers lean down: real yields, dollar smile regime; against: real-yield 1-week momentum. Expected move ±0.24% (20-day average). USD/JPY: 55% up (base rate 56%; macro tilt down 1 pt). Drivers lean down: us 10y yield trend, real-yield 1-week momentum; against: real yields. Expected move ±0.27% (20-day average). NQ (Nasdaq 100): 56% up (base rate 56%; base rate, no macro tilt). Drivers lean up: real-yield 1-week momentum, vix term structure; against: real yields. Expected move ±1.44% (20-day average). ES (S&P 500): 54% up (base rate 54%; base rate, no macro tilt). Drivers lean up: vix term structure, risk sentiment; against: real yields. Expected move ±0.81% (20-day average). DXY: 51% up (mirror of EUR/USD). Gold Macro Score -0.16 → AUCTION (no macro edge) (real yield 4w z +0.64, DXY 4w z -0.20, 2Y 13w z -0.63, curve 13w z -0.44; 6-week path -0.98 → -0.58 → -0.13 → +0.13 → +0.13 → -0.16; week to 2026-11-13, not closed; gold below its 10-week average). Direction only, never a sell; paper reading. Coming up: USD Core CPI m/m Tue 10 Nov 13:30 UTC (consensus 0.2%, previous 0.3%): if hot, gold down, USD up, NQ down; gold usually moves ±1.01%; USD CPI m/m Tue 10 Nov 13:30 UTC (consensus 0.3%, previous 0.6%): if hot, gold down, USD up, NQ down; gold usually moves ±1.01%; GBP GDP m/m Thu 12 Nov 07:00 UTC (consensus 0.0%, previous 0.1%): if hot, gold mixed, USD mixed, NQ mixed; gold usually moves ±1.01%; USD Core PPI m/m Fri 13 Nov 13:30 UTC (consensus 0.3%, previous 0.7%): if hot, gold down, USD up, NQ down; gold usually moves ±1.01%. Honesty check: on the 880-day walk-forward replay the gold calls hit 53% against a 54% base rate (Brier 0.249 vs 0.25 for a coin flip, Pesaran-Timmermann 0.18): no proven edge (about the base rate). Treat the direction odds as context, not trade signals. Move size: all five markets keep the naive 20-day average: none of the 4 models tried beat it out of sample on both MAE and QLIKE, on all days and on CPI / NFP / FOMC days. CPI / NFP / FOMC days moved gold 0.972% on average against 0.861% on other days, but no model turned that into a better forecast."
 }
