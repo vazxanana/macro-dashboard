@@ -79,11 +79,11 @@ test('Topstep rules: trailing EOD drawdown locks at the start balance; consisten
 
 test('partial close books its own record and leaves the rest running; a trailing stop follows the highs and never retreats', () => {
   const a = BT.newAccount(10000); const p = BT.place(a, { side: 'buy', type: 'market', price: 100, stop: 99, target: 104, units: 100 }, T0);
-  const c = BT.closePartial(a, p, 101, T0 + H, 0.5); assert.equal(c.net, 50); assert.equal(c.R, 1); assert.equal(p.units, 50); assert.equal(a.balance, 10050); assert.equal(a.positions.length, 1); assert.match(c.note, /50% closed/);
+  const c = BT.closePartial(a, p, 101, T0 + H, 0.5); assert.equal(c.net, 50); assert.equal(c.R, 0.5, 'half the size at +1R'); assert.equal(c.Rmove, 1); assert.equal(p.units, 50); assert.equal(a.balance, 10050); assert.equal(a.positions.length, 1); assert.match(c.note, /50% closed/);
   p.trail = 1.5; BT.onBar(a, bar(T0 + 2 * H, 101, 102.5, 100.8, 102)); assert.equal(p.stop, 101, 'stop trails to high - 1.5');
   BT.onBar(a, bar(T0 + 3 * H, 102, 102.2, 101.5, 101.8)); assert.equal(p.stop, 101, 'never backwards');
   const ev = BT.onBar(a, bar(T0 + 4 * H, 101.8, 101.9, 100.5, 100.7)); assert.equal(ev[0].trade.reason, 'stop'); assert.equal(ev[0].trade.exit, 101); assert.equal(ev[0].trade.net, 50);
-  const s = BT.stats(a.closed, 10000); assert.equal(s.n, 2); assert.equal(s.holdAvg, 1.5); assert.deepEqual(s.rDist, { '1..2R': 2 });
+  const s = BT.stats(a.closed, 10000); assert.equal(s.n, 1, 'one trade'); assert.equal(s.netR, 1); assert.equal(s.holdAvg, 3); assert.deepEqual(s.rDist, { '1..2R': 1 });
 });
 
 test('Monte Carlo: a winning edge passes often, a losing one fails; daily loss and trailing rules bite; seeded and stable', () => {
@@ -106,4 +106,45 @@ test('stats split by trading session and by mistake tag', () => {
   const s = BT.stats(closed, 10000);
   assert.equal(s.bySession.London.n, 1); assert.equal(s.bySession['New York'].net, -100); assert.equal(s.bySession.Asia.n, 1);
   assert.equal(s.byMistake.FOMO.n, 2); assert.equal(s.byMistake.FOMO.R, -1.5); assert.equal(s.byMistake.none.n, 1); assert.equal(s.byMistake['Moved stop'].n, 1);
+});
+
+// ---- correctness audit (9 Nov 2026): hand-computed expectations ------------------------------------------------------
+test('stop and target in one bar that opened through the stop: exit at the open (worse than the stop)', () => {
+  const a = BT.newAccount(10000); BT.place(a, { side: 'buy', type: 'market', price: 100, stop: 99, target: 102, units: 10 }, T0);
+  const ev = BT.onBar(a, bar(T0 + H, 98, 102.5, 97, 101)); // opened 98 under the 99 stop, then ran to 102.5
+  assert.equal(ev[0].trade.exit, 98); assert.equal(ev[0].trade.net, -20); assert.equal(ev[0].trade.R, -2);
+});
+test('a bar that opens beyond the target takes the target even if it later reaches the stop (the order is known)', () => {
+  const a = BT.newAccount(10000); BT.place(a, { side: 'buy', type: 'market', price: 100, stop: 99, target: 102, units: 10 }, T0);
+  const ev = BT.onBar(a, bar(T0 + H, 103, 103.5, 98.5, 99)); assert.equal(ev[0].trade.exit, 102); assert.equal(ev[0].trade.net, 20);
+});
+test('commission is charged once per trade, split across partial closes', () => {
+  const a = BT.newAccount(10000, { commission: 10 }); const p = BT.place(a, { side: 'buy', type: 'market', price: 100, stop: 99, units: 100 }, T0);
+  assert.equal(BT.closePartial(a, p, 101, T0 + H, 0.5).net, 45); assert.equal(BT.close(a, p, 101, T0 + 2 * H, 'manual').net, 45);
+  assert.equal(a.balance, 10090);
+});
+test('a scaled-out trade counts once in the stats and its R is size-weighted (half at +2R, half at -1R = +0.5R)', () => {
+  const a = BT.newAccount(10000); const p = BT.place(a, { side: 'buy', type: 'market', price: 100, stop: 99, units: 100 }, T0);
+  BT.closePartial(a, p, 102, T0 + H, 0.5); BT.onBar(a, bar(T0 + 2 * H, 101, 101.2, 98.5, 99));
+  assert.equal(a.balance, 10050); const s = BT.stats(a.closed, 10000);
+  assert.equal(s.n, 1); assert.equal(s.netR, 0.5); assert.equal(s.net, 50); assert.equal(s.winRate, 1);
+  assert.deepEqual(BT.trades(a.closed).map((t) => t.R), [0.5]);
+});
+test('daily loss counts a drop on the first bar of a new day (reference = previous day-end equity)', () => {
+  const F = BT.FIRMS.find((f) => f.id === 'ftmo2'), a = BT.newAccount(100000), ch = BT.newChallenge(F);
+  BT.evaluate(ch, a, 100, T0); a.balance = 95000; BT.evaluate(ch, a, 100, T0 + 86400);
+  assert.equal(ch.status, 'failed'); assert.match(ch.reason, /daily loss/);
+});
+test('the rules see the worst equity inside the bar, not only the close', () => {
+  const F = BT.FIRMS.find((f) => f.id === 'ftmo2'), a = BT.newAccount(100000), ch = BT.newChallenge(F);
+  BT.evaluate(ch, a, 100, T0); BT.place(a, { side: 'buy', type: 'market', price: 100, stop: 90, units: 1000 }, T0);
+  BT.evaluate(ch, a, 99, T0 + H, bar(T0 + H, 100, 100.5, 94.9, 99));   // low 94.9: equity 94,900, down 5,100
+  assert.equal(ch.status, 'failed'); assert.match(ch.reason, /daily loss/);
+});
+test('phase 2 does not inherit phase-1 trades closed on the same day', () => {
+  const F = BT.FIRMS.find((f) => f.id === 'ftmo2'), a = BT.newAccount(100000), ch = BT.newChallenge(F);
+  const tradeDay = (d, net) => { const t = T0 + d * 86400; BT.evaluate(ch, a, 100, t); a.balance = BT.r2(a.balance + net); a.closed.push({ net, closedAt: t + H, openedAt: t }); BT.evaluate(ch, a, 100, t + H); };
+  tradeDay(0, 6000); tradeDay(1, 4500); tradeDay(2, 100); tradeDay(3, 100); assert.equal(ch.phase, 1);
+  BT.evaluate(ch, a, 100, T0 + 3 * 86400 + 2 * H); const d = Object.values(ch.days)[0];
+  assert.equal(d.trades, 0); assert.equal(d.net, 0); assert.equal(ch.progress.tradingDays, 0);
 });
