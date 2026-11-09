@@ -864,3 +864,6 @@ or `{ remove: id }`; private Blob `notices/list.json` (100 kept). Page: bell `#n
 unread ones slide in one at a time from the top (oldest first, Next / Mark all read), polled every 2 min and on tab focus; read state
 per account in this browser (`ms-nt-seen-<u>`). Owner: Profile → "Send a notification" (`#ms-pf-nt`, list + delete). The price-alert
 toggle `#ms-alerts` now uses a pulse icon so the bell means notifications only. Tests: `tests/notify.test.mjs`.
+Audit 9 Nov (`tests/audit-nov9.test.mjs`): `/api/logout` and `/api/sounds` POST refuse a foreign Origin; the notify / sounds / profile Blob reads
+throw on a failed read (they used to return empty, so the next save overwrote the list, the other sound or the photo); veteran
+expectations fill a consensus the calendar posts after the first capture but before the release (never after).

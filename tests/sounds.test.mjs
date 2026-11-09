@@ -17,3 +17,8 @@ test('only the owner sets sounds; everyone reads them', async () => {
   assert.equal((await call({ store: s.store }, 'POST', { ownerPw: 'right', kind: 'sl', data: 'data:audio/mpeg;base64,' + 'A'.repeat(1000000) })).code, 400);
   assert.equal((await call({ store: s.store }, 'POST', { ownerPw: 'right', kind: 'sl', data: null })).code, 200); assert.equal(s.peek().sl, null, 'reset');
 });
+test('the owner session saves without the password', async () => {
+  const s = mk(), out = {}; const res = { setHeader() {}, status: (c) => { out.code = c; return res; }, json: (b) => { out.body = b; return out; } };
+  await handle({ method: 'POST', headers: {}, body: { kind: 'tp', data: MP3, name: 'win.mp3' } }, res, { env: {}, store: s.store, isOwner: () => false, isOwnerSession: async () => true, sameOrigin: () => true });
+  assert.equal(out.code, 200); assert.equal(s.peek().tp.name, 'win.mp3');
+});

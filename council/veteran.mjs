@@ -73,6 +73,10 @@ export function captureExpectations(hist, fc, now) {
           source: 'economic-calendar consensus as fetched by the Macro strategist (macro/forecast.json); not a verified survey' }, firstPrint: null };
       H.push(r); by.set(key, r); added.push(key);
     }
+    // a consensus the calendar posts after the first capture but still before the release is filled in once; never after
+    if (r && now < t && r.expectation && r.expectation.consensus == null && e.consensus != null && e.consensus !== '') {
+      r.expectation = { ...r.expectation, consensus: e.consensus, capturedAtUtc: new Date(now * 1000).toISOString() };
+    }
     if (r && !r.firstPrint && e.actual != null && e.actual !== '') {
       const lagH = +((now - t) / 3600).toFixed(1), flags = [];
       if (lagH < 0) flags.push('print seen before the scheduled time: check for early posting or a feed error (BLS posted part of the May 2024 CPI about 31 minutes early)');
