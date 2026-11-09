@@ -178,8 +178,55 @@ test('the argument\'s record: weekly debates resolved at the horizon, a per-topi
   assert.equal(d.topics.find((t) => t.topic === 'Regime').m, null);
 });
 
-test('revision 1.2: the port names its skill version and reads the batch\'s real CPI pilot', () => {
-  assert.equal(V.SKILL_VERSION, '1.2');
-  const c = V.cpiPilot(); assert.equal(c.point, 0.255); assert.equal(c.status, 'unresolved'); assert.equal(c.releaseUtc, '2026-11-10T13:30:00Z');
+test('revision 1.3: the port names its skill version and reads the batch\'s real CPI pilot', () => {
+  assert.equal(V.SKILL_VERSION, '1.3');
+  const c = V.cpiPilot(); assert.equal(c.point, 0.255); assert.equal(c.status, 'unresolved'); assert.match(c.label, /not a scored forecast/); assert.equal(c.releaseUtc, '2026-11-10T13:30:00Z');
   assert.equal(V.cpiPilot('/nonexistent/ledger.jsonl'), null, 'the Vercel bundle has no research/: null, never a throw');
+});
+
+
+test('revision 1.3: release discipline — expectation captured before, first print kept, integrity checks, CPI rate context', () => {
+  const at = '2026-11-10T13:30:00.000Z', T = Date.parse(at) / 1000;
+  const fcPre = { playbook: [{ title: 'Core CPI m/m', at, consensus: '0.2%', previous: '0.3%', actual: null }, { title: 'Late item', at: new Date((NOW - DAY) * 1000).toISOString(), consensus: '1%' }] };
+  const a = V.captureExpectations([], fcPre, NOW);
+  assert.equal(a.hist.length, 1, 'an event already past is never captured after the fact');
+  assert.equal(a.hist[0].expectation.consensus, '0.2%'); assert.equal(a.hist[0].firstPrint, null);
+  // a later run with a changed consensus does not edit the captured expectation
+  const b = V.captureExpectations(a.hist, { playbook: [{ ...fcPre.playbook[0], consensus: '0.3%' }] }, NOW + 3600);
+  assert.equal(b.hist[0].expectation.consensus, '0.2%'); assert.equal(b.added.length, 0);
+  // the print arrives 30 minutes after the release: first print attached once, surprise = print − captured expectation
+  const c = V.captureExpectations(b.hist, { playbook: [{ ...fcPre.playbook[0], actual: '0.3%' }] }, T + 1800);
+  assert.equal(c.hist[0].firstPrint.value, '0.3%'); assert.deepEqual(c.hist[0].firstPrint.flags, []);
+  const d = V.captureExpectations(c.hist, { playbook: [{ ...fcPre.playbook[0], actual: '0.4%' }] }, T + 40 * DAY);
+  assert.equal(d.hist[0].firstPrint.value, '0.3%', 'a revised value never replaces the first print');
+  const S = { DFII10: [{ t: Date.UTC(2026, 10, 9) / 1000, v: 2.60 }, { t: Date.UTC(2026, 10, 10) / 1000, v: 2.68 }] };
+  const r = V.releaseCheck(c.hist[0], S);
+  assert.equal(r.trusted, true); assert.equal(r.surprise, 0.1); assert.equal(r.claim, V.CLAIM.descriptive);
+  assert.equal(r.rates.observedBp, 8); assert.match(r.rates.read, /at or above the typical CPI day/); assert.match(r.rates.study, /6\.11 bp .* 4\.06 bp/);
+  // a print first seen days late, or before its scheduled time, is not scored as a surprise
+  const late = V.captureExpectations(b.hist, { playbook: [{ ...fcPre.playbook[0], actual: '0.3%' }] }, T + 3 * DAY);
+  const rl = V.releaseCheck(late.hist[0]); assert.equal(rl.trusted, false); assert.equal(rl.surprise, null); assert.match(rl.checks[2].text, /may not be the first print/);
+  const early = V.captureExpectations(b.hist, { playbook: [{ ...fcPre.playbook[0], actual: '0.3%' }] }, T - 600);
+  assert.equal(V.releaseCheck(early.hist[0]).trusted, false); assert.match(early.hist[0].firstPrint.flags[0], /before the scheduled time/);
+  // no captured expectation: print minus previous is never a surprise
+  const none = V.captureExpectations([], { playbook: [{ title: 'Core CPI m/m', at, previous: '0.3%' }] }, NOW);
+  const rn = V.releaseCheck(V.captureExpectations(none.hist, { playbook: [{ title: 'Core CPI m/m', at, actual: '0.5%' }] }, T + 600).hist[0]);
+  assert.equal(rn.surprise, null); assert.match(rn.checks[0].text, /not a surprise/);
+  assert.equal(V.CPI_RATE_STUDY.events, 36); assert.equal(V.CPI_RATE_STUDY.contrastBp, 2.06);
+});
+
+test('revision 1.3: build carries the releases, the claim type and the untrusted-print note; run writes veteran-expectations.json', () => {
+  const C = cache(), fc = forecast({ playbook: [{ title: 'Core CPI m/m', at: new Date((NOW + 2 * DAY) * 1000).toISOString(), consensus: '0.2%', previous: '0.3%' }] });
+  const { v, expectations } = V.build({ fc, cache: C, daily: { gold, dxy }, now: NOW });
+  assert.equal(expectations.length, 1); assert.equal(v.releases.length, 1); assert.equal(v.releases[0].firstPrint, null);
+  assert.equal(v.skillVersion, '1.3'); assert.ok(v.cpiRateStudy); assert.ok(Object.values(V.CLAIM).includes(v.card.claimType));
+  assert.match(v.card.surprise, /captured before it \(0\.2%\); print minus previous is not a surprise/);
+  // a print first seen 3 days after the release: kept, flagged, and the verdict says it is not read as a surprise
+  const later = NOW + 5 * DAY, fc2 = forecast({ playbook: [{ ...fc.playbook[0], actual: '0.4%' }] });
+  const o = V.build({ fc: fc2, cache: C, daily: { gold, dxy }, expectations, now: later });
+  assert.equal(o.v.releases[0].trusted, false); assert.match(o.v.verdict.note, /not trusted as a surprise/);
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'vet13-')); fs.mkdirSync(path.join(dir, 'macro'));
+  fs.writeFileSync(path.join(dir, 'macro', 'forecast.json'), JSON.stringify(fc)); fs.writeFileSync(path.join(dir, 'macro', 'cache.json'), JSON.stringify(C));
+  V.run({ dir, now: NOW, log: () => {} });
+  assert.equal(JSON.parse(fs.readFileSync(path.join(dir, 'macro', 'veteran-expectations.json'), 'utf8')).length, 1);
 });

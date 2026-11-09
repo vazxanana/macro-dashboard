@@ -1,0 +1,75 @@
+{
+  "checked_at_utc": "2026-11-09T00:42:25.095142+00:00",
+  "status": "PRIMARY_AND_FORMAL_FOMC_VARIANT_VERIFIED_WITH_LIMITS",
+  "runtime": {
+    "python": "3.12.14",
+    "zoneinfo_key": "America/New_York",
+    "zoneinfo_search_path": [],
+    "tzdata_package_version": "2026.6",
+    "packaged_New_York_tzfile_sha256": "d7f2206b3a45989fc9ad63d558922532fa7352280d5f87176bf1db79cb1d1fa9",
+    "tzdata_selection_note": "On this Windows runtime TZPATH is empty, so ZoneInfo uses the packaged tzdata fallback."
+  },
+  "hashes": {
+    "outputs/treasury-cpi-study-protocol-2022-2024.json": "4bbed411c83a65253d5172badfced14a9c1a6c1e83f939ddaed0ee2f64644835",
+    "outputs/treasury-cpi-study-amendment-01-2026-11-09.json": "e327e9474a789760b3d728dc29a43c2380796b70d1ea250d42a8628dc7756ab2",
+    "outputs/treasury-cpi-coverage-2022-2024.json": "fd2af96c9d36295848ef0d70c272e45ebf432d4ab77be35ec12d2f2abaa9ba9a",
+    "outputs/treasury-cpi-results-2022-2024.json": "1ecf48b3ff355dcaf9452bc74d8d39fc50a9a5fac9e9c9a4f936cea8270e4d33",
+    "outputs/treasury-cpi-calendar-study-2022-2024.md": "f184aa4e5a2d5817a11e23d1620b7d41269388940692ff1f7cf764b36f26b1d1",
+    "outputs/scripts/treasury-cpi-study.py": "7f77b0a4d67e756e0b7aed876f8ad54fe0fc1ff64be30d9e3b624d64b5c0a2a6",
+    "outputs/scripts/test_treasury_cpi_study.py": "c36557ab5f88f5e41a3431ae7da6c684bb6546460e5b403252c6f6687e602d16",
+    "work/treasury-field-binding-independent.json": "f2c3f99689bc60399088f036d45e622fcc673f58278b503bbeb28fad55990fa4",
+    "work/treasury-outcome-independent-review.json": "6f3854ee095e98256ea897fdd46f3c35ea38eb5766843a3e3bc37f22e0c483f9",
+    "work/treasury-cpi-design/actual-bootstrap-independent-check.json": "90e4445e7454dd2cc7a04acbd81c6f7d9faaeca4c71ab5fb96bd0507413f1953",
+    "work/treasury-cpi-bootstrap-python-crosscheck.json": "e5026281417dd0de359ccbb82d34f08a3cea8e7d444f24a6f38a4eac6a1c8545",
+    "outputs/treasury-cpi-fomc-variant-2022-2024.json": "abc7abdf5c70ea1d7c210efaeefa7a050a9e37d2e57b88d856cf017f86c67059",
+    "outputs/treasury-cpi-fomc-exclusion-2022-2024.md": "c6da5b13f828e7b5b37cba95717bed75abd3be736b37e24a92b8d79d04d96aa2",
+    "outputs/scripts/treasury-cpi-fomc-variant.py": "b6f55ca7ead6883557b1b0fd37c1e44da68e38e8bff4a6f876d136fda62fa94e",
+    "work/fomc-overlap-calendar-2022-2024.json": "f4068535b8ada34529ca2233d2fee3fbaedfe3cad09cb91d7dbfee9acc0e9819",
+    "work/treasury-fomc-variant-independent.json": "0214d6d4a21d704c8255480c93296bc524c2b464aa2832a415d31a2499cd5c47"
+  },
+  "source_binding": {
+    "exact_format_agreements": 1498,
+    "independent_binding_regressions": 5,
+    "scope": "Same-producer XML/CSV/HTML consistency, not original-vintage authentication."
+  },
+  "independent_source_control_outcome_reconstruction": {
+    "checks": 4683,
+    "failed": 0,
+    "scope": "All144 slot memberships and missing reasons, UTC endpoints/signatures, selected/rejected control dates; all scored signed event/control changes, absolute values, within-event means and equal-event contrasts; four overall summaries; primary year/leave-year/leave-event/May15 omission points. Bootstrap CIs and macro-overlap variants not independently recomputed in this task."
+  },
+  "bootstrap_validation": {
+    "synthetic_cross_language_fixtures": 7,
+    "actual_cross_language_comparisons": 30,
+    "scope": "Given canonical36 primary contrasts; source/control reconstruction separately checked."
+  },
+  "python_tests": {
+    "command": "python outputs/scripts/test_treasury_cpi_study.py",
+    "observed_passed": 12,
+    "observed_failed": 0,
+    "scope": "Units, missingness/no bridging, DST matching, observation neighbors, weights, semantic headers, duplicate quarantine and exact bootstrap fixtures."
+  },
+  "protected_artifacts": {
+    "delivered_v1_2_zip_unchanged": true,
+    "real_cpi_ledger_byte_identical_to_v1_2": true,
+    "newmont_workbook_byte_identical_to_v1_2": true
+  },
+  "formal_FOMC_variant": {
+    "calendar_statements": 24,
+    "unique_baseline_intervals_audited": 133,
+    "scored_events": 35,
+    "root_interval_tests_passed": 6,
+    "independent_checks": 1345,
+    "independent_failed": 0,
+    "scope": "Currently published formal statements, not all Fed policy/news. No rematching or new CI."
+  },
+  "unavailable_planned_variants": [
+    "Broader core-release overlap exclusion not evaluated without complete required calendar coverage."
+  ],
+  "limits": [
+    "Current historical Treasury source vintage, not authenticated original-day bytes.",
+    "Conservative weekday predecessor, not verified holiday calendar; no bridging or filling.",
+    "Daily windows bundle CPI/Real Earnings, other releases and news; no causal isolation.",
+    "No survey-consensus regression, gold result, five-minute response or execution return.",
+    "CIs rely on limited36-month weak-dependence/stability assumptions; not a randomization test."
+  ]
+}

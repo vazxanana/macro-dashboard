@@ -1,0 +1,25 @@
+{
+  "amendment_id": "treasury-cpi-binding-amendment-01",
+  "status": "adopted_before_outcome_computation",
+  "adopted_at_utc": "2026-11-09T00:20:27.765063Z",
+  "base_protocol_file": "outputs/treasury-cpi-study-protocol-2022-2024.json",
+  "base_protocol_sha256": "4bbed411c83a65253d5172badfced14a9c1a6c1e83f939ddaed0ee2f64644835",
+  "reason": "Official2022/2023 annual HTML requests return No Results Found with no table; official2024 tables and all six annual XML files exist. The website directs older data users to official archived CSV files.",
+  "evidence_capture": "work/raw/treasury-cpi-study-2022-2024/capture-1794183470759.json",
+  "superseded_requirement": "HTML versus XML exact Decimal level agreement in every2022-2024 year.",
+  "adopted_binding_check": {
+    "2022_and_2023": "Compare every selected XML date/value with the corresponding date and named maturity column in the official2020-2023 archived CSV for that same series; exact Decimal equality and identical annual date masks.",
+    "2024": "Compare every selected XML date/value against the exact semantic header in the official2024 HTML table; not a CSS-class substring.",
+    "real_csv_column": "10 yr",
+    "nominal_csv_column": "2 yr",
+    "csv_date_column": "date",
+    "source_archive_page": "https://home.treasury.gov/resource-center/data-chart-center/interest-rates/daily-treasury-rate-archives",
+    "real_csv_url": "https://home.treasury.gov/resource-center/data-chart-center/interest-rates/daily-treasury-rate-archives/par-real-yield-curve-rates-2020-2023.csv",
+    "nominal_csv_url": "https://home.treasury.gov/resource-center/data-chart-center/interest-rates/daily-treasury-rate-archives/par-yield-curve-rates-2020-2023.csv",
+    "unit_evidence_url": "https://home.treasury.gov/policy-issues/financing-the-government/interest-rate-statistics/interest-rates-frequently-asked-questions",
+    "scope": "Same-producer format consistency only; it does not authenticate original-day bytes or quote times."
+  },
+  "exposure_disclosure": "No study differences, contrasts, fitted results or uncertainty estimates computed or inspected. Metadata/date masks inspected. Clicking officialCSV link displayed2020 real-yield levels outside the study cohort; these did not guide the amendment or any estimand.",
+  "analysis_rule_change": false,
+  "preservation": "Original adopted protocol remains unchanged. This amendment only specifies an alternative official-format verification route for inaccessible old HTML tables; XML remains the sole outcome input."
+}
