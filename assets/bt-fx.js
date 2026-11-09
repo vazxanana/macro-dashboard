@@ -69,22 +69,32 @@
   // the built-in chime for a target. Everyone hears the same sounds; members can only switch them off.
   const SND = { sl: { url: '/assets/sounds/sl.mp3', name: 'Faaaah (built in)' }, tp: null };
   const API = /^https?:$/.test(location.protocol) && !/github\.io$/.test(location.hostname) ? '/api/sounds' : null;
-  if (API) fetch(API, { cache: 'no-store' }).then((r) => (r.ok ? r.json() : null)).then((j) => { if (!j) return; if (j.sl && j.sl.data) SND.sl = { url: j.sl.data, name: j.sl.name }; if (j.tp && j.tp.data) SND.tp = { url: j.tp.data, name: j.tp.name }; }).catch(() => {});
-  const clip = (u, fallback) => { try { const el = new Audio(u); el.volume = 1; el.play().catch(() => fallback && fallback()); } catch (e) { fallback && fallback(); } };
-  function playLoss() { if (SND.sl) clip(SND.sl.url, faah); else faah(); }
-  function playWin() { if (SND.tp) clip(SND.tp.url, chime); else chime(); }
+  if (API) fetch(API, { cache: 'no-store' }).then((r) => (r.ok ? r.json() : null)).then((j) => { if (!j) return; if (j.sl && j.sl.data) SND.sl = { url: j.sl.data, name: j.sl.name }; if (j.tp && j.tp.data) SND.tp = { url: j.tp.data, name: j.tp.name }; want('sl'); want('tp'); if (ac) { decode('sl'); decode('tp'); } }).catch(() => {});
+  // clips play through the same WebAudio context as the effects (9 Nov: an <audio> started by a trade close, not by a tap, is blocked
+  // on iPhone/iPad and some browsers; the context is unlocked by the first tap). The clip is fetched and decoded once, then reused.
+  const BUF = {}, raw = {};
+  const want = (k) => { const u = SND[k] && SND[k].url; if (!u) return null; if (raw[k] && raw[k].u === u) return raw[k].p;
+    raw[k] = { u, p: fetch(u).then((r) => r.arrayBuffer()).catch(() => null) }; BUF[k] = null; return raw[k].p; };
+  async function decode(k) { const a = ctx(); if (!a) return null; if (BUF[k] && BUF[k].u === (SND[k] && SND[k].url)) return BUF[k].b;
+    const ab = await want(k); if (!ab) return null; try { const b = await new Promise((res, rej) => { const pr = a.decodeAudioData(ab.slice(0), res, rej); if (pr && pr.then) pr.then(res, rej); }); BUF[k] = { u: SND[k].url, b }; return b; } catch (e) { return null; } }
+  function clip(k, fallback) { const a = ctx();
+    if (a && BUF[k] && BUF[k].u === SND[k].url) { const src = a.createBufferSource(), g = a.createGain(); g.gain.value = 1; src.buffer = BUF[k].b; src.connect(g).connect(a.destination); src.start(); return; }
+    decode(k).then((b) => { if (b && a) { const src = a.createBufferSource(); src.buffer = b; src.connect(a.destination); src.start(); } else { try { const el = new Audio(SND[k].url); el.play().catch(() => fallback && fallback()); } catch (e) { fallback && fallback(); } } }); }
+  function playLoss() { if (SND.sl) clip('sl', faah); else faah(); }
+  function playWin() { if (SND.tp) clip('tp', chime); else chime(); }
   const fmtR = (r) => (r == null || !isFinite(r) ? '' : (r > 0 ? '+' : '') + (+r).toFixed(2).replace(/\.?0+$/, '') + 'R');
   window.BTFX = {
     win(R, sub, title) { const d = layer('win', title || 'Target hit', [fmtR(R), sub].filter(Boolean).join(' · ')); confetti(d); if (on) playWin(); },
     loss(R, sub, title) { layer('loss', title || 'Stopped out', [fmtR(R), sub].filter(Boolean).join(' · ')); if (!RM()) { document.body.classList.remove('btfx-shake'); void document.body.offsetWidth; document.body.classList.add('btfx-shake'); setTimeout(() => document.body.classList.remove('btfx-shake'), 600); } if (on) playLoss(); },
     playLoss() { ctx(); playLoss(); },
     playWin() { ctx(); playWin(); },
+    get decoded() { return { sl: !!BUF.sl, tp: !!BUF.tp }; },
     get sounds() { return { sl: SND.sl && SND.sl.name, tp: SND.tp ? SND.tp.name : 'Chime (built in)' }; },
     get sound() { return on; },
     set sound(v) { on = !!v; try { localStorage.setItem('btLab:sound', on ? '1' : '0'); } catch (e) {} if (on) ctx(); },
     unlock: ctx,
   };
   // browsers start audio only after a user gesture: open the context on the first click or key
-  const un = () => { if (on) ctx(); removeEventListener('pointerdown', un); removeEventListener('keydown', un); };
+  const un = () => { if (on) { ctx(); decode('sl'); decode('tp'); } removeEventListener('pointerdown', un); removeEventListener('keydown', un); };
   addEventListener('pointerdown', un); addEventListener('keydown', un);
 })();
