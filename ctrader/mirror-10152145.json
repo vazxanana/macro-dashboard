@@ -2690,7 +2690,7 @@
    "startBalance": 9987.78
   },
   "startedAt": "2026-11-08T11:42:25.000Z",
-  "status": "ok · demo Fusion Markets · balance 9969.55 · 27 open · 2 resting",
+  "status": "ok · demo Fusion Markets · balance 9969.55 · 27 open · 3 resting",
   "skipped": {
    "audusd-position-1793601653": "price 0.68666 has run 1.27R from the council entry 0.70162: a different trade now",
    "xrp-rswing-1793942619": "none of XRPUSD found at the broker",
@@ -2745,18 +2745,33 @@
     "alerted": [
      "pending"
     ]
+   },
+   "audusd-rintra-1794243191": {
+    "orderId": "33818485",
+    "symbol": "AUDUSD",
+    "side": "buy",
+    "volume": 300000,
+    "lots": 0.03,
+    "digits": 5,
+    "setup": "rintra",
+    "limitPrice": 0.69098,
+    "stop": 0.69046,
+    "t1": 0.6939500000000001,
+    "placedAt": "2026-11-09T16:54:18.000Z",
+    "expires": "2026-11-10T04:53:11.000Z",
+    "riskCash": 1.99,
+    "margin": 4.15,
+    "shadow": true,
+    "alerted": [
+     "pending"
+    ]
    }
   },
   "catchUpAt": "2026-11-08T12:04:40.000Z",
   "balance": 9969.55,
-  "lastRun": "2026-11-09T16:51:47.000Z"
+  "lastRun": "2026-11-09T16:54:18.000Z"
  },
  "log": [
-  {
-   "at": "2026-11-08T22:03:09.000Z",
-   "msg": "opened sell USDCAD 0.01 lot (council scalp)",
-   "trade": "usdcad-scalp-1793689919"
-  },
   {
    "at": "2026-11-08T22:03:09.000Z",
    "msg": "set the missing stop on USDCAD 47373486 at 1.4501 (the broker had opened it without one)",
@@ -4251,6 +4266,11 @@
    "at": "2026-11-09T16:49:16.000Z",
    "msg": "not mirrored xrp-intraday-1794242893: none of XRPUSD found at the broker",
    "trade": "xrp-intraday-1794242893"
+  },
+  {
+   "at": "2026-11-09T16:54:18.000Z",
+   "msg": "placed buy limit AUDUSD 0.03 lot at 0.69098 (council rintra, valid to 2026-11-10T04:53Z)",
+   "trade": "audusd-rintra-1794243191"
   }
  ],
  "limits": {
