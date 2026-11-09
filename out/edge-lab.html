@@ -36,8 +36,24 @@
   .how summary { display: inline-flex; align-items: center; min-height: var(--tap); cursor: pointer; color: var(--accent); font-weight: 500; }
   .how p { margin: 4px 0 0; }
 
-  /* progress: tall segmented bar of study states */
-  .prog { min-width: 0; }
+  /* summary (9 Nov 2026 design pass): a donut of verdicts with words, counts and shares beside it; fixed height so the
+     first fill-in does not move the page */
+  .prog { min-width: 0; min-height: 147px; }
+  .sum { display: grid; grid-template-columns: 124px minmax(0, 1fr); gap: 4px 20px; align-items: center; }
+  .donut { width: 124px; height: 124px; display: block; }
+  .donut circle { fill: none; stroke-width: 15; }
+  .donut .track { stroke: var(--neutral-soft); }
+  .donut .arc { cursor: default; transition: stroke-width .15s var(--ease); }
+  .donut .arc:hover, .donut .arc.on { stroke-width: 19; }
+  .donut .arc.pass { stroke: var(--buy); } .donut .arc.fail { stroke: var(--sell); } .donut .arc.inc { stroke: var(--ink-faint); } .donut .arc.run { stroke: var(--line-strong); }
+  .donut text { fill: var(--ink); font: 600 22px var(--mono); letter-spacing: -.5px; }
+  .donut text.s { fill: var(--ink-faint); font: 500 12px var(--sans); letter-spacing: 0; }
+  .sum .legend { margin: 0; display: grid; grid-template-columns: 1fr; gap: 6px; }
+  .sum .legend li { display: grid; grid-template-columns: 12px minmax(0, 1fr) auto auto; gap: 8px; align-items: center; font-size: 13px; color: var(--ink-dim); }
+  .sum .legend i { width: 10px; height: 10px; border-radius: 3px; }
+  .sum .legend b { font: 600 13px var(--mono); color: var(--ink); text-align: right; }
+  .sum .legend .pc { font: 500 12px var(--mono); color: var(--ink-faint); min-width: 4ch; text-align: right; }
+  .sum small { grid-column: 1 / -1; color: var(--ink-faint); font-size: 12px; }
   .prog-h { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; margin-bottom: 8px; }
   .prog-h strong { font: 600 20px var(--mono); letter-spacing: -.5px; }
   .prog-h strong span { color: var(--ink-faint); font: 500 14px var(--sans); letter-spacing: 0; }
@@ -56,6 +72,28 @@
   .group-h { display: flex; align-items: baseline; gap: 12px; margin: 0 0 10px; padding: 0 2px; }
   .group-h h2 { margin: 0; font: 600 17px var(--sans); letter-spacing: -.2px; }
   .group-h p { margin: 0; color: var(--ink-faint); font-size: 12.5px; }
+
+  /* IS vs OOS expectancy bars (best candidate) with the baseline's OOS as a tick, and the t-stat in words */
+  .iob { display: grid; gap: 4px; margin: 2px 0 4px; cursor: default; }
+  .iob-r { display: grid; grid-template-columns: 30px minmax(0, 1fr) 62px; gap: 6px; align-items: center; }
+  .iob-k { font: 500 12px var(--sans); color: var(--ink-faint); }
+  .iob-t { position: relative; height: 10px; border-radius: 3px; background: var(--neutral-soft); }
+  .iob-t .z { position: absolute; top: -2px; bottom: -2px; width: 1px; background: var(--zero); }
+  .iob-t .bar { position: absolute; top: 1px; bottom: 1px; border-radius: 2px; }
+  .iob-t .bar.is { background: color-mix(in srgb, var(--ink-faint) 70%, transparent); }
+  .iob-t .bar.oos.pos { background: var(--buy); } .iob-t .bar.oos.neg { background: var(--sell); }
+  .iob-t .base { position: absolute; top: -3px; bottom: -3px; width: 2px; border-radius: 1px; background: var(--ink); opacity: .75; }
+  .iob-v { font: 500 12.5px var(--mono); font-variant-numeric: tabular-nums; letter-spacing: -.02em; text-align: right; white-space: nowrap; color: var(--ink-dim); }
+  .iob-r.o .iob-v { color: var(--ink); font-weight: 600; }
+  .tq { font-family: var(--sans); color: var(--ink-faint); }
+  /* equity curve (only for studies that publish their trade list) */
+  .eq { display: block; width: 100%; height: 30px; overflow: visible; cursor: default; }
+  .eq .zero { stroke: var(--zero); stroke-width: 1; stroke-dasharray: 2 3; vector-effect: non-scaling-stroke; }
+  .eq .ln { fill: none; stroke-width: 1.6; vector-effect: non-scaling-stroke; stroke-linejoin: round; }
+  .eq .ln.pos { stroke: var(--buy); } .eq .ln.neg { stroke: var(--sell); }
+  .eq .ar { stroke: none; opacity: .12; } .eq .ar.pos { fill: var(--buy); } .eq .ar.neg { fill: var(--sell); }
+  .eqc { display: flex; justify-content: space-between; gap: 6px; font: 500 12px var(--mono); color: var(--ink-faint); margin: 1px 0 6px; }
+  .eqc b { font-weight: 600; color: var(--ink-dim); }
 
   .table { background: var(--panel); border: 1px solid var(--line); border-radius: var(--r); box-shadow: inset 0 1px 0 rgba(255,255,255,.025); }
   .cols, .row { display: grid; grid-template-columns: minmax(0, 1.55fr) 118px minmax(0, 1fr) minmax(0, 1.1fr) 64px 76px 150px 84px; column-gap: 16px; align-items: center; padding: 0 18px; }
@@ -135,6 +173,7 @@
   .row.running .c-study h3 { color: var(--ink-dim); }
   .row .waiting { grid-column: 3 / 8; font-size: 12.5px; color: var(--ink-faint); }
 
+  #groups:has(> .loading) { min-height: 100vh; }   /* the rows land without pushing the footer up and down (CLS) */
   .loading { margin: 28px 0; color: var(--ink-faint); font-size: 13.5px; }
   #groups:focus { outline: none; }
   .foot { margin-top: 36px; color: var(--ink-faint); font-size: 12px; max-width: 80ch; }
@@ -188,6 +227,7 @@
     /* the switch fits a 390 px bar: the page title is the h1 below, the refresh button keeps its icon */
     .top .crumb, .top .brand.here, .btn-t { display: none; }
     .group-h { flex-direction: column; gap: 2px; }
+    .sum { grid-template-columns: 112px minmax(0, 1fr); gap: 4px 14px; } .donut { width: 112px; height: 112px; }
   }
   @media (prefers-reduced-motion: reduce) {
     *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
@@ -218,7 +258,7 @@
     <div>
       <h1>Edge Lab</h1>
       <p class="lede">Every rule change we test, and whether it held up on data it never saw. <b>Pass</b> means the edge survived out of sample.</p>
-      <details class="how"><summary>How to read the numbers</summary><p>Expectancy is in <b>R per trade</b> (R = the amount risked). Each rule is fitted in sample (IS) and then checked out of sample (OOS); only the OOS number counts. "Best candidate" is the strongest rule a study tried, "vs baseline" its gain over the current system, n the number of OOS trades, max DD the deepest OOS drawdown, and the bars the expectancy year by year.</p></details>
+      <details class="how"><summary>How to read the numbers</summary><p>Expectancy is in <b>R per trade</b> (R = the amount risked). Each rule is fitted in sample (IS) and then checked out of sample (OOS); only the OOS number counts. "Best candidate" is the strongest rule a study tried, "vs baseline" its gain over the current system, n the number of OOS trades, max DD the deepest OOS drawdown, the bars the expectancy year by year, and the small IS / OOS bars the best candidate's expectancy in and out of sample (the dark tick is the baseline's OOS). t is the OOS t-statistic: below 2 the result could be noise, and many variants tried raise the bar. Where a study lists its trades, a line shows its cumulative R.</p></details>
     </div>
     <div class="prog" id="prog" aria-live="polite"></div>
   </section>
@@ -227,7 +267,7 @@
   <div id="groups" tabindex="-1"><p class="loading" role="status">Loading the studies…</p></div>
 
   <footer class="foot">
-    <p>Results come from <span class="num">research/edge/&lt;study&gt;/result.json</span>. Studies land as they finish; this page checks again every two minutes. Year bars use each row's own scale; hover or tap a bar for its value.</p>
+    <p>Results come from <span class="num">research/edge/&lt;study&gt;/result.json</span>. Studies land as they finish; this page checks again every two minutes. Bars and lines use each row's own scale; hover or tap any chart for its values. Colour is never the only signal: every verdict and value is also written out.</p>
     <p><a href="/">Back to the desk</a></p>
   </footer>
 </main>
@@ -366,6 +406,45 @@
       '<div class="yr" aria-hidden="true"><span>' + esc(years[0].year) + '</span>' + (n > 1 ? '<span>' + esc(years[n - 1].year) + '</span>' : '') + '</div>';
   }
 
+  // IS vs OOS expectancy of the best candidate on one shared zero line; the baseline's OOS is the tick on the OOS track
+  function ioBars(b, base) {
+    var is = num(b && b.is && b.is.exp), oos = num(b && b.oos && b.oos.exp), bo = num(base && base.oos && base.oos.exp);
+    if (!isFinite(is) && !isFinite(oos)) return '';
+    var vals = [is, oos, bo].filter(function (v) { return isFinite(v); });
+    var max = Math.max.apply(null, vals.map(Math.abs)) || 1, neg = vals.some(function (v) { return v < 0; }), pos = vals.some(function (v) { return v > 0; });
+    var z = neg && pos ? 50 : neg ? 100 : 0, span = neg && pos ? 50 : 100;
+    var at = function (v) { return v >= 0 ? z + Math.abs(v) / max * span : z - Math.abs(v) / max * span; };
+    function bar(v, cls) {
+      if (!isFinite(v)) return '';
+      var w = Math.max(1.5, Math.abs(v) / max * span);
+      return '<i class="bar ' + cls + ' ' + (v >= 0 ? 'pos' : 'neg') + '" style="left:' + (v >= 0 ? z : z - w).toFixed(1) + '%;width:' + w.toFixed(1) + '%"></i>';
+    }
+    var plain = function (v) { return isFinite(v) ? (v > 0 ? '+' : v < 0 ? '−' : '') + Math.abs(v).toFixed(2) + 'R' : 'none'; };
+    var t = num(b.oos && b.oos.t), n = num(b.oos && b.oos.n);
+    var label = 'Best candidate expectancy per trade: in sample ' + plain(is) + ', out of sample ' + plain(oos) + (isFinite(n) ? ' over ' + Math.round(n) + ' trades' : '') +
+      (isFinite(t) ? ', t ' + t.toFixed(2) : '') + (isFinite(bo) ? '. Baseline out of sample ' + plain(bo) + ' (the tick)' : '');
+    var zl = '<i class="z" style="left:' + z + '%"></i>';
+    return '<div class="iob" role="img" aria-label="' + esc(label) + '" data-tip="' + esc(label) + '">' +
+      '<div class="iob-r"><span class="iob-k">IS</span><span class="iob-t">' + zl + bar(is, 'is') + '</span><span class="iob-v">' + fmtR(is) + '</span></div>' +
+      '<div class="iob-r o"><span class="iob-k">OOS</span><span class="iob-t">' + zl + bar(oos, 'oos') + (isFinite(bo) ? '<i class="base" style="left:calc(' + at(bo).toFixed(1) + '% - 1px)"></i>' : '') + '</span><span class="iob-v">' + fmtR(oos) + '</span></div></div>';
+  }
+  function tLine(st) {
+    var t = num(st && st.oos && st.oos.t); if (!isFinite(t)) return '';
+    return '<span class="sub">t <span class="num">' + fmtT(t) + '</span> <span class="tq">' + (t >= 2 ? '· clears 2' : t <= -2 ? '· reliably negative' : '· could be noise') + '</span></span>';
+  }
+  // cumulative R from the study's own trade list (lab.json `equity`, sampled; drawdown from the full series)
+  function equityLine(eq) {
+    if (!eq || !Array.isArray(eq.pts) || eq.pts.length < 2) return '';
+    var pts = [0].concat(eq.pts), W = 150, H = 30, lo = Math.min.apply(null, pts.concat(0)), hi = Math.max.apply(null, pts.concat(0)), rng = hi - lo || 1;
+    var x = function (i) { return (i / (pts.length - 1) * W).toFixed(1); }, y = function (v) { return (2 + (hi - v) / rng * (H - 4)).toFixed(1); };
+    var d = pts.map(function (v, i) { return (i ? 'L' : 'M') + x(i) + ',' + y(v); }).join(''), cls = eq.total >= 0 ? 'pos' : 'neg';
+    var label = 'Equity: cumulative R over the ' + Math.round(eq.n).toLocaleString('en-US') + ' trades the study lists' + (eq.from ? ', ' + eq.from + ' to ' + eq.to : '') + '. Ends ' + (eq.total >= 0 ? '+' : '−') + Math.abs(eq.total).toFixed(1) + 'R; deepest drawdown ' + Math.abs(eq.maxDD).toFixed(1) + 'R.';
+    return '<svg class="eq" viewBox="0 0 ' + W + ' ' + H + '" preserveAspectRatio="none" role="img" aria-label="' + esc(label) + '" data-tip="' + esc(label) + '">' +
+      '<line class="zero" x1="0" x2="' + W + '" y1="' + y(0) + '" y2="' + y(0) + '"/>' +
+      '<path class="ar ' + cls + '" d="' + d + 'L' + W + ',' + y(0) + 'L0,' + y(0) + 'Z"/><path class="ln ' + cls + '" d="' + d + '"/></svg>' +
+      '<div class="eqc" aria-hidden="true"><span>' + Math.round(eq.n).toLocaleString('en-US') + ' trades</span><b>' + fmtR(eq.total, 1) + '</b></div>';
+  }
+
   function baselines(bl) {
     if (!bl || typeof bl !== 'object') return [];
     if (bl.is || bl.oos) return [['', bl]];
@@ -422,8 +501,7 @@
     var delta = b && isFinite(baseOos) && isFinite(bestOos) ? bestOos - baseOos : NaN;
     var deltaHTML = isFinite(delta) ? '<span class="sub"><span class="num ' + (delta > 0 ? 'up' : delta < 0 ? 'down' : '') + '">' + fmtR(delta) + '</span> vs baseline OOS</span>' : (b ? '' : '<span class="sub">No candidates</span>');
     var years = parseYears((b && b.years) || d.years || (base && base.years));
-    var oosT = num(oosB.t);
-    var nSub = isFinite(oosT) ? '<span class="sub">t <span class="num">' + fmtT(oosT) + '</span></span>' : '';
+    var nSub = '';   // t moved beside the IS / OOS bars, in words
     var wrSub = isFinite(num(oosB.wr)) ? '<span class="sub">WR <span class="num">' + fmtWR(oosB.wr) + '</span></span>' : '';
 
     var candRows = a.cands.map(function (c) {
@@ -443,10 +521,10 @@
       headline + (b && b.rule ? '<p class="rule" title="' + esc(b.rule) + '"><em>Best:</em> ' + esc(b.rule) + '</p>' : '') + '</div>' +
       '<div class="c-verdict">' + BADGE[a.verdict] + '</div>' +
       '<div class="c-base">' + ioCell(base, 'Baseline IS → OOS') + (baseSet.length > 1 ? '<span class="sub">Baseline ' + esc(baseKey) + ' of ' + baseSet.length + '</span>' : '') + '</div>' +
-      '<div class="c-best">' + (b ? ioCell(b, 'Best candidate IS → OOS') + deltaHTML : '<span class="lbl">Best candidate</span><span class="dash">–</span>' + deltaHTML) + '</div>' +
+      '<div class="c-best">' + (b ? '<span class="lbl">Best candidate IS vs OOS</span>' + (ioBars(b, base) || ioCell(b, '')) + tLine(b) + deltaHTML : '<span class="lbl">Best candidate</span><span class="dash">–</span>' + deltaHTML) + '</div>' +
       '<div class="c-n"><span class="lbl">OOS n</span>' + fmtN(oosB.n) + nSub + '</div>' +
       '<div class="c-dd"><span class="lbl">OOS max DD</span>' + fmtDD(oosB.maxDD) + wrSub + '</div>' +
-      '<div class="c-years"><span class="lbl">Exp by year</span>' + sparkline(years) + '</div>' +
+      '<div class="c-years"><span class="lbl">' + (d.equity ? 'Equity and exp by year' : 'Exp by year') + '</span>' + equityLine(d.equity) + (d.equity && !years.length ? '' : sparkline(years)) + '</div>' +
       '<div class="c-rep">' + (rec.report !== false ? '<button class="linkbtn" type="button" data-rep="' + esc(topic) + '">Report' + CHEV.replace('<svg', '<svg width="11" height="11"') + '</button>' : '<button class="linkbtn" type="button" disabled>No report</button>') + '</div>' +
       more + '</article>';
   }
@@ -475,12 +553,9 @@
     });
 
     var total = topics.length, done = total - counts.run;
-    var segs = [['pass', counts.pass, 'Pass'], ['fail', counts.fail, 'Fail'], ['inc', counts.inc + counts.err, 'Inconclusive'], ['run', counts.run, 'Running']];
-    $('prog').innerHTML = '<div class="prog-h"><strong>' + done + '<span> of ' + total + ' studies in</span></strong><small>' + (state.index && state.index.generated ? 'Published ' + esc(new Date(state.index.generated).toLocaleString([], { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })) : '') + '</small></div>' +
-      '<div class="seg" role="img" aria-label="' + segs.map(function (s) { return s[1] + ' ' + s[2].toLowerCase(); }).join(', ') + '">' + segs.map(function (s) { return '<i class="' + s[0] + '" style="flex-grow:' + s[1] + '"></i>'; }).join('') + '</div>' +
-      '<ul class="legend">' + segs.filter(function (s) { return s[1] || s[0] !== 'run'; }).map(function (s) { return '<li><i class="' + s[0] + '" style="background:var(' + ({ pass: '--buy', fail: '--sell', inc: '--ink-faint', run: '--line-strong' })[s[0]] + ')"></i>' + s[2] + ' <b>' + s[1] + '</b></li>'; }).join('') + '</ul>';
+    $('prog').innerHTML = summary(counts, total, done);
 
-    var cols = '<div class="cols" aria-hidden="true"><span>Study</span><span>Verdict</span><span>Baseline IS → OOS</span><span>Best candidate IS → OOS</span><span>OOS n</span><span>Max DD</span><span>Exp by year</span><span></span></div>';
+    var cols = '<div class="cols" aria-hidden="true"><span>Study</span><span>Verdict</span><span>Baseline IS → OOS</span><span>Best candidate IS vs OOS</span><span>OOS n</span><span>Max DD</span><span>Equity · exp by year</span><span></span></div>';
     var gi = 0;
     var html = [['meridian', 'Meridian', 'Desk systems, scalps and the gold book'], ['ict', 'ICT', 'The ICT desk: filters, exits and universe']].map(function (g) {
       var list = groups[g[0]]; if (!list.length) return '';
@@ -492,6 +567,25 @@
     if (state.rendered) document.querySelectorAll('.row').forEach(function (r) { r.style.animation = 'none'; });
     state.rendered = true;
     deepLink();
+  }
+
+  // pass / fail / inconclusive / still running as a donut; the legend writes each out with its count and share
+  function summary(counts, total, done) {
+    var segs = [['pass', counts.pass, 'Pass', '--buy'], ['fail', counts.fail, 'Fail', '--sell'], ['inc', counts.inc + counts.err, 'Inconclusive', '--ink-faint'], ['run', counts.run, 'Running', '--line-strong']];
+    var R = 46, C = 2 * Math.PI * R, off = 0, live = segs.filter(function (s) { return s[1] > 0; }), gap = live.length > 1 ? 1.5 : 0;
+    var pct = function (v) { return total ? Math.round(v / total * 100) + '%' : '–'; };
+    var arcs = live.map(function (s) {
+      var len = C * s[1] / total, vis = Math.max(0.5, len - gap), tipT = s[2] + ': ' + s[1] + ' of ' + total + ' studies (' + pct(s[1]) + ')';
+      var el = '<circle class="arc ' + s[0] + '" cx="62" cy="62" r="' + R + '" stroke-dasharray="' + vis.toFixed(2) + ' ' + (C - vis).toFixed(2) + '" stroke-dashoffset="' + (-off).toFixed(2) + '" data-tip="' + esc(tipT) + '"><title>' + esc(tipT) + '</title></circle>';
+      off += len; return el;
+    }).join('');
+    var label = segs.map(function (s) { return s[1] + ' ' + s[2].toLowerCase(); }).join(', ') + ' of ' + total + ' studies';
+    var when = state.index && state.index.generated ? 'Published ' + esc(new Date(state.index.generated).toLocaleString([], { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })) : '';
+    return '<div class="sum"><svg class="donut" viewBox="0 0 124 124" role="img" aria-label="' + esc(label) + '"><g transform="rotate(-90 62 62)"><circle class="track" cx="62" cy="62" r="' + R + '"/>' + arcs + '</g>' +
+      '<text x="62" y="62" text-anchor="middle">' + done + '</text><text class="s" x="62" y="80" text-anchor="middle">of ' + total + ' in</text></svg>' +
+      '<ul class="legend">' + segs.filter(function (s) { return s[1] || s[0] !== 'run'; }).map(function (s) {
+        return '<li data-tip="' + esc(s[2] + ': ' + s[1] + ' of ' + total + ' studies') + '"><i style="background:var(' + s[3] + ')" aria-hidden="true"></i><span>' + s[2] + '</span><b>' + s[1] + '</b><span class="pc">' + pct(s[1]) + '</span></li>';
+      }).join('') + '</ul>' + (when ? '<small>' + when + '</small>' : '') + '</div>';
   }
 
   // #<topic> opens that study's row: its candidate list unfolds, the row scrolls under the sticky bar and is marked. Runs after
@@ -584,6 +678,7 @@
     var d = years[+g.dataset.i]; if (!d) return;
     if (tipOn && tipOn !== g) tipOn.classList.remove('on');
     tipOn = g; g.classList.add('on');
+    tip.style.whiteSpace = ''; tip.style.maxWidth = '';
     tip.innerHTML = '<b>' + esc(d.year) + '</b>' + (d.exp >= 0 ? '+' : '−') + Math.abs(d.exp).toFixed(2) + 'R' + (d.total ? ' <span>total</span>' : ' <span>per trade</span>') + (Number.isFinite(d.n) ? ' <span>· ' + d.n + ' trades</span>' : '') + (Number.isFinite(d.wr) ? ' <span>· WR ' + fmtWR(d.wr) + '</span>' : '');
     tip.classList.add('on');
     var w = tip.offsetWidth, h = tip.offsetHeight, vw = document.documentElement.clientWidth;
@@ -591,14 +686,24 @@
     if (top < 64) top = y + 16;
     tip.style.left = left + 'px'; tip.style.top = top + 'px';
   }
+  function showText(el, x, y) {
+    if (tipOn && tipOn !== el) tipOn.classList.remove('on');
+    tipOn = el; el.classList.add('on');
+    tip.textContent = el.getAttribute('data-tip'); tip.classList.add('on');
+    tip.style.whiteSpace = 'normal'; tip.style.maxWidth = '320px';
+    var w = tip.offsetWidth, h = tip.offsetHeight, vw = document.documentElement.clientWidth;
+    var left = Math.max(8, Math.min(vw - w - 8, x - w / 2)), top = y - h - 12;
+    if (top < 64) top = y + 16;
+    tip.style.left = left + 'px'; tip.style.top = top + 'px';
+  }
   function hideTip() { tip.classList.remove('on'); if (tipOn) tipOn.classList.remove('on'); tipOn = null; }
   document.addEventListener('pointermove', function (e) {
-    var g = e.target.closest && e.target.closest('.spark g[data-i]');
-    if (g) showTip(g, e.clientX, e.clientY); else if (tipOn && e.pointerType === 'mouse') hideTip();
+    var g = e.target.closest && e.target.closest('.spark g[data-i]'), t = !g && e.target.closest && e.target.closest('[data-tip]');
+    if (g) showTip(g, e.clientX, e.clientY); else if (t) showText(t, e.clientX, e.clientY); else if (tipOn && e.pointerType === 'mouse') hideTip();
   });
   document.addEventListener('pointerdown', function (e) {
-    var g = e.target.closest && e.target.closest('.spark g[data-i]');
-    if (g) showTip(g, e.clientX, e.clientY); else hideTip();
+    var g = e.target.closest && e.target.closest('.spark g[data-i]'), t = !g && e.target.closest && e.target.closest('[data-tip]');
+    if (g) showTip(g, e.clientX, e.clientY); else if (t) showText(t, e.clientX, e.clientY); else hideTip();
   });
   window.addEventListener('scroll', hideTip, { passive: true });
 
