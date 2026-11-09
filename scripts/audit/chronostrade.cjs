@@ -39,7 +39,7 @@ async function load(p, q = 'xau,15m') { await p.click(`#quick [data-q^="${q}"]`)
   // 3. keyboard step / undo
   await p.keyboard.press('ArrowRight'); await p.keyboard.press('ArrowRight'); const b2 = await barN(p); await p.keyboard.press('ArrowLeft'); check('→ steps and ← undoes', b2 === b0 + 2 && (await barN(p)) === b0 + 1, `${b0} ${b2} ${await barN(p)}`);
   // 4. market draft, presets, confirm
-  await p.keyboard.press('b'); check('B opens a buy draft', await vis(p, '#draft') && /buy/i.test(await txt(p, '#dr-title')));
+  await p.keyboard.press('Shift+B'); check('Shift+B opens a buy draft (set up first)', await vis(p, '#draft') && /buy/i.test(await txt(p, '#dr-title')));
   await p.click('[data-sl="atr1.5"]'); await p.click('[data-tp="2"]');
   const dr = await p.evaluate(() => ({ e: +document.getElementById('o-price').value, s: +document.getElementById('o-stop').value, t: +document.getElementById('o-target').value }));
   check('presets place stop below and 2R target above', dr.s < dr.e && Math.abs((dr.t - dr.e) - 2 * (dr.e - dr.s)) < 0.05, JSON.stringify(dr));
@@ -50,23 +50,45 @@ async function load(p, q = 'xau,15m') { await p.click(`#quick [data-q^="${q}"]`)
   await p.click('#open [data-act=half]'); await p.waitForTimeout(100); check('close half books a journal row', (await p.$$('#jbody tr[data-id]')).length === 1 && /50% out/.test(await txt(p, '.pos-card')));
   await p.click('#open [data-act=trail]'); await p.waitForTimeout(100); check('trail toggles on', await p.$eval('#open [data-act=trail]', (e) => e.classList.contains('on')));
   await p.click('#open [data-act=close]'); await p.waitForTimeout(150); check('close removes the position; the journal merges both parts into one trade row', (await p.$$('.pos-card')).length === 0 && (await p.$$('#jbody tr[data-id]')).length === 1 && /2 parts/.test(await txt(p, '#jbody tr[data-id]')), await txt(p, '#jbody tr[data-id]'));
-  check('snapshot stored for closed trades', (await p.$$('#jbody img.shot')).length === 1 && (await p.evaluate(() => Object.keys(Object.values(JSON.parse(localStorage.getItem('btLab:sessions')))[0].shots || {}).length)) === 2);
+  check('snapshot stored for closed trades', (await p.$$('#jbody img.shot')).length === 1 && (await p.evaluate(() => { const id = Object.keys(JSON.parse(localStorage.getItem('btLab:sessions')))[0]; return Object.keys(JSON.parse(localStorage.getItem('btLab:shots:' + id) || '{}')).length; })) === 2);
   // 6. limit and stop orders, cancel
-  await p.keyboard.press('s'); const lp = await p.$eval('#o-price', (e) => +e.value); await p.fill('#o-price', String((lp + 3).toFixed(2))); await p.waitForTimeout(80);
+  await p.keyboard.press('Shift+S'); const lp = await p.$eval('#o-price', (e) => +e.value); await p.fill('#o-price', String((lp + 3).toFixed(2))); await p.waitForTimeout(80);
   check('sell above price becomes a limit', /limit/.test(await txt(p, '#dr-type')), await txt(p, '#dr-type'));
   await p.fill('#o-stop', String((lp + 12).toFixed(2))); await p.fill('#o-target', String((lp - 15).toFixed(2))); await p.waitForTimeout(80); await p.click('#place'); await p.waitForTimeout(120);
   check('limit order rests as pending', /waiting/.test(await txt(p, '#open')), (await txt(p, '#o-err')) || 'ok');
   await p.click('#open [data-act=cancel]'); check('cancel removes the pending order', !(/waiting/.test(await txt(p, '#open'))));
-  await p.keyboard.press('b'); const sp = await p.$eval('#o-price', (e) => +e.value); await p.fill('#o-price', String((sp + 2).toFixed(2))); await p.fill('#o-stop', String((sp - 6).toFixed(2))); await p.waitForTimeout(80);
+  await p.keyboard.press('Shift+B'); const sp = await p.$eval('#o-price', (e) => +e.value); await p.fill('#o-price', String((sp + 2).toFixed(2))); await p.fill('#o-stop', String((sp - 6).toFixed(2))); await p.waitForTimeout(80);
   check('buy above price becomes a stop order', /stop order/.test(await txt(p, '#dr-type')), await txt(p, '#dr-type')); await p.keyboard.press('Escape'); check('Esc cancels the draft', !(await vis(p, '#draft')));
-  // 7. wrong-side stop refused
-  await p.keyboard.press('b'); const wp = await p.$eval('#o-price', (e) => +e.value); await p.fill('#o-stop', String((wp + 5).toFixed(2))); await p.waitForTimeout(80); check('wrong-side stop flagged in the calc', /wrong side/.test(await txt(p, '#calc'))); await p.click('#place'); await p.waitForTimeout(80);
-  check('wrong-side stop refused on confirm', /losing side/.test(await txt(p, '#o-err')), await txt(p, '#o-err')); await p.keyboard.press('Escape');
+  // 7. never refused because the price moved (owner, 9 Nov): a wrong-side stop is mirrored and the trade fills at the price now
+  await p.keyboard.press('Shift+B'); const wp = await p.$eval('#o-price', (e) => +e.value); await p.fill('#o-stop', String((wp + 5).toFixed(2))); await p.waitForTimeout(80); check('wrong-side stop flagged in the calc', /wrong side/.test(await txt(p, '#calc'))); await p.click('#place'); await p.waitForTimeout(120);
+  { const pc = await p.$$eval('#open .pos-card', (c) => c.length); const st = await p.$eval('#open .pos-l input[data-f=stop]', (e) => +e.value).catch(() => NaN);
+    check('wrong-side stop re-anchored on confirm and the buy filled (not refused)', pc === 1 && st < wp && Math.abs((wp - st) - 5) < 0.05 && !(await txt(p, '#o-err')) && /Filled at|kept/.test(await txt(p, '#toasts')), `${pc} stop ${st} entry ${wp} ${await txt(p, "#o-err")} | ${(await txt(p, "#open")).slice(0, 120)} | ${await txt(p, "#toasts")}`);
+    await p.click('#open [data-act=close]'); await p.waitForTimeout(120); }
+  // 7b. instant market orders: one click / one key, stop on the right side, default target, a toast with the levels
+  { await p.click('#qt-buy'); await p.waitForTimeout(120); const ib = await p.evaluate(() => { const c = document.querySelector('#open .pos-card'); return c ? { side: c.querySelector('.badge').textContent, stop: +c.querySelector('input[data-f=stop]').value, tgt: +c.querySelector('input[data-f=target]').value, entry: +c.querySelector('.pos-l b').textContent.replace(/,/g, '') } : null; });
+    check('one click on Buy opens a position at once with the stop below and the target above', ib && /buy/.test(ib.side) && ib.stop < ib.entry && ib.tgt > ib.entry && !(await vis(p, '#draft')) && /Bought at/.test(await txt(p, '#toasts')) && (await p.$$('#ptags .ptag')).length === 1, JSON.stringify(ib));
+    await p.click('#open [data-act=close]'); await p.waitForTimeout(120);
+    await p.keyboard.press('s'); await p.waitForTimeout(120); const is = await p.evaluate(() => { const c = document.querySelector('#open .pos-card'); return c ? { side: c.querySelector('.badge').textContent, stop: +c.querySelector('input[data-f=stop]').value, entry: +c.querySelector('.pos-l b').textContent.replace(/,/g, '') } : null; });
+    check('S key sells at once with the stop above the entry', is && /sell/.test(is.side) && is.stop > is.entry && /Sold at .*risk \$/.test(await txt(p, '#toasts')), JSON.stringify(is));
+    await p.click('#open [data-act=close]'); await p.waitForTimeout(120); }
+  // 7c. flipping the side mirrors the stop and target around the entry
+  { await p.keyboard.press('Shift+B'); const a = await p.evaluate(() => ({ e: +document.getElementById('o-price').value, s: +document.getElementById('o-stop').value, t: +document.getElementById('o-target').value }));
+    await p.click('#dr-flip'); await p.waitForTimeout(80); const b = await p.evaluate(() => ({ side: document.getElementById('dr-title').textContent, e: +document.getElementById('o-price').value, s: +document.getElementById('o-stop').value, t: +document.getElementById('o-target').value }));
+    check('flip to sell mirrors the stop and target around the entry', /sell/i.test(b.side) && Math.abs((b.s - b.e) - (a.e - a.s)) < 0.02 && Math.abs((b.e - b.t) - (a.t - a.e)) < 0.02, JSON.stringify([a, b]));
+    await p.keyboard.press('Shift+B'); check('asking for the other side flips the open draft back', /buy/i.test(await txt(p, '#dr-title')) && Math.abs(await p.$eval('#o-stop', (e) => +e.value) - a.s) < 0.02); await p.keyboard.press('Escape'); }
+  // 7d. a limit the price has already passed fills at market, same stop distance and R:R
+  { await p.keyboard.press('Shift+B'); const q0 = await p.$eval('#o-price', (e) => +e.value), le = +(q0 - 0.3).toFixed(2); await p.fill('#o-price', String(le)); await p.fill('#o-stop', String((le - 4).toFixed(2))); await p.fill('#o-target', String((le + 8).toFixed(2))); await p.waitForTimeout(60);
+    const t0 = await txt(p, '#dr-type'); const last = async () => +((await txt(p, '#px-now')).match(/[\d.]+/) || [0])[0]; let q1 = await last();
+    await p.evaluate(() => document.activeElement && document.activeElement.blur()); for (let k = 0; k < 120 && q1 >= le - 0.01; k++) { await p.keyboard.press('ArrowRight'); q1 = await last(); }
+    await p.click('#place'); await p.waitForTimeout(120);
+    const f = await p.evaluate(() => { const c = document.querySelector('#open .pos-card'); return c && !/waiting/.test(c.textContent) ? { stop: +c.querySelector('input[data-f=stop]').value, tgt: +c.querySelector('input[data-f=target]').value, entry: +c.querySelector('.pos-l b').textContent.replace(/,/g, '') } : null; });
+    check('a buy limit the price already passed fills at market, same stop distance and R:R', /limit/.test(t0) && q1 < le && f && Math.abs(f.entry - q1) < 0.02 && Math.abs((f.entry - f.stop) - 4) < 0.03 && Math.abs((f.tgt - f.entry) - 8) < 0.03 && /passed your limit/.test(await txt(p, '#toasts')) && !(await txt(p, '#o-err')), `${t0} ${le} -> ${q1} ${JSON.stringify(f)} ${await txt(p, '#o-err')}`);
+    if (await p.$('#open [data-act=close]')) await p.click('#open [data-act=close]'); if (await p.$('#open [data-act=cancel]')) await p.click('#open [data-act=cancel]'); await p.waitForTimeout(100); }
   // 8. play / pause / speed / skip day / jump
   await p.click('.speed [data-sp="80"]'); const bp = await barN(p); await p.click('#play'); await p.waitForTimeout(1500); await p.click('#play'); const ba = await barN(p); check('play advances bars and pauses', ba > bp + 5 && !(await p.$eval('#play', (e) => e.classList.contains('playing'))), `${bp}→${ba}`);
   const day0 = (await txt(p, '#now')).slice(0, 10); await p.click('#skipday'); check('skip day lands on the next trading day', (await txt(p, '#now')).slice(0, 10) !== day0, day0 + ' -> ' + await txt(p, '#now'));
   // 8b. on-chart trade UI (pass 9): draft readout with R presets and keys, Shift+drag placement, live position tags
-  { await p.keyboard.press('b'); await p.waitForTimeout(120); check('draft readout shows on the chart with risk in $ and %', await vis(p, '#dchip') && /Risk/.test(await txt(p, '#dchip')) && /\d\.\d\d%/.test(await txt(p, '#dchip')), await txt(p, '#dchip'));
+  { await p.keyboard.press('Shift+B'); await p.waitForTimeout(120); check('draft readout shows on the chart with risk in $ and %', await vis(p, '#dchip') && /Risk/.test(await txt(p, '#dchip')) && /\d\.\d\d%/.test(await txt(p, '#dchip')), await txt(p, '#dchip'));
     await p.keyboard.press('3'); await p.waitForTimeout(80); const d3 = await p.evaluate(() => ({ e: +document.getElementById('o-price').value, s: +document.getElementById('o-stop').value, t: +document.getElementById('o-target').value }));
     check('key 3 sets the target at 3R', Math.abs((d3.t - d3.e) - 3 * (d3.e - d3.s)) < 0.05 && /1:3\.00/.test(await txt(p, '#dchip')), JSON.stringify(d3));
     await p.click('#dchip [data-dr="1"]'); await p.waitForTimeout(80); check('1R button on the chart readout', /1:1\.00/.test(await txt(p, '#dchip')), await txt(p, '#dchip'));
@@ -81,7 +103,7 @@ async function load(p, q = 'xau,15m') { await p.click(`#quick [data-q^="${q}"]`)
     await p.click('#qt-drag'); check('drag button arms placement', (await p.getAttribute('#qt-drag', 'aria-pressed')) === 'true');
     await p.mouse.move(cb.x + cb.w * 0.45, cb.y + cb.h * 0.6); await p.mouse.down(); await p.mouse.move(cb.x + cb.w * 0.45, cb.y + cb.h * 0.45, { steps: 6 }); await p.mouse.up(); await p.waitForTimeout(120);
     check('drag up places a sell draft and disarms', /sell/i.test(await txt(p, '#dr-title')) && (await p.getAttribute('#qt-drag', 'aria-pressed')) === 'false', await txt(p, '#dr-title')); await p.keyboard.press('Escape');
-    await p.keyboard.press('b'); await p.click('#dchip [data-dgo]'); await p.waitForTimeout(150);
+    await p.keyboard.press('Shift+B'); await p.click('#dchip [data-dgo]'); await p.waitForTimeout(150);
     check('Confirm on the chart opens the trade; its tag shows P&L, R and the stop', (await p.$$('#ptags .ptag')).length === 1 && /R/.test(await txt(p, '#ptags .pv')) && /SL \d/.test(await txt(p, '#ptags .sl')), await txt(p, '#ptags'));
     await p.click('.speed [data-sp="1000"]'); await p.click('#play'); const s1 = []; for (let k = 0; k < 6; k++) { await p.waitForTimeout(140); s1.push(await txt(p, '#ptags .pv')); } await p.click('#play');
     check('position tag P&L moves with the forming candle', new Set(s1.filter(Boolean)).size > 1, s1.join(' / '));
@@ -89,9 +111,9 @@ async function load(p, q = 'xau,15m') { await p.click(`#quick [data-q^="${q}"]`)
     if ((await p.$$('#ptags .ptag')).length) { await p.click('#ptags [data-pa="close"]'); await p.waitForTimeout(150); }
     check('✕ on the tag closes the trade', (await p.$$('#ptags .ptag')).length === 0 && (await p.$$('.pos-card')).length === 0); }
   // 9. layers and context
-  await p.click('#tb summary'); for (const l of ['ema20', 'ema50', 'vol', 'sess', 'pdhl', 'anim']) await p.click(`.ddp [data-l=${l}]`).catch(() => {}); await p.keyboard.press('Escape');
+  await p.click('#laydd summary'); for (const l of ['ema20', 'ema50', 'vol', 'sess', 'pdhl', 'anim']) await p.click(`.ddp [data-l=${l}]`).catch(() => {}); await p.keyboard.press('Escape');
   check('layer toggles flip state', await p.evaluate(() => JSON.parse(localStorage.getItem('btLab:layers') || '{}').ema20 === true));
-  const ctxdd = (await p.$$('#tb details.dd'))[1]; await (await ctxdd.$('summary')).click(); await p.click('[data-htf="4h"]'); await p.waitForFunction(() => /context ·|failed/.test(document.getElementById('htf-title').textContent), null, { timeout: 60000 }).catch(() => {});
+  await p.click('#ctxdd summary'); await p.click('[data-htf="4h"]'); await p.waitForFunction(() => /context ·|failed/.test(document.getElementById('htf-title').textContent), null, { timeout: 60000 }).catch(() => {});
   check('H4 context chart loads', /4H context/.test(await txt(p, '#htf-title')), await txt(p, '#htf-title'));
   // 10. drawings
   const box = await p.$eval('#chart', (e) => { const r = e.getBoundingClientRect(); return { x: r.left, y: r.top, w: r.width, h: r.height }; });
@@ -102,10 +124,10 @@ async function load(p, q = 'xau,15m') { await p.click(`#quick [data-q^="${q}"]`)
   // 11. prop firm challenge: fail fast with 6% risk on FTMO
   await p.selectOption('#firm', 'ftmo2'); await p.click('#pf-start'); await p.click('dialog.msd button.pri').catch(() => {}); await p.waitForTimeout(200);
   check('challenge starts at the firm size', /100,000/.test(await txt(p, '#bal')) && /live/.test(await txt(p, '#pf-status')), await txt(p, '#pf-status'));
-  let failed = false; for (let k = 0; k < 6 && !failed; k++) { await p.keyboard.press('b'); await p.fill('#o-risk', '6'); await p.dispatchEvent('#o-risk', 'input'); await p.click('[data-sl="bar"]'); await p.click('[data-tp="3"]'); await p.click('#place'); for (let i = 0; i < 80; i++) { await p.keyboard.press('ArrowRight'); if (!(await p.$('.pos-card'))) break; } failed = /failed/.test(await txt(p, '#pf-status')); }
+  let failed = false; for (let k = 0; k < 6 && !failed; k++) { await p.keyboard.press('Shift+B'); await p.fill('#o-risk', '6'); await p.dispatchEvent('#o-risk', 'input'); await p.click('[data-sl="bar"]'); await p.click('[data-tp="3"]'); await p.click('#place'); for (let i = 0; i < 80; i++) { await p.keyboard.press('ArrowRight'); if (!(await p.$('.pos-card'))) break; } failed = /failed/.test(await txt(p, '#pf-status')); }
   check('daily loss / max loss trips the challenge', failed, await txt(p, '#pf'));
   check('a breach flattens the account', (await p.$$('.pos-card')).length === 0, await txt(p, '#open'));
-  check('challenge log lists the days', (await p.$$('#pflog tr')).length > 1);
+  await p.click('.tabs [data-t=log]'); check('challenge log lists the days', (await p.$$('#pflog tr')).length > 1); await p.click('.tabs [data-t=journal]');
   await p.fill('#o-risk', '1'); await p.click('#pf-stop').catch(() => {}); await p.click('dialog.msd button.pri').catch(() => {});
   // 12. tabs: stats, calendar, export
   await p.click('.tabs [data-t=stats]'); check('statistics render', (await p.$$('#stats div')).length >= 16 && !/NaN|undefined/.test(await txt(p, '#stats')), (await txt(p, '#stats')).slice(0, 80));
@@ -158,14 +180,14 @@ async function load(p, q = 'xau,15m') { await p.click(`#quick [data-q^="${q}"]`)
   await p.keyboard.press('f'); await p.waitForTimeout(300);
   const fsI = await p.evaluate(() => { const tc = document.getElementById('tradecard').getBoundingClientRect(), ch = document.getElementById('chart').getBoundingClientRect(); return { fs: document.body.classList.contains('fs'), dock: getComputedStyle(document.getElementById('tradecard')).position, chartH: Math.round(ch.height), tbFloat: document.getElementById('tb').classList.contains('float'), tcX: Math.round(tc.left) }; });
   check('F enters full screen: chart fills, Trade dock and replay bar float', fsI.fs && fsI.dock === 'fixed' && fsI.chartH > 850 && fsI.tbFloat, JSON.stringify(fsI));
-  await p.keyboard.press('s'); check('Sell draft works in full screen', await vis(p, '#draft')); await p.keyboard.press('Escape');
+  await p.keyboard.press('Shift+S'); check('Sell draft works in full screen', await vis(p, '#draft')); await p.keyboard.press('Escape');
   const g = await p.$eval('#tc-grip', (e) => { const r = e.getBoundingClientRect(); return { x: r.left + 5, y: r.top + 5 }; }); await p.mouse.move(g.x, g.y); await p.mouse.down(); await p.mouse.move(g.x - 600, g.y + 100, { steps: 8 }); await p.mouse.up();
   check('Trade dock drags', (await p.$eval('#tradecard', (e) => e.getBoundingClientRect().left)) < fsI.tcX - 300);
   await p.screenshot({ path: OUT + 'ct-fs.png' });
   await p.click('#fs-btn'); await p.waitForTimeout(200); check('full screen exits and the Trade card returns to the side', !(await p.evaluate(() => document.body.classList.contains('fs'))) && (await p.$eval('#tradecard', (e) => !!e.closest('.side'))));
   // 15. settings: commission
   await p.$eval('#comm', (e) => { e.closest('details').open = true; }); await p.fill('#comm', '7'); await p.dispatchEvent('#comm', 'change'); await p.evaluate(() => document.activeElement.blur());
-  await p.keyboard.press('b'); await p.click('#place'); await p.click('#open [data-act=close]'); await p.waitForTimeout(100); const lastNet = await p.$eval('#jbody tr[data-id] td.net', (e) => e.textContent); check('commission is charged on close', /−\$7|-\$7|−\$/.test(lastNet), lastNet);
+  await p.keyboard.press('Shift+B'); await p.click('#place'); await p.click('#open [data-act=close]'); await p.waitForTimeout(100); const lastNet = await p.$eval('#jbody tr[data-id] td.net', (e) => e.textContent); check('commission is charged on close', /−\$7|-\$7|−\$/.test(lastNet), lastNet);
   // 16. new session + delete
   await p.click('#sess-toggle'); await p.click('#newsess'); check('New session clears the chart', (await txt(p, '#sess-sum')).includes('New session'));
   // 17. phone layout and light theme
@@ -177,6 +199,34 @@ async function load(p, q = 'xau,15m') { await p.click(`#quick [data-q^="${q}"]`)
   await m.screenshot({ path: OUT + 'ct-phone-light.png' });
   { await m.click('.tabs [data-t=stats]').catch(() => {}); await m.waitForTimeout(300); check('phone: analytics fit at 390 px', !(await m.evaluate(() => document.documentElement.scrollWidth > innerWidth + 1))); await m.$eval('#tab-stats', (e) => e.scrollIntoView()); await m.screenshot({ path: OUT + 'ct-analytics-phone-light.png' });
     await m.click('#rep-btn').catch(() => {}); await m.waitForTimeout(200); const rw = await m.$eval('#repd', (e) => { const r = e.getBoundingClientRect(); return { l: r.left, r: r.right }; }); check('phone: session report fits', rw.l >= 0 && rw.r <= 390, JSON.stringify(rw)); await m.screenshot({ path: OUT + 'ct-report-phone-light.png' }); await m.keyboard.press('Escape'); }
+  // 18. toolbar (pass 11): Replay | time | Chart tools | View, one row at 1366 × 768 with nothing important below the fold;
+  // phones keep replay, speed, jump and Buy / Sell in sight and put Chart tools and View behind More; J jumps; 100+ trades stay quick
+  for (const [w, h] of [[1366, 768], [390, 844]]) { const q = await ctx.newPage(); q.on('pageerror', (e) => errs.push(w + ': ' + e.message)); await route(q); await me(q, OWNER); await q.setViewportSize({ width: w, height: h });
+    await q.goto(H + '/backtest.html', { waitUntil: 'load' }); await q.waitForFunction(() => /Resumed/.test(document.getElementById('loadmsg').textContent), null, { timeout: 120000 }).catch(() => {}); await q.waitForTimeout(500);
+    const L = await q.evaluate(() => { const r = (s) => { const e = document.querySelector(s); if (!e) return null; const b = e.getBoundingClientRect(); return { t: Math.round(b.top), b: Math.round(b.bottom), l: Math.round(b.left), r: Math.round(b.right), h: Math.round(b.height), v: b.width > 0 }; };
+      return { tb: r('#tb'), play: r('#play'), sp: r('.speed [data-sp="80"]'), jump: r('#jumpdd > summary'), lay: r('#laydd > summary'), draw: r('#drawdd > summary'), fs: r('#fs-btn'), more: r('#tb-more'), buy: r('#qt-buy'), sell: r('#qt-sell'), vh: innerHeight, vw: innerWidth, sw: document.documentElement.scrollWidth }; });
+    const inView = (k) => !!(L[k] && L[k].v && L[k].b <= L.vh && L[k].t >= 0 && L[k].r <= L.vw && L[k].l >= 0);
+    if (w > 700) {
+      check('1366×768: the toolbar is one row; replay, speed, jump, chart tools, view and Buy / Sell all in sight', L.tb.h <= 64 && Math.abs(L.fs.t - L.play.t) < 8 && ['play', 'sp', 'jump', 'lay', 'draw', 'fs', 'buy', 'sell'].every(inView) && !inView('more'), JSON.stringify(L));
+      await q.screenshot({ path: OUT + 'ct-1366.png' });
+      const n0 = await barN(q); await q.keyboard.press('j'); await q.waitForTimeout(120); const jo = await q.$eval('#jumpdd', (e) => e.open); await q.keyboard.press('Enter'); await q.waitForTimeout(400); const n1 = await barN(q);
+      check('J opens the jump popover (a day ahead filled in) and Enter jumps forward', jo && n1 > n0 && !(await q.$eval('#jumpdd', (e) => e.open)), `${jo} ${n0} -> ${n1}`);
+      // a long journal: 110 one-click trades; the table shows 100 with "Show more", and closing a trade stays quick
+      await q.evaluate(async () => { const k = (key) => document.body.dispatchEvent(new KeyboardEvent('keydown', { key, bubbles: true })); for (let i = 0; i < 110; i++) { k(i % 2 ? 's' : 'b'); const c = document.querySelector('#open [data-act=close]'); if (c) c.click(); if (i % 10 === 0) await new Promise((r) => setTimeout(r, 0)); } });
+      await q.waitForTimeout(300); const rows = (await q.$$('#jbody tr[data-id]')).length, moreBtn = await q.$('#jbody [data-jmore]');
+      const ms = await q.evaluate(async () => { document.body.dispatchEvent(new KeyboardEvent('keydown', { key: 'b', bubbles: true })); const t0 = performance.now(); document.querySelector('#open [data-act=close]').click(); await new Promise((r) => requestAnimationFrame(() => setTimeout(r, 0))); return Math.round(performance.now() - t0); });
+      check('100+ trades: the journal shows the latest 50 with "Show more"', rows === 50 && !!moreBtn, `${rows} rows, more ${!!moreBtn}`);
+      if (moreBtn) { await q.waitForTimeout(200); await q.click('#jbody [data-jmore]'); await q.waitForTimeout(150); } check('"Show more" adds the older trades', (await q.$$('#jbody tr[data-id]')).length > 50);
+      check('closing a trade with 100+ in the journal takes under 150 ms', ms < 150, ms + ' ms');
+    } else {
+      check('390×844: one toolbar row; replay, speed, jump, More and Buy / Sell in sight without scrolling', L.tb.h <= 64 && Math.abs(L.more.t - L.play.t) < 8 && ['play', 'sp', 'jump', 'more', 'buy', 'sell'].every(inView) && !inView('draw') && L.sw <= L.vw + 1, JSON.stringify(L));
+await q.click('#tb-more'); await q.waitForTimeout(120);
+      const o = await q.evaluate(() => ['#laydd > summary', '#ctxdd > summary', '#drawdd > summary', '#snd-btn', '#fs-btn', '#tb-dock'].map((s) => { const b = document.querySelector(s).getBoundingClientRect(); return b.width > 0 && b.left >= 0 && b.right <= innerWidth && b.top >= 0 && b.bottom <= innerHeight; }));
+      check('phone: More shows Layers, Context, Draw, sound, full screen and toolbar position on screen', o.every(Boolean), JSON.stringify(o)); await q.screenshot({ path: OUT + 'ct-phone-more.png' });
+      await q.click('#drawdd > summary'); check('phone: the Draw menu opens from More', await q.$eval('#drawdd', (e) => e.open));
+      await q.mouse.click(8, 140); await q.waitForTimeout(80); check('phone: More closes on an outside tap', !(await q.$eval('#tb', (e) => e.classList.contains('more-open'))));
+    }
+    await q.close(); }
   check('no page errors', errs.length === 0, errs.join(' | '));
   await b.close();
   for (const r of R) console.log(`${r.ok ? 'PASS' : 'FAIL'}  ${r.name}${r.ok ? '' : '  ← ' + r.info}`);

@@ -15,7 +15,7 @@
   // ---- shared tooltip ----
   let tipEl = null, tipAt = 0;
   function tip(e) { const t = e.target.closest && e.target.closest('[data-tip]'); if (!tipEl) { tipEl = document.createElement('div'); tipEl.className = 'bv-tip'; tipEl.setAttribute('role', 'tooltip'); document.body.appendChild(tipEl); }
-    if (!t || !t.closest('.bv')) { tipEl.hidden = true; return; } tipEl.innerHTML = t.getAttribute('data-tip'); tipEl.hidden = false; tipAt = performance.now();
+    if (!t || !t.closest('.bv')) { if (!tipEl.hidden) tipEl.hidden = true; return; } tipEl.innerHTML = t.getAttribute('data-tip'); tipEl.hidden = false; tipAt = performance.now();
     let x, y; if (e.type === 'focusin') { const r = t.getBoundingClientRect(); x = r.left + r.width / 2; y = r.top; } else { x = e.clientX; y = e.clientY; }
     const r = tipEl.getBoundingClientRect(); tipEl.style.left = Math.max(6, Math.min(innerWidth - r.width - 6, x - r.width / 2)) + 'px'; tipEl.style.top = Math.max(6, y - r.height - 12) + 'px'; }
   ['pointermove', 'pointerdown', 'focusin'].forEach((k) => document.addEventListener(k, tip, { passive: true }));
