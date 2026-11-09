@@ -1,18 +1,177 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Macro Trading Dashboard - Fundamental Analysis</title>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<meta name="color-scheme" content="dark light">
+<meta name="theme-color" content="#08090c" media="(prefers-color-scheme: dark)">
+<meta name="theme-color" content="#f4f6f9" media="(prefers-color-scheme: light)">
+<title>Macro · Meridian X</title>
+<meta name="description" content="Meridian X macro: today's macro read for gold, the Macro desk, the veteran's research library and the edge studies in one place.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cdefs%3E%3CradialGradient id='g' cx='.35' cy='.3' r='.8'%3E%3Cstop offset='0' stop-color='%23fbe7a6'/%3E%3Cstop offset='.55' stop-color='%23e3b341'/%3E%3Cstop offset='1' stop-color='%238a6312'/%3E%3C/radialGradient%3E%3C/defs%3E%3Ccircle cx='16' cy='16' r='14' fill='url(%23g)'/%3E%3Ccircle cx='16' cy='16' r='10.5' fill='none' stroke='%23fff' stroke-opacity='.35'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<!-- fonts never hold up the first paint: the system font shows until Figtree arrives -->
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600&display=swap" media="print" onload="this.media='all'">
+<script>
+  // Same theme key as the desk (localStorage msPrefs.theme): light stays light, every other desk theme is dark; else the system.
+  (function () { try { var p = JSON.parse(localStorage.getItem('msPrefs') || 'null'); if (p && p.theme) document.documentElement.dataset.theme = p.theme === 'light' ? 'light' : p.theme === 'midnight' ? 'midnight' : 'dark'; } catch (e) {} })();
+</script>
+<link rel="stylesheet" href="/macro-dashboard/assets/mx-page.css?v=688ec3a7b6">
+<script src="/macro-dashboard/assets/mx-nav.js?v=3f8fef533d" defer></script>
+<style>
+  /* /macro (9 Nov 2026): replaces a 2024 demo app (616 KB of script, hard-coded 2024 rates and calendar) that went blank once
+     its last calendar date passed; this page reads the council's own files and points at the macro tools */
+  .head { padding: 36px 0 22px; }
+  h1 { font: 600 clamp(26px, 3vw, 34px)/1.15 var(--sans); letter-spacing: -.6px; margin: 0 0 10px; }
+  .lede { margin: 0; color: var(--ink-dim); max-width: 66ch; font-size: 14.5px; text-wrap: pretty; }
+  h2 { font: 600 17px var(--sans); letter-spacing: -.2px; margin: 0 0 10px; }
+  .k { margin: 0 0 4px; font: 600 12px var(--sans); color: var(--ink-faint); }
+  .card { background: var(--panel); border: 1px solid var(--line); border-radius: var(--r); padding: 16px 18px; min-width: 0; }
 
+  /* today's read (members) */
+  .today { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; }
+  .today .card { display: flex; flex-direction: column; gap: 4px; }
+  .big { font: 600 22px/1.2 var(--mono); letter-spacing: -.5px; color: var(--ink); }
+  .big.up { color: var(--buy); } .big.dn { color: var(--sell); } .big.flat { color: var(--gold); }
+  .sm { font-size: 13px; color: var(--ink-dim); margin: 0; }
+  .faint { color: var(--ink-faint); }
+  .today-h { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; flex-wrap: wrap; margin: 0 0 10px; }
+  .today-h h2 { margin: 0; }
+  .today-h small { color: var(--ink-faint); font-size: 12.5px; }
+  .gate { display: flex; align-items: center; justify-content: space-between; gap: 12px 18px; flex-wrap: wrap; }
+  .gate p { margin: 0; color: var(--ink-dim); max-width: 60ch; }
+  .btn.pri { background: var(--accent); border-color: var(--accent); color: var(--bg); font-weight: 600; }
+  .btn.pri:hover { color: var(--bg); filter: brightness(1.08); }
+  .skel { display: inline-block; width: 7em; height: 1em; border-radius: 4px; background: var(--neutral-soft); vertical-align: middle; }
 
-    <script type="module" crossorigin src="/macro-dashboard/assets/index-C0AwpGdj.js"></script>
-    <link rel="stylesheet" crossorigin href="/macro-dashboard/assets/index-wUp2apRp.css">
-  <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700;800&display=swap">
-<style>/* TradingView-style type everywhere (7 Nov): Figtree */ html, body, button, input, select, textarea, h1, h2, h3, h4 { font-family: Figtree, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important; } html { font-variant-numeric: tabular-nums; -webkit-font-smoothing: antialiased; } code, pre, kbd { font-family: "JetBrains Mono", ui-monospace, monospace !important; }</style>
+  /* destinations */
+  .tools { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; margin-top: 28px; }
+  .tool { display: flex; flex-direction: column; gap: 6px; min-height: 140px; color: var(--ink); text-decoration: none; transition: border-color .15s, background .15s, transform .2s var(--ease); }
+  .tool:hover { text-decoration: none; border-color: var(--line-strong); background: var(--panel-hover); }
+  .tool h3 { margin: 0; font: 600 15.5px var(--sans); display: flex; align-items: center; gap: 8px; }
+  .tool h3 .go { margin-left: auto; color: var(--ink-faint); transition: transform .2s var(--ease); }
+  .tool:hover h3 .go { transform: translateX(3px); color: var(--accent); }
+  .tool p { margin: 0; color: var(--ink-dim); font-size: 13.5px; }
+  .tool .st { margin-top: auto; padding-top: 6px; font-size: 12.5px; color: var(--ink-faint); }
+  .tool .st b { color: var(--ink); font-weight: 600; }
+  .dot { width: 8px; height: 8px; border-radius: 50%; flex: none; }
+  .p { color: var(--buy); } .f { color: var(--sell); }
+  .lock { font: 500 12px var(--sans); color: var(--ink-faint); border: 1px solid var(--line-strong); border-radius: 999px; padding: 0 8px; }
+  .foot { margin-top: 32px; color: var(--ink-faint); font-size: 12.5px; max-width: 80ch; }
+  .foot p { margin: 0 0 6px; }
+
+  @media (max-width: 1000px) { .today { grid-template-columns: repeat(2, minmax(0, 1fr)); } .tools { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+  @media (max-width: 600px) { .today, .tools { grid-template-columns: minmax(0, 1fr); } .tool { min-height: 0; } .head { padding: 24px 0 16px; } }
+  @media (max-width: 520px) { .top .crumb, .top .brand.here { display: none; } }
+</style>
 </head>
-  <body>
-    <div id="root"></div>
-  </body>
+<body>
+<a class="skip" href="#main">Skip to the content</a>
+<header class="top">
+  <div class="wrap">
+    <a class="brand" href="/" title="Back to the desk"><span class="coin" aria-hidden="true"></span>Meridian X</a>
+    <span class="crumb" aria-hidden="true">/</span>
+    <span class="brand here">Macro</span>
+    <div class="check">
+      <nav class="hdr-sw" data-mx-members hidden aria-label="Desk, macro or ChronosTrade"><a href="/#home" title="Back to the main desk"><i aria-hidden="true"></i><span>Desk</span></a><a class="on" data-mx-macro href="/macro-desk" title="Macro desk"><i aria-hidden="true"></i><span>Macro</span></a><a href="/backtest" title="ChronosTrade: manual backtesting, journal and prop-firm challenges"><i aria-hidden="true"></i><span>ChronosTrade</span></a></nav>
+    </div>
+  </div>
+</header>
+<main class="wrap" id="main" tabindex="-1">
+  <section class="head">
+    <h1>Macro</h1>
+    <p class="lede">Today's macro read for gold, and the tools behind it. Paper readings only: nothing here places a trade.</p>
+  </section>
+
+  <section aria-labelledby="today-h" id="today-s">
+    <div class="today-h"><h2 id="today-h">Today's macro read</h2><small id="today-when" aria-live="polite"></small></div>
+    <div id="today"><div class="today" aria-hidden="true"><div class="card"><span class="skel"></span><span class="skel" style="width:4em;height:1.4em"></span></div><div class="card"><span class="skel"></span><span class="skel" style="width:4em;height:1.4em"></span></div><div class="card"><span class="skel"></span><span class="skel" style="width:5em;height:1.4em"></span></div><div class="card"><span class="skel"></span><span class="skel" style="width:6em;height:1.4em"></span></div></div></div>
+  </section>
+
+  <section aria-label="Macro tools" class="tools">
+    <a class="card tool" data-mx-macro href="/macro-desk"><h3><span class="dot" style="background:#e0a526" aria-hidden="true"></span>Macro desk <span class="lock" data-lock>members</span><span class="go" aria-hidden="true">→</span></h3>
+      <p>The strategist and the veteran side by side, with their calls for the week and month.</p><span class="st" id="st-desk">Updated about every 25 minutes.</span></a>
+    <a class="card tool" href="/veteran/"><h3><span class="dot" style="background:#7b61ff" aria-hidden="true"></span>Veteran library<span class="go" aria-hidden="true">→</span></h3>
+      <p>The research the veteran reads from: frameworks, briefs and its forecast on the record.</p><span class="st" id="st-lib">&nbsp;</span></a>
+    <a class="card tool" href="/edge-lab.html"><h3><span class="dot" style="background:var(--buy)" aria-hidden="true"></span>Edge lab<span class="go" aria-hidden="true">→</span></h3>
+      <p>Every rule change we tested, and whether it held up on unseen data.</p><span class="st" id="st-edge">&nbsp;</span></a>
+    <a class="card tool" href="/"><h3><span class="dot" style="background:var(--accent)" aria-hidden="true"></span>The desk<span class="go" aria-hidden="true">→</span></h3>
+      <p>Trades, charts, open positions and the P&amp;L calendar.</p><span class="st">Sign in there once; the other pages follow.</span></a>
+    <a class="card tool" href="/gold"><h3><span class="dot" style="background:var(--gold)" aria-hidden="true"></span>Gold terminal<span class="go" aria-hidden="true">→</span></h3>
+      <p>The original gold page: daily bias, real yields and the news calendar.</p><span class="st">Public market data, read in your browser.</span></a>
+    <a class="card tool" data-mx-members hidden href="/backtest"><h3><span class="dot" style="background:var(--sell)" aria-hidden="true"></span>ChronosTrade<span class="go" aria-hidden="true">→</span></h3>
+      <p>Practise on past candles, keep a journal, run prop-firm challenges.</p><span class="st">Members.</span></a>
+  </section>
+
+  <footer class="foot">
+    <p>Times are in UTC, with your local time alongside.</p>
+  </footer>
+</main>
+<script>
+(function () {
+  'use strict';
+  var $ = function (id) { return document.getElementById(id); };
+  var esc = function (s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); };
+  var api = /^https?:$/.test(location.protocol) && !/github\.io$/.test(location.hostname);
+  var get = function (u) { return fetch(u, { cache: 'no-cache', credentials: 'same-origin' }).then(function (r) { return r.ok ? r.json() : null; }).catch(function () { return null; }); };
+  var p2 = function (n) { return (n < 10 ? '0' : '') + n; };
+  var DAYS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'], MON = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+  // "Tue 10 Nov, 13:30 UTC (14:30 your time)"; the local part only off UTC
+  function utc(iso) {
+    var d = new Date(iso); if (!iso || isNaN(d)) return '';
+    var s = DAYS[d.getUTCDay()] + ' ' + d.getUTCDate() + ' ' + MON[d.getUTCMonth()] + ', ' + p2(d.getUTCHours()) + ':' + p2(d.getUTCMinutes()) + ' UTC';
+    if (d.getTimezoneOffset() !== 0) s += ' (' + d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) + ' your time)';
+    return s;
+  }
+  function ago(iso) { var m = Math.round((Date.now() - Date.parse(iso)) / 60000); if (!isFinite(m)) return ''; return m < 1 ? 'just now' : m < 60 ? m + ' min ago' : m < 2880 ? Math.round(m / 60) + ' h ago' : Math.round(m / 1440) + ' days ago'; }
+  var pct = function (v) { return v == null || !isFinite(+v) ? '–' : Math.round(v * 100) + '%'; };
+  var sg = function (v, d) { return v == null || !isFinite(+v) ? '–' : (v > 0 ? '+' : v < 0 ? '−' : '') + Math.abs(+v).toFixed(d == null ? 2 : d); };
+
+  function today(fc) {
+    var gs = fc.goldScore || {}, g = (fc.assets && fc.assets.gold) || {}, base = g.fit && g.fit.base, rg = fc.regime || {};
+    var now = Date.now(), next = (fc.playbook || []).filter(function (e) { return e && Date.parse(e.at) > now - 3600000; }).sort(function (a, b) { return Date.parse(a.at) - Date.parse(b.at); })[0];
+    var bias = String(gs.bias || ''), cls = /BUY/.test(bias) ? 'up' : 'flat';
+    var stale = Date.now() - Date.parse(fc.at) > 6 * 3600000;
+    $('today-when').textContent = 'Macro strategist · ' + ago(fc.at) + (stale ? ' · the council may be behind' : '');
+    var tilt = isFinite(+g.pUp) && isFinite(+base) ? Math.round((g.pUp - base) * 100) : null;
+    $('today').innerHTML = '<div class="today">' +
+      '<div class="card"><p class="k">Gold Macro Score</p><span class="big ' + (gs.ok ? cls : '') + '">' + (gs.ok ? sg(gs.score) : '–') + '</span><p class="sm">' + esc(gs.label || 'Not available this round') + '</p>' + (gs.asOf ? '<p class="sm faint">Week to ' + esc(gs.asOf) + ' · direction only, never a sell</p>' : '') + '</div>' +
+      '<div class="card"><p class="k">Gold up ' + (fc.target ? 'on ' + esc(utc(fc.target + 'T12:00:00Z').split(',')[0]) : 'next day') + '</p><span class="big">' + pct(g.pUp) + '</span><p class="sm">' + (tilt == null ? '' : tilt === 0 ? 'The base rate (' + pct(base) + '): no macro tilt' : 'Base rate ' + pct(base) + ', macro tilt ' + (tilt > 0 ? '+' : '−') + Math.abs(tilt) + ' pt') + '</p>' + (isFinite(+g.expMovePct) ? '<p class="sm faint">Usual move ±' + (+g.expMovePct).toFixed(2) + '%</p>' : '') + '</div>' +
+      '<div class="card"><p class="k">Regime</p><p class="sm" style="color:var(--ink)">' + esc(rg.label || '–') + '</p>' + (isFinite(+rg.vix) ? '<p class="sm faint">VIX ' + (+rg.vix).toFixed(1) + (rg.realYield && isFinite(+rg.realYield.level) ? ' · 10Y real yield ' + (+rg.realYield.level).toFixed(2) + '%' : '') + '</p>' : '') + '</div>' +
+      '<div class="card"><p class="k">Next release</p>' + (next ? '<p class="sm" style="color:var(--ink);font-weight:600">' + esc(next.country) + ' ' + esc(next.title) + '</p><p class="sm">' + esc(utc(next.at)) + '</p><p class="sm faint">Consensus ' + esc(next.consensus || '–') + ' · previous ' + esc(next.previous || '–') + (next.actual != null ? ' · actual ' + esc(next.actual) : '') + '</p>' : '<p class="sm">No tier-1 release on the playbook.</p>') + '</div>' +
+      '</div>';
+  }
+  function gate(why) {
+    $('today-when').textContent = '';
+    $('today').innerHTML = '<div class="card gate"><p>' + why + '</p><a class="btn pri" href="/#home">Open the desk</a></div>';
+  }
+
+  // the live read is members only (/cdata answers a signed-in session); GitHub Pages / local copies read the public raw file
+  // assets/mx-nav.js is deferred: it has set window.MX_ME by DOMContentLoaded
+  new Promise(function (r) { if (document.readyState !== 'loading') r(); else document.addEventListener('DOMContentLoaded', r); }).then(function () { return window.MX_ME || null; }).then(function (me) {
+    document.querySelectorAll('[data-lock]').forEach(function (el) { el.hidden = !!me || !api; });
+    if (api && !me) return gate('Sign in on the desk to see today’s macro read for gold: the Gold Macro Score, tomorrow’s odds against the base rate, the regime and the next release.');
+    var src = api ? '/cdata/macro/forecast.json' : 'https://raw.githubusercontent.com/vazxanana/macro-dashboard/council-data/macro/forecast.json';
+    return get(src).then(function (fc) {
+      if (!fc || !fc.at) return gate('The macro read is not available right now. The Macro desk shows the last one the council wrote.');
+      today(fc);
+      $('st-desk').textContent = 'Last strategist round ' + ago(fc.at) + '.';
+    });
+  });
+  // public indexes, published with every build
+  get('/veteran/index.json').then(function (I) {
+    if (!I || !I.docs) { $('st-lib').textContent = 'The library index is not available right now.'; return; }
+    var c = I.cpiPilot && I.cpiPilot[0];
+    $('st-lib').innerHTML = 'Revision <b>' + esc(I.version || '?') + '</b> · ' + I.docs.length + ' files' + (c ? ' · CPI pilot ' + esc(c.status) : '');
+  });
+  get('/research/edge/index.json').then(function (ix) {
+    if (!ix || !Array.isArray(ix.topics)) { $('st-edge').textContent = 'The study index is not available right now.'; return; }
+    var n = { pass: 0, fail: 0, inc: 0 }; ix.topics.forEach(function (t) { if (n[t.verdict] != null) n[t.verdict]++; else n.inc++; });
+    $('st-edge').innerHTML = '<b>' + ix.topics.length + '</b> studies · <span class="p">' + n.pass + ' pass</span> · <span class="f">' + n.fail + ' fail</span> · ' + n.inc + ' inconclusive';
+  });
+})();
+</script>
+</body>
 </html>

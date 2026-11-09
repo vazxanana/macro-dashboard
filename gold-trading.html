@@ -8,13 +8,19 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <script>
+    // Theme before the first paint (9 Nov 2026): the terminal's own toggle (goldDarkMode) wins; with none, the desk's theme
+    // (msPrefs.theme: light stays light), else dark. It used to switch to dark only after the scripts ran: a light flash on load.
+    (function () { var d = document.documentElement, g = null, p = null; try { g = localStorage.getItem('goldDarkMode'); p = JSON.parse(localStorage.getItem('msPrefs') || 'null'); } catch (e) {}
+      if (g === '1' || (g === null && !(p && p.theme === 'light'))) d.classList.add('dark'); })();
+  </script>
   <link rel="manifest" href="manifest.json">
   <meta name="theme-color" content="#030607">
   <link rel="apple-touch-icon" href="icon-192.png">
   <link rel="icon" type="image/png" href="icon-192.png">
   <script src="https://s3.tradingview.com/tv.js" async></script>
   <!-- Lightweight Charts: MUST be the "standalone" build to expose window.LightweightCharts -->
-  <script src="/assets/lightweight-charts-4.1.3.js"></script>
+  <script src="/assets/lightweight-charts-4.1.3.js" defer></script><!-- defer (9 Nov): 161 KB no longer blocks the first paint; the app starts on DOMContentLoaded, after it -->
   <style>
     * {
       margin: 0;
@@ -2765,6 +2771,26 @@
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700;800&display=swap">
 <style>/* TradingView-style type everywhere (7 Nov): Figtree */ html, body, button, input, select, textarea, h1, h2, h3, h4 { font-family: Figtree, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important; } html { font-variant-numeric: tabular-nums; -webkit-font-smoothing: antialiased; } code, pre, kbd { font-family: "JetBrains Mono", ui-monospace, monospace !important; }</style>
+<style>
+  /* 9 Nov 2026 quality pass (owner: "user friendly, no errors"): readable labels (WCAG AA contrast, 11.5 px floor for the
+     uppercase micro-labels), 44 px touch targets on phones, and the live pill no longer clipped on a 390 px screen */
+  :root { --text-tertiary: #5B6F6B; --mint: #08766A; --mint-2: #065E55; }   /* light: mint text at 5:1 on white (was 3:1) */
+  html:not(.dark) .pnav-live:not(.is-stale):not(.is-offline) .pnav-live-label { color: #fff; }
+  html:not(.dark) .pnav-live:not(.is-stale):not(.is-offline) .pnav-live-dot { background: #fff; }
+  html.dark { --text-tertiary: #8A9E9B; }
+  .ticker-label, .kpi-label, .dash-widget-title, .signal-desc, .clv-lbl, .session-name, .session-countdown, .ry-metric-label, .dash-shortcut-sub, .gauge-row-lbl, .gauge-row-val { font-size: 11.5px !important; }
+  .panel-close { background: none; border: 0; color: inherit; font: inherit; font-size: 22px; line-height: 1; cursor: pointer; min-width: 36px; min-height: 36px; border-radius: 8px; }
+  .panel-close:focus-visible, .ctrl-btn:focus-visible, .pnav-btn:focus-visible { outline: 2px solid var(--mint); outline-offset: 2px; }
+  @media (pointer: coarse) { .ctrl-btn, .panel-close { min-width: 44px !important; min-height: 44px !important; } .pnav-btn { min-height: 44px; } }
+  /* wide screens: the four session pills used to squeeze the price strip into one tall column, and filling them in after load
+     moved the whole page down (layout shift 0.7); now the prices take a full row and the pills sit below in a reserved row */
+  @media (min-width: 901px) {
+    .header-inner { flex-wrap: wrap; row-gap: 16px; }
+    .price-ticker { flex: 1 1 100%; gap: 14px 48px; }
+    .session-bar { flex: 1 1 auto; flex-wrap: wrap; min-height: 34px; }
+  }
+  @media (max-width: 600px) { .pnav-live { padding: 8px 10px !important; } .pnav-live-label { display: none; } .primary-nav { padding-right: 12px; } }
+</style>
 </head>
 <body>
 
@@ -2807,8 +2833,8 @@
       </div>
     </div>
     <div class="header-controls">
-      <button class="ctrl-btn" id="darkToggle" onclick="toggleDarkMode()" title="Toggle dark mode">🌙</button>
-      <button class="ctrl-btn" id="alertsToggle" onclick="toggleAlerts()" title="Price Alerts">
+      <button class="ctrl-btn" id="darkToggle" onclick="toggleDarkMode()" title="Toggle dark mode" aria-label="Switch between light and dark">🌙</button>
+      <button class="ctrl-btn" id="alertsToggle" onclick="toggleAlerts()" title="Price Alerts" aria-label="Price alerts">
         🔔
         <span class="alert-badge" id="alertBadge">0</span>
       </button>
@@ -2823,7 +2849,7 @@
 <div class="alerts-panel" id="alertsPanel">
   <div class="panel-header">
     <span>Price Alerts</span>
-    <span class="panel-close" onclick="toggleAlerts()">×</span>
+    <button type="button" class="panel-close" onclick="toggleAlerts()" aria-label="Close price alerts">×</button>
   </div>
   <button class="j-add-btn" id="notifBtn" style="width:100%;margin-bottom:10px;" onclick="enableNotifs()">🔕 Enable auto alerts (zones · bias · events)</button>
   <div class="alert-form">
@@ -7838,7 +7864,7 @@
         const spot = await fetchSpot(GOLD_SOURCES);
 
         if (spot) {
-          prevGoldPrice = lastGoldPrice;
+          prevGoldPrice = goldIsLive ? lastGoldPrice : spot.val;   // the first live tick has no change (was measured against the 3900 placeholder)
           lastGoldPrice = spot.val;
           goldIsLive    = true;
           lastLiveTs    = Date.now();
@@ -7989,9 +8015,8 @@
     // Theme FIRST — dark terminal by default (institutional standard); an
     // explicit user toggle ('0' = light) is respected. Must run before
     // initChart() so the TradingView embed picks the right theme.
-    const themePref = localStorage.getItem('goldDarkMode');
-    if (themePref === '1' || themePref === null) {
-      document.documentElement.classList.add('dark');
+    // the class is set by the head script (goldDarkMode, else the desk's msPrefs theme, else dark)
+    if (document.documentElement.classList.contains('dark')) {
       const btn = document.getElementById('darkToggle');
       if (btn) btn.textContent = '☀️';
     }
@@ -8263,8 +8288,9 @@
     if (realYield.level !== null) return;
     const seed = 1.95;
     applyRealYield([{ value: String(seed) }, { value: String(seed) }]);
+    realYield.seeded = true; renderRealYieldBanner();
     const t = document.getElementById('tipsYield');
-    if (t && (t.textContent === '…' || t.textContent.trim() === '')) t.textContent = '+' + seed.toFixed(2) + '%';
+    if (t && (t.textContent === '…' || t.textContent.trim() === '')) { t.textContent = '+' + seed.toFixed(2) + '% est.'; t.title = 'A stored estimate until the FRED 10Y TIPS yield arrives (the scoring reads this number)'; }
   }
 
   // ─── VIX (risk sentiment) — FRED VIXCLS, daily close ────────────────────────
@@ -8312,7 +8338,7 @@
     const set = (id, v) => { const e = document.getElementById(id); if (e) e.textContent = v; };
     if (ry.level === null) return;
     const sign = ry.level >= 0 ? '+' : '';
-    set('ry-level', `${sign}${ry.level.toFixed(2)}%`);
+    set('ry-level', `${sign}${ry.level.toFixed(2)}%${ry.seeded ? ' est.' : ''}`);   // a stored estimate until FRED answers
 
     const dirEl = document.getElementById('ry-dir');
     if (dirEl) {
@@ -8579,6 +8605,14 @@
       </div>`;
     })();
     if (!lastGoldPrice) return;
+    if (!goldIsLive) {
+      const si0 = getSessionInfo(), put = (id, v) => { const e = document.getElementById(id); if (e) e.textContent = v; };
+      put('dash-price', '—'); put('dash-price-ch', 'Waiting for a live price…');
+      put('dash-sig', '—'); const b0 = document.getElementById('dash-sig-badge'); if (b0) b0.innerHTML = '<span class="kpi-sub">Needs a live price</span>';
+      put('dash-sess', si0.name); put('dash-sess-sub', si0.sub);
+      put('dash-conf-val', '—'); put('dash-conf-sub', 'Needs a live price');
+      return;
+    }
     renderRealYieldBanner();
     renderEventRiskBanner();
     scalpChartCtl.updateLevels();

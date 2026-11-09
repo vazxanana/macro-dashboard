@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<meta name="color-scheme" content="dark light">
+<meta name="theme-color" content="#08090c" media="(prefers-color-scheme: dark)">
+<meta name="theme-color" content="#f4f6f9" media="(prefers-color-scheme: light)">
+<title>Veteran library · Meridian X</title>
+<meta name="description" content="The Macro veteran's research library: frameworks, briefs, the CPI pilot forecast and the release-integrity study, as published with the desk.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cdefs%3E%3CradialGradient id='g' cx='.35' cy='.3' r='.8'%3E%3Cstop offset='0' stop-color='%23fbe7a6'/%3E%3Cstop offset='.55' stop-color='%23e3b341'/%3E%3Cstop offset='1' stop-color='%238a6312'/%3E%3C/radialGradient%3E%3C/defs%3E%3Ccircle cx='16' cy='16' r='14' fill='url(%23g)'/%3E%3Ccircle cx='16' cy='16' r='10.5' fill='none' stroke='%23fff' stroke-opacity='.35'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<!-- fonts never hold up the first paint: the system font shows until Figtree arrives -->
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600&display=swap" media="print" onload="this.media='all'">
+<script>
+  // Same theme key as the desk (localStorage msPrefs.theme): light stays light, every other desk theme is dark; else the system.
+  (function () { try { var p = JSON.parse(localStorage.getItem('msPrefs') || 'null'); if (p && p.theme) document.documentElement.dataset.theme = p.theme === 'light' ? 'light' : p.theme === 'midnight' ? 'midnight' : 'dark'; } catch (e) {} })();
+</script>
+<link rel="stylesheet" href="/assets/mx-page.css?v=688ec3a7b6">
+<script src="/assets/mx-nav.js?v=3f8fef533d" defer></script>
+<style>
+  /* the Veteran library (scripts/veteran-library.html, copied to /veteran/index.html by scripts/veteran-index.mjs) */
+  .head { padding: 32px 0 20px; }
+  h1 { font: 600 clamp(24px, 3vw, 32px)/1.15 var(--sans); letter-spacing: -.5px; margin: 0 0 8px; }
+  .lede { margin: 0; color: var(--ink-dim); max-width: 70ch; font-size: 14.5px; text-wrap: pretty; }
+  .lede b { color: var(--ink); font-weight: 600; }
+  .more-cpi { margin-top: 4px; font-size: 12.5px; color: var(--ink-faint); }
+  .more-cpi summary { display: inline-flex; align-items: center; min-height: var(--tap); cursor: pointer; color: var(--accent); }
+  .more-cpi p { margin: 0; }
+  .facts { display: flex; flex-wrap: wrap; gap: 6px 8px; margin: 12px 0 0; padding: 0; list-style: none; }
+  .facts li { padding: 3px 10px; border-radius: 999px; border: 1px solid var(--line); background: var(--panel); font-size: 12.5px; color: var(--ink-dim); }
+  .facts b { color: var(--ink); font-weight: 600; }
+
+  .lib { display: grid; grid-template-columns: minmax(250px, 320px) minmax(0, 1fr); gap: 20px; align-items: start; }
+  .side { position: sticky; top: 72px; max-height: calc(100vh - 88px); overflow: auto; padding: 2px 4px 12px 2px; display: flex; flex-direction: column; gap: 12px; }
+  .card { background: var(--panel); border: 1px solid var(--line); border-radius: var(--r); padding: 12px 14px; }
+  .k { margin: 0 0 4px; font: 600 12px var(--sans); color: var(--ink-faint); }
+  .cpi b { display: block; font: 600 22px var(--mono); letter-spacing: -.5px; margin: 2px 0; color: var(--ink); }
+  .cpi p { margin: 4px 0 0; font-size: 12.5px; color: var(--ink-dim); }
+  .pill { display: inline-block; padding: 1px 9px; border-radius: 999px; border: 1px solid var(--line-strong); font-size: 12px; color: var(--ink-dim); }
+  .pill.ok { color: var(--buy); border-color: color-mix(in srgb, var(--buy) 45%, transparent); }
+  .new summary, .docs summary { cursor: pointer; font-weight: 600; font-size: 13px; min-height: var(--tap); display: flex; align-items: center; gap: 6px; list-style: none; }
+  .new summary::-webkit-details-marker, .docs summary::-webkit-details-marker { display: none; }
+  .new summary::before, .docs summary::before { content: ""; width: 6px; height: 6px; border-right: 1.6px solid currentColor; border-bottom: 1.6px solid currentColor; transform: rotate(-45deg); transition: transform .2s var(--ease); margin: 0 4px 0 2px; }
+  .new[open] summary::before, .docs[open] summary::before { transform: rotate(45deg); }
+  .new ul { margin: 4px 0 0; padding-left: 18px; font-size: 12.5px; color: var(--ink-dim); } .new li { margin: 4px 0; }
+  .search { position: relative; }
+  .search input { width: 100%; min-height: var(--tap); padding: 7px 10px 7px 32px; border-radius: var(--r-sm); border: 1px solid var(--line-strong); background: var(--panel); color: var(--ink); font: 500 14px var(--sans); }
+  .search input::placeholder { color: var(--ink-faint); }
+  .search svg { position: absolute; left: 10px; top: 50%; width: 14px; height: 14px; transform: translateY(-50%); color: var(--ink-faint); pointer-events: none; }
+  .nav h2 { margin: 12px 0 4px; font: 600 12px var(--sans); color: var(--ink-faint); letter-spacing: .02em; }
+  .nav h2:first-child { margin-top: 2px; }
+  .nav a { display: flex; align-items: baseline; gap: 6px; min-height: var(--tap); padding: 6px 8px; border-radius: 6px; font: 500 13px/1.35 var(--sans); color: var(--ink-dim); text-decoration: none; }
+  .nav a:hover { background: var(--panel-hover); color: var(--ink); }
+  .nav a[aria-current="page"] { background: var(--accent-soft); color: var(--ink); box-shadow: inset 2px 0 0 var(--accent); }
+  .nav a small { margin-left: auto; color: var(--ink-faint); font-weight: 400; font-size: 12px; flex: none; }
+  .nav .none { color: var(--ink-faint); font-size: 13px; padding: 6px 8px; }
+
+  .doc { min-width: 0; background: var(--panel); border: 1px solid var(--line); border-radius: var(--r); padding: 20px 24px 28px; font-size: 14.5px; line-height: 1.6; color: var(--ink-dim); scroll-margin-top: 72px; }
+  .doc:focus { outline: none; }
+  .doc .meta { display: flex; flex-wrap: wrap; gap: 4px 12px; font-size: 12.5px; color: var(--ink-faint); margin: 0 0 12px; }
+  .doc .meta a { margin-left: auto; }
+  .doc h1 { font-size: 22px; margin: 0 0 10px; color: var(--ink); line-height: 1.25; }
+  .doc h2 { font-size: 18px; margin: 22px 0 8px; color: var(--ink); } .doc h3 { font-size: 15.5px; margin: 18px 0 6px; color: var(--ink); } .doc h4 { font-size: 14.5px; margin: 14px 0 4px; color: var(--ink); }
+  .doc p { margin: 8px 0; } .doc ul, .doc ol { padding-left: 22px; margin: 8px 0; } .doc li { margin: 4px 0; }
+  .doc .tbl { overflow-x: auto; margin: 10px 0; border: 1px solid var(--line); border-radius: var(--r-sm); }
+  .doc table { border-collapse: collapse; font-size: 13px; width: 100%; }
+  .doc th, .doc td { border-bottom: 1px solid var(--line-soft); padding: 6px 9px; vertical-align: top; text-align: left; }
+  .doc th { background: var(--panel-raised); color: var(--ink); font-weight: 600; }
+  .doc code { font: 12.5px var(--mono); background: var(--neutral-soft); padding: 1px 5px; border-radius: 4px; overflow-wrap: anywhere; }
+  .doc pre { background: var(--neutral-soft); border: 1px solid var(--line); border-radius: var(--r-sm); padding: 10px 12px; overflow: auto; }
+  .doc pre code { background: none; padding: 0; overflow-wrap: normal; }
+  .doc blockquote { margin: 10px 0; padding: 4px 14px; border-left: 3px solid var(--line-strong); color: var(--ink-faint); }
+  .doc hr { border: 0; border-top: 1px solid var(--line); margin: 18px 0; }
+  .doc a { overflow-wrap: anywhere; }
+  .doc .note { color: var(--ink-faint); }
+  .doc .err { color: var(--sell); }
+  .pager { display: flex; justify-content: space-between; gap: 12px; margin-top: 24px; padding-top: 14px; border-top: 1px solid var(--line); }
+  .pager a { display: inline-flex; flex-direction: column; min-height: var(--tap); justify-content: center; max-width: 48%; font-size: 13px; }
+  .pager a small { color: var(--ink-faint); font-size: 12px; }
+  .pager a.nx { text-align: right; margin-left: auto; }
+  .foot { margin-top: 28px; color: var(--ink-faint); font-size: 12.5px; max-width: 80ch; }
+  .foot p { margin: 0 0 6px; }
+
+  @media (max-width: 900px) {
+    .lib { grid-template-columns: minmax(0, 1fr); }
+    .side { position: static; max-height: none; overflow: visible; padding: 0; }
+    .doc { padding: 16px 16px 22px; }
+  }
+  @media (max-width: 520px) { .top .crumb, .top .brand.here { display: none; } .doc h1 { font-size: 20px; } }
+</style>
+</head>
+<body>
+<a class="skip" href="#doc">Skip to the document</a>
+<header class="top">
+  <div class="wrap">
+    <a class="brand" href="/" title="Back to the desk"><span class="coin" aria-hidden="true"></span>Meridian X</a>
+    <span class="crumb" aria-hidden="true">/</span>
+    <span class="brand here">Veteran library</span>
+    <div class="check">
+      <nav class="hdr-sw" data-mx-members hidden aria-label="Desk, macro or ChronosTrade"><a href="/#home" title="Back to the main desk"><i aria-hidden="true"></i><span>Desk</span></a><a class="on" data-mx-macro href="/macro-desk" title="Macro desk"><i aria-hidden="true"></i><span>Macro</span></a><a href="/backtest" title="ChronosTrade: manual backtesting, journal and prop-firm challenges"><i aria-hidden="true"></i><span>ChronosTrade</span></a></nav>
+    </div>
+  </div>
+</header>
+<main class="wrap" id="main">
+  <section class="head">
+    <h1>Veteran library</h1>
+    <p class="lede">The research the Macro veteran reads from. Start with <b>Start here</b>, or search for a topic. Reading only: nothing here changes a rule or a trade.</p>
+    <ul class="facts" id="facts" aria-label="About this batch"><li>Loading…</li></ul>
+  </section>
+  <div class="lib">
+    <aside class="side" aria-label="Library">
+      <div class="search"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true"><circle cx="7" cy="7" r="4.5"/><path d="M10.5 10.5L14 14"/></svg><label class="sr" for="q">Find a document</label><input id="q" type="search" placeholder="Find a document" autocomplete="off" spellcheck="false"></div>
+      <div class="card cpi" id="cpi" hidden></div>
+      <details class="card new" id="new" hidden></details>
+      <details class="card docs" id="docs" open><summary id="docs-h">Documents</summary><nav class="nav" id="nav" aria-label="Documents"></nav></details>
+    </aside>
+    <article class="doc" id="doc" tabindex="-1" aria-live="polite"><p class="note">Loading the library…</p></article>
+  </div>
+  <footer class="foot">
+    <p>Published from <span class="num">research/macro-veteran/</span> with every build. Times are shown in UTC with your local time alongside. Paper only: the veteran can lower the desk's conviction, never place a trade.</p>
+    <p><a href="/">Back to the desk</a> <span data-mx-members hidden>· <a data-mx-macro href="/macro-desk">Macro desk</a></span></p>
+  </footer>
+</main>
+<script>
+(function () {
+  'use strict';
+  var $ = function (id) { return document.getElementById(id); };
+  var esc = function (s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); };
+  var I = null, cur = null, phone = window.matchMedia('(max-width: 900px)');
+  var kb = function (b) { return b < 1024 ? b + ' B' : Math.round(b / 1024) + ' KB'; };
+  // 2026-11-10T13:30:00Z -> "Tue 10 Nov, 13:30 UTC (14:30 your time)"; the second part only when the viewer is not on UTC
+  function utc(iso) {
+    var d = new Date(iso); if (!iso || isNaN(d)) return '';
+    var p = function (n) { return (n < 10 ? '0' : '') + n; };
+    var s = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'][d.getUTCDay()] + ' ' + d.getUTCDate() + ' ' + ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'][d.getUTCMonth()] + ', ' + p(d.getUTCHours()) + ':' + p(d.getUTCMinutes()) + ' UTC';
+    if (d.getTimezoneOffset() !== 0) s += ' (' + d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) + (d.toDateString() !== new Date(d.getTime() + d.getTimezoneOffset() * 60000).toDateString() ? ' ' + d.toLocaleDateString([], { day: 'numeric', month: 'short' }) : '') + ' your time)';
+    return s;
+  }
+
+  // a small Markdown renderer (the Macro desk's, plus relative links resolved against the open document): headings, lists,
+  // tables, quotes, fenced code, paragraphs; the text is escaped first, links go to http(s) or to another library document
+  function resolve(href, from) {
+    if (/^https?:/.test(href)) return null;
+    var parts = (from.split('/').slice(0, -1).join('/') + '/' + href.replace(/#.*$/, '')).split('/'), out = [];
+    parts.forEach(function (x) { if (!x || x === '.') return; if (x === '..') out.pop(); else out.push(x); });
+    return out.join('/');
+  }
+  function mdInline(t, from) {
+    return t.replace(/`([^`]+)`/g, function (m, c) { return '<code>' + c + '</code>'; }).replace(/\*\*([^*]+)\*\*/g, '<b>$1</b>').replace(/(^|[^*])\*([^*\n]+)\*/g, '$1<i>$2</i>')
+      .replace(/\[([^\]]+)\]\(([^)\s]+)\)/g, function (m, txt, href) {
+        if (/^https?:/.test(href)) return '<a href="' + href + '" target="_blank" rel="noopener">' + txt + '</a>';
+        var p = resolve(href.replace(/&amp;/g, '&'), from), d = p && find(p);
+        return d ? '<a href="#' + esc(d.path) + '">' + txt + '</a>' : txt;
+      });
+  }
+  function md(src, from) {
+    var lines = esc(src).replace(/\r/g, '').split('\n'), out = [], i = 0, para = [];
+    if (/^---$/.test(lines[0])) { var e = lines.indexOf('---', 1); if (e > 0) i = e + 1; }   // YAML front matter
+    function flush() { if (para.length) { out.push('<p>' + mdInline(para.join(' '), from) + '</p>'); para = []; } }
+    while (i < lines.length) {
+      var l = lines[i];
+      if (/^```/.test(l)) { flush(); var code = []; i++; while (i < lines.length && !/^```/.test(lines[i])) code.push(lines[i++]); i++; out.push('<pre><code>' + code.join('\n') + '</code></pre>'); continue; }
+      var h = /^(#{1,4})\s+(.*)$/.exec(l); if (h) { flush(); out.push('<h' + h[1].length + '>' + mdInline(h[2], from) + '</h' + h[1].length + '>'); i++; continue; }
+      if (/^\s*(-{3,}|\*{3,})\s*$/.test(l)) { flush(); out.push('<hr>'); i++; continue; }
+      if (/^\|/.test(l) && i + 1 < lines.length && /^\|?\s*:?-{2,}/.test(lines[i + 1])) {
+        flush(); var head = l.split('|').slice(1, -1), rows = []; i += 2; while (i < lines.length && /^\|/.test(lines[i])) rows.push(lines[i++].split('|').slice(1, -1));
+        out.push('<div class="tbl"><table><thead><tr>' + head.map(function (c) { return '<th scope="col">' + mdInline(c.trim(), from) + '</th>'; }).join('') + '</tr></thead><tbody>' + rows.map(function (r) { return '<tr>' + r.map(function (c) { return '<td>' + mdInline(c.trim(), from) + '</td>'; }).join('') + '</tr>'; }).join('') + '</tbody></table></div>'); continue; }
+      var li = /^\s*([-*]|\d+\.)\s+(.*)$/.exec(l);
+      if (li) { flush(); var ol = /\d/.test(li[1]), items = []; while (i < lines.length && (li = /^\s*([-*]|\d+\.)\s+(.*)$/.exec(lines[i]))) { var it = li[2]; i++; while (i < lines.length && /^\s{2,}\S/.test(lines[i]) && !/^\s*([-*]|\d+\.)\s+/.test(lines[i])) it += ' ' + lines[i++].trim(); items.push('<li>' + mdInline(it, from) + '</li>'); } out.push((ol ? '<ol>' : '<ul>') + items.join('') + (ol ? '</ol>' : '</ul>')); continue; }
+      if (/^&gt;\s?/.test(l)) { flush(); var q = []; while (i < lines.length && /^&gt;\s?/.test(lines[i])) q.push(lines[i++].replace(/^&gt;\s?/, '')); out.push('<blockquote>' + mdInline(q.join(' '), from) + '</blockquote>'); continue; }
+      if (!l.trim()) { flush(); i++; continue; }
+      para.push(l.trim()); i++;
+    }
+    flush(); return out.join('\n');
+  }
+
+  function find(p) { if (!I || !p) return null; return I.docs.filter(function (d) { return d.path === p || d.path === 'references/' + p || d.path === 'notes/' + p; })[0] || null; }
+  function first() {
+    var st = I.docs.filter(function (d) { return /latest-research-batch-status/.test(d.path); }).map(function (d) { return d.path; }).sort().pop();
+    return find('START_HERE.md') ? 'START_HERE.md' : st || 'SKILL.md';
+  }
+
+  function header(I) {
+    var v = I.validation, t = v && v.tests, f = [];
+    if (I.version) f.push('<li>Revision <b>' + esc(I.version) + '</b></li>');
+    if (I.prepared) f.push('<li>Prepared <b>' + esc(I.prepared) + '</b></li>');
+    f.push('<li><b>' + I.docs.length + '</b> files in ' + I.groups.length + ' groups</li>');
+    if (t) f.push('<li title="' + esc(t.kind || 'evaluator tests') + '">Tests <b>' + t.passed + ' of ' + t.tests + '</b> passed</li>');
+    $('facts').innerHTML = f.join('');
+    var c = I.cpiPilot && I.cpiPilot[0];
+    if (c) {
+      $('cpi').hidden = false;
+      $('cpi').innerHTML = '<p class="k">The veteran\'s forecast: core CPI m/m, ' + esc(c.reference) + '</p><b>' + (c.point == null ? 'n/a' : (+c.point).toFixed(3) + '%') + '</b>' +
+        '<p>Issued ' + esc(utc(c.issuedAt)) + '</p><p>BLS first print ' + esc(utc(c.releaseUtc)) + '</p>' +
+        '<p><span class="pill' + (c.status === 'resolved' ? ' ok' : '') + '">' + esc(c.status) + (c.outcome != null ? ' · actual ' + esc(String(c.outcome)) : '') + '</span></p>' +
+        '<details class="more-cpi"><summary>How it is scored</summary><p>Against the exact one-decimal first-release value, never a revision. One case, so no skill claim.</p></details>';
+    }
+    if (I.whatsNew && I.whatsNew.length) { $('new').hidden = false; $('new').innerHTML = '<summary>What’s new in ' + esc(I.version || 'this revision') + '</summary><ul>' + I.whatsNew.map(function (l) { return '<li>' + mdInline(esc(l), '') + '</li>'; }).join('') + '</ul>'; }
+  }
+
+  function nav(q) {
+    q = (q || '').trim().toLowerCase();
+    var words = q.split(/\s+/).filter(Boolean), n = 0;
+    var html = I.groups.map(function (g) {
+      var ds = I.docs.filter(function (d) { if (d.group !== g) return false; var hay = (d.title + ' ' + d.path).toLowerCase(); return words.every(function (w) { return hay.indexOf(w) >= 0; }); });
+      n += ds.length; if (!ds.length) return '';
+      return '<h2>' + esc(g) + '</h2>' + ds.map(function (d) { return '<a href="#' + esc(d.path) + '"' + (cur && cur.path === d.path ? ' aria-current="page"' : '') + '>' + esc(d.title) + (d.kind !== 'doc' ? '<small>' + esc(d.kind) + '</small>' : '') + '</a>'; }).join('');
+    }).join('');
+    $('nav').innerHTML = html || '<p class="none">No document matches “' + esc(q) + '”.</p>';
+    $('docs-h').textContent = q ? n + ' of ' + I.docs.length + ' documents' : 'Documents (' + I.docs.length + ')';
+  }
+
+  var seq = 0;
+  function open(p, fromUser) {
+    var d = find(p) || find(first());
+    if (!d) { $('doc').innerHTML = '<p class="err">Not in the library: ' + esc(p) + '</p>'; return; }
+    cur = d; var my = ++seq;
+    document.querySelectorAll('#nav a').forEach(function (a) { if (a.getAttribute('href') === '#' + d.path) a.setAttribute('aria-current', 'page'); else a.removeAttribute('aria-current'); });
+    document.title = d.title + ' · Veteran library';
+    var i = I.docs.indexOf(d), pv = I.docs[i - 1], nx = I.docs[i + 1];
+    var pager = '<nav class="pager" aria-label="Previous and next document">' + (pv ? '<a href="#' + esc(pv.path) + '"><small>Previous</small>' + esc(pv.title) + '</a>' : '') + (nx ? '<a class="nx" href="#' + esc(nx.path) + '"><small>Next</small>' + esc(nx.title) + '</a>' : '') + '</nav>';
+    var meta = '<p class="meta"><span>' + esc(d.group) + '</span><span class="num">' + esc(d.path) + '</span>' + (d.date ? '<span>' + esc(d.date) + '</span>' : '') + '<span>' + kb(d.bytes) + '</span><a href="' + encodeURI(d.path) + '" target="_blank" rel="noopener">Open raw</a></p>';
+    var done = function () { if (fromUser) { var el = $('doc'); if (phone.matches) el.scrollIntoView({ block: 'start' }); else window.scrollTo({ top: 0 }); try { el.focus({ preventScroll: true }); } catch (e) {} } };
+    if (d.kind !== 'doc') {
+      $('doc').innerHTML = meta + '<h1>' + esc(d.title) + '</h1><p>' + ({ script: 'A tool from the batch. Run it from a checkout of the repository, never from the browser.', workbook: 'A spreadsheet from the batch; open it with Excel or Numbers.', data: 'A data file from the batch.', log: 'A test log from the batch.' }[d.kind] || '') + '</p><p><a class="btn" href="' + encodeURI(d.path) + '" target="_blank" rel="noopener">Open the file</a></p>' + pager;
+      done(); return;
+    }
+    $('doc').innerHTML = meta + '<p class="note" role="status">Loading ' + esc(d.title) + '…</p>';
+    fetch(encodeURI(d.path), { cache: 'no-cache' }).then(function (r) { if (!r.ok) throw new Error(r.status === 404 ? 'the file is missing from this build' : 'HTTP ' + r.status); return r.text(); })
+      .then(function (t) { if (my !== seq) return; $('doc').innerHTML = meta + md(t, d.path) + pager; done(); },
+        function (e) { if (my !== seq) return; $('doc').innerHTML = meta + '<p class="err">Could not load this document: ' + esc(e.message) + '. <a href="#' + esc(d.path) + '" data-again>Try again</a></p>' + pager; });
+  }
+  function route(fromUser) { var p = decodeURIComponent((location.hash || '').slice(1)); open(p || first(), fromUser && !!p); }
+
+  $('q').addEventListener('input', function () { nav(this.value); });
+  $('q').addEventListener('keydown', function (e) { if (e.key === 'Enter') { var a = document.querySelector('#nav a'); if (a) { location.hash = a.getAttribute('href').slice(1); } } });
+  document.addEventListener('click', function (e) { var a = e.target.closest && e.target.closest('a[data-again]'); if (a) { e.preventDefault(); route(true); } });
+  window.addEventListener('hashchange', function () { route(true); });
+
+  fetch('index.json', { cache: 'no-cache' }).then(function (r) { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); }).then(function (ix) {
+    if (!ix || !Array.isArray(ix.docs) || !ix.docs.length) throw new Error('the index is empty');
+    I = ix; header(I); route(false); nav('');
+  }).catch(function (e) {
+    $('facts').innerHTML = '';
+    $('nav').innerHTML = '';
+    $('doc').innerHTML = '<p class="err">The library could not be loaded (' + esc(e.message) + '). It is published with every build of the site; try again in a minute.</p>';
+  });
+})();
+</script>
+</body>
+</html>
