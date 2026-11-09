@@ -49,6 +49,7 @@
   #snd-btn svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; } #snd-btn .x { display: none; } #snd-btn[aria-pressed="false"] .x { display: inline; } #snd-btn[aria-pressed="false"] .w1, #snd-btn[aria-pressed="false"] .w2 { display: none; }
   .sndset { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; margin-top: 8px; font-size: 12.5px; } .sndset span { color: var(--ink-dim); margin-right: 4px; } .sndset small { flex-basis: 100%; color: var(--ink-faint); }
   #snddd .sndp { left: 0; min-width: 270px; padding: 10px; } #snddd summary { list-style: none; } #snddd .sndon { display: flex; gap: 8px; align-items: center; font-size: 13px; cursor: pointer; } #snddd hr { border: 0; border-top: 1px solid var(--line); margin: 8px 0 0; }
+  .dr-more { border: 1px solid var(--line); border-radius: 10px; padding: 0 12px; } .dr-more summary { cursor: pointer; padding: 10px 0; font-size: 13px; color: var(--ink-dim); list-style: none; } .dr-more summary::before { content: "▸ "; } .dr-more[open] summary::before { content: "▾ "; } .dr-more[open] { padding-bottom: 10px; } .dr-more > * + * { margin-top: 8px; }
   .chartc { position: relative; }
   .qtr { position: absolute; top: 60px; right: 96px; z-index: 6; display: flex; align-items: stretch; gap: 0; border-radius: 12px; overflow: hidden; box-shadow: 0 8px 24px rgba(0,0,0,.22); border: 1px solid var(--line); background: var(--panel); }
   .qtr .qb { border: 0; min-height: 40px; min-width: 96px; padding: 0 16px; font: 700 14px var(--sans, Figtree, sans-serif); color: #fff; cursor: pointer; display: grid; place-items: center; line-height: 1.05; transition: filter .12s, transform .08s; touch-action: manipulation; }
@@ -212,11 +213,13 @@
             <label>Take profit<input type="number" id="o-target" step="any" placeholder="optional"></label><label>Size (units)<input type="number" id="o-units" step="any"></label>
             <div class="full qp"><span>Stop</span><button class="btn sm" data-sl="atr1">1 ATR</button><button class="btn sm" data-sl="atr1.5">1.5 ATR</button><button class="btn sm" data-sl="swing">Last swing</button><button class="btn sm" data-sl="bar">This bar</button></div>
             <div class="full qp"><span>Target</span><button class="btn sm" data-tp="1">1R</button><button class="btn sm" data-tp="1.5">1.5R</button><button class="btn sm" data-tp="2">2R</button><button class="btn sm" data-tp="3">3R</button><button class="btn sm" data-tp="0">none</button></div>
+            <div class="calc" id="calc"></div>
+            <div class="full qb"><button class="btn pri" id="place">Confirm <kbd>Enter</kbd></button><button class="btn" id="o-cancel">Cancel <kbd>Esc</kbd></button></div><div class="err full" id="o-err"></div>
+            <details class="full dr-more" id="dr-more"><summary>Checklist, tags and note <small id="dr-more-n"></small></summary>
             <div class="full rules" id="rules"></div>
             <label class="full">Tags <small>(comma separated)</small><input id="o-tags" placeholder="london sweep, A setup"></label>
             <label class="full">Note<textarea id="o-note" placeholder="Why this trade?"></textarea></label>
-            <div class="calc" id="calc"></div>
-            <div class="full qb"><button class="btn pri" id="place">Confirm <kbd>Enter</kbd></button><button class="btn" id="o-cancel">Cancel <kbd>Esc</kbd></button></div><div class="err full" id="o-err"></div>
+            </details>
           </div>
         </div>
         <div id="open"></div>
@@ -363,6 +366,12 @@
   $('qt-buy').addEventListener('click', () => $('q-buy').click()); $('qt-sell').addEventListener('click', () => $('q-sell').click());
   const qtSync = () => { const r = $('o-risk'); $('qt-risk').textContent = r && r.value ? r.value + '% risk' : ''; const ch = $('chart'); if (ch) $('qtr').style.top = (ch.offsetTop + 10) + 'px'; const p = S.bars && S.bars.length ? px() : null; $('qt-ask').textContent = p == null ? '' : fmt(p); $('qt-bid').textContent = p == null ? '' : fmt(p); };
   setInterval(qtSync, 400); qtSync();
+  // the trade form stays short (owner, 9 Nov: "I need to drop all the way down"): Confirm sits under the levels; the checklist,
+  // tags and note fold away (remembered), and the fold shows how many rules are ticked
+  { const dm = $('dr-more'); try { dm.open = localStorage.getItem('btLab:drMore') === '1'; } catch (e) {}
+    dm.addEventListener('toggle', () => { try { localStorage.setItem('btLab:drMore', dm.open ? '1' : '0'); } catch (e) {} });
+    const cnt = () => { const b = $('rules').querySelectorAll('input[type=checkbox]'), n = [...b].filter((x) => x.checked).length; $('dr-more-n').textContent = b.length ? `${n}/${b.length} rules ticked` : ''; };
+    $('rules').addEventListener('change', cnt); new MutationObserver(cnt).observe($('rules'), { childList: true, subtree: true }); cnt(); }
   const setTool = (t) => { DT = t; DP = null; DM = null; $('chart').classList.toggle('drawing', !!t); if (t) $('drawdd').dataset.on = '1'; else delete $('drawdd').dataset.on; $('drawdd').open = false; if (t) toast(t === 'h' ? 'Click the chart to place a horizontal line' : `Click two points for the ${t === 't' ? 'trend line' : 'box'} · Esc cancels`); overlay(); };
   // H / T / R pick the drawing tool (shown in the Draw menu); the same key again turns it off
   document.addEventListener('keydown', (e) => { if (e.ctrlKey || e.metaKey || e.altKey || /INPUT|TEXTAREA|SELECT/.test(e.target.tagName) || document.querySelector('dialog[open]')) return; const t = { h: 'h', t: 't', r: 'r' }[e.key.toLowerCase()]; if (t) { e.preventDefault(); setTool(DT === t ? null : t); } });
