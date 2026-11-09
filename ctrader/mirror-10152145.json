@@ -2900,7 +2900,8 @@
     "t1": 87.44,
     "adopted": false,
     "alerted": [
-     "open"
+     "open",
+     "close"
     ],
     "viaLimit": true,
     "limitPrice": 86.82,
@@ -2915,7 +2916,8 @@
     "lagSec": 193,
     "positionId": "47775170",
     "volume": 1000,
-    "status": "open"
+    "status": "closed at broker",
+    "closedAt": "2026-11-09T21:42:05.000Z"
    },
    "usdcad-scalp-1794253228": {
     "symbol": "USDCAD",
@@ -3006,7 +3008,7 @@
    "startBalance": 9987.78
   },
   "startedAt": "2026-11-08T11:42:25.000Z",
-  "status": "ok · demo Fusion Markets · balance 9985.96 · 20 open · 1 resting",
+  "status": "ok · demo Fusion Markets · balance 9977.78 · 19 open · 1 resting",
   "skipped": {
    "audusd-position-1793601653": "price 0.68666 has run 1.27R from the council entry 0.70162: a different trade now",
    "xrp-rswing-1793942619": "none of XRPUSD found at the broker",
@@ -3043,15 +3045,10 @@
    }
   },
   "catchUpAt": "2026-11-08T12:04:40.000Z",
-  "balance": 9985.96,
-  "lastRun": "2026-11-09T21:40:31.000Z"
+  "balance": 9977.78,
+  "lastRun": "2026-11-09T21:42:40.000Z"
  },
  "log": [
-  {
-   "at": "2026-11-09T07:03:23.000Z",
-   "msg": "placed sell limit ETHUSD 0.03 lot at 2100.9 (council scalp, valid to 2026-11-09T10:02Z)",
-   "trade": "eth-scalp-1794207743"
-  },
   {
    "at": "2026-11-09T07:06:09.000Z",
    "msg": "limit filled: ETHUSD position 47527636 at the broker",
@@ -4546,6 +4543,11 @@
    "at": "2026-11-09T20:34:45.000Z",
    "msg": "not mirrored xrp-scalp-1794256422: none of XRPUSD found at the broker",
    "trade": "xrp-scalp-1794256422"
+  },
+  {
+   "at": "2026-11-09T21:42:05.000Z",
+   "msg": "SOLUSD position 47775170 closed at the broker",
+   "trade": "sol-rscalp-1794253228"
   }
  ],
  "limits": {
