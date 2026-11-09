@@ -58,7 +58,7 @@
   .qtr { position: absolute; top: 60px; right: 96px; z-index: 6; display: flex; align-items: stretch; gap: 0; border-radius: 12px; overflow: hidden; box-shadow: 0 8px 24px rgba(0,0,0,.22); border: 1px solid var(--line); background: var(--panel); }
   .qtr .qb { border: 0; min-height: 40px; min-width: 96px; padding: 0 16px; font: 700 14px var(--sans, Figtree, sans-serif); color: #fff; cursor: pointer; display: grid; place-items: center; line-height: 1.05; transition: filter .12s, transform .08s; touch-action: manipulation; }
   .qtr .qb b { font: 600 11px var(--mono, ui-monospace, monospace); opacity: .9; } .qtr .qb:hover { filter: brightness(1.08); } .qtr .qb:active { transform: scale(.97); }
-  .qtr .buy { background: var(--buy, #2fbf8f); } .qtr .sell { background: var(--sell, #f2576f); }
+  .qtr .buy { background: #067a64; } .qtr .sell { background: #c8243f; }   /* white label at AA in every theme (dark --buy / --sell gave 1.9-3.3:1) */
   .qtr .qrisk { display: grid; place-items: center; padding: 0 10px; font: 600 11.5px var(--mono, ui-monospace, monospace); color: var(--ink-dim); min-width: 52px; }
   body.fs .qtr { display: none; }
   @media (max-width: 700px) { .qtr { right: auto; left: 50%; transform: translateX(-50%); } .qtr .qb { min-width: 110px; min-height: 46px; } }

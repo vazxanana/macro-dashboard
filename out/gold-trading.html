@@ -2672,6 +2672,7 @@
     .pnav-btn:hover { color: var(--text-primary); background: none; }
     .pnav-btn.active { color: var(--mint); background: none; border: none; box-shadow: none; }
     .pnav-icon { display: none; }
+    .pnav-desk { text-decoration: none; padding-left: 0; margin-right: 10px; }
     .pnav-sep { display: none; }
     .pnav-right {
       margin: 0 0 0 auto; padding: 0; border: none;
@@ -3019,6 +3020,8 @@
 
 <!-- PRIMARY NAV -->
 <nav class="primary-nav" id="primaryNav">
+  <!-- the way back to the desk, first so a phone shows it (QA 9 Nov: the installed app's "Gold" shortcut opens this page with no browser Back) -->
+  <a class="pnav-btn pnav-desk" href="./#home" title="Back to the Meridian X desk">← Desk</a>
   <div class="rail-brand">GOLD<span>TERMINAL · XAU/USD</span></div>
   <button class="pnav-btn active" data-section="dashboard" onclick="switchSection('dashboard',this)">
     <span class="pnav-icon">▣</span> Dashboard
