@@ -1286,6 +1286,33 @@
     "stopCheckedAt": "2026-11-09T07:18:02.000Z",
     "brokerStop": 1.1169,
     "closedAt": "2026-11-09T07:33:04.000Z"
+   },
+   "usdchf-scalp-1794214084": {
+    "positionId": "47565799",
+    "symbol": "USDCHF",
+    "side": "buy",
+    "volume": 200000,
+    "lots": 0.02,
+    "digits": 5,
+    "setup": "scalp",
+    "status": "open",
+    "openedAt": "2026-11-09T08:49:06.000Z",
+    "councilEntry": 0.81794,
+    "stop": 0.8173400000000001,
+    "t1": 0.82206,
+    "riskCash": 2,
+    "margin": 4,
+    "shadow": true,
+    "mark": 0.81794,
+    "levelsFrom": "mark",
+    "fillPrice": 0.81795,
+    "slipR": 0.017,
+    "lagSec": 62,
+    "alerted": [
+     "open"
+    ],
+    "stopCheckedAt": "2026-11-09T08:49:06.000Z",
+    "brokerStop": 0.81735
    }
   },
   "day": {
@@ -1293,7 +1320,7 @@
    "startBalance": 9987.78
   },
   "startedAt": "2026-11-08T11:42:25.000Z",
-  "status": "ok · demo Fusion Markets · balance 10018.74 · 18 open · 2 resting",
+  "status": "ok · demo Fusion Markets · balance 10018.74 · 19 open · 2 resting",
   "skipped": {
    "audusd-position-1793601653": "price 0.68666 has run 1.27R from the council entry 0.70162: a different trade now",
    "xrp-rswing-1793942619": "none of XRPUSD found at the broker",
@@ -1351,14 +1378,9 @@
   },
   "catchUpAt": "2026-11-08T12:04:40.000Z",
   "balance": 10018.74,
-  "lastRun": "2026-11-09T08:46:43.000Z"
+  "lastRun": "2026-11-09T08:49:06.000Z"
  },
  "log": [
-  {
-   "at": "2026-11-08T20:48:06.000Z",
-   "msg": "not mirrored yet eurusd-rswing-1793754423: EURUSD market closed (paused until 20:58 UTC) (will retry)",
-   "trade": "eurusd-rswing-1793754423"
-  },
   {
    "at": "2026-11-08T20:48:06.000Z",
    "msg": "not mirrored yet usdchf-swing-1793762425: USDCHF market closed: MARKET_CLOSED: Trading is not available: Market is closed. (will retry)",
@@ -2853,6 +2875,11 @@
    "at": "2026-11-09T08:31:07.000Z",
    "msg": "not mirrored xrp-rscalp-1794212999: none of XRPUSD found at the broker",
    "trade": "xrp-rscalp-1794212999"
+  },
+  {
+   "at": "2026-11-09T08:49:06.000Z",
+   "msg": "opened buy USDCHF 0.02 lot (council scalp)",
+   "trade": "usdchf-scalp-1794214084"
   }
  ],
  "limits": {
@@ -2931,11 +2958,11 @@
   ]
  },
  "execution": {
-  "n": 44,
-  "meanSlipR": -0.012,
-  "medianSlipR": -0.002,
+  "n": 45,
+  "meanSlipR": -0.011,
+  "medianSlipR": -0.001,
   "worstSlipR": 1.168,
-  "medianLagSec": 2374,
+  "medianLagSec": 1821,
   "bySymbol": {
    "SOLUSD": {
     "n": 5,
@@ -2962,8 +2989,8 @@
     "meanSlipR": -0.019
    },
    "USDCHF": {
-    "n": 6,
-    "meanSlipR": 0.387
+    "n": 7,
+    "meanSlipR": 0.334
    },
    "AUDUSD": {
     "n": 7,
