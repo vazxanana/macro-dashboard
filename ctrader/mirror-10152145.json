@@ -769,7 +769,8 @@
     "t1": 4029.83,
     "adopted": false,
     "alerted": [
-     "open"
+     "open",
+     "close"
     ],
     "viaLimit": true,
     "limitPrice": 4065.91,
@@ -784,7 +785,8 @@
     "lagSec": 122,
     "positionId": "47382347",
     "volume": 100,
-    "status": "open"
+    "status": "closed at broker",
+    "closedAt": "2026-11-09T00:17:15.000Z"
    }
   },
   "day": {
@@ -792,7 +794,7 @@
    "startBalance": 9987.78
   },
   "startedAt": "2026-11-08T11:42:25.000Z",
-  "status": "ok · demo Fusion Markets · balance 9987.78 · 20 open",
+  "status": "ok · demo Fusion Markets · balance 9979.81 · 19 open",
   "skipped": {
    "audusd-position-1793601653": "price 0.68666 has run 1.27R from the council entry 0.70162: a different trade now",
    "xrp-rswing-1793942619": "none of XRPUSD found at the broker",
@@ -807,15 +809,10 @@
   "resetDoneAt": "2026-11-08T11:42:47.000Z",
   "orders": {},
   "catchUpAt": "2026-11-08T12:04:40.000Z",
-  "balance": 9987.78,
-  "lastRun": "2026-11-09T00:14:22.000Z"
+  "balance": 9979.81,
+  "lastRun": "2026-11-09T00:17:15.000Z"
  },
  "log": [
-  {
-   "at": "2026-11-08T20:17:29.000Z",
-   "msg": "not mirrored yet gbpusd-scalp-1793626672: GBPUSD market closed (paused until 20:26 UTC) (will retry)",
-   "trade": "gbpusd-scalp-1793626672"
-  },
   {
    "at": "2026-11-08T20:17:29.000Z",
    "msg": "not mirrored yet usdcad-scalp-1793689919: USDCAD market closed (paused until 20:26 UTC) (will retry)",
@@ -2309,6 +2306,11 @@
   {
    "at": "2026-11-08T23:38:02.000Z",
    "msg": "limit filled: XAUUSD position 47382347 at the broker",
+   "trade": "xau-scalp-1794180919"
+  },
+  {
+   "at": "2026-11-09T00:17:15.000Z",
+   "msg": "XAUUSD position 47382347 closed at the broker",
    "trade": "xau-scalp-1794180919"
   }
  ],
