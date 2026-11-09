@@ -225,8 +225,8 @@
     "status": "open",
     "openedAt": "2026-11-08T22:03:09.000Z",
     "councilEntry": 1.12262,
-    "stop": 1.0799095,
-    "t1": 1.16357,
+    "stop": 1.0794795,
+    "t1": 1.16314,
     "riskCash": 34.14,
     "margin": 2.23,
     "minLot": true,
@@ -243,8 +243,8 @@
     "stopSetAt": "2026-11-08T22:03:09.000Z",
     "stopSetBy": "guard",
     "rr": 0.96,
-    "amended": 2,
-    "amendedAt": "2026-11-09T16:06:50.000Z"
+    "amended": 3,
+    "amendedAt": "2026-11-09T20:04:11.000Z"
    },
    "gbpusd-scalp-1793626672": {
     "positionId": "47373485",
@@ -318,8 +318,8 @@
     "status": "open",
     "openedAt": "2026-11-08T22:03:09.000Z",
     "councilEntry": 1.12262,
-    "stop": 1.0805947,
-    "t1": 1.133425,
+    "stop": 1.0801647,
+    "t1": 1.132995,
     "riskCash": 33.46,
     "margin": 2.23,
     "minLot": true,
@@ -336,8 +336,8 @@
     "stopSetAt": "2026-11-08T22:03:09.000Z",
     "stopSetBy": "guard",
     "rr": 0.26,
-    "amended": 2,
-    "amendedAt": "2026-11-09T16:06:50.000Z"
+    "amended": 3,
+    "amendedAt": "2026-11-09T20:04:11.000Z"
    },
    "usdchf-swing-1793762425": {
     "positionId": "47373488",
@@ -2972,6 +2972,33 @@
     ],
     "noStopTries": 1,
     "closedAt": "2026-11-09T19:46:47.000Z"
+   },
+   "xau-intraday-1794254454": {
+    "symbol": "XAUUSD",
+    "side": "buy",
+    "setup": "intraday",
+    "openedAt": "2026-11-09T20:04:11.000Z",
+    "councilEntry": 4134.135,
+    "stop": 4099.6945535714285,
+    "t1": 4203.015892857144,
+    "adopted": false,
+    "alerted": [
+     "open"
+    ],
+    "viaLimit": true,
+    "limitPrice": 4134.14,
+    "digits": 2,
+    "lots": 0.01,
+    "riskCash": 34.44,
+    "margin": 8.27,
+    "minLot": true,
+    "shadow": true,
+    "fillPrice": 4134.03,
+    "slipR": -0.003,
+    "lagSec": 197,
+    "positionId": "47783605",
+    "volume": 100,
+    "status": "open"
    }
   },
   "day": {
@@ -2979,7 +3006,7 @@
    "startBalance": 9987.78
   },
   "startedAt": "2026-11-08T11:42:25.000Z",
-  "status": "ok · demo Fusion Markets · balance 9985.96 · 19 open · 2 resting",
+  "status": "ok · demo Fusion Markets · balance 9985.96 · 20 open · 1 resting",
   "skipped": {
    "audusd-position-1793601653": "price 0.68666 has run 1.27R from the council entry 0.70162: a different trade now",
    "xrp-rswing-1793942619": "none of XRPUSD found at the broker",
@@ -3012,49 +3039,13 @@
     "alerted": [
      "pending"
     ]
-   },
-   "xau-intraday-1794254454": {
-    "orderId": "33827954",
-    "symbol": "XAUUSD",
-    "side": "buy",
-    "volume": 100,
-    "lots": 0.01,
-    "digits": 2,
-    "setup": "intraday",
-    "limitPrice": 4134.14,
-    "stop": 4099.6945535714285,
-    "t1": 4203.015892857144,
-    "placedAt": "2026-11-09T20:02:17.000Z",
-    "expires": "2026-11-10T08:00:54.000Z",
-    "riskCash": 34.44,
-    "margin": 8.27,
-    "minLot": true,
-    "shadow": true,
-    "alerted": [
-     "pending"
-    ]
    }
   },
   "catchUpAt": "2026-11-08T12:04:40.000Z",
   "balance": 9985.96,
-  "lastRun": "2026-11-09T20:02:17.000Z"
+  "lastRun": "2026-11-09T20:04:11.000Z"
  },
  "log": [
-  {
-   "at": "2026-11-09T06:01:42.000Z",
-   "msg": "placed buy limit USDCAD 0.04 lot at 1.41046 (council scalp, valid to 2026-11-09T09:00Z)",
-   "trade": "usdcad-scalp-1794204019"
-  },
-  {
-   "at": "2026-11-09T06:04:08.000Z",
-   "msg": "limit filled: USDCAD position 47507890 at the broker",
-   "trade": "usdcad-scalp-1794204019"
-  },
-  {
-   "at": "2026-11-09T06:31:43.000Z",
-   "msg": "XAUUSD position 47483504 closed at the broker",
-   "trade": "xau-scalp-1794198321"
-  },
   {
    "at": "2026-11-09T06:48:15.000Z",
    "msg": "USDCAD position 47507890 closed at the broker",
@@ -4539,6 +4530,21 @@
    "at": "2026-11-09T20:02:17.000Z",
    "msg": "placed buy limit XAUUSD 0.01 lot at 4134.14 (council intraday, valid to 2026-11-10T08:00Z)",
    "trade": "xau-intraday-1794254454"
+  },
+  {
+   "at": "2026-11-09T20:04:11.000Z",
+   "msg": "limit filled: XAUUSD position 47783605 at the broker",
+   "trade": "xau-intraday-1794254454"
+  },
+  {
+   "at": "2026-11-09T20:04:11.000Z",
+   "msg": "moved EURUSD 47373484 protection: stop 1.0799095 -> 1.0794795, target 1.16357 -> 1.16314 (council rswing)",
+   "trade": "eurusd-rswing-1793610380"
+  },
+  {
+   "at": "2026-11-09T20:04:11.000Z",
+   "msg": "moved EURUSD 47373487 protection: stop 1.0805947 -> 1.0801647, target 1.133425 -> 1.132995 (council rswing)",
+   "trade": "eurusd-rswing-1793754423"
   }
  ],
  "limits": {
@@ -4617,11 +4623,11 @@
   ]
  },
  "execution": {
-  "n": 99,
+  "n": 100,
   "meanSlipR": -0.004,
   "medianSlipR": 0,
   "worstSlipR": 1.168,
-  "medianLagSec": 161,
+  "medianLagSec": 161.5,
   "bySymbol": {
    "SOLUSD": {
     "n": 9,
@@ -4656,8 +4662,8 @@
     "meanSlipR": 0.041
    },
    "XAUUSD": {
-    "n": 9,
-    "meanSlipR": -0.029
+    "n": 10,
+    "meanSlipR": -0.027
    }
   }
  }
