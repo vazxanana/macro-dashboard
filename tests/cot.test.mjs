@@ -28,3 +28,12 @@ test('signal text speaks in the quoted pair: crowded-short CHF futures lean USD/
   const chf = build({ '092741': rows }, {}).find((m) => m.k === 'chf'), eur = build({ '099741': rows }, {}).find((m) => m.k === 'eur');
   assert.match(chf.signals[0].text, /USD\/CHF down/); assert.equal(chf.signals[0].pairDir, -1); assert.match(eur.signals[0].text, /EUR\/USD up/);
 });
+test('no look-ahead in holiday weeks: a move before the Monday after the report never counts', async () => {
+  const { RELEASE_LAG } = await import('../council/cot.mjs'); assert.equal(RELEASE_LAG, 6);
+  // only the last report fires a flow signal; price jumps +10% on the Friday after it (could be pre-publication in a holiday week)
+  const rows = Array.from({ length: 300 }, (_, i) => ({ t: t0 + i * W, net: Math.round(100 * Math.sin(i)), long: 1, short: 1, tL: 1, tS: 1, oi: 1 }));
+  const t = t0 + 300 * W; rows.push({ t, net: 99999, long: 1, short: 1, tL: 1, tS: 1, oi: 1 });
+  const px = []; for (let d = 0; d < 2200; d++) { const tt = t0 + d * DAY; px.push({ t: tt, v: tt >= t + 3 * DAY ? 110 : 100 }); }
+  const r = evaluate(features(rows), px, 1, { from: t - DAY });
+  assert.equal(r.flow5.n, 1); assert.equal(r.flow5.avg, 0, 'the Friday jump is not in the measured return');
+});

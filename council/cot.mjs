@@ -12,7 +12,8 @@
 //                             at or below the 10th = crowded short → expect up.
 //   * flow      (follow): the week's change in net is 1.5+ standard deviations of the prior year's weekly changes →
 //                         funds are moving hard; expect the price to follow over the next 1 and 4 weeks.
-// Returns start at the first daily close after the Friday release (report date + 3 days), so nothing is known early.
+// Returns start at the first daily candle that opens after report date + 6 days (the Monday after): holiday weeks publish on Monday
+// instead of Friday, so starting earlier could use prices from before the report was public (9 Nov audit). Conservative by design.
 // A signal counts as an edge only with 15+ cases, a hit rate 8+ points above that market's base rate and t >= 2.
 // Paper only: information for the desk; it changes no rule, size or trade.
 // Usage: node council/cot.mjs [dataDir]
@@ -20,6 +21,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 
 const DAY = 86400;
+export const RELEASE_LAG = 6;   // days from the Tuesday report date to the latest normal publication (holiday Monday)
 const FROM = '2019-01-01';   // 3-year lookback ahead of the 2020+ test window
 export const MARKETS = [
   { k: 'gold', name: 'Gold', code: '088691', ds: 'dis', px: 'xau', sign: 1 },
@@ -86,7 +88,7 @@ export const sigFlow = (f) => (f.z == null ? 0 : f.z >= 1.5 ? 1 : f.z <= -1.5 ? 
 
 // forward return of the quoted pair from the first close after the release, h trading days on, in the futures' direction
 function fwd(px, t, h, sign) {
-  const t0 = t + 3 * DAY; let i = px.findIndex((o) => o.t > t0); if (i < 0 || i + h >= px.length) return null;
+  const t0 = t + RELEASE_LAG * DAY; let i = px.findIndex((o) => o.t > t0); if (i < 0 || i + h >= px.length) return null;
   return sign * (px[i + h].v / px[i].v - 1);
 }
 export function evaluate(feats, px, sign, { from = Date.parse('2020-01-01T00:00:00Z') / 1000 } = {}) {
@@ -138,7 +140,7 @@ export async function run({ dir = 'data', fetchImpl = fetch, now = Date.now(), l
   if (!rows) { log('cot: no data', src); return null; }
   const px = {}; for (const m of MARKETS) { try { const j = JSON.parse(fs.readFileSync(path.join(dir, 'research', 'daily', m.px + '.json'), 'utf8')); px[m.px] = j.rows.filter((r) => r && r[4] > 0).map((r) => ({ t: r[0], v: +r[4] })); } catch (e) {} }
   const out = { v: 1, at: new Date(now).toISOString(), paperOnly: true, src, markets: build(rows, px),
-    method: 'Speculators = leveraged funds (financial futures, TFF report) or managed money (metals, Disaggregated report). Positions as of Tuesday, published Friday. Tests: council daily prices since 2020, returns from the first close after the release; "extreme" is contrarian at the 90th/10th percentile of the prior 3 years, "flow" follows a weekly change of 1.5+ standard deviations. An edge needs 15+ cases, a hit rate 8+ points above the base rate and t >= 2.' };
+    method: 'Speculators = leveraged funds (financial futures, TFF report) or managed money (metals, Disaggregated report). Positions as of Tuesday, published Friday. Tests: council daily prices since 2020, returns from the first close after the latest possible release (the Monday after); "extreme" is contrarian at the 90th/10th percentile of the prior 3 years, "flow" follows a weekly change of 1.5+ standard deviations. An edge needs 15+ cases, a hit rate 8+ points above the base rate and t >= 2.' };
   fs.writeFileSync(path.join(M, 'cot.json'), JSON.stringify(out));
   log(`cot: ${out.markets.filter((m) => !m.missing).length}/${MARKETS.length} markets`, JSON.stringify(src));
   return out;
