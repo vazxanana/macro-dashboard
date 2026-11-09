@@ -524,7 +524,7 @@ export async function mirrorRound({ env, trades, state, tokens, specs = null, WS
       let want = !num(t.stop) ? null : isIct ? (fill != null && num(t.entry) ? at(fill + (+t.stop - +t.entry)) : null) : at(t.stop);
       // a stop must sit on the losing side of the fill and above zero (9 Nov audit: a missing level once read as 0)
       // (a trailed stop may sit past the entry, so the side is checked against the current price, when known; else the broker judges)
-      { const side = m.side || t.side, nowPx = t.market ? markOf(marks, t.market, now) : null;
+      { const side = m.side || t.side, nowPx = t.market && !isIct ? markOf(marks, t.market, now) : null;   // ICT: futures price vs a cash-CFD stop, never comparable
         if (want != null && (!(want > 0) || (nowPx != null && ((side === 'buy' && want >= nowPx) || (side === 'sell' && want <= nowPx))))) want = null; }
       const wantT1 = t.t1 != null && !(t.rr >= 50) ? (isIct ? (fill != null ? at(fill + (+t.t1 - +t.entry)) : null) : at(t.t1)) : null;
       const vol = (p.tradeData && +p.tradeData.volume) || m.volume, mk = markOf(marks, t.market, now);
@@ -542,6 +542,9 @@ export async function mirrorRound({ env, trades, state, tokens, specs = null, WS
       try {
         await s.send(PT.AMEND_POSITION_SLTP_REQ, req, PT.EXECUTION_EVENT, amendStep);
         m.stop = t.stop; m.stopSetAt = iso; m.stopSetBy = 'guard'; delete m.noStopTries; out.sent.push({ type: 'amend', trade: id });
+        // (9 Nov audit 2) the reconcile snapshot is stale now: step 2c reads it this round, and an ICT target-only move built from
+        // a null stop would send no stopLoss (cTrader removes the stop) and shift the just-set target a second time
+        p.stopLoss = want; if (req.takeProfit != null) p.takeProfit = req.takeProfit; else delete p.takeProfit; m.t1 = t.t1; m.rr = t.rr;
         say(`set the missing stop on ${m.symbol} ${m.positionId} at ${want} (the broker had opened it without one)`, { trade: id });
         alert('amend', id, m, () => ({ stopFrom: null, stop: t.stop, t1From: m.t1 ?? null, t1: wantT1, brokerStop: want, brokerT1: req.takeProfit ?? null, why: 'the broker opened the position without a stop (the stop distance was inside the spread)' }));
       } catch (e) {
