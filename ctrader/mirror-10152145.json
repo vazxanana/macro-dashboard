@@ -1020,6 +1020,33 @@
     "positionId": "47446367",
     "volume": 100000,
     "status": "open"
+   },
+   "usdcad-scalp-1794195741": {
+    "positionId": "47474553",
+    "symbol": "USDCAD",
+    "side": "buy",
+    "volume": 300000,
+    "lots": 0.03,
+    "digits": 5,
+    "setup": "scalp",
+    "status": "open",
+    "openedAt": "2026-11-09T03:43:20.000Z",
+    "councilEntry": 1.4113,
+    "stop": 1.41046,
+    "t1": 1.41376,
+    "riskCash": 2,
+    "margin": 6,
+    "shadow": true,
+    "mark": 1.4113,
+    "levelsFrom": "mark",
+    "fillPrice": 1.41128,
+    "slipR": -0.024,
+    "lagSec": 59,
+    "alerted": [
+     "open"
+    ],
+    "stopCheckedAt": "2026-11-09T03:43:20.000Z",
+    "brokerStop": 1.41044
    }
   },
   "day": {
@@ -1027,7 +1054,7 @@
    "startBalance": 9987.78
   },
   "startedAt": "2026-11-08T11:42:25.000Z",
-  "status": "ok · demo Fusion Markets · balance 10007.06 · 20 open · 2 resting",
+  "status": "ok · demo Fusion Markets · balance 10007.06 · 21 open · 2 resting",
   "skipped": {
    "audusd-position-1793601653": "price 0.68666 has run 1.27R from the council entry 0.70162: a different trade now",
    "xrp-rswing-1793942619": "none of XRPUSD found at the broker",
@@ -1086,14 +1113,9 @@
   },
   "catchUpAt": "2026-11-08T12:04:40.000Z",
   "balance": 10007.06,
-  "lastRun": "2026-11-09T03:41:01.000Z"
+  "lastRun": "2026-11-09T03:43:20.000Z"
  },
  "log": [
-  {
-   "at": "2026-11-08T20:37:33.000Z",
-   "msg": "not mirrored yet eurusd-rswing-1793610380: EURUSD market closed: MARKET_CLOSED: Trading is not available: Market is closed. (will retry)",
-   "trade": "eurusd-rswing-1793610380"
-  },
   {
    "at": "2026-11-08T20:37:33.000Z",
    "msg": "not mirrored yet gbpusd-scalp-1793626672: GBPUSD market closed: MARKET_CLOSED: Trading is not available: Market is closed. (will retry)",
@@ -2588,6 +2610,11 @@
    "at": "2026-11-09T03:29:45.000Z",
    "msg": "limit filled: AUDUSD position 47446367 at the broker",
    "trade": "audusd-rintra-1794189929"
+  },
+  {
+   "at": "2026-11-09T03:43:20.000Z",
+   "msg": "opened buy USDCAD 0.03 lot (council scalp)",
+   "trade": "usdcad-scalp-1794195741"
   }
  ],
  "limits": {
@@ -2666,11 +2693,11 @@
   ]
  },
  "execution": {
-  "n": 35,
+  "n": 36,
   "meanSlipR": -0.015,
-  "medianSlipR": -0.001,
+  "medianSlipR": -0.002,
   "worstSlipR": 1.168,
-  "medianLagSec": 55060,
+  "medianLagSec": 43780,
   "bySymbol": {
    "SOLUSD": {
     "n": 5,
@@ -2693,8 +2720,8 @@
     "meanSlipR": -0.28
    },
    "USDCAD": {
-    "n": 6,
-    "meanSlipR": 0
+    "n": 7,
+    "meanSlipR": -0.003
    },
    "USDCHF": {
     "n": 5,
