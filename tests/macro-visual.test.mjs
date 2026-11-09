@@ -64,3 +64,17 @@ test('desk: chart hosts, one shared tooltip on hover, tap and focus, n/a for mis
   assert.match(html, /:root\[data-theme="midnight"\]/);
   assert.doesNotMatch(html, /font[^;]*\b(9|10|10\.5|11|11\.5)px/, 'no text under 12px');
 });
+
+test('desk calm pass: one story top to bottom, a staleness stamp, COT says when there is no tested edge', () => {
+  const order = ['s-week', 's-next', 's-why', 's-price', 's-expect', 's-track', 's-deep'].map((id) => html.indexOf(`id="${id}"`));
+  assert.ok(order.every((x, i) => x > 0 && (i === 0 || x > order[i - 1])), 'This week → Next release → Why → Where price sits → What he expects → Track record → the detail');
+  for (const [card, sec] of [['c-glance', 's-week'], ['c-next', 's-next'], ['c-score', 's-why'], ['c-ins', 's-why'], ['c-ladder', 's-price'], ['c-brief', 's-expect'], ['c-calls', 's-track'], ['c-calib', 's-track']]) {
+    const s = html.indexOf(`id="${sec}"`), c = html.indexOf(`id="${card}"`), e = html.indexOf('</section>', s); assert.ok(c > s && c < e, `${card} sits in ${sec}`);
+  }
+  assert.ok(html.indexOf('id="c-changes"') > html.indexOf('id="c-glance"') && html.indexOf('id="c-changes"') < html.indexOf('id="s-next"'), 'what changed folds under the glance');
+  assert.match(html, /<nav class="toc"/); assert.match(html, /function syncStory\(/); assert.match(html, /id="stamp"/);
+  assert.match(html, /STALE_MIN = 90/); assert.match(html, /Stale: last update/);
+  assert.match(html, /m\.edgeStatus/); assert.match(html, /m\.edgeText/); assert.match(html, /'no tested edge'/);
+  assert.match(html, /details\.fold > summary \{[^}]*min-height: 44px/, 'folds are 44 px targets');
+  assert.doesNotMatch(html, /infinite/, 'no infinite animation on the page');
+});
