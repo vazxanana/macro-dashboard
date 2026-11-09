@@ -923,7 +923,8 @@
     "t1": 4134.833714285714,
     "adopted": false,
     "alerted": [
-     "open"
+     "open",
+     "close"
     ],
     "viaLimit": true,
     "limitPrice": 4125.69,
@@ -938,7 +939,8 @@
     "lagSec": 101,
     "positionId": "47445032",
     "volume": 100,
-    "status": "open"
+    "status": "closed at broker",
+    "closedAt": "2026-11-09T02:55:38.000Z"
    },
    "gbpusd-rscalp-1794190773": {
     "symbol": "GBPUSD",
@@ -998,7 +1000,7 @@
    "startBalance": 9987.78
   },
   "startedAt": "2026-11-08T11:42:25.000Z",
-  "status": "ok · demo Fusion Markets · balance 10009.07 · 20 open · 2 resting",
+  "status": "ok · demo Fusion Markets · balance 10007.06 · 19 open · 2 resting",
   "skipped": {
    "audusd-position-1793601653": "price 0.68666 has run 1.27R from the council entry 0.70162: a different trade now",
    "xrp-rswing-1793942619": "none of XRPUSD found at the broker",
@@ -1056,15 +1058,10 @@
    }
   },
   "catchUpAt": "2026-11-08T12:04:40.000Z",
-  "balance": 10009.07,
-  "lastRun": "2026-11-09T02:52:52.000Z"
+  "balance": 10007.06,
+  "lastRun": "2026-11-09T02:55:38.000Z"
  },
  "log": [
-  {
-   "at": "2026-11-08T20:28:54.000Z",
-   "msg": "not mirrored yet usdchf-swing-1793762425: USDCHF market closed (paused until 20:36 UTC) (will retry)",
-   "trade": "usdchf-swing-1793762425"
-  },
   {
    "at": "2026-11-08T20:28:54.000Z",
    "msg": "not mirrored yet xau-position-1793783465: XAUUSD market closed (paused until 20:36 UTC) (will retry)",
@@ -2559,6 +2556,11 @@
    "at": "2026-11-09T02:46:51.000Z",
    "msg": "limit filled: USDCHF position 47453280 at the broker",
    "trade": "usdchf-scalp-1794191336"
+  },
+  {
+   "at": "2026-11-09T02:55:38.000Z",
+   "msg": "XAUUSD position 47445032 closed at the broker",
+   "trade": "xau-scalp-1794189713"
   }
  ],
  "limits": {
