@@ -1147,7 +1147,8 @@
     "t1": 1.41376,
     "adopted": false,
     "alerted": [
-     "open"
+     "open",
+     "close"
     ],
     "viaLimit": true,
     "limitPrice": 1.41046,
@@ -1161,7 +1162,8 @@
     "lagSec": 229,
     "positionId": "47507890",
     "volume": 400000,
-    "status": "open"
+    "status": "closed at broker",
+    "closedAt": "2026-11-09T06:48:15.000Z"
    }
   },
   "day": {
@@ -1169,7 +1171,7 @@
    "startBalance": 9987.78
   },
   "startedAt": "2026-11-08T11:42:25.000Z",
-  "status": "ok · demo Fusion Markets · balance 9995.75 · 21 open · 1 resting",
+  "status": "ok · demo Fusion Markets · balance 9994.09 · 20 open · 1 resting",
   "skipped": {
    "audusd-position-1793601653": "price 0.68666 has run 1.27R from the council entry 0.70162: a different trade now",
    "xrp-rswing-1793942619": "none of XRPUSD found at the broker",
@@ -1206,15 +1208,10 @@
    }
   },
   "catchUpAt": "2026-11-08T12:04:40.000Z",
-  "balance": 9995.75,
-  "lastRun": "2026-11-09T06:45:53.000Z"
+  "balance": 9994.09,
+  "lastRun": "2026-11-09T06:48:15.000Z"
  },
  "log": [
-  {
-   "at": "2026-11-08T20:37:33.000Z",
-   "msg": "not mirrored yet audusd-scalp-1793949425: AUDUSD market closed: MARKET_CLOSED: Trading is not available: Market is closed. (will retry)",
-   "trade": "audusd-scalp-1793949425"
-  },
   {
    "at": "2026-11-08T20:37:33.000Z",
    "msg": "not mirrored yet audusd-intraday-1793949765: AUDUSD market closed (paused until 20:47 UTC) (will retry)",
@@ -2709,6 +2706,11 @@
    "at": "2026-11-09T06:31:43.000Z",
    "msg": "XAUUSD position 47483504 closed at the broker",
    "trade": "xau-scalp-1794198321"
+  },
+  {
+   "at": "2026-11-09T06:48:15.000Z",
+   "msg": "USDCAD position 47507890 closed at the broker",
+   "trade": "usdcad-scalp-1794204019"
   }
  ],
  "limits": {
