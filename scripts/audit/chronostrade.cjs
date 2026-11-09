@@ -249,4 +249,5 @@ await q.click('#tb-more'); await q.waitForTimeout(120);
   await b.close();
   for (const r of R) console.log(`${r.ok ? 'PASS' : 'FAIL'}  ${r.name}${r.ok ? '' : '  ← ' + r.info}`);
   console.log(`\n${R.filter((r) => r.ok).length} / ${R.length} passed`);
+  if (R.some((r) => !r.ok)) process.exitCode = 1; // CI (.github/workflows/ci.yml) fails on any FAIL
 })().catch((e) => { for (const r of R) console.log(`${r.ok ? 'PASS' : 'FAIL'}  ${r.name}${r.ok ? '' : '  ← ' + r.info}`); console.error('ABORTED:', e.message.split('\n')[0]); process.exit(1); });

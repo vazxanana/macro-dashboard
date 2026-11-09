@@ -34,7 +34,11 @@ for (const d of readdirSync(src, { withFileTypes: true })) {
 }
 topics.sort((a, b) => a.topic.localeCompare(b.topic));
 lab.sort((a, b) => a.topic.localeCompare(b.topic));
-const generated = new Date().toISOString();
+// a rebuild of the same studies keeps the previous stamp, so out/ (tracked) stays byte-identical and CI can diff it
+const prev = (f) => { try { return JSON.parse(readFileSync(join(out, f), 'utf8')); } catch (e) { return null; } };
+const pi = prev('index.json'), pl = prev('lab.json');
+const same = pi && pl && pi.generated === pl.generated && JSON.stringify(pi.topics) === JSON.stringify(topics) && JSON.stringify(pl.topics) === JSON.stringify(lab);
+const generated = same ? pi.generated : new Date().toISOString();
 writeFileSync(join(out, 'index.json'), JSON.stringify({ generated, topics }, null, 1));
 writeFileSync(join(out, 'lab.json'), JSON.stringify({ generated, topics: lab }));
 console.log(`edge: published ${topics.length} studies to ${out}`);

@@ -1,0 +1,104 @@
+name: CI
+
+# Site checks on every pull request and every push to main (9 Nov 2026). Free GitHub-hosted runners, no secrets.
+# The unit tests, syntax checks and pinned council-data checks run in tests.yml (same triggers); this adds:
+#   build:  sh scripts/build.sh must leave out/ (tracked) exactly as committed: rebuild and commit out/ with the change.
+#   pages:  the ChronosTrade end-to-end audit (scripts/audit/chronostrade.cjs) and a smoke test of every page
+#           (scripts/audit/smoke.cjs: no page errors, no sideways scroll at 390 px) against out/ served locally.
+#           Both read live candles through meridianx.dev /md/bars (as the audit always has); the smoke test also reads
+#           council-data from the public branch. /api/me is stubbed; nothing writes anywhere.
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+env:
+  PW_VERSION: 1.63.0
+  PORT: 8766
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Build
+        run: sh scripts/build.sh
+
+      - name: out/ matches the commit
+        run: |
+          if [ -n "$(git status --porcelain -- out/)" ]; then
+            git status --short -- out/
+            git --no-pager diff --stat -- out/
+            echo "::error::out/ is stale: run 'sh scripts/build.sh' and commit out/ with your change."
+            exit 1
+          fi
+
+  pages:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      # only Playwright, outside the repo (package.json's Vercel dependencies are not needed here)
+      - name: Install Playwright
+        run: |
+          npm install --prefix "$RUNNER_TEMP/pw" --no-save --no-package-lock --no-audit --no-fund "playwright@$PW_VERSION"
+          echo "NODE_PATH=$RUNNER_TEMP/pw/node_modules" >> "$GITHUB_ENV"
+          echo "$RUNNER_TEMP/pw/node_modules/.bin" >> "$GITHUB_PATH"
+
+      - name: Cache Chromium
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/ms-playwright
+          key: pw-${{ runner.os }}-${{ env.PW_VERSION }}-chromium-shell
+
+      - name: Install Chromium (headless shell)
+        run: |
+          playwright install --only-shell chromium
+          playwright install-deps --dry-run chromium-headless-shell >/dev/null 2>&1 || playwright install-deps chromium-headless-shell
+
+      - name: Build and serve out/
+        run: |
+          sh scripts/build.sh
+          (python3 -m http.server "$PORT" --bind 127.0.0.1 --directory out >/dev/null 2>&1 &)
+          for i in $(seq 1 20); do curl -fsS -o /dev/null "http://127.0.0.1:$PORT/backtest.html" && exit 0; sleep 0.5; done
+          echo "::error::local server did not start"; exit 1
+
+      - name: Page smoke test (every page, 390 px and desktop)
+        run: node scripts/audit/smoke.cjs
+
+      # live candles: one retry so a network blip on meridianx.dev does not fail the PR (a retry shows as a warning)
+      - name: ChronosTrade audit
+        env:
+          AUDIT_OUT: ${{ runner.temp }}/audit/
+        run: |
+          mkdir -p "$AUDIT_OUT"
+          node scripts/audit/chronostrade.cjs && exit 0
+          echo "::warning::ChronosTrade audit failed once; retrying (live candles)"
+          node scripts/audit/chronostrade.cjs
+
+      - name: Audit screenshots
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: audit-screenshots
+          path: ${{ runner.temp }}/audit/
+          retention-days: 7
+          if-no-files-found: ignore
