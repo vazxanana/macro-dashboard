@@ -931,6 +931,14 @@ Audit (9 Nov, owner: "keep finding bugs, this can't have errors"): the stop guar
 left the list (uses the stop saved at the open, `m.stop`); `ensureStop` never sets a stop from a missing level (it read as 0) and
 rejects one on the wrong side of the current mark (closes instead); step 2d closes any position with our label the mirror does
 not manage that has no stop (one with a stop is reported once, `state.orphans`).
+Bug hunt (9 Nov, 3): another account never opens a trade any account has copied, whatever the copy's status (`copiedIds`; before,
+only open copies were excluded and 4 trades stopped at the broker on the base account were opened and lost again on the shadow
+account, 8 Nov); a finished copy is kept past `keepDays` while the council trade is open; an ICT futures roll (`rolled`) is
+absorbed into the copy's saved levels (`absorbRolls`) instead of moving the cash-CFD stop by the roll offset; a pending order the
+council re-quotes cancels the resting limit (`requoted`) and a limit filled at old levels is amended to the council's; mirror files
+are written atomically. The Trader writes with `writeAtomic` and stops (writes nothing) when config / state / trades / research /
+coach.json exists but does not parse (it used to write trades.json out empty). Tests: `tests/ctrader-mirror.test.mjs` ("bug hunt"),
+`tests/trader-state-guard.test.mjs`.
 
 ## Veteran's calls: track record and COT calls (9 Nov 2026, owner: "keep improving our veteran macro")
 Every dated call now carries structured fields (`asset`, `kind`: closeAbove / touchUp / touchDown / range / bigMove / pairUp /

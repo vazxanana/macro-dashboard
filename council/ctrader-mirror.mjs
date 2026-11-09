@@ -49,6 +49,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import crypto from 'node:crypto';
 import { sendAlerts, when, NTFY_DEFAULT } from './alerts.mjs';
+import { writeAtomic } from './jsonio.mjs';   // state files: a killed run never leaves one cut short (the live runner's child timeout)
 
 export const DEMO_HOST = 'wss://demo.ctraderapi.com:5036';
 export const PT = {
@@ -276,6 +277,33 @@ export function applyReset(state, reset, now = Math.floor(Date.now() / 1000)) {
   const dropped = Object.keys(state.map || {}).length;
   return { applied: true, dropped, state: { ...state, map: {}, skipped: {}, wait: {}, paused: {}, day: null, resetAt: at, resetDoneAt: new Date(now * 1000).toISOString() } };
 }
+// every trade id an account's saved state has copied, whatever became of the copy (open, sent, closed at the broker, not filled), or
+// rests a limit order for: another account never opens these (bug hunt 9 Nov: only open / sent ones were excluded, so four trades
+// the base account had copied and seen stopped at the broker were opened and lost a second time on the shadow account, 8 Nov)
+// ICT futures roll (bug hunt 9 Nov): on a contract switch ict/tracker.mjs shiftTrade moves every level of an open trade by the
+// offset (often 0.5-1.5% of the price) and appends { at, by } to `rolled`. The demo trades the cash CFD, which did not move: before,
+// step 2c moved the broker stop by the whole offset (a sell's stop loosened by it, a buy's pushed up to or past the price). The
+// copy's saved council levels (stop, t1, councilEntry) take each roll once; `rollsSeen` counts the ones taken (a copy saved before
+// this code takes only the rolls after its open).
+export function absorbRolls(m, t) {
+  const rolls = Array.isArray(t && t.rolled) ? t.rolled : [];
+  if (m.rollsSeen == null) { const since = Date.parse(m.openedAt) / 1000; m.rollsSeen = Number.isFinite(since) ? rolls.filter((x) => !(+x.at > since)).length : rolls.length; }
+  if (rolls.length <= m.rollsSeen) return 0;
+  const by = rolls.slice(m.rollsSeen).reduce((a, x) => a + (Number.isFinite(+x.by) ? +x.by : 0), 0);
+  for (const k of ['stop', 't1', 'councilEntry']) if (m[k] != null && Number.isFinite(+m[k])) m[k] = +(+m[k] + by).toFixed(6);
+  m.rollsSeen = rolls.length; m.rolledBy = +((+m.rolledBy || 0) + by).toFixed(6);
+  return by;
+}
+// a resting limit whose council order changed its levels since it was placed: the reason to cancel it, else null
+export function requoted(o, t) {
+  const d = Number.isFinite(+o.digits) ? +o.digits : 5, tick = 0.5 * 10 ** -d, num = (v) => v != null && v !== '' && Number.isFinite(+v);
+  const moved = (a, b) => (num(a) !== num(b)) || (num(a) && num(b) && Math.abs(+a - +b) >= tick);
+  if (moved(o.limitPrice, num(t.entry) ? +(+t.entry).toFixed(d) : null)) return `the council re-quoted the order (entry ${o.limitPrice} -> ${t.entry})`;
+  if (moved(o.stop, t.stop)) return `the council re-quoted the order (stop ${o.stop} -> ${t.stop})`;
+  if (o.t1 !== undefined && moved(o.t1, t.t1)) return `the council re-quoted the order (target ${o.t1} -> ${t.t1})`;
+  return null;
+}
+export const copiedIds = (state) => new Set([...Object.keys((state && state.map) || {}), ...Object.keys((state && state.orders) || {})]);
 // ---- books and accounts (8 Nov, owner: "4 extra accounts, one for the shadow trades, the other LIT") -----------------------------
 // Every trade belongs to one book; each book can have its own demo account (same cTrader ID, same token). Account numbers are
 // not secrets: council-data config.json { mirrorAccounts: { council, ict, shadow, lit } }, or the env CTRADER_ACCOUNTS
@@ -461,7 +489,9 @@ export async function mirrorRound({ env, trades, state, tokens, specs = null, WS
       const unanswered = !m && !!(st.skipped && st.skipped[t.id]);
       // the mirror's own LIMIT order filled at the broker (same touch as the council's): the position is ours from now on
       const o = st.orders[t.id] || null;
-      st.map[t.id] = { ...(m || { symbol: o ? o.symbol : t.market.toUpperCase(), side: t.side, setup: t.k, openedAt: iso, councilEntry: t.entry, stop: t.stop, t1: t.t1, adopted: !o, alerted: unanswered || o ? [] : ['open'],
+      // (bug hunt 9 Nov) a filled limit holds the levels the order was placed with: saved as such, so a council level that moved since
+      // (a re-quote) is seen by step 2c and sent to the broker
+      st.map[t.id] = { ...(m || { symbol: o ? o.symbol : t.market.toUpperCase(), side: t.side, setup: t.k, openedAt: iso, councilEntry: t.entry, stop: o && o.stop != null ? o.stop : t.stop, t1: o && o.t1 !== undefined ? o.t1 : t.t1, adopted: !o, alerted: unanswered || o ? [] : ['open'],
           ...(o ? { viaLimit: true, limitPrice: o.limitPrice, digits: o.digits, lots: o.lots, riskCash: o.riskCash, ...(o.margin != null ? { margin: o.margin } : {}), ...(o.minLot ? { minLot: true } : {}), ...(o.shadow ? { shadow: true } : {}),
             ...fillQuality(t, p.price ?? o.limitPrice, now) } : {}) }),
         positionId: pid, volume: +(p.tradeData || {}).volume || (m && m.volume) || (o && o.volume), status: 'open' };
@@ -487,7 +517,9 @@ export async function mirrorRound({ env, trades, state, tokens, specs = null, WS
     //     order follows in step 3 this round), expired / missed / dropped (nothing follows). A cancel the broker rejects means the
     //     order filled meanwhile: the position is adopted next round (step 0), nothing is sent now.
     for (const [id, o] of Object.entries(st.orders)) {
-      const t = byId.get(id), reason = !t ? 'the council dropped the trade' : t.status === 'pending' ? null : t.status === 'open' ? 'the council filled it on its feed first' : `the council ended it: ${t.status}`;
+      // (bug hunt 9 Nov) a pending order the council re-quoted (council/feed.mjs re-derives a resting order's levels when the feed
+      // changes) is cancelled too and placed again at the new levels below: the broker must not fill at the old entry with the old stop
+      const t = byId.get(id), reason = !t ? 'the council dropped the trade' : t.status === 'pending' ? requoted(o, t) : t.status === 'open' ? 'the council filled it on its feed first' : `the council ended it: ${t.status}`;
       if (!reason) continue;
       try { await s.send(PT.CANCEL_ORDER_REQ, { ctidTraderAccountId: ctid, orderId: Number(o.orderId) }, PT.EXECUTION_EVENT, cancelStep);
         delete st.orders[id]; out.sent.push({ type: 'cancel', trade: id }); say(`cancelled ${o.symbol} limit order ${o.orderId} for ${id}: ${reason}`, { trade: id });
@@ -512,6 +544,9 @@ export async function mirrorRound({ env, trades, state, tokens, specs = null, WS
           return { by: 'council', council: t.status, R: t.R ?? null, price: dl.executionPrice ?? null, pnl: cd.grossProfit != null && Number.isFinite(+cd.grossProfit) ? +cd.grossProfit / 10 ** md : null }; }); }
       catch (e) { say(`close ${m.symbol} ${m.positionId} failed: ${e.message}`, { trade: id }); alert('closefail', id, m, { result: scrub(e.message) }); }
     }
+    // 2a) ICT futures rolls: the tracker shifts an open trade's levels by the contract switch (records carry `rolled`); the cash CFD
+    //     at the broker did not move, so the copy's saved council levels take the same shift and step 2c never reads it as a move
+    for (const [id, m] of Object.entries(st.map)) { const t = byId.get(id); if (m.status === 'open' && t && String(id).startsWith('ict:')) absorbRolls(m, t); }
     // 2b) RULE (owner, 8 Nov): a mirrored position never sits without a stop. A market order's relative stop is measured from the
     //     fill, and when the stop distance is inside the spread the broker drops the stop and keeps the position. ensureStop sets
     //     the council's absolute stop (an ICT trade: the council's distance from the fill) by amend, right at the fill and again on
@@ -577,7 +612,8 @@ export async function mirrorRound({ env, trades, state, tokens, specs = null, WS
     //     next round, AMEND_TRIES times in all.
     for (const [id, m] of Object.entries(st.map)) {
       if (m.status !== 'open') continue;
-      const t = byId.get(id); if (!t || !OPEN.has(t.status)) continue;
+      // (bug hunt 9 Nov) a broker-filled limit whose council order is still pending follows the council's levels too
+      const t = byId.get(id); if (!t || !(OPEN.has(t.status) || t.status === 'pending')) continue;
       const p = positions.get(String(m.positionId)); if (!p) continue;
       const d = Number.isFinite(+m.digits) ? +m.digits : 5, at = (v) => +(+v).toFixed(d), tick = 0.5 * 10 ** -d;
       const wantT1 = t.t1 != null && !(t.rr >= 50) ? +t.t1 : null, hadT1 = m.t1 != null && !(m.rr >= 50) ? +m.t1 : null;
@@ -705,7 +741,10 @@ export async function mirrorRound({ env, trades, state, tokens, specs = null, WS
     }
     // housekeeping: skip/retry notes matter only while the council trade is open; finished positions are kept LIMITS.keepDays
     for (const k of ['skipped', 'wait']) for (const id of Object.keys(st[k] || {})) { const t = byId.get(id); if (!t || !(OPEN.has(t.status) || t.status === 'pending')) delete st[k][id]; }
-    for (const [id, m] of Object.entries(st.map)) if (m.closedAt && now - Date.parse(m.closedAt) / 1000 > LIMITS.keepDays * 86400) delete st.map[id];
+    // (bug hunt 9 Nov) never while the council trade is still open or pending: the record is what stops it being copied a second time
+    // (a position / trend trade lives for weeks; one stopped at the broker would have been opened again 30 days later)
+    for (const [id, m] of Object.entries(st.map)) { const t = byId.get(id);
+      if (m.closedAt && now - Date.parse(m.closedAt) / 1000 > LIMITS.keepDays * 86400 && !(t && (OPEN.has(t.status) || t.status === 'pending'))) delete st.map[id]; }
     st.status = `ok · demo ${acc.brokerTitleShort || ''} · balance ${balance} · ${openCount() - Object.keys(st.orders).length} open${Object.keys(st.orders).length ? ` · ${Object.keys(st.orders).length} resting` : ''}`.trim();
     st.balance = balance; st.lastRun = new Date(now * 1000).toISOString();
     return out;
@@ -721,7 +760,7 @@ if (process.argv[1] && process.argv[1].endsWith('ctrader-mirror.mjs')) {
   const raw = JSON.parse(fs.readFileSync(path.join(DIR, 'trades.json'), 'utf8'));
   let ict = []; try { ict = JSON.parse(fs.readFileSync(path.join(DIR, 'ict', 'trades.json'), 'utf8')); } catch (e) {}
   const trades = (Array.isArray(raw) ? raw : raw.trades || []).concat(ictCandidates(ict));
-  const saveTokens = (t) => { fs.mkdirSync(CD, { recursive: true }); fs.writeFileSync(path.join(CD, 'tokens.json'), JSON.stringify(t)); };
+  const saveTokens = (t) => { fs.mkdirSync(CD, { recursive: true }); writeAtomic(path.join(CD, 'tokens.json'), JSON.stringify(t)); };
   let cfg = {}; try { cfg = JSON.parse(fs.readFileSync(path.join(DIR, 'config.json'), 'utf8')) || {}; } catch (e) {}
   const shadows = cfg.mirrorShadow !== false;   // 8 Nov, owner: shadows mirrored too; config.json mirrorShadow: false turns it off
   // the council's latest prices (Trader snapshot): stop/target distances of a council trade are measured from them, see the header
@@ -736,9 +775,10 @@ if (process.argv[1] && process.argv[1].endsWith('ctrader-mirror.mjs')) {
   let accFile = {}; try { accFile = JSON.parse(fs.readFileSync(new URL('./ctrader-accounts.json', import.meta.url), 'utf8')); } catch (e) {}
   const { groups } = accountsFor(process.env, { mirrorAccounts: { ...(accFile.mirrorAccounts || {}), ...(cfg.mirrorAccounts || {}) } }), allAlerts = [], base = String(process.env.CTRADER_ACCOUNT_ID || '').trim();
   let tokens = rd('tokens.json', null), summaryLines = [];
-  // what each account already holds (open / sent positions, resting orders): another account never opens the same trade
+  // what each account has copied (any status, resting orders too; after the owner's reset, if one applies): another account never
+  // opens the same trade
   const fileOf = (acc) => (acc === base ? 'mirror.json' : `mirror-${acc}.json`), held = new Map();
-  for (const g of groups) { const st = (rd(fileOf(g.account), {}).state) || {}; held.set(g.account, new Set([...Object.entries(st.map || {}).filter(([, m]) => m.status === 'open' || m.status === 'sent').map(([id]) => id), ...Object.keys(st.orders || {})])); }
+  for (const g of groups) { const st = (rd(fileOf(g.account), {}).state) || {}; held.set(g.account, copiedIds(applyReset(st, resetFile).state)); }
   for (const g of groups) {
     const file = fileOf(g.account), prev = rd(file, {});
     const exclude = new Set(); for (const [acc, ids] of held) if (acc !== g.account) for (const id of ids) exclude.add(id);
@@ -747,14 +787,14 @@ if (process.argv[1] && process.argv[1].endsWith('ctrader-mirror.mjs')) {
     // every trade is passed (this account keeps managing what it already holds); only its books are opened here
     const r = await mirrorRound({ env: { ...process.env, CTRADER_ACCOUNT_ID: g.account }, trades, state: reset.state, tokens, specs: rd('symbols.json', null), onTokens: saveTokens, shadows, marks, openBooks: g.books, exclude });
     if (r.tokens) tokens = r.tokens;
-    fs.writeFileSync(path.join(CD, file), JSON.stringify({ account: g.account, books: g.books, state: r.state, log: (prev.log || []).concat(r.log).slice(-300), limits: LIMITS, symbols: SYMBOLS, execution: executionStats(r.state.map) }, null, 1));
+    writeAtomic(path.join(CD, file), JSON.stringify({ account: g.account, books: g.books, state: r.state, log: (prev.log || []).concat(r.log).slice(-300), limits: LIMITS, symbols: SYMBOLS, execution: executionStats(r.state.map) }, null, 1));
     summaryLines.push(`${g.books.join('+')} (${g.account}): ${r.state.status}${r.sent.length ? ` · ${r.sent.length} sent` : ''}`);
     // a burst (the catch-up round, or many closes at once) goes as one summary instead of a phone message per position
     if (r.alerts.length > 6) { const n = r.alerts.length, opens = r.alerts.filter((a) => a.kind === 'open').length, closes = r.alerts.filter((a) => a.kind === 'close').length;
       r.alerts = [{ kind: 'summary', n, opens, closes, other: n - opens - closes, catchUp: !(prev.state && prev.state.catchUpAt) && !!r.state.catchUpAt }]; }
     for (const a of r.alerts) allAlerts.push(groups.length > 1 ? { ...a, book: g.books.join('+') } : a);
   }
-  fs.writeFileSync(path.join(CD, 'mirror-accounts.json'), JSON.stringify({ at: new Date().toISOString(), groups: groups.map((g) => ({ account: g.account, books: g.books, file: g.account === base ? 'mirror.json' : `mirror-${g.account}.json` })) }, null, 1));
+  writeAtomic(path.join(CD, 'mirror-accounts.json'), JSON.stringify({ at: new Date().toISOString(), groups: groups.map((g) => ({ account: g.account, books: g.books, file: g.account === base ? 'mirror.json' : `mirror-${g.account}.json` })) }, null, 1));
   if (tokens && JSON.stringify(tokens) !== JSON.stringify(rd('tokens.json', null))) saveTokens(tokens);
   console.log(`cTrader mirror: ${summaryLines.join(' | ')}`);
   const r = { alerts: allAlerts };
