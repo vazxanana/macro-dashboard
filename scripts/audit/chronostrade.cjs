@@ -49,8 +49,8 @@ async function load(p, q = 'xau,15m') { await p.click(`#quick [data-q^="${q}"]`)
   await p.click('#open [data-act=be]'); await p.waitForTimeout(100); const st = await p.$eval('.pos-l input[data-f=stop]', (e) => +e.value); check('break-even moves the stop to entry', Math.abs(st - dr.e) < 0.02, `${st} vs ${dr.e}`);
   await p.click('#open [data-act=half]'); await p.waitForTimeout(100); check('close half books a journal row', (await p.$$('#jbody tr[data-id]')).length === 1 && /50% out/.test(await txt(p, '.pos-card')));
   await p.click('#open [data-act=trail]'); await p.waitForTimeout(100); check('trail toggles on', await p.$eval('#open [data-act=trail]', (e) => e.classList.contains('on')));
-  await p.click('#open [data-act=close]'); await p.waitForTimeout(150); check('close removes the position and journals it', (await p.$$('.pos-card')).length === 0 && (await p.$$('#jbody tr[data-id]')).length === 2);
-  check('snapshot stored for closed trades', (await p.$$('#jbody img.shot')).length === 2);
+  await p.click('#open [data-act=close]'); await p.waitForTimeout(150); check('close removes the position; the journal merges both parts into one trade row', (await p.$$('.pos-card')).length === 0 && (await p.$$('#jbody tr[data-id]')).length === 1 && /2 parts/.test(await txt(p, '#jbody tr[data-id]')), await txt(p, '#jbody tr[data-id]'));
+  check('snapshot stored for closed trades', (await p.$$('#jbody img.shot')).length === 1 && (await p.evaluate(() => Object.keys(Object.values(JSON.parse(localStorage.getItem('btLab:sessions')))[0].shots || {}).length)) === 2);
   // 6. limit and stop orders, cancel
   await p.keyboard.press('s'); const lp = await p.$eval('#o-price', (e) => +e.value); await p.fill('#o-price', String((lp + 3).toFixed(2))); await p.waitForTimeout(80);
   check('sell above price becomes a limit', /limit/.test(await txt(p, '#dr-type')), await txt(p, '#dr-type'));
@@ -117,6 +117,40 @@ async function load(p, q = 'xau,15m') { await p.click(`#quick [data-q^="${q}"]`)
   await p.click('.tabs [data-t=cal]'); const t1 = await txt(p, '#cal-title'); await p.click('#cal-prev'); check('calendar navigates', (await txt(p, '#cal-title')) !== t1); await p.click('#cal-next');
   await p.click('.tabs [data-t=data]'); const [dl] = await Promise.all([p.waitForEvent('download'), p.click('#exp-csv')]); const csv = fs.readFileSync(await dl.path(), 'utf8'); check('CSV export has the trades', csv.trim().split('\n').length >= 2 && /entry/.test(csv.split('\n')[0]), csv.split('\n')[0]);
   const [dj] = await Promise.all([p.waitForEvent('download'), p.click('#exp-json')]); const js = JSON.parse(fs.readFileSync(await dj.path(), 'utf8')); check('JSON export is a session', js.acct && js.sym === 'xau');
+  // 12b. review pass: journal filters / sort / click-through / inline screenshot, analytics charts, session report
+  { await p.click('.tabs [data-t=journal]'); const nAll = (await p.$$('#jbody tr[data-id]')).length;
+    await p.selectOption('#jf-side', 'buy'); const sides = await p.$$eval('#jbody tr[data-id] .badge', (b) => b.map((x) => x.textContent));
+    check('journal filter by side shows only buys and counts them', sides.length > 0 && sides.every((x) => x === 'buy') && /of \d+ trades/.test(await txt(p, '#jf-n')), sides.join(',') + ' ' + await txt(p, '#jf-n'));
+    await p.selectOption('#jf-res', 'loss'); const nets = await p.$$eval('#jbody tr[data-id] td.net', (b) => b.map((x) => x.textContent)); check('win / loss filter keeps losses only', nets.every((x) => /−/.test(x)), nets.join(' '));
+    await p.click('#jf-clear'); check('clear filters brings every trade back', (await p.$$('#jbody tr[data-id]')).length === nAll, nAll);
+    await p.click('.jt th[data-k=R] button'); let rs = await p.$$eval('#jbody tr[data-id] .rchip', (b) => b.map((x) => parseFloat(x.textContent.replace('−', '-')) || 0));
+    const desc = rs.every((v, i) => !i || rs[i - 1] >= v); await p.click('.jt th[data-k=R] button'); rs = await p.$$eval('#jbody tr[data-id] .rchip', (b) => b.map((x) => parseFloat(x.textContent.replace('−', '-')) || 0));
+    check('R column sorts both ways', desc && rs.every((v, i) => !i || rs[i - 1] <= v) && (await p.getAttribute('.jt th[data-k=R]', 'aria-sort')) === 'ascending', rs.join(' '));
+    await p.fill('#jbody tr[data-id] input[data-f=tags] >> nth=0', 'breakout'); await p.press('#jbody tr[data-id] input[data-f=tags] >> nth=0', 'Tab'); await p.waitForTimeout(100);
+    check('inline tag edit feeds the setup filter', await p.$$eval('#jf-tag option', (o) => o.some((x) => x.value === 'breakout')));
+    await p.selectOption('#jf-tag', 'breakout'); check('setup filter narrows the journal', (await p.$$('#jbody tr[data-id]')).length === 1); await p.click('#jf-clear');
+    await p.click('#jbody tr[data-id] [data-go] >> nth=0'); await p.waitForTimeout(400);
+    check('click-through frames the trade and draws its levels', /trade \d+/.test(await txt(p, '#legend')) && await p.evaluate(() => document.querySelector('#jbody tr.hl') != null), await txt(p, '#legend'));
+    await p.screenshot({ path: OUT + 'ct-review-trade.png' });
+    const png = Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAIAAAACCAIAAAD91JpzAAAAFklEQVR4nGP8z8DAwMDAxMDAwMDAAAANHQEDasKb6QAAAABJRU5ErkJggg==', 'base64');
+    const [fc] = await Promise.all([p.waitForEvent('filechooser'), p.click('#jbody tr[data-id] [data-up] >> nth=-1')]); await fc.setFiles({ name: 'shot.png', mimeType: 'image/png', buffer: png }); await p.waitForTimeout(400);
+    check('a screenshot can be added inline', /Screenshot saved/.test(await txt(p, '#toasts')), await txt(p, '#toasts'));
+    await p.click('.tabs [data-t=stats]'); await p.waitForTimeout(200);
+    check('KPI tiles: win rate, expectancy, profit factor', /Win rate/.test(await txt(p, '#kpis')) && /Expectancy/.test(await txt(p, '#kpis')) && /Profit factor/.test(await txt(p, '#kpis')) && !/NaN|undefined/.test(await txt(p, '#kpis')), await txt(p, '#kpis'));
+    check('equity curve with drawdown shading and legend', (await p.$$('#v-eq svg .bv-line')).length === 1 && (await p.$$('#v-eq .bv-dd')).length === 1 && /Drawdown/.test(await txt(p, '#v-eq .bv-leg')));
+    check('R histogram renders bars and the average', (await p.$$('#v-hist .bv-bar')).length >= 2 && /avg/.test(await txt(p, '#v-hist')));
+    check('weekday × hour heatmap renders cells', (await p.$$('#v-heat .bv-cell')).length >= 1 && (await p.$$('#v-heat .bv-cell0')).length > 50);
+    await p.hover('#v-heat .bv-cell >> nth=0'); await p.waitForTimeout(80); check('chart tooltip shows on hover', await p.$eval('.bv-tip', (e) => !e.hidden && /UTC/.test(e.textContent)).catch(() => false));
+    check('setup and rule-compliance charts render', (await p.$$('#v-tag .bv-bar')).length >= 1 && ((await p.$$('#v-rules .bv-bar')).length >= 1 || /Tick/.test(await txt(p, '#v-rules'))), await txt(p, '#v-rules'));
+    await p.click('.tabs [data-t=journal]'); await p.selectOption('#jf-side', 'sell'); await p.click('.tabs [data-t=stats]'); check('analytics follow the journal filters', /journal filters/.test(await txt(p, '#afilt'))); await p.screenshot({ path: OUT + 'ct-analytics.png', fullPage: true });
+    await p.click('.tabs [data-t=journal]'); await p.click('#jf-clear'); await p.click('.tabs [data-t=stats]');
+    await p.click('#rep-btn'); await p.waitForTimeout(200); check('session report opens with key numbers, best / worst and mistakes', await p.$eval('#repd', (e) => e.open) && /Win rate/.test(await txt(p, '#rep')) && /Best trade/.test(await txt(p, '#rep')) && /Mistakes/.test(await txt(p, '#rep')) && (await p.$$('#rep-eq svg')).length === 1);
+    await p.screenshot({ path: OUT + 'ct-report.png' });
+    await ctx.grantPermissions(['clipboard-read', 'clipboard-write']).catch(() => {}); await p.click('#rep-copy'); await p.waitForTimeout(150); const clip = await p.evaluate(() => navigator.clipboard.readText()).catch(() => '');
+    check('report copies as text', /session report/.test(clip) && /Net P&L/.test(clip), clip.slice(0, 80));
+    const [dp] = await Promise.all([p.waitForEvent('download'), p.click('#rep-png')]); const pb = fs.readFileSync(await dp.path()); check('report downloads as a PNG image', pb.slice(1, 4).toString() === 'PNG' && pb.length > 5000, pb.length); fs.writeFileSync(OUT + 'ct-report-image.png', pb);
+    const [pw] = await Promise.all([ctx.waitForEvent('page'), p.click('#rep-print')]); await pw.waitForLoadState(); check('printable page opens with the report', /Best trade/.test(await pw.textContent('body')) && (await pw.$$('svg')).length === 1); await pw.screenshot({ path: OUT + 'ct-report-print.png', fullPage: true }); await pw.close();
+    await p.keyboard.press('Escape'); }
   // 13. reload resumes the session
   await p.click('.tabs [data-t=journal]'); const jn = (await p.$$('#jbody tr[data-id]')).length; await p.reload({ waitUntil: 'load' }); await p.waitForFunction(() => /Resumed/.test(document.getElementById('loadmsg').textContent), null, { timeout: 120000 }).catch(() => {}); await p.waitForTimeout(500);
   check('reload resumes the last session', (await p.$$('#jbody tr[data-id]')).length === jn && jn > 0, `${jn} vs ${(await p.$$('#jbody tr[data-id]')).length}`);
@@ -131,7 +165,7 @@ async function load(p, q = 'xau,15m') { await p.click(`#quick [data-q^="${q}"]`)
   await p.click('#fs-btn'); await p.waitForTimeout(200); check('full screen exits and the Trade card returns to the side', !(await p.evaluate(() => document.body.classList.contains('fs'))) && (await p.$eval('#tradecard', (e) => !!e.closest('.side'))));
   // 15. settings: commission
   await p.$eval('#comm', (e) => { e.closest('details').open = true; }); await p.fill('#comm', '7'); await p.dispatchEvent('#comm', 'change'); await p.evaluate(() => document.activeElement.blur());
-  await p.keyboard.press('b'); await p.click('#place'); await p.click('#open [data-act=close]'); await p.waitForTimeout(100); const lastNet = await p.$eval('#jbody tr[data-id] td:nth-child(11)', (e) => e.textContent); check('commission is charged on close', /−\$7|-\$7|−\$/.test(lastNet), lastNet);
+  await p.keyboard.press('b'); await p.click('#place'); await p.click('#open [data-act=close]'); await p.waitForTimeout(100); const lastNet = await p.$eval('#jbody tr[data-id] td.net', (e) => e.textContent); check('commission is charged on close', /−\$7|-\$7|−\$/.test(lastNet), lastNet);
   // 16. new session + delete
   await p.click('#sess-toggle'); await p.click('#newsess'); check('New session clears the chart', (await txt(p, '#sess-sum')).includes('New session'));
   // 17. phone layout and light theme
@@ -141,6 +175,8 @@ async function load(p, q = 'xau,15m') { await p.click(`#quick [data-q^="${q}"]`)
   await m.evaluate(() => localStorage.setItem('msPrefs', JSON.stringify({ theme: 'light' }))); await m.reload({ waitUntil: 'load' }); await m.waitForTimeout(1500);
   check('light theme applies', await m.evaluate(() => getComputedStyle(document.body).backgroundColor !== 'rgb(8, 9, 12)'), await m.evaluate(() => getComputedStyle(document.body).backgroundColor));
   await m.screenshot({ path: OUT + 'ct-phone-light.png' });
+  { await m.click('.tabs [data-t=stats]').catch(() => {}); await m.waitForTimeout(300); check('phone: analytics fit at 390 px', !(await m.evaluate(() => document.documentElement.scrollWidth > innerWidth + 1))); await m.$eval('#tab-stats', (e) => e.scrollIntoView()); await m.screenshot({ path: OUT + 'ct-analytics-phone-light.png' });
+    await m.click('#rep-btn').catch(() => {}); await m.waitForTimeout(200); const rw = await m.$eval('#repd', (e) => { const r = e.getBoundingClientRect(); return { l: r.left, r: r.right }; }); check('phone: session report fits', rw.l >= 0 && rw.r <= 390, JSON.stringify(rw)); await m.screenshot({ path: OUT + 'ct-report-phone-light.png' }); await m.keyboard.press('Escape'); }
   check('no page errors', errs.length === 0, errs.join(' | '));
   await b.close();
   for (const r of R) console.log(`${r.ok ? 'PASS' : 'FAIL'}  ${r.name}${r.ok ? '' : '  ← ' + r.info}`);
