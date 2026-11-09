@@ -20,6 +20,7 @@
 const crypto = require('node:crypto');
 
 const ACC = require('./_accounts');
+const G = require('./_guard');
 const OWNER_HASH = ACC.OWNER_HASH;
 const HOSTS = { demo: 'wss://demo.ctraderapi.com:5036', live: 'wss://live.ctraderapi.com:5036' };
 const PT = { APP_AUTH_REQ: 2100, APP_AUTH_RES: 2101, ACCOUNT_AUTH_REQ: 2102, ACCOUNT_AUTH_RES: 2103, ASSET_LIST_REQ: 2112, ASSET_LIST_RES: 2113,
@@ -219,7 +220,8 @@ async function handle(req, res, { env = process.env, WS = globalThis.WebSocket, 
     if (req.method !== 'POST') return res.status(405).json({ error: 'GET or POST' });
     let b; try { b = typeof req.body === 'string' ? JSON.parse(req.body || '{}') || {} : req.body || {}; } catch (e) { return res.status(400).json({ error: 'bad JSON' }); }
     if (b.action === 'session') {
-      const who = await identify(deps, b.user, b.pw); if (!who) return res.status(403).json({ error: 'Password not accepted' });
+      const secs = G.wait(req); if (secs) return G.tooMany(res, secs);   // password guessing (api/_guard.js)
+      const who = await identify(deps, b.user, b.pw); if (!who) { G.failed(req); return res.status(403).json({ error: 'Password not accepted' }); }
       return res.status(200).json({ session: sign(env, { k: 'sess', u: who.u, f: fpOf(env, who.h), exp: Date.now() + 30 * 86400e3 }), user: who.u });
     }
     const ses = verify(env, b.session);

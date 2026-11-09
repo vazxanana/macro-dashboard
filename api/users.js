@@ -14,6 +14,7 @@ const put = (...a) => blob().put(...a), list = (...a) => blob().list(...a), del 
 const crypto = require('node:crypto');
 const A = require('./_accounts');
 const S = require('./_session');
+const G = require('./_guard');
 const OWNER_HASH = A.OWNER_HASH;
 const isOwner = (pw) => !!pw && String(pw).length <= 200 && crypto.timingSafeEqual(Buffer.from(A.sha(pw)), Buffer.from(OWNER_HASH));   // constant time
 const tok = (env) => env.BLOB_READ_WRITE_TOKEN;
@@ -76,8 +77,9 @@ async function handle(req, res, d = {}) {
     if (req.method !== 'POST') return res.status(405).json({ error: 'GET or POST' });
     if (!S.sameOrigin(req)) return res.status(403).json({ error: 'Owner password not accepted' });
     let b; try { b = typeof req.body === 'string' ? (JSON.parse(req.body || '{}') || {}) : (req.body || {}); } catch (e) { return res.status(400).json({ error: 'bad JSON' }); }
-    let owner = isOwner(b.ownerPw);
-    if (!owner) { const acct = await S.fromRequest(req, env, deps).catch(() => null); owner = !!acct && acct.u === 'owner'; }
+    // the owner's session, else the owner password (counted against the shared password-guess limit, api/_guard.js)
+    const acct = await S.fromRequest(req, env, deps).catch(() => null); let owner = !!acct && acct.u === 'owner';
+    if (!owner && b.ownerPw) { const secs = G.wait(req); if (secs) return G.tooMany(res, secs); owner = isOwner(b.ownerPw); if (!owner) G.failed(req); }
     if (!owner) return res.status(403).json({ error: 'Owner password not accepted' });
     const cur = await load(), j = withHashes(b.users, (cur && cur.users) || {}, d.builtIns || A.builtInUsers()); if (j.error) return res.status(400).json({ error: j.error });
     const users = clean(j.users); if (!users) return res.status(400).json({ error: 'Bad user list' });
