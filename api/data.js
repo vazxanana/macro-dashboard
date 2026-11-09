@@ -40,6 +40,7 @@ async function bridgePing(req) {
 }
 async function handle(req, res, d = {}) {
   const env = d.env || process.env;
+  if (req.method && req.method !== 'GET' && req.method !== 'HEAD') { res.setHeader('Allow', 'GET, HEAD'); return res.status(405).json({ error: 'GET' }); }   // reads only (no GitHub call, no bridge ping)
   const p = String((req.query && req.query.p) || '').replace(/^\/+/, '');
   if (!p || p.length > 200 || !/^[A-Za-z0-9._\/-]+$/.test(p) || p.split('/').some((s) => s === '' || s === '..' || s.startsWith('.'))) return res.status(400).json({ error: 'bad path' });
   if (PRIVATE.has(p.toLowerCase())) return res.status(404).json({ error: 'not found' });   // sealed secrets and hashes stay server-side

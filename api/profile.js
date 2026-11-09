@@ -28,7 +28,7 @@ async function handle(req, res, d = {}) {
     const u = acct.u;
     if (req.method === 'GET') return res.status(200).json((await store.get(u)) || {});
     let b; try { b = typeof req.body === 'string' ? JSON.parse(req.body || '{}') : req.body || {}; } catch (e) { return res.status(400).json({ error: 'bad JSON' }); }
-    b = b || {};
+    b = b == null ? {} : b; if (typeof b !== 'object' || Array.isArray(b)) return res.status(400).json({ error: 'bad JSON' });   // 5, "x", [..] used to throw a 500
     const cur = (await store.get(u)) || {}, next = { ...cur };
     if ('photo' in b) { if (b.photo == null) delete next.photo; else if (typeof b.photo === 'string' && /^data:image\/(jpeg|png);base64,[A-Za-z0-9+/=]+$/.test(b.photo) && b.photo.length <= 160e3) next.photo = b.photo; else return res.status(400).json({ error: 'photo must be a JPEG or PNG under 160 KB' }); }
     if ('name' in b) { const n = b.name == null ? '' : String(b.name).replace(/[<>]/g, '').trim().slice(0, 24); if (n) next.name = n; else delete next.name; }

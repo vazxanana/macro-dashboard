@@ -5,13 +5,14 @@ const { all, read, save } = require('./_alerts');
 const { SYM } = require('./_oanda');
 const DEC = { xau: 2, xag: 3, eurusd: 5, gbpusd: 5, audusd: 5, usdcad: 5, usdchf: 5, usdjpy: 3, nas100: 1, spx500: 1 };
 module.exports = async (req, res) => {
-  if (!process.env.CRON_SECRET || req.headers.authorization !== `Bearer ${process.env.CRON_SECRET}`) return res.status(401).json({ error: 'unauthorised' });
+  if (!require('./_guard').bearerOk(req.headers && req.headers.authorization, process.env.CRON_SECRET)) return res.status(401).json({ error: 'unauthorised' });   // constant time
   const tok = process.env.OANDA_TOKEN; if (!tok || !process.env.VAPID_PRIVATE_KEY) return res.status(200).json({ skipped: 'not set up' });
   webpush.setVapidDetails('https://meridianx.dev', process.env.VAPID_PUBLIC_KEY, process.env.VAPID_PRIVATE_KEY);
   const host = process.env.OANDA_ENV === 'live' ? 'api-fxtrade.oanda.com' : 'api-fxpractice.oanda.com', now = Math.floor(Date.now() / 1000);
   try {
     const { by, blobs } = await all(); if (!by.size) return res.status(200).json({ devices: 0 });
-    const devs = []; for (const [id, bl] of by) { try { devs.push({ id, d: await read(bl) }); } catch (e) {} }
+    // an unreadable or malformed record is skipped (and kept: never deleted on a read error); it must not stop the other devices
+    const devs = []; for (const [id, bl] of by) { try { const d = await read(bl); if (d && typeof d === 'object' && d.sub && Array.isArray(d.alerts || [])) devs.push({ id, d }); } catch (e) {} }
     const need = {}; devs.forEach(({ d }) => (d.alerts || []).forEach((a) => { need[a.sym] = Math.min(need[a.sym] || now, Math.max(a.at, now - 900)); }));
     const bars = {};
     await Promise.all(Object.entries(need).map(async ([sym, from]) => {

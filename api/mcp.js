@@ -88,8 +88,8 @@ async function granted(name, host, env = process.env) {
   let users = GRANT.users;
   if (!users || Date.now() - GRANT.at > 60e3) { try { const ct = require('./ctrader-link.js')._t; const r = await ct.blobUsers(env, host); users = (r && r.users) || {}; GRANT.users = users; GRANT.at = Date.now(); } catch (e) { if (!GRANT.users) return false; users = GRANT.users; } }   // fails closed: no list read yet, no grant (a built-in member disabled on the Users page stays out)
   const u = users[name]; if (u && u.disabled) return false;
-  if (u && (u.mcp || (u.perms && u.perms.mcp))) return true;
-  if (u && u.perms && u.perms.mcp === false) return false;
+  if (u && u.perms && typeof u.perms.mcp === 'boolean') return u.perms.mcp;   // an explicit permission wins over the older flag (as msPerms on the page)
+  if (u && u.mcp) return true;
   return PROFILE_USERS.includes(name);
 }
 // ICT permission of the member (Users page: perms.ict false | 'read' | 'write', else the record's ict flag, else the built-in record).
@@ -479,9 +479,10 @@ module.exports = async (req, res) => {
     let b; try { b = typeof req.body === 'string' ? JSON.parse(req.body) : req.body; } catch (e) { return res.status(400).json({ error: 'bad JSON' }); }
     if (b.action !== 'mykey') return res.status(400).json({ error: 'unknown action' });
     const want = String(b.user || '').toLowerCase(); if (!/^[a-z0-9-]{1,24}$/.test(want) || want === 'owner') return res.status(403).json({ error: 'Not available for this account' });
+    const G = require('./_guard.js'), secs = G.wait(req); if (secs) return G.tooMany(res, secs);   // password guessing, shared budget
     try {
       const ct = require('./ctrader-link.js')._t, blobUsers = () => ct.blobUsers(process.env, H.host), who = await ct.identify({ blobUsers }, want, b.pw);
-      if (!who || who.u !== want) return res.status(403).json({ error: 'Password not accepted' });
+      if (!who || who.u !== want) { G.failed(req); return res.status(403).json({ error: 'Password not accepted' }); }
       // the owner grants the connector per member (Users page, 8 Nov): the record's mcp flag or perms.mcp; Fred has it built in
       if (!(await granted(want, H.host))) return res.status(403).json({ error: 'The owner has not switched the connector on for you' });
       const k = keyFor(want); if (!k) return res.status(503).json({ error: 'The server has no key secret yet; ask the owner' });

@@ -1378,6 +1378,7 @@ document.addEventListener('DOMContentLoaded', function () {
       try { localStorage.setItem('ms-acct', JSON.stringify(j.account)); localStorage.removeItem('ms-guest'); } catch (e) {} location.reload(); return; }
     btn.disabled = false; btn.textContent = 'Sign in';
     if (!r || r.status >= 500) { err.textContent = 'Sign-in is not available right now. Try again in a minute.'; return; }
+    if (r.status === 429) { err.textContent = (j && j.error) || 'Too many password attempts. Try again in a few minutes.'; return; }   // api/_guard.js
     window.msTrack && msTrack('Sign in', { result: 'wrong' }); err.textContent = 'Wrong password.'; document.getElementById('ms-gate-p').select(); });
   if (gb) gb.addEventListener('click', function () { window.msTrack && msTrack('Guest'); var was = document.documentElement.dataset.mode === 'public' && localStorage.getItem('ms-guest'); try { localStorage.setItem('ms-guest', '1'); } catch (e) {} if (was) msGate(false); else location.reload(); });
   if (x) x.addEventListener('click', function () { msGate(false); });

@@ -6,6 +6,7 @@
 // (the owner's clip, shipped with the site); without a target sound, the built-in chime.
 const isOwner = (pw) => require('./users.js')._t.isOwner(pw);
 const S = require('./_session.js');
+const G = require('./_guard.js');
 const MAX = 700 * 1024;
 function blobStore(env, io = {}) {
   const B = () => io.blob || require('@vercel/blob'), F = io.fetch || fetch, token = env.BLOB_READ_WRITE_TOKEN, P = 'sounds/config.json';
@@ -27,7 +28,10 @@ async function handle(req, res, d = {}) {
     let b; try { b = typeof req.body === 'string' ? JSON.parse(req.body || '{}') : req.body; } catch (e) { b = null; } if (!b || typeof b !== 'object') b = {};
     // the owner's session (same-origin, checked above) or the owner password
     const viaSession = await (d.isOwnerSession || ((r) => require('./_session.js').isOwnerSession(r, env)))(req).catch(() => false);
-    if (!viaSession && !owner(b.ownerPw)) return res.status(403).json({ error: 'Owner password not accepted' });
+    if (!viaSession) {   // the owner password, under the shared password-guess limit (api/_guard.js)
+      const secs = b.ownerPw ? G.wait(req) : 0; if (secs) return G.tooMany(res, secs);
+      if (!owner(b.ownerPw)) { if (b.ownerPw) G.failed(req); return res.status(403).json({ error: 'Owner password not accepted' }); }
+    }
     if (b.kind !== 'sl' && b.kind !== 'tp') return res.status(400).json({ error: 'kind must be sl or tp' });
     let v = null;
     if (b.data != null) {
@@ -37,7 +41,7 @@ async function handle(req, res, d = {}) {
     }
     const c = (await store.get()) || {}; c[b.kind] = v; await store.put(c);
     return res.status(200).json({ ok: true, sl: c.sl ? { name: c.sl.name } : null, tp: c.tp ? { name: c.tp.name } : null });
-  } catch (e) { return res.status(500).json({ error: 'sounds unavailable' }); }
+  } catch (e) { res.setHeader('Cache-Control', 'no-store'); return res.status(500).json({ error: 'sounds unavailable' }); }   // a failed read is never cached as the public answer
 }
 module.exports = (req, res) => handle(req, res);
 module.exports.handle = handle;

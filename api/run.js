@@ -28,7 +28,7 @@ const sha1 = (b) => crypto.createHash('sha1').update(b).digest('hex');
 const walk = (d, b = d) => fs.readdirSync(d, { withFileTypes: true }).flatMap((e) => e.isDirectory() ? walk(path.join(d, e.name), b) : [path.relative(b, path.join(d, e.name)).split(path.sep).join('/')]);
 
 module.exports = async (req, res) => {
-  if (!process.env.CRON_SECRET || req.headers.authorization !== `Bearer ${process.env.CRON_SECRET}`) return res.status(401).json({ error: 'unauthorised' });
+  if (!require('./_guard').bearerOk(req.headers && req.headers.authorization, process.env.CRON_SECRET)) return res.status(401).json({ error: 'unauthorised' });   // constant time
   const job = String((req.query && req.query.job) || ''), J = JOBS[job]; if (!J) return res.status(400).json({ error: 'unknown job' });
   const F = await flags(), paused = [].concat(F.paused || []);
   if (paused.includes(job) || paused.includes('all')) { console.log(JSON.stringify({ job, paused: true })); return res.status(200).json({ job, paused: true }); }

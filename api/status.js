@@ -8,7 +8,9 @@ module.exports = async (req, res) => {
   // the last round of each job (dry or live), from the runner's Blob reports
   const last = async (job) => { const tok = process.env.BLOB_READ_WRITE_TOKEN; if (!tok) return null; try { const { list } = require('@vercel/blob'); const { blobs } = await list({ prefix: `runs/${job}-`, token: tok });
     blobs.sort((x, y) => new Date(y.uploadedAt) - new Date(x.uploadedAt)); if (!blobs.length) return null; const r = await fetch(blobs[0].url, { headers: { Authorization: `Bearer ${tok}` }, cache: 'no-store', signal: AbortSignal.timeout(5000) }); if (!r.ok) return null;
-    const j = await r.json(); return { at: j.at, mode: j.mode, why: j.why || null, seconds: j.seconds, failed: j.failed || null, error: j.error || null, cause: j.cause || null, step: j.step || null, stack: j.stack || null, changed: (j.changed || []).length, commit: j.commit || null, d1src: j.d1src || null }; } catch (e) { return null; } };
+    // public and edge-cached: the error line and step only (the page shows them); the runner's stack and error cause stay in
+    // the private Blob report and the function log
+    const j = await r.json(); return { at: j.at, mode: j.mode, why: j.why || null, seconds: j.seconds, failed: j.failed || null, error: j.error ? String(j.error).slice(0, 200) : null, step: j.step || null, changed: (j.changed || []).length, commit: j.commit || null, d1src: j.d1src || null }; } catch (e) { return null; } };
   const [lastC, lastI] = await Promise.all([last('council'), last('ict')]);
   const paused = [].concat(f.paused || []);
   const bot = (name, b, limit, weekend) => ({ ...(b || {}), paused: paused.includes(name) || paused.includes('all'),
