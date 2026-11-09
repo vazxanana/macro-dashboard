@@ -93,7 +93,8 @@ button { font: inherit; color: inherit; }
 .hdr-sw a:not(.on):hover { color: var(--ink); background: color-mix(in srgb, var(--hm-b) 12%, var(--panel)); }
 .hdr-sw a:not(.on):hover i { background: var(--hm-b); opacity: 1; }
 @property --hm-r { syntax: '<angle>'; inherits: false; initial-value: 0turn; }
-@media (prefers-reduced-motion: no-preference) { .hdr-sw::before { animation: hm-spin 7s linear infinite; } @keyframes hm-spin { to { --hm-r: 1turn; } } }
+/* sweeps once on hover / focus, as on the desk (9 Nov perf rule: no infinite animation on a custom property; it repainted every frame) */
+@media (prefers-reduced-motion: no-preference) { .hdr-sw:is(:hover, :focus-within)::before { animation: hm-spin 1.1s cubic-bezier(.22, 1, .36, 1) 1; } @keyframes hm-spin { to { --hm-r: 1turn; } } }
 @media (pointer: coarse) { .hdr-sw { padding: 0; } .hdr-sw a { height: 44px; min-width: 44px; } }
 /* phones: dots only, as on the main desk and the Macro desk */
 @media (max-width: 760px) { .hdr-sw a span { display: none; } .hdr-sw a { padding: 0 9px; } }

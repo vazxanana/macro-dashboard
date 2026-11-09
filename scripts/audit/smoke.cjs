@@ -1,6 +1,7 @@
 // Run: sh scripts/build.sh && (cd out && python3 -m http.server 8766 &) ; node --use-env-proxy scripts/audit/smoke.cjs
 // Page smoke test (CI, .github/workflows/ci.yml): every page of out/ opens without a page error (uncaught exception or
-// unhandled rejection) and without sideways scroll at 390 px, as the owner, signed out, and on a 1366 px desktop.
+// unhandled rejection) and without sideways scroll at 390 px, as the owner, signed out, and on a 1366 px desktop; and no visible
+// element runs an endless animation of a custom property or box-shadow (the header ring rule, CLAUDE.md "Desk smoothness").
 // Like the ChronosTrade audit: /api/me is stubbed (owner or signed out), /md/bars is fetched from the live meridianx.dev proxy;
 // /cdata/* comes from the public council-data branch (what api/data.js serves). Other /api/* answer 404 and every other
 // third-party host (exchanges, FRED, calendars, websockets) is cut, so a page's offline path runs the same on every run.
@@ -8,7 +9,7 @@
 const { chromium } = require('playwright');
 const PORT = process.env.PORT || 8766, H = 'http://127.0.0.1:' + PORT;
 const CDATA = 'https://raw.githubusercontent.com/vazxanana/macro-dashboard/council-data/';
-const PAGES = ['/', '/market-structure.html', '/macro-desk.html', '/backtest.html', '/edge-lab.html', '/gold-trading.html', '/macro/', '/veteran/'];
+const PAGES = ['/', '/market-structure.html', '/macro-desk.html', '/backtest.html', '/edge-lab.html', '/gold-trading.html', '/macro/', '/veteran/', '/offline.html'];
 const OWNER = { u: 'owner', name: 'Owner', role: 'owner' };
 // script and font CDNs the pages load (a page without its chart library is not what visitors get)
 const ALLOW = /^https:\/\/(cdn\.jsdelivr\.net|s3\.tradingview\.com|fonts\.googleapis\.com|fonts\.gstatic\.com)\//;
@@ -51,6 +52,11 @@ async function wire(ctx, account) {
       // scroll to the bottom and back so lazy sections render before the width check
       await p.evaluate(async () => { window.scrollTo(0, document.body.scrollHeight); await new Promise((r) => setTimeout(r, 300)); window.scrollTo(0, 0); }).catch(() => {});
       const w = await p.evaluate(() => ({ sw: document.documentElement.scrollWidth, iw: innerWidth })).catch(() => ({ sw: 0, iw: 0 }));
+      // endless animations that repaint every frame: a custom property (the conic ring's angle) or box-shadow; opacity / transform pulses are fine
+      const spin = await p.evaluate(() => document.getAnimations().filter((a) => { try { const t = a.effect && a.effect.target; if (a.effect.getComputedTiming().iterations !== Infinity || a.playState !== 'running' || !t || !t.getClientRects().length) return false;
+        const ks = new Set(a.effect.getKeyframes().flatMap((k) => Object.keys(k)).filter((x) => !/^(offset|easing|composite|computedOffset)$/.test(x))); return !ks.size || ks.has('boxShadow') || [...ks].some((x) => x.startsWith('--')); } catch (e) { return false; } })
+        .map((a) => `${a.effect.target.tagName.toLowerCase()}${a.effect.target.className && typeof a.effect.target.className === 'string' ? '.' + a.effect.target.className.trim().split(/\s+/)[0] : ''}${a.effect.pseudoElement || ''} ${a.animationName || ''}`)).catch(() => []);
+      if (spin.length) errs.push('endless repaint animation: ' + [...new Set(spin)].join(', '));
       // against the set width, not innerWidth: a phone browser zooms out to fit a too-wide page, so innerWidth grows with it
       const wide = viewport.width < 500 && Math.max(w.sw, w.iw) > viewport.width + 1;
       const ok = !errs.length && !wide;

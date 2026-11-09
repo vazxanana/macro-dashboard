@@ -44,8 +44,8 @@
     :root:not([data-theme="dark"]):not([data-theme="midnight"]) {
       --bg: #f4f6f9; --panel: #ffffff; --panel-raised: #f7f8fb; --panel-hover: #f9fafc;
       --line: #dfe3ea; --line-soft: #eceff4; --line-strong: #cdd3dd;
-      --ink: #131722; --ink-dim: #4a5160; --ink-faint: #5f6675; --accent: #2f6bff; --accent-soft: rgba(47,107,255,.09);
-      --buy: #08876f; --sell: #d92d4b; --buy-soft: rgba(8,135,111,.09); --sell-soft: rgba(217,45,75,.08);
+      --ink: #131722; --ink-dim: #4a5160; --ink-faint: #5f6675; --accent: #2a5fe0; --accent-soft: rgba(47,107,255,.09);
+      --buy: #067a64; --sell: #c8243f; --buy-soft: rgba(8,135,111,.09); --sell-soft: rgba(217,45,75,.08);
       --neutral-soft: rgba(19,23,34,.05); --zero: rgba(19,23,34,.28);
       --gold: #c99400; --gold-ink: #8a6312; --neutral-strong: rgba(19,23,34,.13);
       --shadow-pop: 0 18px 40px -12px rgba(16,24,40,.22), 0 2px 6px rgba(16,24,40,.06);
@@ -55,8 +55,8 @@
   :root[data-theme="light"] {
     --bg: #f4f6f9; --panel: #ffffff; --panel-raised: #f7f8fb; --panel-hover: #f9fafc;
     --line: #dfe3ea; --line-soft: #eceff4; --line-strong: #cdd3dd;
-    --ink: #131722; --ink-dim: #4a5160; --ink-faint: #5f6675; --accent: #2f6bff; --accent-soft: rgba(47,107,255,.09);
-    --buy: #08876f; --sell: #d92d4b; --buy-soft: rgba(8,135,111,.09); --sell-soft: rgba(217,45,75,.08);
+    --ink: #131722; --ink-dim: #4a5160; --ink-faint: #5f6675; --accent: #2a5fe0; --accent-soft: rgba(47,107,255,.09);
+    --buy: #067a64; --sell: #c8243f; --buy-soft: rgba(8,135,111,.09); --sell-soft: rgba(217,45,75,.08);
     --neutral-soft: rgba(19,23,34,.05); --zero: rgba(19,23,34,.28);
     --gold: #c99400; --gold-ink: #8a6312; --neutral-strong: rgba(19,23,34,.13);
     --shadow-pop: 0 18px 40px -12px rgba(16,24,40,.22), 0 2px 6px rgba(16,24,40,.06);
@@ -214,7 +214,7 @@
   .lvt td:first-child { font-family: var(--mono); font-variant-numeric: tabular-nums; white-space: nowrap; color: var(--ink); }
   .lvt td:nth-child(2) small { display: block; color: var(--ink-faint); font-size: 12px; } .lvt td:last-child { text-align: right; white-space: nowrap; color: var(--ink-faint); font-family: var(--mono); }
   .lvt tr.now td { color: var(--accent); font-weight: 600; border-top: 1px solid var(--accent); } .lvt tr.cf td:nth-child(2)::after { content: " · confluence"; color: var(--accent); font-size: 12px; }
-  .lvt tr.dv td { opacity: .78; }
+  .lvt tr.dv td:first-child { color: var(--ink-dim); }   /* derived levels: quieter price, readable note (was opacity .78: the 12 px note fell under AA) */
   .anw { overflow-x: auto; } .ant { width: 100%; border-collapse: collapse; font-size: 12.5px; min-width: 460px; } .ant th, .ant td { text-align: right; padding: 5px 8px; border-top: 1px solid var(--line-soft); font-variant-numeric: tabular-nums; } .ant th:first-child, .ant td:first-child { text-align: left; }
   .ant th { color: var(--ink-faint); font-weight: 500; font-size: 12px; } .ant .up { color: var(--buy); } .ant .dn { color: var(--sell); }
   .anst { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 8px; margin: 6px 0 10px; } .anst div { border: 1px solid var(--line-soft); border-radius: var(--r-sm); padding: 8px 10px; font-size: 12px; color: var(--ink-dim); } .anst b { display: block; font: 600 16px var(--mono); color: var(--ink); } .anst small { color: var(--ink-faint); }
@@ -381,6 +381,8 @@
     .toc a[aria-current="true"]::before { color: var(--gold-ink); }
   }
   .story { margin-top: var(--s6); scroll-margin-top: 112px; counter-increment: story; }
+  /* until the first load: the empty section headers used to show, then jump or vanish when the data came (layout shift ~0.45 at 1440 px) */
+  main[data-loading] .story, main[data-loading] .toc { display: none; }
   #s-week { margin-top: var(--s3); } .toc { counter-reset: toc; }
   .st-h { display: flex; flex-wrap: wrap; align-items: baseline; gap: var(--s1) var(--s3); margin: 0 0 var(--s3); }
   .st-h h2 { margin: 0; font: 700 var(--fs-xs)/1.4 var(--sans); letter-spacing: .08em; text-transform: uppercase; color: var(--gold-ink); }
@@ -458,7 +460,7 @@
       <nav class="hdr-sw" aria-label="Desk, macro or ChronosTrade"><a href="/#home" title="Back to the main desk"><i aria-hidden="true"></i><span>Desk</span></a><a class="on" href="/macro-desk" aria-current="page"><i aria-hidden="true"></i><span>Macro</span></a><a href="/backtest" class="hdr-ct" title="ChronosTrade: manual backtesting, journal and prop-firm challenges"><i aria-hidden="true"></i><span>ChronosTrade</span></a></nav></div>
   </div>
 </header>
-<main class="wrap">
+<main class="wrap" data-loading>
   <!-- Calm pass (9 Nov 2026, owner: "more simpler", "more visual", "keep improving all the bits"): one story, top to bottom.
        This week → Next release → Why → Where price sits → What he expects → Track record → the detail, folded. Each card: a title,
        one line to take away, the chart, then the detail folded. Nothing removed; the long tables and lists moved into the folds. -->
@@ -1210,7 +1212,7 @@
       renderGlance(v); renderNext(v); renderScore(fc); renderLadder(v); renderChanges(v); renderCalib(v); renderStrip(fc, v); renderStrat(fc); renderVet(v); renderDebate(v); renderInsights(fc, v, cache); renderSource(fc, cache); renderLedger(v, L); renderCalls(v); renderBrief(v); get('macro/cot.json').then(renderCot);
       syncStory(); redraw();
       $('foot').textContent = 'Paper only. The strategist and the veteran change no rule, size or trade; the owner decides. Data: council-data macro/forecast.json, macro/veteran.json, macro/cache.json, macro/veteran-ledger.json.';
-    });
+    }).finally(function () { var m = document.querySelector('main.wrap'); if (m) delete m.dataset.loading; });   // the story shows once its cards know whether they have data
   }
   // ---- Veteran library (owner, 8 Nov: "this is our updated veteran macro, insert on the system and deploy it on the website") ----
   // The batch is published at /veteran/ by scripts/veteran-index.mjs; the index lists every document with a title and group.
