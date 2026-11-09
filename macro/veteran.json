@@ -1,8 +1,8 @@
 {
  "v": 1,
- "at": "2026-11-09T00:59:41.000Z",
+ "at": "2026-11-09T01:05:16.000Z",
  "paperOnly": true,
- "strategistAt": "2026-11-09T00:59:34.000Z",
+ "strategistAt": "2026-11-09T01:05:09.000Z",
  "shock": {
   "shock": "Risk-off / de-risking, funding still calm",
   "clues": [
@@ -164,13 +164,15 @@
   ],
   "eventWithin72h": {
    "title": "Core CPI m/m",
-   "at": "2026-11-10T13:30:00.000Z"
+   "at": "2026-11-10T13:30:00.000Z",
+   "consensus": "0.2%"
   }
  },
  "card": {
   "claim": "No directional macro claim for gold over 20 trading days (the score's tested horizon)",
+  "claimType": "descriptive association",
   "shock": "Risk-off / de-risking, funding still calm",
-  "surprise": "Pending: Core CPI m/m at 2026-11-10 13:30 UTC against the consensus captured before it",
+  "surprise": "Pending: Core CPI m/m at 2026-11-10 13:30 UTC against the calendar expectation captured before it (0.2%); print minus previous is not a surprise",
   "observed": "VIX/VIX3M 1.103 · HY +22 bp on the week · SOFR−EFFR 4 bp · DXY +0.27%",
   "decomposition": "TIPS real yield observed (DFII10); breakeven = 10Y nominal − TIPS, carrying inflation-risk and liquidity premia; no ACM term-premium estimate in the council's data",
   "mechanism": "Gold whipsaws: sold with risk assets first, then the haven bid if funding stays calm. The test is whether funding spreads widen; while they do not, this is risk aversion, not a liquidity squeeze.",
@@ -271,9 +273,182 @@
   "recent": [],
   "line": "The strategist has adopted none of the veteran's challengers yet. v_ry4w hit 51%, t 0.59 vs ry hit 52%, t 0.88; v_d2_4w hit 52%, t 1.02 vs dgs2 hit 54%, t 2.12; v_dxy4w hit 50%, t -0.04 vs dxymom hit 49%, t -0.58. A challenger is adopted when it is proven on the replay (t ≥ 3, n ≥ 30) and beats its incumbent; it is handed back when it stops being proven."
  },
+ "releases": [
+  {
+   "event": "Core PPI m/m",
+   "scheduledUtc": "2026-11-13T13:30:00.000Z",
+   "consensus": "0.3%",
+   "previous": "0.7%",
+   "firstPrint": null,
+   "checks": [
+    {
+     "k": "expectation",
+     "ok": true,
+     "text": "expectation 0.3% captured 2026-11-09 01:05 UTC, before the release (calendar consensus, not a verified survey)"
+    },
+    {
+     "k": "clock",
+     "ok": null,
+     "text": "the scheduled time is the announced time, not verified first availability (May 2024: part of the CPI files were public about 31 minutes early, DOL OIG 17-26-001-11-001)"
+    },
+    {
+     "k": "vintage",
+     "ok": null,
+     "text": "no print yet"
+    }
+   ],
+   "trusted": false,
+   "surprise": null,
+   "surpriseNote": "pending",
+   "claim": "descriptive association"
+  },
+  {
+   "event": "PPI m/m",
+   "scheduledUtc": "2026-11-13T13:30:00.000Z",
+   "consensus": "0.4%",
+   "previous": "1.3%",
+   "firstPrint": null,
+   "checks": [
+    {
+     "k": "expectation",
+     "ok": true,
+     "text": "expectation 0.4% captured 2026-11-09 01:05 UTC, before the release (calendar consensus, not a verified survey)"
+    },
+    {
+     "k": "clock",
+     "ok": null,
+     "text": "the scheduled time is the announced time, not verified first availability (May 2024: part of the CPI files were public about 31 minutes early, DOL OIG 17-26-001-11-001)"
+    },
+    {
+     "k": "vintage",
+     "ok": null,
+     "text": "no print yet"
+    }
+   ],
+   "trusted": false,
+   "surprise": null,
+   "surpriseNote": "pending",
+   "claim": "descriptive association"
+  },
+  {
+   "event": "GDP m/m",
+   "scheduledUtc": "2026-11-12T07:00:00.000Z",
+   "consensus": "0.0%",
+   "previous": "0.1%",
+   "firstPrint": null,
+   "checks": [
+    {
+     "k": "expectation",
+     "ok": true,
+     "text": "expectation 0.0% captured 2026-11-09 01:05 UTC, before the release (calendar consensus, not a verified survey)"
+    },
+    {
+     "k": "clock",
+     "ok": null,
+     "text": "the scheduled time is the announced time, not verified first availability (May 2024: part of the CPI files were public about 31 minutes early, DOL OIG 17-26-001-11-001)"
+    },
+    {
+     "k": "vintage",
+     "ok": null,
+     "text": "no print yet"
+    }
+   ],
+   "trusted": false,
+   "surprise": null,
+   "surpriseNote": "pending",
+   "claim": "descriptive association"
+  },
+  {
+   "event": "Core CPI m/m",
+   "scheduledUtc": "2026-11-10T13:30:00.000Z",
+   "consensus": "0.2%",
+   "previous": "0.3%",
+   "firstPrint": null,
+   "checks": [
+    {
+     "k": "expectation",
+     "ok": true,
+     "text": "expectation 0.2% captured 2026-11-09 01:05 UTC, before the release (calendar consensus, not a verified survey)"
+    },
+    {
+     "k": "clock",
+     "ok": null,
+     "text": "the scheduled time is the announced time, not verified first availability (May 2024: part of the CPI files were public about 31 minutes early, DOL OIG 17-26-001-11-001)"
+    },
+    {
+     "k": "vintage",
+     "ok": null,
+     "text": "no print yet"
+    }
+   ],
+   "trusted": false,
+   "surprise": null,
+   "surpriseNote": "pending",
+   "claim": "descriptive association",
+   "rates": {
+    "study": "On 2022-24 CPI days the 10Y real yield moved 6.11 bp on average (absolute) vs 4.06 bp on matched days; 20 of 36 events above their controls. A daily association, not causality or a gold result.",
+    "observedBp": null,
+    "read": "pending the print",
+    "claim": "descriptive association"
+   }
+  },
+  {
+   "event": "CPI m/m",
+   "scheduledUtc": "2026-11-10T13:30:00.000Z",
+   "consensus": "0.3%",
+   "previous": "0.6%",
+   "firstPrint": null,
+   "checks": [
+    {
+     "k": "expectation",
+     "ok": true,
+     "text": "expectation 0.3% captured 2026-11-09 01:05 UTC, before the release (calendar consensus, not a verified survey)"
+    },
+    {
+     "k": "clock",
+     "ok": null,
+     "text": "the scheduled time is the announced time, not verified first availability (May 2024: part of the CPI files were public about 31 minutes early, DOL OIG 17-26-001-11-001)"
+    },
+    {
+     "k": "vintage",
+     "ok": null,
+     "text": "no print yet"
+    }
+   ],
+   "trusted": false,
+   "surprise": null,
+   "surpriseNote": "pending",
+   "claim": "descriptive association",
+   "rates": {
+    "study": "On 2022-24 CPI days the 10Y real yield moved 6.11 bp on average (absolute) vs 4.06 bp on matched days; 20 of 36 events above their controls. A daily association, not causality or a gold result.",
+    "observedBp": null,
+    "read": "pending the print",
+    "claim": "descriptive association"
+   }
+  }
+ ],
+ "cpiRateStudy": {
+  "period": "2022-2024",
+  "events": 36,
+  "eventAbsBp": 6.11,
+  "matchedAbsBp": 4.06,
+  "contrastBp": 2.06,
+  "interval3m": [
+   0.2,
+   3.96
+  ],
+  "positive": 20,
+  "fomcExcluded": {
+   "events": 35,
+   "contrastBp": 2.24
+  },
+  "nominal2yContrastBp": 5.39,
+  "claim": "descriptive association",
+  "source": "research/macro-veteran/references/treasury-cpi-calendar-study-2022-2024.md"
+ },
  "cpiPilot": null,
- "skillVersion": "1.2",
- "source": "council/veteran.mjs: a code port of the owner's gptmacro_v.1 skill, revision 1.2 (research/macro-veteran/); reads the strategist's data only, fetches nothing",
+ "skillVersion": "1.3",
+ "source": "council/veteran.mjs: a code port of the owner's gptmacro_v.1 skill, revision 1.3 (research/macro-veteran/); reads the strategist's data only, fetches nothing",
  "outlook": {
   "week": {
    "horizon": 5,
@@ -497,5 +672,5 @@
   },
   "recent": []
  },
- "brief": "Macro veteran, 2026-11-09 00:59 UTC. Shock: Risk-off / de-risking, funding still calm (medium). Consensus with the strategist: AUCTION · 3 agree, 2 qualify, 1 disagree (Real yields); qualified: US dollar, Positioning. No macro edge from either member: auction. Direction comes from the technical systems; the macro layer sets event risk and size only. Event within 72 hours (Core CPI m/m): the bias is conditional until the print. Fails if 10Y TIPS real yield above 2.75% (+15 bp from 2.60%) ends the real-rate support; DXY above 103.9 (+1.5%) says the dollar channel has turned; a weekly close below the 10-week average 4160 removes the trend tiebreaker. Ledger: P(gold up over 20 days) 57% vs base 57%, 0 resolved. Teaching: The strategist has adopted none of the veteran's challengers yet. v_ry4w hit 51%, t 0.59 vs ry hit 52%, t 0.88; v_d2_4w hit 52%, t 1.02 vs dgs2 hit 54%, t 2.12; v_dxy4w hit 50%, t -0.04 vs dxymom hit 49%, t -0.58. A challenger is adopted when it is proven on the replay (t ≥ 3, n ≥ 30) and beats its incumbent; it is handed back when it stops being proven."
+ "brief": "Macro veteran, 2026-11-09 01:05 UTC. Shock: Risk-off / de-risking, funding still calm (medium). Consensus with the strategist: AUCTION · 3 agree, 2 qualify, 1 disagree (Real yields); qualified: US dollar, Positioning. No macro edge from either member: auction. Direction comes from the technical systems; the macro layer sets event risk and size only. Event within 72 hours (Core CPI m/m): the bias is conditional until the print. Fails if 10Y TIPS real yield above 2.75% (+15 bp from 2.60%) ends the real-rate support; DXY above 103.9 (+1.5%) says the dollar channel has turned; a weekly close below the 10-week average 4160 removes the trend tiebreaker. Ledger: P(gold up over 20 days) 57% vs base 57%, 0 resolved. Teaching: The strategist has adopted none of the veteran's challengers yet. v_ry4w hit 51%, t 0.59 vs ry hit 52%, t 0.88; v_d2_4w hit 52%, t 1.02 vs dgs2 hit 54%, t 2.12; v_dxy4w hit 50%, t -0.04 vs dxymom hit 49%, t -0.58. A challenger is adopted when it is proven on the replay (t ≥ 3, n ≥ 30) and beats its incumbent; it is handed back when it stops being proven."
 }
