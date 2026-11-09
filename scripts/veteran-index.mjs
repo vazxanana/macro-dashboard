@@ -45,6 +45,9 @@ export function cpiPilot(src = SRC) {
 }
 if (import.meta.url === `file://${process.argv[1]}`) {
   const idx = buildIndex();
+  // unchanged library: keep the previous builtAt, so out/ (tracked) stays byte-identical and CI can diff it
+  try { const old = JSON.parse(fs.readFileSync(path.join(OUT, 'index.json'), 'utf8'));
+    if (JSON.stringify({ ...old, builtAt: 0 }) === JSON.stringify({ ...idx, builtAt: 0 })) idx.builtAt = old.builtAt; } catch (e) {}
   fs.rmSync(OUT, { recursive: true, force: true }); fs.mkdirSync(OUT, { recursive: true });
   for (const d of idx.docs) { const to = path.join(OUT, d.path); fs.mkdirSync(path.dirname(to), { recursive: true }); fs.copyFileSync(path.join(SRC, d.path), to); }
   fs.writeFileSync(path.join(OUT, 'index.json'), JSON.stringify(idx, null, 1));
