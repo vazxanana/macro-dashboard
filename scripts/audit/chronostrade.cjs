@@ -105,11 +105,20 @@ async function load(p, q = 'xau,15m') { await p.click(`#quick [data-q^="${q}"]`)
     check('drag up places a sell draft and disarms', /sell/i.test(await txt(p, '#dr-title')) && (await p.getAttribute('#qt-drag', 'aria-pressed')) === 'false', await txt(p, '#dr-title')); await p.keyboard.press('Escape');
     await p.keyboard.press('Shift+B'); await p.click('#dchip [data-dgo]'); await p.waitForTimeout(150);
     check('Confirm on the chart opens the trade; its tag shows P&L, R and the stop', (await p.$$('#ptags .ptag')).length === 1 && /R/.test(await txt(p, '#ptags .pv')) && /SL \d/.test(await txt(p, '#ptags .sl')), await txt(p, '#ptags'));
+    // chart design pass (9 Nov): live P&L pill at the price, grip handles, two-row legend, symbol watermark, tabular scales
+    await p.waitForTimeout(250); const pill = await p.$eval('#pnlpill', (e) => ({ vis: !e.hidden && e.offsetParent != null, t: e.textContent, fs: parseFloat(getComputedStyle(e).fontSize) }));
+    check('live P&L pill rides at the price with an icon, a sign and R (12 px+)', pill.vis && /[▲▼]/.test(pill.t) && /[+−]\$/.test(pill.t) && /\dR/.test(pill.t) && pill.fs >= 12, JSON.stringify(pill));
+    const look = await p.evaluate(() => window.ctChart()); check('draggable stop / target lines carry grip handles', look.handles >= 2, JSON.stringify(look));
+    check('watermark names the symbol and timeframe; scales use tabular mono figures', /XAU\/USD · 15m/.test(look.wm) && /JetBrains Mono/.test(look.font), look.wm + ' | ' + look.font);
+    const lg = await p.$eval('#legend', (e) => ({ rows: e.children.length, t: e.textContent, fs: Math.min(...[...e.querySelectorAll('*')].map((x) => parseFloat(getComputedStyle(x).fontSize))) }));
+    check('legend: symbol, timeframe and time in UTC, then O H L C and change % (12 px+)', lg.rows === 2 && /XAU\/USD/.test(lg.t) && /UTC/.test(lg.t) && /O \d.*H \d.*L \d.*C \d/.test(lg.t) && /%\)/.test(lg.t) && lg.fs >= 12, JSON.stringify(lg));
     await p.click('.speed [data-sp="1000"]'); await p.click('#play'); const s1 = []; for (let k = 0; k < 6; k++) { await p.waitForTimeout(140); s1.push(await txt(p, '#ptags .pv')); } await p.click('#play');
     check('position tag P&L moves with the forming candle', new Set(s1.filter(Boolean)).size > 1, s1.join(' / '));
     await p.screenshot({ path: OUT + 'ct-pos-tag.png' });
     if ((await p.$$('#ptags .ptag')).length) { await p.click('#ptags [data-pa="close"]'); await p.waitForTimeout(150); }
-    check('✕ on the tag closes the trade', (await p.$$('#ptags .ptag')).length === 0 && (await p.$$('.pos-card')).length === 0); }
+    check('✕ on the tag closes the trade', (await p.$$('#ptags .ptag')).length === 0 && (await p.$$('.pos-card')).length === 0);
+    await p.waitForTimeout(200); const lk2 = await p.evaluate(() => window.ctChart());
+    check('flat: the P&L pill goes; closed trades show entry → exit connectors with a signed R label', await p.$eval('#pnlpill', (e) => e.hidden) && lk2.conn >= 1 && lk2.lbl >= 1, JSON.stringify(lk2)); }
   // 9. layers and context
   await p.click('#laydd summary'); for (const l of ['ema20', 'ema50', 'vol', 'sess', 'pdhl', 'anim']) await p.click(`.ddp [data-l=${l}]`).catch(() => {}); await p.keyboard.press('Escape');
   check('layer toggles flip state', await p.evaluate(() => JSON.parse(localStorage.getItem('btLab:layers') || '{}').ema20 === true));
@@ -121,6 +130,11 @@ async function load(p, q = 'xau,15m') { await p.click(`#quick [data-q^="${q}"]`)
   await p.click('#drawdd summary'); await p.click('[data-dt=r]'); await p.mouse.click(box.x + box.w * 0.3, box.y + box.h * 0.4); await p.mouse.click(box.x + box.w * 0.4, box.y + box.h * 0.5);
   const nd = await p.evaluate(() => Object.values(JSON.parse(localStorage.getItem('btLab:sessions')))[0].draw.length); check('drawings placed and saved', nd === 2, nd);
   await p.click('#drawdd summary'); await p.click('[data-dx=last]'); check('remove last drawing', (await p.evaluate(() => Object.values(JSON.parse(localStorage.getItem('btLab:sessions')))[0].draw.length)) === 1);
+  // selection (chart design pass): click a box to select it, Delete removes it
+  await p.click('#drawdd summary'); await p.click('[data-dt=r]'); await p.mouse.click(box.x + box.w * 0.3, box.y + box.h * 0.4); await p.mouse.click(box.x + box.w * 0.4, box.y + box.h * 0.5); await p.waitForTimeout(350);
+  await p.mouse.move(box.x + box.w * 0.35, box.y + box.h * 0.45); await p.mouse.click(box.x + box.w * 0.35, box.y + box.h * 0.45); await p.waitForTimeout(100);
+  const selA = await p.evaluate(() => window.ctChart()); await p.keyboard.press('Delete'); await p.waitForTimeout(100); const selB = await p.evaluate(() => window.ctChart());
+  check('click selects a drawing and Delete removes it', selA.sel === 1 && selA.drawings === 2 && selB.drawings === 1 && selB.sel === -1, JSON.stringify([selA.sel, selA.drawings, selB.drawings]));
   // 11. prop firm challenge: fail fast with 6% risk on FTMO
   await p.selectOption('#firm', 'ftmo2'); await p.click('#pf-start'); await p.click('dialog.msd button.pri').catch(() => {}); await p.waitForTimeout(200);
   check('challenge starts at the firm size', /100,000/.test(await txt(p, '#bal')) && /live/.test(await txt(p, '#pf-status')), await txt(p, '#pf-status'));
@@ -197,6 +211,10 @@ async function load(p, q = 'xau,15m') { await p.click(`#quick [data-q^="${q}"]`)
   await m.evaluate(() => localStorage.setItem('msPrefs', JSON.stringify({ theme: 'light' }))); await m.reload({ waitUntil: 'load' }); await m.waitForTimeout(1500);
   check('light theme applies', await m.evaluate(() => getComputedStyle(document.body).backgroundColor !== 'rgb(8, 9, 12)'), await m.evaluate(() => getComputedStyle(document.body).backgroundColor));
   await m.screenshot({ path: OUT + 'ct-phone-light.png' });
+  await m.evaluate(() => localStorage.setItem('msPrefs', JSON.stringify({ theme: 'midnight' }))); await m.reload({ waitUntil: 'load' }); await m.waitForTimeout(1200);
+  check('midnight theme applies to ChronosTrade', await m.evaluate(() => getComputedStyle(document.body).backgroundColor === 'rgb(7, 13, 31)'), await m.evaluate(() => getComputedStyle(document.body).backgroundColor));
+  await m.emulateMedia({ reducedMotion: 'reduce' }); check('reduced motion: chart pills do not animate', await m.evaluate(() => parseFloat(getComputedStyle(document.getElementById('pnlpill')).transitionDuration) === 0 && getComputedStyle(document.getElementById('dchip')).animationName === 'none')); await m.emulateMedia({ reducedMotion: null });
+  await m.evaluate(() => localStorage.setItem('msPrefs', JSON.stringify({ theme: 'light' }))); await m.reload({ waitUntil: 'load' }); await m.waitForTimeout(1200);
   { await m.click('.tabs [data-t=stats]').catch(() => {}); await m.waitForTimeout(300); check('phone: analytics fit at 390 px', !(await m.evaluate(() => document.documentElement.scrollWidth > innerWidth + 1))); await m.$eval('#tab-stats', (e) => e.scrollIntoView()); await m.screenshot({ path: OUT + 'ct-analytics-phone-light.png' });
     await m.click('#rep-btn').catch(() => {}); await m.waitForTimeout(200); const rw = await m.$eval('#repd', (e) => { const r = e.getBoundingClientRect(); return { l: r.left, r: r.right }; }); check('phone: session report fits', rw.l >= 0 && rw.r <= 390, JSON.stringify(rw)); await m.screenshot({ path: OUT + 'ct-report-phone-light.png' }); await m.keyboard.press('Escape'); }
   // 18. toolbar (pass 11): Replay | time | Chart tools | View, one row at 1366 × 768 with nothing important below the fold;
