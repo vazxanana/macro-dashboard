@@ -175,8 +175,8 @@ export function manageLive(tr, b, { be = null, feed = undefined } = {}) {
   tr.mfe = +Math.max(tr.mfe || 0, ((s ? E - b.low : b.high - E) / r0)).toFixed(2);
   tr.mae = +Math.max(tr.mae || 0, ((s ? b.high - E : E - b.low) / r0)).toFixed(2);
   if (tr.trail && tr.mfe >= tr.trail[0]) { const ns = E + (s ? -1 : 1) * (tr.mfe - tr.trail[1]) * r0; if (s ? ns < tr.stop : ns > tr.stop) { tr.stop = +ns.toFixed(Math.max(2, (tr.dec ?? 2) + 1)); tr.trailMoved = true; } }
-  if (be && !tr.noBe && !tr.beMoved && ((s ? E - b.low : b.high - E) / r0) >= be) { tr.stop = E; tr.beMoved = true; }
-  if (tr.beAt && !tr.beMoved && ((s ? E - b.low : b.high - E) / r0) >= tr.beAt) { tr.stop = E; tr.beMoved = true; }
+  if (be && !tr.noBe && !tr.beMoved && (s ? E < tr.stop : E > tr.stop) && ((s ? E - b.low : b.high - E) / r0) >= be) { tr.stop = E; tr.beMoved = true; }
+  if (tr.beAt && !tr.beMoved && (s ? E < tr.stop : E > tr.stop) && ((s ? E - b.low : b.high - E) / r0) >= tr.beAt) { tr.stop = E; tr.beMoved = true; }
   if (tr.addAt && !tr.addDone && tr.status === 'open' && tr.mfe >= tr.addAt) { tr.addDone = true; const add = addUnit(tr, b, feed); if (add) return { add }; }
   return null;
 }
