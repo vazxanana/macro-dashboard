@@ -1,8 +1,8 @@
 {
  "v": 1,
- "at": "2026-11-09T00:09:09.000Z",
+ "at": "2026-11-09T00:11:55.000Z",
  "paperOnly": true,
- "strategistAt": "2026-11-09T00:08:46.000Z",
+ "strategistAt": "2026-11-09T00:11:36.000Z",
  "shock": {
   "shock": "Risk-off / de-risking, funding still calm",
   "clues": [
@@ -283,35 +283,69 @@
    "list": [
     {
      "claim": "Gold closes 2026-11-13 above $4,071 (today's close)",
-     "p": 0.55
+     "p": 0.55,
+     "asset": "gold",
+     "kind": "closeAbove",
+     "level": 4070.59,
+     "by": "2026-11-13"
     },
     {
      "claim": "Gold closes at or above $4,100 on some day by 2026-11-13",
-     "p": 0.52
+     "p": 0.52,
+     "asset": "gold",
+     "kind": "touchUp",
+     "level": 4100,
+     "by": "2026-11-13"
     },
     {
      "claim": "Gold closes at or above $4,170 on some day by 2026-11-13 (stretch)",
-     "p": 0.14
+     "p": 0.14,
+     "asset": "gold",
+     "kind": "touchUp",
+     "level": 4170,
+     "by": "2026-11-13"
     },
     {
      "claim": "Gold closes at or below $4,050 on some day by 2026-11-13",
-     "p": 0.5
+     "p": 0.5,
+     "asset": "gold",
+     "kind": "touchDown",
+     "level": 4050,
+     "by": "2026-11-13"
     },
     {
      "claim": "Gold closes at or below $3,990 on some day by 2026-11-13 (stretch)",
-     "p": 0.15
+     "p": 0.15,
+     "asset": "gold",
+     "kind": "touchDown",
+     "level": 3990,
+     "by": "2026-11-13"
     },
     {
      "claim": "Gold's 2026-11-13 close lands between $4,022 and $4,137",
-     "p": 0.6
+     "p": 0.6,
+     "asset": "gold",
+     "kind": "range",
+     "lo": 4021.63,
+     "hi": 4136.8366,
+     "by": "2026-11-13"
     },
     {
      "claim": "Gold moves 2.5% or more either way by 2026-11-13",
-     "p": 0.17
+     "p": 0.17,
+     "asset": "gold",
+     "kind": "bigMove",
+     "level": 4070.59,
+     "pct": 0.0254,
+     "by": "2026-11-13"
     },
     {
      "claim": "DXY closes 2026-11-13 above 102.36 (today's close)",
-     "p": 0.52
+     "p": 0.52,
+     "asset": "dxy",
+     "kind": "closeAbove",
+     "level": 102.3593,
+     "by": "2026-11-13"
     }
    ]
   },
@@ -323,35 +357,69 @@
    "list": [
     {
      "claim": "Gold closes 2026-12-04 above $4,071 (today's close)",
-     "p": 0.57
+     "p": 0.57,
+     "asset": "gold",
+     "kind": "closeAbove",
+     "level": 4070.59,
+     "by": "2026-12-04"
     },
     {
      "claim": "Gold closes at or above $4,170 on some day by 2026-12-04",
-     "p": 0.48
+     "p": 0.48,
+     "asset": "gold",
+     "kind": "touchUp",
+     "level": 4170,
+     "by": "2026-12-04"
     },
     {
      "claim": "Gold closes at or above $4,320 on some day by 2026-12-04 (stretch)",
-     "p": 0.14
+     "p": 0.14,
+     "asset": "gold",
+     "kind": "touchUp",
+     "level": 4320,
+     "by": "2026-12-04"
     },
     {
      "claim": "Gold closes at or below $4,010 on some day by 2026-12-04",
-     "p": 0.48
+     "p": 0.48,
+     "asset": "gold",
+     "kind": "touchDown",
+     "level": 4010,
+     "by": "2026-12-04"
     },
     {
      "claim": "Gold closes at or below $3,900 on some day by 2026-12-04 (stretch)",
-     "p": 0.14
+     "p": 0.14,
+     "asset": "gold",
+     "kind": "touchDown",
+     "level": 3900,
+     "by": "2026-12-04"
     },
     {
      "claim": "Gold's 2026-12-04 close lands between $3,982 and $4,229",
-     "p": 0.6
+     "p": 0.6,
+     "asset": "gold",
+     "kind": "range",
+     "lo": 3982.1407,
+     "hi": 4228.5912,
+     "by": "2026-12-04"
     },
     {
      "claim": "Gold moves 5.9% or more either way by 2026-12-04",
-     "p": 0.13
+     "p": 0.13,
+     "asset": "gold",
+     "kind": "bigMove",
+     "level": 4070.59,
+     "pct": 0.0593,
+     "by": "2026-12-04"
     },
     {
      "claim": "DXY closes 2026-12-04 above 102.36 (today's close)",
-     "p": 0.52
+     "p": 0.52,
+     "asset": "dxy",
+     "kind": "closeAbove",
+     "level": 102.3593,
+     "by": "2026-12-04"
     }
    ]
   },
@@ -411,7 +479,23 @@
     "NY Fed ACM term premium"
    ]
   },
-  "method": "Each probability is gold's own frequency for the same horizon over the last 10 years, moved by the council's tilt (the veteran's calibrated probability minus its base rate, carrying the strategist's Gold Macro Score); half the tilt for the week. The range call is the middle 60% of past outcomes. DXY calls carry no tilt."
+  "method": "Each probability is gold's own frequency for the same horizon over the last 10 years, moved by the council's tilt (the veteran's calibrated probability minus its base rate, carrying the strategist's Gold Macro Score); half the tilt for the week. The range call is the middle 60% of past outcomes. DXY calls carry no tilt.",
+  "cot": [
+   {
+    "claim": "USD/CHF closes 2026-12-04 below 0.8206 (COT extreme signal; tested 99 times since 2020, right 61%)",
+    "p": 0.61,
+    "asset": "chf",
+    "kind": "pairDown",
+    "level": 0.82058,
+    "by": "2026-12-04",
+    "src": "COT extreme"
+   }
+  ],
+  "record": {
+   "n": 0,
+   "open": 17
+  },
+  "recent": []
  },
- "brief": "Macro veteran, 2026-11-09 00:09 UTC. Shock: Risk-off / de-risking, funding still calm (medium). Consensus with the strategist: AUCTION · 3 agree, 2 qualify, 1 disagree (Real yields); qualified: US dollar, Positioning. No macro edge from either member: auction. Direction comes from the technical systems; the macro layer sets event risk and size only. Event within 72 hours (Core CPI m/m): the bias is conditional until the print. Fails if 10Y TIPS real yield above 2.75% (+15 bp from 2.60%) ends the real-rate support; DXY above 103.9 (+1.5%) says the dollar channel has turned; a weekly close below the 10-week average 4160 removes the trend tiebreaker. Ledger: P(gold up over 20 days) 57% vs base 57%, 0 resolved. Teaching: The strategist has adopted none of the veteran's challengers yet. v_ry4w hit 51%, t 0.59 vs ry hit 52%, t 0.88; v_d2_4w hit 52%, t 1.02 vs dgs2 hit 54%, t 2.12; v_dxy4w hit 50%, t -0.04 vs dxymom hit 49%, t -0.58. A challenger is adopted when it is proven on the replay (t ≥ 3, n ≥ 30) and beats its incumbent; it is handed back when it stops being proven."
+ "brief": "Macro veteran, 2026-11-09 00:11 UTC. Shock: Risk-off / de-risking, funding still calm (medium). Consensus with the strategist: AUCTION · 3 agree, 2 qualify, 1 disagree (Real yields); qualified: US dollar, Positioning. No macro edge from either member: auction. Direction comes from the technical systems; the macro layer sets event risk and size only. Event within 72 hours (Core CPI m/m): the bias is conditional until the print. Fails if 10Y TIPS real yield above 2.75% (+15 bp from 2.60%) ends the real-rate support; DXY above 103.9 (+1.5%) says the dollar channel has turned; a weekly close below the 10-week average 4160 removes the trend tiebreaker. Ledger: P(gold up over 20 days) 57% vs base 57%, 0 resolved. Teaching: The strategist has adopted none of the veteran's challengers yet. v_ry4w hit 51%, t 0.59 vs ry hit 52%, t 0.88; v_d2_4w hit 52%, t 1.02 vs dgs2 hit 54%, t 2.12; v_dxy4w hit 50%, t -0.04 vs dxymom hit 49%, t -0.58. A challenger is adopted when it is proven on the replay (t ≥ 3, n ≥ 30) and beats its incumbent; it is handed back when it stops being proven."
 }
