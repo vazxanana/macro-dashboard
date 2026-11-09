@@ -796,7 +796,7 @@
     "lots": 0.04,
     "digits": 5,
     "setup": "intraday",
-    "status": "open",
+    "status": "closed by council",
     "openedAt": "2026-11-09T00:56:57.000Z",
     "councilEntry": 1.41197,
     "stop": 1.41134,
@@ -810,10 +810,15 @@
     "slipR": -0.079,
     "lagSec": 65,
     "alerted": [
-     "open"
+     "open",
+     "close"
     ],
     "stopCheckedAt": "2026-11-09T00:56:57.000Z",
-    "brokerStop": 1.41129
+    "brokerStop": 1.41129,
+    "closedAt": "2026-11-09T01:28:45.000Z",
+    "exitPrice": 1.41138,
+    "councilExit": 1.41134,
+    "councilR": -1
    },
    "usdcad-scalp-1794185752": {
     "positionId": "47414223",
@@ -823,7 +828,7 @@
     "lots": 0.04,
     "digits": 5,
     "setup": "scalp",
-    "status": "open",
+    "status": "closed by council",
     "openedAt": "2026-11-09T00:56:57.000Z",
     "councilEntry": 1.41197,
     "stop": 1.41134,
@@ -837,10 +842,15 @@
     "slipR": -0.079,
     "lagSec": 65,
     "alerted": [
-     "open"
+     "open",
+     "close"
     ],
     "stopCheckedAt": "2026-11-09T00:56:57.000Z",
-    "brokerStop": 1.41129
+    "brokerStop": 1.41129,
+    "closedAt": "2026-11-09T01:28:45.000Z",
+    "exitPrice": 1.41138,
+    "councilExit": 1.41134,
+    "councilR": -1
    }
   },
   "day": {
@@ -848,7 +858,7 @@
    "startBalance": 9987.78
   },
   "startedAt": "2026-11-08T11:42:25.000Z",
-  "status": "ok · demo Fusion Markets · balance 9979.81 · 21 open · 1 resting",
+  "status": "ok · demo Fusion Markets · balance 9979.81 · 19 open · 1 resting",
   "skipped": {
    "audusd-position-1793601653": "price 0.68666 has run 1.27R from the council entry 0.70162: a different trade now",
    "xrp-rswing-1793942619": "none of XRPUSD found at the broker",
@@ -886,19 +896,9 @@
   },
   "catchUpAt": "2026-11-08T12:04:40.000Z",
   "balance": 9979.81,
-  "lastRun": "2026-11-09T01:26:14.000Z"
+  "lastRun": "2026-11-09T01:28:45.000Z"
  },
  "log": [
-  {
-   "at": "2026-11-08T20:26:46.000Z",
-   "msg": "not mirrored yet gbpusd-scalp-1793626672: GBPUSD market closed: MARKET_CLOSED: Trading is not available: Market is closed. (will retry)",
-   "trade": "gbpusd-scalp-1793626672"
-  },
-  {
-   "at": "2026-11-08T20:26:46.000Z",
-   "msg": "not mirrored yet usdcad-scalp-1793689919: USDCAD market closed: MARKET_CLOSED: Trading is not available: Market is closed. (will retry)",
-   "trade": "usdcad-scalp-1793689919"
-  },
   {
    "at": "2026-11-08T20:26:46.000Z",
    "msg": "not mirrored yet eurusd-rswing-1793754423: EURUSD market closed (paused until 20:36 UTC) (will retry)",
@@ -2388,6 +2388,16 @@
    "at": "2026-11-09T01:20:30.000Z",
    "msg": "cancelled EURUSD limit order 33771333 for eurusd-rscalp-1794186612: the council ended it: missed",
    "trade": "eurusd-rscalp-1794186612"
+  },
+  {
+   "at": "2026-11-09T01:28:45.000Z",
+   "msg": "closed USDCAD position 47414209 (council: loss)",
+   "trade": "usdcad-intraday-1794185752"
+  },
+  {
+   "at": "2026-11-09T01:28:45.000Z",
+   "msg": "closed USDCAD position 47414223 (council: loss)",
+   "trade": "usdcad-scalp-1794185752"
   }
  ],
  "limits": {
