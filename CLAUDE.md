@@ -781,3 +781,10 @@ Audit (9 Nov, owner: "keep finding bugs, this can't have errors"): the stop guar
 left the list (uses the stop saved at the open, `m.stop`); `ensureStop` never sets a stop from a missing level (it read as 0) and
 rejects one on the wrong side of the current mark (closes instead); step 2d closes any position with our label the mirror does
 not manage that has no stop (one with a stop is reported once, `state.orphans`).
+
+## Veteran's calls: track record and COT calls (9 Nov 2026, owner: "keep improving our veteran macro")
+Every dated call now carries structured fields (`asset`, `kind`: closeAbove / touchUp / touchDown / range / bigMove / pairUp /
+pairDown, levels, `by`). `callsLedger` (council/outlook.mjs, run from veteran.mjs) records each call once in
+`macro/veteran-calls.json`, resolves it on the daily closes after its date and scores it (hit, Brier); `callsScore` gives hit rate vs
+expected, Brier and high/low-probability bands. `cotCalls` turns COT signals that passed the desk's test (macro/cot.json, edge true)
+into dated pair calls at the tested hit rate (clamped 50–75%). Macro desk: COT calls and the track record under the veteran's calls.
