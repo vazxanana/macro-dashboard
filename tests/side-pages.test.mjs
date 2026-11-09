@@ -7,7 +7,7 @@ import os from 'node:os';
 import path from 'node:path';
 import vm from 'node:vm';
 import { execFileSync } from 'node:child_process';
-import { slimStudy, slimCandidate } from '../research/edge/lab-summary.mjs';
+import { slimStudy, slimCandidate, equityOf, EQ_POINTS } from '../research/edge/lab-summary.mjs';
 
 const src = (p) => fs.readFileSync(new URL(`../${p}`, import.meta.url), 'utf8');
 const scripts = (html) => [...html.matchAll(/<script(\s[^>]*)?>([\s\S]*?)<\/script>/gi)].filter((m) => !/\bsrc=/.test(m[1] || '') && m[2].trim()).map((m) => m[2]);
@@ -36,6 +36,8 @@ test('the build writes lab.json for every published study, far smaller than the 
   const size = fs.statSync(path.join(dir, 'lab.json')).size;
   assert.ok(size < full / 10 && size < 600000, `lab.json ${size} B vs ${full} B of result.json`);
   assert.ok(lab.topics.filter((t) => t.valid).every((t) => t.data && typeof t.data === 'object'));
+  const eq = lab.topics.filter((t) => t.data && t.data.equity);
+  assert.ok(eq.length >= 1 && eq.every((t) => t.data.equity.pts.length <= EQ_POINTS && !t.data.trades), 'equity curves only where a study lists its trades, sampled, never the raw list');
   fs.rmSync(out, { recursive: true, force: true });
 });
 
@@ -78,5 +80,53 @@ test('gold terminal: no placeholder shown as a live price, chart library off the
   assert.match(h, /if \(!goldIsLive\) \{[\s\S]{0,200}Waiting for a live price/);
   assert.match(h, /lightweight-charts-4\.1\.3\.js" defer/);
   assert.match(h, /% est\./);
-  assert.ok(h.indexOf("localStorage.getItem('goldDarkMode')") < h.indexOf('<body>'));
+  assert.ok(h.indexOf("localStorage.getItem('goldDarkMode')") < h.indexOf('<body'));
+});
+
+// 9 Nov 2026 design pass: equity curves in lab.json, the Edge lab's visuals, the gold terminal's hero / chart / tokens
+test('equity curve: sampled cumulative R from the study\'s own trades; drawdown from the full series; none without R', () => {
+  const trades = []; for (let i = 0; i < 200; i++) trades.push({ d: `2020-01-${String(1 + (i % 28)).padStart(2, '0')}`, R: i === 101 ? -40 : 0.5 });
+  const e = equityOf(trades);
+  assert.equal(e.n, 200); assert.equal(e.pts.length, EQ_POINTS); assert.equal(e.pts.at(-1), e.total);
+  assert.equal(e.total, 199 * 0.5 - 40); assert.equal(e.maxDD, 40, 'a one-trade trough the sampling may skip still sets the drawdown');
+  assert.equal(e.from, '2020-01-01');
+  assert.equal(equityOf(trades.slice(0, 5)), undefined, 'too few trades');
+  assert.equal(equityOf([...trades, { d: 'x' }]), undefined, 'any trade without a numeric R: no curve');
+  assert.equal(equityOf([[1, 2]]), undefined);
+  const s = slimStudy({ system: 'X', trades }); assert.ok(s.equity); assert.equal(s.trades, undefined);
+  assert.equal(slimStudy({ system: 'X' }).equity, undefined);
+  assert.ok(JSON.stringify(s).length < 800, 'a curve stays a few hundred bytes');
+});
+
+test('Edge lab visuals: verdict donut with words, IS vs OOS bars with t, equity line, tooltips on hover and tap', () => {
+  const h = src('edge-lab.html');
+  for (const c of scripts(h)) assert.doesNotThrow(() => new vm.Script(c));
+  assert.match(h, /function summary\(counts, total, done\)/); assert.match(h, /class="donut"/); assert.match(h, /<title>/);
+  assert.match(h, /\['pass', counts\.pass, 'Pass', '--buy'\], \['fail', counts\.fail, 'Fail'/, 'each arc has a word in the legend');
+  assert.match(h, /function ioBars\(b, base\)/); assert.match(h, /class="iob" role="img" aria-label="/); assert.match(h, /could be noise/);
+  assert.match(h, /function equityLine\(eq\)/); assert.match(h, /equityLine\(d\.equity\)/);
+  assert.match(h, /addEventListener\('pointerdown'[\s\S]{0,200}closest\('\[data-tip\]'\)/, 'tap shows the tooltip too');
+  assert.match(h, /#groups:has\(> \.loading\) \{ min-height: 100vh; \}/, 'the rows land without moving the footer');
+  for (const m of h.matchAll(/font(?:-size)?:[^;{}]*?(\d+(?:\.\d+)?)px/g)) assert.ok(+m[1] >= 12, `text at ${m[1]}px`);
+});
+
+test('gold terminal design pass: 12 px floor and AA tokens, hero, premium chart, never a placeholder as live', () => {
+  const h = src('gold-trading.html');
+  for (const c of scripts(h)) assert.doesNotThrow(() => new vm.Script(c));
+  for (const m of h.matchAll(/font-size:\s*(\d+(?:\.\d+)?)px/g)) assert.ok(+m[1] >= 12, `font-size ${m[1]}px`);
+  assert.ok(!/#D97706/i.test(h) && !/color:#D4AF37/i.test(h), 'the 3:1 amber / gold inline colours are tokens now');
+  assert.match(h, /--fs-xs: 12px;/); assert.match(h, /html\.dark\.midnight \{/); assert.match(h, /p\.theme === 'midnight'\) d\.classList\.add\('midnight'\)/);
+  // hero first, then the chart, then folded panels
+  const hero = h.indexOf('id="gxHero"'), chart = h.indexOf('id="scalpChart"'), fold = h.indexOf('class="gx-fold"');
+  assert.ok(hero > 0 && hero < chart && chart < fold);
+  assert.match(h, /<body data-section="dashboard">/, 'the header is already in its dashboard shape at first paint (no shift)');
+  // no plan or price off the 3900 cold-start placeholder
+  assert.match(h, /function scalpLevels\(\) \{\n\s+if \(!goldIsLive/);
+  assert.match(h, /aligned = !!\(goldIsLive && lastClose\); offset = aligned \? \(lastGoldPrice - lastClose\) : 0;/);
+  assert.match(h, /function gxRenderHero\(\) \{[\s\S]{0,300}if \(!goldIsLive\) \{[\s\S]{0,120}Waiting for a live price/);
+  // chart: theme tokens, restyled on toggle, OHLC legend in UTC, quiet key levels, smooth updates
+  assert.match(h, /function gxPalette\(\)/); assert.match(h, /gxRestyleCharts\(\);/); assert.match(h, /subscribeCrosshairMove/);
+  assert.match(h, /UTC`; \};/); assert.match(h, /Prior day high \$\{gxFmt/); assert.match(h, /function makeKeyLevelsPrimitive\(\)/);
+  assert.match(h, /else for \(const c of candles\) if \(c\.time >= prevLast\) series\.update\(c\);/);
+  assert.match(h, /if \(!fitted && chart/, 'the view is fitted once, not reset every minute');
 });
