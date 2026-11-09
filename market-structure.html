@@ -1367,19 +1367,30 @@ function msGate(show) {
 document.addEventListener('DOMContentLoaded', function () {
   var f = document.getElementById('ms-gate-f'), err = document.getElementById('ms-gate-err'), gb = document.getElementById('ms-gate-guest'), x = document.getElementById('ms-gate-x');
   if (document.documentElement.dataset.gate) setTimeout(function () { var u = document.getElementById('ms-gate-p'); if (u) u.focus(); }, 30);
+  // sign-in states (9 Nov 2026 polish): Enter submits; the button holds its size while it waits (aria-busy, finite spinner); every
+  // failure says why (empty, wrong password, too many tries, server down, offline, timeout) and leaves the field ready to retype
+  var inp = document.getElementById('ms-gate-p'), eye = document.getElementById('ms-gate-eye'), card = document.querySelector('.gate-card');
+  var showPw = function (on) { if (!inp || !eye) return; inp.type = on ? 'text' : 'password'; eye.setAttribute('aria-pressed', String(on)); eye.setAttribute('aria-label', on ? 'Hide password' : 'Show password'); eye.classList.toggle('on', on); };
+  if (eye) eye.addEventListener('click', function () { var pos = inp.selectionStart; showPw(inp.type === 'password'); inp.focus(); try { inp.setSelectionRange(pos, pos); } catch (e) {} });
+  var fail = function (msg, shake) { err.textContent = msg; inp.setAttribute('aria-invalid', 'true'); if (shake && card) { card.classList.remove('shake'); void card.offsetWidth; card.classList.add('shake'); } inp.focus(); inp.select(); };
+  if (inp) inp.addEventListener('input', function () { inp.removeAttribute('aria-invalid'); if (err.textContent) err.textContent = ''; });
   if (f) f.addEventListener('submit', async function (ev) { ev.preventDefault();
-    var pw = document.getElementById('ms-gate-p').value || '', btn = document.getElementById('ms-gate-go');
-    err.textContent = ''; if (!pw) { err.textContent = 'Type your password.'; document.getElementById('ms-gate-p').focus(); return; }
-    if (!window.MS_API) { err.textContent = 'Sign in on meridianx.dev: this copy of the page cannot check passwords.'; return; }
-    btn.disabled = true; btn.textContent = 'Signing in…';
+    var pw = inp.value || '', btn = document.getElementById('ms-gate-go'), lab = btn.querySelector('.gate-go-t') || btn;
+    if (btn.getAttribute('aria-busy') === 'true') return;
+    err.textContent = ''; if (!pw) { fail('Type your password first.'); return; }
+    if (!window.MS_API) { fail('This copy of the page cannot check passwords: sign in on meridianx.dev.'); return; }
+    btn.setAttribute('aria-busy', 'true'); btn.disabled = true; inp.readOnly = true; lab.textContent = 'Signing in…';
     // the password goes to the server once (9 Nov); it answers with the account and an HttpOnly session cookie
-    var r = null, j = {}; try { r = await fetch(window.MS_API + 'login', { method: 'POST', headers: { 'Content-Type': 'application/json' }, credentials: 'same-origin', cache: 'no-store', body: JSON.stringify({ password: pw }) }); j = await r.json().catch(function () { return {}; }); } catch (e) {}
-    if (r && r.ok && j && j.account) { window.msTrack && msTrack('Sign in', { result: 'ok' });
+    var r = null, j = {}, timedOut = false, ac = window.AbortController ? new AbortController() : null, tm = setTimeout(function () { timedOut = true; if (ac) ac.abort(); }, 15000);
+    try { r = await fetch(window.MS_API + 'login', { method: 'POST', headers: { 'Content-Type': 'application/json' }, credentials: 'same-origin', cache: 'no-store', body: JSON.stringify({ password: pw }), signal: ac ? ac.signal : undefined }); j = await r.json().catch(function () { return {}; }); } catch (e) {}
+    clearTimeout(tm);
+    if (r && r.ok && j && j.account) { window.msTrack && msTrack('Sign in', { result: 'ok' }); lab.textContent = 'Signed in · opening the desk…'; showPw(false);
       try { localStorage.setItem('ms-acct', JSON.stringify(j.account)); localStorage.removeItem('ms-guest'); } catch (e) {} location.reload(); return; }
-    btn.disabled = false; btn.textContent = 'Sign in';
-    if (!r || r.status >= 500) { err.textContent = 'Sign-in is not available right now. Try again in a minute.'; return; }
-    if (r.status === 429) { err.textContent = (j && j.error) || 'Too many password attempts. Try again in a few minutes.'; return; }   // api/_guard.js
-    window.msTrack && msTrack('Sign in', { result: 'wrong' }); err.textContent = 'Wrong password.'; document.getElementById('ms-gate-p').select(); });
+    btn.removeAttribute('aria-busy'); btn.disabled = false; inp.readOnly = false; lab.textContent = 'Sign in';
+    if (!r) { fail(timedOut ? 'The server took too long to answer. Try again.' : navigator.onLine === false ? 'You are offline. Connect and try again.' : 'Could not reach the server. Check your connection and try again.'); return; }
+    if (r.status === 429) { fail((j && j.error) || 'Too many tries. Wait a few minutes, then try again.')   /* api/_guard.js */; return; }
+    if (r.status >= 500) { fail('Sign-in is unavailable right now (the server could not check accounts). Try again in a minute.'); return; }
+    window.msTrack && msTrack('Sign in', { result: 'wrong' }); fail('That password was not accepted. Check it and try again.', true); });
   if (gb) gb.addEventListener('click', function () { window.msTrack && msTrack('Guest'); var was = document.documentElement.dataset.mode === 'public' && localStorage.getItem('ms-guest'); try { localStorage.setItem('ms-guest', '1'); } catch (e) {} if (was) msGate(false); else location.reload(); });
   if (x) x.addEventListener('click', function () { msGate(false); });
   document.addEventListener('keydown', function (ev) { if (ev.key === 'Escape' && document.documentElement.dataset.gate && localStorage.getItem('ms-guest')) msGate(false); });
@@ -2271,9 +2282,10 @@ html:not([data-mode="admin"]):not([data-ict]) .dsk, html[data-deny~="desks"]:not
 .gs-i3 { --m: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round'%3E%3Cpath d='M4 9V5a1 1 0 0 1 1-1h4M15 4h4a1 1 0 0 1 1 1v4M20 15v4a1 1 0 0 1-1 1h-4M9 20H5a1 1 0 0 1-1-1v-4'/%3E%3Ccircle cx='12' cy='12' r='2.5'/%3E%3C/svg%3E"); }
 .gs-live { display: inline-grid; gap: 6px; padding: 12px 16px; border-radius: 12px; background: rgba(15,17,22,.72); border: 1px solid rgba(255,255,255,.08); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); min-width: 300px; }
 .gs-tk { display: flex; align-items: baseline; gap: 10px; font: 500 13px Figtree, sans-serif; color: #a6adbb; }
-.gs-dot { width: 8px; height: 8px; border-radius: 50%; background: #3fbf8f; align-self: center; box-shadow: 0 0 0 0 rgba(63,191,143,.6); animation: gs-pulse 2s ease-out infinite; }
-@keyframes gs-pulse { to { box-shadow: 0 0 0 8px transparent; } }
-.gs-dot.off { background: #7c8496; animation: none; }
+.gs-dot { width: 8px; height: 8px; border-radius: 50%; background: #3fbf8f; align-self: center; position: relative; flex: none; }
+@media (prefers-reduced-motion: no-preference) { .gs-dot::after { content: ""; position: absolute; inset: 0; border-radius: 50%; background: inherit; animation: gs-pulse 2.2s cubic-bezier(.22, 1, .36, 1) 3; } }
+@keyframes gs-pulse { from { transform: scale(1); opacity: .55; } to { transform: scale(2.8); opacity: 0; } }
+.gs-dot.off { background: #7c8496; } .gs-dot.off::after { display: none; }
 .gs-sym { font-weight: 600; color: #eceef2; }
 .gs-px { font: 650 18px "JetBrains Mono", ui-monospace, monospace; color: #f4f5f8; font-variant-numeric: tabular-nums; }
 .gs-tf { display: inline-flex; gap: 4px; margin-left: auto; }
@@ -2292,7 +2304,7 @@ html:not([data-mode="admin"]):not([data-ict]) .dsk, html[data-deny~="desks"]:not
 .gs-tape[hidden] { display: none; }
 .gs-tape-in { display: inline-flex; gap: 26px; padding: 8px 14px; white-space: nowrap; font: 600 12px "JetBrains Mono", ui-monospace, monospace; color: #a6adbb; width: max-content; }
 .gs-tape-in i { font-style: normal; color: #f4f5f8; } .gs-tape-in .u { color: #3fbf8f; } .gs-tape-in .d { color: #ff6b81; }
-@media (prefers-reduced-motion: no-preference) { .gs-tape-in { animation: gs-tape 40s linear infinite; } @keyframes gs-tape { to { transform: translateX(-50%); } } }
+.gs-tape-in > span { color: #6f7686; }
 @media (max-width: 560px) { .gs-proof { grid-template-columns: 1fr 1fr; } .gs-proof .gs-pk:last-child { grid-column: 1 / -1; } }
 /* card refinements */
 .gate-card { width: 100% !important; border-radius: 18px !important; padding: 30px 30px 20px !important; box-shadow: 0 40px 100px -20px rgba(0,0,0,.7), 0 0 0 1px rgba(255,255,255,.04) inset !important; }
@@ -2300,7 +2312,7 @@ html:not([data-mode="admin"]):not([data-ict]) .dsk, html[data-deny~="desks"]:not
 .gate-caps { margin: 6px 0 0; font: 500 12.5px Figtree, sans-serif; color: #e9c46a; display: flex; align-items: center; gap: 6px; }
 .gate-caps::before { content: "⇪"; font-size: 13px; }
 .gate-go { position: relative; }
-.gate-go:disabled::after { content: ""; position: absolute; right: 16px; top: 50%; width: 14px; height: 14px; margin-top: -7px; border-radius: 50%; border: 2px solid rgba(23,19,10,.35); border-top-color: #17130a; animation: gate-spin .7s linear infinite; }
+.gate-go[aria-busy="true"]::after { content: ""; position: absolute; right: 16px; top: 50%; width: 14px; height: 14px; margin-top: -7px; border-radius: 50%; border: 2px solid rgba(23,19,10,.35); border-top-color: #17130a; animation: gate-spin .8s linear 24; }
 @keyframes gate-spin { to { transform: rotate(360deg); } }
 .gate-card.shake { animation: gate-shake .42s cubic-bezier(.36, .07, .19, .97); }
 @keyframes gate-shake { 15%, 85% { transform: translateX(-2px); } 30%, 70% { transform: translateX(5px); } 45%, 55% { transform: translateX(-7px); } }
@@ -2310,7 +2322,7 @@ html[data-gate] .gate-bg path[stroke] { stroke-dasharray: 2400; stroke-dashoffse
 @keyframes gate-draw { to { stroke-dashoffset: 0; } }
 html[data-gate] .gate-side { animation: gate-in .6s .1s cubic-bezier(.16, 1, .3, 1) both; } html[data-gate] .gate-card { animation: gate-in .6s cubic-bezier(.16, 1, .3, 1) both; }
 @keyframes gate-in { from { opacity: 0; transform: translateY(10px); } }
-@media (prefers-reduced-motion: reduce) { html[data-gate] .gate-bg path[stroke] { animation: none; stroke-dasharray: none; } html[data-gate] .gate-side, html[data-gate] .gate-card, .gate-card.shake, .gs-dot { animation: none !important; } }
+@media (prefers-reduced-motion: reduce) { html[data-gate] .gate-bg path[stroke] { animation: none; stroke-dasharray: none; } html[data-gate] .gate-side, html[data-gate] .gate-card, .gate-card.shake, .gs-dot, .gs-dot::after, .gate-go[aria-busy="true"]::after { animation: none !important; } }
 html[data-motion="off"][data-gate] .gate-bg path[stroke] { animation: none; stroke-dasharray: none; } html[data-motion="off"] .gate-side, html[data-motion="off"] .gate-card { animation: none !important; }
 /* tablet and phone: the card first, a compact desk strip above it */
 @media (max-width: 900px) {
@@ -2667,26 +2679,27 @@ html[data-motion="off"] #v-ict .ict-cal-d:hover { transform: none !important; }
     <!-- what the desk is doing right now, from public council-data (8 Nov, owner: make guests want to join) -->
     <div class="gs-proof" id="gs-proof" hidden>
       <div class="gs-pk"><span>Open now</span><b id="gs-p-open">—</b><small>paper trades the council manages</small></div>
-      <div class="gs-pk"><span>ICT replay</span><b id="gs-p-ict">—</b><small id="gs-p-ict-s">H1 iFVG, 2020 → now</small></div>
+      <div class="gs-pk"><span>ICT replay</span><b id="gs-p-ict">—</b><small id="gs-p-ict-s">since 2020</small></div>
       <div class="gs-pk"><span>Last signal</span><b id="gs-p-last">—</b><small id="gs-p-last-s"></small></div>
     </div>
     <div class="gs-tape" id="gs-tape" aria-hidden="true" hidden><div class="gs-tape-in" id="gs-tape-in"></div></div>
   </aside>
   <div class="gate-card">
     <div class="gate-brand"><i class="ms-coin" aria-hidden="true"></i><span>Aurum Desk</span><button type="button" class="gate-x" id="ms-gate-x" aria-label="Close sign-in">×</button></div>
-    <h1 id="ms-gate-t">Sign in</h1>
-    <p class="gate-sub">Welcome back. Sign in to continue.</p>
-    <form id="ms-gate-f" novalidate>
+    <h1 id="ms-gate-t">Sign in to the desk</h1>
+    <p class="gate-sub">Your password opens your own account.</p>
+    <!-- sign-in (9 Nov 2026 polish): the password goes to /api/login once and is checked on the server; nothing secret lives here -->
+    <form id="ms-gate-f" method="post" action="#" novalidate>
+      <input class="gate-user" type="text" name="username" autocomplete="username" value="Aurum Desk" tabindex="-1" aria-hidden="true">
       <label for="ms-gate-p">Password</label>
-      <input id="ms-gate-p" name="password" type="password" autocomplete="current-password" aria-describedby="ms-gate-caps ms-gate-err">
-      <p class="gate-caps" id="ms-gate-caps" hidden>Caps Lock is on</p>
-      <p class="gate-err" id="ms-gate-err" role="alert"></p>
-      <button type="submit" class="gate-go" id="ms-gate-go">Sign in</button>
+      <span class="pw-wrap gate-pw"><input id="ms-gate-p" name="password" type="password" autocomplete="current-password" autocapitalize="off" autocorrect="off" spellcheck="false" enterkeyhint="go" required aria-describedby="ms-gate-msg"><button type="button" class="gate-eye" id="ms-gate-eye" aria-controls="ms-gate-p" aria-pressed="false" aria-label="Show password"><svg class="ge-on" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg><svg class="ge-off" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 3l18 18M10.6 5.1A10.9 10.9 0 0 1 12 5c6.5 0 10 7 10 7a17.6 17.6 0 0 1-3.2 4.2M6.3 6.3C3.6 8 2 12 2 12s3.5 7 10 7c1.6 0 3-.4 4.3-1"/><path d="M9.9 9.9a3 3 0 0 0 4.2 4.2"/></svg></button></span>
+      <div class="gate-msg" id="ms-gate-msg"><p class="gate-help">Case-sensitive · press Enter to sign in</p><p class="gate-caps" id="ms-gate-caps" hidden>Caps Lock is on</p><p class="gate-err" id="ms-gate-err" role="alert"></p></div>
+      <button type="submit" class="gate-go" id="ms-gate-go"><span class="gate-go-t">Sign in</span></button>
     </form>
-    <div class="gate-or"><span>or</span></div>
-    <button type="button" class="gate-guest" id="ms-gate-guest">Continue as guest</button>
-    <p class="gate-note">Guests see a live gold H4 chart with one trade setup and the P&amp;L calendar. <b>Want a seat at the desk?</b> Members get every chart, the council's trades and the ICT, gold and crypto desks. Ask the owner for a password.</p>
-    <p class="gate-foot"><span>Paper trading only · not financial advice</span><span>meridianx.dev</span></p>
+    <div class="gate-or"><span>or look around first</span></div>
+    <button type="button" class="gate-guest" id="ms-gate-guest"><span>Continue as guest</span><small>Live gold chart, the trade and results</small></button>
+    <p class="gate-note"><b>Want a seat at the desk?</b> Seats are by invitation: ask the owner for a password.</p>
+    <p class="gate-foot"><span class="gate-sec"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="10" width="16" height="11" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg>Checked on the server · private session</span><span>Paper trading · not financial advice</span></p>
   </div>
   </div>
 </div>
@@ -2793,18 +2806,20 @@ html[data-motion="off"] #v-ict .ict-cal-d:hover { transform: none !important; }
     <div class="g-head"><div><h1 class="h-head">The desk's gold trade <small class="g-live"><i aria-hidden="true"></i>live</small></h1><p class="ms-note g-lede">The council's current gold trade: its levels are drawn on every gold chart above, its results and the P&amp;L calendar are here. Paper trading, one system, nothing hidden.</p></div></div>
     <!-- the trade in words (8 Nov, owner: "improve this"; the chart itself is the charts grid above) -->
     <div class="card g-setup" id="g-setup" hidden></div>
-    <h2 class="g-h2">Results <small>main systems, live trades only</small></h2>
+    <h2 class="g-h2">Results <small>the desk's main system · paper trades</small></h2>
     <div class="h-today" id="g-today" role="group" aria-label="Results"></div>
-    <!-- the invitation (8 Nov): what members get, with a sign-in that opens the gate -->
+    <!-- results as a picture (9 Nov 2026): the cumulative R of the main system over the last 90 days, drawn at the card's width -->
+    <div class="card g-curve" id="g-curve"><div class="g-cv-h"><div class="g-cv-net"><span>Last 90 days</span><b id="g-cv-net">—</b></div><p class="g-cv-st" id="g-cv-st">Loading results…</p></div><div class="g-cv-plot" id="g-cv-plot" role="img" aria-label="Loading results"></div><p class="g-cv-note">Cumulative result in R: each closed trade adds what it made or lost in units of its risk. Paper trades of the desk's main system.</p></div>
+    <div class="card g-cal-card"><div class="ms-k"><span>P&amp;L calendar</span><span class="cal-nav"><button type="button" id="g-cal-prev" aria-label="Previous month">‹</button><b id="g-cal-m"></b><button type="button" id="g-cal-next" aria-label="Next month">›</button></span></div>
+      <div class="cal" id="g-cal"></div><p class="ms-note" id="g-cal-sum"></p></div>
+    <!-- the invitation (8 Nov, last on the page since 9 Nov): what members get, a sign-in that opens the gate, and how to get a seat -->
     <section class="g-join" aria-labelledby="g-join-t">
-      <div class="g-join-txt"><h2 id="g-join-t">This is the guest view. Members get the whole desk.</h2>
+      <div class="g-join-txt"><p class="g-join-k">Guest view</p><h2 id="g-join-t">Want a seat at the desk?</h2>
         <ul><li><b>Every chart</b>: D1 to M1 with structure, origins, the next setup and your own indicators and drawings.</li>
           <li><b>The AI council</b>: every paper trade it places, manages and reviews, with the loss reviews and the systems behind them.</li>
           <li><b>Three desks</b>: ICT on index futures and gold, the gold playbook, crypto scalps, plus the macro desk with the strategist and the veteran.</li></ul></div>
-      <div class="g-join-act"><button type="button" class="gate-go g-join-btn" id="g-join-btn">Sign in</button><p>Have no password yet? Ask the owner for a seat.</p></div>
+      <div class="g-join-act"><button type="button" class="gate-go g-join-btn" id="g-join-btn">Sign in</button><p>No password yet? Seats are by invitation: <b>ask the owner for a seat</b>.</p></div>
     </section>
-    <div class="card g-cal-card"><div class="ms-k"><span>P&amp;L calendar</span><span class="cal-nav"><button type="button" id="g-cal-prev" aria-label="Previous month">‹</button><b id="g-cal-m"></b><button type="button" id="g-cal-next" aria-label="Next month">›</button></span></div>
-      <div class="cal" id="g-cal"></div><p class="ms-note" id="g-cal-sum"></p></div>
   </section>
   <!-- ─── Home: one card per section ─── -->
   <section class="view" id="v-home" aria-label="Home">
@@ -6542,6 +6557,41 @@ function msNextSetup(bars, A) {
     document.getElementById('g-cal-m').innerHTML = `${first.toLocaleDateString(undefined, { month: 'long', year: 'numeric' })}${up + dn ? ` <small class="cal-mt ${mR > 0 ? 'pos' : mR < 0 ? 'neg' : ''}">${fR(mR)}</small>` : ''}`;
     const n = up + dn, sum = document.getElementById('g-cal-sum');
     if (sum) sum.innerHTML = n ? `Month: <b class="${mR >= 0 ? 'pos' : 'neg'}">${fR(mR)}</b> · ${up} green day${up === 1 ? '' : 's'}, ${dn} red. Our system only; days before the live start come from its replay.` : 'No closed trades of our system this month.';
+    renderGuestCurve();
+  }
+  // Guest results as a picture (9 Nov 2026): cumulative R of the main system (sysClosed) over the last 90 days, a step line drawn
+  // at the card's pixel width (text stays 12 px), zero line, high / low / now on the right; redrawn on resize, skipped when unchanged
+  const GCV = { sig: '', on: false };
+  function renderGuestCurve() {
+    const el = document.getElementById('g-curve'), plot = document.getElementById('g-cv-plot'); if (!el || !plot || !PUB) return;
+    if (!GCV.on) { GCV.on = true; let raf = 0; addEventListener('resize', () => { cancelAnimationFrame(raf); raf = requestAnimationFrame(renderGuestCurve); }, { passive: true }); }
+    const now = Date.now() / 1000, t0 = now - 90 * 86400, fR = (v, d = 1) => `${v > 0 ? '+' : v < 0 ? '−' : ''}${Math.abs(v).toFixed(d)}R`;
+    const L = COUNCIL.trades ? sysClosed().filter((x) => x.closed >= t0 && x.closed <= now + 60).sort((a, b) => a.closed - b.closed) : null;
+    const W = Math.round(plot.clientWidth), H = Math.round(plot.clientHeight); if (!W || !H) return;
+    const sig = `${W}x${H}|${L ? L.length : '-'}|${L && L.length ? L[L.length - 1].id + L.reduce((q, x) => q + x.R, 0).toFixed(3) : ''}|${Math.floor(now / 3600)}`;
+    if (sig === GCV.sig) return; GCV.sig = sig;
+    const net = document.getElementById('g-cv-net'), st = document.getElementById('g-cv-st');
+    if (!L) return;
+    if (!L.length) { net.textContent = '0.0R'; net.className = ''; st.textContent = 'No closed trades in the last 90 days.'; plot.setAttribute('aria-label', 'No closed trades in the last 90 days'); plot.innerHTML = ''; return; }
+    let c = 0, peak = 0, dip = 0; const pts = [[t0, 0]];
+    for (const x of L) { c += x.R; pts.push([x.closed, c]); peak = Math.max(peak, c); dip = Math.min(dip, c - peak); }
+    pts.push([now, c]);
+    const wins = L.filter((x) => x.R > 0).length, lo = Math.min(0, ...pts.map((q) => q[1])), hi = Math.max(0, ...pts.map((q) => q[1]));
+    net.textContent = fR(c); net.className = c > 0 ? 'pos' : c < 0 ? 'neg' : '';
+    st.innerHTML = `<span><b>${L.length}</b> trades</span><span><b>${Math.round((100 * wins) / L.length)}%</b> won</span><span>deepest dip <b>${fR(dip)}</b></span>`;
+    const padR = 58, padT = 10, padB = 24, iw = W - padR, ih = H - padT - padB, span = (hi - lo) || 1;
+    const X = (t) => ((t - t0) / (now - t0)) * iw, Y = (v) => padT + (1 - (v - lo) / span) * ih;
+    let d = `M0,${Y(0).toFixed(1)}`; for (let i = 1; i < pts.length; i++) d += `H${X(pts[i][0]).toFixed(1)}V${Y(pts[i][1]).toFixed(1)}`;
+    const area = `${d}H${iw.toFixed(1)}V${Y(0).toFixed(1)}Z`, tone = c >= 0 ? 'up' : 'dn';
+    // month starts along the bottom
+    let ticks = ''; for (let m = new Date(t0 * 1000); ; ) { m = new Date(m.getFullYear(), m.getMonth() + 1, 1); const t = m / 1000; if (t > now) break; const x = X(t); if (x < 24 || x > iw - 24) continue;
+      ticks += `<line class="g-cv-grid" x1="${x.toFixed(1)}" x2="${x.toFixed(1)}" y1="${padT}" y2="${padT + ih}"/><text class="g-cv-ax" x="${x.toFixed(1)}" y="${H - 6}" text-anchor="middle">${m.toLocaleDateString(undefined, { month: 'short' })}</text>`; }
+    const lab = (v, cls) => `<text class="g-cv-ax ${cls || ''}" x="${W - 4}" y="${(Y(v) + 4).toFixed(1)}" text-anchor="end">${fR(v)}</text>`;
+    const yLabels = [[hi, ''], [lo, '']].filter(([v]) => Math.abs(Y(v) - Y(c)) > 16 && Math.abs(Y(v) - Y(0)) > 16 && v !== 0);
+    plot.setAttribute('aria-label', `Cumulative result over the last 90 days: ${fR(c)} from ${L.length} closed trades, ${Math.round((100 * wins) / L.length)}% won, deepest dip ${fR(dip)}`);
+    plot.innerHTML = `<svg viewBox="0 0 ${W} ${H}" width="${W}" height="${H}" aria-hidden="true" focusable="false">${ticks}
+      <line class="g-cv-zero" x1="0" x2="${iw}" y1="${Y(0).toFixed(1)}" y2="${Y(0).toFixed(1)}"/><path class="g-cv-area ${tone}" d="${area}"/><path class="g-cv-line ${tone}" d="${d}"/>
+      <circle class="g-cv-dot ${tone}" cx="${iw.toFixed(1)}" cy="${Y(c).toFixed(1)}" r="3.5"/>${Math.abs(Y(c) - Y(0)) > 16 ? lab(0) : ''}${yLabels.map(([v]) => lab(v)).join('')}<text class="g-cv-ax g-cv-now ${tone}" x="${W - 4}" y="${(Y(c) + 4).toFixed(1)}" text-anchor="end">${fR(c)}</text></svg>`;
   }
   ['g-cal-prev', 'g-cal-next'].forEach((id, i) => { const b = document.getElementById(id); if (b) b.addEventListener('click', () => { GCAL.m += i ? 1 : -1; if (GCAL.m < 0) { GCAL.m = 11; GCAL.y--; } if (GCAL.m > 11) { GCAL.m = 0; GCAL.y++; } renderGuestCal(); }); });   // live paper systems: the gold replica, Mosha BO (gold), crypto trend (BTC, ETH, SOL, XRP)
   function renderCalendar() {
@@ -9703,8 +9753,7 @@ function gpStats(T) {
   var R = document.documentElement; if (!document.getElementById('ms-gate')) return;
   var inp = document.getElementById('ms-gate-p'), caps = document.getElementById('ms-gate-caps'), err = document.getElementById('ms-gate-err'), card = document.querySelector('.gate-card');
   function capsCheck(e) { if (caps && e.getModifierState) caps.hidden = !e.getModifierState('CapsLock'); }
-  if (inp) { inp.addEventListener('keydown', capsCheck); inp.addEventListener('keyup', capsCheck); inp.addEventListener('blur', function () { if (caps) caps.hidden = true; }); inp.addEventListener('input', function () { if (err && err.textContent) err.textContent = ''; }); }
-  if (err && card) new MutationObserver(function () { if (/wrong/i.test(err.textContent)) { card.classList.remove('shake'); void card.offsetWidth; card.classList.add('shake'); } }).observe(err, { childList: true, characterData: true, subtree: true });
+  if (inp) { inp.addEventListener('keydown', capsCheck); inp.addEventListener('keyup', capsCheck); inp.addEventListener('blur', function () { if (caps) caps.hidden = true; }); }
   function sess() { var d = new Date(), h = d.getUTCHours() + d.getUTCMinutes() / 60, w = d.getUTCDay(), on = [], el = document.getElementById('gs-sess'); if (!el) return;
     if (w === 6 || (w === 0 && h < 22) || (w === 5 && h >= 21)) { el.innerHTML = 'Forex and gold <b>closed</b> for the weekend · crypto trades 24/7'; return; }
     if (h >= 23 || h < 8) on.push('Asia'); if (h >= 7 && h < 16) on.push('London'); if (h >= 12.5 && h < 21) on.push('New York');
@@ -9722,12 +9771,12 @@ function gpStats(T) {
       var T = Array.isArray(a[0]) ? a[0] : (a[0] && a[0].trades) || [], I = a[1] || null, S = a[2] || null, box = document.getElementById('gs-proof'); if (!box) return;
       var open = T.filter(function (t) { return t.status === 'open'; }), set = function (id, v, cls) { var el = document.getElementById(id); if (el) { el.textContent = v; if (cls != null) el.className = cls; } };
       set('gs-p-open', String(open.length));
-      var tot = I && I.totals; if (tot && tot.n) { set('gs-p-ict', (tot.R > 0 ? '+' : '') + Math.round(tot.R) + 'R', tot.R > 0 ? 'pos' : tot.R < 0 ? 'neg' : ''); set('gs-p-ict-s', tot.n + ' trades · ' + Math.round(100 * tot.wins / tot.n) + '% winners · 2020 → now'); }
+      var tot = I && I.totals; if (tot && tot.n) { set('gs-p-ict', (tot.R > 0 ? '+' : '') + Math.round(tot.R) + 'R', tot.R > 0 ? 'pos' : tot.R < 0 ? 'neg' : ''); set('gs-p-ict-s', tot.n + ' trades · ' + Math.round(100 * tot.wins / tot.n) + '% won'); }
       var last = T.filter(function (t) { return t.opened; }).sort(function (x, y) { return y.opened - x.opened; })[0];
-      if (last) { set('gs-p-last', (last.side === 'sell' ? '▼ ' : '▲ ') + (last.label || String(last.market || '').toUpperCase())); var ago = Math.max(1, Math.round((Date.now() / 1000 - last.opened) / 60)); set('gs-p-last-s', (last.name || last.k || 'setup') + ' · ' + (ago < 60 ? ago + ' min ago' : ago < 1440 ? Math.round(ago / 60) + ' h ago' : Math.round(ago / 1440) + ' d ago')); }
+      if (last) { set('gs-p-last', (last.side === 'sell' ? '▼ ' : '▲ ') + (last.label || String(last.market || '').toUpperCase())); var ago = Math.max(1, Math.round((Date.now() / 1000 - last.opened) / 60)); set('gs-p-last-s', (last.side === 'sell' ? 'sell' : 'buy') + ' · ' + (ago < 60 ? ago + ' min ago' : ago < 1440 ? Math.round(ago / 60) + ' h ago' : Math.round(ago / 1440) + ' d ago')); }
       box.hidden = false;
       var M = S && S.markets, tape = document.getElementById('gs-tape-in'); if (M && tape) { var rows = Object.keys(M).map(function (k) { var m = M[k]; if (!m || !m.price) return ''; var ch = m.chg != null ? m.chg : m.change != null ? m.change : null; return '<i>' + (m.label || k.toUpperCase()) + '</i> ' + (+m.price).toLocaleString(undefined, { maximumFractionDigits: m.price > 100 ? 1 : 5 }) + (ch != null ? ' <span class="' + (ch > 0 ? 'u' : ch < 0 ? 'd' : '') + '">' + (ch > 0 ? '+' : '') + (+ch).toFixed(2) + '%</span>' : ''); }).filter(Boolean);
-        if (rows.length) { tape.innerHTML = rows.join('<span>·</span>') + '<span>·</span>' + rows.join('<span>·</span>') + '<span>·</span>'; document.getElementById('gs-tape').hidden = false; } }
+        if (rows.length) { tape.innerHTML = rows.join('<span aria-hidden="true">·</span>'); document.getElementById('gs-tape').hidden = false; } }
     }); }
   sess(); px(); proof(); setInterval(function () { if (R.dataset.gate) { sess(); } }, 30000); setInterval(px, 120000); setInterval(proof, 300000);
   window.msGateRefresh = function () { sess(); px(); proof(); };   // every Log in button shows the full card (8 Nov: from Charts it looked like the old one)
@@ -10844,6 +10893,112 @@ html[data-role="public"] #v-charts::before { content: "Guest view: candles, your
 :is(#v-guest, .g-merged) .g-join-btn:hover { filter: brightness(1.06); } :is(#v-guest, .g-merged) .g-join-btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 :is(#v-guest, .g-merged) .g-join-act p { margin: 0; font-size: 12.5px; color: var(--ink-faint); text-align: center; }
 @media (max-width: 720px) { :is(#v-guest, .g-merged) .g-join { grid-template-columns: 1fr; padding: 18px; } :is(#v-guest, .g-merged) .g-join-act { min-width: 0; width: 100%; } }
+</style>
+<style id="ms-gate3-css">
+/* ═══ Sign-in and guest polish (9 Nov 2026). Scoped to the gate (.gate*, .gs-*) and the guest page (#v-guest / .g-merged, the guest
+   banner and toolbar for html[data-role="public"]). The sign-in page stays dark in every theme (its own palette below, AA on #0f1116). ═══ */
+.gate { --g-ink: #eceef2; --g-dim: #b3bac6; --g-faint: #9aa2b1; --g-gold: #e9c46a; --g-red: #ff8c9e; --g-line: rgba(255,255,255,.1); }
+html[data-gate] .gate { padding: max(24px, env(safe-area-inset-top)) 16px max(24px, env(safe-area-inset-bottom)); }
+.gate-card h1 { margin-bottom: 6px; text-wrap: balance; }
+.gate-sub { margin: 0 0 18px; color: var(--g-dim); font-size: 14px; }
+.gate form { gap: 8px; }
+.gate label { margin-top: 0; color: var(--g-ink); }
+/* password managers: a fixed, invisible username so the saved entry has a name (password-only sign-in) */
+.gate .gate-user { position: absolute; width: 1px; height: 1px; min-height: 0; padding: 0; margin: -1px; border: 0; opacity: 0; overflow: hidden; clip: rect(0 0 0 0); pointer-events: none; }
+.gate-pw { position: relative; display: block; }
+.gate-pw > input { width: 100%; box-sizing: border-box; min-height: 48px; padding-right: 52px !important; font-size: 16px; letter-spacing: .02em; }
+.gate-pw > input[type="password"] { letter-spacing: .12em; }
+.gate input[aria-invalid="true"] { border-color: var(--g-red); box-shadow: 0 0 0 3px rgba(255,140,158,.16); }
+.gate input[readonly] { color: var(--g-dim); }
+.gate-eye { position: absolute; right: 2px; top: 50%; transform: translateY(-50%); width: 44px; height: 44px; padding: 0; border: 0; border-radius: 8px; background: none; color: var(--g-dim); cursor: pointer; display: grid; place-items: center; touch-action: manipulation; }
+.gate-eye:hover { color: var(--g-ink); background: rgba(255,255,255,.05); }
+.gate-eye:focus-visible { outline: 2px solid #e3b341; outline-offset: -4px; }
+.gate-eye svg { width: 20px; height: 20px; } .gate-eye .ge-off, .gate-eye.on .ge-on { display: none; } .gate-eye.on .ge-off { display: block; }
+/* the caps hint and the error share one reserved row, so neither pushes the button down */
+.gate-msg { min-height: 40px; display: grid; align-content: start; gap: 4px; }
+.gate-help { margin: 0; color: var(--g-faint); font: 500 12.5px/1.4 Figtree, -apple-system, sans-serif; }
+.gate-msg:has(.gate-err:not(:empty)) .gate-help, .gate-msg:has(.gate-caps:not([hidden])) .gate-help { display: none; }
+.gate-msg .gate-caps { margin: 0; color: var(--g-gold); }
+.gate-err { min-height: 0; margin: 0; display: flex; gap: 8px; align-items: flex-start; color: var(--g-red); font: 500 13px/1.4 Figtree, -apple-system, sans-serif; text-wrap: pretty; }
+.gate-err:empty { display: none; }
+.gate-err::before { content: "!"; flex: none; width: 16px; height: 16px; margin-top: 1px; border-radius: 50%; background: var(--g-red); color: #1a0d10; font: 800 11px/16px Figtree, sans-serif; text-align: center; }
+.gate-go { min-height: 48px; margin-top: 0; font-size: 15px; display: flex; align-items: center; justify-content: center; box-shadow: 0 1px 0 rgba(255,255,255,.25) inset, 0 8px 24px -10px rgba(227,179,65,.55); }
+.gate-go[aria-busy="true"], .gate-go:disabled { opacity: 1; cursor: progress; background: #d9aa3c; }
+.gate-or { color: var(--g-faint); margin: 20px 0 14px; }
+.gate-or::before, .gate-or::after { background: var(--g-line); }
+.gate-guest { display: grid; gap: 1px; place-items: center; min-height: 56px; padding: 9px 14px; border-color: rgba(255,255,255,.18); }
+.gate-guest > span { font: 600 14.5px Figtree, -apple-system, sans-serif; color: var(--g-ink); }
+.gate-guest > small { font: 500 12.5px Figtree, -apple-system, sans-serif; color: var(--g-dim); }
+.gate-guest:hover { border-color: rgba(233,196,106,.5); background: rgba(233,196,106,.06); }
+.gate-note { margin: 14px 0 0; color: var(--g-dim); font-size: 13px; line-height: 1.5; text-wrap: pretty; }
+.gate-note b { color: var(--g-ink); font-weight: 600; }
+.gate-foot { color: var(--g-faint); font-size: 12px; flex-direction: column; align-items: flex-start; gap: 4px; }
+.gate-sec { display: inline-flex; align-items: center; gap: 6px; color: var(--g-dim); }
+.gate-sec svg { width: 13px; height: 13px; color: var(--g-gold); flex: none; }
+.gate-x { width: 44px; height: 44px; margin-right: -10px; color: var(--g-faint); }
+.gate-x:hover { color: var(--g-ink); }
+.gs-pk span, .gs-pk small, .gs-sess { color: var(--g-faint); }
+.gs-tape-in { color: var(--g-dim); }
+.gs-tk { flex-wrap: wrap; row-gap: 6px; }
+/* phones and tablets: the card first (brand inside it), the live strip and proof under it; the tape is for wide screens */
+@media (max-width: 900px) {
+  .gate-wrap { gap: 14px; }
+  .gate-side { order: 1; }
+  .gs-brand, .gs-tape { display: none !important; }
+  .gate-card .gate-brand > span { display: inline; } .gate-card .gate-brand > .ms-coin { display: inline-block; }
+  .gate-card .gate-brand { justify-content: flex-start; margin: 0 0 14px; min-height: 44px; }
+  .gs-proof { max-width: none; }
+}
+@media (max-width: 420px) { .gate-card h1 { font-size: 23px !important; } }
+@media (prefers-reduced-motion: reduce) { .gate-guest, .gate-eye { transition: none; } }
+
+/* ── guest page ── */
+:root[data-theme="light"] :is(#v-guest, .g-merged) { --buy: #067a62; --sell: #c42340; --ink-faint: #5d6472; }
+/* the live dot rings three times, then rests (no endless animation) */
+:is(#v-guest, .g-merged) .g-live i::after { animation-iteration-count: 3 !important; }
+:is(#v-guest, .g-merged) .g-h2 { margin-top: 18px; }
+:is(#v-guest, .g-merged) .g-setup { box-shadow: 0 10px 30px -22px rgba(0,0,0,.5); }
+/* results as a picture: cumulative R, last 90 days */
+:is(#v-guest, .g-merged) .g-curve { padding: 16px 18px 14px; border-radius: 14px; display: grid; gap: 10px; }
+.g-cv-h { display: flex; align-items: flex-end; justify-content: space-between; gap: 8px 20px; flex-wrap: wrap; }
+.g-cv-net { display: grid; gap: 2px; }
+.g-cv-net span { font: 600 12.5px var(--sans); color: var(--ink-faint); }
+.g-cv-net b { font: 650 26px/1.1 var(--mono); font-variant-numeric: tabular-nums; color: var(--ink); }
+.g-cv-net b.pos { color: var(--buy); } .g-cv-net b.neg { color: var(--sell); }
+.g-cv-st { margin: 0; display: flex; flex-wrap: wrap; gap: 4px 16px; font-size: 13px; color: var(--ink-dim); }
+.g-cv-st b { color: var(--ink); font-variant-numeric: tabular-nums; }
+.g-cv-plot { height: 190px; min-width: 0; }
+.g-cv-plot svg { display: block; width: 100%; height: 100%; overflow: visible; }
+.g-cv-zero { stroke: var(--line-strong, var(--line)); stroke-dasharray: 3 4; }
+.g-cv-grid { stroke: var(--line-soft, var(--line)); }
+.g-cv-line { fill: none; stroke-width: 2; stroke-linejoin: round; }
+.g-cv-line.up { stroke: var(--buy); } .g-cv-line.dn { stroke: var(--sell); }
+.g-cv-area { stroke: none; } .g-cv-area.up { fill: color-mix(in srgb, var(--buy) 12%, transparent); } .g-cv-area.dn { fill: color-mix(in srgb, var(--sell) 12%, transparent); }
+.g-cv-dot { stroke: var(--panel); stroke-width: 2; } .g-cv-dot.up { fill: var(--buy); } .g-cv-dot.dn { fill: var(--sell); }
+.g-cv-ax { font: 500 12px var(--mono); fill: var(--ink-faint); }
+.g-cv-now { font-weight: 700; } .g-cv-now.up { fill: var(--buy); } .g-cv-now.dn { fill: var(--sell); }
+.g-cv-note { margin: 0; font-size: 12.5px; color: var(--ink-faint); text-wrap: pretty; }
+@media (max-width: 560px) { .g-cv-plot { height: 160px; } :is(#v-guest, .g-merged) .g-curve { padding: 14px 14px 12px; } }
+/* the invitation closes the page */
+:is(#v-guest, .g-merged) .g-join { margin: 8px 0 18px; padding: 24px 26px; }
+:is(#v-guest, .g-merged) .g-join-k { margin: 0 0 4px; font: 700 11.5px var(--sans); letter-spacing: .08em; text-transform: uppercase; color: #e9c46a; }
+:root[data-theme="light"] :is(#v-guest, .g-merged) .g-join-k { color: #8a5a00; }
+:is(#v-guest, .g-merged) .g-join h2 { font-size: 22px; }
+:is(#v-guest, .g-merged) .g-join-act { min-width: 230px; }
+:is(#v-guest, .g-merged) .g-join-btn { min-height: 48px; box-shadow: 0 8px 24px -12px rgba(227,179,65,.6); }
+:is(#v-guest, .g-merged) .g-join-act p { color: var(--ink-dim); font-size: 13px; line-height: 1.45; max-width: 30ch; text-wrap: balance; }
+:is(#v-guest, .g-merged) .g-join-act p b { color: var(--ink); font-weight: 600; }
+@media (max-width: 720px) { :is(#v-guest, .g-merged) .g-join { padding: 20px 18px; } :is(#v-guest, .g-merged) .g-join-act p { max-width: none; } }
+/* guest banner over the charts: shorter, and a gold dot instead of a second gradient */
+html[data-role="public"] #v-charts::before { content: "Guest view · candles, indicators and drawings on any market. Meridian and ICT markups and the council's trades are for members."; padding: 10px 14px 10px 30px; line-height: 1.45;
+  background: radial-gradient(circle at 15px 50%, #e0a526 0 4px, transparent 4.5px), color-mix(in srgb, #e0a526 9%, var(--panel)); border-color: color-mix(in srgb, #e0a526 28%, var(--line)); }
+@media (max-width: 560px) { html[data-role="public"] #v-charts::before { content: "Guest view · candles and your own drawings on any market. Markups and the council's trades are for members."; font-size: 12.5px; background-position: 13px 50%, 0 0; padding: 8px 12px 8px 26px; background: radial-gradient(circle at 13px 50%, #e0a526 0 4px, transparent 4.5px), color-mix(in srgb, #e0a526 9%, var(--panel)); } }
+/* guest toolbar on a phone: the markup switch gets its own row (it was squeezed to 56 px with its labels on top of each other) */
+@media (max-width: 700px) {
+  html[data-role="public"] #v-charts .sec-h > .mk-mode { flex: 1 1 100%; }
+  html[data-role="public"] #v-charts .sec-h > .mk-mode button { flex: 1 1 0; min-width: 0; }
+  html[data-role="public"] #v-charts .sec-h > .mk-mode::before { display: none; }
+}
 </style>
 <style id="ms-home2-css">
 /* ── Home refresh (8 Nov 2026, owner: "a strong change in the design and theme of the dashboard, more noticeable").
