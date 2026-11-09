@@ -2,8 +2,8 @@
 const flags = require('./_flags');
 const closed = (d) => { const w = d.getUTCDay(), h = d.getUTCHours(); return w === 6 || (w === 5 && h >= 21) || (w === 0 && h < 22); };   // gold/NQ weekend break (UTC)
 module.exports = async (req, res) => {
-  const f = await flags(), base = `https://${req.headers.host}/cdata/`, now = new Date();
-  const age = async (p) => { try { const r = await fetch(base + p, { signal: AbortSignal.timeout(6000) }); if (!r.ok) return null; const at = (await r.json()).at; return at ? { at, ageMin: Math.round((now - Date.parse(at)) / 6e4) } : null; } catch { return null; } };
+  const f = await flags(), now = new Date(), { readFile } = require('./data.js');   // straight from council-data (/cdata needs a session since 9 Nov)
+  const age = async (p) => { try { const r = await readFile(p); if (!r.ok) return null; const at = JSON.parse(r.buf.toString('utf8')).at; return at ? { at, ageMin: Math.round((now - Date.parse(at)) / 6e4) } : null; } catch { return null; } };
   const [council, ict] = await Promise.all([age('snapshot.json'), age('ict/snapshot.json')]);
   // the last round of each job (dry or live), from the runner's Blob reports
   const last = async (job) => { const tok = process.env.BLOB_READ_WRITE_TOKEN; if (!tok) return null; try { const { list } = require('@vercel/blob'); const { blobs } = await list({ prefix: `runs/${job}-`, token: tok });

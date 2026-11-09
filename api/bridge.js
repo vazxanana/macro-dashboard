@@ -1,15 +1,18 @@
 // Broker bridge status and downloads (7 Nov 2026).
 //   GET  /api/bridge                      -> { lastRead: { at, client } | null }  (when an MT5/cTrader bridge last fetched mt5/signals.csv)
-//   POST /api/bridge { ownerPw, file }    -> the EA source (file "mt5" = CouncilBridge.mq5, "ctrader" = CouncilBridge.cs), owner only
+//   POST /api/bridge { ownerPw?, file }   -> the EA source (file "mt5" = CouncilBridge.mq5, "ctrader" = CouncilBridge.cs), owner only
+//                                            (owner password or the owner's session cookie)
 const fs = require('node:fs'), path = require('node:path'), crypto = require('node:crypto');
 const { list } = require('@vercel/blob');
-const OWNER_HASH = '49c5624f2625ed8b42b6e1bf2819a3a41ddb9743aeca36ea34ea7eb96c252ca8';
+const { OWNER_HASH } = require('./_accounts');
+const S = require('./_session');
 const FILES = { mt5: 'mt5/CouncilBridge.mq5', ctrader: 'ctrader/CouncilBridge.cs' };
 module.exports = async (req, res) => {
   res.setHeader('Cache-Control', 'no-store');
   if (req.method === 'POST') {
     let b; try { b = typeof req.body === 'string' ? (JSON.parse(req.body || '{}') || {}) : (req.body || {}); } catch (e) { return res.status(400).json({ error: 'bad JSON' }); }
-    if (!b.ownerPw || String(b.ownerPw).length > 200 || !crypto.timingSafeEqual(Buffer.from(crypto.createHash('sha256').update(String(b.ownerPw)).digest('hex')), Buffer.from(OWNER_HASH))) return res.status(403).json({ error: 'Owner password not accepted' });
+    const pwOk = !!b.ownerPw && String(b.ownerPw).length <= 200 && crypto.timingSafeEqual(Buffer.from(crypto.createHash('sha256').update(String(b.ownerPw)).digest('hex')), Buffer.from(OWNER_HASH));
+    if (!pwOk && !(S.sameOrigin(req) && (await S.isOwnerSession(req)))) return res.status(403).json({ error: 'Owner password not accepted' });
     const f = FILES[b.file]; if (!f) return res.status(400).json({ error: 'unknown file' });
     try { const txt = fs.readFileSync(path.join(process.cwd(), f), 'utf8'); res.setHeader('Content-Type', 'text/plain; charset=utf-8'); return res.status(200).send(txt); }
     catch (e) { return res.status(500).json({ error: 'file missing from the deployment' }); }

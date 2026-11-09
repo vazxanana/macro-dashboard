@@ -251,12 +251,13 @@
 </main>
 <section class="gate card" id="gate" hidden><h1>ChronosTrade</h1><p>Sign in on the desk first, then come back here.</p><p><a href="/#home">Open the desk</a></p></section>
 <script>
-(function () {
+(async function () {
   'use strict';
   const $ = (id) => document.getElementById(id), esc = (x) => String(x == null ? '' : x).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
-  let signed = false; try { signed = !!localStorage.getItem('ms-admin'); } catch (e) {}
-  if (!signed) { $('gate').hidden = false; return; } $('app').hidden = false;
-  try { const rec = JSON.parse(localStorage.getItem('ms-user-rec') || 'null'); $('who').textContent = rec ? rec.name : 'owner'; } catch (e) {}
+  // signed in? the server's word (/api/me reads the HttpOnly session cookie from the desk's sign-in, 9 Nov security fix)
+  let me = null; try { const r = await fetch('/api/me', { cache: 'no-store', credentials: 'same-origin' }); me = r.ok ? (await r.json()).account : null; } catch (e) {}
+  if (!me) { $('gate').hidden = false; return; } $('app').hidden = false;
+  $('who').textContent = me.u === 'owner' ? 'owner' : me.name;
   const MARKETS = [['xau', 'Gold XAU/USD', 2], ['xag', 'Silver XAG/USD', 3], ['nas100', 'Nasdaq 100', 1], ['spx500', 'S&P 500', 1], ['us30', 'Dow 30', 1], ['de40', 'DAX 40', 1], ['eurusd', 'EUR/USD', 5], ['gbpusd', 'GBP/USD', 5], ['usdjpy', 'USD/JPY', 3], ['audusd', 'AUD/USD', 5], ['usdcad', 'USD/CAD', 5], ['usdchf', 'USD/CHF', 5], ['nzdusd', 'NZD/USD', 5], ['gbpjpy', 'GBP/JPY', 3], ['bco', 'Brent oil', 2], ['wtico', 'WTI oil', 2]];
   const TFS = { '1m': 60, '5m': 300, '15m': 900, '1h': 3600, '4h': 14400 };
   $('sym').innerHTML = MARKETS.map((m) => `<option value="${m[0]}">${m[1]}</option>`).join('');

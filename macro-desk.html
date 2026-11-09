@@ -257,8 +257,15 @@
   </section>
   <p class="note" id="foot"></p>
 </main>
+<section id="md-gate" style="padding:0 16px" hidden><div class="card" style="max-width:520px;margin:48px auto;text-align:center"><h2>Macro desk</h2><p>Sign in on the desk first, then come back here.</p><p><a href="/#home">Open the desk</a></p></div></section>
 <script>
-(function () {
+(async function () {
+  // members only (9 Nov security fix): /api/me reads the HttpOnly session cookie set by the desk's sign-in; the council files
+  // behind /cdata answer only signed-in sessions. GitHub Pages / local copies read the public raw files as before (no check there).
+  if (/^https?:$/.test(location.protocol) && !/github\.io$/.test(location.hostname)) {
+    var me = null; try { var mr = await fetch('/api/me', { cache: 'no-store', credentials: 'same-origin' }); me = mr.ok ? (await mr.json()).account : null; } catch (e) {}
+    if (!me) { document.querySelector('main.wrap').style.display = 'none'; document.getElementById('md-gate').hidden = false; var w = document.getElementById('when'); if (w) w.textContent = 'Signed out'; return; }
+  }
   var BASE = (/^https?:$/.test(location.protocol) && !/github\.io$/.test(location.hostname) ? location.origin + '/cdata/' : 'https://raw.githubusercontent.com/vazxanana/macro-dashboard/council-data/');
   var $ = function (id) { return document.getElementById(id); };
   var esc = function (s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); };
