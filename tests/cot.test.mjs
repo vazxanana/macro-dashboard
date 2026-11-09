@@ -22,3 +22,9 @@ test('evaluation scores signals against later prices, and build marks missing ma
   const r = evaluate(features(rows), px, 1); assert.ok(r.extreme5 && r.flow20); assert.ok(r.flow5.base > 0.9);
   const out = build({ '099741': rows }, { eurusd: px }); assert.equal(out.find((m) => m.k === 'eur').missing, undefined); assert.equal(out.find((m) => m.k === 'gold').missing, true);
 });
+test('signal text speaks in the quoted pair: crowded-short CHF futures lean USD/CHF down', () => {
+  const rows = Array.from({ length: 300 }, (_, i) => ({ t: t0 + i * W, net: Math.round(1000 * Math.sin(i / 9)), long: 1, short: 1, tL: 1, tS: 1, oi: 1 }));
+  rows.push({ t: t0 + 300 * W, net: -5000, long: 1, short: 1, tL: 1, tS: 1, oi: 1 });
+  const chf = build({ '092741': rows }, {}).find((m) => m.k === 'chf'), eur = build({ '099741': rows }, {}).find((m) => m.k === 'eur');
+  assert.match(chf.signals[0].text, /USD\/CHF down/); assert.equal(chf.signals[0].pairDir, -1); assert.match(eur.signals[0].text, /EUR\/USD up/);
+});
