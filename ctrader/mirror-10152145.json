@@ -1246,6 +1246,33 @@
     ],
     "stopCheckedAt": "2026-11-09T07:14:37.000Z",
     "brokerStop": 1.33898
+   },
+   "eurusd-scalp-1794208621": {
+    "positionId": "47532379",
+    "symbol": "EURUSD",
+    "side": "sell",
+    "volume": 500000,
+    "lots": 0.05,
+    "digits": 5,
+    "setup": "scalp",
+    "status": "open",
+    "openedAt": "2026-11-09T07:18:02.000Z",
+    "councilEntry": 1.11657,
+    "stop": 1.11696,
+    "t1": 1.11311,
+    "riskCash": 2,
+    "margin": 11.16,
+    "shadow": true,
+    "mark": 1.11657,
+    "levelsFrom": "mark",
+    "fillPrice": 1.11651,
+    "slipR": 0.154,
+    "lagSec": 61,
+    "alerted": [
+     "open"
+    ],
+    "stopCheckedAt": "2026-11-09T07:18:02.000Z",
+    "brokerStop": 1.1169
    }
   },
   "day": {
@@ -1253,7 +1280,7 @@
    "startBalance": 9987.78
   },
   "startedAt": "2026-11-08T11:42:25.000Z",
-  "status": "ok · demo Fusion Markets · balance 9995.85 · 22 open · 1 resting",
+  "status": "ok · demo Fusion Markets · balance 9995.85 · 23 open · 1 resting",
   "skipped": {
    "audusd-position-1793601653": "price 0.68666 has run 1.27R from the council entry 0.70162: a different trade now",
    "xrp-rswing-1793942619": "none of XRPUSD found at the broker",
@@ -1291,14 +1318,9 @@
   },
   "catchUpAt": "2026-11-08T12:04:40.000Z",
   "balance": 9995.85,
-  "lastRun": "2026-11-09T07:15:04.000Z"
+  "lastRun": "2026-11-09T07:18:02.000Z"
  },
  "log": [
-  {
-   "at": "2026-11-08T20:37:33.000Z",
-   "msg": "not mirrored yet audusd-intraday-1793998319: AUDUSD market closed (paused until 20:47 UTC) (will retry)",
-   "trade": "audusd-intraday-1793998319"
-  },
   {
    "at": "2026-11-08T20:38:51.000Z",
    "msg": "not mirrored yet eurusd-rswing-1793610380: EURUSD market closed (paused until 20:47 UTC) (will retry)",
@@ -2793,6 +2815,11 @@
    "at": "2026-11-09T07:14:37.000Z",
    "msg": "opened sell GBPUSD 0.04 lot (council scalp)",
    "trade": "gbpusd-scalp-1794208418"
+  },
+  {
+   "at": "2026-11-09T07:18:02.000Z",
+   "msg": "opened sell EURUSD 0.05 lot (council scalp)",
+   "trade": "eurusd-scalp-1794208621"
   }
  ],
  "limits": {
@@ -2871,11 +2898,11 @@
   ]
  },
  "execution": {
-  "n": 43,
-  "meanSlipR": -0.016,
+  "n": 44,
+  "meanSlipR": -0.012,
   "medianSlipR": -0.002,
   "worstSlipR": 1.168,
-  "medianLagSec": 2927,
+  "medianLagSec": 2374,
   "bySymbol": {
    "SOLUSD": {
     "n": 5,
@@ -2890,8 +2917,8 @@
     "meanSlipR": -0.195
    },
    "EURUSD": {
-    "n": 3,
-    "meanSlipR": -0.13
+    "n": 4,
+    "meanSlipR": -0.059
    },
    "GBPUSD": {
     "n": 3,
