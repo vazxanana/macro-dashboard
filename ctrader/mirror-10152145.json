@@ -2692,7 +2692,7 @@
    "startBalance": 9987.78
   },
   "startedAt": "2026-11-08T11:42:25.000Z",
-  "status": "ok · demo Fusion Markets · balance 9964.88 · 26 open · 4 resting",
+  "status": "ok · demo Fusion Markets · balance 9964.88 · 26 open · 3 resting",
   "skipped": {
    "audusd-position-1793601653": "price 0.68666 has run 1.27R from the council entry 0.70162: a different trade now",
    "xrp-rswing-1793942619": "none of XRPUSD found at the broker",
@@ -2706,26 +2706,6 @@
   "resetAt": "2026-11-08T09:45Z",
   "resetDoneAt": "2026-11-08T11:42:47.000Z",
   "orders": {
-   "gbpusd-scalp-1794240823": {
-    "orderId": "33815891",
-    "symbol": "GBPUSD",
-    "side": "buy",
-    "volume": 100000,
-    "lots": 0.01,
-    "digits": 5,
-    "setup": "scalp",
-    "limitPrice": 1.3411,
-    "stop": 1.33982,
-    "t1": 1.34262,
-    "placedAt": "2026-11-09T16:14:46.000Z",
-    "expires": "2026-11-09T19:13:43.000Z",
-    "riskCash": 1.99,
-    "margin": 2.68,
-    "shadow": true,
-    "alerted": [
-     "pending"
-    ]
-   },
    "xau-rscalp-1794242893": {
     "orderId": "33817909",
     "symbol": "XAUUSD",
@@ -2790,14 +2770,9 @@
   },
   "catchUpAt": "2026-11-08T12:04:40.000Z",
   "balance": 9964.88,
-  "lastRun": "2026-11-09T17:35:17.000Z"
+  "lastRun": "2026-11-09T17:37:44.000Z"
  },
  "log": [
-  {
-   "at": "2026-11-08T22:03:09.000Z",
-   "msg": "set the missing stop on EURUSD 47373487 at 1.08061 (the broker had opened it without one)",
-   "trade": "eurusd-rswing-1793754423"
-  },
   {
    "at": "2026-11-08T22:03:09.000Z",
    "msg": "opened sell USDCHF 0.01 lot (council swing)",
@@ -4292,6 +4267,11 @@
    "at": "2026-11-09T17:23:37.000Z",
    "msg": "placed buy limit GBPUSD 0.03 lot at 1.34232 (council scalp, valid to 2026-11-09T20:22Z)",
    "trade": "gbpusd-scalp-1794244949"
+  },
+  {
+   "at": "2026-11-09T17:37:44.000Z",
+   "msg": "cancelled GBPUSD limit order 33815891 for gbpusd-scalp-1794240823: the council ended it: missed",
+   "trade": "gbpusd-scalp-1794240823"
   }
  ],
  "limits": {
