@@ -2503,6 +2503,33 @@
     "exitPrice": 74893.4,
     "councilExit": null,
     "councilR": 0
+   },
+   "audusd-scalp-1794239726": {
+    "positionId": "47706230",
+    "symbol": "AUDUSD",
+    "side": "buy",
+    "volume": 100000,
+    "lots": 0.01,
+    "digits": 5,
+    "setup": "scalp",
+    "status": "open",
+    "openedAt": "2026-11-09T15:56:42.000Z",
+    "councilEntry": 0.69054,
+    "stop": 0.68949,
+    "t1": 0.6930000000000001,
+    "riskCash": 2,
+    "margin": 1.38,
+    "shadow": true,
+    "mark": 0.69054,
+    "levelsFrom": "mark",
+    "fillPrice": 0.69057,
+    "slipR": 0.029,
+    "lagSec": 76,
+    "alerted": [
+     "open"
+    ],
+    "stopCheckedAt": "2026-11-09T15:56:42.000Z",
+    "brokerStop": 0.68952
    }
   },
   "day": {
@@ -2510,7 +2537,7 @@
    "startBalance": 9987.78
   },
   "startedAt": "2026-11-08T11:42:25.000Z",
-  "status": "ok · demo Fusion Markets · balance 9991.59 · 26 open · 2 resting",
+  "status": "ok · demo Fusion Markets · balance 9991.59 · 27 open · 2 resting",
   "skipped": {
    "audusd-position-1793601653": "price 0.68666 has run 1.27R from the council entry 0.70162: a different trade now",
    "xrp-rswing-1793942619": "none of XRPUSD found at the broker",
@@ -2568,14 +2595,9 @@
   },
   "catchUpAt": "2026-11-08T12:04:40.000Z",
   "balance": 9991.59,
-  "lastRun": "2026-11-09T15:53:43.000Z"
+  "lastRun": "2026-11-09T15:56:42.000Z"
  },
  "log": [
-  {
-   "at": "2026-11-08T21:43:51.000Z",
-   "msg": "not mirrored yet usdcad-scalp-1793689919: USDCAD market closed (paused until 21:51 UTC) (will retry)",
-   "trade": "usdcad-scalp-1793689919"
-  },
   {
    "at": "2026-11-08T21:43:51.000Z",
    "msg": "not mirrored yet usdchf-swing-1793762425: USDCHF market closed (paused until 21:51 UTC) (will retry)",
@@ -4070,6 +4092,11 @@
    "at": "2026-11-09T15:25:01.000Z",
    "msg": "closed BTCUSD position 47694911 (council: missed)",
    "trade": "btc-rscalp-1794237676"
+  },
+  {
+   "at": "2026-11-09T15:56:42.000Z",
+   "msg": "opened buy AUDUSD 0.01 lot (council scalp)",
+   "trade": "audusd-scalp-1794239726"
   }
  ],
  "limits": {
@@ -4148,11 +4175,11 @@
   ]
  },
  "execution": {
-  "n": 85,
-  "meanSlipR": -0.012,
+  "n": 86,
+  "meanSlipR": -0.011,
   "medianSlipR": 0,
   "worstSlipR": 1.168,
-  "medianLagSec": 166,
+  "medianLagSec": 164,
   "bySymbol": {
    "SOLUSD": {
     "n": 7,
@@ -4183,8 +4210,8 @@
     "meanSlipR": 0.198
    },
    "AUDUSD": {
-    "n": 13,
-    "meanSlipR": 0.045
+    "n": 14,
+    "meanSlipR": 0.044
    },
    "XAUUSD": {
     "n": 9,
