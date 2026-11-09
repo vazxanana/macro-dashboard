@@ -5,11 +5,11 @@
 // Stored privately in the Blob store as notices/list.json (100 kept). Read/unread is kept per browser and account (localStorage).
 const S = require('./_session.js');
 const KEEP = 100, SHOW = 50;
-function blobStore(env) {
-  const B = () => require('@vercel/blob'), token = env.BLOB_READ_WRITE_TOKEN, P = 'notices/list.json';
+function blobStore(env, io = {}) {
+  const B = () => io.blob || require('@vercel/blob'), F = io.fetch || fetch, token = env.BLOB_READ_WRITE_TOKEN, P = 'notices/list.json';
   return {
     async get() { const { blobs } = await B().list({ prefix: P, token }); const b = blobs.find((x) => x.pathname === P); if (!b) return [];
-      const r = await fetch(b.url, { headers: { Authorization: `Bearer ${token}` }, cache: 'no-store', signal: AbortSignal.timeout(8000) }); const j = r.ok ? await r.json() : []; return Array.isArray(j) ? j : []; },
+      const r = await F(b.url, { headers: { Authorization: `Bearer ${token}` }, cache: 'no-store', signal: AbortSignal.timeout(8000) }); if (!r.ok) throw new Error(`notices read ${r.status}`); const j = await r.json(); return Array.isArray(j) ? j : []; },   // a failed read never looks empty (a POST would overwrite the list),
     async put(list) { await B().put(P, JSON.stringify(list), { access: 'private', addRandomSuffix: false, allowOverwrite: true, contentType: 'application/json', token }); },
   };
 }
@@ -36,3 +36,4 @@ async function handle(req, res, d = {}) {
 }
 module.exports = (req, res) => handle(req, res);
 module.exports.handle = handle;
+module.exports.blobStore = blobStore;

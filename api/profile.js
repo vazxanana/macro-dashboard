@@ -8,11 +8,11 @@
 // writes only its own record. Stored privately in the Blob store as profiles/<key>.json. Nothing here touches trading.
 const S = require('./_session');
 
-function blobStore(env) {
-  const B = () => require('@vercel/blob'), token = env.BLOB_READ_WRITE_TOKEN;
+function blobStore(env, io = {}) {
+  const B = () => io.blob || require('@vercel/blob'), F = io.fetch || fetch, token = env.BLOB_READ_WRITE_TOKEN;
   return {
     async get(u) { const { blobs } = await B().list({ prefix: `profiles/${u}.json`, token }); const b = blobs.find((x) => x.pathname === `profiles/${u}.json`); if (!b) return null;
-      const r = await fetch(b.url, { headers: { Authorization: `Bearer ${token}` }, cache: 'no-store', signal: AbortSignal.timeout(8000) }); return r.ok ? r.json() : null; },
+      const r = await F(b.url, { headers: { Authorization: `Bearer ${token}` }, cache: 'no-store', signal: AbortSignal.timeout(8000) }); if (!r.ok) throw new Error(`profile read ${r.status}`); return r.json(); },   // a failed read never looks empty (a save would drop the photo)
     async put(u, data) { await B().put(`profiles/${u}.json`, JSON.stringify(data), { access: 'private', addRandomSuffix: false, allowOverwrite: true, contentType: 'application/json', token }); },
   };
 }
@@ -38,3 +38,4 @@ async function handle(req, res, d = {}) {
 }
 module.exports = (req, res) => handle(req, res);
 module.exports.handle = handle;
+module.exports.blobStore = blobStore;

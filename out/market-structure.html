@@ -12888,7 +12888,7 @@ html[data-theme="dark"] #v-home::before, html:not([data-theme="light"]) #v-home:
   bell.addEventListener('click', function (e) { e.stopPropagation(); if (pop) closePop(); else openPop(); });
   document.addEventListener('click', function (e) { if (pop && !pop.contains(e.target)) closePop(); });
   document.addEventListener('keydown', function (e) { if (e.key === 'Escape') { closePop(); var c = document.querySelector('.nt-in'); if (c) c.querySelector('[data-ok]').click(); } });
-  // new ones slide onto the screen, newest first, one card at a time
+  // new ones slide onto the screen, oldest first, one card at a time
   function slideIn() { var u = unread().slice().reverse(); if (!u.length || document.querySelector('.nt-in') || document.documentElement.dataset.gate) return; var x = u[0], c = document.createElement('div');
     c.className = 'nt-in'; c.setAttribute('role', 'alertdialog'); c.setAttribute('aria-live', 'assertive');
     c.innerHTML = '<h3><svg viewBox="0 0 24 24"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/></svg>From the desk' + (u.length > 1 ? ' · 1 of ' + u.length : '') + '</h3><b>' + esc(x.title) + '</b>' + (x.body ? '<p>' + esc(x.body) + '</p>' : '') + '<div class="nt-act">' + (u.length > 1 ? '<button type="button" data-skip>Mark all read</button>' : '') + '<button type="button" class="pri" data-ok>' + (u.length > 1 ? 'Next' : 'Got it') + '</button></div>';

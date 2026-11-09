@@ -5,12 +5,13 @@
 // Stored privately in the Blob store as sounds/config.json. Without a stored stop-loss sound the page plays /assets/sounds/sl.mp3
 // (the owner's clip, shipped with the site); without a target sound, the built-in chime.
 const isOwner = (pw) => require('./users.js')._t.isOwner(pw);
+const S = require('./_session.js');
 const MAX = 700 * 1024;
-function blobStore(env) {
-  const B = () => require('@vercel/blob'), token = env.BLOB_READ_WRITE_TOKEN, P = 'sounds/config.json';
+function blobStore(env, io = {}) {
+  const B = () => io.blob || require('@vercel/blob'), F = io.fetch || fetch, token = env.BLOB_READ_WRITE_TOKEN, P = 'sounds/config.json';
   return {
     async get() { const { blobs } = await B().list({ prefix: P, token }); const b = blobs.find((x) => x.pathname === P); if (!b) return null;
-      const r = await fetch(b.url, { headers: { Authorization: `Bearer ${token}` }, cache: 'no-store', signal: AbortSignal.timeout(8000) }); return r.ok ? r.json() : null; },
+      const r = await F(b.url, { headers: { Authorization: `Bearer ${token}` }, cache: 'no-store', signal: AbortSignal.timeout(8000) }); if (!r.ok) throw new Error(`sounds read ${r.status}`); return r.json(); },   // a failed read never looks empty (a POST would drop the other sound)
     async put(data) { await B().put(P, JSON.stringify(data), { access: 'private', addRandomSuffix: false, allowOverwrite: true, contentType: 'application/json', token }); },
   };
 }
@@ -22,7 +23,8 @@ async function handle(req, res, d = {}) {
     if (req.method === 'GET') { res.setHeader('Cache-Control', 'public, max-age=60'); const c = (await store.get()) || {}; return res.status(200).json({ sl: c.sl || null, tp: c.tp || null }); }
     res.setHeader('Cache-Control', 'no-store');
     if (req.method !== 'POST') return res.status(405).json({ error: 'GET or POST' });
-    const b = req.body && typeof req.body === 'object' ? req.body : {};
+    if (!S.sameOrigin(req)) return res.status(403).json({ error: 'not allowed' });
+    let b; try { b = typeof req.body === 'string' ? JSON.parse(req.body || '{}') : req.body; } catch (e) { b = null; } if (!b || typeof b !== 'object') b = {};
     if (!owner(b.ownerPw)) return res.status(403).json({ error: 'Owner password not accepted' });
     if (b.kind !== 'sl' && b.kind !== 'tp') return res.status(400).json({ error: 'kind must be sl or tp' });
     let v = null;
@@ -37,3 +39,4 @@ async function handle(req, res, d = {}) {
 }
 module.exports = (req, res) => handle(req, res);
 module.exports.handle = handle;
+module.exports.blobStore = blobStore;
