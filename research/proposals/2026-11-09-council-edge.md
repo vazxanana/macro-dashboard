@@ -41,3 +41,42 @@ your yes or no. Evidence: `research/edge/council-edge/` (pre-registration, RESUL
 
 Mosha BO, the gold momentum pullback (8 h time exit), the NQ open run and crypto trend have no 2020-to-now replay in the repo
 with their live management, so they are not covered here. The ICT desk is a separate edge and was not touched.
+
+## Follow-up to proposal 3: every shadow stream at realistic costs (9 Nov 2026)
+
+You asked to compare all the shadow systems with realistic costs and keep only those whose cost is at most 0.10R a trade.
+Evidence: `research/edge/shadow-cost/` (pre-registration, RESULT.md, result.json; Edge lab row "shadow-cost"). Paper only; nothing
+below has been changed, each line waits for your yes or no.
+
+**What "realistic" means here:** the real spread for the market and hour (wider in Asia and around the 17:00 New York rollover), the
+demo broker's commission, and slippage on every market order and stop. The demo mirror's same-time fills were checked: 8 of them, on
+average 0.04R worse than the council's price, which fits the model, so the model stands.
+
+### In plain words
+
+1. **Most shadow streams are too expensive to trade.** The engine's scalp (0.35R a trade), retrace scalp (0.40R), intraday (0.14R),
+   retrace intraday (0.17R) and M30→M1 (0.16R), and LIT (0.25R) all pay more than 0.10R. This is not only crypto: the forex and gold
+   scalps alone cost 0.13–0.18R. After costs the scalp lost −0.10R a trade this week and −0.40R in its own 150-day replay.
+2. **The cheap streams have not traded yet.** The five ICT shadows (no Friday, H1 opposite, structure trail, silver, dip-buy) cost
+   only 0.015–0.06R a trade and were all positive in the desk's replay (+0.26R to +0.45R after costs), but that replay is the period
+   the desk was designed on, and none of them has a closed forward trade yet. They need about 30 forward trades each before they can
+   be judged. The engine's swing, retrace swing and position are cheap too (0.03–0.05R) but lose money in their own replay
+   (−0.20R to −0.70R a trade) and have 1–2 forward trades.
+3. **Strictly by your rule (cost ≤ 0.10R and making money out of sample), only the engine retrace swing survives, and only on two
+   trades.** That is not evidence of anything.
+4. **Two things look promising, but neither is ready for real money.**
+   - *The NQ open run, trend-on only:* +0.18R a trade after costs since 2020 (514 trades), and costs are now only 0.04R. But all of
+     that profit came from 2023 on, which is the period the NQ rule was built on; 2020–22 was flat. Keep it on paper.
+   - *The scalp's cheap trades only (cost ≤ 0.10R, about a quarter of them):* +0.78R a trade in this week's paper trades (84 trades)
+     and +0.17R in the 150-day replay. But one week is one market, and nine years of forex and gold history found no version of the
+     scalp that makes money. Track it as a paper column (proposal 3 as written) and judge it after 200 forward trades.
+
+### Decisions for you
+
+| # | Proposal | Evidence | What changes if you say yes |
+|---|---|---|---|
+| 3a | **Keep proposal 3 as a paper column**: stamp each engine shadow trade with its realistic cost and show "cost ≤ 0.10R" vs "> 0.10R" next to the shadow totals; judge after 200 forward trades (the cheap side must stay positive in both halves). | Gated scalp: +0.78R forward (n 84, t 2.8), +0.17R replay (n 1,137, t 3.2); expensive side loses. | A statistic on the shadow page only. No trade, alert or mirror order changes. |
+| 3b | **Stop recording the engine scalp, retrace scalp, intraday, retrace intraday and M30→M1 as shadow streams** (or keep them only for the 3a column). | Cost 0.14–0.40R a trade, above your 0.10R limit; net negative in their own replay. | Fewer paper trades on the shadow book and the demo shadow account; nothing live. |
+| 3c | **Retire the engine swing, retrace swing and position shadows.** | Cheap (0.03–0.05R) but losing in their replay: −0.22R, −0.20R, −0.70R a trade. | Fewer paper trades; nothing live. |
+| 3d | **Keep LIT on paper only as you decided, knowing it fails your cost limit** (0.25R a trade; no LIT trade in 19 years was cheaper than 0.10R). | LIT study + this re-costing. | Nothing, or retire it if you prefer to apply the 0.10R rule strictly. |
+| 3e | **Keep the five ICT shadows and the NQ trend-on shadow running unchanged**; look again when each has 30 forward trades. | Cost 0.015–0.06R; replay positive; no forward record yet. NQ trend-on +0.18R since 2020, but flat before 2023. | Nothing. |

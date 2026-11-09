@@ -1,0 +1,5093 @@
+{
+ "topic": "shadow-cost",
+ "built": "2026-11-09",
+ "at": "2026-11-09T07:23:18.261Z",
+ "system": "Every paper shadow stream (NQ trend-on, LIT, ICT variants + dip-buy + silver, council engine setups) re-costed at realistic spread + commission + slippage; council-data 2026-11-09T07:03:28.538Z",
+ "question": "Which shadow streams cost at most 0.10R a trade and keep a positive net expectancy out of sample? (proposal 3, research/proposals/2026-11-09-council-edge.md)",
+ "verdict": {
+  "verdict": "INCONCLUSIVE",
+  "pass": [],
+  "passGated": [
+   "nq-trend",
+   "eng-scalp"
+  ],
+  "costOk": [
+   "ict-nofri",
+   "ict-h1opp",
+   "ict-strail",
+   "ict-silver",
+   "ict-dip",
+   "eng-swing",
+   "eng-rswing",
+   "eng-position"
+  ],
+  "survivesProposal3": [
+   "eng-rswing"
+  ]
+ },
+ "gate": 0.1,
+ "oosFrom": "2020-01-01",
+ "costInputs": {
+  "broker": {
+   "commPerSide": {
+    "forex": 0.0000225,
+    "gold": 0.000012,
+    "silver": 0.000012,
+    "crypto": 0
+   },
+   "cryptoSpread": {
+    "btc": 0.00023611301313260577,
+    "eth": 0.0014628006934055233,
+    "sol": 0.0024260803639120543,
+    "xrp": 0.0013749980234833946
+   }
+  },
+  "brokerAt": "2026-11-09T07:03:28.538Z",
+  "mirror": {
+   "n": 8,
+   "medianLagSec": 65,
+   "meanSlipR": 0.041,
+   "groups": {
+    "crypto": {
+     "n": 3,
+     "meanExcessOverDefault": 0.88,
+     "used": false
+    },
+    "forex": {
+     "n": 4,
+     "meanExcessOverDefault": -4.39,
+     "used": false
+    },
+    "gold": {
+     "n": 1,
+     "meanExcessOverDefault": 6.63,
+     "used": false
+    }
+   },
+   "used": {},
+   "fills": [
+    {
+     "id": "sol-scalp-1794145395",
+     "market": "sol",
+     "lagSec": 53,
+     "slipR": 0.254,
+     "excessOverDefault": 0.28
+    },
+    {
+     "id": "eth-scalp-1794161544",
+     "market": "eth",
+     "lagSec": 74,
+     "slipR": 0.082,
+     "excessOverDefault": -0.57
+    },
+    {
+     "id": "audusd-scalp-1794179316",
+     "market": "audusd",
+     "lagSec": 40,
+     "slipR": 0,
+     "excessOverDefault": -2.75
+    },
+    {
+     "id": "sol-position-1794174537",
+     "market": "sol",
+     "lagSec": 103,
+     "slipR": 0.121,
+     "excessOverDefault": 2.92
+    },
+    {
+     "id": "usdcad-intraday-1794185752",
+     "market": "usdcad",
+     "lagSec": 65,
+     "slipR": -0.079,
+     "excessOverDefault": -5.88
+    },
+    {
+     "id": "usdcad-scalp-1794185752",
+     "market": "usdcad",
+     "lagSec": 65,
+     "slipR": -0.079,
+     "excessOverDefault": -5.88
+    },
+    {
+     "id": "usdcad-scalp-1794195741",
+     "market": "usdcad",
+     "lagSec": 59,
+     "slipR": -0.024,
+     "excessOverDefault": -3.04
+    },
+    {
+     "id": "xau-scalp-1794198321",
+     "market": "xau",
+     "lagSec": 60,
+     "slipR": 0.056,
+     "excessOverDefault": 6.63
+    }
+   ]
+  }
+ },
+ "variantsTried": 30,
+ "candidates": [
+  {
+   "rule": "nq-trend: NQ open run, trend-on only (|TS| ≥ 0.295)",
+   "verdict": "FAIL",
+   "is": {
+    "n": 1024,
+    "wr": 0.444,
+    "exp": -0.005,
+    "R": -5.4,
+    "t": -0.13,
+    "maxDD": -44.3
+   },
+   "oos": {
+    "n": 514,
+    "wr": 0.438,
+    "exp": 0.176,
+    "R": 90.6,
+    "t": 2.58,
+    "maxDD": -22.7
+   },
+   "years": {
+    "2020": {
+     "n": 78,
+     "wr": 0.372,
+     "exp": -0.031,
+     "R": -2.4,
+     "t": -0.18,
+     "maxDD": -9.4
+    },
+    "2021": {
+     "n": 92,
+     "wr": 0.402,
+     "exp": -0.047,
+     "R": -4.4,
+     "t": -0.33,
+     "maxDD": -18.7
+    },
+    "2022": {
+     "n": 76,
+     "wr": 0.434,
+     "exp": 0.143,
+     "R": 10.9,
+     "t": 0.82,
+     "maxDD": -10.4
+    },
+    "2023": {
+     "n": 79,
+     "wr": 0.456,
+     "exp": 0.337,
+     "R": 26.6,
+     "t": 1.72,
+     "maxDD": -6.2
+    },
+    "2024": {
+     "n": 77,
+     "wr": 0.455,
+     "exp": 0.302,
+     "R": 23.3,
+     "t": 1.64,
+     "maxDD": -9.4
+    },
+    "2025": {
+     "n": 49,
+     "wr": 0.469,
+     "exp": 0.241,
+     "R": 11.8,
+     "t": 1.17,
+     "maxDD": -5.3
+    },
+    "2026": {
+     "n": 63,
+     "wr": 0.508,
+     "exp": 0.394,
+     "R": 24.8,
+     "t": 1.91,
+     "maxDD": -8.6
+    }
+   }
+  },
+  {
+   "rule": "lit: LIT paper shadow (gold, pre-registered primary)",
+   "verdict": "FAIL",
+   "is": {
+    "n": 9,
+    "wr": 0.222,
+    "exp": 0.648,
+    "R": 5.8,
+    "t": 0.54,
+    "maxDD": -5.7
+   },
+   "oos": {
+    "n": 18,
+    "wr": 0.222,
+    "exp": -0.16,
+    "R": -2.9,
+    "t": -0.3,
+    "maxDD": -8.6
+   },
+   "years": {
+    "2020": {
+     "n": 3,
+     "wr": 0,
+     "exp": -1.307,
+     "R": -3.9,
+     "t": -29.59,
+     "maxDD": -3.9
+    },
+    "2021": {
+     "n": 1,
+     "wr": 1,
+     "exp": 2.999,
+     "R": 3,
+     "t": null,
+     "maxDD": 0
+    },
+    "2022": {
+     "n": 2,
+     "wr": 0.5,
+     "exp": 2.561,
+     "R": 5.1,
+     "t": 0.68,
+     "maxDD": -1.2
+    },
+    "2023": {
+     "n": 3,
+     "wr": 0.333,
+     "exp": -0.593,
+     "R": -1.8,
+     "t": -0.9,
+     "maxDD": -2.5
+    },
+    "2024": {
+     "n": 5,
+     "wr": 0,
+     "exp": -1.217,
+     "R": -6.1,
+     "t": -69.66,
+     "maxDD": -6.1
+    },
+    "2025": {
+     "n": 3,
+     "wr": 0.333,
+     "exp": 0.634,
+     "R": 1.9,
+     "t": 0.35,
+     "maxDD": -2.4
+    },
+    "2026": {
+     "n": 1,
+     "wr": 0,
+     "exp": -1.104,
+     "R": -1.1,
+     "t": null,
+     "maxDD": -1.1
+    }
+   }
+  },
+  {
+   "rule": "ict-nofri: ICT A-rule, no Friday (shadow)",
+   "verdict": "INCONCLUSIVE",
+   "is": {
+    "n": 220,
+    "wr": 0.414,
+    "exp": 0.314,
+    "R": 69,
+    "t": 2.83,
+    "maxDD": -10.9
+   },
+   "oos": {
+    "n": 0,
+    "wr": null,
+    "exp": null,
+    "R": 0,
+    "t": null,
+    "maxDD": 0
+   }
+  },
+  {
+   "rule": "ict-h1opp: ICT A-rule, H1 opposite filter (shadow)",
+   "verdict": "INCONCLUSIVE",
+   "is": {
+    "n": 176,
+    "wr": 0.415,
+    "exp": 0.287,
+    "R": 50.5,
+    "t": 2.32,
+    "maxDD": -11.6
+   },
+   "oos": {
+    "n": 0,
+    "wr": null,
+    "exp": null,
+    "R": 0,
+    "t": null,
+    "maxDD": 0
+   }
+  },
+  {
+   "rule": "ict-strail: ICT A-rule, structure trail exit (shadow)",
+   "verdict": "INCONCLUSIVE",
+   "is": {
+    "n": 256,
+    "wr": 0.387,
+    "exp": 0.259,
+    "R": 66.3,
+    "t": 2.53,
+    "maxDD": -12.2
+   },
+   "oos": {
+    "n": 0,
+    "wr": null,
+    "exp": null,
+    "R": 0,
+    "t": null,
+    "maxDD": 0
+   }
+  },
+  {
+   "rule": "ict-silver: ICT gold rule on spot silver (paper market)",
+   "verdict": "INCONCLUSIVE",
+   "is": {
+    "n": 82,
+    "wr": 0.451,
+    "exp": 0.424,
+    "R": 34.7,
+    "t": 2.09,
+    "maxDD": -7.1
+   },
+   "oos": {
+    "n": 0,
+    "wr": null,
+    "exp": null,
+    "R": 0,
+    "t": null,
+    "maxDD": 0
+   }
+  },
+  {
+   "rule": "ict-dip: ICT NQ/ES dip-buy (shadow)",
+   "verdict": "INCONCLUSIVE",
+   "is": {
+    "n": 68,
+    "wr": 0.471,
+    "exp": 0.45,
+    "R": 30.6,
+    "t": 2.03,
+    "maxDD": -10.1
+   },
+   "oos": {
+    "n": 0,
+    "wr": null,
+    "exp": null,
+    "R": 0,
+    "t": null,
+    "maxDD": 0
+   }
+  },
+  {
+   "rule": "ref-ict-a: Reference: ICT A-setups (live desk rule, not a shadow)",
+   "verdict": "REFERENCE",
+   "is": {
+    "n": 254,
+    "wr": 0.394,
+    "exp": 0.245,
+    "R": 62.3,
+    "t": 2.45,
+    "maxDD": -11.9
+   },
+   "oos": {
+    "n": 0,
+    "wr": null,
+    "exp": null,
+    "R": 0,
+    "t": null,
+    "maxDD": 0
+   }
+  },
+  {
+   "rule": "eng-scalp: Council engine scalp (shadow book)",
+   "verdict": "FAIL",
+   "is": {
+    "n": 4150,
+    "wr": 0.261,
+    "exp": -0.395,
+    "R": -1637.3,
+    "t": -12.7,
+    "maxDD": -1646.5
+   },
+   "oos": {
+    "n": 280,
+    "wr": 0.282,
+    "exp": -0.1,
+    "R": -28,
+    "t": -0.71,
+    "maxDD": -69.7
+   }
+  },
+  {
+   "rule": "eng-rscalp: Council engine rscalp (shadow book)",
+   "verdict": "FAIL",
+   "is": {
+    "n": 2168,
+    "wr": 0.392,
+    "exp": -0.397,
+    "R": -860,
+    "t": -10.2,
+    "maxDD": -863.1
+   },
+   "oos": {
+    "n": 163,
+    "wr": 0.356,
+    "exp": -0.222,
+    "R": -36.2,
+    "t": -1.49,
+    "maxDD": -55
+   }
+  },
+  {
+   "rule": "eng-intraday: Council engine intraday (shadow book)",
+   "verdict": "FAIL",
+   "is": {
+    "n": 992,
+    "wr": 0.252,
+    "exp": -0.286,
+    "R": -283.6,
+    "t": -5.51,
+    "maxDD": -283.6
+   },
+   "oos": {
+    "n": 52,
+    "wr": 0.385,
+    "exp": 0.114,
+    "R": 5.9,
+    "t": 0.48,
+    "maxDD": -13.2
+   }
+  },
+  {
+   "rule": "eng-rintra: Council engine rintra (shadow book)",
+   "verdict": "FAIL",
+   "is": {
+    "n": 499,
+    "wr": 0.483,
+    "exp": -0.102,
+    "R": -50.7,
+    "t": -1.31,
+    "maxDD": -69.7
+   },
+   "oos": {
+    "n": 29,
+    "wr": 0.414,
+    "exp": 0.18,
+    "R": 5.2,
+    "t": 0.44,
+    "maxDD": -6.6
+   }
+  },
+  {
+   "rule": "eng-swing: Council engine swing (shadow book)",
+   "verdict": "INCONCLUSIVE",
+   "is": {
+    "n": 105,
+    "wr": 0.276,
+    "exp": -0.221,
+    "R": -23.3,
+    "t": -1.66,
+    "maxDD": -38.8
+   },
+   "oos": {
+    "n": 1,
+    "wr": 0,
+    "exp": -1.016,
+    "R": -1,
+    "t": null,
+    "maxDD": -1
+   }
+  },
+  {
+   "rule": "eng-rswing: Council engine rswing (shadow book)",
+   "verdict": "INCONCLUSIVE",
+   "is": {
+    "n": 55,
+    "wr": 0.545,
+    "exp": -0.204,
+    "R": -11.2,
+    "t": -2.07,
+    "maxDD": -13.8
+   },
+   "oos": {
+    "n": 2,
+    "wr": 1,
+    "exp": 0.251,
+    "R": 0.5,
+    "t": 1.46,
+    "maxDD": 0
+   }
+  },
+  {
+   "rule": "eng-position: Council engine position (shadow book)",
+   "verdict": "INCONCLUSIVE",
+   "is": {
+    "n": 74,
+    "wr": 0.108,
+    "exp": -0.696,
+    "R": -51.5,
+    "t": -5.96,
+    "maxDD": -51.5
+   },
+   "oos": {
+    "n": 2,
+    "wr": 0,
+    "exp": -1.013,
+    "R": -2,
+    "t": -705.16,
+    "maxDD": -2
+   }
+  },
+  {
+   "rule": "eng-m30m1: Council engine m30m1 (shadow book)",
+   "verdict": "FAIL",
+   "is": {
+    "n": 0,
+    "wr": null,
+    "exp": null,
+    "R": 0,
+    "t": null,
+    "maxDD": 0
+   },
+   "oos": {
+    "n": 2,
+    "wr": 0.5,
+    "exp": 0.336,
+    "R": 0.7,
+    "t": 0.2,
+    "maxDD": -1.3
+   }
+  }
+ ],
+ "streams": {
+  "nq-trend": {
+   "name": "NQ open run, trend-on only (|TS| ≥ 0.295)",
+   "backtest": "regime-switch study trades 2004–Nov 2026",
+   "reference": false,
+   "oosRule": "backtest from 2020-01-01 + live paper",
+   "cost": {
+    "mean": 0.139,
+    "median": 0.127,
+    "n": 1538
+   },
+   "is": {
+    "n": 1024,
+    "wr": 0.444,
+    "exp": -0.005,
+    "R": -5.4,
+    "t": -0.13,
+    "maxDD": -44.3
+   },
+   "isGross": {
+    "n": 1024,
+    "wr": 0.475,
+    "exp": 0.184,
+    "R": 188.1,
+    "t": 4.41,
+    "maxDD": -19.8
+   },
+   "oos": {
+    "n": 514,
+    "wr": 0.438,
+    "exp": 0.176,
+    "R": 90.6,
+    "t": 2.58,
+    "maxDD": -22.7
+   },
+   "oosGross": {
+    "n": 514,
+    "wr": 0.442,
+    "exp": 0.215,
+    "R": 110.4,
+    "t": 3.15,
+    "maxDD": -19.3
+   },
+   "oosX2": {
+    "n": 514,
+    "wr": 0.436,
+    "exp": 0.138,
+    "R": 70.7,
+    "t": 2.01,
+    "maxDD": -26.1
+   },
+   "oosCost": 0.039,
+   "halves": [
+    {
+     "n": 257,
+     "wr": 0.405,
+     "exp": 0.021,
+     "R": 5.5,
+     "t": 0.24,
+     "maxDD": -22.7
+    },
+    {
+     "n": 257,
+     "wr": 0.471,
+     "exp": 0.331,
+     "R": 85.1,
+     "t": 3.26,
+     "maxDD": -9.9
+    }
+   ],
+   "live": {
+    "n": 0,
+    "wr": null,
+    "exp": null,
+    "R": 0,
+    "t": null,
+    "maxDD": 0
+   },
+   "liveGross": {
+    "n": 0,
+    "wr": null,
+    "exp": null,
+    "R": 0,
+    "t": null,
+    "maxDD": 0
+   },
+   "costOk": false,
+   "survives": false,
+   "verdict": "FAIL",
+   "why": "cost 0.139R > 0.1R",
+   "parts": {
+    "spread": 0.025,
+    "comm": 0.063,
+    "slip": 0.051
+   },
+   "costByMarket": {
+    "nq": {
+     "n": 1538,
+     "mean": 0.139
+    }
+   },
+   "shareUnderGate": 0.429,
+   "years": {
+    "2020": {
+     "n": 78,
+     "wr": 0.372,
+     "exp": -0.031,
+     "R": -2.4,
+     "t": -0.18,
+     "maxDD": -9.4
+    },
+    "2021": {
+     "n": 92,
+     "wr": 0.402,
+     "exp": -0.047,
+     "R": -4.4,
+     "t": -0.33,
+     "maxDD": -18.7
+    },
+    "2022": {
+     "n": 76,
+     "wr": 0.434,
+     "exp": 0.143,
+     "R": 10.9,
+     "t": 0.82,
+     "maxDD": -10.4
+    },
+    "2023": {
+     "n": 79,
+     "wr": 0.456,
+     "exp": 0.337,
+     "R": 26.6,
+     "t": 1.72,
+     "maxDD": -6.2
+    },
+    "2024": {
+     "n": 77,
+     "wr": 0.455,
+     "exp": 0.302,
+     "R": 23.3,
+     "t": 1.64,
+     "maxDD": -9.4
+    },
+    "2025": {
+     "n": 49,
+     "wr": 0.469,
+     "exp": 0.241,
+     "R": 11.8,
+     "t": 1.17,
+     "maxDD": -5.3
+    },
+    "2026": {
+     "n": 63,
+     "wr": 0.508,
+     "exp": 0.394,
+     "R": 24.8,
+     "t": 1.91,
+     "maxDD": -8.6
+    }
+   },
+   "gated": {
+    "n": 660,
+    "verdict": "PASS",
+    "why": "all bars met",
+    "survives": true,
+    "cost": {
+     "mean": 0.047,
+     "median": 0.042,
+     "n": 660
+    },
+    "is": {
+     "n": 147,
+     "wr": 0.442,
+     "exp": 0.141,
+     "R": 20.7,
+     "t": 1.23,
+     "maxDD": -10.5
+    },
+    "oos": {
+     "n": 513,
+     "wr": 0.437,
+     "exp": 0.168,
+     "R": 85.9,
+     "t": 2.47,
+     "maxDD": -22.7
+    },
+    "oosX2": {
+     "n": 513,
+     "wr": 0.435,
+     "exp": 0.129,
+     "R": 66.2,
+     "t": 1.9,
+     "maxDD": -28.1
+    },
+    "halves": [
+     {
+      "n": 256,
+      "wr": 0.402,
+      "exp": 0.003,
+      "R": 0.9,
+      "t": 0.04,
+      "maxDD": -22.7
+     },
+     {
+      "n": 257,
+      "wr": 0.471,
+      "exp": 0.331,
+      "R": 85.1,
+      "t": 3.26,
+      "maxDD": -9.9
+     }
+    ],
+    "live": {
+     "n": 0,
+     "wr": null,
+     "exp": null,
+     "R": 0,
+     "t": null,
+     "maxDD": 0
+    }
+   },
+   "diag": {
+    "byGroup": {
+     "is": {
+      "futures": {
+       "n": 1024,
+       "cost": 0.189,
+       "gross": 0.184,
+       "net": {
+        "n": 1024,
+        "wr": 0.444,
+        "exp": -0.005,
+        "R": -5.4,
+        "t": -0.13,
+        "maxDD": -44.3
+       }
+      }
+     },
+     "oos": {
+      "futures": {
+       "n": 514,
+       "cost": 0.039,
+       "gross": 0.215,
+       "net": {
+        "n": 514,
+        "wr": 0.438,
+        "exp": 0.176,
+        "R": 90.6,
+        "t": 2.58,
+        "maxDD": -22.7
+       }
+      }
+     }
+    },
+    "gatedByGroup": {
+     "is": {
+      "futures": {
+       "n": 147,
+       "cost": 0.075,
+       "gross": 0.216,
+       "net": {
+        "n": 147,
+        "wr": 0.442,
+        "exp": 0.141,
+        "R": 20.7,
+        "t": 1.23,
+        "maxDD": -10.5
+       }
+      }
+     },
+     "oos": {
+      "futures": {
+       "n": 513,
+       "cost": 0.038,
+       "gross": 0.206,
+       "net": {
+        "n": 513,
+        "wr": 0.437,
+        "exp": 0.168,
+        "R": 85.9,
+        "t": 2.47,
+        "maxDD": -22.7
+       }
+      }
+     }
+    },
+    "oos2020to22": {
+     "n": 246,
+     "wr": 0.402,
+     "exp": 0.017,
+     "R": 4.1,
+     "t": 0.18,
+     "maxDD": -22.7
+    },
+    "oos2023on": {
+     "n": 268,
+     "wr": 0.47,
+     "exp": 0.323,
+     "R": 86.5,
+     "t": 3.26,
+     "maxDD": -9.9
+    }
+   }
+  },
+  "lit": {
+   "name": "LIT paper shadow (gold, pre-registered primary)",
+   "backtest": "LIT study XAUUSD 2008–Oct 2026",
+   "reference": false,
+   "oosRule": "backtest from 2020-01-01 + live paper",
+   "cost": {
+    "mean": 0.253,
+    "median": 0.234,
+    "n": 27
+   },
+   "is": {
+    "n": 9,
+    "wr": 0.222,
+    "exp": 0.648,
+    "R": 5.8,
+    "t": 0.54,
+    "maxDD": -5.7
+   },
+   "isGross": {
+    "n": 9,
+    "wr": 0.333,
+    "exp": 0.963,
+    "R": 8.7,
+    "t": 0.81,
+    "maxDD": -4
+   },
+   "oos": {
+    "n": 18,
+    "wr": 0.222,
+    "exp": -0.16,
+    "R": -2.9,
+    "t": -0.3,
+    "maxDD": -8.6
+   },
+   "oosGross": {
+    "n": 18,
+    "wr": 0.222,
+    "exp": 0.063,
+    "R": 1.1,
+    "t": 0.12,
+    "maxDD": -7
+   },
+   "oosX2": {
+    "n": 18,
+    "wr": 0.222,
+    "exp": -0.382,
+    "R": -6.9,
+    "t": -0.7,
+    "maxDD": -10.2
+   },
+   "oosCost": 0.222,
+   "halves": [
+    {
+     "n": 9,
+     "wr": 0.333,
+     "exp": 0.269,
+     "R": 2.4,
+     "t": 0.3,
+     "maxDD": -3.9
+    },
+    {
+     "n": 9,
+     "wr": 0.111,
+     "exp": -0.588,
+     "R": -5.3,
+     "t": -0.96,
+     "maxDD": -6.1
+    }
+   ],
+   "live": {
+    "n": 0,
+    "wr": null,
+    "exp": null,
+    "R": 0,
+    "t": null,
+    "maxDD": 0
+   },
+   "liveGross": {
+    "n": 0,
+    "wr": null,
+    "exp": null,
+    "R": 0,
+    "t": null,
+    "maxDD": 0
+   },
+   "costOk": false,
+   "survives": false,
+   "verdict": "FAIL",
+   "why": "cost 0.253R > 0.1R",
+   "parts": {
+    "spread": 0.139,
+    "comm": 0.04,
+    "slip": 0.073
+   },
+   "costByMarket": {
+    "xau": {
+     "n": 27,
+     "mean": 0.253
+    }
+   },
+   "shareUnderGate": 0,
+   "years": {
+    "2020": {
+     "n": 3,
+     "wr": 0,
+     "exp": -1.307,
+     "R": -3.9,
+     "t": -29.59,
+     "maxDD": -3.9
+    },
+    "2021": {
+     "n": 1,
+     "wr": 1,
+     "exp": 2.999,
+     "R": 3,
+     "t": null,
+     "maxDD": 0
+    },
+    "2022": {
+     "n": 2,
+     "wr": 0.5,
+     "exp": 2.561,
+     "R": 5.1,
+     "t": 0.68,
+     "maxDD": -1.2
+    },
+    "2023": {
+     "n": 3,
+     "wr": 0.333,
+     "exp": -0.593,
+     "R": -1.8,
+     "t": -0.9,
+     "maxDD": -2.5
+    },
+    "2024": {
+     "n": 5,
+     "wr": 0,
+     "exp": -1.217,
+     "R": -6.1,
+     "t": -69.66,
+     "maxDD": -6.1
+    },
+    "2025": {
+     "n": 3,
+     "wr": 0.333,
+     "exp": 0.634,
+     "R": 1.9,
+     "t": 0.35,
+     "maxDD": -2.4
+    },
+    "2026": {
+     "n": 1,
+     "wr": 0,
+     "exp": -1.104,
+     "R": -1.1,
+     "t": null,
+     "maxDD": -1.1
+    }
+   },
+   "gated": {
+    "n": 0,
+    "verdict": "INCONCLUSIVE",
+    "why": "only 0 OOS trades",
+    "survives": false,
+    "cost": {
+     "mean": null,
+     "median": null,
+     "n": 0
+    },
+    "is": {
+     "n": 0,
+     "wr": null,
+     "exp": null,
+     "R": 0,
+     "t": null,
+     "maxDD": 0
+    },
+    "oos": {
+     "n": 0,
+     "wr": null,
+     "exp": null,
+     "R": 0,
+     "t": null,
+     "maxDD": 0
+    },
+    "oosX2": {
+     "n": 0,
+     "wr": null,
+     "exp": null,
+     "R": 0,
+     "t": null,
+     "maxDD": 0
+    },
+    "halves": [
+     {
+      "n": 0,
+      "wr": null,
+      "exp": null,
+      "R": 0,
+      "t": null,
+      "maxDD": 0
+     },
+     {
+      "n": 0,
+      "wr": null,
+      "exp": null,
+      "R": 0,
+      "t": null,
+      "maxDD": 0
+     }
+    ],
+    "live": {
+     "n": 0,
+     "wr": null,
+     "exp": null,
+     "R": 0,
+     "t": null,
+     "maxDD": 0
+    }
+   },
+   "diag": {
+    "byGroup": {
+     "is": {
+      "gold": {
+       "n": 9,
+       "cost": 0.315,
+       "gross": 0.963,
+       "net": {
+        "n": 9,
+        "wr": 0.222,
+        "exp": 0.648,
+        "R": 5.8,
+        "t": 0.54,
+        "maxDD": -5.7
+       }
+      }
+     },
+     "oos": {
+      "gold": {
+       "n": 18,
+       "cost": 0.222,
+       "gross": 0.063,
+       "net": {
+        "n": 18,
+        "wr": 0.222,
+        "exp": -0.16,
+        "R": -2.9,
+        "t": -0.3,
+        "maxDD": -8.6
+       }
+      }
+     }
+    },
+    "gatedByGroup": {
+     "is": {},
+     "oos": {}
+    }
+   }
+  },
+  "ict-nofri": {
+   "name": "ICT A-rule, no Friday (shadow)",
+   "backtest": "ICT desk replay Aug 2025–Nov 2026",
+   "reference": false,
+   "oosRule": "live paper only",
+   "cost": {
+    "mean": 0.02,
+    "median": 0.013,
+    "n": 220
+   },
+   "is": {
+    "n": 220,
+    "wr": 0.414,
+    "exp": 0.314,
+    "R": 69,
+    "t": 2.83,
+    "maxDD": -10.9
+   },
+   "isGross": {
+    "n": 220,
+    "wr": 0.418,
+    "exp": 0.334,
+    "R": 73.4,
+    "t": 3.01,
+    "maxDD": -10.5
+   },
+   "oos": {
+    "n": 0,
+    "wr": null,
+    "exp": null,
+    "R": 0,
+    "t": null,
+    "maxDD": 0
+   },
+   "oosGross": {
+    "n": 0,
+    "wr": null,
+    "exp": null,
+    "R": 0,
+    "t": null,
+    "maxDD": 0
+   },
+   "oosX2": {
+    "n": 0,
+    "wr": null,
+    "exp": null,
+    "R": 0,
+    "t": null,
+    "maxDD": 0
+   },
+   "oosCost": null,
+   "halves": [
+    {
+     "n": 0,
+     "wr": null,
+     "exp": null,
+     "R": 0,
+     "t": null,
+     "maxDD": 0
+    },
+    {
+     "n": 0,
+     "wr": null,
+     "exp": null,
+     "R": 0,
+     "t": null,
+     "maxDD": 0
+    }
+   ],
+   "live": {
+    "n": 0,
+    "wr": null,
+    "exp": null,
+    "R": 0,
+    "t": null,
+    "maxDD": 0
+   },
+   "liveGross": {
+    "n": 0,
+    "wr": null,
+    "exp": null,
+    "R": 0,
+    "t": null,
+    "maxDD": 0
+   },
+   "costOk": true,
+   "survives": false,
+   "verdict": "INCONCLUSIVE",
+   "why": "only 0 OOS trades",
+   "parts": {
+    "spread": 0.004,
+    "comm": 0.007,
+    "slip": 0.009
+   },
+   "costByMarket": {
+    "es": {
+     "n": 53,
+     "mean": 0.032
+    },
+    "nq": {
+     "n": 37,
+     "mean": 0.008
+    },
+    "ym": {
+     "n": 53,
+     "mean": 0.021
+    },
+    "gc": {
+     "n": 53,
+     "mean": 0.012
+    },
+    "rty": {
+     "n": 24,
+     "mean": 0.029
+    }
+   },
+   "shareUnderGate": 0.995,
+   "gated": {
+    "n": 219,
+    "verdict": "INCONCLUSIVE",
+    "why": "only 0 OOS trades",
+    "survives": false,
+    "cost": {
+     "mean": 0.02,
+     "median": 0.013,
+     "n": 219
+    },
+    "is": {
+     "n": 219,
+     "wr": 0.416,
+     "exp": 0.323,
+     "R": 70.6,
+     "t": 2.9,
+     "maxDD": -10.9
+    },
+    "oos": {
+     "n": 0,
+     "wr": null,
+     "exp": null,
+     "R": 0,
+     "t": null,
+     "maxDD": 0
+    },
+    "oosX2": {
+     "n": 0,
+     "wr": null,
+     "exp": null,
+     "R": 0,
+     "t": null,
+     "maxDD": 0
+    },
+    "halves": [
+     {
+      "n": 0,
+      "wr": null,
+      "exp": null,
+      "R": 0,
+      "t": null,
+      "maxDD": 0
+     },
+     {
+      "n": 0,
+      "wr": null,
+      "exp": null,
+      "R": 0,
+      "t": null,
+      "maxDD": 0
+     }
+    ],
+    "live": {
+     "n": 0,
+     "wr": null,
+     "exp": null,
+     "R": 0,
+     "t": null,
+     "maxDD": 0
+    }
+   },
+   "diag": {
+    "byGroup": {
+     "is": {
+      "futures": {
+       "n": 220,
+       "cost": 0.02,
+       "gross": 0.334,
+       "net": {
+        "n": 220,
+        "wr": 0.414,
+        "exp": 0.314,
+        "R": 69,
+        "t": 2.83,
+        "maxDD": -10.9
+       }
+      }
+     },
+     "oos": {}
+    },
+    "gatedByGroup": {
+     "is": {
+      "futures": {
+       "n": 219,
+       "cost": 0.02,
+       "gross": 0.342,
+       "net": {
+        "n": 219,
+        "wr": 0.416,
+        "exp": 0.323,
+        "R": 70.6,
+        "t": 2.9,
+        "maxDD": -10.9
+       }
+      }
+     },
+     "oos": {}
+    }
+   }
+  },
+  "ict-h1opp": {
+   "name": "ICT A-rule, H1 opposite filter (shadow)",
+   "backtest": "ICT desk replay Aug 2025–Nov 2026",
+   "reference": false,
+   "oosRule": "live paper only",
+   "cost": {
+    "mean": 0.022,
+    "median": 0.013,
+    "n": 176
+   },
+   "is": {
+    "n": 176,
+    "wr": 0.415,
+    "exp": 0.287,
+    "R": 50.5,
+    "t": 2.32,
+    "maxDD": -11.6
+   },
+   "isGross": {
+    "n": 176,
+    "wr": 0.42,
+    "exp": 0.309,
+    "R": 54.3,
+    "t": 2.5,
+    "maxDD": -10.8
+   },
+   "oos": {
+    "n": 0,
+    "wr": null,
+    "exp": null,
+    "R": 0,
+    "t": null,
+    "maxDD": 0
+   },
+   "oosGross": {
+    "n": 0,
+    "wr": null,
+    "exp": null,
+    "R": 0,
+    "t": null,
+    "maxDD": 0
+   },
+   "oosX2": {
+    "n": 0,
+    "wr": null,
+    "exp": null,
+    "R": 0,
+    "t": null,
+    "maxDD": 0
+   },
+   "oosCost": null,
+   "halves": [
+    {
+     "n": 0,
+     "wr": null,
+     "exp": null,
+     "R": 0,
+     "t": null,
+     "maxDD": 0
+    },
+    {
+     "n": 0,
+     "wr": null,
+     "exp": null,
+     "R": 0,
+     "t": null,
+     "maxDD": 0
+    }
+   ],
+   "live": {
+    "n": 0,
+    "wr": null,
+    "exp": null,
+    "R": 0,
+    "t": null,
+    "maxDD": 0
+   },
+   "liveGross": {
+    "n": 0,
+    "wr": null,
+    "exp": null,
+    "R": 0,
+    "t": null,
+    "maxDD": 0
+   },
+   "costOk": true,
+   "survives": false,
+   "verdict": "INCONCLUSIVE",
+   "why": "only 0 OOS trades",
+   "parts": {
+    "spread": 0.005,
+    "comm": 0.008,
+    "slip": 0.01
+   },
+   "costByMarket": {
+    "es": {
+     "n": 48,
+     "mean": 0.034
+    },
+    "nq": {
+     "n": 32,
+     "mean": 0.009
+    },
+    "ym": {
+     "n": 40,
+     "mean": 0.024
+    },
+    "gc": {
+     "n": 39,
+     "mean": 0.012
+    },
+    "rty": {
+     "n": 17,
+     "mean": 0.031
+    }
+   },
+   "shareUnderGate": 0.994,
+   "gated": {
+    "n": 175,
+    "verdict": "INCONCLUSIVE",
+    "why": "only 0 OOS trades",
+    "survives": false,
+    "cost": {
+     "mean": 0.021,
+     "median": 0.013,
+     "n": 175
+    },
+    "is": {
+     "n": 175,
+     "wr": 0.417,
+     "exp": 0.298,
+     "R": 52.1,
+     "t": 2.41,
+     "maxDD": -11.6
+    },
+    "oos": {
+     "n": 0,
+     "wr": null,
+     "exp": null,
+     "R": 0,
+     "t": null,
+     "maxDD": 0
+    },
+    "oosX2": {
+     "n": 0,
+     "wr": null,
+     "exp": null,
+     "R": 0,
+     "t": null,
+     "maxDD": 0
+    },
+    "halves": [
+     {
+      "n": 0,
+      "wr": null,
+      "exp": null,
+      "R": 0,
+      "t": null,
+      "maxDD": 0
+     },
+     {
+      "n": 0,
+      "wr": null,
+      "exp": null,
+      "R": 0,
+      "t": null,
+      "maxDD": 0
+     }
+    ],
+    "live": {
+     "n": 0,
+     "wr": null,
+     "exp": null,
+     "R": 0,
+     "t": null,
+     "maxDD": 0
+    }
+   },
+   "diag": {
+    "byGroup": {
+     "is": {
+      "futures": {
+       "n": 176,
+       "cost": 0.022,
+       "gross": 0.309,
+       "net": {
+        "n": 176,
+        "wr": 0.415,
+        "exp": 0.287,
+        "R": 50.5,
+        "t": 2.32,
+        "maxDD": -11.6
+       }
+      }
+     },
+     "oos": {}
+    },
+    "gatedByGroup": {
+     "is": {
+      "futures": {
+       "n": 175,
+       "cost": 0.021,
+       "gross": 0.319,
+       "net": {
+        "n": 175,
+        "wr": 0.417,
+        "exp": 0.298,
+        "R": 52.1,
+        "t": 2.41,
+        "maxDD": -11.6
+       }
+      }
+     },
+     "oos": {}
+    }
+   }
+  },
+  "ict-strail": {
+   "name": "ICT A-rule, structure trail exit (shadow)",
+   "backtest": "ICT desk replay Aug 2025–Nov 2026",
+   "reference": false,
+   "oosRule": "live paper only",
+   "cost": {
+    "mean": 0.02,
+    "median": 0.013,
+    "n": 256
+   },
+   "is": {
+    "n": 256,
+    "wr": 0.387,
+    "exp": 0.259,
+    "R": 66.3,
+    "t": 2.53,
+    "maxDD": -12.2
+   },
+   "isGross": {
+    "n": 256,
+    "wr": 0.391,
+    "exp": 0.279,
+    "R": 71.4,
+    "t": 2.72,
+    "maxDD": -11.7
+   },
+   "oos": {
+    "n": 0,
+    "wr": null,
+    "exp": null,
+    "R": 0,
+    "t": null,
+    "maxDD": 0
+   },
+   "oosGross": {
+    "n": 0,
+    "wr": null,
+    "exp": null,
+    "R": 0,
+    "t": null,
+    "maxDD": 0
+   },
+   "oosX2": {
+    "n": 0,
+    "wr": null,
+    "exp": null,
+    "R": 0,
+    "t": null,
+    "maxDD": 0
+   },
+   "oosCost": null,
+   "halves": [
+    {
+     "n": 0,
+     "wr": null,
+     "exp": null,
+     "R": 0,
+     "t": null,
+     "maxDD": 0
+    },
+    {
+     "n": 0,
+     "wr": null,
+     "exp": null,
+     "R": 0,
+     "t": null,
+     "maxDD": 0
+    }
+   ],
+   "live": {
+    "n": 0,
+    "wr": null,
+    "exp": null,
+    "R": 0,
+    "t": null,
+    "maxDD": 0
+   },
+   "liveGross": {
+    "n": 0,
+    "wr": null,
+    "exp": null,
+    "R": 0,
+    "t": null,
+    "maxDD": 0
+   },
+   "costOk": true,
+   "survives": false,
+   "verdict": "INCONCLUSIVE",
+   "why": "only 0 OOS trades",
+   "parts": {
+    "spread": 0.004,
+    "comm": 0.007,
+    "slip": 0.009
+   },
+   "costByMarket": {
+    "es": {
+     "n": 65,
+     "mean": 0.032
+    },
+    "nq": {
+     "n": 46,
+     "mean": 0.008
+    },
+    "ym": {
+     "n": 58,
+     "mean": 0.021
+    },
+    "gc": {
+     "n": 62,
+     "mean": 0.012
+    },
+    "rty": {
+     "n": 25,
+     "mean": 0.028
+    }
+   },
+   "shareUnderGate": 0.996,
+   "gated": {
+    "n": 255,
+    "verdict": "INCONCLUSIVE",
+    "why": "only 0 OOS trades",
+    "survives": false,
+    "cost": {
+     "mean": 0.02,
+     "median": 0.013,
+     "n": 255
+    },
+    "is": {
+     "n": 255,
+     "wr": 0.388,
+     "exp": 0.266,
+     "R": 67.9,
+     "t": 2.6,
+     "maxDD": -12.2
+    },
+    "oos": {
+     "n": 0,
+     "wr": null,
+     "exp": null,
+     "R": 0,
+     "t": null,
+     "maxDD": 0
+    },
+    "oosX2": {
+     "n": 0,
+     "wr": null,
+     "exp": null,
+     "R": 0,
+     "t": null,
+     "maxDD": 0
+    },
+    "halves": [
+     {
+      "n": 0,
+      "wr": null,
+      "exp": null,
+      "R": 0,
+      "t": null,
+      "maxDD": 0
+     },
+     {
+      "n": 0,
+      "wr": null,
+      "exp": null,
+      "R": 0,
+      "t": null,
+      "maxDD": 0
+     }
+    ],
+    "live": {
+     "n": 0,
+     "wr": null,
+     "exp": null,
+     "R": 0,
+     "t": null,
+     "maxDD": 0
+    }
+   },
+   "diag": {
+    "byGroup": {
+     "is": {
+      "futures": {
+       "n": 256,
+       "cost": 0.02,
+       "gross": 0.279,
+       "net": {
+        "n": 256,
+        "wr": 0.387,
+        "exp": 0.259,
+        "R": 66.3,
+        "t": 2.53,
+        "maxDD": -12.2
+       }
+      }
+     },
+     "oos": {}
+    },
+    "gatedByGroup": {
+     "is": {
+      "futures": {
+       "n": 255,
+       "cost": 0.02,
+       "gross": 0.286,
+       "net": {
+        "n": 255,
+        "wr": 0.388,
+        "exp": 0.266,
+        "R": 67.9,
+        "t": 2.6,
+        "maxDD": -12.2
+       }
+      }
+     },
+     "oos": {}
+    }
+   }
+  },
+  "ict-silver": {
+   "name": "ICT gold rule on spot silver (paper market)",
+   "backtest": "ICT desk replay Aug 2025–Nov 2026",
+   "reference": false,
+   "oosRule": "live paper only",
+   "cost": {
+    "mean": 0.056,
+    "median": 0.04,
+    "n": 82
+   },
+   "is": {
+    "n": 82,
+    "wr": 0.451,
+    "exp": 0.424,
+    "R": 34.7,
+    "t": 2.09,
+    "maxDD": -7.1
+   },
+   "isGross": {
+    "n": 82,
+    "wr": 0.451,
+    "exp": 0.479,
+    "R": 39.3,
+    "t": 2.37,
+    "maxDD": -6
+   },
+   "oos": {
+    "n": 0,
+    "wr": null,
+    "exp": null,
+    "R": 0,
+    "t": null,
+    "maxDD": 0
+   },
+   "oosGross": {
+    "n": 0,
+    "wr": null,
+    "exp": null,
+    "R": 0,
+    "t": null,
+    "maxDD": 0
+   },
+   "oosX2": {
+    "n": 0,
+    "wr": null,
+    "exp": null,
+    "R": 0,
+    "t": null,
+    "maxDD": 0
+   },
+   "oosCost": null,
+   "halves": [
+    {
+     "n": 0,
+     "wr": null,
+     "exp": null,
+     "R": 0,
+     "t": null,
+     "maxDD": 0
+    },
+    {
+     "n": 0,
+     "wr": null,
+     "exp": null,
+     "R": 0,
+     "t": null,
+     "maxDD": 0
+    }
+   ],
+   "live": {
+    "n": 0,
+    "wr": null,
+    "exp": null,
+    "R": 0,
+    "t": null,
+    "maxDD": 0
+   },
+   "liveGross": {
+    "n": 0,
+    "wr": null,
+    "exp": null,
+    "R": 0,
+    "t": null,
+    "maxDD": 0
+   },
+   "costOk": true,
+   "survives": false,
+   "verdict": "INCONCLUSIVE",
+   "why": "only 0 OOS trades",
+   "parts": {
+    "spread": 0.038,
+    "comm": 0.002,
+    "slip": 0.016
+   },
+   "costByMarket": {
+    "xag": {
+     "n": 82,
+     "mean": 0.056
+    }
+   },
+   "shareUnderGate": 0.829,
+   "gated": {
+    "n": 68,
+    "verdict": "INCONCLUSIVE",
+    "why": "only 0 OOS trades",
+    "survives": false,
+    "cost": {
+     "mean": 0.038,
+     "median": 0.035,
+     "n": 68
+    },
+    "is": {
+     "n": 68,
+     "wr": 0.471,
+     "exp": 0.51,
+     "R": 34.7,
+     "t": 2.23,
+     "maxDD": -6.2
+    },
+    "oos": {
+     "n": 0,
+     "wr": null,
+     "exp": null,
+     "R": 0,
+     "t": null,
+     "maxDD": 0
+    },
+    "oosX2": {
+     "n": 0,
+     "wr": null,
+     "exp": null,
+     "R": 0,
+     "t": null,
+     "maxDD": 0
+    },
+    "halves": [
+     {
+      "n": 0,
+      "wr": null,
+      "exp": null,
+      "R": 0,
+      "t": null,
+      "maxDD": 0
+     },
+     {
+      "n": 0,
+      "wr": null,
+      "exp": null,
+      "R": 0,
+      "t": null,
+      "maxDD": 0
+     }
+    ],
+    "live": {
+     "n": 0,
+     "wr": null,
+     "exp": null,
+     "R": 0,
+     "t": null,
+     "maxDD": 0
+    }
+   },
+   "diag": {
+    "byGroup": {
+     "is": {
+      "silver": {
+       "n": 82,
+       "cost": 0.056,
+       "gross": 0.479,
+       "net": {
+        "n": 82,
+        "wr": 0.451,
+        "exp": 0.424,
+        "R": 34.7,
+        "t": 2.09,
+        "maxDD": -7.1
+       }
+      }
+     },
+     "oos": {}
+    },
+    "gatedByGroup": {
+     "is": {
+      "silver": {
+       "n": 68,
+       "cost": 0.038,
+       "gross": 0.548,
+       "net": {
+        "n": 68,
+        "wr": 0.471,
+        "exp": 0.51,
+        "R": 34.7,
+        "t": 2.23,
+        "maxDD": -6.2
+       }
+      }
+     },
+     "oos": {}
+    }
+   }
+  },
+  "ict-dip": {
+   "name": "ICT NQ/ES dip-buy (shadow)",
+   "backtest": "ICT desk replay Aug 2025–Nov 2026",
+   "reference": false,
+   "oosRule": "live paper only",
+   "cost": {
+    "mean": 0.015,
+    "median": 0.012,
+    "n": 68
+   },
+   "is": {
+    "n": 68,
+    "wr": 0.471,
+    "exp": 0.45,
+    "R": 30.6,
+    "t": 2.03,
+    "maxDD": -10.1
+   },
+   "isGross": {
+    "n": 68,
+    "wr": 0.471,
+    "exp": 0.465,
+    "R": 31.6,
+    "t": 2.1,
+    "maxDD": -10
+   },
+   "oos": {
+    "n": 0,
+    "wr": null,
+    "exp": null,
+    "R": 0,
+    "t": null,
+    "maxDD": 0
+   },
+   "oosGross": {
+    "n": 0,
+    "wr": null,
+    "exp": null,
+    "R": 0,
+    "t": null,
+    "maxDD": 0
+   },
+   "oosX2": {
+    "n": 0,
+    "wr": null,
+    "exp": null,
+    "R": 0,
+    "t": null,
+    "maxDD": 0
+   },
+   "oosCost": null,
+   "halves": [
+    {
+     "n": 0,
+     "wr": null,
+     "exp": null,
+     "R": 0,
+     "t": null,
+     "maxDD": 0
+    },
+    {
+     "n": 0,
+     "wr": null,
+     "exp": null,
+     "R": 0,
+     "t": null,
+     "maxDD": 0
+    }
+   ],
+   "live": {
+    "n": 0,
+    "wr": null,
+    "exp": null,
+    "R": 0,
+    "t": null,
+    "maxDD": 0
+   },
+   "liveGross": {
+    "n": 0,
+    "wr": null,
+    "exp": null,
+    "R": 0,
+    "t": null,
+    "maxDD": 0
+   },
+   "costOk": true,
+   "survives": false,
+   "verdict": "INCONCLUSIVE",
+   "why": "only 0 OOS trades",
+   "parts": {
+    "spread": 0.003,
+    "comm": 0.004,
+    "slip": 0.007
+   },
+   "costByMarket": {
+    "nq": {
+     "n": 34,
+     "mean": 0.006
+    },
+    "es": {
+     "n": 34,
+     "mean": 0.024
+    }
+   },
+   "shareUnderGate": 1,
+   "gated": {
+    "n": 68,
+    "verdict": "INCONCLUSIVE",
+    "why": "only 0 OOS trades",
+    "survives": false,
+    "cost": {
+     "mean": 0.015,
+     "median": 0.012,
+     "n": 68
+    },
+    "is": {
+     "n": 68,
+     "wr": 0.471,
+     "exp": 0.45,
+     "R": 30.6,
+     "t": 2.03,
+     "maxDD": -10.1
+    },
+    "oos": {
+     "n": 0,
+     "wr": null,
+     "exp": null,
+     "R": 0,
+     "t": null,
+     "maxDD": 0
+    },
+    "oosX2": {
+     "n": 0,
+     "wr": null,
+     "exp": null,
+     "R": 0,
+     "t": null,
+     "maxDD": 0
+    },
+    "halves": [
+     {
+      "n": 0,
+      "wr": null,
+      "exp": null,
+      "R": 0,
+      "t": null,
+      "maxDD": 0
+     },
+     {
+      "n": 0,
+      "wr": null,
+      "exp": null,
+      "R": 0,
+      "t": null,
+      "maxDD": 0
+     }
+    ],
+    "live": {
+     "n": 0,
+     "wr": null,
+     "exp": null,
+     "R": 0,
+     "t": null,
+     "maxDD": 0
+    }
+   },
+   "diag": {
+    "byGroup": {
+     "is": {
+      "futures": {
+       "n": 68,
+       "cost": 0.015,
+       "gross": 0.465,
+       "net": {
+        "n": 68,
+        "wr": 0.471,
+        "exp": 0.45,
+        "R": 30.6,
+        "t": 2.03,
+        "maxDD": -10.1
+       }
+      }
+     },
+     "oos": {}
+    },
+    "gatedByGroup": {
+     "is": {
+      "futures": {
+       "n": 68,
+       "cost": 0.015,
+       "gross": 0.465,
+       "net": {
+        "n": 68,
+        "wr": 0.471,
+        "exp": 0.45,
+        "R": 30.6,
+        "t": 2.03,
+        "maxDD": -10.1
+       }
+      }
+     },
+     "oos": {}
+    }
+   }
+  },
+  "ref-ict-a": {
+   "name": "Reference: ICT A-setups (live desk rule, not a shadow)",
+   "backtest": "ICT desk replay Aug 2025–Nov 2026",
+   "reference": true,
+   "oosRule": "live paper only",
+   "cost": {
+    "mean": 0.02,
+    "median": 0.013,
+    "n": 254
+   },
+   "is": {
+    "n": 254,
+    "wr": 0.394,
+    "exp": 0.245,
+    "R": 62.3,
+    "t": 2.45,
+    "maxDD": -11.9
+   },
+   "isGross": {
+    "n": 254,
+    "wr": 0.398,
+    "exp": 0.265,
+    "R": 67.4,
+    "t": 2.65,
+    "maxDD": -11.5
+   },
+   "oos": {
+    "n": 0,
+    "wr": null,
+    "exp": null,
+    "R": 0,
+    "t": null,
+    "maxDD": 0
+   },
+   "oosGross": {
+    "n": 0,
+    "wr": null,
+    "exp": null,
+    "R": 0,
+    "t": null,
+    "maxDD": 0
+   },
+   "oosX2": {
+    "n": 0,
+    "wr": null,
+    "exp": null,
+    "R": 0,
+    "t": null,
+    "maxDD": 0
+   },
+   "oosCost": null,
+   "halves": [
+    {
+     "n": 0,
+     "wr": null,
+     "exp": null,
+     "R": 0,
+     "t": null,
+     "maxDD": 0
+    },
+    {
+     "n": 0,
+     "wr": null,
+     "exp": null,
+     "R": 0,
+     "t": null,
+     "maxDD": 0
+    }
+   ],
+   "live": {
+    "n": 0,
+    "wr": null,
+    "exp": null,
+    "R": 0,
+    "t": null,
+    "maxDD": 0
+   },
+   "liveGross": {
+    "n": 0,
+    "wr": null,
+    "exp": null,
+    "R": 0,
+    "t": null,
+    "maxDD": 0
+   },
+   "costOk": true,
+   "verdict": "REFERENCE",
+   "why": "only 0 OOS trades",
+   "parts": {
+    "spread": 0.004,
+    "comm": 0.007,
+    "slip": 0.009
+   },
+   "costByMarket": {
+    "es": {
+     "n": 64,
+     "mean": 0.032
+    },
+    "nq": {
+     "n": 45,
+     "mean": 0.008
+    },
+    "ym": {
+     "n": 58,
+     "mean": 0.021
+    },
+    "gc": {
+     "n": 62,
+     "mean": 0.012
+    },
+    "rty": {
+     "n": 25,
+     "mean": 0.028
+    }
+   },
+   "shareUnderGate": 0.996,
+   "gated": {
+    "n": 253,
+    "verdict": "INCONCLUSIVE",
+    "why": "only 0 OOS trades",
+    "survives": false,
+    "cost": {
+     "mean": 0.02,
+     "median": 0.013,
+     "n": 253
+    },
+    "is": {
+     "n": 253,
+     "wr": 0.395,
+     "exp": 0.253,
+     "R": 63.9,
+     "t": 2.52,
+     "maxDD": -11.9
+    },
+    "oos": {
+     "n": 0,
+     "wr": null,
+     "exp": null,
+     "R": 0,
+     "t": null,
+     "maxDD": 0
+    },
+    "oosX2": {
+     "n": 0,
+     "wr": null,
+     "exp": null,
+     "R": 0,
+     "t": null,
+     "maxDD": 0
+    },
+    "halves": [
+     {
+      "n": 0,
+      "wr": null,
+      "exp": null,
+      "R": 0,
+      "t": null,
+      "maxDD": 0
+     },
+     {
+      "n": 0,
+      "wr": null,
+      "exp": null,
+      "R": 0,
+      "t": null,
+      "maxDD": 0
+     }
+    ],
+    "live": {
+     "n": 0,
+     "wr": null,
+     "exp": null,
+     "R": 0,
+     "t": null,
+     "maxDD": 0
+    }
+   },
+   "diag": {
+    "byGroup": {
+     "is": {
+      "futures": {
+       "n": 254,
+       "cost": 0.02,
+       "gross": 0.265,
+       "net": {
+        "n": 254,
+        "wr": 0.394,
+        "exp": 0.245,
+        "R": 62.3,
+        "t": 2.45,
+        "maxDD": -11.9
+       }
+      }
+     },
+     "oos": {}
+    },
+    "gatedByGroup": {
+     "is": {
+      "futures": {
+       "n": 253,
+       "cost": 0.02,
+       "gross": 0.272,
+       "net": {
+        "n": 253,
+        "wr": 0.395,
+        "exp": 0.253,
+        "R": 63.9,
+        "t": 2.52,
+        "maxDD": -11.9
+       }
+      }
+     },
+     "oos": {}
+    }
+   }
+  },
+  "eng-scalp": {
+   "name": "Council engine scalp (shadow book)",
+   "backtest": "engine 150-day replay Jun–Nov 2026",
+   "reference": false,
+   "oosRule": "live paper only",
+   "cost": {
+    "mean": 0.35,
+    "median": 0.18,
+    "n": 4430
+   },
+   "is": {
+    "n": 4150,
+    "wr": 0.261,
+    "exp": -0.395,
+    "R": -1637.3,
+    "t": -12.7,
+    "maxDD": -1646.5
+   },
+   "isGross": {
+    "n": 4150,
+    "wr": 0.262,
+    "exp": -0.038,
+    "R": -157.7,
+    "t": -1.31,
+    "maxDD": -302.9
+   },
+   "oos": {
+    "n": 280,
+    "wr": 0.282,
+    "exp": -0.1,
+    "R": -28,
+    "t": -0.71,
+    "maxDD": -69.7
+   },
+   "oosGross": {
+    "n": 280,
+    "wr": 0.282,
+    "exp": 0.158,
+    "R": 44.2,
+    "t": 1.11,
+    "maxDD": -29.6
+   },
+   "oosX2": {
+    "n": 280,
+    "wr": 0.282,
+    "exp": -0.358,
+    "R": -100.2,
+    "t": -2.51,
+    "maxDD": -115.9
+   },
+   "oosCost": 0.258,
+   "halves": [
+    {
+     "n": 140,
+     "wr": 0.279,
+     "exp": -0.227,
+     "R": -31.8,
+     "t": -1.38,
+     "maxDD": -50.6
+    },
+    {
+     "n": 140,
+     "wr": 0.286,
+     "exp": 0.027,
+     "R": 3.8,
+     "t": 0.12,
+     "maxDD": -38
+    }
+   ],
+   "live": {
+    "n": 280,
+    "wr": 0.282,
+    "exp": -0.1,
+    "R": -28,
+    "t": -0.71,
+    "maxDD": -69.7
+   },
+   "liveGross": {
+    "n": 280,
+    "wr": 0.282,
+    "exp": 0.158,
+    "R": 44.2,
+    "t": 1.11,
+    "maxDD": -29.6
+   },
+   "costOk": false,
+   "survives": false,
+   "verdict": "FAIL",
+   "why": "cost 0.35R > 0.1R",
+   "parts": {
+    "spread": 0.229,
+    "comm": 0.031,
+    "slip": 0.091
+   },
+   "costByMarket": {
+    "audusd": {
+     "n": 349,
+     "mean": 0.13
+    },
+    "btc": {
+     "n": 539,
+     "mean": 0.129
+    },
+    "eth": {
+     "n": 402,
+     "mean": 0.534
+    },
+    "eurusd": {
+     "n": 181,
+     "mean": 0.126
+    },
+    "gbpusd": {
+     "n": 387,
+     "mean": 0.181
+    },
+    "sol": {
+     "n": 634,
+     "mean": 0.995
+    },
+    "usdcad": {
+     "n": 409,
+     "mean": 0.213
+    },
+    "usdchf": {
+     "n": 372,
+     "mean": 0.165
+    },
+    "xau": {
+     "n": 604,
+     "mean": 0.074
+    },
+    "xrp": {
+     "n": 553,
+     "mean": 0.552
+    }
+   },
+   "stampedCouncilCost": 0.208,
+   "shareUnderGate": 0.276,
+   "gated": {
+    "n": 1221,
+    "verdict": "PASS",
+    "why": "all bars met",
+    "survives": true,
+    "cost": {
+     "mean": 0.056,
+     "median": 0.055,
+     "n": 1221
+    },
+    "is": {
+     "n": 1137,
+     "wr": 0.361,
+     "exp": 0.168,
+     "R": 191.1,
+     "t": 3.17,
+     "maxDD": -43
+    },
+    "oos": {
+     "n": 84,
+     "wr": 0.488,
+     "exp": 0.783,
+     "R": 65.7,
+     "t": 2.81,
+     "maxDD": -8.3
+    },
+    "oosX2": {
+     "n": 84,
+     "wr": 0.488,
+     "exp": 0.723,
+     "R": 60.7,
+     "t": 2.6,
+     "maxDD": -9.1
+    },
+    "halves": [
+     {
+      "n": 42,
+      "wr": 0.476,
+      "exp": 0.506,
+      "R": 21.2,
+      "t": 1.72,
+      "maxDD": -8.3
+     },
+     {
+      "n": 42,
+      "wr": 0.5,
+      "exp": 1.06,
+      "R": 44.5,
+      "t": 2.24,
+      "maxDD": -5.3
+     }
+    ],
+    "live": {
+     "n": 84,
+     "wr": 0.488,
+     "exp": 0.783,
+     "R": 65.7,
+     "t": 2.81,
+     "maxDD": -8.3
+    }
+   },
+   "diag": {
+    "byGroup": {
+     "is": {
+      "forex": {
+       "n": 1548,
+       "cost": 0.17,
+       "gross": -0.107,
+       "net": {
+        "n": 1548,
+        "wr": 0.251,
+        "exp": -0.277,
+        "R": -429,
+        "t": -6.22,
+        "maxDD": -441.6
+       }
+      },
+      "crypto": {
+       "n": 2054,
+       "cost": 0.574,
+       "gross": 0.015,
+       "net": {
+        "n": 2054,
+        "wr": 0.269,
+        "exp": -0.559,
+        "R": -1147.2,
+        "t": -11.67,
+        "maxDD": -1152.5
+       }
+      },
+      "gold": {
+       "n": 548,
+       "cost": 0.068,
+       "gross": -0.043,
+       "net": {
+        "n": 548,
+        "wr": 0.265,
+        "exp": -0.112,
+        "R": -61.1,
+        "t": -1.34,
+        "maxDD": -129.2
+       }
+      }
+     },
+     "oos": {
+      "gold": {
+       "n": 56,
+       "cost": 0.131,
+       "gross": -0.059,
+       "net": {
+        "n": 56,
+        "wr": 0.179,
+        "exp": -0.19,
+        "R": -10.6,
+        "t": -0.52,
+        "maxDD": -26.7
+       }
+      },
+      "crypto": {
+       "n": 74,
+       "cost": 0.566,
+       "gross": 0.661,
+       "net": {
+        "n": 74,
+        "wr": 0.324,
+        "exp": 0.095,
+        "R": 7,
+        "t": 0.26,
+        "maxDD": -24.3
+       }
+      },
+      "forex": {
+       "n": 150,
+       "cost": 0.153,
+       "gross": -0.009,
+       "net": {
+        "n": 150,
+        "wr": 0.3,
+        "exp": -0.162,
+        "R": -24.4,
+        "t": -1.22,
+        "maxDD": -44
+       }
+      }
+     }
+    },
+    "gatedByGroup": {
+     "is": {
+      "forex": {
+       "n": 404,
+       "cost": 0.065,
+       "gross": 0.22,
+       "net": {
+        "n": 404,
+        "wr": 0.376,
+        "exp": 0.155,
+        "R": 62.5,
+        "t": 1.85,
+        "maxDD": -19
+       }
+      },
+      "crypto": {
+       "n": 287,
+       "cost": 0.064,
+       "gross": 0.608,
+       "net": {
+        "n": 287,
+        "wr": 0.453,
+        "exp": 0.544,
+        "R": 156.2,
+        "t": 4.51,
+        "maxDD": -14.9
+       }
+      },
+      "gold": {
+       "n": 446,
+       "cost": 0.043,
+       "gross": -0.019,
+       "net": {
+        "n": 446,
+        "wr": 0.289,
+        "exp": -0.062,
+        "R": -27.6,
+        "t": -0.79,
+        "maxDD": -75.9
+       }
+      }
+     },
+     "oos": {
+      "crypto": {
+       "n": 9,
+       "cost": 0.058,
+       "gross": 1.094,
+       "net": {
+        "n": 9,
+        "wr": 0.444,
+        "exp": 1.036,
+        "R": 9.3,
+        "t": 1.03,
+        "maxDD": -2.2
+       }
+      },
+      "forex": {
+       "n": 47,
+       "cost": 0.065,
+       "gross": 0.771,
+       "net": {
+        "n": 47,
+        "wr": 0.574,
+        "exp": 0.705,
+        "R": 33.2,
+        "t": 3,
+        "maxDD": -6.5
+       }
+      },
+      "gold": {
+       "n": 28,
+       "cost": 0.052,
+       "gross": 0.883,
+       "net": {
+        "n": 28,
+        "wr": 0.357,
+        "exp": 0.831,
+        "R": 23.3,
+        "t": 1.22,
+        "maxDD": -7.3
+       }
+      }
+     }
+    }
+   }
+  },
+  "eng-rscalp": {
+   "name": "Council engine rscalp (shadow book)",
+   "backtest": "engine 150-day replay Jun–Nov 2026",
+   "reference": false,
+   "oosRule": "live paper only",
+   "cost": {
+    "mean": 0.402,
+    "median": 0.193,
+    "n": 2331
+   },
+   "is": {
+    "n": 2168,
+    "wr": 0.392,
+    "exp": -0.397,
+    "R": -860,
+    "t": -10.2,
+    "maxDD": -863.1
+   },
+   "isGross": {
+    "n": 2168,
+    "wr": 0.475,
+    "exp": 0.013,
+    "R": 28.5,
+    "t": 0.38,
+    "maxDD": -46
+   },
+   "oos": {
+    "n": 163,
+    "wr": 0.356,
+    "exp": -0.222,
+    "R": -36.2,
+    "t": -1.49,
+    "maxDD": -55
+   },
+   "oosGross": {
+    "n": 163,
+    "wr": 0.423,
+    "exp": 0.07,
+    "R": 11.4,
+    "t": 0.5,
+    "maxDD": -17.2
+   },
+   "oosX2": {
+    "n": 163,
+    "wr": 0.313,
+    "exp": -0.514,
+    "R": -83.7,
+    "t": -3.08,
+    "maxDD": -95.8
+   },
+   "oosCost": 0.292,
+   "halves": [
+    {
+     "n": 81,
+     "wr": 0.383,
+     "exp": -0.035,
+     "R": -2.9,
+     "t": -0.14,
+     "maxDD": -20.2
+    },
+    {
+     "n": 82,
+     "wr": 0.329,
+     "exp": -0.406,
+     "R": -33.3,
+     "t": -2.39,
+     "maxDD": -34.8
+    }
+   ],
+   "live": {
+    "n": 163,
+    "wr": 0.356,
+    "exp": -0.222,
+    "R": -36.2,
+    "t": -1.49,
+    "maxDD": -55
+   },
+   "liveGross": {
+    "n": 163,
+    "wr": 0.423,
+    "exp": 0.07,
+    "R": 11.4,
+    "t": 0.5,
+    "maxDD": -17.2
+   },
+   "costOk": false,
+   "survives": false,
+   "verdict": "FAIL",
+   "why": "cost 0.402R > 0.1R",
+   "parts": {
+    "spread": 0.278,
+    "comm": 0.034,
+    "slip": 0.09
+   },
+   "costByMarket": {
+    "audusd": {
+     "n": 134,
+     "mean": 0.127
+    },
+    "btc": {
+     "n": 324,
+     "mean": 0.154
+    },
+    "eth": {
+     "n": 243,
+     "mean": 0.635
+    },
+    "eurusd": {
+     "n": 104,
+     "mean": 0.135
+    },
+    "gbpusd": {
+     "n": 189,
+     "mean": 0.191
+    },
+    "sol": {
+     "n": 305,
+     "mean": 1.073
+    },
+    "usdcad": {
+     "n": 239,
+     "mean": 0.262
+    },
+    "usdchf": {
+     "n": 153,
+     "mean": 0.186
+    },
+    "xau": {
+     "n": 328,
+     "mean": 0.069
+    },
+    "xrp": {
+     "n": 312,
+     "mean": 0.717
+    }
+   },
+   "stampedCouncilCost": 0.184,
+   "shareUnderGate": 0.29,
+   "gated": {
+    "n": 677,
+    "verdict": "INCONCLUSIVE",
+    "why": "net OOS 0.23R, t 0.87; halves 0.172 / 0.285; x2 0.167",
+    "survives": true,
+    "cost": {
+     "mean": 0.054,
+     "median": 0.052,
+     "n": 677
+    },
+    "is": {
+     "n": 622,
+     "wr": 0.58,
+     "exp": 0.069,
+     "R": 42.7,
+     "t": 1.43,
+     "maxDD": -15
+    },
+    "oos": {
+     "n": 55,
+     "wr": 0.491,
+     "exp": 0.23,
+     "R": 12.6,
+     "t": 0.87,
+     "maxDD": -11.2
+    },
+    "oosX2": {
+     "n": 55,
+     "wr": 0.473,
+     "exp": 0.167,
+     "R": 9.2,
+     "t": 0.63,
+     "maxDD": -12.5
+    },
+    "halves": [
+     {
+      "n": 27,
+      "wr": 0.444,
+      "exp": 0.172,
+      "R": 4.6,
+      "t": 0.39,
+      "maxDD": -9.3
+     },
+     {
+      "n": 28,
+      "wr": 0.536,
+      "exp": 0.285,
+      "R": 8,
+      "t": 0.9,
+      "maxDD": -5.2
+     }
+    ],
+    "live": {
+     "n": 55,
+     "wr": 0.491,
+     "exp": 0.23,
+     "R": 12.6,
+     "t": 0.87,
+     "maxDD": -11.2
+    }
+   },
+   "diag": {
+    "byGroup": {
+     "is": {
+      "forex": {
+       "n": 753,
+       "cost": 0.195,
+       "gross": 0.031,
+       "net": {
+        "n": 753,
+        "wr": 0.462,
+        "exp": -0.163,
+        "R": -123.1,
+        "t": -3.29,
+        "maxDD": -125.7
+       }
+      },
+      "crypto": {
+       "n": 1127,
+       "cost": 0.642,
+       "gross": 0.026,
+       "net": {
+        "n": 1127,
+        "wr": 0.332,
+        "exp": -0.616,
+        "R": -693.7,
+        "t": -9.71,
+        "maxDD": -704
+       }
+      },
+      "gold": {
+       "n": 288,
+       "cost": 0.064,
+       "gross": -0.086,
+       "net": {
+        "n": 288,
+        "wr": 0.444,
+        "exp": -0.15,
+        "R": -43.3,
+        "t": -1.95,
+        "maxDD": -54.1
+       }
+      }
+     },
+     "oos": {
+      "crypto": {
+       "n": 57,
+       "cost": 0.557,
+       "gross": 0.108,
+       "net": {
+        "n": 57,
+        "wr": 0.404,
+        "exp": -0.449,
+        "R": -25.6,
+        "t": -1.98,
+        "maxDD": -26.2
+       }
+      },
+      "forex": {
+       "n": 66,
+       "cost": 0.178,
+       "gross": -0.073,
+       "net": {
+        "n": 66,
+        "wr": 0.364,
+        "exp": -0.25,
+        "R": -16.5,
+        "t": -1.43,
+        "maxDD": -21.7
+       }
+      },
+      "gold": {
+       "n": 40,
+       "cost": 0.102,
+       "gross": 0.25,
+       "net": {
+        "n": 40,
+        "wr": 0.275,
+        "exp": 0.148,
+        "R": 5.9,
+        "t": 0.35,
+        "maxDD": -18
+       }
+      }
+     }
+    },
+    "gatedByGroup": {
+     "is": {
+      "forex": {
+       "n": 216,
+       "cost": 0.063,
+       "gross": 0.253,
+       "net": {
+        "n": 216,
+        "wr": 0.676,
+        "exp": 0.191,
+        "R": 41.2,
+        "t": 2.36,
+        "maxDD": -9.1
+       }
+      },
+      "crypto": {
+       "n": 162,
+       "cost": 0.06,
+       "gross": 0.132,
+       "net": {
+        "n": 162,
+        "wr": 0.574,
+        "exp": 0.072,
+        "R": 11.7,
+        "t": 0.84,
+        "maxDD": -11.4
+       }
+      },
+      "gold": {
+       "n": 244,
+       "cost": 0.041,
+       "gross": 0,
+       "net": {
+        "n": 244,
+        "wr": 0.5,
+        "exp": -0.042,
+        "R": -10.1,
+        "t": -0.51,
+        "maxDD": -27
+       }
+      }
+     },
+     "oos": {
+      "crypto": {
+       "n": 11,
+       "cost": 0.068,
+       "gross": 0.662,
+       "net": {
+        "n": 11,
+        "wr": 0.818,
+        "exp": 0.593,
+        "R": 6.5,
+        "t": 1.37,
+        "maxDD": -1.1
+       }
+      },
+      "forex": {
+       "n": 18,
+       "cost": 0.074,
+       "gross": -0.119,
+       "net": {
+        "n": 18,
+        "wr": 0.5,
+        "exp": -0.193,
+        "R": -3.5,
+        "t": -0.89,
+        "maxDD": -4.6
+       }
+      },
+      "gold": {
+       "n": 26,
+       "cost": 0.052,
+       "gross": 0.421,
+       "net": {
+        "n": 26,
+        "wr": 0.346,
+        "exp": 0.369,
+        "R": 9.6,
+        "t": 0.72,
+        "maxDD": -7.5
+       }
+      }
+     }
+    }
+   }
+  },
+  "eng-intraday": {
+   "name": "Council engine intraday (shadow book)",
+   "backtest": "engine 150-day replay Jun–Nov 2026",
+   "reference": false,
+   "oosRule": "live paper only",
+   "cost": {
+    "mean": 0.141,
+    "median": 0.083,
+    "n": 1044
+   },
+   "is": {
+    "n": 992,
+    "wr": 0.252,
+    "exp": -0.286,
+    "R": -283.6,
+    "t": -5.51,
+    "maxDD": -283.6
+   },
+   "isGross": {
+    "n": 992,
+    "wr": 0.252,
+    "exp": -0.145,
+    "R": -143.7,
+    "t": -2.86,
+    "maxDD": -157.3
+   },
+   "oos": {
+    "n": 52,
+    "wr": 0.385,
+    "exp": 0.114,
+    "R": 5.9,
+    "t": 0.48,
+    "maxDD": -13.2
+   },
+   "oosGross": {
+    "n": 52,
+    "wr": 0.385,
+    "exp": 0.264,
+    "R": 13.7,
+    "t": 1.16,
+    "maxDD": -11.1
+   },
+   "oosX2": {
+    "n": 52,
+    "wr": 0.385,
+    "exp": -0.035,
+    "R": -1.8,
+    "t": -0.14,
+    "maxDD": -15.9
+   },
+   "oosCost": 0.15,
+   "halves": [
+    {
+     "n": 26,
+     "wr": 0.346,
+     "exp": 0.082,
+     "R": 2.1,
+     "t": 0.24,
+     "maxDD": -11.8
+    },
+    {
+     "n": 26,
+     "wr": 0.423,
+     "exp": 0.147,
+     "R": 3.8,
+     "t": 0.43,
+     "maxDD": -4.2
+    }
+   ],
+   "live": {
+    "n": 52,
+    "wr": 0.385,
+    "exp": 0.114,
+    "R": 5.9,
+    "t": 0.48,
+    "maxDD": -13.2
+   },
+   "liveGross": {
+    "n": 52,
+    "wr": 0.385,
+    "exp": 0.264,
+    "R": 13.7,
+    "t": 1.16,
+    "maxDD": -11.1
+   },
+   "costOk": false,
+   "survives": false,
+   "verdict": "FAIL",
+   "why": "cost 0.141R > 0.1R",
+   "parts": {
+    "spread": 0.088,
+    "comm": 0.017,
+    "slip": 0.037
+   },
+   "costByMarket": {
+    "audusd": {
+     "n": 108,
+     "mean": 0.08
+    },
+    "btc": {
+     "n": 125,
+     "mean": 0.054
+    },
+    "eth": {
+     "n": 100,
+     "mean": 0.19
+    },
+    "eurusd": {
+     "n": 31,
+     "mean": 0.059
+    },
+    "gbpusd": {
+     "n": 70,
+     "mean": 0.096
+    },
+    "sol": {
+     "n": 126,
+     "mean": 0.405
+    },
+    "usdcad": {
+     "n": 99,
+     "mean": 0.106
+    },
+    "usdchf": {
+     "n": 104,
+     "mean": 0.11
+    },
+    "xau": {
+     "n": 155,
+     "mean": 0.022
+    },
+    "xrp": {
+     "n": 126,
+     "mean": 0.226
+    }
+   },
+   "stampedCouncilCost": 0.088,
+   "shareUnderGate": 0.572,
+   "gated": {
+    "n": 597,
+    "verdict": "INCONCLUSIVE",
+    "why": "net OOS 0.08R, t 0.3; halves -0.107 / 0.267; x2 0.031",
+    "survives": true,
+    "cost": {
+     "mean": 0.044,
+     "median": 0.041,
+     "n": 597
+    },
+    "is": {
+     "n": 563,
+     "wr": 0.298,
+     "exp": -0.08,
+     "R": -45.2,
+     "t": -1.21,
+     "maxDD": -61.9
+    },
+    "oos": {
+     "n": 34,
+     "wr": 0.353,
+     "exp": 0.08,
+     "R": 2.7,
+     "t": 0.3,
+     "maxDD": -13.1
+    },
+    "oosX2": {
+     "n": 34,
+     "wr": 0.353,
+     "exp": 0.031,
+     "R": 1.1,
+     "t": 0.12,
+     "maxDD": -14
+    },
+    "halves": [
+     {
+      "n": 17,
+      "wr": 0.294,
+      "exp": -0.107,
+      "R": -1.8,
+      "t": -0.29,
+      "maxDD": -11.7
+     },
+     {
+      "n": 17,
+      "wr": 0.412,
+      "exp": 0.267,
+      "R": 4.5,
+      "t": 0.67,
+      "maxDD": -5.2
+     }
+    ],
+    "live": {
+     "n": 34,
+     "wr": 0.353,
+     "exp": 0.08,
+     "R": 2.7,
+     "t": 0.3,
+     "maxDD": -13.1
+    }
+   },
+   "diag": {
+    "byGroup": {
+     "is": {
+      "forex": {
+       "n": 382,
+       "cost": 0.097,
+       "gross": -0.138,
+       "net": {
+        "n": 382,
+        "wr": 0.246,
+        "exp": -0.235,
+        "R": -89.9,
+        "t": -2.72,
+        "maxDD": -103.3
+       }
+      },
+      "crypto": {
+       "n": 458,
+       "cost": 0.217,
+       "gross": -0.145,
+       "net": {
+        "n": 458,
+        "wr": 0.251,
+        "exp": -0.363,
+        "R": -166,
+        "t": -4.71,
+        "maxDD": -175.9
+       }
+      },
+      "gold": {
+       "n": 152,
+       "cost": 0.021,
+       "gross": -0.161,
+       "net": {
+        "n": 152,
+        "wr": 0.27,
+        "exp": -0.182,
+        "R": -27.7,
+        "t": -1.56,
+        "maxDD": -45.6
+       }
+      }
+     },
+     "oos": {
+      "crypto": {
+       "n": 19,
+       "cost": 0.302,
+       "gross": 0.255,
+       "net": {
+        "n": 19,
+        "wr": 0.421,
+        "exp": -0.047,
+        "R": -0.9,
+        "t": -0.12,
+        "maxDD": -6.6
+       }
+      },
+      "forex": {
+       "n": 30,
+       "cost": 0.065,
+       "gross": 0.396,
+       "net": {
+        "n": 30,
+        "wr": 0.4,
+        "exp": 0.33,
+        "R": 9.9,
+        "t": 1.02,
+        "maxDD": -7.4
+       }
+      },
+      "gold": {
+       "n": 3,
+       "cost": 0.028,
+       "gross": -1,
+       "net": {
+        "n": 3,
+        "wr": 0,
+        "exp": -1.028,
+        "R": -3.1,
+        "t": -57.37,
+        "maxDD": -3.1
+       }
+      }
+     }
+    },
+    "gatedByGroup": {
+     "is": {
+      "forex": {
+       "n": 249,
+       "cost": 0.054,
+       "gross": -0.021,
+       "net": {
+        "n": 249,
+        "wr": 0.293,
+        "exp": -0.075,
+        "R": -18.6,
+        "t": -0.72,
+        "maxDD": -36.4
+       }
+      },
+      "crypto": {
+       "n": 162,
+       "cost": 0.051,
+       "gross": 0.058,
+       "net": {
+        "n": 162,
+        "wr": 0.333,
+        "exp": 0.007,
+        "R": 1.1,
+        "t": 0.05,
+        "maxDD": -42.4
+       }
+      },
+      "gold": {
+       "n": 152,
+       "cost": 0.021,
+       "gross": -0.161,
+       "net": {
+        "n": 152,
+        "wr": 0.27,
+        "exp": -0.182,
+        "R": -27.7,
+        "t": -1.56,
+        "maxDD": -45.6
+       }
+      }
+     },
+     "oos": {
+      "forex": {
+       "n": 26,
+       "cost": 0.05,
+       "gross": 0.145,
+       "net": {
+        "n": 26,
+        "wr": 0.346,
+        "exp": 0.095,
+        "R": 2.5,
+        "t": 0.3,
+        "maxDD": -10.9
+       }
+      },
+      "crypto": {
+       "n": 5,
+       "cost": 0.057,
+       "gross": 0.722,
+       "net": {
+        "n": 5,
+        "wr": 0.6,
+        "exp": 0.665,
+        "R": 3.3,
+        "t": 0.91,
+        "maxDD": -1.1
+       }
+      },
+      "gold": {
+       "n": 3,
+       "cost": 0.028,
+       "gross": -1,
+       "net": {
+        "n": 3,
+        "wr": 0,
+        "exp": -1.028,
+        "R": -3.1,
+        "t": -57.37,
+        "maxDD": -3.1
+       }
+      }
+     }
+    }
+   }
+  },
+  "eng-rintra": {
+   "name": "Council engine rintra (shadow book)",
+   "backtest": "engine 150-day replay Jun–Nov 2026",
+   "reference": false,
+   "oosRule": "live paper only",
+   "cost": {
+    "mean": 0.165,
+    "median": 0.082,
+    "n": 528
+   },
+   "is": {
+    "n": 499,
+    "wr": 0.483,
+    "exp": -0.102,
+    "R": -50.7,
+    "t": -1.31,
+    "maxDD": -69.7
+   },
+   "isGross": {
+    "n": 499,
+    "wr": 0.543,
+    "exp": 0.061,
+    "R": 30.5,
+    "t": 0.8,
+    "maxDD": -25
+   },
+   "oos": {
+    "n": 29,
+    "wr": 0.414,
+    "exp": 0.18,
+    "R": 5.2,
+    "t": 0.44,
+    "maxDD": -6.6
+   },
+   "oosGross": {
+    "n": 29,
+    "wr": 0.483,
+    "exp": 0.38,
+    "R": 11,
+    "t": 0.91,
+    "maxDD": -4.4
+   },
+   "oosX2": {
+    "n": 29,
+    "wr": 0.414,
+    "exp": -0.02,
+    "R": -0.6,
+    "t": -0.05,
+    "maxDD": -9.5
+   },
+   "oosCost": 0.2,
+   "halves": [
+    {
+     "n": 14,
+     "wr": 0.357,
+     "exp": -0.181,
+     "R": -2.5,
+     "t": -0.43,
+     "maxDD": -6
+    },
+    {
+     "n": 15,
+     "wr": 0.467,
+     "exp": 0.516,
+     "R": 7.7,
+     "t": 0.74,
+     "maxDD": -5.4
+    }
+   ],
+   "live": {
+    "n": 29,
+    "wr": 0.414,
+    "exp": 0.18,
+    "R": 5.2,
+    "t": 0.44,
+    "maxDD": -6.6
+   },
+   "liveGross": {
+    "n": 29,
+    "wr": 0.483,
+    "exp": 0.38,
+    "R": 11,
+    "t": 0.91,
+    "maxDD": -4.4
+   },
+   "costOk": false,
+   "survives": false,
+   "verdict": "FAIL",
+   "why": "cost 0.165R > 0.1R",
+   "parts": {
+    "spread": 0.113,
+    "comm": 0.021,
+    "slip": 0.031
+   },
+   "costByMarket": {
+    "audusd": {
+     "n": 42,
+     "mean": 0.103
+    },
+    "btc": {
+     "n": 64,
+     "mean": 0.06
+    },
+    "eth": {
+     "n": 37,
+     "mean": 0.248
+    },
+    "eurusd": {
+     "n": 20,
+     "mean": 0.056
+    },
+    "gbpusd": {
+     "n": 28,
+     "mean": 0.097
+    },
+    "sol": {
+     "n": 75,
+     "mean": 0.361
+    },
+    "usdcad": {
+     "n": 61,
+     "mean": 0.158
+    },
+    "usdchf": {
+     "n": 56,
+     "mean": 0.107
+    },
+    "xau": {
+     "n": 65,
+     "mean": 0.032
+    },
+    "xrp": {
+     "n": 80,
+     "mean": 0.262
+    }
+   },
+   "stampedCouncilCost": 0.081,
+   "shareUnderGate": 0.54,
+   "gated": {
+    "n": 285,
+    "verdict": "INCONCLUSIVE",
+    "why": "only 13 OOS trades",
+    "survives": true,
+    "cost": {
+     "mean": 0.043,
+     "median": 0.04,
+     "n": 285
+    },
+    "is": {
+     "n": 272,
+     "wr": 0.651,
+     "exp": 0.109,
+     "R": 29.8,
+     "t": 1.6,
+     "maxDD": -16.2
+    },
+    "oos": {
+     "n": 13,
+     "wr": 0.538,
+     "exp": 0.868,
+     "R": 11.3,
+     "t": 1.13,
+     "maxDD": -1.9
+    },
+    "oosX2": {
+     "n": 13,
+     "wr": 0.538,
+     "exp": 0.838,
+     "R": 10.9,
+     "t": 1.09,
+     "maxDD": -2
+    },
+    "halves": [
+     {
+      "n": 6,
+      "wr": 0.333,
+      "exp": -0.247,
+      "R": -1.5,
+      "t": -0.95,
+      "maxDD": -1.9
+     },
+     {
+      "n": 7,
+      "wr": 0.714,
+      "exp": 1.824,
+      "R": 12.8,
+      "t": 1.36,
+      "maxDD": -1
+     }
+    ],
+    "live": {
+     "n": 13,
+     "wr": 0.538,
+     "exp": 0.868,
+     "R": 11.3,
+     "t": 1.13,
+     "maxDD": -1.9
+    }
+   },
+   "diag": {
+    "byGroup": {
+     "is": {
+      "forex": {
+       "n": 201,
+       "cost": 0.116,
+       "gross": 0.034,
+       "net": {
+        "n": 201,
+        "wr": 0.453,
+        "exp": -0.082,
+        "R": -16.5,
+        "t": -0.51,
+        "maxDD": -36.5
+       }
+      },
+      "crypto": {
+       "n": 242,
+       "cost": 0.232,
+       "gross": 0.069,
+       "net": {
+        "n": 242,
+        "wr": 0.492,
+        "exp": -0.163,
+        "R": -39.5,
+        "t": -2.13,
+        "maxDD": -42.4
+       }
+      },
+      "gold": {
+       "n": 56,
+       "cost": 0.03,
+       "gross": 0.124,
+       "net": {
+        "n": 56,
+        "wr": 0.554,
+        "exp": 0.094,
+        "R": 5.2,
+        "t": 0.54,
+        "maxDD": -8.5
+       }
+      }
+     },
+     "oos": {
+      "crypto": {
+       "n": 14,
+       "cost": 0.355,
+       "gross": 0.166,
+       "net": {
+        "n": 14,
+        "wr": 0.357,
+        "exp": -0.189,
+        "R": -2.6,
+        "t": -0.44,
+        "maxDD": -6.1
+       }
+      },
+      "gold": {
+       "n": 9,
+       "cost": 0.047,
+       "gross": 1.323,
+       "net": {
+        "n": 9,
+        "wr": 0.556,
+        "exp": 1.276,
+        "R": 11.5,
+        "t": 1.17,
+        "maxDD": -2.3
+       }
+      },
+      "forex": {
+       "n": 6,
+       "cost": 0.066,
+       "gross": -0.538,
+       "net": {
+        "n": 6,
+        "wr": 0.333,
+        "exp": -0.604,
+        "R": -3.6,
+        "t": -2.01,
+        "maxDD": -4.2
+       }
+      }
+     }
+    },
+    "gatedByGroup": {
+     "is": {
+      "forex": {
+       "n": 125,
+       "cost": 0.047,
+       "gross": 0.094,
+       "net": {
+        "n": 125,
+        "wr": 0.616,
+        "exp": 0.047,
+        "R": 5.8,
+        "t": 0.43,
+        "maxDD": -10.1
+       }
+      },
+      "crypto": {
+       "n": 94,
+       "cost": 0.05,
+       "gross": 0.212,
+       "net": {
+        "n": 94,
+        "wr": 0.734,
+        "exp": 0.162,
+        "R": 15.2,
+        "t": 1.77,
+        "maxDD": -7
+       }
+      },
+      "gold": {
+       "n": 53,
+       "cost": 0.023,
+       "gross": 0.187,
+       "net": {
+        "n": 53,
+        "wr": 0.585,
+        "exp": 0.164,
+        "R": 8.7,
+        "t": 0.91,
+        "maxDD": -5.1
+       }
+      }
+     },
+     "oos": {
+      "crypto": {
+       "n": 1,
+       "cost": 0.05,
+       "gross": 0,
+       "net": {
+        "n": 1,
+        "wr": 0,
+        "exp": -0.05,
+        "R": 0,
+        "t": null,
+        "maxDD": 0
+       }
+      },
+      "gold": {
+       "n": 8,
+       "cost": 0.021,
+       "gross": 1.614,
+       "net": {
+        "n": 8,
+        "wr": 0.625,
+        "exp": 1.593,
+        "R": 12.7,
+        "t": 1.34,
+        "maxDD": -1.1
+       }
+      },
+      "forex": {
+       "n": 4,
+       "cost": 0.044,
+       "gross": -0.307,
+       "net": {
+        "n": 4,
+        "wr": 0.5,
+        "exp": -0.351,
+        "R": -1.4,
+        "t": -0.87,
+        "maxDD": -2.1
+       }
+      }
+     }
+    }
+   }
+  },
+  "eng-swing": {
+   "name": "Council engine swing (shadow book)",
+   "backtest": "engine 150-day replay Jun–Nov 2026",
+   "reference": false,
+   "oosRule": "live paper only",
+   "cost": {
+    "mean": 0.041,
+    "median": 0.03,
+    "n": 106
+   },
+   "is": {
+    "n": 105,
+    "wr": 0.276,
+    "exp": -0.221,
+    "R": -23.3,
+    "t": -1.66,
+    "maxDD": -38.8
+   },
+   "isGross": {
+    "n": 105,
+    "wr": 0.276,
+    "exp": -0.18,
+    "R": -18.9,
+    "t": -1.35,
+    "maxDD": -35.6
+   },
+   "oos": {
+    "n": 1,
+    "wr": 0,
+    "exp": -1.016,
+    "R": -1,
+    "t": null,
+    "maxDD": -1
+   },
+   "oosGross": {
+    "n": 1,
+    "wr": 0,
+    "exp": -1,
+    "R": -1,
+    "t": null,
+    "maxDD": -1
+   },
+   "oosX2": {
+    "n": 1,
+    "wr": 0,
+    "exp": -1.032,
+    "R": -1,
+    "t": null,
+    "maxDD": -1
+   },
+   "oosCost": 0.016,
+   "halves": [
+    {
+     "n": 0,
+     "wr": null,
+     "exp": null,
+     "R": 0,
+     "t": null,
+     "maxDD": 0
+    },
+    {
+     "n": 1,
+     "wr": 0,
+     "exp": -1.016,
+     "R": -1,
+     "t": null,
+     "maxDD": -1
+    }
+   ],
+   "live": {
+    "n": 1,
+    "wr": 0,
+    "exp": -1.016,
+    "R": -1,
+    "t": null,
+    "maxDD": -1
+   },
+   "liveGross": {
+    "n": 1,
+    "wr": 0,
+    "exp": -1,
+    "R": -1,
+    "t": null,
+    "maxDD": -1
+   },
+   "costOk": true,
+   "survives": false,
+   "verdict": "INCONCLUSIVE",
+   "why": "only 1 OOS trades",
+   "parts": {
+    "spread": 0.027,
+    "comm": 0.005,
+    "slip": 0.01
+   },
+   "costByMarket": {
+    "audusd": {
+     "n": 11,
+     "mean": 0.018
+    },
+    "btc": {
+     "n": 12,
+     "mean": 0.017
+    },
+    "eth": {
+     "n": 4,
+     "mean": 0.031
+    },
+    "gbpusd": {
+     "n": 14,
+     "mean": 0.023
+    },
+    "sol": {
+     "n": 26,
+     "mean": 0.095
+    },
+    "usdcad": {
+     "n": 8,
+     "mean": 0.031
+    },
+    "usdchf": {
+     "n": 9,
+     "mean": 0.034
+    },
+    "xau": {
+     "n": 12,
+     "mean": 0.006
+    },
+    "xrp": {
+     "n": 10,
+     "mean": 0.045
+    }
+   },
+   "stampedCouncilCost": 0.022,
+   "shareUnderGate": 0.906,
+   "gated": {
+    "n": 96,
+    "verdict": "INCONCLUSIVE",
+    "why": "only 1 OOS trades",
+    "survives": false,
+    "cost": {
+     "mean": 0.03,
+     "median": 0.025,
+     "n": 96
+    },
+    "is": {
+     "n": 95,
+     "wr": 0.295,
+     "exp": -0.155,
+     "R": -14.7,
+     "t": -1.09,
+     "maxDD": -30.6
+    },
+    "oos": {
+     "n": 1,
+     "wr": 0,
+     "exp": -1.016,
+     "R": -1,
+     "t": null,
+     "maxDD": -1
+    },
+    "oosX2": {
+     "n": 1,
+     "wr": 0,
+     "exp": -1.032,
+     "R": -1,
+     "t": null,
+     "maxDD": -1
+    },
+    "halves": [
+     {
+      "n": 0,
+      "wr": null,
+      "exp": null,
+      "R": 0,
+      "t": null,
+      "maxDD": 0
+     },
+     {
+      "n": 1,
+      "wr": 0,
+      "exp": -1.016,
+      "R": -1,
+      "t": null,
+      "maxDD": -1
+     }
+    ],
+    "live": {
+     "n": 1,
+     "wr": 0,
+     "exp": -1.016,
+     "R": -1,
+     "t": null,
+     "maxDD": -1
+    }
+   },
+   "diag": {
+    "byGroup": {
+     "is": {
+      "forex": {
+       "n": 42,
+       "cost": 0.025,
+       "gross": -0.27,
+       "net": {
+        "n": 42,
+        "wr": 0.262,
+        "exp": -0.296,
+        "R": -12.4,
+        "t": -1.53,
+        "maxDD": -13
+       }
+      },
+      "crypto": {
+       "n": 51,
+       "cost": 0.063,
+       "gross": -0.03,
+       "net": {
+        "n": 51,
+        "wr": 0.314,
+        "exp": -0.094,
+        "R": -4.8,
+        "t": -0.45,
+        "maxDD": -10.9
+       }
+      },
+      "gold": {
+       "n": 12,
+       "cost": 0.006,
+       "gross": -0.499,
+       "net": {
+        "n": 12,
+        "wr": 0.167,
+        "exp": -0.506,
+        "R": -6.1,
+        "t": -1.5,
+        "maxDD": -9.1
+       }
+      }
+     },
+     "oos": {
+      "crypto": {
+       "n": 1,
+       "cost": 0.016,
+       "gross": -1,
+       "net": {
+        "n": 1,
+        "wr": 0,
+        "exp": -1.016,
+        "R": -1,
+        "t": null,
+        "maxDD": -1
+       }
+      }
+     }
+    },
+    "gatedByGroup": {
+     "is": {
+      "forex": {
+       "n": 42,
+       "cost": 0.025,
+       "gross": -0.27,
+       "net": {
+        "n": 42,
+        "wr": 0.262,
+        "exp": -0.296,
+        "R": -12.4,
+        "t": -1.53,
+        "maxDD": -13
+       }
+      },
+      "crypto": {
+       "n": 41,
+       "cost": 0.041,
+       "gross": 0.133,
+       "net": {
+        "n": 41,
+        "wr": 0.366,
+        "exp": 0.092,
+        "R": 3.8,
+        "t": 0.38,
+        "maxDD": -7.7
+       }
+      },
+      "gold": {
+       "n": 12,
+       "cost": 0.006,
+       "gross": -0.499,
+       "net": {
+        "n": 12,
+        "wr": 0.167,
+        "exp": -0.506,
+        "R": -6.1,
+        "t": -1.5,
+        "maxDD": -9.1
+       }
+      }
+     },
+     "oos": {
+      "crypto": {
+       "n": 1,
+       "cost": 0.016,
+       "gross": -1,
+       "net": {
+        "n": 1,
+        "wr": 0,
+        "exp": -1.016,
+        "R": -1,
+        "t": null,
+        "maxDD": -1
+       }
+      }
+     }
+    }
+   }
+  },
+  "eng-rswing": {
+   "name": "Council engine rswing (shadow book)",
+   "backtest": "engine 150-day replay Jun–Nov 2026",
+   "reference": false,
+   "oosRule": "live paper only",
+   "cost": {
+    "mean": 0.054,
+    "median": 0.027,
+    "n": 57
+   },
+   "is": {
+    "n": 55,
+    "wr": 0.545,
+    "exp": -0.204,
+    "R": -11.2,
+    "t": -2.07,
+    "maxDD": -13.8
+   },
+   "isGross": {
+    "n": 55,
+    "wr": 0.618,
+    "exp": -0.148,
+    "R": -8.2,
+    "t": -1.53,
+    "maxDD": -11
+   },
+   "oos": {
+    "n": 2,
+    "wr": 1,
+    "exp": 0.251,
+    "R": 0.5,
+    "t": 1.46,
+    "maxDD": 0
+   },
+   "oosGross": {
+    "n": 2,
+    "wr": 1,
+    "exp": 0.26,
+    "R": 0.5,
+    "t": 1.53,
+    "maxDD": 0
+   },
+   "oosX2": {
+    "n": 2,
+    "wr": 1,
+    "exp": 0.242,
+    "R": 0.5,
+    "t": 1.4,
+    "maxDD": 0
+   },
+   "oosCost": 0.009,
+   "halves": [
+    {
+     "n": 1,
+     "wr": 1,
+     "exp": 0.422,
+     "R": 0.4,
+     "t": null,
+     "maxDD": 0
+    },
+    {
+     "n": 1,
+     "wr": 1,
+     "exp": 0.079,
+     "R": 0.1,
+     "t": null,
+     "maxDD": 0
+    }
+   ],
+   "live": {
+    "n": 2,
+    "wr": 1,
+    "exp": 0.251,
+    "R": 0.5,
+    "t": 1.46,
+    "maxDD": 0
+   },
+   "liveGross": {
+    "n": 2,
+    "wr": 1,
+    "exp": 0.26,
+    "R": 0.5,
+    "t": 1.53,
+    "maxDD": 0
+   },
+   "costOk": true,
+   "survives": true,
+   "verdict": "INCONCLUSIVE",
+   "why": "only 2 OOS trades",
+   "parts": {
+    "spread": 0.041,
+    "comm": 0.005,
+    "slip": 0.008
+   },
+   "costByMarket": {
+    "audusd": {
+     "n": 6,
+     "mean": 0.02
+    },
+    "btc": {
+     "n": 5,
+     "mean": 0.011
+    },
+    "eth": {
+     "n": 6,
+     "mean": 0.108
+    },
+    "eurusd": {
+     "n": 3,
+     "mean": 0.014
+    },
+    "gbpusd": {
+     "n": 2,
+     "mean": 0.022
+    },
+    "sol": {
+     "n": 13,
+     "mean": 0.124
+    },
+    "usdcad": {
+     "n": 6,
+     "mean": 0.025
+    },
+    "usdchf": {
+     "n": 5,
+     "mean": 0.032
+    },
+    "xau": {
+     "n": 6,
+     "mean": 0.008
+    },
+    "xrp": {
+     "n": 5,
+     "mean": 0.04
+    }
+   },
+   "stampedCouncilCost": 0.016,
+   "shareUnderGate": 0.877,
+   "gated": {
+    "n": 50,
+    "verdict": "INCONCLUSIVE",
+    "why": "only 2 OOS trades",
+    "survives": true,
+    "cost": {
+     "mean": 0.027,
+     "median": 0.023,
+     "n": 50
+    },
+    "is": {
+     "n": 48,
+     "wr": 0.583,
+     "exp": -0.146,
+     "R": -7,
+     "t": -1.44,
+     "maxDD": -11
+    },
+    "oos": {
+     "n": 2,
+     "wr": 1,
+     "exp": 0.251,
+     "R": 0.5,
+     "t": 1.46,
+     "maxDD": 0
+    },
+    "oosX2": {
+     "n": 2,
+     "wr": 1,
+     "exp": 0.242,
+     "R": 0.5,
+     "t": 1.4,
+     "maxDD": 0
+    },
+    "halves": [
+     {
+      "n": 1,
+      "wr": 1,
+      "exp": 0.422,
+      "R": 0.4,
+      "t": null,
+      "maxDD": 0
+     },
+     {
+      "n": 1,
+      "wr": 1,
+      "exp": 0.079,
+      "R": 0.1,
+      "t": null,
+      "maxDD": 0
+     }
+    ],
+    "live": {
+     "n": 2,
+     "wr": 1,
+     "exp": 0.251,
+     "R": 0.5,
+     "t": 1.46,
+     "maxDD": 0
+    }
+   },
+   "diag": {
+    "byGroup": {
+     "is": {
+      "forex": {
+       "n": 21,
+       "cost": 0.024,
+       "gross": -0.243,
+       "net": {
+        "n": 21,
+        "wr": 0.524,
+        "exp": -0.267,
+        "R": -5.6,
+        "t": -1.77,
+        "maxDD": -8.1
+       }
+      },
+      "crypto": {
+       "n": 28,
+       "cost": 0.089,
+       "gross": -0.071,
+       "net": {
+        "n": 28,
+        "wr": 0.536,
+        "exp": -0.161,
+        "R": -4.5,
+        "t": -1.07,
+        "maxDD": -4.5
+       }
+      },
+      "gold": {
+       "n": 6,
+       "cost": 0.008,
+       "gross": -0.173,
+       "net": {
+        "n": 6,
+        "wr": 0.667,
+        "exp": -0.182,
+        "R": -1.1,
+        "t": -0.68,
+        "maxDD": -1.1
+       }
+      }
+     },
+     "oos": {
+      "crypto": {
+       "n": 1,
+       "cost": 0.008,
+       "gross": 0.43,
+       "net": {
+        "n": 1,
+        "wr": 1,
+        "exp": 0.422,
+        "R": 0.4,
+        "t": null,
+        "maxDD": 0
+       }
+      },
+      "forex": {
+       "n": 1,
+       "cost": 0.011,
+       "gross": 0.09,
+       "net": {
+        "n": 1,
+        "wr": 1,
+        "exp": 0.079,
+        "R": 0.1,
+        "t": null,
+        "maxDD": 0
+       }
+      }
+     }
+    },
+    "gatedByGroup": {
+     "is": {
+      "forex": {
+       "n": 21,
+       "cost": 0.024,
+       "gross": -0.243,
+       "net": {
+        "n": 21,
+        "wr": 0.524,
+        "exp": -0.267,
+        "R": -5.6,
+        "t": -1.77,
+        "maxDD": -8.1
+       }
+      },
+      "crypto": {
+       "n": 21,
+       "cost": 0.037,
+       "gross": 0.024,
+       "net": {
+        "n": 21,
+        "wr": 0.619,
+        "exp": -0.014,
+        "R": -0.3,
+        "t": -0.09,
+        "maxDD": -4.2
+       }
+      },
+      "gold": {
+       "n": 6,
+       "cost": 0.008,
+       "gross": -0.173,
+       "net": {
+        "n": 6,
+        "wr": 0.667,
+        "exp": -0.182,
+        "R": -1.1,
+        "t": -0.68,
+        "maxDD": -1.1
+       }
+      }
+     },
+     "oos": {
+      "crypto": {
+       "n": 1,
+       "cost": 0.008,
+       "gross": 0.43,
+       "net": {
+        "n": 1,
+        "wr": 1,
+        "exp": 0.422,
+        "R": 0.4,
+        "t": null,
+        "maxDD": 0
+       }
+      },
+      "forex": {
+       "n": 1,
+       "cost": 0.011,
+       "gross": 0.09,
+       "net": {
+        "n": 1,
+        "wr": 1,
+        "exp": 0.079,
+        "R": 0.1,
+        "t": null,
+        "maxDD": 0
+       }
+      }
+     }
+    }
+   }
+  },
+  "eng-position": {
+   "name": "Council engine position (shadow book)",
+   "backtest": "engine 150-day replay Jun–Nov 2026",
+   "reference": false,
+   "oosRule": "live paper only",
+   "cost": {
+    "mean": 0.033,
+    "median": 0.021,
+    "n": 76
+   },
+   "is": {
+    "n": 74,
+    "wr": 0.108,
+    "exp": -0.696,
+    "R": -51.5,
+    "t": -5.96,
+    "maxDD": -51.5
+   },
+   "isGross": {
+    "n": 74,
+    "wr": 0.108,
+    "exp": -0.662,
+    "R": -49,
+    "t": -5.71,
+    "maxDD": -49
+   },
+   "oos": {
+    "n": 2,
+    "wr": 0,
+    "exp": -1.013,
+    "R": -2,
+    "t": -705.16,
+    "maxDD": -2
+   },
+   "oosGross": {
+    "n": 2,
+    "wr": 0,
+    "exp": -1,
+    "R": -2,
+    "t": null,
+    "maxDD": -2
+   },
+   "oosX2": {
+    "n": 2,
+    "wr": 0,
+    "exp": -1.026,
+    "R": -2.1,
+    "t": -357.04,
+    "maxDD": -2.1
+   },
+   "oosCost": 0.013,
+   "halves": [
+    {
+     "n": 1,
+     "wr": 0,
+     "exp": -1.011,
+     "R": -1,
+     "t": null,
+     "maxDD": -1
+    },
+    {
+     "n": 1,
+     "wr": 0,
+     "exp": -1.014,
+     "R": -1,
+     "t": null,
+     "maxDD": -1
+    }
+   ],
+   "live": {
+    "n": 2,
+    "wr": 0,
+    "exp": -1.013,
+    "R": -2,
+    "t": -705.16,
+    "maxDD": -2
+   },
+   "liveGross": {
+    "n": 2,
+    "wr": 0,
+    "exp": -1,
+    "R": -2,
+    "t": null,
+    "maxDD": -2
+   },
+   "costOk": true,
+   "survives": false,
+   "verdict": "INCONCLUSIVE",
+   "why": "only 2 OOS trades",
+   "parts": {
+    "spread": 0.02,
+    "comm": 0.003,
+    "slip": 0.01
+   },
+   "costByMarket": {
+    "audusd": {
+     "n": 6,
+     "mean": 0.017
+    },
+    "btc": {
+     "n": 13,
+     "mean": 0.016
+    },
+    "eth": {
+     "n": 6,
+     "mean": 0.038
+    },
+    "eurusd": {
+     "n": 3,
+     "mean": 0.014
+    },
+    "gbpusd": {
+     "n": 7,
+     "mean": 0.011
+    },
+    "sol": {
+     "n": 11,
+     "mean": 0.079
+    },
+    "usdcad": {
+     "n": 4,
+     "mean": 0.028
+    },
+    "usdchf": {
+     "n": 11,
+     "mean": 0.021
+    },
+    "xau": {
+     "n": 5,
+     "mean": 0.005
+    },
+    "xrp": {
+     "n": 10,
+     "mean": 0.063
+    }
+   },
+   "stampedCouncilCost": 0.022,
+   "shareUnderGate": 0.961,
+   "gated": {
+    "n": 73,
+    "verdict": "INCONCLUSIVE",
+    "why": "only 2 OOS trades",
+    "survives": false,
+    "cost": {
+     "mean": 0.028,
+     "median": 0.019,
+     "n": 73
+    },
+    "is": {
+     "n": 71,
+     "wr": 0.113,
+     "exp": -0.676,
+     "R": -48,
+     "t": -5.58,
+     "maxDD": -48
+    },
+    "oos": {
+     "n": 2,
+     "wr": 0,
+     "exp": -1.013,
+     "R": -2,
+     "t": -705.16,
+     "maxDD": -2
+    },
+    "oosX2": {
+     "n": 2,
+     "wr": 0,
+     "exp": -1.026,
+     "R": -2.1,
+     "t": -357.04,
+     "maxDD": -2.1
+    },
+    "halves": [
+     {
+      "n": 1,
+      "wr": 0,
+      "exp": -1.011,
+      "R": -1,
+      "t": null,
+      "maxDD": -1
+     },
+     {
+      "n": 1,
+      "wr": 0,
+      "exp": -1.014,
+      "R": -1,
+      "t": null,
+      "maxDD": -1
+     }
+    ],
+    "live": {
+     "n": 2,
+     "wr": 0,
+     "exp": -1.013,
+     "R": -2,
+     "t": -705.16,
+     "maxDD": -2
+    }
+   },
+   "diag": {
+    "byGroup": {
+     "is": {
+      "forex": {
+       "n": 30,
+       "cost": 0.018,
+       "gross": -0.352,
+       "net": {
+        "n": 30,
+        "wr": 0.2,
+        "exp": -0.37,
+        "R": -11.1,
+        "t": -1.51,
+        "maxDD": -19.3
+       }
+      },
+      "crypto": {
+       "n": 39,
+       "cost": 0.05,
+       "gross": -0.857,
+       "net": {
+        "n": 39,
+        "wr": 0.051,
+        "exp": -0.907,
+        "R": -35.4,
+        "t": -8.72,
+        "maxDD": -36.8
+       }
+      },
+      "gold": {
+       "n": 5,
+       "cost": 0.005,
+       "gross": -1,
+       "net": {
+        "n": 5,
+        "wr": 0,
+        "exp": -1.005,
+        "R": -5,
+        "t": -873.61,
+        "maxDD": -5
+       }
+      }
+     },
+     "oos": {
+      "crypto": {
+       "n": 1,
+       "cost": 0.011,
+       "gross": -1,
+       "net": {
+        "n": 1,
+        "wr": 0,
+        "exp": -1.011,
+        "R": -1,
+        "t": null,
+        "maxDD": -1
+       }
+      },
+      "forex": {
+       "n": 1,
+       "cost": 0.014,
+       "gross": -1,
+       "net": {
+        "n": 1,
+        "wr": 0,
+        "exp": -1.014,
+        "R": -1,
+        "t": null,
+        "maxDD": -1
+       }
+      }
+     }
+    },
+    "gatedByGroup": {
+     "is": {
+      "forex": {
+       "n": 30,
+       "cost": 0.018,
+       "gross": -0.352,
+       "net": {
+        "n": 30,
+        "wr": 0.2,
+        "exp": -0.37,
+        "R": -11.1,
+        "t": -1.51,
+        "maxDD": -19.3
+       }
+      },
+      "crypto": {
+       "n": 36,
+       "cost": 0.04,
+       "gross": -0.845,
+       "net": {
+        "n": 36,
+        "wr": 0.056,
+        "exp": -0.885,
+        "R": -31.9,
+        "t": -7.91,
+        "maxDD": -33.3
+       }
+      },
+      "gold": {
+       "n": 5,
+       "cost": 0.005,
+       "gross": -1,
+       "net": {
+        "n": 5,
+        "wr": 0,
+        "exp": -1.005,
+        "R": -5,
+        "t": -873.61,
+        "maxDD": -5
+       }
+      }
+     },
+     "oos": {
+      "crypto": {
+       "n": 1,
+       "cost": 0.011,
+       "gross": -1,
+       "net": {
+        "n": 1,
+        "wr": 0,
+        "exp": -1.011,
+        "R": -1,
+        "t": null,
+        "maxDD": -1
+       }
+      },
+      "forex": {
+       "n": 1,
+       "cost": 0.014,
+       "gross": -1,
+       "net": {
+        "n": 1,
+        "wr": 0,
+        "exp": -1.014,
+        "R": -1,
+        "t": null,
+        "maxDD": -1
+       }
+      }
+     }
+    }
+   }
+  },
+  "eng-m30m1": {
+   "name": "Council engine m30m1 (shadow book)",
+   "backtest": "none",
+   "reference": false,
+   "oosRule": "live paper only",
+   "cost": {
+    "mean": 0.164,
+    "median": 0.164,
+    "n": 2
+   },
+   "is": {
+    "n": 0,
+    "wr": null,
+    "exp": null,
+    "R": 0,
+    "t": null,
+    "maxDD": 0
+   },
+   "isGross": {
+    "n": 0,
+    "wr": null,
+    "exp": null,
+    "R": 0,
+    "t": null,
+    "maxDD": 0
+   },
+   "oos": {
+    "n": 2,
+    "wr": 0.5,
+    "exp": 0.336,
+    "R": 0.7,
+    "t": 0.2,
+    "maxDD": -1.3
+   },
+   "oosGross": {
+    "n": 2,
+    "wr": 0.5,
+    "exp": 0.5,
+    "R": 1,
+    "t": 0.33,
+    "maxDD": -1
+   },
+   "oosX2": {
+    "n": 2,
+    "wr": 0.5,
+    "exp": 0.171,
+    "R": 0.3,
+    "t": 0.09,
+    "maxDD": -1.6
+   },
+   "oosCost": 0.164,
+   "halves": [
+    {
+     "n": 1,
+     "wr": 1,
+     "exp": 1.986,
+     "R": 2,
+     "t": null,
+     "maxDD": 0
+    },
+    {
+     "n": 1,
+     "wr": 0,
+     "exp": -1.315,
+     "R": -1.3,
+     "t": null,
+     "maxDD": -1.3
+    }
+   ],
+   "live": {
+    "n": 2,
+    "wr": 0.5,
+    "exp": 0.336,
+    "R": 0.7,
+    "t": 0.2,
+    "maxDD": -1.3
+   },
+   "liveGross": {
+    "n": 2,
+    "wr": 0.5,
+    "exp": 0.5,
+    "R": 1,
+    "t": 0.33,
+    "maxDD": -1
+   },
+   "costOk": false,
+   "survives": false,
+   "verdict": "FAIL",
+   "why": "cost 0.164R > 0.1R",
+   "parts": {
+    "spread": 0.069,
+    "comm": 0.039,
+    "slip": 0.056
+   },
+   "costByMarket": {
+    "xau": {
+     "n": 2,
+     "mean": 0.164
+    }
+   },
+   "stampedCouncilCost": 0.233,
+   "shareUnderGate": 0.5,
+   "gated": {
+    "n": 1,
+    "verdict": "INCONCLUSIVE",
+    "why": "only 1 OOS trades",
+    "survives": true,
+    "cost": {
+     "mean": 0.014,
+     "median": 0.014,
+     "n": 1
+    },
+    "is": {
+     "n": 0,
+     "wr": null,
+     "exp": null,
+     "R": 0,
+     "t": null,
+     "maxDD": 0
+    },
+    "oos": {
+     "n": 1,
+     "wr": 1,
+     "exp": 1.986,
+     "R": 2,
+     "t": null,
+     "maxDD": 0
+    },
+    "oosX2": {
+     "n": 1,
+     "wr": 1,
+     "exp": 1.973,
+     "R": 2,
+     "t": null,
+     "maxDD": 0
+    },
+    "halves": [
+     {
+      "n": 0,
+      "wr": null,
+      "exp": null,
+      "R": 0,
+      "t": null,
+      "maxDD": 0
+     },
+     {
+      "n": 1,
+      "wr": 1,
+      "exp": 1.986,
+      "R": 2,
+      "t": null,
+      "maxDD": 0
+     }
+    ],
+    "live": {
+     "n": 1,
+     "wr": 1,
+     "exp": 1.986,
+     "R": 2,
+     "t": null,
+     "maxDD": 0
+    }
+   },
+   "diag": {
+    "byGroup": {
+     "is": {},
+     "oos": {
+      "gold": {
+       "n": 2,
+       "cost": 0.164,
+       "gross": 0.5,
+       "net": {
+        "n": 2,
+        "wr": 0.5,
+        "exp": 0.336,
+        "R": 0.7,
+        "t": 0.2,
+        "maxDD": -1.3
+       }
+      }
+     }
+    },
+    "gatedByGroup": {
+     "is": {},
+     "oos": {
+      "gold": {
+       "n": 1,
+       "cost": 0.014,
+       "gross": 2,
+       "net": {
+        "n": 1,
+        "wr": 1,
+        "exp": 1.986,
+        "R": 2,
+        "t": null,
+        "maxDD": 0
+       }
+      }
+     }
+    }
+   }
+  }
+ },
+ "notes": [
+  "Cost = spread + commission + slippage per round trip, in R of the initial risk (costmodel.mjs). x2 = twice that.",
+  "IS/OOS: streams with a pre-2020 backtest (nq-trend, lit) use 2020-01-01 onward + live paper as OOS; the others (ICT, engine) have only design-window backtests, so OOS = live paper.",
+  "Verdict bar in preregistration.md; \"survives\" = cost <= 0.10R and net OOS expectancy > 0 as point estimates."
+ ]
+}
