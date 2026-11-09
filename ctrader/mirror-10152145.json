@@ -3008,7 +3008,7 @@
    "startBalance": 9987.78
   },
   "startedAt": "2026-11-08T11:42:25.000Z",
-  "status": "ok · demo Fusion Markets · balance 9977.78 · 19 open · 1 resting",
+  "status": "ok · demo Fusion Markets · balance 9977.78 · 19 open · 2 resting",
   "skipped": {
    "audusd-position-1793601653": "price 0.68666 has run 1.27R from the council entry 0.70162: a different trade now",
    "xrp-rswing-1793942619": "none of XRPUSD found at the broker",
@@ -3042,18 +3042,34 @@
     "alerted": [
      "pending"
     ]
+   },
+   "xau-rscalp-1794260665": {
+    "orderId": "33833340",
+    "symbol": "XAUUSD",
+    "side": "sell",
+    "volume": 100,
+    "lots": 0.01,
+    "digits": 2,
+    "setup": "rscalp",
+    "limitPrice": 4135.67,
+    "stop": 4146.5,
+    "t1": 4134.135,
+    "placedAt": "2026-11-09T21:45:13.000Z",
+    "expires": "2026-11-10T00:44:25.000Z",
+    "riskCash": 10.83,
+    "margin": 8.27,
+    "minLot": true,
+    "shadow": true,
+    "alerted": [
+     "pending"
+    ]
    }
   },
   "catchUpAt": "2026-11-08T12:04:40.000Z",
   "balance": 9977.78,
-  "lastRun": "2026-11-09T21:42:40.000Z"
+  "lastRun": "2026-11-09T21:45:13.000Z"
  },
  "log": [
-  {
-   "at": "2026-11-09T07:06:09.000Z",
-   "msg": "limit filled: ETHUSD position 47527636 at the broker",
-   "trade": "eth-scalp-1794207743"
-  },
   {
    "at": "2026-11-09T07:06:09.000Z",
    "msg": "EURUSD position 47491691 closed at the broker",
@@ -4548,6 +4564,11 @@
    "at": "2026-11-09T21:42:05.000Z",
    "msg": "SOLUSD position 47775170 closed at the broker",
    "trade": "sol-rscalp-1794253228"
+  },
+  {
+   "at": "2026-11-09T21:45:13.000Z",
+   "msg": "placed sell limit XAUUSD 0.01 lot at 4135.67 (council rscalp, valid to 2026-11-10T00:44Z)",
+   "trade": "xau-rscalp-1794260665"
   }
  ],
  "limits": {
