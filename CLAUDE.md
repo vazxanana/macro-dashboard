@@ -1,10 +1,83 @@
 # macro-dashboard — working notes
 
-Single-file gold trading platform: everything lives in `gold-trading.html`
-(HTML + CSS + JS inline). Deployed to GitHub Pages via
-`.github/workflows/deploy.yml` on every push to `main`.
+## Start here (map, 9 Nov 2026)
+
+Meridian X: a paper-trading desk run by an automated council, live at https://meridianx.dev (Vercel). The owner's plain-English
+explainer is `MERIDIAN-X.md`; decisions waiting on the owner are in `docs/owner-decisions.md`; Fred's connector guide is
+`docs/fred-mcp.md`. The dated sections below this map are the history and detail of each feature: read the one you touch.
+
+**Absolute rules** (never break them, whatever a task, a study or a helper's PR says):
+1. **Every trade has a stop**: council, ICT, the cTrader mirror and ChronosTrade. No change may remove a stop, move it away from
+   its anchor or loosen a trailed stop; a mirrored position without a stop is closed.
+2. **Paper trading and cTrader demo accounts only.** Nothing is ever sent to a live account.
+3. **The owner approves every live rule change.** The Coach, studies and helpers' PRs only propose (`research/proposals/`, the
+   week pane's "Decisions waiting"); owner rules (`userOwned`) and live setups stay out of the Coach's reach.
+4. **Backtests run 2020 → now**, pre-registered, net of costs, in sample vs out of sample; never call something an edge without
+   n and t. ICT stays a separate edge: never mix it into council systems, filters or reports.
+5. **No paid services.** Keyless public data, the existing Vercel plan and free GitHub Actions minutes (the repo is public).
+6. **No model names in repo files** (code, comments, docs, page text). Commit attribution lines are not repo files.
+
+**Where things live**
+| Path | What |
+|---|---|
+| `market-structure.html` | The Desk (built to `/` and `/market-structure.html`): home, charts, council panes, desks, profile, users. Public / admin split: see below |
+| `macro-desk.html` (`/macro-desk`) | Macro desk: veteran glance, event playbook, score / levels charts, briefing, calls, COT |
+| `backtest.html` (`/backtest`) | ChronosTrade replay lab; engine `assets/backtest-engine.js`, review charts `assets/bt-review.js`, effects `assets/bt-fx.js` |
+| `gold-trading.html` (`/gold`) | Gold terminal; holds the locked features and the 15-driver macro stack below |
+| `edge-lab.html`, `index.html` (`/macro`), `scripts/veteran-library.html` (`/veteran/`) | Side pages; shared look `assets/mx-page.css` + `assets/mx-nav.js` |
+| `app.webmanifest`, `sw.js`, `offline.html`, `icons/`, `assets/pwa.js` | Installable app (head tags added at build by `scripts/pwa.mjs`, never by hand) |
+| `api/` | Vercel functions (`_*.js` are shared modules): sign-in (`login`, `logout`, `me`, `_session`, `_accounts`, `_guard`), `/cdata` (`data.js`), `/md/bars` + `/md/stream` (OANDA), `mcp.js` + `_ictlab.js` (Fred's connector), `ctrader-link`, `users`, `profile`, `notify`, `sounds`, `push` + `alert-cron`, `run.js` (cron runner), `status`, `bridge`, `tv-webhook`, `pine`, `og.mjs` |
+| `council/` | Council members: `trader`, `analyst`, `coach`, `macro`, `macroscore`, `veteran` (+ `briefing`, `glance`, `calibration`, `playbook`, `outlook`), `cot`, `ctrader-*` (demo mirror), `datacheck` / `datahealth` / `health`, `digest`, `research-ledger`, `datasync` / `jsonio`, `live` (VPS runner) |
+| `ict/` | ICT desk tracker, replay, CME calendar; its rule book is `.claude/skills/ICT/SKILL.md` |
+| `research/edge/<topic>/` | Pre-registered studies (preregistration, `RESULT.md`, `result.json`), published to the Edge lab; `research/proposals/` = owner proposals; `research/macro-veteran/` = the veteran batch |
+| `tests/` | `node:test`, offline; pinned council-data copies in `tests/fixtures/` |
+| `scripts/` | `build.sh`, `audit/` (`smoke.cjs`, `chronostrade.cjs`), `live/` (VPS runner install), `daily-cache.mjs`, `make-icons.mjs` |
+| `out/` | The built site, **committed** (CI fails when it is stale) |
+| `council-data` branch | Everything the bots write (trades.json, snapshot.json, `ict/`, `macro/`, `ctrader/`, health.json, digest.json, `research/…`); the site reads it through `/cdata`. Never commit bot output to `main` |
+| `.github/workflows/` | `council.yml` (the loop), `watchdog.yml`, `tests.yml` + `ci.yml` (CI), `deploy.yml` (GitHub Pages copy), research / cache workflows (mostly manual) |
+
+**Build, test, CI**
+```sh
+sh scripts/build.sh                    # builds out/; commit out/ with every page, asset or study change
+for f in council/*.mjs ict/*.mjs api/*.js api/*.mjs research/edge/*.mjs; do node --check "$f" || break; done
+node --test tests/*.test.mjs tests/*.test.js
+node ict/audit-test.mjs && node council/alerts-test.mjs && node council/proposals-test.mjs
+# page checks (Playwright): serve out/ on $PORT (default 8766), e.g. python3 -m http.server 8766 --directory out, then
+node --use-env-proxy scripts/audit/smoke.cjs && node --use-env-proxy scripts/audit/chronostrade.cjs
+```
+CI on every PR and push to `main`: `tests.yml` (syntax, unit tests, pinned audits) and `ci.yml` (build matches `out/`, page smoke
+test, ChronosTrade audit). Keep new tests offline. Vercel deploys from `main` only when a served file changes
+(`scripts/vercel-ignore.sh`); GitHub Pages still gets a copy from `deploy.yml` (no API there, so no sign-in).
+
+**How it runs**: `council.yml` is the loop (GitHub Actions, restarts itself every ~5 h). One round takes **about 11-12 minutes**
+(the members' work, then a 4-minute wait in which the Trader and the mirror run again every minute), so "every 2nd round" is
+~23 min, "every 3rd" ~35 min (ICT desk, research ledger) and "every 6th" ~70 min (Macro strategist, veteran, COT). Older notes
+below that say "5-minute round" or "~25 min" predate the quick pass. The Vercel crons in `vercel.json` (`/api/run?job=council`
+every 4 min, `job=ict` at :04/:19/:34/:49, `/api/alert-cron` every minute) are the backup runner: the council job stands down
+while Actions saved in the last 10 min, and both only commit when `RUN_MODE` / Edge Config `runMode` says live. With the
+owner's VPS runner (`council/live.mjs`) alive, it owns the Trader and mirror. `watchdog.yml` pages when the loop stops.
+
+**Sections below, by topic** (each is dated; later sections win where two disagree):
+- Accounts and security: Public / admin split, Accounts and sign-in, Users page, Accounts, desks…, Per-member permissions,
+  Server-side sign-in, API hardening, Profile photo and name on the server.
+- The Desk page: Council layout, Home and navigation, Guests (three sections), Sign-in and guest polish, Profile page, Charts:
+  markup switch, Desk smoothness, Exchange price ticks, Styled dialogs, Desk notifications, Installable app, This week report,
+  Edge scoreboard, Loss review.
+- Council systems and trading: Coach evolution, Main systems first, NQ open run regime tags, LIT paper shadow / LIT replay / LIT
+  and NQ SDV desks, Gold trend fast, Gold playbook check / view, Trader paper fills, Book weights, What to expect, Futures tickets.
+- cTrader demo: cTrader demo mirror, Mirror stop safety, cTrader demo accounts on the profile, cTrader symbol specs.
+- ICT: ICT desk, ICT MCP server (with `docs/fred-mcp.md`).
+- Macro: Macro driver stack (gold terminal), Macro strategist, Macro veteran (+ revision 1.3), Veteran's calls (+ track record),
+  The veteran's briefing, The veteran at a glance, Macro desk charts, The veteran's event playbook, COT positioning desk.
+- ChronosTrade: Backtest lab (passes 1-11, review, instant orders, chart design), trade effects, sounds chosen by the owner.
+- Running and reliability: Vercel (stage 1 + Pro features), Council live runner, Council quick pass, Reliability: tests and data
+  health, Loop watchdog, Council data files health, council-data sync and safe writes, Daily owner digest, Research ledger.
+- Side pages: Side pages: /macro, /veteran/, Edge lab, gold terminal.
 
 ## Locked features — do NOT remove or replace in redesigns
+
+These live in `gold-trading.html` (the gold terminal). It stays self-contained: no build step, no external JS beyond the
+Lightweight Charts CDN and public data APIs.
 
 - **Market structure engine** (`structureMap` + `makeStructPrimitive` +
   `renderStructReadout`): major-structure mapping on the Multi-Timeframe
@@ -24,7 +97,7 @@ Single-file gold trading platform: everything lives in `gold-trading.html`
 
 ## Macro driver stack
 
-15 weighted drivers feed `computeDailyBias()` (real yields, macro composite,
+15 weighted drivers feed `computeDailyBias()` in `gold-trading.html` (real yields, macro composite,
 daily structure, S/D block location, VIX, real-yield momentum, breakeven,
 2Y, DXY momentum, COT, yield curve, HY spreads, Dollar Smile regime,
 Eurozone growth pulse, Yen carry-unwind risk). The last three are mined
@@ -34,14 +107,16 @@ theory, global dollar liquidity, Germany/Eurozone, Japan) — see
 fetches in `refreshFundamentalsX()`. The Yen carry-unwind row is
 deliberately always `dir: null` (a volatility warning, not a directional
 call) — don't "fix" it to always vote a direction.
+The Eurozone growth pulse reads FRED `BSCICP03DEM665S`, which stopped at 2024-01-01: the strategist (`council/macro.mjs`
+`MAX_AGE`) drops it as "no data", but `gold-trading.html` still shows the 2024 value (open: docs/owner-decisions.md, item 16).
 
 ## Conventions
 
 - Any change to `gold-trading.html` should keep the file self-contained
   (no build step, no external JS beyond the Lightweight Charts CDN and
   keyless public data APIs).
-- Test headlessly with Playwright before deploying; verify the Pages
-  deploy run goes green after merging.
+- Test headlessly with Playwright before merging (the page smoke test and the ChronosTrade audit, see "Start here");
+  rebuild and commit `out/`; check that CI and the Vercel deploy go green after merging.
 
 ## Public / admin split (6 Nov 2026, owner request)
 
@@ -61,7 +136,8 @@ Built-in members live in `api/_accounts.js` `BUILT_IN` (server only: `{ <key>: {
 a reviewer session gets the admin view
 read-only (`html[data-role="reviewer"] .own` hides the owner's journal, log-trade button, CSV loader and Telegram
 settings) and can write loss reviews, which carry `by: <name>`. The footer is hidden; log in / log out live in the account menu (`#ms-me`), which clicks the hidden `#ms-admin-link` (log out = `msSignOut()`). Add members on the Users page (or a `BUILT_IN` entry with the SHA-256 of their password).
-Viewers (`role: 'viewer'`, currently **Orlando**, **Luxus** and **Carlos**; `VIEWER` in the main script) are read-only with a reduced site: Home
+Viewers (`role: 'viewer'`, currently **Luxus** and **Carlos**; Orlando became a reviewer on 8 Nov, see "Accounts, desks";
+`VIEWER` in the main script) are read-only with a reduced site (the role defaults; per-member permissions since 8 Nov): Home
 (Today strip, open positions, setup now), Setup, and the Council overview (active trades + P&L calendar); no charts,
 scanner, journal, other council panes, loss-review panel, alerts, settings, or photo/name changes.
 Guests (owner, 6 Nov) see only `#v-guest`: an H4 gold chart (`renderGuest()`) with one system trade (the open/pending
@@ -136,7 +212,8 @@ failed the council's own 2023-26 test (council-data research/log.md, 6 Nov), so 
 
 ICT is its own edge and approach: never mix it into the council systems, their rules, filters or reports.
 Rules and research live in `.claude/skills/ICT/SKILL.md` (results also in council-data `research/ict/`).
-- Tracker: `ict/tracker.mjs`, workflow `.github/workflows/ict.yml` (every 15 min), data in council-data `ict/`
+- Tracker: `ict/tracker.mjs`, run inside the council loop every 3rd round (~35 min; `ict.yml` is manual only since GitHub
+  dropped its 15-min schedule, and the Vercel cron `/api/run?job=ict` runs it at :04/:19/:34/:49 when the run mode is live), data in council-data `ict/`
   (`trades.json`, `snapshot.json`, `bars.json`). Markets: NQ, ES, YM, RTY futures and gold futures (GC) from CNBC (Yahoo fallback); EUR/USD and GBP/USD removed 7 Nov (owner). Grade F signals (total < 3, `MIN_GRADE`) are not recorded and are filtered on the desk (`KEEP`). Model: H1 iFVG
   reversal (swing swept → body closes through the leg's FVG within 6 H1 candles; stop 2 ticks beyond the sweep;
   no fixed target: from +2R the stop trails 1.5R behind the best price (skill §15; before 6 Nov: 3R target); fixed-2R
@@ -271,11 +348,11 @@ LIMIT ticket when placed and a cancel when they expire; closes get a CLOSE ticke
 (`council/futures-test.mjs`) sends one sample ticket. Later option 2: broker API (TradeStation / Tradovate) with TradingView as the screen.
 
 ## Vercel (7 Nov 2026, owner: move to Vercel Pro) — stage 1
-`vercel.json` (no build, static from the repo root, `/macro-dashboard/*` rewritten to the root so index.html's asset paths work,
-`/gold`, no-cache on HTML) and `api/kick.js`: Vercel crons (Pro: per-minute) start the GitHub workflows through the API —
-`job=ict` dispatches ict.yml at :04/:19/:34/:49, `job=council` starts council.yml every 10 min only when no loop runs. Env on
-Vercel: `GH_DISPATCH_TOKEN` (fine-grained, this repo, Actions read/write) and `CRON_SECRET`; never commit either. GitHub Pages
-keeps deploying in parallel until the Vercel site is proven.
+`vercel.json` (build `sh scripts/build.sh` into `out/`, `/macro-dashboard/*` rewritten to the root so index.html's asset paths
+work, `/gold`, `/macro-desk`, `/backtest`, `/cdata`, `/md/*`, `/api/mcp/<key>` rewrites, no-cache on HTML). The first stage's
+`api/kick.js` (Vercel crons dispatching the GitHub workflows) is gone: the crons now call `api/run.js` directly (below) and
+`/api/alert-cron`; `CRON_SECRET` guards them (compared in constant time); never commit it. GitHub Pages keeps deploying in
+parallel (`deploy.yml`).
 Status 7 Nov: Vercel project `macro-dashboard` (prj_4krxNideb9D2LfdcXkAWtAwzPLST) in team `xau` (team_40SuZQP47lNHxjlzDc8PeRH5),
 production https://meridianx.dev. Protection: previews only (production public). The build copies only the pages,
 assets and icons to out/; council/ and ict/ ship inside the api/run.js bundle and are never served. Owner wants the repo PRIVATE:
@@ -284,10 +361,12 @@ assets and icons to out/; council/ and ict/ ship inside the api/run.js bundle an
   Since 9 Nov only the guest allowlist is public; everything else needs a session (see "Server-side sign-in").
 - api/run.js runs one council round (cron every 4 min, ~75 s) or ICT round (:04/:19/:34/:49, ~35 s): downloads only the files the job
   reads, runs the unchanged script in /tmp, commits the changed files to council-data via the Git Data API. RUN_MODE=live commits and
-  sends alerts; otherwise dry run (no commit, alerts off). Cut-over: set GH_TOKEN (Contents read/write) and the trader's NTFY/Telegram/FUT
-  env on Vercel, set RUN_MODE=live and remove the GitHub council/ICT schedules and loop in the same step, then make the repo private.
-Not yet linked to GitHub (the owner's Vercel login needs a GitHub connection); until then deploys are file uploads through the Vercel API. Later stages: server-side login + private repo (the council and ICT
-loops then have to run off GitHub Actions or on paid minutes), then broker-order functions.
+  sends alerts; otherwise dry run (no commit, alerts off). Owner, 7 Nov 16:3x: GitHub Actions is the council runner (council.yml);
+  the Vercel council job stands down while Actions saved in the last 10 min and takes over by itself if the loop stops. A full
+  cut-over (GH_TOKEN + the trader's NTFY/Telegram/FUT env on Vercel, RUN_MODE=live, the GitHub loop removed, repo private) has not
+  happened; a private repo would end the free Actions minutes the loop relies on (see docs/owner-decisions.md).
+Since 8 Nov the project deploys from GitHub `main` (production only, and only when a served file changed: `scripts/vercel-ignore.sh`).
+Server-side login landed on 9 Nov (below); broker-order functions are a later stage.
 
 ### Vercel Pro features in use (7 Nov 2026)
 - **Firewall** (project WAF): custom rules "Block scanner probes" (PHP/WordPress/dot-file paths, deny), "Only reads outside the API" (POST/PUT/PATCH/DELETE outside /api → deny), "Rate limit data" (/cdata 600/min per IP), "Rate limit API" (/api 30/min per IP); OWASP php/lfi/rfi/java/scanner-detection on deny, sqli/xss/rce/generic on log; managed AI-bot blocking. No persistent (timed) blocks: a shared mobile IP must never lose the site for an hour. Bot protection is NOT on: MT5/cTrader read /cdata/mt5/signals.csv without a browser.
@@ -310,12 +389,12 @@ loops then have to run off GitHub Actions or on paid minutes), then broker-order
   (rows / first / last / status per key; a market the proxy or OANDA rejects is `status: "error"`, the rest is saved). Studies read
   `/cdata/research/daily/<key>.json` instead of calling OANDA; a re-run refetches only the last week and merges by time.
 - **Price alerts (Web Push)**: dialog `#ms-pa` (chart bell, Settings → Price alerts, Ctrl K). Device list in localStorage `ms-pa` + Blob `push/<device>/…` via `api/push.js` (with the push subscription). `api/alert-cron.js` runs every minute: OANDA S5 candles since each alert was set, web-push (VAPID_PUBLIC_KEY / VAPID_PRIVATE_KEY env), removes fired alerts and dead subscriptions. `sw.js` shows the notification (it no longer caches data/API calls). `app.webmanifest` makes the dashboard installable (needed for iPhone push).
-- **Users: Vercel Blob** (private store `meridian-users`, store_9ViGtEotT2PeSlXc, env `BLOB_READ_WRITE_TOKEN`): `api/users.js` GET (owner session: every member + the built-ins' public records; a member: their own record; guests 401; never a hash; falls back to council-data users.json read on the server if the store is empty); POST saves the whole list for the owner's session (or `ownerPw`): records go up without hashes and keep the stored / built-in one, `pw` sets a new password (hashed on the server, refused if another account or the owner uses it). Each save is a new `users/<time>-<rand>.json`, older ones deleted. Account changes need the Vercel site (no GitHub-token path any more). `package.json` holds only `@vercel/blob`.
+- **Users: Vercel Blob** (private store `meridian-users`, store_9ViGtEotT2PeSlXc, env `BLOB_READ_WRITE_TOKEN`): `api/users.js` GET (owner session: every member + the built-ins' public records; a member: their own record; guests 401; never a hash; falls back to council-data users.json read on the server if the store is empty); POST saves the whole list for the owner's session (or `ownerPw`): records go up without hashes and keep the stored / built-in one, `pw` sets a new password (hashed on the server, refused if another account or the owner uses it). Each save is a new `users/<time>-<rand>.json`, older ones deleted. Account changes need the Vercel site (no GitHub-token path any more). `package.json` holds only the functions' dependencies: `@vercel/blob`, `@vercel/og`, `web-push` (pinned versions).
 - **`/api/status`**: notice + age of each bot's last round; the dashboard shows "Council bot behind" / "ICT tracker behind" to signed-in users (council > 20 min; ICT > 45 min outside the weekend).
 - **Web Analytics** (custom events: View {view}, Sign in {result}, Guest, Trade review) and **Speed Insights**, loaded from /_vercel/* only on the Vercel site. Fluid compute, skew protection (12 h) and preview-only deployment protection are on.
 
 ## Macro strategist (7 Nov 2026, owner: a council member for macro, paper only)
-`council/macro.mjs`, run by council.yml every 6th round (~25 min, `timeout 180`, a failure never stops the loop). Mixes the
+`council/macro.mjs`, run by council.yml every 6th round (~70 min; "~25 min" when rounds were shorter; `timeout 180`, a failure never stops the loop). Mixes the
 15-driver stack of `gold-trading.html` (`computeDailyBias`, `dollarSmileRegime`, `refreshFundamentalsX`, ported, not imported)
 with the handbook knowledge encoded there, a VIX/VIX3M term-structure input, and net liquidity / the FOMC calendar as context.
 Free keyless sources only, each with a timeout and a fallback: FRED fredgraph.csv (4 at a time, a circuit breaker after 4 failures;
@@ -405,7 +484,7 @@ hidden behind a checkbox. The main script hands its data over with `window.MS_CO
   (phone owner / phone signed out / 1366 desktop) and fails on a page error or sideways scroll at 390 px (`/api/me` stubbed, other
   `/api/*` 404, `/cdata` from the public council-data branch, other third-party hosts cut), then the ChronosTrade audit (exits 1 on any
   FAIL; retried once since it reads live `/md/bars`). Locally: serve out/ on `PORT` and run either script with `node --use-env-proxy`.
-- **Data health** `council/datacheck.mjs` (council loop, every 2nd round): 5m candles from the OANDA proxy, Kraken (crypto) and the ICT
+- **Data health** `council/datacheck.mjs` (council loop, every 2nd round, ~23 min): 5m candles from the OANDA proxy, Kraken (crypto) and the ICT
   desk's CNBC futures → council-data `health.json` (per market: stale in open-market minutes, gaps, zero/negative prices, broken candles,
   jumps > `CFG.jumpAtr` 25x the 50-candle ATR). Weekend, the 17:00-18:00 New York halt and CME US holidays are closed, never errors. One
   phone alert per bad episode through `alerts.mjs` `sendAlerts` (bad on 2 checks in a row; new markets at most every 30 min; 12 h
@@ -425,7 +504,8 @@ not in the futures weekend), open trades on an open market not re-checked for 60
 ONE phone alert per state change (new problem / "Council back" / "still n problems"), a reminder every 12 h, marked in council-data
 `watchdog.json` `healthSent` like coach.json decaySent; every channel failing keeps the old mark. Run only by
 `.github/workflows/watchdog.yml` (cron :11/:41, every completed Council trader run except pending-push cancels, manual), never from the
-loop it watches; it trades nothing and restarts nothing (council.yml's cron job does). Watchdog review of 6-8 Nov: 489 saves in 48 h
+loop it watches; it trades nothing and restarts nothing (council.yml's cron job does). GitHub fires the :11/:41 cron only a few times a day;
+a Vercel-cron trigger is an open owner decision (docs/owner-decisions.md, item 15). Watchdog review of 6-8 Nov: 489 saves in 48 h
 (one per 5.9 min), two outages (80 min: 330-min timeout; 262 min: a push cancelled the loop and GitHub fired the cron only twice that
 day), zero data-branch push rejections in the logs read; the loop now aborts a stuck rebase and retries the hand-over dispatch.
 Tests: `tests/health.test.mjs`.
@@ -565,7 +645,7 @@ code 3 = new council code on main: the wrapper pulls and restarts. Tests: `tests
 council.yml: every minute of the 4-minute wait between rounds the Trader runs again and the mirror copies what it recorded
 ("Council quick pass" commit on council-data), so a setup reaches cTrader within about a minute (owner, 8 Nov: 2 minutes, then
 every minute; a VPS live runner is the next step); the heavy members (Analyst,
-Coach, Macro, veteran, data check, digest, ledger) keep the 5-minute round. Owner: "ok build it, start at 2 minutes". If the
+Coach, Macro, veteran, data check, digest, ledger) keep the full round (~11-12 min since the pass was added; 5 min before). Owner: "ok build it, start at 2 minutes". If the
 data-health monitor shows the OANDA proxy or Kraken throttling, drop the pass (delete the quick-pass block) before shortening anything else.
 
 ## cTrader demo mirror: same-time copies (8 Nov 2026)
@@ -579,12 +659,13 @@ same round; the council expiring / missing / dropping the trade → cancelled; a
 A buy whose entry is above the current price (or a sell below) is left to the council's next candle and copied as a market order. Open
 council trades are copied as market orders with relative distances measured from the council's latest price (snapshot.json `marks`),
 so the demo stop/target equal the council's; a price already past the stop/target or more than `LIMITS.maxDriftR` (1R) into the trade
-is skipped. Minimum-lot orders risking over `LIMITS.maxMinLotRisk` (2%) wait for a bigger balance. Closed market, holidays and the
+is skipped (council trades only: ICT trades carry futures levels, so they skip this late-copy check; docs/owner-decisions.md item 10). Minimum-lot orders risking over `LIMITS.maxMinLotRisk` (2%) wait for a bigger balance. Closed market, holidays and the
 capacity caps are waits (symbol paused `LIMITS.pause`), broker rejections skips; notes live while the council trade is open or pending.
 One demo account per book (8 Nov, owner): `bookOf` (ict / lit / replica / shadow / council), `accountsFor(env, cfg)` from council-data
 config.json `mirrorAccounts` or env `CTRADER_ACCOUNTS` ("council:1,ict:2,shadow:3,lit:4"; wins), books without a number trade on
 CTRADER_ACCOUNT_ID; the CLI runs one round per account (the token pair is shared and handed on), writes mirror.json for the base
-account and mirror-<account>.json for the others, plus mirror-accounts.json (the map); alerts carry [book]. When the council moves an open trade's stop or target (break-even, trailing, a re-planned target) the demo position's protection follows
+account and mirror-<account>.json for the others, plus mirror-accounts.json (the map); alerts carry [book]. Shadows are mirrored unless config.json `mirrorShadow: false`; ICT signals that are not A-setups count as shadows
+(`ictCandidates`) and go to the ICT book's account (docs/owner-decisions.md item 9). When the council moves an open trade's stop or target (break-even, trailing, a re-planned target) the demo position's protection follows
 (`AMEND_POSITION_SLTP_REQ`, own positions only; council trades take the absolute levels, ICT trades move the broker stop by the
 council's distance; `AMEND_TRIES` rejections then left alone; 8 Nov, owner approved). `council/ctrader-reset.json { at }` drops the copied-trade records once per `at` (owner closed everything by hand). **RULE (owner, 8 Nov):
 a mirrored position never sits without a stop.** A market order's relative stop is measured from the fill, so a stop distance inside
@@ -653,8 +734,8 @@ words (`#g-setup`), named price lines, a chart that follows the page theme with 
 invitation (`.g-join`) whose Sign in opens the gate.
 
 ## Accounts, desks, header switch, gate (8 Nov 2026)
-Users (built-ins in `api/_accounts.js`): Fred reviewer + ICT (reviews), Orlando reviewer (sees everything) + ICT read-only, Carlos
-viewer; `ct: true` (all three) shows the council's demo accounts on "My cTrader account" with edge labels only, never account numbers
+Users (built-ins in `api/_accounts.js`): Fred reviewer + ICT write (reviews) + mcp, Orlando reviewer (sees everything) + ICT read-only,
+Luxus viewer, Carlos viewer; `ct: true` (Fred, Orlando, Carlos) shows the council's demo accounts on "My cTrader account" with edge labels only, never account numbers
 (`html[data-ct]`, "owner" for the owner who also sees the logins). ICT, Gold and Crypto share one sidebar / header entry "Desks"
 (`[data-desks]`, opens the desk used last, localStorage `ms-desk`) and each desk carries the `.desk-sw` switch. The header's
 Desk | Macro control (`.hdr-sw`, conic ring) also sits on /macro-desk the other way round (Desk goes back). Home refresh: scoped
@@ -740,9 +821,9 @@ and its `perms` override key by key (`msPerms(R, owner)`; the owner has everythi
 charts / scanner / journal / desks / council were converted); the router sends a denied view home (`VIEW_PERM`, `msDenied`).
 Users page: a "Permissions…" button per member opens `permDialog` (checkboxes + ICT radio, "Back to role defaults"); saved on the
 record as `perms` plus ict / ct / mcp for the older checks. `api/users.js` `cleanPerms` whitelists keys and values (a bad perms
-object rejects the save). `/api/login` and `/api/me` return the account's perms (cached in localStorage `ms-acct`); the post-load `/api/me` check reloads when they changed. MCP: derived
-keys are `<name>.<HMAC>` for any member; `granted(name)` is checked on every call (record's mcp / perms.mcp; perms.mcp false
-revokes; an MCP_KEYS entry is a grant; Fred built in). Tests: `tests/users-perms.test.mjs`, `tests/mcp.test.mjs`.
+object rejects the save). `/api/login` and `/api/me` return the account's perms (cached in localStorage `ms-acct`); the post-load `/api/me` check reloads when they changed. MCP keys
+and `granted(name)`: see the ICT MCP section above. The perms gate the page only: `/cdata` serves any file to any signed-in member
+(docs/owner-decisions.md, item 3). Tests: `tests/users-perms.test.mjs`, `tests/mcp.test.mjs`.
 
 ## Backtest lab (8 Nov 2026, owner: "build a manual backtesting like TradeZella … and he can simulate prop-firm challenges")
 `backtest.html` ("ChronosTrade", owner's name, 8 Nov: third segment of the header switch Desk | Macro | ChronosTrade on all three pages, `.hdr-ct`, green when lit) at `/backtest` (vercel rewrite; build copies it; sidebar entry `.bt-nav` for signed-in members; the page itself
@@ -905,7 +986,7 @@ were CSS-hidden and /cdata served every file. Now:
 - Tests: `tests/auth.test.mjs` (login, same error, disabled, fail closed, tamper / expiry, /api/me refresh, users without hashes,
   cdata allowlist), `tests/profile.test.mjs`, `tests/security-review.test.js`. The ChronosTrade audit stubs `/api/me`.
 - The old hashes were public for days: the members' and the owner's passwords should be changed (Users page "New password";
-  the owner's in `api/_accounts.js`).
+  the owner's in `api/_accounts.js`). Still open on 9 Nov, with stronger hashing: docs/owner-decisions.md items 1-2.
 
 ## Styled dialogs (8 Nov 2026, owner: native prompt boxes "very ugly")
 `assets/ms-dialog.js` replaces the browser's prompt / confirm / alert on market-structure and ChronosTrade with a `<dialog class="msd">`

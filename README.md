@@ -1,62 +1,20 @@
-# Institutional Trading Dashboard - Netlify Deployment
+# Meridian X
 
-## Files Included
+A paper-trading desk run by an automated council (gold, forex, index futures, crypto), live at
+[meridianx.dev](https://meridianx.dev). Paper trading and demo accounts only. Not financial advice.
 
-- `index.html` - Complete dashboard (all-in-one file with HTML, CSS, and JavaScript)
-- `netlify.toml` - Netlify configuration
-- `_redirects` - URL routing configuration
+- **What it is, in plain English:** [MERIDIAN-X.md](MERIDIAN-X.md)
+- **Decisions waiting on the owner:** [docs/owner-decisions.md](docs/owner-decisions.md)
+- **Working on the ICT desk from ChatGPT (or another MCP client):** [docs/fred-mcp.md](docs/fred-mcp.md)
+- **Developer notes (map, rules, build and test):** [CLAUDE.md](CLAUDE.md), starting with "Start here"
 
-## How to Deploy to Netlify
+## Quick start for developers
 
-### Option 1: Drag & Drop (Easiest)
-
-1. Go to https://app.netlify.com
-2. Sign in (or create free account)
-3. Drag this entire folder onto the Netlify dashboard
-4. **Done!** Your site is live in seconds
-
-### Option 2: Netlify CLI
-
-```bash
-# Install Netlify CLI (if not already installed)
-npm install -g netlify-cli
-
-# Navigate to this folder
-cd netlify-deploy
-
-# Log in
-netlify login
-
-# Deploy to production
-netlify deploy --prod
+```sh
+sh scripts/build.sh                    # build the site into out/ (commit out/ with page changes)
+node --test tests/*.test.mjs tests/*.test.js
 ```
 
-### Option 3: Git Push (GitHub/GitLab)
-
-1. Create a new GitHub repo
-2. Push this folder to GitHub
-3. Connect repo to Netlify in dashboard
-4. Netlify auto-deploys on each push
-
-## Dashboard Features
-
-✅ Soft purple institutional design (#9B7BA8)
-✅ Real-time market signals (10 major indicators)
-✅ Economic calendar with multi-timeframe impact (1m, 3m, 5m, 10m)
-✅ Trade Setups tab with macro-based trading ideas
-✅ Weekly Report tab with comprehensive analysis
-✅ Professional Bloomberg-style typography
-✅ Glassmorphism UI design
-✅ Dark terminal aesthetic
-✅ Full responsive design
-✅ Real-time data refresh
-✅ News detail modal
-✅ Risk appetite calculation
-
-## All-in-One File
-
-`index.html` contains everything needed - no external dependencies, no build process required.
-
-## Support
-
-For issues or updates, regenerate the dashboard HTML file and replace `index.html`.
+The site is static pages plus Vercel functions in `api/`; the council runs on GitHub Actions (`.github/workflows/council.yml`)
+and writes to the `council-data` branch. `netlify.toml` and `_redirects` are left over from an early Netlify version and are not
+used by the live site.
