@@ -75,15 +75,21 @@ export function resolveCall(c, closes, now) {
     case 'bigMove': return Math.abs(last / c.level - 1) >= c.pct;
     case 'pairDown': return last < c.level;
     case 'pairUp': return last > c.level;
+    // the veteran's hypotheses (9 Nov): which comes first on the daily closes, the target or the guard; and a range held on every close
+    case 'firstTouchUp': for (const o of S) { if (o.v <= c.guard) return false; if (o.v >= c.level) return true; } return false;
+    case 'firstTouchDown': for (const o of S) { if (o.v >= c.guard) return false; if (o.v <= c.level) return true; } return false;
+    case 'stayInside': return S.every((o) => o.v >= c.lo && o.v <= c.hi);
     default: return null;
   }
 }
-export function callsLedger(ledger, { outlook, closesBy, now }) {
+export function callsLedger(ledger, { outlook, closesBy, now, extra = [] }) {
   const L = (ledger || []).slice(), today = new Date(now * 1000).toISOString().slice(0, 10), have = new Set(L.map((r) => r.id));
-  const all = [...((outlook && outlook.week && outlook.week.list) || []), ...((outlook && outlook.month && outlook.month.list) || []), ...((outlook && outlook.cot) || [])];
-  for (const c of all) { if (!c.kind || !c.by) continue; const id = `${c.asset}:${c.kind}:${c.level ?? c.lo}:${c.by}`; if (have.has(id)) continue;
+  const all = [...((outlook && outlook.week && outlook.week.list) || []), ...((outlook && outlook.month && outlook.month.list) || []), ...((outlook && outlook.cot) || []), ...(extra || [])];
+  // a call may carry its own id (the veteran's hypotheses: one per slot and week, so the first version of the week is the one kept)
+  for (const c of all) { if (!c.kind || !c.by) continue; const id = c.id || `${c.asset}:${c.kind}:${c.level ?? c.lo}:${c.by}`; if (have.has(id)) continue;
     // one record per call: issued the first day it appears (the same call re-issued on later days is not counted twice)
-    L.push({ id, issued: today, claim: c.claim, p: c.p, asset: c.asset, kind: c.kind, level: c.level ?? null, lo: c.lo ?? null, hi: c.hi ?? null, pct: c.pct ?? null, by: c.by, src: c.src || 'base rate + council tilt' }); have.add(id); }
+    L.push({ id, issued: today, claim: c.claim, p: c.p, asset: c.asset, kind: c.kind, level: c.level ?? null, lo: c.lo ?? null, hi: c.hi ?? null, pct: c.pct ?? null, by: c.by, src: c.src || 'base rate + council tilt',
+      ...(c.guard != null ? { guard: c.guard } : {}), ...(c.base ? { base: { analog: c.base.analog, n: c.base.n, all: c.base.all } } : {}) }); have.add(id); }
   for (const r of L) if (r.hit == null) { const h = resolveCall(r, closesBy[r.asset], now); if (h != null) { r.hit = h; r.resolvedAt = today; r.brier = +((r.p - (h ? 1 : 0)) ** 2).toFixed(4); } }
   return L.slice(-600);
 }
