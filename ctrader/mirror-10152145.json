@@ -2176,6 +2176,32 @@
     "positionId": "47640466",
     "volume": 1,
     "status": "open"
+   },
+   "audusd-scalp-1794232565": {
+    "symbol": "AUDUSD",
+    "side": "buy",
+    "setup": "scalp",
+    "openedAt": "2026-11-09T13:59:40.000Z",
+    "councilEntry": 0.68998,
+    "stop": 0.68894,
+    "t1": 0.6920600000000001,
+    "adopted": false,
+    "alerted": [
+     "open"
+    ],
+    "viaLimit": true,
+    "limitPrice": 0.68998,
+    "digits": 5,
+    "lots": 0.01,
+    "riskCash": 2,
+    "margin": 1.38,
+    "shadow": true,
+    "fillPrice": 0.68998,
+    "slipR": 0,
+    "lagSec": 215,
+    "positionId": "47658311",
+    "volume": 100000,
+    "status": "open"
    }
   },
   "day": {
@@ -2183,7 +2209,7 @@
    "startBalance": 9987.78
   },
   "startedAt": "2026-11-08T11:42:25.000Z",
-  "status": "ok · demo Fusion Markets · balance 9999.56 · 27 open · 1 resting",
+  "status": "ok · demo Fusion Markets · balance 9999.56 · 28 open",
   "skipped": {
    "audusd-position-1793601653": "price 0.68666 has run 1.27R from the council entry 0.70162: a different trade now",
    "xrp-rswing-1793942619": "none of XRPUSD found at the broker",
@@ -2195,38 +2221,12 @@
   "paused": {},
   "resetAt": "2026-11-08T09:45Z",
   "resetDoneAt": "2026-11-08T11:42:47.000Z",
-  "orders": {
-   "audusd-scalp-1794232565": {
-    "orderId": "33806167",
-    "symbol": "AUDUSD",
-    "side": "buy",
-    "volume": 100000,
-    "lots": 0.01,
-    "digits": 5,
-    "setup": "scalp",
-    "limitPrice": 0.68998,
-    "stop": 0.68894,
-    "t1": 0.6920600000000001,
-    "placedAt": "2026-11-09T13:57:12.000Z",
-    "expires": "2026-11-09T16:56:05.000Z",
-    "riskCash": 2,
-    "margin": 1.38,
-    "shadow": true,
-    "alerted": [
-     "pending"
-    ]
-   }
-  },
+  "orders": {},
   "catchUpAt": "2026-11-08T12:04:40.000Z",
   "balance": 9999.56,
-  "lastRun": "2026-11-09T13:57:12.000Z"
+  "lastRun": "2026-11-09T13:59:40.000Z"
  },
  "log": [
-  {
-   "at": "2026-11-08T21:22:43.000Z",
-   "msg": "not mirrored yet xau-position-1793783465: XAUUSD market closed (paused until 21:30 UTC) (will retry)",
-   "trade": "xau-position-1793783465"
-  },
   {
    "at": "2026-11-08T21:22:43.000Z",
    "msg": "not mirrored yet audusd-scalp-1793949425: AUDUSD market closed (paused until 21:30 UTC) (will retry)",
@@ -3721,6 +3721,11 @@
    "at": "2026-11-09T13:57:12.000Z",
    "msg": "placed buy limit AUDUSD 0.01 lot at 0.68998 (council scalp, valid to 2026-11-09T16:56Z)",
    "trade": "audusd-scalp-1794232565"
+  },
+  {
+   "at": "2026-11-09T13:59:40.000Z",
+   "msg": "limit filled: AUDUSD position 47658311 at the broker",
+   "trade": "audusd-scalp-1794232565"
   }
  ],
  "limits": {
@@ -3799,11 +3804,11 @@
   ]
  },
  "execution": {
-  "n": 75,
-  "meanSlipR": 0.006,
+  "n": 76,
+  "meanSlipR": 0.005,
   "medianSlipR": 0,
   "worstSlipR": 1.168,
-  "medianLagSec": 177,
+  "medianLagSec": 183,
   "bySymbol": {
    "SOLUSD": {
     "n": 6,
@@ -3834,8 +3839,8 @@
     "meanSlipR": 0.334
    },
    "AUDUSD": {
-    "n": 10,
-    "meanSlipR": 0.045
+    "n": 11,
+    "meanSlipR": 0.041
    },
    "XAUUSD": {
     "n": 8,
