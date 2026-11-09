@@ -760,3 +760,63 @@ test('audit 9 Nov (2): an ICT stop set by the guard is not removed by a target m
   assert.ok(ps.stopLoss != null, 'the stop the guard just set is still there'); assert.equal(ps.stopLoss, +(fill - 50).toFixed(2));
   assert.equal(ps.takeProfit, +(fill + 150).toFixed(2), 'target moved once');
 });
+
+// ---- bug hunt 9 Nov (3) ---------------------------------------------------------------------------------------------------
+test('bug hunt 9 Nov: a trade one account copied and saw closed at the broker is never opened again on another account', async () => {
+  // real data, 8 Nov: sol-rintra-1793936181, eth-scalp-1794095566, sol-intraday-1794084386 and sol-scalp-1794102041 were copied on the
+  // base account before the book split, stopped at the broker while the council trade was still open, then opened a second time
+  // (and lost again) on the shadow account, because only open / sent positions of other accounts were excluded
+  const { copiedIds } = await import('../council/ctrader-mirror.mjs');
+  assert.equal(typeof copiedIds, 'function');
+  const b = broker(); let r = await mirrorRound({ env: ENV, trades: [tr({ id: 'sh1', shadow: true })], state: started, WS: b.WS, now: NOW, slWaitMs: 0 });
+  b.positions.clear();   // stopped at the broker; the council's own stop is not hit yet
+  r = await mirrorRound({ env: ENV, trades: [tr({ id: 'sh1', shadow: true })], state: r.state, WS: b.WS, now: NOW + 60, slWaitMs: 0, openBooks: ['council'] });
+  assert.equal(r.state.map.sh1.status, 'closed at broker');
+  const ex = copiedIds(JSON.parse(JSON.stringify(r.state)));
+  assert.ok(ex.has('sh1'), 'a finished copy still counts as copied');
+  const b2 = broker(); const r2 = await mirrorRound({ env: ENV, trades: [tr({ id: 'sh1', shadow: true })], state: started, WS: b2.WS, now: NOW + 120, slWaitMs: 0, openBooks: ['shadow'], exclude: ex });
+  assert.equal(b2.positions.size, 0); assert.equal(r2.state.map.sh1, undefined);
+  // resting limit orders count too; an empty or missing state holds nothing
+  assert.ok(copiedIds({ map: {}, orders: { p1: { orderId: '9' } } }).has('p1')); assert.equal(copiedIds(null).size, 0);
+});
+
+test('bug hunt 9 Nov: a finished copy is kept past keepDays while the council trade is still open (a position trade is never copied twice)', async () => {
+  const b = broker(); const st = { ...started, map: { 'eurusd-intraday-1': { status: 'closed at broker', positionId: '77', symbol: 'EURUSD', side: 'buy', openedAt: new Date((NOW - 45 * 86400) * 1000).toISOString(), closedAt: new Date((NOW - 40 * 86400) * 1000).toISOString() } } };
+  let r = await mirrorRound({ env: ENV, trades: [tr()], state: st, WS: b.WS, now: NOW, slWaitMs: 0 });
+  assert.ok(r.state.map['eurusd-intraday-1'], 'kept while the council trade is open'); assert.equal(orders(b).length, 0, 'not copied a second time');
+  r = await mirrorRound({ env: ENV, trades: [tr({ status: 'loss', R: -1 })], state: r.state, WS: b.WS, now: NOW + 60, slWaitMs: 0 });
+  assert.equal(r.state.map['eurusd-intraday-1'], undefined, 'dropped once the council trade is done');
+});
+
+test('bug hunt 9 Nov: an ICT futures roll (levels shifted by the contract switch) never moves the cash-CFD broker stop; a real move after it does', async () => {
+  const ict = { id: 'nq-s-1', market: 'nq', side: 'sell', entry: 20000, stop: 20050, t1: null, status: 'open', opened: NOW - 60, filled: NOW - 60, aset: true, size: 1 };
+  const b = broker(); let r = await mirrorRound({ env: ENV, trades: ictCandidates([ict]), state: started, WS: b.WS, now: NOW, slWaitMs: 0 });
+  const pid = r.state.map['ict:nq-s-1'].positionId; Object.assign(b.positions.get(pid), { price: 19900, stopLoss: 19950 });   // the cash CFD fills 100 under the futures
+  // the tracker's shiftTrade on a contract switch: every level +300 and a `rolled` entry; nothing really moved
+  const rolled = { ...ict, entry: 20300, stop: 20350, rolled: [{ at: NOW + 100, by: 300 }] };
+  r = await mirrorRound({ env: ENV, trades: ictCandidates([rolled]), state: r.state, WS: b.WS, now: NOW + 240, slWaitMs: 0 });
+  assert.equal(b.amends.length, 0, 'a roll is not a stop move: ' + JSON.stringify(b.amends)); assert.equal(b.positions.get(pid).stopLoss, 19950);
+  // break-even after the roll: the council stop goes to its (shifted) entry -> the broker stop moves 50 down, to the fill-side level
+  r = await mirrorRound({ env: ENV, trades: ictCandidates([{ ...rolled, stop: 20300, beMoved: true }]), state: r.state, WS: b.WS, now: NOW + 480, slWaitMs: 0 });
+  assert.equal(b.amends.length, 1); assert.equal(b.amends[0].stopLoss, 19900);
+  // the guard's fallback (the trade left the list) still sets the stop at the council's distance from the fill
+  delete b.positions.get(pid).stopLoss;
+  r = await mirrorRound({ env: ENV, trades: [], state: r.state, WS: b.WS, now: NOW + 720, slWaitMs: 0 });
+  assert.equal(b.amends.at(-1).stopLoss, 19900);
+});
+
+test('bug hunt 9 Nov: a pending council order re-quoted (new entry / stop) cancels the resting limit and places it at the new levels; a limit filled at old levels is brought to the council stop', async () => {
+  let b = broker(); let r = await mirrorRound({ env: ENV, trades: [pend()], state: started, WS: b.WS, now: NOW, marks: MK });
+  assert.equal(limits(b).length, 1);
+  r = await mirrorRound({ env: ENV, trades: [pend({ entry: 1.0995, stop: 1.0985, t1: 1.104 })], state: r.state, WS: b.WS, now: NOW + 60, marks: MK });
+  assert.equal(cancels(b).length, 1, 'the stale limit is cancelled'); assert.equal(limits(b).length, 2);
+  const nl = limits(b)[1]; assert.equal(nl.limitPrice, 1.0995); assert.equal(nl.stopLoss, 1.0985); assert.equal(nl.takeProfit, 1.104);
+  assert.equal(r.state.orders['eurusd-scalp-9'].stop, 1.0985);
+  r = await mirrorRound({ env: ENV, trades: [pend({ entry: 1.0995, stop: 1.0985, t1: 1.104 })], state: r.state, WS: b.WS, now: NOW + 120, marks: MK });
+  assert.equal(cancels(b).length, 1, 'unchanged levels: nothing more');
+  // the broker filled the old limit before the mirror saw the re-quote: adopted with the stop the broker holds, then moved to the council's
+  b = broker(); r = await mirrorRound({ env: ENV, trades: [pend()], state: started, WS: b.WS, now: NOW, marks: MK });
+  const pid = b.fillOrder(r.state.orders['eurusd-scalp-9'].orderId, 1.1);
+  r = await mirrorRound({ env: ENV, trades: [pend({ stop: 1.0985 })], state: r.state, WS: b.WS, now: NOW + 60, marks: MK });
+  assert.equal(r.state.map['eurusd-scalp-9'].status, 'open'); assert.equal(b.positions.get(String(pid)).stopLoss, 1.0985, 'broker stop follows the council stop');
+});

@@ -28,11 +28,19 @@ import { feedTag, requoteMarket, feedChangeText, feedDecision } from './feed.mjs
 import { newsFeat } from './events.mjs';
 import { fetchDaily as regimeDaily, regimeOf, regimeShadow } from './regime.mjs';
 import { litStep, cleanBars as litClean, LOOKBACK_BARS as LIT_BARS, K as LIT_K } from './lit.mjs';
+import { readJson, writeAtomic } from './jsonio.mjs';
 
 const DIR = process.argv[2] || 'data';
 fs.mkdirSync(DIR, { recursive: true });
-const rd = (f, d) => { try { return JSON.parse(fs.readFileSync(path.join(DIR, f), 'utf8')); } catch (e) { return d; } };
-const wr = (f, v) => fs.writeFileSync(path.join(DIR, f), JSON.stringify(v, null, 1));
+// (bug hunt 9 Nov) a file cut short by a kill mid-write (the live runner's 240-s child timeout, a cancelled job) read as "missing":
+// trades.json came back [] and was written out empty, config.json as the defaults (the owner's rules gone). Writes are atomic now
+// (temp file + rename), and a book file that exists but does not parse stops the round before anything is written; the
+// council loop's datasync restores the last committed copy, the next round goes on from it.
+const MUST_PARSE = new Set(['config.json', 'state.json', 'trades.json', 'research.json', 'coach.json']);
+const rd = (f, d) => { const r = readJson(path.join(DIR, f), d);
+  if (r.state === 'corrupt' && MUST_PARSE.has(f)) { console.error(`Trader stopped: ${f} does not parse (${r.error}); nothing written, restore it from council-data`); process.exit(1); }
+  return r.value; };
+const wr = (f, v) => writeAtomic(path.join(DIR, f), JSON.stringify(v, null, 1));
 
 const MARKETS = {
   xau:    { label: 'XAU/USD', name: 'Gold',     group: 'Metals', kraken: 'PAXGUSD', dec: 1, spot: true },
