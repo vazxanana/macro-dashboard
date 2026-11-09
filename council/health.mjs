@@ -55,7 +55,7 @@ export function problems(d, prev, now) {
   }
   if (!stopped && d.health) {
     const hAt = ts(d.health.at), hAge = hAt != null ? min(hAt, now) : null;
-    if (hAge == null || hAge > CFG.datacheckMin) P.push({ id: 'datacheck', text: `Data check not run for ${hAge == null ? 'unknown' : ago(hAge)} (expected every ~11 min)` });
+    if (hAge == null || hAge > CFG.datacheckMin) P.push({ id: 'datacheck', text: `Data check not run for ${hAge == null ? 'unknown' : ago(hAge)} (expected every ~23 min: every 2nd round)` });
     else for (const F of Object.values(d.health.feeds || {})) for (const m of Object.values(F.markets || {}))
       if (m && m.status === 'bad' && (m.staleMin || 0) >= CFG.feedStaleMin) P.push({ id: `feed:${m.sym || m.label}`, text: `Feed stale: ${m.label} ${ago(m.staleMin)} (${F.label})` });
   }

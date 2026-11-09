@@ -7046,7 +7046,8 @@
         const s = parseFloat(sofr[0].value), e = parseFloat(effr[0].value);
         if (isFinite(s) && isFinite(e)) fundX.sofr = { bps: +((s - e) * 100).toFixed(0) };   // SOFR − EFFR, in bps
       }
-      if (eu && eu.length >= 2) {
+      // a monthly series: ignore it once its newest value is over ~4 months old (BSCICP03DEM665S stopped in Jan 2024; showing it as today's pulse was wrong)
+      if (eu && eu.length >= 2 && eu[0].date && (Date.now() - Date.parse(eu[0].date)) < 120 * 864e5) {
         const now = parseFloat(eu[0].value), prior = parseFloat(eu[eu.length - 1].value);
         if (isFinite(now) && isFinite(prior)) fundX.euGrowth = { level: +now.toFixed(1), chg: +(now - prior).toFixed(1) };
       }
