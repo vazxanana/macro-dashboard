@@ -608,7 +608,7 @@
     "lots": 0.01,
     "digits": 5,
     "setup": "scalp",
-    "status": "open",
+    "status": "closed at broker",
     "openedAt": "2026-11-08T22:03:09.000Z",
     "councilEntry": 0.68703,
     "stop": 0.69153,
@@ -624,13 +624,15 @@
     "lagSec": 178989,
     "alerted": [
      "open",
-     "amend"
+     "amend",
+     "close"
     ],
     "stopSetAt": "2026-11-08T22:03:09.000Z",
     "stopSetBy": "guard",
     "rr": 2,
     "amended": 2,
-    "amendedAt": "2026-11-09T16:06:50.000Z"
+    "amendedAt": "2026-11-09T16:06:50.000Z",
+    "closedAt": "2026-11-09T17:23:37.000Z"
    },
    "audusd-intraday-1793998319": {
     "positionId": "47373497",
@@ -2690,7 +2692,7 @@
    "startBalance": 9987.78
   },
   "startedAt": "2026-11-08T11:42:25.000Z",
-  "status": "ok · demo Fusion Markets · balance 9969.55 · 27 open · 3 resting",
+  "status": "ok · demo Fusion Markets · balance 9964.88 · 26 open · 4 resting",
   "skipped": {
    "audusd-position-1793601653": "price 0.68666 has run 1.27R from the council entry 0.70162: a different trade now",
    "xrp-rswing-1793942619": "none of XRPUSD found at the broker",
@@ -2764,23 +2766,33 @@
     "alerted": [
      "pending"
     ]
+   },
+   "gbpusd-scalp-1794244949": {
+    "orderId": "33819883",
+    "symbol": "GBPUSD",
+    "side": "buy",
+    "volume": 300000,
+    "lots": 0.03,
+    "digits": 5,
+    "setup": "scalp",
+    "limitPrice": 1.34232,
+    "stop": 1.34174,
+    "t1": 1.34348,
+    "placedAt": "2026-11-09T17:23:37.000Z",
+    "expires": "2026-11-09T20:22:29.000Z",
+    "riskCash": 1.99,
+    "margin": 8.05,
+    "shadow": true,
+    "alerted": [
+     "pending"
+    ]
    }
   },
   "catchUpAt": "2026-11-08T12:04:40.000Z",
-  "balance": 9969.55,
-  "lastRun": "2026-11-09T17:20:44.000Z"
+  "balance": 9964.88,
+  "lastRun": "2026-11-09T17:23:37.000Z"
  },
  "log": [
-  {
-   "at": "2026-11-08T22:03:09.000Z",
-   "msg": "set the missing stop on USDCAD 47373486 at 1.4501 (the broker had opened it without one)",
-   "trade": "usdcad-scalp-1793689919"
-  },
-  {
-   "at": "2026-11-08T22:03:09.000Z",
-   "msg": "opened buy EURUSD 0.01 lot (council rswing)",
-   "trade": "eurusd-rswing-1793754423"
-  },
   {
    "at": "2026-11-08T22:03:09.000Z",
    "msg": "set the missing stop on EURUSD 47373487 at 1.08061 (the broker had opened it without one)",
@@ -4270,6 +4282,16 @@
    "at": "2026-11-09T16:54:18.000Z",
    "msg": "placed buy limit AUDUSD 0.03 lot at 0.69098 (council rintra, valid to 2026-11-10T04:53Z)",
    "trade": "audusd-rintra-1794243191"
+  },
+  {
+   "at": "2026-11-09T17:23:37.000Z",
+   "msg": "AUDUSD position 47373496 closed at the broker",
+   "trade": "audusd-scalp-1793996278"
+  },
+  {
+   "at": "2026-11-09T17:23:37.000Z",
+   "msg": "placed buy limit GBPUSD 0.03 lot at 1.34232 (council scalp, valid to 2026-11-09T20:22Z)",
+   "trade": "gbpusd-scalp-1794244949"
   }
  ],
  "limits": {
