@@ -216,7 +216,8 @@ export function insights({ S = {}, fc, cot, expectations = [], an, gl, now }) {
   if (big) {
     const t = Date.parse(big.at) / 1000, days = (t - now) / DAY, rec = (expectations || []).find((r) => r.scheduledUtc && Date.parse(r.scheduledUtc) / 1000 === t && r.event === big.title);
     const sc = Object.fromEntries((big.scenarios || []).map((s) => [s.name, s.moves || {}])), others = evs.filter((e) => e !== big).map((e) => e.title);
-    add({ k: 'event', score: 3.2 - days / 4, title: `${big.country || ''} ${big.title} on ${new Date(t * 1000).toUTCString().slice(0, 11)} is the week's pivot`.trim(),
+    add({ k: 'event', score: 3.2 - days / 4, event: { title: big.title, country: big.country || null, at: new Date(t * 1000).toISOString(), consensus: big.consensus ?? null, previous: big.previous ?? null, goldMovePct: big.expMovePct && big.expMovePct.gold != null ? big.expMovePct.gold : null },
+      title: `${big.country || ''} ${big.title} on ${new Date(t * 1000).toUTCString().slice(0, 11)} is the week's pivot`.trim(),
       evidence: [{ text: `${big.title} at ${when(big.at)}: consensus ${big.consensus ?? 'n/a'}, previous ${big.previous ?? 'n/a'}`, asOf: rec ? rec.expectation.capturedAtUtc.slice(0, 16).replace('T', ' ') + ' UTC (captured before the release)' : 'not captured yet', source: 'economic calendar (Forex Factory feed via the strategist); veteran-expectations.json' },
         ...(big.expMovePct && big.expMovePct.gold != null ? [{ text: `typical gold day move ${big.expMovePct.gold}% (${(big.expBasis && big.expBasis.gold) || 'strategist'})`, asOf: isoDay(now), source: 'macro/forecast.json playbook' }] : []),
         ...(others.length ? [{ text: `also this week: ${others.join(', ')}`, asOf: isoDay(now), source: 'calendar' }] : [])],

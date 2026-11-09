@@ -29,7 +29,9 @@ import { dailyRows, dxyDaily, isoDay } from './macroscore.mjs';
 import { outlook, cotCalls, callsLedger, callsScore } from './outlook.mjs';
 import { MARKETS as COT_MARKETS } from './cot.mjs';
 import { cotMain } from './macro.mjs';
-import { briefing, briefingLines } from './briefing.mjs';
+import { briefing, briefingLines, P_CLAMP } from './briefing.mjs';
+import { calibration, applyCalls } from './calibration.mjs';
+import { summary, snapshot, briefDiff, archiveWeek, previousOf } from './glance.mjs';
 
 const DAY = 86400;
 // the batch revision this port follows (research/macro-veteran/SKILL.md); 1.2 = the owner's 8 Nov evening upload,
@@ -402,7 +404,7 @@ export function teaching(fc) {
   return { adopted, pending, recent: L.recent || [], line };
 }
 
-export function build({ fc, cache, daily, ledger = [], debates = [], expectations = [], cot = null, now }) {
+export function build({ fc, cache, daily, ledger = [], debates = [], expectations = [], cot = null, now, cal = null }) {
   const S = {}; for (const id of ['DFII10', 'T10YIE', 'DGS2', 'DGS10', 'T10Y3M', 'BAMLH0A0HYM2', 'VIXCLS', 'VXVCLS', 'DTWEXBGS', 'SOFR', 'EFFR']) S[id] = fromCache(cache && cache.fred && cache.fred[id]);
   const gold = (daily && daily.gold) || [];
   S.gold = gold; S.dxy = daily && daily.dxy ? daily.dxy : [];
@@ -426,6 +428,9 @@ export function build({ fc, cache, daily, ledger = [], debates = [], expectation
     cpiPilot: cpiPilot(), skillVersion: SKILL_VERSION,
     source: `council/veteran.mjs: a code port of the owner's gptmacro_v.1 skill, revision ${SKILL_VERSION} (research/macro-veteran/); reads the strategist's data only, fetches nothing` };
   { const pr = probability(verdict, base, fc && fc.goldScore); v.outlook = outlook({ gold, dxy: S.dxy, now, tilt20: base ? pr - base.upRate : 0, ch, fc }); }
+  // self-calibration (9 Nov, council/calibration.mjs): from his own scored record; k = 1 until the pre-registered threshold
+  v.calibration = cal || calibration({});
+  if (v.outlook) for (const part of [v.outlook.week, v.outlook.month]) if (part) applyCalls(part.list, v.calibration);
   // the veteran's briefing (9 Nov, owner: key insights, near-inside information read from public data, hypotheses on a base of
   // what happened before, price levels): council/briefing.mjs; its hypotheses go to the calls ledger in run()
   try {
@@ -433,13 +438,15 @@ export function build({ fc, cache, daily, ledger = [], debates = [], expectation
     v.briefing = briefing({ S, weekly: wkly, gold, goldBars: (daily && daily.goldBars) || gold.map((o) => ({ t: o.t, o: o.v, h: o.v, l: o.v, c: o.v })), dxy: S.dxy, spx: (daily && daily.spx) || [],
       fc, cot, expectations: E, outlook: v.outlook, now, week: weekKey(now), tilt: v.outlook ? v.outlook.tilt : 0 });
   } catch (e) { v.briefing = null; v.briefingError = String(e && e.message || e); }
+  if (v.briefing) applyCalls(v.briefing.hypotheses, v.calibration, P_CLAMP);
+  v.summary = summary(v);
   v.brief = briefOf(v);
   return { v, ledger: L, debates: Dh, expectations: E };
 }
 export function briefOf(v) {
   const d = v.verdict, dis = v.debate.filter((t) => t.stance === 'disagree').map((t) => t.topic), q = v.debate.filter((t) => t.stance === 'qualify').map((t) => t.topic);
   const sb = v.scoreboard, sbTxt = sb && sb.weeks ? ` Scoreboard over ${sb.weeks} resolved week${sb.weeks === 1 ? '' : 's'}: veteran ${sb.veteran.hit == null ? 'n/a' : Math.round(sb.veteran.hit * 100) + '%'} vs strategist ${sb.strategist.hit == null ? 'n/a' : Math.round(sb.strategist.hit * 100) + '%'} right on direction per topic.` : '';
-  return `Macro veteran, ${v.at.slice(0, 16).replace('T', ' ')} UTC. Shock: ${v.shock.shock} (${v.shock.confidence}). Consensus with the strategist: ${d.bias}${d.conviction ? ` ${d.conviction}` : ''} · ${d.agree} agree, ${d.qualify} qualify, ${d.disagree} disagree${dis.length ? ` (${dis.join(', ')})` : ''}${q.length ? `; qualified: ${q.join(', ')}` : ''}. ${d.note} Fails if ${d.invalidation.length ? d.invalidation.join('; ') : 'n/a'}.${v.ledger.lastProbability != null ? ` Ledger: P(gold up over ${HORIZON_DAYS} days) ${Math.round(v.ledger.lastProbability * 100)}%${v.base ? ` vs base ${Math.round(v.base.upRate * 100)}%` : ''}, ${v.ledger.resolved} resolved${v.ledger.brier != null ? `, Brier ${v.ledger.brier}${v.ledger.brierBase != null ? ` vs base ${v.ledger.brierBase}` : ''}` : ''}.` : ''}${sbTxt}${v.teaching ? ` Teaching: ${v.teaching.line}` : ''}${v.briefing ? ` Briefing: ${briefingLines(v.briefing).join(' | ')}` : ''}`;
+  return `Macro veteran, ${v.at.slice(0, 16).replace('T', ' ')} UTC. Shock: ${v.shock.shock} (${v.shock.confidence}). Consensus with the strategist: ${d.bias}${d.conviction ? ` ${d.conviction}` : ''} · ${d.agree} agree, ${d.qualify} qualify, ${d.disagree} disagree${dis.length ? ` (${dis.join(', ')})` : ''}${q.length ? `; qualified: ${q.join(', ')}` : ''}. ${d.note} Fails if ${d.invalidation.length ? d.invalidation.join('; ') : 'n/a'}.${v.ledger.lastProbability != null ? ` Ledger: P(gold up over ${HORIZON_DAYS} days) ${Math.round(v.ledger.lastProbability * 100)}%${v.base ? ` vs base ${Math.round(v.base.upRate * 100)}%` : ''}, ${v.ledger.resolved} resolved${v.ledger.brier != null ? `, Brier ${v.ledger.brier}${v.ledger.brierBase != null ? ` vs base ${v.ledger.brierBase}` : ''}` : ''}.` : ''}${sbTxt}${v.teaching ? ` Teaching: ${v.teaching.line}` : ''}${v.briefing ? ` Briefing: ${briefingLines(v.briefing).join(' | ')}` : ''}${v.summary ? ` At a glance: ${v.summary.sentence}` : ''}`;
 }
 export function veteranSection(v) {
   if (!v || !v.debate) return '';
@@ -451,6 +458,9 @@ export function veteranSection(v) {
   if (v.scoreboard) out.push('', `Scoreboard (who was right on gold's direction per topic, ${HORIZON_DAYS} trading days on): ${v.scoreboard.weeks} resolved week${v.scoreboard.weeks === 1 ? '' : 's'}, ${v.scoreboard.pending} pending${v.scoreboard.weeks ? ` · veteran ${v.scoreboard.veteran.hit == null ? 'n/a' : Math.round(v.scoreboard.veteran.hit * 100) + '%'} (${v.scoreboard.veteran.n}) vs strategist ${v.scoreboard.strategist.hit == null ? 'n/a' : Math.round(v.scoreboard.strategist.hit * 100) + '%'} (${v.scoreboard.strategist.n})` : ''}.`);
   if (v.releases && v.releases.length) out.push('', `Releases (expectation captured before, first print kept): ${v.releases.map((r) => `${r.event} ${r.scheduledUtc.slice(0, 10)} exp ${r.consensus ?? 'n/a'}, print ${r.firstPrint ?? 'pending'}${r.surprise != null ? `, surprise ${sg(r.surprise, 2, ' pp')}` : r.firstPrint != null ? ', not scored' : ''}${r.rates && r.rates.observedBp != null ? `, 10Y TIPS ${r.rates.observedBp} bp` : ''}`).join(' · ').replace(/\|/g, '/')}.`);
   if (v.teaching) out.push('', `Teaching: ${v.teaching.line.replace(/\|/g, '/')}`);
+  if (v.summary) out.push('', `**${v.summary.sentence.replace(/\|/g, '/')}**`);
+  if (v.calibration) out.push('', `Calibration: ${v.calibration.line}`);
+  if (v.changes && v.changes.items && v.changes.items.length) out.push('', `Since last week: ${v.changes.items.filter((x) => x.area !== 'hypothesis').map((x) => x.text).join('; ').replace(/\|/g, '/')}.`);
   if (v.briefing) { out.push('', '### The veteran\'s briefing', '', ...v.briefing.insights.map((i) => `${i.rank}. **${i.title.replace(/\|/g, '/')}**: ${i.evidence.map((e) => `${e.text} (${e.asOf}; ${e.source})`).join('; ').replace(/\|/g, '/')}. What would change the view: ${i.change.replace(/\|/g, '/')}.`));
     if (v.briefing.hypotheses.length) out.push('', ...v.briefing.hypotheses.map((h) => `- ${h.slot} · ${Math.round(h.p * 100)}%: ${h.claim.replace(/\|/g, '/')}. ${h.why.replace(/\|/g, '/')} Invalidated by ${h.invalid.replace(/\|/g, '/')}.`));
     out.push('', `_${v.briefing.publicOnly}_`); }
@@ -478,15 +488,22 @@ export function run({ dir = 'data', now = Math.floor(Date.now() / 1000), log = c
   const dx = dxyDaily(daily), xau = rd(path.join(dir, 'research', 'daily', 'xau.json'), null), gold = dailyRows(xau);
   const goldBars = xau && Array.isArray(xau.rows) ? xau.rows.filter((r) => r && r[4] > 0).map((r) => ({ t: Math.floor(r[0] / DAY) * DAY, o: +r[1], h: +r[2], l: +r[3], c: +r[4] })) : null;
   const spx = dailyRows(rd(path.join(dir, 'research', 'daily', 'spx500.json'), null)), cot = rd(path.join(M, 'cot.json'), null);
-  const { v, ledger: L, debates: Dh, expectations: E } = build({ fc, cache, daily: { gold, dxy: dx, goldBars, spx }, ledger, debates, expectations, cot, now });
-  const w = (f, val) => { const s = JSON.stringify(val, null, 1), p = path.join(M, f); let old = null; try { old = fs.readFileSync(p, 'utf8'); } catch (e) {} if (old !== s) fs.writeFileSync(p, s); };
   // the calls' record and COT-edge calls (9 Nov): closes by asset for resolution
-  { const px = { gold, dxy: dx }; for (const m of COT_MARKETS) if (!px[m.k]) px[m.k] = dailyRows(rd(path.join(dir, 'research', 'daily', `${m.px}.json`), null));
-    if (v.outlook) { v.outlook.cot = cotCalls(cot, px, now);
-      const hyps = (v.briefing && v.briefing.hypotheses) || [];
-      const CL = callsLedger(rd(path.join(M, 'veteran-calls.json'), []), { outlook: v.outlook, closesBy: px, now, extra: hyps }); w('veteran-calls.json', CL);
-      v.outlook.record = callsScore(CL); v.outlook.recent = CL.filter((r) => r.hit != null).slice(-12).reverse();
-      if (v.briefing) freezeHypotheses(v.briefing, CL); } }
+  const px = { gold, dxy: dx }; for (const m of COT_MARKETS) if (!px[m.k]) px[m.k] = dailyRows(rd(path.join(dir, 'research', 'daily', `${m.px}.json`), null));
+  // self-calibration from the record as it stands before today's calls (resolved on closes up to now only)
+  const CL0 = callsLedger(rd(path.join(M, 'veteran-calls.json'), []), { outlook: null, closesBy: px, now });
+  const cal = calibration({ calls: CL0, ledger: ledgerResolve(ledger, gold) });
+  const { v, ledger: L, debates: Dh, expectations: E } = build({ fc, cache, daily: { gold, dxy: dx, goldBars, spx }, ledger, debates, expectations, cot, now, cal });
+  const w = (f, val) => { const s = JSON.stringify(val, null, 1), p = path.join(M, f); let old = null; try { old = fs.readFileSync(p, 'utf8'); } catch (e) {} if (old !== s) fs.writeFileSync(p, s); };
+  let CL = CL0;
+  if (v.outlook) { v.outlook.cot = applyCalls(cotCalls(cot, px, now), v.calibration);
+    const hyps = (v.briefing && v.briefing.hypotheses) || [];
+    CL = callsLedger(CL0, { outlook: v.outlook, closesBy: px, now, extra: hyps }); w('veteran-calls.json', CL);
+    v.outlook.record = callsScore(CL); v.outlook.recent = CL.filter((r) => r.hit != null).slice(-12).reverse();
+    if (v.briefing) freezeHypotheses(v.briefing, CL); }
+  // what changed since last week (9 Nov): one compact briefing per week in macro/veteran-briefings.json, diffed against the last one
+  if (v.briefing) { const BH = rd(path.join(M, 'veteran-briefings.json'), []), wk = weekKey(now), snap = snapshot(v, wk);
+    v.changes = briefDiff(previousOf(BH, wk), snap, CL); w('veteran-briefings.json', archiveWeek(BH, snap)); }
   w('veteran.json', v); w('veteran-ledger.json', L); w('veteran-debates.json', Dh); w('veteran-expectations.json', E);
   try { const fA = path.join(dir, 'analysis', 'latest.md');
     if (fs.existsSync(fA)) { const md = fs.readFileSync(fA, 'utf8'), nx = injectSection(md, veteranSection(v), VET_START, VET_END); if (nx !== md) fs.writeFileSync(fA, nx); } } catch (e) { log('veteran: analysis section skipped:', e.message); }
