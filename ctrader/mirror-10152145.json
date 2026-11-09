@@ -2046,7 +2046,7 @@
    "startBalance": 9987.78
   },
   "startedAt": "2026-11-08T11:42:25.000Z",
-  "status": "ok · demo Fusion Markets · balance 9996.03 · 29 open · 1 resting",
+  "status": "ok · demo Fusion Markets · balance 9996.03 · 29 open",
   "skipped": {
    "audusd-position-1793601653": "price 0.68666 has run 1.27R from the council entry 0.70162: a different trade now",
    "xrp-rswing-1793942619": "none of XRPUSD found at the broker",
@@ -2058,39 +2058,12 @@
   "paused": {},
   "resetAt": "2026-11-08T09:45Z",
   "resetDoneAt": "2026-11-08T11:42:47.000Z",
-  "orders": {
-   "btc-rscalp-1794227709": {
-    "orderId": "33801530",
-    "symbol": "BTCUSD",
-    "side": "buy",
-    "volume": 1,
-    "lots": 0.01,
-    "digits": 2,
-    "setup": "rscalp",
-    "limitPrice": 74718.2,
-    "stop": 74256.3456,
-    "t1": 74795.6,
-    "placedAt": "2026-11-09T12:36:18.000Z",
-    "expires": "2026-11-09T15:35:09.000Z",
-    "riskCash": 4.62,
-    "margin": 74.59,
-    "minLot": true,
-    "shadow": true,
-    "alerted": [
-     "pending"
-    ]
-   }
-  },
+  "orders": {},
   "catchUpAt": "2026-11-08T12:04:40.000Z",
   "balance": 9996.03,
-  "lastRun": "2026-11-09T12:36:18.000Z"
+  "lastRun": "2026-11-09T12:37:40.000Z"
  },
  "log": [
-  {
-   "at": "2026-11-08T21:20:48.000Z",
-   "msg": "not mirrored yet eurusd-rswing-1793610380: EURUSD market closed: MARKET_CLOSED: Trading is not available: Market is closed. (will retry)",
-   "trade": "eurusd-rswing-1793610380"
-  },
   {
    "at": "2026-11-08T21:20:48.000Z",
    "msg": "not mirrored yet gbpusd-scalp-1793626672: GBPUSD market closed: MARKET_CLOSED: Trading is not available: Market is closed. (will retry)",
@@ -3584,6 +3557,11 @@
   {
    "at": "2026-11-09T12:36:18.000Z",
    "msg": "placed buy limit BTCUSD 0.01 lot at 74718.2 (council rscalp, valid to 2026-11-09T15:35Z)",
+   "trade": "btc-rscalp-1794227709"
+  },
+  {
+   "at": "2026-11-09T12:37:40.000Z",
+   "msg": "cancelled BTCUSD limit order 33801530 for btc-rscalp-1794227709: the council ended it: missed",
    "trade": "btc-rscalp-1794227709"
   }
  ],
