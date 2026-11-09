@@ -30,6 +30,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { injectSection } from './analyst.mjs';
+import { readJson, writeAtomic, writeIfChanged } from './jsonio.mjs';
 import { EVENTS, HISTORY } from './events.mjs';
 // Gold Macro Score (8 Nov, owner: the macro-agent-demo skill's directional engine): council/macroscore.mjs, a paper reading
 import { goldMacroScore, scoreLine, dxyDaily, dailyRows, weeklyFrame, isoDay as isoW } from './macroscore.mjs';
@@ -101,6 +102,15 @@ export function parseCalendar(j) {
   return j.map((e) => ({ title: String(e.title || '').trim(), country: String(e.country || '').toUpperCase(), at: Math.floor(Date.parse(e.date) / 1000),
     impact: String(e.impact || ''), forecast: e.forecast || '', previous: e.previous || '', actual: e.actual || '' }))
     .filter((e) => e.title && isFinite(e.at));
+}
+// Forex Factory weeks run Sunday to Saturday in New York time: the week an event belongs to (Sunday 00:00 UTC-5 epoch weeks)
+export const calWeek = (t) => Math.floor((t - 5 * 3600 - 3 * DAY) / (7 * DAY));
+// The calendar to use: every week a feed returned (`weeks`: one event list per feed, [] when it failed), plus the cached
+// events of weeks no feed returned this run, from two weeks back on (older ones are history, kept in events.json).
+export function mergeCalendar(weeks, cached, now) {
+  const got = (weeks || []).flat(), have = new Set(got.map((e) => calWeek(e.at)));
+  const old = (Array.isArray(cached) ? cached : []).filter((e) => e && isFinite(e.at) && e.at >= now - 14 * DAY && !have.has(calWeek(e.at)));
+  return [...got, ...old].sort((a, b) => a.at - b.at);
 }
 const unxml = (s) => String(s || '').replace(/<!\[CDATA\[([\s\S]*?)\]\]>/g, '$1').replace(/<[^>]+>/g, '').replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&quot;/g, '"').replace(/&#39;|&apos;/g, "'").replace(/\s+/g, ' ').trim();
 // RSS 2.0 <item> or Atom <entry>
@@ -679,15 +689,18 @@ export async function gather(fetchImpl, now, cache = {}) {
     data.bars[k] = []; src[`bars:${k}`] = `failed (${r.err || 'empty'})`;
   }));
   // calendar: this week + next week; the feed rate-limits, so keep the last good copy
-  const cal = [];
+  const weeks = [];
   for (const w of ['thisweek', 'nextweek']) {
     const r = await get(fetchImpl, `https://nfs.faireconomy.media/ff_calendar_${w}.json`, 'json', 12000);
     const ev = r.body ? parseCalendar(r.body) : [];
     src[`calendar:${w}`] = ev.length ? `ok (${ev.length} events)` : `failed (${r.err || 'empty'})`;
-    cal.push(...ev);
+    weeks.push(ev);
   }
-  if (cal.length) data.cal = cal;
-  else if (Array.isArray(cache.cal) && cache.cal.length) { data.cal = cache.cal; src['calendar:cache'] = `using the last good copy (${cache.cal.length} events)`; }
+  // a week that failed keeps its events from the last good copy (9 Nov: one throttled feed used to drop that whole week,
+  // e.g. tomorrow's CPI, from the playbook and from the cache)
+  data.cal = mergeCalendar(weeks, cache.cal, now);
+  const kept = data.cal.length - weeks.reduce((s, ev) => s + ev.length, 0);
+  if (kept > 0) src['calendar:cache'] = `using the last good copy for ${weeks.some((ev) => ev.length) ? 'the week that failed' : 'both weeks'} (${kept} cached event${kept === 1 ? '' : 's'})`;
   const feeds = [['Fed', 'https://www.federalreserve.gov/feeds/press_all.xml'], ['ECB', 'https://www.ecb.europa.eu/rss/press.html'], ['BoJ', 'https://www.boj.or.jp/en/rss/whatsnew.xml']];
   await Promise.all(feeds.map(async ([name, url]) => { const r = await get(fetchImpl, url, 'text', 12000); const it = r.body ? parseRss(r.body, name) : [];
     src[`rss:${name}`] = it.length ? `ok (${it.length} items)` : `failed (${r.err || 'empty'})`; data.rss.push(...it.slice(0, 10)); }));
@@ -719,10 +732,14 @@ export async function scoreSeries(fetchImpl, now, { dir = 'data', data = { fred:
     src[`score:${id}`] = out[id].length ? `FRED long history failed (${err || 'empty'}): ${wk.length} cached weeks + ${recent.length} recent days` : `failed (${err || 'empty'})`;
   }
   const rd = (k) => { try { return dailyRows(JSON.parse(fs.readFileSync(path.join(dir, 'research', 'daily', `${k}.json`), 'utf8'))); } catch (e) { return null; } };
-  const fromBars = (k) => ((data.bars && data.bars[k]) || []).map((b) => ({ t: Math.floor(b.time / DAY) * DAY, v: b.close }));
+  // this run's closed daily candles (the forming day left out)
+  const fromBars = (k) => ((data.bars && data.bars[k]) || []).filter((b) => b && b.close > 0 && !b.live && Math.floor(b.time / DAY) * DAY + DAY <= now).map((b) => ({ t: Math.floor(b.time / DAY) * DAY, v: b.close }));
+  // the candle cache (research/daily, refreshed on Saturdays) carries the long history; this run's closes extend it past its
+  // last day (9 Nov: from Monday to Friday the DXY and gold used to stop at the cache's last day, up to six days old)
+  const ext = (c, k) => { const lt = c[c.length - 1].t; return c.concat(fromBars(k).filter((o) => o.t > lt)); };
   const daily = {}; let cached = 0;
-  for (const k of ['eurusd', 'usdjpy', 'gbpusd', 'usdcad', 'usdchf']) { const d = rd(k); if (d && d.length) { daily[k] = d; cached++; } else daily[k] = fromBars(k); }
-  const dxy = dxyDaily(daily), goldD = rd('xau'), gold = goldD && goldD.length ? goldD : fromBars('gold');
+  for (const k of ['eurusd', 'usdjpy', 'gbpusd', 'usdcad', 'usdchf']) { const d = rd(k); if (d && d.length) { daily[k] = ext(d, k); cached++; } else daily[k] = fromBars(k); }
+  const dxy = dxyDaily(daily), goldD = rd('xau'), gold = goldD && goldD.length ? ext(goldD, 'gold') : fromBars('gold');
   src['score:dxy'] = dxy.length ? `${dxy.length} days (${cached === 5 ? 'daily cache since ' + iso(dxy[0].t) : `${cached} of 5 pairs cached, rest from this run's bars`})` : 'no DXY (pairs missing)';
   return { ry: out.DFII10 || [], y2: out.DGS2 || [], y10: out.DGS10 || [], dxy, gold };
 }
@@ -886,7 +903,10 @@ export function buildForecast(data, now, { src = {}, history = [], eventLog = []
 
 export async function run({ dir = 'data', fetchImpl = globalThis.fetch, now = Math.floor(Date.now() / 1000), log = console.log } = {}) {
   const M = path.join(dir, 'macro'); fs.mkdirSync(M, { recursive: true });
-  const rd = (f, d) => { try { return JSON.parse(fs.readFileSync(path.join(M, f), 'utf8')); } catch (e) { return d; } };
+  // a file that exists but does not parse (a run killed mid-write before 9 Nov) is reported and, for the append-only logs, never
+  // overwritten: it used to read as empty and the next write replaced the whole history with a fresh one
+  const corrupt = new Set();
+  const rd = (f, d) => { const r = readJson(path.join(M, f), d); if (r.state === 'corrupt') { corrupt.add(f); log(`macro: ${f} is not valid JSON (${r.error}); left as it is`); } return r.value; };
   const cache = rd('cache.json', {});
   const { data, src } = await gather(fetchImpl, now, cache);
   const eventLog = logEvents(rd('events.json', []), data.cal || []);
@@ -894,7 +914,9 @@ export async function run({ dir = 'data', fetchImpl = globalThis.fetch, now = Ma
   const S = await scoreSeries(fetchImpl, now, { dir, data, cache, src }), goldScore = goldMacroScore(S, { asOf: now });
   const fc = buildForecast(data, now, { src, history, eventLog, goldScore, lessons: rd('lessons.json', []) });
   history = updateHistory(history, fc, now).slice(-3000);
-  const w = (f, v, pretty = true) => { const s = pretty ? JSON.stringify(v, null, 1) : JSON.stringify(v); const p = path.join(M, f); let old = null; try { old = fs.readFileSync(p, 'utf8'); } catch (e) {} if (old !== s) fs.writeFileSync(p, s); };
+  const APPEND_ONLY = new Set(['history.json', 'events.json', 'lessons.json']);
+  for (const f of corrupt) src[`file:${f}`] = APPEND_ONLY.has(f) ? 'not valid JSON: left as it is for a repair, not appended to' : 'not valid JSON: rebuilt';
+  const w = (f, v, pretty = true) => { if (APPEND_ONLY.has(f) && corrupt.has(f)) return; writeIfChanged(path.join(M, f), pretty ? JSON.stringify(v, null, 1) : JSON.stringify(v)); };
   w('forecast.json', fc); w('history.json', history); w('events.json', eventLog); w('lessons.json', fc.learned.records);
   // last good copies, so one failed fetch does not blank the drivers (no timestamps: the file only changes with new data)
   const nc = { fred: {}, cal: data.cal && data.cal.length ? data.cal : cache.cal || [], cot: data.cot && data.cot.length ? data.cot : cache.cot || [] };
@@ -902,7 +924,7 @@ export async function run({ dir = 'data', fetchImpl = globalThis.fetch, now = Ma
   nc.score = S.ry.length && S.y2.length && S.y10.length ? scoreCache(S) : cache.score || null;
   w('cache.json', nc, false);
   try { const fA = path.join(dir, 'analysis', 'latest.md');
-    if (fs.existsSync(fA)) { const md = fs.readFileSync(fA, 'utf8'), nx = injectSection(md, macroSection(fc), MACRO_START, MACRO_END); if (nx !== md) fs.writeFileSync(fA, nx); } } catch (e) { log('macro: analysis section skipped:', e.message); }
+    if (fs.existsSync(fA)) { const md = fs.readFileSync(fA, 'utf8'), nx = injectSection(md, macroSection(fc), MACRO_START, MACRO_END); if (nx !== md) writeAtomic(fA, nx); } } catch (e) { log('macro: analysis section skipped:', e.message); }
   log(fc.brief);
   log('Sources: ' + Object.entries(src).map(([k, v]) => `${k} ${v}`).join(' | '));
   return fc;

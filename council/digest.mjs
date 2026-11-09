@@ -40,6 +40,7 @@ import { sendAlerts, when, NTFY_DEFAULT, SITE, alertable, actionable, proposalLi
 import { usHolidays } from './datacheck.mjs';
 import { expectLine } from './expect.mjs';
 import { researchLines } from './research-ledger.mjs';
+import { writeAtomic } from './jsonio.mjs';
 
 export const COUNCIL_URL = SITE + 'market-structure.html#council';
 export const CFG = {
@@ -215,7 +216,7 @@ export function recordVerdicts(dir, { robust = null, decay = null, now = Math.fl
   const file = path.join(dir, 'digest.json');
   if (prev === undefined) { try { prev = JSON.parse(fs.readFileSync(file, 'utf8')) || {}; } catch (e) { prev = {}; } }
   const S = snapshot(prev, { robust: robust ? robustMap(robust) : null, decay: decay ? decayMap(decay) : null, now, names: verdictNames(robust, decay) });
-  if (S.dirty) { try { fs.mkdirSync(dir, { recursive: true }); fs.writeFileSync(file, JSON.stringify(S.state, null, 1) + '\n'); } catch (e) { S.error = String((e && e.message) || e); } }
+  if (S.dirty) { try { fs.mkdirSync(dir, { recursive: true }); writeAtomic(file, JSON.stringify(S.state, null, 1) + '\n'); } catch (e) { S.error = String((e && e.message) || e); } }
   return S;
 }
 // Edge-decay monitor (coach.json decay, council/decay.mjs): one line naming the LIVE systems whose status is 'decaying', or null.
@@ -326,7 +327,7 @@ export async function main(dir, { env = process.env, fetchFn = fetch, now = Math
     : { ...prev, at, sent: { day: s.day, at, kind: s.kind, title: d.title }, sb: d.state.sb, robust: d.state.robust, last: { title: d.title, msg: d.msg }, error: Object.keys(errors).length ? { at, ...errors } : undefined };
   if (out.error === undefined) delete out.error;
   fs.mkdirSync(dir, { recursive: true });
-  fs.writeFileSync(file, JSON.stringify(out, null, 1) + '\n');
+  writeAtomic(file, JSON.stringify(out, null, 1) + '\n');
   return { sent: !failed, title: d.title, msg: d.msg, errors, sbError, recorded };
 }
 

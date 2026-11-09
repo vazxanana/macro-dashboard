@@ -108,6 +108,11 @@ test('the watchdog workflow is its own small cron workflow that reads council-da
   assert.match(wf, /ref: council-data/); assert.match(wf, /run: node council\/health\.mjs data/); assert.match(wf, /timeout-minutes: 5/);
   assert.doesNotMatch(wf, /trader\.mjs|tracker\.mjs/, 'the watchdog never trades');
   const loop = fs.readFileSync(new URL('../.github/workflows/council.yml', import.meta.url), 'utf8');
-  assert.match(loop, /git -C data rebase --abort/, 'a stuck rebase after a push race is aborted, not carried into the next round');
+  // every pull / save of council-data goes through council/datasync.mjs (clears a stuck rebase, conflict policy, JSON check)
+  assert.match(loop, /node council\/datasync\.mjs data pull/); assert.match(loop, /node council\/datasync\.mjs data save "Council run /);
+  assert.match(loop, /node council\/datasync\.mjs data save "Council quick pass /);
+  assert.match(loop, /datasync\.mjs data save "cTrader account [^\n]*ctrader\/account\.json ctrader\/accounts\.json/, 'the minute step commits both account files');
+  assert.doesNotMatch(loop, /pull -q --rebase/, 'no plain pull left: it refused every minute with the uncommitted accounts.json');
+  assert.match(wf, /node council\/datasync\.mjs data save "Council watchdog [^\n]* watchdog\.json/);
   assert.match(loop, /for a in 1 2 3; do gh workflow run council\.yml/, 'the hand-over dispatch is retried');
 });

@@ -114,7 +114,9 @@ jobs:
             # 60 rounds take ~5.6 h (~5.6 min each), longer than the 330-min job timeout, so the job was killed before "Start the
             # next run" (6 Nov 05:44: 79 min with no run until the cron watchdog restarted it). Stop at 300 min so the hand-off runs.
             if [ "$SECONDS" -gt 18000 ]; then echo "Time budget reached after $((i - 1)) rounds"; break; fi
-            git -C data pull -q --rebase origin council-data || true
+            # council/datasync.mjs (9 Nov): pulls with the loop's uncommitted files riding along (a plain pull refused every minute:
+            # "You have unstaged changes"), clears a half-done rebase, and on a conflict keeps the council-data copy of that file
+            node council/datasync.mjs data pull || true
             if livefresh; then echo "live runner alive: Trader + mirror left to it this round"; else
             node council/trader.mjs data || echo "Trader round $i failed"
             # cTrader DEMO mirror (8 Nov, owner: "when he places a trade it must go instantly on ctrader"): the very next step after
@@ -149,13 +151,10 @@ jobs:
             # read by the site, the digest and the week pane. Every 3rd round, before the digest's round; a new study merged
             # while this run is up is also written at once by research-ledger.yml. Read only; never fails the round.
             if [ $((i % 3)) -eq 2 ]; then timeout 60 node council/research-ledger.mjs data || echo "Research ledger round $i failed"; fi
-            git -C data add -A
-            if ! git -C data diff --cached --quiet; then
-              git -C data commit -q -m "Council run $(date -u +%Y-%m-%dT%H:%MZ)"
-              # a rebase that stops on a conflict (another writer touched the same file) must be aborted, or every later round's
-              # pull / commit fails inside the half-done rebase and nothing is saved until the run ends (8 Nov: watchdog review)
-              for j in 1 2 3; do { git -C data pull -q --rebase origin council-data || git -C data rebase --abort || true; } && git -C data push -q origin HEAD:council-data && break; sleep 5; done
-            fi
+            # commit + push (3 tries): a conflicting file keeps the council-data copy (another writer or the owner touched it; this
+            # loop rebuilds its own files next round), the rest of the round is saved, a JSON file that does not parse is never
+            # committed, and nothing is left half-rebased (8 Nov: an abort alone left the clone diverged, every push was rejected)
+            node council/datasync.mjs data save "Council run $(date -u +%Y-%m-%dT%H:%MZ)" || echo "Council data not pushed after round $i (next round retries)"
             if newcode; then echo "New council code on main: handing over after round $i"; break; fi
             if [ "$i" -lt "$ROUNDS" ]; then
               for k in 1 2 3 4; do sleep 60
@@ -164,20 +163,16 @@ jobs:
                 # members keep the 5-minute round. Saved as its own commit; a failure never stops the loop. This is the ceiling of the
                 # free setup; the next step is the live runner on a VPS (council/live.mjs), which then takes these passes over.
                 if ! livefresh; then
-                  git -C data pull -q --rebase origin council-data || true
+                  node council/datasync.mjs data pull || true
                   node council/trader.mjs data || echo "Trader quick pass $i failed"
                   node council/ctrader-mirror.mjs data || echo "cTrader mirror quick pass $i failed"
-                  git -C data add -A
-                  if ! git -C data diff --cached --quiet; then
-                    git -C data commit -q -m "Council quick pass $(date -u +%Y-%m-%dT%H:%MZ)"
-                    for j in 1 2 3; do { git -C data pull -q --rebase origin council-data || git -C data rebase --abort || true; } && git -C data push -q origin HEAD:council-data && break; sleep 5; done
-                  fi
+                  node council/datasync.mjs data save "Council quick pass $(date -u +%Y-%m-%dT%H:%MZ)" || echo "Quick pass $i not pushed"
                 fi
                 # the owner's demo account every minute between rounds (owner, 7 Nov: a manual trade showed up late); saved only on a change
                 node council/ctrader-account.mjs data >/dev/null 2>&1 || true
                 if ! git -C data diff --quiet -- ctrader/account.json 2>/dev/null || [ -n "$(git -C data ls-files --others -- ctrader/account.json)" ]; then
-                  git -C data add ctrader/account.json && git -C data commit -q -m "cTrader account $(date -u +%H:%MZ)" && \
-                  for j in 1 2 3; do { git -C data pull -q --rebase origin council-data || git -C data rebase --abort || true; } && git -C data push -q origin HEAD:council-data && break; sleep 3; done
+                  # with accounts.json too: it changes on every call (its `at`); left uncommitted it blocked every later pull
+                  node council/datasync.mjs data save "cTrader account $(date -u +%H:%MZ)" ctrader/account.json ctrader/accounts.json || true
                 fi
                 if newcode; then echo "New council code on main: handing over after round $i"; break 2; fi
               done

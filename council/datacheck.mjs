@@ -16,6 +16,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { sendAlerts, when, NTFY_DEFAULT, SITE } from './alerts.mjs';
 import { cleanBars } from './clean.mjs';
+import { writeAtomic } from './jsonio.mjs';
 import { MARKETS as ICT_MARKETS } from '../ict/tracker.mjs';
 import { cmeShut } from '../ict/calendar.mjs';
 
@@ -241,7 +242,7 @@ export async function main(dir, { env = process.env, fetchFn = fetch, now = Math
   if (!health.lastAlert && prev && prev.lastAlert) health.lastAlert = prev.lastAlert;
   health.cfg = { staleMin: CFG.staleMin, jumpAtr: CFG.jumpAtr, gapWarnMin: CFG.gapWarnMin, gapBadMin: CFG.gapBadMin, window: CFG.window, confirm: CFG.confirm };
   fs.mkdirSync(dir, { recursive: true });
-  fs.writeFileSync(file, JSON.stringify(health, null, 1));
+  writeAtomic(file, JSON.stringify(health, null, 1));
   return health;
 }
 

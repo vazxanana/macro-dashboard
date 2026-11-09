@@ -65,6 +65,8 @@ export function cardOf(score) {
   if (score > 0.25) return { bias: 'BUY', conviction: 'Medium', label: 'BUY · Medium' };
   return { bias: 'AUCTION', conviction: null, label: 'AUCTION (no macro edge)' };
 }
+export const STALE_DAYS = 10, STALE_STOP_DAYS = 28;
+const INPUT_NAME = { ry: 'real yield', y2: '2Y yield', y10: '10Y yield', dxy: 'DXY' };
 const r2 = (x, d = 2) => (x == null || !Number.isFinite(x) ? null : +(+x).toFixed(d));
 // daily: { ry (DFII10), y2 (DGS2), y10 (DGS10), dxy } as [{ t, v }]; gold (optional, daily closes) for the 10-week tiebreaker
 export function goldMacroScore({ ry, y2, y10, dxy, gold = null }, { from = FROM, minObs = MIN_OBS, asOf = Infinity } = {}) {
@@ -80,8 +82,16 @@ export function goldMacroScore({ ry, y2, y10, dxy, gold = null }, { from = FROM,
   const path = []; for (let i = Math.max(0, last - 5); i <= last; i++) path.push(r2(score[i]));
   // optional tiebreaker from the skill: score > +0.25 and gold above its 10-week average won 70% vs 68% without it
   let trend = null; if (gold && gold.length) { const G = weeklyFrame({ g: cut(gold) }, from).cols.g, j = G.length - 1; if (j >= 9 && G.slice(j - 9, j + 1).every((v) => v != null)) { const m = G.slice(j - 9, j + 1).reduce((s, v) => s + v, 0) / 10; trend = { above10w: G[j] > m, last: r2(G[j]), avg10w: r2(m) }; } }
-  const partial = W[last] > (asOf === Infinity ? Math.floor(Date.now() / 1000) : asOf);
-  return { ok: true, asOf: isoDay(W[last]), partial, score: r2(score[last]), z: Object.fromEntries(keys.map((k) => [k, r2(z[k][last])])), raw: Object.fromEntries(keys.map((k) => [k, r2(raw[k][last], 4)])),
+  const nowT = asOf === Infinity ? Math.floor(Date.now() / 1000) : asOf, partial = W[last] > nowT;
+  // stale inputs (9 Nov): the weekly frame forward-fills, so a series that stopped updating reads as "no change" for its
+  // driver. Flag one whose last value is STALE_DAYS older than the score week; withhold the score past STALE_STOP_DAYS
+  // (then its 4-week change would be made up entirely of filled values).
+  const ref = Math.min(nowT, W[last] + DAY), inputs = { ry: ry, y2: y2, y10: y10, dxy: dxy }, stale = [];
+  for (const [k, s] of Object.entries(inputs)) { const c = cut(s), lt = c.length ? c[c.length - 1].t : null, days = lt == null ? Infinity : Math.floor((ref - lt) / DAY);
+    if (days >= STALE_DAYS) stale.push({ k, name: INPUT_NAME[k], last: lt == null ? null : isoDay(lt), days: Number.isFinite(days) ? days : null }); }
+  const dead = stale.filter((x) => x.days == null || x.days > STALE_STOP_DAYS);
+  if (dead.length) return { ok: false, why: `stale input: ${dead.map((x) => `${x.name} last ${x.last || 'never'}`).join(', ')}`, stale, score: null, weeks: W.length, ...cardOf(null) };
+  return { ok: true, asOf: isoDay(W[last]), partial, stale, score: r2(score[last]), z: Object.fromEntries(keys.map((k) => [k, r2(z[k][last])])), raw: Object.fromEntries(keys.map((k) => [k, r2(raw[k][last], 4)])),
     path, weeks: last + 1, trend, ...cardOf(score[last]),
     rule: 'direction only, long-or-flat: > +0.5 BUY High, +0.25..+0.5 BUY Medium, else AUCTION; a negative score is not a sell (skill test 2007-26: no short edge). Paper reading; nothing trades on it.' };
 }
@@ -89,5 +99,5 @@ export function goldMacroScore({ ry, y2, y10, dxy, gold = null }, { from = FROM,
 export function scoreLine(s) {
   if (!s || !s.ok) return `Gold Macro Score: n/a${s && s.why ? ` (${s.why})` : ''}.`;
   const sg = (v) => (v == null ? '—' : `${v > 0 ? '+' : ''}${v.toFixed(2)}`);
-  return `Gold Macro Score ${sg(s.score)} → ${s.label} (real yield 4w z ${sg(s.z.ry4w)}, DXY 4w z ${sg(s.z.dxy4w)}, 2Y 13w z ${sg(s.z.y2_13w)}, curve 13w z ${sg(s.z.curve13w)}; 6-week path ${s.path.map(sg).join(' → ')}; week to ${s.asOf}${s.partial ? ', not closed' : ''}${s.trend ? `; gold ${s.trend.above10w ? 'above' : 'below'} its 10-week average` : ''}). Direction only, never a sell; paper reading.`;
+  return `Gold Macro Score ${sg(s.score)} → ${s.label} (real yield 4w z ${sg(s.z.ry4w)}, DXY 4w z ${sg(s.z.dxy4w)}, 2Y 13w z ${sg(s.z.y2_13w)}, curve 13w z ${sg(s.z.curve13w)}; 6-week path ${s.path.map(sg).join(' → ')}; week to ${s.asOf}${s.partial ? ', not closed' : ''}${s.stale && s.stale.length ? `; stale: ${s.stale.map((x) => `${x.name} last ${x.last}`).join(', ')}` : ''}${s.trend ? `; gold ${s.trend.above10w ? 'above' : 'below'} its 10-week average` : ''}). Direction only, never a sell; paper reading.`;
 }

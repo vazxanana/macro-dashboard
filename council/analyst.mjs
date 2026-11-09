@@ -45,8 +45,11 @@ export function liveRuleSection({ snapshot, config, backtest, now = Math.floor(D
 // put the section in the report: replace the old block, else insert it before "## Top 3 to watch", else append
 export function injectSection(md, section, start = START, end = END) {
   if (!section) return md;
-  const i = md.indexOf(start), j = md.indexOf(end);
+  const i = md.indexOf(start), j = i >= 0 ? md.indexOf(end, i) : -1;
   if (i >= 0 && j > i) return md.slice(0, i) + section + md.slice(j + end.length);
+  // a lone marker (its partner lost to a cut-short write or a hand edit) is dropped, so the next round's replace cannot swallow
+  // everything between it and the new block (9 Nov: an orphan start before the Analyst's weekly text would have taken it)
+  if (md.includes(start) || md.includes(end)) md = md.split(start).join('').split(end).join('');
   const t = md.indexOf('\n## Top 3');
   return t >= 0 ? md.slice(0, t + 1) + section + '\n\n' + md.slice(t + 1) : md.replace(/\s*$/, '\n\n') + section + '\n';
 }
