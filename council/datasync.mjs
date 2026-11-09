@@ -57,6 +57,13 @@ export function badJson(dir, files) {
 export function rebaseOnto(dir, upstream, log = () => {}) {
   const dropped = new Set();
   let r = git(dir, ['rebase', '--autostash', upstream]);
+  // an untracked file of ours that council-data now has too blocks the whole rebase (the autostash holds tracked files only):
+  // the council-data copy wins, as for a conflict
+  if (!r.ok && !inRebase(dir) && /untracked working tree files would be overwritten/.test(r.err)) {
+    const m = r.err.split('\n').map((x) => x.match(/^\t(.+)$/)).filter(Boolean).map((x) => x[1].trim());
+    for (const f of m) { fs.rmSync(path.join(dir, f), { force: true }); dropped.add(f); }
+    if (m.length) r = git(dir, ['rebase', '--autostash', upstream]);
+  }
   for (let guard = 0; !r.ok && inRebase(dir) && guard < 200; guard++) {
     const um = lines(git(dir, ['diff', '--name-only', '--diff-filter=U']).out);
     if (!um.length) { r = git(dir, ['rebase', '--skip']); continue; }   // nothing left of this commit

@@ -70,6 +70,18 @@ test('a pull into a conflicting uncommitted change never leaves conflict markers
   assert.equal(G(A, 'stash', 'list'), '');                        // no stash left to pile up over a 5-hour run
 });
 
+test('an untracked local file that council-data now also has does not block the pull (the council-data copy wins)', () => {
+  const { A, B } = setup();
+  pushB(B, 'ctrader/mirror-2.json', { from: 'live runner' });
+  W(A, 'ctrader/mirror-2.json', { from: 'loop' }); W(A, 'snapshot.json', { at: 'mine' });
+  W(A, 'trades.json', [{ id: 'a', R: 1 }, { id: 'n' }]); G(A, 'commit', '-q', '-am', 'local round');   // a commit to rebase
+  const r = pull(A, opts);
+  assert.equal(r.ok, true);
+  assert.deepEqual(JSON.parse(R(A, 'ctrader/mirror-2.json')), { from: 'live runner' });
+  assert.equal(G(A, 'rev-list', '--count', 'origin/council-data..HEAD'), '1', 'the local round is rebased, not lost');
+  assert.equal(inRebase(A), false);
+});
+
 test('a rebase left half-done by an earlier step is cleared before the next pull', () => {
   const { A, B } = setup();
   pushB(B, 'trades.json', [{ id: 'b' }]);
