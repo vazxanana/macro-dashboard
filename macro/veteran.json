@@ -1,14 +1,14 @@
 {
  "v": 1,
- "at": "2026-11-09T12:50:16.000Z",
+ "at": "2026-11-09T14:02:25.000Z",
  "paperOnly": true,
- "strategistAt": "2026-11-09T12:49:52.000Z",
+ "strategistAt": "2026-11-09T14:02:13.000Z",
  "shock": {
   "shock": "Risk-off / de-risking, funding still calm",
   "clues": [
    "VIX/VIX3M 1.103",
    "HY +22 bp on the week",
-   "SOFR−EFFR 4 bp",
+   "SOFR−EFFR 1 bp",
    "DXY +0.27%"
   ],
   "goldTest": "Gold whipsaws: sold with risk assets first, then the haven bid if funding stays calm. The test is whether funding spreads widen; while they do not, this is risk aversion, not a liquidity squeeze.",
@@ -55,7 +55,7 @@
   {
    "k": "risk",
    "name": "Risk, safe haven and liquidity",
-   "obs": "VIX 28.2 (VIX/VIX3M 1.10) · HY OAS 3.48%, +22 bp on the week · SOFR−EFFR 4 bp",
+   "obs": "VIX 28.2 (VIX/VIX3M 1.10) · HY OAS 3.48%, +22 bp on the week · SOFR−EFFR 1 bp",
    "lean": 0,
    "asOf": "2026-11-05",
    "stale": false,
@@ -115,7 +115,7 @@
   },
   {
    "topic": "US dollar",
-   "macro": "+0.09 pts in 5 sessions (vote flat); score z (4-week fall) −0.20",
+   "macro": "+0.04 pts in 5 sessions (vote flat); score z (4-week fall) −0.20",
    "veteran": "DXY 102.36, +0.27% on the week, +0.13% over 4 weeks · broad USD −0.10% over 4 weeks",
    "stance": "agree",
    "why": "A 5-day momentum vote and a 4-week change can disagree without either being wrong; the veteran weights the 4-week window the score was tested on and notes that local-currency gold is not checked.",
@@ -143,7 +143,7 @@
   {
    "topic": "Regime",
    "macro": "Dollar Smile left side (stress) · dollar liquidity draining · VIX curve inverted (stress)",
-   "veteran": "Risk-off / de-risking, funding still calm (medium confidence) · clues: VIX/VIX3M 1.103, HY +22 bp on the week, SOFR−EFFR 4 bp, DXY +0.27%",
+   "veteran": "Risk-off / de-risking, funding still calm (medium confidence) · clues: VIX/VIX3M 1.103, HY +22 bp on the week, SOFR−EFFR 1 bp, DXY +0.27%",
    "stance": "agree",
    "why": "Strongest competing explanation: A dollar funding squeeze building underneath (SOFR−EFFR and the FX swap basis would widen next), or forced de-grossing of crowded positions.",
    "m": null,
@@ -173,7 +173,7 @@
   "claimType": "descriptive association",
   "shock": "Risk-off / de-risking, funding still calm",
   "surprise": "Pending: Core CPI m/m at 2026-11-10 13:30 UTC against the calendar expectation captured before it (0.2%); print minus previous is not a surprise",
-  "observed": "VIX/VIX3M 1.103 · HY +22 bp on the week · SOFR−EFFR 4 bp · DXY +0.27%",
+  "observed": "VIX/VIX3M 1.103 · HY +22 bp on the week · SOFR−EFFR 1 bp · DXY +0.27%",
   "decomposition": "TIPS real yield observed (DFII10); breakeven = 10Y nominal − TIPS, carrying inflation-risk and liquidity premia; no ACM term-premium estimate in the council's data",
   "mechanism": "Gold whipsaws: sold with risk assets first, then the haven bid if funding stays calm. The test is whether funding spreads widen; while they do not, this is risk aversion, not a liquidity squeeze.",
   "alternative": "A dollar funding squeeze building underneath (SOFR−EFFR and the FX swap basis would widen next), or forced de-grossing of crowded positions.",
@@ -641,7 +641,7 @@
     },
     {
      "src": "Fed H.4.1 / funding (SOFR, VIX curve, HY spreads)",
-     "read": "VIX 28.2 (VIX/VIX3M 1.10) · HY OAS 3.48%, +22 bp on the week · SOFR−EFFR 4 bp (as of 2026-11-05)",
+     "read": "VIX 28.2 (VIX/VIX3M 1.10) · HY OAS 3.48%, +22 bp on the week · SOFR−EFFR 1 bp (as of 2026-11-05)",
      "says": "neutral for gold. Stress first sells gold for cash, then buys it",
      "limit": "Safe-haven behaviour is conditional: in a liquidity squeeze gold is sold for cash first (BIS WP 1380: the effect depends on financial conditions). An inverted VIX curve is stress, not a direction."
     },
@@ -833,7 +833,7 @@
   "method": "Each scored call (dated calls, COT calls, hypotheses, the weekly ledger forecast) is binned by its stated probability against how often it came true. One factor k scales every future call's distance from its own base rate: k is the Brier-optimal slope over the scored record, pulled toward 1 by a prior (0.3), clamped 0.25-1.5; it stays 1 until 30 calls are scored over 4+ weeks (pre-registered). In-sample Brier before / after is shown for transparency, not as proof. k cannot fix base rates that are themselves off: compare stated vs came true overall."
  },
  "briefing": {
-  "at": "2026-11-09T12:50:16.000Z",
+  "at": "2026-11-09T14:02:25.000Z",
   "publicOnly": "Near-inside information here means reading public data early and carefully: CFTC positioning, funding and stress gauges, central-bank wording and the release calendar, expectations captured before each release, real yields and the dollar. Nothing on this page is, or uses, non-public information.",
   "insights": [
    {
@@ -841,7 +841,7 @@
     "lean": 0,
     "fx": "Hot → EUR/USD down (DXY up), USD/JPY up; cool the reverse.",
     "k": "event",
-    "score": 2.94,
+    "score": 2.96,
     "event": {
      "title": "Core CPI m/m",
      "country": "USD",
@@ -890,8 +890,8 @@
       "source": "FRED BAMLH0A0HYM2 (ICE BofA)"
      },
      {
-      "text": "SOFR − EFFR 4 bp",
-      "asOf": "2026-11-05",
+      "text": "SOFR − EFFR 1 bp",
+      "asOf": "2026-11-06",
       "source": "NY Fed SOFR / EFFR via FRED"
      }
     ],
@@ -5010,7 +5010,7 @@
   },
   "publicOnly": true
  },
- "brief": "Macro veteran, 2026-11-09 12:50 UTC. Shock: Risk-off / de-risking, funding still calm (medium). Consensus with the strategist: AUCTION · 4 agree, 1 qualify, 1 disagree (Real yields); qualified: Positioning. No macro edge from either member: auction. Direction comes from the technical systems; the macro layer sets event risk and size only. Event within 72 hours (Core CPI m/m): the bias is conditional until the print. Fails if 10Y TIPS real yield above 2.75% (+15 bp from 2.60%) ends the real-rate support; DXY above 103.9 (+1.5%) says the dollar channel has turned; a weekly close below the 10-week average 4160 removes the trend tiebreaker. Ledger: P(gold up over 20 days) 57% vs base 57%, 0 resolved. Teaching: The strategist has adopted none of the veteran's challengers yet. v_ry4w hit 51%, t 0.59 vs ry hit 52%, t 0.88; v_d2_4w hit 52%, t 1.02 vs dgs2 hit 54%, t 2.12; v_dxy4w hit 50%, t -0.04 vs dxymom hit 49%, t -0.58. A challenger is adopted when it is proven on the replay (t ≥ 3, n ≥ 30) and beats its incumbent; it is handed back when it stops being proven. Briefing: 1. USD Core CPI m/m on Tue, 10 Nov is the week's pivot | 2. Stress gauges are lit (VIX 28, curve inverted), funding still calm | 3. Real yields fell 27 bp in 4 weeks (10Y TIPS 2.60%) | H1 (52%): If gold stays below $4,100 (round number), it closes at or below $4,045 (20-day average) by 2026-11-13 before any close above $4,100 | H2 (63%): Gold's daily closes stay between $3,891 (last week's low) and $4,147 (last week's high) every day through 2026-11-13 | H3 (56%): DXY closes 2026-12-04 below 102.36 (the latest close) At a glance: This week: no macro edge for gold, neutral (57% chance it is higher by 4 Dec, base 57%). USD Core CPI m/m (Tue 10 Nov, 13:30 UTC) is the event that matters most. Watch $4,100 above and $4,045 below. Event playbook: USD Core CPI m/m 2026-11-10 13:30 UTC: consensus 0.2% (previous 0.3%); P(gold up on the day) 58% vs base 54%; past CPI days n 85, gold up 59%, median |move| 0.629%. Act after the release, not before (¼ starter). Descriptive, not a tested edge.",
+ "brief": "Macro veteran, 2026-11-09 14:02 UTC. Shock: Risk-off / de-risking, funding still calm (medium). Consensus with the strategist: AUCTION · 4 agree, 1 qualify, 1 disagree (Real yields); qualified: Positioning. No macro edge from either member: auction. Direction comes from the technical systems; the macro layer sets event risk and size only. Event within 72 hours (Core CPI m/m): the bias is conditional until the print. Fails if 10Y TIPS real yield above 2.75% (+15 bp from 2.60%) ends the real-rate support; DXY above 103.9 (+1.5%) says the dollar channel has turned; a weekly close below the 10-week average 4160 removes the trend tiebreaker. Ledger: P(gold up over 20 days) 57% vs base 57%, 0 resolved. Teaching: The strategist has adopted none of the veteran's challengers yet. v_ry4w hit 51%, t 0.59 vs ry hit 52%, t 0.88; v_d2_4w hit 52%, t 1.02 vs dgs2 hit 54%, t 2.12; v_dxy4w hit 50%, t -0.04 vs dxymom hit 49%, t -0.58. A challenger is adopted when it is proven on the replay (t ≥ 3, n ≥ 30) and beats its incumbent; it is handed back when it stops being proven. Briefing: 1. USD Core CPI m/m on Tue, 10 Nov is the week's pivot | 2. Stress gauges are lit (VIX 28, curve inverted), funding still calm | 3. Real yields fell 27 bp in 4 weeks (10Y TIPS 2.60%) | H1 (52%): If gold stays below $4,100 (round number), it closes at or below $4,045 (20-day average) by 2026-11-13 before any close above $4,100 | H2 (63%): Gold's daily closes stay between $3,891 (last week's low) and $4,147 (last week's high) every day through 2026-11-13 | H3 (56%): DXY closes 2026-12-04 below 102.36 (the latest close) At a glance: This week: no macro edge for gold, neutral (57% chance it is higher by 4 Dec, base 57%). USD Core CPI m/m (Tue 10 Nov, 13:30 UTC) is the event that matters most. Watch $4,100 above and $4,045 below. Event playbook: USD Core CPI m/m 2026-11-10 13:30 UTC: consensus 0.2% (previous 0.3%); P(gold up on the day) 58% vs base 54%; past CPI days n 85, gold up 59%, median |move| 0.629%. Act after the release, not before (¼ starter). Descriptive, not a tested edge.",
  "eventsRecord": {
   "n": 0,
   "open": 1
