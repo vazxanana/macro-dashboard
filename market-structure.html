@@ -6600,7 +6600,7 @@ function msNextSetup(bars, A) {
   // became of it, the orders and the fills, so the owner can study the edge on recent candles (8 Nov)
   async function litReplay() {
     const box = document.getElementById('lit-replay'); if (!box) return;
-    let R = null; try { const r = await fetch(window.MS_CDATA + 'lit/replay.json?t=' + Math.floor(Date.now() / 600000), { cache: 'no-store' }); R = r.ok ? await r.json() : null; } catch (e) {}
+    let R = null; try { const r = await fetch(window.MS_CDATA + 'lit/replay.json?t=' + Math.floor(Date.now() / 600000), { cache: 'no-store' }); R = r.ok ? JSON.parse(await r.text(), (k, v) => (typeof v === 'string' ? v.replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c])) : v)) : null; } catch (e) {}   // every string escaped once (9 Nov audit)
     if (!R) { box.innerHTML = '<div class="ms-k"><span>Last two months, replayed</span></div><div class="ct-empty">The replay has not run yet. It runs once a day in the council loop and lands here.</div>'; return; }
     const when = (t) => new Date(t * 1000).toLocaleString(undefined, { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' }), fR = (v) => `${v > 0 ? '+' : v < 0 ? '−' : ''}${Math.abs(v).toFixed(2)}R`;
     const LV = { acc: 'accumulation extreme', pd: 'previous day', pw: 'previous week', eqh: 'equal highs / lows', ASIA: 'Asia session', LONDON: 'London session', NY_AM: 'NY morning' };
@@ -7978,7 +7978,7 @@ function msNextSetup(bars, A) {
     PICK.clear(); const A = L.filter(isA).sort((a, b) => a.signalAt - b.signalAt), cl = [];
     const IDX = new Set(['nq', 'es', 'ym', 'rty']);   // clusters are the four indices only; gold and FX are their own bets (skill §26)
     for (const x of A) { const c = cl[cl.length - 1]; if (c && IDX.has(x.market) && IDX.has(c[0].market) && c[0].side === x.side && x.signalAt - c[0].signalAt <= 3 * 3600 && !c.some((y) => y.market === x.market)) c.push(x); else cl.push([x]); }
-    for (const c of cl) { const best = c.slice().sort((a, b) => (b.grade.total - a.grade.total) || ((b.feat.body || 0) - (a.feat.body || 0)) || (a.signalAt - b.signalAt))[0]; for (const x of c) PICK.set(x.id, { pick: x === best, n: c.length }); }
+    for (const c of cl) { const best = c.slice().sort((a, b) => (((b.grade || {}).total || 0) - ((a.grade || {}).total || 0)) || (((b.feat || {}).body || 0) - ((a.feat || {}).body || 0)) || (a.signalAt - b.signalAt))[0]; for (const x of c) PICK.set(x.id, { pick: x === best, n: c.length }); }
   }
   // audit (7 Nov): in Both, a signal the live tracker took is not counted again from the replay (same market, side and candle)
   const all = () => { const lv = new Set(S.trades.map((x) => x.id)); const L = S.src === 'live' ? S.trades : S.src === 'replay' ? S.replay : S.trades.concat(S.replay.filter((x) => !lv.has(String(x.id).replace(/-r$/, '')))); markClusters(L);
@@ -8043,7 +8043,7 @@ function msNextSetup(bars, A) {
     $('ict-eq').innerHTML = Cs.length ? `<svg viewBox="0 0 ${W} ${Hh}" preserveAspectRatio="none" role="img" aria-label="Equity: ${fR(R3)} with the model's exit, ${fR(R2)} with a fixed 2R"><line x1="0" x2="${W}" y1="${y0}" y2="${y0}" stroke="var(--line-strong)" stroke-dasharray="3 4"/><path d="${path(B)}" fill="none" stroke="#6f8fd6" stroke-width="2" vector-effect="non-scaling-stroke"/><path d="${path(A)}" fill="none" stroke="var(--gold)" stroke-width="2" vector-effect="non-scaling-stroke"/></svg>`
       : '<p class="ms-note">The curve starts with the first closed signal.</p>';
     // breakdowns
-    const groups = [['Market', (x) => x.short], ['Side', (x) => x.side], ['Grade', (x) => x.grade.letter], ['Session', (x) => x.feat.session], ['Daily bias', (x) => x.feat.bias || 'n/a'], ['Premium / discount', (x) => x.feat.zone || 'n/a'],
+    const groups = [['Market', (x) => x.short], ['Side', (x) => x.side], ['Grade', (x) => (x.grade || {}).letter || 'n/a'], ['Session', (x) => (x.feat || {}).session || 'n/a'], ['Daily bias', (x) => (x.feat || {}).bias || 'n/a'], ['Premium / discount', (x) => x.feat.zone || 'n/a'],
       ['Prev-day high/low swept', (x) => (x.feat.pdSweep ? 'yes' : 'no')], ['Sweep into a D1/H4 FVG', (x) => (x.feat.htfFvg === undefined ? 'n/a' : x.feat.htfFvg || 'no')], ['Daily candle closure', (x) => (x.feat.cc === undefined ? 'n/a' : x.feat.cc > 0 ? 'agrees' : x.feat.cc < 0 ? 'against' : 'neutral')], ['Valid (internal level untouched)', (x) => (x.valid ? 'yes' : 'no')], ['My review', (x) => (myRev(x) && myRev(x).grade) || 'not graded']];
     const mx = Math.max(0.5, ...groups.flatMap(([, f]) => { const g = {}; C.forEach((x) => { const k = f(x); (g[k] = g[k] || []).push(x.R); }); return Object.values(g).map((a) => Math.abs(a.reduce((s, v) => s + v, 0) / a.length)); }));
     $('ict-break').innerHTML = C.length ? groups.map(([name, f]) => { const g = {}; C.forEach((x) => { const k = f(x); (g[k] = g[k] || []).push(x.R); });
@@ -8223,7 +8223,7 @@ function msNextSetup(bars, A) {
     const x = S.trades.concat(S.replay).find((t) => t.id === id); if (!x) return; S.cur = x;
     const f = x.feat, g = x.grade;
     $('ict-tv-t').innerHTML = `<span class="ms-chip ${x.side === 'sell' ? 'ms-chip-sell' : 'ms-chip-buy'}">${x.side.toUpperCase()}</span> ${esc(x.label)} <span class="ict-g ${gcls(g.letter)}">${esc(g.letter)}</span>`;
-    { const f = x.feat, ck = [['Liquidity swept', true], ['Inversion within 6 H1 candles', true], ['Against the daily bias', f.bias === 'against'], ['Grade B+ or better', x.grade.total >= 7], ['Strong body (≥ 60%)', f.body >= 0.6], ['Not NY PM', f.session !== 'NY PM'], ['Room to the next liquidity ≥ 2R', x.grade.rr >= 2], ['Internal level untouched', !!x.valid]];
+    { const f = x.feat || {}, ck = [['Liquidity swept', true], ['Inversion within 6 H1 candles', true], ['Against the daily bias', f.bias === 'against'], ['Grade B+ or better', ((x.grade || {}).total || 0) >= 7], ['Strong body (≥ 60%)', f.body >= 0.6], ['Not NY PM', f.session !== 'NY PM'], ['Room to the next liquidity ≥ 2R', x.grade.rr >= 2], ['Internal level untouched', !!x.valid]];
       $('ict-tv-ck').innerHTML = ck.map(([t, ok]) => `<li class="${ok ? 'y' : 'n'}">${ok ? '✓' : '✕'} ${esc(t)}</li>`).join('') + `<li>${isAP(x) ? 'A+ setup' : isA(x) ? 'A-setup' : 'Not an A-setup'}${x.size != null && x.size !== 1 ? ` · size ${x.size}×` : ''}</li>` + (isA(x) && ['nq', 'es', 'ym', 'rty'].includes(x.market) ? `<li>Fred's entry (skill §30): wait up to 6 h for an M5 iFVG on the same side, enter on that candle's close, keep the H1 stop; no M5 signal = no trade</li>` : ''); }
     $('ict-tv-s').textContent = `Signal ${tm(x.signalAt)} · ${f.session} · bias ${f.bias || 'n/a'} · ${f.zone || 'n/a'}${f.pdSweep ? ' · prev-day level swept' : ''} · grade ${g.total}/10 (strength ${g.strength}/4, speed ${g.speed}/3, room ${g.rr}/3) · `
       + `entry ${fx(x.entry, x.market)}, stop ${fx(x.stop, x.market)}, ${x.t1 != null ? `target ${fx(x.t1, x.market)}` : (x.be ? `break-even at +${x.be}R, ` : '') + 'trail from +2R, 1.5R behind'} · ${x.closed ? `${x.exit} ${fR(x.R)}` : `open ${fR(liveR(x))}`}`;
