@@ -12,6 +12,9 @@
 // out-of-order times, and jumps (a candle's true range more than JUMP_ATR times the mean true range of the 50 before it; CFG.jumpAtr).
 // Market hours: crypto 24/7; gold, forex and CME futures close Fri 17:00 – Sun 18:00 New York and halt 17:00-18:00 New York
 // daily; CME US holidays (and Christmas / New Year for forex) count as closed. Closed time never counts as stale or as a gap.
+// Council data files (9 Nov): in a council-data checkout it also runs council/datahealth.mjs over every file the site and the council
+// read (freshness per file and cadence, parse errors, sanity bands, cross-file checks) → the pseudo-feed `feeds.files` (the Data chip
+// lists it, the same alert path pages its bad files as "Council data problem") and `brief` (one-glance status for the desk / digest).
 import fs from 'node:fs';
 import path from 'node:path';
 import { sendAlerts, when, NTFY_DEFAULT, SITE } from './alerts.mjs';
@@ -188,10 +191,13 @@ export async function runChecks({ fetchFn = fetch, now = Math.floor(Date.now() /
   const st = Object.values(ordered).map((f) => f.status);
   return { at: new Date(now * 1000).toISOString(), status: st.includes('bad') ? 'bad' : st.includes('warn') ? 'warn' : 'ok', feeds: ordered, summary: summarize(ordered) };
 }
+// what pages: every bad market; an issue marked `quiet` (a council data file whose staleness the watchdog already pages) does not
 export function badList(feeds) {
   const out = [];
-  for (const [f, F] of Object.entries(feeds || {})) for (const [k, m] of Object.entries(F.markets || {})) if (m.status === 'bad')
-    out.push({ id: `${f}:${k}`, text: `${F.label} ${m.label}: ${(m.issues || []).filter((x) => x.sev === 'bad').map((x) => x.detail).join('; ')}` });
+  for (const [f, F] of Object.entries(feeds || {})) for (const [k, m] of Object.entries(F.markets || {})) {
+    const bad = (m.issues || []).filter((x) => x.sev === 'bad' && !x.quiet);
+    if (m.status === 'bad' && (bad.length || !(m.issues || []).length)) out.push({ id: `${f}:${k}`, text: `${F.label} ${m.label}: ${bad.map((x) => x.detail).join('; ')}` });
+  }
   return out;
 }
 export function summarize(feeds) {
@@ -213,8 +219,12 @@ export function alertDecision(health, prev, now) {
   const mark = (k, items) => ({ key: k, at: new Date(now * 1000).toISOString(), items });
   const state = { streak, sent };
   if (conf.length && fresh.length && (!sent.key || now - last >= CFG.minGapMin * 60)) {
-    return { alert: { streak, sent: mark(key, conf.map((b) => b.text)) }, ev: { title: `Data feed problem: ${conf.length} market${conf.length > 1 ? 's' : ''}`,
-      msg: `${conf.map((b) => '• ' + b.text).join('\n')}\nCheck those candles before trusting new signals on them.\n${when(now)}`, tags: 'warning', click: SITE } };
+    // candle feeds keep their wording; council data files (council/datahealth.mjs, ids files:<path>) say so
+    const nf = conf.filter((b) => b.id.startsWith('files:')).length, n = conf.length, s = n > 1 ? 's' : '';
+    const title = !nf ? `Data feed problem: ${n} market${s}` : nf === n ? `Council data problem: ${n} file${s}` : `Data problem: ${n} items`;
+    const tail = nf === n ? 'Details: Council page → Data chip (health.json).' : 'Check those candles before trusting new signals on them.';
+    return { alert: { streak, sent: mark(key, conf.map((b) => b.text)) }, ev: { title,
+      msg: `${conf.map((b) => '• ' + b.text).join('\n')}\n${tail}\n${when(now)}`, tags: 'warning', click: SITE } };
   }
   if (conf.length && !fresh.length && now - last >= CFG.remindH * 3600) {
     return { alert: { streak, sent: mark(key, conf.map((b) => b.text)) }, ev: { title: 'Data feed problem continues', msg: `${conf.map((b) => '• ' + b.text).join('\n')}\n${when(now)}`, tags: 'warning', click: SITE } };
@@ -225,10 +235,20 @@ export function alertDecision(health, prev, now) {
   return { alert: state, ev: null };
 }
 
-export async function main(dir, { env = process.env, fetchFn = fetch, now = Math.floor(Date.now() / 1000), pause } = {}) {
+export async function main(dir, { env = process.env, fetchFn = fetch, now = Math.floor(Date.now() / 1000), pause, files = true } = {}) {
   const file = path.join(dir, 'health.json'), rd = (f) => { try { return JSON.parse(fs.readFileSync(path.join(dir, f), 'utf8')); } catch (e) { return null; } };
   const prev = rd('health.json');
   const health = await runChecks({ fetchFn, now, pause });
+  // the council data files (council/datahealth.mjs, 9 Nov): only in a council-data checkout; a bug there never stops the candle check
+  if (files && fs.existsSync(path.join(dir, 'snapshot.json'))) {
+    try {
+      const { checkFiles, fsReader, asFeed } = await import('./datahealth.mjs');
+      health.feeds.files = asFeed(checkFiles(fsReader(dir), now, { skip: ['health.json'] }));
+      const st = Object.values(health.feeds).map((f) => f.status);
+      health.status = st.includes('bad') ? 'bad' : st.includes('warn') ? 'warn' : 'ok'; health.summary = summarize(health.feeds);
+    } catch (e) { health.filesError = String((e && e.message) || e).slice(0, 160); }
+  }
+  try { health.brief = (await import('./datahealth.mjs')).brief(health.feeds); } catch (e) { /* summary only */ }
   const d = alertDecision(health, prev && prev.alert, now);
   health.alert = d.alert;
   if (d.ev) {
@@ -248,8 +268,8 @@ export async function main(dir, { env = process.env, fetchFn = fetch, now = Math
 
 if (process.argv[1] && process.argv[1].endsWith('datacheck.mjs')) {
   main(process.argv[2] || 'data').then((h) => {
-    console.log(`Data check ${h.status}: ${h.summary}`);
-    for (const [f, F] of Object.entries(h.feeds)) console.log(`  ${f}: ${F.status} — ${Object.entries(F.markets).map(([k, m]) => `${k} ${m.status}${m.staleMin ? ` (${m.staleMin}m)` : ''}${m.maxJump ? ` j${m.maxJump}` : ''}`).join(', ')}`);
+    console.log(`Data check ${h.status}: ${h.summary}${h.brief ? `\n  ${h.brief.line}` : ''}`);
+    for (const [f, F] of Object.entries(h.feeds)) console.log(`  ${f}: ${F.status} — ${Object.entries(F.markets).filter(([, m]) => f !== 'files' || m.status !== 'ok').map(([k, m]) => `${k} ${m.status}${m.staleMin ? ` (${m.staleMin}m)` : ''}${m.maxJump ? ` j${m.maxJump}` : ''}`).join(', ')}`);
     if (h.alertError) console.log('  alert not sent:', JSON.stringify(h.alertError));
   }).catch((e) => { console.log('Data check failed:', (e && e.message) || e); });   // never fails the round
 }

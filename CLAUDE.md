@@ -424,6 +424,22 @@ loop it watches; it trades nothing and restarts nothing (council.yml's cron job 
 day), zero data-branch push rejections in the logs read; the loop now aborts a stuck rebase and retries the hand-over dispatch.
 Tests: `tests/health.test.mjs`.
 
+## Council data files health (9 Nov 2026, reliability: no silently broken feed)
+`council/datahealth.mjs` (pure, injected reader + clock; `node council/datahealth.mjs <dir>` prints the report) holds the inventory
+`FILES` of every council-data file the site and council read, with its writer, cadence and per-file thresholds: wall clock for the
+24/7 loop files, open CME minutes for the ICT desk (`openSecs('cme')`), US business days (bond holidays too) for FRED inputs and
+reviews, the CFTC Tuesday/Friday week for COT, the digest's send days (`digestDue`) and the macro log's target days (`historyDue`).
+Content checks: parse / missing, sanity bands (`PX` prices, `LV` VIX / yields / curve / DXY / P(up) cap / scores), cross-file checks
+(spot gold vs the GC future, the Trader vs mt5/signals.csv, config `btAt` vs backtest.json, veteran vs strategist, trade levels).
+`datacheck.mjs` runs it in a council-data checkout (skips health.json itself) and stores it in health.json as the pseudo-feed
+`feeds.files` (label "Council data files", per file `{ label, status, ageMin, issues }`) plus `brief` (`{ status, line, bad, warn,
+notes }` across candles and files); `status` / `summary` include it, so the admin Data chip, week pane and digest show it with no
+page change (a dedicated desk tile would read `health.brief`). Severities: bad pages through datacheck's alert ("Council data
+problem: n files", 2 checks in a row, 12 h reminder) unless the issue is `quiet` (staleness the watchdog already pages: snapshot,
+state, mt5 csv, ICT, health.json); warn shows; note is a standing gap listed only. The loop's data check flags a watchdog.json older
+than 3 h (pages at 12 h), so loop and watchdog watch each other. Thresholds are monitoring only, never trading rules. Tests:
+`tests/datahealth.test.mjs`.
+
 ## council-data sync and safe writes (9 Nov 2026, reliability audit)
 Every pull / save of council-data in council.yml (round, quick pass, account minute) and watchdog.yml goes through
 `node council/datasync.mjs data pull` / `save "<msg>" [paths]`: uncommitted files ride along (autostash), a half-done rebase or
