@@ -2459,13 +2459,60 @@ html[data-motion="off"][data-gate] .gate-bg path[stroke] { animation: none; stro
 #v-ict .ict-m .px { font: 600 18px var(--mono); letter-spacing: -.01em; margin: 2px 0; }
 #v-ict .ict-m .sub { font-size: 12px; }
 /* 2 · results: a ledger of the totals next to the equity curve (no hero-number tiles) */
-#v-ict .ict-res-g { display: grid; grid-template-columns: minmax(250px, 330px) minmax(0, 1fr); gap: 16px 32px; align-items: start; }
-#v-ict .ict-kpi { display: grid; grid-template-columns: minmax(0, 1fr); gap: 0; background: none; border: 0; border-radius: 0; overflow: visible; }
-#v-ict .ict-kpi > div { background: none; padding: 9px 0; display: grid; grid-template-columns: minmax(0, 1fr) auto; grid-template-areas: "k v" "s v"; column-gap: 16px; row-gap: 1px; align-items: center; border-bottom: 1px solid var(--line-soft); }
-#v-ict .ict-kpi > div:first-child { padding-top: 0; } #v-ict .ict-kpi > div:last-child { border-bottom: 0; padding-bottom: 0; }
-#v-ict .ict-kpi span { grid-area: k; font: 600 13px var(--sans); color: var(--ink); }
-#v-ict .ict-kpi small { grid-area: s; font: 500 12px var(--sans); color: var(--ink-faint); }
-#v-ict .ict-kpi b { grid-area: v; font: 600 17px var(--mono); text-align: right; color: var(--ink); }
+/* edge summary (9 Nov): eight tiles over the equity curve */
+#v-ict .ict-res-g { display: grid; grid-template-columns: minmax(0, 1fr); gap: 18px; }
+#v-ict .ict-kpi { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 1px; background: var(--line-soft); border: 1px solid var(--line-soft); border-radius: 12px; overflow: hidden; }
+#v-ict .ict-kpi > div { background: var(--panel); padding: 12px 14px; display: grid; gap: 3px; align-content: start; min-width: 0; }
+#v-ict .ict-kpi span { font: 600 12px var(--sans); color: var(--ink-dim); }
+#v-ict .ict-kpi b { font: 600 20px var(--mono); letter-spacing: -.01em; color: var(--ink); font-variant-numeric: tabular-nums; }
+#v-ict .ict-kpi small { font: 500 11.5px/1.4 var(--sans); color: var(--ink-faint); overflow-wrap: anywhere; }
+#v-ict .ict-eq-l small { color: var(--ink-faint); margin-left: 6px; font-weight: 500; }
+#v-ict .ict-stale { color: var(--ict-dn); font-weight: 600; }
+/* live-trade cards: R now, a -1R..+3R track (fill from the entry, the stop, the best price), the levels and the time left */
+#v-ict .ict-open li { gap: 10px; }
+#v-ict .ict-open .r1 { display: flex; flex-wrap: wrap; align-items: center; }
+#v-ict .ict-open .r1 .mk { font: 700 15px var(--sans); }
+#v-ict .ict-open .r1 .live { margin-left: auto; display: grid; justify-items: end; line-height: 1.1; }
+#v-ict .ict-open .r1 .live small { font: 500 11px var(--sans); color: var(--ink-faint); }
+#v-ict .ict-open li.sep { all: unset; display: block; font: 600 12px var(--sans); color: var(--ink-faint); padding: 6px 2px 0; }
+#v-ict .ict-open li:has(.ict-rp) { background: none; border-style: dashed; }
+#v-ict .ict-trk { position: relative; height: 8px; border-radius: 4px; background: var(--line-soft); margin: 2px 0 0; }
+#v-ict .ict-trk .f { position: absolute; top: 0; bottom: 0; border-radius: 4px; }
+#v-ict .ict-trk .f.up { background: color-mix(in srgb, var(--ict-up) 70%, transparent); } #v-ict .ict-trk .f.dn { background: color-mix(in srgb, var(--ict-dn) 70%, transparent); }
+#v-ict .ict-trk .tk { position: absolute; top: -3px; bottom: -3px; width: 1px; background: var(--ink-faint); }
+#v-ict .ict-trk .tk.z { width: 2px; background: var(--ink-dim); }
+#v-ict .ict-trk .sp { position: absolute; top: -4px; bottom: -4px; width: 3px; margin-left: -1px; border-radius: 2px; background: var(--ict-dn); }
+#v-ict .ict-trk .bs { position: absolute; top: 50%; width: 7px; height: 7px; margin: -3.5px 0 0 -3.5px; border-radius: 50%; border: 1.5px solid var(--ict-gold-ink); background: var(--panel); }
+#v-ict .ict-trk .nw { position: absolute; top: 50%; width: 12px; height: 12px; margin: -6px 0 0 -6px; border-radius: 50%; border: 2px solid var(--panel-raised); box-shadow: 0 0 0 1px var(--line-strong); }
+#v-ict .ict-trk .nw.up { background: var(--ict-up); } #v-ict .ict-trk .nw.dn { background: var(--ict-dn); }
+#v-ict .ict-trk-l { position: relative; height: 14px; font: 500 10.5px var(--sans); color: var(--ink-faint); }
+#v-ict .ict-trk-l span { position: absolute; transform: translateX(-50%); white-space: nowrap; } #v-ict .ict-trk-l span:first-child { transform: none; }
+#v-ict .ict-lv { display: grid; grid-template-columns: repeat(auto-fill, minmax(104px, 1fr)); gap: 8px 14px; margin: 0; }
+#v-ict .ict-lv > div { min-width: 0; }
+#v-ict .ict-lv dt { font: 500 11px var(--sans); color: var(--ink-faint); }
+#v-ict .ict-lv dd { margin: 1px 0 0; font: 600 13.5px var(--mono); color: var(--ink); font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
+#v-ict .ict-lv dd small { display: block; font: 500 11px/1.35 var(--sans); color: var(--ink-dim); }
+#v-ict .ict-lv .mv dd small { color: var(--ict-gold-ink); }
+/* what works: thin samples faded, rows open their signals */
+#v-ict .ict-break tr.few td { color: var(--ink-faint); } #v-ict .ict-break tr.few .bar { opacity: .45; }
+#v-ict .ict-few { font: 600 9.5px var(--sans); letter-spacing: .04em; text-transform: uppercase; color: var(--ink-faint); border: 1px solid var(--line); border-radius: 4px; padding: 0 4px; margin-left: 4px; vertical-align: 1px; }
+#v-ict .ict-break tr.go { cursor: pointer; } #v-ict .ict-break tr.go:hover td { background: var(--panel-raised); }
+#v-ict .ict-break tr.go:focus-visible { outline: 2px solid var(--gold); outline-offset: -2px; }
+#v-ict .ict-break td:first-child { overflow-wrap: anywhere; }
+/* signal filters: a row of selects under the title, the count and result of what is listed */
+#v-ict .ict-sig-h { flex-wrap: wrap; gap: 4px 12px; }
+#v-ict #ict-f-n { font: 500 12.5px var(--sans); color: var(--ink-dim); } #v-ict #ict-f-n:focus { outline: none; }
+#v-ict .ict-f { display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 12px; }
+#v-ict .ict-f select { min-height: 34px; }
+#v-ict .ict-cal-tz { font: 500 12px var(--sans); color: var(--ink-faint); margin-left: 6px; }
+#v-ict .ict-cal-nav .ms-tbtn[disabled] { opacity: .35; cursor: default; }
+/* signal sheet: levels, then the rule checklist in groups */
+#v-ict .ict-tv-lv { margin: 10px 16px 0; padding: 10px 12px; border: 1px solid var(--line-soft); border-radius: 10px; }
+#v-ict .ict-ck li.h { border: 0; padding: 3px 0 0; margin-left: 4px; font: 600 11px var(--sans); color: var(--ink-faint); text-transform: uppercase; letter-spacing: .05em; flex-basis: 100%; }
+#v-ict .ict-ck li.h:first-child { padding-top: 0; }
+#v-ict .ict-ck li.u { border-style: dashed; color: var(--ink-faint); }
+#v-ict .ict-ck li.v { border-color: var(--gold-line); color: var(--ict-gold-ink); font-weight: 600; margin-top: 4px; }
+#v-ict .ict-ck li.tip { flex-basis: 100%; border-radius: 10px; line-height: 1.45; }
 #v-ict .ict-eq-w { min-width: 0; }
 #v-ict .ict-eq-l { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 4px 14px; font: 500 12px var(--sans); color: var(--ink-faint); margin-bottom: 8px; }
 #v-ict .ict-eq svg { height: 230px; }
@@ -2500,6 +2547,7 @@ html[data-motion="off"][data-gate] .gate-bg path[stroke] { animation: none; stro
 #v-ict .ict-ck li.y { color: var(--ict-up); } #v-ict .ict-ck li.n { color: var(--ict-dn); }
 @media (max-width: 1000px) {
   #v-ict .ict-now, #v-ict .ict-res-g { grid-template-columns: minmax(0, 1fr); }
+  #v-ict .ict-break { grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); }
   #v-ict .ict-mkts { grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); }
 }
 @media (max-width: 700px) {
@@ -2529,10 +2577,17 @@ html[data-motion="off"][data-gate] .gate-bg path[stroke] { animation: none; stro
   #v-ict .ict-t td:nth-child(8)::before { content: "Entry "; font-family: var(--sans); color: var(--ink-faint); }
   #v-ict .ict-t td:nth-child(11) { grid-area: rs; text-align: right; font-weight: 600; }
   #v-ict .ict-t td:nth-child(12) { grid-area: rv; }
+  #v-ict .ict-t td:nth-child(11) .ict-pill, #v-ict .ict-t td:nth-child(11) small { display: none; }
+  #v-ict .ict-t tr.rp td:nth-child(1)::after { content: " · replay"; }
   #v-ict .ict-t td:nth-child(12):has(> .ms-note), #v-ict .ict-t td:nth-child(6), #v-ict .ict-t td:nth-child(7), #v-ict .ict-t td:nth-child(9), #v-ict .ict-t td:nth-child(10) { display: none; }
   #v-ict .ict-t tr.empty { display: block; } #v-ict .ict-t tr.empty td { white-space: normal; padding: 18px 4px !important; }
-  #v-ict .ict-f { width: 100%; } #v-ict .ict-f select { flex: 1; min-width: 0; }
-  #v-ict .ms-k:has(.ict-f) { flex-wrap: wrap; }
+  #v-ict .ict-f { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); } #v-ict .ict-f select { min-width: 0; width: 100%; }
+  #v-ict #ict-f-x { grid-column: 1 / -1; }
+  #v-ict .ict-kpi { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  #v-ict .ict-kpi b { font-size: 17px; }
+  #v-ict .ict-lv { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px 10px; }
+  #v-ict .ict-tv-lv { margin: 8px 12px 0; }
+  #v-ict .ict-break { grid-template-columns: minmax(0, 1fr); }
 }
 /* touch: 44px targets */
 @media (pointer: coarse), (max-width: 700px) {
@@ -3256,10 +3311,10 @@ html[data-motion="off"] #v-ict .ict-cal-d:hover { transform: none !important; }
     </div>
     <div class="ict-mkts" id="ict-mkts" role="list" aria-label="Markets"></div>
     <div class="card ict-card ict-res">
-      <div class="ms-k"><h2 class="ict-h">Results</h2><small>closed signals in the current view</small></div>
+      <div class="ms-k"><h2 class="ict-h">How the edge is doing</h2><small>closed signals in the current view (source and setups above) · R as booked, x size</small></div>
       <div class="ict-res-g">
         <div class="ict-kpi" id="ict-kpi" role="group" aria-label="Results"></div>
-        <div class="ict-eq-w"><div class="ict-eq-l"><span>Equity, R per signal</span><span><i class="ict-sw a"></i>the model (trail) <i class="ict-sw b"></i>fixed 2R</span></div><div class="ict-eq" id="ict-eq"></div></div>
+        <div class="ict-eq-w"><div class="ict-eq-l"><span>Equity, R per signal <small id="ict-eq-d"></small></span><span><i class="ict-sw a"></i>the model (trail) <i class="ict-sw b"></i>fixed 2R</span></div><div class="ict-eq" id="ict-eq"></div></div>
       </div>
     </div>
     <div class="card ict-card ict-dip-c">
@@ -3267,21 +3322,25 @@ html[data-motion="off"] #v-ict .ict-cal-d:hover { transform: none !important; }
       <div class="ict-break ict-dip" id="ict-dip"></div>
     </div>
     <div class="card ict-card">
-      <div class="ms-k"><h2 class="ict-h">What works</h2><small>closed signals split by market, session and each ICT feature · the model's exit</small></div>
+      <div class="ms-k"><h2 class="ict-h">What works</h2><small>closed signals by setup, market, session, grade and each ICT feature · faded rows: under 20 signals · tap a row to list its signals</small></div>
       <div class="ict-break" id="ict-break"></div>
     </div>
     <div class="card ict-card">
-      <div class="ms-k"><h2 class="ict-h">P&amp;L calendar</h2><span class="ict-cal-nav"><button type="button" class="ms-tbtn" id="ict-cal-prev" aria-label="Previous month">‹</button><b id="ict-cal-m" aria-live="polite"></b><button type="button" class="ms-tbtn" id="ict-cal-next" aria-label="Next month">›</button></span></div>
+      <div class="ms-k"><h2 class="ict-h">P&amp;L calendar <small class="ict-cal-tz">New York days</small></h2><span class="ict-cal-nav"><button type="button" class="ms-tbtn" id="ict-cal-prev" aria-label="Previous month">‹</button><b id="ict-cal-m" aria-live="polite"></b><button type="button" class="ms-tbtn" id="ict-cal-next" aria-label="Next month">›</button></span></div>
       <div class="ict-cal" id="ict-cal"></div>
       <ul class="ict-cal-day" id="ict-cal-day"></ul>
     </div>
-    <div class="card ict-card">
-      <div class="ms-k"><h2 class="ict-h">Signals</h2>
-        <span class="ict-f" id="ict-f" role="group" aria-label="Filter signals">
-          <select id="ict-f-m" aria-label="Market"><option value="">All markets</option><option value="nq">NQ</option><option value="es">ES</option><option value="ym">YM</option><option value="rty">RTY</option><option value="gc">Gold (GC)</option></select>
-          <select id="ict-f-s" aria-label="Status"><option value="">All</option><option value="open">Open</option><option value="closed">Closed</option><option value="todo">Not reviewed</option><option value="taken" class="ict-rw">Taken by me</option></select>
-        </span></div>
-      <div class="ms-j-wrap t-scroll ict-tw"><table class="ms-j ict-t"><thead><tr><th>Signal</th><th>Market</th><th>Side</th><th>Grade</th><th>Session</th><th>Bias</th><th>Zone</th><th class="n">Entry</th><th class="n">Stop</th><th class="n">Target</th><th>Result</th><th>Review</th></tr></thead><tbody id="ict-body"><tr class="empty"><td colspan="12">Loading…</td></tr></tbody></table></div>
+    <div class="card ict-card" id="ict-sig">
+      <div class="ms-k ict-sig-h"><h2 class="ict-h">Signals</h2><small id="ict-f-n" tabindex="-1" aria-live="polite"></small></div>
+      <div class="ict-f" id="ict-f" role="group" aria-label="Filter signals">
+        <select id="ict-f-m" aria-label="Market"><option value="">All markets</option><option value="nq">NQ</option><option value="es">ES</option><option value="ym">YM</option><option value="rty">RTY</option><option value="gc">Gold (GC)</option></select>
+        <select id="ict-f-d" aria-label="Side"><option value="">Buys and sells</option><option value="buy">Buys</option><option value="sell">Sells</option></select>
+        <select id="ict-f-se" aria-label="Session"><option value="">All sessions</option></select>
+        <select id="ict-f-g" aria-label="Grade"><option value="">All grades</option></select>
+        <select id="ict-f-s" aria-label="Status"><option value="">Open and closed</option><option value="open">Open</option><option value="closed">Closed</option><option value="todo">Not reviewed</option><option value="taken" class="ict-rw">Taken by me</option></select>
+        <button type="button" class="ms-tbtn" id="ict-f-x" hidden>Clear filters</button>
+      </div>
+      <div class="ms-j-wrap t-scroll ict-tw"><table class="ms-j ict-t"><thead><tr><th>Signal (ET)</th><th>Market</th><th>Side</th><th>Grade</th><th>Session</th><th>Bias</th><th>Zone</th><th class="n">Entry</th><th class="n">Stop</th><th class="n">Target</th><th>Result</th><th>Review</th></tr></thead><tbody id="ict-body"><tr class="empty"><td colspan="12">Loading…</td></tr></tbody></table></div>
     </div>
     <div class="ict-grid ict-rw">
       <div class="card ict-card">
@@ -3319,6 +3378,7 @@ html[data-motion="off"] #v-ict .ict-cal-d:hover { transform: none !important; }
     <dialog class="tv ict-tv" id="ict-tv" aria-labelledby="ict-tv-t">
       <div class="tv-h"><div><h3 id="ict-tv-t">Signal</h3><p id="ict-tv-s"></p></div><div class="ict-tv-tf" role="group" aria-label="Timeframe"><button type="button" data-tf="m5" aria-pressed="false">M5</button><button type="button" data-tf="m15" aria-pressed="false">M15</button><button type="button" data-tf="h1" class="on" aria-pressed="true">H1</button><button type="button" data-tf="h4" aria-pressed="false">H4</button></div><button type="button" class="tv-x" id="ict-tv-x" aria-label="Close">×</button></div>
       <div class="ict-tv-c" id="ict-tv-c"></div>
+      <dl class="ict-lv ict-tv-lv" id="ict-tv-lv"></dl>
       <ul class="ict-ck" id="ict-tv-ck" aria-label="Signal checklist"></ul>
       <p class="ms-note" id="ict-tv-n"></p>
       <form class="ict-rv ict-rw" id="ict-rv">
@@ -7935,6 +7995,112 @@ function msNextSetup(bars, A) {
   boot();
 })();
 </script>
+<script id="ms-ict-lib">
+// ICT desk helpers (9 Nov): pure functions behind the #ict view, kept apart so tests/ict-desk.test.mjs runs them without a page.
+// Every time on the desk is New York time (the clock, the sessions, the calendar days, the signal times and the chart's axis), so
+// a reviewer in another zone reads the same day and hour as the tracker. Nothing here changes the ICT rules: it only reads records.
+(function (W) {
+  var NY = 'America/New_York', HOLD = 36, MON = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+  var fmt = {}, F = function (k, o) { return fmt[k] || (fmt[k] = new Intl.DateTimeFormat(k.indexOf('ca') === 0 ? 'en-CA' : 'en-GB', Object.assign({ timeZone: NY }, o))); };
+  var parts = function (t) { var o = {}; F('en-p', { weekday: 'short', hour: '2-digit', minute: '2-digit', hourCycle: 'h23', year: 'numeric', month: '2-digit', day: '2-digit' }).formatToParts(new Date(t * 1000)).forEach(function (p) { o[p.type] = p.value; }); return o; };
+  var num = function (v) { return typeof v === 'number' && isFinite(v) ? v : null; };
+  // NY calendar day 'YYYY-MM-DD' (the P&L calendar's day; before 9 Nov it was the browser's own day, so a Friday close showed on
+  // Saturday east of New York)
+  function nyDay(t) { return F('ca-d', { year: 'numeric', month: '2-digit', day: '2-digit' }).format(new Date(t * 1000)); }
+  // '9 Nov 20:00' (with the weekday: 'Sun 9 Nov 20:00'), New York
+  function nyTime(t, wd) { if (num(t) == null) return '—'; var p = parts(t); return (wd ? p.weekday + ' ' : '') + (+p.day) + ' ' + MON[+p.month - 1] + ' ' + p.hour + ':' + p.minute; }
+  function nyHM(t) { var p = parts(t); return p.hour + ':' + p.minute; }
+  // CME hours of the desk's futures (weekly close Fri 17:00 - Sun 18:00 ET, the 17:00-18:00 daily halt). Holidays are not known
+  // here (ict/calendar.mjs is server-side), so a time left that crosses one reads an hour or a day early: shown as "about".
+  function openHour(t) { var p = parts(t), h = +p.hour % 24, d = p.weekday;
+    if (h === 17) return false; if (d === 'Sat') return false; if (d === 'Fri' && h >= 17) return false; if (d === 'Sun' && h < 18) return false; return true; }
+  // the record as the desk draws it: missing feat / grade / short never throw (older or partial records), side and numbers checked
+  function norm(x) {
+    if (!x || typeof x !== 'object' || !x.id || !x.market) return null;
+    var y = Object.assign({}, x);
+    y.feat = x.feat && typeof x.feat === 'object' ? x.feat : {};
+    y.grade = x.grade && typeof x.grade === 'object' ? x.grade : {};
+    y.side = x.side === 'sell' ? 'sell' : x.side === 'buy' ? 'buy' : null;
+    y.short = x.short || String(x.market).toUpperCase();
+    y.label = x.label || y.short;
+    y.signalAt = num(x.signalAt) != null ? x.signalAt : num(x.opened);
+    y.opened = num(x.opened) != null ? x.opened : y.signalAt;
+    y.R = num(x.R); y.closed = num(x.closed) || null;
+    return y.side && y.signalAt != null ? y : null;
+  }
+  // floating R per unit at a price: null when there is no usable price, entry or risk (a missing snapshot price used to read
+  // (null - entry) / r0, a huge loss, or NaN)
+  function liveR(x, price) {
+    if (!x || x.status !== 'open') return null;
+    var p = num(price), e = num(x.entry), r0 = num(x.r0); if (p == null || e == null || r0 == null || r0 <= 0) return null;
+    return ((x.side === 'buy' ? 1 : -1) * (p - e)) / r0;
+  }
+  // floating R as the desk books it: per unit x size (closed records store R x size, tracker §25 / §27), so open and closed match
+  function liveRs(x, price) { var r = liveR(x, price); return r == null ? null : r * (num(x.size) || 1); }
+  // time exit (skill §21): out at the close of the 36th closed H1 candle from the signal. h1 = the tracker's closed candles
+  // ([time, o, h, l, c], ict/bars.json); hours after its last candle are counted on the CME clock. -> { held, left, endAt }
+  function holdLeft(x, h1, now, H) {
+    H = H || HOLD; var t0 = x && num(x.signalAt); if (t0 == null || num(now) == null) return null;
+    var B = Array.isArray(h1) ? h1.filter(function (b) { return b && b[0] >= t0 && b[0] + 3600 <= now; }) : [];
+    var held = B.length, t = B.length ? B[B.length - 1][0] + 3600 : Math.floor(t0 / 3600) * 3600, end = null, guard = 0;
+    for (; t + 3600 <= now && held < H && guard < 2000; t += 3600, guard++) if (openHour(t)) held++;   // closed since the feed's last candle
+    if (held >= H) return { held: H, left: 0, endAt: null };
+    var n = held; for (guard = 0; guard < 2000; t += 3600, guard++) if (openHour(t)) { n++; if (n >= H) { end = t + 3600; break; } }
+    return { held: held, left: H - held, endAt: end };
+  }
+  // summary of closed records: n, wins, win rate, total, expectancy (R / trade), average win / loss, profit factor, max drawdown
+  // (peak to trough of the running total, in close order)
+  function stats(L, f) {
+    f = f || function (x) { return x.R; };
+    var A = (L || []).filter(function (x) { return x && num(f(x)) != null; }).slice().sort(function (a, b) { return (a.closed || 0) - (b.closed || 0); });
+    var n = A.length, w = 0, l = 0, gw = 0, gl = 0, tot = 0, pk = 0, dd = 0;
+    A.forEach(function (x) { var r = f(x); tot += r; if (r > 0) { w++; gw += r; } else if (r < 0) { l++; gl -= r; } pk = Math.max(pk, tot); dd = Math.max(dd, pk - tot); });
+    return { n: n, w: w, l: l, wr: n ? w / n : null, tot: tot, exp: n ? tot / n : null, avgW: w ? gw / w : null, avgL: l ? -gl / l : null, pf: gl > 0 ? gw / gl : (gw > 0 ? Infinity : null), dd: dd };
+  }
+  // fixed orders for the breakdown rows (grades best first, sessions in the order of the day); unknown keys after, by sample size
+  var ORDER = { grade: ['A+', 'A', 'A-', 'B+', 'B', 'B-', 'C', 'n/a'], session: ['Asia', 'London', 'NY AM', 'NY PM', 'Close', 'n/a'], tier: ['A+', 'A-setup', 'Other'] };
+  function groupBy(L, key, order) {
+    var g = {}; (L || []).forEach(function (x) { var k = key(x); if (k == null || k === '') k = 'n/a'; (g[k] = g[k] || []).push(x); });
+    var O = ORDER[order] || [];
+    return Object.keys(g).map(function (k) { return { k: k, L: g[k], s: stats(g[k]) }; }).sort(function (a, b) {
+      var ia = O.indexOf(a.k), ib = O.indexOf(b.k); if (ia >= 0 || ib >= 0) return (ia < 0 ? 99 : ia) - (ib < 0 ? 99 : ib); return b.s.n - a.s.n; });
+  }
+  // the same instant as New York wall time read as UTC: the signal chart's axis (Lightweight Charts draws UTC) shows ET this way.
+  // DST changes fall on Sunday 02:00 ET, inside the weekly close, so candle times stay in order.
+  function nyShift(t) { var p = parts(t); return Date.UTC(+p.year, +p.month - 1, +p.day, +p.hour % 24, +p.minute) / 1000 + (t % 60); }
+  // the A-setup rule of the record's market, item by item (display only: the tracker's `aset` / `aplus` stay the verdict).
+  // ok: true / false, or null when an older record lacks the field. Index futures: skill §14 / §20 / §22 / §23 / §25, sized §27,
+  // A+ §17; gold (§26): buys with a 0.3-0.75x ATR stop, size 1, no A+ tier.
+  function checklist(x) {
+    var f = (x && x.feat) || {}, g = (x && x.grade) || {}, a = num(f.atrR), gold = x && x.market === 'gc', I = [];
+    var has = function (v) { return v !== undefined && v !== null; }, add = function (grp, t, ok) { I.push({ grp: grp, t: t, ok: ok }); };
+    add('model', 'Liquidity swept (H1 swing)', true); add('model', 'Inversion within 6 H1 candles', true);
+    var band = a == null ? null : a >= 0.3 && a < 0.75;
+    if (gold) {
+      add('rule', 'Buy (the gold rule takes buys only)', x.side === 'buy');
+      add('rule', 'Stop 0.3-0.75x the daily ATR' + (a != null ? ' (' + a.toFixed(2) + 'x)' : ''), band);
+    } else {
+      add('rule', 'Against the daily bias', has(f.bias) ? f.bias === 'against' : null);
+      add('rule', 'Grade B+ or better (7/10+)', has(g.total) ? g.total >= 7 : null);
+      var tight = a != null && a >= 0.15 && a < 0.3;
+      if (tight) add('rule', 'Tight stop (' + a.toFixed(2) + 'x ATR): A+ quality needed, half size', has(f.body) ? f.body >= 0.6 && f.session !== 'NY PM' : null);
+      else add('rule', 'Stop 0.3-0.75x the daily ATR' + (a != null ? ' (' + a.toFixed(2) + 'x)' : ''), band == null ? null : band);
+      add('plus', 'Strong inversion body (60%+)', has(f.body) ? f.body >= 0.6 : null);
+      add('plus', 'Not the NY afternoon (12-16 ET)', has(f.session) ? f.session !== 'NY PM' : null);
+      var room = num(x.dol) != null && num(x.entry) != null && x.r0 > 0 ? ((x.side === 'buy' ? 1 : -1) * (x.dol - x.entry)) / x.r0 : null;
+      add('plus', 'Room to the draw on liquidity 2R+ (1.5x size)' + (room != null ? ' (' + room.toFixed(1) + 'R)' : ''), room == null ? null : room >= 2);
+    }
+    add('info', 'Internal level untouched', has(x && x.valid) ? !!x.valid : null);
+    if (has(f.htfFvg)) add('info', 'Sweep into a ' + f.htfFvg + ' FVG', true);
+    if (has(f.cc) && f.cc !== 0) add('info', 'Daily candle closure ' + (f.cc > 0 ? 'agrees' : 'against'), f.cc > 0);
+    var rule = I.filter(function (q) { return q.grp === 'rule'; });
+    // every rule item passes but the tracker did not mark an A-setup: the jobs-report morning filter (skill §23, server calendar)
+    if (!gold && x && x.aset === false && rule.every(function (q) { return q.ok === true; })) add('rule', 'Not a jobs-report morning', false);
+    return I;
+  }
+  W.MS_ICT = { NY: NY, HOLD: HOLD, nyShift: nyShift, checklist: checklist, nyDay: nyDay, nyTime: nyTime, nyHM: nyHM, openHour: openHour, norm: norm, liveR: liveR, liveRs: liveRs, holdLeft: holdLeft, stats: stats, groupBy: groupBy, ORDER: ORDER };
+})(window);
+</script>
 <script>
 // ─── ICT desk (owner, 6 Nov 2026): a SEPARATE edge from the Mosha council. Reads council-data ict/ (written by
 // ict/tracker.mjs) and keeps the desk user's own reviews and taken trades (ictDesk in localStorage, ict/desk.json on
@@ -7952,13 +8118,18 @@ function msNextSetup(bars, A) {
   const fx = (v, k) => (v == null || !isFinite(v) ? '—' : (+v).toLocaleString('en-US', { minimumFractionDigits: DEC[k] ?? 2, maximumFractionDigits: DEC[k] ?? 2 }));
   const fR = (r) => (r == null ? '—' : `${r > 0 ? '+' : r < 0 ? '−' : ''}${Math.abs(r).toFixed(2)}R`);
   const cls = (r) => (r > 0 ? 'pos' : r < 0 ? 'neg' : '');
-  const tm = (t) => new Date(t * 1000).toLocaleString('en-GB', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' });
+  const ICT = window.MS_ICT;   // script#ms-ict-lib: New York times, floating R, time left, edge statistics (tests/ict-desk.test.mjs)
+  const tm = (t) => ICT.nyTime(t);   // New York time (9 Nov): before, the browser's own zone, while the clock, the sessions and the kill zones are New York
+  const fRn = (r) => (r == null || !isFinite(r) ? '—' : fR(r));
+  const grL = (x) => (x.grade && x.grade.letter) || '—';
+  const sideChip = (x) => `<span class="ms-chip ${x.side === 'sell' ? 'ms-chip-sell' : 'ms-chip-buy'}">${x.side === 'sell' ? 'SELL' : 'BUY'}</span>`;
+  const sizePill = (x) => (x.size != null && x.size !== 1 ? ` <span class="ict-pill" title="Position size: 1.5x with 2R+ room to the draw on liquidity, 0.5x without (skill §27); tight stops x0.5 (skill §25)">${x.size}× size</span>` : '');
   const ago = (t) => { const m = Math.round((Date.now() / 1000 - t) / 60); return m < 60 ? `${m} min ago` : m < 1440 ? `${Math.round(m / 60)} h ago` : `${Math.round(m / 1440)} d ago`; };
   const gcls = (l) => (/^A/.test(l) ? 'ga' : /^B/.test(l) ? 'gb' : 'gc');
   const TAGS = [['sweep', 'Clean sweep'], ['fvg', 'Obvious FVG'], ['dol', 'Clear DOL'], ['bias', 'With HTF bias'], ['pd', 'Right side of P/D'], ['time', 'Good time'], ['against', 'Against bias'], ['chop', 'Consolidation'], ['news', 'News'], ['late', 'Late entry'], ['nodol', 'No target liquidity'],
     // sponsorship-checklist tags (skill §28, 7 Nov): Fred's chart judgement, recorded so it can be tested on real trades
     ['opens', 'Beyond 00:00 & 08:30 opens'], ['induce', 'Inducement into the level'], ['smt', 'SMT (NQ/ES/YM)'], ['cisd', 'CISD body close'], ['disp', 'Displacement + FVG'], ['reh', 'REH/REL as target'], ['eqwin', '09:00-10:30 window'], ['htffvg', 'Stops run into a D1/H4 FVG']];
-  const S = { trades: [], replay: [], replayInfo: null, snap: null, bars: {}, desk: { reviews: {} }, f: { m: '', s: '' }, cur: null, tf: 'h1', src: 'both', cal: null, calDay: null };
+  const S = { trades: [], replay: [], replayInfo: null, snap: null, bars: {}, desk: { reviews: {} }, f: { m: '', s: '', d: '', se: '', g: '' }, cur: null, tf: 'h1', src: 'both', cal: null, calDay: null };
   const RO = !!document.documentElement.dataset.ictRo;   // read-only desk (Orlando)
   try { S.src = localStorage.getItem('ictSrc') || 'both'; } catch (e) {}
   S.flt = 'a'; try { S.flt = localStorage.getItem('ictFlt') || 'a'; } catch (e) {}
@@ -7985,107 +8156,161 @@ function msNextSetup(bars, A) {
 
   async function load() {
     const [t, s, b, d, r, sh] = await Promise.all([get('trades.json'), get('snapshot.json'), get('bars.json'), get('desk.json'), get('replay.json'), get('shadow.json')]);
-    if (t) S.trades = t.filter(KEEP); if (s) S.snap = s; if (b) S.bars = b; if (d) { mergeDesk(d); saveLocal(); }
-    if (r && r.trades) { S.replay = r.trades.filter(KEEP); S.replayInfo = r; }
-    S.dip = sh && Array.isArray(sh.trades) ? sh : null; S.dipReplay = r && Array.isArray(r.shadow) ? r.shadow.filter(KEEP) : null;   // candidate 'dip' rule, paper comparison only
+    if (t) S.trades = t.map(ICT.norm).filter(KEEP); if (s) S.snap = s; if (b) S.bars = b; if (d) { mergeDesk(d); saveLocal(); }
+    if (r && r.trades) { S.replay = r.trades.map(ICT.norm).filter(KEEP); S.replayInfo = r; }
+    S.dip = sh && Array.isArray(sh.trades) ? sh : null; S.dipReplay = r && Array.isArray(r.shadow) ? r.shadow.map(ICT.norm).filter(KEEP) : null;   // candidate 'dip' rule, paper comparison only
     S.vars = sh && sh.variants ? sh.variants : null; S.varsReplay = r && r.shadowByVariant ? r.shadowByVariant : null;   // 'nofri' / 'h1opp' A-rule variants, paper comparison only
     window.renderIct();
   }
-  const liveR = (x) => { const m = S.snap && S.snap.markets[x.market]; if (!m || x.status !== 'open') return null; return ((x.side === 'buy' ? 1 : -1) * (m.price - x.entry)) / x.r0; };
+  // floating R per unit from the snapshot price (null without a price: never a fake loss); liveRs is x size, as closed R is booked.
+  // A cash-index replay record (x.cash) has no futures price to read.
+  const pxOf = (x) => { const m = S.snap && S.snap.markets && S.snap.markets[x.market]; return m ? m.price : null; };
+  const liveR = (x) => (x.cash ? null : ICT.liveR(x, pxOf(x))), liveRs = (x) => (x.cash ? null : ICT.liveRs(x, pxOf(x)));
   const myRev = (x) => S.desk.reviews[x.id];
+
+  // setup tier of a record: A+ / A-setup / Other (the desk's filters, skill §14 / §17)
+  const tier = (x) => (isAP(x) ? 'A+' : isA(x) ? 'A-setup' : 'Other');
+  const tierPill = (x) => (isAP(x) ? ' <span class="ict-a" title="A+: A-setup with a strong inversion body, not the NY afternoon">A+ setup</span>' : isA(x) ? ' <span class="ict-a" title="A-setup: against the daily bias, grade B+ or better, stop 0.3-0.75x the daily ATR">A-setup</span>' : '');
+  const lvl = (k, v, sub, c) => `<div${c ? ` class="${c}"` : ''}><dt>${k}</dt><dd>${v}${sub ? ` <small>${sub}</small>` : ''}</dd></div>`;
+  // the stop as it stands: first stop, break-even (index futures from +1.5R, skill §32) or trailing (from +2R, skill §15)
+  const stopState = (x) => (x.trailMoved ? 'trailing' : x.beMoved || (x.stop != null && x.stop === x.entry) ? 'break-even' : x.stop0 != null && x.stop !== x.stop0 ? 'moved' : 'first stop');
+  const stopR = (x) => (x.stop != null && x.entry != null && x.r0 > 0 ? ((x.side === 'buy' ? 1 : -1) * (x.stop - x.entry)) / x.r0 : null);
+  const leftTxt = (x) => { const L = ICT.holdLeft(x, ((S.bars[x.market] || {}).h1) || [], Date.now() / 1000); if (!L) return ['—', '']; if (!L.left) return ['due', 'time exit at the next tracker run'];
+    return [`${L.left} H1`, L.endAt ? `ends ~${ICT.nyTime(L.endAt, true)} ET` : '', `${L.held} of ${ICT.HOLD} H1 candles held; out at the close of the ${ICT.HOLD}th (trading hours, CME holidays not counted)`]; };
+  // live-trade card: R now (as booked, x size), a -1R..+3R track with the stop, best and price, then the levels and time left
+  function openCard(x) {
+    const r = liveR(x), rs = liveRs(x), sR = stopR(x), best = typeof x.mfe === 'number' ? x.mfe : null, hi = Math.max(3, Math.ceil((best || 0) + 0.5)), lo = -1;
+    const pc = (v) => Math.max(0, Math.min(100, ((v - lo) / (hi - lo)) * 100)).toFixed(1), z = pc(0);
+    const fill = r == null ? '' : `<i class="f ${r >= 0 ? 'up' : 'dn'}" style="left:${r >= 0 ? z : pc(r)}%;width:${Math.abs(pc(r) - z).toFixed(1)}%"></i>`;
+    const [lt, ls, lh] = leftTxt(x), st = stopState(x);
+    return `<li data-id="${esc(x.id)}" tabindex="0" aria-label="${esc(`${x.side} ${x.short}, ${r == null ? 'no live price' : fR(rs)} now, open, view the chart`)}">`
+      + `<div class="r1">${sideChip(x)}<b class="mk">${esc(x.short)}</b> <span class="ict-g ${gcls(grL(x))}">${esc(grL(x))}</span>${tierPill(x)}${sizePill(x)}${clTag(x)}${x.feat.session ? ` <span class="ict-pill">${esc(x.feat.session)}</span>` : ''}${x.replay ? ' <span class="ict-pill ict-rp" title="Still open in the replay of the rules over history; the live tracker holds no trade on it">replay</span>' : ''}`
+      + `<span class="live ${cls(rs)}">${r == null ? '<small>no price</small>' : fR(rs)}${r != null && x.size != null && x.size !== 1 ? `<small>${fR(r)} a unit</small>` : ''}</span></div>`
+      + `<div class="ict-trk" aria-hidden="true">${fill}<span class="tk z" style="left:${z}%"></span><span class="tk" style="left:${pc(2)}%"></span>${sR != null ? `<span class="sp" style="left:${pc(sR)}%" title="Stop ${fRn(sR)}"></span>` : ''}${best != null ? `<span class="bs" style="left:${pc(best)}%" title="Best ${fRn(best)}"></span>` : ''}${r != null ? `<span class="nw ${r >= 0 ? 'up' : 'dn'}" style="left:${pc(r)}%"></span>` : ''}</div>`
+      + `<div class="ict-trk-l" aria-hidden="true"><span style="left:0">−1R stop</span><span style="left:${z}%">0</span><span style="left:${pc(2)}%">+2R</span></div>`
+      + `<dl class="ict-lv">${lvl('Entry', fx(x.entry, x.market))}${lvl('Stop', fx(x.stop, x.market), `${st}${sR != null && st !== 'first stop' ? ` ${fRn(sR)}` : ''}`, st === 'first stop' ? '' : 'mv')}${lvl('Now', fx(pxOf(x), x.market), r == null ? 'no price' : '')}`
+      + `${lvl('Best', fRn(best), x.replay ? 'at the replay run' : best != null && best >= 2 ? 'trail on' : best != null && x.be && best >= x.be ? 'BE on' : '')}${x.dol != null ? lvl('DOL', fx(x.dol, x.market)) : lvl('2R', fx(x.t2, x.market))}${lvl('Time left', `<span title="${esc(lh || '')}">${lt}</span>`, ls)}</dl></li>`;
+  }
+  // a breakdown table: n, win rate, R a signal (bar), total; rows under 20 closed signals are faded (small samples mislead)
+  const MIN_N = 20;
+  function brTable(name, rows, fk, mx) {
+    return `<table><caption>${esc(name)}</caption><thead><tr><th></th><th class="n">n</th><th class="n">Win</th><th class="n">R / signal</th><th class="n">Total</th></tr></thead><tbody>${rows.map(({ k, s, v }) => {
+      const go = fk && v != null ? ` data-fk="${fk}" data-fv="${esc(v)}" tabindex="0" title="Show these signals in the list below"` : '';
+      return `<tr class="${s.n < MIN_N ? 'few' : ''}${go ? ' go' : ''}"${go}><td>${esc(k)}${s.n < MIN_N ? ' <small class="ict-few" title="Fewer than 20 closed signals: not enough to judge">few</small>' : ''}</td><td class="n">${s.n}</td><td class="n">${Math.round(100 * s.wr)}%</td><td class="n ${cls(s.exp)}">${fR(s.exp)}<i class="bar" style="width:${Math.round((Math.abs(s.exp) / mx) * 40)}px;background:${s.exp >= 0 ? 'var(--ict-up)' : 'var(--ict-dn)'}"></i></td><td class="n ${cls(s.tot)}">${fR(s.tot)}</td></tr>`; }).join('')}</tbody></table>`;
+  }
 
   function render() {
     if ($('v-ict').hidden) return;
     const T = all().slice().sort((a, b) => b.opened - a.opened), C = T.filter((x) => x.closed), O = T.filter((x) => x.status === 'open'), snap = S.snap;
+    const OL = O.filter((x) => !x.replay), OR = O.filter((x) => x.replay);
     $('ict-me').innerHTML = `Desk of <b>${esc(who)}</b>${RO ? ' · read-only' : window.MS_WHO && window.MS_WHO !== 'owner' ? ' · main reviewer and trader' : ''}`;
     $('ict-src').querySelectorAll('button').forEach((b) => { const on = b.dataset.s === S.src; b.classList.toggle('on', on); b.setAttribute('aria-pressed', String(on)); });
     $('ict-flt').querySelectorAll('button').forEach((b) => { const on = b.dataset.f === S.flt; b.classList.toggle('on', on); b.setAttribute('aria-pressed', String(on)); });
     renderCal(T);
     const switched = snap ? Object.entries(snap.markets || {}).filter(([, m]) => m && m.switched).map(([k]) => k.toUpperCase()) : [];
-    $('ict-run').textContent = snap ? `Tracker checked ${ago(Date.parse(snap.at) / 1000)}${Object.keys(snap.errors || {}).length ? ` · feed issue: ${Object.keys(snap.errors).join(', ').toUpperCase()}` : ''}${switched.length ? ` · contract switch on ${switched.join(', ')}: open trades' levels moved by the spread` : ''}.${S.replayInfo ? ` Replay since ${S.replayInfo.from}: ${S.replay.length} signals.` : ''}` : 'Waiting for the first tracker run.';
+    const age = snap && Date.parse(snap.at) ? (Date.now() - Date.parse(snap.at)) / 60000 : null;
+    $('ict-run').innerHTML = snap ? `<span class="${age != null && age > 45 ? 'ict-stale' : ''}">Tracker checked ${age == null ? 'at an unknown time' : ago(Date.parse(snap.at) / 1000)}</span>${Object.keys(snap.errors || {}).length ? ` · feed issue: ${esc(Object.keys(snap.errors).join(', ').toUpperCase())}` : ''}${switched.length ? ` · contract switch on ${switched.join(', ')}: open trades' levels moved by the spread` : ''}.${S.replayInfo ? ` Replay since ${esc(S.replayInfo.from)}: ${S.replay.length} signals.` : ''} Times are New York (ET).` : 'Waiting for the first tracker run.';
     // markets
-    const mk = snap ? snap.markets : {};
-    $('ict-mkts').innerHTML = ['nq', 'es', 'ym', 'rty', 'gc'].map((k) => { const m = mk[k], o = O.find((x) => x.market === k);
+    const mk = (snap && snap.markets) || {};
+    $('ict-mkts').innerHTML = ['nq', 'es', 'ym', 'rty', 'gc'].map((k) => { const m = mk[k], o = OL.find((x) => x.market === k);
       return `<div class="ict-m${o ? ' live' : ''}" role="listitem"><div class="k">${m ? esc(m.short) : k.toUpperCase()} <small>${m ? esc(m.label) : ''}</small></div><div class="px">${m ? fx(m.price, k) : '—'}</div>`
-        + `<div class="sub">${o ? `<b class="${o.side === 'buy' ? 'pos' : 'neg'}">${o.side.toUpperCase()}</b> open · ${fR(liveR(o))}` : m && m.lastSignal ? `Last ${m.lastSignal.side} ${m.lastSignal.grade} · ${ago(m.lastSignal.at)}` : 'No signal yet'}</div>`
+        + `<div class="sub">${o ? `<b class="${o.side === 'buy' ? 'pos' : 'neg'}">${o.side.toUpperCase()}</b> open · ${fRn(liveRs(o))}` : m && m.lastSignal ? `Last ${esc(m.lastSignal.side)} ${esc(m.lastSignal.grade || '')} · ${ago(m.lastSignal.at)}` : 'No signal yet'}</div>`
         + `<div class="sub">PDH ${m ? fx(m.pdh, k) : '—'} · PDL ${m ? fx(m.pdl, k) : '—'}</div>`
         // futures rolls (#578, ict/tracker.mjs rollAdjust / contractShift): the daily candles behind the 50-day bias are back-adjusted
         // for contract switches when the cash index answers; a switch seen this run moved every open trade's levels by the spread
         + (m && m.switched ? `<div class="sub roll" title="The CNBC feed moved to the next contract this run; open trades' levels were moved by the calendar spread so the new contract's candles are judged on their own scale">Contract switch: levels moved ${m.switched.by > 0 ? '+' : ''}${fx(m.switched.by, k)}</div>`
           : m && m.d1Roll ? `<div class="sub roll" title="The daily candles behind the 50-day bias are back-adjusted for the futures roll (the calendar spread at the last contract switch)">Daily roll-adjusted · last switch ${esc(String(m.d1Roll.day || '').slice(5))} (${m.d1Roll.spread > 0 ? '+' : ''}${fx(m.d1Roll.spread, k)})</div>` : '')
         + `</div>`; }).join('');
-    // KPIs
-    const sum = (a, f) => a.reduce((s, x) => s + (f(x) || 0), 0), R3 = sum(C, (x) => x.R), R2 = sum(C, (x) => x.R2 ?? x.R), w = C.filter((x) => x.R > 0).length;
-    const fl = sum(O, (x) => liveR(x) * (x.size || 1)), mine = T.filter((x) => (myRev(x) || {}).act === 'taken'), rev = C.filter((x) => myRev(x) && myRev(x).text).length;
-    const cell = (k, v, sub, c) => `<div><span>${k}</span><b class="${c || ''}">${v}</b><small>${sub}</small></div>`;
-    $('ict-kpi').innerHTML = cell('Signals', T.length, `${O.length} open · ${C.length} closed`) + cell('Win rate', C.length ? Math.round((100 * w) / C.length) + '%' : '—', `${w} of ${C.length}`)
-      + cell('Total', fR(R3), C.length ? `${fR(R3 / C.length)} a signal` : 'no closed yet', cls(R3)) + cell('Fixed 2R', fR(R2), C.length ? `${fR(R2 / C.length)} a signal` : '—', cls(R2))
-      + cell('Floating', fR(O.length ? fl : null), `${O.length} open`, cls(fl)) + cell('Reviewed', `${rev}/${C.length}`, `${mine.length} taken by ${esc(who)}`);
-    // open
-    $('ict-open-n').textContent = O.length ? `${O.length} open` : '';
-    $('ict-open').innerHTML = O.length ? O.map((x) => { const r = liveR(x), pct = Math.max(0, Math.min(100, ((r + 1) / 4) * 100));
-      return `<li data-id="${esc(x.id)}" tabindex="0"><div class="r1"><span class="ms-chip ${x.side === 'sell' ? 'ms-chip-sell' : 'ms-chip-buy'}">${x.side.toUpperCase()}</span>${esc(x.short)} <span class="ict-g ${gcls(x.grade.letter)}">${esc(x.grade.letter)}</span>${x.size != null && x.size !== 1 ? ` <span class="ict-pill" title="Position size: 1.5x with 2R+ room to the draw on liquidity, 0.5x without (skill §27); tight stops x0.5 (skill §25)">${x.size}× size</span>` : ''}${isAP(x) ? ' <span class="ict-a">A+</span>' : isA(x) ? ' <span class="ict-a">A-setup</span>' : ''}${clTag(x)} <span class="ict-pill">${esc(x.feat.session)}</span><span class="live ${cls(r)}">${fR(r)}</span></div>`
-        + `<div class="ict-bar" title="−1R stop … +3R"><i style="left:0;width:${pct.toFixed(0)}%"></i></div>`
-        + `<div class="r2">Entry ${fx(x.entry, x.market)} · stop ${fx(x.stop, x.market)} · 2R ${fx(x.t2, x.market)} · ${x.t1 != null ? `3R ${fx(x.t1, x.market)}` : x.trailMoved ? 'trailing' : 'trail from 2R'} · ${ago(x.opened)}</div></li>`; }).join('')
-      : '<li class="empty">No open signal. The tracker checks NQ, ES, YM and RTY every 15 minutes.</li>';
-    // equity (3R and 2R)
-    const Cs = C.slice().sort((a, b) => a.closed - b.closed), pts = (f) => { let e = 0; return [0].concat(Cs.map((x) => (e += f(x)))); };
+    // edge summary (9 Nov): R, win rate, expectancy, profit factor, drawdown of the closed signals in this view
+    const st = ICT.stats(C), R2 = C.reduce((s, x) => s + ((x.R2 ?? x.R) || 0), 0);
+    const fl = OL.reduce((s, x) => s + (liveRs(x) || 0), 0), flN = OL.filter((x) => liveRs(x) != null).length, mine = T.filter((x) => (myRev(x) || {}).act === 'taken'), rev = C.filter((x) => myRev(x) && myRev(x).text).length;
+    const cell = (k, v, sub, c, tip) => `<div${tip ? ` title="${esc(tip)}"` : ''}><span>${k}</span><b class="${c || ''}">${v}</b><small>${sub}</small></div>`;
+    $('ict-kpi').innerHTML = cell('Total', fR(st.tot), `${st.n} closed · ${T.length - C.length} open`, cls(st.tot))
+      + cell('Expectancy', fRn(st.exp), st.n ? `a signal · avg win ${fRn(st.avgW)}, loss ${fRn(st.avgL)}` : 'no closed yet', cls(st.exp), 'Average R per closed signal, sized as booked')
+      + cell('Win rate', st.n ? Math.round(100 * st.wr) + '%' : '—', `${st.w} won · ${st.l} lost${st.n - st.w - st.l ? ` · ${st.n - st.w - st.l} flat` : ''}`)
+      + cell('Profit factor', st.pf == null ? '—' : st.pf === Infinity ? '∞' : st.pf.toFixed(2), 'won R ÷ lost R', st.pf != null ? (st.pf >= 1 ? 'pos' : 'neg') : '')
+      + cell('Max drawdown', st.n ? fR(-st.dd) : '—', 'peak to trough, in close order', st.dd ? 'neg' : '')
+      + cell('Fixed 2R', fR(R2), st.n ? `${fR(R2 / st.n)} a signal` : '—', cls(R2), 'The same signals with a fixed 2R target instead of the trail')
+      + cell('Floating', flN ? fR(fl) : '—', `${OL.length} live open${OR.length ? ` · ${OR.length} replay not counted` : ''}`, cls(fl))
+      + cell('Reviewed', `${rev}/${st.n}`, `${mine.length} taken by ${esc(who)}`);
+    // open now: live trades first, then trades still open in the replay (not live, labelled)
+    $('ict-open-n').textContent = O.length ? `${OL.length} live${OR.length ? ` · ${OR.length} replay` : ''}` : '';
+    $('ict-open').innerHTML = (OL.length ? OL.map(openCard).join('') : `<li class="empty">No live trade open. The tracker checks NQ, ES, YM, RTY and gold every 15 minutes${S.flt !== 'all' ? ' (this view shows ' + ({ ap: 'A+ only', a: 'A-setups', pick: 'one per cluster' })[S.flt] + ')' : ''}.</li>`)
+      + (OR.length ? `<li class="sep" aria-hidden="true">Still open in the replay · not live trades</li>${OR.map(openCard).join('')}` : '');
+    // equity (the model and fixed 2R)
+    const Cs = C.slice().sort((a, b) => a.closed - b.closed), pts = (f) => { let e = 0; return [0].concat(Cs.map((x) => (e += f(x) || 0))); };
     const A = pts((x) => x.R), B = pts((x) => x.R2 ?? x.R), allv = A.concat(B), lo = Math.min(0, ...allv), hi = Math.max(1, ...allv), W = 600, Hh = 180;
     const path = (P) => P.map((v, i) => `${i ? 'L' : 'M'}${((i / Math.max(1, P.length - 1)) * W).toFixed(1)},${(Hh - 8 - ((v - lo) / (hi - lo || 1)) * (Hh - 16)).toFixed(1)}`).join('');
     const y0 = (Hh - 8 - ((0 - lo) / (hi - lo || 1)) * (Hh - 16)).toFixed(1);
-    $('ict-eq').innerHTML = Cs.length ? `<svg viewBox="0 0 ${W} ${Hh}" preserveAspectRatio="none" role="img" aria-label="Equity: ${fR(R3)} with the model's exit, ${fR(R2)} with a fixed 2R"><line x1="0" x2="${W}" y1="${y0}" y2="${y0}" stroke="var(--line-strong)" stroke-dasharray="3 4"/><path d="${path(B)}" fill="none" stroke="#6f8fd6" stroke-width="2" vector-effect="non-scaling-stroke"/><path d="${path(A)}" fill="none" stroke="var(--gold)" stroke-width="2" vector-effect="non-scaling-stroke"/></svg>`
+    $('ict-eq-d').textContent = Cs.length ? `${tm(Cs[0].closed).replace(/ \d\d:\d\d$/, '')} → ${tm(Cs[Cs.length - 1].closed).replace(/ \d\d:\d\d$/, '')}` : '';
+    $('ict-eq').innerHTML = Cs.length ? `<svg viewBox="0 0 ${W} ${Hh}" preserveAspectRatio="none" role="img" aria-label="Equity: ${fR(st.tot)} with the model's exit, ${fR(R2)} with a fixed 2R, over ${Cs.length} closed signals"><line x1="0" x2="${W}" y1="${y0}" y2="${y0}" stroke="var(--line-strong)" stroke-dasharray="3 4"/><path d="${path(B)}" fill="none" stroke="#6f8fd6" stroke-width="2" vector-effect="non-scaling-stroke"/><path d="${path(A)}" fill="none" stroke="var(--gold)" stroke-width="2" vector-effect="non-scaling-stroke"/></svg>`
       : '<p class="ms-note">The curve starts with the first closed signal.</p>';
-    // breakdowns
-    const groups = [['Market', (x) => x.short], ['Side', (x) => x.side], ['Grade', (x) => (x.grade || {}).letter || 'n/a'], ['Session', (x) => (x.feat || {}).session || 'n/a'], ['Daily bias', (x) => (x.feat || {}).bias || 'n/a'], ['Premium / discount', (x) => x.feat.zone || 'n/a'],
-      ['Prev-day high/low swept', (x) => (x.feat.pdSweep ? 'yes' : 'no')], ['Sweep into a D1/H4 FVG', (x) => (x.feat.htfFvg === undefined ? 'n/a' : x.feat.htfFvg || 'no')], ['Daily candle closure', (x) => (x.feat.cc === undefined ? 'n/a' : x.feat.cc > 0 ? 'agrees' : x.feat.cc < 0 ? 'against' : 'neutral')], ['Valid (internal level untouched)', (x) => (x.valid ? 'yes' : 'no')], ['My review', (x) => (myRev(x) && myRev(x).grade) || 'not graded']];
-    const mx = Math.max(0.5, ...groups.flatMap(([, f]) => { const g = {}; C.forEach((x) => { const k = f(x); (g[k] = g[k] || []).push(x.R); }); return Object.values(g).map((a) => Math.abs(a.reduce((s, v) => s + v, 0) / a.length)); }));
-    $('ict-break').innerHTML = C.length ? groups.map(([name, f]) => { const g = {}; C.forEach((x) => { const k = f(x); (g[k] = g[k] || []).push(x.R); });
-      return `<table><caption>${esc(name)}</caption><thead><tr><th></th><th class="n">n</th><th class="n">Win</th><th class="n">R / signal</th></tr></thead><tbody>${Object.entries(g).sort((a, b) => b[1].length - a[1].length).map(([k, a]) => { const m = a.reduce((s, v) => s + v, 0) / a.length;
-        return `<tr><td>${esc(k)}</td><td class="n">${a.length}</td><td class="n">${Math.round((100 * a.filter((v) => v > 0).length) / a.length)}%</td><td class="n ${cls(m)}">${fR(m)}<i class="bar" style="width:${Math.round((Math.abs(m) / mx) * 40)}px;background:${m >= 0 ? 'var(--pos, #089981)' : 'var(--neg, #f23645)'}"></i></td></tr>`; }).join('')}</tbody></table>`; }).join('')
+    // what works: closed signals split by setup tier, market, session, grade and each ICT feature; tap a row to list its signals
+    const groups = [['Setup', tier, 'tier'], ['Market', (x) => x.short, '', 'm', (k, L) => L[0].market], ['Session', (x) => x.feat.session, 'session', 'se'], ['Grade', (x) => x.grade.letter, 'grade', 'g'], ['Side', (x) => x.side, '', 'd'],
+      ['Daily bias', (x) => x.feat.bias], ['Premium / discount', (x) => x.feat.zone],
+      ['Prev-day high/low swept', (x) => (x.feat.pdSweep == null ? 'n/a' : x.feat.pdSweep ? 'yes' : 'no')], ['Sweep into a D1/H4 FVG', (x) => (x.feat.htfFvg === undefined ? 'n/a' : x.feat.htfFvg || 'no')], ['Daily candle closure', (x) => (x.feat.cc === undefined ? 'n/a' : x.feat.cc > 0 ? 'agrees' : x.feat.cc < 0 ? 'against' : 'neutral')], ['Valid (internal level untouched)', (x) => (x.valid == null ? 'n/a' : x.valid ? 'yes' : 'no')], ['My review', (x) => (myRev(x) && myRev(x).grade) || 'not graded']];
+    const G = groups.map(([name, f, order, fk, fv]) => [name, ICT.groupBy(C, f, order).map((r) => ({ ...r, v: fk ? (fv ? fv(r.k, r.L) : r.k) : null })), fk]);
+    const mx = Math.max(0.5, ...G.flatMap(([, rows]) => rows.map((r) => Math.abs(r.s.exp || 0))));
+    $('ict-break').innerHTML = C.length ? G.filter(([name, rows]) => name !== 'Setup' || rows.length > 1).map(([name, rows, fk]) => brTable(name, rows, fk, mx)).join('')
       : '<p class="ms-note">Each closed signal is split by market, side, grade, session, daily bias, premium/discount, previous-day sweep, validity and your own grade, so the desk shows which ICT filter earns its keep. Small samples mislead: wait for 30+ signals per row.</p>';
-    // table
-    const L = T.filter((x) => (!S.f.m || x.market === S.f.m) && (!S.f.s || (S.f.s === 'open' ? x.status === 'open' : S.f.s === 'closed' ? !!x.closed : S.f.s === 'todo' ? x.closed && !(myRev(x) && myRev(x).at) : (myRev(x) || {}).act === 'taken')));
-    $('ict-body').innerHTML = L.length ? L.slice(0, 300).map((x) => { const rv = myRev(x), r = x.closed ? x.R : liveR(x);
-      return `<tr data-id="${esc(x.id)}" tabindex="0"><td>${tm(x.signalAt)}</td><td><b>${esc(x.short)}</b></td><td><span class="ms-chip ${x.side === 'sell' ? 'ms-chip-sell' : 'ms-chip-buy'}">${x.side.toUpperCase()}</span></td><td><span class="ict-g ${gcls(x.grade.letter)}">${esc(x.grade.letter)}</span>${x.size != null && x.size !== 1 ? ` <span class="ict-pill" title="Position size: 1.5x with 2R+ room to the draw on liquidity, 0.5x without (skill §27); tight stops x0.5 (skill §25)">${x.size}× size</span>` : ''}${isA(x) ? ' <span class="ict-a" title="A-setup: against the daily bias, grade B+ or better">' + (isAP(x) ? 'A+' : 'A') + '</span>' : ''}${clTag(x)}</td><td>${esc(x.feat.session)}</td><td>${esc(x.feat.bias || '—')}</td><td>${esc(x.feat.zone || '—')}</td>`
-        + `<td class="n">${fx(x.entry, x.market)}</td><td class="n">${fx(x.stop, x.market)}</td><td class="n">${x.t1 != null ? fx(x.t1, x.market) : 'trail'}</td><td class="${cls(r)}">${x.closed ? `${x.status === 'win' ? 'Win' : x.status === 'loss' ? 'Loss' : 'Flat'} ${fR(r)}${x.exit === 'time' ? ' <small>time</small>' : x.exit === 'trail' ? ' <small>trail</small>' : ''}${x.replay ? ' <span class="ict-pill">replay</span>' : ''}` : `Open ${fR(r)}`}</td>`
+    // signal list with filters (market, side, session, grade, status)
+    const f = S.f, L = T.filter((x) => (!f.m || x.market === f.m) && (!f.d || x.side === f.d) && (!f.se || (x.feat.session || 'n/a') === f.se) && (!f.g || (x.grade.letter || 'n/a') === f.g)
+      && (!f.s || (f.s === 'open' ? x.status === 'open' : f.s === 'closed' ? !!x.closed : f.s === 'todo' ? x.closed && !(myRev(x) && myRev(x).at) : (myRev(x) || {}).act === 'taken')));
+    const opts = (id, vals, cur, allTxt) => { const el = $(id); if (!el) return; const v = [...new Set(vals.filter(Boolean))]; if (cur && !v.includes(cur)) v.push(cur);
+      el.innerHTML = `<option value="">${allTxt}</option>` + v.map((k) => `<option value="${esc(k)}"${k === cur ? ' selected' : ''}>${esc(k)}</option>`).join(''); };
+    opts('ict-f-se', ICT.ORDER.session.filter((k) => T.some((x) => (x.feat.session || 'n/a') === k)).concat(T.map((x) => x.feat.session).filter((k) => k && !ICT.ORDER.session.includes(k))), f.se, 'All sessions');
+    opts('ict-f-g', ICT.ORDER.grade.filter((k) => T.some((x) => (x.grade.letter || 'n/a') === k)), f.g, 'All grades');
+    $('ict-f-m').value = f.m; $('ict-f-d').value = f.d; $('ict-f-s').value = f.s;
+    const any = f.m || f.d || f.se || f.g || f.s, sL = ICT.stats(L.filter((x) => x.closed));
+    $('ict-f-n').innerHTML = `${L.length === T.length ? `${T.length} signals` : `${L.length} of ${T.length} signals`}${sL.n ? ` · <b class="${cls(sL.tot)}">${fR(sL.tot)}</b> over ${sL.n} closed, ${Math.round(100 * sL.wr)}% won` : ''}`;
+    $('ict-f-x').hidden = !any;
+    $('ict-body').innerHTML = L.length ? L.slice(0, 300).map((x) => { const rv = myRev(x), r = x.closed ? x.R : liveRs(x);
+      return `<tr data-id="${esc(x.id)}" tabindex="0"${x.replay ? ' class="rp"' : ''}><td>${tm(x.signalAt)}</td><td><b>${esc(x.short)}</b></td><td>${sideChip(x)}</td><td><span class="ict-g ${gcls(grL(x))}">${esc(grL(x))}</span>${sizePill(x)}${isA(x) ? ' <span class="ict-a" title="A-setup: against the daily bias, grade B+ or better">' + (isAP(x) ? 'A+' : 'A') + '</span>' : ''}${clTag(x)}</td><td>${esc(x.feat.session || '—')}</td><td>${esc(x.feat.bias || '—')}</td><td>${esc(x.feat.zone || '—')}</td>`
+        + `<td class="n">${fx(x.entry, x.market)}</td><td class="n">${fx(x.stop, x.market)}</td><td class="n">${x.t1 != null ? fx(x.t1, x.market) : 'trail'}</td><td class="${cls(r)}">${x.closed ? `${x.status === 'win' ? 'Win' : x.status === 'loss' ? 'Loss' : 'Flat'} ${fRn(r)}${x.exit === 'time' ? ' <small>time</small>' : x.exit === 'trail' ? ' <small>trail</small>' : x.exit === 'breakeven' ? ' <small>BE</small>' : ''}${x.replay ? ' <span class="ict-pill">replay</span>' : ''}` : `Open ${fRn(r)}${x.replay ? ' <span class="ict-pill">replay</span>' : ''}`}</td>`
         + `<td>${rv ? `${rv.act ? `<span class="ict-pill">${esc(rv.act)}</span> ` : ''}${rv.grade ? `<span class="ict-g ${gcls(rv.grade)}">${esc(rv.grade)}</span>` : ''}${rv.text ? ' ✎' : ''}` : '<span class="ms-note">—</span>'}</td></tr>`; }).join('')
-      : `<tr class="empty"><td colspan="12">${all().length ? 'No signal matches the filter.' : 'No signal yet. The first ones appear after an H1 sweep and inversion on NQ, ES, YM or RTY.'}</td></tr>`;
+        + (L.length > 300 ? `<tr class="empty"><td colspan="12">Showing the newest 300 of ${L.length}. Narrow the filters to see older signals.</td></tr>` : '')
+      : `<tr class="empty"><td colspan="12">${T.length ? 'No signal matches the filters. <button type="button" class="ms-tbtn" data-clear>Clear filters</button>' : 'No signal yet. The first ones appear after an H1 sweep and inversion on NQ, ES, YM, RTY or gold.'}</td></tr>`;
     // my trading
-    $('ict-mine-who').textContent = esc(who);
-    const tk = mine.filter((x) => myRev(x).r != null && myRev(x).r !== ''), myR = tk.reduce((s, x) => s + +myRev(x).r, 0), sk = T.filter((x) => (myRev(x) || {}).act === 'skipped'), skR = sk.filter((x) => x.closed).reduce((s, x) => s + x.R, 0);
+    $('ict-mine-who').textContent = who;
+    const tk = mine.filter((x) => myRev(x).r != null && myRev(x).r !== ''), myR = tk.reduce((s, x) => s + +myRev(x).r, 0), sk = T.filter((x) => (myRev(x) || {}).act === 'skipped'), skR = sk.filter((x) => x.closed).reduce((s, x) => s + (x.R || 0), 0);
     $('ict-mine').innerHTML = `<div class="ict-mine-k"><div><span>Taken</span><b>${mine.length}</b></div><div><span>My result</span><b class="${cls(myR)}">${tk.length ? fR(myR) : '—'}</b></div><div><span>Skipped</span><b>${sk.length}</b></div><div><span>Skipped would be</span><b class="${cls(skR)}">${sk.length ? fR(skR) : '—'}</b></div></div>`
       + `<p class="ms-note">Mark each signal Taken, Skipped or Missed in its chart. "Skipped would be" is what the tracker made on the ones you passed: it shows whether your discretion adds to the model or costs it.</p>`;
     $('ict-sync').textContent = tok() ? 'GitHub connected' : 'This browser only';
     $('ict-gh').textContent = tok() ? 'GitHub connected' : 'Connect GitHub';
   }
   // P&L calendar (closed signals by the local day they closed); a day lists its signals
-  const dkey = (t) => { const d = new Date(t * 1000); return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`; };
+  const dkey = (t) => ICT.nyDay(t);   // the New York day (9 Nov): before, the browser's day, so a Friday-afternoon close showed on Saturday in Asia
   function renderCal(T) {
     const C = T.filter((x) => x.closed), byDay = {};
     C.forEach((x) => { (byDay[dkey(x.closed)] = byDay[dkey(x.closed)] || []).push(x); });
     if (!S.cal) { const d = new Date(); S.cal = { y: d.getFullYear(), m: d.getMonth() }; }
     const { y, m } = S.cal, first = new Date(y, m, 1), days = new Date(y, m + 1, 0).getDate(), lead = (first.getDay() + 6) % 7;
-    const mon = C.filter((x) => { const d = new Date(x.closed * 1000); return d.getFullYear() === y && d.getMonth() === m; }), mR = mon.reduce((a, x) => a + x.R, 0);
+    const mon = C.filter((x) => dkey(x.closed).startsWith(`${y}-${String(m + 1).padStart(2, '0')}-`)), mR = mon.reduce((a, x) => a + (x.R || 0), 0);
     $('ict-cal-m').innerHTML = `${first.toLocaleString('en-GB', { month: 'long', year: 'numeric' })} <small class="${cls(mR)}">${mon.length ? `${fR(mR)} · ${mon.length} signals` : 'no closed signals'}</small>`;
-    const vals = Object.entries(byDay).filter(([k]) => k.startsWith(`${y}-${String(m + 1).padStart(2, '0')}`)).map(([, a]) => Math.abs(a.reduce((s, x) => s + x.R, 0))), mx = Math.max(3, ...vals);
+    { const ks = Object.keys(byDay).sort(), cur = `${y}-${String(m + 1).padStart(2, '0')}`; $('ict-cal-prev').disabled = !ks.length || ks[0].slice(0, 7) >= cur; $('ict-cal-next').disabled = cur >= dkey(Date.now() / 1000).slice(0, 7); }
+    const vals = Object.entries(byDay).filter(([k]) => k.startsWith(`${y}-${String(m + 1).padStart(2, '0')}`)).map(([, a]) => Math.abs(a.reduce((s, x) => s + (x.R || 0), 0))), mx = Math.max(3, ...vals);
     let h = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].map((d) => `<div class="ict-cal-h">${d}</div>`).join('') + '<div></div>'.repeat(lead);
     const wk = []; let wR = 0, wn = 0;
     for (let d = 1; d <= days; d++) {
-      const k = `${y}-${String(m + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`, a = byDay[k] || [], R = a.reduce((s, x) => s + x.R, 0);
+      const k = `${y}-${String(m + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`, a = byDay[k] || [], R = a.reduce((s, x) => s + (x.R || 0), 0);
       const heat = a.length ? Math.min(1, Math.abs(R) / mx) : 0, rp = a.filter((x) => x.replay).length;
       h += `<button type="button" class="ict-cal-d${a.length ? (R > 0 ? ' up' : R < 0 ? ' dn' : ' fl') : ''}${S.calDay === k ? ' sel' : ''}${k === dkey(Date.now() / 1000) ? ' today' : ''}${(lead + d - 1) % 7 >= 5 ? ' we' : ''}" data-k="${k}" style="--heat:${heat.toFixed(2)}"${a.length ? '' : ' disabled'} aria-label="${d} ${first.toLocaleString('en-GB', { month: 'long' })}: ${a.length ? `${fR(R)}, ${a.length} signals` : 'no signals'}"><span class="d">${d}</span>${a.length ? `<b>${fR(R)}</b><small>${a.length}${rp && rp < a.length ? ` · ${rp} replay` : ''}</small>` : ''}</button>`;
     }
     $('ict-cal').innerHTML = h;
     const sel = S.calDay && byDay[S.calDay];
-    $('ict-cal-day').innerHTML = sel ? sel.sort((a, b) => a.closed - b.closed).map((x) => `<li data-id="${esc(x.id)}" tabindex="0"><span class="ms-chip ${x.side === 'sell' ? 'ms-chip-sell' : 'ms-chip-buy'}">${x.side.toUpperCase()}</span><b>${esc(x.short)}</b><span class="ict-g ${gcls(x.grade.letter)}">${esc(x.grade.letter)}</span>${x.size != null && x.size !== 1 ? ` <span class="ict-pill" title="Position size: 1.5x with 2R+ room to the draw on liquidity, 0.5x without (skill §27); tight stops x0.5 (skill §25)">${x.size}× size</span>` : ''}<span>${esc(x.feat.session)}</span><span class="m">${fx(x.entry, x.market)} → ${fx(x.exitPx, x.market)}</span><b class="${cls(x.R)}">${fR(x.R)}</b><small>${x.replay ? 'replay' : 'live'} · ${esc(x.exit || '')}</small></li>`).join('') : '';
+    $('ict-cal-day').innerHTML = sel ? sel.sort((a, b) => a.closed - b.closed).map((x) => `<li data-id="${esc(x.id)}" tabindex="0">${sideChip(x)}<b>${esc(x.short)}</b><span class="ict-g ${gcls(grL(x))}">${esc(grL(x))}</span>${sizePill(x)}<span>${esc(x.feat.session || '—')} · ${ICT.nyHM(x.signalAt)}→${ICT.nyHM(x.closed)} ET</span><span class="m">${fx(x.entry, x.market)} → ${fx(x.exitPx, x.market)}</span><b class="${cls(x.R)}">${fR(x.R)}</b><small>${x.replay ? 'replay' : 'live'} · ${esc(x.exit || '')}</small></li>`).join('') : '';
   }
   $('ict-cal').addEventListener('click', (ev) => { const b = ev.target.closest('[data-k]'); if (!b) return; S.calDay = S.calDay === b.dataset.k ? null : b.dataset.k; render(); });
-  $('ict-cal-day').addEventListener('click', openFrom0);
+  $('ict-cal-day').addEventListener('click', openFrom0); $('ict-cal-day').addEventListener('keydown', (ev) => { if (ev.key === 'Enter' || ev.key === ' ') { ev.preventDefault(); openFrom0(ev); } });
+  // What works: a row lists its closed signals in the Signals table (filters set, the table scrolled into view)
+  const goRow = (ev) => { const tr = ev.target.closest('tr[data-fk]'); if (!tr) return; S.f = { m: '', s: 'closed', d: '', se: '', g: '' }; S.f[tr.dataset.fk] = tr.dataset.fv; render();
+    const c = $('ict-sig'); if (c) { c.scrollIntoView({ behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth', block: 'start' }); $('ict-f-n').focus({ preventScroll: true }); } };
+  $('ict-break').addEventListener('click', goRow); $('ict-break').addEventListener('keydown', (ev) => { if ((ev.key === 'Enter' || ev.key === ' ') && ev.target.closest('tr[data-fk]')) { ev.preventDefault(); goRow(ev); } });
   $('ict-cal-prev').addEventListener('click', () => { S.cal.m--; if (S.cal.m < 0) { S.cal.m = 11; S.cal.y--; } S.calDay = null; render(); });
   $('ict-cal-next').addEventListener('click', () => { S.cal.m++; if (S.cal.m > 11) { S.cal.m = 0; S.cal.y++; } S.calDay = null; render(); });
   $('ict-flt').addEventListener('click', (ev) => { const b = ev.target.closest('button'); if (!b) return; S.flt = b.dataset.f; try { localStorage.setItem('ictFlt', S.flt); } catch (e) {} S.calDay = null; render(); });
   $('ict-src').addEventListener('click', (ev) => { const b = ev.target.closest('button'); if (!b) return; S.src = b.dataset.s; try { localStorage.setItem('ictSrc', S.src); } catch (e) {} render(); });
-  function openFrom0(ev) { const el = ev.target.closest('[data-id]'); if (el) openSig(el.dataset.id); }
+  function openFrom0(ev) { const el = ev.target.closest('[data-id]'); if (el) { OPENER = el; openSig(el.dataset.id); } }
   // session clock (ET) with the ICT / MMXM kill zones; A+ skips NY PM
   const ET = new Intl.DateTimeFormat('en-US', { timeZone: 'America/New_York', hour: '2-digit', minute: '2-digit', weekday: 'short', hourCycle: 'h23' });
   function renderClock() {
@@ -8155,7 +8380,7 @@ function msNextSetup(bars, A) {
   setInterval(() => { if (!$('v-ict').hidden) renderClock(); }, 30e3);
 
   // ─── chart dialog + review ───
-  let CH = null, SER = null, TRL = null, LINES = [], DREQ = 0;
+  let CH = null, SER = null, TRL = null, LINES = [], DREQ = 0, OPENER = null;
   // timeframes (trade viewer, 7 Nov: M5 / M15 / H1 / H4). The tracker keeps futures candles (Yahoo, about 400 h of H1 and 600 M5);
   // M15 and H4 are built from them. Older signals and replays read OANDA cash candles through the page's bar fetcher (msRangeBars),
   // moved by the gap to the signal's own price (futures, or the replay's cash feed) so the entry, stop and target sit where they were set
@@ -8179,14 +8404,18 @@ function msNextSetup(bars, A) {
     const x = S.cur; if (!x) return;
     const box = $('ict-tv-c'), LW = window.LightweightCharts, T = window.MS_TRV; if (!LW) { box.innerHTML = '<p class="ms-note">Charts need the Lightweight Charts library.</p>'; return; }
     if (!CH) { CH = LW.createChart(box, { autoSize: true, layout: { background: { color: 'transparent' }, textColor: getComputedStyle(document.documentElement).getPropertyValue('--ink-dim') || '#9aa3b2' },
-      grid: { vertLines: { visible: false }, horzLines: { visible: false } }, timeScale: { timeVisible: true, secondsVisible: false }, rightPriceScale: { borderVisible: false } });
+      grid: { vertLines: { visible: false }, horzLines: { visible: false } }, timeScale: { timeVisible: true, secondsVisible: false }, rightPriceScale: { borderVisible: false },
+      localization: { timeFormatter: (t) => { const d = new Date(t * 1000); return `${['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'][d.getUTCDay()]} ${d.getUTCDate()} ${['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'][d.getUTCMonth()]} ${String(d.getUTCHours()).padStart(2, '0')}:${String(d.getUTCMinutes()).padStart(2, '0')} ET`; } } });
       SER = CH.addCandlestickSeries({ upColor: '#089981', downColor: '#f23645', borderUpColor: '#089981', borderDownColor: '#f23645', wickUpColor: '#089981', wickDownColor: '#f23645', priceLineVisible: false });
       TRL = CH.addLineSeries({ color: '#f23645', lineWidth: 2, lineStyle: LW.LineStyle.Dotted, lineType: LW.LineType ? LW.LineType.WithSteps : 1, priceLineVisible: false, lastValueVisible: false, crosshairMarkerVisible: false }); }
     const req = ++DREQ, sec = TFSEC[S.tf] || 3600; $('ict-tv-n').textContent = 'Loading candles…';
     let got; try { got = await sigBars(x, S.tf); } catch (e) { got = { raw: [], src: `Couldn't load candles: ${e.message || e}` }; }
     if (req !== DREQ || S.cur !== x) return;
-    const raw = got.raw;
-    SER.setData(raw); SER.applyOptions({ priceFormat: { type: 'price', precision: DEC[x.market] ?? 2, minMove: Math.pow(10, -(DEC[x.market] ?? 2)) } });
+    // the axis in New York time (9 Nov; it read UTC while the desk's times were the browser's): candles shown at ET wall time,
+    // looked up by their real times (`at` below); falls back to UTC if the shift ever breaks the order
+    const raw0 = got.raw, shOk = raw0.every((b, i) => !i || ICT.nyShift(b.time) > ICT.nyShift(raw0[i - 1].time)), sh = (t) => (shOk ? ICT.nyShift(t) : t);
+    const raw = raw0.map((b) => ({ ...b, time: sh(b.time), t0: b.time }));
+    SER.setData(raw.map(({ t0, ...b }) => b)); SER.applyOptions({ priceFormat: { type: 'price', precision: DEC[x.market] ?? 2, minMove: Math.pow(10, -(DEC[x.market] ?? 2)) } });
     LINES.forEach((l) => SER.removePriceLine(l)); LINES = [];
     const add = (price, color, title, style) => { if (price != null) LINES.push(SER.createPriceLine({ price, color, lineWidth: 1, lineStyle: style ?? 0, axisLabelVisible: true, title })); };
     add(x.entry, '#c9a24a', 'Entry'); add(x.stop, '#f23645', 'Stop'); add(x.t1, '#089981', '3R'); add(x.t2, '#089981', '2R', 2); if (x.stop0 != null && x.stop0 !== x.stop) add(x.stop0, '#f23645', 'First stop', 2);
@@ -8200,11 +8429,11 @@ function msNextSetup(bars, A) {
     const d1b = ((S.bars[x.market] || {}).d1 || []).filter((b) => b[0] + 86400 <= x.signalAt); const pd = d1b[d1b.length - 1];
     if (pd) { add(pd[2], '#7d8590', 'PDH', 1); add(pd[3], '#7d8590', 'PDL', 1); }
     // markers on the candle that holds each moment (the signal candle closes at signalAt; a close is recorded at the end of its candle)
-    const at = (t) => { let k = -1; for (let i = 0; i < raw.length && raw[i].time <= t; i++) k = i; return k; };
+    const at = (t) => { let k = -1; for (let i = 0; i < raw.length && raw[i].t0 <= t; i++) k = i; return k; };
     const iS = at(x.signalAt - 1), iE = at(x.signalAt), iX = x.closed ? at(x.closed - 1) : -1, mk = [];
-    if (iS >= 0 && x.signalAt - raw[iS].time <= sec) mk.push({ time: raw[iS].time, position: x.side === 'buy' ? 'belowBar' : 'aboveBar', color: '#c9a24a', shape: x.side === 'buy' ? 'arrowUp' : 'arrowDown', text: 'iFVG' });
-    if (x.sweep) { const i = at(x.sweep.t); if (i >= 0 && x.sweep.t - raw[i].time < sec) mk.unshift({ time: raw[i].time, position: x.side === 'buy' ? 'belowBar' : 'aboveBar', color: '#9aa3b2', shape: 'circle', text: 'Sweep' }); }
-    if (iX >= 0 && x.closed - raw[iX].time <= sec) mk.push({ time: raw[iX].time, position: 'inBar', color: x.R > 0 ? '#089981' : '#f23645', shape: 'square', text: `${x.exit} ${fR(x.R)}` });
+    if (iS >= 0 && x.signalAt - raw[iS].t0 <= sec) mk.push({ time: raw[iS].time, position: x.side === 'buy' ? 'belowBar' : 'aboveBar', color: '#c9a24a', shape: x.side === 'buy' ? 'arrowUp' : 'arrowDown', text: 'iFVG' });
+    if (x.sweep) { const i = at(x.sweep.t); if (i >= 0 && x.sweep.t - raw[i].t0 < sec) mk.unshift({ time: raw[i].time, position: x.side === 'buy' ? 'belowBar' : 'aboveBar', color: '#9aa3b2', shape: 'circle', text: 'Sweep' }); }
+    if (iX >= 0 && x.closed - raw[iX].t0 <= sec) mk.push({ time: raw[iX].time, position: 'inBar', color: x.R > 0 ? '#089981' : '#f23645', shape: 'square', text: `${x.exit || 'exit'} ${fRn(x.R)}` });
     const seen = new Set(); SER.setMarkers(mk.sort((a, b) => a.time - b.time).filter((m) => !seen.has(m.time + m.text) && seen.add(m.time + m.text)));
     // the stop's path: break-even from +1.5R, then the trail from +2R 1.5R behind the best price, rebuilt on these candles (the record keeps the last stop only)
     const moved = x.trailMoved || x.beMoved || /trail|breakeven/.test(x.exit || ''), sp = T && moved && iE >= 0 ? T.stopPath(x, raw, iE, iX, { s: x.side === 'buy' ? 1 : -1, stop0: x.stop0 ?? x.stop, be: x.be || null }) : null;
@@ -8214,12 +8443,24 @@ function msNextSetup(bars, A) {
   }
   function openSig(id) {
     const x = S.trades.concat(S.replay).find((t) => t.id === id); if (!x) return; S.cur = x;
-    const f = x.feat, g = x.grade;
-    $('ict-tv-t').innerHTML = `<span class="ms-chip ${x.side === 'sell' ? 'ms-chip-sell' : 'ms-chip-buy'}">${x.side.toUpperCase()}</span> ${esc(x.label)} <span class="ict-g ${gcls(g.letter)}">${esc(g.letter)}</span>`;
-    { const f = x.feat || {}, ck = [['Liquidity swept', true], ['Inversion within 6 H1 candles', true], ['Against the daily bias', f.bias === 'against'], ['Grade B+ or better', ((x.grade || {}).total || 0) >= 7], ['Strong body (≥ 60%)', f.body >= 0.6], ['Not NY PM', f.session !== 'NY PM'], ['Room to the next liquidity ≥ 2R', x.grade.rr >= 2], ['Internal level untouched', !!x.valid]];
-      $('ict-tv-ck').innerHTML = ck.map(([t, ok]) => `<li class="${ok ? 'y' : 'n'}">${ok ? '✓' : '✕'} ${esc(t)}</li>`).join('') + `<li>${isAP(x) ? 'A+ setup' : isA(x) ? 'A-setup' : 'Not an A-setup'}${x.size != null && x.size !== 1 ? ` · size ${x.size}×` : ''}</li>` + (isA(x) && ['nq', 'es', 'ym', 'rty'].includes(x.market) ? `<li>Fred's entry (skill §30): wait up to 6 h for an M5 iFVG on the same side, enter on that candle's close, keep the H1 stop; no M5 signal = no trade</li>` : ''); }
-    $('ict-tv-s').textContent = `Signal ${tm(x.signalAt)} · ${f.session} · bias ${f.bias || 'n/a'} · ${f.zone || 'n/a'}${f.pdSweep ? ' · prev-day level swept' : ''} · grade ${g.total}/10 (strength ${g.strength}/4, speed ${g.speed}/3, room ${g.rr}/3) · `
-      + `entry ${fx(x.entry, x.market)}, stop ${fx(x.stop, x.market)}, ${x.t1 != null ? `target ${fx(x.t1, x.market)}` : (x.be ? `break-even at +${x.be}R, ` : '') + 'trail from +2R, 1.5R behind'} · ${x.closed ? `${x.exit} ${fR(x.R)}` : `open ${fR(liveR(x))}`}`;
+    const f = x.feat, g = x.grade, gp = (v, of) => (v == null ? '?' : v) + '/' + of;
+    $('ict-tv-t').innerHTML = `${sideChip(x)} ${esc(x.label)} <span class="ict-g ${gcls(grL(x))}">${esc(grL(x))}</span>${tierPill(x)}${sizePill(x)}${x.replay ? ' <span class="ict-pill">replay</span>' : ''}`;
+    // the rule checklist of this market (script#ms-ict-lib checklist): the A-setup rule, the A+ / size extras, then context
+    { const I = ICT.checklist(x), GR = [['model', 'Model'], ['rule', x.market === 'gc' ? 'Gold A-setup rule' : 'A-setup rule'], ['plus', 'A+ and size'], ['info', 'Context']];
+      $('ict-tv-ck').innerHTML = GR.map(([k, n]) => { const L = I.filter((q) => q.grp === k); return L.length ? `<li class="h">${n}</li>` + L.map((q) => `<li class="${q.ok === true ? 'y' : q.ok === false ? 'n' : 'u'}"><span aria-hidden="true">${q.ok === true ? '✓' : q.ok === false ? '✕' : '?'}</span> ${esc(q.t)}<span class="trv-sr">${q.ok === true ? ': yes' : q.ok === false ? ': no' : ': not recorded'}</span></li>`).join('') : ''; }).join('')
+        + `<li class="v">${tier(x) === 'Other' ? 'Not an A-setup: tracked, not traded' : `${tier(x)}${x.size != null && x.size !== 1 ? ` · size ${x.size}×` : ''}`}</li>`
+        + (isA(x) && ['nq', 'es', 'ym', 'rty'].includes(x.market) ? `<li class="tip">Fred's entry (skill §30): wait up to 6 h for an M5 iFVG on the same side, enter on that candle's close, keep the H1 stop; no M5 signal = no trade</li>` : ''); }
+    $('ict-tv-s').textContent = `${ICT.nyTime(x.signalAt, true)} ET · ${f.session || 'session n/a'} · bias ${f.bias || 'n/a'} · ${f.zone || 'n/a'}${f.pdSweep ? ' · prev-day level swept' : ''} · grade ${gp(g.total, 10)} (strength ${gp(g.strength, 4)}, speed ${gp(g.speed, 3)}, room ${gp(g.rr, 3)}) · `
+      + `${x.t1 != null ? `fixed target ${fx(x.t1, x.market)}` : (x.be ? `break-even at +${x.be}R, ` : '') + 'trail from +2R, 1.5R behind'}`;
+    // the levels and the result at a glance
+    { const sR = stopR(x), st = stopState(x), r = x.closed ? x.R : liveRs(x), per = x.closed ? x.Rraw : liveR(x), [lt, ls, lh] = x.closed ? ['', '', ''] : leftTxt(x);
+      $('ict-tv-lv').innerHTML = lvl('Entry', fx(x.entry, x.market)) + lvl('First stop', fx(x.stop0 ?? x.stop, x.market), x.r0 ? `1R = ${fx(x.r0, x.market)}` : '')
+        + (x.closed ? '' : lvl('Stop now', fx(x.stop, x.market), `${st}${sR != null && st !== 'first stop' ? ` ${fRn(sR)}` : ''}`, st === 'first stop' ? '' : 'mv'))
+        + lvl('+2R', fx(x.t2, x.market)) + (x.dol != null ? lvl('Draw on liquidity', fx(x.dol, x.market)) : '')
+        + (x.closed ? lvl('Exit', fx(x.exitPx, x.market), `${esc(x.exit || '')} · ${ICT.nyTime(x.closed, true)} ET`) : lvl('Now', fx(pxOf(x), x.market), r == null ? 'no live price' : ''))
+        + lvl(x.closed ? 'Result' : 'R now', `<span class="${cls(r)}">${fRn(r)}</span>`, per != null && x.size != null && x.size !== 1 ? `${fR(per)} a unit × ${x.size}` : '')
+        + lvl('Best', fRn(typeof x.mfe === 'number' ? x.mfe : null), x.replay && !x.closed ? 'a unit, at the replay run' : 'max favourable, a unit')
+        + (x.closed ? lvl('Held', `${ICT.nyTime(x.signalAt)} →`, `${ICT.nyTime(x.closed)} ET`) : lvl('Time left', `<span title="${esc(lh || '')}">${lt}</span>`, ls)); }
     const rv = myRev(x) || {};
     S.rv = { act: rv.act || '', grade: rv.grade || '', tags: new Set(rv.tags || []) };
     $('ict-rv-fill').value = rv.fill ?? ''; $('ict-rv-r').value = rv.r ?? ''; $('ict-rv-text').value = rv.text || ''; $('ict-rv-msg').textContent = rv.at ? `Saved ${ago(rv.at)}${rv.by ? ` by ${rv.by}` : ''}` : '';
@@ -8252,11 +8493,17 @@ function msNextSetup(bars, A) {
     throw new Error('GitHub kept reporting a newer file; try again');
   }
   // wiring
-  const openFrom = (ev) => { const el = ev.target.closest('[data-id]'); if (el) openSig(el.dataset.id); };
+  const openFrom = (ev) => { if (ev.target.closest('[data-clear]')) { clearF(); return; } const el = ev.target.closest('[data-id]'); if (el) { OPENER = el; openSig(el.dataset.id); } };
   ['ict-open', 'ict-body'].forEach((id) => { const el = $(id); el.addEventListener('click', openFrom); el.addEventListener('keydown', (ev) => { if (ev.key === 'Enter' || ev.key === ' ') { ev.preventDefault(); openFrom(ev); } }); });
   $('ict-f-m').addEventListener('change', (e) => { S.f.m = e.target.value; render(); });
   $('ict-f-s').addEventListener('change', (e) => { S.f.s = e.target.value; render(); });
+  [['ict-f-d', 'd'], ['ict-f-se', 'se'], ['ict-f-g', 'g']].forEach(([id, k]) => $(id).addEventListener('change', (e) => { S.f[k] = e.target.value; render(); }));
+  const clearF = () => { S.f = { m: '', s: '', d: '', se: '', g: '' }; render(); $('ict-f-m').focus(); };
+  $('ict-f-x').addEventListener('click', clearF);
   $('ict-tv-x').addEventListener('click', () => $('ict-tv').close());
+  $('ict-tv').addEventListener('close', () => { const id = OPENER && OPENER.dataset.id; OPENER = null; if (!id) return;
+    // after the router's back step and the re-render it can trigger (#ms-trv-js), the card or row is a new element
+    setTimeout(() => { if ($('ict-tv').open) return; const el = [...document.querySelectorAll('#v-ict [data-id]')].find((e) => e.dataset.id === id && e.offsetParent); if (el) el.focus({ preventScroll: true }); }, 120); });
   $('ict-tv').addEventListener('click', (ev) => { if (ev.target === $('ict-tv')) $('ict-tv').close(); });
   $('ict-tv').querySelector('.ict-tv-tf').addEventListener('click', (ev) => { const b = ev.target.closest('button'); if (!b) return; S.tf = b.dataset.tf; paintTf(); drawChart(); if (window.MS_TRV && S.cur) window.MS_TRV.opened('ict', S.cur.id, TFID[S.tf]); });
   $('ict-rv-act').addEventListener('click', (ev) => { const b = ev.target.closest('button'); if (!b) return; S.rv.act = S.rv.act === b.dataset.a ? '' : b.dataset.a; paintRv(); });
