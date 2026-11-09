@@ -2916,8 +2916,9 @@ html[data-motion="off"] #v-ict .ict-cal-d:hover { transform: none !important; }
       <div class="pa-chips" id="ms-pa-chips" hidden></div>
       <div class="mtf" id="ms-mtf" role="group" aria-label="Timeframe alignment: last structure break per timeframe" hidden></div>
       <button type="button" class="ind-open" id="ms-ind-open" title="Add up to 10 indicators (saved for your account on this device)">Indicators <small id="ms-ind-n">0/10</small></button><div class="mk-mode seg" role="group" aria-label="Chart markup"><button type="button" data-mk="meridian" class="on" aria-pressed="true" title="Meridian: the council's Mosha structure, setups and trades">Meridian</button><button type="button" data-mk="ict" aria-pressed="false" title="ICT: fair value gaps, session liquidity, premium / discount and the ICT desk's signals">ICT</button><button type="button" data-mk="clean" aria-pressed="false" title="Clean: candles only, no markup (your indicators and drawings stay)">Clean</button></div><a class="pubonly g-back" href="#g-setup">↓ Gold trade and results</a>
+      <button type="button" class="cx-tog" id="ms-cx-tog" aria-expanded="false" aria-controls="ms-adr ms-mtf ms-pa-chips" aria-label="Market context: daily range and timeframe alignment" title="Show the daily range and the timeframe alignment">Context</button>
       <div class="seg" role="group" aria-label="Chart view">
-        <button type="button" data-view="1d">D1</button><button type="button" data-view="4h">H4</button><button type="button" data-view="1h">H1</button><button type="button" data-view="15m">M15</button><button type="button" data-view="5m">M5</button><button type="button" data-view="1m">M1</button><button type="button" data-view="all">All</button><button type="button" data-view="split" title="Two charts side by side, with sync settings">Split</button>
+        <button type="button" data-view="1d" title="Daily chart (key 1)">D1</button><button type="button" data-view="4h" title="4-hour chart (key 2)">H4</button><button type="button" data-view="1h" title="1-hour chart (key 3)">H1</button><button type="button" data-view="15m" title="15-minute chart (key 4)">M15</button><button type="button" data-view="5m" title="5-minute chart (key 5)">M5</button><button type="button" data-view="1m" title="1-minute chart (key 6)">M1</button><button type="button" data-view="all" title="Every timeframe in a grid (key 0)">All</button><button type="button" data-view="split" title="Two charts side by side, with sync settings">Split</button>
       </div>
     </div>
     <div class="ict-strip" id="ms-ict-strip" hidden></div>
@@ -4284,6 +4285,7 @@ function msNextSetup(bars, A) {
   // ─── One chart pane per timeframe ───
   const panes = {};
   const VCH = document.getElementById('v-charts');   // perf (8 Nov): the chart panes sit in the Charts view; while it is hidden their per-second timers skip the layout read (offsetParent is null there anyway)
+  const LG_FD = new Intl.DateTimeFormat(undefined, { day: 'numeric', month: 'short', year: 'numeric' }), LG_FT = new Intl.DateTimeFormat(undefined, { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' });
   function makePane(tf) {
     const el = document.getElementById(`ms-c-${tf.id}`);
     if (!el) return null;
@@ -4306,12 +4308,16 @@ function msNextSetup(bars, A) {
     chart.applyOptions({ watermark: { visible: true, text: `${INST.label} · ${tf.label}`, color: 'rgba(128, 138, 160, 0.05)', fontSize: 38, fontStyle: '600', horzAlign: 'center', vertAlign: 'center' },
       crosshair: { mode: LW.CrosshairMode.Normal, vertLine: { color: 'rgba(140, 150, 170, 0.55)', width: 1, style: LW.LineStyle.Dashed, labelBackgroundColor: '#2b3242' }, horzLine: { color: 'rgba(140, 150, 170, 0.55)', width: 1, style: LW.LineStyle.Dashed, labelBackgroundColor: '#2b3242' } } });
     const lg = document.createElement('div'); lg.className = 'ch-lg'; lg.setAttribute('aria-hidden', 'true'); el.appendChild(lg);
-    let lgHover = false, lgLast = '';
+    let lgHover = false, lgLast = '', lgRaf = 0, lgIdx = null;
+    // perf (9 Nov): the legend follows the crosshair on every mouse move; toLocaleString built a date formatter per call
+    // (a third of the legend's time while panning), so the formatters are shared and the redraw waits for the next frame
+    const lgWhen = (t, day) => (day ? LG_FD : LG_FT).format(new Date(t * 1000));
+    const lgSoon = (i) => { lgIdx = i; if (lgRaf) return; lgRaf = requestAnimationFrame(() => { lgRaf = 0; P.legend(lgIdx); }); };
     P.legend = function (i) {
       const B = P.bars; if (!B || !B.length) { lg.innerHTML = ''; return; }
       if (typeof i !== 'number' || i < 0 || i >= B.length) i = B.length - 1;
       const b = B[i], pv = i > 0 ? B[i - 1].close : b.open, ch = b.close - pv, pc = pv ? ch / pv * 100 : 0, cl = ch >= 0 ? 'up' : 'dn';
-      const d = new Date((b.time - TZ) * 1000), when = tf.sec >= 86400 ? d.toLocaleDateString(undefined, { day: 'numeric', month: 'short', year: 'numeric' }) : d.toLocaleString(undefined, { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' });
+      const when = lgWhen(b.time - TZ, tf.sec >= 86400);
       const h = `<span class="k">O</span><b class="${cl}">${fmt(b.open)}</b><span class="k">H</span><b class="${cl}">${fmt(b.high)}</b><span class="k">L</span><b class="${cl}">${fmt(b.low)}</b><span class="k">C</span><b class="${cl}">${fmt(b.close)}</b><b class="${cl} chg">${ch >= 0 ? '+' : '−'}${fmt(Math.abs(ch))} (${ch >= 0 ? '+' : '−'}${Math.abs(pc).toFixed(2)}%)</b><span class="t">${when}</span>`;
       // cursor readout (7 Nov loop): the price under the crosshair and its distance from the last price
       let hx = h; const L0 = B[B.length - 1];
@@ -4343,7 +4349,7 @@ function msNextSetup(bars, A) {
     // candle-close countdown (7 Nov loop): a small pill under the last-price label on the price scale, mm:ss (or h:mm) to this bar's close
     { const cd = document.createElement('div'); cd.className = 'ch-cd'; cd.setAttribute('aria-hidden', 'true'); el.appendChild(cd);
       const tickCd = () => {
-        if (!P.bars || !P.bars.length || (VCH && VCH.hidden) || !el.offsetParent || document.hidden) return;
+        if (!P.vis || !P.bars || !P.bars.length || (VCH && VCH.hidden) || !el.offsetParent || document.hidden) return;
         const L = P.bars[P.bars.length - 1], y = series.priceToCoordinate(L.close), w = chart.priceScale('right').width();
         const left = Math.ceil(((L.time - TZ) + tf.sec) - Date.now() / 1000);
         if (y == null || !w || left <= 0 || left > tf.sec || marketClosedNow()) { cd.style.display = 'none'; return; }
@@ -4353,8 +4359,8 @@ function msNextSetup(bars, A) {
         cd.classList.toggle('up', L.close >= L.open);
       };
       setInterval(tickCd, 1000); chart.timeScale().subscribeVisibleLogicalRangeChange(() => requestAnimationFrame(tickCd)); }
-    chart.subscribeCrosshairMove((pr) => { if (!P.bars) return; if (pr && pr.logical != null && pr.point && pr.point.x >= 0) { lgHover = true; P._cp = series.coordinateToPrice(pr.point.y); P.legend(Math.round(pr.logical)); } else { lgHover = false; P.legend(); } });
-    setInterval(() => { if (!lgHover && !P.rp && !(VCH && VCH.hidden) && el.offsetParent && !document.hidden) { try { const d = series.data(); if (d && d.length && P.bars && P.bars.length) { const L = d[d.length - 1], b = P.bars[P.bars.length - 1]; if (L.time === b.time) Object.assign(b, { open: L.open, high: L.high, low: L.low, close: L.close }); } } catch (e) {} P.legend(); } }, 1000);
+    chart.subscribeCrosshairMove((pr) => { if (!P.bars) return; if (pr && pr.logical != null && pr.point && pr.point.x >= 0) { lgHover = true; P._cp = series.coordinateToPrice(pr.point.y); lgSoon(Math.round(pr.logical)); } else { lgHover = false; lgSoon(undefined); } });
+    setInterval(() => { if (P.vis && !lgHover && !P.rp && !(VCH && VCH.hidden) && el.offsetParent && !document.hidden) { try { const d = series.data(); if (d && d.length && P.bars && P.bars.length) { const L = d[d.length - 1], b = P.bars[P.bars.length - 1]; if (L.time === b.time) Object.assign(b, { open: L.open, high: L.high, low: L.low, close: L.close }); } } catch (e) {} P.legend(); } }, 1000);
     series.applyOptions({ autoscaleInfoProvider: (orig) => {
       const r = orig();
       if (r && r.priceRange && P.pv.length) { r.priceRange.minValue = Math.min(r.priceRange.minValue, ...P.pv); r.priceRange.maxValue = Math.max(r.priceRange.maxValue, ...P.pv); }
@@ -4631,15 +4637,25 @@ function msNextSetup(bars, A) {
       else return;
       const off = G.offset, b = { time: k.time + TZ, open: k.open + off, high: k.high + off, low: k.low + off, close: k.close + off };
       if (P.bars[P.bars.length - 1].time === b.time) P.bars[P.bars.length - 1] = b; else P.bars.push(b);
+      if (P.bars.length > P.raw.length) P.bars.shift();
+      // perf (9 Nov): a pane that is off screen (another view, another timeframe picked, or scrolled away) only keeps its data;
+      // the canvases are brought up to date in one go when it shows again (P.resync), instead of being repainted on every tick
+      if (!P.vis && !P.rp) { P._stale = true; const now = Date.now(); if (k.closed || !P._t || now - P._t > 2000) { P._t = now; P.analyze(); } return; }
       P.tickEma(b); P.tickShade(b);
       if (G.showVol !== false) { const rk = P.raw[P.raw.length - 1]; if (rk.volume > 0 || P.raw.some((x) => x.volume > 0)) try { vol.update({ time: b.time, value: rk.volume || 0, color: vcol(rk) }); } catch (e) {} }
-      if (P.bars.length > P.raw.length) P.bars.shift();
       if (!P.rp) series.update(P.viewBar(b));
       if (!lgHover && !P.rp) P.legend();
       const now = Date.now();
       if (k.closed || !P._t || now - P._t > 2000) { P._t = now; P.analyze(); if (G.showVwap === true && !P.rp) P.setVwap(); if (P._ind.length && !P.rp) P.setInd(); }
     };
     new ResizeObserver(() => { if (!P.fitted && el.clientWidth > 0 && P.bars) requestAnimationFrame(P.fit); }).observe(el);
+    P.vis = true;
+    P.resync = function () {
+      if (!P._stale || !P.bars || !P.bars.length || P.rp) return; P._stale = false;
+      try { series.setData(P.view(P.bars)); P.setVol(); P.setEma(); P.setShade(); if (G.showVwap === true) P.setVwap(); if (P._ind && P._ind.length) P.setInd(); } catch (e) {}
+      P.legend();
+    };
+    if (window.IntersectionObserver) new IntersectionObserver((es) => { const v = es[es.length - 1].isIntersecting; if (v === P.vis) return; P.vis = v; if (v && P._stale) requestAnimationFrame(P.resync); }, { rootMargin: '120px 0px' }).observe(el);
     return P;
   }
 
@@ -4693,10 +4709,12 @@ function msNextSetup(bars, A) {
   }
   setTimeout(rangeMeter, 3000); setInterval(rangeMeter, 15e3);
   // watchlist strip (7 Nov loop): OANDA markets with today's change; tap to switch the charts to that market
+  // the strip's row is held while the quotes load (9 Nov: the toolbar and charts jumped down ~50 px when it appeared, CLS 0.14 for guests)
+  { const w = document.getElementById('ms-wl'); if (w && MD.base) w.classList.add('wl-wait'); }
   async function watchlist() {
-    const el = document.getElementById('ms-wl'); if (!el || !MD.base || MD.on === false) return;
+    const el = document.getElementById('ms-wl'); if (!el) return; if (!MD.base || MD.on === false) { el.classList.remove('wl-wait'); return; }
     const Q = await mdQuotes();   // same quotes and change basis as Home "Markets now" (defined below; runs after the script has loaded)
-    const ok = Object.keys(INSTRUMENTS).filter((k) => Q[k]).map((k) => Q[k]); if (!ok.length) return;
+    const ok = Object.keys(INSTRUMENTS).filter((k) => Q[k]).map((k) => Q[k]); el.classList.remove('wl-wait'); if (!ok.length) return;
     el.hidden = false;
     el.innerHTML = ok.map((r) => { const I = INSTRUMENTS[r.k], d = I.dec ?? 2; return `<a href="?s=${r.k}#charts" class="wl-i${r.k === instKey ? ' cur' : ''}"${r.k === instKey ? ' aria-current="true"' : ''} title="${I.label}: change vs the previous day's close (OANDA, UTC days)${r.closed ? ` · closed, last price ${mdWd(r.day)}` : ''}"><b>${I.label}</b><span>${(+r.c).toLocaleString('en-US', { minimumFractionDigits: d, maximumFractionDigits: d })}</span><em class="${r.ch >= 0 ? 'up' : 'dn'}">${r.ch >= 0 ? '+' : '−'}${Math.abs(r.ch).toFixed(2)}%</em></a>`; }).join('');
   }
@@ -7690,8 +7708,11 @@ function msNextSetup(bars, A) {
     // what each Today figure means
     const tip = { 'Floating now': 'Result of the open trades right now, in R (1R = the risk of one trade)', Today: 'Closed today, in R', 'This week': 'Closed since Monday, in R', 'This month': 'Closed since the 1st, in R' };
     // perf (8 Nov): one pass per frame however many DOM changes arrive (the observer used to run on every mutation batch)
+    // perf (9 Nov): live ticks rewrite the chart legends, countdowns and the header price several times a second; those changes can
+    // never add a KPI, a scroll box or a "Loading…" label, so the page-wide observers below skip batches made only of them
+    window.msLiveOnly = (recs) => { for (const r of recs) { const t = r.target && (r.target.nodeType === 1 ? r.target : r.target.parentElement); if (!t || !t.closest('.ms-chart, .ms-legend, .ms-ph, .ms-ro, .ms-cd, .ch-lg, .ch-cd, .px, .ms-status, .h-ring, #h-clock, #ms-hdr-open, .ms-toasts, .wl')) return false; } return true; };
     let kq = false; const kpiTips = () => document.querySelectorAll('.h-kpi').forEach((c) => { const k = c.querySelector('.h-kpi-k'); if (k && tip[k.textContent] && !c.title) c.title = tip[k.textContent]; });
-    new MutationObserver(() => { if (kq) return; kq = true; requestAnimationFrame(() => { kq = false; kpiTips(); }); }).observe(document.body, { childList: true, subtree: true }); kpiTips();
+    new MutationObserver((recs) => { if (kq || window.msLiveOnly(recs)) return; kq = true; requestAnimationFrame(() => { kq = false; kpiTips(); }); }).observe(document.body, { childList: true, subtree: true }); kpiTips();
   }
 
   // ─── Design round 2 (6 Nov): scroll boxes fade only while more rows are below; the status dot gets a name ───
@@ -7699,7 +7720,7 @@ function msNextSetup(bars, A) {
     const boxes = () => document.querySelectorAll('.t-scroll, #ms-cal-day, #ms-nq-list, #ms-rep-list, .loss-rows, #ms-c-pm, .c-pane-overview > .c-active .c-act');
     const wire = () => boxes().forEach((el) => { if (!el.dataset.fadeWired) { el.dataset.fadeWired = '1'; el.addEventListener('scroll', () => upd(el), { passive: true }); } upd(el); });
     // perf (8 Nov): every mutation batch used to queue its own frame callback, each reading scrollHeight (a layout) on every box; now one pass per frame
-    let wq = false; new MutationObserver(() => { if (wq) return; wq = true; requestAnimationFrame(() => { wq = false; wire(); }); }).observe(document.body, { childList: true, subtree: true }); addEventListener('resize', wire); wire();
+    let wq = false; new MutationObserver((recs) => { if (wq || window.msLiveOnly(recs)) return; wq = true; requestAnimationFrame(() => { wq = false; wire(); }); }).observe(document.body, { childList: true, subtree: true }); addEventListener('resize', wire); wire();
     const dot = document.getElementById('ms-live-dot'), txt = document.getElementById('ms-live-txt');
     if (dot && txt) { const name = () => { const t = txt.textContent.trim() || (dot.classList.contains('on') ? 'Live' : dot.classList.contains('poll') ? 'Updating every few seconds' : 'Connecting'); dot.title = t; dot.setAttribute('role', 'img'); dot.setAttribute('aria-label', `Price feed: ${t}`); };
       new MutationObserver(name).observe(txt, { childList: true, characterData: true, subtree: true }); new MutationObserver(name).observe(dot, { attributes: true, attributeFilter: ['class'] }); name(); }
@@ -7921,7 +7942,7 @@ function msNextSetup(bars, A) {
     const set = (id, html) => { const el = document.getElementById(id); if (el && el._msHtml !== html) { el._msHtml = html; el.innerHTML = html; } };
     try {
       const bias = document.getElementById('ms-td-bias'), hb = document.getElementById('h-bias');
-      if (bias && hb) { hb.textContent = bias.textContent; hb.className = bias.className; }
+      if (bias && hb) { if (hb.textContent !== bias.textContent) hb.textContent = bias.textContent; if (hb.className !== bias.className) hb.className = bias.className; }   // only on change (9 Nov: it was rewritten on every analysis)
       set('h-step', esc((document.getElementById('ms-td-now') || {}).textContent || ''));
       if (G.td) {
         const td = G.td, w = td.word.toLowerCase();
@@ -7954,7 +7975,7 @@ function msNextSetup(bars, A) {
       if (COUNCIL.trades) { const cl = sysTrades().filter((x) => !x.shadow && (x.status === 'win' || x.status === 'loss' || x.status === 'be')), cr = cl.reduce((a, x) => a + x.R, 0); set('h-council', cl.length ? `${cr >= 0 ? '+' : ''}${cr.toFixed(1)}R <small>our system, ${cl.length} trades (live + replay)</small>` : `${COUNCIL.trades.filter((x) => !x.shadow && (x.status === 'open' || x.status === 'pending')).length} open trades`); }
       if (G.bt) set('h-bt', `${G.bt.wr == null ? '—' : Math.round(G.bt.wr * 100) + '%'} win · ${G.bt.R >= 0 ? '+' : ''}${(+G.bt.R).toFixed(1)}R${G.bt.at ? ` <small>${new Date(G.bt.at).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })}</small>` : ''}`);
       const warn = document.getElementById('ms-news-warn'), hw = document.getElementById('h-warn');
-      if (warn && hw) { hw.hidden = warn.hidden; hw.innerHTML = warn.innerHTML; }
+      if (warn && hw) { if (hw.hidden !== warn.hidden) hw.hidden = warn.hidden; set('h-warn', warn.innerHTML); }
     } catch (e) { /* a section isn't ready yet */ }
   }
   // Session table on the News page
@@ -9120,7 +9141,7 @@ function msNextSetup(bars, A) {
   document.addEventListener('click', function (e) { if (e.target.closest && e.target.closest('#ms-theme, [data-theme-set], .cmdk-it')) fade(); }, true);
   // "Loading…" labels breathe until real text replaces them
   function mark(root) { (root || document).querySelectorAll('.tile-big, .h-head, .tile-sub, .ms-note, h1, h2').forEach(function (el) { el.classList.toggle('is-loading', /^(Loading|Starting up|Scanning soon)/.test(el.textContent.trim())); }); }
-  var mt = null; new MutationObserver(function () { if (mt) return; mt = setTimeout(function () { mt = null; mark(); }, 250); }).observe(document.body, { childList: true, subtree: true, characterData: true });
+  var mt = null; new MutationObserver(function (recs) { if (mt || (window.msLiveOnly && window.msLiveOnly(recs))) return; mt = setTimeout(function () { mt = null; mark(); }, 250); }).observe(document.body, { childList: true, subtree: true, characterData: true });
   document.addEventListener('DOMContentLoaded', function () { mark(); }); mark();
   // staggered entrance the first time a list fills
   function stagger(id, item) { var el = document.getElementById(id); if (!el) return; var done = false;
@@ -10476,7 +10497,8 @@ html[data-role="public"] #ms-me-ct { display: none; }
 .hdr-sw a:not(.on):hover { color: var(--ink); background: color-mix(in srgb, var(--hm-b) 12%, var(--panel)); } .hdr-sw a:not(.on):hover i { background: var(--hm-b); opacity: 1; }
 .hdr-sw a:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
 @property --hm-r { syntax: '<angle>'; inherits: false; initial-value: 0turn; }
-@media (prefers-reduced-motion: no-preference) { .hdr-sw::before { animation: hm-spin 7s linear infinite; } @keyframes hm-spin { to { --hm-r: 1turn; } } }
+/* perf (9 Nov): the ring used to spin forever, which repainted and re-committed the whole page every frame (about 5 s of main-thread work per 8 s on a 4x-throttled phone); it now sweeps once on hover / focus only */
+@media (prefers-reduced-motion: no-preference) { .hdr-sw:is(:hover, :focus-within)::before { animation: hm-spin 1.1s cubic-bezier(.22, 1, .36, 1) 1; } @keyframes hm-spin { to { --hm-r: 1turn; } } }
 html[data-role="public"] .hdr-sw { display: none; }
 .hdr-sw a.hdr-ct.on { background: color-mix(in srgb, #2fbf8f 16%, var(--panel)); box-shadow: inset 0 0 0 1px color-mix(in srgb, #2fbf8f 40%, transparent); } .hdr-sw a.hdr-ct.on i { background: #2fbf8f; box-shadow: 0 0 0 3px color-mix(in srgb, #2fbf8f 25%, transparent); } .hdr-sw a.hdr-ct:not(.on):hover i { background: #2fbf8f; }
 @media (max-width: 760px) { .hdr-sw a span { display: none; } .hdr-sw a { padding: 0 9px; } }
@@ -13162,6 +13184,102 @@ html[data-theme="dark"] #v-home::before, html:not([data-theme="light"]) #v-home:
   $('ms-nt-sent').addEventListener('click', function (e) { var b = e.target.closest('[data-del]'); if (!b) return; window.msConfirm('Delete this notification for everyone?', { title: 'Delete notification', ok: 'Delete', danger: true }).then(function (ok) { if (!ok) return;
     fetch(API, { method: 'POST', credentials: 'same-origin', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ remove: b.dataset.del }) }).then(load); }); });
   document.addEventListener('DOMContentLoaded', own); own();
+})();
+</script>
+<!-- Desk polish (9 Nov 2026, owner: "smoother", "buttons organised", "simpler"): one ordered chart toolbar, context folded on phones,
+     pulses on the compositor, a header that fits a 390 px phone, aligned council rows. Scoped to Home, Charts, Council and the header. -->
+<style id="ms-desk-css">
+/* live dots: the box-shadow pulses repainted the page every frame (guest phone: ~5 s of main thread per 8 s at 4x CPU);
+   the same ring now grows on a pseudo-element with transform + opacity, which the compositor animates on its own */
+.ms-live-dot.on, .ms-live-dot.live, :is(#v-guest, .g-merged) .g-live i { animation: none !important; position: relative; }
+@media (prefers-reduced-motion: no-preference) {
+  .ms-live-dot.on::after, .ms-live-dot.live::after, :is(#v-guest, .g-merged) .g-live i::after { content: ""; position: absolute; inset: 0; border-radius: 50%; background: inherit; pointer-events: none; animation: ms-ring 2.2s cubic-bezier(.22, 1, .36, 1) infinite; will-change: transform, opacity; }
+  @keyframes ms-ring { from { transform: scale(1); opacity: .55; } to { transform: scale(2.8); opacity: 0; } }
+}
+html[data-motion="off"] .ms-live-dot::after, html[data-motion="off"] .g-live i::after { animation: none !important; display: none; }
+
+/* header on a 390 px phone (the account oval ran 23 px past the screen and the whole page scrolled sideways): price alerts stay one
+   tap away in Settings, in the chart toolbars and in the search palette; the market list never pokes past the edge */
+@media (max-width: 430px) {
+  .top-actions #ms-alerts { display: none !important; }
+  .top .mk-pop { width: auto; left: 0; right: auto; max-width: calc(100vw - 24px); box-sizing: border-box; }
+}
+@media (max-width: 430px) { .btab > a svg, .btab-more-btn svg { padding: 3px 10px; } .btab > a, .btab-more-btn { overflow: hidden; min-width: 0; } .btab { box-sizing: border-box; width: 100%; max-width: 100vw; grid-auto-columns: minmax(0, 1fr); } }
+/* the home wash bled 24 px past the right edge of a phone (the page scrolled sideways by 8 px); nothing in the app may widen the page */
+@media (max-width: 760px) { #v-home::before { left: -16px; right: -16px; } }
+.ms-live.app { overflow-x: clip; }
+@media (max-width: 360px) { .top-actions #ms-cmdk-btn { display: none !important; } }
+
+/* Charts toolbar: one order everywhere, most used first. Row 1 the markets, row 2 timeframe | markup | indicators, row 3 the
+   context strip (daily range, timeframe alignment), which folds behind "Context" on phones */
+#v-charts .sec-h { column-gap: 10px; row-gap: 10px; justify-content: flex-start; }
+#v-charts .sec-h > h2 { order: 0; }
+#v-charts .sec-h > .wl { order: 1; }
+#v-charts .sec-h > .seg[aria-label="Chart view"] { order: 2; margin-left: 0; }
+#v-charts .sec-h > .mk-mode { order: 3; margin-left: 0; }
+#v-charts .sec-h > .ind-open { order: 4; margin-left: auto; }
+#v-charts .sec-h > .cx-tog { order: 5; }
+#v-charts .sec-h > .g-back { order: 6; margin-left: auto; }
+#v-charts .sec-h::after { content: ""; order: 7; flex: 1 0 100%; height: 0; }
+#v-charts .sec-h > .adr { order: 8; margin: 0; }
+#v-charts .sec-h > .mtf { order: 9; margin: 0; }
+#v-charts .sec-h > .pa-chips { order: 10; }
+#v-charts .sec-h > .mk-mode, #v-charts .sec-h > .ind-open { position: relative; }
+@media (min-width: 701px) {
+  #v-charts .sec-h > .mk-mode::before { content: ""; position: absolute; left: -6px; top: 8px; bottom: 8px; width: 1px; background: var(--line); }
+}
+.cx-tog { display: none; }
+@media (max-width: 700px) {
+  #v-charts .sec-h > h2 { font-size: 22px; } #v-charts .sec-h { padding-top: 6px; }
+  #v-charts .sec-h > .seg[aria-label="Chart view"] { flex: 1 1 100%; }
+  #v-charts .sec-h > .mk-mode { flex: 1 1 0; min-width: 0; }
+  #v-charts .sec-h > .mk-mode button { min-width: 0; padding: 0 4px; }
+  #v-charts .sec-h > .ind-open { margin-left: 0; }
+  #v-charts .sec-h > .ind-open { font-size: 0; gap: 6px; padding: 0 12px; }
+  #v-charts .sec-h > .ind-open small { font-size: 12px; }
+  .cx-tog { display: inline-flex; align-items: center; justify-content: center; gap: 6px; height: 46px; width: 46px; padding: 0; font-size: 0 !important; border-radius: 12px; border: 1px solid var(--line); background: var(--panel); color: var(--ink-dim); font: 600 12.5px var(--sans); cursor: pointer; flex: none; }
+  .cx-tog::after { content: ""; width: 7px; height: 7px; border: solid currentColor; border-width: 0 1.6px 1.6px 0; transform: translateY(-2px) rotate(45deg); transition: transform .15s ease-out; }
+  .cx-tog[aria-expanded="true"] { color: var(--ink); border-color: var(--line-strong); }
+  .cx-tog[aria-expanded="true"]::after { transform: translateY(2px) rotate(-135deg); }
+  .cx-tog:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  #v-charts:not(.cx-open) .sec-h > :is(.adr, .mtf, .pa-chips) { display: none !important; }
+  /* the chart's own header tools scroll sideways inside it; the pane itself never widens the page */
+  #v-charts .ms-pane, #v-charts .ms-ph { min-width: 0; max-width: 100%; }
+}
+html[data-role="public"] .cx-tog { display: none !important; }
+#v-charts .sec-h > .wl.wl-wait[hidden] { display: block !important; visibility: hidden; height: 34px; margin: 4px 0 12px; }
+
+/* Council: rows line up on one side column whatever the chip says (BUY / SELL / a group); the status line folds to one line on phones */
+#v-council .c-act li:not(.grp):not(.empty), #v-council .c-act li.grp > details > summary, #v-home .c-act li:not(.grp):not(.empty), #v-home .c-act li.grp > details > summary { grid-template-columns: 52px minmax(0, 1fr) auto; }
+@media (max-width: 700px) {
+  #v-council #ms-c-status .c-meta { display: -webkit-box; -webkit-line-clamp: 1; -webkit-box-orient: vertical; overflow: hidden; cursor: pointer; border-radius: 6px; }
+  #v-council #ms-c-status .c-meta.open { display: block; -webkit-line-clamp: unset; }
+  #v-council #ms-c-status .c-meta:not(.open)::before { content: "Details ▸ "; font-weight: 600; color: var(--ink-dim); }
+  #v-council #ms-c-status .c-meta:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+}
+
+/* focus is always visible on the navigation and the section shortcuts */
+.btab a:focus-visible, .h-quick a:focus-visible, .top .tabs a:focus-visible, .hdr-sw a:focus-visible, .c-nav button:focus-visible, .wl a:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+</style>
+<script id="ms-desk-js">
+// Desk polish (9 Nov): the phone Context fold on Charts and the council status line's one-line fold
+(function () {
+  var V = document.getElementById('v-charts'), T = document.getElementById('ms-cx-tog');
+  if (V && T) {
+    var open = false; try { open = localStorage.getItem('ms-cx') === '1'; } catch (e) {}
+    var set = function (on) { open = on; V.classList.toggle('cx-open', on); T.setAttribute('aria-expanded', String(on)); T.title = on ? 'Hide the daily range and the timeframe alignment' : 'Show the daily range and the timeframe alignment'; try { localStorage.setItem('ms-cx', on ? '1' : '0'); } catch (e) {} };
+    set(open); T.addEventListener('click', function () { set(!open); });
+  }
+  var I = document.getElementById('ms-ind-open'); if (I && !I.getAttribute('aria-label')) I.setAttribute('aria-label', 'Indicators');
+  var S = document.getElementById('ms-c-status');
+  if (S) {
+    var metaOpen = false;
+    var dress = function () { var m = S.querySelector('.c-meta'); if (!m || m.dataset.fold) return; m.dataset.fold = '1'; m.tabIndex = 0; m.setAttribute('role', 'button'); m.classList.toggle('open', metaOpen); m.setAttribute('aria-expanded', String(metaOpen)); };
+    var flip = function (m) { metaOpen = !metaOpen; m.classList.toggle('open', metaOpen); m.setAttribute('aria-expanded', String(metaOpen)); };
+    S.addEventListener('click', function (e) { var m = e.target.closest && e.target.closest('.c-meta'); if (m && !e.target.closest('[data-dh], a, button')) flip(m); });
+    S.addEventListener('keydown', function (e) { var m = e.target.closest && e.target.closest('.c-meta'); if (m && (e.key === 'Enter' || e.key === ' ')) { e.preventDefault(); flip(m); } });
+    new MutationObserver(dress).observe(S, { childList: true }); dress();
+  }
 })();
 </script>
 </body>
