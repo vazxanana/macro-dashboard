@@ -2458,7 +2458,7 @@
     "lots": 0.02,
     "digits": 5,
     "setup": "scalp",
-    "status": "open",
+    "status": "closed at broker",
     "openedAt": "2026-11-09T15:06:45.000Z",
     "councilEntry": 0.82214,
     "stop": 0.82104,
@@ -2473,13 +2473,15 @@
     "lagSec": 95,
     "alerted": [
      "open",
-     "amend"
+     "amend",
+     "close"
     ],
     "stopCheckedAt": "2026-11-09T15:06:45.000Z",
     "brokerStop": 0.82105,
     "rr": 5.82,
     "amended": 1,
-    "amendedAt": "2026-11-09T15:09:31.000Z"
+    "amendedAt": "2026-11-09T15:09:31.000Z",
+    "closedAt": "2026-11-09T16:18:50.000Z"
    },
    "sol-rscalp-1794237676": {
     "positionId": "47694914",
@@ -2584,7 +2586,8 @@
     "t1": 0.8233100000000001,
     "adopted": false,
     "alerted": [
-     "open"
+     "open",
+     "close"
     ],
     "viaLimit": true,
     "limitPrice": 0.82181,
@@ -2598,7 +2601,8 @@
     "lagSec": 3702,
     "positionId": "47690552",
     "volume": 200000,
-    "status": "open"
+    "status": "closed at broker",
+    "closedAt": "2026-11-09T16:18:50.000Z"
    },
    "gbpusd-intraday-1794237676": {
     "symbol": "GBPUSD",
@@ -2626,6 +2630,32 @@
     "positionId": "47694927",
     "volume": 100000,
     "status": "open"
+   },
+   "eurusd-rintra-1794240969": {
+    "symbol": "EURUSD",
+    "side": "buy",
+    "setup": "rintra",
+    "openedAt": "2026-11-09T16:18:50.000Z",
+    "councilEntry": 1.12028,
+    "stop": 1.1189,
+    "t1": 1.12132,
+    "adopted": false,
+    "alerted": [
+     "open"
+    ],
+    "viaLimit": true,
+    "limitPrice": 1.12028,
+    "digits": 5,
+    "lots": 0.01,
+    "riskCash": 1.99,
+    "margin": 2.24,
+    "shadow": true,
+    "fillPrice": 1.12028,
+    "slipR": 0,
+    "lagSec": 161,
+    "positionId": "47714303",
+    "volume": 100000,
+    "status": "open"
    }
   },
   "day": {
@@ -2633,7 +2663,7 @@
    "startBalance": 9987.78
   },
   "startedAt": "2026-11-08T11:42:25.000Z",
-  "status": "ok · demo Fusion Markets · balance 9973.13 · 27 open · 2 resting",
+  "status": "ok · demo Fusion Markets · balance 9969.55 · 26 open · 1 resting",
   "skipped": {
    "audusd-position-1793601653": "price 0.68666 has run 1.27R from the council entry 0.70162: a different trade now",
    "xrp-rswing-1793942619": "none of XRPUSD found at the broker",
@@ -2666,48 +2696,13 @@
     "alerted": [
      "pending"
     ]
-   },
-   "eurusd-rintra-1794240969": {
-    "orderId": "33816069",
-    "symbol": "EURUSD",
-    "side": "buy",
-    "volume": 100000,
-    "lots": 0.01,
-    "digits": 5,
-    "setup": "rintra",
-    "limitPrice": 1.12028,
-    "stop": 1.1189,
-    "t1": 1.12132,
-    "placedAt": "2026-11-09T16:17:22.000Z",
-    "expires": "2026-11-10T04:16:09.000Z",
-    "riskCash": 1.99,
-    "margin": 2.24,
-    "shadow": true,
-    "alerted": [
-     "pending"
-    ]
    }
   },
   "catchUpAt": "2026-11-08T12:04:40.000Z",
-  "balance": 9973.13,
-  "lastRun": "2026-11-09T16:17:22.000Z"
+  "balance": 9969.55,
+  "lastRun": "2026-11-09T16:18:50.000Z"
  },
  "log": [
-  {
-   "at": "2026-11-08T21:54:37.000Z",
-   "msg": "not mirrored yet audusd-scalp-1793949425: AUDUSD market closed (paused until 22:02 UTC) (will retry)",
-   "trade": "audusd-scalp-1793949425"
-  },
-  {
-   "at": "2026-11-08T21:54:37.000Z",
-   "msg": "placed sell limit BTCUSD 0.01 lot at 75100 (council swing, valid to 2026-11-10T21:54Z)",
-   "trade": "btc-swing-1794174840"
-  },
-  {
-   "at": "2026-11-08T21:56:31.000Z",
-   "msg": "cancelled SOLUSD limit order 33763147 for sol-intraday-1794174307: the council ended it: missed",
-   "trade": "sol-intraday-1794174307"
-  },
   {
    "at": "2026-11-08T22:03:09.000Z",
    "msg": "opened buy EURUSD 0.01 lot (council rswing)",
@@ -4192,6 +4187,21 @@
    "at": "2026-11-09T16:17:22.000Z",
    "msg": "placed buy limit EURUSD 0.01 lot at 1.12028 (council rintra, valid to 2026-11-10T04:16Z)",
    "trade": "eurusd-rintra-1794240969"
+  },
+  {
+   "at": "2026-11-09T16:18:50.000Z",
+   "msg": "limit filled: EURUSD position 47714303 at the broker",
+   "trade": "eurusd-rintra-1794240969"
+  },
+  {
+   "at": "2026-11-09T16:18:50.000Z",
+   "msg": "USDCHF position 47689319 closed at the broker",
+   "trade": "usdchf-scalp-1794236710"
+  },
+  {
+   "at": "2026-11-09T16:18:50.000Z",
+   "msg": "USDCHF position 47690552 closed at the broker",
+   "trade": "usdchf-scalp-1794236890"
   }
  ],
  "limits": {
@@ -4270,11 +4280,11 @@
   ]
  },
  "execution": {
-  "n": 88,
+  "n": 89,
   "meanSlipR": -0.011,
   "medianSlipR": 0,
   "worstSlipR": 1.168,
-  "medianLagSec": 171.5,
+  "medianLagSec": 166,
   "bySymbol": {
    "SOLUSD": {
     "n": 7,
@@ -4289,8 +4299,8 @@
     "meanSlipR": -0.087
    },
    "EURUSD": {
-    "n": 13,
-    "meanSlipR": -0.031
+    "n": 14,
+    "meanSlipR": -0.029
    },
    "GBPUSD": {
     "n": 12,
