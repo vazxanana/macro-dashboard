@@ -6,7 +6,7 @@ const fs = require('fs');
 const PORT = process.env.PORT || 8766, H = 'http://127.0.0.1:' + PORT;
 const OUT = process.env.AUDIT_OUT || require('os').tmpdir() + '/';
 const R = []; const check = (name, ok, info = '') => { R.push({ name, ok: !!ok, info: String(info).slice(0, 140) }); };
-const route = async (p) => p.route(new RegExp('127\\.0\\.0\\.1:' + PORT + '/md/bars'), async (r) => { const u = r.request().url().replace(H, 'https://meridianx.dev'); try { const res = await fetch(u); r.fulfill({ status: res.status, contentType: 'application/json', body: await res.text() }); } catch (e) { r.fulfill({ status: 502, body: '{}' }); } });
+const route = async (p) => (await p.route(/\/api\/sounds/, (r) => r.fulfill({ status: 200, contentType: 'application/json', body: '{"sl":null,"tp":null}' })), p.route(new RegExp('127\\.0\\.0\\.1:' + PORT + '/md/bars'), async (r) => { const u = r.request().url().replace(H, 'https://meridianx.dev'); try { const res = await fetch(u); r.fulfill({ status: res.status, contentType: 'application/json', body: await res.text() }); } catch (e) { r.fulfill({ status: 502, body: '{}' }); } }));
 const barN = async (p) => +((await p.$eval('#now', (e) => e.textContent)).match(/bar (\d+)/) || [0, 0])[1];
 const txt = (p, sel) => p.$eval(sel, (e) => e.textContent).catch(() => '');
 const vis = (p, sel) => p.$eval(sel, (e) => !!(e.offsetParent || getComputedStyle(e).position === 'fixed') && !e.hidden).catch(() => false);
