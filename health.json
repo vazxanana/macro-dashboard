@@ -1,6 +1,6 @@
 {
- "at": "2026-11-09T07:30:50.000Z",
- "status": "ok",
+ "at": "2026-11-09T07:33:48.000Z",
+ "status": "warn",
  "feeds": {
   "oanda": {
    "label": "OANDA spot (md/bars)",
@@ -132,9 +132,9 @@
      "label": "NQ",
      "sym": "@ND.1",
      "status": "ok",
-     "n": 560,
-     "last": "2026-11-09T07:25:00.000Z",
-     "staleMin": 1,
+     "n": 561,
+     "last": "2026-11-09T07:30:00.000Z",
+     "staleMin": 0,
      "maxJump": 2.03,
      "clipped": 0,
      "issues": []
@@ -143,10 +143,10 @@
      "label": "ES",
      "sym": "@SP.1",
      "status": "ok",
-     "n": 560,
-     "last": "2026-11-09T07:25:00.000Z",
-     "staleMin": 1,
-     "maxJump": 2.18,
+     "n": 561,
+     "last": "2026-11-09T07:30:00.000Z",
+     "staleMin": 0,
+     "maxJump": 2.43,
      "clipped": 0,
      "issues": []
     },
@@ -154,10 +154,10 @@
      "label": "YM",
      "sym": "@DJ.1",
      "status": "ok",
-     "n": 559,
-     "last": "2026-11-09T07:25:00.000Z",
-     "staleMin": 1,
-     "maxJump": 2.1,
+     "n": 560,
+     "last": "2026-11-09T07:30:00.000Z",
+     "staleMin": 0,
+     "maxJump": 3.29,
      "clipped": 0,
      "issues": []
     },
@@ -165,10 +165,10 @@
      "label": "RTY",
      "sym": "@TFS.1",
      "status": "ok",
-     "n": 560,
-     "last": "2026-11-09T07:25:00.000Z",
-     "staleMin": 1,
-     "maxJump": 2.08,
+     "n": 561,
+     "last": "2026-11-09T07:30:00.000Z",
+     "staleMin": 0,
+     "maxJump": 3.81,
      "clipped": 0,
      "issues": []
     },
@@ -176,17 +176,293 @@
      "label": "GC",
      "sym": "@GC.1",
      "status": "ok",
-     "n": 560,
-     "last": "2026-11-09T07:25:00.000Z",
-     "staleMin": 1,
+     "n": 561,
+     "last": "2026-11-09T07:30:00.000Z",
+     "staleMin": 0,
      "maxJump": 2.83,
      "clipped": 0,
      "issues": []
     }
    }
+  },
+  "files": {
+   "label": "Council data files",
+   "status": "warn",
+   "markets": {
+    "snapshot.json": {
+     "label": "Trader snapshot (snapshot.json)",
+     "status": "ok",
+     "ageMin": 2,
+     "issues": [
+      {
+       "kind": "source",
+       "sev": "note",
+       "detail": "NQ backup: Yahoo NQ=F: throttled (HTTP 429) (NQ reads cnbc)"
+      }
+     ]
+    },
+    "state.json": {
+     "label": "Trader state (state.json)",
+     "status": "ok",
+     "ageMin": 2,
+     "issues": []
+    },
+    "trades.json": {
+     "label": "Trade records (trades.json)",
+     "status": "ok",
+     "issues": []
+    },
+    "config.json": {
+     "label": "Rules (config) (config.json)",
+     "status": "ok",
+     "issues": []
+    },
+    "research.json": {
+     "label": "Research streams (research.json)",
+     "status": "ok",
+     "issues": []
+    },
+    "mt5/signals.csv": {
+     "label": "MT5 / cTrader signal file (mt5/signals.csv)",
+     "status": "ok",
+     "ageMin": 2,
+     "issues": []
+    },
+    "analysis/latest.md": {
+     "label": "Analyst brief + live blocks (analysis/latest.md)",
+     "status": "ok",
+     "issues": []
+    },
+    "ctrader/account.json": {
+     "label": "cTrader demo account (ctrader/account.json)",
+     "status": "ok",
+     "ageMin": 2,
+     "issues": []
+    },
+    "ctrader/accounts.json": {
+     "label": "cTrader demo accounts (ctrader/accounts.json)",
+     "status": "ok",
+     "ageMin": 2,
+     "issues": []
+    },
+    "ctrader/mirror-10152144.json": {
+     "label": "cTrader mirror 10152144 (ctrader/mirror-10152144.json)",
+     "status": "ok",
+     "ageMin": 0,
+     "issues": []
+    },
+    "ctrader/mirror-10152145.json": {
+     "label": "cTrader mirror 10152145 (ctrader/mirror-10152145.json)",
+     "status": "ok",
+     "ageMin": 0,
+     "issues": []
+    },
+    "ctrader/mirror-10152146.json": {
+     "label": "cTrader mirror 10152146 (ctrader/mirror-10152146.json)",
+     "status": "ok",
+     "ageMin": 0,
+     "issues": []
+    },
+    "ctrader/mirror-10152148.json": {
+     "label": "cTrader mirror 10152148 (ctrader/mirror-10152148.json)",
+     "status": "ok",
+     "ageMin": 0,
+     "issues": []
+    },
+    "ctrader/mirror.json": {
+     "label": "cTrader mirror main (ctrader/mirror.json)",
+     "status": "ok",
+     "ageMin": 0,
+     "issues": []
+    },
+    "ctrader/symbols.json": {
+     "label": "cTrader symbol specs (ctrader/symbols.json)",
+     "status": "ok",
+     "ageMin": 3,
+     "issues": [
+      {
+       "kind": "source",
+       "sev": "note",
+       "detail": "not offered by the broker: xrp (XRPUSD)"
+      }
+     ]
+    },
+    "ict/snapshot.json": {
+     "label": "ICT desk snapshot (ict/snapshot.json)",
+     "status": "ok",
+     "ageMin": 1,
+     "issues": []
+    },
+    "ict/shadow.json": {
+     "label": "ICT shadow book (ict/shadow.json)",
+     "status": "ok",
+     "ageMin": 1,
+     "issues": []
+    },
+    "ict/trades.json": {
+     "label": "ICT trades (ict/trades.json)",
+     "status": "ok",
+     "issues": []
+    },
+    "ict/bars.json": {
+     "label": "ICT desk candles (ict/bars.json)",
+     "status": "ok",
+     "issues": []
+    },
+    "macro/forecast.json": {
+     "label": "Macro forecast (macro/forecast.json)",
+     "status": "warn",
+     "ageMin": 0,
+     "issues": [
+      {
+       "kind": "input",
+       "sev": "warn",
+       "detail": "fred:BSCICP03DEM665S last value 2024-01-01 (1043 days old; over 120 the strategist drops it as \"no data\")"
+      }
+     ]
+    },
+    "macro/veteran.json": {
+     "label": "Macro veteran (macro/veteran.json)",
+     "status": "ok",
+     "ageMin": 0,
+     "issues": []
+    },
+    "macro/cot.json": {
+     "label": "COT positioning (macro/cot.json)",
+     "status": "ok",
+     "ageMin": 0,
+     "issues": []
+    },
+    "macro/history.json": {
+     "label": "Macro forecast log (macro/history.json)",
+     "status": "ok",
+     "issues": []
+    },
+    "macro/events.json": {
+     "label": "Macro release log (macro/events.json)",
+     "status": "ok",
+     "issues": []
+    },
+    "macro/cache.json": {
+     "label": "Macro source cache (macro/cache.json)",
+     "status": "ok",
+     "issues": []
+    },
+    "coach.json": {
+     "label": "Coach (daily review + 6-hourly decay) (coach.json)",
+     "status": "ok",
+     "ageMin": 453,
+     "issues": []
+    },
+    "digest.json": {
+     "label": "Daily owner digest (digest.json)",
+     "status": "ok",
+     "issues": []
+    },
+    "watchdog.json": {
+     "label": "Loop watchdog (watchdog.json)",
+     "status": "warn",
+     "ageMin": 358,
+     "issues": [
+      {
+       "kind": "stale",
+       "sev": "warn",
+       "detail": "not updated for 6.0 h (expected GitHub cron :11/:41 + each loop hand-over; flag after 3.0 h): while it is down nobody is alerted if the council loop stops"
+      }
+     ]
+    },
+    "backtest.json": {
+     "label": "Daily replay (backtest.json)",
+     "status": "ok",
+     "ageMin": 1254,
+     "issues": []
+    },
+    "research/fidelity.json": {
+     "label": "Replay fidelity check (research/fidelity.json)",
+     "status": "ok",
+     "ageMin": 1254,
+     "issues": []
+    },
+    "research/spotcheck.json": {
+     "label": "Feed spot-check (research/spotcheck.json)",
+     "status": "ok",
+     "ageMin": 1254,
+     "issues": []
+    },
+    "research/robustness.json": {
+     "label": "Robustness verdicts (research/robustness.json)",
+     "status": "ok",
+     "ageMin": 3,
+     "issues": []
+    },
+    "research/ledger.json": {
+     "label": "Research ledger (research/ledger.json)",
+     "status": "ok",
+     "issues": []
+    },
+    "research/replay-2w.json": {
+     "label": "System replays (research/replay-2w.json)",
+     "status": "ok",
+     "issues": []
+    },
+    "research/shadow-replay.json": {
+     "label": "Shadow replay (research/shadow-replay.json)",
+     "status": "ok",
+     "issues": []
+    },
+    "ict/replay.json": {
+     "label": "ICT replay (ict/replay.json)",
+     "status": "ok",
+     "ageMin": 1064,
+     "issues": []
+    },
+    "lit/replay.json": {
+     "label": "LIT replay (lit/replay.json)",
+     "status": "ok",
+     "ageMin": 760,
+     "issues": []
+    },
+    "research/daily/_index.json": {
+     "label": "Daily candle cache (research/daily/_index.json)",
+     "status": "ok",
+     "ageMin": 1964,
+     "issues": [
+      {
+       "kind": "stale",
+       "sev": "note",
+       "detail": "no new candles from OANDA: in50 (last 2022-07-12)"
+      }
+     ]
+    },
+    "reviews/latest.md": {
+     "label": "Coach AI review (reviews/latest.md)",
+     "status": "ok",
+     "issues": []
+    },
+    "reviews/losses.json": {
+     "label": "Owner loss reviews (reviews/losses.json)",
+     "status": "ok",
+     "issues": []
+    },
+    "reviews/analyst.json": {
+     "label": "Loss post-mortems (reviews/analyst.json)",
+     "status": "ok",
+     "issues": []
+    }
+   }
   }
  },
- "summary": "All feeds clean",
+ "summary": "Council data files: Macro forecast (macro/forecast.json) input, Loop watchdog (watchdog.json) stale",
+ "brief": {
+  "status": "warn",
+  "line": "2 warnings: Macro forecast (macro/forecast.json): fred:BSCICP03DEM665S last value 2024-01-01 (1043 days old; over 120 the strategist drops it as \"no dat",
+  "bad": [],
+  "warn": [
+   "Macro forecast (macro/forecast.json): fred:BSCICP03DEM665S last value 2024-01-01 (1043 days old; over 120 the strategist drops it as \"no data\")",
+   "Loop watchdog (watchdog.json): not updated for 6.0 h (expected GitHub cron :11/:41 + each loop hand-over; flag after 3.0 h): while it is down nobody is alerted if the council loop stops"
+  ],
+  "notes": 3
+ },
  "alert": {
   "streak": {},
   "sent": {
