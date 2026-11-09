@@ -688,11 +688,11 @@ export async function mirrorRound({ env, trades, state, tokens, specs = null, WS
           // RULE: never a position without a stop. The fill event carries the position's levels; a missing stop is set now, or the position closed
           // (9 Nov, owner: "the most important part"): the fill event can arrive before the broker attaches the relative stop, so the
           // position is read back from the broker first; only a stop that is really missing is set (or the position closed)
-          if (filled && ev.position && ev.position.stopLoss == null) {
+          if (filled && (!ev.position || ev.position.stopLoss == null)) {   // no position body in the event: checked the same way
             let pr = null;
             try { if (slWaitMs > 0) await new Promise((r) => setTimeout(r, slWaitMs)); const rc2 = await s.send(PT.RECONCILE_REQ, { ctidTraderAccountId: ctid }, PT.RECONCILE_RES); pr = (rc2.position || []).find((x) => String(x.positionId) === String(pid)) || null; } catch (e) { pr = null; }
             if (pr && pr.stopLoss != null) { st.map[t.id].stopCheckedAt = iso; st.map[t.id].brokerStop = +pr.stopLoss; }
-            else { const base = pr || ev.position, pf = { ...base, price: base.price ?? ev.position.price ?? (ev.deal && ev.deal.executionPrice) ?? null, tradeData: base.tradeData || ev.position.tradeData || { volume } };
+            else { const ep = ev.position || { positionId: pid }, base = pr || ep, pf = { ...base, price: base.price ?? ep.price ?? (ev.deal && ev.deal.executionPrice) ?? null, tradeData: base.tradeData || ep.tradeData || { volume } };
               await ensureStop(t.id, st.map[t.id], t, pf); }
           }
         } catch (e) { const txt = `${e.code || ''} ${e.message}`;
