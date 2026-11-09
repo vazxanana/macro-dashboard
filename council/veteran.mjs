@@ -15,7 +15,11 @@
 //   4. A forecast ledger (calibration playbook): one binary forecast a week that can fail clearly ("gold's daily close 20
 //      trading days on is above today's close"), with the probability, its base rate, the strategist's score as the named
 //      comparator, then the resolution and Brier scores. Append-only; records are never edited.
-// Paper only: writes macro/veteran.json, macro/veteran-ledger.json and its own block in analysis/latest.md; changes no
+// Revision 1.3 (9 Nov 2026) adds the release discipline: the calendar expectation is captured before each playbook release
+// (macro/veteran-expectations.json, append-only), the first print is attached once and never replaced by a revision, each
+// print passes integrity checks before a surprise is scored, CPI days carry the batch's Treasury study as rate context, and
+// claims are labelled descriptive / prospective (SKILL.md: match language to what was established).
+// Paper only: writes macro/veteran.json, macro/veteran-ledger.json, macro/veteran-expectations.json and its own block in analysis/latest.md; changes no
 // rule, trade or mirror setting.
 // Usage: node council/veteran.mjs [dataDir]   (dataDir = the council-data checkout, default "data")
 import fs from 'node:fs';
@@ -27,8 +31,9 @@ import { MARKETS as COT_MARKETS } from './cot.mjs';
 import { cotMain } from './macro.mjs';
 
 const DAY = 86400;
-// the batch revision this port follows (research/macro-veteran/SKILL.md); 1.2 = the owner's 8 Nov evening upload
-export const SKILL_VERSION = '1.2';
+// the batch revision this port follows (research/macro-veteran/SKILL.md); 1.2 = the owner's 8 Nov evening upload,
+// 1.3 = the 9 Nov batch (release-integrity checks, first-print ledger, Treasury CPI-day study, claim language)
+export const SKILL_VERSION = '1.3';
 // the batch's own real forecast: October 2026 core CPI m/m, issued 8 Nov 2026 14:12 UTC, resolved by the BLS first print of 10 Nov.
 // Read from the repository copy of the ledger when it is there (the Vercel bundle has no research/; then null).
 export function cpiPilot(file = new URL('../research/macro-veteran/references/cpi-pilot-forecast-ledger.jsonl', import.meta.url)) {
@@ -36,9 +41,77 @@ export function cpiPilot(file = new URL('../research/macro-veteran/references/cp
     const recs = fs.readFileSync(file, 'utf8').split(/\r?\n/).filter((l) => l.trim()).map((l) => JSON.parse(l));
     const iss = recs.find((r) => r.record_type === 'issued'); if (!iss) return null;
     const res = recs.find((r) => (r.record_type === 'resolved' || r.record_type === 'resolution') && r.forecast_id === iss.forecast_id), f = iss.forecast || {};
-    return { forecastId: iss.forecast_id, issuedAt: f.issued_at_utc, point: f.distribution && f.distribution.point_estimate, unit: 'percent m/m', reference: 'October 2026', releaseUtc: '2026-11-10T13:30:00Z', status: res ? 'resolved' : 'unresolved', outcome: res ? (res.resolution && res.resolution.outcome) ?? null : null };
+    return { forecastId: iss.forecast_id, issuedAt: f.issued_at_utc, point: f.distribution && f.distribution.point_estimate, unit: 'percent m/m', reference: 'October 2026', releaseUtc: '2026-11-10T13:30:00Z', status: res ? 'resolved' : 'unresolved', outcome: res ? (res.resolution && res.resolution.outcome) ?? null : null,
+      // rev 1.3: never call an unresolved pilot a scored forecast
+      label: res ? 'resolved against the BLS first print' : 'unresolved: issued, not a scored forecast' };
   } catch (e) { return null; }
 }
+// ---- rev 1.3: claim language, expectations capture and release integrity ---------------------------------------------
+// SKILL.md: "match language to what was established": each claim the veteran prints carries one of these labels.
+export const CLAIM = { descriptive: 'descriptive association', prospective: 'prospective prediction', causal: 'causal identification', execution: 'execution performance' };
+// The batch's frozen, independently reconstructed Treasury study (references/treasury-cpi-calendar-study-2022-2024.md and
+// treasury-cpi-fomc-exclusion-2022-2024.md): on the 36 CPI release days of 2022-24 the absolute daily change in the 10-year real
+// par yield averaged 6.11 bp against 4.06 bp on calendar-matched days. Context for the rate read after a print; not a gold
+// finding, not causal, not a trading result, and only 20 of 36 events were above their controls.
+export const CPI_RATE_STUDY = { period: '2022-2024', events: 36, eventAbsBp: 6.11, matchedAbsBp: 4.06, contrastBp: 2.06, interval3m: [0.20, 3.96], positive: 20,
+  fomcExcluded: { events: 35, contrastBp: 2.24 }, nominal2yContrastBp: 5.39, claim: CLAIM.descriptive,
+  source: 'research/macro-veteran/references/treasury-cpi-calendar-study-2022-2024.md' };
+export const PRINT_LAG_HOURS = 48;   // a print first seen later than this after the scheduled time may not be the first print
+const pctNum = (x) => { const m = /(-?\d+(?:\.\d+)?)/.exec(String(x ?? '')); return m ? +m[1] : null; };
+const evKey = (e) => `${String(e.at).slice(0, 16)}|${String(e.title || '').trim()}`;
+// Append-only evidence records, one per playbook release (market-expectations-capture playbook; research-evidence-record):
+// the expectation is captured before the release and never edited, the first print is attached once and never replaced by a
+// later (revised) value, and the surprise is print minus the captured expectation, never print minus previous.
+export function captureExpectations(hist, fc, now) {
+  const H = Array.isArray(hist) ? hist.map((r) => ({ ...r })) : [], by = new Map(H.map((r) => [r.key, r])), added = [];
+  for (const e of (fc && fc.playbook) || []) {
+    const t = Date.parse(e.at) / 1000; if (!Number.isFinite(t) || !e.title) continue;
+    const key = evKey(e); let r = by.get(key);
+    if (!r && now < t) {
+      r = { key, event: e.title, country: e.country || null, scheduledUtc: new Date(t * 1000).toISOString(), claim: CLAIM.descriptive,
+        expectation: { consensus: e.consensus ?? null, previous: e.previous ?? null, capturedAtUtc: new Date(now * 1000).toISOString(),
+          source: 'economic-calendar consensus as fetched by the Macro strategist (macro/forecast.json); not a verified survey' }, firstPrint: null };
+      H.push(r); by.set(key, r); added.push(key);
+    }
+    if (r && !r.firstPrint && e.actual != null && e.actual !== '') {
+      const lagH = +((now - t) / 3600).toFixed(1), flags = [];
+      if (lagH < 0) flags.push('print seen before the scheduled time: check for early posting or a feed error (BLS posted part of the May 2024 CPI about 31 minutes early)');
+      if (lagH > PRINT_LAG_HOURS) flags.push(`first seen ${Math.round(lagH)} h after the scheduled time: it may not be the first print`);
+      r.firstPrint = { value: e.actual, recordedAtUtc: new Date(now * 1000).toISOString(), lagHours: lagH, flags };
+    }
+  }
+  return { hist: H.slice(-300), added };
+}
+// The integrity read of one record before its print is trusted (bls-release-integrity case; first-print coverage study).
+export function releaseCheck(r, S = {}) {
+  if (!r) return null;
+  const ex = r.expectation || {}, fp = r.firstPrint, t = Date.parse(r.scheduledUtc) / 1000, cons = pctNum(ex.consensus), act = fp ? pctNum(fp.value) : null;
+  const before = !!ex.capturedAtUtc && Date.parse(ex.capturedAtUtc) / 1000 < t;
+  const checks = [
+    { k: 'expectation', ok: cons != null && before, text: cons == null ? 'no expectation captured: print minus previous is not a surprise' : before ? `expectation ${ex.consensus} captured ${ex.capturedAtUtc.slice(0, 16).replace('T', ' ')} UTC, before the release (calendar consensus, not a verified survey)` : 'expectation not captured before the release: no surprise is scored' },
+    { k: 'clock', ok: null, text: 'the scheduled time is the announced time, not verified first availability (May 2024: part of the CPI files were public about 31 minutes early, DOL OIG 17-26-001-11-001)' },
+    { k: 'vintage', ok: fp ? !fp.flags.length : null, text: fp ? (fp.flags.length ? fp.flags.join('; ') : `first print ${fp.value} recorded ${fp.lagHours} h after the scheduled time; later revisions are another vintage and never replace it`) : 'no print yet' },
+  ];
+  const trusted = !!(fp && cons != null && before && !fp.flags.length && act != null);
+  const out = { event: r.event, scheduledUtc: r.scheduledUtc, consensus: ex.consensus ?? null, previous: ex.previous ?? null, firstPrint: fp ? fp.value : null, checks, trusted,
+    surprise: trusted ? +(act - cons).toFixed(3) : null, surpriseNote: !fp ? 'pending' : trusted ? `print minus the captured expectation ${sg(+(act - cons).toFixed(3), 2, ' pp')}` : 'not scored: the print did not pass the integrity checks', claim: CLAIM.descriptive };
+  if (/\bCPI\b/i.test(r.event)) {
+    const d = isoDay(t), ry = S.DFII10 || [], at = ry.find((o) => isoDay(o.t) === d);
+    // the study's rule: the immediately preceding Monday-Friday date must exist; no gap is bridged
+    let pd = Math.floor(t / DAY) * DAY - DAY; while ([0, 6].includes(new Date(pd * 1000).getUTCDay())) pd -= DAY;
+    const pr = ry.find((o) => isoDay(o.t) === isoDay(pd));
+    const bp = at && pr ? Math.round(Math.abs(at.v - pr.v) * 100) : null;
+    out.rates = { study: `On 2022-24 CPI days the 10Y real yield moved ${CPI_RATE_STUDY.eventAbsBp} bp on average (absolute) vs ${CPI_RATE_STUDY.matchedAbsBp} bp on matched days; ${CPI_RATE_STUDY.positive} of ${CPI_RATE_STUDY.events} events above their controls. A daily association, not causality or a gold result.`,
+      observedBp: bp, read: bp == null ? (fp ? 'the release-day 10Y TIPS change is not observed yet' : 'pending the print') : `10Y TIPS moved ${bp} bp on the release day (${bp >= CPI_RATE_STUDY.eventAbsBp ? 'at or above the typical CPI day' : bp >= CPI_RATE_STUDY.matchedAbsBp ? 'above a normal day, below the typical CPI day' : 'no more than a normal day'})`, claim: CLAIM.descriptive };
+  }
+  return out;
+}
+// the records the desk shows: upcoming within 7 days and released within the last 7 days, newest first
+export function releaseView(hist, S, now) {
+  return (hist || []).filter((r) => { const t = Date.parse(r.scheduledUtc) / 1000; return t >= now - 7 * DAY && t <= now + 7 * DAY; })
+    .map((r) => releaseCheck(r, S)).sort((a, b) => b.scheduledUtc.localeCompare(a.scheduledUtc)).slice(0, 8);
+}
+
 export const VET_START = '<!-- veteran:start -->', VET_END = '<!-- veteran:end -->';
 export const HORIZON_DAYS = 20;   // trading days: the 4-week horizon the Gold Macro Score was tested on
 export const P_BOUNDS = [0.4, 0.7];   // a weekly directional call never leaves this band (calibration humility)
@@ -213,7 +286,7 @@ export function debate(fc, ch, fp, { now, base } = {}) {
   if (ry.obs !== 'no observation') { const lvl = +ry.obs.match(/TIPS ([\d.]+)%/)[1]; inv.push(`10Y TIPS real yield above ${(lvl + 0.15).toFixed(2)}% (+15 bp from ${lvl.toFixed(2)}%) ends the real-rate support`); }
   if (C.usd.obs !== 'no observation') { const lvl = +C.usd.obs.match(/DXY ([\d.]+)/)[1]; inv.push(`DXY above ${(lvl * 1.015).toFixed(1)} (+1.5%) says the dollar channel has turned`); }
   if (C.price.obs !== 'no observation' && ch.changes && C.price.obs.includes('10-week')) { const a = C.price.obs.match(/10-week average (\d+)/); if (a) inv.push(`a weekly close below the 10-week average ${a[1]} removes the trend tiebreaker`); }
-  const verdict = { bias, conviction, note, agree: topics.filter((t) => t.stance === 'agree').length, qualify: qual, disagree: dis, invalidation: inv, eventWithin72h: evIn72 ? { title: ev.title, at: ev.at } : null };
+  const verdict = { bias, conviction, note, agree: topics.filter((t) => t.stance === 'agree').length, qualify: qual, disagree: dis, invalidation: inv, eventWithin72h: evIn72 ? { title: ev.title, at: ev.at, consensus: ev.consensus ?? null } : null };
   const card = hypothesisCard({ fc, fp, ch, verdict, now, base });
   return { topics, verdict, card };
 }
@@ -223,8 +296,9 @@ export function hypothesisCard({ fc, fp, ch, verdict, now, base }) {
   const gs = fc && fc.goldScore, ev = verdict.eventWithin72h;
   return {
     claim: `${verdict.bias === 'BUY' ? 'Gold higher' : 'No directional macro claim for gold'} over ${HORIZON_DAYS} trading days (the score's tested horizon)`,
+    claimType: verdict.bias === 'BUY' ? CLAIM.prospective : CLAIM.descriptive,
     shock: fp.shock,
-    surprise: ev ? `Pending: ${ev.title} at ${ev.at.slice(0, 16).replace('T', ' ')} UTC against the consensus captured before it` : 'No scheduled red-folder release inside 72 hours; the week\'s moves are judged against their own 1-week windows',
+    surprise: ev ? `Pending: ${ev.title} at ${ev.at.slice(0, 16).replace('T', ' ')} UTC against the calendar expectation captured before it${ev.consensus != null ? ` (${ev.consensus})` : ''}; print minus previous is not a surprise` : 'No scheduled red-folder release inside 72 hours; the week\'s moves are judged against their own 1-week windows',
     observed: fp.clues.join(' · '),
     decomposition: 'TIPS real yield observed (DFII10); breakeven = 10Y nominal − TIPS, carrying inflation-risk and liquidity premia; no ACM term-premium estimate in the council\'s data',
     mechanism: fp.goldTest,
@@ -323,7 +397,7 @@ export function teaching(fc) {
   return { adopted, pending, recent: L.recent || [], line };
 }
 
-export function build({ fc, cache, daily, ledger = [], debates = [], now }) {
+export function build({ fc, cache, daily, ledger = [], debates = [], expectations = [], now }) {
   const S = {}; for (const id of ['DFII10', 'T10YIE', 'DGS2', 'DGS10', 'T10Y3M', 'BAMLH0A0HYM2', 'VIXCLS', 'VXVCLS', 'DTWEXBGS', 'SOFR', 'EFFR']) S[id] = fromCache(cache && cache.fred && cache.fred[id]);
   const gold = (daily && daily.gold) || [];
   S.gold = gold; S.dxy = daily && daily.dxy ? daily.dxy : [];
@@ -336,14 +410,19 @@ export function build({ fc, cache, daily, ledger = [], debates = [], now }) {
   let L = ledgerResolve(ledger, gold); const { ledger: L2, issued } = ledgerIssue(L, { now, gold, verdict, base, gs: fc && fc.goldScore, card }); L = L2;
   let Dh = debatesResolve(debates, gold); Dh = debatesIssue(Dh, { now, gold, topics }).hist;
   const board = scoreboard(Dh), teach = teaching(fc);
+  const E = captureExpectations(expectations, fc, now).hist, releases = releaseView(E, S, now);
+  // rev 1.3: a released print that failed the integrity checks is not read as a surprise
+  const bad = releases.find((r) => r.firstPrint != null && !r.trusted);
+  if (bad) verdict.note += ` ${bad.event} print not trusted as a surprise (${bad.checks.filter((c) => c.ok === false).map((c) => c.k).join(', ') || 'checks'}): the veteran reads the market's reaction, not the headline gap.`;
   const v = { v: 1, at: new Date(now * 1000).toISOString(), paperOnly: true, strategistAt: fc && fc.at || null, shock: fp, channels: ch.list, tally: { sum: ch.tally, observed: ch.have, lean: ch.lean },
     debate: topics, verdict, card, base, ledger: { ...ledgerSummary(L), issuedNow: issued ? issued.forecast_id : null, lastProbability: issued ? issued.forecast.distribution.event_probability : (L.filter((r) => r.record_type === 'issued').at(-1) || {}).forecast?.distribution?.event_probability ?? null },
     scoreboard: board, teaching: teach,
+    releases, cpiRateStudy: CPI_RATE_STUDY,
     cpiPilot: cpiPilot(), skillVersion: SKILL_VERSION,
     source: `council/veteran.mjs: a code port of the owner's gptmacro_v.1 skill, revision ${SKILL_VERSION} (research/macro-veteran/); reads the strategist's data only, fetches nothing` };
   { const pr = probability(verdict, base, fc && fc.goldScore); v.outlook = outlook({ gold, dxy: S.dxy, now, tilt20: base ? pr - base.upRate : 0, ch, fc }); }
   v.brief = briefOf(v);
-  return { v, ledger: L, debates: Dh };
+  return { v, ledger: L, debates: Dh, expectations: E };
 }
 export function briefOf(v) {
   const d = v.verdict, dis = v.debate.filter((t) => t.stance === 'disagree').map((t) => t.topic), q = v.debate.filter((t) => t.stance === 'qualify').map((t) => t.topic);
@@ -358,6 +437,7 @@ export function veteranSection(v) {
   out.push('', v.verdict.note.replace(/\|/g, '/'), '', `Fails if: ${v.verdict.invalidation.join('; ') || 'n/a'}.`, '', `Channels: ${v.channels.map((c) => `${c.name} ${c.lean == null ? 'n/a' : c.lean > 0 ? '+' : c.lean < 0 ? '−' : '0'}${c.stale ? ' (stale)' : ''}`).join(' · ')}.`);
   if (v.ledger) out.push('', `Forecast ledger: ${v.ledger.issued} issued, ${v.ledger.resolved} resolved${v.ledger.brier != null ? `, Brier ${v.ledger.brier} (base ${v.ledger.brierBase ?? 'n/a'}, score rule ${v.ledger.brierScore ?? 'n/a'})` : ''}. ${v.ledger.note}`);
   if (v.scoreboard) out.push('', `Scoreboard (who was right on gold's direction per topic, ${HORIZON_DAYS} trading days on): ${v.scoreboard.weeks} resolved week${v.scoreboard.weeks === 1 ? '' : 's'}, ${v.scoreboard.pending} pending${v.scoreboard.weeks ? ` · veteran ${v.scoreboard.veteran.hit == null ? 'n/a' : Math.round(v.scoreboard.veteran.hit * 100) + '%'} (${v.scoreboard.veteran.n}) vs strategist ${v.scoreboard.strategist.hit == null ? 'n/a' : Math.round(v.scoreboard.strategist.hit * 100) + '%'} (${v.scoreboard.strategist.n})` : ''}.`);
+  if (v.releases && v.releases.length) out.push('', `Releases (expectation captured before, first print kept): ${v.releases.map((r) => `${r.event} ${r.scheduledUtc.slice(0, 10)} exp ${r.consensus ?? 'n/a'}, print ${r.firstPrint ?? 'pending'}${r.surprise != null ? `, surprise ${sg(r.surprise, 2, ' pp')}` : r.firstPrint != null ? ', not scored' : ''}${r.rates && r.rates.observedBp != null ? `, 10Y TIPS ${r.rates.observedBp} bp` : ''}`).join(' · ').replace(/\|/g, '/')}.`);
   if (v.teaching) out.push('', `Teaching: ${v.teaching.line.replace(/\|/g, '/')}`);
   out.push(VET_END);
   return out.join('\n');
@@ -366,18 +446,18 @@ export function veteranSection(v) {
 export function run({ dir = 'data', now = Math.floor(Date.now() / 1000), log = console.log } = {}) {
   const M = path.join(dir, 'macro'); fs.mkdirSync(M, { recursive: true });
   const rd = (f, d) => { try { return JSON.parse(fs.readFileSync(f, 'utf8')); } catch (e) { return d; } };
-  const fc = rd(path.join(M, 'forecast.json'), null), cache = rd(path.join(M, 'cache.json'), {}), ledger = rd(path.join(M, 'veteran-ledger.json'), []), debates = rd(path.join(M, 'veteran-debates.json'), []);
+  const fc = rd(path.join(M, 'forecast.json'), null), cache = rd(path.join(M, 'cache.json'), {}), ledger = rd(path.join(M, 'veteran-ledger.json'), []), debates = rd(path.join(M, 'veteran-debates.json'), []), expectations = rd(path.join(M, 'veteran-expectations.json'), []);
   if (!fc || !fc.assets) { log('Macro veteran: no strategist forecast yet (macro/forecast.json); nothing to discuss.'); return null; }
   const daily = {}; for (const k of ['eurusd', 'usdjpy', 'gbpusd', 'usdcad', 'usdchf']) daily[k] = dailyRows(rd(path.join(dir, 'research', 'daily', `${k}.json`), null));
   const dx = dxyDaily(daily), gold = dailyRows(rd(path.join(dir, 'research', 'daily', 'xau.json'), null));
-  const { v, ledger: L, debates: Dh } = build({ fc, cache, daily: { gold, dxy: dx }, ledger, debates, now });
+  const { v, ledger: L, debates: Dh, expectations: E } = build({ fc, cache, daily: { gold, dxy: dx }, ledger, debates, expectations, now });
   const w = (f, val) => { const s = JSON.stringify(val, null, 1), p = path.join(M, f); let old = null; try { old = fs.readFileSync(p, 'utf8'); } catch (e) {} if (old !== s) fs.writeFileSync(p, s); };
   // the calls' record and COT-edge calls (9 Nov): closes by asset for resolution
   { const px = { gold, dxy: dx }; for (const m of COT_MARKETS) if (!px[m.k]) px[m.k] = dailyRows(rd(path.join(dir, 'research', 'daily', `${m.px}.json`), null));
     if (v.outlook) { v.outlook.cot = cotCalls(rd(path.join(M, 'cot.json'), null), px, now);
       const CL = callsLedger(rd(path.join(M, 'veteran-calls.json'), []), { outlook: v.outlook, closesBy: px, now }); w('veteran-calls.json', CL);
       v.outlook.record = callsScore(CL); v.outlook.recent = CL.filter((r) => r.hit != null).slice(-12).reverse(); } }
-  w('veteran.json', v); w('veteran-ledger.json', L); w('veteran-debates.json', Dh);
+  w('veteran.json', v); w('veteran-ledger.json', L); w('veteran-debates.json', Dh); w('veteran-expectations.json', E);
   try { const fA = path.join(dir, 'analysis', 'latest.md');
     if (fs.existsSync(fA)) { const md = fs.readFileSync(fA, 'utf8'), nx = injectSection(md, veteranSection(v), VET_START, VET_END); if (nx !== md) fs.writeFileSync(fA, nx); } } catch (e) { log('veteran: analysis section skipped:', e.message); }
   log(v.brief);

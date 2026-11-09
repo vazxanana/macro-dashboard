@@ -3,12 +3,12 @@ name: gptmacro-v-1
 description: Research macroeconomics, gold, financial markets, issuer fundamentals and difficult financial data using primary sources, explicit vintages, reproducible calculations and forecast evaluation.
 metadata:
   display_name: "gptmacro_v.1"
-  version: "1.2"
+  version: "1.3"
 ---
 
-# gptmacro_v.1 — complete research batch, revision 1.2
+# gptmacro_v.1 — complete research batch, revision 1.3
 
-Read `BATCH_INDEX.md` first, then `outputs/latest-research-batch-status-2026-11-08.md` and `outputs/research-pack-index.md`. Load only the references needed for the question. This complete batch preserves the original workspace layout: current references, models and tools are in `outputs/`; supporting research notes, source extractors, audits and eligible captures are in `work/`.
+Read `START_HERE.md` first, then `outputs/latest-research-batch-status-2026-11-09.md` and `outputs/research-pack-index.md`. Load only the references needed for the question. This complete batch preserves the original workspace layout: current references, models and tools are in `outputs/`; supporting research notes, source extractors, audits and eligible captures are in `work/`.
 
 The user confirmed **private research and trading**. That purpose is not a blanket redistribution or commercial-data licence. `DATA_LICENSES.md` and `batch-inventory.json` identify source attribution, included data and individual exclusions. Restricted raw publisher files remain represented by URLs, hashes, field profiles and authored findings.
 
@@ -18,7 +18,10 @@ The user confirmed **private research and trading**. That purpose is not a blank
 - The October 2026 CPI pilot contains one real locally timestamped 0.255% core-monthly issuance and remains unresolved. Six absolute case plans exist, but only October has an issued forecast. Do not copy its input values into future months or backdate a record.
 - The Newmont workbook passed 17 behavioral checks and independent calculation/source review. It is a Q3-equivalent consolidated cash-flow sensitivity, not a Q4 forecast, DCF or equity target. Desktop Excel itself was not opened.
 - Newly discovered Cleveland chart JSON supplies historical daily model benchmarks and is included with the chart's CC BY 4.0 declaration. It is not survey consensus or an independently captured historical delivery log.
-- The proposed CPI-to-gold/Treasury study is **not frozen or calculated**. No gold-return, rate-change or event-study result exists in this snapshot. Keep its draft design, data coverage and remaining access/definition questions separate from completed findings.
+- The separate Treasury study is frozen and calculated: 36 CPI-release windows, +2.06 bp mean absolute real10y change versus matched controls; approximate L3 interval [0.20,3.96] bp. Its formal-FOMC exclusion gives +2.24 bp over35 scored events. Both have independent reconstruction. Read their full limitations; this is daily association, not causal CPI identification or a trading result.
+- The CPI release-vintage ledger has144 independently agreeing printed fields over36 releases, plus corrected reissue/format metadata. Present archived bytes are not authenticated original-day bytes.
+- NBU offers a separately defined UAH gold accounting-reference route with affirmative publisher-use conditions. Its1096 effective dates represent781 calculation dates; price values remain analytically uninspected. Methodology/FX/carryover gates remain.
+- The conditional GLD NAV study remains uncalculated and rights/clock-gated. A Cleveland-versus-baseline forecast-quality study was only proposed when this handoff was requested; no such comparison was frozen or calculated.
 
 ## Research decisions
 
@@ -38,7 +41,7 @@ Lead with the conclusion, then evidence, mechanism, strongest counterargument, c
 
 Run the supplied `outputs/scripts/` commands from this folder; the original `outputs/` and `work/` paths are retained. Node.js 20+ is needed for the offline evaluators. Schema validation additionally needs the Ajv packages described in the guide. Dependencies, caches and the original Codex spreadsheet runtime are not bundled. Use the prebuilt workbook or an available verified spreadsheet engine for changes.
 
-The `work/` tree includes one-time repair/registration programs, provisional leads, synthetic future rehearsals and failed access attempts. Read their purpose before execution; do not run all scripts or treat test-generated resolutions as real records. Current `outputs/` files are the main reference layer. Older ZIPs are provenance snapshots and should not replace current instructions.
+The `work/` tree includes one-time repair/registration programs, provisional leads, synthetic future rehearsals and failed access attempts. Read their purpose before execution; do not run all scripts or treat test-generated resolutions as real records. Current `outputs/` files are the main reference layer. Older delivery ZIPs are omitted as duplicates; their hashes are in the inventory. This standalone bundle includes the current library. Historical validator scripts that require an old ZIP need that separate original archive.
 
 Some dated validation-report hashes differ after later documented reference edits. Use this batch's inventory for current bytes and preserve older audit timestamps. Raw captures that are absent are explicitly listed; hashes do not authenticate unavailable source bodies. Source freshness and predictive validity still require their own evidence.
 

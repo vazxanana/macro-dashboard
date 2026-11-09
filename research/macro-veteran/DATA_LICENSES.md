@@ -11,3 +11,9 @@ The user's confirmed scope is private research and trading. This package is inte
 - Dependency trees, caches and external-runtime links are omitted. Duplicate expanded old packages are represented by the unchanged original ZIPs.
 
 `batch-inventory.json` provides individual paths, sizes, SHA-256 hashes and reasons for raw-file omissions. A blank source URL there means to consult the included capture manifests or source notes; it does not assert that no original source exists. Excluded raw files remain in the original local workspace and were not deleted.
+
+## Revision1.3 additions
+
+Official Treasury/Federal Reserve/BLS/DOL research captures are included with source receipts/hashes. They are current agency source versions, not independently authenticated original historical wire bytes. NBU publisher open-data terms expressly permit commercial use with attribution to the [NBU open-data page](https://bank.gov.ua/en/open-data); this applies to its published accounting output and is not a licence to upstream Bloomberg/LBMA feeds. NBU attribution, API/methodology receipts and newly preserved permission/method bodies accompany the authored route review. The separate raw NBU price response is held out under the stated working data-quality boundary until methodology/vintage audit; this is not a finding that NBU prohibits use. Its source/hash/schema/coverage remain included.
+
+Prior delivery ZIPs and dependencies are omitted as duplicate/runtime content; all current research documents and finished model files remain included. See the individual inventory records.

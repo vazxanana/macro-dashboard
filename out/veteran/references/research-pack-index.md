@@ -4,7 +4,7 @@
 
 **Reference update:** The [8 November quality audit and Claude correction note](research-corrections-and-quality-audit-2026-11-08.md) documents a schema-example correction affecting the already shared V1 and factual/measurement corrections in the later master increment. Use the corrected master example for the next update.
 
-**Latest batch:** [Current findings, available data and unfinished work](latest-research-batch-status-2026-11-08.md) includes the newly recovered Cleveland history route, 37 BLS captures, GLD archive/usage findings and the proposed CPI-to-market study. The market study has no calculated results yet.
+**Latest increment:** [9 November findings, validation and unfinished work](latest-research-batch-status-2026-11-09.md) adds the 36-release CPI first-print ledger, direct release-integrity evidence, the frozen daily Treasury comparison and a separately defined NBU accounting-gold route. The [8 November batch status](latest-research-batch-status-2026-11-08.md) remains the dated state accompanying the unchanged V1.2 delivery.
 
 ## Start here
 
@@ -19,6 +19,10 @@
 9. [Core CPI prospective pilot — 8 November 2026](core-cpi-prospective-pilot-2026-11-08.md) — one real locally timestamped issuance for October core CPI, with captured sources, a fixed model and two predeclared comparisons. It is unresolved and establishes no predictive performance; six consecutive intended reference months are registered in its protocol.
 10. [Official CPI publication-time audit](bls-publication-timestamp-audit-2026-11-08.md) — captured feed timestamps illustrate why publisher metadata, schedules, receipts and actual first-publication evidence must remain separate.
 11. [Newmont cash-flow model](newmont-cash-flow-model-2026-11-08.md) — reconcile reported cash, preserve reclamation spending, and vary gold prices, cash costs, tax response and capital spending in an editable workbook. Conditional cash-flow calculations do not establish an equity valuation.
+12. [CPI first-print coverage, 2022–2024 releases](cpi-first-print-coverage-2022-2024.md) — 144 independently agreeing printed figures, original archive selectors/hashes, two embedded reissues and scoped format corrections; schedules remain distinct from authenticated first availability.
+13. [BLS release-integrity worked case](bls-release-integrity-case-2026-11-09.md) — official early-publication evidence, timezone ambiguity and corrected-archive limits.
+14. [CPI dates and daily Treasury movements](treasury-cpi-calendar-study-2022-2024.md) — 36 frozen matched-window comparisons, independent source/control reconstruction, bootstrap uncertainty, placebo and influence checks. Daily association is distinct from causality, gold response and tradability.
+15. [Formal-FOMC exclusion sensitivity](treasury-cpi-fomc-exclusion-2022-2024.md) — a complete bounded statement-calendar audit applied to original windows and controls; one event and nine controls removed without rematching. Broader macro-news coverage remains incomplete.
 
 ## Choose a route by question
 
