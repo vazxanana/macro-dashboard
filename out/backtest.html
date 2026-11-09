@@ -475,7 +475,7 @@
   function undo() { const u = UNDO.pop(); if (!u) { $('loadmsg').textContent = 'Nothing to undo.'; return; } stop(); S.idx = u.idx; S.acct = u.acct; S.ch = u.ch; render(); renderJournal(); save(); }
   $('undo').addEventListener('click', undo);
   function step(quiet) { if (S.idx >= S.bars.length) { stop(); $('loadmsg').textContent = 'End of the loaded candles. Load more days to continue.'; return false; }
-    LIVE = null; if (!quiet) snap(); const b = S.bars[S.idx]; S.idx++; const ev = BT.onBar(S.acct, b); if (S.ch) BT.evaluate(S.ch, S.acct, b.close, b.time);
+    LIVE = null; if (!quiet) snap(); const b = S.bars[S.idx]; S.idx++; const ev = BT.onBar(S.acct, b); if (S.ch) BT.evaluate(S.ch, S.acct, b.close, b.time, b);
     for (const e of ev) { if (e.kind === 'fill') toast(`Filled ${e.pos.side} at <b>${fmt(e.pos.entry)}</b>`, 'gold'); else { const t = e.trade; toast(`${t.reason.startsWith('target') ? 'Target hit' : t.reason.startsWith('stop') ? 'Stopped out' : 'Closed'} · <b>${t.R > 0 ? '+' : ''}${t.R}R</b> · ${money(t.net)}`, t.net >= 0 ? 'good' : 'bad');
       if (window.BTFX) { const sub = money(t.net), tt = t.reason.startsWith('target') ? 'Target hit' : t.reason.startsWith('stop') ? (t.net > 0 ? 'Stopped in profit' : 'Stopped out') : t.net > 0 ? 'Closed in profit' : 'Closed at a loss'; if (t.net > 0) BTFX.win(t.R, sub, tt); else if (t.net < 0) BTFX.loss(t.R, sub, tt); } } }
     if (S.ch && S.ch.status === 'failed' && (S.acct.positions.length || S.acct.orders.length)) { for (const q of S.acct.positions.slice()) { const c = BT.close(S.acct, q, b.close, b.time, 'challenge breach'); ev.push({ kind: 'close', trade: c }); } S.acct.orders = []; }
@@ -602,8 +602,8 @@
     mcDefaults(); }
   // ---- Monte Carlo pass probability ----
   $('mc-firm').innerHTML = BT.FIRMS.map((f) => `<option value="${f.id}">${esc(f.name)}</option>`).join('');
-  function mcDefaults() { if (!$('mc-perday').value) { const days = new Set(S.acct.closed.map((t) => BT.dayKey(t.closedAt))).size; $('mc-perday').value = Math.max(1, Math.round(S.acct.closed.length / Math.max(1, days))); } const n = S.acct.closed.filter((t) => t.R != null && !t.partial).length; $('mc-note').textContent = n < 5 ? `needs at least 5 closed trades (you have ${n})` : `${n} trades in the sample`; $('mc-run').disabled = n < 5; }
-  $('mc-run').addEventListener('click', () => { const Rs = S.acct.closed.filter((t) => t.R != null && !t.partial).map((t) => t.R), F = BT.FIRMS.find((f) => f.id === $('mc-firm').value), risk = (+$('mc-risk').value || 1) / 100, perDay = +$('mc-perday').value || 2;
+  function mcDefaults() { if (!$('mc-perday').value) { const days = new Set(S.acct.closed.map((t) => BT.dayKey(t.closedAt))).size; $('mc-perday').value = Math.max(1, Math.round(BT.trades(S.acct.closed).length / Math.max(1, days))); } const n = BT.trades(S.acct.closed).filter((t) => t.R != null).length; $('mc-note').textContent = n < 5 ? `needs at least 5 closed trades (you have ${n})` : `${n} trades in the sample`; $('mc-run').disabled = n < 5; }
+  $('mc-run').addEventListener('click', () => { const Rs = BT.trades(S.acct.closed).filter((t) => t.R != null).map((t) => t.R), F = BT.FIRMS.find((f) => f.id === $('mc-firm').value), risk = (+$('mc-risk').value || 1) / 100, perDay = +$('mc-perday').value || 2;
     const target = F.phases.reduce((a, ph) => a + ph.target, 0), o = { risk, target, maxLoss: F.maxLoss, dailyLoss: F.dailyLoss, dd: F.dd, perDay, minDays: F.minDays, n: 2000, seed: 11 }, m = BT.monteCarlo(Rs, o); if (!m) return;
     const best = BT.bestRisk(Rs, { ...o, n: 800 }), pct = (x) => Math.round(x * 100);
     $('mc-out').innerHTML = `<div class="mc-bar">${m.pass ? `<div class="p" style="width:${m.pass * 100}%">${pct(m.pass)}% pass</div>` : ''}${m.fail ? `<div class="f" style="width:${m.fail * 100}%">${pct(m.fail)}% fail</div>` : ''}${m.unfinished ? `<div class="u" style="width:${m.unfinished * 100}%">${pct(m.unfinished)}%</div>` : ''}</div>
