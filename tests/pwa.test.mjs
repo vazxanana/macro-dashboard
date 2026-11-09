@@ -241,12 +241,16 @@ test('manifest: installable (name, standalone, start_url in scope, 192 + 512 + m
   for (const s of m.shortcuts) assert.ok(rewrites.includes(s.url), s.url);
 });
 
-test('caching headers: the worker and manifest revalidate, nothing is immutable, the build runs pwa.mjs before stamping', () => {
+test('caching headers: the worker and manifest revalidate, only ?v= assets are immutable, the build runs pwa.mjs before stamping', () => {
   const v = JSON.parse(fs.readFileSync(path.join(ROOT, 'vercel.json'), 'utf8'));
   const cc = (src) => ((v.headers.find((h) => h.source === src) || {}).headers || []).find((h) => h.key === 'Cache-Control');
   assert.equal(cc('/sw.js').value, 'no-cache');
   assert.equal(cc('/app.webmanifest').value, 'no-cache');
-  assert.doesNotMatch(JSON.stringify(v.headers), /immutable/);
+  // immutable only on content-stamped (?v=) asset URLs (delivery layer, tests/delivery.test.mjs); never on the worker, manifest, pages or unstamped files
+  for (const h of v.headers) {
+    const c = (h.headers || []).find((x) => x.key === 'Cache-Control');
+    if (c && /immutable/.test(c.value)) assert.ok((h.has || []).some((q) => q.type === 'query' && q.key === 'v'), 'immutable without a ?v= condition: ' + h.source);
+  }
   const b = fs.readFileSync(path.join(ROOT, 'scripts/build.sh'), 'utf8');
   assert.ok(b.indexOf('scripts/pwa.mjs') > 0 && b.indexOf('scripts/pwa.mjs') < b.indexOf('scripts/stamp-assets.mjs'));
   assert.match(b, /\boffline\.html\b/); assert.match(b, /\bicons\b/);
