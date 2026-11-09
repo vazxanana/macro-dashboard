@@ -1,0 +1,2725 @@
+{
+ "topic": "cot-positioning",
+ "title": "COT positioning: does large-speculator positioning predict 1- and 4-week returns?",
+ "built": "2026-11-09T07:19:06.951Z",
+ "preregistration": "research/edge/cot-positioning/preregistration.md",
+ "status": "ok",
+ "system": "CFTC COT (TFF leveraged funds; Disaggregated managed money for gold), council-data macro/cot-raw.json 2019-2026; OANDA daily closes",
+ "variantsTried": 10,
+ "window": "IS 2020-23, OOS 2024-2026",
+ "split": {
+  "is": [
+   "2020-01-01",
+   "2023-12-31"
+  ],
+  "oos": [
+   "2024-01-01",
+   "2026-09-29"
+  ],
+  "lateExcluded": [
+   {
+    "from": "2025-09-30",
+    "to": "2026-01-27",
+    "why": "US government shutdown backlog: published on a catch-up schedule, not the Friday after"
+   }
+  ]
+ },
+ "timing": "known from 00:00 UTC of the first Monday after the as-of date; entry at the next weekday close; 1w = 5, 4w = 20 weekday closes; futures direction",
+ "sources": {
+  "macro/cot-raw.json": {
+   "sha256": "4f8e4e8a95241b13d6c674cddce798fb53d094605133495ea034f24c372edfda",
+   "fetched": "2026-11-08T23:04:54.195Z",
+   "src": {
+    "tff": "ok (3681 rows)",
+    "dis": "ok (818 rows)"
+   }
+  },
+  "research/daily/xau.json": {
+   "sha256": "76ac192df98e0aebb82be6aea9f08380dd9f6f7759297b3cfda32416d3555b4c",
+   "src": "OANDA"
+  },
+  "research/daily/eurusd.json": {
+   "sha256": "00798b77edcdcc531bc58389fa70f2462c3035a3a755320d89adddb4237621e5",
+   "src": "OANDA"
+  },
+  "research/daily/gbpusd.json": {
+   "sha256": "e3f376c84932092d628db7609c7acd4991b1ddb459012bb46b6a54e925c197d6",
+   "src": "OANDA"
+  },
+  "research/daily/usdjpy.json": {
+   "sha256": "cd68527148b83f0e5938fbdfe23e86c740eec56227c24558675476072769ca82",
+   "src": "OANDA"
+  },
+  "research/daily/audusd.json": {
+   "sha256": "6a7bdf90e45ac3fc0e0da904fad8bac9af562f4be2e4141e6eab0dcbaaf7479f",
+   "src": "OANDA"
+  },
+  "research/daily/nzdusd.json": {
+   "sha256": "9eff3be565f620c4c25f09ede47f89e4ae804fc0d7dfb74dbf4ffe7d26661fff",
+   "src": "OANDA"
+  },
+  "research/daily/usdcad.json": {
+   "sha256": "b91c97f00b68286ed28cdcf05ec9c639cd39f270dc74c1566501672181994da2",
+   "src": "OANDA"
+  },
+  "research/daily/usdchf.json": {
+   "sha256": "fa744f3214c4b59d0e83e36c6e9455a2403720e1d0dccb52405b63de5fd5ea92",
+   "src": "OANDA"
+  },
+  "research/daily/nas100.json": {
+   "sha256": "5fb86a189522cf1730d1763cda14bcf342dd925b768b27b8e73a1564e25dfe0c",
+   "src": "OANDA"
+  },
+  "research/daily/spx500.json": {
+   "sha256": "2452605f34a4841b58180685c809e48b0497e91ea3e4050f498671bde12c6259",
+   "src": "OANDA"
+  }
+ },
+ "coverage": {
+  "gold": "409 reports 2019-01-08 → 2026-11-03; 5364 weekday closes 2006-03-20 → 2026-11-06",
+  "eur": "409 reports 2019-01-08 → 2026-11-03; 6383 weekday closes 2002-05-07 → 2026-11-06",
+  "gbp": "409 reports 2019-01-08 → 2026-11-03; 6384 weekday closes 2002-05-07 → 2026-11-06",
+  "jpy": "409 reports 2019-01-08 → 2026-11-03; 6382 weekday closes 2002-05-07 → 2026-11-06",
+  "aud": "409 reports 2019-01-08 → 2026-11-03; 6381 weekday closes 2002-05-07 → 2026-11-06",
+  "nzd": "409 reports 2019-01-08 → 2026-11-03; 6281 weekday closes 2002-09-24 → 2026-11-06",
+  "cad": "409 reports 2019-01-08 → 2026-11-03; 6380 weekday closes 2002-05-08 → 2026-11-06",
+  "chf": "409 reports 2019-01-08 → 2026-11-03; 6381 weekday closes 2002-05-07 → 2026-11-06",
+  "nq": "409 reports 2019-01-08 → 2026-11-03; 6124 weekday closes 2003-03-24 → 2026-11-06",
+  "es": "409 reports 2019-01-08 → 2026-11-03; 6124 weekday closes 2003-03-24 → 2026-11-06"
+ },
+ "commercialsShare": 0,
+ "verdict": {
+  "verdict": "FAIL",
+  "headline": "FAIL: no pooled positioning signal (crowding, flow or extremes) passed in and out of sample at 1 or 4 weeks; single-market cells that passed: GBP/USD (H4-1w); AUD/USD (H4-4w). Gold 3-year crowding 4-week IC -0.199 in sample, 0.325 out of sample (prior +0.01)."
+ },
+ "primary": [
+  {
+   "id": "H1-1w",
+   "hyp": "H1",
+   "name": "1-year crowding (contrarian)",
+   "horizon": "1w",
+   "expected": "IC < 0",
+   "is": {
+    "weeks": 208,
+    "ic": -0.027,
+    "t": -1.03
+   },
+   "oos": {
+    "weeks": 129,
+    "ic": -0.019,
+    "t": -0.63
+   },
+   "all": {
+    "weeks": 337,
+    "ic": -0.018,
+    "t": -0.91
+   },
+   "checks": {
+    "isSignificant": false,
+    "oosConfirms": false
+   },
+   "verdict": "FAIL"
+  },
+  {
+   "id": "H1-4w",
+   "hyp": "H1",
+   "name": "1-year crowding (contrarian)",
+   "horizon": "4w",
+   "expected": "IC < 0",
+   "is": {
+    "weeks": 208,
+    "ic": -0.012,
+    "t": -0.32
+   },
+   "oos": {
+    "weeks": 126,
+    "ic": -0.05,
+    "t": -0.99
+   },
+   "all": {
+    "weeks": 334,
+    "ic": -0.012,
+    "t": -0.4
+   },
+   "checks": {
+    "isSignificant": false,
+    "oosConfirms": false
+   },
+   "verdict": "FAIL"
+  },
+  {
+   "id": "H2-1w",
+   "hyp": "H2",
+   "name": "3-year crowding (contrarian)",
+   "horizon": "1w",
+   "expected": "IC < 0",
+   "is": {
+    "weeks": 104,
+    "ic": -0.022,
+    "t": -0.55
+   },
+   "oos": {
+    "weeks": 129,
+    "ic": -0.015,
+    "t": -0.5
+   },
+   "all": {
+    "weeks": 233,
+    "ic": -0.017,
+    "t": -0.74
+   },
+   "checks": {
+    "isSignificant": false,
+    "oosConfirms": false
+   },
+   "verdict": "FAIL"
+  },
+  {
+   "id": "H2-4w",
+   "hyp": "H2",
+   "name": "3-year crowding (contrarian)",
+   "horizon": "4w",
+   "expected": "IC < 0",
+   "is": {
+    "weeks": 104,
+    "ic": -0.017,
+    "t": -0.31
+   },
+   "oos": {
+    "weeks": 126,
+    "ic": -0.051,
+    "t": -1.03
+   },
+   "all": {
+    "weeks": 230,
+    "ic": -0.034,
+    "t": -1.02
+   },
+   "checks": {
+    "isSignificant": false,
+    "oosConfirms": false
+   },
+   "verdict": "FAIL"
+  },
+  {
+   "id": "H3-1w",
+   "hyp": "H3",
+   "name": "weekly flow (follow)",
+   "horizon": "1w",
+   "expected": "IC > 0",
+   "is": {
+    "weeks": 207,
+    "ic": -0.028,
+    "t": -0.97
+   },
+   "oos": {
+    "weeks": 129,
+    "ic": -0.011,
+    "t": -0.35
+   },
+   "all": {
+    "weeks": 336,
+    "ic": -0.018,
+    "t": -0.87
+   },
+   "checks": {
+    "isSignificant": false,
+    "oosConfirms": false
+   },
+   "verdict": "FAIL"
+  },
+  {
+   "id": "H3-4w",
+   "hyp": "H3",
+   "name": "weekly flow (follow)",
+   "horizon": "4w",
+   "expected": "IC > 0",
+   "is": {
+    "weeks": 207,
+    "ic": -0.043,
+    "t": -1.95
+   },
+   "oos": {
+    "weeks": 126,
+    "ic": -0.031,
+    "t": -1.06
+   },
+   "all": {
+    "weeks": 333,
+    "ic": -0.035,
+    "t": -1.98
+   },
+   "checks": {
+    "isSignificant": false,
+    "oosConfirms": false
+   },
+   "verdict": "FAIL"
+  }
+ ],
+ "pooledEvents": [
+  {
+   "id": "H4-1w",
+   "hyp": "H4",
+   "name": "extreme 90/10 of 3 years (contrarian)",
+   "horizon": "1w",
+   "is": {
+    "events": 228,
+    "weeks": 99,
+    "hit": 0.539,
+    "mean": 0.02,
+    "t": 0.11
+   },
+   "oos": {
+    "events": 443,
+    "weeks": 124,
+    "hit": 0.499,
+    "mean": 0.01,
+    "t": 0.13
+   },
+   "verdict": "FAIL"
+  },
+  {
+   "id": "H4-4w",
+   "hyp": "H4",
+   "name": "extreme 90/10 of 3 years (contrarian)",
+   "horizon": "4w",
+   "is": {
+    "events": 228,
+    "weeks": 99,
+    "hit": 0.561,
+    "mean": 0.08,
+    "t": 0.19
+   },
+   "oos": {
+    "events": 432,
+    "weeks": 121,
+    "hit": 0.551,
+    "mean": 0.05,
+    "t": 0.26
+   },
+   "verdict": "FAIL"
+  },
+  {
+   "id": "H5-1w",
+   "hyp": "H5",
+   "name": "extreme with commercials opposite (contrarian)",
+   "horizon": "1w",
+   "verdict": "NOT RUN",
+   "why": "commercial positions are in 0% of the cached weeks (needs 90%); runs on the next full CFTC re-fetch"
+  },
+  {
+   "id": "H5-4w",
+   "hyp": "H5",
+   "name": "extreme with commercials opposite (contrarian)",
+   "horizon": "4w",
+   "verdict": "NOT RUN",
+   "why": "commercial positions are in 0% of the cached weeks (needs 90%); runs on the next full CFTC re-fetch"
+  }
+ ],
+ "markets": {
+  "gold": {
+   "name": "Gold",
+   "who": "managed money",
+   "quote": null,
+   "base": {
+    "1w": 0.555,
+    "4w": 0.554
+   },
+   "cells": [
+    {
+     "id": "H1-1w",
+     "is": {
+      "n": 208,
+      "ic": -0.046,
+      "t": -0.67
+     },
+     "oos": {
+      "n": 129,
+      "ic": 0.049,
+      "t": 0.6
+     },
+     "all": {
+      "n": 337,
+      "ic": 0.003,
+      "t": 0.05
+     },
+     "pass": false,
+     "isPass": false
+    },
+    {
+     "id": "H1-4w",
+     "is": {
+      "n": 208,
+      "ic": -0.118,
+      "t": -1.18
+     },
+     "oos": {
+      "n": 126,
+      "ic": 0.184,
+      "t": 1.33
+     },
+     "all": {
+      "n": 334,
+      "ic": 0.038,
+      "t": 0.44
+     },
+     "pass": false,
+     "isPass": false
+    },
+    {
+     "id": "H2-1w",
+     "is": {
+      "n": 104,
+      "ic": -0.042,
+      "t": -0.41
+     },
+     "oos": {
+      "n": 129,
+      "ic": 0.163,
+      "t": 1.94
+     },
+     "all": {
+      "n": 233,
+      "ic": 0.102,
+      "t": 1.5
+     },
+     "pass": false,
+     "isPass": false
+    },
+    {
+     "id": "H2-4w",
+     "is": {
+      "n": 104,
+      "ic": -0.199,
+      "t": -1.44
+     },
+     "oos": {
+      "n": 126,
+      "ic": 0.325,
+      "t": 2.12
+     },
+     "all": {
+      "n": 230,
+      "ic": 0.155,
+      "t": 1.39
+     },
+     "pass": false,
+     "isPass": false
+    },
+    {
+     "id": "H3-1w",
+     "is": {
+      "n": 207,
+      "ic": 0.036,
+      "t": 0.53
+     },
+     "oos": {
+      "n": 129,
+      "ic": 0.031,
+      "t": 0.39
+     },
+     "all": {
+      "n": 336,
+      "ic": 0.04,
+      "t": 0.77
+     },
+     "pass": false,
+     "isPass": false
+    },
+    {
+     "id": "H3-4w",
+     "is": {
+      "n": 207,
+      "ic": -0.133,
+      "t": -1.84
+     },
+     "oos": {
+      "n": 126,
+      "ic": 0.066,
+      "t": 0.86
+     },
+     "all": {
+      "n": 333,
+      "ic": -0.057,
+      "t": -1.05
+     },
+     "pass": false,
+     "isPass": false
+    },
+    {
+     "id": "H4-1w",
+     "is": {
+      "n": 34,
+      "hit": 0.441,
+      "mean": 0.1,
+      "t": 0.25
+     },
+     "oos": {
+      "n": 47,
+      "hit": 0.362,
+      "mean": -0.57,
+      "t": -1.92
+     },
+     "pass": false,
+     "isPass": false
+    },
+    {
+     "id": "H4-4w",
+     "is": {
+      "n": 34,
+      "hit": 0.5,
+      "mean": 0.15,
+      "t": 0.14
+     },
+     "oos": {
+      "n": 47,
+      "hit": 0.255,
+      "mean": -2.14,
+      "t": -3.1
+     },
+     "pass": false,
+     "isPass": false
+    },
+    {
+     "id": "H5-1w",
+     "notRun": true
+    },
+    {
+     "id": "H5-4w",
+     "notRun": true
+    }
+   ]
+  },
+  "eur": {
+   "name": "EUR/USD",
+   "who": "leveraged funds",
+   "quote": null,
+   "base": {
+    "1w": 0.504,
+    "4w": 0.488
+   },
+   "cells": [
+    {
+     "id": "H1-1w",
+     "is": {
+      "n": 208,
+      "ic": 0.069,
+      "t": 0.98
+     },
+     "oos": {
+      "n": 129,
+      "ic": 0.009,
+      "t": 0.1
+     },
+     "all": {
+      "n": 337,
+      "ic": 0.051,
+      "t": 0.91
+     },
+     "pass": false,
+     "isPass": false
+    },
+    {
+     "id": "H1-4w",
+     "is": {
+      "n": 208,
+      "ic": 0.134,
+      "t": 1.25
+     },
+     "oos": {
+      "n": 126,
+      "ic": -0.014,
+      "t": -0.11
+     },
+     "all": {
+      "n": 334,
+      "ic": 0.081,
+      "t": 0.94
+     },
+     "pass": false,
+     "isPass": false
+    },
+    {
+     "id": "H2-1w",
+     "is": {
+      "n": 104,
+      "ic": 0.041,
+      "t": 0.44
+     },
+     "oos": {
+      "n": 129,
+      "ic": 0,
+      "t": 0
+     },
+     "all": {
+      "n": 233,
+      "ic": -0.003,
+      "t": -0.05
+     },
+     "pass": false,
+     "isPass": false
+    },
+    {
+     "id": "H2-4w",
+     "is": {
+      "n": 104,
+      "ic": 0.094,
+      "t": 0.64
+     },
+     "oos": {
+      "n": 126,
+      "ic": -0.066,
+      "t": -0.48
+     },
+     "all": {
+      "n": 230,
+      "ic": -0.023,
+      "t": -0.23
+     },
+     "pass": false,
+     "isPass": false
+    },
+    {
+     "id": "H3-1w",
+     "is": {
+      "n": 207,
+      "ic": -0.037,
+      "t": -0.51
+     },
+     "oos": {
+      "n": 129,
+      "ic": 0.045,
+      "t": 0.54
+     },
+     "all": {
+      "n": 336,
+      "ic": 0.001,
+      "t": 0.03
+     },
+     "pass": false,
+     "isPass": false
+    },
+    {
+     "id": "H3-4w",
+     "is": {
+      "n": 207,
+      "ic": -0.132,
+      "t": -1.75
+     },
+     "oos": {
+      "n": 126,
+      "ic": -0.011,
+      "t": -0.1
+     },
+     "all": {
+      "n": 333,
+      "ic": -0.078,
+      "t": -1.22
+     },
+     "pass": false,
+     "isPass": false
+    },
+    {
+     "id": "H4-1w",
+     "is": {
+      "n": 12,
+      "hit": 0.5,
+      "mean": -0.06,
+      "t": -0.26
+     },
+     "oos": {
+      "n": 47,
+      "hit": 0.489,
+      "mean": -0.09,
+      "t": -0.71
+     },
+     "pass": false,
+     "isPass": false
+    },
+    {
+     "id": "H4-4w",
+     "is": {
+      "n": 12,
+      "hit": 0.5,
+      "mean": -0.25,
+      "t": -0.24
+     },
+     "oos": {
+      "n": 44,
+      "hit": 0.591,
+      "mean": 0.08,
+      "t": 0.22
+     },
+     "pass": false,
+     "isPass": false
+    },
+    {
+     "id": "H5-1w",
+     "notRun": true
+    },
+    {
+     "id": "H5-4w",
+     "notRun": true
+    }
+   ]
+  },
+  "gbp": {
+   "name": "GBP/USD",
+   "who": "leveraged funds",
+   "quote": null,
+   "base": {
+    "1w": 0.496,
+    "4w": 0.518
+   },
+   "cells": [
+    {
+     "id": "H1-1w",
+     "is": {
+      "n": 208,
+      "ic": -0.128,
+      "t": -1.85
+     },
+     "oos": {
+      "n": 129,
+      "ic": -0.087,
+      "t": -1.02
+     },
+     "all": {
+      "n": 337,
+      "ic": -0.107,
+      "t": -2
+     },
+     "pass": false,
+     "isPass": false
+    },
+    {
+     "id": "H1-4w",
+     "is": {
+      "n": 208,
+      "ic": -0.165,
+      "t": -1.55
+     },
+     "oos": {
+      "n": 126,
+      "ic": -0.279,
+      "t": -2
+     },
+     "all": {
+      "n": 334,
+      "ic": -0.191,
+      "t": -2.26
+     },
+     "pass": false,
+     "isPass": false
+    },
+    {
+     "id": "H2-1w",
+     "is": {
+      "n": 104,
+      "ic": -0.142,
+      "t": -1.43
+     },
+     "oos": {
+      "n": 129,
+      "ic": -0.068,
+      "t": -0.79
+     },
+     "all": {
+      "n": 233,
+      "ic": -0.11,
+      "t": -1.65
+     },
+     "pass": false,
+     "isPass": false
+    },
+    {
+     "id": "H2-4w",
+     "is": {
+      "n": 104,
+      "ic": -0.239,
+      "t": -1.7
+     },
+     "oos": {
+      "n": 126,
+      "ic": -0.182,
+      "t": -1.27
+     },
+     "all": {
+      "n": 230,
+      "ic": -0.196,
+      "t": -1.88
+     },
+     "pass": false,
+     "isPass": false
+    },
+    {
+     "id": "H3-1w",
+     "is": {
+      "n": 207,
+      "ic": -0.036,
+      "t": -0.47
+     },
+     "oos": {
+      "n": 129,
+      "ic": -0.004,
+      "t": -0.04
+     },
+     "all": {
+      "n": 336,
+      "ic": -0.025,
+      "t": -0.42
+     },
+     "pass": false,
+     "isPass": false
+    },
+    {
+     "id": "H3-4w",
+     "is": {
+      "n": 207,
+      "ic": -0.089,
+      "t": -1.21
+     },
+     "oos": {
+      "n": 126,
+      "ic": -0.012,
+      "t": -0.13
+     },
+     "all": {
+      "n": 333,
+      "ic": -0.053,
+      "t": -0.92
+     },
+     "pass": false,
+     "isPass": false
+    },
+    {
+     "id": "H4-1w",
+     "is": {
+      "n": 31,
+      "hit": 0.774,
+      "mean": 0.51,
+      "t": 2.75
+     },
+     "oos": {
+      "n": 35,
+      "hit": 0.571,
+      "mean": 0.1,
+      "t": 0.6
+     },
+     "pass": true,
+     "isPass": true
+    },
+    {
+     "id": "H4-4w",
+     "is": {
+      "n": 31,
+      "hit": 0.645,
+      "mean": 1.33,
+      "t": 1.87
+     },
+     "oos": {
+      "n": 33,
+      "hit": 0.606,
+      "mean": 0.43,
+      "t": 0.91
+     },
+     "pass": false,
+     "isPass": false
+    },
+    {
+     "id": "H5-1w",
+     "notRun": true
+    },
+    {
+     "id": "H5-4w",
+     "notRun": true
+    }
+   ]
+  },
+  "jpy": {
+   "name": "USD/JPY",
+   "who": "leveraged funds",
+   "quote": "returns in the futures' direction (USD/JPY inverted)",
+   "base": {
+    "1w": 0.454,
+    "4w": 0.413
+   },
+   "cells": [
+    {
+     "id": "H1-1w",
+     "is": {
+      "n": 208,
+      "ic": -0.054,
+      "t": -0.74
+     },
+     "oos": {
+      "n": 129,
+      "ic": 0.042,
+      "t": 0.46
+     },
+     "all": {
+      "n": 337,
+      "ic": -0.015,
+      "t": -0.27
+     },
+     "pass": false,
+     "isPass": false
+    },
+    {
+     "id": "H1-4w",
+     "is": {
+      "n": 208,
+      "ic": 0.033,
+      "t": 0.28
+     },
+     "oos": {
+      "n": 126,
+      "ic": 0.035,
+      "t": 0.26
+     },
+     "all": {
+      "n": 334,
+      "ic": 0.035,
+      "t": 0.41
+     },
+     "pass": false,
+     "isPass": false
+    },
+    {
+     "id": "H2-1w",
+     "is": {
+      "n": 104,
+      "ic": -0.055,
+      "t": -0.49
+     },
+     "oos": {
+      "n": 129,
+      "ic": 0.014,
+      "t": 0.15
+     },
+     "all": {
+      "n": 233,
+      "ic": 0.011,
+      "t": 0.17
+     },
+     "pass": false,
+     "isPass": false
+    },
+    {
+     "id": "H2-4w",
+     "is": {
+      "n": 104,
+      "ic": 0.119,
+      "t": 0.81
+     },
+     "oos": {
+      "n": 126,
+      "ic": -0.011,
+      "t": -0.08
+     },
+     "all": {
+      "n": 230,
+      "ic": 0.069,
+      "t": 0.71
+     },
+     "pass": false,
+     "isPass": false
+    },
+    {
+     "id": "H3-1w",
+     "is": {
+      "n": 207,
+      "ic": -0.132,
+      "t": -1.91
+     },
+     "oos": {
+      "n": 129,
+      "ic": 0.033,
+      "t": 0.36
+     },
+     "all": {
+      "n": 336,
+      "ic": -0.066,
+      "t": -1.18
+     },
+     "pass": false,
+     "isPass": false
+    },
+    {
+     "id": "H3-4w",
+     "is": {
+      "n": 207,
+      "ic": -0.013,
+      "t": -0.19
+     },
+     "oos": {
+      "n": 126,
+      "ic": -0.055,
+      "t": -0.58
+     },
+     "all": {
+      "n": 333,
+      "ic": -0.028,
+      "t": -0.52
+     },
+     "pass": false,
+     "isPass": false
+    },
+    {
+     "id": "H4-1w",
+     "is": {
+      "n": 20,
+      "hit": 0.4,
+      "mean": -0.4,
+      "t": -1.17
+     },
+     "oos": {
+      "n": 61,
+      "hit": 0.443,
+      "mean": 0.09,
+      "t": 0.54
+     },
+     "pass": false,
+     "isPass": false
+    },
+    {
+     "id": "H4-4w",
+     "is": {
+      "n": 20,
+      "hit": 0.3,
+      "mean": -1.92,
+      "t": -1.91
+     },
+     "oos": {
+      "n": 61,
+      "hit": 0.475,
+      "mean": 0.51,
+      "t": 0.79
+     },
+     "pass": false,
+     "isPass": false
+    },
+    {
+     "id": "H5-1w",
+     "notRun": true
+    },
+    {
+     "id": "H5-4w",
+     "notRun": true
+    }
+   ]
+  },
+  "aud": {
+   "name": "AUD/USD",
+   "who": "leveraged funds",
+   "quote": null,
+   "base": {
+    "1w": 0.51,
+    "4w": 0.5
+   },
+   "cells": [
+    {
+     "id": "H1-1w",
+     "is": {
+      "n": 208,
+      "ic": -0.013,
+      "t": -0.19
+     },
+     "oos": {
+      "n": 129,
+      "ic": -0.127,
+      "t": -1.8
+     },
+     "all": {
+      "n": 337,
+      "ic": -0.051,
+      "t": -1
+     },
+     "pass": false,
+     "isPass": false
+    },
+    {
+     "id": "H1-4w",
+     "is": {
+      "n": 208,
+      "ic": -0.08,
+      "t": -0.75
+     },
+     "oos": {
+      "n": 126,
+      "ic": -0.343,
+      "t": -2.88
+     },
+     "all": {
+      "n": 334,
+      "ic": -0.16,
+      "t": -1.92
+     },
+     "pass": false,
+     "isPass": false
+    },
+    {
+     "id": "H2-1w",
+     "is": {
+      "n": 104,
+      "ic": 0.029,
+      "t": 0.33
+     },
+     "oos": {
+      "n": 129,
+      "ic": -0.119,
+      "t": -1.66
+     },
+     "all": {
+      "n": 233,
+      "ic": -0.07,
+      "t": -1.27
+     },
+     "pass": false,
+     "isPass": false
+    },
+    {
+     "id": "H2-4w",
+     "is": {
+      "n": 104,
+      "ic": -0.185,
+      "t": -1.37
+     },
+     "oos": {
+      "n": 126,
+      "ic": -0.29,
+      "t": -2.35
+     },
+     "all": {
+      "n": 230,
+      "ic": -0.231,
+      "t": -2.27
+     },
+     "pass": false,
+     "isPass": false
+    },
+    {
+     "id": "H3-1w",
+     "is": {
+      "n": 207,
+      "ic": -0.027,
+      "t": -0.38
+     },
+     "oos": {
+      "n": 129,
+      "ic": -0.03,
+      "t": -0.31
+     },
+     "all": {
+      "n": 336,
+      "ic": -0.027,
+      "t": -0.48
+     },
+     "pass": false,
+     "isPass": false
+    },
+    {
+     "id": "H3-4w",
+     "is": {
+      "n": 207,
+      "ic": 0.008,
+      "t": 0.13
+     },
+     "oos": {
+      "n": 126,
+      "ic": -0.082,
+      "t": -1.07
+     },
+     "all": {
+      "n": 333,
+      "ic": -0.024,
+      "t": -0.5
+     },
+     "pass": false,
+     "isPass": false
+    },
+    {
+     "id": "H4-1w",
+     "is": {
+      "n": 15,
+      "hit": 0.667,
+      "mean": 0.55,
+      "t": 1.28
+     },
+     "oos": {
+      "n": 51,
+      "hit": 0.51,
+      "mean": 0.22,
+      "t": 1.05
+     },
+     "pass": false,
+     "isPass": false
+    },
+    {
+     "id": "H4-4w",
+     "is": {
+      "n": 15,
+      "hit": 0.867,
+      "mean": 1.84,
+      "t": 3.12
+     },
+     "oos": {
+      "n": 49,
+      "hit": 0.714,
+      "mean": 0.93,
+      "t": 2.51
+     },
+     "pass": true,
+     "isPass": true
+    },
+    {
+     "id": "H5-1w",
+     "notRun": true
+    },
+    {
+     "id": "H5-4w",
+     "notRun": true
+    }
+   ]
+  },
+  "nzd": {
+   "name": "NZD/USD",
+   "who": "leveraged funds",
+   "quote": null,
+   "base": {
+    "1w": 0.463,
+    "4w": 0.491
+   },
+   "cells": [
+    {
+     "id": "H1-1w",
+     "is": {
+      "n": 208,
+      "ic": -0.045,
+      "t": -0.62
+     },
+     "oos": {
+      "n": 129,
+      "ic": -0.06,
+      "t": -0.67
+     },
+     "all": {
+      "n": 337,
+      "ic": -0.03,
+      "t": -0.55
+     },
+     "pass": false,
+     "isPass": false
+    },
+    {
+     "id": "H1-4w",
+     "is": {
+      "n": 208,
+      "ic": 0.019,
+      "t": 0.19
+     },
+     "oos": {
+      "n": 126,
+      "ic": -0.087,
+      "t": -0.64
+     },
+     "all": {
+      "n": 334,
+      "ic": 0.019,
+      "t": 0.25
+     },
+     "pass": false,
+     "isPass": false
+    },
+    {
+     "id": "H2-1w",
+     "is": {
+      "n": 104,
+      "ic": -0.13,
+      "t": -1.37
+     },
+     "oos": {
+      "n": 129,
+      "ic": -0.066,
+      "t": -0.74
+     },
+     "all": {
+      "n": 233,
+      "ic": -0.071,
+      "t": -1.13
+     },
+     "pass": false,
+     "isPass": false
+    },
+    {
+     "id": "H2-4w",
+     "is": {
+      "n": 104,
+      "ic": 0.01,
+      "t": 0.08
+     },
+     "oos": {
+      "n": 126,
+      "ic": -0.135,
+      "t": -0.89
+     },
+     "all": {
+      "n": 230,
+      "ic": -0.056,
+      "t": -0.58
+     },
+     "pass": false,
+     "isPass": false
+    },
+    {
+     "id": "H3-1w",
+     "is": {
+      "n": 207,
+      "ic": -0.045,
+      "t": -0.58
+     },
+     "oos": {
+      "n": 129,
+      "ic": -0.024,
+      "t": -0.23
+     },
+     "all": {
+      "n": 336,
+      "ic": -0.038,
+      "t": -0.6
+     },
+     "pass": false,
+     "isPass": false
+    },
+    {
+     "id": "H3-4w",
+     "is": {
+      "n": 207,
+      "ic": -0.01,
+      "t": -0.17
+     },
+     "oos": {
+      "n": 126,
+      "ic": -0.106,
+      "t": -1.19
+     },
+     "all": {
+      "n": 333,
+      "ic": -0.046,
+      "t": -0.9
+     },
+     "pass": false,
+     "isPass": false
+    },
+    {
+     "id": "H4-1w",
+     "is": {
+      "n": 11,
+      "hit": 0.636,
+      "mean": 0.39,
+      "t": 0.88
+     },
+     "oos": {
+      "n": 55,
+      "hit": 0.564,
+      "mean": 0.15,
+      "t": 0.72
+     },
+     "pass": false,
+     "isPass": false
+    },
+    {
+     "id": "H4-4w",
+     "is": {
+      "n": 11,
+      "hit": 0.545,
+      "mean": 1.06,
+      "t": 0.78
+     },
+     "oos": {
+      "n": 54,
+      "hit": 0.574,
+      "mean": -0.02,
+      "t": -0.04
+     },
+     "pass": false,
+     "isPass": false
+    },
+    {
+     "id": "H5-1w",
+     "notRun": true
+    },
+    {
+     "id": "H5-4w",
+     "notRun": true
+    }
+   ]
+  },
+  "cad": {
+   "name": "USD/CAD",
+   "who": "leveraged funds",
+   "quote": "returns in the futures' direction (USD/CAD inverted)",
+   "base": {
+    "1w": 0.463,
+    "4w": 0.467
+   },
+   "cells": [
+    {
+     "id": "H1-1w",
+     "is": {
+      "n": 208,
+      "ic": -0.145,
+      "t": -2.06
+     },
+     "oos": {
+      "n": 129,
+      "ic": -0.064,
+      "t": -0.72
+     },
+     "all": {
+      "n": 337,
+      "ic": -0.11,
+      "t": -2
+     },
+     "pass": false,
+     "isPass": true
+    },
+    {
+     "id": "H1-4w",
+     "is": {
+      "n": 208,
+      "ic": -0.189,
+      "t": -1.76
+     },
+     "oos": {
+      "n": 126,
+      "ic": -0.08,
+      "t": -0.5
+     },
+     "all": {
+      "n": 334,
+      "ic": -0.131,
+      "t": -1.49
+     },
+     "pass": false,
+     "isPass": false
+    },
+    {
+     "id": "H2-1w",
+     "is": {
+      "n": 104,
+      "ic": -0.105,
+      "t": -1.16
+     },
+     "oos": {
+      "n": 129,
+      "ic": -0.114,
+      "t": -1.21
+     },
+     "all": {
+      "n": 233,
+      "ic": -0.096,
+      "t": -1.49
+     },
+     "pass": false,
+     "isPass": false
+    },
+    {
+     "id": "H2-4w",
+     "is": {
+      "n": 104,
+      "ic": -0.117,
+      "t": -0.76
+     },
+     "oos": {
+      "n": 126,
+      "ic": -0.151,
+      "t": -1.03
+     },
+     "all": {
+      "n": 230,
+      "ic": -0.127,
+      "t": -1.17
+     },
+     "pass": false,
+     "isPass": false
+    },
+    {
+     "id": "H3-1w",
+     "is": {
+      "n": 207,
+      "ic": -0.036,
+      "t": -0.52
+     },
+     "oos": {
+      "n": 129,
+      "ic": -0.196,
+      "t": -2.36
+     },
+     "all": {
+      "n": 336,
+      "ic": -0.094,
+      "t": -1.77
+     },
+     "pass": false,
+     "isPass": false
+    },
+    {
+     "id": "H3-4w",
+     "is": {
+      "n": 207,
+      "ic": -0.12,
+      "t": -1.8
+     },
+     "oos": {
+      "n": 126,
+      "ic": -0.192,
+      "t": -1.81
+     },
+     "all": {
+      "n": 333,
+      "ic": -0.139,
+      "t": -2.46
+     },
+     "pass": false,
+     "isPass": false
+    },
+    {
+     "id": "H4-1w",
+     "is": {
+      "n": 20,
+      "hit": 0.45,
+      "mean": 0.05,
+      "t": 0.28
+     },
+     "oos": {
+      "n": 54,
+      "hit": 0.519,
+      "mean": 0.01,
+      "t": 0.07
+     },
+     "pass": false,
+     "isPass": false
+    },
+    {
+     "id": "H4-4w",
+     "is": {
+      "n": 20,
+      "hit": 0.55,
+      "mean": 0.18,
+      "t": 0.35
+     },
+     "oos": {
+      "n": 52,
+      "hit": 0.481,
+      "mean": -0.08,
+      "t": -0.3
+     },
+     "pass": false,
+     "isPass": false
+    },
+    {
+     "id": "H5-1w",
+     "notRun": true
+    },
+    {
+     "id": "H5-4w",
+     "notRun": true
+    }
+   ]
+  },
+  "chf": {
+   "name": "USD/CHF",
+   "who": "leveraged funds",
+   "quote": "returns in the futures' direction (USD/CHF inverted)",
+   "base": {
+    "1w": 0.499,
+    "4w": 0.515
+   },
+   "cells": [
+    {
+     "id": "H1-1w",
+     "is": {
+      "n": 208,
+      "ic": 0.036,
+      "t": 0.52
+     },
+     "oos": {
+      "n": 129,
+      "ic": -0.055,
+      "t": -0.61
+     },
+     "all": {
+      "n": 337,
+      "ic": 0.015,
+      "t": 0.27
+     },
+     "pass": false,
+     "isPass": false
+    },
+    {
+     "id": "H1-4w",
+     "is": {
+      "n": 208,
+      "ic": 0.133,
+      "t": 1.4
+     },
+     "oos": {
+      "n": 126,
+      "ic": -0.102,
+      "t": -0.67
+     },
+     "all": {
+      "n": 334,
+      "ic": 0.059,
+      "t": 0.66
+     },
+     "pass": false,
+     "isPass": false
+    },
+    {
+     "id": "H2-1w",
+     "is": {
+      "n": 104,
+      "ic": 0.049,
+      "t": 0.47
+     },
+     "oos": {
+      "n": 129,
+      "ic": -0.122,
+      "t": -1.35
+     },
+     "all": {
+      "n": 233,
+      "ic": -0.054,
+      "t": -0.81
+     },
+     "pass": false,
+     "isPass": false
+    },
+    {
+     "id": "H2-4w",
+     "is": {
+      "n": 104,
+      "ic": 0.067,
+      "t": 0.43
+     },
+     "oos": {
+      "n": 126,
+      "ic": -0.276,
+      "t": -1.72
+     },
+     "all": {
+      "n": 230,
+      "ic": -0.161,
+      "t": -1.37
+     },
+     "pass": false,
+     "isPass": false
+    },
+    {
+     "id": "H3-1w",
+     "is": {
+      "n": 207,
+      "ic": 0.086,
+      "t": 1.26
+     },
+     "oos": {
+      "n": 129,
+      "ic": 0.098,
+      "t": 1.1
+     },
+     "all": {
+      "n": 336,
+      "ic": 0.095,
+      "t": 1.76
+     },
+     "pass": false,
+     "isPass": false
+    },
+    {
+     "id": "H3-4w",
+     "is": {
+      "n": 207,
+      "ic": 0.034,
+      "t": 0.55
+     },
+     "oos": {
+      "n": 126,
+      "ic": 0.023,
+      "t": 0.29
+     },
+     "all": {
+      "n": 333,
+      "ic": 0.043,
+      "t": 0.89
+     },
+     "pass": false,
+     "isPass": false
+    },
+    {
+     "id": "H4-1w",
+     "is": {
+      "n": 20,
+      "hit": 0.5,
+      "mean": 0.27,
+      "t": 0.69
+     },
+     "oos": {
+      "n": 38,
+      "hit": 0.579,
+      "mean": 0.36,
+      "t": 1.67
+     },
+     "pass": false,
+     "isPass": false
+    },
+    {
+     "id": "H4-4w",
+     "is": {
+      "n": 20,
+      "hit": 0.65,
+      "mean": 0.67,
+      "t": 1.38
+     },
+     "oos": {
+      "n": 38,
+      "hit": 0.763,
+      "mean": 1.53,
+      "t": 2.46
+     },
+     "pass": false,
+     "isPass": false
+    },
+    {
+     "id": "H5-1w",
+     "notRun": true
+    },
+    {
+     "id": "H5-4w",
+     "notRun": true
+    }
+   ]
+  },
+  "nq": {
+   "name": "Nasdaq 100",
+   "who": "leveraged funds",
+   "quote": null,
+   "base": {
+    "1w": 0.576,
+    "4w": 0.656
+   },
+   "cells": [
+    {
+     "id": "H1-1w",
+     "is": {
+      "n": 208,
+      "ic": 0.048,
+      "t": 0.64
+     },
+     "oos": {
+      "n": 129,
+      "ic": 0.004,
+      "t": 0.05
+     },
+     "all": {
+      "n": 337,
+      "ic": 0.032,
+      "t": 0.55
+     },
+     "pass": false,
+     "isPass": false
+    },
+    {
+     "id": "H1-4w",
+     "is": {
+      "n": 208,
+      "ic": 0.031,
+      "t": 0.27
+     },
+     "oos": {
+      "n": 126,
+      "ic": 0.053,
+      "t": 0.41
+     },
+     "all": {
+      "n": 334,
+      "ic": 0.035,
+      "t": 0.39
+     },
+     "pass": false,
+     "isPass": false
+    },
+    {
+     "id": "H2-1w",
+     "is": {
+      "n": 104,
+      "ic": 0.201,
+      "t": 1.92
+     },
+     "oos": {
+      "n": 129,
+      "ic": 0.047,
+      "t": 0.61
+     },
+     "all": {
+      "n": 233,
+      "ic": 0.098,
+      "t": 1.54
+     },
+     "pass": false,
+     "isPass": false
+    },
+    {
+     "id": "H2-4w",
+     "is": {
+      "n": 104,
+      "ic": 0.254,
+      "t": 1.61
+     },
+     "oos": {
+      "n": 126,
+      "ic": 0.105,
+      "t": 0.94
+     },
+     "all": {
+      "n": 230,
+      "ic": 0.142,
+      "t": 1.51
+     },
+     "pass": false,
+     "isPass": false
+    },
+    {
+     "id": "H3-1w",
+     "is": {
+      "n": 207,
+      "ic": -0.046,
+      "t": -0.67
+     },
+     "oos": {
+      "n": 129,
+      "ic": -0.045,
+      "t": -0.51
+     },
+     "all": {
+      "n": 336,
+      "ic": -0.043,
+      "t": -0.8
+     },
+     "pass": false,
+     "isPass": false
+    },
+    {
+     "id": "H3-4w",
+     "is": {
+      "n": 207,
+      "ic": 0.005,
+      "t": 0.07
+     },
+     "oos": {
+      "n": 126,
+      "ic": 0.056,
+      "t": 0.99
+     },
+     "all": {
+      "n": 333,
+      "ic": 0.023,
+      "t": 0.5
+     },
+     "pass": false,
+     "isPass": false
+    },
+    {
+     "id": "H4-1w",
+     "is": {
+      "n": 21,
+      "hit": 0.286,
+      "mean": -1.35,
+      "t": -1.41
+     },
+     "oos": {
+      "n": 43,
+      "hit": 0.512,
+      "mean": 0.04,
+      "t": 0.1
+     },
+     "pass": false,
+     "isPass": false
+    },
+    {
+     "id": "H4-4w",
+     "is": {
+      "n": 21,
+      "hit": 0.429,
+      "mean": -3.01,
+      "t": -1.55
+     },
+     "oos": {
+      "n": 42,
+      "hit": 0.595,
+      "mean": 0.8,
+      "t": 0.86
+     },
+     "pass": false,
+     "isPass": false
+    },
+    {
+     "id": "H5-1w",
+     "notRun": true
+    },
+    {
+     "id": "H5-4w",
+     "notRun": true
+    }
+   ]
+  },
+  "es": {
+   "name": "S&P 500",
+   "who": "leveraged funds",
+   "quote": null,
+   "base": {
+    "1w": 0.591,
+    "4w": 0.689
+   },
+   "cells": [
+    {
+     "id": "H1-1w",
+     "is": {
+      "n": 208,
+      "ic": 0.006,
+      "t": 0.08
+     },
+     "oos": {
+      "n": 129,
+      "ic": 0.1,
+      "t": 1.15
+     },
+     "all": {
+      "n": 337,
+      "ic": 0.034,
+      "t": 0.57
+     },
+     "pass": false,
+     "isPass": false
+    },
+    {
+     "id": "H1-4w",
+     "is": {
+      "n": 208,
+      "ic": 0.086,
+      "t": 0.73
+     },
+     "oos": {
+      "n": 126,
+      "ic": 0.131,
+      "t": 1.06
+     },
+     "all": {
+      "n": 334,
+      "ic": 0.098,
+      "t": 1.1
+     },
+     "pass": false,
+     "isPass": false
+    },
+    {
+     "id": "H2-1w",
+     "is": {
+      "n": 104,
+      "ic": -0.066,
+      "t": -0.58
+     },
+     "oos": {
+      "n": 129,
+      "ic": 0.111,
+      "t": 1.26
+     },
+     "all": {
+      "n": 233,
+      "ic": 0.021,
+      "t": 0.28
+     },
+     "pass": false,
+     "isPass": false
+    },
+    {
+     "id": "H2-4w",
+     "is": {
+      "n": 104,
+      "ic": 0.027,
+      "t": 0.17
+     },
+     "oos": {
+      "n": 126,
+      "ic": 0.169,
+      "t": 1.25
+     },
+     "all": {
+      "n": 230,
+      "ic": 0.087,
+      "t": 0.78
+     },
+     "pass": false,
+     "isPass": false
+    },
+    {
+     "id": "H3-1w",
+     "is": {
+      "n": 207,
+      "ic": -0.038,
+      "t": -0.52
+     },
+     "oos": {
+      "n": 129,
+      "ic": -0.016,
+      "t": -0.18
+     },
+     "all": {
+      "n": 336,
+      "ic": -0.026,
+      "t": -0.44
+     },
+     "pass": false,
+     "isPass": false
+    },
+    {
+     "id": "H3-4w",
+     "is": {
+      "n": 207,
+      "ic": 0.016,
+      "t": 0.28
+     },
+     "oos": {
+      "n": 126,
+      "ic": 0.002,
+      "t": 0.03
+     },
+     "all": {
+      "n": 333,
+      "ic": 0.012,
+      "t": 0.26
+     },
+     "pass": false,
+     "isPass": false
+    },
+    {
+     "id": "H4-1w",
+     "is": {
+      "n": 44,
+      "hit": 0.636,
+      "mean": 0.32,
+      "t": 0.81
+     },
+     "oos": {
+      "n": 12,
+      "hit": 0.417,
+      "mean": -0.6,
+      "t": -1.02
+     },
+     "pass": false,
+     "isPass": false
+    },
+    {
+     "id": "H4-4w",
+     "is": {
+      "n": 44,
+      "hit": 0.614,
+      "mean": 0.43,
+      "t": 0.37
+     },
+     "oos": {
+      "n": 12,
+      "hit": 0.5,
+      "mean": -0.8,
+      "t": -0.49
+     },
+     "pass": false,
+     "isPass": false
+    },
+    {
+     "id": "H5-1w",
+     "notRun": true
+    },
+    {
+     "id": "H5-4w",
+     "notRun": true
+    }
+   ]
+  }
+ },
+ "desk": {
+  "gold": {
+   "passed": [],
+   "ic": {
+    "p1_4w": {
+     "is": -0.118,
+     "oos": 0.184
+    },
+    "p3_4w": {
+     "is": -0.199,
+     "oos": 0.325
+    },
+    "z_1w": {
+     "is": 0.036,
+     "oos": 0.031
+    }
+   }
+  },
+  "eur": {
+   "passed": [],
+   "ic": {
+    "p1_4w": {
+     "is": 0.134,
+     "oos": -0.014
+    },
+    "p3_4w": {
+     "is": 0.094,
+     "oos": -0.066
+    },
+    "z_1w": {
+     "is": -0.037,
+     "oos": 0.045
+    }
+   }
+  },
+  "gbp": {
+   "passed": [
+    {
+     "id": "H4-1w",
+     "label": "extreme 90/10 of 3 years (contrarian), 1w: OOS 35 cases, 57% right, 0.1% a case"
+    }
+   ],
+   "ic": {
+    "p1_4w": {
+     "is": -0.165,
+     "oos": -0.279
+    },
+    "p3_4w": {
+     "is": -0.239,
+     "oos": -0.182
+    },
+    "z_1w": {
+     "is": -0.036,
+     "oos": -0.004
+    }
+   }
+  },
+  "jpy": {
+   "passed": [],
+   "ic": {
+    "p1_4w": {
+     "is": 0.033,
+     "oos": 0.035
+    },
+    "p3_4w": {
+     "is": 0.119,
+     "oos": -0.011
+    },
+    "z_1w": {
+     "is": -0.132,
+     "oos": 0.033
+    }
+   }
+  },
+  "aud": {
+   "passed": [
+    {
+     "id": "H4-4w",
+     "label": "extreme 90/10 of 3 years (contrarian), 4w: OOS 49 cases, 71% right, 0.93% a case"
+    }
+   ],
+   "ic": {
+    "p1_4w": {
+     "is": -0.08,
+     "oos": -0.343
+    },
+    "p3_4w": {
+     "is": -0.185,
+     "oos": -0.29
+    },
+    "z_1w": {
+     "is": -0.027,
+     "oos": -0.03
+    }
+   }
+  },
+  "nzd": {
+   "passed": [],
+   "ic": {
+    "p1_4w": {
+     "is": 0.019,
+     "oos": -0.087
+    },
+    "p3_4w": {
+     "is": 0.01,
+     "oos": -0.135
+    },
+    "z_1w": {
+     "is": -0.045,
+     "oos": -0.024
+    }
+   }
+  },
+  "cad": {
+   "passed": [],
+   "ic": {
+    "p1_4w": {
+     "is": -0.189,
+     "oos": -0.08
+    },
+    "p3_4w": {
+     "is": -0.117,
+     "oos": -0.151
+    },
+    "z_1w": {
+     "is": -0.036,
+     "oos": -0.196
+    }
+   }
+  },
+  "chf": {
+   "passed": [],
+   "ic": {
+    "p1_4w": {
+     "is": 0.133,
+     "oos": -0.102
+    },
+    "p3_4w": {
+     "is": 0.067,
+     "oos": -0.276
+    },
+    "z_1w": {
+     "is": 0.086,
+     "oos": 0.098
+    }
+   }
+  },
+  "nq": {
+   "passed": [],
+   "ic": {
+    "p1_4w": {
+     "is": 0.031,
+     "oos": 0.053
+    },
+    "p3_4w": {
+     "is": 0.254,
+     "oos": 0.105
+    },
+    "z_1w": {
+     "is": -0.046,
+     "oos": -0.045
+    }
+   }
+  },
+  "es": {
+   "passed": [],
+   "ic": {
+    "p1_4w": {
+     "is": 0.086,
+     "oos": 0.131
+    },
+    "p3_4w": {
+     "is": 0.027,
+     "oos": 0.169
+    },
+    "z_1w": {
+     "is": -0.038,
+     "oos": -0.016
+    }
+   }
+  }
+ },
+ "diagnostics": {
+  "oiNormalisedP3_4w": {
+   "pooled": {
+    "is": {
+     "weeks": 104,
+     "ic": -0.01,
+     "t": -0.17
+    },
+    "oos": {
+     "weeks": 126,
+     "ic": -0.042,
+     "t": -0.87
+    }
+   },
+   "markets": {
+    "gold": {
+     "is": {
+      "n": 104,
+      "ic": -0.19,
+      "t": -1.42
+     },
+     "oos": {
+      "n": 126,
+      "ic": 0.271,
+      "t": 1.95
+     }
+    },
+    "eur": {
+     "is": {
+      "n": 104,
+      "ic": 0.094,
+      "t": 0.64
+     },
+     "oos": {
+      "n": 126,
+      "ic": -0.08,
+      "t": -0.58
+     }
+    },
+    "gbp": {
+     "is": {
+      "n": 104,
+      "ic": -0.226,
+      "t": -1.58
+     },
+     "oos": {
+      "n": 126,
+      "ic": -0.072,
+      "t": -0.52
+     }
+    },
+    "jpy": {
+     "is": {
+      "n": 104,
+      "ic": 0.192,
+      "t": 1.45
+     },
+     "oos": {
+      "n": 126,
+      "ic": -0.071,
+      "t": -0.5
+     }
+    },
+    "aud": {
+     "is": {
+      "n": 104,
+      "ic": -0.141,
+      "t": -1.01
+     },
+     "oos": {
+      "n": 126,
+      "ic": -0.264,
+      "t": -2.06
+     }
+    },
+    "nzd": {
+     "is": {
+      "n": 104,
+      "ic": -0.059,
+      "t": -0.49
+     },
+     "oos": {
+      "n": 126,
+      "ic": -0.109,
+      "t": -0.74
+     }
+    },
+    "cad": {
+     "is": {
+      "n": 104,
+      "ic": -0.121,
+      "t": -0.78
+     },
+     "oos": {
+      "n": 126,
+      "ic": -0.081,
+      "t": -0.57
+     }
+    },
+    "chf": {
+     "is": {
+      "n": 104,
+      "ic": 0.077,
+      "t": 0.49
+     },
+     "oos": {
+      "n": 126,
+      "ic": -0.24,
+      "t": -1.49
+     }
+    },
+    "nq": {
+     "is": {
+      "n": 104,
+      "ic": 0.246,
+      "t": 1.51
+     },
+     "oos": {
+      "n": 126,
+      "ic": 0.063,
+      "t": 0.55
+     }
+    },
+    "es": {
+     "is": {
+      "n": 104,
+      "ic": 0.025,
+      "t": 0.15
+     },
+     "oos": {
+      "n": 126,
+      "ic": 0.162,
+      "t": 1.17
+     }
+    }
+   }
+  },
+  "oldTimingH4_4w": {
+   "note": "old = as-of + 6 days for every report, Sunday stubs counted as days, late weeks kept, naive t; new = this study (3-year percentile only when 156 reports exist, in both)",
+   "markets": {
+    "gold": {
+     "old": {
+      "n": 81,
+      "hit": 0.309,
+      "mean": -1.04,
+      "naiveT": -2.48
+     },
+     "new": {
+      "n": 81,
+      "hit": 0.358,
+      "mean": -1.18,
+      "t": -1.9
+     }
+    },
+    "eur": {
+     "old": {
+      "n": 62,
+      "hit": 0.565,
+      "mean": -0.04,
+      "naiveT": -0.2
+     },
+     "new": {
+      "n": 56,
+      "hit": 0.571,
+      "mean": 0.01,
+      "t": 0.02
+     }
+    },
+    "gbp": {
+     "old": {
+      "n": 66,
+      "hit": 0.697,
+      "mean": 0.97,
+      "naiveT": 3.92
+     },
+     "new": {
+      "n": 64,
+      "hit": 0.625,
+      "mean": 0.86,
+      "t": 1.98
+     }
+    },
+    "jpy": {
+     "old": {
+      "n": 86,
+      "hit": 0.442,
+      "mean": 0.02,
+      "naiveT": 0.07
+     },
+     "new": {
+      "n": 81,
+      "hit": 0.432,
+      "mean": -0.09,
+      "t": -0.15
+     }
+    },
+    "aud": {
+     "old": {
+      "n": 73,
+      "hit": 0.671,
+      "mean": 0.76,
+      "naiveT": 3.03
+     },
+     "new": {
+      "n": 64,
+      "hit": 0.75,
+      "mean": 1.15,
+      "t": 3.5
+     }
+    },
+    "nzd": {
+     "old": {
+      "n": 70,
+      "hit": 0.6,
+      "mean": 0.39,
+      "naiveT": 1.34
+     },
+     "new": {
+      "n": 65,
+      "hit": 0.569,
+      "mean": 0.16,
+      "t": 0.37
+     }
+    },
+    "cad": {
+     "old": {
+      "n": 72,
+      "hit": 0.486,
+      "mean": -0.01,
+      "naiveT": -0.06
+     },
+     "new": {
+      "n": 72,
+      "hit": 0.5,
+      "mean": -0.01,
+      "t": -0.03
+     }
+    },
+    "chf": {
+     "old": {
+      "n": 58,
+      "hit": 0.707,
+      "mean": 1.26,
+      "naiveT": 4.51
+     },
+     "new": {
+      "n": 58,
+      "hit": 0.724,
+      "mean": 1.23,
+      "t": 2.73
+     }
+    },
+    "nq": {
+     "old": {
+      "n": 73,
+      "hit": 0.507,
+      "mean": -0.6,
+      "naiveT": -0.98
+     },
+     "new": {
+      "n": 63,
+      "hit": 0.54,
+      "mean": -0.47,
+      "t": -0.49
+     }
+    },
+    "es": {
+     "old": {
+      "n": 57,
+      "hit": 0.544,
+      "mean": 0.3,
+      "naiveT": 0.51
+     },
+     "new": {
+      "n": 56,
+      "hit": 0.589,
+      "mean": 0.17,
+      "t": 0.17
+     }
+    }
+   }
+  },
+  "p3Quintiles4w": [
+   {
+    "q": "0-20",
+    "n": 612,
+    "meanPct": 0.17,
+    "up": 0.534
+   },
+   {
+    "q": "20-40",
+    "n": 445,
+    "meanPct": 0.05,
+    "up": 0.501
+   },
+   {
+    "q": "40-60",
+    "n": 436,
+    "meanPct": 0.27,
+    "up": 0.505
+   },
+   {
+    "q": "60-80",
+    "n": 393,
+    "meanPct": 0.25,
+    "up": 0.491
+   },
+   {
+    "q": "80-100",
+    "n": 414,
+    "meanPct": 0.39,
+    "up": 0.498
+   }
+  ],
+  "goldByYearH2_4w": [
+   {
+    "year": "2020",
+    "n": 0,
+    "ic": null
+   },
+   {
+    "year": "2021",
+    "n": 0,
+    "ic": null
+   },
+   {
+    "year": "2022",
+    "n": 52,
+    "ic": -0.044
+   },
+   {
+    "year": "2023",
+    "n": 52,
+    "ic": -0.42
+   },
+   {
+    "year": "2024",
+    "n": 53,
+    "ic": -0.003
+   },
+   {
+    "year": "2025",
+    "n": 38,
+    "ic": 0.476
+   },
+   {
+    "year": "2026",
+    "n": 35,
+    "ic": 0.157
+   }
+  ]
+ },
+ "candidates": [
+  {
+   "rule": "H1 1-year crowding (contrarian), 1w, pooled: IC -0.027 IS / -0.019 OOS",
+   "verdict": "FAIL",
+   "is": {
+    "n": 208,
+    "t": -1.03
+   },
+   "oos": {
+    "n": 129,
+    "t": -0.63
+   }
+  },
+  {
+   "rule": "H1 1-year crowding (contrarian), 4w, pooled: IC -0.012 IS / -0.05 OOS",
+   "verdict": "FAIL",
+   "is": {
+    "n": 208,
+    "t": -0.32
+   },
+   "oos": {
+    "n": 126,
+    "t": -0.99
+   }
+  },
+  {
+   "rule": "H2 3-year crowding (contrarian), 1w, pooled: IC -0.022 IS / -0.015 OOS",
+   "verdict": "FAIL",
+   "is": {
+    "n": 104,
+    "t": -0.55
+   },
+   "oos": {
+    "n": 129,
+    "t": -0.5
+   }
+  },
+  {
+   "rule": "H2 3-year crowding (contrarian), 4w, pooled: IC -0.017 IS / -0.051 OOS",
+   "verdict": "FAIL",
+   "is": {
+    "n": 104,
+    "t": -0.31
+   },
+   "oos": {
+    "n": 126,
+    "t": -1.03
+   }
+  },
+  {
+   "rule": "H3 weekly flow (follow), 1w, pooled: IC -0.028 IS / -0.011 OOS",
+   "verdict": "FAIL",
+   "is": {
+    "n": 207,
+    "t": -0.97
+   },
+   "oos": {
+    "n": 129,
+    "t": -0.35
+   }
+  },
+  {
+   "rule": "H3 weekly flow (follow), 4w, pooled: IC -0.043 IS / -0.031 OOS",
+   "verdict": "FAIL",
+   "is": {
+    "n": 207,
+    "t": -1.95
+   },
+   "oos": {
+    "n": 126,
+    "t": -1.06
+   }
+  },
+  {
+   "rule": "H4 extreme 90/10 of 3 years (contrarian), 1w, pooled: 0.02% / 0.01% a week with an event",
+   "verdict": "FAIL",
+   "is": {
+    "n": 228,
+    "t": 0.11,
+    "wr": 0.539
+   },
+   "oos": {
+    "n": 443,
+    "t": 0.13,
+    "wr": 0.499
+   }
+  },
+  {
+   "rule": "H4 extreme 90/10 of 3 years (contrarian), 4w, pooled: 0.08% / 0.05% a week with an event",
+   "verdict": "FAIL",
+   "is": {
+    "n": 228,
+    "t": 0.19,
+    "wr": 0.561
+   },
+   "oos": {
+    "n": 432,
+    "t": 0.26,
+    "wr": 0.551
+   }
+  },
+  {
+   "rule": "H5 extreme with commercials opposite (contrarian), 1w: not run (commercial positions are in 0% of the cached weeks (needs 90%); runs on the next full CFTC re-fetch)",
+   "verdict": "NOT RUN"
+  },
+  {
+   "rule": "H5 extreme with commercials opposite (contrarian), 4w: not run (commercial positions are in 0% of the cached weeks (needs 90%); runs on the next full CFTC re-fetch)",
+   "verdict": "NOT RUN"
+  }
+ ],
+ "prior": {
+  "goldCrowdingIc": 0.01,
+  "gold": {
+   "H2-4w": {
+    "is": {
+     "n": 104,
+     "ic": -0.199,
+     "t": -1.44
+    },
+    "oos": {
+     "n": 126,
+     "ic": 0.325,
+     "t": 2.12
+    }
+   },
+   "H1-4w": {
+    "is": {
+     "n": 208,
+     "ic": -0.118,
+     "t": -1.18
+    },
+    "oos": {
+     "n": 126,
+     "ic": 0.184,
+     "t": 1.33
+    }
+   }
+  }
+ },
+ "notes": "Paper research only. IC t-stats are Newey-West (lag 2 for 1w, 6 for 4w); event t allows for overlapping windows. History is 2019+ (what the council caches); a long-history replication needs a run where CFTC resolves."
+}
