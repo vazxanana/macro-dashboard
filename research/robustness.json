@@ -1,5 +1,5 @@
 {
- "at": "2026-11-08T10:40:15.738Z",
+ "at": "2026-11-09T01:45:53.915Z",
  "bar": {
   "minN": 30,
   "oosT": 2,
@@ -11,85 +11,85 @@
    "system": "ICT",
    "status": "live (paper desk + cTrader demo mirror)",
    "name": "ICT A-setups (desk replay)",
-   "claim": "desk replay since 2025-08-01: +0.233R a trade over 222 (before costs)",
+   "claim": "desk replay since 2025-08-01: +0.265R a trade over 254 (before costs)",
    "source": "ict/replay.json trades (aset)",
    "fitFrom": "2023-01-01",
    "family": "ict",
-   "n": 222,
-   "mean": 0.212,
-   "sd": 1.5589,
-   "t": 2.026,
-   "wr": 0.4054,
-   "sum": 47.0585,
-   "skew": 1.8801,
-   "kurt": 7.62,
+   "n": 254,
+   "mean": 0.2453,
+   "sd": 1.5971,
+   "t": 2.4475,
+   "wr": 0.3937,
+   "sum": 62.299,
+   "skew": 1.7181,
+   "kurt": 6.3783,
    "maxDD": 11.8938,
    "from": "2025-08-07",
    "to": "2026-11-05",
    "is": {
-    "n": 133,
-    "mean": 0.2121,
-    "sd": 1.5722,
-    "t": 1.5557,
-    "wr": 0.4286,
-    "sum": 28.2082,
-    "skew": 1.898,
-    "kurt": 8.1446,
-    "maxDD": 9.2028
+    "n": 152,
+    "mean": 0.2276,
+    "sd": 1.6227,
+    "t": 1.7291,
+    "wr": 0.3947,
+    "sum": 34.5935,
+    "skew": 1.707,
+    "kurt": 6.4238,
+    "maxDD": 11.2264
    },
    "oos": {
-    "n": 89,
-    "mean": 0.2118,
-    "sd": 1.5477,
-    "t": 1.291,
-    "wr": 0.3708,
-    "sum": 18.8503,
-    "skew": 1.8514,
-    "kurt": 6.7728,
+    "n": 102,
+    "mean": 0.2716,
+    "sd": 1.5657,
+    "t": 1.7521,
+    "wr": 0.3922,
+    "sum": 27.7055,
+    "skew": 1.7394,
+    "kurt": 6.2914,
     "maxDD": 11.8938
    },
    "boot": {
-    "lo": 0.0154,
-    "hi": 0.4284,
-    "pLE0": 0.018
+    "lo": 0.0537,
+    "hi": 0.442,
+    "pLE0": 0.0068
    },
    "cost": {
     "x0": {
-     "mean": 0.2326,
-     "t": 2.2219,
-     "sum": 51.63
+     "mean": 0.2653,
+     "t": 2.6455,
+     "sum": 67.38
     },
     "x1": {
-     "mean": 0.212,
-     "t": 2.026,
-     "sum": 47.0585
+     "mean": 0.2453,
+     "t": 2.4475,
+     "sum": 62.299
     },
     "x1.5": {
-     "mean": 0.2017,
-     "t": 1.9278,
-     "sum": 44.7727
+     "mean": 0.2353,
+     "t": 2.3483,
+     "sum": 59.7585
     },
     "x2": {
-     "mean": 0.1914,
-     "t": 1.8296,
-     "sum": 42.487
+     "mean": 0.2253,
+     "t": 2.249,
+     "sum": 57.2179
     }
    },
    "mc": {
-    "dd50": 11.59,
-    "dd95": 18.5502,
+    "dd50": 11.6593,
+    "dd95": 18.6958,
     "ddActual": 11.8938
    },
    "mt": {
     "N": 363,
     "bonf": {
-     "p": 0.0214,
+     "p": 0.0072,
      "pAdj": 1,
      "tReq": 3.6373
     },
-    "sr": 0.136,
-    "sr0": 0.1988,
-    "dsr": 0.1445
+    "sr": 0.1536,
+    "sr0": 0.1858,
+    "dsr": 0.2794
    },
    "untouched": {
     "n": 0,
@@ -99,8 +99,8 @@
    "warn": [],
    "verdict": "fragile",
    "why": [
-    "out-of-sample t 1.29 < 2",
-    "fails Bonferroni for N=363 (needs t 3.64, has 2.03)",
+    "out-of-sample t 1.75 < 2",
+    "fails Bonferroni for N=363 (needs t 3.64, has 2.45)",
     "no untouched sample: the rule was chosen on data from 2023-01-01 on (0 trades before)"
    ]
   },
@@ -109,90 +109,90 @@
    "system": "ICT",
    "status": "shadow (paper variant)",
    "name": "ICT A-setups, no Friday variant",
-   "claim": "+0.292R a trade over 191 (before costs)",
+   "claim": "+0.334R a trade over 220 (before costs)",
    "source": "ict/replay.json shadowByVariant.nofri",
    "fitFrom": "2023-01-01",
    "dropped": {
-    "n": 31,
-    "mean": -0.1571,
-    "t": -0.7238
+    "n": 34,
+    "mean": -0.1982,
+    "t": -0.9969
    },
    "family": "nofri",
-   "n": 191,
-   "mean": 0.2719,
-   "sd": 1.6033,
-   "t": 2.3436,
-   "wr": 0.4293,
-   "sum": 51.9277,
-   "skew": 1.8686,
-   "kurt": 7.487,
+   "n": 220,
+   "mean": 0.3138,
+   "sd": 1.6459,
+   "t": 2.828,
+   "wr": 0.4136,
+   "sum": 69.0394,
+   "skew": 1.6881,
+   "kurt": 6.1261,
    "maxDD": 10.8843,
    "from": "2025-08-07",
    "to": "2026-11-05",
    "is": {
-    "n": 114,
-    "mean": 0.2838,
-    "sd": 1.6024,
-    "t": 1.8911,
-    "wr": 0.4561,
-    "sum": 32.3547,
-    "skew": 1.9136,
-    "kurt": 8.252,
-    "maxDD": 7.7536
+    "n": 132,
+    "mean": 0.2997,
+    "sd": 1.6597,
+    "t": 2.0745,
+    "wr": 0.4091,
+    "sum": 39.5563,
+    "skew": 1.6991,
+    "kurt": 6.3086,
+    "maxDD": 9.0786
    },
    "oos": {
-    "n": 77,
-    "mean": 0.2542,
-    "sd": 1.615,
-    "t": 1.3812,
-    "wr": 0.3896,
-    "sum": 19.573,
-    "skew": 1.8039,
-    "kurt": 6.3778,
+    "n": 88,
+    "mean": 0.335,
+    "sd": 1.6342,
+    "t": 1.9232,
+    "wr": 0.4205,
+    "sum": 29.4831,
+    "skew": 1.6725,
+    "kurt": 5.8361,
     "maxDD": 10.8843
    },
    "boot": {
-    "lo": 0.0577,
-    "hi": 0.5019,
-    "pLE0": 0.0058
+    "lo": 0.1062,
+    "hi": 0.5343,
+    "pLE0": 0.0008
    },
    "cost": {
     "x0": {
-     "mean": 0.2923,
-     "t": 2.5188,
-     "sum": 55.83
+     "mean": 0.3337,
+     "t": 3.0053,
+     "sum": 73.42
     },
     "x1": {
-     "mean": 0.2719,
-     "t": 2.3436,
-     "sum": 51.9277
+     "mean": 0.3138,
+     "t": 2.828,
+     "sum": 69.0394
     },
     "x1.5": {
-     "mean": 0.2617,
-     "t": 2.2557,
-     "sum": 49.9766
+     "mean": 0.3039,
+     "t": 2.7392,
+     "sum": 66.8491
     },
     "x2": {
-     "mean": 0.2514,
-     "t": 2.1678,
-     "sum": 48.0254
+     "mean": 0.2939,
+     "t": 2.6502,
+     "sum": 64.6587
     }
    },
    "mc": {
-    "dd50": 9.7319,
-    "dd95": 15.8365,
+    "dd50": 9.8519,
+    "dd95": 15.7884,
     "ddActual": 10.8843
    },
    "mt": {
     "N": 64,
     "bonf": {
-     "p": 0.0096,
-     "pAdj": 0.6112,
+     "p": 0.0023,
+     "pAdj": 0.1499,
      "tReq": 3.1628
     },
-    "sr": 0.1696,
-    "sr0": 0.1719,
-    "dsr": 0.4851
+    "sr": 0.1907,
+    "sr0": 0.1601,
+    "dsr": 0.7024
    },
    "untouched": {
     "n": 0,
@@ -202,8 +202,8 @@
    "warn": [],
    "verdict": "fragile",
    "why": [
-    "out-of-sample t 1.38 < 2",
-    "fails Bonferroni for N=64 (needs t 3.16, has 2.34)",
+    "out-of-sample t 1.92 < 2",
+    "fails Bonferroni for N=64 (needs t 3.16, has 2.83)",
     "no untouched sample: the rule was chosen on data from 2023-01-01 on (0 trades before)"
    ]
   },
@@ -212,90 +212,90 @@
    "system": "ICT",
    "status": "shadow (paper variant)",
    "name": "ICT A-setups, H1 structure opposed variant",
-   "claim": "+0.287R a trade over 164 (before costs)",
+   "claim": "+0.309R a trade over 176 (before costs)",
    "source": "ict/replay.json shadowByVariant.h1opp",
    "fitFrom": "2023-01-01",
    "dropped": {
-    "n": 58,
-    "mean": 0.0639,
-    "t": 0.404
+    "n": 78,
+    "mean": 0.1515,
+    "t": 0.8864
    },
    "family": "h1opp",
-   "n": 164,
-   "mean": 0.2644,
-   "sd": 1.6667,
-   "t": 2.0313,
-   "wr": 0.4207,
-   "sum": 43.3551,
-   "skew": 1.8093,
-   "kurt": 7.1088,
-   "maxDD": 10.5691,
+   "n": 176,
+   "mean": 0.2868,
+   "sd": 1.6368,
+   "t": 2.3247,
+   "wr": 0.4148,
+   "sum": 50.4786,
+   "skew": 1.5086,
+   "kurt": 5.4078,
+   "maxDD": 11.5683,
    "from": "2025-08-07",
    "to": "2026-11-05",
    "is": {
-    "n": 98,
-    "mean": 0.183,
-    "sd": 1.6361,
-    "t": 1.1073,
-    "wr": 0.4286,
-    "sum": 17.9344,
-    "skew": 1.9916,
-    "kurt": 8.6127,
-    "maxDD": 10.5691
+    "n": 105,
+    "mean": 0.1718,
+    "sd": 1.5256,
+    "t": 1.1542,
+    "wr": 0.4,
+    "sum": 18.0441,
+    "skew": 1.4987,
+    "kurt": 5.8391,
+    "maxDD": 11.5683
    },
    "oos": {
-    "n": 66,
-    "mean": 0.3852,
-    "sd": 1.7165,
-    "t": 1.8229,
-    "wr": 0.4091,
-    "sum": 25.4207,
-    "skew": 1.5737,
-    "kurt": 5.3262,
-    "maxDD": 10.2845
+    "n": 71,
+    "mean": 0.4568,
+    "sd": 1.7861,
+    "t": 2.1551,
+    "wr": 0.4366,
+    "sum": 32.4345,
+    "skew": 1.4465,
+    "kurt": 4.699,
+    "maxDD": 10.0048
    },
    "boot": {
-    "lo": 0.0213,
-    "hi": 0.5182,
-    "pLE0": 0.016
+    "lo": 0.0551,
+    "hi": 0.5379,
+    "pLE0": 0.0064
    },
    "cost": {
     "x0": {
-     "mean": 0.2865,
-     "t": 2.2029,
-     "sum": 46.99
+     "mean": 0.3088,
+     "t": 2.5032,
+     "sum": 54.34
     },
     "x1": {
-     "mean": 0.2644,
-     "t": 2.0313,
-     "sum": 43.3551
+     "mean": 0.2868,
+     "t": 2.3247,
+     "sum": 50.4786
     },
     "x1.5": {
-     "mean": 0.2533,
-     "t": 1.9454,
-     "sum": 41.5376
+     "mean": 0.2758,
+     "t": 2.2354,
+     "sum": 48.5479
     },
     "x2": {
-     "mean": 0.2422,
-     "t": 1.8595,
-     "sum": 39.7201
+     "mean": 0.2649,
+     "t": 2.146,
+     "sum": 46.6172
     }
    },
    "mc": {
-    "dd50": 10.2553,
-    "dd95": 16.575,
-    "ddActual": 10.5691
+    "dd50": 10.0078,
+    "dd95": 16.0852,
+    "ddActual": 11.5683
    },
    "mt": {
     "N": 102,
     "bonf": {
-     "p": 0.0211,
+     "p": 0.01,
      "pAdj": 1,
      "tReq": 3.2961
     },
-    "sr": 0.1586,
-    "sr0": 0.1988,
-    "dsr": 0.2772
+    "sr": 0.1752,
+    "sr0": 0.1918,
+    "dsr": 0.4012
    },
    "untouched": {
     "n": 0,
@@ -305,8 +305,7 @@
    "warn": [],
    "verdict": "fragile",
    "why": [
-    "out-of-sample t 1.82 < 2",
-    "fails Bonferroni for N=102 (needs t 3.30, has 2.03)",
+    "fails Bonferroni for N=102 (needs t 3.30, has 2.32)",
     "no untouched sample: the rule was chosen on data from 2023-01-01 on (0 trades before)"
    ]
   },
@@ -315,98 +314,96 @@
    "system": "ICT",
    "status": "shadow (paper, NQ/ES)",
    "name": "ICT dip-buy NQ/ES",
-   "claim": "+0.422R a trade over 70 (before costs)",
+   "claim": "+0.465R a trade over 68 (before costs)",
    "source": "ict/replay.json shadow (variant dip)",
    "fitFrom": "2018-01-01",
    "family": "dip",
-   "n": 70,
-   "mean": 0.4078,
-   "sd": 1.5802,
-   "t": 2.1591,
-   "wr": 0.5,
-   "sum": 28.5452,
-   "skew": 0.5614,
-   "kurt": 1.9095,
-   "maxDD": 10.1431,
+   "n": 68,
+   "mean": 0.45,
+   "sd": 1.8244,
+   "t": 2.034,
+   "wr": 0.4706,
+   "sum": 30.5996,
+   "skew": 1.0022,
+   "kurt": 3.0711,
+   "maxDD": 10.1414,
    "from": "2025-08-22",
    "to": "2026-11-05",
    "is": {
-    "n": 42,
-    "mean": 0.5348,
-    "sd": 1.5902,
-    "t": 2.1794,
-    "wr": 0.5476,
-    "sum": 22.4597,
-    "skew": 0.3797,
-    "kurt": 1.7438,
-    "maxDD": 10.1431
+    "n": 40,
+    "mean": 0.5516,
+    "sd": 1.798,
+    "t": 1.9404,
+    "wr": 0.525,
+    "sum": 22.0651,
+    "skew": 0.952,
+    "kurt": 3.4367,
+    "maxDD": 10.1414
    },
    "oos": {
     "n": 28,
-    "mean": 0.2173,
-    "sd": 1.5744,
-    "t": 0.7305,
-    "wr": 0.4286,
-    "sum": 6.0855,
-    "skew": 0.8578,
-    "kurt": 2.3447,
-    "maxDD": 5.1139
+    "mean": 0.3048,
+    "sd": 1.8848,
+    "t": 0.8557,
+    "wr": 0.3929,
+    "sum": 8.5345,
+    "skew": 1.0986,
+    "kurt": 2.6991,
+    "maxDD": 8.1117
    },
    "boot": {
-    "lo": 0.0553,
-    "hi": 0.7694,
-    "pLE0": 0.0134
+    "lo": 0.0342,
+    "hi": 0.885,
+    "pLE0": 0.0158
    },
    "cost": {
     "x0": {
-     "mean": 0.4217,
-     "t": 2.2329,
-     "sum": 29.52
+     "mean": 0.4647,
+     "t": 2.0994,
+     "sum": 31.6
     },
     "x1": {
-     "mean": 0.4078,
-     "t": 2.1591,
-     "sum": 28.5452
+     "mean": 0.45,
+     "t": 2.034,
+     "sum": 30.5996
     },
     "x1.5": {
-     "mean": 0.4008,
-     "t": 2.1222,
-     "sum": 28.0578
+     "mean": 0.4426,
+     "t": 2.0012,
+     "sum": 30.0995
     },
     "x2": {
-     "mean": 0.3939,
-     "t": 2.0852,
-     "sum": 27.5704
+     "mean": 0.4353,
+     "t": 1.9684,
+     "sum": 29.5993
     }
    },
    "mc": {
-    "dd50": 6.1368,
-    "dd95": 10.1185,
-    "ddActual": 10.1431
+    "dd50": 6.8213,
+    "dd95": 10.9401,
+    "ddActual": 10.1414
    },
    "mt": {
     "N": 86,
     "bonf": {
-     "p": 0.0154,
+     "p": 0.021,
      "pAdj": 1,
      "tReq": 3.2479
     },
-    "sr": 0.2581,
-    "sr0": 0.2982,
-    "dsr": 0.3604
+    "sr": 0.2467,
+    "sr0": 0.3026,
+    "dsr": 0.3025
    },
    "untouched": {
     "n": 0,
     "mean": null,
     "t": null
    },
-   "warn": [
-    "the real drawdown (10.1R) is worse than 95% of reshuffles: losses cluster"
-   ],
+   "warn": [],
    "verdict": "fragile",
    "why": [
-    "out-of-sample t 0.73 < 2",
-    "fails Bonferroni for N=86 (needs t 3.25, has 2.16)",
+    "out-of-sample t 0.86 < 2",
+    "fails Bonferroni for N=86 (needs t 3.25, has 2.03)",
     "no untouched sample: the rule was chosen on data from 2018-01-01 on (0 trades before)"
    ]
   },
@@ -419,95 +416,93 @@
    "source": "ict/replay.json trades",
    "fitFrom": "2023-01-01",
    "family": "ict",
-   "n": 729,
-   "mean": 0.0403,
-   "sd": 1.4461,
-   "t": 0.7519,
-   "wr": 0.3676,
-   "sum": 29.3578,
-   "skew": 1.6842,
-   "kurt": 6.2921,
-   "maxDD": 41.084,
+   "n": 813,
+   "mean": 0.0932,
+   "sd": 1.5651,
+   "t": 1.6985,
+   "wr": 0.3678,
+   "sum": 75.7976,
+   "skew": 2.0388,
+   "kurt": 10.2235,
+   "maxDD": 38.1654,
    "from": "2025-08-01",
    "to": "2026-11-06",
    "is": {
-    "n": 437,
-    "mean": 0.1052,
-    "sd": 1.507,
-    "t": 1.4594,
-    "wr": 0.3959,
-    "sum": 45.9763,
-    "skew": 1.5834,
-    "kurt": 5.9208,
-    "maxDD": 18.027
+    "n": 487,
+    "mean": 0.1243,
+    "sd": 1.6195,
+    "t": 1.6941,
+    "wr": 0.384,
+    "sum": 60.5469,
+    "skew": 2.2145,
+    "kurt": 12.1933,
+    "maxDD": 18.3644
    },
    "oos": {
-    "n": 292,
-    "mean": -0.0569,
-    "sd": 1.3465,
-    "t": -0.7223,
-    "wr": 0.3253,
-    "sum": -16.6185,
-    "skew": 1.8416,
-    "kurt": 6.8811,
-    "maxDD": 39.9362
+    "n": 326,
+    "mean": 0.0468,
+    "sd": 1.4815,
+    "t": 0.5702,
+    "wr": 0.3436,
+    "sum": 15.2506,
+    "skew": 1.6652,
+    "kurt": 5.6488,
+    "maxDD": 32.7103
    },
    "boot": {
-    "lo": -0.0631,
-    "hi": 0.1466,
-    "pLE0": 0.2252
+    "lo": -0.0113,
+    "hi": 0.2006,
+    "pLE0": 0.0426
    },
    "cost": {
     "x0": {
-     "mean": 0.0667,
-     "t": 1.2464,
-     "sum": 48.63
+     "mean": 0.1204,
+     "t": 2.1945,
+     "sum": 97.92
     },
     "x1": {
-     "mean": 0.0403,
-     "t": 0.7519,
-     "sum": 29.3578
+     "mean": 0.0932,
+     "t": 1.6985,
+     "sum": 75.7976
     },
     "x1.5": {
-     "mean": 0.0271,
-     "t": 0.5049,
-     "sum": 19.7218
+     "mean": 0.0796,
+     "t": 1.4503,
+     "sum": 64.7363
     },
     "x2": {
-     "mean": 0.0138,
-     "t": 0.2581,
-     "sum": 10.0857
+     "mean": 0.066,
+     "t": 1.2022,
+     "sum": 53.6751
     }
    },
    "mc": {
-    "dd50": 31.8498,
-    "dd95": 49.8514,
-    "ddActual": 41.084
+    "dd50": 27.9825,
+    "dd95": 43.9513,
+    "ddActual": 38.1654
    },
    "mt": {
     "N": 363,
     "bonf": {
-     "p": 0.2261,
+     "p": 0.0447,
      "pAdj": 1,
      "tReq": 3.6373
     },
-    "sr": 0.0278,
-    "sr0": 0.1095,
-    "dsr": 0.012
+    "sr": 0.0596,
+    "sr0": 0.1037,
+    "dsr": 0.0909
    },
    "untouched": {
     "n": 0,
     "mean": null,
     "t": null
    },
-   "warn": [
-    "decay: in-sample +0.105 vs out-of-sample −0.057 a trade"
-   ],
-   "verdict": "not proven",
+   "warn": [],
+   "verdict": "fragile",
    "why": [
-    "out-of-sample −0.057 a trade",
-    "CI includes 0 (−0.063 to +0.147)",
-    "fails Bonferroni for N=363 (needs t 3.64, has 0.75)",
+    "out-of-sample t 0.57 < 2",
+    "CI includes 0 (−0.011 to +0.201)",
+    "fails Bonferroni for N=363 (needs t 3.64, has 1.70)",
     "no untouched sample: the rule was chosen on data from 2023-01-01 on (0 trades before)"
    ]
   },
@@ -2985,7 +2980,7 @@
  ],
  "sources": {
   "ict/replay.json": {
-   "at": "2026-11-08T03:25:18.018Z",
+   "at": "2026-11-08T13:49:48.826Z",
    "from": "2025-08-01"
   },
   "research/replay-2w.json": {
