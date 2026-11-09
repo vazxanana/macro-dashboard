@@ -1863,6 +1863,33 @@
     ],
     "stopCheckedAt": "2026-11-09T11:38:48.000Z",
     "brokerStop": 4102.74
+   },
+   "audusd-scalp-1794224588": {
+    "positionId": "47613889",
+    "symbol": "AUDUSD",
+    "side": "buy",
+    "volume": 300000,
+    "lots": 0.03,
+    "digits": 5,
+    "setup": "scalp",
+    "status": "open",
+    "openedAt": "2026-11-09T11:44:08.000Z",
+    "councilEntry": 0.69056,
+    "stop": 0.6899500000000001,
+    "t1": 0.6917799999999997,
+    "riskCash": 2,
+    "margin": 4.14,
+    "shadow": true,
+    "mark": 0.69056,
+    "levelsFrom": "mark",
+    "fillPrice": 0.69056,
+    "slipR": 0,
+    "lagSec": 60,
+    "alerted": [
+     "open"
+    ],
+    "stopCheckedAt": "2026-11-09T11:44:08.000Z",
+    "brokerStop": 0.68995
    }
   },
   "day": {
@@ -1870,7 +1897,7 @@
    "startBalance": 9987.78
   },
   "startedAt": "2026-11-08T11:42:25.000Z",
-  "status": "ok · demo Fusion Markets · balance 10013.24 · 31 open · 5 resting",
+  "status": "ok · demo Fusion Markets · balance 10013.24 · 32 open · 5 resting",
   "skipped": {
    "audusd-position-1793601653": "price 0.68666 has run 1.27R from the council entry 0.70162: a different trade now",
    "xrp-rswing-1793942619": "none of XRPUSD found at the broker",
@@ -1989,14 +2016,9 @@
   },
   "catchUpAt": "2026-11-08T12:04:40.000Z",
   "balance": 10013.24,
-  "lastRun": "2026-11-09T11:41:46.000Z"
+  "lastRun": "2026-11-09T11:44:08.000Z"
  },
  "log": [
-  {
-   "at": "2026-11-08T21:10:04.000Z",
-   "msg": "not mirrored yet xau-position-1793783465: XAUUSD market closed: MARKET_CLOSED: Trading is not available: Market is closed. (will retry)",
-   "trade": "xau-position-1793783465"
-  },
   {
    "at": "2026-11-08T21:10:04.000Z",
    "msg": "not mirrored yet gbpusd-intraday-1793805393: GBPUSD market closed (paused until 21:20 UTC) (will retry)",
@@ -3491,6 +3513,11 @@
    "at": "2026-11-09T11:38:48.000Z",
    "msg": "opened buy XAUUSD 0.01 lot (council m30m1)",
    "trade": "xau-m30m1-1794224183"
+  },
+  {
+   "at": "2026-11-09T11:44:08.000Z",
+   "msg": "opened buy AUDUSD 0.03 lot (council scalp)",
+   "trade": "audusd-scalp-1794224588"
   }
  ],
  "limits": {
@@ -3569,11 +3596,11 @@
   ]
  },
  "execution": {
-  "n": 65,
+  "n": 66,
   "meanSlipR": -0.006,
   "medianSlipR": 0,
   "worstSlipR": 1.168,
-  "medianLagSec": 210,
+  "medianLagSec": 199.5,
   "bySymbol": {
    "SOLUSD": {
     "n": 5,
@@ -3604,8 +3631,8 @@
     "meanSlipR": 0.334
    },
    "AUDUSD": {
-    "n": 7,
-    "meanSlipR": 0.07
+    "n": 8,
+    "meanSlipR": 0.062
    },
    "XAUUSD": {
     "n": 8,
