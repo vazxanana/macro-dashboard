@@ -83,3 +83,6 @@ Filters (`filters`): `min_grade`, `sides`, `sessions`, `atr_min` / `atr_max` (st
 - **Backtests run on OANDA cash CFDs** (NQ → NAS100, ES → SPX500, YM → US30, RTY → US2000, GC → spot gold), while
   the live desk trades futures. Prices differ, but the structure is the same. If OANDA is unavailable, NQ, ES and YM
   use the research candles from 2023 on, and the answer says so.
+- **Costs:** results are net of a round-trip cost per trade (NQ 1.5 points, ES 0.5, YM 3, RTY 0.4, gold 0.5, silver 0.03;
+  `cost: false` gives gross). The desk's own reports use the CME micro round trip, which is higher on ES, YM and RTY; the owner
+  is deciding whether the connector should use the same numbers.
