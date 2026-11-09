@@ -59,7 +59,7 @@ const GRANT = { at: 0, users: null };
 async function granted(name, host, env = process.env) {
   if (String(env.MCP_KEYS || '').split(',').some((e) => e.trim().toLowerCase().startsWith(name + ':'))) return true;   // an explicit key is the owner's grant
   let users = GRANT.users;
-  if (!users || Date.now() - GRANT.at > 60e3) { try { const ct = require('./ctrader-link.js')._t; const r = await ct.blobUsers(env, host); users = (r && r.users) || {}; GRANT.users = users; GRANT.at = Date.now(); } catch (e) { users = GRANT.users || {}; } }
+  if (!users || Date.now() - GRANT.at > 60e3) { try { const ct = require('./ctrader-link.js')._t; const r = await ct.blobUsers(env, host); users = (r && r.users) || {}; GRANT.users = users; GRANT.at = Date.now(); } catch (e) { if (!GRANT.users) return false; users = GRANT.users; } }   // fails closed: no list read yet, no grant (a built-in member disabled on the Users page stays out)
   const u = users[name]; if (u && u.disabled) return false;
   if (u && (u.mcp || (u.perms && u.perms.mcp))) return true;
   if (u && u.perms && u.perms.mcp === false) return false;

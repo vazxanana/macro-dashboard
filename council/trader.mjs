@@ -616,9 +616,10 @@ for (const [key, M] of Object.entries(MARKETS)) {
         // back near the entry can't place a stop on the wrong side of price, so it waits until it gets there again
         // trailing stop (replica, 4 Nov): once the trade is trail[0] R in profit, the stop follows trail[1] R behind the best price
         if (tr.trail && tr.mfe >= tr.trail[0]) { const ns = E + (s ? -1 : 1) * (tr.mfe - tr.trail[1]) * r0; if (s ? ns < tr.stop : ns > tr.stop) { tr.stop = +ns.toFixed(Math.max(2, (tr.dec ?? 2) + 1)); tr.trailMoved = true; } }
-        if (config.be && !tr.noBe && !tr.beMoved && ((s ? E - b.low : b.high - E) / r0) >= config.be) { tr.stop = E; tr.beMoved = true; }
+        if (config.be && !tr.noBe && !tr.beMoved && (s ? E < tr.stop : E > tr.stop) && ((s ? E - b.low : b.high - E) / r0) >= config.be) { tr.stop = E; tr.beMoved = true; }
         // per-trade breakeven (gold replica, 5 Nov, gold-top-be): once the trade reaches +beAt R the stop moves to the entry
-        if (tr.beAt && !tr.beMoved && ((s ? E - b.low : b.high - E) / r0) >= tr.beAt) { tr.stop = E; tr.beMoved = true; }
+        // (9 Nov audit: both break-evens only ever tighten: a stop the trail already moved past the entry stays where it is)
+        if (tr.beAt && !tr.beMoved && (s ? E < tr.stop : E > tr.stop) && ((s ? E - b.low : b.high - E) / r0) >= tr.beAt) { tr.stop = E; tr.beMoved = true; }
         // pyramid add (gold replica, 5 Nov, gold-add): at +addAt R a second unit opens at that level, stop at this trade's entry, same
         // target; its trail is this trade's trail re-expressed in its own R (parent [4,1] -> add [1,0.5]); size scales its R so
         // the add's 2R-wide stop counts as 2R of account risk. Adds don't count toward the max-3-open cap.
@@ -1932,6 +1933,10 @@ try {
       const s = r.side === 'sell', r0 = Math.abs(r.entry - r.stop);
       for (const b of bars) {
         if (b.time <= r.checked) continue;
+        // time exit first (9 Nov audit): the trade leaves at the open of the first candle at / after its exit time, so that candle's
+        // high and low (after the exit) can neither stop it nor reach the target
+        const p = nyParts(b.time);
+        if (r.exitAt ? b.time >= r.exitAt : (p.d !== r.day || p.m >= 960)) { const R = +((s ? r.entry - b.open : b.open - r.entry) / r0).toFixed(2); r.status = R > 0 ? 'win' : R < 0 ? 'loss' : 'be'; r.R = R; r.closed = b.time; r.exit = r.exitLabel || (r.exitAt ? '07:00 UTC' : '16:00'); break; }
         if (s ? b.high >= r.stop : b.low <= r.stop) { const px = stopFill(b, s, r.stop, b.time > (r.filled || r.opened || 0));   // 8 Nov: a gap fills at the open
           if (r.trailMoved) { const R = exitR(s, r.entry, px, r0); r.status = R > 0 ? 'win' : R < 0 ? 'loss' : 'be'; r.R = R; r.exit = 'trailing stop'; } else { r.status = 'loss'; r.R = px === r.stop ? -1 : exitR(s, r.entry, px, r0); }
           r.closed = b.time; break; }
@@ -1939,8 +1944,6 @@ try {
         // runner (nq-runner, 5 Nov): once the trade is trail[0] R in profit the stop follows trail[1] R behind the best price
         r.mfe = +Math.max(r.mfe || 0, (s ? r.entry - b.low : b.high - r.entry) / r0).toFixed(2);
         if (r.trail && r.mfe >= r.trail[0]) { const ns = +(r.entry + (s ? -1 : 1) * (r.mfe - r.trail[1]) * r0).toFixed(2); if (s ? ns < r.stop : ns > r.stop) { r.stop = ns; r.trailMoved = true; } }
-        const p = nyParts(b.time);
-        if (r.exitAt ? b.time >= r.exitAt : (p.d !== r.day || p.m >= 960)) { const R = +((s ? r.entry - b.open : b.open - r.entry) / r0).toFixed(2); r.status = R > 0 ? 'win' : R < 0 ? 'loss' : 'be'; r.R = R; r.closed = b.time; r.exit = r.exitLabel || (r.exitAt ? '07:00 UTC' : '16:00'); break; }
       }
       if (r.status === 'open' && bars.length) r.checked = bars.at(-1).time;
     }

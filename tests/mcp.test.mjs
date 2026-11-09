@@ -80,3 +80,8 @@ test('derived keys: name.hmac, stable, any granted member, MCP_KEYS overrides; a
   assert.equal(await L.granted('luxus', 'h', { ...env, MCP_KEYS: 'luxus:abcdefghijklmnopqrstuvwx' }), true);
   L.GRANT.users = { fred: {} }; assert.equal(await L.granted('fred', 'h', env), true); L.GRANT.users = null;
 });
+test('grant fails closed: an unreadable user list never grants a built-in member (a disabled Fred stays out)', async () => {
+  L.GRANT.users = null; L.GRANT.at = 0;
+  assert.equal(await L.granted('fred', 'bad host!', { CTRADER_LINK_KEY: 'link-secret' }), false);   // bad host: blobUsers throws
+  L.GRANT.users = null; L.GRANT.at = 0;
+});
