@@ -22,7 +22,8 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { injectSection } from './analyst.mjs';
 import { dailyRows, dxyDaily, isoDay } from './macroscore.mjs';
-import { outlook } from './outlook.mjs';
+import { outlook, cotCalls, callsLedger, callsScore } from './outlook.mjs';
+import { MARKETS as COT_MARKETS } from './cot.mjs';
 import { cotMain } from './macro.mjs';
 
 const DAY = 86400;
@@ -371,6 +372,11 @@ export function run({ dir = 'data', now = Math.floor(Date.now() / 1000), log = c
   const dx = dxyDaily(daily), gold = dailyRows(rd(path.join(dir, 'research', 'daily', 'xau.json'), null));
   const { v, ledger: L, debates: Dh } = build({ fc, cache, daily: { gold, dxy: dx }, ledger, debates, now });
   const w = (f, val) => { const s = JSON.stringify(val, null, 1), p = path.join(M, f); let old = null; try { old = fs.readFileSync(p, 'utf8'); } catch (e) {} if (old !== s) fs.writeFileSync(p, s); };
+  // the calls' record and COT-edge calls (9 Nov): closes by asset for resolution
+  { const px = { gold, dxy: dx }; for (const m of COT_MARKETS) if (!px[m.k]) px[m.k] = dailyRows(rd(path.join(dir, 'research', 'daily', `${m.px}.json`), null));
+    if (v.outlook) { v.outlook.cot = cotCalls(rd(path.join(M, 'cot.json'), null), px, now);
+      const CL = callsLedger(rd(path.join(M, 'veteran-calls.json'), []), { outlook: v.outlook, closesBy: px, now }); w('veteran-calls.json', CL);
+      v.outlook.record = callsScore(CL); v.outlook.recent = CL.filter((r) => r.hit != null).slice(-12).reverse(); } }
   w('veteran.json', v); w('veteran-ledger.json', L); w('veteran-debates.json', Dh);
   try { const fA = path.join(dir, 'analysis', 'latest.md');
     if (fs.existsSync(fA)) { const md = fs.readFileSync(fA, 'utf8'), nx = injectSection(md, veteranSection(v), VET_START, VET_END); if (nx !== md) fs.writeFileSync(fA, nx); } } catch (e) { log('veteran: analysis section skipped:', e.message); }

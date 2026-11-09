@@ -23,3 +23,17 @@ test('COT keeps the main gold contract when the micro shares the report date', a
   const r = cotMain([{ t: 2, net: -118 }, { t: 1, net: 104206 }, { t: 1, net: -1 }, { t: 2, net: 105562, gross: 200000 }]);
   assert.deepEqual(r.map((x) => x.net), [104206, 105562]);
 });
+test('calls are recorded once, resolved after their date and scored', async () => {
+  const { callsLedger, callsScore, resolveCall, cotCalls } = await import('../council/outlook.mjs');
+  const d = (s) => Date.parse(s + 'T21:00:00Z') / 1000, px = [['2026-11-02', 100], ['2026-11-03', 103], ['2026-11-04', 99], ['2026-11-05', 101]].map(([s, v]) => ({ t: d(s), v }));
+  const o = { week: { list: [{ claim: 'up', p: 0.6, asset: 'gold', kind: 'closeAbove', level: 100, by: '2026-11-05' }, { claim: 't', p: 0.3, asset: 'gold', kind: 'touchUp', level: 104, by: '2026-11-05' }] }, month: { list: [] } };
+  let L = callsLedger([], { outlook: o, closesBy: { gold: px }, now: d('2026-11-02') });
+  L = callsLedger(L, { outlook: o, closesBy: { gold: px }, now: d('2026-11-03') }); assert.equal(L.length, 2, 'not twice');
+  assert.equal(L[0].hit, undefined, 'open until the date passes');
+  L = callsLedger(L, { outlook: { week: { list: [] }, month: { list: [] } }, closesBy: { gold: px }, now: d('2026-11-07') });
+  assert.equal(L[0].hit, true); assert.equal(L[1].hit, false); assert.equal(L[0].brier, 0.16);
+  const sc = callsScore(L); assert.equal(sc.n, 2); assert.equal(sc.hitRate, 0.5);
+  assert.equal(resolveCall({ kind: 'range', lo: 100, hi: 102, issued: '2026-11-02', by: '2026-11-05' }, px, d('2026-11-07')), true);
+  const c = cotCalls({ markets: [{ k: 'chf', name: 'USD/CHF', signals: [{ kind: 'extreme', pairDir: -1, tested: { edge: true, n: 99, win: 0.61 } }, { kind: 'flow', pairDir: 1, tested: { edge: false } }] }] }, { chf: px }, d('2026-11-05'));
+  assert.equal(c.length, 1); assert.equal(c[0].kind, 'pairDown'); assert.equal(c[0].p, 0.61);
+});

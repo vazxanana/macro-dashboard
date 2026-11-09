@@ -159,6 +159,7 @@
   .pcall li { display: grid; grid-template-columns: 46px 1fr; gap: 4px 12px; align-items: center; font-size: 13.5px; }
   .pcall b { font: 650 15px var(--mono, ui-monospace, monospace); font-variant-numeric: tabular-nums; text-align: right; }
   .pcall i { grid-column: 2; display: block; height: 4px; border-radius: 3px; background: var(--line-soft); overflow: hidden; } .pcall i s { display: block; height: 100%; background: var(--accent, #e3b341); }
+  .pcall.rec b { font-family: inherit; } #calls-cot h3, #calls-rec h3 { margin: 16px 0 4px; }
   .dig { list-style: none; margin: 6px 0 14px; padding: 0; display: grid; gap: 8px; } .dig li { font-size: 13px; } .dig small { display: block; color: var(--ink-faint); }
   .cotw { overflow-x: auto; } .cott { width: 100%; border-collapse: collapse; font-size: 13px; min-width: 760px; }
   .cott th { text-align: left; font-weight: 600; color: var(--ink-faint); font-size: 11.5px; padding: 6px 8px; border-bottom: 1px solid var(--line-soft); }
@@ -215,7 +216,7 @@
 
   <section class="block card" id="c-calls" aria-labelledby="calls-h"><h2 id="calls-h">The veteran's calls <small id="calls-sub">specific, dated, with the chance of each happening</small></h2>
     <div class="calls"><div><h3 id="calls-wk">This week</h3><ul class="pcall" id="calls-w"></ul></div><div><h3 id="calls-mo">This month</h3><ul class="pcall" id="calls-m"></ul></div></div>
-    <p class="note" id="calls-note"></p></section>
+    <div id="calls-cot"></div><div id="calls-rec"></div><p class="note" id="calls-note"></p></section>
 
   <div class="tabs" role="tablist" aria-label="Sections">
     <button type="button" role="tab" data-t="debate" aria-selected="true">The discussion <span id="deb-n"></span></button>
@@ -286,6 +287,11 @@
     var li = function (c) { var p = Math.round(c.p * 100); return '<li><b>' + p + '%</b><span>' + esc(c.claim) + '</span><i><s style="width:' + p + '%"></s></i></li>'; };
     $('calls-wk').textContent = 'This week · to ' + o.week.by; $('calls-w').innerHTML = o.week.list.map(li).join('');
     $('calls-mo').textContent = 'This month · to ' + o.month.by; $('calls-m').innerHTML = o.month.list.map(li).join('');
+    $('calls-cot').innerHTML = o.cot && o.cot.length ? '<h3>From positioning (COT signals that passed the historical test)</h3><ul class="pcall">' + o.cot.map(li).join('') + '</ul>' : '';
+    var R = o.record; $('calls-rec').innerHTML = !R ? '' : !R.n ? '<p class="note"><b>Track record:</b> ' + R.open + ' calls recorded, none due yet. Each one is scored on its date.</p>'
+      : '<h3>Track record</h3><p class="note">' + R.n + ' calls scored: <b>' + Math.round(R.hitRate * 100) + '% came true</b> against <b>' + Math.round(R.expected * 100) + '% expected</b> · Brier ' + R.brier + ' (0 is perfect, 0.25 is a coin flip)'
+        + (R.high ? ' · calls at 60%+ came true ' + Math.round(R.high.hit * 100) + '% (' + R.high.n + ')' : '') + (R.low ? ' · calls at 40% or less ' + Math.round(R.low.hit * 100) + '% (' + R.low.n + ')' : '') + ' · ' + R.open + ' still open.</p>'
+        + (o.recent && o.recent.length ? '<ul class="pcall rec">' + o.recent.map(function (r) { return '<li><b>' + (r.hit ? '✓' : '✗') + '</b><span>' + esc(r.claim) + ' <small>(' + Math.round(r.p * 100) + '%)</small></span></li>'; }).join('') + '</ul>' : '');
     $('calls-note').textContent = o.method + (o.tilt ? ' Council tilt now ' + (o.tilt > 0 ? '+' : '') + Math.round(o.tilt * 100) + ' points.' : ' Council tilt now zero: the strategist sees no tested edge, so these are the honest base rates.') + ' Paper only, not advice.';
     var d = o.digest || { list: [] }; $('dig').innerHTML = d.list.map(function (r) { return '<li><b>' + esc(r.src) + ':</b> ' + esc(r.read) + ' → <b>' + esc(r.says) + '</b><small>' + esc(r.limit || '') + '</small></li>'; }).join('') + (d.missing && d.missing.length ? '<li><small>Not observed by the council yet: ' + esc(d.missing.join(', ')) + '. The veteran does not guess them.</small></li>' : '');
   }

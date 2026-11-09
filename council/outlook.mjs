@@ -18,7 +18,7 @@ export function paths(closes, h, { now = Infinity, years = 10 } = {}) {
 const q = (arr, p) => { const a = arr.slice().sort((x, y) => x - y); return a[Math.min(a.length - 1, Math.floor(p * a.length))]; };
 const freq = (P, f) => P.filter(f).length / P.length;
 // one horizon's calls for a close series
-export function calls({ closes, now, h, tilt = 0, name = 'Gold', dp = 0, unit = '' }) {
+export function calls({ closes, now, h, tilt = 0, name = 'Gold', dp = 0, unit = '', asset = null }) {
   const P = paths(closes, h, { now }); const s = (closes || []).filter((o) => o.t <= now); if (!P || !s.length) return null;
   const px = s[s.length - 1].v, by = addSessions(Math.min(now, s[s.length - 1].t), h), fmt = (v) => (unit === '$' ? '$' : '') + v.toLocaleString('en-US', { minimumFractionDigits: dp, maximumFractionDigits: dp });
   const up = clamp(freq(P, (p) => p.end > 0) + tilt);
@@ -27,14 +27,15 @@ export function calls({ closes, now, h, tilt = 0, name = 'Gold', dp = 0, unit = 
   const U = lvl(0.5, 'hi'), U2 = lvl(0.85, 'hi'), D = lvl(0.5, 'lo'), D2 = lvl(0.15, 'lo');
   const lo = q(P.map((p) => p.end), 0.2 - tilt / 2), hi = q(P.map((p) => p.end), 0.8 - tilt / 2);
   const big = Math.max(Math.abs(q(P.map((p) => p.end), 0.1)), q(P.map((p) => p.end), 0.9)), pBig = freq(P, (p) => Math.abs(p.end) >= big);
+  const A = asset || name.toLowerCase(), r4 = (v) => +(+v).toPrecision(8);
   return { horizon: h, by, from: fmt(px), n: P.length, list: [
-    { claim: `${name} closes ${by} above ${fmt(px)} (today's close)`, p: +up.toFixed(2) },
-    { claim: `${name} closes at or above ${fmt(U.L)} on some day by ${by}`, p: +U.p.toFixed(2) },
-    { claim: `${name} closes at or above ${fmt(U2.L)} on some day by ${by} (stretch)`, p: +U2.p.toFixed(2) },
-    { claim: `${name} closes at or below ${fmt(D.L)} on some day by ${by}`, p: +D.p.toFixed(2) },
-    { claim: `${name} closes at or below ${fmt(D2.L)} on some day by ${by} (stretch)`, p: +D2.p.toFixed(2) },
-    { claim: `${name}'s ${by} close lands between ${fmt(px * (1 + lo))} and ${fmt(px * (1 + hi))}`, p: 0.6 },
-    { claim: `${name} moves ${(big * 100).toFixed(1)}% or more either way by ${by}`, p: +pBig.toFixed(2) },
+    { claim: `${name} closes ${by} above ${fmt(px)} (today's close)`, p: +up.toFixed(2), asset: A, kind: 'closeAbove', level: r4(px), by },
+    { claim: `${name} closes at or above ${fmt(U.L)} on some day by ${by}`, p: +U.p.toFixed(2), asset: A, kind: 'touchUp', level: r4(U.L), by },
+    { claim: `${name} closes at or above ${fmt(U2.L)} on some day by ${by} (stretch)`, p: +U2.p.toFixed(2), asset: A, kind: 'touchUp', level: r4(U2.L), by },
+    { claim: `${name} closes at or below ${fmt(D.L)} on some day by ${by}`, p: +D.p.toFixed(2), asset: A, kind: 'touchDown', level: r4(D.L), by },
+    { claim: `${name} closes at or below ${fmt(D2.L)} on some day by ${by} (stretch)`, p: +D2.p.toFixed(2), asset: A, kind: 'touchDown', level: r4(D2.L), by },
+    { claim: `${name}'s ${by} close lands between ${fmt(px * (1 + lo))} and ${fmt(px * (1 + hi))}`, p: 0.6, asset: A, kind: 'range', lo: r4(px * (1 + lo)), hi: r4(px * (1 + hi)), by },
+    { claim: `${name} moves ${(big * 100).toFixed(1)}% or more either way by ${by}`, p: +pBig.toFixed(2), asset: A, kind: 'bigMove', level: r4(px), pct: +big.toFixed(4), by },
   ] };
 }
 // the registry digest: what the hard-to-get public data says right now, in plain words, and what the council cannot see
@@ -52,9 +53,54 @@ export function digest(ch, fc) {
   return { list: out, missing };
 }
 export function outlook({ gold, dxy, now, tilt20 = 0, ch, fc }) {
-  const w = calls({ closes: gold, now, h: 5, tilt: tilt20 / 2, unit: '$' }), m = calls({ closes: gold, now, h: 20, tilt: tilt20, unit: '$' });
-  const dw = calls({ closes: dxy, now, h: 5, tilt: 0, name: 'DXY', dp: 2 }), dm = calls({ closes: dxy, now, h: 20, tilt: 0, name: 'DXY', dp: 2 });
+  const w = calls({ closes: gold, now, h: 5, tilt: tilt20 / 2, unit: '$', asset: 'gold' }), m = calls({ closes: gold, now, h: 20, tilt: tilt20, unit: '$', asset: 'gold' });
+  const dw = calls({ closes: dxy, now, h: 5, tilt: 0, name: 'DXY', dp: 2, asset: 'dxy' }), dm = calls({ closes: dxy, now, h: 20, tilt: 0, name: 'DXY', dp: 2, asset: 'dxy' });
   const take = (c) => (c ? c.list[0] : null);
   return { week: w && { ...w, list: [...w.list, take(dw)].filter(Boolean) }, month: m && { ...m, list: [...m.list, take(dm)].filter(Boolean) }, tilt: +tilt20.toFixed(3),
     digest: digest(ch || {}, fc), method: 'Each probability is gold\'s own frequency for the same horizon over the last 10 years, moved by the council\'s tilt (the veteran\'s calibrated probability minus its base rate, carrying the strategist\'s Gold Macro Score); half the tilt for the week. The range call is the middle 60% of past outcomes. DXY calls carry no tilt.' };
+}
+
+// ---- the calls' own record (9 Nov, owner: "keep improving our veteran macro"): every dated call is kept once, resolved on the
+// daily closes after its date, and scored (hit rate and Brier against the stated probability). Append-only; never edited after.
+const dayOf = (iso) => Date.parse(iso + 'T23:59:59Z') / 1000;
+export function resolveCall(c, closes, now) {
+  const end = dayOf(c.by); if (now < end + 86400) return null;   // the date's close must be final
+  const S = (closes || []).filter((o) => o.t > dayOf(c.issued) && o.t <= end); if (!S.length) return null;
+  const last = S[S.length - 1].v;
+  switch (c.kind) {
+    case 'closeAbove': return last > c.level;
+    case 'touchUp': return S.some((o) => o.v >= c.level);
+    case 'touchDown': return S.some((o) => o.v <= c.level);
+    case 'range': return last >= c.lo && last <= c.hi;
+    case 'bigMove': return Math.abs(last / c.level - 1) >= c.pct;
+    case 'pairDown': return last < c.level;
+    case 'pairUp': return last > c.level;
+    default: return null;
+  }
+}
+export function callsLedger(ledger, { outlook, closesBy, now }) {
+  const L = (ledger || []).slice(), today = new Date(now * 1000).toISOString().slice(0, 10), have = new Set(L.map((r) => r.id));
+  const all = [...((outlook && outlook.week && outlook.week.list) || []), ...((outlook && outlook.month && outlook.month.list) || []), ...((outlook && outlook.cot) || [])];
+  for (const c of all) { if (!c.kind || !c.by) continue; const id = `${c.asset}:${c.kind}:${c.level ?? c.lo}:${c.by}`; if (have.has(id)) continue;
+    // one record per call: issued the first day it appears (the same call re-issued on later days is not counted twice)
+    L.push({ id, issued: today, claim: c.claim, p: c.p, asset: c.asset, kind: c.kind, level: c.level ?? null, lo: c.lo ?? null, hi: c.hi ?? null, pct: c.pct ?? null, by: c.by, src: c.src || 'base rate + council tilt' }); have.add(id); }
+  for (const r of L) if (r.hit == null) { const h = resolveCall(r, closesBy[r.asset], now); if (h != null) { r.hit = h; r.resolvedAt = today; r.brier = +((r.p - (h ? 1 : 0)) ** 2).toFixed(4); } }
+  return L.slice(-600);
+}
+export function callsScore(L) {
+  const done = (L || []).filter((r) => r.hit != null); if (!done.length) return { n: 0, open: (L || []).length };
+  const brier = done.reduce((a, r) => a + r.brier, 0) / done.length, exp = done.reduce((a, r) => a + r.p, 0) / done.length, hits = done.filter((r) => r.hit).length / done.length;
+  // calibration: high-probability calls (>= 60%) should come true more often than low ones (<= 40%)
+  const band = (f) => { const b = done.filter(f); return b.length ? { n: b.length, hit: +(b.filter((r) => r.hit).length / b.length).toFixed(2), p: +(b.reduce((a, r) => a + r.p, 0) / b.length).toFixed(2) } : null; };
+  return { n: done.length, open: L.length - done.length, brier: +brier.toFixed(4), expected: +exp.toFixed(2), hitRate: +hits.toFixed(2), high: band((r) => r.p >= 0.6), low: band((r) => r.p <= 0.4) };
+}
+// COT signals that passed the desk's historical test (n >= 15, hit >= base + 8 pts, t >= 2) become dated, scored calls
+export function cotCalls(cot, pxByAsset, now) {
+  const out = []; if (!cot || !cot.markets) return out;
+  for (const m of cot.markets) for (const s of m.signals || []) { const t = s.tested; if (!t || !t.edge || s.pairDir == null) continue;
+    const h = s.kind === 'extreme' ? 20 : 5, closes = pxByAsset[m.k] || []; const last = closes.filter((o) => o.t <= now).at(-1); if (!last) continue;
+    const by = addSessions(Math.min(now, last.t), h), dp = last.v > 50 ? 2 : 4;
+    out.push({ claim: `${m.name} closes ${by} ${s.pairDir > 0 ? 'above' : 'below'} ${last.v.toFixed(dp)} (COT ${s.kind} signal; tested ${t.n} times since 2020, right ${Math.round(t.win * 100)}%)`,
+      p: +Math.min(0.75, Math.max(0.5, t.win)).toFixed(2), asset: m.k, kind: s.pairDir > 0 ? 'pairUp' : 'pairDown', level: +last.v.toPrecision(8), by, src: `COT ${s.kind}` }); }
+  return out;
 }
