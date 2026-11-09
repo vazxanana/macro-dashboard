@@ -1319,7 +1319,7 @@
     "lots": 0.02,
     "digits": 5,
     "setup": "scalp",
-    "status": "open",
+    "status": "closed by council",
     "openedAt": "2026-11-09T08:49:06.000Z",
     "councilEntry": 0.81794,
     "stop": 0.81766,
@@ -1334,14 +1334,19 @@
     "lagSec": 62,
     "alerted": [
      "open",
-     "amend"
+     "amend",
+     "close"
     ],
     "stopCheckedAt": "2026-11-09T08:49:06.000Z",
     "brokerStop": 0.81735,
     "rr": 6.87,
     "amended": 1,
     "amendedAt": "2026-11-09T15:03:27.000Z",
-    "amendFails": 1
+    "amendFails": 1,
+    "closedAt": "2026-11-09T15:12:05.000Z",
+    "exitPrice": 0.82219,
+    "councilExit": 0.8219,
+    "councilR": 6.87
    },
    "gbpusd-rscalp-1794214229": {
     "symbol": "GBPUSD",
@@ -1721,8 +1726,8 @@
     "status": "open",
     "openedAt": "2026-11-09T11:15:20.000Z",
     "councilEntry": 4101.285,
-    "stop": 4092.355,
-    "t1": 4135.1,
+    "stop": 4090.69,
+    "t1": 4133.435,
     "riskCash": 9.89,
     "margin": 8.2,
     "minLot": true,
@@ -1739,8 +1744,8 @@
     "stopCheckedAt": "2026-11-09T11:15:20.000Z",
     "brokerStop": 4091.55,
     "rr": 3.32,
-    "amended": 1,
-    "amendedAt": "2026-11-09T15:03:27.000Z"
+    "amended": 2,
+    "amendedAt": "2026-11-09T15:12:05.000Z"
    },
    "gbpusd-scalp-1794222860": {
     "positionId": "47603262",
@@ -1896,8 +1901,8 @@
     "status": "open",
     "openedAt": "2026-11-09T11:38:48.000Z",
     "councilEntry": 4108.665,
-    "stop": 4102.675,
-    "t1": 4135.1,
+    "stop": 4101.01,
+    "t1": 4133.435,
     "riskCash": 6.94,
     "margin": 8.21,
     "minLot": true,
@@ -1914,8 +1919,8 @@
     "stopCheckedAt": "2026-11-09T11:38:48.000Z",
     "brokerStop": 4102.74,
     "rr": 3.66,
-    "amended": 1,
-    "amendedAt": "2026-11-09T15:03:27.000Z"
+    "amended": 2,
+    "amendedAt": "2026-11-09T15:12:05.000Z"
    },
    "audusd-scalp-1794224588": {
     "positionId": "47613889",
@@ -2290,8 +2295,8 @@
     "setup": "rscalp",
     "openedAt": "2026-11-09T14:41:31.000Z",
     "councilEntry": 4119.94,
-    "stop": 4132.068,
-    "t1": 4095.23,
+    "stop": 4130.403,
+    "t1": 4093.565,
     "adopted": false,
     "alerted": [
      "open",
@@ -2312,8 +2317,8 @@
     "volume": 100,
     "status": "open",
     "rr": 2.3,
-    "amended": 1,
-    "amendedAt": "2026-11-09T15:03:27.000Z"
+    "amended": 2,
+    "amendedAt": "2026-11-09T15:12:05.000Z"
    },
    "btc-rscalp-1794235517": {
     "positionId": "47679932",
@@ -2437,7 +2442,7 @@
    "startBalance": 9987.78
   },
   "startedAt": "2026-11-08T11:42:25.000Z",
-  "status": "ok · demo Fusion Markets · balance 9991.32 · 30 open · 1 resting",
+  "status": "ok · demo Fusion Markets · balance 9991.32 · 29 open · 1 resting",
   "skipped": {
    "audusd-position-1793601653": "price 0.68666 has run 1.27R from the council entry 0.70162: a different trade now",
    "xrp-rswing-1793942619": "none of XRPUSD found at the broker",
@@ -2474,29 +2479,9 @@
   },
   "catchUpAt": "2026-11-08T12:04:40.000Z",
   "balance": 9991.32,
-  "lastRun": "2026-11-09T15:09:31.000Z"
+  "lastRun": "2026-11-09T15:12:05.000Z"
  },
  "log": [
-  {
-   "at": "2026-11-08T21:41:39.000Z",
-   "msg": "not mirrored yet eurusd-intraday-1793890935: EURUSD market closed (paused until 21:51 UTC) (will retry)",
-   "trade": "eurusd-intraday-1793890935"
-  },
-  {
-   "at": "2026-11-08T21:41:39.000Z",
-   "msg": "not mirrored yet gbpusd-scalp-1793916690: GBPUSD market closed (paused until 21:51 UTC) (will retry)",
-   "trade": "gbpusd-scalp-1793916690"
-  },
-  {
-   "at": "2026-11-08T21:41:39.000Z",
-   "msg": "not mirrored yet usdcad-position-1793949081: USDCAD market closed (paused until 21:51 UTC) (will retry)",
-   "trade": "usdcad-position-1793949081"
-  },
-  {
-   "at": "2026-11-08T21:41:39.000Z",
-   "msg": "not mirrored yet usdcad-swing-1793949081: USDCAD market closed (paused until 21:51 UTC) (will retry)",
-   "trade": "usdcad-swing-1793949081"
-  },
   {
    "at": "2026-11-08T21:41:39.000Z",
    "msg": "not mirrored yet audusd-scalp-1793949425: AUDUSD market closed: MARKET_CLOSED: Trading is not available: Market is closed. (will retry)",
@@ -3976,6 +3961,26 @@
    "at": "2026-11-09T15:09:31.000Z",
    "msg": "placed buy limit USDCHF 0.02 lot at 0.82181 (council scalp, valid to 2026-11-09T18:08Z)",
    "trade": "usdchf-scalp-1794236890"
+  },
+  {
+   "at": "2026-11-09T15:12:05.000Z",
+   "msg": "closed USDCHF position 47565799 (council: win)",
+   "trade": "usdchf-scalp-1794214084"
+  },
+  {
+   "at": "2026-11-09T15:12:05.000Z",
+   "msg": "moved XAUUSD 47603258 protection: stop 4092.355 -> 4090.69, target 4135.1 -> 4133.435 (council scalp)",
+   "trade": "xau-scalp-1794222860"
+  },
+  {
+   "at": "2026-11-09T15:12:05.000Z",
+   "msg": "moved XAUUSD 47612512 protection: stop 4102.675 -> 4101.01, target 4135.1 -> 4133.435 (council m30m1)",
+   "trade": "xau-m30m1-1794224183"
+  },
+  {
+   "at": "2026-11-09T15:12:05.000Z",
+   "msg": "moved XAUUSD 47675609 protection: stop 4132.068 -> 4130.403, target 4095.23 -> 4093.565 (council rscalp)",
+   "trade": "xau-rscalp-1794235029"
   }
  ],
  "limits": {
