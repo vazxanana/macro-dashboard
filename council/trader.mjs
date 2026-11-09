@@ -1933,6 +1933,10 @@ try {
       const s = r.side === 'sell', r0 = Math.abs(r.entry - r.stop);
       for (const b of bars) {
         if (b.time <= r.checked) continue;
+        // time exit first (9 Nov audit): the trade leaves at the open of the first candle at / after its exit time, so that candle's
+        // high and low (after the exit) can neither stop it nor reach the target
+        const p = nyParts(b.time);
+        if (r.exitAt ? b.time >= r.exitAt : (p.d !== r.day || p.m >= 960)) { const R = +((s ? r.entry - b.open : b.open - r.entry) / r0).toFixed(2); r.status = R > 0 ? 'win' : R < 0 ? 'loss' : 'be'; r.R = R; r.closed = b.time; r.exit = r.exitLabel || (r.exitAt ? '07:00 UTC' : '16:00'); break; }
         if (s ? b.high >= r.stop : b.low <= r.stop) { const px = stopFill(b, s, r.stop, b.time > (r.filled || r.opened || 0));   // 8 Nov: a gap fills at the open
           if (r.trailMoved) { const R = exitR(s, r.entry, px, r0); r.status = R > 0 ? 'win' : R < 0 ? 'loss' : 'be'; r.R = R; r.exit = 'trailing stop'; } else { r.status = 'loss'; r.R = px === r.stop ? -1 : exitR(s, r.entry, px, r0); }
           r.closed = b.time; break; }
@@ -1940,8 +1944,6 @@ try {
         // runner (nq-runner, 5 Nov): once the trade is trail[0] R in profit the stop follows trail[1] R behind the best price
         r.mfe = +Math.max(r.mfe || 0, (s ? r.entry - b.low : b.high - r.entry) / r0).toFixed(2);
         if (r.trail && r.mfe >= r.trail[0]) { const ns = +(r.entry + (s ? -1 : 1) * (r.mfe - r.trail[1]) * r0).toFixed(2); if (s ? ns < r.stop : ns > r.stop) { r.stop = ns; r.trailMoved = true; } }
-        const p = nyParts(b.time);
-        if (r.exitAt ? b.time >= r.exitAt : (p.d !== r.day || p.m >= 960)) { const R = +((s ? r.entry - b.open : b.open - r.entry) / r0).toFixed(2); r.status = R > 0 ? 'win' : R < 0 ? 'loss' : 'be'; r.R = R; r.closed = b.time; r.exit = r.exitLabel || (r.exitAt ? '07:00 UTC' : '16:00'); break; }
       }
       if (r.status === 'open' && bars.length) r.checked = bars.at(-1).time;
     }
