@@ -1346,7 +1346,7 @@
    "startBalance": 9987.78
   },
   "startedAt": "2026-11-08T11:42:25.000Z",
-  "status": "ok · demo Fusion Markets · balance 10018.74 · 20 open · 2 resting",
+  "status": "ok · demo Fusion Markets · balance 10018.74 · 20 open · 3 resting",
   "skipped": {
    "audusd-position-1793601653": "price 0.68666 has run 1.27R from the council entry 0.70162: a different trade now",
    "xrp-rswing-1793942619": "none of XRPUSD found at the broker",
@@ -1400,18 +1400,33 @@
     "alerted": [
      "pending"
     ]
+   },
+   "gbpusd-scalp-1794215170": {
+    "orderId": "33792120",
+    "symbol": "GBPUSD",
+    "side": "buy",
+    "volume": 400000,
+    "lots": 0.04,
+    "digits": 5,
+    "setup": "scalp",
+    "limitPrice": 1.34112,
+    "stop": 1.3406200000000001,
+    "t1": 1.34212,
+    "placedAt": "2026-11-09T09:07:16.000Z",
+    "expires": "2026-11-09T12:06:10.000Z",
+    "riskCash": 2,
+    "margin": 10.73,
+    "shadow": true,
+    "alerted": [
+     "pending"
+    ]
    }
   },
   "catchUpAt": "2026-11-08T12:04:40.000Z",
   "balance": 10018.74,
-  "lastRun": "2026-11-09T09:05:48.000Z"
+  "lastRun": "2026-11-09T09:07:16.000Z"
  },
  "log": [
-  {
-   "at": "2026-11-08T20:48:06.000Z",
-   "msg": "not mirrored yet gbpusd-intraday-1793805393: GBPUSD market closed (paused until 20:58 UTC) (will retry)",
-   "trade": "gbpusd-intraday-1793805393"
-  },
   {
    "at": "2026-11-08T20:48:06.000Z",
    "msg": "not mirrored yet eurusd-intraday-1793890935: EURUSD market closed (paused until 20:58 UTC) (will retry)",
@@ -2906,6 +2921,11 @@
    "at": "2026-11-09T08:55:11.000Z",
    "msg": "limit filled: GBPUSD position 47566395 at the broker",
    "trade": "gbpusd-rscalp-1794214229"
+  },
+  {
+   "at": "2026-11-09T09:07:16.000Z",
+   "msg": "placed buy limit GBPUSD 0.04 lot at 1.34112 (council scalp, valid to 2026-11-09T12:06Z)",
+   "trade": "gbpusd-scalp-1794215170"
   }
  ],
  "limits": {
