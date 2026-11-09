@@ -161,12 +161,16 @@
     const n = o.n || 2000, risk = o.risk ?? 0.01, target = o.target ?? 0.10, maxLoss = o.maxLoss ?? 0.10, dailyLoss = o.dailyLoss || 0, perDay = Math.max(1, Math.round(o.perDay || 2)),
       minDays = o.minDays || 0, maxTrades = o.maxTrades || 400, trailDD = o.dd === 'eod' || o.dd === 'intraday', rand = rng(o.seed || 7);
     let pass = 0, fail = 0, open = 0, why = { daily: 0, max: 0 }; const tradesToPass = [], daysToPass = [], dds = [];
+    // o.fan = K: also keep each run's balance after trades 1..K (held flat once it passed or failed) for a fan chart. Recording
+    // only: the draws, the rules and every other number are the same with or without it.
+    const K = Math.max(0, Math.min(maxTrades, Math.round(o.fan || 0))), FP = K ? new Float64Array(K * n) : null, FD = K ? new Uint32Array(K) : null;
     for (let k = 0; k < n; k++) {
-      let bal = 1, peak = 1, worst = 0, day = 0, dayStart = 1, done = false;
+      let bal = 1, peak = 1, worst = 0, day = 0, dayStart = 1, done = false, at = 0;
       for (let i = 0; i < maxTrades; i++) {
         if (i % perDay === 0) { day++; dayStart = bal; }
         bal += risk * R[Math.floor(rand() * R.length)];
         worst = Math.max(worst, peak - bal);
+        if (FP && i < K) FP[i * n + k] = bal; at = i + 1;
         if (dailyLoss > 0 && dayStart - bal >= dailyLoss - 1e-12) { fail++; why.daily++; done = true; break; }
         const floor = trailDD ? Math.min(1, peak - maxLoss) : 1 - maxLoss;
         if (bal <= floor + 1e-12) { fail++; why.max++; done = true; break; }
@@ -175,14 +179,20 @@
       }
       if (!done) open++;
       dds.push(worst);
+      if (FP) { for (let i = at; i < K; i++) FP[i * n + k] = bal; if (done) for (let i = at - 1; i < K; i++) FD[i]++; } // at = trades played
     }
     const q = (a, p) => { if (!a.length) return null; const b = a.slice().sort((x, y) => x - y); return b[Math.min(b.length - 1, Math.floor(p * b.length))]; };
     const avgR = R.reduce((x, y) => x + y, 0) / R.length;
     return { n, trades: R.length, avgR: r2(avgR, 3), pass: r2(pass / n, 3), fail: r2(fail / n, 3), unfinished: r2(open / n, 3), failDaily: r2(why.daily / n, 3), failMax: r2(why.max / n, 3),
-      medianTrades: q(tradesToPass, 0.5), medianDays: q(daysToPass, 0.5), dd50: r2((q(dds, 0.5) || 0) * 100, 2), dd95: r2((q(dds, 0.95) || 0) * 100, 2) };
+      medianTrades: q(tradesToPass, 0.5), medianDays: q(daysToPass, 0.5), dd50: r2((q(dds, 0.5) || 0) * 100, 2), dd95: r2((q(dds, 0.95) || 0) * 100, 2), ...(FP ? { fan: fanOf(FP, FD, K, n) } : {}) };
   }
+  // fan percentiles per step, in % of the start balance; done[i] = share of runs already passed or failed after trade i + 1
+  function fanOf(FP, FD, K, n) { const P = [5, 25, 50, 75, 95], f = { steps: K, p: {}, done: [] }; P.forEach((p) => { f.p[p] = []; });
+    for (let i = 0; i < K; i++) { const col = FP.subarray(i * n, i * n + n).slice().sort(); P.forEach((p) => { f.p[p].push(r2((col[Math.min(n - 1, Math.floor(p / 100 * n))] - 1) * 100, 2)); }); f.done.push(r2(FD[i] / n, 3)); }
+    return f; }
   // the best risk per trade for a firm: the highest pass rate over a grid of risks (0.25% .. 3%)
-  function bestRisk(Rs, o = {}) { let best = null; for (const r of [0.0025, 0.005, 0.0075, 0.01, 0.0125, 0.015, 0.02, 0.025, 0.03]) { const m = monteCarlo(Rs, { ...o, risk: r, n: o.n || 1000 }); if (m && (!best || m.pass > best.pass)) best = { risk: r, ...m }; } return best; }
+  // (curve: the pass / fail share at every risk tried, for a chart; it does not change which risk is best)
+  function bestRisk(Rs, o = {}) { let best = null; const curve = []; for (const r of [0.0025, 0.005, 0.0075, 0.01, 0.0125, 0.015, 0.02, 0.025, 0.03]) { const m = monteCarlo(Rs, { ...o, fan: 0, risk: r, n: o.n || 1000 }); if (m) curve.push({ risk: r, pass: m.pass, fail: m.fail, unfinished: m.unfinished }); if (m && (!best || m.pass > best.pass)) best = { risk: r, ...m }; } if (best) best.curve = curve; return best; }
 
   const BT = { FIRMS, trades, newAccount, units, place, cancel, close, closePartial, trail, onBar, equity, pnl, stats, byDay, dayKey, newChallenge, evaluate, monteCarlo, bestRisk, r2 };
   if (typeof module !== 'undefined' && module.exports) module.exports = BT; else root.BT = BT;
