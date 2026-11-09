@@ -1931,7 +1931,7 @@
     "lots": 0.01,
     "digits": 2,
     "setup": "m30m1",
-    "status": "open",
+    "status": "closed at broker",
     "openedAt": "2026-11-09T11:38:48.000Z",
     "councilEntry": 4108.665,
     "stop": 4101.3,
@@ -1947,13 +1947,15 @@
     "lagSec": 108,
     "alerted": [
      "open",
-     "amend"
+     "amend",
+     "close"
     ],
     "stopCheckedAt": "2026-11-09T11:38:48.000Z",
     "brokerStop": 4102.74,
     "rr": 3.66,
     "amended": 4,
-    "amendedAt": "2026-11-09T16:09:52.000Z"
+    "amendedAt": "2026-11-09T16:09:52.000Z",
+    "closedAt": "2026-11-09T17:42:46.000Z"
    },
    "audusd-scalp-1794224588": {
     "positionId": "47613889",
@@ -2712,6 +2714,32 @@
     ],
     "stopCheckedAt": "2026-11-09T17:40:08.000Z",
     "brokerStop": 1.34208
+   },
+   "gbpusd-scalp-1794244949": {
+    "symbol": "GBPUSD",
+    "side": "buy",
+    "setup": "scalp",
+    "openedAt": "2026-11-09T17:42:46.000Z",
+    "councilEntry": 1.34232,
+    "stop": 1.34174,
+    "t1": 1.34348,
+    "adopted": false,
+    "alerted": [
+     "open"
+    ],
+    "viaLimit": true,
+    "limitPrice": 1.34232,
+    "digits": 5,
+    "lots": 0.03,
+    "riskCash": 1.99,
+    "margin": 8.05,
+    "shadow": true,
+    "fillPrice": 1.34232,
+    "slipR": 0,
+    "lagSec": 1217,
+    "positionId": "47737220",
+    "volume": 300000,
+    "status": "open"
    }
   },
   "day": {
@@ -2719,7 +2747,7 @@
    "startBalance": 9987.78
   },
   "startedAt": "2026-11-08T11:42:25.000Z",
-  "status": "ok · demo Fusion Markets · balance 9964.88 · 27 open · 3 resting",
+  "status": "ok · demo Fusion Markets · balance 9956.37 · 27 open · 2 resting",
   "skipped": {
    "audusd-position-1793601653": "price 0.68666 has run 1.27R from the council entry 0.70162: a different trade now",
    "xrp-rswing-1793942619": "none of XRPUSD found at the broker",
@@ -2773,43 +2801,13 @@
     "alerted": [
      "pending"
     ]
-   },
-   "gbpusd-scalp-1794244949": {
-    "orderId": "33819883",
-    "symbol": "GBPUSD",
-    "side": "buy",
-    "volume": 300000,
-    "lots": 0.03,
-    "digits": 5,
-    "setup": "scalp",
-    "limitPrice": 1.34232,
-    "stop": 1.34174,
-    "t1": 1.34348,
-    "placedAt": "2026-11-09T17:23:37.000Z",
-    "expires": "2026-11-09T20:22:29.000Z",
-    "riskCash": 1.99,
-    "margin": 8.05,
-    "shadow": true,
-    "alerted": [
-     "pending"
-    ]
    }
   },
   "catchUpAt": "2026-11-08T12:04:40.000Z",
-  "balance": 9964.88,
-  "lastRun": "2026-11-09T17:40:08.000Z"
+  "balance": 9956.37,
+  "lastRun": "2026-11-09T17:42:46.000Z"
  },
  "log": [
-  {
-   "at": "2026-11-08T22:03:09.000Z",
-   "msg": "set the missing stop on USDCHF 47373488 at 0.82265 (the broker had opened it without one)",
-   "trade": "usdchf-swing-1793762425"
-  },
-  {
-   "at": "2026-11-08T22:03:09.000Z",
-   "msg": "not mirrored yet xau-position-1793783465: XAUUSD market closed: MARKET_CLOSED: Trading is not available: Market is closed. (will retry)",
-   "trade": "xau-position-1793783465"
-  },
   {
    "at": "2026-11-08T22:03:09.000Z",
    "msg": "not mirrored gbpusd-intraday-1793805393: price 1.33526 has run 3.46R from the council entry 1.3469: a different trade now",
@@ -4299,6 +4297,16 @@
    "at": "2026-11-09T17:40:08.000Z",
    "msg": "opened buy GBPUSD 0.05 lot (council scalp)",
    "trade": "gbpusd-scalp-1794245948"
+  },
+  {
+   "at": "2026-11-09T17:42:46.000Z",
+   "msg": "limit filled: GBPUSD position 47737220 at the broker",
+   "trade": "gbpusd-scalp-1794244949"
+  },
+  {
+   "at": "2026-11-09T17:42:46.000Z",
+   "msg": "XAUUSD position 47612512 closed at the broker",
+   "trade": "xau-m30m1-1794224183"
   }
  ],
  "limits": {
@@ -4377,11 +4385,11 @@
   ]
  },
  "execution": {
-  "n": 91,
+  "n": 92,
   "meanSlipR": -0.011,
   "medianSlipR": 0,
   "worstSlipR": 1.168,
-  "medianLagSec": 162,
+  "medianLagSec": 164,
   "bySymbol": {
    "SOLUSD": {
     "n": 7,
@@ -4400,8 +4408,8 @@
     "meanSlipR": -0.029
    },
    "GBPUSD": {
-    "n": 13,
-    "meanSlipR": -0.064
+    "n": 14,
+    "meanSlipR": -0.06
    },
    "USDCAD": {
     "n": 12,
