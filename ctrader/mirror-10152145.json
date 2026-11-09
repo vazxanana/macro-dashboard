@@ -3037,7 +3037,7 @@
     "lots": 0.03,
     "digits": 5,
     "setup": "intraday",
-    "status": "open",
+    "status": "closed at broker",
     "openedAt": "2026-11-09T22:06:15.000Z",
     "councilEntry": 1.34397,
     "stop": 1.34449,
@@ -3051,10 +3051,12 @@
     "slipR": 0.654,
     "lagSec": 63,
     "alerted": [
-     "open"
+     "open",
+     "close"
     ],
     "stopCheckedAt": "2026-11-09T22:06:15.000Z",
-    "brokerStop": 1.34415
+    "brokerStop": 1.34415,
+    "closedAt": "2026-11-09T22:11:01.000Z"
    },
    "gbpusd-rscalp-1794261912": {
     "positionId": "47812568",
@@ -3064,7 +3066,7 @@
     "lots": 0.03,
     "digits": 5,
     "setup": "rscalp",
-    "status": "open",
+    "status": "closed at broker",
     "openedAt": "2026-11-09T22:06:15.000Z",
     "councilEntry": 1.34397,
     "stop": 1.34449,
@@ -3078,10 +3080,38 @@
     "slipR": 0.654,
     "lagSec": 63,
     "alerted": [
-     "open"
+     "open",
+     "close"
     ],
     "stopCheckedAt": "2026-11-09T22:06:15.000Z",
-    "brokerStop": 1.34415
+    "brokerStop": 1.34415,
+    "closedAt": "2026-11-09T22:11:01.000Z"
+   },
+   "audusd-rintra-1794253056": {
+    "symbol": "AUDUSD",
+    "side": "buy",
+    "setup": "rintra",
+    "openedAt": "2026-11-09T22:11:01.000Z",
+    "councilEntry": 0.69156,
+    "stop": 0.69102,
+    "t1": 0.6939500000000001,
+    "adopted": false,
+    "alerted": [
+     "open"
+    ],
+    "viaLimit": true,
+    "limitPrice": 0.69156,
+    "digits": 5,
+    "lots": 0.03,
+    "riskCash": 1.99,
+    "margin": 4.15,
+    "shadow": true,
+    "fillPrice": 0.69147,
+    "slipR": -0.167,
+    "lagSec": 9205,
+    "positionId": "47772710",
+    "volume": 300000,
+    "status": "open"
    }
   },
   "day": {
@@ -3089,7 +3119,7 @@
    "startBalance": 9987.78
   },
   "startedAt": "2026-11-08T11:42:25.000Z",
-  "status": "ok · demo Fusion Markets · balance 9977.78 · 22 open · 1 resting",
+  "status": "ok · demo Fusion Markets · balance 9973.22 · 21 open",
   "skipped": {
    "audusd-position-1793601653": "price 0.68666 has run 1.27R from the council entry 0.70162: a different trade now",
    "xrp-rswing-1793942619": "none of XRPUSD found at the broker",
@@ -3103,48 +3133,12 @@
   "paused": {},
   "resetAt": "2026-11-08T09:45Z",
   "resetDoneAt": "2026-11-08T11:42:47.000Z",
-  "orders": {
-   "audusd-rintra-1794253056": {
-    "orderId": "33825541",
-    "symbol": "AUDUSD",
-    "side": "buy",
-    "volume": 300000,
-    "lots": 0.03,
-    "digits": 5,
-    "setup": "rintra",
-    "limitPrice": 0.69156,
-    "stop": 0.69102,
-    "t1": 0.6939500000000001,
-    "placedAt": "2026-11-09T19:38:37.000Z",
-    "expires": "2026-11-10T07:37:36.000Z",
-    "riskCash": 1.99,
-    "margin": 4.15,
-    "shadow": true,
-    "alerted": [
-     "pending"
-    ]
-   }
-  },
+  "orders": {},
   "catchUpAt": "2026-11-08T12:04:40.000Z",
-  "balance": 9977.78,
-  "lastRun": "2026-11-09T22:08:39.000Z"
+  "balance": 9973.22,
+  "lastRun": "2026-11-09T22:11:01.000Z"
  },
  "log": [
-  {
-   "at": "2026-11-09T07:33:04.000Z",
-   "msg": "EURUSD position 47532379 closed at the broker",
-   "trade": "eurusd-scalp-1794208621"
-  },
-  {
-   "at": "2026-11-09T07:33:04.000Z",
-   "msg": "closed GBPUSD position 47531181 (council: loss)",
-   "trade": "gbpusd-scalp-1794208418"
-  },
-  {
-   "at": "2026-11-09T07:38:52.000Z",
-   "msg": "USDCHF position 47373495 closed at the broker",
-   "trade": "usdchf-rscalp-1793978867"
-  },
   {
    "at": "2026-11-09T07:38:52.000Z",
    "msg": "AUDUSD position 47434324 closed at the broker",
@@ -4629,6 +4623,21 @@
    "at": "2026-11-09T22:06:15.000Z",
    "msg": "opened sell GBPUSD 0.03 lot (council rscalp)",
    "trade": "gbpusd-rscalp-1794261912"
+  },
+  {
+   "at": "2026-11-09T22:11:01.000Z",
+   "msg": "limit filled: AUDUSD position 47772710 at the broker",
+   "trade": "audusd-rintra-1794253056"
+  },
+  {
+   "at": "2026-11-09T22:11:01.000Z",
+   "msg": "GBPUSD position 47812567 closed at the broker",
+   "trade": "gbpusd-intraday-1794261912"
+  },
+  {
+   "at": "2026-11-09T22:11:01.000Z",
+   "msg": "GBPUSD position 47812568 closed at the broker",
+   "trade": "gbpusd-rscalp-1794261912"
   }
  ],
  "limits": {
@@ -4707,11 +4716,11 @@
   ]
  },
  "execution": {
-  "n": 103,
-  "meanSlipR": 0.009,
+  "n": 104,
+  "meanSlipR": 0.007,
   "medianSlipR": 0,
   "worstSlipR": 1.168,
-  "medianLagSec": 159,
+  "medianLagSec": 160,
   "bySymbol": {
    "SOLUSD": {
     "n": 9,
@@ -4742,8 +4751,8 @@
     "meanSlipR": 0.157
    },
    "AUDUSD": {
-    "n": 16,
-    "meanSlipR": 0.041
+    "n": 17,
+    "meanSlipR": 0.029
    },
    "XAUUSD": {
     "n": 11,
