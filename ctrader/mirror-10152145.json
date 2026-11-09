@@ -2162,7 +2162,8 @@
     "t1": 73444.3,
     "adopted": false,
     "alerted": [
-     "open"
+     "open",
+     "close"
     ],
     "viaLimit": true,
     "limitPrice": 74687.4,
@@ -2177,7 +2178,8 @@
     "lagSec": 159,
     "positionId": "47640466",
     "volume": 1,
-    "status": "open"
+    "status": "closed at broker",
+    "closedAt": "2026-11-09T14:49:29.000Z"
    },
    "audusd-scalp-1794232565": {
     "symbol": "AUDUSD",
@@ -2295,7 +2297,7 @@
     "lots": 0.01,
     "digits": 2,
     "setup": "rscalp",
-    "status": "open",
+    "status": "closed at broker",
     "openedAt": "2026-11-09T14:46:54.000Z",
     "councilEntry": 74596,
     "stop": 74232.12928571428,
@@ -2310,10 +2312,12 @@
     "slipR": -0.122,
     "lagSec": 97,
     "alerted": [
-     "open"
+     "open",
+     "close"
     ],
     "stopCheckedAt": "2026-11-09T14:46:54.000Z",
-    "brokerStop": 74187.83
+    "brokerStop": 74187.83,
+    "closedAt": "2026-11-09T14:49:29.000Z"
    }
   },
   "day": {
@@ -2321,7 +2325,7 @@
    "startBalance": 9987.78
   },
   "startedAt": "2026-11-08T11:42:25.000Z",
-  "status": "ok · demo Fusion Markets · balance 9994.48 · 30 open · 1 resting",
+  "status": "ok · demo Fusion Markets · balance 9993.12 · 28 open · 1 resting",
   "skipped": {
    "audusd-position-1793601653": "price 0.68666 has run 1.27R from the council entry 0.70162: a different trade now",
    "xrp-rswing-1793942619": "none of XRPUSD found at the broker",
@@ -2357,20 +2361,10 @@
    }
   },
   "catchUpAt": "2026-11-08T12:04:40.000Z",
-  "balance": 9994.48,
-  "lastRun": "2026-11-09T14:46:54.000Z"
+  "balance": 9993.12,
+  "lastRun": "2026-11-09T14:49:29.000Z"
  },
  "log": [
-  {
-   "at": "2026-11-08T21:31:27.000Z",
-   "msg": "not mirrored yet audusd-intraday-1793949765: AUDUSD market closed (paused until 21:41 UTC) (will retry)",
-   "trade": "audusd-intraday-1793949765"
-  },
-  {
-   "at": "2026-11-08T21:31:27.000Z",
-   "msg": "not mirrored yet usdchf-scalp-1793955902: USDCHF market closed (paused until 21:41 UTC) (will retry)",
-   "trade": "usdchf-scalp-1793955902"
-  },
   {
    "at": "2026-11-08T21:31:27.000Z",
    "msg": "not mirrored yet usdchf-scalp-1793971016: USDCHF market closed (paused until 21:41 UTC) (will retry)",
@@ -3860,6 +3854,16 @@
    "at": "2026-11-09T14:46:54.000Z",
    "msg": "not mirrored xrp-scalp-1794235517: none of XRPUSD found at the broker",
    "trade": "xrp-scalp-1794235517"
+  },
+  {
+   "at": "2026-11-09T14:49:29.000Z",
+   "msg": "BTCUSD position 47640466 closed at the broker",
+   "trade": "btc-scalp-1794229957"
+  },
+  {
+   "at": "2026-11-09T14:49:29.000Z",
+   "msg": "BTCUSD position 47679932 closed at the broker",
+   "trade": "btc-rscalp-1794235517"
   }
  ],
  "limits": {
