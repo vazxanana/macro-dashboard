@@ -1,9 +1,32 @@
 // Council / ICT data for the site, read from the council-data branch with a server-side token (7 Nov 2026, private-repo move).
-// The browser asks /cdata/<path> (rewritten here); it never sees the token, so the repo can be private.
-//   GH_READ_TOKEN  fine-grained GitHub token for this repo with Contents: read (falls back to GH_DISPATCH_TOKEN if that one can read)
+// The browser asks /cdata/<path> (vercel.json rewrite to this function); it never sees the token, so the repo can be private.
+//   GH_READ_TOKEN  fine-grained GitHub token for this repo with Contents: read (falls back to GH_TOKEN / GH_DISPATCH_TOKEN)
+// Sign-in (9 Nov 2026 security fix): every file needs a signed-in session (cookie from /api/login) except GUEST_OK below.
+// Protected files are served with private, no-store cache headers and no CORS; guest files stay edge-cached and public.
+// On GitHub Pages / local copies the page reads raw council-data directly (window.MS_CDATA), as before; this function is not
+// involved there.
 const REPO = 'vazxanana/macro-dashboard', BRANCH = 'council-data';
-// council-data files the site never needs: the demo mirror's rotated cTrader tokens (AES-GCM sealed, but still a secret at rest)
-const PRIVATE = new Set(['ctrader/tokens.json']);
+// never served, signed in or not: the demo mirror's rotated cTrader tokens (AES-GCM sealed, still a secret at rest) and the
+// first-run user list (it carries password hashes; the server reads it directly, see api/_accounts.js blobUsers)
+const PRIVATE = new Set(['ctrader/tokens.json', 'users.json']);
+// What a guest (not signed in) may read. Exactly what the guest view, the sign-in card and the broker bridges fetch:
+//   trades.json              guest gold trade card + Entry/Stop/Target lines, Today/week/month strip, P&L calendar, sign-in proof
+//   snapshot.json            sign-in card gold price + timeframe trend + market tape; guest charts' snapshot
+//   ict/replay.json          sign-in card "ICT replay record" proof line
+//   research/replay-2w.json  the main system's replay trades counted in the guest results and calendar (sysClosed)
+//   research.json            NQ forward paper counted in the guest results and calendar (sysClosed)
+//   mt5/signals.csv          the MT5 / cTrader CouncilBridge EAs poll it without a browser session
+const GUEST_OK = new Set(['trades.json', 'snapshot.json', 'ict/replay.json', 'research/replay-2w.json', 'research.json', 'mt5/signals.csv']);
+
+// one council-data file from GitHub: { ok, status, buf }. With a token: the GitHub API (works on a private repo); without one: the
+// public raw file (only while the repo is still public). Also used by other functions instead of fetching /cdata over HTTP.
+async function readFile(p, env = process.env, fetchFn = fetch) {
+  const tok = env.GH_READ_TOKEN || env.GH_TOKEN || env.GH_DISPATCH_TOKEN, enc = p.split('/').map(encodeURIComponent).join('/');
+  const r = tok ? await fetchFn(`https://api.github.com/repos/${REPO}/contents/${enc}?ref=${BRANCH}`, {
+    headers: { Authorization: `Bearer ${tok}`, Accept: 'application/vnd.github.raw', 'X-GitHub-Api-Version': '2022-11-28', 'User-Agent': 'aurum-desk-data' }, signal: AbortSignal.timeout(10000) })
+    : await fetchFn(`https://raw.githubusercontent.com/${REPO}/${BRANCH}/${enc}?t=${Math.floor(Date.now() / 20000)}`, { signal: AbortSignal.timeout(10000) });
+  return { ok: r.ok, status: r.status, buf: r.ok ? Buffer.from(await r.arrayBuffer()) : null };
+}
 
 // an MT5 / cTrader bridge polling the signals file leaves a tiny "last read" marker in Blob (at most every 2 min per instance)
 let lastPing = 0;
@@ -15,22 +38,33 @@ async function bridgePing(req) {
   await put(`bridge/ping-${client}.json`, JSON.stringify({ at: new Date().toISOString(), ua: ua.slice(0, 80) }), { access: 'private', addRandomSuffix: true, contentType: 'application/json', token: tok });
   if (old.length) await del(old, { token: tok }).catch(() => {});
 }
-module.exports = async (req, res) => {
+async function handle(req, res, d = {}) {
+  const env = d.env || process.env;
   const p = String((req.query && req.query.p) || '').replace(/^\/+/, '');
   if (!p || p.length > 200 || !/^[A-Za-z0-9._\/-]+$/.test(p) || p.split('/').some((s) => s === '' || s === '..' || s.startsWith('.'))) return res.status(400).json({ error: 'bad path' });
-  if (PRIVATE.has(p.toLowerCase())) return res.status(404).json({ error: 'not found' });   // sealed secrets stay server-side
-  const tok = process.env.GH_READ_TOKEN || process.env.GH_TOKEN || process.env.GH_DISPATCH_TOKEN, enc = p.split('/').map(encodeURIComponent).join('/');
+  if (PRIVATE.has(p.toLowerCase())) return res.status(404).json({ error: 'not found' });   // sealed secrets and hashes stay server-side
+  const guest = GUEST_OK.has(p);
+  if (!guest) {
+    res.setHeader('Cache-Control', 'private, no-store');
+    const S = require('./_session');
+    let acct = null; try { acct = await S.fromRequest(req, env, d.deps || S.defaultDeps(env), { cacheMs: 60e3 }); } catch (e) { return res.status(503).json({ error: 'sign-in check unavailable' }); }
+    if (!acct) return res.status(401).json({ error: 'sign in to read this' });
+  }
   try {
-    // with a token: the GitHub API (works on a private repo); without one: the public raw file (only while the repo is still public)
-    const r = tok ? await fetch(`https://api.github.com/repos/${REPO}/contents/${enc}?ref=${BRANCH}`, {
-      headers: { Authorization: `Bearer ${tok}`, Accept: 'application/vnd.github.raw', 'X-GitHub-Api-Version': '2022-11-28', 'User-Agent': 'aurum-desk-data' }, signal: AbortSignal.timeout(10000) })
-      : await fetch(`https://raw.githubusercontent.com/${REPO}/${BRANCH}/${enc}?t=${Math.floor(Date.now() / 20000)}`, { signal: AbortSignal.timeout(10000) });
-    if (!r.ok) { res.setHeader('Cache-Control', 's-maxage=15'); return res.status(r.status === 404 ? 404 : 502).json({ error: `GitHub ${r.status}` }); }
-    const buf = Buffer.from(await r.arrayBuffer()), ext = (p.split('.').pop() || '').toLowerCase();
+    const r = await readFile(p, env, d.fetch || fetch);
+    if (!r.ok) { res.setHeader('Cache-Control', guest ? 's-maxage=15' : 'private, no-store'); return res.status(r.status === 404 ? 404 : 502).json({ error: `GitHub ${r.status}` }); }
+    const ext = (p.split('.').pop() || '').toLowerCase();
     res.setHeader('Content-Type', { json: 'application/json; charset=utf-8', md: 'text/markdown; charset=utf-8', csv: 'text/csv; charset=utf-8', js: 'application/javascript; charset=utf-8' }[ext] || 'text/plain; charset=utf-8');
-    res.setHeader('Cache-Control', (p === 'ctrader/account.json' || p === 'ctrader/accounts.json') ? 'public, max-age=0, s-maxage=5' : 'public, max-age=0, s-maxage=20, stale-while-revalidate=60');   // the owner's account view: near-live   // the edge serves everyone from one copy for 20 s
-    res.setHeader('Access-Control-Allow-Origin', '*');
-    if (p === 'mt5/signals.csv') await bridgePing(req).catch(() => {});   // awaited: a frozen function would drop it
-    return res.status(200).send(buf);
-  } catch (e) { return res.status(502).json({ error: String(e.message || e) }); }
-};
+    if (guest) {   // public: the edge serves everyone from one copy for 20 s
+      res.setHeader('Cache-Control', 'public, max-age=0, s-maxage=20, stale-while-revalidate=60');
+      res.setHeader('Access-Control-Allow-Origin', '*');
+    } else res.setHeader('Cache-Control', 'private, no-store');
+    if (p === 'mt5/signals.csv' && !d.fetch) await bridgePing(req).catch(() => {});   // awaited: a frozen function would drop it
+    return res.status(200).send(r.buf);
+  } catch (e) { return res.status(502).json({ error: 'data source unavailable' }); }
+}
+module.exports = (req, res) => handle(req, res);
+module.exports.handle = handle;
+module.exports.readFile = readFile;
+module.exports.GUEST_OK = GUEST_OK;
+module.exports.PRIVATE = PRIVATE;

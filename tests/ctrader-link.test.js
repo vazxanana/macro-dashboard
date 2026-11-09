@@ -37,9 +37,10 @@ function fakeCtrader({ live = false } = {}) {
   return { WS, sent };
 }
 
-test('built-in users are read from the page; disabled Blob users are refused; the owner is recognised', async () => {
-  const html = "window.MS_USERS = { fred: { name: 'Fred', hash: '" + sha('fred-pw') + "', role: 'reviewer', ict: true },\n  luxus: { name: 'Luxus', hash: '" + sha('lx') + "', role: 'viewer' } };";
-  assert.deepEqual(Object.keys(_t.builtInUsers(html)), ['fred', 'luxus']);
+test('built-in users live on the server (not in the page); disabled Blob users are refused; the owner is recognised', async () => {
+  assert.deepEqual(Object.keys(_t.builtInUsers()).sort(), ['carlos', 'fred', 'luxus', 'orlando']);
+  const page = require('fs').readFileSync(require('path').join(__dirname, '..', 'market-structure.html'), 'utf8');
+  assert.doesNotMatch(page, /[0-9a-f]{64}/, 'no password hash in the page');
   const deps = { blobUsers: async () => USERS };
   assert.equal((await _t.identify(deps, 'maria', 'maria-pw')).u, 'maria');
   assert.equal(await _t.identify(deps, 'maria', 'wrong'), null);

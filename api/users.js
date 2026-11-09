@@ -1,32 +1,27 @@
 // Dashboard accounts, kept in the private Vercel Blob store "meridian-users" (7 Nov 2026), so adding a user no longer
 // needs a GitHub token in the owner's browser and works once the repo is private.
-//   GET  /api/users                       -> { users: { key: { name, role, hash, ict?, disabled? } }, updated }
-//   POST /api/users { ownerPw, users, note } -> saves the whole list; ownerPw must hash to the owner's password hash
+//   GET  /api/users   owner session  -> { users: { key: { name, role, ict?, ct?, mcp?, perms?, disabled? } }, builtins, updated }
+//                     member session -> { users: { <own key>: own record } }      not signed in -> 401
+//                     No password hash ever leaves the server (9 Nov 2026 security fix).
+//   POST /api/users { users, note, ownerPw? }  owner session (or the owner password) -> saves the whole stored list.
+//        A record keeps its stored (or built-in) password hash unless it carries `pw` (a new password, hashed here). A password
+//        already used by another account or by the owner is refused. A record with no password at all is refused.
 // Each save is a new blob users/<time>-<random>.json (unique URL, so no stale CDN copy); older ones are deleted.
 // First run: if the store is empty, it starts from council-data users.json (if that exists).
 // the Blob SDK loads on first use (the list checks below stay testable without it)
 const blob = () => require('@vercel/blob');
 const put = (...a) => blob().put(...a), list = (...a) => blob().list(...a), del = (...a) => blob().del(...a);
 const crypto = require('node:crypto');
-const OWNER_HASH = '49c5624f2625ed8b42b6e1bf2819a3a41ddb9743aeca36ea34ea7eb96c252ca8';   // same as MS_ADMIN_HASH in the page
-const sha = (s) => crypto.createHash('sha256').update(String(s), 'utf8').digest('hex');
-const isOwner = (pw) => !!pw && String(pw).length <= 200 && crypto.timingSafeEqual(Buffer.from(sha(pw)), Buffer.from(OWNER_HASH));   // constant time
-const tok = () => process.env.BLOB_READ_WRITE_TOKEN;
+const A = require('./_accounts');
+const S = require('./_session');
+const OWNER_HASH = A.OWNER_HASH;
+const isOwner = (pw) => !!pw && String(pw).length <= 200 && crypto.timingSafeEqual(Buffer.from(A.sha(pw)), Buffer.from(OWNER_HASH));   // constant time
+const tok = (env) => env.BLOB_READ_WRITE_TOKEN;
 
-async function latest() {
-  const { blobs } = await list({ prefix: 'users/', token: tok() });
+async function latest(env) {
+  const { blobs } = await list({ prefix: 'users/', token: tok(env) });
   blobs.sort((a, b) => new Date(b.uploadedAt) - new Date(a.uploadedAt));
   return blobs;
-}
-async function load(req) {
-  const blobs = await latest();
-  if (blobs.length) {
-    const r = await fetch(blobs[0].url, { headers: { Authorization: `Bearer ${tok()}` }, cache: 'no-store', signal: AbortSignal.timeout(8000) });
-    if (!r.ok) throw new Error(`Blob ${r.status}`);
-    return r.json();
-  }
-  try { const r = await fetch(`https://${req.headers.host}/cdata/users.json`, { signal: AbortSignal.timeout(8000) }); if (r.ok) { const j = await r.json(); if (j && j.users) return j; } } catch (e) {}
-  return { users: {} };
 }
 const PERM_KEYS = ['charts', 'scanner', 'journal', 'desks', 'council', 'macro', 'ct', 'mcp', 'ict'];
 const cleanPerms = (p) => { if (p == null) return null; if (typeof p !== 'object' || Array.isArray(p)) return null; const out = {};
@@ -45,25 +40,59 @@ const clean = (users) => {
   if (Object.keys(out).length > 200) return null;
   return out;
 };
+// the posted list (no hashes from the page) joined with the stored hashes: `pw` sets a new password; otherwise the stored
+// record's hash, else the built-in one. A posted `hash` is ignored. Returns { users } or { error }.
+function withHashes(posted, stored, builtIns = A.builtInUsers()) {
+  if (!posted || typeof posted !== 'object' || Array.isArray(posted)) return { error: 'Bad user list' };
+  const out = {}, fresh = new Set();
+  for (const [k, u] of Object.entries(posted)) {
+    if (!u || typeof u !== 'object') return { error: 'Bad user list' };
+    const { pw, hash, ...rest } = u; let h = null;
+    if (pw != null) { if (typeof pw !== 'string' || pw.trim().length < 4 || pw.length > 200) return { error: 'Use a password of at least 4 characters' }; h = A.sha(pw.trim()); fresh.add(k); }
+    else h = (stored && stored[k] && stored[k].hash) || (builtIns[k] && builtIns[k].hash) || null;
+    if (!h) return { error: `No password set for ${k}` };
+    out[k] = { ...rest, hash: h };
+  }
+  // a new password must be unique: not the owner's, not another live account's (built-ins included)
+  const live = { ...builtIns, ...out }; for (const k of Object.keys(live)) if (live[k] && live[k].disabled) delete live[k];
+  for (const k of fresh) {
+    if (A.same(out[k].hash, OWNER_HASH)) return { error: 'That password is the owner\'s' };
+    if (Object.keys(live).some((j) => j !== k && A.same(live[j].hash, out[k].hash))) return { error: 'That password is already used by another account. Pick another one.' };
+  }
+  return { users: out };
+}
 
-module.exports = async (req, res) => {
-  res.setHeader('Cache-Control', 'no-store');
-  if (!tok()) return res.status(503).json({ error: 'BLOB_READ_WRITE_TOKEN not set' });
+async function handle(req, res, d = {}) {
+  const env = d.env || process.env; res.setHeader('Cache-Control', 'private, no-store');
+  if (!tok(env) && !d.load) return res.status(503).json({ error: 'BLOB_READ_WRITE_TOKEN not set' });
+  const deps = d.deps || S.defaultDeps(env), load = d.load || (async () => (await A.blobUsers(env)) || { users: {} });
   try {
-    if (req.method === 'GET') return res.status(200).json(await load(req));
+    if (req.method === 'GET') {
+      const acct = await S.fromRequest(req, env, deps); if (!acct) return res.status(401).json({ error: 'sign in first' });
+      const data = await load();
+      if (acct.u === 'owner') return res.status(200).json({ users: A.stripHashes(data.users), builtins: A.stripHashes(d.builtIns || A.builtInUsers()), updated: data.updated || null });
+      const { u, ...own } = acct; return res.status(200).json({ users: { [u]: own } });
+    }
     if (req.method !== 'POST') return res.status(405).json({ error: 'GET or POST' });
+    if (!S.sameOrigin(req)) return res.status(403).json({ error: 'Owner password not accepted' });
     let b; try { b = typeof req.body === 'string' ? (JSON.parse(req.body || '{}') || {}) : (req.body || {}); } catch (e) { return res.status(400).json({ error: 'bad JSON' }); }
-    if (!isOwner(b.ownerPw)) return res.status(403).json({ error: 'Owner password not accepted' });
-    const users = clean(b.users); if (!users) return res.status(400).json({ error: 'Bad user list' });
+    let owner = isOwner(b.ownerPw);
+    if (!owner) { const acct = await S.fromRequest(req, env, deps).catch(() => null); owner = !!acct && acct.u === 'owner'; }
+    if (!owner) return res.status(403).json({ error: 'Owner password not accepted' });
+    const cur = await load(), j = withHashes(b.users, (cur && cur.users) || {}, d.builtIns || A.builtInUsers()); if (j.error) return res.status(400).json({ error: j.error });
+    const users = clean(j.users); if (!users) return res.status(400).json({ error: 'Bad user list' });
     if (Object.values(users).some((u) => u.hash === OWNER_HASH)) return res.status(400).json({ error: 'That password is the owner\'s' });
     const data = { users, updated: new Date().toISOString(), note: String(b.note || '').slice(0, 120) };
-    const old = await latest();
-    await put(`users/${Date.now()}.json`, JSON.stringify(data, null, 1), { access: 'private', addRandomSuffix: true, contentType: 'application/json', token: tok() });
-    if (old.length) await del(old.map((x) => x.url), { token: tok() }).catch(() => {});
+    if (d.save) await d.save(data); else {
+      const old = await latest(env);
+      await put(`users/${Date.now()}.json`, JSON.stringify(data, null, 1), { access: 'private', addRandomSuffix: true, contentType: 'application/json', token: tok(env) });
+      if (old.length) await del(old.map((x) => x.url), { token: tok(env) }).catch(() => {});
+    }
     console.log(`[users] ${data.note}`);
-    return res.status(200).json(data);
-  } catch (e) { console.error(`[users] ${e.message}`); return res.status(500).json({ error: String(e.message || e) }); }
-};
-module.exports._t = { clean, isOwner };
-
+    return res.status(200).json({ users: A.stripHashes(users), builtins: A.stripHashes(d.builtIns || A.builtInUsers()), updated: data.updated, note: data.note });
+  } catch (e) { console.error(`[users] ${e.message}`); return res.status(e.status === 503 ? 503 : 500).json({ error: 'account storage unavailable' }); }
+}
+module.exports = (req, res) => handle(req, res);
+module.exports.handle = handle;
+module.exports._t = { clean, isOwner, withHashes };
 module.exports.clean = clean; module.exports.cleanPerms = cleanPerms;

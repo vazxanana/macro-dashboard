@@ -18,10 +18,9 @@
 // once; the user list fails closed (a Blob error never lets a disabled built-in user back in); the key "owner" is reserved;
 // every token in play is scrubbed from errors.
 const crypto = require('node:crypto');
-const fs = require('node:fs');
-const path = require('node:path');
 
-const OWNER_HASH = '49c5624f2625ed8b42b6e1bf2819a3a41ddb9743aeca36ea34ea7eb96c252ca8';
+const ACC = require('./_accounts');
+const OWNER_HASH = ACC.OWNER_HASH;
 const HOSTS = { demo: 'wss://demo.ctraderapi.com:5036', live: 'wss://live.ctraderapi.com:5036' };
 const PT = { APP_AUTH_REQ: 2100, APP_AUTH_RES: 2101, ACCOUNT_AUTH_REQ: 2102, ACCOUNT_AUTH_RES: 2103, ASSET_LIST_REQ: 2112, ASSET_LIST_RES: 2113,
   SYMBOLS_LIST_REQ: 2114, SYMBOLS_LIST_RES: 2115, SYMBOL_BY_ID_REQ: 2116, SYMBOL_BY_ID_RES: 2117, SYMBOLS_FOR_CONVERSION_REQ: 2118,
@@ -36,9 +35,7 @@ const READ_ONLY = new Set([PT.APP_AUTH_REQ, PT.ACCOUNT_AUTH_REQ, PT.ASSET_LIST_R
   PT.RECONCILE_REQ, PT.DEAL_LIST_REQ, PT.ACCOUNTS_BY_TOKEN_REQ, PT.UNREALIZED_PNL_REQ, PT.HEARTBEAT,
   PT.SYMBOLS_FOR_CONVERSION_REQ, PT.EXPECTED_MARGIN_REQ, PT.GET_TICKDATA_REQ, PT.GET_DYNAMIC_LEVERAGE_REQ]);
 
-const sha = (s) => crypto.createHash('sha256').update(String(s), 'utf8').digest('hex');
-// constant-time compare of two hex hashes (false for anything that is not a 64-char hex string)
-const same = (a, b) => /^[0-9a-f]{64}$/.test(String(a)) && /^[0-9a-f]{64}$/.test(String(b)) && crypto.timingSafeEqual(Buffer.from(String(a)), Buffer.from(String(b)));
+const sha = ACC.sha, same = ACC.same;
 const b64u = (b) => Buffer.from(b).toString('base64url');
 const keyOf = (env, use) => crypto.createHash('sha256').update(`${use}|${env.CTRADER_LINK_KEY}`).digest();
 function sign(env, obj) { const body = b64u(JSON.stringify(obj)); return `${body}.${b64u(crypto.createHmac('sha256', keyOf(env, 'sign')).update(body).digest())}`; }
@@ -60,24 +57,8 @@ function unseal(env, box) {
   return JSON.parse(Buffer.concat([d.update(Buffer.from(box.data, 'base64url')), d.final()]).toString('utf8'));
 }
 
-// --- who is asking: the owner, a built-in user (MS_USERS in the page) or one added on the Users page (Blob) ---
-function builtInUsers(html) {
-  const out = {}, re = /([a-z0-9-]{1,24}):\s*\{\s*name:\s*'([^']*)',\s*hash:\s*'([0-9a-f]{64})',\s*role:\s*'(viewer|reviewer)'/g;
-  const block = (String(html).match(/window\.MS_USERS\s*=\s*\{[\s\S]*?\}\s*\};/) || [''])[0];
-  let m; while ((m = re.exec(block))) out[m[1]] = { name: m[2], hash: m[3], role: m[4] };
-  return out;
-}
-// built-in users overridden by the stored list. Fails closed: if the list cannot be read, it throws (never falls back to the
-// built-ins alone, which would let a user removed on the Users page back in).
-async function userList(deps) {
-  let html = deps.pageHtml;
-  if (html == null) { html = ''; try { html = fs.readFileSync(path.join(process.cwd(), 'market-structure.html'), 'utf8'); } catch (e) {} }
-  const users = Object.assign(Object.create(null), builtInUsers(html));
-  let r; try { r = await deps.blobUsers(); } catch (e) { const err = new Error('the user list could not be read'); err.status = 503; throw err; }
-  for (const [k, u] of Object.entries((r && r.users) || {})) { if (u && u.disabled) delete users[k]; else users[k] = u; }
-  delete users.owner;   // reserved: the owner's link lives under "owner"
-  return users;
-}
+// --- who is asking: the owner, a built-in member (api/_accounts.js) or one added on the Users page (Blob); fails closed ---
+const builtInUsers = ACC.builtInUsers, userList = ACC.userList;
 const KEY_RE = /^[a-z0-9-]{1,24}$/;
 async function identify(deps, user, pw) {
   if (!pw || String(pw).length > 200) return null;
@@ -110,22 +91,7 @@ function store(env) {
     async del(u) { const old = await files(u); if (old.length) await del(old.map((x) => x.url), { token }); },
   };
 }
-// the stored user list, as /api/users serves it: the newest Blob users/…json, else council-data users.json (first run).
-// Throws when a list exists but cannot be read; null only when there is none at all.
-async function blobUsers(env, host, io = {}) {
-  const list = io.list || require('@vercel/blob').list, fetchFn = io.fetch || fetch, token = env.BLOB_READ_WRITE_TOKEN;
-  const { blobs } = await list({ prefix: 'users/', token }); blobs.sort((a, b) => new Date(b.uploadedAt) - new Date(a.uploadedAt));
-  if (blobs.length) {
-    const r = await fetchFn(blobs[0].url, { headers: { Authorization: `Bearer ${token}` }, cache: 'no-store', signal: AbortSignal.timeout(8000) });
-    if (!r.ok) throw new Error(`users blob ${r.status}`);
-    return r.json();
-  }
-  if (!/^[a-z0-9.-]{1,253}(:\d{1,5})?$/i.test(String(host || ''))) throw new Error('bad host for users.json');
-  const r = await fetchFn(`https://${host}/cdata/users.json`, { cache: 'no-store', signal: AbortSignal.timeout(8000) });
-  if (r.status === 404) return null;
-  if (!r.ok) throw new Error(`users.json ${r.status}`);
-  return r.json();
-}
+const blobUsers = (env, host, io) => ACC.blobUsers(env, io);   // the stored user list (api/_accounts.js); host is no longer used
 
 // --- cTrader OAuth (HTTP) ---
 async function tokenCall(env, params, fetchFn = fetch) {
@@ -233,7 +199,7 @@ async function handle(req, res, { env = process.env, WS = globalThis.WebSocket, 
   res.setHeader('Cache-Control', 'no-store');
   const ready = ['CTRADER_CLIENT_ID', 'CTRADER_CLIENT_SECRET', 'CTRADER_LINK_KEY', 'BLOB_READ_WRITE_TOKEN'].every((k) => String(env[k] || '').trim());
   if (!ready) return res.status(503).json({ error: 'cTrader linking is not set up on the server yet' });
-  const deps = { store: d.store || store(env), blobUsers: d.blobUsers || (() => blobUsers(env, req.headers.host)), fetch: d.fetch || fetch, pageHtml: d.pageHtml };
+  const deps = { store: d.store || store(env), blobUsers: d.blobUsers || (() => blobUsers(env)), fetch: d.fetch || fetch, builtIns: d.builtIns };
   const page = (q) => `/market-structure.html?${q}#ctrader`;
   // every secret in play is scrubbed from errors: the app's own and, once read, the user's cTrader tokens and the grant code
   const secrets = [env.CTRADER_CLIENT_SECRET, env.CTRADER_CLIENT_ID, env.CTRADER_LINK_KEY, env.BLOB_READ_WRITE_TOKEN];

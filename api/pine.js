@@ -8,7 +8,7 @@ module.exports = async (req, res) => {
   const sym = String((req.query && req.query.sym) || 'xau').toLowerCase(), shadow = req.query && req.query.shadow === '1';
   if (!/^[a-z0-9]{2,12}$/.test(sym)) return res.status(400).send('bad sym');
   let trades = [];
-  try { const r = await fetch(`https://${req.headers.host}/cdata/trades.json`, { signal: AbortSignal.timeout(8000) }); if (r.ok) trades = await r.json(); } catch (e) {}
+  try { const r = await require('./data.js').readFile('trades.json'); if (r.ok) trades = JSON.parse(r.buf.toString('utf8')); } catch (e) {}
   const open = (Array.isArray(trades) ? trades : []).filter((t) => t.market === sym && (t.status === 'open' || t.status === 'pending') && (shadow || !t.shadow) && isFinite(t.entry) && isFinite(t.stop) && isFinite(t.filled || t.opened));
   const at = new Date().toISOString().slice(0, 16).replace('T', ' ');
   const rows = open.map((t) => {

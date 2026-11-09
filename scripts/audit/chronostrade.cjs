@@ -7,6 +7,9 @@ const PORT = process.env.PORT || 8766, H = 'http://127.0.0.1:' + PORT;
 const OUT = process.env.AUDIT_OUT || require('os').tmpdir() + '/';
 const R = []; const check = (name, ok, info = '') => { R.push({ name, ok: !!ok, info: String(info).slice(0, 140) }); };
 const route = async (p) => (await p.route(/\/api\/sounds/, (r) => r.fulfill({ status: 200, contentType: 'application/json', body: '{"sl":null,"tp":null}' })), p.route(new RegExp('127\\.0\\.0\\.1:' + PORT + '/md/bars'), async (r) => { const u = r.request().url().replace(H, 'https://meridianx.dev'); try { const res = await fetch(u); r.fulfill({ status: res.status, contentType: 'application/json', body: await res.text() }); } catch (e) { r.fulfill({ status: 502, body: '{}' }); } }));
+// sign-in (9 Nov): the page asks /api/me (the session cookie lives on the server); the audit stubs the answer
+const me = (p, account) => p.route(/\/api\/me(\?|$)/, (r) => r.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ account }) }));
+const OWNER = { u: 'owner', name: 'Owner', role: 'owner' };
 const barN = async (p) => +((await p.$eval('#now', (e) => e.textContent)).match(/bar (\d+)/) || [0, 0])[1];
 const txt = (p, sel) => p.$eval(sel, (e) => e.textContent).catch(() => '');
 const vis = (p, sel) => p.$eval(sel, (e) => !!(e.offsetParent || getComputedStyle(e).position === 'fixed') && !e.hidden).catch(() => false);
@@ -14,10 +17,10 @@ async function load(p, q = 'xau,15m') { await p.click(`#quick [data-q^="${q}"]`)
 (async () => {
   const b = await chromium.launch();
   // 1. gate
-  { const p = await b.newPage(); await p.goto(H + '/backtest.html'); check('gate shown when signed out', await vis(p, '#gate') && !(await vis(p, '#app'))); await p.close(); }
+  { const p = await b.newPage(); await me(p, null); await p.goto(H + '/backtest.html'); check('gate shown when signed out', await vis(p, '#gate') && !(await vis(p, '#app'))); await p.close(); }
   const ctx = await b.newContext({ viewport: { width: 1500, height: 950 }, acceptDownloads: true }); const p = await ctx.newPage();
   const errs = []; p.on('pageerror', (e) => errs.push(e.message)); p.on('console', (m) => { if (m.type() === 'error') errs.push('console: ' + m.text()); });
-  await route(p); await p.addInitScript(() => { if (!sessionStorage.getItem('init')) { localStorage.clear(); sessionStorage.setItem('init', '1'); } localStorage.setItem('ms-admin', 'x'); });
+  await route(p); await me(p, OWNER); await p.addInitScript(() => { if (!sessionStorage.getItem('init')) { localStorage.clear(); sessionStorage.setItem('init', '1'); } });
   await p.goto(H + '/backtest.html', { waitUntil: 'load' }); await p.waitForTimeout(300);
   check('welcome on first visit', await vis(p, '#welcome'));
   // 1b. first-run guide: shown once, steps, focus inside, Esc closes, remembered, reopens from Keys
@@ -132,7 +135,7 @@ async function load(p, q = 'xau,15m') { await p.click(`#quick [data-q^="${q}"]`)
   // 16. new session + delete
   await p.click('#sess-toggle'); await p.click('#newsess'); check('New session clears the chart', (await txt(p, '#sess-sum')).includes('New session'));
   // 17. phone layout and light theme
-  const m = await ctx.newPage(); await route(m); await m.setViewportSize({ width: 390, height: 844 }); await m.goto(H + '/backtest.html', { waitUntil: 'load' }); await m.waitForTimeout(2500);
+  const m = await ctx.newPage(); await route(m); await me(m, OWNER); await m.setViewportSize({ width: 390, height: 844 }); await m.goto(H + '/backtest.html', { waitUntil: 'load' }); await m.waitForTimeout(2500);
   await m.evaluate(() => window.openGuide()); const gw = await m.$eval('#guide', (e) => { const r = e.getBoundingClientRect(); return { l: r.left, r: r.right }; }); check('phone: guide fits at 390 px', gw.l >= 8 && gw.r <= 382, JSON.stringify(gw)); await m.screenshot({ path: OUT + 'ct-guide-phone.png' }); await m.keyboard.press('Escape');
   check('phone: no sideways scroll', !(await m.evaluate(() => document.documentElement.scrollWidth > innerWidth + 1)), await m.evaluate(() => document.documentElement.scrollWidth));
   await m.evaluate(() => localStorage.setItem('msPrefs', JSON.stringify({ theme: 'light' }))); await m.reload({ waitUntil: 'load' }); await m.waitForTimeout(1500);

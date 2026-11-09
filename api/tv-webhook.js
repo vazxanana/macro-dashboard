@@ -2,12 +2,13 @@
 //   https://meridianx.dev/api/tv-webhook?k=<TV_WEBHOOK_KEY>
 // Each alert is stored (private Blob tvalerts/, newest 50 kept) and forwarded as a push notification to every device
 // that has price alerts on. The owner reads the URL and the log with the owner password:
-//   POST { ownerPw, list: true } -> { url, alerts: [{ at, text, ticker, price }] }
+//   POST { ownerPw?, list: true } -> { url, alerts: [{ at, text, ticker, price }] }   (owner password or the owner's session cookie)
 const crypto = require('node:crypto');
 const { put, list, del } = require('@vercel/blob');
 const webpush = require('web-push');
 const { all, read } = require('./_alerts');
-const OWNER_HASH = '49c5624f2625ed8b42b6e1bf2819a3a41ddb9743aeca36ea34ea7eb96c252ca8';
+const { OWNER_HASH } = require('./_accounts');
+const S = require('./_session');
 const tok = () => process.env.BLOB_READ_WRITE_TOKEN;
 const eq = (a, b) => { const x = Buffer.from(String(a)), y = Buffer.from(String(b)); return x.length === y.length && crypto.timingSafeEqual(x, y); };
 async function recent() {
@@ -23,7 +24,8 @@ module.exports = async (req, res) => {
   // owner: read the webhook URL and the log
   if (!(req.query && req.query.k)) {
     let b = {}; try { b = typeof req.body === 'string' ? JSON.parse(req.body) : (req.body || {}); } catch (e) {}
-    if (!b || !b.ownerPw || String(b.ownerPw).length > 200 || !eq(crypto.createHash('sha256').update(String(b.ownerPw)).digest('hex'), OWNER_HASH)) return res.status(403).json({ error: 'Owner password not accepted' });
+    const pwOk = !!b && !!b.ownerPw && String(b.ownerPw).length <= 200 && eq(crypto.createHash('sha256').update(String(b.ownerPw)).digest('hex'), OWNER_HASH);
+    if (!pwOk && !(S.sameOrigin(req) && (await S.isOwnerSession(req)))) return res.status(403).json({ error: 'Owner password not accepted' });
     let blobs; try { blobs = (await recent()).slice(0, 30); } catch (e) { console.error(`[tv] list ${e.message}`); return res.status(502).json({ error: 'alert log unavailable' }); }
     const alerts = await Promise.all(blobs.map(async (bl) => { try { const r = await fetch(bl.url, { headers: { Authorization: `Bearer ${tok()}` }, signal: AbortSignal.timeout(8000) }); return r.ok ? r.json() : null; } catch (e) { return null; } }));
     return res.status(200).json({ url: `https://${req.headers.host}/api/tv-webhook?k=${KEY}`, alerts: alerts.filter(Boolean) });

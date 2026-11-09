@@ -1272,17 +1272,14 @@
 </style>
 <script>
 // Public / admin split (6 Nov): the public page shows trades and chart markups only; the admin view (rule texts, setups, scanner,
-// shadow trades, scorecards, reviews) opens with the admin password. The password is never stored: only its SHA-256 is compared.
-// Accounts (6 Nov): the owner (admin, everything) and reviewers (user name + password): reviewers see the whole admin view
-// read-only and can write loss reviews only. Reviewer tokens are the SHA-256 of their password, matched with the user name.
-window.MS_USERS = { fred: { name: 'Fred', hash: '370aed697dc503aecee7d8faad5de775f4f7019c86e672e8d93f3df590527058', role: 'reviewer', ict: true, ct: true, mcp: true },   // mcp: ChatGPT connector on his profile (8 Nov); ict: the ICT desk (main reviewer and trader, owner 6 Nov); ct: sees the demo accounts' results (8 Nov), labels only
- 
-  orlando: { name: 'Orlando', hash: '037617a451df6fb39614002d57502a5f7bc240221b1715ed48280534cc478a06', role: 'reviewer', ict: 'read', ct: true },   // sees everything incl. the profile accounts (owner 8 Nov); ICT desk read-only (6 Nov)
-  luxus: { name: 'Luxus', hash: 'dccc5d01dabcd1c0b9fa89c91e7f4bde603121ee0172b4ff394e6bb30d295e41', role: 'viewer' },
-  carlos: { name: 'Carlos', hash: '511d45febaa8559a9071091951613e559f0b8b12b3995e6c13c94c81fbee59f0', role: 'viewer', ct: true } };   // ct: the demo accounts' P&L (owner 8 Nov)
-// users added or changed on the Users page live in council-data users.json ({ users: { key: { name, hash, role, disabled? } } }); they override the built-ins
+// shadow trades, scorecards, reviews) is for signed-in accounts. Sign-in (9 Nov security fix): the password goes to /api/login,
+// which checks it on the server and sets an HttpOnly session cookie; the page keeps only non-secret account info (localStorage
+// ms-acct: { u, name, role, ict?, ct?, mcp?, perms? }) to draw the right view at once, and /api/me confirms it after load. No
+// password hash is in the page any more; the built-in members live on the server (api/_accounts.js).
+// MS_USERS: the built-in members' public records (no hashes), filled from /api/users for the owner's Users page only.
+window.MS_USERS = {};
 window.MS_CDATA = (/^https?:$/.test(location.protocol) && !/github\.io$/.test(location.hostname) ? location.origin + '/cdata/' : 'https://raw.githubusercontent.com/vazxanana/macro-dashboard/council-data/');   // Vercel serves council data from /cdata (private repo); GitHub Pages and local files read GitHub directly
-window.MS_USERS_URL = window.MS_CDATA + 'users.json';
+window.MS_API = /^https?:$/.test(location.protocol) && !/github\.io$/.test(location.hostname) ? location.origin + '/api/' : null;   // sign-in and accounts: the Vercel site only
 // permission keys: what a member can see or do. Role defaults below; `perms` on a user record overrides key by key.
 //   charts, scanner, journal, desks (Gold / Crypto / LIT / NQ SDV), council (every council tab; off = overview only), macro (the
 //   Macro desk switch), ct (demo accounts' results, labels only), mcp (ChatGPT connector on the profile), ict: false | 'read' | 'write'
@@ -1297,16 +1294,22 @@ window.msPerms = function (R, owner) {
   return E;
 };
 window.msMergeUsers = function (remote) { var m = {}, k; for (k in window.MS_USERS) m[k] = window.MS_USERS[k]; var r = (remote && remote.users) || {}; for (k in r) m[k] = r[k]; for (k in m) if (m[k] && m[k].disabled) delete m[k]; return m; };
-// on the Vercel site the list lives in a private Blob store behind /api/users (7 Nov); elsewhere (GitHub Pages, a local copy) in council-data users.json
-window.MS_USERS_API = /^https?:$/.test(location.protocol) && !/github\.io$/.test(location.hostname) ? location.origin + '/api/users' : null;
+// the account list lives in a private Blob store behind /api/users (7 Nov); since 9 Nov it answers signed-in accounts only and
+// never carries password hashes (the owner gets every member, a member only their own record)
+window.MS_USERS_API = window.MS_API ? window.MS_API + 'users' : null;
 window.msFetchUsers = function () {
-  var gh = function () { return fetch(window.MS_USERS_URL + '?t=' + Date.now(), { cache: 'no-store' }).then(function (r) { return r.ok ? r.json() : null; }).catch(function () { return null; }); };
-  if (!window.MS_USERS_API) return gh();
-  return fetch(window.MS_USERS_API, { cache: 'no-store' }).then(function (r) { return r.ok ? r.json() : r.status === 503 ? gh() : null; }).catch(function () { return null; });
-};   // viewer: setups, P&L calendar, active trades; read-only
-(function () { var h = null, u = null; try { h = localStorage.getItem('ms-admin'); u = localStorage.getItem('ms-user'); } catch (e) {}
-  var rec = null; try { rec = JSON.parse(localStorage.getItem('ms-user-rec') || 'null'); } catch (e) {}
-  var R = u && rec && rec.key === u && rec.hash === h ? rec : u && window.MS_USERS[u] && window.MS_USERS[u].hash === h ? window.MS_USERS[u] : null, owner = h === '49c5624f2625ed8b42b6e1bf2819a3a41ddb9743aeca36ea34ea7eb96c252ca8' && !u;
+  if (!window.MS_USERS_API) return Promise.resolve(null);
+  return fetch(window.MS_USERS_API, { cache: 'no-store', credentials: 'same-origin' }).then(function (r) { return r.ok ? r.json() : null; })
+    .then(function (j) { if (j && j.builtins) window.MS_USERS = j.builtins; return j; }).catch(function () { return null; });
+};
+(function () {
+  // old hash-as-token sign-ins (before 9 Nov) are ignored and cleared: everyone signs in once again
+  try { ['ms-admin', 'ms-user', 'ms-user-rec'].forEach(function (k) { localStorage.removeItem(k); }); } catch (e) {}
+  var A = null; try { A = JSON.parse(localStorage.getItem('ms-acct') || 'null'); } catch (e) {}
+  if (!window.MS_API || !A || typeof A !== 'object' || typeof A.u !== 'string') A = null;
+  window.MS_ACCT = A;   // drawing only: every data call is checked on the server against the session cookie
+  var owner = !!A && A.u === 'owner' && A.role === 'owner', R = A && !owner && (A.role === 'viewer' || A.role === 'reviewer') ? A : null;
+  if (A && !owner && !R) window.MS_ACCT = A = null;
   document.documentElement.dataset.mode = owner || R ? 'admin' : 'public';
   document.documentElement.dataset.role = owner ? 'owner' : R ? R.role : 'public';
   window.MS_WHO = owner ? 'owner' : R ? R.name : null;
@@ -1326,26 +1329,34 @@ window.msFetchUsers = function () {
 window.msForgetCt = function () {
   try { for (var i = localStorage.length - 1; i >= 0; i--) { var k = localStorage.key(i); if (k && /^ms-ct-(sess|acc)-/.test(k)) localStorage.removeItem(k); } } catch (e) {}
 };
-// admin login: SHA-256 of the typed password against MS_ADMIN_HASH; the hash is kept as the session token
-async function msSha256(t) { const b = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(t)); return Array.from(new Uint8Array(b)).map((x) => x.toString(16).padStart(2, '0')).join(''); }
+// sign out (9 Nov): the server clears the session cookie; this browser forgets the account info and the cTrader session
+window.msSignOut = function () {
+  try { localStorage.removeItem('ms-acct'); localStorage.removeItem('ms-guest'); sessionStorage.removeItem('ms-own-pw'); } catch (e) {}
+  window.msForgetCt();
+  var done = function () { location.hash = '#home'; location.reload(); };
+  if (window.MS_API) fetch(window.MS_API + 'logout', { method: 'POST', credentials: 'same-origin' }).then(done, done); else done();
+};
 document.addEventListener('DOMContentLoaded', function () { var pub = document.documentElement.dataset.mode !== 'admin', a = document.getElementById('ms-admin-link'), w = document.getElementById('ms-who');
   if (w && window.MS_WHO) w.textContent = window.MS_WHO === 'owner' ? 'admin' : document.documentElement.dataset.role === 'viewer' ? `${window.MS_WHO} (viewer: read-only)` : `${window.MS_WHO} (reviewer: read-only, loss reviews)`; if (!a) return;
   a.textContent = pub ? 'Log in' : `Log out${window.MS_WHO && window.MS_WHO !== 'owner' ? ` (${window.MS_WHO})` : ''}`;
   a.addEventListener('click', function (ev) { ev.preventDefault();
-    if (!pub) { try { localStorage.removeItem('ms-admin'); localStorage.removeItem('ms-user'); localStorage.removeItem('ms-user-rec'); localStorage.removeItem('ms-guest'); } catch (e) {} window.msForgetCt(); location.hash = '#home'; location.reload(); return; }
+    if (!pub) { window.msSignOut(); return; }
     msGate(true); }); });
-// a signed-in user (not the owner) is checked against the current user list once the page has loaded
+// /api/me after load (9 Nov): the server's word on who this is (removed, disabled or a changed password -> signed out; a new
+// role or new perms -> redrawn). The page reloads only when the answer differs from the cached account info and was saved.
 document.addEventListener('DOMContentLoaded', function () {
-  var u = null, h = null; try { u = localStorage.getItem('ms-user'); h = localStorage.getItem('ms-admin'); } catch (e) {}
-  if (!u || !h) return;
-  window.msFetchUsers().then(function (remote) {
-    if (!remote) return;   // offline or no list yet: keep the session
-    var all = window.msMergeUsers(remote), R = all[u];
-    if (!R || R.hash !== h) { try { localStorage.removeItem('ms-admin'); localStorage.removeItem('ms-user'); localStorage.removeItem('ms-user-rec'); } catch (e) {} window.msForgetCt(); location.reload(); return; }
-    var rec = null; try { rec = JSON.parse(localStorage.getItem('ms-user-rec') || 'null'); } catch (e) {}
-    var sig = function (x) { return JSON.stringify([x.role, x.name, x.ict || false, x.ct || false, x.mcp || false, x.perms || null]); };
-    if (!rec || sig(rec) !== sig(R)) { try { localStorage.setItem('ms-user-rec', JSON.stringify({ key: u, name: R.name, role: R.role, hash: h, ict: R.ict || false, ct: R.ct || false, mcp: R.mcp || false, perms: R.perms || null })); } catch (e) {} if (!rec || sig(rec) !== sig(Rlse) !== (R.ct || false)) location.reload(); }
-  });
+  if (!window.MS_API) return;
+  fetch(window.MS_API + 'me', { cache: 'no-store', credentials: 'same-origin' }).then(function (r) { return r.ok ? r.json() : null; }).then(function (j) {
+    if (!j) return;   // offline, or the user list is unreadable (503): keep the view; the server still checks every data call
+    var A = j.account || null, cur = window.MS_ACCT || null;
+    var sig = function (x) { return x ? JSON.stringify([x.u, x.role, x.name, x.ict || false, x.ct || false, x.mcp || false, x.perms || null]) : 'null'; };
+    if (sig(A) === sig(cur)) return;
+    var want = A ? JSON.stringify(A) : null, got;
+    try { if (A) { localStorage.setItem('ms-acct', want); localStorage.removeItem('ms-guest'); } else localStorage.removeItem('ms-acct'); } catch (e) {}
+    try { got = localStorage.getItem('ms-acct'); } catch (e) { got = undefined; }
+    if (!A) window.msForgetCt();
+    if (got === want) location.reload();
+  }).catch(function () {});
 });
 // Sign-in card (6 Nov): first screen for anyone not signed in; "Continue as guest" opens the public view and is remembered
 function msGate(show) {
@@ -1357,16 +1368,17 @@ document.addEventListener('DOMContentLoaded', function () {
   var f = document.getElementById('ms-gate-f'), err = document.getElementById('ms-gate-err'), gb = document.getElementById('ms-gate-guest'), x = document.getElementById('ms-gate-x');
   if (document.documentElement.dataset.gate) setTimeout(function () { var u = document.getElementById('ms-gate-p'); if (u) u.focus(); }, 30);
   if (f) f.addEventListener('submit', async function (ev) { ev.preventDefault();
-    var pw = document.getElementById('ms-gate-p').value || '', h = '', btn = document.getElementById('ms-gate-go');
+    var pw = document.getElementById('ms-gate-p').value || '', btn = document.getElementById('ms-gate-go');
     err.textContent = ''; if (!pw) { err.textContent = 'Type your password.'; document.getElementById('ms-gate-p').focus(); return; }
+    if (!window.MS_API) { err.textContent = 'Sign in on meridianx.dev: this copy of the page cannot check passwords.'; return; }
     btn.disabled = true; btn.textContent = 'Signing in…';
-    try { h = await msSha256(pw); } catch (e) { err.textContent = 'This browser cannot check the password (the page needs https).'; btn.disabled = false; btn.textContent = 'Sign in'; return; }
-    var all = h === window.MS_ADMIN_HASH ? window.MS_USERS : window.msMergeUsers(await window.msFetchUsers());
-    var un = Object.keys(all).find(function (k) { return all[k].hash === h; }), R = un && all[un];   // password only (6 Nov): each password belongs to one account
-    if (h === window.MS_ADMIN_HASH || (R && h === R.hash)) window.msTrack && msTrack('Sign in', { result: 'ok' });
-    if (h === window.MS_ADMIN_HASH) { try { sessionStorage.setItem('ms-own-pw', pw); } catch (e) {} try { localStorage.setItem('ms-admin', h); localStorage.removeItem('ms-user'); localStorage.removeItem('ms-guest'); } catch (e) {} location.reload(); return; }
-    if (R && h === R.hash) { try { localStorage.setItem('ms-admin', h); localStorage.setItem('ms-user', un); localStorage.setItem('ms-user-rec', JSON.stringify({ key: un, name: R.name, role: R.role, hash: h, ict: R.ict || false, ct: R.ct || false, mcp: R.mcp || false, perms: R.perms || null })); localStorage.removeItem('ms-guest'); } catch (e) {} location.reload(); return; }
-    window.msTrack && msTrack('Sign in', { result: 'wrong' }); btn.disabled = false; btn.textContent = 'Sign in'; err.textContent = 'Wrong password.'; document.getElementById('ms-gate-p').select(); });
+    // the password goes to the server once (9 Nov); it answers with the account and an HttpOnly session cookie
+    var r = null, j = {}; try { r = await fetch(window.MS_API + 'login', { method: 'POST', headers: { 'Content-Type': 'application/json' }, credentials: 'same-origin', cache: 'no-store', body: JSON.stringify({ password: pw }) }); j = await r.json().catch(function () { return {}; }); } catch (e) {}
+    if (r && r.ok && j && j.account) { window.msTrack && msTrack('Sign in', { result: 'ok' });
+      try { localStorage.setItem('ms-acct', JSON.stringify(j.account)); localStorage.removeItem('ms-guest'); } catch (e) {} location.reload(); return; }
+    btn.disabled = false; btn.textContent = 'Sign in';
+    if (!r || r.status >= 500) { err.textContent = 'Sign-in is not available right now. Try again in a minute.'; return; }
+    window.msTrack && msTrack('Sign in', { result: 'wrong' }); err.textContent = 'Wrong password.'; document.getElementById('ms-gate-p').select(); });
   if (gb) gb.addEventListener('click', function () { window.msTrack && msTrack('Guest'); var was = document.documentElement.dataset.mode === 'public' && localStorage.getItem('ms-guest'); try { localStorage.setItem('ms-guest', '1'); } catch (e) {} if (was) msGate(false); else location.reload(); });
   if (x) x.addEventListener('click', function () { msGate(false); });
   document.addEventListener('keydown', function (ev) { if (ev.key === 'Escape' && document.documentElement.dataset.gate && localStorage.getItem('ms-guest')) msGate(false); });
@@ -1387,10 +1399,10 @@ document.addEventListener('DOMContentLoaded', function () {
   // the photo and name also live on the server (/api/profile, 8 Nov: they reset because localStorage is per browser: Safari and
   // the home-screen app keep separate copies, and Safari wipes it after a week). Local storage stays as the fast cache.
   const API = /^https?:$/.test(location.protocol) && !/github\.io$/.test(location.hostname) ? location.origin + '/api/profile' : null;
-  const acct = () => { try { const h = localStorage.getItem('ms-admin'), u = localStorage.getItem('ms-user'); return who === 'guest' || !h ? null : { u: u || 'owner', h }; } catch (e) { return null; } };
-  function pushProfile(fields) { const a = acct(); if (!API || !a) return; fetch(API, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ u: a.u, h: a.h, ...fields }) }).catch(() => {}); }
-  function pullProfile() { const a = acct(); if (!API || !a) return;
-    fetch(API + '?u=' + encodeURIComponent(a.u), { headers: { 'X-MS-Auth': a.h }, cache: 'no-store' }).then((r) => (r.ok ? r.json() : null)).then((srv) => { if (!srv) return;
+  const acct = () => who !== 'guest' && !!window.MS_ACCT;   // the session cookie says who (9 Nov); the server reads and writes only that account's record
+  function pushProfile(fields) { if (!API || !acct()) return; fetch(API, { method: 'POST', headers: { 'Content-Type': 'application/json' }, credentials: 'same-origin', body: JSON.stringify(fields) }).catch(() => {}); }
+  function pullProfile() { if (!API || !acct()) return;
+    fetch(API, { cache: 'no-store', credentials: 'same-origin' }).then((r) => (r.ok ? r.json() : null)).then((srv) => { if (!srv) return;
       let changed = false; const lp = get('photo'), ln = get('name');
       if (srv.photo && srv.photo !== lp) { try { localStorage.setItem(key('photo'), srv.photo); } catch (e) {} changed = true; }
       if (srv.name && srv.name !== ln) { try { localStorage.setItem(key('name'), srv.name); } catch (e) {} changed = true; }
@@ -1433,7 +1445,6 @@ document.addEventListener('DOMContentLoaded', function () {
     $('ms-me-out').addEventListener('click', () => { me.open = false; const a = $('ms-admin-link'); if (a) a.click(); });
   });
 })();
-window.MS_ADMIN_HASH = '49c5624f2625ed8b42b6e1bf2819a3a41ddb9743aeca36ea34ea7eb96c252ca8';
 </script>
 <style>
   .gate { display: none; }
@@ -4783,7 +4794,6 @@ function msNextSetup(bars, A) {
     const load = async () => {
       const m = dlg.querySelector('#tvw-msg'), ul = dlg.querySelector('#tvw-list'), u = dlg.querySelector('#tvw-url');
       let pw = ''; try { pw = sessionStorage.getItem('ms-own-pw') || ''; } catch (e) {}
-      if (!pw) { u.textContent = 'Type your owner password to show the webhook address.'; dlg.querySelector('#tvw-pw').hidden = false; return; }
       m.textContent = 'Loading…';
       try { const r = await fetch('/api/tv-webhook', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ ownerPw: pw, list: true }) }); const j = await r.json();
         if (r.status === 403) { try { sessionStorage.removeItem('ms-own-pw'); } catch (e) {} dlg.querySelector('#tvw-pw').hidden = false; u.textContent = 'Owner password not accepted.'; m.textContent = ''; return; }
@@ -4805,7 +4815,7 @@ function msNextSetup(bars, A) {
           <p id="tvw-msg" class="pa-msg" role="status"></p><h3 class="br-h3">Recent alerts</h3><ul class="pa-list" id="tvw-list"></ul>`;
         document.body.appendChild(dlg);
         dlg.querySelector('.pa-x').onclick = () => dlg.close(); dlg.addEventListener('click', (e) => { if (e.target === dlg) dlg.close(); });
-        dlg.querySelector('#tvw-pw').onsubmit = async (e) => { e.preventDefault(); const v = dlg.querySelector('#tvw-pwi').value; if ((await msSha256(v)) !== window.MS_ADMIN_HASH) { dlg.querySelector('#tvw-url').textContent = 'That is not the owner password.'; return; } try { sessionStorage.setItem('ms-own-pw', v); } catch (err) {} load(); };
+        dlg.querySelector('#tvw-pw').onsubmit = async (e) => { e.preventDefault(); const v = dlg.querySelector('#tvw-pwi').value; try { sessionStorage.setItem('ms-own-pw', v); } catch (err) {} load(); };
         const cp = async (t, b) => { try { await navigator.clipboard.writeText(t); b.textContent = 'Copied ✓'; setTimeout(() => { b.textContent = 'Copy'; }, 1400); } catch (e) { msCopy(t); } };
         dlg.querySelector('#tvw-cpu').onclick = (e) => cp(dlg.querySelector('#tvw-url').textContent, e.target);
         dlg.querySelector('#tvw-cpt').onclick = (e) => cp(TPL, e.target);
@@ -4837,8 +4847,9 @@ function msNextSetup(bars, A) {
     };
     const getFile = async (f) => {
       let pw = ''; try { pw = sessionStorage.getItem('ms-own-pw') || ''; } catch (e) {}
-      if (!pw) { pw = (await msAsk('Owner password', '', { title: 'Download the bridge code', type: 'password', ok: 'Continue' })) || ''; if (!pw) return; }
-      const r = await fetch('/api/bridge', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ ownerPw: pw, file: f }) });
+      const ask = async () => { const r = await fetch('/api/bridge', { method: 'POST', headers: { 'Content-Type': 'application/json' }, credentials: 'same-origin', body: JSON.stringify({ ownerPw: pw, file: f }) }); return r; };
+      let r = await ask();   // the owner's session is enough (9 Nov); the password only when the server asks for it
+      if (r.status === 403) { pw = (await msAsk('Owner password', '', { title: 'Download the bridge code', type: 'password', ok: 'Continue' })) || ''; if (!pw) return; r = await ask(); }
       if (!r.ok) { alert(r.status === 403 ? 'Owner password not accepted.' : `Download failed (${r.status}).`); return; }
       try { sessionStorage.setItem('ms-own-pw', pw); } catch (e) {}
       const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([await r.text()], { type: 'text/plain' })); a.download = f === 'mt5' ? 'CouncilBridge.mq5' : 'CouncilBridge.cs'; document.body.appendChild(a); a.click(); a.remove();
@@ -6378,7 +6389,8 @@ function msNextSetup(bars, A) {
   async function loadCouncil() {
     if (!document.getElementById('v-council')) return;
     const bust = Math.floor(Date.now() / 120000);
-    const get = (f, json) => fetch(`${CDATA}${f}?v=${bust}`, { cache: 'no-store' }).then((r) => r.ok ? (json ? r.json() : r.text()) : null).catch(() => null);
+    const GUEST_FILES = ['trades.json', 'snapshot.json', 'research/replay-2w.json', 'research.json'];   // same list as GUEST_OK in api/data.js
+    const get = (f, json) => PUB && window.MS_API && !GUEST_FILES.includes(f) ? Promise.resolve(null) : fetch(`${CDATA}${f}?v=${bust}`, { cache: 'no-store' }).then((r) => r.ok ? (json ? r.json() : r.text()) : null).catch(() => null);
     const anP = get('reviews/analyst.json', 1);   // Analyst post-mortems of live losses (shown on the loss review; owner reviews win)
     let [trades, config, coach, snap, analysis, review, backtest, replay, research, shadowRp, lossRev, mirror, health, specs] = await Promise.all([get('trades.json', 1), get('config.json', 1), get('coach.json', 1), get('snapshot.json', 1), get('analysis/latest.md'), get('reviews/latest.md'), get('backtest.json', 1), get('research/replay-2w.json', 1), get('research.json', 1), get('research/shadow-replay.json', 1), get('reviews/losses.json', 1), get('ctrader/mirror.json', 1), get('health.json', 1), get('ctrader/symbols.json', 1)]);
     // m30m1 (M30 → M1) fires on the same M1 entry as the gold scalp: the same trade recorded twice; count it once (6 Nov)
@@ -7512,52 +7524,22 @@ function msNextSetup(bars, A) {
     if (!r.ok) throw new Error(`GitHub ${r.status}${r.status === 401 ? ' (token not accepted)' : ''}`);
     const j = await r.json(); return { sha: j.sha, json: JSON.parse(decodeURIComponent(escape(atob(String(j.content).replace(/\s/g, ''))))) };
   }
-  // the owner's password, asked once per tab (kept in sessionStorage only) and checked against the owner hash before it is sent
-  function ownerPw() {
-    let pw = ''; try { pw = sessionStorage.getItem('ms-own-pw') || ''; } catch (e) {}
-    if (pw) return Promise.resolve(pw);
-    return new Promise((done) => {
-      let d = document.getElementById('ms-own-dlg');
-      if (!d) {
-        d = document.createElement('dialog'); d.id = 'ms-own-dlg'; d.className = 'own-dlg';
-        d.innerHTML = '<form method="dialog"><h3>Confirm it\'s you</h3><p>Type your owner password to save account changes. It is asked once per visit and never stored on the server.</p><label for="ms-own-pw">Owner password</label><input id="ms-own-pw" type="password" autocomplete="current-password" required><p class="own-err" id="ms-own-err" role="alert"></p><div class="own-acts"><button type="button" value="cancel" id="ms-own-cancel">Cancel</button><button type="submit" value="ok" class="pri">Confirm</button></div></form>';
-        document.body.appendChild(d);
-      }
-      const inp = d.querySelector('#ms-own-pw'), err = d.querySelector('#ms-own-err'), f = d.querySelector('form');
-      inp.value = ''; err.textContent = '';
-      const finish = (v) => { f.onsubmit = null; d.querySelector('#ms-own-cancel').onclick = null; d.onclose = null; if (d.open) d.close(); done(v); };
-      f.onsubmit = async (ev) => { ev.preventDefault(); const v = inp.value; if ((await msSha256(v)) !== window.MS_ADMIN_HASH) { err.textContent = 'That is not the owner password.'; inp.select(); return; } try { sessionStorage.setItem('ms-own-pw', v); } catch (e) {} finish(v); };
-      d.querySelector('#ms-own-cancel').onclick = () => finish('');
-      d.onclose = () => finish('');
-      d.showModal(); setTimeout(() => inp.focus(), 30);
-    });
-  }
   async function saveUsers(mutate, note) {
     const msg = document.getElementById('ms-u-msg'); if (US.busy) return; US.busy = true;
     try {
-      if (window.MS_USERS_API) {
-        const pw = await ownerPw(); if (!pw) { if (msg) msg.textContent = 'Not saved: the owner password is needed.'; return false; }
-        if (msg) msg.textContent = 'Saving…';
-        const cur = await window.msFetchUsers(); if (!cur) throw new Error('Could not read the current accounts; check your connection and try again.');
-        const data = { users: { ...(cur.users || {}) } };
-        const err = mutate(data); if (err) throw new Error(err);
-        const r = await fetch(window.MS_USERS_API, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ ownerPw: pw, users: data.users, note }) });
-        const j = await r.json().catch(() => ({}));
-        if (r.status === 403) { try { sessionStorage.removeItem('ms-own-pw'); } catch (e) {} throw new Error('The server did not accept the owner password. Try again.'); }
-        if (r.status === 503) throw new Error('Account storage is not set up on the server yet.');
-        if (!r.ok) throw new Error(`Not saved: ${j.error || 'server error ' + r.status}`);
-        US.remote = j; if (msg) msg.textContent = `Saved: ${note}.`; renderUsers(true); return true;
-      }
-      for (let a = 0; a < 3; a++) {
-        const f = await ghFile(UPATH), data = f.json || { users: {} }; data.users = data.users || {};
-        const err = mutate(data); if (err) throw new Error(err);
-        data.updated = new Date().toISOString();
-        const r = await fetch(`https://api.github.com/repos/${GHR.repo}/contents/${UPATH}`, { method: 'PUT', headers: { Authorization: `Bearer ${ghTok()}`, Accept: 'application/vnd.github+json' },
-          body: JSON.stringify({ message: `Users: ${note}`, content: btoa(unescape(encodeURIComponent(JSON.stringify(data, null, 1)))), branch: GHR.branch, ...(f.sha ? { sha: f.sha } : {}) }) });
-        if (r.ok) { US.remote = data; if (msg) msg.textContent = `Saved: ${note}.`; renderUsers(true); return true; }
-        if (r.status !== 409 && r.status !== 422) throw new Error(`GitHub ${r.status}`);
-      }
-      throw new Error('GitHub kept reporting a newer file; try again.');
+      // the owner's session saves (9 Nov); records go up without hashes and keep theirs on the server; `pw` sets a new password
+      if (!window.MS_USERS_API) throw new Error('Account changes are made on meridianx.dev.');
+      if (msg) msg.textContent = 'Saving…';
+      const cur = await window.msFetchUsers(); if (!cur || !cur.builtins) throw new Error('Could not read the current accounts; check your connection and try again.');
+      const data = { users: { ...(cur.users || {}) } };
+      const err = mutate(data); if (err) throw new Error(err);
+      const r = await fetch(window.MS_USERS_API, { method: 'POST', headers: { 'Content-Type': 'application/json' }, credentials: 'same-origin', body: JSON.stringify({ users: data.users, note }) });
+      const j = await r.json().catch(() => ({}));
+      if (r.status === 403) throw new Error('Your owner session has ended. Sign in again and retry.');
+      if (r.status === 503) throw new Error('Account storage is not set up on the server yet.');
+      if (!r.ok) throw new Error(`Not saved: ${j.error || 'server error ' + r.status}`);
+      if (j.builtins) window.MS_USERS = j.builtins;
+      US.remote = j; if (msg) msg.textContent = `Saved: ${note}.`; renderUsers(true); return true;
     } catch (e) { if (msg) msg.textContent = e.message || String(e); alert(e.message || e); return false; }
     finally { US.busy = false; }
   }
@@ -7577,19 +7559,15 @@ function msNextSetup(bars, A) {
       <div class="own-acts"><button type="button" value="reset" id="ms-perm-reset">Back to role defaults</button><button type="button" value="cancel" id="ms-perm-cancel">Cancel</button><button type="submit" value="ok" class="pri">Save</button></div></form>`;
     const f = d.querySelector('form');
     f.onsubmit = (ev) => { ev.preventDefault(); const perms = {}; Object.keys(PERM_LABEL).forEach((p) => { perms[p] = f.elements[p].checked; }); const ict = f.elements.ict.value; perms.ict = ict || false;
-      d.close(); saveUsers((dd) => { const base = dd.users[k] || window.MS_USERS[k] || cur; dd.users[k] = { ...base, name: cur.name, role: cur.role, hash: cur.hash, perms, ict: perms.ict, ct: perms.ct, mcp: perms.mcp }; delete dd.users[k].disabled; }, `permissions for ${cur.name}`); };
-    d.querySelector('#ms-perm-reset').onclick = () => { d.close(); saveUsers((dd) => { const base = dd.users[k] || window.MS_USERS[k] || cur; dd.users[k] = { ...base, name: cur.name, role: cur.role, hash: cur.hash }; delete dd.users[k].perms; delete dd.users[k].ict; delete dd.users[k].ct; delete dd.users[k].mcp; if (window.MS_USERS[k]) { const b = window.MS_USERS[k]; if (b.ict) dd.users[k].ict = b.ict; if (b.ct) dd.users[k].ct = b.ct; if (b.mcp) dd.users[k].mcp = b.mcp; } }, `${cur.name} back to ${cur.role} defaults`); };
+      d.close(); saveUsers((dd) => { const base = dd.users[k] || window.MS_USERS[k] || cur; dd.users[k] = { ...base, name: cur.name, role: cur.role, perms, ict: perms.ict, ct: perms.ct, mcp: perms.mcp }; delete dd.users[k].disabled; }, `permissions for ${cur.name}`); };
+    d.querySelector('#ms-perm-reset').onclick = () => { d.close(); saveUsers((dd) => { const base = dd.users[k] || window.MS_USERS[k] || cur; dd.users[k] = { ...base, name: cur.name, role: cur.role }; delete dd.users[k].perms; delete dd.users[k].ict; delete dd.users[k].ct; delete dd.users[k].mcp; if (window.MS_USERS[k]) { const b = window.MS_USERS[k]; if (b.ict) dd.users[k].ict = b.ict; if (b.ct) dd.users[k].ct = b.ct; if (b.mcp) dd.users[k].mcp = b.mcp; } }, `${cur.name} back to ${cur.role} defaults`); };
     d.querySelector('#ms-perm-cancel').onclick = () => d.close();
     d.showModal();
-  }
-  async function hashTaken(h, exceptKey) {
-    if (h === window.MS_ADMIN_HASH) return true;
-    const all = window.msMergeUsers(US.remote); return Object.keys(all).some((k) => k !== exceptKey && all[k].hash === h);
   }
   async function renderUsers(skipFetch) {
     const body = document.getElementById('ms-u-body'); if (!body || document.documentElement.dataset.role !== 'owner') return;
     if (!skipFetch) US.remote = await window.msFetchUsers();
-    const sync = document.getElementById('ms-u-sync'); if (sync) sync.textContent = window.MS_USERS_API ? 'Saved on the server · changes ask for your owner password once per visit' : ghTok() ? 'GitHub connected' : 'Connect GitHub on the Loss review card to make changes';
+    const sync = document.getElementById('ms-u-sync'); if (sync) sync.textContent = window.MS_USERS_API ? 'Saved on the server · your owner session saves changes' : 'Account changes are made on meridianx.dev';
     const rem = (US.remote && US.remote.users) || {}, keys = [...new Set(Object.keys(window.MS_USERS).concat(Object.keys(rem)))];
     body.innerHTML = keys.map((k) => {
       const u = rem[k] || window.MS_USERS[k], off = !!(rem[k] && rem[k].disabled), src = window.MS_USERS[k] ? (rem[k] ? 'built-in, changed here' : 'built-in') : 'added here';
@@ -7604,14 +7582,14 @@ function msNextSetup(bars, A) {
         const b = ev.target.closest('button[data-act]'); if (!b) return; const k = b.closest('tr').dataset.u, cur = window.msMergeUsers(US.remote)[k] || (US.remote && US.remote.users[k]) || window.MS_USERS[k];
         if (b.dataset.act === 'perms') { permDialog(k, cur); return; }
         if (b.dataset.act === 'pw') {
-          const pw = await msAsk(`New password for ${cur.name}`, '', { title: 'New password', ok: 'Save' }); if (!pw) return; const h = await msSha256(pw.trim());
-          if (await hashTaken(h, k)) { alert('That password is already used by another account. Pick another one.'); return; }
-          saveUsers((d) => { d.users[k] = { ...(d.users[k] || window.MS_USERS[k] || {}), name: cur.name, role: cur.role, hash: h }; delete d.users[k].disabled; }, `new password for ${cur.name}`);
+          const pw = await msAsk(`New password for ${cur.name}`, '', { title: 'New password', ok: 'Save' }); if (!pw) return;
+          if (pw.trim().length < 4) { alert('Use a password of at least 4 characters.'); return; }   // the server hashes it and refuses one already in use
+          saveUsers((d) => { d.users[k] = { ...(d.users[k] || window.MS_USERS[k] || {}), name: cur.name, role: cur.role, pw: pw.trim() }; delete d.users[k].disabled; }, `new password for ${cur.name}`);
         } else if (b.dataset.act === 'del') {
           if (!(await msConfirm(`Remove ${cur.name}? They will be signed out on their next visit.`, { title: 'Remove member', ok: 'Remove', danger: true }))) return;
           saveUsers((d) => { if (window.MS_USERS[k]) d.users[k] = { ...(d.users[k] || window.MS_USERS[k]), disabled: true }; else delete d.users[k]; }, `removed ${cur.name}`);
         } else if (b.dataset.act === 'restore') {
-          saveUsers((d) => { if (d.users[k]) delete d.users[k].disabled; if (window.MS_USERS[k] && d.users[k] && d.users[k].hash === window.MS_USERS[k].hash && d.users[k].role === window.MS_USERS[k].role) delete d.users[k]; }, `restored ${k}`);
+          saveUsers((d) => { if (d.users[k]) delete d.users[k].disabled; }, `restored ${k}`);
         }
       });
       tb.addEventListener('change', (ev) => {
@@ -7625,8 +7603,7 @@ function msNextSetup(bars, A) {
       const name = document.getElementById('ms-u-name').value.trim(), pw = document.getElementById('ms-u-pw').value.trim(), role = document.getElementById('ms-u-role').value, k = uKey(name);
       if (!name || !k) { msg.textContent = 'Type a name.'; return; } if (pw.length < 4) { msg.textContent = 'Use a password of at least 4 characters.'; return; }
       const all = window.msMergeUsers(US.remote); if (all[k]) { msg.textContent = `${name} already exists.`; return; }
-      const h = await msSha256(pw); if (await hashTaken(h)) { msg.textContent = 'That password is already used by another account.'; return; }
-      if (await saveUsers((d) => { d.users[k] = { name, role, hash: h }; }, `added ${name} (${role})`)) { f.reset(); }
+      if (await saveUsers((d) => { d.users[k] = { name, role, pw }; }, `added ${name} (${role})`)) { f.reset(); }   // the server hashes the password and refuses one already in use
     });
   }
 
@@ -10304,7 +10281,7 @@ html[data-role="public"] .hdr-sw { display: none; }
   const API = /^https?:$/.test(location.protocol) && !/github\.io$/.test(location.hostname) ? location.origin + '/api/ctrader-link' : null;
   const $ = (id) => document.getElementById(id);
   const ls = (k, v) => { try { if (v === undefined) return localStorage.getItem(k); if (v === null) localStorage.removeItem(k); else localStorage.setItem(k, v); } catch (e) { return null; } };
-  const userKey = () => ls('ms-user') || (ls('ms-admin') ? 'owner' : null);
+  const userKey = () => (window.MS_ACCT && window.MS_ACCT.u) || null;
   const sessKey = () => 'ms-ct-sess-' + (userKey() || 'x');
   const esc = (x) => String(x == null ? '' : x).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
   let state = { data: null, all: null, book: ls('ms-ct-book') || '', days: 30, account: ls('ms-ct-acc-' + (userKey() || 'x')) || '', timer: 0, busy: false };
@@ -10329,7 +10306,7 @@ html[data-role="public"] .hdr-sw { display: none; }
     go.addEventListener('click', async () => {
       go.disabled = true; $('ms-ct-msg').className = 'ct-msg'; $('ms-ct-msg').textContent = 'Opening cTrader…';
       try {
-        if (!ls(sessKey())) { const s = await call({ action: 'session', user: ls('ms-user') || '', pw: pw ? pw.value : '' }); ls(sessKey(), s.session); }
+        if (!ls(sessKey())) { const s = await call({ action: 'session', user: userKey() && userKey() !== 'owner' ? userKey() : '', pw: pw ? pw.value : '' }); ls(sessKey(), s.session); }
         const st = await call({ action: 'start', session: ls(sessKey()) }); location.href = st.url;
       } catch (e) { go.disabled = false; $('ms-ct-msg').textContent = e.status === 401 ? 'Please enter your password again.' : e.message; if (e.status === 401) linkForm('Please enter your password again.'); }
     });
@@ -10414,7 +10391,7 @@ html[data-role="public"] .hdr-sw { display: none; }
   const MCP_API = API ? location.origin + '/api/mcp' : null;
   function mcpCard() {
     const c = $('ms-pf-mcp'); if (!c) return;
-    const me = ls('ms-user'); if (!me || !document.documentElement.dataset.mcp || !MCP_API) { c.hidden = true; return; }
+    const me = userKey() !== 'owner' ? userKey() : null; if (!me || !document.documentElement.dataset.mcp || !MCP_API) { c.hidden = true; return; }
     c.hidden = false; const b = $('ms-pf-mcp-b'); if (b.dataset.ready) return; b.dataset.ready = '1';
     const steps = `<ol><li>In ChatGPT: Settings → Connectors → Advanced → Developer mode on → Create.</li><li>Paste the URL above as the MCP server URL; Authentication: <b>None</b>.</li><li>Enable it in a chat and ask, for example, "show me the A-setup losses on NQ this month" or "read ict/tracker.mjs and propose a change".</li></ol><p class="ms-note" style="margin:10px 0 0">The URL is your key: keep it to yourself. Changes you propose become a draft pull request for the owner; nothing changes live until the owner merges. Paper trading only.</p>`;
     b.innerHTML = `<label>Your Aurum Desk password (to show your connector URL)<input type="password" id="ms-mcp-pw" autocomplete="current-password"></label><div style="margin-top:10px"><button type="button" class="ct-btn" id="ms-mcp-go">Show my connector URL</button></div><div class="ct-msg" id="ms-mcp-msg" role="status"></div>`;

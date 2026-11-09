@@ -46,21 +46,21 @@ call) — don't "fix" it to always vote a direction.
 ## Public / admin split (6 Nov 2026, owner request)
 
 `market-structure.html` has two modes: **public** (default) shows only trades (market, side, entry, stop, target, result)
-and the chart markups; **admin** (footer "Admin login", SHA-256 of the password compared with `MS_ADMIN_HASH` in the head
-script, token kept in localStorage `ms-admin`) shows everything (Setup, Scanner, system cards, shadow trades, scorecards,
+and the chart markups; **admin** (signed in through `/api/login`, see "Server-side sign-in" below) shows everything (Setup, Scanner, system cards, shadow trades, scorecards,
 reviews, notes). Anything that describes a rule, a system name, a note or a reason must sit inside an element with class
 `adm`, or be guarded by `PUB` in the JS templates; `pubonly` is the public-only counterpart. Keep it that way in redesigns.
-To change the password: compute `sha256` of the new one (e.g. `printf %s 'new' | sha256sum`) and replace both copies of the hash.
+To change the owner password: compute `sha256` of the new one (e.g. `printf %s 'new' | sha256sum`) and replace `OWNER_HASH` in
+`api/_accounts.js` (the only copy; the page holds no hash).
 
 ### Accounts and sign-in (6 Nov 2026)
 
 The page opens on a centred sign-in card (`#ms-gate`, shown while `html[data-gate]`) unless the visitor is signed in or
-chose **Continue as guest** (localStorage `ms-guest`, public view). Sign-in is password only (6 Nov): the password picks the account (owner = `MS_ADMIN_HASH`, others matched against
-`MS_USERS` hashes), so every password must be unique.
-Reviewers live in `window.MS_USERS` (head script: `{ <username>: { name, hash: sha256(password), role: 'reviewer' } }`;
-currently **Fred**); a reviewer session stores `ms-admin` = their hash and `ms-user` = the user name, gets the admin view
+chose **Continue as guest** (localStorage `ms-guest`, public view). Sign-in is password only (6 Nov): the password picks the account
+(checked on the server by `/api/login` since 9 Nov), so every password must be unique.
+Built-in members live in `api/_accounts.js` `BUILT_IN` (server only: `{ <key>: { name, hash: sha256(password), role, ict?, ct?, mcp? } }`);
+a reviewer session gets the admin view
 read-only (`html[data-role="reviewer"] .own` hides the owner's journal, log-trade button, CSV loader and Telegram
-settings) and can write loss reviews, which carry `by: <name>`. The footer is hidden; log in / log out live in the account menu (`#ms-me`), which clicks the hidden `#ms-admin-link`. To add a reviewer, add an entry with the SHA-256 of their password.
+settings) and can write loss reviews, which carry `by: <name>`. The footer is hidden; log in / log out live in the account menu (`#ms-me`), which clicks the hidden `#ms-admin-link` (log out = `msSignOut()`). Add members on the Users page (or a `BUILT_IN` entry with the SHA-256 of their password).
 Viewers (`role: 'viewer'`, currently **Orlando**, **Luxus** and **Carlos**; `VIEWER` in the main script) are read-only with a reduced site: Home
 (Today strip, open positions, setup now), Setup, and the Council overview (active trades + P&L calendar); no charts,
 scanner, journal, other council panes, loss-review panel, alerts, settings, or photo/name changes.
@@ -117,11 +117,11 @@ Scanner for admin) becomes a fixed left sidebar at ≥1180 px, where the header'
 
 ## Users page (6 Nov 2026)
 
-Owner-only view `#users` (sidebar "Users"): lists the built-in accounts (`MS_USERS` in the head script) and the ones
-added or changed on the page, which live in `council-data/users.json` (`{ users: { key: { name, hash, role, disabled? } } }`,
-written with the owner's GitHub token, `msGhTok`). users.json overrides built-ins (`msMergeUsers`); `disabled: true`
-removes one. Sign-in fetches the list; a signed-in non-owner is re-checked after load and signed out if removed or if the
-password changed (`ms-user-rec` keeps an added user's record between visits). Passwords must stay unique per account.
+Owner-only view `#users` (sidebar "Users"): lists the built-in accounts (server side, `api/_accounts.js`; their public records
+come from `/api/users`) and the ones added or changed on the page, which live in the private Blob list (see Vercel below; since
+9 Nov saved with the owner's session, hashes never in the browser). The stored list overrides built-ins (`msMergeUsers`);
+`disabled: true` removes one. A signed-in account is re-checked by `/api/me` after load and signed out if removed or if the
+password changed. Passwords must stay unique per account (the server refuses a duplicate).
 
 ## Gold playbook check (6 Nov 2026, owner's skills)
 
@@ -281,6 +281,7 @@ production https://meridianx.dev. Protection: previews only (production public).
 assets and icons to out/; council/ and ict/ ship inside the api/run.js bundle and are never served. Owner wants the repo PRIVATE:
 - api/data.js serves council-data files at /cdata/* with GH_TOKEN/GH_READ_TOKEN (falls back to the public raw file while none is set);
   the site uses /cdata on Vercel (window.MS_CDATA) and raw.githubusercontent elsewhere; MT5/cTrader bridges default to /cdata/mt5/signals.csv.
+  Since 9 Nov only the guest allowlist is public; everything else needs a session (see "Server-side sign-in").
 - api/run.js runs one council round (cron every 4 min, ~75 s) or ICT round (:04/:19/:34/:49, ~35 s): downloads only the files the job
   reads, runs the unchanged script in /tmp, commits the changed files to council-data via the Git Data API. RUN_MODE=live commits and
   sends alerts; otherwise dry run (no commit, alerts off). Cut-over: set GH_TOKEN (Contents read/write) and the trader's NTFY/Telegram/FUT
@@ -309,7 +310,7 @@ loops then have to run off GitHub Actions or on paid minutes), then broker-order
   (rows / first / last / status per key; a market the proxy or OANDA rejects is `status: "error"`, the rest is saved). Studies read
   `/cdata/research/daily/<key>.json` instead of calling OANDA; a re-run refetches only the last week and merges by time.
 - **Price alerts (Web Push)**: dialog `#ms-pa` (chart bell, Settings → Price alerts, Ctrl K). Device list in localStorage `ms-pa` + Blob `push/<device>/…` via `api/push.js` (with the push subscription). `api/alert-cron.js` runs every minute: OANDA S5 candles since each alert was set, web-push (VAPID_PUBLIC_KEY / VAPID_PRIVATE_KEY env), removes fired alerts and dead subscriptions. `sw.js` shows the notification (it no longer caches data/API calls). `app.webmanifest` makes the dashboard installable (needed for iPhone push).
-- **Users: Vercel Blob** (private store `meridian-users`, store_9ViGtEotT2PeSlXc, env `BLOB_READ_WRITE_TOKEN`): `api/users.js` GET returns the list (falls back to council-data users.json if the store is empty); POST saves the whole list when `ownerPw` hashes to the owner hash. Each save is a new `users/<time>-<rand>.json`, older ones deleted. The page asks the owner password once per tab (sessionStorage). GitHub Pages / local copies still use the GitHub token path. `package.json` holds only `@vercel/blob`.
+- **Users: Vercel Blob** (private store `meridian-users`, store_9ViGtEotT2PeSlXc, env `BLOB_READ_WRITE_TOKEN`): `api/users.js` GET (owner session: every member + the built-ins' public records; a member: their own record; guests 401; never a hash; falls back to council-data users.json read on the server if the store is empty); POST saves the whole list for the owner's session (or `ownerPw`): records go up without hashes and keep the stored / built-in one, `pw` sets a new password (hashed on the server, refused if another account or the owner uses it). Each save is a new `users/<time>-<rand>.json`, older ones deleted. Account changes need the Vercel site (no GitHub-token path any more). `package.json` holds only `@vercel/blob`.
 - **`/api/status`**: notice + age of each bot's last round; the dashboard shows "Council bot behind" / "ICT tracker behind" to signed-in users (council > 20 min; ICT > 45 min outside the weekend).
 - **Web Analytics** (custom events: View {view}, Sign in {result}, Guest, Trade review) and **Speed Insights**, loaded from /_vercel/* only on the Vercel site. Fluid compute, skew protection (12 h) and preview-only deployment protection are on.
 
@@ -601,14 +602,14 @@ the app is 1760 px wide (2000 px from 1800 px), tighter gaps and paddings, the h
 ## Profile page and guest view (8 Nov 2026)
 `#profile` (v-profile, in VIEWS and the viewer allow-list) holds the identity card (copied from the account menu) and the council's
 demo accounts rendered by the cTrader module in page mode (`MODE = 'page'` → `#ms-pf-b`; the dialog stays for the cTrader link
-return). The account menu's first item is "Profile and demo accounts"; the old "My cTrader account" item is hidden. The saved user
-record (`ms-user-rec`) carries `ct` so the right survives the reload that stores it. Light theme defines `--panel-hover`,
+return). The account menu's first item is "Profile and demo accounts"; the old "My cTrader account" item is hidden. The cached account
+info (`ms-acct`, from `/api/login` / `/api/me`) carries `ct`. Light theme defines `--panel-hover`,
 `--line-strong`, `--accent-soft`, `--buy-soft`, `--sell-soft` (hovers used to fall back to the dark values). Guest view: the trade in
 words (`#g-setup`), named price lines, a chart that follows the page theme with coloured candles, the header pinned to XAU/USD, and an
 invitation (`.g-join`) whose Sign in opens the gate.
 
 ## Accounts, desks, header switch, gate (8 Nov 2026)
-Users (market-structure.html `MS_USERS`): Fred reviewer + ICT (reviews), Orlando reviewer (sees everything) + ICT read-only, Carlos
+Users (built-ins in `api/_accounts.js`): Fred reviewer + ICT (reviews), Orlando reviewer (sees everything) + ICT read-only, Carlos
 viewer; `ct: true` (all three) shows the council's demo accounts on "My cTrader account" with edge labels only, never account numbers
 (`html[data-ct]`, "owner" for the owner who also sees the logins). ICT, Gold and Crypto share one sidebar / header entry "Desks"
 (`[data-desks]`, opens the desk used last, localStorage `ms-desk`) and each desk carries the `.desk-sw` switch. The header's
@@ -655,7 +656,7 @@ only: `scrub` drops every id / login / account key and 7+ digit numbers), `ict_f
 `okPath`: ict/*.mjs, .claude/skills/ICT/*.md, tests/ict-*.test.mjs, tests/fixtures/ict/*, research/ict/*,
 research/edge/ict-*/*), `ict_note` (append to council-data `ict/mcp-notes.json`, shown in `ict_status`), `ict_propose_change`
 (branch `mcp/<name>/…` + DRAFT PR to main; the owner merges; nothing reaches the tracker before that), and `search` /
-`fetch` for ChatGPT deep research. Fred's key needs no env: `derivedKey` = HMAC(CTRADER_LINK_KEY or CRON_SECRET, "mcp:fred"), 32 chars; `MCP_KEYS` is optional (more people, or an override). Profile card (Fred only, `PROFILE_USERS`): POST `/api/mcp` `{action:"mykey", user, pw}` checks the password with ctrader-link's `identify` and returns his connector URL; the page shows `#ms-pf-mcp` only when `ms-user` is fred. Never: council files, api/, workflows, users, tokens, cTrader orders. Tests
+`fetch` for ChatGPT deep research. Fred's key needs no env: `derivedKey` = HMAC(CTRADER_LINK_KEY or CRON_SECRET, "mcp:fred"), 32 chars; `MCP_KEYS` is optional (more people, or an override). Profile card (Fred only, `PROFILE_USERS`): POST `/api/mcp` `{action:"mykey", user, pw}` checks the password with ctrader-link's `identify` and returns his connector URL; the page shows `#ms-pf-mcp` only for a signed-in member (`MS_ACCT.u`) with the mcp permission. Never: council files, api/, workflows, users, tokens, cTrader orders. Tests
 `tests/mcp.test.mjs`. Rule: a helper's PR is reviewed like any rule change (tests, 2020-now evidence) before merging.
 
 ## Per-member permissions (8 Nov 2026, owner: "select on members what they can and can't do or see")
@@ -667,13 +668,13 @@ and its `perms` override key by key (`msPerms(R, owner)`; the owner has everythi
 charts / scanner / journal / desks / council were converted); the router sends a denied view home (`VIEW_PERM`, `msDenied`).
 Users page: a "Permissions…" button per member opens `permDialog` (checkboxes + ICT radio, "Back to role defaults"); saved on the
 record as `perms` plus ict / ct / mcp for the older checks. `api/users.js` `cleanPerms` whitelists keys and values (a bad perms
-object rejects the save). Login records (`ms-user-rec`) carry perms; the post-load check reloads when they changed. MCP: derived
+object rejects the save). `/api/login` and `/api/me` return the account's perms (cached in localStorage `ms-acct`); the post-load `/api/me` check reloads when they changed. MCP: derived
 keys are `<name>.<HMAC>` for any member; `granted(name)` is checked on every call (record's mcp / perms.mcp; perms.mcp false
 revokes; an MCP_KEYS entry is a grant; Fred built in). Tests: `tests/users-perms.test.mjs`, `tests/mcp.test.mjs`.
 
 ## Backtest lab (8 Nov 2026, owner: "build a manual backtesting like TradeZella … and he can simulate prop-firm challenges")
 `backtest.html` ("ChronosTrade", owner's name, 8 Nov: third segment of the header switch Desk | Macro | ChronosTrade on all three pages, `.hdr-ct`, green when lit) at `/backtest` (vercel rewrite; build copies it; sidebar entry `.bt-nav` for signed-in members; the page itself
-needs `ms-admin` in localStorage). Engine `assets/backtest-engine.js` (`window.BT`, also `module.exports` for tests): accounts,
+asks `/api/me` for a signed-in session since 9 Nov). Engine `assets/backtest-engine.js` (`window.BT`, also `module.exports` for tests): accounts,
 `place` (market / limit / stop; a stop is required; sides checked), `onBar` (fills when touched or gapped through, stop / target
 with the worst case when both sit in one bar, gap exits at the open, MFE / MAE in R), `stats` (win rate, PF, expectancy, max DD,
 streaks, by weekday / hour / tag / side / exit, equity curve), `byDay`, and the prop-firm model: `FIRMS` presets (FTMO 2-step,
@@ -744,10 +745,47 @@ prop challenge), shown once (`btLab:guide`), Skip / Esc close it, reopened from 
 ## Profile photo and name on the server (8 Nov 2026, owner: "the profile photo gets back to default")
 They lived only in localStorage (`ms-photo-<name>`, `ms-name-<name>`), which Safari and the home-screen app keep separately, other
 devices never see, and Safari wipes after about a week without a visit. `api/profile.js` stores them per account in the private
-Blob store (`profiles/<key>.json`): GET `?u=<key|owner>` with header `X-MS-Auth: <ms-admin hash>`, POST `{u, h, photo?, name?}`;
-the hash is checked against the sign-in list (built-ins + Blob list, removed users refused, owner hash for the owner; fails closed);
-photo must be a JPEG / PNG data URL under 160 KB. The account area (`pullProfile` on load, `pushProfile` on change / remove /
+Blob store (`profiles/<key>.json`): GET `/api/profile`, POST `{photo?, name?}`; the account comes from the session cookie (9 Nov;
+it used to trust a hash sent by the page), re-checked against the user list (removed users refused; fails closed); each account
+reads and writes only its own record; photo must be a JPEG / PNG data URL under 160 KB. The account area (`pullProfile` on load, `pushProfile` on change / remove /
 rename) keeps localStorage as the cache and uploads a browser-only photo once. Tests: `tests/profile.test.mjs`.
+
+## Server-side sign-in (9 Nov 2026, security fix, owner: "Fix it properly")
+The audit found password hashes readable by anyone (GET /api/users, `window.MS_USERS`, `MS_ADMIN_HASH`) while the page used a hash
+as the session (localStorage `ms-admin`), so a pasted hash acted as that account and `/api/profile` took `{u, h}`; owner-only views
+were CSS-hidden and /cdata served every file. Now:
+- `api/_accounts.js`: `OWNER_HASH`, built-in members `BUILT_IN` (moved from the page), `userList` (built-ins overridden by the Blob
+  list, disabled removed, "owner" reserved; throws 503 when the list cannot be read = fail closed), `blobUsers` (first-run fallback
+  reads council-data users.json on the server, never through /cdata), `publicRecord` / `stripHashes`.
+- `api/_session.js`: token = base64url JSON `{v:1, u, n, r, f, pv, iat, exp}` + HMAC-SHA256; `f` = keyed fingerprint of the
+  password hash (a password change or a re-used key ends old sessions), 30-day expiry. Key: env `SESSION_SECRET` if set (16+ chars),
+  else HMAC(`CTRADER_LINK_KEY` or `CRON_SECRET`, "meridian-x/session/v1"); none set -> sign-in 503. Cookie `ms_session`: HttpOnly,
+  Secure, SameSite=Lax, Path=/. State-changing calls also refuse a foreign `Origin`.
+- `POST /api/login {password}`: constant-time compare against the owner and every member (no early exit); every failure is the same
+  401 "Password not accepted"; 503 when the list is unreadable. Returns `{account: {u, name, role, ict?, ct?, mcp?, perms?}}` + cookie.
+  `POST /api/logout` clears it. `GET /api/me` re-checks the list on every call (current role / perms; removed or new password ->
+  `{account: null}` and the cookie cleared; renews a session older than a day; 503 when unreadable).
+- Session checks: `/api/profile`, `/api/users` (above), `/cdata` (`api/data.js`, user list cached a minute per instance), and the
+  owner's session also opens `/api/bridge` downloads and the `/api/tv-webhook` URL/log (the owner password still works there).
+  ctrader-link, mcp `mykey`, users `ownerPw` keep taking the real password.
+- `/cdata` guest allowlist `GUEST_OK` (api/data.js, public edge cache + CORS): trades.json, snapshot.json, ict/replay.json,
+  research/replay-2w.json, research.json (guest view, sign-in card proof, guest results/calendar) and mt5/signals.csv (the EAs).
+  Everything else: 401 without a session, `Cache-Control: private, no-store`, no CORS. Never served: ctrader/tokens.json, users.json.
+  `loadCouncil` fetches only the guest files for `PUB` (same list). `api/status.js` / `api/pine.js` read council-data with
+  `readFile` instead of fetching /cdata.
+- Page: head script reads localStorage `ms-acct` (non-secret account info) to draw owner / member / guest at once (`data-mode`,
+  `data-role`, `data-deny`, `msPerms` unchanged); after load `/api/me` confirms it and the page reloads only when the answer differs.
+  Old `ms-admin` / `ms-user` / `ms-user-rec` are ignored and cleared: everyone signs in once again. The gate posts the password to
+  `/api/login`; `msSignOut()` calls `/api/logout`. `MS_ACCT.u` replaces `ms-user` (cTrader link, MCP card). The Users page gets the
+  built-ins' public records from `/api/users` (`window.MS_USERS`, empty otherwise).
+- `backtest.html` (ChronosTrade) and `macro-desk.html` ask `/api/me`; signed out they show "Sign in on the desk first".
+- GitHub Pages / local copies (`github.io` or file:): no API, so no sign-in (the gate says so); the guest view reads the public raw
+  council-data as before (`MS_CDATA` unchanged), and the macro desk there skips the check. Once the repo is private those copies
+  show nothing; meridianx.dev is the site.
+- Tests: `tests/auth.test.mjs` (login, same error, disabled, fail closed, tamper / expiry, /api/me refresh, users without hashes,
+  cdata allowlist), `tests/profile.test.mjs`, `tests/security-review.test.js`. The ChronosTrade audit stubs `/api/me`.
+- The old hashes were public for days: the members' and the owner's passwords should be changed (Users page "New password";
+  the owner's in `api/_accounts.js`).
 
 ## Styled dialogs (8 Nov 2026, owner: native prompt boxes "very ugly")
 `assets/ms-dialog.js` replaces the browser's prompt / confirm / alert on market-structure and ChronosTrade with a `<dialog class="msd">`
