@@ -2690,14 +2690,15 @@
    "startBalance": 9987.78
   },
   "startedAt": "2026-11-08T11:42:25.000Z",
-  "status": "ok · demo Fusion Markets · balance 9969.55 · 27 open · 1 resting",
+  "status": "ok · demo Fusion Markets · balance 9969.55 · 27 open · 2 resting",
   "skipped": {
    "audusd-position-1793601653": "price 0.68666 has run 1.27R from the council entry 0.70162: a different trade now",
    "xrp-rswing-1793942619": "none of XRPUSD found at the broker",
    "gbpusd-intraday-1793805393": "price 1.33526 has run 3.46R from the council entry 1.3469: a different trade now",
    "eurusd-intraday-1793890935": "price 1.11407 has run 1.32R from the council entry 1.12124: a different trade now",
    "gbpusd-scalp-1793916690": "price 1.33526 has run 2.33R from the council entry 1.34482: a different trade now",
-   "xrp-scalp-1794237676": "none of XRPUSD found at the broker"
+   "xrp-scalp-1794237676": "none of XRPUSD found at the broker",
+   "xrp-intraday-1794242893": "none of XRPUSD found at the broker"
   },
   "wait": {},
   "paused": {},
@@ -2723,23 +2724,34 @@
     "alerted": [
      "pending"
     ]
+   },
+   "xau-rscalp-1794242893": {
+    "orderId": "33817909",
+    "symbol": "XAUUSD",
+    "side": "sell",
+    "volume": 100,
+    "lots": 0.01,
+    "digits": 2,
+    "setup": "rscalp",
+    "limitPrice": 4113.17,
+    "stop": 4131.29,
+    "t1": 4094.2650000000003,
+    "placedAt": "2026-11-09T16:49:16.000Z",
+    "expires": "2026-11-09T19:48:13.000Z",
+    "riskCash": 18.12,
+    "margin": 8.23,
+    "minLot": true,
+    "shadow": true,
+    "alerted": [
+     "pending"
+    ]
    }
   },
   "catchUpAt": "2026-11-08T12:04:40.000Z",
   "balance": 9969.55,
-  "lastRun": "2026-11-09T16:46:51.000Z"
+  "lastRun": "2026-11-09T16:49:16.000Z"
  },
  "log": [
-  {
-   "at": "2026-11-08T22:03:09.000Z",
-   "msg": "opened buy GBPUSD 0.01 lot (council scalp)",
-   "trade": "gbpusd-scalp-1793626672"
-  },
-  {
-   "at": "2026-11-08T22:03:09.000Z",
-   "msg": "set the missing stop on GBPUSD 47373485 at 1.3289 (the broker had opened it without one)",
-   "trade": "gbpusd-scalp-1793626672"
-  },
   {
    "at": "2026-11-08T22:03:09.000Z",
    "msg": "opened sell USDCAD 0.01 lot (council scalp)",
@@ -4229,6 +4241,16 @@
    "at": "2026-11-09T16:35:02.000Z",
    "msg": "limit filled: BTCUSD position 47718263 at the broker",
    "trade": "btc-scalp-1794241540"
+  },
+  {
+   "at": "2026-11-09T16:49:16.000Z",
+   "msg": "placed sell limit XAUUSD 0.01 lot at 4113.17 (council rscalp, valid to 2026-11-09T19:48Z)",
+   "trade": "xau-rscalp-1794242893"
+  },
+  {
+   "at": "2026-11-09T16:49:16.000Z",
+   "msg": "not mirrored xrp-intraday-1794242893: none of XRPUSD found at the broker",
+   "trade": "xrp-intraday-1794242893"
   }
  ],
  "limits": {
