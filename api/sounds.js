@@ -25,7 +25,9 @@ async function handle(req, res, d = {}) {
     if (req.method !== 'POST') return res.status(405).json({ error: 'GET or POST' });
     if (!S.sameOrigin(req)) return res.status(403).json({ error: 'not allowed' });
     let b; try { b = typeof req.body === 'string' ? JSON.parse(req.body || '{}') : req.body; } catch (e) { b = null; } if (!b || typeof b !== 'object') b = {};
-    if (!owner(b.ownerPw)) return res.status(403).json({ error: 'Owner password not accepted' });
+    // the owner's session (same-origin, checked above) or the owner password
+    const viaSession = await (d.isOwnerSession || ((r) => require('./_session.js').isOwnerSession(r, env)))(req).catch(() => false);
+    if (!viaSession && !owner(b.ownerPw)) return res.status(403).json({ error: 'Owner password not accepted' });
     if (b.kind !== 'sl' && b.kind !== 'tp') return res.status(400).json({ error: 'kind must be sl or tp' });
     let v = null;
     if (b.data != null) {

@@ -3460,7 +3460,7 @@ html[data-motion="off"] #v-ict .ict-cal-d:hover { transform: none !important; }
           <div class="pf-snd-r" data-kind="tp"><b>Target hit</b><span class="pf-snd-n" id="ms-snd-tp">Chime (built in)</span><button type="button" class="ms-tbtn" data-act="play">Play</button><button type="button" class="ms-tbtn" data-act="pick">Choose a sound…</button><button type="button" class="ms-tbtn" data-act="reset">Built-in</button></div>
           <div class="pf-snd-r" data-kind="sl"><b>Stop-out</b><span class="pf-snd-n" id="ms-snd-sl">Faaaah (built in)</span><button type="button" class="ms-tbtn" data-act="play">Play</button><button type="button" class="ms-tbtn" data-act="pick">Choose a sound…</button><button type="button" class="ms-tbtn" data-act="reset">Built-in</button></div>
           <input type="file" id="ms-snd-file" accept="audio/*" hidden>
-          <p class="ms-note">mp3, m4a, wav or ogg, under 700 KB (a few seconds). Saving asks for the owner password.</p>
+          <p class="ms-note">mp3, m4a, wav or ogg, under 700 KB (a few seconds). Saved with your owner session.</p>
         </div>
       </section>
       <section class="card pf-ct pf-mcp" id="ms-pf-mcp" aria-labelledby="ms-pf-mcp-t" hidden>
@@ -4800,10 +4800,10 @@ function msNextSetup(bars, A) {
     const TPL = '{"ticker":"{{ticker}}","price":{{close}},"side":"buy","msg":"{{strategy.order.comment}} {{interval}}"}';
     const load = async () => {
       const m = dlg.querySelector('#tvw-msg'), ul = dlg.querySelector('#tvw-list'), u = dlg.querySelector('#tvw-url');
-      let pw = ''; try { pw = sessionStorage.getItem('ms-own-pw') || ''; } catch (e) {}
+      let pw = ''; try { pw = window.__tvwPw || ''; } catch (e) {}
       m.textContent = 'Loading…';
       try { const r = await fetch('/api/tv-webhook', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ ownerPw: pw, list: true }) }); const j = await r.json();
-        if (r.status === 403) { try { sessionStorage.removeItem('ms-own-pw'); } catch (e) {} dlg.querySelector('#tvw-pw').hidden = false; u.textContent = 'Owner password not accepted.'; m.textContent = ''; return; }
+        if (r.status === 403) { window.__tvwPw = ''; dlg.querySelector('#tvw-pw').hidden = false; u.textContent = 'Owner password not accepted.'; m.textContent = ''; return; }
         if (!r.ok) throw new Error(j.error || r.status);
         dlg.querySelector('#tvw-pw').hidden = true; u.textContent = j.url; dlg.querySelector('#tvw-cpu').disabled = false; m.textContent = '';
         ul.innerHTML = (j.alerts || []).length ? j.alerts.map((a) => `<li><span class="pa-arr ${/sell|short/i.test(a.side || '') ? 'below' : 'above'}">${/sell|short/i.test(a.side || '') ? '↓' : /buy|long/i.test(a.side || '') ? '↑' : '•'}</span><span class="pa-w"><b>${esc(a.ticker || 'Alert')}${a.price != null ? ` · ${esc(a.price)}` : ''}${a.side ? ` · ${esc(String(a.side).toUpperCase())}` : ''}</b><small>${esc(new Date(a.at).toLocaleString(undefined, { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' }))} · ${esc(String(a.text || '').slice(0, 140))}</small></span></li>`).join('') : '<li class="pa-empty">No TradingView alerts received yet.</li>';
@@ -4822,7 +4822,7 @@ function msNextSetup(bars, A) {
           <p id="tvw-msg" class="pa-msg" role="status"></p><h3 class="br-h3">Recent alerts</h3><ul class="pa-list" id="tvw-list"></ul>`;
         document.body.appendChild(dlg);
         dlg.querySelector('.pa-x').onclick = () => dlg.close(); dlg.addEventListener('click', (e) => { if (e.target === dlg) dlg.close(); });
-        dlg.querySelector('#tvw-pw').onsubmit = async (e) => { e.preventDefault(); const v = dlg.querySelector('#tvw-pwi').value; try { sessionStorage.setItem('ms-own-pw', v); } catch (err) {} load(); };
+        dlg.querySelector('#tvw-pw').onsubmit = async (e) => { e.preventDefault(); const v = dlg.querySelector('#tvw-pwi').value; window.__tvwPw = v; load(); };
         const cp = async (t, b) => { try { await navigator.clipboard.writeText(t); b.textContent = 'Copied ✓'; setTimeout(() => { b.textContent = 'Copy'; }, 1400); } catch (e) { msCopy(t); } };
         dlg.querySelector('#tvw-cpu').onclick = (e) => cp(dlg.querySelector('#tvw-url').textContent, e.target);
         dlg.querySelector('#tvw-cpt').onclick = (e) => cp(TPL, e.target);
@@ -4853,12 +4853,12 @@ function msNextSetup(bars, A) {
       li.innerHTML = live.length ? live.map((r) => `<li><span class="pa-arr ${r.side === 'buy' ? 'above' : 'below'}">${r.side === 'buy' ? '↑' : '↓'}</span><span class="pa-w"><b>${(INSTRUMENTS[r.market] || {}).label || r.market.toUpperCase()} ${r.side.toUpperCase()} ${r.entryMode === 'limit' ? 'LIMIT' : 'MARKET'} ${r.entry}</b><small>${r.status} · stop ${r.stop}${r.t1 ? ` · target ${r.t1}` : ''} · ${r.k}${r.addOf ? ' · add' : ''}</small></span></li>`).join('') : '<li class="pa-empty">No open or pending council trades for the bridge right now.</li>';
     };
     const getFile = async (f) => {
-      let pw = ''; try { pw = sessionStorage.getItem('ms-own-pw') || ''; } catch (e) {}
+      let pw = ''; try { pw = window.__tvwPw || ''; } catch (e) {}
       const ask = async () => { const r = await fetch('/api/bridge', { method: 'POST', headers: { 'Content-Type': 'application/json' }, credentials: 'same-origin', body: JSON.stringify({ ownerPw: pw, file: f }) }); return r; };
       let r = await ask();   // the owner's session is enough (9 Nov); the password only when the server asks for it
       if (r.status === 403) { pw = (await msAsk('Owner password', '', { title: 'Download the bridge code', type: 'password', ok: 'Continue' })) || ''; if (!pw) return; r = await ask(); }
       if (!r.ok) { alert(r.status === 403 ? 'Owner password not accepted.' : `Download failed (${r.status}).`); return; }
-      try { sessionStorage.setItem('ms-own-pw', pw); } catch (e) {}
+      window.__tvwPw = pw;
       const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([await r.text()], { type: 'text/plain' })); a.download = f === 'mt5' ? 'CouncilBridge.mq5' : 'CouncilBridge.cs'; document.body.appendChild(a); a.click(); a.remove();
     };
     const open = () => {
@@ -12853,8 +12853,10 @@ html[data-theme="dark"] #v-home::before, html:not([data-theme="light"]) #v-home:
   function chime() { try { var a = new (window.AudioContext || window.webkitAudioContext)(), t = a.currentTime; [523.25, 659.25, 783.99, 1046.5].forEach(function (f, i) { var o = a.createOscillator(), g = a.createGain(); o.type = 'triangle'; o.frequency.value = f; g.gain.setValueAtTime(0.0001, t + i * 0.09); g.gain.exponentialRampToValueAtTime(0.25, t + i * 0.09 + 0.02); g.gain.exponentialRampToValueAtTime(0.0001, t + i * 0.09 + 0.7); o.connect(g).connect(a.destination); o.start(t + i * 0.09); o.stop(t + i * 0.09 + 0.75); }); } catch (e) {} }
   function play(k) { var u = cur[k] ? cur[k].data : DEF[k].url; if (u) { try { new Audio(u).play(); } catch (e) {} } else chime(); }
   async function save(k, data, name) {
-    var pw = await window.msAsk('Owner password', '', { title: 'Save the ' + (k === 'sl' ? 'stop-out' : 'target') + ' sound', type: 'password', ok: 'Save' }); if (!pw) return;
-    try { var r = await fetch(API, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ ownerPw: pw, kind: k, data: data, name: name }) }), j = await r.json().catch(function () { return {}; });
+    var send = function (pw) { return fetch(API, { method: 'POST', credentials: 'same-origin', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ ownerPw: pw || undefined, kind: k, data: data, name: name }) }); };
+    try { var r = await send(null);   // the owner's session is enough; the password only if the session is refused
+      if (r.status === 403) { var pw = await window.msAsk('Owner password', '', { title: 'Save the ' + (k === 'sl' ? 'stop-out' : 'target') + ' sound', type: 'password', ok: 'Save' }); if (!pw) return; r = await send(pw); }
+      var j = await r.json().catch(function () { return {}; });
       if (!r.ok) return window.msAlert(j.error || 'Could not save the sound.', { title: 'Not saved' });
       load(); if (window.msToast) msToast('Sound saved'); } catch (e) { window.msAlert('Could not reach the server.', { title: 'Not saved' }); }
   }
@@ -12887,7 +12889,7 @@ html[data-theme="dark"] #v-home::before, html:not([data-theme="light"]) #v-home:
     var all = pop.querySelector('[data-all]'); if (all) all.addEventListener('click', function () { markAll(); openPop(); }); }
   bell.addEventListener('click', function (e) { e.stopPropagation(); if (pop) closePop(); else openPop(); });
   document.addEventListener('click', function (e) { if (pop && !pop.contains(e.target)) closePop(); });
-  document.addEventListener('keydown', function (e) { if (e.key === 'Escape') { closePop(); var c = document.querySelector('.nt-in'); if (c) c.querySelector('[data-ok]').click(); } });
+  document.addEventListener('keydown', function (e) { if (e.key !== 'Escape') return; if (pop) { closePop(); return; } if (document.querySelector('dialog[open]')) return; var c = document.querySelector('.nt-in'); if (c) c.querySelector('[data-ok]').click(); });
   // new ones slide onto the screen, oldest first, one card at a time
   function slideIn() { var u = unread().slice().reverse(); if (!u.length || document.querySelector('.nt-in') || document.documentElement.dataset.gate) return; var x = u[0], c = document.createElement('div');
     c.className = 'nt-in'; c.setAttribute('role', 'alertdialog'); c.setAttribute('aria-live', 'assertive');
