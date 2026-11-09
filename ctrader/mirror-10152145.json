@@ -1134,6 +1134,32 @@
     "positionId": "47491691",
     "volume": 200000,
     "status": "open"
+   },
+   "usdcad-scalp-1794204019": {
+    "symbol": "USDCAD",
+    "side": "buy",
+    "setup": "scalp",
+    "openedAt": "2026-11-09T06:04:08.000Z",
+    "councilEntry": 1.41046,
+    "stop": 1.4098600000000001,
+    "t1": 1.41376,
+    "adopted": false,
+    "alerted": [
+     "open"
+    ],
+    "viaLimit": true,
+    "limitPrice": 1.41046,
+    "digits": 5,
+    "lots": 0.04,
+    "riskCash": 2,
+    "margin": 8,
+    "shadow": true,
+    "fillPrice": 1.41038,
+    "slipR": -0.133,
+    "lagSec": 229,
+    "positionId": "47507890",
+    "volume": 400000,
+    "status": "open"
    }
   },
   "day": {
@@ -1141,7 +1167,7 @@
    "startBalance": 9987.78
   },
   "startedAt": "2026-11-08T11:42:25.000Z",
-  "status": "ok · demo Fusion Markets · balance 10003.8 · 21 open · 2 resting",
+  "status": "ok · demo Fusion Markets · balance 10003.8 · 22 open · 1 resting",
   "skipped": {
    "audusd-position-1793601653": "price 0.68666 has run 1.27R from the council entry 0.70162: a different trade now",
    "xrp-rswing-1793942619": "none of XRPUSD found at the broker",
@@ -1175,38 +1201,13 @@
     "alerted": [
      "pending"
     ]
-   },
-   "usdcad-scalp-1794204019": {
-    "orderId": "33783665",
-    "symbol": "USDCAD",
-    "side": "buy",
-    "volume": 400000,
-    "lots": 0.04,
-    "digits": 5,
-    "setup": "scalp",
-    "limitPrice": 1.41046,
-    "stop": 1.4098600000000001,
-    "t1": 1.41376,
-    "placedAt": "2026-11-09T06:01:42.000Z",
-    "expires": "2026-11-09T09:00:19.000Z",
-    "riskCash": 2,
-    "margin": 8,
-    "shadow": true,
-    "alerted": [
-     "pending"
-    ]
    }
   },
   "catchUpAt": "2026-11-08T12:04:40.000Z",
   "balance": 10003.8,
-  "lastRun": "2026-11-09T06:01:42.000Z"
+  "lastRun": "2026-11-09T06:04:08.000Z"
  },
  "log": [
-  {
-   "at": "2026-11-08T20:37:33.000Z",
-   "msg": "not mirrored yet usdcad-position-1793949081: USDCAD market closed (paused until 20:47 UTC) (will retry)",
-   "trade": "usdcad-position-1793949081"
-  },
   {
    "at": "2026-11-08T20:37:33.000Z",
    "msg": "not mirrored yet usdcad-swing-1793949081: USDCAD market closed (paused until 20:47 UTC) (will retry)",
@@ -2701,6 +2702,11 @@
    "at": "2026-11-09T06:01:42.000Z",
    "msg": "placed buy limit USDCAD 0.04 lot at 1.41046 (council scalp, valid to 2026-11-09T09:00Z)",
    "trade": "usdcad-scalp-1794204019"
+  },
+  {
+   "at": "2026-11-09T06:04:08.000Z",
+   "msg": "limit filled: USDCAD position 47507890 at the broker",
+   "trade": "usdcad-scalp-1794204019"
   }
  ],
  "limits": {
@@ -2779,11 +2785,11 @@
   ]
  },
  "execution": {
-  "n": 39,
-  "meanSlipR": -0.013,
-  "medianSlipR": -0.001,
+  "n": 40,
+  "meanSlipR": -0.016,
+  "medianSlipR": -0.002,
   "worstSlipR": 1.168,
-  "medianLagSec": 5056,
+  "medianLagSec": 4908.5,
   "bySymbol": {
    "SOLUSD": {
     "n": 5,
@@ -2806,8 +2812,8 @@
     "meanSlipR": -0.28
    },
    "USDCAD": {
-    "n": 7,
-    "meanSlipR": -0.003
+    "n": 8,
+    "meanSlipR": -0.019
    },
    "USDCHF": {
     "n": 5,
