@@ -2339,7 +2339,8 @@
     "adopted": false,
     "alerted": [
      "open",
-     "amend"
+     "amend",
+     "close"
     ],
     "viaLimit": true,
     "limitPrice": 4119.94,
@@ -2354,10 +2355,11 @@
     "lagSec": 151,
     "positionId": "47675609",
     "volume": 100,
-    "status": "open",
+    "status": "closed at broker",
     "rr": 2.3,
     "amended": 4,
-    "amendedAt": "2026-11-09T16:09:52.000Z"
+    "amendedAt": "2026-11-09T16:09:52.000Z",
+    "closedAt": "2026-11-09T16:14:46.000Z"
    },
    "btc-rscalp-1794235517": {
     "positionId": "47679932",
@@ -2487,7 +2489,7 @@
     "lots": 0.01,
     "digits": 3,
     "setup": "rscalp",
-    "status": "open",
+    "status": "closed at broker",
     "openedAt": "2026-11-09T15:22:22.000Z",
     "councilEntry": 87.51,
     "stop": 86.7950357142857,
@@ -2502,10 +2504,12 @@
     "slipR": 0.208,
     "lagSec": 66,
     "alerted": [
-     "open"
+     "open",
+     "close"
     ],
     "stopCheckedAt": "2026-11-09T15:22:22.000Z",
-    "brokerStop": 86.944
+    "brokerStop": 86.944,
+    "closedAt": "2026-11-09T16:14:46.000Z"
    },
    "btc-rscalp-1794237676": {
     "symbol": "BTCUSD",
@@ -2629,7 +2633,7 @@
    "startBalance": 9987.78
   },
   "startedAt": "2026-11-08T11:42:25.000Z",
-  "status": "ok · demo Fusion Markets · balance 9991.59 · 29 open",
+  "status": "ok · demo Fusion Markets · balance 9973.13 · 27 open · 1 resting",
   "skipped": {
    "audusd-position-1793601653": "price 0.68666 has run 1.27R from the council entry 0.70162: a different trade now",
    "xrp-rswing-1793942619": "none of XRPUSD found at the broker",
@@ -2642,27 +2646,33 @@
   "paused": {},
   "resetAt": "2026-11-08T09:45Z",
   "resetDoneAt": "2026-11-08T11:42:47.000Z",
-  "orders": {},
+  "orders": {
+   "gbpusd-scalp-1794240823": {
+    "orderId": "33815891",
+    "symbol": "GBPUSD",
+    "side": "buy",
+    "volume": 100000,
+    "lots": 0.01,
+    "digits": 5,
+    "setup": "scalp",
+    "limitPrice": 1.3411,
+    "stop": 1.33982,
+    "t1": 1.34262,
+    "placedAt": "2026-11-09T16:14:46.000Z",
+    "expires": "2026-11-09T19:13:43.000Z",
+    "riskCash": 1.99,
+    "margin": 2.68,
+    "shadow": true,
+    "alerted": [
+     "pending"
+    ]
+   }
+  },
   "catchUpAt": "2026-11-08T12:04:40.000Z",
-  "balance": 9991.59,
-  "lastRun": "2026-11-09T16:12:21.000Z"
+  "balance": 9973.13,
+  "lastRun": "2026-11-09T16:14:46.000Z"
  },
  "log": [
-  {
-   "at": "2026-11-08T21:54:37.000Z",
-   "msg": "not mirrored yet gbpusd-scalp-1793626672: GBPUSD market closed (paused until 22:02 UTC) (will retry)",
-   "trade": "gbpusd-scalp-1793626672"
-  },
-  {
-   "at": "2026-11-08T21:54:37.000Z",
-   "msg": "not mirrored yet usdcad-scalp-1793689919: USDCAD market closed (paused until 22:02 UTC) (will retry)",
-   "trade": "usdcad-scalp-1793689919"
-  },
-  {
-   "at": "2026-11-08T21:54:37.000Z",
-   "msg": "not mirrored yet usdchf-swing-1793762425: USDCHF market closed (paused until 22:02 UTC) (will retry)",
-   "trade": "usdchf-swing-1793762425"
-  },
   {
    "at": "2026-11-08T21:54:37.000Z",
    "msg": "not mirrored yet xau-position-1793783465: XAUUSD market closed (paused until 22:02 UTC) (will retry)",
@@ -4147,6 +4157,21 @@
    "at": "2026-11-09T16:09:52.000Z",
    "msg": "moved XAUUSD 47675609 protection: stop 4132.023 -> 4130.693, target 4095.185 -> 4093.855 (council rscalp)",
    "trade": "xau-rscalp-1794235029"
+  },
+  {
+   "at": "2026-11-09T16:14:46.000Z",
+   "msg": "XAUUSD position 47675609 closed at the broker",
+   "trade": "xau-rscalp-1794235029"
+  },
+  {
+   "at": "2026-11-09T16:14:46.000Z",
+   "msg": "SOLUSD position 47694914 closed at the broker",
+   "trade": "sol-rscalp-1794237676"
+  },
+  {
+   "at": "2026-11-09T16:14:46.000Z",
+   "msg": "placed buy limit GBPUSD 0.01 lot at 1.3411 (council scalp, valid to 2026-11-09T19:13Z)",
+   "trade": "gbpusd-scalp-1794240823"
   }
  ],
  "limits": {
