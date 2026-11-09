@@ -65,6 +65,13 @@ export function outlook({ gold, dxy, now, tilt20 = 0, ch, fc }) {
 const dayOf = (iso) => Date.parse(iso + 'T23:59:59Z') / 1000;
 export function resolveCall(c, closes, now) {
   const end = dayOf(c.by); if (now < end + 86400) return null;   // the date's close must be final
+  // the event playbook's release-day call (9 Nov): the UTC daily close of `by` against the close before it; `by` must not be
+  // before the issue date, and the close of `by` must exist (a missing day stays unresolved, never guessed)
+  if (c.kind === 'dayUp' || c.kind === 'dayDown') {
+    if (c.by < c.issued) return null;
+    const S = (closes || []).filter((o) => o.t <= end), i = S.findIndex((o) => new Date(o.t * 1000).toISOString().slice(0, 10) === c.by); if (i < 1) return null;
+    return c.kind === 'dayUp' ? S[i].v > S[i - 1].v : S[i].v < S[i - 1].v;
+  }
   const S = (closes || []).filter((o) => o.t > dayOf(c.issued) && o.t <= end); if (!S.length) return null;
   const last = S[S.length - 1].v;
   switch (c.kind) {

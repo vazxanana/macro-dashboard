@@ -32,6 +32,7 @@ import { cotMain } from './macro.mjs';
 import { briefing, briefingLines, P_CLAMP } from './briefing.mjs';
 import { calibration, applyCalls } from './calibration.mjs';
 import { summary, snapshot, briefDiff, archiveWeek, previousOf } from './glance.mjs';
+import { playbooks, playbookLine, P_BAND as EVENT_P_BAND } from './playbook.mjs';
 
 const DAY = 86400;
 // the batch revision this port follows (research/macro-veteran/SKILL.md); 1.2 = the owner's 8 Nov evening upload,
@@ -44,7 +45,8 @@ export function cpiPilot(file = new URL('../research/macro-veteran/references/cp
     const recs = fs.readFileSync(file, 'utf8').split(/\r?\n/).filter((l) => l.trim()).map((l) => JSON.parse(l));
     const iss = recs.find((r) => r.record_type === 'issued'); if (!iss) return null;
     const res = recs.find((r) => (r.record_type === 'resolved' || r.record_type === 'resolution') && r.forecast_id === iss.forecast_id), f = iss.forecast || {};
-    return { forecastId: iss.forecast_id, issuedAt: f.issued_at_utc, point: f.distribution && f.distribution.point_estimate, unit: 'percent m/m', reference: 'October 2026', releaseUtc: '2026-11-10T13:30:00Z', status: res ? 'resolved' : 'unresolved', outcome: res ? (res.resolution && res.resolution.outcome) ?? null : null,
+    const cmp = f.comparator && Number.isFinite(+f.comparator.probability_or_value) ? { value: +f.comparator.probability_or_value, capturedAt: f.comparator.captured_at_utc || null, label: 'Cleveland Fed core CPI nowcast (a public model, not consensus)' } : null;
+    return { forecastId: iss.forecast_id, issuedAt: f.issued_at_utc, point: f.distribution && f.distribution.point_estimate, unit: 'percent m/m', reference: 'October 2026', releaseUtc: '2026-11-10T13:30:00Z', status: res ? 'resolved' : 'unresolved', outcome: res ? (res.resolution && res.resolution.outcome) ?? null : null, comparator: cmp,
       // rev 1.3: never call an unresolved pilot a scored forecast
       label: res ? 'resolved against the BLS first print' : 'unresolved: issued, not a scored forecast' };
   } catch (e) { return null; }
@@ -119,6 +121,8 @@ export function releaseView(hist, S, now) {
     .map((r) => releaseCheck(r, S)).sort((a, b) => b.scheduledUtc.localeCompare(a.scheduledUtc)).slice(0, 8);
 }
 
+// The event playbook's history (research/edge/event-reaction/build.mjs → council/event-base.json); null when it is missing
+export function eventBase(file = new URL('./event-base.json', import.meta.url)) { try { return JSON.parse(fs.readFileSync(file, 'utf8')); } catch (e) { return null; } }
 export const VET_START = '<!-- veteran:start -->', VET_END = '<!-- veteran:end -->';
 export const HORIZON_DAYS = 20;   // trading days: the 4-week horizon the Gold Macro Score was tested on
 export const P_BOUNDS = [0.4, 0.7];   // a weekly directional call never leaves this band (calibration humility)
@@ -404,7 +408,7 @@ export function teaching(fc) {
   return { adopted, pending, recent: L.recent || [], line };
 }
 
-export function build({ fc, cache, daily, ledger = [], debates = [], expectations = [], cot = null, now, cal = null }) {
+export function build({ fc, cache, daily, ledger = [], debates = [], expectations = [], cot = null, now, cal = null, evBase }) {
   const S = {}; for (const id of ['DFII10', 'T10YIE', 'DGS2', 'DGS10', 'T10Y3M', 'BAMLH0A0HYM2', 'VIXCLS', 'VXVCLS', 'DTWEXBGS', 'SOFR', 'EFFR']) S[id] = fromCache(cache && cache.fred && cache.fred[id]);
   const gold = (daily && daily.gold) || [];
   S.gold = gold; S.dxy = daily && daily.dxy ? daily.dxy : [];
@@ -439,6 +443,11 @@ export function build({ fc, cache, daily, ledger = [], debates = [], expectation
       fc, cot, expectations: E, outlook: v.outlook, now, week: weekKey(now), tilt: v.outlook ? v.outlook.tilt : 0 });
   } catch (e) { v.briefing = null; v.briefingError = String(e && e.message || e); }
   if (v.briefing) applyCalls(v.briefing.hypotheses, v.calibration, P_CLAMP);
+  // the event playbook (9 Nov, council/playbook.mjs): one card per red-folder release within 72 h, with a dated release-day call
+  try {
+    v.events = playbooks({ fc, expectations: E, closes: gold, base: evBase === undefined ? eventBase() : evBase, now, pilot: v.cpiPilot });
+    applyCalls(v.events.map((e) => e.call).filter(Boolean), v.calibration, EVENT_P_BAND);
+  } catch (e) { v.events = []; v.eventsError = String(e && e.message || e); }
   v.summary = summary(v);
   v.brief = briefOf(v);
   return { v, ledger: L, debates: Dh, expectations: E };
@@ -446,7 +455,7 @@ export function build({ fc, cache, daily, ledger = [], debates = [], expectation
 export function briefOf(v) {
   const d = v.verdict, dis = v.debate.filter((t) => t.stance === 'disagree').map((t) => t.topic), q = v.debate.filter((t) => t.stance === 'qualify').map((t) => t.topic);
   const sb = v.scoreboard, sbTxt = sb && sb.weeks ? ` Scoreboard over ${sb.weeks} resolved week${sb.weeks === 1 ? '' : 's'}: veteran ${sb.veteran.hit == null ? 'n/a' : Math.round(sb.veteran.hit * 100) + '%'} vs strategist ${sb.strategist.hit == null ? 'n/a' : Math.round(sb.strategist.hit * 100) + '%'} right on direction per topic.` : '';
-  return `Macro veteran, ${v.at.slice(0, 16).replace('T', ' ')} UTC. Shock: ${v.shock.shock} (${v.shock.confidence}). Consensus with the strategist: ${d.bias}${d.conviction ? ` ${d.conviction}` : ''} · ${d.agree} agree, ${d.qualify} qualify, ${d.disagree} disagree${dis.length ? ` (${dis.join(', ')})` : ''}${q.length ? `; qualified: ${q.join(', ')}` : ''}. ${d.note} Fails if ${d.invalidation.length ? d.invalidation.join('; ') : 'n/a'}.${v.ledger.lastProbability != null ? ` Ledger: P(gold up over ${HORIZON_DAYS} days) ${Math.round(v.ledger.lastProbability * 100)}%${v.base ? ` vs base ${Math.round(v.base.upRate * 100)}%` : ''}, ${v.ledger.resolved} resolved${v.ledger.brier != null ? `, Brier ${v.ledger.brier}${v.ledger.brierBase != null ? ` vs base ${v.ledger.brierBase}` : ''}` : ''}.` : ''}${sbTxt}${v.teaching ? ` Teaching: ${v.teaching.line}` : ''}${v.briefing ? ` Briefing: ${briefingLines(v.briefing).join(' | ')}` : ''}${v.summary ? ` At a glance: ${v.summary.sentence}` : ''}`;
+  return `Macro veteran, ${v.at.slice(0, 16).replace('T', ' ')} UTC. Shock: ${v.shock.shock} (${v.shock.confidence}). Consensus with the strategist: ${d.bias}${d.conviction ? ` ${d.conviction}` : ''} · ${d.agree} agree, ${d.qualify} qualify, ${d.disagree} disagree${dis.length ? ` (${dis.join(', ')})` : ''}${q.length ? `; qualified: ${q.join(', ')}` : ''}. ${d.note} Fails if ${d.invalidation.length ? d.invalidation.join('; ') : 'n/a'}.${v.ledger.lastProbability != null ? ` Ledger: P(gold up over ${HORIZON_DAYS} days) ${Math.round(v.ledger.lastProbability * 100)}%${v.base ? ` vs base ${Math.round(v.base.upRate * 100)}%` : ''}, ${v.ledger.resolved} resolved${v.ledger.brier != null ? `, Brier ${v.ledger.brier}${v.ledger.brierBase != null ? ` vs base ${v.ledger.brierBase}` : ''}` : ''}.` : ''}${sbTxt}${v.teaching ? ` Teaching: ${v.teaching.line}` : ''}${v.briefing ? ` Briefing: ${briefingLines(v.briefing).join(' | ')}` : ''}${v.summary ? ` At a glance: ${v.summary.sentence}` : ''}${v.events && v.events.length ? ` Event playbook: ${playbookLine(v.events.find((e) => !e.released) || v.events[0])}` : ''}`;
 }
 export function veteranSection(v) {
   if (!v || !v.debate) return '';
@@ -460,6 +469,7 @@ export function veteranSection(v) {
   if (v.teaching) out.push('', `Teaching: ${v.teaching.line.replace(/\|/g, '/')}`);
   if (v.summary) out.push('', `**${v.summary.sentence.replace(/\|/g, '/')}**`);
   if (v.calibration) out.push('', `Calibration: ${v.calibration.line}`);
+  if (v.events && v.events.length) out.push('', `Event playbook: ${v.events.map(playbookLine).join(' · ').replace(/\|/g, '/')}`);
   if (v.changes && v.changes.items && v.changes.items.length) out.push('', `Since last week: ${v.changes.items.filter((x) => x.area !== 'hypothesis').map((x) => x.text).join('; ').replace(/\|/g, '/')}.`);
   if (v.briefing) { out.push('', '### The veteran\'s briefing', '', ...v.briefing.insights.map((i) => `${i.rank}. **${i.title.replace(/\|/g, '/')}**: ${i.evidence.map((e) => `${e.text} (${e.asOf}; ${e.source})`).join('; ').replace(/\|/g, '/')}. What would change the view: ${i.change.replace(/\|/g, '/')}.`));
     if (v.briefing.hypotheses.length) out.push('', ...v.briefing.hypotheses.map((h) => `- ${h.slot} · ${Math.round(h.p * 100)}%: ${h.claim.replace(/\|/g, '/')}. ${h.why.replace(/\|/g, '/')} Invalidated by ${h.invalid.replace(/\|/g, '/')}.`));
@@ -479,6 +489,16 @@ export function freezeHypotheses(b, CL) {
   b.record = callsScore(done); b.recent = done.filter((r) => r.hit != null).slice(-8).reverse();
   return b;
 }
+// The event call on the record is the first one issued (the ledger keeps it once): the card shows that probability, its
+// issue date and, after the close, whether it came true; plus the playbook calls' own record.
+export function freezeEventCalls(events, CL) {
+  const by = new Map((CL || []).map((r) => [r.id, r]));
+  for (const e of events || []) {
+    const id = e.call ? e.call.id : `evt:${e.at.slice(0, 10)}:gold:dayUp`, rec = by.get(id);
+    if (rec) { e.call = { ...(e.call || {}), id, claim: rec.claim, p: rec.p, baseP: rec.baseP, by: rec.by, kind: rec.kind, issued: rec.issued, hit: rec.hit ?? null, recorded: true, ...(e.call && e.call.p !== rec.p ? { live: e.call.p } : {}) }; e.callNote = null; }
+  }
+  return callsScore((CL || []).filter((r) => r.src === 'event playbook'));
+}
 export function run({ dir = 'data', now = Math.floor(Date.now() / 1000), log = console.log } = {}) {
   const M = path.join(dir, 'macro'); fs.mkdirSync(M, { recursive: true });
   const rd = (f, d) => { try { return JSON.parse(fs.readFileSync(f, 'utf8')); } catch (e) { return d; } };
@@ -497,8 +517,9 @@ export function run({ dir = 'data', now = Math.floor(Date.now() / 1000), log = c
   const w = (f, val) => { const s = JSON.stringify(val, null, 1), p = path.join(M, f); let old = null; try { old = fs.readFileSync(p, 'utf8'); } catch (e) {} if (old !== s) fs.writeFileSync(p, s); };
   let CL = CL0;
   if (v.outlook) { v.outlook.cot = applyCalls(cotCalls(cot, px, now), v.calibration);
-    const hyps = (v.briefing && v.briefing.hypotheses) || [];
-    CL = callsLedger(CL0, { outlook: v.outlook, closesBy: px, now, extra: hyps }); w('veteran-calls.json', CL);
+    const hyps = (v.briefing && v.briefing.hypotheses) || [], evCalls = (v.events || []).map((e) => e.call).filter(Boolean);
+    CL = callsLedger(CL0, { outlook: v.outlook, closesBy: px, now, extra: [...hyps, ...evCalls] }); w('veteran-calls.json', CL);
+    v.eventsRecord = freezeEventCalls(v.events, CL);
     v.outlook.record = callsScore(CL); v.outlook.recent = CL.filter((r) => r.hit != null).slice(-12).reverse();
     if (v.briefing) freezeHypotheses(v.briefing, CL); }
   // what changed since last week (9 Nov): one compact briefing per week in macro/veteran-briefings.json, diffed against the last one

@@ -1118,3 +1118,21 @@ badge-96 for push; run it by hand with Playwright, commit the PNGs). The old GOL
   device's price alerts need turning on again).
 - Install: iPhone Safari -> Share -> Add to Home Screen (needed for iPhone push); Android Chrome -> menu -> Install app; desktop
   Chrome / Edge -> install icon in the address bar.
+
+## The veteran's event playbook (9 Nov 2026, owner: "be the best of all times veteran", "keep improving all the bits")
+`council/playbook.mjs` (pure, no fetch; built by `veteran.mjs` → `veteran.json.events`, `eventsRecord`): one card per red-folder
+release on the strategist's calendar within `WINDOW_H` 72 h (kept `KEEP_H` 12 h after the print), same time + country grouped
+(Core first). Expectations: the consensus `captureExpectations` froze before the release, the forecast cluster only where the
+repo has one (the batch's CPI pilot 0.255% and its captured Cleveland core nowcast 0.21%, `cpiPilot().comparator`), range n/a.
+Hot / in-line / cool rows (the strategist's `rule`, Fed path, dollar, gold, the action: act after the release, not before; a ¼
+starter after the first hour on a retest, the skill's rule G; funded accounts flat). History: `council/event-base.json`, built by
+`node research/edge/event-reaction/build.mjs <council-data>` from HistData M1 gold + dollar index (85 CPI 2018-26, 51 NFP and 34
+FOMC 2022-26; CPI 2018-21 dates spike-checked, 16 dropped), split by the dollar's first 5-minute read (±`READ_PCT` 0.05%, not a
+consensus surprise) and, CPI 2022-24, by the core print vs the Cleveland nowcast; the release-day move from the daily closes at
+run time; rows and days cut at `now`. The one pre-registered test (CPI T+5→T+60 follows the dollar's read) FAILED (34/72, p 0.72),
+so every figure is labelled "Descriptive, not a tested edge". HistData clock: the files are UTC−5, and UTC−4 while Europe is on
+summer time (release spikes; preregistration Amendment 1), not "EST without DST" all year. The call: P(gold's release-day UTC close
+> the prior close) = past same-type release days shrunk (`SHRINK` 20) to every weekday's 10-year up-rate (`baseP`), band 30-70%,
+calibrated, issued only before the release, one per day (`evt:<date>:gold:dayUp`), recorded once via `callsLedger`, scored by the
+new `dayUp` / `dayDown` kinds in `resolveCall`; calibration source `event`. Desk: `#c-next` under the glance (countdown UTC + local,
+expectation scale, scenario table, strip of past first hours, folded detail). Tests: `tests/playbook.test.mjs`. Paper only.

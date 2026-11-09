@@ -1,4 +1,5 @@
-// Council · The veteran's self-calibration (9 Nov 2026, owner: "be the best of all time veteran").
+// Council · The veteran's self-calibration (9 Nov 2026, owner: "be the best of all time veteran"). Event-playbook release-day
+// calls (council/playbook.mjs, src 'event playbook') are scored here too, against their all-weekdays base rate.
 //
 // The veteran keeps three scored records of his own: the dated calls (macro/veteran-calls.json: week / month calls, COT calls,
 // the briefing's hypotheses) and the weekly 20-day forecast ledger (macro/veteran-ledger.json). This module reads them and does
@@ -39,7 +40,7 @@ export function records({ calls = [], ledger = [] } = {}) {
   const out = [];
   for (const c of calls || []) {
     if (c == null || typeof c.hit !== 'boolean' || !Number.isFinite(c.p)) continue;
-    out.push({ p: c.p, pRaw: Number.isFinite(c.pRaw) ? c.pRaw : c.p, base: baseOf(c), y: c.hit ? 1 : 0, src: c.src === 'veteran hypothesis' ? 'hypothesis' : /^COT/.test(c.src || '') ? 'cot' : 'call', due: c.by });
+    out.push({ p: c.p, pRaw: Number.isFinite(c.pRaw) ? c.pRaw : c.p, base: baseOf(c), y: c.hit ? 1 : 0, src: c.src === 'veteran hypothesis' ? 'hypothesis' : c.src === 'event playbook' ? 'event' : /^COT/.test(c.src || '') ? 'cot' : 'call', due: c.by });
   }
   const issued = new Map((ledger || []).filter((x) => x && x.record_type === 'issued').map((x) => [x.forecast_id, x]));
   for (const x of ledger || []) {
