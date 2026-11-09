@@ -65,17 +65,21 @@
     vib.start(v); vib.stop(v + dur + 0.05);
   }
   // the owner's own clip, if one is saved in this browser (localStorage btLab:lossSound, a data URL under 1.5 MB)
-  let custom = null, customName = null; try { custom = localStorage.getItem('btLab:lossSound'); customName = localStorage.getItem('btLab:lossSoundName'); } catch (e) {}
-  function playLoss() { if (custom) { try { const el = new Audio(custom); el.volume = 1; el.play().catch(() => faah()); return; } catch (e) {} } faah(); }
+  // the owner chooses the sounds on his profile (/api/sounds, 9 Nov); without one: the owner's clip shipped with the site for a stop-out,
+  // the built-in chime for a target. Everyone hears the same sounds; members can only switch them off.
+  const SND = { sl: { url: '/assets/sounds/sl.mp3', name: 'Faaaah (built in)' }, tp: null };
+  const API = /^https?:$/.test(location.protocol) && !/github\.io$/.test(location.hostname) ? '/api/sounds' : null;
+  if (API) fetch(API, { cache: 'no-store' }).then((r) => (r.ok ? r.json() : null)).then((j) => { if (!j) return; if (j.sl && j.sl.data) SND.sl = { url: j.sl.data, name: j.sl.name }; if (j.tp && j.tp.data) SND.tp = { url: j.tp.data, name: j.tp.name }; }).catch(() => {});
+  const clip = (u, fallback) => { try { const el = new Audio(u); el.volume = 1; el.play().catch(() => fallback && fallback()); } catch (e) { fallback && fallback(); } };
+  function playLoss() { if (SND.sl) clip(SND.sl.url, faah); else faah(); }
+  function playWin() { if (SND.tp) clip(SND.tp.url, chime); else chime(); }
   const fmtR = (r) => (r == null || !isFinite(r) ? '' : (r > 0 ? '+' : '') + (+r).toFixed(2).replace(/\.?0+$/, '') + 'R');
   window.BTFX = {
-    win(R, sub, title) { const d = layer('win', title || 'Target hit', [fmtR(R), sub].filter(Boolean).join(' · ')); confetti(d); if (on) chime(); },
+    win(R, sub, title) { const d = layer('win', title || 'Target hit', [fmtR(R), sub].filter(Boolean).join(' · ')); confetti(d); if (on) playWin(); },
     loss(R, sub, title) { layer('loss', title || 'Stopped out', [fmtR(R), sub].filter(Boolean).join(' · ')); if (!RM()) { document.body.classList.remove('btfx-shake'); void document.body.offsetWidth; document.body.classList.add('btfx-shake'); setTimeout(() => document.body.classList.remove('btfx-shake'), 600); } if (on) playLoss(); },
     playLoss() { ctx(); playLoss(); },
-    get customName() { return custom ? customName || 'your sound' : null; },
-    setCustom(file) { if (!file) { custom = customName = null; try { localStorage.removeItem('btLab:lossSound'); localStorage.removeItem('btLab:lossSoundName'); } catch (e) {} return Promise.resolve(true); }
-      if (!/^audio\//.test(file.type)) return Promise.resolve('That is not an audio file'); if (file.size > 1.5e6) return Promise.resolve('Too big: keep the clip under 1.5 MB (a few seconds)');
-      return new Promise((res) => { const r = new FileReader(); r.onload = () => { try { localStorage.setItem('btLab:lossSound', r.result); localStorage.setItem('btLab:lossSoundName', file.name); custom = r.result; customName = file.name; res(true); } catch (e) { res('This browser has no room to keep the sound'); } }; r.onerror = () => res('Could not read the file'); r.readAsDataURL(file); }); },
+    playWin() { ctx(); playWin(); },
+    get sounds() { return { sl: SND.sl && SND.sl.name, tp: SND.tp ? SND.tp.name : 'Chime (built in)' }; },
     get sound() { return on; },
     set sound(v) { on = !!v; try { localStorage.setItem('btLab:sound', on ? '1' : '0'); } catch (e) {} if (on) ctx(); },
     unlock: ctx,

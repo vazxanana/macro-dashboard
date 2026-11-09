@@ -6,7 +6,7 @@ const fs = require('fs');
 const PORT = process.env.PORT || 8766, H = 'http://127.0.0.1:' + PORT;
 const OUT = process.env.AUDIT_OUT || require('os').tmpdir() + '/';
 const R = []; const check = (name, ok, info = '') => { R.push({ name, ok: !!ok, info: String(info).slice(0, 140) }); };
-const route = async (p) => p.route(new RegExp('127\\.0\\.0\\.1:' + PORT + '/md/bars'), async (r) => { const u = r.request().url().replace(H, 'https://meridianx.dev'); try { const res = await fetch(u); r.fulfill({ status: res.status, contentType: 'application/json', body: await res.text() }); } catch (e) { r.fulfill({ status: 502, body: '{}' }); } });
+const route = async (p) => (await p.route(/\/api\/sounds/, (r) => r.fulfill({ status: 200, contentType: 'application/json', body: '{"sl":null,"tp":null}' })), p.route(new RegExp('127\\.0\\.0\\.1:' + PORT + '/md/bars'), async (r) => { const u = r.request().url().replace(H, 'https://meridianx.dev'); try { const res = await fetch(u); r.fulfill({ status: res.status, contentType: 'application/json', body: await res.text() }); } catch (e) { r.fulfill({ status: 502, body: '{}' }); } }));
 const barN = async (p) => +((await p.$eval('#now', (e) => e.textContent)).match(/bar (\d+)/) || [0, 0])[1];
 const txt = (p, sel) => p.$eval(sel, (e) => e.textContent).catch(() => '');
 const vis = (p, sel) => p.$eval(sel, (e) => !!(e.offsetParent || getComputedStyle(e).position === 'fixed') && !e.hidden).catch(() => false);
@@ -20,6 +20,15 @@ async function load(p, q = 'xau,15m') { await p.click(`#quick [data-q^="${q}"]`)
   await route(p); await p.addInitScript(() => { if (!sessionStorage.getItem('init')) { localStorage.clear(); sessionStorage.setItem('init', '1'); } localStorage.setItem('ms-admin', 'x'); });
   await p.goto(H + '/backtest.html', { waitUntil: 'load' }); await p.waitForTimeout(300);
   check('welcome on first visit', await vis(p, '#welcome'));
+  // 1b. first-run guide: shown once, steps, focus inside, Esc closes, remembered, reopens from Keys
+  await p.waitForSelector('#guide[open]', { timeout: 3000 }).catch(() => {}); check('guide opens on the first visit', await p.$eval('#guide', (e) => e.open));
+  check('guide has focus inside', await p.evaluate(() => document.getElementById('guide').contains(document.activeElement)));
+  const gsteps = []; for (let i = 0; i < 5; i++) { gsteps.push(await txt(p, '#gd-title')); if (i < 4) await p.click('#gd-next'); }
+  check('guide walks five steps (market, play, order, stop, challenge)', gsteps.length === 5 && /market/i.test(gsteps[0]) && /stop/i.test(gsteps[3]) && /challenge/i.test(gsteps[4]) && /Start trading/.test(await txt(p, '#gd-next')), gsteps.join(' / '));
+  await p.click('#gd-back'); check('guide Back goes one step back', /stop/i.test(await txt(p, '#gd-title')));
+  await p.keyboard.press('Escape'); await p.waitForTimeout(100); check('Esc closes the guide and it is remembered', !(await p.$eval('#guide', (e) => e.open)) && (await p.evaluate(() => localStorage.getItem('btLab:guide'))) === 'done');
+  await p.click('#hk-btn'); await p.click('#gd-open'); check('guide reopens from Keys', await p.$eval('#guide', (e) => e.open) && /market/i.test(await txt(p, '#gd-title')));
+  await p.click('#gd-skip'); check('Skip closes the guide', !(await p.$eval('#guide', (e) => e.open)));
   // 2. load
   await load(p); check('quick start loads candles', /candles loaded/.test(await txt(p, '#toasts')), await txt(p, '#sess-sum'));
   check('session card folds to a summary', await p.$eval('#sess-body', (e) => e.hidden));
@@ -124,6 +133,7 @@ async function load(p, q = 'xau,15m') { await p.click(`#quick [data-q^="${q}"]`)
   await p.click('#sess-toggle'); await p.click('#newsess'); check('New session clears the chart', (await txt(p, '#sess-sum')).includes('New session'));
   // 17. phone layout and light theme
   const m = await ctx.newPage(); await route(m); await m.setViewportSize({ width: 390, height: 844 }); await m.goto(H + '/backtest.html', { waitUntil: 'load' }); await m.waitForTimeout(2500);
+  await m.evaluate(() => window.openGuide()); const gw = await m.$eval('#guide', (e) => { const r = e.getBoundingClientRect(); return { l: r.left, r: r.right }; }); check('phone: guide fits at 390 px', gw.l >= 8 && gw.r <= 382, JSON.stringify(gw)); await m.screenshot({ path: OUT + 'ct-guide-phone.png' }); await m.keyboard.press('Escape');
   check('phone: no sideways scroll', !(await m.evaluate(() => document.documentElement.scrollWidth > innerWidth + 1)), await m.evaluate(() => document.documentElement.scrollWidth));
   await m.evaluate(() => localStorage.setItem('msPrefs', JSON.stringify({ theme: 'light' }))); await m.reload({ waitUntil: 'load' }); await m.waitForTimeout(1500);
   check('light theme applies', await m.evaluate(() => getComputedStyle(document.body).backgroundColor !== 'rgb(8, 9, 12)'), await m.evaluate(() => getComputedStyle(document.body).backgroundColor));

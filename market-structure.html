@@ -3436,6 +3436,15 @@ html[data-motion="off"] #v-ict .ict-cal-d:hover { transform: none !important; }
         <div class="pf-ct-h"><div><h2 id="ms-pf-t">Demo accounts</h2><div class="ct-sub" id="ms-pf-sub"></div></div></div>
         <div class="ct-b pf-ct-b" id="ms-pf-b" aria-live="polite"></div>
       </section>
+      <section class="card pf-ct pf-snd" id="ms-pf-snd" aria-labelledby="ms-pf-snd-t" hidden>
+        <div class="pf-ct-h"><div><h2 id="ms-pf-snd-t">ChronosTrade sounds</h2><div class="ct-sub">What everyone hears in the backtest lab when a trade hits its target or its stop. Only you can change them.</div></div></div>
+        <div class="pf-snd-b">
+          <div class="pf-snd-r" data-kind="tp"><b>Target hit</b><span class="pf-snd-n" id="ms-snd-tp">Chime (built in)</span><button type="button" class="ms-tbtn" data-act="play">Play</button><button type="button" class="ms-tbtn" data-act="pick">Choose a sound…</button><button type="button" class="ms-tbtn" data-act="reset">Built-in</button></div>
+          <div class="pf-snd-r" data-kind="sl"><b>Stop-out</b><span class="pf-snd-n" id="ms-snd-sl">Faaaah (built in)</span><button type="button" class="ms-tbtn" data-act="play">Play</button><button type="button" class="ms-tbtn" data-act="pick">Choose a sound…</button><button type="button" class="ms-tbtn" data-act="reset">Built-in</button></div>
+          <input type="file" id="ms-snd-file" accept="audio/*" hidden>
+          <p class="ms-note">mp3, m4a, wav or ogg, under 700 KB (a few seconds). Saving asks for the owner password.</p>
+        </div>
+      </section>
       <section class="card pf-ct pf-mcp" id="ms-pf-mcp" aria-labelledby="ms-pf-mcp-t" hidden>
         <div class="pf-ct-h"><div><h2 id="ms-pf-mcp-t">ChatGPT connector</h2><div class="ct-sub">Work on the ICT edge from ChatGPT: read the rules and every signal, save notes, propose changes</div></div></div>
         <div class="ct-b pf-ct-b" id="ms-pf-mcp-b"></div>
@@ -10450,6 +10459,7 @@ html[data-role="public"] .hdr-sw { display: none; }
 </script>
 <style id="ms-profile-css">
 /* ── Profile page (8 Nov 2026): identity on the left, the council's demo accounts on the right ── */
+#v-profile .pf-snd-b { display: grid; gap: 10px; padding: 4px 20px 20px; } #v-profile .pf-snd-r { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; } #v-profile .pf-snd-r b { min-width: 90px; } #v-profile .pf-snd-n { flex: 1 1 140px; color: var(--ink-dim); font-size: 13px; overflow-wrap: anywhere; }
 #v-profile .pf-grid { display: grid; grid-template-columns: minmax(260px, 320px) minmax(0, 1fr); gap: 18px; align-items: start; }
 #v-profile .pf-card { display: grid; gap: 16px; padding: 20px; position: sticky; top: 72px; }
 #v-profile .pf-id { display: flex; align-items: center; gap: 14px; } #v-profile .pf-id b { display: block; font-size: 18px; letter-spacing: -0.01em; } #v-profile .pf-id small { color: var(--ink-faint); font-size: 12.5px; }
@@ -12831,6 +12841,32 @@ html[data-theme="dark"] #v-home::before, html:not([data-theme="light"]) #v-home:
   document.addEventListener('ms:council', function () { if (!pane.hidden) show(); });
   setTimeout(show, 0);
 })(window);
+</script>
+<script>
+// ChronosTrade sounds on the owner's profile (owner, 9 Nov: "I'm the only one who can choose the sounds for SL and TP, on my profile"):
+// stored on the server (/api/sounds), played for everyone in the backtest lab; saving needs the owner password
+(function () {
+  var $ = function (id) { return document.getElementById(id); }, card = $('ms-pf-snd'); if (!card) return;
+  var API = /^https?:$/.test(location.protocol) && !/github\.io$/.test(location.hostname) ? '/api/sounds' : null, cur = { tp: null, sl: null }, want = null;
+  var DEF = { sl: { name: 'Faaaah (built in)', url: '/assets/sounds/sl.mp3' }, tp: { name: 'Chime (built in)', url: null } };
+  function show() { card.hidden = window.MS_WHO !== 'owner' || !API; ['tp', 'sl'].forEach(function (k) { $('ms-snd-' + k).textContent = cur[k] ? cur[k].name : DEF[k].name; }); }
+  function load() { if (!API) return show(); fetch(API, { cache: 'no-store' }).then(function (r) { return r.ok ? r.json() : null; }).then(function (j) { if (j) cur = { tp: j.tp, sl: j.sl }; show(); }).catch(show); }
+  function chime() { try { var a = new (window.AudioContext || window.webkitAudioContext)(), t = a.currentTime; [523.25, 659.25, 783.99, 1046.5].forEach(function (f, i) { var o = a.createOscillator(), g = a.createGain(); o.type = 'triangle'; o.frequency.value = f; g.gain.setValueAtTime(0.0001, t + i * 0.09); g.gain.exponentialRampToValueAtTime(0.25, t + i * 0.09 + 0.02); g.gain.exponentialRampToValueAtTime(0.0001, t + i * 0.09 + 0.7); o.connect(g).connect(a.destination); o.start(t + i * 0.09); o.stop(t + i * 0.09 + 0.75); }); } catch (e) {} }
+  function play(k) { var u = cur[k] ? cur[k].data : DEF[k].url; if (u) { try { new Audio(u).play(); } catch (e) {} } else chime(); }
+  async function save(k, data, name) {
+    var pw = await window.msAsk('Owner password', '', { title: 'Save the ' + (k === 'sl' ? 'stop-out' : 'target') + ' sound', type: 'password', ok: 'Save' }); if (!pw) return;
+    try { var r = await fetch(API, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ ownerPw: pw, kind: k, data: data, name: name }) }), j = await r.json().catch(function () { return {}; });
+      if (!r.ok) return window.msAlert(j.error || 'Could not save the sound.', { title: 'Not saved' });
+      load(); if (window.msToast) msToast('Sound saved'); } catch (e) { window.msAlert('Could not reach the server.', { title: 'Not saved' }); }
+  }
+  card.addEventListener('click', function (ev) { var b = ev.target.closest('[data-act]'); if (!b) return; var k = b.closest('[data-kind]').dataset.kind;
+    if (b.dataset.act === 'play') play(k); else if (b.dataset.act === 'pick') { want = k; $('ms-snd-file').click(); } else if (b.dataset.act === 'reset') save(k, null, null); });
+  $('ms-snd-file').addEventListener('change', function (e) { var f = e.target.files[0]; e.target.value = ''; if (!f || !want) return; var k = want;
+    if (!/^audio\//.test(f.type)) return window.msAlert('That is not an audio file.', { title: 'Not saved' }); if (f.size > 700 * 1024) return window.msAlert('Keep the clip under 700 KB (a few seconds).', { title: 'Too big' });
+    var rd = new FileReader(); rd.onload = function () { save(k, rd.result, f.name); }; rd.readAsDataURL(f); });
+  var vp = $('v-profile'); if (vp) new MutationObserver(function () { if (!vp.hidden) load(); }).observe(vp, { attributes: true, attributeFilter: ['hidden'] });
+  document.addEventListener('DOMContentLoaded', show); show();
+})();
 </script>
 </body>
 </html>
