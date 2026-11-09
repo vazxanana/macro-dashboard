@@ -1565,7 +1565,8 @@
     "t1": 1.118,
     "adopted": false,
     "alerted": [
-     "open"
+     "open",
+     "close"
     ],
     "viaLimit": true,
     "limitPrice": 1.11937,
@@ -1579,7 +1580,8 @@
     "lagSec": 210,
     "positionId": "47592201",
     "volume": 400000,
-    "status": "open"
+    "status": "closed at broker",
+    "closedAt": "2026-11-09T13:54:43.000Z"
    },
    "gbpusd-scalp-1794220021": {
     "symbol": "GBPUSD",
@@ -2179,7 +2181,7 @@
    "startBalance": 9987.78
   },
   "startedAt": "2026-11-08T11:42:25.000Z",
-  "status": "ok · demo Fusion Markets · balance 9997.92 · 29 open",
+  "status": "ok · demo Fusion Markets · balance 9995.72 · 28 open",
   "skipped": {
    "audusd-position-1793601653": "price 0.68666 has run 1.27R from the council entry 0.70162: a different trade now",
    "xrp-rswing-1793942619": "none of XRPUSD found at the broker",
@@ -2193,15 +2195,10 @@
   "resetDoneAt": "2026-11-08T11:42:47.000Z",
   "orders": {},
   "catchUpAt": "2026-11-08T12:04:40.000Z",
-  "balance": 9997.92,
-  "lastRun": "2026-11-09T13:52:21.000Z"
+  "balance": 9995.72,
+  "lastRun": "2026-11-09T13:54:43.000Z"
  },
  "log": [
-  {
-   "at": "2026-11-08T21:22:43.000Z",
-   "msg": "not mirrored yet gbpusd-scalp-1793626672: GBPUSD market closed (paused until 21:30 UTC) (will retry)",
-   "trade": "gbpusd-scalp-1793626672"
-  },
   {
    "at": "2026-11-08T21:22:43.000Z",
    "msg": "not mirrored yet usdcad-scalp-1793689919: USDCAD market closed (paused until 21:30 UTC) (will retry)",
@@ -3696,6 +3693,11 @@
    "at": "2026-11-09T13:36:27.000Z",
    "msg": "moved USDCAD 47605841 protection: stop 1.40856 -> 1.40779, target 1.41464 -> 1.41387 (council intraday)",
    "trade": "usdcad-intraday-1794223067"
+  },
+  {
+   "at": "2026-11-09T13:54:43.000Z",
+   "msg": "EURUSD position 47592201 closed at the broker",
+   "trade": "eurusd-rscalp-1794219587"
   }
  ],
  "limits": {
