@@ -15,7 +15,7 @@ const INFO = { 7: { symbolId: 7, digits: 2, lotSize: 100, minVolume: 1, stepVolu
 // (no fill event: the position opens/closes later) or 'silent' (order placed, no answer at all), info (symbol overrides).
 function broker({ isLive = false, balance = 1000000, expireFirst = false, reject = null, execReject = false, fill = 'normal', closeFill = 'normal', info = {}, names = SYMS } = {}) {
   const sent = [], positions = new Map(), orders = new Map(), amends = []; let pid = 900, expired = expireFirst;
-  const o = { reject, fill, closeFill, rejectPending: null, cancelReject: false, amendReject: null, amendSilent: false, noSL: false, slLate: false, closes: 0 };
+  const o = { reject, fill, closeFill, rejectPending: null, cancelReject: false, amendReject: null, amendSilent: false, noSL: false, slLate: false, strictAmend: false, closes: 0 };
   class WS {
     constructor(url) { this.url = url; setTimeout(() => this.onopen && this.onopen(), 0); }
     send(text) {
@@ -34,7 +34,7 @@ function broker({ isLive = false, balance = 1000000, expireFirst = false, reject
           const ps = positions.get(String(p.positionId));
           if (o.amendSilent) return;
           if (!ps || o.amendReject) return r(PT.EXECUTION_EVENT, { executionType: 7, errorCode: o.amendReject || 'POSITION_NOT_FOUND' });
-          if (p.stopLoss != null) ps.stopLoss = p.stopLoss; if (p.takeProfit != null) ps.takeProfit = p.takeProfit; amends.push(p);
+          if (o.strictAmend) { ps.stopLoss = p.stopLoss; ps.takeProfit = p.takeProfit; } else { if (p.stopLoss != null) ps.stopLoss = p.stopLoss; if (p.takeProfit != null) ps.takeProfit = p.takeProfit; } amends.push(p);   // strictAmend: a level left out is removed, as at cTrader
           return r(PT.EXECUTION_EVENT, { executionType: 4, position: { ...ps } });
         }
         case PT.CANCEL_ORDER_REQ: {
@@ -748,4 +748,15 @@ test('audit 9 Nov: no position is ever left without a stop, and a stop is never 
   assert.equal(b3.o.closes, 1); assert.equal(b3.positions.has('900'), false); assert.equal(b3.positions.has('901'), true); assert.ok(r.state.orphans['901']);
   r = await mirrorRound({ env: ENV, trades: [], state: r.state, WS: b3.WS, now: NOW + 60, slWaitMs: 0 });
   assert.equal(r.log.filter((l) => /unmanaged position 901/.test(l.msg)).length, 0, 'reported once');
+});
+
+test('audit 9 Nov (2): an ICT stop set by the guard is not removed by a target move in the same round, nor the target shifted twice', async () => {
+  const ict = [{ id: 'nq-b-2', market: 'nq', side: 'buy', entry: 20000, stop: 19950, t1: 20100, rr: 2, status: 'open', opened: NOW - 60, filled: NOW - 60, grade: 'A', aset: true }];
+  const b = broker(); b.o.strictAmend = true;
+  let r = await mirrorRound({ env: ENV, trades: ictCandidates(ict), state: started, WS: b.WS, now: NOW, slWaitMs: 0 });
+  const pid = r.state.map["ict:nq-b-2"].positionId, fill = 19900; Object.assign(b.positions.get(pid), { price: fill, takeProfit: fill + 100 }); delete b.positions.get(pid).stopLoss;   // the cash index fills 100 under the futures
+  r = await mirrorRound({ env: ENV, trades: ictCandidates([{ ...ict[0], t1: 20150 }]), state: r.state, WS: b.WS, now: NOW + 60, slWaitMs: 0 });
+  const ps = b.positions.get(pid); assert.ok(ps, "still open: " + JSON.stringify(r.log.map((l) => l.msg)));
+  assert.ok(ps.stopLoss != null, 'the stop the guard just set is still there'); assert.equal(ps.stopLoss, +(fill - 50).toFixed(2));
+  assert.equal(ps.takeProfit, +(fill + 150).toFixed(2), 'target moved once');
 });
