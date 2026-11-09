@@ -5393,6 +5393,9 @@ function msNextSetup(bars, A) {
       $('ms-live-txt').textContent = 'Offline';
       $('ms-td-now').textContent = 'No live candles: the price feeds could not be reached from this page.';
       $('ms-td-steps').innerHTML = '';
+      // the Home headline only changes once a setup is read, so without candles it said "Loading live candles…" forever (9 Nov audit)
+      const hh = document.getElementById('h-head'); if (hh) hh.textContent = 'Live prices are not reachable right now';
+      const hs = document.getElementById('h-step'); if (hs) { hs._msHtml = undefined; hs.textContent = 'No live candles'; }
       return;
     }
     G.source = ok[0].value.src;
@@ -10237,6 +10240,8 @@ html[data-role="public"] #ms-me-ct { display: none; }
 html[data-role="public"] .hdr-sw { display: none; }
 .hdr-sw a.hdr-ct.on { background: color-mix(in srgb, #2fbf8f 16%, var(--panel)); box-shadow: inset 0 0 0 1px color-mix(in srgb, #2fbf8f 40%, transparent); } .hdr-sw a.hdr-ct.on i { background: #2fbf8f; box-shadow: 0 0 0 3px color-mix(in srgb, #2fbf8f 25%, transparent); } .hdr-sw a.hdr-ct:not(.on):hover i { background: #2fbf8f; }
 @media (max-width: 760px) { .hdr-sw a span { display: none; } .hdr-sw a { padding: 0 9px; } }
+/* phones (9 Nov audit): five 44px header buttons + the account oval ran 47px past a 390px screen, hiding log out / profile. Focus mode stays one tap away in the search palette (Ctrl K list). */
+@media (max-width: 430px) { .top-actions { --tap: 40px; } .hdr-sw a { padding: 0 7px; } #ms-focus-btn { display: none !important; } .desk-sw a { padding: 0 10px; } }
 .ct-dlg { width: min(860px, calc(100vw - 16px)); max-height: min(90vh, 900px); padding: 0; border-radius: 14px; border: 1px solid var(--line); background: var(--panel); color: var(--ink); font-variant-numeric: tabular-nums; }
 .ct-dlg::backdrop { background: rgba(0,0,0,.5); }
 .ct-h { display: flex; align-items: center; gap: 12px; padding: 14px 16px; border-bottom: 1px solid var(--line); position: sticky; top: 0; background: var(--panel); z-index: 2; }
