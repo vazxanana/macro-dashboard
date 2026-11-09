@@ -2202,6 +2202,32 @@
     "positionId": "47658311",
     "volume": 100000,
     "status": "open"
+   },
+   "usdcad-intraday-1794233596": {
+    "symbol": "USDCAD",
+    "side": "buy",
+    "setup": "intraday",
+    "openedAt": "2026-11-09T14:17:15.000Z",
+    "councilEntry": 1.41096,
+    "stop": 1.40956,
+    "t1": 1.41376,
+    "adopted": false,
+    "alerted": [
+     "open"
+    ],
+    "viaLimit": true,
+    "limitPrice": 1.41096,
+    "digits": 5,
+    "lots": 0.02,
+    "riskCash": 2,
+    "margin": 4,
+    "shadow": true,
+    "fillPrice": 1.41095,
+    "slipR": -0.007,
+    "lagSec": 239,
+    "positionId": "47666017",
+    "volume": 200000,
+    "status": "open"
    }
   },
   "day": {
@@ -2209,7 +2235,7 @@
    "startBalance": 9987.78
   },
   "startedAt": "2026-11-08T11:42:25.000Z",
-  "status": "ok · demo Fusion Markets · balance 9999.56 · 28 open · 1 resting",
+  "status": "ok · demo Fusion Markets · balance 9999.56 · 29 open",
   "skipped": {
    "audusd-position-1793601653": "price 0.68666 has run 1.27R from the council entry 0.70162: a different trade now",
    "xrp-rswing-1793942619": "none of XRPUSD found at the broker",
@@ -2221,38 +2247,12 @@
   "paused": {},
   "resetAt": "2026-11-08T09:45Z",
   "resetDoneAt": "2026-11-08T11:42:47.000Z",
-  "orders": {
-   "usdcad-intraday-1794233596": {
-    "orderId": "33807100",
-    "symbol": "USDCAD",
-    "side": "buy",
-    "volume": 200000,
-    "lots": 0.02,
-    "digits": 5,
-    "setup": "intraday",
-    "limitPrice": 1.41096,
-    "stop": 1.40956,
-    "t1": 1.41376,
-    "placedAt": "2026-11-09T14:14:15.000Z",
-    "expires": "2026-11-10T02:13:16.000Z",
-    "riskCash": 2,
-    "margin": 4,
-    "shadow": true,
-    "alerted": [
-     "pending"
-    ]
-   }
-  },
+  "orders": {},
   "catchUpAt": "2026-11-08T12:04:40.000Z",
   "balance": 9999.56,
-  "lastRun": "2026-11-09T14:14:15.000Z"
+  "lastRun": "2026-11-09T14:17:15.000Z"
  },
  "log": [
-  {
-   "at": "2026-11-08T21:31:27.000Z",
-   "msg": "not mirrored yet gbpusd-scalp-1793626672: GBPUSD market closed: MARKET_CLOSED: Trading is not available: Market is closed. (will retry)",
-   "trade": "gbpusd-scalp-1793626672"
-  },
   {
    "at": "2026-11-08T21:31:27.000Z",
    "msg": "not mirrored yet usdcad-scalp-1793689919: USDCAD market closed: MARKET_CLOSED: Trading is not available: Market is closed. (will retry)",
@@ -3747,6 +3747,11 @@
    "at": "2026-11-09T14:14:15.000Z",
    "msg": "placed buy limit USDCAD 0.02 lot at 1.41096 (council intraday, valid to 2026-11-10T02:13Z)",
    "trade": "usdcad-intraday-1794233596"
+  },
+  {
+   "at": "2026-11-09T14:17:15.000Z",
+   "msg": "limit filled: USDCAD position 47666017 at the broker",
+   "trade": "usdcad-intraday-1794233596"
   }
  ],
  "limits": {
@@ -3825,11 +3830,11 @@
   ]
  },
  "execution": {
-  "n": 76,
+  "n": 77,
   "meanSlipR": 0.005,
   "medianSlipR": 0,
   "worstSlipR": 1.168,
-  "medianLagSec": 183,
+  "medianLagSec": 189,
   "bySymbol": {
    "SOLUSD": {
     "n": 6,
@@ -3852,8 +3857,8 @@
     "meanSlipR": -0.072
    },
    "USDCAD": {
-    "n": 11,
-    "meanSlipR": 0.004
+    "n": 12,
+    "meanSlipR": 0.003
    },
    "USDCHF": {
     "n": 7,
