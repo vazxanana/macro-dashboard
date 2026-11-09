@@ -1164,6 +1164,33 @@
     "volume": 400000,
     "status": "closed at broker",
     "closedAt": "2026-11-09T06:48:15.000Z"
+   },
+   "usdchf-intraday-1794207655": {
+    "symbol": "USDCHF",
+    "side": "sell",
+    "setup": "intraday",
+    "openedAt": "2026-11-09T07:03:23.000Z",
+    "councilEntry": 0.81905,
+    "stop": 0.82136,
+    "t1": 0.81276,
+    "adopted": false,
+    "alerted": [
+     "open"
+    ],
+    "viaLimit": true,
+    "limitPrice": 0.81905,
+    "digits": 5,
+    "lots": 0.01,
+    "riskCash": 2.82,
+    "margin": 2,
+    "minLot": true,
+    "shadow": true,
+    "fillPrice": 0.81906,
+    "slipR": -0.004,
+    "lagSec": 148,
+    "positionId": "47527250",
+    "volume": 100000,
+    "status": "open"
    }
   },
   "day": {
@@ -1171,7 +1198,7 @@
    "startBalance": 9987.78
   },
   "startedAt": "2026-11-08T11:42:25.000Z",
-  "status": "ok · demo Fusion Markets · balance 9994.09 · 20 open · 2 resting",
+  "status": "ok · demo Fusion Markets · balance 9994.09 · 21 open · 2 resting",
   "skipped": {
    "audusd-position-1793601653": "price 0.68666 has run 1.27R from the council entry 0.70162: a different trade now",
    "xrp-rswing-1793942619": "none of XRPUSD found at the broker",
@@ -1206,22 +1233,21 @@
      "pending"
     ]
    },
-   "usdchf-intraday-1794207655": {
-    "orderId": "33786196",
-    "symbol": "USDCHF",
+   "eth-scalp-1794207743": {
+    "orderId": "33786289",
+    "symbol": "ETHUSD",
     "side": "sell",
-    "volume": 100000,
-    "lots": 0.01,
-    "digits": 5,
-    "setup": "intraday",
-    "limitPrice": 0.81905,
-    "stop": 0.82136,
-    "t1": 0.81276,
-    "placedAt": "2026-11-09T07:02:01.000Z",
-    "expires": "2026-11-09T19:00:55.000Z",
-    "riskCash": 2.82,
-    "margin": 2,
-    "minLot": true,
+    "volume": 3,
+    "lots": 0.03,
+    "digits": 2,
+    "setup": "scalp",
+    "limitPrice": 2100.9,
+    "stop": 2166.200002,
+    "t1": 1970.2999960000002,
+    "placedAt": "2026-11-09T07:03:23.000Z",
+    "expires": "2026-11-09T10:02:23.000Z",
+    "riskCash": 2,
+    "margin": 6.34,
     "shadow": true,
     "alerted": [
      "pending"
@@ -1230,19 +1256,9 @@
   },
   "catchUpAt": "2026-11-08T12:04:40.000Z",
   "balance": 9994.09,
-  "lastRun": "2026-11-09T07:02:01.000Z"
+  "lastRun": "2026-11-09T07:03:23.000Z"
  },
  "log": [
-  {
-   "at": "2026-11-08T20:37:33.000Z",
-   "msg": "not mirrored yet usdchf-scalp-1793955902: USDCHF market closed (paused until 20:47 UTC) (will retry)",
-   "trade": "usdchf-scalp-1793955902"
-  },
-  {
-   "at": "2026-11-08T20:37:33.000Z",
-   "msg": "not mirrored yet usdchf-scalp-1793971016: USDCHF market closed (paused until 20:47 UTC) (will retry)",
-   "trade": "usdchf-scalp-1793971016"
-  },
   {
    "at": "2026-11-08T20:37:33.000Z",
    "msg": "not mirrored yet usdchf-intraday-1793978867: USDCHF market closed (paused until 20:47 UTC) (will retry)",
@@ -2732,6 +2748,16 @@
    "at": "2026-11-09T07:02:01.000Z",
    "msg": "placed sell limit USDCHF 0.01 lot at 0.81905 (council intraday, valid to 2026-11-09T19:00Z)",
    "trade": "usdchf-intraday-1794207655"
+  },
+  {
+   "at": "2026-11-09T07:03:23.000Z",
+   "msg": "limit filled: USDCHF position 47527250 at the broker",
+   "trade": "usdchf-intraday-1794207655"
+  },
+  {
+   "at": "2026-11-09T07:03:23.000Z",
+   "msg": "placed sell limit ETHUSD 0.03 lot at 2100.9 (council scalp, valid to 2026-11-09T10:02Z)",
+   "trade": "eth-scalp-1794207743"
   }
  ],
  "limits": {
@@ -2810,11 +2836,11 @@
   ]
  },
  "execution": {
-  "n": 40,
-  "meanSlipR": -0.016,
+  "n": 41,
+  "meanSlipR": -0.015,
   "medianSlipR": -0.002,
   "worstSlipR": 1.168,
-  "medianLagSec": 4908.5,
+  "medianLagSec": 4761,
   "bySymbol": {
    "SOLUSD": {
     "n": 5,
@@ -2841,8 +2867,8 @@
     "meanSlipR": -0.019
    },
    "USDCHF": {
-    "n": 5,
-    "meanSlipR": 0.466
+    "n": 6,
+    "meanSlipR": 0.387
    },
    "AUDUSD": {
     "n": 7,
