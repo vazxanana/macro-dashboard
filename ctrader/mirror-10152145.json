@@ -541,7 +541,7 @@
     "lots": 0.01,
     "digits": 5,
     "setup": "rscalp",
-    "status": "open",
+    "status": "closed at broker",
     "openedAt": "2026-11-08T22:03:09.000Z",
     "councilEntry": 0.82045,
     "stop": 0.82247,
@@ -557,10 +557,12 @@
     "lagSec": 196509,
     "alerted": [
      "open",
-     "amend"
+     "amend",
+     "close"
     ],
     "stopSetAt": "2026-11-08T22:03:09.000Z",
-    "stopSetBy": "guard"
+    "stopSetBy": "guard",
+    "closedAt": "2026-11-09T07:38:52.000Z"
    },
    "audusd-scalp-1793996278": {
     "positionId": "47373496",
@@ -897,7 +899,8 @@
     "t1": 0.69058,
     "adopted": false,
     "alerted": [
-     "open"
+     "open",
+     "close"
     ],
     "viaLimit": true,
     "limitPrice": 0.68902,
@@ -911,7 +914,8 @@
     "lagSec": 166,
     "positionId": "47434324",
     "volume": 200000,
-    "status": "open"
+    "status": "closed at broker",
+    "closedAt": "2026-11-09T07:38:52.000Z"
    },
    "xau-scalp-1794189713": {
     "symbol": "XAUUSD",
@@ -1064,7 +1068,8 @@
     "t1": 4094.2650000000003,
     "adopted": false,
     "alerted": [
-     "open"
+     "open",
+     "close"
     ],
     "viaLimit": true,
     "limitPrice": 4122.2,
@@ -1079,7 +1084,8 @@
     "lagSec": 2927,
     "positionId": "47463476",
     "volume": 100,
-    "status": "open"
+    "status": "closed at broker",
+    "closedAt": "2026-11-09T07:38:52.000Z"
    },
    "xau-scalp-1794198321": {
     "positionId": "47483504",
@@ -1287,7 +1293,7 @@
    "startBalance": 9987.78
   },
   "startedAt": "2026-11-08T11:42:25.000Z",
-  "status": "ok · demo Fusion Markets · balance 9992.79 · 21 open · 1 resting",
+  "status": "ok · demo Fusion Markets · balance 10018.74 · 18 open · 1 resting",
   "skipped": {
    "audusd-position-1793601653": "price 0.68666 has run 1.27R from the council entry 0.70162: a different trade now",
    "xrp-rswing-1793942619": "none of XRPUSD found at the broker",
@@ -1324,25 +1330,10 @@
    }
   },
   "catchUpAt": "2026-11-08T12:04:40.000Z",
-  "balance": 9992.79,
-  "lastRun": "2026-11-09T07:36:33.000Z"
+  "balance": 10018.74,
+  "lastRun": "2026-11-09T07:38:52.000Z"
  },
  "log": [
-  {
-   "at": "2026-11-08T20:38:51.000Z",
-   "msg": "not mirrored yet usdcad-scalp-1793689919: USDCAD market closed (paused until 20:47 UTC) (will retry)",
-   "trade": "usdcad-scalp-1793689919"
-  },
-  {
-   "at": "2026-11-08T20:38:51.000Z",
-   "msg": "not mirrored yet usdchf-swing-1793762425: USDCHF market closed (paused until 20:47 UTC) (will retry)",
-   "trade": "usdchf-swing-1793762425"
-  },
-  {
-   "at": "2026-11-08T20:38:51.000Z",
-   "msg": "not mirrored yet xau-position-1793783465: XAUUSD market closed (paused until 20:47 UTC) (will retry)",
-   "trade": "xau-position-1793783465"
-  },
   {
    "at": "2026-11-08T20:38:51.000Z",
    "msg": "not mirrored yet audusd-scalp-1793949425: AUDUSD market closed (paused until 20:47 UTC) (will retry)",
@@ -2827,6 +2818,21 @@
    "at": "2026-11-09T07:33:04.000Z",
    "msg": "closed GBPUSD position 47531181 (council: loss)",
    "trade": "gbpusd-scalp-1794208418"
+  },
+  {
+   "at": "2026-11-09T07:38:52.000Z",
+   "msg": "USDCHF position 47373495 closed at the broker",
+   "trade": "usdchf-rscalp-1793978867"
+  },
+  {
+   "at": "2026-11-09T07:38:52.000Z",
+   "msg": "AUDUSD position 47434324 closed at the broker",
+   "trade": "audusd-scalp-1794188337"
+  },
+  {
+   "at": "2026-11-09T07:38:52.000Z",
+   "msg": "XAUUSD position 47463476 closed at the broker",
+   "trade": "xau-rscalp-1794193018"
   }
  ],
  "limits": {
