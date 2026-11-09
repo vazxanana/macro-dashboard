@@ -424,6 +424,18 @@ loop it watches; it trades nothing and restarts nothing (council.yml's cron job 
 day), zero data-branch push rejections in the logs read; the loop now aborts a stuck rebase and retries the hand-over dispatch.
 Tests: `tests/health.test.mjs`.
 
+## council-data sync and safe writes (9 Nov 2026, reliability audit)
+Every pull / save of council-data in council.yml (round, quick pass, account minute) and watchdog.yml goes through
+`node council/datasync.mjs data pull` / `save "<msg>" [paths]`: uncommitted files ride along (autostash), a half-done rebase or
+merge is cleared first, a conflicting file keeps the council-data copy (the loop rebuilds its own next round), a JSON file that
+does not parse is never committed (last good copy restored), push with three tries. The run logs of 8-9 Nov showed the plain
+pull refused every minute ("unstaged changes": accounts.json was never committed by the minute step). Members run under
+`timeout` write with `council/jsonio.mjs` `writeAtomic` (temp + rename); macro.mjs never overwrites an append-only log that
+does not parse (sources `file:<name>`), keeps a failed calendar week from its cache (`mergeCalendar`), extends the weekly
+daily-candle cache with the run's closed OANDA days for the DXY / gold; the Gold Macro Score flags an input older than 10 days
+(`stale`) and is withheld past 28. `injectSection` drops a lone block marker. Tests: `tests/datasync.test.mjs` (local git
+repos), `tests/jsonio.test.mjs`, `tests/macro-reliability.test.mjs`, `tests/macroscore-stale.test.mjs`, `tests/analyst-report.test.mjs`.
+
 ## Book weights, paper comparison (8 Nov 2026; portfolio-v2 proposal, owner undecided)
 `council/book.mjs` (pure; tests `tests/book.test.mjs`): from the forward paper records (trades.json live + NQ open-run paper via
 `alertable`, after costs; ICT A-setups from ict/trades.json with ict/replay.json filling the days the forward tracker has no record
