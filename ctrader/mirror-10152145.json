@@ -1778,6 +1778,32 @@
     "positionId": "47605841",
     "volume": 200000,
     "status": "open"
+   },
+   "usdcad-rscalp-1794223067": {
+    "symbol": "USDCAD",
+    "side": "buy",
+    "setup": "rscalp",
+    "openedAt": "2026-11-09T11:23:42.000Z",
+    "councilEntry": 1.4089,
+    "stop": 1.40768,
+    "t1": 1.40904,
+    "adopted": false,
+    "alerted": [
+     "open"
+    ],
+    "viaLimit": true,
+    "limitPrice": 1.4089,
+    "digits": 5,
+    "lots": 0.02,
+    "riskCash": 2,
+    "margin": 4,
+    "shadow": true,
+    "fillPrice": 1.4089,
+    "slipR": 0,
+    "lagSec": 342,
+    "positionId": "47607409",
+    "volume": 200000,
+    "status": "open"
    }
   },
   "day": {
@@ -1785,7 +1811,7 @@
    "startBalance": 9987.78
   },
   "startedAt": "2026-11-08T11:42:25.000Z",
-  "status": "ok · demo Fusion Markets · balance 10013.35 · 29 open · 6 resting",
+  "status": "ok · demo Fusion Markets · balance 10013.35 · 30 open · 5 resting",
   "skipped": {
    "audusd-position-1793601653": "price 0.68666 has run 1.27R from the council entry 0.70162: a different trade now",
    "xrp-rswing-1793942619": "none of XRPUSD found at the broker",
@@ -1900,38 +1926,13 @@
     "alerted": [
      "pending"
     ]
-   },
-   "usdcad-rscalp-1794223067": {
-    "orderId": "33797950",
-    "symbol": "USDCAD",
-    "side": "buy",
-    "volume": 200000,
-    "lots": 0.02,
-    "digits": 5,
-    "setup": "rscalp",
-    "limitPrice": 1.4089,
-    "stop": 1.40768,
-    "t1": 1.40904,
-    "placedAt": "2026-11-09T11:21:21.000Z",
-    "expires": "2026-11-09T14:17:47.000Z",
-    "riskCash": 2,
-    "margin": 4,
-    "shadow": true,
-    "alerted": [
-     "pending"
-    ]
    }
   },
   "catchUpAt": "2026-11-08T12:04:40.000Z",
   "balance": 10013.35,
-  "lastRun": "2026-11-09T11:21:21.000Z"
+  "lastRun": "2026-11-09T11:23:42.000Z"
  },
  "log": [
-  {
-   "at": "2026-11-08T21:00:57.000Z",
-   "msg": "not mirrored yet audusd-scalp-1793949425: AUDUSD market closed (paused until 21:09 UTC) (will retry)",
-   "trade": "audusd-scalp-1793949425"
-  },
   {
    "at": "2026-11-08T21:04:43.000Z",
    "msg": "not mirrored xrp-rscalp-1794171846: none of XRPUSD found at the broker",
@@ -3426,6 +3427,11 @@
    "at": "2026-11-09T11:21:21.000Z",
    "msg": "placed buy limit USDCAD 0.02 lot at 1.4089 (council rscalp, valid to 2026-11-09T14:17Z)",
    "trade": "usdcad-rscalp-1794223067"
+  },
+  {
+   "at": "2026-11-09T11:23:42.000Z",
+   "msg": "limit filled: USDCAD position 47607409 at the broker",
+   "trade": "usdcad-rscalp-1794223067"
   }
  ],
  "limits": {
@@ -3504,11 +3510,11 @@
   ]
  },
  "execution": {
-  "n": 62,
+  "n": 63,
   "meanSlipR": -0.008,
   "medianSlipR": 0,
   "worstSlipR": 1.168,
-  "medianLagSec": 212,
+  "medianLagSec": 214,
   "bySymbol": {
    "SOLUSD": {
     "n": 5,
@@ -3531,8 +3537,8 @@
     "meanSlipR": -0.077
    },
    "USDCAD": {
-    "n": 9,
-    "meanSlipR": -0.017
+    "n": 10,
+    "meanSlipR": -0.015
    },
    "USDCHF": {
     "n": 7,
