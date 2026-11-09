@@ -1611,6 +1611,33 @@
     "positionId": "47583058",
     "volume": 400000,
     "status": "open"
+   },
+   "eurusd-scalp-1794222180": {
+    "positionId": "47600543",
+    "symbol": "EURUSD",
+    "side": "buy",
+    "volume": 400000,
+    "lots": 0.04,
+    "digits": 5,
+    "setup": "scalp",
+    "status": "open",
+    "openedAt": "2026-11-09T11:04:01.000Z",
+    "councilEntry": 1.11942,
+    "stop": 1.11892,
+    "t1": 1.1204200000000004,
+    "riskCash": 2,
+    "margin": 8.95,
+    "shadow": true,
+    "mark": 1.11942,
+    "levelsFrom": "mark",
+    "fillPrice": 1.11941,
+    "slipR": -0.02,
+    "lagSec": 61,
+    "alerted": [
+     "open"
+    ],
+    "stopCheckedAt": "2026-11-09T11:04:01.000Z",
+    "brokerStop": 1.11891
    }
   },
   "day": {
@@ -1618,7 +1645,7 @@
    "startBalance": 9987.78
   },
   "startedAt": "2026-11-08T11:42:25.000Z",
-  "status": "ok · demo Fusion Markets · balance 10011.11 · 26 open · 3 resting",
+  "status": "ok · demo Fusion Markets · balance 10011.11 · 27 open · 3 resting",
   "skipped": {
    "audusd-position-1793601653": "price 0.68666 has run 1.27R from the council entry 0.70162: a different trade now",
    "xrp-rswing-1793942619": "none of XRPUSD found at the broker",
@@ -1699,14 +1726,9 @@
   },
   "catchUpAt": "2026-11-08T12:04:40.000Z",
   "balance": 10011.11,
-  "lastRun": "2026-11-09T11:02:39.000Z"
+  "lastRun": "2026-11-09T11:04:01.000Z"
  },
  "log": [
-  {
-   "at": "2026-11-08T20:59:01.000Z",
-   "msg": "not mirrored yet eurusd-intraday-1793890935: EURUSD market closed (paused until 21:09 UTC) (will retry)",
-   "trade": "eurusd-intraday-1793890935"
-  },
   {
    "at": "2026-11-08T20:59:01.000Z",
    "msg": "not mirrored yet gbpusd-scalp-1793916690: GBPUSD market closed (paused until 21:09 UTC) (will retry)",
@@ -3201,6 +3223,11 @@
    "at": "2026-11-09T11:02:39.000Z",
    "msg": "not mirrored xrp-scalp-1794222088: none of XRPUSD found at the broker",
    "trade": "xrp-scalp-1794222088"
+  },
+  {
+   "at": "2026-11-09T11:04:01.000Z",
+   "msg": "opened buy EURUSD 0.04 lot (council scalp)",
+   "trade": "eurusd-scalp-1794222180"
   }
  ],
  "limits": {
@@ -3279,11 +3306,11 @@
   ]
  },
  "execution": {
-  "n": 56,
+  "n": 57,
   "meanSlipR": -0.012,
   "medianSlipR": 0,
   "worstSlipR": 1.168,
-  "medianLagSec": 222,
+  "medianLagSec": 220,
   "bySymbol": {
    "SOLUSD": {
     "n": 5,
@@ -3298,8 +3325,8 @@
     "meanSlipR": -0.195
    },
    "EURUSD": {
-    "n": 8,
-    "meanSlipR": -0.042
+    "n": 9,
+    "meanSlipR": -0.04
    },
    "GBPUSD": {
     "n": 9,
