@@ -1297,3 +1297,31 @@ offline.html was 9 px too wide on phones; the Edge lab donut label fell to 10.8 
 quick Buy / Sell labels under AA; the gold terminal had no way back to the desk (the installed app's "Gold" shortcut). Checks:
 `tests/qa-sweep.test.mjs` (also pins the owner's grey / black light-mode candles) and `scripts/audit/smoke.cjs` (offline.html, and no
 visible endless animation of a custom property or box-shadow on any page).
+
+## Inner pages design pass (9 Nov 2026, owner: "keep improving all the bits of the dashboard", "more visual… more simpler")
+Council panes, Journal, the desks (ICT, LIT, NQ SDV, Gold, Crypto), Scanner, Profile, Users and the notifications; Home and Charts
+untouched. All in `#ms-inner-css` / `#ms-inner-js` (end of market-structure.html) plus small renderer edits. Rules that hold:
+- 12 px floor in these views (chips, pills, table notes, calendar cells, SVG labels). Calendar cells carry `msCalR(v, full)`: the full
+  R on wide screens, a compact one (`+1.2R`, `+10R`) under 600 px (`.cr-l` / `.cr-s`); the council's NQ / shadow split per day hides
+  on phones (it is in the day list).
+- Light theme: `--buy #067562`, `--sell #c2203d`, `--ink-faint #5f6673` inside these views (council `--buy #056350`); dark themes'
+  faint text one step lighter there (`#8b94a6`). Primary buttons on the profile and the slide-in are `#2f5fd0` with white text
+  (midnight / pro: the accent with dark text). Light-mode chart candles are not touched (`candleCols()` / `L.vcol`).
+- Touch (`pointer: coarse`): every button, select, input, summary and desk-switch link in these views is >= 44 px; the bell is 44 px.
+- Long detail folds behind "Show all …" (`F` in `#ms-inner-js`: analyst brief, Coach review, rule changes, ready setups, What to
+  expect, profile history, crypto setups). A fold is applied from the start, also while its pane is hidden, and re-applied from its
+  root's Mutation / Resize observers (before paint), so opening a pane never shifts the page. Write-ups fold into `details.in-why`
+  (ICT candidate rules, LIT setup list, gold tweaks).
+- Small charts (inline SVG / CSS, colour never alone: every bar has its signed number): Journal system trades (running-R line +
+  one bar per system, `#ms-js-viz`), ICT candidate rules (R / trade bar, the current A-rule row shaded as the baseline), crypto by
+  system / coin, the LIT detector funnel, Users (`n of 9` areas meter), NQ SDV steps as a stepper.
+- Gold playbook: each part keeps its room while the PAXG history loads (CLS 0.67 -> 0.004); empty parts say what they wait for.
+- Fixed on the way: Council Systems threw `sn is not defined` (Mosha BO chain line), LIT replay text was escaped twice (`&#39;`),
+  the profile portrait was an empty ring (gradient ids copied from a closed popup), the scanner's waiting row pulsed forever,
+  the Users note still said the owner password lives in the page. `/cdata/ict/desk.json` answers a signed-in read with
+  `{"reviews":{}}` until the first review is saved (`EMPTY_UNTIL_WRITTEN` in api/data.js; it logged a 404 on every ICT load).
+- No endless animation in these views: skeleton rows, loaders, the profile's live dot and the macro halo run 3 cycles and rest.
+  Tests: `tests/inner-pages.test.mjs`.
+- Audit (Playwright, not in node --test): 390 / 1440 px x dark / light / midnight / pro x owner / reviewer / viewer, /api/me and
+  /api/notify stubbed, council-data at /cdata, Binance / gold-api stubbed: text < 12 px, AA contrast (canvas-resolved colours, so
+  oklch / color-mix count), touch < 44 px, sideways scroll, CLS, page errors.

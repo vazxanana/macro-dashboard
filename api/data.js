@@ -17,6 +17,9 @@ const PRIVATE = new Set(['ctrader/tokens.json', 'users.json']);
 //   research.json            NQ forward paper counted in the guest results and calendar (sysClosed)
 //   mt5/signals.csv          the MT5 / cTrader CouncilBridge EAs poll it without a browser session
 const GUEST_OK = new Set(['trades.json', 'snapshot.json', 'ict/replay.json', 'research/replay-2w.json', 'research.json', 'mt5/signals.csv']);
+// files that do not exist until someone writes the first one: a signed-in read gets their empty form instead of a 404 (9 Nov QA: every
+// ICT desk load logged "404 /cdata/ict/desk.json" until the first review was saved)
+const EMPTY_UNTIL_WRITTEN = { 'ict/desk.json': '{"reviews":{}}' };
 
 // one council-data file from GitHub: { ok, status, buf }. With a token: the GitHub API (works on a private repo); without one: the
 // public raw file (only while the repo is still public). Also used by other functions instead of fetching /cdata over HTTP.
@@ -53,6 +56,7 @@ async function handle(req, res, d = {}) {
   }
   try {
     const r = await readFile(p, env, d.fetch || fetch);
+    if (!r.ok && r.status === 404 && EMPTY_UNTIL_WRITTEN[p]) { res.setHeader('Cache-Control', 'private, no-store'); res.setHeader('Content-Type', 'application/json; charset=utf-8'); return res.status(200).send(EMPTY_UNTIL_WRITTEN[p]); }
     if (!r.ok) { res.setHeader('Cache-Control', guest ? 's-maxage=15' : 'private, no-store'); return res.status(r.status === 404 ? 404 : 502).json({ error: `GitHub ${r.status}` }); }
     const ext = (p.split('.').pop() || '').toLowerCase();
     res.setHeader('Content-Type', { json: 'application/json; charset=utf-8', md: 'text/markdown; charset=utf-8', csv: 'text/csv; charset=utf-8', js: 'application/javascript; charset=utf-8' }[ext] || 'text/plain; charset=utf-8');
@@ -69,3 +73,4 @@ module.exports.handle = handle;
 module.exports.readFile = readFile;
 module.exports.GUEST_OK = GUEST_OK;
 module.exports.PRIVATE = PRIVATE;
+module.exports.EMPTY_UNTIL_WRITTEN = EMPTY_UNTIL_WRITTEN;
