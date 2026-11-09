@@ -1554,9 +1554,12 @@
   "gbpusd|rscalp|1794222900|1794246000": 1794246092,
   "audusd|rscalp|1794244500|1794246120": 1794246188,
   "sol|rscalp|1794174300|1794246540": 1794246547,
-  "xrp|rscalp|1794245400|1794246600": 1794246692
+  "xrp|rscalp|1794245400|1794246600": 1794246692,
+  "xrp|scalp|1794240900|1794247380": 1794247379,
+  "usdcad|intraday|1794002400|1794233400": 1794247379,
+  "usdcad|rscalp|1794237300|1794245220": 1794247379
  },
- "lastRun": 1794247206,
+ "lastRun": 1794247379,
  "news": {
   "at": 1794242486,
   "data": [
@@ -1630,33 +1633,33 @@
   },
   "btc": {
    "feed": "kraken",
-   "t": 1794247140,
-   "close": 74696.7
+   "t": 1794247320,
+   "close": 74695.3
   },
   "eth": {
    "feed": "kraken",
-   "t": 1794247140,
-   "close": 2123.48
+   "t": 1794247320,
+   "close": 2122.71
   },
   "sol": {
    "feed": "kraken",
-   "t": 1794247140,
-   "close": 86.53
+   "t": 1794247320,
+   "close": 86.55
   },
   "xrp": {
    "feed": "kraken",
-   "t": 1794247140,
-   "close": 1.09246
+   "t": 1794247320,
+   "close": 1.0901
   },
   "eurusd": {
    "feed": "oanda",
-   "t": 1794246900,
-   "close": 1.12041
+   "t": 1794247320,
+   "close": 1.12032
   },
   "gbpusd": {
    "feed": "oanda",
-   "t": 1794246900,
-   "close": 1.34212
+   "t": 1794247320,
+   "close": 1.342
   },
   "audusd": {
    "feed": "oanda",
@@ -1664,14 +1667,14 @@
    "close": 0.69139
   },
   "usdcad": {
-   "feed": "oanda",
-   "t": 1794246900,
-   "close": 1.41296
+   "feed": "kraken",
+   "t": 1794247320,
+   "close": 1.41372
   },
   "usdchf": {
    "feed": "oanda",
-   "t": 1794246900,
-   "close": 0.82095
+   "t": 1794247320,
+   "close": 0.82111
   }
  },
  "feedChanges": [
@@ -2070,14 +2073,33 @@
    "rebased": 0,
    "kept": 0,
    "ids": []
+  },
+  {
+   "at": "2026-11-09T18:02:59.000Z",
+   "market": "usdcad",
+   "label": "USD/CAD",
+   "from": "oanda",
+   "to": "kraken",
+   "basis": 0.00074,
+   "rederived": 0,
+   "cancelled": 0,
+   "rebased": 5,
+   "kept": 0,
+   "ids": [
+    "usdcad-scalp-1793689919",
+    "usdcad-position-1793949081",
+    "usdcad-swing-1793949081",
+    "usdcad-intraday-1794223067",
+    "usdcad-intraday-1794233596"
+   ]
   }
  ],
  "feedMiss": {
-  "xau": 0,
-  "eurusd": 1,
-  "gbpusd": 1,
-  "audusd": 0,
-  "usdcad": 1,
-  "usdchf": 1
+  "xau": 1,
+  "eurusd": 0,
+  "gbpusd": 0,
+  "audusd": 1,
+  "usdcad": 2,
+  "usdchf": 0
  }
 }
