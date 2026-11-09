@@ -95,8 +95,6 @@
   .btn { display: inline-flex; align-items: center; gap: 6px; min-height: 32px; padding: 6px 12px; border-radius: var(--r-sm); border: 1px solid var(--line); background: var(--neutral-soft); font: 500 12.5px var(--sans); color: var(--ink-dim); cursor: pointer; transition: background .15s, color .15s, border-color .15s; }
   .btn:hover { color: var(--ink); border-color: var(--line-strong); }
   .btn svg { width: 14px; height: 14px; }
-  .btn[aria-busy="true"] svg { animation: spin .8s linear infinite; }
-  @keyframes spin { to { transform: rotate(360deg); } }
 
 
   /* ─── Macro desk (8 Nov 2026, owner: "a macro area where i can see both reports ... key insights and near to insider information") ─── */
@@ -129,10 +127,7 @@
   .vlib-doc code { font: 12px ui-monospace, SFMono-Regular, Menlo, monospace; background: var(--neutral-soft); padding: 1px 4px; border-radius: 4px; } .vlib-doc pre { background: var(--neutral-soft); border: 1px solid var(--line); border-radius: 8px; padding: 10px 12px; overflow: auto; } .vlib-doc pre code { background: none; padding: 0; }
   .vlib-doc blockquote { margin: 8px 0; padding: 4px 12px; border-left: 3px solid var(--line); color: var(--ink-faint); } .vlib-doc a { color: var(--accent); } .vlib-doc hr { border: 0; border-top: 1px solid var(--line); margin: 14px 0; }
   .vlib-doc .meta { font-size: 12px; color: var(--ink-faint); margin: 0 0 10px; }
-  .card { padding: 14px 16px; } .card h2 { font-size: 15px; } .card h3 { margin: 12px 0 4px; font-size: 12px; } .card p { font-size: 12.5px; margin: 4px 0; line-height: 1.45; }
-  .big { font-size: 20px; } .ch { font-size: 12px; } .ch th, .ch td { padding: 5px 6px 5px 0; } .ch .cannot { display: none; } .card.limits .ch .cannot { display: block; }
-  .insights { font-size: 12.5px; line-height: 1.5; } .debate li { font-size: 12.5px; padding-top: 9px; } .strip { margin-bottom: 12px; } .pill { padding: 4px 10px; font-size: 12px; }
-  section.block { margin-top: 12px; } .mk { font-size: 12.5px; } .bar { margin-top: 4px; height: 5px; }
+  .ch .cannot { display: none; } .card.limits .ch .cannot { display: block; }
   .lim { font: 500 12px var(--sans); color: var(--accent); background: none; border: 0; padding: 0; cursor: pointer; margin-left: 8px; }
   .strip { display: flex; flex-wrap: wrap; gap: 8px 10px; align-items: center; margin: 0 0 22px; }
   .pill { display: inline-flex; align-items: center; gap: 6px; padding: 5px 11px; border-radius: 999px; border: 1px solid var(--line); background: var(--neutral-soft); font-size: 12.5px; color: var(--ink-dim); }
@@ -354,6 +349,103 @@
   @media (max-width: 720px) { .nx-top { grid-template-columns: 1fr; } .nx-top > .nx-exp { order: 0; }
     .nx-sc thead { display: none; } .nx-sc tr { display: block; border-top: 1px solid var(--line-soft); padding: 8px 0; } .nx-sc td { display: block; border: 0; padding: 2px 0; }
     .nx-sc td[data-l]::before { content: attr(data-l) ": "; color: var(--ink-faint); font-weight: 600; } }
+
+  /* ─── Calm pass (9 Nov 2026, owner: "more simpler", "more visual", "keep improving all the bits"). One spacing and type scale,
+     one card anatomy (title, one line to take away, the chart, the detail folded), quiet hairlines instead of boxes inside boxes,
+     one colour code on every chart: gold = his number or the series, ink tick = the base rate, green / red = up / down (always with
+     a word or a glyph), grey = neutral. Section numbers come from a CSS counter so a hidden section never leaves a gap. ─── */
+  :root { --s1: 4px; --s2: 8px; --s3: 12px; --s4: 16px; --s5: 24px; --s6: 40px;
+    --fs-xs: 12px; --fs-sm: 13px; --fs-md: 14px; --fs-lg: 16px; --fs-xl: 20px; --fs-2xl: 26px; --well: var(--neutral-soft); }
+  small { font-size: var(--fs-xs); }
+  main [hidden] { display: none !important; }
+  @media (prefers-reduced-motion: no-preference) { html { scroll-behavior: smooth; } }
+  main.wrap { counter-reset: story; padding-top: var(--s2); }
+  .head { padding: var(--s4) 0 var(--s3); gap: var(--s1) var(--s4); }
+  .head h1 { font: 700 var(--fs-xl)/1.2 var(--sans); letter-spacing: -.3px; }
+  .head p.lede { font-size: var(--fs-sm); flex: 1 1 320px; }
+  .stamp { flex-basis: 100%; display: flex; align-items: baseline; gap: var(--s2); margin: var(--s1) 0 0; font-size: var(--fs-sm); color: var(--ink-dim); }
+  .stamp b { color: var(--ink); font-weight: 600; }
+  .stamp .sd { flex: none; width: 9px; height: 9px; border-radius: 50%; background: var(--ink-faint); transform: translateY(-1px); }
+  .stamp.ok .sd { background: var(--buy); }
+  .stamp.stale, .stamp.old { padding: var(--s2) var(--s3); border-radius: var(--r-sm); background: color-mix(in srgb, var(--gold) 12%, var(--panel)); color: var(--ink); }
+  .stamp.stale .sd { background: var(--gold); } .stamp.old { background: var(--sell-soft); } .stamp.old .sd { background: var(--sell); }
+  /* the contents bar: sticky under the top bar on wide screens; phones read the page top to bottom */
+  .toc { display: none; }
+  @media (min-width: 900px) {
+    .toc { position: sticky; top: 56px; z-index: calc(var(--z-sticky) - 1); display: flex; flex-wrap: wrap; gap: var(--s1); padding: var(--s2) 0; margin: 0 0 var(--s2);
+      background: color-mix(in srgb, var(--bg) 90%, transparent); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); }
+    .toc a { display: inline-flex; align-items: center; min-height: 32px; padding: 0 var(--s3); border-radius: 999px; color: var(--ink-dim); font: 500 var(--fs-sm) var(--sans); counter-increment: toc; }
+    .toc a::before { content: counter(toc); font: 600 var(--fs-xs) var(--mono); color: var(--ink-faint); margin-right: 6px; }
+    .toc a:hover { text-decoration: none; color: var(--ink); background: var(--well); }
+    .toc a[aria-current="true"] { color: var(--ink); background: color-mix(in srgb, var(--gold) 16%, var(--panel)); }
+    .toc a[aria-current="true"]::before { color: var(--gold-ink); }
+  }
+  .story { margin-top: var(--s6); scroll-margin-top: 112px; counter-increment: story; }
+  #s-week { margin-top: var(--s3); } .toc { counter-reset: toc; }
+  .st-h { display: flex; flex-wrap: wrap; align-items: baseline; gap: var(--s1) var(--s3); margin: 0 0 var(--s3); }
+  .st-h h2 { margin: 0; font: 700 var(--fs-xs)/1.4 var(--sans); letter-spacing: .08em; text-transform: uppercase; color: var(--gold-ink); }
+  .st-h h2::before { content: counter(story); display: inline-grid; place-items: center; width: 22px; height: 22px; margin-right: var(--s2); border-radius: 50%;
+    background: color-mix(in srgb, var(--gold) 16%, var(--panel)); color: var(--gold-ink); font: 700 var(--fs-xs) var(--mono); letter-spacing: 0; vertical-align: 1px; }
+  .st-m { color: var(--ink-faint); font-size: var(--fs-xs); }
+  .story > .card + .card { margin-top: var(--s3); }
+  .pair { display: grid; grid-template-columns: minmax(0, .85fr) minmax(0, 1.15fr); gap: 0 var(--s5); align-items: start; }
+  .pair:has(> .story[hidden]) { grid-template-columns: minmax(0, 1fr); }
+  @media (max-width: 1099px) { .pair { grid-template-columns: minmax(0, 1fr); } }
+  .duo { margin-top: 0; gap: var(--s3); }
+  /* card anatomy */
+  .card { border-color: var(--line-soft); padding: var(--s5); }
+  .card .c-t { margin: 0 0 var(--s1); font: 600 var(--fs-lg)/1.3 var(--sans); color: var(--ink); letter-spacing: -.2px; display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: var(--s1) var(--s3); }
+  .card .c-t small { font: 500 var(--fs-xs) var(--sans); color: var(--ink-faint); }
+  .card p.c-take, .c-take { margin: 0 0 var(--s3); font-size: var(--fs-md); line-height: 1.5; color: var(--ink-dim); max-width: 78ch; }
+  .c-take b { color: var(--ink); font-weight: 600; }
+  .card h4, .card h4.vz-h { margin: var(--s5) 0 var(--s2); font: 600 var(--fs-sm)/1.4 var(--sans); color: var(--ink); }
+  .card h4 small { font-weight: 400; color: var(--ink-faint); font-size: var(--fs-xs); margin-left: 6px; }
+  .card p, .vz-note { font-size: var(--fs-sm); }
+  details.fold { margin-top: var(--s4); border-top: 1px solid var(--line-soft); }
+  details.fold > summary { list-style: none; cursor: pointer; display: flex; align-items: center; flex-wrap: wrap; gap: 2px var(--s2); min-height: 44px; padding: var(--s2) 0; margin: 0; color: var(--ink); font: 600 var(--fs-sm) var(--sans); }
+  details.fold > summary::-webkit-details-marker { display: none; }
+  details.fold > summary::before { content: "▸"; color: var(--gold-ink); width: 12px; flex: none; }
+  details.fold[open] > summary::before { content: "▾"; }
+  details.fold > summary small { font-weight: 400; color: var(--ink-faint); font-size: var(--fs-xs); }
+  details.fold > summary:hover { color: var(--gold-ink); }
+  details.fold[open] { padding-bottom: var(--s2); }
+  /* fewer borders: wells instead of boxes inside cards */
+  .tile, .bins > li, .hyb article, .cg, .anst div, .gauge div, .vlib-cpi { border: 0; background: var(--well); }
+  .tile { padding: var(--s4); }
+  .cg:hover, .cg.tip-on { border: 0; background: color-mix(in srgb, var(--ink) 7%, var(--panel)); }
+  .glance { border-color: var(--line-soft); background: linear-gradient(180deg, color-mix(in srgb, var(--gold) 6%, var(--panel)), var(--panel) 60%); padding: var(--s5); }
+  .g-sent { font-size: var(--fs-xl) !important; margin-bottom: var(--s4) !important; }
+  .g-pub { margin-top: var(--s4) !important; }
+  .jump { font-weight: 600; } .jump:hover { text-decoration: none; color: var(--gold-ink); }
+  .pubonly { border-left: 0; border-radius: var(--r-sm); background: var(--well); margin-top: var(--s4); }
+  .nxt { margin-top: 0; }
+  /* one colour code on the charts */
+  .pcall i s { background: var(--gold); } .lvt tr.now td { color: var(--gold-ink); border-top-color: var(--gold); } .lvt tr.cf td:nth-child(2)::after { color: var(--gold-ink); }
+  .bins > li > b::before { color: var(--gold-ink); } .cot i.last { background: var(--gold); }
+  /* the score: path and drivers side by side on wide screens */
+  .sc-grid { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr); gap: var(--s5); align-items: start; }
+  .sc-grid h4.vz-h { margin-top: var(--s1); }
+  @media (max-width: 900px) { .sc-grid { grid-template-columns: minmax(0, 1fr); } .sc-grid h4.vz-h { margin-top: var(--s4); } }
+  /* next release: the three cases in one row */
+  .nx-3 { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--s3); }
+  .nx-c { background: var(--well); border-radius: var(--r-sm); padding: var(--s3) var(--s4); font-size: var(--fs-sm); color: var(--ink-dim); min-width: 0; }
+  .nx-c > b { display: flex; align-items: center; color: var(--ink); font-size: var(--fs-md); } .nx-c > small { display: block; color: var(--ink-faint); margin-bottom: var(--s1); }
+  .nx-c p { margin: 2px 0 !important; } .nx-c .dir.up { color: var(--buy); font-weight: 600; } .nx-c .dir.dn { color: var(--sell); font-weight: 600; }
+  .nx-c .sw { display: inline-block; width: 10px; height: 10px; border-radius: 3px; margin-right: 6px; background: var(--neutral-strong); } .nx-c.hot .sw { background: var(--sell); } .nx-c.cool .sw { background: var(--buy); }
+  @media (max-width: 720px) { .nx-3 { grid-template-columns: minmax(0, 1fr); } }
+  /* COT: the pre-registered verdict per market, in words */
+  .cot-edge { margin: 0 0 var(--s2); } .cot-edge p { margin: 0 0 var(--s1); }
+  .cg-e { margin: var(--s2) 0 0 !important; font: 600 var(--fs-xs) var(--sans) !important; color: var(--ink-faint); display: flex; gap: 6px; align-items: baseline; }
+  .cg-e.tested { color: var(--ink); } .cg-e .eg-i { width: 12px; text-align: center; } .cg-e.tested .eg-i { color: var(--buy); }
+  /* the folded detail at the bottom */
+  details.deep { margin-top: 0; } details.deep > summary { border: 1px solid var(--line-soft); background: var(--panel); min-height: 52px; align-items: center; }
+  details.deep > summary:hover { border-color: var(--line-strong); }
+  .calls h4 { margin-top: var(--s3); }
+  /* touch screens: 44 px targets */
+  .pbar::after { content: ""; position: absolute; left: 0; right: 0; top: -16px; bottom: -16px; }
+  details.fold + details.fold { margin-top: 0; }
+  @media (pointer: coarse) { .tabs button, .lim, details summary, .toc a, .hdr-sw a, .brand[href], .jump { min-height: 44px; } .jump, .brand[href] { display: inline-flex; align-items: center; } .lim { padding: 0 var(--s2); } details:not(.fold):not(.deep) > summary { display: flex; align-items: center; } }
+  @media (max-width: 600px) { .top #when { display: none; } .card, .glance { padding: var(--s4); } .story { margin-top: var(--s5); } .g-sent { font-size: 17px !important; } .stamp { font-size: var(--fs-xs); } }
 </style>
 <!-- app tags: scripts/pwa.mjs -->
 <link rel="manifest" href="/app.webmanifest">
@@ -375,78 +467,121 @@
   </div>
 </header>
 <main class="wrap">
+  <!-- Calm pass (9 Nov 2026, owner: "more simpler", "more visual", "keep improving all the bits"): one story, top to bottom.
+       This week → Next release → Why → Where price sits → What he expects → Track record → the detail, folded. Each card: a title,
+       one line to take away, the chart, then the detail folded. Nothing removed; the long tables and lists moved into the folds. -->
   <div class="head">
     <h1>Macro desk</h1>
-    <p class="lede">The veteran's week in one look, then the detail. Paper only.</p>
+    <p class="lede">The veteran's week from the top: what matters, why, where price sits, what he expects and how he has scored. Paper only.</p>
+    <p class="stamp" id="stamp" role="status"><span class="sd" aria-hidden="true"></span><span id="stamp-t">Loading…</span></p>
+  </div>
+  <nav class="toc" id="toc" aria-label="Sections on this page">
+    <a href="#s-week">This week</a><a href="#s-next">Next release</a><a href="#s-why">Why</a><a href="#s-price">Where price sits</a><a href="#s-expect">What he expects</a><a href="#s-track">Track record</a><a href="#s-deep">The detail</a>
+  </nav>
+
+  <!-- 1. This week: council/glance.mjs → veteran.json.summary; what changed (veteran.json.changes) folded under it -->
+  <section class="story" id="s-week" aria-labelledby="g-h">
+    <header class="st-h"><h2 id="g-h">This week</h2><small class="st-m" id="g-at"></small></header>
+    <article class="card glance" id="c-glance" hidden>
+      <p class="g-sent" id="g-sent"></p>
+      <div class="g-grid">
+        <div class="tile" id="g-meter" aria-label="Bias for gold"></div>
+        <div class="tile" id="g-event" aria-label="The event that matters most"></div>
+        <div class="tile" id="g-levels" aria-label="Two levels to watch"></div>
+      </div>
+      <p class="g-pub"><b>Public data only.</b> CFTC positioning, Treasury and FRED series, the release calendar and central-bank feeds, read early and carefully. No inside information. <span id="g-cal"></span></p>
+      <details class="fold" id="c-changes" hidden><summary>What changed since last week <small id="chg-sub"></small></summary><ul class="chg" id="chg"></ul></details>
+    </article>
+  </section>
+
+  <!-- 2. Next release: the veteran's event playbook, council/playbook.mjs → veteran.json.events -->
+  <section class="story" id="s-next" aria-labelledby="nx-h">
+    <header class="st-h"><h2 id="nx-h">Next release</h2><small class="st-m" id="nx-sub"></small></header>
+    <article class="card nxt" id="c-next" hidden>
+      <p class="c-take" id="nx-take"></p>
+      <div class="nx-top">
+        <div class="tile nx-ev" id="nx-ev"></div>
+        <div class="tile nx-exp" id="nx-exp"></div>
+        <div class="tile nx-call" id="nx-call"></div>
+      </div>
+      <h4 class="vz-h">If it prints… <small>act after the release, not before</small></h4>
+      <div id="nx-sc"></div>
+      <h4 class="vz-h" id="nx-st-h">What past releases did</h4>
+      <div class="vz" id="nx-chart"></div>
+      <p class="nx-also" id="nx-also"></p>
+      <details class="fold" id="nx-more"><summary>Detail <small>what to do in each case, the release day, after the first spike, the nowcast split, the test, method</small></summary><div id="nx-detail"></div></details>
+    </article>
+  </section>
+
+  <!-- 3. Why: the tested Gold Macro Score and its four drivers, then the briefing's key insights -->
+  <section class="story" id="s-why" aria-labelledby="why-h">
+    <header class="st-h"><h2 id="why-h">Why</h2><small class="st-m">the tested score, what moves it, and the readings that stand out</small></header>
+    <article class="card" id="c-score" aria-labelledby="sc-h" hidden>
+      <h3 class="c-t" id="sc-h">Gold Macro Score <small id="sc-sub"></small></h3>
+      <div class="sc-grid">
+        <div><div class="sc-top" id="sc-top"></div><div class="vz" id="score-spark"></div></div>
+        <div><h4 class="vz-h">What moves it <small>four drivers as z-scores; their average is the score</small></h4><div id="score-drv"></div></div>
+      </div>
+      <details class="fold"><summary>Weekly values <small>table</small></summary><div id="score-tbl"></div></details>
+    </article>
+    <article class="card" id="c-ins" aria-labelledby="ins-h" hidden>
+      <h3 class="c-t" id="ins-h">Key insights <small id="brief-at"></small></h3>
+      <p class="c-take">Ranked by how unusual each reading is against its own history. Tap one for the evidence.</p>
+      <ol class="bins" id="brief-ins"></ol>
+      <p class="pubonly" id="brief-pub"></p>
+    </article>
+  </section>
+
+  <div class="pair">
+    <!-- 4. Where price sits: the briefing's structural levels on one price scale -->
+    <section class="story" id="s-price" aria-labelledby="ld-h">
+      <header class="st-h"><h2 id="ld-h">Where price sits</h2><small class="st-m" id="ld-sub"></small></header>
+      <article class="card" id="c-ladder" hidden>
+        <p class="c-take" id="ld-take"></p>
+        <div class="vz" id="ladder"></div>
+        <p class="vz-note" id="ld-note"></p>
+        <details class="fold"><summary>Every level, gold and the dollar <small>table</small></summary><div class="blv" id="brief-lv"></div></details>
+      </article>
+    </section>
+
+    <!-- 5. What he expects: the briefing's hypotheses against the base rate; his dated calls and the analogs folded -->
+    <section class="story" id="s-expect" aria-labelledby="brief-h">
+      <header class="st-h"><h2 id="brief-h">What he expects</h2><small class="st-m">his chance against the base rate; scored on the date</small></header>
+      <article class="card brief" id="c-brief" hidden>
+        <p class="c-take" id="hyp-take"></p>
+        <div class="hyb" id="brief-hyp"></div>
+        <details class="fold" id="c-calls-d" hidden><summary>His dated calls <small id="calls-sub">this week, this month, from positioning</small></summary>
+          <div class="calls"><div><h4 id="calls-wk">This week</h4><ul class="pcall" id="calls-w"></ul></div><div><h4 id="calls-mo">This month</h4><ul class="pcall" id="calls-m"></ul></div></div>
+          <div id="calls-cot"></div></details>
+        <details class="fold"><summary>Historical analogs <small id="brief-an-sub"></small></summary><div id="brief-an"></div></details>
+      </article>
+    </section>
   </div>
 
-  <!-- 1. the glance (9 Nov 2026, owner: "be the best of all time veteran, more visual, simpler"): council/glance.mjs → veteran.json.summary -->
-  <section class="card glance" id="c-glance" aria-labelledby="g-h" hidden>
-    <p class="kick"><span id="g-h">This week</span><small id="g-at"></small></p>
-    <p class="g-sent" id="g-sent"></p>
-    <div class="g-grid">
-      <div class="tile" id="g-meter" aria-label="Bias for gold"></div>
-      <div class="tile" id="g-event" aria-label="The event that matters most"></div>
-      <div class="tile" id="g-levels" aria-label="Two levels to watch"></div>
+  <!-- 6. Track record: the calls scored on their dates, and the self-calibration (council/calibration.mjs) -->
+  <section class="story" id="s-track" aria-labelledby="tr-h">
+    <header class="st-h"><h2 id="tr-h">Track record</h2><small class="st-m">every call is kept once and scored on its date</small></header>
+    <div class="duo">
+      <article class="card" id="c-calls" aria-labelledby="calls-h" hidden>
+        <h3 class="c-t" id="calls-h">His calls over time <small>running share that came true</small></h3>
+        <p class="c-take" id="calls-take"></p>
+        <div class="vz" id="calls-hist"></div>
+        <div id="calls-rec"></div>
+        <details class="fold"><summary>How the calls are made</summary><p class="note" id="calls-note"></p></details>
+      </article>
+      <article class="card" id="c-calib" aria-labelledby="calib-h" hidden>
+        <h3 class="c-t" id="calib-h">Is he calibrated? <small id="calib-sub"></small></h3>
+        <p class="c-take" id="calib-take"></p>
+        <div class="calib"><div id="calib-chart"></div><div id="calib-side"></div></div>
+        <details class="fold"><summary>How the self-calibration works</summary><p class="note" id="calib-method"></p></details>
+      </article>
     </div>
-    <p class="g-pub"><b>Public data only.</b> CFTC positioning, Treasury and FRED series, the release calendar and central-bank feeds, read early and carefully. No inside information. <span id="g-cal"></span></p>
   </section>
 
-  <!-- 1b. the next release (9 Nov 2026, the veteran's event playbook): council/playbook.mjs → veteran.json.events -->
-  <section class="card nxt" id="c-next" aria-labelledby="nx-h" hidden>
-    <p class="kick"><span id="nx-h">Next release</span><small id="nx-sub"></small></p>
-    <div class="nx-top">
-      <div class="tile nx-ev" id="nx-ev"></div>
-      <div class="tile nx-exp" id="nx-exp"></div>
-      <div class="tile nx-call" id="nx-call"></div>
-    </div>
-    <h3 class="vz-h">If it prints… <small>act after the release, not before</small></h3>
-    <div id="nx-sc"></div>
-    <h3 class="vz-h" id="nx-st-h">What past releases did</h3>
-    <div class="vz" id="nx-chart"></div>
-    <p class="nx-also" id="nx-also"></p>
-    <details class="more" id="nx-more"><summary>Detail <small>the release day, after the first spike, the nowcast split, the test, method</small></summary><div id="nx-detail"></div></details>
-  </section>
-
-  <!-- 2. the two pictures (9 Nov 2026, owner: "more visual… more simpler"): the score's path and drivers, and where gold sits among its levels -->
-  <div class="duo">
-    <section class="card" id="c-score" aria-labelledby="sc-h" hidden><h2 id="sc-h">Gold Macro Score <small id="sc-sub"></small></h2>
-      <div class="sc-top" id="sc-top"></div>
-      <div class="vz" id="score-spark"></div>
-      <h3 class="vz-h">What moves it <small>four drivers as z-scores; their average is the score</small></h3>
-      <div id="score-drv"></div>
-      <details class="more"><summary>Weekly values <small>table</small></summary><div id="score-tbl"></div></details></section>
-    <section class="card" id="c-ladder" aria-labelledby="ld-h" hidden><h2 id="ld-h">Where gold sits <small id="ld-sub"></small></h2>
-      <p class="vz-note" id="ld-note"></p>
-      <div class="vz" id="ladder"></div>
-      <details class="more"><summary>Every level, gold and the dollar <small>table</small></summary><div class="blv" id="brief-lv"></div></details></section>
-  </div>
-
-  <section class="card brief" id="c-brief" aria-labelledby="brief-h" hidden>
-    <h2 id="brief-h">The veteran's briefing <small id="brief-at"></small></h2>
-    <h3>Key insights <small>ranked; tap one for the evidence</small></h3>
-    <ol class="bins" id="brief-ins"></ol>
-    <h3>Hypotheses for the week <small>his chance against the base rate; scored on their date</small></h3>
-    <div class="hyb" id="brief-hyp"></div>
-    <details class="more"><summary>Historical analogs <small id="brief-an-sub"></small></summary><div id="brief-an"></div></details>
-    <p class="pubonly" id="brief-pub"></p>
-  </section>
-
-  <div class="duo">
-    <section class="card" id="c-changes" aria-labelledby="chg-h" hidden><h2 id="chg-h">What changed since last week <small id="chg-sub"></small></h2><ul class="chg" id="chg"></ul></section>
-    <section class="card" id="c-calib" aria-labelledby="calib-h" hidden><h2 id="calib-h">Is he calibrated? <small id="calib-sub"></small></h2>
-      <div class="calib"><div id="calib-chart"></div><div id="calib-side"></div></div>
-      <details><summary>How the self-calibration works</summary><p class="note" id="calib-method"></p></details></section>
-  </div>
-
-  <details class="card more sect" id="c-calls-d"><summary>The veteran's calls <small>dated, with the chance of each</small></summary>
-  <section class="block" id="c-calls" aria-labelledby="calls-h"><h2 id="calls-h" class="sr">The veteran's calls <small id="calls-sub">specific, dated, with the chance of each happening</small></h2>
-    <h3 class="vz-h">Track record over time <small>running share of calls that came true vs what he expected</small></h3><div class="vz" id="calls-hist"></div>
-    <div class="calls"><div><h3 id="calls-wk">This week</h3><ul class="pcall" id="calls-w"></ul></div><div><h3 id="calls-mo">This month</h3><ul class="pcall" id="calls-m"></ul></div></div>
-    <div id="calls-cot"></div><div id="calls-rec"></div><p class="note" id="calls-note"></p></section>
-  </details>
-
-  <details class="deep" id="deep"><summary>The discussion and the data <small>strategist vs veteran, sources, COT, ledger, library</small></summary>
+  <!-- 7. The detail, folded: the discussion, the members, sources, COT, ledger, library -->
+  <section class="story" id="s-deep" aria-labelledby="deep-h">
+    <header class="st-h"><h2 id="deep-h">The detail</h2><small class="st-m">strategist vs veteran, sources, COT, ledger, library</small></header>
+  <details class="deep" id="deep"><summary>The discussion and the data <small>open the full read</small></summary>
   <p class="lede2">The <b>strategist</b> fetches the data and runs the tested Gold Macro Score; the <b>veteran</b> reads the same data with the professionals' frameworks and argues each topic.</p>
   <div class="strip" id="strip" aria-label="Consensus"></div>
   <div class="top3">
@@ -454,7 +589,6 @@
     <article class="card" id="c-vet"><h2>Macro veteran <small id="vet-at"></small></h2><div id="vet"></div></article>
     <article class="card"><h2>Key insights today</h2><ul class="insights" id="insights"></ul></article>
   </div>
-
 
   <div class="tabs" role="tablist" aria-label="Sections">
     <button type="button" role="tab" data-t="debate" aria-selected="true">The discussion <span id="deb-n"></span></button>
@@ -482,9 +616,10 @@
   </section>
 
   <section class="block card tabp" id="tab-cot" role="tabpanel" hidden><h2>COT positioning <small id="cot-sub">what the big speculators hold, week by week</small></h2>
-    <p class="vz-note">Where speculators' net position sits in its 3-year range (0 = the shortest, 100 = the longest), with the change on the week. Crowding context, not a direction.</p>
+    <p class="c-take">Where speculators' net position sits in its 3-year range (0 = the shortest, 100 = the longest), with the change on the week. Crowding context, not a direction.</p>
+    <div class="cot-edge" id="cot-edge"></div>
     <div class="cotg" id="cot-gauges"></div>
-    <details class="more"><summary>Full table <small>net, 4-week change, trader counts, signals and their tests</small></summary>
+    <details class="fold"><summary>Full table <small>net, 4-week change, trader counts, signals and their tests</small></summary>
     <div class="cotw"><table class="cott"><thead><tr><th>Market</th><th>Net</th><th>Week</th><th>4 weeks</th><th>Traders long / short</th><th>3-year range</th><th>Signal now</th></tr></thead><tbody id="cot-b"></tbody></table></div></details>
     <p class="note" id="cot-note"></p></section>
   <section class="block card tabp" id="tab-ledger" role="tabpanel" hidden><h2>Forecast ledger and scoreboard <small>who is right, kept honest</small></h2><div id="ledger"></div></section>
@@ -493,6 +628,7 @@
     <div class="vlib" id="vlib"><div class="vlib-side"><details class="vlib-new" id="vlib-new" open hidden></details><div class="vlib-cpi" id="vlib-cpi"></div><nav class="vlib-nav" id="vlib-nav" aria-label="Documents"></nav></div><article class="vlib-doc" id="vlib-doc"><p class="note">Pick a document. Dated briefs and cases are historical examples: refresh their sources before using a figure today.</p></article></div>
   </section>
   </details>
+  </section>
   <p class="note" id="foot"></p>
 </main>
 <div id="vz-tip" class="vz-tip" role="tooltip" hidden></div>
@@ -533,15 +669,18 @@
 
   // the veteran's dated calls and his summary of the registry data (council/outlook.mjs)
   function renderCalls(v) {
-    var o = v && v.outlook, sec = $('c-calls-d'); if (!o || !o.week) { sec.hidden = true; return; } sec.hidden = false;
+    var o = v && v.outlook, sec = $('c-calls-d'), tr = $('c-calls'); if (!o || !o.week) { sec.hidden = true; tr.hidden = true; return; } sec.hidden = false; tr.hidden = false;
     var li = function (c) { var p = Math.round(c.p * 100); return '<li><b>' + p + '%</b><span>' + esc(c.claim) + '</span><i><s style="width:' + p + '%"></s></i></li>'; };
     $('calls-wk').textContent = 'This week · to ' + o.week.by; $('calls-w').innerHTML = o.week.list.map(li).join('');
     $('calls-mo').textContent = 'This month · to ' + o.month.by; $('calls-m').innerHTML = o.month.list.map(li).join('');
-    $('calls-cot').innerHTML = o.cot && o.cot.length ? '<h3>From positioning (COT signals that passed the historical test)</h3><ul class="pcall">' + o.cot.map(li).join('') + '</ul>' : '';
-    var R = o.record; $('calls-rec').innerHTML = !R ? '' : !R.n ? '<p class="note"><b>Track record:</b> ' + R.open + ' calls recorded, none due yet. Each one is scored on its date.</p>'
-      : '<h3>Track record</h3><p class="note">' + R.n + ' calls scored: <b>' + Math.round(R.hitRate * 100) + '% came true</b> against <b>' + Math.round(R.expected * 100) + '% expected</b> · Brier ' + R.brier + ' (0 is perfect, 0.25 is a coin flip)'
-        + (R.high ? ' · calls at 60%+ came true ' + Math.round(R.high.hit * 100) + '% (' + R.high.n + ')' : '') + (R.low ? ' · calls at 40% or less ' + Math.round(R.low.hit * 100) + '% (' + R.low.n + ')' : '') + ' · ' + R.open + ' still open.</p>'
-        + (o.recent && o.recent.length ? '<ul class="pcall rec">' + o.recent.map(function (r) { return '<li><b>' + (r.hit ? '✓' : '✗') + '</b><span>' + esc(r.claim) + ' <small>(' + Math.round(r.p * 100) + '%)</small></span></li>'; }).join('') + '</ul>' : '');
+    $('calls-cot').innerHTML = o.cot && o.cot.length ? '<h4>From positioning <small>COT signals that passed the pre-registered test</small></h4><ul class="pcall">' + o.cot.map(li).join('') + '</ul>' : '';
+    $('calls-sub').textContent = (o.week.list.length + o.month.list.length + (o.cot ? o.cot.length : 0)) + ' calls · this week, this month' + (o.cot && o.cot.length ? ', from positioning' : '');
+    var R = o.record;
+    $('calls-take').innerHTML = !R ? 'No track record yet.' : !R.n ? '<b>' + R.open + ' calls on the record, none due yet.</b> Each one is scored on its date.'
+      : '<b>' + Math.round(R.hitRate * 100) + '% came true</b> against <b>' + Math.round(R.expected * 100) + '% expected</b> over ' + R.n + ' scored calls · ' + R.open + ' still open.';
+    $('calls-rec').innerHTML = !R || !R.n ? '' : '<details class="fold"><summary>Scores and the latest calls <small>Brier, by confidence band</small></summary><p class="note">Brier ' + R.brier + ' (0 is perfect, 0.25 is a coin flip)'
+        + (R.high ? ' · calls at 60%+ came true ' + Math.round(R.high.hit * 100) + '% (' + R.high.n + ')' : '') + (R.low ? ' · calls at 40% or less ' + Math.round(R.low.hit * 100) + '% (' + R.low.n + ')' : '') + '.</p>'
+        + (o.recent && o.recent.length ? '<ul class="pcall rec">' + o.recent.map(function (r) { return '<li><b>' + (r.hit ? '✓' : '✗') + '</b><span>' + esc(r.claim) + ' <small>(' + Math.round(r.p * 100) + '%, ' + (r.hit ? 'came true' : 'did not') + ')</small></span></li>'; }).join('') + '</ul>' : '') + '</details>';
     var due = (o.week && o.week.by) || null; draw('calls-hist', function (w) { return hitRateSvg(R, due, w); });
     $('calls-note').textContent = o.method + (o.tilt ? ' Council tilt now ' + (o.tilt > 0 ? '+' : '') + Math.round(o.tilt * 100) + ' points.' : ' Council tilt now zero: the strategist sees no tested edge, so these are the honest base rates.') + ' Paper only, not advice.';
     var d = o.digest || { list: [] }; $('dig').innerHTML = d.list.map(function (r) { return '<li><b>' + esc(r.src) + ':</b> ' + esc(r.read) + ' → <b>' + esc(r.says) + '</b><small>' + esc(r.limit || '') + '</small></li>'; }).join('') + (d.missing && d.missing.length ? '<li><small>Not observed by the council yet: ' + esc(d.missing.join(', ')) + '. The veteran does not guess them.</small></li>' : '');
@@ -566,7 +705,8 @@
     if (e) { var hrs = (Date.parse(e.at) - Date.now()) / 36e5, rel = hrs > 0 ? 'in ' + (hrs >= 48 ? Math.round(hrs / 24) + ' days' : Math.round(hrs) + ' h') : 'released';
       $('g-event').innerHTML = '<span class="lab">The event that matters most</span><div class="hero">' + esc((e.country ? e.country + ' ' : '') + e.title) + '</div>'
         + '<p class="sub"><b>' + esc(e.when) + '</b> · ' + esc(rel) + '<br><small>your time: ' + esc(loc(e.at)) + '</small></p>'
-        + '<p class="sub">' + (e.consensus != null ? 'Expected <b>' + esc(e.consensus) + '</b>' : 'No consensus yet') + (e.previous != null ? ' · previous ' + esc(e.previous) : '') + (num(e.goldMovePct) ? ' · gold typically moves ±' + esc(e.goldMovePct) + '% that day' : '') + '</p>'; }
+        + '<p class="sub">' + (e.consensus != null ? 'Expected <b>' + esc(e.consensus) + '</b>' : 'No consensus yet') + (e.previous != null ? ' · previous ' + esc(e.previous) : '') + (num(e.goldMovePct) ? ' · gold typically moves ±' + esc(e.goldMovePct) + '% that day' : '') + '</p>'
+        + (v.events && v.events.length ? '<p class="sub"><a class="jump" href="#s-next">The release playbook <span aria-hidden="true">↓</span></a></p>' : ''); }
     else $('g-event').innerHTML = '<span class="lab">The event that matters most</span><div class="hero">None scheduled</div><p class="sub">No red-folder release this week: gold trades on rates and the dollar.</p>';
     var L = s.levels;
     if (L && (L.above || L.below)) { var row = function (cls, ar, x, txt) { return '<div><span class="ar ' + cls + '" aria-hidden="true">' + ar + '</span><b>' + usd(x) + '</b><small>' + txt + '</small></div>'; };
@@ -580,7 +720,7 @@
   }
   function renderChanges(v) {
     var c = v && v.changes, sec = $('c-changes'); if (!c) { sec.hidden = true; return; } sec.hidden = false;
-    $('chg-sub').textContent = c.first ? 'starts next week' : 'vs ' + String(c.since || c.sinceWeek || '').slice(0, 10);
+    $('chg-sub').textContent = c.first ? 'the comparison starts next week' : ((c.items || []).length ? c.items.length + ' change' + (c.items.length === 1 ? '' : 's') + ' · ' : '') + 'vs ' + String(c.since || c.sinceWeek || '').slice(0, 10);
     if (c.first || !c.items.length) { var s0 = v.summary || {}, b0 = s0.bias, br = v.briefing || {};
       $('chg').innerHTML = '<li class="first">' + esc(c.line) + '</li>' + (c.first ? '<li class="first"><small>Next week is compared against this one:</small></li>'
         + [b0 ? 'Bias ' + b0.lean + ' (' + pct(b0.p) + ')' : null, s0.levels ? 'Gold ' + usd(s0.levels.px) + ' (close ' + s0.levels.asOf + ')' : null, (br.insights || []).length + ' insights, top: ' + ((br.insights || [])[0] || {}).title, (br.hypotheses || []).length + ' hypotheses due ' + (((br.hypotheses || [])[0] || {}).by || '')]
@@ -609,15 +749,15 @@
     var src = c.bySource || {}, names = { call: 'dated calls', hypothesis: 'hypotheses', cot: 'COT calls', ledger: 'weekly ledger' };
     $('calib-side').innerHTML = '<div class="cbig">' + c.n + '<small>of ' + need.scored + ' scored · ' + c.weeks + ' of ' + need.weeks + ' weeks</small></div>'
       + '<div class="prog" role="img" aria-label="' + c.n + ' of ' + need.scored + ' scored calls"><i style="width:' + Math.min(100, Math.round(c.n / need.scored * 100)) + '%"></i></div>'
-      + '<p><b>' + esc(c.line) + '</b></p>'
       + (c.inTheLarge ? '<p>Overall: said <b>' + pct(c.inTheLarge.stated) + '</b>, came true <b>' + pct(c.inTheLarge.came) + '</b>.</p>' : '')
       + (c.brier != null ? '<p>Brier ' + c.brier + (c.brierBase != null ? ' vs base rates ' + c.brierBase : '') + (c.brierAdjusted != null ? ' · after k (in-sample) ' + c.brierAdjusted : '') + ' <small>(lower is better; 0.25 = coin flip)</small></p>' : '')
       + (Object.keys(src).length ? '<p><small>' + Object.keys(src).map(function (k) { return esc(names[k] || k) + ' ' + src[k].n + ' (' + pct(src[k].hit) + ' true vs ' + pct(src[k].stated) + ' said)'; }).join(' · ') + '</small></p>' : '');
+    $('calib-take').textContent = c.line || '';
     $('calib-method').textContent = c.method || '';
   }
   // the veteran's briefing (council/briefing.mjs → veteran.json.briefing): insights → hypotheses → levels → analogs
   function renderBrief(v) {
-    var b = v && v.briefing, sec = $('c-brief'); if (!b) { sec.hidden = true; return; } sec.hidden = false;
+    var b = v && v.briefing, sec = $('c-brief'); if (!b) { sec.hidden = true; $('c-ins').hidden = true; return; } sec.hidden = false; $('c-ins').hidden = false;
     $('brief-at').textContent = 'built ' + ago(b.at) + ' · paper only';
     $('brief-pub').textContent = b.publicOnly || '';
     var leanTag = function (l) { return l > 0 ? '<span class="lean up">supports gold</span>' : l < 0 ? '<span class="lean dn">weighs on gold</span>' : '<span class="lean">no lean</span>'; };
@@ -626,6 +766,8 @@
         + '<p><em>Why for gold:</em> ' + esc(i.why) + '</p>' + (i.fx ? '<p><em>Dollar and majors:</em> ' + esc(i.fx) + '</p>' : '') + '<p><em>What would change the view:</em> ' + esc(i.change) + '</p></div></details></li>';
     }).join('') || '<li class="empty">No insights yet.</li>';
     var hy = b.hypotheses || [];
+    var dues = hy.map(function (h) { return h.by; }).filter(function (x, i, A) { return x && A.indexOf(x) === i; });
+    $('hyp-take').innerHTML = hy.length ? '<b>' + hy.length + ' hypothes' + (hy.length === 1 ? 'is' : 'es') + '</b>, due ' + esc(dues.join(' and ')) + '. The bar is his chance; the tick is how often it happened in all weeks since 2007.' : 'No hypothesis this run.';
     $('brief-hyp').innerHTML = hy.length ? hypBars(hy)
       + (b.record ? '<p class="note" style="grid-column:1/-1">' + (b.record.n ? 'Hypotheses scored: ' + b.record.n + ', <b>' + pct(b.record.hitRate) + ' came true</b> vs ' + pct(b.record.expected) + ' expected, Brier ' + b.record.brier + '; ' + b.record.open + ' open.' : 'Track record: ' + (b.record.open || 0) + ' hypotheses on the record, none due yet.') + '</p>' : '')
       : '<p class="empty">No hypothesis this run (too little history for the analogs).</p>';
@@ -653,6 +795,11 @@
   // COT positioning desk (council/cot.mjs)
   function renderCot(c) {
     $('cot-gauges').innerHTML = cotGauges(c);
+    var ms = (c && c.markets) || [], by = { tested: [], none: [], untested: [] }; ms.forEach(function (m) { var E = edgeWords(m); (by[E.st] || by.untested).push(m.name); });
+    var S = c && c.study;
+    $('cot-edge').innerHTML = !ms.length ? '' : '<p><b>Tested edge?</b> ' + (S && S.verdict ? 'The pre-registered study' + (S.window ? ' (' + esc(S.window) + ')' : '') + ': <b>' + esc(S.verdict === 'FAIL' ? 'failed overall' : S.verdict === 'PASS' ? 'passed' : S.verdict) + '</b>. ' : '')
+      + (by.tested.length ? esc(by.tested.join(', ')) + ': one single-market cell passed in and out of sample. ' : '') + (by.none.length ? '<b>No tested edge</b> for ' + esc(by.none.join(', ')) + '. ' : '') + (by.untested.length ? 'Not in the study: ' + esc(by.untested.join(', ')) + '.' : '') + '</p>'
+      + (S && S.headline ? '<p class="vz-note">' + esc(S.headline) + (S.link ? ' <a href="' + esc(S.link) + '">The study in the Edge lab</a>.' : '') + '</p>' : '');
     var b = $('cot-b'); if (!c || !c.markets) { b.innerHTML = '<tr><td colspan="7" class="empty">No COT data yet: the council fetches it on its next macro round.</td></tr>'; return; }
     var k = function (x) { return x == null ? '—' : (Math.abs(x) >= 1000 ? (x / 1000).toFixed(1) + 'k' : String(x)); }, sgn = function (x) { return x == null ? '—' : '<span class="' + (x > 0 ? 'up' : x < 0 ? 'dn' : '') + '">' + (x > 0 ? '+' : '') + k(x) + '</span>'; };
     var ed = function (t) { return !t ? '' : t.edge ? ' · <b>tested edge</b> (' + t.n + ' cases, ' + Math.round(t.win * 100) + '% right)' : ' · no tested edge yet (' + t.n + ' cases' + (t.win != null ? ', ' + Math.round(t.win * 100) + '% right' : '') + ')'; };
@@ -660,11 +807,11 @@
       if (m.missing) return '<tr><td>' + esc(m.name) + '</td><td colspan="6" class="empty">no data this week</td></tr>';
       var sig = m.signals && m.signals.length ? m.signals.map(function (s) { return esc(s.text) + ed(s.tested); }).join('<br>') : '<small>Nothing unusual</small>';
       var best = m.tests ? Object.keys(m.tests).filter(function (x) { return m.tests[x].edge; }) : [];
-      return '<tr><td><b>' + esc(m.name) + '</b><small>' + esc(m.who) + ' · ' + esc(m.asOf) + '</small>' + (m.quote ? '<small>' + esc(m.quote) + '</small>' : '') + '</td>'
+      return '<tr><td><b>' + esc(m.name) + '</b><small>' + esc(m.who) + ' · ' + esc(m.asOf) + '</small>' + (m.quote ? '<small>' + esc(m.quote) + '</small>' : '') + '<small>' + esc(edgeWords(m).long) + '</small></td>'
         + '<td>' + sgn(m.net) + '<small>' + (m.longShare != null ? m.longShare + '% of positions long' : '') + '</small></td><td>' + sgn(m.chg1) + (m.z != null ? '<small>' + (m.z > 0 ? '+' : '') + m.z + ' sd</small>' : '') + '</td><td>' + sgn(m.chg4) + '</td>'
         + '<td>' + (m.tL != null ? m.tL + ' / ' + m.tS + '<small>' + (m.tLchg != null ? (m.tLchg >= 0 ? '+' : '') + m.tLchg + ' / ' + (m.tSchg >= 0 ? '+' : '') + m.tSchg + ' on the week' : '') + '</small>' : '—') + '</td>'
         + '<td>' + (m.pct != null ? m.pct + ([11, 12, 13].indexOf(m.pct % 100) < 0 && ['th', 'st', 'nd', 'rd'][m.pct % 10] || 'th') + ' percentile<div class="rng"><s style="left:calc(' + m.pct + '% - 2px)"></s></div>' : '—') + '</td>'
-        + '<td>' + sig + (best.length ? '<small>Edge found historically: ' + best.join(', ') + '</small>' : '') + '</td></tr>';
+        + '<td>' + sig + (best.length ? '<small>Passed in the pre-registered test: ' + esc(best.join(', ')) + '</small>' : '') + '</td></tr>';
     }).join('');
     $('cot-sub').textContent = 'positions as of ' + ((c.markets.find(function (m) { return m.asOf; }) || {}).asOf || '—') + ' · updated ' + ago(c.at);
     $('cot-note').textContent = c.method + ' Paper only, not advice.';
@@ -859,6 +1006,9 @@
   function renderLadder(v) {
     var L = v && v.briefing && v.briefing.levels && v.briefing.levels.gold, sec = $('c-ladder'); if (!L) { sec.hidden = true; return; } sec.hidden = false;
     $('ld-sub').textContent = 'last close ' + (L.asOf || NA);
+    var lv = (L.list || []).filter(function (l) { return LADDER_KINDS[l.kind] && num(l.price); }), up = lv.filter(function (l) { return l.price > L.px; }).sort(function (a, b) { return a.price - b.price; })[0], dn = lv.filter(function (l) { return l.price < L.px; }).sort(function (a, b) { return b.price - a.price; })[0];
+    var lvTxt = function (l) { return '<b>' + esc(money(l.price, L.unit, L.dp)) + '</b> ' + esc(l.label) + ' (' + esc(sg(num(l.dist) ? l.dist : (l.price / L.px - 1) * 100, 1)) + '%)'; };
+    $('ld-take').innerHTML = 'Gold closed at <b>' + esc(money(L.px, L.unit, L.dp)) + '</b>' + (up ? '; next above ' + lvTxt(up) : '') + (dn ? '; next below ' + lvTxt(dn) : '') + '.';
     $('ld-note').textContent = 'Nearest swing high and low, the 20/50/200-day averages, last week\'s and last month\'s high and low. ▲ above the close, ▼ below; tap a level for why it matters.';
     draw('ladder', function (w) { return ladderSvg(L, w); });
   }
@@ -913,15 +1063,20 @@
   }
 
   // 5. COT: each market's net position as a percentile of its 3-year range, with the week's change
+  // the pre-registered COT study's verdict per market (council/cot.mjs edgeStatus / edgeText): said plainly, never implied by colour
+  function edgeWords(m) { var st = m.edgeStatus || (m.edge && m.edge.status) || 'untested', t = m.edgeText || (m.edge && m.edge.text) || '';
+    var short = st === 'tested' ? 'passed one test cell' : st === 'none' ? 'no tested edge' : 'not tested';
+    return { st: st, short: short, long: t ? t.charAt(0).toUpperCase() + t.slice(1) : short.charAt(0).toUpperCase() + short.slice(1) }; }
+  function edgeTag(m) { var E = edgeWords(m); return '<p class="cg-e ' + E.st + '"><span class="eg-i" aria-hidden="true">' + (E.st === 'tested' ? '✓' : E.st === 'none' ? '○' : '–') + '</span>' + esc(E.short) + '</p>'; }
   function cotGauges(c) {
     if (!c || !c.markets) return '<p class="empty">No COT data yet.</p>';
     return c.markets.map(function (m) {
-      if (m.missing || !num(m.pct)) return '<div class="cg"><div class="cg-h"><b>' + esc(m.name) + '</b><small>' + esc(m.who || '') + '</small><span class="ch">n/a</span></div><p class="empty" style="margin:6px 0 0">No data this week.</p></div>';
+      if (m.missing || !num(m.pct)) return '<div class="cg"><div class="cg-h"><b>' + esc(m.name) + '</b><small>' + esc(m.who || '') + '</small><span class="ch">n/a</span></div><p class="empty" style="margin:6px 0 0">No data this week.</p>' + edgeTag(m) + '</div>';
       var ch = num(m.chg1) ? +m.chg1 : null, ar = ch == null ? '' : ch > 0 ? '▲ ' : ch < 0 ? '▼ ' : '■ ', zone = m.pct >= 90 ? 'crowded long' : m.pct <= 10 ? 'crowded short' : 'mid-range';
-      return '<div class="cg" tabindex="0"' + tip(m.name + ' · ' + (m.who || '') + '\nNet ' + k1(m.net) + ' contracts · ' + ord(m.pct) + ' percentile of 3 years (' + zone + ')\nWeek ' + (ch == null ? NA : k1(ch)) + (num(m.z) ? ' (' + sg(m.z, 1) + ' sd)' : '') + ' · 4 weeks ' + k1(m.chg4) + '\nPositions as of ' + (m.asOf || NA)) + '>'
+      return '<div class="cg" tabindex="0"' + tip(m.name + ' · ' + (m.who || '') + '\nNet ' + k1(m.net) + ' contracts · ' + ord(m.pct) + ' percentile of 3 years (' + zone + ')\nWeek ' + (ch == null ? NA : k1(ch)) + (num(m.z) ? ' (' + sg(m.z, 1) + ' sd)' : '') + ' · 4 weeks ' + k1(m.chg4) + '\nPositions as of ' + (m.asOf || NA) + '\n' + edgeWords(m).long) + '>'
         + '<div class="cg-h"><b>' + esc(m.name) + '</b><small>' + esc(m.who || '') + ' · net ' + esc(k1(m.net)) + '</small><span class="ch">' + (ch == null ? NA : ar + esc(k1(ch))) + '<small>on the week</small></span></div>'
         + '<div class="cg-g" role="img" aria-label="' + ord(m.pct) + ' percentile"><i class="lo"></i><i class="hi"></i><s style="left:' + Math.max(1, Math.min(99, m.pct)) + '%"></s></div>'
-        + '<div class="cg-l" aria-hidden="true"><span>0 short</span><b>' + ord(m.pct) + ' pct</b><span>100 long</span></div></div>';
+        + '<div class="cg-l" aria-hidden="true"><span>0 short</span><b>' + ord(m.pct) + ' pct</b><span>100 long</span></div>' + edgeTag(m) + '</div>';
     }).join('');
   }
 
@@ -993,6 +1148,8 @@
     if (!e) { sec.hidden = true; NX = null; return; } sec.hidden = false; NX = e;
     var x0 = e.expectations[0] || {}, st = e.stats, c = e.call;
     $('nx-sub').textContent = 'the veteran\'s event playbook · within 72 h · paper only';
+    $('nx-take').innerHTML = '<b>' + esc((e.country ? e.country + ' ' : '') + e.title) + '</b>, ' + esc(utcWhen(e.at)) + (e.released ? ' (released)' : '') + '. Expected <b>' + esc(x0.consensus == null ? NA : x0.consensus) + '</b>, previous ' + esc(x0.previous == null ? NA : x0.previous) + '.'
+      + (c ? ' His call: <b>' + Math.round(c.p * 100) + '%</b> gold up on the day, against a ' + Math.round((c.baseP || 0) * 100) + '% base.' : '') + ' Act after the release, not before.';
     $('nx-ev').innerHTML = '<span class="lab">' + (e.released ? 'Just released' : 'Red-folder release') + '</span><div class="hero">' + esc((e.country ? e.country + ' ' : '') + e.title) + '</div>'
       + (e.titles && e.titles.length > 1 ? '<p class="sub">with ' + esc(e.titles.slice(1).join(', ')) + '</p>' : '')
       + '<div class="nx-cd" id="nx-cd" aria-live="off">' + esc(cdText(e.at)) + '</div>'
@@ -1009,18 +1166,21 @@
         + '<div class="pbl"><span>0%</span><span class="b" style="left:' + b + '%">base ' + b + '%</span><span class="r">100%</span></div>'
         + '<p class="sub">' + esc(c.claim) + '. ' + (c.recorded ? 'On the record since ' + esc(c.issued) + '; ' : '') + 'scored on the ' + esc(c.by) + ' UTC close' + (c.live != null ? ' (today\'s reading ' + Math.round(c.live * 100) + '%; the first one counts)' : '') + '. ' + res + '</p>'; }
     else $('nx-call').innerHTML = '<span class="lab">His call</span><p class="sub">' + esc(e.callNote || 'No call.') + '</p>';
-    $('nx-sc').innerHTML = '<table class="nx-sc"><thead><tr><th>If it prints</th><th>Fed path</th><th>Dollar</th><th>Gold</th><th>Past releases, this read</th><th>What to do</th></tr></thead><tbody>'
-      + e.scenarios.map(function (r) { return '<tr class="' + esc(r.k) + '"><td><b><span class="sw" aria-hidden="true"></span>' + esc(r.name) + '</b><small>' + esc(r.when) + '</small></td><td data-l="Fed path">' + esc(r.path) + '</td><td data-l="Dollar">' + esc(r.usd) + '</td><td data-l="Gold"><span class="dir ' + dirCls(r.gold) + '">' + esc(r.gold) + '</span></td><td data-l="Past">' + esc(r.history || 'n/a: no release history in the repository') + '</td><td data-l="Do">' + esc(r.action) + '</td></tr>'; }).join('') + '</tbody></table>'
+    // visible: the three cases in one row (what prints, the dollar, gold); the full table with the action and history sits in the detail
+    $('nx-sc').innerHTML = '<div class="nx-3">' + e.scenarios.map(function (r) { return '<div class="nx-c ' + esc(r.k) + '"><b><span class="sw" aria-hidden="true"></span>' + esc(r.name) + '</b><small>' + esc(r.when) + '</small>'
+        + '<p>Dollar: ' + esc(r.usd) + '</p><p>Gold: <span class="dir ' + dirCls(r.gold) + '">' + esc(r.gold) + '</span></p></div>'; }).join('') + '</div>'
       + '<p class="vz-note">Prop and funded accounts: flat or at breakeven through the release (rule G). ' + esc(e.note || '') + '</p>';
+    var scT = '<h4 class="vz-h">If it prints, in full <small>Fed path, dollar, gold, past releases, what to do</small></h4><table class="nx-sc"><thead><tr><th>If it prints</th><th>Fed path</th><th>Dollar</th><th>Gold</th><th>Past releases, this read</th><th>What to do</th></tr></thead><tbody>'
+      + e.scenarios.map(function (r) { return '<tr class="' + esc(r.k) + '"><td><b><span class="sw" aria-hidden="true"></span>' + esc(r.name) + '</b><small>' + esc(r.when) + '</small></td><td data-l="Fed path">' + esc(r.path) + '</td><td data-l="Dollar">' + esc(r.usd) + '</td><td data-l="Gold"><span class="dir ' + dirCls(r.gold) + '">' + esc(r.gold) + '</span></td><td data-l="Past">' + esc(r.history || 'n/a: no release history in the repository') + '</td><td data-l="Do">' + esc(r.action) + '</td></tr>'; }).join('') + '</tbody></table>';
     if (st) { $('nx-st-h').innerHTML = 'What past ' + esc(st.type) + ' releases did <small>gold\'s first hour, by the dollar\'s first 5-minute read · ' + st.n + ' releases ' + esc(st.from.slice(0, 4)) + '-' + esc(st.to.slice(0, 4)) + ' · ' + esc(st.label) + '</small>';
       draw('nx-chart', function (w) { return stripSvg(st, w); }); }
     else { $('nx-st-h').innerHTML = 'What past releases did'; $('nx-chart').innerHTML = '<p class="empty">No release history for this event in the repository: n/a.</p>'; }
     var also = E.filter(function (y) { return y !== e; }); $('nx-also').innerHTML = also.length ? 'Also within 72 h: ' + also.map(function (y) { var z = y.expectations[0] || {}; return '<b>' + esc((y.country ? y.country + ' ' : '') + y.title) + '</b> ' + esc(utcWhen(y.at)) + (z.consensus != null ? ' (expected ' + esc(z.consensus) + ')' : ''); }).join(' · ') + '.' : '';
-    var RN = [['hot', 'Hot read (dollar up)'], ['inline', 'In line'], ['cool', 'Cool read (dollar down)'], ['all', 'All releases']], d = '';
-    if (st) { d += '<h3 class="vz-h">Gold on the release day <small>UTC daily close vs the close before; the quantity his call is scored on</small></h3>' + splitTable('Dollar\'s read', st.day, RN) + '<p class="vz-note">Median absolute release-day move ' + (num(st.day.absMedian) ? st.day.absMedian + '%' : NA) + (num(e.expMovePct) ? ' · the strategist\'s naive 20-day expectation ±' + e.expMovePct + '%' : '') + '.</p>';
-      d += '<h3 class="vz-h">After the first spike <small>gold from 5 to 60 minutes after the release</small></h3>' + splitTable('Dollar\'s read', st.after5, RN);
-      if (st.nowcast) d += '<h3 class="vz-h">CPI 2022-24 by the print against the Cleveland nowcast <small>' + st.nowcast.n + ' releases · first hour</small></h3>' + splitTable('Core print vs nowcast', st.nowcast, [['hot', 'Hot (≥ +0.05)'], ['inline', 'In line'], ['cool', 'Cool (≤ −0.05)']]) + '<p class="vz-note">' + esc(st.nowcast.note) + '.</p>';
-      if (st.test) d += '<h3 class="vz-h">The pre-registered test</h3><p class="vz-note">' + esc(st.type) + ': does gold keep going the dollar\'s first-read way from 5 to 60 minutes? ' + st.test.hits + ' of ' + st.test.n + ' (' + pct(st.test.hit) + ', one-sided p ' + st.test.p + ') · 2018-21 ' + (st.test.halves.a.n ? pct(st.test.halves.a.hit) + ' of ' + st.test.halves.a.n : NA) + ' · 2022-26 ' + (st.test.halves.b.n ? pct(st.test.halves.b.hit) + ' of ' + st.test.halves.b.n : NA) + ' → <b>' + (st.test.pass ? 'passed' : 'failed') + '</b>' + (st.test.primary ? '' : ' (a secondary cell, never a pass route)') + '. ' + esc(st.label) + ' Bar: n ≥ 30, hit ≥ 60%, p < 0.05, both halves above 50% (research/edge/event-reaction).</p>';
+    var RN = [['hot', 'Hot read (dollar up)'], ['inline', 'In line'], ['cool', 'Cool read (dollar down)'], ['all', 'All releases']], d = scT;
+    if (st) { d += '<h4 class="vz-h">Gold on the release day <small>UTC daily close vs the close before; the quantity his call is scored on</small></h4>' + splitTable('Dollar\'s read', st.day, RN) + '<p class="vz-note">Median absolute release-day move ' + (num(st.day.absMedian) ? st.day.absMedian + '%' : NA) + (num(e.expMovePct) ? ' · the strategist\'s naive 20-day expectation ±' + e.expMovePct + '%' : '') + '.</p>';
+      d += '<h4 class="vz-h">After the first spike <small>gold from 5 to 60 minutes after the release</small></h4>' + splitTable('Dollar\'s read', st.after5, RN);
+      if (st.nowcast) d += '<h4 class="vz-h">CPI 2022-24 by the print against the Cleveland nowcast <small>' + st.nowcast.n + ' releases · first hour</small></h4>' + splitTable('Core print vs nowcast', st.nowcast, [['hot', 'Hot (≥ +0.05)'], ['inline', 'In line'], ['cool', 'Cool (≤ −0.05)']]) + '<p class="vz-note">' + esc(st.nowcast.note) + '.</p>';
+      if (st.test) d += '<h4 class="vz-h">The pre-registered test</h4><p class="vz-note">' + esc(st.type) + ': does gold keep going the dollar\'s first-read way from 5 to 60 minutes? ' + st.test.hits + ' of ' + st.test.n + ' (' + pct(st.test.hit) + ', one-sided p ' + st.test.p + ') · 2018-21 ' + (st.test.halves.a.n ? pct(st.test.halves.a.hit) + ' of ' + st.test.halves.a.n : NA) + ' · 2022-26 ' + (st.test.halves.b.n ? pct(st.test.halves.b.hit) + ' of ' + st.test.halves.b.n : NA) + ' → <b>' + (st.test.pass ? 'passed' : 'failed') + '</b>' + (st.test.primary ? '' : ' (a secondary cell, never a pass route)') + '. ' + esc(st.label) + ' Bar: n ≥ 30, hit ≥ 60%, p < 0.05, both halves above 50% (research/edge/event-reaction).</p>';
       d += '<p class="vz-note">' + esc(st.readNote) + '</p>'; }
     if (c && c.why) d += '<p class="vz-note"><b>The call:</b> ' + esc(c.why) + ' Kept once on the calls ledger with its base rate; the self-calibration scores it.</p>';
     if (v.eventsRecord && v.eventsRecord.n) d += '<p class="vz-note"><b>Event calls so far:</b> ' + v.eventsRecord.n + ' scored, ' + pct(v.eventsRecord.hitRate) + ' came true vs ' + pct(v.eventsRecord.expected) + ' expected · Brier ' + v.eventsRecord.brier + '.</p>';
@@ -1028,11 +1188,35 @@
     $('nx-detail').innerHTML = d;
   }
   setInterval(function () { var el = $('nx-cd'); if (NX && el) el.textContent = cdText(NX.at); }, 30e3);
+  // ---- the "last updated" stamp: the older of the two members' files decides; the council writes both about every 25 minutes
+  var LAST = null, STALE_MIN = 90, OLD_MIN = 360;
+  function renderStamp() {
+    var el = $('stamp'), t = $('stamp-t'), fc = LAST && LAST.fc, v = LAST && LAST.v, ts = [fc && fc.at, v && v.at].map(function (x) { return Date.parse(x || ''); }).filter(isFinite);
+    if (!ts.length) { el.className = 'stamp old'; t.textContent = 'No macro data yet: the council has not written its files.'; return; }
+    var oldest = Math.min.apply(null, ts), newest = Math.max.apply(null, ts), age = (Date.now() - oldest) / 60000, iso = new Date(oldest).toISOString();
+    var at = new Date(newest).toLocaleString([], { weekday: 'short', day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' });
+    if (age <= STALE_MIN) { el.className = 'stamp ok'; t.innerHTML = '<b>Updated ' + esc(ago(new Date(newest).toISOString())) + '</b> · ' + esc(at) + ' your time · refreshes about every 25 min'; }
+    else { el.className = 'stamp ' + (age > OLD_MIN ? 'old' : 'stale'); t.innerHTML = '<b>Stale: last update ' + esc(ago(iso)) + '</b> · ' + esc(new Date(oldest).toLocaleString([], { weekday: 'short', day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })) + ' your time. The council normally writes every 25 min; read every number as of then.'; }
+  }
+  setInterval(function () { if (LAST) renderStamp(); }, 60e3);
+  // a story section shows when any of its cards has data; the table of contents follows
+  function syncStory() {
+    document.querySelectorAll('main .story').forEach(function (sx) { var cards = sx.querySelectorAll('.card, details.deep'), any = false; cards.forEach(function (c) { if (!c.hidden) any = true; }); sx.hidden = !any; });
+    document.querySelectorAll('#toc a').forEach(function (a) { var t = document.querySelector(a.getAttribute('href')); a.hidden = !t || t.hidden; });
+  }
+  // the contents chips: the section in view is marked (aria-current), on wide screens only (CSS hides the bar on phones)
+  if ('IntersectionObserver' in window) { var seen = {}, io = new IntersectionObserver(function (es) { es.forEach(function (e) { seen[e.target.id] = e.isIntersecting; });
+      var cur = null; document.querySelectorAll('main .story').forEach(function (sx) { if (!cur && seen[sx.id]) cur = sx.id; });
+      document.querySelectorAll('#toc a').forEach(function (a) { if (cur && a.getAttribute('href') === '#' + cur) a.setAttribute('aria-current', 'true'); else a.removeAttribute('aria-current'); }); }, { rootMargin: '-120px 0px -55% 0px' });
+    document.querySelectorAll('main .story').forEach(function (sx) { io.observe(sx); }); }
+  $('toc').addEventListener('click', function (e) { var a = e.target.closest('a'); if (!a) return; var t = document.querySelector(a.getAttribute('href')); if (t && t.id === 's-deep') $('deep').open = true; });
   function load() {
     Promise.all([get('macro/forecast.json'), get('macro/veteran.json'), get('macro/cache.json'), get('macro/veteran-ledger.json')]).then(function (x) {
       var fc = x[0], v = x[1], cache = x[2], L = x[3];
       $('when').textContent = fc && fc.at ? 'strategist ' + ago(fc.at) + (v && v.at ? ' · veteran ' + ago(v.at) : '') : 'No macro data yet';
+      LAST = { fc: fc, v: v }; renderStamp();
       renderGlance(v); renderNext(v); renderScore(fc); renderLadder(v); renderChanges(v); renderCalib(v); renderStrip(fc, v); renderStrat(fc); renderVet(v); renderDebate(v); renderInsights(fc, v, cache); renderSource(fc, cache); renderLedger(v, L); renderCalls(v); renderBrief(v); get('macro/cot.json').then(renderCot);
+      syncStory(); redraw();
       $('foot').textContent = 'Paper only. The strategist and the veteran change no rule, size or trade; the owner decides. Data: council-data macro/forecast.json, macro/veteran.json, macro/cache.json, macro/veteran-ledger.json.';
     });
   }
