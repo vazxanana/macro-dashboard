@@ -14,6 +14,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { execFileSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
+import { writeAtomic } from './jsonio.mjs';
 import { studyVerdict as edgeVerdict, plain } from '../research/edge/verdict.mjs';
 
 export const EDGE_DIR = path.join(path.dirname(fileURLToPath(import.meta.url)), '..', 'research', 'edge');
@@ -179,7 +180,7 @@ export async function main(dir, { edgeDir = EDGE_DIR, now = Math.floor(Date.now(
   if (dry) return { dry: true, ledger };
   if (prevSig === sig) return { unchanged: true, count: ledger.count };   // the loop commits only real changes
   fs.mkdirSync(path.dirname(file), { recursive: true });
-  fs.writeFileSync(file, JSON.stringify(ledger, null, 1) + '\n');
+  writeAtomic(file, JSON.stringify(ledger, null, 1) + '\n');
   return { written: true, count: ledger.count, byVerdict: ledger.byVerdict, file };
 }
 

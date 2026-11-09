@@ -17,6 +17,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { sendAlerts, when, NTFY_DEFAULT, SITE } from './alerts.mjs';
+import { writeAtomic } from './jsonio.mjs';
 
 export const CFG = {
   expectMin: 10,          // a round at most this long ago when all is well (what the message quotes)
@@ -95,7 +96,7 @@ export async function main(dir, { env = process.env, fetchFn = fetch, now = Math
     if (tried && Object.keys(errors).length >= tried) out.alertError = errors;
     else { out.healthSent = dec.mark; if (tried) out.lastAlert = { at: out.at, title: dec.ev.title }; }
   }
-  if (!dry) { fs.mkdirSync(dir, { recursive: true }); fs.writeFileSync(path.join(dir, 'watchdog.json'), JSON.stringify(out, null, 1)); }
+  if (!dry) { fs.mkdirSync(dir, { recursive: true }); writeAtomic(path.join(dir, 'watchdog.json'), JSON.stringify(out, null, 1)); }
   return { ...out, ev: dec.ev };
 }
 
