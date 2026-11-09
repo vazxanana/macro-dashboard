@@ -12,7 +12,8 @@ const pages = [];
 let n = 0;
 for (const p of pages) {
   const s = fs.readFileSync(p, 'utf8');
-  const t = s.replace(/((?:src|href)=["'])(\/assets\/|(?:\.\.?\/)?assets\/)([^"'?#]+)(["'])/g, (m, a, pre, rel, q) => { const h = v(rel); if (!h) return m; n++; return `${a}${pre}${rel}?v=${h}${q}`; });
+  // /macro-dashboard/assets/ too (the /macro page: the same path works on GitHub Pages and, rewritten, on Vercel)
+  const t = s.replace(/((?:src|href)=["'])(\/(?:macro-dashboard\/)?assets\/|(?:\.\.?\/)?assets\/)([^"'?#]+)(["'])/g, (m, a, pre, rel, q) => { const h = v(rel); if (!h) return m; n++; return `${a}${pre}${rel}?v=${h}${q}`; });
   if (t !== s) fs.writeFileSync(p, t);
 }
 console.log(`stamp-assets: ${n} asset links versioned in ${pages.length} pages`);

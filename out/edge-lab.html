@@ -23,83 +23,18 @@
     } catch (e) {}
   })();
 </script>
+<link rel="stylesheet" href="assets/mx-page.css?v=688ec3a7b6">
+<script src="assets/mx-nav.js?v=3f8fef533d" defer></script>
 <style>
-  /* Tokens copied from market-structure.html (4 Nov design pass) so the lab reads as part of the desk */
-  :root {
-    --bg: #08090c; --panel: #0f1116; --panel-raised: #14171e; --panel-hover: #161a22;
-    --line: rgba(255,255,255,.07); --line-soft: rgba(255,255,255,.045); --line-strong: rgba(255,255,255,.12);
-    --ink: #eceef2; --ink-dim: #a4abb8; --ink-faint: #8a92a1; --accent: #5b8cff; --accent-soft: rgba(91,140,255,.12);
-    --buy: #2fbf8f; --sell: #f2576f; --buy-soft: rgba(47,191,143,.12); --sell-soft: rgba(242,87,111,.12);
-    --neutral-soft: rgba(255,255,255,.06); --zero: rgba(255,255,255,.22);
-    --shadow-pop: 0 24px 48px rgba(0,0,0,.55);
-    --sans: Figtree, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-    --mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
-    --r: 12px; --r-sm: 8px;
-    --z-sticky: 10; --z-tip: 40;
-    --ease: cubic-bezier(.22, 1, .36, 1);
-    color-scheme: dark;
-  }
-  @media (prefers-color-scheme: light) {
-    :root:not([data-theme="dark"]):not([data-theme="midnight"]) {
-      --bg: #f4f6f9; --panel: #ffffff; --panel-raised: #f7f8fb; --panel-hover: #f9fafc;
-      --line: #dfe3ea; --line-soft: #eceff4; --line-strong: #cdd3dd;
-      --ink: #131722; --ink-dim: #4a5160; --ink-faint: #5f6675; --accent: #2f6bff; --accent-soft: rgba(47,107,255,.09);
-      --buy: #08876f; --sell: #d92d4b; --buy-soft: rgba(8,135,111,.09); --sell-soft: rgba(217,45,75,.08);
-      --neutral-soft: rgba(19,23,34,.05); --zero: rgba(19,23,34,.28);
-      --shadow-pop: 0 18px 40px -12px rgba(16,24,40,.22), 0 2px 6px rgba(16,24,40,.06);
-      color-scheme: light;
-    }
-  }
-  :root[data-theme="light"] {
-    --bg: #f4f6f9; --panel: #ffffff; --panel-raised: #f7f8fb; --panel-hover: #f9fafc;
-    --line: #dfe3ea; --line-soft: #eceff4; --line-strong: #cdd3dd;
-    --ink: #131722; --ink-dim: #4a5160; --ink-faint: #5f6675; --accent: #2f6bff; --accent-soft: rgba(47,107,255,.09);
-    --buy: #08876f; --sell: #d92d4b; --buy-soft: rgba(8,135,111,.09); --sell-soft: rgba(217,45,75,.08);
-    --neutral-soft: rgba(19,23,34,.05); --zero: rgba(19,23,34,.28);
-    --shadow-pop: 0 18px 40px -12px rgba(16,24,40,.22), 0 2px 6px rgba(16,24,40,.06);
-    color-scheme: light;
-  }
-  :root[data-theme="midnight"] {
-    --bg: #070d1f; --panel: #0d1630; --panel-raised: #111c3a; --panel-hover: #15224a;
-    --line: rgba(150,175,255,.12); --line-soft: rgba(150,175,255,.07); --line-strong: rgba(150,175,255,.2);
-    --ink: #eef2ff; --ink-dim: #b0bcdc; --ink-faint: #8d9ac0; --accent: #e3b341; --accent-soft: rgba(227,179,65,.14);
-    --buy: #34d6a0; --sell: #ff6b85; --buy-soft: rgba(52,214,160,.13); --sell-soft: rgba(255,107,133,.13);
-  }
-
-  * { box-sizing: border-box; }
-  html { -webkit-text-size-adjust: 100%; }
-  html, body { margin: 0; background: var(--bg); color: var(--ink); font: 14px/1.5 var(--sans); font-feature-settings: "cv11", "ss01"; -webkit-font-smoothing: antialiased; }
-  body { padding: env(safe-area-inset-top, 0px) 0 env(safe-area-inset-bottom, 0px); min-height: 100vh; }
-  a { color: var(--accent); text-decoration: none; }
-  a:hover { text-decoration: underline; text-underline-offset: 3px; }
-  button { font: inherit; color: inherit; }
-  :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 4px; }
-  ::selection { background: rgba(91,140,255,.3); }
-  .num { font-family: var(--mono); font-variant-numeric: tabular-nums; letter-spacing: -.02em; }
-  .sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
-
-  .wrap { max-width: 1240px; margin: 0 auto; padding: 0 24px 64px; }
-
-  /* top bar */
-  .top { position: sticky; top: 0; z-index: var(--z-sticky); display: flex; align-items: center; gap: 12px; height: 56px;
-    background: color-mix(in srgb, var(--bg) 86%, transparent); backdrop-filter: saturate(140%) blur(14px); -webkit-backdrop-filter: saturate(140%) blur(14px); border-bottom: 1px solid var(--line); }
-  .top .wrap { display: flex; align-items: center; gap: 12px; width: 100%; padding-bottom: 0; }
-  .brand { display: inline-flex; align-items: center; gap: 9px; color: var(--ink); font: 600 14px var(--sans); letter-spacing: -.1px; }
-  .brand:hover { text-decoration: none; }
-  .coin { width: 20px; height: 20px; border-radius: 50%; background: radial-gradient(circle at 35% 35%, #ffd768, #c99400); box-shadow: inset 0 -2px 4px rgba(0,0,0,.25); flex: none; }
-  .crumb { color: var(--ink-faint); font-weight: 500; }
-  .top .check { margin-left: auto; display: inline-flex; align-items: center; gap: 8px; font-size: 12px; color: var(--ink-faint); white-space: nowrap; }
-  .btn { display: inline-flex; align-items: center; gap: 6px; min-height: 32px; padding: 6px 12px; border-radius: var(--r-sm); border: 1px solid var(--line); background: var(--neutral-soft); font: 500 12.5px var(--sans); color: var(--ink-dim); cursor: pointer; transition: background .15s, color .15s, border-color .15s; }
-  .btn:hover { color: var(--ink); border-color: var(--line-strong); }
-  .btn svg { width: 14px; height: 14px; }
-  .btn[aria-busy="true"] svg { animation: spin .8s linear infinite; }
-  @keyframes spin { to { transform: rotate(360deg); } }
-
+  /* tokens, base, top bar and the Desk | Macro | ChronosTrade switch: assets/mx-page.css (shared with /macro and /veteran/) */
   /* heading */
   .head { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 420px); gap: 16px 48px; align-items: end; padding: 40px 0 28px; }
   h1 { font: 600 clamp(26px, 3vw, 34px)/1.15 var(--sans); letter-spacing: -.6px; margin: 0 0 10px; text-wrap: balance; }
   .lede { margin: 0; color: var(--ink-dim); max-width: 62ch; font-size: 14.5px; text-wrap: pretty; }
   .lede b { color: var(--ink); font-weight: 600; }
+  .how { margin-top: 10px; max-width: 62ch; font-size: 13.5px; color: var(--ink-dim); }
+  .how summary { display: inline-flex; align-items: center; min-height: var(--tap); cursor: pointer; color: var(--accent); font-weight: 500; }
+  .how p { margin: 4px 0 0; }
 
   /* progress: tall segmented bar of study states */
   .prog { min-width: 0; }
@@ -124,7 +59,7 @@
 
   .table { background: var(--panel); border: 1px solid var(--line); border-radius: var(--r); box-shadow: inset 0 1px 0 rgba(255,255,255,.025); }
   .cols, .row { display: grid; grid-template-columns: minmax(0, 1.55fr) 118px minmax(0, 1fr) minmax(0, 1.1fr) 64px 76px 150px 84px; column-gap: 16px; align-items: center; padding: 0 18px; }
-  .cols { min-height: 38px; border-bottom: 1px solid var(--line); font: 500 11.5px var(--sans); color: var(--ink-faint); }
+  .cols { min-height: 38px; border-bottom: 1px solid var(--line); font: 500 12px var(--sans); color: var(--ink-faint); }
   .cols span:nth-child(n+5):nth-child(-n+6), .row .c-n, .row .c-dd { text-align: right; }
   .row { padding-top: 14px; padding-bottom: 14px; border-top: 1px solid var(--line-soft); animation: in .5s var(--ease) backwards; animation-delay: calc(var(--i, 0) * 35ms); }
   .row:first-of-type { border-top: 0; }
@@ -142,9 +77,9 @@
   .c-study .meta { margin: 2px 0 0; font-size: 12px; color: var(--ink-faint); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
   .c-study .rule { margin: 6px 0 0; font-size: 12.5px; color: var(--ink-dim); display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; overflow-wrap: anywhere; }
   .c-study .rule em { font-style: normal; color: var(--ink-faint); }
-  .c-study .rule.head { color: var(--ink); }
+  .c-study .rule.hl { color: var(--ink); }   /* was .head, which also caught the page heading's grid and 40 px padding */
 
-  .badge { display: inline-flex; align-items: center; gap: 5px; height: 24px; padding: 0 9px 0 7px; border-radius: 6px; font: 600 11px var(--sans); letter-spacing: .04em; white-space: nowrap; }
+  .badge { display: inline-flex; align-items: center; gap: 5px; height: 24px; padding: 0 9px 0 7px; border-radius: 6px; font: 600 12px var(--sans); letter-spacing: .04em; white-space: nowrap; }
   .badge svg { width: 12px; height: 12px; flex: none; }
   .badge.pass { background: var(--buy-soft); color: var(--buy); }
   .badge.fail { background: var(--sell-soft); color: var(--sell); }
@@ -158,8 +93,8 @@
   .io .is { color: var(--ink-faint); }
   .io .arr { color: var(--ink-faint); font-family: var(--sans); }
   .io .oos { color: var(--ink); font-weight: 600; font-size: 14px; }
-  .sub { display: block; margin-top: 2px; font-size: 11.5px; color: var(--ink-faint); }
-  .sub .num { font-size: 11px; }
+  .sub { display: block; margin-top: 2px; font-size: 12px; color: var(--ink-faint); }
+  .sub .num { font-size: 12px; }
   .up { color: var(--buy); } .down { color: var(--sell); }
   .dash { color: var(--ink-faint); }
   .c-n, .c-dd { font: 500 13px var(--mono); font-variant-numeric: tabular-nums; }
@@ -172,16 +107,16 @@
   .spark g:hover .b-up, .spark g:hover .b-dn, .spark g.on .b-up, .spark g.on .b-dn { opacity: 1; }
   .spark:hover rect.bar { opacity: .45; }
   .spark:hover g:hover rect.bar { opacity: 1; }
-  .yr { display: flex; justify-content: space-between; font: 500 10.5px var(--mono); color: var(--ink-faint); margin-top: 2px; }
+  .yr { display: flex; justify-content: space-between; font: 500 12px var(--mono); color: var(--ink-faint); margin-top: 2px; }
 
   .c-rep { text-align: right; }
-  .linkbtn { background: none; border: 0; padding: 6px 0; color: var(--accent); font: 500 12.5px var(--sans); cursor: pointer; display: inline-flex; align-items: center; gap: 4px; }
+  .linkbtn { background: none; border: 0; padding: 6px 0; min-height: var(--tap); border-radius: 6px; color: var(--accent); font: 500 12.5px var(--sans); cursor: pointer; display: inline-flex; align-items: center; gap: 4px; }
   .linkbtn:hover { text-decoration: underline; text-underline-offset: 3px; }
   .linkbtn[disabled] { color: var(--ink-faint); cursor: default; text-decoration: none; }
 
   /* candidate list */
   .more { grid-column: 1 / -1; margin-top: 10px; }
-  .more summary { display: inline-flex; align-items: center; gap: 6px; cursor: pointer; list-style: none; font-size: 12px; color: var(--ink-dim); padding: 2px 0; }
+  .more summary { display: inline-flex; align-items: center; gap: 6px; cursor: pointer; list-style: none; font-size: 12.5px; color: var(--ink-dim); padding: 2px 0; min-height: var(--tap); border-radius: 6px; }
   .more summary::-webkit-details-marker { display: none; }
   .more summary svg { width: 12px; height: 12px; transition: transform .2s var(--ease); }
   .more[open] summary svg { transform: rotate(90deg); }
@@ -189,23 +124,25 @@
   .cand-wrap { overflow-x: auto; margin-top: 8px; border: 1px solid var(--line-soft); border-radius: var(--r-sm); }
   .cand { width: 100%; border-collapse: collapse; font-size: 12.5px; }
   .cand th, .cand td { padding: 7px 10px; text-align: right; white-space: nowrap; border-top: 1px solid var(--line-soft); }
-  .cand thead th { border-top: 0; font: 500 11px var(--sans); color: var(--ink-faint); background: var(--panel-raised); }
+  .cand thead th { border-top: 0; font: 500 12px var(--sans); color: var(--ink-faint); background: var(--panel-raised); }
   .cand th:first-child, .cand td:first-child { text-align: left; white-space: normal; min-width: 220px; }
   .cand td { font-family: var(--mono); font-variant-numeric: tabular-nums; letter-spacing: -.02em; }
   .cand td:first-child { font-family: var(--sans); letter-spacing: 0; color: var(--ink-dim); }
   .cand tr.best td:first-child { color: var(--ink); font-weight: 600; }
-  .cand .v { font: 600 10.5px var(--sans); letter-spacing: .04em; }
+  .cand .v { font: 600 12px var(--sans); letter-spacing: .04em; }
   .notes { margin: 10px 0 0; font-size: 12.5px; color: var(--ink-dim); max-width: 90ch; white-space: pre-wrap; text-wrap: pretty; }
 
   .row.running .c-study h3 { color: var(--ink-dim); }
   .row .waiting { grid-column: 3 / 8; font-size: 12.5px; color: var(--ink-faint); }
 
+  .loading { margin: 28px 0; color: var(--ink-faint); font-size: 13.5px; }
+  #groups:focus { outline: none; }
   .foot { margin-top: 36px; color: var(--ink-faint); font-size: 12px; max-width: 80ch; }
   .foot p { margin: 0 0 6px; }
   .banner { margin: 0 0 12px; padding: 10px 14px; border-radius: var(--r-sm); background: var(--sell-soft); color: var(--ink); font-size: 13px; }
 
   /* tooltip */
-  .tip { position: fixed; z-index: var(--z-tip); pointer-events: none; background: var(--panel-raised); border: 1px solid var(--line-strong); border-radius: 6px; padding: 6px 9px; font: 500 11.5px var(--mono); color: var(--ink); white-space: nowrap; box-shadow: var(--shadow-pop); opacity: 0; transition: opacity .12s; }
+  .tip { position: fixed; z-index: var(--z-tip); pointer-events: none; background: var(--panel-raised); border: 1px solid var(--line-strong); border-radius: 6px; padding: 6px 9px; font: 500 12px var(--mono); color: var(--ink); white-space: nowrap; box-shadow: var(--shadow-pop); opacity: 0; transition: opacity .12s; }
   .tip.on { opacity: 1; }
   .tip b { font-family: var(--sans); font-weight: 600; margin-right: 6px; }
   .tip span { color: var(--ink-faint); }
@@ -218,7 +155,7 @@
   .rep-h { display: flex; align-items: center; gap: 12px; padding: 14px 18px; border-bottom: 1px solid var(--line); }
   .rep-h h2 { margin: 0; font: 600 15px var(--sans); flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
   .rep-h a { font-size: 12.5px; white-space: nowrap; }
-  .x { width: 32px; height: 32px; display: grid; place-items: center; border-radius: var(--r-sm); border: 1px solid var(--line); background: none; cursor: pointer; color: var(--ink-dim); }
+  .x { width: var(--tap); height: var(--tap); flex: none; display: grid; place-items: center; border-radius: var(--r-sm); border: 1px solid var(--line); background: none; cursor: pointer; color: var(--ink-dim); }
   .x:hover { color: var(--ink); border-color: var(--line-strong); }
   .rep pre { margin: 0; padding: 18px 20px 24px; overflow: auto; white-space: pre-wrap; overflow-wrap: anywhere; font: 12.5px/1.65 var(--mono); color: var(--ink-dim); }
 
@@ -237,7 +174,7 @@
     .c-years { grid-column: 3 / 5; }
     .c-rep { grid-column: 1 / -1; text-align: left; order: 10; }
     .more { order: 11; margin-top: 0; }
-    .lbl { display: block; font: 500 11px var(--sans); color: var(--ink-faint); margin-bottom: 3px; letter-spacing: 0; }
+    .lbl { display: block; font: 500 12px var(--sans); color: var(--ink-faint); margin-bottom: 3px; letter-spacing: 0; }
     .row { align-items: start; }
     .row .waiting { grid-column: 1 / -1; }
     .c-rep:has(.linkbtn[disabled]), .c-rep:empty { display: none; }
@@ -248,6 +185,8 @@
     .c-n { grid-column: 1; } .c-dd { grid-column: 2; } .c-years { grid-column: 3 / 5; }
     .c-study { grid-column: 1 / 4; }
     .top .check .when { display: none; }
+    /* the switch fits a 390 px bar: the page title is the h1 below, the refresh button keeps its icon */
+    .top .crumb, .top .brand.here, .btn-t { display: none; }
     .group-h { flex-direction: column; gap: 2px; }
   }
   @media (prefers-reduced-motion: reduce) {
@@ -257,32 +196,35 @@
 </style>
 </head>
 <body>
+<a class="skip" href="#groups">Skip to the studies</a>
 <header class="top">
   <div class="wrap">
-    <a class="brand" href="/"><span class="coin" aria-hidden="true"></span>Meridian X</a>
+    <a class="brand" href="/" title="Back to the desk"><span class="coin" aria-hidden="true"></span>Meridian X</a>
     <span class="crumb" aria-hidden="true">/</span>
-    <span class="brand" style="font-weight:500">Edge Lab</span>
+    <span class="brand here">Edge Lab</span>
     <div class="check">
       <span class="when" id="when" aria-live="polite">Checking…</span>
       <button class="btn" id="refresh" type="button" aria-label="Check for new results">
         <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true"><path d="M13.5 8a5.5 5.5 0 1 1-1.6-3.9"/><path d="M13.5 2.5v3h-3"/></svg>
-        <span>Refresh</span>
+        <span class="btn-t">Refresh</span>
       </button>
+      <nav class="hdr-sw" data-mx-members hidden aria-label="Desk, macro or ChronosTrade"><a href="/#home" title="Back to the main desk"><i aria-hidden="true"></i><span>Desk</span></a><a data-mx-macro href="/macro-desk" title="Macro desk"><i aria-hidden="true"></i><span>Macro</span></a><a href="/backtest" title="ChronosTrade: manual backtesting, journal and prop-firm challenges"><i aria-hidden="true"></i><span>ChronosTrade</span></a></nav>
     </div>
   </div>
 </header>
 
-<main class="wrap">
+<main class="wrap" id="main">
   <section class="head">
     <div>
       <h1>Edge Lab</h1>
-      <p class="lede">Each study tests rule changes against the current system. Expectancy is in <b>R per trade</b>, fitted in sample (IS) and then checked out of sample (OOS). Only the OOS number counts: a candidate passes when its edge survives data it never saw.</p>
+      <p class="lede">Every rule change we test, and whether it held up on data it never saw. <b>Pass</b> means the edge survived out of sample.</p>
+      <details class="how"><summary>How to read the numbers</summary><p>Expectancy is in <b>R per trade</b> (R = the amount risked). Each rule is fitted in sample (IS) and then checked out of sample (OOS); only the OOS number counts. "Best candidate" is the strongest rule a study tried, "vs baseline" its gain over the current system, n the number of OOS trades, max DD the deepest OOS drawdown, and the bars the expectancy year by year.</p></details>
     </div>
     <div class="prog" id="prog" aria-live="polite"></div>
   </section>
 
   <div id="banner"></div>
-  <div id="groups"></div>
+  <div id="groups" tabindex="-1"><p class="loading" role="status">Loading the studies…</p></div>
 
   <footer class="foot">
     <p>Results come from <span class="num">research/edge/&lt;study&gt;/result.json</span>. Studies land as they finish; this page checks again every two minutes. Year bars use each row's own scale; hover or tap a bar for its value.</p>
@@ -445,6 +387,16 @@
         '<div class="waiting">Waiting for result.json</div>' +
         '<div class="c-rep">' + (rec && rec.report ? '<button class="linkbtn" type="button" data-rep="' + esc(topic) + '">Report</button>' : '') + '</div></article>';
     }
+    // a finished study with a RESULT.md but no result.json table (9 Nov): its verdict line, not "Running"
+    if (rec.status === 'report') {
+      var rv = /^(pass|fail)$/.test(rec.verdict) ? rec.verdict : 'inc';
+      return '<article class="row" style="--i:' + i + '" data-topic="' + esc(topic) + '">' +
+        '<div class="c-study"><h3>' + esc(name) + '</h3><p class="meta">' + esc(topic) + (rec.built ? ' · built ' + esc(rec.built) : '') + '</p>' +
+        (rec.headline ? '<p class="rule hl" title="' + esc(rec.headline) + '"><em>Verdict:</em> ' + esc(rec.headline) + '</p>' : '') + '</div>' +
+        '<div class="c-verdict">' + BADGE[rv] + '</div>' +
+        '<div class="waiting">Written report only, no results table</div>' +
+        '<div class="c-rep"><button class="linkbtn" type="button" data-rep="' + esc(topic) + '">Report' + CHEV.replace('<svg', '<svg width="11" height="11"') + '</button></div></article>';
+    }
     if (rec.status === 'error') {
       return '<article class="row" style="--i:' + i + '" data-topic="' + esc(topic) + '">' +
         '<div class="c-study"><h3>' + esc(name) + '</h3><p class="meta">' + esc(topic) + '</p></div>' +
@@ -464,7 +416,7 @@
     var sys = d.system ? esc(d.system) : '';
     var tried = num(d.variantsTried);
     var meta = [sys, isFinite(tried) ? fmtN(tried) + ' variants tried' : (a.cands.length ? a.cands.length + ' candidates' : ''), rec.built ? 'built ' + esc(rec.built) : ''].filter(Boolean).join(' · ');
-    var headline = rec.headline ? '<p class="rule head" title="' + esc(rec.headline) + '"><em>Verdict:</em> ' + esc(rec.headline) + '</p>' : '';
+    var headline = rec.headline ? '<p class="rule hl" title="' + esc(rec.headline) + '"><em>Verdict:</em> ' + esc(rec.headline) + '</p>' : '';
     var bestStats = b || { is: base.is, oos: base.oos };
     var oosB = bestStats.oos || {}, baseOos = num(base.oos && base.oos.exp), bestOos = num(oosB.exp);
     var delta = b && isFinite(baseOos) && isFinite(bestOos) ? bestOos - baseOos : NaN;
@@ -509,6 +461,7 @@
       var g = groupOf(t, rec && rec.data);
       groups[g].push(t);
       if (!rec || rec.status === 'missing') counts.run++;
+      else if (rec.status === 'report') counts[/^(pass|fail)$/.test(rec.verdict) ? rec.verdict : 'inc']++;
       else if (rec.status === 'error') counts.err++;
       else counts[analyse(rec.data, rec).verdict]++;
     });
@@ -525,7 +478,7 @@
     var segs = [['pass', counts.pass, 'Pass'], ['fail', counts.fail, 'Fail'], ['inc', counts.inc + counts.err, 'Inconclusive'], ['run', counts.run, 'Running']];
     $('prog').innerHTML = '<div class="prog-h"><strong>' + done + '<span> of ' + total + ' studies in</span></strong><small>' + (state.index && state.index.generated ? 'Published ' + esc(new Date(state.index.generated).toLocaleString([], { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })) : '') + '</small></div>' +
       '<div class="seg" role="img" aria-label="' + segs.map(function (s) { return s[1] + ' ' + s[2].toLowerCase(); }).join(', ') + '">' + segs.map(function (s) { return '<i class="' + s[0] + '" style="flex-grow:' + s[1] + '"></i>'; }).join('') + '</div>' +
-      '<ul class="legend">' + segs.map(function (s) { return '<li><i class="' + s[0] + '" style="background:var(' + ({ pass: '--buy', fail: '--sell', inc: '--ink-faint', run: '--line-strong' })[s[0]] + ')"></i>' + s[2] + ' <b>' + s[1] + '</b></li>'; }).join('') + '</ul>';
+      '<ul class="legend">' + segs.filter(function (s) { return s[1] || s[0] !== 'run'; }).map(function (s) { return '<li><i class="' + s[0] + '" style="background:var(' + ({ pass: '--buy', fail: '--sell', inc: '--ink-faint', run: '--line-strong' })[s[0]] + ')"></i>' + s[2] + ' <b>' + s[1] + '</b></li>'; }).join('') + '</ul>';
 
     var cols = '<div class="cols" aria-hidden="true"><span>Study</span><span>Verdict</span><span>Baseline IS → OOS</span><span>Best candidate IS → OOS</span><span>OOS n</span><span>Max DD</span><span>Exp by year</span><span></span></div>';
     var gi = 0;
@@ -561,17 +514,45 @@
   window.addEventListener('hashchange', function () { linked = { topic: null, scrolled: false }; deepLink(); });
 
   function getJSON(url) {
-    return fetch(url, { cache: 'no-store' }).then(function (r) {
+    return fetch(url, { cache: 'no-cache' }).then(function (r) {
       if (!r.ok) { var e = new Error('HTTP ' + r.status); e.status = r.status; throw e; }
       return r.text();
     }).then(function (t) { return JSON.parse(t); });
+  }
+
+  // lab.json (research/edge/build.mjs, 9 Nov): every study's fields this page reads in one ~50 KB file instead of ~57 result.json
+  // downloads (~7 MB); the per-study path below stays as the fallback for a copy without it
+  function fromLab(lab) {
+    if (!lab || !Array.isArray(lab.topics)) throw new Error('no lab.json');
+    state.index = { generated: lab.generated, topics: lab.topics };
+    var seen = {};
+    lab.topics.forEach(function (e) {
+      if (!e || !e.topic) return;
+      var prev = state.studies[e.topic] || {}; seen[e.topic] = true;
+      if (!e.result) state.studies[e.topic] = { status: e.report ? 'report' : 'missing', report: e.report, open: prev.open, verdict: e.verdict, headline: e.headline, built: e.built };
+      else if (e.valid === false) state.studies[e.topic] = { status: 'error', report: e.report, open: prev.open, verdict: e.verdict, headline: e.headline, built: e.built };
+      else state.studies[e.topic] = { status: 'ok', data: e.data && typeof e.data === 'object' ? e.data : {}, report: e.report, open: prev.open, verdict: e.verdict, headline: e.headline, built: e.built };
+    });
+    KNOWN.forEach(function (k) { if (!seen[k[0]]) state.studies[k[0]] = { status: 'missing' }; });
   }
 
   var busy = false;
   function load() {
     if (busy) return; busy = true;
     $('refresh').setAttribute('aria-busy', 'true');
-    getJSON(BASE + 'index.json').then(function (ix) { return ix; }, function () { return null; }).then(function (ix) {
+    getJSON(BASE + 'lab.json').then(fromLab).catch(loadEach).then(function () {
+      var sig = JSON.stringify(Object.keys(state.studies).sort().map(function (k) { var s = state.studies[k]; return [k, s.status, s.data, s.report]; }));
+      if (sig !== state.sig) { state.sig = sig; render(); }
+      $('banner').innerHTML = '';
+      $('when').textContent = 'Checked ' + new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    }).catch(function (e) {
+      $('banner').innerHTML = '<p class="banner" role="alert">Could not load results: ' + esc(e && e.message) + '. <button class="linkbtn" type="button" data-retry>Try again</button></p>';
+      // nothing loaded yet: no rows (every study drawn as "Running" would read as a fact)
+      if (!state.rendered) $('groups').innerHTML = '';
+    }).then(function () { busy = false; $('refresh').removeAttribute('aria-busy'); });
+  }
+  function loadEach() {
+    return getJSON(BASE + 'index.json').then(function (ix) { return ix; }, function () { return null; }).then(function (ix) {
       state.index = ix;
       var entries;
       if (ix && Array.isArray(ix.topics)) {
@@ -584,7 +565,7 @@
       }
       return Promise.all(entries.map(function (e) {
         var prev = state.studies[e.topic] || {};
-        if (!e.result) { state.studies[e.topic] = { status: 'missing', report: e.report, open: prev.open }; return null; }
+        if (!e.result) { state.studies[e.topic] = { status: e.report ? 'report' : 'missing', report: e.report, open: prev.open, verdict: e.verdict, headline: e.headline, built: e.built }; return null; }
         return getJSON(BASE + encodeURIComponent(e.topic) + '/result.json').then(function (data) {
           state.studies[e.topic] = { status: 'ok', data: data && typeof data === 'object' ? data : {}, report: e.report, open: prev.open, verdict: e.verdict, headline: e.headline, built: e.built };
         }, function (err) {
@@ -592,16 +573,9 @@
           if (state.studies[e.topic].status === 'ok' && !prev.data) state.studies[e.topic].status = 'missing';
         });
       }));
-    }).then(function () {
-      var sig = JSON.stringify(Object.keys(state.studies).sort().map(function (k) { var s = state.studies[k]; return [k, s.status, s.data, s.report]; }));
-      if (sig !== state.sig) { state.sig = sig; render(); }
-      $('banner').innerHTML = '';
-      $('when').textContent = 'Checked ' + new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-    }).catch(function (e) {
-      $('banner').innerHTML = '<p class="banner">Could not load results: ' + esc(e && e.message) + '</p>';
-      if (!state.rendered) render();
-    }).then(function () { busy = false; $('refresh').removeAttribute('aria-busy'); });
+    });
   }
+  document.addEventListener('click', function (e) { if (e.target.closest && e.target.closest('[data-retry]')) load(); });
 
   // tooltip for the year bars
   var tip = $('tip'), tipOn = null;
@@ -637,7 +611,7 @@
     $('rep-raw').href = url;
     $('rep-body').textContent = 'Loading…';
     if (dlg.showModal) dlg.showModal(); else dlg.setAttribute('open', '');
-    fetch(url, { cache: 'no-store' }).then(function (r) { if (!r.ok) throw new Error(r.status === 404 ? 'This study has no RESULT.md yet.' : 'HTTP ' + r.status); return r.text(); })
+    fetch(url, { cache: 'no-cache' }).then(function (r) { if (!r.ok) throw new Error(r.status === 404 ? 'This study has no RESULT.md yet.' : 'HTTP ' + r.status); return r.text(); })
       .then(function (txt) { $('rep-body').textContent = txt; $('rep-body').scrollTop = 0; }, function (err) { $('rep-body').textContent = err.message; });
   });
   $('rep-x').addEventListener('click', function () { dlg.close ? dlg.close() : dlg.removeAttribute('open'); });

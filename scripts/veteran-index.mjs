@@ -48,5 +48,7 @@ if (import.meta.url === `file://${process.argv[1]}`) {
   fs.rmSync(OUT, { recursive: true, force: true }); fs.mkdirSync(OUT, { recursive: true });
   for (const d of idx.docs) { const to = path.join(OUT, d.path); fs.mkdirSync(path.dirname(to), { recursive: true }); fs.copyFileSync(path.join(SRC, d.path), to); }
   fs.writeFileSync(path.join(OUT, 'index.json'), JSON.stringify(idx, null, 1));
+  // the library page itself (9 Nov 2026): /veteran/ answered 404; it now opens a reader over the same index, #<path> deep links
+  fs.copyFileSync(new URL('./veteran-library.html', import.meta.url), path.join(OUT, 'index.html'));
   console.log(`veteran library: ${idx.docs.length} files, version ${idx.version}, CPI pilot ${idx.cpiPilot.length} issued -> ${OUT}`);
 }

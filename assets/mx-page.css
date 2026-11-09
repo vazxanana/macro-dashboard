@@ -1,0 +1,104 @@
+/* Meridian X side pages (Edge lab, /macro, /veteran/): the desk's tokens, top bar and Desk | Macro | ChronosTrade switch in one
+   file (9 Nov 2026 quality pass), so the pages around the desk read as one product. Colours are market-structure.html's 4 Nov
+   tokens; the light theme's accent / buy / sell text colours are a shade darker so small text keeps WCAG AA (4.5:1) on the
+   raised panels. Theme: localStorage msPrefs.theme via each page's head script (light, midnight, anything else dark), else the system. */
+:root {
+  --bg: #08090c; --panel: #0f1116; --panel-raised: #14171e; --panel-hover: #161a22;
+  --line: rgba(255,255,255,.07); --line-soft: rgba(255,255,255,.045); --line-strong: rgba(255,255,255,.12);
+  --ink: #eceef2; --ink-dim: #a4abb8; --ink-faint: #8a92a1; --accent: #5b8cff; --accent-soft: rgba(91,140,255,.12);
+  --buy: #2fbf8f; --sell: #f2576f; --buy-soft: rgba(47,191,143,.12); --sell-soft: rgba(242,87,111,.12);
+  --gold: #e3b341; --gold-soft: rgba(227,179,65,.13);
+  --neutral-soft: rgba(255,255,255,.06); --zero: rgba(255,255,255,.22);
+  --shadow-pop: 0 24px 48px rgba(0,0,0,.55);
+  --sans: Figtree, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  --r: 12px; --r-sm: 8px; --tap: 32px;
+  --z-sticky: 10; --z-tip: 40;
+  --ease: cubic-bezier(.22, 1, .36, 1);
+  color-scheme: dark;
+}
+@media (prefers-color-scheme: light) {
+  :root:not([data-theme="dark"]):not([data-theme="midnight"]) {
+    --bg: #f4f6f9; --panel: #ffffff; --panel-raised: #f7f8fb; --panel-hover: #f2f4f8;
+    --line: #dfe3ea; --line-soft: #eceff4; --line-strong: #cdd3dd;
+    --ink: #131722; --ink-dim: #4a5160; --ink-faint: #5f6675; --accent: #2a62f0; --accent-soft: rgba(47,107,255,.09);
+    --buy: #067a64; --sell: #c92643; --buy-soft: rgba(8,135,111,.09); --sell-soft: rgba(217,45,75,.08);
+    --gold: #8a6100; --gold-soft: rgba(201,148,0,.12);
+    --neutral-soft: rgba(19,23,34,.05); --zero: rgba(19,23,34,.28);
+    --shadow-pop: 0 18px 40px -12px rgba(16,24,40,.22), 0 2px 6px rgba(16,24,40,.06);
+    color-scheme: light;
+  }
+}
+:root[data-theme="light"] {
+  --bg: #f4f6f9; --panel: #ffffff; --panel-raised: #f7f8fb; --panel-hover: #f2f4f8;
+  --line: #dfe3ea; --line-soft: #eceff4; --line-strong: #cdd3dd;
+  --ink: #131722; --ink-dim: #4a5160; --ink-faint: #5f6675; --accent: #2a62f0; --accent-soft: rgba(47,107,255,.09);
+  --buy: #067a64; --sell: #c92643; --buy-soft: rgba(8,135,111,.09); --sell-soft: rgba(217,45,75,.08);
+  --gold: #8a6100; --gold-soft: rgba(201,148,0,.12);
+  --neutral-soft: rgba(19,23,34,.05); --zero: rgba(19,23,34,.28);
+  --shadow-pop: 0 18px 40px -12px rgba(16,24,40,.22), 0 2px 6px rgba(16,24,40,.06);
+  color-scheme: light;
+}
+:root[data-theme="midnight"] {
+  --bg: #070d1f; --panel: #0d1630; --panel-raised: #111c3a; --panel-hover: #15224a;
+  --line: rgba(150,175,255,.12); --line-soft: rgba(150,175,255,.07); --line-strong: rgba(150,175,255,.2);
+  --ink: #eef2ff; --ink-dim: #b0bcdc; --ink-faint: #8d9ac0; --accent: #e3b341; --accent-soft: rgba(227,179,65,.14);
+  --buy: #34d6a0; --sell: #ff6b85; --buy-soft: rgba(52,214,160,.13); --sell-soft: rgba(255,107,133,.13);
+}
+/* phones and tablets: every control at least 44 px tall */
+@media (pointer: coarse) { :root { --tap: 44px; } }
+
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+html, body { margin: 0; background: var(--bg); color: var(--ink); font: 14px/1.5 var(--sans); font-feature-settings: "cv11", "ss01"; -webkit-font-smoothing: antialiased; }
+body { padding: env(safe-area-inset-top, 0px) 0 env(safe-area-inset-bottom, 0px); min-height: 100vh; }
+a { color: var(--accent); text-decoration: none; }
+a:hover { text-decoration: underline; text-underline-offset: 3px; }
+button { font: inherit; color: inherit; }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 4px; }
+::selection { background: rgba(91,140,255,.3); }
+.num { font-family: var(--mono); font-variant-numeric: tabular-nums; letter-spacing: -.02em; }
+.sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+.skip { position: absolute; left: 12px; top: -60px; z-index: 100; padding: 12px 14px; min-height: 44px; border-radius: var(--r-sm); background: var(--panel-raised); color: var(--ink); border: 1px solid var(--line-strong); }
+.skip:focus { top: 10px; }
+.foot a { display: inline-flex; align-items: center; min-height: var(--tap); }
+
+.wrap { max-width: 1240px; margin: 0 auto; padding: 0 24px 64px; }
+
+/* top bar */
+.top { position: sticky; top: 0; z-index: var(--z-sticky); display: flex; align-items: center; gap: 12px; min-height: 56px;
+  background: color-mix(in srgb, var(--bg) 86%, transparent); backdrop-filter: saturate(140%) blur(14px); -webkit-backdrop-filter: saturate(140%) blur(14px); border-bottom: 1px solid var(--line); }
+.top .wrap { display: flex; align-items: center; gap: 12px; width: 100%; padding-bottom: 0; min-width: 0; }
+.brand { display: inline-flex; align-items: center; gap: 9px; min-height: var(--tap); color: var(--ink); font: 600 14px var(--sans); letter-spacing: -.1px; white-space: nowrap; }
+.brand:hover { text-decoration: none; }
+.brand.here { font-weight: 500; min-width: 0; overflow: hidden; text-overflow: ellipsis; }
+.coin { width: 20px; height: 20px; border-radius: 50%; background: radial-gradient(circle at 35% 35%, #ffd768, #c99400); box-shadow: inset 0 -2px 4px rgba(0,0,0,.25); flex: none; }
+.crumb { color: var(--ink-faint); font-weight: 500; }
+.top .check { margin-left: auto; display: inline-flex; align-items: center; gap: 10px; font-size: 12px; color: var(--ink-faint); white-space: nowrap; min-width: 0; }
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: 6px; min-height: var(--tap); min-width: var(--tap); padding: 6px 12px; border-radius: var(--r-sm); border: 1px solid var(--line); background: var(--neutral-soft); font: 500 12.5px var(--sans); color: var(--ink-dim); cursor: pointer; transition: background .15s, color .15s, border-color .15s; }
+.btn:hover { color: var(--ink); border-color: var(--line-strong); text-decoration: none; }
+.btn svg { width: 14px; height: 14px; flex: none; }
+.btn[aria-busy="true"] svg { animation: mx-spin .8s linear infinite; }
+@keyframes mx-spin { to { transform: rotate(360deg); } }
+
+/* Desk | Macro | ChronosTrade switch: the main header's control (conic ring); shown to signed-in members only */
+.hdr-sw { --hm-a: #e0a526; --hm-b: #7b61ff; position: relative; display: inline-flex; gap: 2px; padding: 3px; border-radius: 999px; flex: none; isolation: isolate; background: var(--panel); }
+.hdr-sw[hidden] { display: none; }
+.hdr-sw::before { content: ""; position: absolute; inset: -1.5px; border-radius: inherit; z-index: -2; background: conic-gradient(from var(--hm-r, 0turn), var(--hm-a), var(--hm-b), var(--hm-a)); }
+.hdr-sw::after { content: ""; position: absolute; inset: 0; border-radius: inherit; z-index: -1; background: var(--panel); }
+.hdr-sw a { display: inline-flex; align-items: center; justify-content: center; gap: 7px; height: 28px; min-width: 28px; padding: 0 12px; border-radius: 999px; text-decoration: none; color: var(--ink-dim); font: 700 12.5px/1 var(--sans); white-space: nowrap; transition: background .18s ease-out, color .18s ease-out; }
+.hdr-sw a i { width: 7px; height: 7px; border-radius: 50%; background: currentColor; opacity: .55; flex: none; }
+.hdr-sw a.on { color: var(--ink); background: color-mix(in srgb, var(--hm-a) 16%, var(--panel)); box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--hm-a) 40%, transparent); }
+.hdr-sw a.on i { background: var(--hm-a); opacity: 1; box-shadow: 0 0 0 3px color-mix(in srgb, var(--hm-a) 25%, transparent); }
+.hdr-sw a:not(.on):hover { color: var(--ink); background: color-mix(in srgb, var(--hm-b) 12%, var(--panel)); }
+.hdr-sw a:not(.on):hover i { background: var(--hm-b); opacity: 1; }
+@property --hm-r { syntax: '<angle>'; inherits: false; initial-value: 0turn; }
+@media (prefers-reduced-motion: no-preference) { .hdr-sw::before { animation: hm-spin 7s linear infinite; } @keyframes hm-spin { to { --hm-r: 1turn; } } }
+@media (pointer: coarse) { .hdr-sw { padding: 0; } .hdr-sw a { height: 44px; min-width: 44px; } }
+/* phones: dots only, as on the main desk and the Macro desk */
+@media (max-width: 760px) { .hdr-sw a span { display: none; } .hdr-sw a { padding: 0 9px; } }
+
+@media (max-width: 900px) { .wrap { padding: 0 16px 48px; } }
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; scroll-behavior: auto !important; }
+}

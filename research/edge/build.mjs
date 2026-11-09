@@ -6,12 +6,13 @@ import { readdirSync, existsSync, mkdirSync, copyFileSync, writeFileSync, readFi
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { studyVerdict } from './verdict.mjs';
+import { slimStudy } from './lab-summary.mjs';
 
 const src = dirname(fileURLToPath(import.meta.url));
 const out = join(process.argv[2] || 'out', 'research', 'edge');
 mkdirSync(out, { recursive: true });
 
-const topics = [];
+const topics = [], lab = [];
 for (const d of readdirSync(src, { withFileTypes: true })) {
   if (!d.isDirectory() || !/^[a-z0-9][a-z0-9_-]*$/i.test(d.name)) continue;
   const dir = join(src, d.name), res = join(dir, 'result.json'), md = join(dir, 'RESULT.md');
@@ -26,8 +27,14 @@ for (const d of readdirSync(src, { withFileTypes: true })) {
   if (hasReport) copyFileSync(md, join(out, d.name, 'RESULT.md'));
   // the one-line verdict and its class (pass / fail / inc), read from result.json and the RESULT.md "Verdict" line
   const v = studyVerdict(data, hasReport ? readFileSync(md, 'utf8') : '');
-  topics.push({ topic: d.name, result: hasResult, valid, report: hasReport, verdict: v.verdict, headline: v.headline, built: v.built });
+  const rec = { topic: d.name, result: hasResult, valid, report: hasReport, verdict: v.verdict, headline: v.headline, built: v.built };
+  topics.push(rec);
+  // the page's one-file summary: only the fields /edge-lab.html reads (see lab-summary.mjs)
+  lab.push(valid ? { ...rec, data: slimStudy(data) } : rec);
 }
 topics.sort((a, b) => a.topic.localeCompare(b.topic));
-writeFileSync(join(out, 'index.json'), JSON.stringify({ generated: new Date().toISOString(), topics }, null, 1));
+lab.sort((a, b) => a.topic.localeCompare(b.topic));
+const generated = new Date().toISOString();
+writeFileSync(join(out, 'index.json'), JSON.stringify({ generated, topics }, null, 1));
+writeFileSync(join(out, 'lab.json'), JSON.stringify({ generated, topics: lab }));
 console.log(`edge: published ${topics.length} studies to ${out}`);
