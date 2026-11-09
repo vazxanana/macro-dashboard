@@ -1171,7 +1171,7 @@
    "startBalance": 9987.78
   },
   "startedAt": "2026-11-08T11:42:25.000Z",
-  "status": "ok · demo Fusion Markets · balance 9994.09 · 20 open · 1 resting",
+  "status": "ok · demo Fusion Markets · balance 9994.09 · 20 open · 2 resting",
   "skipped": {
    "audusd-position-1793601653": "price 0.68666 has run 1.27R from the council entry 0.70162: a different trade now",
    "xrp-rswing-1793942619": "none of XRPUSD found at the broker",
@@ -1205,18 +1205,34 @@
     "alerted": [
      "pending"
     ]
+   },
+   "usdchf-intraday-1794207655": {
+    "orderId": "33786196",
+    "symbol": "USDCHF",
+    "side": "sell",
+    "volume": 100000,
+    "lots": 0.01,
+    "digits": 5,
+    "setup": "intraday",
+    "limitPrice": 0.81905,
+    "stop": 0.82136,
+    "t1": 0.81276,
+    "placedAt": "2026-11-09T07:02:01.000Z",
+    "expires": "2026-11-09T19:00:55.000Z",
+    "riskCash": 2.82,
+    "margin": 2,
+    "minLot": true,
+    "shadow": true,
+    "alerted": [
+     "pending"
+    ]
    }
   },
   "catchUpAt": "2026-11-08T12:04:40.000Z",
   "balance": 9994.09,
-  "lastRun": "2026-11-09T06:59:35.000Z"
+  "lastRun": "2026-11-09T07:02:01.000Z"
  },
  "log": [
-  {
-   "at": "2026-11-08T20:37:33.000Z",
-   "msg": "not mirrored yet audusd-intraday-1793949765: AUDUSD market closed (paused until 20:47 UTC) (will retry)",
-   "trade": "audusd-intraday-1793949765"
-  },
   {
    "at": "2026-11-08T20:37:33.000Z",
    "msg": "not mirrored yet usdchf-scalp-1793955902: USDCHF market closed (paused until 20:47 UTC) (will retry)",
@@ -2711,6 +2727,11 @@
    "at": "2026-11-09T06:48:15.000Z",
    "msg": "USDCAD position 47507890 closed at the broker",
    "trade": "usdcad-scalp-1794204019"
+  },
+  {
+   "at": "2026-11-09T07:02:01.000Z",
+   "msg": "placed sell limit USDCHF 0.01 lot at 0.81905 (council intraday, valid to 2026-11-09T19:00Z)",
+   "trade": "usdchf-intraday-1794207655"
   }
  ],
  "limits": {
