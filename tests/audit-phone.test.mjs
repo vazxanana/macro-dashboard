@@ -23,5 +23,5 @@ test('home headline leaves "Loading live candles" when the feeds fail', () => {
 });
 
 test('tv-webhook owner check is constant time, length capped and null-body safe', () => {
-  assert.match(tv, /!b \|\| !b\.ownerPw \|\| String\(b\.ownerPw\)\.length > 200 \|\| !eq\(/);
+  assert.match(tv, /!!b && !!b\.ownerPw && String\(b\.ownerPw\)\.length <= 200 && eq\(/);
 });
