@@ -115,8 +115,10 @@ export function build(rowsByCode, pxByKey) {
     const tests = px.length ? evaluate(F, px, m.sign) : null;
     const sigs = [];
     const e = sigExtreme(cur), fl = sigFlow(cur);
-    if (e) sigs.push({ kind: 'extreme', dir: e, text: e < 0 ? `Speculators crowded long (${cur.pct}th percentile of 3 years): contrarian lean down` : `Speculators crowded short (${cur.pct}th percentile): contrarian lean up`, tested: tests && tests.extreme20 });
-    if (fl) sigs.push({ kind: 'flow', dir: fl, text: `${fl > 0 ? 'Big buying' : 'Big selling'} by speculators this week (${cur.z > 0 ? '+' : ''}${cur.z} standard deviations): follow`, tested: tests && tests.flow5 });
+    // directions are said in the quoted pair's terms: for USD/JPY, USD/CAD, USD/CHF the futures are the other currency (9 Nov fix)
+    const fut = m.sign < 0 ? m.name.slice(4) : null, pairWay = (d) => `${m.name} ${d * m.sign > 0 ? 'up' : 'down'}`;
+    if (e) sigs.push({ kind: 'extreme', dir: e, pairDir: e * m.sign, text: `Speculators crowded ${e < 0 ? 'long' : 'short'}${fut ? ` ${fut}` : ''} (${cur.pct}th percentile of 3 years): contrarian lean ${pairWay(e)}`, tested: tests && tests.extreme20 });
+    if (fl) sigs.push({ kind: 'flow', dir: fl, pairDir: fl * m.sign, text: `${fl > 0 ? 'Big buying' : 'Big selling'}${fut ? ` of ${fut}` : ''} by speculators this week (${cur.z > 0 ? '+' : ''}${cur.z} standard deviations): follow, ${pairWay(fl)}`, tested: tests && tests.flow5 });
     markets.push({ k: m.k, name: m.name, who: m.ds === 'dis' ? 'managed money' : 'leveraged funds', asOf: new Date(cur.t * 1000).toISOString().slice(0, 10),
       net: cur.net, long: cur.long, short: cur.short, chg1: cur.chg1, chg4: cur.chg4, pct: cur.pct, z: cur.z, tL: cur.tL, tS: cur.tS, tLchg: cur.tLchg, tSchg: cur.tSchg, oi: cur.oi, oiChg: cur.oiChg,
       longShare: cur.long + cur.short ? Math.round(cur.long / (cur.long + cur.short) * 100) : null, quote: m.sign < 0 ? `futures are ${m.name.slice(4)} vs USD, so a long is a bet ${m.name} falls` : null,
