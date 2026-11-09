@@ -330,6 +330,30 @@
   .an-key { display: flex; flex-wrap: wrap; gap: 4px 14px; font-size: 12px; color: var(--ink-faint); margin: 6px 0 0; } .an-key i { display: inline-block; width: 16px; height: 0; border-top: 2px solid var(--gold-ink); vertical-align: middle; margin-right: 5px; }
   .an-key i.d { border-top-style: dashed; border-color: var(--ink-faint); } .an-key i.w { border-color: var(--ink-faint); } .an-key i.o { width: 9px; height: 9px; border: 2px solid var(--ink-faint); border-radius: 50%; } .an-key i.f { width: 9px; height: 9px; border: 0; background: var(--gold); border-radius: 50%; }
   @media (max-width: 600px) { .hyb { grid-template-columns: 1fr; } .sc-top .v { font-size: 26px; } }
+  /* ─── Next release (9 Nov 2026, the veteran's event playbook, council/playbook.mjs → veteran.json.events): countdown, what is
+     expected, hot / in-line / cool, what past releases did, his dated call. A word or a glyph beside every colour. ─── */
+  .nxt { margin-top: 12px; } .nxt .sub small { font-size: 12px; color: var(--ink-faint); }
+  .nx-top { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.25fr) minmax(0, .9fr); gap: 12px; }
+  .nx-ev .hero { font-size: 24px; } .nx-cd { font: 700 22px var(--mono); color: var(--gold-ink); letter-spacing: -.4px; margin-top: 6px; font-variant-numeric: tabular-nums; }
+  .nx-call .big { font: 700 34px var(--sans); color: var(--ink); letter-spacing: -.6px; line-height: 1.1; } .nx-call .big small { font: 500 13px var(--sans); color: var(--ink-faint); margin-left: 6px; letter-spacing: 0; }
+  .nx-tag { display: inline-block; font: 600 12px var(--sans); padding: 1px 8px; border-radius: 999px; border: 1px solid var(--line); color: var(--ink-dim); margin-left: 6px; vertical-align: 2px; }
+  .nx-tag.ok { color: var(--buy); border-color: color-mix(in srgb, var(--buy) 45%, var(--line)); } .nx-tag.no { color: var(--sell); border-color: color-mix(in srgb, var(--sell) 45%, var(--line)); }
+  .vz .z-cool { fill: var(--buy); opacity: .10; } .vz .z-hot { fill: var(--sell); opacity: .10; } .vz .z-in { fill: var(--neutral-strong); opacity: .5; }
+  .vz .mk { fill: var(--ink); stroke: var(--panel); stroke-width: 2; } .vz .mk2 { fill: var(--gold); stroke: var(--panel); stroke-width: 2; } .vz .mk3 { fill: var(--panel); stroke: var(--ink-dim); stroke-width: 2; }
+  .vz .pu { fill: var(--buy); stroke: var(--panel); stroke-width: 1.5; opacity: .85; } .vz .pd { fill: var(--sell); stroke: var(--panel); stroke-width: 1.5; opacity: .85; } .vz .pz { fill: var(--ink-faint); stroke: var(--panel); stroke-width: 1.5; }
+  .vz .med { stroke: var(--ink); stroke-width: 3; stroke-linecap: round; } .vz .lane { fill: var(--neutral-soft); }
+  .nx-sc { width: 100%; border-collapse: collapse; font-size: 13px; margin-top: 8px; } .nx-sc th, .nx-sc td { text-align: left; vertical-align: top; padding: 8px 10px 8px 0; border-top: 1px solid var(--line-soft); }
+  .nx-sc th { color: var(--ink-faint); font: 500 12px var(--sans); border-top: 0; padding-top: 0; } .nx-sc td { color: var(--ink-dim); } .nx-sc td:first-child b { display: block; color: var(--ink); font-size: 14px; } .nx-sc td:first-child { width: 120px; } .nx-sc td:first-child b { white-space: nowrap; } .nx-sc td small { display: block; color: var(--ink-faint); font-size: 12px; }
+  .nx-sc .sw { display: inline-block; width: 10px; height: 10px; border-radius: 3px; margin-right: 6px; vertical-align: 0; background: var(--neutral-strong); } .nx-sc tr.hot .sw { background: var(--sell); } .nx-sc tr.cool .sw { background: var(--buy); }
+  .nx-sc .dir.up { color: var(--buy); font-weight: 600; } .nx-sc .dir.dn { color: var(--sell); font-weight: 600; }
+  #nx-detail .vt { max-width: 560px; } #nx-detail .vt td:not(:first-child), #nx-detail .vt th:not(:first-child) { text-align: right; }
+  .nx-also { margin: 10px 0 0 !important; font-size: 13px !important; color: var(--ink-dim); } .nx-also b { color: var(--ink); }
+  .nx-key { display: flex; flex-wrap: wrap; gap: 4px 14px; font-size: 12px; color: var(--ink-faint); margin: 4px 0 0; } .nx-key i { display: inline-block; width: 9px; height: 9px; border-radius: 50%; margin-right: 5px; vertical-align: 0; }
+  .nx-key i.u { background: var(--buy); } .nx-key i.d { background: var(--sell); } .nx-key i.m { width: 3px; height: 12px; border-radius: 1px; background: var(--ink); vertical-align: -2px; }
+  @media (max-width: 1100px) { .nx-top { grid-template-columns: 1fr 1fr; } .nx-top > .nx-exp { grid-column: 1 / -1; order: 3; } }
+  @media (max-width: 720px) { .nx-top { grid-template-columns: 1fr; } .nx-top > .nx-exp { order: 0; }
+    .nx-sc thead { display: none; } .nx-sc tr { display: block; border-top: 1px solid var(--line-soft); padding: 8px 0; } .nx-sc td { display: block; border: 0; padding: 2px 0; }
+    .nx-sc td[data-l]::before { content: attr(data-l) ": "; color: var(--ink-faint); font-weight: 600; } }
 </style>
 </head>
 <body>
@@ -358,6 +382,22 @@
       <div class="tile" id="g-levels" aria-label="Two levels to watch"></div>
     </div>
     <p class="g-pub"><b>Public data only.</b> CFTC positioning, Treasury and FRED series, the release calendar and central-bank feeds, read early and carefully. No inside information. <span id="g-cal"></span></p>
+  </section>
+
+  <!-- 1b. the next release (9 Nov 2026, the veteran's event playbook): council/playbook.mjs → veteran.json.events -->
+  <section class="card nxt" id="c-next" aria-labelledby="nx-h" hidden>
+    <p class="kick"><span id="nx-h">Next release</span><small id="nx-sub"></small></p>
+    <div class="nx-top">
+      <div class="tile nx-ev" id="nx-ev"></div>
+      <div class="tile nx-exp" id="nx-exp"></div>
+      <div class="tile nx-call" id="nx-call"></div>
+    </div>
+    <h3 class="vz-h">If it prints… <small>act after the release, not before</small></h3>
+    <div id="nx-sc"></div>
+    <h3 class="vz-h" id="nx-st-h">What past releases did</h3>
+    <div class="vz" id="nx-chart"></div>
+    <p class="nx-also" id="nx-also"></p>
+    <details class="more" id="nx-more"><summary>Detail <small>the release day, after the first spike, the nowcast split, the test, method</small></summary><div id="nx-detail"></div></details>
   </section>
 
   <!-- 2. the two pictures (9 Nov 2026, owner: "more visual… more simpler"): the score's path and drivers, and where gold sits among its levels -->
@@ -892,11 +932,99 @@
     return '<svg width="' + w + '" height="' + H + '" viewBox="0 0 ' + w + ' ' + H + '" role="img" aria-label="Running share of calls that came true, ' + pct(Lr.cumHit) + ' of ' + Lr.cumN + ', against ' + pct(Lr.cumExpected) + ' expected">' + g + '</svg>'
       + '<p class="an-key"><span><i></i>came true (running)</span><span><i class="d"></i>expected: his average stated chance</span><span>Weeks are the calls\' due weeks.</span></p>';
   }
+  // 1b. the next release (council/playbook.mjs → veteran.json.events): countdown in UTC and local time, what is expected, the
+  // hot / in-line / cool table, past releases as a strip of dots, his dated call; detail folded. n/a where a field is missing.
+  var NX = null, MONS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'], WDS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+  var utcWhen = function (iso) { var d = new Date(iso); return WDS[d.getUTCDay()] + ' ' + d.getUTCDate() + ' ' + MONS[d.getUTCMonth()] + ', ' + String(d.getUTCHours()).padStart(2, '0') + ':' + String(d.getUTCMinutes()).padStart(2, '0') + ' UTC'; };
+  var locWhen = function (iso) { try { return new Date(iso).toLocaleString([], { weekday: 'short', day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit', timeZoneName: 'short' }); } catch (e) { return when(iso); } };
+  function cdText(iso) { var ms = Date.parse(iso) - Date.now(); if (!isFinite(ms)) return NA; if (ms <= 0) return 'released ' + ago(iso);
+    var m = Math.max(1, Math.round(ms / 60000)), d = Math.floor(m / 1440), h = Math.floor((m % 1440) / 60), mm = m % 60; return 'in ' + (d ? d + ' d ' : '') + (d || h ? h + ' h ' : '') + mm + ' min'; }
+  var pc2 = function (x) { return !num(x) ? NA : (x > 0 ? '+' : x < 0 ? '−' : '') + Math.abs(+x).toFixed(2) + '%'; };
+  var numOf = function (x) { var m = /(-?\d+(?:\.\d+)?)/.exec(String(x == null ? '' : x)); return m ? +m[1] : null; };
+  // the expectation scale: one row per number (consensus, the forecast cluster, previous) on one axis, the hot / cool bands behind
+  function expScale(e, w) {
+    var x0 = e.expectations[0] || {}, B = e.bands || {}, rows = [];
+    (x0.cluster && x0.cluster.length ? x0.cluster : num(numOf(x0.consensus)) ? [{ label: 'Calendar consensus', value: numOf(x0.consensus) }] : []).forEach(function (c, i) { rows.push({ l: c.label, v: +c.value, cls: i === 0 ? 'mk' : i === 1 ? 'mk2' : 'mk3' }); });
+    if (num(numOf(x0.previous))) rows.push({ l: 'Previous print', v: numOf(x0.previous), cls: 'mk3' });
+    if (!rows.length) return '<p class="empty">No expectation captured: n/a.</p>';
+    var vals = rows.map(function (r) { return r.v; }).concat([B.cool, B.hot].filter(num)), lo = Math.min.apply(null, vals), hi = Math.max.apply(null, vals), pad = Math.max(0.05, (hi - lo) * 0.25); lo -= pad; hi += pad;
+    var L = 8, R = w - 8, RH = 34, top = 6, H = top + rows.length * RH + 30, X = function (v) { return L + (v - lo) / (hi - lo) * (R - L); }, g = '', bot = top + rows.length * RH;
+    if (num(B.cool)) g += '<rect class="z-cool" x="' + L + '" y="' + top + '" width="' + (X(B.cool) - L) + '" height="' + (bot - top) + '"/>';
+    if (num(B.hot)) g += '<rect class="z-hot" x="' + X(B.hot) + '" y="' + top + '" width="' + (R - X(B.hot)) + '" height="' + (bot - top) + '"/>';
+    if (num(B.cool) && num(B.hot)) g += '<rect class="z-in" x="' + X(B.cool) + '" y="' + top + '" width="' + (X(B.hot) - X(B.cool)) + '" height="' + (bot - top) + '"/>';
+    var short = function (l) { l = l.replace(/ \(.*$/, ''); return w >= 520 ? l : l.replace('Calendar consensus', 'Consensus').replace('Veteran batch pilot forecast', 'Batch pilot').replace('Cleveland Fed core nowcast', 'Cleveland nowcast').replace('Previous print', 'Previous'); };
+    rows.forEach(function (r, i) { var y = top + i * RH + 24, x = X(r.v), tw = short(r.l).length * 6.6 + 12, right = x + tw > R ? true : x - tw < L ? false : x > (L + R) / 2;
+      g += '<g tabindex="0"' + tip(r.l + '\n' + r.v + '%') + '><rect class="lab-bg" x="' + L + '" y="' + (top + i * RH) + '" width="' + (R - L) + '" height="' + RH + '"/><circle class="' + r.cls + '" cx="' + x.toFixed(1) + '" cy="' + y + '" r="6"/>'
+        + '<text class="dim" x="' + (right ? x - 10 : x + 10).toFixed(1) + '" y="' + (y - 9) + '"' + (right ? ' text-anchor="end"' : '') + '>' + esc(short(r.l)) + '</text><text class="ink mono" x="' + (right ? x - 10 : x + 10).toFixed(1) + '" y="' + (y + 5) + '"' + (right ? ' text-anchor="end"' : '') + '>' + esc(r.v + '%') + '</text></g>'; });
+    var ax = bot + 16;
+    if (num(B.cool)) g += '<text x="' + (X(B.cool) - 4) + '" y="' + ax + '" text-anchor="end">≤ ' + B.cool + '% cool</text>';
+    if (num(B.hot)) g += '<text x="' + (X(B.hot) + 4) + '" y="' + ax + '">hot ≥ ' + B.hot + '%</text>';
+    if (num(B.cool) && num(B.hot) && X(B.hot) - X(B.cool) > 70) g += '<text x="' + ((X(B.cool) + X(B.hot)) / 2) + '" y="' + (ax + 14) + '" text-anchor="middle">in line</text>';
+    return '<svg width="' + w + '" height="' + (H + 6) + '" viewBox="0 0 ' + w + ' ' + (H + 6) + '" role="img" aria-label="' + esc(rows.map(function (r) { return r.l + ' ' + r.v + '%'; }).join('; ')) + '">' + g + '</svg>';
+  }
+  // past releases: gold's first hour on each, one lane per dollar read, the median marked; dots coloured by direction with the word in the key
+  function stripSvg(st, w) {
+    var F = st.firstHour, lanes = [['hot', 'Hot read', 'dollar up ≥ 0.05% in 5 min'], ['inline', 'In line', 'dollar within ±0.05%'], ['cool', 'Cool read', 'dollar down ≥ 0.05% in 5 min']];
+    var CL = 1.5, L = 10, R = w - 10, LH = 58, top = 4, X = function (v) { return L + (Math.max(-CL, Math.min(CL, v)) + CL) / (2 * CL) * (R - L); }, g = '', H = top + lanes.length * LH + 26;
+    [-1.5, -1, -0.5, 0, 0.5, 1, 1.5].forEach(function (t) { var narrow = w < 480; if (narrow && Math.abs(t) === 0.5) return; g += '<line class="' + (t ? 'gl' : 'zero') + '" x1="' + X(t) + '" x2="' + X(t) + '" y1="' + top + '" y2="' + (top + lanes.length * LH) + '"/>';
+      if (!(narrow && Math.abs(t) === CL)) g += '<text x="' + X(t) + '" y="' + (H - 8) + '" text-anchor="' + (t === -CL ? 'start' : t === CL ? 'end' : 'middle') + '">' + (t > 0 ? '+' : t < 0 ? '−' : '') + Math.abs(t) + '%</text>'; });
+    lanes.forEach(function (ln, i) { var c = F[ln[0]] || { n: 0, pts: [] }, y0 = top + i * LH, yc = y0 + 38;
+      g += '<rect class="lane" x="' + L + '" y="' + (y0 + 26) + '" width="' + (R - L) + '" height="24" rx="4"/>';
+      g += '<text class="ink" x="' + L + '" y="' + (y0 + 16) + '">' + esc(ln[1]) + (w >= 560 ? '<tspan class="dim"> · ' + esc(ln[2]) + '</tspan>' : '') + '</text>';
+      g += '<text class="mono" x="' + R + '" y="' + (y0 + 16) + '" text-anchor="end">' + (c.n ? 'n ' + c.n + ' · med ' + esc(pc2(c.median)) + ' · up ' + pct(c.up) : 'n 0') + '</text>';
+      (c.pts || []).forEach(function (p, k) { var v = p[1], jy = yc + ((k * 7) % 5 - 2) * 3; g += '<circle class="' + (v > 0 ? 'pu' : v < 0 ? 'pd' : 'pz') + '" cx="' + X(v).toFixed(1) + '" cy="' + jy + '" r="4.5"' + tip(p[0] + ' · ' + ln[1] + '\nGold ' + pc2(v) + ' in the first hour' + (Math.abs(v) > CL ? ' (beyond the ±' + CL + '% axis)' : '')) + '/>'; });
+      if (c.n) g += '<line class="med" x1="' + X(c.median) + '" x2="' + X(c.median) + '" y1="' + (y0 + 24) + '" y2="' + (y0 + 52) + '"' + tip(ln[1] + ': median ' + pc2(c.median) + ', up ' + pct(c.up) + ' of ' + c.n) + '/>'; });
+    return '<svg width="' + w + '" height="' + H + '" viewBox="0 0 ' + w + ' ' + H + '" role="img" aria-label="Gold in the first hour after past ' + esc(st.type) + ' releases, by the dollar\'s first read: ' + lanes.map(function (ln) { var c = F[ln[0]] || {}; return ln[1] + ' n ' + (c.n || 0) + ', median ' + pc2(c.median) + ', up ' + pct(c.up); }).join('; ') + '">' + g + '</svg>'
+      + '<p class="nx-key"><span><i class="u"></i>gold up that hour</span><span><i class="d"></i>gold down</span><span><i class="m"></i>median</span><span>Moves beyond ±' + CL + '% sit on the edge.</span></p>';
+  }
+  var dirCls = function (t) { return /^Up/.test(t) ? 'up' : /^Down/.test(t) ? 'dn' : ''; };
+  function cellRow(c) { return c && c.n ? '<td class="num">' + c.n + '</td><td class="num">' + pc2(c.median) + '</td><td class="num">' + pct(c.up) + '</td>' : '<td>0</td><td>' + NA + '</td><td>' + NA + '</td>'; }
+  function splitTable(head, obj, names) { return '<table class="vt"><thead><tr><th>' + esc(head) + '</th><th>n</th><th>median</th><th>up</th></tr></thead><tbody>' + names.map(function (nm) { return '<tr><td>' + esc(nm[1]) + '</td>' + cellRow(obj && obj[nm[0]]) + '</tr>'; }).join('') + '</tbody></table>'; }
+  function renderNext(v) {
+    var E = (v && v.events) || [], sec = $('c-next'), e = E.filter(function (x) { return !x.released; })[0] || E[0];
+    if (!e) { sec.hidden = true; NX = null; return; } sec.hidden = false; NX = e;
+    var x0 = e.expectations[0] || {}, st = e.stats, c = e.call;
+    $('nx-sub').textContent = 'the veteran\'s event playbook · within 72 h · paper only';
+    $('nx-ev').innerHTML = '<span class="lab">' + (e.released ? 'Just released' : 'Red-folder release') + '</span><div class="hero">' + esc((e.country ? e.country + ' ' : '') + e.title) + '</div>'
+      + (e.titles && e.titles.length > 1 ? '<p class="sub">with ' + esc(e.titles.slice(1).join(', ')) + '</p>' : '')
+      + '<div class="nx-cd" id="nx-cd" aria-live="off">' + esc(cdText(e.at)) + '</div>'
+      + '<p class="sub"><b>' + esc(utcWhen(e.at)) + '</b><br><small>your time: ' + esc(locWhen(e.at)) + '</small></p>';
+    $('nx-exp').innerHTML = '<span class="lab">What is expected</span>'
+      + '<p class="sub">Consensus <b>' + esc(x0.consensus == null ? NA : x0.consensus) + '</b> · previous <b>' + esc(x0.previous == null ? NA : x0.previous) + '</b>' + (x0.actual != null ? ' · printed <b>' + esc(x0.actual) + '</b>' : '') + '</p>'
+      + '<div class="vz" id="nx-scale"></div>'
+      + '<p class="sub"><small>' + esc(x0.captured ? 'Captured ' + x0.captured.slice(0, 16).replace('T', ' ') + ' UTC, before the release; calendar consensus, not a verified survey.' : (x0.source || 'No consensus captured.')) + ' Forecast range: ' + esc(x0.range || 'n/a (the calendar publishes none)') + '.</small></p>'
+      + e.expectations.slice(1).map(function (y) { return '<p class="sub">' + esc(y.title) + ': consensus <b>' + esc(y.consensus == null ? NA : y.consensus) + '</b> · previous ' + esc(y.previous == null ? NA : y.previous) + '</p>'; }).join('');
+    draw('nx-scale', function (w) { return expScale(e, w); });
+    if (c) { var p = Math.round(c.p * 100), b = Math.round((c.baseP || 0) * 100), res = c.hit == null ? '' : c.hit ? '<span class="nx-tag ok">✓ came true</span>' : '<span class="nx-tag no">✗ did not</span>';
+      $('nx-call').innerHTML = '<span class="lab">His call</span><div class="big">' + p + '%<small>gold up on the day</small></div>'
+        + '<div class="pbar" tabindex="0"' + tip('P(gold up on ' + c.by + ') ' + p + '%\nBase rate ' + b + '%: every weekday over 10 years\n' + (c.why || '')) + '><i style="width:' + p + '%"></i><s style="left:' + b + '%"></s></div>'
+        + '<div class="pbl"><span>0%</span><span class="b" style="left:' + b + '%">base ' + b + '%</span><span class="r">100%</span></div>'
+        + '<p class="sub">' + esc(c.claim) + '. ' + (c.recorded ? 'On the record since ' + esc(c.issued) + '; ' : '') + 'scored on the ' + esc(c.by) + ' UTC close' + (c.live != null ? ' (today\'s reading ' + Math.round(c.live * 100) + '%; the first one counts)' : '') + '. ' + res + '</p>'; }
+    else $('nx-call').innerHTML = '<span class="lab">His call</span><p class="sub">' + esc(e.callNote || 'No call.') + '</p>';
+    $('nx-sc').innerHTML = '<table class="nx-sc"><thead><tr><th>If it prints</th><th>Fed path</th><th>Dollar</th><th>Gold</th><th>Past releases, this read</th><th>What to do</th></tr></thead><tbody>'
+      + e.scenarios.map(function (r) { return '<tr class="' + esc(r.k) + '"><td><b><span class="sw" aria-hidden="true"></span>' + esc(r.name) + '</b><small>' + esc(r.when) + '</small></td><td data-l="Fed path">' + esc(r.path) + '</td><td data-l="Dollar">' + esc(r.usd) + '</td><td data-l="Gold"><span class="dir ' + dirCls(r.gold) + '">' + esc(r.gold) + '</span></td><td data-l="Past">' + esc(r.history || 'n/a: no release history in the repository') + '</td><td data-l="Do">' + esc(r.action) + '</td></tr>'; }).join('') + '</tbody></table>'
+      + '<p class="vz-note">Prop and funded accounts: flat or at breakeven through the release (rule G). ' + esc(e.note || '') + '</p>';
+    if (st) { $('nx-st-h').innerHTML = 'What past ' + esc(st.type) + ' releases did <small>gold\'s first hour, by the dollar\'s first 5-minute read · ' + st.n + ' releases ' + esc(st.from.slice(0, 4)) + '-' + esc(st.to.slice(0, 4)) + ' · ' + esc(st.label) + '</small>';
+      draw('nx-chart', function (w) { return stripSvg(st, w); }); }
+    else { $('nx-st-h').innerHTML = 'What past releases did'; $('nx-chart').innerHTML = '<p class="empty">No release history for this event in the repository: n/a.</p>'; }
+    var also = E.filter(function (y) { return y !== e; }); $('nx-also').innerHTML = also.length ? 'Also within 72 h: ' + also.map(function (y) { var z = y.expectations[0] || {}; return '<b>' + esc((y.country ? y.country + ' ' : '') + y.title) + '</b> ' + esc(utcWhen(y.at)) + (z.consensus != null ? ' (expected ' + esc(z.consensus) + ')' : ''); }).join(' · ') + '.' : '';
+    var RN = [['hot', 'Hot read (dollar up)'], ['inline', 'In line'], ['cool', 'Cool read (dollar down)'], ['all', 'All releases']], d = '';
+    if (st) { d += '<h3 class="vz-h">Gold on the release day <small>UTC daily close vs the close before; the quantity his call is scored on</small></h3>' + splitTable('Dollar\'s read', st.day, RN) + '<p class="vz-note">Median absolute release-day move ' + (num(st.day.absMedian) ? st.day.absMedian + '%' : NA) + (num(e.expMovePct) ? ' · the strategist\'s naive 20-day expectation ±' + e.expMovePct + '%' : '') + '.</p>';
+      d += '<h3 class="vz-h">After the first spike <small>gold from 5 to 60 minutes after the release</small></h3>' + splitTable('Dollar\'s read', st.after5, RN);
+      if (st.nowcast) d += '<h3 class="vz-h">CPI 2022-24 by the print against the Cleveland nowcast <small>' + st.nowcast.n + ' releases · first hour</small></h3>' + splitTable('Core print vs nowcast', st.nowcast, [['hot', 'Hot (≥ +0.05)'], ['inline', 'In line'], ['cool', 'Cool (≤ −0.05)']]) + '<p class="vz-note">' + esc(st.nowcast.note) + '.</p>';
+      if (st.test) d += '<h3 class="vz-h">The pre-registered test</h3><p class="vz-note">' + esc(st.type) + ': does gold keep going the dollar\'s first-read way from 5 to 60 minutes? ' + st.test.hits + ' of ' + st.test.n + ' (' + pct(st.test.hit) + ', one-sided p ' + st.test.p + ') · 2018-21 ' + (st.test.halves.a.n ? pct(st.test.halves.a.hit) + ' of ' + st.test.halves.a.n : NA) + ' · 2022-26 ' + (st.test.halves.b.n ? pct(st.test.halves.b.hit) + ' of ' + st.test.halves.b.n : NA) + ' → <b>' + (st.test.pass ? 'passed' : 'failed') + '</b>' + (st.test.primary ? '' : ' (a secondary cell, never a pass route)') + '. ' + esc(st.label) + ' Bar: n ≥ 30, hit ≥ 60%, p < 0.05, both halves above 50% (research/edge/event-reaction).</p>';
+      d += '<p class="vz-note">' + esc(st.readNote) + '</p>'; }
+    if (c && c.why) d += '<p class="vz-note"><b>The call:</b> ' + esc(c.why) + ' Kept once on the calls ledger with its base rate; the self-calibration scores it.</p>';
+    if (v.eventsRecord && v.eventsRecord.n) d += '<p class="vz-note"><b>Event calls so far:</b> ' + v.eventsRecord.n + ' scored, ' + pct(v.eventsRecord.hitRate) + ' came true vs ' + pct(v.eventsRecord.expected) + ' expected · Brier ' + v.eventsRecord.brier + '.</p>';
+    d += '<p class="vz-note">Public data only: the strategist\'s calendar, the veteran\'s captured expectations, HistData 1-minute gold and dollar index bars, the council\'s daily closes. Paper only; no rule, size or trade changes.</p>';
+    $('nx-detail').innerHTML = d;
+  }
+  setInterval(function () { var el = $('nx-cd'); if (NX && el) el.textContent = cdText(NX.at); }, 30e3);
   function load() {
     Promise.all([get('macro/forecast.json'), get('macro/veteran.json'), get('macro/cache.json'), get('macro/veteran-ledger.json')]).then(function (x) {
       var fc = x[0], v = x[1], cache = x[2], L = x[3];
       $('when').textContent = fc && fc.at ? 'strategist ' + ago(fc.at) + (v && v.at ? ' · veteran ' + ago(v.at) : '') : 'No macro data yet';
-      renderGlance(v); renderScore(fc); renderLadder(v); renderChanges(v); renderCalib(v); renderStrip(fc, v); renderStrat(fc); renderVet(v); renderDebate(v); renderInsights(fc, v, cache); renderSource(fc, cache); renderLedger(v, L); renderCalls(v); renderBrief(v); get('macro/cot.json').then(renderCot);
+      renderGlance(v); renderNext(v); renderScore(fc); renderLadder(v); renderChanges(v); renderCalib(v); renderStrip(fc, v); renderStrat(fc); renderVet(v); renderDebate(v); renderInsights(fc, v, cache); renderSource(fc, cache); renderLedger(v, L); renderCalls(v); renderBrief(v); get('macro/cot.json').then(renderCot);
       $('foot').textContent = 'Paper only. The strategist and the veteran change no rule, size or trade; the owner decides. Data: council-data macro/forecast.json, macro/veteran.json, macro/cache.json, macro/veteran-ledger.json.';
     });
   }

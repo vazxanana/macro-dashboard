@@ -1,0 +1,401 @@
+{
+ "topic": "event-reaction",
+ "title": "Gold's reaction to US CPI, NFP and FOMC releases (the veteran's event playbook)",
+ "system": "veteran event playbook (council/playbook.mjs); XAU/USD and the dollar index, HistData M1 2018-26",
+ "built": "2026-11-09T07:17:13.711Z",
+ "preregistration": "research/edge/event-reaction/preregistration.md",
+ "verdict": "FAIL: on CPI days gold's T+5 to T+60 move followed the dollar's first read in 34 of 72 (47%, p 0.722; 2018-21 32%, 2022-26 55%). The playbook labels every reaction statistic descriptive, not a tested edge.",
+ "coverage": {
+  "from": "2018-02-14",
+  "to": "2026-10-28",
+  "xauBars": 3082748,
+  "udxBars": 2735741
+ },
+ "dropped": [
+  {
+   "d": "2018-01-12",
+   "spike": 1.69
+  },
+  {
+   "d": "2018-03-13",
+   "spike": 0.34
+  },
+  {
+   "d": "2018-04-11",
+   "spike": 1.19
+  },
+  {
+   "d": "2018-06-12",
+   "spike": 1.67
+  },
+  {
+   "d": "2018-07-12",
+   "spike": 1.92
+  },
+  {
+   "d": "2019-12-11",
+   "spike": 1.38
+  },
+  {
+   "d": "2020-02-13",
+   "spike": 1.21
+  },
+  {
+   "d": "2020-03-11",
+   "spike": 0.81
+  },
+  {
+   "d": "2020-04-10",
+   "spike": null
+  },
+  {
+   "d": "2020-05-12",
+   "spike": 0.98
+  },
+  {
+   "d": "2020-06-10",
+   "spike": 1.35
+  },
+  {
+   "d": "2020-07-14",
+   "spike": 1.09
+  },
+  {
+   "d": "2020-08-12",
+   "spike": 1.18
+  },
+  {
+   "d": "2020-10-13",
+   "spike": 0.84
+  },
+  {
+   "d": "2020-11-12",
+   "spike": 1.09
+  },
+  {
+   "d": "2021-01-13",
+   "spike": 1.93
+  }
+ ],
+ "missing": [
+  {
+   "type": "FOMC",
+   "d": "2022-06-15"
+  },
+  {
+   "type": "NFP",
+   "d": "2023-03-10"
+  },
+  {
+   "type": "CPI",
+   "d": "2023-03-14"
+  },
+  {
+   "type": "FOMC",
+   "d": "2023-03-22"
+  },
+  {
+   "type": "NFP",
+   "d": "2023-04-07"
+  },
+  {
+   "type": "CPI",
+   "d": "2023-04-12"
+  },
+  {
+   "type": "FOMC",
+   "d": "2023-05-03"
+  },
+  {
+   "type": "NFP",
+   "d": "2023-05-05"
+  },
+  {
+   "type": "NFP",
+   "d": "2023-06-02"
+  },
+  {
+   "type": "CPI",
+   "d": "2023-06-13"
+  },
+  {
+   "type": "FOMC",
+   "d": "2023-06-14"
+  },
+  {
+   "type": "NFP",
+   "d": "2023-07-07"
+  },
+  {
+   "type": "CPI",
+   "d": "2023-07-12"
+  },
+  {
+   "type": "FOMC",
+   "d": "2023-07-26"
+  },
+  {
+   "type": "NFP",
+   "d": "2026-04-03"
+  }
+ ],
+ "test": {
+  "hypothesis": "CPI: gold T+5→T+60 has the sign opposite to the dollar index T→T+5 when |dx5| ≥ 0.05%",
+  "bar": "n ≥ 30, hit ≥ 60%, one-sided binomial p < 0.05, both halves (2018-21, 2022-26) above 50%",
+  "CPI": {
+   "n": 72,
+   "hits": 34,
+   "hit": 0.47,
+   "p": 0.722,
+   "halves": {
+    "a": {
+     "n": 25,
+     "hits": 8,
+     "hit": 0.32
+    },
+    "b": {
+     "n": 47,
+     "hits": 26,
+     "hit": 0.55
+    }
+   },
+   "pass": false
+  },
+  "NFP": {
+   "n": 46,
+   "hits": 20,
+   "hit": 0.43,
+   "p": 0.849,
+   "halves": {
+    "a": {
+     "n": 0,
+     "hits": 0,
+     "hit": null
+    },
+    "b": {
+     "n": 46,
+     "hits": 20,
+     "hit": 0.43
+    }
+   },
+   "pass": false
+  },
+  "FOMC": {
+   "n": 28,
+   "hits": 15,
+   "hit": 0.54,
+   "p": 0.4253,
+   "halves": {
+    "a": {
+     "n": 0,
+     "hits": 0,
+     "hit": null
+    },
+    "b": {
+     "n": 28,
+     "hits": 15,
+     "hit": 0.54
+    }
+   },
+   "pass": false
+  },
+  "verdict": "FAIL: on CPI days gold's T+5 to T+60 move followed the dollar's first read in 34 of 72 (47%, p 0.722; 2018-21 32%, 2022-26 55%). The playbook labels every reaction statistic descriptive, not a tested edge."
+ },
+ "summary": {
+  "CPI": {
+   "n": 85,
+   "all": {
+    "g60": {
+     "n": 85,
+     "median": 0.102,
+     "up": 0.58
+    },
+    "g5to60": {
+     "n": 85,
+     "median": -0.004,
+     "up": 0.49
+    }
+   },
+   "byRead": {
+    "hot": {
+     "n": 31,
+     "g60": {
+      "n": 31,
+      "median": -0.238,
+      "up": 0.29
+     },
+     "g5to60": {
+      "n": 31,
+      "median": 0.005,
+      "up": 0.55
+     }
+    },
+    "inline": {
+     "n": 13,
+     "g60": {
+      "n": 13,
+      "median": 0.058,
+      "up": 0.54
+     },
+     "g5to60": {
+      "n": 13,
+      "median": -0.01,
+      "up": 0.38
+     }
+    },
+    "cool": {
+     "n": 41,
+     "g60": {
+      "n": 41,
+      "median": 0.263,
+      "up": 0.8
+     },
+     "g5to60": {
+      "n": 41,
+      "median": -0.043,
+      "up": 0.49
+     }
+    }
+   }
+  },
+  "NFP": {
+   "n": 51,
+   "all": {
+    "g60": {
+     "n": 51,
+     "median": 0.132,
+     "up": 0.55
+    },
+    "g5to60": {
+     "n": 51,
+     "median": -0.063,
+     "up": 0.45
+    }
+   },
+   "byRead": {
+    "hot": {
+     "n": 22,
+     "g60": {
+      "n": 22,
+      "median": -0.422,
+      "up": 0.23
+     },
+     "g5to60": {
+      "n": 22,
+      "median": 0.029,
+      "up": 0.5
+     }
+    },
+    "inline": {
+     "n": 5,
+     "g60": {
+      "n": 5,
+      "median": 0.317,
+      "up": 0.6
+     },
+     "g5to60": {
+      "n": 5,
+      "median": 0.174,
+      "up": 0.6
+     }
+    },
+    "cool": {
+     "n": 24,
+     "g60": {
+      "n": 24,
+      "median": 0.28,
+      "up": 0.83
+     },
+     "g5to60": {
+      "n": 24,
+      "median": -0.092,
+      "up": 0.38
+     }
+    }
+   }
+  },
+  "FOMC": {
+   "n": 34,
+   "all": {
+    "g60": {
+     "n": 34,
+     "median": -0.036,
+     "up": 0.47
+    },
+    "g5to60": {
+     "n": 34,
+     "median": -0.014,
+     "up": 0.5
+    }
+   },
+   "byRead": {
+    "hot": {
+     "n": 16,
+     "g60": {
+      "n": 16,
+      "median": -0.133,
+      "up": 0.38
+     },
+     "g5to60": {
+      "n": 16,
+      "median": 0.084,
+      "up": 0.56
+     }
+    },
+    "inline": {
+     "n": 6,
+     "g60": {
+      "n": 6,
+      "median": -0.361,
+      "up": 0.17
+     },
+     "g5to60": {
+      "n": 6,
+      "median": -0.308,
+      "up": 0
+     }
+    },
+    "cool": {
+     "n": 12,
+     "g60": {
+      "n": 12,
+      "median": 0.662,
+      "up": 0.75
+     },
+     "g5to60": {
+      "n": 12,
+      "median": 0.439,
+      "up": 0.67
+     }
+    }
+   }
+  }
+ },
+ "nowcastSplit": {
+  "note": "CPI 2022-24: core first print minus the Cleveland core nowcast (model benchmark, not survey consensus)",
+  "hot": {
+   "n": 10,
+   "g60": {
+    "n": 10,
+    "median": -0.463,
+    "up": 0.2
+   }
+  },
+  "inline": {
+   "n": 8,
+   "g60": {
+    "n": 8,
+    "median": 0.085,
+    "up": 0.5
+   }
+  },
+  "cool": {
+   "n": 14,
+   "g60": {
+    "n": 14,
+    "median": 0.302,
+    "up": 0.71
+   }
+  }
+ }
+}
