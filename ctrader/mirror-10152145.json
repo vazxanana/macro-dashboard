@@ -1672,7 +1672,8 @@
     "adopted": false,
     "alerted": [
      "open",
-     "amend"
+     "amend",
+     "close"
     ],
     "viaLimit": true,
     "limitPrice": 1.11904,
@@ -1686,10 +1687,11 @@
     "lagSec": 3979,
     "positionId": "47583058",
     "volume": 400000,
-    "status": "open",
+    "status": "closed at broker",
     "rr": 4.56,
     "amended": 2,
-    "amendedAt": "2026-11-09T16:06:50.000Z"
+    "amendedAt": "2026-11-09T16:06:50.000Z",
+    "closedAt": "2026-11-09T19:34:43.000Z"
    },
    "eurusd-scalp-1794222180": {
     "positionId": "47600543",
@@ -2876,7 +2878,7 @@
    "startBalance": 9987.78
   },
   "startedAt": "2026-11-08T11:42:25.000Z",
-  "status": "ok · demo Fusion Markets · balance 9946.14 · 27 open",
+  "status": "ok · demo Fusion Markets · balance 9954.98 · 26 open",
   "skipped": {
    "audusd-position-1793601653": "price 0.68666 has run 1.27R from the council entry 0.70162: a different trade now",
    "xrp-rswing-1793942619": "none of XRPUSD found at the broker",
@@ -2893,15 +2895,10 @@
   "resetDoneAt": "2026-11-08T11:42:47.000Z",
   "orders": {},
   "catchUpAt": "2026-11-08T12:04:40.000Z",
-  "balance": 9946.14,
-  "lastRun": "2026-11-09T19:32:13.000Z"
+  "balance": 9954.98,
+  "lastRun": "2026-11-09T19:34:43.000Z"
  },
  "log": [
-  {
-   "at": "2026-11-09T02:03:00.000Z",
-   "msg": "placed buy limit XAUUSD 0.01 lot at 4125.69 (council scalp, valid to 2026-11-09T05:01Z)",
-   "trade": "xau-scalp-1794189713"
-  },
   {
    "at": "2026-11-09T02:03:34.000Z",
    "msg": "limit filled: XAUUSD position 47445032 at the broker",
@@ -4396,6 +4393,11 @@
    "at": "2026-11-09T19:29:34.000Z",
    "msg": "GBPUSD position 47694927 closed at the broker",
    "trade": "gbpusd-intraday-1794237676"
+  },
+  {
+   "at": "2026-11-09T19:34:43.000Z",
+   "msg": "EURUSD position 47583058 closed at the broker",
+   "trade": "eurusd-rintra-1794217886"
   }
  ],
  "limits": {
