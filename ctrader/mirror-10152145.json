@@ -1047,6 +1047,33 @@
     ],
     "stopCheckedAt": "2026-11-09T03:43:20.000Z",
     "brokerStop": 1.41044
+   },
+   "xau-rscalp-1794193018": {
+    "symbol": "XAUUSD",
+    "side": "sell",
+    "setup": "rscalp",
+    "openedAt": "2026-11-09T03:45:45.000Z",
+    "councilEntry": 4122.2,
+    "stop": 4134.486160714286,
+    "t1": 4094.2650000000003,
+    "adopted": false,
+    "alerted": [
+     "open"
+    ],
+    "viaLimit": true,
+    "limitPrice": 4122.2,
+    "digits": 2,
+    "lots": 0.01,
+    "riskCash": 12.29,
+    "margin": 8.25,
+    "minLot": true,
+    "shadow": true,
+    "fillPrice": 4122.24,
+    "slipR": -0.003,
+    "lagSec": 2927,
+    "positionId": "47463476",
+    "volume": 100,
+    "status": "open"
    }
   },
   "day": {
@@ -1054,7 +1081,7 @@
    "startBalance": 9987.78
   },
   "startedAt": "2026-11-08T11:42:25.000Z",
-  "status": "ok · demo Fusion Markets · balance 10007.06 · 21 open · 2 resting",
+  "status": "ok · demo Fusion Markets · balance 10007.06 · 22 open · 1 resting",
   "skipped": {
    "audusd-position-1793601653": "price 0.68666 has run 1.27R from the council entry 0.70162: a different trade now",
    "xrp-rswing-1793942619": "none of XRPUSD found at the broker",
@@ -1088,39 +1115,13 @@
     "alerted": [
      "pending"
     ]
-   },
-   "xau-rscalp-1794193018": {
-    "orderId": "33778284",
-    "symbol": "XAUUSD",
-    "side": "sell",
-    "volume": 100,
-    "lots": 0.01,
-    "digits": 2,
-    "setup": "rscalp",
-    "limitPrice": 4122.2,
-    "stop": 4134.486160714286,
-    "t1": 4094.2650000000003,
-    "placedAt": "2026-11-09T02:57:57.000Z",
-    "expires": "2026-11-09T05:56:58.000Z",
-    "riskCash": 12.29,
-    "margin": 8.25,
-    "minLot": true,
-    "shadow": true,
-    "alerted": [
-     "pending"
-    ]
    }
   },
   "catchUpAt": "2026-11-08T12:04:40.000Z",
   "balance": 10007.06,
-  "lastRun": "2026-11-09T03:43:20.000Z"
+  "lastRun": "2026-11-09T03:45:45.000Z"
  },
  "log": [
-  {
-   "at": "2026-11-08T20:37:33.000Z",
-   "msg": "not mirrored yet gbpusd-scalp-1793626672: GBPUSD market closed: MARKET_CLOSED: Trading is not available: Market is closed. (will retry)",
-   "trade": "gbpusd-scalp-1793626672"
-  },
   {
    "at": "2026-11-08T20:37:33.000Z",
    "msg": "not mirrored yet usdcad-scalp-1793689919: USDCAD market closed: MARKET_CLOSED: Trading is not available: Market is closed. (will retry)",
@@ -2615,6 +2616,11 @@
    "at": "2026-11-09T03:43:20.000Z",
    "msg": "opened buy USDCAD 0.03 lot (council scalp)",
    "trade": "usdcad-scalp-1794195741"
+  },
+  {
+   "at": "2026-11-09T03:45:45.000Z",
+   "msg": "limit filled: XAUUSD position 47463476 at the broker",
+   "trade": "xau-rscalp-1794193018"
   }
  ],
  "limits": {
@@ -2693,11 +2699,11 @@
   ]
  },
  "execution": {
-  "n": 36,
+  "n": 37,
   "meanSlipR": -0.015,
   "medianSlipR": -0.002,
   "worstSlipR": 1.168,
-  "medianLagSec": 43780,
+  "medianLagSec": 32500,
   "bySymbol": {
    "SOLUSD": {
     "n": 5,
@@ -2732,8 +2738,8 @@
     "meanSlipR": 0.07
    },
    "XAUUSD": {
-    "n": 4,
-    "meanSlipR": -0.116
+    "n": 5,
+    "meanSlipR": -0.094
    }
   }
  }
