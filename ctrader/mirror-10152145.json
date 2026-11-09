@@ -1320,7 +1320,7 @@
    "startBalance": 9987.78
   },
   "startedAt": "2026-11-08T11:42:25.000Z",
-  "status": "ok · demo Fusion Markets · balance 10018.74 · 19 open · 2 resting",
+  "status": "ok · demo Fusion Markets · balance 10018.74 · 19 open · 3 resting",
   "skipped": {
    "audusd-position-1793601653": "price 0.68666 has run 1.27R from the council entry 0.70162: a different trade now",
    "xrp-rswing-1793942619": "none of XRPUSD found at the broker",
@@ -1374,18 +1374,33 @@
     "alerted": [
      "pending"
     ]
+   },
+   "gbpusd-rscalp-1794214229": {
+    "orderId": "33791521",
+    "symbol": "GBPUSD",
+    "side": "sell",
+    "volume": 300000,
+    "lots": 0.03,
+    "digits": 5,
+    "setup": "rscalp",
+    "limitPrice": 1.34105,
+    "stop": 1.3417,
+    "t1": 1.33964,
+    "placedAt": "2026-11-09T08:51:33.000Z",
+    "expires": "2026-11-09T11:50:29.000Z",
+    "riskCash": 2,
+    "margin": 8.05,
+    "shadow": true,
+    "alerted": [
+     "pending"
+    ]
    }
   },
   "catchUpAt": "2026-11-08T12:04:40.000Z",
   "balance": 10018.74,
-  "lastRun": "2026-11-09T08:49:06.000Z"
+  "lastRun": "2026-11-09T08:51:33.000Z"
  },
  "log": [
-  {
-   "at": "2026-11-08T20:48:06.000Z",
-   "msg": "not mirrored yet usdchf-swing-1793762425: USDCHF market closed: MARKET_CLOSED: Trading is not available: Market is closed. (will retry)",
-   "trade": "usdchf-swing-1793762425"
-  },
   {
    "at": "2026-11-08T20:48:06.000Z",
    "msg": "not mirrored yet xau-position-1793783465: XAUUSD market closed: MARKET_CLOSED: Trading is not available: Market is closed. (will retry)",
@@ -2880,6 +2895,11 @@
    "at": "2026-11-09T08:49:06.000Z",
    "msg": "opened buy USDCHF 0.02 lot (council scalp)",
    "trade": "usdchf-scalp-1794214084"
+  },
+  {
+   "at": "2026-11-09T08:51:33.000Z",
+   "msg": "placed sell limit GBPUSD 0.03 lot at 1.34105 (council rscalp, valid to 2026-11-09T11:50Z)",
+   "trade": "gbpusd-rscalp-1794214229"
   }
  ],
  "limits": {
