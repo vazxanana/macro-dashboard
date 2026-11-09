@@ -1939,7 +1939,8 @@
     "t1": 1.11311,
     "adopted": false,
     "alerted": [
-     "open"
+     "open",
+     "close"
     ],
     "viaLimit": true,
     "limitPrice": 1.11902,
@@ -1953,7 +1954,8 @@
     "lagSec": 213,
     "positionId": "47616616",
     "volume": 300000,
-    "status": "open"
+    "status": "closed at broker",
+    "closedAt": "2026-11-09T13:04:57.000Z"
    },
    "sol-rscalp-1794223067": {
     "positionId": "47618030",
@@ -2100,7 +2102,7 @@
    "startBalance": 9987.78
   },
   "startedAt": "2026-11-08T11:42:25.000Z",
-  "status": "ok · demo Fusion Markets · balance 9996.03 · 31 open",
+  "status": "ok · demo Fusion Markets · balance 9993.92 · 30 open",
   "skipped": {
    "audusd-position-1793601653": "price 0.68666 has run 1.27R from the council entry 0.70162: a different trade now",
    "xrp-rswing-1793942619": "none of XRPUSD found at the broker",
@@ -2114,15 +2116,10 @@
   "resetDoneAt": "2026-11-08T11:42:47.000Z",
   "orders": {},
   "catchUpAt": "2026-11-08T12:04:40.000Z",
-  "balance": 9996.03,
-  "lastRun": "2026-11-09T13:02:16.000Z"
+  "balance": 9993.92,
+  "lastRun": "2026-11-09T13:04:57.000Z"
  },
  "log": [
-  {
-   "at": "2026-11-08T21:20:48.000Z",
-   "msg": "not mirrored yet eurusd-rswing-1793754423: EURUSD market closed (paused until 21:30 UTC) (will retry)",
-   "trade": "eurusd-rswing-1793754423"
-  },
   {
    "at": "2026-11-08T21:20:48.000Z",
    "msg": "not mirrored yet usdchf-swing-1793762425: USDCHF market closed: MARKET_CLOSED: Trading is not available: Market is closed. (will retry)",
@@ -3617,6 +3614,11 @@
    "at": "2026-11-09T12:53:03.000Z",
    "msg": "opened buy AUDUSD 0.04 lot (council scalp)",
    "trade": "audusd-scalp-1794228720"
+  },
+  {
+   "at": "2026-11-09T13:04:57.000Z",
+   "msg": "EURUSD position 47616616 closed at the broker",
+   "trade": "eurusd-intraday-1794225280"
   }
  ],
  "limits": {
