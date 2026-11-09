@@ -3791,9 +3791,8 @@ function msNextSetup(bars, A) {
     pro: { bg: '#11110f', bgTop: '#171715', text: '#a3a29c', grid: '#1a1a18', border: '#2b2b28' },
   };
   const UPC = '#089981', DNC = '#f23645';
-  const candleCols = () => G.theme === 'light'
-    ? { upColor: '#c9ccd2', downColor: '#131722', borderUpColor: '#131722', borderDownColor: '#131722', wickUpColor: '#131722', wickDownColor: '#131722' }
-    : { upColor: UPC, downColor: DNC, borderUpColor: UPC, borderDownColor: DNC, wickUpColor: UPC, wickDownColor: DNC };
+  // light mode uses the guest chart's colours (owner, 9 Nov: "I want my main charts on light mode like the guest mode")
+  const candleCols = () => ({ upColor: UPC, downColor: DNC, borderUpColor: UPC, borderDownColor: DNC, wickUpColor: UPC, wickDownColor: DNC });
   const Z = {
     sell: { fill: 'rgba(242,54,69,0.20)', stroke: 'rgba(178,40,51,0.85)', cf: 'rgba(242,54,69,0.30)', line: '#f23645' },
     buy:  { fill: 'rgba(8,153,129,0.16)', stroke: 'rgba(6,122,103,0.85)', cf: 'rgba(8,153,129,0.28)', line: '#089981' },
@@ -4249,7 +4248,7 @@ function msNextSetup(bars, A) {
     // tick-volume histogram along the bottom (OANDA counts price changes per candle; exchange feeds without volume show nothing)
     const vol = L.vol = chart.addHistogramSeries({ priceScaleId: 'vol', priceFormat: { type: 'volume' }, lastValueVisible: false, priceLineVisible: false });
     chart.priceScale('vol').applyOptions({ scaleMargins: { top: 0.84, bottom: 0 }, visible: false });
-    const vcol = L.vcol = (b) => G.theme === 'light' ? (b.close >= b.open ? 'rgba(19,23,34,.12)' : 'rgba(19,23,34,.28)') : b.close >= b.open ? 'rgba(8,153,129,.26)' : 'rgba(242,54,69,.26)';
+    const vcol = L.vcol = (b) => b.close >= b.open ? 'rgba(8,153,129,.26)' : 'rgba(242,54,69,.26)';
     L.setVol = function () { const raw = src().raw, on = raw && raw.some((b) => b.volume > 0) && G.showVol !== false; vol.setData(on ? raw.map((b) => ({ time: b.time + TZ, value: b.volume || 0, color: vcol(b) })) : []); };
     // session shading (7 Nov loop): faint Asia / London / New York background bands on M15, M5 and M1 (UTC 00-07 / 07-13 / 13-21)
     const sessOn = (s) => ['15m', '5m', '1m'].includes(s.tf.id) && G.showShade !== false && !s.crypto;
