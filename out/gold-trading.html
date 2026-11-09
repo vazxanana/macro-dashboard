@@ -14,9 +14,9 @@
     (function () { var d = document.documentElement, g = null, p = null; try { g = localStorage.getItem('goldDarkMode'); p = JSON.parse(localStorage.getItem('msPrefs') || 'null'); } catch (e) {}
       if (g === '1' || (g === null && !(p && p.theme === 'light'))) { d.classList.add('dark'); if (p && p.theme === 'midnight') d.classList.add('midnight'); } })();
   </script>
-  <link rel="manifest" href="manifest.json">
+  <link rel="manifest" href="/app.webmanifest">
   <meta name="theme-color" content="#030607">
-  <link rel="apple-touch-icon" href="icon-192.png">
+  <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png">
   <link rel="icon" type="image/png" href="icon-192.png">
   <script src="https://s3.tradingview.com/tv.js" async></script>
   <!-- Lightweight Charts: MUST be the "standalone" build to expose window.LightweightCharts -->
@@ -2924,6 +2924,12 @@
     #dash-setup > div:first-child { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; }
   }
 </style>
+<!-- app tags: scripts/pwa.mjs -->
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Meridian X">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+<script src="/assets/pwa.js?v=f264828d81" defer></script>
 </head>
 <body data-section="dashboard">
 
