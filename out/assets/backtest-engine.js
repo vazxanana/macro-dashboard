@@ -35,21 +35,25 @@
     a.orders.push(rec); return rec;
   }
   function fill(a, rec, px, t) {
-    const p = { ...rec, entry: px, openedAt: t, mfe: 0, mae: 0, r0: Math.abs(px - rec.stop) };
+    const p = { ...rec, entry: px, openedAt: t, mfe: 0, mae: 0, r0: Math.abs(px - rec.stop), units0: rec.units };
     a.positions.push(p); a.orders = a.orders.filter((o) => o.id !== rec.id); return p;
   }
   function cancel(a, id) { a.orders = a.orders.filter((o) => o.id !== id); }
+  // share of the original size a record carries: commission and R are split by it, so partial closes add up to one trade
+  const share = (p, u) => (p.units0 > 0 ? u / p.units0 : 1);
+  const moveR = (p, px) => (p.r0 ? (px - p.entry) * (p.side === 'buy' ? 1 : -1) / p.r0 : null);
   function close(a, p, px, t, reason) {
-    const gross = pnl(p, px), net = gross - a.commission;
+    const w = share(p, p.units), gross = pnl(p, px), net = gross - a.commission * w, mr = moveR(p, px);
     a.balance = r2(a.balance + net);
-    const c = { ...p, exit: px, closedAt: t, reason, gross: r2(gross), net: r2(net), R: p.r0 ? r2((px - p.entry) * (p.side === 'buy' ? 1 : -1) / p.r0, 2) : null, holdBars: p.holdBars || 0 };
+    const c = { ...p, exit: px, closedAt: t, reason, gross: r2(gross), net: r2(net), R: mr == null ? null : r2(mr * w, 2), Rmove: mr == null ? null : r2(mr, 2), holdBars: p.holdBars || 0 };
     a.closed.push(c); a.positions = a.positions.filter((x) => x.id !== p.id); return c;
   }
-  // close part of a position: the closed part becomes its own journal record (same entry, R on the full stop distance)
+  // close part of a position: the closed part becomes its own journal record (same entry and id). Its R is the price move
+  // in R (Rmove) times its share of the original size, so the records of one trade sum to the trade's R; same for commission.
   function closePartial(a, p, px, t, fraction, reason = 'partial') {
-    const f = Math.min(0.999, Math.max(0.001, fraction || 0.5)), part = { ...p, units: p.units * f, id: p.id, partial: true };
-    const gross = pnl(part, px), net = gross - a.commission; a.balance = r2(a.balance + net);
-    const c = { ...part, exit: px, closedAt: t, reason, gross: r2(gross), net: r2(net), R: p.r0 ? r2((px - p.entry) * (p.side === 'buy' ? 1 : -1) / p.r0, 2) : null, holdBars: p.holdBars || 0, note: `${p.note || ''} (${Math.round(f * 100)}% closed)`.trim() };
+    const f = Math.min(0.999, Math.max(0.001, fraction || 0.5)), part = { ...p, units: p.units * f, id: p.id, partial: true }, w = share(p, part.units), mr = moveR(p, px);
+    const gross = pnl(part, px), net = gross - a.commission * w; a.balance = r2(a.balance + net);
+    const c = { ...part, exit: px, closedAt: t, reason, gross: r2(gross), net: r2(net), R: mr == null ? null : r2(mr * w, 2), Rmove: mr == null ? null : r2(mr, 2), holdBars: p.holdBars || 0, note: `${p.note || ''} (${Math.round(f * 100)}% closed)`.trim() };
     a.closed.push(c); p.units = p.units * (1 - f); p.scaled = (p.scaled || 0) + f; return c;
   }
   // trailing stop: p.trail = price distance; after each bar the stop follows the best price at that distance, never backwards
@@ -66,7 +70,10 @@
       p.holdBars = (p.holdBars || 0) + 1; const dir = p.side === 'buy' ? 1 : -1;
       p.mfe = Math.max(p.mfe, ((dir === 1 ? b.high : b.low) - p.entry) * dir / p.r0); p.mae = Math.max(p.mae, (p.entry - (dir === 1 ? b.low : b.high)) * dir / p.r0);
       const hitS = dir === 1 ? b.low <= p.stop : b.high >= p.stop, hitT = p.target != null && (dir === 1 ? b.high >= p.target : b.low <= p.target);
-      if (hitS && hitT) { const sl = a.slFirst; out.push({ kind: 'close', trade: close(a, p, sl ? p.stop : p.target, b.time, sl ? 'stop (both in one bar)' : 'target (both in one bar)') }); }
+      // both inside one bar: if the bar OPENED beyond one of them the order is known; otherwise the worst case (stop) unless slFirst is off
+      const gapS = (p.stop - b.open) * dir >= 0, gapT = hitT && (b.open - p.target) * dir >= 0;
+      if (hitS && hitT && gapT && !gapS) out.push({ kind: 'close', trade: close(a, p, p.target, b.time, 'target') });
+      else if (hitS && hitT && !gapS) { const sl = a.slFirst; out.push({ kind: 'close', trade: close(a, p, sl ? p.stop : p.target, b.time, sl ? 'stop (both in one bar)' : 'target (both in one bar)') }); }
       else if (hitS) { const px = dir === 1 ? Math.min(p.stop, b.open) : Math.max(p.stop, b.open); out.push({ kind: 'close', trade: close(a, p, px, b.time, px === p.stop ? 'stop' : 'stop (gap)') }); }
       else if (hitT) out.push({ kind: 'close', trade: close(a, p, p.target, b.time, 'target') });
       else trail(p, b);
@@ -76,7 +83,16 @@
   const equity = (a, px) => r2(a.balance + a.positions.reduce((s, p) => s + pnl(p, px), 0));
 
   // ---- statistics (the journal) -------------------------------------------------------------------------------------
+  // one row per trade: partial-close records are merged into their trade (net, gross and R summed, last exit kept)
+  function trades(closed) {
+    const g = new Map(); let k = 0;
+    for (const t of closed || []) { const key = t.id != null ? 'id' + t.id : 'x' + k++; const m = g.get(key);
+      if (!m) { g.set(key, { ...t }); continue; }
+      g.delete(key); g.set(key, { ...t, net: r2(m.net + t.net), gross: r2((m.gross || 0) + (t.gross || 0)), R: m.R == null || t.R == null ? (t.R ?? m.R) : r2(m.R + t.R), units: t.units0 || (m.units + t.units), partial: !!(m.partial && t.partial), mfe: Math.max(m.mfe || 0, t.mfe || 0), mae: Math.max(m.mae || 0, t.mae || 0), mistakes: t.mistakes && t.mistakes.length ? t.mistakes : m.mistakes, tags: t.tags && t.tags.length ? t.tags : m.tags }); }
+    return [...g.values()];
+  }
   function stats(closed, start) {
+    closed = trades(closed);
     const n = closed.length, wins = closed.filter((t) => t.net > 0), losses = closed.filter((t) => t.net < 0);
     const gw = wins.reduce((s, t) => s + t.net, 0), gl = -losses.reduce((s, t) => s + t.net, 0), net = r2(gw - gl);
     let peak = start, dd = 0, eq = start; const curve = [{ t: closed[0] ? closed[0].openedAt : null, eq: start }];
@@ -101,18 +117,23 @@
   // ch: { firm (rules copy), phase (index), start (balance), status 'live'|'passed'|'failed'|'funded', reason, days: {key: {start, high, low, net}}, eodHigh, lock }
   function newChallenge(firm) { return { firm: JSON.parse(JSON.stringify(firm)), phase: 0, start: firm.size, status: 'live', reason: null, days: {}, eodHigh: firm.size, history: [] }; }
   // evaluate after every bar with the account's balance / equity at that bar. Fills ch.days, trips the rules, passes the phase.
-  function evaluate(ch, a, px, t) {
+  function evaluate(ch, a, px, t, bar) {
     if (ch.status !== 'live') return ch;
-    const F = ch.firm, eq = equity(a, px), key = dayKey(t, F.dayStartUtc), d = ch.days[key] || (ch.days[key] = { start: a.balance, startEq: eq, high: eq, low: eq, trades: 0, net: 0 });
+    const F = ch.firm, eq = equity(a, px), key = dayKey(t, F.dayStartUtc);
+    // worst equity inside the bar (positions open before it, at the bar's adverse extreme): the rules are breached intrabar
+    const eqW = bar ? r2(a.balance + a.positions.reduce((s, p) => s + pnl(p, p.openedAt < bar.time ? (p.side === 'buy' ? bar.low : bar.high) : px), 0)) : eq;
+    // a new day's reference is the previous day's closing equity (a drop on the day's first bar counts against the new day)
+    let d = ch.days[key]; if (!d) { const pk = Object.keys(ch.days), prev = pk.length ? ch.days[pk[pk.length - 1]] : null, s0 = prev ? prev.endEq : eq; d = ch.days[key] = { start: prev ? prev.endBalance : a.balance, startEq: s0, high: eq, low: eq, trades: 0, net: 0 }; }
+    const mine = a.closed.slice(ch.phaseStartIdx || 0).filter((x) => dayKey(x.closedAt, F.dayStartUtc) === key);
     // a new day: the end-of-day balance of the previous one moves the trailing threshold (eod), capped at the start balance
     const keys = Object.keys(ch.days); if (keys.length > 1 && keys[keys.length - 1] === key) { const prev = ch.days[keys[keys.length - 2]]; if (prev && !prev.closedOut) { prev.closedOut = true; ch.eodHigh = Math.max(ch.eodHigh, prev.endBalance ?? prev.start); } }
-    d.high = Math.max(d.high, eq); d.low = Math.min(d.low, eq); d.endBalance = a.balance; d.endEq = eq; d.trades = a.closed.filter((x) => dayKey(x.closedAt, F.dayStartUtc) === key).length; d.net = r2(a.closed.filter((x) => dayKey(x.closedAt, F.dayStartUtc) === key).reduce((s, x) => s + x.net, 0));
+    d.high = Math.max(d.high, eq); d.low = Math.min(d.low, eqW); d.endBalance = a.balance; d.endEq = eq; d.trades = trades(mine).length; d.net = r2(mine.reduce((s, x) => s + x.net, 0));
     if (F.dd === 'intraday') ch.eodHigh = Math.max(ch.eodHigh, eq);
     const fail = (why) => { ch.status = 'failed'; ch.reason = why; ch.failedAt = t; ch.history.push({ t, event: 'failed', why }); return ch; };
     // daily loss: today's loss (closed + floating) against the day's starting equity, as a share of the start balance
-    if (F.dailyLoss > 0 && d.startEq - eq >= F.dailyLoss * ch.start - 1e-9) return fail(`daily loss limit: down ${r2(d.startEq - eq)} today (limit ${r2(F.dailyLoss * ch.start)})`);
+    if (F.dailyLoss > 0 && d.startEq - eqW >= F.dailyLoss * ch.start - 1e-9) return fail(`daily loss limit: down ${r2(d.startEq - eqW)} today (limit ${r2(F.dailyLoss * ch.start)})`);
     const floor = F.dd === 'static' ? ch.start * (1 - F.maxLoss) : Math.min(ch.start, ch.eodHigh - F.maxLoss * ch.start) ;
-    if (eq <= floor + 1e-9) return fail(`${F.dd === 'static' ? 'maximum loss' : 'trailing drawdown'}: equity ${eq} at or under ${r2(floor)}`);
+    if (eqW <= floor + 1e-9) return fail(`${F.dd === 'static' ? 'maximum loss' : 'trailing drawdown'}: equity ${eqW} at or under ${r2(floor)}`);
     if (F.maxDays > 0 && Object.keys(ch.days).length > F.maxDays) return fail(`time limit: more than ${F.maxDays} days`);
     // target: closed balance (floating does not count), on a day's close of a trade; then the minimum days and consistency
     const target = ch.start * (1 + F.phases[ch.phase].target), tradingDays = Object.values(ch.days).filter((x) => x.trades > 0).length;
@@ -163,6 +184,6 @@
   // the best risk per trade for a firm: the highest pass rate over a grid of risks (0.25% .. 3%)
   function bestRisk(Rs, o = {}) { let best = null; for (const r of [0.0025, 0.005, 0.0075, 0.01, 0.0125, 0.015, 0.02, 0.025, 0.03]) { const m = monteCarlo(Rs, { ...o, risk: r, n: o.n || 1000 }); if (m && (!best || m.pass > best.pass)) best = { risk: r, ...m }; } return best; }
 
-  const BT = { FIRMS, newAccount, units, place, cancel, close, closePartial, trail, onBar, equity, pnl, stats, byDay, dayKey, newChallenge, evaluate, monteCarlo, bestRisk, r2 };
+  const BT = { FIRMS, trades, newAccount, units, place, cancel, close, closePartial, trail, onBar, equity, pnl, stats, byDay, dayKey, newChallenge, evaluate, monteCarlo, bestRisk, r2 };
   if (typeof module !== 'undefined' && module.exports) module.exports = BT; else root.BT = BT;
 })(typeof globalThis !== 'undefined' ? globalThis : this);

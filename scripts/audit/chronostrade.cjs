@@ -3,9 +3,10 @@
 // ChronosTrade end-to-end audit: every feature against real OANDA candles (through the live /md/bars proxy).
 const { chromium } = require('playwright');
 const fs = require('fs');
+const PORT = process.env.PORT || 8766, H = 'http://127.0.0.1:' + PORT;
 const OUT = process.env.AUDIT_OUT || require('os').tmpdir() + '/';
 const R = []; const check = (name, ok, info = '') => { R.push({ name, ok: !!ok, info: String(info).slice(0, 140) }); };
-const route = async (p) => p.route(/127\.0\.0\.1:8766\/md\/bars.*/, async (r) => { const u = r.request().url().replace('http://127.0.0.1:8766', 'https://meridianx.dev'); try { const res = await fetch(u); r.fulfill({ status: res.status, contentType: 'application/json', body: await res.text() }); } catch (e) { r.fulfill({ status: 502, body: '{}' }); } });
+const route = async (p) => p.route(new RegExp('127\\.0\\.0\\.1:' + PORT + '/md/bars'), async (r) => { const u = r.request().url().replace(H, 'https://meridianx.dev'); try { const res = await fetch(u); r.fulfill({ status: res.status, contentType: 'application/json', body: await res.text() }); } catch (e) { r.fulfill({ status: 502, body: '{}' }); } });
 const barN = async (p) => +((await p.$eval('#now', (e) => e.textContent)).match(/bar (\d+)/) || [0, 0])[1];
 const txt = (p, sel) => p.$eval(sel, (e) => e.textContent).catch(() => '');
 const vis = (p, sel) => p.$eval(sel, (e) => !!(e.offsetParent || getComputedStyle(e).position === 'fixed') && !e.hidden).catch(() => false);
@@ -13,11 +14,11 @@ async function load(p, q = 'xau,15m') { await p.click(`#quick [data-q^="${q}"]`)
 (async () => {
   const b = await chromium.launch();
   // 1. gate
-  { const p = await b.newPage(); await p.goto('http://127.0.0.1:8766/backtest.html'); check('gate shown when signed out', await vis(p, '#gate') && !(await vis(p, '#app'))); await p.close(); }
+  { const p = await b.newPage(); await p.goto(H + '/backtest.html'); check('gate shown when signed out', await vis(p, '#gate') && !(await vis(p, '#app'))); await p.close(); }
   const ctx = await b.newContext({ viewport: { width: 1500, height: 950 }, acceptDownloads: true }); const p = await ctx.newPage();
   const errs = []; p.on('pageerror', (e) => errs.push(e.message)); p.on('console', (m) => { if (m.type() === 'error') errs.push('console: ' + m.text()); });
   await route(p); await p.addInitScript(() => { if (!sessionStorage.getItem('init')) { localStorage.clear(); sessionStorage.setItem('init', '1'); } localStorage.setItem('ms-admin', 'x'); });
-  await p.goto('http://127.0.0.1:8766/backtest.html', { waitUntil: 'load' }); await p.waitForTimeout(300);
+  await p.goto(H + '/backtest.html', { waitUntil: 'load' }); await p.waitForTimeout(300);
   check('welcome on first visit', await vis(p, '#welcome'));
   // 2. load
   await load(p); check('quick start loads candles', /candles loaded/.test(await txt(p, '#toasts')), await txt(p, '#sess-sum'));
@@ -52,6 +53,29 @@ async function load(p, q = 'xau,15m') { await p.click(`#quick [data-q^="${q}"]`)
   // 8. play / pause / speed / skip day / jump
   await p.click('.speed [data-sp="80"]'); const bp = await barN(p); await p.click('#play'); await p.waitForTimeout(1500); await p.click('#play'); const ba = await barN(p); check('play advances bars and pauses', ba > bp + 5 && !(await p.$eval('#play', (e) => e.classList.contains('playing'))), `${bp}→${ba}`);
   const day0 = (await txt(p, '#now')).slice(0, 10); await p.click('#skipday'); check('skip day lands on the next trading day', (await txt(p, '#now')).slice(0, 10) !== day0, day0 + ' -> ' + await txt(p, '#now'));
+  // 8b. on-chart trade UI (pass 9): draft readout with R presets and keys, Shift+drag placement, live position tags
+  { await p.keyboard.press('b'); await p.waitForTimeout(120); check('draft readout shows on the chart with risk in $ and %', await vis(p, '#dchip') && /Risk/.test(await txt(p, '#dchip')) && /\d\.\d\d%/.test(await txt(p, '#dchip')), await txt(p, '#dchip'));
+    await p.keyboard.press('3'); await p.waitForTimeout(80); const d3 = await p.evaluate(() => ({ e: +document.getElementById('o-price').value, s: +document.getElementById('o-stop').value, t: +document.getElementById('o-target').value }));
+    check('key 3 sets the target at 3R', Math.abs((d3.t - d3.e) - 3 * (d3.e - d3.s)) < 0.05 && /1:3\.00/.test(await txt(p, '#dchip')), JSON.stringify(d3));
+    await p.click('#dchip [data-dr="1"]'); await p.waitForTimeout(80); check('1R button on the chart readout', /1:1\.00/.test(await txt(p, '#dchip')), await txt(p, '#dchip'));
+    await p.click('#dchip [data-dx]'); await p.waitForTimeout(80); check('✕ on the readout cancels the draft', !(await vis(p, '#dchip')) && !(await vis(p, '#draft')));
+    const cb = await p.$eval('#chart', (e) => { const r = e.getBoundingClientRect(); return { x: r.left, y: r.top, w: r.width, h: r.height }; });
+    await p.keyboard.down('Shift'); await p.mouse.move(cb.x + cb.w * 0.45, cb.y + cb.h * 0.35); await p.mouse.down(); await p.mouse.move(cb.x + cb.w * 0.45, cb.y + cb.h * 0.55, { steps: 6 }); await p.waitForTimeout(80);
+    check('Shift+drag shows the live risk while dragging', await vis(p, '#dchip') && /Risk/.test(await txt(p, '#dchip')), await txt(p, '#dchip'));
+    await p.mouse.up(); await p.keyboard.up('Shift'); await p.waitForTimeout(120);
+    const sd = await p.evaluate(() => ({ side: document.getElementById('dr-title').textContent, e: +document.getElementById('o-price').value, s: +document.getElementById('o-stop').value, t: +document.getElementById('o-target').value }));
+    check('Shift+drag down places a buy with the stop below and a 2R target', /buy/i.test(sd.side) && sd.s < sd.e && Math.abs((sd.t - sd.e) - 2 * (sd.e - sd.s)) < 0.05, JSON.stringify(sd));
+    await p.screenshot({ path: OUT + 'ct-drag-draft.png' }); await p.click('#dchip [data-dx]');
+    await p.click('#qt-drag'); check('drag button arms placement', (await p.getAttribute('#qt-drag', 'aria-pressed')) === 'true');
+    await p.mouse.move(cb.x + cb.w * 0.45, cb.y + cb.h * 0.6); await p.mouse.down(); await p.mouse.move(cb.x + cb.w * 0.45, cb.y + cb.h * 0.45, { steps: 6 }); await p.mouse.up(); await p.waitForTimeout(120);
+    check('drag up places a sell draft and disarms', /sell/i.test(await txt(p, '#dr-title')) && (await p.getAttribute('#qt-drag', 'aria-pressed')) === 'false', await txt(p, '#dr-title')); await p.keyboard.press('Escape');
+    await p.keyboard.press('b'); await p.click('#dchip [data-dgo]'); await p.waitForTimeout(150);
+    check('Confirm on the chart opens the trade; its tag shows P&L, R and the stop', (await p.$$('#ptags .ptag')).length === 1 && /R/.test(await txt(p, '#ptags .pv')) && /SL \d/.test(await txt(p, '#ptags .sl')), await txt(p, '#ptags'));
+    await p.click('.speed [data-sp="1000"]'); await p.click('#play'); const s1 = []; for (let k = 0; k < 6; k++) { await p.waitForTimeout(140); s1.push(await txt(p, '#ptags .pv')); } await p.click('#play');
+    check('position tag P&L moves with the forming candle', new Set(s1.filter(Boolean)).size > 1, s1.join(' / '));
+    await p.screenshot({ path: OUT + 'ct-pos-tag.png' });
+    if ((await p.$$('#ptags .ptag')).length) { await p.click('#ptags [data-pa="close"]'); await p.waitForTimeout(150); }
+    check('✕ on the tag closes the trade', (await p.$$('#ptags .ptag')).length === 0 && (await p.$$('.pos-card')).length === 0); }
   // 9. layers and context
   await p.click('#tb summary'); for (const l of ['ema20', 'ema50', 'vol', 'sess', 'pdhl', 'anim']) await p.click(`.ddp [data-l=${l}]`).catch(() => {}); await p.keyboard.press('Escape');
   check('layer toggles flip state', await p.evaluate(() => JSON.parse(localStorage.getItem('btLab:layers') || '{}').ema20 === true));
@@ -99,7 +123,7 @@ async function load(p, q = 'xau,15m') { await p.click(`#quick [data-q^="${q}"]`)
   // 16. new session + delete
   await p.click('#sess-toggle'); await p.click('#newsess'); check('New session clears the chart', (await txt(p, '#sess-sum')).includes('New session'));
   // 17. phone layout and light theme
-  const m = await ctx.newPage(); await route(m); await m.setViewportSize({ width: 390, height: 844 }); await m.goto('http://127.0.0.1:8766/backtest.html', { waitUntil: 'load' }); await m.waitForTimeout(2500);
+  const m = await ctx.newPage(); await route(m); await m.setViewportSize({ width: 390, height: 844 }); await m.goto(H + '/backtest.html', { waitUntil: 'load' }); await m.waitForTimeout(2500);
   check('phone: no sideways scroll', !(await m.evaluate(() => document.documentElement.scrollWidth > innerWidth + 1)), await m.evaluate(() => document.documentElement.scrollWidth));
   await m.evaluate(() => localStorage.setItem('msPrefs', JSON.stringify({ theme: 'light' }))); await m.reload({ waitUntil: 'load' }); await m.waitForTimeout(1500);
   check('light theme applies', await m.evaluate(() => getComputedStyle(document.body).backgroundColor !== 'rgb(8, 9, 12)'), await m.evaluate(() => getComputedStyle(document.body).backgroundColor));
