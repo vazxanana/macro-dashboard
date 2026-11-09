@@ -3548,12 +3548,12 @@
   "h": "1d",
   "side": "sell",
   "entry": 0.70162,
-  "stop": 0.7133928928571428,
-  "t1": 0.5934,
+  "stop": 0.7135529,
+  "t1": 0.59356,
   "rr": 9.19,
   "buf": 0.15,
   "opened": 1793601653,
-  "checked": 1794239760,
+  "checked": 1794240120,
   "status": "open",
   "R": null,
   "feat": {
@@ -3566,7 +3566,7 @@
    "exposure",
    "usd"
   ],
-  "note": "Shadow (already 2 trades or an opposite trade open on this market, already 3 trades betting the same way on the dollar) Feed changed kraken → oanda 2026-11-07 22:55 UTC: no overlapping minute to measure the basis, so stop and target are kept as priced on kraken; entry 0.70162 kept.",
+  "note": "Shadow (already 2 trades or an opposite trade open on this market, already 3 trades betting the same way on the dollar) Feed changed kraken → oanda 2026-11-07 22:55 UTC: no overlapping minute to measure the basis, so stop and target are kept as priced on kraken; entry 0.70162 kept. Feed changed oanda → kraken 2026-11-09 16:03 UTC: basis +0.00016 measured on the switch minute (same candle); stop 0.7135529 and target re-based by it, entry kept at 0.70162 (filled on oanda).",
   "ctx": {
    "atr": 0.0010193,
    "stopAtr": 11.55,
@@ -3584,8 +3584,9 @@
   "r0": 0.01177289285714278,
   "mfe": 1.48,
   "mae": 0.1,
-  "feed": "oanda",
-  "feedKept": 1
+  "feed": "kraken",
+  "feedKept": 1,
+  "feedBasis": 0.00016
  },
  {
   "id": "audusd-scalp-1793601653",
@@ -4576,12 +4577,12 @@
   "h": "4h",
   "side": "buy",
   "entry": 1.12262,
-  "stop": 1.0799294642857142,
-  "t1": 1.16359,
+  "stop": 1.0795795,
+  "t1": 1.16324,
   "rr": 0.96,
   "buf": 0.15,
   "opened": 1793610380,
-  "checked": 1794239760,
+  "checked": 1794240120,
   "status": "open",
   "R": null,
   "feat": {
@@ -4594,7 +4595,7 @@
    "minRR",
    "usd"
   ],
-  "note": "Shadow (reward:risk 0.96 under 1.2, already 3 trades betting the same way on the dollar) Feed changed kraken → oanda 2026-11-07 22:55 UTC: no overlapping minute to measure the basis, so stop and target are kept as priced on kraken; entry 1.12262 kept.",
+  "note": "Shadow (reward:risk 0.96 under 1.2, already 3 trades betting the same way on the dollar) Feed changed kraken → oanda 2026-11-07 22:55 UTC: no overlapping minute to measure the basis, so stop and target are kept as priced on kraken; entry 1.12262 kept. Feed changed oanda → kraken 2026-11-09 16:03 UTC: basis -0.00035 measured on the switch minute (same candle); stop 1.0795795 and target re-based by it, entry kept at 1.12262 (filled on oanda).",
   "ctx": {
    "atr": 0.0058036,
    "stopAtr": 7.36,
@@ -4612,8 +4613,9 @@
   "r0": 0.042690535714285716,
   "mfe": 0.1,
   "mae": 0.23,
-  "feed": "oanda",
-  "feedKept": 1
+  "feed": "kraken",
+  "feedKept": 1,
+  "feedBasis": -0.00035
  },
  {
   "id": "gbpusd-rscalp-1793611014",
@@ -5595,7 +5597,7 @@
   "rr": 2,
   "buf": 0.15,
   "opened": 1793626672,
-  "checked": 1794239760,
+  "checked": 1794240120,
   "status": "open",
   "R": null,
   "feat": {
@@ -17714,12 +17716,12 @@
   "h": "4h",
   "side": "buy",
   "entry": 1.12262,
-  "stop": 1.08061475,
-  "t1": 1.133445,
+  "stop": 1.0802647,
+  "t1": 1.133095,
   "rr": 0.26,
   "buf": 0.15,
   "opened": 1793754423,
-  "checked": 1794239760,
+  "checked": 1794240120,
   "status": "open",
   "R": null,
   "feat": {
@@ -17736,7 +17738,7 @@
    "usd",
    "focus"
   ],
-  "note": "Shadow (reward:risk 0.26 under 1.2, already 2 trades betting the same way on the dollar, focus: only xau trades live) Feed changed kraken → oanda 2026-11-07 22:55 UTC: no overlapping minute to measure the basis, so stop and target are kept as priced on kraken; entry 1.12262 kept.",
+  "note": "Shadow (reward:risk 0.26 under 1.2, already 2 trades betting the same way on the dollar, focus: only xau trades live) Feed changed kraken → oanda 2026-11-07 22:55 UTC: no overlapping minute to measure the basis, so stop and target are kept as priced on kraken; entry 1.12262 kept. Feed changed oanda → kraken 2026-11-09 16:03 UTC: basis -0.00035 measured on the switch minute (same candle); stop 1.0802647 and target re-based by it, entry kept at 1.12262 (filled on oanda).",
   "ctx": {
    "atr": 0.001235,
    "stopAtr": 34.01,
@@ -17754,8 +17756,9 @@
   "r0": 0.04200524999999988,
   "mfe": 0.11,
   "mae": 0.23,
-  "feed": "oanda",
-  "feedKept": 1
+  "feed": "kraken",
+  "feedKept": 1,
+  "feedBasis": -0.00035
  },
  {
   "id": "xau-scalp-1793756986",
@@ -18856,7 +18859,7 @@
   "pm": {
    "phase": "watch",
    "until": 1794410400,
-   "checked": 1794239880,
+   "checked": 1794240240,
    "after": {
     "best": 0,
     "worst": 1,
@@ -20287,7 +20290,7 @@
   "pm": {
    "phase": "watch",
    "until": 1794325920,
-   "checked": 1794240000,
+   "checked": 1794240180,
    "after": {
     "best": 0,
     "worst": 1.86,
@@ -21492,12 +21495,12 @@
   "h": "1d",
   "side": "buy",
   "entry": 4041.66,
-  "stop": 3886.991,
-  "t1": 5636.18,
+  "stop": 3888.611,
+  "t1": 5637.8,
   "rr": 10.36,
   "buf": 0.15,
   "opened": 1793783465,
-  "checked": 1794239880,
+  "checked": 1794240180,
   "status": "open",
   "R": null,
   "feat": {
@@ -21514,7 +21517,7 @@
    "usd",
    "replica"
   ],
-  "note": "Shadow (rule: position is switched off, already 2 trades betting the same way on the dollar, this market trades the gold replica live) Feed changed kraken → oanda 2026-11-07 22:55 UTC: no overlapping minute to measure the basis, so stop and target are kept as priced on kraken; entry 4041.66 kept. Feed changed oanda → kraken 2026-11-08 07:00 UTC: no overlapping minute to measure the basis, so stop and target are kept as priced on oanda; entry 4041.66 kept. Feed changed kraken → oanda 2026-11-08 07:05 UTC: no overlapping minute to measure the basis, so stop and target are kept as priced on kraken; entry 4041.66 kept. Feed changed oanda → kraken 2026-11-09 15:01 UTC: basis +0.965 measured on the switch minute (same candle); stop 3888.656 and target re-based by it, entry kept at 4041.66 (filled on oanda). Feed changed kraken → oanda 2026-11-09 15:10 UTC: basis -1.665 measured on the switch minute (same candle); stop 3886.991 and target re-based by it, entry kept at 4041.66 (filled on kraken).",
+  "note": "Shadow (rule: position is switched off, already 2 trades betting the same way on the dollar, this market trades the gold replica live) Feed changed kraken → oanda 2026-11-07 22:55 UTC: no overlapping minute to measure the basis, so stop and target are kept as priced on kraken; entry 4041.66 kept. Feed changed oanda → kraken 2026-11-08 07:00 UTC: no overlapping minute to measure the basis, so stop and target are kept as priced on oanda; entry 4041.66 kept. Feed changed kraken → oanda 2026-11-08 07:05 UTC: no overlapping minute to measure the basis, so stop and target are kept as priced on kraken; entry 4041.66 kept. Feed changed oanda → kraken 2026-11-09 15:01 UTC: basis +0.965 measured on the switch minute (same candle); stop 3888.656 and target re-based by it, entry kept at 4041.66 (filled on oanda). Feed changed kraken → oanda 2026-11-09 15:10 UTC: basis -1.665 measured on the switch minute (same candle); stop 3886.991 and target re-based by it, entry kept at 4041.66 (filled on kraken). Feed changed oanda → kraken 2026-11-09 16:03 UTC: basis +1.62 measured on the switch minute (same candle); stop 3888.611 and target re-based by it, entry kept at 4041.66 (filled on oanda).",
   "ctx": {
    "atr": 18.396,
    "stopAtr": 8.37,
@@ -21532,9 +21535,9 @@
   "r0": 153.969357142857,
   "mfe": 0.68,
   "mae": 0.08,
-  "feed": "oanda",
+  "feed": "kraken",
   "feedKept": 3,
-  "feedBasis": -0.7
+  "feedBasis": 0.92
  },
  {
   "id": "xau-scalp-1793783465",
@@ -21692,7 +21695,7 @@
   "pm": {
    "phase": "watch",
    "until": 1794325980,
-   "checked": 1794239880,
+   "checked": 1794240240,
    "after": {
     "best": 0,
     "worst": 3.34,
@@ -25799,7 +25802,7 @@
   "rr": 5.78,
   "buf": 0.15,
   "opened": 1793805393,
-  "checked": 1794239760,
+  "checked": 1794240120,
   "status": "open",
   "R": null,
   "feat": {
@@ -32767,12 +32770,12 @@
   "h": "1h",
   "side": "sell",
   "entry": 1.12124,
-  "stop": 1.12667,
-  "t1": 1.11038,
+  "stop": 1.12632,
+  "t1": 1.11003,
   "rr": 2,
   "buf": 0.15,
   "opened": 1793890935,
-  "checked": 1794239760,
+  "checked": 1794240120,
   "status": "open",
   "R": null,
   "feat": {
@@ -32787,7 +32790,7 @@
   "blockedBy": [
    "focus"
   ],
-  "note": "Shadow (focus: only none trades live) Feed changed kraken → oanda 2026-11-07 22:55 UTC: no overlapping minute to measure the basis, so stop and target are kept as priced on kraken; entry 1.12124 kept.",
+  "note": "Shadow (focus: only none trades live) Feed changed kraken → oanda 2026-11-07 22:55 UTC: no overlapping minute to measure the basis, so stop and target are kept as priced on kraken; entry 1.12124 kept. Feed changed oanda → kraken 2026-11-09 16:03 UTC: basis -0.00035 measured on the switch minute (same candle); stop 1.12632 and target re-based by it, entry kept at 1.12124 (filled on oanda).",
   "ctx": {
    "atr": 0.00051071,
    "stopAtr": 10.63,
@@ -32805,8 +32808,9 @@
   "r0": 0.005430000000000046,
   "mfe": 1.54,
   "mae": 0.44,
-  "feed": "oanda",
-  "feedKept": 1
+  "feed": "kraken",
+  "feedKept": 1,
+  "feedBasis": -0.00035
  },
  {
   "id": "eurusd-rscalp-1793890935",
@@ -32979,7 +32983,7 @@
   "rr": 2,
   "buf": 0.15,
   "opened": 1793893928,
-  "checked": 1794240000,
+  "checked": 1794240180,
   "status": "open",
   "R": null,
   "feat": {
@@ -33648,7 +33652,7 @@
   "rr": 2,
   "buf": 0.15,
   "opened": 1793899009,
-  "checked": 1794240000,
+  "checked": 1794240180,
   "status": "open",
   "R": null,
   "feat": {
@@ -36108,7 +36112,7 @@
   "rr": 2.83,
   "buf": 0.15,
   "opened": 1793916690,
-  "checked": 1794239760,
+  "checked": 1794240120,
   "status": "open",
   "R": null,
   "feat": {
@@ -36163,7 +36167,7 @@
   "rr": 2.25,
   "buf": 0.15,
   "opened": 1793919871,
-  "checked": 1794240000,
+  "checked": 1794240180,
   "status": "open",
   "R": null,
   "feat": {
@@ -38802,7 +38806,7 @@
   "rr": 1.03,
   "buf": 0.15,
   "opened": 1793942619,
-  "checked": 1794240060,
+  "checked": 1794240180,
   "status": "open",
   "R": null,
   "feat": {
@@ -39431,12 +39435,12 @@
   "h": "15m",
   "side": "sell",
   "entry": 0.68797,
-  "stop": 0.6919706428571428,
-  "t1": 0.6796087142857142,
+  "stop": 0.6921306,
+  "t1": 0.6797687,
   "rr": 2.09,
   "buf": 0.15,
   "opened": 1793949425,
-  "checked": 1794239760,
+  "checked": 1794240120,
   "status": "open",
   "R": null,
   "feat": {
@@ -39452,7 +39456,7 @@
    "market",
    "focus"
   ],
-  "note": "Shadow (rule: scalp skips audusd, focus: only none trades live) Feed changed kraken → oanda 2026-11-07 22:55 UTC: no overlapping minute to measure the basis, so stop and target are kept as priced on kraken; entry 0.68797 kept.",
+  "note": "Shadow (rule: scalp skips audusd, focus: only none trades live) Feed changed kraken → oanda 2026-11-07 22:55 UTC: no overlapping minute to measure the basis, so stop and target are kept as priced on kraken; entry 0.68797 kept. Feed changed oanda → kraken 2026-11-09 16:03 UTC: basis +0.00016 measured on the switch minute (same candle); stop 0.6921306 and target re-based by it, entry kept at 0.68797 (filled on oanda).",
   "ctx": {
    "atr": 0.0016043,
    "stopAtr": 2.57,
@@ -39471,8 +39475,9 @@
   "mfe": 0.95,
   "mae": 0.83,
   "drift": -0.029,
-  "feed": "oanda",
-  "feedKept": 1
+  "feed": "kraken",
+  "feedKept": 1,
+  "feedBasis": 0.00016
  },
  {
   "id": "xrp-scalp-1793949765",
@@ -39561,12 +39566,12 @@
   "h": "1h",
   "side": "sell",
   "entry": 0.68785,
-  "stop": 0.6920872142857143,
-  "t1": 0.6793755714285713,
+  "stop": 0.6922472,
+  "t1": 0.6795356,
   "rr": 2,
   "buf": 0.15,
   "opened": 1793949765,
-  "checked": 1794239760,
+  "checked": 1794240120,
   "status": "open",
   "R": null,
   "feat": {
@@ -39581,7 +39586,7 @@
   "blockedBy": [
    "focus"
   ],
-  "note": "Shadow (focus: only none trades live) Feed changed kraken → oanda 2026-11-07 22:55 UTC: no overlapping minute to measure the basis, so stop and target are kept as priced on kraken; entry 0.68785 kept.",
+  "note": "Shadow (focus: only none trades live) Feed changed kraken → oanda 2026-11-07 22:55 UTC: no overlapping minute to measure the basis, so stop and target are kept as priced on kraken; entry 0.68785 kept. Feed changed oanda → kraken 2026-11-09 16:03 UTC: basis +0.00016 measured on the switch minute (same candle); stop 0.6922472 and target re-based by it, entry kept at 0.68785 (filled on oanda).",
   "ctx": {
    "atr": 0.0023814,
    "stopAtr": 1.78,
@@ -39599,8 +39604,9 @@
   "r0": 0.00423721428571433,
   "mfe": 0.87,
   "mae": 0.82,
-  "feed": "oanda",
-  "feedKept": 1
+  "feed": "kraken",
+  "feedKept": 1,
+  "feedBasis": 0.00016
  },
  {
   "id": "gbpusd-scalp-1793950449",
@@ -40412,7 +40418,7 @@
   "pm": {
    "phase": "watch",
    "until": 1794251880,
-   "checked": 1794239880,
+   "checked": 1794240240,
    "after": {
     "best": 2.03,
     "worst": 0,
@@ -40444,10 +40450,10 @@
   "pair": "D1 engulf zone",
   "h": "1d",
   "side": "buy",
-  "entry": 3971.36,
-  "stop": 3895.27,
-  "t1": 4732.26,
-  "tp1": 4123.54,
+  "entry": 3985.72,
+  "stop": 3913.98,
+  "t1": 4703.12,
+  "tp1": 4129.2,
   "rr": 10,
   "trail": [
    2,
@@ -40455,17 +40461,17 @@
   ],
   "buf": 0.15,
   "opened": 1793956528,
-  "checked": 1794239880,
+  "checked": 1794240180,
   "status": "pending",
   "R": null,
-  "r0": 76.09,
+  "r0": 71.74,
   "validFor": 1728000,
   "maxHold": 864000,
   "noBe": true,
   "entryMode": "limit",
   "zone": [
-   3895.57,
-   3971.36
+   3914.28,
+   3985.72
   ],
   "lastD": 1794096000,
   "feat": {
@@ -40474,20 +40480,20 @@
   },
   "shadow": false,
   "blockedBy": [],
-  "note": "Gold daily engulf: daily close 4086.685 above the high 3979.355 of the red candle of 2026-11-03 (zone 3907.915-3979.355), close above the 20-day average 4039.22. Limit buy at the zone high 3979.36 for 20 days (cancelled by a daily close under 3907.915); stop 3907.61; after +2R (4122.86) the stop trails 1R behind the best price (cap 10R); out 10 days after the fill. Re-quoted 2026-11-07 22:55 UTC: the candle feed changed kraken → oanda, so the order was re-derived from the zone on the oanda candles: limit 3979.36 → 3971.36, stop 3907.61 → 3895.27, 2R mark 4123.54. Re-quoted 2026-11-08 07:00 UTC: the candle feed changed oanda → kraken, so the order was re-derived from the zone on the kraken candles: limit 3971.36 → 3985, stop 3895.27 → 3913.26, 2R mark 4128.48. Re-quoted 2026-11-08 07:05 UTC: the candle feed changed kraken → oanda, so the order was re-derived from the zone on the oanda candles: limit 3985 → 3971.36, stop 3913.26 → 3895.27, 2R mark 4123.54. Re-quoted 2026-11-09 15:01 UTC: the candle feed changed oanda → kraken, so the order was re-derived from the zone on the kraken candles: limit 3971.36 → 3986.11, stop 3895.27 → 3914.37, 2R mark 4129.59. Re-quoted 2026-11-09 15:10 UTC: the candle feed changed kraken → oanda, so the order was re-derived from the zone on the oanda candles: limit 3986.11 → 3971.36, stop 3914.37 → 3895.27, 2R mark 4123.54.",
-  "feed": "oanda",
+  "note": "Gold daily engulf: daily close 4086.685 above the high 3979.355 of the red candle of 2026-11-03 (zone 3907.915-3979.355), close above the 20-day average 4039.22. Limit buy at the zone high 3979.36 for 20 days (cancelled by a daily close under 3907.915); stop 3907.61; after +2R (4122.86) the stop trails 1R behind the best price (cap 10R); out 10 days after the fill. Re-quoted 2026-11-07 22:55 UTC: the candle feed changed kraken → oanda, so the order was re-derived from the zone on the oanda candles: limit 3979.36 → 3971.36, stop 3907.61 → 3895.27, 2R mark 4123.54. Re-quoted 2026-11-08 07:00 UTC: the candle feed changed oanda → kraken, so the order was re-derived from the zone on the kraken candles: limit 3971.36 → 3985, stop 3895.27 → 3913.26, 2R mark 4128.48. Re-quoted 2026-11-08 07:05 UTC: the candle feed changed kraken → oanda, so the order was re-derived from the zone on the oanda candles: limit 3985 → 3971.36, stop 3913.26 → 3895.27, 2R mark 4123.54. Re-quoted 2026-11-09 15:01 UTC: the candle feed changed oanda → kraken, so the order was re-derived from the zone on the kraken candles: limit 3971.36 → 3986.11, stop 3895.27 → 3914.37, 2R mark 4129.59. Re-quoted 2026-11-09 15:10 UTC: the candle feed changed kraken → oanda, so the order was re-derived from the zone on the oanda candles: limit 3986.11 → 3971.36, stop 3914.37 → 3895.27, 2R mark 4123.54. Re-quoted 2026-11-09 16:03 UTC: the candle feed changed oanda → kraken, so the order was re-derived from the zone on the kraken candles: limit 3971.36 → 3985.72, stop 3895.27 → 3913.98, 2R mark 4129.2.",
+  "feed": "kraken",
   "requoted": {
-   "at": 1794237056,
-   "from": "kraken",
-   "to": "oanda",
+   "at": 1794240194,
+   "from": "oanda",
+   "to": "kraken",
    "was": {
-    "entry": 3986.11,
-    "stop": 3914.37,
-    "t1": 4703.51,
-    "tp1": 4129.59,
+    "entry": 3971.36,
+    "stop": 3895.27,
+    "t1": 4732.26,
+    "tp1": 4123.54,
     "zone": [
-     3914.67,
-     3986.11
+     3895.57,
+     3971.36
     ]
    }
   },
@@ -45428,7 +45434,7 @@
   "pm": {
    "phase": "watch",
    "until": 1794280620,
-   "checked": 1794239880,
+   "checked": 1794240240,
    "after": {
     "best": 0,
     "worst": 1.1,
@@ -46536,12 +46542,12 @@
   "h": "15m",
   "side": "sell",
   "entry": 0.68703,
-  "stop": 0.69141,
-  "t1": 0.6782700000000002,
+  "stop": 0.69157,
+  "t1": 0.67843,
   "rr": 2,
   "buf": 0.15,
   "opened": 1793996278,
-  "checked": 1794239760,
+  "checked": 1794240120,
   "status": "open",
   "R": null,
   "feat": {
@@ -46557,7 +46563,7 @@
    "market",
    "focus"
   ],
-  "note": "Shadow (rule: scalp skips audusd, focus: only none trades live) Feed changed kraken → oanda 2026-11-07 22:55 UTC: no overlapping minute to measure the basis, so stop and target are kept as priced on kraken; entry 0.68703 kept.",
+  "note": "Shadow (rule: scalp skips audusd, focus: only none trades live) Feed changed kraken → oanda 2026-11-07 22:55 UTC: no overlapping minute to measure the basis, so stop and target are kept as priced on kraken; entry 0.68703 kept. Feed changed oanda → kraken 2026-11-09 16:03 UTC: basis +0.00016 measured on the switch minute (same candle); stop 0.69157 and target re-based by it, entry kept at 0.68703 (filled on oanda).",
   "ctx": {
    "atr": 0.000355,
    "stopAtr": 12.34,
@@ -46575,8 +46581,9 @@
   "r0": 0.0043799999999999395,
   "mfe": 0.65,
   "mae": 0.84,
-  "feed": "oanda",
-  "feedKept": 1
+  "feed": "kraken",
+  "feedKept": 1,
+  "feedBasis": 0.00016
  },
  {
   "id": "xau-scalp-1793996959",
@@ -49474,7 +49481,7 @@
   "rr": 2,
   "buf": 0.15,
   "opened": 1794174537,
-  "checked": 1794240000,
+  "checked": 1794240180,
   "status": "open",
   "R": null,
   "feat": {
@@ -49579,7 +49586,7 @@
   "rr": 2,
   "buf": 0.15,
   "opened": 1794174840,
-  "checked": 1794240000,
+  "checked": 1794240180,
   "status": "open",
   "R": null,
   "feat": {
@@ -50576,12 +50583,12 @@
   "h": "1h",
   "side": "buy",
   "entry": 0.68934,
-  "stop": 0.68554,
-  "t1": 0.6939500000000001,
+  "stop": 0.6857,
+  "t1": 0.69411,
   "rr": 1.21,
   "buf": 0.15,
   "opened": 1794189929,
-  "checked": 1794239760,
+  "checked": 1794240120,
   "status": "open",
   "R": null,
   "feat": {
@@ -50598,8 +50605,8 @@
   "blockedBy": [
    "focus"
   ],
-  "feed": "oanda",
-  "note": "Shadow (focus: only none trades live)",
+  "feed": "kraken",
+  "note": "Shadow (focus: only none trades live) Feed changed oanda → kraken 2026-11-09 16:03 UTC: basis +0.00016 measured on the switch minute (same candle); stop 0.6857 and target re-based by it, entry kept at 0.68934 (filled on oanda).",
   "ctx": {
    "atr": 0.00034143,
    "stopAtr": 11.13,
@@ -50616,7 +50623,8 @@
   "filled": 1794194880,
   "r0": 0.0037999999999999146,
   "mfe": 0.36,
-  "mae": 0.36
+  "mae": 0.36,
+  "feedBasis": 0.00016
  },
  {
   "id": "gbpusd-rscalp-1794190773",
@@ -51247,7 +51255,7 @@
   "pm": {
    "phase": "watch",
    "until": 1794278700,
-   "checked": 1794239880,
+   "checked": 1794240240,
    "after": {
     "best": 0,
     "worst": 1.57,
@@ -51283,7 +51291,7 @@
   "rr": 2,
   "buf": 0.15,
   "opened": 1794207743,
-  "checked": 1794240000,
+  "checked": 1794240180,
   "status": "open",
   "R": null,
   "feat": {
@@ -51726,7 +51734,7 @@
   "pm": {
    "phase": "watch",
    "until": 1794251280,
-   "checked": 1794239880,
+   "checked": 1794240240,
    "after": {
     "best": 7.88,
     "worst": 0,
@@ -52206,9 +52214,9 @@
   "pm": {
    "phase": "watch",
    "until": 1794241980,
-   "checked": 1794239880,
+   "checked": 1794240240,
    "after": {
-    "best": 1.65,
+    "best": 1.75,
     "worst": 1.75,
     "hitT1": null,
     "worst15": 1.75
@@ -52364,10 +52372,10 @@
   "pm": {
    "phase": "watch",
    "until": 1794246840,
-   "checked": 1794239880,
+   "checked": 1794240240,
    "after": {
     "best": 2.64,
-    "worst": 0,
+    "worst": 0.06,
     "hitT1": 1794232500,
     "worstPre": 0
    },
@@ -52476,12 +52484,12 @@
   "h": "1h",
   "side": "buy",
   "entry": 1.11904,
-  "stop": 1.11854,
-  "t1": 1.12132,
+  "stop": 1.11819,
+  "t1": 1.12097,
   "rr": 4.56,
   "buf": 0.15,
   "opened": 1794217886,
-  "checked": 1794239760,
+  "checked": 1794240120,
   "status": "open",
   "R": null,
   "feat": {
@@ -52498,8 +52506,8 @@
   "blockedBy": [
    "focus"
   ],
-  "feed": "oanda",
-  "note": "Shadow (focus: only none trades live)",
+  "feed": "kraken",
+  "note": "Shadow (focus: only none trades live) Feed changed oanda → kraken 2026-11-09 16:03 UTC: basis -0.00035 measured on the switch minute (same candle); stop 1.11819 and target re-based by it, entry kept at 1.11904 (filled on oanda).",
   "ctx": {
    "atr": 0.00028929,
    "stopAtr": 1.73,
@@ -52516,7 +52524,8 @@
   "filled": 1794221820,
   "r0": 0.0004999999999999449,
   "mfe": 2.48,
-  "mae": 0.92
+  "mae": 0.92,
+  "feedBasis": -0.00035
  },
  {
   "id": "xrp-rscalp-1794219027",
@@ -52824,9 +52833,9 @@
   "pm": {
    "phase": "watch",
    "until": 1794246840,
-   "checked": 1794239880,
+   "checked": 1794240240,
    "after": {
-    "best": 0.74,
+    "best": 0.88,
     "worst": 1.82,
     "hitT1": null
    },
@@ -53255,12 +53264,12 @@
   "h": "15m",
   "side": "buy",
   "entry": 4101.285,
-  "stop": 4090.69,
-  "t1": 4133.435,
+  "stop": 4092.31,
+  "t1": 4135.055,
   "rr": 3.32,
   "buf": 0.15,
   "opened": 1794222860,
-  "checked": 1794239880,
+  "checked": 1794240180,
   "status": "open",
   "R": null,
   "feat": {
@@ -53278,8 +53287,8 @@
    "focus",
    "replica"
   ],
-  "feed": "oanda",
-  "note": "Shadow (focus: only none trades live, this market trades the gold replica live) Feed changed oanda → kraken 2026-11-09 15:01 UTC: basis +0.965 measured on the switch minute (same candle); stop 4092.355 and target re-based by it, entry kept at 4101.285 (filled on oanda). Feed changed kraken → oanda 2026-11-09 15:10 UTC: basis -1.665 measured on the switch minute (same candle); stop 4090.69 and target re-based by it, entry kept at 4101.285 (filled on kraken).",
+  "feed": "kraken",
+  "note": "Shadow (focus: only none trades live, this market trades the gold replica live) Feed changed oanda → kraken 2026-11-09 15:01 UTC: basis +0.965 measured on the switch minute (same candle); stop 4092.355 and target re-based by it, entry kept at 4101.285 (filled on oanda). Feed changed kraken → oanda 2026-11-09 15:10 UTC: basis -1.665 measured on the switch minute (same candle); stop 4090.69 and target re-based by it, entry kept at 4101.285 (filled on kraken). Feed changed oanda → kraken 2026-11-09 16:03 UTC: basis +1.62 measured on the switch minute (same candle); stop 4092.31 and target re-based by it, entry kept at 4101.285 (filled on oanda).",
   "ctx": {
    "atr": 1.3721,
    "stopAtr": 7.73,
@@ -53298,7 +53307,7 @@
   "r0": 9.894999999999982,
   "mfe": 2.97,
   "mae": 0.29,
-  "feedBasis": -0.7
+  "feedBasis": 0.92
  },
  {
   "id": "gbpusd-scalp-1794222860",
@@ -53446,7 +53455,7 @@
   "rr": 1.24,
   "buf": 0.15,
   "opened": 1794223067,
-  "checked": 1794240000,
+  "checked": 1794240180,
   "status": "open",
   "R": null,
   "feat": {
@@ -53543,7 +53552,7 @@
   "pm": {
    "phase": "watch",
    "until": 1794250080,
-   "checked": 1794240000,
+   "checked": 1794240180,
    "after": {
     "best": 8.07,
     "worst": 0,
@@ -53715,7 +53724,7 @@
   "rr": 3.28,
   "buf": 0.15,
   "opened": 1794223504,
-  "checked": 1794239760,
+  "checked": 1794240120,
   "status": "open",
   "R": null,
   "feat": {
@@ -53763,12 +53772,12 @@
   "h": "30m",
   "side": "buy",
   "entry": 4108.665,
-  "stop": 4101.01,
-  "t1": 4133.435,
+  "stop": 4102.63,
+  "t1": 4135.055,
   "rr": 3.66,
   "buf": 0.15,
   "opened": 1794224183,
-  "checked": 1794239880,
+  "checked": 1794240180,
   "status": "open",
   "R": null,
   "feat": {
@@ -53787,8 +53796,8 @@
    "focus",
    "replica"
   ],
-  "feed": "oanda",
-  "note": "Shadow (rule: only with D1, focus: only none trades live, this market trades the gold replica live) Feed changed oanda → kraken 2026-11-09 15:01 UTC: basis +0.965 measured on the switch minute (same candle); stop 4102.675 and target re-based by it, entry kept at 4108.665 (filled on oanda). Feed changed kraken → oanda 2026-11-09 15:10 UTC: basis -1.665 measured on the switch minute (same candle); stop 4101.01 and target re-based by it, entry kept at 4108.665 (filled on kraken).",
+  "feed": "kraken",
+  "note": "Shadow (rule: only with D1, focus: only none trades live, this market trades the gold replica live) Feed changed oanda → kraken 2026-11-09 15:01 UTC: basis +0.965 measured on the switch minute (same candle); stop 4102.675 and target re-based by it, entry kept at 4108.665 (filled on oanda). Feed changed kraken → oanda 2026-11-09 15:10 UTC: basis -1.665 measured on the switch minute (same candle); stop 4101.01 and target re-based by it, entry kept at 4108.665 (filled on kraken). Feed changed oanda → kraken 2026-11-09 16:03 UTC: basis +1.62 measured on the switch minute (same candle); stop 4102.63 and target re-based by it, entry kept at 4108.665 (filled on oanda).",
   "ctx": {
    "atr": 1.5825,
    "stopAtr": 4.39,
@@ -53806,7 +53815,7 @@
   "r0": 6.954999999999927,
   "mfe": 3.16,
   "mae": 0.33,
-  "feedBasis": -0.7
+  "feedBasis": 0.92
  },
  {
   "id": "audusd-scalp-1794224588",
@@ -53867,11 +53876,11 @@
   "exitKind": "stop",
   "closed": 1794225540,
   "pm": {
-   "phase": "watch",
+   "phase": "done",
    "until": 1794239940,
-   "checked": 1794239880,
+   "checked": 1794239940,
    "after": {
-    "best": 0.34,
+    "best": 0.39,
     "worst": 2.49,
     "hitT1": null
    },
@@ -53879,10 +53888,10 @@
    "slip": 0,
    "sv": 2,
    "verdict": "market",
-   "cause": "normal",
-   "title": "Normal loss",
-   "detail": "Rules followed: best +0.02R, then the stop.",
-   "lesson": "An accepted cost of trading. Count it, don't change the rules for it.",
+   "cause": "reversal",
+   "title": "The market turned for real",
+   "detail": "Price never went for us (best +0.02R) and carried on 2.49R against the entry after the stop.",
+   "lesson": "Valid loss: the stop did its job. Nothing to fix unless this setup keeps doing it.",
    "factors": []
   },
   "costR": 0.328,
@@ -53947,9 +53956,9 @@
   "pm": {
    "phase": "watch",
    "until": 1794272640,
-   "checked": 1794239880,
+   "checked": 1794240240,
    "after": {
-    "best": 0.03,
+    "best": 0.14,
     "worst": 1.91,
     "hitT1": null
    },
@@ -54159,7 +54168,7 @@
   "pm": {
    "phase": "watch",
    "until": 1794244260,
-   "checked": 1794240000,
+   "checked": 1794240180,
    "after": {
     "best": 3.65,
     "worst": 3.45,
@@ -54243,9 +54252,9 @@
   "pm": {
    "phase": "watch",
    "until": 1794244440,
-   "checked": 1794239880,
+   "checked": 1794240240,
    "after": {
-    "best": 2.68,
+    "best": 2.8,
     "worst": 1.16,
     "hitT1": 1794235800,
     "worst15": 1.16,
@@ -54276,12 +54285,12 @@
   "h": "15m",
   "side": "buy",
   "entry": 1.11958,
-  "stop": 1.11848,
-  "t1": 1.1217800000000002,
+  "stop": 1.11813,
+  "t1": 1.12143,
   "rr": 2,
   "buf": 0.15,
   "opened": 1794229579,
-  "checked": 1794239760,
+  "checked": 1794240120,
   "status": "open",
   "R": null,
   "feat": {
@@ -54300,8 +54309,8 @@
    "focus",
    "reentry"
   ],
-  "feed": "oanda",
-  "note": "Shadow (rule: not in overlap, focus: only none trades live, a Scalp the same way lost on this market in the last 3 hours)",
+  "feed": "kraken",
+  "note": "Shadow (rule: not in overlap, focus: only none trades live, a Scalp the same way lost on this market in the last 3 hours) Feed changed oanda → kraken 2026-11-09 16:03 UTC: basis -0.00035 measured on the switch minute (same candle); stop 1.11813 and target re-based by it, entry kept at 1.11958 (filled on oanda).",
   "ctx": {
    "atr": 0.00018214,
    "stopAtr": 6.04,
@@ -54319,7 +54328,8 @@
   "drift": 0,
   "r0": 0.001100000000000101,
   "mfe": 0.64,
-  "mae": 0.53
+  "mae": 0.53,
+  "feedBasis": -0.00035
  },
  {
   "id": "btc-scalp-1794229957",
@@ -54381,7 +54391,7 @@
   "pm": {
    "phase": "watch",
    "until": 1794251940,
-   "checked": 1794240000,
+   "checked": 1794240180,
    "after": {
     "best": 0,
     "worst": 2.41,
@@ -54414,12 +54424,12 @@
   "h": "15m",
   "side": "buy",
   "entry": 0.68998,
-  "stop": 0.68894,
-  "t1": 0.6920600000000001,
+  "stop": 0.6891,
+  "t1": 0.69222,
   "rr": 2,
   "buf": 0.15,
   "opened": 1794232565,
-  "checked": 1794239760,
+  "checked": 1794240120,
   "status": "open",
   "R": null,
   "feat": {
@@ -54440,8 +54450,8 @@
    "focus",
    "reentry"
   ],
-  "feed": "oanda",
-  "note": "Shadow (rule: only against D1, rule: not in overlap, rule: scalp skips audusd, focus: only none trades live, a Scalp the same way lost on this market in the last 3 hours)",
+  "feed": "kraken",
+  "note": "Shadow (rule: only against D1, rule: not in overlap, rule: scalp skips audusd, focus: only none trades live, a Scalp the same way lost on this market in the last 3 hours) Feed changed oanda → kraken 2026-11-09 16:03 UTC: basis +0.00016 measured on the switch minute (same candle); stop 0.6891 and target re-based by it, entry kept at 0.68998 (filled on oanda).",
   "ctx": {
    "atr": 0.000135,
    "stopAtr": 7.7,
@@ -54458,7 +54468,8 @@
   "filled": 1794232620,
   "r0": 0.001040000000000041,
   "mfe": 0.69,
-  "mae": 0.54
+  "mae": 0.54,
+  "feedBasis": 0.00016
  },
  {
   "id": "xrp-scalp-1794232802",
@@ -54520,7 +54531,7 @@
   "pm": {
    "phase": "watch",
    "until": 1794247320,
-   "checked": 1794240060,
+   "checked": 1794240180,
    "after": {
     "best": 5.05,
     "worst": 2.02,
@@ -54655,7 +54666,7 @@
   "pm": {
    "phase": "watch",
    "until": 1794249540,
-   "checked": 1794240000,
+   "checked": 1794240180,
    "after": {
     "best": 3.84,
     "worst": 1.21,
@@ -54689,12 +54700,12 @@
   "h": "15m",
   "side": "sell",
   "entry": 4119.94,
-  "stop": 4130.403,
-  "t1": 4093.565,
+  "stop": 4132.023,
+  "t1": 4095.185,
   "rr": 2.3,
   "buf": 0.15,
   "opened": 1794235029,
-  "checked": 1794239880,
+  "checked": 1794240180,
   "status": "open",
   "R": null,
   "feat": {
@@ -54714,8 +54725,8 @@
    "focus",
    "replica"
   ],
-  "feed": "oanda",
-  "note": "Shadow (rule: rscalp only at reward:risk ≥ 3, already 2 trades or an opposite trade open on this market, focus: only none trades live, this market trades the gold replica live) Feed changed oanda → kraken 2026-11-09 15:01 UTC: basis +0.965 measured on the switch minute (same candle); stop 4132.068 and target re-based by it, entry kept at 4119.94 (filled on oanda). Feed changed kraken → oanda 2026-11-09 15:10 UTC: basis -1.665 measured on the switch minute (same candle); stop 4130.403 and target re-based by it, entry kept at 4119.94 (filled on kraken).",
+  "feed": "kraken",
+  "note": "Shadow (rule: rscalp only at reward:risk ≥ 3, already 2 trades or an opposite trade open on this market, focus: only none trades live, this market trades the gold replica live) Feed changed oanda → kraken 2026-11-09 15:01 UTC: basis +0.965 measured on the switch minute (same candle); stop 4132.068 and target re-based by it, entry kept at 4119.94 (filled on oanda). Feed changed kraken → oanda 2026-11-09 15:10 UTC: basis -1.665 measured on the switch minute (same candle); stop 4130.403 and target re-based by it, entry kept at 4119.94 (filled on kraken). Feed changed oanda → kraken 2026-11-09 16:03 UTC: basis +1.62 measured on the switch minute (same candle); stop 4132.023 and target re-based by it, entry kept at 4119.94 (filled on oanda).",
   "ctx": {
    "atr": 2.8529,
    "stopAtr": 3.91,
@@ -54733,7 +54744,7 @@
   "r0": 11.162928571428893,
   "mfe": 0.51,
   "mae": 0.54,
-  "feedBasis": -0.7
+  "feedBasis": 0.92
  },
  {
   "id": "audusd-scalp-1794235225",
@@ -54746,12 +54757,12 @@
   "h": "15m",
   "side": "buy",
   "entry": 0.69012,
-  "stop": 0.68932,
-  "t1": 0.6917199999999998,
+  "stop": 0.68948,
+  "t1": 0.69188,
   "rr": 2,
   "buf": 0.15,
   "opened": 1794235225,
-  "checked": 1794239760,
+  "checked": 1794240120,
   "status": "open",
   "R": null,
   "feat": {
@@ -54772,8 +54783,8 @@
    "focus",
    "reentry"
   ],
-  "feed": "oanda",
-  "note": "Shadow (rule: only against D1, rule: not in overlap, rule: scalp skips audusd, focus: only none trades live, a Scalp the same way lost on this market in the last 3 hours)",
+  "feed": "kraken",
+  "note": "Shadow (rule: only against D1, rule: not in overlap, rule: scalp skips audusd, focus: only none trades live, a Scalp the same way lost on this market in the last 3 hours) Feed changed oanda → kraken 2026-11-09 16:03 UTC: basis +0.00016 measured on the switch minute (same candle); stop 0.68948 and target re-based by it, entry kept at 0.69012 (filled on oanda).",
   "ctx": {
    "atr": 0.00017643,
    "stopAtr": 4.53,
@@ -54790,7 +54801,8 @@
   "filled": 1794236460,
   "r0": 0.0007999999999999119,
   "mfe": 0.73,
-  "mae": 0.66
+  "mae": 0.66,
+  "feedBasis": 0.00016
  },
  {
   "id": "btc-rscalp-1794235517",
@@ -54853,7 +54865,7 @@
   "pm": {
    "phase": "watch",
    "until": 1794250080,
-   "checked": 1794240000,
+   "checked": 1794240180,
    "after": {
     "best": 2.41,
     "worst": 0.12,
@@ -54935,7 +54947,7 @@
   "pm": {
    "phase": "watch",
    "until": 1794253320,
-   "checked": 1794240060,
+   "checked": 1794240180,
    "after": {
     "best": 3.97,
     "worst": 0,
@@ -55017,7 +55029,7 @@
   "pm": {
    "phase": "watch",
    "until": 1794250800,
-   "checked": 1794240000,
+   "checked": 1794240180,
    "after": {
     "best": 2.04,
     "worst": 1.56,
@@ -55103,9 +55115,9 @@
   "pm": {
    "phase": "watch",
    "until": 1794252060,
-   "checked": 1794239880,
+   "checked": 1794240240,
    "after": {
-    "best": 1.02,
+    "best": 1.14,
     "worst": 1.79,
     "hitT1": null
    },
@@ -55139,7 +55151,7 @@
   "rr": 5.82,
   "buf": 0.15,
   "opened": 1794236710,
-  "checked": 1794239760,
+  "checked": 1794240120,
   "status": "open",
   "R": null,
   "feat": {
@@ -55195,7 +55207,7 @@
   "rr": 2,
   "buf": 0.15,
   "opened": 1794236890,
-  "checked": 1794239760,
+  "checked": 1794240120,
   "status": "pending",
   "R": null,
   "feat": {
@@ -55297,7 +55309,7 @@
   "rr": 1.55,
   "buf": 0.15,
   "opened": 1794237676,
-  "checked": 1794240000,
+  "checked": 1794240180,
   "status": "open",
   "R": null,
   "feat": {
@@ -55352,7 +55364,7 @@
   "rr": 2.66,
   "buf": 0.15,
   "opened": 1794237676,
-  "checked": 1794240060,
+  "checked": 1794240180,
   "status": "open",
   "R": null,
   "feat": {
@@ -55409,7 +55421,7 @@
   "rr": 3.05,
   "buf": 0.15,
   "opened": 1794237676,
-  "checked": 1794239760,
+  "checked": 1794240120,
   "status": "pending",
   "R": null,
   "feat": {
@@ -55453,12 +55465,12 @@
   "h": "15m",
   "side": "buy",
   "entry": 0.69054,
-  "stop": 0.68949,
-  "t1": 0.6930000000000001,
+  "stop": 0.68965,
+  "t1": 0.69316,
   "rr": 2.34,
   "buf": 0.15,
   "opened": 1794239726,
-  "checked": 1794239760,
+  "checked": 1794240120,
   "status": "open",
   "R": null,
   "feat": {
@@ -55479,8 +55491,8 @@
    "focus",
    "reentry"
   ],
-  "feed": "oanda",
-  "note": "Shadow (rule: only against D1, rule: not in overlap, rule: scalp skips audusd, focus: only none trades live, a Scalp the same way lost on this market in the last 3 hours)",
+  "feed": "kraken",
+  "note": "Shadow (rule: only against D1, rule: not in overlap, rule: scalp skips audusd, focus: only none trades live, a Scalp the same way lost on this market in the last 3 hours) Feed changed oanda → kraken 2026-11-09 16:03 UTC: basis +0.00016 measured on the switch minute (same candle); stop 0.68965 and target re-based by it, entry kept at 0.69054 (filled on oanda).",
   "ctx": {
    "atr": 0.000115,
    "stopAtr": 10.17,
@@ -55495,6 +55507,10 @@
    }
   },
   "filled": 1794239726,
-  "drift": -0.103
+  "drift": -0.103,
+  "r0": 0.0010499999999999954,
+  "feedBasis": 0.00016,
+  "mfe": 0.1,
+  "mae": 0.11
  }
 ]
