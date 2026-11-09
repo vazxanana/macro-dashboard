@@ -99,7 +99,17 @@ export function callsScore(L) {
   const brier = done.reduce((a, r) => a + r.brier, 0) / done.length, exp = done.reduce((a, r) => a + r.p, 0) / done.length, hits = done.filter((r) => r.hit).length / done.length;
   // calibration: high-probability calls (>= 60%) should come true more often than low ones (<= 40%)
   const band = (f) => { const b = done.filter(f); return b.length ? { n: b.length, hit: +(b.filter((r) => r.hit).length / b.length).toFixed(2), p: +(b.reduce((a, r) => a + r.p, 0) / b.length).toFixed(2) } : null; };
-  return { n: done.length, open: L.length - done.length, brier: +brier.toFixed(4), expected: +exp.toFixed(2), hitRate: +hits.toFixed(2), high: band((r) => r.p >= 0.6), low: band((r) => r.p <= 0.4) };
+  return { n: done.length, open: L.length - done.length, brier: +brier.toFixed(4), expected: +exp.toFixed(2), hitRate: +hits.toFixed(2), high: band((r) => r.p >= 0.6), low: band((r) => r.p <= 0.4), weekly: callsByWeek(done) };
+}
+// hit rate over time for the desk's chart: scored calls grouped by the ISO week (Monday) of their due date, with the running
+// totals; `expected` is the mean stated probability, so a calibrated record keeps the two lines together
+export function callsByWeek(L) {
+  const done = (L || []).filter((r) => r.hit != null && /^\d{4}-\d\d-\d\d/.test(r.by || '')), g = new Map();
+  for (const r of done) { const d = new Date(r.by.slice(0, 10) + 'T00:00:00Z'), wk = new Date(d.getTime() - ((d.getUTCDay() + 6) % 7) * 864e5).toISOString().slice(0, 10);
+    const x = g.get(wk) || { week: wk, n: 0, hits: 0, p: 0 }; x.n++; x.hits += r.hit ? 1 : 0; x.p += r.p; g.set(wk, x); }
+  let n = 0, h = 0, p = 0;
+  return [...g.values()].sort((a, b) => (a.week < b.week ? -1 : 1)).map((x) => { n += x.n; h += x.hits; p += x.p;
+    return { week: x.week, n: x.n, hit: +(x.hits / x.n).toFixed(2), expected: +(x.p / x.n).toFixed(2), cumN: n, cumHit: +(h / n).toFixed(2), cumExpected: +(p / n).toFixed(2) }; });
 }
 // COT signals that passed the desk's historical test (n >= 15, hit >= base + 8 pts, t >= 2) become dated, scored calls
 export function cotCalls(cot, pxByAsset, now) {

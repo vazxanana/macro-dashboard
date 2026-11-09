@@ -98,7 +98,9 @@ export function findAnalogs(Din, now, { k = 20, sepWeeks = 6, excludeWeeks = 13,
     zNow: Object.fromEntries(FEATURES.map((F) => [F.k, r2(z(q, F.k))])),
     top: picks.map((c) => ({ date: c.date, sim: Math.round(100 / (1 + c.dist)), dist: r2(c.dist, 3), f: c.f, entry: c.entry.v,
       gold5: r2(out5(c) * 100), gold20: r2(out20(c) * 100), max20: r2(Math.max(...c.path) * 100), min20: r2(Math.min(...c.path) * 100),
-      dxy5: c.dpath ? r2(c.dpath[4] * 100) : null, dxy20: c.dpath ? r2(c.dpath[h - 1] * 100) : null })),
+      dxy5: c.dpath ? r2(c.dpath[4] * 100) : null, dxy20: c.dpath ? r2(c.dpath[h - 1] * 100) : null,
+      // the gold path itself (% from the entry close, sessions 1..h) for the desk's small multiples; descriptive, not a tested edge
+      path: c.path.map((x) => r2(x * 100)) })),
     stats: sum(picks), base: sum(cands), since: cands[0].date, candidates: cands.length,
     recent: { n: recent.length, gold20: statsOf(recent.map(out20)) },
     // the paths stay off the JSON (large); hypotheses read them
