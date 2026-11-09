@@ -8,7 +8,7 @@ _Snapshot 2026-11-02 05:37 UTC. Paper trading only._
 <!-- live-rule:start -->
 ## Live Scalp rule check
 
-Built by the Trader at 2026-11-09 02:26 UTC from snapshot, config and the 30-day replay. Rule now: Scalp (M15 → M1) against D1 only, not in asia/overlap, skips audusd. **Scalp is not live right now** (not in focusSetups), so nothing below trades live.
+Built by the Trader at 2026-11-09 02:28 UTC from snapshot, config and the 30-day replay. Rule now: Scalp (M15 → M1) against D1 only, not in asia/overlap, skips audusd. **Scalp is not live right now** (not in focusSetups), so nothing below trades live.
 
 Session now: **asia** — the rule skips it, so no live Scalp until it ends.
 
@@ -31,7 +31,7 @@ Replay total on the markets it trades live: 203 trades, −0.13R a trade (−25.
 <!-- coach-churn:start -->
 ## Coach rule changes
 
-Built by the Trader at 2026-11-09 02:26 UTC from the rule history. Rules the Coach changed by itself in the last 7 days (owner rules are not counted).
+Built by the Trader at 2026-11-09 02:28 UTC from the rule history. Rules the Coach changed by itself in the last 7 days (owner rules are not counted).
 
 | Rule | Changes | Steps (oldest first) |
 |---|---|---|
@@ -45,28 +45,28 @@ Built by the Trader at 2026-11-09 02:26 UTC from the rule history. Rules the Coa
 | rintra · D1 rule | 2 | 11-03 only with D1 → 11-07 dropped the D1 rule |
 | rscalp · D1 rule | 2 | 11-02 only with D1 → 11-02 "only with D1" dropped |
 | rscalp · overlap session | 2 | 11-03 skip the overlap session → 11-06 trading the overlap session again |
-| scalp · D1 rule | 2 | 11-02 only with D1 → 11-02 only against D1 |
 | scalp · pause | 2 | 11-02 Paused scalp for 3 days → 11-02 Resumed scalp early |
 | intraday · asia session | 1 | 11-04 skip the asia session |
 | News guard on | 1 | 11-04 News guard on |
 | rintra · late session | 1 | 11-03 skip the late session |
 | rscalp · newyork session | 1 | 11-06 skip the newyork session |
+| scalp · D1 rule | 1 | 11-02 only against D1 |
 | scalp, rscalp · asia session | 1 | 11-02 skip the asia session |
 
-37 changes on 17 rules; 4 rules went back and forth 3+ times; 1 setting only ever moved one way. A rule that keeps moving is reacting to noise: the 150-day study found the Coach's choices do no better than dropping the same number of trades at random (research/edge/coach-learning).
+36 changes on 17 rules; 4 rules went back and forth 3+ times; 1 setting only ever moved one way. A rule that keeps moving is reacting to noise: the 150-day study found the Coach's choices do no better than dropping the same number of trades at random (research/edge/coach-learning).
 <!-- coach-churn:end -->
 
 <!-- desk-status:start -->
 ## Desk & mirror status
 
-Built by the Trader at 2026-11-09 02:26 UTC. ICT desk: the last 7 days; mirror: the cTrader DEMO account (0.01 lot, demo only).
+Built by the Trader at 2026-11-09 02:28 UTC. ICT desk: the last 7 days; mirror: the cTrader DEMO account (0.01 lot, demo only).
 
 **ICT A-setups:** 1 signal (1 open, 0 closed); 1 other signal tracked, not A-setups.
 - open: ES buy from 7423.25, stop 7363.25 (H1 iFVG reversal, A+)
 
 **Dip-buy candidate (NQ/ES, paper only):** 1 signal in 7 days · recording since 2026-11-07.
 
-**cTrader mirror:** ok · demo Fusion Markets · balance 9967.42 · 3 open · 1 resting (checked 2026-11-09 02:25 UTC).
+**cTrader mirror:** ok · demo Fusion Markets · balance 9967.42 · 3 open · 1 resting (checked 2026-11-09 02:27 UTC).
 - open: SOLUSD sell position (sol-position-1793893928) · fill 89.121 vs council 89.77 (+0.08R slippage)
 - open: SOLUSD sell position (sol-position-1793899009) · fill 89.121 vs council 89.77 (+0.08R slippage)
 - open: BTCUSD sell scalp (btc-scalp-1793919871) · fill 75841.41 vs council 75500 (−0.36R slippage)
@@ -84,7 +84,7 @@ Last mirror events:
 <!-- coach-ledger:start -->
 ## Coach change ledger
 
-Built by the Trader at 2026-11-09 02:26 UTC. Every rule the Coach changed by itself, the evidence it used and what happened 30 days later. Filter changes run as champion/challenger trials: the old rule keeps running as a shadow and the change stays only if it beats it on the same forward signals (20 where they disagree, shrunk edge ≥ +0.05R a signal; else back to the old rule after 60 days). Owner rules and live setups are not Coach changes.
+Built by the Trader at 2026-11-09 02:28 UTC. Every rule the Coach changed by itself, the evidence it used and what happened 30 days later. Filter changes run as champion/challenger trials: the old rule keeps running as a shadow and the change stays only if it beats it on the same forward signals (20 where they disagree, shrunk edge ≥ +0.05R a signal; else back to the old rule after 60 days). Owner rules and live setups are not Coach changes.
 
 | Date | Change | Evidence | Before → after (the sample it used) | Trial | 30 days later |
 |---|---|---|---|---|---|
@@ -204,13 +204,13 @@ Checked 2026-11-08 10:39 UTC; live signals 2026-11-01 to 2026-11-08.
 - **All markets:** 39% of comparable live signals found (246 matched of 624); outcome sign agrees 91% on 186 closed pairs.
 - **Why live signals were missed:** feed differs 251, data feed 44, replay gap 35 (of 413).
 - **Feeds (replay / live):** xau OANDA / live Kraken · btc Kraken / live Kraken · eth Kraken / live Kraken · audusd OANDA / live Kraken · usdchf OANDA / live Kraken · gbpusd OANDA / live Kraken · xrp Kraken / live Kraken · sol Kraken / live Kraken · eurusd OANDA / live Kraken · usdcad OANDA / live Kraken.
-- **Live loop gaps (48 h):** 11-06 20:57 for 5.5 h, 11-07 03:54 for 3 h, 11-07 10:59 for 5.5 h, 11-08 03:00 for 3.7 h: no live signals were possible then.
+- **Live loop gaps (48 h):** 11-07 03:54 for 3 h, 11-07 10:59 for 5.5 h, 11-08 03:00 for 3.7 h: no live signals were possible then.
 <!-- fidelity:end -->
 
 <!-- gold-systems:start -->
 ## Live gold systems now
 
-Built by the Trader at 2026-11-09 02:26 UTC from its own snapshot and the live record. Status only: what each live Meridian system is waiting for right now; the Scalp block below describes a shadow system.
+Built by the Trader at 2026-11-09 02:28 UTC from its own snapshot and the live record. Status only: what each live Meridian system is waiting for right now; the Scalp block below describes a shadow system.
 
 | System | Book | Now | On |
 |---|---|---|---|
