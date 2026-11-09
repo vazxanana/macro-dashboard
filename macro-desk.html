@@ -31,6 +31,7 @@
     --ink: #eceef2; --ink-dim: #a4abb8; --ink-faint: #8a92a1; --accent: #5b8cff; --accent-soft: rgba(91,140,255,.12);
     --buy: #2fbf8f; --sell: #f2576f; --buy-soft: rgba(47,191,143,.12); --sell-soft: rgba(242,87,111,.12);
     --neutral-soft: rgba(255,255,255,.06); --zero: rgba(255,255,255,.22);
+    --gold: #e3b341; --gold-ink: #ecc35e; --neutral-strong: rgba(255,255,255,.16);
     --shadow-pop: 0 24px 48px rgba(0,0,0,.55);
     --sans: Figtree, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
     --mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
@@ -46,6 +47,7 @@
       --ink: #131722; --ink-dim: #4a5160; --ink-faint: #5f6675; --accent: #2f6bff; --accent-soft: rgba(47,107,255,.09);
       --buy: #08876f; --sell: #d92d4b; --buy-soft: rgba(8,135,111,.09); --sell-soft: rgba(217,45,75,.08);
       --neutral-soft: rgba(19,23,34,.05); --zero: rgba(19,23,34,.28);
+      --gold: #c99400; --gold-ink: #8a6312; --neutral-strong: rgba(19,23,34,.13);
       --shadow-pop: 0 18px 40px -12px rgba(16,24,40,.22), 0 2px 6px rgba(16,24,40,.06);
       color-scheme: light;
     }
@@ -56,6 +58,7 @@
     --ink: #131722; --ink-dim: #4a5160; --ink-faint: #5f6675; --accent: #2f6bff; --accent-soft: rgba(47,107,255,.09);
     --buy: #08876f; --sell: #d92d4b; --buy-soft: rgba(8,135,111,.09); --sell-soft: rgba(217,45,75,.08);
     --neutral-soft: rgba(19,23,34,.05); --zero: rgba(19,23,34,.28);
+    --gold: #c99400; --gold-ink: #8a6312; --neutral-strong: rgba(19,23,34,.13);
     --shadow-pop: 0 18px 40px -12px rgba(16,24,40,.22), 0 2px 6px rgba(16,24,40,.06);
     color-scheme: light;
   }
@@ -196,7 +199,7 @@
   @media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
   /* The veteran's briefing (9 Nov 2026, owner: key insights, near-inside information from public data, hypotheses on a base of
      what happened before, price levels): insights → hypotheses → levels → analogs, one column on a phone */
-  .brief { margin: 0 0 14px; }
+  .brief { margin: 12px 0 14px; }
   .brief h3 small { font-weight: 400; color: var(--ink-faint); font-size: 11.5px; margin-left: 6px; }
   .pubonly { border-left: 3px solid var(--accent); background: var(--accent-soft); padding: 8px 12px; border-radius: 0 var(--r-sm) var(--r-sm) 0; font-size: 12.5px !important; color: var(--ink-dim); }
   .bins { margin: 4px 0 0; padding: 0; list-style: none; display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 10px; counter-reset: bi; }
@@ -221,6 +224,57 @@
   .ant th { color: var(--ink-faint); font-weight: 500; font-size: 11.5px; } .ant .up { color: var(--buy); } .ant .dn { color: var(--sell); }
   .anst { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 8px; margin: 6px 0 10px; } .anst div { border: 1px solid var(--line-soft); border-radius: var(--r-sm); padding: 8px 10px; font-size: 12px; color: var(--ink-dim); } .anst b { display: block; font: 600 16px var(--mono); color: var(--ink); } .anst small { color: var(--ink-faint); }
   @media (max-width: 600px) { .bins, .bhyp, .blv { grid-template-columns: 1fr; } .bhyp article { grid-template-columns: 46px 1fr; } .lvt td:nth-child(2) small { display: none; } .lvt tr.open td:nth-child(2) small { display: block; } }
+
+  /* ─── The glance (9 Nov 2026, owner: "be the best of all time veteran, more visual, simpler"): summary → briefing → discussion/data.
+     One sentence, a bias meter, the event, two levels; every colour also has a word next to it (never colour alone). ─── */
+  .glance { padding: 18px 20px 14px; border-color: color-mix(in srgb, var(--gold) 35%, var(--line)); background: linear-gradient(180deg, color-mix(in srgb, var(--gold) 7%, var(--panel)), var(--panel) 70%); }
+  .kick { margin: 0 0 6px !important; font: 700 12px var(--sans); letter-spacing: .08em; text-transform: uppercase; color: var(--gold-ink) !important; display: flex; gap: 10px; align-items: baseline; flex-wrap: wrap; }
+  .kick small { font: 500 12px var(--sans); letter-spacing: 0; text-transform: none; color: var(--ink-faint); }
+  .g-sent { margin: 0 0 14px !important; font: 600 19px/1.4 var(--sans) !important; color: var(--ink) !important; letter-spacing: -.2px; max-width: 72ch; text-wrap: pretty; }
+  .g-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+  .tile { border: 1px solid var(--line); border-radius: var(--r); padding: 12px 14px; background: var(--panel); min-width: 0; }
+  .tile .lab { display: block; font: 600 11.5px var(--sans); color: var(--ink-faint); text-transform: uppercase; letter-spacing: .05em; margin-bottom: 4px; }
+  .tile .hero { display: flex; align-items: center; gap: 8px; font: 700 26px/1.15 var(--sans); color: var(--ink); letter-spacing: -.4px; overflow-wrap: anywhere; }
+  .tile .hero .dot { width: 12px; height: 12px; border-radius: 50%; flex: none; background: var(--ink-faint); }
+  .tile .hero.sup .dot { background: var(--buy); } .tile .hero.ag .dot { background: var(--sell); }
+  .tile .sub { margin: 4px 0 0 !important; font-size: 13px !important; color: var(--ink-dim); line-height: 1.45; } .tile .sub b { color: var(--ink); font-family: var(--mono); font-weight: 600; }
+  .meter { position: relative; margin: 12px 0 4px; height: 10px; display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 2px; }
+  .meter i { display: block; border-radius: 3px; } .meter i:nth-child(1) { background: color-mix(in srgb, var(--sell) 55%, var(--panel)); } .meter i:nth-child(2) { background: var(--neutral-strong); } .meter i:nth-child(3) { background: color-mix(in srgb, var(--buy) 55%, var(--panel)); }
+  .meter s { position: absolute; top: -5px; width: 4px; height: 20px; border-radius: 2px; background: var(--ink); box-shadow: 0 0 0 2px var(--panel); transform: translateX(-2px); }
+  .mlab { display: grid; grid-template-columns: 1fr 1fr 1fr; font-size: 11.5px; color: var(--ink-faint); } .mlab span:nth-child(2) { text-align: center; } .mlab span:nth-child(3) { text-align: right; }
+  .mlab span.on { color: var(--ink); font-weight: 600; }
+  .pips { display: inline-flex; gap: 3px; vertical-align: 1px; margin-left: 4px; } .pips i { width: 14px; height: 6px; border-radius: 2px; background: var(--neutral-strong); } .pips i.on { background: var(--gold); }
+  .ldr { display: grid; gap: 6px; margin-top: 4px; } .ldr div { display: grid; grid-template-columns: 22px auto minmax(0, 1fr); gap: 8px; align-items: baseline; }
+  .ldr .ar { font-size: 13px; text-align: center; } .ldr .ar.up { color: var(--buy); } .ldr .ar.dn { color: var(--sell); } .ldr .ar.now { color: var(--gold-ink); }
+  .ldr b { font: 700 22px var(--mono); letter-spacing: -.5px; color: var(--ink); font-variant-numeric: tabular-nums; } .ldr .now + b { font-size: 15px; color: var(--ink-dim); font-weight: 600; }
+  .ldr small { color: var(--ink-faint); font-size: 12px; min-width: 0; overflow-wrap: anywhere; }
+  .g-pub { margin: 12px 0 0 !important; font-size: 12px !important; color: var(--ink-faint) !important; } .g-pub b { color: var(--ink-dim) !important; }
+  .duo { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 12px; margin-top: 12px; } .duo > [hidden] { display: none; }
+  .chg { list-style: none; margin: 6px 0 0; padding: 0; display: grid; gap: 2px; } .chg li { display: grid; grid-template-columns: 20px minmax(0, 1fr); gap: 8px; padding: 6px 0; border-top: 1px solid var(--line-soft); font-size: 13px; color: var(--ink-dim); }
+  .chg li:first-child { border-top: 0; } .chg .ic { font-size: 12px; text-align: center; color: var(--ink-faint); } .chg .ic.up { color: var(--buy); } .chg .ic.dn { color: var(--sell); }
+  .chg li.hy { font-size: 12.5px; } .chg .tag { font: 600 10.5px var(--sans); color: var(--ink-faint); text-transform: uppercase; letter-spacing: .04em; margin-right: 6px; }
+  .chg li.first { display: block; color: var(--ink-dim); font-size: 13px; padding: 4px 0; }
+  .calib { display: grid; grid-template-columns: minmax(0, 250px) minmax(0, 1fr); gap: 16px; align-items: center; margin-top: 6px; }
+  .calib svg { width: 100%; height: auto; display: block; } .calib svg text { fill: var(--ink-faint); font: 500 10px var(--sans); }
+  .calib .ax { stroke: var(--line-strong); } .calib .grid { stroke: var(--line-soft); } .calib .diag { stroke: var(--ink-faint); stroke-dasharray: 4 4; }
+  .calib .pt { fill: var(--gold); stroke: var(--panel); stroke-width: 2; } .calib .ci { stroke: var(--gold-ink); stroke-width: 2; stroke-linecap: round; }
+  .calib .hit { fill: transparent; } .calib svg text.empty-t { fill: var(--ink-dim); font: 600 12px var(--sans); }
+  .cbig { font: 700 30px var(--mono); color: var(--ink); letter-spacing: -.5px; } .cbig small { font: 500 13px var(--sans); color: var(--ink-faint); margin-left: 4px; letter-spacing: 0; }
+  .prog { height: 8px; border-radius: 4px; background: var(--neutral-strong); overflow: hidden; margin: 6px 0 10px; } .prog i { display: block; height: 100%; background: var(--gold); border-radius: 4px; }
+  #calib-side p { margin: 4px 0; font-size: 13px; }
+  details.more { margin-top: 12px; border-top: 1px solid var(--line-soft); padding-top: 2px; } details.more > summary { font: 600 13.5px var(--sans); color: var(--ink); padding: 8px 0; margin-top: 0; }
+  details.more > summary small { font-weight: 400; color: var(--ink-faint); font-size: 12px; margin-left: 6px; }
+  details.sect { margin-top: 12px; padding: 2px 20px; } details.sect > summary { font-size: 16px; padding: 12px 0; } details.sect[open] { padding-bottom: 16px; } details.sect section.block { margin-top: 4px; }
+  details.deep { margin-top: 18px; } details.deep > summary { list-style: none; cursor: pointer; display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; padding: 14px 18px; margin: 0; border: 1px dashed var(--line-strong); border-radius: var(--r); color: var(--ink); font: 600 15px var(--sans); }
+  details.deep > summary::-webkit-details-marker { display: none; } details.deep > summary::before { content: "▸"; color: var(--gold-ink); } details.deep[open] > summary::before { content: "▾"; }
+  details.deep > summary small { color: var(--ink-faint); font: 400 12.5px var(--sans); } details.deep[open] > summary { margin-bottom: 12px; }
+  .lede2 { color: var(--ink-faint); font-size: 12.5px; margin: 0 0 10px; }
+  .bins > li.ins { padding: 0; } .bins > li.ins details > summary { list-style: none; cursor: pointer; padding: 10px 12px; margin: 0; display: grid; grid-template-columns: 22px minmax(0, 1fr); gap: 8px; align-items: start; color: var(--ink); font: 600 13.5px/1.4 var(--sans); }
+  .bins > li.ins details > summary::-webkit-details-marker { display: none; }
+  .bins .rk { font: 700 13px var(--mono); color: var(--gold-ink); } .bins .ib { padding: 0 12px 10px 42px; }
+  .bhyp .pp { font-size: 28px !important; } .bhyp details summary { margin-top: 4px; font-size: 12.5px; }
+  @media (max-width: 900px) { .g-grid { grid-template-columns: 1fr; } .duo { grid-template-columns: 1fr; } }
+  @media (max-width: 600px) { .glance { padding: 14px 14px 12px; } .g-sent { font-size: 17px !important; } .calib { grid-template-columns: 1fr; } .calib > div:first-child { max-width: 300px; } .bins .ib { padding-left: 12px; } details.sect { padding: 2px 14px; } }
 </style>
 </head>
 <body>
@@ -236,32 +290,54 @@
 <main class="wrap">
   <div class="head">
     <h1>Macro desk</h1>
-    <p class="lede">The <b>strategist</b> fetches the data and runs the tested Gold Macro Score; the <b>veteran</b> reads the same data with the professionals' frameworks and argues each topic. Paper only.</p>
+    <p class="lede">The veteran's week in one look, then the detail. Paper only.</p>
   </div>
-  <div class="strip" id="strip" aria-label="Consensus"></div>
+
+  <!-- 1. the glance (9 Nov 2026, owner: "be the best of all time veteran, more visual, simpler"): council/glance.mjs → veteran.json.summary -->
+  <section class="card glance" id="c-glance" aria-labelledby="g-h" hidden>
+    <p class="kick"><span id="g-h">This week</span><small id="g-at"></small></p>
+    <p class="g-sent" id="g-sent"></p>
+    <div class="g-grid">
+      <div class="tile" id="g-meter" aria-label="Bias for gold"></div>
+      <div class="tile" id="g-event" aria-label="The event that matters most"></div>
+      <div class="tile" id="g-levels" aria-label="Two levels to watch"></div>
+    </div>
+    <p class="g-pub"><b>Public data only.</b> CFTC positioning, Treasury and FRED series, the release calendar and central-bank feeds, read early and carefully. No inside information. <span id="g-cal"></span></p>
+  </section>
+
+  <div class="duo">
+    <section class="card" id="c-changes" aria-labelledby="chg-h" hidden><h2 id="chg-h">What changed since last week <small id="chg-sub"></small></h2><ul class="chg" id="chg"></ul></section>
+    <section class="card" id="c-calib" aria-labelledby="calib-h" hidden><h2 id="calib-h">Is he calibrated? <small id="calib-sub"></small></h2>
+      <div class="calib"><div id="calib-chart"></div><div id="calib-side"></div></div>
+      <details><summary>How the self-calibration works</summary><p class="note" id="calib-method"></p></details></section>
+  </div>
 
   <section class="card brief" id="c-brief" aria-labelledby="brief-h" hidden>
     <h2 id="brief-h">The veteran's briefing <small id="brief-at"></small></h2>
-    <p class="pubonly" id="brief-pub"></p>
-    <h3>Key insights this week <small>ranked: what matters most, the evidence, why, what would change the view</small></h3>
+    <h3>Key insights <small>ranked; tap one for the evidence</small></h3>
     <ol class="bins" id="brief-ins"></ol>
-    <h3>Hypotheses for the week <small>dated, on the record, scored on their date</small></h3>
+    <h3>Hypotheses for the week <small>on the record, scored on their date</small></h3>
     <div class="bhyp" id="brief-hyp"></div>
-    <h3>Price levels that matter now</h3>
-    <div class="blv" id="brief-lv"></div>
-    <h3>Historical analogs <small id="brief-an-sub"></small></h3>
-    <div id="brief-an"></div>
+    <details class="more"><summary>Price levels that matter now</summary><div class="blv" id="brief-lv"></div></details>
+    <details class="more"><summary>Historical analogs <small id="brief-an-sub"></small></summary><div id="brief-an"></div></details>
+    <p class="pubonly" id="brief-pub"></p>
   </section>
 
+  <details class="card more sect" id="c-calls-d"><summary>The veteran's calls <small>dated, with the chance of each</small></summary>
+  <section class="block" id="c-calls" aria-labelledby="calls-h"><h2 id="calls-h" class="sr">The veteran's calls <small id="calls-sub">specific, dated, with the chance of each happening</small></h2>
+    <div class="calls"><div><h3 id="calls-wk">This week</h3><ul class="pcall" id="calls-w"></ul></div><div><h3 id="calls-mo">This month</h3><ul class="pcall" id="calls-m"></ul></div></div>
+    <div id="calls-cot"></div><div id="calls-rec"></div><p class="note" id="calls-note"></p></section>
+  </details>
+
+  <details class="deep" id="deep"><summary>The discussion and the data <small>strategist vs veteran, sources, COT, ledger, library</small></summary>
+  <p class="lede2">The <b>strategist</b> fetches the data and runs the tested Gold Macro Score; the <b>veteran</b> reads the same data with the professionals' frameworks and argues each topic.</p>
+  <div class="strip" id="strip" aria-label="Consensus"></div>
   <div class="top3">
     <article class="card" id="c-strat"><h2>Macro strategist <small id="strat-at"></small></h2><div id="strat"></div></article>
     <article class="card" id="c-vet"><h2>Macro veteran <small id="vet-at"></small></h2><div id="vet"></div></article>
     <article class="card"><h2>Key insights today</h2><ul class="insights" id="insights"></ul></article>
   </div>
 
-  <section class="block card" id="c-calls" aria-labelledby="calls-h"><h2 id="calls-h">The veteran's calls <small id="calls-sub">specific, dated, with the chance of each happening</small></h2>
-    <div class="calls"><div><h3 id="calls-wk">This week</h3><ul class="pcall" id="calls-w"></ul></div><div><h3 id="calls-mo">This month</h3><ul class="pcall" id="calls-m"></ul></div></div>
-    <div id="calls-cot"></div><div id="calls-rec"></div><p class="note" id="calls-note"></p></section>
 
   <div class="tabs" role="tablist" aria-label="Sections">
     <button type="button" role="tab" data-t="debate" aria-selected="true">The discussion <span id="deb-n"></span></button>
@@ -296,6 +372,7 @@
     <h2>Veteran library <small id="lib-sub">gptmacro_v.1 · the owner's research batch, as delivered</small></h2>
     <div class="vlib" id="vlib"><div class="vlib-side"><details class="vlib-new" id="vlib-new" open hidden></details><div class="vlib-cpi" id="vlib-cpi"></div><nav class="vlib-nav" id="vlib-nav" aria-label="Documents"></nav></div><article class="vlib-doc" id="vlib-doc"><p class="note">Pick a document. Dated briefs and cases are historical examples: refresh their sources before using a figure today.</p></article></div>
   </section>
+  </details>
   <p class="note" id="foot"></p>
 </main>
 <section id="md-gate" style="padding:0 16px" hidden><div class="card" style="max-width:520px;margin:48px auto;text-align:center"><h2>Macro desk</h2><p>Sign in on the desk first, then come back here.</p><p><a href="/#home">Open the desk</a></p></div></section>
@@ -335,7 +412,7 @@
 
   // the veteran's dated calls and his summary of the registry data (council/outlook.mjs)
   function renderCalls(v) {
-    var o = v && v.outlook, sec = $('c-calls'); if (!o || !o.week) { sec.hidden = true; return; } sec.hidden = false;
+    var o = v && v.outlook, sec = $('c-calls-d'); if (!o || !o.week) { sec.hidden = true; return; } sec.hidden = false;
     var li = function (c) { var p = Math.round(c.p * 100); return '<li><b>' + p + '%</b><span>' + esc(c.claim) + '</span><i><s style="width:' + p + '%"></s></i></li>'; };
     $('calls-wk').textContent = 'This week · to ' + o.week.by; $('calls-w').innerHTML = o.week.list.map(li).join('');
     $('calls-mo').textContent = 'This month · to ' + o.month.by; $('calls-m').innerHTML = o.month.list.map(li).join('');
@@ -347,6 +424,75 @@
     $('calls-note').textContent = o.method + (o.tilt ? ' Council tilt now ' + (o.tilt > 0 ? '+' : '') + Math.round(o.tilt * 100) + ' points.' : ' Council tilt now zero: the strategist sees no tested edge, so these are the honest base rates.') + ' Paper only, not advice.';
     var d = o.digest || { list: [] }; $('dig').innerHTML = d.list.map(function (r) { return '<li><b>' + esc(r.src) + ':</b> ' + esc(r.read) + ' → <b>' + esc(r.says) + '</b><small>' + esc(r.limit || '') + '</small></li>'; }).join('') + (d.missing && d.missing.length ? '<li><small>Not observed by the council yet: ' + esc(d.missing.join(', ')) + '. The veteran does not guess them.</small></li>' : '');
   }
+  // ---- the glance (9 Nov 2026, owner: "be the best of all time veteran, more visual, simpler"): council/glance.mjs → veteran.json.summary
+  var usd = function (x) { return '$' + Math.round(+x).toLocaleString('en-US'); };
+  function renderGlance(v) {
+    var s = v && v.summary, sec = $('c-glance'); if (!s) { sec.hidden = true; return; } sec.hidden = false;
+    $('g-at').textContent = 'built ' + ago(v.at) + ' · paper only';
+    $('g-sent').textContent = s.sentence;
+    var b = s.bias;
+    if (b) { var cls = b.lean === 'supportive' ? 'sup' : b.lean === 'against' ? 'ag' : '', name = b.lean.charAt(0).toUpperCase() + b.lean.slice(1), ci = ['low', 'medium', 'high'].indexOf(b.confidence);
+      var pos = Math.max(2, Math.min(98, 50 + (+b.meter || 0) * 48));
+      $('g-meter').innerHTML = '<span class="lab">Gold bias</span><div class="hero ' + cls + '"><span class="dot" aria-hidden="true"></span>' + esc(name) + '</div>'
+        + '<div class="meter" role="img" aria-label="' + esc(name) + ': ' + pct(b.p) + ' chance higher, base ' + pct(b.base) + '"><i></i><i></i><i></i><s style="left:' + pos + '%"></s></div>'
+        + '<div class="mlab" aria-hidden="true"><span class="' + (b.lean === 'against' ? 'on' : '') + '">Against</span><span class="' + (b.lean === 'neutral' ? 'on' : '') + '">Neutral</span><span class="' + (b.lean === 'supportive' ? 'on' : '') + '">Supportive</span></div>'
+        + '<p class="sub"><b>' + pct(b.p) + '</b> chance gold is higher' + (b.by ? ' by ' + esc(b.by) : '') + ' · base <b>' + pct(b.base) + '</b></p>'
+        + '<p class="sub">Confidence ' + esc(b.confidence) + '<span class="pips" aria-hidden="true">' + [0, 1, 2].map(function (k) { return '<i class="' + (k <= ci ? 'on' : '') + '"></i>'; }).join('') + '</span> · ' + esc(b.why) + '</p>'
+        + (b.channels ? '<p class="sub">Channels: ' + b.channels.up + ' support · ' + b.channels.down + ' against · ' + b.channels.flat + ' flat' + (b.channels.unobserved ? ' · ' + b.channels.unobserved + ' not observed' : '') + '</p>' : '');
+    } else $('g-meter').innerHTML = '<span class="lab">Gold bias</span><p class="empty">No read yet.</p>';
+    var e = s.event, loc = function (iso) { return new Date(iso).toLocaleString([], { weekday: 'short', hour: '2-digit', minute: '2-digit' }); };
+    if (e) { var hrs = (Date.parse(e.at) - Date.now()) / 36e5, rel = hrs > 0 ? 'in ' + (hrs >= 48 ? Math.round(hrs / 24) + ' days' : Math.round(hrs) + ' h') : 'released';
+      $('g-event').innerHTML = '<span class="lab">The event that matters most</span><div class="hero">' + esc((e.country ? e.country + ' ' : '') + e.title) + '</div>'
+        + '<p class="sub"><b>' + esc(e.when) + '</b> · ' + esc(rel) + '<br><small>your time: ' + esc(loc(e.at)) + '</small></p>'
+        + '<p class="sub">' + (e.consensus != null ? 'Expected <b>' + esc(e.consensus) + '</b>' : 'No consensus yet') + (e.previous != null ? ' · previous ' + esc(e.previous) : '') + (num(e.goldMovePct) ? ' · gold typically moves ±' + esc(e.goldMovePct) + '% that day' : '') + '</p>'; }
+    else $('g-event').innerHTML = '<span class="lab">The event that matters most</span><div class="hero">None scheduled</div><p class="sub">No red-folder release this week: gold trades on rates and the dollar.</p>';
+    var L = s.levels;
+    if (L && (L.above || L.below)) { var row = function (cls, ar, x, txt) { return '<div><span class="ar ' + cls + '" aria-hidden="true">' + ar + '</span><b>' + usd(x) + '</b><small>' + txt + '</small></div>'; };
+      $('g-levels').innerHTML = '<span class="lab">Two levels to watch</span><div class="ldr">'
+        + (L.above ? row('up', '▲', L.above.price, esc(L.above.label) + ' · ' + sg(L.above.dist, 1) + '%') : '')
+        + row('now', '●', L.px, 'last close ' + esc(L.asOf))
+        + (L.below ? row('dn', '▼', L.below.price, esc(L.below.label) + ' · ' + sg(L.below.dist, 1) + '%') : '') + '</div>'
+        + '<p class="sub">A daily close beyond either is the week\'s first real move.</p>'; }
+    else $('g-levels').innerHTML = '<span class="lab">Two levels to watch</span><p class="empty">No price history.</p>';
+    var cal = v.calibration; $('g-cal').textContent = cal ? 'Self-calibration: ' + (cal.status === 'active' ? cal.state + ' (k = ' + cal.k + ')' : 'waiting (' + cal.n + ' of ' + ((cal.need && cal.need.scored) || 30) + ' scored calls)') + '.' : '';
+  }
+  function renderChanges(v) {
+    var c = v && v.changes, sec = $('c-changes'); if (!c) { sec.hidden = true; return; } sec.hidden = false;
+    $('chg-sub').textContent = c.first ? 'starts next week' : 'vs ' + String(c.since || c.sinceWeek || '').slice(0, 10);
+    if (c.first || !c.items.length) { var s0 = v.summary || {}, b0 = s0.bias, br = v.briefing || {};
+      $('chg').innerHTML = '<li class="first">' + esc(c.line) + '</li>' + (c.first ? '<li class="first"><small>Next week is compared against this one:</small></li>'
+        + [b0 ? 'Bias ' + b0.lean + ' (' + pct(b0.p) + ')' : null, s0.levels ? 'Gold ' + usd(s0.levels.px) + ' (close ' + s0.levels.asOf + ')' : null, (br.insights || []).length + ' insights, top: ' + ((br.insights || [])[0] || {}).title, (br.hypotheses || []).length + ' hypotheses due ' + (((br.hypotheses || [])[0] || {}).by || '')]
+          .filter(Boolean).map(function (t) { return '<li><span class="ic" aria-hidden="true">•</span><span><span class="tag">baseline</span>' + esc(t) + '</span></li>'; }).join('') : ''); return; }
+    var main = c.items.filter(function (x) { return x.area !== 'hypothesis'; }), hy = c.items.filter(function (x) { return x.area === 'hypothesis'; });
+    var li = function (x) { return '<li class="' + (x.area === 'hypothesis' ? 'hy' : '') + '"><span class="ic ' + (x.dir > 0 ? 'up' : x.dir < 0 ? 'dn' : '') + '" aria-hidden="true">' + (x.dir > 0 ? '▲' : x.dir < 0 ? '▼' : '•') + '</span><span><span class="tag">' + esc(x.area) + '</span>' + esc(x.text) + '</span></li>'; };
+    $('chg').innerHTML = main.map(li).join('') + hy.map(li).join('');
+  }
+  // reliability: stated probability (x) vs how often it came true (y), 10-point bins, 95% Wilson whiskers; dot area ~ number of calls
+  function calibSvg(c) {
+    var X = function (p) { return 44 + p * 202; }, Y = function (p) { return 222 - p * 212; }, g = '';
+    for (var k = 0; k <= 4; k++) { var t = k / 4; g += '<line class="grid" x1="' + X(0) + '" x2="' + X(1) + '" y1="' + Y(t) + '" y2="' + Y(t) + '"/><text x="' + (X(0) - 6) + '" y="' + (Y(t) + 3) + '" text-anchor="end">' + (t * 100) + '%</text><text x="' + X(t) + '" y="238" text-anchor="middle">' + (t * 100) + '%</text>'; }
+    g += '<line class="diag" x1="' + X(0) + '" y1="' + Y(0) + '" x2="' + X(1) + '" y2="' + Y(1) + '"/><line class="ax" x1="' + X(0) + '" y1="' + Y(0) + '" x2="' + X(1) + '" y2="' + Y(0) + '"/>';
+    g += '<text x="' + X(0.5) + '" y="256" text-anchor="middle">he said (stated %)</text><text transform="translate(10 ' + Y(0.5) + ') rotate(-90)" text-anchor="middle">came true</text>';
+    var any = false; (c.bins || []).forEach(function (b) { if (!b.n) return; any = true; var x = X(b.stated), y = Y(b.came), rr = Math.min(11, 4 + Math.sqrt(b.n) * 1.2), tip = Math.round(b.lo * 100) + '-' + Math.round(b.hi * 100) + '% calls: ' + b.n + ', said ' + pct(b.stated) + ' on average, came true ' + pct(b.came) + (b.ci && b.ci[0] != null ? ' (95% ' + pct(b.ci[0]) + '-' + pct(b.ci[1]) + ')' : '');
+      if (b.ci && b.ci[0] != null) g += '<line class="ci" x1="' + x + '" x2="' + x + '" y1="' + Y(b.ci[0]) + '" y2="' + Y(b.ci[1]) + '"/>';
+      g += '<g><title>' + esc(tip) + '</title><circle class="hit" cx="' + x + '" cy="' + y + '" r="16"/><circle class="pt" cx="' + x + '" cy="' + y + '" r="' + rr.toFixed(1) + '"/></g>'; });
+    if (!any) g += '<text class="empty-t" x="' + X(0.36) + '" y="' + Y(0.86) + '" text-anchor="middle">No scored calls yet</text><text x="' + X(0.36) + '" y="' + Y(0.86) + '" dy="15" text-anchor="middle">dots appear as calls come due</text>';
+    return '<svg viewBox="0 0 256 262" role="img" aria-label="Reliability chart: stated probability against how often the calls came true; on the dashed line means calibrated">' + g + '</svg>';
+  }
+  function renderCalib(v) {
+    var c = v && v.calibration, sec = $('c-calib'); if (!c) { sec.hidden = true; return; } sec.hidden = false;
+    var need = c.need || { scored: 30, weeks: 4 }, ready = c.status === 'active';
+    $('calib-sub').textContent = ready ? 'adjusting: k = ' + c.k : 'waiting for ' + need.scored + ' scored calls';
+    $('calib-chart').innerHTML = calibSvg(c);
+    var src = c.bySource || {}, names = { call: 'dated calls', hypothesis: 'hypotheses', cot: 'COT calls', ledger: 'weekly ledger' };
+    $('calib-side').innerHTML = '<div class="cbig">' + c.n + '<small>of ' + need.scored + ' scored · ' + c.weeks + ' of ' + need.weeks + ' weeks</small></div>'
+      + '<div class="prog" role="img" aria-label="' + c.n + ' of ' + need.scored + ' scored calls"><i style="width:' + Math.min(100, Math.round(c.n / need.scored * 100)) + '%"></i></div>'
+      + '<p><b>' + esc(c.line) + '</b></p>'
+      + (c.inTheLarge ? '<p>Overall: said <b>' + pct(c.inTheLarge.stated) + '</b>, came true <b>' + pct(c.inTheLarge.came) + '</b>.</p>' : '')
+      + (c.brier != null ? '<p>Brier ' + c.brier + (c.brierBase != null ? ' vs base rates ' + c.brierBase : '') + (c.brierAdjusted != null ? ' · after k (in-sample) ' + c.brierAdjusted : '') + ' <small>(lower is better; 0.25 = coin flip)</small></p>' : '')
+      + (Object.keys(src).length ? '<p><small>' + Object.keys(src).map(function (k) { return esc(names[k] || k) + ' ' + src[k].n + ' (' + pct(src[k].hit) + ' true vs ' + pct(src[k].stated) + ' said)'; }).join(' · ') + '</small></p>' : '');
+    $('calib-method').textContent = c.method || '';
+  }
   // the veteran's briefing (council/briefing.mjs → veteran.json.briefing): insights → hypotheses → levels → analogs
   function renderBrief(v) {
     var b = v && v.briefing, sec = $('c-brief'); if (!b) { sec.hidden = true; return; } sec.hidden = false;
@@ -354,16 +500,16 @@
     $('brief-pub').textContent = b.publicOnly || '';
     var leanTag = function (l) { return l > 0 ? '<span class="lean up">supports gold</span>' : l < 0 ? '<span class="lean dn">weighs on gold</span>' : '<span class="lean">no lean</span>'; };
     $('brief-ins').innerHTML = (b.insights || []).map(function (i) {
-      return '<li><b>' + esc(i.title) + leanTag(i.lean) + '</b><ul>' + i.evidence.map(function (e) { return '<li>' + esc(e.text) + ' <small>· as of ' + esc(e.asOf) + ' · ' + esc(e.source) + '</small></li>'; }).join('') + '</ul>'
-        + '<p><em>Why for gold:</em> ' + esc(i.why) + '</p>' + (i.fx ? '<p><em>Dollar and majors:</em> ' + esc(i.fx) + '</p>' : '') + '<p><em>What would change the view:</em> ' + esc(i.change) + '</p></li>';
+      return '<li class="ins"><details><summary><span class="rk">' + i.rank + '</span><span>' + esc(i.title) + leanTag(i.lean) + '</span></summary><div class="ib"><ul>' + i.evidence.map(function (e) { return '<li>' + esc(e.text) + ' <small>· as of ' + esc(e.asOf) + ' · ' + esc(e.source) + '</small></li>'; }).join('') + '</ul>'
+        + '<p><em>Why for gold:</em> ' + esc(i.why) + '</p>' + (i.fx ? '<p><em>Dollar and majors:</em> ' + esc(i.fx) + '</p>' : '') + '<p><em>What would change the view:</em> ' + esc(i.change) + '</p></div></details></li>';
     }).join('') || '<li class="empty">No insights yet.</li>';
     var hy = b.hypotheses || [];
     $('brief-hyp').innerHTML = hy.length ? hy.map(function (h) { var bs = h.base || {}, st = h.hit === true ? ' · came true' : h.hit === false ? ' · did not happen' : '';
       return '<article><div class="pp">' + Math.round(h.p * 100) + '%<small>' + esc(h.slot) + ' · ' + esc(h.horizon) + '</small></div>'
-        + '<p><b>' + esc(h.claim) + '</b></p>'
+        + '<p><b>' + esc(h.claim) + '</b></p><p><em>Due ' + esc(h.by) + st + '</em>' + (num(h.pRaw) && h.pRaw !== h.p ? ' <em>· ' + pct(h.pRaw) + ' before calibration</em>' : '') + '</p><details><summary>Why, and what breaks it</summary>'
         + '<p><em>Base:</em> ' + (bs.n ? bs.k + ' of ' + bs.n + ' analogs (' + pct(bs.analog) + ') vs ' + pct(bs.all) + ' of all ' + (bs.allN || '') + ' weeks' : '—') + '. ' + esc(h.why) + '</p>'
         + '<p><em>Invalidated by:</em> ' + esc(h.invalid) + '</p>'
-        + '<p><em>On the record:</em> ' + (h.issued ? 'issued ' + esc(h.issued) : 'recorded on the next run') + ', due ' + esc(h.by) + st + (h.live ? ' · live reading now: ' + esc(h.live.claim) + ' (' + pct(h.live.p) + ')' : '') + '</p></article>'; }).join('')
+        + '<p><em>On the record:</em> ' + (h.issued ? 'issued ' + esc(h.issued) : 'recorded on the next run') + ', due ' + esc(h.by) + st + (h.live ? ' · live reading now: ' + esc(h.live.claim) + ' (' + pct(h.live.p) + ')' : '') + '</p></details></article>'; }).join('')
       + (b.record ? '<p class="note" style="grid-column:1/-1">' + (b.record.n ? 'Hypotheses scored: ' + b.record.n + ', <b>' + pct(b.record.hitRate) + ' came true</b> vs ' + pct(b.record.expected) + ' expected, Brier ' + b.record.brier + '; ' + b.record.open + ' open.' : 'Track record: ' + (b.record.open || 0) + ' hypotheses on the record, none due yet.') + '</p>' : '')
       : '<p class="empty">No hypothesis this run (too little history for the analogs).</p>';
     var lv = b.levels || {};
@@ -480,7 +626,7 @@
     Promise.all([get('macro/forecast.json'), get('macro/veteran.json'), get('macro/cache.json'), get('macro/veteran-ledger.json')]).then(function (x) {
       var fc = x[0], v = x[1], cache = x[2], L = x[3];
       $('when').textContent = fc && fc.at ? 'strategist ' + ago(fc.at) + (v && v.at ? ' · veteran ' + ago(v.at) : '') : 'No macro data yet';
-      renderStrip(fc, v); renderStrat(fc); renderVet(v); renderDebate(v); renderInsights(fc, v, cache); renderSource(fc, cache); renderLedger(v, L); renderCalls(v); renderBrief(v); get('macro/cot.json').then(renderCot);
+      renderGlance(v); renderChanges(v); renderCalib(v); renderStrip(fc, v); renderStrat(fc); renderVet(v); renderDebate(v); renderInsights(fc, v, cache); renderSource(fc, cache); renderLedger(v, L); renderCalls(v); renderBrief(v); get('macro/cot.json').then(renderCot);
       $('foot').textContent = 'Paper only. The strategist and the veteran change no rule, size or trade; the owner decides. Data: council-data macro/forecast.json, macro/veteran.json, macro/cache.json, macro/veteran-ledger.json.';
     });
   }
@@ -522,6 +668,7 @@
   // tabs (the owner: "i dont like to scroll down all the time"): one lower section at a time, remembered per browser
   var tabs = document.querySelectorAll('.tabs [data-t]'); function showTab(t) { tabs.forEach(function (b) { b.setAttribute('aria-selected', String(b.dataset.t === t)); }); ['debate', 'source', 'cot', 'ledger', 'library'].forEach(function (k) { $('tab-' + k).hidden = k !== t; }); if (t === 'library') loadLib(); try { localStorage.setItem('mdTab', t); } catch (e) {} }
   tabs.forEach(function (b) { b.addEventListener('click', function () { showTab(b.dataset.t); }); }); try { var t0 = localStorage.getItem('mdTab'); if (t0 && $('tab-' + t0)) showTab(t0); } catch (e) {}
+  var deep = $('deep'); try { if (localStorage.getItem('mdDeep') === '1') deep.open = true; } catch (e) {} deep.addEventListener('toggle', function () { try { localStorage.setItem('mdDeep', deep.open ? '1' : '0'); } catch (e) {} });
   load(); setInterval(load, 5 * 60e3);
 })();
 </script>

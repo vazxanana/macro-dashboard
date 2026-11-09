@@ -21,21 +21,21 @@ const freq = (P, f) => P.filter(f).length / P.length;
 export function calls({ closes, now, h, tilt = 0, name = 'Gold', dp = 0, unit = '', asset = null }) {
   const P = paths(closes, h, { now }); const s = (closes || []).filter((o) => o.t <= now); if (!P || !s.length) return null;
   const px = s[s.length - 1].v, by = addSessions(Math.min(now, s[s.length - 1].t), h), fmt = (v) => (unit === '$' ? '$' : '') + v.toLocaleString('en-US', { minimumFractionDigits: dp, maximumFractionDigits: dp });
-  const up = clamp(freq(P, (p) => p.end > 0) + tilt);
+  const up0 = freq(P, (p) => p.end > 0), up = clamp(up0 + tilt);
   const step = px > 1000 ? 10 : px > 100 ? 0.5 : 0.005, rnd = (v) => Math.round(v / step) * step;
-  const lvl = (qq, k) => { const L = rnd(px * (1 + q(P.map((p) => p[k]), qq))), r = L / px - 1; return { L, p: clamp(freq(P, (p) => (k === 'hi' ? p.hi >= r : p.lo <= r)) + (k === 'hi' ? 1 : -1) * tilt * 0.8) }; };
+  const lvl = (qq, k) => { const L = rnd(px * (1 + q(P.map((p) => p[k]), qq))), r = L / px - 1; const f0 = freq(P, (p) => (k === 'hi' ? p.hi >= r : p.lo <= r)); return { L, p: clamp(f0 + (k === 'hi' ? 1 : -1) * tilt * 0.8), b: +f0.toFixed(3) }; };
   const U = lvl(0.5, 'hi'), U2 = lvl(0.85, 'hi'), D = lvl(0.5, 'lo'), D2 = lvl(0.15, 'lo');
   const lo = q(P.map((p) => p.end), 0.2 - tilt / 2), hi = q(P.map((p) => p.end), 0.8 - tilt / 2);
   const big = Math.max(Math.abs(q(P.map((p) => p.end), 0.1)), q(P.map((p) => p.end), 0.9)), pBig = freq(P, (p) => Math.abs(p.end) >= big);
   const A = asset || name.toLowerCase(), r4 = (v) => +(+v).toPrecision(8);
   return { horizon: h, by, from: fmt(px), n: P.length, list: [
-    { claim: `${name} closes ${by} above ${fmt(px)} (today's close)`, p: +up.toFixed(2), asset: A, kind: 'closeAbove', level: r4(px), by },
-    { claim: `${name} closes at or above ${fmt(U.L)} on some day by ${by}`, p: +U.p.toFixed(2), asset: A, kind: 'touchUp', level: r4(U.L), by },
-    { claim: `${name} closes at or above ${fmt(U2.L)} on some day by ${by} (stretch)`, p: +U2.p.toFixed(2), asset: A, kind: 'touchUp', level: r4(U2.L), by },
-    { claim: `${name} closes at or below ${fmt(D.L)} on some day by ${by}`, p: +D.p.toFixed(2), asset: A, kind: 'touchDown', level: r4(D.L), by },
-    { claim: `${name} closes at or below ${fmt(D2.L)} on some day by ${by} (stretch)`, p: +D2.p.toFixed(2), asset: A, kind: 'touchDown', level: r4(D2.L), by },
-    { claim: `${name}'s ${by} close lands between ${fmt(px * (1 + lo))} and ${fmt(px * (1 + hi))}`, p: 0.6, asset: A, kind: 'range', lo: r4(px * (1 + lo)), hi: r4(px * (1 + hi)), by },
-    { claim: `${name} moves ${(big * 100).toFixed(1)}% or more either way by ${by}`, p: +pBig.toFixed(2), asset: A, kind: 'bigMove', level: r4(px), pct: +big.toFixed(4), by },
+    { claim: `${name} closes ${by} above ${fmt(px)} (today's close)`, p: +up.toFixed(2), baseP: +up0.toFixed(3), asset: A, kind: 'closeAbove', level: r4(px), by },
+    { claim: `${name} closes at or above ${fmt(U.L)} on some day by ${by}`, p: +U.p.toFixed(2), baseP: U.b, asset: A, kind: 'touchUp', level: r4(U.L), by },
+    { claim: `${name} closes at or above ${fmt(U2.L)} on some day by ${by} (stretch)`, p: +U2.p.toFixed(2), baseP: U2.b, asset: A, kind: 'touchUp', level: r4(U2.L), by },
+    { claim: `${name} closes at or below ${fmt(D.L)} on some day by ${by}`, p: +D.p.toFixed(2), baseP: D.b, asset: A, kind: 'touchDown', level: r4(D.L), by },
+    { claim: `${name} closes at or below ${fmt(D2.L)} on some day by ${by} (stretch)`, p: +D2.p.toFixed(2), baseP: D2.b, asset: A, kind: 'touchDown', level: r4(D2.L), by },
+    { claim: `${name}'s ${by} close lands between ${fmt(px * (1 + lo))} and ${fmt(px * (1 + hi))}`, p: 0.6, baseP: 0.6, asset: A, kind: 'range', lo: r4(px * (1 + lo)), hi: r4(px * (1 + hi)), by },
+    { claim: `${name} moves ${(big * 100).toFixed(1)}% or more either way by ${by}`, p: +pBig.toFixed(2), baseP: +pBig.toFixed(3), asset: A, kind: 'bigMove', level: r4(px), pct: +big.toFixed(4), by },
   ] };
 }
 // the registry digest: what the hard-to-get public data says right now, in plain words, and what the council cannot see
@@ -89,6 +89,7 @@ export function callsLedger(ledger, { outlook, closesBy, now, extra = [] }) {
   for (const c of all) { if (!c.kind || !c.by) continue; const id = c.id || `${c.asset}:${c.kind}:${c.level ?? c.lo}:${c.by}`; if (have.has(id)) continue;
     // one record per call: issued the first day it appears (the same call re-issued on later days is not counted twice)
     L.push({ id, issued: today, claim: c.claim, p: c.p, asset: c.asset, kind: c.kind, level: c.level ?? null, lo: c.lo ?? null, hi: c.hi ?? null, pct: c.pct ?? null, by: c.by, src: c.src || 'base rate + council tilt',
+      ...(Number.isFinite(c.baseP) ? { baseP: c.baseP } : {}), ...(Number.isFinite(c.pRaw) && c.pRaw !== c.p ? { pRaw: c.pRaw } : {}),
       ...(c.guard != null ? { guard: c.guard } : {}), ...(c.base ? { base: { analog: c.base.analog, n: c.base.n, all: c.base.all } } : {}) }); have.add(id); }
   for (const r of L) if (r.hit == null) { const h = resolveCall(r, closesBy[r.asset], now); if (h != null) { r.hit = h; r.resolvedAt = today; r.brier = +((r.p - (h ? 1 : 0)) ** 2).toFixed(4); } }
   return L.slice(-600);
@@ -107,6 +108,6 @@ export function cotCalls(cot, pxByAsset, now) {
     const h = s.kind === 'extreme' ? 20 : 5, closes = pxByAsset[m.k] || []; const last = closes.filter((o) => o.t <= now).at(-1); if (!last) continue;
     const by = addSessions(Math.min(now, last.t), h), dp = last.v > 50 ? 2 : 4;
     out.push({ claim: `${m.name} closes ${by} ${s.pairDir > 0 ? 'above' : 'below'} ${last.v.toFixed(dp)} (COT ${s.kind} signal; tested ${t.n} times since 2020, right ${Math.round(t.win * 100)}%)`,
-      p: +Math.min(0.75, Math.max(0.5, t.win)).toFixed(2), asset: m.k, kind: s.pairDir > 0 ? 'pairUp' : 'pairDown', level: +last.v.toPrecision(8), by, src: `COT ${s.kind}` }); }
+      p: +Math.min(0.75, Math.max(0.5, t.win)).toFixed(2), ...(Number.isFinite(t.base) ? { baseP: +(s.pairDir > 0 ? t.base : 1 - t.base).toFixed(3) } : {}), asset: m.k, kind: s.pairDir > 0 ? 'pairUp' : 'pairDown', level: +last.v.toPrecision(8), by, src: `COT ${s.kind}` }); }
   return out;
 }
