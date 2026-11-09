@@ -65,7 +65,7 @@ export function cardOf(score) {
   if (score > 0.25) return { bias: 'BUY', conviction: 'Medium', label: 'BUY · Medium' };
   return { bias: 'AUCTION', conviction: null, label: 'AUCTION (no macro edge)' };
 }
-export const STALE_DAYS = 10, STALE_STOP_DAYS = 28;
+export const STALE_DAYS = 10, STALE_STOP_DAYS = 28, HIST_WEEKS = 26;
 const INPUT_NAME = { ry: 'real yield', y2: '2Y yield', y10: '10Y yield', dxy: 'DXY' };
 const r2 = (x, d = 2) => (x == null || !Number.isFinite(x) ? null : +(+x).toFixed(d));
 // daily: { ry (DFII10), y2 (DGS2), y10 (DGS10), dxy } as [{ t, v }]; gold (optional, daily closes) for the 10-week tiebreaker
@@ -80,6 +80,8 @@ export function goldMacroScore({ ry, y2, y10, dxy, gold = null }, { from = FROM,
   let last = score.length - 1; while (last >= 0 && score[last] == null) last--;
   if (last < 0) { const have = Object.fromEntries(keys.map((k) => [k, z[k].filter((v) => v != null).length])); return { ok: false, why: `fewer than ${minObs} weeks of history for a driver`, have, score: null, weeks: W.length, ...cardOf(null) }; }
   const path = []; for (let i = Math.max(0, last - 5); i <= last; i++) path.push(r2(score[i]));
+  // the longer path for the desk's sparkline (9 Nov 2026, owner: "more visual"): up to HIST_WEEKS weekly [Friday, score] pairs, gaps kept as null
+  const hist = []; for (let i = Math.max(0, last - HIST_WEEKS + 1); i <= last; i++) hist.push([isoDay(W[i]), r2(score[i])]);
   // optional tiebreaker from the skill: score > +0.25 and gold above its 10-week average won 70% vs 68% without it
   let trend = null; if (gold && gold.length) { const G = weeklyFrame({ g: cut(gold) }, from).cols.g, j = G.length - 1; if (j >= 9 && G.slice(j - 9, j + 1).every((v) => v != null)) { const m = G.slice(j - 9, j + 1).reduce((s, v) => s + v, 0) / 10; trend = { above10w: G[j] > m, last: r2(G[j]), avg10w: r2(m) }; } }
   const nowT = asOf === Infinity ? Math.floor(Date.now() / 1000) : asOf, partial = W[last] > nowT;
@@ -92,7 +94,7 @@ export function goldMacroScore({ ry, y2, y10, dxy, gold = null }, { from = FROM,
   const dead = stale.filter((x) => x.days == null || x.days > STALE_STOP_DAYS);
   if (dead.length) return { ok: false, why: `stale input: ${dead.map((x) => `${x.name} last ${x.last || 'never'}`).join(', ')}`, stale, score: null, weeks: W.length, ...cardOf(null) };
   return { ok: true, asOf: isoDay(W[last]), partial, stale, score: r2(score[last]), z: Object.fromEntries(keys.map((k) => [k, r2(z[k][last])])), raw: Object.fromEntries(keys.map((k) => [k, r2(raw[k][last], 4)])),
-    path, weeks: last + 1, trend, ...cardOf(score[last]),
+    path, hist, weeks: last + 1, trend, ...cardOf(score[last]),
     rule: 'direction only, long-or-flat: > +0.5 BUY High, +0.25..+0.5 BUY Medium, else AUCTION; a negative score is not a sell (skill test 2007-26: no short edge). Paper reading; nothing trades on it.' };
 }
 // one line for the brief / the Analyst report
