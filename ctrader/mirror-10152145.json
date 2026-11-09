@@ -1626,7 +1626,7 @@
     "lots": 0.04,
     "digits": 5,
     "setup": "scalp",
-    "status": "open",
+    "status": "closed at broker",
     "openedAt": "2026-11-09T11:04:01.000Z",
     "councilEntry": 1.11942,
     "stop": 1.11892,
@@ -1640,10 +1640,12 @@
     "slipR": -0.02,
     "lagSec": 61,
     "alerted": [
-     "open"
+     "open",
+     "close"
     ],
     "stopCheckedAt": "2026-11-09T11:04:01.000Z",
-    "brokerStop": 1.11891
+    "brokerStop": 1.11891,
+    "closedAt": "2026-11-09T11:55:52.000Z"
    },
    "eurusd-scalp-1794222778": {
     "symbol": "EURUSD",
@@ -1655,7 +1657,8 @@
     "t1": 1.1204699999999999,
     "adopted": false,
     "alerted": [
-     "open"
+     "open",
+     "close"
     ],
     "viaLimit": true,
     "limitPrice": 1.11947,
@@ -1669,7 +1672,8 @@
     "lagSec": 142,
     "positionId": "47602855",
     "volume": 400000,
-    "status": "open"
+    "status": "closed at broker",
+    "closedAt": "2026-11-09T11:55:52.000Z"
    },
    "xau-scalp-1794222860": {
     "positionId": "47603258",
@@ -1707,7 +1711,7 @@
     "lots": 0.04,
     "digits": 5,
     "setup": "scalp",
-    "status": "open",
+    "status": "closed at broker",
     "openedAt": "2026-11-09T11:15:20.000Z",
     "councilEntry": 1.34227,
     "stop": 1.3418400000000001,
@@ -1721,10 +1725,12 @@
     "slipR": -0.023,
     "lagSec": 60,
     "alerted": [
-     "open"
+     "open",
+     "close"
     ],
     "stopCheckedAt": "2026-11-09T11:15:20.000Z",
-    "brokerStop": 1.34183
+    "brokerStop": 1.34183,
+    "closedAt": "2026-11-09T11:55:52.000Z"
    },
    "eth-rscalp-1794223067": {
     "positionId": "47605800",
@@ -1890,6 +1896,32 @@
     ],
     "stopCheckedAt": "2026-11-09T11:44:08.000Z",
     "brokerStop": 0.68995
+   },
+   "eurusd-scalp-1794217739": {
+    "symbol": "EURUSD",
+    "side": "buy",
+    "setup": "scalp",
+    "openedAt": "2026-11-09T11:55:52.000Z",
+    "councilEntry": 1.11896,
+    "stop": 1.11846,
+    "t1": 1.1199599999999998,
+    "adopted": false,
+    "alerted": [
+     "open"
+    ],
+    "viaLimit": true,
+    "limitPrice": 1.11896,
+    "digits": 5,
+    "lots": 0.04,
+    "riskCash": 2,
+    "margin": 8.95,
+    "shadow": true,
+    "fillPrice": 1.11895,
+    "slipR": -0.02,
+    "lagSec": 7613,
+    "positionId": "47582433",
+    "volume": 400000,
+    "status": "open"
    }
   },
   "day": {
@@ -1897,7 +1929,7 @@
    "startBalance": 9987.78
   },
   "startedAt": "2026-11-08T11:42:25.000Z",
-  "status": "ok · demo Fusion Markets · balance 10013.24 · 32 open · 5 resting",
+  "status": "ok · demo Fusion Markets · balance 10006.76 · 30 open · 5 resting",
   "skipped": {
    "audusd-position-1793601653": "price 0.68666 has run 1.27R from the council entry 0.70162: a different trade now",
    "xrp-rswing-1793942619": "none of XRPUSD found at the broker",
@@ -1951,26 +1983,6 @@
      "pending"
     ]
    },
-   "eurusd-scalp-1794217739": {
-    "orderId": "33793561",
-    "symbol": "EURUSD",
-    "side": "buy",
-    "volume": 400000,
-    "lots": 0.04,
-    "digits": 5,
-    "setup": "scalp",
-    "limitPrice": 1.11896,
-    "stop": 1.11846,
-    "t1": 1.1199599999999998,
-    "placedAt": "2026-11-09T09:50:03.000Z",
-    "expires": "2026-11-09T12:48:59.000Z",
-    "riskCash": 2,
-    "margin": 8.95,
-    "shadow": true,
-    "alerted": [
-     "pending"
-    ]
-   },
    "btc-rscalp-1794223067": {
     "orderId": "33797772",
     "symbol": "BTCUSD",
@@ -2012,38 +2024,33 @@
     "alerted": [
      "pending"
     ]
+   },
+   "eurusd-intraday-1794225280": {
+    "orderId": "33799470",
+    "symbol": "EURUSD",
+    "side": "sell",
+    "volume": 300000,
+    "lots": 0.03,
+    "digits": 5,
+    "setup": "intraday",
+    "limitPrice": 1.11902,
+    "stop": 1.11968,
+    "t1": 1.11311,
+    "placedAt": "2026-11-09T11:55:52.000Z",
+    "expires": "2026-11-09T23:54:40.000Z",
+    "riskCash": 2,
+    "margin": 6.71,
+    "shadow": true,
+    "alerted": [
+     "pending"
+    ]
    }
   },
   "catchUpAt": "2026-11-08T12:04:40.000Z",
-  "balance": 10013.24,
-  "lastRun": "2026-11-09T11:53:18.000Z"
+  "balance": 10006.76,
+  "lastRun": "2026-11-09T11:55:52.000Z"
  },
  "log": [
-  {
-   "at": "2026-11-08T21:10:04.000Z",
-   "msg": "not mirrored yet gbpusd-intraday-1793805393: GBPUSD market closed (paused until 21:20 UTC) (will retry)",
-   "trade": "gbpusd-intraday-1793805393"
-  },
-  {
-   "at": "2026-11-08T21:10:04.000Z",
-   "msg": "not mirrored yet eurusd-intraday-1793890935: EURUSD market closed (paused until 21:20 UTC) (will retry)",
-   "trade": "eurusd-intraday-1793890935"
-  },
-  {
-   "at": "2026-11-08T21:10:04.000Z",
-   "msg": "not mirrored yet gbpusd-scalp-1793916690: GBPUSD market closed (paused until 21:20 UTC) (will retry)",
-   "trade": "gbpusd-scalp-1793916690"
-  },
-  {
-   "at": "2026-11-08T21:10:04.000Z",
-   "msg": "not mirrored yet usdcad-position-1793949081: USDCAD market closed (paused until 21:20 UTC) (will retry)",
-   "trade": "usdcad-position-1793949081"
-  },
-  {
-   "at": "2026-11-08T21:10:04.000Z",
-   "msg": "not mirrored yet usdcad-swing-1793949081: USDCAD market closed (paused until 21:20 UTC) (will retry)",
-   "trade": "usdcad-swing-1793949081"
-  },
   {
    "at": "2026-11-08T21:10:04.000Z",
    "msg": "not mirrored yet audusd-scalp-1793949425: AUDUSD market closed: MARKET_CLOSED: Trading is not available: Market is closed. (will retry)",
@@ -3518,6 +3525,31 @@
    "at": "2026-11-09T11:44:08.000Z",
    "msg": "opened buy AUDUSD 0.03 lot (council scalp)",
    "trade": "audusd-scalp-1794224588"
+  },
+  {
+   "at": "2026-11-09T11:55:52.000Z",
+   "msg": "limit filled: EURUSD position 47582433 at the broker",
+   "trade": "eurusd-scalp-1794217739"
+  },
+  {
+   "at": "2026-11-09T11:55:52.000Z",
+   "msg": "EURUSD position 47600543 closed at the broker",
+   "trade": "eurusd-scalp-1794222180"
+  },
+  {
+   "at": "2026-11-09T11:55:52.000Z",
+   "msg": "EURUSD position 47602855 closed at the broker",
+   "trade": "eurusd-scalp-1794222778"
+  },
+  {
+   "at": "2026-11-09T11:55:52.000Z",
+   "msg": "GBPUSD position 47603262 closed at the broker",
+   "trade": "gbpusd-scalp-1794222860"
+  },
+  {
+   "at": "2026-11-09T11:55:52.000Z",
+   "msg": "placed sell limit EURUSD 0.03 lot at 1.11902 (council intraday, valid to 2026-11-09T23:54Z)",
+   "trade": "eurusd-intraday-1794225280"
   }
  ],
  "limits": {
@@ -3596,11 +3628,11 @@
   ]
  },
  "execution": {
-  "n": 66,
+  "n": 67,
   "meanSlipR": -0.006,
   "medianSlipR": 0,
   "worstSlipR": 1.168,
-  "medianLagSec": 199.5,
+  "medianLagSec": 210,
   "bySymbol": {
    "SOLUSD": {
     "n": 5,
@@ -3615,8 +3647,8 @@
     "meanSlipR": -0.087
    },
    "EURUSD": {
-    "n": 10,
-    "meanSlipR": -0.04
+    "n": 11,
+    "meanSlipR": -0.038
    },
    "GBPUSD": {
     "n": 11,
