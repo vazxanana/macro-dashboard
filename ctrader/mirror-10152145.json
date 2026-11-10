@@ -5631,6 +5631,61 @@
     "positionId": "48147113",
     "volume": 400000,
     "status": "open"
+   },
+   "eurusd-scalp-1794328725": {
+    "positionId": "48157125",
+    "symbol": "EURUSD",
+    "side": "sell",
+    "volume": 600000,
+    "lots": 0.06,
+    "digits": 5,
+    "setup": "scalp",
+    "status": "open",
+    "openedAt": "2026-11-10T16:40:02.000Z",
+    "councilEntry": 1.11492,
+    "stop": 1.11524,
+    "t1": 1.1137400000000002,
+    "riskCash": 1.99,
+    "margin": 13.38,
+    "shadow": true,
+    "mark": 1.11492,
+    "levelsFrom": "mark",
+    "fillPrice": 1.11486,
+    "slipR": 0.187,
+    "lagSec": 77,
+    "alerted": [
+     "open"
+    ],
+    "stopCheckedAt": "2026-11-10T16:40:02.000Z",
+    "brokerStop": 1.11518
+   },
+   "usdchf-scalp-1794328725": {
+    "symbol": "USDCHF",
+    "side": "buy",
+    "setup": "scalp",
+    "openedAt": "2026-11-10T16:40:02.000Z",
+    "councilEntry": 0.8267,
+    "stop": 0.8262,
+    "t1": 0.8276999999999999,
+    "adopted": false,
+    "alerted": [
+     "open"
+    ],
+    "viaLimit": true,
+    "limitPrice": 0.8267,
+    "digits": 5,
+    "lots": 0.03,
+    "riskCash": 1.99,
+    "margin": 6,
+    "shadow": true,
+    "fillPrice": 0.82668,
+    "slipR": -0.04,
+    "lagSec": 77,
+    "positionId": "48157137",
+    "volume": 300000,
+    "status": "open",
+    "stopCheckedAt": "2026-11-10T16:40:02.000Z",
+    "brokerStop": 0.8262
    }
   },
   "day": {
@@ -5638,7 +5693,7 @@
    "startBalance": 9975.42
   },
   "startedAt": "2026-11-08T11:42:25.000Z",
-  "status": "ok · demo Fusion Markets · balance 9968.86 · 21 open · 1 resting",
+  "status": "ok · demo Fusion Markets · balance 9968.86 · 23 open · 1 resting",
   "skipped": {
    "audusd-position-1793601653": "price 0.68666 has run 1.27R from the council entry 0.70162: a different trade now",
    "gbpusd-intraday-1793805393": "price 1.33526 has run 3.46R from the council entry 1.3469: a different trade now",
@@ -5672,24 +5727,9 @@
   },
   "catchUpAt": "2026-11-08T12:04:40.000Z",
   "balance": 9968.86,
-  "lastRun": "2026-11-10T16:37:23.000Z"
+  "lastRun": "2026-11-10T16:40:02.000Z"
  },
  "log": [
-  {
-   "at": "2026-11-10T09:32:56.000Z",
-   "msg": "limit filled: BTCUSD position 47983029 at the broker",
-   "trade": "btc-rscalp-1794302960"
-  },
-  {
-   "at": "2026-11-10T09:37:03.000Z",
-   "msg": "BTCUSD position 47983029 closed at the broker",
-   "trade": "btc-rscalp-1794302960"
-  },
-  {
-   "at": "2026-11-10T09:41:51.000Z",
-   "msg": "placed sell limit EURUSD 0.01 lot at 1.12274 (council rscalp, valid to 2026-11-10T12:40Z)",
-   "trade": "eurusd-rscalp-1794303645"
-  },
   {
    "at": "2026-11-10T09:45:42.000Z",
    "msg": "cancelled EURUSD limit order 33855975 for eurusd-rscalp-1794303645: the council ended it: win",
@@ -7174,6 +7214,21 @@
    "at": "2026-11-10T16:22:01.000Z",
    "msg": "XAUUSD position 48107209 closed at the broker",
    "trade": "xau-rscalp-1794322967"
+  },
+  {
+   "at": "2026-11-10T16:40:02.000Z",
+   "msg": "opened sell EURUSD 0.06 lot (council scalp)",
+   "trade": "eurusd-scalp-1794328725"
+  },
+  {
+   "at": "2026-11-10T16:40:02.000Z",
+   "msg": "placed buy limit USDCHF 0.03 lot at 0.8267 (council scalp, valid to 2026-11-10T19:38Z)",
+   "trade": "usdchf-scalp-1794328725"
+  },
+  {
+   "at": "2026-11-10T16:40:02.000Z",
+   "msg": "limit filled at once: USDCHF position 48157137 at the broker at 0.82668",
+   "trade": "usdchf-scalp-1794328725"
   }
  ],
  "limits": {
@@ -7252,11 +7307,11 @@
   ]
  },
  "execution": {
-  "n": 189,
-  "meanSlipR": -0.02,
+  "n": 191,
+  "meanSlipR": -0.019,
   "medianSlipR": 0,
   "worstSlipR": 1.168,
-  "medianLagSec": 175,
+  "medianLagSec": 166,
   "bySymbol": {
    "SOLUSD": {
     "n": 16,
@@ -7271,8 +7326,8 @@
     "meanSlipR": -0.026
    },
    "EURUSD": {
-    "n": 35,
-    "meanSlipR": -0.049
+    "n": 36,
+    "meanSlipR": -0.042
    },
    "GBPUSD": {
     "n": 29,
@@ -7283,8 +7338,8 @@
     "meanSlipR": -0.066
    },
    "USDCHF": {
-    "n": 14,
-    "meanSlipR": 0.107
+    "n": 15,
+    "meanSlipR": 0.097
    },
    "AUDUSD": {
     "n": 27,
