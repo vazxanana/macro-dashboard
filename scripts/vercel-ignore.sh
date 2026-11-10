@@ -5,7 +5,7 @@
 # when something the site serves changed: the pages, the PWA files, assets, the API functions, the build itself or a
 # published edge study. Council code, tests, workflows and research scripts change nothing on the site.
 [ "$VERCEL_GIT_COMMIT_REF" = "main" ] || exit 0
-if git diff --quiet HEAD^ HEAD -- market-structure.html gold-trading.html index.html edge-lab.html macro-desk.html backtest.html manifest.json app.webmanifest sw.js offline.html icons icon-192.png icon-512.png robots.txt assets api vercel.json scripts package.json package-lock.json research/edge research/macro-veteran 2>/dev/null; then
+if git diff --quiet HEAD^ HEAD -- market-structure.html gold-trading.html index.html edge-lab.html macro-desk.html backtest.html manifest.json app.webmanifest sw.js offline.html icons icon-192.png icon-512.png robots.txt assets api academy academy.html vercel.json scripts package.json package-lock.json research/edge research/macro-veteran 2>/dev/null; then
   exit 0   # nothing the site serves changed
 fi
 exit 1

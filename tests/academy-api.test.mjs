@@ -463,7 +463,7 @@ test('isolation: the Academy API and risk engine hold no reference to the counci
   for (const f of ['assets/academy-risk.js', 'api/academy.js', 'api/_academy-store.js', 'api/_academy-llm.js']) assert.ok(!/\bimport\s*\(\s*['"]|^\s*import\s/m.test(src(f)), `${f}: no static or literal dynamic import`);
   // vercel.json: the function ships the generated data and /academy is routed like the other pages
   const v = JSON.parse(src('vercel.json'));
-  assert.deepEqual(v.functions['api/academy.js'], { maxDuration: 30, includeFiles: 'academy/data/**' });
+  assert.deepEqual(v.functions['api/academy.js'], { maxDuration: 30, includeFiles: 'academy/{edges.mjs,data/**}' });
   assert.ok(v.rewrites.some((r) => r.source === '/academy' && r.destination === '/academy.html'));
 });
 
