@@ -1235,6 +1235,34 @@
     ],
     "stopCheckedAt": "2026-11-10T12:52:24.000Z",
     "brokerStop": 84.041
+   },
+   "sol-replica-1794316864-s": {
+    "positionId": "48045459",
+    "symbol": "SOLUSD",
+    "side": "sell",
+    "volume": 1000,
+    "lots": 0.01,
+    "digits": 3,
+    "setup": "replica",
+    "status": "open",
+    "openedAt": "2026-11-10T13:22:52.000Z",
+    "councilEntry": 84.68,
+    "stop": 84.946,
+    "t1": 84.147,
+    "riskCash": 2.66,
+    "margin": 84.67,
+    "minLot": true,
+    "shadow": true,
+    "mark": 84.68,
+    "levelsFrom": "mark",
+    "fillPrice": 84.531,
+    "slipR": 0.56,
+    "lagSec": 108,
+    "alerted": [
+     "open"
+    ],
+    "stopCheckedAt": "2026-11-10T13:22:52.000Z",
+    "brokerStop": 84.797
    }
   },
   "day": {
@@ -1242,7 +1270,7 @@
    "startBalance": 10000
   },
   "startedAt": "2026-11-08T11:42:27.000Z",
-  "status": "ok · demo Fusion Markets · balance 9980.01 · 10 open",
+  "status": "ok · demo Fusion Markets · balance 9981.55 · 11 open",
   "skipped": {
    "xrp-replica-1794182743-s": "none of XRPUSD found at the broker",
    "xrp-replica-1794243038-s": "none of XRPUSD found at the broker",
@@ -1256,8 +1284,8 @@
   "resetDoneAt": "2026-11-08T11:42:48.000Z",
   "orders": {},
   "catchUpAt": "2026-11-08T12:04:46.000Z",
-  "balance": 9980.01,
-  "lastRun": "2026-11-10T13:19:43.000Z"
+  "balance": 9981.55,
+  "lastRun": "2026-11-10T13:22:52.000Z"
  },
  "log": [
   {
@@ -1732,6 +1760,11 @@
    "at": "2026-11-10T13:19:43.000Z",
    "msg": "closed USDCAD position 48018901 (council: win)",
    "trade": "usdcad-replica-1794311168-b"
+  },
+  {
+   "at": "2026-11-10T13:22:52.000Z",
+   "msg": "opened sell SOLUSD 0.01 lot (council replica)",
+   "trade": "sol-replica-1794316864-s"
   }
  ],
  "limits": {
@@ -1810,15 +1843,15 @@
   ]
  },
  "execution": {
-  "n": 43,
-  "meanSlipR": 0.102,
-  "medianSlipR": 0.042,
+  "n": 44,
+  "meanSlipR": 0.112,
+  "medianSlipR": 0.045,
   "worstSlipR": 1.236,
-  "medianLagSec": 1086,
+  "medianLagSec": 599,
   "bySymbol": {
    "SOLUSD": {
-    "n": 8,
-    "meanSlipR": 0.069
+    "n": 9,
+    "meanSlipR": 0.124
    },
    "ETHUSD": {
     "n": 5,
