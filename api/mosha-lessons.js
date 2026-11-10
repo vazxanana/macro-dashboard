@@ -37,7 +37,8 @@ const { moshaLevel } = require('./mosha.js');
 const KEEP = 300, MAX_SHOTS = 12, MAX_BYTES = 1.5 * 1024 * 1024, DAY_MAX = 80, MAX_TALK = 60, BOOK_KEEP = 400;
 const ID_RE = /^[0-9]{17}[a-z0-9]{4}$/, BOOK_ID = /^(seed-[0-9]{2}|[0-9]{17}[a-z0-9]{4})$/;
 const TYPES = { 'image/jpeg': 'jpg', 'image/png': 'png', 'image/webp': 'webp' };
-const KINDS = ['term', 'step', 'rule', 'avoid'], MARKETS = ['xau', 'xag', 'eurusd', 'gbpusd', 'nas100'], MARK_KINDS = ['level', 'vr', 'bvr', 'zone', 'htf'], BASE = { '5m': 300, '15m': 900 };
+// the markets a lesson's trade can be on: the ones ChronosTrade replays (a trade taught from a backtest keeps its market)
+const KINDS = ['term', 'step', 'rule', 'avoid'], MARKETS = ['xau', 'xag', 'nas100', 'spx500', 'us30', 'de40', 'eurusd', 'gbpusd', 'usdjpy', 'audusd', 'usdcad', 'usdchf', 'nzdusd', 'gbpjpy', 'bco', 'wtico'], TFS = ['1m', '5m', '15m', '1h', '4h'], MARK_KINDS = ['level', 'vr', 'bvr', 'zone', 'htf'], BASE = { '5m': 300, '15m': 900 };
 const MIN_T = Date.UTC(2006, 0, 1) / 1000;
 const READER = { u: 'assistant', name: 'The desk', role: 'assistant' };
 // What the desk starts with: its own reading of the screenshots and answers received before 10 Nov 2026, as PROPOSED lines.
@@ -107,7 +108,13 @@ function tradeOf(t, now) {
   if (!blank(t.target) && target == null) return { error: 'the target is not a price' };
   if (target != null && (side === 'sell' ? target >= entry : target <= entry)) return { error: side === 'sell' ? 'a sell needs its target below the entry' : 'a buy needs its target above the entry' };
   const at = Math.floor(Number(t.at)), nowS = Math.floor(now / 1000); if (!Number.isFinite(at) || at < MIN_T || at > nowS + 86400) return { error: 'the trade\'s entry time is missing or out of range' };
-  return { trade: { market: MARKETS.includes(String(t.market || '').toLowerCase()) ? String(t.market).toLowerCase() : 'xau', side, at, entry, stop, target } };
+  const market = blank(t.market) ? 'xau' : String(t.market).toLowerCase(); if (!MARKETS.includes(market)) return { error: 'the desk does not know that market' };
+  const out = { market, side, at, entry, stop, target };
+  // how it ended, when the teacher gives it (a trade taken in a ChronosTrade replay): the exit price and time; R is worked out here
+  if (!blank(t.exit)) { const exit = px(t.exit), exitAt = Math.floor(Number(t.exitAt)); if (exit == null || !Number.isFinite(exitAt) || exitAt < at || exitAt > nowS + 86400) return { error: 'the trade\'s exit needs its price and a time after the entry' };
+    out.exit = exit; out.exitAt = exitAt; out.R = +(((side === 'sell' ? -1 : 1) * (exit - entry)) / Math.abs(entry - stop)).toFixed(2); }
+  if (TFS.includes(t.tf)) out.tf = t.tf; if (t.src === 'replay') out.src = 'replay';
+  return { trade: out };
 }
 // The assistant's reading of a lesson for the replay chart: { chart } or { error }. Everything is checked: one candle request,
 // a known market, marks and steps inside the window, a position only with its stop on the losing side.

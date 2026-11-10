@@ -252,3 +252,26 @@ test('the desk\'s reading on the chart: checked marks and steps, a position only
   const txt = TOOLS.lessonText((await call(s, 'GET', LUXUS)).body.lessons[0]); assert.match(txt, /Levels: sell 3908\.27, stop 3916\.1, target 3878\.42/); assert.match(txt, /Picture 1: M30 sweep high/); assert.match(txt, /THE DESK: words only this time/);
   assert.equal(TOOLS.waiting({ state: 'new' }), true); assert.equal(TOOLS.waiting({ state: 'more' }), true); assert.equal(TOOLS.waiting({ state: 'read' }), false); assert.equal(TOOLS.waiting({ state: 'agreed' }), false);
 });
+
+test('backtest with him: a trade taken in a ChronosTrade replay goes to the desk with its levels, its exit and the chart', async () => {
+  const BT = rd('../backtest.html'), s = mk(), at = Date.UTC(2026, 10, 2, 7, 0) / 1000;
+  const T = { market: 'nas100', side: 'buy', at, entry: 25010.5, stop: 24980.5, target: 25070.5, exit: 25070.5, exitAt: at + 5400, tf: '5m', src: 'replay' };
+  const a = await call(s, 'POST', LUXUS, { add: { title: '2026-11-02 buy, Nasdaq 100 (replay)', note: 'Sweep of the Asia low, then the M5 CF.', caption: 'ChronosTrade replay', image: url('image/jpeg', JPG), trade: T } });
+  assert.equal(a.code, 200); assert.deepEqual(a.body.lesson.trade, { market: 'nas100', side: 'buy', at, entry: 25010.5, stop: 24980.5, target: 25070.5, exit: 25070.5, exitAt: at + 5400, R: 2, tf: '5m', src: 'replay' }, 'R is worked out on the server');
+  assert.equal(L.tradeOf({ ...T, exit: 24980.5 }, NOW).trade.R, -1); assert.equal(L.tradeOf({ ...T, side: 'sell', stop: 25040.5, target: 24950.5, exit: 24995.5 }, NOW).trade.R, 0.5);
+  assert.match(L.tradeOf({ ...T, market: 'doge' }, NOW).error, /does not know that market/); assert.match(L.tradeOf({ ...T, exitAt: at - 60 }, NOW).error, /exit needs/); assert.match(L.tradeOf({ ...T, exit: 'x' }, NOW).error, /exit needs/);
+  assert.match(L.tradeOf({ ...T, stop: 25010.5 }, NOW).error, /stop below the entry/, 'a stop moved to the entry is not a stop to learn: the page sends the one the trade was opened with');
+  assert.deepEqual(Object.keys(L.tradeOf({ ...T, tf: '3d', src: 'x', exit: '', junk: 1 }, NOW).trade), ['market', 'side', 'at', 'entry', 'stop', 'target']);
+  // the desk's chart shows how it ended
+  const sp = RP.specOfLesson(a.body.lesson, NOW / 1000); assert.deepEqual([sp.market, sp.entry, sp.stop, sp.exit, sp.label, sp.yours], ['nas100', 25010.5, 24980.5, { p: 25070.5, t: at + 5400 }, 'A trade from a ChronosTrade replay', '+2.00R, closed at 25070.5']);
+  assert.match(TOOLS.lessonText(a.body.lesson), /Levels: buy 25010\.5, stop 24980\.5, target 25070\.5, nas100 5m, entry at 2026-11-02T07:00:00\.000Z, closed 25070\.5 at 2026-11-02T08:30:00\.000Z = \+2R  \(taken in a ChronosTrade replay: practice on past candles, not a live trade\)/);
+  // ChronosTrade: the button and the send, for a member who may teach; the server decides again
+  assert.match(BT, /const TEACH = me\.u === 'owner' \|\| \(\(me\.perms && \(me\.perms\.mosha === false \|\| me\.perms\.mosha === 'read' \|\| me\.perms\.mosha === 'teach'\) \? me\.perms\.mosha : me\.mosha\) === 'teach'\);/);
+  assert.match(BT, /\$\{TEACH \? `<button class="shot-add tch/); assert.match(BT, /data-teach="\$\{t\.id\}"/); assert.match(BT, /\$\('tch-btn'\)\.hidden = !TEACH;/); assert.match(BT, /<dialog id="teachd" class="hkd teachd"/); assert.match(BT, /id="tch-btn"[^>]* hidden>/);
+  assert.match(BT, /const stop0 = \(t\) => \(t\.r0 > 0 \? \+\(t\.side === 'buy' \? t\.entry - t\.r0 : t\.entry \+ t\.r0\)/, 'the stop the trade was opened with');
+  assert.match(BT, /trade: \{ market: S\.sym, side: t\.side, at: t\.openedAt, entry: t\.entry, stop: stop0\(t\), target: t\.target == null \? '' : t\.target, exit: t\.exit, exitAt: t\.closedAt, tf: S\.tf, src: 'replay' \}/);
+  assert.match(BT, /fetch\('\/api\/mosha-lessons', \{ method: 'POST', credentials: 'same-origin'/); assert.match(BT, /Sent to the Mosha desk: \$\{esc\(title\)\}/, 'what the member typed is escaped in the toast');
+  assert.equal([...BT.matchAll(/api\/mosha-lessons/g)].length, 2, 'one call site (and its comment)'); assert.ok(PAGE.includes('<a class="ms-tbtn" href="/backtest">Backtest and teach in ChronosTrade</a>'));
+  // every market ChronosTrade replays is one the desk knows
+  const mk2 = [...BT.match(/const MARKETS = \[(.+?)\];/)[1].matchAll(/\['([a-z0-9]+)'/g)].map((m) => m[1]); assert.ok(mk2.length >= 16); for (const m of mk2) assert.ok(!L.tradeOf({ ...T, market: m }, NOW).error, m);
+});

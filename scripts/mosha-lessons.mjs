@@ -31,7 +31,7 @@ export function bookText(book) {
 export function lessonText(l) {
   const t = l.trade, who = (m) => (m.by === 'assistant' ? 'THE DESK' : (m.name || m.by).toUpperCase());
   return [`${l.title}`, `by ${l.name || l.by}, ${l.at}  ·  state: ${l.state}  ·  id ${l.id}`, '', l.note || '(no note)', '',
-    t ? `Levels: ${t.side} ${t.entry}, stop ${t.stop}${t.target != null ? `, target ${t.target}` : ''}, ${t.market}, entry at ${new Date(t.at * 1000).toISOString()}` : 'Levels: not given', '',
+    t ? `Levels: ${t.side} ${t.entry}, stop ${t.stop}${t.target != null ? `, target ${t.target}` : ''}, ${t.market}${t.tf ? ` ${t.tf}` : ''}, entry at ${new Date(t.at * 1000).toISOString()}${t.exit != null ? `, closed ${t.exit}${t.exitAt ? ` at ${new Date(t.exitAt * 1000).toISOString()}` : ''} = ${t.R > 0 ? '+' : ''}${t.R}R` : ''}${t.src === 'replay' ? '  (taken in a ChronosTrade replay: practice on past candles, not a live trade)' : ''}` : 'Levels: not given', '',
     ...(l.shots.length ? l.shots.map((s, i) => `Picture ${i + 1}: ${s.caption || '(no caption)'}`) : ['(a lesson in words: no picture)']), '',
     'Conversation:', ...(l.thread.length ? l.thread.map((m) => `[${m.at}] ${who(m)}${m.verdict ? ` (the teacher marked this ${m.verdict === 'right' ? 'RIGHT' : 'NOT RIGHT'})` : ''}: ${m.text}`) : ['(nothing yet: the desk has not answered)'])].join('\n');
 }

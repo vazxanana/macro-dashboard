@@ -184,8 +184,8 @@
     if (c) return { id: 'lesson-' + l.id, lesson: true, title: l.title, label: 'The desk\'s reading of this lesson', market: c.market, side: c.side || (t && t.side) || 'sell', entry: c.entry, stop: c.stop, target: c.target,
       base: c.base, tfs: c.base === '15m' ? [900, 3600, 14400] : [300, 900, 3600], h4off: usSummer(c.from) ? 3600 : 7200, from: c.from, to: c.to, fillFrom: c.fillFrom != null ? c.fillFrom : c.from, yours: 'the levels as the desk read them', marks: c.marks || [], steps: c.steps || [] };
     if (!t) return null;
-    var s = specOfTrade({ id: l.id, market: t.market, side: t.side, at: t.at, entry: t.entry, stop: t.stop, target: t.target, status: 'open' }, now);
-    s.id = 'lesson-' + l.id; s.lesson = true; s.title = l.title; s.label = 'The levels of this lesson'; s.yours = 'the levels you gave'; return s;
+    var s = specOfTrade({ id: l.id, market: t.market, side: t.side, at: t.at, entry: t.entry, stop: t.stop, target: t.target, status: t.exit != null ? 'closed' : 'open', exit: t.exit != null ? t.exit : null, exitAt: t.exitAt || null, R: t.R != null ? t.R : null }, now);
+    s.id = 'lesson-' + l.id; s.lesson = true; s.title = l.title; s.label = t.src === 'replay' ? 'A trade from a ChronosTrade replay' : 'The levels of this lesson'; s.yours = t.exit != null ? (t.R > 0 ? '+' : t.R < 0 ? '−' : '') + Math.abs(t.R).toFixed(2) + 'R, closed at ' + t.exit : 'the levels you gave'; return s;
   }
   // the hand-over to ChronosTrade: the same market from the moment before the entry forms, with the marks already known then
   function handoff(spec, now) {

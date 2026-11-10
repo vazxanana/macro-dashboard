@@ -1630,5 +1630,17 @@ studies' figures (linked to the Edge lab; a test compares them with the result f
     levels read off the picture, what is unclear, and the chart when times and levels can be placed on our candles), and
     propose only what is new (`learn <kind> <file> [lesson ids]`). When told "not right", restate the correction, do not
     argue it, and propose the corrected line. Never present a taught line as tested: it is how the teacher trades.
+  - **Backtesting with the teacher** (same day, owner: "And do backtest with him, he will teach you"): a member who may
+    teach (`TEACH` in backtest.html: the owner, or effective `mosha === 'teach'` from `/api/me`) teaches from ChronosTrade.
+    Each closed trade's journal row has "Teach" (`[data-teach]`, "Taught" once sent; the records keep `taught` = the lesson
+    id): `teachTrade` frames the trade on the chart, takes a picture of chart + overlay (`teachShot`, up to 1600 px JPEG)
+    and opens `#teachd` with a title and a note prefilled from the trade's own note, tags, mistakes and ticked rules; the
+    toolbar's `#tch-btn` ("Send this moment to the Mosha desk", `teachMoment`) sends the chart as it stands, with no trade.
+    Both post `{ add }` to `/api/mosha-lessons` like the desk's own form. The trade travels as the lesson's levels with
+    what a replay knows: `market` (the lesson `MARKETS` list is wider than the log's), `exit` + `exitAt` (both or neither;
+    `R` computed on the server), `tf`, `src: 'replay'`. The stop sent is the stop the trade was OPENED with (`stop0` from
+    `r0`), never a trailed or break-even one, and `tradeOf` still refuses a stop on the wrong side. The desk shows "from a
+    ChronosTrade replay" on the lesson and opens it on the replay chart with its exit. A replay trade is practice on past
+    candles: never count it in the Mosha record, never as evidence of an edge. The teach card links to `/backtest`.
 - Tests: `tests/mosha-desk.test.mjs` (permissions, the stop rule, R on the server, `pre`, the locks, statistics, the candle check,
   CSV, page wiring, the studies' figures). The page smoke test opens `#mosha`.

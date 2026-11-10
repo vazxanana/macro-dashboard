@@ -436,6 +436,11 @@ conditions is what makes your trades win.
   its reading of a lesson on the chart with the replay. "What the desk knows" is the whole of what it holds, line by line:
   twelve lines of its own to start with, each marked as its reading until Luxus (or you) confirms, corrects or erases it.
   The Lessons card counts how often the desk was right first time.
+- **"And do backtest with him, he will teach you" (10 Nov):** Luxus can backtest in ChronosTrade and teach from there.
+  Every closed trade in his journal has a "Teach" button: it sends the trade to the desk with its chart picture, exact
+  entry, stop, target, exit and result, and his note. A second button sends the chart as it stands, with no trade, for
+  "look at this moment". On the desk such a lesson is marked "from a ChronosTrade replay" and opens on the replay chart.
+  These are practice trades on past candles: they teach the desk how he trades and are never counted as a record.
 - **What "100 %" cannot mean:** the desk reads and answers only when the assistant runs with the key. Until your step above
   is done nothing is read, and after it a lesson waits until the next reading. Say if you want the reading on a schedule
   (it uses your plan's usage each time, so it is your call how often).
