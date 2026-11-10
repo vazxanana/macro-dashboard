@@ -232,7 +232,7 @@
   const OUTCOME_KEYS = ['R', 'netR', 'exitT', 'exit', 'mfeR', 'maeR', 'outcome'];   // never on a Candidate (contract, section 5)
   const tfOrder = (keys) => keys.slice().sort((x, y) => secOf(x) - secOf(y));
 
-  // MXR.snapshot({ edge, market, t, cand, series, inter, events, dataVersion, keep })
+  // MXR.snapshot({ edge, market, t, cand, series, inter, events, schedule, dataVersion, keep })
   //   series  { tf: Bar[] } FULL arrays, oldest first; the builder keeps only bars closed at t (time + tfSec <= t) and
   //           at most the last `keep` of them per timeframe (a number, or { tf: number }; default MXR.KEEP = 300).
   //   inter   { name: { tf: Bar[] } }, optional (e.g. the dollar index), sliced the same way.
@@ -274,6 +274,14 @@
         .map((e) => ({ t: e.t, title: e.title == null ? '' : String(e.title), impact: e.impact == null ? null : e.impact }))
         .sort((x, y) => x.t - y.t || (x.title < y.title ? -1 : x.title > y.title ? 1 : 0));
     }
+    // schedule: releases that were on the public calendar before t and happen within the next 72 h. Knowing that a release is
+    // due is not look-ahead; knowing its result is, so only { t, title, impact } is kept (no actual / forecast fields).
+    if (o.schedule != null) {
+      if (!Array.isArray(o.schedule)) throw fail('BAD_EVENTS', 'schedule must be an array');
+      snap.schedule = o.schedule.filter((e) => isObj(e) && Number.isFinite(e.t) && e.t > t && e.t <= t + 72 * 3600)
+        .map((e) => ({ t: e.t, title: e.title == null ? '' : String(e.title), impact: e.impact == null ? null : e.impact }))
+        .sort((x, y) => x.t - y.t || (x.title < y.title ? -1 : x.title > y.title ? 1 : 0));
+    }
     snap.dataVersion = o.dataVersion == null ? null : o.dataVersion;
     return guard(snap);
   }
@@ -312,6 +320,14 @@
       snap.events.forEach((e, i) => {
         if (!isObj(e) || !Number.isFinite(e.t)) throw fail('BAD_SNAPSHOT', 'events[' + i + ']: no time');
         if (e.t > t) throw fail('LOOKAHEAD', 'events[' + i + ']: the event at ' + e.t + ' is after the decision time ' + t, { series: 'events', time: e.t });
+      });
+    }
+    if (snap.schedule != null) {
+      if (!Array.isArray(snap.schedule)) throw fail('BAD_SNAPSHOT', 'schedule must be an array');
+      snap.schedule.forEach((e, i) => {
+        if (!isObj(e) || !Number.isFinite(e.t)) throw fail('BAD_SNAPSHOT', 'schedule[' + i + ']: no time');
+        if (e.t <= t) throw fail('BAD_SNAPSHOT', 'schedule[' + i + ']: a release at or before t belongs in events');
+        for (const k of Object.keys(e)) if (k !== 't' && k !== 'title' && k !== 'impact') throw fail('LOOKAHEAD', 'schedule[' + i + ']: field "' + k + '" could carry the result of a release that has not happened yet', { series: 'schedule', time: e.t });
       });
     }
     if (snap.cand != null) {

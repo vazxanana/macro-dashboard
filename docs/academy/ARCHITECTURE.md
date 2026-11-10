@@ -72,7 +72,9 @@ Candidate = { id, edge, market, t, side: 'buy'|'sell', entry, stop, target /* or
 Outcome   = { id, R, netR, exitT, exit, reason, mfeR, maeR }   // out-<edge>.json, keyed by candidate id
 Snapshot  = { v: 1, edge, market, t, cand /* Candidate or null between signals */,
               bars: { '5m': Bar[], '15m': Bar[], '1h': Bar[], '4h': Bar[], '1d': Bar[] },   // only bars with time + tfSec <= t
-              inter: { dxy: { '1h': Bar[], '1d': Bar[] } } /* optional */, events: [{ t, title, impact }] /* optional */,
+              inter: { dxy: { '1h': Bar[], '1d': Bar[] } } /* optional */,
+              events: [{ t, title, impact }]   /* optional: releases at or before t */,
+              schedule: [{ t, title, impact }] /* optional: releases due in the next 72 h; no result fields */,
               dataVersion }
 ```
 

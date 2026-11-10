@@ -582,3 +582,12 @@ test('the same file works as a plain browser script (window.MXR) and holds no ne
   assert.ok(!/\b(require|import)\s*\(/.test(src), 'no dependency');
   assert.ok(!/document\.|localStorage|XMLHttpRequest/.test(src), 'no page code');
 });
+
+test('schedule: upcoming releases within 72 h are kept without results; a result field or a past item is refused', () => {
+  const t = 1700000000, series = { '1h': [] };
+  const snap = MXR.snapshot({ edge: 'gtrend', market: 'xau', t, cand: null, series, schedule: [
+    { t: t + 3600, title: 'CPI', impact: 'high', actual: 0.4 }, { t: t - 10, title: 'old' }, { t: t + 80 * 3600, title: 'far' } ] });
+  assert.deepEqual(snap.schedule, [{ t: t + 3600, title: 'CPI', impact: 'high' }]);
+  assert.throws(() => MXR.guard({ ...snap, schedule: [{ t: t + 60, title: 'x', impact: 'high', actual: 1 }] }), (e) => e.code === 'LOOKAHEAD');
+  assert.throws(() => MXR.guard({ ...snap, schedule: [{ t: t - 60, title: 'x', impact: 'high' }] }), (e) => e.code === 'BAD_SNAPSHOT');
+});
