@@ -358,6 +358,39 @@ or config was changed. The items below are what that work leaves for the owner.
 - **What that means.** Taken every time by fixed rules, the cycle does not make money: about one trade in six reaches its
   target and the 5R winners only just pay for the losers. It says nothing about the trades YOU pick; the rules cannot see
   why you take one cycle and skip another.
+#### Your own example trades, checked on our candles (added 10 Nov, after "check the trades I sent you")
+
+The screenshots you sent on 2 Nov ("Some marking examples", "More examples", "Learn this and let it be your new guide",
+"Study this scenario") and on 10 Nov, read off the charts and replayed on OANDA 5-minute gold candles:
+
+| Trade (your label) | Entry / stop / target | Plan | On our candles |
+|---|---|---|---|
+| 28 Oct sell ("M5 cf for sell", "2000 pips") | 4048.59 / 4076.69 / 3971.09 | 2.8R | Filled 29 Oct 02:25 UTC, target 30 Oct 07:50: +2.8R. Worst point 0.18R against. |
+| 29 Oct sell (the zone after the break) | 4035.72 / 4045.96 / 3988.44 | 4.6R | Filled 11:05 UTC, target 30 Oct 04:05: +4.6R. Worst point 0.36R against. |
+| 2 Nov sell ("M30 sweep high", "i just took entry after bo sell") | 3908.27 / 3916.10 / first 3878.42, then 3891.46 | 3.8R, taken 2.1R | Reached 2.2R in favour (08:20 UTC), never the first target; price later went through the stop. Closing at 3891.46 is what made it a winner. |
+| 2 Nov buy ("Learn this") | 3900.71 / 3896.79 / 3965.08 | 16.4R | Target reached 14:35 UTC. Our feed's lows at 13:00 and 13:15 UTC were 3896.47 and 3896.53, $0.30 under your stop: on our prices it survives only if entered after 13:20. |
+| 10 Nov sell | 4120.42 / 4128.92 / 4072.84 | 5.6R | Filled 05:20 UTC, target 10:55: +5.6R. Worst point 0.89R against. |
+
+Five trades, five winners, about +31R as you took them. They are examples you picked, so they show the pattern, not the
+win rate.
+
+What they show that my three tests did not hold:
+
+- **The trigger is the VR and its CF, on M5 or M15** (your red "5 mn" box: from the extreme to the last swing inside it; a
+  close out of the box is the CF). It comes before the H1 break, at a better price. Two of my tests waited for the H1 break.
+- **Every sell starts from a swept high**: 28 Oct the spike to 4082 over the earlier 4070 highs, 2 Nov the M30 high 3913
+  taken to 3918, 10 Nov the H4 high 4147 taken to 4148.7. I tested touches of H4 levels, not sweeps of an earlier high.
+- **The main trade is entered where the pullback ends, by the same VR and CF**: on 28 Oct the H4 was a sell (BO sell
+  22 Oct), price pulled back up to the broken level (about 4068) and the M5 CF there was the sell with the H4. My test of the
+  main trade used an H4 engulf zone as the barrier and an H1 break as the trigger.
+- **You manage the exit** (the 2 Nov sell was closed at 2.1R, not held for 3.8R), and the stops are a few dollars, so the
+  price feed matters ($0.30 decided the 2 Nov buy on our feed).
+
+**The reading to confirm before any further test:** a prior high is swept at a higher-timeframe point (an H4 or H1 level,
+or the retest of an H4 BO level) → the M5 VR forms → M5 CF (close out of the box) → sell at the CF or on the return to the
+zone of the break, stop above the zone (or above the VR high) → target the next higher-timeframe zone or low. Buys are the
+mirror image. If that is right, it is one more pre-registered test, on gold candles today's tests did not use.
+
 - **Options.** (a) Log your own trades of this pattern for a few weeks (ChronosTrade or the Academy keep entry, stop,
   target and result), so we measure your selection instead of a rule's. (b) Tell me what makes you skip a cycle, and I test
   that one filter. (c) One more mechanical test on older candles (the M15 zone on the first half, OANDA 2006-17): the only

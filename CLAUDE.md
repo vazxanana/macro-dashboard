@@ -1494,3 +1494,11 @@ variants (stop under the barrier, M15 zone, fixed 3R) all negative. The whole cy
 577 trades, -0.03R, t -0.29. Thirteen tests in the three Mosha studies of the day, none positive after Holm: no mechanical version
 of the owner's Mosha cycle is an edge on gold 2020-26. What the rules cannot hold is the owner's own selection, so the open step is
 the owner's own logged trades (docs/owner-decisions.md item 27). Tests: `tests/mosha-cycle.test.mjs`.
+**The owner's own examples, checked** (same day, "check the trades I sent you": the 2 Nov screenshots, labelled "M5 vr", "M5 cf
+for sell", "M30 sweep high", "i just took entry after bo sell", and the 10 Nov sell): five trades, five winners on OANDA M5 (+2.8R,
++4.6R, +2.1R as closed, +16.4R, +5.6R; table in owner decision 27). They show what the three tests did not hold: the trigger is the
+VR and its CF on M5 / M15 (the red "5 mn" box = from the extreme to the last swing inside it; a close out of it = CF), earlier than
+the H1 BO; every sell starts from a SWEPT prior high at a higher-timeframe point; the main trade (28 Oct, with the H4 BO sell) is
+entered where the pullback ends, at the retest of the H4 BO level, by that same M5 CF; exits are managed by hand and stops are a
+few dollars (a $0.30 feed difference decided the 2 Nov buy). Any further Mosha test starts from that reading, confirmed by the owner
+first, on candles the day's thirteen tests did not use.
