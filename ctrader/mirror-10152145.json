@@ -2871,7 +2871,7 @@
     "lots": 0.02,
     "digits": 5,
     "setup": "scalp",
-    "status": "open",
+    "status": "closed at broker",
     "openedAt": "2026-11-09T18:42:08.000Z",
     "councilEntry": 1.3425,
     "stop": 1.34176,
@@ -2885,10 +2885,12 @@
     "slipR": 0.054,
     "lagSec": 77,
     "alerted": [
-     "open"
+     "open",
+     "close"
     ],
     "stopCheckedAt": "2026-11-09T18:42:08.000Z",
-    "brokerStop": 1.3418
+    "brokerStop": 1.3418,
+    "closedAt": "2026-11-10T01:15:51.000Z"
    },
    "sol-rscalp-1794253228": {
     "symbol": "SOLUSD",
@@ -3125,7 +3127,8 @@
     "t1": 1.121335,
     "adopted": false,
     "alerted": [
-     "open"
+     "open",
+     "close"
     ],
     "viaLimit": true,
     "limitPrice": 1.12196,
@@ -3139,7 +3142,8 @@
     "lagSec": 218,
     "positionId": "47826728",
     "volume": 300000,
-    "status": "open"
+    "status": "closed at broker",
+    "closedAt": "2026-11-10T01:15:51.000Z"
    },
    "eurusd-scalp-1794270124": {
     "symbol": "EURUSD",
@@ -3228,7 +3232,7 @@
    "startBalance": 9975.42
   },
   "startedAt": "2026-11-08T11:42:25.000Z",
-  "status": "ok · demo Fusion Markets · balance 9975.74 · 23 open · 1 resting",
+  "status": "ok · demo Fusion Markets · balance 9977.76 · 21 open · 1 resting",
   "skipped": {
    "audusd-position-1793601653": "price 0.68666 has run 1.27R from the council entry 0.70162: a different trade now",
    "xrp-rswing-1793942619": "none of XRPUSD found at the broker",
@@ -3264,20 +3268,10 @@
    }
   },
   "catchUpAt": "2026-11-08T12:04:40.000Z",
-  "balance": 9975.74,
-  "lastRun": "2026-11-10T01:14:21.000Z"
+  "balance": 9977.76,
+  "lastRun": "2026-11-10T01:16:21.000Z"
  },
  "log": [
-  {
-   "at": "2026-11-09T09:09:54.000Z",
-   "msg": "limit filled: GBPUSD position 47570285 at the broker",
-   "trade": "gbpusd-scalp-1794215170"
-  },
-  {
-   "at": "2026-11-09T09:21:41.000Z",
-   "msg": "GBPUSD position 47570285 closed at the broker",
-   "trade": "gbpusd-scalp-1794215170"
-  },
   {
    "at": "2026-11-09T09:21:41.000Z",
    "msg": "placed sell limit EURUSD 0.03 lot at 1.11848 (council rscalp, valid to 2026-11-09T12:20Z)",
@@ -4767,6 +4761,16 @@
    "at": "2026-11-10T01:02:30.000Z",
    "msg": "placed buy limit AUDUSD 0.03 lot at 0.69179 (council scalp, valid to 2026-11-10T04:01Z)",
    "trade": "audusd-scalp-1794272483"
+  },
+  {
+   "at": "2026-11-10T01:15:51.000Z",
+   "msg": "GBPUSD position 47758538 closed at the broker",
+   "trade": "gbpusd-scalp-1794249651"
+  },
+  {
+   "at": "2026-11-10T01:15:51.000Z",
+   "msg": "EURUSD position 47826728 closed at the broker",
+   "trade": "eurusd-rscalp-1794269254"
   }
  ],
  "limits": {
