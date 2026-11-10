@@ -3667,6 +3667,32 @@
     "positionId": "47926350",
     "volume": 200000,
     "status": "open"
+   },
+   "gbpusd-scalp-1794291182": {
+    "symbol": "GBPUSD",
+    "side": "buy",
+    "setup": "scalp",
+    "openedAt": "2026-11-10T06:18:33.000Z",
+    "councilEntry": 1.34517,
+    "stop": 1.34435,
+    "t1": 1.34681,
+    "adopted": false,
+    "alerted": [
+     "open"
+    ],
+    "viaLimit": true,
+    "limitPrice": 1.34517,
+    "digits": 5,
+    "lots": 0.02,
+    "riskCash": 2,
+    "margin": 5.38,
+    "shadow": true,
+    "fillPrice": 1.34517,
+    "slipR": 0,
+    "lagSec": 213,
+    "positionId": "47926356",
+    "volume": 200000,
+    "status": "open"
    }
   },
   "day": {
@@ -3674,7 +3700,7 @@
    "startBalance": 9975.42
   },
   "startedAt": "2026-11-08T11:42:25.000Z",
-  "status": "ok · demo Fusion Markets · balance 9976.54 · 29 open · 1 resting",
+  "status": "ok · demo Fusion Markets · balance 9976.54 · 30 open",
   "skipped": {
    "audusd-position-1793601653": "price 0.68666 has run 1.27R from the council entry 0.70162: a different trade now",
    "xrp-rswing-1793942619": "none of XRPUSD found at the broker",
@@ -3687,38 +3713,12 @@
   "paused": {},
   "resetAt": "2026-11-08T09:45Z",
   "resetDoneAt": "2026-11-08T11:42:47.000Z",
-  "orders": {
-   "gbpusd-scalp-1794291182": {
-    "orderId": "33845876",
-    "symbol": "GBPUSD",
-    "side": "buy",
-    "volume": 200000,
-    "lots": 0.02,
-    "digits": 5,
-    "setup": "scalp",
-    "limitPrice": 1.34517,
-    "stop": 1.34435,
-    "t1": 1.34681,
-    "placedAt": "2026-11-10T06:13:58.000Z",
-    "expires": "2026-11-10T09:13:02.000Z",
-    "riskCash": 2,
-    "margin": 5.38,
-    "shadow": true,
-    "alerted": [
-     "pending"
-    ]
-   }
-  },
+  "orders": {},
   "catchUpAt": "2026-11-08T12:04:40.000Z",
   "balance": 9976.54,
-  "lastRun": "2026-11-10T06:15:34.000Z"
+  "lastRun": "2026-11-10T06:18:33.000Z"
  },
  "log": [
-  {
-   "at": "2026-11-09T11:21:21.000Z",
-   "msg": "USDCAD limit order 33797779 for usdcad-rscalp-1794223067 is gone at the broker (expired or cancelled there)",
-   "trade": "usdcad-rscalp-1794223067"
-  },
   {
    "at": "2026-11-09T11:21:21.000Z",
    "msg": "not mirrored yet usdcad-rscalp-1794223067: USDCAD limit order gone at the broker (will retry)",
@@ -5213,6 +5213,11 @@
    "at": "2026-11-10T06:15:11.000Z",
    "msg": "limit filled: EURUSD position 47926350 at the broker",
    "trade": "eurusd-scalp-1794291182"
+  },
+  {
+   "at": "2026-11-10T06:18:33.000Z",
+   "msg": "limit filled: GBPUSD position 47926356 at the broker",
+   "trade": "gbpusd-scalp-1794291182"
   }
  ],
  "limits": {
@@ -5291,11 +5296,11 @@
   ]
  },
  "execution": {
-  "n": 124,
+  "n": 125,
   "meanSlipR": 0.012,
   "medianSlipR": 0,
   "worstSlipR": 1.168,
-  "medianLagSec": 161.5,
+  "medianLagSec": 162,
   "bySymbol": {
    "SOLUSD": {
     "n": 11,
@@ -5314,8 +5319,8 @@
     "meanSlipR": -0.036
    },
    "GBPUSD": {
-    "n": 18,
-    "meanSlipR": 0.035
+    "n": 19,
+    "meanSlipR": 0.033
    },
    "USDCAD": {
     "n": 13,
