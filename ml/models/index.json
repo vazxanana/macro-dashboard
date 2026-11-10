@@ -1,0 +1,3537 @@
+{
+ "generated": "2026-11-10",
+ "trainer": "gbt-1",
+ "code": {
+  "train.py": "092f110076a3"
+ },
+ "libraries": {
+  "lightgbm": "4.5.0",
+  "numpy": "1.26.4",
+  "scikit-learn": "1.5.2"
+ },
+ "data": {
+  "matrixVersion": "9035174e215f",
+  "featVersions": {
+   "replica": "ca94311891aa",
+   "mosha-bo": "0c8002257605",
+   "gtrend": "96a7d1ed4842",
+   "gtl": "f7f114a7c646",
+   "geg": "a3e0a9015073",
+   "gmp": "c8bf1a3191e8",
+   "nq-open": "2c1c12dda458"
+  },
+  "dataVersion": "histdata@60cea4527cb1",
+  "policy": "policy-1.0"
+ },
+ "target": "net R > 0 (binary)",
+ "rows": "train pool, not flagged (clock-shifted week, before 2020), filled trades, every needed timeframe present",
+ "settings": {
+  "minRows": 150,
+  "firstTrainShare": 0.4,
+  "embargoSec": 86400,
+  "tLine": 2.0,
+  "keepGrid": [
+   0.0,
+   0.1,
+   0.2,
+   0.3,
+   0.4,
+   0.5
+  ],
+  "trees": 120,
+  "minLeafShare": 0.1,
+  "lightgbm": {
+   "objective": "binary",
+   "learning_rate": 0.03,
+   "num_leaves": 4,
+   "max_depth": 2,
+   "lambda_l2": 10.0,
+   "feature_fraction": 0.5,
+   "bagging_fraction": 0.8,
+   "bagging_freq": 1,
+   "max_bin": 31,
+   "min_data_in_bin": 5,
+   "seed": 7,
+   "deterministic": true,
+   "force_row_wise": true,
+   "num_threads": 1,
+   "verbosity": -1
+  },
+  "logitC": 0.05,
+  "seed": 7
+ },
+ "notInputs": {
+  "barsOk": "data flag, not market information",
+  "missingTf": "data flag",
+  "eventTitle": "free text",
+  "eventNear": "null before 2022 (no calendar): its missingness would mark the era",
+  "eventMins": "null before 2022",
+  "eventInH": "null before 2022",
+  "regime": "equals regimeBase except for the event override, which exists only from 2022",
+  "dxyTrend": "no dollar-index candles: always null",
+  "dxyStrength": "always null",
+  "dxyConflict": "always null",
+  "lastClose": "raw price level",
+  "atr": "raw price level",
+  "htfSwingHigh": "raw price level",
+  "htfSwingLow": "raw price level",
+  "pdh": "raw price level",
+  "pdl": "raw price level",
+  "pwh": "raw price level",
+  "pwl": "raw price level",
+  "sessHigh": "raw price level",
+  "sessLow": "raw price level",
+  "eqHigh": "raw price level",
+  "eqLow": "raw price level",
+  "sweepLevel": "raw price level",
+  "nearRes": "raw price level",
+  "nearSup": "raw price level"
+ },
+ "verdictRule": "A model beats taking every setup only if, out of fold, the trades it keeps beat the trades it skips with a Welch t of at least 2.0 (threshold chosen on earlier predictions only), the kept trades average more than all trades, and the last fold shows the same. Otherwise: rejected challenger.",
+ "promotion": "manual, by the owner, through the API (model.register then model.promote). Nothing here promotes a model.",
+ "examRead": true,
+ "models": [
+  {
+   "id": "replica-7bf224d032",
+   "edge": "replica",
+   "scope": "replica",
+   "status": "rejected challenger",
+   "verdict": "no improvement over taking every setup: out of fold it skipped only 1 trade(s), too few for a t; the last fold does not confirm it",
+   "beatsBaseline": false,
+   "promoted": false,
+   "calibrated": true,
+   "file": "replica-7bf224d032.json",
+   "pred": "replica-7bf224d032.pred.json",
+   "candidates": 391,
+   "trainRows": 303,
+   "from": "2020-04-13",
+   "to": "2026-04-27",
+   "winRate": 0.2409,
+   "netRPerTrade": 0.4283,
+   "featureNames": [
+    "sigTf",
+    "structD1",
+    "structH4",
+    "structH1",
+    "structM15",
+    "maPosD1",
+    "maPosH4",
+    "distMa20D1",
+    "htfScore",
+    "htfBias",
+    "ltfBias",
+    "htfLtfConflict",
+    "eqHighs",
+    "eqLows",
+    "distPdh",
+    "distPdl",
+    "distPwh",
+    "distPwl",
+    "distSessHigh",
+    "distSessLow",
+    "distEqHigh",
+    "distEqLow",
+    "sweep",
+    "sweepAge",
+    "sweepOf",
+    "sweepDepth",
+    "displacement",
+    "dispAge",
+    "dispSize",
+    "dispFvg",
+    "fvg",
+    "fvgSize",
+    "roc",
+    "consec",
+    "momentum",
+    "atrPct",
+    "atrPctile",
+    "volRatio",
+    "volState",
+    "volAbnormal",
+    "session",
+    "dow",
+    "hourUtc",
+    "distRes",
+    "distSup",
+    "distSR",
+    "entryLoc",
+    "entryZone",
+    "regimeBase",
+    "regimeTrend",
+    "trendStrength",
+    "effRatio",
+    "regimeHtf",
+    "side",
+    "rr",
+    "stopAtr",
+    "targetAtr",
+    "entryOffset",
+    "geomOk",
+    "biasAlign",
+    "ltfAlign",
+    "sweepFor",
+    "dispFor",
+    "momFor",
+    "locFor",
+    "confirm",
+    "trigCloseLoc",
+    "trigBodyAtr",
+    "oppLiq",
+    "oppLiqFrac"
+   ],
+   "validation": {
+    "scheme": "chronological walk-forward, expanding window",
+    "folds": 4,
+    "firstTrainShare": 0.4,
+    "embargoSec": 86400,
+    "outOfFoldRows": 182
+   },
+   "folds": [
+    {
+     "fold": 1,
+     "trainRows": 119,
+     "purged": 2,
+     "testRows": 46,
+     "testFrom": 1718373240,
+     "testTo": 1734946140,
+     "thresholdFrom": "an inner split of the first training window",
+     "gbt": {
+      "n": 46,
+      "winRate": 0.2826,
+      "auc": 0.5571,
+      "brier": 0.2113,
+      "brierPrior": 0.2107,
+      "brierSkill": -0.0029,
+      "logLoss": 0.6214,
+      "logLossPrior": 0.6186,
+      "dropShare": 0.1,
+      "trading": {
+       "threshold": 0.103419,
+       "mechanical": {
+        "n": 46,
+        "avg": 1.1397,
+        "total": 52.43,
+        "t": 1.84
+       },
+       "kept": {
+        "n": 45,
+        "avg": 1.2,
+        "total": 54.0,
+        "t": 1.9
+       },
+       "skipped": {
+        "n": 1,
+        "avg": -1.5753,
+        "total": -1.58,
+        "t": null
+       },
+       "keptMinusSkippedT": null
+      }
+     },
+     "logit": {
+      "n": 46,
+      "winRate": 0.2826,
+      "auc": 0.324,
+      "brier": 0.2544,
+      "brierPrior": 0.2107,
+      "brierSkill": -0.2075,
+      "logLoss": 0.7753,
+      "logLossPrior": 0.6186,
+      "dropShare": 0.2,
+      "trading": {
+       "threshold": 0.087184,
+       "mechanical": {
+        "n": 46,
+        "avg": 1.1397,
+        "total": 52.43,
+        "t": 1.84
+       },
+       "kept": {
+        "n": 40,
+        "avg": 0.579,
+        "total": 23.16,
+        "t": 1.02
+       },
+       "skipped": {
+        "n": 6,
+        "avg": 4.8779,
+        "total": 29.27,
+        "t": 1.88
+       },
+       "keptMinusSkippedT": -1.62
+      }
+     },
+     "prior": {
+      "p": 0.1933,
+      "brier": 0.2107,
+      "logLoss": 0.6186
+     }
+    },
+    {
+     "fold": 2,
+     "trainRows": 162,
+     "purged": 5,
+     "testRows": 45,
+     "testFrom": 1734965340,
+     "testTo": 1749816840,
+     "thresholdFrom": "the earlier test blocks",
+     "gbt": {
+      "n": 45,
+      "winRate": 0.2667,
+      "auc": 0.5657,
+      "brier": 0.1959,
+      "brierPrior": 0.1981,
+      "brierSkill": 0.0111,
+      "logLoss": 0.5847,
+      "logLossPrior": 0.5871,
+      "dropShare": 0.0,
+      "trading": {
+       "threshold": null,
+       "mechanical": {
+        "n": 45,
+        "avg": 0.9416,
+        "total": 42.37,
+        "t": 1.62
+       },
+       "kept": {
+        "n": 45,
+        "avg": 0.9416,
+        "total": 42.37,
+        "t": 1.62
+       },
+       "skipped": {
+        "n": 0,
+        "avg": null,
+        "total": 0.0,
+        "t": null
+       },
+       "keptMinusSkippedT": null
+      }
+     },
+     "logit": {
+      "n": 45,
+      "winRate": 0.2667,
+      "auc": 0.5429,
+      "brier": 0.1973,
+      "brierPrior": 0.1981,
+      "brierSkill": 0.0042,
+      "logLoss": 0.6082,
+      "logLossPrior": 0.5871,
+      "dropShare": 0.0,
+      "trading": {
+       "threshold": null,
+       "mechanical": {
+        "n": 45,
+        "avg": 0.9416,
+        "total": 42.37,
+        "t": 1.62
+       },
+       "kept": {
+        "n": 45,
+        "avg": 0.9416,
+        "total": 42.37,
+        "t": 1.62
+       },
+       "skipped": {
+        "n": 0,
+        "avg": null,
+        "total": 0.0,
+        "t": null
+       },
+       "keptMinusSkippedT": null
+      }
+     },
+     "prior": {
+      "p": 0.216,
+      "brier": 0.1981,
+      "logLoss": 0.5871
+     }
+    },
+    {
+     "fold": 3,
+     "trainRows": 209,
+     "purged": 3,
+     "testRows": 45,
+     "testFrom": 1749832740,
+     "testTo": 1770363240,
+     "thresholdFrom": "the earlier test blocks",
+     "gbt": {
+      "n": 45,
+      "winRate": 0.2667,
+      "auc": 0.5253,
+      "brier": 0.2002,
+      "brierPrior": 0.1973,
+      "brierSkill": -0.0145,
+      "logLoss": 0.5909,
+      "logLossPrior": 0.5847,
+      "dropShare": 0.0,
+      "trading": {
+       "threshold": null,
+       "mechanical": {
+        "n": 45,
+        "avg": 0.0309,
+        "total": 1.39,
+        "t": 0.1
+       },
+       "kept": {
+        "n": 45,
+        "avg": 0.0309,
+        "total": 1.39,
+        "t": 0.1
+       },
+       "skipped": {
+        "n": 0,
+        "avg": null,
+        "total": 0.0,
+        "t": null
+       },
+       "keptMinusSkippedT": null
+      }
+     },
+     "logit": {
+      "n": 45,
+      "winRate": 0.2667,
+      "auc": 0.6793,
+      "brier": 0.1878,
+      "brierPrior": 0.1973,
+      "brierSkill": 0.048,
+      "logLoss": 0.5802,
+      "logLossPrior": 0.5847,
+      "dropShare": 0.0,
+      "trading": {
+       "threshold": null,
+       "mechanical": {
+        "n": 45,
+        "avg": 0.0309,
+        "total": 1.39,
+        "t": 0.1
+       },
+       "kept": {
+        "n": 45,
+        "avg": 0.0309,
+        "total": 1.39,
+        "t": 0.1
+       },
+       "skipped": {
+        "n": 0,
+        "avg": null,
+        "total": 0.0,
+        "t": null
+       },
+       "keptMinusSkippedT": null
+      }
+     },
+     "prior": {
+      "p": 0.2249,
+      "brier": 0.1973,
+      "logLoss": 0.5847
+     }
+    },
+    {
+     "fold": 4,
+     "trainRows": 253,
+     "purged": 4,
+     "testRows": 46,
+     "testFrom": 1770372540,
+     "testTo": 1777286340,
+     "thresholdFrom": "the earlier test blocks",
+     "gbt": {
+      "n": 46,
+      "winRate": 0.2609,
+      "auc": 0.6544,
+      "brier": 0.1855,
+      "brierPrior": 0.1936,
+      "brierSkill": 0.0415,
+      "logLoss": 0.5561,
+      "logLossPrior": 0.576,
+      "dropShare": 0.0,
+      "trading": {
+       "threshold": null,
+       "mechanical": {
+        "n": 46,
+        "avg": 0.216,
+        "total": 9.94,
+        "t": 0.72
+       },
+       "kept": {
+        "n": 46,
+        "avg": 0.216,
+        "total": 9.94,
+        "t": 0.72
+       },
+       "skipped": {
+        "n": 0,
+        "avg": null,
+        "total": 0.0,
+        "t": null
+       },
+       "keptMinusSkippedT": null
+      }
+     },
+     "logit": {
+      "n": 46,
+      "winRate": 0.2609,
+      "auc": 0.6814,
+      "brier": 0.1784,
+      "brierPrior": 0.1936,
+      "brierSkill": 0.0783,
+      "logLoss": 0.5549,
+      "logLossPrior": 0.576,
+      "dropShare": 0.0,
+      "trading": {
+       "threshold": null,
+       "mechanical": {
+        "n": 46,
+        "avg": 0.216,
+        "total": 9.94,
+        "t": 0.72
+       },
+       "kept": {
+        "n": 46,
+        "avg": 0.216,
+        "total": 9.94,
+        "t": 0.72
+       },
+       "skipped": {
+        "n": 0,
+        "avg": null,
+        "total": 0.0,
+        "t": null
+       },
+       "keptMinusSkippedT": null
+      }
+     },
+     "prior": {
+      "p": 0.2332,
+      "brier": 0.1936,
+      "logLoss": 0.576
+     }
+    }
+   ],
+   "outOfFold": {
+    "gbt": {
+     "n": 182,
+     "winRate": 0.2692,
+     "auc": 0.5615,
+     "brier": 0.1982,
+     "brierPrior": 0.2,
+     "brierSkill": 0.0086,
+     "logLoss": 0.5883,
+     "logLossPrior": 0.5917,
+     "calibration": [
+      {
+       "n": 37,
+       "meanP": 0.131,
+       "winRate": 0.1892
+      },
+      {
+       "n": 37,
+       "meanP": 0.1736,
+       "winRate": 0.2703
+      },
+      {
+       "n": 36,
+       "meanP": 0.2116,
+       "winRate": 0.2778
+      },
+      {
+       "n": 36,
+       "meanP": 0.2481,
+       "winRate": 0.3056
+      },
+      {
+       "n": 36,
+       "meanP": 0.3049,
+       "winRate": 0.3056
+      }
+     ],
+     "trading": {
+      "mechanical": {
+       "n": 182,
+       "avg": 0.5831,
+       "total": 106.12,
+       "t": 2.43
+      },
+      "kept": {
+       "n": 181,
+       "avg": 0.595,
+       "total": 107.7,
+       "t": 2.47
+      },
+      "skipped": {
+       "n": 1,
+       "avg": -1.5753,
+       "total": -1.58,
+       "t": null
+      },
+      "keptMinusSkippedT": null,
+      "keptMinusMechanical": 0.0119,
+      "tOn": "net R"
+     }
+    },
+    "logit": {
+     "n": 182,
+     "winRate": 0.2692,
+     "auc": 0.5559,
+     "brier": 0.2046,
+     "brierPrior": 0.2,
+     "brierSkill": -0.0234,
+     "logLoss": 0.63,
+     "logLossPrior": 0.5917,
+     "calibration": [
+      {
+       "n": 37,
+       "meanP": 0.075,
+       "winRate": 0.2703
+      },
+      {
+       "n": 37,
+       "meanP": 0.1435,
+       "winRate": 0.1622
+      },
+      {
+       "n": 36,
+       "meanP": 0.2022,
+       "winRate": 0.2778
+      },
+      {
+       "n": 36,
+       "meanP": 0.2821,
+       "winRate": 0.1944
+      },
+      {
+       "n": 36,
+       "meanP": 0.4283,
+       "winRate": 0.4444
+      }
+     ],
+     "trading": {
+      "mechanical": {
+       "n": 182,
+       "avg": 0.5831,
+       "total": 106.12,
+       "t": 2.43
+      },
+      "kept": {
+       "n": 176,
+       "avg": 0.4367,
+       "total": 76.86,
+       "t": 1.93
+      },
+      "skipped": {
+       "n": 6,
+       "avg": 4.8779,
+       "total": 29.27,
+       "t": 1.88
+      },
+      "keptMinusSkippedT": -1.71,
+      "keptMinusMechanical": -0.1464,
+      "tOn": "net R"
+     }
+    },
+    "prior": {
+     "brier": 0.2,
+     "logLoss": 0.5917,
+     "auc": 0.5
+    },
+    "alwaysTake": {
+     "n": 182,
+     "avg": 0.5831,
+     "total": 106.12,
+     "t": 2.43
+    }
+   },
+   "regressionView": {
+    "what": "secondary: the same trees fitted to net R itself, out of fold",
+    "n": 182,
+    "rmse": 3.3066,
+    "rmseTrainMean": 3.2508,
+    "rankCorr": 0.1679
+   },
+   "calibration": {
+    "method": "Platt scaling on out-of-fold raw scores, fitted on all folds but the last and checked on the last",
+    "n": 46,
+    "brier": 0.1885,
+    "brierPrior": 0.1936,
+    "meanP": 0.2864,
+    "winRate": 0.2609,
+    "slope": 0.4489,
+    "passed": true
+   },
+   "threshold": {
+    "dropShare": 0.0,
+    "p": null,
+    "from": "all out-of-fold predictions"
+   },
+   "exam": {
+    "what": "the exam pool (whole calendar months held out when the candidates were made), read once after the walk-forward verdict was fixed. It is used to choose nothing.",
+    "from": "2020-08-11",
+    "to": "2025-03-03",
+    "gbt": {
+     "n": 50,
+     "winRate": 0.34,
+     "auc": 0.6007,
+     "brier": 0.221,
+     "brierPrior": 0.2342,
+     "brierSkill": 0.0565,
+     "logLoss": 0.6329,
+     "logLossPrior": 0.6658,
+     "trading": {
+      "threshold": null,
+      "mechanical": {
+       "n": 50,
+       "avg": 1.2883,
+       "total": 64.42,
+       "t": 1.72
+      },
+      "kept": {
+       "n": 50,
+       "avg": 1.2883,
+       "total": 64.42,
+       "t": 1.72
+      },
+      "skipped": {
+       "n": 0,
+       "avg": null,
+       "total": 0.0,
+       "t": null
+      },
+      "keptMinusSkippedT": null
+     }
+    },
+    "logit": {
+     "n": 50,
+     "winRate": 0.34,
+     "auc": 0.6221,
+     "brier": 0.2212,
+     "brierPrior": 0.2342,
+     "brierSkill": 0.0556,
+     "logLoss": 0.6424,
+     "logLossPrior": 0.6658,
+     "trading": {
+      "threshold": null,
+      "mechanical": {
+       "n": 50,
+       "avg": 1.2883,
+       "total": 64.42,
+       "t": 1.72
+      },
+      "kept": {
+       "n": 50,
+       "avg": 1.2883,
+       "total": 64.42,
+       "t": 1.72
+      },
+      "skipped": {
+       "n": 0,
+       "avg": null,
+       "total": 0.0,
+       "t": null
+      },
+      "keptMinusSkippedT": null
+     }
+    },
+    "alwaysTake": {
+     "n": 50,
+     "avg": 1.2883,
+     "total": 64.42,
+     "t": 1.72
+    },
+    "limit": "exam months lie between training months, so this is held-out data but not later data; 0 of the 50 exam setups fired while a training trade was open"
+   },
+   "hash": "68a342626f7aac6a",
+   "register": {
+    "action": "model.register",
+    "model": {
+     "name": "academy-scorer-replica",
+     "version": "replica-7bf224d032",
+     "kind": "gbt-binary",
+     "edge": "replica",
+     "status": "challenger",
+     "metrics": {
+      "oofN": 182,
+      "oofAuc": 0.5615,
+      "oofBrier": 0.1982,
+      "oofBrierPrior": 0.2,
+      "oofLogLoss": 0.5883,
+      "mechanicalR": 0.5831,
+      "keptN": 181,
+      "keptR": 0.595,
+      "skippedN": 1,
+      "skippedR": -1.5753,
+      "keptMinusSkippedT": null,
+      "beatsBaseline": "no",
+      "calibrated": "yes",
+      "examN": 50,
+      "examAuc": 0.6007,
+      "examBrier": 0.221,
+      "examBrierPrior": 0.2342
+     },
+     "datasetVersion": "9035174e215f",
+     "trainedOn": {
+      "pool": "train",
+      "rows": 303,
+      "from": "2020-04-13",
+      "to": "2026-04-27"
+     },
+     "artifact": "ml/models/replica-7bf224d032.json",
+     "hash": "68a342626f7aac6a",
+     "notes": "REJECTED CHALLENGER. no improvement over taking every setup: out of fold it skipped only 1 trade(s), too few for a t; the last fold does not confirm it. Do not promote without the owner reading ml/models/report.md."
+    }
+   }
+  },
+  {
+   "id": "gtl-9d4700e6be",
+   "edge": "gtl",
+   "scope": "gtl",
+   "status": "rejected challenger",
+   "verdict": "no improvement over taking every setup: out of fold the kept trades do not beat the skipped ones (t 0.29, need 2.0); the last fold does not confirm it",
+   "beatsBaseline": false,
+   "promoted": false,
+   "calibrated": false,
+   "file": "gtl-9d4700e6be.json",
+   "pred": "gtl-9d4700e6be.pred.json",
+   "candidates": 314,
+   "trainRows": 165,
+   "from": "2020-02-06",
+   "to": "2026-09-17",
+   "winRate": 0.5212,
+   "netRPerTrade": 0.2323,
+   "featureNames": [
+    "sigTf",
+    "structD1",
+    "structH4",
+    "structH1",
+    "structM15",
+    "maPosD1",
+    "maPosH4",
+    "distMa20D1",
+    "htfScore",
+    "htfBias",
+    "ltfBias",
+    "htfLtfConflict",
+    "eqHighs",
+    "eqLows",
+    "distPdh",
+    "distPdl",
+    "distPwh",
+    "distPwl",
+    "distSessHigh",
+    "distSessLow",
+    "distEqHigh",
+    "distEqLow",
+    "sweep",
+    "sweepAge",
+    "sweepOf",
+    "sweepDepth",
+    "displacement",
+    "dispAge",
+    "dispSize",
+    "dispFvg",
+    "fvg",
+    "fvgSize",
+    "roc",
+    "consec",
+    "momentum",
+    "atrPct",
+    "atrPctile",
+    "volRatio",
+    "volState",
+    "volAbnormal",
+    "session",
+    "dow",
+    "hourUtc",
+    "distRes",
+    "distSup",
+    "distSR",
+    "entryLoc",
+    "entryZone",
+    "regimeBase",
+    "regimeTrend",
+    "trendStrength",
+    "effRatio",
+    "regimeHtf",
+    "side",
+    "rr",
+    "stopAtr",
+    "targetAtr",
+    "entryOffset",
+    "geomOk",
+    "biasAlign",
+    "ltfAlign",
+    "sweepFor",
+    "dispFor",
+    "momFor",
+    "locFor",
+    "confirm",
+    "trigCloseLoc",
+    "trigBodyAtr",
+    "oppLiq",
+    "oppLiqFrac"
+   ],
+   "validation": {
+    "scheme": "chronological walk-forward, expanding window",
+    "folds": 3,
+    "firstTrainShare": 0.4,
+    "embargoSec": 86400,
+    "outOfFoldRows": 99
+   },
+   "folds": [
+    {
+     "fold": 1,
+     "trainRows": 66,
+     "purged": 0,
+     "testRows": 33,
+     "testFrom": 1666368240,
+     "testTo": 1709193840,
+     "thresholdFrom": "an inner split of the first training window",
+     "gbt": {
+      "n": 33,
+      "winRate": 0.4848,
+      "auc": 0.636,
+      "brier": 0.2372,
+      "brierPrior": 0.2507,
+      "brierSkill": 0.0537,
+      "logLoss": 0.6671,
+      "logLossPrior": 0.6945,
+      "dropShare": 0.4,
+      "trading": {
+       "threshold": 0.575227,
+       "mechanical": {
+        "n": 33,
+        "avg": 0.2087,
+        "total": 6.89,
+        "t": 0.81
+       },
+       "kept": {
+        "n": 6,
+        "avg": 0.9565,
+        "total": 5.74,
+        "t": 2.54
+       },
+       "skipped": {
+        "n": 27,
+        "avg": 0.0425,
+        "total": 1.15,
+        "t": 0.14
+       },
+       "keptMinusSkippedT": 1.91
+      }
+     },
+     "logit": {
+      "n": 33,
+      "winRate": 0.4848,
+      "auc": 0.4154,
+      "brier": 0.2896,
+      "brierPrior": 0.2507,
+      "brierSkill": -0.1553,
+      "logLoss": 0.7817,
+      "logLossPrior": 0.6945,
+      "dropShare": 0.0,
+      "trading": {
+       "threshold": null,
+       "mechanical": {
+        "n": 33,
+        "avg": 0.2087,
+        "total": 6.89,
+        "t": 0.81
+       },
+       "kept": {
+        "n": 33,
+        "avg": 0.2087,
+        "total": 6.89,
+        "t": 0.81
+       },
+       "skipped": {
+        "n": 0,
+        "avg": null,
+        "total": 0.0,
+        "t": null
+       },
+       "keptMinusSkippedT": null
+      }
+     },
+     "prior": {
+      "p": 0.5152,
+      "brier": 0.2507,
+      "logLoss": 0.6945
+     }
+    },
+    {
+     "fold": 2,
+     "trainRows": 99,
+     "purged": 0,
+     "testRows": 33,
+     "testFrom": 1712865840,
+     "testTo": 1755086640,
+     "thresholdFrom": "the earlier test blocks",
+     "gbt": {
+      "n": 33,
+      "winRate": 0.6364,
+      "auc": 0.4246,
+      "brier": 0.2755,
+      "brierPrior": 0.2486,
+      "brierSkill": -0.108,
+      "logLoss": 0.7465,
+      "logLossPrior": 0.6904,
+      "dropShare": 0.2,
+      "trading": {
+       "threshold": 0.464705,
+       "mechanical": {
+        "n": 33,
+        "avg": 0.4869,
+        "total": 16.07,
+        "t": 2.32
+       },
+       "kept": {
+        "n": 17,
+        "avg": 0.3549,
+        "total": 6.03,
+        "t": 1.28
+       },
+       "skipped": {
+        "n": 16,
+        "avg": 0.6272,
+        "total": 10.04,
+        "t": 1.94
+       },
+       "keptMinusSkippedT": -0.64
+      }
+     },
+     "logit": {
+      "n": 33,
+      "winRate": 0.6364,
+      "auc": 0.5119,
+      "brier": 0.2799,
+      "brierPrior": 0.2486,
+      "brierSkill": -0.1258,
+      "logLoss": 0.7643,
+      "logLossPrior": 0.6904,
+      "dropShare": 0.0,
+      "trading": {
+       "threshold": null,
+       "mechanical": {
+        "n": 33,
+        "avg": 0.4869,
+        "total": 16.07,
+        "t": 2.32
+       },
+       "kept": {
+        "n": 33,
+        "avg": 0.4869,
+        "total": 16.07,
+        "t": 2.32
+       },
+       "skipped": {
+        "n": 0,
+        "avg": null,
+        "total": 0.0,
+        "t": null
+       },
+       "keptMinusSkippedT": null
+      }
+     },
+     "prior": {
+      "p": 0.5051,
+      "brier": 0.2486,
+      "logLoss": 0.6904
+     }
+    },
+    {
+     "fold": 3,
+     "trainRows": 132,
+     "purged": 0,
+     "testRows": 33,
+     "testFrom": 1755504240,
+     "testTo": 1789661040,
+     "thresholdFrom": "the earlier test blocks",
+     "gbt": {
+      "n": 33,
+      "winRate": 0.4545,
+      "auc": 0.5222,
+      "brier": 0.2566,
+      "brierPrior": 0.2549,
+      "brierSkill": -0.0068,
+      "logLoss": 0.7074,
+      "logLossPrior": 0.7029,
+      "dropShare": 0.0,
+      "trading": {
+       "threshold": null,
+       "mechanical": {
+        "n": 33,
+        "avg": 0.2209,
+        "total": 7.29,
+        "t": 0.91
+       },
+       "kept": {
+        "n": 33,
+        "avg": 0.2209,
+        "total": 7.29,
+        "t": 0.91
+       },
+       "skipped": {
+        "n": 0,
+        "avg": null,
+        "total": 0.0,
+        "t": null
+       },
+       "keptMinusSkippedT": null
+      }
+     },
+     "logit": {
+      "n": 33,
+      "winRate": 0.4545,
+      "auc": 0.4519,
+      "brier": 0.2951,
+      "brierPrior": 0.2549,
+      "brierSkill": -0.1577,
+      "logLoss": 0.8147,
+      "logLossPrior": 0.7029,
+      "dropShare": 0.0,
+      "trading": {
+       "threshold": null,
+       "mechanical": {
+        "n": 33,
+        "avg": 0.2209,
+        "total": 7.29,
+        "t": 0.91
+       },
+       "kept": {
+        "n": 33,
+        "avg": 0.2209,
+        "total": 7.29,
+        "t": 0.91
+       },
+       "skipped": {
+        "n": 0,
+        "avg": null,
+        "total": 0.0,
+        "t": null
+       },
+       "keptMinusSkippedT": null
+      }
+     },
+     "prior": {
+      "p": 0.5379,
+      "brier": 0.2549,
+      "logLoss": 0.7029
+     }
+    }
+   ],
+   "outOfFold": {
+    "gbt": {
+     "n": 99,
+     "winRate": 0.5253,
+     "auc": 0.5164,
+     "brier": 0.2565,
+     "brierPrior": 0.2514,
+     "brierSkill": -0.0201,
+     "logLoss": 0.707,
+     "logLossPrior": 0.696,
+     "calibration": [
+      {
+       "n": 20,
+       "meanP": 0.3817,
+       "winRate": 0.5
+      },
+      {
+       "n": 20,
+       "meanP": 0.455,
+       "winRate": 0.6
+      },
+      {
+       "n": 20,
+       "meanP": 0.5137,
+       "winRate": 0.4
+      },
+      {
+       "n": 20,
+       "meanP": 0.5552,
+       "winRate": 0.6
+      },
+      {
+       "n": 19,
+       "meanP": 0.6224,
+       "winRate": 0.5263
+      }
+     ],
+     "trading": {
+      "mechanical": {
+       "n": 99,
+       "avg": 0.3055,
+       "total": 30.24,
+       "t": 2.24
+      },
+      "kept": {
+       "n": 56,
+       "avg": 0.3404,
+       "total": 19.06,
+       "t": 1.99
+      },
+      "skipped": {
+       "n": 43,
+       "avg": 0.2601,
+       "total": 11.18,
+       "t": 1.17
+      },
+      "keptMinusSkippedT": 0.29,
+      "keptMinusMechanical": 0.0349,
+      "tOn": "net R"
+     }
+    },
+    "logit": {
+     "n": 99,
+     "winRate": 0.5253,
+     "auc": 0.464,
+     "brier": 0.2882,
+     "brierPrior": 0.2514,
+     "brierSkill": -0.1464,
+     "logLoss": 0.7869,
+     "logLossPrior": 0.696,
+     "calibration": [
+      {
+       "n": 20,
+       "meanP": 0.2838,
+       "winRate": 0.5
+      },
+      {
+       "n": 20,
+       "meanP": 0.4282,
+       "winRate": 0.65
+      },
+      {
+       "n": 20,
+       "meanP": 0.511,
+       "winRate": 0.55
+      },
+      {
+       "n": 20,
+       "meanP": 0.5985,
+       "winRate": 0.5
+      },
+      {
+       "n": 19,
+       "meanP": 0.7449,
+       "winRate": 0.4211
+      }
+     ],
+     "trading": {
+      "mechanical": {
+       "n": 99,
+       "avg": 0.3055,
+       "total": 30.24,
+       "t": 2.24
+      },
+      "kept": {
+       "n": 99,
+       "avg": 0.3055,
+       "total": 30.24,
+       "t": 2.24
+      },
+      "skipped": {
+       "n": 0,
+       "avg": null,
+       "total": 0.0,
+       "t": null
+      },
+      "keptMinusSkippedT": null,
+      "keptMinusMechanical": 0.0,
+      "tOn": "net R"
+     }
+    },
+    "prior": {
+     "brier": 0.2514,
+     "logLoss": 0.696,
+     "auc": 0.5
+    },
+    "alwaysTake": {
+     "n": 99,
+     "avg": 0.3055,
+     "total": 30.24,
+     "t": 2.24
+    }
+   },
+   "regressionView": {
+    "what": "secondary: the same trees fitted to net R itself, out of fold",
+    "n": 99,
+    "rmse": 1.3982,
+    "rmseTrainMean": 1.3584,
+    "rankCorr": -0.098
+   },
+   "calibration": {
+    "method": "Platt scaling on out-of-fold raw scores, fitted on all folds but the last and checked on the last",
+    "n": 33,
+    "brier": 0.2593,
+    "brierPrior": 0.2549,
+    "meanP": 0.5618,
+    "winRate": 0.4545,
+    "slope": 0.044,
+    "passed": false
+   },
+   "threshold": {
+    "dropShare": 0.0,
+    "p": null,
+    "from": "all out-of-fold predictions"
+   },
+   "exam": {
+    "what": "the exam pool (whole calendar months held out when the candidates were made), read once after the walk-forward verdict was fixed. It is used to choose nothing.",
+    "from": "2020-01-13",
+    "to": "2026-10-15",
+    "gbt": {
+     "n": 61,
+     "winRate": 0.4754,
+     "auc": 0.5269,
+     "brier": 0.2566,
+     "brierPrior": 0.2515,
+     "brierSkill": -0.0204,
+     "logLoss": 0.7065,
+     "logLossPrior": 0.6961,
+     "trading": {
+      "threshold": null,
+      "mechanical": {
+       "n": 61,
+       "avg": -0.0011,
+       "total": -0.07,
+       "t": -0.01
+      },
+      "kept": {
+       "n": 61,
+       "avg": -0.0011,
+       "total": -0.07,
+       "t": -0.01
+      },
+      "skipped": {
+       "n": 0,
+       "avg": null,
+       "total": 0.0,
+       "t": null
+      },
+      "keptMinusSkippedT": null
+     }
+    },
+    "logit": {
+     "n": 61,
+     "winRate": 0.4754,
+     "auc": 0.4149,
+     "brier": 0.3042,
+     "brierPrior": 0.2515,
+     "brierSkill": -0.2095,
+     "logLoss": 0.8219,
+     "logLossPrior": 0.6961,
+     "trading": {
+      "threshold": null,
+      "mechanical": {
+       "n": 61,
+       "avg": -0.0011,
+       "total": -0.07,
+       "t": -0.01
+      },
+      "kept": {
+       "n": 61,
+       "avg": -0.0011,
+       "total": -0.07,
+       "t": -0.01
+      },
+      "skipped": {
+       "n": 0,
+       "avg": null,
+       "total": 0.0,
+       "t": null
+      },
+      "keptMinusSkippedT": null
+     }
+    },
+    "alwaysTake": {
+     "n": 61,
+     "avg": -0.0011,
+     "total": -0.07,
+     "t": -0.01
+    },
+    "limit": "exam months lie between training months, so this is held-out data but not later data; 0 of the 61 exam setups fired while a training trade was open"
+   },
+   "hash": "01ed23c6fba9fbd1",
+   "register": {
+    "action": "model.register",
+    "model": {
+     "name": "academy-scorer-gtl",
+     "version": "gtl-9d4700e6be",
+     "kind": "gbt-binary",
+     "edge": "gtl",
+     "status": "challenger",
+     "metrics": {
+      "oofN": 99,
+      "oofAuc": 0.5164,
+      "oofBrier": 0.2565,
+      "oofBrierPrior": 0.2514,
+      "oofLogLoss": 0.707,
+      "mechanicalR": 0.3055,
+      "keptN": 56,
+      "keptR": 0.3404,
+      "skippedN": 43,
+      "skippedR": 0.2601,
+      "keptMinusSkippedT": 0.29,
+      "beatsBaseline": "no",
+      "calibrated": "no",
+      "examN": 61,
+      "examAuc": 0.5269,
+      "examBrier": 0.2566,
+      "examBrierPrior": 0.2515
+     },
+     "datasetVersion": "9035174e215f",
+     "trainedOn": {
+      "pool": "train",
+      "rows": 165,
+      "from": "2020-02-06",
+      "to": "2026-09-17"
+     },
+     "artifact": "ml/models/gtl-9d4700e6be.json",
+     "hash": "01ed23c6fba9fbd1",
+     "notes": "REJECTED CHALLENGER. no improvement over taking every setup: out of fold the kept trades do not beat the skipped ones (t 0.29, need 2.0); the last fold does not confirm it. Do not promote without the owner reading ml/models/report.md."
+    }
+   }
+  },
+  {
+   "id": "gmp-0ff03bb04a",
+   "edge": "gmp",
+   "scope": "gmp",
+   "status": "rejected challenger",
+   "verdict": "no improvement over taking every setup: out of fold the kept trades do not beat the skipped ones (t -0.12, need 2.0); the last fold does not confirm it",
+   "beatsBaseline": false,
+   "promoted": false,
+   "calibrated": false,
+   "file": "gmp-0ff03bb04a.json",
+   "pred": "gmp-0ff03bb04a.pred.json",
+   "candidates": 1003,
+   "trainRows": 494,
+   "from": "2020-02-05",
+   "to": "2026-10-22",
+   "winRate": 0.4474,
+   "netRPerTrade": 0.0616,
+   "featureNames": [
+    "sigTf",
+    "structD1",
+    "structH4",
+    "structH1",
+    "structM15",
+    "maPosD1",
+    "maPosH4",
+    "distMa20D1",
+    "htfScore",
+    "htfBias",
+    "ltfBias",
+    "htfLtfConflict",
+    "eqHighs",
+    "eqLows",
+    "distPdh",
+    "distPdl",
+    "distPwh",
+    "distPwl",
+    "distSessHigh",
+    "distSessLow",
+    "distEqHigh",
+    "distEqLow",
+    "sweep",
+    "sweepAge",
+    "sweepOf",
+    "sweepDepth",
+    "displacement",
+    "dispAge",
+    "dispSize",
+    "dispFvg",
+    "fvg",
+    "fvgSize",
+    "roc",
+    "consec",
+    "momentum",
+    "atrPct",
+    "atrPctile",
+    "volRatio",
+    "volState",
+    "volAbnormal",
+    "session",
+    "dow",
+    "hourUtc",
+    "distRes",
+    "distSup",
+    "distSR",
+    "entryLoc",
+    "entryZone",
+    "regimeBase",
+    "regimeTrend",
+    "trendStrength",
+    "effRatio",
+    "regimeHtf",
+    "side",
+    "rr",
+    "stopAtr",
+    "targetAtr",
+    "entryOffset",
+    "geomOk",
+    "biasAlign",
+    "ltfAlign",
+    "sweepFor",
+    "dispFor",
+    "momFor",
+    "locFor",
+    "confirm",
+    "trigCloseLoc",
+    "trigBodyAtr",
+    "oppLiq",
+    "oppLiqFrac"
+   ],
+   "validation": {
+    "scheme": "chronological walk-forward, expanding window",
+    "folds": 4,
+    "firstTrainShare": 0.4,
+    "embargoSec": 86400,
+    "outOfFoldRows": 296
+   },
+   "folds": [
+    {
+     "fold": 1,
+     "trainRows": 198,
+     "purged": 0,
+     "testRows": 74,
+     "testFrom": 1640621400,
+     "testTo": 1673533500,
+     "thresholdFrom": "an inner split of the first training window",
+     "gbt": {
+      "n": 74,
+      "winRate": 0.4459,
+      "auc": 0.5395,
+      "brier": 0.2478,
+      "brierPrior": 0.2473,
+      "brierSkill": -0.0023,
+      "logLoss": 0.6902,
+      "logLossPrior": 0.6877,
+      "dropShare": 0.1,
+      "trading": {
+       "threshold": 0.360167,
+       "mechanical": {
+        "n": 74,
+        "avg": -0.0025,
+        "total": -0.18,
+        "t": -0.02
+       },
+       "kept": {
+        "n": 63,
+        "avg": -0.0079,
+        "total": -0.5,
+        "t": -0.05
+       },
+       "skipped": {
+        "n": 11,
+        "avg": 0.0288,
+        "total": 0.32,
+        "t": 0.07
+       },
+       "keptMinusSkippedT": -0.08
+      }
+     },
+     "logit": {
+      "n": 74,
+      "winRate": 0.4459,
+      "auc": 0.524,
+      "brier": 0.2725,
+      "brierPrior": 0.2473,
+      "brierSkill": -0.1022,
+      "logLoss": 0.7608,
+      "logLossPrior": 0.6877,
+      "dropShare": 0.0,
+      "trading": {
+       "threshold": null,
+       "mechanical": {
+        "n": 74,
+        "avg": -0.0025,
+        "total": -0.18,
+        "t": -0.02
+       },
+       "kept": {
+        "n": 74,
+        "avg": -0.0025,
+        "total": -0.18,
+        "t": -0.02
+       },
+       "skipped": {
+        "n": 0,
+        "avg": null,
+        "total": 0.0,
+        "t": null
+       },
+       "keptMinusSkippedT": null
+      }
+     },
+     "prior": {
+      "p": 0.4596,
+      "brier": 0.2473,
+      "logLoss": 0.6877
+     }
+    },
+    {
+     "fold": 2,
+     "trainRows": 272,
+     "purged": 0,
+     "testRows": 74,
+     "testFrom": 1673960400,
+     "testTo": 1703085600,
+     "thresholdFrom": "the earlier test blocks",
+     "gbt": {
+      "n": 74,
+      "winRate": 0.4324,
+      "auc": 0.4561,
+      "brier": 0.2589,
+      "brierPrior": 0.246,
+      "brierSkill": -0.0527,
+      "logLoss": 0.712,
+      "logLossPrior": 0.6851,
+      "dropShare": 0.5,
+      "trading": {
+       "threshold": 0.458457,
+       "mechanical": {
+        "n": 74,
+        "avg": 0.1664,
+        "total": 12.32,
+        "t": 1.13
+       },
+       "kept": {
+        "n": 37,
+        "avg": 0.2225,
+        "total": 8.23,
+        "t": 0.99
+       },
+       "skipped": {
+        "n": 37,
+        "avg": 0.1104,
+        "total": 4.09,
+        "t": 0.57
+       },
+       "keptMinusSkippedT": 0.38
+      }
+     },
+     "logit": {
+      "n": 74,
+      "winRate": 0.4324,
+      "auc": 0.4702,
+      "brier": 0.2891,
+      "brierPrior": 0.246,
+      "brierSkill": -0.1754,
+      "logLoss": 0.7869,
+      "logLossPrior": 0.6851,
+      "dropShare": 0.4,
+      "trading": {
+       "threshold": 0.324025,
+       "mechanical": {
+        "n": 74,
+        "avg": 0.1664,
+        "total": 12.32,
+        "t": 1.13
+       },
+       "kept": {
+        "n": 59,
+        "avg": 0.1592,
+        "total": 9.39,
+        "t": 0.96
+       },
+       "skipped": {
+        "n": 15,
+        "avg": 0.1951,
+        "total": 2.93,
+        "t": 0.59
+       },
+       "keptMinusSkippedT": -0.1
+      }
+     },
+     "prior": {
+      "p": 0.4559,
+      "brier": 0.246,
+      "logLoss": 0.6851
+     }
+    },
+    {
+     "fold": 3,
+     "trainRows": 346,
+     "purged": 0,
+     "testRows": 74,
+     "testFrom": 1703259300,
+     "testTo": 1749728700,
+     "thresholdFrom": "the earlier test blocks",
+     "gbt": {
+      "n": 74,
+      "winRate": 0.4865,
+      "auc": 0.6148,
+      "brier": 0.2392,
+      "brierPrior": 0.2511,
+      "brierSkill": 0.0475,
+      "logLoss": 0.6705,
+      "logLossPrior": 0.6953,
+      "dropShare": 0.0,
+      "trading": {
+       "threshold": null,
+       "mechanical": {
+        "n": 74,
+        "avg": 0.1296,
+        "total": 9.59,
+        "t": 0.94
+       },
+       "kept": {
+        "n": 74,
+        "avg": 0.1296,
+        "total": 9.59,
+        "t": 0.94
+       },
+       "skipped": {
+        "n": 0,
+        "avg": null,
+        "total": 0.0,
+        "t": null
+       },
+       "keptMinusSkippedT": null
+      }
+     },
+     "logit": {
+      "n": 74,
+      "winRate": 0.4865,
+      "auc": 0.6192,
+      "brier": 0.2375,
+      "brierPrior": 0.2511,
+      "brierSkill": 0.0543,
+      "logLoss": 0.6642,
+      "logLossPrior": 0.6953,
+      "dropShare": 0.2,
+      "trading": {
+       "threshold": 0.275264,
+       "mechanical": {
+        "n": 74,
+        "avg": 0.1296,
+        "total": 9.59,
+        "t": 0.94
+       },
+       "kept": {
+        "n": 62,
+        "avg": 0.2349,
+        "total": 14.56,
+        "t": 1.53
+       },
+       "skipped": {
+        "n": 12,
+        "avg": -0.4143,
+        "total": -4.97,
+        "t": -1.5
+       },
+       "keptMinusSkippedT": 2.05
+      }
+     },
+     "prior": {
+      "p": 0.4509,
+      "brier": 0.2511,
+      "logLoss": 0.6953
+     }
+    },
+    {
+     "fold": 4,
+     "trainRows": 420,
+     "purged": 0,
+     "testRows": 74,
+     "testFrom": 1750340100,
+     "testTo": 1792671600,
+     "thresholdFrom": "the earlier test blocks",
+     "gbt": {
+      "n": 74,
+      "winRate": 0.3919,
+      "auc": 0.4146,
+      "brier": 0.261,
+      "brierPrior": 0.2426,
+      "brierSkill": -0.0758,
+      "logLoss": 0.7158,
+      "logLossPrior": 0.6783,
+      "dropShare": 0.0,
+      "trading": {
+       "threshold": null,
+       "mechanical": {
+        "n": 74,
+        "avg": -0.0015,
+        "total": -0.11,
+        "t": -0.01
+       },
+       "kept": {
+        "n": 74,
+        "avg": -0.0015,
+        "total": -0.11,
+        "t": -0.01
+       },
+       "skipped": {
+        "n": 0,
+        "avg": null,
+        "total": 0.0,
+        "t": null
+       },
+       "keptMinusSkippedT": null
+      }
+     },
+     "logit": {
+      "n": 74,
+      "winRate": 0.3919,
+      "auc": 0.4621,
+      "brier": 0.279,
+      "brierPrior": 0.2426,
+      "brierSkill": -0.1502,
+      "logLoss": 0.7639,
+      "logLossPrior": 0.6783,
+      "dropShare": 0.3,
+      "trading": {
+       "threshold": 0.340729,
+       "mechanical": {
+        "n": 74,
+        "avg": -0.0015,
+        "total": -0.11,
+        "t": -0.01
+       },
+       "kept": {
+        "n": 54,
+        "avg": -0.0431,
+        "total": -2.33,
+        "t": -0.23
+       },
+       "skipped": {
+        "n": 20,
+        "avg": 0.1107,
+        "total": 2.21,
+        "t": 0.41
+       },
+       "keptMinusSkippedT": -0.47
+      }
+     },
+     "prior": {
+      "p": 0.4571,
+      "brier": 0.2426,
+      "logLoss": 0.6783
+     }
+    }
+   ],
+   "outOfFold": {
+    "gbt": {
+     "n": 296,
+     "winRate": 0.4392,
+     "auc": 0.5111,
+     "brier": 0.2517,
+     "brierPrior": 0.2467,
+     "brierSkill": -0.0203,
+     "logLoss": 0.6971,
+     "logLossPrior": 0.6866,
+     "calibration": [
+      {
+       "n": 60,
+       "meanP": 0.3419,
+       "winRate": 0.4167
+      },
+      {
+       "n": 59,
+       "meanP": 0.418,
+       "winRate": 0.4407
+      },
+      {
+       "n": 59,
+       "meanP": 0.4614,
+       "winRate": 0.4576
+      },
+      {
+       "n": 59,
+       "meanP": 0.4998,
+       "winRate": 0.4576
+      },
+      {
+       "n": 59,
+       "meanP": 0.5678,
+       "winRate": 0.4237
+      }
+     ],
+     "trading": {
+      "mechanical": {
+       "n": 296,
+       "avg": 0.073,
+       "total": 21.61,
+       "t": 1.02
+      },
+      "kept": {
+       "n": 248,
+       "avg": 0.0694,
+       "total": 17.21,
+       "t": 0.88
+      },
+      "skipped": {
+       "n": 48,
+       "avg": 0.0917,
+       "total": 4.4,
+       "t": 0.53
+      },
+      "keptMinusSkippedT": -0.12,
+      "keptMinusMechanical": -0.0036,
+      "tOn": "net R"
+     }
+    },
+    "logit": {
+     "n": 296,
+     "winRate": 0.4392,
+     "auc": 0.5245,
+     "brier": 0.2695,
+     "brierPrior": 0.2467,
+     "brierSkill": -0.0924,
+     "logLoss": 0.744,
+     "logLossPrior": 0.6866,
+     "calibration": [
+      {
+       "n": 60,
+       "meanP": 0.2187,
+       "winRate": 0.4
+      },
+      {
+       "n": 59,
+       "meanP": 0.345,
+       "winRate": 0.4407
+      },
+      {
+       "n": 59,
+       "meanP": 0.4521,
+       "winRate": 0.4746
+      },
+      {
+       "n": 59,
+       "meanP": 0.5409,
+       "winRate": 0.3559
+      },
+      {
+       "n": 59,
+       "meanP": 0.6999,
+       "winRate": 0.5254
+      }
+     ],
+     "trading": {
+      "mechanical": {
+       "n": 296,
+       "avg": 0.073,
+       "total": 21.61,
+       "t": 1.02
+      },
+      "kept": {
+       "n": 249,
+       "avg": 0.0861,
+       "total": 21.45,
+       "t": 1.09
+      },
+      "skipped": {
+       "n": 47,
+       "avg": 0.0036,
+       "total": 0.17,
+       "t": 0.02
+      },
+      "keptMinusSkippedT": 0.44,
+      "keptMinusMechanical": 0.0131,
+      "tOn": "net R"
+     }
+    },
+    "prior": {
+     "brier": 0.2467,
+     "logLoss": 0.6866,
+     "auc": 0.5
+    },
+    "alwaysTake": {
+     "n": 296,
+     "avg": 0.073,
+     "total": 21.61,
+     "t": 1.02
+    }
+   },
+   "regressionView": {
+    "what": "secondary: the same trees fitted to net R itself, out of fold",
+    "n": 296,
+    "rmse": 1.2647,
+    "rmseTrainMean": 1.2311,
+    "rankCorr": -0.0403
+   },
+   "calibration": {
+    "method": "Platt scaling on out-of-fold raw scores, fitted on all folds but the last and checked on the last",
+    "n": 74,
+    "brier": 0.2491,
+    "brierPrior": 0.2426,
+    "meanP": 0.462,
+    "winRate": 0.3919,
+    "slope": 0.4291,
+    "passed": false
+   },
+   "threshold": {
+    "dropShare": 0.0,
+    "p": null,
+    "from": "all out-of-fold predictions"
+   },
+   "exam": {
+    "what": "the exam pool (whole calendar months held out when the candidates were made), read once after the walk-forward verdict was fixed. It is used to choose nothing.",
+    "from": "2020-01-02",
+    "to": "2026-06-24",
+    "gbt": {
+     "n": 211,
+     "winRate": 0.4597,
+     "auc": 0.5333,
+     "brier": 0.2501,
+     "brierPrior": 0.2485,
+     "brierSkill": -0.0065,
+     "logLoss": 0.6937,
+     "logLossPrior": 0.6902,
+     "trading": {
+      "threshold": null,
+      "mechanical": {
+       "n": 211,
+       "avg": 0.1699,
+       "total": 35.85,
+       "t": 1.79
+      },
+      "kept": {
+       "n": 211,
+       "avg": 0.1699,
+       "total": 35.85,
+       "t": 1.79
+      },
+      "skipped": {
+       "n": 0,
+       "avg": null,
+       "total": 0.0,
+       "t": null
+      },
+      "keptMinusSkippedT": null
+     }
+    },
+    "logit": {
+     "n": 211,
+     "winRate": 0.4597,
+     "auc": 0.5195,
+     "brier": 0.2671,
+     "brierPrior": 0.2485,
+     "brierSkill": -0.0747,
+     "logLoss": 0.734,
+     "logLossPrior": 0.6902,
+     "trading": {
+      "threshold": 0.343616,
+      "mechanical": {
+       "n": 211,
+       "avg": 0.1699,
+       "total": 35.85,
+       "t": 1.79
+      },
+      "kept": {
+       "n": 143,
+       "avg": 0.1996,
+       "total": 28.55,
+       "t": 1.66
+      },
+      "skipped": {
+       "n": 68,
+       "avg": 0.1074,
+       "total": 7.3,
+       "t": 0.7
+      },
+      "keptMinusSkippedT": 0.47
+     }
+    },
+    "alwaysTake": {
+     "n": 211,
+     "avg": 0.1699,
+     "total": 35.85,
+     "t": 1.79
+    },
+    "limit": "exam months lie between training months, so this is held-out data but not later data; 0 of the 211 exam setups fired while a training trade was open"
+   },
+   "hash": "fc268ade8a52c88f",
+   "register": {
+    "action": "model.register",
+    "model": {
+     "name": "academy-scorer-gmp",
+     "version": "gmp-0ff03bb04a",
+     "kind": "gbt-binary",
+     "edge": "gmp",
+     "status": "challenger",
+     "metrics": {
+      "oofN": 296,
+      "oofAuc": 0.5111,
+      "oofBrier": 0.2517,
+      "oofBrierPrior": 0.2467,
+      "oofLogLoss": 0.6971,
+      "mechanicalR": 0.073,
+      "keptN": 248,
+      "keptR": 0.0694,
+      "skippedN": 48,
+      "skippedR": 0.0917,
+      "keptMinusSkippedT": -0.12,
+      "beatsBaseline": "no",
+      "calibrated": "no",
+      "examN": 211,
+      "examAuc": 0.5333,
+      "examBrier": 0.2501,
+      "examBrierPrior": 0.2485
+     },
+     "datasetVersion": "9035174e215f",
+     "trainedOn": {
+      "pool": "train",
+      "rows": 494,
+      "from": "2020-02-05",
+      "to": "2026-10-22"
+     },
+     "artifact": "ml/models/gmp-0ff03bb04a.json",
+     "hash": "fc268ade8a52c88f",
+     "notes": "REJECTED CHALLENGER. no improvement over taking every setup: out of fold the kept trades do not beat the skipped ones (t -0.12, need 2.0); the last fold does not confirm it. Do not promote without the owner reading ml/models/report.md."
+    }
+   }
+  },
+  {
+   "id": "nq-open-31e519e5dd",
+   "edge": "nq-open",
+   "scope": "nq-open",
+   "status": "rejected challenger",
+   "verdict": "no improvement over taking every setup: out of fold the kept trades do not beat the skipped ones (t 1.29, need 2.0); the last fold does not confirm it",
+   "beatsBaseline": false,
+   "promoted": false,
+   "calibrated": true,
+   "file": "nq-open-31e519e5dd.json",
+   "pred": "nq-open-31e519e5dd.pred.json",
+   "candidates": 721,
+   "trainRows": 327,
+   "from": "2020-01-08",
+   "to": "2026-09-28",
+   "winRate": 0.4312,
+   "netRPerTrade": 0.1846,
+   "featureNames": [
+    "sigTf",
+    "structD1",
+    "structH4",
+    "structH1",
+    "structM15",
+    "maPosD1",
+    "maPosH4",
+    "distMa20D1",
+    "htfScore",
+    "htfBias",
+    "ltfBias",
+    "htfLtfConflict",
+    "eqHighs",
+    "eqLows",
+    "distPdh",
+    "distPdl",
+    "distPwh",
+    "distPwl",
+    "distSessHigh",
+    "distSessLow",
+    "distEqHigh",
+    "distEqLow",
+    "sweep",
+    "sweepAge",
+    "sweepOf",
+    "sweepDepth",
+    "displacement",
+    "dispAge",
+    "dispSize",
+    "dispFvg",
+    "fvg",
+    "fvgSize",
+    "roc",
+    "consec",
+    "momentum",
+    "atrPct",
+    "atrPctile",
+    "volRatio",
+    "volState",
+    "volAbnormal",
+    "session",
+    "dow",
+    "hourUtc",
+    "distRes",
+    "distSup",
+    "distSR",
+    "entryLoc",
+    "entryZone",
+    "regimeBase",
+    "regimeTrend",
+    "trendStrength",
+    "effRatio",
+    "regimeHtf",
+    "side",
+    "rr",
+    "stopAtr",
+    "targetAtr",
+    "entryOffset",
+    "geomOk",
+    "biasAlign",
+    "ltfAlign",
+    "sweepFor",
+    "dispFor",
+    "momFor",
+    "locFor",
+    "confirm",
+    "trigCloseLoc",
+    "trigBodyAtr",
+    "oppLiq",
+    "oppLiqFrac"
+   ],
+   "validation": {
+    "scheme": "chronological walk-forward, expanding window",
+    "folds": 4,
+    "firstTrainShare": 0.4,
+    "embargoSec": 86400,
+    "outOfFoldRows": 196
+   },
+   "folds": [
+    {
+     "fold": 1,
+     "trainRows": 131,
+     "purged": 0,
+     "testRows": 49,
+     "testFrom": 1658151180,
+     "testTo": 1701182700,
+     "thresholdFrom": "an inner split of the first training window",
+     "gbt": {
+      "n": 49,
+      "winRate": 0.4694,
+      "auc": 0.5301,
+      "brier": 0.2661,
+      "brierPrior": 0.2669,
+      "brierSkill": 0.0028,
+      "logLoss": 0.7315,
+      "logLossPrior": 0.7293,
+      "dropShare": 0.3,
+      "trading": {
+       "threshold": 0.312343,
+       "mechanical": {
+        "n": 49,
+        "avg": 0.0414,
+        "total": 2.03,
+        "t": 0.22
+       },
+       "kept": {
+        "n": 31,
+        "avg": 0.1327,
+        "total": 4.11,
+        "t": 0.57
+       },
+       "skipped": {
+        "n": 18,
+        "avg": -0.1159,
+        "total": -2.09,
+        "t": -0.38
+       },
+       "keptMinusSkippedT": 0.64
+      }
+     },
+     "logit": {
+      "n": 49,
+      "winRate": 0.4694,
+      "auc": 0.5853,
+      "brier": 0.2607,
+      "brierPrior": 0.2669,
+      "brierSkill": 0.0233,
+      "logLoss": 0.7223,
+      "logLossPrior": 0.7293,
+      "dropShare": 0.1,
+      "trading": {
+       "threshold": 0.124665,
+       "mechanical": {
+        "n": 49,
+        "avg": 0.0414,
+        "total": 2.03,
+        "t": 0.22
+       },
+       "kept": {
+        "n": 49,
+        "avg": 0.0414,
+        "total": 2.03,
+        "t": 0.22
+       },
+       "skipped": {
+        "n": 0,
+        "avg": null,
+        "total": 0.0,
+        "t": null
+       },
+       "keptMinusSkippedT": null
+      }
+     },
+     "prior": {
+      "p": 0.3359,
+      "brier": 0.2669,
+      "logLoss": 0.7293
+     }
+    },
+    {
+     "fold": 2,
+     "trainRows": 180,
+     "purged": 0,
+     "testRows": 49,
+     "testFrom": 1701354960,
+     "testTo": 1736951520,
+     "thresholdFrom": "the earlier test blocks",
+     "gbt": {
+      "n": 49,
+      "winRate": 0.5102,
+      "auc": 0.505,
+      "brier": 0.2687,
+      "brierPrior": 0.2689,
+      "brierSkill": 0.001,
+      "logLoss": 0.7336,
+      "logLossPrior": 0.7323,
+      "dropShare": 0.5,
+      "trading": {
+       "threshold": 0.376177,
+       "mechanical": {
+        "n": 49,
+        "avg": 0.3632,
+        "total": 17.8,
+        "t": 1.66
+       },
+       "kept": {
+        "n": 25,
+        "avg": 0.4998,
+        "total": 12.49,
+        "t": 1.62
+       },
+       "skipped": {
+        "n": 24,
+        "avg": 0.2209,
+        "total": 5.3,
+        "t": 0.7
+       },
+       "keptMinusSkippedT": 0.63
+      }
+     },
+     "logit": {
+      "n": 49,
+      "winRate": 0.5102,
+      "auc": 0.51,
+      "brier": 0.2787,
+      "brierPrior": 0.2689,
+      "brierSkill": -0.0363,
+      "logLoss": 0.757,
+      "logLossPrior": 0.7323,
+      "dropShare": 0.3,
+      "trading": {
+       "threshold": 0.292178,
+       "mechanical": {
+        "n": 49,
+        "avg": 0.3632,
+        "total": 17.8,
+        "t": 1.66
+       },
+       "kept": {
+        "n": 39,
+        "avg": 0.4434,
+        "total": 17.29,
+        "t": 1.79
+       },
+       "skipped": {
+        "n": 10,
+        "avg": 0.0501,
+        "total": 0.5,
+        "t": 0.11
+       },
+       "keptMinusSkippedT": 0.74
+      }
+     },
+     "prior": {
+      "p": 0.3722,
+      "brier": 0.2689,
+      "logLoss": 0.7323
+     }
+    },
+    {
+     "fold": 3,
+     "trainRows": 229,
+     "purged": 0,
+     "testRows": 49,
+     "testFrom": 1737729960,
+     "testTo": 1770388380,
+     "thresholdFrom": "the earlier test blocks",
+     "gbt": {
+      "n": 49,
+      "winRate": 0.4898,
+      "auc": 0.5817,
+      "brier": 0.2505,
+      "brierPrior": 0.2576,
+      "brierSkill": 0.0278,
+      "logLoss": 0.6949,
+      "logLossPrior": 0.7088,
+      "dropShare": 0.0,
+      "trading": {
+       "threshold": null,
+       "mechanical": {
+        "n": 49,
+        "avg": 0.4951,
+        "total": 24.26,
+        "t": 1.88
+       },
+       "kept": {
+        "n": 49,
+        "avg": 0.4951,
+        "total": 24.26,
+        "t": 1.88
+       },
+       "skipped": {
+        "n": 0,
+        "avg": null,
+        "total": 0.0,
+        "t": null
+       },
+       "keptMinusSkippedT": null
+      }
+     },
+     "logit": {
+      "n": 49,
+      "winRate": 0.4898,
+      "auc": 0.49,
+      "brier": 0.2828,
+      "brierPrior": 0.2576,
+      "brierSkill": -0.0978,
+      "logLoss": 0.7747,
+      "logLossPrior": 0.7088,
+      "dropShare": 0.2,
+      "trading": {
+       "threshold": 0.255447,
+       "mechanical": {
+        "n": 49,
+        "avg": 0.4951,
+        "total": 24.26,
+        "t": 1.88
+       },
+       "kept": {
+        "n": 38,
+        "avg": 0.524,
+        "total": 19.91,
+        "t": 1.67
+       },
+       "skipped": {
+        "n": 11,
+        "avg": 0.395,
+        "total": 4.34,
+        "t": 0.85
+       },
+       "keptMinusSkippedT": 0.23
+      }
+     },
+     "prior": {
+      "p": 0.4017,
+      "brier": 0.2576,
+      "logLoss": 0.7088
+     }
+    },
+    {
+     "fold": 4,
+     "trainRows": 278,
+     "purged": 0,
+     "testRows": 49,
+     "testFrom": 1771338720,
+     "testTo": 1790602380,
+     "thresholdFrom": "the earlier test blocks",
+     "gbt": {
+      "n": 49,
+      "winRate": 0.5102,
+      "auc": 0.5933,
+      "brier": 0.2537,
+      "brierPrior": 0.2585,
+      "brierSkill": 0.0189,
+      "logLoss": 0.7015,
+      "logLossPrior": 0.7104,
+      "dropShare": 0.0,
+      "trading": {
+       "threshold": null,
+       "mechanical": {
+        "n": 49,
+        "avg": 0.4552,
+        "total": 22.3,
+        "t": 1.87
+       },
+       "kept": {
+        "n": 49,
+        "avg": 0.4552,
+        "total": 22.3,
+        "t": 1.87
+       },
+       "skipped": {
+        "n": 0,
+        "avg": null,
+        "total": 0.0,
+        "t": null
+       },
+       "keptMinusSkippedT": null
+      }
+     },
+     "logit": {
+      "n": 49,
+      "winRate": 0.5102,
+      "auc": 0.5583,
+      "brier": 0.2671,
+      "brierPrior": 0.2585,
+      "brierSkill": -0.033,
+      "logLoss": 0.7323,
+      "logLossPrior": 0.7104,
+      "dropShare": 0.2,
+      "trading": {
+       "threshold": 0.249357,
+       "mechanical": {
+        "n": 49,
+        "avg": 0.4552,
+        "total": 22.3,
+        "t": 1.87
+       },
+       "kept": {
+        "n": 40,
+        "avg": 0.4159,
+        "total": 16.63,
+        "t": 1.64
+       },
+       "skipped": {
+        "n": 9,
+        "avg": 0.63,
+        "total": 5.67,
+        "t": 0.85
+       },
+       "keptMinusSkippedT": -0.27
+      }
+     },
+     "prior": {
+      "p": 0.4173,
+      "brier": 0.2585,
+      "logLoss": 0.7104
+     }
+    }
+   ],
+   "outOfFold": {
+    "gbt": {
+     "n": 196,
+     "winRate": 0.4949,
+     "auc": 0.5634,
+     "brier": 0.2597,
+     "brierPrior": 0.263,
+     "brierSkill": 0.0124,
+     "logLoss": 0.7154,
+     "logLossPrior": 0.7202,
+     "calibration": [
+      {
+       "n": 40,
+       "meanP": 0.271,
+       "winRate": 0.45
+      },
+      {
+       "n": 39,
+       "meanP": 0.3363,
+       "winRate": 0.4103
+      },
+      {
+       "n": 39,
+       "meanP": 0.386,
+       "winRate": 0.3846
+      },
+      {
+       "n": 39,
+       "meanP": 0.4478,
+       "winRate": 0.6667
+      },
+      {
+       "n": 39,
+       "meanP": 0.5331,
+       "winRate": 0.5641
+      }
+     ],
+     "trading": {
+      "mechanical": {
+       "n": 196,
+       "avg": 0.3387,
+       "total": 66.39,
+       "t": 2.96
+      },
+      "kept": {
+       "n": 154,
+       "avg": 0.4102,
+       "total": 63.17,
+       "t": 3.1
+      },
+      "skipped": {
+       "n": 42,
+       "avg": 0.0766,
+       "total": 3.22,
+       "t": 0.35
+      },
+      "keptMinusSkippedT": 1.29,
+      "keptMinusMechanical": 0.0715,
+      "tOn": "net R"
+     }
+    },
+    "logit": {
+     "n": 196,
+     "winRate": 0.4949,
+     "auc": 0.5422,
+     "brier": 0.2723,
+     "brierPrior": 0.263,
+     "brierSkill": -0.0354,
+     "logLoss": 0.7466,
+     "logLossPrior": 0.7202,
+     "calibration": [
+      {
+       "n": 40,
+       "meanP": 0.1997,
+       "winRate": 0.375
+      },
+      {
+       "n": 39,
+       "meanP": 0.3074,
+       "winRate": 0.4615
+      },
+      {
+       "n": 39,
+       "meanP": 0.4229,
+       "winRate": 0.6154
+      },
+      {
+       "n": 39,
+       "meanP": 0.5171,
+       "winRate": 0.5128
+      },
+      {
+       "n": 39,
+       "meanP": 0.647,
+       "winRate": 0.5128
+      }
+     ],
+     "trading": {
+      "mechanical": {
+       "n": 196,
+       "avg": 0.3387,
+       "total": 66.39,
+       "t": 2.96
+      },
+      "kept": {
+       "n": 166,
+       "avg": 0.3366,
+       "total": 55.87,
+       "t": 2.73
+      },
+      "skipped": {
+       "n": 30,
+       "avg": 0.3505,
+       "total": 10.52,
+       "t": 1.12
+      },
+      "keptMinusSkippedT": -0.04,
+      "keptMinusMechanical": -0.0021,
+      "tOn": "net R"
+     }
+    },
+    "prior": {
+     "brier": 0.263,
+     "logLoss": 0.7202,
+     "auc": 0.5
+    },
+    "alwaysTake": {
+     "n": 196,
+     "avg": 0.3387,
+     "total": 66.39,
+     "t": 2.96
+    }
+   },
+   "regressionView": {
+    "what": "secondary: the same trees fitted to net R itself, out of fold",
+    "n": 196,
+    "rmse": 1.6127,
+    "rmseTrainMean": 1.6242,
+    "rankCorr": 0.1449
+   },
+   "calibration": {
+    "method": "Platt scaling on out-of-fold raw scores, fitted on all folds but the last and checked on the last",
+    "n": 49,
+    "brier": 0.2451,
+    "brierPrior": 0.2585,
+    "meanP": 0.4922,
+    "winRate": 0.5102,
+    "slope": 0.3202,
+    "passed": true
+   },
+   "threshold": {
+    "dropShare": 0.0,
+    "p": null,
+    "from": "all out-of-fold predictions"
+   },
+   "exam": {
+    "what": "the exam pool (whole calendar months held out when the candidates were made), read once after the walk-forward verdict was fixed. It is used to choose nothing.",
+    "from": "2020-04-02",
+    "to": "2026-10-23",
+    "gbt": {
+     "n": 197,
+     "winRate": 0.4061,
+     "auc": 0.5366,
+     "brier": 0.2538,
+     "brierPrior": 0.2418,
+     "brierSkill": -0.0497,
+     "logLoss": 0.7009,
+     "logLossPrior": 0.6767,
+     "trading": {
+      "threshold": null,
+      "mechanical": {
+       "n": 197,
+       "avg": 0.0519,
+       "total": 10.23,
+       "t": 0.51
+      },
+      "kept": {
+       "n": 197,
+       "avg": 0.0519,
+       "total": 10.23,
+       "t": 0.51
+      },
+      "skipped": {
+       "n": 0,
+       "avg": null,
+       "total": 0.0,
+       "t": null
+      },
+      "keptMinusSkippedT": null
+     }
+    },
+    "logit": {
+     "n": 197,
+     "winRate": 0.4061,
+     "auc": 0.5096,
+     "brier": 0.2644,
+     "brierPrior": 0.2418,
+     "brierSkill": -0.0932,
+     "logLoss": 0.7269,
+     "logLossPrior": 0.6767,
+     "trading": {
+      "threshold": 0.201677,
+      "mechanical": {
+       "n": 197,
+       "avg": 0.0519,
+       "total": 10.23,
+       "t": 0.51
+      },
+      "kept": {
+       "n": 180,
+       "avg": 0.0652,
+       "total": 11.73,
+       "t": 0.61
+      },
+      "skipped": {
+       "n": 17,
+       "avg": -0.0885,
+       "total": -1.5,
+       "t": -0.26
+      },
+      "keptMinusSkippedT": 0.42
+     }
+    },
+    "alwaysTake": {
+     "n": 197,
+     "avg": 0.0519,
+     "total": 10.23,
+     "t": 0.51
+    },
+    "limit": "exam months lie between training months, so this is held-out data but not later data; 0 of the 197 exam setups fired while a training trade was open"
+   },
+   "hash": "e26a6dce251f2562",
+   "register": {
+    "action": "model.register",
+    "model": {
+     "name": "academy-scorer-nq-open",
+     "version": "nq-open-31e519e5dd",
+     "kind": "gbt-binary",
+     "edge": "nq-open",
+     "status": "challenger",
+     "metrics": {
+      "oofN": 196,
+      "oofAuc": 0.5634,
+      "oofBrier": 0.2597,
+      "oofBrierPrior": 0.263,
+      "oofLogLoss": 0.7154,
+      "mechanicalR": 0.3387,
+      "keptN": 154,
+      "keptR": 0.4102,
+      "skippedN": 42,
+      "skippedR": 0.0766,
+      "keptMinusSkippedT": 1.29,
+      "beatsBaseline": "no",
+      "calibrated": "yes",
+      "examN": 197,
+      "examAuc": 0.5366,
+      "examBrier": 0.2538,
+      "examBrierPrior": 0.2418
+     },
+     "datasetVersion": "9035174e215f",
+     "trainedOn": {
+      "pool": "train",
+      "rows": 327,
+      "from": "2020-01-08",
+      "to": "2026-09-28"
+     },
+     "artifact": "ml/models/nq-open-31e519e5dd.json",
+     "hash": "e26a6dce251f2562",
+     "notes": "REJECTED CHALLENGER. no improvement over taking every setup: out of fold the kept trades do not beat the skipped ones (t 1.29, need 2.0); the last fold does not confirm it. Do not promote without the owner reading ml/models/report.md."
+    }
+   }
+  },
+  {
+   "id": "pooled-aa0e51a573",
+   "edge": null,
+   "scope": "pooled",
+   "status": "rejected challenger",
+   "verdict": "no improvement over taking every setup: out of fold the kept trades do not beat the skipped ones (t -0.99, need 2.0); the last fold does not confirm it",
+   "beatsBaseline": false,
+   "promoted": false,
+   "calibrated": false,
+   "file": "pooled-aa0e51a573.json",
+   "pred": "pooled-aa0e51a573.pred.json",
+   "candidates": 2775,
+   "trainRows": 1421,
+   "from": "2020-01-08",
+   "to": "2026-10-22",
+   "winRate": 0.4082,
+   "netRPerTrade": 0.2491,
+   "featureNames": [
+    "sigTf",
+    "structD1",
+    "structH4",
+    "structH1",
+    "structM15",
+    "maPosD1",
+    "maPosH4",
+    "distMa20D1",
+    "htfScore",
+    "htfBias",
+    "ltfBias",
+    "htfLtfConflict",
+    "eqHighs",
+    "eqLows",
+    "distPdh",
+    "distPdl",
+    "distPwh",
+    "distPwl",
+    "distSessHigh",
+    "distSessLow",
+    "distEqHigh",
+    "distEqLow",
+    "sweep",
+    "sweepAge",
+    "sweepOf",
+    "sweepDepth",
+    "displacement",
+    "dispAge",
+    "dispSize",
+    "dispFvg",
+    "fvg",
+    "fvgSize",
+    "roc",
+    "consec",
+    "momentum",
+    "atrPct",
+    "atrPctile",
+    "volRatio",
+    "volState",
+    "volAbnormal",
+    "session",
+    "dow",
+    "hourUtc",
+    "distRes",
+    "distSup",
+    "distSR",
+    "entryLoc",
+    "entryZone",
+    "regimeBase",
+    "regimeTrend",
+    "trendStrength",
+    "effRatio",
+    "regimeHtf",
+    "side",
+    "rr",
+    "stopAtr",
+    "targetAtr",
+    "entryOffset",
+    "geomOk",
+    "biasAlign",
+    "ltfAlign",
+    "sweepFor",
+    "dispFor",
+    "momFor",
+    "locFor",
+    "confirm",
+    "trigCloseLoc",
+    "trigBodyAtr",
+    "oppLiq",
+    "oppLiqFrac",
+    "edge"
+   ],
+   "validation": {
+    "scheme": "chronological walk-forward, expanding window",
+    "folds": 4,
+    "firstTrainShare": 0.4,
+    "embargoSec": 86400,
+    "outOfFoldRows": 853
+   },
+   "folds": [
+    {
+     "fold": 1,
+     "trainRows": 565,
+     "purged": 3,
+     "testRows": 213,
+     "testFrom": 1665060840,
+     "testTo": 1701850500,
+     "thresholdFrom": "an inner split of the first training window",
+     "gbt": {
+      "n": 213,
+      "winRate": 0.3756,
+      "auc": 0.5918,
+      "brier": 0.23,
+      "brierPrior": 0.2357,
+      "brierSkill": 0.0244,
+      "logLoss": 0.6518,
+      "logLossPrior": 0.6644,
+      "dropShare": 0.4,
+      "trading": {
+       "threshold": 0.421027,
+       "mechanical": {
+        "n": 213,
+        "avg": 0.0342,
+        "total": 7.29,
+        "t": 0.26
+       },
+       "kept": {
+        "n": 94,
+        "avg": 0.2198,
+        "total": 20.66,
+        "t": 1.06
+       },
+       "skipped": {
+        "n": 119,
+        "avg": -0.1124,
+        "total": -13.38,
+        "t": -0.69
+       },
+       "keptMinusSkippedT": 0.47,
+       "edgeAdjusted": {
+        "kept": 0.0769,
+        "skipped": -0.0471
+       }
+      }
+     },
+     "logit": {
+      "n": 213,
+      "winRate": 0.3756,
+      "auc": 0.6044,
+      "brier": 0.2383,
+      "brierPrior": 0.2357,
+      "brierSkill": -0.0107,
+      "logLoss": 0.6701,
+      "logLossPrior": 0.6644,
+      "dropShare": 0.4,
+      "trading": {
+       "threshold": 0.367988,
+       "mechanical": {
+        "n": 213,
+        "avg": 0.0342,
+        "total": 7.29,
+        "t": 0.26
+       },
+       "kept": {
+        "n": 120,
+        "avg": 0.208,
+        "total": 24.97,
+        "t": 1.25
+       },
+       "skipped": {
+        "n": 93,
+        "avg": -0.1901,
+        "total": -17.68,
+        "t": -0.94
+       },
+       "keptMinusSkippedT": 0.72,
+       "edgeAdjusted": {
+        "kept": 0.0912,
+        "skipped": -0.1002
+       }
+      }
+     },
+     "prior": {
+      "p": 0.4106,
+      "brier": 0.2357,
+      "logLoss": 0.6644
+     }
+    },
+    {
+     "fold": 2,
+     "trainRows": 779,
+     "purged": 2,
+     "testRows": 213,
+     "testFrom": 1701881100,
+     "testTo": 1734710640,
+     "thresholdFrom": "the earlier test blocks",
+     "gbt": {
+      "n": 213,
+      "winRate": 0.4507,
+      "auc": 0.634,
+      "brier": 0.2412,
+      "brierPrior": 0.25,
+      "brierSkill": 0.0351,
+      "logLoss": 0.6748,
+      "logLossPrior": 0.6932,
+      "dropShare": 0.4,
+      "trading": {
+       "threshold": 0.375394,
+       "mechanical": {
+        "n": 213,
+        "avg": 0.6783,
+        "total": 144.47,
+        "t": 3.6
+       },
+       "kept": {
+        "n": 102,
+        "avg": 0.6257,
+        "total": 63.83,
+        "t": 2.97
+       },
+       "skipped": {
+        "n": 111,
+        "avg": 0.7266,
+        "total": 80.65,
+        "t": 2.37
+       },
+       "keptMinusSkippedT": -0.67,
+       "edgeAdjusted": {
+        "kept": 0.4871,
+        "skipped": 0.7352
+       }
+      }
+     },
+     "logit": {
+      "n": 213,
+      "winRate": 0.4507,
+      "auc": 0.6296,
+      "brier": 0.2477,
+      "brierPrior": 0.25,
+      "brierSkill": 0.0089,
+      "logLoss": 0.7067,
+      "logLossPrior": 0.6932,
+      "dropShare": 0.5,
+      "trading": {
+       "threshold": 0.392844,
+       "mechanical": {
+        "n": 213,
+        "avg": 0.6783,
+        "total": 144.47,
+        "t": 3.6
+       },
+       "kept": {
+        "n": 99,
+        "avg": 0.5484,
+        "total": 54.29,
+        "t": 3.19
+       },
+       "skipped": {
+        "n": 114,
+        "avg": 0.791,
+        "total": 90.18,
+        "t": 2.48
+       },
+       "keptMinusSkippedT": -0.91,
+       "edgeAdjusted": {
+        "kept": 0.4394,
+        "skipped": 0.7701
+       }
+      }
+     },
+     "prior": {
+      "p": 0.4018,
+      "brier": 0.25,
+      "logLoss": 0.6932
+     }
+    },
+    {
+     "fold": 3,
+     "trainRows": 993,
+     "purged": 1,
+     "testRows": 214,
+     "testFrom": 1734913740,
+     "testTo": 1764076440,
+     "thresholdFrom": "the earlier test blocks",
+     "gbt": {
+      "n": 214,
+      "winRate": 0.4299,
+      "auc": 0.6872,
+      "brier": 0.2267,
+      "brierPrior": 0.2454,
+      "brierSkill": 0.0763,
+      "logLoss": 0.6449,
+      "logLossPrior": 0.684,
+      "dropShare": 0.0,
+      "trading": {
+       "threshold": null,
+       "mechanical": {
+        "n": 214,
+        "avg": 0.5653,
+        "total": 120.97,
+        "t": 3.09
+       },
+       "kept": {
+        "n": 214,
+        "avg": 0.5653,
+        "total": 120.97,
+        "t": 3.09
+       },
+       "skipped": {
+        "n": 0,
+        "avg": null,
+        "total": 0.0,
+        "t": null
+       },
+       "keptMinusSkippedT": null,
+       "edgeAdjusted": {
+        "kept": 0.2766,
+        "skipped": null
+       }
+      }
+     },
+     "logit": {
+      "n": 214,
+      "winRate": 0.4299,
+      "auc": 0.5814,
+      "brier": 0.248,
+      "brierPrior": 0.2454,
+      "brierSkill": -0.0106,
+      "logLoss": 0.6969,
+      "logLossPrior": 0.684,
+      "dropShare": 0.0,
+      "trading": {
+       "threshold": null,
+       "mechanical": {
+        "n": 214,
+        "avg": 0.5653,
+        "total": 120.97,
+        "t": 3.09
+       },
+       "kept": {
+        "n": 214,
+        "avg": 0.5653,
+        "total": 120.97,
+        "t": 3.09
+       },
+       "skipped": {
+        "n": 0,
+        "avg": null,
+        "total": 0.0,
+        "t": null
+       },
+       "keptMinusSkippedT": null,
+       "edgeAdjusted": {
+        "kept": 0.2766,
+        "skipped": null
+       }
+      }
+     },
+     "prior": {
+      "p": 0.4119,
+      "brier": 0.2454,
+      "logLoss": 0.684
+     }
+    },
+    {
+     "fold": 4,
+     "trainRows": 1202,
+     "purged": 6,
+     "testRows": 213,
+     "testFrom": 1764116040,
+     "testTo": 1792671600,
+     "thresholdFrom": "the earlier test blocks",
+     "gbt": {
+      "n": 213,
+      "winRate": 0.3709,
+      "auc": 0.5242,
+      "brier": 0.2391,
+      "brierPrior": 0.2353,
+      "brierSkill": -0.0162,
+      "logLoss": 0.6708,
+      "logLossPrior": 0.6635,
+      "dropShare": 0.0,
+      "trading": {
+       "threshold": null,
+       "mechanical": {
+        "n": 213,
+        "avg": 0.1517,
+        "total": 32.31,
+        "t": 1.32
+       },
+       "kept": {
+        "n": 213,
+        "avg": 0.1517,
+        "total": 32.31,
+        "t": 1.32
+       },
+       "skipped": {
+        "n": 0,
+        "avg": null,
+        "total": 0.0,
+        "t": null
+       },
+       "keptMinusSkippedT": null,
+       "edgeAdjusted": {
+        "kept": -0.1388,
+        "skipped": null
+       }
+      }
+     },
+     "logit": {
+      "n": 213,
+      "winRate": 0.3709,
+      "auc": 0.5593,
+      "brier": 0.2417,
+      "brierPrior": 0.2353,
+      "brierSkill": -0.0274,
+      "logLoss": 0.6775,
+      "logLossPrior": 0.6635,
+      "dropShare": 0.0,
+      "trading": {
+       "threshold": null,
+       "mechanical": {
+        "n": 213,
+        "avg": 0.1517,
+        "total": 32.31,
+        "t": 1.32
+       },
+       "kept": {
+        "n": 213,
+        "avg": 0.1517,
+        "total": 32.31,
+        "t": 1.32
+       },
+       "skipped": {
+        "n": 0,
+        "avg": null,
+        "total": 0.0,
+        "t": null
+       },
+       "keptMinusSkippedT": null,
+       "edgeAdjusted": {
+        "kept": -0.1388,
+        "skipped": null
+       }
+      }
+     },
+     "prior": {
+      "p": 0.4151,
+      "brier": 0.2353,
+      "logLoss": 0.6635
+     }
+    }
+   ],
+   "outOfFold": {
+    "gbt": {
+     "n": 853,
+     "winRate": 0.4068,
+     "auc": 0.6022,
+     "brier": 0.2342,
+     "brierPrior": 0.2416,
+     "brierSkill": 0.0305,
+     "logLoss": 0.6606,
+     "logLossPrior": 0.6763,
+     "calibration": [
+      {
+       "n": 171,
+       "meanP": 0.2646,
+       "winRate": 0.269
+      },
+      {
+       "n": 171,
+       "meanP": 0.3366,
+       "winRate": 0.3626
+      },
+      {
+       "n": 171,
+       "meanP": 0.3942,
+       "winRate": 0.4386
+      },
+      {
+       "n": 170,
+       "meanP": 0.4572,
+       "winRate": 0.4529
+      },
+      {
+       "n": 170,
+       "meanP": 0.5194,
+       "winRate": 0.5118
+      }
+     ],
+     "aucWithinEdge": 0.5449,
+     "trading": {
+      "mechanical": {
+       "n": 853,
+       "avg": 0.3576,
+       "total": 305.03,
+       "t": 4.52
+      },
+      "kept": {
+       "n": 623,
+       "avg": 0.3816,
+       "total": 237.76,
+       "t": 4.35
+      },
+      "skipped": {
+       "n": 230,
+       "avg": 0.2925,
+       "total": 67.27,
+       "t": 1.7
+      },
+      "keptMinusSkippedT": -0.99,
+      "keptMinusMechanical": 0.024,
+      "tOn": "net R with each edge's training mean taken out"
+     }
+    },
+    "logit": {
+     "n": 853,
+     "winRate": 0.4068,
+     "auc": 0.5918,
+     "brier": 0.2439,
+     "brierPrior": 0.2416,
+     "brierSkill": -0.0097,
+     "logLoss": 0.6878,
+     "logLossPrior": 0.6763,
+     "calibration": [
+      {
+       "n": 171,
+       "meanP": 0.1463,
+       "winRate": 0.2924
+      },
+      {
+       "n": 171,
+       "meanP": 0.2842,
+       "winRate": 0.3567
+      },
+      {
+       "n": 171,
+       "meanP": 0.3849,
+       "winRate": 0.4152
+      },
+      {
+       "n": 170,
+       "meanP": 0.4767,
+       "winRate": 0.4824
+      },
+      {
+       "n": 170,
+       "meanP": 0.6174,
+       "winRate": 0.4882
+      }
+     ],
+     "aucWithinEdge": 0.5396,
+     "trading": {
+      "mechanical": {
+       "n": 853,
+       "avg": 0.3576,
+       "total": 305.03,
+       "t": 4.52
+      },
+      "kept": {
+       "n": 646,
+       "avg": 0.36,
+       "total": 232.53,
+       "t": 4.37
+      },
+      "skipped": {
+       "n": 207,
+       "avg": 0.3502,
+       "total": 72.5,
+       "t": 1.75
+      },
+      "keptMinusSkippedT": -1.15,
+      "keptMinusMechanical": 0.0024,
+      "tOn": "net R with each edge's training mean taken out"
+     }
+    },
+    "prior": {
+     "brier": 0.2416,
+     "logLoss": 0.6763,
+     "auc": 0.5
+    },
+    "alwaysTake": {
+     "n": 853,
+     "avg": 0.3576,
+     "total": 305.03,
+     "t": 4.52
+    }
+   },
+   "regressionView": {
+    "what": "secondary: the same trees fitted to net R itself, out of fold",
+    "n": 853,
+    "rmse": 2.3244,
+    "rmseTrainMean": 2.3194,
+    "rankCorr": 0.0629
+   },
+   "calibration": {
+    "method": "Platt scaling on out-of-fold raw scores, fitted on all folds but the last and checked on the last",
+    "n": 213,
+    "brier": 0.2453,
+    "brierPrior": 0.2353,
+    "meanP": 0.4486,
+    "winRate": 0.3709,
+    "slope": 1.1502,
+    "passed": false
+   },
+   "threshold": {
+    "dropShare": 0.0,
+    "p": null,
+    "from": "all out-of-fold predictions"
+   },
+   "exam": {
+    "what": "the exam pool (whole calendar months held out when the candidates were made), read once after the walk-forward verdict was fixed. It is used to choose nothing.",
+    "from": "2020-01-02",
+    "to": "2026-10-23",
+    "gbt": {
+     "n": 586,
+     "winRate": 0.4266,
+     "auc": 0.5382,
+     "brier": 0.2436,
+     "brierPrior": 0.245,
+     "brierSkill": 0.0054,
+     "logLoss": 0.68,
+     "logLossPrior": 0.683,
+     "trading": {
+      "threshold": null,
+      "mechanical": {
+       "n": 586,
+       "avg": 0.2278,
+       "total": 133.5,
+       "t": 2.64
+      },
+      "kept": {
+       "n": 586,
+       "avg": 0.2278,
+       "total": 133.5,
+       "t": 2.64
+      },
+      "skipped": {
+       "n": 0,
+       "avg": null,
+       "total": 0.0,
+       "t": null
+      },
+      "keptMinusSkippedT": null,
+      "edgeAdjusted": {
+       "kept": -0.0003,
+       "skipped": null
+      }
+     }
+    },
+    "logit": {
+     "n": 586,
+     "winRate": 0.4266,
+     "auc": 0.5193,
+     "brier": 0.2548,
+     "brierPrior": 0.245,
+     "brierSkill": -0.0404,
+     "logLoss": 0.7038,
+     "logLossPrior": 0.683,
+     "trading": {
+      "threshold": null,
+      "mechanical": {
+       "n": 586,
+       "avg": 0.2278,
+       "total": 133.5,
+       "t": 2.64
+      },
+      "kept": {
+       "n": 586,
+       "avg": 0.2278,
+       "total": 133.5,
+       "t": 2.64
+      },
+      "skipped": {
+       "n": 0,
+       "avg": null,
+       "total": 0.0,
+       "t": null
+      },
+      "keptMinusSkippedT": null,
+      "edgeAdjusted": {
+       "kept": -0.0003,
+       "skipped": null
+      }
+     }
+    },
+    "alwaysTake": {
+     "n": 586,
+     "avg": 0.2278,
+     "total": 133.5,
+     "t": 2.64
+    },
+    "limit": "exam months lie between training months, so this is held-out data but not later data; 314 of the 586 exam setups fired while a training trade was open"
+   },
+   "hash": "a476633886afdcde",
+   "register": {
+    "action": "model.register",
+    "model": {
+     "name": "academy-scorer-pooled",
+     "version": "pooled-aa0e51a573",
+     "kind": "gbt-binary",
+     "edge": null,
+     "status": "challenger",
+     "metrics": {
+      "oofN": 853,
+      "oofAuc": 0.6022,
+      "oofBrier": 0.2342,
+      "oofBrierPrior": 0.2416,
+      "oofLogLoss": 0.6606,
+      "mechanicalR": 0.3576,
+      "keptN": 623,
+      "keptR": 0.3816,
+      "skippedN": 230,
+      "skippedR": 0.2925,
+      "keptMinusSkippedT": -0.99,
+      "beatsBaseline": "no",
+      "calibrated": "no",
+      "examN": 586,
+      "examAuc": 0.5382,
+      "examBrier": 0.2436,
+      "examBrierPrior": 0.245
+     },
+     "datasetVersion": "9035174e215f",
+     "trainedOn": {
+      "pool": "train",
+      "rows": 1421,
+      "from": "2020-01-08",
+      "to": "2026-10-22"
+     },
+     "artifact": "ml/models/pooled-aa0e51a573.json",
+     "hash": "a476633886afdcde",
+     "notes": "REJECTED CHALLENGER. no improvement over taking every setup: out of fold the kept trades do not beat the skipped ones (t -0.99, need 2.0); the last fold does not confirm it. Do not promote without the owner reading ml/models/report.md."
+    }
+   }
+  }
+ ],
+ "skipped": [
+  {
+   "edge": "mosha-bo",
+   "status": "not enough data",
+   "why": "29 filled train trades that are not flagged; 150 are needed to fit",
+   "candidates": 72,
+   "trainRows": 29,
+   "from": "2020-03-02",
+   "to": "2026-10-13"
+  },
+  {
+   "edge": "gtrend",
+   "status": "not enough data",
+   "why": "19 filled train trades that are not flagged; 150 are needed to fit",
+   "candidates": 41,
+   "trainRows": 19,
+   "from": "2020-04-10",
+   "to": "2026-08-06"
+  },
+  {
+   "edge": "geg",
+   "status": "not enough data",
+   "why": "84 filled train trades that are not flagged; 150 are needed to fit",
+   "candidates": 233,
+   "trainRows": 84,
+   "from": "2020-02-01",
+   "to": "2026-09-04"
+  }
+ ]
+}
