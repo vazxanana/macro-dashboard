@@ -1511,5 +1511,12 @@ were read on M1 / M30). **Verdict: FAIL, both entries**: at the CF 6,260 trades 
 2020 on -0.12R; before costs -0.03R); at the zone 6,478 trades -0.21R (t -7.36; -0.23R and -0.18R); 2 and 1 of 21 years positive.
 The pattern prints about five times a trading day, so the owner's five winning examples are picked from thousands of look-alikes:
 the selection is not in any rule. Fifteen tests in four Mosha studies on 10 Nov, none an edge (the retracement chain breaks even,
-the rest lose). Do not write a fifth mechanical reading; the open step is the owner's own logged trades (owner decision 27).
-Tests: `tests/mosha-sweep.test.mjs`.
+the rest lose). Tests: `tests/mosha-sweep.test.mjs`.
+**Which sweeps are worth taking?** (owner: "Keep going"; `research/edge/mosha-select/`, own PREREGISTRATION.md first): the same
+mosha-sweep candidates split by four conditions known when the order is placed (with / against the last H4 BO; the sweep also took a
+live H4 swing or an H1 swing only; session Asia / London / New York; target 4R or more away or nearer), nine cells per entry, each
+its own one-at-a-time stream; a cell had to be positive on 2006-12 (100+ trades), hold on 2013-19 after Holm, and stay positive on
+2020 on. **Verdict: FAIL**: 0 of 18 cells positive on discovery; all 54 cell-period results negative (best -0.05R; with the H4 at
+the CF -0.07R / -0.07R / -0.16R; a far target is worse than a near one in every period). So neither the pattern nor one of these
+simple conditions holds the owner's selection. Five Mosha studies, thirty-three tests on 10 Nov, none an edge. Do not write another
+mechanical reading or filter; the open step is the owner's own logged trades (owner decision 27). Tests: `tests/mosha-select.test.mjs`.

@@ -340,7 +340,7 @@ or config was changed. The items below are what that work leaves for the owner.
 
 ## Mosha as you expected it (10 Nov 2026)
 
-### [ ] 27. Your Mosha trading, tested as fixed rules in four studies: no edge. Log your own trades of it?
+### [ ] 27. Your Mosha trading, tested as fixed rules in five studies: no edge. Log your own trades of it?
 
 - **What you told me.** With the charts of your gold sell of 10 Nov (sell 4120.42, stop 4128.92, target 4072.84, about 5.6R):
   "This is how I was expecting Mosha to work." The method is top-down order only: after an H4 BO, H1 shows when the
@@ -398,7 +398,20 @@ Both fail, in both windows. The detector finds your 28 Oct and 10 Nov sells; you
 are outside it. A swept H1 high or low with an M5 CF happens about five times a trading day, so your five winners are
 five out of thousands of look-alikes, and what sets them apart is not in any rule written so far.
 
+**Is there a simple way to pick the good ones?** (you: "Keep going"; `research/edge/mosha-select/`, pre-registered.) The same
+setups, split by four things you can see when the order is placed, each tried on 2006-12, then 2013-19, then 2020 to now:
+
+| Condition | What happened |
+|---|---|
+| With the last H4 BO, or against it | Both lose in all three periods (at the CF, with the H4: −0.07R, −0.07R, −0.16R a trade). |
+| The sweep also took an H4 swing, or only an H1 swing | Both lose; they swap places from period to period. |
+| Asia, London or New York | All three lose; no session stays best. |
+| Target 4R or more away, or nearer | Both lose; the far targets lose more (12 to 19 % winners). |
+
+Eighteen filtered versions, three periods each: 54 results, all negative, the best −0.05R a trade. None of these simple
+conditions is what makes your trades win.
+
 - **Options.** (a) Log your own trades of this pattern for a few weeks (ChronosTrade or the Academy keep entry, stop,
   target and result), so we measure your selection instead of a rule's. (b) Tell me what makes you skip a setup, and I test
-  that one filter. (c) Leave it. Four mechanical readings and fifteen tests are enough; I do not recommend a fifth.
+  that one filter. (c) Leave it. Five studies and thirty-three tests are enough; I do not recommend another mechanical one.
 - **Recommended: (a).** Nothing live changes on any option; the live Mosha BO is untouched.
