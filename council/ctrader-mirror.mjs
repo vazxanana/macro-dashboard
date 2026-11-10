@@ -75,6 +75,18 @@ export const SYMBOLS = { xau: ['XAUUSD'], eurusd: ['EURUSD'], gbpusd: ['GBPUSD']
 // the ICT desk's trades as mirror candidates: only its A-setups (the part that holds up after costs: research/edge/costs), with
 // their own id space; everything else is treated like a shadow (never sent)
 export const ictCandidates = (ict) => (Array.isArray(ict) ? ict : []).map((t) => ({ ...t, id: 'ict:' + t.id, k: 'ict-' + (t.aplus ? 'A+' : 'A'), shadow: !t.aset, rr: t.t1 == null ? 99 : t.rr }));
+// The replica's forward paper trades (10 Nov, owner: "the mirror is not taking the replica trades"). The Trader records them in
+// research.json (k 'replica', gold, forex and crypto), never in trades.json, which holds only the live gold replica; the mirror
+// used to read trades.json and the ICT desk alone, so the Replica demo account stayed empty. They are candidates for the
+// 'replica' book like any other trade (same stop rules, same limits). A record that is also in trades.json is taken from there
+// (never twice); one whose own filter failed (`pass: false`) counts as a shadow, so config.json mirrorShadow: false leaves it out.
+export const replicaCandidates = (research, have = []) => {
+  const ids = new Set(), sigs = new Set(); for (const t of have || []) { if (!t) continue; ids.add(t.id); if (t.k === 'replica') sigs.add(`${t.market}|${t.side}|${t.opened}`); }
+  return (Array.isArray(research) ? research : []).filter((t) => t && t.k === 'replica' && typeof t.id === 'string' && !ids.has(t.id) && !sigs.has(`${t.market}|${t.side}|${t.opened}`))
+    .map((t) => ({ ...t, shadow: t.shadow === true || t.pass === false, research: true }));
+};
+// true only while the replica book trades on a different demo account from the council book
+export const replicaHasOwnAccount = (byBook) => !!(byBook && byBook.replica && byBook.council && byBook.replica !== byBook.council);
 // sizing (owner, 7 Nov: "risk-based lots, bigger demo", from research/portfolio.md): each order risks a share of the balance per 1R:
 // ICT A-setups 0.20% x the desk's size field (A+ half-size trades 0.10%), Meridian 0.02%; total open risk at most 1%.
 // The lot follows from the stop distance; below the broker's minimum lot the trade is skipped (never rounded up to more risk).
@@ -759,7 +771,8 @@ if (process.argv[1] && process.argv[1].endsWith('ctrader-mirror.mjs')) {
   if (!anySet && !fs.existsSync(path.join(CD, 'mirror.json'))) process.exit(0);   // never set up: stay silent; once any cTrader setting exists, always report status
   const raw = JSON.parse(fs.readFileSync(path.join(DIR, 'trades.json'), 'utf8'));
   let ict = []; try { ict = JSON.parse(fs.readFileSync(path.join(DIR, 'ict', 'trades.json'), 'utf8')); } catch (e) {}
-  const trades = (Array.isArray(raw) ? raw : raw.trades || []).concat(ictCandidates(ict));
+  let research = []; try { research = JSON.parse(fs.readFileSync(path.join(DIR, 'research.json'), 'utf8')); } catch (e) {}
+  const own = Array.isArray(raw) ? raw : raw.trades || [];
   const saveTokens = (t) => { fs.mkdirSync(CD, { recursive: true }); writeAtomic(path.join(CD, 'tokens.json'), JSON.stringify(t)); };
   let cfg = {}; try { cfg = JSON.parse(fs.readFileSync(path.join(DIR, 'config.json'), 'utf8')) || {}; } catch (e) {}
   const shadows = cfg.mirrorShadow !== false;   // 8 Nov, owner: shadows mirrored too; config.json mirrorShadow: false turns it off
@@ -773,7 +786,11 @@ if (process.argv[1] && process.argv[1].endsWith('ctrader-mirror.mjs')) {
   // account numbers: council/ctrader-accounts.json on main (owner gives the numbers in chat, a PR records them; no secrets), then
   // council-data config.json mirrorAccounts, then the env CTRADER_ACCOUNTS
   let accFile = {}; try { accFile = JSON.parse(fs.readFileSync(new URL('./ctrader-accounts.json', import.meta.url), 'utf8')); } catch (e) {}
-  const { groups } = accountsFor(process.env, { mirrorAccounts: { ...(accFile.mirrorAccounts || {}), ...(cfg.mirrorAccounts || {}) } }), allAlerts = [], base = String(process.env.CTRADER_ACCOUNT_ID || '').trim();
+  const { groups, byBook } = accountsFor(process.env, { mirrorAccounts: { ...(accFile.mirrorAccounts || {}), ...(cfg.mirrorAccounts || {}) } }), allAlerts = [], base = String(process.env.CTRADER_ACCOUNT_ID || '').trim();
+  // the replica's research trades are copied only while the replica book has a demo account of its own: without one they
+  // would land on the council's account (a book without a number trades on the base account)
+  const replicaOwn = replicaHasOwnAccount(byBook);
+  const trades = own.concat(ictCandidates(ict), replicaOwn ? replicaCandidates(research, own) : []);
   let tokens = rd('tokens.json', null), summaryLines = [];
   // what each account has copied (any status, resting orders too; after the owner's reset, if one applies): another account never
   // opens the same trade

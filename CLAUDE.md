@@ -1297,3 +1297,13 @@ offline.html was 9 px too wide on phones; the Edge lab donut label fell to 10.8 
 quick Buy / Sell labels under AA; the gold terminal had no way back to the desk (the installed app's "Gold" shortcut). Checks:
 `tests/qa-sweep.test.mjs` (also pins the owner's grey / black light-mode candles) and `scripts/audit/smoke.cjs` (offline.html, and no
 visible endless animation of a custom property or box-shadow on any page).
+
+## Mirror: the replica book takes the replica's research trades (10 Nov 2026, owner: "the mirror is not taking the replica trades")
+The Replica demo account stayed empty because the mirror read only trades.json and the ICT desk, while the replica's forward
+paper trades (gold, forex and crypto; `k: 'replica'`) are recorded by the Trader in research.json; trades.json holds only the
+live gold replica, which fires rarely. `council/ctrader-mirror.mjs` `replicaCandidates(research, own)` now adds them as
+candidates for the `replica` book: same path as every other trade (a stop is required, `ensureStop`, the late-copy guard, the
+limits, stop moves and closes follow the record). A record also in trades.json is taken from there (by id and by market +
+side + time, never twice); one whose own filter failed (`pass: false`) counts as a shadow (config.json `mirrorShadow: false`
+leaves it out). They are copied only while the replica book has a demo account different from the council's
+(`replicaHasOwnAccount`), so they can never land on the council account. Demo only. Tests: `tests/ctrader-mirror.test.mjs`.
