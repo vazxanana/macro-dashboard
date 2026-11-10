@@ -3436,8 +3436,8 @@ html[data-motion="off"] #v-ict .ict-cal-d:hover { transform: none !important; }
         </ol>
         <p class="ms-note">Every trade has a stop. The log refuses one without it.</p></div>
       <div class="card mo-wide" id="mo-replay">
-        <div class="ms-k"><span>Your trades, on the chart</span><small>your own marks on our 5-minute candles · times in UTC</small></div>
-        <div class="mo-rp-top"><div class="mo-rp-seg" id="mo-rp-pick" role="group" aria-label="Which trade"></div><span class="mo-rp-label" id="mo-rp-label"></span></div>
+        <div class="ms-k"><span>Your trades, on the chart</span><small>your own marks on our candles · times in UTC</small></div>
+        <div class="mo-rp-top"><div class="mo-rp-seg" id="mo-rp-pick" role="group" aria-label="Which trade or picture"></div><span class="mo-rp-label" id="mo-rp-label"></span></div>
         <p class="mo-rp-res" id="mo-rp-res"></p>
         <div class="mo-rp-wrap"><div class="mo-rp-chart" id="mo-rp-chart"></div><canvas id="mo-rp-ov" aria-hidden="true"></canvas><div class="mo-rp-msg" id="mo-rp-msg" role="status">Loading the candles…</div></div>
         <p class="mo-rp-cap" id="mo-rp-cap" aria-live="polite">Press play, or step through.</p>
@@ -3452,8 +3452,8 @@ html[data-motion="off"] #v-ict .ict-cal-d:hover { transform: none !important; }
           <span class="mo-rp-k">Speed</span><div class="mo-rp-seg" id="mo-rp-speed" role="group" aria-label="Replay speed"></div>
           <button type="button" class="ms-tbtn mo-rp-ct" id="mo-rp-ct">Trade it yourself in ChronosTrade</button>
         </div>
-        <ul class="mo-rp-leg" aria-label="What the marks mean"><li><i class="lv"></i>Level</li><li><i class="vr"></i>M5 VR, your "5 mn" box</li><li><i class="zn"></i>Zone of the break</li><li><i class="st"></i>Stop</li><li><i class="tg"></i>Target</li></ul>
-        <p class="ms-note">These are the trades from your screenshots, redrawn on our own candles from what the charts show. They are examples you picked, so they show the pattern, not how often it wins. "Replay" on a logged trade opens it here too.</p>
+        <ul class="mo-rp-leg" aria-label="What the marks mean"><li><i class="lv"></i>Level</li><li><i class="vr"></i>M5 VR, your "5 mn" box</li><li><i class="bv"></i>A range, your green box</li><li><i class="zn"></i>Zone of the break</li><li><i class="st"></i>Stop</li><li><i class="tg"></i>Target</li></ul>
+        <p class="ms-note">These are the trades from your screenshots, redrawn on our own candles from what the charts show. They are examples you picked, so they show the pattern, not how often it wins. "The bigger picture" holds the higher-timeframe views from the same screenshots: the H4 BO sell, the M15 VR and the pullback the trades came from. "Replay" on a logged trade opens it here too.</p>
       </div>
       <div class="card mo-wide" id="mo-form-card" hidden>
         <div class="ms-k"><span id="mo-form-h">Log a trade</span><small>write it down as you take it</small></div>
@@ -10970,7 +10970,7 @@ html[data-role="public"] .hdr-sw { display: none; }
 #v-mosha .mo-rp-ctl { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; margin-bottom: 10px; } #v-mosha #mo-rp-slider { flex: 1 1 180px; min-width: 120px; min-height: 34px; accent-color: var(--mo-gold); }
 #v-mosha .mo-rp-clock { font: 500 13px var(--mono); color: var(--ink-dim); font-variant-numeric: tabular-nums; min-width: 132px; text-align: right; } #v-mosha .mo-rp-k { font: 600 12px var(--sans); color: var(--ink-faint); } #v-mosha .mo-rp-ct { margin-left: auto; }
 #v-mosha .mo-rp-leg { list-style: none; margin: 0 0 10px; padding: 0; display: flex; flex-wrap: wrap; gap: 6px 16px; font-size: 12px; color: var(--ink-dim); } #v-mosha .mo-rp-leg li { display: inline-flex; align-items: center; gap: 6px; }
-#v-mosha .mo-rp-leg i { display: inline-block; width: 18px; height: 10px; border-radius: 2px; } #v-mosha .mo-rp-leg .lv { height: 0; border-top: 2px solid #ba68c8; border-radius: 0; } #v-mosha .mo-rp-leg .vr { border: 1.5px solid #e5534b; } #v-mosha .mo-rp-leg .zn { background: rgba(149,117,205,.45); } #v-mosha .mo-rp-leg .st { background: rgba(240,80,110,.45); } #v-mosha .mo-rp-leg .tg { background: rgba(130,140,160,.45); }
+#v-mosha .mo-rp-leg i { display: inline-block; width: 18px; height: 10px; border-radius: 2px; } #v-mosha .mo-rp-leg .lv { height: 0; border-top: 2px solid #ba68c8; border-radius: 0; } #v-mosha .mo-rp-leg .vr { border: 1.5px solid #e5534b; } #v-mosha .mo-rp-leg .bv { border: 1.5px solid #43a047; } #v-mosha .mo-rp-sep { align-self: center; margin: 0 2px 0 10px; } #v-mosha .mo-rp-leg .zn { background: rgba(149,117,205,.45); } #v-mosha .mo-rp-leg .st { background: rgba(240,80,110,.45); } #v-mosha .mo-rp-leg .tg { background: rgba(130,140,160,.45); }
 @media (pointer: coarse) { #v-mosha .mo-rp-seg button { min-height: 44px; } #v-mosha #mo-rp-slider { min-height: 44px; } }
 @media (max-width: 760px) { #v-mosha .mo-rp-wrap { height: 340px; } #v-mosha .mo-rp-ct { margin-left: 0; flex: 1 1 100%; } #v-mosha .mo-rp-clock { min-width: 0; } }
 @media (max-width: 900px) { #v-mosha .mo-grid { grid-template-columns: 1fr; } #v-mosha .mo-form { grid-template-columns: repeat(2, minmax(0, 1fr)); } #v-mosha .mo-f, #v-mosha .mo-seg { grid-column: span 1; } #v-mosha .mo-f2, #v-mosha .mo-f3, #v-mosha .mo-exit { grid-column: 1 / -1; }

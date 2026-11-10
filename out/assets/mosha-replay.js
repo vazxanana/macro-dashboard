@@ -4,6 +4,8 @@
 // lavender zone of the break, the red stop band and the grey target band. A replay walks each one candle by candle and names the
 // step it has reached. A logged trade opens in the same chart (levels only). Times are UTC; the screenshots' clock is New York
 // (UTC-4 until 1 Nov 2026, UTC-5 after). Pure pieces are on MS_MOSHA_RP and tested in tests/mosha-replay.test.mjs.
+// Same day, owner: "And do the same of the previous": the earlier screenshots' higher-timeframe pictures (STUDIES below), the
+// H4 / H1 / M15 story the trades sit in, on the same chart with the same replay.
 // A picture of past trades only: nothing here places or changes a trade.
 (function (root) {
   'use strict';
@@ -77,10 +79,62 @@
         { t: 'fill', text: 'Buy 3900.71, stop 3896.79 (3.9 a unit), target 3965.08. Plan 1 : 16.4. On our feed the lows at 13:00 and 13:15 UTC were 3896.47 and 3896.53, under your stop by 0.3: a stop this tight depends on the price feed.' },
         { t: 'exit', text: 'The target is reached in a little over an hour.' }] }
   ];
+  // The earlier screenshots (2 Nov 2026): "POV 26 October" on H4 and H1, "M15 vr", "2000 pips"; then "H1" and "no vr just after
+  // gave M5 vr m5 cf for sell". Levels and times are our own candles' highs, lows and closes; a box edge that is not one of those
+  // is read off the screenshot (within about 2 dollars). `base` = the candles fetched, `tfs` = the candle sizes offered, `view` =
+  // the size it opens on, `h4off` = where the H4 candles start (17:00 New York = 21:00 UTC in October), `handFrom` = where the
+  // ChronosTrade hand-over starts, `relabel` = a line's name once the break is in, `left` / `under` / `over` = where a mark's name
+  // sits, `keep` = its name stays on a phone, `watch` = the moment a picture without a
+  // position points at (what price did after it is measured on the candles).
+  var STUDIES = [
+    { id: 'cycle', title: '22–30 Oct, top-down', label: 'POV 26 October · M15 vr · 2000 pips', market: 'xau', side: 'sell', entry: 4048.59, stop: 4076.69, target: 3971.09,
+      base: '15m', tfs: [900, 3600, 14400], view: 3600, h4off: 3600, handFrom: T('2026-10-28T20:15'),
+      from: T('2026-10-06T00:00'), to: T('2026-10-30T21:00'), fillFrom: T('2026-10-29T00:15'), yours: '+2.8R on the sell, target reached; the whole fall is your "2000 pips"',
+      marks: [
+        { kind: 'level', under: true, keep: true, label: 'H4 low 4066.5', relabel: { at: T('2026-10-22T17:00'), label: 'BO sell 4066.5' }, p: 4066.5, a: T('2026-10-07T12:45'), b: T('2026-10-22T17:00'), at: T('2026-10-07T13:00') },
+        { kind: 'level', label: 'High 4217.4', p: 4217.4, a: T('2026-10-12T01:00'), b: T('2026-10-28T20:00'), at: T('2026-10-12T05:00') },
+        { kind: 'level', left: true, label: 'Low 3986.7', p: 3986.7, a: T('2026-10-23T02:00'), b: T('2026-10-27T13:00'), at: T('2026-10-23T03:00') },
+        { kind: 'bvr', label: 'M15 VR', top: 4034.1, bot: 3975.65, a: T('2026-10-23T13:15'), b: T('2026-10-27T14:00'), at: T('2026-10-23T14:45') },
+        { kind: 'vr', label: '5 mn', top: 4076.69, bot: 4048.59, a: T('2026-10-28T20:00'), b: T('2026-10-29T02:00'), at: T('2026-10-28T20:15') }],
+      steps: [
+        { t: T('2026-10-07T13:00'), text: 'An H4 low forms at 4066.5. While it holds, the H4 is not a sell.' },
+        { t: T('2026-10-12T05:00'), text: 'The high: 4217.4 on 12 Oct. Price does not get above it again.' },
+        { t: T('2026-10-22T17:00'), text: 'BO sell: the H4 candle closes at 4038, below 4066.5 (H1 had closed below it at 12:00). The H4 is a sell from here.' },
+        { t: T('2026-10-23T14:45'), text: 'The fall stops at 3975.7, just under the morning low of 3986.7. Your M15 VR, the green box: from that extreme up to the last swing high before it, 4034.1.' },
+        { t: T('2026-10-26T02:00'), text: 'The range holds: the lows of 26 Oct (3983.3 and 3978.2) stay above 3975.7.' },
+        { t: T('2026-10-27T14:15'), text: 'The CF: an M15 candle closes above the VR, at 4035.9. The pullback up has started.' },
+        { t: T('2026-10-27T17:45'), text: 'The pullback reaches the H4 BO sell level from below: highs of 4064.9 and 4065.7 against 4066.5.' },
+        { t: T('2026-10-28T20:15'), text: 'It ends with a spike to 4082.8, straight back down. The M5 VR, your red "5 mn" box: 4076.7 down to 4048.6.' },
+        { t: T('2026-10-29T00:00'), text: 'The CF for the sell: an M5 candle closes below the VR, at 4047.7.' },
+        { t: 'fill', text: 'Price comes back to the VR low: sell 4048.59, stop 4076.69, target 3971.09. The main trade, with the H4.' },
+        { t: 'exit', text: 'The target is reached.' },
+        { t: T('2026-10-30T20:00'), text: 'Price runs on to 3870.3 by the end of the week: 206 dollars below the VR high, your "2000 pips".' }] },
+    { id: 'oct29e', title: '29 Oct evening', label: 'no vr just after gave M5 vr m5 cf for sell', market: 'xau', side: 'sell', entry: null, stop: null, target: null,
+      base: '5m', tfs: [300, 900, 3600], view: 900, handFrom: T('2026-10-29T20:15'), watch: { t: T('2026-10-29T23:45'), side: 'sell' },
+      from: T('2026-10-28T16:00'), to: T('2026-10-30T16:00'), fillFrom: T('2026-10-29T23:50'), yours: 'no position is drawn on this screenshot',
+      marks: [
+        { kind: 'level', under: true, label: 'H1 low 4024.7', relabel: { at: T('2026-10-29T08:00'), label: 'BO sell 4024.7' }, p: 4024.7, a: T('2026-10-28T18:00'), b: T('2026-10-29T08:00'), at: T('2026-10-28T19:00') },
+        { kind: 'level', label: 'High 4082.8', p: 4082.8, a: T('2026-10-28T20:00'), b: T('2026-10-29T18:00'), at: T('2026-10-28T20:15') },
+        { kind: 'level', under: true, label: 'Low 4015.8', relabel: { at: T('2026-10-29T18:00'), label: 'BO sell 4015.8' }, p: 4015.8, a: T('2026-10-29T08:00'), b: T('2026-10-29T17:40'), at: T('2026-10-29T09:00') },
+        { kind: 'zone', under: true, label: 'Under the level, no VR', top: 4018, bot: 4005.4, a: T('2026-10-29T17:30'), b: T('2026-10-29T20:30'), at: T('2026-10-29T18:35') },
+        { kind: 'zone', over: true, keep: true, label: 'M5 VR', top: 4032.6, bot: 4009.7, a: T('2026-10-29T19:10'), b: T('2026-10-30T02:00'), at: T('2026-10-29T20:15') }],
+      steps: [
+        { t: T('2026-10-28T19:00'), text: 'On H1: a low at 4024.7, just before the spike up.' },
+        { t: T('2026-10-28T20:15'), text: 'The high: 4082.8. The sells of 28 and 29 Oct start from here.' },
+        { t: T('2026-10-29T09:00'), text: 'BO sell on H1: the 07:00 candle closes at 4023.1, below 4024.7. The next one leaves a new low at 4015.8.' },
+        { t: T('2026-10-29T18:00'), text: 'BO sell again: the H1 candle closes at 4007.2, below 4015.8. No VR here: price only slides under the level, so there is nothing to trade yet.' },
+        { t: T('2026-10-29T20:15'), text: 'Just after, the pullback gives one: up from 4009.7 to 4032.6, then turned. That range is the M5 VR.' },
+        { t: T('2026-10-29T23:50'), text: 'The M5 CF for the sell: a candle closes below the VR, at 4007.7.' },
+        { t: T('2026-10-30T00:50'), text: 'Price comes back into the VR, to 4019.0, and does not get above it.' },
+        { t: T('2026-10-30T14:30'), text: 'By the New York morning it is at 3891.6.' }] }
+  ];
+  var ALL = EXAMPLES.concat(STUDIES), BASE = { '5m': 300, '15m': 900 };
+  // the candle sizes a picture offers (never smaller than the candles fetched for it)
+  function tfsOf(spec) { var b = BASE[spec.base] || 300; return (spec.tfs || [300, 900, 3600]).filter(function (s) { return s >= b; }); }
 
-  function aggBars(bars, sec) {
-    if (sec <= 300) return bars; var out = [], c = null;
-    for (var i = 0; i < bars.length; i++) { var b = bars[i], k = Math.floor(b.time / sec) * sec; if (!c || c.time !== k) { c = { time: k, open: b.open, high: b.high, low: b.low, close: b.close }; out.push(c); } else { if (b.high > c.high) c.high = b.high; if (b.low < c.low) c.low = b.low; c.close = b.close; } }
+  function aggBars(bars, sec, off) {
+    if (sec <= 300) return bars; var out = [], c = null; off = off || 0;
+    for (var i = 0; i < bars.length; i++) { var b = bars[i], k = Math.floor((b.time - off) / sec) * sec + off; if (!c || c.time !== k) { c = { time: k, open: b.open, high: b.high, low: b.low, close: b.close }; out.push(c); } else { if (b.high > c.high) c.high = b.high; if (b.low < c.low) c.low = b.low; c.close = b.close; } }
     return out;
   }
   // index of the last bar that starts at or before t (-1 when none)
@@ -104,7 +158,16 @@
   function stepsOf(spec, oc) { return (spec.steps || []).map(function (s) { var t = s.t === 'fill' ? oc && oc.fill : s.t === 'exit' ? oc && oc.exit : s.t; return t == null ? null : { t: t, text: s.text }; }).filter(Boolean); }
   function stepAt(steps, t) { var k = -1; for (var i = 0; i < steps.length; i++) if (steps[i].t <= t) k = i; return k; }
   // what is on the chart when the replay stands at time t: a mark shows from its `at` (else its start), cut at t
-  function marksAt(spec, t) { return (spec.marks || []).filter(function (m) { return (m.at != null ? m.at : m.a) <= t; }).map(function (m) { var c = {}; for (var k in m) c[k] = m[k]; c.b = Math.min(m.b, t); return c; }); }
+  function marksAt(spec, t) { return (spec.marks || []).filter(function (m) { return (m.at != null ? m.at : m.a) <= t; }).map(function (m) { var c = {}; for (var k in m) c[k] = m[k]; c.b = Math.min(m.b, t); if (m.relabel && m.relabel.at <= t) c.label = m.relabel.label; return c; }); }
+  // a picture without a position: what price did after the candle it points at (`watch.t`, measured from that candle's close):
+  // the furthest it went with the side, and the furthest against it on the way there
+  function follow(spec, bars) {
+    var w = spec.watch; if (!w || !bars || !bars.length) return null; var i = barAt(bars, w.t); if (i < 0 || bars[i].time !== w.t) return null;
+    var s = w.side === 'sell' ? -1 : 1, px = bars[i].close, best = 0, bi = i, worst = 0, j;
+    for (j = i + 1; j < bars.length; j++) { var fav = s < 0 ? px - bars[j].low : bars[j].high - px; if (fav > best) { best = fav; bi = j; } }
+    for (j = i + 1; j <= bi; j++) { var adv = s < 0 ? bars[j].high - px : px - bars[j].low; if (adv > worst) worst = adv; }
+    return { t: w.t, px: px, best: +best.toFixed(2), bestT: bars[bi].time, bestPx: s < 0 ? bars[bi].low : bars[bi].high, worst: +worst.toFixed(2) };
+  }
   // a logged trade as a chart spec (levels only)
   function specOfTrade(t, now) {
     var end = t.status === 'closed' && t.exitAt ? t.exitAt + 2 * 3600 : Math.min(now, t.at + 3 * 86400);
@@ -115,12 +178,12 @@
   }
   // the hand-over to ChronosTrade: the same market from the moment before the entry forms, with the marks already known then
   function handoff(spec, now) {
-    var vr = (spec.marks || []).filter(function (m) { return m.kind === 'vr' || m.kind === 'bvr'; })[0], start = vr ? (vr.at || vr.a) : spec.fillFrom - 3600, draw = [];
-    (spec.marks || []).forEach(function (m) { if ((m.at != null ? m.at : m.a) > start) return; var b = Math.min(m.b, start);
-      if (m.kind === 'level') draw.push({ type: 't', t1: m.a, p1: m.p, t2: b, p2: m.p }); else draw.push({ type: 'r', t1: m.a, p1: m.top, t2: b, p2: m.bot }); });
-    return { made: now, sym: spec.market, tf: '5m', start: start, days: 3, name: 'Mosha ' + spec.title + ' · ' + spec.entry + ' / ' + spec.stop + (spec.target != null ? ' / ' + spec.target : ''), draw: draw };
+    var vr = (spec.marks || []).filter(function (m) { return m.kind === 'vr' || m.kind === 'bvr'; })[0], start = spec.handFrom || (vr ? (vr.at || vr.a) : spec.fillFrom - 3600), draw = [];
+    (spec.marks || []).forEach(function (m) { if ((m.at != null ? m.at : m.a) > start) return; var b = Math.min(m.b, start), a = Math.max(m.a, start - 86400); if (b <= a) return;   // a line from weeks back starts a day before: ChronosTrade loads about a day of candles before the start
+      if (m.kind === 'level') draw.push({ type: 't', t1: a, p1: m.p, t2: b, p2: m.p }); else draw.push({ type: 'r', t1: a, p1: m.top, t2: b, p2: m.bot }); });
+    return { made: now, sym: spec.market, tf: '5m', start: start, days: 3, name: 'Mosha ' + spec.title + (spec.entry != null ? ' · ' + spec.entry + ' / ' + spec.stop + (spec.target != null ? ' / ' + spec.target : '') : ''), draw: draw };
   }
-  var API = { EXAMPLES: EXAMPLES, aggBars: aggBars, barAt: barAt, outcome: outcome, stepsOf: stepsOf, stepAt: stepAt, marksAt: marksAt, specOfTrade: specOfTrade, handoff: handoff };
+  var API = { EXAMPLES: EXAMPLES, STUDIES: STUDIES, tfsOf: tfsOf, follow: follow, aggBars: aggBars, barAt: barAt, outcome: outcome, stepsOf: stepsOf, stepAt: stepAt, marksAt: marksAt, specOfTrade: specOfTrade, handoff: handoff };
   if (typeof module !== 'undefined' && module.exports) module.exports = API;
   root.MS_MOSHA_RP = API;
   if (typeof document === 'undefined') return;
@@ -128,8 +191,8 @@
   // ─── the chart ───
   var $ = function (id) { return document.getElementById(id); };
   var esc = function (v) { return String(v == null ? '' : v).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); };
-  var TFS = [['5m', 300, 'M5'], ['15m', 900, 'M15'], ['1h', 3600, 'H1']], SPEEDS = [[1, 420], [3, 140], [10, 40]];
-  var R = { spec: null, m5: null, bars: null, oc: null, steps: [], tf: 300, cur: 0, timer: 0, speed: 1, chart: null, series: null, cache: {}, lo: 0, hi: 0, token: 0 };
+  var TFS = [[300, 'M5'], [900, 'M15'], [3600, 'H1'], [14400, 'H4']], SPEEDS = [[1, 420], [3, 140], [10, 40]];
+  var R = { spec: null, base: null, bars: null, oc: null, steps: [], tf: 300, cur: 0, timer: 0, speed: 1, chart: null, series: null, cache: {}, lo: 0, hi: 0, token: 0 };
   var fR = function (v) { return v == null ? '—' : (v > 0 ? '+' : v < 0 ? '−' : '') + Math.abs(v).toFixed(2) + 'R'; };
   var utc = function (t) { return new Date(t * 1000).toISOString().slice(5, 16).replace('T', ' ') + ' UTC'; };
   var css = function (n, d) { var v = getComputedStyle(document.documentElement).getPropertyValue(n).trim(); return v || d; };
@@ -162,10 +225,10 @@
     var tag = function (txt, px, py, col) { var w = x.measureText(txt).width + 10; px = Math.max(2, Math.min(px, plotW - w - 2)); py = Math.max(10, Math.min(py, plotH - 10)); x.fillStyle = C.tag; x.globalAlpha = .85; x.fillRect(px, py - 9, w, 18); x.globalAlpha = 1; x.fillStyle = col; x.fillText(txt, px + 5, py + .5); };
     marksAt(sp, now).forEach(function (m) {
       var x1 = X(m.a), x2 = X(m.b); if (x1 == null || x2 == null) return; if (x2 < x1 + 2) x2 = x1 + 2;
-      if (m.kind === 'level') { var y = Y(m.p); if (y == null) return; x.strokeStyle = C.level; x.lineWidth = 2; x.beginPath(); x.moveTo(x1, y); x.lineTo(x2, y); x.stroke(); if (!(narrow && m.under)) tag(m.label, x1 + 4, y + (m.under ? 12 : -12), C.level); return; }
+      if (m.kind === 'level') { var y = Y(m.p); if (y == null) return; x.strokeStyle = C.level; x.lineWidth = 2; x.beginPath(); x.moveTo(x1, y); x.lineTo(x2, y); x.stroke(); if (!(narrow && m.under && !m.keep)) tag(m.label, m.left ? x1 - x.measureText(m.label).width - 14 : x1 + 4, m.left ? y : y + (m.under ? 12 : -12), C.level); return; }
       var yt = Y(m.top), yb = Y(m.bot); if (yt == null || yb == null) return;
-      if (m.kind === 'vr' || m.kind === 'bvr') { var col = m.kind === 'vr' ? C.vr : C.bvr; x.fillStyle = m.kind === 'vr' ? C.vrF : C.bvrF; x.fillRect(x1, yt, x2 - x1, yb - yt); x.strokeStyle = col; x.lineWidth = 1.5; x.strokeRect(x1 + .5, yt + .5, x2 - x1, yb - yt); tag(m.label, (x1 + x2) / 2 - 16, yt - 11, col); }
-      else if (m.kind === 'zone') { x.fillStyle = C.zone; x.fillRect(x1, yt, x2 - x1, yb - yt); x.fillStyle = C.zoneS; x.fillRect(x1, yt, 2, yb - yt); if (!narrow) tag(m.label, x1 + 6, (yt + yb) / 2, C.level); }
+      if (m.kind === 'vr' || m.kind === 'bvr') { var col = m.kind === 'vr' ? C.vr : C.bvr; x.fillStyle = m.kind === 'vr' ? C.vrF : C.bvrF; x.fillRect(x1, yt, x2 - x1, yb - yt); x.strokeStyle = col; x.lineWidth = 1.5; x.strokeRect(x1 + .5, yt + .5, x2 - x1, yb - yt); if (!(narrow && x2 - x1 < 30)) tag(m.label, (x1 + x2) / 2 - 16, yt - 11, col); }
+      else if (m.kind === 'zone') { x.fillStyle = C.zone; x.fillRect(x1, yt, x2 - x1, yb - yt); x.fillStyle = C.zoneS; x.fillRect(x1, yt, 2, yb - yt); if (!narrow || m.keep) tag(m.label, x1 + 6, m.under ? yb + 11 : m.over ? yt - 11 : (yt + yb) / 2, C.level); }
       else { x.fillStyle = C.htf; x.fillRect(x1, yt, x2 - x1, yb - yt); tag(m.label, x1 + 6, (yt + yb) / 2, C.level); }
     });
     // the position: red band entry to stop, grey band entry to target, from the fill to the exit (or to now)
@@ -174,7 +237,7 @@
       if (a != null && b != null && ye != null && ys != null) { if (b < a + 6) b = a + 6;
         x.fillStyle = C.stop; x.fillRect(a, Math.min(ye, ys), b - a, Math.abs(ys - ye)); if (yg != null) { x.fillStyle = C.tgt; x.fillRect(a, Math.min(ye, yg), b - a, Math.abs(yg - ye)); }
         x.strokeStyle = C.ink; x.lineWidth = 1; x.beginPath(); x.moveTo(a, ye + .5); x.lineTo(b, ye + .5); x.stroke();
-        tag('Stop ' + sp.stop, b - 96, ys + (sp.side === 'sell' ? 11 : -11), light() ? '#c2185b' : '#ff8fab'); tag((sp.side === 'sell' ? 'Sell ' : 'Buy ') + sp.entry, a + 4, ye + (sp.side === 'sell' ? -11 : 11), C.ink); if (yg != null) tag('Target ' + sp.target, b - 108, yg + (sp.side === 'sell' ? -11 : 11), C.ink);
+        if (b - a >= 200) tag('Stop ' + sp.stop, b - 96, ys + (sp.side === 'sell' ? 11 : -11), light() ? '#c2185b' : '#ff8fab'); else if (!narrow) tag('Stop ' + sp.stop, b + 6, ys, light() ? '#c2185b' : '#ff8fab');   /* a position too narrow on screen for its tags: the stop's goes beside it (on a phone the line above the chart names it) */ tag((sp.side === 'sell' ? 'Sell ' : 'Buy ') + sp.entry, a + 4, ye + (sp.side === 'sell' ? -11 : 11), C.ink); if (yg != null) tag('Target ' + sp.target, b - 108, yg + (sp.side === 'sell' ? -11 : 11), C.ink);
         if (oc.exit != null && oc.exit <= now && oc.px != null) { var yx = Y(oc.px); if (yx != null) { x.fillStyle = oc.R > 0 ? css('--buy', '#089981') : css('--sell', '#f23645'); x.beginPath(); x.arc(b, yx, 5, 0, 7); x.fill(); } } }
     }
     x.restore();
@@ -190,10 +253,10 @@
   function show(i) { if (!R.bars) return; R.cur = Math.max(0, Math.min(R.bars.length - 1, i)); R.series.setData(R.bars.slice(0, R.cur + 1)); caption(); requestAnimationFrame(paint); }
   function stop() { if (R.timer) { clearInterval(R.timer); R.timer = 0; } caption(); }
   function play() { if (!R.bars) return; if (R.timer) return stop(); if (R.cur >= R.bars.length - 1) show(0);
-    var ms = (SPEEDS.filter(function (s) { return s[0] === R.speed; })[0] || SPEEDS[0])[1] * (R.tf === 300 ? 1 : R.tf === 900 ? 1.6 : 2.4);
+    var ms = (SPEEDS.filter(function (s) { return s[0] === R.speed; })[0] || SPEEDS[0])[1] * (R.tf <= 300 ? 1 : R.tf <= 900 ? 1.6 : 2.4);
     R.timer = setInterval(function () { if (R.cur >= R.bars.length - 1 || !$('mo-rp-chart') || $('v-mosha').hidden) return stop(); show(R.cur + 1); }, ms); caption(); }
   function setTf(sec, keep) {
-    var t = keep && R.bars ? R.bars[R.cur].time : null; R.tf = sec; R.bars = aggBars(R.m5, sec);
+    var t = keep && R.bars ? R.bars[R.cur].time : null; R.tf = sec; R.bars = aggBars(R.base, sec, sec === 14400 ? R.spec.h4off : 0);
     var lo = Infinity, hi = -Infinity; R.bars.forEach(function (b) { if (b.low < lo) lo = b.low; if (b.high > hi) hi = b.high; });
     [R.spec.entry, R.spec.stop, R.spec.target].concat((R.spec.marks || []).filter(function (m) { return m.kind !== 'htf'; }).map(function (m) { return m.p != null ? m.p : m.top; })).forEach(function (p) { if (p == null) return; if (p < lo) lo = p; if (p > hi) hi = p; });
     var pad = (hi - lo) * .04; R.lo = lo - pad; R.hi = hi + pad;
@@ -203,6 +266,8 @@
   }
   function result() {
     var el = $('mo-rp-res'), oc = R.oc, sp = R.spec; if (!el) return;
+    if (sp.entry == null) { var f = follow(sp, R.base), dn = sp.side === 'sell';   // a picture without a position
+      el.innerHTML = '<b>' + esc(sp.title) + '</b> · no position is drawn on this screenshot<small>On our candles: ' + esc(!f ? 'the candle it points at is not in the feed' : 'the ' + utc(f.t) + ' candle closed at ' + f.px.toFixed(1) + '. After it price went ' + f.worst.toFixed(1) + ' ' + (dn ? 'up' : 'down') + ' at most, then ' + f.best.toFixed(1) + ' ' + (dn ? 'down' : 'up') + ', to ' + f.bestPx.toFixed(1) + ' at ' + utc(f.bestT)) + '.</small>'; return; }
     var ours = !oc || oc.fill == null ? 'the entry price was not traded on our candles at that time' : oc.kind === 'target' ? 'filled ' + utc(oc.fill) + ', target reached ' + utc(oc.exit) + ' (' + fR(oc.R) + '), worst point ' + oc.worst.toFixed(2) + 'R against'
       : oc.kind === 'stop' ? 'filled ' + utc(oc.fill) + ', stopped ' + utc(oc.exit) : oc.kind === 'hand' ? 'filled ' + utc(oc.fill) + ', closed ' + utc(oc.exit) + ' (' + fR(oc.R) + '), worst point ' + oc.worst.toFixed(2) + 'R against' : 'filled ' + utc(oc.fill) + ', neither stop nor target by the end of the window';
     el.innerHTML = '<b>' + esc(sp.title) + '</b> · ' + (sp.side === 'sell' ? 'sell ' : 'buy ') + esc(sp.entry) + ' · stop ' + esc(sp.stop) + (sp.target != null ? ' · target ' + esc(sp.target) : '') + '<small>You: ' + esc(sp.yours || '—') + '. On our candles: ' + esc(ours) + '.</small>';
@@ -214,24 +279,26 @@
     if (scroll) card.scrollIntoView({ block: 'start', behavior: 'smooth' });
     if (!root.LightweightCharts) { msg.hidden = false; msg.textContent = 'The chart library did not load. Reload the page.'; return; }
     var done = function (m5) { if (tk !== R.token) return; if (!m5 || m5.length < 20) { msg.hidden = false; msg.textContent = 'No candles came back for that time. The chart needs the live site and an open candle feed.'; return; }
-      msg.hidden = true; build(); R.m5 = m5; R.oc = outcome(spec, m5); R.steps = stepsOf(spec, R.oc);
+      msg.hidden = true; build(); R.base = m5; R.oc = outcome(spec, m5); R.steps = stepsOf(spec, R.oc);
+      var list = tfsOf(spec); if (spec.view && R.viewOf !== spec.id) R.tf = spec.view; if (list.indexOf(R.tf) < 0) R.tf = list[0]; R.viewOf = spec.id;   // a bigger picture opens on its own candle size
+      $('mo-rp-tf').innerHTML = TFS.filter(function (t) { return list.indexOf(t[0]) >= 0; }).map(function (t) { return '<button type="button" data-tf="' + t[0] + '" aria-pressed="' + (t[0] === R.tf) + '">' + t[1] + '</button>'; }).join('');
       $('mo-rp-steps').innerHTML = R.steps.map(function (s, i) { return '<button type="button" data-step="' + i + '" title="' + esc(s.text) + '">' + (i + 1) + '</button>'; }).join('');
       result(); setTf(R.tf); };
     if (R.cache[spec.id]) return done(R.cache[spec.id]);
     msg.hidden = false; msg.textContent = 'Loading the candles…';
-    fetch('/md/bars?sym=' + encodeURIComponent(spec.market) + '&tf=5m&from=' + spec.from + '&to=' + spec.to, { cache: 'force-cache' }).then(function (r) { return r.ok ? r.json() : null; })
+    fetch('/md/bars?sym=' + encodeURIComponent(spec.market) + '&tf=' + (BASE[spec.base] ? spec.base : '5m') + '&from=' + spec.from + '&to=' + spec.to, { cache: 'force-cache' }).then(function (r) { return r.ok ? r.json() : null; })
       .then(function (j) { var bars = j && Array.isArray(j.bars) ? j.bars.filter(function (b) { return !b.live; }).map(function (b) { return { time: +b.time, open: +b.open, high: +b.high, low: +b.low, close: +b.close }; }) : null; if (bars && bars.length >= 20) R.cache[spec.id] = bars; done(bars); })
       .catch(function () { done(null); });
   }
   function wire() {
     var card = $('mo-replay'); if (!card || card.dataset.wired) return; card.dataset.wired = '1';
-    $('mo-rp-pick').innerHTML = EXAMPLES.map(function (e) { return '<button type="button" data-ex="' + e.id + '" aria-pressed="false">' + esc(e.title) + '</button>'; }).join('');
-    $('mo-rp-tf').innerHTML = TFS.map(function (t) { return '<button type="button" data-tf="' + t[1] + '" aria-pressed="' + (t[1] === R.tf) + '">' + t[2] + '</button>'; }).join('');
+    var pick = function (e) { return '<button type="button" data-ex="' + e.id + '" aria-pressed="false">' + esc(e.title) + '</button>'; };
+    $('mo-rp-pick').innerHTML = EXAMPLES.map(pick).join('') + '<span class="mo-rp-k mo-rp-sep">The bigger picture</span>' + STUDIES.map(pick).join('');
     $('mo-rp-speed').innerHTML = SPEEDS.map(function (s) { return '<button type="button" data-sp="' + s[0] + '" aria-pressed="' + (s[0] === R.speed) + '">' + s[0] + '×</button>'; }).join('');
     card.addEventListener('click', function (ev) {
       var b = ev.target.closest('button'); if (!b) return;
-      if (b.dataset.ex) open(EXAMPLES.filter(function (e) { return e.id === b.dataset.ex; })[0]);
-      else if (b.dataset.tf) { if (R.m5) { stop(); setTf(+b.dataset.tf, true); } }
+      if (b.dataset.ex) open(ALL.filter(function (e) { return e.id === b.dataset.ex; })[0]);
+      else if (b.dataset.tf) { if (R.base) { stop(); setTf(+b.dataset.tf, true); } }
       else if (b.dataset.sp) { R.speed = +b.dataset.sp; Array.prototype.forEach.call(document.querySelectorAll('#mo-rp-speed button'), function (x) { x.setAttribute('aria-pressed', String(+x.dataset.sp === R.speed)); }); if (R.timer) { stop(); play(); } }
       else if (b.dataset.step != null) { if (R.bars) { stop(); show(Math.max(0, barAt(R.bars, R.steps[+b.dataset.step].t))); } }
       else if (b.id === 'mo-rp-play') play();

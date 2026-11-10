@@ -1564,6 +1564,14 @@ studies' figures (linked to the Edge lab; a test compares them with the result f
   opens `/backtest`, which reads it once, checks it (known market, under 10 minutes old, at most 24 line / box shapes) and
   starts that session (`HAND` / `handDraw` at the end of backtest.html's script). The examples are the owner's picks: the card
   says they show the pattern, not how often it wins. Tests: `tests/mosha-replay.test.mjs`.
+  **The bigger pictures** (same day, owner: "And do the same of the previous": the higher-timeframe screenshots of 2 Nov):
+  `STUDIES` in the same file, offered apart from the trades ("The bigger picture" in the picker). `cycle` = "POV 26 October",
+  "M15 vr", "2000 pips": the H4 low 4066.5 and the high 4217.4, the H4 BO sell of 22 Oct, the M15 VR (green box, 23 to 27 Oct),
+  its CF up, the pullback to the H4 level, the 28 Oct "5 mn" VR and sell, and the fall to 3870 (M15 candles fetched; M15 / H1 /
+  H4, H4 candles from 17:00 New York, `h4off`). `oct29e` = "H1" and "no vr just after gave M5 vr m5 cf for sell": two H1 BO
+  sells, no VR under the level, then the M5 VR and its CF; the screenshot has no position, so none is drawn and `follow()` only
+  measures what price did after the CF candle. A mark has `at` (it appears once its high or low is in) and a line is renamed
+  "BO sell" only when the break is in (`relabel`). Never give a picture a position its screenshot does not show.
 - A log only: nothing under it places, copies or changes a trade, and no council member reads it. A study of the logged trades
   needs its own pre-registration (n and t, the `pre` trades only).
 - Tests: `tests/mosha-desk.test.mjs` (permissions, the stop rule, R on the server, `pre`, the locks, statistics, the candle check,
