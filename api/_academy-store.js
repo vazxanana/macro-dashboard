@@ -1,5 +1,5 @@
 // MeridianX Academy store (module, not an endpoint): small JSON files in the private Vercel Blob store, the same pattern as
-// api/notify.js. Everything lives under academy/:
+// api/notify.js. Everything lives under academy/ (academy-preview/ on a preview deployment, see rootFor):
 //   lessons.json · attempts/<edge>.json · corrections/<edge>.json · sessions/index.json + sessions/<id>.json ·
 //   seen/<edge>.json (candidate ids ever shown, with mode) · exams/<edge>.json · blind.json · dataset/<edge>.json (Layer B rows) ·
 //   notebook.json · models.json · cost.json · llm-cache.json · audit/<YYYY-MM>.json
@@ -18,6 +18,10 @@ const fs = require('node:fs');
 const path = require('node:path');
 
 const ROOT = 'academy/';
+// A preview or development deployment shares the project's Blob store with production, so it gets its own folder: nothing a
+// preview writes can touch (or be mistaken for) the production Academy's files. Production and local runs keep academy/.
+const PREVIEW_ROOT = 'academy-preview/';
+const rootFor = (env) => { const e = env && env.VERCEL_ENV; return e && e !== 'production' ? PREVIEW_ROOT : ROOT; };
 const KEY_RE = /^[a-z0-9][a-z0-9_.-]*(\/[a-z0-9][a-z0-9_.-]*)*\.json$/;
 function checkKey(k) { if (typeof k !== 'string' || k.length > 160 || !KEY_RE.test(k) || k.includes('..')) throw new Error(`bad store key: ${String(k).slice(0, 80)}`); return k; }
 const clone = (v) => (v === undefined ? undefined : JSON.parse(JSON.stringify(v)));
@@ -107,7 +111,7 @@ function fileStore(dir) {
 // bytes. Its own copy is used only while the listing shows no newer upload by someone else.
 const BLOB_TAILS = new Map(), RECENT = new Map(), RECENT_MS = 60e3;
 function blobBackend(env, io = {}) {
-  const B = () => io.blob || require('@vercel/blob'), F = io.fetch || fetch, token = env.BLOB_READ_WRITE_TOKEN, recent = io.recent || RECENT, now = io.now || Date.now;
+  const B = () => io.blob || require('@vercel/blob'), F = io.fetch || fetch, token = env.BLOB_READ_WRITE_TOKEN, recent = io.recent || RECENT, now = io.now || Date.now, ROOT = rootFor(env);
   return {
     async read(k) {
       const P = ROOT + k, { blobs } = await B().list({ prefix: P, token }), b = blobs.find((x) => x.pathname === P); if (!b) return undefined;
@@ -126,4 +130,4 @@ function blobBackend(env, io = {}) {
 }
 const blobStore = (env, io = {}) => make(blobBackend(env, io), io.tails || BLOB_TAILS);
 
-module.exports = { ROOT, checkKey, emptyRows, asRows, roll, archiveKey, make, memoryStore, fileStore, blobStore, blobBackend };
+module.exports = { ROOT, PREVIEW_ROOT, rootFor, checkKey, emptyRows, asRows, roll, archiveKey, make, memoryStore, fileStore, blobStore, blobBackend };
