@@ -3482,7 +3482,7 @@
    "startBalance": 9975.42
   },
   "startedAt": "2026-11-08T11:42:25.000Z",
-  "status": "ok · demo Fusion Markets · balance 9974.4 · 26 open · 1 resting",
+  "status": "ok · demo Fusion Markets · balance 9974.4 · 26 open · 2 resting",
   "skipped": {
    "audusd-position-1793601653": "price 0.68666 has run 1.27R from the council entry 0.70162: a different trade now",
    "xrp-rswing-1793942619": "none of XRPUSD found at the broker",
@@ -3515,18 +3515,33 @@
     "alerted": [
      "pending"
     ]
+   },
+   "audusd-rscalp-1794287076": {
+    "orderId": "33844023",
+    "symbol": "AUDUSD",
+    "side": "sell",
+    "volume": 300000,
+    "lots": 0.03,
+    "digits": 5,
+    "setup": "rscalp",
+    "limitPrice": 0.69228,
+    "stop": 0.69278,
+    "t1": 0.69211,
+    "placedAt": "2026-11-10T05:05:41.000Z",
+    "expires": "2026-11-10T08:04:36.000Z",
+    "riskCash": 1.99,
+    "margin": 4.15,
+    "shadow": true,
+    "alerted": [
+     "pending"
+    ]
    }
   },
   "catchUpAt": "2026-11-08T12:04:40.000Z",
   "balance": 9974.4,
-  "lastRun": "2026-11-10T05:03:18.000Z"
+  "lastRun": "2026-11-10T05:05:41.000Z"
  },
  "log": [
-  {
-   "at": "2026-11-09T10:48:47.000Z",
-   "msg": "not mirrored xrp-scalp-1794221269: none of XRPUSD found at the broker",
-   "trade": "xrp-scalp-1794221269"
-  },
   {
    "at": "2026-11-09T10:57:45.000Z",
    "msg": "limit filled: EURUSD position 47583058 at the broker",
@@ -5021,6 +5036,11 @@
    "at": "2026-11-10T05:03:18.000Z",
    "msg": "BTCUSD position 47891861 closed at the broker",
    "trade": "btc-rscalp-1794283012"
+  },
+  {
+   "at": "2026-11-10T05:05:41.000Z",
+   "msg": "placed sell limit AUDUSD 0.03 lot at 0.69228 (council rscalp, valid to 2026-11-10T08:04Z)",
+   "trade": "audusd-rscalp-1794287076"
   }
  ],
  "limits": {
