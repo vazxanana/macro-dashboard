@@ -8,7 +8,7 @@ _Snapshot 2026-11-09 05:40 UTC. Paper trading only._
 <!-- live-rule:start -->
 ## Live Scalp rule check
 
-Built by the Trader at 2026-11-10 06:43 UTC from snapshot, config and the 30-day replay. Rule now: Scalp (M15 → M1) against D1 only, not in asia/overlap, skips audusd. **Scalp is not live right now** (not in focusSetups), so nothing below trades live.
+Built by the Trader at 2026-11-10 06:45 UTC from snapshot, config and the 30-day replay. Rule now: Scalp (M15 → M1) against D1 only, not in asia/overlap, skips audusd. **Scalp is not live right now** (not in focusSetups), so nothing below trades live.
 
 Session now: **asia** — the rule skips it, so no live Scalp until it ends.
 
@@ -31,7 +31,7 @@ Replay total on the markets it trades live: 215 trades, −0.11R a trade (−24.
 <!-- coach-churn:start -->
 ## Coach rule changes
 
-Built by the Trader at 2026-11-10 06:43 UTC from the rule history. Rules the Coach changed by itself in the last 7 days (owner rules are not counted).
+Built by the Trader at 2026-11-10 06:45 UTC from the rule history. Rules the Coach changed by itself in the last 7 days (owner rules are not counted).
 
 | Rule | Changes | Steps (oldest first) |
 |---|---|---|
@@ -52,14 +52,14 @@ Built by the Trader at 2026-11-10 06:43 UTC from the rule history. Rules the Coa
 <!-- desk-status:start -->
 ## Desk & mirror status
 
-Built by the Trader at 2026-11-10 06:43 UTC. ICT desk: the last 7 days; mirror: the cTrader DEMO account (0.01 lot, demo only).
+Built by the Trader at 2026-11-10 06:45 UTC. ICT desk: the last 7 days; mirror: the cTrader DEMO account (0.01 lot, demo only).
 
 **ICT A-setups:** 1 signal (1 open, 0 closed); 3 other signals tracked, not A-setups.
 - open: ES buy from 7423.25, stop 7510.25 (H1 iFVG reversal, A+)
 
 **Dip-buy candidate (NQ/ES, paper only):** 2 signals in 7 days, 1 closed −1.00R · recording since 2026-11-07.
 
-**cTrader mirror:** ok · demo Fusion Markets · balance 9967.42 · 4 open · 2 resting (checked 2026-11-10 06:42 UTC).
+**cTrader mirror:** ok · demo Fusion Markets · balance 9967.42 · 4 open · 2 resting (checked 2026-11-10 06:44 UTC).
 - open: SOLUSD sell position (sol-position-1793893928) · fill 89.121 vs council 89.77 (+0.08R slippage)
 - open: SOLUSD sell position (sol-position-1793899009) · fill 89.121 vs council 89.77 (+0.08R slippage)
 - open: BTCUSD sell scalp (btc-scalp-1793919871) · fill 75841.41 vs council 75500 (−0.36R slippage)
@@ -78,7 +78,7 @@ Last mirror events:
 <!-- coach-ledger:start -->
 ## Coach change ledger
 
-Built by the Trader at 2026-11-10 06:43 UTC. Every rule the Coach changed by itself, the evidence it used and what happened 30 days later. Filter changes run as champion/challenger trials: the old rule keeps running as a shadow and the change stays only if it beats it on the same forward signals (20 where they disagree, shrunk edge ≥ +0.05R a signal; else back to the old rule after 60 days). Owner rules and live setups are not Coach changes.
+Built by the Trader at 2026-11-10 06:45 UTC. Every rule the Coach changed by itself, the evidence it used and what happened 30 days later. Filter changes run as champion/challenger trials: the old rule keeps running as a shadow and the change stays only if it beats it on the same forward signals (20 where they disagree, shrunk edge ≥ +0.05R a signal; else back to the old rule after 60 days). Owner rules and live setups are not Coach changes.
 
 | Date | Change | Evidence | Before → after (the sample it used) | Trial | 30 days later |
 |---|---|---|---|---|---|
@@ -190,13 +190,13 @@ Checked 2026-11-09 11:51 UTC; live signals 2026-11-01 to 2026-11-09.
 - **All markets:** 45% of comparable live signals found (316 matched of 697); outcome sign agrees 93% on 229 closed pairs.
 - **Why live signals were missed:** feed differs 251, data feed 40, data feed 37 (of 417).
 - **Feeds (replay / live):** xau OANDA / live Kraken+OANDA · btc Kraken / live Kraken · eth Kraken / live Kraken · audusd OANDA / live Kraken+OANDA · usdchf OANDA / live Kraken+OANDA · gbpusd OANDA / live Kraken+OANDA · xrp Kraken / live Kraken · sol Kraken / live Kraken · eurusd OANDA / live Kraken+OANDA · usdcad OANDA / live Kraken+OANDA.
-- **Live loop gaps (48 h):** 11-08 03:00 for 3.7 h, 11-08 07:17 for 6 h: no live signals were possible then.
+- **Live loop gaps (48 h):** 11-08 07:17 for 6 h: no live signals were possible then.
 <!-- fidelity:end -->
 
 <!-- gold-systems:start -->
 ## Live gold systems now
 
-Built by the Trader at 2026-11-10 06:43 UTC from its own snapshot and the live record. Status only: what each live Meridian system is waiting for right now; the Scalp block below describes a shadow system.
+Built by the Trader at 2026-11-10 06:45 UTC from its own snapshot and the live record. Status only: what each live Meridian system is waiting for right now; the Scalp block below describes a shadow system.
 
 | System | Book | Now | On |
 |---|---|---|---|
