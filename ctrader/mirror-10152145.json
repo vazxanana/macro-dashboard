@@ -225,8 +225,8 @@
     "status": "open",
     "openedAt": "2026-11-08T22:03:09.000Z",
     "councilEntry": 1.12262,
-    "stop": 1.0797695,
-    "t1": 1.16343,
+    "stop": 1.0794895,
+    "t1": 1.16315,
     "riskCash": 34.14,
     "margin": 2.23,
     "minLot": true,
@@ -243,8 +243,8 @@
     "stopSetAt": "2026-11-08T22:03:09.000Z",
     "stopSetBy": "guard",
     "rr": 0.96,
-    "amended": 4,
-    "amendedAt": "2026-11-09T20:07:13.000Z"
+    "amended": 5,
+    "amendedAt": "2026-11-10T11:06:38.000Z"
    },
    "gbpusd-scalp-1793626672": {
     "positionId": "47373485",
@@ -318,8 +318,8 @@
     "status": "open",
     "openedAt": "2026-11-08T22:03:09.000Z",
     "councilEntry": 1.12262,
-    "stop": 1.0804547,
-    "t1": 1.133285,
+    "stop": 1.0801747,
+    "t1": 1.133005,
     "riskCash": 33.46,
     "margin": 2.23,
     "minLot": true,
@@ -336,8 +336,8 @@
     "stopSetAt": "2026-11-08T22:03:09.000Z",
     "stopSetBy": "guard",
     "rr": 0.26,
-    "amended": 4,
-    "amendedAt": "2026-11-09T20:07:13.000Z"
+    "amended": 5,
+    "amendedAt": "2026-11-10T11:06:38.000Z"
    },
    "usdchf-swing-1793762425": {
     "positionId": "47373488",
@@ -4050,11 +4050,12 @@
     "setup": "swing",
     "openedAt": "2026-11-10T08:33:52.000Z",
     "councilEntry": 1.12442,
-    "stop": 1.112987,
-    "t1": 1.147286,
+    "stop": 1.112707,
+    "t1": 1.147006,
     "adopted": false,
     "alerted": [
-     "open"
+     "open",
+     "amend"
     ],
     "viaLimit": true,
     "limitPrice": 1.12442,
@@ -4069,7 +4070,10 @@
     "lagSec": 232,
     "positionId": "47964428",
     "volume": 100000,
-    "status": "open"
+    "status": "open",
+    "rr": 2,
+    "amended": 1,
+    "amendedAt": "2026-11-10T11:06:38.000Z"
    },
    "audusd-scalp-1794299718": {
     "symbol": "AUDUSD",
@@ -4541,24 +4545,9 @@
   },
   "catchUpAt": "2026-11-08T12:04:40.000Z",
   "balance": 9911.47,
-  "lastRun": "2026-11-10T11:03:46.000Z"
+  "lastRun": "2026-11-10T11:06:38.000Z"
  },
  "log": [
-  {
-   "at": "2026-11-09T16:04:58.000Z",
-   "msg": "moved XAUUSD 47603258 protection: stop 4090.69 -> 4092.31, target 4133.435 -> 4135.055 (council scalp)",
-   "trade": "xau-scalp-1794222860"
-  },
-  {
-   "at": "2026-11-09T16:04:58.000Z",
-   "msg": "moved XAUUSD 47612512 protection: stop 4101.01 -> 4102.63, target 4133.435 -> 4135.055 (council m30m1)",
-   "trade": "xau-m30m1-1794224183"
-  },
-  {
-   "at": "2026-11-09T16:04:58.000Z",
-   "msg": "moved EURUSD 47638149 protection: stop 1.11848 -> 1.11813, target 1.1217800000000002 -> 1.12143 (council scalp)",
-   "trade": "eurusd-scalp-1794229579"
-  },
   {
    "at": "2026-11-09T16:04:58.000Z",
    "msg": "moved AUDUSD 47658311 protection: stop 0.68894 -> 0.6891, target 0.6920600000000001 -> 0.69222 (council scalp)",
@@ -6043,6 +6032,21 @@
    "at": "2026-11-10T10:48:08.000Z",
    "msg": "not mirrored xrp-intraday-1794307614: none of XRPUSD found at the broker",
    "trade": "xrp-intraday-1794307614"
+  },
+  {
+   "at": "2026-11-10T11:06:38.000Z",
+   "msg": "moved EURUSD 47373484 protection: stop 1.0797695 -> 1.0794895, target 1.16343 -> 1.16315 (council rswing)",
+   "trade": "eurusd-rswing-1793610380"
+  },
+  {
+   "at": "2026-11-10T11:06:38.000Z",
+   "msg": "moved EURUSD 47373487 protection: stop 1.0804547 -> 1.0801747, target 1.133285 -> 1.133005 (council rswing)",
+   "trade": "eurusd-rswing-1793754423"
+  },
+  {
+   "at": "2026-11-10T11:06:38.000Z",
+   "msg": "moved EURUSD 47964428 protection: stop 1.112987 -> 1.112707, target 1.147286 -> 1.147006 (council swing)",
+   "trade": "eurusd-swing-1794299390"
   }
  ],
  "limits": {
