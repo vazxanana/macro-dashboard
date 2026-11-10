@@ -1395,6 +1395,61 @@
     ],
     "stopCheckedAt": "2026-11-10T17:46:29.000Z",
     "brokerStop": 1.42125
+   },
+   "btc-replica-1794333363-b": {
+    "positionId": "48181678",
+    "symbol": "BTCUSD",
+    "side": "buy",
+    "volume": 1,
+    "lots": 0.01,
+    "digits": 2,
+    "setup": "replica",
+    "status": "open",
+    "openedAt": "2026-11-10T17:57:13.000Z",
+    "councilEntry": 73139.3,
+    "stop": 72537.6,
+    "t1": 74342.71,
+    "riskCash": 6.02,
+    "margin": 72.93,
+    "minLot": true,
+    "mark": 73139.3,
+    "levelsFrom": "mark",
+    "fillPrice": 73174.65,
+    "slipR": 0.059,
+    "lagSec": 70,
+    "alerted": [
+     "open"
+    ],
+    "stopCheckedAt": "2026-11-10T17:57:13.000Z",
+    "brokerStop": 72572.95
+   },
+   "gbpusd-replica-1794333363-b": {
+    "positionId": "48181683",
+    "symbol": "GBPUSD",
+    "side": "buy",
+    "volume": 100000,
+    "lots": 0.01,
+    "digits": 5,
+    "setup": "replica",
+    "status": "open",
+    "openedAt": "2026-11-10T17:57:13.000Z",
+    "councilEntry": 1.33342,
+    "stop": 1.331114,
+    "t1": 1.338033,
+    "riskCash": 2.31,
+    "margin": 2.67,
+    "minLot": true,
+    "shadow": true,
+    "mark": 1.33342,
+    "levelsFrom": "mark",
+    "fillPrice": 1.33334,
+    "slipR": -0.035,
+    "lagSec": 70,
+    "alerted": [
+     "open"
+    ],
+    "stopCheckedAt": "2026-11-10T17:57:13.000Z",
+    "brokerStop": 1.33103
    }
   },
   "day": {
@@ -1402,7 +1457,7 @@
    "startBalance": 10000
   },
   "startedAt": "2026-11-08T11:42:27.000Z",
-  "status": "ok · demo Fusion Markets · balance 10033.15 · 2 open",
+  "status": "ok · demo Fusion Markets · balance 10033.15 · 4 open",
   "skipped": {},
   "wait": {},
   "paused": {},
@@ -1411,7 +1466,7 @@
   "orders": {},
   "catchUpAt": "2026-11-08T12:04:46.000Z",
   "balance": 10033.15,
-  "lastRun": "2026-11-10T17:54:40.000Z"
+  "lastRun": "2026-11-10T17:57:13.000Z"
  },
  "log": [
   {
@@ -1976,6 +2031,16 @@
    "at": "2026-11-10T17:46:29.000Z",
    "msg": "opened sell USDCAD 0.01 lot (council replica)",
    "trade": "usdcad-replica-1794332716-s"
+  },
+  {
+   "at": "2026-11-10T17:57:13.000Z",
+   "msg": "opened buy BTCUSD 0.01 lot (council replica)",
+   "trade": "btc-replica-1794333363-b"
+  },
+  {
+   "at": "2026-11-10T17:57:13.000Z",
+   "msg": "opened buy GBPUSD 0.01 lot (council replica)",
+   "trade": "gbpusd-replica-1794333363-b"
   }
  ],
  "limits": {
@@ -2054,11 +2119,11 @@
   ]
  },
  "execution": {
-  "n": 48,
-  "meanSlipR": 0.107,
+  "n": 50,
+  "meanSlipR": 0.104,
   "medianSlipR": 0.036,
   "worstSlipR": 1.236,
-  "medianLagSec": 96,
+  "medianLagSec": 81,
   "bySymbol": {
    "SOLUSD": {
     "n": 9,
@@ -2073,8 +2138,8 @@
     "meanSlipR": 0.128
    },
    "BTCUSD": {
-    "n": 7,
-    "meanSlipR": -0.019
+    "n": 8,
+    "meanSlipR": -0.009
    },
    "USDCAD": {
     "n": 6,
@@ -2085,8 +2150,8 @@
     "meanSlipR": 0.055
    },
    "GBPUSD": {
-    "n": 1,
-    "meanSlipR": 0.174
+    "n": 2,
+    "meanSlipR": 0.069
    },
    "USDCHF": {
     "n": 3,
