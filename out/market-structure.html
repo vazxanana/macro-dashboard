@@ -13499,6 +13499,10 @@ html[data-role="public"] .cx-tog { display: none !important; }
 #v-scanner .ms-al.ok { color: color-mix(in srgb, var(--buy) 70%, var(--ink)); } #v-scanner .ms-al.against { color: color-mix(in srgb, var(--sell) 70%, var(--ink)); }
 :root[data-theme="light"] #v-scanner .ms-al.ok { color: #056152; } :root[data-theme="light"] #v-scanner .ms-al.against { color: #b0172b; }
 #v-scanner .ms-srow .err { animation: none; color: var(--ink-dim); }   /* the waiting row pulsed forever; it now just reads "waiting" */
+/* no endless animation in these views: loaders, skeleton rows and live dots run a few cycles, then rest (a feed that never answers
+   used to keep the scanner's skeleton rows shimmering forever) */
+:is(#v-council, #v-journal, #v-ict, #v-lit, #v-sdv, #v-gold, #v-scanner, #v-crypto, #v-profile, #v-users) :is(.srow-skel i, .is-loading, [data-loading="1"], .ct-live-dot, .md-smile .halo) { animation-iteration-count: 3; }
+#v-council td.st-pend::before { animation-iteration-count: 3; }
 :root[data-theme="light"] :is(#v-journal, #v-ict, #v-lit, #v-sdv, #v-gold, #v-scanner, #v-crypto, #v-profile, #v-users) { --buy: #067562; --sell: #c2203d; --ink-faint: #5f6673; }
 :root[data-theme="light"] #v-scanner .pr-c.up { color: #067562 !important; } :root[data-theme="light"] #v-scanner .pr-c.dn { color: #c2203d !important; }
 :root:not([data-theme="light"]) #v-scanner .pr-c.dn { color: #ff7a86 !important; } :root:not([data-theme="light"]) #v-scanner .pr-c.up { color: #35c9a0 !important; }
