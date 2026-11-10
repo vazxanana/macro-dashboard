@@ -1857,7 +1857,8 @@
     "adopted": false,
     "alerted": [
      "open",
-     "amend"
+     "amend",
+     "close"
     ],
     "viaLimit": true,
     "limitPrice": 1.4089,
@@ -1871,10 +1872,11 @@
     "lagSec": 214,
     "positionId": "47605841",
     "volume": 200000,
-    "status": "open",
+    "status": "closed at broker",
     "rr": 3.98,
     "amended": 4,
-    "amendedAt": "2026-11-09T18:07:24.000Z"
+    "amendedAt": "2026-11-09T18:07:24.000Z",
+    "closedAt": "2026-11-10T09:56:12.000Z"
    },
    "usdcad-rscalp-1794223067": {
     "symbol": "USDCAD",
@@ -4298,7 +4300,7 @@
    "startBalance": 9975.42
   },
   "startedAt": "2026-11-08T11:42:25.000Z",
-  "status": "ok · demo Fusion Markets · balance 9916.09 · 20 open · 1 resting",
+  "status": "ok · demo Fusion Markets · balance 9922.99 · 19 open · 1 resting",
   "skipped": {
    "audusd-position-1793601653": "price 0.68666 has run 1.27R from the council entry 0.70162: a different trade now",
    "xrp-rswing-1793942619": "none of XRPUSD found at the broker",
@@ -4336,15 +4338,10 @@
    }
   },
   "catchUpAt": "2026-11-08T12:04:40.000Z",
-  "balance": 9916.09,
-  "lastRun": "2026-11-10T09:53:43.000Z"
+  "balance": 9922.99,
+  "lastRun": "2026-11-10T09:56:12.000Z"
  },
  "log": [
-  {
-   "at": "2026-11-09T15:12:05.000Z",
-   "msg": "moved XAUUSD 47603258 protection: stop 4092.355 -> 4090.69, target 4135.1 -> 4133.435 (council scalp)",
-   "trade": "xau-scalp-1794222860"
-  },
   {
    "at": "2026-11-09T15:12:05.000Z",
    "msg": "moved XAUUSD 47612512 protection: stop 4102.675 -> 4101.01, target 4135.1 -> 4133.435 (council m30m1)",
@@ -5839,6 +5836,11 @@
    "at": "2026-11-10T09:51:19.000Z",
    "msg": "limit filled: USDCAD position 47990251 at the broker",
    "trade": "usdcad-intraday-1794304066"
+  },
+  {
+   "at": "2026-11-10T09:56:12.000Z",
+   "msg": "USDCAD position 47605841 closed at the broker",
+   "trade": "usdcad-intraday-1794223067"
   }
  ],
  "limits": {
